@@ -15,8 +15,8 @@ CREATE TABLE Article (
   linkURL text,
   attachment varchar(255) default NULL,
   convertCarriageReturns int(11) NOT NULL default '0',
-  alignImage varchar(30) NOT NULL default 'left',
   allowDiscussion int(11) NOT NULL default '0',
+  templateId int(11) NOT NULL default '1',
   PRIMARY KEY  (wobjectId)
 ) TYPE=MyISAM;
 
@@ -25,7 +25,7 @@ CREATE TABLE Article (
 --
 
 
-INSERT INTO Article VALUES (-2,NULL,'','',NULL,0,'right',0);
+INSERT INTO Article VALUES (-2,NULL,'','',NULL,0,0,1);
 
 --
 -- Table structure for table 'EventsCalendar'
@@ -547,6 +547,7 @@ CREATE TABLE Survey (
   groupToTakeSurvey int(11) default NULL,
   groupToViewReports int(11) default NULL,
   mode varchar(30) default NULL,
+  Survey_id int(11) NOT NULL default '0',
   PRIMARY KEY  (wobjectId)
 ) TYPE=MyISAM;
 
@@ -561,7 +562,7 @@ CREATE TABLE Survey (
 --
 
 CREATE TABLE Survey_answer (
-  wobjectId int(11) NOT NULL default '0',
+  Survey_id int(11) default NULL,
   Survey_questionId int(11) NOT NULL default '0',
   Survey_answerId int(11) NOT NULL default '0',
   sequenceNumber int(11) NOT NULL default '1',
@@ -582,7 +583,7 @@ CREATE TABLE Survey_answer (
 --
 
 CREATE TABLE Survey_question (
-  wobjectId int(11) NOT NULL default '0',
+  Survey_id int(11) default NULL,
   Survey_questionId int(11) NOT NULL default '0',
   question text,
   sequenceNumber int(11) NOT NULL default '1',
@@ -603,7 +604,7 @@ CREATE TABLE Survey_question (
 --
 
 CREATE TABLE Survey_response (
-  wobjectId int(11) NOT NULL default '0',
+  Survey_id int(11) default NULL,
   Survey_questionId int(11) NOT NULL default '0',
   Survey_answerId int(11) NOT NULL default '0',
   Survey_responseId int(11) NOT NULL default '0',
@@ -706,6 +707,47 @@ CREATE TABLE WobjectProxy (
 
 
 --
+-- Table structure for table 'collateral'
+--
+
+CREATE TABLE collateral (
+  collateralId int(11) NOT NULL default '0',
+  name varchar(128) NOT NULL default 'untitled',
+  filename varchar(255) default NULL,
+  parameters varchar(255) default NULL,
+  userId int(11) default NULL,
+  username varchar(128) default NULL,
+  dateUploaded int(11) default NULL,
+  collateralFolderId int(11) NOT NULL default '0',
+  collateralType varchar(30) NOT NULL default 'image',
+  PRIMARY KEY  (collateralId)
+) TYPE=MyISAM;
+
+--
+-- Dumping data for table 'collateral'
+--
+
+
+
+--
+-- Table structure for table 'collateralFolder'
+--
+
+CREATE TABLE collateralFolder (
+  collateralFolderId int(11) NOT NULL default '0',
+  name varchar(128) NOT NULL default 'untitled',
+  parentId int(11) NOT NULL default '0',
+  description varchar(255) default NULL
+) TYPE=MyISAM;
+
+--
+-- Dumping data for table 'collateralFolder'
+--
+
+
+INSERT INTO collateralFolder VALUES (0,'Root',0,'Top level');
+
+--
 -- Table structure for table 'discussion'
 --
 
@@ -728,6 +770,21 @@ CREATE TABLE discussion (
 
 --
 -- Dumping data for table 'discussion'
+--
+
+
+
+--
+-- Table structure for table 'groupGroupings'
+--
+
+CREATE TABLE groupGroupings (
+  groupId int(11) NOT NULL default '0',
+  inGroup int(11) NOT NULL default '0'
+) TYPE=MyISAM;
+
+--
+-- Dumping data for table 'groupGroupings'
 --
 
 
@@ -801,9 +858,7 @@ CREATE TABLE help (
 
 
 INSERT INTO help VALUES (20,'WebGUI',670,625,'26,WebGUI;');
-INSERT INTO help VALUES (1,'FileManager',61,71,'2,DownloadManager;21,WebGUI;');
-INSERT INTO help VALUES (23,'WebGUI',673,628,'26,WebGUI;');
-INSERT INTO help VALUES (26,'WebGUI',676,631,'36,WebGUI;20,WebGUI;23,WebGUI;');
+INSERT INTO help VALUES (1,'FileManager',61,71,'2,FileManager;21,WebGUI;');
 INSERT INTO help VALUES (28,'WebGUI',678,633,'1,WebGUI;3,WebGUI;');
 INSERT INTO help VALUES (31,'WebGUI',681,636,'30,WebGUI;1,WebGUI;3,WebGUI;');
 INSERT INTO help VALUES (30,'WebGUI',680,635,'31,WebGUI;');
@@ -820,7 +875,7 @@ INSERT INTO help VALUES (1,'SyndicatedContent',61,71,'21,WebGUI;');
 INSERT INTO help VALUES (1,'EventsCalendar',61,71,'2,EventsCalendar;21,WebGUI;');
 INSERT INTO help VALUES (1,'MessageBoard',61,71,'21,WebGUI;');
 INSERT INTO help VALUES (1,'LinkList',61,71,'2,LinkList;21,WebGUI;');
-INSERT INTO help VALUES (21,'WebGUI',671,626,'1,Article;1,DownloadManager;1,EventsCalendar;1,ExtraColumn;1,FAQ;1,Item;1,LinkList;19,WebGUI;1,MailForm;1,MessageBoard;1,Poll;1,Product;1,SiteMap;1,SQLReport;18,WebGUI;1,SyndicatedContent;1,UserSubmission;1,WobjectProxy;27,WebGUI;14,WebGUI;');
+INSERT INTO help VALUES (21,'WebGUI',671,626,'1,Article;1,FileManager;1,EventsCalendar;1,ExtraColumn;1,FAQ;1,Item;1,LinkList;19,WebGUI;1,MailForm;1,MessageBoard;1,Poll;1,Product;1,SiteMap;1,SQLReport;18,WebGUI;1,SyndicatedContent;1,USS;1,WobjectProxy;27,WebGUI;14,WebGUI;');
 INSERT INTO help VALUES (1,'Article',61,71,'21,WebGUI;');
 INSERT INTO help VALUES (1,'ExtraColumn',61,71,'21,WebGUI;');
 INSERT INTO help VALUES (27,'WebGUI',677,632,'21,WebGUI;');
@@ -850,12 +905,11 @@ INSERT INTO help VALUES (35,'WebGUI',685,640,'33,WebGUI;');
 INSERT INTO help VALUES (19,'WebGUI',669,624,'9,WebGUI;21,WebGUI;');
 INSERT INTO help VALUES (1,'MailForm',61,71,'21,WebGUI;');
 INSERT INTO help VALUES (2,'MailForm',62,72,'1,MailForm;');
-INSERT INTO help VALUES (36,'WebGUI',686,641,'26,WebGUI;');
-INSERT INTO help VALUES (2,'FileManager',72,73,'1,DownloadManager;');
+INSERT INTO help VALUES (2,'FileManager',72,73,'1,FileManager;');
 INSERT INTO help VALUES (2,'EventsCalendar',72,73,'1,EventsCalendar;');
 INSERT INTO help VALUES (2,'FAQ',72,73,'1,FAQ;');
 INSERT INTO help VALUES (2,'LinkList',72,73,'1,LinkList;');
-INSERT INTO help VALUES (47,'WebGUI',697,698,'1,Article;17,WebGUI;1,MessageBoard;1,Poll;2,WebGUI;1,UserSubmission;');
+INSERT INTO help VALUES (47,'WebGUI',697,698,'1,Article;17,WebGUI;1,MessageBoard;1,Poll;2,WebGUI;1,USS;');
 INSERT INTO help VALUES (1,'WobjectProxy',5,6,'21,WebGUI;');
 INSERT INTO help VALUES (1,'Product',38,39,'5,Product;4,Product;6,Product;2,Product;3,Product;7,Product;21,WebGUI;');
 INSERT INTO help VALUES (2,'Product',40,41,'6,Product;1,Product;');
@@ -866,46 +920,7 @@ INSERT INTO help VALUES (48,'WebGUI',708,709,'12,WebGUI;');
 INSERT INTO help VALUES (6,'Product',49,50,'2,Product;1,Product;');
 INSERT INTO help VALUES (7,'Product',62,63,'1,Product;');
 INSERT INTO help VALUES (1,'Survey',3,4,'21,WebGUI;');
-
---
--- Table structure for table 'imageGroup'
---
-
-CREATE TABLE imageGroup (
-  imageGroupId int(11) NOT NULL default '0',
-  name varchar(128) NOT NULL default 'untitled',
-  parentId int(11) NOT NULL default '0',
-  description varchar(255) default NULL
-) TYPE=MyISAM;
-
---
--- Dumping data for table 'imageGroup'
---
-
-
-INSERT INTO imageGroup VALUES (0,'Root',0,'Top level');
-
---
--- Table structure for table 'images'
---
-
-CREATE TABLE images (
-  imageId int(11) NOT NULL default '0',
-  name varchar(128) NOT NULL default 'untitled',
-  filename varchar(255) default NULL,
-  parameters varchar(255) default NULL,
-  userId int(11) default NULL,
-  username varchar(128) default NULL,
-  dateUploaded int(11) default NULL,
-  imageGroupId int(11) NOT NULL default '0',
-  PRIMARY KEY  (imageId)
-) TYPE=MyISAM;
-
---
--- Dumping data for table 'images'
---
-
-
+INSERT INTO help VALUES (49,'WebGUI',785,786,NULL);
 
 --
 -- Table structure for table 'incrementer'
@@ -923,7 +938,7 @@ CREATE TABLE incrementer (
 
 
 INSERT INTO incrementer VALUES ('groupId',26);
-INSERT INTO incrementer VALUES ('messageId',1000);
+INSERT INTO incrementer VALUES ('messageId',100000);
 INSERT INTO incrementer VALUES ('pageId',1000);
 INSERT INTO incrementer VALUES ('styleId',1000);
 INSERT INTO incrementer VALUES ('userId',26);
@@ -935,10 +950,10 @@ INSERT INTO incrementer VALUES ('USS_submissionId',1);
 INSERT INTO incrementer VALUES ('EventsCalendar_recurringEventId',1000);
 INSERT INTO incrementer VALUES ('messageLogId',1000);
 INSERT INTO incrementer VALUES ('FileManager_fileId',1);
-INSERT INTO incrementer VALUES ('imageId',1);
+INSERT INTO incrementer VALUES ('collateralId',1);
 INSERT INTO incrementer VALUES ('profileCategoryId',1000);
 INSERT INTO incrementer VALUES ('templateId',1000);
-INSERT INTO incrementer VALUES ('imageGroupId',1000);
+INSERT INTO incrementer VALUES ('collateralFolderId',1000);
 INSERT INTO incrementer VALUES ('Product_featureId',1000);
 INSERT INTO incrementer VALUES ('Product_specificationId',1000);
 INSERT INTO incrementer VALUES ('languageId',1000);
@@ -948,6 +963,7 @@ INSERT INTO incrementer VALUES ('Product_benefitId',1000);
 INSERT INTO incrementer VALUES ('Survey_answerId',1000);
 INSERT INTO incrementer VALUES ('Survey_questionId',1000);
 INSERT INTO incrementer VALUES ('Survey_responseId',1000);
+INSERT INTO incrementer VALUES ('Survey_id',1000);
 
 --
 -- Table structure for table 'international'
@@ -1025,7 +1041,7 @@ INSERT INTO international VALUES (2,'Item',1,'Attachment',1031514049);
 INSERT INTO international VALUES (16,'SQLReport',3,'Debug?',1031516049);
 INSERT INTO international VALUES (2,'LinkList',1,'Line Spacing',1031514049);
 INSERT INTO international VALUES (2,'LinkList',5,'Espaço entre linhas',1031510000);
-INSERT INTO international VALUES (1,'Article',10,'Artikel',1031510000);
+INSERT INTO international VALUES (1,'Article',10,'Artikkel',1032469833);
 INSERT INTO international VALUES (2,'MessageBoard',1,'Message Board',1031514049);
 INSERT INTO international VALUES (2,'MessageBoard',4,'Table de Mensages',1031510000);
 INSERT INTO international VALUES (2,'MessageBoard',5,'Quadro de mensagens',1031510000);
@@ -1353,24 +1369,24 @@ INSERT INTO international VALUES (18,'Article',3,'Discussie toelaten?',103151604
 INSERT INTO international VALUES (10,'WebGUI',1,'Manage trash.',1031514049);
 INSERT INTO international VALUES (10,'WebGUI',4,'Ver Papelera',1031510000);
 INSERT INTO international VALUES (10,'WebGUI',5,'Ver o caixote do lixo.',1031510000);
-INSERT INTO international VALUES (17,'Article',3,'Centreren',1031516049);
 INSERT INTO international VALUES (11,'Article',1,'(Select \"Yes\" only if you aren\'t adding &lt;br&gt; manually.)',1031514049);
 INSERT INTO international VALUES (11,'Article',4,'(marque si no está agregando &lt;br&gt; manualmente.)',1031510000);
 INSERT INTO international VALUES (11,'Article',5,'(escolher se não adicionar &lt;br&gt; manualmente.)',1031510000);
-INSERT INTO international VALUES (392,'WebGUI',2,'Sind Sie sicher,\ndass Sie diese Grafik löschen wollen?',1031510000);
+INSERT INTO international VALUES (590,'WebGUI',10,'Sprog ID',1037205552);
+INSERT INTO international VALUES (589,'WebGUI',10,'Redigér sprog.',1037205536);
 INSERT INTO international VALUES (58,'Product',1,'Edit Product Template',1031514049);
 INSERT INTO international VALUES (707,'WebGUI',1,'Show debugging?',1031514049);
 INSERT INTO international VALUES (78,'EventsCalendar',1,'Don\'t delete anything, I made a mistake.',1031514049);
-INSERT INTO international VALUES (393,'WebGUI',2,'Grafiken\nverwalten',1031510000);
+INSERT INTO international VALUES (780,'WebGUI',1,'File',1036912946);
 INSERT INTO international VALUES (2,'EventsCalendar',6,'Händelsekalender',1032259717);
 INSERT INTO international VALUES (2,'Article',6,'Lägg till artikel',1031510000);
 INSERT INTO international VALUES (1,'WebGUI',6,'Lägg till innehåll...',1031648961);
 INSERT INTO international VALUES (1,'USS',6,'Vem kan validera?',1031510000);
-INSERT INTO international VALUES (16,'Article',3,'links',1031516049);
+INSERT INTO international VALUES (772,'WebGUI',1,'Edit File',1036893140);
 INSERT INTO international VALUES (11,'MessageBoard',1,'Back To Message List',1031514049);
 INSERT INTO international VALUES (11,'MessageBoard',4,'Volver a la Lista de Mensages',1031510000);
 INSERT INTO international VALUES (11,'MessageBoard',5,'Voltar á lista de mensagens',1031510000);
-INSERT INTO international VALUES (15,'Article',3,'Rechts',1031516049);
+INSERT INTO international VALUES (767,'WebGUI',1,'Collateral Id',1036892929);
 INSERT INTO international VALUES (11,'SQLReport',1,'<b>Debug:</b> Error: There was a problem with the query.',1031514049);
 INSERT INTO international VALUES (11,'SQLReport',4,'Error: Hay un problema con la consulta.',1031510000);
 INSERT INTO international VALUES (11,'SQLReport',5,'Erro: Houve um problema com a query.',1031510000);
@@ -1378,7 +1394,7 @@ INSERT INTO international VALUES (391,'WebGUI',2,'Anhang löschen',1031510000);
 INSERT INTO international VALUES (1,'SQLReport',6,'SQL Rapport',1031510000);
 INSERT INTO international VALUES (1,'SiteMap',6,'Lägg till site-karta',1031579426);
 INSERT INTO international VALUES (1,'Poll',6,'Fråga',1031510000);
-INSERT INTO international VALUES (14,'Article',3,'Plaatje uitlijnen',1031516049);
+INSERT INTO international VALUES (763,'WebGUI',1,'Add a snippet.',1036892785);
 INSERT INTO international VALUES (11,'WebGUI',1,'Empy trash.',1031514049);
 INSERT INTO international VALUES (11,'WebGUI',4,'Vaciar Papelera',1031510000);
 INSERT INTO international VALUES (11,'WebGUI',5,'Esvaziar o caixote do lixo.',1031510000);
@@ -1397,12 +1413,12 @@ INSERT INTO international VALUES (353,'WebGUI',3,'U heeft nu geen berichten log 
 INSERT INTO international VALUES (12,'MessageBoard',1,'Edit Message',1031514049);
 INSERT INTO international VALUES (12,'MessageBoard',4,'Editar mensage',1031510000);
 INSERT INTO international VALUES (12,'MessageBoard',5,'Modificar mensagem',1031510000);
-INSERT INTO international VALUES (390,'WebGUI',2,'Grafik anzeigen\n...',1031510000);
+INSERT INTO international VALUES (807,'WebGUI',1,'Manage the groups in this group.',1037579473);
 INSERT INTO international VALUES (352,'WebGUI',3,'Datum van toevoeging',1031516049);
 INSERT INTO international VALUES (12,'SQLReport',1,'<b>Debug:</b> Error: Could not connect to the database.',1031514049);
 INSERT INTO international VALUES (12,'SQLReport',4,'Error: No se puede conectar a la base de datos.',1031510000);
 INSERT INTO international VALUES (12,'SQLReport',5,'Erro: Não é possível ligar á base de dados.',1031510000);
-INSERT INTO international VALUES (389,'WebGUI',2,'Grafik Id',1031510000);
+INSERT INTO international VALUES (702,'WebGUI',10,'måned(er)',1036855955);
 INSERT INTO international VALUES (350,'WebGUI',3,'Klaar',1031516049);
 INSERT INTO international VALUES (351,'WebGUI',3,'Bericht',1031516049);
 INSERT INTO international VALUES (12,'USS',1,'(Uncheck if you\'re writing an HTML submission.)',1031514049);
@@ -1436,12 +1452,12 @@ INSERT INTO international VALUES (386,'WebGUI',2,'Bild\nbearbeiten',1031510000);
 INSERT INTO international VALUES (13,'WebGUI',1,'View help index.',1031514049);
 INSERT INTO international VALUES (13,'WebGUI',4,'Ver índice de Ayuda',1031510000);
 INSERT INTO international VALUES (13,'WebGUI',5,'Ver o indice da ajuda.',1031510000);
-INSERT INTO international VALUES (14,'Article',1,'Align Image',1031514049);
+INSERT INTO international VALUES (761,'WebGUI',1,'Add an image.',1036892765);
 INSERT INTO international VALUES (384,'WebGUI',2,'Datei',1031510000);
 INSERT INTO international VALUES (516,'WebGUI',1,'Turn Admin On!',1031514049);
 INSERT INTO international VALUES (517,'WebGUI',1,'Turn Admin Off!',1031514049);
 INSERT INTO international VALUES (515,'WebGUI',1,'Add edit stamp to posts?',1031514049);
-INSERT INTO international VALUES (383,'WebGUI',2,'Name',1031510000);
+INSERT INTO international VALUES (686,'WebGUI',10,'Image gruppe, Tilføj',1036856023);
 INSERT INTO international VALUES (14,'USS',1,'Status',1031514049);
 INSERT INTO international VALUES (14,'USS',4,'Estado',1031510000);
 INSERT INTO international VALUES (14,'USS',5,'Estado',1031510000);
@@ -2384,9 +2400,8 @@ INSERT INTO international VALUES (22,'FileManager',1,'Proceed to add download?',
 INSERT INTO international VALUES (14,'FileManager',1,'File',1031514049);
 INSERT INTO international VALUES (15,'FileManager',1,'Description',1031514049);
 INSERT INTO international VALUES (16,'FileManager',1,'Date Uploaded',1031514049);
-INSERT INTO international VALUES (15,'Article',1,'Right',1031514049);
-INSERT INTO international VALUES (16,'Article',1,'Left',1031514049);
-INSERT INTO international VALUES (17,'Article',1,'Center',1031514049);
+INSERT INTO international VALUES (766,'WebGUI',1,'Back to collateral list.',1036892898);
+INSERT INTO international VALUES (770,'WebGUI',1,'Edit Snippet',1036893050);
 INSERT INTO international VALUES (37,'USS',1,'Delete',1031514049);
 INSERT INTO international VALUES (13,'SQLReport',1,'Convert carriage returns?',1031514049);
 INSERT INTO international VALUES (17,'FileManager',1,'Alternate Version #1',1031514049);
@@ -2400,21 +2415,19 @@ INSERT INTO international VALUES (16,'EventsCalendar',1,'Calendar Layout',103151
 INSERT INTO international VALUES (17,'EventsCalendar',1,'List',1031514049);
 INSERT INTO international VALUES (18,'EventsCalendar',1,'Calendar Month',1031514049);
 INSERT INTO international VALUES (19,'EventsCalendar',1,'Paginate After',1031514049);
-INSERT INTO international VALUES (383,'WebGUI',1,'Name',1031514049);
 INSERT INTO international VALUES (384,'WebGUI',1,'File',1031514049);
 INSERT INTO international VALUES (385,'WebGUI',1,'Parameters',1031514049);
 INSERT INTO international VALUES (386,'WebGUI',1,'Edit Image',1031514049);
 INSERT INTO international VALUES (387,'WebGUI',1,'Uploaded By',1031514049);
 INSERT INTO international VALUES (388,'WebGUI',1,'Upload Date',1031514049);
-INSERT INTO international VALUES (389,'WebGUI',1,'Image Id',1031514049);
-INSERT INTO international VALUES (390,'WebGUI',1,'Displaying Image...',1031514049);
+INSERT INTO international VALUES (703,'WebGUI',10,'år',1036855939);
 INSERT INTO international VALUES (391,'WebGUI',1,'Delete attached file.',1031514049);
-INSERT INTO international VALUES (392,'WebGUI',1,'Are you certain that you wish to delete this image?',1031514049);
-INSERT INTO international VALUES (393,'WebGUI',1,'Manage Images',1031514049);
-INSERT INTO international VALUES (394,'WebGUI',1,'Manage images.',1031514049);
+INSERT INTO international VALUES (588,'WebGUI',10,'Er du sikker på at du vil indsende denne oversættelse til Plain Black for de kan inkludere den i den officielle distribution af WebGUI?.\r\nHvis du klikker på ja betyder det, at du giver Plain Black alle rettigheder til oversættelsen.',1037205505);
+INSERT INTO international VALUES (779,'WebGUI',1,'Image',1036912938);
+INSERT INTO international VALUES (394,'WebGUI',1,'Manage collateral.',1036954925);
 INSERT INTO international VALUES (395,'WebGUI',1,'Add a new image.',1031514049);
-INSERT INTO international VALUES (396,'WebGUI',1,'View Image',1031514049);
-INSERT INTO international VALUES (397,'WebGUI',1,'Back to image list.',1031514049);
+INSERT INTO international VALUES (723,'WebGUI',10,'Undertrykt',1036855601);
+INSERT INTO international VALUES (715,'WebGUI',10,'Rediriger URL',1036855743);
 INSERT INTO international VALUES (398,'WebGUI',1,'Document Type Declaration',1031514049);
 INSERT INTO international VALUES (399,'WebGUI',1,'Validate this page.',1031514049);
 INSERT INTO international VALUES (400,'WebGUI',1,'Prevent Proxy Caching',1031514049);
@@ -2681,21 +2694,20 @@ INSERT INTO international VALUES (16,'FileManager',2,'Upload\nDatum',1031510000)
 INSERT INTO international VALUES (16,'EventsCalendar',2,'Kalender\nLayout',1031510000);
 INSERT INTO international VALUES (16,'SQLReport',2,'debuggen?',1031510000);
 INSERT INTO international VALUES (16,'MessageBoard',2,'Datum',1031510000);
-INSERT INTO international VALUES (17,'Article',2,'Zentrum',1031510000);
+INSERT INTO international VALUES (774,'WebGUI',1,'Are you certain you wish to delete this collateral? It cannot be recovered once deleted.',1036902945);
 INSERT INTO international VALUES (15,'USS',2,'Bearbeiten/Löschen',1031510000);
 INSERT INTO international VALUES (15,'WebGUI',2,'Januar',1031510000);
-INSERT INTO international VALUES (16,'Article',2,'Links',1031510000);
+INSERT INTO international VALUES (771,'WebGUI',1,'Snippet',1036893079);
 INSERT INTO international VALUES (15,'SQLReport',2,'Sollen die\nMakros in der Abfrage vorverarbeitet werden?',1031510000);
 INSERT INTO international VALUES (15,'MessageBoard',2,'Autor',1031510000);
 INSERT INTO international VALUES (15,'EventsCalendar',2,'Ende\nDatum',1031510000);
 INSERT INTO international VALUES (14,'WebGUI',2,'Ausstehende\nBeiträge anschauen',1031510000);
 INSERT INTO international VALUES (15,'FileManager',2,'Beschreibung',1031510000);
-INSERT INTO international VALUES (15,'Article',2,'Rechts',1031510000);
 INSERT INTO international VALUES (14,'USS',2,'Status',1031510000);
 INSERT INTO international VALUES (14,'SQLReport',2,'Später mit\nSeitenzahlen versehen',1031510000);
 INSERT INTO international VALUES (14,'EventsCalendar',2,'Start\nDatum',1031510000);
 INSERT INTO international VALUES (14,'FileManager',2,'Datei',1031510000);
-INSERT INTO international VALUES (14,'Article',2,'Anhang\nherunterladen',1031510000);
+INSERT INTO international VALUES (762,'WebGUI',1,'Add a file.',1036892774);
 INSERT INTO international VALUES (13,'WebGUI',2,'Hilfe anschauen',1031510000);
 INSERT INTO international VALUES (13,'USS',2,'Erstellungsdatum',1031510000);
 INSERT INTO international VALUES (13,'SQLReport',2,'Carriage Return\nbeachten?',1031510000);
@@ -2835,7 +2847,6 @@ INSERT INTO international VALUES (13,'LinkList',6,'Lägg till en ny länk.',103151
 INSERT INTO international VALUES (577,'WebGUI',6,'Skicka svar',1031510000);
 INSERT INTO international VALUES (13,'USS',6,'Inlagt den',1031510000);
 INSERT INTO international VALUES (13,'WebGUI',6,'Visa hjälpindex.',1031510000);
-INSERT INTO international VALUES (14,'Article',6,'Justera bild',1031841948);
 INSERT INTO international VALUES (514,'WebGUI',1,'Views',1031514049);
 INSERT INTO international VALUES (14,'USS',6,'Status',1031510000);
 INSERT INTO international VALUES (14,'WebGUI',6,'Visa väntande meddelanden.',1031510000);
@@ -3119,9 +3130,8 @@ INSERT INTO international VALUES (13,'FileManager',6,'Radera',1031510000);
 INSERT INTO international VALUES (14,'FileManager',6,'Fil',1031510000);
 INSERT INTO international VALUES (15,'FileManager',6,'Beskrivning',1031510000);
 INSERT INTO international VALUES (16,'FileManager',6,'Uppladdat den',1032859243);
-INSERT INTO international VALUES (15,'Article',6,'Höger',1031510000);
-INSERT INTO international VALUES (16,'Article',6,'Vänster',1031510000);
-INSERT INTO international VALUES (17,'Article',6,'Centrera',1031510000);
+INSERT INTO international VALUES (768,'WebGUI',1,'Name',1036892946);
+INSERT INTO international VALUES (773,'WebGUI',1,'File',1036893165);
 INSERT INTO international VALUES (37,'USS',6,'Radera',1031510000);
 INSERT INTO international VALUES (13,'SQLReport',6,'Konvertera radbrytning?',1031510000);
 INSERT INTO international VALUES (17,'FileManager',6,'Alternativ version #1',1032859401);
@@ -3136,21 +3146,20 @@ INSERT INTO international VALUES (17,'EventsCalendar',6,'Lista',1031510000);
 INSERT INTO international VALUES (18,'EventsCalendar',6,'Kalendermånad',1031649486);
 INSERT INTO international VALUES (19,'EventsCalendar',6,'Sidbrytning efter',1031510000);
 INSERT INTO international VALUES (354,'WebGUI',1,'View Inbox.',1031514049);
-INSERT INTO international VALUES (383,'WebGUI',6,'Namn',1031510000);
+INSERT INTO international VALUES (685,'WebGUI',10,'Skabelon, Slet',1036856042);
 INSERT INTO international VALUES (384,'WebGUI',6,'Fil',1031510000);
 INSERT INTO international VALUES (385,'WebGUI',6,'Parametrar',1031510000);
 INSERT INTO international VALUES (386,'WebGUI',6,'Redigera bild',1031581152);
 INSERT INTO international VALUES (387,'WebGUI',6,'Uppladdat av',1031581166);
 INSERT INTO international VALUES (388,'WebGUI',6,'Uppladdat den',1031581182);
-INSERT INTO international VALUES (389,'WebGUI',6,'Bild-ID',1031581500);
-INSERT INTO international VALUES (390,'WebGUI',6,'Visar bild...',1031510000);
+INSERT INTO international VALUES (699,'WebGUI',10,'Første dag i ugen',1036855969);
+INSERT INTO international VALUES (808,'WebGUI',1,'Email this group.',1037579487);
 INSERT INTO international VALUES (391,'WebGUI',6,'Radera',1031510000);
-INSERT INTO international VALUES (392,'WebGUI',6,'Är du säker på att du vill radera denna bild?',1031510000);
-INSERT INTO international VALUES (393,'WebGUI',6,'Hantera bilder',1031582466);
+INSERT INTO international VALUES (592,'WebGUI',10,'Karakter sæt',1037205577);
+INSERT INTO international VALUES (782,'WebGUI',1,'Any',1036913053);
 INSERT INTO international VALUES (394,'WebGUI',6,'Hantera bilder.',1031510000);
 INSERT INTO international VALUES (395,'WebGUI',6,'Lägg till en ny bild.',1031510000);
-INSERT INTO international VALUES (396,'WebGUI',6,'Visa bild',1031510000);
-INSERT INTO international VALUES (397,'WebGUI',6,'Tillbaka till bildlistan.',1031510000);
+INSERT INTO international VALUES (720,'WebGUI',10,'OK',1036855648);
 INSERT INTO international VALUES (398,'WebGUI',6,'Dokumenttypsdeklaration',1032859737);
 INSERT INTO international VALUES (399,'WebGUI',6,'Validera denna sida.',1031510000);
 INSERT INTO international VALUES (400,'WebGUI',6,'Blockera proxy caching',1031582451);
@@ -3286,14 +3295,11 @@ INSERT INTO international VALUES (512,'WebGUI',1,'Next Thread',1031514049);
 INSERT INTO international VALUES (513,'WebGUI',1,'Previous Thread',1031514049);
 INSERT INTO international VALUES (8,'Article',10,'henvisning URL',1031510000);
 INSERT INTO international VALUES (9,'Article',10,'Vis besvarelser',1031510000);
-INSERT INTO international VALUES (10,'Article',10,'Konverter linieskift?',1031510000);
-INSERT INTO international VALUES (11,'Article',10,'\"(Kontroller at du ikke tilføjer &lt;br&gt; manuelt.)\"',1031510000);
+INSERT INTO international VALUES (10,'Article',10,'Konverter linieskift?',1032469845);
+INSERT INTO international VALUES (11,'Article',10,'(Kontroller at du ikke tilføjer <br> manuelt.)',1032469877);
 INSERT INTO international VALUES (12,'Article',10,'rediger artikel',1031510000);
 INSERT INTO international VALUES (13,'Article',10,'Slet',1031510000);
-INSERT INTO international VALUES (14,'Article',10,'Placer billede',1031510000);
-INSERT INTO international VALUES (15,'Article',10,'Højre',1031510000);
-INSERT INTO international VALUES (16,'Article',10,'Venstre',1031510000);
-INSERT INTO international VALUES (17,'Article',10,'Centreret',1031510000);
+INSERT INTO international VALUES (777,'WebGUI',1,'Folder Id',1036905972);
 INSERT INTO international VALUES (18,'Article',10,'Tillad diskussion?',1031510000);
 INSERT INTO international VALUES (3,'Product',1,'Are you certain you wish to delete this feature?',1031514049);
 INSERT INTO international VALUES (22,'Article',10,'Forfatter',1031510000);
@@ -3324,13 +3330,13 @@ INSERT INTO international VALUES (19,'FileManager',10,'Du har ikke nogen filer t
 INSERT INTO international VALUES (20,'FileManager',10,'Slet efter',1031510000);
 INSERT INTO international VALUES (21,'FileManager',10,'Hvis miniature?',1031510000);
 INSERT INTO international VALUES (1,'EventsCalendar',10,'Fortsæt med at tilføje begivenhed?',1031510000);
-INSERT INTO international VALUES (2,'EventsCalendar',10,'Begivenheds kalender',1031510000);
+INSERT INTO international VALUES (2,'EventsCalendar',10,'Begivenheds kalender',1032274027);
 INSERT INTO international VALUES (3,'EventsCalendar',10,'Tilføj begivenheds kalender',1031510000);
 INSERT INTO international VALUES (4,'EventsCalendar',10,'Begivenhed sker én gang',1031510000);
 INSERT INTO international VALUES (700,'WebGUI',10,'dag',1031510000);
 INSERT INTO international VALUES (701,'WebGUI',10,'uge',1031510000);
 INSERT INTO international VALUES (7,'EventsCalendar',10,'Tilføj begivenhed ',1031510000);
-INSERT INTO international VALUES (8,'EventsCalendar',10,'Gentages hver',1031510000);
+INSERT INTO international VALUES (8,'EventsCalendar',10,'Gentages hver',1032274480);
 INSERT INTO international VALUES (9,'EventsCalendar',10,'indtil',1031510000);
 INSERT INTO international VALUES (61,'Product',1,'Product Template',1031514049);
 INSERT INTO international VALUES (12,'EventsCalendar',10,'rediger begivenheds kalender',1031510000);
@@ -3339,42 +3345,42 @@ INSERT INTO international VALUES (14,'EventsCalendar',10,'Fra dato',1031510000);
 INSERT INTO international VALUES (15,'EventsCalendar',10,'Til dato',1031510000);
 INSERT INTO international VALUES (16,'EventsCalendar',10,'Kalender layout',1031510000);
 INSERT INTO international VALUES (17,'EventsCalendar',10,'Liste',1031510000);
-INSERT INTO international VALUES (18,'EventsCalendar',10,'Calendar Month',1031510000);
-INSERT INTO international VALUES (19,'EventsCalendar',10,'Slet efter ',1031510000);
+INSERT INTO international VALUES (18,'EventsCalendar',10,'Kalender måned',1032273971);
+INSERT INTO international VALUES (19,'EventsCalendar',10,'Slet efter ',1032273982);
 INSERT INTO international VALUES (1,'ExtraColumn',10,'Ekstra kolonne',1031510000);
 INSERT INTO international VALUES (2,'ExtraColumn',10,'Tilføj ekstra kolonne',1031510000);
-INSERT INTO international VALUES (3,'ExtraColumn',10,'Mellemrum',1031510000);
-INSERT INTO international VALUES (4,'ExtraColumn',10,'Bredde',1031510000);
-INSERT INTO international VALUES (5,'ExtraColumn',10,'stilarter klasse',1031510000);
-INSERT INTO international VALUES (6,'ExtraColumn',10,'rediger ekstra kolonne',1031510000);
+INSERT INTO international VALUES (3,'ExtraColumn',10,'Mellemrum',1032469898);
+INSERT INTO international VALUES (4,'ExtraColumn',10,'Bredde',1032469906);
+INSERT INTO international VALUES (5,'ExtraColumn',10,'stilarter klasse',1032469915);
+INSERT INTO international VALUES (6,'ExtraColumn',10,'rediger ekstra kolonne',1032469927);
 INSERT INTO international VALUES (74,'FAQ',1,'Template',1036260684);
-INSERT INTO international VALUES (2,'FAQ',10,'Ofte stillede spørgsmål (F.A.Q.)',1031510000);
+INSERT INTO international VALUES (2,'FAQ',10,'Ofte stillede spørgsmål (F.A.Q.)',1032469958);
 INSERT INTO international VALUES (3,'FAQ',10,'Tilføj F.A.Q.',1031510000);
 INSERT INTO international VALUES (4,'FAQ',10,'Tilføj spørgsmål',1031510000);
-INSERT INTO international VALUES (5,'FAQ',10,'Spørgsmål',1031510000);
-INSERT INTO international VALUES (6,'FAQ',10,'Svar',1031510000);
-INSERT INTO international VALUES (7,'FAQ',10,'Er du sikker på du vil slette dette spørgsmål',1031510000);
-INSERT INTO international VALUES (8,'FAQ',10,'Rediger F.A.Q.',1031510000);
-INSERT INTO international VALUES (9,'FAQ',10,'Tilføj nyt spørgsmål',1031510000);
-INSERT INTO international VALUES (10,'FAQ',10,'rediger spørgsmål',1031510000);
-INSERT INTO international VALUES (1,'Item',10,'henvisning URL',1031510000);
-INSERT INTO international VALUES (2,'Item',10,'Vedhæft',1031510000);
-INSERT INTO international VALUES (3,'Item',10,'Slet vedhæft',1031510000);
-INSERT INTO international VALUES (4,'Item',10,'Item',1031510000);
-INSERT INTO international VALUES (5,'Item',10,'Hent vedhæftet',1031510000);
-INSERT INTO international VALUES (1,'LinkList',10,'Indryk',1031510000);
-INSERT INTO international VALUES (2,'LinkList',10,'Linie afstand',1031510000);
-INSERT INTO international VALUES (3,'LinkList',10,'Skal der åbnes i nyt vindue?',1031510000);
-INSERT INTO international VALUES (4,'LinkList',10,'Punkt',1031510000);
-INSERT INTO international VALUES (5,'LinkList',10,'Fortsæt med at tilføje henvisning',1031510000);
-INSERT INTO international VALUES (6,'LinkList',10,'Liste over henvisning',1031510000);
+INSERT INTO international VALUES (5,'FAQ',10,'Spørgsmål',1032469969);
+INSERT INTO international VALUES (6,'FAQ',10,'Svar',1032469976);
+INSERT INTO international VALUES (7,'FAQ',10,'Er du sikker på du vil slette dette spørgsmål?',1032469993);
+INSERT INTO international VALUES (8,'FAQ',10,'Rediger F.A.Q.',1032470003);
+INSERT INTO international VALUES (9,'FAQ',10,'Tilføj nyt spørgsmål',1032470012);
+INSERT INTO international VALUES (10,'FAQ',10,'rediger spørgsmål',1032469946);
+INSERT INTO international VALUES (1,'Item',10,'henvisning til URL',1032470034);
+INSERT INTO international VALUES (2,'Item',10,'Vedhæft',1032470070);
+INSERT INTO international VALUES (3,'Item',10,'Slet vedhæftet',1032470084);
+INSERT INTO international VALUES (4,'Item',10,'Item',1032470093);
+INSERT INTO international VALUES (5,'Item',10,'Hent vedhæftet',1032470104);
+INSERT INTO international VALUES (1,'LinkList',10,'Indryk',1032470114);
+INSERT INTO international VALUES (2,'LinkList',10,'Linie afstand',1032470154);
+INSERT INTO international VALUES (3,'LinkList',10,'Skal der åbnes i nyt vindue?',1032470165);
+INSERT INTO international VALUES (4,'LinkList',10,'Punkt',1032470175);
+INSERT INTO international VALUES (5,'LinkList',10,'Fortsæt med at tilføje henvisning',1032470184);
+INSERT INTO international VALUES (6,'LinkList',10,'Liste over henvisning',1032470193);
 INSERT INTO international VALUES (7,'LinkList',10,'Tilføj henvisning',1031510000);
-INSERT INTO international VALUES (8,'LinkList',10,'URL',1031510000);
-INSERT INTO international VALUES (9,'LinkList',10,'Er du sikker på du vil slette denne henvisning',1031510000);
-INSERT INTO international VALUES (10,'LinkList',10,'Rediger henvisnings liste',1031510000);
+INSERT INTO international VALUES (8,'LinkList',10,'URL',1032470215);
+INSERT INTO international VALUES (9,'LinkList',10,'Er du sikker på du vil slette denne henvisning?',1032470231);
+INSERT INTO international VALUES (10,'LinkList',10,'Rediger henvisnings liste',1032470126);
 INSERT INTO international VALUES (11,'LinkList',10,'Tilføj henvisnings liste',1031510000);
-INSERT INTO international VALUES (12,'LinkList',10,'Rediger henvisning  ',1031510000);
-INSERT INTO international VALUES (13,'LinkList',10,'Tilføj ny henvisning',1031510000);
+INSERT INTO international VALUES (12,'LinkList',10,'Rediger henvisning  ',1032470135);
+INSERT INTO international VALUES (13,'LinkList',10,'Tilføj ny henvisning',1032470146);
 INSERT INTO international VALUES (1,'MessageBoard',10,'Tilføj opslagstavle',1031510000);
 INSERT INTO international VALUES (2,'MessageBoard',10,'Opslagstavle',1031510000);
 INSERT INTO international VALUES (564,'WebGUI',10,'Hvem kan komme med indlæg?',1031510000);
@@ -3385,14 +3391,14 @@ INSERT INTO international VALUES (7,'MessageBoard',10,'Forfatter:',1031510000);
 INSERT INTO international VALUES (8,'MessageBoard',10,'Dato:',1031510000);
 INSERT INTO international VALUES (9,'MessageBoard',10,'Besked nr.:',1031510000);
 INSERT INTO international VALUES (10,'MessageBoard',10,'Forrige tråd',1031510000);
-INSERT INTO international VALUES (11,'MessageBoard',10,'Tilbage til oversigt',1031510000);
-INSERT INTO international VALUES (12,'MessageBoard',10,'Rediger meddelelses',1031510000);
+INSERT INTO international VALUES (11,'MessageBoard',10,'Tilbage til oversigt',1032470244);
+INSERT INTO international VALUES (12,'MessageBoard',10,'Rediger meddelelse',1032470260);
 INSERT INTO international VALUES (577,'WebGUI',10,'Send respons',1031510000);
 INSERT INTO international VALUES (14,'MessageBoard',10,'Næste tråd',1031510000);
-INSERT INTO international VALUES (15,'MessageBoard',10,'Forfatter',1031510000);
-INSERT INTO international VALUES (16,'MessageBoard',10,'Dato',1031510000);
+INSERT INTO international VALUES (15,'MessageBoard',10,'Forfatter',1032470276);
+INSERT INTO international VALUES (16,'MessageBoard',10,'Dato',1032470297);
 INSERT INTO international VALUES (17,'MessageBoard',10,'Ny meddelelse',1031510000);
-INSERT INTO international VALUES (18,'MessageBoard',10,'Tråd startet',1031510000);
+INSERT INTO international VALUES (18,'MessageBoard',10,'Tråd startet',1033508852);
 INSERT INTO international VALUES (19,'MessageBoard',10,'Antal svar',1031510000);
 INSERT INTO international VALUES (20,'MessageBoard',10,'Seneste svar',1031510000);
 INSERT INTO international VALUES (565,'WebGUI',10,'Hvem kan moderere?',1031510000);
@@ -3432,7 +3438,7 @@ INSERT INTO international VALUES (12,'SQLReport',10,'<b>Debug:</b> Error: Could 
 INSERT INTO international VALUES (13,'SQLReport',10,'Konverter linieskift?',1031510000);
 INSERT INTO international VALUES (14,'SQLReport',10,'Slet efter',1031510000);
 INSERT INTO international VALUES (15,'SQLReport',10,'Udfør makroer ved forespørgsel?',1031510000);
-INSERT INTO international VALUES (16,'SQLReport',10,'Debut?',1031510000);
+INSERT INTO international VALUES (16,'SQLReport',10,'Debug?',1031671019);
 INSERT INTO international VALUES (17,'SQLReport',10,'<b>Debug:</b> Query:',1031510000);
 INSERT INTO international VALUES (18,'SQLReport',10,'Der var ikke nogen svar til denne forespørgsel!',1031510000);
 INSERT INTO international VALUES (1,'SyndicatedContent',10,'URL til RSS fil',1031510000);
@@ -3639,7 +3645,7 @@ INSERT INTO international VALUES (171,'WebGUI',10,'Avanceret redigering',1031510
 INSERT INTO international VALUES (174,'WebGUI',10,'Vis titel på siden?',1031510000);
 INSERT INTO international VALUES (175,'WebGUI',10,'Udfør makroer?',1031510000);
 INSERT INTO international VALUES (228,'WebGUI',10,'Rediger besked…',1031510000);
-INSERT INTO international VALUES (229,'WebGUI',10,'Emne',1031510000);
+INSERT INTO international VALUES (229,'WebGUI',10,'Emne',1031546537);
 INSERT INTO international VALUES (230,'WebGUI',10,'Besked  ',1031510000);
 INSERT INTO international VALUES (231,'WebGUI',10,'Oprettet ny besked …',1031510000);
 INSERT INTO international VALUES (232,'WebGUI',10,'Intet emne',1031510000);
@@ -3726,21 +3732,19 @@ INSERT INTO international VALUES (378,'WebGUI',10,'Bruger ID',1031510000);
 INSERT INTO international VALUES (379,'WebGUI',10,'Gruppe ID',1031510000);
 INSERT INTO international VALUES (380,'WebGUI',10,'Stilart ID',1031510000);
 INSERT INTO international VALUES (381,'WebGUI',10,'WebGUI modtog en fejlformateret besked og kan ikke fortsætte - dette skyldes typisk eb speciel karakter. Prøv evt. at trykke tilbage og prøv igen.',1031510000);
-INSERT INTO international VALUES (383,'WebGUI',10,'Navn',1031510000);
+INSERT INTO international VALUES (683,'WebGUI',10,'Skabeloner, Håndter',1036856078);
 INSERT INTO international VALUES (384,'WebGUI',10,'Fil  ',1031510000);
 INSERT INTO international VALUES (385,'WebGUI',10,'Parametre',1031510000);
 INSERT INTO international VALUES (386,'WebGUI',10,'Rediger billede',1031510000);
 INSERT INTO international VALUES (387,'WebGUI',10,'Tilføjet af',1031510000);
 INSERT INTO international VALUES (388,'WebGUI',10,'Tilføjet dato',1031510000);
-INSERT INTO international VALUES (389,'WebGUI',10,'Billede ID',1031510000);
-INSERT INTO international VALUES (390,'WebGUI',10,'Viser billede …',1031510000);
+INSERT INTO international VALUES (812,'WebGUI',1,'Your message has been sent.',1037580328);
 INSERT INTO international VALUES (391,'WebGUI',10,'Sletter vedhæftet fil',1031510000);
-INSERT INTO international VALUES (392,'WebGUI',10,'Er du sikker på du vil slette dette billede',1031510000);
-INSERT INTO international VALUES (393,'WebGUI',10,'administrer billeder',1031510000);
+INSERT INTO international VALUES (596,'WebGUI',10,'MANGLER',1037205673);
 INSERT INTO international VALUES (394,'WebGUI',10,'administrer billeder.',1031510000);
 INSERT INTO international VALUES (395,'WebGUI',10,'Tilføj nyt billede',1031510000);
-INSERT INTO international VALUES (396,'WebGUI',10,'Vis billede',1031510000);
-INSERT INTO international VALUES (397,'WebGUI',10,'Tilbage til billede oversigt',1031510000);
+INSERT INTO international VALUES (717,'WebGUI',10,'Log ud',1036855705);
+INSERT INTO international VALUES (705,'WebGUI',10,'minut(ter)',1036855912);
 INSERT INTO international VALUES (398,'WebGUI',10,'Dokument type deklarering',1031510000);
 INSERT INTO international VALUES (399,'WebGUI',10,'Valider denne side.',1031510000);
 INSERT INTO international VALUES (400,'WebGUI',10,'Forhindre Proxy Caching',1031510000);
@@ -3764,7 +3768,7 @@ INSERT INTO international VALUES (418,'WebGUI',10,'Filter Contributed HTML',1031
 INSERT INTO international VALUES (419,'WebGUI',10,'Fjern alle tags',1031510000);
 INSERT INTO international VALUES (420,'WebGUI',10,'Lad det være',1031510000);
 INSERT INTO international VALUES (421,'WebGUI',10,'Fjerne alt bortset fra basal formatering',1031510000);
-INSERT INTO international VALUES (422,'WebGUI',10,'<h1>Login mislykkedes</h1>Dine informationer stemmer ikke med mine oplysninger',1031510000);
+INSERT INTO international VALUES (422,'WebGUI',10,'Login mislykkedes.\r\nDe indtastede informationer stemmer ikke med mine oplysninger',1032470666);
 INSERT INTO international VALUES (423,'WebGUI',10,'Vis aktive sessioner',1031510000);
 INSERT INTO international VALUES (424,'WebGUI',10,'Vis login historik',1031510000);
 INSERT INTO international VALUES (425,'WebGUI',10,'Aktive sessioner',1031510000);
@@ -3794,7 +3798,7 @@ INSERT INTO international VALUES (448,'WebGUI',10,'Træ struktur',1031510000);
 INSERT INTO international VALUES (449,'WebGUI',10,'Diverse information',1031510000);
 INSERT INTO international VALUES (450,'WebGUI',10,'Arbejdsnavn (Firma navn)',1031510000);
 INSERT INTO international VALUES (451,'WebGUI',10,'er påkrævet',1031510000);
-INSERT INTO international VALUES (452,'WebGUI',10,'Vent venligst …',1031510000);
+INSERT INTO international VALUES (452,'WebGUI',10,'Øjeblik ...',1032273938);
 INSERT INTO international VALUES (453,'WebGUI',10,'Dato oprettet',1031510000);
 INSERT INTO international VALUES (454,'WebGUI',10,'Sidste opdateret',1031510000);
 INSERT INTO international VALUES (455,'WebGUI',10,'Rediger bruger profil',1031510000);
@@ -4051,14 +4055,10 @@ INSERT INTO international VALUES (541,'WebGUI',1,'Karma Per Post',1031514049);
 INSERT INTO international VALUES (5,'Product',1,'Are you certain you wish to delete this specification?',1031514049);
 INSERT INTO international VALUES (542,'WebGUI',1,'Previous..',1031514049);
 INSERT INTO international VALUES (543,'WebGUI',1,'Add a new image group.',1031514049);
-INSERT INTO international VALUES (544,'WebGUI',1,'Are you certain you wish to delete this group?',1031514049);
-INSERT INTO international VALUES (545,'WebGUI',1,'Edit Image Group',1031514049);
-INSERT INTO international VALUES (546,'WebGUI',1,'Group Id',1031514049);
-INSERT INTO international VALUES (547,'WebGUI',1,'Parent group',1031514049);
-INSERT INTO international VALUES (548,'WebGUI',1,'Group name',1031514049);
-INSERT INTO international VALUES (549,'WebGUI',1,'Group description',1031514049);
-INSERT INTO international VALUES (550,'WebGUI',1,'View Image group',1031514049);
-INSERT INTO international VALUES (382,'WebGUI',1,'Edit Image',1031514049);
+INSERT INTO international VALUES (1,'WobjectProxy',10,'Wobject der skal laves proxy fra',1036856119);
+INSERT INTO international VALUES (661,'WebGUI',10,'Fil indstillinger, Redigér',1036856289);
+INSERT INTO international VALUES (586,'WebGUI',10,'Sprog',1037205357);
+INSERT INTO international VALUES (598,'WebGUI',10,'Redigér sprog',1037205737);
 INSERT INTO international VALUES (551,'WebGUI',1,'Notice',1031514049);
 INSERT INTO international VALUES (552,'WebGUI',1,'Pending',1031514049);
 INSERT INTO international VALUES (553,'WebGUI',1,'Status',1031514049);
@@ -4231,7 +4231,7 @@ INSERT INTO international VALUES (13,'EventsCalendar',7,'±à¼­ÊÂÎñ',1031510000);
 INSERT INTO international VALUES (13,'LinkList',7,'Ìí¼ÓÐÂÁ´½Ó¡£',1031510000);
 INSERT INTO international VALUES (13,'USS',7,'Í¶¸åÊ±¼ä',1031510000);
 INSERT INTO international VALUES (13,'WebGUI',7,'²é¿´°ïÖúË÷Òý',1031510000);
-INSERT INTO international VALUES (14,'Article',7,'Í¼Æ¬Î»ÖÃ',1031510000);
+INSERT INTO international VALUES (764,'WebGUI',1,'Edit this collateral item.',1036892856);
 INSERT INTO international VALUES (516,'WebGUI',7,'½øÈë¹ÜÀí',1031510000);
 INSERT INTO international VALUES (517,'WebGUI',7,'ÍË³ö¹ÜÀí',1031510000);
 INSERT INTO international VALUES (515,'WebGUI',7,'ÊÇ·ñÌí¼Ó±à¼­´Á£¿',1031510000);
@@ -4509,9 +4509,6 @@ INSERT INTO international VALUES (22,'FileManager',7,'ÊÇ·ñÖ´ÐÐÌí¼ÓÏÂÔØ£¿',103151
 INSERT INTO international VALUES (14,'FileManager',7,'ÎÄ¼þ',1031510000);
 INSERT INTO international VALUES (15,'FileManager',7,'ÃèÊö',1031510000);
 INSERT INTO international VALUES (16,'FileManager',7,'ÉÏÔØÈÕÆÚ',1031510000);
-INSERT INTO international VALUES (15,'Article',7,'¿¿ÓÒ',1031510000);
-INSERT INTO international VALUES (16,'Article',7,'¿¿×ó',1031510000);
-INSERT INTO international VALUES (17,'Article',7,'¾ÓÖÐ',1031510000);
 INSERT INTO international VALUES (37,'USS',7,'É¾³ý',1031510000);
 INSERT INTO international VALUES (13,'SQLReport',7,'Convert carriage returns?',1031510000);
 INSERT INTO international VALUES (17,'FileManager',7,'ÆäËû°æ±¾ #1',1031510000);
@@ -4526,21 +4523,19 @@ INSERT INTO international VALUES (17,'EventsCalendar',7,'ÁÐ±í·½Ê½',1031510000);
 INSERT INTO international VALUES (18,'EventsCalendar',7,'Calendar Month',1031510000);
 INSERT INTO international VALUES (19,'EventsCalendar',7,'ÔÚºóÃæ±ê×¢Ò³Âë',1031510000);
 INSERT INTO international VALUES (529,'WebGUI',7,'½á¹û',1031510000);
-INSERT INTO international VALUES (383,'WebGUI',7,'Ãû×Ö',1031510000);
 INSERT INTO international VALUES (384,'WebGUI',7,'ÎÄ¼þ',1031510000);
 INSERT INTO international VALUES (385,'WebGUI',7,'²ÎÊý',1031510000);
 INSERT INTO international VALUES (386,'WebGUI',7,'±à¼­Í¼Ïó',1031510000);
 INSERT INTO international VALUES (387,'WebGUI',7,'ÉÏÔØÈË',1031510000);
 INSERT INTO international VALUES (388,'WebGUI',7,'ÉÏÔØÈÕÆÚ',1031510000);
-INSERT INTO international VALUES (389,'WebGUI',7,'Í¼Ïó ID',1031510000);
-INSERT INTO international VALUES (390,'WebGUI',7,'ÏÔÊ¾Í¼Ïó...',1031510000);
+INSERT INTO international VALUES (809,'WebGUI',1,'Email Group',1037579611);
 INSERT INTO international VALUES (391,'WebGUI',7,'É¾³ý¸½¼ÓÎÄ¼þ¡£',1031510000);
-INSERT INTO international VALUES (392,'WebGUI',7,'ÄúÈ·¶¨ÒªÉ¾³ý´ËÍ¼ÏóÂð£¿',1031510000);
-INSERT INTO international VALUES (393,'WebGUI',7,'¹ÜÀíÍ¼Ïó',1031510000);
+INSERT INTO international VALUES (593,'WebGUI',10,'Indsend oversættelse',1037205606);
+INSERT INTO international VALUES (783,'WebGUI',1,'Type',1036954378);
 INSERT INTO international VALUES (394,'WebGUI',7,'¹ÜÀíÍ¼Ïó¡£',1031510000);
 INSERT INTO international VALUES (395,'WebGUI',7,'Ìí¼ÓÐÂÍ¼Ïó¡£',1031510000);
-INSERT INTO international VALUES (396,'WebGUI',7,'²é¿´Í¼Ïó',1031510000);
-INSERT INTO international VALUES (397,'WebGUI',7,'·µ»ØÍ¼ÏóÁÐ±í¡£',1031510000);
+INSERT INTO international VALUES (719,'WebGUI',10,'Forældet',1036855669);
+INSERT INTO international VALUES (710,'WebGUI',10,'Redigér rettigheds indstillinger',1036855857);
 INSERT INTO international VALUES (398,'WebGUI',7,'ÎÄµµÀàÐÍ¶¨Òå',1031510000);
 INSERT INTO international VALUES (399,'WebGUI',7,'·ÖÎö±¾Ò³Ãæ¡£',1031510000);
 INSERT INTO international VALUES (400,'WebGUI',7,'ÊÇ·ñ×èÖ¹´úÀí»º´æ£¿',1031510000);
@@ -4706,18 +4701,18 @@ INSERT INTO international VALUES (523,'WebGUI',7,'ÌáÐÑ',1031510000);
 INSERT INTO international VALUES (524,'WebGUI',7,'ÊÇ·ñÌí¼Ó±à¼­´Á£¿',1031510000);
 INSERT INTO international VALUES (525,'WebGUI',7,'±à¼­ÄÚÈÝÉèÖÃ',1031510000);
 INSERT INTO international VALUES (526,'WebGUI',7,'Ö»Çå³ý JavaScript ¡£',1031510000);
-INSERT INTO international VALUES (584,'WebGUI',1,'Add a new language.',1031514049);
+INSERT INTO international VALUES (584,'WebGUI',1,'Add a new translation.',1036971092);
 INSERT INTO international VALUES (585,'WebGUI',1,'Manage translations.',1031514049);
-INSERT INTO international VALUES (586,'WebGUI',1,'Languages',1031514049);
+INSERT INTO international VALUES (586,'WebGUI',1,'Manage Translations',1036971445);
 INSERT INTO international VALUES (587,'WebGUI',1,'Are you certain you wish to delete this language and all the help and international messages that go with it?',1031514049);
-INSERT INTO international VALUES (589,'WebGUI',1,'Edit Language',1031514049);
+INSERT INTO international VALUES (589,'WebGUI',1,'Edit Translation',1036971172);
 INSERT INTO international VALUES (590,'WebGUI',1,'Language ID',1031514049);
 INSERT INTO international VALUES (591,'WebGUI',1,'Language',1031514049);
 INSERT INTO international VALUES (592,'WebGUI',1,'Character Set',1031514049);
 INSERT INTO international VALUES (595,'WebGUI',1,'International Messages',1031514049);
 INSERT INTO international VALUES (596,'WebGUI',1,'MISSING',1031514049);
 INSERT INTO international VALUES (597,'WebGUI',1,'Edit International Message',1031514049);
-INSERT INTO international VALUES (598,'WebGUI',1,'Edit language.',1031514049);
+INSERT INTO international VALUES (598,'WebGUI',1,'Edit this translation.',1036971142);
 INSERT INTO international VALUES (601,'WebGUI',1,'International ID',1031514049);
 INSERT INTO international VALUES (1,'MailForm',1,'Mail Form',1031514049);
 INSERT INTO international VALUES (2,'MailForm',1,'Your email subject here',1031514049);
@@ -4859,20 +4854,19 @@ INSERT INTO international VALUES (399,'WebGUI',8,'Valida questa pagina.',1031510
 INSERT INTO international VALUES (398,'WebGUI',8,'Document Type Declaration',1031510000);
 INSERT INTO international VALUES (394,'WebGUI',8,'Gestisci Immagini.',1031510000);
 INSERT INTO international VALUES (395,'WebGUI',8,'Aggiungi una nuova Immagine.',1031510000);
-INSERT INTO international VALUES (396,'WebGUI',8,'Visualizza Immagine',1031510000);
-INSERT INTO international VALUES (397,'WebGUI',8,'Indietro alla lista delle Immagini.',1031510000);
-INSERT INTO international VALUES (393,'WebGUI',8,'Gestisci Immagini',1031510000);
+INSERT INTO international VALUES (707,'WebGUI',10,'Vis debug information?',1036855884);
+INSERT INTO international VALUES (784,'WebGUI',1,'Thumbnail',1036954393);
 INSERT INTO international VALUES (391,'WebGUI',8,'Cancella il file Allegato.',1031510000);
-INSERT INTO international VALUES (392,'WebGUI',8,'Sei sicuro di voler cancellare questa Immagine?',1031510000);
-INSERT INTO international VALUES (390,'WebGUI',8,'Visualizza Immagine...',1031510000);
-INSERT INTO international VALUES (389,'WebGUI',8,'Id Immagine',1031510000);
+INSERT INTO international VALUES (594,'WebGUI',10,'Oversæt tekster',1037205626);
+INSERT INTO international VALUES (811,'WebGUI',1,'From',1037580145);
+INSERT INTO international VALUES (810,'WebGUI',1,'send',1037579743);
 INSERT INTO international VALUES (387,'WebGUI',8,'Uploadato Da',1031510000);
 INSERT INTO international VALUES (388,'WebGUI',8,'Data di Upload',1031510000);
 INSERT INTO international VALUES (386,'WebGUI',8,'Modifica Immagine',1031510000);
 INSERT INTO international VALUES (385,'WebGUI',8,'Parametri',1031510000);
 INSERT INTO international VALUES (384,'WebGUI',8,'File',1031510000);
 INSERT INTO international VALUES (19,'EventsCalendar',8,'Cambio Pagina dopo',1031510000);
-INSERT INTO international VALUES (383,'WebGUI',8,'Nome',1031510000);
+INSERT INTO international VALUES (684,'WebGUI',10,'Skabelon, Tilføj/Redigér',1036856063);
 INSERT INTO international VALUES (18,'EventsCalendar',8,'Calendar Month',1031510000);
 INSERT INTO international VALUES (16,'EventsCalendar',8,'Layout del Calendario',1031510000);
 INSERT INTO international VALUES (17,'EventsCalendar',8,'Lista',1031510000);
@@ -4885,9 +4879,7 @@ INSERT INTO international VALUES (18,'FileManager',8,'Versione Alternativa #2',1
 INSERT INTO international VALUES (17,'FileManager',8,'Versione Alternativa #1',1031510000);
 INSERT INTO international VALUES (13,'SQLReport',8,'Converti gli a capo?',1031510000);
 INSERT INTO international VALUES (37,'USS',8,'Cancella',1031510000);
-INSERT INTO international VALUES (17,'Article',8,'Centro',1031510000);
-INSERT INTO international VALUES (15,'Article',8,'Destra',1031510000);
-INSERT INTO international VALUES (16,'Article',8,'Sinistra',1031510000);
+INSERT INTO international VALUES (775,'WebGUI',1,'Are you certain you wish to delete this folder and move its contents to it\'s parent folder?',1036903002);
 INSERT INTO international VALUES (16,'FileManager',8,'Uploadato in Data',1031510000);
 INSERT INTO international VALUES (15,'FileManager',8,'Descrizione',1031510000);
 INSERT INTO international VALUES (14,'FileManager',8,'File',1031510000);
@@ -5163,7 +5155,6 @@ INSERT INTO international VALUES (15,'USS',8,'Modifica/Cancella',1031510000);
 INSERT INTO international VALUES (15,'MessageBoard',8,'Autore',1031510000);
 INSERT INTO international VALUES (14,'WebGUI',8,'Visualizza i contributi pendenti.',1031510000);
 INSERT INTO international VALUES (14,'USS',8,'Stato',1031510000);
-INSERT INTO international VALUES (14,'Article',8,'Allinea Immagine',1031510000);
 INSERT INTO international VALUES (13,'WebGUI',8,'Visualizza indice dell\'aiuto.',1031510000);
 INSERT INTO international VALUES (13,'USS',8,'Data',1031510000);
 INSERT INTO international VALUES (13,'MessageBoard',8,'Rispondi',1031510000);
@@ -5359,14 +5350,9 @@ INSERT INTO international VALUES (541,'WebGUI',8,'Karma Per Post',1031510000);
 INSERT INTO international VALUES (30,'USS',8,'Karma Per Contributo',1031510000);
 INSERT INTO international VALUES (542,'WebGUI',8,'Precedente..',1031510000);
 INSERT INTO international VALUES (543,'WebGUI',8,'Aggiungi un nuovo gruppo',1031510000);
-INSERT INTO international VALUES (544,'WebGUI',8,'Sei sicuro di voler cancellare questo gruppo?',1031510000);
-INSERT INTO international VALUES (545,'WebGUI',8,'Modifica i Gruppi di Immagini',1031510000);
-INSERT INTO international VALUES (546,'WebGUI',8,'Id Gruppo',1031510000);
-INSERT INTO international VALUES (547,'WebGUI',8,'Gruppo Genitore',1031510000);
-INSERT INTO international VALUES (548,'WebGUI',8,'Nome del Gruppo',1031510000);
-INSERT INTO international VALUES (549,'WebGUI',8,'Descrizione del Gruppo',1031510000);
-INSERT INTO international VALUES (550,'WebGUI',8,'Visualizza Gruppo di Immagini',1031510000);
-INSERT INTO international VALUES (382,'WebGUI',8,'Modifica Immagine',1031510000);
+INSERT INTO international VALUES (5,'WobjectProxy',10,'Wobject Proxy, Tilføj/Redigér',1036856225);
+INSERT INTO international VALUES (576,'WebGUI',10,'Slet',1037205126);
+INSERT INTO international VALUES (605,'WebGUI',10,'Tilføj grupper',1037205775);
 INSERT INTO international VALUES (551,'WebGUI',8,'Avviso',1031510000);
 INSERT INTO international VALUES (552,'WebGUI',8,'Pendente',1031510000);
 INSERT INTO international VALUES (553,'WebGUI',8,'Stato',1031510000);
@@ -5404,8 +5390,22 @@ INSERT INTO international VALUES (71,'SQLReport',1,'SQL Reports are perhaps the 
 INSERT INTO international VALUES (71,'MailForm',1,'This wobject creates a simple form that will email an email address when it is filled out.\r\n<br><br>\r\n\r\n<b>Width</b><br>\r\nThe width of all fields in the form.  The default value is 45.\r\n<p>\r\n\r\n<b>From, To, Cc, Bcc, Subject</b><br>\r\nThese fields control how the email will look when sent, and who it is sent to.  You can give your site visitors the ability to modify some or all of these fields, but typically the only fields you will want the user to be able to modify are From and Subject.  Use the drop-down options by each field to choose whether or not the user can see or modify that field.<br>\r\n<br>\r\nYou may also choose to enter a WebGUI username or group in the To field, and the email will be sent to the corresponding user or group.\r\n<p>\r\n\r\n<b>Acknowledgement</b><br>\r\nThis message will be displayed to the user after they click \"Send\".\r\n<p>\r\n\r\n<b>Store Entries?</b><br>\r\nIf set to yes, when your mail form is submitted the entries will be saved to the database for later viewing.  The tool to view these entries is not yet available, but when it is you will be able to view all entries from your form in a centralized location.\r\n<p>\r\n\r\n<b>Proceed to add more fields?</b><br>\r\nLeave this checked if you want to add additional fields to your form directly after creating it.',1031514049);
 INSERT INTO international VALUES (72,'MailForm',1,'You may add as many additional fields to your Mail Form as you like.\r\n<br><br>\r\n\r\n<b>Field Name</b><br>\r\nThe name of this field.  It must be unique among all of the other fields on your form.\r\n<p>\r\n\r\n<b>Status</b><br>\r\nHidden fields will not be visible to the user, but will be sent in the email.<br>\r\nDisplayed fields can be seen by the user but not modified.<br>\r\nModifiable fields can be filled in by the user.<br>\r\nIf you choose Hidden or Displayed, be sure to fill in a Default Value.\r\n<p>\r\n\r\n<b>Type</b><br>\r\nChoose the type of form element for this field.  The following field types are supported:<br>\r\nURL: A textbox that will auto-format URL\'s entered.<br>\r\nTextbox: A standard textbox.<br>\r\nDate: A textbox field with a popup window to select a date.<br>\r\nYes/No: A set of yes/no radio buttons.<br>\r\nEmail Address: A textbox that requires the user to enter a valid email address.<br>\r\nTextarea: A simple textarea.<br>\r\nCheckbox: A single checkbox.<br>\r\nDrop-Down Box: A drop-down box. Use the Possible Values field to enter each option to be displayed in the box.  Enter one option per line.\r\n<p>\r\n\r\n<b>Possible Values</b><br>\r\nThis field is only used for the Drop-Down Box type.  Enter the values you wish to appear in your drop-down box, one per line.\r\n<p>\r\n\r\n<b>Default Value (optional)</b><br>\r\nEnter the default value (if any) for the field.  For Yes/No fields, enter \"yes\" to select \"Yes\" and \"no\" to select \"No\".\r\nFor Checkbox fields, enter \"checked\" to check the box.\r\n<p>\r\n\r\n<b>Proceed to add more fields?</b><br>\r\nLeave this checked if you want to add additional fields to your form directly after creating this field.\r\n<p>\r\n',1031514049);
 INSERT INTO international VALUES (625,'WebGUI',1,'<b>Name</b><br>\r\nThe label that this image will be referenced by to include it into pages.\r\n<p>\r\n\r\n<b>File</b><br>\r\nSelect a file from your local drive to upload to the server.\r\n<p>\r\n\r\n<b>Parameters</b><br>\r\nAdd any HTML &ltimg&rt; parameters that you wish to act as the defaults for this image.\r\n<p>\r\n\r\n<i>Example:</i><br>\r\nalign=\"right\"<br>\r\nalt=\"This is an image\"<br>\r\n',1031514049);
-INSERT INTO international VALUES (628,'WebGUI',1,'When you delete an image it will be removed from the server and cannot be recovered. Therefore, be sure that you really wish to delete the image before you confirm the delete.\r\n<p>\r\n',1031514049);
-INSERT INTO international VALUES (631,'WebGUI',1,'Using the built in image manager in WebGUI you can upload images to one central location for use anywhere else in the site with no need for any special software or knowledge.\r\nYou can also create image groups to help organize your images. To do so, simply click \"Add a new group.\"\r\n<p>\r\n\r\nTo place the images you\'ve uploaded use the ^I(); and ^i(); macros. More information on them can be found in the Using Macros help.\r\n\r\n<p>\r\n<i>Tip:</i> You can use the ^I(); macro (and therefore the images from the image manager) in places you may not have conisdered. For instance, you could place images in the titles of your wobjects. Or in wobjects like Link List and Site Map that use bullets, you could use image manager images as the bullets.\r\n<p>\r\n',1031514049);
+INSERT INTO international VALUES (48,'Survey',1,'You are not currently eligible to participate in this survey. ',1037499301);
+INSERT INTO international VALUES (47,'Survey',1,'You have completed this quiz.',1037499131);
+INSERT INTO international VALUES (46,'Survey',1,'Thank you for taking the time to complete our survey.',1037499049);
+INSERT INTO international VALUES (800,'WebGUI',1,'Unique Visitors',1036978829);
+INSERT INTO international VALUES (799,'WebGUI',1,'Page Views',1036978804);
+INSERT INTO international VALUES (798,'WebGUI',1,'Page Title',1036978688);
+INSERT INTO international VALUES (797,'WebGUI',1,'View traffic statistics.',1036978191);
+INSERT INTO international VALUES (796,'WebGUI',1,'View page statistics.',1036978043);
+INSERT INTO international VALUES (795,'WebGUI',1,'Roots',1036972103);
+INSERT INTO international VALUES (794,'WebGUI',1,'Packages',1036971944);
+INSERT INTO international VALUES (793,'WebGUI',1,'Pieces of Collateral',1036971785);
+INSERT INTO international VALUES (792,'WebGUI',1,'Templates',1036971696);
+INSERT INTO international VALUES (805,'WebGUI',1,'Delete this style.',1037075787);
+INSERT INTO international VALUES (804,'WebGUI',1,'Copy this style.',1037075775);
+INSERT INTO international VALUES (803,'WebGUI',1,'Edit this style.',1037075751);
+INSERT INTO international VALUES (74,'Survey',1,'Are you certain you wish to delete all the responses?',1037574455);
 INSERT INTO international VALUES (633,'WebGUI',1,'Simply put, roots are pages with no parent. The first and most important root in WebGUI is the \"Home\" page. Many people will never add any additional roots, but a few power users will. Those power users will create new roots for many different reasons. Perhaps they\'ll create a staging area for content managers. Or maybe a hidden area for Admin tools. Or possibly even a new root just to place their search engine.\r\n<p>\r\n\r\n',1031514049);
 INSERT INTO international VALUES (636,'WebGUI',1,'To create a package follow these simple steps:\r\n\r\n<ol>\r\n<li> From the admin menu select \"Manage packages.\"\r\n</li>\r\n\r\n<li> Add a page and give it a name. The name of the page will be the name of the package.\r\n</li>\r\n\r\n<li> Go to the new page you created and start adding pages and wobjects. Any pages or wobjects you add will be created each time this package is deployed. \r\n</li>\r\n</ol>\r\n\r\n<b>Notes:</b><br>\r\nIn order to add, edit, or delete packages you must be in the Package Mangers group or in the Admins group.\r\n<br><br>\r\n\r\nIf you add content to any of the wobjects, that content will automatically be copied when the package is deployed.\r\n<br><br>\r\n\r\nPrivileges and styles assigned to pages in the package will not be copied when the package is deployed. Instead the pages will take the privileges and styles of the area to which they are deployed.\r\n<p>\r\n',1031514049);
 INSERT INTO international VALUES (635,'WebGUI',1,'Packages are groups of pages and wobjects that are predefined to be deployed together. A package manager may see the need to create a package several pages with a message board, an FAQ, and a Poll because that task is performed quite often. Packages are often defined to lessen the burden of repetitive tasks.\r\n<br><br>\r\nOne package that many people create is a Page/Article package. It is often the case that you want to add a page with an article on it for content. Instead of going through the steps of creating a page, going to the page, and then adding an article to the page, you may wish to simply create a package to do those steps all at once.',1031514049);
@@ -5442,8 +5442,8 @@ INSERT INTO international VALUES (624,'WebGUI',1,'WebGUI macros are used to crea
 INSERT INTO international VALUES (62,'Product',1,'Product Template, Add/Edit',1031514049);
 INSERT INTO international VALUES (63,'Product',1,'Product templates are used to control how your product presented to your customer, in much the same way that other templates in WebGUI layout content. There are a few templates provided for you as reference, but you should create a template that\'s right for your product. \r\n<p>\r\nChances are you won\'t need all of the fields that WebGUI\'s product manager gives you. When creating your template, be sure to remove those fields for faster operation.\r\n<p>\r\n<b>NOTE:</b> You shouldn\'t edit the default templates, but rather make copies of them if you wish to edit them. This is because the templates may be changed in future releases of WebGUI and then your changes would be lost at upgrade time. If you make copies, or create your own templates, you won\'t have to worry about losing your changes.\r\n<p>\r\nThere are many custom macros to use in your product templates. They are as follows:\r\n<p>\r\n<b>^Product_Accessories;</b><br>\r\nDisplays the list of accessories associated with this product.\r\n<p>\r\n<b>^Product_Benefits;</b><br>\r\nDisplays the list of benefits associated with this product.\r\n<p>\r\n<b>^Product_Description;</b><br>\r\nDisplays the product\'s description.\r\n<p>\r\n<b>^Product_Features;</b><br>\r\nDisplays the list of features associated with this product.\r\n<p>\r\n<b>^Product_Image1;</b><br>\r\nDisplays the first image you uploaded with this product (if any).\r\n<p>\r\n<b>^Product_Image2;</b><br>\r\nDisplays the second image you uploaded with this product (if any).\r\n<p>\r\n<b>^Product_Image2;</b><br>\r\nDisplays the third image you uploaded with this product (if any).\r\n<p>\r\n<b>^Product_Number;</b><br>\r\nDisplays the product\'s number field or SKU.\r\n<p>\r\n<b>^Product_Price;</b><br>\r\nDisplays the product\'s price field.\r\n<p>\r\n<b>^Product_Related;</b><br>\r\nDisplays the list of related products associated with this product.\r\n<p>\r\n<b>^Product_Specifications;</b><br>\r\nDisplays the list of specifications associated with this product.\r\n<p>\r\n<b>^Product_Thumbnail1;</b><br>\r\nDisplays the thumbnail of the first image you uploaded with this product (if any) along with a link to view the full size image.\r\n<p>\r\n<b>^Product_Thumbnail2;</b><br>\r\nDisplays the thumbnail of the second image you uploaded with this product (if any) along with a link to view the full size image.\r\n<p>\r\n<b>^Product_Thumbnail3;</b><br>\r\nDisplays the thumbnail of the third image you uploaded with this product (if any) along with a link to view the full size image.\r\n<p>\r\n<b>^Product_Title;</b><br>\r\nDisplays the title of the product. Note that if you use this macro, you\'ll likely want to turn off the default title by selecting \"No\" on the \"Display title?\" field.\r\n<p>\r\n',1031514049);
 INSERT INTO international VALUES (670,'WebGUI',1,'Image, Add/Edit',1031514049);
-INSERT INTO international VALUES (673,'WebGUI',1,'Image, Delete',1031514049);
-INSERT INTO international VALUES (676,'WebGUI',1,'Images, Manage',1031514049);
+INSERT INTO international VALUES (813,'WebGUI',1,'Groups In This Group',1037583186);
+INSERT INTO international VALUES (72,'Survey',1,'Are you certain you wish to delete this user\'s responses?',1037573460);
 INSERT INTO international VALUES (678,'WebGUI',1,'Root, Manage',1031514049);
 INSERT INTO international VALUES (681,'WebGUI',1,'Packages, Creating',1031514049);
 INSERT INTO international VALUES (680,'WebGUI',1,'Package, Add',1031514049);
@@ -5476,8 +5476,13 @@ INSERT INTO international VALUES (683,'WebGUI',1,'Templates, Manage',1031514049)
 INSERT INTO international VALUES (684,'WebGUI',1,'Template, Add/Edit',1031514049);
 INSERT INTO international VALUES (685,'WebGUI',1,'Template, Delete',1031514049);
 INSERT INTO international VALUES (669,'WebGUI',1,'Macros, Using',1031514049);
-INSERT INTO international VALUES (686,'WebGUI',1,'Image Group, Add',1031514049);
-INSERT INTO international VALUES (641,'WebGUI',1,'Image groups are like folders that are used to organize your images. The use of image groups is not required, but on large sites it is definitely useful.\r\n<p>\r\n\r\n<b>Group Name</b><br>\r\nThe name that will be displayed as you\'re browsing through your images.\r\n<p>\r\n\r\n<b>Group Description</b><br>\r\nBriefly describe what this image group is used for.\r\n<p>\r\n',1031514049);
+INSERT INTO international VALUES (57,'Survey',1,'Comments',1037556124);
+INSERT INTO international VALUES (66,'Survey',1,'Responses',1037557127);
+INSERT INTO international VALUES (65,'Survey',1,'Export composite summary.',1037556821);
+INSERT INTO international VALUES (64,'Survey',1,'Export responses.',1037556721);
+INSERT INTO international VALUES (63,'Survey',1,'Export questions.',1037556710);
+INSERT INTO international VALUES (62,'Survey',1,'Export answers.',1037556697);
+INSERT INTO international VALUES (61,'Survey',1,'View grade book.',1037556642);
 INSERT INTO international VALUES (72,'FileManager',1,'Download, Add/Edit',1031514049);
 INSERT INTO international VALUES (73,'FileManager',1,'<b>File Title</b><br>\r\nThe title that will be displayed for this download.\r\n<p>\r\n\r\n<b>Download File</b><br>\r\nChoose the file from your hard drive that you wish to upload to this download manager.\r\n<p>\r\n\r\n<b>Alternate Version #1</b><br>\r\nAn alternate version of the Download File. For instance, if the download file was a JPEG, perhaps the alternate version would be a TIFF or a BMP.\r\n<p>\r\n\r\n<b>Alternate Version #2</b><br>\r\nAn alternate version of the Download File. For instance, if the download file was a JPEG, perhaps the alternate version would be a TIFF or a BMP.\r\n<p>\r\n\r\n<b>Brief Synopsis</b><br>\r\nA short description of this file. Be sure to include keywords that users may try to search for.\r\n<p>\r\n\r\n<b>Group To Download</b><br>\r\nChoose the group that may download this file.\r\n<p>\r\n\r\n<b>Proceed to add download?</b><br>\r\nChoose \"Yes\" if you have another file to add to this download manager.\r\n<p>\r\n',1031514049);
 INSERT INTO international VALUES (72,'EventsCalendar',1,'Event, Add/Edit',1031514049);
@@ -5559,21 +5564,18 @@ INSERT INTO international VALUES (379,'WebGUI',3,'Groep ID',1031516049);
 INSERT INTO international VALUES (380,'WebGUI',3,'Stijl ID',1031516049);
 INSERT INTO international VALUES (381,'WebGUI',3,'WebGUI heeft een verkeerde vraag gekregen en kan niet verder gaan. Bepaalde karakters op de pagina kunnen de oorzaak zijn. Probeer terug te gaan naar de vorige pagina en probeer het opnieuw.',1031516049);
 INSERT INTO international VALUES (528,'WebGUI',3,'Sjabloon naam',1031516049);
-INSERT INTO international VALUES (383,'WebGUI',3,'Naam',1031516049);
 INSERT INTO international VALUES (384,'WebGUI',3,'Bestand',1031516049);
 INSERT INTO international VALUES (385,'WebGUI',3,'Parameters',1031516049);
 INSERT INTO international VALUES (386,'WebGUI',3,'Bewerk plaatje',1031516049);
 INSERT INTO international VALUES (387,'WebGUI',3,'Geleverd door',1031516049);
 INSERT INTO international VALUES (388,'WebGUI',3,'Upload datum',1031516049);
-INSERT INTO international VALUES (389,'WebGUI',3,'Plaatje ID',1031516049);
-INSERT INTO international VALUES (390,'WebGUI',3,'Plaatje laten zien......',1031516049);
 INSERT INTO international VALUES (391,'WebGUI',3,'Verwijder bijgevoegd bestand',1031516049);
-INSERT INTO international VALUES (392,'WebGUI',3,'Weet u zeker dat u dit plaatje wilt verwijderen?',1031516049);
-INSERT INTO international VALUES (393,'WebGUI',3,'Beheer plaatjes',1031516049);
+INSERT INTO international VALUES (591,'WebGUI',10,'Sprog',1037205563);
+INSERT INTO international VALUES (781,'WebGUI',1,'Snippet',1036912954);
 INSERT INTO international VALUES (394,'WebGUI',3,'Beheer plaatjes.',1031516049);
 INSERT INTO international VALUES (395,'WebGUI',3,'Een nieuw plaatje toevoegen',1031516049);
-INSERT INTO international VALUES (396,'WebGUI',3,'Plaatje laten zien',1031516049);
-INSERT INTO international VALUES (397,'WebGUI',3,'Terug naar plaatjes lijst',1031516049);
+INSERT INTO international VALUES (721,'WebGUI',10,'Benævnelse',1036855637);
+INSERT INTO international VALUES (708,'WebGUI',10,'Rettigheds indstillinger, håndter',1036855832);
 INSERT INTO international VALUES (398,'WebGUI',3,'Document type declaratie',1031516049);
 INSERT INTO international VALUES (399,'WebGUI',3,'Valideer deze pagina',1031516049);
 INSERT INTO international VALUES (400,'WebGUI',3,'Voorkom Proxy Caching',1031516049);
@@ -5734,7 +5736,6 @@ INSERT INTO international VALUES (5,'WobjectProxy',3,'Wobject proxy, Toevoegen/a
 INSERT INTO international VALUES (699,'WebGUI',3,'Eerste dag van de week',1031516049);
 INSERT INTO international VALUES (696,'WebGUI',3,'Prullenbak, Legen',1031516049);
 INSERT INTO international VALUES (697,'WebGUI',3,'Karma, Gebruiken',1031516049);
-INSERT INTO international VALUES (686,'WebGUI',3,'Plaatjesgroep, Toevoegen',1031516049);
 INSERT INTO international VALUES (685,'WebGUI',3,'Sjabloon, verwijderen',1031516049);
 INSERT INTO international VALUES (684,'WebGUI',3,'Template, Toevoegen/aanpassen',1031516049);
 INSERT INTO international VALUES (598,'WebGUI',3,'Taal aanpassen.',1031516049);
@@ -5790,10 +5791,9 @@ INSERT INTO international VALUES (588,'WebGUI',3,'Weet u zeker dat u deze vertal
 INSERT INTO international VALUES (581,'WebGUI',3,'Voeg een nieuwe waarde toe',1031516049);
 INSERT INTO international VALUES (543,'WebGUI',3,'Voeg een nieuwe plaatjesgroep toe.',1031516049);
 INSERT INTO international VALUES (583,'WebGUI',3,'Maximale plaatjesgrootte',1031516049);
-INSERT INTO international VALUES (547,'WebGUI',3,'Ouder groep',1031516049);
-INSERT INTO international VALUES (546,'WebGUI',3,'Groep Id',1031516049);
+INSERT INTO international VALUES (579,'WebGUI',10,'Din meddelelse er blevet godkendt.',1037205180);
 INSERT INTO international VALUES (542,'WebGUI',3,'Vorige..',1031516049);
-INSERT INTO international VALUES (544,'WebGUI',3,'Weet u zeker dat u deze groep wilt verwijderen? ',1031516049);
+INSERT INTO international VALUES (3,'WobjectProxy',10,'Wobject Proxy',1036856148);
 INSERT INTO international VALUES (5,'USS',9,'±zªº±i¶K¤å³¹³Q©Úµ´',1031510000);
 INSERT INTO international VALUES (5,'SyndicatedContent',9,'³Ì«á´£¨ú¤_',1031510000);
 INSERT INTO international VALUES (5,'SQLReport',9,'DSN',1031510000);
@@ -5926,7 +5926,7 @@ INSERT INTO international VALUES (13,'EventsCalendar',9,'½s¿è¨Æ°È',1031510000);
 INSERT INTO international VALUES (13,'LinkList',9,'¼W¥[·s¶W³sµ²',1031510000);
 INSERT INTO international VALUES (13,'USS',9,'±i¶K¤å³¹®É¶¡',1031510000);
 INSERT INTO international VALUES (13,'WebGUI',9,'¬d¬ÝÀ°§U¯Á¤Þ',1031510000);
-INSERT INTO international VALUES (14,'Article',9,'¹Ï¤ù¦ì¸m',1031510000);
+INSERT INTO international VALUES (765,'WebGUI',1,'Delete this collateral item.',1036892866);
 INSERT INTO international VALUES (516,'WebGUI',9,'¶i¤JºÞ²z',1031510000);
 INSERT INTO international VALUES (517,'WebGUI',9,'°h¥XºÞ²z',1031510000);
 INSERT INTO international VALUES (515,'WebGUI',9,'¬O§_¼W¥[½s¿èÂW',1031510000);
@@ -6204,9 +6204,8 @@ INSERT INTO international VALUES (22,'FileManager',9,'¬O§_°õ¦æ¼W¥[¤U¸ü',10315100
 INSERT INTO international VALUES (14,'FileManager',9,'¤å¥ó',1031510000);
 INSERT INTO international VALUES (15,'FileManager',9,'´y­z',1031510000);
 INSERT INTO international VALUES (16,'FileManager',9,'¤W¸ü¤é´Á',1031510000);
-INSERT INTO international VALUES (15,'Article',9,'¾a¥k',1031510000);
-INSERT INTO international VALUES (16,'Article',9,'¾a¥ª',1031510000);
-INSERT INTO international VALUES (17,'Article',9,'©~¤¤',1031510000);
+INSERT INTO international VALUES (769,'WebGUI',1,'Organize in Folder',1036893015);
+INSERT INTO international VALUES (776,'WebGUI',1,'Edit Folder',1036905944);
 INSERT INTO international VALUES (37,'USS',9,'§R°£',1031510000);
 INSERT INTO international VALUES (13,'SQLReport',9,'Convert carriage returns?',1031510000);
 INSERT INTO international VALUES (17,'FileManager',9,'¨ä¥Lª©¥» #1',1031510000);
@@ -6221,21 +6220,19 @@ INSERT INTO international VALUES (17,'EventsCalendar',9,'¦Cªí¤è¦¡',1031510000);
 INSERT INTO international VALUES (18,'EventsCalendar',9,'¤é¾ú¤è¦¡',1031510000);
 INSERT INTO international VALUES (19,'EventsCalendar',9,'¦b«á­±¼Ðª`­¶½X',1031510000);
 INSERT INTO international VALUES (529,'WebGUI',9,'µ²ªG',1031510000);
-INSERT INTO international VALUES (383,'WebGUI',9,'¦W¦r',1031510000);
 INSERT INTO international VALUES (384,'WebGUI',9,'¤å¥ó',1031510000);
 INSERT INTO international VALUES (385,'WebGUI',9,'°Ñ¼Æ',1031510000);
 INSERT INTO international VALUES (386,'WebGUI',9,'½s¿è¹Ï¤ù',1031510000);
 INSERT INTO international VALUES (387,'WebGUI',9,'¤W¸ü¤H',1031510000);
 INSERT INTO international VALUES (388,'WebGUI',9,'¤W¸ü¤é´Á',1031510000);
-INSERT INTO international VALUES (389,'WebGUI',9,'¹Ï¤ù ID',1031510000);
-INSERT INTO international VALUES (390,'WebGUI',9,'Åã¥Ü¹Ï¤ù...',1031510000);
+INSERT INTO international VALUES (697,'WebGUI',10,'Karma, Anvend',1036855986);
 INSERT INTO international VALUES (391,'WebGUI',9,'§R°£ªþ¥[¤å¥ó',1031510000);
-INSERT INTO international VALUES (392,'WebGUI',9,'±z½T©w­n§R°£¦¹¹Ï¤ù¶Ü',1031510000);
-INSERT INTO international VALUES (393,'WebGUI',9,'ºÞ²z¹Ï¤ù',1031510000);
+INSERT INTO international VALUES (595,'WebGUI',10,'International tekst',1037205654);
+INSERT INTO international VALUES (786,'WebGUI',1,'',1036954767);
 INSERT INTO international VALUES (394,'WebGUI',9,'ºÞ²z¹Ï¤ù',1031510000);
 INSERT INTO international VALUES (395,'WebGUI',9,'¼W¥[·s¹Ï¤ù',1031510000);
-INSERT INTO international VALUES (396,'WebGUI',9,'¬d¬Ý¹Ï¤ù',1031510000);
-INSERT INTO international VALUES (397,'WebGUI',9,'ªð¦^¹Ï¤ù¦Cªí',1031510000);
+INSERT INTO international VALUES (718,'WebGUI',10,'Eksporter oversættelse',1036855692);
+INSERT INTO international VALUES (706,'WebGUI',10,'Time(r)',1036855897);
 INSERT INTO international VALUES (398,'WebGUI',9,'¤åÀÉÃþ«¬©w¸q',1031510000);
 INSERT INTO international VALUES (399,'WebGUI',9,'¤ÀªR¥»­¶­±',1031510000);
 INSERT INTO international VALUES (400,'WebGUI',9,'¬O§_ªý¤î¥N²z½w¦s',1031510000);
@@ -6505,8 +6502,7 @@ INSERT INTO international VALUES (1,'EventsCalendar',2,'Termin\nhinzufügen?',103
 INSERT INTO international VALUES (1,'FileManager',2,'Download\nManager',1031510000);
 INSERT INTO international VALUES (1,'Article',2,'Artikel',1031510000);
 INSERT INTO international VALUES (395,'WebGUI',2,'Neue Grafik\nhinzufügen.',1031510000);
-INSERT INTO international VALUES (396,'WebGUI',2,'Grafik\nanschauen',1031510000);
-INSERT INTO international VALUES (397,'WebGUI',2,'Zurück zur\nGrafikübersicht.',1031510000);
+INSERT INTO international VALUES (722,'WebGUI',10,'ID',1036855613);
 INSERT INTO international VALUES (398,'WebGUI',2,'Dokumententyp\nBeschreibung',1031510000);
 INSERT INTO international VALUES (399,'WebGUI',2,'Diese Seite\nüberprüfen.',1031510000);
 INSERT INTO international VALUES (400,'WebGUI',2,'Caching\nverhindern',1031510000);
@@ -6679,14 +6675,17 @@ INSERT INTO international VALUES (467,'WebGUI',2,'Sind Sie sich sicher, dass Sie
 INSERT INTO international VALUES (466,'WebGUI',2,'Sind sie sich sicher, dass Sie diese Kategorie löschen möchten und alle ihre Felder in die Kategorie \'sonstiges\' verschieben möchten?',1031510000);
 INSERT INTO international VALUES (465,'WebGUI',2,'Größe der Textbox',1031510000);
 INSERT INTO international VALUES (464,'WebGUI',2,'Spalten des Textfeldes',1031510000);
-INSERT INTO international VALUES (628,'WebGUI',2,'Wenn Sie ein Bild löschen, wird es endgültig gelöscht und kann nicht mehr wiederhergestellt werden. Sie sollten sich ganz sicher sein bevor Sie bestätigen, daß ein Bild gelöscht werden kann.',1031510000);
+INSERT INTO international VALUES (52,'Survey',1,'Score',1037506007);
+INSERT INTO international VALUES (51,'Survey',1,'Comments?',1037499470);
+INSERT INTO international VALUES (50,'Survey',1,'Next',1037499410);
+INSERT INTO international VALUES (49,'Survey',1,'You may not take this quiz at this time.',1037499363);
 INSERT INTO international VALUES (696,'WebGUI',2,'Mülleimer leeren',1031510000);
 INSERT INTO international VALUES (684,'WebGUI',2,'Vorlagen hinzufügen oder bearbeiten',1031510000);
 INSERT INTO international VALUES (683,'WebGUI',2,'Vorlagen verwalten',1031510000);
 INSERT INTO international VALUES (682,'WebGUI',2,'Benutzerpofil bearbeiten',1031510000);
 INSERT INTO international VALUES (681,'WebGUI',2,'Packages, Creating',1031510000);
 INSERT INTO international VALUES (680,'WebGUI',2,'\'Package\' hinzufügen',1031510000);
-INSERT INTO international VALUES (686,'WebGUI',2,'Gruppe von Grafiken hinzufügen',1031510000);
+INSERT INTO international VALUES (58,'Survey',1,'Statistical Overview',1037556179);
 INSERT INTO international VALUES (679,'WebGUI',2,'inhaltliche Einstellungen bearbeiten',1031510000);
 INSERT INTO international VALUES (677,'WebGUI',2,'Wobject hinzufügen oder bearbeiten',1031510000);
 INSERT INTO international VALUES (708,'WebGUI',2,'Sondereinstellungen verwalten',1031510000);
@@ -6699,8 +6698,7 @@ INSERT INTO international VALUES (704,'WebGUI',2,'Sekunde(n)',1031510000);
 INSERT INTO international VALUES (7,'MailForm',2,'Emailformular bearbeiten',1031510000);
 INSERT INTO international VALUES (685,'WebGUI',2,'Vorlage löschen',1031510000);
 INSERT INTO international VALUES (678,'WebGUI',2,'Hauptverzeichns verwalten',1031510000);
-INSERT INTO international VALUES (676,'WebGUI',2,'Grafiken verwalten',1031510000);
-INSERT INTO international VALUES (673,'WebGUI',2,'Grafik löschen',1031510000);
+INSERT INTO international VALUES (73,'Survey',1,'Delete all the responses.',1037573893);
 INSERT INTO international VALUES (675,'WebGUI',2,'Suchmaschine benutzen',1031510000);
 INSERT INTO international VALUES (674,'WebGUI',2,'sonstige Einstellungen bearbeiten',1031510000);
 INSERT INTO international VALUES (672,'WebGUI',2,'Profileinstellungen bearbeiten',1031510000);
@@ -6729,21 +6727,18 @@ INSERT INTO international VALUES (664,'WebGUI',2,'Wobject löschen',1031510000);
 INSERT INTO international VALUES (640,'WebGUI',2,'Es ist nicht sinnvoll Vorlagen zu löschen, da man nie weiß, welche ungünstige Auswirkung es auf die Seite haben kann (manche Seiten nutzen diese Vorlage eventuell noch). Wenn Sie eine Vorlage löschen, werden alle Seiten, die diese Vorlage noch benutzen, auf die Standardcorlage gesetzt.',1031510000);
 INSERT INTO international VALUES (7,'Product',2,'Produktgrafik 3',1031510000);
 INSERT INTO international VALUES (526,'WebGUI',2,'nur JavaScript entfernen',1031510000);
-INSERT INTO international VALUES (547,'WebGUI',2,'Hauptgruppe',1031510000);
+INSERT INTO international VALUES (578,'WebGUI',10,'Du har afventende meddelelser der skal godkendes.',1037205157);
 INSERT INTO international VALUES (552,'WebGUI',2,'Ausstehend',1031510000);
 INSERT INTO international VALUES (551,'WebGUI',2,'Notiz/Bemerkung',1031510000);
-INSERT INTO international VALUES (550,'WebGUI',2,'Gruppe von Grafiken ansehen',1031510000);
 INSERT INTO international VALUES (542,'WebGUI',2,'Vorhergerige(r)',1031510000);
 INSERT INTO international VALUES (55,'Product',2,'Gewinn (benefit) hinzufügen',1031510000);
-INSERT INTO international VALUES (549,'WebGUI',2,'Beschreibung der Gruppe',1031510000);
-INSERT INTO international VALUES (548,'WebGUI',2,'Gruppenname',1031510000);
 INSERT INTO international VALUES (539,'WebGUI',2,'\'Karma\' aktivieren?',1031510000);
-INSERT INTO international VALUES (546,'WebGUI',2,'Id der Gruppe',1031510000);
-INSERT INTO international VALUES (545,'WebGUI',2,'Gruppe von Grafiken bearbeiten',1031510000);
+INSERT INTO international VALUES (575,'WebGUI',10,'Redigér',1037205114);
+INSERT INTO international VALUES (660,'WebGUI',10,'Grupper, Håndter',1036856312);
 INSERT INTO international VALUES (535,'WebGUI',2,'Group To Alert On New User',1031510000);
 INSERT INTO international VALUES (534,'WebGUI',2,'Bei neuem Benutzer benachrichtigen?',1031510000);
 INSERT INTO international VALUES (536,'WebGUI',2,'Ein neuer Nebutzer mit dem Namen ^@, hat die Seite betreten',1031510000);
-INSERT INTO international VALUES (544,'WebGUI',2,'Sind Sie sich sicher, dass Sie diese Gruppe löschen möchten?',1031510000);
+INSERT INTO international VALUES (2,'WobjectProxy',10,'Redigér Wobject Proxy',1036856135);
 INSERT INTO international VALUES (543,'WebGUI',2,'neue Gruppe von Bildern hinzufügen',1031510000);
 INSERT INTO international VALUES (541,'WebGUI',2,'Karma Per Post',1031510000);
 INSERT INTO international VALUES (537,'WebGUI',2,'Karma',1031510000);
@@ -6769,7 +6764,6 @@ INSERT INTO international VALUES (3,'MailForm',2,'Vielen Dank für Ihren Beitrag!
 INSERT INTO international VALUES (29,'Product',2,'Einheiten',1031510000);
 INSERT INTO international VALUES (28,'Product',2,'Eine weitere Spezifikation hinzufügen?',1031510000);
 INSERT INTO international VALUES (3,'Product',2,'Sind Sie sich sicher, dass Sie diese Eigenschaft löschen möchten?',1031510000);
-INSERT INTO international VALUES (382,'WebGUI',2,'Grafik bearbeiten',1031510000);
 INSERT INTO international VALUES (32,'Product',2,'Zubehör',1031510000);
 INSERT INTO international VALUES (33,'Product',2,'Verwandte Produkte',1031510000);
 INSERT INTO international VALUES (34,'Product',2,'Eine Eigenschaft hinzufügen',1031510000);
@@ -6832,7 +6826,7 @@ INSERT INTO international VALUES (556,'WebGUI',2,'Betrag',1031510000);
 INSERT INTO international VALUES (553,'WebGUI',2,'Status',1031510000);
 INSERT INTO international VALUES (529,'WebGUI',2,'Ergebnisse',1031510000);
 INSERT INTO international VALUES (588,'WebGUI',1,'Are you certain you wish to submit this translation to Plain Black for inclusion in the official distribution of WebGUI? By clicking on the yes link you understand that you\'re giving Plain Black an unlimited license to use the translation in its software distributions.',1031514630);
-INSERT INTO international VALUES (593,'WebGUI',1,'Submit translation.',1031514223);
+INSERT INTO international VALUES (593,'WebGUI',1,'Submit this translation.',1036970850);
 INSERT INTO international VALUES (594,'WebGUI',1,'Translate messages.',1031514314);
 INSERT INTO international VALUES (61,'USS',1,'User Submission System, Add/Edit',1031517089);
 INSERT INTO international VALUES (71,'USS',1,'User Submission Systems are a great way to add a sense of community to any site as well as get free content from your users.\r\n<br><br>\r\n\r\n<b>Layout</b><br>\r\nWhat should this user submission system look like? Currently these are the views available:\r\n<ul>\r\n<li><b>Traditional</b> - Creates a simple spreadsheet style table that lists off each submission and is sorted by date. \r\n</li>\r\n<li><b>Web Log</b> - Creates a view that looks like the news site <a href=\"http://slashdot.org/\">Slashdot</a>. Incidentally, Slashdot invented the web log format, which has since become very popular on news oriented sites. To limit the amount of the article shown on the main page, place the separator macro ^-; where you\'d like the front page content to stop.\r\n</li>\r\n<li><b>Photo Gallery</b> - Creates a matrix of thumbnails that can be clicked on to view the full image.\r\n</li></ul>\r\n\r\n<b>Who can approve?</b><br>\r\nWhat group is allowed to approve and deny content?\r\n<br><br>\r\n\r\n<b>Who can contribute?</b><br>\r\nWhat group is allowed to contribute content?\r\n<br><br>\r\n\r\n<b>Submissions Per Page</b><br>\r\nHow many submissions should be listed per page in the submissions index?\r\n<br><br>\r\n\r\n<b>Default Status</b><br>\r\nShould submissions be set to <i>Approved</i>, <i>Pending</i>, or <i>Denied</i> by default?\r\n<br><br>\r\n<i>Note:</i> If you set the default status to Pending, then be prepared to monitor your message log for new submissions.\r\n<p>\r\n\r\n<b>Karma Per Submission</b><br>\r\nHow much karma should be given to a user when they contribute to this user submission system?\r\n<p>\r\n\r\n\r\n<b>Display thumbnails?</b><br>\r\nIf there is an image present in the submission, the thumbnail will be displayed in the Layout (see above).\r\n<p>\r\n\r\n<b>Allow discussion?</b><br>\r\nDo you wish to attach a discussion to this user submission system? If you do, users will be able to comment on each submission.\r\n<p>\r\n\r\n<b>Who can post?</b><br>\r\nSelect the group that is allowed to post to this discussion.\r\n<p>\r\n\r\n<b>Edit Timeout</b><br>\r\nHow long should a user be able to edit their post before editing is locked to them?\r\n<p>\r\n<i>Note:</i> Don\'t set this limit too high. One of the great things about discussions is that they are an accurate record of who said what. If you allow editing for a long time, then a user has a chance to go back and change his/her mind a long time after the original statement was made.\r\n<p>\r\n\r\n<b>Karma Per Post</b><br>\r\nHow much karma should be given to a user when they post to this discussion?\r\n<p>\r\n\r\n<b>Who can moderate?</b><br>\r\nSelect the group that is allowed to moderate this discussion.\r\n<p>\r\n\r\n<b>Moderation Type?</b><br>\r\nYou can select what type of moderation you\'d like for your users. <i>After-the-fact</i> means that when a user posts a message it is displayed publically right away. <i>Pre-emptive</i> means that a moderator must preview and approve users posts before allowing them to be publically visible. Alerts for new posts will automatically show up in the moderator\'s WebGUI Inbox.\r\n<p>\r\nNote: In both types of moderation the moderator can always edit or delete the messages posted by your users.\r\n<p>\r\n',1031517089);
@@ -6840,7 +6834,7 @@ INSERT INTO international VALUES (722,'WebGUI',1,'Id',1031517195);
 INSERT INTO international VALUES (721,'WebGUI',1,'Namespace',1031515005);
 INSERT INTO international VALUES (720,'WebGUI',1,'OK',1031514777);
 INSERT INTO international VALUES (719,'WebGUI',1,'Out of Date',1031514679);
-INSERT INTO international VALUES (718,'WebGUI',1,'Export translation.',1031514184);
+INSERT INTO international VALUES (718,'WebGUI',1,'Export this translation.',1036970877);
 INSERT INTO international VALUES (12,'Poll',1,'Total Votes:',1031514049);
 INSERT INTO international VALUES (12,'Poll',7,'×ÜÍ¶Æ±ÈËÊý:',1031514049);
 INSERT INTO international VALUES (723,'WebGUI',1,'Deprecated',1031800566);
@@ -6866,7 +6860,11 @@ INSERT INTO international VALUES (1,'WobjectProxy',6,'Wobject till Proxy',103225
 INSERT INTO international VALUES (709,'WebGUI',6,'<b>Bildhanteringsgrupp</b>\r\nVälj en grupp som ska ha kontroll över tillägg, redigering och borttagning av bilder.\r\n\r\n<b>Stilhanteringsgrupp</b>\r\nVälj en grupp som ska ha kontroll över tillägg, redigering och borttagning av stilar.\r\n\r\n<b>Mallhanteringsgrupp</b>\r\nVälj en grupp som ska ha kontroll över tillägg, redigering och borttagning av mallar.',1032256879);
 INSERT INTO international VALUES (698,'WebGUI',6,'Karma är en metod för att mäta en användares aktivitet och eventuellt belöna eller bestraffa denne beroende på aktivitetsnivå. När väl karma är påslaget kommer du märka att många saker i WebGUI ändras för att visa karma.\r\n\r\nDu kan mäta om användarna loggar in och hur mycket de bidrar med till din webbplats. Du kan tillåta dem att komma åt material baserat på deras karma-nivå.\r\n\r\nDu kan läsa mer om karma i online-boken Ruling WebGUI.',1032256794);
 INSERT INTO international VALUES (651,'WebGUI',6,'Om du väljer att tömma skräpkorgen kommer alla saker i den att försvinna. Om du är osäker på vissa saker kan du klippa ut dom till klippbordet innan du tömmer skräpkorgen.',1032256602);
-INSERT INTO international VALUES (641,'WebGUI',6,'Bildgrupper är som mappar som hjälper dig organisera dina bilder. Du behöver inte använda grupper men på större webbplatser kan det definitivt vara användbart.\r\n\r\n<b>Gruppnamn</b>\r\nNamnet på gruppen som kommer visas när du bläddrar bland bilderna.\r\n\r\n<b>Gruppbeskriving</b>\r\nEn kort beskrivning av vilken typ av bilder denna gruppen är avsedd för.',1032256078);
+INSERT INTO international VALUES (71,'Survey',1,'Grade Book',1037573252);
+INSERT INTO international VALUES (70,'Survey',1,'Individual Responses',1037573240);
+INSERT INTO international VALUES (69,'Survey',1,'Delete this user\'s responses.',1037573082);
+INSERT INTO international VALUES (68,'Survey',1,'View reports and exports.',1037560492);
+INSERT INTO international VALUES (67,'Survey',1,'User',1037558860);
 INSERT INTO international VALUES (640,'WebGUI',6,'Det är inte en god idé att ta bort mallar eftersom du inte vet vilka följdverkningar det kan få på din webbplats (vissa sidor kan fortfarande använda mallen). Om du verkligen vill ta bort en mall kommer alla sidor som använder den att byta till standard-mallen',1032255575);
 INSERT INTO international VALUES (639,'WebGUI',6,'<b>Mallnamn</b>\r\nGe den här mallen ett beskrivande namn så att du vet hur den ser ut när du applicerar den på en sida.\r\n\r\n<b>Mall</b>\r\nSkapa en mall genom att placera special macron ^0; ^1; ^2; osv på de positioner du vill ska ha innehåll. Vanligtvis så används en tabell för att positionera innehållet. Titta gärna på mallarna som kommer med WebGUI för idéer.',1032255389);
 INSERT INTO international VALUES (638,'WebGUI',6,'Mallar används för att påverka hur sidor ser ut i WebGUI. Till exempel så har de flesta webbplatser idag mer än bara en meny och ett stort textfält. Många använder tre eller fyra kolumner som börjar med kolumnhuvuden och/eller banners. WebGUI tillåter mycket komplexa designer genom att använda mallar. Det finns flera mallar med WebGUI som kan hjälpa dig komma igång, men du kan även skapa hur många egna du vill.',1032255225);
@@ -6876,10 +6874,19 @@ INSERT INTO international VALUES (635,'WebGUI',6,'Paket är grupper av sidor och 
 INSERT INTO international VALUES (634,'WebGUI',6,'<b>Standard startsida</b>\r\nMånga små webbplatser har inte en dedikerad startsida utan använder en av deras underliggande sidor som \"Om oss\" eller \"Företagsinformation\". På grund av detta kan du själv sätta startsidan till vilken sida som helst inom webbplatsen. Det är den sidan besökarna kommer till om de skriver in http://www.minwebplats.nu eller om de klickar på en länk genererad av ^H; macrot.\r\n\r\n<b>Not Found sida</b>\r\nOm en sida som besökaren efterfrågar inte finns i systemet kan användaren bli omdirigerad till startsidan eller till en felsida där de kan försöka hitta det de letar efter. Du väljer själv hur du tror dina besökare vill ha det.\r\n\r\n<b>Dokumenttypsdeklaration</b>\r\nIdag finns det en mängd olika webbläsare som kan besöka din webbplats. Även automatiserade webbläsare som sökmotorssprindlar. Många webbläsare vill veta vilken typ av dokument du skickar och i dokumenttypsdeklarationen kan du skriva ut just detta. Som standard genererar WebGUI HTML 4.0 innehåll.\r\n\r\n<b>Lägg till redigeringsmärkning på inlägg</b>\r\nVanligtvis när en användare redigerar ett inlägg på ett meddelandeforum så läggs det till en märkning som visar vem som redigerade och vilken tid. På vissa webbplatser är sån information inte viktig och kan därför stängas av här.\r\n\r\n<b>Filtrera bidragen HTML</b>\r\nOm du har en publik webbplats där vem som helst kan posta meddelanden till meddelandeforum och dylikt så är det ofta en god idé att filtrera deras innehåll från \"elak\" data. Elak data kan vara sånt som hindrar eller försvårar för andra besökare att besöka din webbplats och ta del av dess innehåll. Använd detta val för att välja en filtreringsnivå.\r\n\r\n<b>Maximal bilagestorlek</b>\r\nStorlek (i kilobyte) för maximal bilaga.\r\n\r\n<b>Maximal bildstorlek</b>\r\nOm bilder laddas upp till din webbplats som är större än maximal bildstorlek kommer dessa att skalas ner. Bildstorleken mäts i pixlar och använder den längsta sidan på bilden för att avgöra om gränsen är nådd.\r\n\r\n<b>Miniatyrbildsstorlek</b>\r\nNär bilder laddas upp till webbplatsen kommer det automatiskt att skapas miniatyrbilder av dessa i storleken du väljer här. Storleken mäts i pixlar och den längsta sidan kommer aldrig vara större än du anger här.\r\n\r\n<b>Textområde, antal rader</b>\r\nVissa webbplatser vill kontrollera storleken på formulär som WebGUI genererar. Det är just vad du kan göra här. Välj hur många rader text som skall visas.\r\n\r\n<b>Textområde, antal kolumner</b>\r\nPrecis som innan, fast här väljer du antal tecken på varje rad (kolumner).\r\n\r\n<b>Textrutestorlek</b>\r\nSamma som ovan, fast med textrutor.\r\n\r\n<b>Editor att använda</b>\r\nWebGUI har en mycket sofistikerad \"Rich Editor\" som låter användare formatera innehåll som i Microsoft Word, eller annan likvärdig ordbehandlare. För att använda den funktionalliteten väljer du \"Inbyggd redigerare\". Vissa webbplatser kan ha behov av en mer komplett redigerare med stöd för saker som rättstavning osv. Därför kan du installera en tredjeparts editor som heter Real Objects Edit-On Pro®. Efter den är installerad kan du ändra det här valet. Vill du ha mer detaljerade instruktioner på hur du integrerar Edit-On Pro® kan du hitta information i online-boken \"Ruling WebGUI\".',1032251553);
 INSERT INTO international VALUES (633,'WebGUI',6,'För att uttrycka det enkelt så är rötter hemsidor utan föräldrar (utan ovanliggande sidor). Den viktigaste sidan i WebGUI är helt klart \"Hem\"-sidan. Många människor kommer aldrig att lägga till fler rötter till sina hemsidor och det går helt klart att klara sig med en rot. Vissa skapar rötter för innehållshanterare, eller kanske en gömt område för administrationsverktig. ',1032189185);
 INSERT INTO international VALUES (632,'WebGUI',6,'Du kan lägga till wobjects genom att välja <i>Lägg till innehåll...</i> från menyn längst upp på sidan (adminstrationsmenyn). Du kan redigera dom genom att klicka på <i>Redigera</i>-knappen som finns strax över wobjectet du vill redigera.\r\n\r\nNästan alla wobject delar på vissa egenskaper:\r\n\r\n<b>Wobject-ID</b>\r\nDetta är en unik identifierare för ett wobject. Normalt behöver inte användare bry sig om detta, men avancerade användare kan använda id-numret för SQL-rapporter och annat.\r\n\r\n<b>Titel</b>\r\nTitel på wobject. Detta visas vanligtvis ovanför varje wobject.\r\n\r\n<i>Note:</i> Du ska alltid välja en titel även om du inte ska visa den eftersom det är genom titeln du kan identifiera innehåll i skräpkorgen och klippbordet.\r\n\r\n<b>Visa titel?</b>\r\nVill du visa titeln du valt? Detta är inte nödvändigt på alla webbplatser.\r\n\r\n<b>Kör macros?</b>\r\nVill du köra macros på innehållet i detta wobject? Ibland vill du göra detta, men vet du om att du inte har macros i texten eller på andra ställen i ditt wobject så kan du stänga av denna funktionen för att sidorna ska laddas snabbare.\r\n\r\n<b>Mallposition</b>\r\nMallpositionen varierar mellan 0 (null) och uppåt. Hur många som finns beror på vilken mall som används på sidan. Standardmallen har bara en position, andra kan ha fler. Genom att välja en mallposition så väljer du var på mallen du vill att wobjectet skall hamna.\r\n\r\n<b>Startdatum</b>\r\nPå vilket datum ska innehållet visas för användaren? Innan detta datum kommer objektet bara vara synligt för innehållshanterare.\r\n\r\n<b>Slutdatum</b>\r\nVilket datum ska sidan inte längre vara synlig för användarna. Efter detta datum kommer objektet bara vara synligt för innehållshanterarna.\r\n\r\n<b>Beskrivning</b>\r\nEtt innehållsområde som du kan fylla med valfritt område. Till exempel kan en förklaring av vad en FAQ är i början på en FAQ vara en bra idé.',1032187841);
-INSERT INTO international VALUES (631,'WebGUI',6,'Du kan använda WebGUI\'s inbyggda bildhanterare för att ladda upp bilder till en central plats på servern eller på annat ställe på webbplatsen utan någon speciell programvara eller kunskap. Du kan också skapa bildgrupper för att organisera bilderna. För att göra så klickar du på \"Skapa ny grupp\".\r\n\r\nFör att placera bilder du laddat upp kan du använda macron som ^I(); samt ^i();. Mer information om dessa kan fås i macro-hjälpen.\r\n\r\n<i>Tip:</i> Du kan använda ^I(); macrot på platser du annars inte tänkt på. Till exempel kan du placera bilder i titeln på dina wobejts. Eller i wobjects som länklista och webbplatskarta kan du använda egna bilder från bildhanteraren som kulor.',1032186885);
+INSERT INTO international VALUES (790,'WebGUI',1,'Delete this profile category.',1036964807);
+INSERT INTO international VALUES (789,'WebGUI',1,'Edit this profile category.',1036964795);
+INSERT INTO international VALUES (788,'WebGUI',1,'Delete this profile field.',1036964681);
+INSERT INTO international VALUES (787,'WebGUI',1,'Edit this profile field.',1036964659);
+INSERT INTO international VALUES (791,'WebGUI',1,'Delete this translation.',1036970806);
+INSERT INTO international VALUES (802,'WebGUI',1,'WebGUI is not currently tracking page statistics. You can enable this feature in the settings.',1036979395);
+INSERT INTO international VALUES (801,'WebGUI',1,'Wobject Interactions',1036978843);
 INSERT INTO international VALUES (630,'WebGUI',6,'WebGUI har en liten men pålitlig sökmotor inbyggt. Vill du använda den interna sökmotor använder du ^?; macrot eller genom att lägg till <i>?op=search</i> på slutet på varje URL, eller göra din egen sida för att komma åt den.\r\n\r\nMånga installationer behöver en sökmotor för att indexera deras WebGUI webbplats eller har krav på funktioner som inte WebGUI\'s sökmotor stödjer. För dessa rekommenderar vi <a href=\"http://www.mnogosearch.org/\">MnoGo Search</a> eller <a href=\"http://www.htdig.org/\">ht://Dig</a>.',1032185821);
 INSERT INTO international VALUES (629,'WebGUI',6,'<b>Förhindra proxy-cachning</b>\r\nVisa företag har proxy-servrar som kan orsaka problem med WebGUI. Om du märker att du får problem med WebGUI, så som att sidor inte uppdateras som dom ska, och du har en proxy-server så kan du ställa det här alternativet till Ja. WebGUI kommer inte vara lika användarvänlig när du slår på den här funktionen.\r\n\r\n<b>Vid kritiskt fel</b>\r\nVad vill du göra om ett kritiskt fel uppstår. Det kan vara en säkerhetsrisk att visa felsökningsinformation, men du kan visa det så länge systemet är i utveckling.',1032185342);
-INSERT INTO international VALUES (628,'WebGUI',6,'När du tar bort en bild kommer denna även tas bort från servern och kan därför inte hämtas tillbaka. Var mycket säker på att du verkligen vill ta bort bilden innan du bekräftar att du vill fortsätta med borttagningen.',1032184610);
+INSERT INTO international VALUES (56,'Survey',1,'View comments.',1037555787);
+INSERT INTO international VALUES (55,'Survey',1,'View responses.',1037555778);
+INSERT INTO international VALUES (54,'Survey',1,'Percentage',1037555267);
+INSERT INTO international VALUES (53,'Survey',1,'Responses',1037555255);
 INSERT INTO international VALUES (627,'WebGUI',6,'Profiler används för att spara utökad information om en användare. I vissa fall kan profiler vara nödvändiga för en webbplast, ibland inte. Profilsystemet är fullständigt utbyggbart med ny fält och grupperingar. Du kan lägg till så mycket information du vill om en användare.',1032184553);
 INSERT INTO international VALUES (626,'WebGUI',6,'Wobjects (tidigare kända som Widgets) är själva styrkan i WebGUI. Wobjects är små applikationer som går att plugga in i WebGUI. Meddelandeforum och röstningar är två exempel på wobjects.\r\n\r\nFör att läagg till ett wobject till en sida så går du först till den sidan du vill att wobjecten ska synas på. Därefter väljer du <i>Lägg till innehåll...</i> från menyn längst upp på skärmen. Varje wobject har sin egen hjälp-sida, så är det något du behöver hjälp med så är det där du börjar leta.\r\n\r\n<i>Stilmallar:</i> Alla wobjects har en stilmallsklass och ID kopplat till sig.\r\n\r\nStilmallsklassen har order \"wobject\" i början plus vilken typ av wobject det är. Så för en röstning skulle stilmallen blir \"wobjectRöstning\". Stilen gäller för samtliga wobject av den typen på hela webbplatsen.\r\n\r\nStilmalls id kan användas för att bara påverka ett viss wobject med en stilmallsklass. Formatet ska vara \"wobjectId\" plus Id för objektet i fråga. Om du har en artikel med wobject-id 94 så ska en stilmallsklass se ut såhär: \"wobjectId94\". Detta påverkar bara wobject med rätt id-nummer.\r\n',1032184320);
 INSERT INTO international VALUES (625,'WebGUI',6,'<b>Namn</b>\r\nEn etikett för denna bild som kommer användas för att hämta bilden från andra sidor.\r\n\r\n<b>Fil</b>\r\nVälj en fil från din lokala hårddisk för uppladdning till servern.\r\n\r\n<b>Parametrar</b>\r\nLägg till så många HTML img-tagg parametrar som du vill ha för denna bild.\r\n\r\n<i>Exempel:</i>\r\nalign=\"right\"\r\nalt=\"Bild på hunden\"',1032183285);
@@ -6923,10 +6930,8 @@ INSERT INTO international VALUES (721,'WebGUI',6,'Namnrymd',1031841468);
 INSERT INTO international VALUES (669,'WebGUI',6,'Macros, använder',1031841455);
 INSERT INTO international VALUES (670,'WebGUI',6,'Bild, lägg till/redigera',1031841435);
 INSERT INTO international VALUES (672,'WebGUI',6,'Profilinställningar, redigera',1031841417);
-INSERT INTO international VALUES (673,'WebGUI',6,'Bild, radera',1031841399);
 INSERT INTO international VALUES (674,'WebGUI',6,'Blandade inställningar, redigera',1031841383);
 INSERT INTO international VALUES (675,'WebGUI',6,'Sökmotor, använder',1031841354);
-INSERT INTO international VALUES (676,'WebGUI',6,'Bilder, hantera',1031841315);
 INSERT INTO international VALUES (679,'WebGUI',6,'Innehållsinställningar, redigera',1031841268);
 INSERT INTO international VALUES (680,'WebGUI',6,'Paket, lägg till',1031841250);
 INSERT INTO international VALUES (681,'WebGUI',6,'Paket, skapa',1031841235);
@@ -6936,7 +6941,7 @@ INSERT INTO international VALUES (683,'WebGUI',6,'Mallar, hantera',1031841199);
 INSERT INTO international VALUES (684,'WebGUI',6,'Mall, lägg till/redigera',1031841184);
 INSERT INTO international VALUES (696,'WebGUI',6,'Papperskorg, töm',1031841167);
 INSERT INTO international VALUES (685,'WebGUI',6,'Mall, radera',1031841131);
-INSERT INTO international VALUES (686,'WebGUI',6,'Bildgrupp, lägg till',1031841119);
+INSERT INTO international VALUES (59,'Survey',1,'View statistical overview.',1037556614);
 INSERT INTO international VALUES (697,'WebGUI',6,'Karma, använder',1031841097);
 INSERT INTO international VALUES (699,'WebGUI',6,'Första dagen i veckan',1031840984);
 INSERT INTO international VALUES (713,'WebGUI',6,'Stilhanteringsgrupp',1031840911);
@@ -6961,19 +6966,16 @@ INSERT INTO international VALUES (708,'WebGUI',6,'Privilege-inställningar, hante
 INSERT INTO international VALUES (554,'WebGUI',6,'Behandla',1031840452);
 INSERT INTO international VALUES (551,'WebGUI',6,'Påminnelse',1031840439);
 INSERT INTO international VALUES (552,'WebGUI',6,'Väntande',1031840427);
-INSERT INTO international VALUES (550,'WebGUI',6,'Visa bildgrupp',1031840410);
-INSERT INTO international VALUES (549,'WebGUI',6,'Gruppbeskrivning',1031840401);
 INSERT INTO international VALUES (707,'WebGUI',6,'Visa felsökningsinformation?',1031840397);
-INSERT INTO international VALUES (548,'WebGUI',6,'Gruppnamn',1031840392);
+INSERT INTO international VALUES (584,'WebGUI',10,'Tilføj nyt sprog.',1037205300);
 INSERT INTO international VALUES (706,'WebGUI',6,'Timma(r)',1031840361);
 INSERT INTO international VALUES (705,'WebGUI',6,'Minut(er)',1031840344);
 INSERT INTO international VALUES (704,'WebGUI',6,'Sekund(er)',1031840333);
 INSERT INTO international VALUES (703,'WebGUI',6,'År',1031840321);
 INSERT INTO international VALUES (702,'WebGUI',6,'Månad(er)',1031840312);
-INSERT INTO international VALUES (547,'WebGUI',6,'Ägargrupp',1031840271);
-INSERT INTO international VALUES (546,'WebGUI',6,'Grupp-ID',1031840264);
-INSERT INTO international VALUES (545,'WebGUI',6,'Redigera bildgrupp',1031840258);
-INSERT INTO international VALUES (544,'WebGUI',6,'Är du säker på att du vill ta bort denna grupp?',1031840174);
+INSERT INTO international VALUES (582,'WebGUI',10,'Lad være blank',1037205253);
+INSERT INTO international VALUES (581,'WebGUI',10,'Tilføj en ny værdi',1037205231);
+INSERT INTO international VALUES (580,'WebGUI',10,'Din meddelels er <bold>ikke</bold> blevet godkendt.',1037205214);
 INSERT INTO international VALUES (512,'WebGUI',6,'Nästa tråd',1031840161);
 INSERT INTO international VALUES (509,'WebGUI',6,'Diskussionsdesign',1031840153);
 INSERT INTO international VALUES (508,'WebGUI',6,'Hantera mallar.',1031840138);
@@ -6987,7 +6989,7 @@ INSERT INTO international VALUES (496,'WebGUI',6,'Använd redigerare',1031839332)
 INSERT INTO international VALUES (495,'WebGUI',6,'Inbyggd redigerare',1031839316);
 INSERT INTO international VALUES (494,'WebGUI',6,'Real Objects Edit-On Pro',1031839302);
 INSERT INTO international VALUES (406,'WebGUI',6,'Miniatyrbildsstorlek',1031839235);
-INSERT INTO international VALUES (382,'WebGUI',6,'Redigera bild',1031839224);
+INSERT INTO international VALUES (601,'WebGUI',10,'International ID',1037205754);
 INSERT INTO international VALUES (71,'USS',6,'Användarinläggsystem är ett bra sätt att bygga upp en community på webbplatsen och få gratis innehåll från dina användare.\r\n\r\n<b>Design</b>\r\nVad ska inläggsystemet se ut som? Dessa olika vyer finns tillgängliga:\r\n<lu>\r\n <li><b>Traditionell</b> - Skapar en enkel kalkylarksliknande lista av varje inlägg och sorterar efter datum.</li>\r\n <li><b>Webbok</b> - Skapar en vy som liknar nyhetswebbplatsen <a href=\"http://www.slashdot.org\">Slashdot</a>. För att begränsa antalet artiklar på förstasidan kan du använda macrot ^-; där du vill att förstasidans innehåll ska sluta.</li>\r\n <li><b>Fotogalleri</b> - skapar en matris av miniatyrbilder som kan klickas på för att öppna bilden i full storlek.</li>\r\n\r\n<b>Vem kan godkänna?</b>\r\nVälj en grupp som ska godkänna eller refusera inlägg.\r\n\r\n<b>Vem kan bidra?</b>\r\nVälj en grupp som kan bidra med innehåll.\r\n\r\n<b>Inlägg per sida?</b>\r\nHur många inlägg ska visas per sida i inläggsindexet?\r\n\r\n<b>Standardstatus</b>\r\nSka inlägg sättas till <i>godkänd</i>, <i>väntande</i> eller <i>refuserad</i> som standard.\r\n\r\n<i>Note:</i> Om du sätter standardstatus till väntande så måste du själv övervaka meddelandeloggen och godkänna/refusera inlägg.\r\n\r\n<b>Karma per inlägg</b>\r\nHur mycket karma ges till en användare när de bidrar med inlägg?\r\n\r\n<b>Visa miniatyrbilder?</b>\r\nOm det finns en bild med i inlägget kommer denna att visas som en miniatyrbild i designen (se ovan).\r\n\r\n<b>Tillåt diskussion?</b>\r\nVill du koppla ett diskussionsforum till inläggen? Om du gör det så kommer användarna att kunna kommentera inläggen.\r\n\r\n<b>Vem kan skicka?</b>\r\nVälj en grupp som kan skicka kommentarer till inläggen.\r\n\r\n<b>Redigeringstimeout</b>\r\nHur lång tid har en användare på sig att redigera dennes inlägg innan det blir låst? \r\n\r\n<i>Note:</i> Sätt inte denna gränsen för högt. Om användarna tillåts gå tillbaka och ändra långt bak i tiden kan det bli förvirrande när man läser kommentarer till en borttagen text. \r\n\r\n<b>Karma per kommentar</b>\r\nHur mycket karma ges till användare som gör kommentarer till inlägget?\r\n\r\n<b>Vem kan moderera?</b>\r\nVälj en grupp som modererar kommentarerna.\r\n\r\n<b>Modereringstyp</b>\r\nDu kan välja vilken typ av moderering du vill ha på kommentarerna. <i>Efterhand</i> menar att kommentarerna publiceras direkt och tas bort/redigeras i efterhand. <i>Förhand</i> menas att kommentarerna måste godkännas av någon i modereringsgruppen innan dom visas på webbplatsen.\r\n\r\n<b><i>Note:</i><b> oavsett modereringstyp kan modererarna alltid gå in och redigera/ta bort kommentarer och inlägg.',1031839167);
 INSERT INTO international VALUES (567,'WebGUI',6,'Förhand',1031837015);
 INSERT INTO international VALUES (582,'WebGUI',6,'Lämna tom',1031836927);
@@ -7607,10 +7609,8 @@ INSERT INTO international VALUES (24,'Article',11,'ÊÚííä ÇáÑÏ',1031514049);
 INSERT INTO international VALUES (23,'Article',11,'ÇáÊÇÑíÎ (ÇáÒãä)',1031514049);
 INSERT INTO international VALUES (22,'Article',11,'ÇáßÇÊÈ',1031514049);
 INSERT INTO international VALUES (18,'Article',11,'ÝÊÍ ãäÇÞÔÇÊ¿',1031514049);
-INSERT INTO international VALUES (17,'Article',11,'ãÑßÒí',1031514049);
-INSERT INTO international VALUES (16,'Article',11,'íÓÇÑ',1031514049);
-INSERT INTO international VALUES (15,'Article',11,'íãíä',1031514049);
-INSERT INTO international VALUES (14,'Article',11,'ÊÍÑíÑ ãßÇä ÇáÕæÑÉ',1031514049);
+INSERT INTO international VALUES (749,'WebGUI',1,'Track page statistics?',1036736182);
+INSERT INTO international VALUES (778,'WebGUI',1,'Folder Description',1036906132);
 INSERT INTO international VALUES (13,'Article',11,'ÍÐÝ',1031514049);
 INSERT INTO international VALUES (12,'Article',11,'ÊÍÑíÑ ÇáÝÞÑÉ',1031514049);
 INSERT INTO international VALUES (11,'Article',11,'br&gt',0);
@@ -7768,22 +7768,20 @@ INSERT INTO international VALUES (378,'WebGUI',11,'åæíÉ ÇáãÓÊÎÏã',1031514049);
 INSERT INTO international VALUES (379,'WebGUI',11,'åæíÉ ÇáãÌãæÚÉ',1031514049);
 INSERT INTO international VALUES (380,'WebGUI',11,'åæíÉ ÇáÊÕãíã',1031514049);
 INSERT INTO international VALUES (381,'WebGUI',11,'ÊáÞì WebGUI ØáÈðÇ ãÔæåðÇ æáã íÊãßä ãä ÇáÇÓÊãÑÇÑ. æÓÈÈ Ðáß Ãäå íÊã ÊãÑíÑ ÎÕÇÆÕ ÇáÍíÇÒÉ ÎáÇá Ôßá ãØÇÈÞ. ãä ÝÖáß áÇ ÊÔÚÑ ÈÇáÍÑÌ æÇÖÛØ ãÝÊÇÍ ÇáÑÌæÚ¡ Ëã ÍÇæá ãÑÉ ËÇäíÉ.',1031514049);
-INSERT INTO international VALUES (382,'WebGUI',11,'ÊÍÑíÑ ÕæÑÉ',1031514049);
-INSERT INTO international VALUES (383,'WebGUI',11,'ÇÓã',1031514049);
+INSERT INTO international VALUES (806,'WebGUI',1,'Delete this group.',1037579396);
 INSERT INTO international VALUES (384,'WebGUI',11,'ãáÝ',1031514049);
 INSERT INTO international VALUES (385,'WebGUI',11,'ÍÏæÏ',1031514049);
 INSERT INTO international VALUES (386,'WebGUI',11,'ÊÍÑíÑ ÕæÑÉ',1031514049);
 INSERT INTO international VALUES (387,'WebGUI',11,'Êã ÊÍãíáå ÈæÇÓØÉ',1031514049);
 INSERT INTO international VALUES (388,'WebGUI',11,'ÊÇÑíÎ ÇáÊÍãíá',1031514049);
-INSERT INTO international VALUES (389,'WebGUI',11,'åæíÉ ÇáÕæÑÉ',1031514049);
-INSERT INTO international VALUES (390,'WebGUI',11,'ÊÔÛíá ÇáÕæÑÉ…',1031514049);
+INSERT INTO international VALUES (696,'WebGUI',10,'Skraldespand, Tøm',1036856003);
 INSERT INTO international VALUES (391,'WebGUI',11,'ÍÐÝ ãáÝ ãÑÝÞ.',1031514049);
-INSERT INTO international VALUES (392,'WebGUI',11,'åá ÃäÊ ãÊÃßÏ Ãäß ÊÑíÏ ÍÐÝ åÐå ÇáÕæÑÉ¿',1031514049);
-INSERT INTO international VALUES (393,'WebGUI',11,'ÅÏÇÑÉ ÇáÕæÑ',1031514049);
+INSERT INTO international VALUES (597,'WebGUI',10,'Redigér international tekst',1037205701);
+INSERT INTO international VALUES (785,'WebGUI',1,'Collateral, Manage',1036954767);
 INSERT INTO international VALUES (394,'WebGUI',11,'ÅÏÇÑÉ ÇáÕæÑ',1031514049);
 INSERT INTO international VALUES (395,'WebGUI',11,'ÅÖÇÝÉ ÕæÑÉ ÌÏíÏÉ',1031514049);
-INSERT INTO international VALUES (396,'WebGUI',11,'ÇÓÊÚÑÇÖ ÕæÑÉ',1031514049);
-INSERT INTO international VALUES (397,'WebGUI',11,'ÑÌæÚ Åáì ÞÇÆãÉ ÇáÕæÑ',1031514049);
+INSERT INTO international VALUES (716,'WebGUI',10,'Log in',1036855717);
+INSERT INTO international VALUES (704,'WebGUI',10,'sekund(er)',1036855926);
 INSERT INTO international VALUES (398,'WebGUI',11,'ÅÚáÇä äæÚ ÇáæËíÞÉ',1031514049);
 INSERT INTO international VALUES (399,'WebGUI',11,'ÅÌÚá åÐå ÇáÕÝÍÉ ÕÇáÍÉ ÒãäíðÇ',1031514049);
 INSERT INTO international VALUES (400,'WebGUI',11,'ÇãäÚ  ÈÑæßÓí ãä ÇáÅÎÝÇÁ',1031514049);
@@ -7927,13 +7925,10 @@ INSERT INTO international VALUES (540,'WebGUI',11,'ÇáãÞÏÇÑ ÈÍÓÈ ãÑÇÊ ÇáÏÎæá',103
 INSERT INTO international VALUES (541,'WebGUI',11,'ÇáãÞÏÇÑ ÈÍÓÈ ãÑÇÊ ÇáÊÚííä',1031514049);
 INSERT INTO international VALUES (542,'WebGUI',11,'ÇáÓÇÈÞ..',1031514049);
 INSERT INTO international VALUES (543,'WebGUI',11,'ÅÖÇÝÉ ãÌãæÚÉ ÕæÑ ÌÏíÏÉ',1031514049);
-INSERT INTO international VALUES (544,'WebGUI',11,'åá ÃäÊ ãÊÃßÏ Ãäß ÊÑíÏ ÍÐÝ åÐå ÇáãÌãæÚÉ¿',1031514049);
-INSERT INTO international VALUES (545,'WebGUI',11,'ÊÍÑíÑ ãÌãæÚÉ ÇáÕæÑ',1031514049);
-INSERT INTO international VALUES (546,'WebGUI',11,'åæíÉ ÇáãÌãæÚÉ',1031514049);
-INSERT INTO international VALUES (547,'WebGUI',11,'ãÌãæÚÉ ÇáÂÈÇÁ',1031514049);
-INSERT INTO international VALUES (548,'WebGUI',11,'ÇÓã ÇáãÌãæÚÉ',1031514049);
-INSERT INTO international VALUES (549,'WebGUI',11,'ÊæÕíÝ ÇáãÌãæÚÉ',1031514049);
-INSERT INTO international VALUES (550,'WebGUI',11,'ÇÓÊÚÑÇÖ ãÌãæÚÉ ÇáÕæÑ',1031514049);
+INSERT INTO international VALUES (4,'WobjectProxy',10,'Wobject Proxy mislykkedes.\r\nMåske er kilde Wobject slettet.',1036856184);
+INSERT INTO international VALUES (583,'WebGUI',10,'Maksimal størrelse på billede',1037205281);
+INSERT INTO international VALUES (585,'WebGUI',10,'Adminstrer oversættelser',1037205335);
+INSERT INTO international VALUES (587,'WebGUI',10,'Er du sikker på at du vil slette dette sprog og dermed alle internationale tekster herunder?',1037205398);
 INSERT INTO international VALUES (551,'WebGUI',11,'ãáÍæÙÉ',1031514049);
 INSERT INTO international VALUES (552,'WebGUI',11,'ãÚáøÞ',1031514049);
 INSERT INTO international VALUES (553,'WebGUI',11,'ÇáÍÇáÉ',1031514049);
@@ -8006,10 +8001,8 @@ INSERT INTO international VALUES (669,'WebGUI',11,'ãÎÊÕÑÇÊ¡  ÊØÈíÞ',1031514049);
 INSERT INTO international VALUES (670,'WebGUI',11,'ÕæÑÉ¡ ÅÖÇÝÉ/ÍÐÝ',1031514049);
 INSERT INTO international VALUES (671,'WebGUI',11,'ãæÖæÚÇÊ ÇáÇäÊÑäÊ¡ ÊÍÑíÑ',1031514049);
 INSERT INTO international VALUES (672,'WebGUI',11,'ÊÌåíÒÇÊ ÇáÈíÇäÇÊ ÇáÚÇãÉ¡ ÊÍÑíÑ',1031514049);
-INSERT INTO international VALUES (673,'WebGUI',11,'ÕæÑÉ¡ ÍÐÝ',1031514049);
 INSERT INTO international VALUES (674,'WebGUI',11,'ÊÌåíÒÇÊ ãÊäæÚÉ¡ ÊÍÑíÑ',1031514049);
 INSERT INTO international VALUES (675,'WebGUI',11,'ãæÞÚ ÇáÈÍË¡ ÇÓÊÎÏÇã',1031514049);
-INSERT INTO international VALUES (676,'WebGUI',11,'ÕæÑ¡ ÅÏÇÑÉ',1031514049);
 INSERT INTO international VALUES (677,'WebGUI',11,'ãæÖæÚÇÊ ÇáÅäÊÑäÊ¡ ÅÖÇÝÉ/ÍÐÝ',1031514049);
 INSERT INTO international VALUES (678,'WebGUI',11,'ÌÐÑ¡ ÅÏÇÑÉ',1031514049);
 INSERT INTO international VALUES (679,'WebGUI',11,'ÊÌåíÒÇÊ ÇáãÍÊæì¡ ÊÍÑíÑ',1031514049);
@@ -8019,7 +8012,7 @@ INSERT INTO international VALUES (682,'WebGUI',11,'ÈíÇäÇÊ ÇáãÓÊÎÏã ÇáÚÇãÉ¡ ÊÍÑíÑ
 INSERT INTO international VALUES (683,'WebGUI',11,'ÞæÇáÈ¡ ÅÏÇÑÉ',1031514049);
 INSERT INTO international VALUES (684,'WebGUI',11,'ÞÇáÈ¡ ÅÖÇÝÉ/ÊÚÏíá',1031514049);
 INSERT INTO international VALUES (685,'WebGUI',11,'ÞÇáÈ¡ ÍÐÝ',1031514049);
-INSERT INTO international VALUES (686,'WebGUI',11,'ãÌãæÚÉ ÕæÑ¡ ÅÖÇÝÉ',1031514049);
+INSERT INTO international VALUES (60,'Survey',1,'Back to survey.',1037556626);
 INSERT INTO international VALUES (696,'WebGUI',11,'ÓáÉ ÇáãåãáÇÊ¡ ÊÝÑíÛ',1031514049);
 INSERT INTO international VALUES (697,'WebGUI',11,'ÇáãÞÏÇÑ. ÇáÓáæß¡ ÊØÈíÞ',1031514049);
 INSERT INTO international VALUES (699,'WebGUI',11,'Ãæá ÃíÇã ÇáÃÓÈæÚ',1031514049);
@@ -8057,22 +8050,22 @@ INSERT INTO international VALUES (5,'WobjectProxy',11,'ææÈÌíßÊ ÈÑæßÓí¡ ÅÖÇÝÉ/ÊÍÑ
 INSERT INTO international VALUES (746,'WebGUI',1,'Toolbar Icon Set',1036046598);
 INSERT INTO international VALUES (45,'Survey',1,'Are you certain you wish to delete this answer and its responses?',1035951913);
 INSERT INTO international VALUES (44,'Survey',1,'Are you certain you wish to delete this question, its answers and responses?',1035951626);
-INSERT INTO international VALUES (34,'Survey',1,'Agree.',1035948150);
-INSERT INTO international VALUES (33,'Survey',1,'Strongly agree.',1035948137);
-INSERT INTO international VALUES (32,'Survey',1,'False.',1035948033);
-INSERT INTO international VALUES (31,'Survey',1,'True.',1035948023);
+INSERT INTO international VALUES (34,'Survey',1,'Agree',1037498914);
+INSERT INTO international VALUES (33,'Survey',1,'Strongly Agree',1037498857);
+INSERT INTO international VALUES (32,'Survey',1,'False',1037498832);
+INSERT INTO international VALUES (31,'Survey',1,'True',1037498842);
 INSERT INTO international VALUES (27,'Survey',1,'Add an opinion (agree/disagree) answer scale.',1035948010);
 INSERT INTO international VALUES (25,'Survey',1,'Add a true/false answer.',1035947960);
 INSERT INTO international VALUES (26,'Survey',1,'Add a frequency (always/never) answer scale.',1035947924);
-INSERT INTO international VALUES (43,'Survey',1,'Never.',1035947630);
-INSERT INTO international VALUES (42,'Survey',1,'Occasionally.',1035947620);
-INSERT INTO international VALUES (41,'Survey',1,'Frequently.',1035947594);
-INSERT INTO international VALUES (40,'Survey',1,'Always.',1035947586);
-INSERT INTO international VALUES (39,'Survey',1,'Not applicable.',1035947497);
-INSERT INTO international VALUES (38,'Survey',1,'Strongly disagree.',1035947488);
-INSERT INTO international VALUES (37,'Survey',1,'Disagree.',1035947477);
-INSERT INTO international VALUES (36,'Survey',1,'Somewhat disagree.',1035947465);
-INSERT INTO international VALUES (35,'Survey',1,'Somewhat agree.',1035947450);
+INSERT INTO international VALUES (43,'Survey',1,'Never',1037574752);
+INSERT INTO international VALUES (42,'Survey',1,'Occasionally',1037574859);
+INSERT INTO international VALUES (41,'Survey',1,'Frequently',1037574786);
+INSERT INTO international VALUES (40,'Survey',1,'Always',1037574725);
+INSERT INTO international VALUES (39,'Survey',1,'Not Applicable',1037574804);
+INSERT INTO international VALUES (38,'Survey',1,'Strongly Disagree',1037498903);
+INSERT INTO international VALUES (37,'Survey',1,'Disagree',1037498886);
+INSERT INTO international VALUES (36,'Survey',1,'Somewhat Disagree',1037498872);
+INSERT INTO international VALUES (35,'Survey',1,'Somewhat Agree',1037498927);
 INSERT INTO international VALUES (30,'Survey',1,'Add a new question.',1035944708);
 INSERT INTO international VALUES (29,'Survey',1,'Add a text answer.',1035874640);
 INSERT INTO international VALUES (24,'Survey',1,'Add a multiple choice answer.',1035874502);
@@ -8103,6 +8096,247 @@ INSERT INTO international VALUES (3,'Survey',1,'Survey, Add/Edit',1033944306);
 INSERT INTO international VALUES (4,'Survey',1,'',1033944306);
 INSERT INTO international VALUES (2,'Survey',1,'Edit Survey',1033943825);
 INSERT INTO international VALUES (1,'Survey',1,'Survey',1033942924);
+INSERT INTO international VALUES (741,'WebGUI',1,'Edit this template.',1034223116);
+INSERT INTO international VALUES (742,'WebGUI',1,'Manage templates.',1034223130);
+INSERT INTO international VALUES (748,'WebGUI',1,'User Count',1036553016);
+INSERT INTO international VALUES (760,'WebGUI',1,'Delete this folder.',1036892740);
+INSERT INTO international VALUES (759,'WebGUI',1,'Edit this folder.',1036892731);
+INSERT INTO international VALUES (758,'WebGUI',1,'Add a folder.',1036892705);
+INSERT INTO international VALUES (757,'WebGUI',1,'Manage Collateral',1036892669);
+INSERT INTO international VALUES (756,'WebGUI',1,'Back to group list.',1036867726);
+INSERT INTO international VALUES (754,'WebGUI',1,'Manage the users in this group.',1036866994);
+INSERT INTO international VALUES (753,'WebGUI',1,'Edit this group.',1036866979);
+INSERT INTO international VALUES (752,'WebGUI',1,'View this user\'s profile.',1036864965);
+INSERT INTO international VALUES (751,'WebGUI',1,'Become this user.',1036864905);
+INSERT INTO international VALUES (750,'WebGUI',1,'Delete this user.',1036864742);
+INSERT INTO international VALUES (724,'WebGUI',10,'Dit brugernavn kan ikke begynde med blanktegn.',1036855579);
+INSERT INTO international VALUES (725,'WebGUI',10,'Dit brugernavn kan ikke være blankt.',1036855553);
+INSERT INTO international VALUES (726,'WebGUI',10,'Dit kodeord kan ikke være blankt.',1036855532);
+INSERT INTO international VALUES (682,'WebGUI',10,'Brugerprofil, Redigér',1036855505);
+INSERT INTO international VALUES (681,'WebGUI',10,'Pakker, Opret',1036855491);
+INSERT INTO international VALUES (680,'WebGUI',10,'Pakker, Tilføj',1036855476);
+INSERT INTO international VALUES (679,'WebGUI',10,'Indholds indstillinger, Redigér',1036855461);
+INSERT INTO international VALUES (678,'WebGUI',10,'Rod, Håndter',1036855438);
+INSERT INTO international VALUES (677,'WebGUI',10,'Wobjects, Tilføj/Redigér',1036855426);
+INSERT INTO international VALUES (676,'WebGUI',10,'Images, Håndter',1036855404);
+INSERT INTO international VALUES (675,'WebGUI',10,'Søgemaskine, Anvend',1036855390);
+INSERT INTO international VALUES (674,'WebGUI',10,'Diverse indstillinger, Redigér',1036855371);
+INSERT INTO international VALUES (673,'WebGUI',10,'Image, slet',1036855354);
+INSERT INTO international VALUES (672,'WebGUI',10,'Profil indstilling, Redigér',1036855339);
+INSERT INTO international VALUES (669,'WebGUI',10,'Makroer, Anvend',1036855290);
+INSERT INTO international VALUES (668,'WebGUI',10,'Style Sheets, Anvend',1036855265);
+INSERT INTO international VALUES (671,'WebGUI',10,'Wobjects, Anvend',1036855231);
+INSERT INTO international VALUES (670,'WebGUI',10,'Image, Tilføj/redigér',1036855215);
+INSERT INTO international VALUES (667,'WebGUI',10,'Gruppe, Tilføj/Redigér',1036855136);
+INSERT INTO international VALUES (666,'WebGUI',10,'Stilart, Tilføj/Redigér',1036855118);
+INSERT INTO international VALUES (665,'WebGUI',10,'Gruppe, Slet',1036855098);
+INSERT INTO international VALUES (664,'WebGUI',10,'Wobject, Slet',1036855078);
+INSERT INTO international VALUES (663,'WebGUI',10,'Mail indstillinger, Redigér',1036854968);
+INSERT INTO international VALUES (662,'WebGUI',10,'Indstillinger, Håndter',1036854946);
+INSERT INTO international VALUES (571,'WebGUI',10,'Lås tråd op',1036854909);
+INSERT INTO international VALUES (570,'WebGUI',10,'Lås tråd',1036854887);
+INSERT INTO international VALUES (568,'WebGUI',10,'Efter facts',1036854874);
+INSERT INTO international VALUES (569,'WebGUI',10,'Moderations type',1036854857);
+INSERT INTO international VALUES (567,'WebGUI',10,'',1036854833);
+INSERT INTO international VALUES (559,'WebGUI',10,'Kør ved registrering',1036854816);
+INSERT INTO international VALUES (558,'WebGUI',10,'Redigér brugers karma',1036854794);
+INSERT INTO international VALUES (557,'WebGUI',10,'Beskrivelse',1036854778);
+INSERT INTO international VALUES (556,'WebGUI',10,'Værdi',1036854766);
+INSERT INTO international VALUES (555,'WebGUI',10,'Redigér denne brugers karma',1036854755);
+INSERT INTO international VALUES (554,'WebGUI',10,'Tag aktion',1036854733);
+INSERT INTO international VALUES (553,'WebGUI',10,'Status',1036854720);
+INSERT INTO international VALUES (552,'WebGUI',10,'Afventer',1036854708);
+INSERT INTO international VALUES (551,'WebGUI',10,'Besked',1036854692);
+INSERT INTO international VALUES (550,'WebGUI',10,'Vis image gruppe',1036854678);
+INSERT INTO international VALUES (549,'WebGUI',10,'Gruppe beskrivelse',1036854665);
+INSERT INTO international VALUES (548,'WebGUI',10,'Gruppe navn',1036854650);
+INSERT INTO international VALUES (547,'WebGUI',10,'Overgruppe',1036854626);
+INSERT INTO international VALUES (546,'WebGUI',10,'Gruppe ID',1036854611);
+INSERT INTO international VALUES (545,'WebGUI',10,'Redigér image gruppe',1036854598);
+INSERT INTO international VALUES (544,'WebGUI',10,'Er du sikker på du vil slette denne gruppe?',1036854576);
+INSERT INTO international VALUES (543,'WebGUI',10,'Tilføj ny image gruppe',1036854555);
+INSERT INTO international VALUES (542,'WebGUI',10,'Forrige..',1036854517);
+INSERT INTO international VALUES (541,'WebGUI',10,'Karma pr. postering',1036854500);
+INSERT INTO international VALUES (540,'WebGUI',10,'Karma pr. login',1036854367);
+INSERT INTO international VALUES (539,'WebGUI',10,'Aktivér karma?',1036854349);
+INSERT INTO international VALUES (538,'WebGUI',10,'Karma grænse',1036854328);
+INSERT INTO international VALUES (537,'WebGUI',10,'Karma',1036854293);
+INSERT INTO international VALUES (536,'WebGUI',10,'En ny bruger: ^@;, har registreret sig.',1036854252);
+INSERT INTO international VALUES (535,'WebGUI',10,'Gruppe der skal notificeres om ny bruger',1036854162);
+INSERT INTO international VALUES (534,'WebGUI',10,'Giv meddelelse om ny bruger?',1036854133);
+INSERT INTO international VALUES (533,'WebGUI',10,'<bold>uden</bold> disse ord',1036854103);
+INSERT INTO international VALUES (532,'WebGUI',10,'med <bold>mindst et</bold> af disse ord',1036854079);
+INSERT INTO international VALUES (531,'WebGUI',10,'<bold>eksakt</bold> denne sætning',1036854044);
+INSERT INTO international VALUES (530,'WebGUI',10,'med <bold>alle</bold> ordene',1036854002);
+INSERT INTO international VALUES (529,'WebGUI',10,'resultater',1036853971);
+INSERT INTO international VALUES (528,'WebGUI',10,'Navn på skabelon',1036853957);
+INSERT INTO international VALUES (527,'WebGUI',10,'Standard hjemmeside',1036853933);
+INSERT INTO international VALUES (526,'WebGUI',10,'Fjern kun JavaScript.',1036853917);
+INSERT INTO international VALUES (525,'WebGUI',10,'Rediger indholds indstillinger',1036853889);
+INSERT INTO international VALUES (524,'WebGUI',10,'Tilføj redigeringsmærke til posteringer?',1036853870);
+INSERT INTO international VALUES (523,'WebGUI',10,'Notificering',1036853846);
+INSERT INTO international VALUES (522,'WebGUI',10,'Jeg vil gerne notificeres via ICQ.',1036853832);
+INSERT INTO international VALUES (521,'WebGUI',10,'Jeg vil gerne notificeres via email til personsøger.',1036853814);
+INSERT INTO international VALUES (520,'WebGUI',10,'Jeg vil gerne notificeres via Email.',1036853784);
+INSERT INTO international VALUES (519,'WebGUI',10,'Jeg vil gerne notificeres',1036853765);
+INSERT INTO international VALUES (518,'WebGUI',10,'Indbakke notificeringer',1036853749);
+INSERT INTO international VALUES (517,'WebGUI',10,'Slå administration fra',1036853708);
+INSERT INTO international VALUES (516,'WebGUI',10,'Slå administration til',1036853690);
+INSERT INTO international VALUES (515,'WebGUI',10,'Tilføj redigeringsmærke til posteringer?',1036853672);
+INSERT INTO international VALUES (514,'WebGUI',10,'Visninger',1036853524);
+INSERT INTO international VALUES (513,'WebGUI',10,'Forrige tråd',1036853502);
+INSERT INTO international VALUES (512,'WebGUI',10,'Næste tråd',1036853486);
+INSERT INTO international VALUES (727,'WebGUI',10,'Dit kodeord kan ikke være \"password\".',1036612598);
+INSERT INTO international VALUES (511,'WebGUI',10,'Emne opdelt',1036612553);
+INSERT INTO international VALUES (510,'WebGUI',10,'Flad',1036612526);
+INSERT INTO international VALUES (509,'WebGUI',10,'Diskusions layout',1036612509);
+INSERT INTO international VALUES (508,'WebGUI',10,'Administrer skabeloner',1036612485);
+INSERT INTO international VALUES (507,'WebGUI',10,'Redigér skabelon',1036612448);
+INSERT INTO international VALUES (506,'WebGUI',10,'Administrer skabeloner',1036612430);
+INSERT INTO international VALUES (505,'WebGUI',10,'Tilføj ny skabelon',1036612389);
+INSERT INTO international VALUES (504,'WebGUI',10,'Skabelon',1036612373);
+INSERT INTO international VALUES (503,'WebGUI',10,'Skabelon ID',1036612359);
+INSERT INTO international VALUES (502,'WebGUI',10,'Er du sikker på du vil slette denne skabelon og dermed alle sider der anvender den?',1036612343);
+INSERT INTO international VALUES (501,'WebGUI',10,'Body',1036612298);
+INSERT INTO international VALUES (500,'WebGUI',10,'Side ID',1036612281);
+INSERT INTO international VALUES (382,'WebGUI',10,'Redigér billed',1036612267);
+INSERT INTO international VALUES (61,'UserSubmission',10,'Bruger indlæg system, tilføj/redigér',1036612234);
+INSERT INTO international VALUES (59,'UserSubmission',10,'Næste indlæg',1036612208);
+INSERT INTO international VALUES (58,'UserSubmission',10,'Tidligere indlæg',1036612195);
+INSERT INTO international VALUES (57,'UserSubmission',10,'Respons',1036612182);
+INSERT INTO international VALUES (56,'UserSubmission',10,'Foto gallari',1036612168);
+INSERT INTO international VALUES (55,'UserSubmission',10,'Traditionel',1036612152);
+INSERT INTO international VALUES (54,'UserSubmission',10,'web log',1036612137);
+INSERT INTO international VALUES (53,'UserSubmission',10,'Layout',1036612124);
+INSERT INTO international VALUES (52,'UserSubmission',10,'Minature',1036612109);
+INSERT INTO international VALUES (51,'UserSubmission',10,'Vis minature format?',1036612086);
+INSERT INTO international VALUES (48,'UserSubmission',10,'Tillad diskussion?',1036612067);
+INSERT INTO international VALUES (47,'UserSubmission',10,'Send et svar',1036612036);
+INSERT INTO international VALUES (46,'UserSubmission',10,'Læs mere ...',1036612017);
+INSERT INTO international VALUES (45,'UserSubmission',10,'Retur',1036612001);
+INSERT INTO international VALUES (41,'UserSubmission',10,'Dato',1036611623);
+INSERT INTO international VALUES (40,'UserSubmission',10,'indsendt af',1036611601);
+INSERT INTO international VALUES (39,'UserSubmission',10,'Send et svar',1036611581);
+INSERT INTO international VALUES (38,'UserSubmission',10,'(Vælg \"nej\" hvis du skriver et HTML baseret indlæg)',1036611407);
+INSERT INTO international VALUES (30,'UserSubmission',10,'Karma pr. indlæg',1036611359);
+INSERT INTO international VALUES (61,'SyndicatedContent',10,'Syndicated Content, tilføj/redigér',1036611329);
+INSERT INTO international VALUES (61,'SiteMap',10,'Træ struktur (site map), tilføj/redigér',1036611295);
+INSERT INTO international VALUES (61,'SQLReport',10,'SQL Rapport, tilføj/redigér',1036611251);
+INSERT INTO international VALUES (9,'Product',10,'Produkt billed 3',1036611226);
+INSERT INTO international VALUES (8,'Product',10,'Produkt billed 2',1036611213);
+INSERT INTO international VALUES (7,'Product',10,'Produkt billed 1',1036611200);
+INSERT INTO international VALUES (62,'Product',10,'Produkt skabelon, tilføj/redigér',1036611151);
+INSERT INTO international VALUES (61,'Product',10,'Produkt skabelon',1036611127);
+INSERT INTO international VALUES (60,'Product',10,'Skabelon',1036611112);
+INSERT INTO international VALUES (6,'Product',10,'Redigér produkt',1036611098);
+INSERT INTO international VALUES (59,'Product',10,'Navn',1036611082);
+INSERT INTO international VALUES (58,'Product',10,'Redigér produkt skabelon',1036611058);
+INSERT INTO international VALUES (57,'Product',10,'Er du sikker på du vil slette denne skabelon og dermed også alle produkter der anvender den?',1036611039);
+INSERT INTO international VALUES (56,'Product',10,'Tilføj en produkt skabelon.',1036605180);
+INSERT INTO international VALUES (55,'Product',10,'Tilføj en fordel.',1036605149);
+INSERT INTO international VALUES (54,'Product',10,'Fordele',1036605131);
+INSERT INTO international VALUES (53,'Product',10,'Redigér fordel',1036605116);
+INSERT INTO international VALUES (52,'Product',10,'Tilføj yderligere fordel?',1036605101);
+INSERT INTO international VALUES (51,'Product',10,'Fordel',1036605083);
+INSERT INTO international VALUES (5,'Product',10,'Er du sikker på du vil slette denne specifikation?',1036605065);
+INSERT INTO international VALUES (49,'Product',10,'Produkt fordel, tilføj/redigér',1036605042);
+INSERT INTO international VALUES (48,'Product',10,'Er du sikker på du vil slette denne fordel? (kan ikke genskabes når først slettet)',1036605023);
+INSERT INTO international VALUES (46,'Product',10,'Relateret produkt, tilføj/redigér',1036604974);
+INSERT INTO international VALUES (44,'Product',10,'Produkt tilbehør, tilføj/redigér',1036604937);
+INSERT INTO international VALUES (42,'Product',10,'Produkt specifikation, tilføj/redigér',1036604911);
+INSERT INTO international VALUES (40,'Product',10,'Produkt egenskab, tilføj/redigér',1036604886);
+INSERT INTO international VALUES (4,'Product',10,'Er du sikker på du vil slette relationen til det relaterede produkt?',1036604858);
+INSERT INTO international VALUES (38,'Product',10,'Produkter, tilføj/redigér',1036604819);
+INSERT INTO international VALUES (37,'Product',10,'Tilføj et relateret produkt.',1036604797);
+INSERT INTO international VALUES (36,'Product',10,'Tilføj tilbehør.',1036604779);
+INSERT INTO international VALUES (35,'Product',10,'Tilføj en specifikation.',1036604761);
+INSERT INTO international VALUES (34,'Product',10,'Tilføj en egenskab.',1036604744);
+INSERT INTO international VALUES (33,'Product',10,'Relaterede produkter',1036604724);
+INSERT INTO international VALUES (32,'Product',10,'Tilbehør',1036604703);
+INSERT INTO international VALUES (31,'Product',10,'Specifikationer',1036604690);
+INSERT INTO international VALUES (30,'Product',10,'Egenskaber',1036604674);
+INSERT INTO international VALUES (3,'Product',10,'Er du sikker på du vil slette denne egenskab?',1036604621);
+INSERT INTO international VALUES (29,'Product',10,'Enheder',1036604600);
+INSERT INTO international VALUES (28,'Product',10,'Tilføj yderligere specifikation',1036604556);
+INSERT INTO international VALUES (27,'Product',10,'Specifikation',1036604539);
+INSERT INTO international VALUES (26,'Product',10,'Label',1036604513);
+INSERT INTO international VALUES (25,'Product',10,'Redig+er specifikation',1036604493);
+INSERT INTO international VALUES (24,'Product',10,'Tilføj yderligere egenskaber?',1036604476);
+INSERT INTO international VALUES (23,'Product',10,'Egenskab',1036604454);
+INSERT INTO international VALUES (22,'Product',10,'Redigér egenskab',1036604438);
+INSERT INTO international VALUES (21,'Product',10,'Tilføj yderligere releteret produkt?',1036604409);
+INSERT INTO international VALUES (20,'Product',10,'Relateret produkt',1036604385);
+INSERT INTO international VALUES (2,'Product',10,'Er du sikker på du vil slette referencen til dette tilbehør?',1036604368);
+INSERT INTO international VALUES (19,'Product',10,'Tilføj relateret produkt',1036604335);
+INSERT INTO international VALUES (18,'Product',10,'Tilføj yderligere tilbehør?',1036604319);
+INSERT INTO international VALUES (17,'Product',10,'Tilbehør',1036604302);
+INSERT INTO international VALUES (16,'Product',10,'Tilføj tilbehør',1036604289);
+INSERT INTO international VALUES (15,'Product',10,'Garanti',1036604274);
+INSERT INTO international VALUES (14,'Product',10,'Manual',1036604254);
+INSERT INTO international VALUES (13,'Product',10,'Brochure',1036604243);
+INSERT INTO international VALUES (12,'Product',10,'Er du sikker på du vil slette dette felt?',1036604229);
+INSERT INTO international VALUES (11,'Product',10,'Produkt nr.',1036604204);
+INSERT INTO international VALUES (10,'Product',10,'Pris',1036604182);
+INSERT INTO international VALUES (1,'Product',10,'Produkt',1036604168);
+INSERT INTO international VALUES (61,'Poll',10,'Afstemning, tilføj/redigér',1036604149);
+INSERT INTO international VALUES (20,'Poll',10,'Karma per stemme',1036604131);
+INSERT INTO international VALUES (12,'Poll',10,'Stemmer i alt:',1036604113);
+INSERT INTO international VALUES (61,'MessageBoard',10,'Opslagstavle, tilføj/redigér',1036604088);
+INSERT INTO international VALUES (9,'MailForm',10,'Tilføj felt',1036604053);
+INSERT INTO international VALUES (8,'MailForm',10,'Bredde',1036604040);
+INSERT INTO international VALUES (7,'MailForm',10,'Redigér mail formular',1036604018);
+INSERT INTO international VALUES (62,'MailForm',10,'Mail form felter, tilføj/redigér',1036604001);
+INSERT INTO international VALUES (61,'MailForm',10,'Mail formular, tilføj/redigér',1036603976);
+INSERT INTO international VALUES (6,'MailForm',10,'Redigérbar',1036603957);
+INSERT INTO international VALUES (5,'MailForm',10,'Vist',1036603937);
+INSERT INTO international VALUES (4,'MailForm',10,'Skjult',1036603927);
+INSERT INTO international VALUES (3,'MailForm',10,'Tak for din tilbagemelding!',1036603915);
+INSERT INTO international VALUES (26,'MailForm',10,'Gem indhold?',1036603892);
+INSERT INTO international VALUES (25,'MailForm',10,'Standard værdi (valgfrit)',1036603877);
+INSERT INTO international VALUES (24,'MailForm',10,'Mulige værdier (drop-down liste)',1036603850);
+INSERT INTO international VALUES (23,'MailForm',10,'Type',1036603824);
+INSERT INTO international VALUES (22,'MailForm',10,'Status',1036603804);
+INSERT INTO international VALUES (21,'MailForm',10,'Felt navn',1036603793);
+INSERT INTO international VALUES (20,'MailForm',10,'Redigér felt',1036603782);
+INSERT INTO international VALUES (2,'MailForm',10,'Emnet for din email her',1036603768);
+INSERT INTO international VALUES (19,'MailForm',10,'Er du sikker på du vil slette dette felt?',1036603745);
+INSERT INTO international VALUES (18,'MailForm',10,'Gå tilbage!',1036603723);
+INSERT INTO international VALUES (17,'MailForm',10,'Mail sendt',1036603709);
+INSERT INTO international VALUES (15,'MailForm',10,'Fortsæt med at tilføje flere felter?',1036603693);
+INSERT INTO international VALUES (16,'MailForm',10,'Bekræftigelse',1036599476);
+INSERT INTO international VALUES (14,'MailForm',10,'Emne',1036598522);
+INSERT INTO international VALUES (13,'MailForm',10,'Bcc',1036598494);
+INSERT INTO international VALUES (12,'MailForm',10,'Cc',1036598479);
+INSERT INTO international VALUES (11,'MailForm',10,'Til (email, brugernavn ell. gruppenavn)',1036598461);
+INSERT INTO international VALUES (10,'MailForm',10,'Fra',1036598436);
+INSERT INTO international VALUES (1,'MailForm',10,'Mail formular',1036598423);
+INSERT INTO international VALUES (61,'LinkList',10,'Henvisningsliste, tilfæj/redigér',1036598042);
+INSERT INTO international VALUES (61,'Item',10,'Item, tilføj/redigér',1036598009);
+INSERT INTO international VALUES (6,'Item',10,'Redigér item',1036597984);
+INSERT INTO international VALUES (72,'FAQ',10,'Spørgsmål, tilføj/redigér',1036597894);
+INSERT INTO international VALUES (61,'FAQ',10,'FAQ, tilføj/redigér',1036597867);
+INSERT INTO international VALUES (16,'FAQ',10,'[top]',1036597849);
+INSERT INTO international VALUES (15,'FAQ',10,'A',1036597834);
+INSERT INTO international VALUES (14,'FAQ',10,'Q',1036597824);
+INSERT INTO international VALUES (13,'FAQ',10,'Slå [top] link til?',1036597810);
+INSERT INTO international VALUES (12,'FAQ',10,'Slå Q/A til?',1036597786);
+INSERT INTO international VALUES (11,'FAQ',10,'Slå TOC til?',1036597771);
+INSERT INTO international VALUES (61,'ExtraColumn',10,'Ekstra kolonne, tilføj/redigér',1036597749);
+INSERT INTO international VALUES (78,'EventsCalendar',10,'Slet ikke noget, det var en fejl.',1036597719);
+INSERT INTO international VALUES (75,'EventsCalendar',10,'Hvad ønsker du at gøre?',1036597679);
+INSERT INTO international VALUES (73,'DownloadManager',10,'',1036597651);
+INSERT INTO international VALUES (72,'DownloadManager',10,'Download, tilføj/redigér',1036597636);
+INSERT INTO international VALUES (61,'DownloadManager',10,'Download Manager, tilføj/redigér',1036597610);
+INSERT INTO international VALUES (22,'DownloadManager',10,'Fortsæt med at tilføje fil til download?',1033508829);
+INSERT INTO international VALUES (1,'FAQ',10,'Fortsæt med at tilføje spørgsmål?',1032469938);
+INSERT INTO international VALUES (77,'EventsCalendar',10,'Slet denne begivenhed og alle gentagelser',1031671274);
+INSERT INTO international VALUES (76,'EventsCalendar',10,'Slet kun denne begivenhed.',1031671246);
+INSERT INTO international VALUES (74,'EventsCalendar',10,'Kalender måned (lille)',1031671210);
+INSERT INTO international VALUES (72,'EventsCalendar',10,'Begivenhed, tilføj/redigér',1031671171);
+INSERT INTO international VALUES (61,'EventsCalendar',10,'Begivenhedskalender, Tilføj/redigér',1031671122);
+INSERT INTO international VALUES (21,'EventsCalendar',10,'Fortsæt med at tilføje begivenhed?',1031671070);
+INSERT INTO international VALUES (20,'EventsCalendar',10,'Tilføj begivenhed',1031671040);
+INSERT INTO international VALUES (61,'Article',10,'Artikkel, tilføj/redigér',1031546465);
 
 --
 -- Table structure for table 'karmaLog'
@@ -8214,6 +8448,29 @@ INSERT INTO page VALUES (2,0,'Clipboard',4,3,1,1,4,1,1,0,0,23,'','clipboard',0,'
 INSERT INTO page VALUES (5,0,'Packages',1,3,0,0,6,1,1,0,0,24,'','packages',0,'Packages',NULL,1,946710000,2082783600,NULL);
 
 --
+-- Table structure for table 'pageStatistics'
+--
+
+CREATE TABLE pageStatistics (
+  dateStamp int(11) default NULL,
+  userId int(11) default NULL,
+  username varchar(35) default NULL,
+  ipAddress varchar(15) default NULL,
+  userAgent varchar(255) default NULL,
+  referer text,
+  pageId int(11) default NULL,
+  pageTitle varchar(255) default NULL,
+  wobjectId int(11) default NULL,
+  function varchar(60) default NULL
+) TYPE=MyISAM;
+
+--
+-- Dumping data for table 'pageStatistics'
+--
+
+
+
+--
 -- Table structure for table 'settings'
 --
 
@@ -8264,10 +8521,10 @@ INSERT INTO settings VALUES ('useKarma','0');
 INSERT INTO settings VALUES ('karmaPerLogin','1');
 INSERT INTO settings VALUES ('runOnRegistration','');
 INSERT INTO settings VALUES ('maxImageSize','100000');
-INSERT INTO settings VALUES ('imageManagersGroup','9');
 INSERT INTO settings VALUES ('showDebug','0');
 INSERT INTO settings VALUES ('styleManagersGroup','5');
 INSERT INTO settings VALUES ('templateManagersGroup','8');
+INSERT INTO settings VALUES ('trackPageStatistics','0');
 
 --
 -- Table structure for table 'style'
@@ -8337,6 +8594,11 @@ INSERT INTO template VALUES (2,'Traditional with Thumbnails','<tmpl_var searchFo
 INSERT INTO template VALUES (3,'Weblog','<tmpl_var searchForm>\r\n\r\n<tmpl_if description>\r\n   <tmpl_var description><p/>\r\n</tmpl_if>\r\n\r\n<tmpl_if post>\r\n   <tmpl_var post> &middot;\r\n</tmpl_if>\r\n\r\n<tmpl_var search>\r\n<p/>\r\n<table width=\"100%\" cellpadding=2 cellspacing=1 border=0>\r\n\r\n<tmpl_loop submissions_loop>\r\n\r\n<tr><td class=\"tableHeader\"><tmpl_var submission.title>\r\n  <tmpl_if submission.currentUser>\r\n            (<tmpl_var submission.status>)\r\n  </tmpl_if>\r\n</td></tr><tr><td class=\"tableData\"><b>\r\n  <tmpl_if submission.thumbnail>\r\n    <a href=\"<tmpl_var submission.url>\"><img src=\"<tmpl_var submission.thumbnail>\" border=\"0\" align=\"right\"/></a>\r\n   </tmpl_if>\r\n <tmpl_var label.by> <a href=\"<tmpl_var submission.userProfile>\"><tmpl_var submission.username></a>  - <tmpl_var submission.date></b><br/>\r\n<tmpl_var submission.content>\r\n<p/> ( <a href=\"<tmpl_var submission.url>\"><tmpl_var label.readmore></a>\r\n                <tmpl_if submission.responses>\r\n                         | <tmpl_var submission.responses> <tmpl_var label.responses>\r\n                </tmpl_if>\r\n         )<p/>\r\n</td></tr>\r\n\r\n</tmpl_loop>\r\n\r\n</table>\r\n\r\n<tmpl_if multiplePages>\r\n  <div class=\"pagination\">\r\n    <tmpl_var previousPage>  &middot; <tmpl_var nextPage>\r\n  </div>\r\n</tmpl_if>\r\n','USS');
 INSERT INTO template VALUES (4,'Photo Gallery','<tmpl_var searchForm>\r\n\r\n<tmpl_if post>\r\n    <tmpl_var post> &middot;\r\n</tmpl_if>\r\n<tmpl_var search><p/>\r\n\r\n<table width=\"100%\" cellpadding=2 cellspacing=1 border=0>\r\n<tr>\r\n<tmpl_loop submissions_loop>\r\n\r\n<td align=\"center\" class=\"tableData\">\r\n  \r\n  <tmpl_if submission.thumbnail>\r\n       <a href=\"<tmpl_var submission.url>\"><img src=\"<tmpl_var submission.thumbnail>\" border=\"0\"/></a><br/>\r\n  </tmpl_if>\r\n  <a href=\"<tmpl_var submission.url>\"><tmpl_var submission.title></a>\r\n  <tmpl_if submission.currentUser>\r\n    (<tmpl_var submission.status>)\r\n  </tmpl_if>\r\n</td>\r\n\r\n<tmpl_if submission.thirdColumn>\r\n  </tr><tr>\r\n</tmpl_if>\r\n\r\n</tmpl_loop>\r\n</tr>\r\n</table>\r\n\r\n<tmpl_if multiplePages>\r\n  <div class=\"pagination\">\r\n    <tmpl_var previousPage>  &middot; <tmpl_var pageList> &middot; <tmpl_var nextPage>\r\n  </div>\r\n</tmpl_if>\r\n','USS');
 INSERT INTO template VALUES (2,'Item w/pop-up Links','<tmpl_if displaytitle>\r\n   <tmpl_if linkurl>\r\n       <a href=\"<tmpl_var linkurl>\">\r\n    </tmpl_if>\r\n     <span class=\"itemTitle\"><tmpl_var title></span>\r\n   <tmpl_if linkurl>\r\n      </a>\r\n    </tmpl_if>\r\n</tmpl_if>\r\n\r\n<tmpl_if attachment>\r\n   <tmpl_if displaytitle> - </tmpl_if>\r\n   <a href=\"<tmpl_var attachmenturl>\" target=\"_blank\"><img src=\"<tmpl_var attachmentIcon>\" border=0 alt=\"<tmpl_var attachment>\" width=16 height=16 border=0 align=\"middle\"></a>\r\n</tmpl_if>\r\n\r\n<tmpl_if description>\r\n  - <tmpl_var description>\r\n</tmpl_if>','Item');
+INSERT INTO template VALUES (5,'Classifieds','<tmpl_var searchForm>\r\n\r\n<tmpl_if post>\r\n    <tmpl_var post> ·\r\n</tmpl_if>\r\n<tmpl_var search><p/>\r\n\r\n<table width=\"100%\" cellpadding=3 cellspacing=0 border=0>\r\n<tr>\r\n<tmpl_loop submissions_loop>\r\n\r\n<td valign=\"top\" class=\"tableData\" width=\"33%\" style=\"border: 1px dotted black; padding: 10px;\">\r\n  <h2><a href=\"<tmpl_var submission.url>\"><tmpl_var submission.title></a></h2>\r\n  <tmpl_if submission.currentUser>\r\n    (<tmpl_var submission.status>)\r\n  </tmpl_if>\r\n<br/>\r\n  <tmpl_if submission.thumbnail>\r\n       <a href=\"<tmpl_var submission.url>\"><img src=\"<tmpl_var submission.thumbnail>\" border=\"0\"/ align=\"right\"></a><br/>\r\n  </tmpl_if>\r\n<tmpl_var submission.content>\r\n</td>\r\n\r\n<tmpl_if submission.thirdColumn>\r\n  </tr><tr>\r\n</tmpl_if>\r\n\r\n</tmpl_loop>\r\n</tr>\r\n</table>\r\n\r\n<tmpl_if multiplePages>\r\n  <div class=\"pagination\">\r\n    <tmpl_var previousPage>  · <tmpl_var pageList> · <tmpl_var nextPage>\r\n  </div>\r\n</tmpl_if>\r\n','USS');
+INSERT INTO template VALUES (6,'Guest Book','<tmpl_if post>\r\n    <tmpl_var post><p>\r\n</tmpl_if>\r\n\r\n<tmpl_loop submissions_loop>\r\n\r\n<tmpl_if __odd__>\r\n<div class=\"highlight\">\r\n</tmpl_if>\r\n\r\n<b>On <tmpl_var submission.date> <a href=\"<tmpl_var submission.userProfile>\"><tmpl_var submission.username></a> from <a href=\"<tmpl_var submission.url>\">the <tmpl_var submission.title> department</a> wrote</b>, <i><tmpl_var submission.content></i>\r\n\r\n<tmpl_if __odd__>\r\n</div >\r\n</tmpl_if>\r\n\r\n<p/>\r\n\r\n</tmpl_loop>\r\n\r\n<tmpl_if multiplePages>\r\n  <div class=\"pagination\">\r\n    <tmpl_var previousPage> · <tmpl_var nextPage>\r\n  </div>\r\n</tmpl_if>\r\n','USS');
+INSERT INTO template VALUES (1,'Default Article','<tmpl_if image>\r\n  <table width=\"100%\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\"><tr><td class=\"content\">\r\n  <img src=\"<tmpl_var image>\" align=\"right\" border=\"0\">\r\n</tmpl_if>\r\n\r\n<tmpl_if description>\r\n  <tmpl_var description><p/>\r\n</tmpl_if>\r\n\r\n<tmpl_if link.url>\r\n  <tmpl_if link.title>\r\n    <p><a href=\"<tmpl_var linkUrl>\"><tmpl_var linkTitle></a>\r\n  </tmpl_if>\r\n</tmpl_if>\r\n\r\n<tmpl_var attachment.box>\r\n\r\n<tmpl_if image>\r\n  </td></tr></table>\r\n</tmpl_if>\r\n\r\n<tmpl_if allowDiscussion>\r\n  <p><table width=\"100%\" cellspacing=\"2\" cellpadding=\"1\" border=\"0\">\r\n  <tr><td align=\"center\" width=\"50%\" class=\"tableMenu\"><a href=\"<tmpl_var replies.URL>\"><tmpl_var replies.label> (<tmpl_var replies.count>)</a></td>\r\n  <td align=\"center\" width=\"50%\" class=\"tableMenu\"><a href=\"<tmpl_var post.url>\"><tmpl_var post.label></a></td></tr>\r\n  </table>\r\n</tmpl_if>\r\n','Article');
+INSERT INTO template VALUES (2,'Center Image','<tmpl_if image>\r\n  <div align=\"center\"><img src=\"<tmpl_var image>\" border=\"0\"></div>\r\n</tmpl_if>\r\n\r\n<tmpl_if description>\r\n  <tmpl_var description><p/>\r\n</tmpl_if>\r\n\r\n<tmpl_if link.url>\r\n  <tmpl_if link.title>\r\n    <p><a href=\"<tmpl_var linkUrl>\"><tmpl_var linkTitle></a>\r\n  </tmpl_if>\r\n</tmpl_if>\r\n\r\n<tmpl_var attachment.box>\r\n\r\n\r\n<tmpl_if allowDiscussion>\r\n  <p><table width=\"100%\" cellspacing=\"2\" cellpadding=\"1\" border=\"0\">\r\n  <tr><td align=\"center\" width=\"50%\" class=\"tableMenu\"><a href=\"<tmpl_var replies.URL>\"><tmpl_var replies.label> (<tmpl_var replies.count>)</a></td>\r\n  <td align=\"center\" width=\"50%\" class=\"tableMenu\"><a href=\"<tmpl_var post.url>\"><tmpl_var post.label></a></td></tr>\r\n  </table>\r\n</tmpl_if>\r\n','Article');
+INSERT INTO template VALUES (3,'Left Align Image','<tmpl_if image>\r\n  <table width=\"100%\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\"><tr><td class=\"content\">\r\n  <img src=\"<tmpl_var image>\" align=\"left\" border=\"0\">\r\n</tmpl_if>\r\n\r\n<tmpl_if description>\r\n  <tmpl_var description><p/>\r\n</tmpl_if>\r\n\r\n<tmpl_if link.url>\r\n  <tmpl_if link.title>\r\n    <p><a href=\"<tmpl_var linkUrl>\"><tmpl_var linkTitle></a>\r\n  </tmpl_if>\r\n</tmpl_if>\r\n\r\n<tmpl_var attachment.box>\r\n\r\n<tmpl_if image>\r\n  </td></tr></table>\r\n</tmpl_if>\r\n\r\n<tmpl_if allowDiscussion>\r\n  <p><table width=\"100%\" cellspacing=\"2\" cellpadding=\"1\" border=\"0\">\r\n  <tr><td align=\"center\" width=\"50%\" class=\"tableMenu\"><a href=\"<tmpl_var replies.URL>\"><tmpl_var replies.label> (<tmpl_var replies.count>)</a></td>\r\n  <td align=\"center\" width=\"50%\" class=\"tableMenu\"><a href=\"<tmpl_var post.url>\"><tmpl_var post.label></a></td></tr>\r\n  </table>\r\n</tmpl_if>\r\n','Article');
 
 --
 -- Table structure for table 'userLoginLog'
@@ -8481,6 +8743,22 @@ CREATE TABLE userSession (
 
 
 --
+-- Table structure for table 'userSessionScratch'
+--
+
+CREATE TABLE userSessionScratch (
+  sessionId varchar(60) default NULL,
+  name varchar(35) default NULL,
+  value varchar(255) default NULL
+) TYPE=MyISAM;
+
+--
+-- Dumping data for table 'userSessionScratch'
+--
+
+
+
+--
 -- Table structure for table 'users'
 --
 
@@ -8520,7 +8798,7 @@ CREATE TABLE webguiVersion (
 --
 
 
-INSERT INTO webguiVersion VALUES ('4.7.0','initial install',unix_timestamp());
+INSERT INTO webguiVersion VALUES ('4.8.0','initial install',unix_timestamp());
 
 --
 -- Table structure for table 'wobject'
@@ -8562,7 +8840,4 @@ CREATE TABLE wobject (
 
 INSERT INTO wobject VALUES (-1,4,'SiteMap',0,'Page Not Found',1,'The page you were looking for could not be found on this system. Perhaps it has been deleted or renamed. The following list is a site map of this site. If you don\'t find what you\'re looking for on the site map, you can always start from the <a href=\"^/;\">Home Page</a>.',1,1001744792,3,1016077239,3,1,1001744792,1336444487,2,3600,4,0,'after',NULL,NULL,NULL,NULL,NULL);
 INSERT INTO wobject VALUES (-2,1,'Article',1,'Welcome to WebGUI!',1,'<DIV>\r\n<P class=MsoNormal style=\"MARGIN: 0in 0in 0pt\">If you’re reading this message it means that you’ve got WebGUI up and running. Good job! The installation is not trivial.</P>\r\n<P class=MsoNormal style=\"MARGIN: 0in 0in 0pt\"> <?xml:namespace prefix = o ns = \"urn:schemas-microsoft-com:office:office\" /><o:p></o:p></P>\r\n<P class=MsoNormal style=\"MARGIN: 0in 0in 0pt\">In order to do anything useful with your new installation you’ll need to log in as the default administrator account. Follow these steps to get started:</P>\r\n<P class=MsoNormal style=\"MARGIN: 0in 0in 0pt\"> <o:p></o:p></P>\r\n<OL style=\"MARGIN-TOP: 0in\" type=1>\r\n<LI class=MsoNormal style=\"MARGIN: 0in 0in 0pt; mso-list: l1 level1 lfo2; tab-stops: list .5in\"><A href=\"^\\;?op=displayLogin\">Click here to log in.</A> (username: Admin password: 123qwe) \r\n<LI class=MsoNormal style=\"MARGIN: 0in 0in 0pt; mso-list: l1 level1 lfo2; tab-stops: list .5in\"><A href=\"^\\;?op=switchOnAdmin\">Click here to turn the administrative interface on.</A></LI></OL>\r\n<P class=MsoNormal style=\"MARGIN: 0in 0in 0pt\"> Now that you’re in as the administrator, you should <A href=\"^\\;?op=displayAccount\">change your password</A> so no one else can log in and mess with your site. You might also want to <A href=\"^\\;?op=addUser\">create another account </A>for yourself with Administrative privileges in case you can\'t log in with the Admin account for some reason.</P>\r\n<P class=MsoNormal style=\"MARGIN: 0in 0in 0pt\"> <o:p></o:p></P>\r\n<P class=MsoNormal style=\"MARGIN: 0in 0in 0pt\">You’ll notice three menus at the top of your screen. Those are your administrative menus. Going from left to right they are <I>Content</I>, <I>Clipboard</I>, and <I>Admin</I>. The content menu allows you to add new pages and content to your site. The clipboard menu is currently empty, but if you cut or copy anything from any of your pages, it will end up there. The admin menu controls things like system settings and users.</P>\r\n<P class=MsoNormal style=\"MARGIN: 0in 0in 0pt\"> <o:p></o:p></P>\r\n<P class=MsoNormal style=\"MARGIN: 0in 0in 0pt\">For more information about how to administer WebGUI consider getting a copy of <I><A href=\"http://www.plainblack.com/ruling_webgui\">Ruling WebGUI</A></I>. Plain Black Software also provides several <A href=\"http://www.plainblack.com/support_programs\">Support Programs </A>for WebGUI if you run into trouble.</P>\r\n<P class=MsoNormal style=\"MARGIN: 0in 0in 0pt\"> <o:p></o:p></P>Enjoy your new WebGUI site!\r\n</DIV>',1,1023555430,3,1023555630,3,1,1023512400,1338872400,2,3600,4,0,'after',NULL,NULL,NULL,NULL,NULL);
-
-INSERT INTO international VALUES (741,'WebGUI',1,'Edit this template.',1034223116);
-INSERT INTO international VALUES (742,'WebGUI',1,'Manage templates.',1034223130);
 
