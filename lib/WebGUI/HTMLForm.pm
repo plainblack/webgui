@@ -31,6 +31,7 @@ use WebGUI::URL;
  $f = WebGUI::HTMLForm->new;
 
  $f->checkbox("toggleGadget","Turn Gadgets On?");
+ $f->combo("fruit",\%fruit,"Choose a fruit or enter your own.");
  $f->date("endDate","End Date",$endDate);
  $f->email("emailAddress","Email Address");
  $f->file("image","Image to Upload");
@@ -134,6 +135,88 @@ sub checkbox {
         $extras = shift;
         $output = '<input type="checkbox" name="'.$name.'" value="'.$value.'"'.$checked.' '.$extras.'>';
 	$output .= _subtext($subtext);
+        $output = _tableFormRow($label,$output) unless ($class->{_noTable});
+        $class->{_data} .= $output;
+}
+
+#-------------------------------------------------------------------
+
+=head2 combo ( name, options [ label, value, size, multiple, extras, subtext ] )
+
+ Adds a combination select list / text box row to this form. If the
+ text box is filled out it will have a value stored in "name"_new
+ where name is the first field passed into this method.
+
+=item name
+
+ The name field for this form element.
+
+=item options
+ The list of options for this select list. Should be passed as a
+ hash reference.
+
+=item label
+
+ The left column label for this form row.
+
+=item value
+
+ The default value(s) for this form element. This should be passed
+ as an array reference.
+
+=item size
+
+ The number of characters tall this form element should be. Defaults
+ to "1".
+
+=item multiple
+
+ A boolean value for whether this select list should allow multiple
+ selections. Defaults to "0".
+
+=item extras
+
+ If you want to add anything special to this form element like
+ javascript actions, or stylesheet information, you'd add it in
+ here as follows:
+
+   'onChange="this.form.submit()"'
+
+=item subtext
+
+ Extra text to describe this form element or to provide special
+ instructions.
+
+=cut
+
+sub combo {
+        my ($label, $subtext, $class, $output, $value, $key, $item, $name, $options, $size, $multiple, $extras);
+        $class = shift;
+        $name = shift;
+        $options = shift;
+	${$options}{''} = '['.WebGUI::International::get(582).']';
+        $label = shift;
+        $value = shift;
+        $size = shift || 1;
+        $multiple = shift;
+        $multiple = ' multiple="1"' if ($multiple);
+        $extras = shift;
+        $subtext = shift;
+        $output = '<select name="'.$name.'" size="'.$size.'" '.$extras.$multiple.'>';
+	$output .= '<option value="_new_">'.WebGUI::International::get(581).'-&gt;';
+        foreach $key (keys %{$options}) {
+                $output .= '<option value="'.$key.'"';
+                foreach $item (@$value) {
+                        if ($item eq $key) {
+                                $output .= " selected";
+                        }
+                }
+                $output .= '>'.${$options}{$key};
+        }
+        $output .= '</select>';
+	$size =  $session{setting}{textBoxSize}-5;
+        $output .= '<input type="text" name="'.$name.'_new" size="'.$size.'" maxlength="255">';
+        $output .= _subtext($subtext);
         $output = _tableFormRow($label,$output) unless ($class->{_noTable});
         $class->{_data} .= $output;
 }

@@ -55,9 +55,52 @@ insert into international values (579,'WebGUI','English','Your message has been 
 insert into international values (580,'WebGUI','English','Your message has been denied.');
 insert into international values (58,'UserSubmission','English','Previous Submission');
 insert into international values (59,'UserSubmission','English','Next Submission');
-
-
-
+insert into international values (1,'Product','English','Product');
+create table Product_specification ( wobjectId int not null, productSpecificationId int not null primary key, name varchar(255), value varchar(255), units varchar(255), sequenceNumber int not null);
+create table Product_feature ( wobjectId int not null, productFeatureId int not null primary key, feature varchar(255), sequenceNumber int not null);
+create table Product (wobjectId int not null primary key, image1 varchar(255), image2 varchar(255), image3 varchar(255), brochure varchar(255), manual varchar(255), warranty varchar(255), price varchar(255), productNumber varchar(255));
+insert into incrementer values ('productFeatureId',1000);
+insert into incrementer values ('productSpecificationId',1000);
+create table Product_accessory ( wobjectId int not null, AccessoryWobjectId int not null, sequenceNumber int not null, primary key (wobjectId, AccessoryWobjectId));
+create table Product_related ( wobjectId int not null, RelatedWobjectId int not null, sequenceNumber int not null, primary key (wobjectId, RelatedWobjectId));
+insert into international values (7,'Product','English','Product Image 1');
+insert into international values (8,'Product','English','Product Image 2');
+insert into international values (9,'Product','English','Product Image 3');
+insert into international values (5,'Product','English','Are you certain you wish to delete this specification?');
+insert into international values (4,'Product','English','Are you certain you wish to delete the relationship to this related product?');
+insert into international values (3,'Product','English','Are you certain you wish to delete this feature?');
+insert into international values (2,'Product','English','Are you certain you wish to delete the relationship to this accessory?');
+insert into international values (6,'Product','English','Edit Product');
+insert into international values (10,'Product','English','Price');
+insert into international values (11,'Product','English','Product Number');
+insert into international values (12,'Product','English','Are you certain you wish to delete this file?');
+insert into international values (13,'Product','English','Brochure');
+insert into international values (14,'Product','English','Manual');
+insert into international values (15,'Product','English','Warranty');
+insert into international values (16,'Product','English','Add Accessory');
+insert into international values (17,'Product','English','Accessory');
+insert into international values (18,'Product','English','Add another accessory?');
+insert into international values (21,'Product','English','Add another related product?');
+insert into international values (19,'Product','English','Add Related Product');
+insert into international values (20,'Product','English','Related Product');
+insert into international values (22,'Product','English','Edit Feature');
+insert into international values (23,'Product','English','Feature');
+insert into international values (24,'Product','English','Add another feature?');
+insert into international values (25,'Product','English','Edit Specification');
+insert into international values (26,'Product','English','Label');
+insert into international values (27,'Product','English','Specification');
+insert into international values (28,'Product','English','Add another specification?');
+insert into international values (29,'Product','English','Units');
+insert into international values (30,'Product','English','Features');
+insert into international values (31,'Product','English','Specifications');
+insert into international values (32,'Product','English','Accessories');
+insert into international values (33,'Product','English','Related Products');
+insert into international values (34,'Product','English','Add a feature.');
+insert into international values (35,'Product','English','Add a specification.');
+insert into international values (36,'Product','English','Add an accessory.');
+insert into international values (37,'Product','English','Add a related product.');
+insert into international values (581,'WebGUI','English','Add New Value');
+insert into international values (582,'WebGUI','English','Leave Blank');
 
 
 
