@@ -92,22 +92,22 @@ Choose a template that will be used to display the list of stored records in thi
 		message => q|You may add as many additional fields to your Data Form as you like.
 <br><br>
 
-<b>Label</b><br>
-This is an informative text label to let the user know what this field represents.
-<p>
-
-<b>Field Name</b><br>
-The name of this field.  It must be unique among all of the other fields on your form.
-<p>
-
 <b>Tab</b><br>
 When the form has multiple tabs, defines which tab of the form that the
 field is displayed in.  Otherwise, all fields are displayed on the same
 page.
 <p>
 
+<b>Label</b><br>
+This is an informative text label to let the user know what this field represents.
+<p>
+
 <b>Subtext</b><br>
 An extension of the label, this is a description of what should go in the field or optional instructions for the field.
+<p>
+
+<b>Field Name</b><br>
+The name of this field.  It must be unique among all of the other fields on your form.
 <p>
 
 <b>Status</b><br>
@@ -120,15 +120,15 @@ Choose the type of form element for this field.
 <p>
 
 <b>Width</b><br>
-Set the number of characters wide this field will be.
+Set the number of characters wide this form field will be.
 <p>
 
 <b>Height</b><br>
-Set the number of characters tall this field will be. Only used on textarea and HTMLArea.
+Set the number of characters tall this form field will be. Only used on textarea and HTMLArea.
 <p>
 
 <b>Align vertical</b><br>
-This property controls wheter radio- and checklists are layouted horizontally or vertically.
+This property controls wheter radio buttons and checklists are laid horizontally or vertically.
 <p>
 
 <b>Extras</b><br>
@@ -144,7 +144,7 @@ Enter the default value (if any) for the field.  For Yes/No fields, enter "yes" 
 <p>
 
 |,
-		lastUpdated => 1090575731
+		lastUpdated => 1098856520
 	},
 
 	'16' => {
@@ -457,16 +457,16 @@ A loop containing the data submitted by the user for each field in this data for
 
 <blockquote>
 
-<b>record.data.value</b><br>
-The value submitted by the user for this field in this record entry.
-<p>
-
 <b>record.data.name</b><br>
 The web safe name of this field.
 <p>
 
 <b>record.data.label</b><br>
 The human readable label for this field.
+<p>
+
+<b>record.data.value</b><br>
+The value submitted by the user for this field in this record entry.
 <p>
 
 <b>record.data.isMailField</b><br>
@@ -476,7 +476,7 @@ A conditional indicating whether this field exists for the mail subsystem of the
 </blockquote>
 
 </blockquote>|,
-		lastUpdated => 1053885702
+		lastUpdated => 1098856416
 	},
 
 	'24' => {
