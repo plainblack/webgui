@@ -25,17 +25,22 @@ our @ISA = qw(WebGUI::Wobject);
 
 #-------------------------------------------------------------------
 sub _traversePageTree {
-        my ($parent, $sth, $data, $indent, @pages, $i, $currentDepth, $depth, $indentString);
+        my ($parent, $sth, $data, $indent, @pages, $i, $currentDepth, $depth, $indentString, $alphabetic, $orderBy);
 	$parent = $_[0];
 	$currentDepth = $_[1];
 	$depth = $_[2] || 99;
 	$indent = $_[3];
+        $alphabetic = $_[4];
         for ($i=1;$i<=($indent*$currentDepth);$i++) {
                 $indentString .= "&nbsp;";
         }
         if ($currentDepth < $depth) {
-                $sth = WebGUI::SQL->read("select urlizedTitle, menuTitle, title, pageId, synopsis from page 
-			where parentId='$parent' order by sequenceNumber");
+                if ($alphabetic) {
+                        $orderBy = 'title';
+                } else {
+                        $orderBy = 'sequenceNumber';
+                }
+                $sth = WebGUI::SQL->read("select urlizedTitle, menuTitle, title, pageId, synopsis from page where parentId='$parent' and hideFromNavigation = 0 order by $orderBy");
                 while ($data = $sth->hashRef) {
                         if (($data->{pageId}<0 || $data->{pageId}>999 || $data->{pageId}==1) && WebGUI::Privilege::canViewPage($data->{pageId})) {
 				push(@pages,{ 
@@ -48,7 +53,7 @@ sub _traversePageTree {
 					"page.isRoot" => ($parent == 0),
 					"page.isTop" => ($currentDepth == 0 || ($currentDepth == 1 && $parent == 0))
 					});
-                                push(@pages,@{_traversePageTree($data->{pageId},($currentDepth+1),$depth,$indent)});
+                                push(@pages,@{_traversePageTree($data->{pageId},($currentDepth+1),$depth,$indent,$alphabetic)});
                         }
                 }
                 $sth->finish;
@@ -77,7 +82,10 @@ sub new {
 				}, 
 			depth=>{
 				defaultValue=>0
-				}
+                                },
+                        alphabetic=>{
+                                defaultValue=>0
+                                }
 			},
 		-useTemplate=>1
                 );
@@ -111,6 +119,11 @@ sub www_edit {
 		-label=>WebGUI::International::get(6,$_[0]->get("namespace")),
 		-value=>$_[0]->getValue("indent")
 		);
+	$layout->yesNo(
+		-name=>"alphabetic",
+		-label=>WebGUI::International::get(7,$_[0]->get("namespace")),
+		-value=>$_[0]->getValue("alphabetic")
+		);
 	return $_[0]->SUPER::www_edit(
 		-properties=>$properties->printRowsOnly,
 		-layout=>$layout->printRowsOnly,
@@ -123,7 +136,7 @@ sub www_edit {
 #-------------------------------------------------------------------
 sub www_view {
         my (%var);
-	$var{page_loop} = _traversePageTree($_[0]->get("startAtThisLevel"),0,$_[0]->get("depth"),$_[0]->get("indent"));
+	$var{page_loop} = _traversePageTree($_[0]->get("startAtThisLevel"),0,$_[0]->get("depth"),$_[0]->get("indent"),$_[0]->get("alphabetic"));
 	return $_[0]->processTemplate($_[0]->get("templateId"),\%var);
 }
 
