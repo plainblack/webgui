@@ -24,7 +24,7 @@ sub process {
 	if (WebGUI::Privilege::isInGroup($groupId)) { 
 		return $param[1];
 	} else {
-		return "";
+		return $param[2];
 	}
 }
 
