@@ -209,7 +209,7 @@ sub www_editSave {
 #-------------------------------------------------------------------
 sub www_view {
 	my (@row, $i, $p, $ouch, %data, $output, $sth, $dbh, @result, 
-		@template, $temp, $col, $errorMessage);
+		@template, $temp, $col, $errorMessage, $url);
 	tie %data, 'Tie::CPHash';
 	%data = getProperties($namespace,$_[0]);
 	if (%data) {
@@ -269,8 +269,13 @@ sub www_view {
 	                			$output .= $template[2];
         	                       		$output .= WebGUI::International::get(18,$namespace).'<p>';
                 	        	} else {
-                				$p = WebGUI::Paginator->new(WebGUI::URL::page(),
-							\@row,$data{paginateAfter});
+						$url = WebGUI::URL::page();
+						foreach (keys %{$session{form}}) {
+							unless ($_ eq "pn") {
+								$url = WebGUI::URL::append($url, WebGUI::URL::escape($_.'='.$session{form}{$_}));
+							}
+						}
+                				$p = WebGUI::Paginator->new($url,\@row,$data{paginateAfter});
                 				$output .= $p->getPage($session{form}{pn});
     	        	    			$output .= $template[2];
         	        			$output .= $p->getBar($session{form}{pn});

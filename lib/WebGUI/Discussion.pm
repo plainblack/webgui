@@ -23,6 +23,7 @@ use WebGUI::URL;
 #-------------------------------------------------------------------
 sub _deleteReplyTree {
         my ($sth, %data, $messageId);
+	tie %data, 'Tie::CPHash';
         $sth = WebGUI::SQL->read("select messageId from discussion where pid=$_[0] order by messageId");
         while (%data = $sth->hash) {
                 _deleteReplyTree($data{messageId});

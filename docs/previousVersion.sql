@@ -2999,5 +2999,6 @@ CREATE TABLE widget (
 
 INSERT INTO widget VALUES (-1,4,'SiteMap',0,'Page Not Found',1,'The page you were looking for could not be found on this system. Perhaps it has been deleted or renamed. The following list is a site map of this site. If you don\'t find what you\'re looking for on the site map, you can always start from the <a href=\"^/;\">Home Page</a>.',1,1001744792,3,1016077239,3,'A');
 
+insert into international values (438,'WebGUI','English','Your Name');
 
-insert into webguiVersion values ('3.6.0','intitial install',unix_timestamp());
+insert into webguiVersion values ('3.6.1','intitial install',unix_timestamp());

@@ -150,14 +150,14 @@ sub text {
 #-------------------------------------------------------------------
 sub textArea {
         my ($output, $name, $value, $cols, $rows, $htmlEdit, $wrap);
-        ($name, $value, $cols, $rows, $htmlEdit, $wrap) = @_;
 	$output = '<script language="JavaScript">function fixChars(element) {element.value = element.value.replace(/~V/mg,"-");}</script>';
-        if ($cols eq "") {
-                $cols = 50;
-        }
-        if ($rows eq "") {
-                $rows = 5;
-        }
+	$name = $_[0];
+	$value = $_[1];
+	$value =~ s/\<\/textarea\>/\&lt\;\/textarea\&gt\;/ig;
+	$cols = $_[2] || 50;
+        $rows = $_[3] || 5;
+	$htmlEdit = $_[4];
+	$wrap = $_[5] || "virtual";
 	if ($htmlEdit > 0) {
 		$output .= '<script language="JavaScript"> 
 			var formObj; 
@@ -175,9 +175,6 @@ sub textArea {
 		$output .= '<input type="button" onClick="openEditWindow(this.form.'.$name.')" value="'.
 			WebGUI::International::get(171).'" style="font-size: 8pt;"><br>';
 	}
-        if ($wrap eq "") {
-                $wrap = "virtual";
-        }
         $output .= '<textarea name="'.$name.'" cols="'.$cols.'" rows="'.$rows.'" wrap="'.$wrap.
 		'" onBlur="fixChars(this.form.'.$name.')">'.$value.'</textarea>';
         return $output;

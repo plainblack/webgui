@@ -12,6 +12,7 @@ use CGI (); CGI->compile(':all');
 use CGI::Carp ();
 use DBI ();
 use DBD::mysql ();
+use URI::Escape ();
 use HTML::Parser ();
 use Data::Config ();
 use Date::Calc ();
