@@ -11,4 +11,5 @@ delete from international where internationalId=151 and namespace='WebGUI';
 delete from international where internationalId=501 and namespace='WebGUI';
 delete from international where internationalId=154 and namespace='WebGUI';
 delete from international where internationalId=157 and namespace='WebGUI';
+delete from international where internationalId=398 and namespace='WebGUI';
 delete from style where name='Reserved';
