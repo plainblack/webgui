@@ -141,7 +141,7 @@ sub www_deleteDownloadConfirm {
                 $file->deleteNode;
                 WebGUI::SQL->write("delete from DownloadManager_file where downloadId=$session{form}{did}");
                 _reorderDownloads($session{form}{wid});
-                return $_[0]->www_edit();
+                return "";
         } else {
                 return WebGUI::Privilege::insufficient();
         }
@@ -175,8 +175,7 @@ sub www_download {
 
 #-------------------------------------------------------------------
 sub www_edit {
-        my ($output, $f, %hash, @array, $sth, @download, $paginateAfter, $proceed);
-        tie %hash, 'Tie::IxHash';
+        my ($output, $f, $paginateAfter, $proceed);
         if (WebGUI::Privilege::canEditPage()) {
                 if ($_[0]->get("wobjectId") eq "new") {
                         $proceed = 1;
@@ -189,22 +188,6 @@ sub www_edit {
                 $f->yesNo("displayThumbnails",WebGUI::International::get(21,$namespace),$_[0]->get("displayThumbnails"));
                 $f->yesNo("proceed",WebGUI::International::get(22,$namespace),$proceed);
 		$output .= $_[0]->SUPER::www_edit($f->printRowsOnly);
-		unless ($_[0]->get("wobjectId") eq "new") {
-			$output .= '<p><a href="'.WebGUI::URL::page('func=editDownload&did=new&wid='.$_[0]->get("wobjectId"))
-				.'">'.WebGUI::International::get(11,$namespace).'</a><p>';
-                	$sth = WebGUI::SQL->read("select downloadId,fileTitle from DownloadManager_file where wobjectId='$session{form}{wid}' order by sequenceNumber");
-			$output .='<table>';
-                	while (@download = $sth->array) {
-                        	$output .= '<tr><td>'
-					.deleteIcon('func=deleteDownload&wid='.$session{form}{wid}.'&did='.$download[0])
-					.editIcon('func=editDownload&wid='.$session{form}{wid}.'&did='.$download[0])
-					.moveUpIcon('func=moveDownloadUp&wid='.$session{form}{wid}.'&did='.$download[0])
-					.moveDownIcon('func=moveDownloadDown&wid='.$session{form}{wid}.'&did='.$download[0])
-					.'</td><td>'.$download[1].'</td></tr>';
-                	}
-                	$sth->finish;
-			$output .= '</table>';
-		}
                 return $output;
         } else {
                 return WebGUI::Privilege::insufficient();
@@ -313,7 +296,7 @@ sub www_editDownloadSave {
                         $session{form}{did} = "new";
                         $_[0]->www_editDownload();
                 } else {
-                        return $_[0]->www_edit();
+                        return "";
                 }
         } else {
                 return WebGUI::Privilege::insufficient();
@@ -330,7 +313,7 @@ sub www_moveDownloadDown {
                         WebGUI::SQL->write("update DownloadManager_file set sequenceNumber=sequenceNumber+1 where downloadId=$session{form}{did}");
                         WebGUI::SQL->write("update DownloadManager_file set sequenceNumber=sequenceNumber-1 where downloadId=$data[0]");
                 }
-                return $_[0]->www_edit();
+                return "";
         } else {
                 return WebGUI::Privilege::insufficient();
         }
@@ -346,7 +329,7 @@ sub www_moveDownloadUp {
                         WebGUI::SQL->write("update DownloadManager_file set sequenceNumber=sequenceNumber-1 where downloadId=$session{form}{did}");
                         WebGUI::SQL->write("update DownloadManager_file set sequenceNumber=sequenceNumber+1 where downloadId=$data[0]");
                 }
-                return $_[0]->www_edit();
+                return "";
         } else {
                 return WebGUI::Privilege::insufficient();
         }
@@ -360,6 +343,10 @@ sub www_view {
 	$url = WebGUI::URL::page();
 	$output = $_[0]->displayTitle;
         $output .= $_[0]->description;
+	if ($session{var}{adminOn}) {
+		$output .= '<p><a href="'.WebGUI::URL::page('func=editDownload&did=new&wid='.$_[0]->get("wobjectId"))
+                	.'">'.WebGUI::International::get(11,$namespace).'</a><p>';
+	}
 	$searchForm = WebGUI::HTMLForm->new(1);
 	$searchForm->text("keyword",'',$session{form}{keyword});
 	$searchForm->submit(WebGUI::International::get(170));
@@ -395,6 +382,13 @@ sub www_view {
 			$file = WebGUI::Attachment->new($download{downloadFile},
 				$_[0]->get("wobjectId"), $download{downloadId});
 			$row[$i] = '<tr><td class="tableData" valign="top">';
+			if ($session{var}{adminOn}) {
+				$row[$i] .= deleteIcon('func=deleteDownload&wid='.$session{form}{wid}.'&did='.$download{downloadId})
+					.editIcon('func=editDownload&wid='.$session{form}{wid}.'&did='.$download{downloadId})
+					.moveUpIcon('func=moveDownloadUp&wid='.$session{form}{wid}.'&did='.$download{downloadId})
+					.moveDownIcon('func=moveDownloadDown&wid='.$session{form}{wid}.'&did='.$download{downloadId})
+					.' ';
+			}
 			$row[$i] .= '<a href="'.WebGUI::URL::page('func=download&wid='.$_[0]->get("wobjectId").
 				'&did='.$download{downloadId}).'">'.$download{fileTitle}.'</a>&nbsp;&middot;&nbsp;<a href="'.
 				WebGUI::URL::page('func=download&wid='.
