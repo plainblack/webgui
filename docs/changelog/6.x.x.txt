@@ -4,6 +4,9 @@
  - Bugfix [ 884375 ] Fix for multiple forum posts applied also to
    www_viewForum to handle postings that start a new thread.
  - Added German toolbar icons.
+ - Added missing SQL Report help.
+ - Changed the pagination template variables on SQL Report, Article, File
+   Manager and USS to the standard pagination variables.
 
 
 6.0.1

@@ -401,12 +401,7 @@ sub www_view {
 	$var{"noresults.message"} = WebGUI::International::get(19,$_[0]->get("namespace"));
 	$var{noresults} = !$flag;
         $var{file_loop} = \@fileloop;
-        $var{firstPage} = $p->getFirstPageLink;
-        $var{lastPage} = $p->getLastPageLink;
-        $var{nextPage} = $p->getNextPageLink;
-        $var{pageList} = $p->getPageLinks;
-        $var{previousPage} = $p->getPreviousPageLink;
-        $var{multiplePages} = ($p->getNumberOfPages > 1);
+	$p->appendTemplateVars(\%var);
         return $_[0]->processTemplate($_[0]->get("templateId"),\%var);
 }
 

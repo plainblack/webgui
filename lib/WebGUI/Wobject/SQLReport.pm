@@ -164,14 +164,7 @@ sub www_view {
 				$var{'rows.count'} = $p->getRowCount;
 				$var{'rows.count.isZero'} = ($p->getRowCount < 1);
 				$var{'rows.count.isZero.label'} = WebGUI::International::get(18,$_[0]->get("namespace"));
-				$var{firstPage} = $p->getFirstPageLink;
-        			$var{lastPage} = $p->getLastPageLink;
-        			$var{nextPage} = $p->getNextPageLink;
-        			$var{pageList} = $p->getPageLinks;
-        			$var{previousPage} = $p->getPreviousPageLink;
-        			$var{multiplePages} = ($p->getNumberOfPages > 1);
-        			$var{numberOfPages} = $p->getNumberOfPages;
-        			$var{pageNumber} = $p->getPageNumber;
+				$p->appendTemplateVars(\%var);
 			}
                	} else {
 			push(@debug,{'debug.output'=>WebGUI::International::get(10,$_[0]->get("namespace"))});

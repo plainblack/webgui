@@ -736,12 +736,7 @@ sub www_view {
 		$i++;
 	}
 	$var{submissions_loop} = \@submission;
-	$var{firstPage} = $p->getFirstPageLink;
-	$var{lastPage} = $p->getLastPageLink;
-	$var{nextPage} = $p->getNextPageLink;
-	$var{pageList} = $p->getPageLinks;
-	$var{previousPage} = $p->getPreviousPageLink;
-	$var{multiplePages} = ($p->getNumberOfPages > 1);
+	$p->appendTemplateVars(\%var);
 	return $_[0]->processTemplate($_[0]->get("templateId"),\%var);
 }
 

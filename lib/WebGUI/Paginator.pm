@@ -77,6 +77,9 @@ The hash reference to append the variables to.
 sub appendTemplateVars {
 	my $self = shift;
 	my $var = shift;
+	$var->{'pagination.isFirstPage'} = ($self->getPageNumber == 1);
+	$var->{'pagination.isLastPage'} = ($self->getPageNumber == $self->getNumberOfPages);
+	$var->{'pagination.firstPage'} = $self->getFirstPageLink;
 	$var->{'pagination.firstPage'} = $self->getFirstPageLink;
 	$var->{'pagination.lastPage'} = $self->getLastPageLink;
 	$var->{'pagination.nextPage'} = $self->getNextPageLink;

@@ -164,14 +164,7 @@ sub www_view {
 		my $p = WebGUI::Paginator->new(WebGUI::URL::page("wid=".$_[0]->get("wobjectId")."&func=view"),1);
 		$p->setDataByArrayRef(\@pages);
 		$var{description} = $p->getPage;
-		$var{firstPage} = $p->getFirstPageLink;
-        	$var{lastPage} = $p->getLastPageLink;
-        	$var{nextPage} = $p->getNextPageLink;
-        	$var{pageList} = $p->getPageLinks;
-        	$var{previousPage} = $p->getPreviousPageLink;
-        	$var{multiplePages} = ($p->getNumberOfPages > 1);
-		$var{isLastPage} = ($p->getNumberOfPages == $p->getPageNumber);
-		$var{isFirstPage} = (1 == $p->getPageNumber);
+		$p->appendTemplateVars(\%var);
 	}
 	if ($_[0]->get("attachment") ne "") {
 		$file = WebGUI::Attachment->new($_[0]->get("attachment"),$_[0]->get("wobjectId"));
