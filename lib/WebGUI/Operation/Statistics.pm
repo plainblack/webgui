@@ -172,9 +172,9 @@ sub www_viewStatistics {
 		$version = '<a href="http://files.plainblack.com/downloads/'.$rev[0].'.x.x/webgui-'.$version.'.tar.gz">'.$version.'</a>';
 	}
 	$output .= '<tr><td align="right" class="tableHeader">'.WebGUI::International::get(349).':</td><td class="tableData">'.$version.'</td></tr>';
-	($data) = WebGUI::SQL->quickArray("select count(*) from page where parentId>1000 and parentId<>3");
+	($data) = WebGUI::SQL->quickArray("select count(*) from page where pageId>999 and parentId NOT IN(2,3,4,5)");
 	$output .= '<tr><td align="right" class="tableHeader">'.WebGUI::International::get(147).':</td><td class="tableData">'.$data.'</td></tr>';
-	($data) = WebGUI::SQL->quickArray("select count(*) from page where parentId>1000 and parentId=0");
+	($data) = WebGUI::SQL->quickArray("select count(*) from page where parentId=0 and pageId NOT IN(2,3,4,5)");
 	$output .= '<tr><td align="right" class="tableHeader">'.WebGUI::International::get(795).':</td><td class="tableData">'.$data.'</td></tr>';
 	($data) = WebGUI::SQL->quickArray("select count(*) from page where parentId=5");
 	$output .= '<tr><td align="right" class="tableHeader">'.WebGUI::International::get(794).':</td><td class="tableData">'.$data.'</td></tr>';
