@@ -23,6 +23,10 @@ use WebGUI::SQL;
 use WebGUI::Utility;
 
 
+=head1 NAME
+
+Package WebGUI::Forum
+
 =head1 DESCRIPTION
 
 Data management class for forums.

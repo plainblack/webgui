@@ -21,6 +21,10 @@ use WebGUI::Session;
 use WebGUI::SQL;
 use WebGUI::Utility;
 
+=head1 NAME
+
+Package WebGUI::Forum::Post
+
 =head1 DESCRIPTION
                                                                                                                                                              
 Data management class for forum posts.

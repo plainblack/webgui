@@ -18,12 +18,16 @@ use WebGUI::Session;
 use WebGUI::SQL;
 use WebGUI::User;
 
+=head1 NAME
+
+Package WebGUI::Affiliate
+
 =head1 DESCRIPTION
 
 Tracks where users come from.
 
 NOTE: This package is experimental as is not officially supported yet.
-                                                                                                                                                             
+
 =head1 SYNOPSIS
                                                                                                                                                              
  use WebGUI::Affiliate;

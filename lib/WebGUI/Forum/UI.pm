@@ -29,6 +29,10 @@ use WebGUI::Template;
 use WebGUI::User;
 
 
+=head1 NAME
+
+Package WebGUI::Forum::UI
+
 =head1 DESCRIPTION
                                                                                                                                                              
 User interface package for forums.
