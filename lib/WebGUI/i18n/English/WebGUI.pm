@@ -5517,36 +5517,37 @@ loop variables:</p>
 <P dir=ltr><STRONG>page.encryptLogin</STRONG><BR>A conditional indicating whether this page should be served over SSL.</P>
 <P dir=ltr><STRONG>page.absDepth</STRONG><BR>The absolute depth of this page&nbsp;(relative to nameless root).</P>
 <P><STRONG>page.relDepth</STRONG><BR>The relative depth of this page (relative to starting point).</P>
-<P><STRONG>page.isCurrent</STRONG><BR>A condition indicating whether this page is current page.</P>
-<P><STRONG>page.isHidden</STRONG><BR>A condition indicating whether this page is a hidden page.<BR><EM>(Note: This variable is only visible if "Show hidden pages" is switched on.)</EM></P>
-<P><STRONG>page.isSystem</STRONG><BR>A condition indicating whether this page is a system page (Trash, Clipboard, etc).<BR><EM>(Note: This variable is only visible if "Show system pages" is switched on.)</EM></P>
-<P><STRONG>page.isViewable</STRONG><BR>A condition indicating whether the user has permission to view it.<BR><EM>(Note: This variable is only visible if "Show unprivileged pages" is switched on.)</EM></P>
+<P><STRONG>page.isHidden</STRONG><BR>A conditional indicating whether this page is a hidden page.<BR><EM>(Note: This variable is only visible if "Show hidden pages" is switched on.)</EM></P>
+<P><STRONG>page.isSystem</STRONG><BR>A conditional indicating whether this page is a system page (Trash, Clipboard, etc).<BR><EM>(Note: This variable is only visible if "Show system pages" is switched on.)</EM></P>
+<P><STRONG>page.isViewable</STRONG><BR>A conditional indicating whether the user has permission to view it.<BR><EM>(Note: This variable is only visible if "Show unprivileged pages" is switched on.)</EM></P>
 <P><STRONG>page.indent</STRONG><BR>A variable containing the indent for current page. The default indent is three spaces. Use the <STRONG>page.indent_loop</STRONG> if you need a more flexible indent.</P>
 <P><STRONG>page.indent_loop</STRONG><BR>A loop that runs <STRONG>page.relDepth</STRONG> times.</P>
 <BLOCKQUOTE dir=ltr style="MARGIN-RIGHT: 0px">
 <P><STRONG>indent</STRONG><BR>A number representing the loop count. </P></BLOCKQUOTE>
-<P dir=ltr><STRONG>page.isRoot</STRONG><BR>A condition indication whether this page is a root page.</P>
-<P dir=ltr><STRONG>page.isTop</STRONG><BR>A condition indication whether this page is a top page (daughter of root).</P>
-<P dir=ltr><STRONG>page.inCurrentRoot</STRONG><BR>This condition is true if this page is a descendant of the root page of the current page</P>
-<P dir=ltr><STRONG>page.hasDaughter</STRONG><BR>A condition indication whether this page has a daughter. In other words: It evaluates to true if this page is a mother.</P>
-<P dir=ltr><STRONG>page.isMyAncestor</STRONG><BR>A condition indication whether this page is an ancestor of current page.</P>
-<P dir=ltr><STRONG>page.isMyDaughter</STRONG><BR>A condition indication whether this page is a daughter of current page.</P>
-<P dir=ltr><STRONG>page.isMyMother</STRONG><BR>A condition indication whether this page is the mother of current page.</P>
+<P dir=ltr><STRONG>page.isRoot</STRONG><BR>A conditional indication whether this page is a root page.</P>
+<P dir=ltr><STRONG>page.isTop</STRONG><BR>A conditional indication whether this page is a top page (daughter of root).</P>
+<P dir=ltr><STRONG>page.inCurrentRoot</STRONG><BR>This conditional is true if this page is a descendant of the root page of the current page</P>
+<P dir=ltr><STRONG>page.hasDaughter</STRONG><BR>A conditional indication whether this page has a daughter. In other words: It evaluates to true if this page is a mother.</P>
+<P dir=ltr><STRONG>page.isCurrent</STRONG><BR>A conditional indicating whether this page is the current page.</P>
+<P dir=ltr><STRONG>page.isMyAncestor</STRONG><BR>A conditional indication whether this page is an ancestor of current page.</P>
+<P dir=ltr><STRONG>page.isMyDaughter</STRONG><BR>A conditional indication whether this page is a daughter of current page.</P>
+<P dir=ltr><STRONG>page.isMyMother</STRONG><BR>A conditional indication whether this page is the mother of current page.</P>
+<P dir=ltr><STRONG>page.isMySister</STRONG><BR>A conditional indication whether this page is the sister of current page.</P>
 <P dir=ltr><STRONG>page.mother.*</STRONG><BR>These variables will be undefined if the page is a root.</P>
 <P dir=ltr><STRONG>page.mother.title</STRONG><BR>The title of the mother of this page.</P>
 <P dir=ltr><STRONG>page.mother.urlizedTitle</STRONG><BR>The urlized title of the mother of this page.</P>
 <P dir=ltr><STRONG>page.mother.pageId</STRONG><BR>The pageId of the mother of this page.</P>
 <P dir=ltr><STRONG>page.mother.parentId</STRONG><BR>The parentId of the mother of this page.</P>
-<P dir=ltr><STRONG>page.depthIs1 , page.depthIs2 , page.depthIs3 , page.depthIs4 , page.depthIsN<BR></STRONG>A condition indicating whether the depth of this page is N. This variable is useful if you want to style a certain level.</P>
+<P dir=ltr><STRONG>page.depthIs1 , page.depthIs2 , page.depthIs3 , page.depthIs4 , page.depthIsN<BR></STRONG>A conditional indicating whether the depth of this page is N. This variable is useful if you want to style a certain level.</P>
 <P dir=ltr>&lt;tmpl_if page.depthIs1&gt;<BR>&nbsp;&nbsp; &lt;img src="level1.gif"&gt;<BR>&lt;tmpl_else&gt;<BR>&nbsp;&nbsp; &lt;img src="defaultBullet.gif"&gt;<BR>&lt;/tmpl_if&gt;</P>
-<P dir=ltr><STRONG>page.relativeDepthIs1 , page.relativeDepthIs2 , page.relativeDepthIs3 , page.relativeDepthIsN</STRONG><BR>A condition indicating whether the relative depth of this page is N.</P>
+<P dir=ltr><STRONG>page.relativeDepthIs1 , page.relativeDepthIs2 , page.relativeDepthIs3 , page.relativeDepthIsN</STRONG><BR>A conditional indicating whether the relative depth of this page is N.</P>
 <P dir=ltr><STRONG>page.isLeftMost</STRONG><BR>This property is true if this page is the first within this level. Ie. has no left sister.</P>
 <P dir=ltr><STRONG>page.isRightMost</STRONG><BR>This property is true if this page is the last within this level. Ie. has no right sister.</P>
 <P dir=ltr><STRONG>page.depthDiff</STRONG><BR>The difference in depth of this page and the page processed before it. This only has a value when you go up in depth. If you go down, this would be always 1 and going down a level can be detected with <STRONG>page.isLeftMost</STRONG>.</P>
 <P dir=ltr><STRONG>page.depthDiffIs1, page.depthDiffIs2, page.depthDiffIs3, page.depthDiffIsN</STRONG><BR>True if the <STRONG>page.depthDiff</STRONG> variable is N.</P>
 <P dir=ltr><STRONG>page.depthDiff_loop</STRONG><BR>A loop that runs <STRONG>page.depthDiff</STRONG> times. This loop contains no loop variables.</P></BLOCKQUOTE>
 <P dir=ltr>&nbsp;</P>|,
-		lastUpdated => 1097206762
+		lastUpdated => 1097208584
 	},
 
 	'893' => {
@@ -6380,22 +6381,22 @@ The default label for the heading of this form.
 <p>
 
 <b>newpost.isNewThread</b><br>
-A condition indicating whether this post is a new thread.
+A conditional indicating whether this post is a new thread.
 <p>
 
 <b>newpost.isReply</b><br>
-A condition indicating whether this post is a reply.
+A conditional indicating whether this post is a reply.
 <p>
 
 <b>NOTE:</b> If the post is a reply, then the template variables from the post template are included and populated with the data from the original message.
 <p>
 
 <b>newpost.isEdit</b><br>
-A condition indicating whether this post is an edit of an existing post.
+A conditional indicating whether this post is an edit of an existing post.
 <p>
 
 <b>user.isVisitor</b><br>
-A condition indicating whether the current user is a visitor.
+A conditional indicating whether the current user is a visitor.
 <p>
 
 <b>newpost.isNewMessage</b><br>
@@ -6481,7 +6482,7 @@ The form footer.
 <p>
 
 |,
-		lastUpdated => 1066581759
+		lastUpdated => 1097208570
 	},
 
 	'702' => {
