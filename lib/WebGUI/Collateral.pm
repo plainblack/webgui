@@ -173,7 +173,7 @@ sub new {
 			".$properties->{collateralFolderId}.", ".quote($properties->{collateralType}).", 
 			".$properties->{userId}.", ".$properties->{dateUploaded}.", ".$properties->{thumbnailSize}.",
 			".quote($properties->{name}).", ".quote($properties->{username}).")");
-	} else {
+	} elsif ($collateralId > 0) {
 		$properties = WebGUI::SQL->quickHashRef("select * from collateral where collateralId=".$collateralId);
 	}
 	my $self = WebGUI::Attachment->new($properties->{filename},"images",$properties->{collateralId});
