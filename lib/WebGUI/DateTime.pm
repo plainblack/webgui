@@ -622,7 +622,7 @@ sub intervalToSeconds {
 
 =head2 localtime ( epoch )
 
-Returns an array of time elements. The elements are: years, months, days, hours, minutes, seconds, day of year, day of week.
+Returns an array of time elements. The elements are: years, months, days, hours, minutes, seconds, day of year, day of week, daylight savings.
 
 =over
 
@@ -642,7 +642,8 @@ sub localtime {
 	}
 	my $doy = Date::Calc::Day_of_Year($year,$month,$day);
 	my $dow = Date::Calc::Day_of_Week($year,$month,$day);
-	return ($year, $month, $day, $hour, $min, $sec, $doy, $dow);
+	my @temp = Date::Calc::System_Clock();
+	return ($year, $month, $day, $hour, $min, $sec, $doy, $dow, $temp[8]);
 }
 
 #-------------------------------------------------------------------
