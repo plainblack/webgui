@@ -67,7 +67,11 @@ sub definition {
 			templateId=>{
 				fieldType=>"template",
 				defaultValue=>"PBtmpl0000000000000140"
-				}
+				},
+			description=>{
+				fieldType=>"HTMLArea",
+				defaultValue=>undef
+				},
                         }
                 });
         return $class->SUPER::definition($definition);
@@ -80,6 +84,11 @@ sub getEditForm {
 	my $self = shift;
 	my $tabform = $self->SUPER::getEditForm();
 	my $originalTemplate = WebGUI::Asset::Template->new($self->getShortcut->get("templateId"));
+	$tabform->getTab("properties")->HTMLArea(
+		-value=>$self->getValue("description"),
+                -label=>WebGUI::International::get(85),
+		-name=>"description"
+		);
 	$tabform->getTab("display")->template(
 		-value=>$self->getValue("templateId"),
 		-namespace=>"Shortcut"

@@ -96,6 +96,7 @@ WebGUI::SQL->write("alter table Product_related drop primary key");
 WebGUI::SQL->write("alter table Product_related add assetId varchar(22) not null");
 WebGUI::SQL->write("alter table Product_related add relatedAssetId varchar(22) not null");
 WebGUI::SQL->write("alter table Product_related add primary key (assetId,relatedAssetId)");
+WebGUI::SQL->write("alter table WobjectProxy add column description mediumtext");
 
 
 
@@ -1088,6 +1089,9 @@ sub walkTree {
 				# migrate submission forums
 				# migrate submission attachments
 				# migrate submission images
+			} elsif ($wobject->{namespace} eq "WobjectProxy") {
+				WebGUI::SQL->write("update WobjectProxy set description=".quote($wobject->{description})." where
+					assetId=".quote($wobjectId));
 			} elsif ($wobject->{namespace} eq "MessageBoard") {
 				# migrate forums
 			} elsif (isIn($wobject->{namespace}, qw(DataForm Poll))) {
