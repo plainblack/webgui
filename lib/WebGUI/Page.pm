@@ -1296,7 +1296,7 @@ sub paste{
 	# You do not want to paste a page onto itself, believe me.
 	return $self if ($self->get("pageId") eq $newMother->get("pageId"));
 	return WebGUI::ErrorHandler::fatalError("You cannot paste a page that's not on the clipboard. parentId:".
-		$self->get("parentId").", pageId:".$self->get("pageId")) unless ($self->get("parentId") == 2);
+		$self->get("parentId").", pageId:".$self->get("pageId")) unless ($self->get("parentId") eq "2");
 	
 	# Place page in clipboard (pageId 2)
 	if ($self->move($newMother)) {

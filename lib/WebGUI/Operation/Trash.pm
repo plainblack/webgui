@@ -294,10 +294,10 @@ sub www_manageTrash {
 	# Generate list of pages in trash
 	if ($allUsers) {
 		$sth = WebGUI::SQL->read("select pageId,title,urlizedTitle,bufferUserId,bufferDate,bufferPrevId "
-			."from page where parentId=3 order by bufferDate");
+			."from page where parentId='3' order by bufferDate");
 	} else {
 		$sth = WebGUI::SQL->read("select pageId,title,urlizedTitle,bufferUserId,bufferDate,bufferPrevId "
-			."from page where parentId=3 and bufferUserId="
+			."from page where parentId='3' and bufferUserId="
 			. quote($session{user}{userId}) . " order by bufferDate");
 	}
         while (@data = $sth->array) {

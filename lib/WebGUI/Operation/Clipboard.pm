@@ -97,19 +97,19 @@ sub www_deleteClipboardItemConfirm {
 		WebGUI::ErrorHandler::audit("moved wobject ". $session{form}{wid} ." from clipboard to trash");
 	} elsif ($session{form}{pageId} ne "") {
 		if ( ($session{setting}{sharedClipboard} eq "1") || (WebGUI::Grouping::isInGroup(3)) ) {
-        		WebGUI::SQL->write("update page set parentId=3, "
+        		WebGUI::SQL->write("update page set parentId='3', "
                 		."bufferDate=".time().", "
                 		."bufferUserId=".quote($session{user}{userId}) .", "
                 		."bufferPrevId=2 "
-                		."where parentId=2 "
+                		."where parentId='2' "
                 		."and pageId=".quote($session{form}{pageId})
 				);
 		} else {
-        		WebGUI::SQL->write("update page set parentId=3, "
+        		WebGUI::SQL->write("update page set parentId='3', "
                 		."bufferDate=".time().", "
                 		."bufferUserId=".quote($session{user}{userId}) .", "
                 		."bufferPrevId=2 "
-                		."where parentId=2 "
+                		."where parentId='2' "
                 		."and pageId=".quote($session{form}{pageId}) ." "
                 		."and bufferUserId=".quote($session{user}{userId})
 				);
