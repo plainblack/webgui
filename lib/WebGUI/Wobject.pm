@@ -225,13 +225,13 @@ sub duplicate {
 	my %properties;
 	tie %properties, 'Tie::CPHash';
 	%properties = %{$_[0]->get};
-	$properties{pageId} = $_[1] || 2;
+	$properties{pageId} = $_[1] || '2';
 	$properties{sequenceNumber} = _getNextSequenceNumber($properties{pageId});
 	my $page = WebGUI::SQL->quickHashRef("select groupIdView,ownerId,groupIdEdit from page where pageId=".quote($properties{pageId}));
 	$properties{ownerId} = $page->{ownerId};
         $properties{groupIdView} = $page->{groupIdView};
         $properties{groupIdEdit} = $page->{groupIdEdit};
-	if ($properties{pageId} == 2)  {
+	if ($properties{pageId} eq '2')  {
 		$properties{bufferUserId} = $session{user}{userId};
 		$properties{bufferDate} = time();
 		$properties{bufferPrevId} = {};
@@ -1114,7 +1114,7 @@ sub www_createShortcut {
         return WebGUI::Privilege::insufficient() unless ($self->canEdit);
 	my $w = WebGUI::Wobject::WobjectProxy->new({wobjectId=>"new",namespace=>"WobjectProxy"});
 	$w->set({
-		pageId=>2,
+		pageId=>'2',
 		templatePosition=>1,
 		title=>$self->getValue("title"),
 		proxiedNamespace=>$self->get("namespace"),
@@ -1138,7 +1138,7 @@ sub www_cut {
 	my $self = shift;
         return WebGUI::Privilege::insufficient() unless ($self->canEdit);
 	$self->set({
-		pageId=>2, 
+		pageId=>'2', 
 		templatePosition=>1,
 	    	bufferUserId=>$session{user}{userId},
 		bufferDate=>WebGUI::DateTime::time(),
@@ -1188,7 +1188,7 @@ Moves this instance to the trash.
 sub www_deleteConfirm {
 	my $self = shift;
         if ($self->canEdit) {
-		$self->set({pageId=>3, templatePosition=>1,
+		$self->set({pageId=>'3', templatePosition=>1,
                         bufferUserId=>$session{user}{userId},
                         bufferDate=>WebGUI::DateTime::time(),
                         bufferPrevId=>$session{page}{pageId}});
