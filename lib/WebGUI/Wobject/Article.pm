@@ -133,13 +133,31 @@ sub www_view {
 	if ($_[0]->get("convertCarriageReturns")) {
 		$var{description} =~ s/\n/\<br\>\n/g;
 	}
+	$var{"new.template"} = WebGUI::URL::page("wid=".$_[0]->get("wobjectId")."&func=view")."&templateId=";
 	$var{"description.full"} = $var{description};
 	$var{"description.full"} =~ s/\^\-\;//g;
-	$var{"description.first.100characters"} = substr($var{"description.full"},0,100);
-	$var{"description.first.20words"} = $var{"description.full"};
-	$var{"description.first.20words"} =~ s/(((\S+)\s+){20}).*/$1/s;
-	$var{"description.first.paragraph"} = $var{"description.full"};
-	$var{"description.first.paragraph"} =~ s/^(.*?)\n.*/$1/s;
+	$var{"description.first.100words"} = $var{"description.full"};
+	$var{"description.first.100words"} =~ s/(((\S+)\s+){100}).*/$1/s;
+	$var{"description.first.75words"} = $var{"description.first.100words"};
+	$var{"description.first.75words"} =~ s/(((\S+)\s+){75}).*/$1/s;
+	$var{"description.first.50words"} = $var{"description.first.75words"};
+	$var{"description.first.50words"} =~ s/(((\S+)\s+){50}).*/$1/s;
+	$var{"description.first.25words"} = $var{"description.first.50words"};
+	$var{"description.first.25words"} =~ s/(((\S+)\s+){25}).*/$1/s;
+	$var{"description.first.10words"} = $var{"description.first.25words"};
+	$var{"description.first.10words"} =~ s/(((\S+)\s+){10}).*/$1/s;
+	$var{"description.first.2paragraphs"} = $var{"description.full"};
+	$var{"description.first.2paragraphs"} =~ s/^((.*?\n){2}).*/$1/s;
+	$var{"description.first.paragraph"} = $var{"description.first.2paragraphs"};
+	$var{"description.first.paragraph"} =~ s/^(.*?\n).*/$1/s;
+	$var{"description.first.4sentences"} = $var{"description.full"};
+	$var{"description.first.4sentences"} =~ s/^((.*?\.){4}).*/$1/s;
+	$var{"description.first.3sentences"} = $var{"description.first.4sentences"};
+	$var{"description.first.3sentences"} =~ s/^((.*?\.){3}).*/$1/s;
+	$var{"description.first.2sentences"} = $var{"description.first.3sentences"};
+	$var{"description.first.2sentences"} =~ s/^((.*?\.){2}).*/$1/s;
+	$var{"description.first.sentence"} = $var{"description.first.2sentences"};
+	$var{"description.first.sentence"} =~ s/^(.*?\.).*/$1/s;
 	if ($session{form}{makePrintable}) {
 		$var{description} =~ s/\^\-\;//g;
 		$var{isFirstPage} = 1;
@@ -172,7 +190,7 @@ sub www_view {
         	$var{"post.URL"} = WebGUI::URL::page('func=post&mid=new&wid='.$_[0]->get("wobjectId"));
         	$var{"post.label"} = WebGUI::International::get(24,$_[0]->get("namespace"));
 	}
-	return $_[0]->processTemplate($_[0]->get("templateId"),\%var);
+	return $_[0]->processTemplate($_[0]->getValue("templateId"),\%var);
 }
 
 

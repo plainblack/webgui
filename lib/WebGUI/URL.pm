@@ -145,7 +145,7 @@ sub gateway {
 		$url = append($url,$_[1]);
 	}
         if ($session{setting}{preventProxyCache} == 1) {
-                $url = append($url,randint(0,1000).';'.time());
+                $url = append($url,"noCache=".randint(0,1000).';'.time());
         }
         return $url;
 }
@@ -203,7 +203,7 @@ sub page {
 		$url = append($url,$_[0]);
 	}
 	if ($session{setting}{preventProxyCache} == 1) {
-		$url = append($url,randint(0,1000).';'.time());
+		$url = append($url,"noCache=".randint(0,1000).';'.time());
 	}
 	return $url;
 }
