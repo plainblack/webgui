@@ -143,7 +143,7 @@ sub _processWobjectFunctions {
 				}                        
 			}                        
 			if ($wobject) {                                
-				if (${$wobject}{pageId} != $session{page}{pageId}) {                                        
+				if (${$wobject}{pageId} ne $session{page}{pageId}) {                                        
 					($proxyWobjectId) = WebGUI::SQL->quickArray("select wobject.wobjectId from                                                
 						wobject,WobjectProxy                                               
 						where wobject.wobjectId=WobjectProxy.wobjectId                                                
@@ -151,9 +151,9 @@ sub _processWobjectFunctions {
 						and WobjectProxy.proxiedWobjectId=".quote(${$wobject}{wobjectId}),WebGUI::SQL->getSlave);
 				  	${$wobject}{_WobjectProxy} = $proxyWobjectId;
 				}
-				unless (${$wobject}{pageId} eq $session{page}{pageId}                                                                
-					|| ${$wobject}{pageId} == 2                                                                
-					|| ${$wobject}{pageId} == 3                                                                
+				unless (${$wobject}{pageId} eq $session{page}{pageId}
+					|| ${$wobject}{pageId} eq '2'
+					|| ${$wobject}{pageId} eq '3'
 					|| ${$wobject}{_WobjectProxy} ne "") {                                        
 					$output .= WebGUI::International::get(417);                                        
 					WebGUI::ErrorHandler::security("access wobject [".$session{form}{wid}."] on page '"       
@@ -1191,7 +1191,7 @@ sub moveUp {
 	return 0 if (!defined $mother);
 
 	# Don't allow to move up if node is already a webguiroot;
-	return 0 if ($mother->get('pageId') =~ /^\d+$/ && $mother->get('pageId') == 0);
+	return 0 if ($mother->get('pageId') eq "0");
 
 	# Update depth, we do this before the move because now we know the nestedSetRight range of nodes 
 	# that change in depth.
