@@ -25,6 +25,7 @@ Contributing Developers..............Peter Beardsley / Appropriate Solutions
                                      Chris Jackson
                                      Koen de Jonge / ProcoliX
                                      Martin Kamerbeek / ProcoliX
+                                     Christian Kocourek
                                      John W. Krahn
                                      Len Kranendonk
                                      Christophe Marcant

@@ -215,7 +215,7 @@ sub getRecordTemplateVars {
 			"field.label" => $data{label},
 			"field.isMailField" => $data{isMailField},
 			"field.isHidden" => $hidden,
-			"field.isDisplayed" => ($data{status} eq "displayed" && !$hidden),
+			"field.isDisplayed" => ($data{status} eq "visible" && !$hidden),
 			"field.isEditable" => ($data{status} eq "editable" && !$hidden),
 			"field.isRequired" => ($data{status} eq "required" && !$hidden),
 			"field.subtext" => $data{subtext},
@@ -603,7 +603,7 @@ sub www_process {
 	my ($var, %row, @errors, $updating, $hadErrors);
 	$var->{entryId} = $entryId;
 	tie %row, "Tie::CPHash";
-	my $sth = WebGUI::SQL->read("select DataForm_fieldId,name,status,type,defaultValue,isMailField from DataForm_field 
+	my $sth = WebGUI::SQL->read("select DataForm_fieldId,label,name,status,type,defaultValue,isMailField from DataForm_field 
 		where wobjectId=".$_[0]->get("wobjectId")." order by sequenceNumber");
 	while (%row = $sth->hash) {
 		my $value = WebGUI::FormProcessor::process($row{name},$row{type},$row{defaultValue});
@@ -611,10 +611,8 @@ sub www_process {
 			$value = WebGUI::Macro::filter($value);
 		}
 		if ($row{status} eq "required" && ($value =~ /^\s$/ || $value eq "" || not defined $value)) {
-		#if ($row{status} eq "required" && ($value =~ /^\s$/ || $value eq "")) {
-		#if ($row{status} eq "required" && $value eq "") {
 			push (@errors,{
-				"error.message"=>$row{name}." ".WebGUI::International::get(29,$_[0]->get("namespace")).".",
+				"error.message"=>$row{label}." ".WebGUI::International::get(29,$_[0]->get("namespace")).".",
 				});
 			$hadErrors = 1;
 			delete $var->{entryId};

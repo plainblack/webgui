@@ -1,5 +1,7 @@
 5.5.0
  - Rewrote the discussion system and added many new features in the process.
+ - Made the username field in the database unique;
+ - Fixed a display bug in the Data Form. (Thanks to Christian Kocourek.)
  - Added external database group privileges. (Thanks to Andy Grundman.)
  - Added support for encryptLogin user setting. (Thanks to Hal Roberts.)
  - Added anonymous response option to Survey. (Thanks to Andy Grundman.)
@@ -15,6 +17,8 @@
  - Enhanced HTMLArea editor to include table editing. (Thanks to Irving Carrion.)
  - Fixed a bug where reinvoking www_createAccountSave could produce duplicate
    usernames in the database. (Thanks to Martin Kamerbeek.)
+ - Fixed a bug in the 5.4.3-5.4.4 upgrade script that some users experienced
+   with null values in their DataForm.
 
 5.4.4
  - Updated Finnish translation. (Thanks to Markus Hynna.)

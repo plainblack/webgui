@@ -229,6 +229,24 @@ WebGUI::SQL->write("alter table wobject drop column filterPost");
 WebGUI::SQL->write("alter table wobject drop column addEditStampToPosts");
 
 
+#--------------------------------------------
+print "\tForcing unique usernames.\n" unless ($quiet);
+my $a = WebGUI::SQL->read("select userId,username from users order by userId");
+my $test;
+while (my ($userId,$username) = $a->array) {
+	while (($test) = WebGUI::SQL->quickArray("select username from users where username=".quote($username)." and userId<>$userId")) {
+		if ($username =~ /(.*)(\d+$)/) {
+       	                $username = $1.($2+1);
+                } elsif ($test ne "") {
+               	        $username .= "2";
+               	}
+	}
+	WebGUI::SQL->write("update users set username=".quote($username)." where userId=$userId");
+}
+$a->finish;
+WebGUI::SQL->write("alter table users add unique username_unique (username)");
+
+
 WebGUI::Session::close();
 
 

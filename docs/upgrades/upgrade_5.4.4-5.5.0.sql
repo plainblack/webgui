@@ -264,4 +264,3 @@ delete from international where languageId=1 and namespace='WebGUI' and internat
 insert into international (internationalId,languageId,namespace,message,lastUpdated,context) values (529,1,'WebGUI','results per page', 1066492301,'A label indicating the number of items per page to return in a list.');
 
 
-
