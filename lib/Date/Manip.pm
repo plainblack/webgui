@@ -32,7 +32,7 @@ $OS="VMS"      if (defined $^O and
                    $^O =~ /VMS/i);
 
 # Determine if we're doing taint checking
-$Date$^W; unlink "$^X$^T"; 1 };
+ $Date$^W; unlink "$^X$^T"; 1 };
 
 ###########################################################################
 # CUSTOMIZATION
