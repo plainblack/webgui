@@ -1,5 +1,6 @@
 6.2.3
  - Changed to new POD format.
+ - Fixed GUID related bugs in search indexer and passive profiling.
 
 
 6.2.2

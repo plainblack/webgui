@@ -106,8 +106,8 @@ sub getIndexerParams {
 			fieldsToIndex => ["synopsis" , "title"],
 			contentType => 'page',
 			url => '$data{urlizedTitle}',
-			headerShortcut => 'select title from page where pageId = $data{pageId}',
-			bodyShortcut => 'select synopsis from page where pageId = $data{pageId}', 
+			headerShortcut => 'select title from page where pageId = \'$data{pageId}\'',
+			bodyShortcut => 'select synopsis from page where pageId = \'$data{pageId}\'', 
 		},
 	wobject =>	{
 			sql => "select wobject.namespace as namespace, 
@@ -130,8 +130,8 @@ sub getIndexerParams {
 			fieldsToIndex => ["title", "description"],
 			contentType => 'wobject',
 			url => '$data{urlizedTitle}."#".$data{wid}',
-			headerShortcut => 'select title from wobject where wobjectId = $data{wid}',
-			bodyShortcut => 'select description from wobject where wobjectId = $data{wid}',
+			headerShortcut => 'select title from wobject where wobjectId = \'$data{wid}\'',
+			bodyShortcut => 'select description from wobject where wobjectId = \'$data{wid}\'',
 		},
 	wobjectDiscussion => {
 			sql => "select  forumPost.forumPostId,
@@ -159,8 +159,8 @@ sub getIndexerParams {
 			fieldsToIndex => ["username", "subject", "message"],
 			contentType => 'discussion',
 			url => 'WebGUI::URL::append($data{urlizedTitle},"func=view&wid=$data{wid}&forumId=$data{forumId}&forumOp=viewThread&forumPostId=$data{forumPostId}")',
-			headerShortcut => 'select subject from forumPost where forumPostId = $data{forumPostId}',
-			bodyShortcut => 'select message from forumPost where forumPostId = $data{forumPostId}',
+			headerShortcut => 'select subject from forumPost where forumPostId = \'$data{forumPostId}\'',
+			bodyShortcut => 'select message from forumPost where forumPostId = \'$data{forumPostId}\'',
 	},
 	userProfileData => {
 			sql => "select distinct(userProfileData.userId),
@@ -184,11 +184,11 @@ sub getIndexerParams {
 						and userProfileField.visible=1
 						and userProfileData.fieldName = userProfileField.fieldName
 						and fieldData <> ''
-						and userProfileData.userId = $data{userId}
+						and userProfileData.userId = \'$data{userId}\'
 					   / ],
 			url => '"?op=viewProfile&uid=$data{userId}"',
 			contentType => 'profile',
-			headerShortcut => 'select username from users where userId = $data{userId}',
+			headerShortcut => 'select username from users where userId = \'$data{userId}\'',
 			#bodyShortcut => q/select concat(fieldName,': ',fieldData) from userProfileData where userId = $data{userId}/
 			bodyShortcut => '$textToIndex',
 		}

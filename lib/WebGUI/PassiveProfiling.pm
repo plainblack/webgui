@@ -112,7 +112,7 @@ sub summarizeAOI {
 			d.value 
 		from metaData_values d , metaData_properties f 
 		where f.fieldId = d.fieldId 
-			and d.wobjectId = ".$data->{wobjectId};
+			and d.wobjectId = ".quote($data->{wobjectId});
 
         my $sth = WebGUI::SQL->read($sql);
         while (my $field = $sth->hashRef) {
