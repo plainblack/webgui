@@ -26,7 +26,8 @@ INSERT INTO userProfileField VALUES ('signature','WebGUI::International::get(859
 INSERT INTO userProfileField VALUES ('publicProfile','WebGUI::International::get(861)',1,0,'yesNo','','[1]',9,4,0);
 INSERT INTO userProfileField VALUES ('publicEmail','WebGUI::International::get(860)',1,0,'yesNo','','[1]',10,4,0);
 insert into international (internationalId,languageId,namespace,message,lastUpdated) values (862,1,'WebGUI','This user\'s profile is not public.', 1043881275);
-
+alter table groups add column dateCreated int not null default 997938000;
+alter table groups add column lastUpdated int not null default 997938000;
 
 
 

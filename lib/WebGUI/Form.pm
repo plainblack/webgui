@@ -510,18 +510,26 @@ If you want to add anything special to this form element like javascript actions
 
  'onChange="this.form.submit()"'
 
+=item excludeGroups
+
+An array reference containing a list of groups to exclude from the list.
+
 =back
 
 =cut
 
 sub group {
-        my (%hash, $value);
+        my (%hash, $value, $where);
 	$value = $_[0]->{value};
 	if ($$value[0] eq "") { #doing long form otherwise arrayRef didn't work
 		$value = [7];
 	}
 	tie %hash, 'Tie::IxHash';
- 	%hash = WebGUI::SQL->buildHash("select groupId,groupName from groups where groupName<>'Reserved' order by groupName");
+	my $exclude = $_[0]->{excludeGroups};
+	if ($$exclude[0] ne "") {
+		$where = "where groupId not in (".join(",",@$exclude).")";
+	}
+ 	%hash = WebGUI::SQL->buildHash("select groupId,groupName from groups $where order by groupName");
 	return selectList({
 		options=>\%hash,
 		name=>$_[0]->{name},

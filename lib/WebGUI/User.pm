@@ -15,6 +15,8 @@ package WebGUI::User;
 =cut
 
 use strict;
+use WebGUI::DateTime;
+use WebGUI::Grouping;
 use WebGUI::HTMLForm;
 use WebGUI::International;
 use WebGUI::Session;
@@ -78,14 +80,7 @@ An array reference containing a list of groups.
 =cut
 
 sub addToGroups {
-	my ($class, $groups, $gid, $expireAfter);
-	$class = shift;
-	$groups = shift;
-	foreach $gid (@$groups) {
-        	($expireAfter) = WebGUI::SQL->quickArray("select expireAfter from groups where groupId=$gid");
-                WebGUI::SQL->write("insert into groupings values ($gid, $class->{_userId}, ".(time()+$expireAfter).")");
-        }
-        WebGUI::SQL->write("update users set lastUpdated=".time()." where userId=".$class->{_userId});
+	WebGUI::Grouping::addUsersToGroups([$_[0]->{_userId}],$_[1]);
 }
 
 #-------------------------------------------------------------------
@@ -141,10 +136,14 @@ sub delete {
         $class = shift;
         WebGUI::SQL->write("delete from users where userId=".$class->{_userId});
         WebGUI::SQL->write("delete from userProfileData where userId=".$class->{_userId});
-	WebGUI::SQL->write("delete from groupings where userId=".$class->{_userId});
+	WebGUI::Grouping::deleteUsersFromGroups([$class->{_userId}],WebGUI::Grouping::getGroupsForUser($class->{_userId}));
 	WebGUI::SQL->write("delete from messageLog where userId=".$class->{_userId});
-	WebGUI::SQL->write("delete from userSession where userId=".$class->{_userId});
 	WebGUI::Authentication::deleteParams($class->{_userId});
+        my $sth = WebGUI::SQL->read("select sessionId from userSession where userId=$class->{_userId}");
+        while (my ($sid) = $sth->array) {
+                WebGUI::Sesssion::end($sid);
+        }
+        $sth->finish;
 }
 
 #-------------------------------------------------------------------
@@ -164,13 +163,7 @@ An array reference containing a list of groups.
 =cut
 
 sub deleteFromGroups {
-        my ($class, $groups, $gid);
-        $class = shift;
-        $groups = shift;
-        foreach $gid (@$groups) {
-                WebGUI::SQL->write("delete from groupings where groupId=$gid and userId=$class->{_userId}");
-        }
-        WebGUI::SQL->write("update users set lastUpdated=".time()." where userId=".$class->{_userId});
+	WebGUI::Grouping::deleteUsersFromGroups([$_[0]->{_userId}],$_[1]);
 }
 
 #-------------------------------------------------------------------

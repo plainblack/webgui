@@ -47,6 +47,7 @@ Package for interfacing with SQL databases. This package implements Perl DBI fun
  $sth->finish;
 
  @arr = WebGUI::SQL->buildArray($sql);
+ $arrayRef = WebGUI::SQL->buildArrayRef($sql);
  %hash = WebGUI::SQL->buildHash($sql);
  $hashRef = WebGUI::SQL->buildHashRef($sql);
  @arr = WebGUI::SQL->quickArray($sql);
@@ -112,6 +113,30 @@ sub buildArray {
         return @array;
 }
 
+#-------------------------------------------------------------------
+
+=head2 buildArrayRef ( sql [, dbh ] )
+
+Builds an array reference of data from a series of rows.
+
+=over
+
+=item sql
+
+An SQL query. The query must select only one column of data.
+
+=item dbh
+
+By default this method uses the WebGUI database handler. However, you may choose to pass in your own if you wish.
+
+=back
+
+=cut
+
+sub buildArrayRef {
+	my @array = $_[0]->buildArray($_[1],$_[2]);
+	return \@array;
+}
 
 #-------------------------------------------------------------------
 

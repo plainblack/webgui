@@ -599,7 +599,7 @@ sub file {
 
 #-------------------------------------------------------------------
 
-=head2 group ( name [ label, value, size, multiple, extras, subtext, uiLevel ] )
+=head2 group ( name [ label, value, size, multiple, extras, subtext, uiLevel, excludeGroups ] )
 
 Adds a group pull-down to this form. A group pull down provides a select list that provides name value pairs for all the groups in the WebGUI system.
 
@@ -639,6 +639,10 @@ Extra text to describe this form element or to provide special instructions.
 
 The UI level for this field. See the WebGUI developer's site for details. Defaults to "0".
 
+=item excludeGroups
+
+An array reference containing a list of groups to exclude from the list.
+
 =back
 
 =cut
@@ -646,15 +650,16 @@ The UI level for this field. See the WebGUI developer's site for details. Defaul
 sub group {
         my ($output);
         my ($self, @p) = @_;
-        my ($name, $label, $value, $size, $multiple, $extras, $subtext, $uiLevel) =
-                rearrange([qw(name label value size multiple extras subtext uiLevel)], @p);
+        my ($name, $label, $value, $size, $multiple, $extras, $subtext, $uiLevel, $excludeGroups) =
+                rearrange([qw(name label value size multiple extras subtext uiLevel excludeGroups)], @p);
         if (_uiLevelChecksOut($uiLevel)) {
                 $output = WebGUI::Form::group({
                         "name"=>$name,
                         "size"=>$size,
                         "value"=>$value,
                         "multiple"=>$multiple,
-                        "extras"=>$extras
+                        "extras"=>$extras,
+			excludeGroups=>$excludeGroups
                         });
                 $output .= _subtext($subtext);
                 $output = $self->_tableFormRow($label,$output);

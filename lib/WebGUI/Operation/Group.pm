@@ -14,6 +14,8 @@ use Exporter;
 use strict;
 use Tie::CPHash;
 use WebGUI::DateTime;
+use WebGUI::Group;
+use WebGUI::Grouping;
 use WebGUI::HTMLForm;
 use WebGUI::Icon;
 use WebGUI::International;
@@ -54,9 +56,7 @@ sub www_addGroupsToGroupSave {
         return WebGUI::Privilege::adminOnly() unless (WebGUI::Privilege::isInGroup(3));
         my (@groups, $group);
         @groups = $session{cgi}->param('groups');
-	foreach $group (@groups) {
-		WebGUI::SQL->write("insert into groupGroupings values ($group,$session{form}{gid})");
-	}
+	WebGUI::Grouping::addGroupsToGroups(\@groups,[$session{form}{gid}]);
         return www_manageGroupsInGroup();
 }
 
@@ -79,46 +79,42 @@ sub www_deleteGroup {
 sub www_deleteGroupConfirm {
 	return WebGUI::Privilege::adminOnly() unless (WebGUI::Privilege::isInGroup(3));
         return WebGUI::Privilege::vitalComponent() if ($session{form}{gid} < 26);
-        WebGUI::SQL->write("delete from groups where groupId=$session{form}{gid}");
-        WebGUI::SQL->write("delete from groupings where groupId=$session{form}{gid}");
+	my $g = WebGUI::Group->new($session{form}{gid});
+	$g->delete;
         return www_listGroups();
 }
 
 #-------------------------------------------------------------------
 sub www_deleteGroupGrouping {
 	return WebGUI::Privilege::adminOnly() unless (WebGUI::Privilege::isInGroup(3));
-	WebGUI::SQL->write("delete from groupGroupings where inGroup=$session{form}{gid} and groupId=$session{form}{delete}");
+	WebGUI::Grouping::deleteGroupsFromGroups([$session{form}{delete}],[$session{form}{gid}]);
         return www_manageGroupsInGroup();
 }
 
 #-------------------------------------------------------------------
 sub www_editGroup {
 	return WebGUI::Privilege::adminOnly() unless (WebGUI::Privilege::isInGroup(3));
-        my ($output, %group, $f);
-	tie %group, 'Tie::CPHash';
+        my ($output, $f, $g);
 	if ($session{form}{gid} eq "new") {
-		$group{expireAfter} = 314496000;
-		$group{karmaThreshold} = 1000000000;
+		$g = WebGUI::Group->new("");
 	} else {
-               	%group = WebGUI::SQL->quickHash("select * from groups where groupId=$session{form}{gid}");
+		$g = WebGUI::Group->new($session{form}{gid});
 	}
         $output .= helpIcon(17);
 	$output .= '<h1>'.WebGUI::International::get(87).'</h1>';
 	$f = WebGUI::HTMLForm->new;
         $f->hidden("op","editGroupSave");
         $f->hidden("gid",$session{form}{gid});
-	$f->readOnly($session{form}{gid},WebGUI::International::get(379));
-        $f->text("groupName",WebGUI::International::get(84),$group{groupName});
-        $f->textarea("description",WebGUI::International::get(85),$group{description});
-        $f->interval("expireAfter",WebGUI::International::get(367), WebGUI::DateTime::secondsToInterval($group{expireAfter}));
+	$f->readOnly($g->groupId,WebGUI::International::get(379));
+        $f->text("groupName",WebGUI::International::get(84),$g->name);
+        $f->textarea("description",WebGUI::International::get(85),$g->description);
+        $f->interval("expireAfter",WebGUI::International::get(367), WebGUI::DateTime::secondsToInterval($g->expireAfter));
 	if ($session{setting}{useKarma}) {
-               	$f->integer("karmaThreshold",WebGUI::International::get(538),$group{karmaThreshold});
-	} else {
-               	$f->hidden("karmaThreshold",$group{karmaThreshold});
+               	$f->integer("karmaThreshold",WebGUI::International::get(538),$g->karmaThreshold);
 	}
 	$f->text(
 		-name=>"ipFilter",
-		-value=>$group{ipFilter},
+		-value=>$g->ipFilter,
 		-label=>WebGUI::International::get(857)
 		);
 	$f->submit;
@@ -129,17 +125,12 @@ sub www_editGroup {
 #-------------------------------------------------------------------
 sub www_editGroupSave {
 	return WebGUI::Privilege::adminOnly() unless (WebGUI::Privilege::isInGroup(3));
-	if ($session{form}{gid} eq "new") {
-		$session{form}{gid} = getNextId("groupId");
-		WebGUI::SQL->write("insert into groups (groupId) values ($session{form}{gid})");
-	}
-        WebGUI::SQL->write("update groups set groupName=".quote($session{form}{groupName}).", 
-		description=".quote($session{form}{description}).", 
-		expireAfter='".WebGUI::DateTime::intervalToSeconds($session{form}{expireAfter_interval},
-		$session{form}{expireAfter_units})."',
-		karmaThreshold='$session{form}{karmaThreshold}',
-		ipFilter=".quote($session{form}{ipFilter})."
-		where groupId=".$session{form}{gid});
+	my $g = WebGUI::Group->new($session{form}{gid});
+	$g->description($session{form}{description});
+	$g->name($session{form}{groupName});
+	$g->expireAfter(WebGUI::DateTime::intervalToSeconds($session{form}{expireAfter_interval},$session{form}{expireAfter_units}));
+	$g->karmaThreshold($session{form}{karmaThreshold});
+	$g->ipFilter($session{form}{ipFilter});
         return www_listGroups();
 }
 
@@ -218,21 +209,22 @@ sub www_listGroups {
 #-------------------------------------------------------------------
 sub www_manageGroupsInGroup {
         return WebGUI::Privilege::adminOnly() unless (WebGUI::Privilege::isInGroup(3));
-	my ($output, $p, $group, $groups, @array, $f);
+	my ($output, $p, $group, $groups, $f);
 	$output = '<h1>'.WebGUI::International::get(813).'</h1><div align="center">';
         $f = WebGUI::HTMLForm->new;
         $f->hidden("op","addGroupsToGroupSave");
         $f->hidden("gid",$session{form}{gid});
-        @array = WebGUI::SQL->buildArray("select groupId from groupGroupings where inGroup='$session{form}{gid}'");
-	push(@array,$session{form}{gid});
-     #   push(@array,1); #visitors
-     #   push(@array,2); #registered users
-     #   push(@array,7); #everyone
-        $groups = WebGUI::SQL->buildHashRef("select groupId,groupName from groups where groupId not in (".join(",",@array).") order by groupName");
-        $f->select("groups",$groups,WebGUI::International::get(605),[],5,1);
+	$groups = WebGUI::Grouping::getGroupsInGroup($session{form}{gid});
+	push(@$groups,$session{form}{gid});
+        $f->group(
+		-name=>"groups",
+		-excludeGroups=>$groups,
+		-label=>WebGUI::International::get(605),
+		-size=>5,
+		-multiple=>1
+		);
         $f->submit;
         $output .= $f->print;
-
 	$output .= '</div><p/><table class="tableData" align="center">';
 	$output .= '<tr class="tableHeader"><td></td><td>'.WebGUI::International::get(84).'</td></tr>';
 	$p = WebGUI::Paginator->new(WebGUI::URL::page('op=manageGroupsInGroup'));
