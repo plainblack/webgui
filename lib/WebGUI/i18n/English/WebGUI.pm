@@ -1980,7 +1980,7 @@ A shorter or altered title to appear in navigation. If left blank this will defa
 <p>
 
 <b>Page URL</b><br>
-When you create a page a URL for the page is generated based on the page title. If you are unhappy with the URL that was chosen, you can change it here.
+You may either specify a URL for the page, or if you leave this blank, a URL based on the <b>Title</b> will be generated.
 <p>
 
 <b>Redirect URL</b><br>
@@ -2860,29 +2860,32 @@ One package that many people create is a Page/Article package. It is often the c
 	},
 
 	'626' => {
-		message => q|Wobjects (fomerly known as Widgets) are the true power of WebGUI. Wobjects are tiny pluggable applications built to run under WebGUI. Message boards and polls are examples of wobjects.
+		message => q|Wobjects (fomerly known as Widgets) are the true power of WebGUI. Wobjects are tiny pluggable applications built to run under WebGUI. Articles, message boards and polls are examples of wobjects.
 <p>
 
-To add a wobject to a page, first go to that page, then select <i>Add Content...</i> from the upper left corner of your screen. Each wobject has it's own help so be sure to read the help if you're not sure how to use it.
+To add a wobject to a page, first go to that page, then select <b>Add Content...</b> from the upper left corner of your screen. Each wobject has it's own help so be sure to read the help if you're not sure how to use it.
 <p>
 
 
-<i>Style Sheets</i>: All wobjects have a style-sheet class and id attached to them. 
-<p>
-
+<b>Style Sheets:</b><br>
+All wobjects have a style-sheet class and id attached to them. 
 The style-sheet class is the word "wobject" plus the type of wobject it is. So for a poll the class would be "wobjectPoll". The class pertains to all wobjects of that type in the system. 
 <p>
 
 The style-sheet id is the word "wobjectId" plus the Wobject Id for that wobject instance. So if you had an Article with a Wobject Id of 94, then the id would be "wobjectId94".
 <p>
-<i>Direct Linking</i>: You can create a URL to link directly to a wobject
+<h3>URLs</h3>
+
+<b>Direct Linking:</b><br>
+You can create a URL to link directly to a wobject
 on the page be appending the Wobject Id to the URL for the page.
 <p>
-For example, if the Article above was on a page http://www.mysite.com/thisPage, to create a link that will jump directly to the wobject the URL would
-be http://www.mysite.com/thisPage#94
+For example, if the Article above was on a page http://www.mysite.com/thisPage, the link below will jump directly to the wobject on that page:<br>
+
+http://www.mysite.com/thisPage#94
 <p>
 |,
-		lastUpdated => 1094406751
+		lastUpdated => 1101769934,
 	},
 
 	'543' => {
