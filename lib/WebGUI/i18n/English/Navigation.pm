@@ -89,9 +89,9 @@ loop variables:</p>
 <P dir=ltr><STRONG>page.menuTitle</STRONG><BR>The menu title of this page.</P>
 <P dir=ltr><STRONG>page.title</STRONG><BR>The title of this page.</P>
 <P dir=ltr><STRONG>page.url</STRONG><BR>The complete URL to this page.</P>
-<P dir=ltr><STRONG>page.assetId</STRONG><BR>The pageId of this page.</P>
-<P dir=ltr><STRONG>page.parentId</STRONG><BR>The parentId of this page.</P>
-<P dir=ltr><STRONG>page.ownerUserId</STRONG><BR>The ownerId of this page.</P>
+<P dir=ltr><STRONG>page.assetId</STRONG><BR>The assetId of this page.</P>
+<P dir=ltr><STRONG>page.parentId</STRONG><BR>The assetId of the parent of this page.</P>
+<P dir=ltr><STRONG>page.ownerUserId</STRONG><BR>The userId of the owner of this page.</P>
 <P dir=ltr><STRONG>page.synopsis</STRONG><BR>The synopsis of this page.</P>
 <P dir=ltr><STRONG>page.newWindow</STRONG><BR>A conditional indicating whether this page should be opened in a new window.</P>
 <P dir=ltr><STRONG>page.absDepth</STRONG><BR>The absolute depth of this page&nbsp;(relative to nameless root).</P>
@@ -131,7 +131,7 @@ loop variables:</p>
 <P dir=ltr><STRONG>page.depthDiffIs1, page.depthDiffIs2, page.depthDiffIs3, page.depthDiffIsN</STRONG><BR>True if the <STRONG>page.depthDiff</STRONG> variable is N.</P>
 <P dir=ltr><STRONG>page.depthDiff_loop</STRONG><BR>A loop that runs <STRONG>page.depthDiff</STRONG> times. This loop contains no loop variables.</P></BLOCKQUOTE>
 <P dir=ltr>&nbsp;</P>|,
-		lastUpdated => 1104367754,
+		lastUpdated => 1104367983,
 	},
 
 	'1094' => {
