@@ -133,7 +133,7 @@ sub definition {
                 properties=>{
 			templateId =>{
 				fieldType=>"template",
-				defaultValue=>undef,
+				defaultValue=>'PBtmpl0000000000000141',
 				},
 			acknowledgement=>{
 				fieldType=>"textarea",
@@ -148,7 +148,7 @@ sub definition {
 				defaultValue=>'PBtmpl0000000000000104',
 				},
 			listTemplateId=>{
-				defaultValue=>undef,
+				defaultValue=>'PBtmpl0000000000000021',
 				fieldType=>"template"
 				},
 			mailData=>{
@@ -192,10 +192,12 @@ sub duplicate {
 sub getEditForm {
 	my $self = shift;
 	my $tabform = $self->SUPER::getEditForm;
-   	
 	$tabform->getTab("display")->template(
-      		-value=>$self->getValue('templateId'),
-      		-namespace=>"DataForm"
+		-name=>"templateId",
+      		-value=>$self->getValue("templateId"),
+      		-namespace=>"DataForm",
+		-afterEdit=>'func=edit',
+		-defaultValue=>"PBtmpl0000000000000141"
    		);
         $tabform->getTab("display")->template(
                 -name=>"emailTemplateId",

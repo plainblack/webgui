@@ -2275,7 +2275,6 @@ sub www_add {
 		groupIdEdit => $self->get("groupIdEdit"),
 		ownerUserId => $self->get("ownerUserId"),
 		encryptPage => $self->get("encryptPage"),
-		templateId => $self->get("templateId"),
 		styleTemplateId => $self->get("styleTemplateId"),
 		printableStyleTemplateId => $self->get("printableStyleTemplateId"),
 		isHidden => $self->get("isHidden"),

@@ -1208,13 +1208,12 @@ This will be used if no value is specified.
 
 sub integer {
 	my $params = shift;
-        my $value = $params->{value} || $params->{defaultValue} || 0;
-        my $size = $params->{size} || 11;
 	WebGUI::Style::setScript($session{config}{extrasURL}.'/inputCheck.js',{ language=>'javascript' });
 	return text({
 		name=>$params->{name},
-		value=>$value,
-		size=>$size,
+		value=>$params->{value},
+		defaultValue=>$params->{defaultValue} || 0,
+		size=>$params->{size} || 11,
 		extras=>'onKeyUp="doInputCheck(this.form.'.$params->{name}.',\'0123456789-\')" '.$params->{extras},
 		maxlength=>$params->{maxlength}
 		});

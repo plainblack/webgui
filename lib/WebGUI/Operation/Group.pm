@@ -542,7 +542,7 @@ sub www_manageUsersInGroup {
 		.WebGUI::Icon::_getBaseURL().'delete.gif" border="0"></td>
                 <td class="tableHeader">'.WebGUI::International::get(50).'</td>
                 <td class="tableHeader">'.WebGUI::International::get(369).'</td></tr>';
-	my $p = WebGUI::Paginator->new("op=manageUsersInGroup&gid=".$session{form}{gid});
+	my $p = WebGUI::Paginator->new(WebGUI::URL::page("op=manageUsersInGroup&gid=".$session{form}{gid}));
         $p->setDataByQuery("select users.username,users.userId,groupings.expireDate
                 from groupings,users where groupings.groupId=".quote($session{form}{gid})." and groupings.userId=users.userId
                 order by users.username");

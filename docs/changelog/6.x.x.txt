@@ -16,6 +16,9 @@
  - fix [ 1029170 ] Forum: Sorting thread by date
  - Fixed a sort by last reply crash bug.
  - fix [ 1160947 ] Make page printable does not work
+ - fix [ 1150140 ] Manage users in group only views first page
+ - fix [ 1163470 ] [6.5.1CVS] Dataform, wrong template, bad edit URL
+ - fix [ 1159992 ] Integer value zero not returned in form fields
 
 
 6.5.1
