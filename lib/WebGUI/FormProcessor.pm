@@ -34,6 +34,7 @@ This package helps in the processing of the form variables that are returned fro
 
  $value = WebGUI::FormProcessor::checkbox("whichOne");
  $value = WebGUI::FormProcessor::checkList("dayOfWeek");
+ $value = WebGUI::FormProcessor::codearea("snippet");
  $value = WebGUI::FormProcessor::combo("fruit");
  $value = WebGUI::FormProcessor::contentType("text");
  $value = WebGUI::FormProcessor::date("endDate");
@@ -102,6 +103,23 @@ The name of the form variable to retrieve.
 
 sub checkList {
 	return selectList($_[0]);
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 codearea ( name )
+
+Returns a string.
+
+=head3 name
+
+The name of the form variable to retrieve.
+
+=cut
+
+sub codearea {
+	return $session{form}{$_[0]};
 }
 
 

@@ -17,7 +17,6 @@ package WebGUI::Asset::File::Image;
 use strict;
 use WebGUI::Asset::File;
 use WebGUI::HTTP;
-use WebGUI::Icon;
 use WebGUI::Session;
 use WebGUI::Storage;
 use WebGUI::Utility;
@@ -198,12 +197,6 @@ sub processPropertiesFromFormPost {
 sub view {
 	my $self = shift;
 	my $storage = WebGUI::Storage->get($self->get("storageId"));
-	my $toolbar = deleteIcon('func=delete',$self->get("url"),WebGUI::International::get(43))
-              	.editIcon('func=edit',$self->get("url"))
-             	.moveUpIcon('func=promote',$self->get("url"))
-             	.moveDownIcon('func=demote',$self->get("url"))
-            	.cutIcon('func=cut',$self->get("url"))
-            	.copyIcon('func=copy',$self->get("url"));
 	my %var = %{$self->get};
 	$var{controls} = $toolbar;
 	$var{fileUrl} = $storage->getUrl($self->get("filename"));

@@ -83,6 +83,11 @@ create table redirect (
 	redirectUrl text
 );
 
+create table snippet (
+	assetId varchar(22) not null primary key,
+	snippet mediumtext
+);
+
 create table layout (
 	assetId varchar(22) not null primary key,
 	contentPositions text

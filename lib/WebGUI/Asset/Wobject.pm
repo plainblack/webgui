@@ -25,7 +25,6 @@ use WebGUI::FormProcessor;
 use WebGUI::Grouping;
 use WebGUI::HTML;
 use WebGUI::HTMLForm;
-use WebGUI::Icon;
 use WebGUI::Id;
 use WebGUI::International;
 use WebGUI::Macro;
@@ -296,18 +295,7 @@ sub processTemplate {
         foreach my $field (keys %$meta) {
 		$var->{$meta->{$field}{fieldName}} = $meta->{$field}{value};
 	}
-	my $wobjectToolbar = deleteIcon('func=delete',$self->get("url"),WebGUI::International::get(43))
-              	.editIcon('func=edit',$self->get("url"))
-             	.moveUpIcon('func=promote',$self->get("url"))
-             	.moveDownIcon('func=demote',$self->get("url"))
-            	.cutIcon('func=cut',$self->get("url"))
-            	.copyIcon('func=copy',$self->get("url"));
-              #	.moveTopIcon('func=moveTop&wid='.${$wobject}{wobjectId})
-              #	.moveBottomIcon('func=moveBottom&wid='.${$wobject}{wobjectId})
-       # if (${$wobject}{namespace} ne "WobjectProxy" && isIn("WobjectProxy",@{$session{config}{wobjects}})) {
-        #     	$wobjectToolbar .= shortcutIcon('func=createShortcut');
-        #}
-	$var->{'controls'} = $wobjectToolbar;
+	$var->{'controls'} = $self->getToolbar;
 	my %vars = (
 		%{$self->{_properties}},
 		%{$var}

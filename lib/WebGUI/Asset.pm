@@ -546,6 +546,22 @@ sub getRank {
 	return $rank;
 }
 
+sub getToolbar {
+	my $self = shift;
+	my $toolbar = deleteIcon('func=delete',$self->get("url"),WebGUI::International::get(43))
+              	.editIcon('func=edit',$self->get("url"))
+             	.moveUpIcon('func=promote',$self->get("url"))
+             	.moveDownIcon('func=demote',$self->get("url"))
+            	.cutIcon('func=cut',$self->get("url"))
+            	.copyIcon('func=copy',$self->get("url"));
+              #	.moveTopIcon('func=moveTop&wid='.${$wobject}{wobjectId})
+              #	.moveBottomIcon('func=moveBottom&wid='.${$wobject}{wobjectId})
+       # if (${$wobject}{namespace} ne "WobjectProxy" && isIn("WobjectProxy",@{$session{config}{wobjects}})) {
+        #     	$wobjectToolbar .= shortcutIcon('func=createShortcut');
+        #}
+	return $toolbar;
+}
+
 sub getUiLevel {
 	my $self = shift;
 	return 0;

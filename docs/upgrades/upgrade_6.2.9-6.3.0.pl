@@ -343,7 +343,8 @@ $conf->set("assets"=>[
 		'WebGUI::Asset::Redirect',
 		'WebGUI::Asset::FilePile',
 		'WebGUI::Asset::File',
-		'WebGUI::Asset::File::Image'
+		'WebGUI::Asset::File::Image',
+		'WebGUI::Asset::Snippet'
 		]);
 $conf->write;
 
