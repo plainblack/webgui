@@ -10,7 +10,8 @@ Andreas Graf).
  - Bugfix [ 904313 ] Problem with page-template preview in 6.0.0
  - Bugfix [ 912017 ] viewSubmission function error in 6.0.0
  - Bugfix [ 912217 ] top level nav macro problems
-
+ - Bugfix [ 912401 ] level 0 nav
+ - Bugfix [ 912400 ] db link not working
 
 
 6.0.0

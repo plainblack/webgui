@@ -536,14 +536,10 @@ sub databaseLink {
         if (_uiLevelChecksOut($uiLevel)) {
 		$label = $label || WebGUI::International::get(1075);
 		if (WebGUI::Privilege::isInGroup(3)) {
-			#disabled until we can resolve the "new" wobject problem
-        		#if ($afterEdit) {
-                	#	$subtext = '<a href="'.WebGUI::URL::page("op=editDatabaseLink&lid=".$value
-			#		."&afterEdit="
-                        #		.WebGUI::URL::escape($afterEdit)).'">'.WebGUI::International::get(0).'</a> / ';
-        		#}
-        		$subtext .= '<a href="'.WebGUI::URL::page("op=listDatabaseLinks").'">'
-				.WebGUI::International::get(981).'</a>';
+			if ($afterEdit) {
+                                $subtext = editIcon("op=editDatabaseLink&amp;lid=".$value."&amp;afterEdit=".WebGUI::URL::escape($afterEdit));
+                        }
+                        $subtext .= manageIcon("op=listDatabaseLinks");
 		}
         	$output = WebGUI::Form::databaseLink({
                 	"name"=>$name,

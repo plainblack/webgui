@@ -343,7 +343,7 @@ The unique identifier for the selected template. Defaults to "0", which is the W
 =cut
                                                                                                                                                              
 sub databaseLink {
-        my $value = $_[0]->{value} || 1;
+        my $value = $_[0]->{value} || 0;
         my $name = $_[0]->{name} || "databaseLinkId";
         return selectList({
                 name=>$name,

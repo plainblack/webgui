@@ -154,7 +154,7 @@ sub dbh {
 	$dsn = $class->{_databaseLink}{DSN};
 	$username = $class->{_databaseLink}{username};
 	$identifier = $class->{_databaseLink}{identifier};
-	if ($class->{databaseLinkId} == 0) {
+	if ($class->{_databaseLinkId} == 0) {
 		$class->{_dbh} = $session{dbh};
 		return $session{dbh};
 	} elsif ($dsn =~ /\DBI\:\w+\:\w+/i) {
