@@ -12,7 +12,11 @@ our $HELP = {
 			{
 				tag => 'wobjects using',
 				namespace => 'Wobject'
-			}
+			},
+			{
+				tag => 'asset fields',
+				namespace => 'Asset'
+			},
 		]
 	},
 	'article template' => {
