@@ -290,32 +290,25 @@ sub getIndexerParams {
 	my $now = shift;
 	return {
 		Survey => {
-                        sql => "select Survey_question.question as question,
+                        sql =>"select Survey_question.question as question,
                                         Survey_question.Survey_questionId as Survey_questionId,
-                                        Survey.wobjectId as wid,
-                                        wobject.namespace as namespace,
-                                        wobject.addedBy as ownerId,
-                                        page.urlizedTitle as urlizedTitle,
-                                        page.languageId as languageId,
-                                        page.pageId as pageId,
-                                        page.groupIdView as page_groupIdView,
-                                        wobject.groupIdView as wobject_groupIdView,
-                                        Survey.groupToTakeSurvey as wobject_special_groupIdView
-                                        from wobject, page, Survey
+                                        asset.className as class,
+                                        asset.ownerUserId as ownerId,
+                                        asset.url as url,
+                                        asset.assetId as assetId,
+                                        asset.groupIdView as groupIdView,
+                                        Survey.groupToTakeSurvey as special_groupIdView
+                                        from Survey, asset
                                         left join Survey_question on Survey_question.Survey_id=Survey.Survey_id
-                                        where Survey.wobjectId = wobject.wobjectId
-                                        and wobject.pageId = page.pageId
-                                        and wobject.startDate < $now 
-                                        and wobject.endDate > $now
-                                        and page.startDate < $now
-                                        and page.endDate > $now",
+                                        where Survey.assetId = asset.assetId
+					and asset.startDate < $now
+					and asset.endDate > $now",
                         fieldsToIndex => ["question",
                                           'select answer from Survey_answer where Survey_questionId = \'$data{Survey_questionId}\'' ],
-                        contentType => 'wobjectDetail',
-                        url => 'WebGUI::URL::append($data{urlizedTitle}, "func=view&wid=$data{wid}")',
-                        headerShortcut => 'select title from wobject where wobjectId = \'$data{wid}\'',
-                        bodyShortcut => 'select description from wobject where wobjectId = \'$data{wid}\'',
-
+                        contentType => 'assetDetail',
+                        url => 'WebGUI::URL::gateway($data{url})',
+                        headerShortcut => 'select title from asset where assetId = \'$data{assetId}\'',
+                        bodyShortcut => '$textToIndex'
                 }
 	};
 }
