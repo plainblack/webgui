@@ -83,12 +83,16 @@ sub getParams {
 =cut
 
 sub process {
-        my ($macro, $cmd, $output);
+        my ($macro, $cmd, $output, $temp);
 	$output = $_[0];
         foreach $macro (keys %{$session{macro}}) {
 		$cmd = "WebGUI::Macro::".$macro."::process";
-		$output = eval{&$cmd($output)};
-		WebGUI::ErrorHandler::fatalError("Processing failed on macro: $macro: ".$@) if($@);
+		$temp = eval{&$cmd($output)};
+		if ($@) {
+			WebGUI::ErrorHandler::warn("Processing failed on macro: $macro: ".$@);
+		} else {
+			$output = $temp;
+		}
         }
 	return $output;
 }
