@@ -133,7 +133,7 @@ sub _traversePageTree {
         for ($i=1;$i<=$_[1];$i++) {
                 $depth .= $spacer;
         }
-        $a = WebGUI::SQL->read("select * from page where (pageId<2 or pageId>25) and parentId='$_[0]' order by sequenceNumber");
+        $a = WebGUI::SQL->read("select * from page where (pageId=1 or pageId>999) and parentId='$_[0]' order by sequenceNumber");
         while (%page = $a->hash) {
 		if (WebGUI::Privilege::canEditPage($page{pageId})) {
                 	$output .= $depth
