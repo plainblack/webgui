@@ -113,11 +113,16 @@ to load the plug-in at use time.
 
 5.5 Privilege API Change
 
-In 6.1 we move isInGroup from WebGUI::Privilege to WebGUI::Grouping, where it
+In 6.1 we moved isInGroup from WebGUI::Privilege to WebGUI::Grouping, where it
 belongs. We also moved canViewPage and canEditPage to WebGUI::Page and renamed them 
 to canView and canEdit. And finally, we moved canEditWobject and
 canViewWobject to WebGUI::Wobject and renamed them canView and canEdit and
 converted them from regular functions into methods.
 
+5.6 Template API Change
+
+In 6.1 we completely rewrote the underlying template framework to add template
+caching. Any plug-ins that use WebGUI::Template, must be updated to reflect
+the new API.
 
 

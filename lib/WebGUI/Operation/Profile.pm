@@ -195,7 +195,7 @@ sub www_editProfile {
 	$vars->{'profile.form.elements'} = \@array;
     $vars->{'profile.form.submit'} = WebGUI::Form::submit({});
     $vars->{'profile.accountOptions'} = WebGUI::Operation::Shared::accountOptions();
-	return WebGUI::Template::process(WebGUI::Template::get(1,'Operation/Profile/Edit'), $vars);
+	return WebGUI::Template::process(1,'Operation/Profile/Edit', $vars);
 }
 
 #-------------------------------------------------------------------
@@ -257,7 +257,7 @@ sub www_viewProfile {
 	if ($session{user}{userId} == $session{form}{uid}) {
        $vars->{'profile.accountOptions'} = WebGUI::Operation::Shared::accountOptions();
 	}
-    return WebGUI::Template::process(WebGUI::Template::get(1,'Operation/Profile/View'), $vars);
+    return WebGUI::Template::process(1,'Operation/Profile/View', $vars);
 }
 
 1;

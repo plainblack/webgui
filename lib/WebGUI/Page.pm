@@ -451,7 +451,7 @@ sub generate {
 		WebGUI::ErrorHandler::fatalError("Wobject runtime error: ${$wobject}{namespace}. Root cause: ".$@) if($@);
 	}
 	$sth->finish;
-	return WebGUI::Template::process(getTemplate(),\%var);
+	return WebGUI::Template::process($session{page}{templateId},"Page",\%var);
 }
 
 

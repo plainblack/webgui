@@ -53,13 +53,11 @@ sub _submenu {
 
 #-------------------------------------------------------------------
 sub www_copyTemplate {
-	my (%template);
         if (WebGUI::Grouping::isInGroup(8)) {
-		%template = WebGUI::SQL->quickHash("select * from template where templateId=$session{form}{tid} and namespace=".quote($session{form}{namespace}));
-                WebGUI::SQL->write("insert into template (templateId,name,template,namespace) 
-			values ("._getNextTemplateId($session{form}{namespace}).", 
-			".quote('Copy of '.$template{name}).", ".quote($template{template}).",
-			".quote($template{namespace}).")");
+		my $template = WebGUI::Template::get($session{form}{tid},$session{form}{namespace});
+		$template->{name} .= " (copy)";
+		$template->{templateId} = "new";
+		WebGUI::Template::set($template);
                 return www_listTemplates();
         } else {
                 return WebGUI::Privilege::adminOnly();
@@ -157,17 +155,15 @@ sub www_editTemplate {
 #-------------------------------------------------------------------
 sub www_editTemplateSave {
         if (WebGUI::Grouping::isInGroup(8)) {
-		if ($session{form}{tid} eq "new") {
-			$session{form}{tid} = _getNextTemplateId($session{form}{namespace});
-			WebGUI::SQL->write("insert into template (templateId,namespace) values 
-				($session{form}{tid}, ".quote($session{form}{namespace}).")");
-		}
 		if ($session{form}{template} eq "" && $session{form}{namespace} eq "Page") {
 			$session{form}{template} = "<table>\n<tr>\n<td>\n\n<tmpl_var page.position1>\n\n</td>\n </tr>\n</table>\n";
 		}
-                WebGUI::SQL->write("update template set name=".quote($session{form}{name}).", 
-			template=".quote($session{form}{template})."
-			where templateId=".$session{form}{tid}." and namespace=".quote($session{form}{namespace}));
+		$session{form}{tid} = WebGUI::Template::set({
+			templateId=>$session{form}{tid},
+			namespace=>$session{form}{namespace},
+			name=>$session{form}{name},
+			template=>$session{form}{template}
+			});
 		if ($session{form}{action2} eq "") {
                 	return www_listTemplates();
 		} else {
@@ -209,20 +205,5 @@ sub www_listTemplates {
         }
 }
 
-sub _getNextTemplateId {
-	my $namespace = shift;
-	my $templateId;
-	my $query = "select max(templateId) from template";
-	if ($namespace) {
-		$query .= " where namespace = ".quote($namespace);
-	}
-	($templateId) = WebGUI::SQL->quickArray($query);
-	if ($templateId > 999) {
-		$templateId++;
-	} else {
-		$templateId = 1000;
-	}
-	return $templateId;
-}
 
 1;

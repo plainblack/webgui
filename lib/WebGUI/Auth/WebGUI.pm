@@ -400,7 +400,7 @@ sub recoverPassword {
    $vars->{'recover.message'} = $_[0] if ($_[0]);
    $vars->{'recover.form.email'} = WebGUI::Form::text({"name"=>"email"});
    $vars->{'recover.form.email.label'} = WebGUI::International::get(56);
-   return WebGUI::Template::process(WebGUI::Template::get(1,$template), $vars);
+   return WebGUI::Template::process(1,$template, $vars);
 }
 
 #-------------------------------------------------------------------
@@ -459,7 +459,7 @@ sub resetExpiredPassword {
     $vars->{'expired.form.submit'} = WebGUI::Form::submit({});
     $vars->{'expired.form.footer'} = "</form>";
 	
-	return WebGUI::Template::process(WebGUI::Template::get(1,'Auth/WebGUI/Expired'), $vars);
+	return WebGUI::Template::process(1,'Auth/WebGUI/Expired', $vars);
 }
 
 #-------------------------------------------------------------------

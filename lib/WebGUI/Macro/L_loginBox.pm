@@ -64,7 +64,7 @@ sub process {
         $var{'account.create.url'} = WebGUI::URL::page('op=createAccount');
 	$var{'account.create.label'} = WebGUI::International::get(407);
 	$var{'form.footer'} = '</form>';
-        return WebGUI::Template::process(WebGUI::Template::get($templateId,"Macro/L_loginBox"),\%var); 
+        return WebGUI::Template::process($templateId,"Macro/L_loginBox",\%var); 
 }
 
 1;

@@ -797,7 +797,7 @@ sub processTemplate {
 		$vars{originalURL} = WebGUI::URL::gateway($originalPageURL."#".$_[0]->get("wobjectId"));
 	}
 	my $namespace = $_[3] || $_[0]->get("namespace");
-	return WebGUI::Template::process(WebGUI::Template::get($_[1],$namespace), \%vars);
+	return WebGUI::Template::process($_[1],$namespace, \%vars);
 }
 
 #-------------------------------------------------------------------

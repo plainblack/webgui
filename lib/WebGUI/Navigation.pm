@@ -337,8 +337,11 @@ sub build {
 
 	# Configure button
 	$var->{'config.button'} = $self->_getEditButton();
-
-	return WebGUI::Template::process($self->{_template} || WebGUI::Template::get($self->{_templateId}, "Navigation"), $var);
+	if ($self->{_template}) {
+		return WebGUI::Template::processRaw($self->{_template}, $var);
+	} else {
+		return WebGUI::Template::process($self->{_templateId}, "Navigation", $var);
+	}
 }
 
 #-------------------------------------------------------------------

@@ -209,7 +209,7 @@ sub process {
 		$i++;
 	}
 	$var{'admin_loop'} = \@admin;
-	return WebGUI::Template::process(WebGUI::Template::get($templateId,"Macro/AdminBar"),\%var);
+	return WebGUI::Template::process($templateId,"Macro/AdminBar",\%var);
 }
 
 

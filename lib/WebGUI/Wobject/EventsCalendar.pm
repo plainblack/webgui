@@ -566,7 +566,7 @@ sub www_viewEvent {
         $var{"next.label"} = WebGUI::International::get(93,$_[0]->get("namespace")).'&raquo;';
         $var{"next.url"} = WebGUI::URL::page("func=viewEvent&wid=".$_[0]->get("wobjectId")."&eid=".$id) if ($id);
 	$var{description} = $event{description};
-	return WebGUI::Template::process( WebGUI::Template::get( $_[0]->get("eventTemplateId"), "EventsCalendar/Event"), \%var);
+	return $_[0]->processTemplate($_[0]->get("eventTemplateId"),\%var, "EventsCalendar/Event");
 }
 
 1;

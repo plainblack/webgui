@@ -15,6 +15,7 @@ use Tie::CPHash;
 use WebGUI::HTMLForm;
 use WebGUI::Icon;
 use WebGUI::International;
+use WebGUI::Page;
 use WebGUI::Privilege;
 use WebGUI::Session;
 use WebGUI::SQL;
@@ -42,7 +43,7 @@ sub _traversePageTree {
                 }
                 $sth = WebGUI::SQL->read("select urlizedTitle, menuTitle, title, pageId, synopsis from page where parentId='$parent' and hideFromNavigation = 0 order by $orderBy");
                 while ($data = $sth->hashRef) {
-                        if (($data->{pageId}<0 || $data->{pageId}>999 || $data->{pageId}==1) && WebGUI::Privilege::canViewPage($data->{pageId})) {
+                        if (($data->{pageId}<0 || $data->{pageId}>999 || $data->{pageId}==1) && WebGUI::Page::canView($data->{pageId})) {
 				push(@pages,{ 
                                 	"page.indent" => $indentString,
 					"page.url" => WebGUI::URL::gateway($data->{urlizedTitle}),

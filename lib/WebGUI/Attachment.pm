@@ -66,6 +66,7 @@ Package to manipulate WebGUI Attachments.
 
  $filename = $attachment->save("formImage");
  $filename = $attachment->saveFromFilesystem($pathToFile);
+ $filename = $attachment->saveFromScalar($content);
 
  $filename = $attachment->saveFromHashref($hashRef);
  $hashRef = $attachment->getHashref;
@@ -678,6 +679,32 @@ sub saveFromHashref {
 	my ($self, $hashref) = @_;
         $self->getNode->create();
 	store $hashref, $self->getPath;
+	return $self->getFilename;
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 saveFromScalar ( scalar ) 
+
+Stores a scalar as a text attachment.
+
+=over
+
+=item scalar
+
+A scalar variable containing the content to write to the filesystem.
+
+=back
+
+=cut
+
+sub saveFromScalar {
+	my ($self, $content) = @_;
+        $self->getNode->create();
+	open(FILE,">".$self->getPath);
+	print FILE $content;
+	close(FILE);
 	return $self->getFilename;
 }
 

@@ -563,7 +563,7 @@ sub www_editSubmission {
                 });
 	$var{'form.submit'} = WebGUI::Form::submit();
 	$var{'form.footer'} = '</form>';
-	return WebGUI::Template::process(WebGUI::Template::get($_[0]->get("submissionFormTemplateId"),"USS/SubmissionForm"), \%var);
+	return $_[0]->processTemplate($_[0]->get("submissionFormTemplateId"),\%var,"USS/SubmissionForm");
 }
 
 #-------------------------------------------------------------------
@@ -891,7 +891,7 @@ sub www_viewSubmission {
 			{callback=>$callback,title=>$submission->{title},forumId=>$submission->{forumId}},
 			$submission->{forumId});
 	}
-	return WebGUI::Template::process(WebGUI::Template::get($_[0]->get("submissionTemplateId"),"USS/Submission"), \%var);
+	return $_[0]->processTemplate($_[0]->get("submissionTemplateId"),\%var,"USS/Submission");
 }
 
 

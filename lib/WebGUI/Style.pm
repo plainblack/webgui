@@ -88,7 +88,7 @@ The unique identifier for the template to retrieve. Defaults to the style templa
 sub process {
 	my %var;
 	$var{'body.content'} = shift;
-	my $templateId = shift;
+	my $templateId = shift || $session{page}{styleId};
 	if ($session{page}{makePrintable}) {
 		$templateId = $session{page}{printableStyleId};
 	} elsif ($session{page}{useAdminStyle} ne "" && $session{setting}{useAdminStyle}) {
@@ -158,7 +158,7 @@ sub process {
 				';
                 }
         }
-	return WebGUI::Template::process(getTemplate($templateId),\%var);
+	return WebGUI::Template::process($templateId,"style",\%var);
 }	
 
 

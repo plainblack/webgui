@@ -1249,7 +1249,7 @@ sub getPostTemplateVars {
 	$var->{'post.deny.url'} = formatDenyPostURL($callback,$post->get("forumPostId"));
 	$var->{'forum.title'} = $callback->{title};
 	$var->{'forum.description'} = $callback->{description};
-	$var->{'post.full'} = WebGUI::Template::process(WebGUI::Template::get($forum->get("postTemplateId"),"Forum/Post"), $var); 
+	$var->{'post.full'} = WebGUI::Template::process($forum->get("postTemplateId"),"Forum/Post", $var); 
 	return $var;
 }
 
@@ -1382,7 +1382,7 @@ sub notifySubscribers {
 			$lang{$u->profileField("language")}{var} = getPostTemplateVars($post, $thread, $forum, $caller, $lang{$u->profileField("language")}{var});
 			$lang{$u->profileField("language")}{subject} = WebGUI::International::get(523,"WebGUI",$u->profileField("language"));
        			$lang{$u->profileField("language")}{message} = WebGUI::Template::process(
-				WebGUI::Template::get($forum->get("notificationTemplateId"),"Forum/Notification"), 
+				$forum->get("notificationTemplateId"),"Forum/Notification", 
 				$lang{$u->profileField("language")}{var}
 				);
 		}
@@ -1886,7 +1886,7 @@ sub www_post {
 		value=>$subject
 		});
 	$var->{'form.end'} = '</form>';
-	return WebGUI::Template::process(WebGUI::Template::get($forum->get("postformTemplateId"),"Forum/PostForm"), $var); 
+	return WebGUI::Template::process($forum->get("postformTemplateId"),"Forum/PostForm", $var); 
 }
 
 #-------------------------------------------------------------------
@@ -2119,7 +2119,7 @@ sub www_search {
         	$var{numberOfPages} = $p->getNumberOfPages;
         	$var{pageNumber} = $p->getPageNumber;
 	}
-	return WebGUI::Template::process(WebGUI::Template::get($forum->get("searchTemplateId"),"Forum/Search"), \%var);
+	return WebGUI::Template::process($forum->get("searchTemplateId"),"Forum/Search", \%var);
 }
 
 #-------------------------------------------------------------------
@@ -2293,7 +2293,7 @@ sub www_viewForum {
 	my $forum = WebGUI::Forum->new($forumId);
 	return WebGUI::Privilege::insufficient() unless ($forum->canView);
 	my $var = getForumTemplateVars($caller, $forum);
-	return WebGUI::Template::process(WebGUI::Template::get($forum->get("forumTemplateId"),"Forum"), $var); 
+	return WebGUI::Template::process($forum->get("forumTemplateId"),"Forum", $var); 
 }	
 
 #-------------------------------------------------------------------
@@ -2332,7 +2332,7 @@ sub www_viewThread {
 	if ($post->get("forumPostId") == $post->getThread->get("rootPostId") && !$post->canView) {
 		return www_viewForum($caller, $post->getThread->getForum->get("forumId"));
 	} else {	
-		return WebGUI::Template::process(WebGUI::Template::get($post->getThread->getForum->get("threadTemplateId"),"Forum/Thread"), $var); 
+		return WebGUI::Template::process($post->getThread->getForum->get("threadTemplateId"),"Forum/Thread", $var); 
 	}
 }
 

@@ -991,7 +991,7 @@ sub HTMLArea {
 	if ($session{user}{richEditor} eq 'none') {
 		return $var{textarea};
 	} else {
-		return WebGUI::Template::process(WebGUI::Template::get($session{user}{richEditor},'richEditor'),\%var);
+		return WebGUI::Template::process($session{user}{richEditor},'richEditor',\%var);
 	}
 }
 

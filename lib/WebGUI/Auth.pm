@@ -218,7 +218,7 @@ sub createAccount {
     $vars->{'login.url'} = WebGUI::URL::page('op=auth&method=init');
     $vars->{'login.label'} = WebGUI::International::get(58);
 
-	return WebGUI::Template::process(WebGUI::Template::get(1,$template), $vars);
+	return WebGUI::Template::process(1,$template, $vars);
 }
 
 #-------------------------------------------------------------------
@@ -306,7 +306,7 @@ sub deactivateAccount {
 	$var{'yes.label'} = WebGUI::International::get(44);
    	$var{'no.url'} = WebGUI::URL::page();
 	$var{'no.label'} = WebGUI::International::get(45);
-	return WebGUI::Template::process(WebGUI::Template::get(1,"prompt"), \%var);
+	return WebGUI::Template::process(1,"prompt", \%var);
 }
 
 #-------------------------------------------------------------------
@@ -379,7 +379,7 @@ sub displayAccount {
    $vars->{'account.form.footer'} = "</form>";
    
    $vars->{'account.options'} = WebGUI::Operation::Shared::accountOptions();
-   return WebGUI::Template::process(WebGUI::Template::get(1,$template), $vars);
+   return WebGUI::Template::process(1,$template, $vars);
 }
 
 #-------------------------------------------------------------------
@@ -430,7 +430,7 @@ sub displayLogin {
 	$vars->{'anonymousRegistration.isAllowed'} = ($session{setting}{anonymousRegistration});
 	$vars->{'createAccount.url'} = WebGUI::URL::page('op=createAccount');
 	$vars->{'createAccount.label'} = WebGUI::International::get(67);
-	return WebGUI::Template::process(WebGUI::Template::get(1,$template), $vars);
+	return WebGUI::Template::process(1,$template, $vars);
 }
 
 #-------------------------------------------------------------------

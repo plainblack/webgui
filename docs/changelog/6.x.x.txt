@@ -10,7 +10,15 @@
  - Fixed a bug in articles where articles with no content would fail to
    display their images.
  - bugfix [966466] WebGUI::Session. System crash when user language setting missing.
- - Eliminated the need for Data::Serializer.
+ - Eliminated the need for Data::Serializer which results in a small amount of
+   less memory usage.
+ - Rewrote the template API which resulted in a 30% performance increase. See
+   docs/migration.txt for details.
+ - Added five new caching mechanisms for templates. Each has their own
+   benefits and detriments. This allows you to increase scalability and
+   performance at a cost of either memory or disk space or both. The gains
+   here are primarily enjoyed by large heavy traffic sites that use lots of 
+   templates.
 
 
 6.0.3
