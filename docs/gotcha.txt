@@ -56,7 +56,12 @@ save you many hours of grief.
 
  * The default path for WebGUI backups is now /tmp/backups rather than
 	/data/backups
-
+ 
+ * In order to use the CDG Commerce iTransact payment plugin you'll have to 
+	make sure that the following modules are installed:
+		- XML::Simple
+		- LWP::UserAgent
+		- HTTP::Cookies
 
 6.2.8
 --------------------------------------------------------------------

@@ -34,7 +34,8 @@ passwordChangeLoggingEnabled = 1
 
 # Commerce part
 # The PayFlowPro plugin is commented out because it depends on proprietary code from VeriSign
-# paymentPlugins = PayFlowPro
+# The ITransact plugin depends on XML::Simple. LWP::UserAgent and HTTP::Cookies.
+# paymentPlugins = PayFlowPro, ITransact
 
 authMethods = LDAP, WebGUI
 
