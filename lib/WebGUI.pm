@@ -13,6 +13,7 @@ our $VERSION = "5.5.0";
 
 use strict qw(vars subs);
 use Tie::CPHash;
+use WebGUI::Affiliate;
 use WebGUI::Cache;
 use WebGUI::ErrorHandler;
 use WebGUI::Icon;
@@ -77,8 +78,7 @@ sub _generatePage {
                         }
                         
 		        if(!WebGUI::Privilege::canViewWobject($wobject->{wobjectId})){ next; }  
-						
-						if (${$wobject}{namespace} eq "WobjectProxy") {
+			if (${$wobject}{namespace} eq "WobjectProxy") {
                                 $originalWobject = $wobject;
                                 my ($wobjectProxy) = WebGUI::SQL->quickHashRef("select * from WobjectProxy where wobjectId=".${$wobject}{wobjectId});
                                 $wobject = WebGUI::SQL->quickHashRef("select * from wobject where wobject.wobjectId=".$wobjectProxy->{proxiedWobjectId});
@@ -225,6 +225,7 @@ sub page {
                 $content = $cache->get;
         }
 	$operationOutput = _processOperations();
+	WebGUI::Affiliate::grabReferral();
 	$wobjectOutput = _processFunctions();
 	if ($operationOutput eq "" && $wobjectOutput eq "" && $session{form}{action2} ne "") {
 		_processAction($session{form}{action2});

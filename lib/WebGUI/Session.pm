@@ -50,6 +50,7 @@ TIP: The $session variable is a case-insensitive hash. The contents of the has v
  use WebGUI::Session;
  WebGUI::Session::close();
  WebGUI::Session::convertVisitorToUser($sessionId,$userId);
+ WebGUI::Session::deleteScratch($name);
  WebGUI::Session::end($sessionId);
  $header = WebGUI::Session::httpHeader();
  $header = WebGUI::Session::httpRedirect($url);

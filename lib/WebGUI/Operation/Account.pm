@@ -198,7 +198,7 @@ sub www_createAccountSave {
 			$u->profileField($fieldName,${$profile}{$fieldName});
 		}
 		WebGUI::Authentication::registrationFormSave($u->userId);
-                WebGUI::Session::start($u->userId);
+		WebGUI::Session::convertVisitorToUser($session{var}{sessionId},$u->userId);
 		_logLogin($u->userId,"success");
 		system(WebGUI::Macro::process($session{setting}{runOnRegistration})) if ($session{setting}{runOnRegistration} ne "");
 		WebGUI::MessageLog::addInternationalizedEntry('',$session{setting}{onNewUserAlertGroup},'',536) if ($session{setting}{alertOnNewUser});

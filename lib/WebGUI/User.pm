@@ -42,6 +42,7 @@ This package provides an object-oriented way of managing WebGUI users as well as
  $karma = 		$u->karma;
  $lastUpdated = 	$u->lastUpdated;
  $languagePreference = 	$u->profileField("language",1);
+ $referringAffiliate =	$u->referringAffiliate;
  $status =		$u->status("somestatus");
  $username = 		$u->username("jonboy");
 
@@ -301,6 +302,34 @@ sub profileField {
         	WebGUI::SQL->write("update users set lastUpdated=".time()." where userId=".$class->{_userId});
 	}
 	return $class->{_profile}{$fieldName};
+}
+
+#-------------------------------------------------------------------
+
+=head2 referringAffiliate ( [ value ] )
+
+Returns the unique identifier of the affiliate the referred this user to the site. 
+
+=over
+
+=item value
+
+An integer containing the unique identifier of the affiliate.
+
+=back
+
+=cut
+
+sub referringAffiliate {
+        my ($class, $value);
+        $class = shift;
+        $value = shift;
+        if (defined $value) {
+                $class->{_user}{"referringAffiliate"} = $value;
+                WebGUI::SQL->write("update users set referringAffiliate=".$value.",
+                        lastUpdated=".time()." where userId=$class->{_userId}");
+        }
+        return $class->{_user}{"referringAffiliate"};
 }
 
 #-------------------------------------------------------------------
