@@ -77,19 +77,19 @@ sub www_deleteClipboardItemConfirm {
 	return WebGUI::Privilege::insufficient() unless (WebGUI::Grouping::isInGroup(4));
 	if ($session{form}{wid} ne "") {
 		if ( ($session{setting}{sharedClipboard} eq "1") || (WebGUI::Grouping::isInGroup(3)) ) {
-			WebGUI::SQL->write("update wobject set pageId=3, "
+			WebGUI::SQL->write("update wobject set pageId='3', "
                 		."bufferDate=".time().", "
                 		."bufferUserId=".quote($session{user}{userId}) .", "
-                		."bufferPrevId=2 "
-				."where pageId=2 "
+                		."bufferPrevId='2' "
+				."where pageId='2' "
 				."and wobjectId=" . quote($session{form}{wid})
 				);
 		} else {
-			WebGUI::SQL->write("update wobject set pageId=3, "
+			WebGUI::SQL->write("update wobject set pageId='3', "
                 		."bufferDate=".time().", "
                 		."bufferUserId=".quote($session{user}{userId}) .", "
-                		."bufferPrevId=2 "
-				."where pageId=2 "
+                		."bufferPrevId='2' "
+				."where pageId='2' "
 				."and wobjectId=" . quote($session{form}{wid}) ." "
                 		."and bufferUserId=".quote($session{user}{userId})
 				);
@@ -100,7 +100,7 @@ sub www_deleteClipboardItemConfirm {
         		WebGUI::SQL->write("update page set parentId='3', "
                 		."bufferDate=".time().", "
                 		."bufferUserId=".quote($session{user}{userId}) .", "
-                		."bufferPrevId=2 "
+                		."bufferPrevId='2' "
                 		."where parentId='2' "
                 		."and pageId=".quote($session{form}{pageId})
 				);
@@ -108,7 +108,7 @@ sub www_deleteClipboardItemConfirm {
         		WebGUI::SQL->write("update page set parentId='3', "
                 		."bufferDate=".time().", "
                 		."bufferUserId=".quote($session{user}{userId}) .", "
-                		."bufferPrevId=2 "
+                		."bufferPrevId='2' "
                 		."where parentId='2' "
                 		."and pageId=".quote($session{form}{pageId}) ." "
                 		."and bufferUserId=".quote($session{user}{userId})
