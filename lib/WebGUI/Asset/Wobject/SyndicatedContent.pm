@@ -63,7 +63,7 @@ sub getIcon {
 	my $self = shift;
 	my $small = shift;
 	return $session{config}{extrasURL}.'/assets/small/syndicatedContent.gif' if ($small);
-	return $session{config}{extrasURL}.'/assets/syndcatedContent.gif';
+	return $session{config}{extrasURL}.'/assets/syndicatedContent.gif';
 }
 
 #-------------------------------------------------------------------
