@@ -477,7 +477,7 @@ WebGUI::SQL->write("drop table collateral");
 print "\tConverting template system to asset tree\n" unless ($quiet);
 WebGUI::SQL->write("update template set namespace='Layout' where namespace='page'");
 WebGUI::SQL->write("alter table template add column assetId varchar(22) not null");
-my $tempRootLineage = sprintf("%018d",($collateralRootLineage+1));
+my $tempRootLineage = getNextLineage('PBasset000000000000002');
 my $tempRootId = WebGUI::SQL->setRow("asset","assetId",{
 	assetId=>"new",
 	isHidden=>1,
@@ -689,6 +689,7 @@ $conf->set("assets"=>[
 		'WebGUI::Asset::Wobject::HttpProxy',
 		'WebGUI::Asset::Wobject::SQLReport',
 		'WebGUI::Asset::Wobject::Survey',
+		'WebGUI::Asset::Wobject::Product',
 		'WebGUI::Asset::Redirect',
 		'WebGUI::Asset::Template',
 		'WebGUI::Asset::FilePile',

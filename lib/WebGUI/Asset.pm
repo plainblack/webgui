@@ -1425,9 +1425,7 @@ sub getToolbar {
             	.copyIcon('func=copy',$self->get("url"));
               #	.moveTopIcon('func=moveTop&wid='.${$wobject}{wobjectId})
               #	.moveBottomIcon('func=moveBottom&wid='.${$wobject}{wobjectId})
-       # if (${$wobject}{namespace} ne "WobjectProxy" && isIn("WobjectProxy",@{$session{config}{wobjects}})) {
-        #     	$wobjectToolbar .= shortcutIcon('func=createShortcut');
-        #}
+        $toolbar .= shortcutIcon('func=createShortcut') unless ($self->get("className") =~ /Shortcut/);
 	return $toolbar;
 }
 
@@ -2159,6 +2157,19 @@ sub www_copyList {
 		}
 	}
 	return $self->www_manageAssets();
+}
+
+#-------------------------------------------------------------------
+
+=head2 www_createShortcut ()
+
+=cut
+
+sub www_createShortcut () {
+	my $self = shift;
+	$self->addChild({
+		className=>$self->get("className"),
+		});
 }
 
 #-------------------------------------------------------------------

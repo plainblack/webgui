@@ -16,6 +16,7 @@ package WebGUI::Asset::Snippet;
 
 use strict;
 use WebGUI::Asset;
+use WebGUI::Asset::Template;
 use WebGUI::Macro;
 use WebGUI::Session;
 
@@ -134,7 +135,7 @@ sub view {
 	my $output = WebGUI::Macro::process($self->get("snippet"));
 # if it's a javascript file this would break it
 #	$output = '<p>'.$self->getToolbar.'</p>'.$output if ($session{var}{adminOn});
-	return $output;
+	return WebGUI::Asset::Template->processRaw($output);
 }
 
 #-------------------------------------------------------------------

@@ -11,17 +11,11 @@ package WebGUI::Asset::Shortcut;
 #-------------------------------------------------------------------
 
 use strict;
-use Tie::CPHash;
-use WebGUI::DateTime;
-use WebGUI::Icon;
+use WebGUI::Asset;
 use WebGUI::International;
 use WebGUI::Privilege;
 use WebGUI::Session;
 use WebGUI::SQL;
-use WebGUI::Page;
-use WebGUI::TabForm;
-use WebGUI::Template;
-use WebGUI::MetaData;
 
 our @ISA = qw(WebGUI::Asset);
 
@@ -35,7 +29,7 @@ sub definition {
                 className=>'WebGUI::Asset::File',
                 properties=>{
                         shortcutToAssetId=>{
-				fieldType=>"hidden"
+				fieldType=>"hidden",
 				defaultValue=>undef
 				},
 			overrideTitle=>{
@@ -76,15 +70,17 @@ sub definition {
 }
 
 
+
 #-------------------------------------------------------------------
 sub getEditForm {
 	my $self = shift;
 	my $tabform = $self->SUPER::getEditForm();
-#	$tabform->getTab("display")->template(
-#		-name=>"overrideTemplateId",
-#		-value=>$self->getValue("overrideTemplateId"),
-#		-namespace=>$self->getShortcut->
-#		);
+	my $originalTemplate = WebGUI::Asset::Template->new(self->getShortcut->get("templateId"));
+	$tabform->getTab("display")->template(
+		-name=>"overrideTemplateId",
+		-value=>$self->getValue("overrideTemplateId") || $originalTemplate->getId,
+		-namespace=>$originalTemplate->get("namespace")
+		);
 	$tabform->getTab("properties")->yesNo(
 		-name=>"overrideTitle",
 		-value=>$self->getValue("overrideTitle"),
@@ -105,19 +101,17 @@ sub getEditForm {
 		-value=>$self->getValue("overrideTemplate"),
 		-label=>WebGUI::International::get(10,"Shortcut")
 		);
-	my @data = WebGUI::SQL->quickArray("select page.urlizedTitle,wobject.title from wobject left join page on wobject.pageId=page.pageId
-		where wobject.wobjectId=".quote($self->get("proxiedWobjectId")));
 	$tabform->getTab("properties")->readOnly(
 		-label=>WebGUI::International::get(1,"Shortcut"),
-		-value=>'<a href="'.WebGUI::URL::gateway($data[0]).'">'.$data[1].'</a> ('.$self->get("proxiedWobjectId").')'
+		-value=>'<a href="'.$self->getShortcut->getUrl.'">'.$self->getShortcut->get('title').'</a> ('.$self->getShortcut->getId.')'
 		);
 	if($session{setting}{metaDataEnabled}) {
 		$tabform->getTab("properties")->yesNo(
-			-name=>"proxyByCriteria",
-			-value=>$self->getValue("proxyByCriteria"),
-			-label=>WebGUI::International::get("Proxy by alternate criteria?","Shortcut"),
+			-name=>"shortcutByCriteria",
+			-value=>$self->getValue("shortcutByCriteria"),
+			-label=>WebGUI::International::get("Shortcut by alternate criteria?","Shortcut"),
 			-extras=>q|Onchange="
-				if (this.form.proxyByCriteria[0].checked) { 
+				if (this.form.shortcutByCriteria[0].checked) { 
  					this.form.resolveMultiples.disabled=false;
 					this.form.proxyCriteria.disabled=false;
 				} else {
@@ -125,7 +119,7 @@ sub getEditForm {
 					this.form.proxyCriteria.disabled=true;
 				}"|
                 );
-		if ($self->getValue("proxyByCriteria") == 0) {
+		if ($self->getValue("shortcutByCriteria") == 0) {
 			$self->{_disabled} = 'disabled=true';
 		}
 		$tabform->getTab("properties")->selectList(
@@ -160,8 +154,149 @@ sub getName {
         return WebGUI::International::get(3,"Shortcut");
 }
 
+
+
 #-------------------------------------------------------------------
 sub getShortcut {
+	my $self = shift;
+	unless ($self->{_shortcut}) {
+		if ($self->get("shortcutByCriteria")) {
+			$self->{_shortcut} = $self->getShortcutByCriteria;
+		} else {
+			$self->{_shortcut} = $self->getShortcutDefault;
+		}
+	}
+	$self->{_shortcut}{_properties}{templateId} = $self->get("overrideTemplateId") if ($self->get("overrideTemplate"));
+	$self->{_shortcut}{_properties}{title} = $self->get("title") if ($self->get("overrideTitle"));
+	$self->{_shortcut}{_properties}{description} = $self->get("description") if ($self->get("overrideDescription"));
+	$self->{_shortcut}{_properties}{title} = $self->get("displayTitle") if ($self->get("overrideDisplayTitle"));
+	return $self->{_shortcut};
+}
+
+#-------------------------------------------------------------------
+
+=head2 getShortcutByCriteria ( hashRef )
+
+This function will search for a asset that match a metadata criteria set.
+If no asset is found, undef will be returned.
+
+=head3 hashRef
+
+A typical hashRef for this function will look like:
+
+{
+	proxiedNamespace => "Article",
+	resolveMultiples => "random",
+	proxyCriteria => "State = Wisconsin AND Country != Sauk"
+}
+
+Most of the time this will be a:
+
+WebGUI::SQL->quickHashRef("select * from AssetProxy where assetId=".quote($proxiedId));
+
+=cut
+
+sub getShortcutByCriteria {
+	my $self = shift;
+	my $assetProxy = shift;
+	my $criteria = $self->get("shortcutCriteria");
+	my $order = $self->get("resolveMultiples");
+	my $assetId = $self->getId;
+
+	# Parse macro's in criteria
+	$criteria = WebGUI::Macro::process($criteria);
+
+	# Once a asset is found, we will stick to that asset, 
+	# to prevent the proxying of multiple- depth assets like Surveys and USS.
+	my $scratchId;
+	if ($assetId) {
+		$scratchId = "Shortcut_" . $assetId;
+		if($session{scratch}{$scratchId}) {
+			return $session{scratch}{$scratchId} unless ($session{var}{adminOn});
+		}
+	}
+
+	# $criteria = "State = Wisconsin AND Country != Sauk";
+	#
+	# State          =             Wisconsin AND Country != Sauk
+	# |              |             |
+	# |- $field      |_ $operator  |- $value
+	# |_ $attribute                |_ $attribute
+	my $operator = qr/<>|!=|=|>=|<=|>|<|like/i;
+	my $attribute = qr/['"][^()|=><!]+['"]|[^()|=><!\s]+/i; 
+                                                                                                      
+	my $constraint = $criteria;
+	
+	# Get each expression from $criteria
+	foreach my $expression ($criteria =~ /($attribute\s*$operator\s*$attribute)/gi) {
+		# $expression will match "State = Wisconsin"
+
+        	my $replacement = $expression;	# We don't want to modify $expression.
+						# We need it later.
+
+		# Get the field (State) and the value (Wisconsin) from the $expression.
+	        $expression =~ /($attribute)\s*$operator\s*($attribute)/gi;
+	        my $field = $1;
+	        my $value = $2;
+
+		# quote the field / value variables.
+		my $quotedField = $field;
+		my $quotedValue = $value;
+		unless ($field =~ /^\s*['"].*['"]\s*/) {
+			$quotedField = quote($field);
+		}
+                unless ($value =~ /^\s*['"].*['"]\s*/) {
+                        $quotedValue = quote($value);
+                }
+		
+		# transform replacement from "State = Wisconsin" to 
+		# "(fieldname=State and value = Wisconsin)"
+	        $replacement =~ s/\Q$field/(fieldname=$quotedField and value /;
+	        $replacement =~ s/\Q$value/$quotedValue )/i;
+
+		# replace $expression with the new $replacement in $constraint.
+	        $constraint =~ s/\Q$expression/$replacement/;
+	}
+	my $sql =  "	select w.assetId 
+			from metaData_values d, metaData_properties f, asset w 
+			where f.fieldId = d.fieldId
+				and w.assetId = d.assetId
+				and w.className=".quote($self->getShortcutDefault->get("className"));
+
+	
+	# Add constraint only if it has been modified.
+	$sql .= " and ".$constraint if (($constraint ne $criteria) && $constraint ne "");
+	$sql .= " order by w.lastUpdated desc";
+
+	# Execute the query with an unconditional read
+	my @ids;
+        my $sth = WebGUI::SQL->unconditionalRead($sql);
+        while (my ($data) = $sth->array) {
+		push (@ids, $data);
+        }
+        $sth->finish;
+
+	# No matching assets found.
+        if (scalar(@ids) == 0) {
+                return $self->getShortcutDefault; # fall back to the originally mirrored asset.
+	}
+	my $id;
+	# Grab a wid from the results
+	if ($order eq 'random') {
+		$id = $ids[ rand @ids ];
+	} else { 
+				 #default order is mostRecent
+		$id = $ids[0]; # 1st element in list is most recent.
+	}
+
+	# Store the matching assetId in user scratch. 
+	WebGUI::Session::setScratch($scratchId,$id) if ($scratchId);
+
+	return WebGUI::Asset->newByDynamicClass($id);		
+}
+
+#-------------------------------------------------------------------
+sub getShortcutDefault {
 	my $self = shift;
 	return WebGUI::Asset->newByDynamicClass($self->get("shortcutToAssetId"));
 }
@@ -218,9 +353,9 @@ sub _drawQueryBuilder {
 	}
 
 	# Static form fields
-	my $proxyCriteriaField = WebGUI::Form::textarea({
-	                	        name=>"proxyCriteria",
-        	                	value=>$_[0]->getValue("proxyCriteria"),
+	my $shortcutCriteriaField = WebGUI::Form::textarea({
+	                	        name=>"shortcutCriteria",
+        	                	value=>$_[0]->getValue("shortcutCriteria"),
 					extras=>'style="width: 100%" '.$_[0]->{_disabled}
                 	        });
 	my $conjunctionField = WebGUI::Form::selectList({
@@ -235,13 +370,13 @@ sub _drawQueryBuilder {
 	# html
 	my $output;
 	$output .= '<script type="text/javascript" language="javascript" src="'.
-		$session{config}{extrasURL}.'/wobject/WobjectProxy/querybuilder.js"></script>';
+		$session{config}{extrasURL}.'/wobject/Shortcut/querybuilder.js"></script>';
 	$output .= '<link href="'.$session{config}{extrasURL}.
-			'/wobject/WobjectProxy/querybuilder.css" type="text/css" rel="stylesheet">';
+			'/wobject/Shortcut/querybuilder.css" type="text/css" rel="stylesheet">';
 
 	$output .= qq|<table cellspacing="0" cellpadding=0 border=0 >
 			  <tr>
-			    <td colspan="5" align="right">$proxyCriteriaField</td>
+			    <td colspan="5" align="right">$shortcutCriteriaField</td>
 			  </tr>
 			  <tr>
 			    <td></td>
@@ -325,127 +460,5 @@ sub www_view {
 
 1;
 
-
-#-------------------------------------------------------------------
-
-=head2 getAssetByCriteria ( hashRef )
-
-This function will search for a asset that match a metadata criteria set.
-If no asset is found, undef will be returned.
-
-=head3 hashRef
-
-A typical hashRef for this function will look like:
-
-{
-	proxiedNamespace => "Article",
-	resolveMultiples => "random",
-	proxyCriteria => "State = Wisconsin AND Country != Sauk"
-}
-
-Most of the time this will be a:
-
-WebGUI::SQL->quickHashRef("select * from AssetProxy where assetId=".quote($proxiedId));
-
-=cut
-
-sub getAssetByCriteria {
-	my $assetProxy = shift;
-	my $criteria = $assetProxy->{proxyCriteria};
-	my $order = $assetProxy->{resolveMultiples};
-	my $namespace = $assetProxy->{proxiedNamespace};
-	my $assetId = $assetProxy->{assetId};
-
-	# Parse macro's in criteria
-	$criteria = WebGUI::Macro::process($criteria);
-
-	# Once a asset is found, we will stick to that asset, 
-	# to prevent the proxying of multiple- depth assets like Surveys and USS.
-	my $scratchId;
-	if ($assetId) {
-		$scratchId = "AssetProxy_" . $assetId;
-		if($session{scratch}{$scratchId}) {
-			return $session{scratch}{$scratchId} unless ($session{var}{adminOn});
-		}
-	}
-
-	# $criteria = "State = Wisconsin AND Country != Sauk";
-	#
-	# State          =             Wisconsin AND Country != Sauk
-	# |              |             |
-	# |- $field      |_ $operator  |- $value
-	# |_ $attribute                |_ $attribute
-	my $operator = qr/<>|!=|=|>=|<=|>|<|like/i;
-	my $attribute = qr/['"][^()|=><!]+['"]|[^()|=><!\s]+/i; 
-                                                                                                      
-	my $constraint = $criteria;
-	
-	# Get each expression from $criteria
-	foreach my $expression ($criteria =~ /($attribute\s*$operator\s*$attribute)/gi) {
-		# $expression will match "State = Wisconsin"
-
-        	my $replacement = $expression;	# We don't want to modify $expression.
-						# We need it later.
-
-		# Get the field (State) and the value (Wisconsin) from the $expression.
-	        $expression =~ /($attribute)\s*$operator\s*($attribute)/gi;
-	        my $field = $1;
-	        my $value = $2;
-
-		# quote the field / value variables.
-		my $quotedField = $field;
-		my $quotedValue = $value;
-		unless ($field =~ /^\s*['"].*['"]\s*/) {
-			$quotedField = quote($field);
-		}
-                unless ($value =~ /^\s*['"].*['"]\s*/) {
-                        $quotedValue = quote($value);
-                }
-		
-		# transform replacement from "State = Wisconsin" to 
-		# "(fieldname=State and value = Wisconsin)"
-	        $replacement =~ s/\Q$field/(fieldname=$quotedField and value /;
-	        $replacement =~ s/\Q$value/$quotedValue )/i;
-
-		# replace $expression with the new $replacement in $constraint.
-	        $constraint =~ s/\Q$expression/$replacement/;
-	}
-	my $sql =  "	select w.assetId 
-			from metaData_values d, metaData_properties f, asset w 
-			where f.fieldId = d.fieldId
-				and w.assetId = d.assetId
-				and w.namespace = ".quote($namespace); 			
-
-	
-	# Add constraint only if it has been modified.
-	$sql .= " and ".$constraint if (($constraint ne $criteria) && $constraint ne "");
-	$sql .= " order by w.lastEdited desc";
-
-	# Execute the query with an unconditional read
-	my @wids;
-        my $sth = WebGUI::SQL->unconditionalRead($sql);
-        while (my ($data) = $sth->array) {
-		push (@wids, $data);
-        }
-        $sth->finish;
-
-	# No matching assets found.
-        if (scalar(@wids) == 0) {
-                return undef; # fall back to the originally mirrored asset.
-	}
-	my $wid;
-	# Grab a wid from the results
-	if ($order eq 'random') {
-		$wid = $wids[ rand @wids ];
-	} else { 
-				 #default order is mostRecent
-		$wid = $wids[0]; # 1st element in list is most recent.
-	}
-
-	# Store the matching assetId in user scratch. 
-	WebGUI::Session::setScratch($scratchId,$wid) if ($scratchId);
-
-	return $wid;		
-}
 
 
