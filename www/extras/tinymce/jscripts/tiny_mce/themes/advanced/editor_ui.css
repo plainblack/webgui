@@ -118,17 +118,18 @@
 	border-top: 1px solid #cccccc;
 }
 
-.mcePathTop {
-	border-bottom: 1px solid #cccccc;
+.mcePathTop, .mcePathBottom, .mcePath {
 	font-family: "MS Sans Serif";
 	font-size: 9pt;
+	padding: 2px;
+}
+
+.mcePathTop {
+	border-bottom: 1px solid #cccccc;
 }
 
 .mcePathBottom {
 	border-top: 1px solid #cccccc;
-	padding: 2px;
-	font-family: "MS Sans Serif";
-	font-size: 9pt;
 }
 
 .mcePathItem, .mcePathItem:link, .mcePathItem:visited, .mcePathItem:hover {
@@ -139,4 +140,8 @@
 
 .mcePathItem:hover {
 	text-decoration: underline;
+}
+
+.mcePath {
+	border-bottom: 1px solid #cccccc;
 }

@@ -1,3 +1,22 @@
+Version 1.41 (2005-01-31)
+	Added new table plugin, all table code is moved into this plugin [BREAKS COMPATIBLITY].
+	Added new external_link_list_url/external_image_list_url options for better backend integration.
+	Added new file_browser_callback option for better backend integration.
+	Added new layout manager code into the advanced theme, contributed by SlyD.
+	Added new nowrap option, enables so users may change the word wraping behavior.
+	Added new Thai language pack contributed by Innozent.
+	Added obfuscated version of all plugins and themes to reduce over all startup/download time.
+	Added Simplified Chinese language pack contributed by cube316.
+	Added a updated Czech language pack thanks to Josef Klimosz.
+	Fixed issue where anchor elements where closed. This results in browser problems with the outputed HTML.
+	Fixed bug where the first return key press didn't produce a paragraph in Firefox/Mozilla.
+	Fixed bug in the searchreplace plugin where replace content sometimes fails in Firefox/Mozilla.
+	Fixed so all language packs now uses the ISO-639-2 code instead of ISO 3166-1 [BREAKS COMPATIBLITY].
+	Fixed some issues with the force_br_newlines option in MSIE.
+	Fixed bug where the backspace or delete key produced BR elements in Firefox/Mozilla.
+	Fixed bug issue with link and image dialogs of the default theme/simple example.
+	Fixed some bugs when having the editor hidden in a tab/div, contributed by Ernst de Moor.
+	Fixed some character issues with the Danish language packs, contributed by someone unknown.
 Version 1.40 (2005-01-09)
 	Added a new default value for the font size drop down, if no font size where found this gets selected.
 	Added a auto resize window feature, this is enabled by default but can be disabled with a window argument.

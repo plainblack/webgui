@@ -1,0 +1,47 @@
+<HTML>
+<HEAD>
+<TITLE> 常见问题（FAQ） </TITLE>
+<meta http-equiv="Content-Type" content="text/html; charset=gb2312">
+<link href="style.css" rel="stylesheet" type="text/css">
+</HEAD>
+
+<BODY>
+
+<table width="100%" border="0" cellpadding="1" cellspacing="3" class="pageheader">
+  <tr> 
+    <td><span class="title">常见问题（FAQ）</span></td>
+    <td align="right"><a href="index.htm">内容提要</a></td>
+  </tr>
+</table>
+<hr noshade>
+<br>
+<span class="subtitle">为什么&quot;剪切/复制/粘贴&quot;的图标看不到，它们去哪儿了？</span><br>
+<br>
+1.20版本中因为在Mozilla和Firefox上的安全性问题，&quot;剪切/复制/粘贴&quot;的图标被移走了。如果一个功能在2/3的目标平台上无法工作，它将不能被包含进来。换句话说，它不是跨平台的。像Ctrl-X/C/V这样的快捷键还是能继续使用，在浏览器的&quot;编辑&quot;菜单中也可以找到这些功能的子菜单。实际上只有图标快捷键被移除了。欲了解这个安全性问题的更详细信息，请点击Mozilla网站上的&nbsp;<a href="http://bugzilla.mozilla.org/show_bug.cgi?id=192355" target="_blank">bugzilla</a>.<br>
+<br>
+<span class="subtitle">为什么MCE在Opera/Konqueror/Safari浏览器上不能正常工作？</span><br>
+<br>
+只要这些浏览器不能像Mozilla和MSIE一样支持execCommand及designMode，用JavaScript来创建所见即所得编辑器就是不可能的。但如果这些浏览器开始支持上述特性，我们将尽快使tinyMCE能兼容之。<br>
+<br>
+<span class="subtitle">为什么有时候内容是重复的，例如我从word中复制粘贴的时候？</span><br>
+<br>
+当HTML内容没有正确格式化的时候就会发生这个错误，这是MSIE的bug。当HTML代码包含&quot;&lt;b/&gt;&quot;或者嵌套的段落标签&quot;&lt;p&gt;&lt;p&gt;x&lt;/p&gt;&lt;/p&gt;&quot;的时候就会出错，它产生一个错误的DOM tree，及innerHTML上的错误输出。如果有人知道如何解决这个问题，请告诉我。<span class="subtitle"><br>
+<br>
+为什么没有颜色选择跟字体选择？</span><br>
+<br>
+因为颜色跟字体选择将破坏站点或系统的布局标准，例如：会太显宽松，所以没有必要在TinyMCE中加上这些。字体跟颜色可以通过CSS类来设置。<br>
+<br>
+<span class="subtitle">为什么&quot;撤消/恢复&quot;功能在Mozilla中不起作用？</span><br>
+<br>
+这是因为&quot;custom_undo_redo&quot;选项被打开，此选项覆盖了键盘快捷键及命令工具栏上的可用按钮。但目前没有方法可以覆盖内置的&quot;撤消/恢复&quot;菜单子项。<br>
+<br>
+<hr noshade>
+<table width="100%" border="0" cellpadding="1" cellspacing="3" class="pagefooter">
+  <tr> 
+    <td>返回&nbsp;<a href="index.htm">内容提要</a></td>
+    <td align="right"><a href="#">顶部</a></td>
+  </tr>
+</table>
+<br>
+</BODY>
+</HTML>

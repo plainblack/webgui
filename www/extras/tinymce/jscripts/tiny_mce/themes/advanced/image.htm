@@ -3,6 +3,11 @@
 <title>{$lang_insert_image_title}</title>
 <script language="javascript" src="../../tiny_mce_popup.js"></script>
 <script language="javascript">
+var url = tinyMCE.getParam("external_image_list_url");
+if (url != null)
+	document.write('<sc'+'ript language="javascript" type="text/javascript" src="' + tinyMCE.documentBasePath + "/" + url + '"></sc'+'ript>');
+</script>
+<script language="javascript">
 	function insertImage() {
 		if (window.opener) {
 			var src = document.forms[0].src.value;
@@ -37,6 +42,23 @@
 		formObj.height.value = tinyMCE.getWindowArg('height');
 		formObj.insert.value = tinyMCE.getLang('lang_' + tinyMCE.getWindowArg('action')); 
 
+		// Handle file browser
+		if (tinyMCE.getParam("file_browser_callback") != null) {
+			document.getElementById('src').style.width = '180px';
+
+			var html = '';
+
+			html += '<img id="browserBtn" src="images/browse.gif"';
+			html += ' onmouseover="tinyMCE.switchClass(this,\'mceButtonOver\');"';
+			html += ' onmouseout="tinyMCE.restoreClass(this);"';
+			html += ' onmousedown="tinyMCE.restoreAndSwitchClass(this,\'mceButtonDown\');"';
+			html += ' onclick="javascript:tinyMCE.openFileBrowser(\'src\',document.forms[0].src.value,\'image\');"';
+			html += ' width="20" height="18" border="0" title="' + tinyMCE.getLang('lang_browse') + '"';
+			html += ' class="mceButtonNormal" alt="' + tinyMCE.getLang('lang_browse') + '" />';
+
+			document.getElementById('browser').innerHTML = html;
+		}
+
 		window.focus();
 	}
 
@@ -55,8 +77,31 @@
           </tr>
           <tr>
             <td>{$lang_insert_image_src}:</td>
-            <td><input name="src" type="text" id="src" value="" style="width: 200px"></td>
+            <td>              <table border="0" cellspacing="0" cellpadding="0">
+                <tr>
+                  <td><input name="src" type="text" id="src" value="" style="width: 200px"></td>
+                  <td id="browser"></td>
+                </tr>
+              </table></td>
           </tr>
+		  <!-- Image list -->
+		  <script language="javascript">
+			if (typeof(tinyMCEImageList) != "undefined" && tinyMCEImageList.length > 0) {
+				var html = "";
+
+				html += '<tr><td>{$lang_image_list}:</td>';
+				html += '<td><select name="image_list" style="width: 200px" onchange="this.form.src.value=this.options[this.selectedIndex].value;">';
+				html += '<option value="">---</option>';
+
+				for (var i=0; i<tinyMCEImageList.length; i++)
+					html += '<option value="' + tinyMCEImageList[i][1] + '">' + tinyMCEImageList[i][0] + '</option>';
+
+				html += '</select></td></tr>';
+
+				document.write(html);
+			}
+		  </script>
+		  <!-- /Image list -->
           <tr>
             <td>{$lang_insert_image_alt}:</td>
             <td><input name="alt" type="text" id="alt" value="" style="width: 200px"></td>

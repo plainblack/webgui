@@ -8,7 +8,7 @@
 			var src = document.forms[0].src.value;
 			var alt = document.forms[0].alt.value;
 
-			window.opener.tinyMCE.insertImage(src, alt, 0, 0, 0);
+			window.opener.tinyMCE.insertImage(src, alt);
 			top.close();
 		}
 	}
@@ -18,6 +18,7 @@
 
 		formObj.src.value = tinyMCE.getWindowArg('src');
 		formObj.alt.value = tinyMCE.getWindowArg('alt');
+		formObj.insert.value = tinyMCE.getLang('lang_' + tinyMCE.getWindowArg('action')); 
 
 		window.focus();
 	}
@@ -44,9 +45,9 @@
             <td><input name="alt" type="text" id="alt" value="" style="width: 200px"></td>
           </tr>
           <tr>
-            <td><input type="button" name="insert" value="{$lang_insert}" onclick="insertImage();">
+            <td><input type="button" id="insert" name="insert" value="{$lang_insert}" onclick="insertImage();">
             </td>
-            <td align="right"><input type="button" name="cancel" value="{$lang_cancel}" onclick="cancelAction();"></td>
+            <td align="right"><input type="button" id="cancel" name="cancel" value="{$lang_cancel}" onclick="cancelAction();"></td>
           </tr>
         </table></td>
     </tr>

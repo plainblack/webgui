@@ -4,6 +4,11 @@
 <head>
 <title>{$lang_insert_link_title}</title>
 <script language="javascript" type="text/javascript" src="../../tiny_mce_popup.js"></script>
+<script language="javascript">
+var url = tinyMCE.getParam("external_link_list_url");
+if (url != null)
+	document.write('<sc'+'ript language="javascript" type="text/javascript" src="' + tinyMCE.documentBasePath + "/" + url + '"></sc'+'ript>');
+</script>
 <script language="javascript" type="text/javascript">
 <!--
     function myRegexpReplace(in_str, reg_exp, replace_str, opts) {
@@ -73,6 +78,24 @@
         formObj.href.value      = tinyMCE.getWindowArg('href');
         formObj.linktitle.value = tinyMCE.getWindowArg('title');
         setMyTarget(myTarget);
+
+		// Handle file browser
+		if (tinyMCE.getParam("file_browser_callback") != null) {
+			document.getElementById('href').style.width = '280px';
+
+			var html = '';
+
+			html += '<img id="browserBtn" src="../../themes/advanced/images/browse.gif"';
+			html += ' onmouseover="tinyMCE.switchClass(this,\'mceButtonOver\');"';
+			html += ' onmouseout="tinyMCE.restoreClass(this);"';
+			html += ' onmousedown="tinyMCE.restoreAndSwitchClass(this,\'mceButtonDown\');"';
+			html += ' onclick="javascript:tinyMCE.openFileBrowser(\'href\',document.forms[0].href.value,\'file\');"';
+			html += ' width="20" height="18" border="0" title="' + tinyMCE.getLang('lang_browse') + '"';
+			html += ' class="mceButtonNormal" alt="' + tinyMCE.getLang('lang_browse') + '" />';
+
+			document.getElementById('browser').innerHTML = html;
+		}
+
         window.focus();
     }
 
@@ -242,7 +265,6 @@
     function cancelAction() {
         top.close();
     }
-
 //-->
 </script>
 <style type="text/css">
@@ -265,8 +287,31 @@
                     </tr>
                     <tr>
                         <td align="right">{$lang_insert_link_url}:</td>
-                        <td><input name="href" type="text" id="href" value="" style="width: 300px;" /></td>
+                      <td><table border="0" cellspacing="0" cellpadding="0">
+                            <tr>
+                              <td><input name="href" type="text" id="href" value="" style="width: 300px;" /></td>
+                              <td id="browser"></td>
+                            </tr>
+                          </table></td>
                     </tr>
+					  <!-- Link list -->
+					  <script language="javascript">
+						if (typeof(tinyMCELinkList) != "undefined" && tinyMCELinkList.length > 0) {
+							var html = "";
+
+							html += '<tr><td align="right">{$lang_link_list}:</td>';
+							html += '<td><select name="link_list" style="width: 300px" onchange="this.form.href.value=this.options[this.selectedIndex].value;">';
+							html += '<option value="">---</option>';
+
+							for (var i=0; i<tinyMCELinkList.length; i++)
+								html += '<option value="' + tinyMCELinkList[i][1] + '">' + tinyMCELinkList[i][0] + '</option>';
+
+							html += '</select></td></tr>';
+
+							document.write(html);
+						}
+					  </script>
+					  <!-- /Link list -->
                     <tr>
                         <td align="right">{$lang_theme_insert_link_titlefield}:</td>
                         <td><input name="linktitle" type="text" id="linktitle" value="" style="width: 300px;" /></td>

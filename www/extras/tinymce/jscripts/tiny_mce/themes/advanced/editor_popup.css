@@ -90,3 +90,28 @@ input.checkbox {
 	background-color: transparent;
 	vertical-align: middle;
 }
+
+.mceButtonNormal, .mceButtonOver, .mceButtonDown, .mceSeparator, .mceButtonDisabled, .mceButtonSelected {
+	margin-left: 1px;
+}
+
+.mceButtonNormal {
+	border-top: 1px solid;
+	border-left: 1px solid;
+	border-bottom: 1px solid;
+	border-right: 1px solid;
+	border-color: #F0F0EE;
+	cursor: arrow;
+}
+
+.mceButtonOver {
+	border: 1px solid #0A246A;
+	cursor: arrow;
+	background-color: #B6BDD2;
+}
+
+.mceButtonDown {
+	cursor: arrow;
+	border: 1px solid #0A246A;
+	background-color: #8592B5;
+}

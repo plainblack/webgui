@@ -20,6 +20,7 @@ Initialization example:
     mode : "textareas",
     plugins : "flash",
     extended_valid_elements : "img[class|src|border=0|alt|title|hspace|vspace|width|height|align|onmouseover|onmouseout|name]"
+    flash_external_list_url : "example_flash_list.js" // Optional URL to a list of Flash movies
   });
 
 

@@ -1,0 +1,439 @@
+<HTML>
+<HEAD>
+<TITLE>创建主题</TITLE>
+<meta http-equiv="Content-Type" content="text/html; charset=gb2312">
+<link href="style.css" rel="stylesheet" type="text/css">
+</HEAD>
+
+<BODY>
+
+<table width="100%" border="0" cellpadding="1" cellspacing="3" class="pageheader">
+  <tr> 
+    <td class="title">创建主题及插件</td>
+    <td align="right"><a href="index.htm">内容提要</a></td>
+  </tr>
+</table>
+<hr noshade>
+<br>
+<span class="subtitle">创建你自己的主题与插件</span><br>
+<br>如果你懂得HTML,CSS和Javascript的基础知识，为TinyMCE创建自己的主题是相当容易的事情。<BR>最简单的方法莫过于将&quot;default&quot;或者&quot;advanced&quot;模板拷贝，并将它重命名为你自己的主题名称，例如：&quot;mytheme&quot;。<BR>然后你需要把以下片断中的红色标记更改为&quot;mytheme&quot;，这样各种主题就不会冲突。换句话说，给这个主题指定了唯一的名字。<BR>更改里面的HTML代码使之适合你的主题，但需要注意，某些组件是必须的，所以更改以下的每个函数时都请查看相应文档。<BR>此外，自定义主题必须做为子目录放在tiny_mce的&quot;themes&quot;目录下。<BR>如果需要，你完全可以为自己的主题增加特定的选项和设置，不过记得要用以下的命名规则：&quot;theme_&lt;your theme&gt;_&lt;option&gt;&quot;。<br>
+<br>以下示例有三个函数，下面会详细介绍。<br>
+<br>
+    
+<table border="0" cellspacing="3" cellpadding="2" class="sample">
+  <tr> 
+        
+    <td class="samplecontent">function TinyMCE_<font color="#CC0000">default</font>_getEditorTemplate(settings) 
+      {<br>
+      &nbsp;&nbsp;&nbsp;var template = new Array();<br>
+      <br> &nbsp;&nbsp;&nbsp;template['html'] = '&lt;Some HTML&gt;';<br>
+      &nbsp;&nbsp;&nbsp;template['delta_width'] = 0;<br>
+      &nbsp;&nbsp;&nbsp;template['delta_height'] = -40;<br>
+      <br>
+      &nbsp;&nbsp;&nbsp;return template;<br>
+      } 
+      <p>function TinyMCE_<font color="#CC0000">default</font>_getInsertLinkTemplate(settings) 
+        {<br>
+        &nbsp;&nbsp;&nbsp;var template = new Array();<br>
+        <br>
+        &nbsp;&nbsp;&nbsp;template['file'] = 'link.htm';<br>
+        &nbsp;&nbsp;&nbsp;template['width'] = 320;<br>
+        &nbsp;&nbsp;&nbsp;template['height'] = 130;<br>
+        <br>
+        &nbsp;&nbsp;&nbsp;return template;<br>
+        }<br>
+        <br>
+        function TinyMCE_<font color="#CC0000">default</font>_getInsertImageTemplate(settings) 
+        {<br>
+        &nbsp;&nbsp;&nbsp;var template = new Array();<br>
+        <br>
+        &nbsp;&nbsp;&nbsp;template['file'] = 'image.htm';<br>
+        &nbsp;&nbsp;&nbsp;template['width'] = 320;<br>
+        &nbsp;&nbsp;&nbsp;template['height'] = 130;<br>
+        <br>
+        &nbsp;&nbsp;&nbsp;return template;<br>
+        }<br>
+        <br>
+        function TinyMCE_<font color="#CC0000">default</font>_handleNodeChange(editor_id, 
+        node) {<br>
+        &nbsp;&nbsp;&nbsp;// Check what happend<br>
+        }<br>
+        <br>
+        function TinyMCE_<font color="#CC0000">default</font>_execCommand(editor_id, element, command, user_interface, value)
+        {<br>
+        &nbsp;&nbsp;&nbsp;//
+        Your custom command logic<br>
+&nbsp;&nbsp;&nbsp;return false;         <br>
+        }
+        <br>
+      </p>
+    </td>
+  </tr>
+</table>
+<br>
+<hr noshade>
+<p class="subtitle">使用外部模板文件</p>
+<p>当用下面所描述的&quot;file&quot;参数使用外部模板文件时，需要把&quot;tiny_mce_popup.js&quot;包含进来。<BR>为了跟TinyMCE通讯，此文件是必须的。所有的变量和语言定义在&quot;html&quot;属性中被替换。
+</p>外部模板文件示例：
+<br>
+<br>
+<table border="0" cellspacing="3" cellpadding="2" class="sample">
+  <tr>
+    <td class="samplecontent">&lt;html&gt;<br>
+    &lt;head&gt;<br>
+    &lt;title&gt;<span class="failed">{$lang_theme_sample_title}</span>&lt;/title&gt;<br>
+    &lt;script language=&quot;javascript&quot; src=&quot;<span class="failed">../../tiny_mce_popup.js</span>&quot;&gt;&lt;/script&gt;<br>
+    &lt;script language=&quot;javascript&quot;&gt;<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;alert(<span class="failed">tinyMCE.getWindowArg('some_arg')</span>);<br>
+    &lt;/script&gt;
+    <br>
+    &lt;body&gt;<br>
+    <span class="failed">{$lang_theme_sample_desc}</span><br>
+    &lt;/body&gt;
+    </td>
+  </tr>
+</table><BR>
+<hr noshade>
+<br>
+<span class="subtitle">函数 TinyMCE_<font color="#CC0000">&lt;<font color="#CC0000">theme or plugin</font>&gt;</font>_getEditorTemplate(settings)</span></p> 
+<p>此函数负责编辑器实例在页面中的布局，它返回包含特定名称的<U>名称－值</U>对的数组。解释如下，注意用[]括起来的名称是可选的。<BR>此函数的settings参数是一个包含了tinyMCE设置和选项的<U>名称－值</U>对的数组。</p>
+<strong>模板数据：<br>
+<br>
+</strong> 
+<table cellpadding="3" cellspacing="1" bgcolor="#000000">
+  <tr bgcolor="#FFFFFF"> 
+    <td width="150" bgcolor="#EEEEEE"><strong>html</strong></td>
+    <td>HTML模板数据，它的值是实现编辑器所需的全部HTML代码。注意：在使用时{$&lt;variable&gt;}会被实际的值替换。关于这些特定值的更详细说明见后面。</td>
+  </tr>
+  <tr bgcolor="#FFFFFF"> 
+    <td width="150" bgcolor="#EEEEEE"><strong>[delta_width]</strong></td>
+    <td>Delta宽度，此值包含用户界面所需的相关宽度。例如，工具栏需要20象素，则此值为-20。<BR>
+    这也是为什么编辑器的尺寸跟它所替换的组件宽度一致的原因。</td>
+  </tr>
+  <tr bgcolor="#FFFFFF"> 
+    <td width="150" bgcolor="#EEEEEE"><strong>[delta_height]</strong></td>
+    <td>Delta高度，此值包含用户界面所需的相关高度。例如，工具栏需要40象素，则此值为-40。<BR>
+    这也是为什么编辑器的尺寸跟它所替换的组件宽度一致的原因。</td>
+  </tr>
+</table>
+<p>上述&quot;html&quot;中的变量被TinyMCE的内部值所替换。有两种不同类型的变量，一种是以&quot;lang_&quot;为前缀的，它们会被相应名称的语言包替换。例如，&lt;b&gt;{$lang_test}&lt;/b&gt;被语言变量&quot;tinyMCELang['lang_test']&quot;所替换，输出就成了&lt;b&gt;Test&lt;/b&gt;。<BR>另外的变量是所用模板直接传递的，列举如下。 注意用[]括起来的变量是可选的。<br>
+  <br>
+  <strong>变量：</strong></p>
+<table cellpadding="3" cellspacing="1" bgcolor="#000000">
+  <tr bgcolor="#FFFFFF"> 
+    <td width="150" bgcolor="#EEEEEE"><strong>editor_id</strong></td>
+    <td>此为编辑器实例的ID，它应当被放在模板必须包含的IFRAME组件的ID属性中。</td>
+  </tr>
+  <tr bgcolor="#FFFFFF"> 
+    <td width="150" bgcolor="#EEEEEE"><strong>[default_document]</strong></td>
+    <td>为了解决MSIE的安全问题，增加了此设置，它会被替换成空白HTML页面。把它放在模板IFRAME组件的SRC属性中。</td>
+  </tr>
+  <tr bgcolor="#FFFFFF"> 
+    <td bgcolor="#EEEEEE"><strong>[area_width]</strong></td>
+    <td>IFRAME区域的宽度，以象素为单位。</td>
+  </tr>
+  <tr bgcolor="#FFFFFF"> 
+    <td bgcolor="#EEEEEE"><strong>[area_height]</strong></td>
+    <td>IFRAME区域的高度，以象素为单位。</td>
+  </tr>
+  <tr bgcolor="#FFFFFF"> 
+    <td bgcolor="#EEEEEE"><strong>[width]</strong></td>
+    <td>整个编辑器区域的宽度，以象素为单位。</td>
+  </tr>
+  <tr bgcolor="#FFFFFF">
+    <td bgcolor="#EEEEEE"><strong>[height]</strong></td>
+    <td>整个编辑器区域的高度，以象素为单位。</td>
+  </tr>
+  <tr bgcolor="#FFFFFF"> 
+    <td bgcolor="#EEEEEE"><strong>[themeurl]</strong></td>
+    <td>主题所在位置的URL。</td>
+  </tr>
+</table>
+<p>注意：从这个模板可以调用两个JavaScript函数，它们是：在当前选定编辑器区域中执行命令的tinyMCE.execCommand及切换特定组件CSS类的tinyMCE.switchClass。<BR>
+欲了解execCommand中可以执行的更多命令细节，请查看&nbsp;<a href="http://www.mozilla.org/editor/midas-spec.html" target="_blank">Mozilla midas specification</a>&nbsp;和&nbsp;<a href="using.htm#execcommand">TinyMCE specific commands</a>. <br>
+</p>
+<hr noshade>
+<br>
+<span class="subtitle">函数 TinyMCE_<font color="#CC0000">&lt;<font color="#CC0000">theme or plugin</font>&gt;</font>_getInsertLinkTemplate(settings)</span> 
+<p>此函数负责插入链接弹出窗口的布局，它返回包含特定名称的<U>名称－值</U>对的数组。解释如下，注意用[]括起来的名称是可选的。<BR>此函数的settings参数是一个包含了tinyMCE设置和选项的<U>名称－值</U>对的数组。</p>
+<strong>模板数据：<br>
+<br>
+</strong> 
+<table cellpadding="3" cellspacing="1" bgcolor="#000000">
+  <tr bgcolor="#FFFFFF"> 
+    <td width="150" bgcolor="#EEEEEE"><strong>html</strong></td>
+    <td>HTML模板数据，它的值是实现链接对话框所需的全部HTML代码。注意：在使用时{$&lt;variable&gt;}会被实际的值替换。关于这些特定值的更详细说明见后面。如果&quot;file&quot;参数有赋值，此参数不是必须的。</td>
+  </tr>
+  <tr bgcolor="#FFFFFF">
+    <td bgcolor="#EEEEEE"><strong>file</strong></td>
+    <td>要使用的外部模板文件的名称，它可以是像.php,.asp,.jsp这样的动态页。</td>
+  </tr>
+  <tr bgcolor="#FFFFFF"> 
+    <td width="150" bgcolor="#EEEEEE"><strong>[width]</strong></td>
+    <td>弹出窗口的宽度，以象素为单位，默认为320.</td>
+  </tr>
+  <tr bgcolor="#FFFFFF"> 
+    <td width="150" bgcolor="#EEEEEE"><strong>[height]</strong></td>
+    <td>弹出窗口的高度，以象素为单位，默认为200.</td>
+  </tr>
+</table>
+<p>上述&quot;html&quot;中的变量被TinyMCE的内部值所替换。有两种不同类型的变量，一种是以&quot;lang_&quot;为前缀的，它们会被相应名称的语言包替换。例如，&lt;b&gt;{$lang_test}&lt;/b&gt;被语言变量&quot;tinyMCELang['lang_test']&quot;所替换，输出就成了&lt;b&gt;Test&lt;/b&gt;。<BR>另外的变量是所用模板直接传递的，列举如下。 注意用[]括起来的变量是可选的。<br>
+  <br>
+  <strong>变量/窗口 参数：</strong></p>
+<table cellpadding="3" cellspacing="1" bgcolor="#000000">
+  <tr> 
+    <td width="150" bgcolor="#EEEEEE"><strong>[href]</strong></td>
+    <td bgcolor="#FFFFFF">如果有选定一个链接，此变量被链接中的&quot;href&quot;属性值所替代。</td>
+  </tr>
+  <tr>
+    <td bgcolor="#EEEEEE"><strong>[target]</strong></td>
+    <td bgcolor="#FFFFFF">如果有选定一个链接，此变量被链接中的&quot;target&quot;属性值所替代。</td>
+  </tr>
+  <tr> 
+    <td width="150" bgcolor="#EEEEEE"><strong>[css]</strong></td>
+    <td bgcolor="#FFFFFF">主题中弹出窗口CSS的位置。</td>
+  </tr>
+</table>
+<p>注意：从这个模板中可以调用&quot;window.opener.tinyMCE.insertLink(href, target)&quot;这个javascript函数，它的作用是是在当前选定的编辑器中插入链接，并且应当在&quot;插入&quot;按钮按下时被调用。</p>
+<hr noshade>
+<br>
+<span class="subtitle">函数 TinyMCE_<font color="#CC0000">&lt;<font color="#CC0000">theme or plugin</font>&gt;</font>_getInsertImageTemplate(settings)</span> 
+<p>此函数负责插入图像弹出窗口的布局，它返回包含特定名称的<U>名称－值</U>对的数组。解释如下，注意用[]括起来的名称是可选的。<BR>此函数的settings参数是一个包含了tinyMCE设置和选项的<U>名称－值</U>对的数组。</p>
+<strong>模板数据：<br>
+<br>
+</strong> 
+<table cellpadding="3" cellspacing="1" bgcolor="#000000">
+  <tr>
+    <td bgcolor="#EEEEEE"><strong>html</strong></td>
+    <td bgcolor="#FFFFFF">HTML模板数据，它的值是实现图像对话框所需的全部HTML代码。注意：在使用时{$&lt;variable&gt;}会被实际的值替换。关于这些特定值的更详细说明见后面。如果&quot;file&quot;参数有赋值，此参数不是必须的。</td>
+  </tr>
+  <tr>
+    <td bgcolor="#EEEEEE"><strong>file</strong></td>
+    <td bgcolor="#FFFFFF">要使用的外部模板文件的名称，它可以是像.php,.asp,.jsp这样的动态页。</td>
+  </tr>
+  <tr> 
+    <td width="150" bgcolor="#EEEEEE"><strong>[width]</strong></td>
+    <td bgcolor="#FFFFFF">弹出窗口的宽度，以象素为单位，默认为320.</td>
+  </tr>
+  <tr> 
+    <td width="150" bgcolor="#EEEEEE"><strong>[height]</strong></td>
+    <td bgcolor="#FFFFFF">弹出窗口的高度，以象素为单位，默认为200.</td>
+  </tr>
+</table>
+<p>上述&quot;html&quot;中的变量被TinyMCE的内部值所替换。有两种不同类型的变量，一种是以&quot;lang_&quot;为前缀的，它们会被相应名称的语言包替换。例如，&lt;b&gt;{$lang_test}&lt;/b&gt;被语言变量&quot;tinyMCELang['lang_test']&quot;所替换，输出就成了&lt;b&gt;Test&lt;/b&gt;。<BR>另外的变量是所用模板直接传递的，列举如下。 注意用[]括起来的变量是可选的。<br>
+  <br>
+  <strong>变量/窗口 参数：</strong></p>
+<table cellpadding="3" cellspacing="1" bgcolor="#000000">
+  <tr> 
+    <td width="150" bgcolor="#EEEEEE"><strong>[src]</strong></td>
+    <td bgcolor="#FFFFFF">如果有选定一个图像，此变量被图像中的&quot;src&quot;属性值所替代。</td>
+  </tr>
+  <tr> 
+    <td bgcolor="#EEEEEE"><strong>[alt]</strong></td>
+    <td bgcolor="#FFFFFF">如果有选定一个图像，此变量被图像中的&quot;alt&quot;属性值所替代。</td>
+  </tr>
+  <tr> 
+    <td bgcolor="#EEEEEE"><strong>[border]</strong></td>
+    <td bgcolor="#FFFFFF">如果有选定一个图像，此变量被图像中的&quot;border&quot;属性值所替代。</td>
+  </tr>
+  <tr> 
+    <td bgcolor="#EEEEEE"><strong>[hspace]</strong></td>
+    <td bgcolor="#FFFFFF">如果有选定一个图像，此变量被图像中的&quot;hspace&quot;属性值所替代。</td>
+  </tr>
+  <tr> 
+    <td bgcolor="#EEEEEE"><strong>[vspace]</strong></td>
+    <td bgcolor="#FFFFFF">如果有选定一个图像，此变量被图像中的&quot;vspace&quot;属性值所替代。</td>
+  </tr>
+  <tr> 
+    <td bgcolor="#EEEEEE"><strong>[width]</strong></td>
+    <td bgcolor="#FFFFFF">如果有选定一个图像，此变量被图像中的&quot;width&quot;属性值所替代。</td>
+  </tr>
+  <tr> 
+    <td bgcolor="#EEEEEE"><strong>[height]</strong></td>
+    <td bgcolor="#FFFFFF">如果有选定一个图像，此变量被图像中的&quot;height&quot;属性值所替代。</td>
+  </tr>
+  <tr>
+    <td bgcolor="#EEEEEE"><strong>[align]</strong></td>
+    <td bgcolor="#FFFFFF">如果有选定一个图像，此变量被图像中的&quot;align&quot;属性值所替代。</td>
+  </tr>
+  <tr>
+    <td bgcolor="#EEEEEE"><strong>[css]</strong></td>
+    <td bgcolor="#FFFFFF">主题中弹出窗口CSS的位置。</td>
+  </tr>
+</table>
+<p>注意：从这个模板中可以调用&quot;window.opener.tinyMCE.insertImage(src, alt, border, hspace, vspace, width, 
+  height, align)&quot;这个javascript函数，它的作用是是在当前选定的编辑器中插入图像，并且应当在&quot;插入&quot;按钮按下时被调用。</p>
+<hr noshade>
+<br>
+<span class="subtitle">函数 TinyMCE_<font color="#CC0000">&lt;<font color="#CC0000">theme or plugin</font>&gt;</font>_getInsertTableTemplate(settings)</span>
+<span class="subtitle">（可选）</span>
+<p>此函数负责插入表格弹出窗口的布局，它返回包含特定名称的<U>名称－值</U>对的数组。解释如下，注意用[]括起来的名称是可选的。<BR>此函数的settings参数是一个包含了tinyMCE设置和选项的<U>名称－值</U>对的数组。</p>
+<strong>模板数据：<br>
+<br>
+</strong>
+<table cellpadding="3" cellspacing="1" bgcolor="#000000">
+  <tr>
+    <td bgcolor="#EEEEEE"><strong>html</strong></td>
+    <td bgcolor="#FFFFFF">HTML模板数据，它的值是实现表格对话框所需的全部HTML代码。注意：在使用时{$&lt;variable&gt;}会被实际的值替换。关于这些特定值的更详细说明见后面。如果&quot;file&quot;参数有赋值，此参数不是必须的。</td>
+  </tr>
+  <tr>
+    <td bgcolor="#EEEEEE"><strong>file</strong></td>
+    <td bgcolor="#FFFFFF">要使用的外部模板文件的名称，它可以是像.php,.asp,.jsp这样的动态页。 </td>
+  </tr>
+  <tr>
+    <td width="150" bgcolor="#EEEEEE"><strong>[width]</strong></td>
+    <td bgcolor="#FFFFFF">弹出窗口的宽度，以象素为单位。</td>
+  </tr>
+  <tr>
+    <td width="150" bgcolor="#EEEEEE"><strong>[height]</strong></td>
+    <td bgcolor="#FFFFFF">弹出窗口的高度，以象素为单位。</td>
+  </tr>
+</table>
+<p>上述&quot;html&quot;中的变量被TinyMCE的内部值所替换。有两种不同类型的变量，一种是以&quot;lang_&quot;为前缀的，它们会被相应名称的语言包替换。例如，&lt;b&gt;{$lang_test}&lt;/b&gt;被语言变量&quot;tinyMCELang['lang_test']&quot;所替换，输出就成了&lt;b&gt;Test&lt;/b&gt;。<BR>另外的变量是所用模板直接传递的，列举如下。 注意用[]括起来的变量是可选的。<br>
+    <br>
+    <strong>变量/窗口 参数：</strong></p>
+<table cellpadding="3" cellspacing="1" bgcolor="#000000">
+  <tr>
+    <td width="150" bgcolor="#EEEEEE"><strong>[cols]</strong></td>
+    <td bgcolor="#FFFFFF">如果有选定一个表格，此变量会被表格的列数所替代。</td>
+  </tr>
+  <tr>
+    <td bgcolor="#EEEEEE"><strong>[rows]</strong></td>
+    <td bgcolor="#FFFFFF">如果有选定一个表格，此变量会被表格的行数所替代。</td>
+  </tr>
+  <tr>
+    <td bgcolor="#EEEEEE"><strong>[border]</strong></td>
+    <td bgcolor="#FFFFFF">如果有选定一个表格，此变量会被表格的&quot;border&quot;属性值所替代。</td>
+  </tr>
+  <tr>
+    <td bgcolor="#EEEEEE"><strong>[cellpadding]</strong></td>
+    <td bgcolor="#FFFFFF">如果有选定一个表格，此变量会被表格的&quot;cellpadding&quot;属性值所替代。</td>
+  </tr>
+  <tr>
+    <td bgcolor="#EEEEEE"><strong>[cellspacing]</strong></td>
+    <td bgcolor="#FFFFFF">如果有选定一个表格，此变量会被表格的&quot;cellspacing&quot;属性值所替代。</td>
+  </tr>
+  <tr>
+    <td bgcolor="#EEEEEE"><strong>[width]</strong></td>
+    <td bgcolor="#FFFFFF">如果有选定一个表格，此变量会被表格的&quot;width&quot;属性值所替代。</td>
+  </tr>
+  <tr>
+    <td bgcolor="#EEEEEE"><strong>[height]</strong></td>
+    <td bgcolor="#FFFFFF">如果有选定一个表格，此变量会被表格的&quot;height&quot;属性值所替代。</td>
+  </tr>
+  <tr>
+    <td bgcolor="#EEEEEE"><strong>[align]</strong></td>
+    <td bgcolor="#FFFFFF">如果有选定一个表格，此变量会被表格的&quot;align&quot;属性值所替代。</td>
+  </tr>
+  <tr>
+    <td bgcolor="#EEEEEE"><strong>[action]</strong></td>
+    <td bgcolor="#FFFFFF">根据用户是选择了一个表格还是创建一个新的表格来选择操作类型是&quot;update&quot;还是&quot;insert&quot;。</td>
+  </tr>
+</table>
+<br>
+<hr noshade>
+<span class="subtitle">函数 TinyMCE_<font color="#CC0000">&lt;<font color="#CC0000">theme or plugin</font>&gt;</font>_handleNodeChange （可选）</span> 
+<p>此函数在某个编辑器实例的聚焦状态发生改变时被调用，当前新聚焦的节点被做为参数传递给此函数。这对于你需要根据用户的选择来改变用户界面非常有用。</p>
+<strong>参数：<br>
+<br>
+</strong> 
+<table cellpadding="3" cellspacing="1" bgcolor="#000000">
+  <tr> 
+    <td bgcolor="#EEEEEE"><strong>editor_id</strong></td>
+    <td bgcolor="#FFFFFF">编辑器的唯一ID号，这跟getEditorTemplate中的$editor_id变量一致。</td>
+  </tr>
+  <tr>
+    <td bgcolor="#EEEEEE"><strong>node</strong></td>
+    <td bgcolor="#FFFFFF">当前鼠标所在位置节点的引用。</td>
+  </tr>
+  <tr>
+    <td bgcolor="#EEEEEE"><strong>undo_index</strong></td>
+    <td bgcolor="#FFFFFF">当前撤消索引，如果撤消/重做功能被禁用，其值为-1。</td>
+  </tr>
+  <tr>
+    <td bgcolor="#EEEEEE"><strong>undo_levels</strong></td>
+    <td bgcolor="#FFFFFF">当前撤消层次的数目，如果撤消/重做功能被禁用，其值为-1。</td>
+  </tr>
+  <tr>
+    <td bgcolor="#EEEEEE"><strong>visual_aid</strong></td>
+    <td bgcolor="#FFFFFF">视觉帮助模式的状态，True/false。</td>
+  </tr>
+  <tr> 
+    <td width="150" bgcolor="#EEEEEE"><strong>any_selection</strong></td>
+    <td bgcolor="#FFFFFF">是否选定任何文字或图像。</td>
+  </tr>
+</table>
+<br>
+<hr noshade>
+<span class="subtitle">函数 TinyMCE_<font color="#CC0000">&lt;<font color="#CC0000">theme or plugin</font>&gt;</font>_execCommand （可选）</span>
+<p>当执行像&quot;bold&quot;或&quot;createlink&quot;这样的命令时，此方法被调用。然后此 回调/主题/插件 函数回中断主题特定命令，并执行客户逻辑。如果此命令返回true，命令处理被终止，默认的tinyMCE命令处理永远不会被执行。</p>
+<strong>参数：<br>
+<br>
+</strong>
+<table cellpadding="3" cellspacing="1" bgcolor="#000000">
+  <tr>
+    <td bgcolor="#EEEEEE"><strong>editor_id</strong></td>
+    <td bgcolor="#FFFFFF">编辑器的唯一ID号，这跟getEditorTemplate中的$editor_id变量一致。</td>
+  </tr>
+  <tr>
+    <td bgcolor="#EEEEEE"><strong>element</strong></td>
+    <td bgcolor="#FFFFFF">对编辑器实例中文档DOM根组件的引用。</td>
+  </tr>
+  <tr>
+    <td bgcolor="#EEEEEE"><strong>command</strong></td>
+    <td bgcolor="#FFFFFF">要执行的命令，例如：&quot;myCommand&quot;。</td>
+  </tr>
+  <tr>
+    <td bgcolor="#EEEEEE"><strong>user_interface</strong></td>
+    <td bgcolor="#FFFFFF">是否使用用户界面，true/false选项。</td>
+  </tr>
+  <tr>
+    <td width="150" bgcolor="#EEEEEE"><strong>value</strong></td>
+    <td bgcolor="#FFFFFF">要传给命令的自定义数据值，可以是任何数据类型。</td>
+  </tr>
+</table>
+<br>
+<strong>返回：</strong> true - 命令被终止，命令处理不再继续；false - 继续execCommand处理，冒泡的。<br>
+<hr noshade>
+<span class="subtitle">函数 TinyMCE_<font color="#CC0000">&lt;theme or plugin&gt;</font>_getControlHTML(control_name) （可选）</span>
+<p>当编辑器需要实现某个特定控制/按钮的时候此函数被调用，它返回的是那个控制的HTML模板，如果控制的名字不能被识别则返回空串。<BR>注意变量{$pluginurl}会被当前插件目录的URL前缀所替换。</p>
+<strong>参数：<br>
+<br>
+</strong>
+<table cellpadding="3" cellspacing="1" bgcolor="#000000">
+  <tr>
+    <td width="150" bgcolor="#EEEEEE"><span class="subtitle">control_name</span></td>
+    <td bgcolor="#FFFFFF">要匹配的的控制的名称。例如，&quot;iespell&quot;代表的是iespell插件。</td>
+  </tr>
+</table>
+<br>
+<strong>返回：</strong>返回的该控制的HTML模板，如果控制的名字不能被识别则返回空串。
+<hr noshade>
+<span class="subtitle"><a name="cleanup"></a>函数 TinyMCE_<font color="#CC0000">&lt;plugin&gt;</font>_cleanup(type, content) （可选）</span>
+<p>当编辑器对内容进行清理时此函数被调用。</p>
+<strong>参数：<br>
+<br>
+</strong>
+<table cellpadding="3" cellspacing="1" bgcolor="#000000">
+  <tr>
+    <td bgcolor="#EEEEEE"><span class="subtitle">type</span></td>
+    <td bgcolor="#FFFFFF">清理的类型，insert_to_editor或者get_from_editor。<BR>
+    当向编辑器中传递内容时使用insert_to_editor；当从编辑器中获取内容时使用get_from_editor。</td>
+  </tr>
+  <tr>
+    <td width="150" bgcolor="#EEEEEE"><strong>content</strong></td>
+    <td bgcolor="#FFFFFF">要清理的HTML内容，该字符串包含了HTML代码。</td>
+  </tr>
+</table>
+<br>
+<strong>返回：</strong>清理后的HTML代码。<br>
+<hr noshade>
+<table width="100%" border="0" cellpadding="1" cellspacing="3" class="pagefooter">
+  <tr> 
+    <td>返回&nbsp;<a href="index.htm">内容提要</a></td>
+    <td align="right"><a href="#">顶部</a></td>
+  </tr>
+</table>
+<br>
+</BODY>
+</HTML>

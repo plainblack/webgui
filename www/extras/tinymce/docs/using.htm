@@ -83,9 +83,7 @@ optional and is not a requierd setting.<br>
   </tr>
   <tr> 
     <td width="150"><strong>[language]</strong></td>
-    <td>Language pack to use with TinyMCE, this should be the FN codes like se, 
-      uk, us and so forth and it's used to retrive the language packs located 
-      in &quot;langs&quot;. This setting defaults to &quot;uk&quot;.</td>
+    <td>Language pack to use with TinyMCE, this should be a <a href="http://www.loc.gov/standards/iso639-2/englangn.html">ISO-639-2</a> code and it's used to retrive the language packs located in &quot;langs&quot;. This setting defaults to &quot;en&quot;.</td>
   </tr>
   <tr> 
     <td width="150"><strong>[elements]</strong></td>
@@ -375,6 +373,22 @@ optional and is not a requierd setting.<br>
     <td><strong>[cleanup_callback]</strong></td>
     <td>Custom cleanup callback function, this enabled users to add custom cleanup logic to extend the build in one. This callback is called separatly from the default one, it doesn't replace the old one it just extends it. Check the <a href="themes.htm#cleanup">plugin cleanup</a> function for more details.</td>
   </tr>
+  <tr>
+    <td><strong>[nowrap]</strong></td>
+    <td>Sets the how content is to be word wrapped. This option is a true/false option and is disabled by default. </td>
+  </tr>
+  <tr>
+    <td><strong>[external_link_list_url]</strong></td>
+    <td>URL to a backend page (PHP,ASP,ASPX,JSP) that is to populate a array with links called tinyMCELinkList check the <a href="../examples/example_link_list.js">example_link_list.js</a> for a example format. This option enables you to better integrate TinyMCE with a backend system. </td>
+  </tr>
+  <tr>
+    <td><strong>[external_image_list_url]</strong></td>
+    <td>URL to a backend page (PHP,ASP,ASPX,JSP) that is to populate a array with links called tinyMCEImageList check the <a href="../examples/example_image_list.js">example_image_list.js</a> for a example format. This option enables you to better integrate TinyMCE with a backend system. </td>
+  </tr>
+  <tr>
+    <td><strong>[file_browser_callback]</strong></td>
+    <td>String containting the callback function to execute on all &quot;browse&quot; buttons. These buttons will apaear when this option is enabled. The callback function format is: fileBrowserCallBack(field_name, url, type). Where field_name is the form field to place browse result in and the url is the url that is to be changed and type is link/image or flash. </td>
+  </tr>
   <tr bgcolor="#CCCCCC"> 
     <td colspan="2"><strong>Advanced theme specific settings </strong></td>
   </tr>
@@ -524,34 +538,6 @@ Mozilla Midas spec.</a> But there are a some tinyMCE specific commands. <br>
   <tr>
     <td><strong>mceHelp</strong></td>
     <td>Opens the manual pages.</td>
-  </tr>
-  <tr>
-    <td><strong>mceInsertTable</strong></td>
-    <td>Inserts a new table at cursor location the default size is 2x2. If the value parameter is specified it should contain a name/value array, this array has the following options cols, rows, border, cellspacing, cellpadding. The default border is set to: 0. </td>
-  </tr>
-  <tr>
-    <td><strong>mceTableInsertRowBefore</strong></td>
-    <td>Inserts a row before/above the current cursor location. </td>
-  </tr>
-  <tr>
-    <td><strong>mceTableInsertRowAfter</strong></td>
-    <td>Inserts a row after/under the current cursor location. </td>
-  </tr>
-  <tr>
-    <td><strong>mceTableDeleteRow</strong></td>
-    <td>Deletes the  row at the current cursor location. </td>
-  </tr>
-  <tr>
-    <td><strong>mceTableInsertColBefore</strong></td>
-    <td>Inserts a column before the current cursor location.</td>
-  </tr>
-  <tr>
-    <td><strong>mceTableInsertColAfter</strong></td>
-    <td>Inserts a column after the current cursor location.</td>
-  </tr>
-  <tr>
-    <td><strong>mceTableDeleteCol</strong></td>
-    <td>Deletes the column at the current cursor location. </td>
   </tr>
   <tr>
     <td><strong>mceAddControl</strong></td>

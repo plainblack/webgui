@@ -30,6 +30,10 @@ body {
 	color: #0000FF
 }
 
+.tablerow1 {
+	background-color: #BBBBBB;
+}
+
 td {
 	font-family: Verdana, Arial, Helvetica, sans-serif;
 	font-size: 12px;
