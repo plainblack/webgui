@@ -1,6 +1,18 @@
 package WebGUI::Asset;
 
-#needs documentation
+=head1 LEGAL
+
+ -------------------------------------------------------------------
+  WebGUI is Copyright 2001-2004 Plain Black Corporation.
+ -------------------------------------------------------------------
+  Please read the legal notices (docs/legal.txt) and the license
+  (docs/license.txt) that came with this distribution before using
+  this software.
+ -------------------------------------------------------------------
+  http://www.plainblack.com                     info@plainblack.com
+ -------------------------------------------------------------------
+
+=cut
 
 use strict;
 use Tie::IxHash;
@@ -20,6 +32,109 @@ use WebGUI::SQL;
 use WebGUI::TabForm;
 use WebGUI::Utility;
 
+=head1 NAME
+
+Package WebGUI::Asset
+
+=head1 DESCRIPTION
+
+Package to manipulate items in WebGUI's asset system. Replaces Collateral.
+
+=head1 SYNOPSIS
+
+A lineage is a concatonated series of sequence numbers, each six digits long, that explain an asset's position in its familiy tree. Lineage describes who the asset's anscestors are, how many ancestors the asset has in its family tree (lineage length), and the asset's position (rank) amongst its siblings. In addition, lineage provides enough information about an asset to generate a list of its siblings and descendants quite easily.
+ 
+
+ use WebGUI::Asset;
+
+ addChild
+ canEdit
+ canView
+ cascadeLineage
+ cut
+ definition
+ demote
+ DESTROY
+ duplicate
+ fixUrl
+ formatRank
+ getAdminConsole
+ getAssetAdderLinks
+ getEditForm
+ getFirstChild
+ getIcon
+ getId
+ getIndexerParams
+ getLastChild
+ getLineage
+ getLineageLength
+ getName
+ getNextChildRank
+ getParent
+ getParentLineage
+ getRank
+ getUiLevel
+ getUrl
+ getValue
+ hasChildren
+ new
+ newByDynamicClass
+ newByLineage
+ newByPropertyHashRef
+ newByUrl
+ republish
+ paste
+ processPropertiesFromFormPost
+ promote
+ purge
+ setParent
+ setRank
+ setSize
+ swapRank
+ trash
+ update
+ view
+ www_add
+ www_copy
+ www_copyList
+ www_cut
+ www_cutList
+ www_delete
+ www_deleteList
+ www_demote
+ www_edit
+ www_editSave
+ www_editTree (NYI)
+ www_editTreeSave (NYI)
+ www_manageAssets
+ www_paste
+ www_pasteList
+ www_promote
+ www_setParent
+ www_setRank
+ www_view
+ 
+
+=head1 METHODS
+
+These methods are available from this class:
+
+=cut
+#-------------------------------------------------------------------
+
+=head2 addChild ( properties )
+
+Adds a child asset to a parent. 
+Creates a new AssetID for child.
+Makes the parent know that it has children. 
+Adds a new asset to the asset table.
+
+=head3 properties
+
+A hash reference containing a list of properties to associate with the child.
+The only used property value is "className"
+
+=cut
 
 sub addChild {
 	my $self = shift;
@@ -46,6 +161,20 @@ sub addChild {
 	return $newAsset;
 }
 
+#-------------------------------------------------------------------
+
+=head2 canEdit ( [userId] )
+
+Verifies group and user permissions to be able to edit asset.
+Returns 1 if owner is userId, otherwise returns the result checking if the 
+user is a member of the group that can edit.
+
+=head3 userId
+
+Unique hash identifier for a user. If not supplied, current user. 
+
+=cut
+
 sub canEdit {
 	my $self = shift;
 	my $userId = shift || $session{user}{userId};
@@ -54,6 +183,25 @@ sub canEdit {
 	}
         return WebGUI::Grouping::isInGroup($self->get("groupIdEdit"),$userId);
 }
+#-------------------------------------------------------------------
+
+=head2 canView ( [userId] )
+
+Verifies group and user permissions to be able to view asset.
+Returns 1 if user is owner of asset. 
+Returns 1 if within the visibility date range of the asset AND user
+in the View group of asset.
+Otherwise, returns the result of the canEdit.
+
+Only the owner and the editors can always see the asset, 
+regardless of time/date restrictions on the asset.
+
+=head3 userId
+
+Unique hash identifier for a user. If not specified, uses current userId.
+
+=cut
+
 
 sub canView {
 	my $self = shift;
@@ -69,6 +217,22 @@ sub canView {
         return $self->canEdit($userId);
 }
 
+#-------------------------------------------------------------------
+
+=head2 cascadeLineage ( newLineage [,oldLineage] )
+
+Updates lineage when asset is moved. Prepends newLineage to the lineage "stack."
+
+=head3 newLineage
+
+An asset descriptor that indicates the direct tree branch containing the asset.
+
+=head3 oldLineage
+
+If not present, asset's existing lineage is used.
+
+=cut
+
 sub cascadeLineage {
 	my $self = shift;
 	my $newLineage = shift;
@@ -76,6 +240,15 @@ sub cascadeLineage {
 	WebGUI::SQL->write("update asset set lineage=concat(".quote($newLineage).", substring(lineage from ".(length($oldLineage)+1).")) 
 		where lineage like ".quote($oldLineage.'%'));
 }
+
+#-------------------------------------------------------------------
+
+=head2 cut ( )
+
+Removes asset from lineage, places it in clipboard state. The "gap" in the
+lineage is changed in state to limbo.
+
+=cut
 
 sub cut {
 	my $self = shift;
@@ -86,6 +259,19 @@ sub cut {
 	$self->updateHistory("cut");
 	$self->{_properties}{state} = "clipboard";
 }
+ 
+#-------------------------------------------------------------------
+
+=head2 definition ( [ definition ] )
+
+Basic definition of an Asset. Properties, default values. 
+Returns the definition containing tableName,className,properties
+
+=head3 definition
+
+Additional information to include with the default definition.
+
+=cut
 
 sub definition {
         my $class = shift;
@@ -141,6 +327,14 @@ sub definition {
         return \@newDef;
 }
 
+#-------------------------------------------------------------------
+
+=head2 demote ( )
+
+Keeps the same rank of lineage, swaps with sister below.
+
+=cut
+
 sub demote {
 	my $self = shift;
 	my ($sisterLineage) = WebGUI::SQL->quickArray("select min(lineage) from asset 
@@ -152,6 +346,14 @@ sub demote {
 	}
 }
 
+#-------------------------------------------------------------------
+
+=head2 DESTROY ( )
+
+Completely remove an asset from existence.
+
+=cut
+
 sub DESTROY {
 	my $self = shift;
 	$self->{_parent}->DESTROY if (exists $self->{_parent});
@@ -159,6 +361,16 @@ sub DESTROY {
 	$self->{_lastChild}->DESTROY if (exists $self->{_lastChild});
 	$self = undef;
 }
+#-------------------------------------------------------------------
+
+=head2 duplicate ( )
+
+Duplicates an argument.
+
+Calls addChild with itself as an argument.
+Returns $newAsset;
+
+=cut
 
 sub duplicate {
 	my $self = shift;
@@ -166,6 +378,17 @@ sub duplicate {
 	return $newAsset;
 }
 
+#-------------------------------------------------------------------
+
+=head2 fixUrl ( string )
+
+Makes string into a URL, removing invalid characters. 
+
+=head3 string
+
+Any text string. Most likely will have been the Asset's name or title.
+
+=cut
 
 sub fixUrl {
 	my $self = shift;
@@ -185,11 +408,37 @@ sub fixUrl {
 	return $url;
 }
 
+#-------------------------------------------------------------------
+
+=head2 formatRank ( value )
+
+Returns the lineage as six digits with leading zeros.
+
+=head3 value
+
+An integer up to 6 digits. Primarily for lineage.
+
+=cut
+
 sub formatRank {
 	my $self = shift;
 	my $value = shift;
 	return sprintf("%06d",$value);
 }
+
+#-------------------------------------------------------------------
+
+=head2 get ( [propertyName] )
+
+Returns a reference to a list of properties (or specified property) of an Asset.
+
+=head3 propertyName
+
+Any of the values associated with the properties of an Asset.
+Default choices are "title", "menutTitle", "synopsis", "url", "groupIdEdit",
+"groupIdView", "ownerUserId", "startDate", "endDate",  and "assetSize".
+
+=cut
 
 sub get {
 	my $self = shift;
@@ -199,7 +448,6 @@ sub get {
 	}
 	return $self->{_properties};
 }
-
 
 
 
@@ -219,6 +467,21 @@ sub getAdminConsole {
 	$self->{_adminConsole}->setIcon($self->getIcon);
 	return $self->{_adminConsole};
 }
+
+#-------------------------------------------------------------------
+
+=head2 getAssetAdderLinks ( [addToUrl] )
+
+Returns an array that contains a label (name of the class of Asset) and url 
+(url link to function to add the class).
+
+=head3 addToUrl
+
+Any text to append to the getAssetAdderLinks URL. Usually another variable to
+pass in the url. If addToURL is specified, the character & and the text in 
+addToUrl is appended to the returned url.
+
+=cut
 
 sub getAssetAdderLinks {
 	my $self = shift;
@@ -306,6 +569,13 @@ sub getAssetManagerControl {
 	return $output;
 }
 
+#-------------------------------------------------------------------
+
+=head2 getEditForm ( )
+
+Creates a TabForm to edit parameters of an Asset.
+
+=cut
 
 sub getEditForm {
 	my $self = shift;
@@ -429,6 +699,13 @@ sub getEditForm {
 	return $tabform;
 }
 
+#-------------------------------------------------------------------
+
+=head2 getFirstChild ( )
+
+Returns the highest rank, top of the highest rank Asset under current Asset.
+
+=cut
 
 sub getFirstChild {
 	my $self = shift;
@@ -439,12 +716,32 @@ sub getFirstChild {
 	return $self->{_firstChild};
 }
 
+#-------------------------------------------------------------------
+
+=head2 getIcon ( [small] )
+
+Returns the icon located under extras/adminConsole/assets.gif
+
+=head3 small
+
+If this evaluates to True, then the smaller extras/adminConsole/small/assets.gif is returned.
+
+=cut
+
 sub getIcon {
 	my $self = shift;
 	my $small = shift;
 	return $session{config}{extrasURL}.'/adminConsole/small/assets.gif' if ($small);
 	return $session{config}{extrasURL}.'/adminConsole/assets.gif';
 }
+
+#-------------------------------------------------------------------
+
+=head2 getId ( )
+
+Returns the assetId of an Asset.
+
+=cut
 
 
 sub getId {
@@ -464,6 +761,13 @@ sub getIndexerParams {
         return {};
 }
 
+#-------------------------------------------------------------------
+
+=head2 getLastChild ( )
+
+Returns the lowest rank, bottom of the lowest rank Asset under current Asset.
+
+=cut
 
 sub getLastChild {
 	my $self = shift;
@@ -473,6 +777,22 @@ sub getLastChild {
 	}
 	return $self->{_lastChild};
 }
+
+#-------------------------------------------------------------------
+
+=head2 getLineage ( relatives,rules )
+
+Returns an array of lineages of relatives based upon rules.
+
+=head3 relatives
+
+Valid parameters are "siblings", "ancestors", "self", "descendants", "pedigree"
+
+=head3 rules
+
+A hash comprising limits to relative listing. Variables to rules include endingLineageLength, assetToPedigree, excludeClasses, returnQuickReadObjects, returnObjects.
+
+=cut
 
 sub getLineage {
 	my $self = shift;
@@ -566,14 +886,39 @@ sub getLineage {
 	return \@lineage;
 }
 
+#-------------------------------------------------------------------
+
+=head2 getLineageLength ( )
+
+Returns the number of Asset members in an Asset's lineage.
+
+=cut
+
+
 sub getLineageLength {
 	my $self = shift;
 	return length($self->get("lineage"))/6;
 }
 
+#-------------------------------------------------------------------
+
+=head2 getName ( )
+
+Returns the internationalization of the word "Asset".
+
+=cut
+
 sub getName {
 	return WebGUI::International::get("asset","Asset");
 }
+
+#-------------------------------------------------------------------
+
+=head2 getNextChildRank ( )
+
+Returns a formatted 6 digit number of the next rank a child will get.
+
+=cut
 
 sub getNextChildRank {
 	my $self = shift;
@@ -588,11 +933,31 @@ sub getNextChildRank {
 	return $self->formatRank($rank);
 }
 
+#-------------------------------------------------------------------
+
+=head2 getParent ( )
+
+Returns an asset hash of the parent of current Asset.
+
+=cut
+
 sub getParent {
 	my $self = shift;
 	$self->{_parent} = WebGUI::Asset->newByDynamicClass($self->get("parentId")) unless (exists $self->{_parent});
 	return $self->{_parent};
 }
+
+#-------------------------------------------------------------------
+
+=head2 getParentLineage ( [lineage] )
+
+Returns the Lineage of parent of Asset.
+
+=head3 lineage
+
+Optional lineage of another Asset.
+
+=cut
 
 sub getParentLineage {
 	my $self = shift;
@@ -601,6 +966,18 @@ sub getParentLineage {
 	return $parentLineage;
 }
 
+#-------------------------------------------------------------------
+
+=head2 getRank ( [lineage] )
+
+Returns the rank of current Asset.
+
+=head3 lineage
+
+Optional lineage of another Asset.
+
+=cut
+
 sub getRank {
 	my $self = shift;
 	my $lineage = shift || $self->get("lineage");
@@ -608,6 +985,14 @@ sub getRank {
 	my $rank = $rank - 0; # gets rid of preceeding 0s.
 	return $rank;
 }
+
+#-------------------------------------------------------------------
+
+=head2 getToolbar ( )
+
+Returns a toolbar with a set of icons that hyperlink to functions that delete, edit, promote, demote, cut, and copy.
+
+=cut
 
 sub getToolbar {
 	my $self = shift;
@@ -625,10 +1010,32 @@ sub getToolbar {
 	return $toolbar;
 }
 
+#-------------------------------------------------------------------
+
+=head2 getUiLevel ( )
+
+Always returns zero.
+
+=cut
+
 sub getUiLevel {
 	my $self = shift;
 	return 0;
 }
+
+#-------------------------------------------------------------------
+
+=head2 getUrl ( params )
+
+Returns a URL of Asset based upon WebGUI's gateway script.
+
+=head3 params
+
+Name value pairs to add to the URL in the form of:
+
+ name1=value1&name2=value2&name3=value3
+
+=cut
 
 sub getUrl {
 	my $self = shift;
@@ -636,21 +1043,41 @@ sub getUrl {
 	return WebGUI::URL::gateway($self->get("url"),$params);
 }
 
+#-------------------------------------------------------------------
+
+=head2 getValue ( key )
+
+Returns the value of anything it can find with an index of key, or else it returns undefined.
+
+=head3 key
+
+A form variable, an asset property name, or a propertyDefinition.
+
+=cut
+
 sub getValue {
 	my $self = shift;
 	my $key = shift;
 	if (defined $key) {
-		unless (exists $self->{_propertyDefinitions}) { # check to see if the defintions have been merged and cached
+		unless (exists $self->{_propertyDefinitions}) { # check to see if the definitions have been merged and cached
 			my %properties;
 			foreach my $definition (@{$self->definition}) {
 				%properties = (%properties, %{$definition->{properties}});
 			}
 			$self->{_propertyDefinitions} = \%properties;
 		}
-		return $session{form}{$key} || $self->get($key) || $self->{_propertiyDefinitions}{$key}{defaultValue};
+		return $session{form}{$key} || $self->get($key) || $self->{_propertyDefinitions}{$key}{defaultValue};
 	}
 	return undef;
 }
+
+#-------------------------------------------------------------------
+
+=head2 hasChildren ( )
+
+Returns 1 or the count of Assets with the same parentId as current Asset. 
+
+=cut
 
 sub hasChildren {
 	my $self = shift;
@@ -667,6 +1094,26 @@ sub hasChildren {
 	return $self->{_hasChildren};
 }
 
+#-------------------------------------------------------------------
+
+=head2 new ( class,assetId||"new" [,overrideProperties] )
+
+Constructor. This does not create an asset. 
+
+=head class
+
+A hash of a class.
+
+=head3 assetId
+
+The assetId of the asset you're creating an object reference for. Must not be blank. If specified as "new" then the object properties returns an assetId of new.
+
+=head3 overrideProperties
+
+A hash of properties to set besides defaults.
+
+=cut
+
 sub new {
 	my $class = shift;
 	my $assetId = shift;
@@ -676,7 +1123,7 @@ sub new {
 		$properties = $overrideProperties;
 		$properties->{assetId} = "new";
 		$properties->{className} = $class;
-	} else {
+	} else { 
 		my $definitions = $class->definition;
 		my @definitionsReversed = reverse(@{$definitions});
 		shift(@definitionsReversed);
@@ -704,6 +1151,22 @@ sub new {
 	}	
 	return undef;
 }
+
+#-------------------------------------------------------------------
+
+=head2 newByDynamicClass ( class,assetId [,className,overrideProperties] )
+
+Constructor. This does not create an asset. 
+
+=head3 assetId
+
+The assetId of the asset you're creating an object reference for. Must not be blank. If specified as "new" then the object properties returns an assetId of new.
+
+=head3 overrideProperties
+
+Any properties to set besides defaults.
+
+=cut
 
 sub newByDynamicClass {
 	my $class = shift;
