@@ -53,7 +53,9 @@ sub www_viewActiveSessions {
 	my ($output, $p, @row, $i, $sth, %data);
 	tie %data, 'Tie::CPHash';
         $output = '<h1>'.WebGUI::International::get(425).'</h1>';
-	$sth = WebGUI::SQL->read("select * from users,userSession where users.userId=userSession.userId");
+	$sth = WebGUI::SQL->read("select users.username,users.userId,userSession.sessionId,userSession.expires,
+		userSession.lastPageView,userSession.lastIP from users,userSession where users.userId=userSession.userId
+		and users.userId<>1 order by users.username,userSession.lastPageView desc");
 	while (%data = $sth->hash) {
                 $row[$i] = '<tr class="tableData"><td>'.$data{username}.' ('.$data{userId}.')</td>';
                 $row[$i] .= '<td>'.$data{sessionId}.'</td>';
