@@ -25,7 +25,6 @@ QnD INSTALL INSTRUCTIONS:
    SOAP::Lite
    Cache::Cache 
    Time::HiRes
-   XML::Simple
    Image::Magick (optional)
  
 

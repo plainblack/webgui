@@ -62,9 +62,6 @@ save you many hours of grief.
 		PerlAccessHandler WebGUI::UploadsAccessHandler
 	</Location>
 
- * You need to install the XML::Simple perl module which is ued in the
-	new commerce system and will eventually be used in other systems.
-
 
 6.2.8
 --------------------------------------------------------------------
