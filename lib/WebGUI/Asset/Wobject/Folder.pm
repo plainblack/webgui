@@ -145,7 +145,9 @@ sub view {
 			push(@{$vars{"subfolder_loop"}}, {
 				id => $child->getId,
 				url => $child->getUrl,
-				title => $child->get("title")
+				title => $child->get("title"),
+				"icon.small"=>$child->getIcon(1),
+				"icon.big"=>$child->getIcon
 				});
 		} else {
 			my $isImage = (ref $child =~ /^WebGUI::Asset::File::Image/);
