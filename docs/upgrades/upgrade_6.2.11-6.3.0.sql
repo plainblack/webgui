@@ -247,5 +247,81 @@ drop table pageStatistics;
 delete from settings where name='snippetPreviewLength';
 delete from incrementer where incrementerId in ('collateralFolderId','themeId','themeComponentId');
 
+create table Collaboration (
+  assetId varchar(22) not null primary key,
+  postGroupId varchar(22) not null default '2',
+  moderateGroupId varchar(22) not null default '4',
+  moderatePosts int not null default 0,
+  karmaPerPost int not null default 0,
+  collaborationTemplateId varchar(22) not null,
+  threadTemplateId varchar(22) not null,
+  postTemplateId varchar(22) not null,
+  postFormTemplateId varchar(22) not null,
+  postPreviewTemplateId varchar(22) not null,
+  searchTemplateId varchar(22) not null,
+  notificationTemplateId varchar(22) not null,
+  sortBy varchar(35) not null default 'dateUpdated',
+  sortOrder varchar(4) not null default 'desc',
+  usePreview int not null default 1,
+  addEditStampToPosts int not null default 0,
+  editTimeout int not null default 3600,
+  attachmentsPerPost int not null default 0,
+  allowRichEdit int not null default 1,
+  filterCode varchar(30) not null default 'javascript',
+  useContentFilter int not null default 1,
+  threads int not null default 0,
+  views int not null default 0,
+  replies int not null default 0,
+  rating int not null default 0,
+  lastPostId varchar(22),
+  lastPostDate bigint,
+  archiveAfter int not null default 31536000,
+  postsPerPage int not null default 10,
+  threadsPerPage int not null default 30,
+  subscriptionGroupId varchar(22)
+);
 
+create table Thread (
+  assetId varchar(22) not null primary key,
+  views int not null default 0,
+  replies int not null default 0,
+  lastPostId varchar(22) not null default 0,
+  lastPostDate bigint,
+  isLocked int not null default 0,
+  isSticky int not null default 0,
+  status varchar(30) not null default 'approved',
+  rating int not null default 0
+);
 
+create table Post (
+  assetId varchar(22) not null primary key,
+  threadId varchar(22) not null,
+  dateSubmitted bigint,
+  dateUpdated bigint,
+  username varchar(30),
+  content mediumtext,
+  status varchar(30) not null default 'approved',
+  views int not null default 0,
+  contentType varchar(35) not null default 'mixed',
+  userDefined1 text,
+  userDefined2 text,
+  userDefined3 text,
+  userDefined4 text,
+  userDefined5 text,
+  rating int not null default 0
+);
+
+create table Post_rating (
+  assetId varchar(22) not null,
+  userId varchar(22) not null,
+  ipAddress varchar(15) not null,
+  dateOfRating bigint,
+  rating int not null default 0
+);
+
+create table Post_read (
+ postId varchar(22) not null,
+ threadId varchar(22) not null,
+ userId varchar(22) not null,
+ readDate bigint
+);

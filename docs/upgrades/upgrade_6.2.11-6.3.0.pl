@@ -98,6 +98,7 @@ WebGUI::SQL->write("alter table Product_related add assetId varchar(22) not null
 WebGUI::SQL->write("alter table Product_related add relatedAssetId varchar(22) not null");
 WebGUI::SQL->write("alter table Product_related add primary key (assetId,relatedAssetId)");
 WebGUI::SQL->write("alter table WobjectProxy add column description mediumtext");
+WebGUI::SQL->write("alter table forum add assetId varchar(22) not null");
 
 
 
@@ -204,6 +205,8 @@ WebGUI::SQL->write("alter table Product_related drop column wobjectId");
 WebGUI::SQL->write("alter table Product_specification drop column wobjectId");
 WebGUI::SQL->write("alter table Product_related drop column RelatedWobjectId");
 WebGUI::SQL->write("alter table Product_accessory drop column AccessoryWobjectId");
+WebGUI::SQL->write("alter table forum drop column forumId");
+WebGUI::SQL->write("alter table forum drop column groupToView");
 
 
 # start migrating non-wobject stuff into assets
