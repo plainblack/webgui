@@ -195,6 +195,21 @@ sub getBarTraditional {
 
 #-------------------------------------------------------------------
 
+=head2 getColumnNames ( )
+
+Returns an array containing the column names
+
+=cut
+
+sub getColumnNames {
+	if(ref $_[0]->{_columnNames} eq 'ARRAY') {
+		return @{$_[0]->{_columnNames}};
+	}
+}
+
+
+#-------------------------------------------------------------------
+
 =head2 getFirstPageLink ( )
 
 Returns a link to the first page's data.
@@ -493,6 +508,7 @@ sub setDataByQuery {
 		$sth = WebGUI::SQL->read($sql,$dbh);
 	}
 	$self->{_totalRows} = $sth->rows;
+	$self->{_columnNames} = [ $sth->getColumnNames ];
 	my $pageCount = 1;
 	while (my $data = $sth->hashRef) {
 		$rowCount++;

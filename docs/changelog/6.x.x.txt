@@ -1,3 +1,7 @@
+6.3.0
+ - bugfix [ 1045114 ] Columns randomly ordered in SQLReport (Len Kranendonk ,
+   tnx brother for reporting)
+
 6.2.7
  - Expanded upon the help for URL extensions.
  - Added a workaround to a bug in Time::HiRes on windows.

@@ -140,7 +140,7 @@ sub www_view {
 					my %row;
 					my $colnum = 1;
 					my @fields;
-					foreach my $name (keys %{$data}) {
+					foreach my $name ($p->getColumnNames) {
 						if ($first) {
 							push(@columns,{
 								'column.number'=>$colnum,
