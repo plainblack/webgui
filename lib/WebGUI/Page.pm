@@ -493,7 +493,7 @@ sub getPage {
 
 	# Fetch the correct pagetree from cache
 	$cache = WebGUI::Cache->new('root-0','PageTree-'.$session{config}{configFile});
-	$tree = $cache->getDataStructure;
+	$tree = $cache->get;
 	
 	# If the tree is cached then use it.
 	if (defined $tree) {
@@ -649,7 +649,7 @@ sub recachePageTree {
 
 	# Cache complete forrest. 
 	$cache = WebGUI::Cache->new('root-0','PageTree-'.$session{config}{configFile});
-	$cache->setDataStructure($forrest);
+	$cache->set($forrest);
 	
 	return "";
 }
