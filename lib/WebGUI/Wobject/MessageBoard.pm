@@ -108,7 +108,7 @@ sub www_view {
 		<td class="tableHeader">'.WebGUI::International::get(20,$namespace).'</td></tr>';
 	$sth = WebGUI::SQL->read("select messageId,subject,username,dateOfPost,userId,views,status
 		from discussion where wobjectId=".$_[0]->get("wobjectId")." and pid=0 
-		and (status='Approved' or userId=$session{user}{userId}) order by messageId desc");
+		and (status='Approved' or userId=$session{user}{userId}) order by dateOfPost desc");
 	while (%data = $sth->hash) {
 		if ($i >= ($_[0]->get("messagesPerPage")*$pn) && $i < ($_[0]->get("messagesPerPage")*($pn+1))) {
 			@last = WebGUI::SQL->quickArray("select messageId,dateOfPost,username,subject,userId 
