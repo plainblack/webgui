@@ -968,13 +968,13 @@ sub getEditForm {
                 );
         $tabform->getTab("meta")->textarea(
                 -name=>"extraHeadTags",
-                -label=>"Extra Head Tags",
+		-label=>WebGUI::International::get("extra head tags","Asset"),
                 -value=>$self->get("extraHeadTags"),
                 -uiLevel=>5
                 );
 	$tabform->getTab("meta")->yesNo(
 		-name=>"isPackage",
-		-label=>"Make available as package?",
+		-label=>WebGUI::International::get("make package","Asset"),
 		-value=>$self->getValue("isPackage"),
 		-uiLevel=>7
 		);

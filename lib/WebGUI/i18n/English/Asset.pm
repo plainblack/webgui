@@ -96,9 +96,21 @@ Choose which group can view this page. If you want both visitors and registered 
 Choose the group that can edit this page. The group assigned editing rights can also always view the page.
 </p>
 
+<p>
+<b>Extra Head Tags</b><br>
+These tags will be added to the &lt;HEAD&gt; section of each page that the asset appears on.
+</p>
+
+<p>
+<b>Make available as package?</b><br>
+Many WebGUI tasks are very repetitive.  Automating such tasks in Webgui, such as
+creating an Asset, or sets of Assets, is done by creating a package that can be reused
+through the site.  Check yes if you want this Asset to be available as a package.
+</p>
+
         |,
         context => q|Describing the form to add or edit an Asset.|,
-        lastUpdated => 1104622720,
+        lastUpdated => 1106608067,
   },
 
     'asset fields title' => {
@@ -161,6 +173,16 @@ This is the snippet.  Either type it in or copy and paste it into the form field
 |,
                 context => 'Describing snippets and its sole field.',
         	lastUpdated => 1104630518,
+	},
+
+	'extra head tags' => {
+		message => q|Extra HEAD tags|,
+        	lastUpdated => 1106608105,
+	},
+
+	'create package' => {
+		message => q|Make available as package?|,
+        	lastUpdated => 1106608162,
 	},
 
 	'redirect url' => {
