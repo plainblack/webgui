@@ -128,8 +128,12 @@ sub _traditionalView {
         }
         $sth->finish;
         $output .= '<table width="100%" cellpadding=2 cellspacing=1 border=0><tr>'.
-                '<td align="right" class="tableMenu"><a href="'.WebGUI::URL::page('func=editSubmission&sid=new&wid='.
-                $_[0]->get("wobjectId")).'">'.WebGUI::International::get(20,$namespace).'</a> &middot; <a href="'
+                '<td align="right" class="tableMenu">';
+	if (WebGUI::Privilege::isInGroup($_[0]->get("groupToContribute"))) {
+		$output .= '<a href="'.WebGUI::URL::page('func=editSubmission&sid=new&wid='.
+                $_[0]->get("wobjectId")).'">'.WebGUI::International::get(20,$namespace).'</a> &middot; ';
+	}
+	$output .= '<a href="'
 		.WebGUI::URL::page('func=search&wid='.$_[0]->get("wobjectId")).'">'
 		.WebGUI::International::get(364).'</a></td></tr></table>';
         $p = WebGUI::Paginator->new(WebGUI::URL::page(),\@row,$_[0]->get("submissionsPerPage"));
@@ -428,7 +432,9 @@ sub www_editSubmission {
 		$submission{convertCarriageReturns} = 1;
 		$submission{userId} = $session{user}{userId};
 	}
-        if ($submission{userId} == $session{user}{userId} || WebGUI::Privilege::isInGroup($_[0]->get("groupToApprove"))) {
+        if (WebGUI::Privilege::isInGroup($_[0]->get("groupToContribute")) 
+	 || $submission{userId} == $session{user}{userId} 
+	 || WebGUI::Privilege::isInGroup($_[0]->get("groupToApprove"))) {
                 $output = '<h1>'.WebGUI::International::get(19,$namespace).'</h1>';
 		$f = WebGUI::HTMLForm->new;
                 $f->hidden("wid",$session{form}{wid});
@@ -463,7 +469,9 @@ sub www_editSubmission {
 sub www_editSubmissionSave {
 	my ($sqlAdd,$owner,$image,$attachment,$title);
 	($owner) = WebGUI::SQL->quickArray("select userId from UserSubmission_submission where submissionId='$session{form}{sid}'");
-        if ($owner == $session{user}{userId} || $session{form}{sid} eq "new" || WebGUI::Privilege::isInGroup($_[0]->get("groupToApprove"))) {
+        if ($owner == $session{user}{userId} 
+	 || ($session{form}{sid} eq "new" && WebGUI::Privilege::isInGroup($_[0]->get("groupToContribute"))) 
+	 || WebGUI::Privilege::isInGroup($_[0]->get("groupToApprove"))) {
 		if ($session{form}{sid} eq "new") {
 			$session{form}{sid} = getNextId("submissionId");
 			WebGUI::SQL->write("insert into UserSubmission_submission (wobjectId,submissionId,userId,username) 

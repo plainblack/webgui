@@ -203,9 +203,13 @@ sub www_view {
         $html .= $_[0]->description;
 	$html = $_[0]->processMacros($html);
 	$html .= '<table width="100%" cellpadding=2 cellspacing=1 border=0><tr>'.
-		'<td align="right" valign="bottom" class="tableMenu"><a href="'.
+		'<td align="right" valign="bottom" class="tableMenu">';
+	if (WebGUI::Privilege::isInGroup($_[0]->get("groupToPost"))) {
+		$html .= '<a href="'.
 		WebGUI::URL::page('func=post&mid=new&wid='.$_[0]->get("wobjectId")).'">'.
-		WebGUI::International::get(17,$namespace).'</a> &middot; <a href="'.WebGUI::URL::page('func=search&wid='.$_[0]->get("wobjectId")).'">'
+		WebGUI::International::get(17,$namespace).'</a> &middot; ';
+	}
+	$html .= '<a href="'.WebGUI::URL::page('func=search&wid='.$_[0]->get("wobjectId")).'">'
 			.WebGUI::International::get(364).'</a></td></tr></table>';
 	$html .= '<table border=0 cellpadding=2 cellspacing=1 width="100%">';
 	$html .= '<tr><td class="tableHeader">'.WebGUI::International::get(229).'</td>
