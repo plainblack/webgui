@@ -61,7 +61,7 @@ sub _create {
 	my ($userId);
 	$userId = getNextId("userId");
 	WebGUI::SQL->write("insert into users (userId,dateCreated) values ($userId,".time().")");
-	WebGUI::Grouping::addUsersToGroups([$userId],[2,7[2,7]]);
+	WebGUI::Grouping::addUsersToGroups([$userId],[2,7]]);
         return $userId;
 }
 
