@@ -629,7 +629,7 @@ sub www_view {
 		}
 		$sth->finish;
 		unless ($flag) {
-			$output .= '<tr><td class="tableData" colspan="3">'.
+			$head .= '<tr><td class="tableData" colspan="3">'.
 				WebGUI::International::get(19,$namespace).'</td></tr>';
 		}
 		$p = WebGUI::Paginator->new($url,\@row,$data{paginateAfter});

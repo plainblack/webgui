@@ -73,7 +73,7 @@ sub www_search {
 			$p = WebGUI::Paginator->new(WebGUI::URL::page('op=search'),\@row,20);
 			$output .= WebGUI::International::get(365).'<p><ol>';
 			$output .= $p->getPage($session{form}{pn});
-			$output .= '</ol>'.$p->getBarTradiational($session{form}{pn});
+			$output .= '</ol>'.$p->getBarTraditional($session{form}{pn});
 		} else {
 			$output .= WebGUI::International::get(366);
 		}
