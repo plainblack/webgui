@@ -132,6 +132,19 @@ while (my ($namespace) = $sth->array) {
 	}
 }
 $sth->finish;
+WebGUI::SQL->write("alter table WobjectProxy add column shortcutToAssetId varchar(22) not null");
+my $sth = WebGUI::SQL->read("select proxiedWobjectId from WobjectProxy");
+while (my ($wobjectId) = $sth->array) {
+	my ($assetId) = WebGUI::SQL->quickArray("select assetId from wobject where wobjectId=".quote($wobjectId));
+	WebGUI::SQL->write("update WobjectProxy set assetId=".quote($assetId)." where wobjectId=".quote($wobjectId));
+}
+$sth->finish;
+WebGUI::SQL->write("alter table WobjectProxy drop proxiedWobjectId");
+WebGUI::SQL->write("alter table WobjectProxy change proxiedTemplateId overrideTemplateId varchar(22) not null");
+WebGUI::SQL->write("alter table WobjectProxy change proxyByCriteria shortcutByCriteria int not null");
+WebGUI::SQL->write("alter table WobjectProxy change proxyCriteria shortcutCriteria text not null");
+WebGUI::SQL->write("alter table WobjectProxy rename Shortcut");
+WebGUI::SQL->write("update asset set className='WebGUI::Asset::Shortcut' where className='WebGUI::Asset::Wobject::WobjectShortcut'");
 WebGUI::SQL->write("alter table wobject drop column wobjectId");
 WebGUI::SQL->write("alter table wobject add primary key (assetId)");
 WebGUI::SQL->write("alter table wobject drop column templateId");
@@ -184,9 +197,6 @@ WebGUI::SQL->write("alter table USS_submission drop column pageId");
 WebGUI::SQL->write("alter table USS_submission drop column content");
 WebGUI::SQL->write("alter table USS_submission drop column image");
 WebGUI::SQL->write("alter table USS_submission drop column attachment");
-
-# Frank Dillon 20050201 --
-# Converting Product Wobjects to Assets. --
 WebGUI::SQL->write("alter table Product_accessory drop column wobjectId");
 WebGUI::SQL->write("alter table Product_benefit drop column wobjectId");
 WebGUI::SQL->write("alter table Product_feature drop column wobjectId");
@@ -531,7 +541,7 @@ WebGUI::SQL->write("alter table template drop primary key");
 WebGUI::SQL->write("alter table template drop column templateId");
 WebGUI::SQL->write("alter table template drop column name");
 WebGUI::SQL->write("alter table template add primary key (assetId)");
-my @wobjectTypes = qw(Article Poll Survey USS WSClient DataForm Layout EventsCalendar Navigation HttpProxy IndexedSearch MessageBoard Product SQLReport SyndicatedContent WobjectProxy);
+my @wobjectTypes = qw(Article Poll Survey USS WSClient DataForm Layout EventsCalendar Navigation HttpProxy IndexedSearch MessageBoard Product SQLReport SyndicatedContent Shortcut);
 my @allWobjectTypes = (@wobjectTypes,@otherWobjects);
 print "\t\tMigrating wobject templates to new IDs\n" unless ($quiet);
 foreach my $type (@allWobjectTypes) {
@@ -575,7 +585,16 @@ while (my ($assetId, $subId, $formId) = $sth->array) {
 		submissionFormTemplateId=>$templateCache{"USS/SubmissionForm"}{$formId}
 		});
 }
+print "\t\tMigrating Shortcut templates to new IDs\n" unless ($quiet);
+my $sth = WebGUI::SQL->read("select assetId, proxiedNamespace overrideTemplateId from Shortcut");
+while (my ($assetId, $namespace, $tid) = $sth->array) {
+	WebGUI::SQL->setRow("Shortcut","assetId",{
+		assetId=>$assetId,
+		overrideTemplateId=>$templateCache{$namespace}{$tid}
+		});
+}
 $sth->finish;
+WebGUI::SQL->write("alter table Shortcut drop column proxiedNamespace");
 
 
 
@@ -655,6 +674,10 @@ print "\tDeleting files which are no longer used.\n" unless ($quiet);
 #rmtree("../../lib/WebGUI/Persistent");
 #rmtree("../../lib/Tree");
 #rmtree("../../lib/DBIx/Tree");
+#unlink("../../lib/WebGUI/Help/WobjectProxy.pm");
+#unlink("../../lib/WebGUI/i18n/English/WobjectProxy.pm");
+#unlink("../../lib/WebGUI/Wobject/WobjectProxy.pm");
+#rmtree("../../www/extras/wobject/WobjectProxy");
 
 
 
