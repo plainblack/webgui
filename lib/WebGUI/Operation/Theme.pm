@@ -29,6 +29,7 @@ use WebGUI::Session;
 use WebGUI::SQL;
 use WebGUI::URL;
 use WebGUI::Utility;
+use WebGUI::FormProcessor;
 
 #-------------------------------------------------------------------
 sub _getComponentTypes {
@@ -122,18 +123,6 @@ sub www_addThemeComponentSave {
 }
 
 #-------------------------------------------------------------------
-sub www_deleteTheme {
-        return WebGUI::Privilege::insufficient unless (WebGUI::Grouping::isInGroup(9));
-        my $output = WebGUI::International::get(907).'<p>';
-        $output .= '<div align="center"><a href="'.
-		WebGUI::URL::page('op=deleteThemeConfirm&themeId='.$session{form}{themeId})
-		.'">'.WebGUI::International::get(44).'</a>';
-        $output .= '&nbsp;&nbsp;&nbsp;&nbsp;<a href="'.WebGUI::URL::page('op=listThemes').
-		'">'.WebGUI::International::get(45).'</a></div>';
-        return _submenu($output,'42',"theme delete");
-}
-
-#-------------------------------------------------------------------
 sub www_deleteThemeConfirm {
         return WebGUI::Privilege::insufficient unless (WebGUI::Grouping::isInGroup(9));
 	my $theme = WebGUI::SQL->quickHashRef("select * from theme where themeId=".quote($session{form}{themeId}));
@@ -155,18 +144,6 @@ sub www_deleteThemeConfirm {
         WebGUI::SQL->write("delete from theme where themeId=".quote($session{form}{themeId}));
         WebGUI::SQL->write("delete from themeComponent where themeId=".quote($session{form}{themeId}));
         return www_listThemes();
-}
-
-#-------------------------------------------------------------------
-sub www_deleteThemeComponent {
-        return WebGUI::Privilege::insufficient unless (WebGUI::Grouping::isInGroup(9));
-        my $output = WebGUI::International::get(908).'<p>';
-        $output .= '<div align="center"><a href="'.
-                WebGUI::URL::page('op=deleteThemeComponentConfirm&themeId='.$session{form}{themeId})
-                .'&themeComponentId='.$session{form}{themeComponentId}.'">'.WebGUI::International::get(44).'</a>';
-        $output .= '&nbsp;&nbsp;&nbsp;&nbsp;<a href="'.WebGUI::URL::page('op=listThemes').
-                '">'.WebGUI::International::get(45).'</a></div>';
-        return _submenu($output,'42');
 }
 
 #-------------------------------------------------------------------
@@ -215,8 +192,8 @@ sub www_editTheme {
 				and themeComponent.themeId=".quote($session{form}{themeId})." order by name";
 		my $sth = WebGUI::SQL->read($query);
 		while (my $component = $sth->hashRef) {
-			$output .= deleteIcon('op=deleteThemeComponent&themeId='.$session{form}{themeId}
-				.'&themeComponentId='.$component->{componentId})
+			$output .= deleteIcon('op=deleteThemeComponentConfirm&themeId='.$session{form}{themeId}
+				.'&themeComponentId='.$component->{componentId},'',WebGUI::International::get(908))
 				.' '.$component->{name}.' ('.$componentTypes->{$component->{componentType}}.')<br>';
 		}
 		$sth->finish;
@@ -226,8 +203,8 @@ sub www_editTheme {
 			my ($templateId,$namespace) = split("_",$data->{id});
 			my ($name) = WebGUI::SQL->quickArray("select name from template where
 				templateId=".quote($templateId)." and namespace=".quote($namespace));
-			$output .= deleteIcon('op=deleteThemeComponent&themeId='.$session{form}{themeId}
-				.'&themeComponentId='.$data->{themeComponentId})
+			$output .= deleteIcon('op=deleteThemeComponentConfirm&themeId='.$session{form}{themeId}
+				.'&themeComponentId='.$data->{themeComponentId},'',WebGUI::International::get(908))
 				.' '.$name.' ('.$componentTypes->{template}.'/'.$namespace.')<br>';
 		}
 		$sth->finish;
@@ -416,7 +393,7 @@ sub www_listThemes {
         my ($output,@data, @row, $i, $p);
         my $sth = WebGUI::SQL->read("select themeId,name,original from theme order by name");
         while (@data = $sth->array) {
-                $row[$i] = '<tr><td valign="top" class="tableData">'.deleteIcon('op=deleteTheme&themeId='.$data[0]);
+                $row[$i] = '<tr><td valign="top" class="tableData">'.deleteIcon('op=deleteThemeConfirm&themeId='.$data[0],'',WebGUI::International::get(907));
 		if ($data[2]) { 
 			$row[$i] .= editIcon('op=editTheme&themeId='.$data[0]);
 		} else {

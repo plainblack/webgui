@@ -74,25 +74,6 @@ sub www_copyTemplate {
 }
 
 #-------------------------------------------------------------------
-sub www_deleteTemplate {
-        my ($output);
-        if ($session{form}{tid} =~ /^\d+$/ && $session{form}{tid} < 1000 && $session{form}{tid} > 0) {
-		return _submenu(WebGUI::Privilege::vitalComponent());
-        } elsif (WebGUI::Grouping::isInGroup(8)) {
-                $output .= WebGUI::International::get(502).'<p>';
-                $output .= '<div align="center"><a href="'.
-			WebGUI::URL::page('op=deleteTemplateConfirm&tid='.$session{form}{tid}.'&namespace='
-			.$session{form}{namespace})
-			.'">'.WebGUI::International::get(44).'</a>';
-                $output .= '&nbsp;&nbsp;&nbsp;&nbsp;<a href="'.WebGUI::URL::page('op=listTemplates&namespace='
-			.$session{form}{namespace}).'">'.WebGUI::International::get(45).'</a></div>';
-                return _submenu($output,'42',"template delete");
-        } else {
-                return WebGUI::Privilege::adminOnly();
-        }
-}
-
-#-------------------------------------------------------------------
 sub www_deleteTemplateConfirm {
 	my ($a, $pageId);
         if ($session{form}{tid} =~ /^\d+$/ && $session{form}{tid} < 1000 && $session{form}{tid} > 0) {
@@ -186,7 +167,7 @@ sub www_listTemplates {
                 $sth = WebGUI::SQL->read("select templateId,name,namespace from template where isEditable=1 $where order by namespace,name");
                 while (@data = $sth->array) {
                         $row[$i] = '<tr><td valign="top" class="tableData">'
-				.deleteIcon('op=deleteTemplate&tid='.$data[0].'&namespace='.$data[2])
+				.deleteIcon('op=deleteTemplateConfirm&tid='.$data[0].'&namespace='.$data[2],'',WebGUI::International::get(502))
 				.editIcon('op=editTemplate&tid='.$data[0].'&namespace='.$data[2])
 				.copyIcon('op=copyTemplate&tid='.$data[0].'&namespace='.$data[2])
 				.'</td>';
