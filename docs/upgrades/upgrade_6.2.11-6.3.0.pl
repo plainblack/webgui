@@ -259,6 +259,8 @@ WebGUI::SQL->write("delete from EventsCalendar_event where assetId is null or as
 WebGUI::SQL->write("alter table EventsCalendar_event add primary key (assetId)");
 WebGUI::SQL->write("alter table EventsCalendar_event drop column name");
 WebGUI::SQL->write("alter table EventsCalendar_event drop column wobjectId");
+WebGUI::SQL->write("alter table EventsCalendar_event drop column EventsCalendar_eventId");
+
 
 WebGUI::SQL->write("drop table forum");
 WebGUI::SQL->write("drop table forumRead");
@@ -1131,6 +1133,15 @@ while (my ($assetId, $namespace, $tid) = $sth->array) {
 		});
 }
 $sth->finish;
+print "\t\tMigrating Event templates to new IDs\n" unless ($quiet);
+my $sth = WebGUI::SQL->read("select assetId, templateId from EventsCalendar_event");
+while (my ($assetId, $tid) = $sth->array) {
+	WebGUI::SQL->setRow("EventsCalendar_event","assetId",{
+		assetId=>$assetId,
+		templateId=>$templateCache{"EventsCalendar/Event"}{$tid}
+		});
+}
+$sth->finish;
 WebGUI::SQL->write("alter table Shortcut drop column proxiedNamespace");
 WebGUI::SQL->write("alter table Shortcut change templateId templateId varchar(22) not null");
 WebGUI::SQL->write("update Shortcut set templateId='PBtmpl0000000000000140'");
@@ -1770,29 +1781,25 @@ sub walkTree {
 				}
 			} elsif ($wobject->{namespace} eq "EventsCalendar") {
 				print "\t\t\tMigrating Events Calendar ".$wobject->{wobjectId}." and its Events\n" unless ($quiet);
-				my $wobjectId = $namespace->{wobjectId};
-				my $sth = WebGUI::SQL->read("select * from EventsCalendar_event where wobjectId=".quote($wobjectId));
-				my $calendar = WebGUI::Asset->newByDynamicClass($wobjectId,"WebGUI::Asset::Wobject::EventsCalendar");
-				# This is definitely not finished!!!!!!   nor even tested!!!!   yikes!!!
-#				while (my $event = $sth->hashRef) {
-#					#Migrate each event to an asset.
-#					my $eventObject = $calendar->addChild({
-#						className=>'WebGUI::Asset::Event',
-#						title=>$event->{name},
-#						menuTitle=>$event->{name},
-#						isHidden=>1,
-#						newWindow=>0,
-#						startDate=>$calendar->getValue("startDate"),
-#						endDate=>$calendar->getValue("endDate"),
-#						ownerUserId=>$calendar->getValue("ownerUserId"),
-#						groupIdEdit=>$calendar->getValue("groupIdEdit"),
-#						groupIdView=>$calendar->getValue("groupIdView"),
-#						url=>$event->fixUrl($calendar->getUrl().'/'.$namespace->{name}),
-#						templateId=>$calendar->getValue("eventTemplateId")
-#					});
-#					WebGUI::SQL->write("update EventsCalendar_event set assetId=".quote($eventObject->getId)." where EventsCalendar_eventId=".quote($event->{EventsCalendar_eventId}));
-					# I'm sure there's something else I'm forgetting...
-			#	}
+				my $calId = $namespace->{wobjectId};
+				my $sth = WebGUI::SQL->read("select * from EventsCalendar_event where wobjectId=".quote($calId));
+				my $eventRank = 1;
+				while (my $event = $sth->hashRef) {  #Migrate each event to an asset.
+					#generate a new ID.
+					my $eventId = getNewId();
+					#insert a new asset for the event.
+					print "\t\t\t\tMigrating Event ".$event->{EventsCalendar_eventId}."\n" unless ($quiet);
+					WebGUI::SQL->write("insert into asset (assetId, parentId, lineage, className, state, title, menuTitle, 
+						url, startDate, endDate, isHidden, ownerUserId, groupIdView, groupIdEdit,assetSize) values (".
+						quote($eventId).", ".quote($wobjectId).", ".quote($wobjectLineage.sprintf("%06d",$eventRank)).", 
+						'WebGUI::Asset::Event','published',".quote($event->{name}).", ".
+						quote($event->{name}).", ".quote(fixUrl($eventId,$wobjectUrl.'/'.$event->{name})).", 
+						".quote($wobject->{startDate}).", ".quote($wobject->{endDate}).", 1, ".quote($ownerId).", 
+						".quote($groupIdView).", ".quote($groupIdEdit).",".quote(0).")");
+					WebGUI::SQL->write("update EventsCalendar_event set assetId=".quote($eventId).", templateId=".quote($namespace->{eventTemplateId})." where EventsCalendar_eventId=".quote($event->{EventsCalendar_eventId}));
+					#increment the rank.
+					$eventRank++;
+				}
 			}
 			$rank++;
 		}
