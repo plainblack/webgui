@@ -8,6 +8,7 @@
    attached.
  - Added AssetProxy macro, which replaces the Navigation, I, Snippet, and File
    macros.
+ - Added Folder asset type.
  - Added the RandomAssetProxy macro, which replaces the RandomImage and
    RandomSnippet macros.
  - Renamed the i macro to FileUrl.

@@ -666,7 +666,7 @@ sub getAssetAdderLinks {
 				WebGUI::ErrorHandler::warn("Couldn't get the name of ".$class." because ".$@);
 			} else {
 				my $url = $self->getUrl("func=add&class=".$class);
-				$url .= "&".$addToUrl if ($addToUrl);
+				$url = WebGUI::URL::append($url,$addToUrl) if ($addToUrl);
 				push(@links, {
 					label=>$label,
 					url=>$url
@@ -2245,7 +2245,6 @@ Saves and updates history. If canEdit, returns www_manageAssets() if a new Asset
 
 sub www_editSave {
 	my $self = shift;
-WebGUI::ErrorHandler::warn("got here");
 	return $self->getAdminConsole->render(WebGUI::Privilege::insufficient()) unless $self->canEdit;
 	my $object;
 	if ($session{form}{assetId} eq "new") {

@@ -116,7 +116,7 @@ sub definition {
 				},
 				namespace=>{
 					fieldType=>'combo',
-					defaultValue=>'style'
+					defaultValue=>undef
 					}
                         }
                 });
@@ -192,7 +192,7 @@ Specify the namespace to build the list for.
 sub getList {
 	my $class = shift;
 	my $namespace = shift;
-	return WebGUI::SQL->buildHashRef("select asset.assetId,asset.title from template left join asset on asset.assetId=template.assetId where template.namespace=".quote($namespace)." and template.showInForms=1 order by asset.title",WebGUI::SQL->getSlave);
+	return WebGUI::SQL->buildHashRef("select asset.assetId,asset.title from template left join asset on asset.assetId=template.assetId where template.namespace=".quote($namespace)." and template.showInForms=1 and state='published' order by asset.title",WebGUI::SQL->getSlave);
 }
 
 

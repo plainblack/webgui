@@ -668,7 +668,6 @@ $conf->set("paymentPlugins"=>"ITransact");
 $conf->set("macros"=>$macros);
 $conf->set("assets"=>[
 		'WebGUI::Asset::Wobject::Navigation',
-		'WebGUI::Asset::Wobject::Layout',
 		'WebGUI::Asset::Wobject::Poll',
 		'WebGUI::Asset::Wobject::Article',
 		'WebGUI::Asset::Wobject::DataForm',
@@ -684,6 +683,10 @@ $conf->set("assets"=>[
 		'WebGUI::Asset::File',
 		'WebGUI::Asset::File::Image',
 		'WebGUI::Asset::Snippet'
+		]);
+$conf->set("assetContainers"=>[
+		'WebGUI::Asset::Wobject::Folder',
+		'WebGUI::Asset::Wobject::Layout'
 		]);
 $conf->write;
 
@@ -1215,12 +1218,14 @@ sub getNewId {
                       'Auth/WebGUI/Create' => {
                                                 '1' => 'PBtmpl0000000000000011'
                                               },
+			'Folder' => {
+                                  '15' => 'PBtmpl0000000000000078'
+			},
                       'Layout' => {
                                   '6' => 'PBtmpl0000000000000131',
                                   '3' => 'PBtmpl0000000000000109',
                                   '7' => 'PBtmpl0000000000000135',
                                   '2' => 'PBtmpl0000000000000094',
-                                  '15' => 'PBtmpl0000000000000078',
                                   '1' => 'PBtmpl0000000000000054',
                                   '4' => 'PBtmpl0000000000000118',
                                   '5' => 'PBtmpl0000000000000125'

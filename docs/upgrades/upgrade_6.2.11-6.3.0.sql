@@ -94,6 +94,11 @@ create table Layout (
 	contentPositions text
 );
 
+create table Folder (
+	assetId varchar(22) not null primary key,
+	templateId varchar(22) not null
+);
+
 create table FileAsset (
 	assetId varchar(22) not null primary key, 
 	storageId varchar(22) not null, 
@@ -216,7 +221,7 @@ INSERT INTO template VALUES ('1','Default Page','<a href=\"<tmpl_var assetId>\">
 INSERT INTO template VALUES ('1','File','<tmpl_if session.var.adminOn>\r\n<p><tmpl_var controls></p>\r\n</tmpl_if>\r\n<a href=\"<tmpl_var fileUrl>\"><img src=\"<tmpl_var fileIcon>\" alt=\"<tmpl_var title>\" border=\"0\" /><tmpl_var filename></a>','FileAsset',1,1);
 INSERT INTO template VALUES ('2','Image','<tmpl_if session.var.adminOn>\r\n<p><tmpl_var controls></p>\r\n</tmpl_if>\r\n<img src=\"<tmpl_var fileUrl>\" <tmpl_var parameters> />','ImageAsset',1,1);
 
-INSERT INTO template VALUES ('15','File Folder','<a href=\"<tmpl_var assetId>\"></a>\r\n<tmpl_if showAdmin>\r\n<p><tmpl_var controls></p>\r\n</tmpl_if>\r\n\r\n<tmpl_if displayTitle>\r\n  <h1><tmpl_var title></h1>\r\n</tmpl_if>\r\n\r\n<tmpl_if description>\r\n  <p><tmpl_var description></p>\r\n</tmpl_if>\r\n\r\n\r\n<tmpl_if sublayout_loop>\r\n<div style=\"clear: both;\">&nbsp;</div>\r\n</tmpl_if>\r\n\r\n<tmpl_loop sublayout_loop>\r\n   <div style=\"float: left; width: 180px; text-align: center;\">\r\n  <a href=\"<tmpl_var url>\"><img src=\"<tmpl_var session.config.extrasURL>/assets/folder.gif\" border=\"0\" alt=\"Folder\" /><br /><tmpl_var title></a> \r\n   </div>\r\n</tmpl_loop>\r\n\r\n<tmpl_if sublayout_loop>\r\n<div style=\"clear: both;\">&nbsp;</div>\r\n</tmpl_if>\r\n\r\n\r\n<div style=\"clear: both;\">&nbsp;</div>\r\n\r\n<tmpl_loop position1_loop>\r\n   <div style=\"float: left; width: 180px; text-align: center;\">\r\n  <tmpl_var content>\r\n   </div>\r\n</tmpl_loop>\r\n\r\n<div style=\"clear: both;\">&nbsp;</div>\r\n','page',1,1);
+INSERT INTO template VALUES ('15','File Folder','<a name=\"<tmpl_var assetId>\"></a><tmpl_if session.var.adminOn>\r\n <p><tmpl_var controls></p>\r\n</tmpl_if>\r\n\r\n<tmpl_if displayTitle>\r\n      <h1><tmpl_var title></h1>\r\n</tmpl_if>\r\n\r\n<tmpl_if description>\r\n     <p><tmpl_var description></p>\r\n</tmpl_if>\r\n\r\n<table width=\"100%\" cellpadding=\"3\" cellspacing=\"0\" class=\"content\">\r\n<tmpl_loop subfolder_loop>\r\n<tr>\r\n    <td class=\"tableData\"><a href=\"<tmpl_var url>\"><img src=\"<tmpl_var icon.small>\" border=\"0\" alt=\"<tmpl_var title>\"></a></td>\r\n    <td colspan=\"4\" class=\"tableData\"><a href=\"<tmpl_var url>\"><tmpl_var title></td>\r\n</tr>\r\n</tmpl_loop>\r\n<tmpl_loop file_loop>\r\n<tr>\r\n <td class=\"tableData\"><a href=\"<tmpl_var url>\"><img src=\"<tmpl_var icon.small>\" border=\"0\" alt=\"<tmpl_var title>\"></a></td>\r\n    <td class=\"tableData\"><a href=\"<tmpl_var url>\"><tmpl_var title></td>\r\n    <td class=\"tableData\"><tmpl_var type></td>\r\n     <td class=\"tableData\">^D(\"%z %Z\",<tmpl_var date.epoch>);</td>\r\n   <td class=\"tableData\"><tmpl_var size></td>\r\n</tr>\r\n</tmpl_loop>\r\n\r\n</table>', 'Folder',1,1);
 
 alter table HttpProxy add column cookieJarStorageId varchar(22);
 

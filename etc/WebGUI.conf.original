@@ -2,7 +2,6 @@ assets = WebGUI::Asset::File::Image, \
 	WebGUI::Asset::File, \
 	WebGUI::Asset::Snippet, \
 	WebGUI::Asset::Redirect, \
-	WebGUI::Asset::Wobject::Layout, \
 	WebGUI::Asset::Wobject::USS, \
 	WebGUI::Asset::Wobject::Poll, \
 	WebGUI::Asset::Wobject::SyndicatedContent, \
@@ -13,6 +12,9 @@ assets = WebGUI::Asset::File::Image, \
 	WebGUI::Asset::Wobject::Navigation, \
 	WebGUI::Asset::Wobject::Survey, \
 	WebGUI::Asset::FilePile
+
+assetContainers = WebGUI::Asset::Wobject::Layout, \
+	WebGUI::Asset::Wobject::Folder
 
 sitename = www.example.com, example.com
 

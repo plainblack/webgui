@@ -20,6 +20,11 @@ our $I18N = {
 		context => q|The name of the properties tab on the edit page.|
 	},
 	
+	'make package' => {
+		message => q|Make package?|,
+		lastUpdated => 1099344172,
+	},
+
 	'asset id' => {
 		message => q|Asset ID|,
 		lastUpdated => 1099344172,
