@@ -228,7 +228,7 @@ sub www_exportTranslation {
 #-------------------------------------------------------------------
 sub www_listInternationalMessages {
         return WebGUI::Privilege::adminOnly() unless (WebGUI::Privilege::isInGroup(3));
-        my ($output, $sth, $key, $p, $search, $status,%data, %list, $deprecated, $i, $missing, @row, $f, $outOfDate, $ok);
+        my ($output, $sth, $key, $p, $status,%data, %list, $deprecated, $i, $missing, @row, $f, $outOfDate, $ok);
         tie %data, 'Tie::CPHash';
         %data = WebGUI::SQL->quickHash("select language from language where languageId=".$session{form}{lid});
         $missing = '<b>'.WebGUI::International::get(596).'</b>';
@@ -236,14 +236,50 @@ sub www_listInternationalMessages {
         $ok = WebGUI::International::get(720);
 	$deprecated = WebGUI::International::get(723);
         $output = '<h1>'.WebGUI::International::get(595).' ('.$data{language}.')</h1>';
+	WebGUI::Session::setScratch("internationalSearchId",$session{form}{internationalSearchId});
+	WebGUI::Session::setScratch("internationalSearchKeyword",$session{form}{internationalSearchKeyword});
+	WebGUI::Session::setScratch("internationalSearchNamespace",$session{form}{internationalSearchNamespace});
 	$f = WebGUI::HTMLForm->new(1);
 	$f->hidden("op","listInternationalMessages");
 	$f->hidden("lid",$session{form}{lid});
-	$f->text("search","",$session{form}{search});
+	my $selectedNamespace = $session{scratch}{internationalSearchNamespace} || "Any";
+	my %namespaces;
+	tie %namespaces, 'Tie::IxHash';
+	%namespaces = (
+		""=>"Any",
+		WebGUI::SQL->buildHash("select distinct namespace,namespace from international order by namespace")
+		);
+	$f->selectList(
+		-name=>"internationalSearchNamespace",
+		-value=>[$selectedNamespace],
+		-options=>\%namespaces
+		);
+	$f->integer(
+		-name=>"internationalSearchId",
+		-value=>$session{scratch}{internationalSearchId},
+		-size=>4,
+		-maxLength=>4
+		);
+	$f->text(
+		-name=>"internationalSearchKeyword",
+		-value=>$session{scratch}{internationalSearchKeyword},
+		-size=>20
+		);
 	$f->submit("search");
-	$output .= $f->print;
-	if ($session{form}{search} ne "") {
-		$search = " and message like ".quote("%".$session{form}{search}."%");
+	$output .= $f->print;	
+	my $search;
+	my $searchFlag = 0;
+	if ($session{scratch}{internationalSearchKeyword} ne "") {
+		$search = " and message like ".quote("%".$session{scratch}{internationalSearchKeyword}."%");
+		$searchFlag = 1;
+	}
+	if ($session{scratch}{internationalSearchNamespace} ne "") {
+		$search .= " and namespace=".quote($session{scratch}{internationalSearchNamespace});
+		$searchFlag = 1;
+	}
+	if ($session{scratch}{internationalSearchId}) {
+		$search .= " and internationalId=".$session{scratch}{internationalSearchId};
+		$searchFlag = 1;
 	}
         $sth = WebGUI::SQL->read("select * from international where languageId=".$session{form}{lid}.$search);
         while (%data = $sth->hash) {
@@ -257,7 +293,7 @@ sub www_listInternationalMessages {
        	$sth = WebGUI::SQL->read("select * from international where languageId=1");
        	while (%data = $sth->hash) {
 		$key = $data{namespace}."-".$data{internationalId};
-		if ($session{form}{search} ne "") {
+		if ($searchFlag) {
 			if ($list{"z-".$key}) {
 				if ($list{"z-".$key}{lastUpdated} < $data{lastUpdated}) {
                                         $list{"o-".$key} = $list{"z-".$key};
