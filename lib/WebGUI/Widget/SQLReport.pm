@@ -208,7 +208,7 @@ sub www_editSave {
 
 #-------------------------------------------------------------------
 sub www_view {
-	my (@row, $i, $p, $ouch, %data, $output, $sth, $dbh, @result, 
+	my (@row, $i, $rownum, $p, $ouch, %data, $output, $sth, $dbh, @result, 
 		@template, $temp, $col, $errorMessage, $url);
 	tie %data, 'Tie::CPHash';
 	%data = getProperties($namespace,$_[0]);
@@ -258,7 +258,9 @@ sub www_view {
 					$output .= $template[0];
 					while (@result = $sth->array) {
 						$temp = $template[1];
-						$temp =~ s/\^(\d*)\;/$result[$1]/g;
+						$temp =~ s/\^(\d*)\;/$result[$1]/g;	# Shouldn't this be \d+ ?
+						$rownum = $i + 1 ;
+						$temp =~ s/\^rownum\;/$rownum/g;
 						if ($data{convertCarriageReturns}) {
 							$temp =~ s/\n/\<br\>/g;
 						}
