@@ -1162,7 +1162,7 @@ The number of characters wide this form element should be. There should be no re
 
 sub phone {
         my $output = _javascriptFile('inputCheck.js');
-        my $maxLength = $_[0]->{maxLength} || 30;
+        my $maxLength = $_[0]->{maxlength} || 30;
 	$output .= text({
 		name=>$_[0]->{name},
 		maxlength=>$maxLength,
@@ -1707,7 +1707,7 @@ The number of characters wide this form element should be. There should be no re
 
 sub zipcode {
         my $output = _javascriptFile('inputCheck.js');
-        my $maxLength = $_[0]->{maxLength} || 10;
+        my $maxLength = $_[0]->{maxlength} || 10;
 	$output .= text({
 		name=>$_[0]->{name},
 		maxlength=>$maxLength,
