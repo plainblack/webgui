@@ -57,6 +57,10 @@ HTML::TagFilter......................William Ross
 
 HTML::Template.......................Sam Tregar
 
+Tie::CPHash..........................Christopher J. Madsen
+
+Tie::IxHash..........................Gurusamy Sarathy
+
 XML::RSSLite.........................Jerrad Pierce
                                      Scott Thomason
 

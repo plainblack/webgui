@@ -15,12 +15,10 @@ QnD INSTALL INSTRUCTIONS:
 2. Install the following Perl modules:
 
    LWP
-   Tie::IxHash
    DBI
-   Mysql
+   DBD::mysql
    Digest::MD5
    Net::LDAP
-   Tie::CPHash
    Date::Calc
    Image::Magick
    HTML::Parser
