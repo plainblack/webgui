@@ -62,7 +62,7 @@ sub _showReplies {
                                 $data[0].'&wid='.$session{form}{wid}).'">'.substr($data[1],0,30).
                                 '</a></td><td class="tableData"><a href="'.
                                 WebGUI::URL::page('op=viewProfile&uid='.$data[4]).'">'.$data[2].
-                                '</a></td><td class="tableData">'.epochToHuman($data[3],"%M/%D %H:%n%p").
+                                '</a></td><td class="tableData">'.epochToHuman($data[3],"%z %Z").
                                 '</td></tr>';
                 $html .= WebGUI::Discussion::traverseReplyTree($data[0],1);
         }
