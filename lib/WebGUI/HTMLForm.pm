@@ -124,16 +124,17 @@ sub _tableFormRow {
 =cut
 
 sub checkbox {
-        my ($subtext, $class, $output, $name, $label, $extras, $checked, $value);
+        my ($subtext, $checkedText, $class, $output, $name, $label, $extras, $checked, $value);
         $class = shift;
         $name = shift;
         $label = shift;
         $checked = shift;
-        $checked = ' checked="1"' if ($checked);
+        $checkedText = ' checked="1"' if ($checked);
 	$subtext = shift;
-        $value = shift || 1;
+        $value = shift;
+	$value = 1 if ($value eq "");
         $extras = shift;
-        $output = '<input type="checkbox" name="'.$name.'" value="'.$value.'"'.$checked.' '.$extras.'>';
+        $output = '<input type="checkbox" name="'.$name.'" value="'.$value.'"'.$checkedText.' '.$extras.'>';
 	$output .= _subtext($subtext);
         $output = _tableFormRow($label,$output) unless ($class->{_noTable});
         $class->{_data} .= $output;
@@ -1024,7 +1025,7 @@ sub printRowsOnly {
 
 #-------------------------------------------------------------------
 
-=head2 radio ( name [ label, checked, subtext, value, extras ] )
+=head2 radio ( name [ label, checked, value, subtext, extras ] )
 
  Adds a radio button row to this form.
 
@@ -1040,14 +1041,14 @@ sub printRowsOnly {
 
  If you'd like this radio button to be defaultly checked, set this to "1".
 
+=item value
+
+ The default value for this form element.
+
 =item subtext
 
  Extra text to describe this form element or to provide special
  instructions.
-
-=item value
-
- The default value for this form element. Defaults to "1".
 
 =item extras
 
@@ -1060,16 +1061,16 @@ sub printRowsOnly {
 =cut
 
 sub radio {
-        my ($subtext, $class, $output, $name, $label, $extras, $checked, $value);
+        my ($subtext, $checkedText, $class, $output, $name, $label, $extras, $checked, $value);
         $class = shift;
         $name = shift;
         $label = shift;
         $checked = shift;
-        $checked = ' checked="1"' if ($checked);
+        $checkedText = ' checked="1"' if ($checked);
+        $value = shift;
         $subtext = shift;
-        $value = shift || 1;
         $extras = shift;
-        $output = '<input type="radio" name="'.$name.'" value="'.$value.'"'.$checked.' '.$extras.'>';
+        $output = '<input type="radio" name="'.$name.'" value="'.$value.'"'.$checkedText.' '.$extras.'>';
         $output .= _subtext($subtext);
         $output = _tableFormRow($label,$output) unless ($class->{_noTable});
         $class->{_data} .= $output;
