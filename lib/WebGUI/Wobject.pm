@@ -746,8 +746,11 @@ NOTE: This method is meant to be extended by all sub-classes.
 
 sub purge {
 	if ($_[0]->get("forumId")) {
-		my $forum = WebGUI::Forum->new($_[0]->get("forumId"));
-		$forum->purge;
+		my ($inUseElsewhere) = WebGUI::SQL->quickArray("select count(*) from wobject where forumId=".$_[0]->get("forumId"));
+                unless ($inUseElsewhere > 1) {
+			my $forum = WebGUI::Forum->new($_[0]->get("forumId"));
+			$forum->purge;
+		}
 	}
 	WebGUI::SQL->write("delete from ".$_[0]->get("namespace")." where wobjectId=".$_[0]->get("wobjectId"));
         WebGUI::SQL->write("delete from wobject where wobjectId=".$_[0]->get("wobjectId"));

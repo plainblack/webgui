@@ -567,11 +567,42 @@ sub recurseThread {
         return \@post_loop;
 }
                                                                                                                                                              
+sub setPostApproved {
+	my ($callback, $post) = @_;
+	$post->setStatusApproved;
+	unless ($session{user}{userId} == $post->get("userId")) {
+		WebGUI::MessageLog::addInternationalizedEntry($post->get("userId"),'',formatThreadURL($callback,$post->get("forumPostId")),579);
+	}
+	notifySubscribers($post,$post->getThread,$post->getThread->getForum,$callback);
+}
+
+sub setPostDenied {
+	my ($callback, $post) = @_;
+	$post->setStatusDenied;
+	WebGUI::MessageLog::addInternationalizedEntry($post->get("userId"),'',formatThreadURL($callback,$post->get("forumPostId")),580);
+}
+
+sub setPostPending {
+	my ($callback, $post) = @_;
+	$post->setStatusPending;
+	WebGUI::MessageLog::addInternationalizedEntry('',$post->getThread->getForum->get("groupToModerate"),
+		formatThreadURL($callback,$post->get("forumPostId")),578,'WebGUI','pending');
+}
+
+sub setPostStatus {
+	my ($callback, $post) = @_;
+	if ($post->getThread->getForum->get("moderatePosts")) {
+		setPostPending($callback,$post);
+	} else {
+		setPostApproved($callback,$post);
+	}
+}
+
 sub www_approvePost {
 	my ($callback) = @_;
 	my $post = WebGUI::Forum::Post->new($session{form}{forumPostId});
 	return WebGUI::Privilege::insufficient() unless ($post->getThread->getForum->isModerator);
-	$post->setStatusApproved;
+	setPostApproved($callback,$post);
        	return www_viewThread($callback);
 }
 
@@ -599,7 +630,7 @@ sub www_denyPost {
 	my ($callback) = @_;
 	my $post = WebGUI::Forum::Post->new($session{form}{forumPostId});
 	return WebGUI::Privilege::insufficient() unless ($post->canEdit($session{user}{userId}));
-	$post->setStatusDenied;
+	setPostDenied($callback,$post);
        	return www_viewThread($callback);
 }
 
@@ -745,9 +776,11 @@ sub www_postSave {
 	my $forumId = $session{form}{forumId};
 	my $threadId = $session{form}{forumThreadId};
 	my $postId = $session{form}{forumPostId};
+	$session{form}{subject} = WebGUI::International::get(232) if ($session{form}{subject} eq "");
+	$session{form}{subject} .= ' '.WebGUI::International::get(233) if ($session{form}{message} eq "");
 	my %postData = (
 		message=>$session{form}{message},
-		subject=>$session{form}{subject},
+		subject=>formatSubject($session{form}{subject}),
                 contentType=>$session{form}{contentType}
 		);
 	my %postDataNew = (
@@ -763,7 +796,7 @@ sub www_postSave {
 		$postData{forumThreadId} = $parentPost->getThread->get("forumThreadId");
 		$postData{parentId} = $session{form}{parentId};
 		my $post = WebGUI::Forum::Post->create(\%postData);
-		notifySubscribers($post,$post->getThread,$post->getThread->getForum,$callback);
+		setPostStatus($callback,$post);
 		return www_viewThread($callback,$post->get("forumPostId"));
 	}
 	if ($session{form}{forumPostId} > 0) { # edit
@@ -787,6 +820,7 @@ sub www_postSave {
 			isLocked=>$session{form}{isLocked}
 			}, \%postData);
 		$thread->subscribe($session{user}{userId}) if ($session{form}{subscribe});
+		setPostStatus($callback,$thread->getPost($thread->get("rootPostId")));
 		return www_viewForum($callback, $forumId);
 	}
 }

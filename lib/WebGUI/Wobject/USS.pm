@@ -73,7 +73,6 @@ sub duplicate {
 			quote($row{title}).", $row{dateSubmitted}, ".quote($row{username}).", '$row{userId}', ".quote($row{content}).", ".
 			quote($row{image}).", ".quote($row{attachment}).", '$row{status}', '$row{convertCarriageReturns}', 
 			'$row{views}')");
-		WebGUI::Discussion::duplicate($_[0]->get("wobjectId"),$w,$row{USS_submissionId},$newSubmissionId);
         }
         $sth->finish;
 }
@@ -122,8 +121,11 @@ sub new {
 sub purge {
 	my $sth = WebGUI::SQL->read("select forumId from USS_submission where wobjectId=".$_[0]->get("wobjectId"));
 	while (my ($forumId) = $sth->array) {
-		my $forum = WebGUI::Forum->new($forumId);
-		$forum->purge;
+		my ($inUseElsewhere) = WebGUI::SQL->quickArray("select count(*) from USS_submission where forumId=".$forumId);
+		unless ($inUseElsewhere > 1) {
+			my $forum = WebGUI::Forum->new($forumId);
+			$forum->purge;
+		}
 	}
 	$sth->finish;
         WebGUI::SQL->write("delete from USS_submission where wobjectId=".$_[0]->get("wobjectId"));
@@ -186,8 +188,11 @@ sub www_deleteSubmission {
 sub www_deleteSubmissionConfirm {
 	my ($owner, $forumId) = WebGUI::SQL->quickArray("select userId,forumId from USS_submission where USS_submissionId=$session{form}{sid}");
         if ($owner == $session{user}{userId} || WebGUI::Privilege::isInGroup($_[0]->get("groupToApprove"))) {
-		my $forum = WebGUI::Forum->new($forumId);
-		$forum->purge;
+		my ($inUseElsewhere) = WebGUI::SQL->quickArray("select count(*) from USS_submission where forumId=".$forumId);
+                unless ($inUseElsewhere > 1) {
+			my $forum = WebGUI::Forum->new($forumId);
+			$forum->purge;
+		}
 		$_[0]->deleteCollateral("USS_submission","USS_submissionId",$session{form}{sid});
 		my $file = WebGUI::Attachment->new("",$session{form}{wid},$session{form}{sid});
 		$file->deleteNode;

@@ -59,9 +59,12 @@ sub new {
 sub purge {
         my $sth = WebGUI::SQL->read("select forumId from MessageBoard_forums where wobjectId=".$_[0]->get("wobjectId"));
         while (my ($forumId) = $sth->array) {
-                my $forum = WebGUI::Forum->new($forumId);
-                $forum->purge;
-        }
+		my ($inUseElsewhere) = WebGUI::SQL->quickArray("select count(*) from MessageBoard_forums where forumId=".$forumId);
+                unless ($inUseElsewhere > 1) {
+                	my $forum = WebGUI::Forum->new($forumId);
+                	$forum->purge;
+		}
+        }	
         $sth->finish;
 	WebGUI::SQL->write("delete from MessageBoard_forums where wobjectId=".$_[0]->get("wobjectId"));
         $_[0]->SUPER::purge();
@@ -77,9 +80,12 @@ sub www_deleteForum {
 #-------------------------------------------------------------------
 sub www_deleteForumConfirm {
  	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId")));
-	my $forum = WebGUI::Forum->new($session{form}{forumId});
-	$forum->purge;
-	WebGUI::SQL->write("delete from MessageBoard_forums where forumId=".$session{form}{forumId});
+	my ($inUseElsewhere) = WebGUI::SQL->quickArray("select count(*) from MessageBoard_forums where forumId=".$session{form}{forumId});
+        unless ($inUseElsewhere > 1) {
+		my $forum = WebGUI::Forum->new($session{form}{forumId});
+		$forum->purge;
+	}
+	WebGUI::SQL->write("delete from MessageBoard_forums where forumId=".$session{form}{forumId}." and wobjectId=".$_[0]->get("wobjectId"));
 	return "";
 }
 
@@ -209,57 +215,6 @@ sub www_view {
 	$var{areMultipleForums} = ($count > 1);
 	$var{forum_loop} = \@forum_loop;
         return $_[0]->processTemplate($_[0]->get("templateId"),\%var);
-	
-
-	my ($p, $data, %var, @message_loop, $rows, @last, $replies);
-
-	$var{canPost} = WebGUI::Privilege::isInGroup($_[0]->get("groupToPost"));
-	$var{"post.url"} = WebGUI::URL::page('func=post&mid=new&wid='.$_[0]->get("wobjectId"));
-	$var{"post.label"} = WebGUI::International::get(17,$_[0]->get("namespace"));
-	$var{"search.url"} = WebGUI::URL::page('func=search&wid='.$_[0]->get("wobjectId"));
-	$var{"search.label"} = WebGUI::International::get(364);
-	$var{"subject.label"} = WebGUI::International::get(229);
-	$var{"user.label"} = WebGUI::International::get(15,$_[0]->get("namespace"));
-	$var{"date.label"} = WebGUI::International::get(18,$_[0]->get("namespace"));
-	$var{"views.label"} = WebGUI::International::get(514);
-	$var{"replies.label"} = WebGUI::International::get(19,$_[0]->get("namespace"));
-	$var{"last.label"} = WebGUI::International::get(20,$_[0]->get("namespace"));
-	$p = WebGUI::Paginator->new(WebGUI::URL::page('wid='.$_[0]->get("wobjectId").'&func=view'),[],$_[0]->get("messagesPerPage"));
-	$p->setDataByQuery("select messageId,subject,username,dateOfPost,userId,views,status
-		from discussion where wobjectId=".$_[0]->get("wobjectId")." and pid=0 
-		and (status='Approved' or userId=$session{user}{userId}) order by dateOfPost desc");
-	$rows = $p->getPageData;
-	foreach $data (@$rows) {
-		@last = WebGUI::SQL->quickArray("select messageId,dateOfPost,username,subject,userId 
-			from discussion where wobjectId=".$_[0]->get("wobjectId")." and rid=$data->{messageId} 
-			and status='Approved' order by dateOfPost desc");
-		($replies) = WebGUI::SQL->quickArray("select count(*) from discussion 
-			where rid=$data->{messageId} and status='Approved'");
-		$replies--;
-		push (@message_loop,{
-			"last.url" => WebGUI::URL::page('func=showMessage&mid='.$last[0].'&wid='.$_[0]->get("wobjectId")),
-			"last.subject" => substr(WebGUI::HTML::filter($last[3],'all'),0,30),
-			"last.date" => epochToHuman($last[1]),
-			"last.userProfile" => WebGUI::URL::page('op=viewProfile&uid='.$last[4]),
-			"last.username" => $last[2],
-			"message.replies" => $replies,
-			"message.url" => WebGUI::URL::page('func=showMessage&mid='.$data->{messageId}.'&wid='.$_[0]->get("wobjectId")),
-			"message.subject" => substr($data->{subject},0,30),
-			"message.currentUser" => ($data->{userId} == $session{user}{userId}),
-			"message.status" => status($data->{status}),
-			"message.userProfile" => WebGUI::URL::page('op=viewProfile&uid='.$data->{userId}),
-			"message.username" => $data->{username},
-			"message.date" => epochToHuman($data->{dateOfPost}),
-			"message.views" => $data->{views}
-			});
-        }
-	$var{message_loop} = \@message_loop;
-        $var{firstPage} = $p->getFirstPageLink;
-        $var{lastPage} = $p->getLastPageLink;
-        $var{nextPage} = $p->getNextPageLink;
-        $var{pageList} = $p->getPageLinks;
-        $var{previousPage} = $p->getPreviousPageLink;
-        $var{multiplePages} = ($p->getNumberOfPages > 1);
 }
 
 1;
