@@ -36,13 +36,12 @@ while (my $namespace = $sth->hashRef) {
 		isHidden=>1,
 		menuTitle=>$namespace->{namespace},
 		url=>$newUrl,
-		description=>$namespace,
+		description=>$namespace->{namespace},
 		templateId=>'PBtmpl0000000000000078',
 		styleTemplateId=>'PBtmpl0000000000000060',
 		printableStyleTemplateId=>'PBtmpl0000000000000111',
 		groupIdView=>'4',
-		groupIdEdit=>'3',
-		description=>''
+		groupIdEdit=>'3'
 	});
 	my $templatesquery = "select * from asset, template where asset.assetId=template.assetId and asset.className='WebGUI::Asset::Template' and template.namespace='".$namespace->{namespace}."' order by title asc";
 	my $newParentId = $folder->getId;
@@ -54,7 +53,7 @@ while (my $namespace = $sth->hashRef) {
 		my $templateAssetId = $template->{assetId};
 		my $templateObject = WebGUI::Asset->new($templateAssetId);
 		my $newUrl2 = $newUrl.$templateObject->getUrl;
-		my $result = WebGUI::SQL->write("update asset set lineage='$newLineage', parentId='$newParentId', url='$newUrl2' where assetId='$templateAssetId'");
+		my $result = WebGUI::SQL->write("update asset set lineage='$newLineage', parentId='$newParentId' where assetId='$templateAssetId'");
 	}
 	$sth2->finish;
 }
@@ -64,6 +63,75 @@ $sth->finish;
 #should be allowed to view them if the www_view method returns the parent 
 #container anyway...!
 WebGUI::SQL->write("update asset set groupIdView='4' where className='WebGUI::Asset::Template'");
+
+WebGUI::SQL->write("update wobject set styleTemplateId='PBtmpl0000000000000060' where assetId='$templateFolder'");
+
+my $newFailSafe = '
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+        <head>
+                <title>^Page("title"); - WebGUI</title>
+				<tmpl_var head.tags>
+                <style type="text/css">
+			.menu {
+				position: absolute;
+				top: 50px;
+				left: 5px;
+				clear: all;
+                                z-index: 10;
+				font-family: georgia, verdana, helvetica, arial, sans-serif;
+                                color: white;
+				font-size: 11px;
+				}
+			.content {
+				position: absolute;
+				top: 90px;
+				left: 195px;
+				clear: all;
+                                z-index: 10;
+                                font-family: georgia, verdana, helvetica, arial, sans-serif;
+                                color: white;
+				font-size: 13px;
+                                }
+                        .header {
+				position: absolute;
+				left: 5px;
+				top: 5px;
+                                z-index: 10;
+                                font-size: 30px;
+                                font-family: georgia, verdana, helvetica, arial, sans-serif;
+                                color: white;
+                                }
+			.background {
+				position: absolute; 
+				top: 0; 
+				left: 0; 
+				width: 100%; 
+				height: 100%; 
+				z-index: 5;
+				border: 0px;
+				}
+			body {
+				background-color: #6974DE;
+				}
+				</style>
+        </head>
+        <body>	
+			^AdminBar;
+			<div class="header">^PageTitle;</div>
+			<div class="menu">^AssetProxy(flexMenu);</div>
+			<div class="content">
+			^LoginToggle; &nbsp; ^a(^@;); &nbsp; ^AdminToggle;
+			<hr /><div><tmpl_var body.content></div>
+			</div>
+			<img src="<tmpl_var session.config.extrasURL>/background.jpg" border="0" class="background" />
+		</body>
+</html>
+';
+WebGUI::SQL->write("update template set template=".quote($newFailSafe)." where assetId='PBtmpl0000000000000060'");
+
+
 
 WebGUI::Session::close();
 
