@@ -176,7 +176,14 @@ sub page {
 		}
 		$cache->set($output, $ttl) if ($useCache);
 	}
-	my $httpHeader = WebGUI::HTTP::getHeader();
+        my $httpHeader;
+
+        # allow a wobject to force a redirect by setting {page}{redirectURL}
+        if ($session{'page'}{'redirectURL'}) {
+                $httpHeader = WebGUI::Session::httpRedirect(WebGUI::Macro::process($session{'page'}{'redirectURL'}));
+        } else {
+               $httpHeader = WebGUI::HTTP::getHeader();
+        }
 
 	# This allows an operation or wobject to write directly to the browser.
         if ($session{page}{empty}) {
