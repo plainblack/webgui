@@ -193,7 +193,6 @@ sub view {
 	my $self = shift;
 	my %var = %{$self->get};
 	$var{controls} = $self->getToolbar;
-	$var{controls} = '<p>'.$var{controls}.'</p>' if (exists $var{controls});
 	$var{fileUrl} = $self->getFileUrl;
 	$var{fileIcon} = $self->getFileIconUrl;
 	$var{thumbnail} = $self->getThumbnailUrl;

@@ -113,6 +113,11 @@ sub getEditForm {
 		-value=>WebGUI::Form::checkbox({
 				checked=>$selfChecked,
 				name=>"assetsToInclude",
+				value=>"ancestors"
+				}).'Ancestors<br />'
+			.WebGUI::Form::checkbox({
+				checked=>$selfChecked,
+				name=>"assetsToInclude",
 				value=>"self"
 				}).'Self<br />'
 			.WebGUI::Form::checkbox({

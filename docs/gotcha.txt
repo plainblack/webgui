@@ -9,6 +9,25 @@ save you many hours of grief.
 
 6.3.0
 --------------------------------------------------------------------
+ * Your upgrade process will be a little different from here on out.
+	Use the following steps to do the upgrade:
+
+	a) Back up everything.
+
+	b) Extract the 6.3 archive over your existing install.
+
+	c) Restart apache (don't shut down as normal, just restart).
+
+	d) Run upgrade.pl in the sbin folder.
+
+	e) Test.
+
+	The reason for this is that WebGUI has an innovative new way
+	of releasing sites for public view as soon as they become
+	available during the upgrade, even while the other sites are
+	still being upgraded. Each site will have a maintenance 
+	message displayed until its upgrade is complete.
+
  * This upgrade process will run for a very long time and output a
 	lot of debug information which will be useful if something
 	goes wrong. You may wish to pipe the debug info to a log

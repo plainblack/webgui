@@ -374,15 +374,9 @@ while (my $data = $sth->hashRef) {
 	} elsif ($data->{method} eq "generation") {
 		$newNav{assetsToInclude} = "self\nsisters";
 	} elsif ($data->{method} eq "ancestors") {
-		$newNav{endPoint} += $newNav{startPoint} unless ($newNav{startType} eq "specificUrl");
-		$newNav{startType} = "relativeToRoot";
-		$newNav{startPoint} = $data->{stopAtLevel}+1;
-		$newNav{assetsToInclude} = "descendants";
+		$newNav{assetsToInclude} = "ancestors";
 	} elsif ($data->{method} eq "self_and_ancestors") {
-		$newNav{endPoint} += $newNav{startPoint} unless ($newNav{startType} eq "specificUrl");
-		$newNav{startType} = "relativeToRoot";
-		$newNav{startPoint} = $data->{stopAtLevel}+1;
-		$newNav{assetsToInclude} = "self\ndescendants";
+		$newNav{assetsToInclude} = "self\nancestors";
 	} elsif ($data->{method} eq "pedigree") {
 		$newNav{endPoint} = 55;
 		$newNav{startType} = "relativeToRoot";
@@ -1196,6 +1190,7 @@ $sth->finish;
 
 
 print "\tDeleting files which are no longer used.\n" unless ($quiet);
+#unlink("../../lib/WebGUI/Macro/SI_scaledImage.pm");
 #unlink("../../lib/WebGUI/Export.pm");
 #unlink("../../lib/WebGUI/MetaData.pm");
 #unlink("../../lib/WebGUI/Operation/MetaData.pm");
@@ -1262,6 +1257,7 @@ my $macros = $conf->get("macros");
 delete $macros->{"\\"};
 delete $macros->{"Backslash_pageUrl"};
 delete $macros->{"I_imageWithTags"};
+delete $macros->{"SI_scaledImage"};
 delete $macros->{"Snippet"};
 delete $macros->{"Navigation"};
 delete $macros->{"File"};
@@ -1354,7 +1350,7 @@ $nestedMacro = qr /(\^                     # Start with carat
         		}gx;
         	push(@parsed, undef) if substr($params,-1,1) eq ',';
 		my $result;
-		if (isIn($searchString, qw(Navigation I Snippet File))) {
+		if (isIn($searchString, qw(Navigation SI I Snippet File))) {
 			my $url = (exists $macroCache{$parsed[0]}) ? $macroCache{$parsed[0]} : $parsed[0];
 			$result = '^AssetProxy("'.$url.'");';
 		} elsif (isIn($searchString, qw(RandomSnippet RandomImage))) {
@@ -1809,7 +1805,7 @@ sub walkTree {
 			my $b = WebGUI::SQL->read("select assetId, templatePosition from wobject where pageId=".quote($page->{pageId})."
 				order by templatePosition, sequenceNumber");
 			while (my ($assetId, $position) = $b->array) {
-				if ($position ne $last) {
+				if ($position != $last) {
 					push(@positions,join(",",@assets));
 					@assets = ();
 				}
@@ -1817,6 +1813,7 @@ sub walkTree {
 				push(@assets,$assetId);
 			}
 			$b->finish;
+			push(@positions,join(",",@assets));
 			my $contentPositions = join("\.",@positions);
 			WebGUI::SQL->write("update Layout set contentPositions=".quote($contentPositions)." where assetId=".quote($pageId));
 		}
