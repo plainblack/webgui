@@ -47,6 +47,7 @@ Package to manipulate WebGUI Attachments.
  $html = $attachment->box;
  $string = $attachment->getFilename;
  $url = $attachment->getIcon;
+ $node = $attachment->getNode;
  $string = $attachment->getPath;
  $integer = $attachment->getSize;
  $url = $attachment->getThumbnail;
@@ -114,23 +115,23 @@ sub copy {
 	$newNode = WebGUI::Node->new($_[1],$_[2]);
 	$newNode->create;
        	$a = FileHandle->new($_[0]->getPath,"r");
-	$b = FileHandle->new(">".$newNode->getPath.'/'.$_[0]->getFilename);
+	$b = FileHandle->new(">".$newNode->getPath.$session{os}{slash}.$_[0]->getFilename);
 	if (defined $a) {
 		binmode($a); 
-		$b = FileHandle->new(">".$newNode->getPath.'/'.$_[0]->getFilename);
+		$b = FileHandle->new(">".$newNode->getPath.$session{os}{slash}.$_[0]->getFilename);
 		if (defined $b) {
 			binmode($b); 
-       			cp($a,$b) or WebGUI::ErrorHandler::warn("Couldn't copy attachment: ".$newNode->getPath.'/'.$_[0]->getFilename." :".$!);
+       			cp($a,$b) or WebGUI::ErrorHandler::warn("Couldn't copy attachment: ".$newNode->getPath.$session{os}{slash}.$_[0]->getFilename." :".$!);
 			$b->close;
 		}
 		$a->close;
 	}
-	if (isIn($_[0]->getType,qw(jpg jpeg gif png tif tiff bmp))) {
-        	$a = FileHandle->new($_[0]->{_node}->getPath.'/thumb-'.$_[0]->getFilename,"r");
-        	$b = FileHandle->new(">".$newNode->getPath.'/thumb-'.$_[0]->getFilename);
+	if ($_[0]->isImage) {
+        	$a = FileHandle->new($_[0]->getNode->getPath.$session{os}{slash}.'thumb-'.$_[0]->getFilename,"r");
+        	$b = FileHandle->new(">".$newNode->getPath.$session{os}{slash}.'thumb-'.$_[0]->getFilename);
         	if (defined $a) {
                 	binmode($a);
-                	$b = FileHandle->new(">".$newNode->getPath.'/thumb-'.$_[0]->getFilename);
+                	$b = FileHandle->new(">".$newNode->getPath.$session{os}{slash}.'thumb-'.$_[0]->getFilename);
                 	if (defined $b) {
                         	binmode($b);
                         	cp($a,$b);
@@ -171,9 +172,9 @@ sub createThumbnail {
                         $image->Scale(width=>($x/$r),height=>($y/$r));
                 }
                 if (isIn($_[0]->getType, qw(tif tiff bmp))) {
-                        $error = $image->Write($_[0]->{_node}->getPath.'/thumb-'.$_[0]->getFilename.'.png');
+                        $error = $image->Write($_[0]->getNode->getPath.'/thumb-'.$_[0]->getFilename.'.png');
                 } else {
-                        $error = $image->Write($_[0]->{_node}->getPath.'/thumb-'.$_[0]->getFilename);
+                        $error = $image->Write($_[0]->getNode->getPath.'/thumb-'.$_[0]->getFilename);
                 }
                 WebGUI::ErrorHandler::warn("Couldn't create thumbnail: ".$error) if $error;
         }
@@ -202,7 +203,7 @@ Deletes deletes this attachment's node (and everything in it).
 =cut
 
 sub deleteNode {
-        rmtree($_[0]->{_node}->getPath);
+        rmtree($_[0]->getNode->getPath);
 }
 
 
@@ -308,6 +309,18 @@ sub getIcon {
 
 #-------------------------------------------------------------------
 
+=head2 getNode ( )
+
+Returns the node object for this attachment.
+
+=cut
+
+sub getNode {
+	return $_[0]->{_node};	
+}
+
+#-------------------------------------------------------------------
+
 =head2 getPath ( )
 
 Returns a full path to an attachment.
@@ -315,7 +328,7 @@ Returns a full path to an attachment.
 =cut
 
 sub getPath {
-        return $_[0]->{_node}->getPath.$session{os}{slash}.$_[0]->getFilename;
+        return $_[0]->getNode->getPath.$session{os}{slash}.$_[0]->getFilename;
 }
 
 
@@ -329,7 +342,7 @@ Returns the size of this file.
 
 sub getSize {
 	my ($size);
-	my (@attributes) = stat($_[0]->{_node}->getPath.$session{os}{slash}.$_[0]->getFilename);
+	my (@attributes) = stat($_[0]->getNode->getPath.$session{os}{slash}.$_[0]->getFilename);
 	if ($attributes[7] > 1048576) {
 		$size = round($attributes[7]/1048576);
 		$size .= 'MB';
@@ -353,9 +366,9 @@ Returns a full URL to the thumbnail for this attachment. Thumbnails are only cre
 
 sub getThumbnail {
 	if ($hasImageMagick && isIn($_[0]->getType, qw(jpg jpeg gif png))) {
-        	return $_[0]->{_node}->getURL.'/thumb-'.$_[0]->getFilename;
+        	return $_[0]->getNode->getURL.'/thumb-'.$_[0]->getFilename;
 	} elsif ($hasImageMagick && isIn($_[0]->getType, qw(tif tiff bmp))) {
-        	return $_[0]->{_node}->getURL.'/thumb-'.$_[0]->getFilename.'.png';
+        	return $_[0]->getNode->getURL.'/thumb-'.$_[0]->getFilename.'.png';
 	} else {
 		return $_[0]->getIcon;
 	}
@@ -387,7 +400,7 @@ Returns a full URL to an attachment.
 =cut
 
 sub getURL {
-	return $_[0]->{_node}->getURL.'/'.$_[0]->getFilename;
+	return $_[0]->getNode->getURL.'/'.$_[0]->getFilename;
 }
 
 
@@ -451,7 +464,10 @@ Define the new filename for this attachment.
 =cut
 
 sub rename {
-	rename $_[0]->getPath, $_[0]->{_node}->getPath.$session{os}{slash}.$_[1];
+	rename $_[0]->getPath, $_[0]->getNode->getPath.$session{os}{slash}.$_[1];
+	if ($_[0]->isImage) {
+		rename $_[0]->getNode->getPath.$session{os}{slash}.'thumb-'.$_[0]->getFilename, $_[0]->getNode->getPath.$session{os}{slash}."thumb-".$_[1];
+	}
 	$_[0]->{_filename} = $_[1];
 }
 
@@ -530,7 +546,7 @@ sub save {
 			$_[0]->{_filename} .= ".txt";
 		}
 		$_[0]->{_filename} = WebGUI::URL::makeCompliant($_[0]->getFilename);
-		$_[0]->{_node}->create();
+		$_[0]->getNode->create();
 		$file = FileHandle->new(">".$_[0]->getPath);
 		if (defined $file) {
 			binmode $file;
@@ -589,7 +605,7 @@ sub saveFromFilesystem {
                         $_[0]->{_filename} .= ".txt";
                 }
                 $_[0]->{_filename} = WebGUI::URL::makeCompliant($_[0]->getFilename);
-                $_[0]->{_node}->create();
+                $_[0]->getNode->create();
 		$a = FileHandle->new($_[1],"r");
                 if (defined $a) {
                        	binmode($a);
