@@ -276,7 +276,7 @@ sub duplicate {
         while (%data = $sth->hash) {
                 $newId = getNextId("productSpecificationId");
                 WebGUI::SQL->write("insert into Product_specification values (".$w->get("wobjectId").", $newId, "
-                        .quote($data{name}).", ".quote($data{value}).", $data{sequenceNumber})");
+                        .quote($data{name}).", ".quote($data{value}).", ".quote($data{units}).", $data{sequenceNumber})");
         }
         $sth->finish;
         $sth = WebGUI::SQL->read("select * from Product_accessory where wobjectId=".$_[0]->get("wobjectId"));
