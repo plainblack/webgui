@@ -22,6 +22,7 @@ use WebGUI::Session;
 use WebGUI::SQL;
 use WebGUI::Storage;
 use WebGUI::Template;
+use WebGUI::Utility;
 
 our @ISA = qw(WebGUI::Asset);
 
@@ -180,7 +181,9 @@ sub editSave {
 		my $storage = WebGUI::Storage->create;
 		$storage->addFileFromFilesystem($tempStorage->getPath($filename));
 		my %data;
-		my $newAsset = $parent->addChild({className=>'WebGUI::Asset::File'});
+		my $class = 'WebGUI::Asset::File';
+		$class = "WebGUI::Asset::File::Image" if (isIn($storage->getFileExtension($filename),qw(jpg gif png)));
+		my $newAsset = $parent->addChild({className=>$class});
 		foreach my $definition (@{$self->definition}) {
 			foreach my $property (keys %{$definition->{properties}}) {
 				$data{$property} = WebGUI::FormProcessor::process(
@@ -196,6 +199,7 @@ sub editSave {
 		$data{url} = $parent->getUrl.'/'.$filename;
 		$newAsset->update(\%data);
 		$newAsset->setSize($storage->getFileSize($filename));
+		$newAsset->generateThumbnail if ($class eq "WebGUI::Asset::File::Image");
 	}
 	$tempStorage->delete;
 	return $parent->www_manageAssets if ($session{form}{afterEdit} eq "assetManager");

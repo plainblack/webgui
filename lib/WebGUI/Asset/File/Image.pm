@@ -156,7 +156,7 @@ sub getEditForm {
 		my $storage = WebGUI::Storage->get($self->get("storageId"));
 		$tabform->getTab("properties")->readOnly(
 			-label=>"Thumbnail",
-			-value=>'<a href="'.$storage->getUrl($self->get("filename")).'"><img src="'.$storage->getUrl("thumb-".$self->get("filename")).'" alt="thumbnail" /></a>'
+			-value=>'<a href="'.$storage->getUrl($self->get("filename")).'"><img src="'.$storage->getUrl("thumb-".$self->get("filename")).'?noCache='.time().'" alt="thumbnail" /></a>'
 			);
 	}
 	return $tabform;
