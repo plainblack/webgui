@@ -1,6 +1,7 @@
 5.5.6
  - bugfix [ 895067 ] Forum ID Missing In USS
  - bugfix [ 909688 ] USS forum post edit function not work
+ - bugfix [ 910514 ] Article Discussion - Not reporting correctly
 
 
 5.5.5

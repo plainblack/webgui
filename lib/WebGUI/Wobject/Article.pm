@@ -182,7 +182,7 @@ sub www_view {
 	my $callback = WebGUI::URL::page("func=view&amp;wid=".$_[0]->get("wobjectId"));
 	if ($_[0]->get("allowDiscussion")) {
 		my $forum = WebGUI::Forum->new($_[0]->get("forumId"));
-		$var{"replies.count"} = $forum->get("replies");
+		$var{"replies.count"} = ($forum->get("replies") + $forum->get("threads"));
 		$var{"replies.URL"} = WebGUI::Forum::UI::formatForumURL($callback,$forum->get("forumId"));
 		$var{"replies.label"} = WebGUI::International::get(28,$_[0]->get("namespace"));
 		$var{"post.URL"} = WebGUI::Forum::UI::formatNewThreadURL($callback,$forum->get("forumId"));
