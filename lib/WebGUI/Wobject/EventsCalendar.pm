@@ -52,13 +52,14 @@ sub _drawBigCalendar {
 	$calendar->monthname(WebGUI::DateTime::getMonthName($calendar->month));
 	$calendar->header('<h2 align="center">'.$calendar->monthname.' '.$calendar->year.'</h2>');
         ($start,$end) = monthStartEnd($_[1]);
+	my $canEdit = ($session{var}{adminOn} && WebGUI::Privilege::canEditPage());
         $sth = WebGUI::SQL->read("select * from EventsCalendar_event where wobjectId="
 		.$_[0]->get("wobjectId")." order by startDate,endDate");
         while (%event = $sth->hash) {
         	if (epochToHuman($event{startDate},"%M %y") eq $thisMonth 
 			|| epochToHuman($event{endDate},"%M %y") eq $thisMonth) {
 			$message = "";
-                        if ($session{var}{adminOn}) {
+                        if ($canEdit) {
                                 $message = deleteIcon('func=deleteEvent&wid='.$_[0]->get("wobjectId").'&eid='.$event{EventsCalendar_eventId}
                                         .'&rid='.$event{EventsCalendar_recurringEventId})
                                         .editIcon('func=editEvent&wid='.$_[0]->get("wobjectId").'&eid='.$event{EventsCalendar_eventId})
@@ -344,7 +345,7 @@ sub www_editEvent {
                                 addEvent=>WebGUI::International::get(91,$namespace),
                                 backToPage=>WebGUI::International::get(745)
                                 },
-			-value=>"addEvent"
+			-value=>"backToPage"
                         );
         }
 	$f->submit;
