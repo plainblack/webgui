@@ -30,8 +30,11 @@ If you added a link title, now add the URL (uniform resource locater) here.
 
 <p><b>Convert carriage returns?</b><br>
 If you're publishing HTML there's generally no need to check this option, but if you aren't using HTML and you want a carriage return every place you hit your "Enter" key, then check this option.
+
+<p><b>Allow discussion?</b><br>
+Checking this box will enable responses to your article much like Articles on Slashdot.org.
 |,
-		lastUpdated => 1106779583,
+		lastUpdated => 1106783948,
 	},
 
 	'7' => {
@@ -162,8 +165,27 @@ The title of the link added to the article.
 The URL for the link added to the article.
 <p/>
 
+<b>post.label</b><br/>
+The translated label to add a comment to this article.
+<p/>
+
+<b>post.URL</b><br/>
+The URL to add a comment to this article.
+<p/>
+
+<b>replies.count</b><br/>
+The number of comments attached to this article.
+<p/>
+
+<b>replies.label</b><br/>
+The translated text indicating that you can view the replies.
+<p/>
+
+<b>replies.url</b><br/>
+The URL to view the replies to this article.
+<p/>
 |,
-		lastUpdated => 1106777549
+		lastUpdated => 1106783944
 	},
 
 	'24' => {
