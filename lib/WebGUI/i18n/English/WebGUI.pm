@@ -2451,11 +2451,13 @@ The password you use to connect to the DSN.
 Do you wish to display the Wobject's title? On some sites, displaying the title is not necessary. 
 
 <P><b>Template</b><br>
-Select a template to layout your Wobject.
+Select a template from the list to layout your Wobject.  Each Wobject may only use templates for their own
+namespace.  For example, Articles can only use templates from the "Article" namespace.  Layouts
+can only use templates from the "page" namespace.
 
 <P><b>Style Template</b><br>
-Select a style template to enclose your Wobject if it viewed directly.  If the Wobject
-is displayed as part of a Layout Asset, the Layout Asset's Style Template is used instead.
+Select a style template from the list to enclose your Wobject if it is viewed directly.  If the Wobject
+is displayed as part of a Layout Asset, the Layout Asset's <b>Style Template</b> is used instead.
 
 <p><b>Printable Style</b><br>
 This sets the printable style for this page to be something other than the WebGUI Default Printable Style.  It behaves similarly to the <b>Style Template</b> with respect to when it is used.
@@ -2469,7 +2471,7 @@ This sets the printable style for this page to be something other than the WebGU
 <P><B>NOTE:</B> Page caching is only available if your administrator has installed the Cache::FileCache Perl module. Using page caching can improve site performance by as much as 1000%.&nbsp;
 
 |,
-		lastUpdated => 1104628942,
+		lastUpdated => 1104790675,
 	},
 
 	'991' => {
