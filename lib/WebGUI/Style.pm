@@ -18,10 +18,11 @@ use WebGUI::SQL;
 
 #-------------------------------------------------------------------
 sub getStyle {
-	my ($header, $footer, @style, %style);
+	my ($header, $footer, @style, %style, $styleId);
 	tie %style, 'Tie::CPHash';
 	if ($session{form}{makePrintable}) {
-		%style = WebGUI::SQL->quickHash("select header,footer,styleSheet from style where styleId=3");
+		$styleId = $session{form}{style} || 3;
+		%style = WebGUI::SQL->quickHash("select header,footer,styleSheet from style where styleId=$styleId");
 		$header = '<html><!-- WebGUI '.$session{wg}{version}.' -->'."\n";
 		$header .= '<head><title>'.$session{page}{title}.' - '.$session{setting}{companyName}.'</title>';
 		$header .= $style{styleSheet}.'</head>'.$style{header};

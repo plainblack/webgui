@@ -14,14 +14,21 @@ use strict;
 use WebGUI::International;
 use WebGUI::Macro;
 use WebGUI::Session;
+use WebGUI::SQL;
 use WebGUI::URL;
 use WebGUI::Utility;
 
 #-------------------------------------------------------------------
 sub _replacement {
-        my ($temp, @param);
+        my ($temp, @param, $styleId);
         @param = WebGUI::Macro::getParams($_[0]);
         $temp = WebGUI::URL::append($session{env}{REQUEST_URI},'makePrintable=1');
+	if ($param[1] ne "") {
+		($styleId) = WebGUI::SQL->quickArray("select styleId from style where name=".quote($param[1]));
+		if ($styleId != 0) {
+			$temp = WebGUI::URL::append($temp,'style='.$styleId);
+		}
+	}
 	if ($param[0] ne "linkonly") {
         	$temp = '<a class="makePrintableLink" href="'.$temp.'">';
         	if ($param[0] ne "") {
