@@ -10,7 +10,7 @@ our $I18N = {
 		message => q|Articles are the Swiss Army knife of WebGUI. Most pieces of static content can be added via the Article.
 <br><br>
 
-NOTE: You can create a multi-paged article by placing the seperator macro (^-;) at various places through-out your article.
+NOTE: You can create a multi-paged article by placing the separator macro (^-;) at various places through-out your article.  This works unless you are using a Make Page Printable style.
 
 <p />
 <b>Template</b><br/>
@@ -44,12 +44,13 @@ If you're publishing HTML there's generally no need to check this option, but if
 <p>
 
 <b>Allow discussion?</b><br>
-Checking this box will enable responses to your article much like Articles on Slashdot.org.
+Checking this box will enable responses to your article much like Articles on Slashdot.org by
+adding a discussion board to the page.
 <p>
 
 
 |,
-		lastUpdated => 1066583066
+		lastUpdated => 1098850076
 	},
 
 	'7' => {
