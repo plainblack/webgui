@@ -129,7 +129,7 @@ The unique identifier for the wobject that you wish to check the privileges on.
 sub canEditWobject {
 	my (%wobject);
 	tie %wobject, 'Tie::CPHash';
-	return canEditPage() unless ($session{setting}{wobjectPrivileges} == 1);
+	return canEditPage() if ($session{setting}{wobjectPrivileges} != 1 || $_[0] eq "new");
 	%wobject = WebGUI::SQL->quickHash("select ownerId,groupIdEdit from wobject where wobjectId=".quote($_[0]));
 	if ($session{user}{userId} == $wobject{ownerId}) {
 		return 1;

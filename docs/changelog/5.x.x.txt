@@ -1,6 +1,5 @@
 5.5.0
  - Rewrote the discussion system and added many new features in the process.
- - Fixed a bug in the collateralImport.pl script.
  - Added external database group privileges. (Thanks to Andy Grundman.)
  - Added support for encryptLogin user setting. (Thanks to Hal Roberts.)
  - Added anonymous response option to Survey. (Thanks to Andy Grundman.)
@@ -11,6 +10,39 @@
  - Ordered the username list in the manageUsersInGroup operation (Thanks to
    Andreas Graf.)
  - Added support for record deletion in DataForm (Thanks to Hal Roberts.)
+
+
+
+5.4.3
+ - Fixed a bug where CM's could have deleted the entire collateral manager
+   contents if they deleted an item, then hit their back button and deleted it
+again.
+ - Fixed a bug in the collateralImport.pl script.
+ - Fixed a bug where exports of themes would only work if an image was
+   included in the theme.
+ - Fixed a bug in the RandomSnippet and RandomImage macros where they would
+   crash the page if an invalid collateral folder were specified.
+ - Fixed a bug when wobject privileges were turned on and a user had the
+   privileges to edit a page, they could not add wobjects to the page.
+ - Fixed a bug where all of the articles on a page would get the same template
+   for one page view after a properties save.
+ - Fixed a bug where the email address would not appear when editing a user
+   profile after an admin created a new account. (Thanks to Arne Dokken.)
+ - Fixed a bug in editing secondary admins. (Thanks to Leendert Bottelberghs.)
+ - Fixed an ordering bug on the list of users in the Manage Users In Group
+   page.
+ - Fixed an LDAP auth bug where users could not authenticate if RDN = DN.
+   (Thanks to Chris Jackson.)
+ - Fixed a bug in the DataForm where multiple items in a check list were not
+   being emailed.
+ - Fixed a bug in the Syndicated Content wobject where feeds with only one
+   item would cause a problem. (Thanks to Len Kranendonk.)
+ - Made session page setup use the same mechanism to mangle urls as the rest
+   of WebGUI uses.
+ - Fixed a bug in DataForm where the name of the last form element added would
+   appear as the default value of another form field if it were called "name".
+ - Fixed a potential security problem in the collateral manager where content
+   managers could delete collateral they didn't own.
 
 
 

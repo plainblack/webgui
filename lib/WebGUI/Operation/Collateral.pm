@@ -55,15 +55,18 @@ sub _submenu {
 		$menu{WebGUI::URL::page('op=deleteCollateral&cid='.$session{form}{cid})} = WebGUI::International::get(765);
 	}
 	$menu{WebGUI::URL::page('op=editCollateralFolder')} = WebGUI::International::get(759);
-	$menu{WebGUI::URL::page('op=emptyCollateralFolder')} = WebGUI::International::get(980);
-	$menu{WebGUI::URL::page('op=deleteCollateralFolder')} = WebGUI::International::get(760);
+	if (WebGUI::Privilege::isInGroup(3)) {
+		$menu{WebGUI::URL::page('op=emptyCollateralFolder')} = WebGUI::International::get(980);
+		$menu{WebGUI::URL::page('op=deleteCollateralFolder')} = WebGUI::International::get(760);
+	}
 	$menu{WebGUI::URL::page('op=listCollateral')} = WebGUI::International::get(766);
 	return menuWrapper($_[0],\%menu);
 }
 
 #-------------------------------------------------------------------
 sub www_deleteCollateral {
-	return WebGUI::Privilege::insufficient unless (WebGUI::Privilege::isInGroup(4));
+	my $collateral = WebGUI::Collateral->new($session{form}{cid});
+        return WebGUI::Privilege::insufficient unless ($collateral->get("userId") == $session{user}{userId} || WebGUI::Privilege::isInGroup(3));
 	my $output = '<h1>'.WebGUI::International::get(42).'</h1>';
 	$output .= WebGUI::International::get(774).'<p/><div align="center">';
 	$output .= '<a href="'.WebGUI::URL::page('op=deleteCollateralConfirm&cid='.$session{form}{cid}).'">'
@@ -76,16 +79,25 @@ sub www_deleteCollateral {
 
 #-------------------------------------------------------------------
 sub www_deleteCollateralConfirm {
-	return WebGUI::Privilege::insufficient unless (WebGUI::Privilege::isInGroup(4));
 	my $collateral = WebGUI::Collateral->new($session{form}{cid});
+        return WebGUI::Privilege::insufficient unless ($collateral->get("userId") == $session{user}{userId} || WebGUI::Privilege::isInGroup(3));
 	$collateral->delete;
 	WebGUI::Session::deleteScratch("collateralPageNumber");
 	return www_listCollateral();
 }
 
 #-------------------------------------------------------------------
+sub www_deleteCollateralFile {
+	my $collateral = WebGUI::Collateral->new($session{form}{cid});
+        return WebGUI::Privilege::insufficient unless ($collateral->get("userId") == $session{user}{userId} || WebGUI::Privilege::isInGroup(3));
+	my $collateral = WebGUI::Collateral->new($session{form}{cid});
+	$collateral->deleteFile;
+	return www_editCollateral($collateral);
+}
+
+#-------------------------------------------------------------------
 sub www_deleteCollateralFolder {
-        return WebGUI::Privilege::insufficient unless (WebGUI::Privilege::isInGroup(4));
+        return WebGUI::Privilege::insufficient unless (WebGUI::Privilege::isInGroup(3));
 	return WebGUI::Privilege::vitalComponent() unless ($session{scratch}{collateralFolderId} > 999);
         my $output = '<h1>'.WebGUI::International::get(42).'</h1>';
 	$output .= WebGUI::International::get(775).'<p/><div align="center">';
@@ -99,7 +111,7 @@ sub www_deleteCollateralFolder {
 
 #-------------------------------------------------------------------
 sub www_deleteCollateralFolderConfirm {
-        return WebGUI::Privilege::insufficient unless (WebGUI::Privilege::isInGroup(4));
+        return WebGUI::Privilege::insufficient unless (WebGUI::Privilege::isInGroup(3));
 	return WebGUI::Privilege::vitalComponent() unless ($session{scratch}{collateralFolderId} > 999);
         my $folders = WebGUI::CollateralFolder->getTree({-minimumFields => 1});
         if (my $deadFolder = $folders->{$session{scratch}{collateralFolderId}}) {
@@ -112,7 +124,7 @@ sub www_deleteCollateralFolderConfirm {
 
 #-------------------------------------------------------------------
 sub www_emptyCollateralFolder {
-        return WebGUI::Privilege::insufficient unless (WebGUI::Privilege::isInGroup(4));
+        return WebGUI::Privilege::insufficient unless (WebGUI::Privilege::isInGroup(3));
 	return WebGUI::Privilege::vitalComponent() unless ($session{scratch}{collateralFolderId} > 999);
         my $output = '<h1>'.WebGUI::International::get(42).'</h1>';
 	$output .= WebGUI::International::get(979).'<p/><div align="center">';
@@ -126,19 +138,11 @@ sub www_emptyCollateralFolder {
 
 #-------------------------------------------------------------------
 sub www_emptyCollateralFolderConfirm {
-        return WebGUI::Privilege::insufficient unless (WebGUI::Privilege::isInGroup(4));
+        return WebGUI::Privilege::insufficient unless (WebGUI::Privilege::isInGroup(3));
 	return WebGUI::Privilege::vitalComponent() unless ($session{scratch}{collateralFolderId} > 999);
 	my @collateralIds = WebGUI::SQL->buildArray("select collateralId from collateral where collateralFolderId=".$session{scratch}{collateralFolderId});
 	WebGUI::Collateral->multiDelete(@collateralIds);
         return www_listCollateral();
-}
-
-#-------------------------------------------------------------------
-sub www_deleteCollateralFile {
-	return WebGUI::Privilege::insufficient unless (WebGUI::Privilege::isInGroup(4));
-	my $collateral = WebGUI::Collateral->new($session{form}{cid});
-	$collateral->deleteFile;
-	return www_editCollateral($collateral);
 }
 
 #-------------------------------------------------------------------

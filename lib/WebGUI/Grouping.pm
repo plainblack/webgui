@@ -325,7 +325,7 @@ If specified the admin flag will be set to this value.
 =cut
 
 sub userGroupAdmin {
-	if ($_[2]) {
+	if ($_[2] ne "") {
 		WebGUI::SQL->write("update groupings set groupAdmin=$_[2] where groupId=$_[1] and userId=$_[0]");
 		return $_[2];
 	} else {

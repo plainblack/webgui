@@ -197,11 +197,12 @@ sub getRecordTemplateVars {
 	my $sth = WebGUI::SQL->read("$select from DataForm_field as a $join $where order by a.sequenceNumber");
 	while (%data = $sth->hash) {
 		my $formValue = $session{form}{$data{name}};
-		if (defined $formValue) {
-			$data{value} = $formValue;
-		} elsif (not exists $data{value}) {
-			$data{value} = WebGUI::Macro::process($data{defaultValue});
-		}
+		if ((not exists $data{value}) && $session{form}{func} ne "editSave" && $session{form}{func} ne "editFieldSave" && defined $formValue) {
+                        $data{value} = $formValue;
+                }
+                if (not exists $data{value}) {
+                        $data{value} = WebGUI::Macro::process($data{defaultValue});
+                }
 		my $hidden = (($data{status} eq "hidden" || ($data{isMailField} && !$self->get("mailData"))) && !$session{var}{adminOn});
 		push(@fields,{
 			"field.form" => _createField(\%data),
@@ -389,7 +390,7 @@ sub www_editSave {
 			label=>WebGUI::International::get(10,$_[0]->get("namespace")),
 			status=>"editable",
 			isMailField=>1,
-			width=>45,
+			width=>0,
 			type=>"email"
 			});
 		$_[0]->setCollateral("DataForm_field","DataForm_fieldId",{
@@ -398,7 +399,7 @@ sub www_editSave {
 			label=>WebGUI::International::get(11,$_[0]->get("namespace")),
 			status=>"hidden",
 			isMailField=>1,
-			width=>45,
+			width=>0,
 			type=>"email",
 			defaultValue=>$session{setting}{companyEmail}
 			});
@@ -408,7 +409,7 @@ sub www_editSave {
 			label=>WebGUI::International::get(12,$_[0]->get("namespace")),
 			status=>"hidden",
 			isMailField=>1,
-			width=>45,
+			width=>0,
 			type=>"email"
 			});
 		$_[0]->setCollateral("DataForm_field","DataForm_fieldId",{
@@ -417,7 +418,7 @@ sub www_editSave {
 			label=>WebGUI::International::get(13,$_[0]->get("namespace")),
 			status=>"hidden",
 			isMailField=>1,
-			width=>45,
+			width=>0,
 			type=>"email"
 			});
 		$_[0]->setCollateral("DataForm_field","DataForm_fieldId",{
@@ -426,7 +427,7 @@ sub www_editSave {
 			label=>WebGUI::International::get(14,$_[0]->get("namespace")),
 			status=>"editable",
 			isMailField=>1,
-			width=>45,
+			width=>0,
 			type=>"text",
 			defaultValue=>WebGUI::International::get(2,$_[0]->get("namespace"))
 			});

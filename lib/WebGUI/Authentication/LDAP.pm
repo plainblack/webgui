@@ -112,14 +112,17 @@ sub registrationFormSave {
 	$ldap->bind;
 	my $search = $ldap->search (base => $uri->dn, filter => $session{setting}{ldapId}."=".$session{form}{'authLDAP.ldapId'});
 	if (defined $search->entry(0)) {
-		$connectDN = $search->entry(0)->get_value($session{setting}{ldapUserRDN});
+		if ($session{setting}{ldapUserRDN} eq 'dn') {
+			$connectDN = $search->entry(0)->dn;
+		} else { 
+			$connectDN = $search->entry(0)->get_value($session{setting}{ldapUserRDN});
+		}
 	}
 	$ldap->unbind;
-	WebGUI::Authentication::saveParams($uid,'LDAP',
-	{
+	WebGUI::Authentication::saveParams($uid,'LDAP', {
 		connectDN 	=> $connectDN, 
 		ldapUrl 	=> $session{setting}{ldapURL}
-	});
+		});
 }
 
 #-------------------------------------------------------------------
@@ -130,7 +133,11 @@ sub registrationFormValidate {
         	if ($ldap->bind) {
         		$search = $ldap->search (base=>$uri->dn,filter=>$session{setting}{ldapId}."=".$session{form}{'authLDAP.ldapId'});
         		if (defined $search->entry(0)) {
-                		$connectDN = $search->entry(0)->get_value($session{setting}{ldapUserRDN});
+				if ($session{setting}{ldapUserRDN} eq 'dn') {
+                        		$connectDN = $search->entry(0)->dn;
+                		} else {
+                        		$connectDN = $search->entry(0)->get_value($session{setting}{ldapUserRDN});
+                		}
                 		$ldap->unbind;
                 		$ldap = Net::LDAP->new($uri->host, (port=>$uri->port)) or $error .= WebGUI::International::get(2,'Auth/LDAP');
                 		$auth = $ldap->bind(dn=>$connectDN, password=>$session{form}{'authLDAP.ldapPassword'});

@@ -50,9 +50,9 @@ These subroutines are available from this package:
 
 #-------------------------------------------------------------------
 sub _getSiteURL {
-	my $site = $session{env}{HTTP_HOST} || $session{config}{sitename};
+	my $site = $WebGUI::Session::session{env}{HTTP_HOST} || $WebGUI::Session::session{config}{sitename};
 	my $proto = "http://";
-	if ($session{env}{SERVER_PORT} == 443) {
+	if ($WebGUI::Session::session{env}{SERVER_PORT} == 443) {
 		$proto = "https://";
 	}
 	return $proto.$site;
@@ -137,11 +137,11 @@ Name value pairs to add to the URL in the form of:
 =cut
 
 sub gateway {
-        my $url = _getSiteURL().$session{config}{scripturl}.'/'.$_[0];
+        my $url = _getSiteURL().$WebGUI::Session::session{config}{scripturl}.'/'.$_[0];
 	if ($_[1]) {
 		$url = append($url,$_[1]);
 	}
-        if ($session{setting}{preventProxyCache} == 1) {
+        if ($WebGUI::Session::session{setting}{preventProxyCache} == 1) {
                 $url = append($url,"noCache=".randint(0,1000).';'.time());
         }
         return $url;
@@ -195,11 +195,11 @@ Name value pairs to add to the URL in the form of:
 =cut
 
 sub page {
-	my $url = _getSiteURL().$session{page}{url};
+	my $url = _getSiteURL().$WebGUI::Session::session{page}{url};
 	if ($_[0]) {
 		$url = append($url,$_[0]);
 	}
-	if ($session{setting}{preventProxyCache} == 1) {
+	if ($WebGUI::Session::session{setting}{preventProxyCache} == 1) {
 		$url = append($url,"noCache=".randint(0,1000).';'.time());
 	}
 	return $url;

@@ -669,6 +669,7 @@ A hash reference containing the data you wish to persist to the filesystem.
 
 sub saveFromHashref {
 	my ($self, $hashref) = @_;
+        $self->getNode->create();
 	store $hashref, $self->getPath;
 	return $self->getFilename;
 }

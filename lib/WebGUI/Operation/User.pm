@@ -260,7 +260,7 @@ sub www_editGrouping {
 sub www_editGroupingSave {
 	return WebGUI::Privilege::adminOnly() unless (WebGUI::Privilege::isInGroup(3));
         WebGUI::Grouping::userGroupExpireDate($session{form}{uid},$session{form}{gid},setToEpoch($session{form}{expireDate}));
-        WebGUI::Grouping::userGroupAdmin($session{form}{uid},$session{form}{gid},setToEpoch($session{form}{groupAdmin}));
+        WebGUI::Grouping::userGroupAdmin($session{form}{uid},$session{form}{gid},$session{form}{groupAdmin});
         return www_editUserGroup();
 }
 
@@ -429,7 +429,7 @@ sub www_editUserProfile {
                 } elsif ($method) {
 			if ($session{form}{$data{fieldName}}) {
                         	$default = $session{form}{$data{fieldName}};
-                        } elsif (exists $session{user}{$data{fieldName}}) {
+                        } elsif (exists $user{$data{fieldName}}) {
                                 $default = $user{$data{fieldName}};
                         } else {
                                 $default = eval $data{dataDefault};

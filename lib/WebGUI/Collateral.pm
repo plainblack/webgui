@@ -72,8 +72,10 @@ Delete's this collateral item.
 =cut
 
 sub delete {
-        $_[0]->deleteNode;
-	WebGUI::SQL->write("delete from collateral where collateralId=".$_[0]->get("collateralId"));
+	if ($_[0]->{_properties}->{collateralId} > 0) { # blocks deletion of all collateral in the event that no valid collateral id exists
+        	$_[0]->deleteNode;
+		WebGUI::SQL->write("delete from collateral where collateralId=".$_[0]->get("collateralId"));
+	}
 }
 
 

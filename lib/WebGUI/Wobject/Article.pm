@@ -191,10 +191,14 @@ sub www_view {
         	$var{"post.URL"} = WebGUI::URL::page('func=post&mid=new&wid='.$_[0]->get("wobjectId"));
         	$var{"post.label"} = WebGUI::International::get(24,$_[0]->get("namespace"));
 	}
+	 my $templateId = $_[0]->getValue("templateId");
+        if ($session{form}{func} eq "editSave") {
+                $templateId = $_[0]->get("templateId");
+        }
 	if ($session{form}{forumOp}) {
 		return WebGUI::Forum::Web::forumOp(WebGUI::URL::page("func=view&amp;wid=".$_[0]->get("wobjectId")));
 	} else {
-		return $_[0]->processTemplate($_[0]->getValue("templateId"),\%var).WebGUI::Forum::Web::viewForum(WebGUI::URL::page("func=view&amp;wid=".$_[0]->get("wobjectId")),1);
+		return $_[0]->processTemplate($templateId,\%var).WebGUI::Forum::Web::viewForum(WebGUI::URL::page("func=view&amp;wid=".$_[0]->get("wobjectId")),1);
 	}
 }
 

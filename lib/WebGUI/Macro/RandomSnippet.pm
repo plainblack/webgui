@@ -20,12 +20,11 @@ use WebGUI::SQL;
 #-------------------------------------------------------------------
 sub process {
         my @param = WebGUI::Macro::getParams($_[0]);
-	my $collateralFolderId;
+	my $collateralFolderId = 0;
 	if ($param[0] ne "") {
 		($collateralFolderId) = WebGUI::SQL->quickArray("select collateralFolderId from collateralFolder 
 			where name=".quote($param[0]));
-	} else {
-                $collateralFolderId = 0; #Root
+                $collateralFolderId = 0 unless ($collateralFolderId);
         }
 	my @snippets = WebGUI::SQL->buildArray("select collateralId from collateral 
 		where collateralType='snippet' and collateralFolderId=".$collateralFolderId);
