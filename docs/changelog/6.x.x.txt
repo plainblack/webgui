@@ -14,6 +14,7 @@
  - fix [ 1167917 ] Link to Page Tree and No-Cache Imcompatible
  - fix [ 1168084 ] file uploads don't work.
  - fix [ 1167720 ] Folder::view() subfolder_loop - missing.. [mwilson]
+ - fix [ 1169379 ] eventscalendar wobjects have wrong scope after upgrade
 
 
 6.5.3

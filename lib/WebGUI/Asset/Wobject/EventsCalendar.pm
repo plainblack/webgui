@@ -111,8 +111,8 @@ sub getEditForm {
 			-value=>[$self->getValue("scope")],
 			-options=>{
 				0=>WebGUI::International::get(508,"EventsCalendar"),
-				1=>WebGUI::International::get(509,"EventsCalendar"),
-				2=>WebGUI::International::get(510,"EventsCalendar"),
+				1=>WebGUI::International::get(510,"EventsCalendar"),
+				2=>WebGUI::International::get(509,"EventsCalendar"),
 			}
 		);
    	$tabform->getTab("display")->template(
@@ -239,10 +239,10 @@ sub view {
 	if ($scope == 0) { #calendar's scope is regular (immediate descendants)
 		$children = $self->getLineage(["children"],{returnObjects=>1,
 			includeOnlyClasses=>["WebGUI::Asset::Event","WebGUI::Asset::Relation"]});
-	} elsif ($scope == 1) { #calendar is master
+	} elsif ($scope == 2) { #calendar is master
 		$children = $self->getLineage(["descendants"],{returnObjects=>1,
 			includeOnlyClasses=>["WebGUI::Asset::Event","WebGUI::Asset::Relation"]});
-	} elsif ($scope == 2) { #calendar is global
+	} elsif ($scope == 1) { #calendar is global
 		$children = WebGUI::Asset::getRoot()->getLineage(["descendants"],{returnObjects=>1,
 			includeOnlyClasses=>["WebGUI::Asset::Event","WebGUI::Asset::Relation"]}); 
 	}
