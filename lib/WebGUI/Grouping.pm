@@ -254,6 +254,7 @@ A boolean value to determine whether the method should return the groups directl
 =cut
 
 sub getGroupsInGroup {
+	return undef unless $_[0];
        	my $groups = WebGUI::SQL->buildArrayRef("select groupId from groupGroupings where inGroup=$_[0]");
 	if ($_[1]) {
 		my @groupsOfGroups = @$groups;
