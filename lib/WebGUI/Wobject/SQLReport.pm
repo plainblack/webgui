@@ -43,7 +43,9 @@ sub new {
                 -extendedProperties=>{
 			template=>{}, 
 			dbQuery=>{}, 
-			databaseLinkId=>{},
+			databaseLinkId=>{
+				defaultValue=>0
+			},
 			DSN=>{
 				defaultValue=>$session{config}{dsn}
 				},

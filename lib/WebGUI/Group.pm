@@ -535,6 +535,7 @@ sub new {
 		$group{expireNotifyOffset} = -14;
 		$group{deleteOffset} = 14;
 		$group{expireNotify} = 0;
+		$group{databaseLinkId} = 0;
 		$group{dbCacheTimeout} = 3600;
 	} else {
         	%group = WebGUI::SQL->quickHash("select * from groups where groupId='$groupId'");
