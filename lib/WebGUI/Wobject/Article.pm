@@ -181,7 +181,7 @@ sub www_view {
 		$var{"post.URL"} = WebGUI::Forum::UI::formatNewThreadURL($callback,$forum->get("forumId"));
         	$var{"post.label"} = WebGUI::International::get(24,$self->get("namespace"));
 	}
-	my $templateId = $self->getValue("templateId");
+	my $templateId = $self->get("templateId");
         if ($session{form}{overrideTemplateId} ne "") {
                 $templateId = $session{form}{overrideTemplateId};
         }
