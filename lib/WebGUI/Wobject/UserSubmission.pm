@@ -88,8 +88,9 @@ sub _photogalleryView {
         $sth->finish;
         if (WebGUI::Privilege::isInGroup($_[0]->get("groupToContribute"))) {
                 $output .= '<a href="'.WebGUI::URL::page('func=editSubmission&sid=new&wid='.$_[0]->get("wobjectId")).'">'
-                        .WebGUI::International::get(20,$namespace).'</a><p/>';
+                        .WebGUI::International::get(20,$namespace).'</a> &middot; ';
         }
+	$output .= '<a href="'.WebGUI::URL::page('func=search&wid='.$_[0]->get("wobjectId")).'">'.WebGUI::International::get(364).'</a><p/>';
         $output .= '<table width="100%" cellpadding=2 cellspacing=1 border=0>';
         $p = WebGUI::Paginator->new(WebGUI::URL::page(),\@row,$_[0]->get("submissionsPerPage"));
         $output .= $p->getPage($session{form}{pn});
@@ -186,8 +187,9 @@ sub _weblogView {
         $sth->finish;
 	if (WebGUI::Privilege::isInGroup($_[0]->get("groupToContribute"))) {
         	$output .= '<a href="'.WebGUI::URL::page('func=editSubmission&sid=new&wid='.$_[0]->get("wobjectId")).'">'
-			.WebGUI::International::get(20,$namespace).'</a><p/>';
+			.WebGUI::International::get(20,$namespace).'</a> &middot; ';
 	}
+	$output .= '<a href="'.WebGUI::URL::page('func=search&wid='.$_[0]->get("wobjectId")).'">'.WebGUI::International::get(364).'</a><p/>';
         $output .= '<table width="100%" cellpadding=2 cellspacing=1 border=0>';
         $p = WebGUI::Paginator->new(WebGUI::URL::page(),\@row,$_[0]->get("submissionsPerPage"));
         $output .= $p->getPage($session{form}{pn});
