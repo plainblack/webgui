@@ -296,13 +296,13 @@ sub view {
 		$pageData->{"page.isCurrent"} = ($asset->getId eq $current->getId);
 		$pageData->{"page.isDescendant"} = ( $currentLineage =~ m/^$pageLineage/ && !$pageData->{"page.isCurrent"});
 		$pageData->{"page.isAnscestor"} = ( $pageLineage =~ m/^$currentLineage/ && !$pageData->{"page.isCurrent"});
+		my $currentBranchLineage = substr($currentLineage,0,12);
+		$pageData->{"page.inBranchRoot"} = ($currentBranchLineage =~ m/^$pageLineage/);
 		$pageData->{"page.isSibling"} = (
 			$pageData->{"page.inBranchRoot"} && 
 			$asset->getLineageLength == $current->getLineageLength &&
 			!$pageData->{"page.isCurrent"}
 			);
-		my $currentBranchLineage = substr($currentLineage,0,12);
-		$pageData->{"page.inBranchRoot"} = ($currentBranchLineage =~ m/^$pageLineage/);
 		$pageData->{"page.inBranch"} = ( 
 			$pageData->{"page.isCurrent"} ||
 			$pageData->{"page.isAncestor"} ||
