@@ -13,35 +13,38 @@ our $I18N = {
 
 	'71' => {
 		message => q|This wobject creates a simple multipurpose data-entry form.
-<br><br>
+Dataforms are Wobjects, so they inherit the properties of both Wobjects and Assets.  You
+can add additional fields to the DataForm, create multiple tabs, or use the DataForm
+as a web form to email gateway.
 
+<p>
 <b>Acknowledgment</b><br>
 This message will be displayed to the user after they submit their data..
-<p>
 
+<p>
 <b>Mail entries?</b></br>
 If set to yes, some additional fields will be added to your form for dealing with email. These fields will then be used to email any data entered into the form to a person of your choice.  By default the new fields are "Hidden" so that
 they can't be edited by the user.
 <p>
 <b>NOTE:</b> The "To" field that is added as a result of setting this to yes can accept a standard email address, or a WebGUI username or a WebGUI group name.
-<p>
 
+<p>
 <b>Template</b><br>
 Choose a template for your form.
-<p>
 
+<p>
 <b>Email Template</b><br>
 Choose a template for the data that will be sent via email.
-<p>
 
+<p>
 <b>Acknowledgment Template</b><br>
 Choose a template that will be used to display the acknowledgment.
-<p>
 
+<p>
 <b>List Template</b><br>
 Choose a template that will be used to display the list of stored records in this Data Form.
-<p>|,
-		lastUpdated => 1101772835,
+|,
+		lastUpdated => 1106779440,
 	},
 
 	'editField-vertical-label' => {
@@ -90,63 +93,63 @@ Choose a template that will be used to display the list of stored records in thi
 	},
 
 	'72' => {
-		message => q|You may add as many additional fields to your Data Form as you like.
-<br><br>
+		message => q|<p>You may add as many additional fields to your Data Form as you like.
 
+<p>
 <b>Tab</b><br>
 When the form has multiple tabs, defines which tab of the form that the
 field is displayed in.  Otherwise, all fields are displayed on the same
 page.
-<p>
 
+<p>
 <b>Label</b><br>
 This is an informative text label to let the user know what this field represents.
-<p>
 
+<p>
 <b>Subtext</b><br>
 An extension of the label, this is a description of what should go in the field or optional instructions for the field.
-<p>
 
+<p>
 <b>Field Name</b><br>
 The name of this field.  It must be unique among all of the other fields on your form.
-<p>
 
+<p>
 <b>Status</b><br>
 Hidden fields will not be visible to the user, but will be sent in the email. Displayed fields can be seen by the user but not modified. Modifiable fields can be filled in by the user. Required fields must be filled in by the user.
 If you choose Hidden or Displayed, be sure to fill in a Default Value.
-<p>
 
+<p>
 <b>Type</b><br>
 Choose the type of form element for this field.   This is also used
 to validate any input that the user may supply.
-<p>
 
+<p>
 <b>Width</b><br>
 Set the number of characters wide this form field will be.
-<p>
 
+<p>
 <b>Height</b><br>
 Set the number of characters tall this form field will be. Only used on textareas and HTMLAreas.
-<p>
 
+<p>
 <b>Align vertical</b><br>
 This property controls whether radio buttons and checklists are laid out horizontally or vertically.
-<p>
 
+<p>
 <b>Extras</b><br>
 Here you can enter additional tag properties for the field tag. For instance 'class="myClass"'.
-<p>
 
+<p>
 <b>Possible Values</b><br>
 This field is used for the list types (like Checkbox List and Select List).  Enter the values you wish to appear, one per line.
-<p>
 
+<p>
 <b>Default Value (optional)</b><br>
 Enter the default value (if any) for the field.  For Yes/No fields, enter "yes" to select "Yes" and "no" to select "No".
 <p>
 
 |,
-		lastUpdated => 1101772844,
+		lastUpdated => 1106779843,
 	},
 
 	'16' => {
