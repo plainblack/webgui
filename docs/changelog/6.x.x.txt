@@ -7,6 +7,7 @@
  - Bugfix [ 955501 ] Pagination link in SQL Report contains all
    form-parameters
  - Bugfix [ 956221 ] article template
+ - Bugfix [ 952906 ] Terminology in the Layout page
 
 
 

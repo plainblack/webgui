@@ -428,7 +428,7 @@ sub www_editPage {
                 	);
                 $f->getTab("layout")->template(
 			-name=>"styleId",
-			-label=>WebGUI::International::get(912),
+			-label=>WebGUI::International::get(1073),
 			-value=>($page{styleId} || 2),
 			-namespace=>'style',
 			-afterEdit=>'op=editPage&amp;npp='.$session{form}{npp},
@@ -451,7 +451,7 @@ sub www_editPage {
 		}
                 $f->getTab("layout")->readOnly(
                         -value=>_selectPositions($page{templateId}),
-                        -label=>WebGUI::International::get(356),
+                        -label=>WebGUI::International::get(829),
                         -uiLevel=>5
                         );
         	$f->getTab("privileges")->dateTime(
