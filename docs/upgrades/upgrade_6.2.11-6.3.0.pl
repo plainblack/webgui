@@ -132,7 +132,13 @@ WebGUI::SQL->write("alter table Product_related add assetId varchar(22) not null
 WebGUI::SQL->write("alter table Product_related add relatedAssetId varchar(22) not null");
 WebGUI::SQL->write("alter table Product_related add primary key (assetId,relatedAssetId)");
 WebGUI::SQL->write("alter table WobjectProxy add column description mediumtext");
-
+WebGUI::SQL->write("alter table EventsCalendar change column isMaster scope integer not null default 0");
+WebGUI::SQL->write("alter table EventsCalendar_event add column eventLocation text");
+WebGUI::SQL->write("alter table EventsCalendar_event change column startDate eventStartDate bigint(20)");
+WebGUI::SQL->write("alter table EventsCalendar_event change column endDate eventEndDate bigint(20)");
+WebGUI::SQL->write("alter table EventsCalendar_event add column templateId varchar(22)");
+WebGUI::SQL->write("alter table EventsCalendar_event add column assetId varchar(22)");
+WebGUI::SQL->write("alter table EventsCalendar_event drop primary key");
 
 
 # next 2 lines are for sitemap to nav migration
@@ -227,6 +233,11 @@ WebGUI::SQL->write("alter table Product_related drop column wobjectId");
 WebGUI::SQL->write("alter table Product_specification drop column wobjectId");
 WebGUI::SQL->write("alter table Product_related drop column RelatedWobjectId");
 WebGUI::SQL->write("alter table Product_accessory drop column AccessoryWobjectId");
+# I sure hope all the events got a unique assetId, because if they didn't.......
+WebGUI::SQL->write("alter table EventsCalendar_event add primary key assetId");
+WebGUI::SQL->write("alter table EventsCalendar_event drop column name");
+WebGUI::SQL->write("alter table EventsCalendar_event drop column wobjectId");
+
 WebGUI::SQL->write("drop table forum");
 WebGUI::SQL->write("drop table forumRead");
 WebGUI::SQL->write("drop table forumPost");
@@ -869,6 +880,7 @@ print "\tDeleting files which are no longer used.\n" unless ($quiet);
 #unlink("../../lib/WebGUI/Help/SiteMap.pm");
 #unlink("../../lib/WebGUI/i18n/English/SiteMap.pm");
 #unlink("../../lib/WebGUI/Wobject/SiteMap.pm");
+#unlink("../../lib/WebGUI/Wobject/EventsCalendar.pm");
 #unlink("../../lib/WebGUI/Wobject/Poll.pm");
 #unlink("../../lib/WebGUI/Wobject/DataForm.pm");
 #unlink("../../lib/WebGUI/Wobject/USS.pm");
@@ -929,6 +941,7 @@ $conf->set("assets"=>[
 		'WebGUI::Asset::Wobject::Product',
 		'WebGUI::Asset::Wobject::Collaboration',
 		'WebGUI::Asset::Wobject::MessageBoard',
+		'WebGUI::Asset::Wobject::EventsCalendar',
 		'WebGUI::Asset::Redirect',
 		'WebGUI::Asset::Template',
 		'WebGUI::Asset::FilePile',
@@ -949,7 +962,6 @@ print "\tSetting user function style\n" unless ($quiet);
 my ($defaultPageId) = WebGUI::SQL->quickArray("select value from settings where name='defaultPage'");
 my ($styleId) = WebGUI::SQL->quickArray("select styleTemplateId from wobject where assetId=".quote($defaultPageId));
 WebGUI::SQL->write("insert into settings (name,value) values ('userFunctionStyleId',".quote($styleId).")");
-
 
 
 
@@ -1409,6 +1421,31 @@ sub walkTree {
 				print "\t\t\tMigrating wobject collateral data\n" unless ($quiet);
 				foreach my $table (qw(DataForm_entry DataForm_entryData DataForm_field DataForm_tab Poll_answer)) {
 					WebGUI::SQL->write("update $table set assetId=".quote($wobjectId)." where wobjectId=".quote($wobject->{wobjectId}));
+				}
+			} elsif ($wobject->{namespace} eq "EventsCalendar") {
+				print "\t\t\tMigrating Events Calendar ".$wobject->{wobjectId}." and its Events\n" unless ($quiet);
+				my $wobjectId = $namespace->{wobjectId};
+				my $sth = WebGUI::SQL->read("select * from EventsCalendar_event where wobjectId=".quote($wobjectId));
+				my $calendar = WebGUI::Asset->newByDynamicClass($wobjectId,"WebGUI::Asset::Wobject::EventsCalendar");
+				# This is definitely not finished!!!!!!   nor even tested!!!!   yikes!!!
+				while (my $event = $sth->hashRef) {
+					#Migrate each event to an asset.
+					my $eventObject = $calendar->addChild({
+						className=>'WebGUI::Asset::Event',
+						title=>$event->{name},
+						menuTitle=>$event->{name},
+						isHidden=>1,
+						newWindow=>0,
+						startDate=>$calendar->getValue("startDate"),
+						endDate=>$calendar->getValue("endDate"),
+						ownerUserId=>$calendar->getValue("ownerUserId"),
+						groupIdEdit=>$calendar->getValue("groupIdEdit"),
+						groupIdView=>$calendar->getValue("groupIdView"),
+						url=>$event->fixUrl($calendar->getUrl().'/'.$namespace->{name}),
+						templateId=>$calendar->getValue("eventTemplateId")
+					});
+					WebGUI::SQL->write("update EventsCalendar_event set assetId=".quote($eventObject->getId)." where EventsCalendar_eventId=".quote($event->{EventsCalendar_eventId}));
+					# I'm sure there's something else I'm forgetting...
 				}
 			}
 			$rank++;
