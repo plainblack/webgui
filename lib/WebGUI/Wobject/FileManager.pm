@@ -142,13 +142,6 @@ sub www_deleteFile {
 }
 
 #-------------------------------------------------------------------
-sub www_deleteDownload {
-	return WebGUI::Privilege::insufficient() unless ($_[0]->canEdit);
-	return $_[0]->confirm(WebGUI::International::get(12,$_[0]->get("namespace")),
-		WebGUI::URL::page('func=deleteDownloadConfirm&wid='.$session{form}{wid}.'&did='.$session{form}{did}));
-}
-
-#-------------------------------------------------------------------
 sub www_deleteDownloadConfirm {
 	return WebGUI::Privilege::insufficient() unless ($_[0]->canEdit);
         my ($output, $file);
@@ -370,8 +363,8 @@ sub www_view {
 		$file3 = WebGUI::Attachment->new($file->{alternateVersion2},$_[0]->get("wobjectId"),$file->{FileManager_fileId});
 		push (@fileloop,{
 			"file.canView"=>(WebGUI::Grouping::isInGroup($file->{groupToView}) || $canEditWobject),
-			"file.controls"=>deleteIcon('func=deleteDownload&wid='.$_[0]->get("wobjectId")
-				.'&did='.$file->{FileManager_fileId}).editIcon('func=editDownload&wid='.$_[0]->get("wobjectId")
+			"file.controls"=>deleteIcon('func=deleteDownloadConfirm&wid='.$_[0]->get("wobjectId")
+				.'&did='.$file->{FileManager_fileId},'',WebGUI::International::get(12,$_[0]->get("namespace"))).editIcon('func=editDownload&wid='.$_[0]->get("wobjectId")
 				.'&did='.$file->{FileManager_fileId}).moveUpIcon('func=moveDownloadUp&wid='
 				.$_[0]->get("wobjectId")
 				.'&did='.$file->{FileManager_fileId}).moveDownIcon('func=moveDownloadDown&wid='

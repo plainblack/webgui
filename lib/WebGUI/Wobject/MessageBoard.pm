@@ -32,7 +32,8 @@ our @ISA = qw(WebGUI::Wobject);
 
 #-------------------------------------------------------------------
 sub _formatControls {
-	my $controls = deleteIcon("func=deleteForum&amp;wid=".$_[0]->get("wobjectId")."&amp;forumId=".$_[1])
+	my $controls = deleteIcon("func=deleteForumConfirm&amp;wid=".$_[0]->get("wobjectId")."&amp;forumId=".$_[1],'',
+				WebGUI::International::get(76,$_[0]->get("namespace")))
 		.editIcon("func=editForum&amp;wid=".$_[0]->get("wobjectId")."&amp;forumId=".$_[1])
 		.moveUpIcon("func=moveForumUp&amp;wid=".$_[0]->get("wobjectId")."&amp;forumId=".$_[1])
 		.moveDownIcon("func=moveForumDown&amp;wid=".$_[0]->get("wobjectId")."&amp;forumId=".$_[1]);
@@ -136,13 +137,6 @@ sub purge {
         $sth->finish;
 	WebGUI::SQL->write("delete from MessageBoard_forums where wobjectId=".quote($_[0]->get("wobjectId")));
         $_[0]->SUPER::purge();
-}
-
-#-------------------------------------------------------------------
-sub www_deleteForum {
- 	return WebGUI::Privilege::insufficient() unless ($_[0]->canEdit);
-        return $_[0]->confirm(WebGUI::International::get(76,$_[0]->get("namespace")),
-                WebGUI::URL::page('func=deleteForumConfirm&wid='.$_[0]->get("wobjectId").'&forumId='.$session{form}{forumId}));
 }
 
 #-------------------------------------------------------------------

@@ -88,7 +88,7 @@ sub _fieldAdminIcons {
 	my $fid = $_[1];
 	my $tid = $_[2];
 	my $output;
-	$output = deleteIcon('func=deleteField&wid='.$_[0]->get("wobjectId").'&fid='.$fid.'&tid='.$tid) unless ($_[3]);
+	$output = deleteIcon('func=deleteFieldConfirm&wid='.$_[0]->get("wobjectId").'&fid='.$fid.'&tid='.$tid,'',WebGUI::International::get(19,$_[0]->get("namespace"))) unless ($_[3]);
 	$output .= editIcon('func=editField&wid='.$_[0]->get("wobjectId").'&fid='.$fid.'&tid='.$tid)
 		.moveUpIcon('func=moveFieldUp&wid='.$_[0]->get("wobjectId").'&fid='.$fid.'&tid='.$tid)
 		.moveDownIcon('func=moveFieldDown&wid='.$_[0]->get("wobjectId").'&fid='.$fid.'&tid='.$tid);
@@ -98,7 +98,7 @@ sub _fieldAdminIcons {
 sub _tabAdminIcons {
 	my $tid = $_[1];
 	my $output;
-	$output = deleteIcon('func=deleteTab&wid='.$_[0]->get("wobjectId").'&tid='.$tid) unless ($_[2]);
+	$output = deleteIcon('func=deleteTabConfirm&wid='.$_[0]->get("wobjectId").'&tid='.$tid,'',WebGUI::International::get(100,$_[0]->get("namespace"))) unless ($_[2]);
 	$output .= editIcon('func=editTab&wid='.$_[0]->get("wobjectId").'&tid='.$tid)
 		.moveLeftIcon('func=moveTabLeft&wid='.$_[0]->get("wobjectId").'&tid='.$tid)
 		.moveRightIcon('func=moveTabRight&wid='.$_[0]->get("wobjectId").'&tid='.$tid);
@@ -488,25 +488,11 @@ sub www_deleteEntry {
 }
 
 #-------------------------------------------------------------------
-sub www_deleteField {
-	return WebGUI::Privilege::insufficient() unless ($_[0]->canEdit);
-	return $_[0]->confirm(WebGUI::International::get(19,$_[0]->get("namespace")),
-       		WebGUI::URL::page('func=deleteFieldConfirm&wid='.$_[0]->get("wobjectId").'&fid='.$session{form}{fid}));
-}
-
-#-------------------------------------------------------------------
 sub www_deleteFieldConfirm {
 	return WebGUI::Privilege::insufficient() unless ($_[0]->canEdit);
 	$_[0]->deleteCollateral("DataForm_field","DataForm_fieldId",$session{form}{fid});
 	$_[0]->reorderCollateral("DataForm_field","DataForm_fieldId");
        	return "";
-}
-
-#-------------------------------------------------------------------
-sub www_deleteTab {
-	return WebGUI::Privilege::insufficient() unless ($_[0]->canEdit);
-	return $_[0]->confirm(WebGUI::International::get(100,$_[0]->get("namespace")),
-       		WebGUI::URL::page('func=deleteTabConfirm&wid='.$_[0]->get("wobjectId").'&tid='.$session{form}{tid}));
 }
 
 #-------------------------------------------------------------------
