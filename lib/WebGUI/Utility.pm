@@ -72,9 +72,9 @@ Any old number will do.
 =cut
 
 sub commify {
- 	my $text = reverse $_[0];
- 	$text =~ s/(\d\d\d)(?=\d)(?!\d*\.)/$1,/g;
- 	return scalar reverse $text;
+	my $text = reverse $_[0];
+	$text =~ s/(\d\d\d)(?=\d)(?!\d*\.)/$1,/g;
+	return scalar reverse $text;
 }
 
 #-------------------------------------------------------------------
@@ -99,8 +99,8 @@ An array to look for the value in.
 
 sub isIn {
 	my $key = shift;
-  	$_ eq $key and return 1 for @_;
- 	return 0;
+	$_ eq $key and return 1 for @_;
+	return 0;
 }
 
 #-------------------------------------------------------------------
@@ -120,11 +120,8 @@ A reference to the array to look through.
 =cut
 
 sub makeArrayCommaSafe {
-        my ($array) = $_[0];
-        my ($i);
-        for ($i = @$array; --$i;) {
-                $$array[$i] = makeCommaSafe($$array[$i]);
-        }
+	my $array = $_[0];
+	$_ = makeCommaSafe($_) for @$array;
 }
 
 #-------------------------------------------------------------------
@@ -144,11 +141,8 @@ Searches through an array looking for tabs and replaces them with four spaces. A
 =cut
 
 sub makeArrayTabSafe {
-        my ($array) = $_[0];
-        my ($i);
-        for ($i = @$array; --$i;) {
-                $$array[$i] = makeTabSafe($$array[$i]);
-        }
+	my $array = $_[0];
+	$_ = makeTabSafe($_) for @$array;
 }
 
 #-------------------------------------------------------------------
@@ -168,11 +162,9 @@ The text to search through.
 =cut
 
 sub makeCommaSafe {
-        my ($text) = $_[0];
-        $text =~ s/\n/ /g;
-        $text =~ s/\r/ /g;
-        $text =~ s/,/;/g;
-        return $text;
+	my $text = $_[0];
+	$text =~ tr/,\r\n/; /;
+	return $text;
 }
 
 #-------------------------------------------------------------------
@@ -192,11 +184,10 @@ The text to search through.
 =cut
 
 sub makeTabSafe {
-        my ($text) = $_[0];
-        $text =~ s/\n/ /g;
-        $text =~ s/\r/ /g;
-        $text =~ s/\t/    /g;
-        return $text;
+	my $text = $_[0];
+	$text =~ tr/\r\n/ /;
+	$text =~ s/\t/    /g;
+	return $text;
 }
 
 #-------------------------------------------------------------------
@@ -244,11 +235,10 @@ A reference to the array to randomize.
 =cut
 
 sub randomizeArray {
-	my ($array, $i, $j);
-	$array = shift;
+	my $array = shift;
 	if ($#$array > 0) {
-		for ($i = @$array; --$i; ) {
-			$j = int rand ($i+1);
+		for (my $i = @$array; --$i; ) {
+			my $j = int rand ($i+1);
 			next if $i == $j;
 			@$array[$i,$j] = @$array[$j,$i];
 		}
@@ -272,14 +262,11 @@ A reference hash to randomize.
 =cut
 
 sub randomizeHash {
-	my ($hash, $key, @keys, %temp);
-	$hash = $_[0];
-	foreach $key (keys %{$_[0]}) {
-		push(@keys,$key);
-	}
+	my $hash = $_[0];
+	my @keys = keys %$hash;
 	randomizeArray(\@keys);
-	tie %temp, 'Tie::IxHash';
-	foreach $key (@keys) {
+	tie my %temp, 'Tie::IxHash';
+	foreach my $key (@keys) {
 		$temp{$key} = $hash->{$key};
 	}
 	return \%temp;
@@ -302,7 +289,7 @@ Any floating point number.
 =cut
 
 sub round {
-        return sprintf("%.0f", $_[0]);
+	return sprintf('%.0f', $_[0]);
 }
 
 #-------------------------------------------------------------------
@@ -322,14 +309,12 @@ A hash to be sorted.
 =cut
 
 sub sortHash {
-	my ( %hash, %newHash );
-	tie %hash, "Tie::IxHash";
-	tie %newHash, "Tie::IxHash";
-	%hash = @_;
+	my %hash = @_;
+	tie my %newHash, 'Tie::IxHash';
 	for my $key ( sort { $hash{$a} cmp $hash{$b} } keys %hash ) {
-    		$newHash{ $key } = $hash{ $key };
-  	}
-  	return %newHash;
+		$newHash{ $key } = $hash{ $key };
+	}
+	return %newHash;
 }
 
 #-------------------------------------------------------------------
@@ -350,14 +335,12 @@ A hash to be sorted.
 
 
 sub sortHashDescending {
-	my ( %hash, %newHash );
-  	tie %hash, "Tie::IxHash";
-  	tie %newHash, "Tie::IxHash";
-  	%hash = @_;
-  	for my $key ( sort { $hash{$b} cmp $hash{$a} } keys %hash ) {
-    		$newHash{ $key } = $hash{ $key };
-  	}
- 	return %newHash;
+	my %hash = @_;
+	tie my %newHash, 'Tie::IxHash';
+	for my $key ( sort { $hash{$b} cmp $hash{$a} } keys %hash ) {
+		$newHash{ $key } = $hash{ $key };
+	}
+	return %newHash;
 }
 
 1;
