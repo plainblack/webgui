@@ -21,6 +21,7 @@
  - Bugfix [ 886432 ] endless loop in group of groups
  - bugfix [ 887447 ] editing messages
  - Bugfix [ 893203 ] IO::Zlib not getting installed
+ - Bugfix [ 893556 ] TabForm bug: uiLevels not working
 
 
 5.5.4
