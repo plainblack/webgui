@@ -404,11 +404,16 @@ sub www_login {
 	my ($cmd, $uid, $success, $u);
 
 	($uid) = WebGUI::SQL->quickArray("select userId from users where username=".quote($session{form}{username}));
-	$u = WebGUI::User->new($uid);
 
-	$cmd = $session{authentication}{$u->authMethod}."::validateUser";
-	$success = eval{&$cmd($uid, $session{form}{identifier})};
-	WebGUI::ErrorHandler::fatalError("Unable to load method validateUser on Authentication module: $_. ".$@) if($@);
+	if ($uid) {
+		$u = WebGUI::User->new($uid);
+
+		$cmd = $session{authentication}{$u->authMethod}."::validateUser";
+		$success = eval{&$cmd($uid, $session{form}{identifier})};
+		WebGUI::ErrorHandler::fatalError("Unable to load method validateUser on Authentication module: $_. ".$@) if($@);
+	} else {
+		$success = WebGUI::International::get(68);
+	}
 
 	if ($success == 1) {
 		WebGUI::Session::start($uid);
