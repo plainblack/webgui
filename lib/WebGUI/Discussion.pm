@@ -347,13 +347,10 @@ sub showReplyTree {
 sub showThreads {
         my ($sth, %data, $html, $sql);
         $sql = "select * from discussion where wobjectId=$session{form}{wid}";
-        if ($session{form}{sid}) {
-                $sql .= " and subId=$session{form}{sid}";
-        }
-        $sql .= " and pid=0";
+        $sql .= " and subId=$session{form}{sid}" if ($session{form}{sid});
        	$html .= '<table border=0 cellpadding=2 cellspacing=1 width="100%">';
 	if ($session{user}{discussionLayout} eq "threaded") {
-        	$sql .= " order by dateOfPost desc";
+        	$sql .= " and pid=0 order by dateOfPost desc";
         	$sth = WebGUI::SQL->read($sql);
                 $html .= '<tr><td class="tableHeader">'.WebGUI::International::get(229).'</td>
                         <td class="tableHeader">'.WebGUI::International::get(244).'</td>
