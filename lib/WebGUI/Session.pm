@@ -158,6 +158,7 @@ sub _loadWobjects {
 sub close {
 	$session{'dbh'}->disconnect();
 	undef %session;
+	$ENV{PATH_INFO} = "/"; #work around to fix a bug in mod_perl (win32)
 }
 
 #-------------------------------------------------------------------
@@ -174,7 +175,7 @@ sub httpHeader {
 	($charset) = WebGUI::SQL->quickArray("select characterSet from language where languageId=".$session{user}{language});
 	$charset = "ISO-8859-1" if ($charset eq "");
 	return $session{cgi}->header( 
-		-type => 'text/html; charset='.$charset,
+		-type => $session{header}{mimetype}.'; charset='.$charset,
 		-cookie => $session{header}{cookie}, 
 		-status => $session{header}{status} 
 		);
@@ -217,6 +218,9 @@ sub open {
 	### CGI object
 	$session{cgi} = CGI->new();
 	$CGI::POST_MAX=1024 * $session{setting}{maxAttachmentSize};
+	###----------------------------
+	### header variables
+	$session{header}{mimetype} = 'text/html';
 	###----------------------------
 	### evironment variables from web server
 	$session{env} = \%ENV;

@@ -32,7 +32,7 @@ sub _replacement {
 		if (not defined $text){
 			$temp .= WebGUI::International::get(48);
                 	$temp .= ' <a href="'.WebGUI::URL::page('op=displayAccount').
-				'">'.$session{user}{username}.'</a>.';
+				'">'.$session{user}{username}.'</a>. ';
                 	$temp .= WebGUI::International::get(49);
                 	$temp = WebGUI::Macro::Backslash_pageUrl::process($temp);
 		} else {

@@ -1,5 +1,5 @@
 package WebGUI;
-our $VERSION = "4.6.6";
+our $VERSION = "4.6.7";
 
 #-------------------------------------------------------------------
 # WebGUI is Copyright 2001-2002 Plain Black LLC.
@@ -81,7 +81,11 @@ sub page {
 			}
 		}
 	}
-	if ($operationOutput ne "") {
+	if ($session{header}{mimetype} ne "text/html") {
+		$httpHeader = WebGUI::Session::httpHeader();
+		WebGUI::Session::close();
+		return $httpHeader.$operationOutput.$wobjectOutput;
+	} elsif ($operationOutput ne "") {
 		$contentHash{0} = $operationOutput;
 		$content = WebGUI::Template::generate(\%contentHash,1);
 	} elsif ($wobjectOutput ne "") {

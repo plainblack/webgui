@@ -158,9 +158,9 @@ sub www_editHelpSave {
 			$session{form}{seeAlso} = join(";",@seeAlso);
 			$session{form}{seeAlso} .= ';';
 		}
-		WebGUI::SQL->write("update international set message=".quote($session{form}{title})." 
+		WebGUI::SQL->write("update international set message=".quote($session{form}{title}).", lastUpdated=".time()." 
 			where internationalId=$session{form}{titleId} and languageId=1 and namespace=".quote($session{form}{namespace}));
-		WebGUI::SQL->write("update international set message=".quote($session{form}{body})." 
+		WebGUI::SQL->write("update international set message=".quote($session{form}{body}).", lastUpdated=".time()."
 			where internationalId=$session{form}{bodyId} and languageId=1 and namespace=".quote($session{form}{namespace}));
 		WebGUI::SQL->write("update help set seeAlso=".quote($session{form}{seeAlso})." 
 			where helpId=$session{form}{hid} and namespace=".quote($session{form}{namespace}));
@@ -170,35 +170,18 @@ sub www_editHelpSave {
 
 #-------------------------------------------------------------------
 sub www_exportHelp {
-	if ($session{user}{userId} != 3) {
-                return "";
-        } else {
-		my ($export, $output, %help, %data, $sth);
-		$output = '<h1>Export Help</h1>';
-		$export = "#export of WebGUI ".$WebGUI::VERSION." help system.\n\n";
-		$sth = WebGUI::SQL->read("select * from help");
-		while (%help = $sth->hash) {
-			%data = WebGUI::SQL->quickHash("select * from international where internationalId=$help{titleId}"
-				." and languageId=1 and namespace=".quote($help{namespace}));
-			$export .= "delete from international where internationalId=$data{internationalId}" 
-				." and namespace=".quote($data{namespace})." and languageId=1;\n";
-			$export .= "insert into international (internationalId,namespace,languageId,message) values ("
-				."$data{internationalId}, ".quote($data{namespace}).",1,".quote($data{message}).");\n";
-			%data = WebGUI::SQL->quickHash("select * from international where internationalId=$help{bodyId}" 
-				." and languageId=1 and namespace=".quote($help{namespace}));
-			$export .= "delete from international where internationalId=$data{internationalId}"
-				." and namespace=".quote($data{namespace})." and languageId=1;\n";
-                        $export .= "insert into international (internationalId,namespace,languageId,message) values ("
-                                ."$data{internationalId}, ".quote($data{namespace}).",1,".quote($data{message}).");\n";
-			$export .= "delete from help where helpId=$help{helpId} and namespace=".quote($help{namespace}).";\n";
-			$export .= "insert into help (helpId,namespace,titleId,bodyId,seeAlso) values ($help{helpId}, "
-				.quote($help{namespace}).", $help{titleId}, $help{bodyId}, ".quote($help{seeAlso}).");\n";
-		}
-		$sth->finish;
-		#$output .= '<form><textarea cols=80 rows=20>'.$export.'</textarea></form>';
-		$output .= "<p><pre>\n\n\n\n".$export."\n\n\n\n</pre><p>";
-		return $output;
+	return "" if ($session{user}{userId} != 3);
+	my ($export, $output, %help, $sth);
+	$export = "#export of WebGUI ".$WebGUI::VERSION." help system.\n\n";
+	$sth = WebGUI::SQL->read("select * from help");
+	while (%help = $sth->hash) {
+		$export .= "delete from help where helpId=$help{helpId} and namespace=".quote($help{namespace}).";\n";
+		$export .= "insert into help (helpId,namespace,titleId,bodyId,seeAlso) values ($help{helpId}, "
+			.quote($help{namespace}).", $help{titleId}, $help{bodyId}, ".quote($help{seeAlso}).");\n";
 	}
+	$sth->finish;
+	$session{header}{mimetype} = 'text/plain';
+	return $export;
 }
 
 #-------------------------------------------------------------------
