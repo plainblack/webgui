@@ -2045,7 +2045,7 @@ sub submit {
 
 #-------------------------------------------------------------------
 
-=head2 template ( name [, value, label, namespace, afterEdit, extras, uiLevel, defaultValue ] )
+=head2 template ( name [, value, label, namespace, afterEdit, extras, uiLevel, defaultValue, subtext ] )
 
 Adds a template select list to the form.
 
@@ -2083,20 +2083,24 @@ The UI level for this field. See the WebGUI developer's site for details. Defaul
 
 If no value is specified, this will be used. 
 
+=head3 subtext
+
+Any extra information you want to include after the field.
+
 =cut
 
 sub template {
-        my ($output, $subtext);
+        my ($output, $buttons);
         my ($self, @p) = @_;
-        my ($name, $value, $label, $namespace, $afterEdit, $extras, $uiLevel, $defaultValue) = 
-		rearrange([qw(name value label namespace afterEdit extras uiLevel defaultValue)], @p);
+        my ($name, $value, $label, $namespace, $afterEdit, $extras, $uiLevel, $defaultValue, $subtext) = 
+		rearrange([qw(name value label namespace afterEdit extras uiLevel defaultValue subtext)], @p);
         if (_uiLevelChecksOut($uiLevel)) {
 		$label = $label || WebGUI::International::get(356);
 		if (WebGUI::Grouping::isInGroup(8)) {
         		if ($afterEdit) {
-                		$subtext = editIcon("op=editTemplate&tid=".$value."&namespace=".$namespace."&afterEdit=".WebGUI::URL::escape($afterEdit));
+                		$buttons = editIcon("op=editTemplate&tid=".$value."&namespace=".$namespace."&afterEdit=".WebGUI::URL::escape($afterEdit));
         		}
-        		$subtext .= manageIcon("op=listTemplates&namespace=$namespace");
+        		$buttons .= manageIcon("op=listTemplates&namespace=$namespace");
 		}
         	$output = WebGUI::Form::template({
                 	"name"=>$name,
@@ -2105,7 +2109,7 @@ sub template {
                 	"extras"=>$extras,
 			defaultValue=>$defaultValue
                 	});
-                $output .= _subtext($subtext);
+                $output .= _subtext($buttons.$subtext);
                 $output = $self->_tableFormRow($label,$output);
         } else {
                 $output = WebGUI::Form::hidden({

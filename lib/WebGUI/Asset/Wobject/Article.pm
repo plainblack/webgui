@@ -11,13 +11,9 @@ package WebGUI::Asset::Wobject::Article;
 #-------------------------------------------------------------------
 
 use strict;
-use Tie::CPHash;
 use WebGUI::DateTime;
 use WebGUI::Forum;
 use WebGUI::Forum::UI;
-use WebGUI::HTML;
-use WebGUI::HTMLForm;
-use WebGUI::Icon;
 use WebGUI::International;
 use WebGUI::Paginator;
 use WebGUI::Privilege;

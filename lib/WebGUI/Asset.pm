@@ -17,7 +17,6 @@ package WebGUI::Asset;
 use strict;
 use Tie::IxHash;
 use WebGUI::AdminConsole;
-use WebGUI::Clipboard;
 use WebGUI::DateTime;
 use WebGUI::ErrorHandler;
 use WebGUI::Form;
@@ -566,6 +565,52 @@ sub getAssetManagerControl {
 	return $output;
 }
 
+
+sub getAssetsInClipboard {
+	my $self = shift;
+	my $limitToUser = shift;
+	my $userId = shift || $session{user}{userId};
+	my @assets;
+	my $limit;
+	unless ($limitToUser) {
+		$limit = "and lastUpdatedBy=".quote($userId);
+	}
+	my $sth = WebGUI::SQL->read("select assetId, title, className from asset where state='clipboard' $limit order by lastUpdated desc");
+	while (my ($id, $title, $class) = $sth->array) {
+		push(@assets, {
+			title => $title,
+			assetId => $id,
+			className => $class
+			});
+	}
+	$sth->finish;
+	return \@assets;
+}
+
+
+sub getAssetsInTrash {
+	my $self = shift;
+	my $limitToUser = shift;
+	my $userId = shift || $session{user}{userId};
+	my @assets;
+	my $limit;
+	unless ($limitToUser) {
+		$limit = "and lastUpdatedBy=".quote($userId);
+	}
+	my $sth = WebGUI::SQL->read("select assetId, title, className from asset where state='trash' $limit order by lastUpdated desc");
+	while (my ($id, $title, $class) = $sth->array) {
+		push(@assets, {
+			title => $title,
+			assetId => $id,
+			className => $class
+			});
+	}
+	$sth->finish;
+	return \@assets;
+}
+
+
+
 #-------------------------------------------------------------------
 
 =head2 getEditForm ( )
@@ -863,7 +908,11 @@ sub getLineage {
 		# create whatever type of object was requested
 		my $asset;
 		if ($rules->{returnObjects}) {
-			$asset = WebGUI::Asset->newByDynamicClass($properties->{assetId}, $properties->{className});
+			if ($self->getId eq $properties->{assetId}) { # possibly save ourselves a hit to the database
+				$asset =  $self;
+			} else {
+				$asset = WebGUI::Asset->newByDynamicClass($properties->{assetId}, $properties->{className});
+			}
 		} elsif ($rules->{returnQuickReadObjects}) {
 			$asset = WebGUI::Asset->newByPropertyHashRef($properties);
 		} else {
@@ -1479,6 +1528,7 @@ sub update {
 			push(@setPairs,"lastUpdated=".time());
 		}
 		foreach my $property (keys %{$definition->{properties}}) {
+			next unless (exists $properties->{$property});
 			my $value = $properties->{$property} || $definition->{properties}{$property}{defaultValue};
 			if (defined $value) {
 				if (exists $definition->{properties}{$property}{filter}) {
@@ -1621,27 +1671,215 @@ sub www_editSave {
 }
 
 sub www_editTree {
-	return "not yet implemented";
+	my $self = shift;
+	my $ac = WebGUI::AdminConsole->new("assets");
+	return $ac->render(WebGUI::Privilege::insufficient()) unless ($self->canEdit);
+	my $tabform = WebGUI::TabForm->new;
+	$tabform->hidden({name=>"func",value=>"editTreeSave"});
+	$tabform->addTab("properties",WebGUI::International::get("properties","Asset"),9);
+        $tabform->getTab("properties")->readOnly(
+                -label=>WebGUI::International::get(104),
+                -uiLevel=>9,
+		-subtext=>'<br />'.WebGUI::International::get("change","Asset").' '.WebGUI::Form::yesNo({name=>"change_url"}),
+		-value=>WebGUI::Form::selectList({
+                	name=>"baseUrlBy",
+			extras=>'id="baseUrlBy" onchange="toggleSpecificBaseUrl()"',
+			options=>{
+				parentUrl=>"Parent URL",
+				specifiedBase=>"Specified Base",
+				none=>"None"
+				}
+			}).'<span id="baseUrl"></span> / '.WebGUI::Form::selectList({
+				name=>"endOfUrl",
+				options=>{
+					menuTitle=>WebGUI::International::get(411),
+					title=>WebGUI::International::get(99),
+					currentUrl=>"Current URL"
+					}
+				})."<script type=\"text/javascript\">
+			function toggleSpecificBaseUrl () {
+				if (document.getElementById('baseUrlBy').options[document.getElementById('baseUrlBy').selectedIndex].value == 'specifiedBase') {
+					document.getElementById('baseUrl').innerHTML='<input type=\"text\" name=\"baseUrl\" />';
+				} else {
+					document.getElementById('baseUrl').innerHTML='';
+				}
+			}
+			toggleSpecificBaseUrl();
+				</script>"
+                );
+	$tabform->addTab("display",WebGUI::International::get(105),5);
+	$tabform->getTab("display")->yesNo(
+                -name=>"isHidden",
+                -value=>$self->get("isHidden"),
+                -label=>WebGUI::International::get(886),
+                -uiLevel=>6,
+		-subtext=>'<br />'.WebGUI::International::get("change","Asset").' '.WebGUI::Form::yesNo({name=>"change_isHidden"})
+                );
+        $tabform->getTab("display")->yesNo(
+                -name=>"newWindow",
+                -value=>$self->get("newWindow"),
+                -label=>WebGUI::International::get(940),
+                -uiLevel=>6,
+		-subtext=>'<br />'.WebGUI::International::get("change","Asset").' '.WebGUI::Form::yesNo({name=>"change_newWindow"})
+                );
+	$tabform->getTab("display")->yesNo(
+                -name=>"displayTitle",
+                -label=>WebGUI::International::get(174),
+                -value=>$self->getValue("displayTitle"),
+                -uiLevel=>5,
+		-subtext=>'<br />'.WebGUI::International::get("change","Asset").' '.WebGUI::Form::yesNo({name=>"change_displayTitle"})
+                );
+         $tabform->getTab("display")->template(
+		-name=>"styleTemplateId",
+		-label=>WebGUI::International::get(1073),
+		-value=>$self->getValue("styleTemplateId"),
+		-namespace=>'style',
+		-afterEdit=>'op=editPage&amp;npp='.$session{form}{npp},
+		-subtext=>'<br />'.WebGUI::International::get("change","Asset").' '.WebGUI::Form::yesNo({name=>"change_styleTemplateId"})
+		);
+         $tabform->getTab("display")->template(
+		-name=>"printableStyleTemplateId",
+		-label=>WebGUI::International::get(1079),
+		-value=>$self->getValue("printableStyleTemplateId"),
+		-namespace=>'style',
+		-afterEdit=>'op=editPage&amp;npp='.$session{form}{npp},
+		-subtext=>'<br />'.WebGUI::International::get("change","Asset").' '.WebGUI::Form::yesNo({name=>"change_printableStyleTemplateId"})
+		);
+        $tabform->getTab("display")->interval(
+                -name=>"cacheTimeout",
+                -label=>WebGUI::International::get(895),
+                -value=>$self->getValue("cacheTimeout"),
+                -uiLevel=>8,
+		-subtext=>'<br />'.WebGUI::International::get("change","Asset").' '.WebGUI::Form::yesNo({name=>"change_cacheTimeout"})
+                );
+        $tabform->getTab("display")->interval(
+                -name=>"cacheTimeoutVisitor",
+                -label=>WebGUI::International::get(896),
+                -value=>$self->getValue("cacheTimeoutVisitor"),
+                -uiLevel=>8,
+		-subtext=>'<br />'.WebGUI::International::get("change","Asset").' '.WebGUI::Form::yesNo({name=>"change_cacheTimeoutVisitor"})
+                );
+	$tabform->addTab("security",WebGUI::International::get(107),6);
+        $tabform->getTab("security")->yesNo(
+                -name=>"encryptPage",
+                -value=>$self->get("encryptPage"),
+                -label=>WebGUI::International::get('encrypt page'),
+                -uiLevel=>6,
+		-subtext=>'<br />'.WebGUI::International::get("change","Asset").' '.WebGUI::Form::yesNo({name=>"change_encryptPage"})
+                );
+	$tabform->getTab("security")->dateTime(
+                -name=>"startDate",
+                -label=>WebGUI::International::get(497),
+                -value=>$self->get("startDate"),
+                -uiLevel=>6,
+		-subtext=>'<br />'.WebGUI::International::get("change","Asset").' '.WebGUI::Form::yesNo({name=>"change_startDate"})
+                );
+        $tabform->getTab("security")->dateTime(
+                -name=>"endDate",
+                -label=>WebGUI::International::get(498),
+                -value=>$self->get("endDate"),
+                -uiLevel=>6,
+		-subtext=>'<br />'.WebGUI::International::get("change","Asset").' '.WebGUI::Form::yesNo({name=>"change_endDate"})
+                );
+	my $subtext;
+        if (WebGUI::Grouping::isInGroup(3)) {
+                 $subtext = manageIcon('op=listUsers');
+        } else {
+                 $subtext = "";
+        }
+        my $clause;
+        if (WebGUI::Grouping::isInGroup(3)) {
+                my $contentManagers = WebGUI::Grouping::getUsersInGroup(4,1);
+                push (@$contentManagers, $session{user}{userId});
+                $clause = "userId in (".quoteAndJoin($contentManagers).")";
+        } else {
+                $clause = "userId=".quote($self->get("ownerUserId"));
+        }
+        my $users = WebGUI::SQL->buildHashRef("select userId,username from users where $clause order by username");
+        $tabform->getTab("security")->selectList(
+               -name=>"ownerUserId",
+               -options=>$users,
+               -label=>WebGUI::International::get(108),
+               -value=>[$self->get("ownerUserId")],
+               -subtext=>$subtext,
+               -uiLevel=>6,
+		-subtext=>'<br />'.WebGUI::International::get("change","Asset").' '.WebGUI::Form::yesNo({name=>"change_ownerUserId"})
+               );
+        $tabform->getTab("security")->group(
+               -name=>"groupIdView",
+               -label=>WebGUI::International::get(872),
+               -value=>[$self->get("groupIdView")],
+               -uiLevel=>6,
+		-subtext=>'<br />'.WebGUI::International::get("change","Asset").' '.WebGUI::Form::yesNo({name=>"change_groupIdView"})
+               );
+        $tabform->getTab("security")->group(
+               -name=>"groupIdEdit",
+               -label=>WebGUI::International::get(871),
+               -value=>[$self->get("groupIdEdit")],
+               -excludeGroups=>[1,7],
+               -uiLevel=>6,
+		-subtext=>'<br />'.WebGUI::International::get("change","Asset").' '.WebGUI::Form::yesNo({name=>"change_groupIdEdit"})
+		);
+	return $ac->render($tabform->print, "Edit Branch");
 }
 
 sub www_editTreeSave {
-	return "not yet implemented";
+	my $self = shift;
+	return $self->getAdminConsole->render(WebGUI::Privilege::insufficient()) unless ($self->canEdit);
+	my %data;
+	$data{isHidden} = WebGUI::FormProcessor::yesNo("isHidden") if (WebGUI::FormProcessor::yesNo("change_isHidden"));
+	$data{newWindow} = WebGUI::FormProcessor::yesNo("newWindow") if (WebGUI::FormProcessor::yesNo("change_newWindow"));
+	$data{displayTitle} = WebGUI::FormProcessor::yesNo("displayTitle") if (WebGUI::FormProcessor::yesNo("change_displayTitle"));
+	$data{styleTemplateId} = WebGUI::FormProcessor::template("styleTemplateId") if (WebGUI::FormProcessor::yesNo("change_styleTemplateId"));
+	$data{printableStyleTemplateId} = WebGUI::FormProcessor::template("printableStyleTemplateId") if (WebGUI::FormProcessor::yesNo("change_printableStyleTemplateId"));
+	$data{cacheTimeout} = WebGUI::FormProcessor::interval("cacheTimeout") if (WebGUI::FormProcessor::yesNo("change_cacheTimeout"));
+	$data{cacheTimeoutVisitor} = WebGUI::FormProcessor::interval("cacheTimeoutVisitor") if (WebGUI::FormProcessor::yesNo("change_cacheTimeoutVisitor"));
+	$data{encryptPage} = WebGUI::FormProcessor::yesNo("encryptPage") if (WebGUI::FormProcessor::yesNo("change_encryptPage"));
+	$data{startDate} = WebGUI::FormProcessor::dateTime("startDate") if (WebGUI::FormProcessor::yesNo("change_startDate"));
+	$data{endDate} = WebGUI::FormProcessor::dateTime("endDate") if (WebGUI::FormProcessor::yesNo("change_endDate"));
+	$data{ownerUserId} = WebGUI::FormProcessor::selectList("ownerUserId") if (WebGUI::FormProcessor::yesNo("change_ownerUserId"));
+	$data{groupIdView} = WebGUI::FormProcessor::group("groupIdView") if (WebGUI::FormProcessor::yesNo("change_groupIdView"));
+	$data{groupIdEdit} = WebGUI::FormProcessor::group("groupIdEdit") if (WebGUI::FormProcessor::yesNo("change_groupIdEdit"));
+	my ($urlBaseBy, $urlBase, $endOfUrl);
+	my $changeUrl = WebGUI::FormProcessor::yesNo("change_url");
+	if ($changeUrl) {
+		$urlBaseBy = WebGUI::FormProcessor::selectList("urlBaseBy");
+		$urlBase = WebGUI::FormProcessor::text("urlBase");
+		$endOfUrl = WebGUI::FormProcessor::selectList("endOfUrl");
+	}
+	my $descendants = $self->getLineage(["self","descendants"],{returnObjects=>1});	
+	foreach my $descendant (@{$descendants}) {
+		my $url;
+		if ($changeUrl) {
+			if ($urlBaseBy eq "parentUrl") {
+				delete $descendant->{_parent};
+				$data{url} = $descendant->getParent->get("url")."/";
+			} elsif ($urlBaseBy eq "specifiedUrl") {
+				$data{url} = $urlBase."/";
+			} else {
+				$data{url} = "";
+			}
+			if ($endOfUrl eq "menuTitle") {
+				$data{url} .= $descendant->get("menuTitle");
+			} elsif ($endOfUrl eq "title") {
+				$data{url} .= $descendant->get("title");
+			} else {
+				$data{url} .= $descendant->get("url");
+			}
+		}
+		$descendant->update(\%data);
+	}
+	return $self->www_manageAssets;
 }
 
 sub www_emptyClipboard {
 	my $self = shift;
 	my $ac = WebGUI::AdminConsole->new("clipboard");
 	return $ac->render(WebGUI::Privilege::insufficient()) unless (WebGUI::Grouping::isInGroup(4));
-	my $limit;
-	unless ($session{form}{systemTrash} && WebGUI::Grouping::isInGroup(3)) {
-		$limit = "and lastUpdatedBy=".quote($session{user}{userId});
-	}
-	my $sth = WebGUI::SQL->read("select assetId,className from asset where state='clipboard' $limit");
-	while (my ($id, $class) = $sth->array) {
-		my $asset = WebGUI::Asset->newByDynamicClass($id,$class);
+	foreach my $assetData (@{$self->getAssetsInClipboard($session{form}{systemClipboard} && WebGUI::Grouping::isInGroup(3))}) {
+		my $asset = WebGUI::Asset->newByDynamicClass($assetData->{assetId},$assetData->{className});
 		$asset->trash;
 	}
-	$sth->finish;
 	return $self->www_manageClipboard();
 }
 
@@ -1649,16 +1887,10 @@ sub www_emptyTrash {
 	my $self = shift;
 	my $ac = WebGUI::AdminConsole->new("trash");
 	return $ac->render(WebGUI::Privilege::insufficient()) unless (WebGUI::Grouping::isInGroup(4));
-	my $limit;
-	unless ($session{form}{systemTrash} && WebGUI::Grouping::isInGroup(3)) {
-		$limit = "and lastUpdatedBy=".quote($session{user}{userId});
-	}
-	my $sth = WebGUI::SQL->read("select assetId,className from asset where state='trash' $limit");
-	while (my ($id, $class) = $sth->array) {
-		my $asset = WebGUI::Asset->newByDynamicClass($id,$class);
+	foreach my $assetData (@{$self->getAssetsInTrash($session{form}{systemTrash} && WebGUI::Grouping::isInGroup(3))}) {
+		my $asset = WebGUI::Asset->newByDynamicClass($assetData->{assetId},$assetData->{className});
 		$asset->purgeTree;
 	}
-	$sth->finish;
 	return $self->www_manageTrash();
 }
 
@@ -1707,9 +1939,9 @@ sub www_manageClipboard {
 	my $ac = WebGUI::AdminConsole->new("clipboard");
 	return $ac->render(WebGUI::Privilege::insufficient()) unless (WebGUI::Grouping::isInGroup(4));
 	my @assets;
-	my ($header, $limit);
+	my ($header,$limit);
         $ac->setHelp("clipboard manage");
-	if ($session{form}{systemTrash} && WebGUI::Grouping::isInGroup(3)) {
+	if ($session{form}{systemClipboard} && WebGUI::Grouping::isInGroup(3)) {
 		$header = WebGUI::International::get(965);
 		$ac->addSubmenuItem($self->getUrl('func=manageClipboard'), WebGUI::International::get(949));
 		$ac->addSubmenuItem($self->getUrl('func=emptyClipboard&systemClipboard=1'), WebGUI::International::get(959), 
@@ -1718,13 +1950,11 @@ sub www_manageClipboard {
 		$ac->addSubmenuItem($self->getUrl('func=manageClipboard&systemClipboard=1'), WebGUI::International::get(954));
 		$ac->addSubmenuItem($self->getUrl('func=emptyClipboard'), WebGUI::International::get(950),
 			'onclick="return window.confirm(\''.WebGUI::International::get(951).'\')"');
-		$limit = "and lastUpdatedBy=".quote($session{user}{userId});
+		$limit = 1;
 	}
-	my $sth = WebGUI::SQL->read("select assetId,className from asset where state='clipboard' $limit");
-	while (my ($id, $class) = $sth->array) {
-		push(@assets,WebGUI::Asset->newByDynamicClass($id,$class));
+	foreach my $assetData (@{$self->getAssetsInClipboard($limit)}) {
+		push(@assets,WebGUI::Asset->newByDynamicClass($assetData->{assetId},$assetData->{className}));
 	}
-	$sth->finish;
 	return $ac->render($self->getAssetManagerControl(\@assets), $header);
 }
 
@@ -1745,13 +1975,11 @@ sub www_manageTrash {
 		$ac->addSubmenuItem($self->getUrl('func=manageTrash&systemTrash=1'), WebGUI::International::get(964));
 		$ac->addSubmenuItem($self->getUrl('func=emptyTrash'), WebGUI::International::get(11),
 			'onclick="return window.confirm(\''.WebGUI::International::get(651).'\')"');
-		$limit = "and lastUpdatedBy=".quote($session{user}{userId});
+		$limit = 1;
 	}
-	my $sth = WebGUI::SQL->read("select assetId,className from asset where state='trash' $limit");
-	while (my ($id, $class) = $sth->array) {
-		push(@assets,WebGUI::Asset->newByDynamicClass($id,$class));
+	foreach my $assetData (@{$self->getAssetsInTrash($limit)}) {
+		push(@assets,WebGUI::Asset->newByDynamicClass($assetData->{assetId},$assetData->{className}));
 	}
-	$sth->finish;
 	return $ac->render($self->getAssetManagerControl(\@assets), $header);
 }
 

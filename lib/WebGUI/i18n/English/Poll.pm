@@ -111,7 +111,7 @@ Enter the possible answers to your question. Enter only one answer per line. Pol
 In order to be sure that the ordering of the answers in the poll does not bias your users, it is often helpful to present the options in a random order each time they are shown. Select "yes" to randomize the answers on the poll.
 <p>
 
-<b>Reset votes.</b><br>
+<b>Reset votes?</b><br>
 Reset the votes on this Poll.  This option is only available when editing an existing Poll.
 <br><br>
 |,
@@ -174,8 +174,8 @@ Reset the votes on this Poll.  This option is only available when editing an exi
 	},
 
 	'10' => {
-		message => q|Reset votes.|,
-		lastUpdated => 1031514049
+		message => q|Reset votes?|,
+		lastUpdated => 1091514049
 	},
 
 	'5' => {

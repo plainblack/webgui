@@ -4,6 +4,7 @@ assets = WebGUI::Asset::File::Image, \
 	WebGUI::Asset::Redirect, \
 	WebGUI::Asset::Wobject::Layout, \
 	WebGUI::Asset::Wobject::USS, \
+	WebGUI::Asset::Wobject::Poll, \
 	WebGUI::Asset::Wobject::SyndicatedContent, \
 	WebGUI::Asset::Wobject::Article, \
 	WebGUI::Asset::Wobject::Navigation, \

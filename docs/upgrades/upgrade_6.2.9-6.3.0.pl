@@ -81,10 +81,15 @@ WebGUI::SQL->write("alter table wobject add printableStyleTemplateId varchar(22)
 WebGUI::SQL->write("alter table wobject add cacheTimeout int not null default 60");
 WebGUI::SQL->write("alter table wobject add cacheTimeoutVisitor int not null default 3600");
 WebGUI::SQL->write("alter table wobject drop primary key");
+WebGUI::SQL->write("alter table Poll_answer add column assetId varchar(22)");
 # next 2 lines are for sitemap to nav migration
 WebGUI::SQL->write("alter table Navigation rename tempoldnav");
 WebGUI::SQL->write("create table Navigation (assetId varchar(22) not null primary key, assetsToInclude text, startType varchar(35), startPoint varchar(255), endPoint varchar(35), showSystemPages int not null default 0, showHiddenPages int not null default 0, showUnprivilegedPages int not null default 0)");
-my $sth = WebGUI::SQL->read("select distinct(namespace) from wobject");
+my @wobjects = qw(Article Poll Survey USS WSClient DataForm FileManager EventsCalendar HttpProxy IndexedSearch MessageBoard Product SQLReport SyndicatedContent WobjectProxy);
+foreach my $namespace (@wobjects) {
+	WebGUI::SQL->write("alter table ".$namespace." add column assetId varchar(22) not null");
+}
+my $sth = WebGUI::SQL->read("select distinct(namespace) from wobject where namespace not in (".quoteAndJoin(\@wobjects).")");
 while (my ($namespace) = $sth->array) {
 	WebGUI::SQL->write("alter table ".$namespace." add column assetId varchar(22) not null");
 }
@@ -93,7 +98,7 @@ walkTree('0','PBasset000000000000001','000001','1');
 print "\t\tMaking second round of table structure changes\n" unless ($quiet);
 my $sth = WebGUI::SQL->read("select distinct(namespace) from wobject where namespace is not null");
 while (my ($namespace) = $sth->array) {
-	if (isIn($namespace, qw(Article DataForm EventsCalendar HttpProxy IndexedSearch MessageBoard Poll Product SQLReport Survey SyndicatedContent USS WobjectProxy WSClient))) {
+	if (isIn($namespace, @wobjects)) {
 		WebGUI::SQL->write("alter table ".$namespace." drop column wobjectId");
 		WebGUI::SQL->write("alter table ".$namespace." add primary key (assetId)");
 	} elsif (isIn($namespace, qw(Navigation Layout))) {
@@ -138,6 +143,7 @@ WebGUI::SQL->write("drop table SiteMap");
 WebGUI::SQL->write("delete from template where namespace in ('SiteMap')");
 WebGUI::SQL->write("alter table Article drop column image");
 WebGUI::SQL->write("alter table Article drop column attachment");
+WebGUI::SQL->write("alter table Poll_answer drop column wobjectId");
 
 my %migration;
 
@@ -463,6 +469,7 @@ print "\tDeleting files which are no longer used.\n" unless ($quiet);
 #unlink("../../lib/WebGUI/Node.pm");
 #unlink("../../lib/WebGUI/Wobject/Article.pm");
 #unlink("../../lib/WebGUI/Wobject/SiteMap.pm");
+#unlink("../../lib/WebGUI/Wobject/Poll.pm");
 #unlink("../../lib/WebGUI/Wobject/DataForm.pm");
 #unlink("../../lib/WebGUI/Wobject/USS.pm");
 #unlink("../../lib/WebGUI/Wobject/FileManager.pm");
@@ -501,6 +508,7 @@ $conf->set("macros"=>$macros);
 $conf->set("assets"=>[
 		'WebGUI::Asset::Wobject::Navigation',
 		'WebGUI::Asset::Wobject::Layout',
+		'WebGUI::Asset::Wobject::Poll',
 		'WebGUI::Asset::Wobject::Article',
 		'WebGUI::Asset::Wobject::DataForm',
 		'WebGUI::Asset::Wobject::USS',
@@ -756,6 +764,9 @@ sub walkTree {
 				# migrate submission images
 			} elsif ($wobject->{namespace} eq "MessageBoard") {
 				# migrate forums
+			} elsif ($wobject->{namespace} eq "Poll") {
+				print "\t\t\tMigrating poll answers\n" unless ($quiet);
+				WebGUI::SQL->write("update Poll_answer set assetId=".quote($wobjectId)." where wobjectId=".quote($wobject->{wobjectId}));
 			}
 			$rank++;
 		}

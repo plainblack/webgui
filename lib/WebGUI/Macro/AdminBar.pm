@@ -14,7 +14,6 @@ use strict qw(refs vars);
 use Tie::CPHash;
 use Tie::IxHash;
 use WebGUI::AdminConsole;
-use WebGUI::Clipboard;
 use WebGUI::Grouping;
 use WebGUI::International;
 use WebGUI::Macro;
@@ -52,47 +51,21 @@ sub process {
 #	$var{package_loop} = \@packages;
   #--contenttypes adder
 	$var{'contentTypes.label'} = WebGUI::International::get(1083);
-	foreach my $namespace (@{$session{config}{wobjects}}) {
-		my $cmd = "WebGUI::Wobject::".$namespace;	
-		my $load = "use ".$cmd;
-		eval($load);
-		WebGUI::ErrorHandler::warn("Wobject failed to compile: $cmd.".$@) if($@);
-		my $w = eval{$cmd->new({namespace=>$namespace,wobjectId=>"new"})};
-		if ($@) {
-			WebGUI::ErrorHandler::warn("Could not use wobject $namespace because: ".$@);
-			next;
-		}
-                next if ($w->uiLevel > $session{user}{uiLevel});
-		$hash{WebGUI::URL::page('func=edit&wid=new&namespace='.$namespace)} = $w->name;;
-	}
-	%hash = sortHash(%hash);
 	$var{'addcontent.label'} = WebGUI::International::get(1);
-	my @addcontent;
-	$i = 0;
-	foreach my $key (keys %hash) {
-		push(@addcontent,{
-			'contenttype.url'=>$key,
-			'contenttype.label'=>$hash{$key},
-			'contenttype.count'=>$i
-			});
-		$i++;
-	}
-#	$var{'contenttypes_loop'} = \@addcontent;
-foreach my $link (@{$session{asset}->getAssetAdderLinks}) {
+	foreach my $link (@{$session{asset}->getAssetAdderLinks}) {
                 push(@{$var{'contenttypes_loop'}},{'contenttype.url'=>$link->{url},'contenttype.label'=>$link->{label}});
         }
-	$var{'addpage.url'} = WebGUI::URL::page('op=editPage&npp='.$session{page}{pageId});
-	$var{'addpage.label'} = WebGUI::International::get(2);
   #--clipboard paster
 	$var{'clipboard.label'} = WebGUI::International::get(1082);
-	my $clipboard = WebGUI::Clipboard::getAssetsInClipboard();
-	foreach my $item (@{$clipboard}) {
-		my $title = $item->{title};
-		$title =~ s/'//g; # stops it from breaking the javascript menus
-		push(@{$var{clipboard_loop}}, {
-			'clipboard.label'=>$title,
-			'clipboard.url'=>WebGUI::URL::page("func=paste&assetId=".$item->{assetId})
-			});
+	if (exists $session{asset}) {
+		foreach my $item (@{$session{asset}->getAssetsInClipboard(1)}) {
+			my $title = $item->{title};
+			$title =~ s/'//g; # stops it from breaking the javascript menus
+			push(@{$var{clipboard_loop}}, {
+				'clipboard.label'=>$title,
+				'clipboard.url'=>WebGUI::URL::page("func=paste&assetId=".$item->{assetId})
+				});
+		}
 	}
    #--admin functions
 	%hash = (

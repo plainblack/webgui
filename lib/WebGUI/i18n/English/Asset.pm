@@ -1,6 +1,13 @@
 package WebGUI::i18n::English::Asset;
 
 our $I18N = {
+
+	'change' => {
+		message => q|Change?|,
+		lastUpdated => 1099344172,
+		context => q|Used when editing an entire branch, and asks whether the user wants to change this field recursively.|
+	},
+
 	'assets' => {
 		message => q|Assets|,
 		lastUpdated => 1099344172,
