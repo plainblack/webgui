@@ -57,15 +57,14 @@ use WebGUI::Session;
 =cut
 
 sub create {
-	my ($slash, $node);
-	$slash = ($^O =~ /Win/i) ? "\\" : "/";
-	$node = $session{config}{uploadsPath}.$slash.$_[0]->{_node1};
+	my ($node);
+	$node = $session{config}{uploadsPath}.$session{os}{slash}.$_[0]->{_node1};
 	mkdir($node);
 	unless ($! eq "File exists" || $! eq "") {
 		WebGUI::ErrorHandler::warn("Couldn't create node: $node : $!");
 	}
         if ($_[0]->{_node2} ne "") {
-		$node = $session{config}{uploadsPath}.$slash.$_[0]->{_node1}.$slash.$_[0]->{_node2};
+		$node = $session{config}{uploadsPath}.$slash.$_[0]->{_node1}.$session{os}{slash}.$_[0]->{_node2};
 		mkdir($node);
 		unless ($! eq "File exists" || $! eq "") {
                 	WebGUI::ErrorHandler::warn("Couldn't create node: $node : $!");
@@ -95,11 +94,10 @@ sub delete {
 =cut
 
 sub getPath {
-        my ($path,$slash);
-	$slash = ($^O =~ /Win/i) ? "\\" : "/";
-        $path = $session{config}{uploadsPath}.$slash.$_[0]->{_node1};
+        my ($path);
+        $path = $session{config}{uploadsPath}.$session{os}{slash}.$_[0]->{_node1};
         if ($_[0]->{_node2} ne "") {
-                $path .= $slash.$_[0]->{_node2};
+                $path .= $session{os}{slash}.$_[0]->{_node2};
         }
         return $path;
 }
