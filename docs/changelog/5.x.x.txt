@@ -2,6 +2,9 @@
  - bugfix [ 935552 ] USS bug (w/ and w/o img mixed posts). 
  - bugfix [ 926610 ] WebGUI::Wobject::Article
  - Bugfix [ 942865 ] urlizedTitle problem. (Thanks to tr0nd).
+ - Fixed a possible counting problem when looking for an infinite loop in
+   groups of groups.
+ - Fixed a bug in the LDAP module that required the RDN to be a URL.
 
 
 5.5.6

@@ -170,7 +170,7 @@ sub settingsForm {
 	my $f;
 	$f = WebGUI::HTMLForm->new;
 	$f->readOnly('<b>'.optionsLabel().'</b>');
-	$f->url("ldapUserRDN",WebGUI::International::get(9,'Auth/LDAP'),$session{setting}{ldapUserRDN});
+	$f->text("ldapUserRDN",WebGUI::International::get(9,'Auth/LDAP'),$session{setting}{ldapUserRDN});
 	$f->url("ldapURL",WebGUI::International::get(5,'Auth/LDAP'),$session{setting}{ldapURL});
         $f->text("ldapId",WebGUI::International::get(6,'Auth/LDAP'),$session{setting}{ldapId});
         $f->text("ldapIdName",WebGUI::International::get(7,'Auth/LDAP'),$session{setting}{ldapIdName});
