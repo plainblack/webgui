@@ -1758,25 +1758,25 @@ sub walkTree {
 				my $sth = WebGUI::SQL->read("select * from EventsCalendar_event where wobjectId=".quote($wobjectId));
 				my $calendar = WebGUI::Asset->newByDynamicClass($wobjectId,"WebGUI::Asset::Wobject::EventsCalendar");
 				# This is definitely not finished!!!!!!   nor even tested!!!!   yikes!!!
-				while (my $event = $sth->hashRef) {
-					#Migrate each event to an asset.
-					my $eventObject = $calendar->addChild({
-						className=>'WebGUI::Asset::Event',
-						title=>$event->{name},
-						menuTitle=>$event->{name},
-						isHidden=>1,
-						newWindow=>0,
-						startDate=>$calendar->getValue("startDate"),
-						endDate=>$calendar->getValue("endDate"),
-						ownerUserId=>$calendar->getValue("ownerUserId"),
-						groupIdEdit=>$calendar->getValue("groupIdEdit"),
-						groupIdView=>$calendar->getValue("groupIdView"),
-						url=>$event->fixUrl($calendar->getUrl().'/'.$namespace->{name}),
-						templateId=>$calendar->getValue("eventTemplateId")
-					});
-					WebGUI::SQL->write("update EventsCalendar_event set assetId=".quote($eventObject->getId)." where EventsCalendar_eventId=".quote($event->{EventsCalendar_eventId}));
+#				while (my $event = $sth->hashRef) {
+#					#Migrate each event to an asset.
+#					my $eventObject = $calendar->addChild({
+#						className=>'WebGUI::Asset::Event',
+#						title=>$event->{name},
+#						menuTitle=>$event->{name},
+#						isHidden=>1,
+#						newWindow=>0,
+#						startDate=>$calendar->getValue("startDate"),
+#						endDate=>$calendar->getValue("endDate"),
+#						ownerUserId=>$calendar->getValue("ownerUserId"),
+#						groupIdEdit=>$calendar->getValue("groupIdEdit"),
+#						groupIdView=>$calendar->getValue("groupIdView"),
+#						url=>$event->fixUrl($calendar->getUrl().'/'.$namespace->{name}),
+#						templateId=>$calendar->getValue("eventTemplateId")
+#					});
+#					WebGUI::SQL->write("update EventsCalendar_event set assetId=".quote($eventObject->getId)." where EventsCalendar_eventId=".quote($event->{EventsCalendar_eventId}));
 					# I'm sure there's something else I'm forgetting...
-				}
+			#	}
 			}
 			$rank++;
 		}
@@ -2011,7 +2011,7 @@ sub migrateForum {
 				contentType=>$post->{contentType},
 				rating=>$post->{rating}
 				},undef,$postId);
-			my $sth = WebGUI::SQL->read("select userId,ipAddress,dateOfRating,rating from forumPostRating where forumPostId=".$post->{forumPostId});
+			my $sth = WebGUI::SQL->read("select userId,ipAddress,dateOfRating,rating from forumPostRating where forumPostId=".quote($post->{forumPostId}));
 			while (my ($uid,$ip,$date,$rating) = $sth->array) {
 				$ratingprep->execute($postId,$uid,$ip,$date,$rating);
 			}
