@@ -601,6 +601,11 @@ If you'd like to add another specification, select "Yes".
 		message => q|Are you certain you wish to delete this specification?|,
 		lastUpdated => 1031514049
 	},
+	
+	'deleteImage' => {
+		message => q|Delete Attached File|,
+		lastUpdated => 1031514049
+	},
 
 };
 
