@@ -2781,3 +2781,6 @@ CREATE TABLE widget (
 
 INSERT INTO widget VALUES (-1,4,'SiteMap',0,'Page Not Found',1,'The page you were looking for could not be found on this system. Perhaps it has been deleted or renamed. The following list is a site map of this site. If you don\'t find what you\'re looking for on the site map, you can always start from the <a href=\"^/;\">Home Page</a>.',1,1001744792,3,1013215663,3,'A');
 
+insert into international values (403,'WebGUI','English','Prefer not to say.');
+alter table users change column gender gender varchar(6) not null default 'neuter';
+

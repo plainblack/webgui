@@ -51,7 +51,7 @@ sub _calendarLayout {
                         	$calendar->addcontent(epochToHuman($event{startDate},"%D"),$message);
                         } else {
                                 $nextDate = $event{startDate};
-                                while($nextDate < $event{endDate}) {
+                                while($nextDate <= $event{endDate}) {
                                 	if (epochToHuman($nextDate,"%M %y") eq $thisMonth) {
                                         	$calendar->addcontent(epochToHuman($nextDate,"%D"),$message);
                                         }
@@ -409,30 +409,33 @@ sub www_view {
 			while (%event = $sth->hash) {
 				unless ($event{startDate} == $previous{startDate} 
 					&& $event{endDate} == $previous{endDate}) {
-					$output .= "<b>".epochToHuman($event{startDate},"%c %D");
+					$row[$i] = "<b>".epochToHuman($event{startDate},"%c %D");
 					if (epochToHuman($event{startDate},"%y") ne epochToHuman($event{endDate},"%y")) {
-						$output .= ", ".epochToHuman($event{startDate},"%y");
+						$row[$i] .= ", ".epochToHuman($event{startDate},"%y");
 						$flag = 1;
 					}
 					if ($flag || epochToHuman($event{startDate},"%c") ne epochToHuman($event{endDate},"%c")) {
-						$output .= " - ".epochToHuman($event{endDate},"%c %D");
+						$row[$i] .= " - ".epochToHuman($event{endDate},"%c %D");
 					} elsif (epochToHuman($event{startDate},"%D") ne epochToHuman($event{endDate},"%D")) {
-						$output .= " - ".epochToHuman($event{endDate},"%D");
+						$row[$i] .= " - ".epochToHuman($event{endDate},"%D");
 					}
 					$flag = 0;
-					$output .= ", ".epochToHuman($event{endDate},"%y");
-					$output .= "</b>";
-					$output .= "<hr size=1>";
+					$row[$i] .= ", ".epochToHuman($event{endDate},"%y");
+					$row[$i] .= "</b>";
+					$row[$i] .= "<hr size=1>";
 				}
 				%previous = %event;
-				$output .= '<span class="eventTitle">'.$event{name}.'</span>';
+				$row[$i] .= '<span class="eventTitle">'.$event{name}.'</span>';
 					if ($event{description} ne "") {
-					$output .= ' - ';
-					$output .= ''.$event{description};
+					$row[$i] .= ' - ';
+					$row[$i] .= ''.$event{description};
 				}
-				$output .= '<p>';
+				$row[$i] .= '<p>';
+				$i++;
 			}
 			$sth->finish;
+			($dataRows, $prevNextBar) = paginate($data{paginateAfter},WebGUI::URL::page(),\@row);
+                        $output .= $dataRows.$prevNextBar;		
 		}
 		if ($data{processMacros}) {
 			$output = WebGUI::Macro::process($output);

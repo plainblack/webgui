@@ -188,7 +188,7 @@ sub www_editUser {
 	tie %hash, 'Tie::CPHash';
 	tie %data, 'Tie::IxHash';
         if (WebGUI::Privilege::isInGroup(3)) {
-		%gender = ('male'=>WebGUI::International::get(339),'female'=>WebGUI::International::get(340));
+		%gender = ('neuter'=>WebGUI::International::get(403),'male'=>WebGUI::International::get(339),'female'=>WebGUI::International::get(340));
 		%user = WebGUI::SQL->quickHash("select * from users where userId=$session{form}{uid}");
 		$output .= '<table><tr><td valign="top">';
                 $output .= helpLink(5);

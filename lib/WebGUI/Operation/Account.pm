@@ -287,7 +287,7 @@ sub www_displayLogin {
 #-------------------------------------------------------------------
 sub www_editProfile {
 	my ($output, %gender, @array);
-	%gender = ('male'=>WebGUI::International::get(339),'female'=>WebGUI::International::get(340));
+	%gender = ('neuter'=>WebGUI::International::get(403),'male'=>WebGUI::International::get(339),'female'=>WebGUI::International::get(340));
         if ($session{user}{userId} != 1) {
                	$output .= '<h1>'.WebGUI::International::get(338).'</h1>';
                 $output .= formHeader();
@@ -526,7 +526,8 @@ sub www_viewMessageLog {
 
 #-------------------------------------------------------------------
 sub www_viewProfile {
-        my ($output, %user);
+        my ($output, %user, %gender);
+	%gender = ('neuter'=>WebGUI::International::get(403),'male'=>WebGUI::International::get(339),'female'=>WebGUI::International::get(340));
 	%user = WebGUI::SQL->quickHash("select * from users where userId='$session{form}{uid}'");
 	if ($user{username} eq "") {
 		WebGUI::Privilege::notMember();
@@ -579,7 +580,7 @@ sub www_viewProfile {
                 }
                 if ($session{setting}{profileMisc}) {
 			if ($user{gender} ne "") {
-                        	$output .= '<tr><td class="tableHeader" valign="top">'.WebGUI::International::get(335).'</td><td class="tableData">'.$user{gender}.'</td></tr>';
+                        	$output .= '<tr><td class="tableHeader" valign="top">'.WebGUI::International::get(335).'</td><td class="tableData">'.$gender{$user{gender}}.'</td></tr>';
 			}
 			if ($user{birthdate} ne "") {
                         	$output .= '<tr><td class="tableHeader" valign="top">'.WebGUI::International::get(336).'</td><td class="tableData">'.$user{birthdate}.'</td></tr>';
