@@ -8,6 +8,18 @@ versions. Be sure to heed the warnings contained herein as they will
 save you many hours of grief.
 
 
+5.3.0
+--------------------------------------------------------------------
+ * If you are not using sbin/upgrade.pl then you'll need to do all
+	of the processing handled by docs/upgrades/upgrade_5.2.5-5.3.0.pl
+	manually.
+
+ * You must add a new variable to your WebGUI config called "sitename"
+	and make it equal to your site hostname like this:
+ 
+	sitename = www.mycompany.com
+
+
 5.2.5
 --------------------------------------------------------------------
  * You'll need to upgrade HTML::Parser to at least version 3.27.

@@ -1,3 +1,5 @@
+sitename = www.mycompany.com
+
 dsn = DBI:mysql:WebGUI
 dbuser = webgui
 dbpass = password

@@ -131,7 +131,7 @@ sub addEntry {
 				subject, status) values ($messageLogId,".$u->userId.",
 				".quote($message).",".quote($url).",".time().",".quote($subject).", ".quote($status).")");
 			if ($url ne "") {
-				$message .= "\n".WebGUI::URL::append('http://'.$session{env}{HTTP_HOST}.$url,'mlog='.$messageLogId);
+				$message .= "\n".WebGUI::URL::append($url,'mlog='.$messageLogId);
 			}
 			_notify($u,$subject,$message);
 		}
@@ -203,7 +203,7 @@ sub addInternationalizedEntry {
                         WebGUI::SQL->write("insert into messageLog values ($messageLogId,".$u->userId.",
                                 ".quote($message).",".quote($url).",".time().",".quote($message).",".quote($status).")");
                         if ($url ne "") {
-                                $message .= "\n".WebGUI::URL::append('http://'.$session{env}{HTTP_HOST}.$url,'mlog='.$messageLogId);
+                                $message .= "\n".WebGUI::URL::append($url,'mlog='.$messageLogId);
                         }
 			_notify($u,$subject,$message);
                 }

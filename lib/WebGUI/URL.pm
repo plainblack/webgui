@@ -49,6 +49,19 @@ These subroutines are available from this package:
 
 
 #-------------------------------------------------------------------
+sub _getSiteURL {
+	my $site = $session{env}{HTTP_HOST} || $session{config}{sitename};
+	my $proto = "http://";
+	my $port;
+	if ($session{env}{SERVER_PORT} == 443) {
+		$proto = "https://";
+	} elsif ($session{env}{SERVER_PORT} != 80) {
+		$port = ":".$session{env}{SERVER_PORT};
+	}
+	return $proto.$site.$port;
+}
+
+#-------------------------------------------------------------------
 
 =head2 append ( url, pairs ) 
 
@@ -127,8 +140,7 @@ Name value pairs to add to the URL in the form of:
 =cut
 
 sub gateway {
-        my ($url);
-        $url = $session{config}{scripturl}.'/'.$_[0];
+        my $url = _getSiteURL().$session{config}{scripturl}.'/'.$_[0];
 	if ($_[1]) {
 		$url = append($url,$_[1]);
 	}
@@ -186,8 +198,7 @@ Name value pairs to add to the URL in the form of:
 =cut
 
 sub page {
-	my ($url);
-	$url = $session{page}{url};
+	my $url = _getSiteURL().$session{page}{url};
 	if ($_[0]) {
 		$url = append($url,$_[0]);
 	}
