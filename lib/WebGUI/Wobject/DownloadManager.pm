@@ -18,6 +18,7 @@ use WebGUI::Icon;
 use WebGUI::International;
 use WebGUI::Paginator;
 use WebGUI::Privilege;
+use WebGUI::Search;
 use WebGUI::Session;
 use WebGUI::SQL;
 use WebGUI::URL;
@@ -337,46 +338,43 @@ sub www_moveDownloadUp {
 
 #-------------------------------------------------------------------
 sub www_view {
-        my ($url, @row, $head, $searchForm, $i, $p, $search, @test, $file, $alt1, $alt2, $output, $sth, 
-		%download, $flag, $sort, $sortDirection);
+        my ($url, @row, $i, $p, $file, $constraints, $alt1, $numResults, $alt2, $output, $sth, $head, $sql, %download, $flag, $columns);
         tie %download, 'Tie::CPHash';
+	$numResults = $session{form}{numResults} || $_[0]->get("paginateAfter") || 25;
 	$url = WebGUI::URL::page();
-	$output = $_[0]->displayTitle;
+	$url = WebGUI::URL::append($url,"all=$session{form}{all}") if ($session{form}{all});
+	$url = WebGUI::URL::append($url,"atLeastOne=$session{form}{atLeastOne}") if ($session{form}{atLeastOne});
+	$url = WebGUI::URL::append($url,"without=$session{form}{without}") if ($session{form}{without});
+	$url = WebGUI::URL::append($url,"exactPhrase=$session{form}{exactPhrase}") if ($session{form}{exactPhrase});
+	$url = WebGUI::URL::append($url,"numResults=$numResults");
+        $columns = '<tr><td class="tableHeader">'.sortByColumn("fileTitle",WebGUI::International::get(14,$namespace),$url).
+                '</td><td class="tableHeader">'.sortByColumn("briefSynopsis",WebGUI::International::get(15,$namespace),$url).
+                '</td><td class="tableHeader">'.sortByColumn("dateUploaded",WebGUI::International::get(16,$namespace),$url).
+                '</td></tr>';
+	$url = WebGUI::URL::append($url,"sortDirection=$session{form}{sortDirection}") if ($session{form}{sortDirection});
+	$url = WebGUI::URL::append($url,"sort=$session{form}{sort}") if ($session{form}{sort});
+	$session{form}{sort} = "sequenceNumber" if ($session{form}{sort} eq "");
+	$sql = "select * from DownloadManager_file where wobjectId=".$_[0]->get("wobjectId")." ";
+	$constraints = WebGUI::Search::buildConstraints([qw(fileTitle downloadFile alternateVersion1 alternateVersion2 briefSynopsis)]);
+	$sql .= " and ".$constraints if ($constraints ne "");
+	$sql .= " order by $session{form}{sort} ";
+	$sql .= $session{form}{sortDirection};
+        $output = $_[0]->displayTitle;
         $output .= $_[0]->description;
-	if ($session{var}{adminOn}) {
-		$output .= '<p><a href="'.WebGUI::URL::page('func=editDownload&did=new&wid='.$_[0]->get("wobjectId"))
-                	.'">'.WebGUI::International::get(11,$namespace).'</a><p>';
-	}
-	$searchForm = WebGUI::HTMLForm->new(1);
-	$searchForm->text("keyword",'',$session{form}{keyword});
-	$searchForm->submit(WebGUI::International::get(170));
-	$head = '<table cellpadding="3" cellspacing="1" border="0" width="100%">';
-	if ($session{form}{keyword} ne "") {
-        	$search = " and (fileTitle like '%".$session{form}{keyword}.
-			"%' or downloadFile like '%".$session{form}{keyword}.
-			"%' or alternateVersion1 like '%".$session{form}{keyword}.
-			"%' or alternateVersion2 like '%".$session{form}{keyword}.
-			"%' or briefSynopsis like '%".$session{form}{keyword}."%') ";
-		$url = WebGUI::URL::append($url,"keyword=".$session{form}{keyword});
-        }
-	if ($session{form}{sort} ne "") {
-		$sort = " order by ".$session{form}{sort};
-		$url = WebGUI::URL::append($url,"sort=".$session{form}{sort});
+	$output = $_[0]->processMacros($output);
+	if ($session{form}{search}) {
+		$output .= WebGUI::Search::form({search=>1});
 	} else {
-		$sort = " order by sequenceNumber";
+		$head = '<tr><td colspan="3" align="right" class="tableMenu">';
+		$head .= '<a href="'.WebGUI::URL::page('search=1').'">'.WebGUI::International::get(364).'</a>';
+        	if ($session{var}{adminOn}) {
+                	$head .= ' &middot; <a href="'.WebGUI::URL::page('func=editDownload&did=new&wid='.$_[0]->get("wobjectId"))
+                        	.'">'.WebGUI::International::get(11,$namespace).'</a>';
+        	}
+		$head .= '</td></tr>';
 	}
-	if ($session{form}{sortDirection} ne "") {
-		$sortDirection = $session{form}{sortDirection};
-		$url = WebGUI::URL::append($url,"sortDirection=".$session{form}{sortDirection});
-	}
-        $head .= '<tr><td class="tableHeader">'.
-		sortByColumn("fileTitle",WebGUI::International::get(14,$namespace)).
-		'</td><td class="tableHeader">'.
-		sortByColumn("briefSynopsis",WebGUI::International::get(15,$namespace)).
-		'</td><td class="tableHeader">'.
-		sortByColumn("dateUploaded",WebGUI::International::get(16,$namespace)).
-		'</td></tr>';
-	$sth = WebGUI::SQL->read("select * from DownloadManager_file where wobjectId=".$_[0]->get("wobjectId")." $search $sort $sortDirection");
+	$output .= '<table cellpadding="3" cellspacing="1" border="0" width="100%">'.$head.$columns;
+	$sth = WebGUI::SQL->read($sql);
 	while (%download = $sth->hash) {
 		if (WebGUI::Privilege::isInGroup($download{groupToView})) {
 			$file = WebGUI::Attachment->new($download{downloadFile},
@@ -393,15 +391,13 @@ sub www_view {
 				'&did='.$download{downloadId}).'">'.$download{fileTitle}.'</a>&nbsp;&middot;&nbsp;<a href="'.
 				WebGUI::URL::page('func=download&wid='.
 				$_[0]->get("wobjectId").'&did='.$download{downloadId}).'"><img src="'.$file->getIcon.
-				'" border=0 width=16 height=16 align="middle">'.
-				$file->getType.'/'.$file->getSize.'</a>';
+				'" border=0 width=16 height=16 align="middle">'.$file->getType.'/'.$file->getSize.'</a>';
 			if ($download{alternateVersion1}) {
                                	$alt1 = WebGUI::Attachment->new($download{alternateVersion1},
 					$_[0]->get("wobjectId"), $download{downloadId});
                                	$row[$i] .= ' &middot; <a href="'.WebGUI::URL::page('func=download&wid='.
 					$_[0]->get("wobjectId").'&did='.$download{downloadId}.'&alternateVersion=1')
-					.'"><img src="'.$alt1->getIcon.
-                                       	'" border=0 width=16 height=16 align="middle">'.
+					.'"><img src="'.$alt1->getIcon.'" border=0 width=16 height=16 align="middle">'.
                                        	$alt1->getType.'/'.$alt1->getSize.'</a>';
 			}
 			if ($download{alternateVersion2}) {
@@ -409,36 +405,26 @@ sub www_view {
 					$_[0]->get("wobjectId"), $download{downloadId});
                                	$row[$i] .= ' &middot; <a href="'.WebGUI::URL::page('func=download&wid='.
 					$_[0]->get("wobjectId").'&did='.$download{downloadId}.'&alternateVersion=2')
-					.'"><img src="'.$alt2->getIcon.
-                                       	'" border=0 width=16 height=16 align="middle">'.
+					.'"><img src="'.$alt2->getIcon.'" border=0 width=16 height=16 align="middle">'.
                                        	$alt2->getType.'/'.$alt2->getSize.'</a>';
 			}
 			$row[$i] .= '</td><td class="tableData" valign="top">';
-			if ($_[0]->get("displayThumbnails") 
-				&& isIn($file->getType, qw(gif jpeg jpg tif tiff png bmp))) {
-				$row[$i] .= '<img src="'.$file->getThumbnail.
-					'" border=0 align="middle" hspace="3">';
+			if ($_[0]->get("displayThumbnails") && isIn($file->getType, qw(gif jpeg jpg tif tiff png bmp))) {
+				$row[$i] .= '<img src="'.$file->getThumbnail.'" border=0 align="middle" hspace="3">';
 			}
-			$row[$i] .= $download{briefSynopsis}.'</td>'.
-				'<td class="tableData" valign="top">'.
-				epochToHuman($download{dateUploaded},"%z").'</td>'.
-				'</tr>';
+			$row[$i] .= $download{briefSynopsis}.'</td>'.'<td class="tableData" valign="top">'.
+				epochToHuman($download{dateUploaded},"%z").'</td></tr>';
 			$flag = 1;
 			$i++;
 		}
 	}
 	$sth->finish;
-	unless ($flag) {
-		$head .= '<tr><td class="tableData" colspan="3">'.
-			WebGUI::International::get(19,$namespace).'</td></tr>';
-	}
-	$p = WebGUI::Paginator->new($url,\@row,$_[0]->get("paginateAfter"));
-	$output .= $searchForm->print if ($p->getNumberOfPages > 1);
-	$output .= $head;
+	$output .= '<tr><td class="tableData" colspan="3">'.WebGUI::International::get(19,$namespace).'</td></tr>' unless ($flag);
+	$p = WebGUI::Paginator->new($url,\@row,$numResults);
         $output .= $p->getPage($session{form}{pn});
         $output .= '</table>';
         $output .= $p->getBarTraditional($session{form}{pn});
-	return $_[0]->processMacros($output);
+	return $output;
 }
 
 

@@ -60,7 +60,7 @@ sub round {
 # example: sortByColumn(columnToSort,columnLabel);
 sub sortByColumn {
         my ($output);
-	$output = '<a href="'.WebGUI::URL::page('sort='.$_[0].'&sortDirection=');
+	$output = '<a href="'.WebGUI::URL::append($_[2],'sort='.$_[0].'&sortDirection=');
 	if ($session{form}{sortDirection} eq "asc") {
 		$output .= "desc";
 	} else {
