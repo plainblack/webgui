@@ -50,22 +50,22 @@ A lineage is a concatenated series of sequence numbers, each six digits long, th
  
  use WebGUI::Asset;
 
- addChild
- canEdit
- canView
- cascadeLineage
- checkExportPath
- cut
- definition
- deleteMetaDataField
- demote
- DESTROY
- duplicate
- exportAsHtml
- fixUrl
- formatRank
- get
- getAdminConsole
+ $AssetObject=           WebGUI::Asset->addChild(\%properties);
+ $integer=               WebGUI::Asset->canEdit("An_Id_AbCdeFGHiJkLMNOP");
+ $integer=               WebGUI::Asset->canView("An_Id_AbCdeFGHiJkLMNOP");
+                         WebGUI::Asset->cascadeLineage(100001,100101110111);
+ $html=                  WebGUI::Asset->checkExportPath();
+                         WebGUI::Asset->cut();
+ $arrRef=                WebGUI::Asset->definition(\@arr);
+                         WebGUI::Asset->deleteMetaDataField();
+ $integer=               WebGUI::Asset->demote();
+                         WebGUI::Asset->DESTROY();
+ $AssetObject=           WebGUI::Asset->duplicate($AssetObject);
+ $html=                  WebGUI::Asset->exportAsHtml(\%params);
+ $string=                WebGUI::Asset->fixUrl("Title of Page");
+ $string=                WebGUI::Asset->formatRank(1);
+ $hashref=               WebGUI::Asset->get("title");
+ $AdminConsoleObject=    WebGUI::Asset->getAdminConsole();
  getAssetAdderLinks
  getAssetManagerControl
  getAssetsInClipboard
@@ -307,11 +307,11 @@ sub cut {
 
 =head2 definition ( [ definition ] )
 
-Basic definition of an Asset. Properties, default values. Returns the definition containing tableName,className,properties
+Basic definition of an Asset. Properties, default values. Returns an array reference containing tableName,className,properties
 
 =head3 definition
 
-Additional information to include with the default definition.
+An array reference containing additional information to include with the default definition.
 
 =cut
 
@@ -379,7 +379,7 @@ sub definition {
 
 #-------------------------------------------------------------------
 
-=head2 deleteMetaDataField ( fieldId )
+=head2 deleteMetaDataField ( )
 
 Deletes a field from the metadata system.
 
@@ -442,7 +442,7 @@ sub DESTROY {
 
 =head2 duplicate ( [assetToDuplicate] )
 
-Duplicates an asset. Calls addChild with self as an arguement. Returns a new Asset object.
+Duplicates an asset. Calls addChild with assetToDuplicate as an arguement. Returns a new Asset object.
 
 =head3 assetToDuplicate
 
@@ -544,31 +544,6 @@ sub exportAsHtml {
 	delete $session{page}{noHttpHeader};
 	return $content;
 }
-
-
-#-------------------------------------------------------------------
-
-=head2 new (  [ options ] )
-
-Constructor.
-
-Options can be set when a new Export object is constructed, or
-afterwards with the set method. None of the options is required.
-
-=head3 pageId
-
-Sets the page to be generated. Defaults to current page.
- 
-=head3 styleId
-
-Use this to override the default styleId.
-Defaults to the page styleId. 
-
-=head3 userId
-
-Runs the export as this user. Defaults to 1 (Visitor).
-
-
 
 #-------------------------------------------------------------------
 
@@ -704,9 +679,21 @@ sub getAssetAdderLinks {
 
 #-------------------------------------------------------------------
 
-=head2 getAssetManagerControl ( children [,controlType] )
+=head2 getAssetManagerControl ( children [,controlType,removeRank] )
 
-Returns a text string of HTML code for the Asset Manager Control Page. English only.
+Returns a text string of HTML code (Javascript) for the Asset Manager Control Page. English only.
+
+=head3 children
+
+A hashref of the children of the Asset to be managed.
+
+=head3 controlType
+
+An optional string representing the controlType (manager.assetType) to be passed to the assetManager script.
+
+=head3 removeRank
+
+manager.disableDisplay(0) is added to the script if parameter is defined.
 
 =cut
 
@@ -1049,6 +1036,7 @@ sub getId {
 =head2 getIndexerParams ( )
                                                                                                                                                        
 Override this method and return a hash reference that includes the properties necessary to index the content of the wobject.
+Currently does nothing.
                                                                                                                                                        
 =cut
                                                                                                                                                        
@@ -1486,6 +1474,8 @@ The assetId of the asset you're creating an object reference for. Must not be bl
 A hash of properties to set besides defaults.
 
 =cut
+
+
 
 sub new {
 	my $class = shift;
