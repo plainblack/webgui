@@ -15,6 +15,7 @@ package WebGUI::ErrorHandler;
 =cut
 
 use FileHandle;
+use strict;
 use WebGUI::Session;
 
 
@@ -43,6 +44,23 @@ These functions are available from this package:
 
 
 #-------------------------------------------------------------------
+sub _log {
+        if (my $log = FileHandle->new(">>".$WebGUI::Session::session{config}{logfile})) {
+		return $log;
+	} else {
+		print STDOUT "Can't open log file: ".$WebGUI::Session::session{config}{logfile}." Check your WebGUI configuration file to set the path of the log file, and check to be sure the web server has the privileges to write to the log file.";;
+		WebGUI::Session::close();
+		exit;
+	}
+}
+
+#-------------------------------------------------------------------
+sub _stamp {
+        return localtime(time)." ".$0." ".$_[0].": ";
+}
+
+
+#-------------------------------------------------------------------
 
 =head2 audit ( message )
 
@@ -59,12 +77,12 @@ Whatever message you wish to insert into the log.
 =cut
 
 sub audit {
-        my ($log, $data);
-        $log = FileHandle->new(">>".$session{config}{logfile}) or fatalError("Can't open log file for audit.");
-        $data = localtime(time)." ".$0." AUDIT: ".$session{user}{username}." (".$session{user}{userId}.") ".$_[0]."\n";
+        my $data = _stamp("AUDIT").$WebGUI::Session::session{user}{username}
+		." (".$WebGUI::Session::session{user}{userId}.") ".$_[0]."\n";
+        my $log = _log();
         print $log $data;
-        $session{debug}{audit} .= $data."<p>";
         $log->close;
+        $WebGUI::Session::session{debug}{audit} .= $data;
 }
 
 #-------------------------------------------------------------------
@@ -76,82 +94,51 @@ Outputs an error message to the user and logs an error. Should only be called if
 =cut
 
 sub fatalError {
-        my ($key, $log, $cgi, $logfile, $config);
-	if (exists $session{cgi}) {
-		$cgi = $session{cgi};
-		print WebGUI::Session::httpHeader();
+        my $cgi;
+	if (exists $WebGUI::Session::session{cgi}) {
+		$cgi = $WebGUI::Session::session{cgi};
 	} else {
 		use CGI;
 		$cgi = CGI->new;
-		print $cgi->header;
 	}
-	if (exists $session{config}{logfile}) {
-		$logfile = $session{config}{logfile};
-	} else {
-		print STDOUT "ERROR! Cannot open log file. No session information available. Exiting.\n";
-		exit 1;
-	}
-        print "<h1>WebGUI Fatal Error</h1>Something unexpected happened that caused this system to fault.<p>" if ($session{setting}{showDebug}); 
-	$log = FileHandle->new(">>$logfile") or print "Can't open log file: ".$logfile
-		."\n<p>Check your WebGUI configuration file to set the path of the log file, 
-		and check to be sure the web server has the privileges to write to the log file.";
-        print $0." at ".localtime(time)." reported:<br>" if ($session{setting}{showDebug});
-	print $log localtime(time)." ".$0." FATAL: ".$_[0]."\n";
-        print $_[0] if ($session{setting}{showDebug});
-        print "<p><h3>Caller</h3><table border=1><tr><td valign=top>" if ($session{setting}{showDebug});
-        print "<b>Level 1</b><br>".join("<br>",caller(1)) if ($session{setting}{showDebug});
-	print $log "\t".join(",",caller(1))."\n";
-        print "</td><td valign=top>"."<b>Level 2</b><br>".join("<br>",caller(2)) if ($session{setting}{showDebug});
-	print $log "\t".join(",",caller(2))."\n";
-        print "</td><td valign=top>"."<b>Level 3</b><br>".join("<br>",caller(3)) if ($session{setting}{showDebug});
-	print $log "\t".join(",",caller(3))."\n";
-        print "</td><td valign=top>"."<b>Level 4</b><br>".join("<br>",caller(4)) if ($session{setting}{showDebug});
-	print $log "\t".join(",",caller(4))."\n";
-        print "</td></tr></table>" if ($session{setting}{showDebug});
-	print "<h3>Form Variables</h3>" if ($session{setting}{showDebug});
-	print $log "\t";
-	if (exists $session{form}) {
-        	foreach $key (keys %{$session{form}}) {
-                	print $key." = ".$session{form}{$key}."<br>" if ($session{setting}{showDebug});
-                	print $log $key."=".$session{form}{$key}." ";
-        	}
-		print $log "\n";
-	} else {
-		print "Cannot retrieve session information." if ($session{setting}{showDebug});
-		print $log "Session not accessible for form variable dump.\n";
-	}
-	print $log "\n";
-	$log->close;
-        unless ($session{setting}{showDebug}) {
-                print WebGUI::International::get(416).'<br>';
-		print '<br>'.$session{setting}{companyName};
-		print '<br>'.$session{setting}{companyEmail};
-		print '<br>'.$session{setting}{companyURL};
-	} else {
-		print '<h3>Session Variables</h3><table bgcolor="#ffffff" style="color: #000000; font-size: 10pt; font-family: helvetica;">';
-        	while (my ($section, $hash) = each %session) {
-			if (ref $hash eq 'HASH') {
-                                while (my ($key, $value) = each %$hash) {
-                                        if (ref $value eq 'ARRAY') {
-                                                $value = '['.join(', ',@$value).']';
-                                        } elsif (ref $value eq 'HASH') {
-                                                $value = '{'.join(', ',map {"$_ => $value->{$_}"} keys %$value).'}';
-                                        }
-                                        unless (lc($key) eq "password" || lc($key) eq "identifier") {
-                                                print '<tr><td align="right"><b>'.$section.'.'.$key.':</b></td><td>'.$value.'</td>';
-                                        }
+	print $cgi->header;
+	my $data = _stamp("FATAL").$_[0]."\n";
+	$data .= "\t".join(",",caller(1))."\n";
+	$data .= "\t".join(",",caller(2))."\n";
+	$data .= "\t".join(",",caller(3))."\n";
+	$data .= "\t".join(",",caller(4))."\n";
+       	while (my ($section, $hash) = each %WebGUI::Session::session) {
+		if (ref $hash eq 'HASH') {
+                        while (my ($key, $value) = each %$hash) {
+                               if (ref $value eq 'ARRAY') {
+                                        $value = '['.join(', ',@$value).']';
+                                } elsif (ref $value eq 'HASH') {
+                                        $value = '{'.join(', ',map {"$_ => $value->{$_}"} keys %$value).'}';
                                 }
-                        } elsif (ref $hash eq 'ARRAY') {
-                                my $i = 1;
-                                foreach (@$hash) {
-                                        $debug .= '<tr><td align="right"><b>'.$section.'.'.$i.':</b></td><td>'.$_.'</td>';
-                                        $i++;
+                                unless (lc($key) eq "password" || lc($key) eq "identifier") {
+                                        $data .= "\t".$section.'.'.$key.' = '.$value."\n";
                                 }
                         }
-                	print '<tr height=10><td>&nbsp;</td><td>&nbsp</td></tr>';
-        	}
-        	print '</table>';
+                } elsif (ref $hash eq 'ARRAY') {
+                        my $i = 1;
+                        foreach (@$hash) {
+                                $data .= "\t".$section.'.'.$i.' = '.$_."\n";
+                                $i++;
+                        }
+                }
+       	}
+        unless ($WebGUI::Session::session{setting}{showDebug}) {
+                print WebGUI::International::get(416).'<br>';
+                print '<br>'.$WebGUI::Session::session{setting}{companyName};
+                print '<br>'.$WebGUI::Session::session{setting}{companyEmail};
+                print '<br>'.$WebGUI::Session::session{setting}{companyURL};
+        } else {
+	        print "<h1>WebGUI Fatal Error</h1>Something unexpected happened that caused this system to fault.<p>"; 
+		print "<pre>".$data."</pre>";
 	}
+        my $log = _log();
+        print $log $data;
+        $log->close();
 	WebGUI::Session::close();
         exit;
 }
@@ -173,13 +160,13 @@ The message you wish to add to the log.
 =cut
 
 sub security {
-        my ($log, $data);
-        $log = FileHandle->new(">>".$session{config}{logfile}) or fatalError("Can't open log file for audit.");
-        $data = localtime(time)." ".$0." SECURITY: ".$session{user}{username}." (".$session{user}{userId}
-		.") connecting from ".$session{env}{REMOTE_ADDR}." attempted to ".$_[0]."\n";
+        my $data = _stamp("SECURITY").$WebGUI::Session::session{user}{username}
+		." (".$WebGUI::Session::session{user}{userId}
+		.") connecting from ".$WebGUI::Session::session{env}{REMOTE_ADDR}." attempted to ".$_[0]."\n";
+        my $log = _log(); 
         print $log $data;
-        $session{debug}{security} .= $data."<p>";
         $log->close;
+        $WebGUI::Session::session{debug}{security} .= $data;
 }
 
 #-------------------------------------------------------------------
@@ -200,10 +187,11 @@ The message you wish to add to the log.
 
 sub warn {
         my ($log);
-        $log = FileHandle->new(">>".$session{config}{logfile}) or fatalError("Can't open log file for warning.");
-        print $log localtime(time)." ".$0." WARNING: ".$_[0]."\n";
-        $session{debug}{warning} .= localtime(time)." ".$0." WARNING: ".$_[0]."<p>";
+        my $data = _stamp("WARNING").$_[0]."\n";
+        $log = _log();
+	print $log $data;	
 	$log->close;
+        $WebGUI::Session::session{debug}{warning} .= $data;
 }
 
 1;
