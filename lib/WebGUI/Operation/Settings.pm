@@ -120,6 +120,15 @@ sub www_editMiscSettings {
 	$f->yesNo("preventProxyCache",WebGUI::International::get(400),$session{setting}{preventProxyCache});
 	$f->yesNo("showDebug",WebGUI::International::get(707),$session{setting}{showDebug});
 	$f->yesNo("trackPageStatistics",WebGUI::International::get(749),$session{setting}{trackPageStatistics});
+	$f->selectList(
+		-name=>"hostToUse",
+		-value=>[$session{setting}{hostToUse}],
+		-options=>{
+			sitename=>WebGUI::International::get(1070),
+			HTTP_HOST=>WebGUI::International::get(1071)
+			},
+		-label=>WebGUI::International::get(1069)
+		);
 	$f->submit;
 	$output .= $f->print;
         return _submenu($output);

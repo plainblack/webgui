@@ -24,7 +24,6 @@ use strict;
 use Tie::CPHash;
 use WebGUI::ErrorHandler;
 use WebGUI::SQL;
-use WebGUI::URL;
 use WebGUI::Utility;
 
 our @ISA = qw(Exporter);
