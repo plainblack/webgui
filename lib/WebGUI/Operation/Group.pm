@@ -216,7 +216,7 @@ sub www_deleteGroupGrouping {
 #-------------------------------------------------------------------
 sub www_deleteGroupingSecondary {
         return WebGUI::Privilege::adminOnly() unless _hasSecondaryPrivilege($session{form}{gid});
-        if ($session{user}{userId} == $session{form}{uid}) {
+        if ($session{user}{userId} eq $session{form}{uid}) {
                 return WebGUI::Privilege::vitalComponent();
         }
         WebGUI::Grouping::deleteUsersFromGroups([$session{form}{uid}],[$session{form}{gid}]);
