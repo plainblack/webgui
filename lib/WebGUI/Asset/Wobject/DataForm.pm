@@ -133,7 +133,7 @@ sub definition {
                 properties=>{
 			templateId =>{
 				fieldType=>"template",
-				defaultValue=>'PBtmpl0000000000000020'
+				defaultValue=>undef,
 				},
 			acknowledgement=>{
 				fieldType=>"textarea",
@@ -141,11 +141,11 @@ sub definition {
 				},
 			emailTemplateId=>{
 				fieldType=>"template",
-				defaultValue=>undef
+				defaultValue=>'PBtmpl0000000000000085',
 				},
 			acknowlegementTemplateId=>{
-				defaultValue=>undef,
-				fieldType=>"template"
+				fieldType=>"template",
+				defaultValue=>'PBtmpl0000000000000104',
 				},
 			listTemplateId=>{
 				defaultValue=>undef,
