@@ -63,6 +63,15 @@ save you many hours of grief.
 	nothing to worry about. All of the theme components will
 	automatically be converted to 6.0.
 
+ * If you have any SQL Reports going against any USS, they will need
+	to be updated as the USS tables have changed.
+
+ * During the upgrade process you may see some database errors during
+	the migration of SQL Reports. Don't be alarmed. Your upgrade
+	has not failed. Instead, some of the queries in the SQL Reports
+	may have failed and will cause the SQL Report templates to not
+	be automatically generated.
+
 
 5.5.0
 --------------------------------------------------------------------

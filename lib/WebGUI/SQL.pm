@@ -679,7 +679,11 @@ sub unconditionalRead {
         if ($sth) {
         	$sth->execute or WebGUI::ErrorHandler::warn("Unconditional read failed: ".$_[1]." : ".DBI->errstr);
         	bless ({_sth => $sth}, $_[0]);
+		unless (DBI->errstr) {
+			return;
+		}
         }       
+	return undef;
 }
 
 

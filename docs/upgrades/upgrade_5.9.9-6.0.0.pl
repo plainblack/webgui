@@ -400,10 +400,8 @@ WebGUI::SQL->write("delete from incrementer where incrementerId='LinkList_linkId
 #--------------------------------------------
 print "\tUpdating SQL Reports.\n" unless ($quiet);
 my %dblink;
-$dblink{$session{config}{dsn}} = (
-		id=>0,
-		user=>$session{config}{dbuser}
-		);
+$dblink{$session{config}{dsn}}{id} = 0;
+$dblink{$session{config}{dsn}}{user} = $session{config}{dbuser};
 my $sth = WebGUI::SQL->read("select DSN, databaseLinkId, username, identifier, wobjectId from SQLReport");
 while (my $data = $sth->hashRef) {
 	my $id = undef;
@@ -419,10 +417,8 @@ while (my $data = $sth->hashRef) {
 		my $title = $data->{username}.'@'.$data->{DSN};
 		WebGUI::SQL->write("insert into databaseLink (databaseLinkId, title, DSN, username, identifier) values ($id, ".quote($title).",
 			".quote($data->{DSN}).", ".quote($data->{username}).", ".quote($data->{identifier}).")");
-		$dblink{$data->{DSN}} = (
-				id=>$id,
-				user=>$data->{username}
-				);
+		$dblink{$data->{DSN}}{id} = $id;
+		$dblink{$data->{DSN}}{user} = $data->{username};
 	}
 	WebGUI::SQL->write("update SQLReport set databaseLinkId=".$id." where wobjectId=".$data->{wobjectId});
 }
@@ -432,9 +428,9 @@ WebGUI::SQL->write("alter table SQLReport drop column username");
 WebGUI::SQL->write("alter table SQLReport drop column identifier");
 use WebGUI::DatabaseLink;
 my $templateId;
-my $a = WebGUI::SQL->read("select a.databaseLinkId, a.dbQuery, a.template, a.wobjectId, b.title from SQLReport a
-	left join wobject b on a.wobjectId=b.wobjectId");
+my $a = WebGUI::SQL->read("select a.databaseLinkId, a.dbQuery, a.template, a.wobjectId, b.title from SQLReport a , wobject b where a.wobjectId=b.wobjectId");
 while (my $data = $a->hashRef) {
+	next if ($data->{dbQuery} eq "");
 	my $db = WebGUI::DatabaseLink->new($data->{databaseLinkId});
 	if ($data->{template} ne "") {
                 ($templateId) = WebGUI::SQL->quickArray("select max(templateId) from template where namespace='SQLReport'");
@@ -463,10 +459,12 @@ while (my $data = $a->hashRef) {
 			'.$template[0].'
 			<tmpl_loop rows_loop>	';
 		my $i;
+		if (defined $b) {
 		foreach my $col ($b->getColumnNames) {
 			my $replacement = '<tmpl_var row.field.'.$col.'.value>';
 			$template[1] =~ s/\^$i\;/$replacement/g;
 			$i++;
+		}
 		}
 		$template[1] =~ s/\^rownum\;/\<tmpl_var row\.number\>/g;
 		$final .= $template[1].'
@@ -482,7 +480,8 @@ while (my $data = $a->hashRef) {
 	} else {
 		$templateId = 1;
 	}
-	WebGUI::SQL->write("insert into wobject set templateId=$templateId where wobjectId=".$data->{wobjectId});
+	WebGUI::SQL->write("update wobject set templateId=$templateId where wobjectId=".$data->{wobjectId});
+	print "\tend loop\n";
 }
 $a->finish;
 WebGUI::SQL->write("alter table SQLReport drop column template");
@@ -605,13 +604,13 @@ while (my ($surveyId) = $a->array) {
 	while (my ($userId) = $b->array) {
 		my ($username,$ipAddress) = WebGUI::SQL->quickArray("select username,ipAddress from Survey_questionResponse where Survey_id=$surveyId and 
 			userId=".quote($userId));
-		WebGUI::SQL->write("insert into (Survey_id, Survey_responseId, userId, username, isComplete, ipAddress) values ($surveyId,
+		WebGUI::SQL->write("insert into Survey_response (Survey_id, Survey_responseId, userId, username, isComplete, ipAddress) values ($surveyId,
 			".getNextId("Survey_responseId")." ,".quote($userId).", ".quote($username).", 1, ".quote($ipAddress).")");
 	}
 	$b->finish;
 	$b = WebGUI::SQL->read("select distinct ipAddress from Survey_questionResponse where Survey_id=$surveyId and userId='1'");
 	while (my ($ipAddress) = $b->array) {
-		WebGUI::SQL->write("insert into (Survey_id, Survey_responseId, userId, username, isComplete, ipAddress) values (
+		WebGUI::SQL->write("insert into Survey_response (Survey_id, Survey_responseId, userId, username, isComplete, ipAddress) values (
 			$surveyId, ".getNextId("Survey_responseId")." ,'1', 'Visitor', 1, ".quote($ipAddress).")");
 	}
 	$b->finish;
