@@ -799,14 +799,14 @@ $replace{'s'} = {
 	};
 $replace{'TopDropMenu'} = {
 	'columns'=>{
-		identifier=>'TopDropMenu', depth=>0, method=>'self_and_sisters', startAt=>'top', stopAtLevel=>'-1',
+		identifier=>'TopDropMenu', depth=>0, method=>'descendants', startAt=>'WebGUIroot', stopAtLevel=>'-1',
 		templateId=>'4', showSystemPages=>0, showHiddenPages=>0, showUnprivilegedPages=>0, reverse=>0, seperator=>''
 		},
 	'parameter'=>[ ]
 	};
 $replace{'T'} = {
 	'columns'=>{
-		identifier=>'TopLevelMenuVertical', depth=>0, method=>'self_and_sisters', startAt=>'top', stopAtLevel=>'-1',
+		identifier=>'TopLevelMenuVertical', depth=>0, method=>'descendants', startAt=>'WebGUIroot', stopAtLevel=>'-1',
 		templateId=>'1', showSystemPages=>0, showHiddenPages=>0, showUnprivilegedPages=>0, reverse=>0, seperator=>''
 		},
 	'parameter'=>[ "depth" ]
@@ -820,7 +820,7 @@ $replace{'Synopsis'} = {
         };
 $replace{'t'} = {
 	'columns'=>{
-		identifier=>'TopLevelMenuHorizontal', depth=>0, method=>'self_and_sisters', startAt=>'top', stopAtLevel=>'-1',
+		identifier=>'TopLevelMenuHorizontal', depth=>0, method=>'WebGUIroot', startAt=>'WebGUIroot', stopAtLevel=>'-1',
 		templateId=>'3', showSystemPages=>0, showHiddenPages=>0, showUnprivilegedPages=>0, reverse=>0, seperator=>'&middot;'
 		},
 	'parameter'=>[ "seperator" ],
