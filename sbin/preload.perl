@@ -34,9 +34,9 @@ use URI::Escape ();
 #----------------------------------------
 # Database connectivity.
 #----------------------------------------
+#use Apache::DBI (); # Uncomment if you want to enable connection pooling. Not recommended on low memory - high traffic systems.
 use DBI ();
 DBI->install_driver("mysql"); # Change to match your database driver.
-#use Apache::DBI (); # Uncomment if you want to enable connection pooling. Not recommended on low memory - high traffic systems.
 
 
 
