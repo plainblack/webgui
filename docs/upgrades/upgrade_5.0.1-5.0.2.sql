@@ -985,5 +985,7 @@ delete from international where languageId=2 and namespace='WebGUI' and internat
 insert into international (internationalId,languageId,namespace,message,lastUpdated) values (238,2,'WebGUI','Autor:', 1041593082);
 delete from international where languageId=2 and namespace='Poll' and internationalId=12;
 insert into international (internationalId,languageId,namespace,message,lastUpdated) values (12,2,'Poll','Gesamtzahl der Abstimmungen:', 1041071732);
+delete from international where languageId=1 and namespace='Product' and internationalId=47;
+insert into international (internationalId,languageId,namespace,message,lastUpdated) values (47,1,'Product','Related products are products that are comparable or complementary to other products.\r\n<p>\r\n\r\n\r\n<b>Related products</b><br>\r\nChoose from the list of products you\'ve already entered.\r\n<p>\r\n\r\n\r\n<b>Add another related product?</b><br>\r\nSelect "Yes" if you have another related product to add.\r\n<p>\r\n\r\n', 1041876679);
 
 
