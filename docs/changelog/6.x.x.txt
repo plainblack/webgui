@@ -17,6 +17,8 @@ Andreas Graf).
  - Bugfix [ 916538 ] Typo in lib/WebGUI/Auth.pm
  - Bugfix [ 917783 ] 6.0.0 Date Changes
  - Bugfix [ 914217 ] content managers cannot turn admin on
+ - Bugfix [ 920089 ] Problem with clipboard and object names containing a
+   quote.
 
 
 6.0.0

@@ -38,6 +38,7 @@ sub process {
 	my $i;
 	my $sth = WebGUI::SQL->read("select pageId,title from page where parentId=5");
         while (my %data = $sth->hash) {
+		$data{title} =~ s/'//g;
 		push(@packages, {
         		'package.url'=>WebGUI::URL::page('op=deployPackage&pid='.$data{pageId}),
                		'package.label'=>$data{title},
@@ -88,6 +89,7 @@ sub process {
 	}
         $r = WebGUI::SQL->read($query);
         while (%cphash = $r->hash) {
+		$cphash{title} =~ s/'//g;
 		push @item, [	$cphash{bufferDate},
 				WebGUI::URL::page('op=pastePage&pageId='.$cphash{pageId}),
 				$cphash{title} . ' ('. WebGUI::International::get(2) .')' ];
@@ -105,6 +107,7 @@ sub process {
 	}
         $r = WebGUI::SQL->read($query);
         while (%cphash = $r->hash) {
+		$cphash{title} =~ s/'//g;
 		push @item, [	$cphash{bufferDate},
 				WebGUI::URL::page('func=paste&wid='.$cphash{wobjectId}),
 				$cphash{title} . ' ('. $cphash{namespace} .')' ];
