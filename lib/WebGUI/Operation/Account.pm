@@ -31,7 +31,7 @@ use WebGUI::Utility;
 use WebGUI::Authentication;
 
 our @ISA = qw(Exporter);
-our @EXPORT = qw(&www_viewMessageLogMessage &www_viewThreadSubscriptions &www_viewMessageLog &www_viewProfile &www_editProfile &www_editProfileSave &www_createAccount &www_deactivateAccount &www_deactivateAccountConfirm &www_displayAccount &www_displayLogin &www_login &www_logout &www_recoverPassword &www_recoverPasswordFinish &www_createAccountSave &www_updateAccount);
+our @EXPORT = qw(&www_viewMessageLogMessage &www_viewMessageLog &www_viewProfile &www_editProfile &www_editProfileSave &www_createAccount &www_deactivateAccount &www_deactivateAccountConfirm &www_displayAccount &www_displayLogin &www_login &www_logout &www_recoverPassword &www_recoverPasswordFinish &www_createAccountSave &www_updateAccount);
 
 #-------------------------------------------------------------------
 sub _accountOptions {
@@ -54,8 +54,6 @@ sub _accountOptions {
 		unless ($session{form}{op} eq "viewProfile");
 	$output .= '<li><a href="'.WebGUI::URL::page('op=viewMessageLog').'">'.WebGUI::International::get(354).'</a>'
 		unless ($session{form}{op} eq "viewMessageLog");
-	$output .= '<li><a href="'.WebGUI::URL::page('op=viewThreadSubscriptions').'">'.WebGUI::International::get(876).'</a>'
-		unless ($session{form}{op} eq "viewThreadSubscriptions");
 	$output .= '<li><a href="'.WebGUI::URL::page('op=logout').'">'.WebGUI::International::get(64).'</a>'; 
 
 	$output .= '<li><a href="'.WebGUI::URL::page('op=deactivateAccount').'">'.
@@ -63,6 +61,18 @@ sub _accountOptions {
 		&& !WebGUI::Privilege::isInGroup(3));
 	$output .= '</ul></div>';
 	return $output;
+}
+
+#-------------------------------------------------------------------
+sub _checkForDuplicateEmail {
+	my $email = shift;
+	my ($otherEmail) = WebGUI::SQL->quickArray("select count(*) from userProfileData where fieldName = ".
+						quote('email')." and fieldData = ".quote($email));
+	if ($otherEmail) {
+		return "<li>".WebGUI::International::get(1072);
+	} else {
+		return undef;
+	}
 }
 
 #-------------------------------------------------------------------
@@ -125,9 +135,9 @@ sub www_createAccount {
         	while(%data = $a->hash) {
                 	if ($data{required}) {
                         	$category = eval $data{categoryName};
-                        	if ($category ne $previousCategory) {
+                        	#if ($category ne $previousCategory) {
                                 	#$f->raw('<tr><td colspan="2" class="tableHeader">'.$category.'</td></tr>');
-                        	}
+                        	#}
                         	$values = eval $data{dataValues};
                         	$method = $data{dataType};
                         	$label = eval $data{fieldLabel};
@@ -189,24 +199,25 @@ sub www_createAccountSave {
 	($username, $error) = WebGUI::Authentication::registrationFormValidate();
 	($profile, $temp) = _validateProfileData();
 	$error .= $temp;
+        $error .= _checkForDuplicateEmail($profile->{email}) if ($profile->{email});
 	$error .= _checkForDuplicateUsername($username);
-        if ($error eq "") {
-		$u = WebGUI::User->new("new");
-		$u->username($username);
-		$u->authMethod($session{setting}{authMethod});
-		$u->karma($session{setting}{karmaPerLogin},"Login","Just for logging in.") if ($session{setting}{useKarma});
-		foreach $fieldName (keys %{$profile}) {
-			$u->profileField($fieldName,${$profile}{$fieldName});
-		}
-		WebGUI::Authentication::registrationFormSave($u->userId);
-		WebGUI::Session::convertVisitorToUser($session{var}{sessionId},$u->userId);
-		_logLogin($u->userId,"success");
-		system(WebGUI::Macro::process($session{setting}{runOnRegistration})) if ($session{setting}{runOnRegistration} ne "");
-		WebGUI::MessageLog::addInternationalizedEntry('',$session{setting}{onNewUserAlertGroup},'',536) if ($session{setting}{alertOnNewUser});
-        } else {
-                $output = "<h1>".WebGUI::International::get(70)."</h1>".$error.www_createAccount();
-        }
-        return $output;
+    if ($error eq "") {
+	   $u = WebGUI::User->new("new");
+	   $u->username($username);
+	   $u->authMethod($session{setting}{authMethod});
+	   $u->karma($session{setting}{karmaPerLogin},"Login","Just for logging in.") if ($session{setting}{useKarma});
+	   foreach $fieldName (keys %{$profile}) {
+	      $u->profileField($fieldName,${$profile}{$fieldName});
+	   }
+	   WebGUI::Authentication::registrationFormSave($u->userId);
+	   WebGUI::Session::convertVisitorToUser($session{var}{sessionId},$u->userId);
+	   _logLogin($u->userId,"success");
+	   system(WebGUI::Macro::process($session{setting}{runOnRegistration})) if ($session{setting}{runOnRegistration} ne "");
+	   WebGUI::MessageLog::addInternationalizedEntry('',$session{setting}{onNewUserAlertGroup},'',536) if ($session{setting}{alertOnNewUser});
+     } else {
+        $output = "<h1>".WebGUI::International::get(70)."</h1>".$error.www_createAccount();
+     }
+     return $output;
 }
 
 #-------------------------------------------------------------------
@@ -271,6 +282,9 @@ sub www_displayLogin {
 	if ($session{user}{userId} != 1) {
 		$output .= www_displayAccount();
 	} else {
+		unless ($session{env}{REQUEST_URI} =~ "displayLogin" || $session{env}{REQUEST_URI} =~ "displayAccount" || $session{env}{REQUEST_URI} =~ "logout") {
+			WebGUI::Session::setScratch("redirectAfterLogin",$session{env}{REQUEST_URI});
+		}
         	$output .= '<h1>'.WebGUI::International::get(66).'</h1>';
 		$f = WebGUI::HTMLForm->new;
                 if ($session{setting}{encryptLogin}) {
@@ -370,6 +384,8 @@ sub www_editProfileSave {
 	my ($profile, $fieldName, $error, $u);
         if ($session{user}{userId} != 1) {
 		($profile, $error) = _validateProfileData();
+		my ($currentEmail) = WebGUI::SQL->quickArray("select fieldData from userProfileData where fieldname = ".quote('email')." and userId = ".quote($session{user}{userId}));
+		$error .= _checkForDuplicateEmail($profile->{email}) unless ($currentEmail eq $profile->{email});
         	if ($error eq "") {
 			$u = WebGUI::User->new($session{user}{userId});
                 	foreach $fieldName (keys %{$profile}) {
@@ -405,7 +421,12 @@ sub www_login {
 		WebGUI::Session::convertVisitorToUser($session{var}{sessionId},$uid);
 		$u->karma($session{setting}{karmaPerLogin},"Login","Just for logging in.") if ($session{setting}{useKarma});
                 _logLogin($uid,"success");
-		return "";
+		if ($session{scratch}{redirectAfterLogin}) {
+			$session{header}{redirect} = WebGUI::Session::httpRedirect($session{scratch}{redirectAfterLogin});
+			WebGUI::Session::deleteScratch("redirectAfterLogin");
+		} else {
+			return "";
+		}
 	} else {
 		_logLogin($uid, "failure");
 		WebGUI::ErrorHandler::security("login to account ".$session{form}{username}." with invalid information.");
@@ -480,9 +501,10 @@ sub www_recoverPasswordFinish {
 sub www_updateAccount {
         my ($output, $username, $error, $encryptedPassword, $passwordStatement, $u);
         if ($session{user}{userId} != 1) {
-		($username, $error) = WebGUI::Authentication::userFormValidate();
-		$error .= _checkForDuplicateUsername($username);
-        	if ($error eq "") {
+		   my ($currentUsername) = WebGUI::SQL->quickArray("select username from users where userId=".$session{user}{userId});
+		   ($username, $error) = WebGUI::Authentication::userFormValidate();
+		   $error .= _checkForDuplicateUsername($username) unless($currentUsername eq $username);
+           if ($error eq "") {
 			$u = WebGUI::User->new($session{user}{userId});
 			$u->username($username);
 			WebGUI::Authentication::userFormSave();
@@ -622,30 +644,6 @@ sub www_viewProfile {
 }
 
 
-#-------------------------------------------------------------------
-sub www_viewThreadSubscriptions {
-	WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::isInGroup(2));
-	my ($data, $output, $list);
-	$output = '<h1>'.WebGUI::International::get(877).'</h1>';
-	my $sth = WebGUI::SQL->read("select b.subject,b.messageId,b.wobjectId,b.subId,d.urlizedTitle
- 		from discussionSubscription a left join discussion b on (a.threadId=b.rid and b.pid=0)
- 		left join wobject c on (b.wobjectId=c.wobjectId) left join page d on (c.pageId=d.pageId)
- 		where a.userId=$session{user}{userId}");
-	while ($data = $sth->hashRef) {
-		$list .= '<li><a href="'
-			.WebGUI::URL::gateway($data->{urlizedTitle},'func=showMessage&wid='
-			.$data->{wobjectId}.'&mid='.$data->{messageId}.'&sid='.$data->{subId})
-			.'">'.$data->{subject}.'</a>';
-	}
-	$sth->finish;
-	if ($list eq "") {
-		$output .= WebGUI::International::get(878);
-	} else {
-		$output .= '<ul>'.$list.'</ul><hr>';
-	}
-	$output .= _accountOptions();	
-	return $output;
-}
 
 
 1;
