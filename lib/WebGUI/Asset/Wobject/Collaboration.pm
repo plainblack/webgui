@@ -811,19 +811,21 @@ sub unsubscribe {
 sub view {
 	my $self = shift;
 	my $scratchSortBy = $self->getId."_sortBy";
-	my $scratchSortDir = $self->getId."_sortDir";
-        if($session{scratch}{$scratchSortBy} ne $session{form}{sortBy}){
-                WebGUI::Session::setScratch($scratchSortBy,$session{form}{sortBy});
-                WebGUI::Session::setScratch($scratchSortDir, "desc");
-        }else{
-                my $sortDir;
-                if($session{scratch}{$scratchSortDir} eq "asc"){
-                        $sortDir = "desc";
-                }else{
-                        $sortDir = "asc";
+	my $scratchSortOrder = $self->getId."_sortDir";
+	my $sortBy = $session{form}{sortBy} || $session{scratch}{$scratchSortBy} || $self->get("sortBy");
+	my $sortOrder = $session{scratch}{$scratchSortOrder} || $self->get("sortOrder");
+	if ($sortBy ne $session{scratch}{$scratchSortBy}) {
+		WebGUI::Session::setScratch($scratchSortBy,$session{form}{sortBy});
+	} elsif ($session{form}{sortBy}) {
+                if ($sortOrder eq "asc") {
+                        $sortOrder = "desc";
+                } else {
+                        $sortOrder = "asc";
                 }
-                WebGUI::Session::setScratch($scratchSortDir, $sortDir);
-        }
+                WebGUI::Session::setScratch($scratchSortOrder, $sortOrder);
+	}
+	$sortBy ||= "dateUpdated";
+	$sortOrder ||= "desc";
 	my %var;
 	$var{'user.canPost'} = $self->canPost;
         $var{"add.url"} = $self->getNewThreadUrl;
@@ -834,7 +836,7 @@ sub view {
 	$var{'sortby.title.url'} = $self->getSortByUrl("title");
 	$var{'sortby.username.url'} = $self->getSortByUrl("username");
 	$var{'sortby.date.url'} = $self->getSortByUrl("dateSubmitted");
-	$var{'sortby.lastreply.url'} = $self->getSortByUrl("lastreply");
+	$var{'sortby.lastreply.url'} = $self->getSortByUrl("dateUpdated");
 	$var{'sortby.views.url'} = $self->getSortByUrl("views");
 	$var{'sortby.replies.url'} = $self->getSortByUrl("replies");
 	$var{'sortby.rating.url'} = $self->getSortByUrl("rating");
@@ -847,16 +849,12 @@ sub view {
 		$constraints .= " or Post.status='pending'"; 
 	}
 	$constraints .= ")";
-	my $sortBy = $self->getValue("sortBy");
-	if ($sortBy eq "lastreply") {
-		$sortBy = "Thread.lastPostDate";
-	}
 	my $sql = "select * 
 		from Thread
 		left join asset on Thread.assetId=asset.assetId
 		left join Post on Post.assetId=asset.assetId 
 		where asset.parentId=".quote($self->getId)." and asset.state='published' and asset.className='WebGUI::Asset::Post::Thread' and $constraints 
-		order by ".$sortBy." ".$self->getValue("sortOrder");
+		order by ".$sortBy." ".$sortOrder;
 	my $p = WebGUI::Paginator->new($self->getUrl,$self->get("threadsPerPage"));
 	$self->appendPostListTemplateVars(\%var, $sql, $p);
 	$self->appendTemplateLabels(\%var);

@@ -1428,7 +1428,7 @@ sub getNextChildRank {
 
 #-------------------------------------------------------------------
 
-=head getPackageList ( )
+=head2 getPackageList ( )
 
 Returns an array of hashes containing title, assetId, and className for all assets defined as packages.
 
@@ -1716,7 +1716,7 @@ sub new {
 
 Returns a new Asset object based upon the className. Returns a "notFoundPage" Asset if className is not specified and can't be looked up.
 
-=assetId
+=head3 assetId
 
 Must be a valid assetId
 

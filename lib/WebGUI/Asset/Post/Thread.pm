@@ -188,6 +188,7 @@ Returns a thread object for the next (newer) thread in the same forum.
 sub getNextThread {
 	my $self = shift;
         unless (exists $self->{_next}) {
+		my $sortBy = $self->getParent->getValue("sortBy");
 		$self->{_next} = WebGUI::Asset::Post->newByPropertyHashRef(
 			WebGUI::SQL->quickHashRef("
 				select * 
@@ -197,12 +198,12 @@ sub getNextThread {
 				where asset.parentId=".quote($self->get("parentId"))." 
 					and asset.state='published' 
 					and asset.className='WebGUI::Asset::Post::Thread'
-					and ".$self->getParent->getValue("sortBy").">".quote($self->get($self->getParent->getValue("sortBy")))." 
+					and ".$sortBy.">".quote($self->get($sortBy))." 
 					and (
 						Post.status in ('approved','archived')
 						or (asset.ownerUserId=".quote($session{user}{userId})." and asset.ownerUserId<>'1')
 						)
-				order by ".$self->getParent->getValue("sortBy")." asc 
+				order by ".$sortBy." asc 
 				",WebGUI::SQL->getSlave)
 			);
 		delete $self->{_next} unless ($self->{_next}->{_properties}{className} =~ /Thread/);
@@ -223,6 +224,7 @@ Returns a thread object for the previous (older) thread in the same forum.
 sub getPreviousThread {
 	my $self = shift;
         unless (exists $self->{_previous}) {
+		my $sortBy = $self->getParent->getValue("sortBy");
 		$self->{_previous} = WebGUI::Asset::Post->newByPropertyHashRef(
 			WebGUI::SQL->quickHashRef(" select * 
 				from Thread
@@ -231,12 +233,12 @@ sub getPreviousThread {
 				where asset.parentId=".quote($self->get("parentId"))." 
 					and asset.state='published' 
 					and asset.className='WebGUI::Asset::Post::Thread'
-					and ".$self->getParent->getValue("sortBy")."<".quote($self->get($self->getParent->getValue("sortBy")))." 
+					and ".$sortBy."<".quote($self->get($sortBy))." 
 					and (
 						Post.status in ('approved','archived')
 						or (asset.ownerUserId=".quote($session{user}{userId})." and asset.ownerUserId<>'1')
 						)
-				order by ".$self->getParent->getValue("sortBy")." desc ",WebGUI::SQL->getSlave)
+				order by ".$sortBy." desc ",WebGUI::SQL->getSlave)
 			);
 		delete $self->{_previous} unless ($self->{_previous}->{_properties}{className} =~ /Thread/);
 	};
