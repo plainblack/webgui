@@ -184,7 +184,7 @@ sub www_edit {
 	$f->yesNo(
 		-name=>"proceed",
 		-label=>WebGUI::International::get(15,$_[0]->get("namespace")),
-		-label=>$proceed
+		-value=>$proceed
 		);
 	return $_[0]->SUPER::www_edit(
 		-properties=>$f->printRowsOnly,
