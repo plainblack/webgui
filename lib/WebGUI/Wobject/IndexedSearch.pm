@@ -570,7 +570,7 @@ sub _getSearchablePages {
 	my %pages;
 	my $sth = WebGUI::SQL->read("select pageId from page where parentId = ".quote($searchRoot));
 	while (my %data = $sth->hash) {
-		$pages{$data{pageId}} = defined;
+		$pages{$data{pageId}} = 1;
 		%pages = (%pages, _getSearchablePages($data{pageId}) );
 	}
 	return %pages;
