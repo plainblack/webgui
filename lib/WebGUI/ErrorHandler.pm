@@ -192,11 +192,13 @@ Returns a text formatted message containing the current stack trace.
 =cut
 
 sub getStackTrace {
-	my $data = "\t".join(",",caller(2))."\n";
-	$data .= "\t".join(",",caller(3))."\n";
-	$data .= "\t".join(",",caller(4))."\n";
-	$data .= "\t".join(",",caller(5))."\n";
-	return $data;
+	my $i = 2;
+	my $output;
+	while (my @data = caller($i)) {
+		$output .= "\t".join(",",@data)."\n";
+		$i++;
+	}
+	return $output;
 }
 
 
