@@ -108,6 +108,10 @@ The userid of the last poster.
 The username of the last poster.
 <p>
 
+<b>forum.lastpost.user.alias</b><br>
+The current alias of the last poster.
+<p>
+
 <b>forum.lastpost.user.profile</b><br>
 The url to the last poster's profile.
 <p>

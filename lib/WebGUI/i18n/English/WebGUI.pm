@@ -857,6 +857,10 @@ The userId of the poster.
 The username of the poster.
 <p>
 
+<b>post.user.alias</b><br>
+The current alias of the poster.
+<p>
+
 <b>post.user.profile</b><br>
 The url of the poster's profile.
 <p>
@@ -4092,6 +4096,10 @@ The userId of the poster.
 The poster's username.
 <p>
 
+<b>post.user.alias</b><br>
+The poster's current alias.
+<p>
+
 <b>post.user.profile</b><br>
 The url to the poster's profile.
 <p>
@@ -4850,6 +4858,10 @@ The root poster's user id.
 
 <b>thread.root.user.name</b><br>
 The username of the root poster.
+<p>
+
+<b>thread.root.user.alias</b><br>
+The alias of the root poster.
 <p>
 
 <b>thread.root.user.profile</b><br>
@@ -6887,6 +6899,10 @@ If set to yes then posts will be set to pending by default and will not be displ
 
 <b>Who can moderate?</b><br>
 A group that is allowed to moderate messages.
+<p>
+
+<b>Move Forum (Message Board only)</b><br>
+You can move an existing forum to another Message Board. If set to 'No Change' the forum will stay at the current board.
 <p>
 |,
 		lastUpdated => 1068708617
