@@ -36,5 +36,5 @@ use WebGUI::Operation::Theme;
 use WebGUI::Operation::Trash;
 use WebGUI::Operation::User;
 use WebGUI::Operation::WebGUI;
-
+use WebGUI::Operation::Navigation;
 1;
