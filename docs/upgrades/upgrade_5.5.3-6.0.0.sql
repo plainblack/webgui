@@ -58,8 +58,7 @@ insert into help (helpId,namespace,titleId,bodyId,seeAlso) values (1, 'EventsCal
 insert into help (helpId,namespace,titleId,bodyId,seeAlso) values (1, 'MessageBoard', 61, 71, '3,MessageBoard;2,MessageBoard;21,WebGUI;');
 insert into help (helpId,namespace,titleId,bodyId,seeAlso) values (21, 'WebGUI', 671, 626, '19,WebGUI;18,WebGUI;27,WebGUI;14,WebGUI;');
 insert into help (helpId,namespace,titleId,bodyId,seeAlso) values (1, 'Article', 61, 71, '2,Article;71,WebGUI;21,WebGUI;');
-insert into help (helpId,namespace,titleId,bodyId,seeAlso) values (1, 'ExtraColumn', 61, 71, '21,WebGUI;');
-insert into help (helpId,namespace,titleId,bodyId,seeAlso) values (27, 'WebGUI', 677, 632, '1,Article;1,EventsCalendar;1,ExtraColumn;1,FileManager;1,HttpProxy;1,DataForm;1,MessageBoard;1,Poll;1,Product;1,SiteMap;1,SQLReport;1,Survey;1,SyndicatedContent;1,USS;1,WobjectProxy;21,WebGUI;');
+insert into help (helpId,namespace,titleId,bodyId,seeAlso) values (27, 'WebGUI', 677, 632, '1,Article;1,EventsCalendar;1,FileManager;1,HttpProxy;1,DataForm;1,MessageBoard;1,Poll;1,Product;1,SiteMap;1,SQLReport;1,Survey;1,SyndicatedContent;1,USS;1,WobjectProxy;21,WebGUI;');
 insert into help (helpId,namespace,titleId,bodyId,seeAlso) values (1, 'Poll', 61, 71, '2,Poll;21,WebGUI;');
 insert into help (helpId,namespace,titleId,bodyId,seeAlso) values (1, 'SiteMap', 61, 71, '2,SiteMap;21,WebGUI;');
 insert into help (helpId,namespace,titleId,bodyId,seeAlso) values (1, 'SQLReport', 61, 71, '21,WebGUI;');
@@ -153,6 +152,7 @@ INSERT INTO template VALUES (1,'Default Submission Form','<h1><tmpl_var submissi
 INSERT INTO template VALUES (2,'FAQ Submission Form','<h1><tmpl_var question.header.label></h1>\n\n<tmpl_var form.header>\n	<table>\n	<tmpl_if user.isVisitor> <tmpl_if submission.isNew>\n		<tr><td><tmpl_var visitorName.label></td><td><tmpl_var visitorName.form></td></tr>\n	</tmpl_if> </tmpl_if>\n	<tr><td><tmpl_var question.label></td><td><tmpl_var title.form.textarea></td></tr>\n	<tr><td><tmpl_var answer.label></td><td><tmpl_var body.form></td></tr>\n	<tr><td><tmpl_var contentType.label></td><td><tmpl_var contentType.form></td></tr>\n	<tr><td></td><td><tmpl_var form.submit></td></tr>\n	</table>\n<tmpl_var form.footer>\n','USS/SubmissionForm');
 insert into international (internationalId,languageId,namespace,message,lastUpdated,context) values (87,1,'USS','Submission Form Template', 1070027660,'Prompt the user to select a template for the USS submission form.');
 insert into international (internationalId,languageId,namespace,message,lastUpdated,context) values (88,1,'USS','Sequence', 1070027660,'A type of ordering in the USS that will allow the admin to specify (or sequence) the order of the results.');
+delete from international where namespace='ExtraColumn';
 
 
 

@@ -67,6 +67,44 @@ WebGUI::SQL->write("delete from groupings where groupId=5");
 
 
 #--------------------------------------------
+print "\tMigrating extra columns to page templates.\n" unless ($quiet);
+my $a = WebGUI::SQL->read("select a.wobjectId, a.templatePosition, a.sequenceNumber,  a.pageId, b.templateId, c.width, c.class, c.spacer from wobject a 
+	left join page b on a.pageId=b.pageId left join ExtraColumn c on a.wobjectId=c.wobjectId where a.namespace='ExtraColumn'");
+while (my $data = $a->hashRef) {
+	my ($template, $name) = WebGUI::SQL->quickArray("select template,name from template where namespace='Page' and templateId=".$data->{templateId});
+	$name .= " w/ Extra Column";
+	#eliminate the need for compatibility with old-style page templates
+	$template =~ s/\^(\d+)\;/_positionFormat5x($1)/eg;
+	my $i = 1;
+        while ($template =~ m/page\.position$i/) {
+                $i++;
+        }
+        my $position = $i;	
+	my $replacement = '<tmpl_var page.position'.$data->{templatePosition}.'></td><td width="'.$data->{spacer}
+		.'"></td><td width="'.$data->{width}.'" class="'.$data->{class}.'" valign="top"><tmpl_var page.position'.$position.'>';
+	my $spliton = "<tmpl_var page.position".$data->{templatePosition}.">";
+	my @parts = split(/$spliton/, $template);
+	$template = $parts[0].$replacement.$parts[1];
+	my ($id) = WebGUI::SQL->quickArray("select max(templateId) from template where namespace='Page'");
+	$id++;
+	WebGUI::SQL->write("insert into template (templateId, name, template, namespace) values ($id, ".quote($name).", ".quote($template).", 'Page')");
+	WebGUI::SQL->write("update page set templateId=$id where pageId=".$data->{pageId});
+	WebGUI::SQL->write("update wobject set templatePosition=".$position." where pageId=".$data->{pageId}." and templatePosition=".
+		$data->{templatePosition}." and sequenceNumber>".$data->{sequenceNumber}); 
+	WebGUI::SQL->write("delete from wobject where wobjectId=".$data->{wobjectId});
+	my $b = WebGUI::SQL->read("select wobjectId from wobject where pageId=".$data->{pageId}." order by templatePosition,sequenceNumber");
+	my $i = 0;
+        while (my ($wid) = $b->array) {
+                $i++;
+                WebGUI::SQL->write("update wobject set sequenceNumber='$i' where wobjectId=$wid");
+        }
+        $b->finish;
+}
+$a->finish;
+WebGUI::SQL->write("drop table ExtraColumn");
+
+
+#--------------------------------------------
 print "\tMigrating page templates.\n" unless ($quiet);
 my $sth = WebGUI::SQL->read("select * from template where namespace='Page'");
 while (my $template = $sth->hashRef) {
@@ -213,6 +251,9 @@ WebGUI::SQL->write("drop table FAQ_question");
 WebGUI::SQL->write("delete from incrementer where incrementerId='FAQ_questionId'");
 
 
+
+
+
 #--------------------------------------------
 print "\tUpdating config file.\n" unless ($quiet);
 my $pathToConfig = '../../etc/'.$configFile;
@@ -224,7 +265,7 @@ $conf->set("macros"=>$macros);
 my $wobjects = $conf->get("wobjects");
 my @newWobjects;
 foreach my $wobject (@{$wobjects}) {
-	unless ($wobject eq "Item" || $wobject eq "FAQ") {
+	unless ($wobject eq "Item" || $wobject eq "FAQ" || $wobject eq "ExtraColumn") {
 		push(@newWobjects,$wobject);
 	}
 }
@@ -239,6 +280,7 @@ unlink("../../lib/WebGUI/Operation/Style.pm");
 unlink("../../lib/WebGUI/Wobject/Item.pm");
 #unlink("../../lib/WebGUI/Wobject/LinkList.pm");
 unlink("../../lib/WebGUI/Wobject/FAQ.pm");
+unlink("../../lib/WebGUI/Wobject/ExtraColumn.pm");
 
 
 

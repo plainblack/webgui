@@ -9,5 +9,7 @@
  - Converted items to articles and removed the item wobject.
  - Converted FAQ's to USS submissions and removed the FAQ wobject.
  - Created format and processReplacements subs in the WebGUI::HTML package.
+ - Migrated extra columns to page templates and removed the Extra Column
+   wobject.
 
 
