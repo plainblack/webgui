@@ -83,6 +83,7 @@ WebGUI::SQL->write("alter table DataForm_entry add column assetId varchar(22)");
 WebGUI::SQL->write("alter table DataForm_entryData add column assetId varchar(22)");
 WebGUI::SQL->write("alter table DataForm_field add column assetId varchar(22)");
 WebGUI::SQL->write("alter table DataForm_tab add column assetId varchar(22)");
+WebGUI::SQL->write("alter table USS_submission add column assetId varchar(22) not null");
 # next 2 lines are for sitemap to nav migration
 WebGUI::SQL->write("alter table Navigation rename tempoldnav");
 WebGUI::SQL->write("create table Navigation (assetId varchar(22) not null primary key, assetsToInclude text, startType varchar(35), startPoint varchar(255), endPoint varchar(35), showSystemPages int not null default 0, showHiddenPages int not null default 0, showUnprivilegedPages int not null default 0, templateId varchar(22) not null)");
@@ -154,7 +155,17 @@ WebGUI::SQL->write("alter table DataForm_entry drop column wobjectId");
 WebGUI::SQL->write("alter table DataForm_entryData drop column wobjectId");
 WebGUI::SQL->write("alter table DataForm_field drop column wobjectId");
 WebGUI::SQL->write("alter table DataForm_tab drop column wobjectId");
-
+WebGUI::SQL->write("alter table alter table USS_submission drop column forumId");
+WebGUI::SQL->write("alter table alter table USS_submission drop column sequenceNumber");
+WebGUI::SQL->write("alter table alter table USS_submission drop column startDate");
+WebGUI::SQL->write("alter table alter table USS_submission drop column title");
+WebGUI::SQL->write("alter table alter table USS_submission drop column USS_id");
+WebGUI::SQL->write("alter table alter table USS_submission drop column endDate");
+WebGUI::SQL->write("alter table alter table USS_submission drop column USS_submissionId");
+WebGUI::SQL->write("alter table alter table USS_submission drop column pageId");
+WebGUI::SQL->write("alter table alter table USS_submission drop column content");
+WebGUI::SQL->write("alter table alter table USS_submission drop column image");
+WebGUI::SQL->write("alter table alter table USS_submission drop column attachment");
 
 
 my %migration;
@@ -926,6 +937,53 @@ sub walkTree {
 				# migrate attachments to file assets
 				# migrate images to image assets
 			} elsif ($wobject->{namespace} eq "USS") {
+#| dateSubmitted    | int(11)      | YES  |     | NULL       |       |
+#| username         | varchar(30)  | YES  |     | NULL       |       |
+#| userId           | varchar(22)  | YES  |     | NULL       |       |
+#| status           | varchar(30)  |      | MUL | Approved   |       |
+#| views            | int(11)      |      |     | 0          |       |
+#| dateUpdated      | int(11)      |      |     | 0          |       |
+#| contentType      | varchar(35)  |      |     | mixed      |       |
+#| userDefined1     | text         | YES  |     | NULL       |       |
+#| userDefined2     | text         | YES  |     | NULL       |       |
+#| userDefined3     | text         | YES  |     | NULL       |       |
+#| userDefined4     | text         | YES  |     | NULL       |       |
+#| userDefined5     | text         | YES  |     | NULL       |       |
+#| forumId          | varchar(22)  | YES  |     | NULL       |       |
+#| sequenceNumber   | int(11)      |      |     | 0          |       |
+#| startDate        | int(11)      | YES  |     | 946710000  |       |
+#| title            | varchar(128) | YES  |     | NULL       |       |
+#| USS_id           | varchar(22)  | YES  |     | NULL       |       |
+#| endDate          | int(11)      | YES  |     | 2114406000 |       |
+#| USS_submissionId | varchar(22)  |      | PRI |            |       |
+#| pageId           | varchar(22)  |      |     |            |       |
+#| content          | text         | YES  |     | NULL       |       |
+#| image            | varchar(255) | YES  |     | NULL       |       |
+#| attachment       | varchar(255) | YES  |     | NULL       |       |
+				my $sth = WebGUI::SQL->read("select * from USS_submission where USS_id=".quote($wobject->{USS_id}));
+				while (my $submission = $sth->hashRef) {
+					my $id = WebGUI::SQL->setRow("asset","assetId",{
+						title => $submission->{title},
+						menuTitle => $submission->{title},
+						startDate => $submission->{startDate},
+						endDate => $submission->{endDate},
+						url = fixUrl($wobjectId,$submission->{title}),
+						className=>'WebGUI::Asset::Wobject::USS_submission',
+						state=>'published',
+						ownerUserId=>$submission->{userId},
+						groupIdView=>,
+						groupIdEdit=>,
+						synopsis=>,
+						fileSize=>length($submission->{content}),
+						parentId=>$wobjectId,
+						lineage=>$wobjectLineage.sprintf("%06d",1),
+						isHidden => 1
+						});	
+					WebGUI::SQL->setRow("wobject","assetId",{
+						description => $submission->{content}
+						}, undef, $id);	
+					WebGUI::SQL->write("update USS_submission set assetId=".quote($id)." where USS_id=".quote($wobject->{USS_id}));	
+				}
 				# migrate master forum
 				# migrate submissions
 				# migrate submission forums
