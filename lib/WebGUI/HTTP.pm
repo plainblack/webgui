@@ -71,7 +71,7 @@ sub getHeader {
        	        	$params{"-expires"} = "-1d";
        	 	}
 		if ($session{http}{filename}) {
-			$params{"-attachment"} => $session{http}{filename};
+			$params{"-attachment"} = $session{http}{filename};
 		}
 	}
 	$params{"-cookie"} = $session{http}{cookie};
