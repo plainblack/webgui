@@ -16,6 +16,7 @@ package WebGUI::Paginator;
 
 use strict;
 use WebGUI::International;
+use WebGUI::Session;
 use WebGUI::URL;
 
 =head1 NAME
@@ -26,45 +27,29 @@ use WebGUI::URL;
 
  use WebGUI::Paginator;
  $p = WebGUI::Paginator->new("/index.pl/page_name?this=that",\@row);
- $p->getBar(2);
- $p->getBarAdvanced(2);
- $p->getBarSimple(2);
- $p->getBarTraditional(2);
- $p->getFirstPageLink(2);
- $p->getLastPageLink(2);
- $p->getNextPageLink(2);
- $p->getNumberOfPages;
- $p->getPage(2);
- $p->getPageLinks(2);
- $p->getPreviousPageLink(2);
+ $html = $p->getBar;
+ $html = $p->getBarAdvanced;
+ $html = $p->getBarSimple;
+ $html = $p->getBarTraditional;
+ $html = $p->getFirstPageLink;
+ $html = $p->getLastPageLink;
+ $html = $p->getNextPageLink;
+ $integer = $p->getNumberOfPages;
+ $html = $p->getPage;
+ $arrayRef = $p->getPageData;
+ $integer = $p->getPageNumber;
+ $html = $p->getPageLinks;
+ $html = $p->getPreviousPageLink;
 
 =head1 DESCRIPTION
 
- Package that paginates rows of data for display on the web.
+ Package that paginates rows of arbitrary data for display on the web.
 
 =head1 METHODS
 
  These methods are available from this class:
 
 =cut
-
-
-#-------------------------------------------------------------------
-sub _generatePages {
-	my (@page, $row, @rows, $rowRef, $pn, $i, $itemsPerPage);
-	$rowRef = $_[0];
-	@rows = @{$rowRef};
-	$itemsPerPage = $_[1];
-	foreach $row (@rows) {
-		$page[$pn] .= $row;
-		$i++;
-		if ($i >= $itemsPerPage) {
-			$i = 0;
-			$pn++;
-		}
-	}
-	return \@page;
-}
 
 
 #-------------------------------------------------------------------
@@ -75,9 +60,9 @@ sub _generatePages {
  last links. If there's only one page, nothing is returned.
 
 =item pageNumber
-
- The page number you're currently looking at. If omited, page one
- is assumed.
+ 
+ Defaults to the page you're currently viewing. This is mostly here 
+ as an override and probably has no real use.
 
 =cut
 
@@ -110,8 +95,8 @@ sub getBar {
 
 =item pageNumber
 
- The page number you're currently looking at. If omited, page one
- is assumed.
+ Defaults to the page you're currently viewing. This is mostly here
+ as an override and probably has no real use.
 
 =cut
 
@@ -145,8 +130,8 @@ sub getBarAdvanced {
 
 =item pageNumber
 
- The page number you're currently looking at. If omited, page one
- is assumed.
+ Defaults to the page you're currently viewing. This is mostly here
+ as an override and probably has no real use.
 
 =cut 
 
@@ -175,8 +160,8 @@ sub getBarSimple {
 
 =item pageNumber
 
- The page number you're currently looking at. If omited, page one
- is assumed.
+ Defaults to the page you're currently viewing. This is mostly here
+ as an override and probably has no real use.
 
 =cut
 
@@ -205,14 +190,14 @@ sub getBarTraditional {
 
 =item pageNumber
 
- The page number you're currently looking at. If omited, page one
- is assumed.
+ Defaults to the page you're currently viewing. This is mostly here
+ as an override and probably has no real use.
 
 =cut
 
 sub getFirstPageLink {
         my ($text, $pn);
-	$pn = $_[1] || 1;
+	$pn = $_[1] || $_[0]->getPageNumber;
         $text = '|&lt;'.WebGUI::International::get(404);
         if ($pn > 1) {
                 return '<a href="'.
@@ -232,14 +217,14 @@ sub getFirstPageLink {
 
 =item pageNumber
 
- The page number you're currently looking at. If omited, page one
- is assumed.
+ Defaults to the page you're currently viewing. This is mostly here
+ as an override and probably has no real use.
 
 =cut
 
 sub getLastPageLink {
         my ($text, $pn);
-	$pn = $_[1] || 1;
+	$pn = $_[1] || $_[0]->getPageNumber;
         $text = WebGUI::International::get(405).'&gt;|';
         if ($pn != $_[0]->getNumberOfPages) {
                 return '<a href="'.
@@ -259,14 +244,14 @@ sub getLastPageLink {
 
 =item pageNumber
 
- The page number you're currently looking at. If omited, page one 
- is assumed.
+ Defaults to the page you're currently viewing. This is mostly here
+ as an override and probably has no real use.
 
 =cut
 
 sub getNextPageLink {
         my ($text, $pn);
-	$pn = $_[1] || 1;
+	$pn = $_[1] || $_[0]->getPageNumber;
         $text = WebGUI::International::get(92).'&raquo;';
         if ($pn < $_[0]->getNumberOfPages) {
                 return '<a href="'.WebGUI::URL::append($_[0]->{_url},($_[0]->{_pn}.'='.($pn+1))).'">'.$text.'</a>';
@@ -285,7 +270,9 @@ sub getNextPageLink {
 =cut
 
 sub getNumberOfPages {
-	return $#{$_[0]->{_pageRef}}+1;
+	my $pageCount = int(($#{$_[0]->{_rowRef}}+1)/$_[0]->{_rpp});
+	$pageCount++ unless (($#{$_[0]->{_rowRef}}+1)%$_[0]->{_rpp} == 0);
+	return $pageCount;
 }
 
 
@@ -293,20 +280,63 @@ sub getNumberOfPages {
 
 =head2 getPage ( [ pageNumber ] )
 
- Returns the data from the page specified. 
+ Returns the data from the page specified as a string. 
+
+ NOTE: This is really only useful if you passed in an array reference
+ of strings when you created this object.
 
 =item pageNumber
 
- The page number you wish to view. If omitted, page one is assumed.
+ Defaults to the page you're currently viewing. This is mostly here
+ as an override and probably has no real use.
 
 =cut
 
 sub getPage {
-        my ($pn);
-	$pn = $_[1] || 1;
-	return $_[0]->{_pageRef}[$pn-1];
+	return join("",@{$_[0]->getPageData($_[1])});
 }
 
+
+#-------------------------------------------------------------------
+
+=head2 getPageData ( [ pageNumber ] )
+
+ Returns the data from the page specified as an array reference.
+
+=item pageNumber
+
+ Defaults to the page you're currently viewing. This is mostly here
+ as an override and probably has no real use.
+
+=cut
+
+sub getPageData {
+	my ($i, @pageRows, $allRows, $pageCount, $pageNumber, $rowsPerPage, $pageStartRow, $pageEndRow);
+        $pageNumber = $_[1] || $_[0]->getPageNumber;
+        $pageCount = $_[0]->getNumberOfPages;
+        return [] if ($pageNumber > $pageCount);
+        $rowsPerPage = $_[0]->{_rpp};
+        $pageStartRow = ($pageNumber*$rowsPerPage)-$rowsPerPage;
+        $pageEndRow = $pageNumber*$rowsPerPage;
+	$allRows = $_[0]->{_rowRef};
+        for ($i=$pageStartRow; $i<$pageEndRow; $i++) {
+		$pageRows[$i-$pageStartRow] = $allRows->[$i] if ($i <= $#{$_[0]->{_rowRef}});
+        }
+	return \@pageRows;
+}
+
+#-------------------------------------------------------------------
+
+=head2 getPageNumber ( )
+
+ Returns the current page number. If no page number can be found
+ then it returns 1.
+
+=cut
+
+sub getPageNumber {
+        return $session{form}{$_[0]->{_pn}} || 1;
+}
 
 #-------------------------------------------------------------------
 
@@ -316,14 +346,14 @@ sub getPage {
 
 =item pageNumber
 
- The page number you're currently looking at. If omited, page one
- is assumed.
+ Defaults to the page you're currently viewing. This is mostly here
+ as an override and probably has no real use.
 
 =cut
 
 sub getPageLinks {
         my ($i, $output, $pn);
-	$pn = $_[1] || 1;
+	$pn = $_[1] || $_[0]->getPageNumber;
 	for ($i=0; $i<$_[0]->getNumberOfPages; $i++) {
 		if ($i+1 == $pn) {
 			$output .= ' '.($i+1).' ';
@@ -345,14 +375,14 @@ sub getPageLinks {
 
 =item pageNumber
 
- The page number you're currently looking at. If omitted, page one
- is assumed.
+ Defaults to the page you're currently viewing. This is mostly here
+ as an override and probably has no real use.
 
 =cut
 
 sub getPreviousPageLink {
 	my ($text, $pn);
-	$pn = $_[1] || 1;
+	$pn = $_[1] || $_[0]->getPageNumber;
 	$text = '&laquo;'.WebGUI::International::get(91);
 	if ($pn > 1) {
 		return '<a href="'.WebGUI::URL::append($_[0]->{_url},($_[0]->{_pn}.'='.($pn-1))).'">'.$text.'</a>';
@@ -397,9 +427,7 @@ sub new {
 	$rowRef = shift;
 	$rowsPerPage = shift || 25;
 	$formVar = shift || "pn";
-	$pageRef = _generatePages($rowRef,$rowsPerPage);
-        bless {_url => $currentURL, _rpp => $rowsPerPage, _rowRef => $rowRef,
-		_pn => $formVar, _pageRef => $pageRef}, $class;
+        bless {_url => $currentURL, _rpp => $rowsPerPage, _rowRef => $rowRef, _pn => $formVar}, $class;
 }
 
 
