@@ -62,23 +62,19 @@ sub _xml_encode {
 
 #-------------------------------------------------------------------
 sub duplicate {
-        my ($sth, $file, %row, $newSubmissionId, $w);
+        my %row;
 	tie %row, 'Tie::CPHash';
-	$w = $_[0]->SUPER::duplicate($_[1],1);
-	my $props = WebGUI::SQL->quickHashRef("select * from wobject where wobjectId=$w");
-	my $newWobject = WebGUI::Wobject::USS->new($props);
-        $sth = WebGUI::SQL->read("select * from USS_submission where USS_id=".$_[0]->get("USS_id"));
+	my $w = $_[0]->SUPER::duplicate($_[1],1);
+	$w = WebGUI::Wobject::USS->new({wobjectId=>$w});
+        my $sth = WebGUI::SQL->read("select * from USS_submission where USS_id=".$_[0]->get("USS_id"));
         while (%row = $sth->hash) {
-                $newSubmissionId = getNextId("USS_submissionId");
-		$file = WebGUI::Attachment->new($row{image},$_[0]->get("wobjectId"),$row{USS_submissionId});
+                my $newSubmissionId = getNextId("USS_submissionId");
+		my $file = WebGUI::Attachment->new($row{image},$_[0]->get("wobjectId"),$row{USS_submissionId});
 		$file->copy($w,$newSubmissionId);
 		$file = WebGUI::Attachment->new($row{attachment},$_[0]->get("wobjectId"),$row{USS_submissionId});
 		$file->copy($w,$newSubmissionId);
-                WebGUI::SQL->write("insert into USS_submission (USS_submissionId, title, dateSubmitted, username, userId, content,
-			image, attachment, status, views, forumId, dateUpdated, sequenceNumber, USS_id, contentType) values ($newSubmissionId, ".
-			quote($row{title}).", $row{dateSubmitted}, ".quote($row{username}).", $row{userId}, ".quote($row{content}).", ".
-			quote($row{image}).", ".quote($row{attachment}).", '$row{status}', $row{views}, $row{forumId}, $row{dateUpdated},
-			$row{sequenceNumber}, ".$newWobject->get("USS_id").", ".quote($row{contentType}).")");
+		$row{USS_submissionId} = $newSubmissionId;
+		$w->setCollateral("USS_submission","USS_submissionId",\%row);
         }
         $sth->finish;
 }
@@ -199,7 +195,7 @@ sub new {
 				defaultValue=>"desc"
 				},
 			USS_id=>{
-				autoIncrement=>1
+				autoId=>1
 				},
 			submissionFormTemplateId=>{
 				defaultValue=>1

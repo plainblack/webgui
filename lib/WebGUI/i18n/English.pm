@@ -1,9 +1,9 @@
 package WebGUI::i18n::English;
 
-our $LANGUAGE = {
-	label => "English",
-	charset => "ISO-8859-1",
-	toolbar => "metal"
+$LANGUAGE = {
+	label => 'English',
+	charset => 'UTF-8',
+	toolbar => 'metal'
 };
 
 1;

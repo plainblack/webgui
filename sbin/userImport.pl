@@ -232,8 +232,13 @@ while(<FILE>) {
 			$u->username($user{username});
 			$u->authMethod($user{authMethod});
 			$u->status($user{status});
-			WebGUI::Authentication::saveParams($u->userId,"WebGUI",{identifier=>$user{identifier}});
-			WebGUI::Authentication::saveParams($u->userId,"LDAP",{
+			my $cmd = "WebGUI::Auth::".$authMethod;
+        		my $load = "use ".$cmd;
+        		WebGUI::ErrorHandler::fatalError("Authentication module failed to compile: $cmd.".$@) if($@);
+        		eval($load);
+    			my $auth = eval{$cmd->new($authMethod,$u->userId)};
+			$auth->saveParams($u->userId,"WebGUI",{identifier=>$user{identifier}});
+			$auth->saveParams($u->userId,"LDAP",{
 				ldapUrl=>$user{ldapUrl},
 				connectDN=>$user{connectDN}
 				});

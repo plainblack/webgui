@@ -20,6 +20,14 @@
  - bugfix [ 997916 ] Bug and solution in File.pm
  - Added the page.isMyAncestor condition to the Navigation system. (Thanks to
    Len Kranendonk)
+ - Added automatic URL extensions.
+ - Added a new global unique id generator to replace the old incrementer system.
+ - Fixed a bug in userImport.pl, where it was using the old Auth system.
+ - Added a UI Level of 9 to the WS Client. 
+ - Added missing documentation to Page API and fixed pod errors in that package as well.
+ - Fixed a bug in the HTMLArea image picker where it would break if your gateway was not
+   in the root of your virtual host, or you had multiple gateways, but none was the
+   default page of your virtual host.
  - passing form param disableWobjects=$call shortcircuits most of
    WebGUI::Wobject::WSClient::www_view()
  - Added write permission checks to WebGUI::Template.

@@ -1,10 +1,7 @@
 package WebGUI::Wobject::IndexedSearch;
 
-#Test to see if Time::HiRes will load.
-my $hasTimeHiRes=1;
-eval "use Time::HiRes"; $hasTimeHiRes=0 if $@;
-
 use strict;
+use Time::HiRes;
 use WebGUI::Wobject::IndexedSearch::Search;
 use WebGUI::HTMLForm;
 use WebGUI::HTML;
@@ -256,14 +253,14 @@ sub www_view {
 	$var{"select_".$self->getValue("paginateAfter")} = "selected";
 
 	# Do the search
-	my $startTime = ($hasTimeHiRes) ? Time::HiRes::time() : time();
+	my $startTime = Time::HiRes::time();
 	my $filter = $self->_buildFilter;
 
 	my $search = WebGUI::Wobject::IndexedSearch::Search->new($self->getValue('indexName'));
 	$search->open;
 	my $results = $search->search($var{query},$filter);
-	$var{duration} = (($hasTimeHiRes) ? Time::HiRes::time() : time()) - $startTime;
-	$var{duration} = sprintf("%.3f", $var{duration}) if $hasTimeHiRes; # Duration rounded to 3 decimal places
+	$var{duration} = Time::HiRes::time() - $startTime;
+	$var{duration} = sprintf("%.3f", $var{duration}); # Duration rounded to 3 decimal places
 
 	# Let's see if the search returned any results
 	if (defined ($results)) {

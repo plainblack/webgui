@@ -1,244 +1,14 @@
 package WebGUI::i18n::English::Product;
 
 our $I18N = {
-	'58' => {
-		message => q|Edit Product Template|,
-		lastUpdated => 1031514049
-	},
-
-	'10' => {
-		message => q|Price|,
-		lastUpdated => 1031514049
-	},
-
-	'55' => {
-		message => q|Add a benefit.|,
-		lastUpdated => 1031514049
-	},
-
-	'59' => {
-		message => q|Name|,
-		lastUpdated => 1031514049
-	},
-
-	'60' => {
-		message => q|Template|,
-		lastUpdated => 1031514049
-	},
-
-	'48' => {
-		message => q|Are you certain you wish to delete this benefit? It cannot be recovered once it has been deleted.|,
-		lastUpdated => 1031514049
-	},
-
-	'6' => {
-		message => q|Edit Product|,
-		lastUpdated => 1031514049
-	},
-
-	'4' => {
-		message => q|Are you certain you wish to delete the relationship to this related product?|,
-		lastUpdated => 1031514049
-	},
-
-	'54' => {
-		message => q|Benefits|,
-		lastUpdated => 1031514049
-	},
-
-	'8' => {
-		message => q|Product Image 2|,
-		lastUpdated => 1031514049
-	},
-
-	'1' => {
-		message => q|Product|,
-		lastUpdated => 1031514049
-	},
-
-	'3' => {
-		message => q|Are you certain you wish to delete this feature?|,
-		lastUpdated => 1031514049
-	},
-
-	'51' => {
-		message => q|Benefit|,
-		lastUpdated => 1031514049
-	},
-
-	'56' => {
-		message => q|Add a product template.|,
-		lastUpdated => 1031514049
-	},
-
-	'11' => {
-		message => q|Product Number|,
-		lastUpdated => 1031514049
-	},
-
-	'2' => {
-		message => q|Are you certain you wish to delete the relationship to this accessory?|,
-		lastUpdated => 1031514049
-	},
-
-	'9' => {
-		message => q|Product Image 3|,
-		lastUpdated => 1031514049
-	},
-
-	'7' => {
-		message => q|Product Image 1|,
-		lastUpdated => 1031514049
-	},
-
-	'5' => {
-		message => q|Are you certain you wish to delete this specification?|,
-		lastUpdated => 1031514049
-	},
-
-	'13' => {
-		message => q|Brochure|,
-		lastUpdated => 1031514049
-	},
-
-	'14' => {
-		message => q|Manual|,
-		lastUpdated => 1031514049
-	},
-
-	'15' => {
-		message => q|Warranty|,
-		lastUpdated => 1031514049
-	},
-
-	'16' => {
-		message => q|Add Accessory|,
-		lastUpdated => 1031514049
-	},
-
-	'17' => {
-		message => q|Accessory|,
-		lastUpdated => 1031514049
-	},
-
-	'18' => {
-		message => q|Add another accessory?|,
-		lastUpdated => 1031514049
-	},
-
-	'21' => {
-		message => q|Add another related product?|,
-		lastUpdated => 1031514049
-	},
-
-	'19' => {
-		message => q|Add Related Product|,
-		lastUpdated => 1031514049
-	},
-
-	'20' => {
-		message => q|Related Product|,
-		lastUpdated => 1031514049
-	},
-
-	'22' => {
-		message => q|Edit Feature|,
-		lastUpdated => 1031514049
-	},
-
-	'23' => {
-		message => q|Feature|,
-		lastUpdated => 1031514049
-	},
-
-	'24' => {
-		message => q|Add another feature?|,
-		lastUpdated => 1031514049
-	},
-
-	'25' => {
-		message => q|Edit Specification|,
-		lastUpdated => 1031514049
-	},
-
-	'26' => {
-		message => q|Label|,
-		lastUpdated => 1031514049
-	},
-
-	'27' => {
-		message => q|Specification|,
-		lastUpdated => 1031514049
-	},
-
-	'28' => {
-		message => q|Add another specification?|,
-		lastUpdated => 1031514049
-	},
-
-	'29' => {
-		message => q|Units|,
-		lastUpdated => 1031514049
-	},
-
-	'30' => {
-		message => q|Features|,
-		lastUpdated => 1031514049
-	},
-
-	'31' => {
-		message => q|Specifications|,
+	'33' => {
+		message => q|Related Products|,
 		lastUpdated => 1031514049
 	},
 
 	'32' => {
 		message => q|Accessories|,
 		lastUpdated => 1031514049
-	},
-
-	'33' => {
-		message => q|Related Products|,
-		lastUpdated => 1031514049
-	},
-
-	'34' => {
-		message => q|Add a feature.|,
-		lastUpdated => 1031514049
-	},
-
-	'35' => {
-		message => q|Add a specification.|,
-		lastUpdated => 1031514049
-	},
-
-	'36' => {
-		message => q|Add an accessory.|,
-		lastUpdated => 1031514049
-	},
-
-	'37' => {
-		message => q|Add a related product.|,
-		lastUpdated => 1031514049
-	},
-
-	'57' => {
-		message => q|Are you certain you wish to delete this template and set all the products using it to the default template?|,
-		lastUpdated => 1031514049
-	},
-
-	'53' => {
-		message => q|Edit Benefit|,
-		lastUpdated => 1031514049
-	},
-
-	'52' => {
-		message => q|Add another benefit?|,
-		lastUpdated => 1031514049
-	},
-
-	'62' => {
-		message => q|Product Template|,
-		lastUpdated => 1038864092
 	},
 
 	'63' => {
@@ -421,6 +191,176 @@ The WebGUI management controls for this related product.
 		lastUpdated => 1038864092
 	},
 
+	'21' => {
+		message => q|Add another related product?|,
+		lastUpdated => 1031514049
+	},
+
+	'7' => {
+		message => q|Product Image 1|,
+		lastUpdated => 1031514049
+	},
+
+	'26' => {
+		message => q|Label|,
+		lastUpdated => 1031514049
+	},
+
+	'17' => {
+		message => q|Accessory|,
+		lastUpdated => 1031514049
+	},
+
+	'2' => {
+		message => q|Are you certain you wish to delete the relationship to this accessory?|,
+		lastUpdated => 1031514049
+	},
+
+	'1' => {
+		message => q|Product|,
+		lastUpdated => 1031514049
+	},
+
+	'18' => {
+		message => q|Add another accessory?|,
+		lastUpdated => 1031514049
+	},
+
+	'30' => {
+		message => q|Features|,
+		lastUpdated => 1031514049
+	},
+
+	'16' => {
+		message => q|Add Accessory|,
+		lastUpdated => 1031514049
+	},
+
+	'44' => {
+		message => q|Product Accessory, Add/Edit|,
+		lastUpdated => 1031514049
+	},
+
+	'55' => {
+		message => q|Add a benefit.|,
+		lastUpdated => 1031514049
+	},
+
+	'27' => {
+		message => q|Specification|,
+		lastUpdated => 1031514049
+	},
+
+	'25' => {
+		message => q|Edit Specification|,
+		lastUpdated => 1031514049
+	},
+
+	'28' => {
+		message => q|Add another specification?|,
+		lastUpdated => 1031514049
+	},
+
+	'40' => {
+		message => q|Product Feature, Add/Edit|,
+		lastUpdated => 1031514049
+	},
+
+	'57' => {
+		message => q|Are you certain you wish to delete this template and set all the products using it to the default template?|,
+		lastUpdated => 1031514049
+	},
+
+	'20' => {
+		message => q|Related Product|,
+		lastUpdated => 1031514049
+	},
+
+	'14' => {
+		message => q|Manual|,
+		lastUpdated => 1031514049
+	},
+
+	'59' => {
+		message => q|Name|,
+		lastUpdated => 1031514049
+	},
+
+	'49' => {
+		message => q|Product Benefit, Add/Edit|,
+		lastUpdated => 1031514049
+	},
+
+	'24' => {
+		message => q|Add another feature?|,
+		lastUpdated => 1031514049
+	},
+
+	'10' => {
+		message => q|Price|,
+		lastUpdated => 1031514049
+	},
+
+	'31' => {
+		message => q|Specifications|,
+		lastUpdated => 1031514049
+	},
+
+	'35' => {
+		message => q|Add a specification.|,
+		lastUpdated => 1031514049
+	},
+
+	'11' => {
+		message => q|Product Number|,
+		lastUpdated => 1031514049
+	},
+
+	'53' => {
+		message => q|Edit Benefit|,
+		lastUpdated => 1031514049
+	},
+
+	'48' => {
+		message => q|Are you certain you wish to delete this benefit? It cannot be recovered once it has been deleted.|,
+		lastUpdated => 1031514049
+	},
+
+	'42' => {
+		message => q|Product Specification, Add/Edit|,
+		lastUpdated => 1031514049
+	},
+
+	'22' => {
+		message => q|Edit Feature|,
+		lastUpdated => 1031514049
+	},
+
+	'46' => {
+		message => q|Product (Related), Add/Edit|,
+		lastUpdated => 1031514049
+	},
+
+	'13' => {
+		message => q|Brochure|,
+		lastUpdated => 1031514049
+	},
+
+	'23' => {
+		message => q|Feature|,
+		lastUpdated => 1031514049
+	},
+
+	'29' => {
+		message => q|Units|,
+		lastUpdated => 1031514049
+	},
+
+	'6' => {
+		message => q|Edit Product|,
+		lastUpdated => 1031514049
+	},
+
 	'50' => {
 		message => q|Benefits are typically the result of the features of your product. They are why your product is so good. If you add benefits, you may also wish to consider adding some features.
 <p>
@@ -434,16 +374,6 @@ If you'd like to add another benefit right away, select "Yes".
 <p>
 |,
 		lastUpdated => 1031514049
-	},
-
-	'49' => {
-		message => q|Product Benefit, Add/Edit|,
-		lastUpdated => 1031514049
-	},
-
-	'38' => {
-		message => q|Product, Add/Edit|,
-		lastUpdated => 1038889846
 	},
 
 	'39' => {
@@ -489,8 +419,23 @@ The warranty for this product.
 		lastUpdated => 1038889846
 	},
 
-	'40' => {
-		message => q|Product Feature, Add/Edit|,
+	'36' => {
+		message => q|Add an accessory.|,
+		lastUpdated => 1031514049
+	},
+
+	'3' => {
+		message => q|Are you certain you wish to delete this feature?|,
+		lastUpdated => 1031514049
+	},
+
+	'51' => {
+		message => q|Benefit|,
+		lastUpdated => 1031514049
+	},
+
+	'9' => {
+		message => q|Product Image 3|,
 		lastUpdated => 1031514049
 	},
 
@@ -509,8 +454,86 @@ If you'd like to add another feature right away, select "Yes".
 		lastUpdated => 1031514049
 	},
 
-	'42' => {
-		message => q|Product Specification, Add/Edit|,
+	'58' => {
+		message => q|Edit Product Template|,
+		lastUpdated => 1031514049
+	},
+
+	'47' => {
+		message => q|Related products are products that are comparable or complementary to other products.
+<p>
+
+
+<b>Related products</b><br>
+Choose from the list of products you've already entered.
+<p>
+
+
+<b>Add another related product?</b><br>
+Select "Yes" if you have another related product to add.
+<p>
+
+|,
+		lastUpdated => 1041876679
+	},
+
+	'15' => {
+		message => q|Warranty|,
+		lastUpdated => 1031514049
+	},
+
+	'38' => {
+		message => q|Product, Add/Edit|,
+		lastUpdated => 1038889846
+	},
+
+	'52' => {
+		message => q|Add another benefit?|,
+		lastUpdated => 1031514049
+	},
+
+	'8' => {
+		message => q|Product Image 2|,
+		lastUpdated => 1031514049
+	},
+
+	'60' => {
+		message => q|Template|,
+		lastUpdated => 1031514049
+	},
+
+	'4' => {
+		message => q|Are you certain you wish to delete the relationship to this related product?|,
+		lastUpdated => 1031514049
+	},
+
+	'34' => {
+		message => q|Add a feature.|,
+		lastUpdated => 1031514049
+	},
+
+	'56' => {
+		message => q|Add a product template.|,
+		lastUpdated => 1031514049
+	},
+
+	'45' => {
+		message => q|Accessories are products that enhance other products.
+<p>
+
+<b>Accessory</b><br>
+Choose from the list of products you've already entered.
+<p>
+
+<b>Add another accessory?</b><br>
+Select "Yes" if you have another accessory to add.
+<p>
+|,
+		lastUpdated => 1031514049
+	},
+
+	'37' => {
+		message => q|Add a related product.|,
 		lastUpdated => 1031514049
 	},
 
@@ -542,47 +565,24 @@ If you'd like to add another specification, select "Yes".
 		lastUpdated => 1031514049
 	},
 
-	'44' => {
-		message => q|Product Accessory, Add/Edit|,
+	'19' => {
+		message => q|Add Related Product|,
 		lastUpdated => 1031514049
 	},
 
-	'45' => {
-		message => q|Accessories are products that enhance other products.
-<p>
+	'62' => {
+		message => q|Product Template|,
+		lastUpdated => 1038864092
+	},
 
-<b>Accessory</b><br>
-Choose from the list of products you've already entered.
-<p>
-
-<b>Add another accessory?</b><br>
-Select "Yes" if you have another accessory to add.
-<p>
-|,
+	'54' => {
+		message => q|Benefits|,
 		lastUpdated => 1031514049
 	},
 
-	'46' => {
-		message => q|Product (Related), Add/Edit|,
+	'5' => {
+		message => q|Are you certain you wish to delete this specification?|,
 		lastUpdated => 1031514049
-	},
-
-	'47' => {
-		message => q|Related products are products that are comparable or complementary to other products.
-<p>
-
-
-<b>Related products</b><br>
-Choose from the list of products you've already entered.
-<p>
-
-
-<b>Add another related product?</b><br>
-Select "Yes" if you have another related product to add.
-<p>
-
-|,
-		lastUpdated => 1041876679
 	},
 
 };

@@ -29,6 +29,7 @@ use WebGUI::Wobject;
 our @ISA = qw(WebGUI::Wobject);
 
 
+
 #-------------------------------------------------------------------
 sub duplicate {
 	my ($file, $w);

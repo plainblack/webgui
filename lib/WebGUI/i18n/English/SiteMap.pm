@@ -1,24 +1,9 @@
 package WebGUI::i18n::English::SiteMap;
 
 our $I18N = {
-	'2' => {
-		message => q|Site Map|,
-		lastUpdated => 1031514049
-	},
-
-	'3' => {
-		message => q|Start With|,
-		lastUpdated => 1039908390
-	},
-
-	'4' => {
-		message => q|Depth To Traverse|,
-		lastUpdated => 1031514049
-	},
-
-	'5' => {
-		message => q|Edit Site Map|,
-		lastUpdated => 1031514049
+	'74' => {
+		message => q|This Page|,
+		lastUpdated => 1039908565
 	},
 
 	'6' => {
@@ -26,9 +11,9 @@ our $I18N = {
 		lastUpdated => 1031514049
 	},
 
-	'61' => {
-		message => q|Site Map, Add/Edit|,
-		lastUpdated => 1038890147
+	'75' => {
+		message => q|All Roots|,
+		lastUpdated => 1039908572
 	},
 
 	'71' => {
@@ -57,6 +42,31 @@ If this setting is true, site map entries are sorted alphabetically.  If this se
 
 |,
 		lastUpdated => 1039908464
+	},
+
+	'3' => {
+		message => q|Start With|,
+		lastUpdated => 1039908390
+	},
+
+	'7' => {
+		message => q|Alphabetic?|,
+		lastUpdated => 1057208065
+	},
+
+	'61' => {
+		message => q|Site Map, Add/Edit|,
+		lastUpdated => 1038890147
+	},
+
+	'2' => {
+		message => q|Site Map|,
+		lastUpdated => 1031514049
+	},
+
+	'4' => {
+		message => q|Depth To Traverse|,
+		lastUpdated => 1031514049
 	},
 
 	'72' => {
@@ -110,19 +120,9 @@ A condition indicating whether or not this page is at the top of the navigation 
 		lastUpdated => 1047855100
 	},
 
-	'75' => {
-		message => q|All Roots|,
-		lastUpdated => 1039908572
-	},
-
-	'74' => {
-		message => q|This Page|,
-		lastUpdated => 1039908565
-	},
-
-	'7' => {
-		message => q|Alphabetic?|,
-		lastUpdated => 1057208065
+	'5' => {
+		message => q|Edit Site Map|,
+		lastUpdated => 1031514049
 	},
 
 };

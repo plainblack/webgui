@@ -24,6 +24,7 @@ use WebGUI::Grouping;
 use WebGUI::HTML;
 use WebGUI::HTMLForm;
 use WebGUI::Icon;
+use WebGUI::Id;
 use WebGUI::International;
 use WebGUI::Macro;
 use WebGUI::Node;
@@ -65,7 +66,7 @@ sub _reorderWobjects {
 	$sth = WebGUI::SQL->read("select wobjectId from wobject where pageId=$_[0] order by templatePosition,sequenceNumber");
 	while (($wid) = $sth->array) {
 		$i++;
-		WebGUI::SQL->write("update wobject set sequenceNumber='$i' where wobjectId=$wid");
+		WebGUI::SQL->write("update wobject set sequenceNumber='$i' where wobjectId=".quote($wid));
 	}
 	$sth->finish;
 }
@@ -218,7 +219,7 @@ sub displayTitle {
 
 =head2 duplicate ( [ pageId ] )
 
-Duplicates this wobject with a new wobject ID. Returns the new wobject Id.
+Duplicates this wobject with a new wobject Id. Returns the new wobject Id.
 
 NOTE: This method is meant to be extended by all sub-classes.
 
@@ -526,9 +527,9 @@ sub moveCollateralDown {
         ($id) = WebGUI::SQL->quickArray("select $_[2] from $_[1] where $setName=".quote($setValue)
 		." and sequenceNumber=$seq+1");
         if ($id ne "") {
-                WebGUI::SQL->write("update $_[1] set sequenceNumber=sequenceNumber+1 where $_[2]=$_[3] and $setName="
+                WebGUI::SQL->write("update $_[1] set sequenceNumber=sequenceNumber+1 where $_[2]=".quote($_[3])." and $setName="
 			.quote($setValue));
-                WebGUI::SQL->write("update $_[1] set sequenceNumber=sequenceNumber-1 where $_[2]=$id and $setName="
+                WebGUI::SQL->write("update $_[1] set sequenceNumber=sequenceNumber-1 where $_[2]=".quote($id)." and $setName="
 			.quote($setValue));
          }
 }
@@ -579,9 +580,9 @@ sub moveCollateralUp {
         ($id) = WebGUI::SQL->quickArray("select $_[2] from $_[1] where $setName=".quote($setValue)
 		." and sequenceNumber=$seq-1");
         if ($id ne "") {
-                WebGUI::SQL->write("update $_[1] set sequenceNumber=sequenceNumber-1 where $_[2]=$_[3] and $setName="
+                WebGUI::SQL->write("update $_[1] set sequenceNumber=sequenceNumber-1 where $_[2]=".quote($_[3])." and $setName="
 			.quote($setValue));
-                WebGUI::SQL->write("update $_[1] set sequenceNumber=sequenceNumber+1 where $_[2]=$id and $setName="
+                WebGUI::SQL->write("update $_[1] set sequenceNumber=sequenceNumber+1 where $_[2]=".quote($id)." and $setName="
 			.quote($setValue));
         }
 }
@@ -661,6 +662,14 @@ Then the extended property list would be:
 		isCool=>{
 			fieldType=>"yesNo",
 			defaultValue=>1
+			},
+		counter=>{
+			fieldType=>"integer",
+			defaultValue=>1,
+			autoIncrement=>1
+			},
+		someId=>{
+			autoId=>1
 			},
 		foo=>{
 			fieldType=>"integer",
@@ -934,7 +943,7 @@ sub reorderCollateral {
 	$setValue = $_[4] || $_[0]->get($setName);
         $sth = WebGUI::SQL->read("select $_[2] from $_[1] where $setName=".quote($setValue)." order by sequenceNumber");
         while (($id) = $sth->array) {
-                WebGUI::SQL->write("update $_[1] set sequenceNumber=$i where $setName=".quote($setValue)." and $_[2]=$id");
+                WebGUI::SQL->write("update $_[1] set sequenceNumber=$i where $setName=".quote($setValue)." and $_[2]=".quote($id));
                 $i++;
         }
         $sth->finish;
@@ -976,7 +985,7 @@ sub set {
         }
         my $wobjectProperties = \@temp;
 	if ($self->{_property}{wobjectId} eq "new") {
-		$self->{_property}{wobjectId} = getNextId("wobjectId");
+		$self->{_property}{wobjectId} = WebGUI::Id::generate();
 		$self->{_property}{pageId} = ${$_[1]}{pageId} || $session{page}{pageId};
 		$self->{_property}{sequenceNumber} = _getNextSequenceNumber($self->{_property}{pageId});
 		$self->{_property}{addedBy} = $session{user}{userId};
@@ -984,18 +993,21 @@ sub set {
 		WebGUI::SQL->write("insert into wobject 
 			(wobjectId, namespace, dateAdded, addedBy, sequenceNumber, pageId) 
 			values (
-			".$self->{_property}{wobjectId}.", 
+			".quote($self->{_property}{wobjectId}).", 
 			".quote($self->{_property}{namespace}).",
 			".$self->{_property}{dateAdded}.",
-			".$self->{_property}{addedBy}.",
+			".quote($self->{_property}{addedBy}).",
 			".$self->{_property}{sequenceNumber}.",
-			".$self->{_property}{pageId}."
+			".quote($self->{_property}{pageId})."
 			)");
 		WebGUI::SQL->write("insert into ".$self->{_property}{namespace}." (wobjectId) 
-			values (".$self->{_property}{wobjectId}.")");
+			values (".quote($self->{_property}{wobjectId}).")");
 		foreach my $key (keys %{$self->{_extendedProperties}}) {
 			if ($self->{_extendedProperties}{$key}{autoIncrement}) {
 				$properties->{$key} = getNextId($key);
+			}
+			if ($self->{_extendedProperties}{$key}{autoId}) {
+				$properties->{$key} = WebGUI::Id::generate();
 			}
 		}
 	}
@@ -1013,12 +1025,12 @@ sub set {
                 }
 	}
 	$sql .= " lastEdited=".$self->{_property}{lastEdited}.", 
-		editedBy=".$self->{_property}{editedBy}." 
-		where wobjectId=".$self->{_property}{wobjectId};
+		editedBy=".quote($self->{_property}{editedBy})." 
+		where wobjectId=".quote($self->{_property}{wobjectId});
 	WebGUI::SQL->write($sql);
 	if (@update) {
         	WebGUI::SQL->write("update ".$self->{_property}{namespace}." set ".join(",",@update)." 
-			where wobjectId=".$self->{_property}{wobjectId});
+			where wobjectId=".quote($self->{_property}{wobjectId}));
 	}
 	WebGUI::ErrorHandler::audit("edited Wobject ".$self->{_property}{wobjectId});	
 }
@@ -1071,7 +1083,7 @@ sub setCollateral {
 	$setName = $setName || "wobjectId";
 	$setValue = $setValue || $_[0]->get($setName);
 	if ($properties->{$keyName} eq "new" || $properties->{$keyName} eq "") {
-		$properties->{$keyName} = getNextId($keyName);
+		$properties->{$keyName} = WebGUI::Id::generate();
 		$sql = "insert into $table (";
 		$dbkeys = "";
      		$dbvalues = "";
@@ -1110,7 +1122,7 @@ sub setCollateral {
 	$_[0]->{_property}{lastEdited} = time();
         $_[0]->{_property}{editedBy} = $session{user}{userId};
 	WebGUI::SQL->write("update wobject set lastEdited=".$_[0]->{_property}{lastEdited}
-		.", editedBy=".$_[0]->{_property}{editedBy}." where wobjectId=".$_[0]->get("wobjectId"));
+		.", editedBy=".$_[0]->{_property}{editedBy}." where wobjectId=".quote($_[0]->wid));
 	$_[0]->reorderCollateral($table,$keyName,$setName,$setValue) if ($properties->{sequenceNumber} < 0);
 	return $properties->{$keyName};
 }
@@ -1419,7 +1431,7 @@ sub www_edit {
 		   	push (@$contentManagers, $session{user}{userId});
 		   	$clause = "userId in (".join(",",@$contentManagers).")";
 	    	} else {
-		   	$clause = "userId=".$self->getValue("ownerId");
+		   	$clause = "userId=".quote($self->getValue("ownerId"));
 	    	}
 		my $users = WebGUI::SQL->buildHashRef("select userId,username from users where $clause order by username");
 		$f->getTab("privileges")->selectList(
@@ -1588,8 +1600,8 @@ sub www_moveDown {
 		($wid) = WebGUI::SQL->quickArray("select wobjectId from wobject where pageId=".$self->get("pageId")
 			." and sequenceNumber=".($thisSeq+1));
 		if ($wid ne "") {
-                	WebGUI::SQL->write("update wobject set sequenceNumber=sequenceNumber+1 where wobjectId=".$self->get("wobjectId"));
-                	WebGUI::SQL->write("update wobject set sequenceNumber=sequenceNumber-1 where wobjectId=$wid");
+                	WebGUI::SQL->write("update wobject set sequenceNumber=sequenceNumber+1 where wobjectId=".quote($self->get("wobjectId")));
+                	WebGUI::SQL->write("update wobject set sequenceNumber=sequenceNumber-1 where wobjectId=".quote($wid));
                 	_reorderWobjects($self->get("pageId"));
 		}
                 return "";
@@ -1633,8 +1645,8 @@ sub www_moveUp {
                 ($wid) = WebGUI::SQL->quickArray("select wobjectId from wobject where pageId=".$self->get("pageId")
 			." and sequenceNumber=".($thisSeq-1));
                 if ($wid ne "") {
-                        WebGUI::SQL->write("update wobject set sequenceNumber=sequenceNumber-1 where wobjectId=".$self->get("wobjectId"));
-                        WebGUI::SQL->write("update wobject set sequenceNumber=sequenceNumber+1 where wobjectId=$wid");
+                        WebGUI::SQL->write("update wobject set sequenceNumber=sequenceNumber-1 where wobjectId=".quote($self->get("wobjectId")));
+                        WebGUI::SQL->write("update wobject set sequenceNumber=sequenceNumber+1 where wobjectId=".quote($wid));
                 	_reorderWobjects($self->get("pageId"));
                 }
                 return "";

@@ -53,8 +53,8 @@ sub duplicate {
                 $file->copy($w,$newDownloadId);
                 $file = WebGUI::Attachment->new($row{alternateVersion2},$_[0]->get("wobjectId"),$row{FileManager_fileId});
                 $file->copy($w,$newDownloadId);
-                WebGUI::SQL->write("insert into FileManager_file values ($newDownloadId, ".$w.", ".
-			quote($row{fileTitle}).", ".quote($row{downloadFile}).", $row{groupToView}, ".
+                WebGUI::SQL->write("insert into FileManager_file values (".quote($newDownloadId).", ".quote($w).", ".
+			quote($row{fileTitle}).", ".quote($row{downloadFile}).", ".quote($row{groupToView}).", ".
 			quote($row{briefSynopsis}).", $row{dateUploaded}, $row{sequenceNumber}, ".
 			quote($row{alternateVersion1}).", ".quote($row{alternateVersion2}).")");
         }

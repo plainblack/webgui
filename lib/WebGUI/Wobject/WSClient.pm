@@ -123,6 +123,12 @@ sub new {
 
 
 #-------------------------------------------------------------------
+sub uiLevel {
+	return 9;
+}
+
+
+#-------------------------------------------------------------------
 sub www_edit {
    my $layout     = WebGUI::HTMLForm->new;
    my $privileges = WebGUI::HTMLForm->new;

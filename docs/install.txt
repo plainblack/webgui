@@ -25,6 +25,7 @@ QnD INSTALL INSTRUCTIONS:
    IO::Zlib
    SOAP::Lite
    Cache::Cache 
+   Time::HiRes
    Image::Magick (optional)
  
 

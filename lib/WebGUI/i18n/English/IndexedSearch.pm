@@ -1,9 +1,119 @@
 package WebGUI::i18n::English::IndexedSearch;
 
 our $I18N = {
+	'11' => {
+		message => q|Paginate after|,
+		lastUpdated => 1066252409
+	},
+
+	'21' => {
+		message => q|Content|,
+		lastUpdated => 1066765681
+	},
+
+	'7' => {
+		message => q|Only results created by|,
+		lastUpdated => 1066252303
+	},
+
+	'26' => {
+		message => q|Search, Add/Edit|,
+		lastUpdated => 1067346336
+	},
+
+	'17' => {
+		message => q|Search|,
+		lastUpdated => 1066593262
+	},
+
+	'2' => {
+		message => q|No index created. The scheduler must run and create the index first.|,
+		lastUpdated => 1066252099
+	},
+
+	'22' => {
+		message => q|Profile|,
+		lastUpdated => 1066765844
+	},
+
+	'1' => {
+		message => q|Table Search_docInfo can't be opened.|,
+		lastUpdated => 1066252055
+	},
+
+	'18' => {
+		message => q|Any namespace|,
+		lastUpdated => 1066593420
+	},
+
+	'23' => {
+		message => q|Any Content Type|,
+		lastUpdated => 1066766053
+	},
+
+	'16' => {
+		message => q|Search|,
+		lastUpdated => 1066565087
+	},
+
+	'13' => {
+		message => q|Highlight results ?|,
+		lastUpdated => 1066252498
+	},
+
 	'29' => {
 		message => q|Search template|,
 		lastUpdated => 1070202588
+	},
+
+	'27' => {
+		message => q|
+<P>The Search adds advanced search capabilities to your WebGUI site. </P>
+<P><STRONG>Index to use<BR></STRONG>The Search uses an index to retrieve it's 
+results from. Indexes are created with the scheduler. You can create more then one index. Choose here which index to use.</P>
+<P><STRONG>Search through<BR></STRONG>By default all pages are searched. You can 
+limit the search to certain page roots. Multiple choices are allowed.</P>
+<P><STRONG>Only results created by<BR></STRONG>You can limit the results to 
+items created by certain users. By default items from any user are returned.</P>
+<P><STRONG>Only results in namespace<BR></STRONG>By default all namespaces are 
+searched. You can limit the search to certain namespaces. An example of usage is 
+to search only in products.</P>
+<P><STRONG>Only results in language<BR></STRONG>If you have a multi-lingual 
+site, you can use this option to limit the search results to a certain 
+language.</P>
+<P><STRONG>Only results of type<BR></STRONG>You can limit the search to certain 
+types of content.</P>
+<BLOCKQUOTE dir=ltr style="MARGIN-RIGHT: 0px">
+<P align=left><EM>Discussion:</EM> Messages on the forums,&nbsp;discussions on 
+articles or&nbsp;USS.<BR><EM>Help:</EM> Content in the online WebGUI help 
+system<BR><EM>Page:</EM><STRONG> </STRONG>Page title and 
+synopsis<BR><EM>Profile:</EM> User Profiles<BR><EM>Wobject: </EM>Wobject Title 
+and Description<BR><EM>Wobject details: </EM>All other wobject data. For example 
+FAQ question, Calendar item, etc.</P></BLOCKQUOTE>
+<P dir=ltr align=left><b>Force users to use selected roots</b><br>Enabling this option will cause the search to be over all of the selected page roots regardless of what the user entered via the search form.</b></p> 
+<P dir=ltr align=left><STRONG>Template<BR></STRONG>Select a template to layout 
+your Search. The different templates have different functionality.</P>
+<P dir=ltr align=left><STRONG>Paginate after<BR></STRONG>The number of results 
+you'd like to display on a page.</P>
+<P dir=ltr align=left><STRONG>Context preview length<BR></STRONG>The maximum 
+number of characters in each of the context sections. Default is 130 characters. 
+A negative length gives the complete body, while a preview length of null gives 
+no preview.</P>
+<P dir=ltr align=left><STRONG>Highlight results ?<BR></STRONG>If you want to 
+highlight the search results in the preview you'll want to check this box.</P>
+<P dir=ltr align=left><STRONG>Highlight color n<BR></STRONG>The colors that are 
+used to highlight the corresponding words in the query.&nbsp;</P>|,
+		lastUpdated => 1090580644
+	},
+
+	'25' => {
+		message => q|Any user|,
+		lastUpdated => 1066766053
+	},
+
+	'6' => {
+		message => q|Search through|,
+		lastUpdated => 1066252264
 	},
 
 	'28' => {
@@ -86,59 +196,9 @@ the last page.</P>|,
 		lastUpdated => 1090580644
 	},
 
-	'2' => {
-		message => q|No index created. The scheduler must run and create the index first.|,
-		lastUpdated => 1066252099
-	},
-
 	'3' => {
 		message => q|Please refer to the documentation for more info.|,
 		lastUpdated => 1066252166
-	},
-
-	'4' => {
-		message => q|This page|,
-		lastUpdated => 1066252218
-	},
-
-	'5' => {
-		message => q|Index to use|,
-		lastUpdated => 1066252241
-	},
-
-	'6' => {
-		message => q|Search through|,
-		lastUpdated => 1066252264
-	},
-
-	'1' => {
-		message => q|Table Search_docInfo can't be opened.|,
-		lastUpdated => 1066252055
-	},
-
-	'14' => {
-		message => q|Highlight color|,
-		lastUpdated => 1066252536
-	},
-
-	'13' => {
-		message => q|Highlight results ?|,
-		lastUpdated => 1066252498
-	},
-
-	'12' => {
-		message => q|Context preview length|,
-		lastUpdated => 1066252463
-	},
-
-	'11' => {
-		message => q|Paginate after|,
-		lastUpdated => 1066252409
-	},
-
-	'10' => {
-		message => q|Only results of type|,
-		lastUpdated => 1066252387
 	},
 
 	'9' => {
@@ -146,37 +206,9 @@ the last page.</P>|,
 		lastUpdated => 1066252363
 	},
 
-	'8' => {
-		message => q|Only results in namespace|,
-		lastUpdated => 1066252344
-	},
-
-	'7' => {
-		message => q|Only results created by|,
-		lastUpdated => 1066252303
-	},
-
-	'20' => {
-		message => q|Wobject details|,
-		lastUpdated => 1066765556
-	},
-
-	'18' => {
-		message => q|Any namespace|,
-		lastUpdated => 1066593420,
-		context => q|first option for "Search in namespace:"|
-	},
-
-	'17' => {
-		message => q|Search|,
-		lastUpdated => 1066593262,
-		context => q|Title of this wobject|
-	},
-
-	'16' => {
-		message => q|Search|,
-		lastUpdated => 1066565087,
-		context => q|Label of the search submit button.|
+	'12' => {
+		message => q|Context preview length|,
+		lastUpdated => 1066252463
 	},
 
 	'15' => {
@@ -184,19 +216,24 @@ the last page.</P>|,
 		lastUpdated => 1066253116
 	},
 
-	'19' => {
-		message => q|Wobject|,
-		lastUpdated => 1066765495
+	'14' => {
+		message => q|Highlight color|,
+		lastUpdated => 1066252536
 	},
 
-	'22' => {
-		message => q|Profile|,
-		lastUpdated => 1066765844
+	'20' => {
+		message => q|Wobject details|,
+		lastUpdated => 1066765556
 	},
 
-	'25' => {
-		message => q|Any user|,
-		lastUpdated => 1066766053
+	'8' => {
+		message => q|Only results in namespace|,
+		lastUpdated => 1066252344
+	},
+
+	'4' => {
+		message => q|This page|,
+		lastUpdated => 1066252218
 	},
 
 	'24' => {
@@ -204,66 +241,24 @@ the last page.</P>|,
 		lastUpdated => 1066766053
 	},
 
-	'23' => {
-		message => q|Any Content Type|,
-		lastUpdated => 1066766053,
-		context => q|Any type of content|
-	},
-
-	'21' => {
-		message => q|Content|,
-		lastUpdated => 1066765681,
-		context => q|Collective term for Wobjects, Pages and Wobject details.|
-	},
-
-	'26' => {
-		message => q|Search, Add/Edit|,
-		lastUpdated => 1067346336
-	},
-
-	'27' => {
-		message => q|
-<P>The Search adds advanced search capabilities to your WebGUI site. </P>
-<P><STRONG>Index to use<BR></STRONG>The Search uses an index to retrieve it's 
-results from. Indexes are created with the scheduler. You can create more then one index. Choose here which index to use.</P>
-<P><STRONG>Search through<BR></STRONG>By default all pages are searched. You can 
-limit the search to certain page roots. Multiple choices are allowed.</P>
-<P><STRONG>Only results created by<BR></STRONG>You can limit the results to 
-items created by certain users. By default items from any user are returned.</P>
-<P><STRONG>Only results in namespace<BR></STRONG>By default all namespaces are 
-searched. You can limit the search to certain namespaces. An example of usage is 
-to search only in products.</P>
-<P><STRONG>Only results in language<BR></STRONG>If you have a multi-lingual 
-site, you can use this option to limit the search results to a certain 
-language.</P>
-<P><STRONG>Only results of type<BR></STRONG>You can limit the search to certain 
-types of content.</P>
-<BLOCKQUOTE dir=ltr style="MARGIN-RIGHT: 0px">
-<P align=left><EM>Discussion:</EM> Messages on the forums,&nbsp;discussions on 
-articles or&nbsp;USS.<BR><EM>Help:</EM> Content in the online WebGUI help 
-system<BR><EM>Page:</EM><STRONG> </STRONG>Page title and 
-synopsis<BR><EM>Profile:</EM> User Profiles<BR><EM>Wobject: </EM>Wobject Title 
-and Description<BR><EM>Wobject details: </EM>All other wobject data. For example 
-FAQ question, Calendar item, etc.</P></BLOCKQUOTE>
-<P dir=ltr align=left><b>Force users to use selected roots</b><br>Enabling this option will cause the search to be over all of the selected page roots regardless of what the user entered via the search form.</b></p> 
-<P dir=ltr align=left><STRONG>Template<BR></STRONG>Select a template to layout 
-your Search. The different templates have different functionality.</P>
-<P dir=ltr align=left><STRONG>Paginate after<BR></STRONG>The number of results 
-you'd like to display on a page.</P>
-<P dir=ltr align=left><STRONG>Context preview length<BR></STRONG>The maximum 
-number of characters in each of the context sections. Default is 130 characters. 
-A negative length gives the complete body, while a preview length of null gives 
-no preview.</P>
-<P dir=ltr align=left><STRONG>Highlight results ?<BR></STRONG>If you want to 
-highlight the search results in the preview you'll want to check this box.</P>
-<P dir=ltr align=left><STRONG>Highlight color n<BR></STRONG>The colors that are 
-used to highlight the corresponding words in the query.&nbsp;</P>|,
-		lastUpdated => 1090580644
-	},
-
 	'edit-forceSearchRoots-label' => {
 		message => q|Force users to use the selected roots|,
 		lastUpdated => 1090580644
+	},
+
+	'19' => {
+		message => q|Wobject|,
+		lastUpdated => 1066765495
+	},
+
+	'10' => {
+		message => q|Only results of type|,
+		lastUpdated => 1066252387
+	},
+
+	'5' => {
+		message => q|Index to use|,
+		lastUpdated => 1066252241
 	},
 
 };

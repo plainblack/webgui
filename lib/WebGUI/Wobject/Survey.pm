@@ -854,7 +854,7 @@ sub www_respond {
 			my $answer = $self->getCollateral("Survey_answer","Survey_answerId",$session{form}{"answerId_".$id});
 			my $response = $session{form}{"textResponse_".$id} || $answer->{answer};
 			WebGUI::SQL->write("insert into Survey_questionResponse (Survey_answerId,Survey_questionId,Survey_responseId,Survey_id,comment,response,dateOfResponse) values (
-				".$answer->{Survey_answerId}.", ".$answer->{Survey_questionId}.", ".$session{scratch}{$varname}.", ".$answer->{Survey_id}.",
+				".quote($answer->{Survey_answerId}).", ".quote($answer->{Survey_questionId}).", ".quote($session{scratch}{$varname}).", ".quote($answer->{Survey_id}).",
 				".quote($session{form}{"comment_".$id}).", ".quote($response).", ".WebGUI::DateTime::time().")");
 		}
 	}

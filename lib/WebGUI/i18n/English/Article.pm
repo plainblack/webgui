@@ -1,84 +1,9 @@
 package WebGUI::i18n::English::Article;
 
 our $I18N = {
-	'1' => {
-		message => q|Article|,
-		lastUpdated => 1031514049
-	},
-
-	'3' => {
-		message => q|Start Date|,
-		lastUpdated => 1031514049
-	},
-
-	'4' => {
-		message => q|End Date|,
-		lastUpdated => 1031514049
-	},
-
-	'6' => {
-		message => q|Image|,
-		lastUpdated => 1031514049
-	},
-
-	'7' => {
-		message => q|Link Title|,
-		lastUpdated => 1031514049
-	},
-
-	'8' => {
-		message => q|Link URL|,
-		lastUpdated => 1031514049
-	},
-
-	'9' => {
-		message => q|Attachment|,
-		lastUpdated => 1031514049
-	},
-
-	'10' => {
-		message => q|Convert carriage returns?|,
-		lastUpdated => 1031514049
-	},
-
 	'11' => {
 		message => q|(Select "Yes" only if you aren't adding &lt;br&gt; manually.)|,
 		lastUpdated => 1031514049
-	},
-
-	'12' => {
-		message => q|Edit Article|,
-		lastUpdated => 1031514049
-	},
-
-	'13' => {
-		message => q|Delete|,
-		lastUpdated => 1031514049
-	},
-
-	'22' => {
-		message => q|Author|,
-		lastUpdated => 1031514049
-	},
-
-	'23' => {
-		message => q|Date|,
-		lastUpdated => 1031514049
-	},
-
-	'24' => {
-		message => q|Post Response|,
-		lastUpdated => 1031514049
-	},
-
-	'28' => {
-		message => q|View Responses|,
-		lastUpdated => 1031514049
-	},
-
-	'61' => {
-		message => q|Article, Add/Edit|,
-		lastUpdated => 1066583066
 	},
 
 	'71' => {
@@ -125,6 +50,76 @@ Checking this box will enable responses to your article much like Articles on Sl
 
 |,
 		lastUpdated => 1066583066
+	},
+
+	'7' => {
+		message => q|Link Title|,
+		lastUpdated => 1031514049
+	},
+
+	'22' => {
+		message => q|Author|,
+		lastUpdated => 1031514049
+	},
+
+	'1' => {
+		message => q|Article|,
+		lastUpdated => 1031514049
+	},
+
+	'72' => {
+		message => q|Article Template|,
+		lastUpdated => 1038794871
+	},
+
+	'23' => {
+		message => q|Date|,
+		lastUpdated => 1031514049
+	},
+
+	'13' => {
+		message => q|Delete|,
+		lastUpdated => 1031514049
+	},
+
+	'6' => {
+		message => q|Image|,
+		lastUpdated => 1031514049
+	},
+
+	'28' => {
+		message => q|View Responses|,
+		lastUpdated => 1031514049
+	},
+
+	'3' => {
+		message => q|Start Date|,
+		lastUpdated => 1031514049
+	},
+
+	'61' => {
+		message => q|Article, Add/Edit|,
+		lastUpdated => 1066583066
+	},
+
+	'9' => {
+		message => q|Attachment|,
+		lastUpdated => 1031514049
+	},
+
+	'12' => {
+		message => q|Edit Article|,
+		lastUpdated => 1031514049
+	},
+
+	'8' => {
+		message => q|Link URL|,
+		lastUpdated => 1031514049
+	},
+
+	'4' => {
+		message => q|End Date|,
+		lastUpdated => 1031514049
 	},
 
 	'73' => {
@@ -234,9 +229,14 @@ The URL to view the replies to this article.
 		lastUpdated => 1082370724
 	},
 
-	'72' => {
-		message => q|Article Template|,
-		lastUpdated => 1038794871
+	'24' => {
+		message => q|Post Response|,
+		lastUpdated => 1031514049
+	},
+
+	'10' => {
+		message => q|Convert carriage returns?|,
+		lastUpdated => 1031514049
 	},
 
 };

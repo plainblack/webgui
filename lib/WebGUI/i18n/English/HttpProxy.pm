@@ -1,9 +1,9 @@
 package WebGUI::i18n::English::HttpProxy;
 
 our $I18N = {
-	'10' => {
-		message => q|HTTP Proxy, Add/Edit|,
-		lastUpdated => 1047858432
+	'6' => {
+		message => q|Remove style?|,
+		lastUpdated => 1047837230
 	},
 
 	'11' => {
@@ -57,9 +57,29 @@ If you proxy a site like Yahoo! that links to other domains, do you wish to allo
 		lastUpdated => 1031510000
 	},
 
+	'9' => {
+		message => q|Cookie Jar|,
+		lastUpdated => 1047835842
+	},
+
+	'12' => {
+		message => q|Rewrite urls ?|,
+		lastUpdated => 1055908341
+	},
+
 	'2' => {
 		message => q|Edit HTTP Proxy|,
 		lastUpdated => 1031510000
+	},
+
+	'14' => {
+		message => q|Stop at|,
+		lastUpdated => 1060433963
+	},
+
+	'8' => {
+		message => q|Follow redirects?|,
+		lastUpdated => 1047837255
 	},
 
 	'1' => {
@@ -72,41 +92,19 @@ If you proxy a site like Yahoo! that links to other domains, do you wish to allo
 		lastUpdated => 1047837283
 	},
 
+	'13' => {
+		message => q|Search for|,
+		lastUpdated => 1060433963
+	},
+
+	'10' => {
+		message => q|HTTP Proxy, Add/Edit|,
+		lastUpdated => 1047858432
+	},
+
 	'5' => {
 		message => q|Allow proxying of other domains?|,
 		lastUpdated => 1047835817
-	},
-
-	'6' => {
-		message => q|Remove style?|,
-		lastUpdated => 1047837230
-	},
-
-	'8' => {
-		message => q|Follow redirects?|,
-		lastUpdated => 1047837255
-	},
-
-	'9' => {
-		message => q|Cookie Jar|,
-		lastUpdated => 1047835842
-	},
-
-	'12' => {
-		message => q|Rewrite urls ?|,
-		lastUpdated => 1055908341
-	},
-
-	'13' => {
-		message => q|Search for|,
-		lastUpdated => 1060433963,
-		context => q|A string used as starting point when proxying parts of remote content.|
-	},
-
-	'14' => {
-		message => q|Stop at|,
-		lastUpdated => 1060433963,
-		context => q|A string used as ending point when proxying parts of remote content.|
 	},
 
 };

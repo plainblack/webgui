@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/data/perl/bin/perl
 
 #-------------------------------------------------------------------
 # WebGUI is Copyright 2001-2004 Plain Black LLC.
@@ -13,7 +13,7 @@
 our ($webguiRoot, $configFile);
 
 BEGIN {
-        $configFile = "WebGUI.conf";
+        $configFile = "webgui.conf";
         $webguiRoot = "/data/WebGUI";
         unshift (@INC, $webguiRoot."/lib");
 }

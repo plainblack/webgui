@@ -1,8 +1,13 @@
 package WebGUI::i18n::English::WSClient;
 
 our $I18N = {
-	'4' => {
-		message => q|SOAP Method/Call|,
+	'35' => {
+		message => q|<b>Debug:</b> No template specified, using default.|,
+		lastUpdated => 1033575504
+	},
+
+	'32' => {
+		message => q|<b>Debug:</b> Error: Could not connect to the SOAP server.|,
 		lastUpdated => 1033575504
 	},
 
@@ -11,13 +16,8 @@ our $I18N = {
 		lastUpdated => 1033575504
 	},
 
-	'8' => {
-		message => q|Preprocess macros on query?|,
-		lastUpdated => 1033575504
-	},
-
-	'5' => {
-		message => q|SOAP Call Parameters|,
+	'21' => {
+		message => q|There were no results for this query.|,
 		lastUpdated => 1033575504
 	},
 
@@ -65,29 +65,9 @@ By default, SOAP calls are cached uniquely for each user session.  By selecting 
 		lastUpdated => 1088972047
 	},
 
-	'35' => {
-		message => q|<b>Debug:</b> No template specified, using default.|,
-		lastUpdated => 1033575504
-	},
-
-	'1' => {
-		message => q|Web Services Client|,
-		lastUpdated => 1033575504
-	},
-
-	'61' => {
-		message => q|Web Services Client, Add/Edit|,
-		lastUpdated => 1033575504
-	},
-
-	'3' => {
-		message => q|SOAP Proxy|,
-		lastUpdated => 1033575504
-	},
-
-	'32' => {
-		message => q|<b>Debug:</b> Error: Could not connect to the SOAP server.|,
-		lastUpdated => 1033575504
+	'26' => {
+		message => q|Could not connect to SOAP server.|,
+		lastUpdated => 1055349311
 	},
 
 	'2' => {
@@ -95,19 +75,44 @@ By default, SOAP calls are cached uniquely for each user session.  By selecting 
 		lastUpdated => 1033575504
 	},
 
-	'9' => {
-		message => q|Debug?|,
+	'22' => {
+		message => q|Parse error on SOAP parameters.|,
+		lastUpdated => 1055348597
+	},
+
+	'1' => {
+		message => q|Web Services Client|,
 		lastUpdated => 1033575504
 	},
 
-	'24' => {
-		message => q|SOAP return is type: |,
-		lastUpdated => 1055349028
+	'72' => {
+		message => q|Web Services Client Template|,
+		lastUpdated => 1072812143
 	},
 
-	'31' => {
-		message => q|<b>Debug:</b> Error: There was a problem with the SOAP call.|,
+	'30' => {
+		message => q|<b>Debug:</b> Error: The URI/WSDL specified is of an improper format.|,
 		lastUpdated => 1033575504
+	},
+
+	'13' => {
+		message => q|Pagination after|,
+		lastUpdated => 1072810296
+	},
+
+	'16' => {
+		message => q|HTTP Header Override|,
+		lastUpdated => 1033575504
+	},
+
+	'23' => {
+		message => q|The URI/WSDL specified is of an improper format.|,
+		lastUpdated => 1055348955
+	},
+
+	'29' => {
+		message => q|Session|,
+		lastUpdated => 1088120988
 	},
 
 	'25' => {
@@ -120,9 +125,24 @@ By default, SOAP calls are cached uniquely for each user session.  By selecting 
 		lastUpdated => 1055349028
 	},
 
-	'23' => {
-		message => q|The URI/WSDL specified is of an improper format.|,
-		lastUpdated => 1055348955
+	'28' => {
+		message => q|Cache|,
+		lastUpdated => 1088972047
+	},
+
+	'3' => {
+		message => q|SOAP Proxy|,
+		lastUpdated => 1033575504
+	},
+
+	'61' => {
+		message => q|Web Services Client, Add/Edit|,
+		lastUpdated => 1033575504
+	},
+
+	'9' => {
+		message => q|Debug?|,
+		lastUpdated => 1033575504
 	},
 
 	'12' => {
@@ -130,14 +150,14 @@ By default, SOAP calls are cached uniquely for each user session.  By selecting 
 		lastUpdated => 1033575504
 	},
 
-	'21' => {
-		message => q|There were no results for this query.|,
-		lastUpdated => 1033575504
+	'14' => {
+		message => q|Pagination variable|,
+		lastUpdated => 1072810296
 	},
 
-	'22' => {
-		message => q|Parse error on SOAP parameters.|,
-		lastUpdated => 1055348597
+	'15' => {
+		message => q|Decode utf8 data?|,
+		lastUpdated => 1033575504
 	},
 
 	'20' => {
@@ -145,14 +165,14 @@ By default, SOAP calls are cached uniquely for each user session.  By selecting 
 		lastUpdated => 1033575504
 	},
 
-	'16' => {
-		message => q|HTTP Header Override|,
+	'8' => {
+		message => q|Preprocess macros on query?|,
 		lastUpdated => 1033575504
 	},
 
-	'72' => {
-		message => q|Web Services Client Template|,
-		lastUpdated => 1072812143
+	'4' => {
+		message => q|SOAP Method/Call|,
+		lastUpdated => 1033575504
 	},
 
 	'73' => {
@@ -182,44 +202,24 @@ names set for them by the SOAP server (i.e. perhaps "localTime" for a time query
 		lastUpdated => 1072812143
 	},
 
-	'15' => {
-		message => q|Decode utf8 data?|,
-		lastUpdated => 1033575504
-	},
-
-	'14' => {
-		message => q|Pagination variable|,
-		lastUpdated => 1072810296
-	},
-
-	'30' => {
-		message => q|<b>Debug:</b> Error: The URI/WSDL specified is of an improper format.|,
-		lastUpdated => 1033575504
-	},
-
-	'13' => {
-		message => q|Pagination after|,
-		lastUpdated => 1072810296
-	},
-
-	'26' => {
-		message => q|Could not connect to SOAP server.|,
-		lastUpdated => 1055349311
-	},
-
-	'28' => {
-		message => q|Cache|,
-		lastUpdated => 1088972047
-	},
-
-	'29' => {
-		message => q|Session|,
-		lastUpdated => 1088120988
+	'24' => {
+		message => q|SOAP return is type: |,
+		lastUpdated => 1055349028
 	},
 
 	'19' => {
 		message => q|Global|,
 		lastUpdated => 1088972047
+	},
+
+	'31' => {
+		message => q|<b>Debug:</b> Error: There was a problem with the SOAP call.|,
+		lastUpdated => 1033575504
+	},
+
+	'5' => {
+		message => q|SOAP Call Parameters|,
+		lastUpdated => 1033575504
 	},
 
 };

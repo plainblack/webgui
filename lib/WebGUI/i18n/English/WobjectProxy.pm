@@ -1,9 +1,34 @@
 package WebGUI::i18n::English::WobjectProxy;
 
 our $I18N = {
-	'1' => {
-		message => q|Wobject To Proxy|,
-		lastUpdated => 1031514049
+	'Criteria' => {
+		message => q|Criteria|,
+		lastUpdated => 1053183804
+	},
+
+	'Random' => {
+		message => q|Random|,
+		lastUpdated => 1053183804
+	},
+
+	'Resolve Multiples?' => {
+		message => q|Resolve Multiples?|,
+		lastUpdated => 1053183804
+	},
+
+	'7' => {
+		message => q|Override title?|,
+		lastUpdated => 1053183682
+	},
+
+	'isnt' => {
+		message => q|isn't|,
+		lastUpdated => 1053183804
+	},
+
+	'is' => {
+		message => q|is|,
+		lastUpdated => 1053183804
 	},
 
 	'2' => {
@@ -11,18 +36,13 @@ our $I18N = {
 		lastUpdated => 1031514049
 	},
 
-	'3' => {
-		message => q|Wobject Proxy|,
-		lastUpdated => 1031514049
+	'equal to' => {
+		message => q|equal to|,
+		lastUpdated => 1053183804
 	},
 
-	'4' => {
-		message => q|Wobject proxying failed. Perhaps the proxied wobject has been deleted.|,
-		lastUpdated => 1031514049
-	},
-
-	'5' => {
-		message => q|Wobject Proxy, Add/Edit|,
+	'1' => {
+		message => q|Wobject To Proxy|,
 		lastUpdated => 1031514049
 	},
 
@@ -70,94 +90,70 @@ A property or value must be quoted if it contains spaces. Feel free to use the c
 		lastUpdated => 1057091098
 	},
 
-	'8' => {
-		message => q|Override display title?|,
-		lastUpdated => 1053183719,
-		context => q|Asking the user if s/he would like to use the "display title" setting specified in the wobject proxy or the original display title setting of the original wobject.|
+	'greater than' => {
+		message => q|greater than|,
+		lastUpdated => 1053183804
 	},
 
-	'10' => {
-		message => q|Override template?|,
-		lastUpdated => 1053183837,
-		context => q|Asking the user if s/he would like to use the template specified in the wobject proxy or the original template of the original wobject.|
-	},
-
-	'7' => {
-		message => q|Override title?|,
-		lastUpdated => 1053183682,
-		context => q|Asking the user if s/he would like to use the title specified in the wobject proxy or the original title of the original wobject.|
+	'3' => {
+		message => q|Wobject Proxy|,
+		lastUpdated => 1031514049
 	},
 
 	'9' => {
 		message => q|Override description?|,
-		lastUpdated => 1053183804,
-		context => q|Asking the user if s/he would like to use the description specified in the wobject proxy or the original description of the original wobject.|
+		lastUpdated => 1053183804
 	},
+
 	'Proxy by alternate criteria?' => {
 		message => q|Proxy by alternate criteria?|,
-		lastUpdated => 1053183804,
-		context => q|Asking the user if s/he would like to use alternate criteria to find a  matching a wobject to proxy.|
-        },
-	'Resolve Multiples?' => {
-                message => q|Resolve Multiples?|,
-                lastUpdated => 1053183804,
-                context => q|Asking the user what sort order (random / most recent) to use if multiple hits are found.|
-        },
-	'Most Recent' => {
-                message => q|Most Recent|,
-                lastUpdated => 1053183804,
-                context => q|Selectlist item for "Resolve Multiples?"|
-        },
-	'Random'  => {
-                message => q|Random|,
-                lastUpdated => 1053183804,
-                context => q|Selectlist item for "Resolve Multiples?"|
-        },
-	'Criteria' => {
-                message => q|Criteria|,
-                lastUpdated => 1053183804,
-                context => q|Label for the criteria textarea|
-        },
+		lastUpdated => 1053183804
+	},
+
+	'not equal to' => {
+		message => q|not equal to|,
+		lastUpdated => 1053183804
+	},
+
+	'less than' => {
+		message => q|less than|,
+		lastUpdated => 1053183804
+	},
+
+	'8' => {
+		message => q|Override display title?|,
+		lastUpdated => 1053183719
+	},
+
 	'AND' => {
 		message => q|AND|,
-		lastUpdated => 1053183804,
-                context => q|Part of the WobjectProxy Query Builder|
-        },
-        'OR' => {
-                message => q|OR|,
-                lastUpdated => 1053183804,
-                context => q|Part of the WobjectProxy Query Builder|
-        },
-        'is' => {
-                message => q|is|,
-                lastUpdated => 1053183804,
-                context => q|Part of the WobjectProxy Query Builder|
-        },
-        'isnt' => {
-                message => q|isn't|,
-                lastUpdated => 1053183804,
-                context => q|Part of the WobjectProxy Query Builder|
-        },
-	"less than" => {
-		message => q|less than|,
-                lastUpdated => 1053183804,
-                context => q|Part of the WobjectProxy Query Builder|
-        },
-        "equal to" => {
-                message => q|equal to|,
-                lastUpdated => 1053183804,
-                context => q|Part of the WobjectProxy Query Builder|
-        },
-        "greater than" => {
-                message => q|greater than|,
-                lastUpdated => 1053183804,
-                context => q|Part of the WobjectProxy Query Builder|
-        },
-        "not equal to" => {
-                message => q|not equal to|,
-                lastUpdated => 1053183804,
-                context => q|Part of the WobjectProxy Query Builder|
-        },
+		lastUpdated => 1053183804
+	},
+
+	'4' => {
+		message => q|Wobject proxying failed. Perhaps the proxied wobject has been deleted.|,
+		lastUpdated => 1031514049
+	},
+
+	'Most Recent' => {
+		message => q|Most Recent|,
+		lastUpdated => 1053183804
+	},
+
+	'10' => {
+		message => q|Override template?|,
+		lastUpdated => 1053183837
+	},
+
+	'OR' => {
+		message => q|OR|,
+		lastUpdated => 1053183804
+	},
+
+	'5' => {
+		message => q|Wobject Proxy, Add/Edit|,
+		lastUpdated => 1031514049
+	},
 
 };
 

@@ -62,14 +62,14 @@ sub duplicate {
         $sth->finish;
         $sth = WebGUI::SQL->read("select * from Product_accessory where wobjectId=".$_[0]->get("wobjectId"));
         while (%data = $sth->hash) {
-                WebGUI::SQL->write("insert into Product_accessory values (".$w->get("wobjectId").", 
-			$data{accessoryWobjectId}, $data{sequenceNumber})");
+                WebGUI::SQL->write("insert into Product_accessory values (".quote($w->get("wobjectId")).", 
+			".quote($data{accessoryWobjectId}).", $data{sequenceNumber})");
         }
         $sth->finish;
         $sth = WebGUI::SQL->read("select * from Product_related where wobjectId=".$_[0]->get("wobjectId"));
         while (%data = $sth->hash) {
-                WebGUI::SQL->write("insert into Product_related values (".$w->get("wobjectId").", 
-			$data{relatedWobjectId}, $data{sequenceNumber})");
+                WebGUI::SQL->write("insert into Product_related values (".quote($w->get("wobjectId")).", 
+			".quote($data{relatedWobjectId}).", $data{sequenceNumber})");
         }
         $sth->finish;
 }
@@ -187,12 +187,13 @@ sub www_addAccessory {
 #-------------------------------------------------------------------
 sub www_addAccessorySave {
 	return WebGUI::Privilege::insufficient() unless ($_[0]->canEdit);
+	return "" unless ($session{form}{accessoryWobjectId});
         $session{page}{useAdminStyle} = 1;
         my ($seq);
         ($seq) = WebGUI::SQL->quickArray("select max(sequenceNumber) from Product_accessory
                 where wobjectId=".$_[0]->get("wobjectId"));
         WebGUI::SQL->write("insert into Product_accessory (wobjectId,accessoryWobjectId,sequenceNumber) values
-                (".$_[0]->get("wobjectId").",".quote($session{form}{accessoryWobjectId}).",".($seq+1).")");
+                (".quote($_[0]->get("wobjectId")).",".quote($session{form}{accessoryWobjectId}).",".($seq+1).")");
         if ($session{form}{proceed}) {
                 return $_[0]->www_addAccessory();
         } else {
@@ -224,11 +225,12 @@ sub www_addRelated {
 #-------------------------------------------------------------------
 sub www_addRelatedSave {
 	return WebGUI::Privilege::insufficient() unless ($_[0]->canEdit);
+	return "" unless ($session{form}{relatedWobjectId});
         my ($seq);
         ($seq) = WebGUI::SQL->quickArray("select max(sequenceNumber) from Product_related
      		where wobjectId=".$_[0]->get("wobjectId"));
         WebGUI::SQL->write("insert into Product_related (wobjectId,relatedWobjectId,sequenceNumber) values
-                (".$_[0]->get("wobjectId").",".quote($session{form}{relatedWobjectId}).",".($seq+1).")");
+                (".quote($_[0]->get("wobjectId")).",".quote($session{form}{relatedWobjectId}).",".($seq+1).")");
         if ($session{form}{proceed}) {
                 return $_[0]->www_addRelated();
         } else {

@@ -1,99 +1,9 @@
 package WebGUI::i18n::English::FileManager;
 
 our $I18N = {
-	'1' => {
-		message => q|File Manager|,
-		lastUpdated => 1038028463
-	},
-
-	'3' => {
-		message => q|Proceed to add file?|,
-		lastUpdated => 1031514049
-	},
-
-	'5' => {
-		message => q|File Title|,
-		lastUpdated => 1031514049
-	},
-
-	'6' => {
-		message => q|File|,
-		lastUpdated => 1038882929
-	},
-
-	'7' => {
-		message => q|Group to Download|,
-		lastUpdated => 1031514049
-	},
-
-	'8' => {
-		message => q|Brief Synopsis|,
-		lastUpdated => 1031514049
-	},
-
-	'9' => {
-		message => q|Edit File Manager|,
-		lastUpdated => 1038028499
-	},
-
-	'10' => {
-		message => q|Edit File|,
-		lastUpdated => 1038882889
-	},
-
 	'11' => {
 		message => q|Add a new file.|,
 		lastUpdated => 1038882956
-	},
-
-	'12' => {
-		message => q|Are you certain that you wish to delete this file?|,
-		lastUpdated => 1038882975
-	},
-
-	'14' => {
-		message => q|File|,
-		lastUpdated => 1031514049
-	},
-
-	'15' => {
-		message => q|Description|,
-		lastUpdated => 1031514049
-	},
-
-	'16' => {
-		message => q|Date Uploaded|,
-		lastUpdated => 1031514049
-	},
-
-	'17' => {
-		message => q|Alternate Version #1|,
-		lastUpdated => 1031514049
-	},
-
-	'18' => {
-		message => q|Alternate Version #2|,
-		lastUpdated => 1031514049
-	},
-
-	'19' => {
-		message => q|You have no files available.|,
-		lastUpdated => 1038882995
-	},
-
-	'20' => {
-		message => q|Paginate After|,
-		lastUpdated => 1031514049
-	},
-
-	'74' => {
-		message => q|Add a new file.|,
-		lastUpdated => 1038262375
-	},
-
-	'61' => {
-		message => q|File Manager, Add/Edit|,
-		lastUpdated => 1038887335
 	},
 
 	'71' => {
@@ -116,9 +26,89 @@ If you wish to start adding files to download right away, leave this checked.
 		lastUpdated => 1038887335
 	},
 
+	'7' => {
+		message => q|Group to Download|,
+		lastUpdated => 1031514049
+	},
+
+	'17' => {
+		message => q|Alternate Version #1|,
+		lastUpdated => 1031514049
+	},
+
+	'1' => {
+		message => q|File Manager|,
+		lastUpdated => 1038028463
+	},
+
+	'18' => {
+		message => q|Alternate Version #2|,
+		lastUpdated => 1031514049
+	},
+
 	'72' => {
 		message => q|File, Add/Edit|,
 		lastUpdated => 1038883174
+	},
+
+	'16' => {
+		message => q|Date Uploaded|,
+		lastUpdated => 1031514049
+	},
+
+	'74' => {
+		message => q|Add a new file.|,
+		lastUpdated => 1038262375
+	},
+
+	'6' => {
+		message => q|File|,
+		lastUpdated => 1038882929
+	},
+
+	'75' => {
+		message => q|File Manager Template|,
+		lastUpdated => 1038853712
+	},
+
+	'3' => {
+		message => q|Proceed to add file?|,
+		lastUpdated => 1031514049
+	},
+
+	'61' => {
+		message => q|File Manager, Add/Edit|,
+		lastUpdated => 1038887335
+	},
+
+	'9' => {
+		message => q|Edit File Manager|,
+		lastUpdated => 1038028499
+	},
+
+	'12' => {
+		message => q|Are you certain that you wish to delete this file?|,
+		lastUpdated => 1038882975
+	},
+
+	'20' => {
+		message => q|Paginate After|,
+		lastUpdated => 1031514049
+	},
+
+	'14' => {
+		message => q|File|,
+		lastUpdated => 1031514049
+	},
+
+	'15' => {
+		message => q|Description|,
+		lastUpdated => 1031514049
+	},
+
+	'8' => {
+		message => q|Brief Synopsis|,
+		lastUpdated => 1031514049
 	},
 
 	'73' => {
@@ -151,11 +141,6 @@ If you'd like to add another file after this one, then select "add a new file" o
 <p>
 |,
 		lastUpdated => 1038883174
-	},
-
-	'75' => {
-		message => q|File Manager Template|,
-		lastUpdated => 1038853712
 	},
 
 	'76' => {
@@ -301,6 +286,21 @@ A conditional indicating whether there are any files for this user to view.
 
 |,
 		lastUpdated => 1082371148
+	},
+
+	'10' => {
+		message => q|Edit File|,
+		lastUpdated => 1038882889
+	},
+
+	'19' => {
+		message => q|You have no files available.|,
+		lastUpdated => 1038882995
+	},
+
+	'5' => {
+		message => q|File Title|,
+		lastUpdated => 1031514049
 	},
 
 };

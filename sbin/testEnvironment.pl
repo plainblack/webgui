@@ -226,19 +226,18 @@ if (eval { require SOAP::Lite }) {
         }
 }
 
-print "Data::Serializer module .................. ";
-if (eval { require Data::Serializer }) {
+print "Time::HiRes module ....................... ";
+if (eval { require Time::HiRes }) {
         print "OK\n";
 } else {
 	if ($< == 0 && $os eq "Linuxish") {
                 print "Attempting to install...\n";
-                CPAN::Shell->install("Data::Serializer");
+                CPAN::Shell->install("Time::HiRes");
         } else {
                 print "Please install.\n";
 		$prereq = 0;
         }
 }
-
 
 print "Image::Magick module (optional) .......... ";
 if (eval { require Image::Magick }) {

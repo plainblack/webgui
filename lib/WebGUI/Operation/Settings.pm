@@ -64,8 +64,13 @@ sub www_editContentSettings {
         $output .= '<h1>'.WebGUI::International::get(525).'</h1>';
         $f = WebGUI::HTMLForm->new;
         $f->hidden("op","saveSettings");
-        $f->select("defaultPage",$pages,WebGUI::International::get(527),[$session{setting}{defaultPage}]);
-        $f->select("notFoundPage",$pages,WebGUI::International::get(141),[$session{setting}{notFoundPage}]);
+        $f->selectList("defaultPage",$pages,WebGUI::International::get(527),[$session{setting}{defaultPage}]);
+        $f->selectList("notFoundPage",$pages,WebGUI::International::get(141),[$session{setting}{notFoundPage}]);
+	$f->text(
+		-name=>"urlExtension",
+		-value=>$session{setting}{urlExtension},
+		-label=>WebGUI::International::get("url extension")
+		);
         $f->text(
 		-name=>"favicon",
 		-label=>WebGUI::International::get(897),

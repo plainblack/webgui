@@ -1,24 +1,9 @@
 package WebGUI::i18n::English::SyndicatedContent;
 
 our $I18N = {
-	'1' => {
-		message => q|URL to RSS File|,
-		lastUpdated => 1031514049
-	},
-
-	'2' => {
-		message => q|Syndicated Content|,
-		lastUpdated => 1031514049
-	},
-
-	'4' => {
-		message => q|Edit Syndicated Content|,
-		lastUpdated => 1031514049
-	},
-
-	'61' => {
-		message => q|Syndicated Content, Add/Edit|,
-		lastUpdated => 1047855741
+	'3' => {
+		message => q|Maximum Number of Headlines|,
+		lastUpdated => 1057208065
 	},
 
 	'71' => {
@@ -49,6 +34,26 @@ Select a template for this content.
 Enter the maximum number of headlines that should be displayed.  For an aggregate feed, the system will display an equal number of headlines from each source, even if doing so requires displaying more than the requested maximum number of headlines.  Set to zero to allow any number of headlines.
 <p>|,
 		lastUpdated => 1047855741
+	},
+
+	'61' => {
+		message => q|Syndicated Content, Add/Edit|,
+		lastUpdated => 1047855741
+	},
+
+	'2' => {
+		message => q|Syndicated Content|,
+		lastUpdated => 1031514049
+	},
+
+	'1' => {
+		message => q|URL to RSS File|,
+		lastUpdated => 1031514049
+	},
+
+	'4' => {
+		message => q|Edit Syndicated Content|,
+		lastUpdated => 1031514049
 	},
 
 	'72' => {
@@ -91,11 +96,6 @@ A URL directly to the original content.
 
 </blockquote>|,
 		lastUpdated => 1047855526
-	},
-
-	'3' => {
-		message => q|Maximum Number of Headlines|,
-		lastUpdated => 1057208065
 	},
 
 };

@@ -1,109 +1,6 @@
 package WebGUI::i18n::English::Poll;
 
 our $I18N = {
-	'1' => {
-		message => q|Poll|,
-		lastUpdated => 1031514049
-	},
-
-	'3' => {
-		message => q|Active|,
-		lastUpdated => 1031514049
-	},
-
-	'4' => {
-		message => q|Who can vote?|,
-		lastUpdated => 1031514049
-	},
-
-	'5' => {
-		message => q|Graph Width|,
-		lastUpdated => 1031514049
-	},
-
-	'6' => {
-		message => q|Question|,
-		lastUpdated => 1031514049
-	},
-
-	'7' => {
-		message => q|Answers|,
-		lastUpdated => 1031514049
-	},
-
-	'8' => {
-		message => q|(Enter one answer per line. No more than 20.)|,
-		lastUpdated => 1031514049
-	},
-
-	'9' => {
-		message => q|Edit Poll|,
-		lastUpdated => 1031514049
-	},
-
-	'10' => {
-		message => q|Reset votes.|,
-		lastUpdated => 1031514049
-	},
-
-	'11' => {
-		message => q|Vote!|,
-		lastUpdated => 1031514049
-	},
-
-	'20' => {
-		message => q|Karma Per Vote|,
-		lastUpdated => 1031514049
-	},
-
-	'61' => {
-		message => q|Poll, Add/Edit|,
-		lastUpdated => 1050183732
-	},
-
-	'71' => {
-		message => q|Polls can be used to get the impressions of your users on various topics.
-<br><br>
-<b>Active</b><br>
-If this box is checked, then users will be able to vote. Otherwise they'll only be able to see the results of the poll.
-<br><br>
-
-<b>Who can vote?</b><br>
-Choose a group that can vote on this Poll.
-<br><br>
-
-<b>Karma Per Vote</b><br>
-How much karma should be given to a user when they vote?
-<p>
-
-<b>Graph Width</b><br>
-The width of the poll results graph. The width is measured in pixels.
-<br><br>
-
-<b>Question</b><br>
-What is the question you'd like to ask your users?
-<br><br>
-
-<b>Answers</b><br>
-Enter the possible answers to your question. Enter only one answer per line. Polls are only capable of 20 possible answers.
-<br><br>
-
-<b>Randomize answers?</b><br>
-In order to be sure that the ordering of the answers in the poll does not bias your users, it is often helpful to present the options in a random order each time they are shown. Select "yes" to randomize the answers on the poll.
-<p>
-
-<b>Reset votes.</b><br>
-Reset the votes on this Poll.
-<br><br>
-|,
-		lastUpdated => 1050183732
-	},
-
-	'73' => {
-		message => q|Poll Template|,
-		lastUpdated => 1050183668
-	},
-
 	'74' => {
 		message => q|The following variables are available to the poll template:
 
@@ -173,14 +70,117 @@ The total number of votes that have been placed on this poll.
 		lastUpdated => 1050183668
 	},
 
-	'72' => {
-		message => q|Randomize answers?|,
+	'6' => {
+		message => q|Question|,
+		lastUpdated => 1031514049
+	},
+
+	'11' => {
+		message => q|Vote!|,
+		lastUpdated => 1031514049
+	},
+
+	'71' => {
+		message => q|Polls can be used to get the impressions of your users on various topics.
+<br><br>
+<b>Active</b><br>
+If this box is checked, then users will be able to vote. Otherwise they'll only be able to see the results of the poll.
+<br><br>
+
+<b>Who can vote?</b><br>
+Choose a group that can vote on this Poll.
+<br><br>
+
+<b>Karma Per Vote</b><br>
+How much karma should be given to a user when they vote?
+<p>
+
+<b>Graph Width</b><br>
+The width of the poll results graph. The width is measured in pixels.
+<br><br>
+
+<b>Question</b><br>
+What is the question you'd like to ask your users?
+<br><br>
+
+<b>Answers</b><br>
+Enter the possible answers to your question. Enter only one answer per line. Polls are only capable of 20 possible answers.
+<br><br>
+
+<b>Randomize answers?</b><br>
+In order to be sure that the ordering of the answers in the poll does not bias your users, it is often helpful to present the options in a random order each time they are shown. Select "yes" to randomize the answers on the poll.
+<p>
+
+<b>Reset votes.</b><br>
+Reset the votes on this Poll.
+<br><br>
+|,
+		lastUpdated => 1050183732
+	},
+
+	'3' => {
+		message => q|Active|,
+		lastUpdated => 1031514049
+	},
+
+	'61' => {
+		message => q|Poll, Add/Edit|,
+		lastUpdated => 1050183732
+	},
+
+	'7' => {
+		message => q|Answers|,
+		lastUpdated => 1031514049
+	},
+
+	'9' => {
+		message => q|Edit Poll|,
 		lastUpdated => 1031514049
 	},
 
 	'12' => {
 		message => q|Total Votes|,
 		lastUpdated => 1050182699
+	},
+
+	'20' => {
+		message => q|Karma Per Vote|,
+		lastUpdated => 1031514049
+	},
+
+	'8' => {
+		message => q|(Enter one answer per line. No more than 20.)|,
+		lastUpdated => 1031514049
+	},
+
+	'1' => {
+		message => q|Poll|,
+		lastUpdated => 1031514049
+	},
+
+	'4' => {
+		message => q|Who can vote?|,
+		lastUpdated => 1031514049
+	},
+
+	'72' => {
+		message => q|Randomize answers?|,
+		lastUpdated => 1031514049
+	},
+
+	'73' => {
+		message => q|Poll Template|,
+		lastUpdated => 1050183668
+	},
+
+	'10' => {
+		message => q|Reset votes.|,
+		lastUpdated => 1031514049
+	},
+
+	'5' => {
+		message => q|Graph Width|,
+		lastUpdated => 1031514049
 	},
 
 };

@@ -7,6 +7,15 @@ upgrading from one version to the next, or even between multiple
 versions. Be sure to heed the warnings contained herein as they will
 save you many hours of grief.
 
+6.2.0
+--------------------------------------------------------------------
+ * WebGUI now requires Time::HiRes to operate. Be sure to have it 
+	installed prior to upgrading or the the upgrade will fail.
+
+ * Parts of the WebGUI API have changed once again, so be sure that
+	any third-party plug-ins you have installed have been updated
+	to work with 6.2 before upgrading.
+
 
 6.1.0
 --------------------------------------------------------------------

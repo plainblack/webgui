@@ -48,7 +48,7 @@ The methods that do affect or report on this hiearchy should be called in a obje
 
 =head1 SYNOPSIS
 
- Non OO functions
+Non OO functions
  
  use WebGUI::Page;
  $boolean = WebGUI::Page::canEdit();
@@ -61,19 +61,62 @@ The methods that do affect or report on this hiearchy should be called in a obje
  $hashRef = WebGUI::Page::getTemplatePositions($templateId);
  $url = WebGUI::Page::makeUnique($url,$pageId);
 
+ WebGUI::Page::deCache();
 
- Some OO style methods
+Some OO style methods
 
  use WebGUI::Page;
  $page = WebGUI::Page->getPage($pageId);
- $newMother = WebGUI::Page->getPage($anotherPageId);
+ $page = WebGUI::Page->getAnonymousRoot;
+ $page = WebGUI::Page->getFirstDaughter($pageId);
+ $page = WebGUI::Page->getGrandmother($pageId);
+ $page = WebGUI::Page->getLeftSister($pageId);
+ $page = WebGUI::Page->getMother($pageId);
+ $page = WebGUI::Page->getRightSister($pageId);
+ $page = WebGUI::Page->getTop($pageId);
+ $page = WebGUI::Page->getWebGUIRoot($pageId);
+ $page = WebGUI::Page->new($pageId); # the default constructor
+
  $page->cut;
+ $page->delete;
  $page->paste($newMother);
+ $page->move($newMother);
+ $page->moveDown;
+ $page->moveLeft;
+ $page->moveRight;
+ $page->moveUp;
+ $page->purge;
 
- $page->set;				# this automatically recaches the pagetree
+ @array = $page->ancestors;
+ @array = $page->daughters;
+ @array = $page->decendants;
+ @array = $page->generation; 
+ @array = $page->leaves_under; 
+ @array = $page->pedigree;
+ @array = $page->self_and_ancesters;
+ @array = $page->self_and_decendants;
+ @array = $page->self_and_sisters;
+ @array = $page->self_and_sisters_splitted;
+ @array = $page->sisters;
 
+ $boolean = $page->canMoveDown;
+ $boolean = $page->canMoveLeft;
+ $boolean = $page->canMoveRight;
+ $boolean = $page->canMoveUp;
+ $boolean = $page->hasDaughter;
+
+ $page->add($otherPageObject,\%properties);
+ $page->get("title");
+ $page->set(\%properties);				# this automatically recaches the pagetree
  $page->setWithoutRecache;
- WebGUI::Page->recacheNavigation	# here we've got to recache manually
+
+ $page->traversePreOrder(&mappingFunction);
+
+ $page->recacheNavigation      or     WebGUI::Page->recacheNavigation;
+
+=head1 SEE ALSO
+
+This class is a sub-class of DBIx::Tree::NestedSet, which is included in your WebGUI distribution. See that for additional details on the page tree.
 
 =head1 METHODS
 
@@ -82,6 +125,7 @@ These functions are available from this package:
 =cut
 
 #-------------------------------------------------------------------
+
 =head2 add
 
 Adds page to the right of the children of the object this method is invoked 
@@ -118,11 +162,10 @@ sub add {
 }
 
 #-------------------------------------------------------------------
+
 =head2 ancestors
 
 Returns an array of hashes containing the properties of the ancestors of the current node.
-
-=back
 
 =cut
 
@@ -135,6 +178,7 @@ sub ancestors {
 }
 
 #-------------------------------------------------------------------
+
 =head2 canEdit ( [ pageId ] )
         
 Returns a boolean (0|1) value signifying that the user has the required privileges.
@@ -166,12 +210,11 @@ sub canEdit {
 }       
 
 #-------------------------------------------------------------------
+
 =head2 canMoveDown
 
 Returns true if the current node can be moved down the tree. Ie. can be made
 a child of it's left sister.
-
-=back
 
 =cut
 
@@ -181,12 +224,11 @@ sub canMoveDown {
 }
 
 #-------------------------------------------------------------------
+
 =head2 canMoveLeft
 
 Returns true if the current node can be moved left. Ie. if it can swap places
 with it's left sister.
-
-=back
 
 =cut
 
@@ -199,12 +241,11 @@ sub canMoveLeft {
 }
 
 #-------------------------------------------------------------------
+
 =head2 canMoveRight
 
 Returns true if the current node can be moved rightt. Ie. if it can swap places
 with it's right sister.
-
-=back
 
 =cut
 
@@ -217,12 +258,11 @@ sub canMoveRight {
 }
 
 #-------------------------------------------------------------------
+
 =head2 canMoveUp
 
 Returns true if the current node can be moved up the tree. Ie. if it can be 
 made a child of it's grandmother.
-
-=back
 
 =cut
 
@@ -318,11 +358,10 @@ sub cut {
 }
 
 #-------------------------------------------------------------------
+
 =head2 daughters
 
 Returns an array of hashes containing the properties of the daughters of the current node.
-
-=back
 
 =cut
 
@@ -387,11 +426,10 @@ sub delete {
 }
 
 #-------------------------------------------------------------------
+
 =head2 descendants
 
 Returns an array of hashes containing the properties of the descendants of the current node.
-
-=back
 
 =cut
 
@@ -528,13 +566,12 @@ sub generate {
 }
 
 #-------------------------------------------------------------------
+
 =head2 generation
 
 Returns an array of hashes containing the properties of the same generation as the current node. The
 current node, being a member of it's own generation, is of course included. A generation consists of 
 all nodes with the same depth (or level) in the tree.
-
-=back
 
 =cut
 
@@ -557,6 +594,7 @@ sub generation {
 }
 
 #-------------------------------------------------------------------
+
 =head2 get( property )
 
 Returns the disired page property.
@@ -579,6 +617,7 @@ sub get {
 }
 
 #-------------------------------------------------------------------
+
 =head2 getAnonymousRoot
 
 Returns the 'ueber'-root, the root with pageId 0, the one that holds all WebGUI roots
@@ -588,8 +627,6 @@ Note that this node is only in the database because of design. You cannot put st
 it. Well actually you can, but you don't want to. Trust me. Use it to add WebGUI roots
 or traverse the whole page tree instead .
 
-=back
-
 =cut
 
 sub getAnonymousRoot {
@@ -597,6 +634,7 @@ sub getAnonymousRoot {
 }
 
 #-------------------------------------------------------------------
+
 =head2 getFirstDaughter( pageId )
 
 Return the first (leftmost) daughter of the current node when called in instance context,
@@ -629,6 +667,7 @@ sub getFirstDaughter {
 }
 
 #-------------------------------------------------------------------
+
 =head2 getGrandmother( pageId )
 
 Returns the grandmother of the current node, or, when called in class context, the garndmother
@@ -660,6 +699,7 @@ sub getGrandmother {
 }
 
 #-------------------------------------------------------------------
+
 =head2 getLeftSister( pageId )
 
 Returns the left sister of the current node, or, when called in class context, the left sister
@@ -690,6 +730,7 @@ sub getLeftSister {
 }
 
 #-------------------------------------------------------------------
+
 =head2 getMother( pageId )
 
 Returns the mother of the current node, or, when called in class context, the left sister
@@ -722,6 +763,7 @@ sub getMother {
 }
 
 #-------------------------------------------------------------------
+
 =head2 getPage( pageId )
 
 Returns the page identified by 'pageId'.
@@ -745,6 +787,7 @@ sub getPage {
 }
 
 #-------------------------------------------------------------------
+
 =head2 getRightSister( pageId )
 
 Returns the right sister of the current node, or, when called in class context, the right sister
@@ -776,6 +819,7 @@ sub getRightSister {
 }
 
 #-------------------------------------------------------------------
+
 =head2 getTop( pageId )
 
 Returns the top page (child of a WebGUI root, depth = 1) of the current node, or, when called in class 
@@ -870,6 +914,7 @@ sub getTemplatePositions {
 }
 
 #-------------------------------------------------------------------
+
 =head2 getWebGUIRoot( pageId )
 
 Returns the WebGUI root (depth = 0) of the current node, or, when called in class 
@@ -905,11 +950,10 @@ sub getWebGUIRoot {
 }
 
 #-------------------------------------------------------------------
+
 =head2 hasDaughter
 
 Returns true if the page has one or more daughters
-
-=back
 
 =cut
 
@@ -920,12 +964,11 @@ sub hasDaughter {
 }
 
 #-------------------------------------------------------------------
-=head leaves_under
+
+=head2 leaves_under
 
 Returns an array of hashes containing the properties of all leaves (pages without children)
 under the page
-
-=back
 
 =cut
 
@@ -975,13 +1018,17 @@ sub makeUnique {
 	unless ($pageId eq "new") {
 		$where .= " and pageId<>".$pageId;
 	}
-        while (my ($test) = WebGUI::SQL->quickArray("select urlizedTitle from page where urlizedTitle=".quote($url).$where)) {
-                if ($url =~ /(.*)(\d+$)/) {
-                        $url = $1.($2+1);
-                } elsif ($test ne "") {
-                        $url .= "2";
-                }
-        }
+        my ($test) = WebGUI::SQL->quickArray("select urlizedTitle from page ".$where);
+	if ($test) {
+		my @parts = split(/\./,$url);
+       	 	if ($parts[0] =~ /(.*)(\d+$)/) {
+                	$parts[0] = $1.($2+1);
+	        } elsif ($test ne "") {
+        	        $parts[0] .= "2";
+        	}
+		$url = join(".",@parts);
+		$url = makeUnique($url,$pageId);
+	}
         return $url;
 }
 
@@ -1069,11 +1116,10 @@ sub move{
 }
 
 #-------------------------------------------------------------------
+
 =head2 moveDown
 
 Moves the page down the tree. Ie. makes the page a daughter of it's left sister.
-
-=back
 
 =cut
 
@@ -1089,11 +1135,10 @@ sub moveDown {
 }
 
 #-------------------------------------------------------------------
+
 =head2 moveLeft
 
 Move the page to the left. Ie. swaps places with it's left sister.
-
-=back
 
 =cut
 
@@ -1114,11 +1159,10 @@ sub moveLeft {
 }
 
 #-------------------------------------------------------------------
+
 =head2 moveRight
 
 Move the page to the right. Ie. swaps places with it's right sister.
-
-=back
 
 =cut
 
@@ -1139,11 +1183,10 @@ sub moveRight {
 }
 
 #-------------------------------------------------------------------
+
 =head2 moveUp
 
 Moves the page up the tree. Ie. makes the page the right sister of it's mother.
-
-=back
 
 =cut
 
@@ -1195,6 +1238,7 @@ sub moveUp {
 }
 
 #-------------------------------------------------------------------
+
 =head2 new ( pageId || { properties } )
 
 Creates a new page object. You can't create pages in the database with this, though. Use add instead.
@@ -1275,12 +1319,11 @@ sub paste{
 }
 
 #-------------------------------------------------------------------
+
 =head2 pedigree
 
 Ok, this does something funky. It returns an array of hashes containing page properties of the mothers of 
 the page and their daughter, the page itself and it's daugthers. It used for the flexmenu.
-
-=back
 
 =cut
 
@@ -1319,6 +1362,7 @@ sub purge {
 }
 
 #-------------------------------------------------------------------
+
 =head2 recacheNavigation
 
 Actually this doesn't recache anything, but it might be in the future. Hence the name. Currently
@@ -1328,23 +1372,19 @@ the methods in this module that modify the tree already call this.
 If you only change some navigation properties of a navigation element, you should use a more restricted
 cache purge.
 
-=over
-
 =cut
 
 sub recacheNavigation {
 	WebGUI::Cache->new("", "Navigation-".$session{config}{configFile})->deleteByRegex(".*");
-
 	return "";
 }
 
 
 #-------------------------------------------------------------------
+
 =head2 self_and_ancestors
 
 Returns an array of hashrefs containing the page properties of this node and it's ancestors.
-
-=back
 
 =cut
 
@@ -1357,11 +1397,10 @@ sub self_and_ancestors {
 }	
 
 #-------------------------------------------------------------------
+
 =head2 self_and_descendants
 
 Returns an array of hashrefs containing the page properties of this node and it's descendants.
-
-=back
 
 =cut
 
@@ -1377,11 +1416,10 @@ sub self_and_descendants {
 }
 
 #-------------------------------------------------------------------
+
 =head2 self_and_sisters
 
 Returns an array of hashrefs containing the page properties of this node and it's sisters.
-
-=back
 
 =cut
 
@@ -1403,6 +1441,7 @@ sub self_and_sisters {
 }
 
 #-------------------------------------------------------------------
+
 =head2 self_and_sisters_splitted
 
 Returns an array with the following contents:
@@ -1410,8 +1449,6 @@ Returns an array with the following contents:
  - [ leftSisters ] an arrayref of hashref containing the properties of the left sisters of the page.
  - $currentPage    an hashref containing the page properties of this node 
  - [ rightsister ] an arrayref of hashref containing the properties of the right sisters of the page.
-
-=back
 
 =cut
 
@@ -1435,11 +1472,10 @@ sub self_and_sisters_splitted {
 }
 		
 #-------------------------------------------------------------------
+
 =head2 sisters
 
 Returns an array of hashrefs containing the page properties of this nodes sisters. The node not included.
-
-=back
 
 =cut
 
@@ -1521,6 +1557,7 @@ sub setWithoutRecache {
 }
 
 #-------------------------------------------------------------------
+
 =head2 traversePreOrder ( &mappingFunction )
 
 Traverses the tree from this node down in pre-order fashion and excutes (maps) the mapping function

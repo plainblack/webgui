@@ -1,64 +1,9 @@
 package WebGUI::i18n::English::SQLReport;
 
 our $I18N = {
-	'1' => {
-		message => q|SQL Report|,
-		lastUpdated => 1031514049
-	},
-
-	'4' => {
-		message => q|Query|,
-		lastUpdated => 1031514049
-	},
-
-	'8' => {
-		message => q|Edit SQL Report|,
-		lastUpdated => 1031514049
-	},
-
-	'10' => {
-		message => q|<b>Debug:</b> Error: The SQL specified is of an improper format.|,
-		lastUpdated => 1031514049
-	},
-
 	'11' => {
 		message => q|<b>Debug:</b> Error: There was a problem with the query.|,
 		lastUpdated => 1031514049
-	},
-
-	'12' => {
-		message => q|<b>Debug:</b> Error: Could not connect to the database.|,
-		lastUpdated => 1031514049
-	},
-
-	'14' => {
-		message => q|Paginate After|,
-		lastUpdated => 1031514049
-	},
-
-	'15' => {
-		message => q|Preprocess macros on query?|,
-		lastUpdated => 1031514049
-	},
-
-	'16' => {
-		message => q|Debug?|,
-		lastUpdated => 1031514049
-	},
-
-	'17' => {
-		message => q|<b>Debug:</b> Query:|,
-		lastUpdated => 1031514049
-	},
-
-	'18' => {
-		message => q|There were no results for this query.|,
-		lastUpdated => 1031514049
-	},
-
-	'61' => {
-		message => q|SQL Report, Add/Edit|,
-		lastUpdated => 1082365503
 	},
 
 	'71' => {
@@ -91,6 +36,56 @@ How many rows should be displayed before splitting the results into separate pag
 
 |,
 		lastUpdated => 1082365503
+	},
+
+	'61' => {
+		message => q|SQL Report, Add/Edit|,
+		lastUpdated => 1082365503
+	},
+
+	'17' => {
+		message => q|<b>Debug:</b> Query:|,
+		lastUpdated => 1031514049
+	},
+
+	'12' => {
+		message => q|<b>Debug:</b> Error: Could not connect to the database.|,
+		lastUpdated => 1031514049
+	},
+
+	'15' => {
+		message => q|Preprocess macros on query?|,
+		lastUpdated => 1031514049
+	},
+
+	'14' => {
+		message => q|Paginate After|,
+		lastUpdated => 1031514049
+	},
+
+	'8' => {
+		message => q|Edit SQL Report|,
+		lastUpdated => 1031514049
+	},
+
+	'1' => {
+		message => q|SQL Report|,
+		lastUpdated => 1031514049
+	},
+
+	'4' => {
+		message => q|Query|,
+		lastUpdated => 1031514049
+	},
+
+	'18' => {
+		message => q|There were no results for this query.|,
+		lastUpdated => 1031514049
+	},
+
+	'72' => {
+		message => q|SQL Report Template|,
+		lastUpdated => 1082371148
 	},
 
 	'73' => {
@@ -162,9 +157,14 @@ The default label for rows.count.isZero.
 		lastUpdated => 1082365471
 	},
 
-	'72' => {
-		message => q|SQL Report Template|,
-		lastUpdated => 1082371148
+	'16' => {
+		message => q|Debug?|,
+		lastUpdated => 1031514049
+	},
+
+	'10' => {
+		message => q|<b>Debug:</b> Error: The SQL specified is of an improper format.|,
+		lastUpdated => 1031514049
 	},
 
 };

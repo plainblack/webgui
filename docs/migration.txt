@@ -17,9 +17,13 @@ CONTENTS
 1. Wobject Migration
 --------------------
 
-1.1 Nothing Yet
+1.1 Global Unique Wobject IDs
 
-There have currently been no changes to the Wobject API.
+In 6.2 we changed wobjects to use the new Global Unique ID system. See WebGUI::Id for
+details. This change means that wobject Ids are now 22 character text strings rather
+than integers. That means you'll need to update your database tables and code to account
+for the Ids being strings. Also, anything using the setCollateral method will start using
+GUIDs as well.
 
 
 
@@ -151,5 +155,13 @@ In 6.1 we changed the session API to remove functions that didn't really
 belong in WebGUI::Session. The main changes of interest are that you no longer
 do HTTP redirects and set cookies via session. Take a look at WebGUI::HTTP for
 details.
+
+5.9 Global Unique IDs
+
+In 6.2 we added global unique Ids to WebGUI. This means that a lot of the integer-
+based incrementer IDs will now be replaced with 22 character text IDs. You should
+update your code and database tables to take advantage of this. Some of the more
+important ID's that have been changed are User Ids, Group Ids, and Wobject Ids.
+See WebGUI::Id for more information.
 
 

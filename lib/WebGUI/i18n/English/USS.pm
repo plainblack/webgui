@@ -1,148 +1,8 @@
 package WebGUI::i18n::English::USS;
 
 our $I18N = {
-	'1' => {
-		message => q|Who can approve?|,
-		lastUpdated => 1031514049
-	},
-
-	'2' => {
-		message => q|Who can contribute?|,
-		lastUpdated => 1031514049
-	},
-
-	'92' => {
-		message => q|Open in new window?|,
-		lastUpdated => 1031514049
-	},
-
-	'3' => {
-		message => q|You have a new user submission to approve.|,
-		lastUpdated => 1031514049
-	},
-
-	'4' => {
-		message => q|Your submission has been approved.|,
-		lastUpdated => 1031514049
-	},
-
-	'85' => {
-		message => q|Question|,
-		lastUpdated => 1031514049
-	},
-
-	'5' => {
-		message => q|Your submission has been denied.|,
-		lastUpdated => 1031514049
-	},
-
-	'86' => {
-		message => q|Answer|,
-		lastUpdated => 1031514049
-	},
-
-	'6' => {
-		message => q|Submissions Per Page|,
-		lastUpdated => 1031514049
-	},
-
-	'91' => {
-		message => q|URL|,
-		lastUpdated => 1031514049
-	},
-
-	'83' => {
-		message => q|Add a new question.|,
-		lastUpdated => 1031514049
-	},
-
-	'84' => {
-		message => q|Edit Question|,
-		lastUpdated => 1031514049
-	},
-
-	'90' => {
-		message => q|Edit Link|,
-		lastUpdated => 1031514049
-	},
-
-	'12' => {
-		message => q|(Uncheck if you're writing an HTML submission.)|,
-		lastUpdated => 1031514049
-	},
-
-	'89' => {
-		message => q|Add a new link.|,
-		lastUpdated => 1031514049
-	},
-
-	'13' => {
-		message => q|Date Submitted|,
-		lastUpdated => 1031514049
-	},
-
-	'14' => {
-		message => q|Status|,
-		lastUpdated => 1031514049
-	},
-
-	'15' => {
-		message => q|Edit/Delete|,
-		lastUpdated => 1031514049
-	},
-
-	'16' => {
-		message => q|Untitled|,
-		lastUpdated => 1031514049
-	},
-
-	'17' => {
-		message => q|Are you certain you wish to delete this submission?|,
-		lastUpdated => 1031514049
-	},
-
-	'59' => {
-		message => q|Next Submission|,
-		lastUpdated => 1031514049
-	},
-
-	'18' => {
-		message => q|Edit User Submission System|,
-		lastUpdated => 1031514049
-	},
-
-	'19' => {
-		message => q|Edit Submission|,
-		lastUpdated => 1031514049
-	},
-
-	'20' => {
-		message => q|Post New Submission|,
-		lastUpdated => 1031514049
-	},
-
-	'21' => {
-		message => q|Submitted By|,
-		lastUpdated => 1031514049
-	},
-
-	'27' => {
-		message => q|Edit|,
-		lastUpdated => 1031514049
-	},
-
-	'28' => {
-		message => q|Return To Submissions List|,
-		lastUpdated => 1031514049
-	},
-
-	'29' => {
-		message => q|User Submission System|,
-		lastUpdated => 1031514049
-	},
-
-	'31' => {
-		message => q|Content|,
+	'33' => {
+		message => q|Attachment|,
 		lastUpdated => 1031514049
 	},
 
@@ -151,8 +11,366 @@ our $I18N = {
 		lastUpdated => 1031514049
 	},
 
-	'33' => {
-		message => q|Attachment|,
+	'21' => {
+		message => q|Submitted By|,
+		lastUpdated => 1031514049
+	},
+
+	'90' => {
+		message => q|Edit Link|,
+		lastUpdated => 1031514049
+	},
+
+	'71' => {
+		message => q|User Submission Systems (USS) are a great way to add a sense of community to any site as well as get free content from your users. The User Submission System name is misleading to some people, because they immediately think of users as visitors. However, users are also staff, or business partners, or even yourself. With the USS you can select who can add new content, and even who can moderate that content.
+<br><br>
+User Submission systems are so versatile that they allow you to create all kinds of applications, just by editing a few templates. Example applications are Photo Galleries, FAQs, Link Lists, Guest Books, Classifieds, and more.
+
+
+<p>
+<b>Submission Template</b><br/>
+Choose a layout for the individual submissions.
+<p/>
+
+<b>Submission Form Template</b><br>
+Choose a layout of the form users see when submitting content.
+<p>
+
+
+<b>Submissions Per Page</b><br>
+How many submissions should be listed per page in the submissions index?
+<br><br>
+
+
+<b>Filter Content</b><br>
+Select the level of content filtering you wish to perform on all submitted content.
+<p>
+
+<b>Sort By</b><br>
+The field to sort the submission list by.
+<p>
+
+<b>Sort Order</b><br>
+The direction to sort the submission list by.
+<p>
+
+
+
+
+<b>Who can approve?</b><br>
+What group is allowed to approve and deny content?
+<br><br>
+
+<b>Who can contribute?</b><br>
+What group is allowed to contribute content?
+<br><br>
+
+
+<b>Default Status</b><br>
+Should submissions be set to <i>Approved</i>, <i>Pending</i>, or <i>Denied</i> by default?
+<br><br>
+<i>Note:</i> If you set the default status to Pending, then be prepared to monitor your message log for new submissions.
+<p>
+
+<b>Karma Per Submission</b><br>
+How much karma should be given to a user when they contribute to this user submission system?
+<p>
+
+
+<b>Allow discussion?</b><br>
+Checking this box will enable responses to your article much like Articles on Slashdot.org.
+<p>
+
+
+|,
+		lastUpdated => 1070199700
+	},
+
+	'80' => {
+		message => q|Sort Order|,
+		lastUpdated => 1066636329
+	},
+
+	'17' => {
+		message => q|Are you certain you wish to delete this submission?|,
+		lastUpdated => 1031514049
+	},
+
+	'2' => {
+		message => q|Who can contribute?|,
+		lastUpdated => 1031514049
+	},
+
+	'1' => {
+		message => q|Who can approve?|,
+		lastUpdated => 1031514049
+	},
+
+	'88' => {
+		message => q|Sequence|,
+		lastUpdated => 1070027660
+	},
+
+	'18' => {
+		message => q|Edit User Submission System|,
+		lastUpdated => 1031514049
+	},
+
+	'30' => {
+		message => q|Karma Per Submission|,
+		lastUpdated => 1031514049
+	},
+
+	'16' => {
+		message => q|Untitled|,
+		lastUpdated => 1031514049
+	},
+
+	'82' => {
+		message => q|Descending|,
+		lastUpdated => 1066636432
+	},
+
+	'74' => {
+		message => q|User Submission System Template|,
+		lastUpdated => 1038865585
+	},
+
+	'27' => {
+		message => q|Edit|,
+		lastUpdated => 1031514049
+	},
+
+	'84' => {
+		message => q|Edit Question|,
+		lastUpdated => 1031514049
+	},
+
+	'28' => {
+		message => q|Return To Submissions List|,
+		lastUpdated => 1031514049
+	},
+
+	'75' => {
+		message => q|This is the listing of template variables available in user submission system templates.
+<p/>
+
+<b>readmore.label</b><br/>
+A translated label that indicates that the user should click to read more.
+<p/>
+
+<b>responses.label</b><br/>
+A translated label that indicates that the user should click to view the responses to this submission.
+<p/>
+
+<b>canPost</b><br/>
+A condition that indicates whether a user can add a new submission.
+<p/>
+
+<b>post.url</b><br/>
+The URL to add a new submission.
+<p/>
+
+<b>post.label</b><br/>
+A translated label for the post link.
+<p/>
+
+<b>addquestion.label</b><br>
+A translated label that prompts the user to add a question to the USS.
+<p>
+
+<b>addlink.label</b><br>
+A translated label that prompts the user to add a link to the USS.
+<p>
+
+<b>search.label</b><br/>
+A translated label for the search link.
+<p/>
+
+<b>search.url</b><br/>
+The URL to toggle on/off WebGUI's power search form.
+<p/>
+
+<b>search.form</b><br/>
+WebGUI's power search form.
+<p/>
+
+<b>rss.url</b><br>
+The URL to generate an RSS feed from the content in the USS.
+<p>
+
+<b>canModerate</b><br>
+A condition indicating whether the current user has the rights to moderate posts in this USS.
+<p>
+
+<b>title.label</b><br/>
+A translated label for the title column.
+<p/>
+
+<b>thumbnail.label</b><br/>
+A translated label for the thumbnail column.
+<p/>
+
+<b>date.label</b><br/>
+A translated label for the date column.
+<p/>
+
+<b>date.updated.label</b><br/>
+The translated label indicating what date this submission was last edited.
+<p/>
+
+<b>by.label</b><br/>
+A translated label stating who the submission was submitted by.
+<p/>
+
+<b>submission.edit.label</b><br>
+A translated text label that prompts the user to edit a particular submission.
+<p>
+
+<b>submissions_loop</b><br/>
+A loop containing each submission.
+<blockquote>
+
+<b>submission.id</b><br/>
+A unique identifier for this submission.
+<p/>
+
+<b>submission.url</b><br/>
+The URL to view this submission.
+<p/>
+
+<b>submission.content</b><br/>
+The abbreviated text content of this submission.
+<p/>
+
+<b>submission.content.full</b><br/>
+The full text content of this submission.
+<p/>
+
+
+<b>submission.responses</b><br/>
+The number of responses to this submission.
+<p/>
+
+<b>submission.title</b><br/>
+The title for this submission.
+<p/>
+
+<b>submission.userDefined1 - submission.userDefined5</b><br>
+A series of user defined fields to add custom functionality to the USS.
+<p>
+
+<b>submission.userId</b><br/>
+The user id of the user that posted this submission.
+<p/>
+
+<b>submission.username</b><br/>
+The username of the person that posted this submission.
+<p/>
+
+<b>submission.status</b><br/>
+The status of this submission (approved, pending, denied).
+<p/>
+
+<b>submission.thumbnail</b><br/>
+The thumbnail of the image uploaded with this submission (if any).
+<p/>
+
+<b>submission.image</b><br>
+The URL of the image attached to this submission.
+<p>
+
+
+<b>submission.date</b><br/>
+The that this submission was posted.
+<p/>
+
+<b>submission.date.updated</b><br/>
+A human readable date that displays the date and time this submission was last edited.
+<p/>
+
+<b>submission.currentUser</b><br/>
+A condition indicating whether the current user is the same as the user that posted this submission.
+<p/>
+
+<b>submission.userProfile</b><br/>
+The URL to the profile of the user that posted this submission.
+<p/>
+
+<b>submission.edit.url</b><br>
+The URL to edit this submission.
+<p>
+
+
+<b>submission.secondColumn</b><br/>
+A condition indicating whether or not this submission would belong in the second column, in a multi-column layout.
+<p/>
+
+<b>submission.thirdColumn</b><br/>
+A condition indicating whether or not this submission would belong in the third column, in a multi-column layout.
+<p/>
+
+<b>submission.fourthColumn</b><br/>
+A condition indicating whether or not this submission would belong in the fourth column, in a multi-column layout.
+<p/>
+
+<b>submission.fifthColumn</b><br/>
+A condition indicating whether or not this submission would belong in the fifth column, in a multi-column layout.
+<p/>
+
+<b>submission.controls</b><br>
+The administrative toolbar for each submission.
+<p>
+
+</blockquote>
+<p/>
+
+|,
+		lastUpdated => 1082367203
+	},
+
+	'57' => {
+		message => q|Responses|,
+		lastUpdated => 1031514049
+	},
+
+	'83' => {
+		message => q|Add a new question.|,
+		lastUpdated => 1031514049
+	},
+
+	'61' => {
+		message => q|User Submission System, Add/Edit|,
+		lastUpdated => 1047859664
+	},
+
+	'20' => {
+		message => q|Post New Submission|,
+		lastUpdated => 1031514049
+	},
+
+	'14' => {
+		message => q|Status|,
+		lastUpdated => 1031514049
+	},
+
+	'59' => {
+		message => q|Next Submission|,
+		lastUpdated => 1031514049
+	},
+
+	'92' => {
+		message => q|Open in new window?|,
+		lastUpdated => 1031514049
+	},
+
+	'89' => {
+		message => q|Add a new link.|,
+		lastUpdated => 1031514049
+	},
+
+	'31' => {
+		message => q|Content|,
 		lastUpdated => 1031514049
 	},
 
@@ -161,34 +379,24 @@ our $I18N = {
 		lastUpdated => 1031514049
 	},
 
-	'37' => {
-		message => q|Delete|,
+	'53' => {
+		message => q|Layout|,
 		lastUpdated => 1031514049
 	},
 
-	'58' => {
-		message => q|Previous Submission|,
+	'91' => {
+		message => q|URL|,
 		lastUpdated => 1031514049
 	},
 
-	'39' => {
-		message => q|Post a Reply|,
-		lastUpdated => 1031514049
+	'78' => {
+		message => q|Date Updated|,
+		lastUpdated => 1066636183
 	},
 
-	'41' => {
-		message => q|Date|,
-		lastUpdated => 1031514049
-	},
-
-	'46' => {
-		message => q|Read more...|,
-		lastUpdated => 1031514049
-	},
-
-	'47' => {
-		message => q|Post a Response|,
-		lastUpdated => 1031514049
+	'79' => {
+		message => q|Sort By|,
+		lastUpdated => 1066636255
 	},
 
 	'48' => {
@@ -196,29 +404,14 @@ our $I18N = {
 		lastUpdated => 1031514049
 	},
 
-	'51' => {
-		message => q|Display thumbnails?|,
-		lastUpdated => 1031514049
+	'87' => {
+		message => q|Submission Form Template|,
+		lastUpdated => 1070027660
 	},
 
-	'52' => {
-		message => q|Thumbnail|,
-		lastUpdated => 1031514049
-	},
-
-	'53' => {
-		message => q|Layout|,
-		lastUpdated => 1031514049
-	},
-
-	'57' => {
-		message => q|Responses|,
-		lastUpdated => 1031514049
-	},
-
-	'76' => {
-		message => q|Submission Template|,
-		lastUpdated => 1038867009
+	'93' => {
+		message => q|Submission Form Template|,
+		lastUpdated => 1070199365
 	},
 
 	'77' => {
@@ -438,314 +631,39 @@ The filename of the attached file.
 		lastUpdated => 1070197000
 	},
 
-	'30' => {
-		message => q|Karma Per Submission|,
+	'46' => {
+		message => q|Read more...|,
 		lastUpdated => 1031514049
 	},
 
-	'73' => {
-		message => q|Submission Template|,
-		lastUpdated => 1036277524
+	'13' => {
+		message => q|Date Submitted|,
+		lastUpdated => 1031514049
 	},
 
-	'61' => {
-		message => q|User Submission System, Add/Edit|,
-		lastUpdated => 1047859664
+	'29' => {
+		message => q|User Submission System|,
+		lastUpdated => 1031514049
 	},
 
-	'71' => {
-		message => q|User Submission Systems (USS) are a great way to add a sense of community to any site as well as get free content from your users. The User Submission System name is misleading to some people, because they immediately think of users as visitors. However, users are also staff, or business partners, or even yourself. With the USS you can select who can add new content, and even who can moderate that content.
-<br><br>
-User Submission systems are so versatile that they allow you to create all kinds of applications, just by editing a few templates. Example applications are Photo Galleries, FAQs, Link Lists, Guest Books, Classifieds, and more.
-
-
-<p>
-<b>Submission Template</b><br/>
-Choose a layout for the individual submissions.
-<p/>
-
-<b>Submission Form Template</b><br>
-Choose a layout of the form users see when submitting content.
-<p>
-
-
-<b>Submissions Per Page</b><br>
-How many submissions should be listed per page in the submissions index?
-<br><br>
-
-
-<b>Filter Content</b><br>
-Select the level of content filtering you wish to perform on all submitted content.
-<p>
-
-<b>Sort By</b><br>
-The field to sort the submission list by.
-<p>
-
-<b>Sort Order</b><br>
-The direction to sort the submission list by.
-<p>
-
-
-
-
-<b>Who can approve?</b><br>
-What group is allowed to approve and deny content?
-<br><br>
-
-<b>Who can contribute?</b><br>
-What group is allowed to contribute content?
-<br><br>
-
-
-<b>Default Status</b><br>
-Should submissions be set to <i>Approved</i>, <i>Pending</i>, or <i>Denied</i> by default?
-<br><br>
-<i>Note:</i> If you set the default status to Pending, then be prepared to monitor your message log for new submissions.
-<p>
-
-<b>Karma Per Submission</b><br>
-How much karma should be given to a user when they contribute to this user submission system?
-<p>
-
-
-<b>Allow discussion?</b><br>
-Checking this box will enable responses to your article much like Articles on Slashdot.org.
-<p>
-
-
-|,
-		lastUpdated => 1070199700
+	'6' => {
+		message => q|Submissions Per Page|,
+		lastUpdated => 1031514049
 	},
 
-	'82' => {
-		message => q|Descending|,
-		lastUpdated => 1066636432,
-		context => q|When a list is the reverse of chronological, alphabetical, or numeric order. The opposite of Ascending.|
+	'39' => {
+		message => q|Post a Reply|,
+		lastUpdated => 1031514049
 	},
 
-	'81' => {
-		message => q|Ascending|,
-		lastUpdated => 1066636389,
-		context => q|When a list is in chronological, alphabetical, or numeric order.|
+	'85' => {
+		message => q|Question|,
+		lastUpdated => 1031514049
 	},
 
-	'80' => {
-		message => q|Sort Order|,
-		lastUpdated => 1066636329,
-		context => q|The direction of a sort.|
-	},
-
-	'79' => {
-		message => q|Sort By|,
-		lastUpdated => 1066636255,
-		context => q|A field to order a list with.|
-	},
-
-	'78' => {
-		message => q|Date Updated|,
-		lastUpdated => 1066636183,
-		context => q|A label for describing the date when something was changed.|
-	},
-
-	'74' => {
-		message => q|User Submission System Template|,
-		lastUpdated => 1038865585
-	},
-
-	'75' => {
-		message => q|This is the listing of template variables available in user submission system templates.
-<p/>
-
-<b>readmore.label</b><br/>
-A translated label that indicates that the user should click to read more.
-<p/>
-
-<b>responses.label</b><br/>
-A translated label that indicates that the user should click to view the responses to this submission.
-<p/>
-
-<b>canPost</b><br/>
-A condition that indicates whether a user can add a new submission.
-<p/>
-
-<b>post.url</b><br/>
-The URL to add a new submission.
-<p/>
-
-<b>post.label</b><br/>
-A translated label for the post link.
-<p/>
-
-<b>addquestion.label</b><br>
-A translated label that prompts the user to add a question to the USS.
-<p>
-
-<b>addlink.label</b><br>
-A translated label that prompts the user to add a link to the USS.
-<p>
-
-<b>search.label</b><br/>
-A translated label for the search link.
-<p/>
-
-<b>search.url</b><br/>
-The URL to toggle on/off WebGUI's power search form.
-<p/>
-
-<b>search.form</b><br/>
-WebGUI's power search form.
-<p/>
-
-<b>rss.url</b><br>
-The URL to generate an RSS feed from the content in the USS.
-<p>
-
-<b>canModerate</b><br>
-A condition indicating whether the current user has the rights to moderate posts in this USS.
-<p>
-
-<b>title.label</b><br/>
-A translated label for the title column.
-<p/>
-
-<b>thumbnail.label</b><br/>
-A translated label for the thumbnail column.
-<p/>
-
-<b>date.label</b><br/>
-A translated label for the date column.
-<p/>
-
-<b>date.updated.label</b><br/>
-The translated label indicating what date this submission was last edited.
-<p/>
-
-<b>by.label</b><br/>
-A translated label stating who the submission was submitted by.
-<p/>
-
-<b>submission.edit.label</b><br>
-A translated text label that prompts the user to edit a particular submission.
-<p>
-
-<b>submissions_loop</b><br/>
-A loop containing each submission.
-<blockquote>
-
-<b>submission.id</b><br/>
-A unique identifier for this submission.
-<p/>
-
-<b>submission.url</b><br/>
-The URL to view this submission.
-<p/>
-
-<b>submission.content</b><br/>
-The abbreviated text content of this submission.
-<p/>
-
-<b>submission.content.full</b><br/>
-The full text content of this submission.
-<p/>
-
-
-<b>submission.responses</b><br/>
-The number of responses to this submission.
-<p/>
-
-<b>submission.title</b><br/>
-The title for this submission.
-<p/>
-
-<b>submission.userDefined1 - submission.userDefined5</b><br>
-A series of user defined fields to add custom functionality to the USS.
-<p>
-
-<b>submission.userId</b><br/>
-The user id of the user that posted this submission.
-<p/>
-
-<b>submission.username</b><br/>
-The username of the person that posted this submission.
-<p/>
-
-<b>submission.status</b><br/>
-The status of this submission (approved, pending, denied).
-<p/>
-
-<b>submission.thumbnail</b><br/>
-The thumbnail of the image uploaded with this submission (if any).
-<p/>
-
-<b>submission.image</b><br>
-The URL of the image attached to this submission.
-<p>
-
-
-<b>submission.date</b><br/>
-The that this submission was posted.
-<p/>
-
-<b>submission.date.updated</b><br/>
-A human readable date that displays the date and time this submission was last edited.
-<p/>
-
-<b>submission.currentUser</b><br/>
-A condition indicating whether the current user is the same as the user that posted this submission.
-<p/>
-
-<b>submission.userProfile</b><br/>
-The URL to the profile of the user that posted this submission.
-<p/>
-
-<b>submission.edit.url</b><br>
-The URL to edit this submission.
-<p>
-
-
-<b>submission.secondColumn</b><br/>
-A condition indicating whether or not this submission would belong in the second column, in a multi-column layout.
-<p/>
-
-<b>submission.thirdColumn</b><br/>
-A condition indicating whether or not this submission would belong in the third column, in a multi-column layout.
-<p/>
-
-<b>submission.fourthColumn</b><br/>
-A condition indicating whether or not this submission would belong in the fourth column, in a multi-column layout.
-<p/>
-
-<b>submission.fifthColumn</b><br/>
-A condition indicating whether or not this submission would belong in the fifth column, in a multi-column layout.
-<p/>
-
-<b>submission.controls</b><br>
-The administrative toolbar for each submission.
-<p>
-
-</blockquote>
-<p/>
-
-|,
-		lastUpdated => 1082367203
-	},
-
-	'87' => {
-		message => q|Submission Form Template|,
-		lastUpdated => 1070027660,
-		context => q|Prompt the user to select a template for the USS submission form.|
-	},
-
-	'88' => {
-		message => q|Sequence|,
-		lastUpdated => 1070027660,
-		context => q|A type of ordering in the USS that will allow the admin to specify (or sequence) the order of the results.|
-	},
-
-	'93' => {
-		message => q|Submission Form Template|,
-		lastUpdated => 1070199365
+	'3' => {
+		message => q|You have a new user submission to approve.|,
+		lastUpdated => 1031514049
 	},
 
 	'94' => {
@@ -885,6 +803,81 @@ The bottom of the form.
 <p>
 |,
 		lastUpdated => 1070199365
+	},
+
+	'51' => {
+		message => q|Display thumbnails?|,
+		lastUpdated => 1031514049
+	},
+
+	'41' => {
+		message => q|Date|,
+		lastUpdated => 1031514049
+	},
+
+	'58' => {
+		message => q|Previous Submission|,
+		lastUpdated => 1031514049
+	},
+
+	'12' => {
+		message => q|(Uncheck if you're writing an HTML submission.)|,
+		lastUpdated => 1031514049
+	},
+
+	'47' => {
+		message => q|Post a Response|,
+		lastUpdated => 1031514049
+	},
+
+	'15' => {
+		message => q|Edit/Delete|,
+		lastUpdated => 1031514049
+	},
+
+	'81' => {
+		message => q|Ascending|,
+		lastUpdated => 1066636389
+	},
+
+	'52' => {
+		message => q|Thumbnail|,
+		lastUpdated => 1031514049
+	},
+
+	'4' => {
+		message => q|Your submission has been approved.|,
+		lastUpdated => 1031514049
+	},
+
+	'73' => {
+		message => q|Submission Template|,
+		lastUpdated => 1036277524
+	},
+
+	'37' => {
+		message => q|Delete|,
+		lastUpdated => 1031514049
+	},
+
+	'76' => {
+		message => q|Submission Template|,
+		lastUpdated => 1038867009
+	},
+
+	'86' => {
+		message => q|Answer|,
+		lastUpdated => 1031514049
+	},
+
+	'19' => {
+		message => q|Edit Submission|,
+		lastUpdated => 1031514049
+	},
+
+	'5' => {
+		message => q|Your submission has been denied.|,
+		lastUpdated => 1031514049
 	},
 
 };

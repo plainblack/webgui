@@ -41,8 +41,8 @@ sub duplicate {
 			$row[6] = getNextId("EventsCalendar_recurringId");
 			$previousRecurringEventId = $row[6];
 		}
-               	WebGUI::SQL->write("insert into EventsCalendar_event values ($newEventId, ".$w.", ".
-			quote($row[2]).", ".quote($row[3]).", '".$row[4]."', '".$row[5]."', $row[6])");
+               	WebGUI::SQL->write("insert into EventsCalendar_event values (".quote($newEventId).", ".$w.", ".
+			quote($row[2]).", ".quote($row[3]).", ".quote($row[4]).", ".quote($row[5]).", ".quote($row[6]).")");
 	}
 	$sth->finish;
 }
@@ -345,7 +345,7 @@ sub www_editEventSave {
                	$i = 0;
                	while ($eventId[$i] > 0) {
                        	WebGUI::SQL->write("insert into EventsCalendar_event values ($eventId[$i], 
-				".$_[0]->get("wobjectId").", 
+				".quote($_[0]->get("wobjectId")).", 
 				".quote($session{form}{name}).", 
 				".quote($session{form}{description}).", 
 				$startDate[$i], $endDate[$i], $recurringEventId)");

@@ -206,11 +206,11 @@ sub www_editForumSave {
 		my ($seq) = WebGUI::SQL->quickArray("select max(sequenceNumber) from MessageBoard_forums where wobjectId=".$_[0]->get("wobjectId"));
 		$seq++;
 		WebGUI::SQL->write("insert into MessageBoard_forums (wobjectId, forumId, title, description, sequenceNumber) values ("
-			.$_[0]->get("wobjectId").", ".quote($forumId).", ".quote($session{form}{title}).", ".quote($session{form}{description})
+			.quote($_[0]->get("wobjectId")).", ".quote($forumId).", ".quote($session{form}{title}).", ".quote($session{form}{description})
 			.", ".$seq.")");
 	} else {
 		WebGUI::SQL->write("update MessageBoard_forums set title=".quote($session{form}{title}).", description="
-			.quote($session{form}{description})." where forumId=".quote($forumId)." and wobjectId=".$_[0]->get("wobjectId"));
+			.quote($session{form}{description})." where forumId=".quote($forumId)." and wobjectId=".quote($_[0]->get("wobjectId")));
 	}
 	return "";
 }

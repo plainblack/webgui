@@ -893,11 +893,11 @@ sub www_process {
 				and DataForm_fieldId=".quote($row{DataForm_fieldId}));
 			if ($exists) {
 				WebGUI::SQL->write("update DataForm_entryData set value=".quote($value)."
-					where DataForm_entryId=$entryId and DataForm_fieldId=".quote($row{DataForm_fieldId}));
+					where DataForm_entryId=".quote($entryId)." and DataForm_fieldId=".quote($row{DataForm_fieldId}));
 				$updating = 1;
 			} else {
 				WebGUI::SQL->write("insert into DataForm_entryData (DataForm_entryId,DataForm_fieldId,wobjectId,value) values
-					($entryId, $row{DataForm_fieldId}, ".$_[0]->get("wobjectId").", ".quote($value).")");
+					(".quote($entryId).", ".quote($row{DataForm_fieldId}).", ".quote($_[0]->get("wobjectId")).", ".quote($value).")");
 			}
 		}
 	}

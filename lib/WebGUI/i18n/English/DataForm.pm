@@ -1,135 +1,14 @@
 package WebGUI::i18n::English::DataForm;
 
 our $I18N = {
-	'1' => {
-		message => q|Data Form|,
-		lastUpdated => 1052045252
-	},
-
-	'2' => {
-		message => q|Your email subject here|,
-		lastUpdated => 1031514049
-	},
-
-	'3' => {
-		message => q|Thank you for your feedback!|,
-		lastUpdated => 1031514049
-	},
-
-	'4' => {
-		message => q|Hidden|,
-		lastUpdated => 1031514049
-	},
-
-	'5' => {
-		message => q|Displayed|,
-		lastUpdated => 1031514049
-	},
-
-	'6' => {
-		message => q|Modifiable|,
-		lastUpdated => 1031514049
-	},
-
-	'7' => {
-		message => q|Edit Data Form|,
-		lastUpdated => 1052045309
-	},
-
-	'8' => {
-		message => q|Width|,
-		lastUpdated => 1031514049
-	},
-
-	'10' => {
-		message => q|From|,
-		lastUpdated => 1031514049
-	},
-
-	'11' => {
-		message => q|To|,
-		lastUpdated => 1052047848
-	},
-
-	'12' => {
-		message => q|Cc|,
-		lastUpdated => 1031514049
-	},
-
-	'13' => {
-		message => q|Bcc|,
-		lastUpdated => 1031514049
-	},
-
-	'14' => {
-		message => q|Subject|,
-		lastUpdated => 1031514049
-	},
-
-	'16' => {
-		message => q|Acknowledgement|,
-		lastUpdated => 1031514049
-	},
-
-	'17' => {
-		message => q|Mail Sent|,
-		lastUpdated => 1031514049
-	},
-
-	'18' => {
-		message => q|Go back!|,
-		lastUpdated => 1031514049
-	},
-
-	'19' => {
-		message => q|Are you certain that you want to delete this field?|,
-		lastUpdated => 1031514049
-	},
-
-	'20' => {
-		message => q|Edit Field|,
-		lastUpdated => 1031514049
+	'90' => {
+		message => q|Delete this entry.|,
+		lastUpdated => 1057208065
 	},
 
 	'21' => {
 		message => q|Field Name|,
 		lastUpdated => 1031514049
-	},
-
-	'22' => {
-		message => q|Status|,
-		lastUpdated => 1031514049
-	},
-
-	'23' => {
-		message => q|Type|,
-		lastUpdated => 1031514049
-	},
-
-	'24' => {
-		message => q|Possible Values|,
-		lastUpdated => 1031514049
-	},
-
-	'25' => {
-		message => q|Default Value(s)|,
-		lastUpdated => 1053855043
-	},
-
-	'79' => {
-		message => q|Subtext|,
-		lastUpdated => 1051482497,
-		context => q|A small piece of text under a form element. Gives extra description.|
-	},
-
-	'61' => {
-		message => q|Data Form, Add/Edit|,
-		lastUpdated => 1053885941
-	},
-
-	'62' => {
-		message => q|Data Form Fields, Add/Edit|,
-		lastUpdated => 1052047004
 	},
 
 	'71' => {
@@ -162,6 +41,149 @@ Choose a template that will be used to display the acknowlegement.
 Choose a template that will be used to display the list of stored records in this Data Form.
 <p>|,
 		lastUpdated => 1053885941
+	},
+
+	'editField-vertical-label' => {
+		message => q|Align vertical|,
+		lastUpdated => 1090575731
+	},
+
+	'102' => {
+		message => q|Subtext|,
+		lastUpdated => 1052048005
+	},
+
+	'7' => {
+		message => q|Edit Data Form|,
+		lastUpdated => 1052045309
+	},
+
+	'80' => {
+		message => q|Email Template|,
+		lastUpdated => 1052044326
+	},
+
+	'17' => {
+		message => q|Mail Sent|,
+		lastUpdated => 1031514049
+	},
+
+	'2' => {
+		message => q|Your email subject here|,
+		lastUpdated => 1031514049
+	},
+
+	'1' => {
+		message => q|Data Form|,
+		lastUpdated => 1052045252
+	},
+
+	'88' => {
+		message => q|Data Form List Template|,
+		lastUpdated => 1053885702
+	},
+
+	'18' => {
+		message => q|Go back!|,
+		lastUpdated => 1031514049
+	},
+
+	'72' => {
+		message => q|You may add as many additional fields to your Data Form as you like.
+<br><br>
+
+<b>Label</b><br>
+This is an informative text label to let the user know what this field represents.
+<p>
+
+<b>Field Name</b><br>
+The name of this field.  It must be unique among all of the other fields on your form.
+<p>
+
+<b>Subtext</b><br>
+An extension of the label, this is a description of what should go in the field or optional instructions for the field.
+<p>
+
+<b>Status</b><br>
+Hidden fields will not be visible to the user, but will be sent in the email.Displayed fields can be seen by the user but not modified. Modifiable fields can be filled in by the user. Required fields must be filled in by the user.
+If you choose Hidden or Displayed, be sure to fill in a Default Value.
+<p>
+
+<b>Type</b><br>
+Choose the type of form element for this field.  
+<p>
+
+<b>Width</b><br>
+Set the number of characters wide this field will be.
+<p>
+
+<b>Height</b><br>
+Set the number of characters tall this field will be. Only used on textarea and HTMLArea.
+<p>
+
+<b>Align vertical</b><br>
+This property controls wheter radio- and checklists are layouted horizontally or vertically.
+<p>
+
+<b>Extras</b><br>
+Here you can enter additional tag properties for the field tag. For instance 'class="myClass"'.
+<p>
+
+<b>Possible Values</b><br>
+This field is used for the list types (like Checkbox List and Select List).  Enter the values you wish to appear, one per line.
+<p>
+
+<b>Default Value (optional)</b><br>
+Enter the default value (if any) for the field.  For Yes/No fields, enter "yes" to select "Yes" and "no" to select "No".
+<p>
+
+|,
+		lastUpdated => 1090575731
+	},
+
+	'16' => {
+		message => q|Acknowledgement|,
+		lastUpdated => 1031514049
+	},
+
+	'100' => {
+		message => q|Are you certain that you want to delete this tab ?|,
+		lastUpdated => 1052048005
+	},
+
+	'82' => {
+		message => q|Data Form Template|,
+		lastUpdated => 1053885798
+	},
+
+	'74' => {
+		message => q|Mail data?|,
+		lastUpdated => 1051463006
+	},
+
+	'84' => {
+		message => q|Export tab delimited.|,
+		lastUpdated => 1052088598
+	},
+
+	'27' => {
+		message => q|Height|,
+		lastUpdated => 1045210016
+	},
+
+	'25' => {
+		message => q|Default Value(s)|,
+		lastUpdated => 1053855043
+	},
+
+	'28' => {
+		message => q|Optional for text area and HTML area.|,
+		lastUpdated => 1052048005
+	},
+
+	'75' => {
+		message => q|Required|,
+		lastUpdated => 1051463599
 	},
 
 	'83' => {
@@ -320,140 +342,34 @@ The end of the form.
 		lastUpdated => 1090575731
 	},
 
-	'72' => {
-		message => q|You may add as many additional fields to your Data Form as you like.
-<br><br>
+	'61' => {
+		message => q|Data Form, Add/Edit|,
+		lastUpdated => 1053885941
+	},
 
-<b>Label</b><br>
-This is an informative text label to let the user know what this field represents.
-<p>
+	'20' => {
+		message => q|Edit Field|,
+		lastUpdated => 1031514049
+	},
 
-<b>Field Name</b><br>
-The name of this field.  It must be unique among all of the other fields on your form.
-<p>
+	'14' => {
+		message => q|Subject|,
+		lastUpdated => 1031514049
+	},
 
-<b>Subtext</b><br>
-An extension of the label, this is a description of what should go in the field or optional instructions for the field.
-<p>
+	'103' => {
+		message => q|Add new Tab|,
+		lastUpdated => 1052048005
+	},
 
-<b>Status</b><br>
-Hidden fields will not be visible to the user, but will be sent in the email.Displayed fields can be seen by the user but not modified. Modifiable fields can be filled in by the user. Required fields must be filled in by the user.
-If you choose Hidden or Displayed, be sure to fill in a Default Value.
-<p>
-
-<b>Type</b><br>
-Choose the type of form element for this field.  
-<p>
-
-<b>Width</b><br>
-Set the number of characters wide this field will be.
-<p>
-
-<b>Height</b><br>
-Set the number of characters tall this field will be. Only used on textarea and HTMLArea.
-<p>
-
-<b>Align vertical</b><br>
-This property controls wheter radio- and checklists are layouted horizontally or vertically.
-<p>
-
-<b>Extras</b><br>
-Here you can enter additional tag properties for the field tag. For instance 'class="myClass"'.
-<p>
-
-<b>Possible Values</b><br>
-This field is used for the list types (like Checkbox List and Select List).  Enter the values you wish to appear, one per line.
-<p>
-
-<b>Default Value (optional)</b><br>
-Enter the default value (if any) for the field.  For Yes/No fields, enter "yes" to select "Yes" and "no" to select "No".
-<p>
-
-|,
+	'editField-extras-label' => {
+		message => q|Extras|,
 		lastUpdated => 1090575731
 	},
 
-	'80' => {
-		message => q|Email Template|,
-		lastUpdated => 1052044326,
-		context => q|A template that will construct the email to be sent.|
-	},
-
-	'73' => {
-		message => q|Send|,
-		lastUpdated => 1039776778
-	},
-
-	'27' => {
-		message => q|Height|,
-		lastUpdated => 1045210016
-	},
-
-	'28' => {
-		message => q|Optional for text area and HTML area.|,
-		lastUpdated => 1052048005
-	},
-
-	'100' => {
-		message => q|Are you certain that you want to delete this tab ?|,
-		lastUpdated =>1052048005 
-	},
-
-	'101' => {
-		message => q|Label|,
-		lastUpdated => 1052048005
-	},
-
-	'84' => {
-		message => q|Export tab delimited.|,
-		lastUpdated => 1052088598,
-		context => q|Save the data with tabs as separaters.|
-	},
-
-	'82' => {
-		message => q|Data Form Template|,
-		lastUpdated => 1053885798
-	},
-
-	'81' => {
-		message => q|Acknowlegement Template|,
-		lastUpdated => 1052064282,
-		context => q|A template to display whatever data there is to display.|
-	},
-
-	'77' => {
-		message => q|Label|,
-		lastUpdated => 1051467316,
-		context => q|The text in front of a form field. (Like "Context" or "Message".)|
-	},
-
-	'76' => {
-		message => q|Add a field.|,
-		lastUpdated => 1051464925,
-		context => q|As in "Add a field element to this form."|
-	},
-
-	'75' => {
-		message => q|Required|,
-		lastUpdated => 1051463599,
-		context => q|A field that cannot be blank.|
-	},
-
-	'74' => {
-		message => q|Mail data?|,
-		lastUpdated => 1051463006,
-		context => q|As in, "Do you wish to email someone this data?"|
-	},
-
-	'85' => {
-		message => q|One per line.|,
-		lastUpdated => 1053855146,
-		context => q|Telling the user to add one entry per line.|
-	},
-
-	'88' => {
-		message => q|Data Form List Template|,
-		lastUpdated => 1053885702
+	'editField-vertical-subtext' => {
+		message => q|This property only affects radio- and checklists.|,
+		lastUpdated => 1090575731
 	},
 
 	'89' => {
@@ -557,36 +473,14 @@ A conditional indicating whether this field exists for the mail subsystem of the
 		lastUpdated => 1053885702
 	},
 
-	'87' => {
-		message => q|List Template|,
-		lastUpdated => 1053884753,
-		context => q|Prompt the user to select a template for the list view of the data form.|
+	'24' => {
+		message => q|Possible Values|,
+		lastUpdated => 1031514049
 	},
 
-	'86' => {
-		message => q|List all entries.|,
-		lastUpdated => 1053882548,
-		context => q|A label that links to  all Data Form entries made to date.|
-	},
-
-	'29' => {
-		message => q|is required|,
-		lastUpdated => 1031515049
-	},
-
-	'102' => {
-		message => q|Subtext|,
-		lastUpdated => 1052048005
-	},
-
-	'106' => {
-		message => q|Tab Template|,
-		lastUpdated => 1052048005
-	},
-
-	'105' => {
-		message => q|Add a Tab|,
-		lastUpdated => 1052048005
+	'10' => {
+		message => q|From|,
+		lastUpdated => 1031514049
 	},
 
 	'104' => {
@@ -594,29 +488,124 @@ A conditional indicating whether this field exists for the mail subsystem of the
 		lastUpdated => 1052048005
 	},
 
-	'103' => {
-		message => q|Add new Tab|,
+	'11' => {
+		message => q|To|,
+		lastUpdated => 1052047848
+	},
+
+	'79' => {
+		message => q|Subtext|,
+		lastUpdated => 1051482497
+	},
+
+	'22' => {
+		message => q|Status|,
+		lastUpdated => 1031514049
+	},
+
+	'87' => {
+		message => q|List Template|,
+		lastUpdated => 1053884753
+	},
+
+	'77' => {
+		message => q|Label|,
+		lastUpdated => 1051467316
+	},
+
+	'106' => {
+		message => q|Tab Template|,
 		lastUpdated => 1052048005
 	},
 
-	'90' => {
-		message => q|Delete this entry.|,
-		lastUpdated => 1057208065
+	'13' => {
+		message => q|Bcc|,
+		lastUpdated => 1031514049
 	},
 
-	'editField-vertical-label' => {
-		message => q|Align vertical|,
-		lastUpdated => 1090575731
+	'23' => {
+		message => q|Type|,
+		lastUpdated => 1031514049
 	},
 
-	'editField-vertical-subtext' => {
-		message => q|This property only affects radio- and checklists.|,
-		lastUpdated => 1090575731
+	'105' => {
+		message => q|Add a Tab|,
+		lastUpdated => 1052048005
 	},
 
-	'editField-extras-label' => {
-		message => q|Extras|,
-		lastUpdated => 1090575731
+	'29' => {
+		message => q|is required|,
+		lastUpdated => 1031515049
+	},
+
+	'6' => {
+		message => q|Modifiable|,
+		lastUpdated => 1031514049
+	},
+
+	'85' => {
+		message => q|One per line.|,
+		lastUpdated => 1053855146
+	},
+
+	'3' => {
+		message => q|Thank you for your feedback!|,
+		lastUpdated => 1031514049
+	},
+
+	'12' => {
+		message => q|Cc|,
+		lastUpdated => 1031514049
+	},
+
+	'81' => {
+		message => q|Acknowlegement Template|,
+		lastUpdated => 1052064282
+	},
+
+	'8' => {
+		message => q|Width|,
+		lastUpdated => 1031514049
+	},
+
+	'4' => {
+		message => q|Hidden|,
+		lastUpdated => 1031514049
+	},
+
+	'101' => {
+		message => q|Label|,
+		lastUpdated => 1052048005
+	},
+
+	'73' => {
+		message => q|Send|,
+		lastUpdated => 1039776778
+	},
+
+	'86' => {
+		message => q|List all entries.|,
+		lastUpdated => 1053882548
+	},
+
+	'76' => {
+		message => q|Add a field.|,
+		lastUpdated => 1051464925
+	},
+
+	'19' => {
+		message => q|Are you certain that you want to delete this field?|,
+		lastUpdated => 1031514049
+	},
+
+	'62' => {
+		message => q|Data Form Fields, Add/Edit|,
+		lastUpdated => 1052047004
+	},
+
+	'5' => {
+		message => q|Displayed|,
+		lastUpdated => 1031514049
 	},
 
 };

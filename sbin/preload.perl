@@ -29,6 +29,7 @@ use CGI (); CGI->compile(':all');
 use CGI::Carp ();
 use CGI::Util ();
 use Date::Calc ();
+use Digest::MD5 ();
 eval "use Image::Magick ();"; # eval, may not be installed
 use File::Copy ();
 use File::Path ();
@@ -37,6 +38,7 @@ use Net::SMTP ();
 use POSIX ();
 use URI::Escape ();
 use SOAP::Lite ();
+use Time::HiRes ();
 
 
 #----------------------------------------

@@ -570,8 +570,10 @@ sub www_editPageSave {
 
         $session{form}{title} = "no title" if ($session{form}{title} eq "");
         $session{form}{menuTitle} = $session{form}{title} if ($session{form}{menuTitle} eq "");
-        $session{form}{urlizedTitle} = $session{form}{menuTitle} if ($session{form}{urlizedTitle} eq "");
-	$session{form}{urlizedTitle} = WebGUI::Page::makeUnique(WebGUI::URL::urlize($session{form}{urlizedTitle}),$session{form}{pageId});
+        my $url = $session{form}{urlizedTitle};
+	$url = $session{form}{menuTitle} if ($url eq "");
+	$url .= ".".$session{setting}{urlExtension} unless ($url =~ /\./ && $session{setting}{urlExtension} ne "");
+	$url = WebGUI::Page::makeUnique(WebGUI::URL::urlize($url),$session{form}{pageId});
         $page->set({
 		title			=> $session{form}{title}, 
 		styleId			=> $session{form}{styleId}, 
@@ -587,7 +589,7 @@ sub www_editPageSave {
 		cacheTimeout		=> WebGUI::FormProcessor::interval("cacheTimeout"),
 		cacheTimeoutVisitor	=> WebGUI::FormProcessor::interval("cacheTimeoutVisitor"),
 		metaTags		=> $session{form}{metaTags},
-		urlizedTitle		=> $session{form}{urlizedTitle}, 
+		urlizedTitle		=> $url, 
 		redirectURL		=> $session{form}{redirectURL}, 
 		languageId		=> $session{form}{languageId}, 
 		defaultMetaTags		=> $session{form}{defaultMetaTags}, 
