@@ -115,9 +115,9 @@ sub settingsForm {
 	my $f;
 	$f = WebGUI::HTMLForm->new;
 	$f->readOnly('<b>'.optionsLabel().'</b>');
-	$f->text("authSMB.smbPDC",WebGUI::International::get(5,'Auth/SMB'),$session{setting}{smbPDC});
-	$f->text("authSMB.smbBDC",WebGUI::International::get(6,'Auth/SMB'),$session{setting}{smbBDC});
-	$f->text("authSMB.smbDomain",WebGUI::International::get(7,'Auth/SMB'),$session{setting}{smbDomain});
+	$f->text("smbPDC",WebGUI::International::get(5,'Auth/SMB'),$session{setting}{smbPDC});
+	$f->text("smbBDC",WebGUI::International::get(6,'Auth/SMB'),$session{setting}{smbBDC});
+	$f->text("smbDomain",WebGUI::International::get(7,'Auth/SMB'),$session{setting}{smbDomain});
 	return $f->printRowsOnly;
 }
 
