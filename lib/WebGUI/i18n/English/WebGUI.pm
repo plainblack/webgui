@@ -6725,8 +6725,12 @@ If set to yes then users will be able to use replacements in thier posts. Replac
 Select what types of content you will filter from a user's post.
 <p>
 
+<b>Threads Per Page</b><br>
+The number of threads to display on a single page in a forum.
+<p>
+
 <b>Posts Per Page</b><br>
-The number of posts to display on a single page.
+The number of posts (within a thread) to display on a single page.
 <p>
 
 <b>Karma Per Post</b><br>
@@ -7224,6 +7228,11 @@ config file.</p>
                 lastUpdated => 1089039511,
                 context => q|Help body for Page Export operation|
         },
+	'Forum, Threads Per Page' => {
+		message => q|Threads Per Page|,
+		lastUpdated =>1092652208,
+		context => q|Field label for Edit Forum|
+	}
 
 };
 
