@@ -487,7 +487,7 @@ A DBI-style database handler. Defaults to the WebGUI site handler.
 sub setDataByQuery {
 	my ($sth, $pageCount, $rowCount, $dbh, $sql, $self, @row, $data);
 	($self, $sql, $dbh) = @_;
-	$dbh |= $session{dbh};
+	$dbh ||= $session{dbh};
 	$sth = WebGUI::SQL->read($sql);
 	$pageCount = 1;
 	while ($data = $sth->hashRef) {
