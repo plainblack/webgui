@@ -129,6 +129,9 @@ sub readConfig {
 	if (ref $data{wobjects} ne "ARRAY"){
 		$data{wobjects} = [$data{wobjects}];
 	}
+	if (ref $data{paymentPlugins} ne "ARRAY") {
+		$data{paymentPlugins} = [$data{paymentPlugins}] if ($data{paymentPlugins});
+	}
         if( defined( $data{scripturl} ) ) {
                 # get rid of leading "/" if present.
                 $data{scripturl} =~ s/^\///;
