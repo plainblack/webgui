@@ -14,7 +14,7 @@ our ($webguiRoot, $configFile);
 
 BEGIN {
         $configFile = "WebGUI.conf";
-        $webguiRoot = "/data/WebGUI";
+        $webguiRoot = "..";
         unshift (@INC, $webguiRoot."/lib");
 }
 
