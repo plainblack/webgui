@@ -16,6 +16,9 @@
    Matt Wilson for inspiration.
  - Thumbnails will now be generated a little sharper. Thanks to Nuba.
  - SSL is now more strictly enforced.
+ - Deleted the long since deprecated authentication methods (logout, login,
+   displayAccount, displayLogin, recoverPassword). If you don't understand
+   this, don't worry about it, you'll still be able to log in to your site. =)
  - Fixed resetting votes on Poll would crash it.
  - Fixed not being able to set display title and other yes no questions to no.
  - Fixed a bug where URLs would become unreachable when using SSL.

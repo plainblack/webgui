@@ -24,12 +24,12 @@ sub process {
         my $logout = $param[1] || WebGUI::International::get(717);
 	my %var;
         if ($session{user}{userId} eq '1') {
-		return WebGUI::URL::page("op=displayLogin") if ($param[0] eq "linkonly");
-        	$var{'toggle.url'} = WebGUI::URL::page('op=displayLogin');
+		return WebGUI::URL::page("op=auth&method=init") if ($param[0] eq "linkonly");
+        	$var{'toggle.url'} = WebGUI::URL::page('op=auth&method=init');
                	$var{'toggle.text'} = $login;
         } else {
-		return WebGUI::URL::page("op=logout") if ($param[0] eq "linkonly");
-                $var{'toggle.url'} = WebGUI::URL::page('op=logout');
+		return WebGUI::URL::page("op=auth&method=logout") if ($param[0] eq "linkonly");
+                $var{'toggle.url'} = WebGUI::URL::page('op=auth&method=logout');
                	$var{'toggle.text'} = $logout;
         }
 	if ($param[3]) {

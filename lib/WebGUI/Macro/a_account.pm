@@ -21,8 +21,8 @@ use WebGUI::URL;
 sub process {
        my %var;
          my  @param = WebGUI::Macro::getParams(shift);
-	return WebGUI::URL::page("op=displayAccount") if ($param[0] eq "linkonly");
-       $var{'account.url'} = WebGUI::URL::page('op=displayAccount');
+	return WebGUI::URL::page("op=auth&method=init") if ($param[0] eq "linkonly");
+       $var{'account.url'} = WebGUI::URL::page('op=auth&method=init');
        $var{'account.text'} = $param[0] || WebGUI::International::get(46);
          return WebGUI::Asset::Template->newByUrl($param[1]||"default_account_macro")->process(\%var);
 }

@@ -61,45 +61,6 @@ sub www_auth {
    return WebGUI::Operation::Shared::userStyle($authMethod->$methodCall);   
 }
 
-#-------------------------------------------------------------------
-sub www_createAccount {
-   return www_auth("createAccount");
-}
 
-#-------------------------------------------------------------------
-sub www_deactivateAccount {
-   return www_auth("deactivateAccount");
-}
-
-#-------------------------------------------------------------------
-sub www_displayAccount {
-   return www_auth("displayAccount");
-}
-
-#-------------------------------------------------------------------
-sub www_displayLogin {
-   return www_auth("displayLogin");
-}
-
-#-------------------------------------------------------------------
-sub www_init {
-   return www_auth("init");
-}
-
-#Deprecated.  Kept for backwards compatibility.  Use op=auth&method=login
-#-------------------------------------------------------------------
-sub www_login {
-   return www_auth("login");
-}
-
-#-------------------------------------------------------------------
-sub www_logout {
-   return www_auth("logout");
-}
-
-#-------------------------------------------------------------------
-sub www_recoverPassword {
-   return www_auth("recoverPassword");
-}
  
 1;

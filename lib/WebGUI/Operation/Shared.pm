@@ -36,7 +36,7 @@ our @EXPORT = qw(&menuWrapper);
 	}
 	unless ($session{form}{op} eq "displayAccount"){
 		my %hash;
-		$hash{'options.display'} = '<a href="'.WebGUI::URL::page('op=displayAccount').'">'.WebGUI::International::get(342).'</a>';
+		$hash{'options.display'} = '<a href="'.WebGUI::URL::page('op=auth&method=init').'">'.WebGUI::International::get(342).'</a>';
 		push(@array,\%hash);
 	}
 	unless ($session{form}{op} eq "editProfile"){
@@ -59,11 +59,11 @@ our @EXPORT = qw(&menuWrapper);
 	}
 		
 	my %logout;
-	$logout{'options.display'} = '<a href="'.WebGUI::URL::page('op=logout').'">'.WebGUI::International::get(64).'</a>'; 
+	$logout{'options.display'} = '<a href="'.WebGUI::URL::page('op=auth&method=logout').'">'.WebGUI::International::get(64).'</a>'; 
 	push(@array,\%logout);
 	if ($session{setting}{selfDeactivation} && !WebGUI::Grouping::isInGroup(3)){
 	   my %hash;
-	   $hash{'options.display'} = '<a href="'.WebGUI::URL::page('op=deactivateAccount').'">'.WebGUI::International::get(65).'</a>';
+	   $hash{'options.display'} = '<a href="'.WebGUI::URL::page('op=auth&method=deactivateAccount').'">'.WebGUI::International::get(65).'</a>';
 	   push(@array,\%hash);
 	}
 	return \@array;

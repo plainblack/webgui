@@ -179,7 +179,7 @@ sub createAccount {
    $vars->{'create.form.passwordConfirm.label'} = WebGUI::International::get(2,'AuthWebGUI');
    $vars->{'create.form.hidden'} = WebGUI::Form::hidden({"name"=>"confirm","value"=>$session{form}{confirm}});
  	$vars->{'recoverPassword.isAllowed'} = $self->getSetting("passwordRecovery");
-	   $vars->{'recoverPassword.url'} = WebGUI::URL::page('op=recoverPassword');
+	   $vars->{'recoverPassword.url'} = WebGUI::URL::page('op=auth&method=recoverPassword');
 	   $vars->{'recoverPassword.label'} = WebGUI::International::get(59);
    return $self->SUPER::createAccount("createAccountSave",$vars);
 }
@@ -286,7 +286,7 @@ sub displayLogin {
    	return $self->displayAccount($_[0]) if ($self->userId != 1);
    	$vars->{'login.message'} = $_[0] if ($_[0]);
    	$vars->{'recoverPassword.isAllowed'} = $self->getSetting("passwordRecovery");
-   	$vars->{'recoverPassword.url'} = WebGUI::URL::page('op=recoverPassword');
+   	$vars->{'recoverPassword.url'} = WebGUI::URL::page('op=auth&method=recoverPassword');
    	$vars->{'recoverPassword.label'} = WebGUI::International::get(59);
    	return $self->SUPER::displayLogin("login",$vars);
 }
@@ -501,7 +501,7 @@ sub recoverPassword {
     $vars->{'login.label'} = WebGUI::International::get(58);
 
 	     $vars->{'anonymousRegistration.isAllowed'} = ($session{setting}{anonymousRegistration});
-           $vars->{'createAccount.url'} = WebGUI::URL::page('op=createAccount');
+           $vars->{'createAccount.url'} = WebGUI::URL::page('op=auth=&method=createAccount');
            $vars->{'createAccount.label'} = WebGUI::International::get(67);
    $vars->{'recover.message'} = $_[0] if ($_[0]);
    $vars->{'recover.form.email'} = WebGUI::Form::text({"name"=>"email"});

@@ -400,7 +400,7 @@ sub displayLogin {
 	$vars->{'login.form.submit'} = WebGUI::Form::submit({"value"=>WebGUI::International::get(52)});
 	$vars->{'login.form.footer'} = WebGUI::Form::formFooter();
 	$vars->{'anonymousRegistration.isAllowed'} = ($session{setting}{anonymousRegistration});
-	$vars->{'createAccount.url'} = WebGUI::URL::page('op=createAccount');
+	$vars->{'createAccount.url'} = WebGUI::URL::page('op=auth&method=createAccount');
 	$vars->{'createAccount.label'} = WebGUI::International::get(67);
 	return WebGUI::Asset::Template->new($self->getLoginTemplateId)->process($vars);
 }
