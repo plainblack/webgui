@@ -51,6 +51,11 @@ sub getThread {
 	return $self->{_thread};
 }
 
+sub incrementViews {
+	my ($self) = @_;
+	WebGUI::SQL->write("update forumPost set views=views+1 where forumPostId=".$self->get("forumPostId"));
+}
+
 sub isMarkedRead {
 	my ($self, $userId) = @_;
 	$userId = $session{user}{userId} unless ($userId);
@@ -61,10 +66,11 @@ sub isMarkedRead {
 sub markRead {
 	my ($self, $userId) = @_;
 	$userId = $session{user}{userId} unless ($userId);
-	unless (isMarkedRead($userId)) {
+	unless ($self->isMarkedRead($userId)) {
 		WebGUI::SQL->write("insert into forumRead (userId, forumPostId, forumThreadId, lastRead) values ($userId,
 			".$self->get("forumPostId").", ".$self->get("forumThreadId").", ".WebGUI::DateTime::time().")");
 	}
+	$self->incrementViews;
 }
 
 sub new {

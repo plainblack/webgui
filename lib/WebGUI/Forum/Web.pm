@@ -93,21 +93,21 @@ sub _getPostTemplateVars {
                 }
                 $sth->finish;
         }
-        $var->{'post.date'} = _formatPostDate($post->get("dateOfPost"));
+        $var->{'post.date.value'} = _formatPostDate($post->get("dateOfPost"));
 	$var->{'post.date.label'} = WebGUI::International::get(239);
-        $var->{'post.time'} = _formatPostTime($post->get("dateOfPost"));
-	$var->{'post.views'} = $post->get("views");
+        $var->{'post.date.epoch'} = $post->get("dateOfPost");
+        $var->{'post.time.value'} = _formatPostTime($post->get("dateOfPost"));
+	$var->{'post.views.value'} = $post->get("views");
 	$var->{'post.views.label'} = WebGUI::International::get(514);
-	$var->{'post.status'} = _formatStatus($post->get("status"));
+	$var->{'post.status.value'} = _formatStatus($post->get("status"));
 	$var->{'post.status.label'} = WebGUI::International::get(553);
 	$var->{'post.isLocked'} = $thread->isLocked;
 	$var->{'post.isModerator'} = $forum->isModerator;
 	$var->{'post.user.label'} = WebGUI::International::get(238);
-	$var->{'post.username'} = $post->get("username");
-	$var->{'post.userId'} = $post->get("userId");
-	$var->{'post.userProfile'} = _formatUserProfileURL($post->get("userId"));
+	$var->{'post.user.name'} = $post->get("username");
+	$var->{'post.user.Id'} = $post->get("userId");
+	$var->{'post.user.Profile'} = _formatUserProfileURL($post->get("userId"));
 	$var->{'post.id'} = $post->get("forumPostId");
-	$var->{'post.full'} = WebGUI::Template::process(WebGUI::Template::get(1,"Forum/Post"), $var); 
 	$var->{'post.reply.label'} = WebGUI::International::get(577);
 	$var->{'post.reply.url'} = _formatReplyPostURL($callback,$post->get("forumPostId"));
 	$var->{'post.edit.label'} = WebGUI::International::get(575);
@@ -120,7 +120,8 @@ sub _getPostTemplateVars {
 	$var->{'post.deny.url'} = _formatDenyPostURL($callback,$post->get("forumPostId"));
 	$var->{'post.pending.label'} = WebGUI::International::get(573);
 	$var->{'post.pending.url'} = _formatLeavePostPendingURL();
-	$var->{'post.tools.label'} = WebGUI::International::get(238);
+	$var->{'post.tools.label'} = WebGUI::International::get(0);
+	$var->{'post.full'} = WebGUI::Template::process(WebGUI::Template::get(1,"Forum/Post"), $var); 
 	return $var;
 }
 
@@ -336,22 +337,23 @@ sub www_viewThread {
 	my ($callback, $postId) = @_;
 	$postId = $session{form}{forumPostId} unless ($postId);
 	my $post = WebGUI::Forum::Post->new($postId);
+	$post->markRead($session{user}{userId});
 	my $thread = $post->getThread;
 	my $forum = $thread->getForum;
 	my $var = _getPostTemplateVars($post, $thread, $forum, $callback);
 	my $root = WebGUI::Forum::Post->new($thread->get("rootPostId"));
 	$var->{post_loop} = _recurseThread($root, $thread, $forum, 0, $callback);
 	$var->{'thread.layout.isFlat'} = ($session{user}{discussionLayout} eq "flat");
-	$var->{'thread.layout.isThreaded'} = ($session{user}{discussionLayout} eq "threaded");
 	$var->{'thread.layout.isNested'} = ($session{user}{discussionLayout} eq "nested");
+	$var->{'thread.layout.isThreaded'} = ($session{user}{discussionLayout} eq "threaded" || !($var->{'thread.layout.isNested'} || $var->{'thread.layout.isFlat'}));
 	$var->{'thread.new.url'} = '';
-	$var->{'thread.new.label'} = WebGUI::International::get(0);
+	$var->{'thread.new.label'} = WebGUI::International::get(1014);
 	$var->{'thread.previous.url'} = _formatPreviousThreadURL($callback,$thread->get("forumThreadId"));
 	$var->{'thread.previous.label'} = WebGUI::International::get(513);
 	$var->{'thread.next.url'} = _formatNextThreadURL($callback,$thread->get("forumThreadId"));
 	$var->{'thread.next.label'} = WebGUI::International::get(512);
-	$var->{'thread.list.url'} = '';
-	$var->{'thread.list.label'} = WebGUI::International::get(0);
+	$var->{'thread.list.url'} = $callback;
+	$var->{'thread.list.label'} = WebGUI::International::get(1015);
 	return WebGUI::Template::process(WebGUI::Template::get(1,"Forum/Thread"), $var); 
 }
 
