@@ -109,7 +109,7 @@ sub www_deleteCollateralFolderConfirm {
 sub www_deleteCollateralFile {
 	return WebGUI::Privilege::insufficient unless (WebGUI::Privilege::isInGroup(4));
 	my $collateral = WebGUI::Collateral->new($session{form}{cid});
-	$collateral->delete;
+	$collateral->deleteFile;
 	return www_editCollateral($collateral);
 }
 
@@ -208,8 +208,7 @@ sub www_editCollateral {
                 	if ($collateral->{filename} ne "") {
                         	$f->readOnly(
                                 	-value=>'<a href="'.WebGUI::URL::page('op=deleteCollateralFile&cid='
-						.$collateral->{collateralId}).'">'.
-                                        	WebGUI::International::get(391).'</a>',
+						.$collateral->{collateralId}).'">'.WebGUI::International::get(391).'</a>',
                                 	-label=>WebGUI::International::get(384)
                         		);
                 	} else {
