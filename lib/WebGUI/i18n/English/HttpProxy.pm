@@ -16,7 +16,7 @@ The starting URL for the proxy.
 <p>
 
 <b>Follow redirects?</b><br>
-Sometimes the URL to a page, is actually a redirection to another page. Do you wish to follow those redirections when they occur?
+Sometimes the URL to a page is actually a redirection to another page. Do you wish to follow those redirections when they occur?
 <p>
 
 <b>Rewrite urls?</b><br>
