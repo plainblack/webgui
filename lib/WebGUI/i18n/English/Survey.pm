@@ -697,7 +697,7 @@ default is 1.
 <p/>
 
 <b>Questions Per Response?</b><br/>
-The total number of people who can take the survey.
+How many questions are given to each user?
 <p/>
 
 <b>Who can take the survey?</b><br/>
