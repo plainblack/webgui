@@ -92,13 +92,13 @@ sub _generatePage {
                         $w = eval{$cmd->new($wobject)};
                         WebGUI::ErrorHandler::fatalError("Couldn't instanciate wobject: ${$wobject}{namespace}. Root cause: ".$@) if($@);
                         if ($w->inDateRange) {
-                        	$contentHash{"page.position".${$wobject}{templatePosition}} .= '<div class="wobject'
+                        	$contentHash{"page.position".${$wobject}{templatePosition}} .= '<div class="wobject"><div class="wobject'
 					.${$wobject}{namespace}.'" id="wobjectId'.${$wobject}{wobjectId}.'">';
                                 $contentHash{"page.position".${$wobject}{templatePosition}} .= '<a name="'
 					.${$wobject}{wobjectId}.'"></a>';
                                 $contentHash{"page.position".${$wobject}{templatePosition}} .= eval{$w->www_view};
                                 WebGUI::ErrorHandler::fatalError("Wobject runtime error: ${$wobject}{namespace}. Root cause: ".$@) if($@);
-                                $contentHash{"page.position".${$wobject}{templatePosition}} .= "</div>\n\n";
+                                $contentHash{"page.position".${$wobject}{templatePosition}} .= "</div></div>\n\n";
                         }
 		}
                 $sth->finish;
