@@ -47,9 +47,9 @@ These methods are available from this package:
 
 =head2 cleanSegment ( html )
 
-Returns an HTML segment that has been stripped of the <BODY> tag and anything before it, as well as the </BODY> tag and anything after it. 
+Returns an HTML segment that has been stripped of the <BODY> tag and anything before it, as well as the </BODY> tag and anything after it. It's main purpose is to get rid of META tags and other garbage from an HTML page that will be used as a segment inside of another page.
 
-NOTE: This filter does have one exception, it leaves anything before the <BODY> tag that is enclosed in <STYLE></STYLE> tags.
+NOTE: This filter does have one exception, it leaves anything before the <BODY> tag that is enclosed in <STYLE></STYLE> or <SCRIPT></SCRIPT> tags.
 
 =over
 
@@ -62,16 +62,17 @@ The HTML segment you want cleaned.
 =cut
 
 sub cleanSegment {
-	my ($style, $value);
-	$value = $_[0];
+	my $value = $_[0];
 	if ($value =~ s/\r/\n/g) {
 		$value =~ s/\n\n/\n/g
 	}
 	$value =~ m/(\<style.*?\/style\>)/ixsg;
-	$style = $1;
-	$value =~ s/\A.*?\<body.*?\>(.*?)/$style$1/ixsg;
+	my $style = $1;
+	$value =~ m/(\<script.*?\/script\>)/ixsg;
+	my $script = $1;
+	$value =~ s/\A.*?\<body.*?\>(.*?)/$1/ixsg;
         $value =~ s/(.*?)\<\/body\>.*?\z/$1/ixsg;
-	return $value;
+	return $script.$style.$value;
 }
 
 #-------------------------------------------------------------------

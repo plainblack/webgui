@@ -16,6 +16,8 @@
 	- Macros are now negated on user profile fields and authentication
 	  fields.
  - Bugfix [ 930425 ] Bug in EventsCalender, causing other wobjects to fail.
+ - Bugfix [ 925586 ] HttpProxy ignores javascript in <HEAD> (thanks to
+   Nicklous Roberts).
  
 
 
