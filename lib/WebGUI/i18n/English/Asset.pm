@@ -164,7 +164,7 @@ argument.
 	},
 
 	'snippet add/edit body' => {
-                message => q|<P>Snippets are bits of text that may be reused on your site. Thinks like java scripts, style sheets, flash animations, or even slogans are all great snippets. Best of all, if you need to change the text, you can change it in only one location.</P>
+                message => q|<P>Snippets are bits of text that may be reused on your site. Things like java scripts, style sheets, flash animations, or even slogans are all great snippets. Best of all, if you need to change the text, you can change it in only one location.</P>
 
 <P>Since Snippets are Assets, so they have all the properties that Assets do.</P>
 
@@ -172,8 +172,31 @@ argument.
 This is the snippet.  Either type it in or copy and paste it into the form field.
 |,
                 context => 'Describing snippets and its sole field.',
-        	lastUpdated => 1104630518,
+        	lastUpdated => 1106683569,
 	},
+
+	'file add/edit title' => {
+		message => q|File, Add/Edit|,
+        	lastUpdated => 1106683494,
+	},
+
+	'file add/edit body' => {
+                message => q|<P>File Assets are files on your site that are available for users to download. If you would like to have multiple files available, try using a FilePile Asset.</P>
+
+<P>Since Files are Assets, so they have all the properties that Assets do.</P>
+
+<P><b>New file to upload</b><br/>
+Enter the path to a file, or use the "Browse" button to find a file on your local hard
+drive that you would like to be uploaded.
+
+<P><b>Current file</b><br/>
+If this Asset already contains a file, a link to the file with its associated icon will be shown.
+
+|,
+		context => 'Describing file add/edit form specific fields',
+		lastUpdated => 1106683499,
+	},
+
 
 	'extra head tags' => {
 		message => q|Extra HEAD tags|,

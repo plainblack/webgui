@@ -41,6 +41,17 @@ our $HELP = {
 		]
 	},
 
+        'file add/edit' => {
+		title => 'file add/edit title',
+		body => 'file add/edit body',
+		related => [
+			{
+				tag => 'asset fields',
+				namespace => 'Asset'
+			},
+		]
+	},
+
 	'metadata manage'=> {
 		title => 'content profiling',
 		body => 'metadata manage body',
