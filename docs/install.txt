@@ -24,9 +24,8 @@ QnD INSTALL INSTRUCTIONS:
    Compress::Zlib
    IO::Zlib
    SOAP::Lite
-   Data::Serializer
-   Image::Magick (optional)
    Cache::Cache 
+   Image::Magick (optional)
  
 
 3. Install Apache (preferably with mod_perl) and set up your config.

@@ -10,6 +10,7 @@
  - Fixed a bug in articles where articles with no content would fail to
    display their images.
  - bugfix [966466] WebGUI::Session. System crash when user language setting missing.
+ - Eliminated the need for Data::Serializer.
 
 
 6.0.3

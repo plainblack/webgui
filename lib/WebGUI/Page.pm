@@ -28,7 +28,6 @@ use WebGUI::SQL;
 use WebGUI::Template;
 use WebGUI::Utility;
 use WebGUI::DateTime;
-use Data::Serializer;
 
 our @ISA = qw(WebGUI::Persistent::Tree);
 

@@ -12,6 +12,8 @@ save you many hours of grief.
 --------------------------------------------------------------------
  * See docs/migration.txt for changes in plug-in coding.
 
+ * You no longer need Data::Serializer.
+
 
 6.0.2
 --------------------------------------------------------------------

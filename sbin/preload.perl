@@ -29,7 +29,6 @@ use FileHandle ();
 use Net::SMTP ();
 use POSIX ();
 use URI::Escape ();
-use Data::Serializer ();
 use SOAP::Lite ();
 
 
