@@ -6,6 +6,9 @@
  - Fixed a problem in the forum that showed up under Postgres.
  - Bugfix [ 822805 ] Emptying trash can cause fatal error
    (Thanks to Steve Simms.)
+ - Bugfix [ 870681 ] Wobject start/end dates change when editing wobject
+ - Bugfix [ 877999 ] runHourly.pl crashes server when no db
+
 
 5.5.4
  - Bugfix [ 849210 ] Login Redirect should filter out the "logout" operation

@@ -489,10 +489,16 @@ The number of seconds since January 1, 1970. Defaults to now.
 =back
 
 =cut
-
 sub localtime {
-	return Date::Calc::Localtime($_[0]||WebGUI::DateTime::time());
+        return Date::Calc::System_Clock() unless ($_[0]);
+        my $time = $_[0] || WebGUI::DateTime::time();
+        my ($year, $month, $day, $hour, $min, $sec) = Date::Calc::Time_to_Date($time);
+        my $dow = Date::Calc::Day_of_Week($year,$month,$day);
+        my $doy = Date::Calc::Day_of_Year($year,$month,$day);
+        my @temp = Date::Calc::System_Clock();
+        return ($year, $month, $day, $hour, $min, $sec, $doy, $dow, $temp[8]);
 }
+
 
 #-------------------------------------------------------------------
 =head2 monthCount ( startEpoch, endEpoch )

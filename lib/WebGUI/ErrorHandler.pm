@@ -106,7 +106,10 @@ sub fatalError {
 	$toLog .= getSessionVars();
         writeLog($toLog);
         unless ($WebGUI::Session::session{setting}{showDebug}) {
-                print WebGUI::International::get(416).'<br>';
+		#NOTE: You can't internationalize this because with some types of errors that would cause an infinite loop.
+		print "<h1>Problem With Request</h1>
+			We have encountered a problem with your request. Please use your back button and try again. 
+			If this problem persists, please contact us with what you were trying to do and the time and date of the problem.";
                 print '<br>'.$WebGUI::Session::session{setting}{companyName};
                 print '<br>'.$WebGUI::Session::session{setting}{companyEmail};
                 print '<br>'.$WebGUI::Session::session{setting}{companyURL};
