@@ -131,23 +131,36 @@ sub www_createAccount {
                         	$values = eval $data{dataValues};
                         	$method = $data{dataType};
                         	$label = eval $data{fieldLabel};
-                        	if ($method eq "select") {
-                                        # note: this big if statement doesn't look elegant, but doing regular
-                                        # ORs caused problems with the array reference.
-                                        if ($session{form}{$data{fieldName}}) {
-                                                $default = [$session{form}{$data{fieldName}}];
-                                        } elsif ($session{user}{$data{fieldName}}) {
-                                                $default = [$session{user}{$data{fieldName}}];
-                                        } else {
-                                                $default = eval $data{dataDefault};
-                                        }
-                                	$f->select($data{fieldName},$values,$label,$default);
-                        	} else {
-                                	$default = $session{form}{$data{fieldName}} 
-						|| $session{user}{$data{fieldName}} 
-						|| eval $data{dataDefault};
-                                	$f->$method($data{fieldName},$label,$default);
-                        	}
+	                        if ($method eq "selectList") {
+        	                        # note: this big if statement doesn't look elegant, but doing regular
+                	                # ORs caused problems with the array reference.
+                        	        if ($session{form}{$data{fieldName}}) {
+                                        $default = [$session{form}{$data{fieldName}}];
+	                                } elsif ($session{user}{$data{fieldName}}) {
+        	                                $default = [$session{user}{$data{fieldName}}];
+                	                } else {
+                        	                $default = eval $data{dataDefault};
+                                	}
+	                                $f->select(
+        	                                -name=>$data{fieldName},
+                	                        -options=>$values,
+                        	                -label=>$label,
+                                	        -value=>$default
+                                        	);
+	                        } else {
+        	                        if ($session{form}{$data{fieldName}}) {
+                	                        $default = $session{form}{$data{fieldName}};
+                        	        } elsif (exists $session{user}{$data{fieldName}}) {
+                                	        $default = $session{user}{$data{fieldName}};
+	                                } else {
+        	                                $default = eval $data{dataDefault};
+                	                }
+                        	        $f->$method(
+                                	        -name=>$data{fieldName},
+                                        	-label=>$label,
+	                                        -value=>$default
+        	                                );
+                	        }
                         	$previousCategory = $category;
                 	}
        		}
