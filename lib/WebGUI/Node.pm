@@ -14,6 +14,7 @@ package WebGUI::Node;
 
 =cut
 
+use Archive::Tar;
 use File::Path;
 use POSIX;
 use strict;
@@ -37,6 +38,7 @@ Package to manipulate WebGUI storage nodes. The nodes system is a two-tiered fil
  $node->delete;
  $node->getPath;
  $node->getURL;
+ $node->tar($filename);
 
 =head1 METHODS
 
@@ -79,6 +81,29 @@ Deletes this node and its contents (if any) from the filesystem.
 
 sub delete {
         rmtree($_[0]->getPath);
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 getFiles ( )
+
+Returns a list of the files in this node.
+
+=cut
+
+sub getFiles ( ) {
+	my @list;
+	if (opendir (DIR,$_[0]->getPath)) {
+        	my @files = readdir(DIR);
+        	closedir(DIR);
+        	foreach my $file (@files) {
+                	if ($file ne ".." && $file ne ".") {
+				push(@list,$file);
+			}
+                }
+		return @list;
+        }
 }
 
 
@@ -143,7 +168,41 @@ sub new {
 	bless {_node1 => $node1, _node2 => $node2}, $class;
 }
 
+#-------------------------------------------------------------------
 
+=head2 tar ( filename [ , node1, node2 ] )
+
+Archives this node into a tar file.
+
+=over
+
+=item filename
+
+The name of the tar file to be created. Should ideally end with ".tar".
+
+=item node1
+
+The node where you would like to create this tar file. Defaults to "temp".
+
+=item node2
+
+If you need a second level node to store the file, then specify it here.
+
+=back
+
+=cut
+
+sub tar {
+	my $self = $_[0];
+	my $filename = $_[1] || $self->{_node1}."_".$self->{_node2}.".tar";
+	my $node1 = $_[2] || "temp";
+	my $node2 = $_[3];
+	chdir $self->getPath;
+	my $tar = Archive::Tar->new;
+	$tar->add_files($_[0]->getFiles);
+	my $temp = WebGUI::Node->new($node1,$node2);
+	$tar->write($temp->getPath.$session{os}{slash}.$filename);
+}
 
 1;
 
