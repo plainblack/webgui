@@ -20,9 +20,11 @@ use FileHandle;
 use File::Path;
 use POSIX;
 use strict;
+use warnings;
 use WebGUI::ErrorHandler;
 use WebGUI::Id;
 use WebGUI::Session;
+use WebGUI::Utility;
 
 =head1 NAME
 
@@ -95,23 +97,6 @@ sub _addError {
 
 #-------------------------------------------------------------------
 
-=head2 _getStorageParts
-
-Returns an array reference containing the hashed values for the storage location directory.
-
-NOTE: This is a private method and should never be called except internally to this package.
-
-=cut
-
-sub _getStorageParts {
-	my $self = shift;
-	my $id = shift;
-	$id =~ m/^(.{2})(.{2})/;
-	return [$1,$2]
-}
-
-#-------------------------------------------------------------------
-
 =head2 addFileFromFilesystem( pathToFile )
 
 Grabs a file from the server's file system and saves it to a storage location and returns a URL compliant filename.
@@ -177,16 +162,17 @@ Provide the form variable name to which the file being uploaded is assigned.
 
 =cut
 
-sub addFileFromFormPost{
+sub addFileFromFormPost {
 	my $self = shift;
 	my $formVariableName = shift;
         return "" if (WebGUI::HTTP::getStatus() =~ /^413/);
-        my $filename = $session{cgi}->upload($formVariableName);
-        if (defined $filename) {
-                if ($filename =~ /([^\/\\]+)$/) {
+        my $tempPath = $session{cgi}->upload($formVariableName);
+        if (defined $tempPath) {
+		my $filename;
+                if ($tempPath =~ /([^\/\\]+)$/) {
                         $filename = $1;
                 } else {
-                        $filename = $filename;
+                        $filename = $tempPath;
                 }
                 my $type = $self->getFileExtension($filename);
                 if (isIn($type, qw(pl perl sh cgi php asp))) { # make us safe from malicious uploads
@@ -194,11 +180,12 @@ sub addFileFromFormPost{
                         $filename .= ".txt";
                 }
                 $filename = WebGUI::URL::makeCompliant($filename);
+		my $bytesread;
                 my $file = FileHandle->new(">".$self->getPath($filename));
                 if (defined $file) {
 			my $buffer;
                         binmode $file;
-                        while (my $bytesread=read($filename,$buffer,1024)) {
+                        while ($bytesread=read($tempPath,$buffer,1024)) {
                                 print $file $buffer;
                         }
                         close($file);
@@ -206,7 +193,6 @@ sub addFileFromFormPost{
                         $self->_addError("Couldn't open file ".$self->getPath($filename)." for writing due to error: ".$!);
                         return undef;
                 }
-                close $filename;
                 return $filename;
         }
         return undef;
@@ -307,22 +293,15 @@ sub create {
 	my $class = shift;
 	my $id = WebGUI::Id::generate();
 	my $self = $class->get($id); 
-	my $parts = $self->_getStorageParts($id);
-	my $node = $session{config}{uploadsPath}.$session{os}{slash}.$parts->[0];
-	mkdir($node);
-	unless ($! eq "File exists" || $! eq "") {
-		$self->_addError("Couldn't create storage location: $node : $!");
+	my $node = $session{config}{uploadsPath};
+	foreach my $folder ($self->{_part1}, $self->{_part2}, $id) {
+		$node .= $session{os}{slash}.$folder;
+		unless (-e $node) { # check to see if it already exists
+			unless (mkdir($node)) { # check to see if there was an error during creation
+				$self->_addError("Couldn't create storage location: $node : $!");
+			}
+		}
 	}
-	$node .= $session{os}{slash}.$parts->[1];
-	mkdir($node);
-	unless ($! eq "File exists" || $! eq "") {
-               	$self->_addError("Couldn't create storage location: $node : $!");
-       	}
-	$node .= $session{os}{slash}.$id;
-	mkdir($node);
-	unless ($! eq "") {
-               	$self->_addError("Couldn't create storage location: $node : $!");
-       	}
 	return $self; 
 }
 
@@ -374,8 +353,8 @@ The unique identifier for this file system storage location.
 sub get {
 	my $class = shift;
 	my $id = shift;
-	my $parts = _getStorageParts($id);
-	bless {_id => $id, _part1 => $parts->[0], _part2 => $parts->[1]}, $class;
+	$id =~ m/^(.{2})(.{2})/;
+	bless {_id => $id, _part1 => $1, _part2 => $2}, $class;
 }
 
 #-------------------------------------------------------------------
@@ -431,6 +410,7 @@ The filename of the file you wish to find out the type for.
 =cut
                                                                                                                                                        
 sub getFileExtension {
+	my $self = shift;
 	my $filename = shift;
         my $extension = lc($filename);
         $extension =~ s/.*\.(.*?)$/$1/;
@@ -453,9 +433,9 @@ The name of the file to get the icon for.
 sub getFileIconUrl {
 	my $self = shift;
 	my $filename = shift;
-	my $extension =  $self->getFileExtension($filename);	
+	my $extension = $self->getFileExtension($filename);	
 	my $path = $session{config}{extrasPath}.$session{os}{slash}."fileIcons".$session{os}{slash}.$extension.".gif";
-	if (-f $path) {
+	if (-e $path) {
 		return $session{config}{extrasURL}."/fileIcons/".$extension.".gif";
 	}
 	return $session{config}{extrasURL}."/fileIcons/unknown.gif";

@@ -13,10 +13,11 @@ package WebGUI::Macro::Navigation;
 use strict;
 use WebGUI::Macro;
 use WebGUI::Session;
-use WebGUI::Navigation;
+#use WebGUI::Navigation;
 
 #-------------------------------------------------------------------
 sub process {
+	return "Nav disabled.";
         my @param = WebGUI::Macro::getParams($_[0]);
 
 	my $identifier = $param[0];

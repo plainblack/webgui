@@ -4,10 +4,12 @@ package WebGUI::Asset;
 
 use strict;
 use Tie::IxHash;
+use WebGUI::AdminConsole;
 use WebGUI::Clipboard;
 use WebGUI::DateTime;
 use WebGUI::ErrorHandler;
 use WebGUI::Form;
+use WebGUI::FormProcessor;
 use WebGUI::Grouping;
 use WebGUI::HTTP;
 use WebGUI::Icon;
@@ -15,6 +17,7 @@ use WebGUI::Id;
 use WebGUI::Privilege;
 use WebGUI::Session;
 use WebGUI::SQL;
+use WebGUI::TabForm;
 use WebGUI::Utility;
 
 
@@ -90,7 +93,7 @@ sub definition {
                 properties=>{
                                 title=>{
                                         fieldType=>'text',
-                                        defaultValue=>$definition->[0]->{className}
+                                        defaultValue=>$class->getName
                                         },
                                 menuTitle=>{
                                         fieldType=>'text',
@@ -841,7 +844,8 @@ sub www_editSave {
 		}
 	}
 	$object->update(\%data);
-	return $self->www_manageAssets if ($session{form}{afterEdit} eq "assetManager");
+	return $self->www_manageAssets if ($session{form}{afterEdit} eq "assetManager" && $session{form}{assetId} eq "new");
+	return $object->getParent->www_manageAssets if ($session{form}{afterEdit} eq "assetManager");
 	return $object->www_view;
 }
 

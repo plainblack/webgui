@@ -99,11 +99,15 @@ sub getEditForm {
 	my $tabform = $self->SUPER::getEditForm();
 	if ($self->get("filename") ne "") {
 		my $storage = WebGUI::Storage->get($self->get("storageId"));
+		$tabform->getTab("properties")->readOnly(
+			-label=>"Current File",
+			-value=>'<a href="'.$storage->getUrl($self->get("filename")).'"><img src="'.$storage->getFileIconUrl($self->get("filename")).'" alt="'.$self->get("filename").'" border="0" align="middle" /> '.$self->get("filename").'</a>'
+			);
 		
 	}
         $tabform->getTab("properties")->file(
                	-name=>"file",
-               	-label=>"File To Upload"
+               	-label=>"New File To Upload"
                	);
 	return $tabform;
 }
