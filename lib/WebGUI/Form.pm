@@ -453,7 +453,7 @@ sub group {
 =cut
 
 sub hidden {
-        return '<input type="hidden" name="'.$_[0]->{name}.'" value="'._fixQuotes($_[0]->{value}).'">';
+        return '<input type="hidden" name="'.$_[0]->{name}.'" value="'._fixQuotes($_[0]->{value}).'">'."\n";
 }
 
 
@@ -464,6 +464,10 @@ sub hidden {
  Returns a list of hidden fields. This is primarily to be used by
  the HTMLForm package, but we decided to make it a public method
  in case anybody else had a use for it.
+
+=item name
+
+ The name of this field.
 
 =item options 
 
@@ -479,16 +483,16 @@ sub hidden {
 sub hiddenList {
         my ($output, $key, $item);
         foreach $key (keys %{$_[0]->{options}}) {
-                foreach $item (@$_[0]->{value}) {
+                foreach $item (@{$_[0]->{value}}) {
                         if ($item eq $key) {
 				$output .= hidden({
-					name=>$key,
-					value=>$item
+					name=>$_[0]->{name},
+					value=>$key
 					});
                         }
                 }
         }
-        return $output;
+        return $output."\n";
 }
 
 

@@ -68,19 +68,51 @@ sub www_edit {
         $output = helpIcon(1,$namespace);
 	$output .= '<h1>'.WebGUI::International::get(12,$namespace).'</h1>';
 	$f = WebGUI::HTMLForm->new;
-	$f->raw($_[0]->fileProperty("image",6));
+	$f->raw(
+		-value=>$_[0]->fileProperty("image",6),
+		-uiLevel=>3
+		);
         %hash = (
                 right => WebGUI::International::get(15,$namespace),
                 left => WebGUI::International::get(16,$namespace),
                 center => WebGUI::International::get(17,$namespace)
                 );
-	$f->select("alignImage",\%hash,WebGUI::International::get(14,$namespace),[$_[0]->get("alignImage")]);
-	$f->raw($_[0]->fileProperty("attachment",9));
-	$f->text("linkTitle",WebGUI::International::get(7,$namespace),$_[0]->get("linkTitle"));
-        $f->url("linkURL",WebGUI::International::get(8,$namespace),$_[0]->get("linkURL"));
-	$f->yesNo("convertCarriageReturns",WebGUI::International::get(10,$namespace),$_[0]->get("convertCarriageReturns")
-		,'',' &nbsp; <span style="font-size: 8pt;">'.WebGUI::International::get(11,$namespace).'</span>');
-	$f->yesNo("allowDiscussion",WebGUI::International::get(18,$namespace),$_[0]->get("allowDiscussion"));
+	$f->select(
+		-name=>"alignImage",
+		-options=>\%hash,
+		-label=>WebGUI::International::get(14,$namespace),
+		-value=>[$_[0]->get("alignImage")],
+		-uiLevel=>3
+		);
+	$f->raw(
+		-value=>$_[0]->fileProperty("attachment",9),
+		-uiLevel=>1
+		);
+	$f->text(
+		-name=>"linkTitle",
+		-label=>WebGUI::International::get(7,$namespace),
+		-value=>$_[0]->get("linkTitle"),
+		-uiLevel=>3
+		);
+        $f->url(
+		-name=>"linkURL",
+		-label=>WebGUI::International::get(8,$namespace),
+		-value=>$_[0]->get("linkURL"),
+		-uiLevel=>3
+		);
+	$f->yesNo(
+		-name=>"convertCarriageReturns",
+		-label=>WebGUI::International::get(10,$namespace),
+		-value=>$_[0]->get("convertCarriageReturns"),
+		-subtext=>' &nbsp; <span style="font-size: 8pt;">'.WebGUI::International::get(11,$namespace).'</span>',
+		-uiLevel=>5
+		);
+	$f->yesNo(
+		-name=>"allowDiscussion",
+		-label=>WebGUI::International::get(18,$namespace),
+		-value=>$_[0]->get("allowDiscussion"),
+		-uiLevel=>5
+		);
 	$f->raw($_[0]->SUPER::discussionProperties);
 	$output .= $_[0]->SUPER::www_edit($f->printRowsOnly);
         return $output;

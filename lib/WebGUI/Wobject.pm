@@ -162,7 +162,7 @@ sub description {
 =cut
 
 sub discussionProperties {
-        my ($f,$editTimeout,$groupToModerate,%moderationType,$moderationType);
+        my ($f,$editTimeout,$interval, $units, $groupToModerate,%moderationType,$moderationType);
         %moderationType = (before=>WebGUI::International::get(567),after=>WebGUI::International::get(568));
         $f = WebGUI::HTMLForm->new;
         if ($_[0]->get("wobjectId") eq "new") {
@@ -173,15 +173,38 @@ sub discussionProperties {
                 $moderationType = $_[0]->get("moderationType");
         }
         $groupToModerate = $_[0]->get("groupToModerate") || 4;
-        $f->group("groupToPost",WebGUI::International::get(564),[$_[0]->get("groupToPost")]);
-        $f->interval("editTimeout",WebGUI::International::get(566),WebGUI::DateTime::secondsToInterval($editTimeout));
-        if ($session{setting}{useKarma}) {
+        $f->group(
+		-name=>"groupToPost",
+		-label=>WebGUI::International::get(564),
+		-value=>[$_[0]->get("groupToPost")],
+		-uiLevel=>7
+		);
+	($interval, $units) = WebGUI::DateTime::secondsToInterval($editTimeout);
+        $f->interval(
+		-name=>"editTimeout",
+		-label=>WebGUI::International::get(566),
+		-intervalValue=>$interval,
+		-unitsValue=>$units,
+		-uiLevel=>7
+		);
+        if ($session{setting}{useKarma} && $session{user}{uiLevel} <= 7) {
                 $f->integer("karmaPerPost",WebGUI::International::get(541),$_[0]->get("karmaPerPost"));
         } else {
                 $f->hidden("karmaPerPost",$_[0]->get("karmaPerPost"));
         }
-        $f->group("groupToModerate",WebGUI::International::get(565),[$groupToModerate]);
-        $f->select("moderationType",\%moderationType,WebGUI::International::get(569),[$moderationType]);
+        $f->group(
+		-name=>"groupToModerate",
+		-label=>WebGUI::International::get(565),
+		-value=>[$groupToModerate],
+		-uiLevel=>7
+		);
+        $f->select(
+		-name=>"moderationType",
+		-options=>\%moderationType,
+		-label=>WebGUI::International::get(569),
+		-value=>[$moderationType],
+		-uiLevel=>7
+		);
         return $f->printRowsOnly;
 }
 
@@ -895,13 +918,43 @@ sub www_edit {
 	$f->hidden("namespace",$_[0]->get("namespace")) if ($_[0]->get("wobjectId") eq "new");
 	$f->hidden("func","editSave");
 	$f->submit if ($_[0]->get("wobjectId") ne "new");
-	$f->readOnly($_[0]->get("wobjectId"),WebGUI::International::get(499));
+	$f->readOnly(
+		-value=>$_[0]->get("wobjectId"),
+		-label=>WebGUI::International::get(499),
+		-uiLevel=>3
+		);
 	$f->text("title",WebGUI::International::get(99),$title);
-	$f->yesNo("displayTitle",WebGUI::International::get(174),$displayTitle);
-	$f->yesNo("processMacros",WebGUI::International::get(175),$_[0]->get("processMacros"));
-	$f->select("templatePosition",WebGUI::Template::getPositions($session{page}{templateId}),WebGUI::International::get(363),[$templatePosition]);
-	$f->date("startDate",WebGUI::International::get(497),$startDate);
-	$f->date("endDate",WebGUI::International::get(498),$endDate);
+	$f->yesNo(
+		-name=>"displayTitle",
+		-label=>WebGUI::International::get(174),
+		-value=>$displayTitle,
+		-uiLevel=>5
+		);
+	$f->yesNo(
+		-name=>"processMacros",
+		-label=>WebGUI::International::get(175),
+		-value=>$_[0]->get("processMacros"),
+		-uiLevel=>5
+		);
+	$f->select(
+		-name=>"templatePosition",
+		-label=>WebGUI::International::get(363),
+		-value=>[$templatePosition],
+		-uiLevel=>5,
+		-options=>WebGUI::Template::getPositions($session{page}{templateId})
+		);
+	$f->date(
+		-name=>"startDate",
+		-label=>WebGUI::International::get(497),
+		-value=>$startDate,
+		-uiLevel=>9
+		);
+	$f->date(
+		-name=>"endDate",
+		-label=>WebGUI::International::get(498),
+		-value=>$endDate,
+		-uiLevel=>9
+		);
 	$f->HTMLArea("description",WebGUI::International::get(85),$_[0]->get("description"));
 	$f->raw($_[1]);
 	$f->submit;

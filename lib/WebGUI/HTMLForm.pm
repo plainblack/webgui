@@ -16,6 +16,7 @@ package WebGUI::HTMLForm;
 
 use CGI::Util qw(rearrange);
 use strict qw(vars refs);
+use WebGUI::DateTime;
 use WebGUI::Form;
 use WebGUI::International;
 use WebGUI::Session;
@@ -98,7 +99,7 @@ sub _subtext {
 #-------------------------------------------------------------------
 sub _tableFormRow {
 	unless ($_[0]->{_noTable}) {
-        	return '<tr><td class="formDescription" valign="top">'.$_[1].'</td><td class="tableData">'.$_[2].'</td></tr>';
+        	return '<tr><td class="formDescription" valign="top">'.$_[1].'</td><td class="tableData">'.$_[2]."</td></tr>\n";
 	} else {
 		return $_[2];
 	}
@@ -244,7 +245,8 @@ sub checkList {
         	$output .= _subtext($subtext);
                 $output = $self->_tableFormRow($label,$output);
 	} else {
-		hiddenList({
+		$output = WebGUI::Form::hiddenList({
+			name=>$name,
 			options=>$options,
 			value=>$value
 			});
@@ -325,6 +327,7 @@ sub combo {
                 $output = $self->_tableFormRow($label,$output);
         } else {
                 $output = WebGUI::Form::hiddenList({
+			name=>$name,
                         options=>$options,
                         value=>$value
                         });
@@ -398,7 +401,7 @@ sub date {
         } else {
                 $output = WebGUI::Form::hidden({
                         name=>$name,
-                        value=>$value
+                        value=>epochToSet($value)
                         });
         }
         $self->{_data} .= $output;
@@ -600,7 +603,8 @@ sub group {
                 $output = $self->_tableFormRow($label,$output);
         } else {
 		my $hashRef = WebGUI::SQL->quickHashRef("select groupId,groupName from groups");
-                hiddenList({
+                $output = WebGUI::Form::hiddenList({
+			name=>$name,
                         options=>$hashRef,
                         value=>$value
                         });
@@ -912,15 +916,15 @@ sub new {
         my ($noTable, $action, $method, $extras, $enctype, $tableExtras) =
                 rearrange([noTable, action, method, extras, enctype, tableExtras], @p);
 	$noTable = $noTable || 0;
-	$header = WebGUI::Form::formHeader({
+	$header = "\n\n".WebGUI::Form::formHeader({
 		action=>$action,
 		extras=>$extras,
 		method=>$method,
 		enctype=>$enctype
 		});
-	$header .= '<table '.$tableExtras.'>' unless ($noTable);
-	$footer = '</table>' unless ($noTable);
-	$footer .= '</form>';
+	$header .= "\n<table ".$tableExtras.'>' unless ($noTable);
+	$footer = "</table>\n" unless ($noTable);
+	$footer .= "</form>\n\n";
         bless {_noTable => $noTable, _header => $header, _footer => $footer, _data => ''}, $self;
 }
 
@@ -990,7 +994,7 @@ sub password {
                 $output = $self->_tableFormRow($label,$output);
         } else {
                 $output = WebGUI::Form::hidden({
-                        name=>$name.'_interval',
+                        name=>$name,
                         value=>$value
                         });
         }
@@ -1061,7 +1065,7 @@ sub phone {
                 $output = $self->_tableFormRow($label,$output);
         } else {
                 $output = WebGUI::Form::hidden({
-                        name=>$name.'_interval',
+                        name=>$name,
                         value=>$value
                         });
         }
@@ -1224,7 +1228,8 @@ sub radioList {
                 $output .= _subtext($subtext);
                 $output = $self->_tableFormRow($label,$output);
         } else {
-                hiddenList({
+                $output = WebGUI::Form::hiddenList({
+			name=>$name,
                         options=>$options,
                         value=>[$value]
                         });
@@ -1367,7 +1372,8 @@ sub select {
                 $output .= _subtext($subtext);
                 $output = $self->_tableFormRow($label,$output);
         } else {
-                hiddenList({
+                $output = WebGUI::Form::hiddenList({
+			name=>$name,
                         options=>$options,
                         value=>$value
                         });
@@ -1481,7 +1487,7 @@ sub text {
         	$output = $self->_tableFormRow($label,$output);
         } else {
                 $output = WebGUI::Form::hidden({
-                        name=>$name.'_interval',
+                        name=>$name,
                         value=>$value
                         });
         }
@@ -1631,7 +1637,7 @@ sub url {
         	$output = $self->_tableFormRow($label,$output);
         } else {
                 $output = WebGUI::Form::hidden({
-                        name=>$name.'_interval',
+                        name=>$name,
                         value=>$value
                         });
         }
@@ -1764,7 +1770,7 @@ sub zipcode {
         	$output = $self->_tableFormRow($label,$output);
         } else {
                 $output = WebGUI::Form::hidden({
-                        name=>$name.'_interval',
+                        name=>$name,
                         value=>$value
                         });
         }
