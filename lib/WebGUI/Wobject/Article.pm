@@ -189,7 +189,7 @@ sub www_view {
 		$var{"post.URL"} = WebGUI::Forum::UI::formatNewThreadURL($callback,$forum->get("forumId"));
         	$var{"post.label"} = WebGUI::International::get(24,$_[0]->get("namespace"));
 	}
-	my $templateId = $_[0]->getValue("templateId");
+	my $templateId = $_[0]->get("templateId");
         if ($session{form}{func} eq "editSave") {
                 $templateId = $_[0]->get("templateId");
         }
