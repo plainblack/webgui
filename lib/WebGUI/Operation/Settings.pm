@@ -103,17 +103,18 @@ sub www_editCompanyInformationSave {
 
 #-------------------------------------------------------------------
 sub www_editContentSettings {
-        my ($output, %notFoundPage, %htmlFilter, %editor, $f);
+        my ($output, %htmlFilter, %editor, $f, $pages);
+	$pages = WebGUI::SQL->buildHashRef("select pageId,menuTitle from page order by menuTitle");
         %htmlFilter = ('none'=>WebGUI::International::get(420), 'most'=>WebGUI::International::get(421), 
 		'javascript'=>WebGUI::International::get(526), 'all'=>WebGUI::International::get(419));
-        %notFoundPage = (1=>WebGUI::International::get(136), 4=>WebGUI::International::get(137));
         %editor = ('built-in'=>WebGUI::International::get(495), 'edit-on-pro'=>WebGUI::International::get(494));
         if (WebGUI::Privilege::isInGroup(3)) {
                 $output .= helpIcon(29);
                 $output .= '<h1>'.WebGUI::International::get(525).'</h1>';
                 $f = WebGUI::HTMLForm->new;
                 $f->hidden("op","editContentSettingsSave");
-                $f->select("notFoundPage",\%notFoundPage,WebGUI::International::get(141),[$session{setting}{notFoundPage}]);
+                $f->select("defaultPage",$pages,WebGUI::International::get(527),[$session{setting}{defaultPage}]);
+                $f->select("notFoundPage",$pages,WebGUI::International::get(141),[$session{setting}{notFoundPage}]);
                 $f->text("docTypeDec",WebGUI::International::get(398),$session{setting}{docTypeDec});
                 $f->yesNo("addEditStampToPosts",WebGUI::International::get(524),$session{setting}{addEditStampToPosts});
                 $f->select("filterContributedHTML",\%htmlFilter,WebGUI::International::get(418),[$session{setting}{filterContributedHTML}]);
@@ -133,6 +134,7 @@ sub www_editContentSettings {
 sub www_editContentSettingsSave {
         if (WebGUI::Privilege::isInGroup(3)) {
                 _saveSetting("addEditStampToPosts");
+                _saveSetting("defaultPage");
                 _saveSetting("notFoundPage");
                 _saveSetting("docTypeDec");
                 _saveSetting("filterContributedHTML");

@@ -682,7 +682,7 @@ INSERT INTO international VALUES (496,'WebGUI','Dansk','Hvilken editor bruges');
 INSERT INTO international VALUES (497,'WebGUI','Dansk','Start dato');
 INSERT INTO international VALUES (498,'WebGUI','Dansk','Slut dato');
 INSERT INTO international VALUES (499,'WebGUI','Dansk','Wobject ID');
-INSERT INTO international VALUES (518,'WebGUI','English','INBOX Notifications');
+INSERT INTO international VALUES (518,'WebGUI','English','Inbox Notifications');
 INSERT INTO international VALUES (519,'WebGUI','English','I would not like to be notified.');
 INSERT INTO international VALUES (520,'WebGUI','English','I would like to be notified via email.');
 INSERT INTO international VALUES (521,'WebGUI','English','I would like to be notified via email to pager.');
@@ -692,9 +692,24 @@ INSERT INTO international VALUES (523,'WebGUI','English','Notification');
 INSERT INTO international VALUES (524,'WebGUI','English','Add edit stamp to posts?');
 INSERT INTO international VALUES (525,'WebGUI','English','Edit Content Settings');
 INSERT INTO international VALUES (526,'WebGUI','English','Remove only JavaScript.');
-
-
-
+delete from international where internationalId=136 and namespace='WebGUI';
+delete from international where internationalId=137 and namespace='WebGUI';
+INSERT INTO international VALUES (527,'WebGUI','English','Default Home Page');
+delete from international where internationalId=83 and namespace='WebGUI';
+delete from international where internationalId=150 and namespace='WebGUI';
+delete from international where internationalId=382 and namespace='WebGUI';
+delete from international where internationalId=344 and namespace='WebGUI';
+INSERT INTO international VALUES (468,'WebGUI','English','Edit User Profile Category');
+INSERT INTO international VALUES (468,'WebGUI','Svenska','Redigera Användar Profil Kattegorier');
+INSERT INTO international VALUES (468,'WebGUI','Dansk','Rediger bruger profil kategori');
+INSERT INTO international VALUES (471,'WebGUI','English','Edit User Profile Field');
+INSERT INTO international VALUES (471,'WebGUI','Svenska','Redigera Användar Profil Attribut');
+INSERT INTO international VALUES (471,'WebGUI','Dansk','Rediger bruger profil felt');
+INSERT INTO international VALUES (159,'WebGUI','English','Inbox');
+INSERT INTO international VALUES (351,'WebGUI','English','Message');
+INSERT INTO international VALUES (353,'WebGUI','English','You have no messages in your Inbox at this time.');
+INSERT INTO international VALUES (354,'WebGUI','English','View Inbox.');
+INSERT INTO settings VALUES ('defaultPage','1');
 
 
 

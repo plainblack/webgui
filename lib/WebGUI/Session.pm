@@ -47,7 +47,7 @@ sub _getPageInfo {
 				$session{header}{status} = '404';
                 	}
         	} else {
-                	$pageId = 1;
+                	$pageId = $session{setting}{defaultPage};
         	}
 	}
 	%page = WebGUI::SQL->quickHash("select * from page where pageId='".$pageId."'",$_[1]);

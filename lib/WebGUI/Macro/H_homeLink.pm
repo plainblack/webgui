@@ -14,12 +14,14 @@ use strict;
 use WebGUI::International;
 use WebGUI::Macro;
 use WebGUI::Session;
+use WebGUI::SQL;
 
 #-------------------------------------------------------------------
 sub _replacement {
         my (@param, $temp);
         @param = WebGUI::Macro::getParams($1);
-	$temp = WebGUI::URL::gateway('home');
+	($temp) = WebGUI::SQL->quickArray("select urlizedTitle from page where pageId=$session{setting}{defaultPage}");
+	$temp = WebGUI::URL::gateway($temp);
 	if ($param[0] ne "linkonly") {
         	$temp = '<a class="homeLink" href="'.$temp.'">';
         	if ($param[0] ne "") {
