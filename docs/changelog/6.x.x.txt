@@ -2,3 +2,5 @@
 
  - HTTP header conforming P3P Compact Privacy Policy. This fixes IE6 cookie
    privacy problems. 
+ - Removed all the old styles. They now exist as themes in the user
+   contributions area of plainblack.com.
