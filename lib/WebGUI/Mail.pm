@@ -90,7 +90,9 @@ sub send {
         #body
         $message .= $_[2]."\n";
 	#footer
-	$message .= "\n".WebGUI::Macro::process($session{setting}{mailFooter});
+	$message .= "\n".$session{setting}{mailFooter}
+	#process macros on message
+	$message = WebGUI::Macro::process($message);
 	if ($session{setting}{smtpServer} =~ /\/sendmail/) {
 		if (open(MAIL,"| $session{setting}{smtpServer} -t -oi")) {
 			print MAIL $message;
