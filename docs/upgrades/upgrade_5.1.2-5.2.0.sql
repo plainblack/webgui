@@ -3109,6 +3109,7 @@ alter table SyndicatedContent drop column content;
 alter table SyndicatedContent drop column lastFetched;
 alter table SyndicatedContent add column templateId int not null default 1;
 INSERT INTO template VALUES (1,'Default Syndicated Content','<tmpl_if displayTitle>\r\n    <h1><tmpl_var title></h1>\r\n</tmpl_if>\r\n\r\n<tmpl_if description>\r\n    <tmpl_var description><p />\r\n</tmpl_if>\r\n\r\n<h1>\r\n<tmpl_if channel.link>\r\n     <a href=\"<tmpl_var channel.link>\" target=\"_blank\"><tmpl_var channel.title></a>    \r\n<tmpl_else>\r\n     <tmpl_var channel.title>\r\n</tmpl_if>\r\n</h1>\r\n\r\n<tmpl_if channel.description>\r\n    <tmpl_var channel.description><p />\r\n</tmpl_if>\r\n\r\n\r\n<tmpl_loop item_loop>\r\n<li>\r\n  <tmpl_if link>\r\n       <a href=\"<tmpl_var link>\" target=\"_blank\"><tmpl_var title></a>    \r\n    <tmpl_else>\r\n       <tmpl_var title>\r\n  </tmpl_if>\r\n     <tmpl_if description>\r\n        - <tmpl_var description>\r\n     </tmpl_if>\r\n     <br>\r\n\r\n</tmpl_loop>','SyndicatedContent');
+alter table collateral change thumbnailsize thumbnailSize int not null default 50;
 
 
 
