@@ -572,10 +572,10 @@ sub www_view {
 		) && 
 		not $session{var}{adminOn}
 	);
-#	if ($useCache) {
- #              	$cache = WebGUI::Cache->new("asset_".$self->getId."_".$session{user}{userId});
-  #         	$output = $cache->get;
-#	}
+	if ($useCache) {
+               	$cache = WebGUI::Cache->new("wobject_".$self->getId."_".$session{user}{userId});
+           	$output = $cache->get;
+	}
 	unless ($output) {
 		$output = $self->processStyle($self->view);
 		my $ttl;
@@ -584,7 +584,7 @@ sub www_view {
 		} else {
 			$ttl = $self->get("cacheTimeout");
 		}
-#		$cache->set($output, $ttl) if ($useCache && !WebGUI::HTTP::isRedirect());
+		$cache->set($output, $ttl) if ($useCache && !WebGUI::HTTP::isRedirect());
 	}
 	return $output;
 }

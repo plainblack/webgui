@@ -256,9 +256,8 @@ sub page {
         my $url;
         if ($useFullUrl) {
                 $url = getSiteURL();
-        } else {
-                $url = getScriptURL();
         }
+        $url .= getScriptURL();
        	my $pathinfo = $session{env}{PATH_INFO};
 	$pathinfo =~ s/^\/(.*)/$1/;
         $url .= $pathinfo;
