@@ -7,6 +7,15 @@ upgrading from one version to the next, or even between multiple
 versions. Be sure to heed the warnings contained herein as they will
 save you many hours of grief.
 
+
+4.9.3
+--------------------------------------------------------------------
+ * The import utilities imImport.pl and dmImport.pl have been
+	renamed to imageCollateralImport.pl and fileManagerImport.pl
+	respectively. Please delete imImport.pl and dmImport.pl from
+	your sbin folder.
+
+
 4.9.2
 --------------------------------------------------------------------
  * If you upgraded to any of the previous betas before the release
@@ -17,6 +26,7 @@ save you many hours of grief.
 
 	update collateralFolder set parentId=parentId+999 where 
 	collateralFolderId>0 and collateralFolderId<1000;
+
 
 4.9.0
 --------------------------------------------------------------------
@@ -37,6 +47,7 @@ save you many hours of grief.
 	considerably. This is due to the new UI Levels. If you wish
 	see all the form elements then use the user manager to edit
 	your user profile and set your UI Level to 9.
+
 
 4.7.0
 --------------------------------------------------------------------
