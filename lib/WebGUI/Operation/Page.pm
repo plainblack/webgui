@@ -173,7 +173,11 @@ sub www_cutPage {
         if ($session{page}{pageId} < 26) {
                 return WebGUI::Privilege::vitalComponent();
         } elsif (WebGUI::Privilege::canEditPage()) {
-                WebGUI::SQL->write("update page set parentId=2 where pageId=".$session{page}{pageId});
+                WebGUI::SQL->write("update page set parentId=2, "
+                        ."bufferUserId=".$session{user}{userId}.", "
+                        ."bufferDate=".time().", "
+                        ."bufferPrevId=".$session{page}{parentId}." "
+                        ."where pageId=".$session{page}{pageId});
 		_reorderPages($session{page}{parentId});
                 WebGUI::Session::refreshPageInfo($session{page}{parentId});
                 return "";
@@ -206,7 +210,11 @@ sub www_deletePageConfirm {
 	if ($session{page}{pageId} < 1000 && $session{page}{pageId} > 0) {
 		return WebGUI::Privilege::vitalComponent();
         } elsif (WebGUI::Privilege::canEditPage()) {
-		WebGUI::SQL->write("update page set parentId=3 where pageId=".$session{page}{pageId});
+                WebGUI::SQL->write("update page set parentId=3, "
+                        ."bufferUserId=".$session{user}{userId}.", "
+                        ."bufferDate=".time().", "
+                        ."bufferPrevId=".$session{page}{parentId}." "
+                        ."where pageId=".$session{page}{pageId});
 		_reorderPages($session{page}{parentId});
 		WebGUI::Session::refreshPageInfo($session{page}{parentId});
                 return "";
@@ -547,7 +555,9 @@ sub www_pastePage {
 	($nextSeq) = WebGUI::SQL->quickArray("select max(sequenceNumber) from page where parentId=$session{page}{pageId}");
 	$nextSeq += 1;
         if (WebGUI::Privilege::canEditPage()) {
-                WebGUI::SQL->write("update page set parentId=$session{page}{pageId}, sequenceNumber='$nextSeq' where pageId=$session{form}{pageId}");
+		WebGUI::SQL->write("update page set parentId=$session{page}{pageId}, sequenceNumber='$nextSeq', "
+				  ."bufferUserId=NULL, bufferDate=NULL, bufferPrevId=NULL "
+				  ."where pageId=$session{form}{pageId}");
 		_reorderPages($session{page}{pageId});
                 return "";
         } else {

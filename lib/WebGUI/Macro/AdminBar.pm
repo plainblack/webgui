@@ -51,13 +51,25 @@ sub process {
   #--clipboard paster
 	%hash2 = ();
 	$hash2{WebGUI::URL::page()} = WebGUI::International::get(3);
-	%hash = WebGUI::SQL->buildHash("select pageId,title from page where parentId=2 order by title");
+	# pages
+	if ($session{setting}{sharedClipboard} eq "1") {
+		%hash = WebGUI::SQL->buildHash("select pageId, title from page where parentId=2 order by bufferDate desc");
+	} else {
+		%hash = WebGUI::SQL->buildHash("select pageId, title from page where parentId=2 "
+					."and bufferUserId=". $session{user}{userId}. " order by bufferDate desc");
+	}
 	foreach $key (keys %hash) {
 		$hash2{WebGUI::URL::page('op=pastePage&pageId='.$key)} = $hash{$key};
 	}
-        %hash = WebGUI::SQL->buildHash("select wobjectId,title from wobject where pageId=2 order by title");
+	# wobjects
+	if ($session{setting}{sharedClipboard} eq "1") {
+		%hash = WebGUI::SQL->buildHash("select wobjectId, title from wobject where pageId=2 order by bufferDate desc");
+	} else {
+		%hash = WebGUI::SQL->buildHash("select wobjectId, title from wobject where pageId=2 "
+					."and bufferUserId=". $session{user}{userId} ." order by bufferDate desc");
+	}
         foreach $key (keys %hash) {
-                $hash2{WebGUI::URL::page('func=paste&wid='.$key)} = $hash{$key};
+		$hash2{WebGUI::URL::page('func=paste&wid='.$key)} = $hash{$key};
         }
         $clipboardSelect = WebGUI::Form::selectList({
 		name=>"clipboardSelect",
@@ -71,7 +83,6 @@ sub process {
 			WebGUI::URL::page('op=listGroups')=>WebGUI::International::get(5), 
 			WebGUI::URL::page('op=manageSettings')=>WebGUI::International::get(4), 
 			WebGUI::URL::page('op=listUsers')=>WebGUI::International::get(7),
-			WebGUI::URL::gateway('trash')=>WebGUI::International::get(10),
 			WebGUI::URL::page('op=listRoots')=>WebGUI::International::get(410),
 			WebGUI::URL::page('op=viewStatistics')=>WebGUI::International::get(144)
 		);
@@ -80,8 +91,10 @@ sub process {
         	%hash = ( 
 			'http://validator.w3.org/check?uri=http%3A%2F%2F'.$session{env}{SERVER_NAME}.
 				WebGUI::URL::page()=>WebGUI::International::get(399),
-			WebGUI::URL::page('op=viewPageTree')=>WebGUI::International::get(447),
+			WebGUI::URL::page('op=manageClipboard')=>WebGUI::International::get(949),
                         WebGUI::URL::page('op=listCollateral')=>WebGUI::International::get(394),
+			WebGUI::URL::page('op=viewPageTree')=>WebGUI::International::get(447),
+			WebGUI::URL::page('op=manageTrash')=>WebGUI::International::get(10),
 			%hash
 		);
 	}

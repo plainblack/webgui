@@ -260,11 +260,16 @@ If specified the wobject will be duplicated to this pageId, otherwise it will be
 sub duplicate {
 	my %properties = %{$_[0]->get};
 	$properties{pageId} = $_[1] || 2;
+	if ($properties{pageId} == 2)  {
+		$properties{bufferUserId} = $session{user}{userId};
+		$properties{bufferDate} = time();
+		$properties{bufferPrevId} = {};
+	}
 	delete $properties{wobjectId};
 	my $cmd = "WebGUI::Wobject::".$properties{namespace};
         my $w = eval{$cmd->new({namespace=>$properties{namespace},wobjectId=>"new"})};
         if ($@) {
-        	WebGUI::ErrorHandler::warn("Could duplicate wobject ".$properties{namespace}." because: ".$@);
+        	WebGUI::ErrorHandler::warn("Couldn't duplicate wobject ".$properties{namespace}." because: ".$@);
 	}
 	$w->set(\%properties);
 	WebGUI::Discussion::duplicate($_[0]->get("wobjectId"),$w->get("wobjectId")) unless ($_[2]);
@@ -648,6 +653,15 @@ sub new {
 			}, 
 		userDefined5=>{
 			fieldType=>"text"
+			}, 
+		bufferUserId=>{
+			fieldType=>"integer"
+			}, 
+		bufferDate=>{
+			fieldType=>"integer"
+			}, 
+		bufferPrevId=>{
+			fieldType=>"integer"
 			}, 
 		allowDiscussion=>{
 			fieldType=>"yesNo",
@@ -1067,7 +1081,10 @@ Moves this instance to the clipboard.
 
 sub www_cut {
         if (WebGUI::Privilege::canEditPage()) {
-		$_[0]->set({pageId=>2, templatePosition=>1});
+		$_[0]->set({pageId=>2, templatePosition=>1,
+			    bufferUserId=>$session{user}{userId},
+			    bufferDate=>time(),
+			    bufferPrevId=>$session{page}{pageId}});
 		_reorderWobjects($session{page}{pageId});
                 return "";
         } else {
@@ -1113,7 +1130,10 @@ Moves this instance to the trash.
 
 sub www_deleteConfirm {
         if (WebGUI::Privilege::canEditPage()) {
-		$_[0]->set({pageId=>3, templatePosition=>1});
+		$_[0]->set({pageId=>3, templatePosition=>1,
+                        bufferUserId=>$session{user}{userId},
+                        bufferDate=>time(),
+                        bufferPrevId=>$session{page}{pageId}});
 		WebGUI::ErrorHandler::audit("moved Wobject ".$_[0]->{_property}{wobjectId}." to the trash.");
 		_reorderWobjects($_[0]->get("pageId"));
                 return "";
@@ -1481,7 +1501,12 @@ sub www_paste {
         if (WebGUI::Privilege::canEditPage()) {
 		($nextSeq) = WebGUI::SQL->quickArray("select max(sequenceNumber) from wobject where pageId=$session{page}{pageId}");
 		$nextSeq += 1;
-		$_[0]->set({sequenceNumber=>$nextSeq, pageId=>$session{page}{pageId}, templatePosition=>1});
+		WebGUI::SQL->write("UPDATE wobject SET "
+					."pageId=". $session{page}{pageId} .", "
+					."templatePosition=1, "
+					."sequenceNumber=". $nextSeq .", "
+                            		."bufferUserId=NULL, bufferDate=NULL, bufferPrevId=NULL "
+					."WHERE wobjectId=". $session{form}{wid} );
                 return "";
         } else {
                 return WebGUI::Privilege::insufficient();

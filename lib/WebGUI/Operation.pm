@@ -13,6 +13,7 @@ package WebGUI::Operation;
 use strict;
 use WebGUI::Operation::Account;
 use WebGUI::Operation::Admin;
+use WebGUI::Operation::Clipboard;
 use WebGUI::Operation::Collateral;
 use WebGUI::Operation::Group;
 use WebGUI::Operation::Help;

@@ -153,7 +153,10 @@ sub _processFunctions {
                                                 and WobjectProxy.proxiedWobjectId=".${$wobject}{wobjectId});
                                         ${$wobject}{_WobjectProxy} = $proxyWobjectId;
                                 }
-                                unless (${$wobject}{pageId} == $session{page}{pageId} || ${$wobject}{pageId} == 2 || ${$wobject}{_WobjectProxy} ne "") {
+                                unless (${$wobject}{pageId} == $session{page}{pageId}
+								|| ${$wobject}{pageId} == 2
+								|| ${$wobject}{pageId} == 3
+								|| ${$wobject}{_WobjectProxy} ne "") {
                                         $output .= WebGUI::International::get(417);
                                         WebGUI::ErrorHandler::security("access wobject [".$session{form}{wid}."] on page '"
                                                 .$session{page}{title}."' [".$session{page}{pageId}."].");

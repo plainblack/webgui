@@ -153,6 +153,8 @@ sub www_editMiscSettings {
         $output .= '<h1>'.WebGUI::International::get(140).'</h1>';
 	$f = WebGUI::HTMLForm->new;
         $f->hidden("op","saveSettings");
+	$f->yesNo("sharedClipboard",WebGUI::International::get(947),$session{setting}{sharedClipboard});
+	$f->yesNo("sharedTrash",WebGUI::International::get(946),$session{setting}{sharedTrash});
 	$f->yesNo("preventProxyCache",WebGUI::International::get(400),$session{setting}{preventProxyCache});
 	$f->yesNo("showDebug",WebGUI::International::get(707),$session{setting}{showDebug});
 	$f->yesNo("trackPageStatistics",WebGUI::International::get(749),$session{setting}{trackPageStatistics});

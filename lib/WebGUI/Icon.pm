@@ -20,8 +20,9 @@ use WebGUI::Session;
 use WebGUI::URL;
 
 our @ISA = qw(Exporter);
-our @EXPORT = qw(&helpIcon &becomeIcon &cutIcon &copyIcon &deleteIcon &editIcon &moveUpIcon &moveDownIcon
-	&moveRightIcon &moveLeftIcon &wobjectIcon &pageIcon &moveTopIcon &moveBottomIcon &viewIcon);
+our @EXPORT = qw(&helpIcon &becomeIcon &cutIcon &copyIcon &deleteIcon &editIcon
+	&moveBottomIcon &moveDownIcon &moveLeftIcon &moveRightIcon &moveTopIcon &moveUpIcon
+	&pageIcon &pasteIcon &wobjectIcon &viewIcon);
 
 =head1 NAME
 
@@ -46,6 +47,7 @@ A package for generating user interface buttons. The subroutines found herein do
  $html = moveTopIcon('op=something');
  $html = moveUpIcon('op=something');
  $html = pageIcon();
+ $html = pasteIcon('op=something');
  $html = viewIcon('op=something');
  $html = wobjectIcon();
 
@@ -373,6 +375,34 @@ Generates an icon that looks like a page. It's purpose is to represent whether y
 
 sub pageIcon {
         return '<img src="'.$session{config}{extrasURL}.'/toolbar/'.$session{language}{toolbar}.'/page.gif" align="middle" border="0" alt="Page Settings" title="Page Settings" />';
+}
+
+#-------------------------------------------------------------------
+
+=head2 pasteIcon ( urlParameters [, pageURL ] )
+
+Generates a button with the word "Paste" printed on it.
+
+=over
+
+=item urlParameters
+
+Any URL parameters that need to be tacked on to the current URL to accomplish whatever function this button represents.
+
+=item pageURL
+
+The URL to any page. Defaults to the current page.
+
+=back
+
+=cut
+
+sub pasteIcon {
+        my ($output, $pageURL);
+        $pageURL = $_[1] || $session{page}{urlizedTitle};
+        $output = '<a href="'.WebGUI::URL::gateway($pageURL,$_[0]).'">';
+        $output .= '<img src="'.$session{config}{extrasURL}.'/toolbar/'.$session{language}{toolbar}.'/paste.gif" align="middle" border="0" alt="Paste" title="Paste" /></a>';
+        return $output;
 }
 
 #-------------------------------------------------------------------
