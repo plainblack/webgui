@@ -3,6 +3,7 @@ package WebGUI::i18n::English::Poll;
 our $I18N = {
 	'74' => {
 		message => q|The following variables are available to the poll template:
+<p>
 
 <b>canVote</b><br>
 A condition indicating whether the user has the right to vote on this poll.
@@ -13,7 +14,7 @@ The poll question.
 <p>
 
 <b>form.start</b><br>
-The beginning of the vote form.
+The beginning of the poll form.
 <p>
 
 <b>answer_loop</b><br>
@@ -37,7 +38,6 @@ The number of this answer. As in 1, 2, 3, etc.
 <b>answer.graphWidth</b><br>
 The width that the graph should be rendered for this answer. Based upon a percentage of the total graph size.
 <p>
-
 
 <b>answer.percent</b><br>
 The percentage of the vote that this answer has received.
@@ -67,7 +67,7 @@ The total number of votes that have been placed on this poll.
 <p>
 
 |,
-		lastUpdated => 1050183668
+		lastUpdated => 1102115797,
 	},
 
 	'6' => {
