@@ -636,7 +636,10 @@ oTags[i].outerHTML = oTags[i].innerHTML;
 
     // insert image
     else if (cmdID.toLowerCase() == 'insertimage'){
-      showModalDialog(_editor_url + "popups/insert_image.html", editdoc, "resizable: no; help: no; status: no; scroll: no; ");
+	var args = new Array();
+	args[0] = editdoc;
+	args[1] = window;
+      showModalDialog(_editor_url + "popups/insert_image.html", args, "resizable: no; help: no; status: no; scroll: no; ");
     }
 
     // insert table

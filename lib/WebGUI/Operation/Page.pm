@@ -495,7 +495,7 @@ sub www_editPageSave {
         WebGUI::SQL->write("update page set 
 		title=".quote($session{form}{title}).", 
 		styleId=$session{form}{styleId}, 
-		ownerId=$session{form}{ownerId}, 
+		ownerId=($session{form}{ownerId} || 3), 
 		groupIdView=$session{form}{groupIdView}, 
 		groupIdEdit=$session{form}{groupIdEdit}, 
 		newWindow=$session{form}{newWindow},

@@ -68,6 +68,16 @@ sub get {
                 <title>'.$session{page}{title}.' - '.$session{setting}{companyName}.'</title>
         ';
         $header .= $style{styleSheet}.$session{page}{metaTags};
+	$header .= '
+		<script>
+			function getWebguiProperty (propName) {
+				var props = new Array();
+				props["extrasURL"] = "'.$session{config}{extrasURL}.'";
+				props["pageURL"] = "'.$session{page}{url}.'";
+				return props[propName];
+			}
+		</script>
+		';
         if ($session{var}{adminOn}) {
                 # This "triple incantation" panders to the delicate tastes of various browsers for reliable cache suppression.
                 $header .= '<meta http-equiv="Pragma" content="no-cache" />';
