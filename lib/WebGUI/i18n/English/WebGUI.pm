@@ -4547,7 +4547,7 @@ forms that WebGUI generates to be customized on a site-by-site basis.
 <P><B>Text Box Size</B><BR>This setting specifies how many characters can be displayed at once in text boxes on the site. 
 
 
-		<b>Anonymous Registration</b><br>
+<p><b>Anonymous Registration</b><br>
 Do you wish visitors to your site to be able to register themselves?
 <br><br>
 
@@ -4647,7 +4647,7 @@ Just as the LDAP Identity Name is a label, so is the LDAP Password Name. Use thi
 <p>
 
 |,
-		lastUpdated => 1101775542,
+		lastUpdated => 1111984337,
 	},
 
 	'account' => {

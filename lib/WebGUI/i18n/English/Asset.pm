@@ -80,25 +80,25 @@ Select yes to open this asset in a new window.<br>
 
 <p>
 <b>Encrypt page?</b><br>
-Should this page be served over SSL?<br>
+Should this page containing this asset be served over SSL?<br>
 <i>UI level: 6</i>
 </p>
 
 <p>
 <b>^International("497","Asset");</b><br>
-The date when users may begin viewing this page. Before this date only Content Managers with the rights to edit this page will see it<br>
+The date when users may begin viewing this asset. Before this date only Content Managers with the rights to edit this asset will see it<br>
 <i>UI level: 6</i>.
 </p>
 
 <p>
 <b>^International("498","Asset");</b><br>
-The date when users will stop viewing this page. After this date only Content Managers with the rights to edit this page will see it.<br>
+The date when users will stop viewing this asset. After this date only Content Managers with the rights to edit this asset will see it.<br>
 <i>UI level: 6</i>
 </p>
 
 <p>
 <b>^International("108","Asset");</b><br>
-The owner of a page is usually the person who created the page. This user always has full edit and viewing rights on the page.<br>
+The owner of a asset is usually the person who created the asset. This user always has full edit and viewing rights on the asset.<br>
 <i>UI level: 6</i>
 </p>
 
@@ -108,13 +108,13 @@ The owner of a page is usually the person who created the page. This user always
 
 <p>
 <b>^International("872","Asset");</b><br>
-Choose which group can view this page. If you want both visitors and registered users to be able to view the page then you should choose the "Everybody" group.<br>
+Choose which group can view this asset. If you want both visitors and registered users to be able to view the asset then you should choose the "Everybody" group.<br>
 <i>UI level: 6</i>
 </p>
 
 <p>
 <b>^International("871","Asset");</b><br>
-Choose the group that can edit this page. The group assigned editing rights can also always view the page.<br>
+Choose the group that can edit this asset. The group assigned editing rights can also always view the asset.<br>
 <i>UI level: 6</i>
 </p>
 
@@ -146,7 +146,7 @@ Chances are if you like assets to be configured a certain way, then you'll find 
 
         |,
         context => q|Describing the form to add or edit an Asset.|,
-        lastUpdated => 1111801111,
+        lastUpdated => 1111984345,
   },
 
     'asset fields title' => {
