@@ -51,7 +51,9 @@
    feature. 
  - Added new asset type: File Pile. This allows you to do a mass upload of
    files and images.
- - Added CDG Commerce iTransact payment plugin. (Martin Kamerbeek)
+ - Added a privilege access handler to the uploads file system.
+ - Added CDG Commerce iTransact payment plugin.
+
 
 6.2.9
  - bugfix [ 1058105 ] input tag has to be closed with /

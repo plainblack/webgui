@@ -878,12 +878,12 @@ sub setRank {
 		if (isBetween($sibling->getRank, $newRank, $currentRank)) {
 			$sibling->cascadeLineage($previous);
 			$previous = $sibling->get("lineage");
-			$sibling->updateHistory("changed rank");
 		}
 	}
 	$self->cascadeLineage($previous,$temp);
 	$self->{_properties}{lineage} = $previous;
 	WebGUI::SQL->commit;
+	$self->updateHistory("changed rank");
 	return 1;
 }
 

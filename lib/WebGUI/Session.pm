@@ -25,6 +25,7 @@ use WebGUI::Config;
 use WebGUI::ErrorHandler;
 use WebGUI::SQL;
 use WebGUI::Utility;
+use URI::Escape;
 
 our @ISA = qw(Exporter);
 our @EXPORT = qw(%session);
@@ -344,7 +345,7 @@ sub open {
 	###----------------------------
 	### cookies
 	foreach ($session{cgi}->cookie) {
-		$session{cookie}{$_} = $session{cgi}->cookie($_);
+			$session{cookie}{$_} = $session{cgi}->cookie($_);
 	}
 	###----------------------------
 	### session variables 

@@ -6,11 +6,11 @@ The following is a rough overview of how to install WebGUI. For
 more detailed instructions read the WebGUI installation 
 documentation.
    
-   http://plainblack.com/installation
+   http://www.plainblack.com/installing_webgui
 
 QnD INSTALL INSTRUCTIONS:
 
-1. Install Perl 5.6.x or greater.
+1. Install Perl 5.6.x or greater. (5.8.x recommended)
 
 2. Install the following Perl modules:
 

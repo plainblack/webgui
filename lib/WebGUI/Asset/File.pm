@@ -160,8 +160,11 @@ sub processPropertiesFromFormPost {
 		$data{url} = $self->getParent->getUrl.'/'.$filename unless ($session{form}{url});
 		$self->update(\%data);
 		$self->setSize($storage->getFileSize($filename));
+		$storage->setPrivileges($self->get("ownerUserId"), $self->get("groupIdView"), $self->get("groupIdEdit"));
 	} else {
 		$storage->delete;
+		my $storage = WebGUI::Storage->get($self->get("storageId"));
+		$storage->setPrivileges($self->get("ownerUserId"), $self->get("groupIdView"), $self->get("groupIdEdit"));
 	}
 }
 

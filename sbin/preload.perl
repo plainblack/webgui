@@ -1,15 +1,15 @@
 #!/usr/bin/perl
-use strict;
 
 my $webguiRoot;
 
 BEGIN {
-        $webguiRoot = "/data/WebGUI"; # Edit to match your WebGUI installation directory.
+        $webguiRoot = "/data/WebGUI";
         unshift (@INC, $webguiRoot."/lib");
 }
 
 $|=1;
 
+use strict;
 print "\nStarting WebGUI ".$WebGUI::VERSION."\n";
 $ENV{GATEWAY_INTERFACE} =~ /^CGI-Perl/ or die "GATEWAY_INTERFACE not Perl!";
 

@@ -65,6 +65,7 @@ This package provides a mechanism for storing and retrieving files that are not 
  $store->delete;
  $store->deleteFile($filename);
  $store->rename($filename, $newFilename);
+ $store->setPrivileges($userId, $groupIdView, $groupIdEdit);
 
 =head1 METHODS
 
@@ -601,6 +602,36 @@ sub renameFile {
 	my $newFilename = shift;
         rename $self->getPath($filename), $self->getNode->getPath($newFilename);
 }
+
+
+#-------------------------------------------------------------------
+
+=head2 setPrivileges ( ownerUserId, groupIdView, groupIdEdit )
+
+Set filesystem level privileges for this file. Used with the uploads access handler.
+
+=head3 ownerUserId
+
+The userId of the owner of this storage location.
+
+=head3 groupIdView
+
+The groupId that is allowed to view the files in this storage location.
+
+=head3 groupIdEdit
+
+The groupId that is allowed to edit the files in this storage location.
+
+=cut
+
+sub setPrivileges {
+	my $self = shift;
+	my $owner = shift;
+	my $viewGroup = shift;
+	my $editGroup = shift;
+	$self->addFileFromScalar(".wgaccess",$owner."\n".$viewGroup."\n".$editGroup);
+}
+
 
 
 #-------------------------------------------------------------------
