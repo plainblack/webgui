@@ -32,9 +32,7 @@ sub _traversePageTree {
 	$depth = $_[2] || 99;
 	$indent = $_[3];
         $alphabetic = $_[4];
-        for ($i=1;$i<=($indent*$currentDepth);$i++) {
-                $indentString .= "&nbsp;";
-        }
+        $indentString = "&nbsp;" x ($indent*$currentDepth);
         if ($currentDepth < $depth) {
                 if ($alphabetic) {
                         $orderBy = 'title';
