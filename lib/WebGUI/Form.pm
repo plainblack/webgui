@@ -1127,7 +1127,7 @@ sub radioList {
         my ($output, $key, $checked);
         foreach $key (keys %{$_[0]->{options}}) {
 		$checked = 0;
-                $checked = 1 if ($key $_[0]->{value});
+                $checked = 1 if ($key eq $_[0]->{value});
 		$output .= radio({
 			name=>$_[0]->{name},
 			value=>$key,
