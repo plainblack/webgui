@@ -90,7 +90,7 @@ sub duplicate {
 			$row[6] = getNextId("recurringEventId");
 			$previousRecurringEventId = $row[6];
 		}
-               	WebGUI::SQL->write("insert into EventsCalendar_event values ($newEventId, ".$_[0]->get("wobjectId").", ".
+               	WebGUI::SQL->write("insert into EventsCalendar_event values ($newEventId, ".$w->get("wobjectId").", ".
 			quote($row[2]).", ".quote($row[3]).", '".$row[4]."', '".$row[5]."', $row[6])");
 	}
 	$sth->finish;
