@@ -2021,7 +2021,7 @@ Choose the default language for this page. All WebGUI generated messages will ap
 <P><B>NOTE:</B> Page caching is only available if your administrator has installed the Cache::FileCache Perl module. Using page caching can improve site performance by as much as 1000%.&nbsp;
 
 
-<b>Template</b><br>
+<P><b>Template</b><br>
 By default, WebGUI has one big content area to place wobjects. However, by specifying a template other than the default you can sub-divide the content area into several sections.
 <p>
 
@@ -2048,6 +2048,10 @@ By default, when you create a page, it inherits a few traits from its parent. On
 If you select "Yes" below the style pull-down menu, all of the pages below this page will take on the style you've chosen for this page.
 <p>
 
+<b>Printable Style</b><br>
+This sets the printable style for this page to be something other than the WebGUI Default Printable Style.
+<p>
+
 <b>Start Date</b><br>
 The date when users may begin viewing this page. Note that before this date only content managers with the rights to edit this page will see it.
 <p>
@@ -2055,7 +2059,6 @@ The date when users may begin viewing this page. Note that before this date only
 <b>End Date</b><br>
 The date when users will stop viewing this page. Note that after this date only content managers with the rights to edit this page will see it.
 <p>
-
 
 <b>Owner</b><br>
 The owner of a page is usually the person who created the page. This user always has full edit and viewing rights on the page.
@@ -2076,13 +2079,14 @@ Choose the group that can edit this page. The group assigned editing rights can 
 Allows content managers to specify view/edit privileges on a per wobject basis rather than relying on the privileges on the page.
 <p>
 
-You can optionally recursively give these privileges to all pages under this page.
+<b>Recursively set privileges?</b><br>
+You can optionally give the privileges of this page to all pages under this page.
 <p>
 
 <b>What next?</b><br/>
 If you leave this on the default setting you'll be redirected to the new page after creating it.
 <p/>|,
-		lastUpdated =>  1099004008
+		lastUpdated =>  1102031032,
 	},
 
 	'60' => {
