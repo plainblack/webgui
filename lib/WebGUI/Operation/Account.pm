@@ -86,13 +86,14 @@ sub _logLogin {
 sub _validateProfileData {
 	my (%data, $error, $a, %field);
 	tie %field, 'Tie::CPHash';
-        $a = WebGUI::SQL->read("select * from userProfileField");
+        $a = WebGUI::SQL->read("select dataType,fieldName,fieldLabel,required from userProfileField");
         while (%field = $a->hash) {
-		if ($field{fieldType} eq "date") {
-			$session{form}{$field{fieldName}} = setToEpoch($session{form}{$field{fieldName}});
+		if ($field{dataType} eq "date") {
+			$data{$field{fieldName}} = WebGUI::DateTime::setToEpoch($session{form}{$field{fieldName}});
+		} elsif (exists $session{form}{$field{fieldName}}) {
+			$data{$field{fieldName}} = $session{form}{$field{fieldName}};
 		}
-		$data{$field{fieldName}} = $session{form}{$field{fieldName}} if (exists $session{form}{$field{fieldName}});
-		if ($field{required} && $session{form}{$field{fieldName}} eq "") {
+		if ($field{required} && $data{$field{fieldName}} eq "") {
 			$error .= '<li>';
 			$error .= eval $field{fieldLabel};
 			$error .= ' '.WebGUI::International::get(451);

@@ -393,7 +393,7 @@ sub www_editUserProfileSave {
         $u = WebGUI::User->new($session{form}{uid});
       	$a = WebGUI::SQL->read("select * from userProfileField");
       	while (%field = $a->hash) {
-               	if ($field{fieldType} eq "date") {
+               	if ($field{dataType} eq "date") {
                        	$session{form}{$field{fieldName}} = setToEpoch($session{form}{$field{fieldName}});
                	}
                	$u->profileField($field{fieldName},$session{form}{$field{fieldName}}) if (exists $session{form}{$field{fieldName}});
