@@ -1,11 +1,5 @@
 package WebGUI::Authentication;
 
-
-#-------------------------------------------------------------------
-# This module is Copyright 2002 by M. Kamerbeek of Procolix 
-# (procolix.com) for WebGUI and released under GNU/GPL. 
-#-------------------------------------------------------------------
-
 #-------------------------------------------------------------------
 # WebGUI is Copyright 2001-2002 Plain Black LLC.
 #-------------------------------------------------------------------
