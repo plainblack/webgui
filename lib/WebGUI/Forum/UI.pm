@@ -356,7 +356,7 @@ sub formatForumURL {
 
 #-------------------------------------------------------------------
 
-=head formatMessage ( post [, forum])
+=head2 formatMessage ( post [, forum])
 
 Formats a post message for display.
 
