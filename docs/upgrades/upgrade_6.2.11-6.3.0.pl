@@ -757,6 +757,8 @@ while (my ($id, $template, $namespace) = $sth->array) {
 	$template =~ s/back\.url/collaboration.url/ixsg;
 	$template =~ s/list\.label/back.label/ixsg;
 	$template =~ s/-=:\s+:=-//ixsg;
+	$template =~ s/previous\.more/previous.url/ixsg;
+	$template =~ s/next\.more/next.url/ixsg;
 	WebGUI::SQL->write("update template set template=".quote($template).", namespace=".quote($namespace)." where assetId=".quote($id)); 
 }
 $sth->finish;
@@ -766,13 +768,42 @@ print "\tMigrating USS templates to collaboration templates\n" unless ($quiet);
 my $sth = WebGUI::SQL->read("select assetId,template,namespace from template where namespace in ('USS','USS/Submission','USS/SubmissionForm')");
 while (my ($id, $template, $namespace) = $sth->array) {
 	if ($namespace eq "USS") {
+		$template =~ s/post\.url/add.url/ixsg;
 		$namespace = "Collaboration";
 	} elsif ($namespace eq "USS/SubmissionForm") {
 		$namespace = "Collaboration/PostForm";
 	} elsif ($namespace eq "USS/Submission") {
 		$namespace = "Collaboration/Thread";
 	}
-	# fill in stuff here
+	$template =~ s/\<tmpl_var\s+search\.form\>//ixsg;
+	$template =~ s/\<tmpl_var\s+leave\.url\>//ixsg;
+	$template =~ s/\<tmpl_var\s+leave\.label\>//ixsg;
+	$template =~ s/submission\.id/assetId/ixsg;
+	$template =~ s/submission\.content/synopsis/ixsg;
+	$template =~ s/submission\.content\.full/content/ixsg;
+	$template =~ s/submission\.responses/replies/ixsg;
+	$template =~ s/submission\.userId/ownerUserId/ixsg;
+	$template =~ s/submission\.date/dateSubmitted.human/ixsg;
+	$template =~ s/submission\.date.updated/dateUpdated.human/ixsg;
+	$template =~ s/submission\.userProfile/userProfile.url/ixsg;
+	$template =~ s/submission\.currentUser/isCurrentUser/ixsg;
+	$template =~ s/submission\.//ixsg;
+	$template =~ s/user\.Profile/userProfile.url/ixsg;
+	$template =~ s/user\.id/ownerUserId/ixsg;
+	$template =~ s/user\.id/ownerUserId/ixsg;
+	$template =~ s/user\.username/username/ixsg;
+	$template =~ s/date\.epoch/dateSubmitted/ixsg;
+	$template =~ s/date\.human/dateSubmitted.human/ixsg;
+	$template =~ s/date\.updated\.epoch/dateUpdated/ixsg;
+	$template =~ s/date\.updated\.human/dateUpdated.human/ixsg;
+	$template =~ s/date\.updated\.label/date.label/ixsg;
+	$template =~ s/status\.status/status/ixsg;
+	$template =~ s/views\.count/views/ixsg;
+	$template =~ s/post\.url/edit.url/ixsg;
+	$template =~ s/previous\.more/previous.url/ixsg;
+	$template =~ s/next\.more/next.url/ixsg;
+	$template =~ s/canReply/user.canReply/ixsg;
+	$template =~ s/back\.url/collaboration.url/ixsg;
 	WebGUI::SQL->write("update template set template=".quote($template).", namespace=".quote($namespace)." where assetId=".quote($id)); 
 }
 $sth->finish;
