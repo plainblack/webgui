@@ -18,6 +18,7 @@ use WebGUI::Session;
 sub traversePageTreeSynopsis {
 	my ($sth, $output, $parent_id, $current_level, $max_level);
 	($parent_id, $current_level, $max_level) = @_;
+	$maxLevel = 99 unless ($maxLevel);
 	if ($max_level && ($current_level >= $max_level)) {
 		return;
 	}
