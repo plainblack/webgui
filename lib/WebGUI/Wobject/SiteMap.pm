@@ -88,7 +88,8 @@ sub new {
                                 defaultValue=>0
                                 }
 			},
-		-useTemplate=>1
+		-useTemplate=>1,
+		-useMetaData=>1
                 );
         bless $self, $class;
 }
@@ -136,6 +137,7 @@ sub www_edit {
 
 #-------------------------------------------------------------------
 sub www_view {
+	$_[0]->logView() if ($session{setting}{passiveProfilingEnabled});
         my (%var);
 	$var{page_loop} = _traversePageTree($_[0]->get("startAtThisLevel"),0,$_[0]->get("depth"),$_[0]->get("indent"),$_[0]->get("alphabetic"));
 	return $_[0]->processTemplate($_[0]->get("templateId"),\%var);

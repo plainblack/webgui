@@ -135,7 +135,8 @@ sub new {
 			a19=>{}, 
 			a20=>{}
 			},
-		-useTemplate=>1
+		-useTemplate=>1,
+		-useMetaData=>1
                 );
         bless $self, $class;
 }
@@ -231,6 +232,7 @@ sub www_resetVotes {
 
 #-------------------------------------------------------------------
 sub www_view {
+	$_[0]->logView() if ($session{setting}{passiveProfilingEnabled});
 	my (%var, $answer, @answers, $showPoll, $f);
         $var{question} = $_[0]->get("question");
 	if ($_[0]->get("active") eq "0") {

@@ -113,7 +113,8 @@ sub new {
 				defaultValue=>0,
 				}
 			},
-		-useTemplate=>1
+		-useTemplate=>1,
+		-useMetaData=>1
                 );
         bless $self, $class;
 }
@@ -365,6 +366,7 @@ sub www_editEventSave {
 
 #-------------------------------------------------------------------
 sub www_view {
+	$_[0]->logView() if ($session{setting}{passiveProfilingEnabled});
 	my ( $junk, $sameDate, $p, @list, $date, $flag, %previous, $maxDate, $minDate);
 	# figure out the date range
 	tie %previous, 'Tie::CPHash';
@@ -537,6 +539,7 @@ sub www_view {
 
 #-------------------------------------------------------------------
 sub www_viewEvent {
+	$_[0]->logView() if ($session{setting}{passiveProfilingEnabled});
 	my ($output, %event, %var, $id);
 	tie %event, 'Tie::CPHash';
 	%event = WebGUI::SQL->quickHash("select * from EventsCalendar_event where EventsCalendar_eventId=$session{form}{eid}",WebGUI::SQL->getSlave);

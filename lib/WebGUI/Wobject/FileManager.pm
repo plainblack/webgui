@@ -115,7 +115,8 @@ sub new {
 				defaultValue=>50,
 				}
 			},
-		-useTemplate=>1
+		-useTemplate=>1,
+		-useMetaData=>1
                 );
         bless $self, $class;
 }
@@ -159,6 +160,7 @@ sub www_deleteDownloadConfirm {
 
 #-------------------------------------------------------------------
 sub www_download {
+	$_[0]->logView() if ($session{setting}{passiveProfilingEnabled});
 	my (%download, $file);
 	tie %download,'Tie::CPHash';
 	%download = WebGUI::SQL->quickHash("select * from FileManager_file where FileManager_fileId=$session{form}{did}");
@@ -328,6 +330,7 @@ sub www_moveDownloadUp {
 
 #-------------------------------------------------------------------
 sub www_view {
+	$_[0]->logView() if ($session{setting}{passiveProfilingEnabled});
         my ($sortDirection, %var, @fileloop, $files, $sort, $file, $p, $file1, $file2, $file3, $constraints, 
 		$url, $numResults, $sql, $flag);
 	$url = WebGUI::URL::page("func=view&wid=".$_[0]->get("wobjectId"));

@@ -115,7 +115,8 @@ sub new {
         my $property = shift;
         my $self = WebGUI::Wobject->new(
                 -properties=>$property,
-		-useTemplate=>1
+		-useTemplate=>1,
+		-useMetaData=>1
                 );
         bless $self, $class;
 }
@@ -230,6 +231,7 @@ sub www_moveForumUp {
 
 #-------------------------------------------------------------------
 sub www_view {
+	$_[0]->logView() if ($session{setting}{passiveProfilingEnabled});
 	my %var;
 	my $count = 1;
 	my @forum_loop;

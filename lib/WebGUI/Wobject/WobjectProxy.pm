@@ -37,6 +37,7 @@ sub new {
         my $property = shift;
 	my $self = WebGUI::Wobject->new(
                 -properties=>$property,
+		-useMetaData=>undef,	# NO MetaData for wobject proxy
                 -extendedProperties=>{
                         proxiedWobjectId=>{
 				fieldType=>"hidden"

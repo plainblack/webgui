@@ -30,6 +30,7 @@ sub new {
 	my $property = shift;
 	my $self = WebGUI::Wobject->new(
 		-useTemplate=>1,
+		-useMetaData=>1,
 		-properties=>$property,
 		-extendedProperties=>{
                         indexName=>{
@@ -241,6 +242,7 @@ sub www_editSave {
 #-------------------------------------------------------------------
 sub www_view {
 	my $self = shift;
+	$self->logView() if ($session{setting}{passiveProfilingEnabled});
 	my (%var, @resultsLoop);
 
 	# Do some query handling

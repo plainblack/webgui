@@ -143,7 +143,8 @@ sub new {
 			brochure=>{}, 
 			warranty=>{}
 			},
-		-useTemplate=>1
+		-useTemplate=>1,
+		-useMetaData=>1
                 );
         bless $self, $class;
 }
@@ -559,6 +560,7 @@ sub www_moveSpecificationUp {
 
 #-------------------------------------------------------------------
 sub www_view {
+	$_[0]->logView() if ($session{setting}{passiveProfilingEnabled});
         my (%data, $sth, $file, $segment, %var, @featureloop, @benefitloop, @specificationloop, @accessoryloop, @relatedloop);
         tie %data, 'Tie::CPHash';
 	#---brochure

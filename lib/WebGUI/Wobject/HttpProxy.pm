@@ -69,7 +69,8 @@ sub new {
                                 defaultValue=>''
                                 },
 			},
-		-useTemplate=>1
+		-useTemplate=>1,
+		-useMetaData=>1
                 );
         bless $self, $class;
 }
@@ -145,7 +146,7 @@ sub www_edit {
 #-------------------------------------------------------------------
 sub www_view {
    my (%var, %formdata, @formUpload, $redirect, $response, $header, $userAgent, $proxiedUrl, $request, $ttl);
-
+	$_[0]->logView() if ($session{setting}{passiveProfilingEnabled});
    	my $node = WebGUI::Node->new("temp",$_[0]->get("namespace")."_cookies");
 	$node->create;
 	my $cookiebox = WebGUI::URL::escape($session{var}{sessionId});

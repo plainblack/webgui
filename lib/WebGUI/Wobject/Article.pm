@@ -25,6 +25,7 @@ use WebGUI::Privilege;
 use WebGUI::Session;
 use WebGUI::URL;
 use WebGUI::Wobject;
+use WebGUI::PassiveProfiling;
 
 our @ISA = qw(WebGUI::Wobject);
 
@@ -60,6 +61,7 @@ sub new {
                         	}
 			},
 		-useDiscussion=>1,
+		-useMetaData=>1,
 		-useTemplate=>1
 		);
         bless $self, $class;
@@ -120,6 +122,7 @@ sub www_editSave {
 #-------------------------------------------------------------------
 sub www_view {
 	my $self = shift;
+	$self->logView() if ($session{setting}{passiveProfilingEnabled});
 	my ($file, %var);
 	if ($self->get("image") ne "") {
 		$file = WebGUI::Attachment->new($self->get("image"),$self->get("wobjectId"));

@@ -45,7 +45,8 @@ sub new {
 			rssUrl=>{},
                         maxHeadlines=>{},
 			},
-		-useTemplate=>1
+		-useTemplate=>1,
+		-useMetaData=>1
                 );
         bless $self, $class;
 }
@@ -330,6 +331,7 @@ sub _view_single_feed {
 }
 
 sub www_view {
+	$_[0]->logView() if ($session{setting}{passiveProfilingEnabled});
         my $maxHeadlines = $_[0]->get("maxHeadlines") || 1000000;
 
         my @urls = split(/\s+/,$_[0]->get("rssUrl"));        

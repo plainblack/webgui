@@ -387,7 +387,8 @@ sub new {
 				defaultValue=>1
 				}
 			},
-		-useTemplate=>1
+		-useTemplate=>1,
+		-useMetaData=>1
                 );
         bless $self, $class;
 }
@@ -865,12 +866,14 @@ sub www_respond {
 			Survey_responseId=>$session{scratch}{$varname}
 			});
 	}
+	$self->logView() if ($session{setting}{passiveProfilingEnabled});
 	return "";
 }
 
 #-------------------------------------------------------------------
 sub www_view {
 	my $self = shift;
+	$self->logView() if ($session{setting}{passiveProfilingEnabled});
 	my $var = $self->getMenuVars;
 	$var->{'question.add.url'} = WebGUI::URL::page('wid='.$self->get("wobjectId").'&func=editQuestion&qid=new');
 	$var->{'question.add.label'} = WebGUI::International::get(30,$self->get("namespace"));
@@ -939,6 +942,7 @@ sub www_view {
 sub www_viewGradebook {
 	my $self = shift;
         return "" unless (WebGUI::Grouping::isInGroup($self->get("groupToViewReports")));
+	$self->logView() if ($session{setting}{passiveProfilingEnabled});
 	my $var = $self->getMenuVars;
 	$var->{title} = WebGUI::International::get(71,$self->get("namespace"));
 	my $p = WebGUI::Paginator->new(WebGUI::URL::page('func=viewGradebook&wid='.$self->get("wobjectId")));
@@ -975,6 +979,7 @@ sub www_viewGradebook {
 sub www_viewIndividualSurvey {
 	my $self = shift;
         return "" unless (WebGUI::Grouping::isInGroup($self->get("groupToViewReports")));
+	$self->logView() if ($session{setting}{passiveProfilingEnabled});
 	my $var = $self->getMenuVars;
 	$var->{'title'} = WebGUI::International::get(70,$self->get("namespace"));
 	$var->{'delete.url'} = WebGUI::URL::page('func=deleteResponse&amp;wid='.$self->get("wobjectId").'&amp;responseId='.$session{form}{responseId});
@@ -1032,6 +1037,7 @@ sub www_viewIndividualSurvey {
 sub www_viewStatisticalOverview {
 	my $self = shift;
         return "" unless (WebGUI::Grouping::isInGroup($self->get("groupToViewReports")));
+	$self->logView() if ($session{setting}{passiveProfilingEnabled});
 	my $var = $self->getMenuVars;
 	$var->{title} = WebGUI::International::get(58,$self->get("namespace"));
 	my $p = WebGUI::Paginator->new(WebGUI::URL::page('func=viewStatisticalOverview&wid='.$self->get("wobjectId")));

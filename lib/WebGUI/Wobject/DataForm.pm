@@ -390,7 +390,8 @@ sub new {
 				defaultValue=>0
 				}
 			},
-		-useTemplate=>1
+		-useTemplate=>1,
+		-useMetaData=>1
 		);
         bless $self, $class;
 }
@@ -895,6 +896,7 @@ sub www_process {
 
 #-------------------------------------------------------------------
 sub www_view {
+	$_[0]->logView() if ($session{setting}{passiveProfilingEnabled});
 	my $var;
 	$var->{entryId} = $session{form}{entryId} if ($_[0]->canEdit);
 	if ($var->{entryId} eq "list" && $_[0]->canEdit) {

@@ -55,7 +55,8 @@ sub new {
 				defaultValue=>0
 				}
 			},
-		-useTemplate=>1
+		-useTemplate=>1,
+		-useMetaData=>1
                 );
         bless $self, $class;
 }
@@ -105,6 +106,7 @@ sub www_edit {
 
 #-------------------------------------------------------------------
 sub www_view {
+	$_[0]->logView() if ($session{setting}{passiveProfilingEnabled});
 	my ($query, %var, @debug);
 	if ($_[0]->get("preprocessMacros")) {
 		$query = WebGUI::Macro::process($_[0]->get("dbQuery"));

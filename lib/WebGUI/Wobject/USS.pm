@@ -166,6 +166,7 @@ sub new {
         my $self = WebGUI::Wobject->new(
                 -properties=>$property,
 		-useDiscussion=>1,
+		-useMetaData=>1,
                 -extendedProperties=>{
 			submissionsPerPage=>{
 				defaultValue=>50
@@ -645,6 +646,7 @@ sub www_moveSubmissionUp {
 
 #-------------------------------------------------------------------
 sub www_view {
+	$_[0]->logView() if ($session{setting}{passiveProfilingEnabled});
 	my (%var, $row, $page, $p, $constraints, @submission, @content, $image, $i, $numResults, $thumbnail, $responses);
 	$numResults = $_[0]->get("submissionsPerPage");
 	$var{"readmore.label"} = WebGUI::International::get(46,$_[0]->get("namespace"));
@@ -747,7 +749,7 @@ sub www_view {
 #-------------------------------------------------------------------
 # print out RSS 2.0 feed describing the items visible on the first page
 sub www_viewRSS {
-        
+	$_[0]->logView() if ($session{setting}{passiveProfilingEnabled});        
         my $wid = $_[0]->get("wobjectId");
         my $numResults = $_[0]->get("submissionsPerPage");
         
@@ -802,6 +804,7 @@ sub www_viewRSS {
 
 #-------------------------------------------------------------------
 sub www_viewSubmission {
+	$_[0]->logView() if ($session{setting}{passiveProfilingEnabled});
 	return "" unless ($session{form}{sid});
 	my ($file, @data, %var, $replies);
 	my $submission = $_[0]->getCollateral("USS_submission","USS_submissionId",$session{form}{sid});

@@ -64,6 +64,7 @@ sub new {
 
    $self = WebGUI::Wobject->new(
       -properties         => $property,
+      -useMetaData	  => 1,
       -extendedProperties => {
          call             => {
             fieldType     => 'textarea',
@@ -252,7 +253,7 @@ sub www_view {
         %var                          # HTML::Template variables
    );
    my $self= shift;
-
+   $self->logView() if ($session{setting}{passiveProfilingEnabled});
    # this page, with important params
    $url = WebGUI::URL::page("func=view&wid=" . $self->get("wobjectId"));
 
