@@ -1243,7 +1243,7 @@ Returns a select list of templates.
 
 =item name
 
-The name field for this form element.
+The name field for this form element. Defaults to "templateId".
 
 =item value 
 
@@ -1258,10 +1258,10 @@ The namespace for the list of templates to return. If this is omitted, all templ
 =cut
 
 sub template {
-        my ($templateId, $where);
-        $templateId = $_[0]->{value} || 1;
+        my $templateId = $_[0]->{value} || 1;
+	my $name = $_[0]->{name} || "templateId";
         return selectList({
-                name=>$_[0]->{name},
+                name=>$name,
                 options=>WebGUI::Template::getList($_[0]->{namespace}),
                 value=>[$templateId]
                 });

@@ -61,10 +61,10 @@ unlink("../../lib/WebGUI/Wobject/MailForm.pm");
 unlink("../../www/extras/floatCheck.js");
 unlink("../../www/extras/numberCheck.js");
 
+WebGUI::Session::open("../..",$configFile);
 
 print "\tMigrating Mail Form to Data Form.\n" unless ($quiet);
 
-WebGUI::Session::open("../..",$configFile);
 
 #renaming namespace
 my @sql = (
@@ -145,6 +145,25 @@ $sth->finish;
 foreach my $query (@sql) {
         WebGUI::SQL->write($query);
 }
+
+print "\tSetting up new global template structure.\n" unless ($quiet);
+
+WebGUI::SQL->write("alter table wobject add column templateId int not null default 1");
+foreach (qw(Article DataForm EventsCalendar FAQ FileManager Item LinkList MessageBoard Product SiteMap SyndicatedContent USS)) {
+	my $sth = WebGUI::SQL->read("select templateId,wobjectId from $_ where templateId<>1");
+	while (my @data = $sth->array) {
+		WebGUI::SQL->write("update wobject set templateId=$data[0] where wobjectId=$data[1]");
+	}
+	$sth->finish;
+	WebGUI::SQL->write("alter table $_ drop column templateId");
+}
+WebGUI::SQL->write("alter table WobjectProxy add column proxiedNamespace varchar(35)");
+my $sth = WebGUI::SQL->read("select wobject.namespace,wobject.wobjectId from WobjectProxy left join wobject 
+	on WobjectProxy.proxiedWobjectId=wobject.wobjectId");
+while (my @data = $sth->array) {
+	WebGUI::SQL->write("update WobjectProxy set proxiedNamespace=".quote($data[0])." where proxiedWobjectId=$data[1]");
+}
+$sth->finish;
 
 WebGUI::Session::close();
 

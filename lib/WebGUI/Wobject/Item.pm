@@ -46,11 +46,9 @@ sub new {
                 -properties=>$property,
                 -extendedProperties=>{
 			linkURL=>{}, 
-			attachment=>{}, 
-			templateId=>{
-				defaultValue=>1
-				}
-			}
+			attachment=>{}
+			},
+		-useTemplate=>1
                 );
         bless $self, $class;
 }
@@ -58,22 +56,13 @@ sub new {
 #-------------------------------------------------------------------
 sub www_edit {
 	my $properties = WebGUI::HTMLForm->new;
-	my $layout = WebGUI::HTMLForm->new;
 	$properties->url(
 		-name=>"linkURL",
 		-label=>WebGUI::International::get(1,$_[0]->get("namespace")),
 		-value=>$_[0]->getValue("linkURL"));
 	$properties->raw($_[0]->fileProperty("attachment",2));
-	$layout->template(
-                -name=>"templateId",
-                -value=>$_[0]->getValue("templateId"),
-                -namespace=>$_[0]->get("namespace"),
-                -label=>WebGUI::International::get(72,$_[0]->get("namespace")),
-                -afterEdit=>'func=edit&wid='.$_[0]->get("wobjectId")
-                );
 	return $_[0]->SUPER::www_edit(
 		-properties=>$properties->printRowsOnly,
-		-layout=>$layout->printRowsOnly,
 		-headingId=>6,
 		-helpId=>1
 		);

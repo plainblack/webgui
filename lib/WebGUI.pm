@@ -68,6 +68,7 @@ sub _generatePage {
                                         .moveBottomIcon('func=moveBottom&wid='.${$wobject}{wobjectId})
                                         .cutIcon('func=cut&wid='.${$wobject}{wobjectId})
                                         .copyIcon('func=copy&wid='.${$wobject}{wobjectId})
+                                        .shortcutIcon('func=createShortcut&wid='.${$wobject}{wobjectId})
                                         .'<br>';
                         }
                         if (${$wobject}{namespace} eq "WobjectProxy") {

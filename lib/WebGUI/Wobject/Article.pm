@@ -51,9 +51,6 @@ sub new {
 		-properties=>$property,
 		-extendedProperties=>{
 			image=>{ },
-                	templateId=>{
-                        	defaultValue=>1
-                        	},
                 	linkTitle=>{ },
                 	linkURL=>{ },
                 	attachment=>{ },
@@ -61,7 +58,8 @@ sub new {
                         	defaultValue=>0
                         	}
 			},
-		-useDiscussion=>1
+		-useDiscussion=>1,
+		-useTemplate=>1
 		);
         bless $self, $class;
 }
@@ -70,13 +68,6 @@ sub new {
 sub www_edit {
 	my $properties = WebGUI::HTMLForm->new;
 	my $layout = WebGUI::HTMLForm->new;
-	$layout->template(
-                -name=>"templateId",
-                -value=>$_[0]->getValue("templateId"),
-                -namespace=>$_[0]->get("namespace"),
-                -label=>WebGUI::International::get(356),
-                -afterEdit=>'func=edit&wid='.$_[0]->get("wobjectId")
-                );
 	$properties->raw(
 		-value=>$_[0]->fileProperty("image",6),
 		-uiLevel=>3

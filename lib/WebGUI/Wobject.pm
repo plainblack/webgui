@@ -622,7 +622,13 @@ NOTE: This is used to define the wobject and should only be passed in by a wobje
 
 =item -useDiscussion
 
- Defaults to "0". If set to "1" this will add a discussion properties tab to this wobject to enable content managers to set the properties of a discussion attached to this wobject.
+Defaults to "0". If set to "1" this will add a discussion properties tab to this wobject to enable content managers to set the properties of a discussion attached to this wobject.
+
+NOTE: This is used to define the wobject and should only be passed in by a wobject subclass.
+
+=item -useTemplate
+
+Defaults to "0". If set to "1" this will add a template field to the wobject to enable content managers to select a template to layout this wobject.
 
 NOTE: This is used to define the wobject and should only be passed in by a wobject subclass.
 
@@ -632,14 +638,15 @@ NOTE: This is used to define the wobject and should only be passed in by a wobje
 
 sub new {
 	my ($self, @p) = @_;
- 	my ($properties, $extendedProperties, $useDiscussion);
+ 	my ($properties, $extendedProperties, $useTemplate, $useDiscussion);
 	if (ref $_[1] eq "HASH") {
 		$properties = $_[1]; # reverse compatibility prior to 5.2
 	} else {
-		($properties, $extendedProperties, $useDiscussion) = 
-			rearrange([qw(properties extendedProperties useDiscussion)], @p);
+		($properties, $extendedProperties, $useDiscussion, $useTemplate) = 
+			rearrange([qw(properties extendedProperties useDiscussion useTemplate)], @p);
 	} 
 	$useDiscussion = 0 unless ($useDiscussion);
+	$useTemplate = 0 unless ($useDiscussion);
 	my $wobjectProperties = {
 		userDefined1=>{
 			fieldType=>"text"
@@ -657,13 +664,13 @@ sub new {
 			fieldType=>"text"
 			}, 
 		bufferUserId=>{
-			fieldType=>"integer"
+			fieldType=>"hidden"
 			}, 
 		bufferDate=>{
-			fieldType=>"integer"
+			fieldType=>"hidden"
 			}, 
 		bufferPrevId=>{
-			fieldType=>"integer"
+			fieldType=>"hidden"
 			}, 
 		allowDiscussion=>{
 			fieldType=>"yesNo",
@@ -698,8 +705,13 @@ sub new {
 			defaultValue=>1,
 			},
 		title=>{
-			fieldType=>"text"
+			fieldType=>"text",
+			defaultValue=>$_[0]->get("namespace")
 			}, 
+		templateId=>{
+			fieldType=>"template",
+			defaultValue=>1
+			},
 		displayTitle=>{
 			fieldType=>"yesNo",
 			defaultValue=>1
@@ -709,7 +721,7 @@ sub new {
 			fieldType=>"HTMLArea"
 			},
  		pageId=>{
-			fieldType=>"integer",
+			fieldType=>"hidden",
 			defaultValue=>$session{page}{pageId}
 			}, 
 		templatePosition=>{
@@ -725,7 +737,7 @@ sub new {
 			fieldType=>"date"
 			},
 		sequenceNumber=>{
-			fieldType=>"integer"
+			fieldType=>"hidden"
 			}
 		};
         bless({
@@ -1065,12 +1077,35 @@ NOTE: Should never need to be overridden or extended.
 =cut
 
 sub www_copy {
-        if (WebGUI::Privilege::canEditPage()) {
-                $_[0]->duplicate;
-                return "";
-        } else {
-                return WebGUI::Privilege::insufficient();
-        }
+        return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
+        $_[0]->duplicate;
+        return "";
+}
+
+#-------------------------------------------------------------------
+
+=head2 www_createShortcut ( )
+
+Creates a shortcut (using the wobject proxy) of this wobject on the clipboard.
+
+NOTE: Should never need to be overridden or extended.
+
+=cut
+
+sub www_createShortcut {
+        return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
+	my $w = WebGUI::Wobject::WobjectProxy->new({wobjectId=>"new",namespace=>"WobjectProxy"});
+	$w->set({
+		pageId=>2,
+		templatePosition=>1,
+		title=>$_[0]->getValue("title"),
+		proxiedNamespace=>$_[0]->get("namespace"),
+		proxiedWobjectId=>$_[0]->get("wobjectId"),
+	    	bufferUserId=>$session{user}{userId},
+		bufferDate=>time(),
+		bufferPrevId=>$session{page}{pageId}
+		});
+        return "";
 }
 
 #-------------------------------------------------------------------
@@ -1082,16 +1117,16 @@ Moves this instance to the clipboard.
 =cut
 
 sub www_cut {
-        if (WebGUI::Privilege::canEditPage()) {
-		$_[0]->set({pageId=>2, templatePosition=>1,
-			    bufferUserId=>$session{user}{userId},
-			    bufferDate=>time(),
-			    bufferPrevId=>$session{page}{pageId}});
-		_reorderWobjects($session{page}{pageId});
-                return "";
-        } else {
-                return WebGUI::Privilege::insufficient();
-        }
+        return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
+	$_[0]->set({
+		pageId=>2, 
+		templatePosition=>1,
+	    	bufferUserId=>$session{user}{userId},
+		bufferDate=>time(),
+		bufferPrevId=>$session{page}{pageId}
+		});
+	_reorderWobjects($session{page}{pageId});
+        return "";
 }
 
 #-------------------------------------------------------------------
@@ -1302,6 +1337,13 @@ sub www_edit {
 		-value=>$displayTitle,
 		-uiLevel=>5
 		);
+	if ($_[0]->{_useTemplate}) {
+		$f->getTab("layout")->template(
+                	-value=>$_[0]->getValue("templateId"),
+                	-namespace=>$_[0]->get("namespace"),
+                	-afterEdit=>'func=edit&wid='.$_[0]->get("wobjectId")
+                	);
+	}
 	$f->getTab("layout")->select(
 		-name=>"templatePosition",
 		-label=>WebGUI::International::get(363),

@@ -165,9 +165,6 @@ sub new {
         my $self = WebGUI::Wobject->new(
                 -properties=>$property,
                 -extendedProperties=>{
-			templateId=>{
-                        	defaultValue=>1
-                        	},
                 	eventTemplateId=>{
                         	defaultValue=>1
                         	},
@@ -183,7 +180,8 @@ sub new {
                 	paginateAfter=>{
                         	defaultValue=>50
                         	}
-			}
+			},
+		-useTemplate=>1
                 );
         bless $self, $class;
 }
@@ -227,13 +225,6 @@ sub www_edit {
 	my $afterEdit = 'func=edit&wid='.$_[0]->get("wobjectId") if ($_[0]->get("wobjectId") ne "new");
 	my $layout = WebGUI::HTMLForm->new;
 	my $properties = WebGUI::HTMLForm->new;
-        $layout->template(
-                -name=>"templateId",
-                -value=>$_[0]->getValue("templateId"),
-                -namespace=>$_[0]->get("namespace"),
-                -label=>WebGUI::International::get(79,$_[0]->get("namespace")),
-                -afterEdit=>$afterEdit
-                );
         $layout->template(
                 -name=>"eventTemplateId",
                 -value=>$_[0]->getValue("eventTemplateId"),

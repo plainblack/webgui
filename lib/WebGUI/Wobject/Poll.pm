@@ -95,7 +95,8 @@ sub new {
 			a18=>{}, 
 			a19=>{}, 
 			a20=>{}
-			}
+			},
+		-useTemplate=>1
                 );
         bless $self, $class;
 }

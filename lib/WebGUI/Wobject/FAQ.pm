@@ -49,11 +49,8 @@ sub new {
         my $property = shift;
         my $self = WebGUI::Wobject->new(
                 -properties=>$property,
-                -extendedProperties=>{
-			templateId=>{
-				defaultValue=>1
-				}
-			}
+                -extendedProperties=>{},
+		-useTemplate=>1
                 );
         bless $self, $class;
 }
@@ -82,14 +79,6 @@ sub www_deleteQuestionConfirm {
 #-------------------------------------------------------------------
 sub www_edit {
 	my $properties = WebGUI::HTMLForm->new;
-	my $layout = WebGUI::HTMLForm->new;
-	$layout->template(
-              	-name=>"templateId",
-               	-value=>$_[0]->getValue("templateId"),
-               	-namespace=>$_[0]->get("namespace"),
-               	-label=>WebGUI::International::get(74,$_[0]->get("namespace")),
-               	-afterEdit=>'func=edit&wid='.$_[0]->get("wobjectId")
-               	);
 	if ($_[0]->get("wobjectId") eq "new") {
 		$properties->whatNext(
                        	-options=>{
@@ -101,7 +90,6 @@ sub www_edit {
 	}
 	return $_[0]->SUPER::www_edit(
 		-properties=>$properties->printRowsOnly,
-		-layout=>$layout->printRowsOnly,
 		-headingId=>8,
 		-helpId=>1
 		);

@@ -87,9 +87,6 @@ sub new {
                 -properties=>$property,
                 -extendedProperties=>{
 			price=>{}, 
-			templateId=>{
-				defaultValue=>1
-				},
 			productNumber=>{}, 
 			image1=>{}, 
 			image2=>{}, 
@@ -97,7 +94,8 @@ sub new {
 			manual=>{}, 
 			brochure=>{}, 
 			warranty=>{}
-			}
+			},
+		-useTemplate=>1
                 );
         bless $self, $class;
 }
@@ -274,15 +272,7 @@ sub www_deleteSpecificationConfirm {
 
 #-------------------------------------------------------------------
 sub www_edit {
-	my $layout = WebGUI::HTMLForm->new;
 	my $properties = WebGUI::HTMLForm->new;
-        $layout->template(
-                -name=>"templateId",
-                -value=>$_[0]->getValue("template"),
-                -namespace=>$_[0]->get("namespace"),
-                -label=>WebGUI::International::get(61,$_[0]->get("namespace")),
-		-afterEdit=>'func=edit&wid='.$_[0]->get("wobjectId")
-                );
 	$properties->text(
 		-name=>"price",
 		-label=>WebGUI::International::get(10,$_[0]->get("namespace")),
@@ -301,7 +291,6 @@ sub www_edit {
 	$properties->raw($_[0]->fileProperty("warranty",15));
 	return $_[0]->SUPER::www_edit(
 		-properties=>$properties->printRowsOnly,
-		-layout=>$layout->printRowsOnly,
 		-helpId=>1,
 		-headingId=>6
 		);

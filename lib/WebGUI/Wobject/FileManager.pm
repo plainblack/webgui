@@ -73,11 +73,9 @@ sub new {
                 -extendedProperties=>{
 			paginateAfter=>{
 				defaultValue=>50,
-				},
-			templateId=>{
-				defaultValue=>1
 				}
-			}
+			},
+		-useTemplate=>1
                 );
         bless $self, $class;
 }
@@ -149,12 +147,6 @@ sub www_download {
 sub www_edit {
 	my $properties = WebGUI::HTMLForm->new;
 	my $layout = WebGUI::HTMLForm->new;
-	$layout->template(
-                -name=>"templateId",
-                -value=>$_[0]->getValue("templateId"),
-                -namespace=>$_[0]->get("namespace"),
-                -afterEdit=>'func=edit&wid='.$_[0]->get("wobjectId")
-                );
 	$layout->integer(
 		-name=>"paginateAfter",
 		-label=>WebGUI::International::get(20,$_[0]->get("namespace")),

@@ -38,7 +38,32 @@ sub new {
 	my $self = WebGUI::Wobject->new(
                 -properties=>$property,
                 -extendedProperties=>{
-                        proxiedWobjectId=>{ }
+                        proxiedWobjectId=>{
+				fieldType=>"hidden"
+				},
+			proxiedNamespace=>{
+				fieldType=>"hidden"
+				},
+			overrideTitle=>{
+				fieldType=>"yesNo",
+				defaultValue=>0
+				},
+			overrideTemplate=>{
+				fieldType=>"yesNo",
+				defaultValue=>0
+				},
+			overrideDisplayTitle=>{
+				fieldType=>"yesNo",
+				defaultValue=>0
+				},
+			overrideDescription=>{
+				fieldType=>"yesNo",
+				defaultValue=>0
+				},
+			proxiedTemplateId=>{
+				fieldType=>"template",
+				defaultValue=>1
+				}
                         }
                 );
         bless $self, $class;
@@ -47,80 +72,51 @@ sub new {
 
 #-------------------------------------------------------------------
 sub uiLevel {
-        return 8;
+        return 999;
 }
 
 #-------------------------------------------------------------------
 sub www_edit {
-	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
-        my ($output, $f, %wobjects, %page, %wobject, $a, $b);
-	tie %wobject, 'Tie::CPHash';
-	tie %page, 'Tie::CPHash';
-	tie %wobjects, 'Tie::IxHash';
-        $output = helpIcon(1,$_[0]->get("namespace"));
-	$output .= '<h1>'.WebGUI::International::get(2,$_[0]->get("namespace")).'</h1>';
-	my %tabs;
-        tie %tabs, 'Tie::IxHash';
-        %tabs = (
-                properties=>{
-                        label=>WebGUI::International::get(893)
-                        },
-                layout=>{
-                        label=>WebGUI::International::get(105),
-                        uiLevel=>5
-                        },
-                privileges=>{
-                        label=>WebGUI::International::get(107),
-                        uiLevel=>9
-                        }
-                );
-       	$f = WebGUI::TabForm->new(\%tabs);
-       	$f->hidden({name=>"wid",value=>$_[0]->get("wobjectId")});
-       	$f->hidden({name=>"namespace",value=>$_[0]->get("namespace")}) if ($_[0]->get("wobjectId") eq "new");
-       	$f->hidden({name=>"func",value=>"editSave"});
-       	$f->getTab("properties")->readOnly(
-		-value=>$_[0]->get("wobjectId"),
-		-label=>WebGUI::International::get(499)
+	my $properties = WebGUI::HTMLForm->new;
+        my $layout = WebGUI::HTMLForm->new;
+	$layout->template(
+		-name=>"proxiedTemplateId",
+		-value=>[$_[0]->getValue("proxiedTemplateId")],
+		-namespace=>$_[0]->get("proxiedNamespace")
 		);
-       	$f->hidden({name=>"title",value=>$_[0]->name});
-       	$f->hidden({name=>"displayTitle",value=>$_[0]->getValue("displayTitle")});
-	$f->getTab("layout")->select(
-                -name=>"templatePosition",
-                -label=>WebGUI::International::get(363),
-                -value=>[$_[0]->getValue("templatePosition")],
-                -uiLevel=>5,
-                -options=>WebGUI::Page::getTemplatePositions($session{page}{templateId}),
-                -subtext=>WebGUI::Page::drawTemplate($session{page}{templateId})
-                );
-       	$f->getTab("privileges")->date(
-		-name=>"startDate",
-		-label=>WebGUI::International::get(497),
-		-value=>$_[0]->getValue("startDate")
+	$properties->yesNo(
+		-name=>"overrideTitle",
+		-value=>$_[0]->getValue("overrideTitle"),
+		-label=>WebGUI::International::get(7,$_[0]->get("namespace"))
 		);
-       	$f->getTab("privileges")->date(
-		-name=>"endDate",
-		-label=>WebGUI::International::get(498),
-		-value=>$_[0]->getValue("endDate")
+	$layout->yesNo(
+		-name=>"overrideDisplayTitle",
+		-value=>$_[0]->getValue("overrideDisplayTitle"),
+		-label=>WebGUI::International::get(8,$_[0]->get("namespace"))
 		);
-	$a = WebGUI::SQL->read("select pageId,menuTitle from page where pageId<2 or pageId>25 order by menuTitle");
-	while (%page = $a->hash) {
-		$b = WebGUI::SQL->read("select wobjectId,title from wobject 
-			where pageId=".$page{pageId}." and namespace<>'WobjectProxy' and 
-			namespace<>'ExtraColumn' and endDate>=".time()." and pageId<>3 order by sequenceNumber");
-		while (%wobject = $b->hash) {
-			$wobjects{$wobject{wobjectId}} = $page{menuTitle}." / ".$wobject{title}." (".$wobject{wobjectId}.")";
-		}
-		$b->finish;
-	}
-	$a->finish;
-	$f->getTab("properties")->select(
-		-name=>"proxiedWobjectId",
-		-options=>\%wobjects,
+	$properties->yesNo(
+		-name=>"overrideDescription",
+		-value=>$_[0]->getValue("overrideTitle"),
+		-label=>WebGUI::International::get(9,$_[0]->get("namespace"))
+		);
+	$layout->yesNo(
+		-name=>"overrideTemplate",
+		-value=>$_[0]->getValue("overrideTitle"),
+		-label=>WebGUI::International::get(10,$_[0]->get("namespace"))
+		);
+	my @data = WebGUI::SQL->read("select page.urlizedTitle,wobject.title from wobject left join page on wobject.pageId=page.pageId
+		where wobject.wobjectId=".$_[0]->get("proxiedWobjectId"));
+	$properties->readonly(
 		-label=>WebGUI::International::get(1,$_[0]->get("namespace")),
-		-value=>[$_[0]->getValue("proxiedWobjectId")]
+		-value=>'<a href="'.WebGUI::URL::gateway($data[0]).'">'.$data[1].'</a>'
 		);
-       	$output .= $f->print;
-	return $output;
+	return $_[0]->SUPER::www_edit(
+                -properties=>$properties->printRowsOnly,
+                -layout=>$layout->printRowsOnly,
+                -headingId=>2,
+                -helpId=>1
+                );
+
 }
 
 #-------------------------------------------------------------------

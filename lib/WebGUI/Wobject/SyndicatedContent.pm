@@ -39,11 +39,9 @@ sub new {
         my $self = WebGUI::Wobject->new(
                 -properties=>$property,
                 -extendedProperties=>{
-			rssUrl=>{},
-			templateId=>{
-                                defaultValue=>1
-                                }
-			}
+			rssUrl=>{}
+			},
+		-useTemplate=>1
                 );
         bless $self, $class;
 }
@@ -57,21 +55,13 @@ sub uiLevel {
 #-------------------------------------------------------------------
 sub www_edit {
 	my $properties = WebGUI::HTMLForm->new;
-	my $layout = WebGUI::HTMLForm->new;
 	$properties->url(
 		-name=>"rssUrl",
 		-label=>WebGUI::International::get(1,$_[0]->get("namespace")),
 		-value=>$_[0]->getValue("rssUrl")
 		);
-	$layout->template(
-                -name=>"templateId",
-                -value=>$_[0]->getValue("templateId"),
-                -namespace=>$_[0]->get("namespace"),
-                -afterEdit=>'func=edit&wid='.$_[0]->get("wobjectId")
-                );
 	return $_[0]->SUPER::www_edit(
 		-properties=>$properties->printRowsOnly,
-		-layout=>$layout->printRowsOnly,
 		-headingId=>4,
 		-helpId=>1
 		);

@@ -81,16 +81,14 @@ sub new {
 			submissionTemplateId=>{
 				defaultValue=>1
 				}, 
-			templateId=>{
-				defaultValue=>1 
-				},
 			karmaPerSubmission=>{
 				defaultValue=>0
 				},
 			filterContent=>{
 				defaultValue=>"javascript"
 				}
-			}
+			},
+		-useTemplate=>1
                 );
         bless $self, $class;
 }
@@ -187,13 +185,6 @@ sub www_edit {
 	my $layout = WebGUI::HTMLForm->new;
 	my $privileges = WebGUI::HTMLForm->new;
 	my $properties = WebGUI::HTMLForm->new;
-	$layout->template(
-                -name=>"templateId",
-                -value=>$_[0]->getValue("templateId"),
-                -namespace=>$_[0]->get("namespace"),
-                -label=>WebGUI::International::get(72,$_[0]->get("namespace")),
-                -afterEdit=>'func=edit&wid='.$_[0]->get("wobjectId")
-                );
         $layout->template(
                 -name=>"submissionTemplateId",
                 -value=>$_[0]->getValue("submissionTemplateId"),

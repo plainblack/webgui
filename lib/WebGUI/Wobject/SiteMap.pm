@@ -75,13 +75,11 @@ sub new {
  			indent=>{
 				defaultValue=>5
 				}, 
-			templateId=>{
-				defaultValue=>1
-				},
 			depth=>{
 				defaultValue=>0
 				}
-			}
+			},
+		-useTemplate=>1
                 );
         bless $self, $class;
 }
@@ -93,12 +91,6 @@ sub www_edit {
 		and (pageId=1 or pageId>999) order by title");
         my $layout = WebGUI::HTMLForm->new;
         my $properties = WebGUI::HTMLForm->new;
-	$layout->template(
-                -name=>"templateId",
-                -value=>$_[0]->getValue("templateId"),
-                -namespace=>$_[0]->get("namespace"),
-                -afterEdit=>'func=edit&wid='.$_[0]->get("wobjectId")
-                );
         $properties->select(
 		-name=>"startAtThisLevel",
 		-label=>WebGUI::International::get(3,$_[0]->get("namespace")),

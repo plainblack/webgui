@@ -22,7 +22,7 @@ use WebGUI::URL;
 our @ISA = qw(Exporter);
 our @EXPORT = qw(&helpIcon &becomeIcon &cutIcon &copyIcon &deleteIcon &editIcon
 	&moveBottomIcon &moveDownIcon &moveLeftIcon &moveRightIcon &moveTopIcon &moveUpIcon
-	&pageIcon &pasteIcon &wobjectIcon &viewIcon);
+	&pageIcon &shortcutIcon &pasteIcon &wobjectIcon &viewIcon);
 
 =head1 NAME
 
@@ -48,6 +48,7 @@ A package for generating user interface buttons. The subroutines found herein do
  $html = moveUpIcon('op=something');
  $html = pageIcon();
  $html = pasteIcon('op=something');
+ $html = shortcutIcon('op=something');
  $html = viewIcon('op=something');
  $html = wobjectIcon();
 
@@ -404,6 +405,39 @@ sub pasteIcon {
         $output .= '<img src="'.$session{config}{extrasURL}.'/toolbar/'.$session{language}{toolbar}.'/paste.gif" align="middle" border="0" alt="Paste" title="Paste" /></a>';
         return $output;
 }
+
+#-------------------------------------------------------------------
+
+=head2 shortcutIcon ( urlParameters [, pageURL ] )
+
+Generates a button with a shortcut symbol printed on it, similar to the shortcut icon in Microsoft Windows or the link Icon in Gnome.
+
+=over
+
+=item urlParameters
+
+Any URL parameters that need to be tacked on to the current URL to accomplish whatever function this button represents.
+
+=item pageURL
+
+The URL to any page. Defaults to the current page.
+
+=back
+
+=cut
+
+sub shortcutIcon {
+        my ($output, $pageURL);
+        $pageURL = $_[1] || $session{page}{urlizedTitle};
+        $output = '<a href="'.WebGUI::URL::gateway($pageURL,$_[0]).'">';
+        $output .= '<img src="'.$session{config}{extrasURL}.'/toolbar/'.$session{language}{toolbar}.'/shortcut.gif" align="middle" border="0" alt="Shortcut" title="Shortcut" /></a>';
+        return $output;
+}
+
+#-------------------------------------------------------------------
+
+=head2 pasteIcon ( urlParameters [, pageURL ] )
+
 
 #-------------------------------------------------------------------
 

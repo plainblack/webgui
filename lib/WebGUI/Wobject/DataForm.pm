@@ -179,9 +179,6 @@ sub new {
                 -properties=>$property,
 		-extendedProperties=>{
 			acknowledgement=>{},
-			templateId=>{
-				defaultValue=>1
-				},
 			emailTemplateId=>{
 				defaultValue=>2
 				},
@@ -190,8 +187,9 @@ sub new {
 				},
 			mailData=>{
 				defaultValue=>0
-				},
-			}
+				}
+			},
+		-useTemplate=>1
 		);
         bless $self, $class;
 }
@@ -269,13 +267,6 @@ sub www_deleteFieldConfirm {
 #-------------------------------------------------------------------
 sub www_edit {
 	my $layout = WebGUI::HTMLForm->new;
-        $layout->template(
-                -name=>"templateId",
-                -value=>$_[0]->getValue("templateId"),
-                -namespace=>$_[0]->get("namespace"),
-                -label=>WebGUI::International::get(78,$_[0]->get("namespace")),
-                -afterEdit=>'func=edit&wid='.$_[0]->get("wobjectId")
-                );
         $layout->template(
                 -name=>"emailTemplateId",
                 -value=>$_[0]->getValue("emailTemplateId"),
