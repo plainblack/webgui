@@ -836,9 +836,7 @@ sub www_editTreeSave {
 sub www_manageAssets {
 	my $self = shift;
 	return WebGUI::Privilege::insufficient() unless $self->canEdit;
-	WebGUI::Style::setLink($session{config}{extrasURL}.'/assetManager/ActiveWidgets/runtime/styles/xp/grid.css', {rel=>"stylesheet",type=>"text/css"});
 	WebGUI::Style::setLink($session{config}{extrasURL}.'/assetManager/assetManager.css', {rel=>"stylesheet",type=>"text/css"});
-	WebGUI::Style::setScript($session{config}{extrasURL}.'/assetManager/ActiveWidgets/source/lib/grid.js', {type=>"text/javascript"});
 	WebGUI::Style::setScript($session{config}{extrasURL}.'/assetManager/Tools.js', {type=>"text/javascript"});
 	WebGUI::Style::setScript($session{config}{extrasURL}.'/assetManager/ContextMenu.js', {type=>"text/javascript"});
 	WebGUI::Style::setScript($session{config}{extrasURL}.'/assetManager/Asset.js', {type=>"text/javascript"});
@@ -857,35 +855,26 @@ sub www_manageAssets {
 	$output .= "<script>\n";
 	$output .= "/* assetId, url, title */\nvar crumbtrail = [\n";
 	my $ancestors = $self->getLineage(["self","ancestors"],{returnObjects=>1});
+	my @dataArray;
 	foreach my $ancestor (@{$ancestors}) {
-		$output .= '[';
-		$output .= "'".$ancestor->getId."',";
-		$output .= "'".$ancestor->getUrl."',";
 		my $title = $ancestor->get("title");
 		$title =~ s/\'/\\\'/g;
-		$output .= "'".$title."'";
-		$output .= "],\n";
+		push(@dataArray,"['".$ancestor->getId."','".$ancestor->getUrl."','".$title."']\n");
 	}
+	$output .= join(",",@dataArray);
 	$output .= "];\n";
 	$output .= "var columnHeadings = ['Rank','Title','Type','Last Updated','Size'];\n";
 	$output .= "/*rank, title, type, lastUpdate, size, url, assetId, icon */\nvar assets = [\n";
+	@dataArray = ();
 	foreach my $child (@{$children}) {
-		$output .= '[';
-		$output .= $child->getRank.",";
 		my $title = $child->get("title");
 		$title =~ s/\'/\\\'/g;
-		$output .= "'".$title."',";
-		$output .= "'".$child->getName."',";
-		$output .= "'".WebGUI::DateTime::epochToHuman($child->get("lastUpdated"))."',";
-		$output .= "'".formatBytes($child->get("assetSize"))."',";
-		#my $hasChildren = "false";
-		$output .= "'".$child->getUrl."',";
-		$output .= "'".$child->getId."',";
-		$output .= "'".$child->getIcon(1)."'";
+		push(@dataArray, '['.$child->getRank.",'".$title."','".$child->getName."','".WebGUI::DateTime::epochToHuman($child->get("lastUpdated"))."','".formatBytes($child->get("assetSize"))."','".$child->getUrl."','".$child->getId."','".$child->getIcon(1)."']\n");
+#my $hasChildren = "false";
 		#$hasChildren = "true" if ($child->hasChildren);
 		#$output .= $hasChildren;
-		$output .= "],\n";
 	}
+	$output .= join(",",@dataArray);
 	$output .= "];\n var labels = new Array();\n";
 	$output .= "labels['edit'] = 'Edit';\n";
 	$output .= "labels['cut'] = 'Cut';\n";
