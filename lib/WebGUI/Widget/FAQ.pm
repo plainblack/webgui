@@ -30,6 +30,12 @@ sub _reorderQuestions {
 }
 
 #-------------------------------------------------------------------
+sub purge {
+        WebGUI::SQL->write("delete from faqQuestion where widgetId=$_[0]",$_[1]);
+        purgeWidget($_[0],$_[1]);
+}
+
+#-------------------------------------------------------------------
 sub widgetName {
 	return "F.A.Q.";
 }
@@ -103,7 +109,7 @@ sub www_deleteQuestion {
 	my ($output);
         if (WebGUI::Privilege::canEditPage()) {
 		$output = '<h1>Please Confirm</h1>';
-		$output = 'Are you certain that you want to delete this question?<p><div align="center"><a href="'.$session{page}{url}.'?func=deleteQuestionConfirm&wid='.$session{form}{wid}.'&lid='.$session{form}{lid}.'">Yes, I\'m sure.</a> &nbsp; <a href="'.$session{page}{url}.'?func=edit&wid='.$session{form}{wid}.'">No, I made a mistake.</a></div>';
+		$output = 'Are you certain that you want to delete this question?<p><div align="center"><a href="'.$session{page}{url}.'?func=deleteQuestionConfirm&wid='.$session{form}{wid}.'&qid='.$session{form}{qid}.'">Yes, I\'m sure.</a> &nbsp; <a href="'.$session{page}{url}.'?func=edit&wid='.$session{form}{wid}.'">No, I made a mistake.</a></div>';
                 return $output;
         } else {
                 return WebGUI::Privilege::insufficient();
@@ -186,7 +192,7 @@ sub www_editQuestion {
 sub www_editQuestionSave {
         if (WebGUI::Privilege::canEditPage()) {
                 WebGUI::SQL->write("update faqQuestion set question=".quote($session{form}{question}).", answer=".quote($session{form}{answer})." where questionId=$session{form}{qid}",$session{dbh});
-                return "";
+                return www_edit();
         } else {
                 return WebGUI::Privilege::insufficient();
         }
@@ -231,7 +237,7 @@ sub www_view {
 	%data = WebGUI::SQL->quickHash("select * from widget where widget.widgetId='$widgetId'",$session{dbh});
 	if (defined %data) {
 		if ($data{displayTitle} == 1) {
-			$output = "<h2>".$data{title}."</h2>";
+			$output = "<h1>".$data{title}."</h1>";
 		}
 		if ($data{description} ne "") {
 			$output .= $data{description};

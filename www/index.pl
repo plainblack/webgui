@@ -11,7 +11,7 @@
 #-------------------------------------------------------------------
 
 BEGIN {
-        unshift (@INC, "../lib/");
+        unshift (@INC, "../lib");
 }
 
 use CGI::Carp qw(fatalsToBrowser);

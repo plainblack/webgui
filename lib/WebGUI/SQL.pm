@@ -14,6 +14,7 @@ use CGI::Carp qw(fatalsToBrowser);
 use DBI;
 use strict;
 use Tie::IxHash;
+use WebGUI::ErrorHandler;
 
 # Note: This class is really not necessary, I just decided to wrapper DBI in case
 # 	I wanted to change to some other DB connector in the future. Also, it shorthands
@@ -21,7 +22,7 @@ use Tie::IxHash;
 
 #-------------------------------------------------------------------
 sub array {
-        return $_[0]->{_sth}->fetchrow_array() or croak DBI->errstr;
+        return $_[0]->{_sth}->fetchrow_array() or WebGUI::ErrorHandler::fatalError(DBI->errstr);
 }
 
 #-------------------------------------------------------------------
@@ -56,7 +57,7 @@ sub finish {
 
 #-------------------------------------------------------------------
 sub hash {
-        return $_[0]->{_sth}->fetchrow_hashref() or croak DBI->errstr;
+        return $_[0]->{_sth}->fetchrow_hashref() or WebGUI::ErrorHandler::fatalError(DBI->errstr);
 }
 
 #-------------------------------------------------------------------
@@ -65,8 +66,8 @@ sub new {
         $class = shift;
         $sql = shift;
         $dbh = shift;
-        $sth = $dbh->prepare($sql) or croak "Couldn't prepare statement: ".$sql." : ". DBI->errstr;
-        $sth->execute or croak "Couldn't execute statement: ".$sql." : ". DBI->errstr;
+        $sth = $dbh->prepare($sql) or WebGUI::ErrorHandler::fatalError("Couldn't prepare statement: ".$sql." : ". DBI->errstr);
+        $sth->execute or WebGUI::ErrorHandler::fatalError("Couldn't execute statement: ".$sql." : ". DBI->errstr);
 	bless ({_sth => $sth}, $class);
 }
 
@@ -97,9 +98,9 @@ sub read {
 
 #-------------------------------------------------------------------
 sub write {
-     	$_[2]->do($_[1]) or croak "Couldn't prepare statement: ".$_[1]." : ". DBI->errstr;
+     	$_[2]->do($_[1]) or WebGUI::ErrorHandler::fatalError("Couldn't prepare statement: ".$_[1]." : ". DBI->errstr);
 }
 
 
-
 1;
+

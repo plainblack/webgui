@@ -119,7 +119,11 @@ sub www_displayAccount {
         	$output .= '</form> ';
 		$output .= '<div class="accountOptions"><ul>';
 		if (WebGUI::Privilege::isInGroup(3) || WebGUI::Privilege::isInGroup(4)) {
-			$output .= '<li><a href="'.$session{page}{url}.'?op=switchOnAdmin">Turn admin on.</a>';
+			if ($session{var}{adminOn}) {
+				$output .= '<li><a href="'.$session{page}{url}.'?op=switchOffAdmin">Turn admin off.</a>';
+			} else {
+				$output .= '<li><a href="'.$session{page}{url}.'?op=switchOnAdmin">Turn admin on.</a>';
+			}
 		}
 		$output .= '<li><a href="'.$session{page}{url}.'?op=logout">Logout.</a><li><a href="'.$session{page}{url}.'?op=deactivateAccount">Please deactivate my account permanently.</a></ul></div>';
         } else {

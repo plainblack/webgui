@@ -2,11 +2,34 @@ WebGUI is Copyright 2001 Plain Black Software. All rights reserved.
 
 WebGUI is a trademark of Plain Black Software.
 
-WebGUI may be distributed under the GNU General Public license. A copy of that license is distributed with this code in a file called "license.txt". If you are unable to retrieve that license for any reason, you may find a copy of it here: http://www.opensource.org/licenses/gpl-license.html
+WebGUI is free software; you can redistribute it and/or modify it 
+under the terms of the GNU General Public License as published by the 
+Free Software Foundation; either version 2 of the License, or (at your 
+option) any later version.
 
-For more information about Plain Black Software or WebGUI, please visit http://www.plainblack.com or email info@plainblack.com.
+WebGUI is distributed in the hope that it will be useful, but 
+WITHOUT ANY WARRANTY; without even the implied warranty of 
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU 
+General Public License for more details. However, support may be
+purchased from Plain Black Software at
+http://www.plainblack.com/index.pl/support_programs
 
-It is illegal to remove or tamper with the notices at the top of each file, or this file, or the license file. The notice at the top of each file looks like the following:
+You should have received a copy of the GNU General Public License 
+along with this program in a file called "license.txt". If not you can
+download it at http://www.opensource.org/licenses/gpl-license.html or
+write to:
+ 
+	Free Software Foundation, Inc. 
+	59 Temple Place, Suite 330 
+	Boston, MA 02111-1307 
+	USA
+
+For more information about Plain Black Software or WebGUI, please visit 
+http://www.plainblack.com or email info@plainblack.com.
+
+It is illegal to remove or tamper with the notices at the top of each 
+file, or this file, or the license file. The notice at the top of each 
+file looks like the following:
 
 #-------------------------------------------------------------------
 # WebGUI is Copyright 2001 Plain Black Software.

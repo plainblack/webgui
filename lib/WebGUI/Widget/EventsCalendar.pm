@@ -19,6 +19,12 @@ use WebGUI::Utility;
 use WebGUI::Widget;
 
 #-------------------------------------------------------------------
+sub purge {
+        WebGUI::SQL->write("delete from event where widgetId=$_[0]",$_[1]);
+        purgeWidget($_[0],$_[1]);
+}
+
+#-------------------------------------------------------------------
 sub widgetName {
 	return "Events Calendar";
 }
@@ -193,12 +199,12 @@ sub www_view {
 	%data = WebGUI::SQL->quickHash("select * from widget where widget.widgetId='$widgetId'",$session{dbh});
 	if (defined %data) {
 		if ($data{displayTitle}) {
-			$output = "<h2>".$data{title}."</h2>";
+			$output = "<h1>".$data{title}."</h1>";
 		}
 		if ($data{description} ne "") {
 			$output .= $data{description}.'<p>';
 		}
-		$sth = WebGUI::SQL->read("select name, description, date_format(startDate,'%M'), date_format(startDate,'%e'), date_format(startDate,'%Y'), date_format(endDate,'%e') from event where widgetId='$widgetId' and startDate>now() order by startDate",$session{dbh});
+		$sth = WebGUI::SQL->read("select name, description, date_format(startDate,'%M'), date_format(startDate,'%e'), date_format(startDate,'%Y'), date_format(endDate,'%e') from event where widgetId='$widgetId' and to_days(startDate)>(to_days(now())-1) order by startDate",$session{dbh});
 		while (@event = $sth->array) {
 			$output .= "<b>$event[2] $event[3]";
 			if ($event[3] ne $event[5]) {

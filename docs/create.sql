@@ -454,7 +454,6 @@ CREATE TABLE page (
 #
 
 INSERT INTO page VALUES (1,0,'Home',3,3,1,1,1,1,0,1,0,1,'','home');
-INSERT INTO page VALUES (5,3,'Reserved',1,1,1,1,NULL,1,0,1,0,1,NULL,'page_2.1');
 INSERT INTO page VALUES (6,0,'Reserved',0,0,1,1,NULL,1,0,1,0,1,NULL,NULL);
 INSERT INTO page VALUES (7,0,'Reserved',0,0,1,1,NULL,1,0,1,0,1,NULL,NULL);
 INSERT INTO page VALUES (8,0,'Reserved',0,0,1,1,NULL,1,0,1,0,1,NULL,NULL);
@@ -1186,6 +1185,7 @@ CREATE TABLE submission (
   image varchar(255) default NULL,
   attachment varchar(255) default NULL,
   status varchar(30) default NULL,
+  convertCarriageReturns int(11) NOT NULL default '0',
   PRIMARY KEY  (submissionId)
 ) TYPE=MyISAM;
 

@@ -44,6 +44,13 @@ sub _traverseReplyTree {
 }
 
 #-------------------------------------------------------------------
+sub purge {
+        WebGUI::SQL->write("delete from message where widgetId=$_[0]",$_[1]);
+        WebGUI::SQL->write("delete from MessageBoard where widgetId=$_[0]",$_[1]);
+        purgeWidget($_[0],$_[1]);
+}
+
+#-------------------------------------------------------------------
 sub widgetName {
         return "Message Board";
 }
@@ -310,18 +317,12 @@ sub www_showMessage {
 
 #-------------------------------------------------------------------
 sub www_view {
-	my ($sth, @data, $html, %board, $itemsPerPage, $currentPage, $totalItems);
+	my ($sth, @data, $html, %board, $itemsPerPage, $i, @row, $pn);
 	%board = _getBoardProperties($_[0]);
         $itemsPerPage = $board{messagesPerPage};
-        if ($session{form}{pageNumber} < 1) {
-                $currentPage = 1;
-        } else {
-                $currentPage = $session{form}{pageNumber};
-        }
 	if ($board{description} ne "") {
 		$html .= $board{description}.'<p>';
 	}
-        ($totalItems) = WebGUI::SQL->quickArray("select count(*) from message where widgetId=$_[0]",$session{dbh});
 	$html .= '<table width="100%"><tr><td class="boardTitle">';
 	if ($board{displayTitle}) {
 		$html .= $board{title};
@@ -329,32 +330,34 @@ sub www_view {
 	$html .= '</td><td align="right" valign="bottom" class="boardMenu"><a href="'.$session{page}{url}.'?func=postNewMessage&wid='.$_[0].'">Post New Message</a></td></tr></table>';
 	$html .= '<table border=0 cellpadding=2 cellspacing=1 width="100%">';
 	$html .= '<tr><td class="tableHeader">Subject</td><td class="tableHeader">Author</td><td class="tableHeader">Thread Started</td><td class="tableHeader">Replies</td><td class="tableHeader">Last Reply</td></tr>';
-	$sth = WebGUI::SQL->read("select messageId,substring(subject,1,30),count(messageId)-1,username,date_format(dateOfPost,'%c/%e %l:%i%p'),date_format(max(dateOfPost),'%c/%e %l:%i%p'),max(messageId) from message where widgetId=$_[0] group by rid order by messageId desc limit ".(($currentPage*$itemsPerPage)-$itemsPerPage).",".$itemsPerPage, $session{dbh});
+	$sth = WebGUI::SQL->read("select messageId,substring(subject,1,30),count(messageId)-1,username,date_format(dateOfPost,'%c/%e %l:%i%p'),date_format(max(dateOfPost),'%c/%e %l:%i%p'),max(messageId) from message where widgetId=$_[0] group by rid order by messageId desc", $session{dbh});
 	while (@data = $sth->array) {
-		$html .= '<tr><td class="tableData"><a href="'.$session{page}{url}.'?func=showMessage&mid='.$data[0].'&wid='.$_[0].'">'.$data[1].'</a></td><td class="tableData">'.$data[3].'</td><td class="tableData">'.$data[4].'</td><td class="tableData">'.$data[2].'</td><td class="tableData"><a href="'.$session{page}{url}.'?func=showMessage&mid='.$data[6].'&wid='.$_[0].'">'.$data[5].'</a></td></tr>';
-	}
-	$html .= "</table>";
-	$sth->finish;
-    	$html .= '<div class="pagination">';
-	if ($currentPage > 1) {
-    		$html .= '<a href="'.$session{page}{url}.'?pageNumber='.($currentPage-1).'">&laquo;Previous Page</a>';
-    	} else {
-    		$html .= '&laquo;Previous Page';
-    	}
-    	$html .= ' &middot; ';
-    	if ($currentPage < round($totalItems/$itemsPerPage)) {
-    		$html .= '<a href="'.$session{page}{url}.'?pageNumber='.($currentPage+1).'">Next Page&raquo;</a>';
-    	} else {
-		$html .= 'Next Page&raquo;';
-    	}
-	$html .= '</div>';
+		$row[$i] = '<tr><td class="tableData"><a href="'.$session{page}{url}.'?func=showMessage&mid='.$data[0].'&wid='.$_[0].'">'.$data[1].'</a></td><td class="tableData">'.$data[3].'</td><td class="tableData">'.$data[4].'</td><td class="tableData">'.$data[2].'</td><td class="tableData"><a href="'.$session{page}{url}.'?func=showMessage&mid='.$data[6].'&wid='.$_[0].'">'.$data[5].'</a></td></tr>';
+       		$i++;
+        }
+        if ($session{form}{pn} < 1) {
+        	$pn = 0;
+        } else {
+                $pn = $session{form}{pn};
+        }
+        for ($i=($itemsPerPage*$pn); $i<($itemsPerPage*($pn+1));$i++) {
+                $html .= $row[$i];
+        }
+        $html .= '</table>';
+        $html .= '<div class="pagination">';
+        if ($pn > 0) {
+                $html .= '<a href="'.$session{page}{url}.'?pn='.($pn-1).'">&laquo;Previous Page</a>';
+        } else {
+                $html .= '&laquo;Previous Page';
+        }
+        $html .= ' &middot; ';
+        if ($pn < round($#row/$itemsPerPage)) {
+        	$html .= '<a href="'.$session{page}{url}.'?pn='.($pn+1).'">Next Page&raquo;</a>';
+        } else {
+        	$html .= 'Next Page&raquo;';
+        }
+        $html .= '</div>';
 	return $html;
 }
-
-
-
-
-
-
 
 1;

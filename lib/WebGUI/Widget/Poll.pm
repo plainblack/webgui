@@ -24,7 +24,7 @@ sub _viewPoll {
         %poll = WebGUI::SQL->quickHash("select * from widget,Poll where widget.widgetId=Poll.widgetId and widget.widgetId='$widgetId'",$session{dbh});
         if (defined %poll) {
                 if ($poll{displayTitle} == 1) {
-                        $output = "<h2>".$poll{title}."</h2>";
+                        $output = "<h1>".$poll{title}."</h1>";
                 }
                 if ($poll{description} ne "") {
                         $output .= $poll{description}.'<p>';
@@ -52,7 +52,7 @@ sub _viewResults {
         %poll = WebGUI::SQL->quickHash("select * from widget,Poll where widget.widgetId=Poll.widgetId and widget.widgetId='$widgetId'",$session{dbh});
         if (defined %poll) {
                 if ($poll{displayTitle} == 1) {
-                        $output = "<h2>".$poll{title}."</h2>";
+                        $output = "<h1>".$poll{title}."</h1>";
                 }
                 if ($poll{description} ne "") {
                         $output .= $poll{description}.'<p>';
@@ -71,6 +71,13 @@ sub _viewResults {
                 }
         }
         return $output;
+}
+
+#-------------------------------------------------------------------
+sub purge {
+        WebGUI::SQL->write("delete from pollAnswer where widgetId=$_[0]",$_[1]);
+        WebGUI::SQL->write("delete from Poll where widgetId=$_[0]",$_[1]);
+        purgeWidget($_[0],$_[1]);
 }
 
 #-------------------------------------------------------------------

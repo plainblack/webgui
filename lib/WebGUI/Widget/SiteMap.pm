@@ -35,6 +35,12 @@ sub _traversePageTree {
 }
 
 #-------------------------------------------------------------------
+sub purge {
+        WebGUI::SQL->write("delete from SiteMap where widgetId=$_[0]",$_[1]);
+        purgeWidget($_[0],$_[1]);
+}
+
+#-------------------------------------------------------------------
 sub widgetName {
 	return "Site Map";
 }
@@ -86,7 +92,7 @@ sub www_edit {
                 $output .= '<tr><td class="formDescription">Display title?</td><td>'.WebGUI::Form::checkbox("displayTitle",1,$data{displayTitle}).'</td></tr>';
                 $output .= '<tr><td class="formDescription">Description</td><td>'.WebGUI::Form::textArea("description",$data{description}).'</td></tr>';
                 $output .= '<tr><td class="formDescription">Starting from this level?</td><td>'.WebGUI::Form::checkbox("startAtThisLevel",1,$data{startAtThisLevel}).'</td></tr>';
-                $output .= '<tr><td class="formDescription">Show only one level?uuuu</td><td>'.WebGUI::Form::checkbox("showOnlyThisLevel",1,$data{showOnlyThisLevel}).'</td></tr>';
+                $output .= '<tr><td class="formDescription">Show only one level?</td><td>'.WebGUI::Form::checkbox("showOnlyThisLevel",1,$data{showOnlyThisLevel}).'</td></tr>';
 		$output .= '<tr><td></td><td>'.WebGUI::Form::submit("save").'</td></tr>';
                 $output .= '</table></form>';
                 return $output;

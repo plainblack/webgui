@@ -18,6 +18,13 @@ use WebGUI::Utility;
 use WebGUI::Widget;
 
 #-------------------------------------------------------------------
+sub purge {
+        WebGUI::SQL->write("delete from submission where widgetId=$_[0]",$_[1]);
+        WebGUI::SQL->write("delete from UserSubmission where widgetId=$_[0]",$_[1]);
+        purgeWidget($_[0],$_[1]);
+}
+
+#-------------------------------------------------------------------
 sub widgetName {
 	return "User Submission System";
 }
@@ -27,7 +34,7 @@ sub www_add {
         my ($output, %hash);
 	tie %hash, "Tie::IxHash";
       	if (WebGUI::Privilege::canEditPage()) {
-                $output = '<h1>Add User Submission System</h1><form method="post" enctype="multipart/form-data" action="'.$session{page}{url}.'">';
+                $output = '<a href="'.$session{page}{url}.'?op=viewHelp&hid=44"><img src="'.$session{setting}{lib}.'/help.gif" border="0" align="right"></a><h1>Add User Submission System</h1><form method="post" enctype="multipart/form-data" action="'.$session{page}{url}.'">';
                 $output .= WebGUI::Form::hidden("widget","UserSubmission");
                 $output .= WebGUI::Form::hidden("func","addSave");
                 $output .= '<table>';
@@ -73,11 +80,12 @@ sub www_addSubmission {
                 $output .= '<tr><td class="formDescription">Content</td><td>'.WebGUI::Form::textArea("content",'',50,10,1).'</td></tr>';
                 $output .= '<tr><td class="formDescription">Image</td><td>'.WebGUI::Form::file("image").'</td></tr>';
                 $output .= '<tr><td class="formDescription">Attachment</td><td>'.WebGUI::Form::file("attachment").'</td></tr>';
+                $output .= '<tr><td class="formDescription">Convert Carriage Returns</td><td>'.WebGUI::Form::checkbox("convertCarriageReturns",1,1).' <span style="font-size: 8pt;">(uncheck if you\'re writing an HTML submission)</span></td></tr>';
                 $output .= '<tr><td></td><td>'.WebGUI::Form::submit("save").'</td></tr>';
                 $output .= '</table></form>';
                 $output .= '<table width="100%" cellspacing=1 cellpadding=2 border=0>';
                 $output .= '<tr><td class="tableHeader">Edit/Delete</td><td class="tableHeader">Title</td><td class="tableHeader">Date Submitted</td><td class="tableHeader">Status</td></tr>';
-                $sth = WebGUI::SQL->read("select title,submissionId,date_format(dateSubmitted,'%c/%e %l:%i%p'),status from submission where widgetId='$session{form}{wid}' and userId=$session{user}{userId} order by dateSubmitted desc",$session{dbh});
+                $sth = WebGUI::SQL->read("select title,submissionId,date_format(dateSubmitted,'%c/%e/%Y'),status from submission where widgetId='$session{form}{wid}' and userId=$session{user}{userId} order by dateSubmitted desc",$session{dbh});
                 while (@submission = $sth->array) {
                         $output .= '<tr><td class="tableData"><a href="'.$session{page}{url}.'?func=editSubmission&wid='.$session{form}{wid}.'&sid='.$submission[1].'"><img src="'.$session{setting}{lib}.'/edit.gif" border=0></a><a href="'.$session{page}{url}.'?wid='.$session{form}{wid}.'&sid='.$submission[1].'&func=deleteSubmission"><img src="'.$session{setting}{lib}.'/delete.gif" border=0></a></td><td class="tableData"><a href="'.$session{page}{url}.'?wid='.$session{form}{wid}.'&func=viewSubmission&sid='.$submission[1].'">'.$submission[0].'</a></td><td class="tableData">'.$submission[2].'</td><td class="tableData">'.$submission[3].'</td></tr>';
                 }
@@ -91,13 +99,18 @@ sub www_addSubmission {
 
 #-------------------------------------------------------------------
 sub www_addSubmissionSave {
-        my ($submissionId, $image, $attachment, $status, $groupToContribute);
+        my ($title, $submissionId, $image, $attachment, $status, $groupToContribute);
 	($status, $groupToContribute) = WebGUI::SQL->quickArray("select defaultStatus,groupToContribute from UserSubmission where widgetId=$session{form}{wid}",$session{dbh});
         if (WebGUI::Privilege::isInGroup($groupToContribute,$session{user}{userId})) {
                 $submissionId = getNextId("submissionId");
                 $image = saveAttachment("image",$session{form}{wid},$submissionId);
                 $attachment = saveAttachment("attachment",$session{form}{wid},$submissionId);
-                WebGUI::SQL->write("insert into submission set widgetId=$session{form}{wid}, submissionId=$submissionId, title=".quote($session{form}{title}).", username=".quote($session{user}{username}).", status='$status', dateSubmitted=now(), userId='$session{user}{userId}', content=".quote($session{form}{content}).", image=".quote($image).", attachment=".quote($attachment),$session{dbh});
+		if ($session{form}{title} ne "") {
+			$title = $session{form}{title};
+		} else {
+			$title = "Untitled";
+		}
+                WebGUI::SQL->write("insert into submission set widgetId=$session{form}{wid}, submissionId=$submissionId, convertCarriageReturns='$session{form}{convertCarriageReturns}', title=".quote($title).", username=".quote($session{user}{username}).", status='$status', dateSubmitted=now(), userId='$session{user}{userId}', content=".quote($session{form}{content}).", image=".quote($image).", attachment=".quote($attachment),$session{dbh});
                 return "";
         } else {
                 return WebGUI::Privilege::insufficient();
@@ -158,7 +171,7 @@ sub www_edit {
         my ($output, %data, @array, $sth, %hash);
         if (WebGUI::Privilege::canEditPage()) {
 		%data = WebGUI::SQL->quickHash("select * from widget,UserSubmission where widget.widgetId=$session{form}{wid} and widget.widgetId=UserSubmission.widgetId",$session{dbh});
-                $output = '<h1>Edit User Submission System</h1><form method="post" enctype="multipart/form-data" action="'.$session{page}{url}.'">';
+                $output = '<a href="'.$session{page}{url}.'?op=viewHelp&hid=45"><img src="'.$session{setting}{lib}.'/help.gif" border="0" align="right"></a><h1>Edit User Submission System</h1><form method="post" enctype="multipart/form-data" action="'.$session{page}{url}.'">';
                 $output .= WebGUI::Form::hidden("wid",$session{form}{wid});
                 $output .= WebGUI::Form::hidden("func","editSave");
                 $output .= '<table>';
@@ -214,6 +227,7 @@ sub www_editSubmission {
                 } else {
                         $output .= '<tr><td class="formDescription">Attachment</td><td>'.WebGUI::Form::file("attachment").'</td></tr>';
                 }
+                $output .= '<tr><td class="formDescription">Convert Carriage Returns</td><td>'.WebGUI::Form::checkbox("convertCarriageReturns",1,$submission{convertCarriageReturns}).' <span style="font-size: 8pt;">(uncheck if you\'re writing an HTML submission)</span></td></tr>';
                 $output .= '<tr><td></td><td>'.WebGUI::Form::submit("save").'</td></tr>';
                 $output .= '</table></form>';
                 return $output;
@@ -225,7 +239,7 @@ sub www_editSubmission {
 
 #-------------------------------------------------------------------
 sub www_editSubmissionSave {
-	my ($owner,$status,$image,$attachment);
+	my ($owner,$status,$image,$attachment,$title);
 	($owner) = WebGUI::SQL->quickArray("select userId from submission where submissionId=$session{form}{sid}",$session{dbh});
         if ($owner == $session{user}{userId}) {
 		($status) = WebGUI::SQL->quickArray("select defaultStatus from UserSubmission where widgetId=$session{form}{wid}",$session{dbh});
@@ -237,7 +251,12 @@ sub www_editSubmissionSave {
                 if ($attachment ne "") {
                         $attachment = 'attachment='.quote($attachment).', ';
                 }
-                WebGUI::SQL->write("update submission set title=".quote($session{form}{title}).", content=".quote($session{form}{content}).", ".$image.$attachment." status='$status' where submissionId=$session{form}{sid}",$session{dbh});
+                if ($session{form}{title} ne "") {
+                        $title = $session{form}{title};
+                } else {
+                        $title = "Untitled";
+                }
+                WebGUI::SQL->write("update submission set convertCarriageReturns='$session{form}{convertCarriageReturns}', title=".quote($title).", content=".quote($session{form}{content}).", ".$image.$attachment." status='$status' where submissionId=$session{form}{sid}",$session{dbh});
                 return www_viewSubmission();
         } else {
                 return WebGUI::Privilege::insufficient();
@@ -251,12 +270,12 @@ sub www_view {
 	%data = WebGUI::SQL->quickHash("select * from widget,UserSubmission where widget.widgetId=$widgetId and widget.widgetId=UserSubmission.widgetId",$session{dbh});
 	if (%data) {
 		if ($data{displayTitle} == 1) {
-			$output = "<h2>".$data{title}."</h2>";
+			$output = "<h1>".$data{title}."</h1>";
 		}
 		if ($data{description} ne "") {
 			$output .= $data{description}.'<p>';
 		}
-		$sth = WebGUI::SQL->read("select title,submissionId,date_format(dateSubmitted,'%c/%e %l:%i%p'),username,userId from submission where widgetId='$widgetId' and status='Approved' order by dateSubmitted desc",$session{dbh});
+		$sth = WebGUI::SQL->read("select title,submissionId,date_format(dateSubmitted,'%c/%e/%Y'),username,userId from submission where widgetId='$widgetId' and status='Approved' order by dateSubmitted desc",$session{dbh});
 		while (@submission = $sth->array) {
 			$row[$i] = '<tr><td class="tableData"><a href="'.$session{page}{url}.'?wid='.$widgetId.'&func=viewSubmission&sid='.$submission[1].'">'.$submission[0].'</a></td><td class="tableData">'.$submission[2].'</td><td class="tableData">'.$submission[3].'</td></tr>';
 			$i++;
@@ -295,7 +314,7 @@ sub www_view {
 sub www_viewSubmission {
 	my ($output, %submission);
 	%submission = WebGUI::SQL->quickHash("select * from submission where submissionId=$session{form}{sid}",$session{dbh});
-       	$output = "<h2>".$submission{title}."</h2>";
+       	$output = "<h1>".$submission{title}."</h1>";
 	$output .= '<b>Submitted By:</b> '.$submission{username}.'<br>';
 	$output .= '<b>Date Submitted:</b> '.$submission{dateSubmitted}.'<p>';
 	if ($submission{image} ne "") {
@@ -307,7 +326,10 @@ sub www_viewSubmission {
                 $output .= '<a href="'.$session{page}{url}.'?op=viewPendingSubmissions">Leave Pending</a> &middot; ';
                 $output .= '<a href="'.$session{page}{url}.'?op=denySubmission&sid='.$session{form}{sid}.'">Deny</a> ';
 		$output .= '</div>';
-        }	
+        }
+	if ($submission{convertCarriageReturns}) {
+		$submission{content} =~ s/\n/\<br\>/g;
+	}	
 	$output .= $submission{content}.'<p>';
 	if ($submission{attachment} ne "") {
                	$output .= '<p><a href="'.$session{setting}{attachmentDirectoryWeb}.'/'.$session{form}{wid}.'/'.$session{form}{sid}.'/'.$submission{attachment}.'"><img src="'.$session{setting}{lib}.'/attachment.gif" border=0 alt="Download Attachment"></a><p>';

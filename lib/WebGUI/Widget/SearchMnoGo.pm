@@ -27,6 +27,7 @@ sub _mnogoSearch {
 		$dbh = DBI->connect($data{DSN},$data{username},$data{identifier});
 	} else {
 		$output .= '<b>Error</b>: The DSN specified is of an improper format.<p>';
+		WebGUI::ErrorHandler::warn("Search (MnoGo) The DSN specified is of an improper format.");
 	}
 	if (defined $dbh) {
 		foreach $word (@keyword) {
@@ -38,6 +39,7 @@ sub _mnogoSearch {
 				$sth->finish;
 			} else {
 				$output .= '<b>Error</b>: There was a problem with the query.<p>';
+				WebGUI::ErrorHandler::warn("Search (MnoGo) There was a problem with the query.");
 			}
 		}
 		foreach $key (sort {$result{$b} <=> $result{$a}} keys %result) {
@@ -50,8 +52,15 @@ sub _mnogoSearch {
 		$dbh->disconnect();
 	} else {
 		$output .= '<b>Error</b>: Could not connect to remote database.<p>';
+		WebGUI::ErrorHandler::warn("Search (MnoGo) Could not connect to remote database.");
 	}
 	return $output;
+}
+
+#-------------------------------------------------------------------
+sub purge {
+        WebGUI::SQL->write("delete from SearchMnoGo where widgetId=$_[0]",$_[1]);
+        purgeWidget($_[0],$_[1]);
 }
 
 #-------------------------------------------------------------------
@@ -63,7 +72,7 @@ sub widgetName {
 sub www_add {
         my ($output);
       	if (WebGUI::Privilege::canEditPage()) {
-                $output = '<h1>Add Search (MnoGo)</h1><form method="post" enctype="multipart/form-data" action="'.$session{page}{url}.'">';
+                $output = '<a href="'.$session{page}{url}.'?op=viewHelp&hid=42"><img src="'.$session{setting}{lib}.'/help.gif" border="0" align="right"></a><h1>Add Search (MnoGo)</h1><form method="post" enctype="multipart/form-data" action="'.$session{page}{url}.'">';
                 $output .= WebGUI::Form::hidden("widget","SearchMnoGo");
                 $output .= WebGUI::Form::hidden("func","addSave");
                 $output .= '<table>';
@@ -99,7 +108,7 @@ sub www_edit {
         my ($output, %data);
         if (WebGUI::Privilege::canEditPage()) {
 		%data = WebGUI::SQL->quickHash("select * from widget,SearchMnoGo where widget.widgetId=SearchMnoGo.widgetId and widget.widgetId=$session{form}{wid}",$session{dbh});
-                $output = '<h1>Edit Search (MnoGo)</h1><form method="post" enctype="multipart/form-data" action="'.$session{page}{url}.'">';
+                $output = '<a href="'.$session{page}{url}.'?op=viewHelp&hid=43"><img src="'.$session{setting}{lib}.'/help.gif" border="0" align="right"></a><h1>Edit Search (MnoGo)</h1><form method="post" enctype="multipart/form-data" action="'.$session{page}{url}.'">';
                 $output .= WebGUI::Form::hidden("wid",$session{form}{wid});
                 $output .= WebGUI::Form::hidden("func","editSave");
                 $output .= '<table>';
@@ -135,7 +144,7 @@ sub www_view {
 	%data = WebGUI::SQL->quickHash("select * from widget,SearchMnoGo where widget.widgetId='$widgetId' and widget.WidgetId=SearchMnoGo.widgetId",$session{dbh});
 	if (%data) {
 		if ($data{displayTitle} == 1) {
-			$output = "<h2>".$data{title}."</h2>";
+			$output = "<h1>".$data{title}."</h1>";
 		}
 		if ($data{description} ne "") {
 			$output .= $data{description}.'<p>';

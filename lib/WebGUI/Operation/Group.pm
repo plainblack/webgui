@@ -115,33 +115,37 @@ sub www_editGroupSave {
 
 #-------------------------------------------------------------------
 sub www_listGroups {
-        my ($output, $sth, @data, $totalItems, $currentPage, $itemsPerPage);
+        my ($output, $pn, $sth, @data, @row, $i, $itemsPerPage);
         if (WebGUI::Privilege::isInGroup(3)) {
                 $itemsPerPage = 50;
-                if ($session{form}{pageNumber} < 1) {
-                        $currentPage = 1;
-                } else {
-                        $currentPage = $session{form}{pageNumber};
-                }
-                ($totalItems) = WebGUI::SQL->quickArray("select count(*) from groups where groupName<>'Reserved'",$session{dbh});
                 $output = '<a href="'.$session{page}{url}.'?op=viewHelp&hid=10"><img src="'.$session{setting}{lib}.'/help.gif" border="0" align="right"></a><h1>Groups</h1>';
 		$output .= '<div align="center"><a href="'.$session{page}{url}.'?op=addGroup">Add a new group.</a></div>';
                 $output .= '<table border=1 cellpadding=5 cellspacing=0 align="center">';
-                $sth = WebGUI::SQL->read("select groupId,groupName,description from groups where groupName<>'Reserved' order by groupName limit ".(($currentPage*$itemsPerPage)-$itemsPerPage).",".$itemsPerPage,$session{dbh});
+                $sth = WebGUI::SQL->read("select groupId,groupName,description from groups where groupName<>'Reserved' order by groupName",$session{dbh});
                 while (@data = $sth->array) {
-                        $output .= '<tr><td valign="top"><a href="'.$session{page}{url}.'?op=deleteGroup&gid='.$data[0].'"><img src="'.$session{setting}{lib}.'/delete.gif" border=0></a><a href="'.$session{page}{url}.'?op=editGroup&gid='.$data[0].'"><img src="'.$session{setting}{lib}.'/edit.gif" border=0></a></td>';
-                        $output .= '<td valign="top">'.$data[1].'</td>';
-                        $output .= '<td valign="top">'.$data[2].'</td></tr>';
+                        $row[$i] = '<tr><td valign="top"><a href="'.$session{page}{url}.'?op=deleteGroup&gid='.$data[0].'"><img src="'.$session{setting}{lib}.'/delete.gif" border=0></a><a href="'.$session{page}{url}.'?op=editGroup&gid='.$data[0].'"><img src="'.$session{setting}{lib}.'/edit.gif" border=0></a></td>';
+                        $row[$i] .= '<td valign="top">'.$data[1].'</td>';
+                        $row[$i] .= '<td valign="top">'.$data[2].'</td></tr>';
+                        $i++;
                 }
-                $output .= '</table><div class="pagination">';
-                if ($currentPage > 1) {
-                        $output .= '<a href="'.$session{page}{url}.'?op=listGroups&pageNumber='.($currentPage-1).'">&laquo;Previous Page</a>';
+                if ($session{form}{pn} < 1) {
+                        $pn = 0;
+                } else {
+                        $pn = $session{form}{pn};
+                }
+                for ($i=($itemsPerPage*$pn); $i<($itemsPerPage*($pn+1));$i++) {
+                        $output .= $row[$i];
+                }
+                $output .= '</table>';
+                $output .= '<div class="pagination">';
+                if ($pn > 0) {
+                        $output .= '<a href="'.$session{page}{url}.'?pn='.($pn-1).'&op=listGroups">&laquo;Previous Page</a>';
                 } else {
                         $output .= '&laquo;Previous Page';
                 }
                 $output .= ' &middot; ';
-                if ($currentPage < round($totalItems/$itemsPerPage)) {
-                        $output .= '<a href="'.$session{page}{url}.'?op=listGroups&pageNumber='.($currentPage+1).'">Next Page&raquo;</a>';
+                if ($pn < round($#row/$itemsPerPage)) {
+                        $output .= '<a href="'.$session{page}{url}.'?pn='.($pn+1).'&op=listGroups">Next Page&raquo;</a>';
                 } else {
                         $output .= 'Next Page&raquo;';
                 }

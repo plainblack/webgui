@@ -19,6 +19,12 @@ use WebGUI::Utility;
 use WebGUI::Widget;
 
 #-------------------------------------------------------------------
+sub purge {
+        WebGUI::SQL->write("delete from SyndicatedContent where widgetId=$_[0]",$_[1]);
+        purgeWidget($_[0],$_[1]);
+}
+
+#-------------------------------------------------------------------
 sub widgetName {
 	return "Syndicated Content";
 }
@@ -98,7 +104,7 @@ sub www_view {
 	%data = WebGUI::SQL->quickHash("select * from widget,SyndicatedContent where widget.widgetId=$widgetId",$session{dbh});
 	if (defined %data) {
 		if ($data{displayTitle} == 1) {
-			$output = "<h2>".$data{title}."</h2>";
+			$output = "<h1>".$data{title}."</h1>";
 		}
 		if ($data{description} ne "") {
 			$output .= $data{description}.'<p>';

@@ -18,6 +18,12 @@ use WebGUI::Utility;
 use WebGUI::Widget;
 
 #-------------------------------------------------------------------
+sub purge {
+        WebGUI::SQL->write("delete from ExtraColumn where widgetId=$_[0]",$_[1]);
+        purgeWidget($_[0],$_[1]);
+}
+
+#-------------------------------------------------------------------
 sub widgetName {
 	return "Extra Column";
 }

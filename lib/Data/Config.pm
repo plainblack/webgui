@@ -1,5 +1,4 @@
-package WebGUI::Config;
-# This package was originally Data::Config 
+package Data::Config;
 
 use strict;
 use Carp;

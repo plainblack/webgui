@@ -30,6 +30,12 @@ sub _reorderLinks {
 }
 
 #-------------------------------------------------------------------
+sub purge {
+        WebGUI::SQL->write("delete from link where widgetId=$_[0]",$_[1]);
+        purgeWidget($_[0],$_[1]);
+}
+
+#-------------------------------------------------------------------
 sub widgetName {
 	return "Link List";
 }
@@ -234,7 +240,7 @@ sub www_view {
 	%data = WebGUI::SQL->quickHash("select * from widget where widget.widgetId='$widgetId'",$session{dbh});
 	if (defined %data) {
 		if ($data{displayTitle}) {
-			$output = "<h2>".$data{title}."</h2>";
+			$output = "<h1>".$data{title}."</h1>";
 		}
 		if ($data{description} ne "") {
 			$output .= $data{description}.'<p>';

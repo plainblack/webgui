@@ -19,7 +19,7 @@ use WebGUI::SQL;
 use WebGUI::Utility;
 
 our @ISA = qw(Exporter);
-our @EXPORT = qw(&www_jumpDown &www_jumpUp &update &www_moveUp &www_moveDown &www_delete &www_deleteConfirm &www_cut &create &www_paste);
+our @EXPORT = qw(&purgeWidget &www_jumpDown &www_jumpUp &update &www_moveUp &www_moveDown &www_delete &www_deleteConfirm &www_cut &create &www_paste);
 
 #-------------------------------------------------------------------
 sub _reorderWidgets {
@@ -44,6 +44,11 @@ sub create {
 #-------------------------------------------------------------------
 sub update {
 	WebGUI::SQL->write("update widget set title=".quote($session{form}{title}).", displayTitle='$session{form}{displayTitle}', description=".quote($session{form}{description}).", processMacros='$session{form}{processMacros}', lastEdited=now(), editedBy='$session{user}{userId}' where widgetId=$session{form}{wid}",$session{dbh});
+}
+
+#-------------------------------------------------------------------
+sub purgeWidget {
+	WebGUI::SQL->write("delete from widget where widgetId=$_[0]",$_[1]);
 }
 
 #-------------------------------------------------------------------

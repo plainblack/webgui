@@ -14,11 +14,11 @@ use DBI;
 use HTTP::Request;
 use LWP::UserAgent;
 use strict;
-use WebGUI::Config;
+use Data::Config;
 use WebGUI::SQL;
 use XML::RSS;
 
-my $config = new WebGUI::Config '../etc/WebGUI.conf';
+my $config = new Data::Config '../etc/WebGUI.conf';
 our $dbh = DBI->connect($config->param('dsn'), $config->param('dbuser'), $config->param('dbpass'));
 
 deleteExpiredSessions();

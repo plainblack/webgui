@@ -1,4 +1,5 @@
 package WebGUI;
+our $VERSION = "1.0.0";
 
 #-------------------------------------------------------------------
 # WebGUI is Copyright 2001 Plain Black Software.
@@ -52,7 +53,8 @@ sub _displayAdminBar {
 			$session{page}{url}.'?op=listStyles'=>'Manage Styles', 
 			$session{page}{url}.'?op=listUsers'=>'Manage Users',
 			$session{env}{SCRIPT_NAME}.'/clipboard'=>'View Clipboard',
-			$session{env}{SCRIPT_NAME}.'/trash'=>'View Trash'
+			$session{env}{SCRIPT_NAME}.'/trash'=>'View Trash',
+			$session{page}{url}.'?op=purgeTrash'=>'Empty Trash'
 		);
 	}
         %hash = ( $session{page}{url}=>'Admin...', 

@@ -40,7 +40,7 @@ sub www_editSettings {
                 $output .= '<tr><td></td><td>'.WebGUI::Form::submit("save").'</td></tr>';
                 $output .= '</table>';
                 $output .= '</form> ';
-		$output .= '<hr size=1>Build Version: '.$session{wg}{version}.'<br>Release Date: '.$session{wg}{date};
+		$output .= '<hr size=1>Build Version: '.$WebGUI::VERSION;
         } else {
                 $output = WebGUI::Privilege::insufficient();
         }

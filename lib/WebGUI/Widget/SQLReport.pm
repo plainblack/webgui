@@ -11,12 +11,19 @@ package WebGUI::Widget::SQLReport;
 #-------------------------------------------------------------------
 
 use strict;
+use WebGUI::ErrorHandler;
 use WebGUI::Macro;
 use WebGUI::Privilege;
 use WebGUI::Session;
 use WebGUI::SQL;
 use WebGUI::Utility;
 use WebGUI::Widget;
+
+#-------------------------------------------------------------------
+sub purge {
+        WebGUI::SQL->write("delete from SQLReport where widgetId=$_[0]",$_[1]);
+        purgeWidget($_[0],$_[1]);
+}
 
 #-------------------------------------------------------------------
 sub widgetName {
@@ -108,7 +115,7 @@ sub www_view {
 	%data = WebGUI::SQL->quickHash("select * from widget,SQLReport where widget.widgetId=$widgetId and widget.widgetId=SQLReport.widgetId",$session{dbh});
 	if (defined %data) {
 		if ($data{displayTitle} == 1) {
-			$output = "<h2>".$data{title}."</h2>";
+			$output = "<h1>".$data{title}."</h1>";
 		}
 		if ($data{description} ne "") {
 			$output .= $data{description}.'<p>';
@@ -119,9 +126,15 @@ sub www_view {
         	        $dbh = DBI->connect($data{DSN},$data{username},$data{identifier});
        	 	} else {
                 	$output .= '<b>Error</b>: The DSN specified is of an improper format.<p>';
+			WebGUI::ErrorHandler::warn("SQLReport [$widgetId] The DSN specified is of an improper format.");
         	}
 		if (defined $dbh) {
-			$sth = WebGUI::SQL->read($data{dbQuery},$dbh);
+			if ($data{dbQuery} =~ /select/i) {
+				$sth = WebGUI::SQL->read($data{dbQuery},$dbh);
+			} else {
+				$output .= '<b>Error</b>: The SQL query is improperly formatted.<p>';
+				WebGUI::ErrorHandler::warn("SQLReport [$widgetId] The SQL query is improperly formatted.");
+			}
 			if (defined $sth) {
 				while (@result = $sth->array) {
 					$temp = $template[1];
@@ -133,11 +146,13 @@ sub www_view {
 				}
 				$sth->finish;
 			} else {
-				$output .= '<b>Error</b>: There was a problem with the query.';
+				$output .= '<b>Error</b>: There was a problem with the query.<p>';
+				WebGUI::ErrorHandler::warn("SQLReport [$widgetId] There was a problem with the query.");
 			}
 			$dbh->disconnect();
 		} else {
-			$output .= '<b>Error</b>: Could not connect to remote database.';
+			$output .= '<b>Error</b>: Could not connect to remote database.<p>';
+			WebGUI::ErrorHandler::warn("SQLReport [$widgetId] Could not connect to remote database.");
 		}	
 		$output .= $template[2];
 	}

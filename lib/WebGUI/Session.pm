@@ -14,7 +14,7 @@ use CGI;
 use DBI;
 use Exporter;
 use strict;
-use WebGUI::Config;
+use Data::Config;
 use WebGUI::SQL;
 
 our @ISA = qw(Exporter);
@@ -93,9 +93,8 @@ sub httpRedirect {
 
 #-------------------------------------------------------------------
 sub open {
-        my ($key, %WebGUI, %CONFIG, %VARS, %PAGE, %FORM, $query, %COOKIES, $config, %USER, %SETTINGS, $dbh);
-	%WebGUI = (version=>"0.12.0", date=>"2001-08-26");
-        $config = new WebGUI::Config '../etc/WebGUI.conf';
+        my ($key, %CONFIG, %VARS, %PAGE, %FORM, $query, %COOKIES, $config, %USER, %SETTINGS, $dbh);
+        $config = new Data::Config '../etc/WebGUI.conf';
         foreach ($config->param) {
                 $CONFIG{$_} = $config->param($_);
         }
@@ -124,7 +123,6 @@ sub open {
                 page => \%PAGE,					# variables related to the current page 
                 header => {},					# settings to be passed back through the http header
                 dbh => $dbh,					# interface to the default WebGUI database
-		wg => \%WebGUI					# WebGUI internal settings
         );
 }
 
