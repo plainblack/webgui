@@ -122,9 +122,8 @@ sub _setupUserInfo {
 #-------------------------------------------------------------------
 sub _loadAuthentication {
 	my ($dir, @files, $slash, $file, $cmd, $namespace, $exclude, @availableModules);
-	$slash = ($^O =~ /Win/i) ? "\\" : "/";
-	$dir = $slash."lib".$slash."WebGUI".$slash."Authentication";
-	opendir (DIR,$session{config}{webguiRoot}.$dir) or WebGUI::ErrorHandler::fatalError("Can't open Authentication module directory!");
+	$dir = $session{config}{webguiRoot}.$session{os}{slash}."lib".$session{os}{slash}."WebGUI".$session{os}{slash}."Authentication";
+	opendir (DIR,$dir) or WebGUI::ErrorHandler::fatalError("Can't open Authentication module directory!");
 	@files = readdir(DIR);
 	foreach $file (@files) {
 		if ($file =~ /(.*?)\.pm$/) {
@@ -150,10 +149,9 @@ sub _loadAuthentication {
 
 #-------------------------------------------------------------------
 sub _loadMacros {
-	my ($slash, $namespace, $cmd, @files, $file, $dir, $exclude);
-	$slash = ($^O =~ /Win/i) ? "\\" : "/";
-	$dir = $slash."lib".$slash."WebGUI".$slash."Macro";
-	opendir (DIR,$session{config}{webguiRoot}.$dir) or WebGUI::ErrorHandler::fatalError("Can't open macro directory!");
+	my ($namespace, $cmd, @files, $file, $dir, $exclude);
+	$dir = $session{config}{webguiRoot}.$session{os}{slash}."lib".$session{os}{slash}."WebGUI".$session{os}{slash}."Authentication";
+	opendir (DIR,$dir) or WebGUI::ErrorHandler::fatalError("Can't open macro directory!");
 	@files = readdir(DIR);
 	foreach $file (@files) {
 		if ($file =~ /(.*?)\.pm$/) {
@@ -173,10 +171,9 @@ sub _loadMacros {
 
 #-------------------------------------------------------------------
 sub _loadWobjects {
-	my ($dir, @files, $slash, $file, $cmd, $namespace, $exclude);
-	$slash = ($^O =~ /Win/i) ? "\\" : "/";
-	$dir = $slash."lib".$slash."WebGUI".$slash."Wobject";
-	opendir (DIR,$session{config}{webguiRoot}.$dir) or WebGUI::ErrorHandler::fatalError("Can't open wobject directory!");
+	my ($dir, @files, $file, $cmd, $namespace, $exclude);
+	$dir = $session{config}{webguiRoot}.$session{os}{slash}."lib".$session{os}{slash}."WebGUI".$session{os}{slash}."Authentication";
+	opendir (DIR,$dir) or WebGUI::ErrorHandler::fatalError("Can't open wobject directory!");
 	@files = readdir(DIR);
 	foreach $file (@files) {
 		if ($file =~ /(.*?)\.pm$/) {
@@ -245,6 +242,16 @@ sub httpRedirect {
 #-------------------------------------------------------------------
 sub open {
 	my ($key, $config);
+	###----------------------------
+	### operating system specific things
+	$session{os}{name} = $^O;
+	if ($session{os}{name} =~ /^Win/i) {
+		$session{os}{type} = "Windowsish";
+		$session{os}{slash} = "\\";
+	} else {
+		$session{os}{type} = "Linuxish";
+		$session{os}{slash} = "/";
+	}
 	###----------------------------
 	### config variables
 	$session{config}{webguiRoot} = $_[0];

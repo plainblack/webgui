@@ -307,9 +307,7 @@ sub getIcon {
 =cut
 
 sub getPath {
-	my ($slash);
-	$slash = ($^O =~ /Win/i) ? "\\" : "/";
-        return $_[0]->{_node}->getPath.$slash.$_[0]->getFilename;
+        return $_[0]->{_node}->getPath.$session{os}{slash}.$_[0]->getFilename;
 }
 
 
@@ -322,9 +320,8 @@ sub getPath {
 =cut
 
 sub getSize {
-	my ($size, $slash);
-	$slash = ($^O =~ /Win/i) ? "\\" : "/";
-	my (@attributes) = stat($_[0]->{_node}->getPath.$slash.$_[0]->getFilename);
+	my ($size);
+	my (@attributes) = stat($_[0]->{_node}->getPath.$session{os}{slash}.$_[0]->getFilename);
 	if ($attributes[7] > 1048576) {
 		$size = round($attributes[7]/1048576);
 		$size .= 'mb';
@@ -350,12 +347,10 @@ sub getSize {
 =cut
 
 sub getThumbnail {
-	my ($slash);
-	$slash = ($^O =~ /Win/i) ? "\\" : "/";
 	if ($hasImageMagick && isIn($_[0]->getType, qw(jpg jpeg gif png))) {
-        	return $_[0]->{_node}->getURL.$slash.'thumb-'.$_[0]->getFilename;
+        	return $_[0]->{_node}->getURL.'/thumb-'.$_[0]->getFilename;
 	} elsif ($hasImageMagick && isIn($_[0]->getType, qw(tif tiff bmp))) {
-        	return $_[0]->{_node}->getURL.$slash.'thumb-'.$_[0]->getFilename.'.png';
+        	return $_[0]->{_node}->getURL.'/thumb-'.$_[0]->getFilename.'.png';
 	} else {
 		return "";
 	}
@@ -446,9 +441,7 @@ sub new {
 =cut
 
 sub rename {
-	my ($slash);
-	$slash = ($^O =~ /Win/i) ? "\\" : "/";
-	rename $_[0]->getPath, $_[0]->{_node}->getPath.$slash.$_[1];
+	rename $_[0]->getPath, $_[0]->{_node}->getPath.$session{os}{slash}.$_[1];
 	$_[0]->{_filename} = $_[1];
 }
 
