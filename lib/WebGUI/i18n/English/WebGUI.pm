@@ -5545,21 +5545,21 @@ Macros always begin with a caret (&#94;) and follow with at least one other char
 		message => q|<p>Users are the accounts in the system that are given rights to do certain things. There are two default users built into the system: Admin and Visitor.
 </p>
 
-<p><i><b>Admin</b></i><br>
+<p><i>Admin</i><br>
 Admin is exactly what you'd expect. It is a user with unlimited rights in the WebGUI environment. If it can be done, this user has the rights to do it.
 </p>
 
-<p><i><b>Visitor</b></i><br>
+<p><i>Visitor</i><br>
 Visitor is exactly the opposite of Admin. Visitor has no rights what-so-ever. By default any user who is not logged in is seen as the user Visitor.
 </p>
 
-<p><i><b>Add a new user.</b></i><br>
+<p><b>Add a new user.</b><br>
 Click on this to go to the add user screen.
 </p>
 
-<p><i><b>Search</b></i><br>
+<p><b>Search</b><br>
 You can search users based on username and email address. You can do partial searches too if you like.</p>|,
-		lastUpdated => 1098327134
+		lastUpdated => 1102660904,
 	},
 
 	'1043' => {
