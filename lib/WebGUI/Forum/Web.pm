@@ -288,6 +288,7 @@ sub www_post {
 	$var->{'form.begin'} = WebGUI::Form::formHeader({
 		action=>$callback
 		});
+	my $defaultSubscribeValue = 0;
 	if ($var->{isReply}) {
 		my $reply = WebGUI::Forum::Post->new($session{form}{parentId});
 		return WebGUI::Privilege::insufficient unless ($reply->getThread->getForum->canPost);
@@ -300,10 +301,6 @@ sub www_post {
 
 		$subject = $reply->get("subject");
 		$subject = "Re: ".$subject unless ($subject =~ /^Re:/);
-		$var->{'subscribe.form'} = WebGUI::Form::yesNo({
-			name=>'subscribe',
-			value=>0
-			});
 	}
 	if ($var->{isNewThread}) {
 		$var->{'form.begin'} .= WebGUI::Form::hidden({
@@ -319,10 +316,7 @@ sub www_post {
 				value=>0
 				});
 		}
-		$var->{'subscribe.form'} = WebGUI::Form::yesNo({
-			name=>'subscribe',
-			value=>1
-			});
+		$defaultSubscribeValue = 1 unless ($forum->isSubscribed);
 	}
 	if ($var->{isNewMessage}) {
 		$var->{'subscribe.label'} = WebGUI::International::get(873);
@@ -333,6 +327,10 @@ sub www_post {
 				value=>0
 				});
 		}
+		$var->{'subscribe.form'} = WebGUI::Form::yesNo({
+			name=>'subscribe',
+			value=>$defaultSubscribeValue
+			});
 	}
 	if ($var->{isEdit}) {
 		my $post = WebGUI::Forum::Post->new($session{form}{forumPostId});

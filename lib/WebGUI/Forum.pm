@@ -43,6 +43,13 @@ sub isModerator {
 	return WebGUI::Privilege::isInGroup($self->get("groupToModerate"), $userId);
 }
 
+sub isSubscribed {
+	my ($self, $userId) = @_;
+        $userId = $session{user}{userId} unless ($userId);
+        my ($isSubscribed) = WebGUI::SQL->quickArray("select count(*) from forumSubscription where forumId=".$self->get("forumId")." and userId=$userId");
+        return $isSubscribed;
+}
+
 sub new {
 	my ($self, $forumId) = @_;
 	my $properties = WebGUI::SQL->getRow("forum","forumId",$forumId);
