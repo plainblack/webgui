@@ -112,6 +112,33 @@ sub confirm {
         }
 }
 
+
+#-------------------------------------------------------------------
+
+=head2 deleteCollateral ( tableName, keyName, keyValue )
+
+ Deletes a row of collateral data.
+
+=item tableName
+
+ The name of the table you wish to delete the data from.
+
+=item keyName
+
+ The name of the column that is the primary key in the table.
+
+=item keyValue
+
+ An integer containing the key value.
+
+=cut
+
+sub deleteCollateral {
+        WebGUI::SQL->write("delete from $_[1] where $_[2]=".quote($_[3]));
+	WebGUI::ErrorHandler::audit("deleted ".$_[2]." ".$_[3]);
+}
+
+
 #-------------------------------------------------------------------
 
 =head2 description ( )
@@ -257,6 +284,7 @@ sub get {
 sub getCollateral {
 	return WebGUI::SQL->quickHashRef("select * from $_[1] where $_[2]=".quote($_[3]));
 }
+
 
 #-------------------------------------------------------------------
 
@@ -493,6 +521,7 @@ sub set {
 	if (@update) {
         	WebGUI::SQL->write("update ".$_[0]->{_property}{namespace}." set ".join(",",@update)." where wobjectId=".$_[0]->{_property}{wobjectId});
 	}
+	WebGUI::ErrorHandler::audit("edited Wobject ".$_[0]->{_property}{wobjectId});
 }
 
 
@@ -570,6 +599,7 @@ sub setCollateral {
 		$sql .= " where $keyName='".$properties->{$keyName}."'";
 	}
   	WebGUI::SQL->write($sql);
+	WebGUI::ErrorHandler::audit("edited ".$keyName." ".$properties->{$keyName});
 	return $properties->{$keyName};
 }
 
@@ -614,6 +644,7 @@ sub www_delete {
                 $output .= '&nbsp;&nbsp;&nbsp;&nbsp;<a href="'.WebGUI::URL::page().'">';
 		$output .= WebGUI::International::get(45);
 		$output .= '</a></div>';
+		WebGUI::ErrorHandler::audit("moved Wobject ".$_[0]->{_property}{wobjectId}." to the trash.");
                 return $output;
         } else {
                 return WebGUI::Privilege::insufficient();

@@ -14,6 +14,16 @@ use FileHandle;
 use WebGUI::Session;
 
 #-------------------------------------------------------------------
+sub audit {
+        my ($log, $data);
+        $log = FileHandle->new(">>".$session{config}{logfile}) or fatalError("Can't open log file for audit.");
+        $data = localtime(time)." ".$0." AUDIT: ".$session{user}{username}." (".$session{user}{userId}.") ".$_[0]."\n";
+        print $log $data;
+        $session{debug}{audit} .= $data."<p>";
+        $log->close;
+}
+
+#-------------------------------------------------------------------
 sub fatalError {
         my ($key, $log, $cgi, $logfile, $config);
 	if (exists $session{cgi}) {
@@ -73,15 +83,8 @@ sub fatalError {
 
 #-------------------------------------------------------------------
 sub warn {
-        my ($log, $logfile, $config);
-        if (exists $session{config}{logfile}) {
-                $logfile = $session{config}{logfile};
-        } else {
-                use Data::Config;
-                $config = new Data::Config '../etc/WebGUI.conf';
-                $logfile = $config->param('logfile');
-        }
-        $log = FileHandle->new(">>".$logfile) or fatalError("Can't open log file for warning.");
+        my ($log);
+        $log = FileHandle->new(">>".$session{config}{logfile}) or fatalError("Can't open log file for warning.");
         print $log localtime(time)." ".$0." WARNING: ".$_[0]."\n";
         $session{debug}{warning} .= localtime(time)." ".$0." WARNING: ".$_[0]."<p>";
 	$log->close;

@@ -336,7 +336,7 @@ sub www_deleteBenefit {
 #-------------------------------------------------------------------
 sub www_deleteBenefitConfirm {
         if (WebGUI::Privilege::canEditPage()) {
-                WebGUI::SQL->write("delete from Product_benefit where productBenefitId=$session{form}{bid}");
+		$_[0]->deleteCollateral("Product_benefit","productBenefitId",$session{form}{bid});
                 _reorderBenefits($_[0]->get("wobjectId"));
                 return "";
         } else {
@@ -355,7 +355,7 @@ sub www_deleteFeature {
 #-------------------------------------------------------------------
 sub www_deleteFeatureConfirm {
         if (WebGUI::Privilege::canEditPage()) {
-                WebGUI::SQL->write("delete from Product_feature where productFeatureId=$session{form}{fid}");
+		$_[0]->deleteCollateral("Product_feature","productFeatureId",$session{form}{fid});
                 _reorderFeatures($_[0]->get("wobjectId"));
                 return "";
         } else {
@@ -413,7 +413,7 @@ sub www_deleteSpecification {
 #-------------------------------------------------------------------
 sub www_deleteSpecificationConfirm {
         if (WebGUI::Privilege::canEditPage()) {
-                WebGUI::SQL->write("delete from Product_specification where productSpecificationId=$session{form}{sid}");
+		$_[0]->deleteCollateral("Product_specification","productSpecificationId",$session{form}{sid});
                 _reorderSpecifications($_[0]->get("wobjectId"));
                 return "";
         } else {
@@ -434,7 +434,7 @@ sub www_deleteTemplate {
 #-------------------------------------------------------------------
 sub www_deleteTemplateConfirm {
         if (WebGUI::Privilege::canEditPage()) {
-                WebGUI::SQL->write("delete from Product_template where productTemplateId=$session{form}{tid}");
+		$_[0]->deleteCollateral("Product_template","productTemplateId",$session{form}{tid});
                 WebGUI::SQL->write("update Product set productTemplateId=1 where productTemplateId=$session{form}{tid}");
                 return $_[0]->www_edit();
         } else {

@@ -148,8 +148,8 @@ sub page {
 		}
 	}
         if ($session{setting}{showDebug} || ($session{form}{debug}==1 && WebGUI::Privilege::isInGroup(3))) {
-		$debug = '<div style="background-color: #ffdddd;color: #000000;">'
-			.$session{debug}{warning}.'</div>';
+		$debug = '<div style="background-color: #ffdddd;color: #000000;">'.$session{debug}{warning}.'</div>';
+		$debug .= '<div style="background-color: #ffffdd;color: #000000;">'.$session{debug}{audit}.'</div>';
                 $debug .= '<table bgcolor="#ffffff" style="color: #000000; font-size: 10pt; font-family: helvetica;">';
                 while (my ($section, $hash) = each %session) {
                         while (my ($key, $value) = each %$hash) {
