@@ -51,6 +51,7 @@ my $template = <<STOP;
 </tmpl_if>
 <p />
 </tmpl_if>
+<tmpl_var form.start>
 <table>
         <tmpl_loop field_loop>
                 <tmpl_unless field.isHidden>
