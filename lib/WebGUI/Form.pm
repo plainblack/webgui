@@ -926,7 +926,7 @@ sub HTMLArea {
                        	$output .= $button;
 		} else {
 			$output .= _javascriptFile('htmlArea/editor.js');
-               		$output .= '<script>'."\n";
+               		$output .= '<script>'."\nvar master = window;\n";
                		$output .= '_editor_url = "'.$session{config}{extrasURL}.'/htmlArea/";'."\n";
                		$output .= '</script>'."\n";
 			$htmlArea = 1;
