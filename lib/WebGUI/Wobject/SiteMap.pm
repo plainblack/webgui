@@ -78,8 +78,12 @@ sub set {
 #-------------------------------------------------------------------
 sub www_edit {
 	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
-        my ($output, $f, $indent);
-	my $startLevel = $_[0]->get("startAtThisLevel") || 1;
+        my ($output, $f, $indent, $startLevel);
+	if ($_[0]->get("wobjectId") eq "new") {
+		$startLevel = 1;
+	} else {
+		$startLevel = $_[0]->get("startAtThisLevel");
+	}
 	my $options = WebGUI::SQL->buildHashRef("select pageId,title from page where parentId=0 
 		and (pageId=1 or pageId>999) order by title");
 	$indent = $_[0]->get("indent") || 5;
