@@ -2089,7 +2089,7 @@ If not specified, current user is used.
 sub updateHistory {
 	my $self = shift;
 	my $action = shift;
-	my $userId = shift || $session{user}{userId};
+	my $userId = shift || $session{user}{userId} || '3';
 	my $dateStamp = time();
 	WebGUI::SQL->beginTransaction;
 	WebGUI::SQL->write("insert into assetHistory (assetId, userId, actionTaken, dateStamp) values (
