@@ -36,6 +36,7 @@ sub duplicate {
         $w = WebGUI::Wobject::Poll->new({wobjectId=>$w,namespace=>$namespace});
         $w->set({
                 active=>$_[0]->get("active"),
+                randomizeAnswers=>$_[0]->get("randomizeAnswers"),
                 graphWidth=>$_[0]->get("graphWidth"),
                 voteGroup=>$_[0]->get("voteGroup"),
                 question=>$_[0]->get("question"),
@@ -85,7 +86,7 @@ sub purge {
 
 #-------------------------------------------------------------------
 sub set {
-        $_[0]->SUPER::set($_[1],[qw(active karmaPerVote graphWidth voteGroup question a1 a2 a3 a4 a5 a6 a7 a8 a9 a10 a11 a12 a13 a14 a15 a16 a17 a18 a19 a20)]);
+        $_[0]->SUPER::set($_[1],[qw(active karmaPerVote graphWidth voteGroup question randomizeAnswers a1 a2 a3 a4 a5 a6 a7 a8 a9 a10 a11 a12 a13 a14 a15 a16 a17 a18 a19 a20)]);
 }
 
 #-------------------------------------------------------------------
@@ -100,12 +101,14 @@ sub www_copy {
 
 #-------------------------------------------------------------------
 sub www_edit {
-        my ($f, $i, $output, $active, $voteGroup, $graphWidth, $answers);
+        my ($f, $i, $output, $active, $voteGroup, $graphWidth, $answers, $randomizeAnswers);
         if (WebGUI::Privilege::canEditPage()) {
 		if ($_[0]->get("wobjectId") eq "new") {
 			$active = 1;
+			$randomizeAnswers = 1;
 		} else {
 			$active = $_[0]->get("active");
+			$randomizeAnswers = $_[0]->get("randomizeAnswers");
 		}
 		$voteGroup = $_[0]->get("voteGroup") || 7;
 		$graphWidth = $_[0]->get("graphWidth") || 150;
@@ -127,6 +130,7 @@ sub www_edit {
 		$f->integer("graphWidth",WebGUI::International::get(5,$namespace),$graphWidth);
 		$f->text("question",WebGUI::International::get(6,$namespace),$_[0]->get("question"));
                 $f->textarea("answers",WebGUI::International::get(7,$namespace).'<span class="formSubtext"><br>'.WebGUI::International::get(8,$namespace).'</span>',$answers);
+		$f->yesNo("randomizeAnswers",WebGUI::International::get(72,$namespace),$randomizeAnswers);
 		$output .= $_[0]->SUPER::www_edit($f->printRowsOnly);
 		if ($_[0]->get("wobjectId") ne "new") {
 			$output .= '<p>';
@@ -148,6 +152,7 @@ sub www_editSave {
                 for ($i=1; $i<=20; $i++) {
                 	$property->{'a'.$i} = $answer[($i-1)];
                 }
+		$property->{randomizeAnswers} = $session{form}{randomizeAnswers};
 		$property->{karmaPerVote} = $session{form}{karmaPerVote};
 		$property->{voteGroup} = $session{form}{voteGroup};
 		$property->{graphWidth} = $session{form}{graphWidth};
@@ -170,7 +175,7 @@ sub www_resetVotes {
 
 #-------------------------------------------------------------------
 sub www_view {
-	my ($hasVoted, $output, $showPoll, $f, $i, $totalResponses, @data);
+	my ($hasVoted, $answer, $output, @answers, $showPoll, $f, $i, $totalResponses, @data);
         $output = $_[0]->displayTitle;
         $output .= $_[0]->description;
 	if ($_[0]->get("active") eq "0") {
@@ -193,9 +198,15 @@ sub www_view {
                 $f->hidden('func','vote');
                 for ($i=1; $i<=20; $i++) {
                         if ($_[0]->get('a'.$i) =~ /\w/) {
-                                $f->raw('<input type="radio" name="answer" value="a'.$i.'"> <span class="pollAnswer">'.$_[0]->get('a'.$i).'</span><br>');
+                                $answers[($i-1)] = '<input type="radio" name="answer" value="a'.$i.'"> <span class="pollAnswer">'.$_[0]->get('a'.$i).'</span><br>';
                         }
                 }
+		if ($_[0]->get("randomizeAnswers")) {
+			randomizeArray(\@answers);
+		}
+		foreach $answer (@answers) {
+			$f->raw($answer);
+		}
                 $f->raw('<br>');
 		$f->submit(WebGUI::International::get(11,$namespace));
 		$output .= $f->print;

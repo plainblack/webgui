@@ -15,7 +15,7 @@ use strict;
 use Tie::IxHash;
 
 our @ISA = qw(Exporter);
-our @EXPORT = qw(&sortHashDescending &sortHash &isIn &randint &round);
+our @EXPORT = qw(&randomizeArray &sortHashDescending &sortHash &isIn &randint &round);
 
 #-------------------------------------------------------------------
 sub isIn {
@@ -45,6 +45,17 @@ sub randint {
 	$high = 1 unless defined $high;
 	($low, $high) = ($high,$low) if $low > $high;
 	return $low + int( rand( $high - $low + 1 ) );
+}
+
+#-------------------------------------------------------------------
+sub randomizeArray {
+	my ($array, $i, $j);
+	$array = shift;
+	for ($i = @$array; --$i; ) {
+		$j = int rand ($i+1);
+		next if $i == $j;
+		@$array[$i,$j] = @$array[$j,$i];
+	}
 }
 
 #-------------------------------------------------------------------
