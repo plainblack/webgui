@@ -8,6 +8,7 @@ WebGUI Core..........................JT Smith / Plain Black Software
 
 Contributing Developers..............Peter Beardsley / Appropriate Solutions, Inc.
                                      Richard Caelius
+                                     Richard Clark
                                      Doug Collinge
                                      Flavio Curti
                                      Frank Dillon
