@@ -40,12 +40,12 @@ Contributing Developers..............Peter Beardsley / Appropriate Solutions
 
 Contributing Translators.............AGOFER Ltda.
                                      Natalia Almazova
+                                     Paco Avila
                                      BNC Distribution
                                      Joeri de Bruin / ProcoliX
                                      Jose Caneira
                                      Junying Du / WDI
                                      Marcelo Ennes / FIOCRUZ
-                                     GIT Consultors
                                      Gordan Gledec 
                                      Andreas Graf
                                      Emiliano Grilli / Webopen

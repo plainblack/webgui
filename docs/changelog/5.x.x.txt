@@ -68,7 +68,7 @@
    page will not be cached.
  - Added master events calendar switch.
  - Updated the Dutch translation. (Thanks to ProcoliX.)
- - Updated the Spanish translation. (Thanks to GIT Consultors.) 
+ - Updated the Spanish translation. (Thanks to Paco Avila.) 
  - Updated the German translation. (Thanks to Andreas Graf.)
  - Updated the Norwegian translation. (Thanks to Nils-Magne Kvammen.)
  - Added the missing group scratch filter documentation to the help.
