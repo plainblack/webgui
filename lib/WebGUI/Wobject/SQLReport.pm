@@ -54,7 +54,8 @@ sub new {
 			debugMode=>{
 				defaultValue=>0
 				}
-			}
+			},
+		-useTemplate=>1
                 );
         bless $self, $class;
 }
