@@ -1,5 +1,5 @@
 package WebGUI;
-our $VERSION = "3.2.4";
+our $VERSION = "3.3.0";
 
 #-------------------------------------------------------------------
 # WebGUI is Copyright 2001-2002 Plain Black Software.
@@ -148,7 +148,7 @@ sub _loadWidgets {
 #-------------------------------------------------------------------
 sub page {
 	my (%contentHash, $cmd, $pageEdit, $widgetType, $functionOutput, @availableWidgets, @widgetList, $sth, $httpHeader, $header, $footer, $content, $operationOutput, $adminBar);
-	WebGUI::Session::open($_[0]);
+	WebGUI::Session::open($_[0],$_[1]);
 	# For some reason we have to pre-cache the templates when running under mod_perl
 	# so that's what we're doing with this next command.
 	WebGUI::Template::loadTemplates();

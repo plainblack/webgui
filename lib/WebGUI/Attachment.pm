@@ -1,142 +1,344 @@
 package WebGUI::Attachment;
 
-#-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2002 Plain Black Software.
-#-------------------------------------------------------------------
-# Please read the legal notices (docs/legal.txt) and the license
-# (docs/license.txt) that came with this distribution before using
-# this software.
-#-------------------------------------------------------------------
-# http://www.plainblack.com                     info@plainblack.com
-#-------------------------------------------------------------------
+=head1 LEGAL
+
+ -------------------------------------------------------------------
+  WebGUI is Copyright 2001-2002 Plain Black Software.
+ -------------------------------------------------------------------
+  Please read the legal notices (docs/legal.txt) and the license
+  (docs/license.txt) that came with this distribution before using
+  this software.
+ -------------------------------------------------------------------
+  http://www.plainblack.com                     info@plainblack.com
+ -------------------------------------------------------------------
+
+=cut
 
 use File::Copy cp;
 use File::Path;
 use FileHandle;
+use Image::Magick;
 use POSIX;
 use strict;
+use WebGUI::ErrorHandler;
+use WebGUI::Node;
 use WebGUI::Session;
 use WebGUI::URL;
 use WebGUI::Utility;
 
+=head1 NAME
+
+ Package WebGUI::Attachment
+
+=head1 SYNOPSIS
+
+ use WebGUI::Attachment;
+ $attachment = WebGUI::Attachment->new("file.txt","100","20");
+ $attachment->copy("files","10");
+ $attachment->delete;
+ $attachment->deleteNode;
+ $attachment->getFilename;
+ $attachment->getIcon;
+ $attachment->getPath;
+ $attachment->getThumbnail;
+ $attachment->getType;
+ $attachment->getURL;
+ $attachment->save("formImage");
+
+=head1 DESCRIPTION
+ 
+ Package to manipulate WebGUI Attachments.
+
+=head1 METHODS
+
+ These methods are available from this class:
+
+=cut
+
+
 #-------------------------------------------------------------------
-# eg: copy(filename,oldWidgetId,newWidgetId,oldSubId,newSubId);
-sub copy {
-	my ($a, $b, $newFile, $oldFile);
-	if ($_[0] ne "") {
-		$oldFile = $session{setting}{attachmentDirectoryLocal}.'/'.$_[1];
-		if ($_[3] ne "") {
-			$oldFile .= '/'.$_[3];
+sub _createThumbnail {
+	my ($image, $error, $x, $y, $r, $n);
+        if (isIn($_[0]->getType, qw(jpg jpeg gif png tif tiff bmp))) {
+		$image = Image::Magick->new;
+		$error = $image->Read($_[0]->getPath);
+		WebGUI::ErrorHandler::warning($error) if $error;
+		($x, $y) = $image->Get('width','height');
+		$n = $_[1] || $session{setting}{thumbnailSize};
+		$r = $x>$y ? $x / $n : $y / $n;
+		$image->Scale(width=>($x/$r),height=>($y/$r));
+		if (isIn($_[0]->getType, qw(tif tiff bmp))) {
+			$error = $image->Write($_[0]->{_node}->getPath.'/thumb-'.$_[0]->getFilename.'.png');
+		} else {
+			$error = $image->Write($_[0]->{_node}->getPath.'/thumb-'.$_[0]->getFilename);
 		}
-		$oldFile .= '/'.$_[0];
-        	$newFile = $session{setting}{attachmentDirectoryLocal}.'/'.$_[2];
-		mkdir ($newFile,0755);
-        	if ($_[4] ne "") {
-                	$newFile .= '/'.$_[4];
-			mkdir ($newFile,0755);
-        	}	
-        	$newFile .= '/'.$_[0];
-        	$a = FileHandle->new($oldFile,"r");
-		$b = FileHandle->new(">".$newFile);
-		binmode($a); 
-		binmode($b); 
-        	cp($a,$b);
-		$a->close;
-		$b->close;
+		WebGUI::ErrorHandler::warning($error) if $error;
 	}
 }
 
-#-------------------------------------------------------------------
-sub deleteSubmission {
-        my ($dir);
-        $dir = $session{setting}{attachmentDirectoryLocal}.'/'.$_[0].'/'.$_[1];
-        rmtree($dir);
-}
 
 #-------------------------------------------------------------------
-sub getType {
-	my ($extension, $icon, %type);
-	$extension = lc($_[0]);
-	$extension =~ s/.*?\.(.*?)$/$1/;
-	if ($extension eq "doc" || $extension eq "dot" || $extension eq "wri") {
-                $icon = $session{setting}{lib}."/fileIcons/doc.gif";
-        } elsif ($extension eq "txt" || $extension eq "log" || $extension eq "config" || $extension eq "conf") {
-                $icon = $session{setting}{lib}."/fileIcons/txt.gif";
-	} elsif ($extension eq "xls" || $extension eq "xlt" || $extension eq "csv") {
-                $icon = $session{setting}{lib}."/fileIcons/xls.gif";
-        } elsif ($extension eq "html" || $extension eq "htm" || $extension eq "xml") {
-                $icon = $session{setting}{lib}."/fileIcons/html.gif";
-        } elsif ($extension eq "ram" || $extension eq "mpeg" || $extension eq "mpg" || 
-		$extension eq "wav" || $extension eq "mp3" || $extension eq "avi") {
-                $icon = $session{setting}{lib}."/fileIcons/html.gif";
-        } elsif ($extension eq "html" || $extension eq "htm" || $extension eq "xml") {
-                $icon = $session{setting}{lib}."/fileIcons/html.gif";
-        } elsif ($extension eq "rar" || $extension eq "tgz" || $extension eq "tar.gz" || 
-		$extension eq "tar" || $extension eq "gz" || $extension eq "Z") {
-                $icon = $session{setting}{lib}."/fileIcons/rar.gif";
+
+=head2 copy ( newNode [, newNodeSub ] )
+ 
+ Copies an attachment from one node to another.
+
+=item newNode
+
+ Define the node to copy the attachment to.
+
+=item newNodeSub
+
+ If there is a subordinate element on this node define it here.
+
+=cut
+
+sub copy {
+	my ($a, $b, $newNode);
+	$newNode = WebGUI::Node->new($_[1],$_[2]);
+       	$a = FileHandle->new($_[0]->getPath,"r");
+	$b = FileHandle->new(">".$newNode->getPath.'/'.$_[0]->getFilename);
+	binmode($a); 
+	binmode($b); 
+       	cp($a,$b);
+	$a->close;
+	$b->close;
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 delete ( )
+
+ Deletes an attachment from its node.
+
+=cut
+
+sub delete {
+        unlink($_[0]->getPath);
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 deleteNode ( )
+
+ Deletes deletes this attachment's node (and everything in it).
+
+=cut
+
+sub deleteNode {
+        rmtree($_[0]->{_node}->getPath);
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 getFilename ( )
+
+ Returns the attachment's filename.
+
+=cut
+
+sub getFilename {
+        return $_[0]->{_filename};
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 getIcon ( )
+
+ Returns the full URL to the file icon for this attachment.
+
+=cut
+
+sub getIcon {
+	my ($extension, $icon);
+	$extension = $_[0]->getType;
+	$icon = $session{setting}{lib}."/fileIcons/";
+	if (isIn($extension, qw(doc dot wri))) {
+                $icon .= "doc.gif";
+        } elsif (isIn($extension, qw(txt log config conf))) {
+                $icon .= "txt.gif";
+	} elsif (isIn($extension, qw(xlt csv xls))) {
+                $icon .= "xls.gif";
+        } elsif (isIn($extension, qw(ram mpeg mpg wav mp3 avi))) {
+                $icon .= "wav.gif";
+        } elsif (isIn($extension, qw(html htm xml))) {
+                $icon .= "html.gif";
+        } elsif (isIn($extension, qw(exe com bat pif))) {
+                $icon .= "exe.gif";
+        } elsif (isIn($extension, qw(sit hqx))) {
+                $icon .= "sit.gif";
+        } elsif (isIn($extension, qw(tgz gz tar Z))) {
+                $icon .= "gz.gif";
+        } elsif ($extension eq "rar") {
+                $icon .= "rar.gif";
         } elsif ($extension eq "mdb") {
-                $icon = $session{setting}{lib}."/fileIcons/mdb.gif";
+                $icon .= "mdb.gif";
         } elsif ($extension eq "ppt") {
-                $icon = $session{setting}{lib}."/fileIcons/ppt.gif";
-        } elsif ($extension eq "tiff" || $extension eq "tif" || $extension eq "bmp" || 
-		$extension eq "psd" ||$extension eq "psp" || $extension eq "gif" || 
-		$extension eq "jpg" || $extension eq "jpeg") {
-                $icon = $session{setting}{lib}."/fileIcons/psp.gif";
+                $icon .= "ppt.gif";
+        } elsif (isIn($extension, qw(psd eps ai))) {
+                $icon .= "psd.gif";
+        } elsif (isIn($extension, qw(tiff tif bmp psp gif jpg jpeg png))) {
+                $icon .= "psp.gif";
         } elsif ($extension eq "zip") {
-                $icon = $session{setting}{lib}."/fileIcons/zip.gif";
+                $icon .= "zip.gif";
         } elsif ($extension eq "mov") {
-                $icon = $session{setting}{lib}."/fileIcons/mov.gif";
+                $icon .= "mov.gif";
         } elsif ($extension eq "pdf") {
-                $icon = $session{setting}{lib}."/fileIcons/pdf.gif";
+                $icon .= "pdf.gif";
 	} else {
-		$icon = $session{setting}{lib}."/fileIcons/unknown.gif";
+		$icon .= "unknown.gif";
 	}
-	%type = (extension => $extension, icon => $icon);
-	return %type;
+	return $icon;
 }
 
-#-------------------------------------------------------------------
-sub purgeWidget {
-	my ($dir);
-	$dir = $session{setting}{attachmentDirectoryLocal}.'/'.$_[0];
-	rmtree($dir);
-}
 
 #-------------------------------------------------------------------
-# eg: save(formVarName,widgetId,optionallySubmissionId);
+
+=head2 getPath ( )
+
+ Returns a full path to an attachment.
+
+=cut
+
+sub getPath {
+        return $_[0]->{_node}->getPath.'/'.$_[0]->getFilename;
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 getThumbnail ( )
+
+ Returns a full URL to the thumbnail for this attachment. Thumbnails
+ are only created for jpg, gif, png, tif, and bmp so getThumbnail 
+ only returns a thumbnail if the file is one of those types.
+
+=cut
+
+sub getThumbnail {
+	if (isIn($_[0]->getType, qw(jpg jpeg gif png))) {
+        	return $_[0]->{_node}->getURL.'/thumb-'.$_[0]->getFilename;
+	} elsif (isIn($_[0]->getType, qw(tif tiff bmp))) {
+        	return $_[0]->{_node}->getURL.'/thumb-'.$_[0]->getFilename.'.png';
+	} else {
+		return "";
+	}
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 getType ( )
+
+ Returns the extension or type of this attachment.
+
+=cut
+
+sub getType {
+	my ($extension);
+	$extension = $_[0]->getFilename;
+	$extension =~ s/.*\.(.*?)$/$1/;
+	return $extension;
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 getURL ( )
+
+ Returns a full URL to an attachment.
+
+=cut
+
+sub getURL {
+	return $_[0]->{_node}->getURL.'/'.$_[0]->getFilename;
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 new ( filename, node [, nodeSubordinate ] )
+
+ Constructor.
+
+=item filename
+
+ What is the filename for this attachment. If you'll be uploading
+ the attachment using the "save" method then you may leave this
+ field blank.
+
+=item node
+
+ The node where this attachment is (or will be placed).
+
+=item nodeSubordinate
+
+ The subordinate element of the node where this attachment is (or
+ will be placed).
+
+=cut
+
+sub new {
+	my ($class, $filename, $node, $nodeSub) = @_;
+	my $node = WebGUI::Node->new($node, $nodeSub);
+	bless {_node => $node, _filename => $filename}, $class;
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 save ( formVariableName [, thumbnailSize ] )
+
+ Grabs an attachment from a form POST and saves it to a node. It 
+ then returns the filename of the attachment.
+
+=item formVariableName
+
+ Provide the form variable name to which the file being uploaded
+ is assigned.
+
+=item thumbnailSize
+
+ If an image is being uploaded a thumbnail will be generated
+ automatically. By default, WebGUI will create a thumbnail of the
+ size specified in the attachment settings. You can override that
+ size by specifying one here. Size is measured in pixels of the
+ longest side.
+
+=cut
+
 sub save {
-	my (%type, $file, $filename, $bytesread, $buffer, $urlizedFilename, $path);
-	$filename = $session{cgi}->upload($_[0]);
+	my ($type, $file, $filename, $bytesread, $buffer, $urlizedFilename, $path);
+	$filename = $session{cgi}->upload($_[1]);
 	if (defined $filename) {
 		if ($filename =~ /([^\/\\]+)$/) {
-     			$urlizedFilename = $1;
+     			$_[0]->{_filename} = $1;
    		} else {
-     			$urlizedFilename = $filename;
+     			$_[0]->{_filename} = $filename;
    		}
-		%type = getType($urlizedFilename);
-		if ($type{extension} eq "pl" || $type{extension} eq "perl" || $type{extension} eq "sh" || 
-			$type{extension} eq "cgi" || $type{extension} eq "php" || $type{extension} eq "asp") {
-			$urlizedFilename =~ s/\./\_/g;
-			$urlizedFilename .= ".txt";
+		$type = $_[0]->getType();
+		if (isIn($type, qw(pl perl sh cgi php asp))) {
+			$_[0]->{_filename} =~ s/\./\_/g;
+			$_[0]->{_filename} .= ".txt";
 		}
-		$urlizedFilename = WebGUI::URL::urlize($urlizedFilename);
-		$path = $session{setting}{attachmentDirectoryLocal}."/".$_[1]."/";
-		mkdir ($path,0755);
-		if ($_[2] ne "") {
-			$path = $path.$_[2].'/';
-			mkdir ($path,0755);
-		}
-		$file = FileHandle->new(">".$path.$urlizedFilename);
+		$_[0]->{_filename} = WebGUI::URL::urlize($_[0]->getFilename);
+		$_[0]->{_node}->create();
+		$file = FileHandle->new(">".$_[0]->getPath);
 		if (defined $file) {
 			binmode $file;
 			while ($bytesread=read($filename,$buffer,1024)) {
         			print $file $buffer;
 			}
 			close($file);
+			_createThumbnail($_[0],$_[2]);
 		} else {
 			return "";
 		}
-		return $urlizedFilename;
+		return $_[0]->getFilename;
 	} else {
 		return "";
 	}

@@ -18,6 +18,7 @@ use Tie::CPHash;
 use WebGUI::DateTime;
 use WebGUI::International;
 use WebGUI::Macro;
+use WebGUI::Paginator;
 use WebGUI::Privilege;
 use WebGUI::Session;
 use WebGUI::Shortcut;
@@ -304,13 +305,14 @@ sub www_edit {
                 $output .= '<p><a href="'.WebGUI::URL::page('func=addEvent&wid='.$session{form}{wid})
 			.'">Add New Event</a><p>';
                 $output .= '<table border=1 cellpadding=3 cellspacing=0>';
-		$sth = WebGUI::SQL->read("select eventId, name, recurringEventId from EventsCalendar_event where widgetId='$session{form}{wid}' order by startDate");
+		$sth = WebGUI::SQL->read("select eventId, name, recurringEventId, startDate from EventsCalendar_event where widgetId='$session{form}{wid}' order by startDate");
 		while (@event = $sth->array) {
                 	$output .= '<tr><td><a href="'.WebGUI::URL::page('func=editEvent&wid='.$session{form}{wid}.
 				'&eid='.$event[0]).'"><img src="'.$session{setting}{lib}.
 				'/edit.gif" border=0></a><a href="'.WebGUI::URL::page('func=deleteEvent&wid='.
 				$session{form}{wid}.'&eid='.$event[0].'&rid='.$event[2]).'"><img src="'.
-				$session{setting}{lib}.'/delete.gif" border=0></a></td><td>'.$event[1].'</td></td>';
+				$session{setting}{lib}.'/delete.gif" border=0></a></td><td>'.
+				epochToHuman($event[3],'%m/%d/%y').'</td><td>'.$event[1].'</td></td>';
 		}
 		$sth->finish;
                 $output .= '</table>';
@@ -373,7 +375,7 @@ sub www_editEventSave {
 
 #-------------------------------------------------------------------
 sub www_view {
-	my (%data, %event, $dataRows, $prevNextBar, $output, $sth, $flag, %previous, $junk,
+	my (%data, %event, $p, $output, $sth, $flag, %previous, $junk,
 		@row, $i, $maxDate, $minDate, $nextDate, $first, $last);
 	tie %data, 'Tie::CPHash';
 	tie %event, 'Tie::CPHash';
@@ -401,8 +403,10 @@ sub www_view {
 				$i++;
 				$nextDate = addToDate($nextDate,0,1,0);
 			}
-			($dataRows, $prevNextBar) = paginate(1,WebGUI::URL::page(),\@row);
-                	$output .= $prevNextBar.$dataRows.$prevNextBar;
+			$p = WebGUI::Paginator->new(WebGUI::URL::page(),\@row,1);
+                	$output .= $p->getBar($session{form}{pn}).
+				$p->getPage($session{form}{pn}).
+				$p->getBarTraditional($session{form}{pn});
 			$session{form}{pn} = "";
 		} else {
 			$sth = WebGUI::SQL->read("select name, description, startDate, endDate from EventsCalendar_event where widgetId='$_[0]' and endDate>".(time()-86400)." order by startDate,endDate");
@@ -434,8 +438,8 @@ sub www_view {
 				$i++;
 			}
 			$sth->finish;
-			($dataRows, $prevNextBar) = paginate($data{paginateAfter},WebGUI::URL::page(),\@row);
-                        $output .= $dataRows.$prevNextBar;		
+			$p = WebGUI::Paginator->new(WebGUI::URL::page(),\@row,$data{paginateAfter});
+                        $output .= $p->getPage($session{form}{pn}).$p->getBarSimple($session{form}{pn});		
 		}
 		if ($data{processMacros}) {
 			$output = WebGUI::Macro::process($output);

@@ -111,10 +111,16 @@ sub www_editFileSettings {
 		$output .= formHeader();
                 $output .= WebGUI::Form::hidden("op","editFileSettingsSave");
                 $output .= '<table>';
-                $output .= tableFormRow(WebGUI::International::get(129),WebGUI::Form::text("lib",30,255,$session{setting}{lib}));
-                $output .= tableFormRow(WebGUI::International::get(130),WebGUI::Form::text("maxAttachmentSize",30,11,$session{setting}{maxAttachmentSize}));
-                $output .= tableFormRow(WebGUI::International::get(131),WebGUI::Form::text("attachmentDirectoryWeb",30,255,$session{setting}{attachmentDirectoryWeb}));
-                $output .= tableFormRow(WebGUI::International::get(132),WebGUI::Form::text("attachmentDirectoryLocal",30,255,$session{setting}{attachmentDirectoryLocal}));
+                $output .= tableFormRow(WebGUI::International::get(129),
+			WebGUI::Form::text("lib",30,255,$session{setting}{lib}));
+                $output .= tableFormRow(WebGUI::International::get(130),
+			WebGUI::Form::text("maxAttachmentSize",30,11,$session{setting}{maxAttachmentSize}));
+                $output .= tableFormRow(WebGUI::International::get(406),
+			WebGUI::Form::text("thumbnailSize",30,3,$session{setting}{thumbnailSize}));
+                $output .= tableFormRow(WebGUI::International::get(131),
+			WebGUI::Form::text("attachmentDirectoryWeb",30,255,$session{setting}{attachmentDirectoryWeb}));
+                $output .= tableFormRow(WebGUI::International::get(132),
+			WebGUI::Form::text("attachmentDirectoryLocal",30,255,$session{setting}{attachmentDirectoryLocal}));
                 $output .= formSave();
                 $output .= '</table>';
                 $output .= '</form> ';
@@ -128,9 +134,14 @@ sub www_editFileSettings {
 sub www_editFileSettingsSave {
         if (WebGUI::Privilege::isInGroup(3)) {
                 WebGUI::SQL->write("update settings set value=".quote($session{form}{lib})." where name='lib'");
-                WebGUI::SQL->write("update settings set value=".quote($session{form}{maxAttachmentSize})." where name='maxAttachmentSize'");
-                WebGUI::SQL->write("update settings set value=".quote($session{form}{attachmentDirectoryWeb})." where name='attachmentDirectoryWeb'");
-                WebGUI::SQL->write("update settings set value=".quote($session{form}{attachmentDirectoryLocal})." where name='attachmentDirectoryLocal'");
+                WebGUI::SQL->write("update settings set value=".
+			quote($session{form}{maxAttachmentSize})." where name='maxAttachmentSize'");
+                WebGUI::SQL->write("update settings set value=".
+                        quote($session{form}{thumbnailSize})." where name='thumbnailSize'");
+                WebGUI::SQL->write("update settings set value=".
+			quote($session{form}{attachmentDirectoryWeb})." where name='attachmentDirectoryWeb'");
+                WebGUI::SQL->write("update settings set value=".
+			quote($session{form}{attachmentDirectoryLocal})." where name='attachmentDirectoryLocal'");
                 return www_manageSettings();
         } else {
                 return WebGUI::Privilege::adminOnly();

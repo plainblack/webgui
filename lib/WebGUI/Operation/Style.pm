@@ -15,6 +15,7 @@ use strict;
 use Tie::CPHash;
 use WebGUI::Form;
 use WebGUI::International;
+use WebGUI::Paginator;
 use WebGUI::Privilege;
 use WebGUI::Session;
 use WebGUI::Shortcut;
@@ -142,7 +143,7 @@ sub www_editStyleSave {
 
 #-------------------------------------------------------------------
 sub www_listStyles {
-        my ($output, $sth, @data, @row, $i, $prevNextBar, $dataRows);
+        my ($output, $sth, @data, @row, $i, $p);
         if (WebGUI::Privilege::isInGroup(5)) {
                 $output = helpLink(9);
 		$output .= '<h1>'.WebGUI::International::get(157).'</h1>';
@@ -161,11 +162,11 @@ sub www_listStyles {
                         $i++;
                 }
 		$sth->finish;
-		($dataRows, $prevNextBar) = paginate(50,WebGUI::URL::page('op=listStyles'),\@row);
+		$p = WebGUI::Paginator->new(WebGUI::URL::page('op=listStyles'),\@row);
                 $output .= '<table border=1 cellpadding=5 cellspacing=0 align="center">';
-		$output .= $dataRows;
+		$output .= $p->getPage($session{form}{pn});
 		$output .= '</table>';
-		$output .= $prevNextBar;
+		$output .= $p->getBarTraditional($session{form}{pn});
                 return $output;
         } else {
                 return WebGUI::Privilege::adminOnly();

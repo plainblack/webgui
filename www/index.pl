@@ -11,6 +11,7 @@
 #-------------------------------------------------------------------
 
 my $webguiRoot = "..";
+my $configFile = "WebGUI.conf";
 
 BEGIN {
         unshift (@INC, "../lib");
@@ -22,5 +23,5 @@ use CGI::Carp qw(fatalsToBrowser);
 use strict;
 use WebGUI;
 
-print WebGUI::page($webguiRoot);
+print WebGUI::page($webguiRoot,$configFile);
 

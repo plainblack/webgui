@@ -50,9 +50,9 @@ sub _getSessionVars {
         my (%vars, $uid, $encryptedPassword);
 	tie %vars, 'Tie::CPHash';
         if ($_[0] ne "") {
-        	%vars = WebGUI::SQL->quickHash("select * from session where sessionId='$_[0]'", $_[1]);
+        	%vars = WebGUI::SQL->quickHash("select * from userSession where sessionId='$_[0]'", $_[1]);
 		if ($vars{sessionId} ne "") {
-			WebGUI::SQL->write("update session set lastPageView=".time().", lastIP='$ENV{REMOTE_ADDR}', expires=".(time()+$_[2])." where sessionId='$_[0]'",$_[1]);
+			WebGUI::SQL->write("update userSession set lastPageView=".time().", lastIP='$ENV{REMOTE_ADDR}', expires=".(time()+$_[2])." where sessionId='$_[0]'",$_[1]);
 		}
 	}
         return %vars;
@@ -82,7 +82,7 @@ sub close {
 
 #-------------------------------------------------------------------
 sub end {
-	WebGUI::SQL->write("delete from session where sessionId='$_[0]'",$session{dbh});
+	WebGUI::SQL->write("delete from userSession where sessionId='$_[0]'",$session{dbh});
 	refreshSessionVars();
 }
 
@@ -103,7 +103,8 @@ sub open {
 	tie %VARS, 'Tie::CPHash';
 	tie %PAGE, 'Tie::CPHash';
 	$CONFIG{webguiRoot} = $_[0];
-        $config = new Data::Config $CONFIG{webguiRoot}.'/etc/WebGUI.conf';
+	$CONFIG{configFile} = $_[1] || "WebGUI.conf";
+        $config = new Data::Config $CONFIG{webguiRoot}.'/etc/'.$CONFIG{configFile};
         foreach ($config->param) {
                 $CONFIG{$_} = $config->param($_);
         }
@@ -115,6 +116,10 @@ sub open {
                 $CONFIG{scripturl} = $ENV{SCRIPT_NAME};
         }
         $dbh = DBI->connect($CONFIG{dsn}, $CONFIG{dbuser}, $CONFIG{dbpass}, { RaiseError => 0, AutoCommit => 1 });
+	if ( $CONFIG{dsn} =~ /Oracle/ ) { # Set Oracle specific attributes
+		$dbh->{LongReadLen} = 512 * 1024;
+ 		$dbh->{LongTruncOk} = 1;
+ 	} 
         $query = CGI->new();
         foreach ($query->param) {
                 $FORM{$_} = $query->param($_);
@@ -179,7 +184,7 @@ sub start {
 	tie %user, 'Tie::CPHash';
 	%user = WebGUI::SQL->quickHash("select * from users where userId='$uid'", $session{dbh});
         if (crypt($user{identifier},"yJ") eq $encryptedPassword) {
-		WebGUI::SQL->write("insert into session values ('$_[0]', ".(time()+$session{setting}{sessionTimeout}).", ".time().", 0, '$ENV{REMOTE_ADDR}', $uid)",$session{dbh});
+		WebGUI::SQL->write("insert into userSession values ('$_[0]', ".(time()+$session{setting}{sessionTimeout}).", ".time().", 0, '$ENV{REMOTE_ADDR}', $uid)",$session{dbh});
 		refreshSessionVars($_[0]);
 		return 1;
         } else {

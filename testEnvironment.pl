@@ -202,6 +202,18 @@ if (eval { require HTML::CalendarMonthSimple }) {
         }
 }
 
+print "Image::Magick module.....................";
+if (eval { require Image::Magick }) {
+        print "OK\n";
+} else {
+        if ($ARGV[0] eq "--install-modules") {
+                print "Installing...\n";
+                CPAN::Shell->install("Image::Magick");
+        } else {
+                print "Please install.\n";
+        }
+}
+
 # this is here to insure they installed correctly.
 print "WebGUI modules...........................";
 if (eval { require WebGUI } && eval { require WebGUI::SQL }) {

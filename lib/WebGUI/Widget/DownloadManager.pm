@@ -18,6 +18,7 @@ use WebGUI::DateTime;
 use WebGUI::Form;
 use WebGUI::International;
 use WebGUI::Macro;
+use WebGUI::Paginator;
 use WebGUI::Privilege;
 use WebGUI::Session;
 use WebGUI::Shortcut;
@@ -39,7 +40,7 @@ sub _reorderDownloads {
 
 #-------------------------------------------------------------------
 sub duplicate {
-        my (%data, $newWidgetId, $pageId, %row, $sth, $newDownloadId);
+        my (%data, $file, $newWidgetId, $pageId, %row, $sth, $newDownloadId);
         tie %data, 'Tie::CPHash';
         %data = getProperties($namespace,$_[0]);
         $pageId = $_[1] || $data{pageId};
@@ -56,13 +57,17 @@ sub duplicate {
         $sth = WebGUI::SQL->read("select * from DownloadManager_file where widgetId=$_[0]");
         while (%row = $sth->hash) {
                 $newDownloadId = getNextId("downloadId");
-        	WebGUI::Attachment::copy($row{downloadFile},$_[0],$newWidgetId,$row{downloadId},$newDownloadId);
-        	WebGUI::Attachment::copy($row{alternateVersion1},$_[0],$newWidgetId,$row{downloadId},$newDownloadId);
-        	WebGUI::Attachment::copy($row{alternateVersion2},$_[0],$newWidgetId,$row{downloadId},$newDownloadId);
+		$file = WebGUI::Attachment->new($row{downloadFile},$_[0],$row{downloadId});
+		$file->copy($newWidgetId,$newDownloadId);
+                $file = WebGUI::Attachment->new($row{alternateVersion1},$_[0],$row{downloadId});
+                $file->copy($newWidgetId,$newDownloadId);
+                $file = WebGUI::Attachment->new($row{alternateVersion2},$_[0],$row{downloadId});
+                $file->copy($newWidgetId,$newDownloadId);
                 WebGUI::SQL->write("insert into DownloadManager_file values ($newDownloadId, $newWidgetId, ".
 			quote($row{fileTitle}).", ".quote($row{downloadFile}).", $row{groupToView}, ".
 			quote($row{briefSynopsis}).", $row{dateUploaded}, $row{sequenceNumber}, ".
-			quote($row{alternateVersion1}).", ".quote($row{alternateVersion2}).")");
+			quote($row{alternateVersion1}).", ".quote($row{alternateVersion2}).
+			", $row{displayThumbnails})");
         }
 	$sth->finish;
 }
@@ -115,6 +120,10 @@ sub www_add {
                         WebGUI::Form::text("paginateAfter",20,30,50)
                         );
                 $output .= tableFormRow(
+                        WebGUI::International::get(21,$namespace),
+                        WebGUI::Form::checkbox("displayThumbnails",1,1)
+                        );
+                $output .= tableFormRow(
                         WebGUI::International::get(3,$namespace),
                         WebGUI::Form::checkbox("proceed",1,1)
                         );
@@ -140,7 +149,7 @@ sub www_addSave {
 			$session{form}{processMacros},
 			$session{form}{templatePosition}
 			);
-                WebGUI::SQL->write("insert into DownloadManager values ($widgetId, '$session{form}{paginateAfter}')");
+                WebGUI::SQL->write("insert into DownloadManager values ($widgetId, '$session{form}{paginateAfter}', '$session{form}{displayThumbnails}')");
                 if ($session{form}{proceed} == 1) {
                         $session{form}{wid} = $widgetId;
                         return www_addDownload();
@@ -198,21 +207,24 @@ sub www_addDownloadSave {
         my ($downloadId,$file,$alt1,$alt2,$sequenceNumber);
         if (WebGUI::Privilege::canEditPage()) {
                 $downloadId = getNextId("downloadId"); 
-		$file = WebGUI::Attachment::save("downloadFile",$session{form}{wid},$downloadId);
-		$alt1 = WebGUI::Attachment::save("alternateVersion1",$session{form}{wid},$downloadId);
-		$alt2 = WebGUI::Attachment::save("alternateVersion2",$session{form}{wid},$downloadId);
+		$file = WebGUI::Attachment->new("",$session{form}{wid},$downloadId);
+		$file->save("downloadFile");
+		$alt1 = WebGUI::Attachment->new("",$session{form}{wid},$downloadId);
+		$alt1->save("alternateVersion1");
+		$alt2 = WebGUI::Attachment->new("",$session{form}{wid},$downloadId);
+		$alt2->save("alternateVersion2");
 		($sequenceNumber) = WebGUI::SQL->quickArray("select count(*)+1 from DownloadManager_file where widgetId=$session{form}{wid}");
                 WebGUI::SQL->write("insert into DownloadManager_file values (".
 			$downloadId.
 			", ".$session{form}{wid}. 
 			", ".quote($session{form}{fileTitle}).
-			", ".quote($file).
+			", ".quote($file->getFilename).
 			", '$session{form}{groupToView}'".
 			", ".quote($session{form}{briefSynopsis}).
 			", ".time().
 			", ".$sequenceNumber.
-			", ".quote($alt1).
-			", ".quote($alt2).
+			", ".quote($alt1->getFilename).
+			", ".quote($alt2->getFilename).
 			")");
                 return www_edit();
         } else {
@@ -268,8 +280,10 @@ sub www_deleteDownload {
 
 #-------------------------------------------------------------------
 sub www_deleteDownloadConfirm {
-        my ($output);
+        my ($output, $file);
         if (WebGUI::Privilege::canEditPage()) {
+                $file = WebGUI::Attachment->new("",$session{form}{wid},$session{form}{did});
+                $file->deleteNode;
                 WebGUI::SQL->write("delete from DownloadManager_file where downloadId=$session{form}{did}");
                 _reorderDownloads($session{form}{wid});
                 return www_edit();
@@ -280,19 +294,24 @@ sub www_deleteDownloadConfirm {
 
 #-------------------------------------------------------------------
 sub www_download {
-	my (%download, $url);
+	my (%download, $file);
 	tie %download,'Tie::CPHash';
 	%download = WebGUI::SQL->quickHash("select * from DownloadManager_file where downloadId=$session{form}{did}");
 	if (WebGUI::Privilege::isInGroup($download{groupToView})) {
-		$url = $session{setting}{attachmentDirectoryWeb}."/".$session{form}{wid}."/".$session{form}{did}."/";
 		if ($session{form}{alternateVersion} == 1) {
-			$url .= $download{alternateVersion1};
+                        $file = WebGUI::Attachment->new($download{alternateVersion1},
+                                $session{form}{wid},
+                                $session{form}{did});
 		} elsif ($session{form}{alternateVersion} == 2) {
-			$url .= $download{alternateVersion2};
+                        $file = WebGUI::Attachment->new($download{alternateVersion2},
+                                $session{form}{wid},
+                                $session{form}{did});
 		} else {
-			$url .= $download{downloadFile};
+			$file = WebGUI::Attachment->new($download{downloadFile},
+				$session{form}{wid},
+				$session{form}{did});
 		}
-		$session{header}{redirect} = WebGUI::Session::httpRedirect($url);
+		$session{header}{redirect} = WebGUI::Session::httpRedirect($file->getURL);
 		return "";
 	} else {
 		return WebGUI::Privilege::insufficient();
@@ -339,6 +358,10 @@ sub www_edit {
                         WebGUI::International::get(20,$namespace),
                         WebGUI::Form::text("paginateAfter",20,30,$data{paginateAfter})
                         );
+                $output .= tableFormRow(
+                        WebGUI::International::get(21,$namespace),
+                        WebGUI::Form::checkbox("displayThumbnails","1",$data{displayThumbnails})
+                        );
                 $output .= formSave();
                 $output .= '</table></form>';
 		$output .= '<p><a href="'.WebGUI::URL::page('func=addDownload&wid='.$session{form}{wid})
@@ -372,7 +395,7 @@ sub www_edit {
 sub www_editSave {
         if (WebGUI::Privilege::canEditPage()) {
                 update();
-		WebGUI::SQL->write("update DownloadManager set paginateAfter='$session{form}{paginateAfter}' where widgetId=$session{form}{wid}");
+		WebGUI::SQL->write("update DownloadManager set paginateAfter='$session{form}{paginateAfter}', displayThumbnails='$session{form}{displayThumbnails}' where widgetId=$session{form}{wid}");
                 return "";
         } else {
                 return WebGUI::Privilege::insufficient();
@@ -452,25 +475,28 @@ sub www_editDownload {
 
 #-------------------------------------------------------------------
 sub www_editDownloadSave {
-        my ($file, $alt1, $alt2);
+        my ($file, $alt1, $alt2, $sqlAdd);
         if (WebGUI::Privilege::canEditPage()) {
-                $file = WebGUI::Attachment::save("downloadFile",$session{form}{wid},$session{form}{did});
-                if ($file ne "") {
-                        $file = ', downloadFile='.quote($file);
+                $file = WebGUI::Attachment->new("",$session{form}{wid},$session{form}{did});
+		$file->save("downloadFile");
+                if ($file->getFilename ne "") {
+                        $sqlAdd = ', downloadFile='.quote($file->getFilename);
                 }
-                $alt1 = WebGUI::Attachment::save("alternateVersion1",$session{form}{wid},$session{form}{did});
-                if ($alt1 ne "") {
-                        $alt1 = ', alternateVersion1='.quote($alt1);
+                $alt1 = WebGUI::Attachment->new("",$session{form}{wid},$session{form}{did});
+		$alt1->save("alternateVersion1");
+                if ($alt1->getFilename ne "") {
+                        $sqlAdd .= ', alternateVersion1='.quote($alt1->getFilename);
                 }
-                $alt2 = WebGUI::Attachment::save("alternateVersion2",$session{form}{wid},$session{form}{did});
-                if ($alt2 ne "") {
-                        $alt2 = ', alternateVersion2='.quote($alt2);
+                $alt2 = WebGUI::Attachment->new("",$session{form}{wid},$session{form}{did});
+		$alt2->save("alternateVersion2");
+                if ($alt2->getFilename ne "") {
+                        $sqlAdd = ', alternateVersion2='.quote($alt2->getFilename);
                 }
                 WebGUI::SQL->write("update DownloadManager_file set ".
                         " downloadId=".$session{form}{did}.
                         ", widgetId=".$session{form}{wid}.
                         ", fileTitle=".quote($session{form}{fileTitle}).
-			$file.$alt1.$alt2.
+			$sqlAdd.
                         ", groupToView='$session{form}{groupToView}'".
                         ", briefSynopsis=".quote($session{form}{briefSynopsis}).
                         ", dateUploaded=".time().
@@ -516,7 +542,7 @@ sub www_moveDownloadUp {
 
 #-------------------------------------------------------------------
 sub www_view {
-        my ($url, @row, $i, $dataRows, $search, $prevNextBar, %data, @test, %fileType, $output, $sth, 
+        my ($url, @row, $i, $p, $search, %data, @test, $file, $alt1, $alt2, $output, $sth, 
 		%download, $flag, $sort, $sortDirection);
         tie %download, 'Tie::CPHash';
         tie %data, 'Tie::CPHash';
@@ -562,29 +588,38 @@ sub www_view {
 		$sth = WebGUI::SQL->read("select * from DownloadManager_file where widgetId=$_[0] $search $sort $sortDirection");
 		while (%download = $sth->hash) {
 			if (WebGUI::Privilege::isInGroup($download{groupToView})) {
-				%fileType = WebGUI::Attachment::getType($download{downloadFile});
+				$file = WebGUI::Attachment->new($download{downloadFile},
+					$_[0], $download{downloadId});
 				$row[$i] = '<tr><td class="tableData" valign="top">';
 				$row[$i] .= '<a href="'.WebGUI::URL::page('func=download&wid='.$_[0].
-					'&did='.$download{downloadId}).'"><img src="'.$fileType{icon}.
+					'&did='.$download{downloadId}).'"><img src="'.$file->getIcon.
 					'" border=0 width=16 height=16 align="middle">'.
-					$download{fileTitle}.' ('.$fileType{extension}.')</a>';
+					$download{fileTitle}.' ('.$file->getType.')</a>';
 				if ($download{alternateVersion1}) {
-					%fileType = WebGUI::Attachment::getType($download{alternateVersion1});
+                                	$alt1 = WebGUI::Attachment->new($download{alternateVersion1},
+						$_[0], $download{downloadId});
                                 	$row[$i] .= ' &middot; <a href="'.WebGUI::URL::page('func=download&wid='.
 						$_[0].'&did='.$download{downloadId}.'&alternateVersion=1')
-						.'"><img src="'.$fileType{icon}.
+						.'"><img src="'.$alt1->getIcon.
                                         	'" border=0 width=16 height=16 align="middle">('.
-                                        	$fileType{extension}.')</a>';
+                                        	$alt1->getType.')</a>';
 				}
 				if ($download{alternateVersion2}) {
-					%fileType = WebGUI::Attachment::getType($download{alternateVersion2});
+                                	$alt2 = WebGUI::Attachment->new($download{alternateVersion2}, 
+						$_[0], $download{downloadId});
                                 	$row[$i] .= ' &middot; <a href="'.WebGUI::URL::page('func=download&wid='.
 						$_[0].'&did='.$download{downloadId}.'&alternateVersion=2')
-						.'"><img src="'.$fileType{icon}.
+						.'"><img src="'.$alt2->getIcon.
                                         	'" border=0 width=16 height=16 align="middle">('.
-                                        	$fileType{extension}.')</a>';
+                                        	$alt2->getType.')</a>';
 				}
-				$row[$i] .= '</td><td class="tableData" valign="top">'.$download{briefSynopsis}.'</td>'.
+				$row[$i] .= '</td><td class="tableData" valign="top">';
+				if ($data{displayThumbnails} 
+					&& isIn($file->getType, qw(gif jpeg jpg tif tiff png bmp))) {
+					$row[$i] .= '<img src="'.$file->getThumbnail.
+						'" border=0 align="middle" hspace="3">';
+				}
+				$row[$i] .= $download{briefSynopsis}.'</td>'.
 					'<td class="tableData" valign="top">'.
 					epochToHuman($download{dateUploaded},"%M/%D/%y").'</td>'.
 					'</tr>';
@@ -597,10 +632,10 @@ sub www_view {
 			$output .= '<tr><td class="tableData" colspan="3">'.
 				WebGUI::International::get(19,$namespace).'</td></tr>';
 		}
-		($dataRows, $prevNextBar) = paginate($data{paginateAfter},$url,\@row);
-                $output .= $dataRows;
+		$p = WebGUI::Paginator->new($url,\@row,$data{paginateAfter});
+                $output .= $p->getPage($session{form}{pn});
                 $output .= '</table>';
-                $output .= $prevNextBar;
+                $output .= $p->getBarTraditional($session{form}{pn});
 	        if ($data{processMacros} == 1) {
         	        $output = WebGUI::Macro::process($output);
         	}

@@ -17,6 +17,7 @@ use Tie::CPHash;
 use WebGUI::DateTime;
 use WebGUI::Form;
 use WebGUI::International;
+use WebGUI::Paginator;
 use WebGUI::Privilege;
 use WebGUI::Session;
 use WebGUI::Shortcut;
@@ -67,7 +68,8 @@ sub www_addUser {
 sub www_addUserSave {
         my ($output, @groups, $uid, $gid, $encryptedPassword, $expireAfter);
         if (WebGUI::Privilege::isInGroup(3)) {
-		($uid) = WebGUI::SQL->quickArray("select userId from users where username='$session{form}{username}'");
+		($uid) = WebGUI::SQL->quickArray("select userId from users where username=".
+			quote($session{form}{username}));
 		unless ($uid) {
                 	$encryptedPassword = Digest::MD5::md5_base64($session{form}{identifier});
 			$uid = getNextId("userId");
@@ -276,7 +278,8 @@ sub www_editUser {
 sub www_editUserSave {
         my ($error, $uid, $encryptedPassword, $passwordStatement);
         if (WebGUI::Privilege::isInGroup(3)) {
-                ($uid) = WebGUI::SQL->quickArray("select userId from users where username='$session{form}{username}'");
+                ($uid) = WebGUI::SQL->quickArray("select userId from users where username=".
+			quote($session{form}{username}));
                 if ($uid == $session{form}{uid} || $uid < 1) {
                 	if ($session{form}{identifier} ne "password") {
                         	$encryptedPassword = Digest::MD5::md5_base64($session{form}{identifier});
@@ -311,7 +314,7 @@ sub www_editUserGroupSave {
 
 #-------------------------------------------------------------------
 sub www_listUsers {
-	my ($output, $sth, @data, @row, $dataRows, $prevNextBar, $i, $search);
+	my ($output, $sth, @data, @row, $p, $i, $search);
         if (WebGUI::Privilege::isInGroup(3)) {
 		$output = helpLink(8);
 		$output .= '<h1>'.WebGUI::International::get(149).'</h1>';
@@ -342,11 +345,11 @@ sub www_listUsers {
 			$i++;
 		}
 		$sth->finish;
-                ($dataRows, $prevNextBar) = paginate(50,WebGUI::URL::page('op=listUsers'),\@row);
+                $p = WebGUI::Paginator->new(WebGUI::URL::page('op=listUsers'),\@row);
                 $output .= '<table border=1 cellpadding=5 cellspacing=0 align="center">';
-                $output .= $dataRows;
+                $output .= $p->getPage($session{form}{pn});
                 $output .= '</table>';
-                $output .= $prevNextBar;
+                $output .= $p->getBarTraditional($session{form}{pn});
 		return $output;
         } else {
                 return WebGUI::Privilege::adminOnly();

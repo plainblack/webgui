@@ -1,4 +1,4 @@
-package WebGUI::Macro::i_imageNoTags;
+package WebGUI::Macro::Thumbnail;
 
 #-------------------------------------------------------------------
 # WebGUI is Copyright 2001-2002 Plain Black Software.
@@ -19,19 +19,19 @@ use WebGUI::SQL;
 
 #-------------------------------------------------------------------
 sub _replacement {
-	my (@param, $image, %data);
+	my (@param, %data, $image);
 	tie %data, 'Tie::CPHash';
         @param = WebGUI::Macro::getParams($_[0]);
 	%data = WebGUI::SQL->quickHash("select * from images where name='$param[0]'");
 	$image = WebGUI::Attachment->new($data{filename},"images",$data{imageId});
-	return $image->getURL;
+	return $image->getThumbnail;
 }
 
 #-------------------------------------------------------------------
 sub process {
 	my ($output, $temp);
 	$output = $_[0];
-        $output =~ s/\^i\((.*?)\)\;/_replacement($1)/ge;
+        $output =~ s/\^Thumbnail\((.*?)\)\;/_replacement($1)/ge;
 	return $output;
 }
 

@@ -20,6 +20,7 @@ use WebGUI::International;
 use WebGUI::Macro;
 use WebGUI::MessageLog;
 use WebGUI::Operation;
+use WebGUI::Paginator;
 use WebGUI::Privilege;
 use WebGUI::Session;
 use WebGUI::Shortcut;
@@ -30,17 +31,21 @@ use WebGUI::Widget;
 
 #-------------------------------------------------------------------
 sub duplicate {
-        my ($sth, %data, $newWidgetId, @row, $newSubmissionId, $pageId);
+        my ($sth, $file, %data, $newWidgetId, @row, $newSubmissionId, $pageId);
         tie %data, 'Tie::CPHash';
         %data = getProperties($namespace,$_[0]);
 	$pageId = $_[1] || $data{pageId};
-        $newWidgetId = create($pageId,$namespace,$data{title},$data{displayTitle},$data{description},$data{processMacros},$data{templatePosition});
+        $newWidgetId = create($pageId,$namespace,$data{title},$data{displayTitle},
+		$data{description},$data{processMacros},$data{templatePosition});
 	WebGUI::SQL->write("insert into UserSubmission values ($newWidgetId, $data{groupToContribute}, '$data{submissionsPerPage}', '$data{defaultStatus}', $data{groupToApprove})");
         $sth = WebGUI::SQL->read("select * from UserSubmission_submission where widgetId=$_[0]");
         while (@row = $sth->array) {
                 $newSubmissionId = getNextId("submissionId");
-		WebGUI::Attachment::copy($row[8],$_[0],$newWidgetId,$row[1],$newSubmissionId);
-                WebGUI::SQL->write("insert into UserSubmission_submission values ($newWidgetId, $newSubmissionId, ".quote($row[2]).", $row[3], ".quote($row[4]).", '$row[5]', ".quote($row[6]).", ".quote($row[7]).", ".quote($row[8]).", '$row[9]', '$row[10]')");
+		$file = WebGUI::Attachment->new($row[8],$_[0],$row[1]);
+		$file->copy($newWidgetId,$newSubmissionId);
+                WebGUI::SQL->write("insert into UserSubmission_submission values ($newWidgetId, $newSubmissionId, ".
+			quote($row[2]).", $row[3], ".quote($row[4]).", '$row[5]', ".quote($row[6]).", ".
+			quote($row[7]).", ".quote($row[8]).", '$row[9]', '$row[10]')");
         }
         $sth->finish;
 }
@@ -93,7 +98,9 @@ sub www_add {
 sub www_addSave {
 	my ($widgetId);
 	if (WebGUI::Privilege::canEditPage()) {
-		$widgetId = create($session{page}{pageId},$session{form}{widget},$session{form}{title},$session{form}{displayTitle},$session{form}{description},$session{form}{processMacros},$session{form}{templatePosition});
+		$widgetId = create($session{page}{pageId},$session{form}{widget},$session{form}{title},
+			$session{form}{displayTitle},$session{form}{description},$session{form}{processMacros},
+			$session{form}{templatePosition});
 		WebGUI::SQL->write("insert into UserSubmission values ($widgetId, $session{form}{groupToContribute}, '$session{form}{submissionsPerPage}', '$session{form}{defaultStatus}', $session{form}{groupToApprove})");
 		return "";
 	} else {
@@ -146,14 +153,21 @@ sub www_addSubmissionSave {
 	%userSubmission = getProperties($namespace,$session{form}{wid});
         if (WebGUI::Privilege::isInGroup($userSubmission{groupToContribute},$session{user}{userId})) {
                 $submissionId = getNextId("submissionId");
-                $image = WebGUI::Attachment::save("image",$session{form}{wid},$submissionId);
-                $attachment = WebGUI::Attachment::save("attachment",$session{form}{wid},$submissionId);
+                $image = WebGUI::Attachment->new("",$session{form}{wid},$submissionId);
+		$image->save("image");
+                $attachment = WebGUI::Attachment->new("",$session{form}{wid},$submissionId);
+		$attachment->save("attachment");
 		if ($session{form}{title} ne "") {
 			$title = $session{form}{title};
 		} else {
 			$title = WebGUI::International::get(16,$namespace);
 		}
-                WebGUI::SQL->write("insert into UserSubmission_submission values ($session{form}{wid}, $submissionId, ".quote($title).", ".time().", ".quote($session{user}{username}).", '$session{user}{userId}', ".quote($session{form}{content}).", ".quote($image).", ".quote($attachment).", '$userSubmission{defaultStatus}', '$session{form}{convertCarriageReturns}')");
+                WebGUI::SQL->write("insert into UserSubmission_submission values ($session{form}{wid}, $submissionId, "
+			.quote($title).", ".time().", ".quote($session{user}{username}).
+			", '$session{user}{userId}', ".quote($session{form}{content}).", ".
+			quote($image->getFilename).", ".
+			quote($attachment->getFilename).
+			", '$userSubmission{defaultStatus}', '$session{form}{convertCarriageReturns}')");
 		if ($userSubmission{defaultStatus} ne "Approved") {
 			WebGUI::MessageLog::addEntry('',$userSubmission{groupToApprove},
 				WebGUI::URL::page('func=viewSubmission&wid='.$session{form}{wid}.
@@ -233,10 +247,12 @@ sub www_deleteSubmission {
 
 #-------------------------------------------------------------------
 sub www_deleteSubmissionConfirm {
-        my ($output, $owner);
+        my ($output, $owner, $file);
 	($owner) = WebGUI::SQL->quickArray("select userId from UserSubmission_submission where submissionId=$session{form}{sid}");
         if ($owner == $session{user}{userId}) {
 		WebGUI::SQL->write("delete from UserSubmission_submission where submissionId=$session{form}{sid}");
+		$file = WebGUI::Attachment->new("",$session{form}{wid},$session{form}{sid});
+		$file->deleteNode;
                 return www_addSubmission();
         } else {
                 return WebGUI::Privilege::insufficient();
@@ -347,24 +363,29 @@ sub www_editSubmission {
 
 #-------------------------------------------------------------------
 sub www_editSubmissionSave {
-	my ($owner,%userSubmission,$image,$attachment,$title);
+	my ($sqlAdd,$owner,%userSubmission,$image,$attachment,$title);
 	($owner) = WebGUI::SQL->quickArray("select userId from UserSubmission_submission where submissionId=$session{form}{sid}");
         if ($owner == $session{user}{userId}) {
 		%userSubmission = getProperties($namespace,$session{form}{wid});
-                $image = WebGUI::Attachment::save("image",$session{form}{wid},$session{form}{sid});
-		if ($image ne "") {
-			$image = 'image='.quote($image).', ';
+                $image = WebGUI::Attachment->new("",$session{form}{wid},$session{form}{sid});
+		$image->save("image");
+		if ($image->getFilename ne "") {
+			$sqlAdd = 'image='.quote($image->getFilename).', ';
 		}
-                $attachment = WebGUI::Attachment::save("attachment",$session{form}{wid},$session{form}{sid});
-                if ($attachment ne "") {
-                        $attachment = 'attachment='.quote($attachment).', ';
+                $attachment = WebGUI::Attachment->new("",$session{form}{wid},$session{form}{sid});
+		$attachment->save("attachment");
+                if ($attachment->getFilename ne "") {
+                        $sqlAdd .= 'attachment='.quote($attachment->getFilename).', ';
                 }
                 if ($session{form}{title} ne "") {
                         $title = $session{form}{title};
                 } else {
                         $title = WebGUI::International::get(16,$namespace);
                 }
-                WebGUI::SQL->write("update UserSubmission_submission set dateSubmitted=".time().", convertCarriageReturns='$session{form}{convertCarriageReturns}', title=".quote($title).", content=".quote($session{form}{content}).", ".$image.$attachment." status='$userSubmission{defaultStatus}' where submissionId=$session{form}{sid}");
+                WebGUI::SQL->write("update UserSubmission_submission set dateSubmitted=".time().
+			", convertCarriageReturns='$session{form}{convertCarriageReturns}', title=".quote($title).
+			", content=".quote($session{form}{content}).", ".$sqlAdd.
+			" status='$userSubmission{defaultStatus}' where submissionId=$session{form}{sid}");
 		if ($userSubmission{defaultStatus} ne "Approved") {
 			WebGUI::MessageLog::addEntry('',$userSubmission{groupToApprove},
 				WebGUI::URL::page('func=viewSubmission&wid='.$session{form}{wid}.'&sid='.
@@ -378,7 +399,7 @@ sub www_editSubmissionSave {
 
 #-------------------------------------------------------------------
 sub www_view {
-	my (%data, @submission, $output, $sth, @row, $i, $dataRows, $prevNextBar);
+	my (%data, @submission, $output, $sth, @row, $i, $p);
 	tie %data, 'Tie::CPHash';
 	%data = getProperties($namespace,$_[0]);
 	if (%data) {
@@ -404,19 +425,21 @@ sub www_view {
 		$output .= '<table width="100%" cellpadding=2 cellspacing=1 border=0><tr>'.
 			'<td align="right" class="tableMenu"><a href="'.WebGUI::URL::page('func=addSubmission&wid='.
 			$_[0]).'">'.WebGUI::International::get(20,$namespace).'</a></td></tr></table>';
-                ($dataRows, $prevNextBar) = paginate($data{submissionsPerPage},WebGUI::URL::page(),\@row);
+                $p = WebGUI::Paginator->new(WebGUI::URL::page(),\@row,$data{submissionsPerPage});
 		$output .= '<table width="100%" cellspacing=1 cellpadding=2 border=0>';
-		$output .= '<tr><td class="tableHeader">'.WebGUI::International::get(99).'</td><td class="tableHeader">'.WebGUI::International::get(13,$namespace).'</td><td class="tableHeader">'.WebGUI::International::get(21,$namespace).'</td></tr>';
-                $output .= $dataRows;
+		$output .= '<tr><td class="tableHeader">'.WebGUI::International::get(99).
+			'</td><td class="tableHeader">'.WebGUI::International::get(13,$namespace).
+			'</td><td class="tableHeader">'.WebGUI::International::get(21,$namespace).'</td></tr>';
+                $output .= $p->getPage($session{form}{pn});
                 $output .= '</table>';
-                $output .= $prevNextBar;
+                $output .= $p->getBarTraditional($session{form}{pn});
 	}
 	return $output;
 }
 
 #-------------------------------------------------------------------
 sub www_viewSubmission {
-	my ($output, %submission);
+	my ($output, %submission, $file);
 	tie %submission, 'Tie::CPHash';
 	%submission = WebGUI::SQL->quickHash("select * from UserSubmission_submission where submissionId=$session{form}{sid}");
        	$output = "<h1>".$submission{title}."</h1>";
@@ -448,7 +471,8 @@ sub www_viewSubmission {
 	$output .= '</td</tr><tr><td class="tableData">';
   #---content
 	if ($submission{image} ne "") {
-		$output .= '<img src="'.$session{setting}{attachmentDirectoryWeb}.'/'.$session{form}{wid}.'/'.$session{form}{sid}.'/'.$submission{image}.'" hspace=3 align="right">';
+		$file = WebGUI::Attachment->new($submission{filename},$session{form}{wid},$session{form}{sid});
+		$output .= '<img src="'.$file->getURL.'" hspace=3 align="right">';
 	}
 	if ($submission{convertCarriageReturns}) {
 		$submission{content} =~ s/\n/\<br\>/g;

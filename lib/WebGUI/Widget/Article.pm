@@ -27,14 +27,20 @@ use WebGUI::Widget;
 
 #-------------------------------------------------------------------
 sub duplicate {
-	my (%data, $newWidgetId, $pageId);
+	my (%data, $newWidgetId, $pageId, $file);
 	tie %data, 'Tie::CPHash';
 	%data = getProperties($namespace,$_[0]);
 	$pageId = $_[1] || $data{pageId};
-	$newWidgetId = create($pageId,$namespace,$data{title},$data{displayTitle},$data{description},$data{processMacros},$data{templatePosition});
-	WebGUI::Attachment::copy($data{image},$_[0],$newWidgetId);
-	WebGUI::Attachment::copy($data{attachment},$_[0],$newWidgetId);
-	WebGUI::SQL->write("insert into Article values ($newWidgetId, $data{startDate}, $data{endDate}, ".quote($data{body}).", ".quote($data{image}).", ".quote($data{linkTitle}).", ".quote($data{linkURL}).", ".quote($data{attachment}).", '$data{convertCarriageReturns}', ".quote($data{alignImage}).")");
+	$newWidgetId = create($pageId,$namespace,$data{title},$data{displayTitle},
+		$data{description},$data{processMacros},$data{templatePosition});
+	$file = WebGUI::Attachment->new($data{image},$_[0]);
+	$file->copy($newWidgetId);
+        $file = WebGUI::Attachment->new($data{attachment},$_[0]);
+        $file->copy($newWidgetId);
+	WebGUI::SQL->write("insert into Article values ($newWidgetId, $data{startDate}, $data{endDate}, ".
+		quote($data{body}).", ".quote($data{image}).", ".quote($data{linkTitle}).", ".
+		quote($data{linkURL}).", ".quote($data{attachment}).", '$data{convertCarriageReturns}', ".
+		quote($data{alignImage}).")");
 }
 
 #-------------------------------------------------------------------
@@ -92,10 +98,24 @@ sub www_add {
 sub www_addSave {
 	my ($widgetId, $image, $attachment);
 	if (WebGUI::Privilege::canEditPage()) {
-		$widgetId = create($session{page}{pageId},$session{form}{widget},$session{form}{title},$session{form}{displayTitle},$session{form}{description},$session{form}{processMacros},$session{form}{templatePosition});
-		$image = WebGUI::Attachment::save("image",$widgetId);
-		$attachment = WebGUI::Attachment::save("attachment",$widgetId);
-		WebGUI::SQL->write("insert into Article values ($widgetId, '".setToEpoch($session{form}{startDate})."', '".setToEpoch($session{form}{endDate})."', ".quote($session{form}{body}).", ".quote($image).", ".quote($session{form}{linkTitle}).", ".quote($session{form}{linkURL}).", ".quote($attachment).", '$session{form}{convertCarriageReturns}', ".quote($session{form}{alignImage}).")");
+		$widgetId = create($session{page}{pageId},$session{form}{widget},
+			$session{form}{title},$session{form}{displayTitle},
+			$session{form}{description},$session{form}{processMacros},
+			$session{form}{templatePosition});
+		$image = WebGUI::Attachment->new("",$widgetId);
+		$image->save("image");
+		$attachment = WebGUI::Attachment->new("",$widgetId);
+		$attachment->save("attachment");
+		WebGUI::SQL->write("insert into Article values ($widgetId, '".
+			setToEpoch($session{form}{startDate})."', '".
+			setToEpoch($session{form}{endDate})."', ".
+			quote($session{form}{body}).", ".
+			quote($image->getFilename).", ".
+			quote($session{form}{linkTitle}).", ".
+			quote($session{form}{linkURL}).", ".
+			quote($attachment->getFilename).
+			", '$session{form}{convertCarriageReturns}', ".
+			quote($session{form}{alignImage}).")");
 		return "";
 	} else {
 		return WebGUI::Privilege::insufficient();
@@ -145,15 +165,22 @@ sub www_edit {
                 $output .= WebGUI::Form::hidden("wid",$session{form}{wid});
                 $output .= WebGUI::Form::hidden("func","editSave");
                 $output .= '<table>';
-                $output .= tableFormRow(WebGUI::International::get(99),WebGUI::Form::text("title",20,128,$data{title}));
-                $output .= tableFormRow(WebGUI::International::get(174),WebGUI::Form::checkbox("displayTitle","1",$data{displayTitle}));
-                $output .= tableFormRow(WebGUI::International::get(175),WebGUI::Form::checkbox("processMacros","1",$data{processMacros}));
+                $output .= tableFormRow(WebGUI::International::get(99),
+			WebGUI::Form::text("title",20,128,$data{title}));
+                $output .= tableFormRow(WebGUI::International::get(174),
+			WebGUI::Form::checkbox("displayTitle","1",$data{displayTitle}));
+                $output .= tableFormRow(WebGUI::International::get(175),
+			WebGUI::Form::checkbox("processMacros","1",$data{processMacros}));
 		%hash = WebGUI::Widget::getPositions();
 		$array[0] = $data{templatePosition};
-                $output .= tableFormRow(WebGUI::International::get(363),WebGUI::Form::selectList("templatePosition",\%hash,\@array));
-                $output .= tableFormRow(WebGUI::International::get(3,$namespace),WebGUI::Form::text("startDate",20,30,epochToSet($data{startDate}),1));
-                $output .= tableFormRow(WebGUI::International::get(4,$namespace),WebGUI::Form::text("endDate",20,30,epochToSet($data{endDate}),1));
-                $output .= tableFormRow(WebGUI::International::get(5,$namespace),WebGUI::Form::textArea("body",$data{body},50,10,1));
+                $output .= tableFormRow(WebGUI::International::get(363),
+			WebGUI::Form::selectList("templatePosition",\%hash,\@array));
+                $output .= tableFormRow(WebGUI::International::get(3,$namespace),
+			WebGUI::Form::text("startDate",20,30,epochToSet($data{startDate}),1));
+                $output .= tableFormRow(WebGUI::International::get(4,$namespace),
+			WebGUI::Form::text("endDate",20,30,epochToSet($data{endDate}),1));
+                $output .= tableFormRow(WebGUI::International::get(5,$namespace),
+			WebGUI::Form::textArea("body",$data{body},50,10,1));
 		if ($data{image} ne "") {
                 	$output .= tableFormRow(WebGUI::International::get(6,$namespace),'<a href="'.
 				WebGUI::URL::page('func=deleteImage&wid='.$session{form}{wid})
@@ -169,16 +196,21 @@ sub www_edit {
                 $array[0] = $data{alignImage};
                 $output .= tableFormRow(WebGUI::International::get(14,$namespace),
                         WebGUI::Form::selectList("alignImage",\%hash,\@array));
-                $output .= tableFormRow(WebGUI::International::get(7,$namespace),WebGUI::Form::text("linkTitle",20,128,$data{linkTitle}));
-                $output .= tableFormRow(WebGUI::International::get(8,$namespace),WebGUI::Form::text("linkURL",20,2048,$data{linkURL}));
+                $output .= tableFormRow(WebGUI::International::get(7,$namespace),
+			WebGUI::Form::text("linkTitle",20,128,$data{linkTitle}));
+                $output .= tableFormRow(WebGUI::International::get(8,$namespace),
+			WebGUI::Form::text("linkURL",20,2048,$data{linkURL}));
 		if ($data{attachment} ne "") {
                 	$output .= tableFormRow(WebGUI::International::get(9,$namespace),'<a href="'.
 				WebGUI::URL::page('func=deleteAttachment&wid='.$session{form}{wid})
 				.'">'.WebGUI::International::get(13,$namespace).'</a>');
 		} else {
-                	$output .= tableFormRow(WebGUI::International::get(9,$namespace),WebGUI::Form::file("attachment"));
+                	$output .= tableFormRow(WebGUI::International::get(9,$namespace),
+				WebGUI::Form::file("attachment"));
 		}
-		$output .= tableFormRow(WebGUI::International::get(10,$namespace),WebGUI::Form::checkbox("convertCarriageReturns",1,$data{convertCarriageReturns}).' <span style="font-size: 8pt;">'.WebGUI::International::get(11,$namespace).'</span>');
+		$output .= tableFormRow(WebGUI::International::get(10,$namespace),
+			WebGUI::Form::checkbox("convertCarriageReturns",1,$data{convertCarriageReturns}).
+			' <span style="font-size: 8pt;">'.WebGUI::International::get(11,$namespace).'</span>');
                 $output .= formSave();
                 $output .= '</table></form>';
                 return $output;
@@ -189,18 +221,27 @@ sub www_edit {
 
 #-------------------------------------------------------------------
 sub www_editSave {
-        my ($image, $attachment);
+        my ($sqlAdd, $image, $attachment);
         if (WebGUI::Privilege::canEditPage()) {
 		update();
-                $image = WebGUI::Attachment::save("image",$session{form}{wid});
-		if ($image ne "") {
-			$image = ', image='.quote($image);
+                $image = WebGUI::Attachment->new("",$session{form}{wid});
+		$image->save("image");
+		if ($image->getFilename ne "") {
+			$sqlAdd = ', image='.quote($image->getFilename);
 		}
-                $attachment = WebGUI::Attachment::save("attachment",$session{form}{wid});
+                $attachment = WebGUI::Attachment->new("",$session{form}{wid});
+		$attachment->save("attachment");
 		if ($attachment ne "") {
-                        $attachment = ', attachment='.quote($attachment);
+                        $sqlAdd .= ', attachment='.quote($attachment->getFilename);
                 }
-                WebGUI::SQL->write("update Article set alignImage=".quote($session{form}{alignImage}).", startDate='".setToEpoch($session{form}{startDate})."', endDate='".setToEpoch($session{form}{endDate})."', convertCarriageReturns='$session{form}{convertCarriageReturns}', body=".quote($session{form}{body}).", linkTitle=".quote($session{form}{linkTitle}).", linkURL=".quote($session{form}{linkURL}).$attachment.$image." where widgetId=$session{form}{wid}");
+                WebGUI::SQL->write("update Article set alignImage=".quote($session{form}{alignImage}).
+			", startDate='".setToEpoch($session{form}{startDate}).
+			"', endDate='".setToEpoch($session{form}{endDate}).
+			"', convertCarriageReturns='$session{form}{convertCarriageReturns}', body=".
+			quote($session{form}{body}).", linkTitle=".
+			quote($session{form}{linkTitle}).", linkURL=".
+			quote($session{form}{linkURL}).$sqlAdd.
+			" where widgetId=$session{form}{wid}");
                 return "";
         } else {
                 return WebGUI::Privilege::insufficient();
@@ -217,7 +258,8 @@ sub www_view {
 			$output = "<h1>".$data{title}."</h1>";
 		}
 		if ($data{image} ne "") {
-			$image = '<img src="'.$session{setting}{attachmentDirectoryWeb}.'/'.$_[0].'/'.$data{image}.'"';
+			$image = WebGUI::Attachment->new($data{image},$_[0]);
+			$image = '<img src="'.$image->getURL.'"';
 			if ($data{alignImage} ne "center") {
 				$image .= ' align="'.$data{alignImage}.'"';
 			}

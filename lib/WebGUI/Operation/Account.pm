@@ -20,6 +20,7 @@ use WebGUI::ErrorHandler;
 use WebGUI::Form;
 use WebGUI::International;
 use WebGUI::Mail;
+use WebGUI::Paginator;
 use WebGUI::Privilege;
 use WebGUI::Session;
 use WebGUI::Shortcut;
@@ -489,7 +490,7 @@ sub www_updateAccount {
 
 #-------------------------------------------------------------------
 sub www_viewMessageLog {
-        my (@data, $output, $sth, @row, $i, $dataRows, $prevNextBar);
+        my (@data, $output, $sth, @row, $i, $p);
         if (WebGUI::Privilege::isInGroup(2,$session{user}{userId})) {
                 $output = '<h1>'.WebGUI::International::get(159).'</h1>';
                 $sth = WebGUI::SQL->read("select messageLogId,message,url,dateOfEntry from messageLog where userId=$session{user}{userId} order by dateOfEntry desc");
@@ -507,16 +508,16 @@ sub www_viewMessageLog {
                         $i++;
                 }
                 $sth->finish;
-                ($dataRows, $prevNextBar) = paginate(50,WebGUI::URL::page('op=viewMessageLog'),\@row);
+                $p = WebGUI::Paginator->new(WebGUI::URL::page('op=viewMessageLog'),\@row);
                 $output .= '<table width="100%" cellspacing=1 cellpadding=2 border=0>';
                 $output .= '<tr><td class="tableHeader">'.WebGUI::International::get(351).'</td><td class="tableHeader">'.WebGUI::International::get(352).'</td></tr>';
-                if ($dataRows eq "") {
+                if ($p->getPage($session{form}{pn}) eq "") {
                         $output .= '<tr><td rowspan=2 class="tableData">'.WebGUI::International::get(353).'</td></tr>';
                 } else {
-                        $output .= $dataRows;
+                        $output .= $p->getPage($session{form}{pn});
                 }
                 $output .= '</table>';
-                $output .= $prevNextBar;
+                $output .= $p->getBarSimple($session{form}{pn});
 		$output .= _accountOptions();
         } else {
                 $output = WebGUI::Privilege::insufficient();

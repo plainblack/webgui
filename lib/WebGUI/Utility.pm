@@ -19,41 +19,27 @@ use WebGUI::SQL;
 use WebGUI::URL;
 
 our @ISA = qw(Exporter);
-our @EXPORT = qw(&sortByColumn &sortHashDescending &sortHash 
-	&paginate &randint &round);
+our @EXPORT = qw(&sortByColumn &sortHashDescending &sortHash &isIn &randint &round);
 
 #-------------------------------------------------------------------
-sub paginate {
-	my ($pn, $i, $dataRows, $prevNextBar, $itemsPerPage, @row, $url);
-	$itemsPerPage = $_[0];
-	$url = $_[1];
-	@row = @{$_[2]};
-	if ($session{form}{pn} < 1) {
-		$pn = 0;
-	} else {
-		$pn = $session{form}{pn};
-	}
-	for ($i=($itemsPerPage*$pn); $i<($itemsPerPage*($pn+1));$i++) {
-		$dataRows .= $row[$i];
-	}
-	if ($#row+1 > $itemsPerPage) {
-		$prevNextBar = '<div class="pagination">';
-		if ($pn > 0) {
-			$prevNextBar .= '<a href="'.WebGUI::URL::append($url,('pn='.($pn-1))).'">&laquo;'.
-				WebGUI::International::get(91).'</a>';
-		} else {
-			$prevNextBar .= '&laquo;'.WebGUI::International::get(91);
-		}
-		$prevNextBar .= ' &middot; ';
-		if (($pn+1) < (($#row+1)/$itemsPerPage)) {
-			$prevNextBar .= '<a href="'.WebGUI::URL::append($url,('pn='.($pn+1))).'">'.
-				WebGUI::International::get(92).'&raquo;</a>';
-		} else {
-			$prevNextBar .= WebGUI::International::get(92).'&raquo;';
-		}
-		$prevNextBar .= '</div>';
-	}
-	return ($dataRows, $prevNextBar);
+sub isIn {
+        my ($i, @a, @b, @isect, %union, %isect, $e);
+        foreach $e (@_) {
+                if ($a[0] eq "") {
+                        $a[0] = $e;
+                } else {
+                        $b[$i] = $e;
+                        $i++;
+                }
+        }
+        foreach $e (@a, @b) { $union{$e}++ && $isect{$e}++ }
+        @isect = keys %isect;
+        if (defined @isect) {
+		undef @isect;
+                return 1;
+        } else {
+                return 0;
+        }
 }
 
 #-------------------------------------------------------------------

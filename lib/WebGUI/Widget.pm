@@ -15,8 +15,8 @@ use DBI;
 use Exporter;
 use strict qw(subs vars);
 use Tie::IxHash;
-use WebGUI::Attachment;
 use WebGUI::International;
+use WebGUI::Node;
 use WebGUI::Session;
 use WebGUI::SQL;
 use WebGUI::Template;
@@ -63,9 +63,11 @@ sub getProperties {
 
 #-------------------------------------------------------------------
 sub purgeWidget {
+	my ($node);
         WebGUI::SQL->write("delete from $_[2] where widgetId=$_[0]",$_[1]);
         WebGUI::SQL->write("delete from widget where widgetId=$_[0]",$_[1]);
-        WebGUI::Attachment::purgeWidget($_[0]);
+	$node = WebGUI::Node->new($_[0]);
+	$node->delete;
 }
 
 #-------------------------------------------------------------------

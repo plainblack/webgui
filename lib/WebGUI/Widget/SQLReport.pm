@@ -16,6 +16,7 @@ use strict;
 use WebGUI::ErrorHandler;
 use WebGUI::International;
 use WebGUI::Macro;
+use WebGUI::Paginator;
 use WebGUI::Privilege;
 use WebGUI::Session;
 use WebGUI::Shortcut;
@@ -187,7 +188,7 @@ sub www_editSave {
 
 #-------------------------------------------------------------------
 sub www_view {
-	my (@row, $i, $dataRows, $prevNextBar, $ouch, %data, $output, $sth, $dbh, @result, 
+	my (@row, $i, $p, $ouch, %data, $output, $sth, $dbh, @result, 
 		@template, $temp, $col);
 	tie %data, 'Tie::CPHash';
 	%data = getProperties($namespace,$_[0]);
@@ -239,10 +240,10 @@ sub www_view {
 					$i++;
 				}
 				$sth->finish;
-                		($dataRows, $prevNextBar) = paginate($data{paginateAfter},WebGUI::URL::page(),\@row);
-                		$output .= $dataRows;
+                		$p = WebGUI::Paginator->new(WebGUI::URL::page(),\@row,$data{paginateAfter});
+                		$output .= $p->getPage($session{form}{pn});
                 		$output .= $template[2];
-                		$output .= $prevNextBar;
+                		$output .= $p->getBar($session{form}{pn});
 			} else {
 				$output .= WebGUI::International::get(11,$namespace).'<p>';
 				WebGUI::ErrorHandler::warn("SQLReport [$_[0]] There was a problem with the query.");

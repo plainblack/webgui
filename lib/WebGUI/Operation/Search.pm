@@ -14,6 +14,7 @@ use Exporter;
 use strict;
 use Tie::IxHash;
 use WebGUI::International;
+use WebGUI::Paginator;
 use WebGUI::Privilege;
 use WebGUI::Session;
 use WebGUI::Shortcut;
@@ -26,7 +27,7 @@ our @EXPORT = qw(&www_search);
 
 #-------------------------------------------------------------------
 sub www_search {
-        my ($dataRows, $prevNextBar, $output, %page, @keyword, $pageId, $term, %result, $sth, @data, @row, $i);
+        my ($p, $output, %page, @keyword, $pageId, $term, %result, $sth, @data, @row, $i);
 	tie %result,'Tie::IxHash';
 	$output = formHeader();
 	$output .= WebGUI::Form::hidden("op","search");
@@ -69,10 +70,10 @@ sub www_search {
 			}
 		}
 		if ($row[0] ne "") {
-			($dataRows, $prevNextBar) = paginate(20,WebGUI::URL::page('op=search'),\@row);
+			$p = WebGUI::Paginator->new(WebGUI::URL::page('op=search'),\@row,20);
 			$output .= WebGUI::International::get(365).'<p><ol>';
-			$output .= $dataRows;
-			$output .= '</ol>'.$prevNextBar;
+			$output .= $p->getPage($session{form}{pn});
+			$output .= '</ol>'.$p->getBarTradiational($session{form}{pn});
 		} else {
 			$output .= WebGUI::International::get(366);
 		}

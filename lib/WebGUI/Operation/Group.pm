@@ -16,6 +16,7 @@ use Tie::CPHash;
 use WebGUI::DateTime;
 use WebGUI::Form;
 use WebGUI::International;
+use WebGUI::Paginator;
 use WebGUI::Privilege;
 use WebGUI::Session;
 use WebGUI::Shortcut;
@@ -146,7 +147,7 @@ sub www_editGroupSave {
 
 #-------------------------------------------------------------------
 sub www_listGroups {
-        my ($output, $dataRows, $prevNextBar, $sth, @data, @row, $i);
+        my ($output, $p, $sth, @data, @row, $i);
         if (WebGUI::Privilege::isInGroup(3)) {
                 $output = helpLink(10);
 		$output .= '<h1>'.WebGUI::International::get(89).'</h1>';
@@ -165,11 +166,11 @@ sub www_listGroups {
                         $i++;
                 }
 		$sth->finish;
-                ($dataRows, $prevNextBar) = paginate(50,WebGUI::URL::page('op=listGroups'),\@row);
+                $p = WebGUI::Paginator->new(WebGUI::URL::page('op=listGroups'),\@row);
                 $output .= '<table border=1 cellpadding=5 cellspacing=0 align="center">';
-                $output .= $dataRows;
+                $output .= $p->getPage($session{form}{pn});
                 $output .= '</table>';
-                $output .= $prevNextBar;
+                $output .= $p->getBarTraditional($session{form}{pn});
                 return $output;
         } else {
                 return WebGUI::Privilege::adminOnly();

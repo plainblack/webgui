@@ -28,17 +28,15 @@ our @EXPORT = qw(&attachmentBox &formHeader &formSave &tableFormRow &helpLink);
 
 #-------------------------------------------------------------------
 sub attachmentBox {
-	my ($output, %fileType, $fileUrl);
-	$fileUrl = $session{setting}{attachmentDirectoryWeb}.'/'.$_[1].'/';
-	if ($_[2] ne "") {
-		$fileUrl .= $_[2].'/';
-	}
-	$fileUrl .= $_[0];
-	%fileType = WebGUI::Attachment::getType($_[0]);
+	my ($output, $attachment);
+	$attachment = WebGUI::Attachment->new($_[0],$_[1],$_[2]);
 	$output = '<p><table cellpadding=3 cellspacing=0 border=1><tr><td class="tableHeader">'.
-		'<a href="'.$fileUrl.'"><img src="'.$session{setting}{lib}.'/attachment.gif" border=0 alt="'.
-		$_[0].'"></a></td><td><a href="'.$fileUrl.'"><img src="'.$fileType{icon}.
-		'" align="middle" width="16" height="16" border="0" alt="'.$_[0].'">'.$_[0].'</a></td></tr></table>';
+		'<a href="'.$attachment->getURL.'"><img src="'.$session{setting}{lib}.
+		'/attachment.gif" border=0 alt="'.
+		$attachment->getFilename.'"></a></td><td><a href="'.$attachment->getURL.
+		'"><img src="'.$attachment->getIcon.
+		'" align="middle" width="16" height="16" border="0" alt="'.$attachment->getFilename
+		.'">'.$attachment->getFilename.'</a></td></tr></table>';
 	return $output;
 }
 

@@ -14,6 +14,7 @@ use DBD::mysql ();
 use Data::Config ();
 use Date::Calc ();
 use HTML::CalendarMonthSimple ();
+use Image::Magick ();
 use Tie::CPHash ();
 use Tie::IxHash ();
 use Net::LDAP ();

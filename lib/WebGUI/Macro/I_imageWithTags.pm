@@ -12,18 +12,19 @@ package WebGUI::Macro::I_imageWithTags;
 
 use strict;
 use Tie::CPHash;
+use WebGUI::Attachment;
 use WebGUI::Macro;
 use WebGUI::Session;
 use WebGUI::SQL;
 
 #-------------------------------------------------------------------
 sub _replacement {
-	my (@param, $temp, %data);
+	my (@param, $temp, %data, $image);
 	tie %data, 'Tie::CPHash';
         @param = WebGUI::Macro::getParams($_[0]);
 	%data = WebGUI::SQL->quickHash("select * from images where name='$param[0]'");
-	$temp = '<img src="'.$session{setting}{attachmentDirectoryWeb}.'/images/'.
-		$data{imageId}.'/'.$data{filename}.'" '.$data{parameters}.'>'; 
+	$image = WebGUI::Attachment->new($data{filename},"images",$data{imageId});
+	$temp = '<img src="'.$image->getURL.'" '.$data{parameters}.'>'; 
 	return $temp;
 }
 

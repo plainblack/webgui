@@ -24,6 +24,7 @@ QnD INSTALL INSTRUCTIONS:
    Tie::CPHash
    Date::Calc
    HTML::CalendarMonthSimple
+   Image::Magick
 
 3. Install Apache (with or without mod_perl) and set up your config.
 
