@@ -16,6 +16,7 @@ use strict;
 use Tie::CPHash;
 use WebGUI::Attachment;
 use WebGUI::DateTime;
+use WebGUI::HTML;
 use WebGUI::International;
 use WebGUI::Macro;
 use WebGUI::MessageLog;
@@ -129,6 +130,7 @@ sub www_addSubmission {
                 $output .= '<tr><td class="tableHeader">'.WebGUI::International::get(15,$namespace).'</td><td class="tableHeader">'.WebGUI::International::get(99).'</td><td class="tableHeader">'.WebGUI::International::get(13,$namespace).'</td><td class="tableHeader">'.WebGUI::International::get(14,$namespace).'</td></tr>';
                 $sth = WebGUI::SQL->read("select title,submissionId,dateSubmitted,status from UserSubmission_submission where widgetId='$session{form}{wid}' and userId=$session{user}{userId} order by dateSubmitted desc");
                 while (@submission = $sth->array) {
+			$submission[0] = WebGUI::HTML::filter($submission[0],'all');
                         $output .= '<tr><td class="tableData"><a href="'.WebGUI::URL::page('func=editSubmission&wid='.
 				$session{form}{wid}.'&sid='.$submission[1]).'"><img src="'.$session{setting}{lib}.
 				'/edit.gif" border=0></a><a href="'.WebGUI::URL::page('wid='.$session{form}{wid}.
@@ -341,7 +343,7 @@ sub www_editSubmission {
                 $output .= WebGUI::Form::hidden("func","editSubmissionSave");
                 $output .= '<table>';
                 $output .= tableFormRow(WebGUI::International::get(35,$namespace),WebGUI::Form::text("title",20,128,$submission{title}));
-                $output .= tableFormRow(WebGUI::International::get(31,$namespace),WebGUI::Form::textArea("content",$submission{content},50,10));
+                $output .= tableFormRow(WebGUI::International::get(31,$namespace),WebGUI::Form::textArea("content",$submission{content},50,10,1));
                 if ($submission{image} ne "") {
                         $output .= tableFormRow(WebGUI::International::get(32,$namespace),'<a href="'.
 				WebGUI::URL::page('func=deleteImage&wid='.$session{form}{wid}.'&sid='.
@@ -419,6 +421,7 @@ sub www_view {
 		}
 		$sth = WebGUI::SQL->read("select title,submissionId,dateSubmitted,username,userId from UserSubmission_submission where widgetId='$_[0]' and status='Approved' order by dateSubmitted desc");
 		while (@submission = $sth->array) {
+			$submission[0] = WebGUI::HTML::filter($submission[0],'all');
 			$row[$i] = '<tr><td class="tableData"><a href="'.WebGUI::URL::page('wid='.$_[0].
 				'&func=viewSubmission&sid='.$submission[1]).'">'.$submission[0].
 				'</a></td><td class="tableData">'.epochToHuman($submission[2],"%M/%D/%y").
@@ -447,6 +450,8 @@ sub www_viewSubmission {
 	my ($output, %submission, $file);
 	tie %submission, 'Tie::CPHash';
 	%submission = WebGUI::SQL->quickHash("select * from UserSubmission_submission where submissionId=$session{form}{sid}");
+	$submission{title} = WebGUI::HTML::filter($submission{title},'all');
+	$submission{content} = WebGUI::HTML::filter($submission{content},$session{setting}{filterContributedHTML});
        	$output = "<h1>".$submission{title}."</h1>";
 	$output .= '<table width="100%" cellpadding=2 cellspacing=1 border=0>';
 	$output .= '<tr><td class="tableHeader">';

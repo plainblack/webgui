@@ -34,13 +34,15 @@ sub adminOnly {
 
 #-------------------------------------------------------------------
 sub canEditPage {
-	if ($session{page}{worldEdit}) {
+	my ($isContentManager);
+	$isContentManager = isInGroup(4);
+	if ($session{page}{worldEdit} && $isContentManager) {
 		return 1;
-	} elsif ($session{user}{userId} eq $session{page}{ownerId} && $session{page}{ownerEdit}) {
+	} elsif ($session{user}{userId} eq $session{page}{ownerId} && $session{page}{ownerEdit} && $isContentManager) {
 		return 1;
 	} elsif (isInGroup(3)) {
 		return 1;
-	} elsif (isInGroup($session{page}{groupId}) && $session{page}{groupEdit}) {
+	} elsif (isInGroup($session{page}{groupId}) && $session{page}{groupEdit} && $isContentManager) {
 		return 1;
 	} else {
 		return 0;

@@ -7,6 +7,26 @@ upgrading from one version to the next, or even between multiple
 versions. Be sure to heed the warnings contained herein as they will
 save you many hours of grief.
 
+3.6.0
+--------------------------------------------------------------------
+ * You need to get a new Perl module called HTML::Parser before you 
+	upgrade. You probably already have this module installed,
+	but we had to warn those of you who don't. 
+ * If your first install was WebGUI 3.5.2 then you are missing a
+	necessary table. 3.5.2 was released without this code in
+        create.sql. Execute the following code on your database:
+
+	CREATE TABLE webguiVersion (
+  		webguiVersion varchar(10) default NULL,
+  		versionType varchar(30) default NULL,
+  		dateApplied int(11) default NULL
+	);
+	insert into webguiVersion values 
+	('3.5.2','intitial install',unix_timestamp());
+
+	NOTE: If you upgraded to 3.5.2 from any version, you are
+	not at risk. Do not apply the above update.
+
 3.3.0
 --------------------------------------------------------------------
  * You need to get a new Perl module before you upgrade. It is

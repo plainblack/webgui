@@ -183,7 +183,7 @@ sub www_edit {
 sub www_editSave {
         if (WebGUI::Privilege::canEditPage()) {
 		update();
-		WebGUI::SQL->write("update SiteMap set startAtThisLevel='$session{form}{startAtThisLevel}', depth='$session{form}{depth}', indent='$session{form}{indent}', bullet=".quote($session{form}{bullet}).", lineSpacing='$session{form}{lineSpacing}' where widgetId=$session{form}{wid}");
+		WebGUI::SQL->write("update SiteMap set startAtThisLevel='$session{form}{startAtThisLevel}', depth='$session{form}{depth}', indent='$session{form}{indent}', bullet=".quote($session{form}{bullet}).", lineSpacing='$session{form}{lineSpacing}', displaySynopsis='$session{form}{displaySynopsis}' where widgetId=$session{form}{wid}");
                 return "";
         } else {
                 return WebGUI::Privilege::insufficient();

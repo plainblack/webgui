@@ -16,6 +16,7 @@ use strict;
 use Tie::CPHash;
 use WebGUI::DateTime;
 use WebGUI::Discussion;
+use WebGUI::HTML;
 use WebGUI::International;
 use WebGUI::Macro;
 use WebGUI::Privilege;
@@ -319,6 +320,7 @@ sub www_showMessage {
 			'</td><td class="tableHeader">'.WebGUI::International::get(15,$namespace).
 			'</td><td class="tableHeader">'.WebGUI::International::get(16,$namespace).'</td></tr>';
 		@data = WebGUI::SQL->quickArray("select messageId,subject,username,dateOfPost,userId from discussion where messageId=$message{rid}");
+		$data[1] = WebGUI::HTML::filter($data[1],'all');
 		$html .= '<tr';
 		if ($session{form}{mid} eq $message{rid}) {
 			$html .= ' class="highlight"';
@@ -365,8 +367,10 @@ sub www_view {
 	#$sth = WebGUI::SQL->read("select messageId,subject,count(*)-1,username,dateOfPost,max(dateOfPost),max(messageId) from discussion where widgetId=$_[0] group by rid order by messageId desc");
 	$sth = WebGUI::SQL->read("select messageId,subject,username,dateOfPost,userId from discussion where widgetId=$_[0] and pid=0 order by messageId desc");
 	while (@data = $sth->array) {
+		$data[1] = WebGUI::HTML::filter($data[1],'all');
 		if ($i >= ($itemsPerPage*$pn) && $i < ($itemsPerPage*($pn+1))) {
 			@last = WebGUI::SQL->quickArray("select messageId,dateOfPost,username,subject,userId from discussion where widgetId=$_[0] and rid=$data[0] order by dateOfPost desc");
+			$last[3] = WebGUI::HTML::filter($last[3],'all');
 			($replies) = WebGUI::SQL->quickArray("select count(*)-1 from discussion where rid=$data[0]");
 			$html .= '<tr><td class="tableData"><a href="'.WebGUI::URL::page('func=showMessage&mid='.
 				$data[0].'&wid='.$_[0]).'">'.substr($data[1],0,30).

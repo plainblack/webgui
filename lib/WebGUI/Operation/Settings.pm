@@ -181,7 +181,10 @@ sub www_editMailSettingsSave {
 
 #-------------------------------------------------------------------
 sub www_editMiscSettings {
-        my ($output, @array, %notFoundPage, %yesNo);
+        my ($output, @array, %notFoundPage, %yesNo, %criticalError, %htmlFilter);
+	%htmlFilter = ('none'=>WebGUI::International::get(420), 'most'=>WebGUI::International::get(421),
+		'all'=>WebGUI::International::get(419));
+	%criticalError = ('debug'=>WebGUI::International::get(414), 'friendly'=>WebGUI::International::get(415));
         %notFoundPage = (1=>WebGUI::International::get(136), 4=>WebGUI::International::get(137));
 	%yesNo = ('1'=>WebGUI::International::get(138), '0'=>WebGUI::International::get(139));
         if (WebGUI::Privilege::isInGroup(3)) {
@@ -200,6 +203,12 @@ sub www_editMiscSettings {
                 $array[0] = $session{setting}{preventProxyCache};
                 $output .= tableFormRow(WebGUI::International::get(400),
 			WebGUI::Form::selectList("preventProxyCache",\%yesNo,\@array));
+		$array[0] = $session{setting}{onCriticalError};
+		$output .= tableFormRow(WebGUI::International::get(413),
+			WebGUI::Form::selectList("onCriticalError",\%criticalError,\@array));
+                $array[0] = $session{setting}{filterContributedHTML};
+                $output .= tableFormRow(WebGUI::International::get(418),
+                        WebGUI::Form::selectList("filterContributedHTML",\%htmlFilter,\@array));
                 $output .= formSave();
                 $output .= '</table>';
                 $output .= '</form> ';
@@ -220,6 +229,10 @@ sub www_editMiscSettingsSave {
 			" where name='docTypeDec'");
 		WebGUI::SQL->write("update settings set value=".quote($session{form}{preventProxyCache}).
 			" where name='preventProxyCache'");
+		WebGUI::SQL->write("update settings set value=".quote($session{form}{onCriticalError}).
+			" where name='onCriticalError'");
+		WebGUI::SQL->write("update settings set value=".quote($session{form}{filterContributedHTML}).
+			" where name='filterContributedHTML'");
                 return www_manageSettings(); 
         } else {
                 return WebGUI::Privilege::adminOnly();

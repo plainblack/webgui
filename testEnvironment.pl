@@ -102,21 +102,41 @@ if (eval { require Digest::MD5 }) {
         }
 }
 
+my $dbi;
 print "DBI module...............................";
 if (eval { require DBI }) {
 	print "OK\n";
+	$dbi = 1;
 } else {
         if ($ARGV[0] eq "--install-modules") {
         	print "Installing...\n";
                 CPAN::Shell->install("DBI");
+		eval {require DBI};
+		$dbi = 1;
         } else {
                 print "Please install.\n";
         }
 }
 
 print "Avalable database drivers................";
-print join(", ",DBI->available_drivers);
+if ($dbi) {
+	print join(", ",DBI->available_drivers);
+} else {
+	print "None";
+}
 print "\n";
+
+print "HTML::Parser module......................";
+if (eval { require HTML::Parser }) {
+        print "OK\n";
+} else {
+        if ($ARGV[0] eq "--install-modules") {
+                print "Installing...\n";
+                CPAN::Shell->install("HTML::Parser");
+        } else {
+                print "Please install.\n";
+        }
+}
 
 print "Tie::IxHash module.......................";
 if (eval { require Tie::IxHash }) {
@@ -217,6 +237,13 @@ if (eval { require Data::Config }) {
         print "Please install.\n";
 }
 
+print "HTML::TagFilter module...................";
+if (eval { require HTML::TagFilter }) {
+        print "OK\n";
+} else {
+        print "Please install.\n";
+}
+
 ###################################
 # Checking Config File
 ###################################
@@ -243,19 +270,23 @@ unless (defined $config) {
 ###################################
 
 print "Database connection......................";
-my ($dbh, $test);
-unless (eval { $dbh = DBI->connect($config->param('dsn'), $config->param('dbuser'), $config->param('dbpass')) }) {
-	print "Can't connect with info provided.\n";
-} else {
-	print "OK\n";
-	print "Database tables..........................";
-	($test) = WebGUI::SQL->quickArray("select count(*) from page",$dbh);
-	if ($test < 1) {
-		print "Looks like you need to create some tables.\n";
+if ($dbi) {
+	my ($dbh, $test);
+	unless (eval {$dbh = DBI->connect($config->param('dsn'),$config->param('dbuser'),$config->param('dbpass'))}) {
+		print "Can't connect with info provided.\n";
 	} else {
 		print "OK\n";
+		print "Database tables..........................";
+		($test) = WebGUI::SQL->quickArray("select count(*) from page",$dbh);
+		if ($test < 1) {
+			print "Looks like you need to create some tables.\n";
+		} else {
+			print "OK\n";
+		}
+		$dbh->disconnect();
 	}
-	$dbh->disconnect();
+} else {
+	print "Failed. DBI not loaded.\n";
 }
 
 ###################################

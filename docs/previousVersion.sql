@@ -1,9 +1,4 @@
-create table webguiVersion (
-webguiVersion varchar(10),
-versionType varchar(30),
-dateApplied int
-);
-insert into webguiVersion values ('3.5.1','intitial install',unix_timestamp());
+insert into webguiVersion values ('3.5.2','intitial install',unix_timestamp());
 
 # MySQL dump 8.14
 #

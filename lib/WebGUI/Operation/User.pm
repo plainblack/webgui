@@ -91,14 +91,10 @@ sub www_addUserSave {
 
 #-------------------------------------------------------------------
 sub www_becomeUser {
-        my ($cookieInfo, $output, $password);
+        my ($output);
         if (WebGUI::Privilege::isInGroup(3)) {
-		($password) = WebGUI::SQL->quickArray("select identifier from users where userId='$session{form}{uid}'");
         	WebGUI::Session::end($session{var}{sessionId});
-        	$cookieInfo = $session{form}{uid}."|".crypt($password,"yJ");
-		WebGUI::Session::end($cookieInfo);
-		WebGUI::Session::start($cookieInfo);
-        	WebGUI::Session::setCookie("wgSession",$cookieInfo);
+		WebGUI::Session::start($session{form}{uid});
 		$output = "";
         } else {
                 $output = WebGUI::Privilege::adminOnly();

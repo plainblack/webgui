@@ -24,6 +24,7 @@ QnD INSTALL INSTRUCTIONS:
    Date::Calc
    HTML::CalendarMonthSimple
    Image::Magick
+   HTML::Parser
 
 3. Install Apache (with or without mod_perl) and set up your config.
 

@@ -77,17 +77,9 @@ sub _hasBadUsername {
 }
 
 #-------------------------------------------------------------------
-sub _login {
-	my ($cookieInfo);
-	$cookieInfo = $_[0]."|".crypt($_[1],"yJ");
-	WebGUI::Session::end($cookieInfo); #clearing out old session info just in case something bad happened
-	if (WebGUI::Session::start($cookieInfo)) {
-		WebGUI::Session::setCookie("wgSession",$cookieInfo);
-		return "";
-	} else {
-		WebGUI::ErrorHandler::warn("Session signature '".$cookieInfo."' does not match account info for user ID ".$_[0]);
-		return "<b>Error:</b> Unable to initialize session vars because your session signature does not match your account information.<p>";
-	}
+sub _logLogin {
+        WebGUI::SQL->write("insert into userLoginLog values ('$_[0]','$_[1]',".time().",".
+                quote($session{env}{REMOTE_ADDR}).",".quote($session{env}{HTTP_USER_AGENT}).")");
 }
 
 #-------------------------------------------------------------------
@@ -192,9 +184,8 @@ sub www_createAccountSave {
                 WebGUI::SQL->write("insert into users (userId,username,identifier,email,authMethod,ldapURL,connectDN,language) values ($uid, ".quote($username).", ".quote($encryptedPassword).", ".quote($session{form}{email}).", ".quote($session{setting}{authMethod}).", ".quote($session{setting}{ldapURL}).", ".quote($connectDN).", ".quote($session{form}{language}).")");
 		($registeredUserExpire) = WebGUI::SQL->quickArray("select expireAfter from groups where groupId=2");
                 WebGUI::SQL->write("insert into groupings values (2,$uid,".(time()+$registeredUserExpire).")");
-                _login($uid,$encryptedPassword);
-                $output .= WebGUI::International::get(80).'<p>';
-                $output .= www_displayAccount();
+                WebGUI::Session::start($uid);
+		_logLogin($uid,"success");
         } else {
                 $output = "<h1>".WebGUI::International::get(70)."</h1>".$error.www_createAccount();
         }
@@ -222,7 +213,6 @@ sub www_deactivateAccountConfirm {
                 WebGUI::SQL->write("delete from users where userId=$session{user}{userId}");
                 WebGUI::SQL->write("delete from groupings where userId=$session{user}{userId}");
 	        WebGUI::Session::end($session{var}{sessionId});
-        	_login(1,"null");
         }
         return www_displayLogin();
 }
@@ -405,10 +395,12 @@ sub www_login {
                 if ($auth->code == 48 || $auth->code == 49) {
 			$error = WebGUI::International::get(68);
 			WebGUI::ErrorHandler::warn("Invalid login for user account: ".$session{form}{username});
+                	_logLogin($uid,"invalid username/password");
 		} elsif ($auth->code > 0) {
 			$error .= 'LDAP error "'.$ldapStatusCode{$auth->code}.'" occured.';
 			$error .= WebGUI::International::get(69);
 			WebGUI::ErrorHandler::warn("LDAP error: ".$ldapStatusCode{$auth->code});
+                	_logLogin($uid,"LDAP error: ".$ldapStatusCode{$auth->code});
 		} else {
 			$success = 1;
 		}
@@ -419,10 +411,12 @@ sub www_login {
 		} else {
 			$error = WebGUI::International::get(68);
 			WebGUI::ErrorHandler::warn("Invalid login for user account: ".$session{form}{username});
+			_logLogin($uid,"invalid username/password");
 		}
 	}
 	if ($success) {
-		_login($uid,$pass);
+		WebGUI::Session::start($uid);
+                _logLogin($uid,"success");
 		return "";
 	} else {
 		return "<h1>".WebGUI::International::get(70)."</h1>".$error.www_displayLogin();
@@ -510,9 +504,6 @@ sub www_updateAccount {
         	if ($error eq "") {
                 	$encryptedPassword = Digest::MD5::md5_base64($session{form}{identifier1});
                 	WebGUI::SQL->write("update users set username=".quote($session{form}{username}).$passwordStatement.", email=".quote($session{form}{email}).", language=".quote($session{form}{language})." where userId=".$session{user}{userId});
-			if ($passwordStatement ne "") {
-                		_login($session{user}{userId},$encryptedPassword);
-			}
                 	$output .= WebGUI::International::get(81).'<p>';
                 	$output .= www_displayAccount();
         	} else {

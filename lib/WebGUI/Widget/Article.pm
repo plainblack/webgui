@@ -17,6 +17,7 @@ use Tie::CPHash;
 use WebGUI::Attachment;
 use WebGUI::DateTime;
 use WebGUI::Discussion;
+use WebGUI::HTML;
 use WebGUI::International;
 use WebGUI::Macro;
 use WebGUI::Privilege;
@@ -35,6 +36,7 @@ sub _showReplies {
         $html .= '<tr><td class="tableHeader">'.WebGUI::International::get(229).'</td><td class="tableHeader">'.WebGUI::International::get(22,$namespace).'</td><td class="tableHeader">'.WebGUI::International::get(23,$namespace).'</td></tr>';
         $sth = WebGUI::SQL->read("select messageId,subject,username,dateOfPost,userId from discussion where widgetId=$session{form}{wid} and pid=0 order by messageId desc");
         while (@data = $sth->array) {
+		$data[1] = WebGUI::HTML::filter($data[1],'all');
                 $html .= '<tr';
 		if ($data[0] == $session{form}{mid}) {
 			$html .= ' class="highlight"';

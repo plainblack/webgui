@@ -13,6 +13,7 @@ package WebGUI::Discussion;
 use strict;
 use Tie::CPHash;
 use WebGUI::DateTime;
+use WebGUI::HTML;
 use WebGUI::International;
 use WebGUI::Session;
 use WebGUI::Shortcut;
@@ -123,6 +124,8 @@ sub getMessage {
 	my (%message);
         tie %message, 'Tie::CPHash';
         %message = WebGUI::SQL->quickHash("select * from discussion where messageId='$_[0]'");
+	$message{subject} = WebGUI::HTML::filter($message{subject},'all');
+	$message{message} = WebGUI::HTML::filter($message{message},$session{setting}{filterContributedHTML});
 	unless ($message{message} =~ /\<div\>/ig || $message{message} =~ /\<br\>/ig || $message{message} =~ /\<p\>/ig) {
 		$message{message} =~ s/\n/\<br\>/g;
 	}
@@ -241,6 +244,7 @@ sub traverseReplyTree {
         }
         $sth = WebGUI::SQL->read("select messageId,subject,username,dateOfPost,userId from discussion where pid=$_[0] order by messageId");
         while (@data = $sth->array) {
+		$data[1] = WebGUI::HTML::filter($data[1],'all');
                 $html .= '<tr';
                 if ($session{form}{mid} eq $data[0]) {
                         $html .= ' class="highlight"';

@@ -1,5 +1,5 @@
 package WebGUI;
-our $VERSION = "3.5.2";
+our $VERSION = "3.6.0";
 
 #-------------------------------------------------------------------
 # WebGUI is Copyright 2001-2002 Plain Black Software.
@@ -145,7 +145,7 @@ sub _loadWidgets {
 
 #-------------------------------------------------------------------
 sub page {
-	my (%contentHash, $cmd, $pageEdit, $widgetType, $functionOutput, @availableWidgets, @widgetList, $sth, $httpHeader, $header, $footer, $content, $operationOutput, $adminBar);
+	my (%contentHash, $cmd, $pageEdit, $widgetPage, $widgetType, $functionOutput, @availableWidgets, @widgetList, $sth, $httpHeader, $header, $footer, $content, $operationOutput, $adminBar);
 	WebGUI::Session::open($_[0],$_[1]);
 	# For some reason we have to pre-cache the templates when running under mod_perl
 	# so that's what we're doing with this next command.
@@ -158,12 +158,18 @@ sub page {
 	if (exists $session{form}{func}) {
 		if (exists $session{form}{widget}) {
 			$widgetType = $session{form}{widget};
+			$widgetPage = $session{page}{pageId};
 		} else {
-			($widgetType) = WebGUI::SQL->quickArray("select namespace from widget where widgetId='$session{form}{wid}'");
+			($widgetType,$widgetPage) = WebGUI::SQL->quickArray("select namespace,pageId from widget where widgetId='$session{form}{wid}'");
 		}
                 if ($widgetType ne "") {
-                        $cmd = "WebGUI::Widget::".$widgetType."::www_".$session{form}{func};
-                        $functionOutput = &$cmd();
+			if ($widgetPage != $session{page}{pageId}) {
+				$functionOutput = WebGUI::International::get(417);
+				WebGUI::ErrorHandler::warn($session{user}{username}." [".$session{user}{userId}."] attempted to access widget [".$session{form}{wid}."] on page '".$session{page}{title}."' [".$session{page}{pageId}."].");
+			} else {
+                        	$cmd = "WebGUI::Widget::".$widgetType."::www_".$session{form}{func};
+                        	$functionOutput = &$cmd();
+			}
                 } else {
                         $functionOutput = WebGUI::International::get(381);
                 }

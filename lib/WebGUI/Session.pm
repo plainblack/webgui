@@ -24,6 +24,13 @@ our %session = ();
 tie %session, 'Tie::CPHash';
 
 #-------------------------------------------------------------------
+sub _generateSessionId {
+	my ($sessionId);
+	$sessionId = crypt(time(),rand(99));
+	return $sessionId;
+}
+
+#-------------------------------------------------------------------
 sub _getPageInfo {
         my (%page, $pageId, $pageName);
 	tie %page, 'Tie::CPHash';
@@ -31,6 +38,8 @@ sub _getPageInfo {
 	if ($pageId eq "") {
         	$pageName = lc($ENV{PATH_INFO});
         	$pageName =~ s/\///;
+		$pageName =~ s/\'//;
+		$pageName =~ s/\"//;
         	if ($pageName ne "") {
                 	($pageId) = WebGUI::SQL->quickArray("select pageId from page where urlizedTitle='".$pageName."'",$_[1]);
                 	if ($pageId eq "") {
@@ -60,16 +69,12 @@ sub _getSessionVars {
 
 #-------------------------------------------------------------------
 sub _getUserInfo {
-	my (%user, $uid, $encryptedPassword);
+	my (%user, $uid);
 	tie %user, 'Tie::CPHash';
-	if ($_[0] ne "") {
-		($uid, $encryptedPassword) = split(/\|/,$_[0]);
-	} else {
-		$uid = 1;
-	}
+	$uid = $_[0] || 1;
 	%user = WebGUI::SQL->quickHash("select * from users where userId='$uid'", $_[1]);
 	if ($user{userId} eq "") {
-		%user = _getUserInfo("1|none",$_[1]);
+		%user = _getUserInfo("1",$_[1]);
 	}
 	return %user;
 }
@@ -129,7 +134,7 @@ sub open {
         }
         %SETTINGS = WebGUI::SQL->buildHash("select name,value from settings",$dbh);
 	%VARS = _getSessionVars($COOKIES{wgSession},$dbh,$SETTINGS{sessionTimeout});
-        %USER = _getUserInfo($VARS{sessionId},$dbh);
+        %USER = _getUserInfo($VARS{userId},$dbh);
 	$CGI::POST_MAX=1024 * $SETTINGS{maxAttachmentSize};
 	%PAGE = _getPageInfo("",$dbh,$SETTINGS{notFoundPage},$CONFIG{scripturl});
         %session = (
@@ -166,7 +171,7 @@ sub refreshSessionVars {
 	tie %VARS, 'Tie::CPHash';
         %VARS = _getSessionVars($_[0],$session{dbh},$session{setting}{sessionTimeout});
         $session{var} = \%VARS;
-	refreshUserInfo($session{var}{sessionId});
+	refreshUserInfo($session{var}{userId});
 }
 
 #-------------------------------------------------------------------
@@ -184,17 +189,13 @@ sub setCookie {
 
 #-------------------------------------------------------------------
 sub start {
-	my (%user, $uid, $encryptedPassword);
-        ($uid, $encryptedPassword) = split(/\|/,$_[0]);
-	tie %user, 'Tie::CPHash';
-	%user = WebGUI::SQL->quickHash("select * from users where userId='$uid'", $session{dbh});
-        if (crypt($user{identifier},"yJ") eq $encryptedPassword) {
-		WebGUI::SQL->write("insert into userSession values ('$_[0]', ".(time()+$session{setting}{sessionTimeout}).", ".time().", 0, '$ENV{REMOTE_ADDR}', $uid)",$session{dbh});
-		refreshSessionVars($_[0]);
-		return 1;
-        } else {
-		return 0;
-	}
+	my ($sessionId);
+	$sessionId = _generateSessionId();
+	WebGUI::SQL->write("insert into userSession values ('$sessionId', ".
+		(time()+$session{setting}{sessionTimeout}).", ".
+		time().", 0, '$ENV{REMOTE_ADDR}', $_[0])",$session{dbh});
+	setCookie("wgSession",$sessionId);
+	refreshSessionVars($sessionId);
 }
 
 1;
