@@ -154,7 +154,7 @@ sub getEditForm {
 		);
 	if ($self->get("filename") ne "") {
 		$tabform->getTab("properties")->readOnly(
-			-label=>WebGUI::International::get('52', 'USS'),
+			-label=>WebGUI::International::get('thumbnail', 'Asset'),
 			-value=>'<a href="'.$self->getFileUrl.'"><img src="'.$self->getThumbnailUrl.'?noCache='.time().'" alt="thumbnail" /></a>'
 			);
 	}

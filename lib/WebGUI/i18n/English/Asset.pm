@@ -287,6 +287,12 @@ The URL where the user will be redirected.
 		lastUpdated => 1106609855,
 	},
 
+	'thumbnail' => {
+		message => q|Thumbnail|,
+		context => q|label for Image asset form|,
+		lastUpdated => 1106765841
+	},
+
 	'errorEmptyField' => {
 		message => q|<p><b>Error: Field name may not be empty.</b></p>|,
 		lastUpdated => 1089039511,
