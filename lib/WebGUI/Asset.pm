@@ -1848,14 +1848,6 @@ sub purge {
 	}
 	WebGUI::SQL->write("delete from metaData_values where assetId = ".quote($self->getId));
 	WebGUI::SQL->commit;
-	# eliminate anything bound to this asset
-	my $sth = WebGUI::SQL->read("select assetId,className from asset where boundToId=".quote($self->getId));
-	while (my ($id, $class) = $sth->array) {
-		my $asset = WebGUI::Asset->newByDynamicClass($id,$class);
-		if (defined $asset) {
-			$asset->purgeTree;
-		}	
-	}
 	$self = undef;
 	return 1;
 }

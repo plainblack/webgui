@@ -56,7 +56,9 @@ This package provides an object-oriented way of managing WebGUI groups and group
  
 
  $g->addGroups(\@arr);
+ $g->addUsers(\@arr);
  $g->deleteGroups(\@arr);
+ $g->deleteUsers(\@arr);
  $g->delete;
 
 =head1 METHODS
@@ -89,6 +91,22 @@ An array reference containing the list of group ids to add to this group.
 
 sub addGroups {
 	WebGUI::Grouping::addGroupsToGroups($_[1],[$_[0]->{_groupId}]);
+}
+
+#-------------------------------------------------------------------
+
+=head2 addUsers ( users )
+
+Adds users to this group.
+
+=head3 users
+
+An array reference containing the list of user ids to add to this group.
+
+=cut
+
+sub addUsers {
+	WebGUI::Grouping::addUsersToGroups($_[1],[$_[0]->{_groupId}]);
 }
 
 #-------------------------------------------------------------------
@@ -182,6 +200,22 @@ An array reference containing the list of group ids to delete from this group.
 
 sub deleteGroups {
 	WebGUI::Grouping::deleteGroupsFromGroups($_[1],[$_[0]->{_groupId}]);
+}
+
+#-------------------------------------------------------------------
+
+=head2 deleteUsers ( users )
+
+Deletes users from this group.
+
+=head3 users
+
+An array reference containing the list of user ids to delete from this group.
+
+=cut
+
+sub deleteUsers {
+	WebGUI::Grouping::deleteUsersFromGroups($_[1],[$_[0]->{_groupId}]);
 }
 
 

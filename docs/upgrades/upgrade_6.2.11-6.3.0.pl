@@ -123,7 +123,6 @@ WebGUI::SQL->write("alter table Product_related add assetId varchar(22) not null
 WebGUI::SQL->write("alter table Product_related add relatedAssetId varchar(22) not null");
 WebGUI::SQL->write("alter table Product_related add primary key (assetId,relatedAssetId)");
 WebGUI::SQL->write("alter table WobjectProxy add column description mediumtext");
-WebGUI::SQL->write("alter table forum add assetId varchar(22) not null");
 
 
 
@@ -230,9 +229,14 @@ WebGUI::SQL->write("alter table Product_related drop column wobjectId");
 WebGUI::SQL->write("alter table Product_specification drop column wobjectId");
 WebGUI::SQL->write("alter table Product_related drop column RelatedWobjectId");
 WebGUI::SQL->write("alter table Product_accessory drop column AccessoryWobjectId");
-WebGUI::SQL->write("alter table forum drop column forumId");
-WebGUI::SQL->write("alter table forum drop column groupToView");
-
+WebGUI::SQL->write("drop table forum");
+WebGUI::SQL->write("drop table forumRead");
+WebGUI::SQL->write("drop table forumPost");
+WebGUI::SQL->write("drop table forumPostRating");
+WebGUI::SQL->write("drop table forumPostAttachment");
+WebGUI::SQL->write("drop table forumSubscription");
+WebGUI::SQL->write("drop table forumThread");
+WebGUI::SQL->write("drop table forumThreadSubscription");
 
 # start migrating non-wobject stuff into assets
 my %migration;
@@ -1066,7 +1070,13 @@ sub walkTree {
 					WebGUI::SQL->write("insert into ImageAsset (assetId, thumbnailSize) values (".quote($imageId).",
 						".quote($session{setting}{thumbnailSize}).")");
 				}
-				# migrate forums
+				if ($namespace->{allowDiscussion}) {
+					print "\t\t\tMigrating forum for Article ".$wobject->{wobjectId}."\n" unless ($quiet);
+					$rank++;
+					migrateForum($wobject->{forumId},$pageId,$pageLineage,$rank, $wobject->{title},$wobject->{description},
+						$wobject->{startDate}, $wobject->{endDate}, $wobject->{ownerId}, $wobject->{groupIdView},
+						$wobject->{groupIdView},$page->{styleId}, $page->{printableStyleId});
+				}
 				rmtree($session{config}{uploadsPath}.'/'.$wobject->{wobjectId});
 			} elsif ($wobject->{namespace} eq "SiteMap") {
 				print "\t\t\tConverting SiteMap ".$wobject->{wobjectId}." into Navigation\n" unless ($quiet);
@@ -1241,7 +1251,234 @@ sub walkTree {
 }
 
 
-
+sub migrateForum {
+	my $originalId = shift;
+	my $newParentId = shift;
+	my $newParentLineage = shift;
+	my $rank = shift;
+	my $title = shift;
+	my $description = shift;
+	my $startDate = shift;
+	my $endDate = shift;
+	my $userId = shift;
+	my $viewGroup = shift;
+	my $editGroup = shift;
+	my $styleId = shift;
+	my $printId = shift;
+	my $lineage = $newParentLineage.sprintf("%06d",$rank);
+	my $data = WebGUI::SQL->quickHashRef("select * from forum where forumId=".quote($originalId));
+	if ($data->{masterForumId}) {
+		my $master = WebGUI::SQL->quickHashRef("select * from forum where forumId=".quote($data->{masterForumId}));
+		$data->{forumTemplateId} = $master->{forumTemplateId};
+                $data->{threadTemplateId} = $master->{threadTemplateId};
+                $data->{postTemplateId} = $master->{postTemplateId};
+                $data->{searchTemplateId} = $master->{searchTemplateId};
+                $data->{notificationTemplateId} = $master->{notificationTemplateId};
+                $data->{postFormTemplateId} = $master->{postFormTemplateId};
+                $data->{postPreviewTemplateId} = $master->{postPreviewTemplateId};
+                $data->{archiveAfter} = $master->{archiveAfter};
+                $data->{allowRichEdit} = $master->{allowRichEdit};
+                $data->{allowReplacements} = $master->{allowReplacements};
+                $data->{filterPosts} = $master->{filterPosts};
+                $data->{karmaPerPost} = $master->{karmaPerPost};
+                $data->{groupToView} = $master->{groupToView};
+                $data->{groupToPost} = $master->{groupToPost};
+                $data->{groupToView} = $master->{groupToView};
+                $data->{groupToModerate} = $master->{groupToModerate};
+                $data->{moderatePosts} = $master->{moderatePosts};
+                $data->{attachmentsPerPost} = $master->{attachmentsPerPost};
+                $data->{addEditStampToPosts} = $master->{addEditStampsToPost};
+                $data->{postsPerPage} = $master->{postsPerPage};
+                $data->{usePreview} = $master->{usePreview};
+	}
+	my $newId = WebGUI::SQL->setRow("asset","assetId",{
+		assetId=>"new",
+		parentId=>$newParentId,
+		lineage=>$lineage,
+		state=>'published',
+		className=>'WebGUI::Asset::Wobject::Collaboration',
+		title=>$title,
+		menuTitle=>$title,
+		url=>fixUrl("noneyet",$title),
+		startDate=>$startDate,
+		endDate=>$endDate,
+		ownerUserId=>$userId,
+		groupIdView=>$viewGroup,
+		groupIdEdit=>$editGroup,
+		isHidden=>1,
+		lastUpdated=>time(),
+		lastUpdatedBy=>'3'});
+	WebGUI::SQL->setRow("wobject","assetId",{
+		assetId=>$newId,
+		description=>$description,
+		styleTemplateId=>$styleId,
+		printableStyleTemplateId=>$printId
+		},undef,$newId);
+	my $subscriptionGroup = WebGUI::Group->new("new");
+	$subscriptionGroup->description("The group to store subscriptions for the collaboration system $newId");
+	$subscriptionGroup->name($newId);
+	$subscriptionGroup->showInForms(0);
+	$subscriptionGroup->isEditable(0);
+	$subscriptionGroup->deleteGroups(['3']);
+	my $sth = WebGUI::SQL->read("select userId from forumSubscription where forumId=".quote($originalId));
+	my @users;
+	while (my ($uid) = $sth->array) {
+		push(@users,$uid);
+	}
+	$sth->finish;
+	$subscriptionGroup->addUsers(\@users);
+	WebGUI::SQL->setRow("Collaboration","assetId", {
+		postGroupId=>$data->{groupToPost},
+		moderateGroupId=>$data->{groupToModerate},
+		moderatePosts=>$data->{moderatePosts},
+		karmaPerPost=>$data->{karmaPerPost},
+		collaborationTemplateId=>$data->{forumTemplateId},
+		threadTemplateId=>$data->{threadTemplateId},
+		postFormTemplateId=>$data->{postformTemplateId},
+		searchTemplateId=>$data->{searchTemplateId},
+		notificationTemplateId=>$data->{notificationTemplateId},
+		sortBy=>$data->{sortBy},
+		sortOrder=>$data->{sortOrder},
+		usePreview=>$data->{usePreview},
+		addEditStampToPosts=>$data->{addEditStampToPosts},
+		editTimeout=>$data->{editTimeout},
+		attachmentsPerPost=>$data->{attachmentsPerPost},
+		allowRichEdit=>$data->{allowRichEdit},
+		filterCode=>$data->{filterPosts},
+		useContentFilter=>$data->{allowReplacements},
+		threads=>$data->{threads},
+		views=>$data->{views},
+		replies=>$data->{replies},
+		rating=>$data->{rating},
+		archiveAfter=>$data->{archiveAfter},
+		postsPerPage=>$data->{postsPerPage},
+		threadsPerPage=>$data->{threadsPerPage},
+		subscriptionGroupId=>$subscriptionGroup->groupId,
+		allowReplies=>1
+		},undef,$newId);
+	my %oldestForumPost;
+	my $ratingprep = WebGUI::SQL->prepare("insert into Post_rating (assetId, userId, ipAddress, dateOfRating, rating) values (?,?,?,?,?)");
+	my $threads = WebGUI::SQL->read("select * from forumThread left join forumPost on forumThread.rootPostId=forumPost.forumPostId where
+		forumThread.forumId=".quote($originalId));
+	my $threadRank = 1;
+	while (my ($thread) = $threads->hashRef) {
+		my $threadLineage = $lineage.sprintf("%06d",$threadRank);
+		my $threadId = WebGUI::SQL->setRow("asset","assetId",{
+			assetId=>"new",
+			parentId=>$newId,
+			lineage=>$threadLineage,
+			state=>'published',
+			className=>'WebGUI::Asset::Post::Thread',
+			title=>$thread->{subject},
+			menuTitle=>$thread->{subject},
+			url=>fixUrl("noneyet",$title.'/'.$thread->{subject}),
+			startDate=>$startDate,
+			endDate=>$endDate,
+			ownerUserId=>$thread->{userId},
+			groupIdView=>$viewGroup,
+			groupIdEdit=>$editGroup,
+			isHidden=>1,
+			lastUpdated=>$thread->{dateOfPost},
+			lastUpdatedBy=>$thread->{userId}
+			});
+		WebGUI::SQL->setRow("Post","assetId",{
+			assetId=>$threadId,
+			threadId=>$threadId,
+			dateSubmitted=>$thread->{dateOfPost},
+			dateUpdated=>$thread->{dateOfPost},
+			username=>$thread->{username},
+			content=>$thread->{message},
+			status=>$thread->{status},
+			views=>$thread->{views},
+			contentType=>$thread->{contentType},
+			rating=>$thread->{rating}
+			},undef,$threadId);
+		my $threadSubscriptionGroup = WebGUI::Group->new("new");
+		$threadSubscriptionGroup->description("The group to store subscriptions for the thread $threadId");
+		$threadSubscriptionGroup->name($threadId);
+		$threadSubscriptionGroup->showInForms(0);
+		$threadSubscriptionGroup->isEditable(0);
+		$threadSubscriptionGroup->deleteGroups(['3']);
+		my $sth = WebGUI::SQL->read("select userId from forumThreadSubscription where forumThreadId=".quote($thread->{forumThreadId}));
+		my @users;
+		while (my ($uid) = $sth->array) {
+			push(@users,$uid);
+		}
+		$sth->finish;
+		$threadSubscriptionGroup->addUsers(\@users);
+		WebGUI::SQL->setRow("Thread","assetId",{
+			assetId=>$threadId,
+			replies=>$thread->{replies},
+			isLocked=>$thread->{isLocked},
+			isSticky=>$thread->{isSticky},
+			subscriptionGroupId=>$threadSubscriptionGroup->groupId
+			}, undef, $threadId);
+		# we're going to give up hierarchy during the upgrade for the sake of simplicity
+		my %oldestThreadPost;
+		my $posts = WebGUI::SQL->read("select * from forumPost where forumThreadId=".quote($thread->{forumThreadId})." and parentId<>''");
+		my $postRank = 1;
+		while (my $post = $posts->hashRef) {
+			my $postId = WebGUI::SQL->setRow("asset","assetId",{
+				assetId=>"new",
+				parentId=>$threadId,
+				lineage=>$threadLineage.sprintf("%06d",$postRank),
+				state=>'published',
+				className=>'WebGUI::Asset::Post',
+				title=>$post->{subject},
+				menuTitle=>$post->{subject},
+				url=>fixUrl("noneyet",$title.'/'.$thread->{subject}.'/'.$post->{subject}),
+				startDate=>$startDate,
+				endDate=>$endDate,
+				ownerUserId=>$post->{userId},
+				groupIdView=>$viewGroup,
+				groupIdEdit=>$editGroup,
+				isHidden=>1,
+				lastUpdated=>$post->{dateOfPost},
+				lastUpdatedBy=>$post->{userId}
+				});
+			if ($oldestThreadPost{date} < $post->{dateOfPost}) {
+				$oldestThreadPost{date} = $post->{dateOfPost};
+				$oldestThreadPost{id} = $postId;
+			}
+			WebGUI::SQL->setRow("Post","assetId",{
+				assetId=>$postId,
+				threadId=>$threadId,
+				dateSubmitted=>$post->{dateOfPost},
+				dateUpdated=>$post->{dateOfPost},
+				username=>$post->{username},
+				content=>$post->{message},
+				status=>$post->{status},
+				views=>$post->{views},
+				contentType=>$post->{contentType},
+				rating=>$post->{rating}
+				},undef,$postId);
+			my $sth = WebGUI::SQL->read("select userId,ipAddress,dateOfRating,rating from forumPostRating where forumPostId=".$post->{forumPostId});
+			while (my ($uid,$ip,$date,$rating) = $sth->array) {
+				$ratingprep->execute($postId,$uid,$ip,$date,$rating);
+			}
+			$sth->finish;
+			$postRank++;
+		}
+		$posts->finish;
+		WebGUI::SQL->setRow("Thread","assetId",{
+			assetId=>$threadId,
+			lastPostId=>$oldestThreadPost{id},
+			lastPostDate=>$oldestThreadPost{date}
+			});
+		if ($oldestForumPost{date} < $oldestThreadPost{date}) {
+			$oldestForumPost{date} = $oldestThreadPost{date};
+			$oldestForumPost{id} = $oldestThreadPost{id};
+		}
+		$threadRank++;
+	}
+	$threads->finish;
+	$ratingprep->finish;
+	WebGUI::SQL->setRow("Collaboration","assetId",{
+		assetId=>$newId,
+		lastPostId=>$oldestForumPost{id},
+		lastPostDate=>$oldestForumPost{date}
+		});
+}
 
 sub fixUrl {
 	my $id = shift;

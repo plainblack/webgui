@@ -48,7 +48,6 @@ create table asset (
 	lineage varchar(255) not null,
 	state varchar(35) not null,
 	className varchar(255) not null,
-	boundToId varchar(22),
 	title varchar(255) not null default 'untitled',
 	menuTitle varchar(255) not null default 'untitled',
 	url varchar(255) not null,

@@ -42,10 +42,10 @@ sub createSubscriptionGroup {
 	my $self = shift;
 	my $group = WebGUI::Group->new("new");
 	$group->name($self->getId);
-	$group->description("The group to store subscriptions for the collaboration system ".$self->getId);
+	$group->description("The group to store subscriptions for the thread ".$self->getId);
 	$group->isEditable(0);
 	$group->showInForms(0);
-	$group->deleteGroups([3]); # admins don't want to be auto subscribed to this thing
+	$group->deleteGroups(['3']); # admins don't want to be auto subscribed to this thing
 	$self->update({
 		subscriptionGroupId=>$group->groupId
 		});
