@@ -41,7 +41,7 @@ sub getRequiredProfileFields {
    #$f = WebGUI::HTMLForm->new();
    
    $a = WebGUI::SQL->read("select * from userProfileField, userProfileCategory where userProfileField.profileCategoryId=userProfileCategory.profileCategoryId and 
-	                        userProfileField.required=1 order by userProfileCategory.sequenceNumber,userProfileField.sequenceNumber");
+	                        userProfileField.required=1 order by userProfileCategory.sequenceNumber,userProfileField.sequenceNumber",WebGUI::SQL->getSlave);
     while($data = $a->hashRef) {
 	   my %hash = ();
        $method = $data->{dataType};
@@ -225,7 +225,8 @@ sub www_viewProfile {
 	return $vars->{displayTitle}.WebGUI::International::get(862) if($u->profileField("publicProfile") < 1);
 	return WebGUI::Privilege::insufficient() if(!WebGUI::Grouping::isInGroup(2));
     $a = WebGUI::SQL->read("select * from userProfileField,userProfileCategory where userProfileField.profileCategoryId=userProfileCategory.profileCategoryId
-		                    and userProfileCategory.visible=1 and userProfileField.visible=1 order by userProfileCategory.sequenceNumber,userProfileField.sequenceNumber");
+		and userProfileCategory.visible=1 and userProfileField.visible=1 order by userProfileCategory.sequenceNumber,
+		userProfileField.sequenceNumber",WebGUI::SQL->getSlave);
     while (%data = $a->hash) {
 	   $category = eval $data{categoryName};
        if ($category ne $previousCategory) {

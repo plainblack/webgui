@@ -68,8 +68,7 @@ sub _processFunctions {
                         if ($session{form}{wid} eq "new") {
                                 $wobject = {wobjectId=>"new",namespace=>$session{form}{namespace},pageId=>$session{page}{pageId}};
                         } else {
-                                $wobject = WebGUI::SQL->quickHashRef("select * from wobject where wobjectId="
-                                        .$session{form}{wid});
+                                $wobject = WebGUI::SQL->quickHashRef("select * from wobject where wobjectId=".$session{form}{wid},WebGUI::SQL->getSlave);
                                 if (${$wobject}{namespace} eq "") {
                                         WebGUI::ErrorHandler::warn("Wobject [$session{form}{wid}] appears to be missing or "
                                                 ."corrupt, but was requested "
@@ -83,7 +82,7 @@ sub _processFunctions {
                                                 wobject,WobjectProxy
                                                 where wobject.wobjectId=WobjectProxy.wobjectId
                                                 and wobject.pageId=".$session{page}{pageId}."
-                                                and WobjectProxy.proxiedWobjectId=".${$wobject}{wobjectId});
+                                                and WobjectProxy.proxiedWobjectId=".${$wobject}{wobjectId},WebGUI::SQL->getSlave);
                                         ${$wobject}{_WobjectProxy} = $proxyWobjectId;
                                 }
                                 unless (${$wobject}{pageId} == $session{page}{pageId}

@@ -696,7 +696,7 @@ sub www_view {
 			$imageURL = "";
                 }
 		($responses) = WebGUI::SQL->quickArray("select count(*) from forumPost left join forumThread on
-			forumThread.forumThreadId=forumPost.forumThreadId where forumThread.forumId=".$row->{forumId});
+			forumThread.forumThreadId=forumPost.forumThreadId where forumThread.forumId=".$row->{forumId},WebGUI::SQL->getSlave);
 		my $quickurl = 'wid='.$_[0]->get("wobjectId").'&amp;sid='.$page->[$i]->{USS_submissionId}.'&amp;func=';
 		my $controls = deleteIcon($quickurl.'deleteSubmission')
 			.editIcon($quickurl.'editSubmission');
@@ -767,7 +767,7 @@ sub www_viewRSS {
           ("select USS_submissionId, content, title, " .
            "dateSubmitted, username from USS_submission " .
            "where USS_id = " .$session{dbh}->quote($_[0]->get("USS_id")) . " and status='Approved' " .
-           "order by ".$_[0]->getValue("sortBy")." ".$_[0]->getValue("sortOrder")." limit " . $numResults);
+           "order by ".$_[0]->getValue("sortBy")." ".$_[0]->getValue("sortOrder")." limit " . $numResults,WebGUI::SQL->getSlave);
         
         while (my $row = $res->{_sth}->fetchrow_arrayref()) {
                 my ($sid, $content, $title, $dateSubmitted, $username) = 
@@ -841,13 +841,13 @@ sub www_viewSubmission {
         $var{"post.label"} = WebGUI::International::get(20,$_[0]->get("namespace"));
 	@data = WebGUI::SQL->quickArray("select max(USS_submissionId) from USS_submission 
         	where USS_id=".$_[0]->get("USS_id")." and USS_submissionId<$submission->{USS_submissionId}
-		and (userId=$submission->{userId} or status='Approved')");
+		and (userId=$submission->{userId} or status='Approved')",WebGUI::SQL->getSlave);
         $var{"previous.more"} = ($data[0] ne "");
        	$var{"previous.url"} = WebGUI::URL::page('func=viewSubmission&sid='.$data[0].'&wid='.$session{form}{wid});
 	$var{"previous.label"} = WebGUI::International::get(58,$_[0]->get("namespace"));
         @data = WebGUI::SQL->quickArray("select min(USS_submissionId) from USS_submission 
                 where USS_id=$submission->{USS_id} and USS_submissionId>$submission->{USS_submissionId}
-		and (userId=$submission->{userId} or status='Approved')");
+		and (userId=$submission->{userId} or status='Approved')",WebGUI::SQL->getSlave);
         $var{"next.more"} = ($data[0] ne "");
         $var{"next.url"} = WebGUI::URL::page('func=viewSubmission&sid='.$data[0].'&wid='.$session{form}{wid});
 	$var{"next.label"} = WebGUI::International::get(59,$_[0]->get("namespace"));

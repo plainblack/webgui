@@ -371,7 +371,7 @@ sub www_view {
 	if ($_[0]->get("startMonth") eq "first") {
 		my $query = "select min(startDate) from EventsCalendar_event";
 		$query .= " where wobjectId=".$_[0]->get("wobjectId") unless ($_[0]->get("isMaster"));
-		($minDate) = WebGUI::SQL->quickArray($query);
+		($minDate) = WebGUI::SQL->quickArray($query,WebGUI::SQL->getSlave);
 	} elsif ($_[0]->get("startMonth") eq "january") {
 		$minDate = WebGUI::DateTime::humanToEpoch(WebGUI::DateTime::epochToHuman("","%y")."-01-01 00:00:00");
 	} else {
@@ -383,7 +383,7 @@ sub www_view {
 	if ($_[0]->get("endMonth") eq "last") {
 		my $query = "select max(endDate) from EventsCalendar_event";
 		$query .= " where wobjectId=".$_[0]->get("wobjectId") unless ($_[0]->get("isMaster"));
-		($maxDate) = WebGUI::SQL->quickArray($query);	
+		($maxDate) = WebGUI::SQL->quickArray($query,WebGUI::SQL->getSlave);	
 	} elsif ($_[0]->get("endMonth") eq "after12") {
 		$maxDate = WebGUI::DateTime::addToDate($minDate,1,0,0); 
 	} elsif ($_[0]->get("endMonth") eq "after9") {
@@ -423,7 +423,7 @@ sub www_view {
 			$query .= " (endDate>=$monthStart and endDate<=$monthEnd) and (startDate>=$monthStart and startDate<=$monthEnd) order by startDate,endDate";
 			my %events;
 			my %previous;
-			my $sth = WebGUI::SQL->read($query);
+			my $sth = WebGUI::SQL->read($query,WebGUI::SQL->getSlave);
 			while (my $event = $sth->hashRef) {
 				my $eventLength = WebGUI::DateTime::getDaysInInterval($event->{startDate},$event->{endDate});
 				my $startYear = epochToHuman($event->{startDate},"%y");
@@ -539,7 +539,7 @@ sub www_view {
 sub www_viewEvent {
 	my ($output, %event, %var, $id);
 	tie %event, 'Tie::CPHash';
-	%event = WebGUI::SQL->quickHash("select * from EventsCalendar_event where EventsCalendar_eventId=$session{form}{eid}");
+	%event = WebGUI::SQL->quickHash("select * from EventsCalendar_event where EventsCalendar_eventId=$session{form}{eid}",WebGUI::SQL->getSlave);
 	$var{title} = $event{name};
 	$var{"start.label"} =  WebGUI::International::get(14,$_[0]->get("namespace"));
 	$var{"start.date"} = epochToHuman($event{startDate},"%z");
@@ -556,13 +556,13 @@ sub www_viewEvent {
 	my $query = "select EventsCalendar_eventId from EventsCalendar_event where EventsCalendar_eventId<>$event{EventsCalendar_eventId}";
 	$query .= " and wobjectId=".$_[0]->get("wobjectId") unless ($_[0]->get("isMaster"));
 	$query .= " and startDate<=$event{startDate} order by startDate desc, endDate desc";
-	($id) = WebGUI::SQL->quickArray($query);
+	($id) = WebGUI::SQL->quickArray($query,WebGUI::SQL->getSlave);
 	$var{"previous.label"} = '&laquo;'.WebGUI::International::get(92,$_[0]->get("namespace"));
 	$var{"previous.url"} = WebGUI::URL::page("func=viewEvent&wid=".$_[0]->get("wobjectId")."&eid=".$id) if ($id);
 	$query = "select EventsCalendar_eventId from EventsCalendar_event where EventsCalendar_eventId<>$event{EventsCalendar_eventId}";
 	$query .= " and wobjectId=".$_[0]->get("wobjectId") unless ($_[0]->get("isMaster"));
 	$query .= " and startDate>=$event{startDate} order by startDate, endDate";
-        ($id) = WebGUI::SQL->quickArray($query);
+        ($id) = WebGUI::SQL->quickArray($query,WebGUI::SQL->getSlave);
         $var{"next.label"} = WebGUI::International::get(93,$_[0]->get("namespace")).'&raquo;';
         $var{"next.url"} = WebGUI::URL::page("func=viewEvent&wid=".$_[0]->get("wobjectId")."&eid=".$id) if ($id);
 	$var{description} = $event{description};

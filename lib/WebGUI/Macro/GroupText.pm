@@ -19,7 +19,7 @@ use WebGUI::Session;
 #-------------------------------------------------------------------
 sub process {
 	my @param = WebGUI::Macro::getParams($_[0]);
-	my ($groupId) = WebGUI::SQL->quickArray("select groupId from groups where groupName=".quote($param[0]));
+	my ($groupId) = WebGUI::SQL->quickArray("select groupId from groups where groupName=".quote($param[0]),WebGUI::SQL->getSlave);
 	$groupId = 3 if ($groupId eq "");
 	if (WebGUI::Grouping::isInGroup($groupId)) { 
 		return $param[1];

@@ -184,7 +184,7 @@ sub getReplies {
                 $query .= "(status='approved'";
         }
         $query .= " or userId=$session{user}{userId})  order by forumPostId";
-	my $sth = WebGUI::SQL->read($query);
+	my $sth = WebGUI::SQL->read($query,WebGUI::SQL->getSlave);
 	while (my @data = $sth->array) {
 		push(@replies,WebGUI::Forum::Post->new($data[0]));
 	}

@@ -23,7 +23,6 @@ use WebGUI::International;
 use WebGUI::Paginator;
 use WebGUI::Privilege;
 use WebGUI::Session;
-use WebGUI::SQL;
 use WebGUI::URL;
 use WebGUI::Wobject;
 

@@ -314,6 +314,11 @@ sub open {
 		$session{dbh}->{LongReadLen} = 512 * 1024;
 		$session{dbh}->{LongTruncOk} = 1;
 	}
+	foreach (1..3) {
+		if ($session{config}{"dbslave".$_}) {
+			push(@{$session{slave}},DBI->connect($session{config}{"dbslave".$_}{dsn},$session{config}{"dbslave".$_}{user},$session{config}{"dbslave".$_}{pass}));
+		}
+	}
 	###----------------------------
 	### global system settings (from settings table)
 	$session{setting} = WebGUI::SQL->buildHashRef("select name,value from settings");

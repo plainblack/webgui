@@ -513,7 +513,7 @@ A boolean indicating that the query should be read unconditionally. Defaults to 
 sub setDataByQuery {
 	my ($sth, $rowCount, @row);
 	my ($self, $sql, $dbh, $unconditional) = @_;
-	$dbh ||= $session{dbh};
+	$dbh ||= WebGUI::SQL->getSlave;
 	if ($unconditional) {
 		$sth = WebGUI::SQL->unconditionalRead($sql,$dbh);
 		return $sth->errorMessage if ($sth->errorCode > 0);

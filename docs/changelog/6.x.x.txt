@@ -62,6 +62,10 @@
    gain, but it was already really fast, so relatively users aren't likely to
    notice the difference. However, this change helps in the overall
    scalability of WebGUI under load.
+ - Added the ability to use replicated slave databases to lessen the load on
+   the master database. This will have no effect on single database users, but
+   can add a tremendous amount of scalability on large WebGUI sites that use
+   database replication.
 
 
 6.0.3

@@ -23,11 +23,11 @@ sub process {
 	my $collateralFolderId = 0;
 	if ($param[0] ne "") {
 		($collateralFolderId) = WebGUI::SQL->quickArray("select collateralFolderId from collateralFolder 
-			where name=".quote($param[0]));
+			where name=".quote($param[0]),WebGUI::SQL->getSlave);
                 $collateralFolderId = 0 unless ($collateralFolderId);
         }
 	my @snippets = WebGUI::SQL->buildArray("select collateralId from collateral 
-		where collateralType='snippet' and collateralFolderId=".$collateralFolderId);
+		where collateralType='snippet' and collateralFolderId=".$collateralFolderId,WebGUI::SQL->getSlave);
 	if (my $collateral = WebGUI::Collateral->new($snippets[rand($#snippets+1)])) {
 	        return $collateral->get("parameters");
         } else {

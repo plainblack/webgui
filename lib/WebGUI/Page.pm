@@ -223,7 +223,7 @@ sub canView {
         if ($pageId eq $session{page}{pageId}) {
                 %page = %{$session{page}};
         } else {
-                %page = WebGUI::SQL->quickHash("select ownerId,groupIdView,startDate,endDate from page where pageId=$pageId");
+                %page = WebGUI::SQL->quickHash("select ownerId,groupIdView,startDate,endDate from page where pageId=$pageId",WebGUI::SQL->getSlave);
         }
         if ($session{user}{userId} == $page{ownerId}) {
                 return 1;
@@ -404,7 +404,7 @@ sub generate {
 		.moveUpIcon('op=movePageUp')
 		.moveDownIcon('op=movePageDown')
 		.cutIcon('op=cutPage');
-	my $sth = WebGUI::SQL->read("select * from wobject where pageId=".$session{page}{pageId}." order by sequenceNumber, wobjectId");
+	my $sth = WebGUI::SQL->read("select * from wobject where pageId=".$session{page}{pageId}." order by sequenceNumber, wobjectId",WebGUI::SQL->getSlave);
         while (my $wobject = $sth->hashRef) {
 		my $wobjectToolbar = wobjectIcon()
          		.deleteIcon('func=delete&wid='.${$wobject}{wobjectId})
@@ -420,8 +420,8 @@ sub generate {
          	}
        		if (${$wobject}{namespace} eq "WobjectProxy") {
           		my $originalWobject = $wobject;
-      			my ($wobjectProxy) = WebGUI::SQL->quickHashRef("select * from WobjectProxy where wobjectId=".${$wobject}{wobjectId});
-        		$wobject = WebGUI::SQL->quickHashRef("select * from wobject where wobject.wobjectId=".$wobjectProxy->{proxiedWobjectId});
+      			my ($wobjectProxy) = WebGUI::SQL->quickHashRef("select * from WobjectProxy where wobjectId=".${$wobject}{wobjectId},WebGUI::SQL->getSlave);
+        		$wobject = WebGUI::SQL->quickHashRef("select * from wobject where wobject.wobjectId=".$wobjectProxy->{proxiedWobjectId},WebGUI::SQL->getSlave);
            		if (${$wobject}{namespace} eq "") {
              			$wobject = $originalWobject;
          		} else {

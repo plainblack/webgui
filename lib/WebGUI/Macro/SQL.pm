@@ -21,7 +21,7 @@ sub process {
 	my ($statement, $format) = WebGUI::Macro::getParams(shift);
 	$format = '^0;' if ($format eq "");
 	if ($statement =~ /^\s*select/i || $statement =~ /^\s*show/i || $statement =~ /^\s*describe/i) {
-		my $sth = WebGUI::SQL->unconditionalRead($statement);
+		my $sth = WebGUI::SQL->unconditionalRead($statement,WebGUI::SQL->getSlave);
 		unless ($sth->errorCode < 1) { 
 			return '<p><b>SQL Macro Failed:</b> '.$sth->errorMessage.'<p>';
 		} else {

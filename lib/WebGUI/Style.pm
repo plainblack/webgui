@@ -19,7 +19,6 @@ use strict;
 use Tie::CPHash;
 use WebGUI::International;
 use WebGUI::Session;
-use WebGUI::SQL;
 use WebGUI::Template;
 
 

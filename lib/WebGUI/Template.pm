@@ -108,7 +108,7 @@ Defaults to "page". Specify the namespace of the template to retrieve.
 sub get {
 	my $templateId = shift || 1;
 	my $namespace = shift || "page";
-        return WebGUI::SQL->quickHashRef("select * from template where templateId=".$templateId." and namespace=".quote($namespace));
+        return WebGUI::SQL->quickHashRef("select * from template where templateId=".$templateId." and namespace=".quote($namespace),WebGUI::SQL->getSlave);
 }
 
 
@@ -130,7 +130,7 @@ Defaults to "page". Specify the namespace to build the list for.
 
 sub getList {
 	my $namespace = $_[0] || "page";
-	return WebGUI::SQL->buildHashRef("select templateId,name from template where namespace=".quote($namespace)." and showInForms=1 order by name");
+	return WebGUI::SQL->buildHashRef("select templateId,name from template where namespace=".quote($namespace)." and showInForms=1 order by name",WebGUI::SQL->getSlave);
 }
 
 
@@ -184,7 +184,7 @@ sub process {
 		$params{double_file_cache} = 1;
 	}
 	unless (-f $file->getPath) {
-        	my ($template) = WebGUI::SQL->quickArray("select template from template where templateId=".$templateId." and namespace=".quote($namespace));
+        	my ($template) = WebGUI::SQL->quickArray("select template from template where templateId=".$templateId." and namespace=".quote($namespace),WebGUI::SQL->getSlave);
 		$file->saveFromScalar($template);
 	}
 	return _execute(\%params,$vars);

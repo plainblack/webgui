@@ -347,7 +347,7 @@ sub getCollateral {
 	if ($keyValue eq "new" || $keyValue eq "") {
 		return {$keyName=>"new"};
 	} else {
-		return WebGUI::SQL->quickHashRef("select * from $tableName where $keyName=".quote($keyValue));
+		return WebGUI::SQL->quickHashRef("select * from $tableName where $keyName=".quote($keyValue),WebGUI::SQL->getSlave);
 	}
 }
 
@@ -766,7 +766,7 @@ sub new {
 	my %fullProperties;
 	my $extra;
 	unless ($properties->{wobjectId} eq "new") {
-		$extra = WebGUI::SQL->quickHashRef("select * from ".$properties->{namespace}." where wobjectId='".$properties->{wobjectId}."'");
+		$extra = WebGUI::SQL->quickHashRef("select * from ".$properties->{namespace}." where wobjectId='".$properties->{wobjectId}."'",WebGUI::SQL->getSlave);
 	}
         tie %fullProperties, 'Tie::CPHash';
         %fullProperties = (%{$properties},%{$extra});
@@ -838,7 +838,7 @@ sub processTemplate {
 		);
 	if (defined $self->get("_WobjectProxy")) {
 		$vars{isShortcut} = 1;
-		my ($originalPageURL) = WebGUI::SQL->quickArray("select urlizedTitle from page where pageId=".$self->get("pageId"));
+		my ($originalPageURL) = WebGUI::SQL->quickArray("select urlizedTitle from page where pageId=".$self->get("pageId"),WebGUI::SQL->getSlave);
 		$vars{originalURL} = WebGUI::URL::gateway($originalPageURL."#".$self->get("wobjectId"));
 	}
 	my $namespace = $namespace || $self->get("namespace");

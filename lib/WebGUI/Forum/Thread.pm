@@ -172,7 +172,7 @@ sub getNextThread {
 	my ($self) = @_;
 	unless (exists $self->{_next}) {
 		my ($nextId) = WebGUI::SQL->quickArray("select min(forumThreadId) from forumThread where forumId=".$self->get("forumId")." 
-			and forumThreadId>".$self->get("forumThreadId"));
+			and forumThreadId>".$self->get("forumThreadId"),WebGUI::SQL->getSlave);
 		$self->{_next} = WebGUI::Forum::Thread->new($nextId);
 	}
 	return $self->{_next};
@@ -214,7 +214,7 @@ sub getPreviousThread {
 	my ($self) = @_;
 	unless (exists $self->{_previous}) {
 		my ($nextId) = WebGUI::SQL->quickArray("select max(forumThreadId) from forumThread where forumId=".$self->get("forumId")." 
-			and forumThreadId<".$self->get("forumThreadId"));
+			and forumThreadId<".$self->get("forumThreadId"),WebGUI::SQL->getSlave);
 		$self->{_previous} = WebGUI::Forum::Thread->new($nextId);
 	}
 	return $self->{_previous};

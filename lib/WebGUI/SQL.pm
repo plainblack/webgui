@@ -65,6 +65,8 @@ Package for interfacing with SQL databases. This package implements Perl DBI fun
  $hashRef = WebGUI::SQL->quickHashRef($sql);
  $text = WebGUI::SQL->quickTab($sql);
 
+ $dbh = WebGUI::SQL->getSlave;
+
  $id = getNextId("wobjectId");
  $string = quote($string);
 
@@ -73,6 +75,12 @@ Package for interfacing with SQL databases. This package implements Perl DBI fun
 These methods are available from this package:
 
 =cut
+
+
+#-------------------------------------------------------------------
+sub _getDefaultDb {
+	return $WebGUI::Session::session{dbh};
+}
 
 
 #-------------------------------------------------------------------
@@ -387,6 +395,25 @@ sub getRow {
         return $row;
 }
 
+
+#-------------------------------------------------------------------
+
+=head2 getSlave ( ) 
+
+Returns a random slave database handler, if one is defined, otherwise it returns undef. Likewise if admin mode is on it returns undef.
+
+=cut
+
+sub getSlave {
+	if ($WebGUI::Session::session{var}{adminOn}) {
+		return undef;
+	} else {
+		return $WebGUI::Session::session{slave}->[rand @{$WebGUI::Session::session{slave}}];
+	}
+}
+
+
+
 #-------------------------------------------------------------------
 
 =head2 hash ( )
@@ -450,7 +477,7 @@ A database handler. Defaults to the WebGUI default database handler.
 sub prepare {
 	my $class = shift;
 	my $sql = shift;
-	my $dbh = shift || $WebGUI::Session::session{dbh};
+	my $dbh = shift || _getDefaultDb();
 	if ($WebGUI::Session::session{setting}{showDebug}) {
 		push(@{$WebGUI::Session::session{SQLquery}},$sql);
 	}
@@ -622,7 +649,7 @@ sub quickTab {
 
 #-------------------------------------------------------------------
 
-=head2 quote ( string ) 
+=head2 quote ( string [ , dbh ] ) 
 
 Returns a string quoted and ready for insert into the database.  
 
@@ -634,13 +661,18 @@ NOTE: This is not a regular method, but is an exported subroutine.
 
 Any scalar variable that needs to be escaped to be inserted into the database.
 
+=item dbh
+
+The database handler. Defaults to the WebGUI database handler.
+
 =back
 
 =cut
 
 sub quote {
-        my $value = $_[0]; #had to add this here cuz Tie::CPHash variables cause problems otherwise.
-        return $WebGUI::Session::session{dbh}->quote($value);
+        my $value = shift; #had to add this here cuz Tie::CPHash variables cause problems otherwise.
+	my $dbh = shift || _getDefaultDb();
+        return $dbh->quote($value);
 }
 
 
@@ -780,7 +812,7 @@ By default this method uses the WebGUI database handler. However, you may choose
 sub unconditionalRead {
 	my $class = shift;
 	my $sql = shift;
-	my $dbh = shift || $WebGUI::Session::session{dbh};
+	my $dbh = shift || _getDefaultDb();
 	if ($WebGUI::Session::session{setting}{showDebug}) {
 		push(@{$WebGUI::Session::session{SQLquery}},$sql);
 	}
@@ -815,7 +847,7 @@ By default this method uses the WebGUI database handler. However, you may choose
 sub write {
 	my $class = shift;
 	my $sql = shift;
-	my $dbh = shift || $WebGUI::Session::session{dbh};
+	my $dbh = shift || _getDefaultDb();
 	if ($WebGUI::Session::session{setting}{showDebug}) {
 		push(@{$WebGUI::Session::session{SQLquery}},$sql);
 	}

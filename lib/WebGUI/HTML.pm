@@ -198,7 +198,7 @@ sub processReplacements {
 			$content =~ s/\Q$searchFor/$replaceWith/gs;
 		}
 	} else {
-		my $sth = WebGUI::SQL->read("select searchFor,replaceWith from replacements");
+		my $sth = WebGUI::SQL->read("select searchFor,replaceWith from replacements",WebGUI::SQL->getSlave);
         	while (my ($searchFor,$replaceWith) = $sth->array) {
 			$session{replacements}{$searchFor} = $replaceWith;
         		$content =~ s/\Q$searchFor/$replaceWith/gs;

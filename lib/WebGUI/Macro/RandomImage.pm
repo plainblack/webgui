@@ -23,11 +23,11 @@ sub process {
 	my $collateralFolderId = 0;
 	if ($param[0] ne "") {
 		($collateralFolderId) = WebGUI::SQL->quickArray("select collateralFolderId from collateralFolder 
-			where name=".quote($param[0]));
+			where name=".quote($param[0]),WebGUI::SQL->getSlave);
 		$collateralFolderId = 0 unless ($collateralFolderId);
 	}
 	my @images = WebGUI::SQL->buildArray("select collateralId from collateral 
-		where collateralType='image' and collateralFolderId=".$collateralFolderId);
+		where collateralType='image' and collateralFolderId=".$collateralFolderId,WebGUI::SQL->getSlave);
 	if (my $collateral = WebGUI::Collateral->new($images[rand($#images+1)])) {
 	        return '<img src="'.$collateral->getURL.'" '.$collateral->get("parameters").' />';
         } else {

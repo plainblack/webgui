@@ -28,7 +28,7 @@ sub process {
 	}
         $temp = WebGUI::URL::append($session{env}{REQUEST_URI},$append);
 	if ($param[1] ne "") {
-		($styleId) = WebGUI::SQL->quickArray("select styleId from style where name=".quote($param[1]));
+		($styleId) = WebGUI::SQL->quickArray("select styleId from style where name=".quote($param[1]),WebGUI::SQL->getSlave);
 		if ($styleId != 0) {
 			$temp = WebGUI::URL::append($temp,'styleId='.$styleId);
 		}
