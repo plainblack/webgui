@@ -12,27 +12,27 @@ our $I18N = {
 
 NOTE: You can create a multi-paged article by placing the separator macro (&#94;-;) at various places through-out your article.  This works unless you are using a Make Page Printable style.
 
-<P><b>Template</b><br>
+<P><b>^International("913","Template");</b><br>
 Select a template from the list to layout your Wobject.  Each Wobject
 may only use templates for their own namespace.  For example, Articles
 can only use templates from the "Article" namespace.  Layouts can only
 use templates from the "page" namespace.
 
-<p><b>Link Title</b><br>
+<p><b>^International("1",Article");</b><br>
 If you wish to add a link to your article, enter the title of the link in this field. 
 <br><br>
 <i>Example:</i> Google
 
-<p><b>Link URL</b><br>
+<p><b>^International("8","Article");</b><br>
 If you added a link title, now add the URL (uniform resource locater) here. 
 <br><br>
 <i>Example:</i> http://www.google.com
 
-<p><b>Convert carriage returns?</b><br>
+<p><b>^International("10","Article");</b><br>
 If you're publishing HTML there's generally no need to check this option, but if you aren't using HTML and you want a carriage return every place you hit your "Enter" key, then check this option.
 
 |,
-		lastUpdated => 1109999943,
+		lastUpdated => 1110135832,
 	},
 
 	'7' => {
