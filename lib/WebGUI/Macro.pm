@@ -41,7 +41,7 @@ sub process {
         foreach $file (@files) {
                 if ($file ne "." && $file ne ".." && $file =~ /\.pm/) {
                         $file =~ s/\.pm//;
-                        $cmd = "require WebGUI::Macro::".$file;
+                        $cmd = "use WebGUI::Macro::".$file;
                         eval($cmd);
                         $cmd = "WebGUI::Macro::".$file."::process";
 			$output = &$cmd($output);

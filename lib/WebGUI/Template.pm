@@ -15,6 +15,33 @@ use Tie::IxHash;
 use WebGUI::ErrorHandler;
 use WebGUI::Session;
 
+
+#-------------------------------------------------------------------
+sub loadTemplates {
+        my ($templateDir, @files, $file, $use, @template, $i);
+        if ($^O =~ /Win/i) {
+                $templateDir = "\\lib\\WebGUI\\Template";
+        } else {
+                $templateDir = "/lib/WebGUI/Template";
+        }
+        opendir (DIR,$session{config}{webguiRoot}.$templateDir) or WebGUI::ErrorHandler::fatalError("Can't open template directory!");
+        @files = readdir(DIR);
+        foreach $file (@files) {
+                if ($file ne "." && $file ne ".." && $file =~ /\.pm/) {
+                        $file =~ s/\.pm//;
+                        $template[$i] = $file;
+                        $use = "require WebGUI::Template::".$template[$i];
+                        eval($use);
+			if ($@) {
+				WebGUI::ErrorHandler::fatalError("Template load failed: ".$@);
+			}
+                        $i++;
+                }
+        }
+        closedir(DIR);
+        return @template;
+}
+
 #-------------------------------------------------------------------
 sub calculatePositions {
         my (%positions, $string);
@@ -29,34 +56,22 @@ sub calculatePositions {
 
 #-------------------------------------------------------------------
 sub getList {
-        my (@files, $file, $namespace, $cmd, %list, $templateDir);
-	if ($^O =~ /Win/i) {
-		$templateDir = "\\lib\\WebGUI\\Template";
-	} else {
-		$templateDir = "/lib/WebGUI/Template";
-	}
-        opendir (DIR,$session{config}{webguiRoot}.$templateDir) or WebGUI::ErrorHandler::fatalError("Can't open template directory!");
-        @files = readdir(DIR);
-        foreach $file (@files) {
-                if ($file ne "." && $file ne ".." && $file =~ /\.pm/) {
-                        $file =~ s/\.pm//;
-                        $cmd = "require WebGUI::Template::".$file;
-                        eval($cmd);
-			$cmd = "WebGUI::Template::".$file."::namespace";
-			$namespace = $$cmd;
-                        $cmd = "WebGUI::Template::".$file."::name";
-			$list{$namespace} = &$cmd();
-                }
+        my (@templates, $cmd, $template, $namespace, %list);
+        @templates = loadTemplates();
+        foreach $template (@templates) {
+        	#$cmd = "WebGUI::Template::".$template."::namespace";
+                #$namespace = $$cmd;
+                $cmd = "WebGUI::Template::".$template."::name";
+                $list{$template} = &$cmd();
         }
-        closedir(DIR);
-	return %list;
+        return %list;
 }
 
 #-------------------------------------------------------------------
 sub getPositions {
 	my ($cmd, %hash);
 	tie %hash, "Tie::IxHash";
-	$cmd = "require WebGUI::Template::".$_[0];
+	$cmd = "use WebGUI::Template::".$_[0];
 	eval($cmd);
 	$cmd = "WebGUI::Template::".$_[0]."::getPositions";
 	%hash = &$cmd;

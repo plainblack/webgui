@@ -8,6 +8,14 @@ versions. Be sure to heed the warnings contained herein as they will
 save you many hours of grief.
 
 
+2.6.0
+--------------------------------------------------------------------
+ * If you've already downloaded the Item widget from the contributed
+	section on the Plain Black site, it will be replaced with
+	the now built in Item widget. You may notice an error
+	regarding this when upgrading the database. You can ignore
+	it.
+
 2.5.0
 --------------------------------------------------------------------
  * Any third-party Widgets you have installed are likely not to work

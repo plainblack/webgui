@@ -1,5 +1,5 @@
 package WebGUI;
-our $VERSION = "2.5.0";
+our $VERSION = "2.6.0";
 
 #-------------------------------------------------------------------
 # WebGUI is Copyright 2001 Plain Black Software.
@@ -21,6 +21,7 @@ use WebGUI::Privilege;
 use WebGUI::Session;
 use WebGUI::SQL;
 use WebGUI::Style;
+use WebGUI::Template;
 use WebGUI::Template::Default;
 use WebGUI::Utility;
 
@@ -122,6 +123,9 @@ sub _loadWidgets {
 sub page {
 	my (%contentHash, $cmd, $pageEdit, $widgetType, $functionOutput, @availableWidgets, @widgetList, $sth, $httpHeader, $header, $footer, $content, $operationOutput, $adminBar);
 	WebGUI::Session::open($_[0]);
+	# For some reason we have to pre-cache the templates when running under mod_perl
+	# so that's what we're doing with this next command.
+	WebGUI::Template::loadTemplates();
 	@availableWidgets = _loadWidgets();
 	if (exists $session{form}{op}) {
 		$cmd = "WebGUI::Operation::www_".$session{form}{op};

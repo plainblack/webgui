@@ -291,11 +291,11 @@ sub www_view {
                 }
 		$sth = WebGUI::SQL->read("select name, url, description, newWindow from LinkList_link where widgetId='$widgetId' order by sequenceNumber",$session{dbh});
 		while (@link = $sth->array) {
-			$output .= $indent.$data{bullet}.'<b><a href="'.$link[1].'"';
+			$output .= $indent.$data{bullet}.'<a href="'.$link[1].'"';
 			if ($link[3]) {
 				$output .= ' target="_blank"';
 			}
-			$output .= '>'.$link[0].'</a></b>';
+			$output .= '><span class="linkTitle">'.$link[0].'</span></a>';
 			if ($link[2] ne "") {
 				$output .= ' - '.$link[2];
 			}

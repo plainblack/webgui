@@ -65,14 +65,14 @@ sub www_search {
 				$row[$i] = '<li><a href="'.$session{ENV}{SCRIPT_NAME}.'/'.$page{urlizedTitle}.'">'.$page{title}.'</a>';
 				$i++;
 			}
-			if ($row[0] ne "") {
-				($dataRows, $prevNextBar) = paginate(20,$session{page}{url}.'?op=search',\@row);
-				$output .= WebGUI::International::get(365).'<p><ul>';
-				$output .= $dataRows;
-				$output .= '</ul>'.$prevNextBar;
-			} else {
-				$output .= WebGUI::International::get(366);
-			}
+		}
+		if ($row[0] ne "") {
+			($dataRows, $prevNextBar) = paginate(20,$session{page}{url}.'?op=search',\@row);
+			$output .= WebGUI::International::get(365).'<p><ol>';
+			$output .= $dataRows;
+			$output .= '</ol>'.$prevNextBar;
+		} else {
+			$output .= WebGUI::International::get(366);
 		}
 	}
         return $output;
