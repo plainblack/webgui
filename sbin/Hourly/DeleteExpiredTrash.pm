@@ -13,6 +13,7 @@ package Hourly::DeleteExpiredTrash;
 
 use strict;
 use WebGUI::DateTime;
+use WebGUI::Page;
 use WebGUI::Session;
 use WebGUI::SQL;
 
@@ -44,7 +45,8 @@ sub process {
 			WebGUI::ErrorHandler::audit("purging expired page ". $pageId ." from trash");
 			WebGUI::Operation::Trash::_recursePageTree($pageId);
 			WebGUI::Operation::Trash::_purgeWobjects($pageId);
-			WebGUI::SQL->write("delete from page where pageId=".quote($pageId));
+			my $page = WebGUI::Page->new($pageId);
+			$page->purge;
 		}
 		$a->finish;
 	}

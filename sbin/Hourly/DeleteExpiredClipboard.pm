@@ -13,6 +13,7 @@ package Hourly::DeleteExpiredClipboard;
 
 use strict;
 use WebGUI::DateTime;
+use WebGUI::Page;
 use WebGUI::Session;
 use WebGUI::SQL;
 
@@ -20,12 +21,13 @@ use WebGUI::SQL;
 sub process {
 	if ($session{config}{DeleteExpiredClipboard_offset} ne "") {
 		my $expireDate = (time()-(86400*$session{config}{DeleteExpiredClipboard_offset}));
-
 		WebGUI::ErrorHandler::audit("moving expired clipboard items to trash");
-
-		WebGUI::SQL->write("update page set parentId=3, bufferPrevId=2, bufferDate=" .WebGUI::DateTime::time()
-				." where parentId=2 and bufferDate < ". $expireDate );
-
+		my $sth = WebGUI::SQL->read("select pageId from page where parentId=2 and bufferDate <".$expireDate);
+		while (my ($pageId) = $sth->array) {
+			my $page = WebGUI::Page->new($pageId);
+			$page->delete;
+		}
+		$sth->finish;
 		WebGUI::SQL->write("update wobject set pageId=3, bufferPrevId=2, bufferDate=" .WebGUI::DateTime::time()
 				." where pageId=2 and bufferDate < ". $expireDate );
 	}

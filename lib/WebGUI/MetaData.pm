@@ -104,6 +104,7 @@ The fieldId for which you want to retrieve field properties.
 
 If specified, the method will not only get the field properties,
 but the value for this wobjectId as well.
+
 =back
 
 =cut

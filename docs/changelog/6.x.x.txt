@@ -6,6 +6,9 @@
  - Fixed a version check problem in Syndicated Content wobject.
  - Fixed some GUID problems in the scheduler plug-ins.
  - Fixed some epoch bugs in the scheduler plug-ins.
+ - Updated scheduler plug-ins to use the new page tree the way they're
+   supposed to.
+ - Fixed some POD errors.
 
 
 6.2.0

@@ -104,6 +104,8 @@ sub addPage {
 Summarizes passive profile log data using the metadata attributes. An entry
 is logged in the passiveProfileAOI table.
 
+=over
+
 =item hashRef
 
 A hashRef with userId and wobjectId.

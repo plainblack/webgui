@@ -12,6 +12,7 @@ package Hourly::TrashExpiredContent;
 
 use strict;
 use WebGUI::DateTime;
+use WebGUI::Page;
 use WebGUI::Session;
 use WebGUI::SQL;
 
@@ -20,7 +21,12 @@ sub process {
 	my $offset = $session{config}{TrashExpiredContent_offset};
 	if ($offset ne "") {
 		my $epoch = time()-(86400*$offset);
-		WebGUI::SQL->write("update page set parentId=3, endDate=endDate+31536000 where endDate<".$epoch);
+		my $sth = WebGUI::SQL->read("select pageId from page where endDate<".$epoch);
+		while (my ($pageId) = $sth->array) {
+			my $page = WebGUI::Page->new($pageId);
+			$page->delete;
+		}
+		$sth->finish;
 		WebGUI::SQL->write("update wobject set pageId=3, endDate=endDate+31536000 where endDate<".$epoch);
 	}
 }
