@@ -50,9 +50,64 @@ $sth->finish;
 WebGUI::SQL->write("delete from settings where name in ('siteicon','favicon')");
 
 
-#print "\tConverting Pages, Wobjects, and Forums to Assets\n" unless ($quiet);
-#print "\t\tHold on cuz this is going to take a long time...\n" unless ($quiet);
-#walkTree('0','theroot','000001','0');
+print "\tConverting Pages, Wobjects, and Forums to Assets\n" unless ($quiet);
+print "\t\tHold on cuz this is going to take a long time...\n" unless ($quiet);
+print "\t\tMaking first round of table structure changes\n" unless ($quiet);
+WebGUI::SQL->write("alter table wobject add column assetId varchar(22) not null");
+WebGUI::SQL->write("alter table wobject add styleTemplateId varchar(22) not null");
+WebGUI::SQL->write("alter table wobject add printableStyleTemplateId varchar(22) not null");
+WebGUI::SQL->write("alter table wobject drop primary key");
+my $sth = WebGUI::SQL->read("select distinct(namespace) from wobject");
+while (my ($namespace) = $sth->array) {
+	WebGUI::SQL->write("alter table ".$namespace." add column assetId varchar(22) not null");
+}
+$sth->finish;
+walkTree('0','theroot','000001','1');
+print "\t\tMaking second round of table structure changes\n" unless ($quiet);
+WebGUI::SQL->write("drop table SiteMap");
+WebGUI::SQL->write("delete from template where namespace in ('SiteMap')");
+my $sth = WebGUI::SQL->read("select distinct(namespace) from wobject where namespace is not null");
+while (my ($namespace) = $sth->array) {
+	if (isIn($namespace, qw(Article DataForm EventsCalendar HttpProxy IndexedSearch MessageBoard Poll Product SQLReport Survey SyndicatedContent USS WobjectProxy WSClient))) {
+		WebGUI::SQL->write("alter table ".$namespace." drop column wobjectId");
+	} else {
+		WebGUI::SQL->write("alter table ".$namespace." drop primary key");
+	}
+	
+	WebGUI::SQL->write("alter table ".$namespace." add primary key (assetId)");
+}
+$sth->finish;
+WebGUI::SQL->write("alter table wobject drop column wobjectId");
+WebGUI::SQL->write("alter table wobject add primary key (assetId)");
+WebGUI::SQL->write("alter table wobject drop column namespace");
+WebGUI::SQL->write("alter table wobject drop column pageId");
+WebGUI::SQL->write("alter table wobject drop column sequenceNumber");
+WebGUI::SQL->write("alter table wobject drop column title");
+WebGUI::SQL->write("alter table wobject drop column ownerId");
+WebGUI::SQL->write("alter table wobject drop column groupIdEdit");
+WebGUI::SQL->write("alter table wobject drop column groupIdView");
+WebGUI::SQL->write("alter table wobject drop column userDefined1");
+WebGUI::SQL->write("alter table wobject drop column userDefined2");
+WebGUI::SQL->write("alter table wobject drop column userDefined3");
+WebGUI::SQL->write("alter table wobject drop column userDefined4");
+WebGUI::SQL->write("alter table wobject drop column userDefined5");
+WebGUI::SQL->write("alter table wobject drop column templatePosition");
+WebGUI::SQL->write("alter table wobject drop column bufferUserId");
+WebGUI::SQL->write("alter table wobject drop column bufferDate");
+WebGUI::SQL->write("alter table wobject drop column bufferPrevId");
+WebGUI::SQL->write("alter table wobject drop column forumId");
+WebGUI::SQL->write("alter table wobject drop column startDate");
+WebGUI::SQL->write("alter table wobject drop column endDate");
+WebGUI::SQL->write("alter table wobject drop column allowDiscussion");
+WebGUI::SQL->write("drop table page");
+WebGUI::SQL->write("alter table Article drop column image");
+WebGUI::SQL->write("alter table Article drop column attachment");
+
+
+
+
+
+
 
 WebGUI::Session::close();
 
@@ -62,17 +117,13 @@ sub walkTree {
 	my $newParentId = shift;
 	my $parentLineage = shift;
 	my $myRank = shift;
-	WebGUI::SQL->write("alter table wobject add column assetId varchar(22) not null");
-	my $sth = WebGUI::SQL->read("select distinct(namespace) from wobject");
-	while (my ($namespace) = $sth->array) {
-		WebGUI::SQL->write("alter table ".$namespace." add column assetId varchar(22) not null");
-	}
-	$sth->finish;
+	print "\t\tFinding children of page ".$oldParentId."\n" unless ($quiet);
 	my $a = WebGUI::SQL->read("select * from page where subroutinePackage='WebGUI::Page' and parentId=".quote($oldParentId)." order by nestedSetLeft");
 	while (my $page = $a->hashRef) {
+		print "\t\tConverting page ".$page->{pageId}."\n" unless ($quiet);
 		my $pageId = WebGUI::Id::generate();
 		my $pageLineage = $parentLineage.sprintf("%06d",$myRank);
-		my $pageUrl = fixUrl($page->{urlizedTitle});
+		my $pageUrl = fixUrl($pageId,$page->{urlizedTitle});
 		my $className = 'WebGUI::Asset::Layout';
 		if ($page->{redirectURL} ne "") {
 			$className = 'WebGUI::Asset::Redirect';
@@ -80,24 +131,26 @@ sub walkTree {
 		WebGUI::SQL->write("insert into asset (assetId, parentId, lineage, className, state, title, menuTitle, url, startDate, 
 			endDate, synopsis, newWindow, isHidden, ownerUserId, groupIdView, groupIdEdit, encryptPage ) values (".quote($pageId).",
 			".quote($newParentId).", ".quote($pageLineage).", ".quote($className).",'published',".quote($page->{title}).",
-			".quote($page->{menuTitle}).", ".quote($pageUrl).", ".quote($page->startDate).", ".quote($page->{endDate}).",
+			".quote($page->{menuTitle}).", ".quote($pageUrl).", ".quote($page->{startDate}).", ".quote($page->{endDate}).",
 			".quote($page->{synopsis}).", ".quote($page->{newWindow}).", ".quote($page->{hideFromNavigation}).", ".quote($page->{ownerId}).",
 			".quote($page->{groupIdView}).", ".quote($page->{groupIdEdit}).", ".quote($page->{encryptPage}).")");
 		if ($page->{redirectURL} ne "") {
 			WebGUI::SQL->write("insert into redirect (assetId, redirectUrl) values (".quote($pageId).",".quote($page->{redirectURL}).")");
 		} else {
-			WebGUI::SQL->write("insert into layout (assetId, styleTemplateId, layoutTemplateId, printableStyleTemplateId) values (
+			WebGUI::SQL->write("insert into wobject (assetId, styleTemplateId, templateId, printableStyleTemplateId) values (
 				".quote($pageId).", ".quote($page->{styleId}).", ".quote($page->{templateId}).", 
-				".quote($page->{printableStyleTemplateId}).")");
+				".quote($page->{printableStyleId}).")");
+			WebGUI::SQL->write("insert into layout (assetId) values (".quote($pageId).")");
 		}
-		my $rank = 0;
+		my $rank = 1;
+		print "\t\tFinding wobjects on page ".$page->{pageId}."\n" unless ($quiet);
 		my $b = WebGUI::SQL->read("select * from wobject where pageId=".quote($page->{pageId})." order by sequenceNumber");
 		while (my $wobject = $b->hashRef) {
-			$rank++;
+			print "\t\t\tConverting wobject ".$wobject->{wobjectId}."\n" unless ($quiet);
 			my ($namespace) = WebGUI::SQL->quickHashRef("select * from ".$wobject->{namespace}." where wobjectId=".quote($wobject->{wobjectId}));
 			my $wobjectId = WebGUI::Id::generate();
 			my $wobjectLineage = $pageLineage.sprintf("%06d",$rank);
-			my $wobjectUrl = fixUrl($pageUrl."/".$wobject->{title});
+			my $wobjectUrl = fixUrl($wobjectId,$pageUrl."/".$wobject->{title});
 			my $groupIdView = $page->{groupIdView};
 			my $groupIdEdit = $page->{groupIdEdit};
 			my $ownerId = $page->{ownerId};
@@ -112,16 +165,19 @@ sub walkTree {
 				".quote($pageId).", ".quote($wobjectLineage).", ".quote($className).",'published',".quote($page->{title}).",
 				".quote($page->{title}).", ".quote($wobjectUrl).", ".quote($wobject->{startDate}).", ".quote($wobject->{endDate}).",
 				1, ".quote($ownerId).", ".quote($groupIdView).", ".quote($groupIdEdit).", ".quote($page->{encryptPage}).")");
-			WebGUI::SQL->write("update wobject set assetId=".quote($wobjectId));
-			WebGUI::SQL->write("update ".$wobject->{namespace}." set assetId=".quote($wobjectId));
-			if ($namespace eq "Article") {
+			WebGUI::SQL->write("update wobject set assetId=".quote($wobjectId).", styleTemplateId=".quote($page->{styleId}).",
+				printableStyleTemplateId=".quote($page->{printableStyleId})." where wobjectId=".quote($wobject->{wobjectId}));
+			WebGUI::SQL->write("update ".$wobject->{namespace}." set assetId=".quote($wobjectId)." where wobjectId="
+				.quote($wobject->{wobjectId}));
+			if ($wobject->{namespace} eq "Article") {
+				print "\t\t\tMigrating attachments for Article ".$wobject->{wobjectId}."\n" unless ($quiet);
 				if ($namespace->{attachment}) {
 					my $attachmentId = WebGUI::Id::generate();
 					WebGUI::SQL->write("insert into asset (assetId, parentId, lineage, className, state, title, menuTitle, 
 						url, startDate, endDate, isHidden, ownerUserId, groupIdView, groupIdEdit, boundToId) values (".
 						quote($attachmentId).", ".quote($wobjectId).", ".quote($wobjectLineage.sprintf("%06d",1)).", 
 						'WebGUI::Asset::File','published',".quote($namespace->{attachment}).", ".
-						quote($namespace->{attachment}).", ".quote(fixUrl($wobjectUrl.$namespace->{attachment})).", 
+						quote($namespace->{attachment}).", ".quote(fixUrl($attachmentId,$wobjectUrl.$namespace->{attachment})).", 
 						".quote($wobject->{startDate}).", ".quote($wobject->{endDate}).", 1, ".quote($ownerId).", 
 						".quote($groupIdView).", ".quote($groupIdEdit).", ".quote($wobjectId).")");
 					my $storageId = copyFile($namespace->{attachment},$wobject->{wobjectId});
@@ -137,7 +193,7 @@ sub walkTree {
 						url, startDate, endDate, isHidden, ownerUserId, groupIdView, groupIdEdit, boundToId) values (".
 						quote($imageId).", ".quote($wobjectId).", ".quote($wobjectLineage.sprintf("%06d",$rank)).", 
 						'WebGUI::Asset::File::Image','published',".quote($namespace->{attachment}).", ".
-						quote($namespace->{image}).", ".quote(fixUrl($wobjectUrl.$namespace->{image})).", 
+						quote($namespace->{image}).", ".quote(fixUrl($imageId,$wobjectUrl.$namespace->{image})).", 
 						".quote($wobject->{startDate}).", ".quote($wobject->{endDate}).", 1, ".quote($ownerId).", 
 						".quote($groupIdView).", ".quote($groupIdEdit).", ".quote($wobjectId).")");
 					my $storageId = copyFile($namespace->{image},$wobject->{wobjectId});
@@ -149,7 +205,8 @@ sub walkTree {
 						".quote($session{setting}{thumbnailSize}).")");
 				}
 				# migrate forums
-			} elsif ($namespace eq "SiteMap") {
+			} elsif ($wobject->{namespace} eq "SiteMap") {
+				print "\t\t\tConverting SiteMap ".$wobject->{wobjectId}." into Navigation\n" unless ($quiet);
 				my $navident = 'SiteMap_'.$namespace->{wobjectId};
 				my ($starturl) = WebGUI::SQL->quickArray("select urlizedTitle from page 
 					where pageId=".quote($namespace->{startAtThisLevel}));
@@ -157,65 +214,32 @@ sub walkTree {
 					templateId) values (".quote(WebGUI::Id::generate()).", ".quote($navident).", 
 					".quote($namespace->{depth}).", ".quote($starturl).", '1')"); 
 				my $navmacro = $wobject->{description}.'<p>^Navigation('.$navident.');</p>';
-				WebGUI::SQL->write("update wobject set className='WebGUI::Asset::Wobject::Article', description=".quote($navmacro)."
+				WebGUI::SQL->write("update asset set className='WebGUI::Asset::Wobject::Article' where assetId=".quote($wobjectId));
+				WebGUI::SQL->write("update wobject set namespace='Article', description=".quote($navmacro)." 
 					where assetId=".quote($wobjectId));
-				WebGUI::SQL->write("insert into Article (assetId) values (".quote($wobjectId).")");
-			} elsif ($namespace eq "FileManager") {
+				WebGUI::SQL->write("insert into Article (assetId,wobjectId) values (".quote($wobjectId).",
+					".quote($wobject->{wobjectId}).")");
+			} elsif ($wobject->{namespace} eq "FileManager") {
 				# we're dumping file manager's so do that here
-			} elsif ($namespace eq "Product") {
+			} elsif ($wobject->{namespace} eq "Product") {
 				# migrate attachments to file assets
 				# migrate images to image assets
-			} elsif ($namespace eq "USS") {
+			} elsif ($wobject->{namespace} eq "USS") {
 				# migrate master forum
 				# migrate submissions
 				# migrate submission forums
 				# migrate submission attachments
 				# migrate submission images
-			} elsif ($namespace eq "MessageBoard") {
+			} elsif ($wobject->{namespace} eq "MessageBoard") {
 				# migrate forums
 			}
+			$rank++;
 		}
 		$b->finish;
-		walkTree($page->{pageId},$pageId,$pageLineage,$rank+1);
+		walkTree($page->{pageId},$pageId,$pageLineage,$rank);
 		$myRank++;
 	}
 	$a->finish;
-	my $sth = WebGUI::SQL->read("select distinct(namespace) from wobject");
-	while (my ($namespace) = $sth->array) {
-		if (isIn($namespace, qw(Article DataForm EventsCalendar HttpProxy IndexedSearch MessageBoard Poll Product SQLReport Survey SyndicatedContent USS WobjectProxy WSClient))) {
-			WebGUI::SQL->write("alter table ".$namespace." drop column wobjectId");
-		} else {
-			WebGUI::SQL->write("alter table ".$namespace." drop primary key");
-		}
-		WebGUI::SQL->write("alter table ".$namespace." add primary key (assetId)");
-	}
-	$sth->finish;
-	WebGUI::SQL->write("alter table wobject drop column wobjectId");
-	WebGUI::SQL->write("alter table wobject add primary key (assetId)");
-	WebGUI::SQL->write("alter table wobject drop column namespace");
-	WebGUI::SQL->write("alter table wobject drop column pageId");
-	WebGUI::SQL->write("alter table wobject drop column sequenceNumber");
-	WebGUI::SQL->write("alter table wobject drop column title");
-	WebGUI::SQL->write("alter table wobject drop column ownerId");
-	WebGUI::SQL->write("alter table wobject drop column groupIdEdit");
-	WebGUI::SQL->write("alter table wobject drop column groupIdView");
-	WebGUI::SQL->write("alter table wobject drop column userDefined1");
-	WebGUI::SQL->write("alter table wobject drop column userDefined2");
-	WebGUI::SQL->write("alter table wobject drop column userDefined3");
-	WebGUI::SQL->write("alter table wobject drop column userDefined4");
-	WebGUI::SQL->write("alter table wobject drop column userDefined5");
-	WebGUI::SQL->write("alter table wobject drop column templatePosition");
-	WebGUI::SQL->write("alter table wobject drop column bufferUserId");
-	WebGUI::SQL->write("alter table wobject drop column bufferDate");
-	WebGUI::SQL->write("alter table wobject drop column bufferPrevId");
-	WebGUI::SQL->write("alter table wobject drop column forumId");
-	WebGUI::SQL->write("alter table wobject drop column startDate");
-	WebGUI::SQL->write("alter table wobject drop column endDate");
-	WebGUI::SQL->write("alter table wobject drop column allowDiscussion");
-	WebGUI::SQL->write("drop table page");
-	WebGUI::SQL->write("alter table Article drop column image");
-	WebGUI::SQL->write("alter table Article drop column attachment");
-	WebGUI::SQL->write("delete from template where namespace in ('SiteMap')");
 }
 
 
@@ -223,7 +247,8 @@ sub walkTree {
 
 sub fixUrl {
 	my $id = shift;
-        my $url = WebGUI::URL::urlize(shift);
+        my $url = shift;
+        $url = WebGUI::URL::urlize($url);
         my ($test) = WebGUI::SQL->quickArray("select url from asset where assetId<>".quote($id)." and url=".quote($url));
         if ($test) {
                 my @parts = split(/\./,$url);
@@ -265,3 +290,11 @@ sub getFileSize {
 	my (@attributes) = stat($path);
 	return $attributes[7];
 }
+
+sub isIn {
+        my $key = shift;
+        $_ eq $key and return 1 for @_;
+        return 0;
+}
+
+

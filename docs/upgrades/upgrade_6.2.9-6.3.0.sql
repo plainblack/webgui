@@ -83,10 +83,7 @@ create table redirect (
 );
 
 create table layout (
-	assetId varchar(22) not null primary key, 
-	styleTemplateId varchar(22) not null, 
-	layoutTemplateId varchar(22) not null, 
-	printableStyleTemplateId varchar(22) not null
+	assetId varchar(22) not null primary key
 );
 
 create table FileAsset (

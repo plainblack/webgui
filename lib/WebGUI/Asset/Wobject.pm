@@ -171,6 +171,27 @@ sub getEditForm {
                 -namespace=>$self->get("namespace"),
                 -afterEdit=>'func=edit&amp;wid='.$self->get("wobjectId")."&amp;namespace=".$self->get("namespace")
                 );
+         $tabform->getTab("layout")->template(
+		-name=>"styleTemplateId",
+		-label=>WebGUI::International::get(1073),
+		-value=>($page{styleId} || 2),
+		-namespace=>'style',
+		-afterEdit=>'op=editPage&amp;npp='.$session{form}{npp}
+		);
+         $tabform->getTab("layout")->template(
+		-name=>"printableStyleTemplateId",
+		-label=>WebGUI::International::get(1079),
+		-value=>($page{printableStyleId} || 3),
+		-namespace=>'style',
+		-afterEdit=>'op=editPage&amp;npp='.$session{form}{npp}
+		);
+	if ($childCount) {
+               	$tabform->getTab("layout")->yesNo(
+			-name=>"recurseStyle",
+			-subtext=>' &nbsp; '.WebGUI::International::get(106),
+			-uiLevel=>9
+			);
+	}
 	$tabform->getTab("properties")->HTMLArea(
                 -name=>"description",
                 -label=>WebGUI::International::get(85),
