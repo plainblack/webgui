@@ -143,7 +143,7 @@ sub www_editInternationalMessage {
                 $f = WebGUI::HTMLForm->new;
                 $f->readOnly($session{form}{iid},WebGUI::International::get(601));
                 $f->hidden("lid",$session{form}{lid});
-		$f->hidden("missing",$session{form}{missing});
+		$f->hidden("status",$session{form}{status});
                 $f->hidden("iid",$session{form}{iid});
                 $f->hidden("pn",$session{form}{pn});
                 $f->hidden("namespace",$session{form}{namespace});
@@ -165,7 +165,7 @@ sub www_editInternationalMessage {
 #-------------------------------------------------------------------
 sub www_editInternationalMessageSave {
         if (WebGUI::Privilege::isInGroup(3)) {
-		if ($session{form}{missing}) {
+		if ($session{form}{status} eq "missing") {
                 	WebGUI::SQL->write("insert into international (message,namespace,languageId,internationalId,lastUpdated) 
 				values (".quote($session{form}{message}).",".quote($session{form}{namespace})
 				.",".$session{form}{lid}.",".$session{form}{iid}.", ".time().")");
@@ -228,7 +228,7 @@ sub www_exportTranslation {
 
 #-------------------------------------------------------------------
 sub www_listInternationalMessages {
-        my ($output, $sth, $key, $p, $search, $status, %data, %list, $deprecated, $i, $missing, @row, $f, $outOfDate, $ok);
+        my ($output, $sth, $key, $p, $search, $status,%data, %list, $deprecated, $i, $missing, @row, $f, $outOfDate, $ok);
         tie %data, 'Tie::CPHash';
         if (WebGUI::Privilege::isInGroup(3)) {
                 %data = WebGUI::SQL->quickHash("select language from language where languageId=".$session{form}{lid});
@@ -288,7 +288,7 @@ sub www_listInternationalMessages {
 			$row[$i] = '<tr valign="top"><td nowrap="1">'.$status."</td><td>"
 				.editIcon('op=editInternationalMessage&lid='.$session{form}{lid}
                 		.'&iid='.$list{$key}{id}.'&namespace='.$list{$key}{namespace}.'&pn='.$session{form}{pn}
-				.'&missing='.$list{$key}{missing})."</td><td>".$list{$key}{namespace}."</td><td>"
+				."&status=".$list{$key}{status})."</td><td>".$list{$key}{namespace}."</td><td>"
 				.$list{$key}{id}."</td><td>".$list{$key}{message}."</td></tr>\n";
 			$i++;
                 }
