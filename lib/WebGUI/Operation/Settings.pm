@@ -56,14 +56,9 @@ sub www_editUserSettings {
         $f->select("authMethod",\%authMethod,WebGUI::International::get(119),[$session{setting}{authMethod}]);
         $f->yesNo("usernameBinding",WebGUI::International::get(306),$session{setting}{usernameBinding});
 	$f->yesNo("selfDeactivation","Allow users to deactivate their account",$session{setting}{selfDeactivation});
-
-	foreach (@{$session{authentication}{available}}) {
-               	$cmd = "WebGUI::Authentication::".$_."::formEditUserSettings";
-               	$html = eval{&$cmd};
-               	WebGUI::ErrorHandler::fatalError("Unable to load method formEditUserSettings on Authentication module: $_. ".$@) if($@);
-		$f->raw($html);
+	foreach (keys %{$session{authentication}}) {
+		$f->raw(WebGUI::Authentication::settingsForm($_));
  	}
-
 	$f->submit;
 	$output .= $f->print;
         return _submenu($output);

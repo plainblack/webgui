@@ -122,7 +122,7 @@ sub _setupUserInfo {
 
 #-------------------------------------------------------------------
 sub _loadAuthentication {
-	my ($dir, @files, $slash, $file, $cmd, $namespace, $exclude, @availableModules);
+	my ($dir, @files, $file, $cmd, $namespace, $exclude);
 	$dir = $session{config}{webguiRoot}.$session{os}{slash}."lib".$session{os}{slash}."WebGUI".$session{os}{slash}."Authentication";
 	opendir (DIR,$dir) or WebGUI::ErrorHandler::fatalError("Can't open Authentication module directory!");
 	@files = readdir(DIR);
@@ -135,8 +135,7 @@ sub _loadAuthentication {
 				$exclude = $session{config}{excludeAuthentication};
                         	$exclude =~ s/ //g;
 				unless (isIn($namespace, split(/,/,$exclude))) {
-					$session{authentication}{$namespace} = 'WebGUI::Authentication::' . $namespace;
-					push(@availableModules, $namespace);
+					$session{authentication}{$namespace} = $namespace;
 				}
 			} else {
 				WebGUI::ErrorHandler::warn("Authentication module failed to compile: $namespace. ".$@);
@@ -144,7 +143,6 @@ sub _loadAuthentication {
 			}
 		}
 	}
-	$session{authentication}{available} = \@availableModules;
 	closedir(DIR);
 }
 

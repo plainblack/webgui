@@ -10,100 +10,114 @@ package WebGUI::Authentication::WebGUI;
 # http://www.plainblack.com			info@plainblack.com
 #-------------------------------------------------------------------
 
+use Digest::MD5;
 use strict;
 use WebGUI::Session;
 use WebGUI::Authentication;
 use WebGUI::HTMLForm;
-use Digest::MD5;
+
 
 #-------------------------------------------------------------------
-sub hasBadUserData {
-	return WebGUI::Operation::Account::_hasBadPassword($session{form}{identifier1},$session{form}{identifier2});
-}
-
-#-------------------------------------------------------------------
-sub validateUser {
+sub authenticate {
 	my ($userId, $identifier, $userData, $success);
-	($userId, $identifier) = @_;
-
+	$userId = $_[0]->[0];
+	$identifier = $_[0]->[1];
 	$userData = WebGUI::Authentication::getParams($userId, 'WebGUI');
 	if ((Digest::MD5::md5_base64($identifier) eq $$userData{identifier}) && ($identifier ne "")) {
 		$success = 1;
 	} else {
 		$success = WebGUI::International::get(68);
-		WebGUI::ErrorHandler::security("login to account ".$session{form}{username}." with invalid information.");
 	}
 	return $success;
 }
 
 
-#-------------------------------------------------------------------------
-# Below are the subs that create and save the forms used for inputting 
-# config data for this auth module. The 'form' and 'save' subs of each
-# from are so related that I've grouped by function. Apart from the 
-# 'save' and 'form' stuff the subs are still in alphabetical order though.
-#-------------------------------------------------------------------------
-
-
 #-------------------------------------------------------------------
-sub formAddUser {
+sub adminForm {
 	my $f;
-
 	$f = WebGUI::HTMLForm->new;
-	$f->readOnly("<b>WebGUI Authentication options</b>");
-	$f->password("identifier",WebGUI::International::get(51));
-	return $f->printRowsOnly;
-}
-
-#-------------------------------------------------------------------
-sub saveAddUser {
-	my $encryptedPassword;
-
-	$encryptedPassword = Digest::MD5::md5_base64($session{form}{identifier});
-	WebGUI::Authentication::saveParams($session{form}{uid},'WebGUI',{identifier => $encryptedPassword});
-}
-
-#-------------------------------------------------------------------
-sub formCreateAccount {
-	my $f;
-
-	$f = WebGUI::HTMLForm->new;
-	$f->password("identifier1",WebGUI::International::get(51));
-	$f->password("identifier2",WebGUI::International::get(55));
-	return $f->printRowsOnly;
-}
-
-#-------------------------------------------------------------------
-sub saveCreateAccount {
-	my ($encryptedPassword, $uid);
- 
-	$uid = shift;
-	$encryptedPassword = Digest::MD5::md5_base64($session{form}{identifier1});
-	WebGUI::Authentication::saveParams($uid, 'WebGUI', {identifier => $encryptedPassword});
-}
-
-#-------------------------------------------------------------------
-sub formEditUser {
-	my $f;
-
-	$f = WebGUI::HTMLForm->new;
-	$f->readOnly('<b>WebGUI Authentication Options</b>');
+	$f->readOnly('<b>'.optionsLabel().'</b>');
 	$f->password("identifier",WebGUI::International::get(51),"password");
+	return $f->printRowsOnly;
 }
 
 #-------------------------------------------------------------------
-sub saveEditUser {
-	my ($encryptedPassword);
-
-	if ($session{form}{identifier} ne "password") {
-		$encryptedPassword = Digest::MD5::md5_base64($session{form}{identifier});
-		WebGUI::Authentication::saveParams($session{form}{uid}, 'WebGUI', {identifier => $encryptedPassword});
+sub adminFormSave {
+	unless ($session{form}{identifier} eq "password") {
+		WebGUI::Authentication::saveParams($_[0],'WebGUI',{identifier => Digest::MD5::md5_base64($session{form}{identifier})});
 	}
 }
 
 #-------------------------------------------------------------------
-sub formEditUserSettings {
-	return '';
+sub adminFormValidate {
+	return "";
 }
 
+#-------------------------------------------------------------------
+sub optionsLabel {
+        return "WebGUI Authentication Options";
+}
+
+#-------------------------------------------------------------------
+sub registrationForm {
+	my $f;
+	$f = WebGUI::HTMLForm->new;
+	$f->password("identifier",WebGUI::International::get(51));
+	$f->password("identifierConfirm",WebGUI::International::get(55));
+	return $f->printRowsOnly;
+}
+
+#-------------------------------------------------------------------
+sub registrationFormSave {
+	adminFormSave($_[0]);
+}
+
+#-------------------------------------------------------------------
+sub registrationFormValidate {
+	my ($error);
+        if ($session{form}{identifier} ne $session{form}{identifierConfirm}) {
+                $error = '<li>'.WebGUI::International::get(78);
+        }
+        if ($session{form}{identifier} eq "password") {
+                $error .= '<li>'.WebGUI::International::get(727);
+        }
+        if ($session{form}{identifier} eq "") {
+                $error .= '<li>'.WebGUI::International::get(726);
+        }
+        return $error;
+}
+
+#-------------------------------------------------------------------
+sub settingsForm {
+	return "";
+}
+
+#-------------------------------------------------------------------
+sub userForm {
+        my $f;
+        $f = WebGUI::HTMLForm->new;
+        $f->password("identifier",WebGUI::International::get(51),"password");
+        $f->password("identifierConfirm",WebGUI::International::get(55),"password");
+        return $f->printRowsOnly;
+}
+
+#-------------------------------------------------------------------
+sub userFormSave {
+	adminFormSave($session{user}{userId});
+}
+
+#-------------------------------------------------------------------
+sub userFormValidate {
+        my ($error);
+        if ($session{form}{identifier} ne $session{form}{identifierConfirm}) {
+                $error = '<li>'.WebGUI::International::get(78);
+        }
+        if ($session{form}{identifier} eq "") {
+                $error .= '<li>'.WebGUI::International::get(726);
+        }
+        return $error;
+}
+
+
 1;
+

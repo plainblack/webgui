@@ -10,7 +10,6 @@ package WebGUI::Operation::User;
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
-use Digest::MD5 qw(md5_base64);
 use Exporter;
 use strict qw(vars subs);
 use Tie::CPHash;
@@ -56,8 +55,7 @@ sub _submenu {
 
 #-------------------------------------------------------------------
 sub www_addUser {
-        my (@array, $output, $groups, %hash, $f, $cmd, $html, %status);
-	tie %hash, 'Tie::IxHash';
+        my (@array, $output, $groups, $f, $cmd, $html, %status);
         return WebGUI::Privilege::adminOnly() unless (WebGUI::Privilege::isInGroup(3));
         $output .= helpIcon(5);
 	$output .= '<h1>'.WebGUI::International::get(163).'</h1>';
@@ -80,14 +78,9 @@ sub www_addUser {
         push(@array,7); #everyone
         $groups = WebGUI::SQL->buildHashRef("select groupId,groupName from groups where groupId not in (".join(",",@array).") order by groupName");
         $f->select("groups",$groups,WebGUI::International::get(605),[],5,1);
-	%hash = map {$_ => $_} @{$session{authentication}{available}};
-	$f->select("authMethod",\%hash,WebGUI::International::get(164),[$session{setting}{authMethod}]);
-
-	foreach (@{$session{authentication}{available}}) {
-              	$cmd = "WebGUI::Authentication::".$_."::formAddUser";
-              	$html = eval{&$cmd};
-               	WebGUI::ErrorHandler::fatalError("Unable to load method formAddUser on Authentication module: $_. ".$@) if($@);
-		$f->raw($html);
+	$f->select("authMethod",$session{authentication},WebGUI::International::get(164),[$session{setting}{authMethod}]);
+	foreach (keys %{$session{authentication}}) {
+		$f->raw(WebGUI::Authentication::adminForm(0,$_));
 	}
 	$f->submit;
 	$output .= $f->print;
@@ -104,13 +97,9 @@ sub www_addUserSave {
 		$u = WebGUI::User->new("new");
 		$session{form}{uid}=$u->userId;
 		$u->username($session{form}{username});
-
-		foreach (@{$session{authentication}{available}}) {
-        	       	$cmd = "WebGUI::Authentication::".$_."::saveAddUser";
-                	eval{&$cmd};
-                	WebGUI::ErrorHandler::fatalError("Unable to load method saveAddUser on Authentication module: $_. ".$@) if($@);
+		foreach (keys %{$session{authentication}}) {
+			WebGUI::Authentication::adminFormSave($u->userId,$_);
 	 	}
-		
 		$u->status($session{form}{status});
 		$u->authMethod($session{form}{authMethod});
                	@groups = $session{cgi}->param('groups');
@@ -180,6 +169,7 @@ sub www_deleteUserConfirm {
 		return WebGUI::Privilege::vitalComponent();
         } else {
 		$u = WebGUI::User->new($session{form}{uid});
+		WebGUI::Authentication::deleteParams($u->userId);
 		$u->delete;
                 return www_listUsers();
         }
@@ -215,7 +205,7 @@ sub www_editGroupingSave {
 #-------------------------------------------------------------------
 sub www_editUser {
 	return WebGUI::Privilege::adminOnly() unless (WebGUI::Privilege::isInGroup(3));
-        my ($output, $f, $u, $cmd, $html, %hash, %status);
+        my ($output, $f, $u, $cmd, $html, %status);
 	$u = WebGUI::User->new($session{form}{uid});
         $output .= helpIcon(5);
 	$output .= '<h1>'.WebGUI::International::get(168).'</h1>';
@@ -227,7 +217,6 @@ sub www_editUser {
         $f->readOnly(epochToHuman($u->dateCreated,"%z"),WebGUI::International::get(453));
         $f->readOnly(epochToHuman($u->lastUpdated,"%z"),WebGUI::International::get(454));
         $f->text("username",WebGUI::International::get(50),$u->username);
-
 	tie %status, 'Tie::IxHash';
 	%status = (
 		Active		=>WebGUI::International::get(817),
@@ -235,17 +224,10 @@ sub www_editUser {
 		Selfdestructed	=>WebGUI::International::get(819)
 		);
 	$f->select("status",\%status,WebGUI::International::get(816),[$u->status]);
-
-	%hash = map {$_ => $_} @{$session{authentication}{available}};	
-       	$f->select("authMethod",\%hash,WebGUI::International::get(164),[$session{setting}{authMethod}]);
-
-	foreach (@{$session{authentication}{available}}) {
-               	$cmd = "WebGUI::Authentication::".$_."::formEditUser";
-               	$html = eval{&$cmd};
-               	WebGUI::ErrorHandler::fatalError("Unable to load method formEditUser on Authentication module: $_. ".$@) if($@);
-		$f->raw($html);
+       	$f->select("authMethod",$session{authentication},WebGUI::International::get(164),[$session{setting}{authMethod}]);
+	foreach (keys %{$session{authentication}}) {
+		$f->raw(WebGUI::Authentication::adminForm($u->userId,$_));
  	}
-
         $f->submit;
 	$output .= $f->print;
 	return _submenu($output);
@@ -261,10 +243,8 @@ sub www_editUserSave {
 		$u->username($session{form}{username});
 		$u->authMethod($session{form}{authMethod});
 		$u->status($session{form}{status});
-		foreach (@{$session{authentication}{available}}) {
-                	$cmd = "WebGUI::Authentication::".$_."::saveEditUser";
-               		eval{&$cmd};
-               		WebGUI::ErrorHandler::fatalError("Unable to load method saveEditUser on Authentication module: $_. ".$@) if($@);
+		foreach (keys %{$session{authentication}}) {
+			WebGUI::Authentication::adminFormSave($u->userId,$_);
 	 	}
 	} else {
                 $error = '<ul><li>'.WebGUI::International::get(77).' '.$session{form}{username}.'Too or '.$session{form}{username}.'02</ul>';

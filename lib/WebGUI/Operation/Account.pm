@@ -10,9 +10,7 @@ package WebGUI::Operation::Account;
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
-use Digest::MD5 qw(md5_base64);
 use Exporter;
-use Net::LDAP;
 use strict qw(vars subs);
 use URI;
 use WebGUI::DateTime;
@@ -57,21 +55,6 @@ sub _accountOptions {
 		WebGUI::International::get(65).'</a>' if ($session{setting}{selfDeactivation});
 	$output .= '</ul></div>';
 	return $output;
-}
-
-#-------------------------------------------------------------------
-sub _hasBadPassword {
-	my ($error);
-	if ($_[0] ne $_[1]) {
-		$error = '<li>'.WebGUI::International::get(78);
-	} 
-	if ($_[0] eq "password") {
-		$error .= '<li>'.WebGUI::International::get(727);
-	}
-	if ($_[0] eq "") {
-		$error .= '<li>'.WebGUI::International::get(726);
-	}
-	return $error;
 }
 
 #-------------------------------------------------------------------
@@ -122,7 +105,7 @@ sub _validateProfileData {
 
 #-------------------------------------------------------------------
 sub www_createAccount {
-	my ($output, %language, @array, $cmd, $return,
+	my ($output, %language, @array,
         	$previousCategory, $category, $f, $a, %data, $default, $label, $values, $method);
         tie %data, 'Tie::CPHash';
 	if ($session{user}{userId} != 1) {
@@ -137,15 +120,7 @@ sub www_createAccount {
 		unless ($session{setting}{authMethod} ne "WebGUI" && $session{setting}{usernameBinding}) {
 			$f->text("username",WebGUI::International::get(50),$session{form}{username});
 		}
-		if ($session{setting}{authMethod} ne 'WebGUI') {
-			$f->text("loginId", 'loginName');
-		}
- 
-		$cmd = $session{authentication}{$session{setting}{authMethod}} . "::formCreateAccount";
-		$return = eval {&$cmd};
-               	WebGUI::ErrorHandler::fatalError("Unable to load method formCreateAccount on Authentication module: $session{setting}{authMethod}. ".$@) if($@);
-		$f->raw($return);
-
+		$f->raw(WebGUI::Authentication::registrationForm());
         	$a = WebGUI::SQL->read("select * from userProfileField,userProfileCategory 
 			where userProfileField.profileCategoryId=userProfileCategory.profileCategoryId 
 			order by userProfileCategory.sequenceNumber,userProfileField.sequenceNumber");
@@ -205,22 +180,14 @@ sub www_createAccountSave {
                 $username = $session{form}{username};
         }
 	$error = _hasBadUsername($username);
-
-	$cmd = $session{authentication}{$session{setting}{authMethod}} . '::hasBadUserData';
-	$error .= eval {&$cmd};
-	WebGUI::ErrorHandler::fatalError("Unable to load method hasBadUserData on Authentication module: $session{setting}{authMethod}. ".$@) if($@);
-
+	$error .= WebGUI::Authentication::registrationFormValidate();
 	($profile, $temp) = _validateProfileData();
 	$error .= $temp;
         if ($error eq "") {
 		$u = WebGUI::User->new("new");
 		$u->username($username);
 		$u->authMethod($session{setting}{authMethod});
-
-		$cmd = $session{authentication}{$session{setting}{authMethod}} . '::saveCreateAccount';
-		eval {&$cmd($u->userId)};
-               	WebGUI::ErrorHandler::fatalError("Unable to load method saveCreateAccount on Authentication module: $session{setting}{authMethod}. ".$@) if($@);
-
+		WebGUI::Authentication::registrationFormSave($u->userId);
 		$u->karma($session{setting}{karmaPerLogin},"Login","Just for logging in.") if ($session{setting}{useKarma});
 		foreach $fieldName (keys %{$profile}) {
 			$u->profileField($fieldName,${$profile}{$fieldName});
@@ -282,14 +249,7 @@ sub www_displayAccount {
 		} else {
         		$f->text("username",WebGUI::International::get(50),$session{user}{username});
 		}
-
-		if ($session{user}{authMethod} ne "WebGUI") {
-        		$f->hidden("identifier1","password");
-        		$f->hidden("identifier2","password");
-		} else {
-        		$f->password("identifier1",WebGUI::International::get(51),"password");
-        		$f->password("identifier2",WebGUI::International::get(55),"password");
-		}
+		$f->raw(WebGUI::Authentication::userForm());
 		$f->submit;
 		$output .= $f->print;
 		$output .= _accountOptions();
@@ -420,9 +380,7 @@ sub www_login {
 	if ($uid) {
 		$u = WebGUI::User->new($uid);
 		if ($u->status eq 'Active') {
-			$cmd = $session{authentication}{$u->authMethod}."::validateUser";
-			$success = eval{&$cmd($uid, $session{form}{identifier})};
-			WebGUI::ErrorHandler::fatalError("Unable to load method validateUser on Authentication module: $_. ".$@) if($@);
+			$success = WebGUI::Authentication::authenticate($uid,$session{form}{identifier},$u->authMethod);
 		} else {
 			$success = WebGUI::International::get(820);			
 		}
@@ -437,6 +395,7 @@ sub www_login {
 		return "";
 	} else {
 		_logLogin($uid, $success);
+		WebGUI::ErrorHandler::security("login to account ".$session{form}{username}." with invalid information.");
 		return "<h1>".WebGUI::International::get(70)."</h1>".$success.www_displayLogin();
 	}
 }
@@ -507,15 +466,14 @@ sub www_recoverPasswordFinish {
 sub www_updateAccount {
         my ($output, $error, $encryptedPassword, $passwordStatement, $u);
         if ($session{user}{userId} != 1) {
-        	if ($session{form}{identifier1} ne "password") {
-			$error = _hasBadPassword($session{form}{identifier1},$session{form}{identifier2});
-		}
+		$error = WebGUI::Authentication::userFormValidate();
 		$error .= _hasBadUsername($session{form}{username});
         	if ($error eq "") {
 			$u = WebGUI::User->new($session{user}{userId});
-			$u->identifier(Digest::MD5::md5_base64($session{form}{identifier1})) if ($session{form}{identifier1} ne "password");
 			$u->username($session{form}{username});
-                	$output .= WebGUI::International::get(81).'<p>';
+			WebGUI::Authentication::userFormSave();
+                	$output .= '<li>'.WebGUI::International::get(81).'<p>';
+			WebGUI::Session::refreshUserInfo($u->userId);
         	} else {
                 	$output = $error;
         	}
