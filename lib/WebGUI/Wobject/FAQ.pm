@@ -33,9 +33,7 @@ sub duplicate {
         $w = $_[0]->SUPER::duplicate($_[1]);
 	$w = WebGUI::Wobject::FAQ->new({wobjectId=>$w,namespace=>$namespace});
 	$w->set({
-		topOn=>$_[0]->get("topOn"),
-		tocOn=>$_[0]->get("tocOn"),
-		qaOn=>$_[0]->get("qaOn")
+		templateId=>$_[0]->get("templateId")
 		});
         $sth = WebGUI::SQL->read("select * from FAQ_question where wobjectId=".$_[0]->get("wobjectId"));
         while (%data = $sth->hash) {
@@ -179,9 +177,8 @@ sub www_moveQuestionUp {
 
 #-------------------------------------------------------------------
 sub www_view {
-	my (%question, $output, $controls, $sth, %var, @qa, @toc);
+	my (%question, $controls, $sth, %var, @qa, @toc);
 	tie %question,'Tie::CPHash';
-	$output = $_[0]->displayTitle;
 	if ($session{var}{adminOn}) {
 		$var{addquestion} .= '<a href="'.WebGUI::URL::page('func=editQuestion&wid='.$_[0]->get("wobjectId")).'">'
 			.WebGUI::International::get(9,$namespace).'</a>';
@@ -209,7 +206,7 @@ sub www_view {
 	$sth->finish;
 	$var{toc_loop} = \@toc;
 	$var{qa_loop} = \@qa;
-	return $_[0]->processMacros($output.$_[0]->processTemplate($_[0]->get("templateId"),\%var));
+	return $_[0]->processMacros($_[0]->displayTitle.$_[0]->processTemplate($_[0]->get("templateId"),\%var));
 }
 
 
