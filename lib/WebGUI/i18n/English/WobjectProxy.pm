@@ -54,7 +54,7 @@ our $I18N = {
 <p>
 
 <b>Wobject To Proxy</b><br>
-Provides a link to the orignal wobject being proxied.
+Provides a link to the original wobject being proxied.
 <p>
 
 <b>Override title?</b><br>
@@ -89,7 +89,7 @@ A property or value must be quoted if it contains spaces. Feel free to use the c
 <b>NOTE:</b> Wobject Proxy will automatically add a template variable to the wobject it's proxying called 'original.page.url'. You can use that to link to the original content that's being proxied.
 <p>
 |,
-		lastUpdated => 1053183804
+		lastUpdated => 1101795461,
 	},
 
 	'greater than' => {
