@@ -55,12 +55,12 @@ sub _seeAlso {
 sub www_viewHelp {
 	my $namespace = $session{form}{namespace} || "WebGUI";
 	my $help = _get($session{form}{hid},$namespace);
-        my $output = '<h1>'.WebGUI::International::get(93).': '.WebGUI::International::get($help->{title},$namespace).'</h1>';
+    my $output = '<h1>'.WebGUI::International::get(93).': '.WebGUI::International::get($help->{title},$namespace).'</h1>';
 	$output .= WebGUI::International::get($help->{body},$namespace);
 	$output .= '<p><b>'.WebGUI::International::get(94).':<ul>';
 	$output .= _seeAlso($help->{related},$namespace);
-        $output .= '<li><a href="'.WebGUI::URL::page('op=viewHelpIndex').'">'.WebGUI::International::get(95).'</a></ul>';
-        return WebGUI::Macro::negate($output);
+    $output .= '<li><a href="'.WebGUI::URL::page('op=viewHelpIndex').'">'.WebGUI::International::get(95).'</a></ul></b>';
+    return WebGUI::Macro::negate($output);
 }
 
 #-------------------------------------------------------------------
