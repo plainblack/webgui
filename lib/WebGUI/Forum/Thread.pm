@@ -419,6 +419,7 @@ sub setLastPost {
 		lastPostId=>$postId,
 		lastPostDate=>$postDate
 		});
+	$self->getForum->setLastPost($postDate,$postId);
 }
 
 #-------------------------------------------------------------------
