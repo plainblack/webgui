@@ -50,10 +50,13 @@ use WebGUI::Utility;
  $url = 	$attachment->getURL;
  $boolean = 	$attachment->isImage;
  $attachment->copy("files","10");
+ $attachment->createThumbnail;
  $attachment->delete;
  $attachment->deleteNode;
  $attachment->rename("thisfile.txt");
- $attachment->save("formImage");
+ $attachment->resizeImage(300);
+ $filename = $attachment->save("formImage");
+ $filename = $attachment->saveFromFilesystem($pathToFile);
 
 =head1 DESCRIPTION
  
@@ -65,47 +68,6 @@ use WebGUI::Utility;
 
 =cut
 
-
-#-------------------------------------------------------------------
-sub _createThumbnail {
-	my ($image, $error, $x, $y, $r, $n);
-        if ($hasImageMagick && $_[0]->isImage) {
-		$image = Image::Magick->new;
-		$error = $image->Read($_[0]->getPath);
-		WebGUI::ErrorHandler::warn("Couldn't read image for thumnail creation: ".$error) if $error;
-		($x, $y) = $image->Get('width','height');
-		$n = $_[1] || $session{setting}{thumbnailSize};
-		if ($x > $n || $y > $n) {
-			$r = $x>$y ? $x / $n : $y / $n;
-			$image->Scale(width=>($x/$r),height=>($y/$r));
-		}
-		if (isIn($_[0]->getType, qw(tif tiff bmp))) {
-			$error = $image->Write($_[0]->{_node}->getPath.'/thumb-'.$_[0]->getFilename.'.png');
-		} else {
-			$error = $image->Write($_[0]->{_node}->getPath.'/thumb-'.$_[0]->getFilename);
-		}
-		WebGUI::ErrorHandler::warn("Couldn't create thumbnail: ".$error) if $error;
-	}
-}
-
-
-#-------------------------------------------------------------------
-sub _resizeImage {
-        my ($image, $error, $x, $y, $r, $n);
-        if ($hasImageMagick && isIn($_[0]->getType, qw(jpg jpeg gif png))) {
-                $image = Image::Magick->new;
-                $error = $image->Read($_[0]->getPath);
-                WebGUI::ErrorHandler::warn("Couldn't read image for resizing: ".$error) if $error;
-                ($x, $y) = $image->Get('width','height');
-                $n = $_[1] || $session{setting}{maxImageSize};
-		if ($x > $n || $y > $n) {
-                	$r = $x>$y ? $x / $n : $y / $n;
-                	$image->Scale(width=>($x/$r),height=>($y/$r));
-                	$error = $image->Write($_[0]->getPath);
-                	WebGUI::ErrorHandler::warn("Couldn't resize image: ".$error) if $error;
-		}
-        }       
-}               
 
 #-------------------------------------------------------------------
 
@@ -173,6 +135,41 @@ sub copy {
                 	$a->close;
         	}
 	}
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 createThumbnail ( [ thumbnailSize ] )
+
+ Generates a thumbnail for this attachment.
+
+=item thumbnailSize
+
+ Defaults to the global setting for thumbnail size. However, it
+ can be overriden with this value. Specified in pixels.
+
+=cut
+
+sub createThumbnail {
+        my ($image, $error, $x, $y, $r, $n);
+        if ($hasImageMagick && $_[0]->isImage) {
+                $image = Image::Magick->new;
+                $error = $image->Read($_[0]->getPath);
+                WebGUI::ErrorHandler::warn("Couldn't read image for thumnail creation: ".$error) if $error;
+                ($x, $y) = $image->Get('width','height');
+                $n = $_[1] || $session{setting}{thumbnailSize};
+                if ($x > $n || $y > $n) {
+                        $r = $x>$y ? $x / $n : $y / $n;
+                        $image->Scale(width=>($x/$r),height=>($y/$r));
+                }
+                if (isIn($_[0]->getType, qw(tif tiff bmp))) {
+                        $error = $image->Write($_[0]->{_node}->getPath.'/thumb-'.$_[0]->getFilename.'.png');
+                } else {
+                        $error = $image->Write($_[0]->{_node}->getPath.'/thumb-'.$_[0]->getFilename);
+                }
+                WebGUI::ErrorHandler::warn("Couldn't create thumbnail: ".$error) if $error;
+        }
 }
 
 
@@ -448,6 +445,38 @@ sub rename {
 
 #-------------------------------------------------------------------
 
+=head2 resizeImage ( [ imageSize ] )
+
+ Resizes this attachment to the specified size. Use this method only
+ if the attachment is an image.
+
+=item imageSize
+
+ Defaults to the max image size setting. Specify a value in pixels
+ to resize this image to.
+
+=cut
+
+sub resizeImage {
+        my ($image, $error, $x, $y, $r, $n);
+        if ($hasImageMagick && isIn($_[0]->getType, qw(jpg jpeg gif png))) {
+                $image = Image::Magick->new;
+                $error = $image->Read($_[0]->getPath);
+                WebGUI::ErrorHandler::warn("Couldn't read image for resizing: ".$error) if $error;
+                ($x, $y) = $image->Get('width','height');
+                $n = $_[1] || $session{setting}{maxImageSize};
+                if ($x > $n || $y > $n) {
+                        $r = $x>$y ? $x / $n : $y / $n;
+                        $image->Scale(width=>($x/$r),height=>($y/$r));
+                        $error = $image->Write($_[0]->getPath);
+                        WebGUI::ErrorHandler::warn("Couldn't resize image: ".$error) if $error;
+                }
+        }
+}
+
+
+#-------------------------------------------------------------------
+
 =head2 save ( formVariableName [, thumbnailSize, imageSize ] )
 
  Grabs an attachment from a form POST and saves it to a node. It 
@@ -498,8 +527,8 @@ sub save {
         			print $file $buffer;
 			}
 			close($file);
-			_createThumbnail($_[0],$_[2]);
-			_resizeImage($_[0],$_[3]);
+			$_[0]->createThumbnail($_[2]);
+			$_[0]->resizeImage($_[3]);
 		} else {
 			WebGUI::ErrorHandler::warn("Couldn't open file ".$_[0]->getPath." for writing due to error: ".$!);
 			$_[0]->{_filename} = "";
@@ -510,6 +539,75 @@ sub save {
 		return "";
 	}
 }
+
+#-------------------------------------------------------------------
+
+=head2 saveFromFilesystem ( pathToFile [, thumbnailSize, imageSize ] )
+
+ Grabs an attachment from the server's file system and saves it to a node. It
+ then returns the filename of the attachment.
+
+=item pathToFile 
+
+ Provide the local path to this file.
+
+=item thumbnailSize
+
+ If an image is being grabbed a thumbnail will be generated
+ automatically. By default, WebGUI will create a thumbnail of the
+ size specified in the file settings. You can override that
+ size by specifying one here. Size is measured in pixels of the
+ longest side.
+
+=item imageSize
+
+ If a web image (gif, png, jpg, jpeg) is being grabbed it will be
+ resized if it is larger than this value. By default images are
+ resized to stay within the contraints of the Max Image Size
+ setting in the file settings.
+
+=cut
+
+sub saveFromFilesystem {
+        my ($type, $a, $b, $filename, $bytesread, $buffer, $urlizedFilename, $path);
+        $filename = $_[1];
+        if (defined $filename) {
+                if ($filename =~ /([^\/\\]+)$/) {
+                        $_[0]->{_filename} = $1;
+                } else {
+                        $_[0]->{_filename} = $filename;
+                }
+                if (isIn($_[0]->getType, qw(pl perl sh cgi php asp))) {
+                        $_[0]->{_filename} =~ s/\./\_/g;
+                        $_[0]->{_filename} .= ".txt";
+                }
+                $_[0]->{_filename} = WebGUI::URL::makeCompliant($_[0]->getFilename);
+                $_[0]->{_node}->create();
+		$a = FileHandle->new($_[1],"r");
+                if (defined $a) {
+                       	binmode($a);
+                	$b = FileHandle->new(">".$_[0]->getPath);
+			if (defined $b) {
+                        	binmode($b);
+                        	cp($a,$b);
+                        	$b->close;
+                        	$_[0]->createThumbnail($_[2]);
+                        	$_[0]->resizeImage($_[3]);
+                	} else {
+                        	WebGUI::ErrorHandler::warn("Couldn't open file ".$_[0]->getPath." for writing due to error: ".$!);
+                        	$_[0]->{_filename} = "";
+			}
+                       	$a->close;
+		} else {
+                       	WebGUI::ErrorHandler::warn("Couldn't open file ".$_[1]." for reading due to error: ".$!);
+                       	$_[0]->{_filename} = "";
+                }
+        } else {
+                $_[0]->{_filename} = "";
+        }
+        return $_[0]->getFilename;
+}
+
 
 
 1;
