@@ -49,7 +49,6 @@ The total number of votes that this answer has received.
 
 </blockquote>
 
-
 <b>form.submit</b><br>
 The submit button for the poll form.
 <p>
@@ -81,31 +80,33 @@ The total number of votes that have been placed on this poll.
 	},
 
 	'71' => {
-		message => q|Polls can be used to get the impressions of your users on various topics.
-<br><br>
+		message => q|Polls can be used to get the impressions of your users on various topics.  Polls are Wobjects and Assets so they have the basic properties of both of those.  Polls also have these unique properties:
+<p>
 <b>Active</b><br>
 If this box is checked, then users will be able to vote. Otherwise they'll only be able to see the results of the poll.
-<br><br>
+<p>
 
 <b>Who can vote?</b><br>
-Choose a group that can vote on this Poll.
-<br><br>
+Choose a group that can vote on this Poll.  The default group is Everyone.
+<p>
 
 <b>Karma Per Vote</b><br>
-How much karma should be given to a user when they vote?
+How much karma should be given to a user when they vote?  This option is only
+available if karma is enabled in the settings.  The default amount is 0.
 <p>
 
 <b>Graph Width</b><br>
-The width of the poll results graph. The width is measured in pixels.
-<br><br>
+The width of the poll results graph. The width is measured in pixels.  The default
+width is 150 pixels.
+<p>
 
 <b>Question</b><br>
 What is the question you'd like to ask your users?
-<br><br>
+<p>
 
 <b>Answers</b><br>
 Enter the possible answers to your question. Enter only one answer per line. Polls are only capable of 20 possible answers.
-<br><br>
+<p>
 
 <b>Randomize answers?</b><br>
 In order to be sure that the ordering of the answers in the poll does not bias your users, it is often helpful to present the options in a random order each time they are shown. Select "yes" to randomize the answers on the poll.
@@ -113,9 +114,9 @@ In order to be sure that the ordering of the answers in the poll does not bias y
 
 <b>Reset votes?</b><br>
 Reset the votes on this Poll.  This option is only available when editing an existing Poll.
-<br><br>
+<p>
 |,
-		lastUpdated => 1102229887,
+		lastUpdated => 1109998278,
 	},
 
 	'3' => {
