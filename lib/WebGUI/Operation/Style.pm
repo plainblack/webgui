@@ -45,6 +45,7 @@ sub _submenu {
 sub www_copyStyle {
         return WebGUI::Privilege::insufficient unless (WebGUI::Privilege::isInGroup(5));
 	my (%style);
+	tie %style, 'Tie::CPHash';
 	%style = WebGUI::SQL->quickHash("select * from style where styleId=$session{form}{sid}");
         WebGUI::SQL->write("insert into style (styleId,name,body,styleSheet) values (".getNextId("styleId").", 
 		".quote('Copy of '.$style{name}).", ".quote($style{body}).", ".quote($style{styleSheet}).")");
