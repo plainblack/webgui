@@ -6,6 +6,11 @@ our $I18N = {
 		lastUpdated => 1057208065
 	},
 
+	'91' => {
+		message => q|Delete all entries.|,
+		lastUpdated => 1110780333,
+	},
+
 	'21' => {
 		message => q|Field Name|,
 		lastUpdated => 1031514049
@@ -232,6 +237,11 @@ Enter the default value (if any) for the field.  For Yes/No fields, enter "yes" 
 
 <b>canEdit</b>
 A conditional indicating whether the current user has the privileges to edit this Data Form.
+<p>
+
+<b>entryId</b>
+The ID of the current entry being viewed.  This variable is undefined
+unless the user can edit the Data Form (<b>canEdit</b> it true).
 <p>
 
 <b>form.start</b> !<br>
