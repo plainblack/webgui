@@ -8,6 +8,8 @@
  - Bugfix [ 859199 ] Login problem
  - Bugfix [ 852930 ] Pieces of Collateral Statistic always zero. Thanks to ajaman.
  - Bugfix [ 854124 ] Can't reply to discussion message for USS submission.
+ - Fixed a bug in form processor that caused legal email addy's with funny
+   characters to fail the check.
 
 
 5.5.3
