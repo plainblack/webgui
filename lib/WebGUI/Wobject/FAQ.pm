@@ -99,7 +99,7 @@ sub www_deleteQuestionConfirm {
         if (WebGUI::Privilege::canEditPage()) {
 		WebGUI::SQL->write("delete from FAQ_question where questionId=$session{form}{qid}");
 		_reorderQuestions($_[0]->get("wobjectId"));
-                return $_[0]->www_edit();
+                return "";
         } else {
                 return WebGUI::Privilege::insufficient();
         }
@@ -107,7 +107,7 @@ sub www_deleteQuestionConfirm {
 
 #-------------------------------------------------------------------
 sub www_edit {
-        my ($f, $output, @question, $sth, $proceed);
+        my ($f, $output, $proceed);
         if (WebGUI::Privilege::canEditPage()) {
                 if ($_[0]->get("wobjectId") eq "new") {
                         $proceed = 1;
@@ -117,23 +117,6 @@ sub www_edit {
 		$f = WebGUI::HTMLForm->new;
 		$f->yesNo("proceed",WebGUI::International::get(1,$namespace),$proceed);
 		$output = $_[0]->SUPER::www_edit($f->printRowsOnly);
-		unless ($_[0]->get("wobjectId") eq "new") {
-                	$output .= '<p><a href="'.WebGUI::URL::page('func=editQuestion&wid='.$_[0]->get("wobjectId"))
-				.'">'.WebGUI::International::get(9,$namespace).'</a><p>';
-                	$output .= '<table border=1 cellpadding=3 cellspacing=0>';
-			$sth = WebGUI::SQL->read("select questionId,question from FAQ_question where wobjectId="
-				.$_[0]->get("wobjectId")." order by sequenceNumber");
-			while (@question = $sth->array) {
-                		$output .= '<tr><td>'
-					.editIcon('func=editQuestion&wid='.$_[0]->get("wobjectId").'&qid='.$question[0])
-					.deleteIcon('func=deleteQuestion&wid='.$_[0]->get("wobjectId").'&qid='.$question[0])
-					.moveUpIcon('func=moveQuestionUp&wid='.$_[0]->get("wobjectId").'&qid='.$question[0])
-					.moveDownIcon('func=moveQuestionDown&wid='.$_[0]->get("wobjectId").'&qid='.$question[0])
-					.'</td><td>'.$question[1].'</td><tr>';
-			}
-			$sth->finish;
-                	$output .= '</table>';
-		}
                 return $output;
         } else {
                 return WebGUI::Privilege::insufficient();
@@ -194,7 +177,7 @@ sub www_editQuestionSave {
 			$session{form}{qid} = "new";
 			return $_[0]->www_editQuestion();
 		} else {
-                	return $_[0]->www_edit();
+                	return "";
 		}
         } else {
                 return WebGUI::Privilege::insufficient();
@@ -211,7 +194,7 @@ sub www_moveQuestionDown {
                         WebGUI::SQL->write("update FAQ_question set sequenceNumber=sequenceNumber+1 where questionId=$session{form}{qid}");
                         WebGUI::SQL->write("update FAQ_question set sequenceNumber=sequenceNumber-1 where questionId=$data[0]");
                 }
-                return $_[0]->www_edit();
+                return "";
         } else {
                 return WebGUI::Privilege::insufficient();
         }
@@ -227,7 +210,7 @@ sub www_moveQuestionUp {
                         WebGUI::SQL->write("update FAQ_question set sequenceNumber=sequenceNumber-1 where questionId=$session{form}{qid}");
                         WebGUI::SQL->write("update FAQ_question set sequenceNumber=sequenceNumber+1 where questionId=$data[0]");
                 }
-                return $_[0]->www_edit();
+                return "";
         } else {
                 return WebGUI::Privilege::insufficient();
         }
@@ -235,14 +218,26 @@ sub www_moveQuestionUp {
 
 #-------------------------------------------------------------------
 sub www_view {
-	my (@question, $output, $sth, $qNa);
+	my (%question, $output, $sth, $qNa);
+	tie %question,'Tie::CPHash';
 	$output = $_[0]->displayTitle;
 	$output .= $_[0]->description;
+	if ($session{var}{adminOn}) {
+		$output .= '<a href="'.WebGUI::URL::page('func=editQuestion&wid='.$_[0]->get("wobjectId")).'">'
+			.WebGUI::International::get(9,$namespace).'</a>';
+	}
 	$output .= '<ul>';
-	$sth = WebGUI::SQL->read("select questionId,question,answer from FAQ_question where wobjectId=".$_[0]->get("wobjectId")." order by sequenceNumber");
-	while (@question = $sth->array) {
-		$output .= '<li><a href="#'.$question[0].'"><span class="faqQuestion">'.$question[1].'</span></a>';
-		$qNa .= '<a name="'.$question[0].'"><span class="faqQuestion">'.$question[1].'</span></a><br>'.$question[2].'<p>';
+	$sth = WebGUI::SQL->read("select * from FAQ_question where wobjectId=".$_[0]->get("wobjectId")." order by sequenceNumber");
+	while (%question = $sth->hash) {
+		$output .= '<li><a href="#'.$question{questionId}.'"><span class="faqQuestion">'.$question{question}.'</span></a>';
+		if ($session{var}{adminOn}) {
+			$qNa .= deleteIcon('func=deleteQuestion&wid='.$_[0]->get("wobjectId").'&qid='.$question{questionId})
+				.editIcon('func=editQuestion&wid='.$_[0]->get("wobjectId").'&qid='.$question{questionId})
+				.moveUpIcon('func=moveQuestionUp&wid='.$_[0]->get("wobjectId").'&qid='.$question{questionId})
+				.moveDownIcon('func=moveQuestionDown&wid='.$_[0]->get("wobjectId").'&qid='.$question{questionId})
+				.' ';
+		}
+		$qNa .= '<a name="'.$question{questionId}.'"><span class="faqQuestion">'.$question{question}.'</span></a><br>'.$question{answer}.'<p>';
 	}
 	$sth->finish;
 	$output .= '</ul>'.$qNa;
