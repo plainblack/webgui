@@ -303,7 +303,7 @@ sub file {
 	$subtext = shift;
         $extras = shift;
         $size = shift || $session{setting}{textBoxSize} || 30;
-        $output = '<input type="file" name="'.$name.'" size="'..'" '.$extras.'>';
+        $output = '<input type="file" name="'.$name.'" size="'.$size.'" '.$extras.'>';
 	$output .= _subtext($subtext);
         $output = _tableFormRow($label,$output);
 	$class->{_data} .= $output;
@@ -473,19 +473,29 @@ sub HTMLArea {
         $output = '<script language="JavaScript">function fixChars(element) {element.value = element.value.replace(/~V/mg,"-");}</script>';
         $value =~ s/\</\&lt\;/g;
         $value =~ s/\>/\&gt\;/g;
-        $output .= '<script language="JavaScript">
-               var formObj;
-               var extrasDir="'.$session{setting}{lib}.'";
-               function openEditWindow(obj) {
-               formObj = obj;
-               if (navigator.userAgent.substr(navigator.userAgent.indexOf("MSIE")+5,1)>=5)
-                 window.open("'.$session{setting}{lib}.'/ieEdit.html","editWindow","width=490,height=400,resizable=1");
-               else
-                 window.open("'.$session{setting}{lib}.'/nonIeEdit.html","editWindow","width=500,height=410");
-               }
-               function setContent(content) {
-                 formObj.value = content;
-               } </script>';
+	if ($session{setting}{richEditor} eq "edit-on-pro") {
+		$output .= '<script language="JavaScript">
+			var formObj;
+			function openEditWindow(obj) {
+	                	formObj = obj;
+				window.open("'.$session{setting}{lib}.'/eopro.html","editWindow","width=720,height=450,resizable=1");
+			}
+			</script>';
+	} else {
+	        $output .= '<script language="JavaScript">
+        	       var formObj;
+	               var extrasDir="'.$session{setting}{lib}.'";
+        	       function openEditWindow(obj) {
+	               formObj = obj;
+        	       if (navigator.userAgent.substr(navigator.userAgent.indexOf("MSIE")+5,1)>=5)
+                	 window.open("'.$session{setting}{lib}.'/ieEdit.html","editWindow","width=490,height=400,resizable=1");
+	               else
+        	         window.open("'.$session{setting}{lib}.'/nonIeEdit.html","editWindow","width=500,height=410");
+	               }
+        	       function setContent(content) {
+                	 formObj.value = content;
+	               } </script>';
+	}
         $output .= '<input type="button" onClick="openEditWindow(this.form.'.$name.')" value="'.
         	WebGUI::International::get(171).'" style="font-size: 8pt;"><br>';
         $output .= '<textarea name="'.$name.'" cols="'.$columns.'" rows="'.$rows.'" wrap="'.$wrap.

@@ -49,6 +49,7 @@ use WebGUI::Utility;
  $attachment->getThumbnail;
  $attachment->getType;
  $attachment->getURL;
+ $attachment->rename("thisfile.txt");
  $attachment->save("formImage");
 
 =head1 DESCRIPTION
@@ -302,6 +303,24 @@ sub new {
 	my ($class, $filename, $node, $nodeSub) = @_;
 	$node = WebGUI::Node->new($node, $nodeSub);
 	bless {_node => $node, _filename => $filename}, $class;
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 rename ( newFilename )
+
+ Renames an attachment's filename.
+
+=item newFilename
+
+ Define the new filename for this attachment.
+
+=cut
+
+sub rename {
+	rename $_[0]->getPath, $_[0]->{_node}->getPath.'/'.$_[1];
+	$_[0]->{_filename} = $_[1];
 }
 
 

@@ -165,10 +165,11 @@ sub www_editMailSettingsSave {
 
 #-------------------------------------------------------------------
 sub www_editMiscSettings {
-        my ($output, %notFoundPage, %criticalError, %htmlFilter, $f);
+        my ($output, %notFoundPage, %criticalError, %htmlFilter, %editor, $f);
 	%htmlFilter = ('none'=>WebGUI::International::get(420), 'most'=>WebGUI::International::get(421), 'all'=>WebGUI::International::get(419));
 	%criticalError = ('debug'=>WebGUI::International::get(414), 'friendly'=>WebGUI::International::get(415));
         %notFoundPage = (1=>WebGUI::International::get(136), 4=>WebGUI::International::get(137));
+ 	%editor = ('built-in'=>WebGUI::International::get(495), 'edit-on-pro'=>WebGUI::International::get(494));
         if (WebGUI::Privilege::isInGroup(3)) {
                 $output .= helpIcon(24);
                 $output .= '<h1>'.WebGUI::International::get(140).'</h1>';
@@ -183,6 +184,7 @@ sub www_editMiscSettings {
                 $f->integer("textAreaRows",WebGUI::International::get(463),$session{setting}{textAreaRows});
                 $f->integer("textAreaCols",WebGUI::International::get(464),$session{setting}{textAreaCols});
                 $f->integer("textBoxSize",WebGUI::International::get(465),$session{setting}{textBoxSize});
+                $f->select("richEditor",\%editor,WebGUI::International::get(496),[$session{setting}{richEditor}]);
 		$f->submit;
 		$output .= $f->print;
         } else {
@@ -203,6 +205,7 @@ sub www_editMiscSettingsSave {
 		_saveSetting("textAreaRows");
 		_saveSetting("textAreaCols");
 		_saveSetting("textBoxSize");
+		_saveSetting("richEditor");
                 return www_manageSettings(); 
         } else {
                 return WebGUI::Privilege::adminOnly();
