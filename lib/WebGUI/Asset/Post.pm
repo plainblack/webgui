@@ -331,11 +331,11 @@ sub getStatus {
 	my $self = shift;
 	my $status = $self->get("status");
         if ($status eq "approved") {
-                return "Approved";
+                return WebGUI::International::get('approved','Post');
         } elsif ($status eq "denied") {
-                return "Denied";
+                return WebGUI::International::get('denied','Post');
         } elsif ($status eq "pending") {
-                return "Pending";
+                return WebGUI::International::get('pending','Post');
         }
 }
 

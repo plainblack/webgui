@@ -231,8 +231,71 @@ URLs that are used to rate this post.  N goes from 1 to 5.
 A conditional that is true if the user has already rated this Post.
 <p>
 
+<b>attachment_loop</b><br>
+A loop containing all file and image attachments to this Post.
+<p>
+
+<blockquote>
+
+<b>url</b><br>
+The URL to download this attachment.
+<p>
+
+<b>icon</b><br>
+The icon representing the file type of this attachment.
+<p>
+
+<b>filename</b><br>
+The name of this attachment.
+<p>
+
+<b>thumbnail</b><br>
+A thumbnail of this attachment, if applicable.
+<p>
+
+<b>isImage</b><br>
+A conditional indicating whether this attachment is an image.
+<p>
+
+<b>image.url</b><br>
+The URL to the image.
+<p>
+
+<b>image.thumbnail</b><br>
+A thumbnail for the image.
+<p>
+
+<b>attachment.url</b><br>
+The URL to download the attachment.
+<p>
+
+<b>attachment.icon</b><br>
+An icon showing the file type of this attachment.
+<p>
+
+<b>attachment.name</b><br>
+The name of this attachment.
+<p>
+
+</blockquote>
+
 |,
-		lastUpdated => 1111446222,
+		lastUpdated => 1111447237,
+	},
+
+	'approved' => {
+		message => q|Approved|,
+		lastUpdated => 1031514049,
+	},
+
+	'denied' => {
+		message => q|Denied|,
+		lastUpdated => 1031514049
+	},
+
+	'pending' => {
+		message => q|Pending|,
+		lastUpdated => 1031514049
 	},
 
 
