@@ -23,6 +23,20 @@ print "\tDeleting old templates\n" unless ($quiet);
 my $asset = WebGUI::Asset->newByDynamicClass("PBtmpl0000000000000035");
 $asset->purge;
 
+#--------------------------------------------
+print "\tUpdating config file.\n" unless ($quiet);
+my $pathToConfig = '../../etc/'.$configFile;
+my $conf = Parse::PlainConfig->new('DELIM' => '=', 'FILE' => $pathToConfig, 'PURGE'=>1);
+my %newConfig;
+foreach my $key ($conf->directives) {
+	unless ($key eq "logfile" || $key eq "passwordChangeLoggingEnabled" || $key eq "emailRecoveryLoggingEnabled") {
+		$newConfig{$key} = $conf->get($key);
+	}
+}
+$conf->purge;
+$conf->set(%newConfig);
+$conf->write;
+
 
 WebGUI::Session::close();
 

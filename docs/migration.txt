@@ -349,3 +349,10 @@ In 6.3 the template system has been replaced in favor of the new template
 asset. Please see WebGUI::Asset::Template for details.
 
 
+5.17 WebGUI::ErrorHandler API Changed
+
+In 6.6 we brought log4perl to bear on our debuging and logging needs. This had
+a slight impact on the WebGUI::ErrorHandler API. Although there are many
+changes, the only thing anyone should notice is that fatalError() was renamed
+to fatal().
+

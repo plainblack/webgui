@@ -67,9 +67,7 @@ sub _isValidPassword {
 =cut
 
 sub _logSecurityMessage {
-   if($session{config}{passwordChangeLoggingEnabled}) {
-      WebGUI::ErrorHandler::security("change password.  Password changed successfully");
-   }
+    WebGUI::ErrorHandler::security("change password.  Password changed successfully");
 }
 
 #-------------------------------------------------------------------
@@ -535,9 +533,7 @@ sub recoverPasswordFinish {
    	   $encryptedPassword = Digest::MD5::md5_base64($password);
 	   $self->saveParams($userId,"WebGUI",{identifier=>$encryptedPassword});
 	   _logSecurityMessage();
-	   if($session{config}{emailRecoveryLoggingEnabled}) {
-	      WebGUI::ErrorHandler::security("recover a password.  Password emailed to: ".$session{form}{email});
-	   }
+	   WebGUI::ErrorHandler::security("recover a password.  Password emailed to: ".$session{form}{email});
 	   $message = $session{setting}{webguiRecoverPasswordEmail};
 	   $message .= "\n".WebGUI::International::get(50).": ".$username."\n";
 	   $message .= WebGUI::International::get(51).": ".$password."\n";

@@ -28,8 +28,6 @@ dsn = DBI:mysql:www_example_com
 dbuser = webgui
 dbpass = password
 
-logfile = /var/log/webgui.log
-
 extrasURL = /extras
 extrasPath = /data/WebGUI/www/extras
 
@@ -43,9 +41,6 @@ uploadsPath = /data/WebGUI/www/uploads
 templateCacheType=file
 
 passiveProfileInterval = 86400	# in seconds
-
-emailRecoveryLoggingEnabled = 1
-passwordChangeLoggingEnabled = 1
 
 paymentPlugins = ITransact
 

@@ -13,8 +13,8 @@ save you many hours of grief.
 	to be installed on your system manually. You can optionally
 	just use the WebGUI runtime environment to save yourself
 	the hassle of downloading all of them. You can also install
-	them using testEnvironment.pl --install-modules
-	The new modules you'll need to install are:
+	them using testEnvironment.pl The new modules you'll need 
+	to install are:
 
 	Net::LDAP
 	Date::Manip
@@ -23,13 +23,16 @@ save you many hours of grief.
 	HTML::TagFilter
 	HTML::Template
 	Parse::PlainConfig	
-	HTTP::BrowserDetect
-	Parse::RecDescent
-	Text::Balanced
 	Tie::IxHash
 	Tie::CPHash
 	XML::RSSLite
 	XML::Simple
+
+ * After upgrading you'll need to create a log.conf file in your etc
+	folder for the new logger. For most situations you can just copy 
+	log.conf.original to log.conf and you'll be fine. If you want
+	to set up custom logging rules, see this web page:
+	http://log4perl.sourceforge.net/releases/Log-Log4perl/docs/html/Log/Log4perl/Config.html
 
 
 6.5.0
