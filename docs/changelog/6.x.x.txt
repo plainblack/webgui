@@ -99,7 +99,7 @@
    database
  - bugfix [ 991782 ] More Fault Tolerent upgrade_5.9.9-6.0.0.pl
  - Minor performance enhancements to Navigation system.
-
+ - Fixes to online help content. (Colin Kuskie)
 
 
 6.1.1
