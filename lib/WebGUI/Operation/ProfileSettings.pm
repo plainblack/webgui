@@ -17,6 +17,7 @@ use Tie::IxHash;
 use WebGUI::Grouping;
 use WebGUI::HTMLForm;
 use WebGUI::Icon;
+use WebGUI::Id;
 use WebGUI::International;
 use WebGUI::Operation::Shared;
 use WebGUI::Privilege;
@@ -32,7 +33,7 @@ sub _reorderCategories {
         $sth = WebGUI::SQL->read("select profileCategoryId from userProfileCategory order by sequenceNumber");
         while (($id) = $sth->array) {
                 $i++;
-                WebGUI::SQL->write("update userProfileCategory set sequenceNumber='$i' where profileCategoryId=$id");
+                WebGUI::SQL->write("update userProfileCategory set sequenceNumber='$i' where profileCategoryId=".quote($id));
         }
         $sth->finish;
 }
@@ -71,7 +72,7 @@ sub _submenu {
 sub www_deleteProfileCategory {
         return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
         my ($output);
-        return WebGUI::Privilege::vitalComponent() if ($session{form}{cid} < 1000);
+        return WebGUI::Privilege::vitalComponent() if ($session{form}{cid} < 1000 && $session{form}{cid} > 0);
         $output = '<h1>'.WebGUI::International::get(42).'</h1>';
         $output .= WebGUI::International::get(466,"WebGUIProfile").'<p>';
         $output .= '<div align="center"><a href="'.WebGUI::URL::page('op=deleteProfileCategoryConfirm&cid='.$session{form}{cid}).
@@ -84,9 +85,9 @@ sub www_deleteProfileCategory {
 #-------------------------------------------------------------------
 sub www_deleteProfileCategoryConfirm {
         return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
-        return WebGUI::Privilege::vitalComponent() if ($session{form}{cid} < 1000);
-	WebGUI::SQL->write("delete from userProfileCategory where profileCategoryId=$session{form}{cid}");
-	WebGUI::SQL->write("update userProfileField set profileCategoryId=1 where profileCategoryId=$session{form}{cid}");
+        return WebGUI::Privilege::vitalComponent() if ($session{form}{cid} < 1000 && $session{form}{cid} > 0);
+	WebGUI::SQL->write("delete from userProfileCategory where profileCategoryId=".quote($session{form}{cid}));
+	WebGUI::SQL->write("update userProfileField set profileCategoryId=1 where profileCategoryId=".quote($session{form}{cid}));
         return www_editProfileSettings();
 }
 
@@ -127,7 +128,7 @@ sub www_editProfileCategory {
 	if ($session{form}{cid}) {
 		$f->hidden("cid",$session{form}{cid});
 		$f->readOnly($session{form}{cid},WebGUI::International::get(469));
-		%data = WebGUI::SQL->quickHash("select * from userProfileCategory where profileCategoryId=$session{form}{cid}");
+		%data = WebGUI::SQL->quickHash("select * from userProfileCategory where profileCategoryId=".quote($session{form}{cid}));
 	} else {
                 $f->hidden("cid","new");
 	}
@@ -155,14 +156,14 @@ sub www_editProfileCategorySave {
 	$test = eval($session{form}{categoryName});
 	$session{form}{categoryName} = "'".$session{form}{categoryName}."'" if ($test eq "");
 	if ($session{form}{cid} eq "new") {
-		$session{form}{cid} = getNextId("profileCategoryId");
+		$session{form}{cid} = WebGUI::Id::generate();
 		($sequenceNumber) = WebGUI::SQL->quickArray("select max(sequenceNumber) from userProfileCategory");
-		WebGUI::SQL->write("insert into userProfileCategory (profileCategoryId,sequenceNumber) values ($session{form}{cid}, "
+		WebGUI::SQL->write("insert into userProfileCategory (profileCategoryId,sequenceNumber) values (".quote($session{form}{cid}).", "
 			.($sequenceNumber+1).")");
 	}
 	WebGUI::SQL->write("update userProfileCategory set categoryName=".quote($session{form}{categoryName}).", 
 		editable=".$session{form}{editable}.", visible=".$session{form}{visible}." 
-		where profileCategoryId=$session{form}{cid}");
+		where profileCategoryId=".quote($session{form}{cid}));
 	return www_editProfileSettings();
 }
 
@@ -243,7 +244,7 @@ sub www_editProfileFieldSave {
 			$session{form}{fid} .= '2';	
 		}
 		($sequenceNumber) = WebGUI::SQL->quickArray("select max(sequenceNumber) 
-			from userProfileField where profileCategoryId=$session{form}{profileCategoryId}");
+			from userProfileField where profileCategoryId=".quote($session{form}{profileCategoryId}));
 		WebGUI::SQL->write("insert into userProfileField (fieldName, sequenceNumber, protected)
 			values (".quote($session{form}{fid}).", ".($sequenceNumber+1).", 0)");
 	}
@@ -278,7 +279,7 @@ sub www_editProfileSettings {
 		$output .= eval $category{categoryName};
 		$output .= '</b><br>';
 		$b = WebGUI::SQL->read("select * from userProfileField where 
-			profileCategoryId=$category{profileCategoryId} order by sequenceNumber");
+			profileCategoryId=".quote($category{profileCategoryId})." order by sequenceNumber");
 		while (%field = $b->hash) {
 			$output .= '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
                         $output .= deleteIcon('op=deleteProfileField&fid='.$field{fieldName});
@@ -299,11 +300,11 @@ sub www_editProfileSettings {
 sub www_moveProfileCategoryDown {
         return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
         my ($id, $thisSeq);
-        ($thisSeq) = WebGUI::SQL->quickArray("select sequenceNumber from userProfileCategory where profileCategoryId=$session{form}{cid}");
+        ($thisSeq) = WebGUI::SQL->quickArray("select sequenceNumber from userProfileCategory where profileCategoryId=".quote($session{form}{cid}));
         ($id) = WebGUI::SQL->quickArray("select profileCategoryId from userProfileCategory where sequenceNumber=$thisSeq+1");
         if ($id ne "") {
-                WebGUI::SQL->write("update userProfileCategory set sequenceNumber=sequenceNumber+1 where profileCategoryId=$session{form}{cid}");
-                WebGUI::SQL->write("update userProfileCategory set sequenceNumber=sequenceNumber-1 where profileCategoryId=$id");
+                WebGUI::SQL->write("update userProfileCategory set sequenceNumber=sequenceNumber+1 where profileCategoryId=".quote($session{form}{cid}));
+                WebGUI::SQL->write("update userProfileCategory set sequenceNumber=sequenceNumber-1 where profileCategoryId=".quote($id));
                 _reorderCategories();
         }
         return www_editProfileSettings();
@@ -313,11 +314,11 @@ sub www_moveProfileCategoryDown {
 sub www_moveProfileCategoryUp {
         return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
         my ($id, $thisSeq);
-        ($thisSeq) = WebGUI::SQL->quickArray("select sequenceNumber from userProfileCategory where profileCategoryId=$session{form}{cid}");
+        ($thisSeq) = WebGUI::SQL->quickArray("select sequenceNumber from userProfileCategory where profileCategoryId=".quote($session{form}{cid}));
         ($id) = WebGUI::SQL->quickArray("select profileCategoryId from userProfileCategory where sequenceNumber=$thisSeq-1");
         if ($id ne "") {
-                WebGUI::SQL->write("update userProfileCategory set sequenceNumber=sequenceNumber-1 where profileCategoryId=$session{form}{cid}");
-                WebGUI::SQL->write("update userProfileCategory set sequenceNumber=sequenceNumber+1 where profileCategoryId=$id");
+                WebGUI::SQL->write("update userProfileCategory set sequenceNumber=sequenceNumber-1 where profileCategoryId=".quote($session{form}{cid}));
+                WebGUI::SQL->write("update userProfileCategory set sequenceNumber=sequenceNumber+1 where profileCategoryId=".quote($id));
                 _reorderCategories();
         }
         return www_editProfileSettings();
@@ -328,7 +329,7 @@ sub www_moveProfileFieldDown {
         return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
         my ($id, $thisSeq, $profileCategoryId);
         ($thisSeq,$profileCategoryId) = WebGUI::SQL->quickArray("select sequenceNumber,profileCategoryId from userProfileField where fieldName=".quote($session{form}{fid}));
-        ($id) = WebGUI::SQL->quickArray("select fieldName from userProfileField where profileCategoryId=$profileCategoryId and sequenceNumber=$thisSeq+1");
+        ($id) = WebGUI::SQL->quickArray("select fieldName from userProfileField where profileCategoryId=".quote($profileCategoryId)." and sequenceNumber=$thisSeq+1");
         if ($id ne "") {
                 WebGUI::SQL->write("update userProfileField set sequenceNumber=sequenceNumber+1 where fieldName=".quote($session{form}{fid}));
                 WebGUI::SQL->write("update userProfileField set sequenceNumber=sequenceNumber-1 where fieldName=".quote($id));
@@ -342,7 +343,7 @@ sub www_moveProfileFieldUp {
         return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
         my ($id, $thisSeq, $profileCategoryId);
         ($thisSeq,$profileCategoryId) = WebGUI::SQL->quickArray("select sequenceNumber,profileCategoryId from userProfileField where fieldName=".quote($session{form}{fid}));
-        ($id) = WebGUI::SQL->quickArray("select fieldName from userProfileField where profileCategoryId=$profileCategoryId and sequenceNumber=$thisSeq-1");
+        ($id) = WebGUI::SQL->quickArray("select fieldName from userProfileField where profileCategoryId=".quote($profileCategoryId)." and sequenceNumber=$thisSeq-1");
         if ($id ne "") {
                 WebGUI::SQL->write("update userProfileField set sequenceNumber=sequenceNumber-1 where fieldName=".quote($session{form}{fid}));
                 WebGUI::SQL->write("update userProfileField set sequenceNumber=sequenceNumber+1 where fieldName=".quote($id));
