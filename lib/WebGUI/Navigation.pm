@@ -225,7 +225,6 @@ sub build {
 
 	my $cache = WebGUI::Cache->new($self->{_identifier}.'-'.$session{page}{pageId}, "Navigation-".$session{config}{configFile});
 	my $cacheContent = $cache->get unless $session{var}{adminOn}; 
-
 	my (@page_loop, $lastPage, %unfolded);
 	tie %unfolded, "Tie::IxHash";
 
@@ -242,22 +241,35 @@ sub build {
 			WebGUI::ErrorHandler::warn("Error in WebGUI::Navigation::build while trying to execute $method".$@);
 		}
 		if (@pages) {
-			my $startPageDepth = ($p->ancestors);
+			my $startPageDepth = $p->get("depth")+1;
 			my $maxDepth = $startPageDepth + $self->{_depth};
 			my $minDepth = $startPageDepth - $self->{_depth};
 
 			foreach my $page (@pages) {
 				my $pageData = {};
+				$pageData->{"page.absDepth"} = $page->{'depth'} + 1;
+				$pageData->{"page.isSystem"} = $page->{isSystem};
+
+				# Check if in depth range
+				next if ($pageData->{"page.absDepth"} > $maxDepth || $pageData->{"page.absDepth"} < $minDepth);
+				
+				# Check stopAtLevel
+				next if ($pageData->{"page.absDepth"} < $self->{_stopAtLevel});
+
+				# Check showSystemPages
+				next if (! $self->{_showSystemPages} && $pageData->{"page.isSystem"}); 
+	
+				# Deal with hidden pages, don't ever hide pages if admin mode is on
+				next if(($page->{'hideFromNavigation'} && ! $self->{_showHiddenPages}) && (! $session{var}{adminOn}));
+
 				# Initial page info
 				$pageData->{"page.url"} = WebGUI::URL::gateway($page->{'urlizedTitle'});
 			        if ($page->{'encryptPage'}) {
 					$pageData->{"page.url"} =~ s/http:/https:/;
 				}
-				$pageData->{"page.absDepth"} = $page->{'depth'} + 1;
 				$pageData->{"page.relDepth"} = $pageData->{"page.absDepth"} - $startPageDepth;
 				$pageData->{"page.isCurrent"} = ($page->{'pageId'} eq $session{page}{pageId});
 				$pageData->{"page.isHidden"} = $page->{'hideFromNavigation'};
-				$pageData->{"page.isSystem"} = $page->{isSystem};
 				
 				# indent
 				my $indent = 0;
@@ -277,18 +289,6 @@ sub build {
 				$pageData->{"page.indent_loop"} = [];
 				push(@{$pageData->{"page.indent_loop"}},{'indent'=>$_}) for(1..$indent);
 				$pageData->{"page.indent"} = "&nbsp;&nbsp;&nbsp;" x $indent;
-
-				# Check if in depth range
-				next if ($pageData->{"page.absDepth"} > $maxDepth || $pageData->{"page.absDepth"} < $minDepth);
-				
-				# Check stopAtLevel
-				next if ($pageData->{"page.absDepth"} < $self->{_stopAtLevel});
-
-				# Check showSystemPages
-				next if (! $self->{_showSystemPages} && $pageData->{"page.isSystem"}); 
-	
-				# Deal with hidden pages, don't ever hide pages if admin mode is on
-				next if(($page->{'hideFromNavigation'} && ! $self->{_showHiddenPages}) && (! $session{var}{adminOn}));
 
 				# Put page properties in $pageData hashref
 				foreach my $property (@interestingPageProperties) {

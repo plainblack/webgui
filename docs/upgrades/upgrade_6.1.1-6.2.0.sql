@@ -255,7 +255,6 @@ alter table userSessionScratch change sessionId sessionId char(22) not null;
 alter table users change referringAffiliate referringAffiliate char(22) not null;
 alter table page change lft nestedSetLeft int(11);
 alter table page change rgt nestedSetRight int(11);
-alter table page change id id char(22);
 delete from incrementer where incrementerId in ("messageLogId","profileCategoryId","templateId","navigationId","passiveProfileLogId","metaData_fieldId","userId","collateralId","pageId","databaseLinkId", "DataForm_entryId", "DataForm_fieldId", "DataForm_tabId", "EventsCalendar_eventId", "EventsCalendar_recurringId", "FileManager_fileId", "forumId", "forumPostId", "forumThreadId", "groupId", "languageId", "Product_benefitId", "Product_featureId", "Product_specificationId", "replacementId", "Survey_answerId", "Survey_id", "Survey_questionId", "Survey_responseId", "USS_id", "USS_submissionId", "wobjectId");
 alter table forum change postsPerPage threadsPerPage int(11) default 30;
 alter table forum add postsPerPage int(11) default 10 after threadsPerPage;
