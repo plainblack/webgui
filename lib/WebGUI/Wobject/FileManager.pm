@@ -207,7 +207,7 @@ sub www_editDownload {
 		$f->file("alternateVersion1",WebGUI::International::get(17,$namespace));
         }
         if ($file->{alternateVersion2} ne "") {
-		$f->readOnly('<a href="'.WebGUI::URL::page('func=deleteFile&file=alternateVersion1&wid='.
+		$f->readOnly('<a href="'.WebGUI::URL::page('func=deleteFile&file=alternateVersion2&wid='.
 			$_[0]->get("wobjectId").'&did='.$file->{FileManager_fileId}).'">'.
 			WebGUI::International::get(391).'</a>',WebGUI::International::get(18,$namespace));
         } else {
