@@ -177,6 +177,7 @@ sub formEditUserSettings {
 	my $f;
 
 	$f = WebGUI::HTMLForm->new;
+	$f->readOnly('<b>LDAP Authentication Options</b>');
 	$f->url("ldapURL",WebGUI::International::get(120),$session{setting}{ldapURL});
         $f->text("ldapId",WebGUI::International::get(121),$session{setting}{ldapId});
         $f->text("ldapIdName",WebGUI::International::get(122),$session{setting}{ldapIdName});
