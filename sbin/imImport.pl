@@ -76,8 +76,10 @@ sub addFiles {
 	       			$_[4]->{uploadsPath}."/images/".$id,
         			$_[2]->{thumbnailSize});
        			print "Adding $filename to the database.\n";
-			WebGUI::SQL->write("insert into images (imageId,name,filename,userId,username,dateUploaded) values
-				($id,".$dbh->quote($filename).",".$dbh->quote($filename.".".$ext).",3,'Imported',".time().")",$_[0]);
+			WebGUI::SQL->write("insert into collateral (collateralId,name,filename,userId,username,
+				dateUploaded,collateralType,thumbnailsize) values
+				($id,".$dbh->quote($filename).",".$dbh->quote($filename.".".$ext).",3,'Imported',".time()."
+				'image',$_[2]->{thumbnailSize})",$_[0]);
 	       	}
 	}
   	print "Finished adding.\n";
