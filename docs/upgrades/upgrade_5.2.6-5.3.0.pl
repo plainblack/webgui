@@ -19,7 +19,7 @@ GetOptions(
 
 print "\tUpdating config file.\n" unless ($quiet);
 
-my $pathToConfig = '../../etc/'.$configFile; print"debug:$pathToConfig\n";
+my $pathToConfig = '../../etc/'.$configFile;
 my $conf = Parse::PlainConfig->new('DELIM' => '=', 'FILE' => $pathToConfig);
 my $macros = $conf->get("macros");
 $macros->{RootTab} = "RootTab";
@@ -53,7 +53,6 @@ $conf->set("searchAndReplace"=>{ ":)"  => "<img src='/extras/smileys/smile01.gif
         			 "WebGUI" => "<a href='http://www.plainblack.com/webgui'>WebGUI</a>"});
 
 $conf->write;
-exit;
 
 print "\tRemoving unneeded files.\n" unless ($quiet);
 
