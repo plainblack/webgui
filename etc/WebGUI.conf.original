@@ -12,6 +12,10 @@ extrasPath = /data/WebGUI/www/extras
 uploadsURL = /uploads
 uploadsPath = /data/WebGUI/www/uploads
 
+# If exportPath is defined, an "Export" toolbar icon will appear
+# which allows you to export pages to static html
+# exportPath = /data/WebGUI/export
+
 templateCacheType=file
 
 passiveProfileInterval = 86400	# in seconds
