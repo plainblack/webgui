@@ -298,6 +298,27 @@ sub end {
 
 #-------------------------------------------------------------------
 
+=head2 getScratch ( varName ) 
+
+Retrieves the current value of a scratch variable.
+
+=over
+
+=item varName
+
+The name of the variable set with setScratch().
+
+=back
+
+=cut
+
+sub getScratch {
+	my $var = shift;
+	return $session{scratch}{$var};
+}
+
+#-------------------------------------------------------------------
+
 =head2 open ( webguiRoot [ , configFile ] )
 
 Opens a closed ( or new ) WebGUI session.
