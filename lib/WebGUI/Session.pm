@@ -44,7 +44,15 @@ sub _getPageInfo {
                 	($pageId) = WebGUI::SQL->quickArray("select pageId from page where urlizedTitle='".$pageName."'",$_[1]);
                 	if ($pageId eq "") {
                         	$pageId = $_[2];
-				$session{header}{status} = '404';
+				if($ENV{"MOD_PERL"}) {
+                                       my $r = Apache->request;
+                                       if(defined($r)) {
+                                               $r->custom_response(404, $session{page}{url} );
+                                               $r->status(404);
+                                       }
+                                } else {
+					$session{header}{status} = '404';
+				}
                 	}
         	} else {
                 	$pageId = $session{setting}{defaultPage};
