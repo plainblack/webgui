@@ -219,17 +219,17 @@ sub isInGroup {
 		return 1;
 	}
 	### Use session to cache multiple lookups of the same group.
-	if ($session{isInGroup}{$gid} || $session{isInGroup}{3}) {
+	if ($session{isInGroup}{$gid}{$uid} || $session{isInGroup}{3}{$uid}) {
 		return 1;
-	} elsif ($session{isInGroup}{$gid} eq "0") {
+	} elsif ($session{isInGroup}{$gid}{$uid} eq "0") {
 		return 0;
 	}
         ### Lookup the actual groupings.
 	my $groups = WebGUI::Grouping::getGroupsForUser($uid,1);
 	foreach (@{$groups}) {
-		$session{isInGroup}{$_} = 1;
+		$session{isInGroup}{$_}{$uid} = 1;
 	}
-	if ($session{isInGroup}{$gid} || $session{isInGroup}{3}) {
+	if ($session{isInGroup}{$gid}{$uid} || $session{isInGroup}{3}{$uid}) {
 		return 1;
 	}
         ### Get data for auxillary checks.
@@ -244,7 +244,7 @@ sub isInGroup {
 		my @ips = split(";",$group{ipFilter});
 		foreach my $ip (@ips) {
 			if ($session{env}{REMOTE_ADDR} =~ /^$ip/) {
-				$session{isInGroup}{$gid} = 1;
+				$session{isInGroup}{$gid}{$uid} = 1;
 				return 1;
 			}
 		}
@@ -259,7 +259,7 @@ sub isInGroup {
 		foreach my $var (@vars) {
 			my ($name, $value) = split(/\=/,$var);
 			if ($session{scratch}{$name} eq $value) {
-				$session{isInGroup}{$gid} = 1;
+				$session{isInGroup}{$gid}{$uid} = 1;
 				return 1;
 			}
 		}
@@ -273,20 +273,20 @@ sub isInGroup {
 			($karma) = WebGUI::SQL->quickHash("select karma from users where userId='$uid'");
 		}
 		if ($karma >= $group{karmaThreshold}) {
-			$session{isInGroup}{$gid} = 1;
+			$session{isInGroup}{$gid}{$uid} = 1;
 			return 1;
 		}
 	}
 	### Check for groups of groups.
 	$groups = WebGUI::Grouping::getGroupsInGroup($gid,1);
 	foreach (@{$groups}) {
-		$session{isInGroup}{$_} = isInGroup($_, $uid);
-		if ($session{isInGroup}{$_}) {
-			$session{isInGroup}{$gid} = 1;
+		$session{isInGroup}{$_}{$uid} = isInGroup($_, $uid);
+		if ($session{isInGroup}{$_}{$uid}) {
+			$session{isInGroup}{$gid}{$uid} = 1;
 			return 1;
 		}
 	}
-	$session{isInGroup}{$gid} = 0;
+	$session{isInGroup}{$gid}{$uid} = 0;
 	return 0;
 }
 
