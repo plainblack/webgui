@@ -386,67 +386,65 @@ sub www_viewSubmission {
 	$var{content} = WebGUI::HTML::filter($submission->{content},$session{setting}{filterContributedHTML});
 	$var{content} =~ s/\^\-\;//g;
 	$var{content} =~ s/\n/\<br\>/g if ($submission->{convertCarriageReturns});
-        $var{"label.by"} = WebGUI::International::get(21,$namespace);
-	$var{userProfile} = WebGUI::URL::page('op=viewProfile&uid='.$submission->{userId});
-	$var{userId} = $submission->{userId};
-	$var{username} = $submission->{username};
-	$var{"label.date"} = WebGUI::International::get(13,$namespace);
-	$var{date} = epochToHuman($submission->{dateSubmitted});
-	$var{"label.status"} = WebGUI::International::get(14,$namespace);
-	$var{status} = $submissionStatus{$submission->{status}};
-	$var{"label.views"} = WebGUI::International::get(514);
-	$var{views} = $submission->{views};
+        $var{"user.label"} = WebGUI::International::get(21,$namespace);
+	$var{"user.Profile"} = WebGUI::URL::page('op=viewProfile&uid='.$submission->{userId});
+	$var{"user.Id"} = $submission->{userId};
+	$var{"user.username"} = $submission->{username};
+	$var{"date.label"} = WebGUI::International::get(13,$namespace);
+	$var{"date.epoch"} = $submission->{dateSubmitted};
+	$var{"date.human"} = epochToHuman($submission->{dateSubmitted});
+	$var{"status.label"} = WebGUI::International::get(14,$namespace);
+	$var{"status.status"} = $submissionStatus{$submission->{status}};
+	$var{"views.label"} = WebGUI::International::get(514);
+	$var{"views.count"} = $submission->{views};
+        $var{canPost} = WebGUI::Privilege::isInGroup($_[0]->get("groupToContribute"));
+        $var{"post.url"} = WebGUI::URL::page('func=editSubmission&sid=new&wid='.$_[0]->get("wobjectId"));
+        $var{"post.label"} = WebGUI::International::get(20,$namespace);
 	@data = WebGUI::SQL->quickArray("select max(USS_submissionId) from USS_submission 
         	where wobjectId=$submission->{wobjectId} and USS_submissionId<$submission->{USS_submissionId}
 		and (userId=$submission->{userId} or status='Approved')");
-        if ($data[0] ne "") {
-        	$var{previousSubmission} = '<a href="'.WebGUI::URL::page('func=viewSubmission&sid='.$data[0].'&wid='.
-                	$session{form}{wid}).'">&laquo; '.WebGUI::International::get(58,$namespace).'</a>';
-        }
+        $var{"previous.more"} = ($data[0] ne "");
+       	$var{"previous.url"} = WebGUI::URL::page('func=viewSubmission&sid='.$data[0].'&wid='.$session{form}{wid});
+	$var{"previous.label"} = WebGUI::International::get(58,$namespace);
         @data = WebGUI::SQL->quickArray("select min(USS_submissionId) from USS_submission 
                 where wobjectId=$submission->{wobjectId} and USS_submissionId>$submission->{USS_submissionId}
 		and (userId=$submission->{userId} or status='Approved')");
-        if ($data[0] ne "") {
-                $var{nextSubmission} = '<a href="'.WebGUI::URL::page('func=viewSubmission&sid='.$data[0].'&wid='.
-                        $session{form}{wid}).'">'.WebGUI::International::get(59,$namespace).' &raquo;</a>';
-        }
-        if ($submission->{userId} == $session{user}{userId} || WebGUI::Privilege::isInGroup($_[0]->get("groupToApprove"))) {
-                $var{deleteSubmission} = '<a href="'.WebGUI::URL::page('func=deleteSubmission&wid='.$session{form}{wid}.'&sid='.
-			$session{form}{sid}).'">'.WebGUI::International::get(37,$namespace).'</a>';
-                $var{editSubmission} = '<a href="'.WebGUI::URL::page('func=editSubmission&wid='.$session{form}{wid}.'&sid='.
-			$session{form}{sid}).'">'.WebGUI::International::get(27,$namespace).'</a>';
-        }
-        if ($submission->{status} ne "Approved" && WebGUI::Privilege::isInGroup($_[0]->get("groupToApprove"),$session{user}{userId})) {
-                $var{approveSubmission} = '<a href="'.WebGUI::URL::page('func=approveSubmission&wid='.$session{form}{wid}.
-			'&sid='.$session{form}{sid}.'&mlog='.$session{form}{mlog}).'">'.
-			WebGUI::International::get(572).'</a>';
-                $var{leaveSubmission} = '<a href="'.WebGUI::URL::page('op=viewMessageLog').'">'.
-			WebGUI::International::get(573).'</a>';
-                $var{denySubmission} = '<a href="'.WebGUI::URL::page('func=denySubmission&wid='.$session{form}{wid}.
-			'&sid='.$session{form}{sid}.'&mlog='.$session{form}{mlog}).'">'.
-			WebGUI::International::get(574).'</a>';
-        }
-	if ($_[0]->get("allowDiscussion")) {
-		$var{postReply} = '<a href="'.WebGUI::URL::page('func=post&mid=new&wid='.$_[0]->get("wobjectId")
-			.'&sid='.$session{form}{sid}).'">'.WebGUI::International::get(47,$namespace).'</a>';
-	}
-	$var{search} = '<a href="'.WebGUI::URL::page('search=1&func=view&wid='.$_[0]->get("wobjectId")).'">'
-		.WebGUI::International::get(364).'</a>';
-        $var{backToList} = '<a href="'.WebGUI::URL::page().'">'.WebGUI::International::get(28,$namespace).'</a>';
+        $var{"next.more"} = ($data[0] ne "");
+        $var{"next.url"} = WebGUI::URL::page('func=viewSubmission&sid='.$data[0].'&wid='.$session{form}{wid});
+	$var{"next.label"} = WebGUI::International::get(59,$namespace);
+        $var{canEdit} = ($submission->{userId} == $session{user}{userId} || WebGUI::Privilege::isInGroup($_[0]->get("groupToApprove")));
+        $var{"delete.url"} = WebGUI::URL::page('func=deleteSubmission&wid='.$session{form}{wid}.'&sid='.$session{form}{sid});
+	$var{"delete.label"} = WebGUI::International::get(37,$namespace);
+        $var{"edit.url"} = WebGUI::URL::page('func=editSubmission&wid='.$session{form}{wid}.'&sid='.$session{form}{sid});
+	$var{"edit.label"} = WebGUI::International::get(27,$namespace);
+        $var{canChangeStatus} = ($submission->{status} ne "Approved" && WebGUI::Privilege::isInGroup($_[0]->get("groupToApprove"),$session{user}{userId}));
+        $var{"approve.url"} = WebGUI::URL::page('func=approveSubmission&wid='.$session{form}{wid}.'&sid='.$session{form}{sid}.'&mlog='.$session{form}{mlog});
+	$var{"approve.label"} = WebGUI::International::get(572);
+        $var{"leave.url"} = WebGUI::URL::page('op=viewMessageLog');
+	$var{"leave.label"} = WebGUI::International::get(573);
+        $var{"deny.url"} = WebGUI::URL::page('func=denySubmission&wid='.$session{form}{wid}.'&sid='.$session{form}{sid}.'&mlog='.$session{form}{mlog});
+	$var{"deny.label"} = WebGUI::International::get(574);
+	$var{"canDiscuss"} = ($_[0]->get("allowDiscussion"));
+	$var{"reply.url"} = WebGUI::URL::page('func=post&mid=new&wid='.$_[0]->get("wobjectId").'&sid='.$session{form}{sid});
+	$var{"reply.label"} = WebGUI::International::get(47,$namespace);
+	$var{"search.url"} = WebGUI::Search::toggleURL();
+	$var{"search.label"} = WebGUI::International::get(364);
+        $var{"back.url"} = WebGUI::URL::page();
+	$var{"back.label"} = WebGUI::International::get(28,$namespace);
 	if ($submission->{image} ne "") {
 		$file = WebGUI::Attachment->new($submission->{image},$session{form}{wid},$session{form}{sid});
-		$var{image} = $file->getURL;
-		$var{thumbnail} = $file->getThumbnail;
+		$var{"image.url"} = $file->getURL;
+		$var{"image.thumbnail"} = $file->getThumbnail;
 	}
 	if ($submission->{attachment} ne "") {
 		$file = WebGUI::Attachment->new($submission->{attachment},$session{form}{wid},$session{form}{sid});
-		$var{attachment} = $file->box;
+		$var{"attachment.box"} = $file->box;
+		$var{"attachment.url"} = $file->getURL;
+		$var{"attachment.icon"} = $file->getIcon;
+		$var{"attachment.name"} = $file->getFilename;
         }		
-	$output = WebGUI::Template::process(WebGUI::Template::get($_[0]->get("submissionTemplateId"),"USS/Submission"), \%var);
-        if ($_[0]->get("allowDiscussion")) {
-		$output .= WebGUI::Discussion::showThreads();
-        }
-	return $output;
+	$var{"replies"} = WebGUI::Discussion::showThreads();
+	return WebGUI::Template::process(WebGUI::Template::get($_[0]->get("submissionTemplateId"),"USS/Submission"), \%var);
 }
 
 

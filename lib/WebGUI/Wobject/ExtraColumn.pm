@@ -19,6 +19,7 @@ use WebGUI::International;
 use WebGUI::Privilege;
 use WebGUI::Session;
 use WebGUI::SQL;
+use WebGUI::Template;
 use WebGUI::Wobject;
 
 our @ISA = qw(WebGUI::Wobject);
@@ -51,16 +52,12 @@ sub uiLevel {
 #-------------------------------------------------------------------
 sub www_edit {
 	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
-        my ($output, $f, $endDate, $width, $class, $spacer,$startDate);
+        my ($output, $f, $endDate, $width, $class, $spacer,$startDate, $templatePosition);
         $output = helpIcon(1,$namespace);
 	$output .= '<h1>'.WebGUI::International::get(6,$namespace).'</h1>';
-       	if ($_[0]->get("wobjectId") eq "new") {
-               	$width = 200;
-               	$spacer = 10;
-       	} else {
-               	$width = $_[0]->get("width");
-               	$spacer = $_[0]->get("spacer");
-       	}
+        $width = $_[0]->get("width") || 200;
+        $spacer = $_[0]->get("spacer") || 10;
+	$templatePosition = $_[0]->get("templatePosition") || 1;
 	$class = $_[0]->get("class") || "content";
        	$startDate = $_[0]->get("startDate") || $session{page}{startDate};
        	$endDate = $_[0]->get("endDate") || $session{page}{endDate};
@@ -72,7 +69,14 @@ sub www_edit {
        	$f->hidden("title",$namespace);
        	$f->hidden("displayTitle",0);
        	$f->hidden("processMacros",0);
-       	$f->hidden("templatePosition",0);
+	$f->select(
+                -name=>"templatePosition",
+                -label=>WebGUI::International::get(363),
+                -value=>[$templatePosition],
+                -uiLevel=>5,
+                -options=>WebGUI::Template::getPositions($session{page}{templateId}),
+                -subtext=>WebGUI::Template::draw($session{page}{templateId})
+                );
        	$f->date("startDate",WebGUI::International::get(497),$startDate);
        	$f->date("endDate",WebGUI::International::get(498),$endDate);
 	$f->integer("spacer",WebGUI::International::get(3,$namespace),$spacer);

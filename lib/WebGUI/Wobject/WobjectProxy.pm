@@ -19,6 +19,7 @@ use WebGUI::International;
 use WebGUI::Privilege;
 use WebGUI::Session;
 use WebGUI::SQL;
+use WebGUI::Template;
 use WebGUI::Wobject;
 
 our @ISA = qw(WebGUI::Wobject);
@@ -55,7 +56,7 @@ sub www_edit {
 	tie %wobjects, 'Tie::IxHash';
         $output = helpIcon(1,$namespace);
 	$output .= '<h1>'.WebGUI::International::get(2,$namespace).'</h1>';
-	$templatePosition = $_[0]->get("templatePosition") || '0';
+	$templatePosition = $_[0]->get("templatePosition") || 1;
        	$startDate = $_[0]->get("startDate") || $session{page}{startDate};
        	$endDate = $_[0]->get("endDate") || $session{page}{endDate};
        	$f = WebGUI::HTMLForm->new;
@@ -66,12 +67,21 @@ sub www_edit {
        	$f->hidden("title",$namespace);
        	$f->hidden("displayTitle",0);
        	$f->hidden("processMacros",0);
-       	$f->select("templatePosition",WebGUI::Template::getPositions($session{page}{templateId}),WebGUI::International::get(363),[$templatePosition]);
+	$f->select(
+                -name=>"templatePosition",
+                -label=>WebGUI::International::get(363),
+                -value=>[$templatePosition],
+                -uiLevel=>5,
+                -options=>WebGUI::Template::getPositions($session{page}{templateId}),
+                -subtext=>WebGUI::Template::draw($session{page}{templateId})
+                );
        	$f->date("startDate",WebGUI::International::get(497),$startDate);
        	$f->date("endDate",WebGUI::International::get(498),$endDate);
 	$a = WebGUI::SQL->read("select pageId,menuTitle from page where pageId<2 or pageId>25 order by title");
 	while (%page = $a->hash) {
-		$b = WebGUI::SQL->read("select wobjectId,title from wobject where pageId=".$page{pageId}." and namespace<>'WobjectProxy' and namespace<>'ExtraColumn' and endDate=>".time()." and pageId<>3 order by sequenceNumber");
+		$b = WebGUI::SQL->read("select wobjectId,title from wobject 
+			where pageId=".$page{pageId}." and namespace<>'WobjectProxy' and 
+			namespace<>'ExtraColumn' and endDate>=".time()." and pageId<>3 order by sequenceNumber");
 		while (%wobject = $b->hash) {
 			$wobjects{$wobject{wobjectId}} = $page{menuTitle}." / ".$wobject{title}." (".$wobject{wobjectId}.")";
 		}
