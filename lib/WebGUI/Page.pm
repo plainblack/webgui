@@ -609,19 +609,22 @@ daughter of. Defaults to the current page.
 =cut
 
 sub getFirstDaughter {
-	my ($self, $pageId, $daughterId);
+	my ($self, $pageId, $daughterId, @daughters); 
 	($self, $pageId) = @_;
 	unless (ref($self)) {
 		$self = WebGUI::Page->new($pageId || $session{page}{pageId});
 	}
 	
-	$daughterId = ($self->daughters)[0]->{pageId};
+	@daughters = $self->daughters;
+	return undef unless (scalar(@daughters));
+	
+	$daughterId = $daughters[0]->{pageId};
 
 	return WebGUI::Page->new($daughterId);
 }
 
 #-------------------------------------------------------------------
-=head2 getGrandMother( pageId )
+=head2 getGrandmother( pageId )
 
 Returns the grandmother of the current node, or, when called in class context, the garndmother
 of 'pageId'.
@@ -637,14 +640,14 @@ grandmother of. Defaults to the current page.
 
 =cut
 
-sub getGrandMother {
+sub getGrandmother {
 	my ($self, $pageId, $grannyId);
 	($self, $pageId) = @_;
 	unless (ref($self)) {
 		$self = WebGUI::Page->new($pageId || $session{page}{pageId});
 	}
 	
-	return undef if ($self->get('depth') < 2);
+	return undef if ($self->get('depth') < 1);
 	
 	# We use self and ancestors here because ancestors strips on the wrong side.
 	$grannyId = (reverse $self->self_and_ancestors)[2]->{pageId};
@@ -706,7 +709,7 @@ sub getMother {
 		$self = WebGUI::Page->new($pageId || $session{page}{pageId});
 	}
 	
-	return undef if ($self->get('depth') < 1);
+	return undef if ($self->get('depth') < 0);
 	
 	# We use self and ancestors here because ancestors strips on the wrong side.
 	$mommyId = (reverse $self->self_and_ancestors)[1]->{pageId};
@@ -786,21 +789,19 @@ top page of. Defaults to the current page.
 
 
 sub getTop {
-	my ($self, $pageId, $topId, @descendants);
+	my ($self, $pageId, $topId);
 	($self, $pageId) = shift;
 	unless (ref($self)) {
 		$self= WebGUI::Page->new($pageId || $session{page}{pageId});
 	}
 
-	@descendants = $self->descendants;
-	if (scalar(@descendants) == 2) {
-		$topId = $self->get('pageId');		#The current page is a top level page
-	} elsif (scalar(@descendants) > 2) {
-		$topId = $descendants[2]->{pageId};
-	} else {					#Either the current page is a root page or there's no top level page.
+	if ($self->get('depth') == 1) {
+		$topId = $self->get('pageId');          #The current page is a top level page
+	} elsif ($self->get('depth') > 1) {
+		$topId = ($self->self_and_ancestors)[2]->{pageId};
+	} else {
 		$topId = ($self->daughters)[0]->{pageId};
 	}
-	
 	return WebGUI::Page->new($topId);
 }
 
@@ -881,17 +882,16 @@ WebGUI root of. Defaults to the current page.
 =cut
 
 sub getWebGUIRoot {
-	my ($self, $pageId, $node, $rootId, @descendants);
+	my ($self, $pageId, $rootId);
 	($self, $pageId) = shift;
 	unless (ref($self)) {
 		$self= WebGUI::Page->new($pageId || $session{page}{pageId});
 	}
 
-	@descendants = $self->descendants;
-	if (scalar(@descendants) == 1) {		#The current page is a WebGUI root
+	if ($self->get('depth') == 0) {		#The current page is a WebGUI root
 		$rootId = $self->get('pageId');
-	} elsif (scalar(@descendants) > 1) {
-		$rootId = $descendants[1]->{pageId};
+	} elsif ($self->get('depth') > 0) {
+		$rootId = ($self->ancestors)[1]->{pageId};
 	} else {					#There's no root, your tree is broken
 		return undef;
 	}
