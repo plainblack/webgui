@@ -166,8 +166,8 @@ sub getRecordTemplateVars {
 	$var->{"entryList.label"} = WebGUI::International::get(86,$self->get("namespace"));
 	$var->{"export.tab.url"} = WebGUI::URL::page('func=exportTab&wid='.$self->get("wobjectId"));
 	$var->{"export.tab.label"} = WebGUI::International::get(84,$self->get("namespace"));
-+	$var->{"delete.url"} = WebGUI::URL::page('func=delete&wid='.$self->get("wobjectId").'&entryId='.$var->{entryId});
-+	$var->{"delete.label"} = WebGUI::International::get(90,$self->get("namespace"));
+	$var->{"delete.url"} = WebGUI::URL::page('func=deleteEntry&wid='.$self->get("wobjectId").'&entryId='.$var->{entryId});
+	$var->{"delete.label"} = WebGUI::International::get(90,$self->get("namespace"));
 	$var->{"back.url"} = WebGUI::URL::page();
 	$var->{"back.label"} = WebGUI::International::get(18,$self->get("namespace"));
 	$var->{"addField.url"} = WebGUI::URL::page('func=editField&wid='.$self->get("wobjectId"));
@@ -313,6 +313,15 @@ sub sendEmail {
 #-------------------------------------------------------------------
 sub uiLevel {
         return 5;
+}
+
+#-------------------------------------------------------------------
+sub www_deleteEntry {
+        return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId")));
+        my $entryId = $session{form}{entryId};
+    	WebGUI::SQL->write("delete from DataForm_entry where DataForm_entryId=".$entryId);
+        $session{form}{entryId} = 'list';
+        return $_[0]->www_view();
 }
 
 #-------------------------------------------------------------------
@@ -652,19 +661,6 @@ sub www_view {
 	}
 	$var = $_[1] || $_[0]->getRecordTemplateVars($var);
 	return $_[0]->processTemplate($_[0]->get("templateId"),$var);
-}
-
-#-------------------------------------------------------------------
-sub www_delete {
-        my $entryId = $session{form}{entryId};
-        if (!WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId"))) {
-                return WebGUI::Privilege::insufficient();
-        }
-        
-    	WebGUI::SQL->write("delete from DataForm_entry where DataForm_entryId=".$entryId);
-        
-        $session{form}{entryId} = 'list';
-        return $_[0]->www_view();
 }
 
 
