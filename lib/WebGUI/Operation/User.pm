@@ -396,8 +396,8 @@ sub www_listUsers {
 			$row[$i] .= '</td>';
 			$row[$i] .= '<td><a href="'.WebGUI::URL::page('op=viewProfile&uid='.$data{userId})
 				.'">'.$data{username}.'</a></td>';
-			$row[$i] .= '<td class="tableData">'.epochToHuman($data{dateCreated},"%z").'</td>';
-			$row[$i] .= '<td class="tableData">'.epochToHuman($data{lastUpdated},"%z").'</td>';
+			#$row[$i] .= '<td class="tableData">'.epochToHuman($data{dateCreated},"%z").'</td>';
+			#$row[$i] .= '<td class="tableData">'.epochToHuman($data{lastUpdated},"%z").'</td>';
 			$row[$i] .= '</tr>';
 			$i++;
 		}
