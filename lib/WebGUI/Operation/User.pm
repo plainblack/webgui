@@ -423,7 +423,7 @@ sub www_listUsers {
 	$f->text("keyword",'',$session{scratch}{userSearchKeyword});
 	$f->select(
 		-name	=> "status",
-		-value	=> [$session{form}{status} || "status like '%'"],
+		-value	=> [$session{form}{status} || "users.status like '%'"],
 		-options=> \%status
 	);
 	$f->submit(WebGUI::International::get(170));
@@ -433,6 +433,7 @@ sub www_listUsers {
         $output .= '<tr>
                 <td class="tableHeader">'.WebGUI::International::get(816).'</td>
                 <td class="tableHeader">'.WebGUI::International::get(50).'</td>
+                <td class="tableHeader">'.WebGUI::International::get(56).'</td>
                 <td class="tableHeader">'.WebGUI::International::get(453).'</td>
                 <td class="tableHeader">'.WebGUI::International::get(454).'</td></tr>';
 	if ($session{scratch}{userSearchStatus}) {
@@ -441,10 +442,14 @@ sub www_listUsers {
 		$selectedStatus = "status like '%'";
 	}
 	if ($session{scratch}{userSearchKeyword} ne "") {
-		$search = " and users.username like ".quote("%".$session{scratch}{userSearchKeyword}."%");
+		$search = " and (users.username like ".quote("%".$session{scratch}{userSearchKeyword}."%")
+			." or email.fieldData like ".quote("%".$session{scratch}{userSearchKeyword}."%").")";
 	}
         $p = WebGUI::Paginator->new(WebGUI::URL::page("op=listUsers"));
-	$p->setDataByQuery("select userId,username,status,dateCreated,lastUpdated from users 
+	$p->setDataByQuery("select users.userId, users.username, users.status, users.dateCreated, users.lastUpdated,
+		email.fieldData as email
+		from users left join userProfileData email on users.userId=email.userId and
+		email.fieldName='email'
 		where $selectedStatus $search order by users.username");
 	$rows = $p->getPageData;
 	foreach $data (@$rows) {
@@ -452,6 +457,7 @@ sub www_listUsers {
 		$output .= '<td>'.$status{$data->{status}}.'</td>';
 		$output .= '<td><a href="'.WebGUI::URL::page('op=editUser&uid='.$data->{userId})
 			.'">'.$data->{username}.'</a></td>';
+		$output .= '<td class="tableData">'.$data->{email}.'</td>';
 		$output .= '<td class="tableData">'.epochToHuman($data->{dateCreated},"%z").'</td>';
 		$output .= '<td class="tableData">'.epochToHuman($data->{lastUpdated},"%z").'</td>';
 		$output .= '</tr>';
