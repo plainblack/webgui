@@ -11,7 +11,7 @@ function addCriteria ( fieldname, opform, valform ) {
    if(/\s+/.test(fieldname)) {
 	fieldname = '"' + fieldname + '"';
    }
-   if(/^\D+$/.test(value)) {
+   if(/^\D*$/.test(value)) {
 	value = '"' + value + '"';
    }
    var statement = fieldname + " " + operator + " " + value;

@@ -56,8 +56,7 @@ sub www_editMetaDataField {
         return WebGUI::Privilege::vitalComponent() if ($session{form}{fid} < 1000 && $session{form}{fid} > 0);
 
         my ($output, $fieldName, $defaultValue, $description, $fieldInfo);
-        # TODO: add help / internationlize
-        $output = helpIcon(22);
+        $output = helpIcon('metadata edit property');
         $output .= '<h1>'.WebGUI::International::get('Edit Metadata','MetaData').'</h1>';
 	
 	if($session{form}{fid} && $session{form}{fid} ne "new") {
@@ -66,7 +65,6 @@ sub www_editMetaDataField {
 
 	my $fid = $session{form}{fid} || "new";
 	
-        #TODO: internatioa
         my $f = WebGUI::HTMLForm->new;
         $f->hidden("op", "editMetaDataFieldSave");
         $f->hidden("fid", $fid);
@@ -95,7 +93,7 @@ sub www_editMetaDataFieldSave {
 	return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
 	return WebGUI::Privilege::vitalComponent() if ($session{form}{fid} < 1000 && $session{form}{fid} > 0);
 	# Check for duplicate field names
-	my $sql = "select count(*) from metaData_fields where fieldName = ".
+	my $sql = "select count(*) from metaData_properties where fieldName = ".
                                 quote($session{form}{fieldName});
 	if ($session{form}{fid} ne "new") {
 		$sql .= " and fieldId <> ".quote($session{form}{fid});
@@ -106,9 +104,13 @@ sub www_editMetaDataFieldSave {
 		$error =~ s/\%field\%/$session{form}{fieldName}/;
 		return $error . www_editMetaDataField();
 	}
+	if($session{form}{fieldName} eq "") {
+		return WebGUI::International::get("errorEmptyField", "MetaData")
+			. www_editMetaDataField();
+	}
 	if($session{form}{fid} eq 'new') {
 		$session{form}{fid} = getNextId("metaData_fieldId");
-		WebGUI::SQL->write("insert into metaData_fields (fieldId, fieldName, defaultValue, description, fieldType, possibleValues) values (".
+		WebGUI::SQL->write("insert into metaData_properties (fieldId, fieldName, defaultValue, description, fieldType, possibleValues) values (".
 					quote($session{form}{fid}).",".
 					quote($session{form}{fieldName}).",".
 					quote($session{form}{defaultValue}).",".
@@ -116,7 +118,7 @@ sub www_editMetaDataFieldSave {
 					quote($session{form}{fieldType}).",".
 					quote($session{form}{possibleValues}).")");
 	} else {
-                WebGUI::SQL->write("update metaData_fields set fieldName = ".quote($session{form}{fieldName}).", ".
+                WebGUI::SQL->write("update metaData_properties set fieldName = ".quote($session{form}{fieldName}).", ".
 					"defaultValue = ".quote($session{form}{defaultValue}).", ".
 					"description = ".quote($session{form}{description}).", ".
 					"fieldType = ".quote($session{form}{fieldType}).", ".
@@ -160,7 +162,7 @@ sub www_manageMetaData {
         return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
 	my $output;
         # TODO: add help
-        $output = helpIcon(22);
+        $output = helpIcon('metadata manage');
         $output .= '<h1>'.WebGUI::International::get('Manage Metadata','MetaData').'</h1>';
 	my $f = new WebGUI::HTMLForm;
 	$f->hidden("op","saveSettings");

@@ -22,7 +22,7 @@ sub process {
 	my $key = $param[0];
 	my $rank = $param[1] || 1; # 1 is highest rank
 	$rank--;	# Rank is zero based
-	my $sql = "select value from passiveProfileAOI a, metaData_fields f 
+	my $sql = "select value from passiveProfileAOI a, metaData_properties f 
 			where a.fieldId=f.fieldId 
 			and userId=".quote($session{user}{userId})." 
 			and fieldName=".quote($key)." order by a.count desc";

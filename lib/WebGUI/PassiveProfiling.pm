@@ -119,7 +119,7 @@ sub summarizeAOI {
 			d.fieldId, 
 			d.wobjectId, 
 			d.value 
-		from metaData_data d , metaData_fields f 
+		from metaData_values d , metaData_properties f 
 		where f.fieldId = d.fieldId 
 			and d.wobjectId = ".$data->{wobjectId};
 

@@ -124,11 +124,12 @@ sub www_edit {
 		-label=>WebGUI::International::get(1,$_[0]->get("namespace")),
 		-value=>'<a href="'.WebGUI::URL::gateway($data[0]).'">'.$data[1].'</a> ('.$_[0]->get("proxiedWobjectId").')'
 		);
-	$properties->yesNo(
-		-name=>"proxyByCriteria",
-		-value=>$_[0]->getValue("proxyByCriteria"),
-		-label=>WebGUI::International::get("Proxy by alternate criteria?",$_[0]->get("namespace")),
-		-extras=>q|Onchange="
+	if($session{setting}{metaDataEnabled}) {
+		$properties->yesNo(
+			-name=>"proxyByCriteria",
+			-value=>$_[0]->getValue("proxyByCriteria"),
+			-label=>WebGUI::International::get("Proxy by alternate criteria?",$_[0]->get("namespace")),
+			-extras=>q|Onchange="
 				if (this.form.proxyByCriteria[0].checked) { 
  					this.form.resolveMultiples.disabled=false;
 					this.form.proxyCriteria.disabled=false;
@@ -137,26 +138,25 @@ sub www_edit {
 					this.form.proxyCriteria.disabled=true;
 				}"|
                 );
-	my $extras;
-	if ($_[0]->getValue("proxyByCriteria") == 0) {
-		$extras = 'disabled=true';
-	}
-	$properties->selectList(
-		-name=>"resolveMultiples",
-		-value=>[ $_[0]->getValue("resolveMultiples") ],
-		-label=>WebGUI::International::get("Resolve Multiples?",$_[0]->get("namespace")),
-		-options=>{
+		if ($_[0]->getValue("proxyByCriteria") == 0) {
+			$_[0]->{_disabled} = 'disabled=true';
+		}
+		$properties->selectList(
+			-name=>"resolveMultiples",
+			-value=>[ $_[0]->getValue("resolveMultiples") ],
+			-label=>WebGUI::International::get("Resolve Multiples?",$_[0]->get("namespace")),
+			-options=>{
 				mostRecent=>WebGUI::International::get("Most Recent",$_[0]->get("namespace")),
 				random=>WebGUI::International::get("Random",$_[0]->get("namespace")),
 			},
-		-extras=>$extras
+			-extras=>$_[0]->{_disabled}
 		);
 
-	 $properties->readOnly(
-        -value=>$_[0]->_drawQueryBuilder(),
-        -label=>WebGUI::International::get("Criteria",$_[0]->get("namespace")),
-	
-        );
+		 $properties->readOnly(
+        		-value=>$_[0]->_drawQueryBuilder(),
+		        -label=>WebGUI::International::get("Criteria",$_[0]->get("namespace")),
+	        );
+	}
 	return $_[0]->SUPER::www_edit(
                 -properties=>$properties->printRowsOnly,
                 -layout=>$layout->printRowsOnly,
@@ -197,6 +197,7 @@ sub _drawQueryBuilder {
 	my $proxyCriteriaField = WebGUI::Form::textarea({
 	                	        name=>"proxyCriteria",
         	                	value=>$_[0]->getValue("proxyCriteria"),
+					extras=>'style="width: 100%" '.$_[0]->{_disabled}
                 	        });
 	my $conjunctionField = WebGUI::Form::selectList({
 					name=>"conjunction",
@@ -216,7 +217,7 @@ sub _drawQueryBuilder {
 
 	$output .= qq|<table cellspacing="0" cellpadding=0 border=0 >
 			  <tr>
-			    <td colspan="5">$proxyCriteriaField</td>
+			    <td colspan="5" align="right">$proxyCriteriaField</td>
 			  </tr>
 			  <tr>
 			    <td></td>

@@ -1,6 +1,6 @@
 insert into webguiVersion values ('6.2.0','upgrade',unix_timestamp());
-DROP TABLE IF EXISTS metaData_fields;
-CREATE TABLE metaData_fields (
+DROP TABLE IF EXISTS metaData_properties;
+CREATE TABLE metaData_properties (
   fieldId int(11) NOT NULL default '0',
   fieldName varchar(100) NOT NULL ,
   description mediumtext NOT NULL ,
@@ -11,8 +11,8 @@ CREATE TABLE metaData_fields (
   UNIQUE KEY field_unique (fieldName)
 ) TYPE=MyISAM;
 
-DROP TABLE IF EXISTS metaData_data;
-CREATE TABLE metaData_data (
+DROP TABLE IF EXISTS metaData_values;
+CREATE TABLE metaData_values (
   fieldId int(11) NOT NULL default '0',
   wobjectId int(11) NOT NULL default '0',
   value varchar(100) default NULL,

@@ -33,8 +33,16 @@ This package provides an interface to the MetaData system.
 =head1 SYNOPSIS
 
  use WebGUI::MetaData;
+
+ $wid = getWobjectByCriteria($hashRef);
+ $hashRef = WebGUI::MetaData::getField( $fieldId );
+ $hashRef = WebGUI::MetaData::getMetaDataFields();
+ $wid = getWobjectByCriteria($hashRef);
  $arrayRef = WebGUI::MetaData::getFieldTypes;
- $hashRef = WebGUI::MetaData::getMetaDataFields;
+ WebGUI::MetaData::metaDataSave( $wobjectId )
+ WebGUI::MetaData::metaDataDelete( $wobjectId )
+ WebGUI::MetaData::MetaDataDuplicate( $fromWobjectId , $toWobjectId )
+ WebGUI::MetaData::deleteField( $fieldId );
 
 =head1 METHODS
 
@@ -75,8 +83,8 @@ The fieldId to be deleted.
 sub deleteField {
 	my $fieldId = shift;
 	return unless ($fieldId =~ /^\d+$/);
-        WebGUI::SQL->write("delete from metaData_fields where fieldId = ".quote($fieldId));
-        WebGUI::SQL->write("delete from metaData_data where fieldId = ".quote($fieldId));
+        WebGUI::SQL->write("delete from metaData_properties where fieldId = ".quote($fieldId));
+        WebGUI::SQL->write("delete from metaData_values where fieldId = ".quote($fieldId));
 }
 
 #-------------------------------------------------------------------
@@ -147,8 +155,8 @@ sub getMetaDataFields {
 			f.fieldType,
 			f.possibleValues,
 			d.value
-		from metaData_fields f
-		left join metaData_data d on f.fieldId=d.fieldId and d.wobjectId=".quote($wobjectId);
+		from metaData_properties f
+		left join metaData_values d on f.fieldId=d.fieldId and d.wobjectId=".quote($wobjectId);
 	$sql .= " where f.fieldId = ".quote($fieldId) if ($fieldId);
 	$sql .= " order by f.fieldName";
 	my $sth = WebGUI::SQL->read($sql);
@@ -182,19 +190,19 @@ sub metaDataSave {
 	foreach my $form (keys %{$session{form}}) {
 		if ($form =~ /^metadata_(\d+)$/) {
 			my $fieldId = $1; 
-			my ($exists) = WebGUI::SQL->quickArray("select count(*) from metaData_data
+			my ($exists) = WebGUI::SQL->quickArray("select count(*) from metaData_values
 							where wobjectId = ".quote($wobjectId)."
 							and fieldId = ".quote($fieldId));
 			if(! $exists && $session{form}{$form} ne "") {
-				WebGUI::SQL->write("insert into metaData_data (fieldId, wobjectId)
+				WebGUI::SQL->write("insert into metaData_values (fieldId, wobjectId)
 							values (".quote($fieldId).",".quote($wobjectId).")");
 			}
 			if($session{form}{$form} eq "") {
 				# Keep it clean
-				WebGUI::SQL->write("delete from metaData_data where wobjectId = ".
+				WebGUI::SQL->write("delete from metaData_values where wobjectId = ".
 							quote($wobjectId)." and fieldId = ".quote($fieldId));
 			} else {
-				WebGUI::SQL->write("update metaData_data set value = ".quote($session{form}{$form})."
+				WebGUI::SQL->write("update metaData_values set value = ".quote($session{form}{$form})."
 							where wobjectId = ".quote($wobjectId)." and fieldId = ".
 							quote($fieldId));
 			}
@@ -220,7 +228,7 @@ The Id from the wobject you want to delete metadata for.
 
 sub metaDataDelete {
 	my $wobjectId = shift;
-	return WebGUI::SQL->write("delete from metaData_data where wobjectId = ".quote($wobjectId));
+	return WebGUI::SQL->write("delete from metaData_values where wobjectId = ".quote($wobjectId));
 }
 
 #-------------------------------------------------------------------
@@ -246,9 +254,9 @@ The new wobject Id
 sub MetaDataDuplicate {
 	my $fromWobjectId = shift;
 	my $toWobjectId = shift;
-        my $sth = WebGUI::SQL->read("select * from metaData_data where wobjectId = ".quote($fromWobjectId));
+        my $sth = WebGUI::SQL->read("select * from metaData_values where wobjectId = ".quote($fromWobjectId));
         while( my $h = $sth->hashRef) {
-		WebGUI::SQL->write("insert into metaData_data (fieldId, wobjectId, value) values (".
+		WebGUI::SQL->write("insert into metaData_values (fieldId, wobjectId, value) values (".
 					quote($h->{fieldId}).",".quote($toWobjectId).",".quote($h->{value}).")");
         }
         $sth->finish;
@@ -341,7 +349,7 @@ sub getWobjectByCriteria {
 	        $constraint =~ s/\Q$expression/$replacement/;
 	}
 	my $sql =  "	select w.wobjectId 
-			from metaData_data d, metaData_fields f, wobject w 
+			from metaData_values d, metaData_properties f, wobject w 
 			where f.fieldId = d.fieldId
 				and w.wobjectId = d.wobjectId
 				and w.namespace = ".quote($namespace); 			

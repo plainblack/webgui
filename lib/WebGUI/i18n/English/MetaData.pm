@@ -6,16 +6,20 @@ our $I18N = {
                 lastUpdated => 1089039511,
                 context => 'Label for tab'
         },
+	'errorEmptyField' => { 
+		message => q|<p><b>Error: Field name may not be empty.</b></p>|,
+                lastUpdated => 1089039511,
+        },
 	'duplicateField' => {
 		message => q|<p><b>Error: Fieldname "%field%" is already in use.</b></p>|,
 		lastUpdated => 1089039511,
         },
 	'Delete Metadata field' => {
-		message => q|Delete Metadata field|,
+		message => q|Delete Metadata property|,
                 lastUpdated => 1089039511,
         },
 	'deleteConfirm' => {
-		message => q|Are you certain you want to delete this Metadata field ?|,
+		message => q|Are you certain you want to delete this Metadata property ?|,
 		lastUpdated => 1089039511,
         },
 	'Manage Metadata' => {
@@ -27,15 +31,15 @@ our $I18N = {
 		lastUpdated => 1089039511,
         },
 	'Add new field' => {
-		message => q|Add new field|,
+		message => q|Add new metadata property|,
 		lastUpdated => 1089039511,
         },
 	'Manage Metadata fields' => {
-		message => q|Manage Metadata fields|,
+		message => q|Manage metadata properties|,
                 lastUpdated => 1089039511,
         },
 	'Edit Metadata' => {
-		message => q|Edit Metadata|,
+		message => q|Edit Metadata property|,
 		lastUpdated => 1089039511,
         },
 	'Field Id' => {

@@ -8,7 +8,12 @@ our $HELP = {
 			{
 				tag => 'wobjects using',
 				namespace => 'WebGUI'
-			}
+			},
+                        {
+                                tag => 'metadata manage',
+                                namespace => 'WebGUI'
+                        },
+
 		]
 	},
 };

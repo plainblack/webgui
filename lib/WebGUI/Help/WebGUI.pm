@@ -186,6 +186,10 @@ our $HELP = {
 				namespace => 'MessageBoard'
 			},
 			{
+				tag => 'metadata manage',
+				namespace => 'WebGUI'
+			},
+			{
 				tag => 'poll add/edit',
 				namespace => 'Poll'
 			},
@@ -1109,6 +1113,39 @@ our $HELP = {
 			}
 		]
 	},
+	'metadata manage'=> {
+		title => 'Metadata, Manage',
+		body => 'metadata manage body',
+		related => [
+			{
+				tag => 'user macros',
+				namespace => 'WebGUI'
+			},
+			{
+				tag => 'wobject add/edit',
+				namespace => 'WebGUI',
+			},
+		],
+	},
+	'metadata edit property' => {
+                title => 'Metadata, Edit property',
+                body => 'metadata edit property body',
+                related => [
+			{
+				tag => 'metadata manage',
+				namespace => 'WebGUI'
+                        },
+                        {
+                                tag => 'user macros',
+                                namespace => 'WebGUI'
+                        },
+                        {
+                                tag => 'wobject add/edit',
+                                namespace => 'WebGUI',
+                        },
+                ],
+        },
+
 };
 
 1;

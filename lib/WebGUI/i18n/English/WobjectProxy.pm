@@ -52,6 +52,20 @@ Set to "yes" to use the display title setting of the wobject proxy instead of th
 <b>Override template?</b><br>
 Set to "yes" to use the template of the wobject proxy instead of the original template of the wobject.
 <p>
+
+<b>Proxy by alternate criteria?</b><br>
+Set to "yes" to enable selecting a wobject based upon custom criteria. Metadata must be enabled for this option to function properly.
+<p>
+
+<b>Resolve Multiples?</b><br>
+Sets the order to use when multiple wobjects are selected. Random means that if multiple wobjects match the proxy criteria then the wobject proxy will select a random wobject to proxy.<br>
+Most Recent will select the most recent wobject that match the proxy criteria.
+<p>
+
+<b>Criteria</b><br>
+A statement to determinate what to proxy, in the form of "color = blue and weight != heavy". Multiple expressions may be joined with "and" and "or". <br>
+A property or value must be quoted if it contains spaces. Feel free to use the criteria builder to build your statements.
+<p>
 |,
 		lastUpdated => 1057091098
 	},

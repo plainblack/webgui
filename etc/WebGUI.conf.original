@@ -14,6 +14,8 @@ uploadsPath = /data/WebGUI/www/uploads
 
 templateCacheType=file
 
+passiveProfileInterval = 86400	# in seconds
+
 emailRecoveryLoggingEnabled = 1
 passwordChangeLoggingEnabled = 1
 

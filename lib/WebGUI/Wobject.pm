@@ -1470,6 +1470,12 @@ sub www_edit {
 		my $meta = WebGUI::MetaData::getMetaDataFields($self->get("wobjectId"));
 		foreach my $field (keys %$meta) {
 			my $fieldType = $meta->{$field}{fieldType} || "text";
+			my $options;
+			# Add a "Select..." option on top of a select list to prevent from
+			# saving the value on top of the list when no choice is made.
+			if($fieldType eq "selectList") {
+				$options = {"", WebGUI::International::get("Select...","MetaData")};
+			}
 			$f->getTab("metadata")->dynamicField($fieldType,
 						-name=>"metadata_".$meta->{$field}{fieldId},
 						-label=>$meta->{$field}{fieldName},
@@ -1477,9 +1483,15 @@ sub www_edit {
 						-value=>$meta->{$field}{value},
 						-extras=>qq/title="$meta->{$field}{description}"/,
 						-possibleValues=>$meta->{$field}{possibleValues},
-						-options=>{"", WebGUI::International::get("Select...","MetaData")}
+						-options=>$options
 				);
         	}
+		# Add a quick link to add field
+		$f->getTab("metadata")->readOnly(
+					-value=>'<p><a href="'.WebGUI::URL::page("op=editMetaDataField&fid=new").'">'.
+				                        WebGUI::International::get('Add new field','MetaData').
+     					                '</a></p>'
+		);
 	}
 	my $output;
 	$output = helpIcon($helpId,$self->get("namespace")) if ($helpId);

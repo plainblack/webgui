@@ -21,7 +21,7 @@ sub process {
         @param = WebGUI::Macro::getParams($_[0]);
 	my $key = $param[0];
 	my $value = $param[1];
-	my $sql = "select count from passiveProfileAOI a, metaData_fields f 
+	my $sql = "select count from passiveProfileAOI a, metaData_properties f 
 			where a.fieldId=f.fieldId 
 			and userId=".quote($session{user}{userId})." 
 			and fieldName=".quote($key)." 

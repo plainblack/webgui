@@ -3008,6 +3008,7 @@ The style-sheet id is the word "wobjectId" plus the Wobject Id for that wobject 
 <P><B>Title</B> The title of the wobject. This is typically displayed at the top of each wobject. 
 <P><I>Note:</I> You should always specify a title even if you are going to turn it off (with the next property). This is because the title shows up in the trash and clipboard and you'll want to be able to distinguish which wobject is which. 
 <P><B>Display title?</B><BR>Do you wish to display the title you specified? On some sites, displaying the title is not necessary. 
+<P><B>Metadata</B><BR>Under the Metadata tab you can set the metadata properties for this content. Metadata must be enabled in the Manage Settings menu.
 <P><B>Process macros?</B><BR>Do you wish to process macros in the content of this wobject? Sometimes you'll want to do this, but more often than not you'll want to say "no" to this question. By disabling the processing of macros on the wobjects that don't use them, you'll speed up your web server slightly. 
 <P><B>Template Position</B><BR>Template positions range from 0 (zero) to any number. How many are available depends upon the Template associated with this page. The default template has only one template position, others may have more. By selecting a template position, you're specifying where this wobject should be placed within the template. 
 <P><B>Start Date</B><BR>On what date should this wobject become visible? Before this date, the wobject will only be displayed to Content Managers. 
@@ -4535,6 +4536,14 @@ Displays a small text message to a user who is in admin mode. Example: &#94;Admi
 
 <b>&#94;AdminToggle; or &#94;AdminToggle();</b><br>
 Places a link on the page which is only visible to content managers and adminstrators. The link toggles on/off admin mode. You can optionally specify other messages to display like this: &#94;AdminToggle("Edit On","Edit Off"); This macro optionally takes a third parameter that allows you to specify an alternate template name in the Macro/AdminToggle namespace.
+<p>
+
+<b>&#94;AOIHits();</b><br>
+Displays the number of views for a metadata property/value pair. Example: &#94;AOIHits(contenttype,sport); would display 99 if this user has looked at content that was tagged "contenttype = sport" 99 times.
+<p>
+
+<b>&#94;AOIRank();</b><br>
+Diplays the highest ranked metadata property for this user. Example &#94;AOIRank(contenttype); would display "sport" if this user has looked mostly to content tagged "contenttype = sport". Optionally the rank can also be displayed. Example &#94;AOIRank(contenttype, 2); would return the second highest ranked contenttype.
 <p>
 
 <b>&#94;CanEditText();</b><br>
@@ -7025,7 +7034,103 @@ Following a guide like the above will help you get good ranking on search engine
 		message => q|Decimal|,
 		lastUpdated => 1089039511,
 		context => q|A label that tells the user that this field uses a floating point number, aka a Decimal number, aka a Real number.|
-	}
+	},
+	'Metadata, Edit property' => {
+		message => q|Metadata, Edit property|,
+		lastUpdated => 1089039511,
+		context => q|Metadata edit property help title|
+	},
+	'metadata edit property body' => {
+                message => q|
+You may add as many Metadata properties as you like.<br>
+<br>
+<b>Field Name</b><br>
+The name of this metadata propertie.It must be unique. <br>
+It is advisable to use only letters (a-z), numbers (0-9) or underscores (_) for
+the field names.
+<p><b>Description<br>
+</b>An optional description for this metadata property. This text is displayed
+as mouseover text in the wobject properties tab.</p>
+<p><b>Data Type<br>
+</b>Choose the type of form element for this field.<b><br>
+<br>
+Possible Values<br>
+</b>This field is used for the list types (Radio List and Select List). Enter
+the values you wish to appear, one per line.</p>
+|,
+                lastUpdated => 1089039511,
+                context => q|Metadata edit property help|
+	},
+	'Metadata, Manage' => {
+		message => q|Metadata, Manage|,
+		lastUpdated => 1089039511,
+                context => q|Metadata help title|
+	},
+	'metadata manage body' => {
+		message => q|
+<p>The metadata system in WebGUI allows you to identify content. Metadata is
+information about the content, and is defined in terms of property-value pairs.</p>
+<p>Examples of metadata:</p>
+<ul>
+  <li>contenttype: sport</li>
+  <li>adult content: no</li>
+  <li>source: newspaper</li>
+</ul>
+<p>In the example <b>source: newspaper</b> is <i>source</i> the <i>property</i>
+and <i>newspaper</i> the <i>value</i>.</p>
+<p>Metadata properties are defined globally, while Metadata values are set for
+each wobject under the tab &quot;Metadata&quot; in the wobject properties.</p>
+<p>Before you can use metadata, you'll have to switch the &quot;Enable Metadata
+?&quot; setting to Yes.</p>
+<p>Usage of metadata:</p>
+<ul>
+  <li><b>Passive Profiling</b><br>
+    When passive profiling is switched on, every wobject viewed by a user will
+    be logged.&nbsp;<br>
+    The WebGUI scheduler summarizes the profiling information on a regular
+    basis.&nbsp;<br>
+    The metadata is used to generate the summary. This is basically content
+    ranking based upon the user's Areas of Interest (AOI).<br>
+    By default the summarizer runs once a day. However you can change that by
+    setting: <b>passiveProfileInterval = &lt;number of seconds&gt; </b>in the
+    WebGUI config file. <br>
+  </li>
+</ul>
+<ul>
+  <li><b>Areas of Interest Ranking<br>
+    </b>Metadata in combination with passive profiling produces AOI (Areas of
+    Interest) information. You can retrieve the value of a metadata property
+    with the ^AOIRank macro:<br>
+    <br>
+    ^AOIRank(contenttype); <br>
+    This would return the highest ranked contenttype for this user, such as
+    &quot;sport&quot;.<br>
+    <br>
+    ^AOIRank(contenttype,2);<br>
+    This would return the second highest ranked contenttype for this user.<br>
+    <br>
+    You can also retrieve the number of hits a particular AOI has gotten:<br>
+    <br>
+    ^AOIHits(contenttype,sport); <br>
+    This would return 99 is this user has looked at content that was tagged
+    &quot;contenttype = sport&quot; 99 times. </li>
+</ul>
+<ul>
+  <li><b>Show content based upon criteria<br>
+    </b>The Wobject Proxy allows you to select content based upon criteria like:<br>
+    contenttype = sport AND source != newspaper<br>
+    <br>
+    You can use the AOI macro's described above in the criteria, so you can
+    present content based upon the users Areas of Interest. Example:<br>
+    type = ^AOIRank(contenttype);</li>
+</ul>|,
+                lastUpdated => 1089039511,
+                context => q|Metadata help|
+        },
+
+
+
+
 
 };
 
