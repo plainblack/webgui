@@ -78,7 +78,7 @@ sub new {
 
 #-------------------------------------------------------------------
 sub purge {
-	WebGUI::SQL->write("delete from DownloadManager_file where wobjectId=$_[0]");
+	WebGUI::SQL->write("delete from DownloadManager_file where wobjectId=".$_[0]->get("wobjectId"));
 	$_[0]->SUPER::purge();
 }
 
