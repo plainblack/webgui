@@ -171,10 +171,6 @@ Returns an HTML string with all the necessary components to draw the tab form.
 
 sub print {
 	my $output = '
-		<script src="'.$session{config}{extrasURL}.'/tabs/utils.js" type="text/javascript"></script>
-		<script src="'.$session{config}{extrasURL}.'/tabs/viewport.js" type="text/javascript"></script>
-		<script src="'.$session{config}{extrasURL}.'/tabs/global.js" type="text/javascript"></script>
-		<script src="'.$session{config}{extrasURL}.'/tabs/cookie.js" type="text/javascript"></script>
 		<script src="'.$session{config}{extrasURL}.'/tabs/tabs.js" type="text/javascript"></script>
 		<link href="'.$session{config}{extrasURL}.'/tabs/tabs.css" rel="stylesheet" rev="stylesheet" type="text/css">
 	';
@@ -184,12 +180,8 @@ sub print {
 	my $tabs;
 	my $form;	
 	foreach my $key (keys %{$_[0]->{_tab}}) {
-		$tabs .= '<span id="tab'.$i.'" class="tab';
-		if ($i == 1) {
-			$tabs .= ' tabActive';
-		}
-		$tabs .= '">'.$_[0]->{_tab}{$key}{label}.'</span> ';
-		$form .= '<div id="content'.$i.'" class="tabBody"><table>';
+		$tabs .= '<span onclick="toggleTab('.$i.')" id="tab'.$i.'" class="tab">'.$_[0]->{_tab}{$key}{label}.'</span> ';
+		$form .= '<div id="tabcontent'.$i.'" class="tabBody"><table>';
 		$form .= $_[0]->{_tab}{$key}{form}->printRowsOnly;
 		$form .= '</table></div>';
 		$i++;
@@ -197,7 +189,7 @@ sub print {
 	$output .= '<div class="tabs">'.$tabs.$_[0]->{_submit}.'</div>';
 	$output .= $form;
 	$output .= '</form>';
-	$output .= '<script>tabInit();</script>';
+	$output .= '<script>var numberOfTabs = '.($i-1).'; initTabs();</script>';
 	return $output;
 }
 

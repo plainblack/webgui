@@ -95,6 +95,3 @@ HTML Area............................interactivetools.com
 
 Classic Rich Edit....................Bratta
 
-Tab DHTML............................Garrett Smith
-                                     dhtmlkitchen.com
-
