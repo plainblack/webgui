@@ -34,7 +34,7 @@ sub getStyle {
 			<head>
 			<title>';
 		$header .= $session{page}{title}.' - '.$session{setting}{companyName};
-		$header .= '</title>'
+		$header .= '</title><link REL="icon" HREF="'.$session{setting}{lib}.'/favicon.png" TYPE="image/png">'
 			.$style{styleSheet}
 			.$session{page}{metaTags};
 		if ($session{var}{adminOn}) {
