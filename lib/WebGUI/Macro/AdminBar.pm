@@ -26,7 +26,6 @@ sub _replacement {
 	tie %hash, "Tie::IxHash";
 	tie %hash2, "Tie::IxHash";
   #--content adder
-	$hash{WebGUI::URL::page()} = WebGUI::International::get(1);
 	$hash{WebGUI::URL::page('op=editPage&npp='.$session{page}{pageId})} = WebGUI::International::get(2);
 	if ($session{user}{uiLevel} >= 7) {
 		$hash{WebGUI::URL::page('op=selectPackageToDeploy')} = WebGUI::International::get(376);
@@ -35,6 +34,7 @@ sub _replacement {
 		$hash{WebGUI::URL::page('func=edit&wid=new&namespace='.$key)} = $session{wobject}{$key};
 	}
 	%hash = sortHash(%hash);
+	%hash = (%{{WebGUI::URL::page()=>WebGUI::International::get(1)}},%hash);
         $contentSelect = WebGUI::Form::selectList({
 		name=>"contentSelect",
 		options=>\%hash,
