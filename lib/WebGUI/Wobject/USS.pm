@@ -219,8 +219,8 @@ sub new {
 
 #-------------------------------------------------------------------
 sub purge {
-	my $sth = WebGUI::SQL->read("select forumId,pageId from USS_submission where USS_id=".quote($_[0]->get("USS_id")));
-	while (my ($forumId, $pageId) = $sth->array) {
+	my $sth = WebGUI::SQL->read("select forumId,pageId,USS_submissionId from USS_submission where USS_id=".quote($_[0]->get("USS_id")));
+	while (my ($forumId, $pageId,$submissionId) = $sth->array) {
 		my ($inUseElsewhere) = WebGUI::SQL->quickArray("select count(*) from USS_submission where forumId=".quote($forumId));
 		unless ($inUseElsewhere > 1) {
 			my $forum = WebGUI::Forum->new($forumId);
@@ -230,8 +230,7 @@ sub purge {
 		if (defined $page) {
                         $page->purge;
                 } else {
-                        WebGUI::ErrorHandler::warn("Submission ".$submissionId."
- of USS ".$_[0]->get("USS_id")." didn't have real page attached to it. This could be a minor problem caused by a bug of old, or it could indicate major data corruption issues.");
+                        WebGUI::ErrorHandler::warn("Submission ".$submissionId." of USS ".$_[0]->get("USS_id")." didn't have real page attached to it. This could be a minor problem caused by a bug of old, or it could indicate major data corruption issues.");
                 }
 	}
 	$sth->finish;
