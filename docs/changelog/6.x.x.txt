@@ -19,6 +19,10 @@ Andreas Graf).
  - Bugfix [ 914217 ] content managers cannot turn admin on
  - Bugfix [ 920089 ] Problem with clipboard and object names containing a
    quote.
+ - Bugfix [ 921750 ] Error in Horizontal Login Box template (Thanks to Tony
+   Mountifield.)
+ - Added Tony Mountifield to the credits list for all his debugging efforts as
+   of late.
 
 
 6.0.0
