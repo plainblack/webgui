@@ -810,37 +810,43 @@ sub forumProperties {
 		-name=>"forumTemplateId",
 		-label=>WebGUI::International::get(1031),
 		-namespace=>"Forum",
-		-uiLevel=>5
+		-uiLevel=>5,
+		-value=>$forum->get("forumTemplateId")
 		);
 	$f->template(
 		-name=>"threadTemplateId",
 		-label=>WebGUI::International::get(1032),
 		-namespace=>"Forum/Thread",
-		-uiLevel=>5
+		-uiLevel=>5,
+		-value=>$forum->get("threadTemplateId")
 		);
 	$f->template(
 		-name=>"postTemplateId",
 		-label=>WebGUI::International::get(1033),
 		-namespace=>"Forum/Post",
-		-uiLevel=>5
+		-uiLevel=>5,
+		-value=>$forum->get("postTemplateId")
 		);
 	$f->template(
 		-name=>"searchTemplateId",
 		-label=>WebGUI::International::get(1044),
 		-namespace=>"Forum/Search",
-		-uiLevel=>5
+		-uiLevel=>5,
+		-value=>$forum->get("searchTemplateId")
 		);
 	$f->template(
 		-name=>"postFormTemplateId",
 		-label=>WebGUI::International::get(1034),
 		-namespace=>"Forum/PostForm",
-		-uiLevel=>5
+		-uiLevel=>5,
+		-value=>$forum->get("postFormTemplateId")
 		);
 	$f->template(
 		-name=>"notificationTemplateId",
 		-label=>WebGUI::International::get(1035),
 		-namespace=>"Forum/Notification",
-		-uiLevel=>5
+		-uiLevel=>5,
+		-value=>$forum->get("notificationTemplateId")
 		);
         my ($interval, $units) = WebGUI::DateTime::secondsToInterval(($forum->get("archiveAfter") || 31536000));
         $f->interval(
