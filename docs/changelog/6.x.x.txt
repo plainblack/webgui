@@ -7,6 +7,7 @@
  - Fixed typo in Wobjects/IndexedSearch.pm
  - Navigation template variable rename, added template variables for
    basepage.hasDaughter, page.inRoot.
+ - Lots of GUID changes in Perl and SQL code.
 
 
 6.2.7
