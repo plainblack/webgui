@@ -1,7 +1,7 @@
 package WebGUI::Forum::UI;
 
 =head1 LEGAL
-                                                                                                                                                             
+
  -------------------------------------------------------------------
   WebGUI is Copyright 2001-2003 Plain Black LLC.
  -------------------------------------------------------------------
@@ -11,7 +11,7 @@ package WebGUI::Forum::UI;
  -------------------------------------------------------------------
   http://www.plainblack.com                     info@plainblack.com
  -------------------------------------------------------------------
-                                                                                                                                                             
+
 =cut
 
 use strict qw(vars subs);
@@ -2240,6 +2240,7 @@ The web method to unsubscribe from a thread.
 =item caller
 
 A hash reference containing information passed from the calling object.
+
 =back
 
 =cut
