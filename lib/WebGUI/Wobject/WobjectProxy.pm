@@ -79,14 +79,6 @@ sub uiLevel {
 sub www_edit {
 	my $properties = WebGUI::HTMLForm->new;
         my $layout = WebGUI::HTMLForm->new;
-	$properties->hidden(
-		-name=>"proxiedNamespace",
-		-value=>$_[0]->get("proxiedNamespace")
-		);
-	$properties->hidden(
-		-name=>"proxiedWobjectId",
-		-value=>$_[0]->get("proxiedWobjectId")
-		);
 	$layout->template(
 		-name=>"proxiedTemplateId",
 		-value=>$_[0]->getValue("proxiedTemplateId"),

@@ -1410,19 +1410,21 @@ sub www_editSave {
 	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
 	my %set;
 	foreach my $key (keys %{$_[0]->{_wobjectProperties}}) {
-		$set{$key} = WebGUI::FormProcessor::process(
+		my $temp = WebGUI::FormProcessor::process(
 			$key,
 			$_[0]->{_wobjectProperties}{$key}{fieldType},
 			$_[0]->{_wobjectProperties}{$key}{defaultValue}
 			);
+		$set{$key} = $temp if (defined $temp);
 	}
 	$set{title} = $session{form}{title} || $_[0]->name;
 	foreach my $key (keys %{$_[0]->{_extendedProperties}}) {
-		$set{$key} = WebGUI::FormProcessor::process(
+		my $temp = WebGUI::FormProcessor::process(
 			$key,
 			$_[0]->{_extendedProperties}{$key}{fieldType},
 			$_[0]->{_extendedProperties}{$key}{defaultValue}
 			);
+		$set{$key} = $temp if (defined $temp);
 	}
 	%set = (%set, %{$_[1]});
 	$_[0]->set(\%set);
