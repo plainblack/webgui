@@ -221,10 +221,44 @@ sub createAccount {
 }
 
 #-------------------------------------------------------------------
+sub createAccountSave {
+   my $self = shift;
+   my $username = $_[0];
+   my $properties = $_[1];
+   my $password = $_[2];
+   my $profile = $_[3];
+   
+      
+   my $u = WebGUI::User->new("new");
+   $self->user($u);
+   my $userId = $u->userId;
+   $u->username($username);
+   $u->authMethod($self->authMethod);
+   $u->karma($session{setting}{karmaPerLogin},"Login","Just for logging in.") if ($session{setting}{useKarma});
+   WebGUI::Operation::Profile::saveProfileFields($u,$profile) if($profile);
+   $self->saveParams($userId,$self->authMethod,$properties);
+   
+   if ($self->getSetting("sendWelcomeMessage")){
+      my $authInfo = "\n\n".WebGUI::International::get(50).": ".$username;
+      $authInfo .= "\n".WebGUI::International::get(51).": ".$password if($password);
+      $authInfo .= "\n\n";
+      WebGUI::MessageLog::addEntry($self->userId,"",WebGUI::International::get(870),getSetting("welcomeMessage").$authInfo);
+   }
+   
+   WebGUI::Session::convertVisitorToUser($session{var}{sessionId},$userId);
+   $self->_logLogin($userId,"success");
+   system(WebGUI::Macro::process($session{setting}{runOnRegistration})) if ($session{setting}{runOnRegistration} ne "");
+   WebGUI::MessageLog::addInternationalizedEntry('',$session{setting}{onNewUserAlertGroup},'',536) if ($session{setting}{alertOnNewUser});
+   return "";
+}
+
+#-------------------------------------------------------------------
 sub deactivateAccount {
    my $self = shift;
    my $method = $_[0];
    my ($output);
+   return WebGUI::Privilege::vitalComponent() if($self->userId < 26);
+   return WebGUI::Privilege::adminOnly() if(!$session{setting}{selfDeactivation});
    $output = '<h1>'.WebGUI::International::get(42).'</h1>';
    $output .= WebGUI::International::get(60).'<p>';
    $output .= '<div align="center"><a href="'.WebGUI::URL::page('op=auth&method='.$method).'">'.WebGUI::International::get(44).'</a>';
@@ -235,8 +269,8 @@ sub deactivateAccount {
 #-------------------------------------------------------------------
 sub deactivateAccountConfirm {
    my $self = shift;
-   my ($u);
-   $u = WebGUI::User->new($session{user}{userId});
+   return WebGUI::Privilege::vitalComponent() if ($self->userId < 26);
+   my $u = $self->user;   #WebGUI::User->new($session{user}{userId});
    $u->status("Selfdestructed");
    WebGUI::Session::end($session{var}{sessionId});
    WebGUI::Session::start(1);   

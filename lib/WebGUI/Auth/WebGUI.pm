@@ -123,44 +123,24 @@ sub createAccountSave {
       return $self->createAccount('<li>'.WebGUI::International::get(1078));
    }
 
-   my $lastUpdated = time();
+   my $properties;
+   $properties->{identifier} = Digest::MD5::md5_base64($password);
+   $properties->{passwordLastUpdated} = time();
+   $properties->{passwordTimeout} = $session{setting}{webguiPasswordTimeout};
       
-   my $u = WebGUI::User->new("new");
-   $self->user($u);
-   my $userId = $u->userId;
-   $u->username($username);
-   $u->authMethod($self->authMethod);
-   $u->karma($session{setting}{karmaPerLogin},"Login","Just for logging in.") if ($session{setting}{useKarma});
-   WebGUI::Operation::Profile::saveProfileFields($u,$profile);
-   
-   my %properties;
-   $properties{identifier} = Digest::MD5::md5_base64($password);
-   $properties{passwordLastUpdated} = $lastUpdated;
-   $properties{passwordTimeout} = $session{setting}{webguiPasswordTimeout};
-   $self->saveParams($userId,$self->authMethod,\%properties);
-   my $authInfo = "\n\n".WebGUI::International::get(50).": ".$username."\n".WebGUI::International::get(51).": ".$password."\n\n";
-   WebGUI::MessageLog::addEntry($self->userId,"",WebGUI::International::get(870),$session{setting}{webguiWelcomeMessage}.$authInfo) if ($session{setting}{webguiSendWelcomeMessage});
-   
-   WebGUI::Session::convertVisitorToUser($session{var}{sessionId},$userId);
-   $self->_logLogin($userId,"success");
-   system(WebGUI::Macro::process($session{setting}{runOnRegistration})) if ($session{setting}{runOnRegistration} ne "");
-   WebGUI::MessageLog::addInternationalizedEntry('',$session{setting}{onNewUserAlertGroup},'',536) if ($session{setting}{alertOnNewUser});
-   return "";
+   return $self->SUPER::createAccountSave($username,$properties,$password,$profile);
 }
 
 #-------------------------------------------------------------------
 sub deactivateAccount {
    my $self = shift;
    return $self->displayLogin if($self->userId == 1);
-   return WebGUI::Privilege::vitalComponent() if($self->userId < 26);
-   return WebGUI::Privilege::adminOnly() if(!$session{setting}{selfDeactivation});
    return $self->SUPER::deactivateAccount("deactivateAccountConfirm");
 }
 
 #-------------------------------------------------------------------
 sub deactivateAccountConfirm {
    my $self = shift;
-   return WebGUI::Privilege::vitalComponent() if ($self->userId < 26);
    return $self->displayLogin unless ($session{setting}{selfDeactivation});
    return $self->SUPER::deactivateAccountConfirm;
 }

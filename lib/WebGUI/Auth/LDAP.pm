@@ -62,7 +62,7 @@ sub _isValidLDAPUser {
                 }
                 $ldap->unbind;
                 $ldap = Net::LDAP->new($uri->host, (port=>$uri->port)) or $error .= WebGUI::International::get(2,'Auth/LDAP');
-                $auth = $ldap->bind(dn=>$connectDN, password=>$session{form}{'authLDAP.password'});
+                $auth = $ldap->bind(dn=>$connectDN, password=>$session{form}{'authLDAP.identifier'});
                 if ($auth->code == 48 || $auth->code == 49) {
                    $error .= '<li>'.WebGUI::International::get(68);
                    WebGUI::ErrorHandler::warn("Invalid LDAP information for registration of LDAP ID: ".$session{form}{'authLDAP.ldapId'});
@@ -190,26 +190,16 @@ sub createAccount {
 #-------------------------------------------------------------------
 sub createAccountSave {
    my $self = shift;
+   my $username = $session{form}{'authLDAP.ldapId'};
+   my $password = $session{form}{'authLDAP.identifier'};
+   my $error = "";
+   
+   #Validate user in LDAP
    if(!$self->_isValidLDAPUser()){
       return $self->createAccount("<h1>".WebGUI::International::get(70)."</h1>".$self->error);
    }
    
-   my $username = $session{form}{'authWebGUI.ldapId'};
-   my $password = $session{form}{'authWebGUI.identifier'};
-   my $passConfirm = $session{form}{'authWebGUI.identifierConfirm'};
-   
-   my $error = $self->error if(!$self->validUsernameAndPassword($username,$password,$password));
-   my ($profile, $temp, $warning) = WebGUI::Operation::Profile::validateProfileData();
-   $error .= $temp;
-   
-   return $self->createAccount("<h1>".WebGUI::International::get(70)."</h1>".$error) unless ($error eq "");
-   
-   #If Email address is not unique, a warning is displayed
-   if($warning ne "" && !$session{form}{confirm}){
-      $session{form}{confirm} = 1;
-      return $self->createAccount('<li>'.WebGUI::International::get(1078));
-   }
-   
+   #Get connectDN from settings   
    my $uri = URI->new($session{setting}{ldapURL});
    my $ldap = Net::LDAP->new($uri->host, (port=>$uri->port));
    $ldap->bind;
@@ -224,43 +214,37 @@ sub createAccountSave {
    }
    $ldap->unbind;
    
-   my $u = WebGUI::User->new("new");
-   $self->user($u);
-   my $userId = $u->userId;
-   $u->username($username);
-   $u->authMethod($self->authMethod);
-   $u->karma($session{setting}{karmaPerLogin},"Login","Just for logging in.") if ($session{setting}{useKarma});
-   WebGUI::Operation::Profile::saveProfileFields($u,$profile);
+   
+   #Check that username is valid and not a duplicate in the system.
+   $error .= $self->error if($self->_isDuplicateUsername($username));
+   $error .= $self->error if(!$self->_isValidUsername($username));
+   #Validate profile data.
+   my ($profile, $temp, $warning) = WebGUI::Operation::Profile::validateProfileData();
+   $error .= $temp;
+   return $self->createAccount("<h1>".WebGUI::International::get(70)."</h1>".$error) unless ($error eq "");
+   #If Email address is not unique, a warning is displayed
+   if($warning ne "" && !$session{form}{confirm}){
+      $session{form}{confirm} = 1;
+      return $self->createAccount('<li>'.WebGUI::International::get(1078));
+   }
    
    my $properties;
    $properties->{connectDN} = $connectDN;
    $properties->{ldapUrl} = $session{setting}{ldapURL};
    
-   $self->saveParams($userId,$self->authMethod,$properties);
-   
-   my $authInfo = "\n\n".WebGUI::International::get(50).": ".$username."\n".WebGUI::International::get(51).": ".$password."\n\n";
-   WebGUI::MessageLog::addEntry($self->userId,"",WebGUI::International::get(870),$session{setting}{ldapWelcomeMessage}.$authInfo) if ($session{setting}{ldapSendWelcomeMessage});
-   
-   WebGUI::Session::convertVisitorToUser($session{var}{sessionId},$userId);
-   $self->_logLogin($userId,"success");
-   system(WebGUI::Macro::process($session{setting}{runOnRegistration})) if ($session{setting}{runOnRegistration} ne "");
-   WebGUI::MessageLog::addInternationalizedEntry('',$session{setting}{onNewUserAlertGroup},'',536) if ($session{setting}{alertOnNewUser});
-   return "";
+   return $self->SUPER::createAccountSave($username,$properties,$password,$profile);
 }
 
 #-------------------------------------------------------------------
 sub deactivateAccount {
    my $self = shift;
    return $self->displayLogin if($self->userId == 1);
-   return WebGUI::Privilege::vitalComponent() if($self->userId < 26);
-   return WebGUI::Privilege::adminOnly() if(!$session{setting}{selfDeactivation});
    return $self->SUPER::deactivateAccount("deactivateAccountConfirm");
 }
 
 #-------------------------------------------------------------------
 sub deactivateAccountConfirm {
    my $self = shift;
-   return WebGUI::Privilege::vitalComponent() if ($self->userId < 26);
    return $self->displayLogin unless ($session{setting}{selfDeactivation});
    return $self->SUPER::deactivateAccountConfirm;
 }
