@@ -12,14 +12,15 @@ package WebGUI::Macro::PageTitle;
 
 use strict;
 use WebGUI::Session;
-use WebGUI::URL;
 
 #-------------------------------------------------------------------
 sub process {
-	if ($session{form}{op} || $session{form}{func}) {
-        	return '<a href="'.WebGUI::URL::page().'">'.$session{page}{title}.'</a>';
-	} else {
-		return $session{page}{title};
+	if (exists $session{asset}) {
+		if ($session{form}{op} || $session{form}{func}) {
+	        	return '<a href="'.$session{asset}->getUrl.'">'.$session{asset}->get("title").'</a>';
+		} else {
+			return $session{asset}->get("title");
+		}
 	}
 }
 

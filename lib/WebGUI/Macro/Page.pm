@@ -16,10 +16,11 @@ use WebGUI::Session;
 
 #-------------------------------------------------------------------
 sub process {
-	my (@param, $temp);
-        @param = WebGUI::Macro::getParams($_[0]);
-	$temp = $session{page}{$param[0]};
-	return $temp;
+        my @param = WebGUI::Macro::getParams($_[0]);
+	if (exists $session{asset}) {
+		return $session{asset}->get($param[0]);
+	}
+	return "";
 }
 
 

@@ -28,7 +28,6 @@ use WebGUI::HTMLForm;
 use WebGUI::Id;
 use WebGUI::International;
 use WebGUI::Macro;
-use WebGUI::Node;
 use WebGUI::Privilege;
 use WebGUI::Session;
 use WebGUI::Style;
