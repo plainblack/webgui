@@ -1,18 +1,15 @@
-# MySQL dump 8.14
-#
-# Host: localhost    Database: WebGUI
-#--------------------------------------------------------
-# Server version	3.23.41
+-- MySQL dump 8.21
+--
+-- Host: localhost    Database: WebGUI
+---------------------------------------------------------
+-- Server version	3.23.49
 
-#
-# Table structure for table 'Article'
-#
+--
+-- Table structure for table 'Article'
+--
 
 CREATE TABLE Article (
-  widgetId int(11) NOT NULL default '0',
-  startDate int(11) default NULL,
-  endDate int(11) default NULL,
-  body mediumtext,
+  wobjectId int(11) NOT NULL default '0',
   image varchar(255) default NULL,
   linkTitle varchar(255) default NULL,
   linkURL text,
@@ -23,37 +20,39 @@ CREATE TABLE Article (
   groupToPost int(11) NOT NULL default '2',
   groupToModerate int(11) NOT NULL default '4',
   editTimeout int(11) NOT NULL default '1',
-  PRIMARY KEY  (widgetId)
+  PRIMARY KEY  (wobjectId)
 ) TYPE=MyISAM;
 
-#
-# Dumping data for table 'Article'
-#
+--
+-- Dumping data for table 'Article'
+--
 
 
-#
-# Table structure for table 'DownloadManager'
-#
+
+--
+-- Table structure for table 'DownloadManager'
+--
 
 CREATE TABLE DownloadManager (
-  widgetId int(11) NOT NULL default '0',
+  wobjectId int(11) NOT NULL default '0',
   paginateAfter int(11) NOT NULL default '50',
   displayThumbnails int(11) NOT NULL default '0',
-  PRIMARY KEY  (widgetId)
+  PRIMARY KEY  (wobjectId)
 ) TYPE=MyISAM;
 
-#
-# Dumping data for table 'DownloadManager'
-#
+--
+-- Dumping data for table 'DownloadManager'
+--
 
 
-#
-# Table structure for table 'DownloadManager_file'
-#
+
+--
+-- Table structure for table 'DownloadManager_file'
+--
 
 CREATE TABLE DownloadManager_file (
   downloadId int(11) NOT NULL default '0',
-  widgetId int(11) NOT NULL default '0',
+  wobjectId int(11) NOT NULL default '0',
   fileTitle varchar(128) NOT NULL default 'untitled',
   downloadFile varchar(255) default NULL,
   groupToView int(11) NOT NULL default '2',
@@ -65,34 +64,36 @@ CREATE TABLE DownloadManager_file (
   PRIMARY KEY  (downloadId)
 ) TYPE=MyISAM;
 
-#
-# Dumping data for table 'DownloadManager_file'
-#
+--
+-- Dumping data for table 'DownloadManager_file'
+--
 
 
-#
-# Table structure for table 'EventsCalendar'
-#
+
+--
+-- Table structure for table 'EventsCalendar'
+--
 
 CREATE TABLE EventsCalendar (
-  widgetId int(11) NOT NULL default '0',
+  wobjectId int(11) NOT NULL default '0',
   calendarLayout varchar(30) NOT NULL default 'list',
   paginateAfter int(11) NOT NULL default '50',
-  PRIMARY KEY  (widgetId)
+  PRIMARY KEY  (wobjectId)
 ) TYPE=MyISAM;
 
-#
-# Dumping data for table 'EventsCalendar'
-#
+--
+-- Dumping data for table 'EventsCalendar'
+--
 
 
-#
-# Table structure for table 'EventsCalendar_event'
-#
+
+--
+-- Table structure for table 'EventsCalendar_event'
+--
 
 CREATE TABLE EventsCalendar_event (
   eventId int(11) NOT NULL default '1',
-  widgetId int(11) default NULL,
+  wobjectId int(11) NOT NULL default '0',
   name varchar(255) default NULL,
   description text,
   startDate int(11) default NULL,
@@ -101,48 +102,51 @@ CREATE TABLE EventsCalendar_event (
   PRIMARY KEY  (eventId)
 ) TYPE=MyISAM;
 
-#
-# Dumping data for table 'EventsCalendar_event'
-#
+--
+-- Dumping data for table 'EventsCalendar_event'
+--
 
 
-#
-# Table structure for table 'ExtraColumn'
-#
+
+--
+-- Table structure for table 'ExtraColumn'
+--
 
 CREATE TABLE ExtraColumn (
-  widgetId int(11) NOT NULL default '0',
+  wobjectId int(11) NOT NULL default '0',
   spacer int(11) default NULL,
   width int(11) default NULL,
   class varchar(50) default NULL,
-  PRIMARY KEY  (widgetId)
+  PRIMARY KEY  (wobjectId)
 ) TYPE=MyISAM;
 
-#
-# Dumping data for table 'ExtraColumn'
-#
+--
+-- Dumping data for table 'ExtraColumn'
+--
 
 
-#
-# Table structure for table 'FAQ'
-#
+
+--
+-- Table structure for table 'FAQ'
+--
 
 CREATE TABLE FAQ (
-  widgetId int(11) NOT NULL default '0',
-  PRIMARY KEY  (widgetId)
+  wobjectId int(11) NOT NULL default '0',
+  PRIMARY KEY  (wobjectId)
 ) TYPE=MyISAM;
 
-#
-# Dumping data for table 'FAQ'
-#
+--
+-- Dumping data for table 'FAQ'
+--
 
 
-#
-# Table structure for table 'FAQ_question'
-#
+
+--
+-- Table structure for table 'FAQ_question'
+--
 
 CREATE TABLE FAQ_question (
-  widgetId int(11) default NULL,
+  wobjectId int(11) NOT NULL default '0',
   questionId int(11) NOT NULL default '0',
   question text,
   answer text,
@@ -150,51 +154,53 @@ CREATE TABLE FAQ_question (
   PRIMARY KEY  (questionId)
 ) TYPE=MyISAM;
 
-#
-# Dumping data for table 'FAQ_question'
-#
+--
+-- Dumping data for table 'FAQ_question'
+--
 
 
-#
-# Table structure for table 'Item'
-#
+
+--
+-- Table structure for table 'Item'
+--
 
 CREATE TABLE Item (
-  widgetId int(11) NOT NULL default '0',
-  description text,
+  wobjectId int(11) NOT NULL default '0',
   linkURL text,
   attachment varchar(255) default NULL,
-  PRIMARY KEY  (widgetId)
+  PRIMARY KEY  (wobjectId)
 ) TYPE=MyISAM;
 
-#
-# Dumping data for table 'Item'
-#
+--
+-- Dumping data for table 'Item'
+--
 
 
-#
-# Table structure for table 'LinkList'
-#
+
+--
+-- Table structure for table 'LinkList'
+--
 
 CREATE TABLE LinkList (
-  widgetId int(11) NOT NULL default '0',
+  wobjectId int(11) NOT NULL default '0',
   indent int(11) NOT NULL default '0',
   lineSpacing int(11) NOT NULL default '1',
   bullet varchar(255) NOT NULL default '&middot;',
-  PRIMARY KEY  (widgetId)
+  PRIMARY KEY  (wobjectId)
 ) TYPE=MyISAM;
 
-#
-# Dumping data for table 'LinkList'
-#
+--
+-- Dumping data for table 'LinkList'
+--
 
 
-#
-# Table structure for table 'LinkList_link'
-#
+
+--
+-- Table structure for table 'LinkList_link'
+--
 
 CREATE TABLE LinkList_link (
-  widgetId int(11) default NULL,
+  wobjectId int(11) NOT NULL default '0',
   linkId int(11) NOT NULL default '0',
   name varchar(128) default NULL,
   url text,
@@ -204,35 +210,37 @@ CREATE TABLE LinkList_link (
   PRIMARY KEY  (linkId)
 ) TYPE=MyISAM;
 
-#
-# Dumping data for table 'LinkList_link'
-#
+--
+-- Dumping data for table 'LinkList_link'
+--
 
 
-#
-# Table structure for table 'MessageBoard'
-#
+
+--
+-- Table structure for table 'MessageBoard'
+--
 
 CREATE TABLE MessageBoard (
-  widgetId int(11) NOT NULL default '0',
+  wobjectId int(11) NOT NULL default '0',
   groupToPost int(11) default NULL,
   messagesPerPage int(11) NOT NULL default '50',
   editTimeout int(11) default NULL,
   groupToModerate int(11) NOT NULL default '4',
-  PRIMARY KEY  (widgetId)
+  PRIMARY KEY  (wobjectId)
 ) TYPE=MyISAM;
 
-#
-# Dumping data for table 'MessageBoard'
-#
+--
+-- Dumping data for table 'MessageBoard'
+--
 
 
-#
-# Table structure for table 'Poll'
-#
+
+--
+-- Table structure for table 'Poll'
+--
 
 CREATE TABLE Poll (
-  widgetId int(11) NOT NULL default '0',
+  wobjectId int(11) NOT NULL default '0',
   active int(11) NOT NULL default '1',
   graphWidth int(11) NOT NULL default '150',
   voteGroup int(11) default NULL,
@@ -257,36 +265,38 @@ CREATE TABLE Poll (
   a18 varchar(255) default NULL,
   a19 varchar(255) default NULL,
   a20 varchar(255) default NULL,
-  PRIMARY KEY  (widgetId)
+  PRIMARY KEY  (wobjectId)
 ) TYPE=MyISAM;
 
-#
-# Dumping data for table 'Poll'
-#
+--
+-- Dumping data for table 'Poll'
+--
 
 
-#
-# Table structure for table 'Poll_answer'
-#
+
+--
+-- Table structure for table 'Poll_answer'
+--
 
 CREATE TABLE Poll_answer (
-  widgetId int(11) NOT NULL default '0',
+  wobjectId int(11) NOT NULL default '0',
   answer char(3) default NULL,
   userId int(11) default NULL,
   ipAddress varchar(50) default NULL
 ) TYPE=MyISAM;
 
-#
-# Dumping data for table 'Poll_answer'
-#
+--
+-- Dumping data for table 'Poll_answer'
+--
 
 
-#
-# Table structure for table 'SQLReport'
-#
+
+--
+-- Table structure for table 'SQLReport'
+--
 
 CREATE TABLE SQLReport (
-  widgetId int(11) NOT NULL default '0',
+  wobjectId int(11) NOT NULL default '0',
   template text,
   dbQuery text,
   DSN varchar(255) default NULL,
@@ -296,76 +306,80 @@ CREATE TABLE SQLReport (
   paginateAfter int(11) NOT NULL default '50',
   preprocessMacros int(11) NOT NULL default '0',
   debugMode int(11) NOT NULL default '0',
-  PRIMARY KEY  (widgetId)
+  PRIMARY KEY  (wobjectId)
 ) TYPE=MyISAM;
 
-#
-# Dumping data for table 'SQLReport'
-#
+--
+-- Dumping data for table 'SQLReport'
+--
 
 
-#
-# Table structure for table 'SiteMap'
-#
+
+--
+-- Table structure for table 'SiteMap'
+--
 
 CREATE TABLE SiteMap (
-  widgetId int(11) NOT NULL default '0',
+  wobjectId int(11) NOT NULL default '0',
   startAtThisLevel int(11) default NULL,
   depth int(11) NOT NULL default '0',
   indent int(11) NOT NULL default '5',
   bullet varchar(30) NOT NULL default '&middot',
   lineSpacing int(11) NOT NULL default '1',
   displaySynopsis int(11) NOT NULL default '0',
-  PRIMARY KEY  (widgetId)
+  PRIMARY KEY  (wobjectId)
 ) TYPE=MyISAM;
 
-#
-# Dumping data for table 'SiteMap'
-#
+--
+-- Dumping data for table 'SiteMap'
+--
+
 
 INSERT INTO SiteMap VALUES (-1,0,0,5,'&middot;',1,1);
 
-#
-# Table structure for table 'SyndicatedContent'
-#
+--
+-- Table structure for table 'SyndicatedContent'
+--
 
 CREATE TABLE SyndicatedContent (
-  widgetId int(11) NOT NULL default '0',
+  wobjectId int(11) NOT NULL default '0',
   rssUrl text,
   content text,
   lastFetched int(11) default NULL,
-  PRIMARY KEY  (widgetId)
+  PRIMARY KEY  (wobjectId)
 ) TYPE=MyISAM;
 
-#
-# Dumping data for table 'SyndicatedContent'
-#
+--
+-- Dumping data for table 'SyndicatedContent'
+--
 
 
-#
-# Table structure for table 'UserSubmission'
-#
+
+--
+-- Table structure for table 'UserSubmission'
+--
 
 CREATE TABLE UserSubmission (
-  widgetId int(11) NOT NULL default '0',
+  wobjectId int(11) NOT NULL default '0',
   groupToContribute int(11) default NULL,
   submissionsPerPage int(11) NOT NULL default '50',
   defaultStatus varchar(30) default 'Approved',
   groupToApprove int(11) NOT NULL default '4',
-  PRIMARY KEY  (widgetId)
+  PRIMARY KEY  (wobjectId)
 ) TYPE=MyISAM;
 
-#
-# Dumping data for table 'UserSubmission'
-#
+--
+-- Dumping data for table 'UserSubmission'
+--
 
 
-#
-# Table structure for table 'UserSubmission_submission'
-#
+
+--
+-- Table structure for table 'UserSubmission_submission'
+--
 
 CREATE TABLE UserSubmission_submission (
-  widgetId int(11) default NULL,
+  wobjectId int(11) NOT NULL default '0',
   submissionId int(11) NOT NULL default '0',
   title varchar(128) default NULL,
   dateSubmitted int(11) default NULL,
@@ -379,19 +393,20 @@ CREATE TABLE UserSubmission_submission (
   PRIMARY KEY  (submissionId)
 ) TYPE=MyISAM;
 
-#
-# Dumping data for table 'UserSubmission_submission'
-#
+--
+-- Dumping data for table 'UserSubmission_submission'
+--
 
 
-#
-# Table structure for table 'discussion'
-#
+
+--
+-- Table structure for table 'discussion'
+--
 
 CREATE TABLE discussion (
   messageId int(11) NOT NULL default '0',
   rid int(11) default NULL,
-  widgetId int(11) default NULL,
+  wobjectId int(11) NOT NULL default '0',
   pid int(11) default NULL,
   userId int(11) default NULL,
   username varchar(30) default NULL,
@@ -402,14 +417,15 @@ CREATE TABLE discussion (
   PRIMARY KEY  (messageId)
 ) TYPE=MyISAM;
 
-#
-# Dumping data for table 'discussion'
-#
+--
+-- Dumping data for table 'discussion'
+--
 
 
-#
-# Table structure for table 'groupings'
-#
+
+--
+-- Table structure for table 'groupings'
+--
 
 CREATE TABLE groupings (
   groupId int(11) NOT NULL default '0',
@@ -418,9 +434,10 @@ CREATE TABLE groupings (
   PRIMARY KEY  (groupId,userId)
 ) TYPE=MyISAM;
 
-#
-# Dumping data for table 'groupings'
-#
+--
+-- Dumping data for table 'groupings'
+--
+
 
 INSERT INTO groupings VALUES (1,1,2114402400);
 INSERT INTO groupings VALUES (5,3,2114402400);
@@ -429,9 +446,9 @@ INSERT INTO groupings VALUES (3,3,2114402400);
 INSERT INTO groupings VALUES (2,3,2114402400);
 INSERT INTO groupings VALUES (6,3,2114402400);
 
-#
-# Table structure for table 'groups'
-#
+--
+-- Table structure for table 'groups'
+--
 
 CREATE TABLE groups (
   groupId int(11) NOT NULL default '0',
@@ -441,9 +458,10 @@ CREATE TABLE groups (
   PRIMARY KEY  (groupId)
 ) TYPE=MyISAM;
 
-#
-# Dumping data for table 'groups'
-#
+--
+-- Dumping data for table 'groups'
+--
+
 
 INSERT INTO groups VALUES (1,'Visitors','This is the public group that has no privileges.',314496000);
 INSERT INTO groups VALUES (2,'Registered Users','All registered users belong to this group automatically. There are no associated privileges other than that the user has an account and is logged in.',314496000);
@@ -453,9 +471,9 @@ INSERT INTO groups VALUES (5,'Style Managers','Users that have privileges to edi
 INSERT INTO groups VALUES (6,'Package Managers','Users that have privileges to add, edit, and delete packages of widgets and pages to deploy.',314496000);
 INSERT INTO groups VALUES (7,'Everyone','A group that automatically includes all users including Visitors.',314496000);
 
-#
-# Table structure for table 'help'
-#
+--
+-- Table structure for table 'help'
+--
 
 CREATE TABLE help (
   helpId int(11) NOT NULL default '0',
@@ -469,9 +487,10 @@ CREATE TABLE help (
   KEY helpId (helpId,language)
 ) TYPE=MyISAM;
 
-#
-# Dumping data for table 'help'
-#
+--
+-- Dumping data for table 'help'
+--
+
 
 INSERT INTO help VALUES (1,'WebGUI','English','Add/Edit','Page','Think of pages as containers for content. For instance, if you want to write a letter to the editor of your favorite magazine you\'d get out a notepad (or open a word processor) and start filling it with your thoughts. The same is true with WebGUI. Create a page, then add your content to the page.\r\n<p>\r\n<b>Title</b><br>\r\nThe title of the page is what your users will use to navigate through the site. Titles should be descriptive, but not very long.\r\n<p>\r\n<b>Menu Title</b><br>\r\nA shorter or altered title to appear in navigation. If left blank this will default to <i>Title</i>.\r\n<p>\r\n<b>Page URL</b><br>\r\nWhen you create a page a URL for the page is generated based on the page title. If you are unhappy with the URL that was chosen, you can change it here.\r\n<p>\r\n<b>Template</b><br>\r\nBy default, WebGUI has one big content area to place widgets. However, by specifying a template other than the default you can sub-divide the content area into several sections.\r\n<p>\r\n<b>Synopsis</b><br>\r\nA short description of a page. It is used to populate default descriptive meta tags as well as to provide descriptions on Site Maps.\r\n<p>\r\n<b>Meta Tags</b><br>\r\nMeta tags are used by some search engines to associate key words to a particular page. There is a great site called <a href=\"http://www.metatagbuilder.com/\">Meta Tag Builder</a> that will help you build meta tags if you\'ve never done it before.\r\n<p>\r\n<i>Advanced Users:</i> If you have other things (like JavaScript) you usually put in the &lt;head&gt; area of your pages, you may put them here as well.\r\n<p>\r\n<b>Use default meta tags?</b><br>\r\nIf you don\'t wish to specify meta tags yourself, WebGUI can generate meta tags based on the page title and your company\'s name. Check this box to enable the WebGUI-generated meta tags.\r\n<p>\r\n<b>Style</b><br>\r\nBy default, when you create a page, it inherits a few traits from its parent. One of those traits is style. Choose from the list of styles if you would like to change the appearance of this page. See <i>Add Style</i> for more details.\r\n<p>\r\nIf you check the box below the style pull-down menu, all of the pages below this page will take on the style you\'ve chosen for this page.\r\n<p>\r\n<b>Owner</b><br>\r\nThe owner of a page is usually the person who created the page.\r\n<p>\r\n<b>Owner can view?</b><br>\r\nCan the owner view the page or not?\r\n<p>\r\n<b>Owner can edit?</b><br>\r\nCan the owner edit the page or not? Be careful, if you decide that the owner cannot edit the page and you do not belong to the page group, then you\'ll lose the ability to edit this page.\r\n<p>\r\n<b>Group</b><br>\r\nA group is assigned to every page for additional privilege control. Pick a group from the pull-down menu.\r\n<p>\r\n<b>Group can view?</b><br>\r\nCan members of this group view this page?\r\n<p>\r\n<b>Group can edit?</b><br>\r\nCan members of this group edit this page?\r\n<p>\r\n<b>Anybody can view?</b><br>\r\nCan any visitor or member regardless of the group and owner view this page?\r\n<p>\r\n<b>Anybody can edit?</b><br>\r\nCan any visitor or member regardless of the group and owner edit this page?\r\n<p>\r\nYou can optionally give these privileges to all pages under this page.\r\n','0');
 INSERT INTO help VALUES (3,'WebGUI','English','Delete','Page','Deleting a page can create a big mess if you are uncertain about what you are doing. When you delete a page you are also deleting the content it contains, all sub-pages connected to this page, and all the content they contain. Be certain that you have already moved all the content you wish to keep before you delete a page.\r\n<p>\r\nAs with any delete operation, you are prompted to be sure you wish to proceed with the delete. If you answer yes, the delete will proceed and there is no recovery possible. If you answer no you\'ll be returned to the prior screen.','0');
@@ -487,8 +506,8 @@ INSERT INTO help VALUES (15,'WebGUI','English','Delete','Group','As the function
 INSERT INTO help VALUES (16,'WebGUI','English','Add/Edit','Style','Styles are WebGUI macro enabled. See <i>Using Macros</i> for more information.\r\n<p>\r\n\r\n<b>Style Name</b><br>\r\nA unique name to describe what this style looks like at a glance. The name has no effect on the actual look of the style.\r\n<p>\r\n\r\n<b>Header</b><br>\r\nThe header is the start of the look of your site. It is helpful to look at your design and cut it into three pieces. The top and left of your design is the header. The center part is the content, and the right and bottom is the footer. Cut the HTML from your header and paste it in the space provided.\r\n<p>\r\n\r\nIf you are in need of assistance for creating a look for your site, or if you need help cutting apart your design, <a href=\"http://www.plainblack.com\">Plain Black Software</a> provides support services for a small fee.\r\n<p>\r\n\r\nMany people will add WebGUI macros to their header for automated navigation, and other features.\r\n<p>\r\n\r\n<b>Footer</b><br>\r\nThe footer is the end of the look for your site. It is the right and bottom portion of your design. You may also place WebGUI macros in your footer.\r\n<p>\r\n\r\n<b>Style Sheet</b><br>\r\nPlace your style sheet entries here. Style sheets are used to control colors, sizes, and other properties of the elements on your site. See <i>Using Style Sheets</i> for more information.\r\n<p>\r\n\r\n<i>Advanced Users:</i> for greater performance create your stylesheet on the file system (call it something like webgui.css) and add an entry like this to this area: \r\n&lt;link href=\"/webgui.css\" rel=\"stylesheet\" rev=\"stylesheet\" type=\"text/css\"&gt;','4,5');
 INSERT INTO help VALUES (17,'WebGUI','English','Add/Edit','Group','See <i>Manage Group</i> for a description of grouping functions and the default groups.\r\n<p>\r\n\r\n<b>Group Name</b><br>\r\nA name for the group. It is best if the name is descriptive so you know what it is at a glance.\r\n<p>\r\n\r\n<b>Description</b><br>\r\nA longer description of the group so that other admins and content managers (or you if you forget) will know what the purpose of this group is.','0');
 INSERT INTO help VALUES (24,'WebGUI','English','Edit','Miscellaneous Settings','<b>Not Found Page</b><br>\r\nIf a page that a user requests is not found in the system, the user can be redirected to the home page or to an error page where they can attempt to find what they were looking for. You decide which is better for your users.\r\n<p>\r\n\r\n<b>Session Timeout</b><br>\r\nThe time (in seconds) that a user session remains active (before needing to log in again). This timeout is reset each time a visitor hits a page. Therefore if you set the timeout for 8 hours, a user would have to log in again if s/he hadn\'t visited the site for 8 hours.\r\n<p>\r\n\r\n1800 = half hour<br>\r\n3600 = 1 hour<br>\r\n28000 = 8 hours<br>\r\n86400 = 1 day<br>\r\n604800 = 1 week<br>\r\n1209600 = 2 weeks<br>\r\n\r\n<p>\r\n<b>Document Type Declaration</b><br>\r\nThis setting allows you to specify what type of HTML you\'re generating with WebGUI. This is usually useful for HTML validation or for gaining special functionality in certain browsers. Most people should leave this at the default setting.\r\n\r\n<p>\r\n<b>Prevent Proxy Caching</b><br>\r\nSome companies have proxy servers that cause problems with WebGUI. If you\'re experiencing problems with WebGUI, and you have a proxy server, you may want to set this setting to <i>Yes</i>. Beware that WebGUI\'s URLs will not be as user-friendly after this feature is turned on.\r\n\r\n\r\n<p>\r\n<b>On Critical Error</b><br>\r\nWhat do you want WebGUI to do if a critical error occurs. It can be a security risk to show debugging information, but you may want to show it if you are in development.\r\n\r\n<p>\r\n<b>Filter Contributed HTML</b><br>\r\nChoose a setting that represents what you\'d like to do with user contributed HTML like that found in Message Boards and User Submission Systems. Note that it can be a security risk to not filter the HTML at all.\r\n','6');
-INSERT INTO help VALUES (18,'WebGUI','English','Using','Style Sheets','<a href=\"http://www.w3.org/Style/CSS/\">Cascading Style Sheets (CSS)</a> are a great way to manage the look and feel of any web site. They are used extensively in WebGUI.\r\n<p>\r\n\r\nIf you are unfamiliar with how to use CSS, <a href=\"http://www.plainblack.com\">Plain Black Software</a> provides training classes on XHTML and CSS. Alternatively, Bradsoft makes an excellent CSS editor called <a href=\"http://www.bradsoft.com/topstyle/index.asp\">Top Style</a>.\r\n<p>\r\n\r\nThe following is a list of classes used to control the look of WebGUI:\r\n<p>\r\n\r\n<b>A</b><br>\r\nThe links throughout the style.\r\n<p>\r\n\r\n<b>BODY</b><br>\r\nThe default setup of all pages within a style.\r\n<p>\r\n\r\n<b>H1</b><br>\r\nThe headers on every page.\r\n<p>\r\n\r\n<b>.accountOptions</b><br>\r\nThe links that appear under the login and account update forms.\r\n<p>\r\n\r\n<b>.adminBar </b><br>\r\nThe bar that appears at the top of the page when you\'re in admin mode.\r\n<p>\r\n\r\n<b>.content</b><br>\r\nThe main content area on all pages of the style.\r\n<p>\r\n\r\n<b>.crumbTrail </b><br>\r\nThe crumb trail (if you\'re using that macro).\r\n<p>\r\n\r\n<b>.formDescription </b><br>\r\nThe tags on all forms next to the form elements. \r\n<p>\r\n\r\n<b>.formSubtext </b><br>\r\nThe tags below some form elements.\r\n<p>\r\n\r\n<b>.highlight </b><br>\r\nDenotes a highlighted item, such as which message you are viewing within a list.\r\n<p>\r\n\r\n<b>.homeLink</b><br>\r\nUsed by the my home (^H;) macro.\r\n<p>\r\n\r\n<b>.horizontalMenu </b><br>\r\nThe horizontal menu (if you use a horizontal menu macro).\r\n<p>\r\n\r\n<b>.loginBox</b><br>\r\nThe login box (^L;) macro.\r\n<p>\r\n\r\n<b>.makePrintableLink</b><br>\r\nUsed by the make printable (^r;) macro.\r\n<p>\r\n\r\n<b>.myAccountLink</b><br>\r\nUsed by the my account (^a;) macro.\r\n<p>\r\n\r\n<b>.pagination </b><br>\r\nThe Previous and Next links on pages with pagination.\r\n<p>\r\n\r\n<b>.searchBox</b><br>\r\nUsed by the search (^?;) macro.\r\n<p>\r\n\r\n<b>.selectedMenuItem</b><br>\r\nUsed by the FlexMenu (^FlexMenu;) macro.\r\n<p>\r\n\r\n<b>.tableData </b><br>\r\nThe data rows on things like message boards and user contributions.\r\n<p>\r\n\r\n<b>.tableHeader </b><br>\r\nThe headings of columns on things like message boards and user contributions.\r\n<p>\r\n\r\n<b>.tableMenu </b><br>\r\nThe menu on things like message boards and user submissions.\r\n<p>\r\n\r\n<b>.verticalMenu </b><br>\r\nThe vertical menu (if you use a verticall menu macro).\r\n<p>\r\n\r\n<i><b>Note:</b></i> Some widgets have their own unique styles.\r\n\r\n','0');
-INSERT INTO help VALUES (19,'WebGUI','English','Using','Macros','WebGUI macros are used to create dynamic content within otherwise static content. For instance, you may wish to show which user is logged in on every page, or you may wish to have a dynamically built menu or crumb trail. \r\n<p>\r\nMacros always begin with a carat (^) and follow with at least one other character and ended with w semicolon (;). Some macros can be extended/configured by taking the format of ^<i>x</i>(\"<b>config text</b>\");. The following is a description of all the macros in the WebGUI system.\r\n<p>\r\n<b>^a; or ^a(); - My Account Link</b><br>\r\nA link to your account information. In addition you can change the link text by creating a macro like this <b>^a(\"Account Info\");</b>. \r\n<p>\r\n<i>Note:</i> You can also use the special case ^a(linkonly); to return only the URL to the account page and nothing more.\r\n<p>\r\n<b>^C; or ^C(); - Crumb Trail</b><br>\r\nA dynamically generated crumb trail to the current page. You can optionally specify a delimeter to be used between page names by using ^C(::);. The default delimeter is &gt;.\r\n<p>\r\n<b>^c; - Company Name</b><br>\r\nThe name of your company specified in the settings by your Administrator.\r\n<p>\r\n<b>^D; or ^D(); - Date</b><br>\r\nThe current date and time.\r\n<p>\r\nYou can configure the date by using date formatting symbols. For instance, if you created a macro like this <b>^D(\"%c %D, %y\");</b> it would output <b>September 26, 2001</b>. The following are the available date formatting symbols:\r\n<table>\r\n<tr><td>%%</td><td>%</td></tr>\r\n<tr><td>%y</td><td>4 digit year</td></tr>\r\n<tr><td>%Y</td><td>2 digit year</td></tr>\r\n<tr><td>%m</td><td>2 digit month</td></tr>\r\n<tr><td>%M</td><td>variable digit month</td></tr>\r\n<tr><td>%c</td><td>month name</td></tr>\r\n<tr><td>%d</td><td>2 digit day of month</td></tr>\r\n<tr><td>%D</td><td>variable digit day of month</td></tr>\r\n<tr><td>%w</td><td>day of week name</td></tr>\r\n<tr><td>%h</td><td>2 digit base 12 hour</td></tr>\r\n<tr><td>%H</td><td>variable digit base 12 hour</td></tr>\r\n<tr><td>%j</td><td>2 digit base 24 hour</td></tr>\r\n<tr><td>%J</td><td>variable digit base 24 hour</td></tr>\r\n<tr><td>%p</td><td>lower case am/pm</td></tr>\r\n<tr><td>%P</td><td>upper case AM/PM</td></tr>\r\n</table>\r\n<p>\r\n<b>^e; - Company Email Address</b><br>\r\nThe email address for your company specified in the settings by your Administrator.\r\n<p>\r\n<b>^Execute();</b><br>\r\nAllows a content manager or administrator to execute an external program. Takes the format of <b>^Execute(\"/this/file.sh\");</b>.\r\n<p>\r\n<b>^FlexMenu;</b><br>\r\nThis menu macro creates a top-level menu that expands as the user selects each menu item.\r\n<p>\r\n<b>^FormParam();</b><br>\r\nThis macro is mainly used in generating dynamic queries in SQL Reports. Using this macro you can pull the value of any form field simply by specifing the name of the form field, like this: ^FormParam(\"phoneNumber\");\r\n<p>\r\n<b>^H; or ^H(); - Home Link</b><br>\r\nA link to the home page of this site.  In addition you can change the link text by creating a macro like this <b>^H(\"Go Home\");</b>.\r\n<p>\r\n<i>Note:</i> You can also use the special case ^H(linkonly); to return only the URL to the home page and nothing more.\r\n<p>\r\n<b>^I(); - Image Manager Image with Tag</b><br>\r\nThis macro returns an image tag with the parameters for an image defined in the image manager. Specify the name of the image using a tag like this <b>^I(\"imageName\")</b>;.\r\n<p>\r\n<b>^i(); - Image Manager Image Path</b><br>\r\nThis macro returns the path of an image uploaded using the Image Manager. Specify the name of the image using a tag like this <b>^i(\"imageName\");</b>.\r\n<p>\r\n<b>^Include();</b><br>\r\nAllows a content manager or administrator to include a file from the local filesystem. Takes the format of <b>^Include(\"/this/file.html\")</b>;\r\n<p>\r\n<b>^L; or ^L(); - Login</b><br>\r\nA small login form. You can also configure this macro. You can set the width of the login box like this ^L(20);. You can also set the message displayed after the user is logged in like this ^L(20,Hi ^a(^@;);. Click %here% if you wanna log out!)\r\n<p>\r\n<b>^M; or ^M(); - Current Menu (Vertical)</b><br>\r\nA vertical menu containing the sub-pages at the current level. In addition, you may configure this macro by specifying how many levels deep the menu should go. By default it will show only the first level. To go three levels deep create a macro like this <b>^M(3);</b>. If you set the macro to \"0\" it will track the entire site tree.\r\n<p>\r\n<b>^m; - Current Menu (Horizontal)</b><br>\r\nA horizontal menu containing the sub-pages at the current level. You can optionally specify a delimeter to be used between page names by using ^m(:--:);. The default delimeter is &middot;.\r\n<p>\r\n<b>^P; or ^P(); - Previous Menu (Vertical)</b><br>\r\nA vertical menu containing the sub-pages at the previous level. In addition, you may configure this macro by specifying how many levels deep the menu should go. By default it will show only the first level. To go three levels deep create a macro like this <b>^P(3);</b>. If you set the macro to \"0\" it will track the entire site tree.\r\n<p>\r\n<b>^p; - Previous Menu (Horizontal)</b><br>\r\nA horizontal menu containing the sub-pages at the previous level. You can optionally specify a delimeter to be used between page names by using ^p(:--:);. The default delimeter is &middot;.\r\n<p>\r\n<b>^PageTitle;</b><br>\r\nDisplays the title of the current page.\r\n<p>\r\n<b>^r; or ^r(); - Make Page Printable</b><br>\r\nCreates a link to remove the style from a page to make it printable.  In addition, you can change the link text by creating a macro like this <b>^r(\"Print Me!\");</b>.\r\n<p>\r\n<i>Note:</i> You can also use the special case ^r(linkonly); to return only the URL to the make printable page and nothing more.\r\n<p>\r\n<b>^S(); - Specific SubMenu (Vertical)</b><br>\r\nThis macro allows you to get the submenu of any page, starting with the page you specified. For instance, you could get the home page submenu by creating a macro that looks like this <b>^S(\"home\",0);</b>. The first value is the urlized title of the page and the second value is the depth you\'d like the menu to go. By default it will show only the first level. To go three levels deep create a macro like this <b>^S(\"home\",3);</b>.\r\n<p>\r\n<b>^s(); - Specific SubMenu (Horizontal)</b><br>\r\nThis macro allows you to get the submenu of any page, starting with the page you specified. For instance, you could get the home page submenu by creating a macro that looks like this <b>^s(\"home\");</b>. The value is the urlized title of the page.  You can optionally specify a delimeter to be used between page names by using ^s(\"home\",\":--:\");. The default delimeter is &middot;.\r\n<p>\r\n<b>^T; or ^T(); - Top Level Menu (Vertical)</b><br>\r\nA vertical menu containing the main pages of the site (aka the sub-pages from the home page). In addition, you may configure this macro by specifying how many levels deep the menu should go. By default it will show only the first level. To go three levels deep create a macro like this <b>^T(3);</b>. If you set the macro to \"0\" it will track the entire site tree.\r\n<p>\r\n<b>^t; - Top Level Menu (Horizontal)</b><br>\r\nA vertical menu containing the main pages of the site (aka the sub-pages from the home page). You can optionally specify a delimeter to be used between page names by using ^t(:--:);. The default delimeter is &middot;.\r\n<p>\r\n<b>^Thumbnail();</b><br>\r\nReturns the URL of a thumbnail for an image from the image manager. Specify the name of the image like this <b>^Thumbnail(\"imageName\");</b>.\r\n<p>\r\n<b>^u; - Company URL</b><br>\r\nThe URL for your company specified in the settings by your Administrator.\r\n<p>\r\n<b>^/; - System URL</b><br>\r\nThe URL to the gateway script (including the domain for this site). This is often used within pages so that if your development server is on a domain different than your production server that your URLs will still worked when moved.\r\n<p>\r\n<b>^\\; - Page URL</b><br>\r\nThe URL to the current page (including the domain for this site). This is often used within pages so that if your development server is on a domain different than your production server that your URLs will still worked when moved.\r\n<p>\r\n<b>^@; - Username</b><br>\r\nThe username of the currently logged in user.\r\n<p>\r\n<b>^?; - Search</b><br>\r\nAdd a search box.\r\n<p>\r\n<b>^#; - User ID</b><br>\r\nThe user id of the currently logged in user.\r\n<p>\r\n<b>^*; or ^*(); - Random Number</b><br>\r\nA randomly generated number. This is often used on images (such as banner ads) that you want to ensure do not cache. In addition, you may configure this macro like this <b>^*(100);</b> to create a random number between 0 and 100.\r\n<p>\r\n<b>^-;,^0;,^1;,^2;,^3;, etc.</b><br>\r\nThese macros are reserved for widget-specific functions as in the SQL Report widget.\r\n','0');
+INSERT INTO help VALUES (18,'WebGUI','English','Using','Style Sheets','<a href=\"http://www.w3.org/Style/CSS/\">Cascading Style Sheets (CSS)</a> are a great way to manage the look and feel of any web site. They are used extensively in WebGUI.\r\n<p>\r\n\r\nIf you are unfamiliar with how to use CSS, <a href=\"http://www.plainblack.com\">Plain Black Software</a> provides training classes on XHTML and CSS. Alternatively, Bradsoft makes an excellent CSS editor called <a href=\"http://www.bradsoft.com/topstyle/index.asp\">Top Style</a>.\r\n<p>\r\n\r\nThe following is a list of classes used to control the look of WebGUI:\r\n<p>\r\n\r\n<b>A</b><br>\r\nThe links throughout the style.\r\n<p>\r\n\r\n<b>BODY</b><br>\r\nThe default setup of all pages within a style.\r\n<p>\r\n\r\n<b>H1</b><br>\r\nThe headers on every page.\r\n<p>\r\n\r\n<b>.accountOptions</b><br>\r\nThe links that appear under the login and account update forms.\r\n<p>\r\n\r\n<b>.adminBar </b><br>\r\nThe bar that appears at the top of the page when you\'re in admin mode.\r\n<p>\r\n\r\n<b>.content</b><br>\r\nThe main content area on all pages of the style.\r\n<p>\r\n\r\n<b>.crumbTrail </b><br>\r\nThe crumb trail (if you\'re using that macro).\r\n<p>\r\n\r\n<b>.formDescription </b><br>\r\nThe tags on all forms next to the form elements. \r\n<p>\r\n\r\n<b>.formSubtext </b><br>\r\nThe tags below some form elements.\r\n<p>\r\n\r\n<b>.highlight </b><br>\r\nDenotes a highlighted item, such as which message you are viewing within a list.\r\n<p>\r\n\r\n<b>.homeLink</b><br>\r\nUsed by the my home (^H;) macro.\r\n<p>\r\n\r\n<b>.horizontalMenu </b><br>\r\nThe horizontal menu (if you use a horizontal menu macro).\r\n<p>\r\n\r\n<b>.loginBox</b><br>\r\nThe login box (^L;) macro.\r\n<p>\r\n\r\n<b>.makePrintableLink</b><br>\r\nUsed by the make printable (^r;) macro.\r\n<p>\r\n\r\n<b>.myAccountLink</b><br>\r\nUsed by the my account (^a;) macro.\r\n<p>\r\n\r\n<b>.pagination </b><br>\r\nThe Previous and Next links on pages with pagination.\r\n<p>\r\n\r\n<b>.synopsis_sub</b><br>\r\nUsed by the ^Synopsis; macro to display sub pages.\r\n<p>\r\n\r\n<b>.synopsis_summary </b><br>\r\nUsed by the ^Synopsis; macro to display the synopsis from the page.\r\n<p>\r\n\r\n<b>.synopsis_title</b><br>\r\nUsed by the ^Synopsis; macro to display the menu title of a page.\r\n<p>\r\n\r\n<b>.searchBox</b><br>\r\nUsed by the search (^?;) macro.\r\n<p>\r\n\r\n<b>.selectedMenuItem</b><br>\r\nUsed by the FlexMenu (^FlexMenu;) macro.\r\n<p>\r\n\r\n<b>.tableData </b><br>\r\nThe data rows on things like message boards and user contributions.\r\n<p>\r\n\r\n<b>.tableHeader </b><br>\r\nThe headings of columns on things like message boards and user contributions.\r\n<p>\r\n\r\n<b>.tableMenu </b><br>\r\nThe menu on things like message boards and user submissions.\r\n<p>\r\n\r\n<b>.verticalMenu </b><br>\r\nThe vertical menu (if you use a verticall menu macro).\r\n<p>\r\n\r\n<i><b>Note:</b></i> Some widgets have their own unique styles.\r\n\r\n','0');
+INSERT INTO help VALUES (19,'WebGUI','English','Using','Macros','WebGUI macros are used to create dynamic content within otherwise static content. For instance, you may wish to show which user is logged in on every page, or you may wish to have a dynamically built menu or crumb trail. \r\n<p>\r\nMacros always begin with a carat (^) and follow with at least one other character and ended with w semicolon (;). Some macros can be extended/configured by taking the format of ^<i>x</i>(\"<b>config text</b>\");. The following is a description of all the macros in the WebGUI system.\r\n<p>\r\n<b>^a; or ^a(); - My Account Link</b><br>\r\nA link to your account information. In addition you can change the link text by creating a macro like this <b>^a(\"Account Info\");</b>. \r\n<p>\r\n<i>Note:</i> You can also use the special case ^a(linkonly); to return only the URL to the account page and nothing more.\r\n<p>\r\n<b>^C; or ^C(); - Crumb Trail</b><br>\r\nA dynamically generated crumb trail to the current page. You can optionally specify a delimeter to be used between page names by using ^C(::);. The default delimeter is &gt;.\r\n<p>\r\n<b>^c; - Company Name</b><br>\r\nThe name of your company specified in the settings by your Administrator.\r\n<p>\r\n<b>^D; or ^D(); - Date</b><br>\r\nThe current date and time.\r\n<p>\r\nYou can configure the date by using date formatting symbols. For instance, if you created a macro like this <b>^D(\"%c %D, %y\");</b> it would output <b>September 26, 2001</b>. The following are the available date formatting symbols:\r\n<table>\r\n<tr><td>%%</td><td>%</td></tr>\r\n<tr><td>%y</td><td>4 digit year</td></tr>\r\n<tr><td>%Y</td><td>2 digit year</td></tr>\r\n<tr><td>%m</td><td>2 digit month</td></tr>\r\n<tr><td>%M</td><td>variable digit month</td></tr>\r\n<tr><td>%c</td><td>month name</td></tr>\r\n<tr><td>%d</td><td>2 digit day of month</td></tr>\r\n<tr><td>%D</td><td>variable digit day of month</td></tr>\r\n<tr><td>%w</td><td>day of week name</td></tr>\r\n<tr><td>%h</td><td>2 digit base 12 hour</td></tr>\r\n<tr><td>%H</td><td>variable digit base 12 hour</td></tr>\r\n<tr><td>%j</td><td>2 digit base 24 hour</td></tr>\r\n<tr><td>%J</td><td>variable digit base 24 hour</td></tr>\r\n<tr><td>%p</td><td>lower case am/pm</td></tr>\r\n<tr><td>%P</td><td>upper case AM/PM</td></tr>\r\n</table>\r\n<p>\r\n<b>^e; - Company Email Address</b><br>\r\nThe email address for your company specified in the settings by your Administrator.\r\n<p>\r\n<b>^Execute();</b><br>\r\nAllows a content manager or administrator to execute an external program. Takes the format of <b>^Execute(\"/this/file.sh\");</b>.\r\n<p>\r\n<b>^FlexMenu;</b><br>\r\nThis menu macro creates a top-level menu that expands as the user selects each menu item.\r\n<p>\r\n<b>^FormParam();</b><br>\r\nThis macro is mainly used in generating dynamic queries in SQL Reports. Using this macro you can pull the value of any form field simply by specifing the name of the form field, like this: ^FormParam(\"phoneNumber\");\r\n<p>\r\n<b>^H; or ^H(); - Home Link</b><br>\r\nA link to the home page of this site.  In addition you can change the link text by creating a macro like this <b>^H(\"Go Home\");</b>.\r\n<p>\r\n<i>Note:</i> You can also use the special case ^H(linkonly); to return only the URL to the home page and nothing more.\r\n<p>\r\n<b>^I(); - Image Manager Image with Tag</b><br>\r\nThis macro returns an image tag with the parameters for an image defined in the image manager. Specify the name of the image using a tag like this <b>^I(\"imageName\")</b>;.\r\n<p>\r\n<b>^i(); - Image Manager Image Path</b><br>\r\nThis macro returns the path of an image uploaded using the Image Manager. Specify the name of the image using a tag like this <b>^i(\"imageName\");</b>.\r\n<p>\r\n<b>^Include();</b><br>\r\nAllows a content manager or administrator to include a file from the local filesystem. Takes the format of <b>^Include(\"/this/file.html\")</b>;\r\n<p>\r\n<b>^L; or ^L(); - Login</b><br>\r\nA small login form. You can also configure this macro. You can set the width of the login box like this ^L(20);. You can also set the message displayed after the user is logged in like this ^L(20,Hi ^a(^@;);. Click %here% if you wanna log out!)\r\n<p>\r\n<b>^M; or ^M(); - Current Menu (Vertical)</b><br>\r\nA vertical menu containing the sub-pages at the current level. In addition, you may configure this macro by specifying how many levels deep the menu should go. By default it will show only the first level. To go three levels deep create a macro like this <b>^M(3);</b>. If you set the macro to \"0\" it will track the entire site tree.\r\n<p>\r\n<b>^m; - Current Menu (Horizontal)</b><br>\r\nA horizontal menu containing the sub-pages at the current level. You can optionally specify a delimeter to be used between page names by using ^m(:--:);. The default delimeter is &middot;.\r\n<p>\r\n<b>^P; or ^P(); - Previous Menu (Vertical)</b><br>\r\nA vertical menu containing the sub-pages at the previous level. In addition, you may configure this macro by specifying how many levels deep the menu should go. By default it will show only the first level. To go three levels deep create a macro like this <b>^P(3);</b>. If you set the macro to \"0\" it will track the entire site tree.\r\n<p>\r\n<b>^p; - Previous Menu (Horizontal)</b><br>\r\nA horizontal menu containing the sub-pages at the previous level. You can optionally specify a delimeter to be used between page names by using ^p(:--:);. The default delimeter is &middot;.\r\n<p>\r\n<b>^PageTitle;</b><br>\r\nDisplays the title of the current page.\r\n<p>\r\n<b>^r; or ^r(); - Make Page Printable</b><br>\r\nCreates a link to remove the style from a page to make it printable.  In addition, you can change the link text by creating a macro like this <b>^r(\"Print Me!\");</b>.\r\n<p>\r\n<i>Note:</i> You can also use the special case ^r(linkonly); to return only the URL to the make printable page and nothing more.\r\n<p>\r\n<b>^S(); - Specific SubMenu (Vertical)</b><br>\r\nThis macro allows you to get the submenu of any page, starting with the page you specified. For instance, you could get the home page submenu by creating a macro that looks like this <b>^S(\"home\",0);</b>. The first value is the urlized title of the page and the second value is the depth you\'d like the menu to go. By default it will show only the first level. To go three levels deep create a macro like this <b>^S(\"home\",3);</b>.\r\n<p>\r\n<b>^s(); - Specific SubMenu (Horizontal)</b><br>\r\nThis macro allows you to get the submenu of any page, starting with the page you specified. For instance, you could get the home page submenu by creating a macro that looks like this <b>^s(\"home\");</b>. The value is the urlized title of the page.  You can optionally specify a delimeter to be used between page names by using ^s(\"home\",\":--:\");. The default delimeter is &middot;.\r\n<p>\r\n<b>^Synopsis; or ^Synopsis(); Menu</b><br>\r\nThis macro allows you to get the submenu of a page along with the synopsis of each link. You may specify an integer to specify how many levels deep to traverse the page tree.\r\n<p>\r\n<b>^T; or ^T(); - Top Level Menu (Vertical)</b><br>\r\nA vertical menu containing the main pages of the site (aka the sub-pages from the home page). In addition, you may configure this macro by specifying how many levels deep the menu should go. By default it will show only the first level. To go three levels deep create a macro like this <b>^T(3);</b>. If you set the macro to \"0\" it will track the entire site tree.\r\n<p>\r\n<b>^t; - Top Level Menu (Horizontal)</b><br>\r\nA vertical menu containing the main pages of the site (aka the sub-pages from the home page). You can optionally specify a delimeter to be used between page names by using ^t(:--:);. The default delimeter is &middot;.\r\n<p>\r\n<b>^Thumbnail();</b><br>\r\nReturns the URL of a thumbnail for an image from the image manager. Specify the name of the image like this <b>^Thumbnail(\"imageName\");</b>.\r\n<p>\r\n<b>^u; - Company URL</b><br>\r\nThe URL for your company specified in the settings by your Administrator.\r\n<p>\r\n<b>^/; - System URL</b><br>\r\nThe URL to the gateway script (including the domain for this site). This is often used within pages so that if your development server is on a domain different than your production server that your URLs will still worked when moved.\r\n<p>\r\n<b>^\\; - Page URL</b><br>\r\nThe URL to the current page (including the domain for this site). This is often used within pages so that if your development server is on a domain different than your production server that your URLs will still worked when moved.\r\n<p>\r\n<b>^@; - Username</b><br>\r\nThe username of the currently logged in user.\r\n<p>\r\n<b>^?; - Search</b><br>\r\nAdd a search box.\r\n<p>\r\n<b>^#; - User ID</b><br>\r\nThe user id of the currently logged in user.\r\n<p>\r\n<b>^*; or ^*(); - Random Number</b><br>\r\nA randomly generated number. This is often used on images (such as banner ads) that you want to ensure do not cache. In addition, you may configure this macro like this <b>^*(100);</b> to create a random number between 0 and 100.\r\n<p>\r\n<b>^-;,^0;,^1;,^2;,^3;, etc.</b><br>\r\nThese macros are reserved for widget-specific functions as in the SQL Report widget.\r\n','0');
 INSERT INTO help VALUES (1,'SQLReport','English','Add/Edit','SQL Report','SQL Reports are perhaps the most powerful widget in the WebGUI arsenal. They allow a user to query data from any database that they have access to. This is great for getting sales figures from your Accounting database or even summarizing all the message boards on your web site.\r\n<p>\r\n\r\n<b>Title</b><br>\r\nThe title of this report.\r\n<p>\r\n\r\n<b>Display the title?</b><br>\r\nDo you wish to disply the title?\r\n<p>\r\n\r\n<b>Process macros?</b><br>\r\nDo you wish to process WebGUI macros? Unchecking this box will not process macros and will speed up page execution.\r\n<p>\r\n\r\n<b>Position</b><br>\r\nSelect the position in the current page template where this widget should be placed.\r\n<p>\r\n\r\n<b>Description</b><br>\r\nDescribe the content of this report so your users will better understand what the report is all about.\r\n<p>\r\n\r\n<b>Preprocess macros on query?</b><br>\r\nIf you\'re using WebGUI macros in your query you\'ll want to check this box.\r\n<p>\r\n\r\n<b>Debug?</b><br>\r\nIf you want to display debugging and error messages on the page, check this box.\r\n<p>\r\n\r\n<b>Query</b><br>\r\nThis is a standard SQL query. If you are unfamiliar with SQL, <a href=\"http://www.plainblack.com\">Plain Black Software</a> provides training courses in SQL and database management. You can make your queries more dynamic by using the ^FormParam(); macro.\r\n<p>\r\n\r\n<b>Template</b><br>\r\nLayout a template of how this report should look. Usually you\'ll use HTML tables to generate a report. An example is included below. If you leave this field blank a template will be generated based on your result set.\r\n<p>\r\n\r\nThere are special macro characters used in generating SQL Reports. They are ^-;, ^0;, ^1;, ^2;, ^3;, etc. These macros will be processed regardless of whether you checked the process macros box above. The ^- macro represents split points in the document where the report will begin and end looping. The numeric macros represent the data fields that will be returned from your query. There is an additional macro, ^rownum; that counts the rows of the query starting at 1 for use where the lines of the output need to be numbered.\r\n<p>\r\n<pre>\r\n<i>Sample Template:</i>\r\n&lt;table&gt;\r\n&lt;tr&gt;&lt;th&gt;Employee Name&lt;/th&gt;&lt;th&gt;Employee #&lt;/th&gt;&lt;th&gt;Vacation Days Remaining&lt;/th&gt;&lt;th&gt;Monthly Salary&lt;/th&gt;&lt;/tr&gt;\r\n^-;\r\n&lt;tr&gt;&lt;td&gt;^0;&lt;/td&gt;&lt;td&gt;^1;&lt;/td&gt;&lt;td&gt;^2;&lt;/td&gt;&lt;td&gt;^3;&lt;/td&gt;&lt;/tr&gt;\r\n^-;\r\n&lt;/table&gt;\r\n</pre>\r\n<b>DSN</b><br>\r\n<b>D</b>ata <b>S</b>ource <b>N</b>ame is the unique identifier that Perl uses to describe the location of your database. It takes the format of DBI:[driver]:[database name]:[host]. \r\n<p>\r\n\r\n<i>Example:</i> DBI:mysql:WebGUI:localhost\r\n<p>\r\n\r\n<b>Database User</b>\r\nThe username you use to connect to the DSN.\r\n<p>\r\n\r\n<b>Database Password</b>\r\nThe password you use to connect to the DSN.\r\n<p>\r\n\r\n<b>Paginate After</b>\r\nHow many rows should be displayed before splitting the results into separate pages? In other words, how many rows should be displayed per page?\r\n<p>\r\n\r\n<b>Convert carriage returns?</b>\r\nDo you wish to convert the carriage returns in the resultant data to HTML breaks (&lt;br&gt;).\r\n','1,2,3,4,5');
 INSERT INTO help VALUES (21,'WebGUI','English','Using','Widget','Widgets are the true power of WebGUI. Widgets are tiny pluggable applications built to run under WebGUI. Message boards and polls are examples of widgets.\r\n<br><br>\r\nTo add a widget to a page, first go to that page, then select <i>Add Content...</i> from the upper left corner of your screen. Each widget has it\'s own help so be sure to read the help if you\'re not sure how to use a widget.\r\n','0');
 INSERT INTO help VALUES (1,'Article','English','Add/Edit','Article','Articles are the Swiss Army knife of WebGUI. Most pieces of static content can be added via the Article widget.\r\n<br><br>\r\n<b>Title</b><br>\r\nWhat\'s the title for this content? Even if you don\'t wish the title to appear, it\'s a good idea to title your content so that if it is ever copied to the clipboard it will have a name.\r\n<br><br>\r\n<b>Display the title?</b><br>\r\nDo you wish to display the title?\r\n<br><br>\r\n<b>Process macros?</b><br>\r\nDo you wish to process WebGUI macros on this article? Unchecking this box will not process macros and will speed up page execution.\r\n<br><br>\r\n<b>Position</b><br>\r\nSelect the position in the current page template where this widget should be placed.\r\n<br><br>\r\n<b>Start Date</b><br>\r\nWhat date do you want this article to appear on the site? Dates are in the format of MM/DD/YYYY. You can use the JavaScript wizard to choose your date from a calendar by clicking on the <i>set date</i> button. By default the date is set to 01/01/2000.\r\n<br><br>\r\n<b>End Date</b><br>\r\nWhat date do you want this article to be removed from the site? By default the date is set to 100 years in the future, 01/01/2100.\r\n<br><br>\r\n<b>Body</b><br>\r\nThe body of the article is where all content is placed. You may feel free to add HTML tags as necessary to format your content. Be sure to put a &lt;p&gt; between paragraphs to add white space to your content.\r\n<br><br>\r\n<b>Image</b><br>\r\nChoose an image (.jpg, .gif, .png) file from your hard drive. This file will be uploaded to the server and displayed in the upper-right corner of your article.\r\n<br><br>\r\n<b>Link Title</b><br>\r\nIf you wish to add a link to your article, enter the title of the link in this field. \r\n<br><br>\r\n<i>Example:</i> Google\r\n<br><br>\r\n<b>Link URL</b><br>\r\nIf you added a link title, now add the URL (uniform resource locator) here. \r\n<br><br>\r\n<i>Example:</i> http://www.google.com\r\n<br><br>\r\n<b>Attachment</b><br>\r\nIf you wish to attach a word processor file, a zip file, or any other file for download by your users, then choose it from your hard drive.\r\n<br><br>\r\n<b>Convert carriage returns?</b><br>\r\nIf you\'re publishing HTML there\'s generally no need to check this option, but if you aren\'t using HTML and you want a carriage return every place you hit your \"Enter\" key, then check this option.\r\n<p>\r\n<b>Allow discussion?</b><br>\r\nChecking this box will enable responses to your article much like Articles on Slashdot.org.\r\n<p>\r\n<b>Who can post?</b><br>\r\nSelect the group that is allowed to respond to this article. By default it is registered users.\r\n<p>\r\n<b>Who can moderate?</b><br>\r\nSelect the group that is allowed to moderate the responses to this article. By default it is content managers.\r\n<p>\r\n<b>Edit Timeout</b><br>\r\nHow long (in hours) should a user be able to edit their response before editing is locked to them?\r\n','1,2,3,4,5');
@@ -518,9 +537,9 @@ INSERT INTO help VALUES (23,'WebGUI','English','Delete','Image','When you delete
 INSERT INTO help VALUES (26,'WebGUI','English','Manage','Image','Using the built in image manager in WebGUI you can upload images to one central location for use anywhere else in the site with no need for any special software or knowledge.\r\n<p>\r\n To place the images you\'ve uploaded use the ^I(); and ^i(); macros. More information on them can be found in the Using Macros help.','15');
 INSERT INTO help VALUES (28,'WebGUI','English','Manage','Root','Simply put, roots are pages with no parent. The first and most important root in WebGUI is the \"Home\" page. Many people will never add any additional roots, but a few power users will. Those power users will create new roots for many different reasons. Perhaps they\'ll create a staging area for content managers. Or maybe a hidden area for Admin tools. Or possibly even a new root just to place their search engine.','0');
 
-#
-# Table structure for table 'helpSeeAlso'
-#
+--
+-- Table structure for table 'helpSeeAlso'
+--
 
 CREATE TABLE helpSeeAlso (
   seeAlsoId int(11) NOT NULL default '0',
@@ -529,9 +548,10 @@ CREATE TABLE helpSeeAlso (
   PRIMARY KEY  (seeAlsoId)
 ) TYPE=MyISAM;
 
-#
-# Dumping data for table 'helpSeeAlso'
-#
+--
+-- Dumping data for table 'helpSeeAlso'
+--
+
 
 INSERT INTO helpSeeAlso VALUES (1,21,'WebGUI');
 INSERT INTO helpSeeAlso VALUES (2,27,'WebGUI');
@@ -546,9 +566,9 @@ INSERT INTO helpSeeAlso VALUES (10,13,'WebGUI');
 INSERT INTO helpSeeAlso VALUES (11,24,'WebGUI');
 INSERT INTO helpSeeAlso VALUES (12,22,'WebGUI');
 
-#
-# Table structure for table 'images'
-#
+--
+-- Table structure for table 'images'
+--
 
 CREATE TABLE images (
   imageId int(11) NOT NULL default '0',
@@ -561,14 +581,15 @@ CREATE TABLE images (
   PRIMARY KEY  (imageId)
 ) TYPE=MyISAM;
 
-#
-# Dumping data for table 'images'
-#
+--
+-- Dumping data for table 'images'
+--
 
 
-#
-# Table structure for table 'incrementer'
-#
+
+--
+-- Table structure for table 'incrementer'
+--
 
 CREATE TABLE incrementer (
   incrementerId varchar(50) NOT NULL default '',
@@ -576,16 +597,17 @@ CREATE TABLE incrementer (
   PRIMARY KEY  (incrementerId)
 ) TYPE=MyISAM;
 
-#
-# Dumping data for table 'incrementer'
-#
+--
+-- Dumping data for table 'incrementer'
+--
+
 
 INSERT INTO incrementer VALUES ('groupId',26);
 INSERT INTO incrementer VALUES ('messageId',1);
 INSERT INTO incrementer VALUES ('pageId',26);
 INSERT INTO incrementer VALUES ('styleId',26);
 INSERT INTO incrementer VALUES ('userId',26);
-INSERT INTO incrementer VALUES ('widgetId',1);
+INSERT INTO incrementer VALUES ('wobjectId',1);
 INSERT INTO incrementer VALUES ('eventId',1);
 INSERT INTO incrementer VALUES ('linkId',1);
 INSERT INTO incrementer VALUES ('questionId',1);
@@ -596,9 +618,9 @@ INSERT INTO incrementer VALUES ('downloadId',1);
 INSERT INTO incrementer VALUES ('imageId',1);
 INSERT INTO incrementer VALUES ('profileCategoryId',1000);
 
-#
-# Table structure for table 'international'
-#
+--
+-- Table structure for table 'international'
+--
 
 CREATE TABLE international (
   internationalId int(11) NOT NULL default '0',
@@ -608,9 +630,10 @@ CREATE TABLE international (
   PRIMARY KEY  (internationalId,namespace,language)
 ) TYPE=MyISAM;
 
-#
-# Dumping data for table 'international'
-#
+--
+-- Dumping data for table 'international'
+--
+
 
 INSERT INTO international VALUES (367,'WebGUI','English','Expire After');
 INSERT INTO international VALUES (1,'Article','Dutch','Artikel');
@@ -632,18 +655,17 @@ INSERT INTO international VALUES (1,'Item','English','Link URL');
 INSERT INTO international VALUES (1,'LinkList','Dutch','Inspringen');
 INSERT INTO international VALUES (1,'LinkList','English','Indent');
 INSERT INTO international VALUES (1,'LinkList','Português','Destaque');
-INSERT INTO international VALUES (1,'MessageBoard','Dutch','Voeg berichten bord toe');
-INSERT INTO international VALUES (1,'MessageBoard','English','Add Message Board');
-INSERT INTO international VALUES (1,'MessageBoard','Español','Agregar Tabla de Mensages');
-INSERT INTO international VALUES (1,'MessageBoard','Português','Adicionar quadro de mensagens');
+INSERT INTO international VALUES (5,'ExtraColumn','Svenska','StyleSheet Class');
+INSERT INTO international VALUES (5,'EventsCalendar','Svenska','Dag');
+INSERT INTO international VALUES (5,'Article','Svenska','Body');
+INSERT INTO international VALUES (4,'WebGUI','Svenska','Kontrolera inställningar.');
 INSERT INTO international VALUES (13,'UserSubmission','Deutsch','Erstellungsdatum');
 INSERT INTO international VALUES (1,'Poll','Dutch','Stemming');
 INSERT INTO international VALUES (1,'Poll','English','Poll');
 INSERT INTO international VALUES (1,'Poll','Español','Encuesta');
 INSERT INTO international VALUES (1,'Poll','Português','Sondagem');
-INSERT INTO international VALUES (1,'SiteMap','Dutch','Doorgaan met link toevoegen?');
-INSERT INTO international VALUES (1,'SiteMap','English','Add Site Map');
-INSERT INTO international VALUES (1,'SiteMap','Português','Adicionar mapa do site');
+INSERT INTO international VALUES (4,'UserSubmission','Svenska','Ditt medelande har blivit validerat.');
+INSERT INTO international VALUES (4,'SyndicatedContent','Svenska','Redigera Syndicated inehåll');
 INSERT INTO international VALUES (13,'WebGUI','Deutsch','Hilfe anschauen');
 INSERT INTO international VALUES (1,'SQLReport','Dutch','SQL rapport');
 INSERT INTO international VALUES (1,'SQLReport','English','SQL Report');
@@ -661,18 +683,14 @@ INSERT INTO international VALUES (1,'WebGUI','English','Add content...');
 INSERT INTO international VALUES (1,'WebGUI','Español','Agregar Contenido ...');
 INSERT INTO international VALUES (1,'WebGUI','Português','Adicionar conteudo...');
 INSERT INTO international VALUES (14,'DownloadManager','Deutsch','Datei');
-INSERT INTO international VALUES (2,'Article','Dutch','Artikel toevoegen');
-INSERT INTO international VALUES (2,'Article','English','Add Article');
-INSERT INTO international VALUES (2,'Article','Español','Agregar Artículo');
-INSERT INTO international VALUES (2,'Article','Português','Adicionar artigo');
 INSERT INTO international VALUES (2,'EventsCalendar','Dutch','Evenementen kalender');
 INSERT INTO international VALUES (2,'EventsCalendar','English','Events Calendar');
 INSERT INTO international VALUES (2,'EventsCalendar','Español','Calendario de Eventos');
 INSERT INTO international VALUES (2,'EventsCalendar','Português','Calendário de eventos');
-INSERT INTO international VALUES (2,'ExtraColumn','Dutch','Voeg extra kolom toe');
-INSERT INTO international VALUES (2,'ExtraColumn','English','Add Extra Column');
-INSERT INTO international VALUES (2,'ExtraColumn','Español','Agregar Columna Extra');
-INSERT INTO international VALUES (2,'ExtraColumn','Português','Adicinar coluna extra');
+INSERT INTO international VALUES (4,'SiteMap','Svenska','Nivåer att traversera');
+INSERT INTO international VALUES (4,'Poll','Svenska','Vem kan rösta?');
+INSERT INTO international VALUES (4,'MessageBoard','Svenska','Meddelanden per sida');
+INSERT INTO international VALUES (4,'LinkList','Svenska','Kula');
 INSERT INTO international VALUES (14,'EventsCalendar','Deutsch','Start\r\nDatum');
 INSERT INTO international VALUES (2,'FAQ','Dutch','FAQ');
 INSERT INTO international VALUES (2,'FAQ','English','F.A.Q.');
@@ -687,18 +705,14 @@ INSERT INTO international VALUES (2,'MessageBoard','Dutch','Berichten bord');
 INSERT INTO international VALUES (2,'MessageBoard','English','Message Board');
 INSERT INTO international VALUES (2,'MessageBoard','Español','Table de Mensages');
 INSERT INTO international VALUES (2,'MessageBoard','Português','Quadro de mensagens');
-INSERT INTO international VALUES (2,'Poll','Dutch','Stemming toevoegen');
-INSERT INTO international VALUES (2,'Poll','English','Add Poll');
-INSERT INTO international VALUES (2,'Poll','Español','Agregar Encuesta');
-INSERT INTO international VALUES (2,'Poll','Português','Adicionar sondagem');
+INSERT INTO international VALUES (4,'FAQ','Svenska','Lägg till fråga');
+INSERT INTO international VALUES (4,'ExtraColumn','Svenska','Bredd');
 INSERT INTO international VALUES (2,'SiteMap','Dutch','Site map');
 INSERT INTO international VALUES (2,'SiteMap','English','Site Map');
 INSERT INTO international VALUES (2,'SiteMap','Português','Mapa do site');
 INSERT INTO international VALUES (14,'SQLReport','Deutsch','Später mit\r\nSeitenzahlen versehen');
-INSERT INTO international VALUES (2,'SQLReport','Dutch','SQL rapport toevoegen');
-INSERT INTO international VALUES (2,'SQLReport','English','Add SQL Report');
-INSERT INTO international VALUES (2,'SQLReport','Español','Agregar Reporte SQL');
-INSERT INTO international VALUES (2,'SQLReport','Português','Adicionar relatório SQL');
+INSERT INTO international VALUES (4,'Article','Svenska','Slut datum');
+INSERT INTO international VALUES (3,'WebGUI','Svenska','Klistra in från klippbord...');
 INSERT INTO international VALUES (14,'UserSubmission','Deutsch','Status');
 INSERT INTO international VALUES (2,'SyndicatedContent','Dutch','Syndicated content');
 INSERT INTO international VALUES (2,'SyndicatedContent','English','Syndicated Content');
@@ -717,19 +731,17 @@ INSERT INTO international VALUES (3,'Article','English','Start Date');
 INSERT INTO international VALUES (3,'Article','Español','Fecha Inicio');
 INSERT INTO international VALUES (3,'Article','Português','Data de inicio');
 INSERT INTO international VALUES (14,'WebGUI','Deutsch','Ausstehende\r\nBeiträge anschauen');
-INSERT INTO international VALUES (3,'EventsCalendar','Dutch','Voeg evenementen kalender toe');
-INSERT INTO international VALUES (3,'EventsCalendar','English','Add Events Calendar');
-INSERT INTO international VALUES (3,'EventsCalendar','Español','Agregar Calendario de Eventos');
-INSERT INTO international VALUES (3,'EventsCalendar','Português','Adicionar calendário de eventos');
+INSERT INTO international VALUES (3,'SyndicatedContent','Svenska','Lägg till Syndicated inehåll');
+INSERT INTO international VALUES (3,'SQLReport','Svenska','Rapport Mall');
+INSERT INTO international VALUES (3,'SiteMap','Svenska','Starta från denna nivå?');
+INSERT INTO international VALUES (3,'Poll','Svenska','Aktiv');
 INSERT INTO international VALUES (3,'ExtraColumn','Dutch','Tussenruimte');
 INSERT INTO international VALUES (3,'ExtraColumn','English','Spacer');
 INSERT INTO international VALUES (3,'ExtraColumn','Español','Espaciador');
 INSERT INTO international VALUES (3,'ExtraColumn','Português','Espaçamento');
 INSERT INTO international VALUES (15,'DownloadManager','Deutsch','Beschreibung');
-INSERT INTO international VALUES (3,'FAQ','Dutch','Voeg FAQ toe');
-INSERT INTO international VALUES (3,'FAQ','English','Add F.A.Q.');
-INSERT INTO international VALUES (3,'FAQ','Español','Agregar F.A.Q.');
-INSERT INTO international VALUES (3,'FAQ','Português','Adicionar perguntas mais frequentes');
+INSERT INTO international VALUES (3,'MessageBoard','Svenska','Vem kan posta?');
+INSERT INTO international VALUES (3,'LinkList','Svenska','Öppna i ny ruta?');
 INSERT INTO international VALUES (3,'Item','English','Delete Attachment');
 INSERT INTO international VALUES (15,'EventsCalendar','Deutsch','Ende\r\nDatum');
 INSERT INTO international VALUES (3,'LinkList','Dutch','Open in nieuw venster?');
@@ -751,9 +763,9 @@ INSERT INTO international VALUES (3,'SQLReport','Dutch','Sjabloon');
 INSERT INTO international VALUES (3,'SQLReport','English','Report Template');
 INSERT INTO international VALUES (3,'SQLReport','Español','Modelo');
 INSERT INTO international VALUES (3,'SQLReport','Português','Template');
-INSERT INTO international VALUES (3,'SyndicatedContent','Dutch','Syndicated content toevoegen');
-INSERT INTO international VALUES (3,'SyndicatedContent','English','Add Syndicated Content');
-INSERT INTO international VALUES (3,'SyndicatedContent','Português','Adicionar conteudo sindical');
+INSERT INTO international VALUES (3,'ExtraColumn','Svenska','Mellanrumm');
+INSERT INTO international VALUES (3,'EventsCalendar','Svenska','Lägg till händelse kalender');
+INSERT INTO international VALUES (3,'Article','Svenska','Start datum');
 INSERT INTO international VALUES (3,'UserSubmission','Dutch','U heeft een nieuwe bijdrage om goed te keuren.');
 INSERT INTO international VALUES (3,'UserSubmission','English','You have a new user submission to approve.');
 INSERT INTO international VALUES (3,'UserSubmission','Português','Tem nova submissão para aprovar.');
@@ -774,10 +786,8 @@ INSERT INTO international VALUES (4,'ExtraColumn','Dutch','Wijdte');
 INSERT INTO international VALUES (4,'ExtraColumn','English','Width');
 INSERT INTO international VALUES (4,'ExtraColumn','Español','Ancho');
 INSERT INTO international VALUES (4,'ExtraColumn','Português','Largura');
-INSERT INTO international VALUES (4,'FAQ','Dutch','Voeg vraag toe');
-INSERT INTO international VALUES (4,'FAQ','English','Add Question');
-INSERT INTO international VALUES (4,'FAQ','Español','Agregar Pregunta');
-INSERT INTO international VALUES (4,'FAQ','Português','Adicionar questão');
+INSERT INTO international VALUES (2,'UserSubmission','Svenska','Vem kan göra inlägg?');
+INSERT INTO international VALUES (2,'SyndicatedContent','Svenska','Syndicated inehåll');
 INSERT INTO international VALUES (4,'Item','English','Item');
 INSERT INTO international VALUES (15,'UserSubmission','Deutsch','Bearbeiten/Löschen');
 INSERT INTO international VALUES (4,'LinkList','Dutch','Opsommingsteken');
@@ -811,10 +821,8 @@ INSERT INTO international VALUES (4,'WebGUI','English','Manage settings.');
 INSERT INTO international VALUES (4,'WebGUI','Español','Configurar Opciones.');
 INSERT INTO international VALUES (4,'WebGUI','Português','Organizar preferências.');
 INSERT INTO international VALUES (16,'DownloadManager','Deutsch','Upload\r\nDatum');
-INSERT INTO international VALUES (5,'Article','Dutch','Inhoud');
-INSERT INTO international VALUES (5,'Article','English','Body');
-INSERT INTO international VALUES (5,'Article','Español','Cuerpo');
-INSERT INTO international VALUES (5,'Article','Português','Corpo');
+INSERT INTO international VALUES (38,'UserSubmission','English','(Select \"No\" if you\'re writing an HTML/Rich Edit submission.)');
+INSERT INTO international VALUES (20,'EventsCalendar','English','Add an event.');
 INSERT INTO international VALUES (5,'EventsCalendar','Dutch','Dag');
 INSERT INTO international VALUES (5,'EventsCalendar','English','Day');
 INSERT INTO international VALUES (5,'EventsCalendar','Español','Día');
@@ -916,19 +924,17 @@ INSERT INTO international VALUES (7,'Article','Dutch','Link titel');
 INSERT INTO international VALUES (7,'Article','English','Link Title');
 INSERT INTO international VALUES (7,'Article','Español','Link Título');
 INSERT INTO international VALUES (7,'Article','Português','Titulo da hiperlink');
-INSERT INTO international VALUES (7,'EventsCalendar','Dutch','Evenement toevoegen');
-INSERT INTO international VALUES (7,'EventsCalendar','English','Add Event');
-INSERT INTO international VALUES (7,'EventsCalendar','Español','Agregar Evento');
-INSERT INTO international VALUES (7,'EventsCalendar','Português','Adicionar evento');
+INSERT INTO international VALUES (2,'SiteMap','Svenska','Site Karta');
+INSERT INTO international VALUES (2,'Poll','Svenska','Lägg till fråga');
+INSERT INTO international VALUES (2,'MessageBoard','Svenska','Meddelande Forum');
 INSERT INTO international VALUES (17,'UserSubmission','Deutsch','Sind Sie\r\nsicher, dass Sie diesen Beitrag löschen wollen?');
 INSERT INTO international VALUES (7,'FAQ','Dutch','Weet u zeker dat u deze vraag wilt verwijderen?');
 INSERT INTO international VALUES (7,'FAQ','English','Are you certain that you want to delete this question?');
 INSERT INTO international VALUES (7,'FAQ','Español','Está seguro de querer eliminar ésta pregunta?');
 INSERT INTO international VALUES (7,'FAQ','Português','Tem a certeza que quer apagar esta questão?');
-INSERT INTO international VALUES (7,'LinkList','Dutch','Voeg link toe');
-INSERT INTO international VALUES (7,'LinkList','English','Add Link');
-INSERT INTO international VALUES (7,'LinkList','Español','Agregar Enlace');
-INSERT INTO international VALUES (7,'LinkList','Português','Adicionar hiperlink');
+INSERT INTO international VALUES (2,'Item','Svenska','Bilagor');
+INSERT INTO international VALUES (2,'FAQ','Svenska','F.A.Q.');
+INSERT INTO international VALUES (2,'ExtraColumn','Svenska','Lägg till Extra Column');
 INSERT INTO international VALUES (18,'Article','Deutsch','Diskussion\r\nerlauben?');
 INSERT INTO international VALUES (7,'MessageBoard','Dutch','Naam:');
 INSERT INTO international VALUES (7,'MessageBoard','English','Author:');
@@ -1078,7 +1084,7 @@ INSERT INTO international VALUES (10,'WebGUI','English','Manage trash.');
 INSERT INTO international VALUES (10,'WebGUI','Español','Ver Papelera');
 INSERT INTO international VALUES (10,'WebGUI','Português','Ver o caixote do lixo.');
 INSERT INTO international VALUES (11,'Article','Dutch','(Vink aan als u geen &lt;br&gt; manueel gebruikt.)');
-INSERT INTO international VALUES (11,'Article','English','(Check if you aren\'t adding &lt;br&gt; manually.)');
+INSERT INTO international VALUES (11,'Article','English','(Select \"Yes\" only if you aren\'t adding &lt;br&gt; manually.)');
 INSERT INTO international VALUES (11,'Article','Español','(marque si no está agregando &lt;br&gt; manualmente.)');
 INSERT INTO international VALUES (11,'Article','Português','(escolher se não adicionar &lt;br&gt; manualmente.)');
 INSERT INTO international VALUES (20,'DownloadManager','Deutsch','Später\r\nmit Seitenzahlen versehen');
@@ -1087,10 +1093,10 @@ INSERT INTO international VALUES (11,'EventsCalendar','English','<b>and</b> all 
 INSERT INTO international VALUES (11,'EventsCalendar','Español','<b>y</b> todos las recurrencias del mismo');
 INSERT INTO international VALUES (11,'EventsCalendar','Português','<b>e</b> todos os recurrentes');
 INSERT INTO international VALUES (20,'MessageBoard','Deutsch','Letzte\r\nAntwort');
-INSERT INTO international VALUES (11,'LinkList','Dutch','Voeg link lijst toe');
-INSERT INTO international VALUES (11,'LinkList','English','Add Link List');
-INSERT INTO international VALUES (11,'LinkList','Español','Agregar Lista de Enlaces');
-INSERT INTO international VALUES (11,'LinkList','Português','Adicionar lista de hiperlinks');
+INSERT INTO international VALUES (2,'EventsCalendar','Svenska','Händelse Kalender');
+INSERT INTO international VALUES (2,'Article','Svenska','Lägg till artikel');
+INSERT INTO international VALUES (1,'WebGUI','Svenska','Lägg till innehåll....');
+INSERT INTO international VALUES (1,'UserSubmission','Svenska','Vem kan validera?');
 INSERT INTO international VALUES (11,'MessageBoard','Dutch','Terug naar berichten lijst');
 INSERT INTO international VALUES (11,'MessageBoard','English','Back To Message List');
 INSERT INTO international VALUES (11,'MessageBoard','Español','Volver a la Lista de Mensages');
@@ -1101,10 +1107,9 @@ INSERT INTO international VALUES (11,'SQLReport','English','<b>Debug:</b> Error:
 INSERT INTO international VALUES (11,'SQLReport','Español','Error: Hay un problema con la consulta.');
 INSERT INTO international VALUES (11,'SQLReport','Português','Erro: Houve um problema com a query.');
 INSERT INTO international VALUES (20,'WebGUI','Deutsch','Juni');
-INSERT INTO international VALUES (11,'UserSubmission','Dutch','Bijdrage toevoegen');
-INSERT INTO international VALUES (11,'UserSubmission','English','Add Submission');
-INSERT INTO international VALUES (11,'UserSubmission','Español','Contribuir');
-INSERT INTO international VALUES (11,'UserSubmission','Português','Adicionar submissão');
+INSERT INTO international VALUES (1,'SQLReport','Svenska','SQL Rapport');
+INSERT INTO international VALUES (1,'SiteMap','Svenska','Läggtill Site Karta');
+INSERT INTO international VALUES (1,'Poll','Svenska','Fråga');
 INSERT INTO international VALUES (11,'WebGUI','Dutch','Leeg prullenbak.');
 INSERT INTO international VALUES (11,'WebGUI','English','Empy trash.');
 INSERT INTO international VALUES (11,'WebGUI','Español','Vaciar Papelera');
@@ -1345,10 +1350,10 @@ INSERT INTO international VALUES (29,'WebGUI','English','Tuesday');
 INSERT INTO international VALUES (29,'WebGUI','Español','Martes');
 INSERT INTO international VALUES (29,'WebGUI','Português','Terça');
 INSERT INTO international VALUES (29,'UserSubmission','Deutsch','Benutzer\r\nBeitragssystem');
-INSERT INTO international VALUES (30,'UserSubmission','Dutch','Gebruikers bijdrage systeem toevoegen');
-INSERT INTO international VALUES (30,'UserSubmission','English','Add User Submission System');
-INSERT INTO international VALUES (30,'UserSubmission','Español','Agregar Sistema de Contribución de Usuarios');
-INSERT INTO international VALUES (30,'UserSubmission','Português','Adicionar sistema de submissão do utilizador');
+INSERT INTO international VALUES (1,'LinkList','Svenska','Indentering');
+INSERT INTO international VALUES (1,'Item','Svenska','Länk URL');
+INSERT INTO international VALUES (1,'FAQ','Svenska','Fortsätt med att lägga till en fråga?');
+INSERT INTO international VALUES (1,'ExtraColumn','Svenska','Extra Column');
 INSERT INTO international VALUES (28,'WebGUI','Deutsch','Montag');
 INSERT INTO international VALUES (30,'WebGUI','Dutch','woensdag');
 INSERT INTO international VALUES (30,'WebGUI','English','Wednesday');
@@ -1371,7 +1376,7 @@ INSERT INTO international VALUES (34,'WebGUI','Dutch','Zet datum');
 INSERT INTO international VALUES (34,'WebGUI','English','set date');
 INSERT INTO international VALUES (34,'WebGUI','Español','fijar fecha');
 INSERT INTO international VALUES (34,'WebGUI','Português','acertar a data');
-INSERT INTO international VALUES (30,'UserSubmission','Deutsch','Benutzer\r\nBeitragssystem hinzufügen');
+INSERT INTO international VALUES (1,'MessageBoard','Svenska','Läggtill Meddelande Forum');
 INSERT INTO international VALUES (35,'WebGUI','Dutch','Administratieve functie');
 INSERT INTO international VALUES (35,'WebGUI','English','Administrative Function');
 INSERT INTO international VALUES (35,'WebGUI','Español','Funciones Administrativas');
@@ -1428,7 +1433,6 @@ INSERT INTO international VALUES (45,'WebGUI','Dutch','\"Nee, ik heb een foutje 
 INSERT INTO international VALUES (45,'WebGUI','English','No, I made a mistake.');
 INSERT INTO international VALUES (45,'WebGUI','Español','No');
 INSERT INTO international VALUES (45,'WebGUI','Português','\"Não, enganei-me.\"');
-INSERT INTO international VALUES (36,'UserSubmission','Deutsch','Datei\r\nlöschen.');
 INSERT INTO international VALUES (46,'WebGUI','Dutch','Mijn account');
 INSERT INTO international VALUES (46,'WebGUI','English','My Account');
 INSERT INTO international VALUES (46,'WebGUI','Español','Mi Cuenta');
@@ -1660,10 +1664,8 @@ INSERT INTO international VALUES (97,'WebGUI','Dutch','Gesorteerd op object');
 INSERT INTO international VALUES (97,'WebGUI','English','Sorted by Object');
 INSERT INTO international VALUES (97,'WebGUI','Español','Ordenar por Objeto');
 INSERT INTO international VALUES (97,'WebGUI','Português','Ordenar por objecto');
-INSERT INTO international VALUES (98,'WebGUI','Dutch','Pagina toevoegen');
-INSERT INTO international VALUES (98,'WebGUI','English','Add Page');
-INSERT INTO international VALUES (98,'WebGUI','Español','Agregar Página');
-INSERT INTO international VALUES (98,'WebGUI','Português','Adicionar página');
+INSERT INTO international VALUES (5,'LinkList','Svenska','Fortsätt med att lägga till en länk?');
+INSERT INTO international VALUES (5,'Item','Svenska','Ladda ned bilaga');
 INSERT INTO international VALUES (58,'WebGUI','Deutsch','Ich besitze\r\nbereits ein Benutzerkonto.');
 INSERT INTO international VALUES (99,'WebGUI','Dutch','Titel');
 INSERT INTO international VALUES (99,'WebGUI','English','Title');
@@ -1696,7 +1698,7 @@ INSERT INTO international VALUES (105,'WebGUI','Español','Estilo');
 INSERT INTO international VALUES (105,'WebGUI','Português','Estilo');
 INSERT INTO international VALUES (60,'WebGUI','Deutsch','Sind Sie sicher,\r\ndass Sie dieses Benutzerkonto deaktivieren möchten? Wenn Sie fortfahren\r\nsind Ihre Konteninformationen endgültig verloren.');
 INSERT INTO international VALUES (106,'WebGUI','Dutch','Aanvinken om deze stijl in alle pagina\'s te gebruiiken.');
-INSERT INTO international VALUES (106,'WebGUI','English','Check to give this style to all sub-pages.');
+INSERT INTO international VALUES (106,'WebGUI','English','Select \"Yes\" to change all the pages under this page to this style.');
 INSERT INTO international VALUES (106,'WebGUI','Español','Marque para dar éste estilo a todas las sub-páginas.');
 INSERT INTO international VALUES (106,'WebGUI','Português','Escolha para atribuir este estilo a todas as sub-páginas');
 INSERT INTO international VALUES (107,'WebGUI','Dutch','Privileges');
@@ -1740,7 +1742,7 @@ INSERT INTO international VALUES (115,'WebGUI','Español','Cualquiera puede edita
 INSERT INTO international VALUES (115,'WebGUI','Português','Qualquer pessoa pode modificar?');
 INSERT INTO international VALUES (62,'WebGUI','Deutsch','sichern');
 INSERT INTO international VALUES (116,'WebGUI','Dutch','Aanvinken om deze privileges aan alle sub pagina\'s te geven.');
-INSERT INTO international VALUES (116,'WebGUI','English','Check to give these privileges to all sub-pages.');
+INSERT INTO international VALUES (116,'WebGUI','English','Select \"Yes\" to change the privileges of all pages under this page to these privileges.');
 INSERT INTO international VALUES (116,'WebGUI','Español','Marque para dar éstos privilegios a todas las sub-páginas.');
 INSERT INTO international VALUES (116,'WebGUI','Português','Escolher para atribuir estes privilégios a todas as sub-páginas.');
 INSERT INTO international VALUES (117,'WebGUI','Dutch','Bewerk toegangs controle instellingen');
@@ -2100,7 +2102,7 @@ INSERT INTO international VALUES (318,'WebGUI','Dutch','\"<a href=\"\"http://www
 INSERT INTO international VALUES (318,'WebGUI','English','<a href=\"http://www.aol.com/aim/homenew.adp\">AIM</a> Id');
 INSERT INTO international VALUES (318,'WebGUI','Português','\"<a href=\"\"http://www.aol.com/aim/homenew.adp\"\">AIM</a> Id\"');
 INSERT INTO international VALUES (99,'WebGUI','Deutsch','Titel');
-INSERT INTO international VALUES (98,'WebGUI','Deutsch','Seite\r\nhinzufügen');
+INSERT INTO international VALUES (5,'MessageBoard','Svenska','Redigera Timeout');
 INSERT INTO international VALUES (319,'WebGUI','Dutch','\"<a href=\"\"http://messenger.msn.com/\"\">MSN Messenger</a> Id\"');
 INSERT INTO international VALUES (319,'WebGUI','English','<a href=\"http://messenger.msn.com/\">MSN Messenger</a> Id');
 INSERT INTO international VALUES (319,'WebGUI','Português','\"<a href=\"\"http://messenger.msn.com/\"\">MSN Messenger</a> Id\"');
@@ -2252,15 +2254,15 @@ INSERT INTO international VALUES (32,'UserSubmission','English','Image');
 INSERT INTO international VALUES (33,'UserSubmission','English','Attachement');
 INSERT INTO international VALUES (34,'UserSubmission','English','Convert Carriage Returns');
 INSERT INTO international VALUES (35,'UserSubmission','English','Title');
-INSERT INTO international VALUES (36,'UserSubmission','English','Delete file.');
+INSERT INTO international VALUES (21,'EventsCalendar','English','Proceed to add event?');
 INSERT INTO international VALUES (378,'WebGUI','English','User ID');
 INSERT INTO international VALUES (379,'WebGUI','English','Group ID');
 INSERT INTO international VALUES (380,'WebGUI','English','Style ID');
 INSERT INTO international VALUES (381,'WebGUI','English','WebGUI received a malformed request and was unable to continue. Proprietary characters being passed through a form typically cause this. Please feel free to hit your back button and try again.');
 INSERT INTO international VALUES (1,'DownloadManager','English','Download Manager');
-INSERT INTO international VALUES (2,'DownloadManager','English','Add Download Manager');
+INSERT INTO international VALUES (1,'EventsCalendar','Svenska','Fortsätt med att lägga till en händelse?');
 INSERT INTO international VALUES (3,'DownloadManager','English','Proceed to add file?');
-INSERT INTO international VALUES (4,'DownloadManager','English','Add Download');
+INSERT INTO international VALUES (367,'WebGUI','Svenska','Bäst före');
 INSERT INTO international VALUES (5,'DownloadManager','English','File Title');
 INSERT INTO international VALUES (6,'DownloadManager','English','Download File');
 INSERT INTO international VALUES (7,'DownloadManager','English','Group to Download');
@@ -2269,7 +2271,7 @@ INSERT INTO international VALUES (9,'DownloadManager','English','Edit Download M
 INSERT INTO international VALUES (10,'DownloadManager','English','Edit Download');
 INSERT INTO international VALUES (11,'DownloadManager','English','Add a new download.');
 INSERT INTO international VALUES (12,'DownloadManager','English','Are you certain that you wish to delete this download?');
-INSERT INTO international VALUES (13,'DownloadManager','English','Delete attached file.');
+INSERT INTO international VALUES (22,'DownloadManager','English','Proceed to add download?');
 INSERT INTO international VALUES (14,'DownloadManager','English','File');
 INSERT INTO international VALUES (15,'DownloadManager','English','Description');
 INSERT INTO international VALUES (16,'DownloadManager','English','Date Uploaded');
@@ -2531,7 +2533,6 @@ INSERT INTO international VALUES (438,'WebGUI','English','Your Name');
 INSERT INTO international VALUES (13,'MessageBoard','Deutsch','Antwort\r\nschicken');
 INSERT INTO international VALUES (13,'LinkList','Deutsch','Neuen Link\r\nhinzufügen');
 INSERT INTO international VALUES (13,'EventsCalendar','Deutsch','Veranstaltung bearbeiten');
-INSERT INTO international VALUES (13,'DownloadManager','Deutsch','Anhang\r\nlöschen.');
 INSERT INTO international VALUES (13,'Article','Deutsch','Löschen');
 INSERT INTO international VALUES (12,'WebGUI','Deutsch','Administrationsmodus abschalten');
 INSERT INTO international VALUES (12,'UserSubmission','Deutsch','(Bitte\r\nausklicken, wenn Ihr Beitrag in HTML geschrieben ist)');
@@ -2542,11 +2543,10 @@ INSERT INTO international VALUES (12,'EventsCalendar','Deutsch','Veranstaltungsk
 INSERT INTO international VALUES (12,'DownloadManager','Deutsch','Sind Sie\r\nsicher, dass Sie diesen Download löschen möchten?');
 INSERT INTO international VALUES (12,'Article','Deutsch','Artikel\r\nbearbeiten');
 INSERT INTO international VALUES (11,'WebGUI','Deutsch','Mülleimer\r\nleeren');
-INSERT INTO international VALUES (11,'UserSubmission','Deutsch','Beitrag\r\nhinzufügen');
+INSERT INTO international VALUES (1,'SyndicatedContent','Svenska','URL till RSS filen');
 INSERT INTO international VALUES (11,'SQLReport','Deutsch','Fehler: Es gab\r\nein Problem mit der Abfrage.');
 INSERT INTO international VALUES (11,'Poll','Deutsch','Abstimmen');
 INSERT INTO international VALUES (11,'MessageBoard','Deutsch','Zurück zur\r\nBeitragsliste');
-INSERT INTO international VALUES (11,'LinkList','Deutsch','Link Liste\r\nhinzufügen');
 INSERT INTO international VALUES (11,'EventsCalendar','Deutsch','<b>und</b>\r\nalle seine Wiederholungen löschen wollen?');
 INSERT INTO international VALUES (11,'DownloadManager','Deutsch','Neuen\r\nDownload hinzufügen.');
 INSERT INTO international VALUES (11,'Article','Deutsch','(Bitte anklicken,\r\nfalls Sie nicht &lt;br&gt; in Ihrem Text hinzufügen.)');
@@ -2588,9 +2588,9 @@ INSERT INTO international VALUES (7,'SQLReport','Deutsch','Datenbankpasswort');
 INSERT INTO international VALUES (7,'SiteMap','Deutsch','Kugel');
 INSERT INTO international VALUES (7,'Poll','Deutsch','Antworten');
 INSERT INTO international VALUES (7,'MessageBoard','Deutsch','Autor:');
-INSERT INTO international VALUES (7,'LinkList','Deutsch','Link\r\nhinzufügen');
+INSERT INTO international VALUES (2,'LinkList','Svenska','Avstånd mellan rader');
 INSERT INTO international VALUES (7,'FAQ','Deutsch','Sind Sie sicher, dass\r\nSie diese Frage löschen wollen?');
-INSERT INTO international VALUES (7,'EventsCalendar','Deutsch','Termin\r\nhinzufügen');
+INSERT INTO international VALUES (2,'SQLReport','Svenska','Lägg till SQL rapport');
 INSERT INTO international VALUES (7,'DownloadManager','Deutsch','Gruppe,\r\ndie Download benutzen kann');
 INSERT INTO international VALUES (7,'Article','Deutsch','Link Titel');
 INSERT INTO international VALUES (6,'WebGUI','Deutsch','Stile verwalten');
@@ -2618,7 +2618,6 @@ INSERT INTO international VALUES (5,'Item','Deutsch','Anhang\r\nherunterladen');
 INSERT INTO international VALUES (5,'FAQ','Deutsch','Frage');
 INSERT INTO international VALUES (5,'ExtraColumn','Deutsch','StyleSheet\r\nClass');
 INSERT INTO international VALUES (5,'EventsCalendar','Deutsch','Tag');
-INSERT INTO international VALUES (5,'Article','Deutsch','Text');
 INSERT INTO international VALUES (5,'DownloadManager','Deutsch','Dateititel');
 INSERT INTO international VALUES (4,'WebGUI','Deutsch','Einstellungen\r\nverwalten');
 INSERT INTO international VALUES (4,'UserSubmission','Deutsch','Ihr Betrag\r\nwurde angenommen.');
@@ -2626,49 +2625,45 @@ INSERT INTO international VALUES (4,'SQLReport','Deutsch','Abfrage');
 INSERT INTO international VALUES (4,'SyndicatedContent','Deutsch','Clipping-Dienst bearbeiten');
 INSERT INTO international VALUES (4,'SiteMap','Deutsch','Tiefe');
 INSERT INTO international VALUES (4,'Poll','Deutsch','Wer kann\r\nabstimmen?');
-INSERT INTO international VALUES (4,'FAQ','Deutsch','Frage hinzufügen');
+INSERT INTO international VALUES (2,'WebGUI','Svenska','Sida');
 INSERT INTO international VALUES (4,'Item','Deutsch','Kleiner Artikel');
 INSERT INTO international VALUES (4,'LinkList','Deutsch','Kugel');
 INSERT INTO international VALUES (4,'MessageBoard','Deutsch','Beiträge pro\r\nSeite');
 INSERT INTO international VALUES (4,'ExtraColumn','Deutsch','Breite');
 INSERT INTO international VALUES (4,'EventsCalendar','Deutsch','Einmaliges\r\nEreignis');
-INSERT INTO international VALUES (4,'DownloadManager','Deutsch','Download\r\nhinzufügen');
+INSERT INTO international VALUES (1,'Article','Svenska','Artikel');
 INSERT INTO international VALUES (4,'Article','Deutsch','Ende Datum');
 INSERT INTO international VALUES (3,'WebGUI','Deutsch','Aus Zwischenablage\r\neinfügen...');
 INSERT INTO international VALUES (3,'UserSubmission','Deutsch','Sie sollten\r\neinen neuen Beitrag genehmigen.');
-INSERT INTO international VALUES (3,'SyndicatedContent','Deutsch','Clipping-Dienst hinzufügen');
+INSERT INTO international VALUES (3,'FAQ','Svenska','Lägg till F.A.Q.');
 INSERT INTO international VALUES (3,'SQLReport','Deutsch','Schablone');
 INSERT INTO international VALUES (3,'SiteMap','Deutsch','Auf dieser Ebene\r\nStarten?');
 INSERT INTO international VALUES (3,'Poll','Deutsch','Aktiv');
 INSERT INTO international VALUES (3,'MessageBoard','Deutsch','Wer kann\r\nBeiträge schreiben?');
 INSERT INTO international VALUES (3,'LinkList','Deutsch','In neuem Fenster\r\nöffnen?');
-INSERT INTO international VALUES (3,'FAQ','Deutsch','F.A.Q. hinzufügen');
 INSERT INTO international VALUES (3,'Item','Deutsch','Anhang löschen');
 INSERT INTO international VALUES (3,'ExtraColumn','Deutsch','Platzhalter');
-INSERT INTO international VALUES (3,'EventsCalendar','Deutsch','Veranstaltungskalender hinzufügen');
+INSERT INTO international VALUES (3,'UserSubmission','Svenska','Du har ett nytt medelande att validera.');
 INSERT INTO international VALUES (3,'DownloadManager','Deutsch','Fortfahren\r\ndie Datei hinzuzufügen?');
 INSERT INTO international VALUES (3,'Article','Deutsch','Start Datum');
 INSERT INTO international VALUES (2,'WebGUI','Deutsch','Seite');
 INSERT INTO international VALUES (2,'UserSubmission','Deutsch','Wer kann\r\nBeiträge schreiben?');
 INSERT INTO international VALUES (2,'SyndicatedContent','Deutsch','Clipping-Dienst');
-INSERT INTO international VALUES (2,'SQLReport','Deutsch','SQL Bericht\r\nhinzufügen');
+INSERT INTO international VALUES (4,'EventsCalendar','Svenska','Inträffar endast en gång.');
 INSERT INTO international VALUES (2,'SiteMap','Deutsch','Site\r\nMap/Übersicht');
 INSERT INTO international VALUES (2,'FAQ','Deutsch','F.A.Q.');
 INSERT INTO international VALUES (2,'Item','Deutsch','Anhang');
 INSERT INTO international VALUES (2,'LinkList','Deutsch','Zeilenabstand');
 INSERT INTO international VALUES (2,'MessageBoard','Deutsch','Diskussionsforum');
-INSERT INTO international VALUES (2,'Poll','Deutsch','Abstimmung\r\nhinzufügen');
+INSERT INTO international VALUES (4,'Item','Svenska','Post');
 INSERT INTO international VALUES (2,'EventsCalendar','Deutsch','Veranstaltungskalender');
-INSERT INTO international VALUES (2,'ExtraColumn','Deutsch','Extra Spalte\r\nhinzufügen');
-INSERT INTO international VALUES (2,'DownloadManager','Deutsch','Download\r\nManager hinzufügen');
-INSERT INTO international VALUES (2,'Article','Deutsch','Artikel\r\nhinzufügen');
+INSERT INTO international VALUES (4,'SQLReport','Svenska','Query');
 INSERT INTO international VALUES (1,'WebGUI','Deutsch','Inhalt\r\nhinzufügen...');
 INSERT INTO international VALUES (1,'SyndicatedContent','Deutsch','URL zur\r\nRSS-Datei');
 INSERT INTO international VALUES (1,'UserSubmission','Deutsch','Wer kann\r\ngenehmigen?');
 INSERT INTO international VALUES (1,'SQLReport','Deutsch','SQL Bericht');
-INSERT INTO international VALUES (1,'SiteMap','Deutsch','Site Map/Überblick\r\nhinzufügen');
 INSERT INTO international VALUES (1,'Poll','Deutsch','Abstimmung');
-INSERT INTO international VALUES (1,'MessageBoard','Deutsch','Diskussionsforum hinzufügen');
+INSERT INTO international VALUES (5,'FAQ','Svenska','Fråga');
 INSERT INTO international VALUES (1,'LinkList','Deutsch','Tabulator');
 INSERT INTO international VALUES (1,'Item','Deutsch','Link URL');
 INSERT INTO international VALUES (1,'FAQ','Deutsch','Frage hinzufügen?');
@@ -2774,10 +2769,535 @@ INSERT INTO international VALUES (490,'WebGUI','English','Add a profile category
 INSERT INTO international VALUES (491,'WebGUI','English','Add a profile field.');
 INSERT INTO international VALUES (492,'WebGUI','English','Profile fields list.');
 INSERT INTO international VALUES (493,'WebGUI','English','Back to site.');
+INSERT INTO international VALUES (495,'WebGUI','English','Built-In Editor');
+INSERT INTO international VALUES (496,'WebGUI','English','Editor To Use');
+INSERT INTO international VALUES (494,'WebGUI','English','Real Objects Edit-On Pro');
+INSERT INTO international VALUES (497,'WebGUI','English','Start Date');
+INSERT INTO international VALUES (498,'WebGUI','English','End Date');
+INSERT INTO international VALUES (499,'WebGUI','English','Wobject ID');
+INSERT INTO international VALUES (500,'WebGUI','English','Page ID');
+INSERT INTO international VALUES (5,'Poll','Svenska','Bred på staplar');
+INSERT INTO international VALUES (5,'SiteMap','Svenska','Redigera Site Kartan');
+INSERT INTO international VALUES (5,'SQLReport','Svenska','DSN');
+INSERT INTO international VALUES (5,'SyndicatedContent','Svenska','Senast hämtad');
+INSERT INTO international VALUES (5,'UserSubmission','Svenska','Ditt medelande har blivit nekat validering.');
+INSERT INTO international VALUES (5,'WebGUI','Svenska','Kontrolera grupper.');
+INSERT INTO international VALUES (6,'Article','Svenska','Bild');
+INSERT INTO international VALUES (6,'EventsCalendar','Svenska','Vecka');
+INSERT INTO international VALUES (6,'ExtraColumn','Svenska','Lägg till extra column');
+INSERT INTO international VALUES (6,'FAQ','Svenska','Svar');
+INSERT INTO international VALUES (6,'LinkList','Svenska','Länk Lista');
+INSERT INTO international VALUES (6,'MessageBoard','Svenska','Redigera Meddelande Forum');
+INSERT INTO international VALUES (6,'Poll','Svenska','Fråga');
+INSERT INTO international VALUES (6,'SiteMap','Svenska','Indentering');
+INSERT INTO international VALUES (6,'SQLReport','Svenska','Database Användare');
+INSERT INTO international VALUES (6,'SyndicatedContent','Svenska','Nuvarande inehåll');
+INSERT INTO international VALUES (6,'UserSubmission','Svenska','Inlägg per sida');
+INSERT INTO international VALUES (6,'WebGUI','Svenska','Kontrolera stilar.');
+INSERT INTO international VALUES (7,'Article','Svenska','Länk Titel');
+INSERT INTO international VALUES (7,'EventsCalendar','Svenska','Lägg till händelse');
+INSERT INTO international VALUES (7,'FAQ','Svenska','Är du säker på att du vill radera denna fråga?');
+INSERT INTO international VALUES (7,'LinkList','Svenska','Lägg till länk');
+INSERT INTO international VALUES (7,'MessageBoard','Svenska','Författare:');
+INSERT INTO international VALUES (7,'Poll','Svenska','Svar');
+INSERT INTO international VALUES (7,'SiteMap','Svenska','Kula');
+INSERT INTO international VALUES (7,'SQLReport','Svenska','Database Lösenord');
+INSERT INTO international VALUES (7,'UserSubmission','Svenska','Godkännt');
+INSERT INTO international VALUES (7,'WebGUI','Svenska','Kontrolera användare.');
+INSERT INTO international VALUES (8,'Article','Svenska','Länk URL');
+INSERT INTO international VALUES (8,'EventsCalendar','Svenska','Recurs every');
+INSERT INTO international VALUES (8,'FAQ','Svenska','Redigera F.A.Q.');
+INSERT INTO international VALUES (8,'LinkList','Svenska','URL');
+INSERT INTO international VALUES (8,'MessageBoard','Svenska','Datum:');
+INSERT INTO international VALUES (8,'Poll','Svenska','(Mata in ett svar per rad. Max 20.)');
+INSERT INTO international VALUES (8,'SiteMap','Svenska','Avstånd mellan rader');
+INSERT INTO international VALUES (8,'SQLReport','Svenska','Redigera SQL Rapport');
+INSERT INTO international VALUES (8,'UserSubmission','Svenska','Nekat');
+INSERT INTO international VALUES (8,'WebGUI','Svenska','Visa page not found.');
+INSERT INTO international VALUES (9,'Article','Svenska','Bilagor');
+INSERT INTO international VALUES (9,'EventsCalendar','Svenska','until');
+INSERT INTO international VALUES (9,'FAQ','Svenska','Lägg till ny fråga.');
+INSERT INTO international VALUES (9,'LinkList','Svenska','Är du säker att du vill radera denna länk?');
+INSERT INTO international VALUES (9,'MessageBoard','Svenska','Meddelande ID:');
+INSERT INTO international VALUES (9,'Poll','Svenska','Redigera fråga');
+INSERT INTO international VALUES (9,'SQLReport','Svenska','&lt;b&gt;Debug:&lt;/b&gt; Error: The DSN specified is of an improper format.');
+INSERT INTO international VALUES (9,'UserSubmission','Svenska','Väntande');
+INSERT INTO international VALUES (9,'WebGUI','Svenska','Visa klippbord.');
+INSERT INTO international VALUES (10,'Article','Svenska','Konvertera radbrytning?');
+INSERT INTO international VALUES (10,'EventsCalendar','Svenska','Är du säker på att du vill radera denna händelse');
+INSERT INTO international VALUES (10,'FAQ','Svenska','Redigera fråga');
+INSERT INTO international VALUES (10,'LinkList','Svenska','Redigera Länk Lista');
+INSERT INTO international VALUES (10,'MessageBoard','Svenska','Föregående tråd');
+INSERT INTO international VALUES (10,'Poll','Svenska','Återställ röster.');
+INSERT INTO international VALUES (10,'SQLReport','Svenska','&lt;b&gt;Debug:&lt;/b&gt; Error: The SQL specified is of an improper format.');
+INSERT INTO international VALUES (10,'UserSubmission','Svenska','Default Status');
+INSERT INTO international VALUES (10,'WebGUI','Svenska','Hantera skräpkorgen.');
+INSERT INTO international VALUES (11,'Article','Svenska','(Kryssa i om du inte skriver &amp;lt;br&amp;gt; manuelt.)');
+INSERT INTO international VALUES (11,'EventsCalendar','Svenska','&lt;b&gt;and&lt;/b&gt; all of its recurring events');
+INSERT INTO international VALUES (11,'LinkList','Svenska','Lägg till Länk Lista');
+INSERT INTO international VALUES (11,'MessageBoard','Svenska','Tillbaka till meddelande lista');
+INSERT INTO international VALUES (11,'SQLReport','Svenska','&lt;b&gt;Debug:&lt;/b&gt; Error: There was a problem with the query.');
+INSERT INTO international VALUES (11,'UserSubmission','Svenska','Lägg till inlägg');
+INSERT INTO international VALUES (11,'WebGUI','Svenska','Töm skräpkoren.');
+INSERT INTO international VALUES (12,'Article','Svenska','Redigera Artikel');
+INSERT INTO international VALUES (12,'EventsCalendar','Svenska','Edit Events Calendar');
+INSERT INTO international VALUES (12,'LinkList','Svenska','Redigera Länk');
+INSERT INTO international VALUES (12,'MessageBoard','Svenska','Redigera meddelande');
+INSERT INTO international VALUES (12,'SQLReport','Svenska','&lt;b&gt;Debug:&lt;/b&gt; Error: Could not connect to the database.');
+INSERT INTO international VALUES (12,'UserSubmission','Svenska','(Avkryssa om du skriver ett HTML inlägg.)');
+INSERT INTO international VALUES (12,'WebGUI','Svenska','Stäng av adminverktyg.');
+INSERT INTO international VALUES (13,'Article','Svenska','Radera');
+INSERT INTO international VALUES (13,'EventsCalendar','Svenska','Lägg till händelse');
+INSERT INTO international VALUES (13,'LinkList','Svenska','Lägg till en ny länk.');
+INSERT INTO international VALUES (13,'MessageBoard','Svenska','Skicka svar');
+INSERT INTO international VALUES (13,'UserSubmission','Svenska','Inlagt den');
+INSERT INTO international VALUES (13,'WebGUI','Svenska','Visa hjälpindex.');
+INSERT INTO international VALUES (14,'Article','Svenska','Justera Bild');
+INSERT INTO international VALUES (14,'MessageBoard','Svenska','Nästa tråd');
+INSERT INTO international VALUES (14,'UserSubmission','Svenska','Status');
+INSERT INTO international VALUES (14,'WebGUI','Svenska','Visa väntande meddelanden.');
+INSERT INTO international VALUES (15,'MessageBoard','Svenska','Författare');
+INSERT INTO international VALUES (15,'UserSubmission','Svenska','Redigera/Ta bort');
+INSERT INTO international VALUES (15,'WebGUI','Svenska','Januari');
+INSERT INTO international VALUES (16,'MessageBoard','Svenska','Datum');
+INSERT INTO international VALUES (16,'UserSubmission','Svenska','Namnlös');
+INSERT INTO international VALUES (16,'WebGUI','Svenska','Februari');
+INSERT INTO international VALUES (17,'MessageBoard','Svenska','Skicka nytt meddelande');
+INSERT INTO international VALUES (17,'UserSubmission','Svenska','Är du säger du vill ta bort detta inlägg?');
+INSERT INTO international VALUES (17,'WebGUI','Svenska','Mars');
+INSERT INTO international VALUES (18,'MessageBoard','Svenska','Tråd startad');
+INSERT INTO international VALUES (18,'UserSubmission','Svenska','Regigera inläggs system');
+INSERT INTO international VALUES (18,'WebGUI','Svenska','April');
+INSERT INTO international VALUES (19,'MessageBoard','Svenska','Svar');
+INSERT INTO international VALUES (19,'UserSubmission','Svenska','Redigera inlägg');
+INSERT INTO international VALUES (19,'WebGUI','Svenska','Maj');
+INSERT INTO international VALUES (20,'MessageBoard','Svenska','Senaste svar');
+INSERT INTO international VALUES (20,'UserSubmission','Svenska','Skicka nytt inlägg');
+INSERT INTO international VALUES (20,'WebGUI','Svenska','Juni');
+INSERT INTO international VALUES (21,'UserSubmission','Svenska','Skrivet av');
+INSERT INTO international VALUES (21,'WebGUI','Svenska','Juli');
+INSERT INTO international VALUES (22,'UserSubmission','Svenska','Skrivet av:');
+INSERT INTO international VALUES (22,'WebGUI','Svenska','Augusti');
+INSERT INTO international VALUES (23,'UserSubmission','Svenska','Inläggsdatum:');
+INSERT INTO international VALUES (23,'WebGUI','Svenska','September');
+INSERT INTO international VALUES (24,'UserSubmission','Svenska','Godkänn');
+INSERT INTO international VALUES (24,'WebGUI','Svenska','Oktober');
+INSERT INTO international VALUES (25,'UserSubmission','Svenska','Lämna i vänteläge');
+INSERT INTO international VALUES (25,'WebGUI','Svenska','November');
+INSERT INTO international VALUES (26,'UserSubmission','Svenska','Neka');
+INSERT INTO international VALUES (26,'WebGUI','Svenska','December');
+INSERT INTO international VALUES (27,'UserSubmission','Svenska','Redigera');
+INSERT INTO international VALUES (27,'WebGUI','Svenska','Söndag');
+INSERT INTO international VALUES (28,'UserSubmission','Svenska','Återgå till inläggslistan');
+INSERT INTO international VALUES (28,'WebGUI','Svenska','Måndag');
+INSERT INTO international VALUES (29,'UserSubmission','Svenska','Användar-inläggs system');
+INSERT INTO international VALUES (29,'WebGUI','Svenska','Tisdag');
+INSERT INTO international VALUES (30,'UserSubmission','Svenska','Läggtill använda-inläggs system');
+INSERT INTO international VALUES (30,'WebGUI','Svenska','Onsdag');
+INSERT INTO international VALUES (31,'WebGUI','Svenska','Torsdag');
+INSERT INTO international VALUES (32,'WebGUI','Svenska','Fredag');
+INSERT INTO international VALUES (33,'WebGUI','Svenska','Lördag');
+INSERT INTO international VALUES (34,'WebGUI','Svenska','sätt datum');
+INSERT INTO international VALUES (35,'WebGUI','Svenska','Administrativa funktioner');
+INSERT INTO international VALUES (36,'WebGUI','Svenska','Du måste vara administratör för att utföra denna funktion. Var vänlig kontakta någon av administratörerna. Följande är en lista av administratörer i systemet:');
+INSERT INTO international VALUES (37,'WebGUI','Svenska','Åtkomst nekas!');
+INSERT INTO international VALUES (404,'WebGUI','Svenska','Första Sidan');
+INSERT INTO international VALUES (38,'WebGUI','Svenska','Du har inte rättigheter att utföra denna operation. Var vänlig och ^a(logga in); på ett konto med tillräckliga rättigheter.');
+INSERT INTO international VALUES (39,'WebGUI','Svenska','Åtkomst nekas, du har inte tillräckliga previlegier.');
+INSERT INTO international VALUES (40,'WebGUI','Svenska','Vital komponent');
+INSERT INTO international VALUES (41,'WebGUI','Svenska','Du håller på att ta bort en vital komponent från WebGUI systemet. Om du hade varit tillåten att göra detta, hade WebGUI slutat fungera !');
+INSERT INTO international VALUES (42,'WebGUI','Svenska','Var vänlig konfirmera');
+INSERT INTO international VALUES (43,'WebGUI','Svenska','Är du säker att du vill ta bort detta inehåll?');
+INSERT INTO international VALUES (44,'WebGUI','Svenska','Ja, jag är säker.');
+INSERT INTO international VALUES (45,'WebGUI','Svenska','Nej, jag gjorde ett misstag.');
+INSERT INTO international VALUES (46,'WebGUI','Svenska','Mitt konto');
+INSERT INTO international VALUES (47,'WebGUI','Svenska','Hem');
+INSERT INTO international VALUES (48,'WebGUI','Svenska','Hej');
+INSERT INTO international VALUES (49,'WebGUI','Svenska','Klicka &lt;a href=unknown://\"^\\;?op=logout\" TARGET=\"_blank\"&gt;här&lt;/a&gt; för att logga ur.');
+INSERT INTO international VALUES (50,'WebGUI','Svenska','Användarnamn');
+INSERT INTO international VALUES (51,'WebGUI','Svenska','Lösenord');
+INSERT INTO international VALUES (52,'WebGUI','Svenska','logga in');
+INSERT INTO international VALUES (53,'WebGUI','Svenska','Utskrifts version');
+INSERT INTO international VALUES (54,'WebGUI','Svenska','Skapa konto');
+INSERT INTO international VALUES (55,'WebGUI','Svenska','Lösenord (kontroll)');
+INSERT INTO international VALUES (56,'WebGUI','Svenska','Email adress');
+INSERT INTO international VALUES (57,'WebGUI','Svenska','Detta krävs endas om du vill använda tjänster som kräver Email.');
+INSERT INTO international VALUES (58,'WebGUI','Svenska','Jag har redan ett konto.');
+INSERT INTO international VALUES (59,'WebGUI','Svenska','Jag har glömt mitt lösenord.');
+INSERT INTO international VALUES (60,'WebGUI','Svenska','ÄR du säker på att du vill stänga ned ditt konto ? Om du fortsätter kommer all information att vara permanent förlorad.');
+INSERT INTO international VALUES (61,'WebGUI','Svenska','Uppdatera konto information');
+INSERT INTO international VALUES (62,'WebGUI','Svenska','spara');
+INSERT INTO international VALUES (63,'WebGUI','Svenska','Slå på admin-verktyg.');
+INSERT INTO international VALUES (64,'WebGUI','Svenska','Logga ut.');
+INSERT INTO international VALUES (65,'WebGUI','Svenska','Var vänlig och radera mitt konto permanent.');
+INSERT INTO international VALUES (66,'WebGUI','Svenska','Logga in.');
+INSERT INTO international VALUES (67,'WebGUI','Svenska','Skapa ett konto.');
+INSERT INTO international VALUES (68,'WebGUI','Svenska','Informationen du gav var felaktig. Antingen så finns ingen sådan användare eller också så gav du fellösenords.');
+INSERT INTO international VALUES (69,'WebGUI','Svenska','Var vänlig kontakta system administratören för vidare hjälp.');
+INSERT INTO international VALUES (70,'WebGUI','Svenska','Fel');
+INSERT INTO international VALUES (71,'WebGUI','Svenska','Rädda lösenord');
+INSERT INTO international VALUES (72,'WebGUI','Svenska','rädda');
+INSERT INTO international VALUES (73,'WebGUI','Svenska','Logga in.');
+INSERT INTO international VALUES (74,'WebGUI','Svenska','Konto information');
+INSERT INTO international VALUES (75,'WebGUI','Svenska','Din kontoinformation har skickats till din Email adress.');
+INSERT INTO international VALUES (76,'WebGUI','Svenska','Den Email adressen finns inte i vårt system.');
+INSERT INTO international VALUES (77,'WebGUI','Svenska','Det kontonamnet du valde används redan på denna site. Var vänlig välj ett annat. Här kommer några ideer som du kan använda:');
+INSERT INTO international VALUES (78,'WebGUI','Svenska','Ditt lösenord stämde inte. Var vänlig försök igen.');
+INSERT INTO international VALUES (79,'WebGUI','Svenska','Cannot connect to LDAP server.');
+INSERT INTO international VALUES (80,'WebGUI','Svenska','Kontot skapades utan problem!');
+INSERT INTO international VALUES (81,'WebGUI','Svenska','Kontot uppdaterat utan problem!');
+INSERT INTO international VALUES (82,'WebGUI','Svenska','Administrativa funktioner...');
+INSERT INTO international VALUES (83,'WebGUI','Svenska','Lägg till grupp');
+INSERT INTO international VALUES (84,'WebGUI','Svenska','Grupp namn');
+INSERT INTO international VALUES (85,'WebGUI','Svenska','Beskrivning');
+INSERT INTO international VALUES (86,'WebGUI','Svenska','Är du säker på att du vill radera denna grupp? Var medveten om att alla rättigheter associerade med denna grupp kommer att raderas.');
+INSERT INTO international VALUES (87,'WebGUI','Svenska','Ändra grupp');
+INSERT INTO international VALUES (88,'WebGUI','Svenska','Användare i gruppen');
+INSERT INTO international VALUES (89,'WebGUI','Svenska','Grupper');
+INSERT INTO international VALUES (90,'WebGUI','Svenska','Lägg till grupp.');
+INSERT INTO international VALUES (91,'WebGUI','Svenska','Föregående sida');
+INSERT INTO international VALUES (92,'WebGUI','Svenska','Nästa sida');
+INSERT INTO international VALUES (93,'WebGUI','Svenska','Hjälp');
+INSERT INTO international VALUES (94,'WebGUI','Svenska','Se vidare');
+INSERT INTO international VALUES (95,'WebGUI','Svenska','Hjälp index');
+INSERT INTO international VALUES (96,'WebGUI','Svenska','Sortera på åtgärd');
+INSERT INTO international VALUES (97,'WebGUI','Svenska','Sortera på objekt');
+INSERT INTO international VALUES (98,'WebGUI','Svenska','Lägg till sida');
+INSERT INTO international VALUES (99,'WebGUI','Svenska','Titel');
+INSERT INTO international VALUES (100,'WebGUI','Svenska','Meta Tag');
+INSERT INTO international VALUES (101,'WebGUI','Svenska','Är du säker på att du vill radera denna sita, dess inehåll och underligande objekt?');
+INSERT INTO international VALUES (102,'WebGUI','Svenska','Editera sida');
+INSERT INTO international VALUES (103,'WebGUI','Svenska','Sidspecifikation');
+INSERT INTO international VALUES (104,'WebGUI','Svenska','Sidans URL');
+INSERT INTO international VALUES (105,'WebGUI','Svenska','Stil');
+INSERT INTO international VALUES (106,'WebGUI','Svenska','Ge samma stil till underliggande sidor.');
+INSERT INTO international VALUES (107,'WebGUI','Svenska','Previlegier');
+INSERT INTO international VALUES (108,'WebGUI','Svenska','Ägare');
+INSERT INTO international VALUES (109,'WebGUI','Svenska','Ägaren kan se?');
+INSERT INTO international VALUES (110,'WebGUI','Svenska','Ägaren kan editera?');
+INSERT INTO international VALUES (111,'WebGUI','Svenska','Grupp');
+INSERT INTO international VALUES (112,'WebGUI','Svenska','Gruppen kan se?');
+INSERT INTO international VALUES (113,'WebGUI','Svenska','Gruppen kan editera?');
+INSERT INTO international VALUES (114,'WebGUI','Svenska','Vemsomhelst kan titta?');
+INSERT INTO international VALUES (115,'WebGUI','Svenska','Kan vem som helst redigera?');
+INSERT INTO international VALUES (116,'WebGUI','Svenska','Kryssa här för att kopiera dessa previlegier till undersidor.');
+INSERT INTO international VALUES (117,'WebGUI','Svenska','Redigera Autentiserings inställningar');
+INSERT INTO international VALUES (118,'WebGUI','Svenska','Anonyma registreringar');
+INSERT INTO international VALUES (119,'WebGUI','Svenska','Authentiserings metod(default)');
+INSERT INTO international VALUES (120,'WebGUI','Svenska','LDAP URL (default)');
+INSERT INTO international VALUES (121,'WebGUI','Svenska','LDAP Identity (default)');
+INSERT INTO international VALUES (122,'WebGUI','Svenska','LDAP Identity Name');
+INSERT INTO international VALUES (123,'WebGUI','Svenska','LDAP Password Name');
+INSERT INTO international VALUES (124,'WebGUI','Svenska','Edit Company Information');
+INSERT INTO international VALUES (125,'WebGUI','Svenska','Företags namn');
+INSERT INTO international VALUES (126,'WebGUI','Svenska','Företags Email adress');
+INSERT INTO international VALUES (127,'WebGUI','Svenska','Företags URL');
+INSERT INTO international VALUES (128,'WebGUI','Svenska','Redigera Fil inställningar');
+INSERT INTO international VALUES (129,'WebGUI','Svenska','Path till WebGUI Extras');
+INSERT INTO international VALUES (130,'WebGUI','Svenska','Maximal storlek på bilagor');
+INSERT INTO international VALUES (131,'WebGUI','Svenska','Web Attachment Path');
+INSERT INTO international VALUES (132,'WebGUI','Svenska','Server Attachment Path');
+INSERT INTO international VALUES (133,'WebGUI','Svenska','Redigera Mail Inställningar');
+INSERT INTO international VALUES (134,'WebGUI','Svenska','Rädda lösenords meddelande');
+INSERT INTO international VALUES (135,'WebGUI','Svenska','SMTP Server');
+INSERT INTO international VALUES (136,'WebGUI','Svenska','Hemsida');
+INSERT INTO international VALUES (137,'WebGUI','Svenska','Page Not Found Page');
+INSERT INTO international VALUES (138,'WebGUI','Svenska','Ja');
+INSERT INTO international VALUES (139,'WebGUI','Svenska','Nej');
+INSERT INTO international VALUES (140,'WebGUI','Svenska','Redigera övriga inställningar');
+INSERT INTO international VALUES (141,'WebGUI','Svenska','Not Found Page');
+INSERT INTO international VALUES (142,'WebGUI','Svenska','Session Timeout');
+INSERT INTO international VALUES (143,'WebGUI','Svenska','Kontrolera inställningar');
+INSERT INTO international VALUES (144,'WebGUI','Svenska','Visa statistik.');
+INSERT INTO international VALUES (145,'WebGUI','Svenska','WebGUI Build Version');
+INSERT INTO international VALUES (146,'WebGUI','Svenska','Aktiva sessioner');
+INSERT INTO international VALUES (147,'WebGUI','Svenska','Sidor');
+INSERT INTO international VALUES (148,'WebGUI','Svenska','Widgets');
+INSERT INTO international VALUES (149,'WebGUI','Svenska','Användare');
+INSERT INTO international VALUES (150,'WebGUI','Svenska','Läggtill stil');
+INSERT INTO international VALUES (151,'WebGUI','Svenska','Stil namn');
+INSERT INTO international VALUES (152,'WebGUI','Svenska','Header');
+INSERT INTO international VALUES (153,'WebGUI','Svenska','Footer');
+INSERT INTO international VALUES (154,'WebGUI','Svenska','Stil schema (Style Sheet)');
+INSERT INTO international VALUES (155,'WebGUI','Svenska','Är du säker på att du vill radera denna stil och vilket resulterar i att alla sidor som använder den stilen kommer använda \"Fail Safe\" stilen?');
+INSERT INTO international VALUES (156,'WebGUI','Svenska','Redigera stil');
+INSERT INTO international VALUES (157,'WebGUI','Svenska','Stilar');
+INSERT INTO international VALUES (158,'WebGUI','Svenska','Lägg till en ny stil.');
+INSERT INTO international VALUES (159,'WebGUI','Svenska','Medelande log');
+INSERT INTO international VALUES (160,'WebGUI','Svenska','Inlagt den');
+INSERT INTO international VALUES (161,'WebGUI','Svenska','Skrivet av');
+INSERT INTO international VALUES (162,'WebGUI','Svenska','Är du säker på att du vill ta bort allt ur skräpkorgen?');
+INSERT INTO international VALUES (163,'WebGUI','Svenska','Lägg till användare');
+INSERT INTO international VALUES (164,'WebGUI','Svenska','Autentiserings metod');
+INSERT INTO international VALUES (165,'WebGUI','Svenska','LDAP URL');
+INSERT INTO international VALUES (166,'WebGUI','Svenska','Connect DN');
+INSERT INTO international VALUES (167,'WebGUI','Svenska','Är du absolut säker att du vill radera denna användare? Var medveten om att all information om denna användare kommer att vara permanent förlorade om du fortsätter.');
+INSERT INTO international VALUES (168,'WebGUI','Svenska','Redigera Användare');
+INSERT INTO international VALUES (169,'WebGUI','Svenska','Lägg till en ny användare.');
+INSERT INTO international VALUES (170,'WebGUI','Svenska','sök');
+INSERT INTO international VALUES (171,'WebGUI','Svenska','rich edit');
+INSERT INTO international VALUES (174,'WebGUI','Svenska','Visa titel?');
+INSERT INTO international VALUES (175,'WebGUI','Svenska','Berarbeta makron?');
+INSERT INTO international VALUES (228,'WebGUI','Svenska','Redigerar Meddelande...');
+INSERT INTO international VALUES (229,'WebGUI','Svenska','Subject');
+INSERT INTO international VALUES (230,'WebGUI','Svenska','Meddelande');
+INSERT INTO international VALUES (231,'WebGUI','Svenska','Skickar nytt meddelande...');
+INSERT INTO international VALUES (232,'WebGUI','Svenska','no subject');
+INSERT INTO international VALUES (233,'WebGUI','Svenska','(eom)');
+INSERT INTO international VALUES (234,'WebGUI','Svenska','Skickar svar...');
+INSERT INTO international VALUES (237,'WebGUI','Svenska','Subject:');
+INSERT INTO international VALUES (238,'WebGUI','Svenska','Författare:');
+INSERT INTO international VALUES (239,'WebGUI','Svenska','Datum:');
+INSERT INTO international VALUES (240,'WebGUI','Svenska','Meddelande ID:');
+INSERT INTO international VALUES (244,'WebGUI','Svenska','Författare');
+INSERT INTO international VALUES (245,'WebGUI','Svenska','Datum');
+INSERT INTO international VALUES (304,'WebGUI','Svenska','Språk');
+INSERT INTO international VALUES (306,'WebGUI','Svenska','Username Binding');
+INSERT INTO international VALUES (307,'WebGUI','Svenska','Använd den vanliga meta tagen?');
+INSERT INTO international VALUES (308,'WebGUI','Svenska','Redigera profilinställningar');
+INSERT INTO international VALUES (309,'WebGUI','Svenska','Tillåt riktigt namn?');
+INSERT INTO international VALUES (310,'WebGUI','Svenska','Tillåt extra kontaktinformation?');
+INSERT INTO international VALUES (311,'WebGUI','Svenska','Tillåt heminformation?');
+INSERT INTO international VALUES (312,'WebGUI','Svenska','Tillåt företagsinformation?');
+INSERT INTO international VALUES (313,'WebGUI','Svenska','Tillåt extra informaiton?');
+INSERT INTO international VALUES (314,'WebGUI','Svenska','Förnamn');
+INSERT INTO international VALUES (315,'WebGUI','Svenska','Mellannamn');
+INSERT INTO international VALUES (316,'WebGUI','Svenska','Efternamn');
+INSERT INTO international VALUES (317,'WebGUI','Svenska','&lt;a href=unknown://\"http://www.icq.com\" TARGET=\"_blank\"&gt;ICQ&lt;/a&gt; UIN');
+INSERT INTO international VALUES (318,'WebGUI','Svenska','&lt;a href=unknown://\"http://www.aol.com/aim/homenew.adp\" TARGET=\"_blank\"&gt;AIM&lt;/a&gt; Id');
+INSERT INTO international VALUES (319,'WebGUI','Svenska','&lt;a href=unknown://\"http://messenger.msn.com/\" TARGET=\"_blank\"&gt;MSN Messenger&lt;/a&gt; Id');
+INSERT INTO international VALUES (320,'WebGUI','Svenska','&lt;a href=unknown://\"http://messenger.yahoo.com/\" TARGET=\"_blank\"&gt;Yahoo! Messenger&lt;/a&gt; Id');
+INSERT INTO international VALUES (321,'WebGUI','Svenska','Mobil nummer');
+INSERT INTO international VALUES (322,'WebGUI','Svenska','Personsökare');
+INSERT INTO international VALUES (323,'WebGUI','Svenska','Hem adress');
+INSERT INTO international VALUES (324,'WebGUI','Svenska','Hem stad');
+INSERT INTO international VALUES (325,'WebGUI','Svenska','Hem län');
+INSERT INTO international VALUES (326,'WebGUI','Svenska','Hem postnummer');
+INSERT INTO international VALUES (327,'WebGUI','Svenska','Hem land');
+INSERT INTO international VALUES (328,'WebGUI','Svenska','Hem telefon');
+INSERT INTO international VALUES (329,'WebGUI','Svenska','Arbets adress');
+INSERT INTO international VALUES (330,'WebGUI','Svenska','Arbets stad');
+INSERT INTO international VALUES (331,'WebGUI','Svenska','Arbets län');
+INSERT INTO international VALUES (332,'WebGUI','Svenska','Arbets postnummer');
+INSERT INTO international VALUES (333,'WebGUI','Svenska','Arbets land');
+INSERT INTO international VALUES (334,'WebGUI','Svenska','Arbets telefon');
+INSERT INTO international VALUES (335,'WebGUI','Svenska','Kön');
+INSERT INTO international VALUES (336,'WebGUI','Svenska','Födelsedatum');
+INSERT INTO international VALUES (337,'WebGUI','Svenska','Hemside URL');
+INSERT INTO international VALUES (338,'WebGUI','Svenska','Redigera profil');
+INSERT INTO international VALUES (339,'WebGUI','Svenska','Man');
+INSERT INTO international VALUES (340,'WebGUI','Svenska','Kvinna');
+INSERT INTO international VALUES (341,'WebGUI','Svenska','Redigera profil.');
+INSERT INTO international VALUES (342,'WebGUI','Svenska','Redigera kontoinformation.');
+INSERT INTO international VALUES (343,'WebGUI','Svenska','Visa profil.');
+INSERT INTO international VALUES (344,'WebGUI','Svenska','Visa medelande log.');
+INSERT INTO international VALUES (345,'WebGUI','Svenska','Inte en medlem');
+INSERT INTO international VALUES (346,'WebGUI','Svenska','Denna användare är inte längre medlem på vår site. Vi har ingen vidare information om användaren.');
+INSERT INTO international VALUES (347,'WebGUI','Svenska','Visa profilen för');
+INSERT INTO international VALUES (348,'WebGUI','Svenska','Namn');
+INSERT INTO international VALUES (349,'WebGUI','Svenska','Senaste tillgängliga version');
+INSERT INTO international VALUES (350,'WebGUI','Svenska','Avslutad');
+INSERT INTO international VALUES (351,'WebGUI','Svenska','Medelandelog Post');
+INSERT INTO international VALUES (352,'WebGUI','Svenska','Skapat datum');
+INSERT INTO international VALUES (353,'WebGUI','Svenska','Du har inga nya logmedelanden just nu.');
+INSERT INTO international VALUES (354,'WebGUI','Svenska','Visa medelande log.');
+INSERT INTO international VALUES (355,'WebGUI','Svenska','Standard');
+INSERT INTO international VALUES (356,'WebGUI','Svenska','Mall');
+INSERT INTO international VALUES (357,'WebGUI','Svenska','Nyheter');
+INSERT INTO international VALUES (358,'WebGUI','Svenska','Vänster kolumn');
+INSERT INTO international VALUES (359,'WebGUI','Svenska','Höger kolumn');
+INSERT INTO international VALUES (360,'WebGUI','Svenska','En över tre');
+INSERT INTO international VALUES (361,'WebGUI','Svenska','Tre över en');
+INSERT INTO international VALUES (362,'WebGUI','Svenska','SidaVidSida');
+INSERT INTO international VALUES (363,'WebGUI','Svenska','Mall position');
+INSERT INTO international VALUES (364,'WebGUI','Svenska','Sök');
+INSERT INTO international VALUES (365,'WebGUI','Svenska','Sökresultaten..');
+INSERT INTO international VALUES (366,'WebGUI','Svenska','Inga sidor hittades som stämde med din förfrågan.');
+INSERT INTO international VALUES (368,'WebGUI','Svenska','Lägg till en ny grupp till denna användare.');
+INSERT INTO international VALUES (369,'WebGUI','Svenska','Bästföre datum');
+INSERT INTO international VALUES (370,'WebGUI','Svenska','Redigera gruppering');
+INSERT INTO international VALUES (371,'WebGUI','Svenska','Lägg till gruppering');
+INSERT INTO international VALUES (372,'WebGUI','Svenska','Redigera Användares Grupper');
+INSERT INTO international VALUES (373,'WebGUI','Svenska','&lt;b&gt;Varning:&lt;/b&gt; Genom att redigera listan ovan så kommer du att återställa alla bästföre datum för varje grupp till standard värdet.');
+INSERT INTO international VALUES (374,'WebGUI','Svenska','Hantera paket.');
+INSERT INTO international VALUES (375,'WebGUI','Svenska','Välj ett paket att använda');
+INSERT INTO international VALUES (376,'WebGUI','Svenska','Paket');
+INSERT INTO international VALUES (377,'WebGUI','Svenska','Inga paket har definierats av din packet hanterare eller administratör.');
+INSERT INTO international VALUES (11,'Poll','Svenska','Rösta!');
+INSERT INTO international VALUES (31,'UserSubmission','Svenska','Inehåll');
+INSERT INTO international VALUES (32,'UserSubmission','Svenska','Bild');
+INSERT INTO international VALUES (33,'UserSubmission','Svenska','Bilag');
+INSERT INTO international VALUES (34,'UserSubmission','Svenska','Konvertera radbrytningar');
+INSERT INTO international VALUES (35,'UserSubmission','Svenska','Titel');
+INSERT INTO international VALUES (36,'UserSubmission','Svenska','Radera fil.');
+INSERT INTO international VALUES (378,'WebGUI','Svenska','Användar ID');
+INSERT INTO international VALUES (379,'WebGUI','Svenska','Grupp ID');
+INSERT INTO international VALUES (380,'WebGUI','Svenska','Stil ID');
+INSERT INTO international VALUES (381,'WebGUI','Svenska','WebGUI fick in en felformulerad förfrågan och kunde inte fortsätta. Oftast beror detta på ovanliga tecken som skickas från ett formulär. Du kan försöka med att gå tillbaka och försöka igen.');
+INSERT INTO international VALUES (1,'DownloadManager','Svenska','Filhanterare');
+INSERT INTO international VALUES (2,'DownloadManager','Svenska','Lägg till en Filhanterare');
+INSERT INTO international VALUES (3,'DownloadManager','Svenska','Fortsätt med att lägga till fil?');
+INSERT INTO international VALUES (4,'DownloadManager','Svenska','Läggtill Nedladdning');
+INSERT INTO international VALUES (5,'DownloadManager','Svenska','Fil Titel');
+INSERT INTO international VALUES (6,'DownloadManager','Svenska','Ladda ned fil');
+INSERT INTO international VALUES (7,'DownloadManager','Svenska','Grupp för nedladdning');
+INSERT INTO international VALUES (8,'DownloadManager','Svenska','Kort Beskrivning');
+INSERT INTO international VALUES (9,'DownloadManager','Svenska','Redigera Filhanterare');
+INSERT INTO international VALUES (10,'DownloadManager','Svenska','Redigera Nedladdning');
+INSERT INTO international VALUES (11,'DownloadManager','Svenska','Lägg till en ny nedladdning.');
+INSERT INTO international VALUES (12,'DownloadManager','Svenska','Är du säker på att du vill ta bort denna nedladdning?');
+INSERT INTO international VALUES (13,'DownloadManager','Svenska','Radera');
+INSERT INTO international VALUES (14,'DownloadManager','Svenska','Fil');
+INSERT INTO international VALUES (15,'DownloadManager','Svenska','Beskrivning');
+INSERT INTO international VALUES (16,'DownloadManager','Svenska','Uppladat den');
+INSERT INTO international VALUES (15,'Article','Svenska','Höger');
+INSERT INTO international VALUES (16,'Article','Svenska','Vänster');
+INSERT INTO international VALUES (17,'Article','Svenska','Centrera');
+INSERT INTO international VALUES (37,'UserSubmission','Svenska','Radera');
+INSERT INTO international VALUES (13,'SQLReport','Svenska','Konvertera radbrytning?');
+INSERT INTO international VALUES (17,'DownloadManager','Svenska','Alternativ Version #1');
+INSERT INTO international VALUES (18,'DownloadManager','Svenska','Alternativ Version #2');
+INSERT INTO international VALUES (19,'DownloadManager','Svenska','Du har inga filer att ladda ned.');
+INSERT INTO international VALUES (14,'EventsCalendar','Svenska','Start datum');
+INSERT INTO international VALUES (15,'EventsCalendar','Svenska','Slut datum');
+INSERT INTO international VALUES (20,'DownloadManager','Svenska','Sidbrytning efter');
+INSERT INTO international VALUES (14,'SQLReport','Svenska','Sidbrytning efter');
+INSERT INTO international VALUES (16,'EventsCalendar','Svenska','Kalender utseende');
+INSERT INTO international VALUES (17,'EventsCalendar','Svenska','Lista');
+INSERT INTO international VALUES (18,'EventsCalendar','Svenska','Kalender');
+INSERT INTO international VALUES (19,'EventsCalendar','Svenska','Sidbrytning efter');
+INSERT INTO international VALUES (382,'WebGUI','Svenska','Lägg till bild');
+INSERT INTO international VALUES (383,'WebGUI','Svenska','Namn');
+INSERT INTO international VALUES (384,'WebGUI','Svenska','Fil');
+INSERT INTO international VALUES (385,'WebGUI','Svenska','Parametrar');
+INSERT INTO international VALUES (386,'WebGUI','Svenska','Redigera Bild');
+INSERT INTO international VALUES (387,'WebGUI','Svenska','Uppladat av');
+INSERT INTO international VALUES (388,'WebGUI','Svenska','Uppladat den');
+INSERT INTO international VALUES (389,'WebGUI','Svenska','Bild ID');
+INSERT INTO international VALUES (390,'WebGUI','Svenska','Visar bild...');
+INSERT INTO international VALUES (391,'WebGUI','Svenska','Radera');
+INSERT INTO international VALUES (392,'WebGUI','Svenska','Är du säker på att du vill radera denna bild?');
+INSERT INTO international VALUES (393,'WebGUI','Svenska','Hantera Bilder');
+INSERT INTO international VALUES (394,'WebGUI','Svenska','Hantera bilder.');
+INSERT INTO international VALUES (395,'WebGUI','Svenska','Lägg till en ny bild.');
+INSERT INTO international VALUES (396,'WebGUI','Svenska','Visa bild');
+INSERT INTO international VALUES (397,'WebGUI','Svenska','Tillbaka till bildlistan.');
+INSERT INTO international VALUES (398,'WebGUI','Svenska','Dokument Typ Deklaration');
+INSERT INTO international VALUES (399,'WebGUI','Svenska','Validera denna sida.');
+INSERT INTO international VALUES (400,'WebGUI','Svenska','Blokera Proxy Caching');
+INSERT INTO international VALUES (401,'WebGUI','Svenska','Är du säker på att du vill radera medelandet och alla undermedelanden i denna tråd?');
+INSERT INTO international VALUES (21,'MessageBoard','Svenska','Vem kan moderera?');
+INSERT INTO international VALUES (22,'MessageBoard','Svenska','Radera Medelandet');
+INSERT INTO international VALUES (402,'WebGUI','Svenska','Medelandet du frågade efter existerar inte.');
+INSERT INTO international VALUES (403,'WebGUI','Svenska','Föredrar att inte säga.');
+INSERT INTO international VALUES (405,'WebGUI','Svenska','Sista sidan');
+INSERT INTO international VALUES (407,'WebGUI','Svenska','Klicka här för att registrera.');
+INSERT INTO international VALUES (15,'SQLReport','Svenska','Förbearbeta macron vid förfrågan?');
+INSERT INTO international VALUES (16,'SQLReport','Svenska','Debug?');
+INSERT INTO international VALUES (17,'SQLReport','Svenska','&lt;b&gt;Debug:&lt;/b&gt; Förfrågan(query):');
+INSERT INTO international VALUES (18,'SQLReport','Svenska','Det fanns inga resultat för denna förfrågan.');
+INSERT INTO international VALUES (408,'WebGUI','Svenska','Hantera bassidor(Roots)');
+INSERT INTO international VALUES (409,'WebGUI','Svenska','Lägg till en ny bassida.');
+INSERT INTO international VALUES (410,'WebGUI','Svenska','Hantera bassidor.');
+INSERT INTO international VALUES (411,'WebGUI','Svenska','Huvud titel');
+INSERT INTO international VALUES (412,'WebGUI','Svenska','Synopsis');
+INSERT INTO international VALUES (9,'SiteMap','Svenska','Visa synopsis?');
+INSERT INTO international VALUES (18,'Article','Svenska','Tillåt diskusion');
+INSERT INTO international VALUES (19,'Article','Svenska','Vem kan posta?');
+INSERT INTO international VALUES (20,'Article','Svenska','Vem kan moderera?');
+INSERT INTO international VALUES (21,'Article','Svenska','Redigera Timeout');
+INSERT INTO international VALUES (22,'Article','Svenska','Författare');
+INSERT INTO international VALUES (23,'Article','Svenska','Datum');
+INSERT INTO international VALUES (24,'Article','Svenska','Skicka svar');
+INSERT INTO international VALUES (25,'Article','Svenska','Redigera svar');
+INSERT INTO international VALUES (26,'Article','Svenska','Radera svar');
+INSERT INTO international VALUES (27,'Article','Svenska','Tillbaka till artikel');
+INSERT INTO international VALUES (413,'WebGUI','Svenska','Vid kritiskta fel');
+INSERT INTO international VALUES (28,'Article','Svenska','Visa svar');
+INSERT INTO international VALUES (414,'WebGUI','Svenska','Visa debugg information.');
+INSERT INTO international VALUES (415,'WebGUI','Svenska','Visa ett användarvänligt medelande.');
+INSERT INTO international VALUES (416,'WebGUI','Svenska','&lt;h1&gt;Problem Med Förfrågan&lt;/h1&gt;\r\nVi har stött på ett problem med din förfrågan. Var vänlig och gå tillbaka och fösök igen. Om problemet kvarstår var vänlig och rapportera detta till oss med tid och datum samt vad du försökte göra.');
+INSERT INTO international VALUES (417,'WebGUI','Svenska','&lt;h1&gt;Säkerhets Överträdelse&lt;/h1&gt;\r\nDu försökte att komma åt en widget som inte associeras med denna sida. Denna incident har rapporterats.');
+INSERT INTO international VALUES (418,'WebGUI','Svenska','Ta bort inmatad HTML');
+INSERT INTO international VALUES (419,'WebGUI','Svenska','Ta bort alla taggar.');
+INSERT INTO international VALUES (420,'WebGUI','Svenska','Lämna som den är.');
+INSERT INTO international VALUES (421,'WebGUI','Svenska','Ta bort allt utom grundformateringen.');
+INSERT INTO international VALUES (422,'WebGUI','Svenska','&lt;h1&gt;Inloggning misslyckades&lt;/h1&gt;\r\nInformationen du gav stämmer inte med kontot.');
+INSERT INTO international VALUES (423,'WebGUI','Svenska','Visa aktiva sessioner.');
+INSERT INTO international VALUES (424,'WebGUI','Svenska','Visa logginhistorik.');
+INSERT INTO international VALUES (425,'WebGUI','Svenska','Aktiva sessioner');
+INSERT INTO international VALUES (426,'WebGUI','Svenska','Inloggnings historik');
+INSERT INTO international VALUES (427,'WebGUI','Svenska','Stilar');
+INSERT INTO international VALUES (428,'WebGUI','Svenska','Användar (ID)');
+INSERT INTO international VALUES (429,'WebGUI','Svenska','Inloggnings tid');
+INSERT INTO international VALUES (430,'WebGUI','Svenska','Senaste sida visad');
+INSERT INTO international VALUES (431,'WebGUI','Svenska','IP Adress');
+INSERT INTO international VALUES (432,'WebGUI','Svenska','Bäst före');
+INSERT INTO international VALUES (433,'WebGUI','Svenska','Användar Klient (Browser)');
+INSERT INTO international VALUES (434,'WebGUI','Svenska','Status');
+INSERT INTO international VALUES (435,'WebGUI','Svenska','Sessions signatur');
+INSERT INTO international VALUES (436,'WebGUI','Svenska','Avsluta session');
+INSERT INTO international VALUES (437,'WebGUI','Svenska','Statistik');
+INSERT INTO international VALUES (438,'WebGUI','Svenska','Ditt namn');
+INSERT INTO international VALUES (439,'WebGUI','Svenska','Personlig Information');
+INSERT INTO international VALUES (440,'WebGUI','Svenska','Kontakt Information');
+INSERT INTO international VALUES (441,'WebGUI','Svenska','E-Mail till personsökar-gateway');
+INSERT INTO international VALUES (442,'WebGUI','Svenska','Arbets Information');
+INSERT INTO international VALUES (443,'WebGUI','Svenska','Hem Information');
+INSERT INTO international VALUES (444,'WebGUI','Svenska','Demografisk Information');
+INSERT INTO international VALUES (445,'WebGUI','Svenska','Inställningar');
+INSERT INTO international VALUES (446,'WebGUI','Svenska','Arbetets Website');
+INSERT INTO international VALUES (447,'WebGUI','Svenska','Hantera sidträd.');
+INSERT INTO international VALUES (448,'WebGUI','Svenska','Sid träd');
+INSERT INTO international VALUES (449,'WebGUI','Svenska','Övrig information');
+INSERT INTO international VALUES (450,'WebGUI','Svenska','Jobb Namn (Namn på företaget)');
+INSERT INTO international VALUES (451,'WebGUI','Svenska','är obligatoriskt.');
+INSERT INTO international VALUES (452,'WebGUI','Svenska','Var god vänta...');
+INSERT INTO international VALUES (453,'WebGUI','Svenska','Skapad den');
+INSERT INTO international VALUES (454,'WebGUI','Svenska','Senast Uppdaterad');
+INSERT INTO international VALUES (455,'WebGUI','Svenska','Redigera Användar Profil');
+INSERT INTO international VALUES (456,'WebGUI','Svenska','Tillbaka till användarlistan.');
+INSERT INTO international VALUES (457,'WebGUI','Svenska','Redigera denna användares konto.');
+INSERT INTO international VALUES (458,'WebGUI','Svenska','Redigera denna användares grupper.');
+INSERT INTO international VALUES (459,'WebGUI','Svenska','Redigera denna användares profil.');
+INSERT INTO international VALUES (460,'WebGUI','Svenska','Tidsoffset');
+INSERT INTO international VALUES (461,'WebGUI','Svenska','Datum Format');
+INSERT INTO international VALUES (462,'WebGUI','Svenska','Tids Format');
+INSERT INTO international VALUES (463,'WebGUI','Svenska','Text Fält Rader');
+INSERT INTO international VALUES (464,'WebGUI','Svenska','Text Fält Kolumner');
+INSERT INTO international VALUES (465,'WebGUI','Svenska','Text Box Storlek');
+INSERT INTO international VALUES (466,'WebGUI','Svenska','Är du säker på att du vill ta bort denna kategori och flytta alla dess attribut till Övrigt kattegorin.');
+INSERT INTO international VALUES (467,'WebGUI','Svenska','Är du säker på att du vill ta bort detta attribut och all användar data som finns i det ?');
+INSERT INTO international VALUES (468,'WebGUI','Svenska','Läggtill/Redigera Användar Profil Kattegorier');
+INSERT INTO international VALUES (469,'WebGUI','Svenska','Id');
+INSERT INTO international VALUES (470,'WebGUI','Svenska','Namn');
+INSERT INTO international VALUES (471,'WebGUI','Svenska','Läggtill/Redigera Användar Profil Attribut');
+INSERT INTO international VALUES (472,'WebGUI','Svenska','Märke');
+INSERT INTO international VALUES (473,'WebGUI','Svenska','Synligt?');
+INSERT INTO international VALUES (474,'WebGUI','Svenska','Obligatoriskt?');
+INSERT INTO international VALUES (475,'WebGUI','Svenska','Text');
+INSERT INTO international VALUES (476,'WebGUI','Svenska','Text Område');
+INSERT INTO international VALUES (477,'WebGUI','Svenska','HTML Område');
+INSERT INTO international VALUES (478,'WebGUI','Svenska','URL');
+INSERT INTO international VALUES (479,'WebGUI','Svenska','Datum');
+INSERT INTO international VALUES (480,'WebGUI','Svenska','Email adress');
+INSERT INTO international VALUES (481,'WebGUI','Svenska','Telefånnummer');
+INSERT INTO international VALUES (482,'WebGUI','Svenska','Nummer (Heltal)');
+INSERT INTO international VALUES (483,'WebGUI','Svenska','Ja eller Nej');
+INSERT INTO international VALUES (484,'WebGUI','Svenska','Vallista');
+INSERT INTO international VALUES (485,'WebGUI','Svenska','Boolean (Kryssbox)');
+INSERT INTO international VALUES (486,'WebGUI','Svenska','Data typ');
+INSERT INTO international VALUES (487,'WebGUI','Svenska','Möjliga värden');
+INSERT INTO international VALUES (488,'WebGUI','Svenska','Standar värden');
+INSERT INTO international VALUES (489,'WebGUI','Svenska','Profil kategorier.');
+INSERT INTO international VALUES (490,'WebGUI','Svenska','Lägg till en profilkategori.');
+INSERT INTO international VALUES (491,'WebGUI','Svenska','Lägg till profilattribut.');
+INSERT INTO international VALUES (492,'WebGUI','Svenska','Profil attribut lista.');
+INSERT INTO international VALUES (493,'WebGUI','Svenska','Tillbaka till siten.');
 
-#
-# Table structure for table 'messageLog'
-#
+--
+-- Table structure for table 'messageLog'
+--
 
 CREATE TABLE messageLog (
   messageLogId int(11) NOT NULL default '0',
@@ -2788,14 +3308,15 @@ CREATE TABLE messageLog (
   PRIMARY KEY  (messageLogId,userId)
 ) TYPE=MyISAM;
 
-#
-# Dumping data for table 'messageLog'
-#
+--
+-- Dumping data for table 'messageLog'
+--
 
 
-#
-# Table structure for table 'page'
-#
+
+--
+-- Table structure for table 'page'
+--
 
 CREATE TABLE page (
   pageId int(11) NOT NULL default '0',
@@ -2820,9 +3341,10 @@ CREATE TABLE page (
   PRIMARY KEY  (pageId)
 ) TYPE=MyISAM;
 
-#
-# Dumping data for table 'page'
-#
+--
+-- Dumping data for table 'page'
+--
+
 
 INSERT INTO page VALUES (1,0,'Home',-3,3,1,1,1,1,0,1,0,0,'','home',1,'Default','Home',NULL);
 INSERT INTO page VALUES (4,0,'Page Not Found',-3,3,1,1,1,1,0,1,0,21,'','page_not_found',0,'Default','Page Not Found',NULL);
@@ -2830,9 +3352,9 @@ INSERT INTO page VALUES (3,0,'Trash',5,3,1,1,3,1,1,0,0,22,'','trash',0,'Default'
 INSERT INTO page VALUES (2,0,'Clipboard',4,3,1,1,4,1,1,0,0,23,'','clipboard',0,'Default','Clipboard',NULL);
 INSERT INTO page VALUES (5,0,'Packages',1,3,0,0,6,1,1,0,0,24,'','packages',0,'Default','Packages',NULL);
 
-#
-# Table structure for table 'settings'
-#
+--
+-- Table structure for table 'settings'
+--
 
 CREATE TABLE settings (
   name varchar(255) NOT NULL default '',
@@ -2840,9 +3362,10 @@ CREATE TABLE settings (
   PRIMARY KEY  (name)
 ) TYPE=MyISAM;
 
-#
-# Dumping data for table 'settings'
-#
+--
+-- Dumping data for table 'settings'
+--
+
 
 INSERT INTO settings VALUES ('attachmentDirectoryWeb','/uploads');
 INSERT INTO settings VALUES ('maxAttachmentSize','300');
@@ -2875,10 +3398,11 @@ INSERT INTO settings VALUES ('filterContributedHTML','most');
 INSERT INTO settings VALUES ('textAreaRows','5');
 INSERT INTO settings VALUES ('textAreaCols','50');
 INSERT INTO settings VALUES ('textBoxSize','30');
+INSERT INTO settings VALUES ('richEditor','built-in');
 
-#
-# Table structure for table 'style'
-#
+--
+-- Table structure for table 'style'
+--
 
 CREATE TABLE style (
   styleId int(11) NOT NULL default '0',
@@ -2889,9 +3413,10 @@ CREATE TABLE style (
   PRIMARY KEY  (styleId)
 ) TYPE=MyISAM;
 
-#
-# Dumping data for table 'style'
-#
+--
+-- Dumping data for table 'style'
+--
+
 
 INSERT INTO style VALUES (-3,'WebGUI','<body bgcolor=\"#000000\" text=\"#C9E200\" link=\"#ED4400\" marginwidth=\"0\" leftmargin=\"0\">\r\n<table width=\"100%\" cellpadding=0 cellspacing=0 border=0>\r\n<tr><td valign=\"top\" width=\"200\">\r\n<a href=\"/\"><img src=\"/extras/styles/webgui/logo.gif\" border=0></a>\r\n<table cellpadding=0 border=0 cellspacing=0>\r\n<tr><td colspan=3><img src=\"/extras/styles/webgui/menuTop.gif\" width=\"200\"></td></tr>\r\n<tr>\r\n  <td bgcolor=\"#C9E200\"><img src=\"/extras/spacer.gif\" width=5></td>\r\n  <td bgcolor=\"#C9E200\">^FlexMenu;</td>\r\n  <td bgcolor=\"#C9E200\"><img src=\"/extras/spacer.gif\" width=5></td>\r\n</tr>\r\n<tr><td colspan=3><img src=\"/extras/styles/webgui/menuBottom.gif\" width=\"200\"></td></tr>\r\n</table>\r\n^L;\r\n</td>\r\n<td><img src=\"/extras/spacer.gif\" width=20></td>\r\n<td valign=\"top\" width=\"100%\">\r\n\r\n','</td></tr></table>\r\n<p>\r\n<div align=\"center\">\r\n<a href=\"/\"><img src=\"/extras/styles/webgui/icon.gif\" border=0></a><br>\r\n©2001-2002 Plain Black Software<br>\r\n</div>\r\n</body>','<style>\r\n\r\n.content, body {\r\n  background-color: #000000;\r\n  color: #C9E200;\r\n  font-family: helvetica, arial;\r\n  font-size: 10pt;\r\n  scrollbar-base-color: #000000;\r\n  scrollbar-track-color: #444444;\r\n  scrollbar-face-color: #000000;\r\n  scrollbar-highlight-color: #555555;\r\n  scrollbar-3dlight-color: #444444;\r\n  scrollbar-darkshadow-color: #222222;\r\n  scrollbar-shadow-color: #333333;\r\n  scrollbar-arrow-color: #ED4400;\r\n}\r\n\r\nselect, input, textarea {\r\n  color: #000000;\r\n  background-color: #C9E200;\r\n}\r\n\r\nA {\r\n  color: #ED4400;\r\n}\r\n\r\nA:visited {\r\n  color: #ffffff;\r\n}\r\n\r\n.verticalMenu {\r\n  font-size: 10pt;\r\n}\r\n\r\n.verticalMenu A, .verticalMenu A:visited {\r\n  color: #000000;\r\n}\r\n\r\n.verticalMenu A:hover {\r\n  color: #ED4400;\r\n}\r\n\r\n.selectedMenuItem A,.selectedMenuItem A:visited {\r\n  color: #ED4400;\r\n}\r\n\r\n.loginBox {\r\n  font-size: 10pt;\r\n}\r\n\r\nH1 {\r\n  font-family: helvetica, arial;\r\n  font-size: 16pt;\r\n}\r\n\r\nsearchBox {\r\n  font-size: 10pt;\r\n}\r\n\r\n.pagination {\r\n  font-family: helvetica, arial;\r\n  font-size: 8pt;\r\n  text-align: center;\r\n}\r\n\r\n.adminBar {\r\n        background-color: #dddddd;\r\n        font-size: 8pt;\r\n        font-family: helvetica, arial;\r\n        color: #000055;\r\n}\r\n\r\n.formDescription {\r\n  font-family: helvetica, arial;\r\n  font-size: 10pt;\r\n  font-weight: bold;\r\n}\r\n\r\n.formSubtext {\r\n  font-family: helvetica, arial;\r\n  font-size: 8pt;\r\n}\r\n\r\n.highlight {\r\n  background-color: #444444;\r\n}\r\n\r\n.tableMenu {\r\n  background-color: #444444;\r\n  font-size: 8pt;\r\n  font-family: Helvetica, Arial;\r\n}\r\n\r\n.tableMenu a {\r\n  text-decoration: none;\r\n}\r\n\r\n.tableHeader {\r\n  background-color: #555555;\r\n  font-size: 10pt;\r\n  font-family: Helvetica, Arial;\r\n}\r\n\r\n.tableData {\r\n  font-size: 10pt;\r\n  font-family: Helvetica, Arial;\r\n}\r\n\r\n.pollAnswer {\r\n  font-family: Helvetica, Arial;\r\n  font-size: 8pt;\r\n}\r\n\r\n.pollColor {\r\n  background-color: #C9E200;\r\n}\r\n\r\n.pollQuestion {\r\n  font-face: Helvetica, Arial;\r\n  font-weight: bold;\r\n}\r\n\r\n.faqQuestion {\r\n  font-size: 12pt;\r\n  color: #aaaaaa;\r\n}\r\n</style>');
 INSERT INTO style VALUES (2,'Fail Safe','<body>\r\n^H; / ^t; / ^m; / ^a;\r\n<hr>','<hr>\r\n^H; / ^t; / ^m; / ^a;\r\n</body>','<style>\r\n.adminBar {\r\n        background-color: #dddddd;\r\n        font-size: 8pt;\r\n        font-family: helvetica, arial;\r\n        color: #000055;\r\n}\r\n</style>');
@@ -2904,9 +3429,9 @@ INSERT INTO style VALUES (-5,'Plain Black Software (white)','<body text=\"#00000
 INSERT INTO style VALUES (5,'Trash','<body>\r\n<table width=\"100%\">\r\n<tr><td><span style=\"font-size: 36pt;\">Trash</span>\r\n</td>\r\n<td align=\"right\">^H; / ^a; / <a href=\"^\\;?op=purgeTrash\">Empty Trash</a></td></tr>\r\n<tr><td bgcolor=\"#000000\" colspan=\"2\"><img src=\"/extras/spacer.gif\" height=\"1\"></td></tr>\r\n</table>\r\n<table width=\"100%\"><tr><td valign=\"top\" width=\"30%\"><b>PAGES</b><br>^FlexMenu;</td><td width=\"1\" bgcolor=\"#000000\"><img src=\"/extras/spacer.gif\" width=\"1\"></td><td valign=\"top\" width=\"70%\"><b>CONTENT</b><br>','</td></tr></table>\r\n<table width=\"100%\">\r\n<tr><td bgcolor=\"#000000\" colspan=\"2\"><img src=\"/extras/spacer.gif\" height=\"1\"></td></tr>\r\n</table>\r\n^H; / ^a; / <a href=\"^\\;?op=purgeTrash\">Empty Trash</a>\r\n</body>','<style>\r\n.adminBar {\r\n        background-color: #dddddd;\r\n        font-size: 8pt;\r\n        font-family: helvetica, arial;\r\n        color: #000055;\r\n}\r\n</style>');
 INSERT INTO style VALUES (1,'Packages','<body>\r\n<table width=\"100%\">\r\n<tr><td><span style=\"font-size: 36pt;\">Packages</span>\r\n</td>\r\n<td align=\"right\">^H; / ^a;</td></tr>\r\n<tr><td bgcolor=\"#000000\" colspan=\"2\"><img src=\"/extras/spacer.gif\" height=\"1\"></td></tr>\r\n</table>\r\n<table width=\"100%\"><tr><td valign=\"top\" width=\"30%\"><b>PACKAGES</b><br>^FlexMenu;</td><td width=\"1\" bgcolor=\"#000000\"><img src=\"/extras/spacer.gif\" width=\"1\"></td><td valign=\"top\" width=\"70%\"><b>CONTENT</b><br>','</td></tr></table>\r\n<table width=\"100%\">\r\n<tr><td bgcolor=\"#000000\" colspan=\"2\"><img src=\"/extras/spacer.gif\" height=\"1\"></td></tr>\r\n</table>\r\n^H; / ^a;\r\n</body>','<style>\r\n.adminBar {\r\n        background-color: #dddddd;\r\n        font-size: 8pt;\r\n        font-family: helvetica, arial;\r\n        color: #000055;\r\n}\r\n</style>');
 
-#
-# Table structure for table 'userLoginLog'
-#
+--
+-- Table structure for table 'userLoginLog'
+--
 
 CREATE TABLE userLoginLog (
   userId int(11) default NULL,
@@ -2916,14 +3441,15 @@ CREATE TABLE userLoginLog (
   userAgent text
 ) TYPE=MyISAM;
 
-#
-# Dumping data for table 'userLoginLog'
-#
+--
+-- Dumping data for table 'userLoginLog'
+--
 
 
-#
-# Table structure for table 'userProfileCategory'
-#
+
+--
+-- Table structure for table 'userProfileCategory'
+--
 
 CREATE TABLE userProfileCategory (
   profileCategoryId int(11) NOT NULL default '0',
@@ -2932,9 +3458,10 @@ CREATE TABLE userProfileCategory (
   PRIMARY KEY  (profileCategoryId)
 ) TYPE=MyISAM;
 
-#
-# Dumping data for table 'userProfileCategory'
-#
+--
+-- Dumping data for table 'userProfileCategory'
+--
+
 
 INSERT INTO userProfileCategory VALUES (1,'WebGUI::International::get(449,\"WebGUI\");',6);
 INSERT INTO userProfileCategory VALUES (2,'WebGUI::International::get(440,\"WebGUI\");',2);
@@ -2944,9 +3471,9 @@ INSERT INTO userProfileCategory VALUES (5,'WebGUI::International::get(443,\"WebG
 INSERT INTO userProfileCategory VALUES (6,'WebGUI::International::get(442,\"WebGUI\");',4);
 INSERT INTO userProfileCategory VALUES (7,'WebGUI::International::get(444,\"WebGUI\");',5);
 
-#
-# Table structure for table 'userProfileData'
-#
+--
+-- Table structure for table 'userProfileData'
+--
 
 CREATE TABLE userProfileData (
   userId int(11) NOT NULL default '0',
@@ -2955,16 +3482,17 @@ CREATE TABLE userProfileData (
   PRIMARY KEY  (userId,fieldName)
 ) TYPE=MyISAM;
 
-#
-# Dumping data for table 'userProfileData'
-#
+--
+-- Dumping data for table 'userProfileData'
+--
+
 
 INSERT INTO userProfileData VALUES (1,'language','English');
 INSERT INTO userProfileData VALUES (3,'language','English');
 
-#
-# Table structure for table 'userProfileField'
-#
+--
+-- Table structure for table 'userProfileField'
+--
 
 CREATE TABLE userProfileField (
   fieldName varchar(128) NOT NULL default '',
@@ -2980,9 +3508,10 @@ CREATE TABLE userProfileField (
   PRIMARY KEY  (fieldName)
 ) TYPE=MyISAM;
 
-#
-# Dumping data for table 'userProfileField'
-#
+--
+-- Dumping data for table 'userProfileField'
+--
+
 
 INSERT INTO userProfileField VALUES ('email','WebGUI::International::get(56,\"WebGUI\");',1,1,'email',NULL,NULL,1,2,1);
 INSERT INTO userProfileField VALUES ('firstName','WebGUI::International::get(314,\"WebGUI\");',1,0,'text',NULL,NULL,1,3,1);
@@ -3017,9 +3546,9 @@ INSERT INTO userProfileField VALUES ('timeOffset','WebGUI::International::get(46
 INSERT INTO userProfileField VALUES ('dateFormat','WebGUI::International::get(461,\"WebGUI\");',1,0,'select','{\r\n \'%M/%D/%y\'=>WebGUI::DateTime::epochToHuman(\"\",\"%M/%D/%y\"),\r\n \'%y-%m-%d\'=>WebGUI::DateTime::epochToHuman(\"\",\"%y-%m-%d\"),\r\n \'%D-%c-%y\'=>WebGUI::DateTime::epochToHuman(\"\",\"%D-%c-%y\"),\r\n \'%c %D, %y\'=>WebGUI::DateTime::epochToHuman(\"\",\"%c %D, %y\")\r\n}\r\n','[\'%M/%D/%y\']',3,4,1);
 INSERT INTO userProfileField VALUES ('timeFormat','WebGUI::International::get(462,\"WebGUI\");',1,0,'select','{\r\n \'%H:%n %p\'=>WebGUI::DateTime::epochToHuman(\"\",\"%H:%n %p\"),\r\n \'%H:%n:%s %p\'=>WebGUI::DateTime::epochToHuman(\"\",\"%H:%n:%s %p\"),\r\n \'%j:%n\'=>WebGUI::DateTime::epochToHuman(\"\",\"%j:%n\"),\r\n \'%j:%n:%s\'=>WebGUI::DateTime::epochToHuman(\"\",\"%j:%n:%s\")\r\n}\r\n','[\'%H:%n %p\']',4,4,1);
 
-#
-# Table structure for table 'userSession'
-#
+--
+-- Table structure for table 'userSession'
+--
 
 CREATE TABLE userSession (
   sessionId varchar(60) NOT NULL default '',
@@ -3031,14 +3560,15 @@ CREATE TABLE userSession (
   PRIMARY KEY  (sessionId)
 ) TYPE=MyISAM;
 
-#
-# Dumping data for table 'userSession'
-#
+--
+-- Dumping data for table 'userSession'
+--
 
 
-#
-# Table structure for table 'users'
-#
+
+--
+-- Table structure for table 'users'
+--
 
 CREATE TABLE users (
   userId int(11) NOT NULL default '0',
@@ -3052,16 +3582,17 @@ CREATE TABLE users (
   PRIMARY KEY  (userId)
 ) TYPE=MyISAM;
 
-#
-# Dumping data for table 'users'
-#
+--
+-- Dumping data for table 'users'
+--
+
 
 INSERT INTO users VALUES (1,'Visitor','No Login','WebGUI',NULL,NULL,1019867418,1019867418);
 INSERT INTO users VALUES (3,'Admin','RvlMjeFPs2aAhQdo/xt/Kg','WebGUI','','',1019867418,1019935552);
 
-#
-# Table structure for table 'webguiVersion'
-#
+--
+-- Table structure for table 'webguiVersion'
+--
 
 CREATE TABLE webguiVersion (
   webguiVersion varchar(10) default NULL,
@@ -3069,15 +3600,15 @@ CREATE TABLE webguiVersion (
   dateApplied int(11) default NULL
 ) TYPE=MyISAM;
 
-#
-# Dumping data for table 'webguiVersion'
-#
+--
+-- Dumping data for table 'webguiVersion'
+--
 
-INSERT INTO webguiVersion VALUES ('3.7.0','intitial install',unix_timestamp());
+INSERT INTO webguiVersion VALUES ('3.8.0','intitial install',unix_timestamp());
 
-#
-# Table structure for table 'widget'
-#
+--
+-- Table structure for table 'widget'
+--
 
 CREATE TABLE widget (
   widgetId int(11) NOT NULL default '0',
@@ -3096,9 +3627,39 @@ CREATE TABLE widget (
   PRIMARY KEY  (widgetId)
 ) TYPE=MyISAM;
 
-#
-# Dumping data for table 'widget'
-#
+--
+-- Dumping data for table 'widget'
+--
 
-INSERT INTO widget VALUES (-1,4,'SiteMap',0,'Page Not Found',1,'The page you were looking for could not be found on this system. Perhaps it has been deleted or renamed. The following list is a site map of this site. If you don\'t find what you\'re looking for on the site map, you can always start from the <a href=\"^/;\">Home Page</a>.',1,1001744792,3,1016077239,3,'A');
+
+
+--
+-- Table structure for table 'wobject'
+--
+
+CREATE TABLE wobject (
+  wobjectId int(11) NOT NULL default '0',
+  pageId int(11) default NULL,
+  namespace varchar(35) default NULL,
+  sequenceNumber int(11) NOT NULL default '1',
+  title varchar(255) default NULL,
+  displayTitle int(11) NOT NULL default '1',
+  description mediumtext,
+  processMacros int(11) NOT NULL default '0',
+  dateAdded int(11) default NULL,
+  addedBy int(11) default NULL,
+  lastEdited int(11) default NULL,
+  editedBy int(11) default NULL,
+  templatePosition char(1) NOT NULL default 'A',
+  startDate int(11) default NULL,
+  endDate int(11) default NULL,
+  PRIMARY KEY  (wobjectId)
+) TYPE=MyISAM;
+
+--
+-- Dumping data for table 'wobject'
+--
+
+
+INSERT INTO wobject VALUES (-1,4,'SiteMap',0,'Page Not Found',1,'The page you were looking for could not be found on this system. Perhaps it has been deleted or renamed. The following list is a site map of this site. If you don\'t find what you\'re looking for on the site map, you can always start from the <a href=\"^/;\">Home Page</a>.',1,1001744792,3,1016077239,3,'A',1001744792,1336444487);
 

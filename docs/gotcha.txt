@@ -17,8 +17,8 @@ save you many hours of grief.
  * The "Registered Users" group no longer has the privilege of 
 	doing whatever "Visitors" can do. Instead we have created
 	a new group called "Everyone", which means registered users
-	and visitors alike can do whatever is assigned those
-	privileges.
+	and visitors alike can do whatever is assigned to the
+	"Everyone" group. 
 
 3.6.0
 --------------------------------------------------------------------
