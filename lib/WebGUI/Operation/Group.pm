@@ -136,6 +136,23 @@ sub getGroupSearchForm {
 
 
 #-------------------------------------------------------------------
+sub walkGroups {
+        my $parentId = shift;
+        my $indent = shift;
+	my $output;
+        my $sth = WebGUI::SQL->read("select groups.groupId, groups.groupName from groupGroupings left join groups on groups.groupId=groupGroupings.groupId where groupGroupings.inGroup=".quote($parentId));
+        while (my ($id, $name) = $sth->array) {
+		$output .= $indent
+			.deleteIcon('op=deleteGroupGrouping&gid='.$parentId.'&delete='.$id)
+			.editIcon('op=editGroup&gid='.$id)
+			.' '.$name.'<br />';
+                $output .= walkGroups($id,$indent."&nbsp; &nbsp; ");
+        }
+        $sth->finish;
+	return $output;
+}
+
+#-------------------------------------------------------------------
 sub www_addGroupsToGroupSave {
         return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
         my @groups = $session{cgi}->param('groups');
@@ -478,21 +495,23 @@ sub www_manageGroupsInGroup {
 		);
         $f->submit;
         $output .= $f->print;
-	$output .= '<p/><table class="tableData" align="center">';
-	$output .= '<tr class="tableHeader"><td></td><td>'.WebGUI::International::get(84).'</td></tr>';
-	$p = WebGUI::Paginator->new(WebGUI::URL::page('op=manageGroupsInGroup&gid='.$session{form}{gid}));
-	$p->setDataByQuery("select a.groupName as name,a.groupId as id from groups a 
-		left join groupGroupings b on a.groupId=b.groupId 
-		where b.inGroup=".quote($session{form}{gid})." order by a.groupName");
-	$groups = $p->getPageData;
-	foreach $group (@$groups) {
-		$output .= '<tr><td>'
-			.deleteIcon('op=deleteGroupGrouping&gid='.$session{form}{gid}.'&delete='.$group->{id})
-			.'</td><td><a href="'.WebGUI::URL::page('op=editGroup&gid='.$group->{id}).'">'
-			.$group->{name}.'</a></td></tr>';
-	}
-	$output .= '</table>';
-	$output .= $p->getBarTraditional;
+	$output .= '<p />';
+	$output .= walkGroups($session{form}{gid});
+#<table class="tableData" align="center">';
+#	$output .= '<tr class="tableHeader"><td></td><td>'.WebGUI::International::get(84).'</td></tr>';
+#	$p = WebGUI::Paginator->new(WebGUI::URL::page('op=manageGroupsInGroup&gid='.$session{form}{gid}));
+#	$p->setDataByQuery("select a.groupName as name,a.groupId as id from groups a 
+#		left join groupGroupings b on a.groupId=b.groupId 
+#		where b.inGroup=".quote($session{form}{gid})." order by a.groupName");
+#	$groups = $p->getPageData;
+#	foreach $group (@$groups) {
+#		$output .= '<tr><td>'
+#			.deleteIcon('op=deleteGroupGrouping&gid='.$session{form}{gid}.'&delete='.$group->{id})
+#			.'</td><td><a href="'.WebGUI::URL::page('op=editGroup&gid='.$group->{id}).'">'
+#			.$group->{name}.'</a></td></tr>';
+#	}
+#	$output .= '</table>';
+#	$output .= $p->getBarTraditional;
 	return _submenu($output,'813');
 }
 

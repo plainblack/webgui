@@ -172,7 +172,8 @@ sub www_editProfileField {
 	$f->fieldType(
 		-name=>"dataType",
 		-label=>WebGUI::International::get(486),
-		-value=>[$data{dataType} || "text"]
+		-value=>$data{dataType},
+		-defaultValue=>"text"
 		);
 	$f->textarea("dataValues",WebGUI::International::get(487),$data{dataValues});
 	$f->textarea("dataDefault",WebGUI::International::get(488),$data{dataDefault});
@@ -218,16 +219,17 @@ sub www_editProfileFieldSave {
 		WebGUI::SQL->write("insert into userProfileField (fieldName, sequenceNumber, protected)
 			values (".quote($session{form}{fid}).", ".($sequenceNumber+1).", 0)");
 	}
-	WebGUI::SQL->write("update userProfileField set
-			fieldLabel=".quote($session{form}{fieldLabel}).",
-			visible=$session{form}{visible},
-			required=$session{form}{required},
-			editable=$session{form}{editable},
-			dataType=".quote($session{form}{dataType}).",
-			dataValues=".quote($session{form}{dataValues}).",
-			dataDefault=".quote($session{form}{dataDefault}).",
-			profileCategoryId=".quote($session{form}{profileCategoryId})."
-			where fieldName=".quote($session{form}{fid}));
+	WebGUI::SQL->setRow("userProfileField","fieldName",{
+			fieldLabel=>$session{form}{fieldLabel},
+			visible=>$session{form}{visible},
+			required=>$session{form}{required},
+			editable=>$session{form}{editable},
+			dataType=>$session{form}{dataType},
+			dataValues=>$session{form}{dataValues},
+			dataDefault=>$session{form}{dataDefault},
+			profileCategoryId=>$session{form}{profileCategoryId},
+			fieldName=>$session{form}{fid}
+			});
 	return www_editProfileSettings();
 }
 

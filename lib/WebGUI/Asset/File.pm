@@ -71,10 +71,6 @@ sub definition {
 					fieldType=>'hidden',
 					defaultValue=>undef
 					},
-				fileSize=>{
-					fieldType=>'hidden',
-					defaultValue=>undef
-				},
 				olderVersions=>{
 					fieldType=>'hidden',
 					defaultValue=>undef

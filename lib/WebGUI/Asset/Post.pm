@@ -157,7 +157,7 @@ sub definition {
 #-------------------------------------------------------------------
 sub DESTROY {
 	my $self = shift;
-	$self->{_thread}->DESTROY if (exists $self->{_thread});
+	$self->{_thread}->DESTROY if (exists $self->{_thread} && ref $self->{_thread} =~ /Thread/);
 	$self->SUPER::DESTROY;
 }
 
