@@ -501,6 +501,7 @@ sub purge {
 	}
 	WebGUI::SQL->commit;
 	$self = undef;
+	return 1;
 }
 
 sub setParent {

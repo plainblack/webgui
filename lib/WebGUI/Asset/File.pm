@@ -74,7 +74,11 @@ sub definition {
 				fileSize=>{
 					fieldType=>'hidden',
 					defaultValue=>undef
-				}
+				},
+				olderVersions=>{
+					fieldType=>'hidden',
+					defaultValue=>undef
+					}
                         }
                 });
         return $class->SUPER::definition($definition);
@@ -119,6 +123,26 @@ sub getName {
 
 #-------------------------------------------------------------------
 
+=head2 purge
+
+=cut
+
+sub purge {
+	my $self = shift;
+	my @old = split("\n",$self->get("olderVersions"));
+	foreach my $oldone (@old) {
+		my ($storageId, $filename) = split("|",$oldone);
+		my $storage = WebGUI::Storage->new($storageId);
+		$storage->delete;
+	}
+	my $storage = WebGUI::Storage->new($self->get("storageId"));
+	$storage->delete;
+	return $self->SUPER::purge;
+}
+
+
+#-------------------------------------------------------------------
+
 =head2 www_editSave
 
 Gathers data from www_edit and persists it.
@@ -131,11 +155,21 @@ sub www_editSave {
 	my $storage = WebGUI::Storage->create;
 	my $filename = $storage->addFileFromFormPost("file");
 	if (defined $filename) {
+		my $oldVersions;
+		if ($self->get($filename)) { # do file versioning
+			my @old = split("\n",$self->get("olderVersions"));
+			push(@old,$self->get{"storageId")."|".$self->get("filename"));
+			$oldVersions = join("\n",@old);
+		}
 		$self->update({
 			filename=>$filename,
 			storageId=>$storage->getId,
-			fileSize=>$storage->getFileSize
+			fileSize=>$storage->getFileSize,
+			olderVersions=>$oldVersions
 			});
+	} else {
+		$storage->delete;
+	}
 	return "";
 }
 

@@ -242,13 +242,13 @@ sub www_editUser {
 	if ($u->userId eq $session{user}{userId}) {
 		$tabform->getTab("account")->hidden("status",$u->status);
 	} else {
-		$tabform->getTab("account")->select("status",\%status,$i18n->get(816),[$u->status]);
+		$tabform->getTab("account")->selectList("status",\%status,$i18n->get(816),[$u->status]);
 	}
 	my $options;
 	foreach (@{$session{config}{authMethods}}) {
 		$options->{$_} = $_;
 	}
-	$tabform->getTab("account")->select(
+	$tabform->getTab("account")->selectList(
 	        -name=>"authMethod",
 		-options=>$options,
 		-label=>$i18n->get(164),
