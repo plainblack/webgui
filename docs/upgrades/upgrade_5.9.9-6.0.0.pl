@@ -874,7 +874,7 @@ foreach $table (keys %dbFields){
 					   ! $identifier{cachedTemplate}{$replaceId."_".$repNav->{columns}->{seperator}}) {
   					   WebGUI::SQL->write("insert into template (templateId,namespace,name,template) values
 					  ($repNav->{columns}->{templateId}, ".quote('Navigation').", ".
-					  quote("AutoGen ".$searchString).", ".quote($repNav->{template}).")");	
+					  quote("AutoGen ".$macro).", ".quote($repNav->{template}).")");	
 					}
 					my $replacement = "^Navigation($identifier{cachedConfig}{$replaceId});";
 					 # print "\tReplacing macro $macro with $replacement ";
