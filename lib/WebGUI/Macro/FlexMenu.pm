@@ -14,6 +14,7 @@ use strict;
 use WebGUI::Macro;
 use WebGUI::Privilege;
 use WebGUI::Session;
+use WebGUI::URL;
 
 #-------------------------------------------------------------------
 sub _replacement {
@@ -35,8 +36,8 @@ sub _reversePageTree {
 			if ($_[1] == $data[0]) {
 				$output .= '<span class="selectedMenuItem">';
 			}
-                	$output .= '<a class="verticalMenu" href="'.$session{config}{scripturl}.
-				'/'.$data[3].'">'.$data[2].'</a><br>';
+                	$output .= '<a class="verticalMenu" href="'.WebGUI::URL::gateway($data[3]).
+				'">'.$data[2].'</a><br>';
 			if ($_[1] == $data[0]) {
 				$output .= '</span>';
 			}

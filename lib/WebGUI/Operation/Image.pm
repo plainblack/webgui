@@ -21,6 +21,7 @@ use WebGUI::Session;
 use WebGUI::Shortcut;
 use WebGUI::SQL;
 use WebGUI::Template;
+use WebGUI::URL;
 use WebGUI::Utility;
 
 our @ISA = qw(Exporter);
@@ -72,9 +73,10 @@ sub www_deleteImage {
                 $output .= helpLink(23);
                 $output .= '<h1>'.WebGUI::International::get(42).'</h1>';
                 $output .= WebGUI::International::get(392).'<p>';
-                $output .= '<div align="center"><a href="'.$session{page}{url}.
-			'?op=deleteImageConfirm&iid='.$session{form}{iid}.'">'.WebGUI::International::get(44).'</a>';
-                $output .= '&nbsp;&nbsp;&nbsp;&nbsp;<a href="'.$session{page}{url}.'?op=listImages">'.
+                $output .= '<div align="center"><a href="'.
+			WebGUI::URL::page('op=deleteImageConfirm&iid='.$session{form}{iid})
+			.'">'.WebGUI::International::get(44).'</a>';
+                $output .= '&nbsp;&nbsp;&nbsp;&nbsp;<a href="'.WebGUI::URL::page('op=listImages').'">'.
 			WebGUI::International::get(45).'</a></div>';
                 return $output;
         } else {
@@ -122,7 +124,7 @@ sub www_editImage {
                         WebGUI::Form::text("name",20,128,$data{name}));
 		if ($data{filename} ne "") {
 			$output .= tableFormRow(WebGUI::International::get(384),
-				'<a href="'.$session{page}{url}.'?op=deleteImageFile&iid='.$data{imageId}.'">'.
+				'<a href="'.WebGUI::URL::page('op=deleteImageFile&iid='.$data{imageId}).'">'.
 				WebGUI::International::get(391).'</a>');
 		} else {
                 	$output .= tableFormRow(WebGUI::International::get(384),
@@ -168,7 +170,7 @@ sub www_listImages {
                 $output = helpLink(26);
                 $output .= '<h1>'.WebGUI::International::get(393).'</h1>';
                 $output .= '<table class="tableData" align="center" width="75%"><tr><td>';
-                $output .= '<a href="'.$session{page}{url}.'?op=addImage">'.WebGUI::International::get(395).'</a>';
+                $output .= '<a href="'.WebGUI::URL::page('op=addImage').'">'.WebGUI::International::get(395).'</a>';
                 $output .= '</td>'.formHeader().'<td align="right">';
                 $output .= WebGUI::Form::hidden("op","listImages");
                 $output .= WebGUI::Form::text("keyword",20,50);
@@ -182,12 +184,12 @@ sub www_listImages {
                 while (%data = $sth->hash) {
                         $row[$i] = '<tr class="tableData"><td>';
 			if ($session{user}{userId} == $data{userId}) {
-	                        $row[$i] .= '<a href="'.$session{page}{url}.'?op=deleteImage&iid='.$data{imageId}.
+	                        $row[$i] .= '<a href="'.WebGUI::URL::page('op=deleteImage&iid='.$data{imageId}).
         	                        '"><img src="'.$session{setting}{lib}.'/delete.gif" border=0></a>';
-                                $row[$i] .= '<a href="'.$session{page}{url}.'?op=editImage&iid='.$data{imageId}.
+                                $row[$i] .= '<a href="'.WebGUI::URL::page('op=editImage&iid='.$data{imageId}).
                                         '"><img src="'.$session{setting}{lib}.'/edit.gif" border=0></a>';
 			} else {
-                        	$row[$i] .= '<a href="'.$session{page}{url}.'?op=viewImage&iid='.$data{imageId}.
+                        	$row[$i] .= '<a href="'.WebGUI::URL::page('op=viewImage&iid='.$data{imageId}).
 					'"><img src="'.$session{setting}{lib}.'/view.gif" border=0></a>';
 			}
                         $row[$i] .= '</td>';
@@ -198,7 +200,7 @@ sub www_listImages {
                         $i++;
                 }
                 $sth->finish;
-                ($dataRows, $prevNextBar) = paginate(50,$session{page}{url}.'?op=listImages',\@row);
+                ($dataRows, $prevNextBar) = paginate(50,WebGUI::URL::page('op=listImages'),\@row);
                 $output .= '<table border=1 cellpadding=5 cellspacing=0 align="center">';
                 $output .= $dataRows;
                 $output .= '</table>';
@@ -216,7 +218,7 @@ sub www_viewImage {
         if (WebGUI::Privilege::isInGroup(4)) {
                 %data = WebGUI::SQL->quickHash("select * from images where imageId=$session{form}{iid}");
                 $output .= '<h1>'.WebGUI::International::get(396).'</h1>';
-		$output .= '<a href="'.$session{page}{url}.'?op=listImages">'.WebGUI::International::get(397).'</a>';
+		$output .= '<a href="'.WebGUI::URL::page('op=listImages').'">'.WebGUI::International::get(397).'</a>';
                 $output .= '<table>';
                 $output .= tableFormRow(WebGUI::International::get(389),$data{imageId});
                 $output .= tableFormRow(WebGUI::International::get(383),$data{name});

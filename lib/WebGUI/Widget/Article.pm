@@ -22,6 +22,7 @@ use WebGUI::Privilege;
 use WebGUI::Session;
 use WebGUI::Shortcut;
 use WebGUI::SQL;
+use WebGUI::URL;
 use WebGUI::Widget;
 
 #-------------------------------------------------------------------
@@ -154,7 +155,9 @@ sub www_edit {
                 $output .= tableFormRow(WebGUI::International::get(4,$namespace),WebGUI::Form::text("endDate",20,30,epochToSet($data{endDate}),1));
                 $output .= tableFormRow(WebGUI::International::get(5,$namespace),WebGUI::Form::textArea("body",$data{body},50,10,1));
 		if ($data{image} ne "") {
-                	$output .= tableFormRow(WebGUI::International::get(6,$namespace),'<a href="'.$session{page}{url}.'?func=deleteImage&wid='.$session{form}{wid}.'">'.WebGUI::International::get(13,$namespace).'</a>');
+                	$output .= tableFormRow(WebGUI::International::get(6,$namespace),'<a href="'.
+				WebGUI::URL::page('func=deleteImage&wid='.$session{form}{wid})
+				.'">'.WebGUI::International::get(13,$namespace).'</a>');
 		} else {
                 	$output .= tableFormRow(WebGUI::International::get(6,$namespace),WebGUI::Form::file("image"));
 		}
@@ -169,7 +172,9 @@ sub www_edit {
                 $output .= tableFormRow(WebGUI::International::get(7,$namespace),WebGUI::Form::text("linkTitle",20,128,$data{linkTitle}));
                 $output .= tableFormRow(WebGUI::International::get(8,$namespace),WebGUI::Form::text("linkURL",20,2048,$data{linkURL}));
 		if ($data{attachment} ne "") {
-                	$output .= tableFormRow(WebGUI::International::get(9,$namespace),'<a href="'.$session{page}{url}.'?func=deleteAttachment&wid='.$session{form}{wid}.'">'.WebGUI::International::get(13,$namespace).'</a>');
+                	$output .= tableFormRow(WebGUI::International::get(9,$namespace),'<a href="'.
+				WebGUI::URL::page('func=deleteAttachment&wid='.$session{form}{wid})
+				.'">'.WebGUI::International::get(13,$namespace).'</a>');
 		} else {
                 	$output .= tableFormRow(WebGUI::International::get(9,$namespace),WebGUI::Form::file("attachment"));
 		}

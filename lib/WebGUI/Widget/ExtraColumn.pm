@@ -27,8 +27,10 @@ sub duplicate {
         tie %data, 'Tie::CPHash';
         %data = getProperties($namespace,$_[0]);
 	$pageId = $_[1] || $data{pageId};
-        $newWidgetId = create($pageId,$namespace,$data{title},$data{displayTitle},$data{description},$data{processMacros},$data{templatePosition});
-	WebGUI::SQL->write("insert into ExtraColumn values ($newWidgetId, '$data{spacer}', '$data{width}', ".quote($data{class}).")");
+        $newWidgetId = create($pageId,$namespace,$data{title},
+		$data{displayTitle},$data{description},$data{processMacros},$data{templatePosition});
+	WebGUI::SQL->write("insert into ExtraColumn values ($newWidgetId, '$data{spacer}', '$data{width}', ".
+		quote($data{class}).")");
 }
 
 #-------------------------------------------------------------------

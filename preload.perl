@@ -12,6 +12,8 @@ use CGI::Carp ();
 use DBI ();
 use DBD::mysql ();
 use Data::Config ();
+use Date::Calc ();
+use HTML::CalendarMonthSimple ();
 use Tie::CPHash ();
 use Tie::IxHash ();
 use Net::LDAP ();

@@ -24,6 +24,7 @@ use WebGUI::Privilege;
 use WebGUI::Session;
 use WebGUI::Shortcut;
 use WebGUI::SQL;
+use WebGUI::URL;
 use WebGUI::Utility;
 
 our @ISA = qw(Exporter);
@@ -36,17 +37,20 @@ sub _accountOptions {
 	$output = '<div class="accountOptions"><ul>';
 	if (WebGUI::Privilege::isInGroup(3) || WebGUI::Privilege::isInGroup(4) || WebGUI::Privilege::isInGroup(5) || WebGUI::Privilege::isInGroup(6)) {
 		if ($session{var}{adminOn}) {
-			$output .= '<li><a href="'.$session{page}{url}.'?op=switchOffAdmin">'.WebGUI::International::get(12).'</a>';
+			$output .= '<li><a href="'.WebGUI::URL::page('op=switchOffAdmin').'">'.
+				WebGUI::International::get(12).'</a>';
 		} else {
-			$output .= '<li><a href="'.$session{page}{url}.'?op=switchOnAdmin">'.WebGUI::International::get(63).'</a>';
+			$output .= '<li><a href="'.WebGUI::URL::page('op=switchOnAdmin').'">'.WebGUI::International::get(63).'</a>';
 		}
 	}
-	$output .= '<li><a href="'.$session{page}{url}.'?op=displayAccount">'.WebGUI::International::get(342).'</a>';
-	$output .= '<li><a href="'.$session{page}{url}.'?op=editProfile">'.WebGUI::International::get(341).'</a>';
-	$output .= '<li><a href="'.$session{page}{url}.'?op=viewProfile&uid='.$session{user}{userId}.'">'.WebGUI::International::get(343).'</a>';
-	$output .= '<li><a href="'.$session{page}{url}.'?op=viewMessageLog">'.WebGUI::International::get(354).'</a>';
-	$output .= '<li><a href="'.$session{page}{url}.'?op=logout">'.WebGUI::International::get(64).'</a>'; 
-	$output .= '<li><a href="'.$session{page}{url}.'?op=deactivateAccount">'.WebGUI::International::get(65).'</a>';
+	$output .= '<li><a href="'.WebGUI::URL::page('op=displayAccount').'">'.WebGUI::International::get(342).'</a>';
+	$output .= '<li><a href="'.WebGUI::URL::page('op=editProfile').'">'.WebGUI::International::get(341).'</a>';
+	$output .= '<li><a href="'.WebGUI::URL::page('op=viewProfile&uid='.$session{user}{userId}).'">'.
+		WebGUI::International::get(343).'</a>';
+	$output .= '<li><a href="'.WebGUI::URL::page('op=viewMessageLog').'">'.WebGUI::International::get(354).'</a>';
+	$output .= '<li><a href="'.WebGUI::URL::page('op=logout').'">'.WebGUI::International::get(64).'</a>'; 
+	$output .= '<li><a href="'.WebGUI::URL::page('op=deactivateAccount').'">'.
+		WebGUI::International::get(65).'</a>';
 	$output .= '</ul></div>';
 	return $output;
 }
@@ -117,9 +121,11 @@ sub www_createAccount {
 		$output .= '</table>';
 		$output .= '</form> ';
 		$output .= '<div class="accountOptions"><ul>';
-		$output .= '<li><a href="'.$session{page}{url}.'?op=displayLogin">'.WebGUI::International::get(58).'</a>';
+		$output .= '<li><a href="'.WebGUI::URL::page('op=displayLogin').'">'.
+			WebGUI::International::get(58).'</a>';
 		if ($session{setting}{authMethod} eq "WebGUI") {
-			$output .= '<li><a href="'.$session{page}{url}.'?op=recoverPassword">'.WebGUI::International::get(59).'</a>';
+			$output .= '<li><a href="'.WebGUI::URL::page('op=recoverPassword').'">'.
+				WebGUI::International::get(59).'</a>';
 		}
 		$output .= '</ul></div>';
 	}
@@ -196,8 +202,9 @@ sub www_deactivateAccount {
         } else {
                 $output .= '<h1>'.WebGUI::International::get(42).'</h1>';
                 $output .= WebGUI::International::get(60).'<p>';
-                $output .= '<div align="center"><a href="'.$session{page}{url}.'?op=deactivateAccountConfirm">'.WebGUI::International::get(44).'</a>';
-                $output .= '&nbsp;&nbsp;&nbsp;&nbsp;<a href="'.$session{page}{url}.'">'.WebGUI::International::get(45).'</a></div>';
+                $output .= '<div align="center"><a href="'.WebGUI::URL::page('op=deactivateAccountConfirm').'">'.
+			WebGUI::International::get(44).'</a>';
+                $output .= '&nbsp;&nbsp;&nbsp;&nbsp;<a href="'.WebGUI::URL::page().'">'.WebGUI::International::get(45).'</a></div>';
         }
         return $output;
 }
@@ -265,10 +272,12 @@ sub www_displayLogin {
 		$output .= '</form>';
 		$output .= '<div class="accountOptions"><ul>';
 		if ($session{setting}{anonymousRegistration} eq "yes") {
-			$output .= '<li><a href="'.$session{page}{url}.'?op=createAccount">'.WebGUI::International::get(67).'</a>';
+			$output .= '<li><a href="'.WebGUI::URL::page('op=createAccount').'">'.
+				WebGUI::International::get(67).'</a>';
 		}
 		if ($session{setting}{authMethod} eq "WebGUI") {
-			$output .= '<li><a href="'.$session{page}{url}.'?op=recoverPassword">'.WebGUI::International::get(59).'</a>';
+			$output .= '<li><a href="'.WebGUI::URL::page('op=recoverPassword').'">'.
+				WebGUI::International::get(59).'</a>';
 		}
 		$output .= '</ul></div>';
 	}
@@ -397,15 +406,18 @@ sub www_recoverPassword {
 		$output .= formHeader();
                 $output .= WebGUI::Form::hidden("op","recoverPasswordFinish");
                 $output .= '<table>';
-                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(56).'</td><td>'.WebGUI::Form::text("email",20,255).'</td></tr>';
+                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(56).
+			'</td><td>'.WebGUI::Form::text("email",20,255).'</td></tr>';
                 $output .= '<tr><td></td><td>'.WebGUI::Form::submit(WebGUI::International::get(72)).'</td></tr>';
                 $output .= '</table>';
                 $output .= '</form>';
                 $output .= '<div class="accountOptions"><ul>';
 		if ($session{setting}{anonymousRegistration} eq "yes") {
-			$output .= '<li><a href="'.$session{page}{url}.'?op=createAccount">'.WebGUI::International::get(67).'</a>';
+			$output .= '<li><a href="'.WebGUI::URL::page('op=createAccount').'">'.
+				WebGUI::International::get(67).'</a>';
 		}
-		$output .= '<li><a href="'.$session{page}{url}.'?op=displayLogin">'.WebGUI::International::get(73).'</a>';
+		$output .= '<li><a href="'.WebGUI::URL::page('op=displayLogin').'">'.
+			WebGUI::International::get(73).'</a>';
 		$output .= '</ul></div>';
         }
         return $output;
@@ -484,7 +496,7 @@ sub www_viewMessageLog {
                 while (@data = $sth->array) {
                         $row[$i] = '<tr><td class="tableData">';
                         if ($data[2] ne "") {
-				$data[2] = appendToUrl($data[2],'mlog='.$data[0]);
+				$data[2] = WebGUI::URL::append($data[2],'mlog='.$data[0]);
                                 $row[$i] .= '<a href="'.$data[2].'">';
                         }
                         $row[$i] .= $data[1];
@@ -495,7 +507,7 @@ sub www_viewMessageLog {
                         $i++;
                 }
                 $sth->finish;
-                ($dataRows, $prevNextBar) = paginate(50,$session{page}{url}.'?op=viewMessageLog',\@row);
+                ($dataRows, $prevNextBar) = paginate(50,WebGUI::URL::page('op=viewMessageLog'),\@row);
                 $output .= '<table width="100%" cellspacing=1 cellpadding=2 border=0>';
                 $output .= '<tr><td class="tableHeader">'.WebGUI::International::get(351).'</td><td class="tableHeader">'.WebGUI::International::get(352).'</td></tr>';
                 if ($dataRows eq "") {

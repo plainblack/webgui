@@ -16,21 +16,11 @@ use Tie::IxHash;
 use WebGUI::International;
 use WebGUI::Session;
 use WebGUI::SQL;
+use WebGUI::URL;
 
 our @ISA = qw(Exporter);
-our @EXPORT = qw(&sortHashDescending &sortHash &paginate &appendToUrl &randint &round &urlize);
-
-#-------------------------------------------------------------------
-sub appendToUrl {
-	my ($url);
-	$url = $_[0];
-	if ($url =~ /\?/) {
-		$url .= '&'.$_[1];
-	} else {
-		$url .= '?'.$_[1];
-	}
-	return $url;
-}
+our @EXPORT = qw(&sortByColumn &sortHashDescending &sortHash 
+	&paginate &randint &round);
 
 #-------------------------------------------------------------------
 sub paginate {
@@ -46,19 +36,23 @@ sub paginate {
 	for ($i=($itemsPerPage*$pn); $i<($itemsPerPage*($pn+1));$i++) {
 		$dataRows .= $row[$i];
 	}
-	$prevNextBar = '<div class="pagination">';
-	if ($pn > 0) {
-		$prevNextBar .= '<a href="'.appendToUrl($url,('pn='.($pn-1))).'">&laquo;'.WebGUI::International::get(91).'</a>';
-	} else {
-		$prevNextBar .= '&laquo;'.WebGUI::International::get(91);
+	if ($#row+1 > $itemsPerPage) {
+		$prevNextBar = '<div class="pagination">';
+		if ($pn > 0) {
+			$prevNextBar .= '<a href="'.WebGUI::URL::append($url,('pn='.($pn-1))).'">&laquo;'.
+				WebGUI::International::get(91).'</a>';
+		} else {
+			$prevNextBar .= '&laquo;'.WebGUI::International::get(91);
+		}
+		$prevNextBar .= ' &middot; ';
+		if (($pn+1) < (($#row+1)/$itemsPerPage)) {
+			$prevNextBar .= '<a href="'.WebGUI::URL::append($url,('pn='.($pn+1))).'">'.
+				WebGUI::International::get(92).'&raquo;</a>';
+		} else {
+			$prevNextBar .= WebGUI::International::get(92).'&raquo;';
+		}
+		$prevNextBar .= '</div>';
 	}
-	$prevNextBar .= ' &middot; ';
-	if (($pn+1) < (($#row+1)/$itemsPerPage)) {
-		$prevNextBar .= '<a href="'.appendToUrl($url,('pn='.($pn+1))).'">'.WebGUI::International::get(92).'&raquo;</a>';
-	} else {
-		$prevNextBar .= WebGUI::International::get(92).'&raquo;';
-	}
-	$prevNextBar .= '</div>';
 	return ($dataRows, $prevNextBar);
 }
 
@@ -74,6 +68,27 @@ sub randint {
 #-------------------------------------------------------------------
 sub round {
         return sprintf("%.0f", $_[0]);
+}
+
+#-------------------------------------------------------------------
+# example: sortByColumn(columnToSort,columnLabel);
+sub sortByColumn {
+        my ($output);
+	$output = '<a href="'.WebGUI::URL::page('sort='.$_[0].'&sortDirection=');
+	if ($session{form}{sortDirection} eq "asc") {
+		$output .= "desc";
+	} else {
+		$output .= "asc";
+	}
+	$output .= '">'.$_[1].'</a>';
+        if ($session{form}{sort} eq $_[0]) {
+		if ($session{form}{sortDirection} eq "desc") {
+                	$output .= ' <img src="'.$session{setting}{lib}.'/desc.gif">';
+		} else {
+                	$output .= ' <img src="'.$session{setting}{lib}.'/asc.gif">';
+		}
+        }
+        return $output;
 }
 
 #-------------------------------------------------------------------
@@ -106,14 +121,6 @@ sub sortHashDescending {
         return %reversedHash;
 }
 
-#-------------------------------------------------------------------
-sub urlize {
-	my ($title);
-        $title = lc($_[0]);
-        $title =~ s/ /_/g;
-        $title =~ s/[^a-z0-9\-\.\_]//g;
-        return $title;
-}
 
 
 1;

@@ -13,6 +13,7 @@ our $namespace = "EventsCalendar";
 #-------------------------------------------------------------------
 
 use strict;
+use HTML::CalendarMonthSimple;
 use Tie::CPHash;
 use WebGUI::DateTime;
 use WebGUI::International;
@@ -21,7 +22,46 @@ use WebGUI::Privilege;
 use WebGUI::Session;
 use WebGUI::Shortcut;
 use WebGUI::SQL;
+use WebGUI::URL;
+use WebGUI::Utility;
 use WebGUI::Widget;
+
+#-------------------------------------------------------------------
+sub _calendarLayout {
+	my ($thisMonth, $calendar, $start, $end, $sth, %event, $nextDate); 
+        $thisMonth = epochToHuman($_[1],"%M %y");
+        $calendar = new HTML::CalendarMonthSimple('year'=>epochToHuman($_[1],"%y"),'month'=>epochToHuman($_[1],"%M"));
+        $calendar->width("100%");
+        $calendar->border(1);
+        $calendar->cellclass("tableData");
+        $calendar->todaycellclass("tableHeader");
+        $calendar->headerclass("tableHeader");
+        ($start,$end) = monthStartEnd($_[1]);
+        $sth = WebGUI::SQL->read("select name, description, startDate, endDate from EventsCalendar_event where widgetId='$_[0]' order by startDate,endDate");
+        while (%event = $sth->hash) {
+        	if (epochToHuman($event{startDate},"%M %y") eq $thisMonth ||
+                	epochToHuman($event{endDate},"%M %y") eq $thisMonth) {
+                        if ($event{startDate} == $event{endDate}) {
+                        	$calendar->addcontent(epochToHuman($event{startDate},"%D"),
+                        		'<a href=\'javascript:popUp("'.$event{description}.'");\'>'.
+                                        $event{name}.'</a><br>');
+                        } else {
+                                $nextDate = $event{startDate};
+                                while($nextDate < $event{endDate}) {
+                                	if (epochToHuman($nextDate,"%M %y") eq $thisMonth) {
+                                        	$calendar->addcontent(epochToHuman($nextDate,"%D"),
+                                                	'<a href=\'javascript:popUp("'.
+                                                        $event{description}
+                                                        .'");\'>'.$event{name}.'</a><br>');
+                                        }
+                                        $nextDate = addToDate($nextDate,0,0,1);
+				}
+                        }
+                }
+        }
+        $sth->finish;
+        return '<script language="JavaScript">function popUp(message) { alert(message); }</script>'.$calendar->as_HTML;
+}
 
 #-------------------------------------------------------------------
 sub duplicate {
@@ -200,7 +240,12 @@ sub www_deleteEvent {
 		if ($session{form}{rid} > 0) {
 			$output .= ' '.WebGUI::International::get(11,$namespace);
 		}
-		$output .= '?<p><div align="center"><a href="'.$session{page}{url}.'?func=deleteEventConfirm&wid='.$session{form}{wid}.'&eid='.$session{form}{eid}.'&rid='.$session{form}{rid}.'">'.WebGUI::International::get(44).'</a> &nbsp; <a href="'.$session{page}{url}.'?func=edit&wid='.$session{form}{wid}.'">'.WebGUI::International::get(45).'</a></div>';
+		$output .= '?<p><div align="center"><a href="'.
+			WebGUI::URL::page('func=deleteEventConfirm&wid='.$session{form}{wid}.
+			'&eid='.$session{form}{eid}.'&rid='.$session{form}{rid}).'">'.
+			WebGUI::International::get(44).'</a> &nbsp; <a href="'.
+			WebGUI::URL::page('func=edit&wid='.$session{form}{wid}).'">'.
+			WebGUI::International::get(45).'</a></div>';
                 return $output;
         } else {
                 return WebGUI::Privilege::insufficient();
@@ -255,11 +300,16 @@ sub www_edit {
                         WebGUI::Form::text("paginateAfter",20,30,$data{paginateAfter}));
                 $output .= formSave();
                 $output .= '</table></form>';
-                $output .= '<p><a href="'.$session{page}{url}.'?func=addEvent&wid='.$session{form}{wid}.'">Add New Event</a><p>';
+                $output .= '<p><a href="'.WebGUI::URL::page('func=addEvent&wid='.$session{form}{wid})
+			.'">Add New Event</a><p>';
                 $output .= '<table border=1 cellpadding=3 cellspacing=0>';
 		$sth = WebGUI::SQL->read("select eventId, name, recurringEventId from EventsCalendar_event where widgetId='$session{form}{wid}' order by startDate");
 		while (@event = $sth->array) {
-                	$output .= '<tr><td><a href="'.$session{page}{url}.'?func=editEvent&wid='.$session{form}{wid}.'&eid='.$event[0].'"><img src="'.$session{setting}{lib}.'/edit.gif" border=0></a><a href="'.$session{page}{url}.'?func=deleteEvent&wid='.$session{form}{wid}.'&eid='.$event[0].'&rid='.$event[2].'"><img src="'.$session{setting}{lib}.'/delete.gif" border=0></a></td><td>'.$event[1].'</td></td>';
+                	$output .= '<tr><td><a href="'.WebGUI::URL::page('func=editEvent&wid='.$session{form}{wid}.
+				'&eid='.$event[0]).'"><img src="'.$session{setting}{lib}.
+				'/edit.gif" border=0></a><a href="'.WebGUI::URL::page('func=deleteEvent&wid='.
+				$session{form}{wid}.'&eid='.$event[0].'&rid='.$event[2]).'"><img src="'.
+				$session{setting}{lib}.'/delete.gif" border=0></a></td><td>'.$event[1].'</td></td>';
 		}
 		$sth->finish;
                 $output .= '</table>';
@@ -322,8 +372,11 @@ sub www_editEventSave {
 
 #-------------------------------------------------------------------
 sub www_view {
-	my (%data, @event, $output, $sth, $flag, @previous);
+	my (%data, %event, $dataRows, $prevNextBar, $output, $sth, $flag, %previous, 
+		@row, $i, $maxDate, $minDate, $nextDate, $defaultPn);
 	tie %data, 'Tie::CPHash';
+	tie %event, 'Tie::CPHash';
+	tie %previous, 'Tie::CPHash';
 	%data = getProperties($namespace,$_[0]);
 	if (defined %data) {
 		if ($data{displayTitle}) {
@@ -332,34 +385,53 @@ sub www_view {
 		if ($data{description} ne "") {
 			$output .= $data{description}.'<p>';
 		}
-		$sth = WebGUI::SQL->read("select name, description, startDate, endDate from EventsCalendar_event where widgetId='$_[0]' and endDate>".(time()-86400)." order by startDate,endDate");
-		while (@event = $sth->array) {
-			unless ($event[2] == $previous[0] && $event[3] == $previous[1]) {
-				$output .= "<b>".epochToHuman($event[2],"%c")." ".epochToHuman($event[2],"%D");
-				if (epochToHuman($event[2],"%y") ne epochToHuman($event[3],"%y")) {
-					$output .= ", ".epochToHuman($event[2],"%y");
-					$flag = 1;
+		($minDate) = WebGUI::SQL->quickArray("select min(startDate) from EventsCalendar_event where widgetId=$_[0]");
+		($maxDate) = WebGUI::SQL->quickArray("select max(endDate) from EventsCalendar_event where widgetId=$_[0]");	
+		if ($data{calendarLayout} eq "calendar") {
+			$nextDate = $minDate;
+			while ($nextDate < $maxDate) {
+				$row[$i] = _calendarLayout($_[0],$nextDate);
+				if ($session{form}{pn} eq "" && $nextDate <= time()) {
+					$defaultPn = $i;
 				}
-				if ($flag || epochToHuman($event[2],"%c") ne epochToHuman($event[3],"%c")) {
-					$output .= " - ".epochToHuman($event[3],"%c");
-					$output .= " ".epochToHuman($event[3],"%D");
-				} elsif (epochToHuman($event[2],"%D") ne epochToHuman($event[3],"%D")) {
-					$output .= " - ".epochToHuman($event[3],"%D");
+				$i++;
+				$nextDate = addToDate($nextDate,0,1,0);
+			}
+			if ($session{form}{pn} eq "") {
+				$session{form}{pn} = $defaultPn;
+			}
+			($dataRows, $prevNextBar) = paginate(1,WebGUI::URL::page(),\@row);
+                	$output .= $prevNextBar.$dataRows.$prevNextBar;
+		} else {
+			$sth = WebGUI::SQL->read("select name, description, startDate, endDate from EventsCalendar_event where widgetId='$_[0]' and endDate>".(time()-86400)." order by startDate,endDate");
+			while (%event = $sth->hash) {
+				unless ($event{startDate} == $previous{startDate} 
+					&& $event{endDate} == $previous{endDate}) {
+					$output .= "<b>".epochToHuman($event{startDate},"%c %D");
+					if (epochToHuman($event{startDate},"%y") ne epochToHuman($event{endDate},"%y")) {
+						$output .= ", ".epochToHuman($event{startDate},"%y");
+						$flag = 1;
+					}
+					if ($flag || epochToHuman($event{startDate},"%c") ne epochToHuman($event{endDate},"%c")) {
+						$output .= " - ".epochToHuman($event{endDate},"%c %D");
+					} elsif (epochToHuman($event{startDate},"%D") ne epochToHuman($event{endDate},"%D")) {
+						$output .= " - ".epochToHuman($event{endDate},"%D");
+					}
+					$flag = 0;
+					$output .= ", ".epochToHuman($event{endDate},"%y");
+					$output .= "</b>";
+					$output .= "<hr size=1>";
 				}
-				$flag = 0;
-				$output .= ", ".epochToHuman($event[3],"%y");
-				$output .= "</b>";
-				$output .= "<hr size=1>";
+				%previous = %event;
+				$output .= '<span class="eventTitle">'.$event{name}.'</span>';
+					if ($event{description} ne "") {
+					$output .= ' - ';
+					$output .= ''.$event{description};
+				}
+				$output .= '<p>';
 			}
-			@previous = ($event[2],$event[3]);
-			$output .= '<span class="eventTitle">'.$event[0].'</span>';
-			if ($event[1] ne "") {
-				$output .= ' - ';
-				$output .= ''.$event[1];
-			}
-			$output .= '<p>';
+			$sth->finish;
 		}
-		$sth->finish;
 		if ($data{processMacros}) {
 			$output = WebGUI::Macro::process($output);
 		}

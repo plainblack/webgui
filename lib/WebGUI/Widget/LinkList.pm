@@ -20,6 +20,7 @@ use WebGUI::Privilege;
 use WebGUI::Session;
 use WebGUI::Shortcut;
 use WebGUI::SQL;
+use WebGUI::URL;
 use WebGUI::Widget;
 
 #-------------------------------------------------------------------
@@ -158,8 +159,11 @@ sub www_deleteLink {
         if (WebGUI::Privilege::canEditPage()) {
 		$output = '<h1>'.WebGUI::International::get(42).'</h1>';
 		$output .= WebGUI::International::get(9,$namespace).'<p>';
-		$output .= '<div align="center"><a href="'.$session{page}{url}.'?func=deleteLinkConfirm&wid='.$session{form}{wid}.'&lid='.$session{form}{lid}.'">'.WebGUI::International::get(44).'</a>';
-		$output .= ' &nbsp; <a href="'.$session{page}{url}.'?func=edit&wid='.$session{form}{wid}.'">'.WebGUI::International::get(45).'</a></div>';
+		$output .= '<div align="center"><a href="'.
+			WebGUI::URL::page('func=deleteLinkConfirm&wid='.$session{form}{wid}.'&lid='.$session{form}{lid})
+			.'">'.WebGUI::International::get(44).'</a>';
+		$output .= ' &nbsp; <a href="'.WebGUI::URL::page('func=edit&wid='.$session{form}{wid})
+			.'">'.WebGUI::International::get(45).'</a></div>';
                 return $output;
         } else {
                 return WebGUI::Privilege::insufficient();
@@ -203,11 +207,20 @@ sub www_edit {
                 $output .= tableFormRow(WebGUI::International::get(4,$namespace),WebGUI::Form::text("bullet",20,255,$data{bullet}));
                 $output .= formSave();
                 $output .= '</table></form>';
-                $output .= '<p><a href="'.$session{page}{url}.'?func=addLink&wid='.$session{form}{wid}.'">'.WebGUI::International::get(13,$namespace).'</a><p>';
+                $output .= '<p><a href="'.WebGUI::URL::page('func=addLink&wid='.$session{form}{wid})
+			.'">'.WebGUI::International::get(13,$namespace).'</a><p>';
                 $output .= '<table border=1 cellpadding=3 cellspacing=0>';
 		$sth = WebGUI::SQL->read("select linkId, name from LinkList_link where widgetId='$session{form}{wid}' order by sequenceNumber");
 		while (@link = $sth->array) {
-                	$output .= '<tr><td><a href="'.$session{page}{url}.'?func=editLink&wid='.$session{form}{wid}.'&lid='.$link[0].'"><img src="'.$session{setting}{lib}.'/edit.gif" border=0></a><a href="'.$session{page}{url}.'?func=deleteLink&wid='.$session{form}{wid}.'&lid='.$link[0].'"><img src="'.$session{setting}{lib}.'/delete.gif" border=0></a><a href="'.$session{page}{url}.'?func=moveLinkUp&wid='.$session{form}{wid}.'&lid='.$link[0].'"><img src="'.$session{setting}{lib}.'/upArrow.gif" border=0></a><a href="'.$session{page}{url}.'?func=moveLinkDown&wid='.$session{form}{wid}.'&lid='.$link[0].'"><img src="'.$session{setting}{lib}.'/downArrow.gif" border=0></a></td><td>'.$link[1].'</td></tr>';
+                	$output .= '<tr><td><a href="'.WebGUI::URL::page('func=editLink&wid='.$session{form}{wid}.
+				'&lid='.$link[0]).'"><img src="'.$session{setting}{lib}.
+				'/edit.gif" border=0></a><a href="'.WebGUI::URL::page('func=deleteLink&wid='.
+				$session{form}{wid}.'&lid='.$link[0]).'"><img src="'.$session{setting}{lib}.
+				'/delete.gif" border=0></a><a href="'.WebGUI::URL::page('func=moveLinkUp&wid='.
+				$session{form}{wid}.'&lid='.$link[0]).'"><img src="'.$session{setting}{lib}.
+				'/upArrow.gif" border=0></a><a href="'.WebGUI::URL::page('func=moveLinkDown&wid='.
+				$session{form}{wid}.'&lid='.$link[0]).'"><img src="'.$session{setting}{lib}.
+				'/downArrow.gif" border=0></a></td><td>'.$link[1].'</td></tr>';
 		}
 		$sth->finish;
                 $output .= '</table>';

@@ -24,6 +24,7 @@ use WebGUI::Privilege;
 use WebGUI::Session;
 use WebGUI::Shortcut;
 use WebGUI::SQL;
+use WebGUI::URL;
 use WebGUI::Utility;
 use WebGUI::Widget;
 
@@ -121,7 +122,15 @@ sub www_addSubmission {
                 $output .= '<tr><td class="tableHeader">'.WebGUI::International::get(15,$namespace).'</td><td class="tableHeader">'.WebGUI::International::get(99).'</td><td class="tableHeader">'.WebGUI::International::get(13,$namespace).'</td><td class="tableHeader">'.WebGUI::International::get(14,$namespace).'</td></tr>';
                 $sth = WebGUI::SQL->read("select title,submissionId,dateSubmitted,status from UserSubmission_submission where widgetId='$session{form}{wid}' and userId=$session{user}{userId} order by dateSubmitted desc");
                 while (@submission = $sth->array) {
-                        $output .= '<tr><td class="tableData"><a href="'.$session{page}{url}.'?func=editSubmission&wid='.$session{form}{wid}.'&sid='.$submission[1].'"><img src="'.$session{setting}{lib}.'/edit.gif" border=0></a><a href="'.$session{page}{url}.'?wid='.$session{form}{wid}.'&sid='.$submission[1].'&func=deleteSubmission"><img src="'.$session{setting}{lib}.'/delete.gif" border=0></a></td><td class="tableData"><a href="'.$session{page}{url}.'?wid='.$session{form}{wid}.'&func=viewSubmission&sid='.$submission[1].'">'.$submission[0].'</a></td><td class="tableData">'.epochToHuman($submission[2],"%M/%D/%y").'</td><td class="tableData">'.$submission[3].'</td></tr>';
+                        $output .= '<tr><td class="tableData"><a href="'.WebGUI::URL::page('func=editSubmission&wid='.
+				$session{form}{wid}.'&sid='.$submission[1]).'"><img src="'.$session{setting}{lib}.
+				'/edit.gif" border=0></a><a href="'.WebGUI::URL::page('wid='.$session{form}{wid}.
+				'&sid='.$submission[1].'&func=deleteSubmission').'"><img src="'.$session{setting}{lib}
+				.'/delete.gif" border=0></a></td><td class="tableData"><a href="'.
+				WebGUI::URL::page('wid='.$session{form}{wid}.'&func=viewSubmission&sid='.
+				$submission[1]).'">'.$submission[0].'</a></td><td class="tableData">'.
+				epochToHuman($submission[2],"%M/%D/%y").'</td><td class="tableData">'.
+				$submission[3].'</td></tr>';
                 }
                 $sth->finish;
                 $output .= '</table>';
@@ -146,7 +155,9 @@ sub www_addSubmissionSave {
 		}
                 WebGUI::SQL->write("insert into UserSubmission_submission values ($session{form}{wid}, $submissionId, ".quote($title).", ".time().", ".quote($session{user}{username}).", '$session{user}{userId}', ".quote($session{form}{content}).", ".quote($image).", ".quote($attachment).", '$userSubmission{defaultStatus}', '$session{form}{convertCarriageReturns}')");
 		if ($userSubmission{defaultStatus} ne "Approved") {
-			WebGUI::MessageLog::addEntry('',$userSubmission{groupToApprove},$session{page}{url}.'?func=viewSubmission&wid='.$session{form}{wid}.'&sid='.$submissionId,3,$namespace);
+			WebGUI::MessageLog::addEntry('',$userSubmission{groupToApprove},
+				WebGUI::URL::page('func=viewSubmission&wid='.$session{form}{wid}.
+					'&sid='.$submissionId),3,$namespace);
 		}
                 return "";
         } else {
@@ -161,7 +172,8 @@ sub www_approveSubmission {
 		%submission = WebGUI::SQL->quickHash("select * from UserSubmission_submission where submissionId=$session{form}{sid}");
 		%userSubmission = getProperties($namespace,$session{form}{wid});;
                 WebGUI::SQL->write("update UserSubmission_submission set status='Approved' where submissionId=$session{form}{sid}");
-		WebGUI::MessageLog::addEntry($submission{userId},'',$session{page}{url}.'?func=viewSubmission&wid='.$session{form}{wid}.'&sid='.$session{form}{sid},4,$namespace);
+		WebGUI::MessageLog::addEntry($submission{userId},'',WebGUI::URL::page('func=viewSubmission&wid='.
+			$session{form}{wid}.'&sid='.$session{form}{sid}),4,$namespace);
 		WebGUI::MessageLog::completeEntry($session{form}{mlog});
                 return WebGUI::Operation::www_viewMessageLog();
         } else {
@@ -210,8 +222,9 @@ sub www_deleteSubmission {
         if ($owner == $session{user}{userId}) {
 		$output = '<h1>'.WebGUI::International::get(42).'</h1>';
 		$output .= WebGUI::International::get(17,$namespace).'<p>';
-		$output .= '<div align="center"><a href="'.$session{page}{url}.'?func=deleteSubmissionConfirm&wid='.$session{form}{wid}.'&sid='.$session{form}{sid}.'">'.WebGUI::International::get(44).'</a>';
-		$output .= ' &nbsp; <a href="'.$session{page}{url}.'">'.WebGUI::International::get(45).'</a></div>';
+		$output .= '<div align="center"><a href="'.WebGUI::URL::page('func=deleteSubmissionConfirm&wid='.
+			$session{form}{wid}.'&sid='.$session{form}{sid}).'">'.WebGUI::International::get(44).'</a>';
+		$output .= ' &nbsp; <a href="'.WebGUI::URL::page().'">'.WebGUI::International::get(45).'</a></div>';
                 return $output;
         } else {
                 return WebGUI::Privilege::insufficient();
@@ -237,7 +250,8 @@ sub www_denySubmission {
 		%submission = WebGUI::SQL->quickHash("select * from UserSubmission_submission where submissionId=$session{form}{sid}");
                 %userSubmission = getProperties($namespace,$session{form}{wid});
                 WebGUI::SQL->write("update UserSubmission_submission set status='Denied' where submissionId=$session{form}{sid}");
-                WebGUI::MessageLog::addEntry($submission{userId},'',$session{page}{url}.'?func=viewSubmission&wid='.$session{form}{wid}.'&sid='.$session{form}{sid},5,$namespace);
+                WebGUI::MessageLog::addEntry($submission{userId},'',WebGUI::URL::page('func=viewSubmission&wid='.
+			$session{form}{wid}.'&sid='.$session{form}{sid}),5,$namespace);
                 WebGUI::MessageLog::completeEntry($session{form}{mlog});
                 return WebGUI::Operation::www_viewMessageLog();
         } else {
@@ -308,12 +322,16 @@ sub www_editSubmission {
                 $output .= tableFormRow(WebGUI::International::get(35,$namespace),WebGUI::Form::text("title",20,128,$submission{title}));
                 $output .= tableFormRow(WebGUI::International::get(31,$namespace),WebGUI::Form::textArea("content",$submission{content},50,10));
                 if ($submission{image} ne "") {
-                        $output .= tableFormRow(WebGUI::International::get(32,$namespace),'<a href="'.$session{page}{url}.'?func=deleteImage&wid='.$session{form}{wid}.'&sid='.$session{form}{sid}.'">'.WebGUI::International::get(36,$namespace).'</a>');
+                        $output .= tableFormRow(WebGUI::International::get(32,$namespace),'<a href="'.
+				WebGUI::URL::page('func=deleteImage&wid='.$session{form}{wid}.'&sid='.
+					$session{form}{sid}).'">'.WebGUI::International::get(36,$namespace).'</a>');
                 } else {
                         $output .= tableFormRow(WebGUI::International::get(32,$namespace),WebGUI::Form::file("image"));
                 }
                 if ($submission{attachment} ne "") {
-                        $output .= tableFormRow(WebGUI::International::get(33,$namespace),'<a href="'.$session{page}{url}.'?func=deleteAttachment&wid='.$session{form}{wid}.'&sid='.$session{form}{sid}.'">'.WebGUI::International::get(36,$namespace).'</a>');
+                        $output .= tableFormRow(WebGUI::International::get(33,$namespace),'<a href="'.
+				WebGUI::URL::page('func=deleteAttachment&wid='.$session{form}{wid}.'&sid='.
+				$session{form}{sid}).'">'.WebGUI::International::get(36,$namespace).'</a>');
                 } else {
                         $output .= tableFormRow(WebGUI::International::get(33,$namespace),WebGUI::Form::file("attachment"));
                 }
@@ -348,7 +366,9 @@ sub www_editSubmissionSave {
                 }
                 WebGUI::SQL->write("update UserSubmission_submission set dateSubmitted=".time().", convertCarriageReturns='$session{form}{convertCarriageReturns}', title=".quote($title).", content=".quote($session{form}{content}).", ".$image.$attachment." status='$userSubmission{defaultStatus}' where submissionId=$session{form}{sid}");
 		if ($userSubmission{defaultStatus} ne "Approved") {
-			WebGUI::MessageLog::addEntry('',$userSubmission{groupToApprove},$session{page}{url}.'?func=viewSubmission&wid='.$session{form}{wid}.'&sid='.$session{form}{sid},3,$namespace);
+			WebGUI::MessageLog::addEntry('',$userSubmission{groupToApprove},
+				WebGUI::URL::page('func=viewSubmission&wid='.$session{form}{wid}.'&sid='.
+				$session{form}{sid}),3,$namespace);
 		}
                 return www_viewSubmission();
         } else {
@@ -373,12 +393,18 @@ sub www_view {
 		}
 		$sth = WebGUI::SQL->read("select title,submissionId,dateSubmitted,username,userId from UserSubmission_submission where widgetId='$_[0]' and status='Approved' order by dateSubmitted desc");
 		while (@submission = $sth->array) {
-			$row[$i] = '<tr><td class="tableData"><a href="'.$session{page}{url}.'?wid='.$_[0].'&func=viewSubmission&sid='.$submission[1].'">'.$submission[0].'</a></td><td class="tableData">'.epochToHuman($submission[2],"%M/%D/%y").'</td><td class="tableData"><a href="'.$session{page}{url}.'?op=viewProfile&uid='.$submission[4].'">'.$submission[3].'</a></td></tr>';
+			$row[$i] = '<tr><td class="tableData"><a href="'.WebGUI::URL::page('wid='.$_[0].
+				'&func=viewSubmission&sid='.$submission[1]).'">'.$submission[0].
+				'</a></td><td class="tableData">'.epochToHuman($submission[2],"%M/%D/%y").
+				'</td><td class="tableData"><a href="'.WebGUI::URL::page('op=viewProfile&uid='.
+				$submission[4]).'">'.$submission[3].'</a></td></tr>';
 			$i++;
 		}
 		$sth->finish;
-		$output .= '<table width="100%" cellpadding=3 cellspacing=0 border=0><tr><td align="right" class="tableMenu"><a href="'.$session{page}{url}.'?func=addSubmission&wid='.$_[0].'">'.WebGUI::International::get(20,$namespace).'</a></td></tr></table>';
-                ($dataRows, $prevNextBar) = paginate($data{submissionsPerPage},$session{page}{url},\@row);
+		$output .= '<table width="100%" cellpadding=3 cellspacing=0 border=0><tr>'.
+			'<td align="right" class="tableMenu"><a href="'.WebGUI::URL::page('func=addSubmission&wid='.
+			$_[0]).'">'.WebGUI::International::get(20,$namespace).'</a></td></tr></table>';
+                ($dataRows, $prevNextBar) = paginate($data{submissionsPerPage},WebGUI::URL::page(),\@row);
 		$output .= '<table width="100%" cellspacing=1 cellpadding=2 border=0>';
 		$output .= '<tr><td class="tableHeader">'.WebGUI::International::get(99).'</td><td class="tableHeader">'.WebGUI::International::get(13,$namespace).'</td><td class="tableHeader">'.WebGUI::International::get(21,$namespace).'</td></tr>';
                 $output .= $dataRows;
@@ -397,19 +423,27 @@ sub www_viewSubmission {
 	$output .= '<table width="100%" cellpadding=2 cellspacing=1 border=0>';
 	$output .= '<tr><td class="tableHeader">';
   #---header
-	$output .= '<b>'.WebGUI::International::get(22,$namespace).'</b> <a href="'.$session{page}{url}.'?op=viewProfile&uid='.$submission{userId}.'">'.$submission{username}.'</a><br>';
+	$output .= '<b>'.WebGUI::International::get(22,$namespace).'</b> <a href="'.
+		WebGUI::URL::page('op=viewProfile&uid='.$submission{userId}).'">'.$submission{username}.'</a><br>';
 	$output .= '<b>'.WebGUI::International::get(23,$namespace).'</b> '.epochToHuman($submission{dateSubmitted},"%w, %c %D, %y at %H:%n%p");
 	$output .= '</td><td rowspan="2" class="tableMenu" nowrap valign="top">';
   #---menu
-        $output .= '<a href="'.$session{page}{url}.'">'.WebGUI::International::get(28,$namespace).'</a><br>';
+        $output .= '<a href="'.WebGUI::URL::page().'">'.WebGUI::International::get(28,$namespace).'</a><br>';
         if ($submission{userId} == $session{user}{userId}) {
-                $output .= '<a href="'.$session{page}{url}.'?func=deleteSubmission&wid='.$session{form}{wid}.'&sid='.$session{form}{sid}.'">'.WebGUI::International::get(37,$namespace).'</a><br>';
-                $output .= '<a href="'.$session{page}{url}.'?func=editSubmission&wid='.$session{form}{wid}.'&sid='.$session{form}{sid}.'">'.WebGUI::International::get(27,$namespace).'</a><br>';
+                $output .= '<a href="'.WebGUI::URL::page('func=deleteSubmission&wid='.$session{form}{wid}.'&sid='.
+			$session{form}{sid}).'">'.WebGUI::International::get(37,$namespace).'</a><br>';
+                $output .= '<a href="'.WebGUI::URL::page('func=editSubmission&wid='.$session{form}{wid}.'&sid='.
+			$session{form}{sid}).'">'.WebGUI::International::get(27,$namespace).'</a><br>';
         }
         if ($submission{status} eq "Pending" && (WebGUI::Privilege::isInGroup(3,$session{user}{userId}) || WebGUI::Privilege::isInGroup(4,$session{user}{userId}))) {
-                $output .= '<a href="'.$session{page}{url}.'?func=approveSubmission&wid='.$session{form}{wid}.'&sid='.$session{form}{sid}.'&mlog='.$session{form}{mlog}.'">'.WebGUI::International::get(24,$namespace).'</a><br>';
-                $output .= '<a href="'.$session{page}{url}.'?op=viewMessageLog">'.WebGUI::International::get(25,$namespace).'</a><br>';
-                $output .= '<a href="'.$session{page}{url}.'?func=denySubmission&wid='.$session{form}{wid}.'&sid='.$session{form}{sid}.'&mlog='.$session{form}{mlog}.'">'.WebGUI::International::get(26,$namespace).'</a><br>';
+                $output .= '<a href="'.WebGUI::URL::page('func=approveSubmission&wid='.$session{form}{wid}.
+			'&sid='.$session{form}{sid}.'&mlog='.$session{form}{mlog}).'">'.
+			WebGUI::International::get(24,$namespace).'</a><br>';
+                $output .= '<a href="'.WebGUI::URL::page('op=viewMessageLog').'">'.
+			WebGUI::International::get(25,$namespace).'</a><br>';
+                $output .= '<a href="'.WebGUI::URL::page('func=denySubmission&wid='.$session{form}{wid}.
+			'&sid='.$session{form}{sid}.'&mlog='.$session{form}{mlog}).'">'.
+			WebGUI::International::get(26,$namespace).'</a><br>';
         }
 	$output .= '</td</tr><tr><td class="tableData">';
   #---content

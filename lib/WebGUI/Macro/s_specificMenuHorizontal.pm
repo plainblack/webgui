@@ -11,15 +11,22 @@ package WebGUI::Macro::s_specificMenuHorizontal;
 #-------------------------------------------------------------------
 
 use strict;
+use WebGUI::Macro;
 use WebGUI::Macro::Shared;
 use WebGUI::Privilege;
 use WebGUI::Session;
 use WebGUI::SQL;
+use WebGUI::URL;
 
 #-------------------------------------------------------------------
 sub _replacement {
-        my ($temp, @data, $pageTitle, $parentId, $sth, $first, @param);
+        my ($temp, @data, $pageTitle, $parentId, $sth, $first, @param, $delimeter);
 	@param = WebGUI::Macro::getParams($_[0]);
+	if ($param[1] eq "") {
+                $delimeter = " &middot; ";
+        } else {
+                $delimeter = " ".$param[1]." ";
+        }
         $temp = '<span class="horizontalMenu">';
         $first = 1;
         ($parentId) = WebGUI::SQL->quickArray("select pageId from page where urlizedTitle='$param[0]'");
@@ -29,10 +36,10 @@ sub _replacement {
                 	if ($first) {
                         	$first = 0;
                         } else {
-                                $temp .= " &middot; ";
+                                $temp .= $delimeter;
                         }
-                        $temp .= '<a class="horizontalMenu" href="'.$session{config}{scripturl}.
-				'/'.$data[1].'">'.$data[0].'</a>';
+                        $temp .= '<a class="horizontalMenu" href="'.WebGUI::URL::gateway($data[1]).'">'.
+				$data[0].'</a>';
                 }
         }
         $sth->finish;
@@ -45,7 +52,6 @@ sub process {
 	my ($output,@data, $pageTitle, $parentId, $sth, $first, $temp);
 	$output = $_[0];
         $output =~ s/\^s\((.*?)\)\;/_replacement($1)/ge;
-        #$output =~ s/\^s\;/_replacement()/ge;
 	return $output;
 }
 

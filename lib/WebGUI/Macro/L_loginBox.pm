@@ -15,6 +15,7 @@ use WebGUI::Form;
 use WebGUI::International;
 use WebGUI::Macro::Backslash_pageUrl;
 use WebGUI::Session;
+use WebGUI::URL;
 
 #-------------------------------------------------------------------
 sub _replacement {
@@ -22,11 +23,11 @@ sub _replacement {
         $temp = '<div class="loginBox">';
         if ($session{var}{sessionId}) {
 		$temp .= WebGUI::International::get(48);
-                $temp .= ' <a href="'.$session{page}{url}.'?op=displayAccount">'.$session{user}{username}.'</a>.';
+                $temp .= ' <a href="'.WebGUI::URL::page('op=displayAccount').'">'.$session{user}{username}.'</a>.';
                 $temp .= WebGUI::International::get(49);
                 $temp = WebGUI::Macro::Backslash_pageUrl::process($temp);
         } else {
-        	$temp .= '<form method="post" action="'.$session{page}{url}.'"> ';
+        	$temp .= '<form method="post" action="'.WebGUI::URL::page().'"> ';
                 $temp .= WebGUI::Form::hidden("op","login").'<span class="formSubtext">';
                 $temp .= WebGUI::International::get(50);
                 $temp .= '<br></span>';
@@ -36,7 +37,7 @@ sub _replacement {
                 $temp .= WebGUI::Form::password("identifier",12,30).'<span class="formSubtext"><br></span>';
                 $temp .= WebGUI::Form::submit(WebGUI::International::get(52));
                 $temp .= '</form>';
-                $temp .= '<a href="'.$session{page}{url}.'?op=createAccount">Click here to register.</a>';
+                $temp .= '<a href="'.WebGUI::URL::page('op=createAccount').'">Click here to register.</a>';
         }
         $temp .= '</div>';
 	return $temp;

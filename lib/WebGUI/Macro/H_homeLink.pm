@@ -19,7 +19,7 @@ use WebGUI::Session;
 sub _replacement {
         my (@param, $temp);
         @param = WebGUI::Macro::getParams($1);
-        $temp = '<a class="homeLink" href="'.$session{config}{scripturl}.'/home">';
+        $temp = '<a class="homeLink" href="'.WebGUI::URL::gateway('home').'">';
         if ($param[0] ne "") {
 		$temp .= $param[0];
         } else {

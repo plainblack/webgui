@@ -10,13 +10,14 @@ package WebGUI::DateTime;
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
+use Date::Calc;
 use Exporter;
 use strict;
 use Time::Local;
 use WebGUI::International;
 
 our @ISA = qw(Exporter);
-our @EXPORT = qw(&epochToHuman &epochToSet &humanToEpoch &setToEpoch);
+our @EXPORT = qw(&addToTime &addToDate &epochToHuman &epochToSet &humanToEpoch &setToEpoch &monthStartEnd);
 
 #-------------------------------------------------------------------
 sub _getMonth { 
@@ -49,6 +50,24 @@ sub _getWeekday {
 		7=> 	WebGUI::International::get(33)
 		);
 	return %weekday;
+}
+
+#-------------------------------------------------------------------
+sub addToDate {
+	my ($year,$month,$day, $hour,$min,$sec, $newDate);
+	($year,$month,$day, $hour,$min,$sec) = Date::Calc::Time_to_Date($_[0]);
+	($year,$month,$day) = Date::Calc::Add_Delta_YMD($year,$month,$day, $_[1],$_[2],$_[3]);
+	$newDate = Date::Calc::Date_to_Time($year,$month,$day, $hour,$min,$sec);
+	return $newDate;
+}
+
+#-------------------------------------------------------------------
+sub addToTime {
+        my ($year,$month,$day, $hour,$min,$sec, $newDate);
+        ($year,$month,$day, $hour,$min,$sec) = Date::Calc::Time_to_Date($_[0]);
+        ($year,$month,$day, $hour,$min,$sec) = Date::Calc::Add_Delta_DHMS($year,$month,$day,$hour,$min,$sec,0,$_[1],$_[2],$_[3]);
+        $newDate = Date::Calc::Date_to_Time($year,$month,$day, $hour,$min,$sec);
+        return $newDate;
 }
 
 #-------------------------------------------------------------------
@@ -149,6 +168,16 @@ sub humanToEpoch {
 	$output = timelocal(@date);
 	return $output;
 } 
+
+#-------------------------------------------------------------------
+sub monthStartEnd {
+	my ($year,$month,$day, $hour,$min,$sec, $start, $end);
+	($year,$month,$day, $hour,$min,$sec) = Date::Calc::Time_to_Date($_[0]);
+	$start = Date::Calc::Date_to_Time($year,$month,1,0,0,0);
+	($year,$month,$day, $hour,$min,$sec) = Date::Calc::Time_to_Date(addToDate($_[0],0,1,0));
+	$end = Date::Calc::Date_to_Time($year,$month,1,0,0,0)-1;
+	return ($start, $end);
+}
 
 #-------------------------------------------------------------------
 sub setToEpoch {

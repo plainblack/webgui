@@ -20,6 +20,7 @@ use WebGUI::Privilege;
 use WebGUI::Session;
 use WebGUI::Shortcut;
 use WebGUI::SQL;
+use WebGUI::URL;
 use WebGUI::Utility;
 use WebGUI::Widget;
 
@@ -238,12 +239,10 @@ sub www_view {
 					$i++;
 				}
 				$sth->finish;
-                		($dataRows, $prevNextBar) = paginate($data{paginateAfter},$session{page}{url},\@row);
+                		($dataRows, $prevNextBar) = paginate($data{paginateAfter},WebGUI::URL::page(),\@row);
                 		$output .= $dataRows;
                 		$output .= $template[2];
-				if ($#row > $data{paginateAfter}) {
-                			$output .= $prevNextBar;
-				}
+                		$output .= $prevNextBar;
 			} else {
 				$output .= WebGUI::International::get(11,$namespace).'<p>';
 				WebGUI::ErrorHandler::warn("SQLReport [$_[0]] There was a problem with the query.");

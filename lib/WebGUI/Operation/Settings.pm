@@ -18,6 +18,7 @@ use WebGUI::Privilege;
 use WebGUI::Session;
 use WebGUI::Shortcut;
 use WebGUI::SQL;
+use WebGUI::URL;
 
 our @ISA = qw(Exporter);
 our @EXPORT = qw(&www_editProfileSettings &www_editProfileSettingsSave &www_editAuthenticationSettings &www_editAuthenticationSettingsSave &www_editCompanyInformation &www_editCompanyInformationSave &www_editFileSettings &www_editFileSettingsSave &www_editMailSettings &www_editMailSettingsSave &www_editMiscSettings &www_editMiscSettingsSave &www_manageSettings);
@@ -169,8 +170,9 @@ sub www_editMailSettingsSave {
 
 #-------------------------------------------------------------------
 sub www_editMiscSettings {
-        my ($output, @array, %notFoundPage);
+        my ($output, @array, %notFoundPage, %yesNo);
         %notFoundPage = (1=>WebGUI::International::get(136), 4=>WebGUI::International::get(137));
+	%yesNo = ('1'=>WebGUI::International::get(138), '0'=>WebGUI::International::get(139));
         if (WebGUI::Privilege::isInGroup(3)) {
                 $output .= helpLink(24);
                 $output .= '<h1>'.WebGUI::International::get(140).'</h1>';
@@ -178,8 +180,15 @@ sub www_editMiscSettings {
                 $output .= WebGUI::Form::hidden("op","editMiscSettingsSave");
                 $output .= '<table>';
                 $array[0] = $session{setting}{notFoundPage};
-                $output .= tableFormRow(WebGUI::International::get(141),WebGUI::Form::selectList("notFoundPage",\%notFoundPage,\@array));
-                $output .= tableFormRow(WebGUI::International::get(142),WebGUI::Form::text("sessionTimeout",30,11,$session{setting}{sessionTimeout}));
+                $output .= tableFormRow(WebGUI::International::get(141),
+			WebGUI::Form::selectList("notFoundPage",\%notFoundPage,\@array));
+                $output .= tableFormRow(WebGUI::International::get(142),
+			WebGUI::Form::text("sessionTimeout",30,11,$session{setting}{sessionTimeout}));
+		$output .= tableFormRow(WebGUI::International::get(398),
+			WebGUI::Form::text("docTypeDec", 70, 255, $session{setting}{docTypeDec}));
+                $array[0] = $session{setting}{preventProxyCache};
+                $output .= tableFormRow(WebGUI::International::get(400),
+			WebGUI::Form::selectList("preventProxyCache",\%yesNo,\@array));
                 $output .= formSave();
                 $output .= '</table>';
                 $output .= '</form> ';
@@ -192,8 +201,14 @@ sub www_editMiscSettings {
 #-------------------------------------------------------------------
 sub www_editMiscSettingsSave {
         if (WebGUI::Privilege::isInGroup(3)) {
-                WebGUI::SQL->write("update settings set value=".quote($session{form}{sessionTimeout})." where name='sessionTimeout'");
-                WebGUI::SQL->write("update settings set value=".quote($session{form}{notFoundPage})." where name='notFoundPage'");
+                WebGUI::SQL->write("update settings set value=".quote($session{form}{sessionTimeout}).
+			" where name='sessionTimeout'");
+                WebGUI::SQL->write("update settings set value=".quote($session{form}{notFoundPage}).
+			" where name='notFoundPage'");
+		WebGUI::SQL->write("update settings set value=".quote($session{form}{docTypeDec}).
+			" where name='docTypeDec'");
+		WebGUI::SQL->write("update settings set value=".quote($session{form}{preventProxyCache}).
+			" where name='preventProxyCache'");
                 return www_manageSettings(); 
         } else {
                 return WebGUI::Privilege::adminOnly();
@@ -250,12 +265,18 @@ sub www_manageSettings {
                 $output .= helpLink(12);
                 $output .= '<h1>'.WebGUI::International::get(143).'</h1>';
                 $output .= '<ul>';
-                $output .= '<li><a href="'.$session{page}{url}.'?op=editAuthenticationSettings">'.WebGUI::International::get(117).'</a>';
-                $output .= '<li><a href="'.$session{page}{url}.'?op=editCompanyInformation">'.WebGUI::International::get(124).'</a>';
-                $output .= '<li><a href="'.$session{page}{url}.'?op=editFileSettings">'.WebGUI::International::get(128).'</a>';
-                $output .= '<li><a href="'.$session{page}{url}.'?op=editMailSettings">'.WebGUI::International::get(133).'</a>';
-                $output .= '<li><a href="'.$session{page}{url}.'?op=editMiscSettings">'.WebGUI::International::get(140).'</a>';
-                $output .= '<li><a href="'.$session{page}{url}.'?op=editProfileSettings">'.WebGUI::International::get(308).'</a>';
+                $output .= '<li><a href="'.WebGUI::URL::page('op=editAuthenticationSettings').
+			'">'.WebGUI::International::get(117).'</a>';
+                $output .= '<li><a href="'.WebGUI::URL::page('op=editCompanyInformation').
+			'">'.WebGUI::International::get(124).'</a>';
+                $output .= '<li><a href="'.WebGUI::URL::page('op=editFileSettings').
+			'">'.WebGUI::International::get(128).'</a>';
+                $output .= '<li><a href="'.WebGUI::URL::page('op=editMailSettings').
+			'">'.WebGUI::International::get(133).'</a>';
+                $output .= '<li><a href="'.WebGUI::URL::page('op=editMiscSettings').
+			'">'.WebGUI::International::get(140).'</a>';
+                $output .= '<li><a href="'.WebGUI::URL::page('op=editProfileSettings').
+			'">'.WebGUI::International::get(308).'</a>';
                 $output .= '</ul>';
         } else {
                 $output = WebGUI::Privilege::adminOnly();

@@ -12,8 +12,10 @@ package WebGUI::Macro::C_crumbTrail;
 
 use strict;
 use Tie::CPHash;
+use WebGUI::Macro;
 use WebGUI::Session;
 use WebGUI::SQL;
+use WebGUI::URL;
 
 #-------------------------------------------------------------------
 sub _recurseCrumbTrail {
@@ -24,16 +26,23 @@ sub _recurseCrumbTrail {
                 $output .= _recurseCrumbTrail($data{parentId});
         }
         if ($data{title} ne "") {
-		$output .= '<a class="crumbTrail" href="'.$session{config}{scripturl}.
-			'/'.$data{urlizedTitle}.'">'.$data{title}.'</a> &gt; ';
+		$output .= '<a class="crumbTrail" href="'.WebGUI::URL::gateway($data{urlizedTitle})
+			.'">'.$data{title}.'</a>'.$_[1];
         }
         return $output;
 }
 
 #-------------------------------------------------------------------
 sub _replacement {
-        my (@param, $temp);
-        $temp = '<span class="crumbTrail">'._recurseCrumbTrail($session{page}{parentId}).'<a href="'.$session{page}{url}.'">'.$session{page}{title}.'</a></span>';
+        my (@param, $temp, $delimeter);
+        @param = WebGUI::Macro::getParams($_[0]);
+        if ($param[0] eq "") {
+                $delimeter = " &gt; ";
+        } else {
+                $delimeter = " ".$param[0]." ";
+        }
+        $temp = '<span class="crumbTrail">'._recurseCrumbTrail($session{page}{parentId},$delimeter).
+		'<a href="'.WebGUI::URL::page().'">'.$session{page}{title}.'</a></span>';
 	return $temp;
 }
 
@@ -41,6 +50,7 @@ sub _replacement {
 sub process {
 	my ($output, $temp);
 	$output = $_[0];
+	$output =~ s/\^C\((.*?)\)\;/_replacement($1)/ge;
         $output =~ s/\^C\;/_replacement()/ge;
 	return $output;
 }

@@ -30,6 +30,7 @@ sub www_viewStatistics {
         if (WebGUI::Privilege::isInGroup(3)) {
 		$userAgent = new LWP::UserAgent;
 		$userAgent->agent("WebGUI-Check/2.0");
+		$userAgent->timeout(10);
 		$header = new HTTP::Headers;
 		$referer = "http://webgui.web.getversion/".$session{env}{SERVER_NAME}.$session{env}{REQUEST_URI};
 		chomp $referer;

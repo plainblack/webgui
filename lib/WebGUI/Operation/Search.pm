@@ -18,6 +18,7 @@ use WebGUI::Privilege;
 use WebGUI::Session;
 use WebGUI::Shortcut;
 use WebGUI::SQL;
+use WebGUI::URL;
 use WebGUI::Utility;
 
 our @ISA = qw(Exporter);
@@ -68,7 +69,7 @@ sub www_search {
 			}
 		}
 		if ($row[0] ne "") {
-			($dataRows, $prevNextBar) = paginate(20,$session{page}{url}.'?op=search',\@row);
+			($dataRows, $prevNextBar) = paginate(20,WebGUI::URL::page('op=search'),\@row);
 			$output .= WebGUI::International::get(365).'<p><ol>';
 			$output .= $dataRows;
 			$output .= '</ol>'.$prevNextBar;

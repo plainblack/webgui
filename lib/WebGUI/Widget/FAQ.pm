@@ -20,6 +20,7 @@ use WebGUI::Privilege;
 use WebGUI::Session;
 use WebGUI::Shortcut;
 use WebGUI::SQL;
+use WebGUI::URL;
 use WebGUI::Widget;
 
 #-------------------------------------------------------------------
@@ -153,8 +154,11 @@ sub www_deleteQuestion {
         if (WebGUI::Privilege::canEditPage()) {
 		$output = '<h1>'.WebGUI::International::get(42).'</h1>';
 		$output .= WebGUI::International::get(7,$namespace).'<p>';
-		$output .= '<div align="center"><a href="'.$session{page}{url}.'?func=deleteQuestionConfirm&wid='.$session{form}{wid}.'&qid='.$session{form}{qid}.'">'.WebGUI::International::get(44).'</a>';
-		$output .= ' &nbsp; <a href="'.$session{page}{url}.'?func=edit&wid='.$session{form}{wid}.'">'.WebGUI::International::get(45).'</a></div>';
+		$output .= '<div align="center"><a href="'.
+			WebGUI::URL::page('func=deleteQuestionConfirm&wid='.$session{form}{wid}.
+			'&qid='.$session{form}{qid}).'">'.WebGUI::International::get(44).'</a>';
+		$output .= ' &nbsp; <a href="'.WebGUI::URL::page('func=edit&wid='.$session{form}{wid})
+			.'">'.WebGUI::International::get(45).'</a></div>';
                 return $output;
         } else {
                 return WebGUI::Privilege::insufficient();
@@ -187,19 +191,32 @@ sub www_edit {
                 $output .= WebGUI::Form::hidden("func","editSave");
                 $output .= '<table>';
                 $output .= tableFormRow(WebGUI::International::get(99),WebGUI::Form::text("title",20,128,$data{title}));
-                $output .= tableFormRow(WebGUI::International::get(174),WebGUI::Form::checkbox("displayTitle","1",$data{displayTitle}));
-                $output .= tableFormRow(WebGUI::International::get(175),WebGUI::Form::checkbox("processMacros","1",$data{processMacros}));
+                $output .= tableFormRow(WebGUI::International::get(174),
+			WebGUI::Form::checkbox("displayTitle","1",$data{displayTitle}));
+                $output .= tableFormRow(WebGUI::International::get(175),
+			WebGUI::Form::checkbox("processMacros","1",$data{processMacros}));
 		%hash = WebGUI::Widget::getPositions();
                 $array[0] = $data{templatePosition};
-                $output .= tableFormRow(WebGUI::International::get(363),WebGUI::Form::selectList("templatePosition",\%hash,\@array));
-                $output .= tableFormRow(WebGUI::International::get(85),WebGUI::Form::textArea("description",$data{description},'','',1));
+                $output .= tableFormRow(WebGUI::International::get(363),
+			WebGUI::Form::selectList("templatePosition",\%hash,\@array));
+                $output .= tableFormRow(WebGUI::International::get(85),
+			WebGUI::Form::textArea("description",$data{description},'','',1));
                 $output .= formSave();
                 $output .= '</table></form>';
-                $output .= '<p><a href="'.$session{page}{url}.'?func=addQuestion&wid='.$session{form}{wid}.'">'.WebGUI::International::get(9,$namespace).'</a><p>';
+                $output .= '<p><a href="'.WebGUI::URL::page('func=addQuestion&wid='.$session{form}{wid})
+			.'">'.WebGUI::International::get(9,$namespace).'</a><p>';
                 $output .= '<table border=1 cellpadding=3 cellspacing=0>';
 		$sth = WebGUI::SQL->read("select questionId,question from FAQ_question where widgetId='$session{form}{wid}' order by sequenceNumber");
 		while (@question = $sth->array) {
-                	$output .= '<tr><td><a href="'.$session{page}{url}.'?func=editQuestion&wid='.$session{form}{wid}.'&qid='.$question[0].'"><img src="'.$session{setting}{lib}.'/edit.gif" border=0></a><a href="'.$session{page}{url}.'?func=deleteQuestion&wid='.$session{form}{wid}.'&qid='.$question[0].'"><img src="'.$session{setting}{lib}.'/delete.gif" border=0></a><a href="'.$session{page}{url}.'?func=moveQuestionUp&wid='.$session{form}{wid}.'&qid='.$question[0].'"><img src="'.$session{setting}{lib}.'/upArrow.gif" border=0></a><a href="'.$session{page}{url}.'?func=moveQuestionDown&wid='.$session{form}{wid}.'&qid='.$question[0].'"><img src="'.$session{setting}{lib}.'/downArrow.gif" border=0></a></td><td>'.$question[1].'</td><tr>';
+                	$output .= '<tr><td><a href="'.WebGUI::URL::page('func=editQuestion&wid='.$session{form}{wid}.
+				'&qid='.$question[0]).'"><img src="'.$session{setting}{lib}.
+				'/edit.gif" border=0></a><a href="'.WebGUI::URL::page('func=deleteQuestion&wid='.
+				$session{form}{wid}.'&qid='.$question[0]).'"><img src="'.$session{setting}{lib}.
+				'/delete.gif" border=0></a><a href="'.WebGUI::URL::page('func=moveQuestionUp&wid='.
+				$session{form}{wid}.'&qid='.$question[0]).'"><img src="'.$session{setting}{lib}.
+				'/upArrow.gif" border=0></a><a href="'.WebGUI::URL::page('func=moveQuestionDown&wid='.
+				$session{form}{wid}.'&qid='.$question[0]).'"><img src="'.$session{setting}{lib}.
+				'/downArrow.gif" border=0></a></td><td>'.$question[1].'</td><tr>';
 		}
 		$sth->finish;
                 $output .= '</table>';

@@ -16,6 +16,7 @@ use FileHandle;
 use POSIX;
 use strict;
 use WebGUI::Session;
+use WebGUI::URL;
 use WebGUI::Utility;
 
 #-------------------------------------------------------------------
@@ -117,7 +118,7 @@ sub save {
 			$urlizedFilename =~ s/\./\_/g;
 			$urlizedFilename .= ".txt";
 		}
-		$urlizedFilename = urlize($urlizedFilename);
+		$urlizedFilename = WebGUI::URL::urlize($urlizedFilename);
 		$path = $session{setting}{attachmentDirectoryLocal}."/".$_[1]."/";
 		mkdir ($path,0755);
 		if ($_[2] ne "") {

@@ -20,6 +20,7 @@ use WebGUI::International;
 use WebGUI::Session;
 use WebGUI::SQL;
 use WebGUI::Template;
+use WebGUI::URL;
 
 our @ISA = qw(Exporter);
 our @EXPORT = qw(&getProperties &purgeWidget &www_jumpDown &www_jumpUp &update &www_moveUp &www_moveDown &www_delete &www_deleteConfirm &www_cut &create &www_paste);
@@ -87,14 +88,16 @@ sub www_cut {
 sub www_delete {
         my ($output);
         if (WebGUI::Privilege::canEditPage()) {
-                $output = '<a href="'.$session{page}{url}.'?op=viewHelp&hid=14"><img src="'.$session{setting}{lib}.'/help.gif" border="0" align="right"></a>';
+                $output = '<a href="'.WebGUI::URL::page('op=viewHelp&hid=14').'"><img src="'.
+			$session{setting}{lib}.'/help.gif" border="0" align="right"></a>';
 		$output .= '<h1>'.WebGUI::International::get(42).'</h1>';
                 $output .= WebGUI::International::get(43);
 		$output .= '<p>';
-                $output .= '<div align="center"><a href="'.$session{page}{url}.'?func=deleteConfirm&wid='.$session{form}{wid}.'">';
+                $output .= '<div align="center"><a href="'.WebGUI::URL::page('func=deleteConfirm&wid='.
+			$session{form}{wid}).'">';
 		$output .= WebGUI::International::get(44); 
 		$output .= '</a>';
-                $output .= '&nbsp;&nbsp;&nbsp;&nbsp;<a href="'.$session{page}{url}.'">';
+                $output .= '&nbsp;&nbsp;&nbsp;&nbsp;<a href="'.WebGUI::URL::page().'">';
 		$output .= WebGUI::International::get(45);
 		$output .= '</a></div>';
                 return $output;

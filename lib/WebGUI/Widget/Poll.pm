@@ -19,6 +19,7 @@ use WebGUI::Privilege;
 use WebGUI::Session;
 use WebGUI::Shortcut;
 use WebGUI::SQL;
+use WebGUI::URL;
 use WebGUI::Utility;
 use WebGUI::Widget;
 
@@ -185,7 +186,8 @@ sub www_edit {
                 $output .= tableFormRow(WebGUI::International::get(7,$namespace).'<span><br>'.WebGUI::International::get(8,$namespace).'</span>',
 			WebGUI::Form::textArea("answers",$data{a1}."\n".$data{a2}."\n".$data{a3}."\n".$data{a4}."\n".$data{a5}."\n".$data{a6}."\n".$data{a7}."\n".$data{a8}."\n".$data{a9}."\n".$data{a10}."\n".$data{a11}."\n".$data{a12}."\n".$data{a13}."\n".$data{a14}."\n".$data{a15}."\n".$data{a16}."\n".$data{a17}."\n".$data{a18}."\n".$data{a19}."\n".$data{a20}."\n",50,8,0,'on'));
                 $output .= formSave();
-		$output .= tableFormRow("",'<a href="'.$session{page}{url}.'?func=resetVotes&wid='.$session{form}{wid}.'">'.WebGUI::International::get(10,$namespace).'</a>');
+		$output .= tableFormRow("",'<a href="'.WebGUI::URL::page('func=resetVotes&wid='.$session{form}{wid})
+			.'">'.WebGUI::International::get(10,$namespace).'</a>');
                 $output .= '</table></form>';
                 return $output;
         } else {

@@ -21,6 +21,7 @@ use WebGUI::Privilege;
 use WebGUI::Session;
 use WebGUI::Shortcut;
 use WebGUI::SQL;
+use WebGUI::URL;
 use WebGUI::Widget;
 
 #-------------------------------------------------------------------
@@ -29,9 +30,11 @@ sub duplicate {
         tie %data, 'Tie::CPHash';
         %data = getProperties($namespace,$_[0]);
 	$pageId = $_[1] || $data{pageId};
-        $newWidgetId = create($pageId,$namespace,$data{title},$data{displayTitle},$data{description},$data{processMacros},$data{templatePosition});
+        $newWidgetId = create($pageId,$namespace,$data{title},
+		$data{displayTitle},$data{description},$data{processMacros},$data{templatePosition});
         WebGUI::Attachment::copy($data{attachment},$_[0],$newWidgetId);
-	WebGUI::SQL->write("insert into Item values ($newWidgetId, ".quote($data{description}).", ".quote($data{linkURL}).", ".quote($data{attachment}).")");
+	WebGUI::SQL->write("insert into Item values ($newWidgetId, ".
+		quote($data{description}).", ".quote($data{linkURL}).", ".quote($data{attachment}).")");
 }
 
 #-------------------------------------------------------------------
@@ -118,16 +121,23 @@ sub www_edit {
                 $output .= WebGUI::Form::hidden("func","editSave");
                 $output .= '<table>';
                 $output .= tableFormRow(WebGUI::International::get(99),WebGUI::Form::text("title",20,30,$data{title}));
-		$output .= tableFormRow(WebGUI::International::get(175),WebGUI::Form::checkbox("processMacros","1",$data{processMacros}));
+		$output .= tableFormRow(WebGUI::International::get(175),
+			WebGUI::Form::checkbox("processMacros","1",$data{processMacros}));
 		%hash = WebGUI::Widget::getPositions();
                 $array[0] = $data{templatePosition};
-                $output .= tableFormRow(WebGUI::International::get(363),WebGUI::Form::selectList("templatePosition",\%hash,\@array));
-                $output .= tableFormRow(WebGUI::International::get(85),WebGUI::Form::textArea("description",$data{description}));
-                $output .= tableFormRow(WebGUI::International::get(1,$namespace),WebGUI::Form::text("linkURL",20,2048,$data{linkURL}));
+                $output .= tableFormRow(WebGUI::International::get(363),
+			WebGUI::Form::selectList("templatePosition",\%hash,\@array));
+                $output .= tableFormRow(WebGUI::International::get(85),
+			WebGUI::Form::textArea("description",$data{description}));
+                $output .= tableFormRow(WebGUI::International::get(1,$namespace),
+			WebGUI::Form::text("linkURL",20,2048,$data{linkURL}));
 		if ($data{attachment} ne "") {
-                	$output .= tableFormRow(WebGUI::International::get(2,$namespace),'<a href="'.$session{page}{url}.'?func=deleteAttachment&wid='.$session{form}{wid}.'">'.WebGUI::International::get(3,$namespace).'</a>');
+                	$output .= tableFormRow(WebGUI::International::get(2,$namespace),'<a href="'.
+				WebGUI::URL::page('func=deleteAttachment&wid='.$session{form}{wid})
+				.'">'.WebGUI::International::get(3,$namespace).'</a>');
 		} else {
-                	$output .= tableFormRow(WebGUI::International::get(2,$namespace),WebGUI::Form::file("attachment"));
+                	$output .= tableFormRow(WebGUI::International::get(2,$namespace),
+				WebGUI::Form::file("attachment"));
 		}
                 $output .= formSave();
                 $output .= '</table></form>';

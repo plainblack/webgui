@@ -16,6 +16,7 @@ use Tie::CPHash;
 use WebGUI::International;
 use WebGUI::Session;
 use WebGUI::SQL;
+use WebGUI::URL;
 
 our @ISA = qw(Exporter);
 our @EXPORT = qw(&www_viewHelp &www_viewHelpIndex);
@@ -31,16 +32,19 @@ sub www_viewHelp {
 	$output .= '<p><b>'.WebGUI::International::get(94).':';
         $sth = WebGUI::SQL->read("select helpId, action, object, namespace from help where object='$help{object}' and action<>'$help{action}' and language='$session{user}{language}' order by action");
         while (@data = $sth->array) {
-                $output .= ' <a href="'.$session{page}{url}.'?op=viewHelp&hid='.$data[0].'&namespace='.$data[3].'">'.$data[1].' '.$data[2].'</a>,';
+                $output .= ' <a href="'.WebGUI::URL::page('op=viewHelp&hid='.$data[0].'&namespace='.$data[3])
+			.'">'.$data[1].' '.$data[2].'</a>,';
         }
         $sth->finish;
         $sth = WebGUI::SQL->read("select helpId, namespace from helpSeeAlso where seeAlsoId in ($help{seeAlso})");
         while (@data = $sth->array) {
 		%seeAlso = WebGUI::SQL->quickHash("select helpId,namespace,action,object from help where helpId='$data[0]' and namespace='$data[1]' and language='$session{user}{language}'");
-                $output .= ' <a href="'.$session{page}{url}.'?op=viewHelp&hid='.$seeAlso{helpId}.'&namespace='.$seeAlso{namespace}.'">'.$seeAlso{action}.' '.$seeAlso{object}.'</a>,';
+                $output .= ' <a href="'.
+			WebGUI::URL::page('op=viewHelp&hid='.$seeAlso{helpId}.'&namespace='.$seeAlso{namespace})
+			.'">'.$seeAlso{action}.' '.$seeAlso{object}.'</a>,';
         }
         $sth->finish;
-        $output .= ' <a href="'.$session{page}{url}.'?op=viewHelpIndex">'.WebGUI::International::get(95).'</a>';
+        $output .= ' <a href="'.WebGUI::URL::page('op=viewHelpIndex').'">'.WebGUI::International::get(95).'</a>';
         return $output;
 }
 
@@ -55,7 +59,8 @@ sub www_viewHelpIndex {
 			$output .= '<p><b>'.$data[1].'</b><br>';
 			$previous = $data[1];
 		} 
-		$output .= '<li><a href="'.$session{page}{url}.'?op=viewHelp&hid='.$data[0].'&namespace='.$data[3].'">'.$data[2].'</a><br>';
+		$output .= '<li><a href="'.WebGUI::URL::page('op=viewHelp&hid='.$data[0].'&namespace='.$data[3])
+			.'">'.$data[2].'</a><br>';
 	}
 	$sth->finish;
 	$output .= '</td><td valign="top"><b>'.WebGUI::International::get(97).'</b><p>';
@@ -65,7 +70,8 @@ sub www_viewHelpIndex {
                         $output .= '<p><b>'.$data[1].'</b><br>';
                         $previous = $data[1];
                 }
-                $output .= '<li><a href="'.$session{page}{url}.'?op=viewHelp&hid='.$data[0].'&namespace='.$data[3].'">'.$data[2].'</a><br>';
+                $output .= '<li><a href="'.WebGUI::URL::page('op=viewHelp&hid='.$data[0].'&namespace='.$data[3])
+			.'">'.$data[2].'</a><br>';
         }
         $sth->finish;
 	$output .= '</td></tr></table>';

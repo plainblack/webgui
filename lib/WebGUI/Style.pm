@@ -28,7 +28,7 @@ sub getStyle {
 	} else {
 		tie %style, 'Tie::CPHash';
 		%style = WebGUI::SQL->quickHash("select header,footer,styleSheet from style where styleId=$session{page}{styleId}");
-		$header = '<!-- WebGUI '.$WebGUI::VERSION.' -->
+		$header = $session{setting}{docTypeDec}."\n".'<!-- WebGUI '.$WebGUI::VERSION.' -->
 			<html>
 			<head>
 			<title>';

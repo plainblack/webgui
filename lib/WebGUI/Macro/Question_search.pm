@@ -14,12 +14,13 @@ use strict;
 use WebGUI::Form;
 use WebGUI::International;
 use WebGUI::Session;
+use WebGUI::URL;
 
 #-------------------------------------------------------------------
 sub process {
 	my ($output, $temp);
 	$output = $_[0];
-        $temp = '<form class="searchBox" method="post" action="'.$session{page}{url}.'">';
+        $temp = '<form class="searchBox" method="post" action="'.WebGUI::URL::page().'">';
         $temp .= WebGUI::Form::hidden("op","search");
         $temp .= WebGUI::Form::text("keywords",10,100,$session{form}{keywords});
         $temp .= WebGUI::Form::submit(WebGUI::International::get(364));

@@ -14,12 +14,13 @@ use strict;
 use WebGUI::International;
 use WebGUI::Macro;
 use WebGUI::Session;
+use WebGUI::URL;
 
 #-------------------------------------------------------------------
 sub _replacement {
 	my (@param, $temp);
         @param = WebGUI::Macro::getParams($_[0]);
-        $temp = '<a class="myAccountLink" href="'.$session{page}{url}.'?op=displayAccount">';
+        $temp = '<a class="myAccountLink" href="'.WebGUI::URL::page('op=displayAccount').'">';
         if ($param[0] ne "") {
         	$temp .= $param[0];
         } else {

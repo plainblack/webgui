@@ -22,6 +22,7 @@ use WebGUI::Privilege;
 use WebGUI::Session;
 use WebGUI::Shortcut;
 use WebGUI::SQL;
+use WebGUI::URL;
 use WebGUI::Utility;
 use WebGUI::Widget;
 
@@ -254,12 +255,10 @@ sub www_deleteDownload {
                 $output = '<h1>'.WebGUI::International::get(42).'</h1>';
                 $output .= WebGUI::International::get(12,$namespace).'<p>';
                 $output .= '<div align="center">'.
-			'<a href="'.$session{page}{url}.
-			'?func=deleteDownloadConfirm&wid='.
-			$session{form}{wid}.'&did='.$session{form}{did}.'">'.
+			'<a href="'.WebGUI::URL::page('func=deleteDownloadConfirm&wid='.
+			$session{form}{wid}.'&did='.$session{form}{did}).'">'.
 			WebGUI::International::get(44).'</a>';
-                $output .= ' &nbsp; <a href="'.$session{page}{url}.
-			'?func=edit&wid='.$session{form}{wid}.'">'.
+                $output .= ' &nbsp; <a href="'.WebGUI::URL::page('func=edit&wid='.$session{form}{wid}).'">'.
 			WebGUI::International::get(45).'</a></div>';
                 return $output;
         } else {
@@ -337,24 +336,23 @@ sub www_edit {
                         );
                 $output .= formSave();
                 $output .= '</table></form>';
-		$output .= '<p><a href="'.$session{page}{url}.'?func=addDownload&wid='.
-			$session{form}{wid}.'">'.WebGUI::International::get(11,$namespace).'</a><p>';
+		$output .= '<p><a href="'.WebGUI::URL::page('func=addDownload&wid='.$session{form}{wid})
+			.'">'.WebGUI::International::get(11,$namespace).'</a><p>';
                 $output .= '<table border=1 cellpadding=3 cellspacing=0>';
                 $sth = WebGUI::SQL->read("select downloadId,fileTitle from DownloadManager_file where widgetId='$session{form}{wid}' order by sequenceNumber");
                 while (@download = $sth->array) {
-                        $output .= '<tr><td><a href="'.$session{page}{url}.
-				'?func=editDownload&wid='.$session{form}{wid}.
-				'&did='.$download[0].'"><img src="'.
+                        $output .= '<tr><td><a href="'.
+				WebGUI::URL::page('func=editDownload&wid='.$session{form}{wid}.'&did='.$download[0])
+				.'"><img src="'.
 				$session{setting}{lib}.'/edit.gif" border=0></a><a href="'.
-				$session{page}{url}.'?func=deleteDownload&wid='.
-				$session{form}{wid}.'&did='.$download[0].'"><img src="'.
+				WebGUI::URL::page('func=deleteDownload&wid='.$session{form}{wid}.'&did='.$download[0])
+				.'"><img src="'.
 				$session{setting}{lib}.'/delete.gif" border=0></a><a href="'.
-				$session{page}{url}.'?func=moveDownloadUp&wid='.
-				$session{form}{wid}.'&did='.$download[0].'"><img src="'.
+				WebGUI::URL::page('func=moveDownloadUp&wid='.$session{form}{wid}.'&did='.$download[0])
+				.'"><img src="'.
 				$session{setting}{lib}.'/upArrow.gif" border=0></a><a href="'.
-				$session{page}{url}.'?func=moveDownloadDown&wid='.
-				$session{form}{wid}.'&did='.$download[0].
-				'"><img src="'.$session{setting}{lib}.
+				WebGUI::URL::page('func=moveDownloadDown&wid='.$session{form}{wid}.'&did='.$download[0])
+				.'"><img src="'.$session{setting}{lib}.
 				'/downArrow.gif" border=0></a></td><td>'.$download[1].'</td><tr>';
                 }
                 $sth->finish;
@@ -391,8 +389,8 @@ sub www_editDownload {
 		if ($download{downloadFile} ne "") {
                         $output .= tableFormRow(
 				WebGUI::International::get(6,$namespace),
-				'<a href="'.$session{page}{url}.'?func=deleteFile&wid='.
-				$session{form}{wid}.'&did='.$session{form}{did}.'">'.
+				'<a href="'.WebGUI::URL::page('func=deleteFile&wid='.
+				$session{form}{wid}.'&did='.$session{form}{did}).'">'.
 				WebGUI::International::get(13,$namespace).'</a>
 				');
                 } else {
@@ -404,8 +402,8 @@ sub www_editDownload {
                 if ($download{alternateVersion1} ne "") {
                         $output .= tableFormRow(
                                 WebGUI::International::get(17,$namespace),
-                                '<a href="'.$session{page}{url}.'?func=deleteFile&alt=1&wid='.
-                                $session{form}{wid}.'&did='.$session{form}{did}.'">'.
+                                '<a href="'.WebGUI::URL::page('func=deleteFile&alt=1&wid='.
+                                $session{form}{wid}.'&did='.$session{form}{did}).'">'.
                                 WebGUI::International::get(13,$namespace).'</a>
                                 ');
                 } else {
@@ -417,8 +415,8 @@ sub www_editDownload {
                 if ($download{alternateVersion2} ne "") {
                         $output .= tableFormRow(
                                 WebGUI::International::get(18,$namespace),
-                                '<a href="'.$session{page}{url}.'?func=deleteFile&alt=2&wid='.
-                                $session{form}{wid}.'&did='.$session{form}{did}.'">'.
+                                '<a href="'.WebGUI::URL::page('func=deleteFile&alt=2&wid='.
+                                $session{form}{wid}.'&did='.$session{form}{did}).'">'.
                                 WebGUI::International::get(13,$namespace).'</a>
                                 ');
                 } else {
@@ -513,41 +511,69 @@ sub www_moveDownloadUp {
 
 #-------------------------------------------------------------------
 sub www_view {
-        my (@row, $i, $dataRows, $prevNextBar, %data, @test, %fileType, $output, $sth, %download, $flag);
+        my ($url, @row, $i, $dataRows, $search, $prevNextBar, %data, @test, %fileType, $output, $sth, 
+		%download, $flag, $sort, $sortDirection);
         tie %download, 'Tie::CPHash';
         tie %data, 'Tie::CPHash';
         %data = getProperties($namespace,$_[0]);
         if (defined %data) {
+		$url = WebGUI::URL::page();
                 if ($data{displayTitle} == 1) {
                         $output .= '<h1>'.$data{title}.'</h1>';
                 }
 		if ($data{description} ne "") {
                 	$output .= $data{description}.'<p>';
 		}
+		$output .= formHeader();
+                $output .= WebGUI::Form::text("keyword",20,50);
+                $output .= WebGUI::Form::submit(WebGUI::International::get(170));
+                $output .= '</form>';
 		$output .= '<table cellpadding="3" cellspacing="1" border="0" width="100%">';
-		$output .= '<tr><td class="tableHeader">'.WebGUI::International::get(14,$namespace).
-			'</td><td class="tableHeader">'.WebGUI::International::get(15,$namespace).
-			'</td><td class="tableHeader">'.WebGUI::International::get(16,$namespace).'</td></tr>';
-		$sth = WebGUI::SQL->read("select * from DownloadManager_file where widgetId=$_[0] order by sequenceNumber");
+		if ($session{form}{keyword} ne "") {
+                        $search = " and (fileTitle like '%".$session{form}{keyword}.
+				"%' or downloadFile like '%".$session{form}{keyword}.
+				"%' or alternateVersion1 like '%".$session{form}{keyword}.
+				"%' or alternateVersion2 like '%".$session{form}{keyword}.
+				"%' or briefSynopsis like '%".$session{form}{keyword}."%') ";
+			$url = WebGUI::URL::append($url,"keyword=".$session{form}{keyword});
+                }
+		if ($session{form}{sort} ne "") {
+			$sort = " order by ".$session{form}{sort};
+			$url = WebGUI::URL::append($url,"sort=".$session{form}{sort});
+		} else {
+			$sort = " order by sequenceNumber";
+		}
+		if ($session{form}{sortDirection} ne "") {
+			$sortDirection = $session{form}{sortDirection};
+			$url = WebGUI::URL::append($url,"sortDirection=".$session{form}{sortDirection});
+		}
+                $output .= '<tr><td class="tableHeader">'.
+			sortByColumn("fileTitle",WebGUI::International::get(14,$namespace)).
+			'</td><td class="tableHeader">'.
+			sortByColumn("briefSynopsis",WebGUI::International::get(15,$namespace)).
+			'</td><td class="tableHeader">'.
+			sortByColumn("dateUploaded",WebGUI::International::get(16,$namespace)).
+			'</td></tr>';
+		$sth = WebGUI::SQL->read("select * from DownloadManager_file where widgetId=$_[0] $search $sort $sortDirection");
 		while (%download = $sth->hash) {
 			if (WebGUI::Privilege::isInGroup($download{groupToView})) {
 				%fileType = WebGUI::Attachment::getType($download{downloadFile});
 				$row[$i] = '<tr><td class="tableData" valign="top">';
-				$row[$i] .= '<a href="'.$session{page}{url}.'?func=download&wid='.$_[0].
-					'&did='.$download{downloadId}.'"><img src="'.$fileType{icon}.
+				$row[$i] .= '<a href="'.WebGUI::URL::page('func=download&wid='.$_[0].
+					'&did='.$download{downloadId}).'"><img src="'.$fileType{icon}.
 					'" border=0 width=16 height=16 align="middle">'.
 					$download{fileTitle}.' ('.$fileType{extension}.')</a>';
 				if ($download{alternateVersion1}) {
 					%fileType = WebGUI::Attachment::getType($download{alternateVersion1});
-                                	$row[$i] .= ' &middot; <a href="'.$session{page}{url}.'?func=download&wid='.
-						$_[0].'&did='.$download{downloadId}.'"><img src="'.$fileType{icon}.
+                                	$row[$i] .= ' &middot; <a href="'.WebGUI::URL::page('func=download&wid='.
+						$_[0].'&did='.$download{downloadId}).'"><img src="'.$fileType{icon}.
                                         	'" border=0 width=16 height=16 align="middle">('.
                                         	$fileType{extension}.')</a>';
 				}
 				if ($download{alternateVersion2}) {
 					%fileType = WebGUI::Attachment::getType($download{alternateVersion2});
-                                	$row[$i] .= ' &middot; <a href="'.$session{page}{url}.'?func=download&wid='.
-						$_[0].'&did='.$download{downloadId}.'"><img src="'.$fileType{icon}.
+                                	$row[$i] .= ' &middot; <a href="'.WebGUI::URL::page('func=download&wid='.
+						$_[0].'&did='.$download{downloadId}).'"><img src="'.$fileType{icon}.
                                         	'" border=0 width=16 height=16 align="middle">('.
                                         	$fileType{extension}.')</a>';
 				}
@@ -564,7 +590,7 @@ sub www_view {
 			$output .= '<tr><td class="tableData" colspan="3">'.
 				WebGUI::International::get(19,$namespace).'</td></tr>';
 		}
-		($dataRows, $prevNextBar) = paginate($data{paginateAfter},$session{page}{url},\@row);
+		($dataRows, $prevNextBar) = paginate($data{paginateAfter},$url,\@row);
                 $output .= $dataRows;
                 $output .= '</table>';
                 $output .= $prevNextBar;

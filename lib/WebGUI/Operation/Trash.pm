@@ -16,6 +16,7 @@ use WebGUI::Privilege;
 use WebGUI::Session;
 use WebGUI::Shortcut;
 use WebGUI::SQL;
+use WebGUI::URL;
 
 our @ISA = qw(Exporter);
 our @EXPORT = qw(&www_purgeTrash &www_purgeTrashConfirm);
@@ -50,8 +51,10 @@ sub www_purgeTrash {
                 $output = helpLink(46);
 		$output .= '<h1>'.WebGUI::International::get(42).'</h1>';
                 $output .= WebGUI::International::get(162).'<p>';
-                $output .= '<div align="center"><a href="'.$session{page}{url}.'?op=purgeTrashConfirm">'.WebGUI::International::get(44).'</a>';
-                $output .= '&nbsp;&nbsp;&nbsp;&nbsp;<a href="'.$session{page}{url}.'">'.WebGUI::International::get(45).'</a></div>';
+                $output .= '<div align="center"><a href="'.WebGUI::URL::page('op=purgeTrashConfirm').
+			'">'.WebGUI::International::get(44).'</a>';
+                $output .= '&nbsp;&nbsp;&nbsp;&nbsp;<a href="'.WebGUI::URL::page().'">'.
+			WebGUI::International::get(45).'</a></div>';
                 return $output;
         } else {
                 return WebGUI::Privilege::adminOnly();

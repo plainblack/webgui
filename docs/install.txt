@@ -22,6 +22,8 @@ QnD INSTALL INSTRUCTIONS:
    Digest::MD5
    Net::LDAP
    Tie::CPHash
+   Date::Calc
+   HTML::CalendarMonthSimple
 
 3. Install Apache (with or without mod_perl) and set up your config.
 

@@ -15,6 +15,7 @@ use Tie::CPHash;
 use WebGUI::Privilege;
 use WebGUI::Session;
 use WebGUI::SQL;
+use WebGUI::URL;
 
 our @ISA = qw(Exporter);
 our @EXPORT = qw(&traversePageTree);
@@ -40,7 +41,7 @@ sub traversePageTree {
         	while (@data = $sth->array) {
                 	if (WebGUI::Privilege::canViewPage($data[2])) {
                         	$output .= $depth.'<a class="verticalMenu" href="'.
-					$session{config}{scripturl}.'/'.$data[0].'">'.$data[1].'</a><br>';
+					WebGUI::URL::gateway($data[0]).'">'.$data[1].'</a><br>';
                         	$output .= traversePageTree($data[2],$_[1]+1,$toLevel);
                 	}
         	}

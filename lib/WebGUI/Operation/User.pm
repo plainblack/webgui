@@ -21,6 +21,7 @@ use WebGUI::Privilege;
 use WebGUI::Session;
 use WebGUI::Shortcut;
 use WebGUI::SQL;
+use WebGUI::URL;
 use WebGUI::Utility;
 
 our @ISA = qw(Exporter);
@@ -122,8 +123,11 @@ sub www_deleteUser {
                 $output .= helpLink(7);
 		$output .= '<h1>'.WebGUI::International::get(42).'</h1>';
                 $output .= WebGUI::International::get(167).'<p>';
-                $output .= '<div align="center"><a href="'.$session{page}{url}.'?op=deleteUserConfirm&uid='.$session{form}{uid}.'">'.WebGUI::International::get(44).'</a>';
-                $output .= '&nbsp;&nbsp;&nbsp;&nbsp;<a href="'.$session{page}{url}.'?op=listUsers">'.WebGUI::International::get(45).'</a></div>'; 
+                $output .= '<div align="center"><a href="'.
+			WebGUI::URL::page('op=deleteUserConfirm&uid='.$session{form}{uid}).
+			'">'.WebGUI::International::get(44).'</a>';
+                $output .= '&nbsp;&nbsp;&nbsp;&nbsp;<a href="'.WebGUI::URL::page('op=listUsers').'">'.
+			WebGUI::International::get(45).'</a></div>'; 
 		return $output;
         } else {
                 return WebGUI::Privilege::adminOnly();
@@ -250,11 +254,11 @@ sub www_editUser {
                 $output .= '<table><tr><td class="tableHeader">'.WebGUI::International::get(89).'</td><td class="tableHeader">'.WebGUI::International::get(84).'</td><td class="tableHeader">'.WebGUI::International::get(369).'</td></tr>';
                 $sth = WebGUI::SQL->read("select groups.groupId,groups.groupName,groupings.expireDate from groupings,groups where groupings.groupId=groups.groupId and groupings.userId=$session{form}{uid} order by groups.groupName");
                 while (%hash = $sth->hash) {
-                        $output .= '<tr><td><a href="'.$session{page}{url}.'?op=deleteGrouping&uid='.
-				$session{form}{uid}.'&gid='.$hash{groupId}.'"><img src="'.
+                        $output .= '<tr><td><a href="'.WebGUI::URL::page('op=deleteGrouping&uid='.
+				$session{form}{uid}.'&gid='.$hash{groupId}).'"><img src="'.
 				$session{setting}{lib}.'/delete.gif" border=0></a><a href="'.
-				$session{page}{url}.'?op=editGrouping&uid='.$session{form}{uid}.
-				'&gid='.$hash{groupId}.'"><img src="'.$session{setting}{lib}.
+				WebGUI::URL::page('op=editGrouping&uid='.$session{form}{uid}.
+				'&gid='.$hash{groupId}).'"><img src="'.$session{setting}{lib}.
 				'/edit.gif" border=0></a></td>';
                         $output .= '<td class="tableData">'.$hash{groupName}.'</td>';
 			$output .= '<td class="tableData">'.epochToHuman($hash{expireDate},"%M/%D/%y").'</td></tr>';
@@ -312,7 +316,7 @@ sub www_listUsers {
 		$output = helpLink(8);
 		$output .= '<h1>'.WebGUI::International::get(149).'</h1>';
 		$output .= '<table class="tableData" align="center" width="75%"><tr><td>';
-		$output .= '<a href="'.$session{page}{url}.'?op=addUser">'.WebGUI::International::get(169).'</a>';
+		$output .= '<a href="'.WebGUI::URL::page('op=addUser').'">'.WebGUI::International::get(169).'</a>';
 		$output .= '</td>'.formHeader().'<td align="right">';
 		$output .= WebGUI::Form::hidden("op","listUsers");
 		$output .= WebGUI::Form::text("keyword",20,50);
@@ -324,17 +328,21 @@ sub www_listUsers {
 		$sth = WebGUI::SQL->read("select userId,username,email from users where username<>'Reserved' $search order by username");
 		while (@data = $sth->array) {
 			$row[$i] = '<tr class="tableData"><td>';
-			$row[$i] .= '<a href="'.$session{page}{url}.'?op=deleteUser&uid='.$data[0].'"><img src="'.$session{setting}{lib}.'/delete.gif" border=0></a>';
-			$row[$i] .= '<a href="'.$session{page}{url}.'?op=editUser&uid='.$data[0].'"><img src="'.$session{setting}{lib}.'/edit.gif" border=0></a>';
-			$row[$i] .= '<a href="'.$session{page}{url}.'?op=becomeUser&uid='.$data[0].'"><img src="'.$session{setting}{lib}.'/become.gif" border=0></a>';
+			$row[$i] .= '<a href="'.WebGUI::URL::page('op=deleteUser&uid='.$data[0]).
+				'"><img src="'.$session{setting}{lib}.'/delete.gif" border=0></a>';
+			$row[$i] .= '<a href="'.WebGUI::URL::page('op=editUser&uid='.$data[0]).
+				'"><img src="'.$session{setting}{lib}.'/edit.gif" border=0></a>';
+			$row[$i] .= '<a href="'.WebGUI::URL::page('op=becomeUser&uid='.$data[0]).
+				'"><img src="'.$session{setting}{lib}.'/become.gif" border=0></a>';
 			$row[$i] .= '</td>';
-			$row[$i] .= '<td><a href="'.$session{page}{url}.'?op=viewProfile&uid='.$data[0].'">'.$data[1].'</a></td>';
+			$row[$i] .= '<td><a href="'.WebGUI::URL::page('?op=viewProfile&uid='.$data[0])
+				.'">'.$data[1].'</a></td>';
 			#$row[$i] .= '<td>'.$data[1].'</td>';
 			$row[$i] .= '<td><a href="mailto:'.$data[2].'">'.$data[2].'</a></td></tr>';
 			$i++;
 		}
 		$sth->finish;
-                ($dataRows, $prevNextBar) = paginate(50,$session{page}{url}.'?op=listUsers',\@row);
+                ($dataRows, $prevNextBar) = paginate(50,WebGUI::URL::page('?op=listUsers'),\@row);
                 $output .= '<table border=1 cellpadding=5 cellspacing=0 align="center">';
                 $output .= $dataRows;
                 $output .= '</table>';

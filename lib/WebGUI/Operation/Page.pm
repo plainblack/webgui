@@ -19,6 +19,7 @@ use WebGUI::Session;
 use WebGUI::Shortcut;
 use WebGUI::SQL;
 use WebGUI::Template;
+use WebGUI::URL;
 use WebGUI::Utility;
 
 our @ISA = qw(Exporter);
@@ -90,7 +91,7 @@ sub www_addPageSave {
 		if ($session{form}{title} eq "") {
 			$session{form}{title} = "no title";
 		}
-		$urlizedTitle = urlize($session{form}{title});
+		$urlizedTitle = WebGUI::URL::urlize($session{form}{title});
 		while (($test) = WebGUI::SQL->quickArray("select urlizedTitle from page where urlizedTitle='$urlizedTitle'")) {
 			$urlizedTitle .= 2;
 		}
@@ -124,8 +125,10 @@ sub www_deletePage {
 		$output .= helpLink(3);
 		$output .= '<h1>'.WebGUI::International::get(42).'</h1>';
 		$output .= WebGUI::International::get(101).'<p>';
-		$output .= '<div align="center"><a href="'.$session{page}{url}.'?op=deletePageConfirm">'.WebGUI::International::get(44).'</a>';
-		$output .= '&nbsp;&nbsp;&nbsp;&nbsp;<a href="'.$session{page}{url}.'">'.WebGUI::International::get(45).'</a></div>';
+		$output .= '<div align="center"><a href="'.WebGUI::URL::page('op=deletePageConfirm').
+			'">'.WebGUI::International::get(44).'</a>';
+		$output .= '&nbsp;&nbsp;&nbsp;&nbsp;<a href="'.WebGUI::URL::page().'">'.
+			WebGUI::International::get(45).'</a></div>';
 		return $output;
 	} else {
 		return WebGUI::Privilege::insufficient();
@@ -158,30 +161,44 @@ sub www_editPage {
                 $output .= WebGUI::Form::hidden("op","editPageSave");
                 $output .= '<table>';
 		$output .= '<tr><td colspan=2><b>'.WebGUI::International::get(103).'</b></td></tr>';
-                $output .= tableFormRow(WebGUI::International::get(99),WebGUI::Form::text("title",20,128,$session{page}{title}));
-                $output .= tableFormRow(WebGUI::International::get(104),WebGUI::Form::text("urlizedTitle",20,128,$session{page}{urlizedTitle}));
+                $output .= tableFormRow(WebGUI::International::get(99),
+			WebGUI::Form::text("title",20,128,$session{page}{title}));
+                $output .= tableFormRow(WebGUI::International::get(104),
+			WebGUI::Form::text("urlizedTitle",20,128,$session{page}{urlizedTitle}));
 		%hash = sortHash(WebGUI::Template::getList());
                 $array[0] = $session{page}{template};
                 $output .= '<script language="JavaScript"> function updateTemplateImage(template) { document.template.src = "'.$session{setting}{lib}.'/templates/"+template+".gif"; } </script>';
-                $output .= tableFormRow(WebGUI::International::get(356),WebGUI::Form::selectList("template",\%hash,\@array,1,0,"updateTemplateImage(this.form.template.value)").'<br><img src="'.$session{setting}{lib}.'/templates/'.$session{page}{template}.'.gif" name="template">');
+                $output .= tableFormRow(WebGUI::International::get(356),
+			WebGUI::Form::selectList("template",\%hash,\@array,1,0,"updateTemplateImage(this.form.template.value)").'<br><img src="'.$session{setting}{lib}.'/templates/'.$session{page}{template}.'.gif" name="template">');
                 $output .= tableFormRow(WebGUI::International::get(100),WebGUI::Form::textArea("metaTags",$session{page}{metaTags}));
                 $output .= tableFormRow(WebGUI::International::get(307),WebGUI::Form::checkbox("defaultMetaTags",1,$session{page}{defaultMetaTags}));
 		$output .= '<tr><td colspan=2><hr size=1><b>'.WebGUI::International::get(105).'</b></td></tr>';
 		%hash = WebGUI::SQL->buildHash("select styleId,name from style where name<>'Reserved' order by name");
 		$array[0] = $session{page}{styleId};
-                $output .= tableFormRow(WebGUI::International::get(105),WebGUI::Form::selectList("styleId",\%hash,\@array).' <span class="formSubtext"><a href="'.$session{page}{url}.'?op=listStyles">'.WebGUI::International::get(6).'</a></span>');
+                $output .= tableFormRow(WebGUI::International::get(105),
+			WebGUI::Form::selectList("styleId",\%hash,\@array).
+			' <span class="formSubtext"><a href="'.WebGUI::URL::page('op=listStyles').
+			'">'.WebGUI::International::get(6).'</a></span>');
                 $output .= tableFormRow("",WebGUI::Form::checkbox("recurseStyle","yes").' <span class="formSubtext">'.WebGUI::International::get(106).'</span>');
 		$output .= '<tr><td colspan=2><hr size=1><b>'.WebGUI::International::get(107).'</b></td></tr>';
 		%hash = WebGUI::SQL->buildHash("select users.userId,users.username from users,groupings where groupings.groupId=4 and groupings.userId=users.userId order by users.username");
 		$array[0] = $session{page}{ownerId};
-                $output .= tableFormRow(WebGUI::International::get(108),WebGUI::Form::selectList("ownerId",\%hash,\@array).' <span class="formSubtext"><a href="'.$session{page}{url}.'?op=listUsers">'.WebGUI::International::get(7).'</a></span>');
+                $output .= tableFormRow(WebGUI::International::get(108),
+			WebGUI::Form::selectList("ownerId",\%hash,\@array).
+			' <span class="formSubtext"><a href="'.WebGUI::URL::page('op=listUsers').'">'.
+			WebGUI::International::get(7).'</a></span>');
 		$array[0] = $session{page}{ownerView};
-                $output .= tableFormRow(WebGUI::International::get(109),WebGUI::Form::selectList("ownerView",\%yesNo,\@array));
+                $output .= tableFormRow(WebGUI::International::get(109),
+			WebGUI::Form::selectList("ownerView",\%yesNo,\@array));
 		$array[0] = $session{page}{ownerEdit};
-                $output .= tableFormRow(WebGUI::International::get(110),WebGUI::Form::selectList("ownerEdit",\%yesNo,\@array));
+                $output .= tableFormRow(WebGUI::International::get(110),
+			WebGUI::Form::selectList("ownerEdit",\%yesNo,\@array));
 		%hash = WebGUI::SQL->buildHash("select groupId,groupName from groups where groupName<>'Reserved' order by groupName");
 		$array[0] = $session{page}{groupId};
-                $output .= tableFormRow(WebGUI::International::get(111),WebGUI::Form::selectList("groupId",\%hash,\@array).' <span class="formSubtext"><a href="'.$session{page}{url}.'?op=listGroups">'.WebGUI::International::get(5).'</a></span>');
+                $output .= tableFormRow(WebGUI::International::get(111),
+			WebGUI::Form::selectList("groupId",\%hash,\@array).
+			' <span class="formSubtext"><a href="'.WebGUI::URL::page('op=listGroups').'">'.
+			WebGUI::International::get(5).'</a></span>');
 		$array[0] = $session{page}{groupView};
                 $output .= tableFormRow(WebGUI::International::get(112),WebGUI::Form::selectList("groupView",\%yesNo,\@array));
 		$array[0] = $session{page}{groupEdit};
@@ -206,7 +223,7 @@ sub www_editPageSave {
                 if ($session{form}{title} eq "") {
                         $session{form}{title} = "no title";
                 }
-                $urlizedTitle = urlize($session{form}{urlizedTitle});
+                $urlizedTitle = WebGUI::URL::urlize($session{form}{urlizedTitle});
                 while (($test) = WebGUI::SQL->quickArray("select urlizedTitle from page where urlizedTitle='$urlizedTitle' and pageId<>$session{page}{pageId}")) {
                         $urlizedTitle .= 2;
                 }

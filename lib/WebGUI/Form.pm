@@ -159,13 +159,27 @@ sub textArea {
                 $rows = 5;
         }
 	if ($htmlEdit > 0) {
-		$output .= '<script language="JavaScript"> var formObj; var extrasDir="'.$session{setting}{lib}.'"; function openEditWindow(obj) { formObj = obj;  if (navigator.userAgent.substr(navigator.userAgent.indexOf("MSIE")+5,1)>=5)  window.open("'.$session{setting}{lib}.'/ieEdit.html","editWindow","width=490,height=400");  else  window.open("'.$session{setting}{lib}.'/nonIeEdit.html","editWindow","width=450,height=240"); } function setContent(content) { formObj.value = content; } </script>';
-		$output .= '<input type="button" onClick="openEditWindow(this.form.'.$name.')" value="'.WebGUI::International::get(171).'" style="font-size: 8pt;"><br>';
+		$output .= '<script language="JavaScript"> 
+			var formObj; 
+			var extrasDir="'.$session{setting}{lib}.'"; 
+			function openEditWindow(obj) { 
+			formObj = obj;  
+			if (navigator.userAgent.substr(navigator.userAgent.indexOf("MSIE")+5,1)>=5)  
+			window.open("'.$session{setting}{lib}.'/ieEdit.html","editWindow","width=490,height=400");  
+			else  
+			window.open("'.$session{setting}{lib}.'/nonIeEdit.html","editWindow","width=490,height=400"); 
+			}
+			function setContent(content) { 
+				formObj.value = content; 
+			} </script>';
+		$output .= '<input type="button" onClick="openEditWindow(this.form.'.$name.')" value="'.
+			WebGUI::International::get(171).'" style="font-size: 8pt;"><br>';
 	}
         if ($wrap eq "") {
                 $wrap = "virtual";
         }
-        $output .= '<textarea name="'.$name.'" cols="'.$cols.'" rows="'.$rows.'" wrap="'.$wrap.'" onBlur="fixChars(this.form.'.$name.')">'.$value.'</textarea>';
+        $output .= '<textarea name="'.$name.'" cols="'.$cols.'" rows="'.$rows.'" wrap="'.$wrap.
+		'" onBlur="fixChars(this.form.'.$name.')">'.$value.'</textarea>';
         return $output;
 }
 

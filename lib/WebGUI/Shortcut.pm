@@ -15,6 +15,7 @@ use strict;
 use WebGUI::Attachment;
 use WebGUI::International;
 use WebGUI::Session;
+use WebGUI::URL;
 
 our @ISA = qw(Exporter);
 our @EXPORT = qw(&attachmentBox &formHeader &formSave &tableFormRow &helpLink);
@@ -44,7 +45,7 @@ sub attachmentBox {
 #-------------------------------------------------------------------
 sub formHeader {
         my ($output);
-	$output = '<form method="post" enctype="multipart/form-data" action="'.$session{page}{url}.'">';
+	$output = '<form method="post" enctype="multipart/form-data" action="'.WebGUI::URL::page().'">';
         return $output;
 }
 
@@ -59,7 +60,7 @@ sub formSave {
 sub helpLink {
 	my ($output, $namespace);
 	$namespace = $_[1] || "WebGUI";
-	$output = '<a href="'.$session{page}{url}.'?op=viewHelp&hid='.$_[0].'&namespace='.$namespace.
+	$output = '<a href="'.WebGUI::URL::page('op=viewHelp&hid='.$_[0].'&namespace='.$namespace).
 		'" target="_blank"><img src="'.$session{setting}{lib}.'/help.gif" border="0" align="right"></a>';
 	return $output;
 }

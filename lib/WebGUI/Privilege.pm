@@ -13,6 +13,7 @@ package WebGUI::Privilege;
 use strict;
 use Tie::CPHash;
 use WebGUI::International;
+use WebGUI::Operation::Account ();
 use WebGUI::Session;
 use WebGUI::SQL;
 
@@ -71,10 +72,14 @@ sub canViewPage {
 #-------------------------------------------------------------------
 sub insufficient {
 	my ($output);
-	$output = '<h1>'.WebGUI::International::get(37).'</h1>';
-	$output .= WebGUI::International::get(38);
-	$output .= '<p>';
-	$output = WebGUI::Macro::process($output);
+	if ($session{user}{userId} == 1) {
+		$output = WebGUI::Operation::Account();
+	} else {
+		$output = '<h1>'.WebGUI::International::get(37).'</h1>';
+		$output .= WebGUI::International::get(38);
+		$output .= '<p>';
+		$output = WebGUI::Macro::process($output);
+	}
 	return $output;
 }
 

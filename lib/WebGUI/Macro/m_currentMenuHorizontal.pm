@@ -11,13 +11,21 @@ package WebGUI::Macro::m_currentMenuHorizontal;
 #-------------------------------------------------------------------
 
 use strict;
+use WebGUI::Macro;
 use WebGUI::Privilege;
 use WebGUI::Session;
 use WebGUI::SQL;
+use WebGUI::URL;
 
 #-------------------------------------------------------------------
 sub _replacement {
-        my ($temp, @data, $sth, $first);
+        my ($temp, @data, $sth, $first, @param, $delimeter);
+        @param = WebGUI::Macro::getParams($_[0]);
+        if ($param[0] eq "") {
+                $delimeter = " &middot; ";
+        } else {
+                $delimeter = " ".$param[0]." ";
+        }
         $temp = '<span class="horizontalMenu">';
         $first = 1;
         $sth = WebGUI::SQL->read("select title,urlizedTitle,pageId from page where parentId=$session{page}{pageId} order by sequenceNumber");
@@ -26,10 +34,10 @@ sub _replacement {
                 	if ($first) {
                         	$first = 0;
                         } else {
-                        	$temp .= " &middot; ";
+                        	$temp .= $delimeter;
                         }
-                        $temp .= '<a class="horizontalMenu" href="'.$session{config}{scripturl}.
-				'/'.$data[1].'">'.$data[0].'</a>';
+                        $temp .= '<a class="horizontalMenu" href="'.WebGUI::URL::gateway($data[1]).
+				'">'.$data[0].'</a>';
                 }
         }
         $sth->finish;
@@ -41,6 +49,7 @@ sub _replacement {
 sub process {
 	my ($output, $temp, @data, $sth, $first);
 	$output = $_[0];
+	$output =~ s/\^m\((.*?)\)\;/_replacement($1)/ge;
         $output =~ s/\^m\;/_replacement()/ge;
 	return $output;
 }

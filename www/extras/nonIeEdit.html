@@ -29,7 +29,6 @@ function centerText(obj) {
 
 function colorText(obj) {
 	formObj = obj;
-	window.alert(window.opener.extrasDir);
 	window.open(window.opener.extrasDir+"/colorPicker.html","colorPicker","width=438,height=258");
 }
 
@@ -86,7 +85,7 @@ function url(obj) {
 }
 </script>
 </head>
-<body onLoad="edit.editor.value=window.opener.formObj.value">
+<body onLoad="document.edit.editor.value=window.opener.formObj.value">
 <form name="edit">
 <input type="button" onClick="colorText(this.form.editor)" value="color" style="font-size: 8pt;">
 <input type="button" onClick="boldText(this.form.editor)" value="bold" style="font-size: 8pt;">
@@ -100,7 +99,7 @@ function url(obj) {
 <input type="button" onClick="registered(this.form.editor)" value="(R)" style="font-size: 8pt;">
 <input type="button" onClick="trademark(this.form.editor)" value="TM" style="font-size: 8pt;">
 <br>
-<textarea name="editor" rows=10 cols=50></textarea>
+<textarea name="editor" rows=20 cols=55></textarea>
 <br>
 <input type="button" onClick="showMe(this.form.editor)" value="show me" style="font-size: 8pt;">
 <input type="button" onClick="window.blur(); window.opener.focus();window.opener.setContent(this.form.editor.value);window.close();" value="done" style="font-size: 8pt;">

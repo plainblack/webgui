@@ -30,7 +30,7 @@ if ($ARGV[0] eq "--help" || $ARGV[0] eq "/?" || $ARGV[0] eq "/help" || $ARGV[0] 
 	exit;
 }
 
-print "\nWebGUI is checking your system environment...\n\n";
+print "\nWebGUI is checking your system environment:\n\n";
 
 my $os;
 if ($^O =~ /Win/i) {
@@ -39,7 +39,7 @@ if ($^O =~ /Win/i) {
 	$os = "Linuxish";
 }
 
-print "Operating System:\t".$os."\n";
+print "Operating System.........................".$os."\n";
 
 if ($ARGV[0] eq "--install-modules" && $< != 0 && $os eq "Linuxish") {
 	print "You cannot install Perl modules unless you are the root user.\n";
@@ -53,7 +53,7 @@ if ($ARGV[0] eq "--install-modules" && $< != 0 && $os eq "Linuxish") {
 # Checking Perl
 ###################################
 
-print "Perl Interpreter:\t";
+print "Perl Interpreter.........................";
 if ($] >= 5.006) {
 	print "OK\n";
 } else {
@@ -64,7 +64,7 @@ if ($] >= 5.006) {
 	}
 }
 
-print "LWP module:\t\t";
+print "LWP module...............................";
 if (eval { require LWP }) {
         print "OK\n";
 } else {
@@ -76,21 +76,21 @@ if (eval { require LWP }) {
 	}
 }
 
-print "HTTP::Request module:\t";
+print "HTTP::Request module.....................";
 if (eval { require HTTP::Request }) {
         print "OK\n";
 } else {
         print "Please install LWP.\n";
 }
 
-print "HTTP::Headers module:\t";
+print "HTTP::Headers module.....................";
 if (eval { require HTTP::Headers }) {
         print "OK\n";
 } else {
         print "Please install LWP.\n";
 }
 
-print "Digest::MD5 module:\t";
+print "Digest::MD5 module.......................";
 if (eval { require Digest::MD5 }) {
         print "OK\n";
 } else {
@@ -102,7 +102,7 @@ if (eval { require Digest::MD5 }) {
         }
 }
 
-print "DBI module:\t\t";
+print "DBI module...............................";
 if (eval { require DBI }) {
 	print "OK\n";
 } else {
@@ -114,11 +114,11 @@ if (eval { require DBI }) {
         }
 }
 
-print "Database drivers:\t";
+print "Avalable database drivers................";
 print join(", ",DBI->available_drivers);
 print "\n";
 
-print "Tie::IxHash module:\t";
+print "Tie::IxHash module.......................";
 if (eval { require Tie::IxHash }) {
         print "OK\n";
 } else {
@@ -130,7 +130,7 @@ if (eval { require Tie::IxHash }) {
         }
 }
 
-print "Tie::CPHash module:\t";
+print "Tie::CPHash module.......................";
 if (eval { require Tie::CPHash }) {
         print "OK\n";
 } else {
@@ -142,7 +142,7 @@ if (eval { require Tie::CPHash }) {
         }
 }
 
-print "Net::SMTP module:\t";
+print "Net::SMTP module.........................";
 if (eval { require Net::SMTP }) {
         print "OK\n";
 } else {
@@ -154,7 +154,7 @@ if (eval { require Net::SMTP }) {
         }
 }
 
-print "XML::RSS module:\t";
+print "XML::RSS module..........................";
 if (eval { require XML::RSS }) {
         print "OK\n";
 } else {
@@ -166,7 +166,7 @@ if (eval { require XML::RSS }) {
         }
 }
 
-print "Net::LDAP module:\t";
+print "Net::LDAP module.........................";
 if (eval { require Net::LDAP }) {
         print "OK\n";
 } else {
@@ -178,15 +178,39 @@ if (eval { require Net::LDAP }) {
         }
 }
 
+print "Date::Calc module........................";
+if (eval { require Date::Calc }) {
+        print "OK\n";
+} else {
+        if ($ARGV[0] eq "--install-modules") {
+                print "Installing...\n";
+                CPAN::Shell->install("Date::Calc");
+        } else {
+                print "Please install.\n";
+        }
+}
+
+print "HTML::CalendarMonthSimple module.........";
+if (eval { require HTML::CalendarMonthSimple }) {
+        print "OK\n";
+} else {
+        if ($ARGV[0] eq "--install-modules") {
+                print "Installing...\n";
+                CPAN::Shell->install("HTML::CalendarMonthSimple");
+        } else {
+                print "Please install.\n";
+        }
+}
+
 # this is here to insure they installed correctly.
-print "WebGUI modules:\t\t";
+print "WebGUI modules...........................";
 if (eval { require WebGUI } && eval { require WebGUI::SQL }) {
         print "OK\n";
 } else {
         print "Please install.\n";
 }
 
-print "Data::Config module:\t";
+print "Data::Config module......................";
 if (eval { require Data::Config }) {
         print "OK\n";
 } else {
@@ -197,7 +221,7 @@ if (eval { require Data::Config }) {
 # Checking Config File
 ###################################
 
-print "Config file:\t\t";
+print "Config file..............................";
 my ($config);
 $config = new Data::Config './etc/WebGUI.conf';
 unless (defined $config) {
@@ -218,13 +242,13 @@ unless (defined $config) {
 # Checking database
 ###################################
 
-print "Database connection:\t";
+print "Database connection......................";
 my ($dbh, $test);
 unless (eval { $dbh = DBI->connect($config->param('dsn'), $config->param('dbuser'), $config->param('dbpass')) }) {
 	print "Can't connect with info provided.\n";
 } else {
 	print "OK\n";
-	print "Database tables:\t";
+	print "Database tables..........................";
 	($test) = WebGUI::SQL->quickArray("select count(*) from page",$dbh);
 	if ($test < 1) {
 		print "Looks like you need to create some tables.\n";
@@ -238,10 +262,11 @@ unless (eval { $dbh = DBI->connect($config->param('dsn'), $config->param('dbuser
 # Checking Version
 ###################################
 
-print "Latest version:\t\t";
+print "Latest version...........................";
 my ($header, $userAgent, $request, $response, $version, $referer);
 $userAgent = new LWP::UserAgent;
 $userAgent->agent("WebGUI-Check/2.0");
+$userAgent->timeout(30);
 $header = new HTTP::Headers;
 $referer = "http://webgui.cli.getversion/".`hostname`;
 chomp $referer;

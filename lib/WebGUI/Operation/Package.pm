@@ -16,6 +16,7 @@ use WebGUI::Privilege;
 use WebGUI::Session;
 use WebGUI::Shortcut;
 use WebGUI::SQL;
+use WebGUI::URL;
 
 our @ISA = qw(Exporter);
 our @EXPORT = qw(&www_deployPackage &www_selectPackageToDeploy);
@@ -61,7 +62,8 @@ sub www_selectPackageToDeploy {
 		$output .= '<ul>';
 		$sth = WebGUI::SQL->read("select * from page where parentId=5");
 		while (%data = $sth->hash) {
-			$output .= '<li> <a href="'.$session{page}{url}.'?op=deployPackage&pid='.$data{pageId}.'">'.$data{title}.'</a>';
+			$output .= '<li> <a href="'.WebGUI::URL::page('op=deployPackage&pid='.$data{pageId})
+				.'">'.$data{title}.'</a>';
 			$flag = 1;
 		}
 		$sth->finish;

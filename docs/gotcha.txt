@@ -7,6 +7,12 @@ upgrading from one version to the next, or even between multiple
 versions. Be sure to heed the warnings contained herein as they will
 save you many hours of grief.
 
+3.2.0
+--------------------------------------------------------------------
+ * You need to get two new Perl modules before you upgrade. Those
+ 	are Date::Calc and HTML::CalendarMonthSimple.
+
+
 3.0.2
 --------------------------------------------------------------------
  * 3.0.2 was accidentally released with an internal version number
