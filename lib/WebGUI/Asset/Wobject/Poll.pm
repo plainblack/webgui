@@ -151,6 +151,17 @@ sub definition {
 }
 
 #-------------------------------------------------------------------
+sub duplcate {
+	my $self = shift;
+	my $newAsset = $self->SUPER::duplicate;
+	my $sth = WebGUI::SQL->read("select * from Poll_answer where assetId=".quote($self->getId));
+	while (my $data = $sth->hashRef) {
+		$newAsset->setVote($data->{answer}, $data->{userId}, $data->{ipAddress});
+	}
+	$sth->finish;
+}
+
+#-------------------------------------------------------------------
 sub getEditForm {
 	my $self = shift;
 	my $tabform = $self->SUPER::getEditForm; 
@@ -283,6 +294,15 @@ sub purge {
 	$self->SUPER::purge();
 }	
 
+#-------------------------------------------------------------------
+sub setVote {
+	my $self = shift;
+	my $answer = shift;
+	my $userId = shift;
+	my $ip = shift;
+       	WebGUI::SQL->write("insert into Poll_answer (assetId, answer, userId, ipAddress) values (".quote($self->getId).", 
+		".quote($answer).", ".quote($userId).", '$ip')");
+}
 
 #-------------------------------------------------------------------
 sub view {
@@ -342,8 +362,7 @@ sub www_vote {
 	my $self = shift;
 	my $u;
         if ($session{form}{answer} ne "" && WebGUI::Grouping::isInGroup($self->get("voteGroup")) && !($self->_hasVoted())) {
-        	WebGUI::SQL->write("insert into Poll_answer (assetId, answer, userId, ipAddress) values (".quote($self->getId).", 
-			".quote($session{form}{answer}).", ".quote($session{user}{userId}).", '$session{env}{REMOTE_ADDR}')");
+        	$self->setVote($session{form}{answer},$session{user}{userId},$session{env}{REMOTE_ADDR});
 		if ($session{setting}{useKarma}) {
 			$u = WebGUI::User->new($session{user}{userId});
 			$u->karma($self->get("karmaPerVote"),"Poll (".$self->getId.")","Voted on this poll.");
