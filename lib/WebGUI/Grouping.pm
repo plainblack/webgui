@@ -115,6 +115,7 @@ sub addUsersToGroups {
         		($expireOffset) = WebGUI::SQL->quickArray("select expireOffset from groups where groupId=".quote($gid));
 		}
 		foreach my $uid (@{$_[0]}) {
+			next if ($uid eq '1');
 			my ($isIn) = WebGUI::SQL->quickArray("select count(*) from groupings where groupId=".quote($gid)." and userId=".quote($uid));
 			unless ($isIn) {
                 		WebGUI::SQL->write("insert into groupings (groupId,userId,expireDate) 
