@@ -18,10 +18,8 @@ QnD INSTALL INSTRUCTIONS:
    DBI
    DBD::mysql
    Digest::MD5
-   Net::LDAP
    Date::Calc
    Image::Magick
-   HTML::Parser
 
 3. Install Apache (with or without mod_perl) and set up your config.
 

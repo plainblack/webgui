@@ -49,6 +49,8 @@ Perl.................................Larry Wall / O'Reilly
 
 Rich Edit............................interactivetools.com
 
+Convert::ASN1........................Graham Barr
+
 Data::Config.........................Sébastien Aperghis-Tramoni
 
 HTML::CalendarMonthSimple............Gregor Mosheh
@@ -56,6 +58,8 @@ HTML::CalendarMonthSimple............Gregor Mosheh
 HTML::TagFilter......................William Ross
 
 HTML::Template.......................Sam Tregar
+
+Net::LDAP............................Graham Barr
 
 Tie::CPHash..........................Christopher J. Madsen
 
