@@ -100,14 +100,13 @@ sub www_edit {
 sub www_editSave {
 	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
 	my ($property);
-	$_[0]->SUPER::www_editSave();
 	$property->{indent} = $session{form}{indent};
 	$property->{displaySynopsis} = $session{form}{displaySynopsis};
 	$property->{bullet} = $session{form}{bullet};
 	$property->{startAtThisLevel} = $session{form}{startAtThisLevel};
 	$property->{depth} = $session{form}{depth};
 	$property->{lineSpacing} = $session{form}{lineSpacing};
-	$_[0]->set($property);
+	$_[0]->SUPER::www_editSave($property);
         return "";
 }
 

@@ -122,7 +122,7 @@ sub www_edit {
 sub www_editSave {
 	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
         my ($image, $attachment, %property);
-	$_[0]->SUPER::www_editSave();
+	$_[0]->SUPER::www_editSave() if ($_[0]->get("wobjectId") eq "new");
         $image = WebGUI::Attachment->new("",$_[0]->get("wobjectId"));
 	$image->save("image");
         $attachment = WebGUI::Attachment->new("",$_[0]->get("wobjectId"));
@@ -134,7 +134,7 @@ sub www_editSave {
 	$property{linkTitle} = $session{form}{linkTitle};
 	$property{linkURL} = $session{form}{linkURL};
 	$property{allowDiscussion} = $session{form}{allowDiscussion};
-	$_[0]->set(\%property);
+	$_[0]->SUPER::www_editSave(\%property);
         return "";
 }
 

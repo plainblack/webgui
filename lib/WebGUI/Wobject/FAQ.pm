@@ -103,11 +103,10 @@ sub www_edit {
 #-------------------------------------------------------------------
 sub www_editSave {
         if (WebGUI::Privilege::canEditPage()) {
-		$_[0]->SUPER::www_editSave();
-		$_[0]->set({
-			tocOn=>$session{form}{tocOn},
-			topOn=>$session{form}{topOn},
-			qaOn=>$session{form}{qaOn}
+		$_[0]->SUPER::www_editSave({
+                        tocOn=>$session{form}{tocOn},
+                        topOn=>$session{form}{topOn},
+                        qaOn=>$session{form}{qaOn}
 			});
 		if ($session{form}{proceed}) {
 			$_[0]->www_editQuestion();

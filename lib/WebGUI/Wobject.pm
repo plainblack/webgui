@@ -995,7 +995,8 @@ sub www_editSave {
 		groupToPost=>$session{form}{groupToPost},
 		groupToModerate=>$session{form}{groupToModerate},
 		editTimeout=>$session{form}{editTimeout},
-		moderationType=>$session{form}{moderationType}
+		moderationType=>$session{form}{moderationType},
+		%{$_[1]}
 	});
 	return "";
 }

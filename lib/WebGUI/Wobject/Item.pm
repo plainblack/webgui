@@ -62,12 +62,12 @@ sub www_edit {
 sub www_editSave {
 	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
         my ($attachment, $property);
-	$_[0]->SUPER::www_editSave();
+	$_[0]->SUPER::www_editSave() if ($_[0]->get("wobjectId") eq "new");
         $attachment = WebGUI::Attachment->new("",$_[0]->get("wobjectId"));
 	$attachment->save("attachment");
 	$property->{linkURL} = $session{form}{linkURL};
 	$property->{attachment} = $attachment->getFilename if ($attachment->getFilename ne "");
-	$_[0]->set($property);
+	$_[0]->SUPER::www_editSave($property);
         return "";
 }
 

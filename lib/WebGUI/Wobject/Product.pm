@@ -333,7 +333,7 @@ sub www_edit {
 sub www_editSave {
 	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
 	my ($file, %property);
-	$_[0]->SUPER::www_editSave();
+	$_[0]->SUPER::www_editSave() if ($_[0]->get("wobjectId") eq "new");
 	$file = WebGUI::Attachment->new("",$_[0]->get("wobjectId"));
         $file->save("image1");
 	$property{image1}=$file->getFilename("image1") if ($file->getFilename("image1") ne "");
@@ -355,7 +355,7 @@ sub www_editSave {
 	$property{Product_templateId}=$session{form}{Product_templateId};
 	$property{price}=$session{form}{price};
 	$property{productNumber}=$session{form}{productNumber};
-	$_[0]->set(\%property);
+	$_[0]->SUPER::www_editSave(\%property);
 	return "";
 }
 

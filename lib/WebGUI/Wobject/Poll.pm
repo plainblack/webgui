@@ -125,7 +125,6 @@ sub www_edit {
 sub www_editSave {
 	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
 	my (@answer, $i, $property);
-	$_[0]->SUPER::www_editSave();
 	@answer = split("\n",$session{form}{answers});
         for ($i=1; $i<=20; $i++) {
              	$property->{'a'.$i} = $answer[($i-1)];
@@ -136,7 +135,7 @@ sub www_editSave {
 	$property->{graphWidth} = $session{form}{graphWidth};
 	$property->{active} = $session{form}{active};
 	$property->{question} = $session{form}{question};
-	$_[0]->set($property);
+	$_[0]->SUPER::www_editSave($property);
 	return "";
 }
 

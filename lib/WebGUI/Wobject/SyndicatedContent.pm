@@ -71,11 +71,10 @@ sub www_edit {
 sub www_editSave {
         return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
 	my ($property);
-	$_[0]->SUPER::www_editSave();
 	$property->{rssUrl} = $session{form}{rssUrl};
 	$property->{content} = $session{form}{content} if ($session{form}{content} ne "");
 	$property->{lastFetched} = $session{form}{lastFetched} if ($session{form}{lastFetched} ne "");
-	$_[0]->set($property);
+	$_[0]->SUPER::www_editSave($property);
         return "";
 }
 

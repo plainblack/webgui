@@ -14,7 +14,7 @@ use strict;
 use Tie::CPHash;
 use WebGUI::Attachment;
 use WebGUI::DateTime;
-#use WebGUI::Discussion;
+use WebGUI::Discussion;
 use WebGUI::HTML;
 use WebGUI::HTMLForm;
 use WebGUI::Icon;
@@ -333,8 +333,7 @@ sub www_edit {
 #-------------------------------------------------------------------
 sub www_editSave {
 	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
-	$_[0]->SUPER::www_editSave();
-        $_[0]->set({
+	$_[0]->SUPER::www_editSave({
 		submissionsPerPage=>$session{form}{submissionsPerPage},
 		groupToContribute=>$session{form}{groupToContribute},
 		groupToApprove=>$session{form}{groupToApprove},

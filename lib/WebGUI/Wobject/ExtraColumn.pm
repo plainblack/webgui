@@ -86,8 +86,7 @@ sub www_edit {
 #-------------------------------------------------------------------
 sub www_editSave {
 	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
-	$_[0]->SUPER::www_editSave();
-        $_[0]->set({
+	$_[0]->SUPER::www_editSave({
 		spacer=>$session{form}{spacer},
 		width=>$session{form}{width},
 		class=>$session{form}{class}

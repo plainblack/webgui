@@ -166,8 +166,7 @@ sub www_edit {
 #-------------------------------------------------------------------
 sub www_editSave {
 	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
-	$_[0]->SUPER::www_editSave();
-        $_[0]->set({
+	$_[0]->SUPER::www_editSave({
 		paginateAfter=>$session{form}{paginateAfter},
 		displayThumbnails=>$session{form}{displayThumbnails}
 		});

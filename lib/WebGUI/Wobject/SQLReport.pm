@@ -82,9 +82,7 @@ sub www_edit {
 #-------------------------------------------------------------------
 sub www_editSave {
 	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
-        my ($wobjectId, $displayTitle, $image, $attachment);
-	$_[0]->SUPER::www_editSave();
-        $_[0]->set({
+	$_[0]->SUPER::www_editSave({
 		template=>$session{form}{template},
 		dbQuery=>$session{form}{dbQuery},
 		convertCarriageReturns=>$session{form}{convertCarriageReturns},

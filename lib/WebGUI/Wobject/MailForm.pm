@@ -153,11 +153,10 @@ sub www_edit {
 sub www_editSave {
 	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
 	my ($property);
-	$_[0]->SUPER::www_editSave();
 	foreach my $field (@fields) {
 		$property->{$field} = $session{form}{$field};
 	}
-	$_[0]->set($property);
+	$_[0]->SUPER::www_editSave($property);
         if ($session{form}{proceed}) {
             return $_[0]->www_editField();
         } else {
