@@ -96,6 +96,9 @@ sub _hasBadUsername {
 	if ($_[0] eq "") {
 		$error .= '<li>'.WebGUI::International::get(725);
 	}
+	unless ($_[0] =~ /^[A-Za-z0-9\-\_\.\,\@]+$/) {
+		$error .= '<li>'.WebGUI::International::get(747);
+	}
 	($otherUser) = WebGUI::SQL->quickArray("select username from users where username='$_[0]'");
 	if ($otherUser ne "" && $otherUser ne $session{user}{username}) {
 		$error .= '<li>'.WebGUI::International::get(77).' "'.$_[0].'too", "'.$_[0].'2", '

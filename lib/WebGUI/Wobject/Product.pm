@@ -510,44 +510,41 @@ sub www_view {
 	#---brochure
         if ($_[0]->get("brochure")) {
                 $file = WebGUI::Attachment->new($_[0]->get("brochure"),$_[0]->get("wobjectId"));
-                $var{brochure} = '<a href="'.$file->getURL.'"><img src="'.$file->getIcon.'" border=0 align="absmiddle"> '
-			.WebGUI::International::get(13,$namespace).'</a>';
-		$var{brochureURL} = $file->getURL;
+                $var{"brochure.icon"} = $file->getIcon;
+		$var{"brochure.label"} = WebGUI::International::get(13,$namespace);
+		$var{"brochure.URL"} = $file->getURL;
         }
 	#---manual
         if ($_[0]->get("manual")) {
                 $file = WebGUI::Attachment->new($_[0]->get("manual"),$_[0]->get("wobjectId"));
-                $var{manual} = '<a href="'.$file->getURL.'"><img src="'.$file->getIcon.'" border=0 align="absmiddle"> '
-			.WebGUI::International::get(14,$namespace).'</a>';
-		$var{manualURL} = $file->getURL;
+                $var{"manual.icon"} = $file->getIcon;
+		$var{"manual.label"} = WebGUI::International::get(14,$namespace);
+		$var{"manual.URL"} = $file->getURL;
         }
 	#---warranty
         if ($_[0]->get("warranty")) {
                 $file = WebGUI::Attachment->new($_[0]->get("warranty"),$_[0]->get("wobjectId"));
-                $var{warranty} = '<a href="'.$file->getURL.'"><img src="'.$file->getIcon.'" border=0 align="absmiddle"> '
-			.WebGUI::International::get(15,$namespace).'</a>';
-		$var{warrantyURL} = $file->getURL;
+                $var{"warranty.icon"} = $file->getIcon;
+		$var{"warranty.label"} = WebGUI::International::get(15,$namespace);
+		$var{"warranty.URL"} = $file->getURL;
         }
 	#---image1
         if ($_[0]->get("image1")) {
                 $file = WebGUI::Attachment->new($_[0]->get("image1"),$_[0]->get("wobjectId"));
-                $var{image1} = '<img src="'.$file->getURL.'" border=0>';
-                $var{image1thumbnail} = '<a href="'.$file->getURL.'"><img src="'.$file->getThumbnail.'" border=0></a>';
-		$var{image1url} = $file->getURL;
+                $var{thumbnail1} = $file->getThumbnail;
+		$var{image1} = $file->getURL;
         }
 	#---image2
         if ($_[0]->get("image2")) {
                 $file = WebGUI::Attachment->new($_[0]->get("image2"),$_[0]->get("wobjectId"));
-                $var{image2} = '<img src="'.$file->getURL.'" border=0>';
-                $var{image2thumbnail} = '<a href="'.$file->getURL.'"><img src="'.$file->getThumbnail.'" border=0></a>';
-		$var{image2url} = $file->getURL;
+                $var{thumbnail2} = $file->getThumbnail;
+		$var{image2} = $file->getURL;
         }
 	#---image3
         if ($_[0]->get("image3")) {
                 $file = WebGUI::Attachment->new($_[0]->get("image3"),$_[0]->get("wobjectId"));
-                $var{image3} = '<img src="'.$file->getURL.'" border=0>';
-                $var{image3thumbnail} = '<a href="'.$file->getURL.'"><img src="'.$file->getThumbnail.'" border=0></a>';
-                $var{image3url} = $file->getURL;
+                $var{thumbnail3} = $file->getThumbnail;
+                $var{image3} = $file->getURL;
         }
 
 	#---features 
@@ -564,7 +561,10 @@ sub www_view {
                                 .moveUpIcon('func=moveFeatureUp&wid='.$_[0]->get("wobjectId").'&fid='.$data{Product_featureId})
                                 .moveDownIcon('func=moveFeatureDown&wid='.$_[0]->get("wobjectId").'&fid='.$data{Product_featureId});
                 }
-		push(@featureloop,{feature=>$data{feature},featureId=>$data{Product_featureId},controls=>$segment});
+		push(@featureloop,{
+			"feature.feature"=>$data{feature},
+			"feature.controls"=>$segment
+			});
         }
         $sth->finish;
 	$var{feature_loop} = \@featureloop;
@@ -583,7 +583,10 @@ sub www_view {
                                 .moveUpIcon('func=moveBenefitUp&wid='.$_[0]->get("wobjectId").'&bid='.$data{Product_benefitId})
                                 .moveDownIcon('func=moveBenefitDown&wid='.$_[0]->get("wobjectId").'&bid='.$data{Product_benefitId});
                 }
-		push(@benefitloop,{benefit=>$data{benefit},benefitId=>$data{Product_benefitId},controls=>$segment});
+		push(@benefitloop,{
+			"benefit.benefit"=>$data{benefit},
+			"benefit.controls"=>$segment
+			});
         }
         $sth->finish;
 	$var{benefit_loop} = \@benefitloop;
@@ -602,8 +605,12 @@ sub www_view {
                                 .moveUpIcon('func=moveSpecificationUp&wid='.$_[0]->get("wobjectId").'&sid='.$data{Product_specificationId})
                                 .moveDownIcon('func=moveSpecificationDown&wid='.$_[0]->get("wobjectId").'&sid='.$data{Product_specificationId});
                 }
-		push(@specificationloop,{specificationId=>$data{Product_specificationId},
-			controls=>$segment,specification=>$data{value},units=>$data{units},label=>$data{name}});
+		push(@specificationloop,{
+			"specification.controls"=>$segment,
+			"specification.specification"=>$data{value},
+			"specification.units"=>$data{units},
+			"specification.label"=>$data{name}
+			});
         }
         $sth->finish;
 	$var{specification_loop} = \@specificationloop;
@@ -624,9 +631,11 @@ sub www_view {
                                 .moveUpIcon('func=moveAccessoryUp&wid='.$_[0]->get("wobjectId").'&aid='.$data{accessoryWobjectId})
                                 .moveDownIcon('func=moveAccessoryDown&wid='.$_[0]->get("wobjectId").'&aid='.$data{accessoryWobjectId});
                 }
-		push(@accessoryloop,{URL=>WebGUI::URL::gateway($data{urlizedTitle}),title=>$data{title},
-			accessory=>'<a href="'.WebGUI::URL::gateway($data{urlizedTitle}).'">'.$data{title}.'</a>',
-			controls=>$segment});
+		push(@accessoryloop,{
+			"accessory.URL"=>WebGUI::URL::gateway($data{urlizedTitle}),
+			"accessory.title"=>$data{title},
+			"accessory.controls"=>$segment
+			});
         }
         $sth->finish;
 	$var{accessory_loop} = \@accessoryloop;
@@ -648,9 +657,11 @@ sub www_view {
                                 .moveDownIcon('func=moveRelatedDown&wid='.$_[0]->get("wobjectId").'&rid='.$data{relatedWobjectId});
                 }
                 $segment .= '&middot;<a href="'.WebGUI::URL::gateway($data{urlizedTitle}).'">'.$data{title}.'</a><br>';
-                push(@relatedloop,{URL=>WebGUI::URL::gateway($data{urlizedTitle}),title=>$data{title},
-                        specification=>'<a href="'.WebGUI::URL::gateway($data{urlizedTitle}).'">'.$data{title}.'</a>',
-                        controls=>$segment});
+                push(@relatedloop,{
+			"relatedproduct.URL"=>WebGUI::URL::gateway($data{urlizedTitle}),
+			"relatedproduct.title"=>$data{title},
+                        "relatedproduct.controls"=>$segment
+			});
         }
         $sth->finish;
 	$var{relatedproduct_loop} = \@relatedloop;

@@ -110,7 +110,6 @@ sub www_view {
 		from discussion where wobjectId=".$_[0]->get("wobjectId")." and pid=0 
 		and (status='Approved' or userId=$session{user}{userId}) order by messageId desc");
 	while (%data = $sth->hash) {
-		$data{subject} = WebGUI::Discussion::formatSubject($data{subject});
 		if ($i >= ($_[0]->get("messagesPerPage")*$pn) && $i < ($_[0]->get("messagesPerPage")*($pn+1))) {
 			@last = WebGUI::SQL->quickArray("select messageId,dateOfPost,username,subject,userId 
 				from discussion where wobjectId=".$_[0]->get("wobjectId")." and rid=$data{messageId} 

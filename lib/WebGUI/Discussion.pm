@@ -180,7 +180,7 @@ sub deleteMessageConfirm {
 #-------------------------------------------------------------------
 sub formatHeader {
 	my ($output, $subject);
-	$subject = formatSubject($_[0]);
+	$subject = $_[0];
 	if ($_[5] ne "") {
 		$subject = '<a href="'.$_[5].'">'.$subject.'</a>';
 	}
@@ -201,14 +201,6 @@ sub formatMessage {
 	unless ($output =~ /\<div\>/ig || $output =~ /\<br\>/ig || $output =~ /\<p\>/ig) {
 		$output =~ s/\n/\<br\>/g;
 	}
-        return $output;
-}
-
-#-------------------------------------------------------------------
-sub formatSubject {
-        my $output;
-        $output = $_[0];
-        $output = WebGUI::HTML::filter($output,'all');
         return $output;
 }
 
@@ -239,7 +231,7 @@ sub post {
 			'',$message{status})
 			.'<p>'.formatMessage($message{message});
 		$message{message} = "";
-		$message{subject} = formatSubject("Re: ".$message{subject}) unless ($message{subject} =~ /^Re:/);
+		$message{subject} = "Re: ".$message{subject} unless ($message{subject} =~ /^Re:/);
 		$session{form}{mid} = "new";
 		$f->hidden("replyTo",$session{form}{replyTo});
        		if ($session{user}{userId} == 1) {
@@ -256,7 +248,6 @@ sub post {
 		$footer = formatHeader($message{subject},$message{userId},$message{username},$message{dateOfPost},$message{views},
 			'',$message{status})
 			.'<p>'.formatMessage($message{message});
-		$message{subject} = formatSubject($message{subject});
 	}
        	$f->hidden("func","postSave");
         $f->hidden("wid",$session{form}{wid});
@@ -276,7 +267,9 @@ sub postSave {
 	my ($u, $rid, $status, $username, $pid);
         if ($session{form}{subject} eq "") {
         	$session{form}{subject} = WebGUI::International::get(232);
-        }
+        } else {
+		$session{form}{subject} = WebGUI::HTML::filter($session{form}{subject},'all');
+	}
  	if ($session{form}{message} eq "") {
               		$session{form}{subject} .= ' '.WebGUI::International::get(233);
         }

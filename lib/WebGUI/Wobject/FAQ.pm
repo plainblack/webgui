@@ -177,7 +177,7 @@ sub www_moveQuestionUp {
 
 #-------------------------------------------------------------------
 sub www_view {
-	my (%question, $controls, $sth, %var, @qa, @toc);
+	my (%question, $controls, $sth, %var, @qa);
 	tie %question,'Tie::CPHash';
 	if ($session{var}{adminOn}) {
 		$var{addquestion} .= '<a href="'.WebGUI::URL::page('func=editQuestion&wid='.$_[0]->get("wobjectId")).'">'
@@ -185,10 +185,6 @@ sub www_view {
 	}
 	$sth = WebGUI::SQL->read("select * from FAQ_question where wobjectId=".$_[0]->get("wobjectId")." order by sequenceNumber");
 	while (%question = $sth->hash) {
-		push(@toc,{
-			questionId=>$question{FAQ_questionId},
-			question=>$question{question}
-			});
 		if ($session{var}{adminOn}) {
 			$controls = deleteIcon('func=deleteQuestion&wid='.$_[0]->get("wobjectId").'&qid='.$question{FAQ_questionId})
 				.editIcon('func=editQuestion&wid='.$_[0]->get("wobjectId").'&qid='.$question{FAQ_questionId})
@@ -197,14 +193,13 @@ sub www_view {
 				.' ';
 		}
                 push(@qa,{
-                        questionId=>$question{FAQ_questionId},
-                        answer=>$question{answer},
-			question=>$question{question},
-			controls=>$controls
+                        "qa.Id"=>$question{FAQ_questionId},
+                        "qa.answer"=>$question{answer},
+			"qa.question"=>$question{question},
+			"qa.controls"=>$controls
                         });
 	}
 	$sth->finish;
-	$var{toc_loop} = \@toc;
 	$var{qa_loop} = \@qa;
 	return $_[0]->processMacros($_[0]->displayTitle.$_[0]->processTemplate($_[0]->get("templateId"),\%var));
 }
