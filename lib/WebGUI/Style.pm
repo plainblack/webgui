@@ -18,18 +18,18 @@ use WebGUI::SQL;
 
 #-------------------------------------------------------------------
 sub getStyle {
-	my ($header, $footer, @style, %style, $styleId);
+	my ($header, $footer, %style, $styleId, @body);
 	tie %style, 'Tie::CPHash';
 	if ($session{form}{makePrintable}) {
 		$styleId = $session{form}{style} || 3;
-		%style = WebGUI::SQL->quickHash("select header,footer,styleSheet from style where styleId=$styleId");
+		%style = WebGUI::SQL->quickHash("select * from style where styleId=$styleId");
+		@body = split(/\^\-\;/,$style{body});
 		$header = '<html><!-- WebGUI '.$session{wg}{version}.' -->'."\n";
 		$header .= '<head><title>'.$session{page}{title}.' - '.$session{setting}{companyName}.'</title>';
 		$header .= $style{styleSheet}.'</head>'.$style{header};
-		$footer = $style{footer}.'</html>'; 
 	} else {
-		tie %style, 'Tie::CPHash';
-		%style = WebGUI::SQL->quickHash("select header,footer,styleSheet from style where styleId=$session{page}{styleId}");
+		%style = WebGUI::SQL->quickHash("select * from style where styleId=$session{page}{styleId}");
+		@body = split(/\^\-\;/,$style{body});
 		$header = $session{setting}{docTypeDec}."\n".'<!-- WebGUI '.$WebGUI::VERSION.' -->
 			<html>
 			<head>
@@ -51,9 +51,9 @@ sub getStyle {
 				$session{page}{synopsis}.'">';
 
 		}
-		$header .= '</head>'.$style{header};
-		$footer = $style{footer}.' </html>';
+		$header .= '</head>'.$body[0];
 	}
+	$footer = $body[1].' </html>';
 	$header = WebGUI::Macro::process($header);
 	$footer = WebGUI::Macro::process($footer);
 	return ($header, $footer);

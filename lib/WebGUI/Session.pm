@@ -94,6 +94,27 @@ sub _getUserInfo {
 }
 
 #-------------------------------------------------------------------
+sub _loadMacros {
+	my ($namespace, $cmd, @files, $file, $dir);
+        if ($^O =~ /Win/i) {
+                $dir = "\\lib\\WebGUI\\Macro";
+        } else {
+                $dir = "/lib/WebGUI/Macro";
+        }
+        opendir (DIR,$session{config}{webguiRoot}.$dir) or WebGUI::ErrorHandler::fatalError("Can't open macro directory!");
+        @files = readdir(DIR);
+        foreach $file (@files) {
+                if ($file =~ /(.*?)\.pm$/) {
+			$namespace = $1;
+                        $cmd = "use WebGUI::Macro::".$1;
+                        eval($cmd);
+			$session{macro}{$namespace} = $namespace;
+                }
+        }
+        closedir(DIR);
+}
+
+#-------------------------------------------------------------------
 sub _loadWobjects {
         my ($dir, @files, $file, $cmd, $namespace);
         if ($^O =~ /Win/i) {
@@ -199,6 +220,7 @@ sub open {
 	###----------------------------
 	### loading plugins
         _loadWobjects();
+	_loadMacros();
 }
 
 #-------------------------------------------------------------------

@@ -29,24 +29,12 @@ sub getParams {
 
 #-------------------------------------------------------------------
 sub process {
-        my (@files, $file, $cmd, $output, $macroDir);
+        my ($macro, $cmd, $output);
 	$output = $_[0];
-	if ($^O =~ /Win/i) {
-		$macroDir = "\\lib\\WebGUI\\Macro";
-	} else {
-		$macroDir = "/lib/WebGUI/Macro";
-	}
-        opendir (DIR,$session{config}{webguiRoot}.$macroDir) or WebGUI::ErrorHandler::fatalError("Can't open macro directory!");
-        @files = readdir(DIR);
-        foreach $file (@files) {
-                if ($file =~ /(.*?)\.pm$/) {
-                        $cmd = "use WebGUI::Macro::".$1;
-                        eval($cmd);
-                        $cmd = "WebGUI::Macro::".$1."::process";
-			$output = &$cmd($output);
-                }
+        foreach $macro (keys %{$session{macro}}) {
+		$cmd = "WebGUI::Macro::".$macro."::process";
+		$output = &$cmd($output);
         }
-        closedir(DIR);
 	return $output;
 }
 
