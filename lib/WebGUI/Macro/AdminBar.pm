@@ -35,7 +35,7 @@ sub process {
 		my $cmd = "WebGUI::Wobject::".$namespace;	
 		my $w = eval{$cmd->new({namespace=>$namespace,wobjectId=>"new"})};
 		if ($@) {
-			WebGUI::ErrorHandler::warn("Could use wobject $namespace because: ".$@);
+			WebGUI::ErrorHandler::warn("Could not use wobject $namespace because: ".$@);
 			next;
 		}
                 next if ($w->uiLevel > $session{user}{uiLevel});
