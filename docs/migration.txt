@@ -38,6 +38,8 @@ There have currently been no changes to the macro API.
 3.1 Nothing Yet
 
 There have currently been no changes to the authentication API.
+In 6.0 all Authentication modules will need to be rewritten as Auth modules according to the new
+Auth API in WebGUI::Auth.  Details to follow.
 
 
 
