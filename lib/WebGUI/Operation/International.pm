@@ -118,7 +118,7 @@ sub www_editHelpMessageSave {
         if (WebGUI::Privilege::isInGroup(3)) {
 		if ($session{form}{missing}) {
                 	WebGUI::SQL->write("insert into help (body,action,object,namespace,languageId,helpId) values (".quote($session{form}{body}).", "
-				.quote($session{form}{action}).", ".quote($session{form}{action}).",".quote($session{form}{namespace}).","
+				.quote($session{form}{action}).", ".quote($session{form}{object}).",".quote($session{form}{namespace}).","
 				.$session{form}{lid}.",".$session{form}{hid}.")");
 		} else {
 			WebGUI::SQL->write("update help set body=".quote($session{form}{body}).", action=".quote($session{form}{action}).", 
