@@ -92,14 +92,14 @@ sub www_deleteTemplateConfirm {
 		return WebGUI::Privilege::vitalComponent();
         } elsif (WebGUI::Grouping::isInGroup(8)) {
 		if ($session{form}{namespace} eq "Page") {
-			$a = WebGUI::SQL->read("select * from page where templateId=".$session{form}{tid});
+			$a = WebGUI::SQL->read("select * from page where templateId=".quote($session{form}{tid}));
 			while (($pageId) = $a->array) {
-				WebGUI::SQL->write("update wobject set templatePosition=1 where pageId=$pageId");
+				WebGUI::SQL->write("update wobject set templatePosition=1 where pageId=".quote($pageId));
 			}
 			$a->finish;
-                	WebGUI::SQL->write("update page set templateId=2 where templateId=".$session{form}{tid});
+                	WebGUI::SQL->write("update page set templateId=2 where templateId=".quote($session{form}{tid}));
 		}
-                WebGUI::SQL->write("delete from template where templateId=".$session{form}{tid}
+                WebGUI::SQL->write("delete from template where templateId=".quote($session{form}{tid})
 			." and namespace=".quote($session{form}{namespace}));
                 return www_listTemplates();
         } else {
@@ -120,7 +120,7 @@ sub www_editTemplate {
 				$template{template} = "<h1><tmpl_var title></h1>\n\n";
 			}
 		} else {
-                	%template = WebGUI::SQL->quickHash("select * from template where templateId=$session{form}{tid} and
+                	%template = WebGUI::SQL->quickHash("select * from template where templateId=".quote($session{form}{tid})." and
 				namespace=".quote($session{form}{namespace}));
 		}
                 $output .= helpIcon("template add/edit");

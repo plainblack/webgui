@@ -13,16 +13,17 @@ package WebGUI::Operation::MetaData;
 use Exporter;
 use strict;
 use Tie::IxHash;
+use WebGUI::Icon;
+use WebGUI::Id;
 use WebGUI::International;
 use WebGUI::Macro;
+use WebGUI::MetaData;
+use WebGUI::Operation::Shared;
+use WebGUI::Privilege;
 use WebGUI::Session;
+use WebGUI::SQL;
 use WebGUI::URL;
 use WebGUI::Utility;
-use WebGUI::Operation::Shared;
-use WebGUI::Icon;
-use WebGUI::Privilege;
-use WebGUI::SQL;
-use WebGUI::MetaData;
 
 our @ISA = qw(Exporter);
 our @EXPORT = qw(&www_editMetaDataField &www_manageMetaData &www_editMetaDataFieldSave &www_deleteMetaDataField
@@ -109,7 +110,7 @@ sub www_editMetaDataFieldSave {
 			. www_editMetaDataField();
 	}
 	if($session{form}{fid} eq 'new') {
-		$session{form}{fid} = getNextId("metaData_fieldId");
+		$session{form}{fid} = WebGUI::Id::generate();
 		WebGUI::SQL->write("insert into metaData_properties (fieldId, fieldName, defaultValue, description, fieldType, possibleValues) values (".
 					quote($session{form}{fid}).",".
 					quote($session{form}{fieldName}).",".

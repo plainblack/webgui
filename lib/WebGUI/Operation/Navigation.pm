@@ -19,6 +19,7 @@ use WebGUI::ErrorHandler;
 use WebGUI::Grouping;
 use WebGUI::HTMLForm;
 use WebGUI::Icon;
+use WebGUI::Id;
 use WebGUI::International;
 use WebGUI::Macro;
 use WebGUI::Navigation;
@@ -60,9 +61,9 @@ sub www_copyNavigation {
 	WebGUI::SQL->write("insert into Navigation (navigationId, identifier, depth, method, startAt, stopAtLevel,
 						templateId, showSystemPages, showHiddenPages, showUnprivilegedPages,
 						reverse)
-		values (".getNextId("navigationId").",
-                        ".quote('Copy of '.$navigation{identifier}).", $navigation{depth}, ".quote($navigation{method}).
-			", ".quote($navigation{startAt}).", $navigation{stopAtLevel}, $navigation{templateId}, 
+		values (".WebGUI::Id::generate().",
+                        ".quote($navigation{identifier}.' (copy)').", $navigation{depth}, ".quote($navigation{method}).
+			", ".quote($navigation{startAt}).", $navigation{stopAtLevel}, ".quote($navigation{templateId}).", 
 			$navigation{showSystemPages}, $navigation{showHiddenPages},$navigation{showUnprivilegedPages},
 			$navigation{reverse})");
 	return www_listNavigation();
@@ -90,7 +91,7 @@ sub www_deleteNavigationConfirm {
         if ($session{form}{navigationId} < 1000 && $session{form}{navigationId} > 0) {
                 return WebGUI::Privilege::vitalComponent();
         }
-	WebGUI::SQL->write("delete from Navigation where navigationId = $session{form}{navigationId}");
+	WebGUI::SQL->write("delete from Navigation where navigationId = ".quote($session{form}{navigationId}));
 
 	# Also delete cache
 	WebGUI::Page->recacheNavigation;
@@ -258,22 +259,22 @@ sub www_editNavigationSave {
 		return WebGUI::International::get(33,'Navigation').www_editNavigation();
 	}
 	if ($session{form}{navigationId} eq "new") {
-		$session{form}{navigationId} = getNextId("navigationId");
+		$session{form}{navigationId} = WebGUI::Id::generate();
 		 WebGUI::SQL->write("insert into Navigation (navigationId, identifier)
-					values ($session{form}{navigationId}, ".quote($session{form}{identifier}).")");
+					values (".quote($session{form}{navigationId}).", ".quote($session{form}{identifier}).")");
 	}
 	$session{form}{startAt} = $session{form}{startAt_new} || $session{form}{startAt}; # Combo field
 	WebGUI::SQL->write("update Navigation set depth       = $session{form}{depth},
 						  method      = ".quote($session{form}{method}).",
 						  startAt     = ".quote($session{form}{startAt}).",
 						  stopAtLevel = ".quote($session{form}{stopAtLevel}).",
-						  templateId  = $session{form}{templateId},
+						  templateId  = ".quote($session{form}{templateId}).",
 						  showSystemPages = $session{form}{showSystemPages},
 						  showHiddenPages = $session{form}{showHiddenPages},
 						  showUnprivilegedPages = $session{form}{showUnprivilegedPages},
 						  identifier  = ".quote($session{form}{identifier}).",
 						  reverse     = ".quote($session{form}{'reverse'})."
-				where navigationId = $session{form}{navigationId}"); 
+				where navigationId = ".quote($session{form}{navigationId})); 
 	# Delete from cache
 	
 	WebGUI::Page->recacheNavigation;

@@ -16,14 +16,15 @@ package WebGUI::Template;
 
 
 
+use File::Path;
 use HTML::Template;
 use strict;
 use WebGUI::Attachment;
 use WebGUI::ErrorHandler;
+use WebGUI::Id;
 use WebGUI::International;
 use WebGUI::Session;
 use WebGUI::SQL;
-use File::Path;
 
 =head1 NAME
 
@@ -109,7 +110,7 @@ Defaults to "page". Specify the namespace of the template to retrieve.
 sub get {
 	my $templateId = shift || 1;
 	my $namespace = shift || "page";
-        return WebGUI::SQL->quickHashRef("select * from template where templateId=".$templateId." and namespace=".quote($namespace),WebGUI::SQL->getSlave);
+        return WebGUI::SQL->quickHashRef("select * from template where templateId=".quote($templateId)." and namespace=".quote($namespace),WebGUI::SQL->getSlave);
 }
 
 
@@ -229,7 +230,7 @@ sub process {
 
 	my $template;
 	unless (-f $file->getPath) {
-        	($template) = WebGUI::SQL->quickArray("select template from template where templateId=".$templateId." and namespace=".quote($namespace),WebGUI::SQL->getSlave);
+        	($template) = WebGUI::SQL->quickArray("select template from template where templateId=".quote($templateId)." and namespace=".quote($namespace),WebGUI::SQL->getSlave);
 		$file->saveFromScalar($template);
 		unless (-f $file->getPath) {
 	                WebGUI::ErrorHandler::warn("Could not create file ".$file->getPath."\nTemplate file caching is disabled");
@@ -304,18 +305,14 @@ A hash reference containing the data to be stored. At minimum the hash reference
 sub set {
 	my $data = shift;
 	if ($data->{templateId} eq "new") {
-		($data->{templateId}) = WebGUI::SQL->quickArray("select max(templateId) from template where namespace=".quote($data->{namespace}));
-		$data->{templateId}++;
-		if ($data->{templateId} < 1000) {
-			$data->{templateId} = 1000;
-		}
-		WebGUI::SQL->write("insert into template (templateId,namespace) values (".$data->{templateId}.",".quote($data->{namespace}).")");
+		$data->{templateId} = WebGUI::Id::generate();	
+		WebGUI::SQL->write("insert into template (templateId,namespace) values (".quote($data->{templateId}).",".quote($data->{namespace}).")");
 	}
 	my @pairs;
 	foreach my $key (keys %{$data}) {
 		push(@pairs, $key."=".quote($data->{$key})) unless ($key eq "namespace" || $key eq "templateId");
 	}
-	WebGUI::SQL->write("update template set ".join(",",@pairs)." where templateId=".$data->{templateId}." and namespace=".quote($data->{namespace}));
+	WebGUI::SQL->write("update template set ".join(",",@pairs)." where templateId=".quote($data->{templateId})." and namespace=".quote($data->{namespace}));
 	my $file = _getTemplateFile($data->{templateId},$data->{namespace});
 	$file->delete;
 	return $data->{templateId};

@@ -16,10 +16,11 @@ package WebGUI::PassiveProfiling;
 
 
 use strict;
+use Tie::IxHash;
+use WebGUI::DateTime;
+use WebGUI::Id;
 use WebGUI::Session;
 use WebGUI::SQL;
-use WebGUI::DateTime;
-use Tie::IxHash;
 
 =head1 NAME
 
@@ -60,7 +61,7 @@ sub add {
 	return unless ($session{setting}{passiveProfilingEnabled});
 	my $wobjectId = shift;
 	my $sql = "insert into passiveProfileLog (passiveProfileLogId, userId, sessionId, wobjectId, dateOfEntry)
-		     values (".quote(getNextId("passiveProfileLogId")).",".
+		     values (".quote(WebGUI::Id::generate()).",".
 				quote($session{user}{userId}).",".
 				quote($session{var}{sessionId}).",".
 				quote($wobjectId).",".
