@@ -269,7 +269,9 @@ sub new {
         $userId = shift || 1;
 	$userId = _create() if ($userId eq "new");
 	%user = WebGUI::SQL->quickHash("select * from users where userId='$userId'");
-	%profile = WebGUI::SQL->buildHash("select userProfileField.fieldName, userProfileData.fieldData from userProfileField, userProfileData where userProfileField.fieldName=userProfileData.fieldName and userProfileData.userId=$user{userId}");
+	%profile = WebGUI::SQL->buildHash("select userProfileField.fieldName, userProfileData.fieldData 
+		from userProfileField, userProfileData where userProfileField.fieldName=userProfileData.fieldName and 
+		userProfileData.userId='$user{userId}'");
         bless {_userId => $userId, _user => \%user, _profile =>\%profile }, $class;
 }
 
