@@ -664,7 +664,10 @@ sub new {
 			}
 		};
 	my %fullProperties;
-	my $extra = WebGUI::SQL->quickHashRef("select * from ".$properties->{namespace}." where wobjectId='".$properties->{wobjectId}."'");
+	my $extra;
+	unless ($properties->{wobjectId} eq "new") {
+		$extra = WebGUI::SQL->quickHashRef("select * from ".$properties->{namespace}." where wobjectId='".$properties->{wobjectId}."'");
+	}
         tie %fullProperties, 'Tie::CPHash';
         %fullProperties = (%{$properties},%{$extra});
         bless({

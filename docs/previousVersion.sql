@@ -1053,10 +1053,8 @@ CREATE TABLE groupings (
 --
 
 
-INSERT INTO groupings VALUES (5,3,2114402400,0);
-INSERT INTO groupings VALUES (4,3,2114402400,0);
+INSERT INTO groupings VALUES (1,1,2114402400,0);
 INSERT INTO groupings VALUES (3,3,2114402400,0);
-INSERT INTO groupings VALUES (6,3,2114402400,0);
 
 --
 -- Table structure for table `groups`

@@ -348,19 +348,19 @@ INSERT INTO template VALUES (4,'Tab Form','<tmpl_if displayTitle>\r\n    <h1><tm
 alter table groups add column isEditable int not null default 1;
 alter table groups add column showInForms int not null default 1;
 update groups set isEditable=0 where groupId in (1,2,7);
-insert into groupings (groupId,userId) select userId, 7 from users;
-insert into groupings (groupId,userId) select userId, 2 from users where userId<>1;
+delete from groupings where groupId is in (1,7,2,5);
+insert into groupings (groupId,userId) values (1,1);
+insert into groupings (groupId,userId) select 7, userId from users;
+insert into groupings (groupId,userId) select 2, userId from users where userId<>1;
 insert into groups (groupId,groupName,description,showInForms) values (5,'Turn Admin On','These users can enable admin mode.',0);
-insert into groupGroupings (groupId, inGroup) values (3,5);
 insert into groupGroupings (groupId, inGroup) values (4,5);
 insert into groupGroupings (groupId, inGroup) values (6,5);
 insert into groupGroupings (groupId, inGroup) values (8,5);
 insert into groupGroupings (groupId, inGroup) values (9,5);
 insert into groupGroupings (groupId, inGroup) values (10,5);
 insert into groupGroupings (groupId, inGroup) values (11,5);
-
-
-
+delete from groupGroupings where groupId = 3;
+insert into groupGroupings (groupId, inGroup) select 3, groupId from groups where groupId not in (1,3);
 CREATE TABLE WSClient (
   wobjectId int(11) NOT NULL default '0',
   call text NOT NULL,

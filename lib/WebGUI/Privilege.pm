@@ -264,25 +264,25 @@ sub isInGroup {
 	$uid = $session{user}{userId} if ($uid eq "");
 
 
-	#The next 3 checks are to increase performance. If this section were removed, everything would continue to work as normal. 
-        if ($gid == 7) {
-                return 1;
-        }
-	if ($gid == 1) {
-		if ($uid == 1) {
-			return 1;
-		} else {
-			return 0;
-		}
-	}
-	if ($gid==2 && $uid != 1) {
-		return 1;
-	}
+	#The several checks are to increase performance. If this section were removed, everything would continue to work as normal. 
+#        if ($gid == 7) {
+#                return 1;
+#        }
+#	if ($gid == 1) {
+#		if ($uid == 1) {
+#			return 1;
+#		} else {
+#			return 0;
+#		}
+#	}
+#	if ($gid==2 && $uid != 1) {
+#		return 1;
+#	}
 
 
 
 	### Use session to cache multiple lookups of the same group.
-	if ($session{isInGroup}{$gid}{$uid} || $session{isInGroup}{3}{$uid}) {
+	if ($session{isInGroup}{$gid}{$uid} == 1) {
 		return 1;
 	} elsif ($session{isInGroup}{$gid}{$uid} eq "0") {
 		return 0;
@@ -292,9 +292,10 @@ sub isInGroup {
 	foreach (@{$groups}) {
 		$session{isInGroup}{$_}{$uid} = 1;
 	}
-	if ($session{isInGroup}{$gid}{$uid} || $session{isInGroup}{3}{$uid}) {
+	if ($session{isInGroup}{$gid}{$uid} == 1) {
 		return 1;
 	}
+
         ### Get data for auxillary checks.
 	tie %group, 'Tie::CPHash';
 	%group = WebGUI::SQL->quickHash("select karmaThreshold,ipFilter,scratchFilter,databaseLinkId,dbQuery,dbCacheTimeout from groups where groupId='$gid'");
@@ -313,6 +314,7 @@ sub isInGroup {
 			}
 		}
 	}
+
 	### Check Scratch Variables 
 	if ($group{scratchFilter} ne "") {
 		$group{scratchFilter} =~ s/\t//g;
@@ -328,6 +330,7 @@ sub isInGroup {
 			}
 		}
 	}
+
         ### Check karma levels.
 	if ($session{setting}{useKarma}) {
 		my $karma;
@@ -382,7 +385,7 @@ sub isInGroup {
 	foreach (@{$groups}) {
 		$session{isInGroup}{$_}{$uid} = isInGroup($_, $uid);
 		if ($session{isInGroup}{$_}{$uid}) {
-			$session{isInGroup}{$gid}{$uid} = 1;
+			$session{isInGroup}{$gid}{$uid} = 1; # cache current group also so we don't have to do the group in group check again
 			return 1;
 		}
 	}

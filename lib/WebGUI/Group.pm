@@ -70,6 +70,7 @@ sub _create {
         my $groupId = getNextId("groupId");
         WebGUI::SQL->write("insert into groups (groupId,dateCreated,expireOffset,karmaThreshold) values 
 		($groupId,".time().",314496000,1000000000)");
+	WebGUI::Grouping::addGroupsToGroups([3],[$groupId]);
         return $groupId;
 }
 
