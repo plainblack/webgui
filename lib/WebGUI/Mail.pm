@@ -87,12 +87,11 @@ sub send {
         $message .= "BCC: $_[5]\n" if ($_[5]);
         $message .= "Subject: ".$_[1]."\n";
         $message .= "\n";
+	$message = WebGUI::Macro::process($message);
         #body
         $message .= $_[2]."\n";
 	#footer
-	$message .= "\n".$session{setting}{mailFooter};
-	#process macros on message
-	$message = WebGUI::Macro::process($message);
+	$message .= WebGUI::Macro::process("\n".$session{setting}{mailFooter});
 	if ($session{setting}{smtpServer} =~ /\/sendmail/) {
 		if (open(MAIL,"| $session{setting}{smtpServer} -t -oi")) {
 			print MAIL $message;

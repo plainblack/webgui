@@ -20,9 +20,9 @@ use Exporter;
 use strict;
 use Tie::IxHash;
 
-our @ISA    = qw(Exporter);
-our @EXPORT = qw(&makeTabSafe &makeArrayTabSafe &randomizeHash &commify &randomizeArray
-&sortHashDescending &sortHash &isIn &makeCommaSafe &makeArrayCommaSafe &randint &round);
+our @ISA = qw(Exporter);
+our @EXPORT = qw(&makeTabSafe &makeArrayTabSafe &randomizeHash &commify &randomizeArray 
+	&sortHashDescending &sortHash &isIn &makeCommaSafe &makeArrayCommaSafe &randint &round);
 
 
 =head1 NAME
@@ -71,9 +71,8 @@ Any old number will do.
 
 =cut
 
-
 sub commify {
-	my $text = reverse $_[ 0 ];
+	my $text = reverse $_[0];
 	$text =~ s/(\d\d\d)(?=\d)(?!\d*\.)/$1,/g;
 	return scalar reverse $text;
 }
@@ -98,7 +97,6 @@ An array to look for the value in.
 
 =cut
 
-
 sub isIn {
 	my $key = shift;
 	$_ eq $key and return 1 for @_;
@@ -121,10 +119,9 @@ A reference to the array to look through.
 
 =cut
 
-
 sub makeArrayCommaSafe {
-	my $array = $_[ 0 ];
-	$_ = makeCommaSafe( $_ ) for @$array;
+	my $array = $_[0];
+	$_ = makeCommaSafe($_) for @$array;
 }
 
 #-------------------------------------------------------------------
@@ -143,10 +140,9 @@ Searches through an array looking for tabs and replaces them with four spaces. A
 
 =cut
 
-
 sub makeArrayTabSafe {
-	my $array = $_[ 0 ];
-	$_ = makeTabSafe( $_ ) for @$array;
+	my $array = $_[0];
+	$_ = makeTabSafe($_) for @$array;
 }
 
 #-------------------------------------------------------------------
@@ -165,9 +161,8 @@ The text to search through.
 
 =cut
 
-
 sub makeCommaSafe {
-	my $text = $_[ 0 ];
+	my $text = $_[0];
 	$text =~ tr/,\r\n/; /;
 	return $text;
 }
@@ -188,9 +183,8 @@ The text to search through.
 
 =cut
 
-
 sub makeTabSafe {
-	my $text = $_[ 0 ];
+	my $text = $_[0];
 	$text =~ tr/\r\n/ /;
 	$text =~ s/\t/    /g;
 	return $text;
@@ -216,12 +210,11 @@ The highest possible value. Defaults to 1.
 
 =cut
 
-
 sub randint {
-	my ( $low, $high ) = @_;
-	$low  = 0 unless defined $low;
+	my ($low, $high) = @_;
+	$low = 0 unless defined $low;
 	$high = 1 unless defined $high;
-	( $low, $high ) = ( $high, $low ) if $low > $high;
+	($low, $high) = ($high,$low) if $low > $high;
 	return $low + int( rand( $high - $low + 1 ) );
 }
 
@@ -241,14 +234,13 @@ A reference to the array to randomize.
 
 =cut
 
-
 sub randomizeArray {
 	my $array = shift;
-	if ( $#$array > 0 ) {
-		for ( my $i = @$array; --$i; ) {
-			my $j = int rand( $i + 1 );
+	if ($#$array > 0) {
+		for (my $i = @$array; --$i; ) {
+			my $j = int rand ($i+1);
 			next if $i == $j;
-			@$array[ $i, $j ] = @$array[ $j, $i ];
+			@$array[$i,$j] = @$array[$j,$i];
 		}
 	}
 }
@@ -269,40 +261,32 @@ A reference hash to randomize.
 
 =cut
 
-
 sub randomizeHash {
-	my $hash = $_[ 0 ];
+	my $hash = $_[0];
 	my @keys = keys %$hash;
-	randomizeArray( \@keys );
+	randomizeArray(\@keys);
 	tie my %temp, 'Tie::IxHash';
-	foreach my $key ( @keys ) {
-		$temp{ $key } = $hash->{ $key };
+	foreach my $key (@keys) {
+		$temp{$key} = $hash->{$key};
 	}
 	return \%temp;
 }
 
 #-------------------------------------------------------------------
 
-=head2 round ( float [, significantDigits ] )
+=head2 round ( real )
 
-Returns an integer after rounding a floating point number.
+Returns an integer after rounding a real number.
 
 =over
 
-=item float
+=item real
 
 Any floating point number.
-
-=item significantDigits
-
-The number of digits to leave after the decimal point. Defaults to 0.
-
-NOTE: If you set this higher than 0 then you'll get back another floating point number rather than an integer.
 
 =back
 
 =cut
-
 
 sub round {
 	my $significantDigits = $_[1] || 0;
@@ -325,11 +309,10 @@ A hash to be sorted.
 
 =cut
 
-
 sub sortHash {
 	my %hash = @_;
 	tie my %newHash, 'Tie::IxHash';
-	for my $key ( sort { $hash{ $a } cmp $hash{ $b } } keys %hash ) {
+	for my $key ( sort { $hash{$a} cmp $hash{$b} } keys %hash ) {
 		$newHash{ $key } = $hash{ $key };
 	}
 	return %newHash;
@@ -355,11 +338,12 @@ A hash to be sorted.
 sub sortHashDescending {
 	my %hash = @_;
 	tie my %newHash, 'Tie::IxHash';
-	for my $key ( sort { $hash{ $b } cmp $hash{ $a } } keys %hash ) {
+	for my $key ( sort { $hash{$b} cmp $hash{$a} } keys %hash ) {
 		$newHash{ $key } = $hash{ $key };
 	}
 	return %newHash;
 }
 
 1;
+
 
