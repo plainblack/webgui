@@ -8,6 +8,7 @@ use strict;
 use WebGUI::Session;
 use WebGUI::SQL;
 use WebGUI::Forum;
+use WebGUI::Macro;
 
 my $configFile;
 my $quiet;
@@ -586,6 +587,256 @@ WebGUI::SQL->write("alter table Survey add column overviewTemplateId int not nul
 WebGUI::SQL->write("alter table Survey add column maxResponsesPerUser int not null default 1");
 WebGUI::SQL->write("alter table Survey add column questionsPerResponse int not null default 9999999");
 
+#--------------------------------------------
+print "\tMigrating Navigation Macro's.\n" unless ($quiet);
+my %dbFields = ( 
+	template => { id => [ "templateId", "namespace" ], fields => [ "template" ] },
+	wobject => { id => [ "wobjectId" ], fields => [ "description" ] },
+	collateral => { id => [ "collateralId" ], fields => [ "parameters" ] }
+	);
+my %replace;
+$replace{'C'} = {
+	columns => {
+		identifier=>'crumbTrail', depth=>1, method=>'self_and_ancestors', startAt=>'current', stopAtLevel=>'-1',
+		templateId=>'2', showSystemPages=>0, showHiddenPages=>0, showUnprivilegedPages=>0, reverse=>1, seperator=>'&gt;'
+		},
+	parameter => [ "seperator" ],
+	template => q{<tmpl_if session.var.adminOn>
+<tmpl_var config.button>
+</tmpl_if>
+<span class="crumbTrail">
+<tmpl_loop page_loop>
+<a class="crumbTrail" 
+   <tmpl_if page.newWindow>target="_blank"</tmpl_if>
+   href="<tmpl_var page.url>"><tmpl_var page.menuTitle></a>
+   <tmpl_unless "__last__"> __SEPARATOR__ </tmpl_unless>
+</tmpl_loop>
+</span>},
+	};
+$replace{'FlexMenu'} = {
+	columns => {
+		identifier=>'FlexMenu', depth=>99, method=>'pedigree', startAt=>'current', stopAtLevel=>'2',
+		templateId=>'1', showSystemPages=>0, showHiddenPages=>0, showUnprivilegedPages=>0, reverse=>0, seperator=>''
+		},
+	'parameter'=>[ "depth" ]
+	};
+$replace{'M'} = {
+	'columns'=>{
+		identifier=>'currentMenuVertical', depth=>1, method=>'descendants', startAt=>'current', stopAtLevel=>'-1',
+		templateId=>'1', showSystemPages=>0, showHiddenPages=>0, showUnprivilegedPages=>0, reverse=>0, seperator=>''
+		},
+	'parameter'=>[ "depth" ]
+	};
+$replace{'m'} = {
+	'columns'=>{
+		identifier=>'currentMenuHorizontal', depth=>1, method=>'descendants',  startAt=>'current',stopAtLevel=>'-1',
+		templateId=>'3', showSystemPages=>0, showHiddenPages=>0, showUnprivilegedPages=>0, reverse=>0, seperator=>'&middot;'
+		},
+	'parameter'=>[ "seperator" ],
+	template=>q{<tmpl_if session.var.adminOn>
+<tmpl_var config.button>
+</tmpl_if>
+<span class="horizontalMenu">
+<tmpl_loop page_loop>
+<a class="horizontalMenu" 
+   <tmpl_if page.newWindow>target="_blank"</tmpl_if>
+   href="<tmpl_var page.url>"><tmpl_var page.menuTitle></a>
+   <tmpl_unless "__last__"> __SEPARATOR__ </tmpl_unless>
+</tmpl_loop>
+</span>},
+	};
+$replace{'PreviousDropMenu'} = {
+	'columns'=>{
+		identifier=>'PreviousDropMenu', depth=>99, method=>'self_and_sisters', startAt=>'current',stopAtLevel=>'-1',
+		templateId=>'4', showSystemPages=>0, showHiddenPages=>0, showUnprivilegedPages=>0, reverse=>0, seperator=>''
+		},
+	'parameter'=>[ ]
+	};
+$replace{'P'} = {
+	'columns'=>{
+		identifier=>'previousMenuVertical', depth=>1, method=>'descendants', startAt=>'mother', stopAtLevel=>'-1',
+		templateId=>'1', showSystemPages=>0, showHiddenPages=>0, showUnprivilegedPages=>0, reverse=>0, seperator=>''
+		},
+	'parameter'=>[ "depth" ]
+	};
+$replace{'p'} = {
+	'columns'=>{
+		identifier=>'previousMenuHorizontal', depth=>1, method=>'descendants', startAt=>'mother', stopAtLevel=>'-1',
+		templateId=>'3', showSystemPages=>0, showHiddenPages=>0, showUnprivilegedPages=>0, reverse=>0, seperator=>'&middot;'
+		},
+	'parameter'=>[ "seperator" ],
+	template=>q{<tmpl_if session.var.adminOn>
+<tmpl_var config.button>
+</tmpl_if>
+<span class="horizontalMenu">
+<tmpl_loop page_loop>
+<a class="horizontalMenu"
+   <tmpl_if page.newWindow>target="_blank"</tmpl_if>
+   href="<tmpl_var page.url>"><tmpl_var page.menuTitle></a>
+   <tmpl_unless "__last__"> __SEPARATOR__ </tmpl_unless>
+</tmpl_loop>
+</span>},
+	};
+$replace{'rootmenu'} = {
+	'columns'=>{
+		identifier=>'rootmenu', depth=>1, method=>'daughters', startAt=>'root', stopAtLevel=>'-1', 
+		templateId=>'3', showSystemPages=>0, showHiddenPages=>0, showUnprivilegedPages=>0, reverse=>0, seperator=>'&middot;'
+		},
+	'parameter'=>[ "seperator" ],
+        template=>q{<tmpl_if session.var.adminOn>
+<tmpl_var config.button>
+</tmpl_if>
+<span class="horizontalMenu">
+<tmpl_loop page_loop>
+<a class="horizontalMenu"
+   <tmpl_if page.newWindow>target="_blank"</tmpl_if>
+   href="<tmpl_var page.url>"><tmpl_var page.menuTitle></a>
+   <tmpl_unless "__last__"> __SEPARATOR__ </tmpl_unless>
+</tmpl_loop>
+</span>},
+	};
+$replace{'RootTab'} = {
+	'columns'=>{
+		identifier=>'RootTab', depth=>99, method=>'daughters', startAt=>'root', stopAtLevel=>'-1',
+		templateId=>'5', showSystemPages=>0, showHiddenPages=>0, showUnprivilegedPages=>0, reverse=>0, seperator=>''
+		},
+	'parameter'=>[ ]
+	};
+$replace{'SpecificDropMenu'} = {
+	'columns'=>{
+		identifier=>'SpecificDropMenu', depth=>3, method=>'descendants', startAt=>'home', stopAtLevel=>'-1',
+		templateId=>'4', showSystemPages=>0, showHiddenPages=>0, showUnprivilegedPages=>0, reverse=>0, seperator=>''
+		},
+	'parameter'=>[ "startAt", "depth" ]
+	};
+$replace{'S'} = {
+	'columns'=>{
+		identifier=>'SpecificMenuVertical', depth=>3, method=>'descendants', startAt=>'home', stopAtLevel=>'-1',
+		templateId=>'1', showSystemPages=>0, showHiddenPages=>0, showUnprivilegedPages=>0, reverse=>0, seperator=>''
+		},
+	'parameter'=>[ "startAt", "depth" ]
+	};
+$replace{'s'} = {
+	'columns'=>{
+		identifier=>'SpecificMenuHorizontal', depth=>3, method=>'descendants', startAt=>'home', stopAtLevel=>'-1',
+		templateId=>'3', showSystemPages=>0, showHiddenPages=>0, showUnprivilegedPages=>0, reverse=>0, seperator=>''
+		},
+	'parameter'=>[ "startAt", "seperator" ],
+        template=>q{<tmpl_if session.var.adminOn>
+<tmpl_var config.button>
+</tmpl_if>
+<span class="horizontalMenu">
+<tmpl_loop page_loop>
+<a class="horizontalMenu"
+   <tmpl_if page.newWindow>target="_blank"</tmpl_if>
+   href="<tmpl_var page.url>"><tmpl_var page.menuTitle></a>
+   <tmpl_unless "__last__"> __SEPARATOR__ </tmpl_unless>
+</tmpl_loop>
+</span>},
+
+	};
+$replace{'TopDropMenu'} = {
+	'columns'=>{
+		identifier=>'TopDropMenu', depth=>0, method=>'self_and_sisters', startAt=>'top', stopAtLevel=>'-1',
+		templateId=>'4', showSystemPages=>0, showHiddenPages=>0, showUnprivilegedPages=>0, reverse=>0, seperator=>''
+		},
+	'parameter'=>[ ]
+	};
+$replace{'T'} = {
+	'columns'=>{
+		identifier=>'TopLevelMenuVertical', depth=>0, method=>'self_and_sisters', startAt=>'top', stopAtLevel=>'-1',
+		templateId=>'1', showSystemPages=>0, showHiddenPages=>0, showUnprivilegedPages=>0, reverse=>0, seperator=>''
+		},
+	'parameter'=>[ "depth" ]
+	};
+$replace{'t'} = {
+	'columns'=>{
+		identifier=>'TopLevelMenuHorizontal', depth=>0, method=>'self_and_sisters', startAt=>'top', stopAtLevel=>'-1',
+		templateId=>'3', showSystemPages=>0, showHiddenPages=>0, showUnprivilegedPages=>0, reverse=>0, seperator=>'&middot;'
+		},
+	'parameter'=>[ "seperator" ],
+        template=>q{<tmpl_if session.var.adminOn>
+<tmpl_var config.button>
+</tmpl_if>
+<span class="horizontalMenu">
+<tmpl_loop page_loop>
+<a class="horizontalMenu"
+   <tmpl_if page.newWindow>target="_blank"</tmpl_if>
+   href="<tmpl_var page.url>"><tmpl_var page.menuTitle></a>
+   <tmpl_unless "__last__"> __SEPARATOR__ </tmpl_unless>
+</tmpl_loop>
+</span>},
+
+	};
+
+my ($sth, $data, $code, $table, $column, %identifier);
+foreach $table (keys %dbFields){
+	$sth = WebGUI::SQL->read("SELECT * FROM $table ");
+	die "Cannot read from table $table " if ($!);
+	while ($data = $sth->hashRef){
+		foreach $column (@{$dbFields{$table}{fields}}){
+			$code = $data->{$column};
+			while ($code =~ /$WebGUI::Macro::nestedMacro/gs){
+				my ($macro, $searchString, $params) = ($1, $2, $3);
+				next if ($searchString =~ /^\d+$/); # don't process ^0; ^1; ^2; etc.
+				next if ($searchString =~ /^\-$/); # don't process ^-;
+				if ($params ne "") {
+					$params =~ s/(^\(|\)$)//g; # remove parenthesis
+					$params = WebGUI::Macro::process($params); # recursive process params
+				}
+				my @param = WebGUI::Macro::getParams($params);
+				if($replace{$searchString}){
+					my $repNav = $replace{$searchString};
+                                       my $replaceId = $macro.'_'.join('_',@param);
+					# print "\nReplacing macro: $macro\n";
+					for(my $i=0; $i<scalar(@param); $i++){
+						$repNav->{columns}->{$repNav->{parameter}->[$i]} = $param[$i];
+						# print "Found parameters:\n";
+						# print "\t".$repNav->{parameter}->[$i].": ".$repNav->{columns}->{$repNav->{parameter}->[$i]}."\n";
+					}
+					my $doTemplate = ($repNav->{template} && $repNav->{columns}->{seperator});
+					if($doTemplate) {
+					  if($identifier{cachedTemplate}{$replaceId."_".$repNav->{columns}->{seperator}}) {
+						$repNav->{columns}->{templateId} = 
+					    	  $identifier{cachedTemplate}{$replaceId."_".$repNav->{columns}->{seperator}};
+					  } else {
+						$repNav->{template} =~ s/__SEPARATOR__/$repNav->{columns}->{seperator}/g;
+						($repNav->{columns}->{templateId}) = WebGUI::SQL->quickArray("select max(templateId)
+                                from template where namespace=".quote('Navigation'));
+	                        		if ($repNav->{columns}->{templateId} > 999) {
+        	                        		$repNav->{columns}->{templateId}++;
+                	        		} else {
+                        	        		$repNav->{columns}->{templateId} = 1000;
+                        			}
+					  }
+					}
+					unless ($identifier{cachedConfig}{$replaceId}) { 
+						$identifier{cachedConfig}{$replaceId} = addNavigation($repNav->{columns});
+					}
+					if($doTemplate && 
+					   ! $identifier{cachedTemplate}{$replaceId."_".$repNav->{columns}->{seperator}}) {
+  					   WebGUI::SQL->write("insert into template (templateId,namespace,name,template) values
+					  ($repNav->{columns}->{templateId}, ".quote('Navigation').", ".
+					  quote($identifier{$replaceId}).", ".quote($repNav->{template}).")");	
+					}
+					my $replacement = "^Navigation($identifier{cachedConfig}{$replaceId});";
+					 # print "\tReplacing macro $macro with $replacement ";
+					$code =~ s/\Q$macro/$replacement/ges;
+				}
+			}
+			my ($update, @where);
+			$update = "UPDATE $table SET $column=".quote($code)." WHERE ";
+			foreach (@{$dbFields{$table}{id}}){
+				push (@where, $_."=".quote($data->{$_}));
+			}
+			$update .= join (" AND ", @where);
+			WebGUI::SQL->write($update);
+		}
+	}
+	$sth->finish;
+}
+
+
 
 WebGUI::Session::close();
 
@@ -632,5 +883,22 @@ sub _positionFormat6x {
 	';
 	return $newPositionCode;
 }
-
-
+#--------------------------------------------
+sub addNavigation {
+	my $properties = shift;
+#	use Data::Dumper; print "\n\n". Dumper($properties);
+	my $navId = getNextId("navigationId");
+	my $identifier = $properties->{identifier}."_".$navId;
+	WebGUI::SQL->write("INSERT INTO Navigation(navigationId, identifier) VALUES ($navId, ".quote($identifier).")");
+	my ($update, @set);
+	$update = "UPDATE Navigation SET ";
+	foreach (keys %{$properties}){
+		next if (/seperator/i);
+		push (@set, $_."=".quote($properties->{$_})) unless($_ eq "identifier");
+	}
+	$update .= join(",", @set);
+	$update .= " WHERE navigationId=".quote($navId);
+	WebGUI::SQL->write($update);
+	return $identifier;
+}
+#--------------------------------------------
