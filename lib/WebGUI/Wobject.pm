@@ -521,7 +521,7 @@ sub processTemplate {
 		%{$_[0]->{_property}},
 		%{$_[2]}
 		);
-	return WebGUI::Template::process(WebGUI::Template::get($_[1]), \%vars);
+	return WebGUI::Template::process(WebGUI::Template::get($_[1],$_[0]->get("namespace")), \%vars);
 }
 
 #-------------------------------------------------------------------
