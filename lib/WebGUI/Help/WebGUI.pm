@@ -642,7 +642,11 @@ our $HELP = {
 			{
 				tag => 'macros using',
 				namespace => 'WebGUI'
-			}
+			},
+			{
+				tag => 'navigation template',
+				namespace => 'WebGUI'
+			},
 		]
 	},
 	'user macros' => {
