@@ -74,22 +74,34 @@ sub _accountOptions {
 
 #-------------------------------------------------------------------
 sub _hasBadPassword {
-	if ($_[0] ne $_[1] || $_[0] eq "") {
-		return 1;
-	} else {
-		return 0;
+	my ($error);
+	if ($_[0] ne $_[1]) {
+		$error = '<li>'.WebGUI::International::get(78);
+	} 
+	if ($_[0] eq "password") {
+		$error .= '<li>'.WebGUI::International::get(727);
 	}
+	if ($_[0] eq "") {
+		$error .= '<li>'.WebGUI::International::get(726);
+	}
+	return $error;
 }
 
 #-------------------------------------------------------------------
 sub _hasBadUsername {
-	my ($otherUser);
-	($otherUser) = WebGUI::SQL->quickArray("select username from users where username='$_[0]'");
-	if (($otherUser ne "" && $otherUser ne $session{user}{username}) || $_[0] eq "") {
-		return 1;
-	} else {
-		return 0;
+	my ($error,$otherUser);
+	if ($_[0] =~ /^\s/ || $_[0] =~ /\s$/) {
+		$error = '<li>'.WebGUI::International::get(724);
+	} 
+	if ($_[0] eq "") {
+		$error .= '<li>'.WebGUI::International::get(725);
 	}
+	($otherUser) = WebGUI::SQL->quickArray("select username from users where username='$_[0]'");
+	if ($otherUser ne "" && $otherUser ne $session{user}{username}) {
+		$error .= '<li>'.WebGUI::International::get(77).' "'.$_[0].'too", "'.$_[0].'2", '
+                	.'"'.$_[0].'_'.WebGUI::DateTime::epochToHuman(time(),"%y").'"';
+	}
+	return $error;
 }
 
 #-------------------------------------------------------------------
@@ -193,22 +205,14 @@ sub www_createAccount {
 #-------------------------------------------------------------------
 sub www_createAccountSave {
         my ($profile, $u, $username, $uri, $temp, $ldap, $port, %args, $search, 
-		$connectDN, $auth, $output, $error, $uid,  
-		$encryptedPassword, $fieldName);
+		$connectDN, $auth, $output, $error, $uid,  $encryptedPassword, $fieldName);
         if ($session{setting}{authMethod} eq "LDAP" && $session{setting}{usernameBinding}) {
                 $username = $session{form}{ldapId};
         } else {
                 $username = $session{form}{username};
         }
-        if (_hasBadUsername($username)) {
-                $error = '<li>'.WebGUI::International::get(77);
-                $error .= ' "'.$username.'too", ';
-                $error .= '"'.$username.'2", ';
-                $error .= '"'.$username.'_'.WebGUI::DateTime::epochToHuman(time(),"%y").'"';
-        }
-        if (_hasBadPassword($session{form}{identifier1},$session{form}{identifier2})) {
-                $error .= '<li>'.WebGUI::International::get(78);
-        }
+	$error = _hasBadUsername($username);
+	$error .= _hasBadPassword($session{form}{identifier1},$session{form}{identifier2});
         if ($session{setting}{authMethod} eq "LDAP") {
                 $uri = URI->new($session{setting}{ldapURL});
                 if ($uri->port < 1) {
@@ -533,21 +537,14 @@ sub www_recoverPasswordFinish {
 sub www_updateAccount {
         my ($output, $error, $encryptedPassword, $passwordStatement, $u);
         if ($session{var}{sessionId}) {
-        	if (_hasBadUsername($session{form}{username})) {
-                	$error = WebGUI::International::get(77);
-			$error .= ' "'.$session{form}{username}.'too", ';
-                	$error .= '"'.$session{form}{username}.'2", ';
-                	$error .= '"'.$session{form}{username}.'_'.WebGUI::DateTime::epochToHuman(time(),"%y").'"';
-			$error .= '<p>';
-        	}
         	if ($session{form}{identifier1} ne "password") {
-			if (_hasBadPassword($session{form}{identifier1},$session{form}{identifier2})) {
-                		$error .= WebGUI::International::get(78).'<p>';
-        		} else {
+			$error = _hasBadPassword($session{form}{identifier1},$session{form}{identifier2});
+        		unless ($error) {
                 		$encryptedPassword = Digest::MD5::md5_base64($session{form}{identifier1});
 				$passwordStatement = ', identifier='.quote($encryptedPassword);
 			}
 		}
+		$error .= _hasBadUsername($session{form}{username});
         	if ($error eq "") {
 			$u = WebGUI::User->new($session{user}{userId});
                 	$encryptedPassword = Digest::MD5::md5_base64($session{form}{identifier1});
