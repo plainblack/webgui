@@ -53,45 +53,6 @@ sub set {
 }
 
 #-------------------------------------------------------------------
-sub www_add {
-        my ($output, %hash);
-	tie %hash, 'Tie::IxHash';
-      	if (WebGUI::Privilege::canEditPage()) {
-                $output = helpLink(1,$namespace);
-		$output .= '<h1>'.WebGUI::International::get(3,$namespace).'</h1>';
-		$output .= formHeader();
-                $output .= WebGUI::Form::hidden("widget",$namespace);
-                $output .= WebGUI::Form::hidden("func","addSave");
-                $output .= '<table>';
-                $output .= tableFormRow(WebGUI::International::get(99),WebGUI::Form::text("title",20,128,'Syndicated Content'));
-                $output .= tableFormRow(WebGUI::International::get(174),WebGUI::Form::checkbox("displayTitle",1));
-                $output .= tableFormRow(WebGUI::International::get(175),WebGUI::Form::checkbox("processMacros",1));
-		%hash = WebGUI::Widget::getPositions();
-                $output .= tableFormRow(WebGUI::International::get(363),WebGUI::Form::selectList("templatePosition",\%hash));
-                $output .= tableFormRow(WebGUI::International::get(85),WebGUI::Form::textArea("description",'','','',1));
-                $output .= tableFormRow(WebGUI::International::get(1,$namespace),WebGUI::Form::text("rssUrl",20,2048));
-                $output .= formSave(); 
-                $output .= '</table></form>';
-                return $output;
-        } else {
-                return WebGUI::Privilege::insufficient();
-        }
-	return $output;
-}
-
-#-------------------------------------------------------------------
-sub www_addSave {
-	my ($widgetId);
-	if (WebGUI::Privilege::canEditPage()) {
-		$widgetId = create($session{page}{pageId},$session{form}{widget},$session{form}{title},$session{form}{displayTitle},$session{form}{description},$session{form}{processMacros},$session{form}{templatePosition});
-		WebGUI::SQL->write("insert into SyndicatedContent values ($widgetId, ".quote($session{form}{rssUrl}).", 'Not yet fetched.', '".time()."')");
-		return "";
-	} else {
-		return WebGUI::Privilege::insufficient();
-	}
-}
-
-#-------------------------------------------------------------------
 sub www_copy {
         if (WebGUI::Privilege::canEditPage()) {
 		$_[0]->duplicate;

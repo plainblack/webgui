@@ -61,80 +61,6 @@ sub set {
 }
 
 #-------------------------------------------------------------------
-sub www_add {
-        my ($output, %hash);
-	tie %hash, 'Tie::IxHash';
-      	if (WebGUI::Privilege::canEditPage()) {
-                $output = helpLink(1,$namespace);
-		$output .= '<h1>'.WebGUI::International::get(2,$namespace).'</h1>';
-		$output .= formHeader();
-                $output .= WebGUI::Form::hidden("widget",$namespace);
-                $output .= WebGUI::Form::hidden("func","addSave");
-                $output .= '<table>';
-                $output .= tableFormRow(WebGUI::International::get(99),
-			WebGUI::Form::text("title",20,128,widgetName()));
-                $output .= tableFormRow(WebGUI::International::get(174),
-			WebGUI::Form::checkbox("displayTitle",1,1));
-                $output .= tableFormRow(WebGUI::International::get(175),
-			WebGUI::Form::checkbox("processMacros",1,1));
-		%hash = WebGUI::Widget::getPositions();
-                $output .= tableFormRow(WebGUI::International::get(363),
-			WebGUI::Form::selectList("templatePosition",\%hash));
-                $output .= tableFormRow(WebGUI::International::get(85),
-			WebGUI::Form::textArea("description",'','','',1));
-                $output .= tableFormRow(WebGUI::International::get(15,$namespace),
-                        WebGUI::Form::checkbox("preprocessMacros",1));
-                $output .= tableFormRow(WebGUI::International::get(16,$namespace),
-                        WebGUI::Form::checkbox("debugMode",1));
-                $output .= tableFormRow(WebGUI::International::get(4,$namespace),
-                        WebGUI::Form::textArea("dbQuery",''));
-                $output .= tableFormRow(WebGUI::International::get(3,$namespace),
-			WebGUI::Form::textArea("template",'','','',1));
-                $output .= tableFormRow(WebGUI::International::get(5,$namespace),
-			WebGUI::Form::text("DSN",20,255,$session{config}{dsn}));
-                $output .= tableFormRow(WebGUI::International::get(6,$namespace),
-			WebGUI::Form::text("username",20,255,$session{config}{dbuser}));
-                $output .= tableFormRow(WebGUI::International::get(7,$namespace),
-			WebGUI::Form::password("identifier",20,255));
-                $output .= tableFormRow(WebGUI::International::get(14,$namespace),
-                        WebGUI::Form::text("paginateAfter",20,30,50));
-                $output .= tableFormRow(WebGUI::International::get(13,$namespace),
-			WebGUI::Form::checkbox("convertCarriageReturns",1));
-                $output .= formSave();
-                $output .= '</table></form>';
-                return $output;
-        } else {
-                return WebGUI::Privilege::insufficient();
-        }
-	return $output;
-}
-
-#-------------------------------------------------------------------
-sub www_addSave {
-	my ($widgetId);
-	if (WebGUI::Privilege::canEditPage()) {
-		$widgetId = create($session{page}{pageId},$session{form}{widget},
-			$session{form}{title},$session{form}{displayTitle},
-			$session{form}{description},$session{form}{processMacros},
-			$session{form}{templatePosition});
-		WebGUI::SQL->write("insert into SQLReport values($widgetId, ".
-			quote($session{form}{template}).", ".
-			quote($session{form}{dbQuery}).", ".
-			quote($session{form}{DSN}).", ".
-			quote($session{form}{username}).", ".
-			quote($session{form}{identifier}).", ".
-			"'$session{form}{convertCarriageReturns}', ".
-			"'$session{form}{paginateAfter}', ".
-			"'$session{form}{preprocessMacros}', ".
-			"'$session{form}{debugMode}'".
-			")");
-		return "";
-	} else {
-		return WebGUI::Privilege::insufficient();
-	}
-}
-
-#-------------------------------------------------------------------
 sub www_copy {
         if (WebGUI::Privilege::canEditPage()) {
 		$_[0]->duplicate;
@@ -172,7 +98,7 @@ sub www_edit {
 
 #-------------------------------------------------------------------
 sub www_editSave {
-        my ($widgetId, $displayTitle, $image, $attachment);
+        my ($wobjectId, $displayTitle, $image, $attachment);
         if (WebGUI::Privilege::canEditPage()) {
 		$_[0]->SUPER::www_editSave();
                 $_[0]->set({
@@ -195,7 +121,11 @@ sub www_editSave {
 #-------------------------------------------------------------------
 sub www_view {
 	my ($dsn, $query, @row, $i, $rownum, $p, $ouch, $output, $sth, $dbh, @result, @template, $temp, $col, $errorMessage, $url);
-	$query = WebGUI::Macro::process($_[0]->get("dbQuery")) if ($_[0]->get("preprocessMacros"));
+	if ($_[0]->get("preprocessMacros")) {
+		$query = WebGUI::Macro::process($_[0]->get("dbQuery"));
+	} else {
+		$query = $_[0]->get("dbQuery");
+	}
 	$dsn = $_[0]->get("DSN");
 	$output = $_[0]->displayTitle;
         $output .= $_[0]->description;

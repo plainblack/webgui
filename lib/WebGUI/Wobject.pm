@@ -277,7 +277,7 @@ sub purge {
 sub set {
 	my ($key, $sql, @update, $i);
 	if ($_[0]->{_property}{wobjectId} eq "new") {
-		$_[0]->{_property}{wobjectId} = getNextId("widgetId");
+		$_[0]->{_property}{wobjectId} = getNextId("wobjectId");
 		$_[0]->{_property}{pageId} = ${$_[1]}{pageId} || $session{page}{pageId};
 		$_[0]->{_property}{sequenceNumber} = _getNextSequenceNumber($_[0]->{_property}{pageId});
 		$_[0]->{_property}{addedBy} = $session{user}{userId};

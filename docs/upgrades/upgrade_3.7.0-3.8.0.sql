@@ -104,6 +104,8 @@ delete from widget where namespace='EventsCalendar';
 alter table EventsCalendar change widgetId wobjectId int not null;
 alter table EventsCalendar_event change widgetId wobjectId int not null;
 
+update incrementer set incrementerId='wobjectId' where incrementerId='widgetId';
+
 INSERT INTO international VALUES (21,'EventsCalendar','English','Proceed to add event?');
 INSERT INTO international VALUES (20,'EventsCalendar','English','Add an event.');
 INSERT INTO international VALUES (38,'UserSubmission','English','(Select \"No\" if you\'re writing an HTML/Rich Edit submission.)');
