@@ -602,6 +602,8 @@ sub generate {
          			if ($wobjectProxy->{overrideTemplate}) {
        					${$wobject}{templateId} = $wobjectProxy->{proxiedTemplateId};
        				}
+				my $originalWobjectPage = WebGUI::Page->new($wobject->{pageId});
+				$wobject->{'original.page.url'} = WebGUI::URL::gateway($originalWobjectPage->get("urlizedTitle"));
         		}
       		}
                 my $cmd = "WebGUI::Wobject::".${$wobject}{namespace};

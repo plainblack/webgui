@@ -86,8 +86,10 @@ Most Recent will select the most recent wobject that match the proxy criteria.
 A statement to determinate what to proxy, in the form of "color = blue and weight != heavy". Multiple expressions may be joined with "and" and "or". <br>
 A property or value must be quoted if it contains spaces. Feel free to use the criteria builder to build your statements.
 <p>
+<b>NOTE:</b> Wobject Proxy will automatically add a template variable to the wobject it's proxying called 'original.page.url'. You can use that to link to the original content that's being proxied.
+<p>
 |,
-		lastUpdated => 1057091098
+		lastUpdated => 1053183804
 	},
 
 	'greater than' => {

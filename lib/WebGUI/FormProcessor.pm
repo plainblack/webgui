@@ -585,7 +585,7 @@ The name of the form variable to retrieve.
 =cut
 
 sub template {
-	if ($session{form}{$_[0]} =~ /^\d+$/) {
+	if (exists $session{form}{$_[0]}) {
 		return $session{form}{$_[0]};
 	}
 	return 1;

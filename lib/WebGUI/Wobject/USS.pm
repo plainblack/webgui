@@ -258,6 +258,12 @@ sub www_approveSubmission {
 }
 
 #-------------------------------------------------------------------
+sub www_copy {
+	return "Copying of User Submission Systems has been disabled until 6.3.";
+}
+
+
+#-------------------------------------------------------------------
 sub www_deleteFile {
 	my ($owner) = WebGUI::SQL->quickArray("select userId from USS_submission where USS_submissionId=".quote($session{form}{sid}));
         if ($owner == $session{user}{userId} || WebGUI::Grouping::isInGroup($_[0]->get("groupToApprove"))) {
@@ -284,13 +290,15 @@ sub www_deleteSubmission {
 
 #-------------------------------------------------------------------
 sub www_deleteSubmissionConfirm {
-	my ($owner, $forumId) = WebGUI::SQL->quickArray("select userId,forumId from USS_submission where USS_submissionId=".quote($session{form}{sid}));
+	my ($owner, $forumId, $pageId) = WebGUI::SQL->quickArray("select userId,forumId,pageId from USS_submission where USS_submissionId=".quote($session{form}{sid}));
         if ($owner == $session{user}{userId} || WebGUI::Grouping::isInGroup($_[0]->get("groupToApprove"))) {
 		my ($inUseElsewhere) = WebGUI::SQL->quickArray("select count(*) from USS_submission where forumId=".quote($forumId));
                 unless ($inUseElsewhere > 1) {
 			my $forum = WebGUI::Forum->new($forumId);
 			$forum->purge;
 		}
+		my $page = WebGUI::Page->new($pageId);
+		$page->purge;
 		$_[0]->deleteCollateral("USS_submission","USS_submissionId",$session{form}{sid});
 		my $file = WebGUI::Attachment->new("",$session{form}{wid},$session{form}{sid});
 		$file->deleteNode;
@@ -639,6 +647,23 @@ sub www_editSubmissionSave {
 				$hash{status} = "Approved";
 			}
 		}
+		my $parentPage = WebGUI::Page->new($_[0]->get("pageId"));
+                my %pageVars = %{$parentPage->get};
+                delete $pageVars{pageId};
+                delete $pageVars{nestedSetLeft};
+                delete $pageVars{nestedSetRight};
+                delete $pageVars{depth};
+                delete $pageVars{parentId};
+                delete $pageVars{sequenceNumber};
+                $pageVars{hideFromNavigation} = 1;
+                $pageVars{title} = $pageVars{menuTitle} = $hash{title};
+                $pageVars{subroutine} = "viewSubmissionAsPage";
+                $pageVars{subroutinePackage} = "WebGUI::Wobject::USS";
+                $pageVars{subroutineParams} = "{wobjectId=>'".$_[0]->wid."',submissionId=>'".$hash{USS_submissionId}."'}";
+                $pageVars{urlizedTitle} .= "/".$hash{title};
+                my $newPage = $parentPage->add;
+                $pageVars{urlizedTitle} = WebGUI::Page::makeUnique(WebGUI::URL::urlize($pageVars{urlizedTitle},$newPage->get("pageId")));
+                $newPage->set(\%pageVars);
 		$_[0]->setCollateral("USS_submission", "USS_submissionId", \%hash, 1, 0, "USS_id", $_[0]->get("USS_id"));
                 return $_[0]->www_viewSubmission();
         } else {

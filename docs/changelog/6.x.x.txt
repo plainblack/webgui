@@ -72,6 +72,9 @@
  - Updated some out of date and missing help information. (Colin Kuskie)
  - RFE [ 855761 ]. Move forum to another Message Board (Leendert Bottelberghs).
  - RFE [ 1010055 ]. Added template variables for current user alias (Leendert Bottelberghs).
+ - Wobject Proxies (Shortcuts) now expose a template variable called
+   original.page.url that will allow you to link to the original content from
+   the shortcut.
  - bugfix [ 1016271 ]. all posts go to last forum in MB (Leendert Bottelberghs).
 
 
