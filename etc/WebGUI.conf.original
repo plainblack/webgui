@@ -16,7 +16,8 @@ authMethods = LDAP, WebGUI
 
 wobjects = Article, EventsCalendar, FileManager, HttpProxy, \
 	DataForm, MessageBoard, Poll, Product, SiteMap, \
-	SQLReport, Survey, SyndicatedContent, USS, WobjectProxy
+	SQLReport, Survey, SyndicatedContent, USS, WobjectProxy, \
+	WSClient
 
 macros = a => a_account, \
 	AdminBar => AdminBar, \
