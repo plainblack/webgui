@@ -36,6 +36,7 @@ sub _submenu {
                 $menu{WebGUI::URL::page('op=editStyle&sid='.$session{form}{sid})} = WebGUI::International::get(803);
                 $menu{WebGUI::URL::page('op=copyStyle&sid='.$session{form}{sid})} = WebGUI::International::get(804);
 		$menu{WebGUI::URL::page('op=deleteStyle&sid='.$session{form}{sid})} = WebGUI::International::get(805);
+		$menu{WebGUI::URL::page('op=listStyles')} = WebGUI::International::get(814);
 	}
         return menuWrapper($_[0],\%menu);
 }
@@ -135,7 +136,7 @@ sub www_listStyles {
 	$output .= $p->getPage($session{form}{pn});
 	$output .= '</table>';
 	$output .= $p->getBarTraditional($session{form}{pn});
-        return $output;
+        return _submenu($output);
 }
 
 
