@@ -85,7 +85,8 @@ sub _recursivelyChangeProperties {
 					groupIdEdit		=> $session{form}{groupIdEdit}
 				}) if ($session{form}{recursePrivs});
 				$currentPage->setWithoutRecache({
-					styleId => $session{form}{styleId}
+					styleId => $session{form}{styleId},
+					printableStyleId => $session{form}{printableStyleId}
 				}) if ($session{form}{recurseStyle});
 			}
 			return 1;

@@ -1,3 +1,7 @@
+6.0.3
+ - Fixed a recursive style change bug.
+
+
 6.0.2
  - Fixed a bug where visitor contributed items in the USS were editable by all
    visitors.
