@@ -22,6 +22,12 @@ save you many hours of grief.
 	need to download and upgrade to 5.5.x before you can upgrade
 	to 6.3 or higher.
 
+ * All Site Map wobjects will be migrated to Navigation macros in
+	Articles during the upgrade. All the site map templates will
+	be lost. If you want them, save them before the upgrade. Also
+	check your site after the upgrade for all site maps to make
+	sure that they look the way you want them to look.
+
 
 6.2.8
 --------------------------------------------------------------------

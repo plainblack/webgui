@@ -70,7 +70,7 @@ sub walkTree {
 	while (my $page = $a->hashRef) {
 		my $pageId = WebGUI::Id::generate();
 		my $pageLineage = $parentLineage.sprintf("%06d",$myRank);
-		my $pageUrl = $page->{urlizedTitle};
+		my $pageUrl = fixUrl($page->{urlizedTitle});
 		my $className = 'WebGUI::Asset::Layout';
 		if ($page->{redirectURL} ne "") {
 			$className = 'WebGUI::Asset::Redirect';
@@ -95,7 +95,7 @@ sub walkTree {
 			my ($namespace) = WebGUI::SQL->quickHashRef("select * from ".$wobject->{namespace}." where wobjectId=".quote($wobject->{wobjectId}));
 			my $wobjectId = WebGUI::Id::generate();
 			my $wobjectLineage = $pageLineage.sprintf("%06d",$rank);
-			my $wobjectUrl = $pageUrl."/".$wobject->{title};
+			my $wobjectUrl = fixUrl($pageUrl."/".$wobject->{title});
 			my $groupIdView = $page->{groupIdView};
 			my $groupIdEdit = $page->{groupIdEdit};
 			my $ownerId = $page->{ownerId};
@@ -117,7 +117,16 @@ sub walkTree {
 				# migrate image to image asset
 				# migrate forums
 			} elsif ($namespace eq "SiteMap") {
-				# we're dumping sitemaps so do that here
+				my $navident = 'SiteMap_'.$namespace->{wobjectId};
+				my ($starturl) = WebGUI::SQL->quickArray("select urlizedTitle from page 
+					where pageId=".quote($namespace->{startAtThisLevel}));
+				WebGUI::SQL->write("insert into Navigation (navigationId, identifier, depth, startAt, 
+					templateId) values (".quote(WebGUI::Id::generate()).", ".quote($navident).", 
+					".quote($namespace->{depth}).", ".quote($starturl).", '1')"); 
+				my $navmacro = $wobject->{description}.'<p>^Navigation('.$navident.');</p>';
+				WebGUI::SQL->write("update wobject set className='WebGUI::Asset::Wobject::Article', description=".quote($navmacro)."
+					where assetId=".quote($wobjectId));
+				WebGUI::SQL->write("insert into Article (assetId) values (".quote($wobjectId).")");
 			} elsif ($namespace eq "FileManager") {
 				# we're dumping file manager's so do that here
 			} elsif ($namespace eq "Product") {
@@ -135,6 +144,7 @@ sub walkTree {
 		}
 		$b->finish;
 		walkTree($page->{pageId},$pageId,$pageLineage,$rank+1);
+		$myRank++;
 	}
 	$a->finish;
 	my $sth = WebGUI::SQL->read("select distinct(namespace) from wobject");
@@ -172,9 +182,25 @@ sub walkTree {
 	WebGUI::SQL->write("drop table page");
 	WebGUI::SQL->write("alter table Article drop column image");
 	WebGUI::SQL->write("alter table Article drop column attachment");
+	WebGUI::SQL->write("delete from template where namespace in ('SiteMap')");
 }
 
 
 
 
-
+sub fixUrl {
+	my $id = shift;
+        my $url = WebGUI::URL::urlize(shift);
+        my ($test) = WebGUI::SQL->quickArray("select url from asset where assetId<>".quote($id)." and url=".quote($url));
+        if ($test) {
+                my @parts = split(/\./,$url);
+                if ($parts[0] =~ /(.*)(\d+$)/) {
+                        $parts[0] = $1.($2+1);
+                } elsif ($test ne "") {
+                        $parts[0] .= "2";
+                }
+                $url = join(".",@parts);
+                $url = fixUrl($url);
+        }
+        return $url;
+}

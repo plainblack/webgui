@@ -54,10 +54,6 @@ sub definition {
 }
 
 
-#-------------------------------------------------------------------
-sub name {
-	return WebGUI::International::get(1,"Article");
-}
 
 #-------------------------------------------------------------------
 sub getEditForm {
@@ -84,6 +80,12 @@ sub getEditForm {
 		-defaultValue=>0
 		);
 	return $tabform;
+}
+
+
+#-------------------------------------------------------------------
+sub getName {
+	return WebGUI::International::get(1,"Article");
 }
 
 

@@ -161,7 +161,7 @@ sub fixUrl {
                         $parts[0] .= "2";
                 }
                 $url = join(".",@parts);
-                $url = $self->setUrl($url);
+                $url = $self->fixUrl($url);
         }
 	return $url;
 }
@@ -326,6 +326,11 @@ Override this method and return a hash reference that includes the properties ne
                                                                                                                                                        
 sub getIndexerParams {
         return {};
+}
+
+
+sub getName {
+	return WebGUI::International::get('asset','Asset');
 }
 
 sub getNextChildRank {

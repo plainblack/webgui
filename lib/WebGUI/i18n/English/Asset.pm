@@ -76,6 +76,12 @@ A short description of an asset.  It is used in default meta tags, site maps and
         lastUpdated => 1100463645,
 	},
 
+	'asset' => {
+		message => q|Asset|,
+        	lastUpdated => 1100463645,
+		context => 'The default name of all assets.'
+	}
+
 };
 
 1;

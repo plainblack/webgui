@@ -193,6 +193,21 @@ sub getEditForm {
 
 
 #-------------------------------------------------------------------
+
+=head2 getName ( )
+
+This method should be overridden by all wobjects and should return an internationalized human friendly name for the wobject. This method only exists in the super class for reverse compatibility and will try to look up the name based on the old name definition.
+
+=cut
+
+sub getName {
+	my $self = shift;
+	return $self->get("className");
+} 
+
+
+
+#-------------------------------------------------------------------
                                                                                                                              
 =head2 logView ( )
               
@@ -204,21 +219,6 @@ sub logView {
 	WebGUI::PassiveProfiling::add($self->get("assetId"));
 	return;
 }
-
-
-#-------------------------------------------------------------------
-
-=head2 name ( )
-
-This method should be overridden by all wobjects and should return an internationalized human friendly name for the wobject. This method only exists in the super class for reverse compatibility and will try to look up the name based on the old name definition.
-
-=cut
-
-sub name {
-	my $self = shift;
-	return $self->get("className");
-} 
-
 
 
 #-------------------------------------------------------------------
