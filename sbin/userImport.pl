@@ -8,167 +8,206 @@
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
-
-our ($slash, $webguiRoot, $usersFile, $configFile, $defaultIdentifier);
+our ($webguiRoot);
 
 BEGIN { 
-	$slash = ($^O =~ /Win/i) ? "\\" : "/";
 	$webguiRoot = "..";
-	$usersFile = $ARGV[0];
-	$configFile = $ARGV[1];
-	$defaultIdentifier = $ARGV[2] || "password";
-	unshift (@INC, $webguiRoot.$slash."lib"); 
+	unshift (@INC, $webguiRoot."/lib"); 
 }
 
-unless ($usersFile ne "" && $configFile ne "") {
-	print "\nUsage: $0 <pathToUserFile> <webguiConfigFile> [ <defaultIdentifier> ]\n\n";
-	print "User file format:\n";
-	print "\t-Tab delimited fields.\n";
-	print "\t-First row contains field names.\n";
-	print "\t-Valid field names:\n";
-	print "\t\tusername password authMethod ldapURL connectDN\n";
-	print "\t\tfirstName middleName lastName gender birthdate\n";
-	print "\t\temail icq aim msnIM yahooIM cellPhone pager emailToPager\n";
-	print "\t\thomeAddress homeCity homeState homeZip homeCountry homePhone homeURL\n";
-	print "\t\tworkName workAddress workCity workState workZip workCountry workPhone workURL\n";
-	print "\t\ttimeOffset dateFormat timeFormat language discussionLayout INBOXNotifications\n";
-	print "\t\tgroups\n";
-	print "\t-The special field name 'groups' should contain a comma separated list of group ids.\n";
-	print "\n";
-	print "Special cases:\n";
-	print "\t-If no username is specified it will default to 'firstName.lastName'.\n";
-	print "\t-If firstName and lastName or username are not specified, user will be skipped.\n";
-	print "\t-If no identifier is specified, the default identifier will be used.\n";
-	print "\t-If no default identifier is specified 'password' will be used.\n";
-	print "\t-If no authMethod is specified 'WebGUI' will be used.\n";
-	print "\t-Invalid field names will be ignored.\n";
-	print "\t-Blank lines will be ignored.\n";
-	print "\n";
-	exit;
-}
-
+use Digest::MD5;
+use Getopt::Long;
 use strict;
-use Data::Config;
+use WebGUI::Grouping;
+use WebGUI::Session;
 use WebGUI::SQL;
-use Digest::MD5 qw(md5_base64);
+use WebGUI::User;
+use WebGUI::Utility;
 
 $|=1;
 
-print "Starting...\n";
+my $delimiter = "\t";
+my $usersFile;
+my $configFile;
+my $defaultIdentifier = '123qwe';
+my $help;
+my $authMethod = 'WebGUI';
+my $groups;
+my $ldapUrl;
+my $status = 'Active';
 
-my ($i, $dbh, @row, %user, @field, $userId, $first, $dup, $lineNumber, $expireOffset, @group);
-$first = 1;
-$dbh = connectToDb();
+GetOptions(
+	'usersfile=s'=>\$usersFile,
+	'configfile=s'=>\$configFile,
+	'help'=>\$help,
+	'authMethod:s'=>\$authMethod,
+	'delimiter:s'=>\$delimiter,
+	'password|identifier:s'=>\$defaultIdentifier,
+	'groups:s'=>\$groups,
+	'ldapUrl:s'=>\$ldapUrl,
+	'status:s'=>\$status
+);
+
+
+
+
+
+unless ($usersFile && $configFile && !$help) {
+	print <<STOP;
+
+
+Usage: $0 --userfile=<pathToFile> --configfile=<webguiConfig>
+
+	--usersFile	File containing import information.
+
+	--configFile	WebGUI config file.
+
+
+Options:
+
+	--authMethod	The authentication method to be used for
+			each user. Defaults to 'WebGUI'. Can be
+			overridden in the import file.
+
+	--delimiter	The string that separates each field in the
+			import file. Defaults to tab.
+
+	--groups	A comma separated list of group ids that
+			each user in the import file will be set
+			to. Can be overridden in the import file.
+
+	--help		Display this help message.
+
+	--identifier	Alias for --password.  
+
+	--ldapUrl	The URL used to connect to the LDAP server
+			for authentication. Can be overridden in
+			the import file.
+
+	--password	The default password to use when none is 
+			specified with the user. Defaults to 
+			'123qwe'. Can be overridden in the import
+			file.
+
+	--status	The user's account status. Defaults to
+			'Active'. Other valid value is 'Deactivated'.
+
+
+User File Format:
+
+	-Tab delimited fields (unless overridden with --delimiter).
+
+	-First row contains field names.
+
+	-Valid field names:
+	
+		username password authMethod status
+		ldapUrl connectDN groups
+
+	-In addition to the field names above, you may use any 
+	valid profile field name.
+	
+	-The special field name 'groups' should contain a comma 
+	separated list of group ids.
+
+
+Special Cases:
+
+	-If no username is specified it will default to 
+	'firstName.lastName'.
+
+	-If firstName and lastName or username are not specified, 
+	the user will be skipped.
+
+	-Invalid field names will be ignored.
+
+	-Blank lines will be ignored.
+
+STOP
+	exit;
+}
+
+
+print "Starting up...";
+WebGUI::Session::open($webguiRoot,$configFile);
+WebGUI::Session::refreshUserInfo(3); # The script should run as admin.
 open(FILE,"<".$usersFile);
+print "OK\n";
+
+my $first = 1;
+my $lineNumber = 0;
+my @field;
+my @profileFields = WebGUI::SQL->buildArray("select fieldName from userProfileField");
 while(<FILE>) {
 	$lineNumber++;
-	%user = ();
   	chomp;
-  	@row = split("\t",$_);
-  	$i=0;
+  	my @row = split($delimiter,$_);
+  	my $i=0;
 	if ($first) {
+		# parse field headers
                 foreach (@row) {
                         chomp;
                         $field[$i] = $_;
                         $i++;
                 }
 		$first = 0;
+
 	} else {
+		# parse fields
+		my %user = ();
   		foreach (@row) {
     			chomp;
     			$user{$field[$i]} = $_;
 			$user{$field[$i]} =~ s/\s+$//g; #remove trailing whitespace from each field
     			$i++;
   		}
-		$user{username} = $user{firstName}.".".$user{lastName} if ($user{username} eq "" && $user{firstName} ne "" && $user{lastName} ne "");
+
+		# deal with defaults and overrides
+		if ($user{username} eq "" && $user{firstName} ne "" && $user{lastName} ne "") {
+			$user{username} = $user{firstName}.".".$user{lastName};
+		}
 		$user{identifier} = $defaultIdentifier if ($user{password} eq "");
-		$user{authMethod} = "WebGUI" if ($user{authMethod} eq "");
 		$user{identifier} = Digest::MD5::md5_base64($user{identifier});
-		($dup) = WebGUI::SQL->quickArray("select count(*) from users where username=".$dbh->quote($user{username}),$dbh);
+		$user{ldapUrl} = $ldapUrl if ($user{ldapUrl} eq "");
+		$user{authMethod} = $authMethod if ($user{authMethod} eq "");
+		$user{groups} = $groups if ($user{groups} eq "");
+		$user{status} = $status if ($user{status} eq "");
+
+		# process user
+		my ($duplicate) = WebGUI::SQL->quickArray("select count(*) from users where username=".quote($user{username}));
   		if ($user{username} eq "") {
     			print "Skipping line $lineNumber.\n";
-		} elsif ($dup) {
+		} elsif ($duplicate) {
 			print "User $user{username} already exists. Skipping.\n";
 		} else {
     			print "Adding user $user{username}\n";
-    			$user{userId} = getUserId($dbh);
-    			WebGUI::SQL->write("insert into users (userId,username,authMethod,dateCreated,lastUpdated) values 
-				($user{userId},".$dbh->quote($user{username}).", ".$dbh->quote($user{authMethod}).",
-				".time().",".time().")",$dbh);
+			my $u = WebGUI::User->new("new");
+			$u->username($user{username});
+			$u->authMethod($user{authMethod});
+			$u->status($user{status});
+			WebGUI::Authentication::saveParams($u->userId,"WebGUI",{identifier=>$user{identifier}});
+			WebGUI::Authentication::saveParams($u->userId,"LDAP",{
+				ldapUrl=>$user{ldapUrl},
+				connectDN=>$user{connectDN}
+				});
 			foreach (keys %user) {
-				if (isIn($_, qw(discussionLayout INBOXNotifications gender birthdate timeOffset dateFormat timeFormat email language firstName middleName lastName icq aim msnIM yahooIM cellPhone pager emailToPager homeAddress homeCity homeState homeZip homeCountry homePhone homeURL workName workAddress workCity workState workZip workCountry workPhone workURL))) {
-					WebGUI::SQL->write("insert into userProfileData (userId, fieldName, fieldData) values
-						($user{userId}, '$_', ".$dbh->quote($user{$_}).")",$dbh);
+				if (isIn($_, @profileFields)) {
+					$u->profileField($_,$user{$_});
 				}
-				if ($_ eq "identifier") {
-					WebGUI::SQL->write("insert into authentication (userId,authMethod,fieldName,fieldData)
-						values ($user{userId},'WebGUI','$_',".$dbh->quote($user{$_}).")");
-				}
-                                if (isIn($_, qw(ldapURL connectDN))) {
-                                        WebGUI::SQL->write("insert into authentication (userId,authMethod,fieldName,fieldData)
-                                                values ($user{userId},'LDAP','$_',".$dbh->quote($user{$_}).")");
-                                }
 			}
-			($expireOffset) = WebGUI::SQL->quickArray("select expireOffset from groups where groupId=2",$dbh);
-			$user{groups} =~ s/ //g;
-			@group = split(/,/,$user{groups});
-			foreach (@group) {
-				($expireOffset) = WebGUI::SQL->quickArray("select expireOffset from groups where groupId=$_",$dbh);
-				WebGUI::SQL->write("insert into groupings (groupId,userId,expireDate) values 
-					($user{userId},$_,".(time()+$expireOffset).")",$dbh);
+			if ($user{groups} ne "") {
+				my @groups = split(/,/,$user{groups});
+				$u->addToGroups(\@groups);
 			}
   		}
 	}
 }
-print "Cleaning up...\n";
+print "Cleaning up...";
 close(FILE);
-$dbh->disconnect;
-print "Finished.\n";
+WebGUI::Session::close();
+print "OK\n";
 
 
-#-----------------------------------------
-sub connectToDb {
-  	print "Connecting to database.\n";
-  	my ($config, $dbh, $error);
-  	$config = new Data::Config $webguiRoot.'/etc/'.$configFile;
-  	$dbh = DBI->connect($config->param("dsn"), $config->param("dbuser"), $config->param("dbpass"), { RaiseError => 0, AutoCommit => 1 }) or $error=1;
-  	unless ($error) {
-    		print "Connection established.\n";
-    		return $dbh;
-  	} else {
-    		print "Error: Could not connect to the database.\n";
-    		exit;
-  	}
-}
-
-#-----------------------------------------
-sub isIn {
-  	my ($i, @a, @b, @isect, %union, %isect, $e);
-  	foreach $e (@_) {
-    		if ($a[0] eq "") {
-      			$a[0] = $e;
-    		} else {
-      			$b[$i] = $e;
-      			$i++;
-    		}
-  	}
-  	foreach $e (@a, @b) { $union{$e}++ && $isect{$e}++ }
-  	@isect = keys %isect;
-  	if (defined @isect) {
-    		undef @isect;
-    		return 1;
-  	} else {
-    		return 0;
-  	}
-}
-
-#-----------------------------------------
-sub getUserId {
-  	my ($id);
-  	($id) = WebGUI::SQL->quickArray("select nextValue from incrementer where incrementerId='userId'",$_[0]);
-  	WebGUI::SQL->write("update incrementer set nextValue=nextValue+1 where incrementerId='userId'",$_[0]);
-  	return $id;
-}
 
 
 
