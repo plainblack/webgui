@@ -33,6 +33,7 @@ use WebGUI::DateTime;
 use WebGUI::Session;
 use WebGUI::SQL;
 use WebGUI::Utility;
+use WebGUI::Wobject::FileManager;
 
 
 my $configFile;
@@ -46,13 +47,13 @@ my $wobjectId;
 
 GetOptions(
 	'configFile=s'=>\$configFile,
-	'groupToView=i'=>\$groupToView,
+	'groupToView=s'=>\$groupToView,
         'help'=>\$help,
 	'override'=>$override,
 	'pathToFiles=s'=>\$pathToFiles,
         'quiet'=>\$quiet,
 	'webUser=s'=>\$webUser,
-	'wobjectId=i'=>\$wobjectId
+	'wobjectId=s'=>\$wobjectId
 );
 
 

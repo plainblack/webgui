@@ -4,6 +4,7 @@
  - bugfix [ 1038289 ] Performance problems with 6.2 
  - bugfix [ 1038837 ] Hashing issues (Paul Malabad)
  - bugfix [ 1038678 ] 6.2.6- HTML Editor Image/ Collateral
+ - bugfix [ 1038129 ] Error importing with filemanagerimport.pl
  
 
 6.2.6
