@@ -16,6 +16,7 @@ use Tie::CPHash;
 use WebGUI::DatabaseLink;
 use WebGUI::Grouping;
 use WebGUI::Icon;
+use WebGUI::Id;
 use WebGUI::International;
 use WebGUI::Operation::Shared;
 use WebGUI::Paginator;
@@ -47,9 +48,9 @@ sub www_copyDatabaseLink {
         return WebGUI::Privilege::insufficient unless (WebGUI::Grouping::isInGroup(3));
 	my (%db);
 	tie %db, 'Tie::CPHash';
-	%db = WebGUI::SQL->quickHash("select * from databaseLink where databaseLinkId=$session{form}{dlid}");
-        WebGUI::SQL->write("insert into databaseLink (databaseLinkId,title,DSN,username,identifier) values (".getNextId("databaseLinkId").", 
-		".quote('Copy of '.$db{title}).", ".quote($db{DSN}).", ".quote($db{username}).", ".quote($db{identifier}).")");
+	%db = WebGUI::SQL->quickHash("select * from databaseLink where databaseLinkId=".quote($session{form}{dlid}));
+        WebGUI::SQL->write("insert into databaseLink (databaseLinkId,title,DSN,username,identifier) values (".quote(WebGUI::Id::generate()).", 
+		".quote($db{title}." (copy)").", ".quote($db{DSN}).", ".quote($db{username}).", ".quote($db{identifier}).")");
         return www_listDatabaseLinks();
 }
 
@@ -79,7 +80,7 @@ sub www_deleteDatabaseLink {
 #-------------------------------------------------------------------
 sub www_deleteDatabaseLinkConfirm {
         return WebGUI::Privilege::insufficient unless (WebGUI::Grouping::isInGroup(3));
-        WebGUI::SQL->write("delete from databaseLink where databaseLinkId=".$session{form}{dlid});
+        WebGUI::SQL->write("delete from databaseLink where databaseLinkId=".quote($session{form}{dlid}));
         return www_listDatabaseLinks();
 }
 
@@ -91,7 +92,7 @@ sub www_editDatabaseLink {
 	if ($session{form}{dlid} eq "new") {
 
 	} else {
-               	%db = WebGUI::SQL->quickHash("select * from databaseLink where databaseLinkId=$session{form}{dlid}");
+               	%db = WebGUI::SQL->quickHash("select * from databaseLink where databaseLinkId=".quote($session{form}{dlid}));
 	}
         $output .= helpIcon("database link add/edit");
 	$output .= '<h1>'.WebGUI::International::get(990).'</h1>';
@@ -102,7 +103,7 @@ sub www_editDatabaseLink {
         $f->text("title",WebGUI::International::get(992),$db{title});
         $f->text("DSN",WebGUI::International::get(993),$db{DSN});
         $f->text("username",WebGUI::International::get(994),$db{username});
-        $f->text("identifier",WebGUI::International::get(995),$db{identifier});
+        $f->password("identifier",WebGUI::International::get(995),$db{identifier});
         $f->submit;
 	$output .= $f->print;
         return _submenu($output);
@@ -112,11 +113,11 @@ sub www_editDatabaseLink {
 sub www_editDatabaseLinkSave {
         return WebGUI::Privilege::insufficient unless (WebGUI::Grouping::isInGroup(3));
 	if ($session{form}{dlid} eq "new") {
-		$session{form}{dlid} = getNextId("databaseLinkId");
-		WebGUI::SQL->write("insert into databaseLink (databaseLinkId) values ($session{form}{dlid})");
+		$session{form}{dlid} = WebGUI::Id::generate();
+		WebGUI::SQL->write("insert into databaseLink (databaseLinkId) values (".quote($session{form}{dlid}).")");
 	}
 	    WebGUI::SQL->write("update databaseLink set title=".quote($session{form}{title}).", DSN=".quote($session{form}{DSN}).",
-		username=".quote($session{form}{username}).", identifier=".quote($session{form}{identifier})." where databaseLinkId=".$session{form}{dlid});
+		username=".quote($session{form}{username}).", identifier=".quote($session{form}{identifier})." where databaseLinkId=".quote($session{form}{dlid}));
         return www_listDatabaseLinks();
 }
 

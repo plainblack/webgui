@@ -76,7 +76,7 @@ A valid databaseLinkId
 =cut
 
 sub get {
-		return WebGUI::SQL->quickHash("select * from databaseLink where databaseLinkId=".$_[0]);
+		return WebGUI::SQL->quickHash("select * from databaseLink where databaseLinkId=".quote($_[0]));
 }
 
 #-------------------------------------------------------------------
@@ -98,7 +98,7 @@ A valid databaseLinkId
 sub whatIsUsing {
 	# get list of SQLReports
 	my $sql = 'select wobject.wobjectId, wobject.title, page.menuTitle, page.urlizedTitle from wobject, SQLReport, page '.
-		'where SQLReport.databaseLinkId = '.$_[0].' and SQLReport.wobjectId = wobject.wobjectId '.
+		'where SQLReport.databaseLinkId = '.quote($_[0]). 'and SQLReport.wobjectId = wobject.wobjectId '.
 		'and wobject.pageId = page.pageId';
 	my $sth = WebGUI::SQL->read($sql);
 	my @using;
@@ -108,7 +108,7 @@ sub whatIsUsing {
 	$sth->finish;
 	
 	# get list of groups
-	$sql = 'select groupId, groupName from groups where databaseLinkId = '.$_[0];
+	$sql = 'select groupId, groupName from groups where databaseLinkId = '.quote($_[0]);
 	$sth = WebGUI::SQL->read($sql);
 	while (my $data = $sth->hashRef()) {
 		push @using, $data;
@@ -203,7 +203,7 @@ sub new {
 				title=>"WebGUI Database"
 				);
 		} else {
-			%databaseLink = WebGUI::SQL->quickHash("select * from databaseLink where databaseLinkId='$databaseLinkId'");
+			%databaseLink = WebGUI::SQL->quickHash("select * from databaseLink where databaseLinkId=".quote($databaseLinkId));
 		}
 	}
 	bless {_databaseLinkId => $databaseLinkId, _databaseLink => \%databaseLink }, $class;
