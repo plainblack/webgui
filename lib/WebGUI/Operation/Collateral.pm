@@ -266,7 +266,7 @@ sub www_editCollateralSave {
 	WebGUI::Session::setScratch("collateralFolderId",$session{form}{collateralFolderId});
 	my ($test, $file, $addFile, $thumbnailSize, $collateral);
 	$collateral = WebGUI::SQL->quickHashRef("select * from collateral where collateralId=".$session{form}{cid}) unless ($session{form}{cid} eq "new");	
-	$thumbnailSize = $session{form}{thumbnailSize} || $collateral->{thumbnailSize} || $session{setting}{thumbnailSize};
+	$thumbnailSize = $session{form}{thumbnailSize} || $session{setting}{thumbnailSize};
 
 	if ($session{form}{cid} eq "new") {
 		$session{form}{cid} = getNextId("collateralId");
@@ -274,12 +274,12 @@ sub www_editCollateralSave {
 			values ($session{form}{cid},
 			$session{user}{userId}, ".quote($session{user}{username}).",
 			".quote($session{form}{collateralType}).")");
-        	$file = WebGUI::Attachment->new("","images",$session{form}{cid});
-       		$file->save("filename", $thumbnailSize);
-	} else {
+	} elsif ($collateral->{thumbnailSize} != $thumbnailSize) {
 		$file = WebGUI::Attachment->new($collateral->{filename},"images", $session{form}{cid});
 		WebGUI::Attachment::_createThumbnail($file, $thumbnailSize);
 	}
+       	$file = WebGUI::Attachment->new("","images",$session{form}{cid});
+       	$file->save("filename", $thumbnailSize);
 	if ($file->getFilename ne "") {
        		$addFile = ", filename=".quote($file->getFilename);
 		$session{form}{name} = $file->getFilename if ($session{form}{name} eq "");
