@@ -29,6 +29,8 @@
  - Fixed bug [ 808704 ] Privilege API missing in Ruling WebGUI 5.4
  - Updated the Norwegian translation. (Thanks to Nils-Magne Kvammen.)
  - Updated the German translation. (Thanks to Andreas Graf.)
+ - Fixed a security problem where users could access a forum they didn't have
+   privileges to view if they created a specific URL.
 
 
 5.5.0

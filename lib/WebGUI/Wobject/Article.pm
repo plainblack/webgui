@@ -193,7 +193,16 @@ sub www_view {
                 $templateId = $_[0]->get("templateId");
         }
 	if ($session{form}{forumOp}) {
-		return WebGUI::Forum::UI::forumOp($callback,$_[0]->get("title"),$_[0]->get("description"));
+		unless ($!= $_[0]->get("wobjectId")) {
+                        WebGUI::ErrorHandler::security("access a forum that was not related to this message board (".$_[0]->get("wobjectId").")");
+                        return WebGUI::Privilege::insufficient();
+                }
+		return WebGUI::Forum::UI::forumOp({
+			callback=>$callback,
+			title=>$_[0]->get("title"),
+			description=>$_[0]->get("description"),
+			forumId=>$_[0]->get("forumId")
+			});
 	} else {
 		return $_[0]->processTemplate($templateId,\%var);
 	}

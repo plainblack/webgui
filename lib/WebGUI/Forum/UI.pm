@@ -969,40 +969,47 @@ sub forumPropertiesSave {
 
 #-------------------------------------------------------------------
 
-=head2 forumOp ( callback, title, description )
+=head2 forumOp ( caller )
 
 Returns the output of the various www_ subroutines.
 
 =over
 
-=item callback
+=item caller
 
-The URL to get back to the calling object.
+A hash reference containing information passed from the calling object. The following are hash keys that should be passed:
 
-=item title
+callback: The URL to get back to the calling object.
 
-The title of the parent object for display in the forum templates.
+title: The title of the parent object for display in the forum templates.
 
-=item description
+description: The description of the parent object for display in the fourm templates.
 
-The description of the parent object for display in the fourm templates.
+forumId: The ID of the forum that is attached to the calling object.
 
 =back
 
 =cut
 
 sub forumOp {
-        my ($callback, $title, $description) = @_;
-	my $caller = {
-		callback=>$callback,
-		title=>$title,
-		description=>$description
-		};
+        my ($caller) = @_;
 	if ($session{form}{forumOp} =~ /^[A-Za-z]+$/) {
+		my $forumId = $session{form}{forumId};
+		if ($session{form}{forumPostId}) {
+			my $post = WebGUI::Forum::Post->new($session{form}{forumPostId});
+			$forumId = $post->getThread->get("forumId");
+		} elsif ($session{form}{forumThreadId}) {
+			my $thread = WebGUI::Forum::Thread->new($session{form}{forumThreadId});
+			$forumId = $thread->get("forumId");
+		}
+		if ($forumId != $caller->{forumId}) {
+			WebGUI::ErrorHandler::security("view a forum (".$caller->{forumId}.") that does not belong to the calling object (".$caller->{callback}.")");
+			return WebGUI::Privilege::insufficient();
+		} 
         	my $cmd = "www_".$session{form}{forumOp};
         	return &$cmd($caller);
 	} else {
-		WebGUI::ErrorHandler::security("execute an invalid forum operation: ".$session{form}{forumOp});
+		return WebGUI::ErrorHandler::security("execute an invalid forum operation: ".$session{form}{forumOp});
 	}
 }
 

@@ -166,13 +166,16 @@ sub www_moveForumUp {
 sub www_view {
 	my $callback = WebGUI::URL::page("func=view&amp;wid=".$_[0]->get("wobjectId"));
 	if ($session{form}{forumOp}) {
-		my ($title, $description);
-		if ($session{form}{forumId} ne "") {
-			($title,$description) = WebGUI::SQL->quickArray("select title,description from MessageBoard_forums where forumId=".$session{form}{forumId});
-			my $forumParam = "forumId=".$session{form}{forumId};
-			$callback = WebGUI::URL::append($callback,$forumParam);
-		}
-		return WebGUI::Forum::UI::forumOp($callback,$title,$description);
+		my ($forumId, $title, $description) = WebGUI::SQL->quickArray("select forumId, title, description from MessageBoard_forums 
+			where wobjectId=".$_[0]->get("wobjectId")." and forumId=".$session{form}{forumId});
+		my $forumParam = "forumId=".$forumId;
+		$callback = WebGUI::URL::append($callback,$forumParam);
+		return WebGUI::Forum::UI::forumOp({
+			callback=>$callback,
+			title=>$title,
+			description=>$description,
+			forumId=>$forumId
+			});
 	}
 	my %var;
 	$var{title} = $_[0]->get("title");
