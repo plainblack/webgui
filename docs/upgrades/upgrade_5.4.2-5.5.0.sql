@@ -40,7 +40,7 @@ create table forumPost (
 
 create table forumPostAttachment (
   forumPostAttachmentId int not null primary key,
-  postId int not null,
+  forumPostId int not null,
   filename varchar(255)
 );
 
@@ -61,13 +61,13 @@ create table forumRead (
   forumPostId int not null,
   forumThreadId int not null,
   lastRead int not null,
-  primary key (userId, postId)
+  primary key (userId, forumPostId)
 );
 
 create table forumBookmark (
   userId int not null,
   forumPostId int not null,
-  primary key (userId, postId)
+  primary key (userId, forumPostId)
 );
 
 create table forumThreadSubscription (
