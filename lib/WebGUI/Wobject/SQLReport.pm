@@ -178,7 +178,7 @@ sub www_view {
                		$output .= WebGUI::International::get(10,$namespace).'<p>' if ($_[0]->get("debugMode"));
                         WebGUI::ErrorHandler::warn("SQLReport [".$_[0]->get("wobjectId")."] The SQL query is improperly formatted.");
                 }
-		$dbh->disconnect();
+		$dbh->disconnect() unless ($dsn eq $session{config}{dsn});
 	} else {
 		$output .= WebGUI::International::get(12,$namespace).'<p>' if ($_[0]->get("debugMode"));
 		WebGUI::ErrorHandler::warn("SQLReport [".$_[0]->get("wobjectId")."] Could not connect to database.");
