@@ -972,9 +972,8 @@ sub www_search {
 					Post.status in ('approved','archived')";
 		$sql .= "		or Post.status='pending'" if ($self->canModerate);
 		$sql .= "		or (asset.ownerUserId=".quote($session{user}{userId})." and asset.ownerUserId<>'1')
-					)
-				and ";
-		$sql .= "($all) " if ($all ne "");
+					) ";
+		$sql .= " and ($all) " if ($all ne "");
 		$sql .= " and " if ($sql ne "" && $exactPhrase ne "");
 		$sql .= " ($exactPhrase) " if ($exactPhrase ne "");
 		$sql .= " and " if ($sql ne "" && $atLeastOne ne "");

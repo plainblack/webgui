@@ -334,4 +334,4 @@ update template set template='<a name=\"<tmpl_var assetId>\"></a>\r\n<tmpl_if se
 
 delete from template where templateId='2' and namespace='IndexedSearch';
 delete from template where templateId='3' and namespace='IndexedSearch';
-
+update page set parentId='_noparent_' where pageId='0';

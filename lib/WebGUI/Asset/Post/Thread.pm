@@ -729,7 +729,33 @@ sub www_unsubscribe {
 sub www_view {
 	my $self = shift;
 	return WebGUI::Privilege::noAccess() unless $self->canView;
-	return $self->getParent->processStyle($self->view);
+	my $cache;
+	my $output;
+        my $useCache = (
+		$session{form}{op} eq "" && 
+		$session{form}{func} eq "" && 
+		$session{form}{layout} eq "" && 
+		(
+			( $self->getParent->get("cacheTimeout") > 10 && $session{user}{userId} ne '1') || 
+			( $self->getParent->get("cacheTimeoutVisitor") > 10 && $session{user}{userId} eq '1')
+		) && 
+		not $session{var}{adminOn}
+	);
+	if ($useCache) {
+               	$cache = WebGUI::Cache->new("cspost_".$self->getId."_".$session{user}{userId});
+           	$output = $cache->get;
+	}
+	unless ($output) {
+		$output = $self->getParent->processStyle($self->view);
+		my $ttl;
+		if ($session{user}{userId} eq '1') {
+			$ttl = $self->getParent->get("cacheTimeoutVisitor");
+		} else {
+			$ttl = $self->getParent->get("cacheTimeout");
+		}
+		$cache->set($output, $ttl) if ($useCache);
+	}
+	return $output;
 }
 
 

@@ -11,6 +11,15 @@
  - fix [ 1157311 ] Edit User Profile fails on Windows/Firefox
  - fix [ 1160623 ] Redirect Incorrect- 6.2.11
  - fix [ 1161455 ] New Content >> Data Form
+ - fixed a loop bug in the 6.3.0 upgrade that could cause pages to be upgraded
+   twice, which would kill the upgrade script
+ - fix [ 1158983 ] 6.4.0 demo Setting Asset rank crashes WebGUI 
+ - fix [ 1160229 ] Couldn't call method www_search
+ - fix [ 1153154 ] 6.3 beta Add function doesn't use WYSIWYG
+ - fix [ 1157205 ] default content (in create.sql) outdated
+ - fix [ 1028595 ] Denial of Service WebGUI (e.g. forum wobject)
+ - fix [ 1157229 ] Not Found Page
+ - fix [ 1157198 ] selecting content profiling sends you back to admin console
 
 
 6.5.0

@@ -1366,7 +1366,6 @@ If specified, the hashRef will contain only this field.
 sub getMetaDataFields {
 	my $self = shift;
 	my $fieldId = shift;
-	tie my %hash, 'Tie::IxHash';
 	my $sql = "select
 		 	f.fieldId, 
 			f.fieldName, 
@@ -1379,14 +1378,19 @@ sub getMetaDataFields {
 		left join metaData_values d on f.fieldId=d.fieldId and d.assetId=".quote($self->getId);
 	$sql .= " where f.fieldId = ".quote($fieldId) if ($fieldId);
 	$sql .= " order by f.fieldName";
-	my $sth = WebGUI::SQL->read($sql);
-        while( my $h = $sth->hashRef) {
-		foreach(keys %$h) {
-			$hash{$h->{fieldId}}{$_} = $h->{$_};
+	if ($fieldId) {
+		return WebGUI::SQL->quickHashRef($sql);	
+	} else {
+		tie my %hash, 'Tie::IxHash';
+		my $sth = WebGUI::SQL->read($sql);
+	        while( my $h = $sth->hashRef) {
+			foreach(keys %$h) {
+				$hash{$h->{fieldId}}{$_} = $h->{$_};
+			}
 		}
+       	 	$sth->finish;
+        	return \%hash;
 	}
-        $sth->finish;
-        return \%hash;
 }
 
 #-------------------------------------------------------------------
@@ -1814,6 +1818,8 @@ sub newByUrl {
 		}
 		if ($asset->{assetId} ne "" || $asset->{className} ne "") {
 			return WebGUI::Asset->newByDynamicClass($asset->{assetId}, $asset->{className});
+		} else {
+        		return $class->newByDynamicClass($session{setting}{notFoundPage});
 		}
         }
         return $class->newByDynamicClass($session{setting}{defaultPage});
@@ -2527,11 +2533,11 @@ Returns a rendered page to edit MetaData.  Will return an insufficient Privilege
 
 sub www_editMetaDataField {
 	my $self = shift;
-	my $ac = WebGUI::AdminConsole->new("content profiling");
+	my $ac = WebGUI::AdminConsole->new("contentProfiling");
 	return WebGUI::Privilege::insufficient() unless (WebGUI::Grouping::isInGroup(4));
         my $fieldInfo;
 	if($session{form}{fid} && $session{form}{fid} ne "new") {
-		$fieldInfo = WebGUI::MetaData::getField($session{form}{fid});
+		$fieldInfo = $self->getMetaDataFields($session{form}{fid});
 	}
 	my $fid = $session{form}{fid} || "new";
         my $f = WebGUI::HTMLForm->new(-action=>$self->getUrl);
@@ -3095,16 +3101,17 @@ Returns an AdminConsole to deal with MetaDataFields. If isInGroup(4) is False, r
 
 sub www_manageMetaData {
 	my $self = shift;
-	my $ac = WebGUI::AdminConsole->new("content profiling");
+	my $ac = WebGUI::AdminConsole->new("contentProfiling");
 	return WebGUI::Privilege::insufficient() unless (WebGUI::Grouping::isInGroup(4));
+	$ac->addSubmenuItem($self->getUrl('func=editMetaDataField'), WebGUI::International::get("Add new field","Asset"),"Asset");
 	my $output;
 	my $fields = $self->getMetaDataFields();
 	foreach my $fieldId (keys %{$fields}) {
 		$output .= deleteIcon("func=deleteMetaDataField&fid=".$fieldId,$self->getUrl,WebGUI::International::get('deleteConfirm','Asset'));
 		$output .= editIcon("func=editMetaDataField&fid=".$fieldId,$self->getUrl);
-		$output .= "<b>".$fields->{$fieldId}{fieldName}."</b><br>";
+		$output .= " <b>".$fields->{$fieldId}{fieldName}."</b><br>";
 	}	
-        $ac->setHelp("metadata manage");
+        $ac->setHelp("metadata manage","Asset");
 	return $ac->render($output);
 }
 
