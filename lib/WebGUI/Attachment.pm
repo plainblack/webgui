@@ -83,7 +83,7 @@ sub _createThumbnail {
 		} else {
 			$error = $image->Write($_[0]->{_node}->getPath.'/thumb-'.$_[0]->getFilename);
 		}
-		WebGUI::ErrorHandler::warning("Couldn't create thumbnail: ".$error) if $error;
+		WebGUI::ErrorHandler::warn("Couldn't create thumbnail: ".$error) if $error;
 	}
 }
 
@@ -101,7 +101,7 @@ sub _resizeImage {
                 	$r = $x>$y ? $x / $n : $y / $n;
                 	$image->Scale(width=>($x/$r),height=>($y/$r));
                 	$error = $image->Write($_[0]->getPath);
-                	WebGUI::ErrorHandler::warning("Couldn't resize image: ".$error) if $error;
+                	WebGUI::ErrorHandler::warn("Couldn't resize image: ".$error) if $error;
 		}
         }       
 }               
