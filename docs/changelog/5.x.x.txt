@@ -8,6 +8,7 @@
    when saving page.
  - Bugfix [ 884375 ] Fix for multiple forum posts applied also to
    www_viewForum to handle postings that start a new thread.
+ - Bugfix [ 909579 ] possible package problem 5.5.4
 
 
 
