@@ -141,6 +141,11 @@ sub www_editGroup {
 		-value=>$g->ipFilter,
 		-label=>WebGUI::International::get(857)
 		);
+	$f->textarea(
+		-name=>"scratchFilter",
+		-value=>$g->scratchFilter,
+		-label=>WebGUI::International::get(945)
+		);
 	$f->submit;
 	$output .= $f->print;
         return _submenu($output);
@@ -155,6 +160,7 @@ sub www_editGroupSave {
 	$g->expireOffset(WebGUI::DateTime::intervalToSeconds($session{form}{expireOffset_interval},$session{form}{expireOffset_units}));
 	$g->karmaThreshold($session{form}{karmaThreshold});
 	$g->ipFilter($session{form}{ipFilter});
+	$g->scratchFilter($session{form}{scratchFilter});
 	$g->expireNotify($session{form}{expireNotify});
 	$g->expireNotifyOffset($session{form}{expireNotifyOffset});
 	$g->expireNotifyMessage($session{form}{expireNotifyMessage});

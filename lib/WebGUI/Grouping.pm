@@ -204,7 +204,7 @@ sub getGroupsForGroup {
 
 #-------------------------------------------------------------------
 
-=head2 getGroupsForUser ( userId )
+=head2 getGroupsForUser ( userId [ , withoutExpired ] )
 
 Returns an array reference containing a list of groups the specified user is in.
 
@@ -214,12 +214,17 @@ Returns an array reference containing a list of groups the specified user is in.
 
 A unique identifier for the user.
 
+=item withoutExpired
+
+If set to "1" then the listing will not include expired groupings. Defaults to "0".
+
 =back
 
 =cut
 
 sub getGroupsForUser {
-        return WebGUI::SQL->buildArrayRef("select groupId from groupings where userId=$_[0]");
+	my $clause = "and expireDate>".time() if ($_[1]);
+        return WebGUI::SQL->buildArrayRef("select groupId from groupings where userId=$_[0] $clause");
 }
 
 
@@ -252,9 +257,8 @@ sub getGroupsInGroup {
 			push(@groupsOfGroups, @$gog);
 		}
 		return \@groupsOfGroups;
-	} else {
-		return $groups;
 	}
+	return $groups;
 }
 
 

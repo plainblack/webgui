@@ -46,6 +46,7 @@ This package provides an object-oriented way of managing WebGUI groups and group
  $string =     	$g->ipFilter("10.;192.168.1.");
  $epoch =     	$g->lastUpdated;
  $string =     	$g->name("Nerds");
+ $string =     	$g->scratchFilter("www_location=International;somesetting=1");
 
  $g->addGroups(\@arr);
  $g->deleteGroups(\@arr);
@@ -455,6 +456,34 @@ sub new {
         	%group = WebGUI::SQL->quickHash("select * from groups where groupId='$groupId'");
 	}
         bless {_groupId => $groupId, _group => \%group }, $class;
+}
+
+#-------------------------------------------------------------------
+
+=head2 scratchFilter ( [ value ] )
+
+Returns the name of this group.
+
+=over
+
+=item value
+
+If specified, the name is set to this value.
+
+=back
+
+=cut
+
+sub scratchFilter {
+        my ($class, $value);
+        $class = shift;
+        $value = shift;
+        if (defined $value) {
+                $class->{_group}{"scratchFilter"} = $value;
+                WebGUI::SQL->write("update groups set scratchFilter=".quote($value).",
+                        lastUpdated=".time()." where groupId=$class->{_groupId}");
+        }
+        return $class->{_group}{"scratchFilter"};
 }
 
 

@@ -17,6 +17,8 @@ package WebGUI::Privilege;
 use strict;
 use Tie::CPHash;
 use WebGUI::DateTime;
+use WebGUI::Group;
+use WebGUI::Grouping;
 use WebGUI::International;
 use WebGUI::Operation::Account ();
 use WebGUI::Session;
@@ -197,7 +199,7 @@ The user that you wish to verify against the group. Defaults to the currently lo
 =cut
 
 sub isInGroup {
-	my ($gid, $uid, @data, %group, %user, $groupId);
+	my ($gid, $uid, @data, %group, $groupId);
 	($gid, $uid) = @_;
 	$uid = $session{user}{userId} if ($uid eq "");
         ### The "Everyone" group automatically returns true.
@@ -221,18 +223,18 @@ sub isInGroup {
 		return 1;
 	} elsif ($session{isInGroup}{$gid} eq "0") {
 		return 0;
-	} else {
-		$session{isInGroup}{$gid} = 0;
 	}
-        ### Lookup the actual grouping.
-	@data = WebGUI::SQL->quickArray("select count(*) from groupings where groupId='$gid' and userId='$uid' and expireDate>".time());
-	if ($data[0] > 0 && $uid != 1) {
-		$session{isInGroup}{$gid} = 1;
+        ### Lookup the actual groupings.
+	my $groups = WebGUI::Grouping::getGroupsForUser($uid,1);
+	foreach (@{$groups}) {
+		$session{isInGroup}{$_} = 1;
+	}
+	if ($session{isInGroup}{$gid} || $session{isInGroup}{3}) {
 		return 1;
 	}
         ### Get data for auxillary checks.
 	tie %group, 'Tie::CPHash';
-	%group = WebGUI::SQL->quickHash("select karmaThreshold,ipFilter from groups where groupId='$gid'");
+	%group = WebGUI::SQL->quickHash("select karmaThreshold,ipFilter,scratchFilter from groups where groupId='$gid'");
 	### Check IP Address
 	if ($group{ipFilter} ne "") {
 		$group{ipFilter} =~ s/\t//g;
@@ -247,32 +249,44 @@ sub isInGroup {
 			}
 		}
 	}
+	### Check Scratch Variables 
+	if ($group{scratchFilter} ne "") {
+		$group{scratchFilter} =~ s/\t//g;
+		$group{scratchFilter} =~ s/\r//g;
+		$group{scratchFilter} =~ s/\n//g;
+		$group{scratchFilter} =~ s/\s//g;
+		my @vars = split(";",$group{scratchFilter});
+		foreach my $var (@vars) {
+			my ($name, $value) = split(/\=/,$var);
+			if ($session{scratch}{$name} eq $value) {
+				$session{isInGroup}{$gid} = 1;
+				return 1;
+			}
+		}
+	}
         ### Check karma levels.
 	if ($session{setting}{useKarma}) {
-		tie %user, 'Tie::CPHash';
-		%user = WebGUI::SQL->quickHash("select karma from users where userId='$uid'");
-		if ($user{karma} >= $group{karmaThreshold}) {
+		my $karma;
+		if ($uid == $session{user}{userId}) {
+			$karma = $session{user}{karma};
+		} else {
+			($karma) = WebGUI::SQL->quickHash("select karma from users where userId='$uid'");
+		}
+		if ($karma >= $group{karmaThreshold}) {
 			$session{isInGroup}{$gid} = 1;
 			return 1;
 		}
 	}
-	### Admins can do anything!
-        if ($gid != 3 && $session{isInGroup}{3} eq "") {                        
-                $session{isInGroup}{3} = isInGroup(3, $uid);
-		if ($session{isInGroup}{3}) {
-			$session{isInGroup}{$gid} = 1;
-			return 1;
-		}
-        }                                       
 	### Check for groups of groups.
-	@data = WebGUI::SQL->buildArray("select groupId from groupGroupings where inGroup='$gid'");
-	foreach $groupId (@data) {
-		$session{isInGroup}{$groupId} = isInGroup($groupId, $uid);
-		if ($session{isInGroup}{$groupId}) {
+	my $groups = WebGUI::Grouping::getGroupsInGroup($gid,1);
+	foreach (@{$groups}) {
+		$session{isInGroup}{$_} = isInGroup($_, $uid);
+		if ($session{isInGroup}{$_}) {
 			$session{isInGroup}{$gid} = 1;
 			return 1;
 		}
 	}
+	$session{isInGroup}{$gid} = 0;
 	return 0;
 }
 

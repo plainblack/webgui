@@ -79,6 +79,8 @@ Tie::CPHash..........................Christopher J. Madsen
 
 Tie::IxHash..........................Gurusamy Sarathy
 
+Tree::DAG_Node.......................Sean M. Burke
+
 XML::RSSLite.........................Jerrad Pierce
                                      Scott Thomason
 
@@ -86,6 +88,7 @@ Midas................................The Mozilla Development Team
                                      Mike Kaply
 
 HTML Area............................interactivetools.com
+                                     The Open Source Community
 
 Classic Rich Edit....................Bratta
 

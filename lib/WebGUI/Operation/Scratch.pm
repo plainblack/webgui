@@ -19,12 +19,14 @@ our @EXPORT = qw(&www_setScratch &www_deleteScratch);
 
 #-------------------------------------------------------------------
 sub www_deleteScratch {
-	WebGUI::Session::deleteScratch("www_".$session{user}{scratchName});
+	WebGUI::Session::deleteScratch("www_".$session{form}{scratchName});
+	return "";
 }
 
 #-------------------------------------------------------------------
 sub www_setScratch {
 	WebGUI::Session::setScratch("www_".$session{form}{scratchName},$session{form}{scratchValue});
+	return "";
 }
 
 
