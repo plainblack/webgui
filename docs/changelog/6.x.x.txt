@@ -15,8 +15,8 @@
  - Added AOIRank and AOIHits macro's to retrieve user's Area's Of Interest
    statistics. (Thanks to DonorWare for funding this feature.)
  - Fixed a typo in Forum/UI.pm
- - bugfix [ 996284 ] Compile error in macro.pm
- - bugfix [ 997918 ] Default value in profile not working
+ - bugfix [ 996284 ] Compile error in macro.pm (Len Kranendonk)
+ - bugfix [ 997918 ] Default value in profile not working (Len Kranendonk)
  - bugfix [ 997916 ] Bug and solution in File.pm
  - Added the page.isMyAncestor condition to the Navigation system. (Thanks to
    Len Kranendonk)
@@ -30,15 +30,18 @@
    default page of your virtual host.
  - passing form param disableWobjects=$call shortcircuits most of
    WebGUI::Wobject::WSClient::www_view()
- - Added write permission checks to WebGUI::Template.
+ - Added write permission checks to WebGUI::Template. (Len Kranendonk)
  - Added Export Page functionality.
- - bugfix: Loginbox didn't support encrypt login.
- - Bugfix: [ 1000205 ] Password Recovery Doesn't Work
- - Bugfix: [ 1003594 ] Fixed Navigation Cacheing bug
- - Bugfix: [ 1000299 ] laodAllConfigs should be loadAllConfigs?
- - Bugfix: [ 995088 ] Error in printable macro 6.1.1
+ - bugfix: Loginbox didn't support encrypt login. (Len Kranendonk)
+ - Bugfix: [ 1000205 ] Password Recovery Doesn't Work (Len Kranendonk)
+ - Bugfix: [ 1003594 ] Fixed Navigation Cacheing bug (OpenTech / Len Kranendonk)
+ - Bugfix: [ 1000299 ] laodAllConfigs should be loadAllConfigs? (Len
+   Kranendonk)
+ - Bugfix: [ 995088 ] Error in printable macro 6.1.1 (Len Kranendonk)
  - Bugfix: [ 1003511 ] Users cannot be added to Registered Users if removed
+   (Len Kranendonk)
  - Bugfix: [ 996592 ] Fixed Infinite loop in Page.pm makeUnique in 6.1.1
+   (OpenTech / Len Kranendonk)
  - Converted all IDs to use global unique ids rather than incremented ids as
    they were in the past.
  - BugFix: [ 999799 ] Fixed Package deletion/copy bug in 6.1.1
@@ -58,6 +61,7 @@
  - RFE [ 806332 ] Force SSL, a new page property "Encrypt page" is added. (Len
    Kranendonk)
  - RFE [ 1004098 ] Additional navigation Template Parameters added. (Martin Kamerbeek / Procolix, code thanks to Opentech)
+ - RFE [ 747859 ] RSS Encoding (Len Kranendonk) NB: Needs perl 5.8.0 or up.
 
 6.1.1
  - bugfix [ 991313 ] Manage Translations doesn't work

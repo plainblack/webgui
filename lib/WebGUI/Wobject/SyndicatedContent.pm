@@ -25,6 +25,7 @@ use WebGUI::Session;
 use WebGUI::Wobject;
 use XML::RSSLite;
 use LWP::UserAgent;
+use WebGUI::ErrorHandler;
 
 our @ISA = qw(WebGUI::Wobject);
 
@@ -182,11 +183,25 @@ sub _get_rss_data {
                 my $ua = LWP::UserAgent->new(timeout => 5);
                 my $response = $ua->get($url);
                 if (!$response->is_success()) {
-                        warn("Error retrieving url '$url': " . 
+                        WebGUI::ErrorHandler::warn("Error retrieving url '$url': " . 
                              $response->status_line());
                         return undef;
                 }
                 my $xml = $response->content();
+
+		# Convert encoding if needed / Perl 5.8.0 or up required.
+		if ($] >= 5.008) {
+			$xml =~ /<\?xml.*?encoding=['"](\S+)['"]/i;
+			my $xmlEncoding = $1;
+			my $encoding = WebGUI::International::getLanguage($session{user}{language},"charset");
+			if (lc($xmlEncoding) ne lc($encoding)) {
+				use Encode qw(from_to);
+				eval {	from_to($xml, $xmlEncoding, $encoding) };
+				WebGUI::ErrorHandler::warn($@) if ($@);
+			}
+				
+		}
+
                 
                 # there is no encode_entities_numeric that I can find, so I am 
                 # commenting this out. -hal
@@ -198,7 +213,7 @@ sub _get_rss_data {
                         XML::RSSLite::parseXML($rss_lite, \$xml);
                 };
                 if ($@) {
-                        warn("error parsing rss for url $url");
+                        WebGUI::ErrorHandler::warn("error parsing rss for url $url");
                 }
                 
                 # make sure that the {channel} points to the channel 
@@ -209,10 +224,10 @@ sub _get_rss_data {
                 $rss_lite = {channel => $rss_lite};
                 if (!($rss->{channel} = 
                       _find_record($rss_lite, qr/^channel$/))) {
-                        warn("unable to find channel info for url $url");
+                        WebGUI::ErrorHandler::warn("unable to find channel info for url $url");
                 }
                 if (!($rss->{items} = _find_record($rss_lite, qr/^items?$/))) {
-                        warn("unable to find item info for url $url");
+                        WebGUI::ErrorHandler::warn("unable to find item info for url $url");
                         $rss->{items} = [];
                 }
                 
