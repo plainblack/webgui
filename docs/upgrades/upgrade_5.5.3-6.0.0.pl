@@ -440,8 +440,8 @@ WebGUI::SQL->write("delete from authentication where authMethod='WebGUI' and fie
 WebGUI::SQL->write("delete from authentication where authMethod='WebGUI' and fieldName='passwordTimeout'");
 my $authSth = WebGUI::SQL->read("select userId from users where authMethod='WebGUI'");
 while (my $authHash = $authSth->hashRef){
-   WebGUI::SQL->write("insert into authentication (userId,authMethod,fieldName,fieldData) values ('".$authHash->userId."','WebGUI','passwordLastUpdated','".time()."');
-   WebGUI::SQL->write("insert into authentication (userId,authMethod,fieldName,fieldData) values ('".$authHash->userId."','WebGUI','passwordTimeout','3122064000');
+   WebGUI::SQL->write("insert into authentication (userId,authMethod,fieldName,fieldData) values ('".$authHash->{userId}."','WebGUI','passwordLastUpdated','".time()."')");
+   WebGUI::SQL->write("insert into authentication (userId,authMethod,fieldName,fieldData) values ('".$authHash->{userId}."','WebGUI','passwordTimeout','3122064000')");
 }
 
 
@@ -457,7 +457,7 @@ unlink("../../lib/WebGUI/Operation/Account.pm");
 unlink("../../lib/WebGUI/Authentication/WebGUI.pm");
 unlink("../../lib/WebGUI/Authentication/LDAP.pm");
 unlink("../../lib/WebGUI/Authentication/SMB.pm");
-rmdir("../../lib/WebGUI/Authentication")
+rmdir("../../lib/WebGUI/Authentication");
 WebGUI::Session::close();
 
 
