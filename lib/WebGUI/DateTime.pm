@@ -77,10 +77,7 @@ sub epochToHuman {
 	$offset = $offset*3600;
 	$temp = $_[0] || time();
 	$temp = $temp+$offset;
-	@date = localtime($temp);
-	$date[4]++; 		# offset the months starting from 0
-	$date[5] += 1900;	# original value is Year-1900
-	$date[6]++;		# offset for weekdays starting from 0
+	@date = &localtime($temp);
 	$output = $_[1] || "%z %Z";
   #---dealing with percent symbol
 	$output =~ s/\%\%/\%/g;
@@ -91,27 +88,27 @@ sub epochToHuman {
 	$temp = $session{user}{timeFormat} || '%H:%n %p';
 	$output =~ s/\%Z/$temp/g;
   #---year stuff
-	$output =~ s/\%y/$date[5]/g;
-	$value = substr($date[5],2,2);
+	$output =~ s/\%y/$date[0]/g;
+	$value = substr($date[0],2,2);
 	$output =~ s/\%Y/$value/g;
   #---month stuff
-	$value = sprintf("%02d",$date[4]);
+	$value = sprintf("%02d",$date[1]);
 	$output =~ s/\%m/$value/g;
-	$output =~ s/\%M/$date[4]/g;
+	$output =~ s/\%M/$date[1]/g;
 	if ($output =~ /\%c/) {
 		%month = _getMonth();
-		$output =~ s/\%c/$month{$date[4]}/g;
+		$output =~ s/\%c/$month{$date[1]}/g;
 	}
   #---day stuff
-	$value = sprintf("%02d",$date[3]);
+	$value = sprintf("%02d",$date[2]);
 	$output =~ s/\%d/$value/g;
-	$output =~ s/\%D/$date[3]/g;
+	$output =~ s/\%D/$date[2]/g;
 	if ($output =~ /\%w/) {
 		%weekday = _getWeekday();
 		$output =~ s/\%w/$weekday{$date[6]}/g;
 	}
   #---hour stuff
-	$hour12 = $date[2];
+	$hour12 = $date[3];
 	if ($hour12 > 12) {
 		$hour12 = $hour12 - 12;
 		if ($hour12 == 0) {
@@ -121,10 +118,10 @@ sub epochToHuman {
 	$value = sprintf("%02d",$hour12);
 	$output =~ s/\%h/$value/g;
 	$output =~ s/\%H/$hour12/g;
-	$value = sprintf("%02d",$date[2]);
+	$value = sprintf("%02d",$date[3]);
 	$output =~ s/\%j/$value/g;
-	$output =~ s/\%J/$date[2]/g;
-	if ($date[2] > 11) {
+	$output =~ s/\%J/$date[3]/g;
+	if ($date[3] > 11) {
 		$output =~ s/\%p/pm/g;
 		$output =~ s/\%P/PM/g;
 	} else {
@@ -132,10 +129,10 @@ sub epochToHuman {
 		$output =~ s/\%P/AM/g;
 	}
   #---minute stuff
-	$value = sprintf("%02d",$date[1]);
+	$value = sprintf("%02d",$date[4]);
 	$output =~ s/\%n/$value/g;
   #---second stuff
-	$value = sprintf("%02d",$date[0]);
+	$value = sprintf("%02d",$date[5]);
 	$output =~ s/\%s/$value/g;
 	return $output;
 }
@@ -179,7 +176,7 @@ sub monthStartEnd {
 
 #-------------------------------------------------------------------
 sub setToEpoch {
-	my @date = localtime(time());
+	my @date = &localtime(time());
  	my ($month, $day, $year) = split(/\//,$_[0]);
 	if (int($year) < 2038 && int($year) > 1900) {
 		$year = int($year);

@@ -176,7 +176,7 @@ sub www_edit {
 		$f = WebGUI::HTMLForm->new;
                 %hash = (list => WebGUI::International::get(17,$namespace),
                         calendarMonth => WebGUI::International::get(18,$namespace),
-			calendarMonthSmall => WebGUI::International::get(74,$namespace);
+			calendarMonthSmall => WebGUI::International::get(74,$namespace));
 		$f->select("calendarLayout",\%hash,WebGUI::International::get(16,$namespace),[$_[0]->get("calendarLayout")]);
 		$f->integer("paginateAfter",WebGUI::International::get(19,$namespace),$paginateAfter);
 		$f->yesNo("proceed",WebGUI::International::get(21,$namespace),$proceed);

@@ -422,7 +422,7 @@ sub www_deleteConfirm {
 =cut
 
 sub www_edit {
-        my ($f, $displayTitle, $title, $templatePosition, $endDate);
+        my ($f, $startDate, $displayTitle, $title, $templatePosition, $endDate);
         if ($_[0]->get("wobjectId") eq "new") {
                	$displayTitle = 1;
         } else {
@@ -430,7 +430,8 @@ sub www_edit {
         }
 	$title = $_[0]->get("title") || $_[0]->get("namespace");
 	$templatePosition = $_[0]->get("templatePosition") || '0';
-	$endDate = $_[0]->get("endDate") || (time()+315360000);
+	$startDate = $_[0]->get("startDate") || $session{page}{startDate};
+	$endDate = $_[0]->get("endDate") || $session{page}{endDate};
 	$f = WebGUI::HTMLForm->new;
 	$f->hidden("wid",$_[0]->get("wobjectId"));
 	$f->hidden("namespace",$_[0]->get("namespace")) if ($_[0]->get("wobjectId") eq "new");
@@ -441,7 +442,7 @@ sub www_edit {
 	$f->yesNo("displayTitle",WebGUI::International::get(174),$displayTitle);
 	$f->yesNo("processMacros",WebGUI::International::get(175),$_[0]->get("processMacros"));
 	$f->select("templatePosition",WebGUI::Template::getPositions($session{page}{templateId}),WebGUI::International::get(363),[$templatePosition]);
-	$f->date("startDate",WebGUI::International::get(497),$_[0]->get("startDate"));
+	$f->date("startDate",WebGUI::International::get(497),$startDate);
 	$f->date("endDate",WebGUI::International::get(498),$endDate);
 	$f->HTMLArea("description",WebGUI::International::get(85),$_[0]->get("description"));
 	$f->raw($_[1]);
@@ -463,8 +464,8 @@ sub www_editSave {
 	my ($title, $templatePosition, $startDate, $endDate);
 	$title = $session{form}{title} || $_[0]->get("namespace");
         $templatePosition = $session{form}{templatePosition} || '0';
-        $startDate = setToEpoch($session{form}{startDate}) || setToEpoch(time());
-        $endDate = setToEpoch($session{form}{endDate}) || setToEpoch(time()+315360000);
+        $startDate = setToEpoch($session{form}{startDate}) || $session{page}{startDate};
+        $endDate = setToEpoch($session{form}{endDate}) || $session{page}{endDate};
 	$session{form}{description} = WebGUI::HTML::cleanSegment($session{form}{description});
 	$_[0]->set({
 		title=>$title,

@@ -12,6 +12,7 @@ package WebGUI::Wobject::WobjectProxy;
 
 use strict;
 use Tie::CPHash;
+use WebGUI::DateTime;
 use WebGUI::HTMLForm;
 use WebGUI::Icon;
 use WebGUI::International;
@@ -61,7 +62,7 @@ sub www_copy {
 
 #-------------------------------------------------------------------
 sub www_edit {
-        my ($output, $f, $endDate, $templatePosition,%wobjects, %page, %wobject, $a, $b);
+        my ($output, $f, $startDate, $endDate, $templatePosition,%wobjects, %page, %wobject, $a, $b);
 	tie %wobject, 'Tie::CPHash';
 	tie %page, 'Tie::CPHash';
 	tie %wobjects, 'Tie::IxHash';
@@ -69,7 +70,8 @@ sub www_edit {
                 $output = helpIcon(1,$namespace);
 		$output .= '<h1>'.WebGUI::International::get(2,$namespace).'</h1>';
 		$templatePosition = $_[0]->get("templatePosition") || '0';
-        	$endDate = $_[0]->get("endDate") || (time()+315360000);
+        	$startDate = $_[0]->get("startDate") || $session{page}{startDate};
+        	$endDate = $_[0]->get("endDate") || $session{page}{endDate};
         	$f = WebGUI::HTMLForm->new;
         	$f->hidden("wid",$_[0]->get("wobjectId"));
         	$f->hidden("namespace",$_[0]->get("namespace")) if ($_[0]->get("wobjectId") eq "new");
@@ -79,7 +81,7 @@ sub www_edit {
         	$f->hidden("displayTitle",0);
         	$f->hidden("processMacros",0);
         	$f->select("templatePosition",WebGUI::Template::getPositions($session{page}{templateId}),WebGUI::International::get(363),[$templatePosition]);
-        	$f->date("startDate",WebGUI::International::get(497),$_[0]->get("startDate"));
+        	$f->date("startDate",WebGUI::International::get(497),$startDate);
         	$f->date("endDate",WebGUI::International::get(498),$endDate);
 		$a = WebGUI::SQL->read("select pageId,menuTitle from page where pageId<2 or pageId>25 order by title");
 		while (%page = $a->hash) {

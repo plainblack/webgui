@@ -12,6 +12,7 @@ package WebGUI::Wobject::ExtraColumn;
 
 use strict;
 use Tie::CPHash;
+use WebGUI::DateTime;
 use WebGUI::HTMLForm;
 use WebGUI::Icon;
 use WebGUI::International;
@@ -63,7 +64,7 @@ sub www_copy {
 
 #-------------------------------------------------------------------
 sub www_edit {
-        my ($output, $f, $endDate, $width, $class, $spacer);
+        my ($output, $f, $endDate, $width, $class, $spacer,$startDate);
         if (WebGUI::Privilege::canEditPage()) {
                 $output = helpIcon(1,$namespace);
 		$output .= '<h1>'.WebGUI::International::get(6,$namespace).'</h1>';
@@ -75,7 +76,8 @@ sub www_edit {
                 	$spacer = $_[0]->get("spacer");
         	}
 		$class = $_[0]->get("class") || "content";
-        	$endDate = $_[0]->get("endDate") || (time()+315360000);
+        	$startDate = $_[0]->get("startDate") || $session{page}{startDate};
+        	$endDate = $_[0]->get("endDate") || $session{page}{endDate};
         	$f = WebGUI::HTMLForm->new;
         	$f->hidden("wid",$_[0]->get("wobjectId"));
         	$f->hidden("namespace",$_[0]->get("namespace")) if ($_[0]->get("wobjectId") eq "new");
@@ -85,7 +87,7 @@ sub www_edit {
         	$f->hidden("displayTitle",0);
         	$f->hidden("processMacros",0);
         	$f->hidden("templatePosition",0);
-        	$f->date("startDate",WebGUI::International::get(497),$_[0]->get("startDate"));
+        	$f->date("startDate",WebGUI::International::get(497),$startDate);
         	$f->date("endDate",WebGUI::International::get(498),$endDate);
 		$f->integer("spacer",WebGUI::International::get(3,$namespace),$spacer);
 		$f->integer("width",WebGUI::International::get(4,$namespace),$width);

@@ -159,7 +159,7 @@ sub www_editPage {
 		} else {
 			%page = %{$session{page}};
 		}
-		$page{endDate} = (time()+315360000) if ($page{endDate} < 0);
+		$page{endDate} = (addToDate(time(),10)) if ($page{endDate} < 0);
                 $output = helpIcon(1);
 		$output .= '<h1>'.WebGUI::International::get(102).'</h1>';
 		$f->hidden("pageId",$page{pageId});
@@ -225,7 +225,7 @@ sub www_editPageSave {
                 $session{form}{urlizedTitle} = $session{form}{menuTitle} if ($session{form}{urlizedTitle} eq "");
 		$session{form}{urlizedTitle} = WebGUI::URL::makeUnique(WebGUI::URL::urlize($session{form}{urlizedTitle}),$session{form}{pageId});
 		$session{form}{startDate} = setToEpoch($session{form}{startDate}) || setToEpoch(time());
-        	$session{form}{endDate} = setToEpoch($session{form}{endDate}) || setToEpoch(time()+315360000);
+        	$session{form}{endDate} = setToEpoch($session{form}{endDate}) || setToEpoch(addToDate(time(),10));
                 WebGUI::SQL->write("update page set 
 			title=".quote($session{form}{title}).", 
 			styleId=$session{form}{styleId}, 
