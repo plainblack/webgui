@@ -427,7 +427,7 @@ sub www_edit {
 sub www_editSave {
 	my ($title, $templatePosition, $startDate, $endDate);
 	$title = $session{form}{title} || $_[0]->get("namespace");
-        $templatePosition = $session{form}{templatePosition} || 'A';
+        $templatePosition = $session{form}{templatePosition} || '0';
         $startDate = setToEpoch($session{form}{startDate}) || setToEpoch(time());
         $endDate = setToEpoch($session{form}{endDate}) || setToEpoch(time()+315360000);
 	$session{form}{description} = WebGUI::HTML::cleanSegment($session{form}{description});
