@@ -1,4 +1,4 @@
-package WebGUI::Wobject::SQLReport;
+package WebGUI::Asset::Wobject::SQLReport;
 
 #-------------------------------------------------------------------
 # WebGUI is Copyright 2001-2004 Plain Black Corporation.
@@ -13,8 +13,6 @@ package WebGUI::Wobject::SQLReport;
 use strict;
 use WebGUI::DatabaseLink;
 use WebGUI::ErrorHandler;
-use WebGUI::HTMLForm;
-use WebGUI::Icon;
 use WebGUI::International;
 use WebGUI::Macro;
 use WebGUI::Paginator;
@@ -23,95 +21,125 @@ use WebGUI::Session;
 use WebGUI::SQL;
 use WebGUI::URL;
 use WebGUI::Utility;
-use WebGUI::Wobject;
+use WebGUI::Asset::Wobject;
 
-our @ISA = qw(WebGUI::Wobject);
+our @ISA = qw(WebGUI::Asset::Wobject);
 
-
-#-------------------------------------------------------------------
-sub name {
-        return WebGUI::International::get(1,$_[0]->get("namespace"));
-}
 
 
 #-------------------------------------------------------------------
-sub new {
-        my $class = shift;
-        my $property = shift;
-        my $self = WebGUI::Wobject->new(
-                -properties=>$property,
-                -extendedProperties=>{
+sub definition {
+	my $class = shift;
+	my $definition = shift;
+	push(@{$definition}, {
+		tableName=>'SQLReport',
+		className=>'WebGUI::Asset::Wobject::SQLReport',
+		properties=>{
 			paginateAfter=>{
+				fieldType=>"integer",
 				defaultValue=>50
 				},
-			dbQuery1=>{}, 
+			dbQuery1=>{
+				fieldType=>"codearea",
+				defaultValue=>undef
+				}, 
 			preprocessMacros1=>{
+				fieldType=>"yesNo",
 				defaultValue=>0
 				},
-			placeholderParams1=>{},
+			placeholderParams1=>{
+				fieldType=>"textarea",
+				defaultValue=>undef
+				},
                         databaseLinkId1=>{
+				fieldType=>"databaseLink",
                                 defaultValue=>0
                         },
-			dbQuery2=>{},
+			dbQuery2=>{
+                                fieldType=>"codearea",
+                                defaultValue=>undef
+                                },
                         preprocessMacros2=>{
+				fieldType=>"yesNo",
                                 defaultValue=>0
                                 },
-                        placeholderParams2=>{},
+                        placeholderParams2=>{
+                                fieldType=>"textarea",
+                                defaultValue=>undef
+                                },
                         databaseLinkId2=>{
+				fieldType=>"databaseLink",
                                 defaultValue=>0
                         },
-			dbQuery3=>{},
+			dbQuery3=>{
+                                fieldType=>"codearea",
+                                defaultValue=>undef
+                                },
                         preprocessMacros3=>{
+				fieldType=>"yesNo",
                                 defaultValue=>0
                                 },
-                        placeholderParams3=>{},
+                        placeholderParams3=>{
+                                fieldType=>"textarea",
+                                defaultValue=>undef
+                                },
                         databaseLinkId3=>{
+				fieldType=>"databaseLink",
                                 defaultValue=>0
                         },
-			dbQuery4=>{},
+			dbQuery4=>{
+                                fieldType=>"codearea",
+                                defaultValue=>undef
+                                },
                         preprocessMacros4=>{
+				fieldType=>"yesNo",
                                 defaultValue=>0
                                 },
-                        placeholderParams4=>{},
+                        placeholderParams4=>{
+                                fieldType=>"textarea",
+                                defaultValue=>undef
+                                },
                         databaseLinkId4=>{
+				fieldType=>"databaseLink",
                                 defaultValue=>0
                         },
-			dbQuery5=>{},
+			dbQuery5=>{
+                                fieldType=>"codearea",
+                                defaultValue=>undef
+                                },
                         preprocessMacros5=>{
+				fieldType=>"yesNo",
                                 defaultValue=>0
                                 },
-                        placeholderParams5=>{},
+                        placeholderParams5=>{
+                                fieldType=>"textarea",
+                                defaultValue=>undef
+                                },
                         databaseLinkId5=>{
+				fieldType=>"databaseLink",
                                 defaultValue=>0
                         },
 			debugMode=>{
+				fieldType=>"yesNo",
 				defaultValue=>0
 				},
-			},
-		-useTemplate=>1,
-		-useMetaData=>1
-                );
-        bless $self, $class;
+                        }
+                });
+        return $class->SUPER::definition($definition);
 }
 
 #-------------------------------------------------------------------
-sub uiLevel {
-	return 9;
-}
-
-#-------------------------------------------------------------------
-sub www_edit {
-	my $privileges = WebGUI::HTMLForm->new;
-	my $layout = WebGUI::HTMLForm->new;
-	my $properties = WebGUI::HTMLForm->new;
-        $properties->yesNo(
+sub getEditForm {
+	my $self = shift;
+	my $tabform = $self->SUPER::getEditForm();
+        $tabform->getTab("properties")->yesNo(
                 -name=>"debugMode",
-                -label=>WebGUI::International::get(16,$_[0]->get("namespace")),
-                -value=>$_[0]->getValue("debugMode")
+                -label=>WebGUI::International::get(16,"SQLReport"),
+                -value=>$self->getValue("debugMode")
                 );
 
 	# Add toggleQuery javascript
-	$properties->raw(qq|
+	$tabform->getTab("properties")->raw(qq|
 		<script language="javascript">
 		function toggleQuery(Id) {
 			queryClass = "query" + Id;
@@ -132,44 +160,44 @@ sub www_edit {
 
 	for my $nr (1..5) {
 	   # Set TR class for this query properties
-	   $properties->trClass("query".$nr);
+	   $tabform->getTab("properties")->trClass("query".$nr);
 
-	   $properties->readOnly(
+	   $tabform->getTab("properties")->readOnly(
 		   -value=>"<hr>",
                    -label=>"<b>query".$nr.":</b>",
 		   ); 
-	   $properties->yesNo(
+	   $tabform->getTab("properties")->yesNo(
 	  	   -name=>"preprocessMacros".$nr,
-		   -label=>WebGUI::International::get(15,$_[0]->get("namespace")),
-		   -value=>$_[0]->getValue("preprocessMacros".$nr)
+		   -label=>WebGUI::International::get(15,"SQLReport"),
+		   -value=>$self->getValue("preprocessMacros".$nr)
 		   );
-	   $properties->textarea(
+	   $tabform->getTab("properties")->textarea(
                    -name=>"placeholderParams".$nr,
-                   -label=>WebGUI::International::get('Placeholder Parameters',$_[0]->get("namespace")),
-                   -value=>$_[0]->getValue("placeholderParams".$nr)
+                   -label=>WebGUI::International::get('Placeholder Parameters',"SQLReport"),
+                   -value=>$self->getValue("placeholderParams".$nr)
                    );
-	   $properties->textarea(
+	   $tabform->getTab("properties")->codearea(
 		   -name=>"dbQuery".$nr,
-		   -label=>WebGUI::International::get(4,$_[0]->get("namespace")),
-		   -value=>$_[0]->getValue("dbQuery".$nr)
+		   -label=>WebGUI::International::get(4,"SQLReport"),
+		   -value=>$self->getValue("dbQuery".$nr)
 		   );
-	   $properties->databaseLink(
+	   $tabform->getTab("properties")->databaseLink(
 		   -name=>"databaseLinkId".$nr,
-		   -value=>$_[0]->getValue("databaseLinkId".$nr)
+		   -value=>$self->getValue("databaseLinkId".$nr)
 		   );
 
 	   # Add a "Add another query" button
-	   if ($nr < 5	and ($_[0]->get("dbQuery".($nr+1)) eq "" || ($_[0]->get("dbQuery".($nr)) eq "" and $_[0]->get("dbQuery".($nr+1)) ne ""))) {
-	           $properties->button(
-        	           -value=>WebGUI::International::get('Add another query',$_[0]->get("namespace")),
+	   if ($nr < 5	and ($self->get("dbQuery".($nr+1)) eq "" || ($_[0]->get("dbQuery".($nr)) eq "" and $_[0]->get("dbQuery".($nr+1)) ne ""))) {
+	           $tabform->getTab("properties")->button(
+        	           -value=>WebGUI::International::get('Add another query',"SQLReport"),
                 	   -extras=>'onClick="toggleQuery(\''.($nr+1).'\'); this.style.display=\'none\';"',
 	                   -noWait=>1
         	           );
 	   }
 
 	   # Make empty query blocks invisible
-           if ($nr > 1 && ($_[0]->get("dbQuery".$nr) eq "" || $_[0]->get("dbQuery".($nr-1)) eq "")) {
-		$properties->raw(qq|
+           if ($nr > 1 && ($self->get("dbQuery".$nr) eq "" || $_[0]->get("dbQuery".($nr-1)) eq "")) {
+		$tabform->getTab("properties")->raw(qq|
                         <script language="javascript">
                                 toggleQuery('$nr');
                         </script>
@@ -178,21 +206,35 @@ sub www_edit {
 
 	}
 	# Undefine TR class
-	$properties->trClass();
+	$tabform->getTab("properties")->trClass();
 
-	$layout->integer(
+	$tabform->getTab("display")->integer(
 		-name=>"paginateAfter",
-		-label=>WebGUI::International::get(14,$_[0]->get("namespace")),
-		-value=>$_[0]->getValue("paginateAfter")
+		-label=>WebGUI::International::get(14,"SQLReport"),
+		-value=>$self->getValue("paginateAfter")
 		);
-	return $_[0]->SUPER::www_edit(
-		-layout=>$layout->printRowsOnly,
-		-properties=>$properties->printRowsOnly,
-		-privileges=>$privileges->printRowsOnly,
-		-headingId=>8,
-		-helpId=>"sql report add/edit"
-		);
+	return $tabform;
 }
+
+#-------------------------------------------------------------------
+sub getIcon {
+	my $self = shift;
+	my $small = shift;
+	return $session{config}{extrasURL}.'/assets/small/sqlReport.gif' if ($small);
+	return $session{config}{extrasURL}.'/assets/sqlReport.gif';
+}
+
+#-------------------------------------------------------------------
+sub getName {
+        return WebGUI::International::get(1,"SQLReport");
+}
+
+
+#-------------------------------------------------------------------
+sub getUiLevel {
+	return 9;
+}
+
 
 #-------------------------------------------------------------------
 sub www_view {
@@ -213,6 +255,15 @@ sub www_view {
 	#use Data::Dumper; return '<pre>'.Dumper($var).'</pre>';
 	return $self->processTemplate($self->get("templateId"),$var);
 }
+
+#-------------------------------------------------------------------
+sub www_edit {
+        my $self = shift;
+	return $self->getAdminConsole->render(WebGUI::Privilege::insufficient()) unless $self->canEdit;
+	$self->getAdminConsole->setHelp("sql report add/edit");
+        return $self->getAdminConsole->render($self->getEditForm->print,WebGUI::International::get("8","SQLReport"));
+}
+
 
 #-------------------------------------------------------------------
 sub _storeQueries {
@@ -269,15 +320,15 @@ sub _processQuery {
                 $query = $self->{_query}{$nr}{dbQuery};
         }
 	
-        push(@{$self->{_debug_loop}},{'debug.output'=>WebGUI::International::get(17,$self->get("namespace")).$query});
-        push(@{$self->{_debug_loop}},{'debug.output'=>WebGUI::International::get('debug placeholder parameters',$self->get("namespace")).join(",",@$placeholderParams)});
+        push(@{$self->{_debug_loop}},{'debug.output'=>WebGUI::International::get(17,"SQLReport").$query});
+        push(@{$self->{_debug_loop}},{'debug.output'=>WebGUI::International::get('debug placeholder parameters',"SQLReport").join(",",@$placeholderParams)});
         my $dbLink = WebGUI::DatabaseLink->new($self->{_query}{$nr}{databaseLinkId});
         my $dbh = $dbLink->dbh;
         if (defined $dbh) {
                 if ($query =~ /^select/i || $query =~ /^show/i || $query =~ /^describe/i) {
-                        my $url = WebGUI::URL::page('&wid='.$self->get("wobjectId").'&func=view');
+                        my $url = $self->getUrl('func=view');
                         foreach (keys %{$session{form}}) {
-                                unless ($_ eq "pn" || $_ eq "wid" || $_ eq "func" || $_ =~ /identifier/i || $_ =~ /password/i) {
+                                unless ($_ eq "pn" || $_ eq "func" || $_ =~ /identifier/i || $_ =~ /password/i) {
                                         $url = WebGUI::URL::append($url, WebGUI::URL::escape($_)
                                                 .'='.WebGUI::URL::escape($session{form}{$_}));
                                 }
@@ -288,7 +339,7 @@ sub _processQuery {
                         my $error = $p->setDataByQuery($query,$dbh,1,$placeholderParams);
                         if ($error ne "") {
                                 WebGUI::ErrorHandler::warn("There was a problem with the query: ".$error);
-                                push(@{$self->{_debug_loop}},{'debug.output'=>WebGUI::International::get(11,$self->get("namespace"))." ".$error});
+                                push(@{$self->{_debug_loop}},{'debug.output'=>WebGUI::International::get(11,"SQLReport")." ".$error});
                         } else {
                                 my $first = 1;
                                 my @columns;
@@ -332,17 +383,17 @@ sub _processQuery {
 				$var{$prefix.'columns.count'} = scalar(@columns);
                                 $var{$prefix.'rows.count'} = $p->getRowCount;
                                 $var{$prefix.'rows.count.isZero'} = ($p->getRowCount < 1);
-                                $var{$prefix.'rows.count.isZero.label'} = WebGUI::International::get(18,$self->get("namespace"));
+                                $var{$prefix.'rows.count.isZero.label'} = WebGUI::International::get(18,"SQLReport");
                                 $p->appendTemplateVars(\%var) if ($nr == 1);
                         }
                 } else {
-                        push(@{$self->{_debug_loop}},{'debug.output'=>WebGUI::International::get(10,$self->get("namespace"))});
-                        WebGUI::ErrorHandler::warn("SQLReport [".$self->get("wobjectId")."] The SQL query is improperly formatted.");
+                        push(@{$self->{_debug_loop}},{'debug.output'=>WebGUI::International::get(10,"SQLReport")});
+                        WebGUI::ErrorHandler::warn("SQLReport [".$self->getId."] The SQL query is improperly formatted.");
                 }
                 $dbLink->disconnect;
         } else {
-                push(@{$self->{_debug_loop}},{'debug.output'=>WebGUI::International::get(12,$self->get("namespace"))});
-                WebGUI::ErrorHandler::warn("SQLReport [".$self->get("wobjectId")."] Could not connect to database.");
+                push(@{$self->{_debug_loop}},{'debug.output'=>WebGUI::International::get(12,"SQLReport")});
+                WebGUI::ErrorHandler::warn("SQLReport [".$self->getId."] Could not connect to database.");
         }
 	return \%var;
 }

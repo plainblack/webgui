@@ -488,6 +488,7 @@ print "\tDeleting files which are no longer used.\n" unless ($quiet);
 #unlink("../../lib/WebGUI/Wobject/FileManager.pm");
 #rmtree("../../lib/WebGUI/Wobject/HttpProxy");
 #unlink("../../lib/WebGUI/Wobject/HttpProxy.pm");
+#unlink("../../lib/WebGUI/Wobject/SQLReport.pm");
 #unlink("../../lib/WebGUI/Operation/Clipboard.pm");
 #unlink("../../lib/WebGUI/Operation/Trash.pm");
 #unlink("../../lib/WebGUI/Operation/Collateral.pm");
@@ -530,6 +531,7 @@ $conf->set("assets"=>[
 		'WebGUI::Asset::Wobject::SyndicatedContent',
 		'WebGUI::Asset::Wobject::WSClient',
 		'WebGUI::Asset::Wobject::HttpProxy',
+		'WebGUI::Asset::Wobject::SQLReport',
 		'WebGUI::Asset::Redirect',
 		'WebGUI::Asset::FilePile',
 		'WebGUI::Asset::File',

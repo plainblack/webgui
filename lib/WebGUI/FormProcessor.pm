@@ -161,6 +161,22 @@ sub contentType {
 
 #-------------------------------------------------------------------
 
+=head2 databaseLink ( name )
+
+Returns the ID of a database link.
+
+=head3 name
+
+The name of the form variable to retrieve.
+
+=cut
+
+sub databaseLink {
+	return selectList($_[0]);
+}
+
+#-------------------------------------------------------------------
+
 =head2 date ( name )
 
 Returns an epoch datestamp.
