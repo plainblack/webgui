@@ -25,6 +25,16 @@
  - Updated the Dutch translation. (Thanks to ProcoliX.)
  - Updated the Spanish translation. (Thanks to GIT Consultors.) 
  - Updated the German translation. (Thanks to Andreas Graf.)
+ - Fixed a bug in SQL macro where it required a leading space in queries.
+ - Fixed a case-sensitivity bug in email verfication. (Thanks to Steve Simms.)
+ - Fixed a bug where the user was returned to the wrong page after deleting an
+   item from the clipboard. (Thanks to Steve Simms.)
+ - Fixed a bug in WebGUI account creation where welcome emails were sent
+   regardless of the sendWelcomeMessage setting. (Thanks to Steve Simms.)
+ - Fixed a bug where templates would not render properly in the mini view on
+   the page if they contained macros.
+ - Fixed a bug in the date method of the forms package where the noDate option
+   did the opposite of what was expected. (Thanks to Ed Van Duinen.)
 
 
 5.4.4

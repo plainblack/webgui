@@ -20,7 +20,7 @@ sub process {
 	my ($output, @data, $rownum, $temp);
 	my ($statement, $format) = WebGUI::Macro::getParams(shift);
 	$format = '^0;' if ($format eq "");
-	if ($statement =~ /^\s+select/i || $statement =~ /^\s+show/i || $statement =~ /^\s+describe/i) {
+	if ($statement =~ /^\s*select/i || $statement =~ /^\s*show/i || $statement =~ /^\s*describe/i) {
 		my $sth = WebGUI::SQL->unconditionalRead($statement);
 		unless ($sth->errorCode < 1) { 
 			return '<p><b>SQL Macro Failed:</b> '.$sth->errorMessage.'<p>';

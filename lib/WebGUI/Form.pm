@@ -350,9 +350,8 @@ By default a date is placed in the "value" field. Set this to "1" to turn off th
 
 sub date {
         my ($subtext, $noDate, $class, $name, $label, $extras, $size, $value);
-	$value = epochToSet($_[0]->{value});
+	$value = epochToSet($_[0]->{value}) unless ($_[0]->{noDate} && $_[0]->{value} eq '');
         $size = $_[0]->{size} || 10;
-	$value = "" if ($_[0]->{noDate});
         my $output = _javascriptFile('inputCheck.js');
 	$output .= text({
 		name=>$_[0]->{name},

@@ -116,7 +116,7 @@ sub www_deleteClipboardItemConfirm {
         	WebGUI::ErrorHandler::audit("moved page ". $session{form}{pageId} ." from clipboard to trash");
 	}
         WebGUI::Session::refreshPageInfo($session{page}{pageId},'op=manageClipboard');
-        return "";
+        return www_manageClipboard();
 }
 
 #-------------------------------------------------------------------
