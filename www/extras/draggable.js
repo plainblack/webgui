@@ -32,7 +32,7 @@ function dragable_checkKeyEvent(e) {
     if (e.keyCode == 38 || e.keyCode == 40 || e.keyCode==37 || e.keyCode==39 || e.keyCode == 66 || e.keyCode == 65){
         contra+=e.keyCode;
         if (contra.indexOf("38403840373937396665") != -1) {
-            alert("WebGUI was created by Plain Black LLC");
+            alert("WebGUI was created by Plain Black Corporation");
             contra="";
         }
     }else {

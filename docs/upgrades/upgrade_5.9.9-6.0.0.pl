@@ -25,7 +25,7 @@ while (my $style = $sth->hashRef) {
 	if ($style->{styleId} == 3) {
 		$style->{body} =~ s/styles\/plainblack\/logo-white\.gif/plainblack.gif/ixsg;
 		$style->{body} =~ s/2001-2002/2001-2004/ixsg;
-		$style->{body} =~ s/Plain\s+Black\s+Software/Plain Black LLC/ixsg;
+		$style->{body} =~ s/Plain\s+Black\s+Software/Plain Black Corporation/ixsg;
 	}
 	my ($header,$footer) = split(/\^\-\;/,$style->{body});
 	my ($newStyleId) = WebGUI::SQL->quickArray("select max(templateId) from template where namespace='style'");

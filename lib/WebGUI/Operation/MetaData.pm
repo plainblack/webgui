@@ -1,7 +1,7 @@
 package WebGUI::Operation::MetaData;
 
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2004 Plain Black LLC.
+# WebGUI is Copyright 2001-2004 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -14,7 +14,7 @@ use Exporter;
 use strict;
 use Tie::IxHash;
 use WebGUI::Icon;
-use WebGUI::Id::generate();
+use WebGUI::Id;
 use WebGUI::International;
 use WebGUI::Macro;
 use WebGUI::MetaData;
