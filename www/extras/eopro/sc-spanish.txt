@@ -1,0 +1,27 @@
+#Settings for French dictionary
+UserLexicon1=lex/userdic.tlx,url,t
+UserLexicon2=lex/correct.tlx,url,t
+MainLexicon1=lex/sscesp.tlx,url,t
+MainLexicon2=lex/sscesp2.clx,url,c
+REPORT_UNCAPPED_OPT=true
+IGNORE_CAPPED_WORD_OPT=false
+SPLIT_WORDS_OPT=true
+IGNORE_NON_ALPHA_WORD_OPT=true
+REPORT_MIXED_CASE_OPT=false
+REPORT_DOUBLED_WORD_OPT=true
+IGNORE_ALL_CAPS_WORD_OPT=false
+#Set the following to false for French Canadian
+ALLOW_ACCENTED_CAPS_OPT=true
+MinSuggestDepth=50
+SPLIT_HYPHENATED_WORDS_OPT=true
+Suggestions=typographical
+IGNORE_MIXED_CASE_OPT=false
+STRIP_POSSESSIVES_OPT=true
+REPORT_MIXED_DIGITS_OPT=false
+SUGGEST_SPLIT_WORDS_OPT=true
+IGNORE_DOMAIN_NAMES_OPT=true
+IGNORE_MIXED_DIGITS_OPT=false
+SPLIT_CONTRACTED_WORDS_OPT=true
+Comparator=Typographical
+CASE_SENSITIVE_OPT=true
+

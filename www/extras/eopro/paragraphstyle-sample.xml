@@ -1,0 +1,43 @@
+<styles>
+ <style name="H1">
+   <fontface>Serif</fontface>
+   <fontsize>24</fontsize>
+   <fontcolor>red</fontcolor>
+   <bold />
+ </style>
+ <style name="H2">
+   <fontface>Serif</fontface>
+   <fontsize>18</fontsize>
+   <fontcolor>blue</fontcolor>
+   <bold />
+ </style>
+ <style name="H3">
+   <fontface>Serif</fontface>
+   <fontsize>14</fontsize>
+   <fontcolor>#2789ff</fontcolor>
+   <bold />
+ </style>
+ <style name="H4">
+   <fontface>Serif</fontface>
+   <fontsize>12</fontsize>
+   <fontcolor>#2789ff</fontcolor>
+   <bold />
+ </style>
+ <style name="H5">
+   <fontface>Serif</fontface>
+   <fontsize>10</fontsize>
+   <fontcolor>#2789ff</fontcolor>
+   <bold />
+ </style>
+ <style name="H6">
+   <fontface>Serif</fontface>
+   <fontsize>8</fontsize>
+   <fontcolor>#2789ff</fontcolor>
+   <bold />
+ </style>
+ <style name="Standard">
+   <fontface>Serif</fontface>
+   <fontsize>12</fontsize>
+   <fontcolor>#2789ff</fontcolor>
+ </style>
+</styles>
