@@ -361,3 +361,55 @@ insert into groupGroupings (groupId, inGroup) values (11,5);
 
 
 
+CREATE TABLE WSClient (
+  wobjectId int(11) NOT NULL default '0',
+  call text NOT NULL,
+  uri varchar(255) NOT NULL default '',
+  proxy varchar(255) NOT NULL default '',
+  preprocessMacros int(11) NOT NULL default '0',
+  paginateAfter int(11) NOT NULL default '50',
+  paginateVar varchar(35) default NULL,
+  debugMode int(11) NOT NULL default '0',
+  params text,
+  execute_by_default tinyint(4) NOT NULL default '1',
+  templateId int(11) NOT NULL default '1',
+  decodeUtf8 tinyint(3) unsigned NOT NULL default '0',
+  httpHeader varchar(50),
+  PRIMARY KEY  (wobjectId)
+) TYPE=MyISAM;
+INSERT INTO help VALUES (1,'WSClient',61,71,'2,WSClient;21,WebGUI;');
+INSERT INTO help VALUES (2,'WSClient',72,73,'1,WSClient;51,WebGUI;');
+INSERT INTO international VALUES (1,'WSClient',1,'Web Services Client',1033575504,NULL);
+INSERT INTO international VALUES (2,'WSClient',1,'SOAP URI or WSDL',1033575504,NULL);
+INSERT INTO international VALUES (3,'WSClient',1,'SOAP Proxy',1033575504,NULL);
+INSERT INTO international VALUES (5,'WSClient',1,'SOAP Call Parameters',1033575504,NULL);
+INSERT INTO international VALUES (8,'WSClient',1,'Preprocess macros on query?',1033575504,NULL);
+INSERT INTO international VALUES (9,'WSClient',1,'Debug?',1033575504,NULL);
+INSERT INTO international VALUES (11,'WSClient',1,'Execute by default?',1033575504,NULL);
+INSERT INTO international VALUES (12,'WSClient',1,'Msg if no results',1033575504,NULL);
+INSERT INTO international VALUES (13,'WSClient',1,'Pagination after',1072810296,NULL);
+INSERT INTO international VALUES (14,'WSClient',1,'Pagination variable',1072810296,NULL);
+insert into international values (15,'WSClient',1,'Decode utf8 data?',1033575504,NULL);
+insert into international values (16,'WSClient',1,'HTTP Header Override', 1033575504,NULL);
+INSERT INTO international VALUES (20,'WSClient',1,'Edit Web Services Client',1033575504,NULL);
+INSERT INTO international VALUES (21,'WSClient',1,'There were no results for this query.',1033575504,NULL);
+INSERT INTO international VALUES (22,'WSClient',1,'Parse error on SOAP parameters.',1055348597,NULL);
+INSERT INTO international VALUES (23,'WSClient',1,'The URI/WSDL specified is of an improper format.',1055348955,NULL);
+INSERT INTO international VALUES (24,'WSClient',1,'SOAP return is type: ',1055349028,NULL);
+INSERT INTO international VALUES (25,'WSClient',1,'There was a problem with the SOAP call: ',1055349116,NULL);
+INSERT INTO international VALUES (26,'WSClient',1,'Could not connect to SOAP server.',1055349311,NULL);
+INSERT INTO international VALUES (30,'WSClient',1,'<b>Debug:</b> Error: The URI/WSDL specified is of an improper format.',1033575504,NULL);
+INSERT INTO international VALUES (31,'WSClient',1,'<b>Debug:</b> Error: There was a problem with the SOAP call.',1033575504,NULL);
+INSERT INTO international VALUES (32,'WSClient',1,'<b>Debug:</b> Error: Could not connect to the SOAP server.',1033575504,NULL);
+INSERT INTO international VALUES (35,'WSClient',1,'<b>Debug:</b> No template specified, using default.',1033575504,NULL);
+INSERT INTO international VALUES (61,'WSClient',1,'Web Services Client, Add/Edit',1033575504,NULL);
+INSERT INTO international VALUES (71,'WSClient',1,'A Web Services Client allows a user to query data from any SOAP server to which they have access.  This wobject is in development status and should not be made accessible to un-trusted site administratores.<p></p>\n\n<b>SOAP URI/WSDL</b><br>\nFrom the SOAP::Lite manpage, "URIs are just identifiers. They may look like URLs, but they are not guaranteed to point to anywhere and shouldn\'t be used as such pointers.  URIs assume to be unique within the space of all XML documents, so consider them as unique identifiers and nothing else."  If you specify a URI, you probably also need a proxy below.  Alternatively, you can specify a WSDL file in place of a URI.  This file refers to a real location at which a SOAP service description can be downloaded and used.  For our purposes, the file must end in ".wsdl" to be properly recognized.  If you use a WSDL file, you probably don\'t need to specify a proxy.<p></p>\n\n<b>SOAP Proxy</b><br>\nThe SOAP proxy is the full name of the server and/or script that is listening for SOAP calls.  For example:\n<code>http://mydomain.com/cgi-bin/soaplistener.pl</code><p></p>\n\n<b>SOAP Method/Call</b><br>\nThe SOAP method is the name of the function to be invoked by the SOAP server. Include any extra parameters in the SOAP Call Parameters field below.<p></p>\n\n<b>SOAP Call Parameters</b><br>\nIf your SOAP call requires any additional parameters, include them here as a valid perl hash, array or scalar.  For example: <code>\'userid\' => \'12\', companyid => \'^FormParam("companyid");  Whether you need to use scalar, hash or array is entirely dependent on what your SOAP service expects as input.  Likewise, what you get back is entirely dependent on what the service deems to return.\'</code>.<p></p>\n\n<b>Execute by default?</b><br>\nLeave this set to yes unless your page is calling itself with additional parameters.  You will probably know if/when you need to turn off default execution.  To force execution when it has been disabled by default, pass a form variable "targetWobjects" specifying the name of the SOAP call to force execution.<p></p>\n\n<b>Template</b><br>\nChoose a layout for this SOAP client.<p></p>\n\n<b>Preprocess macros on query?</b><br>\nIf you\'re using WebGUI macros in your query you\'ll want to check this box.<p></p>\n\n<b>Pagination After</b><br>\nHow many rows should be displayed before splitting the results into separate pages? In other words, how many rows should be displayed per page?<p></p>\n\n<b>Pagination Variable</b><br>\nBecause a SOAP call can return complex data structures, you\'ll need to specify which named variable is to be paginated.  If none is specified, no pagination will occur.<p></p>\n\n<b>Debug?</b><br>\nIf you want to display debugging and error messages on the page, check this box.<p></p>\n\n<b>Decode utf8?</b><br />\nThis option will only display if you have Data::Structure::Util installed.  SOAP calls return utf8 strings even if they may not have utf8 characters within them.  This converts utf8 characters to that there aren\'t collisions with any character sets specified in the page header.  Deocing is turned off by default, but try turning it on if you see goofy gibberish, especially with the display of copyright symbols and the like.',1033739828,NULL);
+INSERT INTO international VALUES (72,'WSClient',1,'Web Services Client Template',1072812143,NULL);
+INSERT INTO international VALUES (73,'WSClient',1,'This is the list of
+template variables available for Web Services Client
+templates.<p></p><b>results</b><br />This loop contains all the results from
+the SOAP call.  Within the loop, you may access specific data elements by the
+names set for them by the SOAP server (i.e. perhaps "localTime" for a time query).  In addition, there are a number of special template variables:\n\n<blockquote><b>numResults</b><br />Number of rows found by the client, if an array was returned.<p></p>\n\n<b>firstPage</b><br />Link to first page in a paginated set.<p></p>\n\n<b>lastPage</b><br />Link to last page in a paginated set.<p></p>\n\n<b>nextPage</b><br />Link to next page in a paginated set.<p></p>\n\n<b>pageList</b><br />List of all pages in a paginated set.<p></p>\n\n<b>previousPage</b><br />Link to previous page in a paginated set.<p></p>\n\n<b>multiplePages</b><br />Boolean indicating multiple pages in a paginated set.<p></p>\n\n<b>numberOfPages</b><br />Number of pages in a paginated set.<p></p>\n\n<b>pageNumber</b><br />Current page number in a paginated set.</blockquote>',1072812143,NULL);
+INSERT INTO template VALUES (1,'Xmethods: getTemp','<h1><tmpl_var title></h1>\n\n<tmpl_if description>\n  <tmpl_var description><br /><br />\n</tmpl_if>\n\n\r\n<tmpl_if results>\r\n  <tmpl_loop results>\r\n    The current temp is: <tmpl_var result>\r\n  </tmpl_loop>\r\n<tmpl_else>\r\n  Failed to retrieve temp.\r\n</tmpl_if>','WSClient');
+INSERT INTO template VALUES (2,'Google: doGoogleSearch','<style>\n.googleDetail {\n  font-size: 9px;\n}\n</style>\n\n<h1><tmpl_var title></h1>\n\n<tmpl_if description>\n  <tmpl_var description><br /><br />\n</tmpl_if>\n\n<form method=\"post\">\n <input type=\"hidden\" name=\"func\" value=\"view\">\n <input type=\"hidden\" name=\"wid\" value=\"<tmpl_var wobjectId>\">\n <input type=\"hidden\" name=\"targetWobjects\" value=\"doGoogleSearch\">\n <input type=\"text\" name=\"q\"><input type=\"submit\" value=\"Search\">\n</form>\n\n<tmpl_if results>\n  <tmpl_loop results>\n   <tmpl_if resultElements>\n      <p> You searched for <b><tmpl_var searchQuery></b>. We found around <tmpl_var estimatedTotalResultsCount> matching records.</p>\n   </tmpl_if>\n\n   <tmpl_loop resultElements>\n     <a href=\"<tmpl_var URL>\">\n	<tmpl_if title>\n		    <tmpl_var title>\n	<tmpl_else>\n                    <tmpl_var url>\n        </tmpl_if>\n     </a><br />\n        <tmpl_if snippet>\n            <tmpl_var snippet><br />\n        </tmpl_if>\n        <div class=\"googleDetail\">\n        <tmpl_if summary>\n            <b>Description:</b> <tmpl_var summary><br />\n        </tmpl_if>\n        <a href=\"<tmpl_var URL>\"><tmpl_var URL></a>\n     <tmpl_if cachedSize>\n           - <tmpl_var cachedSize>\n     </tmpl_if>\n     </div><br />\n    </tmpl_loop>\n  </tmpl_loop>\n<tmpl_else>\n   Could not retrieve results from Google.\n</tmpl_if>','WSClient');
+

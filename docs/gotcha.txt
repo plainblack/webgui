@@ -23,7 +23,9 @@ save you many hours of grief.
  * The Paginator API has been significantly changed.
 	Please see docs/migration.txt for details.
 
- * WebGUI now requires Data::Serializer to be installed.
+ * WebGUI now requires the following Perl modules to be installed:
+	Data::Serializer
+	SOAP::Lite
  
 
 5.5.0

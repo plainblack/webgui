@@ -22,8 +22,12 @@ QnD INSTALL INSTRUCTIONS:
    HTML::Parser 
    Archive::Tar
    Compress::Zlib
+   IO::Zlib
+   SOAP::Lite
+   Data::Serializer
    Image::Magick (optional)
-   Cache::FileCache (optional)
+   Cache::Cache (optional)
+ 
 
 3. Install Apache (preferably with mod_perl) and set up your config.
    If you are using Apache 2, see the additional instructions below.

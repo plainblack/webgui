@@ -31,6 +31,7 @@ Contributing Developers..............Peter Beardsley / Appropriate Solutions
                                      Christophe Marcant
                                      Tavis Parker / ParkerOne Consulting
                                      Daniel Quinlan
+                                     Alan Ritari / DonorWare
                                      Hal Roberts / Harvard
                                      Steve Simms
                                      Ben Simpson

@@ -59,6 +59,7 @@ webgui.
    hard to maintain and users were confused by it.
  - Added a "Turn Admin On" group to determine who can enable or disable admin
    mode. 
+ - Added the Web Services Client wobject. (Thanks to Alan Ritari and DonorWare.)
 
 
 

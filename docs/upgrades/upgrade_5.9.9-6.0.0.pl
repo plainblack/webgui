@@ -431,6 +431,7 @@ foreach my $wobject (@{$wobjects}) {
 		push(@newWobjects,$wobject);
 	}
 }
+push(@newWobjects,"WSClient");
 $conf->set("wobjects"=>\@newWobjects);
 $conf->write;
 
