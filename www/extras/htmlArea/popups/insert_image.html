@@ -50,6 +50,7 @@ TD.thumbnail { font: 9pt 'MS Shell Dlg', Helvetica, sans-serif; width: 30em; }
 TD.upload { font: 9pt 'MS Shell Dlg', Helvetica, sans-serif; width: 37em; }
 </style>
 
+
 <!-- script copied from original "insert_image.html" -->
 <script defer>
 function _CloseOnEsc() {
@@ -141,7 +142,6 @@ function _isValidNumber(txtBox) {
     }
     return true;
 }
-
 function OKClick() {
     var elmImage;
     var intAlignment;
@@ -266,7 +266,10 @@ var dialogArgs = window.dialogArguments;
                 </tr>
                 <tr>
                   <td colspan="3">
-                    <form name="actions" method="POST" action="/" enctype="multipart/form-data" target="lister">
+		<script>
+    			var dialogArgs = window.dialogArguments;
+                    document.write('<form name="actions" method="POST" action="'+ dialogArgs[1] +'" enctype="multipart/form-data" target="lister">');
+		</script>
                       <table border="0" cellpadding="0" cellspacing="0">
                         <tr>
                           <td class="upload" colspan="2">

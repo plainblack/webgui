@@ -92,6 +92,8 @@
  - Changed navigation, page, macro, and rich editor templates to load more
    quickly.
  - upgrade.pl now deletes temporary files and template cache.
+ - Fixed a bug in the HTMLArea image manager that would not allow users to
+   upload files if the gateway script was not at /index.pl
 
 
 6.1.1
