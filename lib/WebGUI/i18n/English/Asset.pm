@@ -25,11 +25,12 @@ our $I18N = {
 		lastUpdated => 1099344172,
 	},
 
-    'asset add/edit body' => {
+    'asset fields body' => {
         message => q|
 <p>
 <b>Title</b><br>
-The title of the asset.  This should be descriptive, but not very long.
+The title of the asset.  This should be descriptive, but not very long.  If left
+blank, this will be set to "Untitled".
 </p>
 
 <p>
@@ -40,7 +41,13 @@ to the <b>Title</b>.
 
 <p>
 <b>URL</b><br>
-The URL for this asset.
+The URL for this asset.  It must be unique.  If this field is left blank, then
+a URL will be made from the parent's URL and the <b>Menu Title</b>.
+</p>
+
+<p>
+<b>Synopsis</b><br>
+A short description of this Asset. 
 </p>
 
 <p>
@@ -59,27 +66,40 @@ Should this page be served over SSL?
 </p>
 
 <p>
-<b>Cache timeout</b><br>
-How long should this asset be cached for someone who is logged in to WebGUI.
+<b>Start Date</b><br>
+The date when users may begin viewing this page. Note that before this date only content managers with the rights to edit this page will see it.
 </p>
 
 <p>
-<b>Visitor cache timeout</b><br>
-How long should this asset be cached for someone who a visitor to WebGUI.
+<b>End Date</b><br>
+The date when users will stop viewing this page. Note that after this date only content managers with the rights to edit this page will see it.
 </p>
 
 <p>
-<b>Synopsis</b><br>
-A short description of an asset.  It is used in default meta tags, site maps and navigation.
+<b>Owner</b><br>
+The owner of a page is usually the person who created the page. This user always has full edit and viewing rights on the page.
+</p>
+<p>
+<b>NOTE:</b> The owner can only be changed by an administrator.
+</p>
+
+<p>
+<b>Who can view?</b><br>
+Choose which group can view this page. If you want both visitors and registered users to be able to view the page then you should choose the "Everybody" group.
+</p>
+
+<p>
+<b>Who can edit?</b><br>
+Choose the group that can edit this page. The group assigned editing rights can also always view the page.
 </p>
 
         |,
         context => q|Describing the form to add or edit an Asset.|,
-        lastUpdated => 1100462749,
+        lastUpdated => 1104621979,
     },
 
-    'asset add/edit title' => {
-        message => q|Asset, Add/Edit|,
+    'asset fields title' => {
+        message => q|Common Asset Fields|,
         lastUpdated => 1100463645,
     },
 
