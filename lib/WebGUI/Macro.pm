@@ -147,8 +147,7 @@ sub process {
       		next if ($searchString =~ /^\d+$/); # don't process ^0; ^1; ^2; etc.
       		next if ($searchString =~ /^\-$/); # don't process ^-;
 		if ($params ne "") {
-      			$params =~ s/^\(//; # remove opening parenthesis
-      			$params =~ s/\)$//; # remove trailing parenthesis
+      			$params =~ s/(^\(|\)$)//g; # remove parenthesis
       			$params = &process($params); # recursive process params
 		}
 		if ($session{config}{macros}{$searchString} ne "") {
