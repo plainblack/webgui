@@ -17,14 +17,6 @@ asset.getContextMenu = function () {
 	return arr;    
 }	
 	
-asset.select= function() {
-	this.div.className="am-crumbtrail-over";				
-}
-
-asset.deselect = function() {
-	this.div.className="am-crumbtrail";				
-}
-								
 	return asset;
 	
 }		
