@@ -31,10 +31,8 @@ If you added a link title, now add the URL (uniform resource locater) here.
 <p><b>Convert carriage returns?</b><br>
 If you're publishing HTML there's generally no need to check this option, but if you aren't using HTML and you want a carriage return every place you hit your "Enter" key, then check this option.
 
-<p><b>Allow discussion?</b><br>
-Checking this box will enable responses to your article much like Articles on Slashdot.org.
 |,
-		lastUpdated => 1106783948,
+		lastUpdated => 1109616401,
 	},
 
 	'7' => {
