@@ -390,7 +390,7 @@ sub www_editPage {
                 	$f->whatNext(
                         	-options=>{
                                 	gotoNewPage=>WebGUI::International::get(823),
-                               	 	backToPage=>WebGUI::International::get(745)
+                               	 	backToPage=>WebGUI::International::get(847)
                                 	},
                         	-value=>"gotoNewPage"
                         	);
