@@ -601,11 +601,14 @@ sub www_process {
 		if ($row{status} eq "required" || $row{status} eq "editable") {
 			$value = WebGUI::Macro::filter($value);
 		}
-		if ($row{status} eq "required" && not defined $value) {
+		if ($row{status} eq "required" && ($value =~ /^\s$/ || $value eq "" || not defined $value)) {
+		#if ($row{status} eq "required" && ($value =~ /^\s$/ || $value eq "")) {
+		#if ($row{status} eq "required" && $value eq "") {
 			push (@errors,{
-				"error.message"=>$row{name}." ".WebGUI::International::get(29,$_[0]->get("namespace")),
+				"error.message"=>$row{name}." ".WebGUI::International::get(29,$_[0]->get("namespace")).".",
 				});
 			$hadErrors = 1;
+			delete $var->{entryId};
 		}
 		unless ($hadErrors) {
 			my ($exists) = WebGUI::SQL->quickArray("select count(*) from DataForm_entryData where DataForm_entryId=$entryId
