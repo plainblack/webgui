@@ -124,13 +124,13 @@ sub www_edit {
                         $proceed = 1;
                 }
 		$output = helpIcon(1,$namespace);
-                $output = '<h1>'.WebGUI::International::get(8,$namespace).'</h1>';
+                $output .= '<h1>'.WebGUI::International::get(8,$namespace).'</h1>';
 		$f = WebGUI::HTMLForm->new;
 		$f->yesNo("tocOn",WebGUI::International::get(11,$namespace),$_[0]->get("tocOn"));
 		$f->yesNo("qaOn",WebGUI::International::get(12,$namespace),$_[0]->get("qaOn"));
 		$f->yesNo("topOn",WebGUI::International::get(13,$namespace),$_[0]->get("topOn"));
 		$f->yesNo("proceed",WebGUI::International::get(1,$namespace),$proceed);
-		$output = $_[0]->SUPER::www_edit($f->printRowsOnly);
+		$output .= $_[0]->SUPER::www_edit($f->printRowsOnly);
                 return $output;
         } else {
                 return WebGUI::Privilege::insufficient();
