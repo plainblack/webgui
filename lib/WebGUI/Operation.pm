@@ -123,8 +123,6 @@ sub getOperations {
           'deleteMetaDataField' => 'WebGUI::Operation::MetaData',
           'deleteMetaDataFieldConfirm' => 'WebGUI::Operation::MetaData',
           'saveMetaDataSettings' => 'WebGUI::Operation::MetaData',
-          'deployPackage' => 'WebGUI::Operation::Package',
-	  'managePackages' => 'WebGUI::Operation::Package',
           'editProfile' => 'WebGUI::Operation::Profile',
           'editProfileSave' => 'WebGUI::Operation::Profile',
           'viewProfile' => 'WebGUI::Operation::Profile',
