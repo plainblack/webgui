@@ -93,5 +93,59 @@
 	position: absolute;
 	top: 60px;
 	right: 200px;
-	z-index: 100;
+	z-index: 1000;
 }
+
+/* tables */
+
+.tableMenu {
+  	background-color: #CCCCCC;
+  	font-size: 10pt;
+  	font-family: Helvetica, Arial;
+}
+
+.tableMenu a {
+  	font-size: 10pt;
+  	text-decoration: none;
+}
+
+.tableHeader {
+  	background-color: #CECECE;
+  	font-size: 10pt;
+  	font-family: Helvetica, Arial;
+}
+
+.tableData {
+  	font-size: 10pt;
+  	font-family: Helvetica, Arial;
+}
+
+/* tab forms */
+
+.tab {
+  	border: 1px solid black;
+   	background-color: #eeeeee;
+	-moz-border-radius: 6px 6px 0px 0px;
+}
+
+.tabBody {
+   	border: 1px solid black;
+   	border-top: 1px solid black;
+   	border-left: 1px solid black;
+   	background-color: #dddddd; 
+	-moz-border-radius: 10px;
+}
+
+div.tabs {
+    	line-height: 15px;
+    	font-size: 14px;
+}
+
+.tabHover {
+   	background-color: #cccccc;
+}
+
+.tabActive { 
+   	background-color: #dddddd; 
+}
+
