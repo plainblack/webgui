@@ -11,6 +11,7 @@ package WebGUI::Wobject::SQLReport;
 #-------------------------------------------------------------------
 
 use strict;
+use WebGUI::DatabaseLink;
 use WebGUI::ErrorHandler;
 use WebGUI::HTMLForm;
 use WebGUI::Icon;
@@ -42,6 +43,7 @@ sub new {
                 -extendedProperties=>{
 			template=>{}, 
 			dbQuery=>{}, 
+			databaseLinkId=>{},
 			DSN=>{
 				defaultValue=>$session{config}{dsn}
 				},
@@ -95,8 +97,21 @@ sub www_edit {
 		-name=>"template",
 		-label=>WebGUI::International::get(3,$_[0]->get("namespace")),
 		-value=>$_[0]->getValue("template")
-		);        
-        $privileges->text(
+		);
+	$privileges->selectList(
+		-name=>"databaseLinkId",
+		-options=>{
+			""=>WebGUI::International::get(19,$_[0]->get("namespace")),
+			WebGUI::DatabaseLink::getHash(),
+		},
+		-label=>WebGUI::International::get(20,$_[0]->get("namespace")),
+		-value=>[$_[0]->getValue("databaseLinkId")],
+		-subtext=>(WebGUI::Privilege::isInGroup(3)) ? '<a href="'.WebGUI::URL::page("op=listDatabaseLinks").'">'.WebGUI::International::get(981).'</a>' : ""
+		);		
+	$privileges->readOnly(
+		-value=>WebGUI::International::get(21,$_[0]->get("namespace")),
+		);
+	$privileges->text(
 		-name=>"DSN",
 		-label=>WebGUI::International::get(5,$_[0]->get("namespace")),
 		-value=>$_[0]->getValue("DSN")
@@ -133,20 +148,34 @@ sub www_edit {
 
 #-------------------------------------------------------------------
 sub www_view {
-	my ($dsn, $query, @row, $i, $rownum, $p, $ouch, $output, $sth, $dbh, @result, @template, $temp, $col, $errorMessage, $url);
+	my ($dsn, $username, $identifier, $query, @row, $i, $rownum, $p, $ouch, $output, $sth, $dbh, @result, @template, $temp, $col, $errorMessage, $url);
 	if ($_[0]->get("preprocessMacros")) {
 		$query = WebGUI::Macro::process($_[0]->get("dbQuery"));
 	} else {
 		$query = $_[0]->get("dbQuery");
 	}
 	$dsn = $_[0]->get("DSN");
+	$username = $_[0]->get("username");
+	$identifier = $_[0]->get("identifier");	
 	$output = $_[0]->displayTitle;
         $output .= $_[0]->description;
 	$output .= WebGUI::International::get(17,$_[0]->get("namespace"))." ".$query."<p>" if ($_[0]->get("debugMode"));
+	
+	# pull database link info if selected
+	if ($_[0]->get("databaseLinkId")) {
+		my %databaseLink = WebGUI::DatabaseLink::get($_[0]->get("databaseLinkId"));
+		# failsafe check in case the link gets deleted
+		if ($databaseLink{DSN}) {
+			$dsn = $databaseLink{DSN};
+			$username = $databaseLink{username};
+			$identifier = $databaseLink{identifier};
+		}
+	}
+	
 	if ($dsn eq $session{config}{dsn}) {
 		$dbh = $session{dbh};
 	} elsif ($dsn =~ /\DBI\:\w+\:\w+/) {
-                eval{$dbh = DBI->connect($dsn,$_[0]->get("username"),$_[0]->get("identifier"))};
+                eval{$dbh = DBI->connect($dsn,$username,$identifier)};
 		if ($@) {
 			WebGUI::ErrorHandler::warn("SQL Report [".$_[0]->get("wobjectId")."] ".$@);
 			undef $dbh;

@@ -105,7 +105,8 @@ sub process {
 			WebGUI::URL::page('op=listGroups')=>WebGUI::International::get(5), 
 			WebGUI::URL::page('op=manageSettings')=>WebGUI::International::get(4), 
 			WebGUI::URL::page('op=listUsers')=>WebGUI::International::get(7),
-			WebGUI::URL::page('op=viewStatistics')=>WebGUI::International::get(144)
+			WebGUI::URL::page('op=viewStatistics')=>WebGUI::International::get(144),
+			WebGUI::URL::page('op=listDatabaseLinks')=>WebGUI::International::get(981),
 		);
 	} elsif (WebGUI::Privilege::isInGroup(11)) {
                 %hash = (

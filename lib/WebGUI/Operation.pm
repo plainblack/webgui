@@ -15,6 +15,7 @@ use WebGUI::Operation::Account;
 use WebGUI::Operation::Admin;
 use WebGUI::Operation::Clipboard;
 use WebGUI::Operation::Collateral;
+use WebGUI::Operation::DatabaseLink;
 use WebGUI::Operation::Group;
 use WebGUI::Operation::Help;
 use WebGUI::Operation::International;

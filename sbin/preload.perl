@@ -62,6 +62,7 @@ use WebGUI::Authentication ();
 use WebGUI::Cache ();
 use WebGUI::Collateral ();
 use WebGUI::CollateralFolder ();
+use WebGUI::DatabaseLink ();
 use WebGUI::DateTime ();
 #use WebGUI::Discussion (); # compile problems when this is included
 use WebGUI::ErrorHandler ();
@@ -90,6 +91,7 @@ use WebGUI::Operation::Account ();
 use WebGUI::Operation::Admin ();
 use WebGUI::Operation::Clipboard ();
 use WebGUI::Operation::Collateral ();
+use WebGUI::Operation::DatabaseLink ();
 use WebGUI::Operation::Group ();
 use WebGUI::Operation::Help ();
 use WebGUI::Operation::International ();
