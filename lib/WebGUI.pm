@@ -11,6 +11,10 @@ our $VERSION = "4.9.4";
 # http://www.plainblack.com			info@plainblack.com
 #-------------------------------------------------------------------
 
+#Test to see if Cache::FileCache will load.
+my $hasCache=1;
+eval " use Cache::FileCache; "; $hasCache=0 if $@;
+
 use strict qw(vars subs);
 use Tie::CPHash;
 use WebGUI::ErrorHandler;
@@ -223,6 +227,14 @@ sub _processOperations {
 sub page {
 	my ($debug, $positions, $wobjectOutput, $pageEdit, $httpHeader, $content, $operationOutput, $template);
 	WebGUI::Session::open($_[0],$_[1]);
+        my $useCache = ($hasCache && $session{config}{cachePages} && $session{form}{op} eq ""
+                && $session{form}{wid} eq "" && not $session{var}{adminOn});
+        my $cache;
+        my $cacheKey = "page_".$session{page}{pageId}."_".$session{user}{userId};
+        if ($useCache) {
+                $cache = new Cache::FileCache({'namespace'=>$_[1]});
+                $content = $cache->get($cacheKey);
+        }
 	$operationOutput = _processOperations();
 	$wobjectOutput = _processFunctions();
 	if ($operationOutput eq "" && $wobjectOutput eq "" && $session{form}{action2} ne "") {
@@ -254,11 +266,15 @@ sub page {
                 return $httpHeader;
 	} elsif ($wobjectOutput ne "") {
 		$positions->{"page.position1"} = $wobjectOutput;
-	} else {
+	} elsif (!($useCache && defined $content)) {
 		($positions, $template, $pageEdit) = _generatePage();
 	}
 	$httpHeader = WebGUI::Session::httpHeader();
-	$content = WebGUI::Template::process(WebGUI::Style::get($pageEdit.WebGUI::Page::getTemplate($template)), $positions);
+	unless ($useCache && defined $content) {
+		$content = WebGUI::Template::process(WebGUI::Style::get($pageEdit.WebGUI::Page::getTemplate($template)), 
+			$positions);
+		$cache->set($cacheKey, $content, $session{config}{cachePages}) if ($useCache);
+	}
 	$debug = _generateDebug();
 	WebGUI::Session::close();
 	return $httpHeader.$content.$debug;

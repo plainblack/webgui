@@ -184,23 +184,23 @@ The depth the tree should be traversed. Defaults to "0". If set to "0" the entir
 
 sub tree {
         my ($sth, %data, %tree);
-	tie %tree, 'Tie::IxHash';
-	tie %data, 'Tie::CPHash';
 	my ($parentId, $toLevel, $depth) = @_;
         $toLevel = 99 if ($toLevel > 100 || $toLevel < 1);
-        if ($depth < $toLevel) {
-                $sth = WebGUI::SQL->read("select urlizedTitle, menuTitle, pageId, synopsis from page 
+	tie %tree, 'Tie::IxHash';
+	tie %data, 'Tie::CPHash';
+       	if ($depth < $toLevel) {
+               	$sth = WebGUI::SQL->read("select urlizedTitle, menuTitle, pageId, synopsis from page 
 			where parentId='$parentId' order by sequenceNumber");
-                while (%data = $sth->hash) {
-                        if (WebGUI::Privilege::canViewPage($data{pageId})) {
+               	while (%data = $sth->hash) {
+                       	if (WebGUI::Privilege::canViewPage($data{pageId})) {
 				$tree{$data{pageId}}{url} = WebGUI::URL::gateway($data{urlizedTitle}); 
 				$tree{$data{pageId}}{title} = $data{menuTitle}; 
 				$tree{$data{pageId}}{synopsis} = $data{synopsis}; 
-                                $tree{$data{pageId}}{sub} = tree($data{pageId},$toLevel,($depth+1));
-                        }
+               	                $tree{$data{pageId}}{sub} = tree($data{pageId},$toLevel,($depth+1));
+                       	}
                 }
-                $sth->finish;
-        }
+       	        $sth->finish;
+       	}
         return \%tree;
 }
 
