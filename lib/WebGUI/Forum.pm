@@ -47,7 +47,9 @@ sub set {
 	my ($self, $data) = @_;
 	$data->{forumId} = $self->get("forumId") unless ($data->{forumId});
 	WebGUI::SQL->setRow("forum","forumId",$data);
-	$self->{_properties} = $data;
+	foreach my $key (keys %{$data}) {
+                $self->{_properties}{$key} = $data->{$key};
+        }
 }
 
 1;

@@ -6,12 +6,6 @@ use WebGUI::Forum::Thread;
 use WebGUI::Session;
 use WebGUI::SQL;
 
-sub addView {
-	my ($self) = @_;
-	WebGUI::SQL->write("update forumPost set views=views+1 where forumPostId=".$self->get("forumPostId"));
-	$self->getThread->addView;
-}
-
 sub canEdit {
         my ($self, $userId) = @_;
 	$userId = $session{user}{userId} unless ($userId);
@@ -25,8 +19,10 @@ sub create {
 	$data->{forumPostId} = "new";
 	my $forumPostId = WebGUI::SQL->setRow("forumPost","forumPostId", $data);
 	$self = WebGUI::Forum::Post->new($forumPostId);
-	if ($data->{parentId} > 0) {
-		$self->getThread->addReply($self->get("forumPostId"),$forumPostId,$self->get("dateOfPost"));
+	if ($self->getThread->getForum->get("moderatePosts")) {
+		$self->setStatusPending;
+	} else {
+		$self->setStatusApproved;
 	}
 	return $self;
 }
@@ -71,6 +67,15 @@ sub isMarkedRead {
 	return $isRead;
 }
 
+sub isReply {
+	my ($self) = @_;
+	if ($self->get("parentId") > 0) {
+		return 1;
+	} else {
+		return 0;
+	}
+}
+
 sub markRead {
 	my ($self, $userId) = @_;
 	$userId = $session{user}{userId} unless ($userId);
@@ -82,28 +87,42 @@ sub markRead {
 }
 
 sub new {
-	my ($self, $forumPostId) = @_;
+	my ($class, $forumPostId) = @_;
 	my $properties = WebGUI::SQL->getRow("forumPost","forumPostId",$forumPostId);
-	bless {_properties=>$properties}, $self;
+	if (defined $properties) {
+		bless {_properties=>$properties}, $class;
+	} else {
+		return undef;
+	}
 }
 
 sub set {
 	my ($self, $data) = @_;
 	$data->{forumPostId} = $self->get("forumPostId") unless ($data->{forumPostId});
 	WebGUI::SQL->setRow("forumPost","forumPostId",$data);
-	$self->{_properties} = $data;
+	foreach my $key (keys %{$data}) {
+		$self->{_properties}{$key} = $data->{$key};
+	}
 }
 
 sub setStatusApproved {
 	my ($self) = @_;
 	$self->set({status=>'approved'});
 	$self->getThread->setStatusApproved if ($self->getThread->get("rootPostId") == $self->get("forumPostId"));
+	if ($self->isReply) {
+		$self->getThread->incrementReplies($self->get("dateOfPost"),$self->get("forumPostId"));
+	}
 }
 
 sub setStatusDeleted {
 	my ($self) = @_;
 	$self->set({status=>'deleted'});
 	$self->getThread->setStatusDeleted if ($self->getThread->get("rootPostId") == $self->get("forumPostId"));
+	if ($self->getThread->get("lastPostId") == $self->get("forumPostId")) {
+		my ($id, $date) = WebGUI::SQL->quickArray("select forumPostId,dateOfPost from forumPost where forumThreadId="
+			.$self->get("forumThreadId")." and status='approved'");
+		$self->getThread->setLastPost($id,$date);
+	}
 }
 
 sub setStatusDenied {

@@ -7,18 +7,6 @@ use WebGUI::Forum::Post;
 use WebGUI::Session;
 use WebGUI::SQL;
 
-sub addReply {
-        my ($self, $dateOfReply, $replyId) = @_;
-        WebGUI::SQL->write("update forumThread set replies=replies+1, lastPostId=$replyId, lastPostDate=$dateOfReply 
-		where forumThreadId=".$self->get("forumThreadId"));
-	#add method to notify users for subscriptions
-}
-
-sub addView {
-        my ($self) = @_;
-        WebGUI::SQL->write("update forumThread set views=views+1 where forumThreadId=".$self->get("forumThreadId"));
-}
-
 sub create {
 	my ($self, $data, $postData) = @_;
 	$data->{forumThreadId} = "new";
@@ -82,6 +70,13 @@ sub isLocked {
 	return $self->get("isLocked");
 }
 
+sub incrementReplies {
+        my ($self, $dateOfReply, $replyId) = @_;
+        WebGUI::SQL->write("update forumThread set replies=replies+1, lastPostId=$replyId, lastPostDate=$dateOfReply 
+		where forumThreadId=".$self->get("forumThreadId"));
+	#add method to notify users for subscriptions
+}
+
 sub incrementViews {
         my ($self) = @_;
         WebGUI::SQL->write("update forumThread set views=views+1 where forumThreadId=".$self->get("forumThreadId"));
@@ -119,7 +114,17 @@ sub set {
 	my ($self, $data) = @_;
 	$data->{forumThreadId} = $self->get("forumThreadId") unless ($data->{forumThreadId});
 	WebGUI::SQL->setRow("forumThread","forumThreadId",$data);
-	$self->{_properties} = $data;
+	foreach my $key (keys %{$data}) {
+                $self->{_properties}{$key} = $data->{$key};
+        }
+}
+
+sub setLastPost {
+	my ($self, $postId, $postDate) = @_;
+	$self->set({
+		lastPostId=>$postId,
+		lastPostDate=>$postDate
+		});
 }
 
 sub setStatusApproved {
