@@ -34,7 +34,7 @@ sub fatalError {
         print "<h1>WebGUI Fatal Error</h1>Something unexpected happened that caused this system to fault.<p>" unless ($friendly); 
 	$log = FileHandle->new(">>$logfile") or print "Can't open log file.";
         print $0." at ".localtime(time)." reported:<br>" unless ($friendly);
-	print $log localtime(time)." ".$0." ".$_[0]."\n";
+	print $log localtime(time)." ".$0." FATAL: ".$_[0]."\n";
         print $_[0] unless ($friendly);
         print "<p><h3>Caller</h3><table border=1><tr><td valign=top>" unless ($friendly);
         print "<b>Level 1</b><br>".join("<br>",caller(1)) unless ($friendly);
