@@ -4,12 +4,49 @@ use strict;
 use WebGUI::SQL;
 use WebGUI::International;
 use Tie::IxHash;
+use WebGUI::HTMLForm;
+
+#-------------------------------------------------------------------
+sub configurationForm {
+	my ($self, $form, $f);
+	$self = shift;
+	$form = shift;
+
+	$f = WebGUI::HTMLForm->new;
+	$f->yesNo(
+		-name	=> $self->prepend('enabled'),
+		-value	=> $self->enabled,
+#### intl ####
+		-label	=> 'Enable',
+		);
+	$f->raw($form);
+
+	return $f->printRowsOnly;
+}
+	
+#-------------------------------------------------------------------
+sub enabled {
+	return $_[0]->{_enabled};
+}
 
 #-------------------------------------------------------------------
 sub get {
 	return $_[0]->{_properties}{$_[1]};
 }
 
+#-------------------------------------------------------------------
+sub getEnabledPlugins {
+	my (@enabledPlugins, $plugin, @plugins);
+	@enabledPlugins = WebGUI::SQL->buildArray("select namespace from commerceSettings where type='Payment' and fieldName='enabled' and fieldValue='1'");
+
+	foreach (@enabledPlugins) {
+		$plugin = WebGUI::Commerce::Payment->load($_);
+		push(@plugins, $plugin) if ($plugin);
+	}
+
+	return \@plugins;
+}
+	
 #-------------------------------------------------------------------
 sub init {
 	my ($class, $namespace, $properties);
@@ -18,7 +55,7 @@ sub init {
 	
 	$properties = WebGUI::SQL->buildHashRef("select fieldName, fieldValue from commerceSettings where namespace=".quote($namespace)." and type='Payment'");
 
-	bless {_properties => $properties, _namespace=>$namespace}, $class;
+	bless {_properties=>$properties, _namespace=>$namespace, _enabled=>$properties->{enabled}}, $class;
 }
 
 #-------------------------------------------------------------------

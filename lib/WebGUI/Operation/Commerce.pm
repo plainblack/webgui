@@ -17,6 +17,7 @@ use WebGUI::International;
 use WebGUI::Template;
 use WebGUI::HTTP;
 use WebGUI::Paginator;
+use WebGUI::Form;
 
 #-------------------------------------------------------------------
 sub _submenu {
@@ -33,6 +34,14 @@ sub _submenu {
 	$ac->addSubmenuItem(WebGUI::URL::page('op=editCommerceSettings'), $i18n->get('manage commerce settings'));
 	$ac->addSubmenuItem(WebGUI::URL::page('op=listPendingTransactions'), $i18n->get('pending transactions')); 
         return $ac->render($workarea, $title);
+}
+
+#-------------------------------------------------------------------
+sub _gatewaySelected {
+	return 0 unless ($session{form}{paymentGateway});
+	my $plugin = WebGUI::Commerce::Payment->load($session{form}{paymentGateway});
+	return 1 if ($plugin && $plugin->enabled);
+	return 0;
 }
 
 #-------------------------------------------------------------------
@@ -61,12 +70,16 @@ sub www_checkoutConfirm {
 	$errors = shift;
 	
 	$i18n = WebGUI::International->new('Commerce');
-
-	unless ($session{setting}{commercePaymentPlugin}) {
-		$var{errorLoop} = [{message=>$i18n->get('no payment gateway')}];
-		return WebGUI::Template::process($session{setting}{commerceConfirmCheckoutTemplateId}, 'Commerce/ConfirmCheckout', \%var);
-	}
 	
+	# If the user isn't logged in yet, let him do so or have him create an account
+	if ($session{user}{userId} == 1) {
+		WebGUI::Session::setScratch('redirectAfterLogin', WebGUI::URL::page('op=checkout'));
+		return WebGUI::Operation::execute('displayLogin');
+	}
+
+	# If no payment gateway has been selected yet, have the user do so now.
+	return WebGUI::Operation::execute('selectPaymentGateway') unless _gatewaySelected;
+
 	$var{errorLoop} = [ map {{message => $_}} @{$errors} ] if $errors;
 
 	# Put contents of cart in template vars
@@ -78,16 +91,12 @@ sub www_checkoutConfirm {
 	$var{recurringLoop} = $recurring;
 	$var{recurringItems} = scalar(@$recurring);
 	
-	$plugin = WebGUI::Commerce::Payment->load($session{setting}{commercePaymentPlugin});
+	$plugin = WebGUI::Commerce::Payment->load($session{form}{paymentGateway});
 
-	# If the user isn't logged in yet, let him do so or have him create an account
-	if ($session{user}{userId} == 1) {
-		WebGUI::Session::setScratch('redirectAfterLogin', WebGUI::URL::page('op=checkout'));
-		return WebGUI::Operation::execute('displayLogin');
-	}
 
 	$f = WebGUI::HTMLForm->new;
 	$f->hidden('op', 'checkoutSubmit');
+	$f->hidden('paymentGateway', $session{form}{paymentGateway});
 	$f->raw($plugin->checkoutForm);
 	$f->submit($i18n->get('pay button'));
 	
@@ -103,14 +112,17 @@ sub www_checkoutSubmit {
 		@normal, $currentPurchase, $checkoutError, @resultLoop, %param, $normal, $recurring, $formError);
 	
 	$i18n = WebGUI::International->new('Commerce');
-	
+
 	# check if user has already logged in
 	if ($session{user}{userId} == 1) {
 		WebGUI::Session::setScratch('redirectAfterLogin', WebGUI::URL::page('op=checkout'));
 		return WebGUI::Operation::execute('displayLogin');
 	}
 
-	$plugin = WebGUI::Commerce::Payment->load($session{setting}{commercePaymentPlugin});
+	# Check if a valid payment gateway has bee selected. If not have the user do so.
+	return WebGUI::Operation::execute('selectPaymentGateway') unless _gatewaySelected;
+	
+	$plugin = WebGUI::Commerce::Payment->load($session{form}{paymentGateway});
 	$shoppingCart = WebGUI::Commerce::ShoppingCart->new;
 	($normal, $recurring) = $shoppingCart->getItems;
 
@@ -215,7 +227,7 @@ sub www_completePendingTransaction {
 #-------------------------------------------------------------------
 sub www_confirmTransaction {
 	my($plugin, %var);
-	$plugin = WebGUI::Commerce::Payment->load($session{setting}{commercePaymentPlugin});
+	$plugin = WebGUI::Commerce::Payment->load($session{form}{pg});
 
 	if ($plugin->confirmTransaction) {
 		WebGUI::Commerce::Transaction->new($plugin->getTransactionId)->completeTransaction;
@@ -235,7 +247,7 @@ sub www_editCommerceSettings {
         	payment=>{label=>$i18n->get('payment tab')},
         );
 
-	$paymentPlugin = $session{setting}{commercePaymentPlugin} || $session{config}{paymentPlugins}->[0];
+	$paymentPlugin = $session{config}{paymentPlugins}->[0];
 
 	$tabform = WebGUI::TabForm->new(\%tabs);
 	$tabform->hidden({name => 'op', value => 'editCommerceSettingsSave'});
@@ -259,6 +271,12 @@ sub www_editCommerceSettings {
 		-value		=> $session{setting}{commerceCheckoutCanceledTemplateId},
 		-namespace	=> 'Commerce/CheckoutCanceled'
 		);
+	$tabform->getTab('general')->template(
+		-name		=> 'commerceSelectPaymentGatewayTemplateId',
+		-label		=> $i18n->get('checkout select payment template'),
+		-value		=> $session{setting}{commerceSelectPaymentGatewayTemplateId},
+		-namespace	=> 'Commerce/SelectPaymentGateway'
+		);
 	$tabform->getTab('general')->email(
 		-name		=> 'commerceSendDailyReportTo',
 		-label		=> $i18n->get('daily report email'),
@@ -281,7 +299,7 @@ sub www_editCommerceSettings {
 		$tabform->getTab('payment')->raw('<script language="JavaScript" > var activePayment="'.$paymentPlugin.'"; </script>');
 		$tabform->getTab("payment")->selectList(
 			-name		=> 'commercePaymentPlugin',
-			-options	=> \%paymentPlugins, #{map {$_ => $_} @{$session{config}{paymentPlugins}}},
+			-options	=> \%paymentPlugins,
 			-label		=> $i18n->get('payment form'),
 			-value		=> [$paymentPlugin],
 			-extras		=> 'onChange="activePayment=operateHidden(this.options[this.selectedIndex].value,activePayment)"'
@@ -364,6 +382,32 @@ sub www_listPendingTransactions {
 	$output .= $p->getBarTraditional($session{form}{pn});
 
 	_submenu($output, 'list pending transactions', 'list pending transactions');
+}
+
+#-------------------------------------------------------------------
+sub www_selectPaymentGateway {
+	my ($plugins, $f, $i18n, @pluginLoop, %var);
+
+	$i18n = WebGUI::International->new('Commerce');
+	$plugins = WebGUI::Commerce::Payment->getEnabledPlugins;
+
+	foreach (@$plugins) {
+		push(@pluginLoop, {
+			name		=> $_->name,
+			namespace	=> $_->namespace,
+			formElement	=> WebGUI::Form::radio({name=>'paymentGateway', value=>$_->namespace})
+			});
+	}
+	
+	$var{pluginLoop} = \@pluginLoop;
+	$var{message} = $i18n->get('select payment gateway');
+	$var{pluginsAvailable} = @$plugins;
+	$var{noPluginsMessage} = $i18n->get('no payment gateway');
+	$var{formHeader} = WebGUI::Form::formHeader.WebGUI::Form::hidden({name=>'op', value=>'checkoutConfirm'});
+	$var{formSubmit} = WebGUI::Form::submit({value=>$i18n->get('payment gateway select')});
+	$var{formFooter} = WebGUI::Form::formFooter;		
+	
+	return WebGUI::Template::process($session{setting}{commerceSelectPaymentGatewayTemplateId}, 'Commerce/SelectPaymentGateway', \%var);
 }
 
 #-------------------------------------------------------------------

@@ -365,6 +365,63 @@ A template loop containing the items that were checked out. The following templa
 		lastUpdated => 0,
 		context => q|The message that sais which payment plugins did not compile.|
 	},
+	'select payment gateway'=> {
+		message => q|Please select a payment gateway.|,
+		lastUpdated => 0,
+		context => q|The message that asks the user to select a payment gateway.|
+	},
+	'payment gateway select' => {
+		message => q|Select gateway|,
+		lastUpdated => 0,
+		context => q|The text on the submit button of the select gateway form.|
+	},
+	'checkout select payment template' => {
+		message => q|Select payment gateway template|,
+		lastUpdated => 0,
+		context => q|The formlabel for the 'select payment gateway template' option in the commerce part of the admin console.|
+	},
+	'help select payment template title' => {
+		message => q|Select payment gateway template|,
+		lastUpdated => 0,
+		context => q|The title of the 'select payment gateway' help page.|
+	},
+	'help select payment template body' => {
+		message => q|In this template the following template variables are available:<br>
+<br>
+<b>message</b><br>
+This is the message that ask the user to select a payment gateway.<br>
+<br>
+<b>pluginsAvailable</b><br>
+A boolean value that is true when one or more payment plugins can be loaded and are enabled.<br>
+<br>
+<b>noPluginsMessage</b><br>
+A message that sais that there are no payment plugins that ca be used.<br>
+<br>
+<b>formHeader</b><br>
+This contains the form header and all hidden form variables that are needed for a successfull checkout.<br>
+<br>
+<b>formFooter</b><br>
+The form footer.<br>
+<br>
+<b>formSubmit</b><br>
+The submit button for this form.<br>
+<br>
+<b>pluginLoop</b><br>
+A template loop containing all enabled payment plugins. Within this loop the following template variables are provided:
+<blockquote>
+<b>name</b><br>
+The name of the plugin.<br>
+<br>
+<b>namespace</b><br>
+The namespace of the plugin. You only need this if you want to create your own custom foem elements.<br>
+<br>
+<b>formElement</b><br>
+A radio button tied to this plugin.<br>
+</blockquote>|,
+		lastUpdated => 0,
+		context => q|The body of the help page of the select payment gateway template.|
+	},
+
 };
 
 1;

@@ -59,6 +59,22 @@ our $HELP = {
 			}
 		]
 	},
+
+	'select payment gateway template' => {
+		title => 'help select payment template title',
+		body => 'help select payment template body',
+		related => [
+			{
+				tag => 'template language',
+				namespace => 'WebGUI'
+			},
+			{
+				tag => 'templates manage',
+				namespace => 'WebGUI'
+			}
+		]
+	},
+
 };
 
 1;

@@ -92,7 +92,7 @@ create table layout (
 INSERT INTO settings VALUES ('commerceCheckoutCanceledTemplateId','1');
 INSERT INTO settings VALUES ('commerceConfirmCheckoutTemplateId','1');
 INSERT INTO settings VALUES ('commercePaymentPlugin','PayFlowPro');
-INSERT INTO settings VALUES ('commerceSendDailyReportTo','');
+INSERT INTO settings VALUES ('commerceSelectPaymentGatewayTemplateId','1');
 INSERT INTO settings VALUES ('commerceTransactionErrorTemplateId','1');
 INSERT INTO template VALUES ('1','Subscription code redemption','<tmpl_if batchDescription>\r\nBatch: <tmpl_var batchDescription>\r\n</tmpl_if>\r\n\r\n<tmpl_var message><br>\r\n<tmpl_var codeForm>','Operation/RedeemSubscription',1,1);
 INSERT INTO template VALUES ('1','Subscriptionitem default template','<h2><tmpl_var name></h2>\r\n<tmpl_var description><br>\r\n<br>\r\n<br>\r\n$ <tmpl_var price><br>\r\n<a href=\"<tmpl_var url>\">Subscribe now</a><br>','Macro/SubscriptionItem',1,1);
@@ -168,4 +168,4 @@ CREATE TABLE commerceSettings (
   namespace varchar(64) NOT NULL default '',
   type varchar(10) NOT NULL default ''
 ) TYPE=MyISAM;
-
+INSERT INTO template VALUES ('1','Default payment gateway selection template','<tmpl_if pluginsAvailable>\r\n   <tmpl_var message><br>\r\n    <tmpl_var formHeader>\r\n       <table border=\"0\" cellspacing=\"0\" cellpadding=\"5\">\r\n    <tmpl_loop pluginLoop>\r\n            <tr>\r\n                        <td><tmpl_var formElement></td>\r\n                     <td align=\"left\"><tmpl_var name></td>\r\n           </tr>\r\n       </tmpl_loop>\r\n        </table>\r\n    <tmpl_var formSubmit>\r\n    <tmpl_var formFooter>\r\n<tmpl_else>\r\n <tmpl_var noPluginsMessage>\r\n</tmpl_if>','Commerce/SelectPaymentGateway',1,1);

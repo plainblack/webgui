@@ -10,7 +10,6 @@ use WebGUI::International;
 
 our @ISA = qw(WebGUI::Commerce::Payment);
 
-
 #-------------------------------------------------------------------
 sub cancelRecurringPayment {
 	my ($self, $recurring);
@@ -138,7 +137,7 @@ sub configurationForm {
 		-subText=> $i18n->get('testModeEnabled')
 		);
 		
-	return $f->printRowsOnly;
+	return $self->SUPER::configurationForm($f->printRowsOnly);
 }
 
 #-------------------------------------------------------------------

@@ -263,6 +263,7 @@ sub getOperations {
 	  'listPendingTransactions' => 'WebGUI::Operation::Commerce',
 	  'cancelTransaction' => 'WebGUI::Operation::Commerce',
 	  'completePendingTransaction' => 'WebGUI::Operation::Commerce',
+	  'selectPaymentGateway' => 'WebGUI::Operation::Commerce',
 	  'viewPurchaseHistory' => 'WebGUI::Operation::TransactionLog',
 	  'cancelRecurringTransaction' => 'WebGUI::Operation::TransactionLog',
         };
