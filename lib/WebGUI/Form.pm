@@ -208,6 +208,7 @@ sub combo {
 	$_[0]->{options}->{_new_} = WebGUI::International::get(581).'-&gt;';
 	$output = selectList({
 		name=>$_[0]->{name},
+		options=>$_[0]->{options},
 		value=>$_[0]->{value},
 		multiple=>$_[0]->{multiple},
 		extras=>$_[0]->{extras}
