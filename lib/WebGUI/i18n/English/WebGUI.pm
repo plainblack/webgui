@@ -5394,16 +5394,18 @@ Start typing! Or better yet, copy the snippet from some other electronic documen
 	},
 
 	'1093' => {
-		message => q|<P>Edit Navigation lets you add and edit what are essentially 'menu templates' -- they define what pages' Menu Names should be included in a menu based (sometimes) on where that menu appears. </P>
+		message => q|<P>Edit Navigation lets you add and edit what are essentially 'menu templates' -- they define which pages' Menu Names should be included in a menu, optionally based on where that menu appears.</P>
+<P>The Add/Edit Navigation form allows you to do choose the set of pages, and to choose which
+template is used to create the menu.</P>
 <P><B>Identifier</B><BR>This is the (unique) label you will later use to specify this Navigation definition in a ^Navigation(); macro.</P>
 <P><B>Base Page<BR></B>This identifies the spot in the Page Tree where the macro should commence listing pages. The first three choices will create 'absolute' menus -- ones which will display the same pages no matter which page you use the macro from. </P>
 <P></P>
 <P>The next four create 'relative' menus -- ones in which the items which will be displayed depend on the location in the page tree of the page in which you use the macro.</P>
-<P>Use the&nbsp;'Add new value' option if you want to specify a custom starting page. You can refer&nbsp;to a&nbsp;starting page by its urlized title or its pageId.</P>
+<P>Use the 'Add new value' option if you want to specify a custom starting page. You can refer to a starting page by its urlized title or its pageId.</P>
 <P><B>Return a Loop With</B><BR>This determines which pages relative to the base page will be included in the menu which the macro creates.</P>
 <UL>
-<LI>daughters - pages below the&nbsp;base&nbsp;page 
-<LI>sisters - pages at the same level as the&nbsp;base page, excluding the base page itself. 
+<LI>daughters - pages below the base page 
+<LI>sisters - pages at the same level as the base page, excluding the base page itself. 
 <LI>self and sisters - all pages at the same level as the base page. 
 <LI>descendants - all the descendants of base page (daughters, granddaughters, grand-granddaughters, etc) 
 <LI>self and descendants - base page and all of it's descendants. 
@@ -5414,13 +5416,15 @@ Start typing! Or better yet, copy the snippet from some other electronic documen
 <LI>pedigree - This is what we know as the "FlexMenu". Starting at base page, it returns its daughters, self and sisters, ancestors and the sisters of each ancestor.<BR></LI></UL>
 <P><B>Stop traversing when reaching level</B><BR>This allows you to prune a menu -- in either direction -- when it reaches a <I>specific</I> level in the page tree. It's slightly different in effect than... </P>
 <P><B>Max Depth</B><BR>...which allows you to prune a menu -- in either direction -- when it reaches a <I>number of levels</I> in the page tree. 'Stop Traversing' is absolute; 'Max Depth' is relative. Presumably, if you set both, whichever one takes effect <I>first</I> will be the active limit (that is, they're OR'd together). </P>
-<P><B>Show System Pages</B><BR>Should the menus the macro creates include System pages? <BR>System pages: Trash, clipboard, page not found, etc.</P>
-<P><B>Show Hidden Pages</B><BR>Should the menus the macro creates include pages which are marked as Hidden? </P>
+<P><B>Show System Pages</B><BR>Should the menus the macro creates include System pages such as Trash, Clipboard, Page not found, etc.?  If you want Admins or Content Managers to be able to see System Pages, then select Yes and use the Navigation Template to hide them.</P>
+<P><B>Show Hidden Pages</B><BR>Should the menus include pages which are marked as Hidden? Similar to
+System Pages, if you want certain groups to be able to see Hidden Pages, then select Yes and use
+the Navigation Template to determine who can see them in the menu.</P>
 <P><B>Show Unpriviliged Pages</B><BR>Should the menus the macro creates include pages which the currently logged-in user does not have the privilige to view? </P>
 <P><B>Template</B><BR>This menu permits you to select a template which is used to style the output created by the macro -- if you need the same collection of pages in multiple formats, you'll need to create multiple Navigation entries with (slightly) different names; the Copy Navigation button is useful for this.</P>
-<P><B>Revert Output<BR></B>When this option is switched on, the menu will be in reverse order.</P>
-<P><STRONG>Preview<BR></STRONG>The Preview button allows you to view a navigation setup without actually saving it.<STRONG><FONT color=#ff0000></P></FONT></STRONG>|,
-		lastUpdated => 1078461049
+<P><B>Reverse Output</B><BR>When this option is switched on, the menu will be in reverse order.</P>
+<P><B>Preview</B><BR>The Preview button allows you to view a navigation setup without actually saving it.</P>|,
+		lastUpdated => 1100586425,
 	},
 
 	'908' => {
@@ -5949,14 +5953,15 @@ Privileges and styles assigned to pages in the package will not be copied when t
 	},
 
 	'1095' => {
-		message => q|<P>The general idea behind the&nbsp;navigation system is that instead of<BR>hardwiring all the various choices you might make into the code, the<BR>system manages a 'library' of these styles, just the way it does with<BR>Snippets, Images, Templates, Page Styles, and other types of reusable<BR>information.&nbsp; You can create a new 'nav menu style', give it a name,<BR>and then use it anywhere on your site that you like.</P>
+		message => q|<P>The general idea behind the navigation system is that instead of hardwiring all the various choices you might make into the code, the system manages a 'library' of these styles, just the way it does with Snippets, Images, Templates, Page Styles, and other types of reusable information.  You can create a new 'Navgation menu style', give it a name, and then use it anywhere on your site that you like.</P>
 <P>The navigation system consists of two parts:</P>
 <OL>
-<LI>The navigation editor</LI>
-<LI>The <STRONG>^Navigation();</STRONG> macro</LI></OL>
-<P>The easiest way to add a completely new menu to your site is to put a <STRONG>^Navigation(myMenu);</STRONG> macro into your style. <BR>A "edit myMenu" link will be displayed if "myMenu" is not defined. </P>
+<LI>The <STRONG>&#94;Navigation();</STRONG> macro, which determines which files may be included in the menu and which template to use.</LI>
+<LI>The Navigation Template, which creates the menu and presents it to the user.</LI>
+</OL>
+<P>To create a new menu for your site, place a <B>&#94;Navigation(myMenu);</B> macro into a style. An "edit myMenu" link will be displayed if "myMenu" is not defined. </P>
 <P>Note: In this example "myMenu" is used, but you can pick any name, as long as it is unique.</P>|,
-		lastUpdated => 1078462928
+		lastUpdated => 1100587054
 	},
 
 	'505' => {

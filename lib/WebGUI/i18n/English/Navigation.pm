@@ -128,8 +128,8 @@ our $I18N = {
 	},
 
 	'29' => {
-		message => q|Revert output|,
-		lastUpdated => 1077080738
+		message => q|Reverse output|,
+		lastUpdated => 1100587628
 	},
 
 	'6' => {
