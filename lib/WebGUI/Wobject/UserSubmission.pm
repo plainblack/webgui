@@ -279,7 +279,7 @@ sub www_copy {
 sub www_deleteAttachment {
 	my ($owner);
 	($owner) = WebGUI::SQL->quickArray("select userId from UserSubmission_submission where submissionId=$session{form}{sid}");
-        if ($owner == $session{user}{userId}) {
+        if ($owner == $session{user}{userId} || WebGUI::Privilege::isInGroup($_[0]->get("groupToApprove"))) {
                 WebGUI::SQL->write("update UserSubmission_submission set attachment='' where submissionId=$session{form}{sid}");
                 return $_[0]->www_editSubmission();
         } else {
@@ -291,7 +291,7 @@ sub www_deleteAttachment {
 sub www_deleteImage {
 	my ($owner);
 	($owner) = WebGUI::SQL->quickArray("select userId from UserSubmission_submission where submissionId=$session{form}{sid}");
-        if ($owner == $session{user}{userId}) {
+        if ($owner == $session{user}{userId} || WebGUI::Privilege::isInGroup($_[0]->get("groupToApprove"))) {
                 WebGUI::SQL->write("update UserSubmission_submission set image='' where submissionId=$session{form}{sid}");
                 return $_[0]->www_editSubmission();
         } else {
