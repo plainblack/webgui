@@ -94,6 +94,8 @@ alter table discussion add column views int not null default 0;
 INSERT INTO international VALUES (514,'WebGUI','English','Views');
 INSERT INTO international VALUES (515,'WebGUI','English','Add edit stamp to posts?');
 alter table UserSubmission_submission add column views int not null default 0
+INSERT INTO international VALUES (517,'WebGUI','English','Turn Admin Off!');
+INSERT INTO international VALUES (516,'WebGUI','English','Turn Admin On!');
 
 
 
