@@ -113,7 +113,7 @@ sub www_edit {
 		$voteGroup = $_[0]->get("voteGroup") || 7;
 		$graphWidth = $_[0]->get("graphWidth") || 150;
 		for ($i=1; $i<=20; $i++) {
-                        if ($_[0]->get('a'.$i) =~ /\w/) {
+                        if ($_[0]->get('a'.$i) =~ /\C/) {
                                 $answers .= $_[0]->get("a".$i)."\n";
                         }
                 }
@@ -197,7 +197,7 @@ sub www_view {
                 $f->hidden('wid',$_[0]->get("wobjectId"));
                 $f->hidden('func','vote');
                 for ($i=1; $i<=20; $i++) {
-                        if ($_[0]->get('a'.$i) =~ /\w/) {
+                        if ($_[0]->get('a'.$i) =~ /\C/) {
                                 $answers[($i-1)] = '<input type="radio" name="answer" value="a'.$i.'"> <span class="pollAnswer">'.$_[0]->get('a'.$i).'</span><br>';
                         }
                 }
