@@ -38,6 +38,7 @@
  - Fixed a bug that caused begin/commit/rollback to fail when using the
    internal WebGUI database. This exhibited no problems prior to this release
    because no WebGUI functions actually used those methods before.
+ - bugfix [1073753]. bug in WebGUI::Search (Leendert Bottelberghs).
 
 
 6.2.9
