@@ -610,7 +610,7 @@ sub view {
 	WebGUI::Style::setLink($session{config}{extrasURL}.'/tabs/tabs.css', {"type"=>"text/css"});
 	WebGUI::Style::setScript($session{config}{extrasURL}.'/tabs/tabs.js', {"language"=>"JavaScript"});
 	$var = $passedVars || $self->getRecordTemplateVars($var);
-	return $self->processTemplate($var,"DataForm",$self->get("templateId"));
+	return $self->processTemplate($var,$self->get("templateId"));
 }
 
 

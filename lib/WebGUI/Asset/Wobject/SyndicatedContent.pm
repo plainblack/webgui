@@ -98,6 +98,7 @@ sub getEditForm {
 	return $tabform;
 }
 
+#-------------------------------------------------------------------
 # strip all html tags from the given data structure.  This is important to
 # prevent cross site scripting attacks
 my $_stripped_html = {};
@@ -124,6 +125,7 @@ sub _strip_html {
         return $_[0];
 }
 
+#-------------------------------------------------------------------
 # horrible kludge to find the channel or item record
 # in the varying kinds of rss structures returned by RSSLite
 sub _find_record {
@@ -154,6 +156,7 @@ sub _find_record {
         return undef;
 }
 
+#-------------------------------------------------------------------
 # Copy the guid field to the link field if the guid looks like a link.
 # This is a kludge that gets around the fact that some folks use the link
 # field as the link to the story while others use it as the link
@@ -189,6 +192,7 @@ sub _normalize_items {
         }
 }
 
+#-------------------------------------------------------------------
 sub _get_rss_data {
         my ($url) = @_;
         
@@ -259,6 +263,7 @@ sub _get_rss_data {
         return $rss;
 }
 
+#-------------------------------------------------------------------
 # rss items don't have a standard date, so timestamp them the first time
 # we see them and use that timestamp as the date.  Periodically nuke the
 # whole database to keep the thing from growing too large
@@ -278,6 +283,7 @@ sub _assign_rss_dates {
         }
   }
 
+#-------------------------------------------------------------------
 sub _get_aggregate_items {
 	my $self = shift;
 	my $urls = shift;
@@ -328,6 +334,7 @@ sub _get_aggregate_items {
         return $items;
 }  
 
+#-------------------------------------------------------------------
 # interleave stories from each feed, up to a total of $_aggregate_size
 sub _view_aggregate_feed {
 	my $self = shift;
@@ -338,7 +345,7 @@ sub _view_aggregate_feed {
         $var{'channel.description'} = $self->get("description");
         $var{item_loop} = $self->_get_aggregate_items($urls, $maxHeadlines);
         
-        return $self->processTemplate(\%var,"SyndactedContent");
+        return $self->processTemplate(\%var,$self->get("templateId"));
 }
 
 
@@ -362,9 +369,10 @@ sub _view_single_feed {
                              });
         }
         $var{item_loop} = \@items;
-        return $self->processTemplate(\%var,"SyndicatedContent");
+        return $self->processTemplate(\%var,$self->get("templateId"));
 }
 
+#-------------------------------------------------------------------
 sub view {
 	my $self = shift;
 	$self->logView() if ($session{setting}{passiveProfilingEnabled});
