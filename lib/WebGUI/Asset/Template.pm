@@ -78,7 +78,7 @@ sub _execute {
 		return $t->output;
 	} else {
 		WebGUI::ErrorHandler::warn("Error in template. ".$@);
-		return WebGUI::International::get(848).$@;
+		return WebGUI::International::get('template error', 'Template').$@;
 	}
 }
 
@@ -142,23 +142,23 @@ sub getEditForm {
 		$tabform->getTab("properties")->combo(
 			-name=>"namespace",
 			-options=>$namespaces,
-			-label=>"Namespace",
+			-label=>WebGUI::International::get('namespace','Template'),
 			-value=>[$session{form}{namespace}] 
 			);
 	} else {
 		$tabform->getTab("meta")->readOnly(
-			-label=>"Namespace",
+			-label=>WebGUI::International::get('namespace','Template'),
 			-value=>$self->getValue("namespace")
 			);	
 	}
 	$tabform->getTab("display")->yesNo(
 		-name=>"showInForms",
 		-value=>$self->getValue("showInForms"),
-		-label=>"Show in forms?"
+		-label=>WebGUI::International::get('show in forms', 'Template'),
 		);
         $tabform->getTab("properties")->codearea(
 		-name=>"template",
-		-label=>WebGUI::International::get(504),
+		-label=>WebGUI::International::get('template', 'Template'),
 		-value=>$self->getValue("template")
 		);
 	return $tabform;
@@ -321,7 +321,7 @@ sub www_edit {
         my $self = shift;
         return WebGUI::Privilege::insufficient() unless $self->canEdit;
 	$self->getAdminConsole->setHelp("template add/edit");
-        return $self->getAdminConsole->render($self->getEditForm->print,WebGUI::International::get(507));
+        return $self->getAdminConsole->render($self->getEditForm->print,WebGUI::International::get('edit template', 'Template'));
 }
 
 
