@@ -14,6 +14,11 @@ save you many hours of grief.
 	system. If you want to save them, please copy them to a
 	safe location prior to the upgrade.
 
+ * If you were doing any custom coding against the userDefined
+	fields in the old discussion system, please be aware that
+	these fields no longer exist in the new discussion system
+	due to the complexities of the new system.
+
 
 5.4.1
 --------------------------------------------------------------------

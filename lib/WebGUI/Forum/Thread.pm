@@ -44,7 +44,8 @@ sub getForum {
 sub getNextThread {
 	my ($self) = @_;
 	unless (exists $self->{_next}) {
-		my ($nextId) = WebGUI::SQL->quickArray("select min(forumThreadId) from forumThread where forumThreadId>".$self->get("forumThreadId"));
+		my ($nextId) = WebGUI::SQL->quickArray("select min(forumThreadId) from forumThread where forumId=".$self->get("forumId")." 
+			and forumThreadId>".$self->get("forumThreadId"));
 		$self->{_next} = WebGUI::Forum::Thread->new($nextId);
 	}
 	return $self->{_next};
@@ -61,7 +62,8 @@ sub getPost {
 sub getPreviousThread {
 	my ($self) = @_;
 	unless (exists $self->{_previous}) {
-		my ($nextId) = WebGUI::SQL->quickArray("select max(forumThreadId) from forumThread where forumThreadId<".$self->get("forumThreadId"));
+		my ($nextId) = WebGUI::SQL->quickArray("select max(forumThreadId) from forumThread where forumId=".$self->get("forumId")." 
+			and forumThreadId<".$self->get("forumThreadId"));
 		$self->{_previous} = WebGUI::Forum::Thread->new($nextId);
 	}
 	return $self->{_previous};
