@@ -145,7 +145,7 @@ sub copy {
                 	$b = FileHandle->new(">".$newNode->getPath.$session{os}{slash}.'thumb-'.$_[0]->getFilename);
                 	if (defined $b) {
                         	binmode($b);
-                        	cp($a,$b) or WebGUI::ErrorHandler::warn("Couldn't copy thumbnail: ".)$newNode->getPath.$session{os}{slash}.'thumb-'.$_[0]->getFilename." :".$!);
+                        	cp($a,$b) or WebGUI::ErrorHandler::warn("Couldn't copy thumbnail: ".$newNode->getPath.$session{os}{slash}.'thumb-'.$_[0]->getFilename." :".$!);
                         	$b->close;
                 	}
                 	$a->close;
