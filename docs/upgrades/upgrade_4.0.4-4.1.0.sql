@@ -30,7 +30,7 @@ CREATE TABLE imageGroup (
   PRIMARY KEY  (imageGroupId),
   UNIQUE KEY imageGroupId (imageGroupId)
 );
-INSERT INTO incrementer (incrementId, nextValue) VALUES('imageGroupId',1);
+INSERT INTO incrementer VALUES('imageGroupId',1);
 INSERT INTO imageGroup (imageGroupId, name, parentId, description) VALUES (0, 'Root', 0, 'Top level');
 alter table images add column imageGroupId int not null default 0;
 INSERT INTO groups (groupId, groupName, description) VALUES (9, 'Image Managers', 'Users that have privileges to add, edit, and delete images from the image manager. Content managers can view by default');
