@@ -395,7 +395,9 @@ sub writeLog {
 		print $log $_[0];
 		$log->close;
 	} else {
-		print STDOUT "Can't open log file: ".$WebGUI::Session::session{config}{logfile}." Check your WebGUI configuration file to set the path of the log file, and check to be sure the web server has the privileges to write to the log file.";;
+		use CGI;
+                my $cgi = CGI->new;
+		print STDOUT $cgi->header(). "Can't open log file: ".$WebGUI::Session::session{config}{logfile}." Check your WebGUI configuration file to set the path of the log file, and check to be sure the web server has the privileges to write to the log file.";;
 		WebGUI::Session::close();
 		exit;
 	}
