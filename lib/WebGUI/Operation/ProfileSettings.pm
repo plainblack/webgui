@@ -145,7 +145,7 @@ sub www_editProfileField {
 	tie %data, 'Tie::CPHash';
         $f = WebGUI::HTMLForm->new;
         $f->hidden("op","editProfileFieldSave");
-	if ($session{form}{fid}) {
+	if ($session{form}{fid} ne 'new') {
               	$f->hidden("fid",$session{form}{fid});
 		$f->readOnly($session{form}{fid},WebGUI::International::get(470));
 		%data = WebGUI::SQL->quickHash("select * from userProfileField where fieldName=".quote($session{form}{fid}));
