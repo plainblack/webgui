@@ -40,7 +40,7 @@ my $webUser = 'apache';
 
 GetOptions(
         'configFile=s'=>\$configFile,
-	'folderId=i'=>\$folderId,
+	    'folderId=s'=>\$folderId,
         'help'=>\$help,
         'override'=>\$override,
         'pathToFiles=s'=>\$pathToFiles,
