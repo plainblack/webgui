@@ -67,11 +67,11 @@ unless ($usersFile && $configFile && !$help) {
 	print <<STOP;
 
 
-Usage: perl $0 --userfile=<pathToFile> --configfile=<webguiConfig>
+Usage: perl $0 --usersfile=<pathToFile> --configfile=<webguiConfig>
 
-	--usersFile	File containing import information.
+	--usersFile	File (and path) containing import information.
 
-	--configFile	WebGUI config file.
+	--configFile	WebGUI config file (with no path info). 
 
 
 Options:
