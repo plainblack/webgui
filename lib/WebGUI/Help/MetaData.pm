@@ -2,7 +2,7 @@ package WebGUI::Help::MetaData;
 
 our $HELP = {
 	'metadata manage'=> {
-		title => 'content profiling',
+		title => 'Metadata, Manage',
 		body => 'metadata manage body',
 		related => [
 			{

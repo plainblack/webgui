@@ -162,7 +162,7 @@ our $HELP = {
 			},
 			{
 				tag => 'metadata manage',
-				namespace => 'WebGUI'
+				namespace => 'MetaData'
 			},
 			{
 				tag => 'poll add/edit',
@@ -1043,38 +1043,6 @@ our $HELP = {
 			}
 		]
 	},
-	'metadata manage'=> {
-		title => 'Metadata, Manage',
-		body => 'metadata manage body',
-		related => [
-			{
-				tag => 'user macros',
-				namespace => 'WebGUI'
-			},
-			{
-				tag => 'wobject add/edit',
-				namespace => 'WebGUI',
-			},
-		],
-	},
-	'metadata edit property' => {
-                title => 'Metadata, Edit property',
-                body => 'metadata edit property body',
-                related => [
-			{
-				tag => 'metadata manage',
-				namespace => 'WebGUI'
-                        },
-                        {
-                                tag => 'user macros',
-                                namespace => 'WebGUI'
-                        },
-                        {
-                                tag => 'wobject add/edit',
-                                namespace => 'WebGUI',
-                        },
-                ],
-        },
 	'page export' => {
                 title => 'Page, Export',
                 body => 'Page, Export body',
