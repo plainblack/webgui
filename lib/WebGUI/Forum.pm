@@ -1,5 +1,19 @@
 package WebGUI::Forum;
 
+=head1 LEGAL
+                                                                                                                                                             
+ -------------------------------------------------------------------
+  WebGUI is Copyright 2001-2003 Plain Black LLC.
+ -------------------------------------------------------------------
+  Please read the legal notices (docs/legal.txt) and the license
+  (docs/license.txt) that came with this distribution before using
+  this software.
+ -------------------------------------------------------------------
+  http://www.plainblack.com                     info@plainblack.com
+ -------------------------------------------------------------------
+                                                                                                                                                             
+=cut
+                                                                                                                                                             
 use strict;
 use WebGUI::Forum::Thread;
 use WebGUI::Paginator;
@@ -8,12 +22,82 @@ use WebGUI::Session;
 use WebGUI::SQL;
 use WebGUI::Utility;
 
+
+=head1 DESCRIPTION
+
+Data management class for forums.
+
+=head1 SYNOPSIS
+
+ use WebGUI::Forum;
+ $forum = WebGUI::Forum->create(\%forumParams);
+ $forum = WebGUI::Forum->new($forumId);
+
+=head1 METHODS
+
+These methods are available from this class:
+
+=cut
+
+
+#-------------------------------------------------------------------
+
+=head2 canPost ( [ userId ] )
+
+Returns a boolean whether the user has the privileges required to post.
+
+=over
+
+=item userId
+
+Defaults to $session{user}{userId}. Specify a user ID to check privileges for.
+
+=back
+
+=cut
+
 sub canPost {
         my ($self, $userId) = @_;
         $userId = $session{user}{userId} unless ($userId);
         return WebGUI::Privilege::isInGroup($self->get("groupToPost"));
 }
 
+#-------------------------------------------------------------------
+                                                                                                                                                             
+=head2 create ( forumParams )
+
+Creates a new forum. Returns a forum object.
+
+=over
+
+=item forumParams
+
+A hash reference containing a list of the parameters to default the forum to. The valid parameters are: 
+
+addEditStampToPosts - boolean
+filterPosts - A valid HTML::filter string.
+karmaPerPost - integer
+groupToPost - Group ID
+groupToModerate - Group ID
+editTimeout - interval
+moderatePosts - boolean
+attachmentsPerPost - integer
+allowRichEdit - boolean
+allowReplacements - boolean
+forumTemplateId - Template ID
+threadTemplateId - Template ID
+postTemplateId - Template ID
+postFormTemplateId - Template ID
+searchTemplateId - Template ID
+notificationTemplateId - Template ID
+archiveAfter - interval
+postsPerPage - integer
+masterForumId - Forum ID
+ 
+=back
+ 
+=cut
+ 
 sub create {
 	my ($self, $data) = @_;
 	$data->{forumId} = "new";
@@ -21,6 +105,22 @@ sub create {
 	return WebGUI::Forum->new($forumId);
 }
 
+#-------------------------------------------------------------------
+                                                                                                                                                             
+=head2 get ( [ param ] )
+
+Returns a hash reference containing all of the properties of the forum.
+
+=over
+
+=item param
+
+If specified then this method will return the value of this one parameter as a scalar. Param is the name of the parameter to return. See the forum table for details.
+
+=back
+
+=cut
+                                                                                                                                                             
 sub get {
 	my ($self, $key) = @_;
 	if ($key eq "") {
@@ -28,6 +128,22 @@ sub get {
 	}
 	return $self->{_properties}->{$key};
 }
+
+#-------------------------------------------------------------------
+
+=head2 getThread ( threadId )
+
+Returns a thread object.
+
+=over
+
+=item threadId
+
+The unique identifier of a thread in this forum.
+
+=back
+
+=cut
 
 sub getThread {
 	my ($self, $threadId) = @_;
@@ -37,33 +153,129 @@ sub getThread {
 	return $self->{_thread}{$threadId};
 }
 
+#-------------------------------------------------------------------
+
+=head2 isModerator ( [ userId ] )
+
+Returns a boolean indicating whether the user is a moderator.
+
+=over
+
+=item userId
+
+Defaults to $session{user}{userId}. A user id to test for moderator privileges.
+
+=back
+
+=cut
+
 sub isModerator {
 	my ($self, $userId) = @_;
 	$userId = $session{user}{userId} unless ($userId);
 	return WebGUI::Privilege::isInGroup($self->get("groupToModerate"), $userId);
 }
 
+#-------------------------------------------------------------------
+
+=head2 incrementReplies ( lastPostDate, lastPostId )
+
+Increments this forum's reply counter.
+
+=over
+
+=item lastPostDate
+
+The date of the post being added.
+
+=item lastPostId
+
+The unique identifier of the post being added.
+
+=back
+
+=cut
+
 sub incrementReplies {
         my ($self, $lastPostDate, $lastPostId) = @_;
         WebGUI::SQL->write("update forum set replies=replies+1, lastPostId=$lastPostId, lastPostDate=$lastPostDate where forumId=".$self->get("forumId"));
 }
                                                                                                                                                              
+#-------------------------------------------------------------------
+
+=head2 incrementThreads ( lastPostDate, lastPostId )
+
+Increments the thread counter for this forum.
+
+=over
+
+=item lastPostDate
+
+The date of the post that was just added.
+
+=item lastPostId
+
+The unique identifier of the post that was just added.
+
+=back
+
+=cut
+
 sub incrementThreads {
         my ($self, $lastPostDate, $lastPostId) = @_;
         WebGUI::SQL->write("update forum set threads=threads+1, lastPostId=$lastPostId, lastPostDate=$lastPostDate where forumId=".$self->get("forumId"));
 }
                                                                                                                                                              
+#-------------------------------------------------------------------
+
+=head2 incrementViews ( )
+
+Increments the views counter on this forum.
+
+=cut
+
 sub incrementViews {
         my ($self) = @_;
         WebGUI::SQL->write("update forum set views=views+1 where forumId=".$self->get("forumId"));
 }
                                                                                                                                                              
+#-------------------------------------------------------------------
+
+=head2 isSubscribed ( [ userId ] )
+
+Returns a boolean indicating whether the user is subscribed to the forum.
+
+=over
+
+=item userId
+
+The user to check for the subscription. Defaults to $session{user}{userId}.
+
+=back
+
+=cut
+
 sub isSubscribed {
 	my ($self, $userId) = @_;
         $userId = $session{user}{userId} unless ($userId);
         my ($isSubscribed) = WebGUI::SQL->quickArray("select count(*) from forumSubscription where forumId=".$self->get("forumId")." and userId=$userId");
         return $isSubscribed;
 }
+
+#-------------------------------------------------------------------
+
+=head2 new ( forumId )
+
+Constructor.
+
+=over
+
+=item forumId
+
+The unique identifier of the forum to retrieve the object for.
+
+=back
+
+=cut
 
 sub new {
 	my ($class, $forumId) = @_;
@@ -91,6 +303,14 @@ sub new {
 	bless {_properties=>$properties}, $class;
 }
 
+#-------------------------------------------------------------------
+
+=head2 purge ( ) 
+
+Destroys this forum and everything it contains.
+
+=cut
+
 sub purge {
 	my ($self) = @_;
 	my $a = WebGUI::SQL->read("select * from forumThread where forumId=".$self->get("forumId"));
@@ -111,6 +331,14 @@ sub purge {
 	WebGUI::SQL->write("delete from forum where forumId=".$self->get("forumId"));
 }
 
+#-------------------------------------------------------------------
+
+=head2 recalculateRating ( )
+
+Calculates the rating of this forum from its threads and stores the new value in the forum properties.
+
+=cut
+
 sub recalculateRating {
         my ($self) = @_;
         my ($count) = WebGUI::SQL->quickArray("select count(*) from forumThread where forumId=".$self->get("forumId")." and rating>0");
@@ -119,6 +347,22 @@ sub recalculateRating {
         my $average = round($sum/$count);
         $self->set({rating=>$average});
 }
+
+#-------------------------------------------------------------------
+
+=head2 set ( data )
+
+Sets the forum properties both in the object and to the database.
+
+=over
+
+=item data
+
+A hash reference containing the properties to set. See the forum table for details.
+
+=back
+
+=cut
 
 sub set {
 	my ($self, $data) = @_;
@@ -129,6 +373,22 @@ sub set {
         }
 }
 
+#-------------------------------------------------------------------
+
+=head2 subscribe ( [ userId ] )
+
+Subscribes a user to this forum.
+
+=over
+
+=item userId
+
+The unique identifier of the user to subscribe. Defaults to the current user.
+
+=back
+
+=cut
+
 sub subscribe {
         my ($self, $userId) = @_;
         $userId = $session{user}{userId} unless ($userId);
@@ -137,6 +397,22 @@ sub subscribe {
         }
 }
                                                                                                                                                              
+#-------------------------------------------------------------------
+
+=head2 unsubscribe ( [ userId ] )
+
+Unsubscribes a user from this forum.
+
+=over
+
+=item userId
+
+The unique identifier of the user to unsubscribe. Defaults to the current user.
+
+=back
+
+=cut
+
 sub unsubscribe {
         my ($self, $userId) = @_;
         $userId = $session{user}{userId} unless ($userId);
