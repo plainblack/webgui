@@ -40,7 +40,7 @@ sub www_viewMessageLog {
    WebGUI::Privilege::insufficient() unless (WebGUI::Grouping::isInGroup(2,$session{user}{userId}));
    $vars->{displayTitle} = '<h1>'.WebGUI::International::get(159).'</h1>';
    my $p = WebGUI::Paginator->new(WebGUI::URL::page('op=viewMessageLog'));
-   my $query = "select messageLogId,subject,url,dateOfEntry,status from messageLog where userId=$session{user}{userId} order by dateOfEntry desc";
+   my $query = "select messageLogId,subject,url,dateOfEntry,status from messageLog where userId=".quote($session{user}{userId})." order by dateOfEntry desc";
    $p->setDataByQuery($query);
    
    $vars->{'message.subject.label'} = WebGUI::International::get(351);
@@ -77,7 +77,7 @@ sub www_viewMessageLogMessage {
    return WebGUI::Privilege::insufficient() unless (WebGUI::Grouping::isInGroup(2,$session{user}{userId}));
    $vars->{displayTitle} = '<h1>'.WebGUI::International::get(159).'</h1>';
    
-   $data = WebGUI::SQL->quickHashRef("select * from messageLog where messageLogId=$session{form}{mlog} and userId=$session{user}{userId}");
+   $data = WebGUI::SQL->quickHashRef("select * from messageLog where messageLogId=".quote($session{form}{mlog})." and userId=".quote($session{user}{userId}));
    
    $vars->{'message.subject'} = $data->{subject};
    $vars->{'message.dateOfEntry'} = epochToHuman($data->{dateOfEntry});

@@ -9,14 +9,13 @@ save you many hours of grief.
 
 6.2.2
 --------------------------------------------------------------------
- * If you're on a Windows environment and upgrading to 6.2 you'll
-	need to set a TZ environment variable. Our recommendation is
-	to set the variable like follows
-
-	TZ = EST5EDT
-
-	If your first install is the WebGUI 6.2 zip-n-go then you
-	won't need to do this, as the installer will do it for you.
+ * If you used 6.1.1 for a while, and feel like there's something
+	wrong with your navigation or page tree, then there just
+	might be. We corrected a rather large problem in the Page
+	system that could have caused page tree corruption. To test
+	and fix this problem, get the page tree tools from the user
+	contribs area of plainblack.com. Be sure to back up your
+	databases before using this tool.
 
 
 6.2.0

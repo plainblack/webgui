@@ -17,6 +17,10 @@
  - bugfix [ 1024073 ] Problem with Collateral Management (ID?)
  - bugfix [ 1023688 ] upgrade.pl from 6.03 - 6.10 using 6.2.1 beta
  - bugfix [ 1024079 ] "Software error" message
+ - bugfix [ 1027362 ] 6.2.1 Page Tree
+ - bugfix [ 1027333 ] 6.2.1 Page Tree
+ - bugfix [ 1027129 ] view message causes error
+ - bugfix [ 1024079 ] "Software error" message
 
 
 
