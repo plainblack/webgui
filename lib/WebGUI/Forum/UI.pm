@@ -1184,29 +1184,9 @@ sub getPostTemplateVars {
 	$var->{'post.subject.label'} = WebGUI::International::get(229);
         $var->{'post.subject'} = WebGUI::HTML::filter($post->get("subject"),"none");
         $var->{'post.message'} = WebGUI::HTML::filter($post->get("message"),$forum->get("filterPosts"));
-	if ($post->get("contentType") eq "mixed") {
-		unless ($var->{'post.message'} =~ /\<div/ig || $var->{'post.message'} =~ /\<br/ig || $var->{'post.message'} =~ /\<p/ig) {
-                	$var->{'post.message'} =~ s/\n/\<br \/\>/g;
-        	}
-	} elsif ($post->get("contentType") eq "text") {
-               	$var->{'post.message'} =~ s/\t/&nbsp;&nbsp;&nbsp;&nbsp;/g;
-               	$var->{'post.message'} =~ s/ /&nbsp;/g;
-               	$var->{'post.message'} =~ s/\n/\<br \/\>/g;
-	} elsif ($post->get("contentType") eq "code") {
-               	$var->{'post.message'} =~ s/&/&amp;/g;
-               	$var->{'post.message'} =~ s/\</&lt;/g;
-               	$var->{'post.message'} =~ s/\>/&gt;/g;
-               	$var->{'post.message'} =~ s/\n/\<br \/\>/g;
-               	$var->{'post.message'} =~ s/\t/&nbsp;&nbsp;&nbsp;&nbsp;/g;
-               	$var->{'post.message'} =~ s/ /&nbsp;/g;
-               	$var->{'post.message'} = '<div style="font-family: fixed;">'.$var->{'post.message'}.'</div>';
-	}
+	$var->{'post.message'} = WebGUI::HTML::format($var->{'post.message'}, $post->get("contentType"));
         if ($forum->get("allowReplacements")) {
-                my $sth = WebGUI::SQL->read("select searchFor,replaceWith from replacements");
-                while (my ($searchFor,$replaceWith) = $sth->array) {
-                        $var->{'post.message'} =~ s/\Q$searchFor/$replaceWith/gs;
-                }
-                $sth->finish;
+		$var->{'post.message'} = WebGUI::HTML::processReplacements($var->{'post.message'});
         }
 	$var->{'user.canPost'} = $forum->canPost;
         $var->{'post.date.value'} = formatPostDate($post->get("dateOfPost"));

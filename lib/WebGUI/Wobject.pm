@@ -857,6 +857,11 @@ sub set {
 			)");
 		WebGUI::SQL->write("insert into ".$self->{_property}{namespace}." (wobjectId) 
 			values (".$self->{_property}{wobjectId}.")");
+		foreach my $key (keys %{$self->{_extendedProperties}}) {
+			if ($self->{_extendedProperties}{$key}{autoIncrement}) {
+				$properties->{$key} = getNextId($key);
+			}
+		}
 	}
 	$self->{_property}{lastEdited} = time();
 	$self->{_property}{editedBy} = $session{user}{userId};

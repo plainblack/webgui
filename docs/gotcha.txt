@@ -7,6 +7,18 @@ upgrading from one version to the next, or even between multiple
 versions. Be sure to heed the warnings contained herein as they will
 save you many hours of grief.
 
+
+6.0.0
+--------------------------------------------------------------------
+ * As part of the upgrade process our scripts will attempt to
+	migrate your styles, page, FAQ, Item, Link List, and
+	SQL Report templates. However, the migration scripts are not
+	perfect due to the wide-variety of templates out there, so
+	you may need to update some portions of your templates
+	manually.
+
+
+
 5.5.0
 --------------------------------------------------------------------
  * If you have any custom Message Board templates they will be

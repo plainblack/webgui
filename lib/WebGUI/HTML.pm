@@ -18,6 +18,7 @@ use HTML::TagFilter;
 use strict;
 use WebGUI::Macro;
 use WebGUI::Session;
+use WebGUI::SQL;
 
 =head1 NAME
 
@@ -32,6 +33,8 @@ A package for manipulating and massaging HTML.
  use WebGUI::HTML;
  $html = WebGUI::HTML::cleanSegment($html);
  $html = WebGUI::HTML::filter($html);
+ $html = WebGUI::HTML::format($content, $contentType);
+ $html = WebGUI::HTML::processReplacements($html);
 
 =head1 METHODS
 
@@ -126,6 +129,85 @@ sub filter {
 		return WebGUI::Macro::filter($html);
 	}
 }
+
+#-------------------------------------------------------------------
+
+=head2 format ( content [ , contentType ] )
+
+Formats various text types into HTML.
+
+=over
+
+=item content
+
+The text content to be formatted.
+
+=item contentType
+
+The content type to use as formatting. Valid types are 'html', 'text', 'code', and 'mixed'. Defaults to mixed. See also the contentType method in WebGUI::Form, WebGUI::HTMLForm, and WebGUI::FormProcessor.
+
+=back
+
+=cut
+
+sub format {
+	my ($content, $contentType) = @_;
+	$contentType = 'mixed' unless ($contentType);
+	if ($contentType eq "mixed") {
+                unless ($content =~ /\<div/ig || $content =~ /\<br/ig || $content =~ /\<p/ig) {
+                        $content =~ s/\n/\<br \/\>/g;
+                }
+        } elsif ($contentType eq "text") {
+                $content =~ s/\t/&nbsp;&nbsp;&nbsp;&nbsp;/g;
+                $content =~ s/ /&nbsp;/g;
+                $content =~ s/\n/\<br \/\>/g;
+        } elsif ($contentType eq "code") {
+                $content =~ s/&/&amp;/g;
+                $content =~ s/\</&lt;/g;
+                $content =~ s/\>/&gt;/g;
+                $content =~ s/\n/\<br \/\>/g;
+                $content =~ s/\t/&nbsp;&nbsp;&nbsp;&nbsp;/g;
+                $content =~ s/ /&nbsp;/g;
+                $content = '<div style="font-family: fixed;">'.$content.'</div>';
+        }
+	return $content;
+}
+
+#-------------------------------------------------------------------
+
+=head2 processReplacements ( content ) 
+
+Processes text using the WebGUI replacements system.
+
+=over
+
+=item content
+
+The content to be processed through the replacements filter.
+
+=back
+
+=cut
+
+sub processReplacements {
+	my ($content) = @_;
+	if (exists $session{replacements}) {
+		my $replacements = $session{replacements};
+		foreach my $searchFor (keys %{$replacements}) {
+			my $replaceWith = $replacements->{$searchFor};
+			$content =~ s/\Q$searchFor/$replaceWith/gs;
+		}
+	} else {
+		my $sth = WebGUI::SQL->read("select searchFor,replaceWith from replacements");
+        	while (my ($searchFor,$replaceWith) = $sth->array) {
+			$session{replacements}{$searchFor} = $replaceWith;
+        		$content =~ s/\Q$searchFor/$replaceWith/gs;
+        	}
+        	$sth->finish;
+	}
+	return $content;
+}
+
 
 
 1;

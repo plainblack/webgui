@@ -52,16 +52,14 @@ insert into help (helpId,namespace,titleId,bodyId,seeAlso) values (46, 'WebGUI',
 insert into help (helpId,namespace,titleId,bodyId,seeAlso) values (22, 'WebGUI', 672, 627, '12,WebGUI;');
 insert into help (helpId,namespace,titleId,bodyId,seeAlso) values (1, 'USS', 61, 71, '71,WebGUI;3,USS;2,USS;21,WebGUI;');
 insert into help (helpId,namespace,titleId,bodyId,seeAlso) values (24, 'WebGUI', 674, 629, '12,WebGUI;');
-insert into help (helpId,namespace,titleId,bodyId,seeAlso) values (1, 'FAQ', 61, 71, '3,FAQ;2,FAQ;21,WebGUI;');
 insert into help (helpId,namespace,titleId,bodyId,seeAlso) values (13, 'WebGUI', 663, 618, '12,WebGUI;');
 insert into help (helpId,namespace,titleId,bodyId,seeAlso) values (1, 'SyndicatedContent', 61, 71, '2,SyndicatedContent;21,WebGUI;');
 insert into help (helpId,namespace,titleId,bodyId,seeAlso) values (1, 'EventsCalendar', 61, 71, '2,EventsCalendar;3,EventsCalendar;21,WebGUI;');
 insert into help (helpId,namespace,titleId,bodyId,seeAlso) values (1, 'MessageBoard', 61, 71, '3,MessageBoard;2,MessageBoard;21,WebGUI;');
-insert into help (helpId,namespace,titleId,bodyId,seeAlso) values (1, 'LinkList', 61, 71, '3,LinkList;2,LinkList;21,WebGUI;');
 insert into help (helpId,namespace,titleId,bodyId,seeAlso) values (21, 'WebGUI', 671, 626, '19,WebGUI;18,WebGUI;27,WebGUI;14,WebGUI;');
 insert into help (helpId,namespace,titleId,bodyId,seeAlso) values (1, 'Article', 61, 71, '2,Article;71,WebGUI;21,WebGUI;');
 insert into help (helpId,namespace,titleId,bodyId,seeAlso) values (1, 'ExtraColumn', 61, 71, '21,WebGUI;');
-insert into help (helpId,namespace,titleId,bodyId,seeAlso) values (27, 'WebGUI', 677, 632, '1,Article;1,EventsCalendar;1,ExtraColumn;1,FAQ;1,FileManager;1,HttpProxy;1,LinkList;1,DataForm;1,MessageBoard;1,Poll;1,Product;1,SiteMap;1,SQLReport;1,Survey;1,SyndicatedContent;1,USS;1,WobjectProxy;21,WebGUI;');
+insert into help (helpId,namespace,titleId,bodyId,seeAlso) values (27, 'WebGUI', 677, 632, '1,Article;1,EventsCalendar;1,ExtraColumn;1,FileManager;1,HttpProxy;1,DataForm;1,MessageBoard;1,Poll;1,Product;1,SiteMap;1,SQLReport;1,Survey;1,SyndicatedContent;1,USS;1,WobjectProxy;21,WebGUI;');
 insert into help (helpId,namespace,titleId,bodyId,seeAlso) values (1, 'Poll', 61, 71, '2,Poll;21,WebGUI;');
 insert into help (helpId,namespace,titleId,bodyId,seeAlso) values (1, 'SiteMap', 61, 71, '2,SiteMap;21,WebGUI;');
 insert into help (helpId,namespace,titleId,bodyId,seeAlso) values (1, 'SQLReport', 61, 71, '21,WebGUI;');
@@ -88,8 +86,6 @@ insert into help (helpId,namespace,titleId,bodyId,seeAlso) values (66, 'WebGUI',
 insert into help (helpId,namespace,titleId,bodyId,seeAlso) values (65, 'WebGUI', 957, 958, '67,WebGUI;');
 insert into help (helpId,namespace,titleId,bodyId,seeAlso) values (2, 'FileManager', 72, 73, '1,FileManager;');
 insert into help (helpId,namespace,titleId,bodyId,seeAlso) values (2, 'EventsCalendar', 72, 73, '4,EventsCalendar;1,EventsCalendar;');
-insert into help (helpId,namespace,titleId,bodyId,seeAlso) values (2, 'FAQ', 72, 73, '1,FAQ;');
-insert into help (helpId,namespace,titleId,bodyId,seeAlso) values (2, 'LinkList', 72, 73, '1,LinkList;');
 insert into help (helpId,namespace,titleId,bodyId,seeAlso) values (47, 'WebGUI', 697, 698, '1,Article;17,WebGUI;1,MessageBoard;1,Poll;2,WebGUI;1,USS;');
 insert into help (helpId,namespace,titleId,bodyId,seeAlso) values (1, 'WobjectProxy', 5, 6, '21,WebGUI;');
 insert into help (helpId,namespace,titleId,bodyId,seeAlso) values (1, 'Product', 38, 39, '5,Product;4,Product;6,Product;2,Product;3,Product;7,Product;21,WebGUI;');
@@ -103,12 +99,10 @@ insert into help (helpId,namespace,titleId,bodyId,seeAlso) values (1, 'Survey', 
 insert into help (helpId,namespace,titleId,bodyId,seeAlso) values (49, 'WebGUI', 785, 786, '53,WebGUI;54,WebGUI;56,WebGUI;20,WebGUI;61,WebGUI;55,WebGUI;');
 insert into help (helpId,namespace,titleId,bodyId,seeAlso) values (50, 'WebGUI', 825, 826, '33,WebGUI;');
 insert into help (helpId,namespace,titleId,bodyId,seeAlso) values (2, 'Article', 72, 73, '1,Article;51,WebGUI;');
-insert into help (helpId,namespace,titleId,bodyId,seeAlso) values (51, 'WebGUI', 827, 828, '2,Article;3,DataForm;3,EventsCalendar;3,FAQ;3,FileManager;3,LinkList;2,MessageBoard;7,Product;2,SiteMap;2,SyndicatedContent;33,WebGUI;2,USS;');
+insert into help (helpId,namespace,titleId,bodyId,seeAlso) values (51, 'WebGUI', 827, 828, '2,Article;3,DataForm;3,EventsCalendar;3,FileManager;2,MessageBoard;7,Product;2,SiteMap;2,SyndicatedContent;33,WebGUI;2,USS;');
 insert into help (helpId,namespace,titleId,bodyId,seeAlso) values (3, 'EventsCalendar', 94, 95, '1,EventsCalendar;51,WebGUI;');
-insert into help (helpId,namespace,titleId,bodyId,seeAlso) values (3, 'FAQ', 76, 77, '1,FAQ;51,WebGUI;');
 insert into help (helpId,namespace,titleId,bodyId,seeAlso) values (3, 'FileManager', 75, 76, '1,FileManager;51,WebGUI;');
 insert into help (helpId,namespace,titleId,bodyId,seeAlso) values (4, 'EventsCalendar', 96, 97, '2,EventsCalendar;51,WebGUI;');
-insert into help (helpId,namespace,titleId,bodyId,seeAlso) values (3, 'LinkList', 75, 76, '1,LinkList;51,WebGUI;');
 insert into help (helpId,namespace,titleId,bodyId,seeAlso) values (2, 'MessageBoard', 73, 74, '75,WebGUI;76,WebGUI;73,WebGUI;77,WebGUI;72,WebGUI;74,WebGUI;1,MessageBoard;51,WebGUI;');
 insert into help (helpId,namespace,titleId,bodyId,seeAlso) values (2, 'SiteMap', 72, 73, '1,SiteMap;51,WebGUI;');
 insert into help (helpId,namespace,titleId,bodyId,seeAlso) values (2, 'USS', 74, 75, '1,USS;51,WebGUI;');
@@ -148,5 +142,18 @@ insert into help (helpId,namespace,titleId,bodyId,seeAlso) values (3, 'MessageBo
 
 
 delete from international where namespace='Item';
+update international set namespace='USS', internationalId='83' where namespace='FAQ' and internationalId=9;
+update international set namespace='USS', internationalId='84' where namespace='FAQ' and internationalId=10;
+update international set namespace='USS', internationalId='85' where namespace='FAQ' and internationalId=5;
+update international set namespace='USS', internationalId='86' where namespace='FAQ' and internationalId=6;
+delete from international where namespace='FAQ';
+delete from international where namespace='USS' and internationalId=34;
+delete from international where namespace='USS' and internationalId=38;
+INSERT INTO template VALUES (1,'Default Submission Form','<h1><tmpl_var submission.header.label></h1>\n\n<tmpl_var form.header>\n	<table>\n	<tmpl_if user.isVisitor> <tmpl_if submission.isNew>\n		<tr><td><tmpl_var visitorName.label></td><td><tmpl_var visitorName.form></td></tr>\n	</tmpl_if> </tmpl_if>\n	<tr><td><tmpl_var title.label></td><td><tmpl_var title.form></td></tr>\n	<tr><td><tmpl_var body.label></td><td><tmpl_var body.form></td></tr>\n	<tr><td><tmpl_var image.label></td><td><tmpl_var image.form></td></tr>\n	<tr><td><tmpl_var attachment.label></td><td><tmpl_var attachment.form></td></tr>\n	<tr><td><tmpl_var contentType.label></td><td><tmpl_var contentType.form></td></tr>\n	<tr><td></td><td><tmpl_var form.submit></td></tr>\n	</table>\n<tmpl_var form.footer>\n','USS/SubmissionForm');
+INSERT INTO template VALUES (2,'FAQ Submission Form','<h1><tmpl_var question.header.label></h1>\n\n<tmpl_var form.header>\n	<table>\n	<tmpl_if user.isVisitor> <tmpl_if submission.isNew>\n		<tr><td><tmpl_var visitorName.label></td><td><tmpl_var visitorName.form></td></tr>\n	</tmpl_if> </tmpl_if>\n	<tr><td><tmpl_var question.label></td><td><tmpl_var title.form.textarea></td></tr>\n	<tr><td><tmpl_var answer.label></td><td><tmpl_var body.form></td></tr>\n	<tr><td><tmpl_var contentType.label></td><td><tmpl_var contentType.form></td></tr>\n	<tr><td></td><td><tmpl_var form.submit></td></tr>\n	</table>\n<tmpl_var form.footer>\n','USS/SubmissionForm');
+insert into international (internationalId,languageId,namespace,message,lastUpdated,context) values (87,1,'USS','Submission Form Template', 1070027660,'Prompt the user to select a template for the USS submission form.');
+insert into international (internationalId,languageId,namespace,message,lastUpdated,context) values (88,1,'USS','Sequence', 1070027660,'A type of ordering in the USS that will allow the admin to specify (or sequence) the order of the results.');
+
+
 
 

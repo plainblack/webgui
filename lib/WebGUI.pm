@@ -60,7 +60,7 @@ sub _processAction {
 
 #-------------------------------------------------------------------	
 sub _processFunctions {
-	my ($wobject, $extra, %hash, $output, $proxyWobjectId, $cmd, $w);
+	my ($wobject, $output, $proxyWobjectId, $cmd, $w);
         if (exists $session{form}{func} && exists $session{form}{wid}) {
                 if ($session{form}{func} =~ /^[A-Za-z]+$/) {
                         if ($session{form}{wid} eq "new") {
@@ -73,12 +73,6 @@ sub _processFunctions {
                                                 ."corrupt, but was requested "
                                                 ."by $session{user}{username} [$session{user}{userId}].");
                                         $wobject = ();
-                                } else {
-                                        $extra = WebGUI::SQL->quickHashRef("select * from ${$wobject}{namespace}
-                                                where wobjectId=${$wobject}{wobjectId}");
-                                        tie %hash, 'Tie::CPHash';
-                                        %hash = (%{$wobject},%{$extra});
-                                        $wobject = \%hash;
                                 }
                         }
                         if ($wobject) {
