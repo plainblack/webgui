@@ -2411,7 +2411,7 @@ sub migrateForum {
 		# we're going to give up hierarchy during the upgrade for the sake of simplicity
 		print "\t\t\t\t\t\t Migrating posts for thread ".$thread->{forumThreadId}."\n";
 		my %oldestThreadPost;
-		my $posts = WebGUI::SQL->read("select * from forumPost where forumThreadId=".quote($thread->{forumThreadId})." and parentId<>'' and forumPost.status<>'deleted'");
+		my $posts = WebGUI::SQL->read("select * from forumPost where forumThreadId=".quote($thread->{forumThreadId})." and parentId<>0 and forumPost.status<>'deleted'");
 		my $postRank = 1;
 		if ($posts->errorCode>0) {
 			print "\t\t\t\tWARNING: There was a problem migrating the posts for ".$thread->{forumThreadId}."\n";

@@ -10,6 +10,10 @@
  - Fixed a password timeout bug caused by the change in the interval method.
  - Removed the depricated fileSize property from the File asset.
  - Fixed a user profile editing bug.
+ - bugfix [ 1151462 ] missing slash in form URL
+ - bugfix [ 1155826 ] Forum After update has doble posts
+ - bugfix [ 1154990 ] lost "get" in code (Collaboration)
+ - bugfix [ 1154269 ] empty trash doesn't work
 
 
 6.3.0

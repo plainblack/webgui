@@ -259,7 +259,7 @@ sub cascadeLineage {
 	my $oldLineage = shift || $self->get("lineage");
 	WebGUI::Cache->new($self->getId)->deleteByRegex(/^asset_/);
 	WebGUI::Cache->new($self->getId)->deleteByRegex(/^lineage_$oldLineage/);
-	WebGUI::SQL->write("update asset set lineage=concat(".quote($newLineage).", substring(lineage from ".(length($oldLineage)+1).")) 
+	WebGUI::SQL->write("update asset set lineage=concat(".quote($newLineage).", lastUpdatedBy=".quote($session{user}{userId}).", lastUpdated=".time().", substring(lineage from ".(length($oldLineage)+1).")) 
 		where lineage like ".quote($oldLineage.'%'));
 }
 
@@ -304,8 +304,8 @@ Removes asset from lineage, places it in clipboard state. The "gap" in the linea
 sub cut {
 	my $self = shift;
 	WebGUI::SQL->beginTransaction;
-	WebGUI::SQL->write("update asset set state='limbo' where lineage like ".quote($self->get("lineage").'%'));
-	WebGUI::SQL->write("update asset set state='clipboard' where assetId=".quote($self->getId));
+	WebGUI::SQL->write("update asset set state='limbo', lastUpdatedBy=".quote($session{user}{userId}).", lastUpdated=".time()." where lineage like ".quote($self->get("lineage").'%'));
+	WebGUI::SQL->write("update asset set state='clipboard', lastUpdatedBy=".quote($session{user}{userId}).", lastUpdated=".time()." where assetId=".quote($self->getId));
 	WebGUI::SQL->commit;
 	$self->updateHistory("cut");
 	$self->{_properties}{state} = "clipboard";
@@ -809,7 +809,7 @@ sub getAssetsInClipboard {
 	my $userId = shift || $session{user}{userId};
 	my @assets;
 	my $limit;
-	unless ($limitToUser) {
+	if ($limitToUser) {
 		$limit = "and lastUpdatedBy=".quote($userId);
 	}
 	my $sth = WebGUI::SQL->read("select assetId, title, className from asset where state='clipboard' $limit order by lastUpdated desc");
@@ -846,7 +846,7 @@ sub getAssetsInTrash {
 	my $userId = shift || $session{user}{userId};
 	my @assets;
 	my $limit;
-	unless ($limitToUser) {
+	if ($limitToUser) {
 		$limit = "and lastUpdatedBy=".quote($userId);
 	}
 	my $sth = WebGUI::SQL->read("select assetId, title, className from asset where state='trash' $limit order by lastUpdated desc");
@@ -1137,7 +1137,47 @@ An array reference of relatives to retrieve. Valid parameters are "siblings", "c
 
 =head3 rules
 
-A hash reference comprising limits to relative listing.  Variables to rules include endingLineageLength, assetToPedigree, excludeClasses, returnQuickReadObjects, returnObjects, invertTree, includeOnlyClasses, joinClass, and whereClause.  There is no real reason to use a joinClass without a whereClause, but it's trivial to use a whereClause if you don't use a joinClass.  You will only be able to filter on the asset table, however.
+A hash reference comprising modifiers to relative listing. Rules include:
+
+=head4 statesToInclude
+
+An array reference containing a list of states that should be returned. Defaults to 'published'. Options include 'published', 'trash', 'cliboard', and 'limbo'.
+
+=head4 endingLineageLength
+
+An integer limiting the length of the lineages of the assets to be returned. This can help limit levels of depth in the asset tree.
+
+=head4 assetToPedigree
+
+An asset object reference to draw a pedigree from. A pedigree includes ancestors, siblings, descendants and other information. It's specifically used in flexing navigations.
+
+=head4 excludeClasses
+
+An array reference containing a list of asset classes to remove from the result set. The opposite of the includOnlyClasses rule.
+
+=head4 returnQuickReadObjects
+
+A boolean indicating that we should return objects that contain only base asset information rather than asset ids. This is mainly useful for navigation, clipboard, trash, and other system level functions.
+
+=head4 returnObjects
+
+A boolean indicating that we should return objects rather than asset ids.
+
+=head4 invertTree
+
+A boolean indicating whether the resulting asset tree should be returned in reverse order.
+
+=head4 includeOnlyClasses
+
+An array reference containing a list of asset classes to include in the result. If this is specified then no other classes except these will be returned. The opposite of the excludeClasses rule.
+
+=head4 joinClass
+
+An array reference containing asset classes to join in. There is no real reason to use a joinClass without a whereClause, but it's trivial to use a whereClause if you don't use a joinClass.  You will only be able to filter on the asset table, however.
+
+=head4 whereClause
+
+A string containing extra where clause information for the query.
 
 =cut
 
@@ -1193,6 +1233,7 @@ sub getLineage {
 	}
 	# formulate a where clause
 	my $where = "state='published'";
+	$where = "state in (".quoteAndJoin($rules->{statesToInclude}).")" if (exists $rules->{statesToInclude});
 	if (exists $rules->{excludeClasses}) { # deal with exclusions
 		my @set;
 		foreach my $className (@{$rules->{excludeClasses}}) {
@@ -1754,7 +1795,7 @@ Sets Asset properties state to published.
 
 sub republish {
 	my $self = shift;
-	WebGUI::SQL->write("update asset set state='published' where lineage like ".quote($self->get("lineage").'%'));
+	WebGUI::SQL->write("update asset set state='published', lastUpdatedBy=".quote($session{user}{userId}).", lastUpdated=".time()." where lineage like ".quote($self->get("lineage").'%'));
 	$self->{_properties}{state} = "published";
 }
 
@@ -1921,7 +1962,7 @@ Returns 1. Purges self and all descendants.
 
 sub purgeTree {
 	my $self = shift;
-	my $descendants = $self->getLineage(["self","descendants"],{returnObjects=>1, invertTree=>1});
+	my $descendants = $self->getLineage(["self","descendants"],{returnObjects=>1, invertTree=>1, statesToInclude=>['trash','limbo']});
 	foreach my $descendant (@{$descendants}) {
 		$descendant->purge;
 	}
@@ -1951,7 +1992,7 @@ sub setParent {
 		my $lineage = $parent->get("lineage").$parent->getNextChildRank; 
 		return 0 if ($lineage =~ m/^$oldLineage/); # can't move it to its own child
 		WebGUI::SQL->beginTransaction;
-		WebGUI::SQL->write("update asset set parentId=".quote($parent->getId)." where assetId=".quote($self->getId));
+		WebGUI::SQL->write("update asset set parentId=".quote($parent->getId).", lastUpdatedBy=".quote($session{user}{userId}).", lastUpdated=".time()." where assetId=".quote($self->getId));
 		$self->cascadeLineage($lineage);
 		WebGUI::SQL->commit;
 		$self->updateHistory("moved to parent ".$parent->getId);
@@ -2019,7 +2060,7 @@ sub setSize {
 	foreach my $key (keys %{$self->get}) {
 		$sizetest .= $self->get($key);
 	}
-	WebGUI::SQL->write("update asset set assetSize=".(length($sizetest)+$extra)." where assetId=".quote($self->getId));
+	WebGUI::SQL->write("update asset set assetSize=".(length($sizetest)+$extra).", lastUpdatedBy=".quote($session{user}{userId}).", lastUpdated=".time()." where assetId=".quote($self->getId));
 }
 
 #-------------------------------------------------------------------
@@ -2059,8 +2100,8 @@ Removes asset from lineage, places it in trash state. The "gap" in the lineage i
 sub trash {
 	my $self = shift;
 	WebGUI::SQL->beginTransaction;
-	WebGUI::SQL->write("update asset set state='limbo' where lineage like ".quote($self->get("lineage").'%'));
-	WebGUI::SQL->write("update asset set state='trash' where assetId=".quote($self->getId));
+	WebGUI::SQL->write("update asset set state='limbo', lastUpdatedBy=".quote($session{user}{userId}).", lastUpdated=".time()." where lineage like ".quote($self->get("lineage").'%'));
+	WebGUI::SQL->write("update asset set state='trash', lastUpdatedBy=".quote($session{user}{userId}).", lastUpdated=".time()." where assetId=".quote($self->getId));
 	WebGUI::SQL->commit;
 	$self->{_properties}{state} = "trash";
 	$self->updateHistory("trashed");
@@ -2104,6 +2145,7 @@ sub update {
                 my @setPairs;
                 if ($definition->{tableName} eq "asset") {
                         push(@setPairs,"lastUpdated=".time());
+                        push(@setPairs,"lastUpdatedBy=".quote($session{user}{userId}));
                 }
                 foreach my $property (keys %{$definition->{properties}}) {
                         next unless (exists $properties->{$property});
@@ -2748,7 +2790,7 @@ sub www_emptyClipboard {
 	my $self = shift;
 	my $ac = WebGUI::AdminConsole->new("clipboard");
 	return WebGUI::Privilege::insufficient() unless (WebGUI::Grouping::isInGroup(4));
-	foreach my $assetData (@{$self->getAssetsInClipboard($session{form}{systemClipboard} && WebGUI::Grouping::isInGroup(3))}) {
+	foreach my $assetData (@{$self->getAssetsInClipboard(!($session{form}{systemClipboard} && WebGUI::Grouping::isInGroup(3)))}) {
 		my $asset = WebGUI::Asset->newByDynamicClass($assetData->{assetId},$assetData->{className});
 		$asset->trash;
 	}
@@ -2767,7 +2809,7 @@ sub www_emptyTrash {
 	my $self = shift;
 	my $ac = WebGUI::AdminConsole->new("trash");
 	return WebGUI::Privilege::insufficient() unless (WebGUI::Grouping::isInGroup(4));
-	foreach my $assetData (@{$self->getAssetsInTrash($session{form}{systemTrash} && WebGUI::Grouping::isInGroup(3))}) {
+	foreach my $assetData (@{$self->getAssetsInTrash(!($session{form}{systemTrash} && WebGUI::Grouping::isInGroup(3)))}) {
 		my $asset = WebGUI::Asset->newByDynamicClass($assetData->{assetId},$assetData->{className});
 		$asset->purgeTree;
 	}
