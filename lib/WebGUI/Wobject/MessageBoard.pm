@@ -54,7 +54,8 @@ sub duplicate {
 		groupToPost=>$_[0]->get("groupToPost"),
 		messagesPerPage=>$_[0]->get("messagesPerPage"),
 		editTimeout=>$_[0]->get("editTimeout"),
-		groupToModerate=>$_[0]->get("groupToModerate")
+		groupToModerate=>$_[0]->get("groupToModerate"),
+		karmaPerPost=>$_[0]->get("karmaPerPost")
 		});
 	WebGUI::Discussion::duplicate($_[0]->get("wobjectId"),$w->get("wobjectId"));
 }
@@ -76,7 +77,7 @@ sub purge {
 
 #-------------------------------------------------------------------
 sub set {
-        $_[0]->SUPER::set($_[1],[qw(editTimeout groupToPost groupToModerate messagesPerPage)]);
+        $_[0]->SUPER::set($_[1],[qw(editTimeout karmaPerPost groupToPost groupToModerate messagesPerPage)]);
 }
 
 #-------------------------------------------------------------------
@@ -125,6 +126,11 @@ sub www_edit {
 		$f->group("groupToModerate",WebGUI::International::get(21,$namespace),[$groupToModerate]);
                 $f->integer("messagesPerPage",WebGUI::International::get(4,$namespace),$messagesPerPage);
                 $f->integer("editTimeout",WebGUI::International::get(5,$namespace),$editTimeout);
+		if ($session{setting}{useKarma}) {
+                	$f->integer("karmaPerPost",WebGUI::International::get(541),$_[0]->get("karmaPerPost"));
+		} else {
+			$f->hidden("karmaPerPost",$_[0]->get("karmaPerPost"));
+		}
 		$output .= $_[0]->SUPER::www_edit($f->printRowsOnly);
                 return $output;
         } else {
@@ -141,6 +147,7 @@ sub www_editSave {
 			messagesPerPage=>$session{form}{messagesPerPage},
 			groupToPost=>$session{form}{groupToPost},
 			editTimeout=>$session{form}{editTimeout},
+			karmaPerPost=>$session{form}{karmaPerPost},
 			groupToModerate=>$session{form}{groupToModerate}
 			});
                 return "";
@@ -161,7 +168,7 @@ sub www_post {
 #-------------------------------------------------------------------
 sub www_postSave {
 	if (WebGUI::Privilege::isInGroup($_[0]->get("groupToPost"),$session{user}{userId})) {
-		WebGUI::Discussion::postSave();
+		WebGUI::Discussion::postSave($_[0]->get("karmaPerPost"));
 		return $_[0]->www_showMessage();
 	} else {
 		return WebGUI::Privilege::insufficient();

@@ -26,6 +26,7 @@ use WebGUI::Privilege;
 use WebGUI::Session;
 use WebGUI::SQL;
 use WebGUI::URL;
+use WebGUI::User;
 use WebGUI::Utility;
 use WebGUI::Wobject;
 
@@ -213,6 +214,8 @@ sub duplicate {
 		groupToApprove=>$_[0]->get("groupToApprove"),
 		allowDiscussion=>$_[0]->get("allowDiscussion"),
 		editTimeout=>$_[0]->get("editTimeout"),
+		karmaPerPost=>$_[0]->get("karmaPerPost"),
+		karmaPerSubmission=>$_[0]->get("karmaPerSubmission"),
 		groupToPost=>$_[0]->get("groupToPost"),
 		layout=>$_[0]->get("layout"),
 		displayThumbnails=>$_[0]->get("displayThumbnails"),
@@ -252,7 +255,7 @@ sub purge {
 #-------------------------------------------------------------------
 sub set {
         $_[0]->SUPER::set($_[1],[qw(submissionsPerPage groupToContribute groupToApprove defaultStatus groupToModerate 
-		groupToPost displayThumbnails editTimeout layout allowDiscussion)]);
+		groupToPost displayThumbnails editTimeout karmaPerPost karmaPerSubmission layout allowDiscussion)]);
 }
 
 #-------------------------------------------------------------------
@@ -389,11 +392,21 @@ sub www_edit {
                 $f->group("groupToContribute",WebGUI::International::get(2,$namespace),[$_[0]->get("groupToContribute")]);
                 $f->integer("submissionsPerPage",WebGUI::International::get(6,$namespace),$submissionsPerPage);
                 $f->select("defaultStatus",\%submissionStatus,WebGUI::International::get(10,$namespace),[$defaultStatus]);
+                if ($session{setting}{useKarma}) {
+                        $f->integer("karmaPerSubmission",WebGUI::International::get(30,$namespace),$_[0]->get("karmaPerSubmission"));
+                } else {
+                        $f->hidden("karmaPerSubmission",$_[0]->get("karmaPerSubmission"));
+                }
 		$f->yesNo("displayThumbnails",WebGUI::International::get(51,$namespace),$_[0]->get("displayThumbnails"));
 		$f->yesNo("allowDiscussion",WebGUI::International::get(48,$namespace),$_[0]->get("allowDiscussion"));
 		$f->integer("editTimeout",WebGUI::International::get(49,$namespace),$_[0]->get("editTimeout"));
 		$f->group("groupToPost",WebGUI::International::get(50,$namespace),[$_[0]->get("groupToPost")]);
 		$f->group("groupToModerate",WebGUI::International::get(44,$namespace),[$groupToModerate]);
+                if ($session{setting}{useKarma}) {
+                        $f->integer("karmaPerPost",WebGUI::International::get(541),$_[0]->get("karmaPerPost"));
+                } else {
+                        $f->hidden("karmaPerPost",$_[0]->get("karmaPerPost"));
+                }
 		$output .= $_[0]->SUPER::www_edit($f->printRowsOnly);
                 return $output;
         } else {
@@ -412,6 +425,8 @@ sub www_editSave {
 			defaultStatus=>$session{form}{defaultStatus},
 			groupToModerate=>$session{form}{groupToModerate},
 			groupToPost=>$session{form}{groupToPost},
+			karmaPerPost=>$session{form}{karmaPerPost},
+			karmaPerSubmission=>$session{form}{karmaPerSubmission},
 			editTimeout=>$session{form}{editTimeout},
 			allowDiscussion=>$session{form}{allowDiscussion},
 			layout=>$session{form}{layout},
@@ -467,7 +482,7 @@ sub www_editSubmission {
 
 #-------------------------------------------------------------------
 sub www_editSubmissionSave {
-	my ($sqlAdd,$owner,$image,$attachment,$title);
+	my ($sqlAdd,$owner,$image,$attachment,$title,$u);
 	($owner) = WebGUI::SQL->quickArray("select userId from UserSubmission_submission where submissionId='$session{form}{sid}'");
         if ($owner == $session{user}{userId} 
 	 || ($session{form}{sid} eq "new" && WebGUI::Privilege::isInGroup($_[0]->get("groupToContribute"))) 
@@ -476,6 +491,10 @@ sub www_editSubmissionSave {
 			$session{form}{sid} = getNextId("submissionId");
 			WebGUI::SQL->write("insert into UserSubmission_submission (wobjectId,submissionId,userId,username) 
 				values (".$_[0]->get("wobjectId").",$session{form}{sid},$session{user}{userId},".quote($session{user}{username}).")");
+			if ($session{setting}{useKarma}) {
+				$u = WebGUI::User->new($session{user}{userId});
+				$u->karma($_[0]->get("karmaPerSubmission"),$namespace." (".$_[0]->get("wobjectId")."/".$session{form}{sid}.")","User submission.");
+			}
 		}
                 $image = WebGUI::Attachment->new("",$session{form}{wid},$session{form}{sid});
 		$image->save("image");
@@ -523,7 +542,7 @@ sub www_post {
 #-------------------------------------------------------------------
 sub www_postSave {
         if (WebGUI::Privilege::isInGroup($_[0]->get("groupToPost"),$session{user}{userId})) {
-                WebGUI::Discussion::postSave();
+                WebGUI::Discussion::postSave($_[0]->get("karmaPerPost"));
                 return $_[0]->www_showMessage();
         } else {
                 return WebGUI::Privilege::insufficient();

@@ -21,6 +21,7 @@ use WebGUI::Search;
 use WebGUI::Session;
 use WebGUI::SQL;
 use WebGUI::URL;
+use WebGUI::User;
 
 #-------------------------------------------------------------------
 sub _deleteReplyTree {
@@ -172,7 +173,7 @@ sub post {
 
 #-------------------------------------------------------------------
 sub postSave {
-	my ($rid, $username, $pid);
+	my ($u, $rid, $username, $pid);
         if ($session{form}{subject} eq "") {
         	$session{form}{subject} = WebGUI::International::get(232);
         }
@@ -207,6 +208,10 @@ sub postSave {
 	}
 	WebGUI::SQL->write("update discussion set subject=".quote($session{form}{subject}).", 
 		message=".quote($session{form}{message}).", dateOfPost=".time()." where messageId=$session{form}{mid}");
+        if ($session{setting}{useKarma}) {
+        	$u = WebGUI::User->new($session{user}{userId});
+                $u->karma($_[0],"Discussion (".$session{form}{wid}."/".$session{form}{sid}.")","Made a post.");
+        }
 	return "";
 }
 

@@ -65,6 +65,7 @@ sub duplicate {
 		allowDiscussion=>$_[0]->get("allowDiscussion"),
 		groupToPost=>$_[0]->get("groupToPost"),
 		groupToModerate=>$_[0]->get("groupToModerate"),
+		karmaPerPost=>$_[0]->get("karmaPerPost"),
 		editTimeout=>$_[0]->get("editTimeout")
 		});
 	WebGUI::Discussion::duplicate($_[0]->get("wobjectId"),$w->get("wobjectId"));
@@ -88,7 +89,7 @@ sub purge {
 #-------------------------------------------------------------------
 sub set {
         $_[0]->SUPER::set($_[1],
-		[qw(image linkTitle linkURL attachment convertCarriageReturns alignImage allowDiscussion groupToPost groupToModerate editTimeout)]);
+		[qw(karmaPerPost image linkTitle linkURL attachment convertCarriageReturns alignImage allowDiscussion groupToPost groupToModerate editTimeout)]);
 }
 
 #-------------------------------------------------------------------
@@ -179,6 +180,11 @@ sub www_edit {
 		$f->group("groupToPost",WebGUI::International::get(19,$namespace),[$_[0]->get("groupToPost")]);
 		$f->group("groupToModerate",WebGUI::International::get(20,$namespace),[$groupToModerate]);
 		$f->integer("editTimeout",WebGUI::International::get(21,$namespace),$editTimeout);
+                if ($session{setting}{useKarma}) {
+                        $f->integer("karmaPerPost",WebGUI::International::get(541),$_[0]->get("karmaPerPost"));
+                } else {
+                        $f->hidden("karmaPerPost",$_[0]->get("karmaPerPost"));
+                }
 		$output .= $_[0]->SUPER::www_edit($f->printRowsOnly);
                 return $output;
         } else {
@@ -203,6 +209,7 @@ sub www_editSave {
 		$property{linkURL} = $session{form}{linkURL};
 		$property{allowDiscussion} = $session{form}{allowDiscussion};
 		$property{groupToModerate} = $session{form}{groupToModerate};
+		$property{karmaPerPost} = $session{form}{karmaPerPost};
 		$property{groupToPost} = $session{form}{groupToPost};
 		$property{editTimeout} = $session{form}{editTimeout};
 		$_[0]->set(\%property);
@@ -224,7 +231,7 @@ sub www_post {
 #-------------------------------------------------------------------
 sub www_postSave {
         if (WebGUI::Privilege::isInGroup($_[0]->get("groupToPost"),$session{user}{userId})) {
-                WebGUI::Discussion::postSave();
+                WebGUI::Discussion::postSave($_[0]->get("karmaPerPost"));
                 return $_[0]->www_showMessage();
         } else {
                 return WebGUI::Privilege::insufficient();

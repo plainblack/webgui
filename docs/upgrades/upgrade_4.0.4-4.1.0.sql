@@ -21,5 +21,6 @@ INSERT INTO international VALUES (30,'UserSubmission','English','Karma Per Submi
 alter table UserSubmission add column karmaPerSubmission int not null default 0;
 alter table UserSubmission add column karmaPerPost int not null default 0;
 alter table MessageBoard add column karmaPerPost int not null default 0;
+alter table Article add column karmaPerPost int not null default 0;
 
 
