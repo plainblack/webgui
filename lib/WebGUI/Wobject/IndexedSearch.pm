@@ -133,7 +133,7 @@ sub www_edit {
 	# Page roots
 	%searchRoot = (	'any'=>WebGUI::International::get(15,$self->get("namespace")), 
 				$session{page}{pageId}=>WebGUI::International::get(4,$self->get("namespace")),
-				WebGUI::SQL->buildHash("select pageId,title from page where parentId=0 and isSystem<>1 order by title")
+				WebGUI::SQL->buildHash("select pageId,title from page where parentId='0' and isSystem<>'1' order by title")
 			);
 	$properties->checkList (	-name=>'searchRoot',
 						-options=>\%searchRoot, 

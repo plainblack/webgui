@@ -344,7 +344,7 @@ sub motherSelfAndSisters {
                $class->keyColumn()." != $keyColumnId",
           ]
      );
-     if ($class->useDummyRoot() && $parentId == 0) {
+     if ($class->useDummyRoot() && $parentId eq '0') {
           push @objs, $class->dummyRoot();
      }
      return ($self,@objs);
