@@ -1,3 +1,7 @@
+6.2.2
+
+
+
 6.2.1
  - Fixed a GUID quoting bug in WebGUI.pm setCollateral.
  - Fixed all sorts of GUID related bugs in the Forums.
