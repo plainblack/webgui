@@ -585,15 +585,17 @@ sub www_view {
 				my @questions = WebGUI::SQL->buildArray("select Survey_questionId from Survey_response
 					where Survey_id=".$_[0]->get("Survey_id")." and ((userId=$session{user}{userId} 
 					and userId<>1) or (userId=1 and ipAddress='$session{env}{REMOTE_ADDR}'))");
-				@questions = WebGUI::SQL->buildArray("select Survey_questionId from Survey_question 
-					where Survey_id=".$_[0]->get("Survey_id")
-					." and Survey_questionId not in (".join(",",@questions).")");
+				if ($#questions >= 0) {
+					@questions = WebGUI::SQL->buildArray("select Survey_questionId from Survey_question 
+						where Survey_id=".$_[0]->get("Survey_id")
+						." and Survey_questionId not in (".join(",",@questions).")");
+				}
 				if ($#questions >= 0) {
 					$question = $_[0]->getCollateral("Survey_question","Survey_questionId",
 						$questions[rand($#questions+1)]);
 				}
 			}
-			if ($questionOrder eq "response") {
+			if ($questionOrder eq "response" && $previousResponse->{Survey_answerId}) {
 				my ($responseDriver) = WebGUI::SQL->quickArray("select goto from Survey_answer where
 					Survey_answerId=".$previousResponse->{Survey_answerId});
 				if ($responseDriver) {
@@ -602,7 +604,7 @@ sub www_view {
 					$questionOrder = "sequential";
 				}
 			} 
-			if ($questionOrder eq "sequential") {
+			if ($questionOrder eq "sequential" && $previousResponse->{Survey_questionId}) {
 				my $previousQuestion = $_[0]->getCollateral("Survey_question","Survey_questionId",
 					$previousResponse->{Survey_questionId});
 				$previousQuestion->{sequenceNumber} = 0 unless($previousQuestion->{sequenceNumber});
@@ -655,9 +657,12 @@ sub www_view {
 					and ((userId=$session{user}{userId} and userId<>1) or 
 					(userId=1 and ipAddress='$session{env}{REMOTE_ADDR}'))
 					and a.Survey_answerId=b.Survey_answerId and b.isCorrect=1");
-				$output .= "<h1>".WebGUI::International::get(52,$namespace).": ".$correctCount."/".$questionCount
-					."<br/>".WebGUI::International::get(54,$namespace).": "
-					.round(($correctCount/$questionCount)*100)."%</h1>";
+				if ($questionCount > 0) {
+					$output .= "<h1>".WebGUI::International::get(52,$namespace).": "
+						.$correctCount."/".$questionCount
+						."<br/>".WebGUI::International::get(54,$namespace).": "
+						.round(($correctCount/$questionCount)*100)."%</h1>";
+				}
 			}
 		}
 	} else {
