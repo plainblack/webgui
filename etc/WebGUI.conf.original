@@ -1,10 +1,12 @@
 assets = WebGUI::Asset::File::Image, \
 	WebGUI::Asset::File, \
+	WebGUI::Asset::Snippet, \
 	WebGUI::Asset::Redirect, \
 	WebGUI::Asset::Wobject::Layout, \
 	WebGUI::Asset::Wobject::USS, \
 	WebGUI::Asset::Wobject::SyndicatedContent, \
 	WebGUI::Asset::Wobject::Article, \
+	WebGUI::Asset::Wobject::Navigation, \
 	WebGUI::Asset::FilePile
 
 sitename = www.example.com, example.com

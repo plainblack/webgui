@@ -466,6 +466,8 @@ print "\tDeleting files which are no longer used.\n" unless ($quiet);
 #unlink("../../lib/WebGUI/Wobject/DataForm.pm");
 #unlink("../../lib/WebGUI/Wobject/USS.pm");
 #unlink("../../lib/WebGUI/Wobject/FileManager.pm");
+#unlink("../../lib/WebGUI/Operation/Clipboard.pm");
+#unlink("../../lib/WebGUI/Operation/Trash.pm");
 #unlink("../../lib/WebGUI/Operation/Collateral.pm");
 #unlink("../../lib/WebGUI/Collateral.pm");
 #unlink("../../lib/WebGUI/CollateralFolder.pm");
@@ -494,6 +496,7 @@ $macros->{"AssetProxy"} = "AssetProxy";
 $macros->{"RandomAssetProxy"} = "RandomAssetProxy";
 $macros->{"FileUrl"} = "FileUrl";
 $macros->{"PageUrl"} = "PageUrl";
+$conf->set("paymentPlugins"=>"ITransact");
 $conf->set("macros"=>$macros);
 $conf->set("assets"=>[
 		'WebGUI::Asset::Wobject::Navigation',

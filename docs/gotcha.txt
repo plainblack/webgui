@@ -36,16 +36,6 @@ save you many hours of grief.
 	you'll need to update them after the upgrade. Most of WebGUI's 
 	database tables will be changed during the upgrade process.
 
- * If you want to use the e-commerce system, you'll have to enable the
-	PayFlowPro plugin in the config file. To do this correctly 
-	you'll also have to download the Payflow Pro SDK from Verisign.
-	Be sure to export the cert path into the PFPRO_CERT_PATH 
-	environment variable, and to start your server the hard way 
-	(apachectl stop; apachectl start, restart won't do). Also be sure
-	that this variable is set in the environment in which cron 
-	operates, or else the scheduler plugin ProcessRecurringPayments
-	will fail with a cert error.
-
  * If you have any custom page templates, they'll need to be updated
 	to work with the new Layout system. The templates have been 
 	changed significantly enough that automatic migration of them is
@@ -72,11 +62,8 @@ save you many hours of grief.
 		PerlAccessHandler WebGUI::UploadsAccessHandler
 	</Location>
 
- * In order to use the CDG Commerce iTransact payment plugin you'll have to 
-	make sure that the following modules are installed:
-		- XML::Simple
-		- LWP::UserAgent
-		- HTTP::Cookies
+ * You need to install the XML::Simple perl module which is ued in the
+	new commerce system and will eventually be used in other systems.
 
 
 6.2.8

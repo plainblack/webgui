@@ -213,6 +213,19 @@ if (eval { require SOAP::Lite }) {
         }
 }
 
+print "XML::Simple module ....................... ";
+if (eval { require XML::Simple }) {
+        print "OK\n";
+} else {
+	if ($< == 0 && $os eq "Linuxish") {
+                print "Attempting to install...\n";
+                CPAN::Shell->install("XML::Simple");
+        } else {
+                print "Please install.\n";
+		$prereq = 0;
+        }
+}
+
 print "Time::HiRes module ....................... ";
 if (eval { require Time::HiRes }) {
         print "OK\n";
