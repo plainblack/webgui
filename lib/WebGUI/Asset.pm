@@ -1135,6 +1135,19 @@ sub getRank {
 
 #-------------------------------------------------------------------
 
+=head2 getRoot ()
+
+Returns the root asset object.
+
+=cut
+
+sub getRoot {
+	return WebGUI::Asset->new("PBasset000000000000001");
+}
+
+
+#-------------------------------------------------------------------
+
 =head2 getToolbar ( )
 
 Returns a toolbar with a set of icons that hyperlink to functions that delete, edit, promote, demote, cut, and copy.
