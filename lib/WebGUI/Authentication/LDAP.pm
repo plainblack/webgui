@@ -104,7 +104,7 @@ sub registrationForm {
 
 #-------------------------------------------------------------------
 sub registrationFormSave { 
-	my($$auth, $connectDN);
+	my ($auth, $connectDN);
 	my $uid = shift;
 	my $uri = URI->new($session{setting}{ldapURL});
 	my $ldap = Net::LDAP->new($uri->host, (port=>$uri->port));
