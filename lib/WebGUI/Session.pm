@@ -68,39 +68,6 @@ These subroutines are available from this package:
 
 
 #-------------------------------------------------------------------
-sub _setupPageInfo {
-	my (%page, $pageId, $pageName);
-	tie %page, 'Tie::CPHash';
-	($pageId) = $_[0];
-	if ($pageId eq "") {
-		$pageName = lc($ENV{PATH_INFO});
-		$pageName =~ s/\/$//;
-		$pageName =~ s/\///;
-		$pageName =~ s/\'//;
-		$pageName =~ s/\"//;
-		if ($pageName ne "") {
-			($pageId) = WebGUI::SQL->quickArray("select pageId from page where urlizedTitle=".quote($pageName));
-			if ($pageId eq "") {
-				$pageId = $session{setting}{notFoundPage};
-				if($ENV{"MOD_PERL"}) {
-					my $r = Apache->request;
-					if(defined($r)) {
-						$r->custom_response(404, $pageName);
-						$r->status(404);
-					}
-				} else {
-					$session{http}{status} = '404';
-				}
-			}
-		} else {
-			$pageId = $session{setting}{defaultPage};
-		}
-	}
-	%page = WebGUI::SQL->quickHash("select * from page where pageId=".quote($pageId));
-	$session{page} = \%page;
-}
-
-#-------------------------------------------------------------------
 sub _setupSessionVars {
 	my (%vars, $uid, $encryptedPassword);
 	tie %vars, 'Tie::CPHash';
@@ -402,9 +369,6 @@ sub open {
 	} else {
 		_setupSessionVars($session{cookie}{wgSession});
 	}
-        ###----------------------------
-        ### current page's properties (from page table)
-        _setupPageInfo("");
 	###----------------------------
 	### current user's account and profile information (from users and userProfileData tables)
 	_setupUserInfo($session{var}{userId});
@@ -412,7 +376,7 @@ sub open {
 
 #-------------------------------------------------------------------
 
-=head2 refreshPageInfo ( [ pageId ] ) 
+=head2 refreshPageInfo ( pageId ) 
 
 Updates the WebGUI session to reflect new page information.
 
@@ -420,15 +384,15 @@ Updates the WebGUI session to reflect new page information.
 
 =item pageId
 
-Defaults to the current page. Specify the page id to change this WebGUI session to use.
+Specify which page you want to change to.
 
 =back
 
 =cut
 
 sub refreshPageInfo {
-	my $pageId = $_[0];
-	_setupPageInfo($pageId);
+	my $pageId = shift;
+	$session{page} = WebGUI::SQL->quickHashRef("select * from page where pageId=".quote($pageId));
 }
 
 #-------------------------------------------------------------------

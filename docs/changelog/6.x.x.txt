@@ -64,6 +64,9 @@
  - RFE [ 747859 ] RSS Encoding (Len Kranendonk) NB: Needs perl 5.8.0 or up.
  - RFE [ 906852 ] Extended forum sorting (Leendert Bottelberghs).
  - Bugfix [ 998588 ] (Leendert Bottelberghs).
+ - Changed page system to support multiple types of pages and to make URLs
+   resources in WebGUI rather than tied specifically to content pages.
+
 
 6.1.1
  - bugfix [ 991313 ] Manage Translations doesn't work

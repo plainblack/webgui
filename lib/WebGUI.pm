@@ -25,7 +25,6 @@ use WebGUI::Privilege;
 use WebGUI::Session;
 use WebGUI::SQL;
 use WebGUI::Style;
-use WebGUI::Page;
 use WebGUI::URL;
 use WebGUI::PassiveProfiling;
 
@@ -48,6 +47,36 @@ sub _generatePage {
 	return $output;
 }
 
+#-------------------------------------------------------------------
+sub _getPageInfo {
+	my $sql = "select * from page where "; 
+	my $url = shift || $ENV{PATH_INFO};
+	$url = lc($url);
+	$url =~ s/\/$//;
+        $url =~ s/^\///;
+        $url =~ s/\'//;
+        $url =~ s/\"//;
+	my $pageData;
+        if ($url ne "") {
+		$pageData = WebGUI::SQL->quickHashRef($sql."urlizedTitle=".quote($url));
+                if ($pageData->{subroutine} eq "") {
+                        if($ENV{"MOD_PERL"}) {
+                                my $r = Apache->request;
+                                if(defined($r)) {
+                                        $r->custom_response(404, $url);
+                                        $r->status(404);
+                                }
+                        } else {
+                                $session{http}{status} = '404';
+                        }
+			$pageData = WebGUI::SQL->quickHashRef($sql."pageId=".quote($session{setting}{pageNotFound}));
+                }
+        } else {
+		$pageData = WebGUI::SQL->quickHashRef($sql."pageId=".quote($session{setting}{defaultPage}));
+        }
+	$session{page} = $pageData;
+	return $pageData;
+}
 
 #-------------------------------------------------------------------	
 sub _processAction {
@@ -82,10 +111,11 @@ sub page {
 	my $webguiRoot = shift;
 	my $configFile = shift;
 	my $useExistingSession = shift;   # used for static page generation functions where  you may generate more than one page at a time.
+	my $pageUrl = shift;
 	WebGUI::Session::open($webguiRoot,$configFile) unless ($useExistingSession);
 
 # JT: don't forget to do something with action 2
-
+	my $page = _getPageInfo($pageUrl);
 	my $output = _processOperations();
 	if ($output ne "") {
 		$output = _generatePage($output);
@@ -105,7 +135,14 @@ sub page {
                		$output = $cache->get;
 		}
 		unless ($output) {
-			$output = WebGUI::Page::generate();
+			my $cmd = "use ".$page->{subroutinePackage};
+			eval ($cmd);
+			WebGUI::ErrorHandler::fatalError("Couldn't compile page package: ".$page->{subroutinePackage}.". Root cause: ".$@) if ($@);
+			my $params = eval $page->{subroutineParams};
+			WebGUI::ErrorHandler::fatalError("Couldn't interpret page params: ".$page->{subroutineParams}.". Root cause: ".$@) if ($@);
+			$cmd = $page->{subroutinePackage}."::".$page->{subroutine};
+			$output = eval{&$cmd($params)};
+			WebGUI::ErrorHandler::fatalError("Couldn't execute page command: ".$page->{subroutine}.". Root cause: ".$@) if ($@);
 			if (WebGUI::HTTP::getMimeType() eq "text/html") {
 				$output = _generatePage($output);
 			}
@@ -116,8 +153,8 @@ sub page {
 				$ttl = $session{page}{cacheTimeout};
 			}
 			$cache->set($output, $ttl) if ($useCache);
+			WebGUI::PassiveProfiling::addPage();	# add wobjects on page to passive profile log
 		}
-		WebGUI::PassiveProfiling::addPage();	# add wobjects on page to passive profile log
 	}
 	WebGUI::Affiliate::grabReferral();	# process affilliate tracking request
         my $httpHeader = WebGUI::HTTP::getHeader();

@@ -171,8 +171,8 @@ Returns a thread object for the next (newer) thread in the same forum.
 sub getNextThread {
 	my ($self) = @_;
 	unless (exists $self->{_next}) {
-		my ($nextId) = WebGUI::SQL->quickArray("select min(lastPostDate) from forumThread where forumId=".quote($self->get("forumId"))." 
-			and lastPostDate>".quote($self->get("lastPostDate")),WebGUI::SQL->getSlave);
+		my ($nextId) = WebGUI::SQL->quickArray("select lastPostId from forumThread where forumId=".quote($self->get("forumId"))." 
+			and lastPostDate>".quote($self->get("lastPostDate")." order by lastPostDate asc"),WebGUI::SQL->getSlave);
 		$self->{_next} = WebGUI::Forum::Thread->new($nextId);
 	}
 	return $self->{_next};
@@ -213,8 +213,8 @@ Returns a thread object for the previous (older) thread in the same forum.
 sub getPreviousThread {
 	my ($self) = @_;
 	unless (exists $self->{_previous}) {
-		my ($nextId) = WebGUI::SQL->quickArray("select max(lastPostDate) from forumThread where forumId=".quote($self->get("forumId"))." 
-			and lastPostDate<".quote($self->get("lastPostDate")),WebGUI::SQL->getSlave);
+		my ($nextId) = WebGUI::SQL->quickArray("select lastPostId from forumThread where forumId=".quote($self->get("forumId"))." 
+			and lastPostDate<".quote($self->get("lastPostDate")." order by lastPostDate desc"),WebGUI::SQL->getSlave);
 		$self->{_previous} = WebGUI::Forum::Thread->new($nextId);
 	}
 	return $self->{_previous};

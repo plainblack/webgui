@@ -14,10 +14,10 @@ package WebGUI::Page;
 
 =cut
 
-use warnings;
 use HTML::Template;
 use strict;
 use Tie::IxHash;
+use WebGUI::Cache;
 use WebGUI::DateTime;
 use WebGUI::ErrorHandler;
 use WebGUI::Grouping;
@@ -658,23 +658,24 @@ sub generation {
 
 =head2 get( property )
 
-Returns the disired page property.
+Returns a hash reference of all the page properties.
 
 =over
 
 =item property
 
-The name of the property you wanna have
+Returns a scalar containing the value of the specififed proeprty.
 
 =back
 
 =cut
 
 sub get {
-	my ($self, $property);
-	($self, $property) = @_;
-
-	return $self->{_pageProperties}->{$_[1]};
+	my ($self, $property) = @_;
+	if ($property) {
+		return $self->{_pageProperties}->{$property};
+	}
+	return $self->{_pageProperties};
 }
 
 #-------------------------------------------------------------------

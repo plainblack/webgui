@@ -213,14 +213,15 @@ URL name value pairs (this=that&foo=bar) to be passed with this toggle.
 =cut
 
 sub toggleURL {
+	my $pairs = shift;
+	my $url = shift || $session{page}{urlizedTitle};
 	WebGUI::Session::setScratch("search",$session{form}{search});
-	my $url;
 	if ($session{scratch}{search}) {
-		$url = WebGUI::URL::page("search=0");
+		$url = WebGUI::URL::gateway($url,"search=0");
 	} else {
-		$url = WebGUI::URL::page("search=1");
+		$url = WebGUI::URL::gateway($url,"search=1");
 	}
-	$url = WebGUI::URL::append($url,$_[0]) if ($_[0]);
+	$url = WebGUI::URL::append($url,$pairs) if ($pairs);
 	return $url;
 }
 

@@ -97,7 +97,7 @@ sub generate {
 	# Caching
 	if($self->get('noCache')) {
 		$session{page}{cacheTimeout} = 0;
-                $session{page}{cacheTimeoutVisitor} = 0;
+               $session{page}{cacheTimeoutVisitor} = 0;
 	}
 
 	# Uploads / Extras URL
@@ -125,7 +125,7 @@ sub generate {
 	$session{page}{styleId} = $self->get('styleId') || $session{page}{styleId};
 
 	# Generate the page
-	my $content = WebGUI::page(undef, undef, 1);
+	my $content = WebGUI::page(undef, undef, 1, $session{page}{urlizedTitle});
 
 	if($self->get('stripHTML')) {
 		$content = WebGUI::HTML::html2text($content);
