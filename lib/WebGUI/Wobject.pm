@@ -674,6 +674,19 @@ sub setCollateral {
 
 #-------------------------------------------------------------------
 
+=head2 uiLevel
+
+ Returns the UI Level of a wobject. Defaults to "0" for all wobjects.
+ Override to set the UI Level higher for a given wobject.
+
+=cut
+
+sub uiLevel {
+	return 0;
+}
+
+#-------------------------------------------------------------------
+
 =head2 www_approvePost ( )
 
  Sets the status flag on a discussion message to "approved".

@@ -144,13 +144,14 @@ sub _loadWobjects {
 			unless ($@) {
 				$exclude = $session{config}{excludeWobject};
                         	$exclude =~ s/ //g;
-				unless (isIn($namespace, split(/,/,$exclude))) {
-					$cmd = "\$WebGUI::Wobject::".$namespace."::name";
-					$session{wobject}{$namespace} = eval($cmd);
-					if ($@) {
-						WebGUI::ErrorHandler::warn("No name method in wobject: $namespace. ".$@);
-						$session{wobject}{$namespace} = "ERROR: ".$namespace;
-					}
+				next if (isIn($namespace, split(/,/,$exclude)));
+				$cmd = "\WebGUI::Wobject::".$namespace."::uiLevel";
+				next if (eval($cmd) > $session{user}{uiLevel});	
+				$cmd = "\$WebGUI::Wobject::".$namespace."::name";
+				$session{wobject}{$namespace} = eval($cmd);
+				if ($@) {
+					WebGUI::ErrorHandler::warn("No name method in wobject: $namespace. ".$@);
+					$session{wobject}{$namespace} = "ERROR: ".$namespace;
 				}
 			} else {
 				WebGUI::ErrorHandler::warn("Wobject failed to compile: $namespace. ".$@);

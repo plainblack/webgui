@@ -78,6 +78,11 @@ sub set {
 }
 
 #-------------------------------------------------------------------
+sub uiLevel {
+        return 5;
+}
+
+#-------------------------------------------------------------------
 sub www_deleteField {
 	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
 	return $_[0]->confirm(WebGUI::International::get(19,$namespace),

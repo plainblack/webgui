@@ -90,6 +90,11 @@ sub set {
 }
 
 #-------------------------------------------------------------------
+sub uiLevel {
+        return 4;
+}
+
+#-------------------------------------------------------------------
 sub www_deleteFile {
 	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
 	$_[0]->setCollateral("DownloadManager_file","downloadId",{$session{form}{file}=>''},0,0);

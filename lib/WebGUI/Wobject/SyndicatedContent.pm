@@ -44,6 +44,11 @@ sub set {
 }
 
 #-------------------------------------------------------------------
+sub uiLevel {
+        return 6;
+}
+
+#-------------------------------------------------------------------
 sub www_edit {
         return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
         my ($output, $f);
