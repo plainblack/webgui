@@ -113,7 +113,7 @@ How many rows should be displayed before splitting the results into separate pag
 	},
 
 	'73' => {
-		message => q|The following variables are made available from SQL Reports:
+		message => q|The following variables are made available in SQL Reports:
 <p>
 
 <b>columns_loop</b><br />
@@ -161,6 +161,7 @@ The name of the field as it is returned by the query.
 The data in this field.
 <br /><br />
 
+</blockquote>
 </blockquote>
 
 <b>hasNest</b><br />
@@ -252,7 +253,7 @@ The default label for rows.count.isZero.
 <br /><br />
 
 |,
-		lastUpdated => 1082365473
+		lastUpdated => 1100235434
 	},
 
 	'16' => {
