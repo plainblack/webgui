@@ -33,7 +33,9 @@ sub fatalError {
 		$logfile = $config->param('logfile');
 	}
         print "<h1>WebGUI Fatal Error</h1>Something unexpected happened that caused this system to fault.<p>" unless ($friendly); 
-	$log = FileHandle->new(">>$logfile") or print "Can't open log file.";
+	$log = FileHandle->new(">>$logfile") or print "Can't open log file: ".$logfile
+		."\n<p>Check your WebGUI configuration file to set the path of the log file, 
+		and check to be sure the web server has the privileges to write to the log file.";
         print $0." at ".localtime(time)." reported:<br>" unless ($friendly);
 	print $log localtime(time)." ".$0." FATAL: ".$_[0]."\n";
         print $_[0] unless ($friendly);
