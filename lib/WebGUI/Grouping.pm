@@ -115,8 +115,12 @@ sub addUsersToGroups {
 			unless ($isIn) {
                 		WebGUI::SQL->write("insert into groupings (groupId,userId,expireDate) 
 					values (".quote($gid).", ".quote($uid).", ".(WebGUI::DateTime::time()+$expireOffset).")");
+			} else {
+                        	if ($_[2]) {
+                                	userGroupExpireDate($uid,$gid,(WebGUI::DateTime::time()+$expireOffset));
+                        	}
 			}
-		}
+                }
         }
 }
 

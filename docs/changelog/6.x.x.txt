@@ -76,6 +76,9 @@
    authentication, etc.
  - Merged the forum and USS into a new asset type called the Collaboration
    System with all the best features of each system.
+ - Enhanced the user import script to allow you to update existing accounts,
+   group expirations, etc, in addition to just importing new accounts. (Nick
+   Roberts)
 
 
 

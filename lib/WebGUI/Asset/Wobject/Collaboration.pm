@@ -438,6 +438,11 @@ sub getEditForm {
 			lineage=>"Sequence",
 			dateUpdated=>"Date Updated",
 			dateSubmitted=>"Date Submitted",
+			userDefined1=>"User Defined 1",
+			userDefined2=>"User Defined 2",
+			userDefined3=>"User Defined 3",
+			userDefined4=>"User Defined 4",
+			userDefined5=>"User Defined 5",
 			title=>"Title"
 			},
 		-label=>"Sort By"

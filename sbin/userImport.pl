@@ -42,6 +42,10 @@ my $expireOffset;
 my $expireUnits = 'seconds';
 my $override;
 my $quiet;
+my $update;
+my $updateAdd;
+my $replaceGroups;
+my $canChangePass;
 
 GetOptions(
 	'usersfile=s'=>\$usersFile,
@@ -56,7 +60,11 @@ GetOptions(
 	'status:s'=>\$status,
 	'expireOffset:i'=>\$expireOffset,
 	'expireUnits:s'=>\$expireUnits,
-	'override'=>\$override
+	'override'=>\$override,
+	'update'=>\$update,
+	'updateAdd'=>\$updateAdd,
+	'replaceGroups'=>\$replaceGroups,
+	'canChangePass'=>\$canChangePass
 );
 
 
@@ -80,6 +88,9 @@ Options:
 			each user. Defaults to 'WebGUI'. Can be
 			overridden in the import file.
 
+	--canChangePass	If this flag is set users will be able to change
+			their passwords.  Otherwise not.
+
 	--delimiter	The string that separates each field in the
 			import file. Defaults to tab.
 
@@ -91,11 +102,13 @@ Options:
 
 	--expireUnits	Valid values are "seconds", "minutes",
 			"hours", "days", "weeks", "months", "years",
-			or "epoch". Defaults to "seconds". This is 
+			"epoch", or "fixed". Defaults to "seconds". This is 
 			the units of the expire offset. If set to
 			"epoch" the system will assume that the
 			expire offset is an epoch date rather than
-			an interval.
+			an interval.  If set to "fixed" the 
+			system will assume that the expireDate is
+			a fixed date.
 
 	--groups	A comma separated list of group ids that
 			each user in the import file will be set
@@ -125,6 +138,20 @@ Options:
 
 	--status	The user's account status. Defaults to
 			'Active'. Other valid value is 'Deactivated'.
+	
+	--update	looks up all the users from the file in the database
+				and updates all the given fields for each user that 
+				exists in the database. users that are in the file
+				and not in the database are ignored.
+				
+	--updateAdd	looks up the users from the file in the database
+				and updates all the given fields for each user that
+				exists in the database. users who do not exist in the
+				database are added as new users.
+				
+	--replaceGroups	when updating, if the user already belongs to some group
+					this flag will delete all the user's existing groups and
+					and the new groups to him/her
 
 
 User File Format:
@@ -206,7 +233,7 @@ while(<FILE>) {
     			$i++;
   		}
 
-		# deal with defaults and overrides
+		# deal with defaults and overridescate) = WebGUI::SQL->quickArray("select userid from users where username=".quote($user{username}));
 		if ($user{username} eq "" && $user{firstName} ne "" && $user{lastName} ne "") {
 			$user{username} = $user{firstName}.".".$user{lastName};
 		}
@@ -222,20 +249,67 @@ while(<FILE>) {
 		$user{status} = $status if ($user{status} eq "");
 		$user{expireOffset} = $expireOffset if ($user{expireOffset} eq "");
 		$user{expireOffset} = calculateExpireOffset($user{expireOffset},$expireUnits);
+               if ($user{changePassword} eq "") {
+                       if ($canChangePass) {
+                               $user{changePassword} = 1;
+                       } else {
+                               $user{changePassword} = 0;
+                       }
+               }
 
 		# process user
-		my ($duplicate) = WebGUI::SQL->quickArray("select count(*) from users where username=".quote($user{username}));
-		my ($duplicateId) = WebGUI::SQL->quickArray("select count(*) from users where userId=".quote($user{userId})) if $user{userId};
-  		if ($user{username} eq "") {
-    			print "Skipping line $lineNumber.\n" unless ($quiet);
-		} elsif ($duplicate) {
-			print "User $user{username} already exists. Skipping.\n" unless ($quiet);
-		} elsif ($duplicateId) {
-                        print "ID $user{userId} already exists. Skipping.\n" unless ($quiet);
-		} else {
-    			print "Adding user $user{username}\n" unless ($quiet);
-			my $u = WebGUI::User->new("new", $user{userId});
-			$u->username($user{username});
+               my $u;
+               my $queryHandler;
+       #       my ($duplicate) = WebGUI::SQL->quickArray("select count(*) from users where username=".quote($user{username}));
+               my ($duplicate) = WebGUI::SQL->quickArray("select userid from users where username=".quote($user{username}));
+
+               if ($user{username} eq "") { print "Skipping line $lineNumber.\n" unless ($quiet); }
+               else
+               {
+                       # update only
+                       if ($update)
+                       {
+                               if ($duplicate)
+                               {
+                                       print "Updating user $user{username}\n" unless ($quiet);
+                                       $u = WebGUI::User->new($duplicate);
+                                       if ($replaceGroups and ($user{groups} ne ""))
+                                       {
+                                               $queryHandler = WebGUI::SQL->prepare("delete from groupings where userid=".quote($duplicate));
+                                               if ($queryHandler) { $queryHandler->execute(); }
+                                       }
+                                       my ($pw) = WebGUI::SQL->quickArray("select authentication.fieldData from authentication,users where authentication.authMethod='WebGUI' and users.username=".quote($user{username})." and users.userId=authentication.userId and authentication.fieldName='identifier'");
+                                       $user{identifier} = $pw;
+                               }
+                               else { print "User $user{username} not found. Skipping.\n" unless ($quiet); }
+                       }
+                       elsif ($updateAdd)      # update and add users
+                       {
+                               if ($duplicate)
+                               {
+                                       print "Updating user $user{username}\n" unless ($quiet);
+                                       $u = WebGUI::User->new($duplicate);
+                                       if ($replaceGroups and ($user{groups} ne ""))
+                                       {
+                                               $queryHandler = WebGUI::SQL->prepare("delete from groupings where userid=".quote($duplicate));
+                                               if ($queryHandler) { $queryHandler->execute(); }
+                                       }
+                                       my ($pw) = WebGUI::SQL->quickArray("select authentication.fieldData from authentication,users where authentication.authMethod='WebGUI' and users.username=".quote($user{username})." and users.userId=authentication.userId and authentication.fieldName='identifier'");
+                                       $user{identifier} = $pw;
+                               }
+                               else { $u = WebGUI::User->new("new"); print "Adding user $user{username}\n" unless ($quiet); }
+                       }
+                       else    # add users only
+                       {
+                               if ($duplicate) { print "User $user{username} already exists. Skipping.\n" unless ($quiet); }
+                               else { $u = WebGUI::User->new("new"); print "Adding user $user{username}\n" unless ($quiet); }
+                       }
+               }
+
+               if ($u)
+               {
+               #       my $u = WebGUI::User->new("new");
+ 			$u->username($user{username});
 			$u->authMethod($user{authMethod});
 			$u->status($user{status});
 			my $cmd = "WebGUI::Auth::".$authMethod;
@@ -248,6 +322,7 @@ while(<FILE>) {
 				ldapUrl=>$user{ldapUrl},
 				connectDN=>$user{connectDN}
 				});
+			$auth->saveParams($u->userId,"WebGUI",{changePassword=>$user{changePassword}});
 			foreach (keys %user) {
 				if (isIn($_, @profileFields)) {
 					$u->profileField($_,$user{$_});
@@ -257,7 +332,8 @@ while(<FILE>) {
 				my @groups = split(/,/,$user{groups});
 				$u->addToGroups(\@groups,$user{expireOffset});
 			}
-  		}
+		}
+  		
 	}
 }
 print "Cleaning up..." unless ($quiet);
@@ -274,13 +350,21 @@ sub calculateExpireOffset {
 	my ($offset, $units) = @_;
 	return undef if ($offset < 1);
 	if ($units eq "epoch") {
-		my $seconds = (WebGUI::DateTime::time() - $offset);
+		my $seconds = ($offset);
 		if ($seconds < 1) {
 			return undef;
 		} else {
 			return $seconds;
 		}
 	}
+        if ($units eq "fixed") {
+                my $seconds = (($offset - WebGUI::DateTime::time()));
+                if ($seconds < 1) {
+                        return undef;
+                } else {
+                        return int($seconds);
+                }
+        }
 	return WebGUI::DateTime::intervalToSeconds($offset, $units)
 }
 
