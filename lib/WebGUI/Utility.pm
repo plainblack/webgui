@@ -15,7 +15,14 @@ use strict;
 use Tie::IxHash;
 
 our @ISA = qw(Exporter);
-our @EXPORT = qw(&randomizeArray &sortHashDescending &sortHash &isIn &randint &round);
+our @EXPORT = qw(&commify &randomizeArray &sortHashDescending &sortHash &isIn &randint &round);
+
+#-------------------------------------------------------------------
+sub commify {
+ 	my $text = reverse $_[0];
+ 	$text =~ s/(\d\d\d)(?=\d)(?!\d*\.)/$1,/g;
+ 	return scalar reverse $text;
+}
 
 #-------------------------------------------------------------------
 sub isIn {
