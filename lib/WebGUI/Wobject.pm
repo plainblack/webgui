@@ -63,7 +63,7 @@ These methods are available from this class:
 #-------------------------------------------------------------------
 sub _reorderWobjects {
 	my ($sth, $i, $wid);
-	$sth = WebGUI::SQL->read("select wobjectId from wobject where pageId=$_[0] order by templatePosition,sequenceNumber");
+	$sth = WebGUI::SQL->read("select wobjectId from wobject where pageId=".quote($_[0])." order by templatePosition,sequenceNumber");
 	while (($wid) = $sth->array) {
 		$i++;
 		WebGUI::SQL->write("update wobject set sequenceNumber='$i' where wobjectId=".quote($wid));
@@ -75,7 +75,7 @@ sub _reorderWobjects {
 #-------------------------------------------------------------------
 sub _getNextSequenceNumber {
 	my ($sequenceNumber);
-	($sequenceNumber) = WebGUI::SQL->quickArray("select max(sequenceNumber) from wobject where pageId='$_[0]'");
+	($sequenceNumber) = WebGUI::SQL->quickArray("select max(sequenceNumber) from wobject where pageId=".quote($_[0]));
 	return ($sequenceNumber+1);
 }
 
@@ -239,7 +239,7 @@ sub duplicate {
 	%properties = %{$_[0]->get};
 	$properties{pageId} = $_[1] || 2;
 	$properties{sequenceNumber} = _getNextSequenceNumber($properties{pageId});
-	my $page = WebGUI::SQL->quickHashRef("select groupIdView,ownerId,groupIdEdit from page where pageId=".$properties{pageId});
+	my $page = WebGUI::SQL->quickHashRef("select groupIdView,ownerId,groupIdEdit from page where pageId=".quote($properties{pageId}));
 	$properties{ownerId} = $page->{ownerId};
         $properties{groupIdView} = $page->{groupIdView};
         $properties{groupIdEdit} = $page->{groupIdEdit};
@@ -576,7 +576,7 @@ sub moveCollateralUp {
 	unless (defined $setValue) {
 		$setValue = $_[0]->get($setName);
 	}
-        ($seq) = WebGUI::SQL->quickArray("select sequenceNumber from $_[1] where $_[2]=$_[3] and $setName=".quote($setValue));
+        ($seq) = WebGUI::SQL->quickArray("select sequenceNumber from $_[1] where $_[2]=".quote($_[3])." and $setName=".quote($setValue));
         ($id) = WebGUI::SQL->quickArray("select $_[2] from $_[1] where $setName=".quote($setValue)
 		." and sequenceNumber=$seq-1");
         if ($id ne "") {
@@ -797,7 +797,7 @@ sub new {
 	my %fullProperties;
 	my $extra;
 	unless ($properties->{wobjectId} eq "new") {
-		$extra = WebGUI::SQL->quickHashRef("select * from ".$properties->{namespace}." where wobjectId='".$properties->{wobjectId}."'",WebGUI::SQL->getSlave);
+		$extra = WebGUI::SQL->quickHashRef("select * from ".$properties->{namespace}." where wobjectId=".quote($properties->{wobjectId}),WebGUI::SQL->getSlave);
 	}
         tie %fullProperties, 'Tie::CPHash';
         %fullProperties = (%{$properties},%{$extra});
@@ -876,7 +876,7 @@ sub processTemplate {
 		);
 	if (defined $self->get("_WobjectProxy")) {
 		$vars{isShortcut} = 1;
-		my ($originalPageURL) = WebGUI::SQL->quickArray("select urlizedTitle from page where pageId=".$self->get("pageId"),WebGUI::SQL->getSlave);
+		my ($originalPageURL) = WebGUI::SQL->quickArray("select urlizedTitle from page where pageId=".quote($self->get("pageId")),WebGUI::SQL->getSlave);
 		$vars{originalURL} = WebGUI::URL::gateway($originalPageURL."#".$self->get("wobjectId"));
 	}
 	return WebGUI::Template::process($templateId,$namespace, \%vars);
@@ -894,14 +894,14 @@ NOTE: This method is meant to be extended by all sub-classes.
 
 sub purge {
 	if ($_[0]->get("forumId")) {
-		my ($inUseElsewhere) = WebGUI::SQL->quickArray("select count(*) from wobject where forumId=".$_[0]->get("forumId"));
+		my ($inUseElsewhere) = WebGUI::SQL->quickArray("select count(*) from wobject where forumId=".quote($_[0]->get("forumId")));
                 unless ($inUseElsewhere > 1) {
 			my $forum = WebGUI::Forum->new($_[0]->get("forumId"));
 			$forum->purge;
 		}
 	}
-	WebGUI::SQL->write("delete from ".$_[0]->get("namespace")." where wobjectId=".$_[0]->get("wobjectId"));
-        WebGUI::SQL->write("delete from wobject where wobjectId=".$_[0]->get("wobjectId"));
+	WebGUI::SQL->write("delete from ".$_[0]->get("namespace")." where wobjectId=".quote($_[0]->get("wobjectId")));
+        WebGUI::SQL->write("delete from wobject where wobjectId=".quote($_[0]->get("wobjectId")));
 	WebGUI::MetaData::metaDataDelete($_[0]->get("wobjectId"));
 	my $node = WebGUI::Node->new($_[0]->get("wobjectId"));
 	$node->delete;
@@ -1115,7 +1115,7 @@ sub setCollateral {
 				$sql .= $key."=".quote($properties->{$key});
 			}
 		}
-		$sql .= " where $keyName='".$properties->{$keyName}."'";
+		$sql .= " where $keyName='".quote($properties->{$keyName})."'";
 		WebGUI::ErrorHandler::audit("edited ".$table." ".$properties->{$keyName});
 	}
   	WebGUI::SQL->write($sql);
@@ -1596,8 +1596,8 @@ sub www_moveDown {
 	my ($wid, $thisSeq);
 	my $self = shift;
         if ($self->canEdit) {
-		($thisSeq) = WebGUI::SQL->quickArray("select sequenceNumber from wobject where wobjectId=".$self->get("wobjectId"));
-		($wid) = WebGUI::SQL->quickArray("select wobjectId from wobject where pageId=".$self->get("pageId")
+		($thisSeq) = WebGUI::SQL->quickArray("select sequenceNumber from wobject where wobjectId=".quote($self->get("wobjectId")));
+		($wid) = WebGUI::SQL->quickArray("select wobjectId from wobject where pageId=".quote($self->get("pageId"))
 			." and sequenceNumber=".($thisSeq+1));
 		if ($wid ne "") {
                 	WebGUI::SQL->write("update wobject set sequenceNumber=sequenceNumber+1 where wobjectId=".quote($self->get("wobjectId")));
@@ -1641,8 +1641,8 @@ sub www_moveUp {
 	my $self = shift;
         my ($wid, $thisSeq);
         if ($self->canEdit) {
-                ($thisSeq) = WebGUI::SQL->quickArray("select sequenceNumber from wobject where wobjectId=".$self->get("wobjectId"));
-                ($wid) = WebGUI::SQL->quickArray("select wobjectId from wobject where pageId=".$self->get("pageId")
+                ($thisSeq) = WebGUI::SQL->quickArray("select sequenceNumber from wobject where wobjectId=".quote($self->get("wobjectId")));
+                ($wid) = WebGUI::SQL->quickArray("select wobjectId from wobject where pageId=".quote($self->get("pageId"))
 			." and sequenceNumber=".($thisSeq-1));
                 if ($wid ne "") {
                         WebGUI::SQL->write("update wobject set sequenceNumber=sequenceNumber-1 where wobjectId=".quote($self->get("wobjectId")));
@@ -1667,7 +1667,7 @@ sub www_paste {
 	my $self = shift;
         my ($output, $nextSeq);
         if ($self->canEdit) {
-		($nextSeq) = WebGUI::SQL->quickArray("select max(sequenceNumber) from wobject where pageId=$session{page}{pageId}");
+		($nextSeq) = WebGUI::SQL->quickArray("select max(sequenceNumber) from wobject where pageId=".quote($session{page}{pageId}));
 		$nextSeq += 1;
 		WebGUI::SQL->write("UPDATE wobject SET "
 					."pageId=". $session{page}{pageId} .", "
