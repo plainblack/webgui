@@ -3901,6 +3901,10 @@ Large sites using external group data will be making many calls to the external 
 
 	'830' => {
 		message => q|Page templates are used to organize wobjects on your page. To do this you create page template positions. You can have any number of positions in your page template, but you must always have position one. The following are the variables available to page templates.
+
+<p>
+<b>NOTE:</b> The position elements can go up to 1 billion, which should be more than enough for the average site.
+
 <p>
 
 <b>position<i>X</i>_loop</b><br>
@@ -3916,7 +3920,12 @@ A conditional indicating whether the current user has the privileges to edit thi
 <p>
 
 <b>wobject.controls</b><br>
-The toolbar for manipulating the properties of this wobject.
+The icon toolbar for manipulating the properties of this wobject and for copying, deleting and moving the wobject
+on the page.
+<p>
+
+<b>wobject.controls.drag</b><br>
+The toolbar icon that allows the wobject to be repositioned via a click and drag interface.
 <p>
 
 <b>wobject.namespace</b><br>
@@ -3938,9 +3947,6 @@ The content produced by the wobject.
 </blockquote>
 
 <p>
-<b>NOTE:</b> The position elements can go up to 1 billion, which should be more than enough for the average site.
-
-<p>
 
 <b>page.canEdit</b><br>
 A conditional indicating whether the current user has the privileges to edit this page.
@@ -3953,7 +3959,7 @@ The toolbar for manipulating the properties of the page.
 
 
 |,
-		lastUpdated => 1099613418
+		lastUpdated => 1102027873,
 	},
 
 	'754' => {
