@@ -90,6 +90,7 @@ sub _validateProfileData {
         while (%field = $a->hash) {
 		if ($field{dataType} eq "date") {
 			$data{$field{fieldName}} = WebGUI::DateTime::setToEpoch($session{form}{$field{fieldName}});
+			$session{form}{$field{fieldName}} = $data{$field{fieldName}};
 		} elsif (exists $session{form}{$field{fieldName}}) {
 			$data{$field{fieldName}} = $session{form}{$field{fieldName}};
 		}
@@ -582,6 +583,9 @@ sub www_viewProfile {
 			} else {
 				$value = $u->profileField($data{fieldName});
 			}
+			if ($data{dataType} eq "date") {
+                                $value = WebGUI::DateTime::epochToHuman($value,"%z");
+                        }
 			unless ($data{fieldName} eq "email" and $u->profileField("publicEmail") < 1) {
 				$output .= '<tr><td class="tableHeader">'.$label.'</td><td class="tableData">'.$value.'</td></tr>';
 			}

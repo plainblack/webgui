@@ -86,16 +86,16 @@ sub www_view {
 	unless (defined $rssFile) {
 		$rssFile = $cache->setByHTTP($_[0]->get("rssUrl"),3600);
 	}
-	$rssFile =~ s#(<title>)(.*?)(</title>)#$1.encode_entities(decode_entities($2)).$3#ges; 
-	$rssFile =~ s#(<description>)(.*?)(</description>)#$1.encode_entities(decode_entities($2)).$3#ges; 
+	$rssFile =~ s#(<title>)(.*?)(</title>)#$1.encode_entities_numeric(decode_entities($2)).$3#ges; 
+	$rssFile =~ s#(<description>)(.*?)(</description>)#$1.encode_entities_numeric(decode_entities($2)).$3#ges; 
 	eval{parseRSS(\%rss, \$rssFile)};
 	if ($@) {
 		WebGUI::ErrorHandler::warn($_[0]->get("rssUrl")." ".$@);
 	}
 	my %var;
-	$var{"channel.title"} = $rss{title};
-	$var{"channel.link"} = $rss{link};
-	$var{"channel.description"} = $rss{description};
+	$var{"channel.title"} = $rss{title} || $rss{channel}{title};
+        $var{"channel.link"} = $rss{link} || $rss{channel}{link};
+        $var{"channel.description"} = $rss{description} || $rss{channel}{description};
 	my @items;
         foreach my $item (@{$rss{item}}) {
 		push (@items,{

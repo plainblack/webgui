@@ -7,6 +7,12 @@ upgrading from one version to the next, or even between multiple
 versions. Be sure to heed the warnings contained herein as they will
 save you many hours of grief.
 
+
+5.2.5
+--------------------------------------------------------------------
+ * You'll need to upgrade HTML::Parser to at least version 3.27.
+
+
 5.2.0
 --------------------------------------------------------------------
  * You'll need to add a section to the style sheet of each one of

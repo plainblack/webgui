@@ -144,8 +144,7 @@ sub www_deleteFile {
 
 #-------------------------------------------------------------------
 sub www_deleteSubmission {
-	my ($owner);
-	($owner) = WebGUI::SQL->quickArray("select userId from USS_submission where USS_submissionId=$session{form}{sid}");
+	my ($owner) = WebGUI::SQL->quickArray("select userId from USS_submission where USS_submissionId=$session{form}{sid}");
         if ($owner == $session{user}{userId} || WebGUI::Privilege::isInGroup($_[0]->get("groupToApprove"))) {
 		return $_[0]->confirm(WebGUI::International::get(17,$_[0]->get("namespace")),
 			WebGUI::URL::page('func=deleteSubmissionConfirm&wid='.$session{form}{wid}.'&sid='.$session{form}{sid}));
@@ -156,11 +155,10 @@ sub www_deleteSubmission {
 
 #-------------------------------------------------------------------
 sub www_deleteSubmissionConfirm {
-        my ($output, $owner, $file);
-	($owner) = WebGUI::SQL->quickArray("select userId from USS_submission where USS_submissionId=$session{form}{sid}");
+	my ($owner) = WebGUI::SQL->quickArray("select userId from USS_submission where USS_submissionId=$session{form}{sid}");
         if ($owner == $session{user}{userId} || WebGUI::Privilege::isInGroup($_[0]->get("groupToApprove"))) {
 		$_[0]->deleteCollateral("USS_submission","USS_submissionId",$session{form}{sid});
-		$file = WebGUI::Attachment->new("",$session{form}{wid},$session{form}{sid});
+		my $file = WebGUI::Attachment->new("",$session{form}{wid},$session{form}{sid});
 		$file->deleteNode;
                 return "";
         } else {

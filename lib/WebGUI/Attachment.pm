@@ -261,7 +261,7 @@ sub getIcon {
                 $icon .= "xls.gif";
         } elsif (isIn($extension, qw(zip arj cab))) {
                 $icon .= "zip.gif";
-        } elsif (isIn($extension, qw(mpeg mpg wav mp3 avi))) {
+        } elsif (isIn($extension, qw(mpeg mpg wav mp3 avi m3u))) {
                 $icon .= "wav.gif";
         } elsif (isIn($extension, qw(html htm xml))) {
                 $icon .= "html.gif";

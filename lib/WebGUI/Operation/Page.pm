@@ -246,7 +246,6 @@ sub www_editPage {
 		} else {
 			%page = %{$session{page}};
 			($childCount) = WebGUI::SQL->quickArray("select count(*) from page where parentId=$page{pageId}");
-			$page{hideFromNavigation} = 0;
 		}
 		$page{endDate} = (addToDate(time(),10)) if ($page{endDate} < 0);
                 $output = helpIcon(1);

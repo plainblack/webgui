@@ -114,19 +114,13 @@ A comparison expression to be used when checking whether the action should be al
 =cut
 
 sub confirm {
-        my ($output, $noURL);
-        if ($_[4]) {
-                return WebGUI::Privilege::vitalComponent();
-        } elsif (WebGUI::Privilege::canEditPage()) {
-		$noURL = $_[3] || WebGUI::URL::page();
-                $output = '<h1>'.WebGUI::International::get(42).'</h1>';
-                $output .= $_[1].'<p>';
-                $output .= '<div align="center"><a href="'.$_[2].'">'.WebGUI::International::get(44).'</a>';
-                $output .= ' &nbsp; <a href="'.$noURL.'">'.WebGUI::International::get(45).'</a></div>';
-                return $output;
-        } else {
-                return WebGUI::Privilege::insufficient();
-        }
+        return WebGUI::Privilege::vitalComponent() if ($_[4]);
+	my $noURL = $_[3] || WebGUI::URL::page();
+        my $output = '<h1>'.WebGUI::International::get(42).'</h1>';
+        $output .= $_[1].'<p>';
+        $output .= '<div align="center"><a href="'.$_[2].'">'.WebGUI::International::get(44).'</a>';
+        $output .= ' &nbsp; <a href="'.$noURL.'">'.WebGUI::International::get(45).'</a></div>';
+        return $output;
 }
 
 

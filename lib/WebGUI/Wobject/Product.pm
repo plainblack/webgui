@@ -189,6 +189,7 @@ sub www_addRelatedSave {
 
 #-------------------------------------------------------------------
 sub www_deleteAccessory {
+	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
         return $_[0]->confirm(
                 WebGUI::International::get(2,$_[0]->get("namespace")),
 		WebGUI::URL::page('func=deleteAccessoryConfirm&wid='.$_[0]->get("wobjectId").'&aid='.$session{form}{aid})
@@ -205,6 +206,7 @@ sub www_deleteAccessoryConfirm {
 
 #-------------------------------------------------------------------
 sub www_deleteBenefit {
+	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
         return $_[0]->confirm(
                 WebGUI::International::get(48,$_[0]->get("namespace")),
 		WebGUI::URL::page('func=deleteBenefitConfirm&wid='.$_[0]->get("wobjectId").'&bid='.$session{form}{bid})
@@ -221,6 +223,7 @@ sub www_deleteBenefitConfirm {
 
 #-------------------------------------------------------------------
 sub www_deleteFeature {
+	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
 	return $_[0]->confirm(
 		WebGUI::International::get(3,$_[0]->get("namespace")),
 		WebGUI::URL::page('func=deleteFeatureConfirm&wid='.$_[0]->get("wobjectId").'&fid='.$session{form}{fid})
@@ -237,6 +240,7 @@ sub www_deleteFeatureConfirm {
 
 #-------------------------------------------------------------------
 sub www_deleteRelated {
+	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
         return $_[0]->confirm(
                 WebGUI::International::get(4,$_[0]->get("namespace")),
 		WebGUI::URL::page('func=deleteRelatedConfirm&wid='.$_[0]->get("wobjectId").'&rid='.$session{form}{rid})
@@ -253,6 +257,7 @@ sub www_deleteRelatedConfirm {
 
 #-------------------------------------------------------------------
 sub www_deleteSpecification {
+	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
         return $_[0]->confirm(
                 WebGUI::International::get(5,$_[0]->get("namespace")),
 		WebGUI::URL::page('func=deleteSpecificationConfirm&wid='.$_[0]->get("wobjectId").'&sid='.$session{form}{sid})

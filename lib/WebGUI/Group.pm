@@ -347,7 +347,7 @@ sub karmaThreshold {
                 WebGUI::SQL->write("update groups set karmaThreshold=".quote($value).",
                         lastUpdated=".time()." where groupId=$class->{_groupId}");
         }
-        return $class->{_group}{"karamThreshold"};
+        return $class->{_group}{"karmaThreshold"};
 }
 
 

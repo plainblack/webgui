@@ -111,7 +111,7 @@ sub registrationFormSave {
 	$ldap->bind;
 	my $search = $ldap->search (base => $uri->dn, filter => $session{setting}{ldapId}."=".$session{form}{'authLDAP.ldapId'});
 	if (defined $search->entry(0)) {
-		$connectDN = "cn=".$search->entry(0)->get_value("cn");
+		$connectDN = $search->entry(0)->get_value("cn");
 	}
 	$ldap->unbind;
 	WebGUI::Authentication::saveParams($uid,'LDAP',
@@ -129,7 +129,7 @@ sub registrationFormValidate {
         	if ($ldap->bind) {
         		$search = $ldap->search (base=>$uri->dn,filter=>$session{setting}{ldapId}."=".$session{form}{'authLDAP.ldapId'});
         		if (defined $search->entry(0)) {
-                		$connectDN = "cn=".$search->entry(0)->get_value("cn");
+                		$connectDN = $search->entry(0)->get_value("cn");
                 		$ldap->unbind;
                 		$ldap = Net::LDAP->new($uri->host, (port=>$uri->port)) or $error .= WebGUI::International::get(2,'Auth/LDAP');
                 		$auth = $ldap->bind(dn=>$connectDN, password=>$session{form}{'authLDAP.ldapPassword'});

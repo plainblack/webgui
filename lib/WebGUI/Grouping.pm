@@ -283,7 +283,7 @@ sub getUsersInGroup {
 	if ($_[1]) {
 		my $groups = getGroupsInGroup($_[0],1);
 		if ($#$groups >= 0) {
-			$clause = "groupId in (".join(",",@$groups).")";
+			$clause .= " or groupId in (".join(",",@$groups).")";
 		}
 	}
        	return WebGUI::SQL->buildArrayRef("select userId from groupings where $clause");

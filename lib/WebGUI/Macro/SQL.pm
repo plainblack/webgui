@@ -20,8 +20,10 @@ sub process {
 	my ($output, @data, $rownum, $temp);
 	my ($statement, $format) = WebGUI::Macro::getParams(shift);
 	$format = '^0;' if ($format eq "");
-	my $result = eval {
-		my $sth = WebGUI::SQL->new($statement,$session{dbh});
+	my $sth = WebGUI::SQL->unconditionalRead($statement);
+	unless ($sth->errorCode < 1) { 
+		return '<p><b>SQL Macro Failed:</b> '.$sth->errorMessage.'<p>';
+	} else {
 		while (@data = $sth->array) {
                 	$temp = $format; 
                         $temp =~ s/\^(\d+)\;/$data[$1]/g; 
@@ -30,10 +32,6 @@ sub process {
 			$output .= $temp;
                 }
 		$sth->finish;
-	};
-	if ($@) {
-		return '<p><b>SQL Macro Failed:</b> '.$@.'<p>';
-	} else {
 		return $output;
 	}
 }

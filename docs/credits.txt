@@ -38,6 +38,7 @@ Contributing Translators.............AGOFER Ltda.
                                      Andreas Graf
                                      Emiliano Grilli / Webopen
                                      Ehab Heikal
+                                     Markus Hynna
                                      Bart Jol / ProcoliX
                                      Mattias Kunkel / WERU AG
                                      Nils-Magne Kvammen
@@ -47,6 +48,7 @@ Contributing Translators.............AGOFER Ltda.
                                      orosor@yahoo.com.tw
                                      Paolo Pigati / Webopen
                                      Michael Ugilt
+                                     Michael Westlund
                                      Zhou Xiaopeng
 
 
