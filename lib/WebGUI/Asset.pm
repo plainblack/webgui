@@ -44,10 +44,8 @@ Package to manipulate items in WebGUI's asset system. Replaces Collateral.
 
 An asset is the basic class of content in WebGUI. This handles security, urls, and other basic information common to all content items.
 
-
 A lineage is a concatenated series of sequence numbers, each six digits long, that explain an asset's position in its familiy tree. Lineage describes who the asset's anscestors are, how many ancestors the asset has in its family tree (lineage length), and the asset's position (rank) amongst its siblings. In addition, lineage provides enough information about an asset to generate a list of its siblings and descendants.
  
-
  use WebGUI::Asset;
 
  addChild
@@ -61,8 +59,10 @@ A lineage is a concatenated series of sequence numbers, each six digits long, th
  duplicate
  fixUrl
  formatRank
+ get
  getAdminConsole
  getAssetAdderLinks
+ getAssetManagerControl
  getEditForm
  getFirstChild
  getIcon
@@ -76,6 +76,7 @@ A lineage is a concatenated series of sequence numbers, each six digits long, th
  getParent
  getParentLineage
  getRank
+ getToolbar
  getUiLevel
  getUrl
  getValue
@@ -90,7 +91,7 @@ A lineage is a concatenated series of sequence numbers, each six digits long, th
  processPropertiesFromFormPost
  promote
  purge
- purgetree
+ purgeTree
  setParent
  setRank
  setSize
@@ -507,7 +508,7 @@ sub getAssetAdderLinks {
 
 =head2 getAssetManagerControl ( children )
 
-
+Returns HTML code for the Asset Manager Control Page. English only.
 
 =cut
 
@@ -782,7 +783,7 @@ Returns an array of lineages of relatives based upon rules.
 
 =head3 relatives
 
-Valid parameters are "siblings", "ancestors", "self", "descendants", "pedigree"
+Square bracketed, comma separated list, quoted entries; eg ["siblings"] or ["self","ancestors"].Valid parameters are "siblings", "ancestors", "self", "descendants", "pedigree"
 
 =head3 rules
 
@@ -1150,13 +1151,13 @@ sub new {
 
 #-------------------------------------------------------------------
 
-=head2 newByDynamicClass ( class,assetId [,className,overrideProperties] )
+=head2 newByDynamicClass ( assetId,className [,overrideProperties] )
 
-Constructor. This does not create an asset. 
+Returns an Asset object.
 
-=head3 assetId
+=head3 className
 
-The assetId of the asset you're creating an object reference for. Must not be blank. If specified as "new" then the object properties returns an assetId of new.
+String of class to use. 
 
 =head3 overrideProperties
 
@@ -1186,12 +1187,36 @@ sub newByDynamicClass {
 }
 
 
+#-------------------------------------------------------------------
+
+=head2 newByLineage ( lineage )
+
+Returns an Asset object based upon given lineage.
+
+=head3 lineage
+
+Lineage string.
+
+=cut
+
 sub newByLineage {
 	my $class = shift;
         my $lineage = shift;
         my $asset = WebGUI::SQL->quickHashRef("select assetId, className from asset where lineage=".quote($lineage));
 	return WebGUI::Asset->newByDynamicClass($asset->{assetId}, $asset->{className});
 }
+
+#-------------------------------------------------------------------
+
+=head2 newByPropertyHashRef ( properties )
+
+Constructor. 
+
+=head3 properties
+
+A Properties Hash Ref.
+
+=cut
 
 sub newByPropertyHashRef {
 	my $class = shift;
@@ -1202,6 +1227,18 @@ sub newByPropertyHashRef {
         WebGUI::ErrorHandler::fatalError("Couldn't compile asset package: ".$className.". Root cause: ".$@) if ($@);
 	bless {_properties => $properties}, $className;
 }
+
+#-------------------------------------------------------------------
+
+=head2 newByUrl ( url )
+
+Returns a new Asset object based upon current url, given url or defaultPage.
+
+=head3 url
+
+String representing a URL. 
+
+=cut
 
 sub newByUrl {
 	my $class = shift;
@@ -1219,12 +1256,31 @@ sub newByUrl {
         return $class->newByDynamicClass($session{setting}{defaultPage});
 }
 
+#-------------------------------------------------------------------
+
+=head2 republish ( )
+
+Sets Asset properties state to published.
+
+=cut
 
 sub republish {
 	my $self = shift;
 	WebGUI::SQL->write("update asset set state='published' where lineage like ".quote($self->get("lineage").'%'));
 	$self->{_properties}{state} = "published";
 }
+
+#-------------------------------------------------------------------
+
+=head2 paste ( assetId )
+
+Returns 1 if can paste to a Parent. Sets the Asset to published. Otherwise returns 0.
+
+=head3 assetId
+
+Alphanumeric ID tag of Asset.
+
+=cut
 
 sub paste {
 	my $self = shift;
@@ -1237,6 +1293,14 @@ sub paste {
 	}
 	return 0;
 }
+
+#-------------------------------------------------------------------
+
+=head2 processPropertiesFromFormPost ( )
+
+Updates current Asset with data from Form.
+
+=cut
 
 sub processPropertiesFromFormPost {
 	my $self = shift;
@@ -1256,6 +1320,14 @@ sub processPropertiesFromFormPost {
 	$self->update(\%data);
 }
 
+#-------------------------------------------------------------------
+
+=head2 promote ( )
+
+Keeps the same rank of lineage, swaps with sister above.
+
+=cut
+
 sub promote {
 	my $self = shift;
 	my ($sisterLineage) = WebGUI::SQL->quickArray("select max(lineage) from asset 
@@ -1268,6 +1340,14 @@ sub promote {
 	}
 	return 0;
 }
+
+#-------------------------------------------------------------------
+
+=head2 purge ( )
+
+Returns 1. Deletes an asset from tables and removes anything bound to that asset.
+
+=cut
 
 sub purge {
 	my $self = shift;
@@ -1288,6 +1368,14 @@ sub purge {
 	$self = undef;
 	return 1;
 }
+
+#-------------------------------------------------------------------
+
+=head2 purgeTree ( )
+
+Updates current Asset with data from Form.
+
+=cut
 
 sub purgeTree {
 	my $self = shift;
