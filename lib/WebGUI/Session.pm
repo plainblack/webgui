@@ -338,6 +338,9 @@ sub open {
 	foreach ($session{cgi}->param) {
 		$session{form}{$_} = $session{cgi}->param($_);
 	}
+	foreach ($session{cgi}->url_param) {
+		$session{form}{$_} = $session{cgi}->url_param($_) unless (defined $session{form}{$_});
+	} 
 	###----------------------------
 	### cookies
 	foreach ($session{cgi}->cookie) {
