@@ -29,21 +29,6 @@ sub page {
 	my ($debug, %contentHash, $w, $cmd, $pageEdit, $wobject, $wobjectOutput, $extra, $originalWobject, $proxyWobjectId,
 		$sth, $httpHeader, $header, $footer, $content, $operationOutput, $adminBar, %hash);
 	WebGUI::Session::open($_[0],$_[1]);
-	if ($session{form}{debug}==1 && WebGUI::Privilege::isInGroup(3)) {
-		$debug = '<table bgcolor="#ffffff" style="color: #000000; font-size: 10pt; font-family: helvetica;">';
-		while (my ($section, $hash) = each %session) {
-			while (my ($key, $value) = each %$hash) {
-				if (ref $value eq 'ARRAY') {
-					$value = '['.join(', ',@$value).']';
-				} elsif (ref $value eq 'HASH') {
-					$value = '{'.join(', ',map {"$_ => $value->{$_}"} keys %$value).'}';
-				}
-				$debug .= '<tr><td align="right"><b>'.$section.'.'.$key.':</b></td><td>'.$value.'</td>';
-			}
-			$debug .= '<tr height=10><td>&nbsp;</td><td>&nbsp</td></tr>';
-		}
-		$debug .='</table>';
-	}
 	if (exists $session{form}{op}) {
 		$cmd = "WebGUI::Operation::www_".$session{form}{op};
 		$operationOutput = eval($cmd);
@@ -55,11 +40,13 @@ sub page {
 		} else {
 			$wobject = WebGUI::SQL->quickHashRef("select * from wobject where wobjectId=".$session{form}{wid});	
 			if (${$wobject}{namespace} eq "") {
-				WebGUI::ErrorHandler::warn("Wobject [$session{form}{wid}] appears to be missing or corrupt, but was requested "
+				WebGUI::ErrorHandler::warn("Wobject [$session{form}{wid}] appears to be missing or "
+					."corrupt, but was requested "
 					."by $session{user}{username} [$session{user}{userId}].");
 				$wobject = ();
 			} else {
-				$extra = WebGUI::SQL->quickHashRef("select * from ${$wobject}{namespace} where wobjectId=${$wobject}{wobjectId}");
+				$extra = WebGUI::SQL->quickHashRef("select * from ${$wobject}{namespace} 
+					where wobjectId=${$wobject}{wobjectId}");
                         	tie %hash, 'Tie::CPHash';
                         	%hash = (%{$wobject},%{$extra});
                          	$wobject = \%hash;
@@ -68,21 +55,24 @@ sub page {
 		if ($wobject) {
                         if (${$wobject}{pageId} != $session{page}{pageId}) {
                                 ($proxyWobjectId) = WebGUI::SQL->quickArray("select wobject.wobjectId from wobject,WobjectProxy 
-                                        where wobject.wobjectId=WobjectProxy.wobjectId and wobject.pageId=".$session{page}{pageId}."
+                                        where wobject.wobjectId=WobjectProxy.wobjectId 
+					and wobject.pageId=".$session{page}{pageId}."
                                         and WobjectProxy.proxiedWobjectId=".${$wobject}{wobjectId});
                                 ${$wobject}{_WobjectProxy} = $proxyWobjectId;
                         } 
 			unless (${$wobject}{pageId} == $session{page}{pageId} || ${$wobject}{pageId} == 2 || ${$wobject}{_WobjectProxy} ne "") {
 				$wobjectOutput .= WebGUI::International::get(417);
-				WebGUI::ErrorHandler::warn($session{user}{username}." [".$session{user}{userId}."] attempted to access wobject ["
-					.$session{form}{wid}."] on page '".$session{page}{title}."' [".$session{page}{pageId}."].");
+				WebGUI::ErrorHandler::warn($session{user}{username}." [".$session{user}{userId}
+					."] attempted to access wobject ["
+					.$session{form}{wid}."] on page '".$session{page}{title}."' ["
+					.$session{page}{pageId}."].");
 			} else {
 				$cmd = "WebGUI::Wobject::".${$wobject}{namespace};
 				$w = eval{$cmd->new($wobject)};
-				WebGUI::ErrorHandler::fatalError("Couldn't instanciate wojbect: ${$wobject}{namespace}.") if($@);
+				WebGUI::ErrorHandler::fatalError("Couldn't instanciate wojbect: ${$wobject}{namespace}. Root Cause: ".$@) if($@);
 				$cmd = "www_".$session{form}{func};
 				$wobjectOutput = eval{$w->$cmd};
-				WebGUI::ErrorHandler::fatalError("Web method doesn't exist in wojbect: ${$wobject}{namespace} / $session{form}{func}.") if($@);
+				WebGUI::ErrorHandler::fatalError("Web method doesn't exist in wojbect: ${$wobject}{namespace} / $session{form}{func}. Root Cause: ".$@) if($@);
 			}
 		}
 	}
@@ -135,12 +125,12 @@ sub page {
 				$wobject = \%hash;
 				$cmd = "WebGUI::Wobject::".${$wobject}{namespace};
 				$w = eval{$cmd->new($wobject)};
-				WebGUI::ErrorHandler::fatalError("Couldn't instanciate wojbect: ${$wobject}{namespace}.") if($@);
+				WebGUI::ErrorHandler::fatalError("Couldn't instanciate wojbect: ${$wobject}{namespace}. Root cause: ".$@) if($@);
 				if ($w->inDateRange) {
 					$contentHash{${$wobject}{templatePosition}} .= '<div class="wobject'.${$wobject}{namespace}.'" id="wobjectId'.${$wobject}{wobjectId}.'">';
 					$contentHash{${$wobject}{templatePosition}} .= '<a name="'.${$wobject}{wobjectId}.'"></a>';
 					$contentHash{${$wobject}{templatePosition}} .= eval{$w->www_view};
-					WebGUI::ErrorHandler::fatalError("No view method in wojbect: ${$wobject}{namespace}.") if($@);
+					WebGUI::ErrorHandler::fatalError("No view method in wojbect: ${$wobject}{namespace}. Root cause: ".$@) if($@);
 					$contentHash{${$wobject}{templatePosition}} .= "</div>\n\n";
 				}
 			}
@@ -150,6 +140,23 @@ sub page {
 			$contentHash{0} = WebGUI::Privilege::noAccess();
 			$content = WebGUI::Template::generate(\%contentHash,1);
 		}
+	}
+        if ($session{setting}{showDebug} || ($session{form}{debug}==1 && WebGUI::Privilege::isInGroup(3))) {
+		$debug = '<div style="background-color: #ffdddd;color: #000000;">'
+			.$session{debug}{warning}.'</div>';
+                $debug .= '<table bgcolor="#ffffff" style="color: #000000; font-size: 10pt; font-family: helvetica;">';
+                while (my ($section, $hash) = each %session) {
+                        while (my ($key, $value) = each %$hash) {
+                                if (ref $value eq 'ARRAY') {
+                                        $value = '['.join(', ',@$value).']';
+                                } elsif (ref $value eq 'HASH') {
+                                        $value = '{'.join(', ',map {"$_ => $value->{$_}"} keys %$value).'}';
+                                }
+                                $debug .= '<tr><td align="right"><b>'.$section.'.'.$key.':</b></td><td>'.$value.'</td>';
+                        }
+                        $debug .= '<tr height=10><td>&nbsp;</td><td>&nbsp</td></tr>';
+                }
+                $debug .='</table>';
 	}
 	if ($session{header}{redirect} ne "") {
 		return $session{header}{redirect};

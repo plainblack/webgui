@@ -84,6 +84,7 @@ sub warn {
         }
         $log = FileHandle->new(">>".$logfile) or fatalError("Can't open log file for warning.");
         print $log localtime(time)." ".$0." WARNING: ".$_[0]."\n";
+        $session{debug}{warning} .= localtime(time)." ".$0." WARNING: ".$_[0]."<p>";
 	$log->close;
 }
 

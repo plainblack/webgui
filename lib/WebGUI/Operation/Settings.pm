@@ -210,6 +210,7 @@ sub www_editMiscSettings {
 		$f = WebGUI::HTMLForm->new;
                 $f->hidden("op","editMiscSettingsSave");
 		$f->yesNo("preventProxyCache",WebGUI::International::get(400),$session{setting}{preventProxyCache});
+		$f->yesNo("showDebug",WebGUI::International::get(707),$session{setting}{showDebug});
 		$f->select("onCriticalError",\%criticalError,WebGUI::International::get(413),[$session{setting}{onCriticalError}]);
 		$f->submit;
 		$output .= $f->print;
@@ -223,6 +224,7 @@ sub www_editMiscSettings {
 sub www_editMiscSettingsSave {
         if (WebGUI::Privilege::isInGroup(3)) {
 		_saveSetting("preventProxyCache");
+		_saveSetting("showDebug");
 		_saveSetting("onCriticalError");
                 return www_manageSettings(); 
         } else {

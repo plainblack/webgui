@@ -27,8 +27,8 @@ insert into international values (76,'EventsCalendar',1,'Delete only this event.
 insert into international values (77,'EventsCalendar',1,'Delete this event <b>and</b> all of its recurrences.');
 insert into international values (78,'EventsCalendar',1,'Don\'t delete anything, I made a mistake.');
 update wobject set editTimeout=editTimeout*3600;
-
-
+insert into international values (707,"WebGUI",1,"Show debugging?");
+insert into settings values ('showDebug',0);
 
 
 
