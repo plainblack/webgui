@@ -138,7 +138,7 @@ sub www_view {
 		$var{"image.url"} = $file->getURL;
 		$var{"image.thumbnail"} = $file->getThumbnail;
 	}
-        $var{description} = $_[0]->description;
+        $var{description} = $_[0]->get("description");
 	if ($_[0]->get("convertCarriageReturns")) {
 		$var{description} =~ s/\n/\<br\>/g;
 	}
