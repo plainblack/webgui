@@ -11,6 +11,7 @@
  - Fixed a timing bug in the run hourly script
  - Bugfix [ 903064 ] article won't display after edit
  - Bugfix [ 903063 ] weird url cause page to break
+ - Bugfix [ 889761 ] Editing Page/Wobject Settings Crashes Netscape 4
 
 
 5.5.4
