@@ -40,16 +40,17 @@ use WebGUI::Utility;
 
  use WebGUI::Attachment;
  $attachment = WebGUI::Attachment->new("file.txt","100","20");
+ $html = 	$attachment->box;
+ $string = 	$attachment->getFilename;
+ $url = 	$attachment->getIcon;
+ $string = 	$attachment->getPath;
+ $integer = 	$attachment->getSize;
+ $url = 	$attachment->getThumbnail;
+ $string = 	$attachment->getType;
+ $url = 	$attachment->getURL;
  $attachment->copy("files","10");
  $attachment->delete;
  $attachment->deleteNode;
- $attachment->getFilename;
- $attachment->getIcon;
- $attachment->getPath;
- $attachment->getSize;
- $attachment->getThumbnail;
- $attachment->getType;
- $attachment->getURL;
  $attachment->rename("thisfile.txt");
  $attachment->save("formImage");
 
@@ -84,6 +85,26 @@ sub _createThumbnail {
 	}
 }
 
+
+#-------------------------------------------------------------------
+
+=head2 box ( )
+
+ Displays the attachment in WebGUI's standard "Attachment Box".
+
+=cut
+
+sub box {
+        my ($output);
+        $output = '<p><table cellpadding=3 cellspacing=0 border=1><tr><td class="tableHeader">'.
+                '<a href="'.$_[0]->getURL.'"><img src="'.$session{setting}{lib}.
+                '/attachment.gif" border=0 alt="'.
+                $_[0]->getFilename.'"></a></td><td><a href="'.$_[0]->getURL.
+                '"><img src="'.$_[0]->getIcon.
+                '" align="middle" width="16" height="16" border="0" alt="'.$_[0]->getFilename
+                .'">'.$_[0]->getFilename.'</a></td></tr></table>';
+        return $output;
+}
 
 #-------------------------------------------------------------------
 

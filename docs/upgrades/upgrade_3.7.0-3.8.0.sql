@@ -60,7 +60,7 @@ insert into wobject (wobjectId, pageId, title, displayTitle, processMacros, desc
 delete from widget where namespace='DownloadManager';
 alter table DownloadManager change widgetId wobjectId int not null;
 alter table DownloadManager_file change widgetId wobjectId int not null;
-delete from International where helpId=13 and namespace='DownloadManager';
+delete from International where internationalId=13 and namespace='DownloadManager';
 INSERT INTO international VALUES (22,'DownloadManager','English','Proceed to add download?');
 
 insert into wobject (wobjectId, pageId, title, displayTitle, processMacros, description, dateAdded, addedBy, namespace, lastEdited, editedBy, templatePosition, sequenceNumber, startDate, endDate) select widgetId, pageId, title, displayTitle, processMacros, description, dateAdded, addedBy, namespace, lastEdited, editedBy, templatePosition, sequenceNumber, dateAdded, 1336444487 from widget where namespace='MessageBoard';
@@ -72,7 +72,35 @@ insert into wobject (wobjectId, pageId, title, displayTitle, processMacros, desc
 delete from widget where namespace='ExtraColumn';
 alter table ExtraColumn change widgetId wobjectId int not null;
 
+alter table wobject change description description mediumtext;
 
+insert into wobject (wobjectId, pageId, title, displayTitle, processMacros, description, dateAdded, addedBy, namespace, lastEdited, editedBy, templatePosition, sequenceNumber, startDate, endDate) select widget.widgetId, widget.pageId, widget.title, widget.displayTitle, widget.processMacros, Article.body, widget.dateAdded, widget.addedBy, widget.namespace, widget.lastEdited, widget.editedBy, widget.templatePosition, widget.sequenceNumber, Article.startDate, Article.endDate from widget,Article where widget.widgetId=Article.widgetId;
+delete from widget where namespace='Article';
+alter table Article change widgetId wobjectId int not null;
+alter table Article drop column startDate;
+alter table Article drop column endDate;
+alter table Article drop column body;
+delete from international where internationalId=2 and namespace='Article';
+delete from international where internationalId=5 and namespace='Article';
+update international set message='(Select \"Yes\" only if you aren\'t adding &lt;br&gt; manually.)' where internationalId='11' and namespace='Article' and language='English';
+
+delete from international where internationalId=1 and namespace='MessageBoard';
+delete from international where internationalId=1 and namespace='SiteMap';
+delete from international where internationalId=2 and namespace='Article';
+delete from international where internationalId=2 and namespace='ExtraColumn';
+delete from international where internationalId=2 and namespace='Poll';
+delete from international where internationalId=2 and namespace='SQLReport';
+delete from international where internationalId=3 and namespace='EventsCalendar';
+delete from international where internationalId=3 and namespace='FAQ';
+delete from international where internationalId=3 and namespace='SyndicatedContent';
+delete from international where internationalId=4 and namespace='FAQ';
+delete from international where internationalId=7 and namespace='EventsCalendar';
+delete from international where internationalId=7 and namespace='LinkList';
+delete from international where internationalId=11 and namespace='LinkList';
+delete from international where internationalId=11 and namespace='UserSubmission';
+delete from international where internationalId=30 and namespace='UserSubmission';
+delete from international where internationalId=2 and namespace='DownloadManager';
+delete from international where internationalId=4 and namespace='DownloadManager';
 
 delete from international where language='Svenska';
 INSERT INTO international VALUES (367,'WebGUI','Svenska','Bäst före'); 
