@@ -1294,7 +1294,7 @@ sub www_edit {
 	my $self = shift;
 	return WebGUI::Privilege::insufficient() unless ($self->canEdit);
 	$session{page}{useAdminStyle} = 1;
-	my ($self, @p) = @_;
+	my (@p) = @_;
         my ($properties, $layout, $privileges, $heading, $helpId, $headingId) = 
 		rearrange([qw(properties layout privileges heading helpId headingId)], @p);
         my ($f, $startDate, $displayTitle, $templatePosition, $endDate);
