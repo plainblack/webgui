@@ -296,7 +296,10 @@ sub getWobjectByCriteria {
 	my $order = $wobjectProxy->{resolveMultiples};
 	my $namespace = $wobjectProxy->{proxiedNamespace};
 	my $wobjectId = $wobjectProxy->{wobjectId};
-	
+
+	# Parse macro's in criteria
+	$criteria = WebGUI::Macro::process($criteria);
+
 	# Once a wobject is found, we will stick to that wobject, 
 	# to prevent the proxying of multiple- depth wobjects like Surveys and USS.
 	my $scratchId;
@@ -332,10 +335,10 @@ sub getWobjectByCriteria {
 
 		# quote the field / value variables.
 		my $quotedField = $field;
+		my $quotedValue = $value;
 		unless ($field =~ /^\s*['"].*['"]\s*/) {
 			$quotedField = quote($field);
 		}
-		my $quotedValue = WebGUI::Macro::process($value);
                 unless ($value =~ /^\s*['"].*['"]\s*/) {
                         $quotedValue = quote($value);
                 }
