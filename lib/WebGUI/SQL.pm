@@ -266,20 +266,21 @@ sub errorMessage {
 
 #-------------------------------------------------------------------
 
-=head2 execute ( values )
+=head2 execute ( [ placeholders ] )
 
 Executes a prepared SQL statement.
 
-=head3 values
+=head3 placeholders 
 
-A list of values to be used in the placeholders defined in the prepared statement.
+An array reference containing a list of values to be used in the placeholders defined in the SQL statement.
 
 =cut
 
 sub execute {
 	my $self = shift;
-	my $sql = shift;
-	$self->{_sth}->execute or WebGUI::ErrorHandler::fatalError("Couldn't execute prepared statement: $sql   Root cause: ". DBI->errstr);
+	my $placeholders = shift || [];
+	my $sql = $self->{_sql};
+	$self->{_sth}->execute(@$placeholders) or WebGUI::ErrorHandler::fatalError("Couldn't execute prepared statement: $sql  Root cause: ". DBI->errstr);
 }
 
 
@@ -306,7 +307,7 @@ Returns an array of column names. Use with a "read" method.
 =cut
 
 sub getColumnNames {
-        return @{$_[0]->{_sth}->{NAME}};
+        return @{$_[0]->{_sth}->{NAME}} if (ref $_[0]->{_sth}->{NAME} eq 'ARRAY');
 }
 
 
@@ -444,7 +445,7 @@ sub prepare {
 		push(@{$WebGUI::Session::session{SQLquery}},$sql);
 	}
         my $sth = $dbh->prepare($sql) or WebGUI::ErrorHandler::fatalError("Couldn't prepare statement: ".$sql." : ". DBI->errstr);
-	bless ({_sth => $sth}, $class);
+	bless ({_sth => $sth, _sql => $sql}, $class);
 }
 
 
@@ -644,17 +645,21 @@ sub quoteAndJoin {
 
 #-------------------------------------------------------------------
 
-=head2 read ( sql [, dbh ] )
+=head2 read ( sql [, dbh, placeholders ] )
 
 Returns a statement handler. This is a utility method that runs both a prepare and execute all in one.
 
 =head3 sql
 
-An SQL query.
+An SQL query. Can use the "?" placeholder for maximum performance on multiple statements with the execute method.
 
 =head3 dbh
 
 By default this method uses the WebGUI database handler. However, you may choose to pass in your own if you wish.
+
+=head3 placeholders
+
+An array reference containing a list of values to be used in the placeholders defined in the SQL statement.
 
 =cut
 
@@ -662,8 +667,9 @@ sub read {
 	my $class = shift;
 	my $sql = shift;
 	my $dbh = shift;
+	my $placeholders = shift;
 	my $sth = WebGUI::SQL->prepare($sql, $dbh);
-	$sth->execute($sql);
+	$sth->execute($placeholders);
 	return $sth;
 }
 
@@ -745,7 +751,7 @@ sub setRow {
 
 #-------------------------------------------------------------------
 
-=head2 unconditionalRead ( sql [, dbh ] )
+=head2 unconditionalRead ( sql [, dbh, placeholders ] )
 
 An alias of the "read" method except that it will not cause a fatal error in WebGUI if the query is invalid. This is useful for user generated queries such as those in the SQL Report. Returns a statement handler.
 
@@ -757,19 +763,24 @@ An SQL query.
 
 By default this method uses the WebGUI database handler. However, you may choose to pass in your own if you wish.
 
+=head3 placeholders
+
+An array reference containing a list of values to be used in the placeholders defined in the SQL statement.
+
 =cut
 
 sub unconditionalRead {
 	my $class = shift;
 	my $sql = shift;
 	my $dbh = shift || _getDefaultDb();
+	my $placeholders = shift;
 	if ($WebGUI::Session::session{setting}{showDebug}) {
 		push(@{$WebGUI::Session::session{SQLquery}},$sql);
 	}
         my $sth = $dbh->prepare($sql) or WebGUI::ErrorHandler::warn("Unconditional read failed: ".$sql." : ".DBI->errstr);
         if ($sth) {
-        	$sth->execute or WebGUI::ErrorHandler::warn("Unconditional read failed: ".$sql." : ".DBI->errstr);
-        	bless ({_sth => $sth}, $class);
+        	$sth->execute(@$placeholders) or WebGUI::ErrorHandler::warn("Unconditional read failed: ".$sql." : ".DBI->errstr);
+        	bless ({_sth => $sth} , $class);
         }       
 }
 

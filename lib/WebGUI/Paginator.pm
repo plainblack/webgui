@@ -477,7 +477,7 @@ sub setDataByArrayRef {
 
 #-------------------------------------------------------------------
 
-=head2 setDataByQuery ( query [, dbh, unconditional ] )
+=head2 setDataByQuery ( query [, dbh, unconditional, placeholders ] )
 
 Retrieves a data set from a database and replaces whatever data set was passed in through the constructor.
 
@@ -495,17 +495,21 @@ A DBI-style database handler. Defaults to the WebGUI site handler.
 
 A boolean indicating that the query should be read unconditionally. Defaults to "0". If set to "1" and the unconditional read results in an error, the error will be returned by this method.
 
+=head3 placeholders
+
+An array reference containing a list of values to be used in the placeholders defined in the SQL statement.
+
 =cut
 
 sub setDataByQuery {
 	my ($sth, $rowCount, @row);
-	my ($self, $sql, $dbh, $unconditional) = @_;
+	my ($self, $sql, $dbh, $unconditional, $placeholders) = @_;
 	$dbh ||= WebGUI::SQL->getSlave;
 	if ($unconditional) {
-		$sth = WebGUI::SQL->unconditionalRead($sql,$dbh);
+		$sth = WebGUI::SQL->unconditionalRead($sql,$dbh,$placeholders);
 		return $sth->errorMessage if ($sth->errorCode > 0);
 	} else {
-		$sth = WebGUI::SQL->read($sql,$dbh);
+		$sth = WebGUI::SQL->read($sql,$dbh,$placeholders);
 	}
 	$self->{_totalRows} = $sth->rows;
 	$self->{_columnNames} = [ $sth->getColumnNames ];
