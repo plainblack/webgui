@@ -266,3 +266,4 @@ create table urls (
 	params text
 );
 
+alter table page drop column id;

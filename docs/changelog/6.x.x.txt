@@ -50,7 +50,8 @@
  - bugfix [ 996170 ] mesage log logId not being passed
  - Added template variables user.canPost and user.canView in forum_loop to MessageBoard / RFE[864134] (Leendert Bottelberghs)
  - Made flat thread work like flat thread -> messages sorted by submission date / RFE[995982]. (Leendert Bottelberghs)
-
+ - Upgraded DBIx::Tree::NestedSet to the latest version (0.15) (Martin Kamerbeek /Procolix)
+ - Eliminated the use for the 'id' column in the page table (Martin Kamerbeek /Procolix)
 
 
 6.1.1

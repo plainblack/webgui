@@ -209,15 +209,12 @@ sub add {
 		
 	$newPageId = WebGUI::Id::generate();
 	$self->add_child_to_right(
-		id	=>$self->get('pageId'),
-		pageId	=>$newPageId,
+		pageId	=>$self->get('pageId'),
+		provided_primary_key => $newPageId,
 		parentId=>$self->get('pageId'),
 		depth	=>($self->get('depth') + 1),
 		);
 	
-	# Fixup the 'id' column that has the wrong value.
-	WebGUI::SQL->write("update page set id=pageId where pageId=".quote($newPageId));
-
 	$self->recacheNavigation;
 
 	return WebGUI::Page->new($newPageId);
@@ -1341,9 +1338,11 @@ sub new {
 		table_name		=> 'page',
 		left_column_name	=> 'nestedSetLeft',
 		right_column_name	=> 'nestedSetRight',
+		id_name			=> 'pageId',
 		dbh			=> $session{dbh},
 		no_alter_table		=> 1,
-		no_locking		=> 1
+		no_locking		=> 1,
+		no_id_creation		=> 1,
 		);
 	unless (ref($properties)) {
 		$properties = WebGUI::SQL->quickHashRef("select * from page where pageId=".quote($_[1]));
