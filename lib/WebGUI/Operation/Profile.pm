@@ -136,7 +136,7 @@ sub www_editProfile {
    
    $vars->{'profile.message'} = $_[0] if($_[0]);
    $vars->{'profile.form.header'} = "\n\n".WebGUI::Form::formHeader({});
-   $vars->{'profile.form.footer'} = "</form>";
+   $vars->{'profile.form.footer'} = WebGUI::Form::formFooter();
    
    $vars->{'profile.form.hidden'} = WebGUI::Form::hidden({"name"=>"op","value"=>"editProfileSave"});
    $vars->{'profile.form.hidden'} .= WebGUI::Form::hidden({"name"=>"uid","value"=>$session{user}{userId}});

@@ -1886,7 +1886,7 @@ sub www_post {
 		name=>'subject',
 		value=>$subject
 		});
-	$var->{'form.end'} = '</form>';
+	$var->{'form.end'} = WebGUI::Form::formFooter();
 	return WebGUI::Template::process($forum->get("postformTemplateId"),"Forum/PostForm", $var); 
 }
 
@@ -2083,7 +2083,7 @@ sub www_search {
 		value=>[$numResults]
 		});
 	$var{'form.search'} = WebGUI::Form::submit({value=>WebGUI::International::get(170)});
-	$var{'form.end'} = '</form>';
+	$var{'form.end'} = WebGUI::Form::formFooter();
 	$var{'thread.list.url'} = formatForumURL($caller->{callback},$forum->get("forumId"));
         $var{'thread.list.label'} = WebGUI::International::get(1019);
 	$var{doit} = $session{form}{doit};

@@ -1408,7 +1408,7 @@ sub new {
 		});
 	$header .= "\n<table ".$tableExtras.'>' unless ($noTable);
 	$footer = "</table>\n" unless ($noTable);
-	$footer .= "</form>\n\n";
+	$footer .= WebGUI::Form::formFooter();
         bless {_noTable => $noTable, _header => $header, _footer => $footer, _data => ''}, $self;
 }
 

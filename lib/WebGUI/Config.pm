@@ -147,6 +147,8 @@ sub readConfig {
         } else {
                 $data{defaultSitename} = $data{sitename};
         }
+	$data{webguiRoot} = $webguiPath;
+	$data{configFile} = $filename;
 	return \%data;
 }
 

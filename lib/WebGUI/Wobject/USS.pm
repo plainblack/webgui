@@ -564,7 +564,7 @@ sub www_editSubmission {
                 value=>[$submission->{contentType}]
                 });
 	$var{'form.submit'} = WebGUI::Form::submit();
-	$var{'form.footer'} = '</form>';
+	$var{'form.footer'} = WebGUI::Form::formFooter();
 	return $_[0]->processTemplate($_[0]->get("submissionFormTemplateId"),\%var,"USS/SubmissionForm");
 }
 

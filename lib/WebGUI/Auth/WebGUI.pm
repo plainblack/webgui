@@ -390,7 +390,7 @@ sub recoverPassword {
    $vars->{'recover.form.hidden'} .= WebGUI::Form::hidden({"name"=>"method","value"=>"recoverPasswordFinish"});
 
    $vars->{'recover.form.submit'} = WebGUI::Form::submit({});
-   $vars->{'recover.form.footer'} = "</form>";
+   $vars->{'recover.form.footer'} = WebGUI::Form::formFooter();
     $vars->{'login.url'} = WebGUI::URL::page('op=auth&method=init');
     $vars->{'login.label'} = WebGUI::International::get(58);
 
@@ -457,7 +457,7 @@ sub resetExpiredPassword {
     $vars->{'expired.form.passwordConfirm'} = WebGUI::Form::password({"name"=>"identifierConfirm"});
     $vars->{'expired.form.passwordConfirm.label'} = WebGUI::International::get(2,'AuthWebGUI');
     $vars->{'expired.form.submit'} = WebGUI::Form::submit({});
-    $vars->{'expired.form.footer'} = "</form>";
+    $vars->{'expired.form.footer'} = WebGUI::Form::formFooter();
 	
 	return WebGUI::Template::process(1,'AuthWebGUI/Expired', $vars);
 }

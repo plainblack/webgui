@@ -201,7 +201,7 @@ sub print {
 	}
 	$output .= '<div class="tabs">'.$tabs.$_[0]->{_submit}.'</div>';
 	$output .= $form;
-	$output .= '</form>';
+	$output .= WebGUI::Form::formFooter();
 	$output .= '<script>var numberOfTabs = '.($i-1).'; initTabs();</script>';
 	return $output;
 }

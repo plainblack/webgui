@@ -65,7 +65,6 @@ sub www_editContentSettings {
         $f->hidden("op","saveSettings");
         $f->select("defaultPage",$pages,WebGUI::International::get(527),[$session{setting}{defaultPage}]);
         $f->select("notFoundPage",$pages,WebGUI::International::get(141),[$session{setting}{notFoundPage}]);
-        $f->text("docTypeDec",WebGUI::International::get(398),$session{setting}{docTypeDec});
         $f->text(
 		-name=>"favicon",
 		-label=>WebGUI::International::get(897),

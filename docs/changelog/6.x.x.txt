@@ -68,6 +68,13 @@
    database replication.
  - Templated the EditableToggle, a, and AdminToggle macros. Thanks to Colin
    Kuskie.
+ - bugfix [ 933881 ] Forms not compliant (solution). Thanks to Nicklous
+   Roberts.
+ - bugfix [ 934410 ] non-compliant HTML (solution). Thanks to Nicklous
+   Roberts.
+ - bugfix [ 963316 ] Field without title in Content Settings
+
+
 
 6.0.3
  - Fixed a recursive style change bug.

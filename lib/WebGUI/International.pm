@@ -146,7 +146,7 @@ Returns a hash reference to the languages (languageId/lanugage) installed on thi
 sub getLanguages {
         my ($hashRef);
 	my $dir = $session{config}{webguiRoot}.$session{os}{slash}."lib".$session{os}{slash}."WebGUI".$session{os}{slash}."i18n";
-	opendir (DIR,$dir) or WebGUI::ErrorHandler::fatalError("Can't open I18N directory!");
+	opendir (DIR,$dir) or WebGUI::ErrorHandler::fatalError("Can't open I18N directory! ".$dir);
 	my @files = readdir(DIR);
 	closedir(DIR);
 	foreach my $file (@files) {

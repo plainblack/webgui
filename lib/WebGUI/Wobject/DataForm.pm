@@ -359,7 +359,7 @@ sub getRecordTemplateVars {
 	$var->{tab_loop} = \@tabs;
 	$var->{"form.send"} = WebGUI::Form::submit({value=>WebGUI::International::get(73, $self->get("namespace"))});
 	$var->{"form.save"} = WebGUI::Form::submit();
-	$var->{"form.end"} = "</form>";	
+	$var->{"form.end"} = WebGUI::Form::formFooter();	
 	return $var;
 }
 

@@ -19,7 +19,12 @@ use WebGUI::Session;
 sub process {
         my @param = WebGUI::Macro::getParams($_[0]);
 	if (my $collateral = WebGUI::Collateral->find($param[0])) {
-		return '<img src="'.$collateral->getURL.'" '.$collateral->get("parameters").' />'; 
+		my $tag = '<img src="'.$collateral->getURL.'" '.$collateral->get("parameters");
+		unless ($tag =~ /alt\=/i) {
+			$tag .= ' alt="'.$collateral->get("name").'"';
+		}
+		$tag .= ' />'; 
+		return $tag;
 	} else {
 		return "";
 	}

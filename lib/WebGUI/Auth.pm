@@ -214,7 +214,7 @@ sub createAccount {
     $vars->{'create.form.profile'} = WebGUI::Operation::Profile::getRequiredProfileFields();
 	
 	$vars->{'create.form.submit'} = WebGUI::Form::submit({});
-    $vars->{'create.form.footer'} = "</form>";
+    $vars->{'create.form.footer'} = WebGUI::Form::formFooter();
 	
     $vars->{'login.url'} = WebGUI::URL::page('op=auth&method=init');
     $vars->{'login.label'} = WebGUI::International::get(58);
@@ -377,7 +377,7 @@ sub displayAccount {
 	  $vars->{'account.form.karma.label'} = WebGUI::International::get(537);
    }
    $vars->{'account.form.submit'} = WebGUI::Form::submit({});
-   $vars->{'account.form.footer'} = "</form>";
+   $vars->{'account.form.footer'} = WebGUI::Form::formFooter();
    
    $vars->{'account.options'} = WebGUI::Operation::Shared::accountOptions();
    return WebGUI::Template::process(1,$template, $vars);
@@ -427,7 +427,7 @@ sub displayLogin {
     	$vars->{'login.form.password'} = WebGUI::Form::password({"name"=>"identifier"});
     	$vars->{'login.form.password.label'} = WebGUI::International::get(51);
 	$vars->{'login.form.submit'} = WebGUI::Form::submit({"value"=>WebGUI::International::get(52)});
-	$vars->{'login.form.footer'} = "</form>";
+	$vars->{'login.form.footer'} = WebGUI::Form::formFooter();
 	$vars->{'anonymousRegistration.isAllowed'} = ($session{setting}{anonymousRegistration});
 	$vars->{'createAccount.url'} = WebGUI::URL::page('op=createAccount');
 	$vars->{'createAccount.label'} = WebGUI::International::get(67);

@@ -917,7 +917,7 @@ sub www_view {
 			name=>'func',
 			value=>'respond'
 			});
-	$var->{'form.footer'} = '</form>';
+	$var->{'form.footer'} = WebGUI::Form::formFooter();
 	$var->{'form.submit'} = WebGUI::Form::submit({
 			value=>WebGUI::International::get(50,$self->get("namespace"))
 			});

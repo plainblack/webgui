@@ -63,7 +63,7 @@ sub process {
 		});
         $var{'account.create.url'} = WebGUI::URL::page('op=createAccount');
 	$var{'account.create.label'} = WebGUI::International::get(407);
-	$var{'form.footer'} = '</form>';
+	$var{'form.footer'} = WebGUI::Form::formFooter();
         return WebGUI::Template::process($templateId,"Macro/L_loginBox",\%var); 
 }
 

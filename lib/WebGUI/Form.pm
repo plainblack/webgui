@@ -46,6 +46,7 @@ Base forms package. Eliminates some of the normal code work that goes along with
  $html = WebGUI::Form::email({name=>"emailAddress"});
  $html = WebGUI::Form::fieldType({name=>"fieldType");
  $html = WebGUI::Form::file({name=>"image"});
+ $html = WebGUI::Form::formFooter();
  $html = WebGUI::Form::formHeader();
  $html = WebGUI::Form::filterContent({value=>"javascript"});
  $html = WebGUI::Form::float({name=>"distance"});
@@ -677,6 +678,19 @@ sub filterContent {
 
 #-------------------------------------------------------------------
 
+=head2 formFooter ( )
+
+Returns a form footer.
+
+=cut
+
+sub formFooter {
+	return "</div></form>\n\n";
+}
+
+
+#-------------------------------------------------------------------
+
 =head2 formHeader ( hashRef )
 
 Returns a form header.
@@ -718,7 +732,7 @@ sub formHeader {
 	}
         my $method = $_[0]->{method} || "POST";
         my $enctype = $_[0]->{enctype} || "multipart/form-data";
-	return '<form action="'.$action.'" enctype="'.$enctype.'" method="'.$method.'" '.$_[0]->{extras}.'>'.$hidden;
+	return '<form action="'.$action.'" enctype="'.$enctype.'" method="'.$method.'" '.$_[0]->{extras}.'><div class="formContents">'.$hidden;
 }
 
 
@@ -1164,7 +1178,7 @@ The number of characters wide this form element should be. There should be no re
 
 sub phone {
 	WebGUI::Style::setScript($session{config}{extrasURL}.'/inputCheck.js',{ language=>'javascript' });
-        my $maxLength = $_[0]->{maxLength} || 30;
+        my $maxLength = $_[0]->{maxlength} || 30;
 	return text({
 		name=>$_[0]->{name},
 		maxlength=>$maxLength,
@@ -1714,7 +1728,7 @@ The number of characters wide this form element should be. There should be no re
 
 sub zipcode {
 	WebGUI::Style::setScript($session{config}{extrasURL}.'/inputCheck.js',{ language=>'javascript' });
-        my $maxLength = $_[0]->{maxLength} || 10;
+        my $maxLength = $_[0]->{maxlength} || 10;
 	return text({
 		name=>$_[0]->{name},
 		maxlength=>$maxLength,

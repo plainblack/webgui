@@ -5,6 +5,16 @@
  - Fixed a possible counting problem when looking for an infinite loop in
    groups of groups.
  - Fixed a bug in the LDAP module that required the RDN to be a URL.
+ - bugfix [962196] addHTTP problem.
+ - bugfix [962224] WebGUI::Operation::Statistics
+ - bugfix [966470] WebGUI::User. Session not properly killed when deleting user.
+ - bugfix [966466] WebGUI::Session. System crash when user language missing.
+ - bugfix [ 981059 ] WebGUI vs perl 5.8.4
+ - bugfix [ 975609 ] The form field for phone and email do not support maxlength
+   (Thanks to Junying Du).
+ - bugfix [ 938266 ] Fix: 5.5.4 Synopsis ignores hideFromNav (Thanks to 
+   Nicklous Roberts.)
+ - bugfix [ 961056 ] pages erroneously owned by visitor
 
 
 5.5.6

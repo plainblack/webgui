@@ -253,7 +253,7 @@ sub www_view {
         $var{"form.start"} .= WebGUI::Form::hidden({name=>'wid',value=>$_[0]->get("wobjectId")});
         $var{"form.start"} .= WebGUI::Form::hidden({name=>'func',value=>'vote'});
 	$var{"form.submit"} = WebGUI::Form::submit({value=>WebGUI::International::get(11,$_[0]->get("namespace"))});
-	$var{"form.end"} = "</form>";
+	$var{"form.end"} = WebGUI::Form::formFooter();
 	$totalResponses = 1 if ($totalResponses < 1);
         for (my $i=1; $i<=20; $i++) {
         	if ($_[0]->get('a'.$i) =~ /\C/) {
