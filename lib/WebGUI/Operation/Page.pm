@@ -190,11 +190,18 @@ sub www_editPage {
 			-value=>$page{urlizedTitle},
 			-uiLevel=>3
 			);
+		$f->select(
+			-name=>"languageId",
+			-label=>WebGUI::International::get(304),
+			-value=>[$page{internationalId}],
+			-uiLevel=>1,
+			-options=>WebGUI::International::getLanguages()
+			);
                 $f->url(
 			-name=>"redirectURL",
 			-label=>WebGUI::International::get(715),
 			-value=>$page{redirectURL},
-			-uiLevel=>8
+			-uiLevel=>9
 			);
 		$f->textarea(
 			-name=>"synopsis",
@@ -357,6 +364,7 @@ sub www_editPageSave {
 			metaTags=".quote($session{form}{metaTags}).", 
 			urlizedTitle='$session{form}{urlizedTitle}', 
 			redirectURL='$session{form}{redirectURL}', 
+			languageId='$session{form}{languageId}', 
 			defaultMetaTags='$session{form}{defaultMetaTags}', 
 			templateId='$session{form}{templateId}', 
 			menuTitle=".quote($session{form}{menuTitle}).", 

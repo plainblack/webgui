@@ -97,6 +97,7 @@ sub _setupUserInfo {
 			from userProfileData, userProfileField where userProfileData.fieldName=userProfileField.fieldName 
 			and userProfileData.userId='$user{userId}'");
 		%user = (%user, %profile);
+		$user{language} = $session{page}{languageId} if ($user{userId} == 1);
 		%default = WebGUI::SQL->buildHash("select fieldName, dataDefault from userProfileField 
 			where profileCategoryId=4");
 		foreach $key (keys %default) {
@@ -331,12 +332,12 @@ sub open {
 	} else {
 		_setupSessionVars($session{cookie}{wgSession},$session{setting}{sessionTimeout});
 	}
+        ###----------------------------
+        ### current page's properties (from page table)
+        _setupPageInfo("",$session{setting}{notFoundPage},$session{config}{scripturl});
 	###----------------------------
 	### current user's account and profile information (from users and userProfileData tables)
 	_setupUserInfo($session{var}{userId});
-	###----------------------------
-	### current page's properties (from page table)
-	_setupPageInfo("",$session{setting}{notFoundPage},$session{config}{scripturl});
 	###----------------------------
 	### language settings
 	$session{language} = WebGUI::SQL->quickHashRef("select * from language where languageId=$session{user}{language}");
