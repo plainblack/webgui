@@ -278,13 +278,13 @@ sub www_editDownload {
 
 #-------------------------------------------------------------------
 sub www_editDownloadSave {
-        my ($file, $alt1, $alt2, $sqlAdd, $seq);
+        my ($file, $alt1, $alt2, $sqlAdd);
         if (WebGUI::Privilege::canEditPage()) {
 		if ($session{form}{did} eq "new") {
 			$session{form}{did} = getNextId("downloadId");
-			($seq) = WebGUI::SQL->quickArray("select max(sequenceNumber) from DownloadManager_file where wobjectId=".$_[0]->get("wobjectId"));
 			WebGUI::SQL->write("insert into DownloadManager_file (wobjectId,downloadId,sequenceNumber) 
-				values (".$_[0]->get("wobjectId").",$session{form}{did},".($seq+1).")");
+				values (".$_[0]->get("wobjectId").",$session{form}{did},-1)");
+			_reorderDownloads($_[0]->get("wobjectId"));
 		}
                 $file = WebGUI::Attachment->new("",$session{form}{wid},$session{form}{did});
 		$file->save("downloadFile");

@@ -192,13 +192,12 @@ sub www_editLink {
 
 #-------------------------------------------------------------------
 sub www_editLinkSave {
-	my ($seq);
         if (WebGUI::Privilege::canEditPage()) {
 		if ($session{form}{lid} eq "new") {
-			($seq) = WebGUI::SQL->quickArray("select max(sequenceNumber) from LinkList_link where wobjectId=".$_[0]->get("wobjectId"));
 			$session{form}{lid} = getNextId("linkId");
                 	WebGUI::SQL->write("insert into LinkList_link (wobjectId,linkId,sequenceNumber) values (".$_[0]->get("wobjectId")
-				.",$session{form}{lid},".($seq+1).")");
+				.",$session{form}{lid},-1)");
+			_reorderLinks($_[0]->get("wobjectId"));
 		}
                 WebGUI::SQL->write("update LinkList_link set name=".quote($session{form}{name}).",
 			url=".quote($session{form}{url}).",description=".quote($session{form}{description}).",
