@@ -18,10 +18,6 @@ sub process {
 	my ($output);
 	$output = $_[0];
         $output =~ s/\^e\;/$session{setting}{companyEmail}/g;
-        #---everything below this line will go away in a later rev.
-        if ($output =~ /\^e/) {
-                $output =~ s/\^e/$session{setting}{companyEmail}/g;
-        }
 	return $output;
 }
 

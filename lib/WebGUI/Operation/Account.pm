@@ -34,7 +34,7 @@ our %ldapStatusCode = ( 0=>'success (0)', 1=>'Operations Error (1)', 2=>'Protoco
 sub _accountOptions {
 	my ($output);
 	$output = '<div class="accountOptions"><ul>';
-	if (WebGUI::Privilege::isInGroup(3) || WebGUI::Privilege::isInGroup(4)) {
+	if (WebGUI::Privilege::isInGroup(3) || WebGUI::Privilege::isInGroup(4) || WebGUI::Privilege::isInGroup(5) || WebGUI::Privilege::isInGroup(6)) {
 		if ($session{var}{adminOn}) {
 			$output .= '<li><a href="'.$session{page}{url}.'?op=switchOffAdmin">'.WebGUI::International::get(12).'</a>';
 		} else {

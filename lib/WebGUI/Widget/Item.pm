@@ -29,7 +29,7 @@ sub duplicate {
         tie %data, 'Tie::CPHash';
         %data = getProperties($namespace,$_[0]);
 	$pageId = $_[1] || $data{pageId};
-        $newWidgetId = create($pageId,$namespace,$data{title},$data{displayTitle},$data{description},$data{processMacros},$data{position});
+        $newWidgetId = create($pageId,$namespace,$data{title},$data{displayTitle},$data{description},$data{processMacros},$data{templatePosition});
         WebGUI::Attachment::copy($data{attachment},$_[0],$newWidgetId);
 	WebGUI::SQL->write("insert into Item values ($newWidgetId, ".quote($data{description}).", ".quote($data{linkURL}).", ".quote($data{attachment}).")");
 }
@@ -58,7 +58,7 @@ sub www_add {
                 $output .= tableFormRow(WebGUI::International::get(99),WebGUI::Form::text("title",20,30,widgetName()));
 		$output .= tableFormRow(WebGUI::International::get(175),WebGUI::Form::checkbox("processMacros",1,1));
 		%hash = WebGUI::Widget::getPositions();
-                $output .= tableFormRow(WebGUI::International::get(363),WebGUI::Form::selectList("position",\%hash));
+                $output .= tableFormRow(WebGUI::International::get(363),WebGUI::Form::selectList("templatePosition",\%hash));
                 $output .= tableFormRow(WebGUI::International::get(85),WebGUI::Form::textArea("description",''));
                 $output .= tableFormRow(WebGUI::International::get(1,$namespace),WebGUI::Form::text("linkURL",20,2048));
                 $output .= tableFormRow(WebGUI::International::get(2,$namespace),WebGUI::Form::file("attachment"));
@@ -75,7 +75,7 @@ sub www_add {
 sub www_addSave {
 	my ($widgetId, $attachment);
 	if (WebGUI::Privilege::canEditPage()) {
-		$widgetId = create($session{page}{pageId},$session{form}{widget},$session{form}{title},$session{form}{displayTitle},$session{form}{description},$session{form}{processMacros},$session{form}{position});
+		$widgetId = create($session{page}{pageId},$session{form}{widget},$session{form}{title},$session{form}{displayTitle},$session{form}{description},$session{form}{processMacros},$session{form}{templatePosition});
 		$attachment = WebGUI::Attachment::save("attachment",$widgetId);
 		WebGUI::SQL->write("insert into Item values ($widgetId, ".quote($session{form}{description}).", ".quote($session{form}{linkURL}).", ".quote($attachment).")");
 		return "";
@@ -120,8 +120,8 @@ sub www_edit {
                 $output .= tableFormRow(WebGUI::International::get(99),WebGUI::Form::text("title",20,30,$data{title}));
 		$output .= tableFormRow(WebGUI::International::get(175),WebGUI::Form::checkbox("processMacros","1",$data{processMacros}));
 		%hash = WebGUI::Widget::getPositions();
-                $array[0] = $data{position};
-                $output .= tableFormRow(WebGUI::International::get(363),WebGUI::Form::selectList("position",\%hash,\@array));
+                $array[0] = $data{templatePosition};
+                $output .= tableFormRow(WebGUI::International::get(363),WebGUI::Form::selectList("templatePosition",\%hash,\@array));
                 $output .= tableFormRow(WebGUI::International::get(85),WebGUI::Form::textArea("description",$data{description}));
                 $output .= tableFormRow(WebGUI::International::get(1,$namespace),WebGUI::Form::text("linkURL",20,2048,$data{linkURL}));
 		if ($data{attachment} ne "") {

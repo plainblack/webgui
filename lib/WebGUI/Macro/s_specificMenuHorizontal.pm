@@ -45,27 +45,6 @@ sub process {
 	$output = $_[0];
         $output =~ s/\^s\((.*?)\)\;/_replacement($1)/ge;
         $output =~ s/\^s\;/_replacement()/ge;
-        #---everything below this line will go away in a later rev.
-        if ($output =~ /\^s(.*)\^\/s/) {
-		$pageTitle = $1;
-                $temp = '<span class="horizontalMenu">';
-                $first = 1;
-		($parentId) = WebGUI::SQL->quickArray("select pageId from page where urlizedTitle='$pageTitle'"); 
-                $sth = WebGUI::SQL->read("select title,urlizedTitle,pageId from page where parentId='$parentId' order by sequenceNumber");
-                while (@data = $sth->array) {
-                        if (WebGUI::Privilege::canViewPage($data[2])) {
-                                if ($first) {
-                                        $first = 0;
-                                } else {
-                                        $temp .= " &middot; ";
-                                }
-                                $temp .= '<a class="horizontalMenu" href="'.$session{env}{SCRIPT_NAME}.'/'.$data[1].'">'.$data[0].'</a>';
-                        }
-                }
-                $sth->finish;
-                $temp .= '</span>';
-                $output =~ s/\^s(.*)\^\/s/$temp/g;
-        }
 	return $output;
 }
 

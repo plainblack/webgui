@@ -35,14 +35,6 @@ sub process {
         $output = $_[0];
         $output =~ s/\^H\((.*?)\)\;/_replacement($1)/ge;
         $output =~ s/\^H\;/_replacement()/ge;
-        #---everything below this line will go away in a later rev.
-        if ($output =~ /\^H(.*)\^\/H/) {
-                $temp = '<a class="homeLink" href="'.$session{env}{SCRIPT_NAME}.'/home">'.$1.'</a>';
-                $output =~ s/\^H(.*)\^\/H/$temp/g;
-        } elsif ($output =~ /\^H/) {
-        	$temp = '<a class="homeLink" href="'.$session{env}{SCRIPT_NAME}.'/home">'.WebGUI::International::get(47).'</a>';
-        	$output =~ s/\^H/$temp/g;
-	}
 	return $output;
 }
 

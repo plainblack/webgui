@@ -72,9 +72,9 @@ sub duplicate {
         tie %data, 'Tie::CPHash';
         %data = getProperties($namespace,$_[0]);
 	$pageId = $_[1] || $data{pageId};
-        $newWidgetId = create($pageId,$namespace,$data{title},$data{displayTitle},$data{description},$data{processMacros},$data{position});
+        $newWidgetId = create($pageId,$namespace,$data{title},$data{displayTitle},$data{description},$data{processMacros},$data{templatePosition});
 	WebGUI::SQL->write("insert into Poll values ($newWidgetId, '$data{active}', '$data{graphWidth}', '$data{voteGroup}', ".quote($data{question}).", ".quote($data{a1}).", ".quote($data{a2}).", ".quote($data{a3}).", ".quote($data{a4}).", ".quote($data{a5}).", ".quote($data{a6}).", ".quote($data{a7}).", ".quote($data{a8}).", ".quote($data{a9}).", ".quote($data{a10}).", ".quote($data{a11}).", ".quote($data{a12}).", ".quote($data{a13}).", ".quote($data{a14}).", ".quote($data{a15}).", ".quote($data{a16}).", ".quote($data{a17}).", ".quote($data{a18}).", ".quote($data{a19}).", ".quote($data{a20}).")");
-        $sth = WebGUI::SQL->read("select * from Poll_answer");
+        $sth = WebGUI::SQL->read("select * from Poll_answer where widgetId=$_[0]");
         while (@row = $sth->array) {
         	WebGUI::SQL->write("insert into Poll_answer values ($newWidgetId, '$row[1]', $row[2], '$row[3]')");
         }
@@ -107,7 +107,7 @@ sub www_add {
                 $output .= tableFormRow(WebGUI::International::get(174),WebGUI::Form::checkbox("displayTitle",1));
                 $output .= tableFormRow(WebGUI::International::get(175),WebGUI::Form::checkbox("processMacros",1));
 		%hash = WebGUI::Widget::getPositions();
-                $output .= tableFormRow(WebGUI::International::get(363),WebGUI::Form::selectList("position",\%hash));
+                $output .= tableFormRow(WebGUI::International::get(363),WebGUI::Form::selectList("templatePosition",\%hash));
                 $output .= tableFormRow(WebGUI::International::get(85),WebGUI::Form::textArea("description",'',50,5,1));
                 $output .= tableFormRow(WebGUI::International::get(3,$namespace),WebGUI::Form::checkbox("active",1,1));
 		%hash = WebGUI::SQL->buildHash("select groupId,groupName from groups where groupName<>'Reserved' order by groupName");
@@ -129,7 +129,7 @@ sub www_add {
 sub www_addSave {
 	my ($widgetId, @answer);
 	if (WebGUI::Privilege::canEditPage()) {
-		$widgetId = create($session{page}{pageId},$session{form}{widget},$session{form}{title},$session{form}{displayTitle},$session{form}{description},$session{form}{processMacros},$session{form}{position});
+		$widgetId = create($session{page}{pageId},$session{form}{widget},$session{form}{title},$session{form}{displayTitle},$session{form}{description},$session{form}{processMacros},$session{form}{templatePosition});
 		@answer = split("\n",$session{form}{answers});	
 		WebGUI::SQL->write("insert into Poll values ($widgetId, '$session{form}{active}', '$session{form}{graphWidth}', '$session{form}{voteGroup}', ".quote($session{form}{question}).", ".quote($answer[0]).", ".quote($answer[1]).", ".quote($answer[2]).", ".quote($answer[3]).", ".quote($answer[4]).", ".quote($answer[5]).", ".quote($answer[6]).", ".quote($answer[7]).", ".quote($answer[8]).", ".quote($answer[9]).", ".quote($answer[10]).", ".quote($answer[11]).", ".quote($answer[12]).", ".quote($answer[13]).", ".quote($answer[14]).", ".quote($answer[15]).", ".quote($answer[16]).", ".quote($answer[17]).", ".quote($answer[18]).", ".quote($answer[19]).")");
 		return "";
@@ -165,8 +165,8 @@ sub www_edit {
                 $output .= tableFormRow(WebGUI::International::get(174),WebGUI::Form::checkbox("displayTitle",1,$data{displayTitle}));
                 $output .= tableFormRow(WebGUI::International::get(175),WebGUI::Form::checkbox("processMacros",1,$data{processMacros}));
 		%hash = WebGUI::Widget::getPositions();
-                $array[0] = $data{position};
-                $output .= tableFormRow(WebGUI::International::get(363),WebGUI::Form::selectList("position",\%hash,\@array));
+                $array[0] = $data{templatePosition};
+                $output .= tableFormRow(WebGUI::International::get(363),WebGUI::Form::selectList("templatePosition",\%hash,\@array));
                 $output .= tableFormRow(WebGUI::International::get(85),WebGUI::Form::textArea("description",$data{description},50,5,1));
                 $output .= tableFormRow(WebGUI::International::get(3,$namespace),WebGUI::Form::checkbox("active",1,$data{active}));
 		%hash = WebGUI::SQL->buildHash("select groupId,groupName from groups where groupName<>'Reserved' order by groupName");

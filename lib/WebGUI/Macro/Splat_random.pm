@@ -32,14 +32,6 @@ sub process {
         $output = $_[0];
         $output =~ s/\^\*\((.*?)\)\;/_replacement($1)/ge;
         $output =~ s/\^\*\;/_replacement()/ge;
-        #---everything below this line will go away in a later rev.
-        if ($output =~ /\^\*(.*)\^\/\*/) {
-                $temp = round(rand()*$1);
-                $output =~ s/\^\*(.*)\^\/\*/$temp/g;
-        } elsif ($output =~ /\^\*/) {
-                $temp = round(rand()*1000000000);
-                $output =~ s/\^\*/$temp/g;
-        }
 	return $output;
 }
 

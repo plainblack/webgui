@@ -47,12 +47,6 @@ sub process {
                 }
         }
         closedir(DIR);
-  #---script url---
-  # slash has to go last because it is also used as the end character for configurable widgets 
-  # this will disappear in a future rev as it is depricated
-        if ($output =~ /\^\//) {
-                $output =~ s/\^\//$session{env}{SCRIPT_NAME}/g;
-        }
 	return $output;
 }
 

@@ -41,11 +41,6 @@ sub process {
 	my ($output, $temp);
 	$output = $_[0];
         $output =~ s/\^C\;/_replacement()/ge;
-        #---everything below this line will go away in a later rev.
-	if ($output =~ /\^C/) {
-        	$temp = '<span class="crumbTrail">'._recurseCrumbTrail($session{page}{parentId}).'<a href="'.$session{page}{url}.'">'.$session{page}{title}.'</a></span>';
-        	$output =~ s/\^C/$temp/g;
-	}
 	return $output;
 }
 

@@ -56,7 +56,7 @@ sub duplicate {
         tie %data, 'Tie::CPHash';
         %data = getProperties($namespace,$_[0]);
 	$pageId = $_[1] || $data{pageId};
-        $newWidgetId = create($pageId,$namespace,$data{title},$data{displayTitle},$data{description},$data{processMacros},$data{position});
+        $newWidgetId = create($pageId,$namespace,$data{title},$data{displayTitle},$data{description},$data{processMacros},$data{templatePosition});
 	WebGUI::SQL->write("insert into SiteMap values ($newWidgetId, '$data{startAtThisLevel}', '$data{depth}', '$data{indent}', ".quote($data{bullet}).", '$data{lineSpacing}')");
 }
 
@@ -85,7 +85,7 @@ sub www_add {
                 $output .= tableFormRow(WebGUI::International::get(174),WebGUI::Form::checkbox("displayTitle",1,1));
                 $output .= tableFormRow(WebGUI::International::get(175),WebGUI::Form::checkbox("processMacros",1));
 		%hash = WebGUI::Widget::getPositions();
-                $output .= tableFormRow(WebGUI::International::get(363),WebGUI::Form::selectList("position",\%hash));
+                $output .= tableFormRow(WebGUI::International::get(363),WebGUI::Form::selectList("templatePosition",\%hash));
                 $output .= tableFormRow(WebGUI::International::get(85),WebGUI::Form::textArea("description",'',50,5,1));
                 $output .= tableFormRow(WebGUI::International::get(3,$namespace),WebGUI::Form::checkbox("startAtThisLevel",1,1));
                 $output .= tableFormRow(WebGUI::International::get(4,$namespace),WebGUI::Form::text("depth",20,2,0));
@@ -105,7 +105,7 @@ sub www_add {
 sub www_addSave {
 	my ($widgetId, $displayTitle, $image, $attachment);
 	if (WebGUI::Privilege::canEditPage()) {
-		$widgetId = create($session{page}{pageId},$session{form}{widget},$session{form}{title},$session{form}{displayTitle},$session{form}{description},$session{form}{processMacros},$session{form}{position});
+		$widgetId = create($session{page}{pageId},$session{form}{widget},$session{form}{title},$session{form}{displayTitle},$session{form}{description},$session{form}{processMacros},$session{form}{templatePosition});
 		WebGUI::SQL->write("insert into SiteMap values ($widgetId, '$session{form}{startAtThisLevel}', '$session{form}{depth}', '$session{form}{indent}', ".quote($session{form}{bullet}).", '$session{form}{lineSpacing}')");
 		return "";
 	} else {
@@ -140,8 +140,8 @@ sub www_edit {
                 $output .= tableFormRow(WebGUI::International::get(174),WebGUI::Form::checkbox("displayTitle",1,$data{displayTitle}));
                 $output .= tableFormRow(WebGUI::International::get(175),WebGUI::Form::checkbox("processMacros",1,$data{processMacros}));
 		%hash = WebGUI::Widget::getPositions();
-                $array[0] = $data{position};
-                $output .= tableFormRow(WebGUI::International::get(363),WebGUI::Form::selectList("position",\%hash,\@array));
+                $array[0] = $data{templatePosition};
+                $output .= tableFormRow(WebGUI::International::get(363),WebGUI::Form::selectList("templatePosition",\%hash,\@array));
                 $output .= tableFormRow(WebGUI::International::get(85),WebGUI::Form::textArea("description",$data{description},50,5,1));
                 $output .= tableFormRow(WebGUI::International::get(3,$namespace),WebGUI::Form::checkbox("startAtThisLevel",1,$data{startAtThisLevel}));
                 $output .= tableFormRow(WebGUI::International::get(4,$namespace),WebGUI::Form::text("depth",20,2,$data{depth}));

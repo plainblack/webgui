@@ -39,21 +39,6 @@ sub process {
         $output = $_[0];
         $output =~ s/\^S\((.*?)\)\;/_replacement($1)/ge;
         $output =~ s/\^S\;/_replacement()/ge;
-        #---everything below this line will go away in a later rev.
-	my ($pageTitle, $depth);
-        if ($output =~ /\^S(.*)\^\/S/) {
-		($pageTitle,$depth) = split(/,/,$1);
-		if ($depth eq "") {
-			$depth = 0;
-		}
-		@data = WebGUI::SQL->quickArray("select pageId,title,urlizedTitle from page where urlizedTitle='$pageTitle'"); 
-                $temp = '<span class="verticalMenu">';
-		if (defined $data[0] && WebGUI::Privilege::canViewPage($data[0])) {
-                	$temp .= traversePageTree($data[0],1,$depth);
-		}
-                $temp .= '</span>';
-                $output =~ s/\^S(.*)\^\/S/$temp/g;
-        }
 	return $output;
 }
 

@@ -27,7 +27,7 @@ our @EXPORT = qw(&getProperties &purgeWidget &www_jumpDown &www_jumpUp &update &
 #-------------------------------------------------------------------
 sub _reorderWidgets {
 	my ($sth, $i, $wid);
-	$sth = WebGUI::SQL->read("select widgetId from widget where pageId=$_[0] order by position,sequenceNumber");
+	$sth = WebGUI::SQL->read("select widgetId from widget where pageId=$_[0] order by templatePosition,sequenceNumber");
 	while (($wid) = $sth->array) {
 		$i++;
 		WebGUI::SQL->write("update widget set sequenceNumber='$i' where widgetId=$wid");
@@ -69,7 +69,7 @@ sub purgeWidget {
 
 #-------------------------------------------------------------------
 sub update {
-	WebGUI::SQL->write("update widget set title=".quote($session{form}{title}).", displayTitle='$session{form}{displayTitle}', description=".quote($session{form}{description}).", processMacros='$session{form}{processMacros}', lastEdited=".time().", editedBy='$session{user}{userId}', position='$session{form}{position}' where widgetId=$session{form}{wid}");
+	WebGUI::SQL->write("update widget set title=".quote($session{form}{title}).", displayTitle='$session{form}{displayTitle}', description=".quote($session{form}{description}).", processMacros='$session{form}{processMacros}', lastEdited=".time().", editedBy='$session{user}{userId}', templatePosition='$session{form}{templatePosition}' where widgetId=$session{form}{wid}");
 }
 
 #-------------------------------------------------------------------

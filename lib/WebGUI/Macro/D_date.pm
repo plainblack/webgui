@@ -28,18 +28,10 @@ sub _replacement {
 
 #-------------------------------------------------------------------
 sub process {
-        my ($output, $temp, @param);
+        my ($output);
         $output = $_[0];
         $output =~ s/\^D\((.*?)\)\;/_replacement($1)/ge;
         $output =~ s/\^D\;/_replacement()/ge;
-        #---everything below this line will go away in a later rev.
-	if ($output =~ /\^D(.*)\^\/D/) {
-		$temp = epochToHuman(time(),$1);
-		$output =~ s/\^D(.*)\^\/D/$temp/g;
-	} elsif ($output =~ /\^D/) {
-		$temp = localtime(time);
-		$output =~ s/\^D/$temp/g;
-	}
 	return $output;
 }
 

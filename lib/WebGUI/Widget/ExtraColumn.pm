@@ -27,7 +27,7 @@ sub duplicate {
         tie %data, 'Tie::CPHash';
         %data = getProperties($namespace,$_[0]);
 	$pageId = $_[1] || $data{pageId};
-        $newWidgetId = create($pageId,$namespace,$data{title},$data{displayTitle},$data{description},$data{processMacros},$data{position});
+        $newWidgetId = create($pageId,$namespace,$data{title},$data{displayTitle},$data{description},$data{processMacros},$data{templatePosition});
 	WebGUI::SQL->write("insert into ExtraColumn values ($newWidgetId, '$data{spacer}', '$data{width}', ".quote($data{class}).")");
 }
 
@@ -54,7 +54,7 @@ sub www_add {
                 $output .= WebGUI::Form::hidden("title","column");
                 $output .= '<table>';
 		%hash = WebGUI::Widget::getPositions();
-                $output .= tableFormRow(WebGUI::International::get(363),WebGUI::Form::selectList("position",\%hash));
+                $output .= tableFormRow(WebGUI::International::get(363),WebGUI::Form::selectList("templatePosition",\%hash));
                 $output .= tableFormRow(WebGUI::International::get(3,$namespace),WebGUI::Form::text("spacer",20,3,10));
                 $output .= tableFormRow(WebGUI::International::get(4,$namespace),WebGUI::Form::text("width",20,3,200));
                 $output .= tableFormRow(WebGUI::International::get(5,$namespace),WebGUI::Form::text("class",20,50,"content"));
@@ -71,7 +71,7 @@ sub www_add {
 sub www_addSave {
 	my ($widgetId, $displayTitle, $image, $attachment);
 	if (WebGUI::Privilege::canEditPage()) {
-		$widgetId = create($session{page}{pageId},$session{form}{widget},$session{form}{title},$session{form}{displayTitle},$session{form}{description},$session{form}{processMacros},$session{form}{position});
+		$widgetId = create($session{page}{pageId},$session{form}{widget},$session{form}{title},$session{form}{displayTitle},$session{form}{description},$session{form}{processMacros},$session{form}{templatePosition});
 		WebGUI::SQL->write("insert into ExtraColumn values ($widgetId, '$session{form}{spacer}', '$session{form}{width}', ".quote($session{form}{class}).")");
 		return "";
 	} else {
@@ -104,8 +104,8 @@ sub www_edit {
                 $output .= WebGUI::Form::hidden("title","column");
                 $output .= '<table>';
 		%hash = WebGUI::Widget::getPositions();
-                $array[0] = $data{position};
-                $output .= tableFormRow(WebGUI::International::get(363),WebGUI::Form::selectList("position",\%hash,\@array));
+                $array[0] = $data{templatePosition};
+                $output .= tableFormRow(WebGUI::International::get(363),WebGUI::Form::selectList("templatePosition",\%hash,\@array));
                 $output .= tableFormRow(WebGUI::International::get(3,$namespace),WebGUI::Form::text("spacer",20,3,$data{spacer}));
                 $output .= tableFormRow(WebGUI::International::get(4,$namespace),WebGUI::Form::text("width",20,3,$data{width}));
                 $output .= tableFormRow(WebGUI::International::get(5,$namespace),WebGUI::Form::text("class",20,50,$data{class}));

@@ -101,6 +101,7 @@ sub www_editGroup {
                 $output .= WebGUI::Form::hidden("op","editGroupSave");
                 $output .= WebGUI::Form::hidden("gid",$session{form}{gid});
                 $output .= '<table>';
+		$output .= tableFormRow(WebGUI::International::get(379),$session{form}{gid});
                 $output .= tableFormRow(WebGUI::International::get(84),WebGUI::Form::text("groupName",20,30,$group{groupName}));
                 $output .= tableFormRow(WebGUI::International::get(85),WebGUI::Form::textArea("description",$group{description}));
                 $output .= tableFormRow(WebGUI::International::get(367),WebGUI::Form::text("expireAfter",20,30,$group{expireAfter}));

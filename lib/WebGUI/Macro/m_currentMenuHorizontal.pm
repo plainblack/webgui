@@ -41,25 +41,6 @@ sub process {
 	my ($output, $temp, @data, $sth, $first);
 	$output = $_[0];
         $output =~ s/\^m\;/_replacement()/ge;
-        #---everything below this line will go away in a later rev.
-	if ($output =~ /\^m/) {
-        	$temp = '<span class="horizontalMenu">';
-		$first = 1;
-        	$sth = WebGUI::SQL->read("select title,urlizedTitle,pageId from page where parentId=$session{page}{pageId} order by sequenceNumber");
-        	while (@data = $sth->array) {
-			if (WebGUI::Privilege::canViewPage($data[2])) {
-                		if ($first) {
-                        		$first = 0;
-                		} else {
-                        		$temp .= " &middot; ";
-                		}
-                		$temp .= '<a class="horizontalMenu" href="'.$session{env}{SCRIPT_NAME}.'/'.$data[1].'">'.$data[0].'</a>';
-			}
-        	}
-        	$sth->finish;
-        	$temp .= '</span>';
-        	$output =~ s/\^m/$temp/g;
-	}
 	return $output;
 }
 

@@ -35,18 +35,6 @@ sub process {
         $output = $_[0];
         $output =~ s/\^P\((.*?)\)\;/_replacement($1)/ge;
         $output =~ s/\^P\;/_replacement()/ge;
-        #---everything below this line will go away in a later rev.
-        if ($output =~ /\^P(.*)\^\/P/) {
-                $temp = '<span class="verticalMenu">';
-                $temp .= traversePageTree($session{page}{parentId},0,$1);
-                $temp .= '</span>';
-                $output =~ s/\^P(.*)\^\/P/$temp/g;
-        } elsif ($output =~ /\^P/) {
-                $temp = '<span class="verticalMenu">';
-                $temp .= traversePageTree($session{page}{parentId},0,1);
-                $temp .= '</span>';
-                $output =~ s/\^P/$temp/g;
-        }
 	return $output;
 }
 

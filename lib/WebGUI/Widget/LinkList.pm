@@ -39,9 +39,9 @@ sub duplicate {
         tie %data, 'Tie::CPHash';
         %data = getProperties($namespace,$_[0]);
 	$pageId = $_[1] || $data{pageId};
-        $newWidgetId = create($pageId,$namespace,$data{title},$data{displayTitle},$data{description},$data{processMacros},$data{position});
+        $newWidgetId = create($pageId,$namespace,$data{title},$data{displayTitle},$data{description},$data{processMacros},$data{templatePosition});
 	WebGUI::SQL->write("insert into LinkList values ($newWidgetId, '$data{indent}', '$data{lineSpacing}', ".quote($data{bullet}).")");
-        $sth = WebGUI::SQL->read("select * from LinkList_link");
+        $sth = WebGUI::SQL->read("select * from LinkList_link where widgetId=$_[0]");
         while (@row = $sth->array) {
                 $newLinkId = getNextId("linkId");
                 WebGUI::SQL->write("insert into LinkList_link values ($newWidgetId, $newLinkId, ".quote($row[2]).", ".quote($row[3]).", ".quote($row[4]).", '$row[5]', '$row[6]')");
@@ -75,7 +75,7 @@ sub www_add {
                 $output .= tableFormRow(WebGUI::International::get(174),WebGUI::Form::checkbox("displayTitle",1,1));
                 $output .= tableFormRow(WebGUI::International::get(175),WebGUI::Form::checkbox("processMacros",1));
 		%hash = WebGUI::Widget::getPositions();
-                $output .= tableFormRow(WebGUI::International::get(363),WebGUI::Form::selectList("position",\%hash));
+                $output .= tableFormRow(WebGUI::International::get(363),WebGUI::Form::selectList("templatePosition",\%hash));
                 $output .= tableFormRow(WebGUI::International::get(85),WebGUI::Form::textArea("description",'',50,5,1));
                 $output .= tableFormRow(WebGUI::International::get(1,$namespace),WebGUI::Form::text("indent",20,2,0));
                 $output .= tableFormRow(WebGUI::International::get(2,$namespace),WebGUI::Form::text("lineSpacing",20,1,1));
@@ -94,7 +94,7 @@ sub www_add {
 sub www_addSave {
 	my ($widgetId);
 	if (WebGUI::Privilege::canEditPage()) {
-		$widgetId = create($session{page}{pageId},$session{form}{widget},$session{form}{title},$session{form}{displayTitle},$session{form}{description},$session{form}{processMacros},$session{form}{position});
+		$widgetId = create($session{page}{pageId},$session{form}{widget},$session{form}{title},$session{form}{displayTitle},$session{form}{description},$session{form}{processMacros},$session{form}{templatePosition});
 		WebGUI::SQL->write("insert into LinkList values ($widgetId, '$session{form}{indent}', '$session{form}{lineSpacing}', ".quote($session{form}{bullet}).")");
                 if ($session{form}{proceed} == 1) {
                         $session{form}{wid} = $widgetId;
@@ -195,8 +195,8 @@ sub www_edit {
                 $output .= tableFormRow(WebGUI::International::get(174),WebGUI::Form::checkbox("displayTitle",1,$data{displayTitle}));
                 $output .= tableFormRow(WebGUI::International::get(175),WebGUI::Form::checkbox("processMacros",1,$data{processMacros}));
 		%hash = WebGUI::Widget::getPositions();
-                $array[0] = $data{position};
-                $output .= tableFormRow(WebGUI::International::get(363),WebGUI::Form::selectList("position",\%hash,\@array));
+                $array[0] = $data{templatePosition};
+                $output .= tableFormRow(WebGUI::International::get(363),WebGUI::Form::selectList("templatePosition",\%hash,\@array));
                 $output .= tableFormRow(WebGUI::International::get(85),WebGUI::Form::textArea("description",$data{description},50,5,1));
                 $output .= tableFormRow(WebGUI::International::get(1,$namespace),WebGUI::Form::text("indent",20,2,$data{indent}));
                 $output .= tableFormRow(WebGUI::International::get(2,$namespace),WebGUI::Form::text("lineSpacing",20,1,$data{lineSpacing}));

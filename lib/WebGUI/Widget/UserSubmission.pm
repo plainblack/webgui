@@ -33,9 +33,9 @@ sub duplicate {
         tie %data, 'Tie::CPHash';
         %data = getProperties($namespace,$_[0]);
 	$pageId = $_[1] || $data{pageId};
-        $newWidgetId = create($pageId,$namespace,$data{title},$data{displayTitle},$data{description},$data{processMacros},$data{position});
+        $newWidgetId = create($pageId,$namespace,$data{title},$data{displayTitle},$data{description},$data{processMacros},$data{templatePosition});
 	WebGUI::SQL->write("insert into UserSubmission values ($newWidgetId, $data{groupToContribute}, '$data{submissionsPerPage}', '$data{defaultStatus}', $data{groupToApprove})");
-        $sth = WebGUI::SQL->read("select * from UserSubmission_submission");
+        $sth = WebGUI::SQL->read("select * from UserSubmission_submission where widgetId=$_[0]");
         while (@row = $sth->array) {
                 $newSubmissionId = getNextId("submissionId");
                 WebGUI::SQL->write("insert into UserSubmission_submission values ($newWidgetId, $newSubmissionId, ".quote($row[2]).", $row[3], ".quote($row[4]).", '$row[5]', ".quote($row[6]).", ".quote($row[7]).", ".quote($row[8]).", '$row[9]', '$row[10]')");
@@ -69,7 +69,7 @@ sub www_add {
                 $output .= tableFormRow(WebGUI::International::get(174),WebGUI::Form::checkbox("displayTitle",1,1));
                 $output .= tableFormRow(WebGUI::International::get(175),WebGUI::Form::checkbox("processMacros",1));
 		%hash = WebGUI::Widget::getPositions();
-                $output .= tableFormRow(WebGUI::International::get(363),WebGUI::Form::selectList("position",\%hash));
+                $output .= tableFormRow(WebGUI::International::get(363),WebGUI::Form::selectList("templatePosition",\%hash));
                 $output .= tableFormRow(WebGUI::International::get(85),WebGUI::Form::textArea("description",'',50,5,1));
                 %hash = WebGUI::SQL->buildHash("select groupId,groupName from groups where groupName<>'Reserved' order by groupName");
 		$array[0] = 4;
@@ -92,7 +92,7 @@ sub www_add {
 sub www_addSave {
 	my ($widgetId);
 	if (WebGUI::Privilege::canEditPage()) {
-		$widgetId = create($session{page}{pageId},$session{form}{widget},$session{form}{title},$session{form}{displayTitle},$session{form}{description},$session{form}{processMacros},$session{form}{position});
+		$widgetId = create($session{page}{pageId},$session{form}{widget},$session{form}{title},$session{form}{displayTitle},$session{form}{description},$session{form}{processMacros},$session{form}{templatePosition});
 		WebGUI::SQL->write("insert into UserSubmission values ($widgetId, $session{form}{groupToContribute}, '$session{form}{submissionsPerPage}', '$session{form}{defaultStatus}', $session{form}{groupToApprove})");
 		return "";
 	} else {
@@ -110,11 +110,11 @@ sub www_addSubmission {
                 $output .= WebGUI::Form::hidden("wid",$session{form}{wid});
                 $output .= WebGUI::Form::hidden("func","addSubmissionSave");
                 $output .= '<table>';
-                $output .= tableFormRow(WebGUI::International::get(99),WebGUI::Form::text("title",20,128));
-                $output .= tableFormRow(WebGUI::International::get(178),WebGUI::Form::textArea("content",'',50,10,1));
-                $output .= tableFormRow(WebGUI::International::get(179),WebGUI::Form::file("image"));
-                $output .= tableFormRow(WebGUI::International::get(182),WebGUI::Form::file("attachment"));
-                $output .= tableFormRow(WebGUI::International::get(183),WebGUI::Form::checkbox("convertCarriageReturns",1,1).' <span style="font-size: 8pt;">'.WebGUI::International::get(12,$namespace).'</span>');
+                $output .= tableFormRow(WebGUI::International::get(35,$namespace),WebGUI::Form::text("title",20,128));
+                $output .= tableFormRow(WebGUI::International::get(31,$namespace),WebGUI::Form::textArea("content",'',50,10,1));
+                $output .= tableFormRow(WebGUI::International::get(32,$namespace),WebGUI::Form::file("image"));
+                $output .= tableFormRow(WebGUI::International::get(33,$namespace),WebGUI::Form::file("attachment"));
+                $output .= tableFormRow(WebGUI::International::get(34,$namespace),WebGUI::Form::checkbox("convertCarriageReturns",1,1).' <span style="font-size: 8pt;">'.WebGUI::International::get(12,$namespace).'</span>');
                 $output .= formSave();
                 $output .= '</table></form>';
                 $output .= '<table width="100%" cellspacing=1 cellpadding=2 border=0>';
@@ -262,8 +262,8 @@ sub www_edit {
                 $output .= tableFormRow(WebGUI::International::get(174),WebGUI::Form::checkbox("displayTitle","1",$data{displayTitle}));
                 $output .= tableFormRow(WebGUI::International::get(175),WebGUI::Form::checkbox("processMacros","1",$data{processMacros}));
 		%hash = WebGUI::Widget::getPositions();
-                $array[0] = $data{position};
-                $output .= tableFormRow(WebGUI::International::get(363),WebGUI::Form::selectList("position",\%hash,\@array));
+                $array[0] = $data{templatePosition};
+                $output .= tableFormRow(WebGUI::International::get(363),WebGUI::Form::selectList("templatePosition",\%hash,\@array));
                 $output .= tableFormRow(WebGUI::International::get(85),WebGUI::Form::textArea("description",$data{description}));
 		$array[0] = $data{groupToApprove};
 		%hash = WebGUI::SQL->buildHash("select groupId,groupName from groups where groupName<>'Reserved' order by groupName");
@@ -306,19 +306,19 @@ sub www_editSubmission {
                 $output .= WebGUI::Form::hidden("sid",$session{form}{sid});
                 $output .= WebGUI::Form::hidden("func","editSubmissionSave");
                 $output .= '<table>';
-                $output .= tableFormRow(WebGUI::International::get(99),WebGUI::Form::text("title",20,128,$submission{title}));
-                $output .= tableFormRow(WebGUI::International::get(178),WebGUI::Form::textArea("content",$submission{content},50,10));
+                $output .= tableFormRow(WebGUI::International::get(35,$namespace),WebGUI::Form::text("title",20,128,$submission{title}));
+                $output .= tableFormRow(WebGUI::International::get(31,$namespace),WebGUI::Form::textArea("content",$submission{content},50,10));
                 if ($submission{image} ne "") {
-                        $output .= tableFormRow(WebGUI::International::get(179),'<a href="'.$session{page}{url}.'?func=deleteImage&wid='.$session{form}{wid}.'&sid='.$session{form}{sid}.'">'.WebGUI::International::get(186).'</a>');
+                        $output .= tableFormRow(WebGUI::International::get(32,$namespace),'<a href="'.$session{page}{url}.'?func=deleteImage&wid='.$session{form}{wid}.'&sid='.$session{form}{sid}.'">'.WebGUI::International::get(36,$namespace).'</a>');
                 } else {
-                        $output .= tableFormRow(WebGUI::International::get(179),WebGUI::Form::file("image"));
+                        $output .= tableFormRow(WebGUI::International::get(32,$namespace),WebGUI::Form::file("image"));
                 }
                 if ($submission{attachment} ne "") {
-                        $output .= tableFormRow(WebGUI::International::get(182),'<a href="'.$session{page}{url}.'?func=deleteAttachment&wid='.$session{form}{wid}.'&sid='.$session{form}{sid}.'">'.WebGUI::International::get(186).'</a>');
+                        $output .= tableFormRow(WebGUI::International::get(33,$namespace),'<a href="'.$session{page}{url}.'?func=deleteAttachment&wid='.$session{form}{wid}.'&sid='.$session{form}{sid}.'">'.WebGUI::International::get(36,$namespace).'</a>');
                 } else {
-                        $output .= tableFormRow(WebGUI::International::get(182),WebGUI::Form::file("attachment"));
+                        $output .= tableFormRow(WebGUI::International::get(33,$namespace),WebGUI::Form::file("attachment"));
                 }
-                $output .= tableFormRow(WebGUI::International::get(183),WebGUI::Form::checkbox("convertCarriageReturns",1,$submission{convertCarriageReturns}).' <span style="font-size: 8pt;">(uncheck if you\'re writing an HTML submission)</span>');
+                $output .= tableFormRow(WebGUI::International::get(34,$namespace),WebGUI::Form::checkbox("convertCarriageReturns",1,$submission{convertCarriageReturns}).' <span style="font-size: 8pt;">(uncheck if you\'re writing an HTML submission)</span>');
                 $output .= formSave();
                 $output .= '</table></form>';
                 return $output;

@@ -193,6 +193,7 @@ sub www_editUser {
                 $output .= WebGUI::Form::hidden("op","editUserSave");
                 $output .= WebGUI::Form::hidden("uid",$session{form}{uid});
                 $output .= '<table>';
+                $output .= tableFormRow(WebGUI::International::get(378),$session{form}{uid});
                 $output .= tableFormRow(WebGUI::International::get(50),WebGUI::Form::text("username",20,30,$user{username}));
                 $output .= tableFormRow(WebGUI::International::get(51),WebGUI::Form::password("identifier",20,30,"password"));
 		%hash = ('WebGUI'=>'WebGUI', 'LDAP'=>'LDAP');

@@ -18,10 +18,6 @@ sub process {
 	my ($output);
 	$output = $_[0];
         $output =~ s/\^\\\;/$session{page}{url}/g;
-        #---everything below this line will go away in a later rev.
-        if ($output =~ /\^\\/) {
-                $output =~ s/\^\\/$session{page}{url}/g;
-        }
 	return $output;
 }
 

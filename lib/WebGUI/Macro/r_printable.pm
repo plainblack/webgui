@@ -37,18 +37,6 @@ sub process {
         $output = $_[0];
         $output =~ s/\^r\((.*?)\)\;/_replacement($1)/ge;
         $output =~ s/\^r\;/_replacement()/ge;
-        #---everything below this line will go away in a later rev.
-        if ($output =~ /\^r(.*)\^\/r/) {
-                $temp = appendToUrl($session{env}{REQUEST_URI},'makePrintable=1');
-                $temp = '<a class="makePrintableLink" href="'.$temp.'">'.$1.'</a>';
-                $output =~ s/\^r(.*)\^\/r/$temp/g;
-        } elsif ($output =~ /\^r/) {
-                $temp = appendToUrl($session{env}{REQUEST_URI},'makePrintable=1');
-		$temp = '<a class="makePrintableLink" href="'.$temp.'">';
-		$temp .= WebGUI::International::get(53); 
-		$temp .= '</a>';
-                $output =~ s/\^r/$temp/g;
-        }
 	return $output;
 }
 

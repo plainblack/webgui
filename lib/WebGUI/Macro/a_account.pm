@@ -35,14 +35,6 @@ sub process {
 	$output = $_[0];
         $output =~ s/\^a\((.*?)\)\;/_replacement($1)/ge;
         $output =~ s/\^a\;/_replacement()/ge;
-	#---everything below this line will go away in a later rev.
-	if ($output =~ /\^a(.*)\^\/a/) {
-        	$temp = '<a class="myAccountLink" href="'.$session{page}{url}.'?op=displayAccount">'.$1.'</a>';
-                $output =~ s/\^a(.*)\^\/a/$temp/g;
-	} elsif ($output =~ /\^a/) {
-        	$temp = '<a class="myAccountLink" href="'.$session{page}{url}.'?op=displayAccount">'.WebGUI::International::get(46).'</a>';
-        	$output =~ s/\^a/$temp/g;
-	}
 	return $output;
 }
 
