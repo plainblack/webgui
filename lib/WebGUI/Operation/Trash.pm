@@ -256,9 +256,11 @@ sub www_emptyTrashConfirm {
 #-------------------------------------------------------------------
 sub www_manageTrash {
 	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::isInGroup(4));
-	my ($sth, @data, @row, $i, $p, $allUsers);
+
+	my ($sth, @data, @row, @sorted_row, $i, $p, $allUsers);
 	my $output = helpIcon(66);
 
+	# Add appropriate html page header
 	if ($session{setting}{sharedTrash} eq "1") {
 		$allUsers = 1;
         	$output .= '<h1>'. WebGUI::International::get(962) .'</h1>';
@@ -270,22 +272,18 @@ sub www_manageTrash {
 		$allUsers = 0;
         	$output .= '<h1>'. WebGUI::International::get(962) .'</h1>';
 	}
-	
 
-
-	#
-	# Generate list of pages
-	#
+	# Generate list of pages in trash
 	if ($allUsers) {
 		$sth = WebGUI::SQL->read("select pageId,title,urlizedTitle,bufferUserId,bufferDate,bufferPrevId "
-			."from page where parentId=3 order by bufferDate desc,bufferUserId");
+			."from page where parentId=3 order by bufferDate");
 	} else {
 		$sth = WebGUI::SQL->read("select pageId,title,urlizedTitle,bufferUserId,bufferDate,bufferPrevId "
 			."from page where parentId=3 and bufferUserId="
-			. $session{user}{userId} . " order by bufferDate desc");
+			. $session{user}{userId} . " order by bufferDate");
 	}
         while (@data = $sth->array) {
-		my ($pageId,$title,$urlizedTitle,$bufferUserId,$bufferDate,$bufferPrevId,$url);
+		my ($pageId,$title,$urlizedTitle,$bufferUserId,$bufferDate,$bufferPrevId,$url,$htmlData);
 		$pageId = $data[0];
 		$title = $data[1];
 		$urlizedTitle = $data[2];
@@ -306,41 +304,38 @@ sub www_manageTrash {
                 		$bufferPrevId = '<a href="'. WebGUI::URL::gateway($url) .'">' .$bufferPrevId .'</a>';
 			}
 		}
-                $row[$i] = '<tr>';
-                $row[$i] .= '<td valign="top" class="tableData">'
+
+		# create html row data
+		$htmlData = '<tr>';
+		$htmlData .= '<td valign="top" class="tableData">'
 				.pageIcon()
 				.deleteIcon('op=deleteTrashItem&pageId='.$pageId)
 				.cutIcon('op=cutTrashItem&pageId='.$pageId);
-                $row[$i] .= '</td>';
-                $row[$i] .= '<td valign="top" class="tableData">'.$title;
-                $row[$i] .= '</td>';
-                $row[$i] .= '<td valign="top" class="tableData">'.WebGUI::International::get(2);
-                $row[$i] .= '</td>';
-                $row[$i] .= '<td valign="top" class="tableData">'.$bufferDate;
-                $row[$i] .= '</td>';
-                $row[$i] .= '<td valign="top" class="tableData">'.$bufferPrevId;
-                $row[$i] .= '</td>';
+		$htmlData .= '</td>';
+		$htmlData .= '<td valign="top" class="tableData">'. $title .'</td>';
+		$htmlData .= '<td valign="top" class="tableData">'. WebGUI::International::get(2) .'</td>';
+		$htmlData .= '<td valign="top" class="tableData">'. $bufferDate .'</td>';
+		$htmlData .= '<td valign="top" class="tableData">'. $bufferPrevId .'</td>';
 		if ($allUsers) {
-                	$row[$i] .= '<td valign="top" class="tableData">'.$bufferUserId;
-                	$row[$i] .= '</td>';
+			$htmlData .= '<td valign="top" class="tableData">'. $bufferUserId .'</td>';
 		}
-                $row[$i] .= '</tr>';
-                $i++;
+		$htmlData .= '</tr>';
+
+		# store row data in array of arrays with integer bufferDate for later sorting
+		push @row, [$data[4], $htmlData];
         }
 
-	#
-	# Generate list of wobjects
-	#
+	# Generate list of wobjects in clipboard
 	if ($allUsers) {
 		$sth = WebGUI::SQL->read("select wobjectId,namespace,title,bufferUserId,bufferDate,bufferPrevId "
-			. "from wobject where pageId=3 order by bufferDate desc,bufferUserId");
+			. "from wobject where pageId=3 order by bufferDate");
 	} else {
 		$sth = WebGUI::SQL->read("select wobjectId,namespace,title,bufferUserId,bufferDate,bufferPrevId "
 			. "from wobject where pageId=3 and bufferUserId="
-			. $session{user}{userId} ." order by bufferDate desc");
+			. $session{user}{userId} ." order by bufferDate");
 	}
         while (@data = $sth->array) {
-		my ($wobjectId,$namespace,$title,$bufferUserId,$bufferDate,$bufferPrevId,$url);
+		my ($wobjectId,$namespace,$title,$bufferUserId,$bufferDate,$bufferPrevId,$url,$htmlData);
 
 		$wobjectId = $data[0];
 		$namespace = $data[1];
@@ -364,44 +359,50 @@ sub www_manageTrash {
 					.$bufferUsername .'</a>';
 		}
 
-                $row[$i] = '<tr>';
-                $row[$i] .= '<td valign="top" class="tableData">'
+		# create html row data
+		$htmlData = '<tr>';
+		$htmlData .= '<td valign="top" class="tableData">'
 				.wobjectIcon()
 				.deleteIcon('op=deleteTrashItem&wid='.$wobjectId)
 				.cutIcon('op=cutTrashItem&wid='.$wobjectId);
-                $row[$i] .= '<td valign="top" class="tableData">'.$title;
-                $row[$i] .= '</td>';
-                $row[$i] .= '<td valign="top" class="tableData">'.$namespace;
-                $row[$i] .= '</td>';
-                $row[$i] .= '<td valign="top" class="tableData">'.$bufferDate;
-                $row[$i] .= '</td>';
-                $row[$i] .= '<td valign="top" class="tableData">'.$bufferPrevId;
-                $row[$i] .= '</td>';
+		$htmlData .= '</td>';
+		$htmlData .= '<td valign="top" class="tableData">'. $title .'</td>';
+		$htmlData .= '<td valign="top" class="tableData">'. $namespace .'</td>';
+		$htmlData .= '<td valign="top" class="tableData">'. $bufferDate .'</td>';
+		$htmlData .= '<td valign="top" class="tableData">'. $bufferPrevId .'</td>';
 		if ($allUsers) {
-                	$row[$i] .= '<td valign="top" class="tableData">'.$bufferUserId;
-                	$row[$i] .= '</td>';
+			$htmlData .= '<td valign="top" class="tableData">'. $bufferUserId .'</td>';
 		}
-                $row[$i] .= '</tr>';
-                $i++;
+		$htmlData .= '</tr>';
+
+		# store row data in array of arrays with integer bufferDate for later sorting
+		push @row, [$data[4], $htmlData];
         }
         $sth->finish;
+
+	# Reverse sort row htmlData by bufferDate
+	@sorted_row = sort {$b->[0] <=> $a->[0]} @row;
+	@row = ();
+ 	for $i ( 0 .. $#sorted_row ) {
+		push @row, $sorted_row[$i][1];
+	}
+
+	# Create output with pagination
+        $output .= '<table border=1 cellpadding=5 cellspacing=0 align="center">';
+        $output .= '<tr><th></th>';
+	$output .= '<th>'. WebGUI::International::get(99) .'</th>';
+	$output .= '<th>'. WebGUI::International::get(783) .'</th>';
+	$output .= '<th>'. WebGUI::International::get(963) .'</th>';
+	$output .= '<th>'. WebGUI::International::get(953) .'</th>';
+	if ($allUsers) {
+		$output .= '<th>'. WebGUI::International::get(50) .'</th>';
+	}
+	$output .= '</tr>';
 	if ($session{form}{systemTrash} eq "1") {
         	$p = WebGUI::Paginator->new(WebGUI::URL::page('op=manageTrash&systemTrash=1'),\@row);
 	} else {
         	$p = WebGUI::Paginator->new(WebGUI::URL::page('op=manageTrash'),\@row);
 	}
-        $output .= '<table border=1 cellpadding=5 cellspacing=0 align="center">';
-        $output .= '<tr><th></th>'
-		.'<th>'. WebGUI::International::get(99) .'</th>'
-		.'<th>'. WebGUI::International::get(783) .'</th>'
-		.'<th>'. WebGUI::International::get(963) .'</th>'
-		.'<th>'. WebGUI::International::get(953) .'</th>';
-		if ($allUsers) {
-			$output .= '<th>'. WebGUI::International::get(50) .'</th>'
-			.'</tr>';
-		} else {
-			$output .= '</tr>';
-		}
         $output .= $p->getPage($session{form}{pn});
         $output .= '</table>';
         $output .= $p->getBarTraditional($session{form}{pn});
