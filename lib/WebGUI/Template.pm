@@ -30,9 +30,9 @@ sub countPositions {
 
 #-------------------------------------------------------------------
 sub generate {
-        my ($output, $content, %template);
-	%template = WebGUI::SQL->quickHash("select * from template where templateId=".$_[1]);
-	$content = $template{template};
+        my ($output, $content, $template);
+	$template = WebGUI::SQL->quickHashRef("select * from template where templateId=".$_[1]);
+	$content = $template->{template};
 	$content =~ s/\^(\d+)\;/${$_[0]}{$1}/g;
 	return $content;
 }
