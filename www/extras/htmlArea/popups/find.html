@@ -1,0 +1,134 @@
+<HTML id=dlgFind STYLE="width: 385px; height: 165px; ">
+<HEAD>
+<TITLE>Find & Replace</TITLE>
+<style>
+html, body, button, div, input, select, fieldset, td { font-family: MS Shell Dlg; font-size: 8pt;};
+</style>
+<script>
+window.setInterval(checkInputString, 500);
+opener = window.dialogArguments;
+var editor_obj = opener.document.all["_" + opener.getGlobalVar('_editor_field') + "_editor"];
+function checkInputString() {
+// close when switched to textedit
+   if (opener.getGlobalVar('_editor_field') == "_editor_disabled") {
+      window.close();
+   }
+ }  
+</script>   
+<SCRIPT defer>
+var TxtRange;
+TxtRange = dialogArguments.document.selection.createRange();
+
+function _CloseOnEsc() {
+  if (event.keyCode == 27) { window.close(); return; }
+}
+window.onerror = HandleError
+
+function HandleError(message, url, line) {
+  var str = "An error has occurred in this dialog." + "\n\n"
+  + "Error: " + line + "\n" + message;
+	  alert(str);
+	  window.close(); 
+	  return true;
+}
+
+// event handlers 
+function Init() {document.body.onkeypress = _CloseOnEsc;}
+
+//Match Case and Whole Words  
+function matchtype(){
+    var retval = 0;
+    var matchcase = 0;
+    var matchword = 0;
+    if (document.formSearch.MatchCase.checked) matchcase = 4;
+    if (document.formSearch.MatchWholeWord.checked) matchword = 2;
+    retval = matchcase + matchword;
+    return(retval);
+}
+
+//Checks for Find field not empty
+function checkInputString(){
+    if (document.formSearch.stringSearch.value.length < 1) {
+        alert("Nothing to search.\nPlease enter some text in the field labeled Find what:");
+        return false;
+    } else {
+        return true;
+    }
+}
+
+// Finds the entered text
+function FindTxt(){
+    if (checkInputString()) {
+        var searchval = document.formSearch.stringSearch.value;
+        TxtRange.collapse(false);
+        if (TxtRange.findText(searchval, 1000000000, matchtype())) {TxtRange.select();}
+			else {
+            var startAgain = confirm("Finished Searching the document. Would you like to start again from the top of the page?");
+            if (startAgain) {
+                TxtRange.expand("textedit");
+                TxtRange.collapse();
+                TxtRange.select();
+                FindTxt();
+            }
+        }
+    }
+}
+
+// replaces the first found instance of the entered textwith the desired text
+function ReplaceTxt(){
+    if (checkInputString()) {
+        if (document.formSearch.MatchCase.checked){
+            if (TxtRange.text == document.formSearch.stringSearch.value) TxtRange.text = document.formSearch.stringReplace.value
+        } 
+		else {
+            if (TxtRange.text.toLowerCase() == document.formSearch.stringSearch.value.toLowerCase()) 
+			TxtRange.text = document.formSearch.stringReplace.value
+			}
+        	FindTxt();
+    	}
+	}
+
+// replaces all instances of the entered text with the desired text
+function ReplaceAllTxt(){
+    if (checkInputString()) {
+        var searchval = document.formSearch.stringSearch.value;
+        var wordcount = 0;
+        var msg = "";
+        TxtRange.expand("textedit");
+        TxtRange.collapse();
+        TxtRange.select();
+        while (TxtRange.findText(searchval, 1000000000, matchtype())){
+            TxtRange.select();
+            TxtRange.text = document.formSearch.stringReplace.value;
+            wordcount++;
+        }
+        if (wordcount == 0) msg = "Word not found. Nothing replaced."
+        else msg = wordcount + " word(s) were replaced.";
+        alert(msg);
+    }
+}
+</script>
+
+</HEAD>
+<BODY id=bdy onload="Init()" style="background: threedface; color: windowtext;" scroll=no>
+<FORM NAME="formSearch" method="post" action="">
+<TABLE CELLSPACING="0" cellpadding="5" border="0">
+<TR><TD VALIGN="top" align="left" nowrap>
+<label for="stringSearch">Find what:</label><br>
+<INPUT TYPE=TEXT SIZE=40 NAME=stringSearch id="stringSearch" style="width : 280px; height: 22px;"><br>
+<label for="stringReplace">Replace with:</label><br>
+<INPUT TYPE=TEXT SIZE=40 NAME=stringReplace id="stringReplace" style="width : 280px; height: 22px;"><br>
+<INPUT TYPE=Checkbox SIZE=40 NAME=MatchWholeWord ID="MatchWholeWord"><label for="MatchWholeWord">Match whole word only</label><br>
+<INPUT TYPE=Checkbox SIZE=40 NAME=MatchCase ID="MatchCase"><label for="MatchCase">Match case</label>
+</td>
+<td rowspan="2" valign="top">
+<button name="Find" style="width:75px; height:22px;  margin-top:15px" onClick="FindTxt();">Find Next</button><br>
+<button name="Replace" style="width:75px; height:22px;  margin-top:7px" onClick="ReplaceTxt();">Replace</button><br>
+<button name="Replaceall" style="width:75px; height:22px;  margin-top:7px" onClick="ReplaceAllTxt();">Replace All</button><br>
+<button name="Cancel" style="width:75px; height:22px;  margin-top:7px" onClick="window.close();">Close</button><br>
+</td>
+</tr>
+</table>
+</FORM>
+</BODY>
+</HTML>

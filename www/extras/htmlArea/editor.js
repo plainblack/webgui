@@ -42,8 +42,9 @@ this.toolbar = [
     ['fontsize'],
 //    ['fontstyle'],
 //    ['linebreak'],
+    ['find','separator'],
     ['bold','italic','underline','separator'],
-//  ['strikethrough','subscript','superscript','separator'],
+    ['strikethrough','subscript','superscript','separator'],
     ['justifyleft','justifycenter','justifyright','separator'],
     ['OrderedList','UnOrderedList','Outdent','Indent','separator'],
     ['forecolor','backcolor','separator'],
@@ -84,7 +85,8 @@ this.fontstyles = [     // make sure these exist in the header of page the conte
 
 this.btnList = {
     // buttonName:    commandID,               title,                onclick,                   image,             
-    "smileys":           ['Smileys',         'Insert Smiley',  'editor_action(this.id)',  'ed_smiley.gif'],
+    "find":	      ['Find',	     	       'Find',	             'editor_action(this.id)',  'ed_find.gif'],
+    "smileys":        ['Smileys',              'Insert Smiley',      'editor_action(this.id)',  'ed_smiley.gif'],
     "bold":           ['Bold',                 'Bold',               'editor_action(this.id)',  'ed_format_bold.gif'],
     "italic":         ['Italic',               'Italic',             'editor_action(this.id)',  'ed_format_italic.gif'],
     "underline":      ['Underline',            'Underline',          'editor_action(this.id)',  'ed_format_underline.gif'],
@@ -319,6 +321,14 @@ function editor_action(button_id) {
                                  "resizable: yes; help: no; status: no; scroll: yes; ");
     if (myText) { editor_insertHTML(objname, myText); }
   }
+
+  // Find function
+   if (cmdID == 'Find') {
+	setGlobalVar ("_editor_field",objname);
+	var findRange = editor_obj.contentWindow.document.body.createTextRange();
+	showModelessDialog(_editor_url + "popups/find.html",window, "resizable: no; help: no; status: no; scroll: no; ");
+   return;
+	}
 
   // Custom1
   else if (cmdID == 'custom1') {
@@ -1161,3 +1171,33 @@ function editor_cMenu(obj,menuIdx,objname) {
 }
 
 /* ---------------------------------------------------------------------- */
+
+/* ---------------------------------------------------------------------- */
+// insert by lvn : find + insertTable
+// insert by lvn : check editor changes
+/* ---------------------------------------------------------------------- *\
+  Function    : setGlobalVar
+  Description : set a variable with a global scope
+  Usage       : setGlobalVar(varName, value);
+  Arguments   : varName - name of the global variable to set
+                value - value of the global variable to set
+\* ---------------------------------------------------------------------- */
+function setGlobalVar(varName, value) {
+   if (this.cache == null) {this.cache = new Object();}
+   this.cache[varName] = value;
+}
+/* ---------------------------------------------------------------------- *\
+  Function    : getGlobalVar
+  Description : get a variable in a global scope
+  Usage       : value = getGlobalVar(varName);
+  Arguments   : varName - name of the global variable to get
+                value - value of the global variable to get
+\* ---------------------------------------------------------------------- */
+function getGlobalVar(varName, value) {
+   if (this.cache == null) {
+     return null;
+   } else {
+     return this.cache[varName];
+   }
+}
+
