@@ -323,7 +323,7 @@ sub www_manageTrash {
 		$htmlData = '<tr>';
 		$htmlData .= '<td valign="top" class="tableData">'
 				.pageIcon()
-				.deleteIcon('op=deleteTrashItem&pageId='.$pageId)
+				.deleteIcon('op=deleteTrashItemConfirm&pageId='.$pageId,'',WebGUI::International::get(966))
 				.cutIcon('op=cutTrashItem&pageId='.$pageId);
 		$htmlData .= '</td>';
 		$htmlData .= '<td valign="top" class="tableData">'. $title .'</td>';
@@ -377,7 +377,7 @@ sub www_manageTrash {
 		$htmlData = '<tr>';
 		$htmlData .= '<td valign="top" class="tableData">'
 				.wobjectIcon()
-				.deleteIcon('op=deleteTrashItem&wid='.$wobjectId)
+				.deleteIcon('op=deleteTrashItemConfirm&wid='.$wobjectId ,'',WebGUI::International::get(966))
 				.cutIcon('op=cutTrashItem&wid='.$wobjectId);
 		$htmlData .= '</td>';
 		$htmlData .= '<td valign="top" class="tableData">'. $title .'</td>';
