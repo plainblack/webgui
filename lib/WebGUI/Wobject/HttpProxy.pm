@@ -54,6 +54,9 @@ sub new {
 			followExternal=>{
 				defaultValue=>1
 				}, 
+                        rewriteUrls=>{
+                                defaultValue=>1
+                                },
 			followRedirect=>{
 				defaultValue=>0
 				} 
@@ -89,6 +92,11 @@ sub www_edit {
                 -name=>"followRedirect",
                 -label=>WebGUI::International::get(8,$_[0]->get("namespace")),
                 -value=>$_[0]->getValue("followRedirect")
+                );
+        $properties->yesNo(
+                -name=>"rewriteUrls",
+                -label=>WebGUI::International::get(12,$_[0]->get("namespace")),
+                -value=>$_[0]->getValue("rewriteUrls")
                 );
         $layout->yesNo(
                 -name=>"removeStyle",
@@ -226,7 +234,7 @@ sub www_view {
       if($response->content_type eq "text/html" || 
         ($response->content_type eq "" && $content=~/<html/gis)) {
   
-         my $p = WebGUI::Wobject::HttpProxy::Parse->new($proxiedUrl, $content, $_[0]->get("wobjectId"));
+         my $p = WebGUI::Wobject::HttpProxy::Parse->new($proxiedUrl, $content, $_[0]->get("wobjectId"),$_[0]->get("rewriteUrls"));
          $content = $p->filter; # Rewrite content. (let forms/links return to us).
          $p->DESTROY; 
    

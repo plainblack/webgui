@@ -51,6 +51,7 @@ sub new {
   	$self->{Url} = shift;
   	$self->{Content} = shift;
   	$self->{wid} = shift;
+	$self->{rewriteUrls} = shift;
   	$self->{Filtered} ="";
   	$self->{FormAction} = "";
   	$self->{FormActionIsDefined} = 0;
@@ -120,7 +121,7 @@ sub start {
         			$val = URI::URL::url($val)->abs($self->{Url},1); # make absolute
       			}
       			if ($val->scheme eq "http") {
-        			if (lc($tag) ne "img" && lc($tag) ne "script" && lc($tag) ne "iframe") { # no rewrite for some 
+        			if (lc($tag) ne "img" && lc($tag) ne "script" && lc($tag) ne "iframe" && $self->{rewriteUrls}) { # no rewrite for some 
           				if (lc($tag) eq "form" && lc($_) eq "action") {  # Found FORM ACTION
 	    					$self->{FormActionIsDefined}=1;
             					$self->{FormAction} = $val;  # set FormAction to include hidden field later
