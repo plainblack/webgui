@@ -22,6 +22,7 @@ use WebGUI::SQL;
 use WebGUI::URL;
 use WebGUI::Utility;
 use WebGUI::Wobject;
+use Digest::MD5 qw(md5_hex);
 
 our @ISA = qw(WebGUI::Wobject);
 
@@ -126,7 +127,10 @@ sub new {
 				},
 			mode=>{
 				defaultValue=>"survey"
-				}
+				},
+			anonymous=>{
+				defaultValue=>0
+				},
 			}
                 );
         bless $self, $class;
@@ -194,7 +198,7 @@ sub www_deleteResponses {
 #-------------------------------------------------------------------
 sub www_deleteResponsesConfirm {
 	return "" unless (WebGUI::Privilege::isInGroup($_[0]->get("groupToViewReports")));
-        WebGUI::SQL->write("delete from Survey_response where ((userId=$session{form}{uid}
+        WebGUI::SQL->write("delete from Survey_response where ((userId='$session{form}{uid}'
         	and userId<>1) or (userId=1 and ipAddress='$session{form}{ip}')) and Survey_id=".$_[0]->get("Survey_id"));
         return $_[0]->www_viewGradebook;
 }
@@ -240,6 +244,11 @@ sub www_edit {
                 -label=>WebGUI::International::get(11,$_[0]->get("namespace")),
                 -value=>[$_[0]->getValue("mode")]
                 );
+		$properties->yesNo(
+					-name=>"anonymous",
+                	-value=>$_[0]->getValue("anonymous"),
+                	-label=>WebGUI::International::get(81,$_[0]->get("namespace"))
+                	);
 	$privileges->group(
 		-name=>"groupToTakeSurvey",
 		-value=>[$_[0]->getValue("groupToTakeSurvey")],
@@ -550,8 +559,9 @@ sub www_moveQuestionUp {
 sub www_respond {
 	return "" unless (WebGUI::Privilege::isInGroup($_[0]->get("groupToTakeSurvey")));
 	return "" unless ($session{form}{Survey_answerId} ne "");
+	my $userId = ($_[0]->get("anonymous")) ? substr(md5_hex($session{user}{userId}),0,8) : $session{user}{userId};
 	my ($previousResponse) = WebGUI::SQL->quickArray("select count(*) from Survey_response
-		where Survey_answerId=$session{form}{Survey_answerId} and ((userId=".$session{user}{userId}." and userId<>1)
+		where Survey_answerId=$session{form}{Survey_answerId} and ((userId='".$userId."' and userId<>1)
                         or (userId=1 and ipAddress='".$session{form}{ip}."'))");
 	return "" if ($previousResponse);
 	my $answer = $_[0]->getCollateral("Survey_answer","Survey_answerId",$session{form}{Survey_answerId});
@@ -563,17 +573,19 @@ sub www_respond {
 		Survey_id=>$answer->{Survey_id},
 		comment=>$session{form}{comment},
 		response=>$response,
-		userId=>$session{user}{userId},
-		username=>$session{user}{username},
+		userId=>($_[0]->get("anonymous")) ? substr(md5_hex($session{user}{userId}),0,8) : $session{user}{userId},
+		username=>($_[0]->get("anonymous")) ? substr(md5_hex($session{user}{username}),0,8) : $session{user}{username},
 		dateOfResponse=>time(),
-		ipAddress=>$session{env}{REMOTE_ADDR}
+		ipAddress=>($_[0]->get("anonymous")) ? substr(md5_hex($session{env}{REMOTE_ADDR}),0,8) : $session{env}{REMOTE_ADDR}
 		},0,0);
 	return "";
 }
 
 #-------------------------------------------------------------------
 sub www_view {
-	my ($output, $f, $previous, $questionOrder, $previousResponse, $question);
+	my ($output, $f, $previous, $questionOrder, $previousResponse, $question, $ipAddress, $userId);
+	$ipAddress = ($_[0]->get("anonymous")) ? substr(md5_hex($session{env}{REMOTE_ADDR}),0,8) : $session{env}{REMOTE_ADDR};
+	$userId = ($_[0]->get("anonymous")) ? substr(md5_hex($session{user}{userId}),0,8) : $session{user}{userId};
 	$output = $_[0]->displayTitle;
 	$output .= $_[0]->description;
         if (WebGUI::Privilege::isInGroup($_[0]->get("groupToViewReports"))) {
@@ -583,14 +595,14 @@ sub www_view {
 	if (WebGUI::Privilege::isInGroup($_[0]->get("groupToTakeSurvey"))) {
         	$previousResponse = WebGUI::SQL->quickHashRef("select Survey_questionId, Survey_answerId from Survey_response 
 			where Survey_id=".$_[0]->get("Survey_id")
-			." and ((userId=$session{user}{userId} and userId<>1) or (userId=1 and 
-			ipAddress='$session{env}{REMOTE_ADDR}')) order by dateOfResponse desc");
+			." and ((userId='$userId' and userId<>1) or (userId=1 and 
+			ipAddress='$ipAddress')) order by dateOfResponse desc");
 		$questionOrder = $_[0]->get("questionOrder");
 		if ($previousResponse->{Survey_questionId}) {
 			if ($questionOrder eq "random") {
 				my @questions = WebGUI::SQL->buildArray("select Survey_questionId from Survey_response
-					where Survey_id=".$_[0]->get("Survey_id")." and ((userId=$session{user}{userId} 
-					and userId<>1) or (userId=1 and ipAddress='$session{env}{REMOTE_ADDR}'))");
+					where Survey_id=".$_[0]->get("Survey_id")." and ((userId='$userId' 
+					and userId<>1) or (userId=1 and ipAddress='$ipAddress'))");
 				if ($#questions >= 0) {
 					@questions = WebGUI::SQL->buildArray("select Survey_questionId from Survey_question 
 						where Survey_id=".$_[0]->get("Survey_id")
@@ -673,8 +685,8 @@ sub www_view {
 					where Survey_id=".$_[0]->get("Survey_id"));
 				my ($correctCount) = WebGUI::SQL->quickArray("select count(*) from Survey_response a,
 					Survey_answer b where a.Survey_id=".$_[0]->get("Survey_id")." 
-					and ((userId=$session{user}{userId} and userId<>1) or 
-					(userId=1 and ipAddress='$session{env}{REMOTE_ADDR}'))
+					and ((userId='$userId' and userId<>1) or 
+					(userId=1 and ipAddress='$ipAddress'))
 					and a.Survey_answerId=b.Survey_answerId and b.isCorrect=1");
 				if ($questionCount > 0) {
 					$output .= "<h1>".WebGUI::International::get(52,$_[0]->get("namespace")).": "
@@ -734,7 +746,7 @@ sub www_viewGradebook {
 		$output .= '</a></td>';
 		my ($correctCount) = WebGUI::SQL->quickArray("select count(*) from Survey_response a,
                 	Survey_answer b where a.Survey_id=".$_[0]->get("Survey_id")."
-                        and ((userId=".$user->{userId}." and userId<>1) or
+                        and ((userId='".$user->{userId}."' and userId<>1) or
                         (userId=1 and ipAddress='".$user->{ipAddress}."'))
                         and a.Survey_answerId=b.Survey_answerId and b.isCorrect=1");
 		$output .= '<td>'.$correctCount.'/'.$questionCount.'</td>';
@@ -755,10 +767,10 @@ sub www_viewIndividualSurvey {
 	$output .= '<a href="'.WebGUI::URL::page('func=deleteResponses&wid='.$_[0]->get("wobjectId")
                 .'&uid='.$session{form}{uid}.'&ip='.$session{form}{ip}).'">'.WebGUI::International::get(69,$_[0]->get("namespace")).'</a><p/>';
 	my ($start) = WebGUI::SQL->quickArray("select min(dateOfResponse) from Survey_response 
-		where Survey_id=".$_[0]->get("Survey_id")." and ((userId=".$session{form}{uid}." and userId<>1)
+		where Survey_id=".$_[0]->get("Survey_id")." and ((userId='".$session{form}{uid}."' and userId<>1)
                 or (userId=1 and ipAddress='".$session{form}{ip}."'))");
         my ($end) = WebGUI::SQL->quickArray("select max(dateOfResponse) from Survey_response
-                where Survey_id=".$_[0]->get("Survey_id")." and ((userId=".$session{form}{uid}." and userId<>1)
+                where Survey_id=".$_[0]->get("Survey_id")." and ((userId='".$session{form}{uid}."' and userId<>1)
                 or (userId=1 and ipAddress='".$session{form}{ip}."'))");
 	$output .= '<b>'.WebGUI::International::get(76,$_[0]->get("namespace")).':</b> '.epochToHuman($start).'<br/>';
 	$output .= '<b>'.WebGUI::International::get(77,$_[0]->get("namespace")).':</b> '.epochToHuman($end).'<br/>';
@@ -788,7 +800,7 @@ sub www_viewIndividualSurvey {
 			.WebGUI::International::get(66,$_[0]->get("namespace")).'</td>';
 		$rdata = WebGUI::SQL->quickHashRef("select Survey_answerId,response,comment from Survey_response 
 			where Survey_questionId=".$qdata->{Survey_questionId}." 
-			and ((userId=".$session{form}{uid}." and userId<>1) 
+			and ((userId='".$session{form}{uid}."' and userId<>1) 
 			or (userId=1 and ipAddress='".$session{form}{ip}."'))");
 		$output .= '<td width="75%">'.$rdata->{response}.'</td></tr>';
 		if ($rdata->{comment} ne "") {

@@ -87,7 +87,9 @@ alter table groups add column databaseLinkId int not null default 0;
 alter table groups add column dbCacheTimeout int not null default 3600;
 alter table groups add column dbQuery text;
 
-
-
-
+insert into international (internationalId,languageId,namespace,message,lastUpdated) values (81,1,'Survey','Anonymous responses?',1059069492);
+delete from international where languageId=1 and namespace='Survey' and internationalId=4;
+insert into international (internationalId,languageId,namespace,message,lastUpdated) values (4,1,'Survey','Surveys allow you to gather information from your users. In the case of WebGUI surveys, you can also use them to test your user\'s knowledge.\r\n<p/>\r\n\r\n<b>Question Order</b><br/>\r\nThe order the questions will be asked. Sequential displays the questions in the order you create them. Random displays the questions randomly. Response driven displays the questions in order based on the responses of the users.\r\n<p/>\r\n\r\n<b>Mode</b><br/>\r\nBy default the Survey is in survey mode. This allows it to ask questions of your users. However, if you switch to Quiz mode, you can have a self-correcting test of your user\'s knowledge.\r\n<p/>\r\n\r\n<b>Anonymous responses?</b><br/>\r\nSelect whether or not the survey will record and display information that can identify a user and their responses.  If left at the default value of "No", the survey will record the user\'s IP address as well as their WebGUI User ID and Username if logged in.  This info will then be available in the survey\'s reports.  If set to "Yes", these three fields will contain scrambled data that can not be traced to a particular user.\r\n<p/>\r\n\r\n<b>Who can take the survey?</b><br/>\r\nWhich users can participate in the survey?\r\n<p/>\r\n\r\n\r\n<b>Who can view reports?</b><br/>\r\nWho can view the results of the survey?\r\n<p/>\r\n\r\n\r\n<b>What next?</b><br/>\r\nIf you leave this set at its default, then you will add a question directly after adding the survey.\r\n<p/>\r\n',1059069492);
+alter table Survey add column anonymous char(1) not null default 0;
+alter table Survey_response change userId userId varchar(11);
 
