@@ -87,7 +87,8 @@ sub classSettings {
                groupIdEdit  => { defaultValue => 3 },
                hideFromNavigation => { defaultValue => 0 },
           },
-          useDummyRoot => 1
+          useDummyRoot => 1,
+          table => 'page'
      }
 }
 
@@ -235,10 +236,6 @@ sub makeUnique {
         }
         return $url;
 }
-
-#-------------------------------------------------------------------
-
-sub table { 'page' }
 
 1;
 

@@ -43,17 +43,15 @@ database.
  use WebGUI::Persistent;
  our @ISA = qw(WebGUI::Persistent);
 
- sub table { 'myTable' }
-
-
  sub classSettings { 
       {
            properties => {
                 A => { key => 1 },
                 B => { defaultValue => 5},
                 C => { quote => 1 , defaultValue => "hello world"},
-                D => { }
-           }
+                D => { },
+           },
+           table => 'myTable'
       }
  }
 
@@ -114,6 +112,18 @@ sub classData {
 This class method must be overridden to return a hash reference with one or
 more of the following keys.
 
+ sub classSettings { 
+      {
+           properties => {
+                A => { key => 1 },
+                B => { defaultValue => 5},
+                C => { quote => 1 , defaultValue => "hello world"},
+                D => { },
+           },
+           table => 'myTable'
+      }
+ }
+
 =over
 
 =item properties
@@ -138,6 +148,10 @@ Should be true for the primary key column (one field must be set in this way).
 Should be true for fields that need to be quoted in database queries.
 
 =back
+
+=head2 table
+
+This must be set to the name of the table that this class represents.
 
 =back
 
@@ -457,13 +471,19 @@ sub set {
 
 =head2 table
 
-This method must be overriden to return the name of the table modeled by this
-class.
+Returns the table name set in classSettings().
 
-=cut
+=cut 
 
 sub table {
-     WebGUI::ErrorHandler::fatalError("table() must be overridden");
+     my ($class) = @_;
+     unless ($class->classData->{table}) {
+          unless ($class->classSettings->{table}) {
+               WebGUI::ErrorHandler::fatalError("table() must be overridden");
+          }
+          $class->classData->{table} = $class->classSettings->{table};
+     }
+     return $class->classData->{table}
 }
 
 1;

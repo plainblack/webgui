@@ -48,7 +48,8 @@ sub classSettings {
       parentId           => { defaultValue => 0 },
       collateralFolderId => { key          => 1 },
       description        => { quote        => 1 }
-    }
+    },
+    table => 'collateralFolder'
   }  
 }
 
@@ -72,7 +73,5 @@ sub recursiveDelete {
   my @collateralIds = WebGUI::SQL->buildArray("select collateralId from collateral where collateralType='image' and collateralFolderId in (".join(',',@ids).")");
   WebGUI::Collateral->multiDelete(@collateralIds);
 }
-
-sub table     { 'collateralFolder' }
 
 1;

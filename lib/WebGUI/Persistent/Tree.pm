@@ -44,9 +44,6 @@ methods), and from Tree::DAG_Node (to provide tree manipulation methods).
  use WebGUI::Persistent::Tree;
  our @ISA = qw(WebGUI::Persistent::Tree);
 
- sub table { 'myTreeTable' }
-
-
  sub classSettings { 
       {
            properties => {
@@ -55,7 +52,8 @@ methods), and from Tree::DAG_Node (to provide tree manipulation methods).
                 C => { quote => 1 , defaultValue => "hello world"},
                 parentId       => { defaultValue => 0 },
                 sequenceNumber => { defaultValue => 1 }
-           }
+           },
+           table => 'myTreeTable'
       }
  }
 
