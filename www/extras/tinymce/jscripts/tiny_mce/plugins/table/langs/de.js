@@ -1,0 +1,30 @@
+// DE lang variables, Translated 2004 by Crazy Chrissi, Edited 2004 by Krokogras
+
+tinyMCELang['lang_table_desc'] = 'Neue Tabelle einf&uuml;gen / Tabelle bearbeiten';
+tinyMCELang['lang_table_insert_row_before_desc'] = 'Davor Zeile einf&uuml;gen';
+tinyMCELang['lang_table_insert_row_after_desc'] = 'Danach Zeile einf&uuml;gen';
+tinyMCELang['lang_table_delete_row_desc'] = 'Zeile l&ouml;schen';
+tinyMCELang['lang_table_insert_col_before_desc'] = 'Davor Spalte einf&uuml;gen';
+tinyMCELang['lang_table_insert_col_after_desc'] = 'Danach Spalte einf&uuml;gen';
+tinyMCELang['lang_table_delete_col_desc'] = 'Spalte l&ouml;schen';
+tinyMCELang['lang_insert_table_title'] = 'Tabelle Einf&uuml;gen/Bearbeiten';
+tinyMCELang['lang_insert_table_width'] = 'Breite';
+tinyMCELang['lang_insert_table_height'] = 'H&ouml;he';
+tinyMCELang['lang_insert_table_cols'] = 'Spalten';
+tinyMCELang['lang_insert_table_rows'] = 'Zeilen';
+tinyMCELang['lang_insert_table_cellspacing'] = 'Au&szlig;enabstand';
+tinyMCELang['lang_insert_table_cellpadding'] = 'Innenabstand';
+tinyMCELang['lang_insert_table_border'] = 'Rahmen';
+tinyMCELang['lang_insert_table_align'] = 'Ausrichten';
+tinyMCELang['lang_insert_table_align_default'] = 'Normal';
+tinyMCELang['lang_insert_table_align_left'] = 'Links';
+tinyMCELang['lang_insert_table_align_right'] = 'Rechts';
+tinyMCELang['lang_insert_table_align_middle'] = 'Zentriert';
+tinyMCELang['lang_insert_table_class'] = 'Klasse';
+tinyMCELang['lang_table_row_title'] = 'Table row properties';
+tinyMCELang['lang_table_cell_title'] = 'Table cell properties';
+tinyMCELang['lang_table_row_desc'] = 'Table row properties';
+tinyMCELang['lang_table_cell_desc'] = 'Table cell properties';
+tinyMCELang['lang_insert_table_valign'] = 'Vertical alignment';
+tinyMCELang['lang_insert_table_align_top'] = 'Top';
+tinyMCELang['lang_insert_table_align_bottom'] = 'Bottom';
