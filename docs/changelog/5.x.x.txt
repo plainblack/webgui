@@ -21,6 +21,9 @@
    https://some.server to work in a url field
  - Bugfix [ 852024 ] Can't copy a USS wobject (Thanks to Len Kranendonk)
  - Bugfix [ 849438 ] Adding Wobject Fails for Content Managers
+ - Updated the Italian translation. (Thanks to Paolo Pigati.)
+ - Updated the Italian translation. (Thanks to ProcoliX.)
+ - Bugfix [ 870209 ] Calendar times thrown off by user's offset.
 
 
 5.5.3
