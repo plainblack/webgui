@@ -23,6 +23,13 @@ save you many hours of grief.
 	discussions then you'll need to rebuild them because the 
 	discussion data structures have changed significantly.
 
+ * Due to a previous bug in WebGUI some databases will have duplicate
+	usernames. WebGUI 5.5.0 has a mechanism to make this
+	impossible, but in order for it to work we must first get rid
+	of all the duplicates. Therefore some usernames will be
+	renamed with an integer like at the end. So if you have two
+	users called "joe" then one of them will be renamed to "joe1".
+
 
 5.4.1
 --------------------------------------------------------------------
