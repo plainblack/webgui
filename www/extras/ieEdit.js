@@ -595,8 +595,8 @@ sz += ""
 sz += "</SELECT>"
 */
 }
-var arTypes = new Array("http","ftp","mailto")
-var arText = new Array("http://","ftp://","mailto:")
+var arTypes = new Array("","http","ftp","mailto")
+var arText = new Array("","http://","ftp://","mailto:")
 var szType = szURL.substring(0,szURL.indexOf(":"))
 if (("http"==szType) || ("ftp"==szType)) 
 szURL = szURL.substring(szURL.indexOf("//")+2)
