@@ -47,17 +47,17 @@ sub www_search {
                                 $result{$data[0]} += 1;
                         }
                         $sth->finish;
-                        $sth = WebGUI::SQL->read("select pageId from widget where title like '%".$term."%' and pageId > 25");
+                        $sth = WebGUI::SQL->read("select pageId from wobject where title like '%".$term."%' and pageId > 25");
                         while (@data = $sth->array) {
                                 $result{$data[0]} += 5;
                         }
                         $sth->finish;
-                        $sth = WebGUI::SQL->read("select pageId from widget where description like '%".$term."%' and pageId > 25");
+                        $sth = WebGUI::SQL->read("select pageId from wobject where description like '%".$term."%' and pageId > 25");
                         while (@data = $sth->array) {
                                 $result{$data[0]} += 2;
                         }
                         $sth->finish;
-                        $sth = WebGUI::SQL->read("select widget.pageId from Article,widget where Article.widgetId=widget.widgetId and Article.body like '%".$term."%'");
+                        $sth = WebGUI::SQL->read("select wobject.pageId from Article,wobject where Article.wobjectId=wobject.wobjectId and Article.body like '%".$term."%'");
                         while (@data = $sth->array) {
                                 $result{$data[0]} += 2;
                         }

@@ -22,12 +22,13 @@ our @ISA = qw(Exporter);
 our @EXPORT = qw(&www_purgeTrash &www_purgeTrashConfirm);
 
 #-------------------------------------------------------------------
-sub _purgeWidgets {
-	my ($b, $widgetId, $widgetType, $func);
-	$b = WebGUI::SQL->read("select widgetId, namespace from widget where pageId=$_[0]");
-        while (($widgetId,$widgetType) = $b->array) {
-        	$func = "WebGUI::Widget::".$widgetType."::purge";
-                &$func($widgetId);
+sub _purgeWobjects {
+	my ($b, $wobjectId, $namespace, $w, $cmd);
+	$b = WebGUI::SQL->read("select wobjectId, namespace from wobject where pageId=$_[0]");
+        while (($wobjectId,$namespace) = $b->array) {
+        	$cmd = "WebGUI::Wobject::".$namespace;
+                $w = $cmd->new({wobjectId=>$wobjectId,namespace=>$namespace});
+		$w->purge;
         }
         $b->finish;
 }
@@ -38,7 +39,7 @@ sub _recursePageTree {
         $a = WebGUI::SQL->read("select pageId from page where parentId=$_[0]");
         while (($pageId) = $a->array) {
                 _recursePageTree($pageId);
-		_purgeWidgets($pageId);
+		_purgeWobjects($pageId);
                 WebGUI::SQL->write("delete from page where pageId=$pageId");
         }
         $a->finish;
@@ -65,7 +66,7 @@ sub www_purgeTrash {
 sub www_purgeTrashConfirm {
         if (WebGUI::Privilege::isInGroup(3)) {
 		_recursePageTree(3);
-		_purgeWidgets(3);
+		_purgeWobjects(3);
 		return "";
 	} else {
 		return WebGUI::Privilege::adminOnly();

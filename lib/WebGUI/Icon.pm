@@ -21,7 +21,7 @@ use WebGUI::URL;
 
 our @ISA = qw(Exporter);
 our @EXPORT = qw(&helpIcon &becomeIcon &cutIcon &copyIcon &deleteIcon &editIcon &moveUpIcon &moveDownIcon
-	&moveTopIcon &moveBottomIcon &viewIcon);
+	&pageIcon &moveTopIcon &moveBottomIcon &viewIcon);
 
 =head1 NAME
 

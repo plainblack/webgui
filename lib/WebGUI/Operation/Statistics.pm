@@ -127,7 +127,7 @@ sub www_viewStatistics {
 		($data) = WebGUI::SQL->quickArray("select count(*) from page where parentId>25");
 		$data++;
 		$output .= '<tr><td class="tableHeader">'.WebGUI::International::get(147).'</td><td class="tableData">'.$data.'</td></tr>';
-		($data) = WebGUI::SQL->quickArray("select count(*) from widget");
+		($data) = WebGUI::SQL->quickArray("select count(*) from wobject");
 		$data--;
 		$output .= '<tr><td class="tableHeader">'.WebGUI::International::get(148).'</td><td class="tableData">'.$data.'</td></tr>';
 		($data) = WebGUI::SQL->quickArray("select count(*) from style where styleId>25");

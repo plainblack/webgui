@@ -47,10 +47,11 @@ our @EXPORT = qw(&quote &getNextId);
  $hashRef = WebGUI::SQL->buildHashRef($sql);
  @arr = WebGUI::SQL->quickArray($sql);
  %hash = WebGUI::SQL->quickHash($sql);
+ $hashRef = WebGUI::SQL->quickHashRef($sql);
 
  WebGUI::SQL->write($sql);
 
- $id = getNextId("widgetId");
+ $id = getNextId("wobjectId");
  $string = quote($string);
 
 =head1 DESCRIPTION
@@ -355,6 +356,30 @@ sub quickHash {
 	}
 }
 
+#-------------------------------------------------------------------
+
+=head2 quickHashRef ( sql [, dbh ] )
+
+ Executes a query and returns a single row of data as a hash
+ reference.
+
+=item sql
+
+ An SQL query.
+
+=item dbh
+
+ By default this method uses the WebGUI database handler. However,
+ you may choose to pass in your own if you wish.
+
+=cut
+
+sub quickHashRef {
+        my ($sth, %hash);
+        tie %hash, "Tie::CPHash";
+        %hash = $_[0]->quickHash($_[1],$_[2]);
+        return \%hash;
+}
 
 #-------------------------------------------------------------------
 

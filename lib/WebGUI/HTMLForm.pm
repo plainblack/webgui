@@ -1123,7 +1123,7 @@ sub url {
         $extras = shift;
         $subtext = shift;
         $size = shift || $session{setting}{textBoxSize} || 30;
-	$output = '<script language="JavaScript">function addHTTP(element) {if (!element.value.match(":\/\/")) 
+	$output = '<script language="JavaScript">function addHTTP(element) {if (!element.value.match(":\/\/") && element.value != "") 
 		{ element.value = "http://"+element.value}}</script>';
         $output .= '<input type="text" name="'.$name.'" value="'.$value.'" size="'.
                 $size.'" maxlength="'.$maxLength.'" onBlur="addHTTP(this.form.'.$name.')" '.$extras.'>';

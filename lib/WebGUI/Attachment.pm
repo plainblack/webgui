@@ -103,6 +103,7 @@ sub _createThumbnail {
 sub copy {
 	my ($a, $b, $newNode);
 	$newNode = WebGUI::Node->new($_[1],$_[2]);
+	$newNode->create;
        	$a = FileHandle->new($_[0]->getPath,"r");
 	$b = FileHandle->new(">".$newNode->getPath.'/'.$_[0]->getFilename);
 	if (defined $a) {
