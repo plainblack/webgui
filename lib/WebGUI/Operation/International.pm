@@ -50,9 +50,13 @@ sub _export {
         while (%data = $sth->hash) {
                 $export .= "delete from international where languageId=".$_[0]." and namespace="
                         .quote($data{namespace})." and internationalId=".$data{internationalId}.";\n";
-                $export .= "insert into international (internationalId,languageId,namespace,message,lastUpdated) values ("
+                $export .= "insert into international (internationalId,languageId,namespace,message,lastUpdated";
+		$export .= ",context" if ($_[0] == 1);
+		$export .= ") values ("
                         .$data{internationalId}.",".$data{languageId}.",".quote($data{namespace})
-                        .",".quote($data{message}).", ".$data{lastUpdated}.");\n";
+                        .",".quote($data{message}).", ".$data{lastUpdated};
+		$export .= ",".quote($data{context}) if ($_[0] == 1);
+		$export .= ");\n";
         }
         $sth->finish;
 	return $export;
