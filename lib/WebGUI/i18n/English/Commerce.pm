@@ -92,11 +92,11 @@ Your partner id.<br>
 Here you should enter your vendor id.<br>
 <br>
 <b>Login</b>
-Your login to Versign PayflowPro.<br>
+Your login to Verisign PayflowPro.<br>
 <br>
 <b>Password</b>
 Your password.<br>|,
-		lastUpdated => 1101772591,
+		lastUpdated => 1101881895,
 		context => q|The content of the manage commerce help page.|
 	},
 
@@ -362,8 +362,8 @@ A template loop containing the items that were checked out. The following templa
 	},
 	'failed payment plugins' => {
 		message => q|The following Payment Plugins failed to compile, please check your log for more information: |,
-		lastUpdated => 0,
-		context => q|The message that sais which payment plugins did not compile.|
+		lastUpdated => 1101881907,
+		context => q|The message that says which payment plugins did not compile.|
 	},
 	'select payment gateway'=> {
 		message => q|Please select a payment gateway.|,
@@ -395,10 +395,10 @@ This is the message that ask the user to select a payment gateway.<br>
 A boolean value that is true when one or more payment plugins can be loaded and are enabled.<br>
 <br>
 <b>noPluginsMessage</b><br>
-A message that sais that there are no payment plugins that ca be used.<br>
+A message that says that there are no payment plugins that ca be used.<br>
 <br>
 <b>formHeader</b><br>
-This contains the form header and all hidden form variables that are needed for a successfull checkout.<br>
+This contains the form header and all hidden form variables that are needed for a successful checkout.<br>
 <br>
 <b>formFooter</b><br>
 The form footer.<br>
@@ -413,12 +413,12 @@ A template loop containing all enabled payment plugins. Within this loop the fol
 The name of the plugin.<br>
 <br>
 <b>namespace</b><br>
-The namespace of the plugin. You only need this if you want to create your own custom foem elements.<br>
+The namespace of the plugin. You only need this if you want to create your own custom form elements.<br>
 <br>
 <b>formElement</b><br>
 A radio button tied to this plugin.<br>
 </blockquote>|,
-		lastUpdated => 0,
+		lastUpdated => 1101881921,
 		context => q|The body of the help page of the select payment gateway template.|
 	},
 
