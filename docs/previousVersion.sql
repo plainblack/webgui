@@ -17969,4 +17969,8 @@ INSERT INTO wobject VALUES (5,1001,'USS',2,'Your Next Step',0,' To learn more ab
 INSERT INTO wobject VALUES (6,1002,'SyndicatedContent',1,'The Latest News',0,'This is the latest news from Plain Black and WebGUI pulled directly from the site every hour.',1076708567,3,1076709040,3,1,946710000,2082783600,NULL,NULL,NULL,NULL,NULL,0,NULL,NULL,NULL,1000,3,3,7,NULL);
 INSERT INTO wobject VALUES (7,1003,'DataForm',1,'Tell A Friend',0,'Tell a friend about WebGUI.',1076709292,3,1076709522,3,1,946710000,2082783600,NULL,NULL,NULL,NULL,NULL,0,NULL,NULL,NULL,1,3,3,7,NULL);
 INSERT INTO wobject VALUES (8,1004,'SiteMap',0,'Site Map',0,'',1001744792,3,1016077239,3,1,1001744792,1336444487,NULL,NULL,NULL,NULL,NULL,0,NULL,NULL,NULL,2,3,3,7,NULL);
+update settings set value=0 where name='anonymousRegistration';
+update settings set value=3600 where name='sessionTimeout';
+
+
 

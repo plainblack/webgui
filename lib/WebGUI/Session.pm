@@ -109,6 +109,9 @@ sub _setupSessionVars {
 	tie %vars, 'Tie::CPHash';
 	if ($_[0] ne "") {
 		%vars = WebGUI::SQL->quickHash("select * from userSession where sessionId='$_[0]'");
+		if ($vars{expires} < _time()) {
+			WebGUI::Session::end($_[0]);
+		}
 		if ($vars{sessionId} ne "") {
 			$session{scratch} = WebGUI::SQL->buildHashRef("select name,value from userSessionScratch
                 		where sessionId=".quote($_[0]));

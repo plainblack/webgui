@@ -406,33 +406,30 @@ sub displayAccount {
 =cut
 
 sub displayLogin {
-    my $self = shift;
+    	my $self = shift;
 	my $method = $_[0] || "login";
 	my $vars = $_[1];
 	my $template = $_[2] || 'Auth/'.$self->authMethod.'/Login';
-
 	unless ($session{env}{REQUEST_URI} =~ "displayLogin" || $session{env}{REQUEST_URI} =~ "displayAccount" ||
-	        $session{env}{REQUEST_URI} =~ "logout" || $session{env}{REQUEST_URI} =~ "deactivateAccount"){
-	   WebGUI::Session::setScratch("redirectAfterLogin",$session{env}{REQUEST_URI});
+		$session{env}{REQUEST_URI} =~ "logout" || $session{env}{REQUEST_URI} =~ "deactivateAccount"){
+	   	WebGUI::Session::setScratch("redirectAfterLogin",$session{env}{REQUEST_URI});
 	}
-
 	$vars->{title} = WebGUI::International::get(66);
-	$vars->{'login.form.header'} = WebGUI::Form::formHeader({});
+	$vars->{'login.form.header'} = WebGUI::Form::formHeader();
 	if ($session{setting}{encryptLogin}) {
-       $vars->{'login.form.header'} =~ s/http:/https:/;
-    }
-    $vars->{'login.form.hidden'} = WebGUI::Form::hidden({"name"=>"op","value"=>"auth"});
+       		$vars->{'login.form.header'} =~ s/http:/https:/;
+    	}
+    	$vars->{'login.form.hidden'} = WebGUI::Form::hidden({"name"=>"op","value"=>"auth"});
 	$vars->{'login.form.hidden'} .= WebGUI::Form::hidden({"name"=>"method","value"=>$method});
 	$vars->{'login.form.username'} = WebGUI::Form::text({"name"=>"username"});
-    $vars->{'login.form.username.label'} = WebGUI::International::get(50);
-    $vars->{'login.form.password'} = WebGUI::Form::password({"name"=>"identifier"});
-    $vars->{'login.form.password.label'} = WebGUI::International::get(51);
+    	$vars->{'login.form.username.label'} = WebGUI::International::get(50);
+    	$vars->{'login.form.password'} = WebGUI::Form::password({"name"=>"identifier"});
+    	$vars->{'login.form.password.label'} = WebGUI::International::get(51);
 	$vars->{'login.form.submit'} = WebGUI::Form::submit({"value"=>WebGUI::International::get(52)});
 	$vars->{'login.form.footer'} = "</form>";
-
 	$vars->{'anonymousRegistration.isAllowed'} = ($session{setting}{anonymousRegistration});
-	   $vars->{'createAccount.url'} = WebGUI::URL::page('op=createAccount');
-	   $vars->{'createAccount.label'} = WebGUI::International::get(67);
+	$vars->{'createAccount.url'} = WebGUI::URL::page('op=createAccount');
+	$vars->{'createAccount.label'} = WebGUI::International::get(67);
 	return WebGUI::Template::process(WebGUI::Template::get(1,$template), $vars);
 }
 
@@ -745,7 +742,7 @@ sub username {
 
 sub validUsername {
    my $self = shift;
-   my $username = $_[0];
+   my $username = WebGUI::Macro::negate($_[0]);
    my $error = "";
    
    if($self->_isDuplicateUsername($username)){

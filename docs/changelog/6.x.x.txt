@@ -7,6 +7,15 @@
  - Added missing SQL Report help.
  - Changed the pagination template variables on SQL Report, Article, File
    Manager and USS to the standard pagination variables.
+ - A very special thanks to Len Kranendonk for the following security
+   improvements.
+	- Disabled anonymous registration by default for better security.
+ 	- Set session timeout to 1 hour by default for better security.
+ 	- Sessions now auto end themselves if they are used after their
+ 	  expires timeout and before the scheduler has cleaned them up.
+	- Macros are now negated on user profile fields and authentication
+	  fields.
+ 
 
 
 6.0.1

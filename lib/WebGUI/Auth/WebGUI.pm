@@ -15,6 +15,7 @@ use strict;
 use WebGUI::Auth;
 use WebGUI::DateTime;
 use WebGUI::HTMLForm;
+use WebGUI::Macro;
 use WebGUI::Mail;
 use WebGUI::Session;
 use WebGUI::SQL;
@@ -33,8 +34,8 @@ our @ISA = qw(WebGUI::Auth);
 
 sub _isValidPassword {
    my $self = shift;
-   my $password = shift;
-   my $confirm = shift;
+   my $password = WebGUI::Macro::negate(shift);
+   my $confirm = WebGUI::Macro::negate(shift);
    my $error = "";
 
    if ($password ne $confirm) {
@@ -244,16 +245,14 @@ sub displayAccount {
 =cut
 
 sub displayLogin {
-   my $self = shift;
-   my $vars;
-   return $self->displayAccount($_[0]) if ($self->userId != 1);
-   $vars->{'login.message'} = $_[0] if ($_[0]);
-   $vars->{'recoverPassword.isAllowed'} = $self->getSetting("passwordRecovery");
-           $vars->{'recoverPassword.url'} = WebGUI::URL::page('op=recoverPassword');
-           $vars->{'recoverPassword.label'} = WebGUI::International::get(59);
-
-
-   return $self->SUPER::displayLogin("login",$vars);
+   	my $self = shift;
+   	my $vars;
+   	return $self->displayAccount($_[0]) if ($self->userId != 1);
+   	$vars->{'login.message'} = $_[0] if ($_[0]);
+   	$vars->{'recoverPassword.isAllowed'} = $self->getSetting("passwordRecovery");
+   	$vars->{'recoverPassword.url'} = WebGUI::URL::page('op=recoverPassword');
+   	$vars->{'recoverPassword.label'} = WebGUI::International::get(59);
+   	return $self->SUPER::displayLogin("login",$vars);
 }
 
 #-------------------------------------------------------------------
