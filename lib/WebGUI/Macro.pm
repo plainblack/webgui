@@ -132,8 +132,7 @@ sub process {
 			if ($@) {
 				WebGUI::ErrorHandler::warn("Processing failed on macro: $macro: ".$@);
 			} else {
-				$macro =~ s/\^/\\\^/;
-				$content =~ s/$macro/$result/ges;
+				$content =~ s/\Q$macro/$result/ges;
 			}
 		}
    	}
