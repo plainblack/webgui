@@ -1,6 +1,41 @@
 package WebGUI::i18n::English::AuthWebGUI;
 
 our $I18N = {
+	'use captcha' => {
+		message => q|Use captcha image?|,
+		lastUpdated => 1078852836
+	},
+
+	'validate email' => {
+		message => q|Validate email addresses?|,
+		lastUpdated => 1078852836
+	},
+
+	'captcha label' => {
+		message => q|Verify Your Humanity|,
+		lastUpdated => 1078852836
+	},
+
+	'captcha failure' => {
+		message => q|You need to type in the six characters you see in the image to prove that you are human.|,
+		lastUpdated => 1078852836
+	},
+
+	'email address validation email subject' => {
+		message => q|Account Activation|,
+		lastUpdated => 1078852836
+	},
+
+	'email address validation email body' => {
+		message => q|Welcome to our site. Please click on the link below to activate your account.|,
+		lastUpdated => 1078852836
+	},
+
+	'check email for validation' => {
+		message => q|Please check your email to activate your account.|,
+		lastUpdated => 1078852836
+	},
+
 	'account-1' => {
 		message => q|WebGUI Authentication Display Account Template|,
 		lastUpdated => 1078852836

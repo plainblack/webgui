@@ -12,6 +12,7 @@ package WebGUI::Auth::WebGUI;
 
 use Digest::MD5;
 use strict;
+use URI;
 use WebGUI::Asset::Template;
 use WebGUI::Auth;
 use WebGUI::DateTime;
@@ -21,6 +22,8 @@ use WebGUI::Macro;
 use WebGUI::Mail;
 use WebGUI::Session;
 use WebGUI::SQL;
+use WebGUI::Storage::Image;
+use WebGUI::User;
 use WebGUI::Utility;
 
 our @ISA = qw(WebGUI::Auth);
@@ -161,6 +164,13 @@ sub createAccount {
  	  return $self->displayLogin;
    } 
    $vars->{'create.message'} = $_[0] if ($_[0]);
+	my $storage = WebGUI::Storage::Image->createTemp;
+	my ($filename, $challenge) = $storage->addFileFromCaptcha;
+   	$vars->{'create.form.captcha'} = WebGUI::Form::text({"name"=>"authWebGUI.captcha", size=>6, maxlength=>6})
+		.WebGUI::Form::hidden({name=>"authWebGUI.captcha.validation", value=>Digest::MD5::md5_base64(lc($challenge))})
+		.'<img src="'.$storage->getUrl($filename).'" border="0" alt="captcha" align="middle" />';
+   	$vars->{'create.form.captcha.label'} = WebGUI::International::get("captcha label","AuthWebGUI");
+	$vars->{useCaptcha} = $session{setting}{webguiUseCaptcha};
    $vars->{'create.form.username'} = WebGUI::Form::text({"name"=>"authWebGUI.username","value"=>$session{form}{"authWebGUI.username"}});
    $vars->{'create.form.username.label'} = WebGUI::International::get(50);
    $vars->{'create.form.password'} = WebGUI::Form::password({"name"=>"authWebGUI.identifier","value"=>$session{form}{"authWebGUI.identifier"}});
@@ -188,6 +198,11 @@ sub createAccountSave {
    $error.= $self->error if(!$self->_isValidPassword($password,$passConfirm));
    my ($profile, $temp, $warning) = WebGUI::Operation::Profile::validateProfileData();
    $error .= $temp;
+	if ($session{setting}{webguiUseCaptcha}) {
+		unless ($session{form}{'authWebGUI.captcha.validation'} eq Digest::MD5::md5_base64(lc($session{form}{'authWebGUI.captcha'}))) {
+			$error .= WebGUI::International::get("captcha failure","AuthWebGUI");
+		}
+	}
    
    return $self->createAccount($error) unless ($error eq "");
    
@@ -203,8 +218,20 @@ sub createAccountSave {
    $properties->{identifier} = Digest::MD5::md5_base64($password);
    $properties->{passwordLastUpdated} = time();
    $properties->{passwordTimeout} = $session{setting}{webguiPasswordTimeout};
-      
-   return $self->SUPER::createAccountSave($username,$properties,$password,$profile);
+   $properties->{status} = 'Deactiviated' if ($session{setting}{webguiValidateEmail});
+   $self->SUPER::createAccountSave($username,$properties,$password,$profile);
+   	if ($session{setting}{webguiValidateEmail}) {
+		my $key = WebGUI::Id::generate();
+		$self->saveParams($self->userId,"WebGUI",{emailValidationKey=>$key});
+   		WebGUI::Mail::send(
+			$profile->{email},
+			WebGUI::International::get('email address validation email subject','AuthWebGUI'),
+			WebGUI::International::get('email address validation email body','AuthWebGUI')."\n\n".WebGUI::URL::getSiteURL().WebGUI::URL::page("op=auth&method=validateEmail&key=".$key),
+			);
+		$self->logout;
+		return $self->displayLogin(WebGUI::International::get('check email for validation','AuthWebGUI'));
+	}
+	return "";
 }
 
 #-------------------------------------------------------------------
@@ -356,6 +383,16 @@ sub editUserSettingsForm {
              -label=>WebGUI::International::get(6,'AuthWebGUI')
              );
    $f->textarea("webguiRecoverPasswordEmail",WebGUI::International::get(134),$session{setting}{webguiRecoverPasswordEmail});
+   $f->yesNo(
+	         -name=>"webguiValidateEmail",
+             -value=>$session{setting}{webguiValidateEmail},
+             -label=>WebGUI::International::get('validate email','AuthWebGUI')
+             );
+   $f->yesNo(
+	         -name=>"webguiUseCaptcha",
+             -value=>$session{setting}{webguiUseCaptcha},
+             -label=>WebGUI::International::get('use captcha','AuthWebGUI')
+             );
    return $f->printRowsOnly;
 }
 
@@ -411,7 +448,7 @@ sub new {
    my $class = shift;
    my $authMethod = $_[0];
    my $userId = $_[1];
-   my @callable = ('createAccount','deactivateAccount','displayAccount','displayLogin','login','logout','recoverPassword','resetExpiredPasswordSave','recoverPasswordFinish','createAccountSave','deactivateAccountConfirm','resetExpiredPasswordSave','updateAccount');
+   my @callable = ('validateEmail','createAccount','deactivateAccount','displayAccount','displayLogin','login','logout','recoverPassword','resetExpiredPasswordSave','recoverPasswordFinish','createAccountSave','deactivateAccountConfirm','resetExpiredPasswordSave','updateAccount');
    my $self = WebGUI::Auth->new($authMethod,$userId,\@callable);
    bless $self, $class;
 }
@@ -527,6 +564,18 @@ sub resetExpiredPasswordSave {
    }
    return $self->displayLogin($msg);
 }
+
+#-------------------------------------------------------------------
+sub validateEmail {
+	my $self = shift;
+	my ($userId) = WebGUI::SQL->quickArray("select userId from authentication where fieldData=".quote($session{form}{key})." and fieldName='emailValidationKey' and authMethod='WebGUI'");
+	if (defined $userId) {
+		my $u = WebGUI::User->new($userId);
+		$u->status("Active");
+	}
+	return $self->displayLogin;
+}
+
 
 #-------------------------------------------------------------------
 
