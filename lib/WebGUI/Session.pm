@@ -411,7 +411,12 @@ sub setScratch {
 #-------------------------------------------------------------------
 sub start {
 	my ($sessionId);
-	$sessionId = _generateSessionId();
+	if ($session{cookie}{wgSession} ne "") {  #fix for internet exploder cookie bug
+		$sessionId = $session{cookie}{wgSession};
+		end($sessionId);
+	} else {
+		$sessionId = _generateSessionId();
+	}
 	WebGUI::SQL->write("insert into userSession values ('$sessionId', ".
 		(time()+$session{setting}{sessionTimeout}).", ".time().", 0, '$ENV{REMOTE_ADDR}', $_[0])");
 	setCookie("wgSession",$sessionId);
