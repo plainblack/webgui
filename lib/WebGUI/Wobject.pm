@@ -14,7 +14,6 @@ package WebGUI::Wobject;
 
 =cut
 
-use CGI::Carp qw(fatalsToBrowser);
 use DBI;
 use strict qw(subs vars);
 use Tie::IxHash;

@@ -24,6 +24,7 @@ use WebGUI::Style;
 use WebGUI::Template;
 use WebGUI::Utility;
 
+
 #-------------------------------------------------------------------
 sub page {
 	my ($debug, %contentHash, $w, $cmd, $pageEdit, $wobject, $wobjectOutput, $extra, $originalWobject, $proxyWobjectId,
@@ -169,8 +170,9 @@ sub page {
                 $debug .='</table>';
 	}
 	if ($session{header}{redirect} ne "") {
+		$httpHeader = $session{header}{redirect};
 		WebGUI::Session::close();
-		return $session{header}{redirect};
+		return $httpHeader;
 	} else {
 		$httpHeader = WebGUI::Session::httpHeader();
 		($header, $footer) = WebGUI::Style::getStyle();

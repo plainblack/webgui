@@ -14,7 +14,6 @@ package WebGUI::SQL;
 
 =cut
 
-use CGI::Carp qw(fatalsToBrowser);
 use DBI;
 use Exporter;
 use strict;
