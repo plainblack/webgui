@@ -28,22 +28,6 @@ our $name = WebGUI::International::get(1,$namespace);
 
 
 #-------------------------------------------------------------------
-sub _fileProperty {
-	my ($filename, $f, $labelId, $name);
-	$name = shift;
-	$labelId = shift;
-	$filename = shift;
-	$f = WebGUI::HTMLForm->new;
-	if ($filename ne "") {
-                $f->readOnly('<a href="'.WebGUI::URL::page('func=deleteFile&file='.$name.'&wid='.$session{form}{wid}).'">'.
-                                WebGUI::International::get(391).'</a>',WebGUI::International::get($labelId,$namespace));
-        } else {
-                $f->file($name,WebGUI::International::get($labelId,$namespace));
-        }
-	return $f->printRowsOnly;
-}
-
-#-------------------------------------------------------------------
 sub _reorderAccessories {
         my ($sth, $i, $id);
         $sth = WebGUI::SQL->read("select accessoryWobjectId from
@@ -345,25 +329,6 @@ sub www_deleteFeatureConfirm {
 }
 
 #-------------------------------------------------------------------
-sub www_deleteFile {
-        $_[0]->confirm(
-                WebGUI::International::get(12,$namespace),
-		WebGUI::URL::page('func=deleteFileConfirm&wid='.$_[0]->get("wobjectId").'&file='.$session{form}{file}),
-		WebGUI::URL::page('func=edit&wid='.$_[0]->get("wobjectId"))
-                );
-}
-
-#-------------------------------------------------------------------
-sub www_deleteFileConfirm {
-        if (WebGUI::Privilege::canEditPage()) {
-		$_[0]->set({$session{form}{file}=>''});
-                return $_[0]->www_edit();
-        } else {
-                return WebGUI::Privilege::insufficient();
-        }
-}
-
-#-------------------------------------------------------------------
 sub www_deleteRelated {
         $_[0]->confirm(
                 WebGUI::International::get(4,$namespace),
@@ -437,12 +402,12 @@ sub www_edit {
 		$f = WebGUI::HTMLForm->new;
 		$f->text("price",WebGUI::International::get(10,$namespace),$_[0]->get("price"));
 		$f->text("productNumber",WebGUI::International::get(11,$namespace),$_[0]->get("productNumber"));
-		$f->raw(_fileProperty("image1",7,$_[0]->get("image1")));
-		$f->raw(_fileProperty("image2",8,$_[0]->get("image2")));
-		$f->raw(_fileProperty("image3",9,$_[0]->get("image3")));
-		$f->raw(_fileProperty("brochure",13,$_[0]->get("brochure")));
-		$f->raw(_fileProperty("manual",14,$_[0]->get("manual")));
-		$f->raw(_fileProperty("warranty",15,$_[0]->get("warranty")));
+		$f->raw($_[0]->fileProperty("image1",7));
+		$f->raw($_[0]->fileProperty("image2",8));
+		$f->raw($_[0]->fileProperty("image3",9));
+		$f->raw($_[0]->fileProperty("brochure",13));
+		$f->raw($_[0]->fileProperty("manual",14));
+		$f->raw($_[0]->fileProperty("warranty",15));
 		$templates = WebGUI::SQL->buildHashRef("select productTemplateId,name from Product_template order by name");
 		$f->select("productTemplateId",$templates,WebGUI::International::get(61,$namespace),[$template]);
 		$output .= $_[0]->SUPER::www_edit($f->printRowsOnly);

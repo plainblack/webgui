@@ -46,16 +46,6 @@ sub set {
 }
 
 #-------------------------------------------------------------------
-sub www_deleteAttachment {
-        if (WebGUI::Privilege::canEditPage()) {
-		$_[0]->set({attachment=>''});
-		return $_[0]->www_edit();
-        } else {
-                return WebGUI::Privilege::insufficient();
-        }
-}
-
-#-------------------------------------------------------------------
 sub www_edit {
         my ($output, $f);
         if (WebGUI::Privilege::canEditPage()) {
@@ -63,12 +53,7 @@ sub www_edit {
 		$output .= '<h1>'.WebGUI::International::get(6,$namespace).'</h1>';
 		$f = WebGUI::HTMLForm->new;
 		$f->url("linkURL",WebGUI::International::get(1,$_[0]->get("namespace")),$_[0]->get("linkURL"));
-		if ($_[0]->get("attachment") eq "") {
-			$f->file("attachment",WebGUI::International::get(2,$_[0]->get("namespace")))
-		} else {
-			$f->readOnly('<a href="'.WebGUI::URL::page('func=deleteAttachment&wid='.$session{form}{wid}).'">'
-				.WebGUI::International::get(3,$namespace).'</a>',WebGUI::International::get(2,$_[0]->get("namespace")))
-		}
+		$f->raw($_[0]->fileProperty("attachment",2));
 		$output .= $_[0]->SUPER::www_edit($f->printRowsOnly);
                 return $output;
         } else {

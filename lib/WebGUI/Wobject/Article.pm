@@ -55,26 +55,6 @@ sub set {
 }
 
 #-------------------------------------------------------------------
-sub www_deleteAttachment {
-        if (WebGUI::Privilege::canEditPage()) {
-		$_[0]->set({attachment=>''});
-		return $_[0]->www_edit();
-        } else {
-                return WebGUI::Privilege::insufficient();
-        }
-}
-
-#-------------------------------------------------------------------
-sub www_deleteImage {
-        if (WebGUI::Privilege::canEditPage()) {
-		$_[0]->set({image=>''});
-                return $_[0]->www_edit();
-        } else {
-                return WebGUI::Privilege::insufficient();
-        }
-}
-
-#-------------------------------------------------------------------
 sub www_edit {
         my ($output, $editTimeout, $groupToModerate, %hash, $f);
 	tie %hash, 'Tie::IxHash';
@@ -88,24 +68,14 @@ sub www_edit {
                 $output = helpIcon(1,$namespace);
 		$output .= '<h1>'.WebGUI::International::get(12,$namespace).'</h1>';
 		$f = WebGUI::HTMLForm->new;
-		if ($_[0]->get("image") ne "") {
-			$f->readOnly('<a href="'.WebGUI::URL::page('func=deleteImage&wid='.$session{form}{wid}).'">'.
-				WebGUI::International::get(391).'</a>',WebGUI::International::get(6,$namespace));
-		} else {
-			$f->file("image",WebGUI::International::get(6,$namespace));
-		}
+		$f->raw($_[0]->fileProperty("image",6));
                 %hash = (
                         right => WebGUI::International::get(15,$namespace),
                         left => WebGUI::International::get(16,$namespace),
                         center => WebGUI::International::get(17,$namespace)
                         );
 		$f->select("alignImage",\%hash,WebGUI::International::get(14,$namespace),[$_[0]->get("alignImage")]);
-		if ($_[0]->get("attachment") ne "") {
-			$f->readOnly('<a href="'.WebGUI::URL::page('func=deleteAttachment&wid='.$session{form}{wid}).'">'.
-				WebGUI::International::get(391).'</a>',WebGUI::International::get(9,$namespace));
-		} else {
-			$f->file("attachment",WebGUI::International::get(9,$namespace));
-		}
+		$f->raw($_[0]->fileProperty("attachment",9));
 		$f->text("linkTitle",WebGUI::International::get(7,$namespace),$_[0]->get("linkTitle"));
                 $f->url("linkURL",WebGUI::International::get(8,$namespace),$_[0]->get("linkURL"));
 		$f->yesNo("convertCarriageReturns",WebGUI::International::get(10,$namespace),$_[0]->get("convertCarriageReturns")

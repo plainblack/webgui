@@ -245,6 +245,41 @@ sub duplicate {
 
 #-------------------------------------------------------------------
 
+=head2 fileProperty ( name, labelId )
+
+ Returns a file property form row which can be used in any Wobject
+ properties page. 
+
+ NOTE: This method is meant for use with www_deleteFile.
+
+=item name
+
+ The name of the property that stores the filename.
+
+=item labelId
+
+ The internationalId of the form label for this file.
+
+=cut
+
+sub fileProperty {
+        my ($self, $f, $labelId, $name);
+	$self = shift;
+        $name = shift;
+        $labelId = shift;
+        $f = WebGUI::HTMLForm->new;
+        if ($self->get($name) ne "") {
+                $f->readOnly('<a href="'.WebGUI::URL::page('func=deleteFile&file='.$name.'&wid='.$self->get("wobjectId")).'">'.
+                        WebGUI::International::get(391).'</a>',
+			WebGUI::International::get($labelId,$self->get("namespace")));
+        } else {
+                $f->file($name,WebGUI::International::get($labelId,$self->get("namespace")));
+        }
+        return $f->printRowsOnly;
+}
+
+#-------------------------------------------------------------------
+
 =head2 get ( [ propertyName ] )
 
  Returns a hash reference containing all of the properties of this
@@ -720,6 +755,39 @@ sub www_deleteConfirm {
 
 #-------------------------------------------------------------------
 
+=head2 www_deleteFile ( )
+
+ Displays a confirmation message relating to the deletion of a file.
+
+=cut
+
+sub www_deleteFile {
+        $_[0]->confirm(
+                WebGUI::International::get(728),
+                WebGUI::URL::page('func=deleteFileConfirm&wid='.$_[0]->get("wobjectId").'&file='.$session{form}{file}),
+                WebGUI::URL::page('func=edit&wid='.$_[0]->get("wobjectId"))
+                );
+}
+
+#-------------------------------------------------------------------
+
+=head2 www_deleteFileConfirm ( )
+
+ Deletes a file from this instance.
+
+=cut
+
+sub www_deleteFileConfirm {
+        if (WebGUI::Privilege::canEditPage()) {
+                $_[0]->set({$session{form}{file}=>''});
+                return $_[0]->www_edit();
+        } else {
+                return WebGUI::Privilege::insufficient();
+        }
+}
+
+#-------------------------------------------------------------------
+
 =head2 www_deleteMessage ( )
 
  Displays a message asking for confirmation to delete a message from
@@ -1019,9 +1087,14 @@ sub www_search {
 
 #-------------------------------------------------------------------
 
-=head2 www_showMessage ( )
+=head2 www_showMessage ( [menuItem] )
 
  Shows a message from a discussion.
+
+=item menuItem
+
+ You can optionally extend this method by passing in an HTML string
+ of menu items to be added to the menu of this display.
 
 =cut
 
