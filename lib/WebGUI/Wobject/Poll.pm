@@ -216,7 +216,7 @@ sub www_view {
                         $totalResponses = 1;
                 }
                 for ($i=1; $i<=20; $i++) {
-                        if ($_[0]->get('a'.$i) =~ /\w/) {
+                        if ($_[0]->get('a'.$i) =~ /\C/) {
                                 $output .= '<span class="pollAnswer"><hr size="1">'.$_[0]->get('a'.$i).'<br></span>';
                                 @data = WebGUI::SQL->quickArray("select count(*), answer from Poll_answer where answer='a$i' and wobjectId="
 					.$_[0]->get("wobjectId")." group by answer");
@@ -226,7 +226,7 @@ sub www_view {
 					round(100*$data[0]/$totalResponses).'% ('.($data[0]+0).')</td></tr></table>';
                         }
                 }
-                $output .= '<span class="pollAnswer"><hr size="1"><b>Total Votes:</b> '.$totalResponses.'</span>';
+                $output .= '<span class="pollAnswer"><hr size="1"><b>'.WebGUI::International::get(12,$namespace).'</b> '.$totalResponses.'</span>';
 	}
 	return $_[0]->processMacros($output);
 }
