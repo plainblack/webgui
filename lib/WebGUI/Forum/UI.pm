@@ -2276,6 +2276,12 @@ sub www_viewForum {
 	my ($caller, $forumId) = @_;
 	WebGUI::Session::setScratch("forumSortBy",$session{form}{sortBy});
 	$forumId = $session{form}{forumId} unless ($forumId);
+	# if POST, cause redirect, so new post is displayed using GET instead of POST
+	if ($session{env}{REQUEST_METHOD} =~ /POST/i) {
+		my $url= formatForumURL($caller->{callback}, $forumId);
+		$session{header}{redirect} = WebGUI::Session::httpRedirect($url);
+		return "";
+	}
 	my $forum = WebGUI::Forum->new($forumId);
 	return WebGUI::Privilege::insufficient() unless ($forum->canView);
 	my $var = getForumTemplateVars($caller, $forum);

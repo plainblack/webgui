@@ -1,6 +1,8 @@
 6.0.2
  - Fixed a bug where visitor contributed items in the USS were editable by all
    visitors.
+ - Bugfix [ 884375 ] Fix for multiple forum posts applied also to
+   www_viewForum to handle postings that start a new thread.
 
 
 6.0.1
