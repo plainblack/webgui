@@ -12,7 +12,7 @@ create table forum (
   groupToPost int not null default 2,
   editTimeout int not null default 3600,
   moderatePosts int not null default 0,
-  groupToModerate int not null default 0,
+  groupToModerate int not null default 4,
   attachmentsPerPost int not null default 0,
   allowRichEdit int not null default 1,
   allowReplacements int not null default 1
