@@ -27,6 +27,8 @@
  - fix [ 1165829 ] i18n/english/Eventscalendar.pm: double entrys [mwilson]
  - fix [ 1165386 ] Templates page overlap [mwilson]
  - fix [ 1166071 ] Create New User allows blank username [mwilson]
+ - fix [ 1166133 ] DataForm www_edit and www_editField's "proceed" [mwilson] 
+ - fix [ 1164211 ] DataForm export tab deliniated always contains.. [mwilson]
 
 
 6.5.2

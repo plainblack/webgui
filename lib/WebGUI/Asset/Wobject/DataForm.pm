@@ -299,8 +299,11 @@ sub getListTemplateVars {
 	my $self = shift;
 	my $var = shift;
 	my @fieldLoop;
-	$var->{"back.url"} = $self->getUrl;
+	$var->{"back.url"} = $self->getUrl."&entryId=0";
 	$var->{"back.label"} = WebGUI::International::get(18,"DataForm");
+	#$var->{"entryId"} = $self->getId;
+	#$var->{"delete.url"} = $self->getUrl."&func=deleteAllEntries";
+	#$var->{"delete.label"} = WebGUI::International::get(91,"DataForm");
 	my $a = WebGUI::SQL->read("select DataForm_fieldId,name,label,isMailField,type from DataForm_field
 		where assetId=".quote($self->getId)." order by sequenceNumber");
 	while (my $field = $a->hashRef) {
@@ -346,7 +349,7 @@ sub getListTemplateVars {
 			});
 	}
 	$a->finish;
-	$var->{record_loop} = \@recordLoop;
+	$var->{record_loop} = \@recordLoop;	
 	return $var;
 }
 
@@ -544,6 +547,9 @@ sub processPropertiesFromFormPost {
 			defaultValue=>WebGUI::International::get(2,"DataForm")
 			});
 	}
+	if ($session{form}{fid} eq "new") { # hack to get proceed to work.
+		$session{whatNext} = $session{form}{proceed};
+	} else { $session{whatNext} = "nothing"; }
 }
 
 #-------------------------------------------------------------------
@@ -598,7 +604,6 @@ sub sendEmail {
         }
 }
 
-
 #-------------------------------------------------------------------
 sub view {
 	my $self = shift;
@@ -613,6 +618,24 @@ sub view {
 	WebGUI::Style::setScript($session{config}{extrasURL}.'/tabs/tabs.js', {"language"=>"JavaScript"});
 	$var = $passedVars || $self->getRecordTemplateVars($var);
 	return $self->processTemplate($var,$self->get("templateId"));
+}
+
+#-------------------------------------------------------------------
+sub www_deleteAllEntries {
+	my $self = shift;
+	return WebGUI::Privilege::insufficient() unless $self->canEdit;
+        my $assetId = $session{form}{entryId};
+	$self->deleteCollateral("DataForm_entry","assetId",$assetId);
+        $session{form}{entryId} = 'list';
+        return "";
+}
+
+#-------------------------------------------------------------------
+sub www_deleteAllEntriesConfirm {
+	my $self = shift;
+	return WebGUI::Privilege::insufficient() unless ($self->canEdit && $session{form}{entryId}==$self->getId);
+	my $a = WebGUI::SQL->write("delete from DataForm_entry where assetId=".quote($self->getId));
+	return $self->www_view;
 }
 
 
@@ -751,8 +774,8 @@ sub www_editField {
 	if ($session{form}{fid} eq "new" && $session{form}{proceed} ne "manageAssets") {
         	$f->whatNext(
 			-options=>{
-				editField=>WebGUI::International::get(76,"DataForm"),
-				""=>WebGUI::International::get(745,"DataForm")
+				"editField"=>WebGUI::International::get(76,"DataForm"),
+				"viewDataForm"=>WebGUI::International::get(745,"DataForm")
 				},
 			-value=>"editField"
 			);
@@ -792,7 +815,7 @@ sub www_editFieldSave {
 					" where DataForm_fieldId=".quote($session{form}{fid}));
 	}
 	$self->reorderCollateral("DataForm_field","DataForm_fieldId", _tonull("DataForm_tabId",$session{form}{tid})) if ($session{form}{fid} ne "new");
-        if ($session{form}{proceed} eq "editField") {
+        if ($session{whatNext} eq "editField" || $session{form}{proceed} eq "editField") {
             $session{form}{fid} = "new";
             return $self->www_editField;
         }
@@ -827,7 +850,6 @@ sub www_editTab {
         	$f->whatNext(
 			-options=>{
 				editTab=>WebGUI::International::get(103,"DataForm"),
-
 				""=>WebGUI::International::get(745,"DataForm")
 				},
 			-value=>"editTab"
@@ -871,7 +893,9 @@ sub www_exportTab {
 	my $where = " where a.assetId=".quote($self->getId);
 	my $orderBy = " order by a.DataForm_entryId";
 	my $columnCounter = "b";
+	my $mailData = ($self->get("mailData") == 0);
 	foreach my $fieldId (keys %fields) {
+		next if (isIn($fields{$fieldId}, qw(to from cc bcc subject)) && $mailData);
 		my $extension = "";
 		$extension = "mail_" if (isIn($fields{$fieldId}, qw(to from cc bcc subject)));
 		$select .= ", ".$columnCounter.".value as ".$extension.$fields{$fieldId};
