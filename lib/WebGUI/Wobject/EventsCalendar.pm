@@ -11,7 +11,6 @@ package WebGUI::Wobject::EventsCalendar;
 #-------------------------------------------------------------------
 
 use strict;
-use HTML::CalendarMonthSimple;
 use Tie::CPHash;
 use WebGUI::DateTime;
 use WebGUI::FormProcessor;
@@ -29,116 +28,6 @@ use WebGUI::Wobject;
 
 our @ISA = qw(WebGUI::Wobject);
 
-#-------------------------------------------------------------------
-sub _drawBigCalendar {
-	my ($thisMonth, $calendar, $message, $start, $end, $sth, %event, $nextDate); 
-	tie %event, 'Tie::CPHash';
-        $thisMonth = epochToHuman($_[1],"%M %y");
-        $calendar = new HTML::CalendarMonthSimple('year'=>epochToHuman($_[1],"%y"),'month'=>epochToHuman($_[1],"%M"));
-        $calendar->width("100%");
-        $calendar->border(1);
-        $calendar->cellclass("tableData");
-        $calendar->todaycellclass("tableHeader");
-        $calendar->headerclass("tableHeader");
-	$calendar->mondayisfirstday($session{user}{firstDayOfWeek});
-	$calendar->sunday(WebGUI::International::get(27));
-        $calendar->weekdays(WebGUI::International::get(28),
-		WebGUI::International::get(29),
-		WebGUI::International::get(30),
-		WebGUI::International::get(31),
-		WebGUI::International::get(32));
-        $calendar->saturday(WebGUI::International::get(33));
-	$calendar->monthname(WebGUI::DateTime::getMonthName($calendar->month));
-	$calendar->header('<h2 align="center">'.$calendar->monthname.' '.$calendar->year.'</h2>');
-        ($start,$end) = monthStartEnd($_[1]);
-	my $canEdit = ($session{var}{adminOn} && WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId")));
-	my $query = "select * from EventsCalendar_event";
-	$query .= " where wobjectId=".$_[0]->get("wobjectId") unless ($_[0]->get("isMaster"));
-	$query .= " order by startDate,endDate";
-        $sth = WebGUI::SQL->read($query);
-        while (%event = $sth->hash) {
-        	if (epochToHuman($event{startDate},"%M %y") eq $thisMonth 
-			|| epochToHuman($event{endDate},"%M %y") eq $thisMonth) {
-			$message = "";
-                        if ($canEdit) {
-                                $message = deleteIcon('func=deleteEvent&wid='.$_[0]->get("wobjectId").'&eid='.$event{EventsCalendar_eventId}
-                                        .'&rid='.$event{EventsCalendar_recurringId})
-                                        .editIcon('func=editEvent&wid='.$_[0]->get("wobjectId").'&eid='.$event{EventsCalendar_eventId})
-                                        .' ';
-                        }
-			$message .= '<a href="'.WebGUI::URL::page('wid='.$_[0]->get("wobjectId")
-				.'&func=viewEvent&eid='.$event{EventsCalendar_eventId}).'">'.$event{name}.'</a>';
-			$message .= '<br>';
-                        if ($event{startDate} == $event{endDate}) {
-                        	$calendar->addcontent(epochToHuman($event{startDate},"%D"),$message);
-                        } else {
-                                $nextDate = $event{startDate};
-                                while($nextDate <= $event{endDate}) {
-                                	if (epochToHuman($nextDate,"%M %y") eq $thisMonth) {
-                                        	$calendar->addcontent(epochToHuman($nextDate,"%D"),$message);
-                                        }
-                                        $nextDate = addToDate($nextDate,0,0,1);
-				}
-                        }
-                }
-        }
-        $sth->finish;
-        return $calendar->as_HTML;
-}
-
-#-------------------------------------------------------------------
-sub _drawSmallCalendar {
-        my ($thisMonth, $calendar, $message, $start, $end, $sth, %event, $nextDate);
-        tie %event, 'Tie::CPHash';
-        $thisMonth = epochToHuman($_[1],"%M %y");
-        $calendar = new HTML::CalendarMonthSimple('year'=>epochToHuman($_[1],"%y"),'month'=>epochToHuman($_[1],"%M"));
-        $calendar->width(200);
-        $calendar->border(0);
-        $calendar->cellclass("tableData");
-        $calendar->todaycellclass("tableHeader");
-        $calendar->headerclass("tableHeader");
-        $calendar->mondayisfirstday($session{user}{firstDayOfWeek});
-        $calendar->sunday(substr(WebGUI::International::get(27),0,1));
-	#$calendar->showweekdayheaders(0);
-        $calendar->weekdays(
-		substr(WebGUI::International::get(28),0,1),
-                substr(WebGUI::International::get(29),0,1),
-                substr(WebGUI::International::get(30),0,1),
-                substr(WebGUI::International::get(31),0,1),
-                substr(WebGUI::International::get(32),0,1)
-		);
-        $calendar->saturday(substr(WebGUI::International::get(33),0,1));
-        $calendar->monthname(WebGUI::DateTime::getMonthName($calendar->month));
-        $calendar->header('<b>'.$calendar->monthname.' '.$calendar->year.'</b>');
-        ($start,$end) = monthStartEnd($_[1]);
-	my $query = "select * from EventsCalendar_event";
-	$query .= " where wobjectId=".$_[0]->get("wobjectId") unless ($_[0]->get("isMaster"));
-	$query .= " order by startDate,endDate";
-        $sth = WebGUI::SQL->read($query);
-        while (%event = $sth->hash) {
-                if (epochToHuman($event{startDate},"%M %y") eq $thisMonth || epochToHuman($event{endDate},"%M %y") eq $thisMonth) {
-                        if ($event{startDate} == $event{endDate}) {
-                                $calendar->setdatehref(epochToHuman($event{startDate},"%D"),
-					WebGUI::URL::page('wid='.$_[0]->get("wobjectId")
-					.'&func=viewEvent&eid='.$event{EventsCalendar_eventId}));
-				#$calendar->datecellclass(epochToHuman($nextDate,"%D"),"highlight");
-                        } else {
-                                $nextDate = $event{startDate};
-                                while($nextDate <= $event{endDate}) {
-                                        if (epochToHuman($nextDate,"%M %y") eq $thisMonth) {
-                                                $calendar->setdatehref(epochToHuman($nextDate,"%D"),
-							WebGUI::URL::page('wid='.$_[0]->get("wobjectId")
-							.'&func=viewEvent&eid='.$event{EventsCalendar_eventId}));
-						#$calendar->datecellclass(epochToHuman($nextDate,"%D"),"highlight");
-                                        }
-                                        $nextDate = addToDate($nextDate,0,0,1);
-                                }
-                        }
-                }
-        }
-        $sth->finish;
-        return $calendar->as_HTML;
-}
 
 #-------------------------------------------------------------------
 sub duplicate {
@@ -183,7 +72,7 @@ sub new {
                         	defaultValue=>"current"
                         	},
                 	paginateAfter=>{
-                        	defaultValue=>50
+                        	defaultValue=>1
                         	},
 			isMaster=>{
 				defaultValue=>0,
@@ -441,10 +330,9 @@ sub www_editEventSave {
 
 #-------------------------------------------------------------------
 sub www_view {
-	my (%var, $junk, $sameDate, $p, @list, $date, $flag, %previous, @row, $i, $maxDate, $minDate);
+	my ( $junk, $sameDate, $p, @list, $date, $flag, %previous, $maxDate, $minDate);
+	# figure out the date range
 	tie %previous, 'Tie::CPHash';
-	$var{"addevent.url"} = WebGUI::URL::page('func=editEvent&eid=new&wid='.$_[0]->get("wobjectId"));
-	$var{"addevent.label"} = WebGUI::International::get(20,$_[0]->get("namespace"));
 	if ($_[0]->get("startMonth") eq "first") {
 		my $query = "select min(startDate) from EventsCalendar_event";
 		$query .= " where wobjectId=".$_[0]->get("wobjectId") unless ($_[0]->get("isMaster"));
@@ -462,13 +350,13 @@ sub www_view {
 		$query .= " where wobjectId=".$_[0]->get("wobjectId") unless ($_[0]->get("isMaster"));
 		($maxDate) = WebGUI::SQL->quickArray($query);	
 	} elsif ($_[0]->get("endMonth") eq "after12") {
-		$maxDate = WebGUI::DateTime::addToDate($minDate,0,11,0); 
+		$maxDate = WebGUI::DateTime::addToDate($minDate,1,0,0); 
 	} elsif ($_[0]->get("endMonth") eq "after9") {
-		$maxDate = WebGUI::DateTime::addToDate($minDate,0,8,0); 
+		$maxDate = WebGUI::DateTime::addToDate($minDate,0,9,0); 
 	} elsif ($_[0]->get("endMonth") eq "after6") {
-		$maxDate = WebGUI::DateTime::addToDate($minDate,0,5,0); 
+		$maxDate = WebGUI::DateTime::addToDate($minDate,0,6,0); 
 	} elsif ($_[0]->get("endMonth") eq "after3") {
-		$maxDate = WebGUI::DateTime::addToDate($minDate,0,2,0); 
+		$maxDate = WebGUI::DateTime::addToDate($minDate,0,3,0); 
 	}
 	$maxDate = $maxDate || WebGUI::DateTime::time();
 	($junk,$maxDate) = WebGUI::DateTime::dayStartEnd($maxDate);
@@ -476,77 +364,139 @@ sub www_view {
 	unless ($session{form}{pn}) {
 		$flag = 1;
 		if ($_[0]->get("defaultMonth") eq "current") {
-			$session{form}{pn} = WebGUI::DateTime::monthCount($minDate,WebGUI::DateTime::time());
+			$session{form}{pn} = round(WebGUI::DateTime::monthCount($minDate,WebGUI::DateTime::time())/$_[0]->getValue("paginateAfter"));
 		} elsif ($_[0]->get("defaultMonth") eq "last") {
 			$session{form}{pn} = WebGUI::DateTime::monthCount($minDate,$maxDate);
 		} else {
 			$session{form}{pn} = 1;
 		}
 	}
-	for ($i=1;$i<=$monthCount;$i++) {
-		if ($session{form}{pn} == ($i)) {
+
+	# create template variables
+	my %var;
+	$var{"addevent.url"} = WebGUI::URL::page('func=editEvent&eid=new&wid='.$_[0]->get("wobjectId"));
+	$var{"addevent.label"} = WebGUI::International::get(20,$_[0]->get("namespace"));
+	my @monthloop;
+	for (my $i=1;$i<=$monthCount;$i++) {
+	#	if ($session{form}{pn} == ($i)) {
 			my $thisMonth = WebGUI::DateTime::addToDate($minDate,0,($i-1),0);
-			$var{"calendar.big"} = $_[0]->_drawBigCalendar($thisMonth);
-			$var{"calendar.small"} = $_[0]->_drawSmallCalendar($thisMonth);
-		}
-		$row[$i-1] = "page";
-	}
-	$p = WebGUI::Paginator->new(WebGUI::URL::page("func=view&wid=".$_[0]->get("wobjectId")),1);
-	$p->setDataByArrayRef(\@row);
-        $var{"calendar.firstPage"} = $p->getFirstPageLink;
-        $var{"calendar.lastPage"} = $p->getLastPageLink;
-        $var{"calendar.nextPage"} = $p->getNextPageLink;
-        $var{"calendar.pageList"} = $p->getPageLinks;
-        $var{"calendar.previousPage"} = $p->getPreviousPageLink;
-        $var{"calendar.multiplePages"} = ($p->getNumberOfPages > 1);
-	if ($flag) {
-		$flag = 0;
-		$session{form}{pn} = "";
+			my ($monthStart, $monthEnd) = WebGUI::DateTime::monthStartEnd($thisMonth);
+			my @thisMonthDate = WebGUI::DateTime::epochToArray($thisMonth);
+			# get event information
+			my $query = "select * from EventsCalendar_event where ";
+			$query .= " wobjectId=".$_[0]->get("wobjectId")." and " unless ($_[0]->get("isMaster"));
+			$query .= " (endDate>=$monthStart or endDate<=$monthEnd) and (startDate>=$monthStart or startDate<=$monthEnd) order by startDate,endDate";
+			my %events;
+			my %previous;
+			my $sth = WebGUI::SQL->read($query);
+			while (my $event = $sth->hashRef) {
+				my $eventLength = WebGUI::DateTime::getDaysInInterval($event->{startDate},$event->{endDate});
+				my $startYear = epochToHuman($event->{startDate},"%y");
+				my $startMonth = epochToHuman($event->{startDate},"%c");
+				my $startDay = epochToHuman($event->{startDate},"%D");
+				my $endYear = epochToHuman($event->{endDate},"%y");
+				my $endMonth = epochToHuman($event->{endDate},"%c");
+				my $endDay = epochToHuman($event->{endDate},"%D");
+				for (my $i=0; $i<=$eventLength; $i++) {	
+					my @date = WebGUI::DateTime::epochToArray(WebGUI::DateTime::addToDate($event->{startDate},0,0,$i));
+					if ($date[1] == $thisMonthDate[1]) {
+						push(@{$events{$date[2]}}, {
+							description=>$event->{description},
+							name=>$event->{name},
+							'start.date.human'=>WebGUI::DateTime::epochToHuman($event->{startDate},"%z"),
+							'start.time.human'=>WebGUI::DateTime::epochToHuman($event->{startDate},"%Z"),
+							'start.date.epoch'=>$event->{startDate},
+							'start.year'=>$startYear,
+							'start.month'=>$startMonth,
+							'start.day'=>$startDay,
+							'end.date.human'=>WebGUI::DateTime::epochToHuman($event->{endDate},"%z"),
+							'end.time.human'=>WebGUI::DateTime::epochToHuman($event->{endDate},"%Z"),
+							'end.date.epoch'=>$event->{endDate},
+							'end.year'=>$endYear,
+							'end.month'=>$endMonth,
+							'end.day'=>$endDay,
+							'startEndYearMatch'=>($startYear eq $endYear),
+							'startEndMonthMatch'=>($startMonth eq $endMonth),
+							'startEndDayMatch'=>($startDay eq $endDay),
+							isFirstDayOfEvent=>($i == 0),
+							dateIsSameAsPrevious=>($startYear."-".$startMonth."-".$startDay eq $previous{start} 
+								&& $endYear."-".$endMonth."-".$endDay eq $previous{end}),
+							daysInEvent=>($eventLength+1),
+							url=>WebGUI::URL::page('wid='.$_[0]->get("wobjectId").'&func=viewEvent&eid='.$event->{EventsCalendar_eventId})
+							});
+					}
+				}
+				$previous{start} = $startYear."-".$startMonth."-".$startDay;
+				$previous{end} = $endYear."-".$endMonth."-".$endDay;
+			}
+			$sth->finish;
+
+			my $dayOfWeekCounter = 1;
+			my $firstDayInFirstWeek = WebGUI::DateTime::getFirstDayInMonthPosition($thisMonth);
+			my $daysInMonth = WebGUI::DateTime::getDaysInMonth($thisMonth);
+			my @prepad;
+			while ($dayOfWeekCounter < $firstDayInFirstWeek) {
+				push(@prepad,{
+					count => $dayOfWeekCounter
+					});
+        			$dayOfWeekCounter++;
+			} 
+			my @date = WebGUI::DateTime::epochToArray($thisMonth);
+			my @dayloop;
+			for (my $dayCounter=1; $dayCounter <= $daysInMonth; $dayCounter++) {
+				push(@dayloop, {
+					dayOfWeek => $dayOfWeekCounter,
+					day=>$dayCounter,
+					isStartOfWeek=>($dayOfWeekCounter==1),
+					isEndOfWeek=>($dayOfWeekCounter==7),
+					isToday=>(WebGUI::DateTime::getDaysInInterval(
+						WebGUI::DateTime::setToEpoch($date[0]."-".$date[1]."-".$dayCounter),
+						WebGUI::DateTime::time()) == 0),
+					event_loop=>\@{$events{$dayCounter}},
+					url=>$events{$dayCounter}->[0]->{url}
+					});
+        			if ($dayOfWeekCounter == 7) {
+                			$dayOfWeekCounter = 1;
+       		 		} else {
+                			$dayOfWeekCounter++;
+        			}
+			}
+			my @postpad;
+			while ($dayOfWeekCounter <= 7 && $dayOfWeekCounter > 1) {
+				push(@postpad,{
+					count => $dayOfWeekCounter
+					});
+        			$dayOfWeekCounter++;
+			}
+			push(@monthloop, {
+				'daysInMonth'=>$daysInMonth,
+				'day_loop'=>\@dayloop,
+				'prepad_loop'=>\@prepad,
+				'postpad_loop'=>\@postpad,
+				'month'=>WebGUI::DateTime::getMonthName($date[1]),
+				'year'=>$date[0]
+				});
+	#	}
+	#	$row[$i-1] = "page";
 	}
 	$p = WebGUI::Paginator->new(WebGUI::URL::page("func=view&wid=".$_[0]->get("wobjectId")),$_[0]->get("paginateAfter"));
-	my $query = "select * from EventsCalendar_event where ";
-	$query .= " wobjectId=".$_[0]->get("wobjectId")." and " unless ($_[0]->get("isMaster"));
-	$query .= " endDate>=$minDate and startDate<=$maxDate order by startDate,endDate";
-	$p->setDataByQuery($query);
-	my $events = $p->getPageData;
-	foreach my $event (@$events) {
-		if ($event->{startDate} == $previous{startDate} && $event->{endDate} == $previous{endDate}) {
-			$sameDate = 1;
-		} else {
-			$sameDate = 0;
-		}
-		$date = epochToHuman($event->{startDate},"%c %D");
-		if (epochToHuman($event->{startDate},"%y") ne epochToHuman($event->{endDate},"%y")) {
-			$date .= ", ".epochToHuman($event->{startDate},"%y");
-			$flag = 1;
-		}
-		if ($flag || epochToHuman($event->{startDate},"%c") ne epochToHuman($event->{endDate},"%c")) {
-			$date .= " - ".epochToHuman($event->{endDate},"%c %D");
-		} elsif (epochToHuman($event->{startDate},"%D") ne epochToHuman($event->{endDate},"%D")) {
-			$date .= " - ".epochToHuman($event->{endDate},"%D");
-		}
-		$flag = 0;
-		$date .= ", ".epochToHuman($event->{endDate},"%y");
-		%previous = %{$event};
-		push(@list, {
-			"list.date"=>$date,
-			"list.title"=>$event->{name},
-			"list.description"=>$event->{description},
-			"list.sameAsPrevious"=>$sameDate,
-			"list.url"=>WebGUI::URL::page('func=viewEvent&wid='.$_[0]->get("wobjectId").'&eid='
-				.$event->{EventsCalendar_eventId}),
-			"list.controls"=>deleteIcon('func=deleteEvent&wid='.$_[0]->get("wobjectId").'&eid='
-				.$event->{EventsCalendar_eventId}.'&rid='.$event->{EventsCalendar_recurringId})
-				.editIcon('func=editEvent&wid='.$_[0]->get("wobjectId").'&eid='.$event->{EventsCalendar_eventId})
-			});
-	}
-	$var{list_loop} = \@list;
-	$var{"list.firstPage"} = $p->getFirstPageLink;
-        $var{"list.lastPage"} = $p->getLastPageLink;
-        $var{"list.nextPage"} = $p->getNextPageLink;
-        $var{"list.pageList"} = $p->getPageLinks;
-        $var{"list.previousPage"} = $p->getPreviousPageLink;
-        $var{"list.multiplePages"} = ($p->getNumberOfPages > 1);
+	$p->setDataByArrayRef(\@monthloop);
+	$var{month_loop} = $p->getPageData;
+	$p->appendTemplateVars(\%var);
+	$var{'sunday.label'} = WebGUI::DateTime::getDayName(7);
+	$var{'monday.label'} = WebGUI::DateTime::getDayName(1);
+	$var{'tuesday.label'} = WebGUI::DateTime::getDayName(2);
+	$var{'wednesday.label'} = WebGUI::DateTime::getDayName(3);
+	$var{'thursday.label'} = WebGUI::DateTime::getDayName(4);
+	$var{'friday.label'} = WebGUI::DateTime::getDayName(5);
+	$var{'saturday.label'} = WebGUI::DateTime::getDayName(6);
+	$var{'sunday.label.short'} = substr(WebGUI::DateTime::getDayName(7),0,1);
+	$var{'monday.label.short'} = substr(WebGUI::DateTime::getDayName(1),0,1);
+	$var{'tuesday.label.short'} = substr(WebGUI::DateTime::getDayName(2),0,1);
+	$var{'wednesday.label.short'} = substr(WebGUI::DateTime::getDayName(3),0,1);
+	$var{'thursday.label.short'} = substr(WebGUI::DateTime::getDayName(4),0,1);
+	$var{'friday.label.short'} = substr(WebGUI::DateTime::getDayName(5),0,1);
+	$var{'saturday.label.short'} = substr(WebGUI::DateTime::getDayName(6),0,1);
 	return $_[0]->processTemplate($_[0]->get("templateId"),\%var);
 }
 

@@ -30,6 +30,12 @@ save you many hours of grief.
    WARNING: Be sure you install these modules BEFORE you attempt to
 	upgrade or the upgrade will fail and you'll have a mess to
 	clean up!
+
+ * If you've created any custom Events Calendar templates, they will
+	no longer work due to the new template structure for events
+	calendars. Your old templates will remain intact, however,
+	so that you can migrate them manually to the new template
+	variables.
  
 
 5.5.0

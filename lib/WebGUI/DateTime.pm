@@ -39,10 +39,15 @@ This package provides easy to use date math functions, which are normally a comp
  use WebGUI::DateTime;
  $epoch = WebGUI::DateTime::addToDate($epoch, $years, $months, $days);
  $epoch = WebGUI::DateTime::addToTime($epoch, $hours, $minutes, $seconds);
+ $epoch = WebGUI::DateTime::arrayToEpoch(@date);
  ($startEpoch, $endEpoch) = WebGUI::DateTime::dayStartEnd($epoch);
+ @date = WebGUI::DateTime::epochToArray($epoch);
  $dateString = WebGUI::DateTime::epochToHuman($epoch, $formatString);
  $setString = WebGUI::DateTime::epochToSet($epoch);
  $day = WebGUI::DateTime::getDayName($dayInteger);
+ $integer = WebGUI::DateTime::getDaysInMonth($epoch);
+ $integer = WebGUI::DateTime::getDaysInInterval($start, $end);
+ $integer = WebGUI::DateTime::getFirstDayInMonthPosition($epoch);
  $month = WebGUI::DateTime::getMonthName($monthInteger);
  $seconds = WebGUI::DateTime::getSecondsFromEpoch($seconds);
  $epoch = WebGUI::DateTime::humanToEpoch($dateString);
@@ -94,9 +99,9 @@ The number of days to add to the epoch.
 
 sub addToDate {
 	my ($year,$month,$day, $hour,$min,$sec, $newDate);
-	($year,$month,$day, $hour,$min,$sec) = Date::Calc::Time_to_Date($_[0]);
+	($year,$month,$day, $hour,$min,$sec) = epochToArray($_[0]);
 	($year,$month,$day) = Date::Calc::Add_Delta_YMD($year,$month,$day, $_[1],$_[2],$_[3]);
-	$newDate = Date::Calc::Date_to_Time($year,$month,$day, $hour,$min,$sec);
+	$newDate = arrayToEpoch($year,$month,$day, $hour,$min,$sec);
 	return $newDate;
 }
 
@@ -130,11 +135,38 @@ The number of seconds to add to the epoch.
 
 sub addToTime {
         my ($year,$month,$day, $hour,$min,$sec, $newDate);
-        ($year,$month,$day, $hour,$min,$sec) = Date::Calc::Time_to_Date($_[0]);
+        ($year,$month,$day, $hour,$min,$sec) = epochToArray($_[0]);
         ($year,$month,$day, $hour,$min,$sec) = Date::Calc::Add_Delta_DHMS($year,$month,$day,$hour,$min,$sec,0,$_[1],$_[2],$_[3]);
-        $newDate = Date::Calc::Date_to_Time($year,$month,$day, $hour,$min,$sec);
+        $newDate = arrayToEpoch($year,$month,$day, $hour,$min,$sec);
         return $newDate;
 }
+
+#-------------------------------------------------------------------
+
+=head2 arrayToEpoch ( date )
+
+Returns an epoch date.
+
+=over
+
+=item date
+
+An array of the format year, month, day, hour, min, sec.
+
+=back
+
+=cut
+
+sub arrayToEpoch {
+	my $year = shift;
+	my $month = shift;
+	my $day = shift;
+	my $hour = shift;
+	my $min = shift;
+	my $sec = shift;
+	return Date::Calc::Date_to_Time($year,$month,$day,$hour,$min,$sec);
+}
+
 
 #-------------------------------------------------------------------
 
@@ -154,11 +186,33 @@ The number of seconds since January 1, 1970.
 
 sub dayStartEnd {
         my ($year,$month,$day, $hour,$min,$sec, $start, $end);
-        ($year,$month,$day, $hour,$min,$sec) = Date::Calc::Time_to_Date($_[0]);
+        ($year,$month,$day, $hour,$min,$sec) = epochToArray($_[0]);
         $start = Date::Calc::Date_to_Time($year,$month,$day,0,0,0);
         $end = Date::Calc::Date_to_Time($year,$month,$day,23,59,59);
         return ($start, $end);
 }
+
+#-------------------------------------------------------------------
+
+=head2 epochToArray ( epoch ) 
+
+Returns a date array in the form of year, month, day, hour, min, sec.
+
+=over
+
+=item epoch
+
+An epoch date.
+
+=back
+
+=cut
+
+sub epochToArray {
+	my $epoch = shift;
+	return Date::Calc::Time_to_Date($epoch);
+}
+
 
 #-------------------------------------------------------------------
 
@@ -210,7 +264,7 @@ sub epochToHuman {
 	$offset = $offset*3600;
 	$temp = int($_[0]) || time();
 	$temp = $temp+$offset;
-	my ($year,$month,$day,$hour,$min,$sec) = Date::Calc::Time_to_Date($temp);
+	my ($year,$month,$day,$hour,$min,$sec) = epochToArray($temp);
 	$output = $_[1] || "%z %Z";
   #---GMT Offsets
 	$temp = $session{user}{timeOffset}*100;
@@ -392,6 +446,89 @@ sub getDayName {
 
 #-------------------------------------------------------------------
 
+=head2 getDaysInMonth ( epoch )
+
+Returns the total number of days in the month.
+
+=over
+
+=item epoch
+
+An epoch date.
+
+=back
+
+=cut
+
+sub getDaysInMonth {
+	my $epoch = shift;
+	my @date = WebGUI::DateTime::epochToArray($epoch);
+	return Date::Calc::Days_in_Month($date[0], $date[1]);
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 getDaysInInterval ( start, end )
+
+Returns the number of days between two epoch dates.
+
+=over
+
+=item start
+
+An epoch date.
+
+=item end
+
+An epoch date.
+
+=back
+
+=cut
+
+sub getDaysInInterval {
+	my $start = shift;
+	my $end = shift;
+	my @start = WebGUI::DateTime::epochToArray($start);
+	my @end = WebGUI::DateTime::epochToArray($end);
+	return Date::Calc::Delta_Days($start[0], $start[1], $start[2], $end[0], $end[1], $end[2]);
+}
+
+
+
+#-------------------------------------------------------------------
+
+=head2 getFirstDayInMonthPosition ( epoch) {
+
+Returns the position (1 - 7) of the first day in the month.
+
+=over
+
+=item epoch
+
+An epoch date.
+
+=back
+
+=cut
+
+sub getFirstDayInMonthPosition {
+	my $epoch = shift;
+	my @date = WebGUI::DateTime::epochToArray($epoch);
+	my $firstDayInFirstWeek = Date::Calc::Day_of_Week($date[0],$date[1],1);
+	unless ($session{user}{firstDayOfWeek}) { #american format
+        	$firstDayInFirstWeek++;
+        	if ($firstDayInFirstWeek > 7) {
+                	$firstDayInFirstWeek = 1;
+        	}
+	}
+	return $firstDayInFirstWeek;
+}
+
+
+#-------------------------------------------------------------------
+
 =head2 getSecondsFromEpoch ( epoch )
 
 Calculates the number of seconds into the day of an epoch date the epoch datestamp is.
@@ -439,7 +576,7 @@ sub humanToEpoch {
 	$date[3] = int($temp[0]);
 	$date[4] = int($temp[1]);
 	$date[5] = int($temp[2]);
-	$output = Date::Calc::Date_to_Time(@date);
+	$output = arrayToEpoch(@date);
 	return $output;
 } 
 
@@ -485,7 +622,7 @@ sub intervalToSeconds {
 
 =head2 localtime ( epoch )
 
-Returns an array of time elements. The elements are: years, months, days, hours, minutes, seconds, day of year, day of week, daylight savings time.
+Returns an array of time elements. The elements are: years, months, days, hours, minutes, seconds, day of year, day of week.
 
 =over
 
@@ -498,7 +635,14 @@ The number of seconds since January 1, 1970. Defaults to now.
 =cut
 
 sub localtime {
-	return Date::Calc::Localtime($_[0]||WebGUI::DateTime::time());
+	my $epoch = shift;
+	my ($year, $month, $day, $hour, $min, $sec) = Date::Calc::Today_and_Now();
+	if ($epoch) {
+		($year, $month, $day, $hour, $min, $sec) = epochToArray($epoch);
+	}
+	my $doy = Date::Calc::Day_of_Year($year,$month,$day);
+	my $dow = Date::Calc::Day_of_Week($year,$month,$day);
+	return ($year, $month, $day, $hour, $min, $sec, $doy, $dow);
 }
 
 #-------------------------------------------------------------------
@@ -522,7 +666,7 @@ An epoch datestamp corresponding to the last month.
 
 sub monthCount {
 	my ($start, $end) = @_;
-	my @delta = Date::Calc::Delta_YMDHMS( Date::Calc::Time_to_Date($start), Date::Calc::Time_to_Date($end));
+	my @delta = Date::Calc::Delta_YMDHMS( epochToArray($start), epochToArray($end));
 	my $change = (($delta[0]*12)+$delta[1])+1;
 	return $change;
 }
@@ -546,10 +690,10 @@ The number of seconds since January 1, 1970.
 
 sub monthStartEnd {
 	my ($year,$month,$day, $hour,$min,$sec, $start, $end);
-	($year,$month,$day, $hour,$min,$sec) = Date::Calc::Time_to_Date($_[0]);
-	$start = Date::Calc::Date_to_Time($year,$month,1,0,0,0);
-	($year,$month,$day, $hour,$min,$sec) = Date::Calc::Time_to_Date(addToDate($_[0],0,1,0));
-	$end = Date::Calc::Date_to_Time($year,$month,1,0,0,0)-1;
+	($year,$month,$day, $hour,$min,$sec) = epochToArray($_[0]);
+	$start = arrayToEpoch($year,$month,1,0,0,0);
+	($year,$month,$day, $hour,$min,$sec) = epochToArray(addToDate($_[0],0,1,0));
+	$end = arrayToEpoch($year,$month,1,0,0,0)-1;
 	return ($start, $end);
 }
 
@@ -640,7 +784,7 @@ A string in the format of YYYY-MM-DD or YYYY-MM-DD HH:MM:SS.
 =cut
 
 sub setToEpoch {
-	my @now = Date::Calc::Time_to_Date(time());
+	my @now = epochToArray(time());
 	my ($date,$time) = split(/ /,$_[0]);
  	my ($year, $month, $day) = split(/\-/,$date);
 	my ($hour, $minute, $second) = split(/\:/,$time);
@@ -659,7 +803,7 @@ sub setToEpoch {
         } else {
                 $day = $now[2];
         }
-	return Date::Calc::Date_to_Time($year,$month,$day,$hour,$minute,$second);
+	return arrayToEpoch($year,$month,$day,$hour,$minute,$second);
 }
 
 #-------------------------------------------------------------------
@@ -671,7 +815,7 @@ Returns an epoch date for now.
 =cut
 
 sub time {
-	return Date::Calc::Date_to_Time(Date::Calc::Today_and_Now());
+	return arrayToEpoch(Date::Calc::Today_and_Now());
 }
 
 #-------------------------------------------------------------------

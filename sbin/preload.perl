@@ -43,7 +43,6 @@ DBI->install_driver("mysql"); # Change to match your database driver.
 #----------------------------------------
 # Distributed utilities external to WebGUI.
 #----------------------------------------
-use HTML::CalendarMonthSimple ();
 #use HTML::Parser (); # commented because it is causing problems with attachments
 #use HTML::TagFilter (); # commented because it is causing problems with attachments
 use Net::LDAP ();

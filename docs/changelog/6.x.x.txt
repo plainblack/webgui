@@ -68,3 +68,9 @@ webgui.
  - Added new toolbar icons. 
  - Made the add content menu much more powerful.
  - Added new navigation system. (Len Kranendonk).
+ - Made the date/time system more precise.
+ - The Events Calendar is now 100% template driven.
+ - The Events Calendar now allows for more than one drawn calendar per page.
+   Choose with your pagination options.
+
+
