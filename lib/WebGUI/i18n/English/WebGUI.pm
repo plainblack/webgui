@@ -2560,7 +2560,8 @@ A title for the database link.
 <p>
 
 <b>DSN</b><br>
-<b>D</b>ata <b>S</b>ource <b>N</b>ame is the unique identifier that Perl uses to describe the location of your database. It takes the format of DBI:[driver]:[database name]:[host].<br>
+<b>D</b>ata <b>S</b>ource <b>N</b>ame is the unique identifier that Perl uses to describe the location of your database. It takes the format of
+<blockquote>DBI:[driver]:[database name]:[host].</blockquote>
 <p>
 
 
@@ -2598,7 +2599,7 @@ The username you use to connect to the DSN.
 The password you use to connect to the DSN.
 <p>
 |,
-		lastUpdated => 1098920920
+		lastUpdated => 1099536266
 	},
 
 	'556' => {
