@@ -38,7 +38,10 @@ sub _changeWobjectPrivileges {
    $sth = WebGUI::SQL->read("select wobjectId from wobject where pageId=".quote($_[0]));
    while ($wobject = $sth->hashRef) {
       if (WebGUI::Privilege::canEditWobject($wobject->{wobjectId})) {
-         WebGUI::SQL->write("update wobject set startDate=$session{form}{startDate}, endDate=$session{form}{endDate}, ownerId=$session{form}{ownerId}, groupIdView=$session{form}{groupIdView}, groupIdEdit=$session{form}{groupIdEdit} where wobjectId=".quote($wobject->{wobjectId}));
+         WebGUI::SQL->write("update wobject set startDate=".WebGUI::FormProcessor::dateTime("startDate").", 
+		                     endDate=".WebGUI::FormProcessor::dateTime("endDate").", 
+							 ownerId=$session{form}{ownerId}, groupIdView=$session{form}{groupIdView}, 
+							 groupIdEdit=$session{form}{groupIdEdit} where wobjectId=".quote($wobject->{wobjectId}));
 	  }
     }
 }			
@@ -47,11 +50,11 @@ sub _changeWobjectPrivileges {
 sub _recursivelyChangePrivileges {
         my ($sth, $pageId);
         $sth = WebGUI::SQL->read("select pageId from page where parentId=$_[0]");
-	_changeWobjectPrivileges($_[0]);
+	    _changeWobjectPrivileges($_[0]) unless $session{form}{wobjectPrivileges};
         while (($pageId) = $sth->array) {
 		if (WebGUI::Privilege::canEditPage($pageId)) {
-        		WebGUI::SQL->write("update page set startDate=$session{form}{startDate}, 
-				endDate=$session{form}{endDate},
+        		WebGUI::SQL->write("update page set startDate=".WebGUI::FormProcessor::dateTime("startDate").", 
+				endDate=".WebGUI::FormProcessor::dateTime("endDate").",
 				ownerId=$session{form}{ownerId},  groupIdView=$session{form}{groupIdView}, 
 				groupIdEdit=$session{form}{groupIdEdit} where pageId=$pageId");
                 	_recursivelyChangePrivileges($pageId);
