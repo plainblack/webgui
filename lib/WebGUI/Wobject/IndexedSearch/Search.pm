@@ -668,8 +668,6 @@ sub search {
 		foreach my $filterElement (keys %{$filter}) {
 			$sql .= " AND $filterElement in (".quoteAndJoin($filter->{$filterElement}).")";
 		}
-		# No trash or other garbage
-		$sql .= " AND isSystem<>1 ";
 		# Keep @fts_docIds list order
 		$sql .= " ORDER BY FIELD(docID,$docIds)" unless $noFtsSearch;
 		my $filteredDocIds = WebGUI::SQL->buildArrayRef($sql);
