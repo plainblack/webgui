@@ -566,6 +566,32 @@ sub recursiveDelete {
 
 #-------------------------------------------------------------------
 
+=head2 pedigree 
+
+=cut
+
+sub pedigree {
+	my $node = shift;
+	my @flexMenu = ($node->left_sisters,$node,$node->daughters,$node->right_sisters);
+	while(defined($node = $node->{'mother'} ) && ref($node)) {
+		@flexMenu = ($node->left_sisters,$node,@flexMenu,$node->right_sisters);
+	}
+	return @flexMenu;
+}
+
+#-------------------------------------------------------------------
+
+=head2 self_and_ancestors 
+
+=cut
+
+sub self_and_ancestors {
+        my $node = shift;
+	return ($node, $node->ancestors);
+}
+
+#-------------------------------------------------------------------
+
 =head2 sortSiblings( \@siblings )
 
 Sorts an array of objects according to sequenceNumber

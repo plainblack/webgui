@@ -46,6 +46,7 @@ macros = a => a_account, \
 	LoginToggle => LoginToggle, \
 	m => m_currentMenuHorizontal, \
 	M => M_currentMenuVertical, \
+	Navigation => Navigation, \
 	PageTitle => PageTitle, \
 	PreviousDropMenu => PreviousDropMenu, \
 	p => p_previousMenuHorizontal, \
