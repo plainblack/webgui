@@ -619,7 +619,7 @@ sub swap_nodes{
     my $first_id=$params{first_id};
     my $second_id=$params{second_id};
     croak("You didn't give me valid IDs to swap!\n") if(! $first_id || ! $second_id);
-    croak("You can't switch a node with itself!\n") if($first_id == $second_id);
+    croak("You can't switch a node with itself!\n") if($first_id eq $second_id);
 
     $self->_lock_tables();
     my $first_id_info=$self->get_hashref_of_info_by_id($first_id);
