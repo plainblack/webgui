@@ -17,7 +17,7 @@ use WebGUI::Session;
 
 #-------------------------------------------------------------------
 #eg: send("jt@jt.com","hi, how are you","this is my message","bob@bob.com","you@ther.com");
-#eg: send(to,subject,message,cc,from);
+#eg: send(to,subject,message,cc,from,bcc);
 sub send {
         my ($smtp, $message, $from);
 	$from = $_[4] || ($session{setting}{companyName}.' <'.$session{setting}{companyEmail}.'>');
@@ -25,6 +25,7 @@ sub send {
 	$message = "To: $_[0]\n";
         $message .= "From: $from\n";
         $message .= "CC: $_[3]\n" if ($_[3]);
+        $message .= "BCC: $_[5]\n" if ($_[5]);
         $message .= "Subject: ".$_[1]."\n";
         $message .= "\n";
         #body
@@ -40,6 +41,8 @@ sub send {
         	if (defined $smtp) {
         		$smtp->mail($from);     # use the sender's address here
         		$smtp->to($_[0]);             # recipient's address
+        		$smtp->cc($_[3]) if ($_[3]);          
+        		$smtp->bcc($_[5]) if ($_[5]);         
         		$smtp->data();              # Start the mail
         		$smtp->datasend($message);
         		$smtp->dataend();           # Finish sending the mail

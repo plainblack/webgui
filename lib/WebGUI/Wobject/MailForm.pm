@@ -542,48 +542,20 @@ sub www_send {
 		$data{name} .= ":" unless ($data{name} =~ /:$/);
 		$message .= "$data{name} $value\n";
 	}
-
 	my $error;	
 	my $to = $session{form}{toField};
 	if ($to =~ /\@/) {
 		# send a direct email if the To field is an email address
-		eval{
-			my ($smtp);
-			$smtp = Net::SMTP->new($session{setting}{smtpServer}); # connect to an SMTP server
-			my ($subject, $cc, $from, $bcc) = 
-				($session{form}{subjectField},$session{form}{ccField},
-				$session{form}{fromField},$session{form}{bccField});
-			# From is either the logged on user, filled out, or the site
-			if ($from && $session{user}) {
-				# add their name from their profile if available
-				$from = ("$session{user}{firstName} $session{user}{lastName}" || $session{user}{username}) . " <$from>";
-			} elsif ($from) {
-				# leave the from as-is
-			} else {
-				# last resort, use the website info
-				$from = "$session{setting}{companyName} <$session{setting}{companyEmail}>";
-			}
-			if (defined $smtp) {
-				$smtp->mail($session{setting}{companyEmail});     # use the sender's address here
-				$smtp->to($to);             # recipient's address
-				$smtp->data();              # Start the mail
-				# Send the header.
-				$smtp->datasend("To: $to\n");
-				$smtp->datasend("From: $from\n");
-				$smtp->datasend("CC: $cc\n") if ($cc);
-				$smtp->datasend("BCC: $bcc\n") if ($bcc);
-				$smtp->datasend("Subject: $subject\n\n");
-				# Send the body.
-				$smtp->datasend("$message\n\n");
-				if ($from =~ /$session{setting}{companyEmail}/) {
-					$smtp->datasend("$session{setting}{companyName}\n $session{setting}{companyEmail}\n $session{setting}{companyURL}\n");
-				}
-				$smtp->dataend();           # Finish sending the mail
-				$smtp->quit;                # Close the SMTP connection
-			} else {
-				WebGUI::ErrorHandler::warn("Couldn't connect to mail server: ".$session{setting}{smtpServer});
-			}			
-		};
+		my ($subject, $cc, $from, $bcc) = ($session{form}{subjectField},$session{form}{ccField}, 
+			$session{form}{fromField},$session{form}{bccField});
+		# From is either the logged on user, filled out, or the site
+		if ($from && $session{user}) {
+			# add their name from their profile if available
+			$from = ("$session{user}{firstName} $session{user}{lastName}" || $session{user}{username}) . " <$from>";
+		} elsif ($from) {
+			# leave the from as-is
+		}
+		WebGUI::Mail::send($to,$subject,$message,$cc,$from,$bcc);
 	} else {
 		my ($userId) = WebGUI::SQL->quickArray("select userId from users where username=".quote($to));
 		my $groupId;
