@@ -234,7 +234,7 @@ WebGUI::SQL->write("alter table Product_specification drop column wobjectId");
 WebGUI::SQL->write("alter table Product_related drop column RelatedWobjectId");
 WebGUI::SQL->write("alter table Product_accessory drop column AccessoryWobjectId");
 # I sure hope all the events got a unique assetId, because if they didn't.......
-WebGUI::SQL->write("alter table EventsCalendar_event add primary key assetId");
+WebGUI::SQL->write("alter table EventsCalendar_event add primary key (assetId)");
 WebGUI::SQL->write("alter table EventsCalendar_event drop column name");
 WebGUI::SQL->write("alter table EventsCalendar_event drop column wobjectId");
 
