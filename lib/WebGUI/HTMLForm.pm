@@ -222,13 +222,13 @@ sub _uiLevelChecksOut {
 
 #-------------------------------------------------------------------
 
-=head2 button ( value [ label, extras, subtext ] )
+=head2 button ( value [, label, extras, subtext, defaultValue ] )
 
 Adds a button row to this form. Use it in combination with scripting code to make the button perform an action.
 
 =head3 value
 
-The button text for this button. Defaults to "save".
+The button text for this button. 
 
 =head3 label
 
@@ -244,15 +244,20 @@ If you want to add anything special to this form element like javascript actions
 
 Extra text to describe this form element or to provide special instructions.
 
+=head3 defaultValue
+
+If no value is specified, a default value to use. Defaults to "save".
+
 =cut
 
 sub button {
         my ($output);
         my ($self, @p) = @_;
-        my ($value, $label, $extras, $subtext) = rearrange([qw(value label extras subtext)], @p);
+        my ($value, $label, $extras, $subtext, $defaultValue) = rearrange([qw(value label extras subtext defaultValue)], @p);
         $output = WebGUI::Form::button({
                 "value"=>$value,
-                "extras"=>$extras
+                "extras"=>$extras,
+		"defaultValue"=>$defaultValue
                 });
         $output .= _subtext($subtext);
         $output = $self->_tableFormRow($label,$output);
@@ -261,7 +266,7 @@ sub button {
 
 #-------------------------------------------------------------------
 
-=head2 checkbox ( name [ label, checked, subtext, value, extras, uiLevel ] )
+=head2 checkbox ( name [, label, checked, subtext, value, extras, uiLevel, defaultValue ] )
 
 Adds a checkbox row to this form.
 
@@ -283,7 +288,7 @@ Extra text to describe this form element or to provide special instructions.
 
 =head3 value
 
-The default value for this form element. Defaults to "1".
+The default value for this form element.
 
 =head3 extras
 
@@ -295,19 +300,24 @@ If you want to add anything special to this form element like javascript actions
 
 The UI level for this field. See the WebGUI developer's site for details. Defaults to "0".
 
+=head3 defaultValue
+
+When no value is specified, we'll use this. Defaults to "1".
+
 =cut
 
 sub checkbox {
 	my ($output);
 	my ($self, @p) = @_;
-    	my ($name, $label, $checked, $subtext, $value, $extras, $uiLevel) = 
-		rearrange([qw(name label checked subtext value extras uiLevel)], @p);
+    	my ($name, $label, $checked, $subtext, $value, $extras, $uiLevel, $defaultValue) = 
+		rearrange([qw(name label checked subtext value extras uiLevel defaultValue)], @p);
 	if (_uiLevelChecksOut($uiLevel)) {
 		$output = WebGUI::Form::checkbox({
 			"name"=>$name,
 			"value"=>$value,
 			"checked"=>$checked,
-			"extras"=>$extras
+			"extras"=>$extras,
+			"defaultValue"=>$defaultValue
 			});
 		$output .= _subtext($subtext);
         	$output = $self->_tableFormRow($label,$output);
@@ -315,7 +325,8 @@ sub checkbox {
 		if ($checked) {
 			$output = WebGUI::Form::hidden({
 				"name"=>$name,
-				"value"=>$value
+				"value"=>$value,
+				"defaultValue"=>$defaultValue
 				});
 		}
 	}
@@ -324,7 +335,7 @@ sub checkbox {
 
 #-------------------------------------------------------------------
 
-=head2 checkList ( name, options [ , label, value, vertical, extras, subtext, uiLevel ] )
+=head2 checkList ( name, options [ , label, value, vertical, extras, subtext, uiLevel, defaultValue ] )
 
 Adds a checkbox list row to this form.
 
@@ -362,13 +373,17 @@ Extra text to describe this form element or to provide special instructions.
 
 The UI level for this field. See the WebGUI developer's site for details. Defaults to "0".
 
+=head3 defaultValue
+
+When no other value is passed, use this. Should be passed as an array reference.
+
 =cut
 
 sub checkList {
         my ($output);
         my ($self, @p) = @_;
-        my ($name, $options, $label, $value, $vertical, $extras, $subtext, $uiLevel) =
-                rearrange([qw(name options label value vertical extras subtext uiLevel)], @p);
+        my ($name, $options, $label, $value, $vertical, $extras, $subtext, $uiLevel, $defaultValue) =
+                rearrange([qw(name options label value vertical extras subtext uiLevel defaultValue)], @p);
         if (_uiLevelChecksOut($uiLevel)) {
 		$output = WebGUI::Form::checkList({
 			"name"=>$name,
@@ -383,7 +398,8 @@ sub checkList {
 		$output = WebGUI::Form::hiddenList({
 			"name"=>$name,
 			"options"=>$options,
-			"value"=>$value
+			"value"=>$value,
+			"defaultValue"=>$defaultValue
 			});
 	}
         $self->{_data} .= $output;
@@ -391,7 +407,7 @@ sub checkList {
 
 #-------------------------------------------------------------------
 
-=head2 combo ( name, options, [ label, value, size, multiple, extras, subtext, uiLevel ] )
+=head2 combo ( name, options [, label, value, size, multiple, extras, subtext, uiLevel, defaultValue ] )
 
 Adds a combination select list / text box row to this form. If the text box is filled out it will have a value stored in "name"_new where name is the first field passed into this method.
 
@@ -433,13 +449,17 @@ Extra text to describe this form element or to provide special instructions.
 
 The UI level for this field. See the WebGUI developer's site for details. Defaults to "0".
 
+=head3 defaultValue
+
+When no other value is present, will use this. Should be passed as an array reference.
+
 =cut
 
 sub combo {
         my ($output);
         my ($self, @p) = @_;
-        my ($name, $options, $label, $value, $size, $multiple, $extras, $subtext, $uiLevel) =
-                rearrange([qw(name options label value size multiple extras subtext uiLevel)], @p);
+        my ($name, $options, $label, $value, $size, $multiple, $extras, $subtext, $uiLevel, $defaultValue) =
+                rearrange([qw(name options label value size multiple extras subtext uiLevel defaultValue)], @p);
         if (_uiLevelChecksOut($uiLevel)) {
                 $output = WebGUI::Form::combo({
                         "name"=>$name,
@@ -447,7 +467,8 @@ sub combo {
                         "value"=>$value,
                         "size"=>$size,
 			"multiple"=>$multiple,
-                        "extras"=>$extras
+                        "extras"=>$extras,
+			"defaultValue"=>$defaultValue
                         });
                 $output .= _subtext($subtext);
                 $output = $self->_tableFormRow($label,$output);
@@ -455,7 +476,8 @@ sub combo {
                 $output = WebGUI::Form::hiddenList({
 			"name"=>$name,
                         "options"=>$options,
-                        "value"=>$value
+                        "value"=>$value,
+			"defaultValue",$defaultValue
                         });
         }
         $self->{_data} .= $output;
@@ -463,7 +485,7 @@ sub combo {
 
 #-------------------------------------------------------------------
 
-=head2 contentType ( name, types [ label, value, extras, subtext, uiLevel ] )
+=head2 contentType ( name, types [, label, value, extras, subtext, uiLevel, defaultValue ] )
 
 Adds a content type select list field to this form.
 
@@ -497,13 +519,17 @@ Extra text to describe this form element or to provide special instructions.
 
 The UI level for this field. See the WebGUI developer's site for details. Defaults to "3".
 
+=head3 defaultValue
+
+When no value is specified, we'll use this.
+
 =cut
 
 sub contentType {
         my ($output);
         my ($self, @p) = @_;
-        my ($name, $types, $label, $value, $extras, $subtext, $uiLevel) =
-                rearrange([qw(name types label value extras subtext uiLevel)], @p);
+        my ($name, $types, $label, $value, $extras, $subtext, $uiLevel, $defaultValue) =
+                rearrange([qw(name types label value extras subtext uiLevel defaultValue)], @p);
 	$uiLevel = 3 if ($uiLevel eq "");
         if (_uiLevelChecksOut($uiLevel)) {
 		$label = WebGUI::International::get(1007) unless ($label);
@@ -511,15 +537,16 @@ sub contentType {
                         "name"=>$name,
                         "types"=>$types,
                         "value"=>$value,
-                        "extras"=>$extras
+                        "extras"=>$extras,
+			defaultValue=>$defaultValue
                         });
                 $output .= _subtext($subtext);
                 $output = $self->_tableFormRow($label,$output);
         } else {
-                $output = WebGUI::Form::hiddenList({
+                $output = WebGUI::Form::hidden({
                         "name"=>$name,
-                        types=>$types,
-                        "value"=>$value
+                        "value"=>$value,
+			defaultValue=>$defaultValue
                         });
         }
         $self->{_data} .= $output;
@@ -528,7 +555,7 @@ sub contentType {
 
 #-------------------------------------------------------------------
 
-=head2 databaseLink (  [name , value, label, afterEdit, extras, uiLevel ] )
+=head2 databaseLink (  [name , value, label, afterEdit, extras, uiLevel, defaultValue ] )
 
 Adds a database link select list to the form.
 
@@ -558,13 +585,17 @@ If you want to add anything special to this form element like javascript actions
 
 The UI level for this field. See the WebGUI developer's site for details. Defaults to "5".
 
+=head3 defaultValue
+
+When no other value is passed, we'll use this.
+
 =cut
 
 sub databaseLink {
         my ($output, $subtext);
         my ($self, @p) = @_;
-        my ($name, $value, $label, $afterEdit, $extras, $uiLevel) = 
-		rearrange([qw(name value label afterEdit extras uiLevel)], @p);
+        my ($name, $value, $label, $afterEdit, $extras, $uiLevel, $defaultValue) = 
+		rearrange([qw(name value label afterEdit extras uiLevel defaultValue)], @p);
         if (_uiLevelChecksOut($uiLevel)) {
 		$label = $label || WebGUI::International::get(1075);
 		if (WebGUI::Grouping::isInGroup(3)) {
@@ -576,14 +607,16 @@ sub databaseLink {
         	$output = WebGUI::Form::databaseLink({
                 	"name"=>$name,
                 	"value"=>$value,
-                	"extras"=>$extras
+                	"extras"=>$extras,
+			"defaultValue"=>$defaultValue
                 	});
                 $output .= _subtext($subtext);
                 $output = $self->_tableFormRow($label,$output);
         } else {
                 $output = WebGUI::Form::hidden({
                         "name"=>$name,
-                        "value"=>$value
+                        "value"=>$value,
+			"defaultValue"=>$defaultValue
                         });
         }
         $self->{_data} .= $output;
@@ -593,7 +626,7 @@ sub databaseLink {
 
 #-------------------------------------------------------------------
 
-=head2 date ( name [ label, value, extras, subtext, size, noDate, uiLevel ] )
+=head2 date ( name [, label, value, extras, subtext, size, noDate, uiLevel, defaultValue ] )
 
 Adds a date row to this form.
 
@@ -607,7 +640,7 @@ The left column label for this form row.
 
 =head3 value
 
-The default date. Pass as an epoch value. Defaults to today.
+The default date. Pass as an epoch value. 
 
 =head3 extras
 
@@ -631,27 +664,33 @@ By default a date is placed in the "value" field. Set this to "1" to turn off th
 
 The UI level for this field. See the WebGUI developer's site for details. Defaults to "0".
 
+=head3 defaultValue
+
+When no value is specified, use this. Defaults to today.
+
 =cut
 
 sub date {
         my ($output);
         my ($self, @p) = @_;
-        my ($name, $label, $value, $extras, $subtext, $size, $noDate, $uiLevel) =
-                rearrange([qw(name label value extras subtext size noDate uiLevel)], @p);
+        my ($name, $label, $value, $extras, $subtext, $size, $noDate, $uiLevel, $defaultValue) =
+                rearrange([qw(name label value extras subtext size noDate uiLevel defaultValue)], @p);
         if (_uiLevelChecksOut($uiLevel)) {
                 $output = WebGUI::Form::date({
                         "name"=>$name,
                         "value"=>$value,
                         "noDate"=>$noDate,
                         "size"=>$size,
-                        "extras"=>$extras
+                        "extras"=>$extras,
+			defaultValue=>$defaultValue
                         });
                 $output .= _subtext($subtext);
                 $output = $self->_tableFormRow($label,$output);
         } else {
                 $output = WebGUI::Form::hidden({
                         "name"=>$name,
-                        "value"=>epochToSet($value)
+                        "value"=>epochToSet($value),
+			defaultValue=>$defaultValue
                         });
         }
         $self->{_data} .= $output;
@@ -661,7 +700,7 @@ sub date {
 
 #-------------------------------------------------------------------
 
-=head2 dateTime ( name [ label, value, subtext, uiLevel, dateExtras, timeExtras ] )
+=head2 dateTime ( name [, label, value, subtext, uiLevel, dateExtras, timeExtras, defaultValue ] )
 
 Adds a date time row to this form.
 
@@ -689,25 +728,29 @@ The UI level for this field. See the WebGUI developer's site for details. Defaul
 
 Extra parameters such as javascript or style sheet information that you wish to add to the form element.
 
+=head3 defaultValue
+
 =cut
 
 sub dateTime {
         my ($output);
         my ($self, @p) = @_;
-        my ($name, $label, $value, $subtext, $uiLevel, $extras) = 
-		rearrange([qw(name label value subtext uiLevel extras)], @p);
+        my ($name, $label, $value, $subtext, $uiLevel, $extras, $defaultValue) = 
+		rearrange([qw(name label value subtext uiLevel extras defaultValue)], @p);
         if (_uiLevelChecksOut($uiLevel)) {
                 $output = WebGUI::Form::dateTime({
                         "name"=>$name,
                         "value"=>$value,
-			"extras"=>$extras
+			"extras"=>$extras,
+			defaultValue=>$defaultValue
                         });
                 $output .= _subtext($subtext);
                 $output = $self->_tableFormRow($label,$output);
         } else {
                 $output = WebGUI::Form::hidden({
                         "name"=>$name,
-                        "value"=>epochToSet($value,1)
+                        "value"=>epochToSet($value,1),
+			defaultValue=>$defaultValue
                         });
         }
         $self->{_data} .= $output;
@@ -749,7 +792,8 @@ sub dynamicField {
         } else {
                 $output = WebGUI::Form::hidden({
                         "name"=>$param{name},
-                        "value"=>$param{value}
+                        "value"=>$param{value},
+			"defaultValue"=>$param{defaultValue}
                         });
         }
         $self->{_data} .= $output;
@@ -757,7 +801,7 @@ sub dynamicField {
 
 #-------------------------------------------------------------------
 
-=head2 email ( name [ label, value, maxlength, extras, subtext, size, uiLevel ] )
+=head2 email ( name [, label, value, maxlength, extras, subtext, size, uiLevel, defaultValue ] )
 
 Adds an email address row to this form.
 
@@ -795,27 +839,33 @@ The number of characters wide this form element should be. There should be no re
 
 The UI level for this field. See the WebGUI developer's site for details. Defaults to "0".
 
+=head3 defaultValue
+
+When no other value is specified, this will be used.
+
 =cut
 
 sub email {
         my ($output);
         my ($self, @p) = @_;
-        my ($name, $label, $value, $maxlength, $extras, $subtext, $size, $uiLevel) =
-                rearrange([qw(name label value maxlength extras subtext size uiLevel)], @p);
+        my ($name, $label, $value, $maxlength, $extras, $subtext, $size, $uiLevel, $defaultValue) =
+                rearrange([qw(name label value maxlength extras subtext size uiLevel defaultValue)], @p);
         if (_uiLevelChecksOut($uiLevel)) {
                 $output = WebGUI::Form::email({
                         "name"=>$name,
                         "value"=>$value,
                         "maxlength"=>$maxlength,
                         "size"=>$size,
-                        "extras"=>$extras
+                        "extras"=>$extras,
+			"defaultValue" => $defaultValue
                         });
                 $output .= _subtext($subtext);
                 $output = $self->_tableFormRow($label,$output);
         } else {
                 $output = WebGUI::Form::hidden({
                         "name"=>$name,
-                        "value"=>$value
+                        "value"=>$value,
+			defaultValue=>$defaultValue
                         });
         }
         $self->{_data} .= $output;
@@ -824,7 +874,7 @@ sub email {
 
 #-------------------------------------------------------------------
 
-=head2 fieldType ( name, types [ label, value, size, extras, subtext, uiLevel ] )
+=head2 fieldType ( name, types [, label, value, size, extras, subtext, uiLevel, defaultValue ] )
 
 Adds a field type select list field to this form. This is primarily useful for building dynamic form builders.
 
@@ -862,13 +912,17 @@ Extra text to describe this form element or to provide special instructions.
 
 The UI level for this field. See the WebGUI developer's site for details. Defaults to "0".
 
+=head3 defaultValue
+
+When no other value is specified, this will be used.
+
 =cut
 
 sub fieldType {
         my ($output);
         my ($self, @p) = @_;
-        my ($name, $types, $label, $value, $size, $multiple, $extras, $subtext, $uiLevel) =
-                rearrange([qw(name types label value size multiple extras subtext uiLevel)], @p);
+        my ($name, $types, $label, $value, $size, $multiple, $extras, $subtext, $uiLevel, $defaultValue) =
+                rearrange([qw(name types label value size multiple extras subtext uiLevel, $defaultValue)], @p);
         if (_uiLevelChecksOut($uiLevel)) {
                 $output = WebGUI::Form::fieldType({
                         "name"=>$name,
@@ -876,15 +930,16 @@ sub fieldType {
                         "value"=>$value,
                         "multiple"=>$multiple,
                         "size"=>$size,
-                        "extras"=>$extras
+                        "extras"=>$extras,
+			"defaultValue"=>$defaultValue
                         });
                 $output .= _subtext($subtext);
                 $output = $self->_tableFormRow($label,$output);
         } else {
-                $output = WebGUI::Form::hiddenList({
+                $output = WebGUI::Form::hidden({
                         "name"=>$name,
-                        types=>$types,
-                        "value"=>$value
+                        "value"=>$value,
+			"defaultValue"=>$defaultValue
                         });
         }
         $self->{_data} .= $output;
@@ -892,7 +947,7 @@ sub fieldType {
 
 #-------------------------------------------------------------------
 
-=head2 file ( name [ label, subtext, extras, size, uiLevel ] )
+=head2 file ( name [, label, subtext, extras, size, uiLevel ] )
 
 Adds a file browse row to this form.
 
@@ -943,7 +998,7 @@ sub file {
 
 #-------------------------------------------------------------------
 
-=head2 filterContent ( [ name, label, value, extras, subtext, uiLevel ] )
+=head2 filterContent ( [ name, label, value, extras, subtext, uiLevel, defaultValue ] )
 
 Adds a content filter select list to the form for use with the WebGUI::HTML::filter() function.
 
@@ -974,26 +1029,32 @@ Extra text to describe this form element or to provide special instructions.
 
 The UI level for this field. See the WebGUI developer's site for details. Defaults to "0".
 
+=head3 defaultValue
+
+When no other value is present, this will be used.
+
 =cut
 
 sub filterContent {
         my ($output);
         my ($self, @p) = @_;
-        my ($name, $label, $value, $extras, $subtext, $uiLevel) =
-                rearrange([qw(name label value extras subtext uiLevel)], @p);
+        my ($name, $label, $value, $extras, $subtext, $uiLevel, $defaultValue) =
+                rearrange([qw(name label value extras subtext uiLevel defaultValue)], @p);
         if (_uiLevelChecksOut($uiLevel)) {
 		$label = WebGUI::International::get(418) if ($label eq "");
                 $output = WebGUI::Form::filterContent({
                         "name"=>$name,
                         "value"=>$value,
-                        "extras"=>$extras
+                        "extras"=>$extras,
+			defaultValue=>$defaultValue
                         });
                 $output .= _subtext($subtext);
                 $output = $self->_tableFormRow($label,$output);
         } else {
                 $output = WebGUI::Form::hidden({
                         "name"=>$name,
-                        "value"=>$value
+                        "value"=>$value,
+			defaultValue=>$defaultValue
                         });
         }
         $self->{_data} .= $output;
@@ -1002,7 +1063,7 @@ sub filterContent {
 
 #-------------------------------------------------------------------
 
-=head2 float ( name [ label, value, maxlength, extras, subtext, size, uiLevel ] )
+=head2 float ( name [, label, value, maxlength, extras, subtext, size, uiLevel, defaultValue ] )
 
 Adds an integer row to this form.
 
@@ -1040,27 +1101,33 @@ The number of characters wide this form element should be. There should be no re
 
 The UI level for this field. See the WebGUI developer's site for details. Defaults to "0".
 
+=head3 defaultValue
+
+When no other value is specified, this will be used.
+
 =cut
 
 sub float {
 	my ($output);
 	my ($self, @p) = @_;
-	my ($name, $label, $value, $maxlength, $extras, $subtext, $size, $uiLevel) =
-		rearrange([qw(name label value maxlength extras subtext size uiLevel)], @p);
+	my ($name, $label, $value, $maxlength, $extras, $subtext, $size, $uiLevel, $defaultValue) =
+		rearrange([qw(name label value maxlength extras subtext size uiLevel defaultValue)], @p);
 	if (_uiLevelChecksOut($uiLevel)) {
 		$output = WebGUI::Form::float({
 			"name"=>$name,
 			"value"=>$value,
 			"maxlength"=>$maxlength,
 			"size"=>$size,
-			"extras"=>$extras
+			"extras"=>$extras,
+			defaultValue=>$defaultValue
 			});
 		$output .= _subtext($subtext);
 		$output = $self->_tableFormRow($label,$output);
 	} else {
 		$output = WebGUI::Form::hidden({
 			"name"=>$name,
-			"value"=>$value
+			"value"=>$value,
+			defaultValue=>$defaultValue
 			});
 	}
 	$self->{_data} .= $output;
@@ -1070,7 +1137,7 @@ sub float {
 
 #-------------------------------------------------------------------
 
-=head2 group ( name [ label, value, size, multiple, extras, subtext, uiLevel, excludeGroups ] )
+=head2 group ( name [, label, value, size, multiple, extras, subtext, uiLevel, excludeGroups, defaultValue ] )
 
 Adds a group pull-down to this form. A group pull down provides a select list that provides name value pairs for all the groups in the WebGUI system.
 
@@ -1084,7 +1151,7 @@ The left column label for this form row.
 
 =head3 value
 
-The default value(s) for this form element. This should be passed as an array reference. Defaults to "7" (Everyone).
+The default value(s) for this form element. This should be passed as an array reference.
 
 =head3 size
 
@@ -1112,13 +1179,17 @@ The UI level for this field. See the WebGUI developer's site for details. Defaul
 
 An array reference containing a list of groups to exclude from the list.
 
+=head3 defaultValue
+
+When no other value is specified, this will be used. Should be passed as an array reference. Defaults to "7" (Everyone).
+
 =cut
 
 sub group {
         my ($output);
         my ($self, @p) = @_;
-        my ($name, $label, $value, $size, $multiple, $extras, $subtext, $uiLevel, $excludeGroups) =
-                rearrange([qw(name label value size multiple extras subtext uiLevel excludeGroups)], @p);
+        my ($name, $label, $value, $size, $multiple, $extras, $subtext, $uiLevel, $excludeGroups, $defaultValue) =
+                rearrange([qw(name label value size multiple extras subtext uiLevel excludeGroups defaultValue)], @p);
         if (_uiLevelChecksOut($uiLevel)) {
 		if (WebGUI::Grouping::isInGroup(3)) {
 			$subtext = manageIcon("op=listGroups").$subtext;
@@ -1129,7 +1200,8 @@ sub group {
                         "value"=>$value,
                         "multiple"=>$multiple,
                         "extras"=>$extras,
-			excludeGroups=>$excludeGroups
+			excludeGroups=>$excludeGroups,
+			defaultValue=>$defaultValue
                         });
                 $output .= _subtext($subtext);
                 $output = $self->_tableFormRow($label,$output);
@@ -1138,7 +1210,8 @@ sub group {
                 $output = WebGUI::Form::hiddenList({
 			"name"=>$name,
                         "options"=>$hashRef,
-                        "value"=>$value
+                        "value"=>$value,
+			defaultValue=>$defaultValue
                         });
         }
         $self->{_data} .= $output;
@@ -1146,7 +1219,7 @@ sub group {
 
 #-------------------------------------------------------------------
 
-=head2 hidden ( name [ value ] )
+=head2 hidden ( name, value [, defaultValue ] )
 
 Adds a hidden row to this form.
 
@@ -1158,20 +1231,25 @@ The name field for this form element.
 
 The default value for this form element.
 
+=head3 defaultValue
+
+If no value is specified, this will be used instead.
+
 =cut
 
 sub hidden {
         my ($self, @p) = @_;
-        my ($name, $value) = rearrange([qw(name value)], @p);
+        my ($name, $value, $defaultValue) = rearrange([qw(name value defaultValue)], @p);
         $self->{_data} .= WebGUI::Form::hidden({
 		"name"=>$name,
-		"value"=>$value
+		"value"=>$value,
+		defaultValue=>$defaultValue
 		});
 }
 
 #-------------------------------------------------------------------
 
-=head2 HTMLArea ( name [ label, value, subtext, extras, wrap, rows, columns, uiLevel, popupToggle ] )
+=head2 HTMLArea ( name [, label, value, subtext, extras, wrap, rows, columns, uiLevel, defaultValue ] )
 
 Adds an HTML area row to this form. An HTML area is different than a standard text area in that it provides rich edit functionality and some special error trapping for HTML and other special characters.
 
@@ -1213,19 +1291,17 @@ The number of characters wide this form element should be. There should be no re
 
 The UI level for this field. See the WebGUI developer's site for details. Defaults to "0".
 
-=head3 popupToggle
+=head3 defaultValue
 
-Defaults to "0". If set to "1" the rich editor will be a pop-up editor. If set to "0" the rich editor will be inline.
-
-B<NOTE:> WebGUI uses a great variety of rich editors. Not all of them are capable of inline mode, so even if you leave this set to "0" the editor may be a pop-up anyway.
+If no value is specified, this will be used.
 
 =cut
 
 sub HTMLArea {
         my ($output);
         my ($self, @p) = @_;
-        my ($name, $label, $value, $subtext, $extras, $wrap, $rows, $columns, $uiLevel, $popupToggle) =
-                rearrange([qw(name label value subtext extras wrap rows columns uiLevel popupToggle)], @p);
+        my ($name, $label, $value, $subtext, $extras, $wrap, $rows, $columns, $uiLevel, $defaultValue) =
+                rearrange([qw(name label value subtext extras wrap rows columns uiLevel defaultValue)], @p);
         if (_uiLevelChecksOut($uiLevel)) {
                 $output = WebGUI::Form::HTMLArea({
                         "name"=>$name,
@@ -1234,14 +1310,15 @@ sub HTMLArea {
                         "columns"=>$columns,
                         "rows"=>$rows,
                         "extras"=>$extras,
-			"popupToggle"=>$popupToggle
+			defaultValue=>$defaultValue
                         });
                 $output .= _subtext($subtext);
                 $output = $self->_tableFormRow($label,$output);
         } else {
                 $output = WebGUI::Form::hidden({
                         "name"=>$name,
-                        "value"=>$value
+                        "value"=>$value,	
+			defaultValue=>$defaultValue
                         });
         }
         $self->{_data} .= $output;
@@ -1249,7 +1326,7 @@ sub HTMLArea {
 
 #-------------------------------------------------------------------
 
-=head2 integer ( name [ label, value, maxlength, extras, subtext, size, uiLevel ] )
+=head2 integer ( name [, label, value, maxlength, extras, subtext, size, uiLevel, defaultValue ] )
 
 Adds an integer row to this form.
 
@@ -1287,27 +1364,33 @@ The number of characters wide this form element should be. There should be no re
 
 The UI level for this field. See the WebGUI developer's site for details. Defaults to "0".
 
+=head3 defaultValue
+
+If no value is specified, this will be used.
+
 =cut
 
 sub integer {
         my ($output);
         my ($self, @p) = @_;
-        my ($name, $label, $value, $maxlength, $extras, $subtext, $size, $uiLevel) =
-                rearrange([qw(name label value maxlength extras subtext size uiLevel)], @p);
+        my ($name, $label, $value, $maxlength, $extras, $subtext, $size, $uiLevel, $defaultValue) =
+                rearrange([qw(name label value maxlength extras subtext size uiLevel defaultValue)], @p);
         if (_uiLevelChecksOut($uiLevel)) {
                 $output = WebGUI::Form::integer({
                         "name"=>$name,
                         "value"=>$value,
                         "maxlength"=>$maxlength,
                         "size"=>$size,
-                        "extras"=>$extras
+                        "extras"=>$extras,
+			defaultValue=>$defaultValue
                         });
                 $output .= _subtext($subtext);
                 $output = $self->_tableFormRow($label,$output);
         } else {
                 $output = WebGUI::Form::hidden({
                         "name"=>$name,
-                        "value"=>$value
+                        "value"=>$value,
+			"defaultValue"=>$defaultValue
                         });
         }
         $self->{_data} .= $output;
@@ -1315,7 +1398,7 @@ sub integer {
 
 #-------------------------------------------------------------------
 
-=head2 interval ( name [ label, intervalValue, unitsValue, extras, subtext, uiLevel ] )
+=head2 interval ( name [, label, value, extras, subtext, uiLevel, defaultValue ] )
 
 Adds a time interval row to this form.
 
@@ -1327,13 +1410,9 @@ The the base name for this form element. This form element actually returns two 
 
 The left column label for this form row.
 
-=head3 intervalValue
+=head3 value 
 
-The default value for interval portion of this form element. Defaults to '1'.
-
-=head3 unitsValue
-
-The default value for units portion of this form element. Defaults to 'seconds'. Possible values are 'seconds', 'minutes', 'hours', 'days', 'weeks', 'months', and 'years'.
+The number of seconds in this interval.
 
 =head3 extras
 
@@ -1349,30 +1428,35 @@ Extra text to describe this form element or to provide special instructions.
 
 The UI level for this field. See the WebGUI developer's site for details. Defaults to "0".
 
+=head3 defaultValue
+
+When no value is specified, we'll use this instead. Defaults to 1.
+
 =cut
 
 sub interval {
         my ($output);
         my ($self, @p) = @_;
-        my ($name, $label, $intervalValue, $unitsValue, $extras, $subtext, $uiLevel) =
-                rearrange([qw(name label intervalValue unitsValue extras subtext uiLevel)], @p);
+        my ($name, $label, $value, $extras, $subtext, $uiLevel, $defaultValue) =
+                rearrange([qw(name label value extras subtext uiLevel defaultValue)], @p);
         if (_uiLevelChecksOut($uiLevel)) {
                 $output = WebGUI::Form::interval({
                         "name"=>$name,
-                        "intervalValue"=>$intervalValue,
-                        "unitsValue"=>$unitsValue,
-                        "extras"=>$extras
+                        "value"=>$value,
+                        "extras"=>$extras,
+			defaultValue=>$defaultValue
                         });
                 $output .= _subtext($subtext);
                 $output = $self->_tableFormRow($label,$output);
         } else {
+		my ($interval, $units) = WebGUI::DateTime::secondsToInterval($value||$defaultValue||1);
                 $output = WebGUI::Form::hidden({
                         "name"=>$name.'_interval',
-                        "value"=>$intervalValue
+                        "value"=>$interval
                         });
                 $output .= WebGUI::Form::hidden({
                         "name"=>$name.'_units',
-                        "value"=>$unitsValue
+                        "value"=>$units
                         });
         }
         $self->{_data} .= $output;
@@ -1435,7 +1519,7 @@ sub new {
 
 #-------------------------------------------------------------------
 
-=head2 password ( name [ label, value, subtext, maxlength, extras, size, uiLevel ] )
+=head2 password ( name [, label, value, subtext, maxlength, extras, size, uiLevel, defaultValue ] )
 
 Adds a password row to this form. 
 
@@ -1473,27 +1557,33 @@ The number of characters wide this form element should be. There should be no re
 
 The UI level for this field. See the WebGUI developer's site for details. Defaults to "0".
 
+=head3 defaultValue
+
+When no value is specified, this will be used instead.
+
 =cut
 
 sub password {
         my ($output);
         my ($self, @p) = @_;
-        my ($name, $label, $value, $subtext, $maxlength, $extras, $size, $uiLevel) =
-                rearrange([qw(name label value subtext maxlength extras size uiLevel)], @p);
+        my ($name, $label, $value, $subtext, $maxlength, $extras, $size, $uiLevel, $defaultValue) =
+                rearrange([qw(name label value subtext maxlength extras size uiLevel defaultValue)], @p);
         if (_uiLevelChecksOut($uiLevel)) {
                 $output = WebGUI::Form::password({
                         "name"=>$name,
                         "value"=>$value,
                         "size"=>$size,
                         "maxlength"=>$maxlength,
-                        "extras"=>$extras
+                        "extras"=>$extras,
+			defaultValue=>$defaultValue
                         });
                 $output .= _subtext($subtext);
                 $output = $self->_tableFormRow($label,$output);
         } else {
                 $output = WebGUI::Form::hidden({
                         "name"=>$name,
-                        "value"=>$value
+                        "value"=>$value,
+			defaultValue=>$defaultValue
                         });
         }
         $self->{_data} .= $output;
@@ -1501,7 +1591,7 @@ sub password {
 
 #-------------------------------------------------------------------
 
-=head2 phone ( name [ label, value, maxlength, extras, subtext, size, uiLevel ] )
+=head2 phone ( name [, label, value, maxlength, extras, subtext, size, uiLevel, defaultValue ] )
 
 Adds a text row to this form.
 
@@ -1539,27 +1629,33 @@ The number of characters wide this form element should be. There should be no re
 
 The UI level for this field. See the WebGUI developer's site for details. Defaults to "0".
 
+=head3 defaultValue
+
+If no value is specified, we'll use this instead.
+
 =cut
 
 sub phone {
         my ($output);
         my ($self, @p) = @_;
-        my ($name, $label, $value, $maxlength, $extras, $subtext, $size, $uiLevel) =
-                rearrange([qw(name label value maxlength extras subtext size uiLevel)], @p);
+        my ($name, $label, $value, $maxlength, $extras, $subtext, $size, $uiLevel, $defaultValue) =
+                rearrange([qw(name label value maxlength extras subtext size uiLevel defaultValue)], @p);
         if (_uiLevelChecksOut($uiLevel)) {
                 $output = WebGUI::Form::phone({
                         "name"=>$name,
                         "value"=>$value,
                         "size"=>$size,
                         "maxlength"=>$maxlength,
-                        "extras"=>$extras
+                        "extras"=>$extras,
+			defaultValue=>$defaultValue
                         });
                 $output .= _subtext($subtext);
                 $output = $self->_tableFormRow($label,$output);
         } else {
                 $output = WebGUI::Form::hidden({
                         "name"=>$name,
-                        "value"=>$value
+                        "value"=>$value,
+			defaultValue=>$defaultValue
                         });
         }
         $self->{_data} .= $output;
@@ -1591,7 +1687,7 @@ sub printRowsOnly {
 
 #-------------------------------------------------------------------
 
-=head2 radio ( name [ label, checked, value, subtext, extras, uiLevel ] )
+=head2 radio ( name [, label, checked, value, subtext, extras, uiLevel, defaultValue ] )
 
 Adds a radio button row to this form.
 
@@ -1625,19 +1721,24 @@ If you want to add anything special to this form element like javascript actions
 
 The UI level for this field. See the WebGUI developer's site for details. Defaults to "0".
 
+=head3 defaultValue
+
+If no value is specified, we'll use this instead.
+
 =cut
 
 sub radio {
         my ($output);
         my ($self, @p) = @_;
-        my ($name, $label, $checked, $value, $subtext, $extras, $uiLevel) =
-                rearrange([qw(name label checked value subtext extras uiLevel)], @p);
+        my ($name, $label, $checked, $value, $subtext, $extras, $uiLevel, $defaultValue) =
+                rearrange([qw(name label checked value subtext extras uiLevel defaultValue)], @p);
         if (_uiLevelChecksOut($uiLevel)) {
                 $output = WebGUI::Form::radio({
                         "name"=>$name,
                         "value"=>$value,
                         "checked"=>$checked,
-                        "extras"=>$extras
+                        "extras"=>$extras,
+			defaultValue=>$defaultValue
                         });
                 $output .= _subtext($subtext);
                 $output = $self->_tableFormRow($label,$output);
@@ -1645,7 +1746,8 @@ sub radio {
 		if ($checked) {
                 	$output = WebGUI::Form::hidden({
                         	"name"=>$name,
-                        	"value"=>$value
+                        	"value"=>$value,
+				defaultValue=>$defaultValue
                         	});
 		}
         }
@@ -1654,7 +1756,7 @@ sub radio {
 
 #-------------------------------------------------------------------
 
-=head2 radioList ( name, options, [ label, value, vertical, extras, subtext, uiLevel ] )
+=head2 radioList ( name, options [, label, value, vertical, extras, subtext, uiLevel, defaultValue ] )
 
 Adds a radio button list row to this form.
 
@@ -1692,28 +1794,33 @@ Extra text to describe this form element or to provide special instructions.
 
 The UI level for this field. See the WebGUI developer's site for details. Defaults to "0".
 
+=head3 defaultValue
+
+If no other value is specified, we'll use this instead.
+
 =cut
 
 sub radioList {
         my ($output);
         my ($self, @p) = @_;
-        my ($name, $options, $label, $value, $vertical, $extras, $subtext, $uiLevel) =
-                rearrange([qw(name options label value vertical extras subtext uiLevel)], @p);
+        my ($name, $options, $label, $value, $vertical, $extras, $subtext, $uiLevel, $defaultValue) =
+                rearrange([qw(name options label value vertical extras subtext uiLevel defaultValue)], @p);
         if (_uiLevelChecksOut($uiLevel)) {
                 $output = WebGUI::Form::radioList({
                         "name"=>$name,
                         "options"=>$options,
                         "value"=>$value,
                         "vertical"=>$vertical,
-                        "extras"=>$extras
+                        "extras"=>$extras,
+			defaultValue=>$defaultValue
                         });
                 $output .= _subtext($subtext);
                 $output = $self->_tableFormRow($label,$output);
         } else {
-                $output = WebGUI::Form::hiddenList({
+                $output = WebGUI::Form::hidden({
 			"name"=>$name,
-                        "options"=>$options,
-                        "value"=>[$value]
+                        "value"=>$value,
+			defaultValue=>$defaultValue
                         });
         }
         $self->{_data} .= $output;
@@ -1743,7 +1850,7 @@ sub raw {
 
 #-------------------------------------------------------------------
 
-=head2 readOnly ( value [ label, subtext, uiLevel ] )
+=head2 readOnly ( value [, label, subtext, uiLevel, defaultValue ] )
 
 Adds a read only row to this form. This is mainly used for displaying not editable properties, but it can also be used to quickly insert custom form elements.
 
@@ -1763,15 +1870,19 @@ Extra text to describe this form element or to provide special instructions.
 
 The UI level for this field. See the WebGUI developer's site for details. Defaults to "0".
 
+=head3 defaultValue
+
+If no value is specified, we'll use this.
+
 =cut
 
 sub readOnly {
         my ($output);
         my ($self, @p) = @_;
-        my ($value, $label, $subtext, $uiLevel) =
-                rearrange([qw(value label subtext uiLevel)], @p);
+        my ($value, $label, $subtext, $uiLevel, $defaultValue) =
+                rearrange([qw(value label subtext uiLevel defaultValue)], @p);
         if (_uiLevelChecksOut($uiLevel)) {
-                $output = $value;
+                $output = $value || $defaultValue;
                 $output .= _subtext($subtext);
                 $output = $self->_tableFormRow($label,$output);
         }
@@ -1779,15 +1890,8 @@ sub readOnly {
 }
 
 #-------------------------------------------------------------------
-#Use of this method is depricated. Use selectList instead.
-sub select {
-	my $self = shift;
-	return $self->selectList(@_);
-}
 
-#-------------------------------------------------------------------
-
-=head2 selectList ( name, options, [ label, value, size, multiple, extras, subtext, uiLevel ] )
+=head2 selectList ( name, options [, label, value, size, multiple, extras, subtext, uiLevel, sortByValue, defaultValue ] )
 
 Adds a select list row to this form.
 
@@ -1833,13 +1937,17 @@ The UI level for this field. See the WebGUI developer's site for details. Defaul
 
 A boolean value for whether the values in the options hash should be sorted.
 
+=head3 defaultValue
+
+If no value is specified, this will be used. Pass as an array reference.
+
 =cut
 
 sub selectList {
         my ($output);
         my ($self, @p) = @_;
-        my ($name, $options, $label, $value, $size, $multiple, $extras, $subtext, $uiLevel, $sortByValue) =
-                rearrange([qw(name options label value size multiple extras subtext uiLevel sortByValue)], @p);
+        my ($name, $options, $label, $value, $size, $multiple, $extras, $subtext, $uiLevel, $sortByValue, $defaultValue) =
+                rearrange([qw(name options label value size multiple extras subtext uiLevel sortByValue defaultValue)], @p);
         if (_uiLevelChecksOut($uiLevel)) {
                 $output = WebGUI::Form::selectList({
                         "name"=>$name,
@@ -1848,7 +1956,8 @@ sub selectList {
                         "multiple"=>$multiple,
                         "size"=>$size,
                         "extras"=>$extras,
-			"sortByValue"=>$sortByValue
+			"sortByValue"=>$sortByValue,
+			defaultValue=>$defaultValue
                         });
                 $output .= _subtext($subtext);
                 $output = $self->_tableFormRow($label,$output);
@@ -1856,7 +1965,8 @@ sub selectList {
                 $output = WebGUI::Form::hiddenList({
 			"name"=>$name,
                         "options"=>$options,
-                        "value"=>$value
+                        "value"=>$value,
+			defaultValue=>$defaultValue
                         });
         }
         $self->{_data} .= $output;
@@ -1864,13 +1974,13 @@ sub selectList {
 
 #-------------------------------------------------------------------
 
-=head2 submit ( value [ label, extras, subtext ] )
+=head2 submit ( value [ label, extras, subtext, defaultValue ] )
 
 Adds a submit button row to this form.
 
 =head3 value
 
-The button text for this submit button. Defaults to "save".
+The button text for this submit button.
 
 =head3 label
 
@@ -1886,15 +1996,20 @@ If you want to add anything special to this form element like javascript actions
 
 Extra text to describe this form element or to provide special instructions.
 
+=head3 defaultValue
+
+If no value is specified, this will be used. Defaults to "save".
+
 =cut
 
 sub submit {
         my ($output);
         my ($self, @p) = @_;
-        my ($value, $label, $extras, $subtext) = rearrange([qw(value label extras subtext)], @p);
+        my ($value, $label, $extras, $subtext, $defaultValue) = rearrange([qw(value label extras subtext defaultValue)], @p);
         $output = WebGUI::Form::submit({
                 "value"=>$value,
-                "extras"=>$extras
+                "extras"=>$extras,
+		defaultValue=>$defaultValue
                 });
         $output .= _subtext($subtext);
         $output = $self->_tableFormRow($label,$output);
@@ -1903,7 +2018,7 @@ sub submit {
 
 #-------------------------------------------------------------------
 
-=head2 template ( name [, value, label, namespace, afterEdit, extras, uiLevel ] )
+=head2 template ( name [, value, label, namespace, afterEdit, extras, uiLevel, defaultValue ] )
 
 Adds a template select list to the form.
 
@@ -1921,7 +2036,7 @@ The left column label for this form row.
 
 =head3 namespace
 
-The namespace (or type) of templates to show in this list. Defaults to "Page".
+The namespace (or type) of templates to show in this list. 
 
 =head3 afterEdit
 
@@ -1937,13 +2052,17 @@ If you want to add anything special to this form element like javascript actions
 
 The UI level for this field. See the WebGUI developer's site for details. Defaults to "0".
 
+=head3 defaultValue
+
+If no value is specified, this will be used. 
+
 =cut
 
 sub template {
         my ($output, $subtext);
         my ($self, @p) = @_;
-        my ($name, $value, $label, $namespace, $afterEdit, $extras, $uiLevel) = 
-		rearrange([qw(name value label namespace afterEdit extras uiLevel)], @p);
+        my ($name, $value, $label, $namespace, $afterEdit, $extras, $uiLevel, $defaultValue) = 
+		rearrange([qw(name value label namespace afterEdit extras uiLevel defaultValue)], @p);
         if (_uiLevelChecksOut($uiLevel)) {
 		$label = $label || WebGUI::International::get(356);
 		if (WebGUI::Grouping::isInGroup(8)) {
@@ -1956,14 +2075,16 @@ sub template {
                 	"name"=>$name,
                 	"value"=>$value,
                 	"namespace"=>$namespace,
-                	"extras"=>$extras
+                	"extras"=>$extras,
+			defaultValue=>$defaultValue
                 	});
                 $output .= _subtext($subtext);
                 $output = $self->_tableFormRow($label,$output);
         } else {
                 $output = WebGUI::Form::hidden({
                         "name"=>$name,
-                        "value"=>$value
+                        "value"=>$value,
+			defaultValue=>$defaultValue
                         });
         }
         $self->{_data} .= $output;
@@ -1971,7 +2092,7 @@ sub template {
 
 #-------------------------------------------------------------------
 
-=head2 text ( name [ label, value, maxlength, extras, subtext, size, uiLevel ] )
+=head2 text ( name [, label, value, maxlength, extras, subtext, size, uiLevel, defaultValue ] )
 
 Adds a text row to this form.
 
@@ -2009,27 +2130,33 @@ The number of characters wide this form element should be. There should be no re
 
 The UI level for this field. See the WebGUI developer's site for details. Defaults to "0".
 
+=head3 defaultValue
+
+This will be used if no value is specified.
+
 =cut
 
 sub text {
         my ($output);
         my ($self, @p) = @_;
-        my ($name, $label, $value, $maxlength, $extras, $subtext, $size, $uiLevel) =
-                rearrange([qw(name label value maxlength extras subtext size uiLevel)], @p);
+        my ($name, $label, $value, $maxlength, $extras, $subtext, $size, $uiLevel, $defaultValue) =
+                rearrange([qw(name label value maxlength extras subtext size uiLevel defaultValue)], @p);
         if (_uiLevelChecksOut($uiLevel)) {
                 $output = WebGUI::Form::text({
                         "name"=>$name,
                         "value"=>$value,
                         "size"=>$size,
                         "maxlength"=>$maxlength,
-                        "extras"=>$extras
+                        "extras"=>$extras,
+			defaultValue=>$defaultValue
                         });
                 $output .= _subtext($subtext);
         	$output = $self->_tableFormRow($label,$output);
         } else {
                 $output = WebGUI::Form::hidden({
                         "name"=>$name,
-                        "value"=>$value
+                        "value"=>$value,
+			defaultValue=>$defaultValue
                         });
         }
         $self->{_data} .= $output;
@@ -2037,7 +2164,7 @@ sub text {
 
 #-------------------------------------------------------------------
 
-=head2 textarea ( name [ label, value, subtext, extras, wrap, rows, columns, uiLevel ] )
+=head2 textarea ( name [, label, value, subtext, extras, wrap, rows, columns, uiLevel, defaultValue ] )
 
 Adds a text area row to this form.
 
@@ -2079,13 +2206,17 @@ The number of characters wide this form element should be. There should be no re
 
 The UI level for this field. See the WebGUI developer's site for details. Defaults to "0".
 
+=head3 defaultValue
+
+This will be used if no value is specified.
+
 =cut
 
 sub textarea {
         my ($output);
         my ($self, @p) = @_;
-        my ($name, $label, $value, $subtext, $extras, $wrap, $rows, $columns, $uiLevel) =
-                rearrange([qw(name label value subtext extras wrap rows columns uiLevel)], @p);
+        my ($name, $label, $value, $subtext, $extras, $wrap, $rows, $columns, $uiLevel, $defaultValue) =
+                rearrange([qw(name label value subtext extras wrap rows columns uiLevel defaultValue)], @p);
         if (_uiLevelChecksOut($uiLevel)) {
                 $output = WebGUI::Form::textarea({
                         "name"=>$name,
@@ -2093,14 +2224,16 @@ sub textarea {
                         "wrap"=>$wrap,
                         "columns"=>$columns,
                         "rows"=>$rows,
-                        "extras"=>$extras
+                        "extras"=>$extras,
+			defaultValue =>$defaultValue
                         });
                 $output .= _subtext($subtext);
         	$output = $self->_tableFormRow($label,$output);
         } else {
                 $output = WebGUI::Form::hidden({
                         "name"=>$name,
-                        "value"=>$value
+                        "value"=>$value,
+			defaultValue=>$defaultValue
                         });
         }
         $self->{_data} .= $output;
@@ -2108,7 +2241,7 @@ sub textarea {
 
 #-------------------------------------------------------------------
 
-=head2 timeField ( name [ label, value, extras, subtext, size, noDate, uiLevel ] )
+=head2 timeField ( name [, label, value, extras, subtext, size, noDate, uiLevel, defaultValue ] )
 
 Adds a date row to this form.
 
@@ -2142,26 +2275,32 @@ The number of characters wide this form element should be. There should be no re
 
 The UI level for this field. See the WebGUI developer's site for details. Defaults to "0".
 
+=head3 defaultValue
+
+This will be used if no value is specified.
+
 =cut
 
 sub timeField {
         my ($output);
         my ($self, @p) = @_;
-        my ($name, $label, $value, $extras, $subtext, $size, $uiLevel) =
-                rearrange([qw(name label value extras subtext size uiLevel)], @p);
+        my ($name, $label, $value, $extras, $subtext, $size, $uiLevel, $defaultValue) =
+                rearrange([qw(name label value extras subtext size uiLevel defaultValue)], @p);
         if (_uiLevelChecksOut($uiLevel)) {
                 $output = WebGUI::Form::time({
                         "name"=>$name,
                         "value"=>$value,
                         "size"=>$size,
-                        "extras"=>$extras
+                        "extras"=>$extras,
+			defaultValue=>$defaultValue
                         });
                 $output .= _subtext($subtext);
                 $output = $self->_tableFormRow($label,$output);
         } else {
                 $output = WebGUI::Form::hidden({
                         "name"=>$name,
-                        "value"=>secondsToTime($value)
+                        "value"=>secondsToTime($value),
+			defaultValue=>$defaultValue
                         });
         }
         $self->{_data} .= $output;
@@ -2184,7 +2323,7 @@ sub trClass {
 
 #-------------------------------------------------------------------
 
-=head2 url ( name [ label, value, maxlength, extras, subtext, size, uiLevel ] )
+=head2 url ( name [, label, value, maxlength, extras, subtext, size, uiLevel, defaultValue ] )
 
 Adds a URL row to this form.
 
@@ -2222,27 +2361,31 @@ The number of characters wide this form element should be. There should be no re
 
 The UI level for this field. See the WebGUI developer's site for details. Defaults to "0".
 
+=head3 defaultValue
+
 =cut
 
 sub url {
         my ($output);
         my ($self, @p) = @_;
-        my ($name, $label, $value, $maxlength, $extras, $subtext, $size, $uiLevel) =
-                rearrange([qw(name label value maxlength extras subtext size uiLevel)], @p);
+        my ($name, $label, $value, $maxlength, $extras, $subtext, $size, $uiLevel, $defaultValue) =
+                rearrange([qw(name label value maxlength extras subtext size uiLevel defaultValue)], @p);
         if (_uiLevelChecksOut($uiLevel)) {
                 $output = WebGUI::Form::url({
                         "name"=>$name,
                         "value"=>$value,
                         "size"=>$size,
                         "maxlength"=>$maxlength,
-                        "extras"=>$extras
+                        "extras"=>$extras,
+			defaultValue=>$defaultValue
                         });
                 $output .= _subtext($subtext);
         	$output = $self->_tableFormRow($label,$output);
         } else {
                 $output = WebGUI::Form::hidden({
                         "name"=>$name,
-                        "value"=>$value
+                        "value"=>$value,
+			defaultValue=>$defaultValue
                         });
         }
         $self->{_data} .= $output;
@@ -2250,7 +2393,7 @@ sub url {
 
 #-------------------------------------------------------------------
 
-=head2 whatNext ( options [, value, name, label, subtext, uiLevel, extras ] )
+=head2 whatNext ( options [, value, name, label, subtext, uiLevel, extras, defaultValue ] )
 
 Adds a "What next?" select list to this form for use with chained action forms in WebGUI.
 
@@ -2284,13 +2427,17 @@ If you want to add anything special to this form element like javascript actions
 
  'onChange="this.form.submit()"'
 
+=head3 defaultValue
+
+Used if value is not specified. 
+
 =cut
 
 sub whatNext {
         my ($output);
         my ($self, @p) = @_;
-        my ($options, $value, $name, $label, $subtext, $uiLevel, $extras) =
-                rearrange([qw(options value name label subtext uiLevel extras)], @p);
+        my ($options, $value, $name, $label, $subtext, $uiLevel, $extras, $defaultValue) =
+                rearrange([qw(options value name label subtext uiLevel extras defaultValue)], @p);
 	$uiLevel |= 1;
 	$label |= WebGUI::International::get(744);
         if (_uiLevelChecksOut($uiLevel)) {
@@ -2298,14 +2445,16 @@ sub whatNext {
                         "name"=>$name,
 			"options"=>$options,
                         "value"=>$value,
-                        "extras"=>$extras
+                        "extras"=>$extras,
+			defaultValue=>$defaultValue
                         });
                 $output .= _subtext($subtext);
                 $output = $self->_tableFormRow($label,$output);
         } else {
                 $output = WebGUI::Form::hidden({
                         "name"=>$name,
-                        "value"=>$value
+                        "value"=>$value,
+			defaultValue=>$defaultValue
                         });
         }
         $self->{_data} .= $output;
@@ -2313,7 +2462,7 @@ sub whatNext {
 
 #-------------------------------------------------------------------
 
-=head2 yesNo ( name [ label, value, extras, subtext, uiLevel ] )
+=head2 yesNo ( name [, label, value, extras, subtext, uiLevel, defaultValue ] )
 
 Adds a yes/no radio menu to this form.
 
@@ -2327,7 +2476,7 @@ The left column label for this form row.
 
 =head3 value
 
-The default value(s) for this form element. Valid values are "1" and "0". Defaults to "1".
+The default value(s) for this form element. Valid values are "1" and "0". 
 
 =head3 extras
 
@@ -2343,6 +2492,9 @@ Extra text to describe this form element or to provide special instructions.
 
 The UI level for this field. See the WebGUI developer's site for details. Defaults to "0".
 
+=head3 defaultValue
+
+This will be used if value is not specified. Defaults to 1.
 =cut
 
 sub yesNo {
@@ -2370,7 +2522,7 @@ sub yesNo {
 
 #-------------------------------------------------------------------
 
-=head2 zipcode ( name [ label, value, maxlength, extras, subtext, size, uiLevel ] )
+=head2 zipcode ( name [, label, value, maxlength, extras, subtext, size, uiLevel, defaultValue ] )
 
 Adds a zip code row to this form.
 
@@ -2408,27 +2560,33 @@ The number of characters wide this form element should be. There should be no re
 
 The UI level for this field. See the WebGUI developer's site for details. Defaults to "0".
 
+=head3 defaultValue
+
+Used if value not specified. 
+
 =cut
 
 sub zipcode {
         my ($output);
         my ($self, @p) = @_;
-        my ($name, $label, $value, $maxlength, $extras, $subtext, $size, $uiLevel) =
-                rearrange([qw(name label value maxlength extras subtext size uiLevel)], @p);
+        my ($name, $label, $value, $maxlength, $extras, $subtext, $size, $uiLevel, $defaultValue) =
+                rearrange([qw(name label value maxlength extras subtext size uiLevel defaultValue)], @p);
         if (_uiLevelChecksOut($uiLevel)) {
                 $output = WebGUI::Form::zipcode({
                         "name"=>$name,
                         "value"=>$value,
                         "size"=>$size,
                         "maxlength"=>$maxlength,
-                        "extras"=>$extras
+                        "extras"=>$extras,
+			defaultValue=>$defaultValue
                         });
                 $output .= _subtext($subtext);
         	$output = $self->_tableFormRow($label,$output);
         } else {
                 $output = WebGUI::Form::hidden({
                         "name"=>$name,
-                        "value"=>$value
+                        "value"=>$value,
+			defaultValue=>$defaultValue
                         });
         }
         $self->{_data} .= $output;

@@ -126,13 +126,17 @@ If you want to add anything special to this form element like javascript actions
 
  'onClick="alert(\'You've just pushed me !\')"'
 
+=head3 defaultValue
+
+This will be used if no value is specified.
+
 =cut
 
 sub button {
-        my ($label, $extras, $subtext, $class, $output, $name, $value);
-        $value = $_[0]->{value} || WebGUI::International::get(62);
+	my $params = shift;
+        my $value = $params->{value} || $params->{defaultValue} || WebGUI::International::get(62);
         $value = _fixQuotes($value);
-        return '<input type="button" value="'.$value.'" '.$_[0]->{extras}.'>';
+        return '<input type="button" value="'.$value.'" '.$params->{extras}.'>';
 }
 
 #-------------------------------------------------------------------
@@ -151,7 +155,7 @@ If you'd like this box to be defaultly checked, set this to "1".
 
 =head3 value
 
-The default value for this form element. Defaults to "1".
+The default value for this form element.
 
 =head3 extras
 
@@ -159,13 +163,17 @@ If you want to add anything special to this form element like javascript actions
 
  'onChange="this.form.submit()"'
 
+=head3 defaultValue
+
+This will be used if no value is specified. Defaults to 1.
+
 =cut
 
 sub checkbox {
-        my ($checkedText, $value);
-        $checkedText = ' checked="1"' if ($_[0]->{checked});
-        $value = $_[0]->{value} || 1;
-        return '<input type="checkbox" name="'.$_[0]->{name}.'" value="'.$value.'"'.$checkedText.' '.$_[0]->{extras}.'>';
+	my $params = shift;
+        my $checkedText = ' checked="1"' if ($params->{checked});
+        my $value = $params->{value} || $params->{defaultValue} || 1;
+        return '<input type="checkbox" name="'.$params->{name}.'" value="'.$value.'"'.$checkedText.' '.$params->{extras}.'>';
 }
 
 #-------------------------------------------------------------------
@@ -196,25 +204,31 @@ If you want to add anything special to this form element like javascript actions
 
  'onChange="this.form.submit()"'
 
+=head3 defaultValue
+
+This will be used if no value is specified. Should be passed as an array reference.
+
 =cut
 
 sub checkList {
+	my $params = shift;
         my ($output, $checked, $key, $item);
-        foreach $key (keys %{$_[0]->{options}}) {
+	my $values = $params->{value} || $params->{defaultValue};
+        foreach $key (keys %{$params->{options}}) {
 		$checked = 0;
-		foreach $item (@{$_[0]->{value}}) {
+		foreach $item (@{$values}) {
                         if ($item eq $key) {
                                 $checked = 1;
                         }
                 }
 		$output .= checkbox({
-			name=>$_[0]->{name},
+			name=>$params->{name},
 			value=>$key,
-			extras=>$_[0]->{extras},
+			extras=>$params->{extras},
 			checked=>$checked
 			});
-                $output .= ${$_[0]->{options}}{$key};
-		if ($_[0]->{vertical}) {
+                $output .= ${$params->{options}}{$key};
+		if ($params->{vertical}) {
 			$output .= "<br />\n";
 		} else {
 			$output .= " &nbsp; &nbsp;\n";
@@ -255,21 +269,25 @@ If you want to add anything special to this form element like javascript actions
 
  'onChange="this.form.submit()"'
 
+=head3 defaultValue
+
+This will be used if no value is specified. Should be passed as an array reference.
+
 =cut
 
 sub combo {
-        my ($output, $size);
-	$_[0]->{options}->{''} = '['.WebGUI::International::get(582).']';
-	$_[0]->{options}->{_new_} = WebGUI::International::get(581).'-&gt;';
-	$output = selectList({
-		name=>$_[0]->{name},
-		options=>$_[0]->{options},
-		value=>$_[0]->{value},
-		multiple=>$_[0]->{multiple},
-		extras=>$_[0]->{extras}
+	my $params = shift;
+	$params->{options}->{''} = '['.WebGUI::International::get(582).']';
+	$params->{options}->{_new_} = WebGUI::International::get(581).'-&gt;';
+	my $output = selectList({
+		name=>$params->{name},
+		options=>$params->{options},
+		value=>$params->{value} || $params->{defaultValue},
+		multiple=>$params->{multiple},
+		extras=>$params->{extras}
 		});
-	$size =  $session{setting}{textBoxSize}-5;
-        $output .= text({name=>$_[0]->{name}."_new",size=>$size});
+	my $size =  $session{setting}{textBoxSize}-5;
+        $output .= text({name=>$params->{name}."_new",size=>$size});
 	return $output;
 }
 
@@ -289,7 +307,7 @@ An array reference of field types to be displayed. The types are "mixed", "html"
 
 =head3 value
 
-The default value for this form element. Defaults to "mixed".
+The default value for this form element. 
 
 =head3 extras
 
@@ -297,9 +315,14 @@ If you want to add anything special to this form element like javascript actions
 
  'onChange="this.form.submit()"'
 
+=head3 defaultValue
+
+This will be used if no value is specified. Defaults to "mixed".
+
 =cut
 
 sub contentType {
+	my $params = shift;
 	my (%hash, $output, $type);
  	tie %hash, 'Tie::IxHash';
 	# NOTE: What you are about to see is bad code. Do not attempt this
@@ -307,8 +330,8 @@ sub contentType {
 	# if/elsif construct executes much more quickly than a bunch of
 	# unnecessary database hits.
 	my @types = qw(mixed html code text);
-	$_[0]->{types} = \@types unless ($_[0]->{types});
-	foreach $type (@{$_[0]->{types}}) {
+	$params->{types} = \@types unless ($params->{types});
+	foreach $type (@{$params->{types}}) {
 		if ($type eq "text") {
 			$hash{text} = WebGUI::International::get(1010);
 		} elsif ($type eq "mixed") {
@@ -321,32 +344,38 @@ sub contentType {
 	}
 	return selectList({
 		options=>\%hash,
-		name=>$_[0]->{name},
-		value=>$_[0]->{value},
-		extras=>$_[0]->{extras}
+		name=>$params->{name},
+		value=>[$params->{value}],
+		extras=>$params->{extras},
+		defaultValue=>[$params->{defaultValue}]
 		});
 }
 
 
 #-------------------------------------------------------------------
-                                                                                                                                                             
+                                                                                                                                                      
 =head2 databaseLink ( hashRef )
-                                                                                                                                                             
+                                                                                                                                                       
 Returns a select list of database links.
-                                                                                                                                                             
+                                                                                                                                                       
 =head3 name
-                                                                                                                                                             
+                                                                                                                                                       
 The name field for this form element. Defaults to "databaseLinkId".
-                                                                                                                                                             
+                                                                                                                                                       
 =head3 value
-                                                                                                                                                             
-The unique identifier for the selected template. Defaults to "0", which is the WebGUI database.
-                                                                                                                                                             
+                                                                                                                                               
+The unique identifier for the selected template. 
+                                                                                                                                         
+=head3 defaultValue
+
+This will be used if no value is specified. Defaults to 0 (the WebGUI database).
+
 =cut
                                                                                                                                                              
 sub databaseLink {
-        my $value = $_[0]->{value} || 0;
-        my $name = $_[0]->{name} || "databaseLinkId";
+	my $params = shift;
+        my $value = $params->{value} || $params->{defaultValue} || 0;
+        my $name = $params->{name} || "databaseLinkId";
         return selectList({
                 name=>$name,
                 options=>WebGUI::DatabaseLink::getList(),
@@ -387,24 +416,29 @@ The number of characters wide this form element should be. There should be no re
 
 By default a date is placed in the "value" field. Set this to "1" to turn off the default date.
 
+=head3 defaultValue
+
+This will be used if no value is specified. Defaults to today.
+
 =cut
 
 sub date {
-	my $value = epochToSet($_[0]->{value}) unless ($_[0]->{noDate} && $_[0]->{value} eq '');
-        my $size = $_[0]->{size} || 10;
+	my $params = shift;
+	my $value = epochToSet($params->{value}||$params->{defaultValue}) unless ($params->{noDate} && $params->{value} eq '');
+        my $size = $params->{size} || 10;
 	WebGUI::Style::setScript($session{config}{extrasURL}.'/calendar/calendar.js',{ language=>'javascript' });
 	WebGUI::Style::setScript($session{config}{extrasURL}.'/calendar/lang/calendar-en.js',{ language=>'javascript' });
 	WebGUI::Style::setScript($session{config}{extrasURL}.'/calendar/calendar-setup.js',{ language=>'javascript' });
 	WebGUI::Style::setLink($session{config}{extrasURL}.'/calendar/calendar-win2k-1.css', { rel=>"stylesheet", type=>"text/css", media=>"all" });
 	return text({
-		name=>$_[0]->{name},
+		name=>$params->{name},
 		value=>$value,
 		size=>$size,
-		extras=>'id="'.$_[0]->{name}.'Id" '.$_[0]->{extras},
+		extras=>'id="'.$params->{name}.'Id" '.$params->{extras},
 		maxlength=>10
 		}) . '<script type="text/javascript"> 
 			Calendar.setup({ 
-				inputField : "'.$_[0]->{name}.'Id", 
+				inputField : "'.$params->{name}.'Id", 
 				ifFormat : "%Y-%m-%d", 
 				showsTime : false, 
 				timeFormat : "12",
@@ -433,23 +467,28 @@ The date and time. Pass as an epoch value. Defaults to today and now.
 
 Extra parameters to add to the date/time form element such as javascript or stylesheet information.
 
+=head3 defaultValue
+
+This will be used if no value is specified. Defaults to today and now.
+
 =cut
 
 sub dateTime {
-	my $value = epochToSet($_[0]->{value},1);
+	my $params = shift;
+	my $value = epochToSet($params->{value}||$params->{defaultValue},1);
 	WebGUI::Style::setScript($session{config}{extrasURL}.'/calendar/calendar.js',{ language=>'javascript' });
 	WebGUI::Style::setScript($session{config}{extrasURL}.'/calendar/lang/calendar-en.js',{ language=>'javascript' });
 	WebGUI::Style::setScript($session{config}{extrasURL}.'/calendar/calendar-setup.js',{ language=>'javascript' });
 	WebGUI::Style::setLink($session{config}{extrasURL}.'/calendar/calendar-win2k-1.css', { rel=>"stylesheet", type=>"text/css", media=>"all" });
         return text({
-                name=>$_[0]->{name},
+                name=>$params->{name},
                 value=>$value,
                 size=>19,
-                extras=>'id="'.$_[0]->{name}.'Id" '.$_[0]->{extras},
+                extras=>'id="'.$params->{name}.'Id" '.$params->{extras},
                 maxlength=>19
                 }) . '<script type="text/javascript">
                         Calendar.setup({
-                                inputField : "'.$_[0]->{name}.'Id",
+                                inputField : "'.$params->{name}.'Id",
                                 ifFormat : "%Y-%m-%d %H:%M:%S",
                                 showsTime : true,
                                 timeFormat : "12",
@@ -536,15 +575,21 @@ If you want to add anything special to this form element like javascript actions
 
 The number of characters wide this form element should be. There should be no reason for anyone to specify this.
 
+=head3 defaultValue
+
+This will be used if no value is specified.
+
 =cut
 
 sub email {
+	my $params = shift;
 	WebGUI::Style::setScript($session{config}{extrasURL}.'/emailCheck.js',{ language=>'javascript' });
 	my $output .= text({
-		name=>$_[0]->{name},
-		value=>$_[0]->{value},
-		size=>$_[0]->{size},
-		extras=>' onChange="emailCheck(this.value)" '.$_[0]->{extras}
+		name=>$params->{name},
+		value=>$params->{value},
+		size=>$params->{size},
+		extras=>' onChange="emailCheck(this.value)" '.$params->{extras},
+		defaultValue=>$params->{defaultValue}
 		});
 	return $output;
 }
@@ -578,16 +623,21 @@ If you want to add anything special to this form element like javascript actions
 
  'onChange="this.form.submit()"'
 
+=head3 defaultValue
+
+This will be used if no value is specified.
+
 =cut
 
 sub fieldType {
+	my $params = shift;
 	my (%hash, $output, $type);
  	tie %hash, 'Tie::IxHash';
 	# NOTE: What you are about to see is bad code. Do not attempt this
 	# without adult supervision. =) 
 	my @types = qw(dateTime time float zipcode text textarea HTMLArea url date email phone integer yesNo selectList radioList checkList);
-	$_[0]->{types} = \@types unless ($_[0]->{types});
-	foreach $type (@{$_[0]->{types}}) {
+	$params->{types} = \@types unless ($params->{types});
+	foreach $type (@{$params->{types}}) {
 		if ($type eq "text") {
 			$hash{text} = WebGUI::International::get(475);
 		} elsif ($type eq "timeField") {
@@ -624,17 +674,13 @@ sub fieldType {
         		$hash{checkbox} = WebGUI::International::get(943);
 		}
 	}
-	# This is a hack for reverse compatibility with a bug where this field used to allow an array ref.
-	my $value = $_[0]->{value};
-	unless ($value eq "ARRAY") {
-		$value = [$value];
-	}
 	return selectList({
 		options=>\%hash,
-		name=>$_[0]->{name},
-		value=>$_[0]->{value},
-		extras=>$_[0]->{extras},
-		size=>$_[0]->{size}
+		name=>$params->{name},
+		value=>[$params->{value}],
+		extras=>$params->{extras},
+		size=>$params->{size},
+		defaultValue=>[$params->{defaultValue}]
 		});
 }
 
@@ -661,9 +707,9 @@ The number of characters wide this form element should be. There should be no re
 =cut
 
 sub file {
-        my ($size);
-        $size = $_[0]->{size} || $session{setting}{textBoxSize} || 30;
-        return '<input type="file" name="'.$_[0]->{name}.'" size="'.$size.'" '.$_[0]->{extras}.'>';
+	my $params = shift;
+        my $size = $params->{size} || $session{setting}{textBoxSize} || 30;
+        return '<input type="file" name="'.$params->{name}.'" size="'.$size.'" '.$params->{extras}.'>';
 }
 
 
@@ -687,9 +733,14 @@ If you want to add anything special to this form element like javascript actions
 
  'onChange="this.form.submit()"'
 
+=head3 defaultValue
+
+This will be used if no value is specified.
+
 =cut
 
 sub filterContent {
+	my $params = shift;
 	my %filter;
 	tie %filter, 'Tie::IxHash';
 	%filter = (
@@ -699,12 +750,13 @@ sub filterContent {
 		'most'=>WebGUI::International::get(421),
 		'all'=>WebGUI::International::get(419)
 		);
-	my $name = $_[0]->{name} || "filterContent";
+	my $name = $params->{name} || "filterContent";
         return selectList({
 		name=>$name,
 		options=>\%filter,
-		value=>[$_[0]->{value}],
-		extras=>$_[0]->{extras}
+		value=>[$params->{value}],
+		extras=>$params->{extras},
+		defaultValue=>[$params->{defaultValue}]
 		});
 }
 
@@ -746,7 +798,8 @@ If you want to add anything special to the form header like javascript actions o
 =cut
 
 sub formHeader {
-        my $action = $_[0]->{action} || WebGUI::URL::page();
+	my $params = shift;
+        my $action = $params->{action} || WebGUI::URL::page();
 	my $hidden;
 	if ($action =~ /\?/) {
 		my ($path,$query) = split(/\?/,$action);
@@ -758,9 +811,9 @@ sub formHeader {
 			$hidden .= hidden({name=>$name,value=>$value});
 		}
 	}
-        my $method = $_[0]->{method} || "POST";
-        my $enctype = $_[0]->{enctype} || "multipart/form-data";
-	return '<form action="'.$action.'" enctype="'.$enctype.'" method="'.$method.'" '.$_[0]->{extras}.'><div class="formContents">'.$hidden;
+        my $method = $params->{method} || "POST";
+        my $enctype = $params->{enctype} || "multipart/form-data";
+	return '<form action="'.$action.'" enctype="'.$enctype.'" method="'.$method.'" '.$params->{extras}.'><div class="formContents">'.$hidden;
 }
 
 
@@ -792,18 +845,24 @@ If you want to add anything special to this form element like javascript actions
 
 The number of characters wide this form element should be. There should be no reason for anyone to specify this.
 
+=head3 defaultValue
+
+This will be used if no value is specified.
+
 =cut
 
 sub float {
-        my $value = $_[0]->{value} || 0;
-        my $size = $_[0]->{size} || 11;
+	my $params = shift;
+        my $value = $params->{value} || 0;
+        my $size = $params->{size} || 11;
 	WebGUI::Style::setScript($session{config}{extrasURL}.'/inputCheck.js',{ language=>'javascript' });
 	return text({
-		name=>$_[0]->{name},
+		name=>$params->{name},
 		value=>$value,
 		size=>$size,
-		extras=>'onKeyUp="doInputCheck(this.form.'.$_[0]->{name}.',\'0123456789.\')" '.$_[0]->{extras},
-		maxlength=>$_[0]->{maxlength}
+		extras=>'onKeyUp="doInputCheck(this.form.'.$params->{name}.',\'0123456789.\')" '.$params->{extras},
+		maxlength=>$params->{maxlength},
+		defaultValue=>$params->{defaultValue}
 		});
 }
 
@@ -822,7 +881,7 @@ The name field for this form element.
 
 =head3 value 
 
-The selected group id(s) for this form element.  This should be passed as an array reference. Defaults to "7" (Everyone).
+The selected group id(s) for this form element.  This should be passed as an array reference.
 
 =head3 size
 
@@ -842,27 +901,33 @@ If you want to add anything special to this form element like javascript actions
 
 An array reference containing a list of groups to exclude from the list.
 
+=head3 defaultValue
+
+This will be used if no value is specified. Should be passed as an array reference. Defaults to 7 (Everyone).
+
 =cut
 
 sub group {
+	my $params = shift;
         my (%hash, $value, $where);
-	$value = $_[0]->{value};
+	$value = $params->{value};
 	if ($$value[0] eq "") { #doing long form otherwise arrayRef didn't work
 		$value = [7];
 	}
 	tie %hash, 'Tie::IxHash';
-	my $exclude = $_[0]->{excludeGroups};
+	my $exclude = $params->{excludeGroups};
 	if ($$exclude[0] ne "") {
 		$where = "and groupId not in (".quoteAndJoin($exclude).")";
 	}
  	%hash = WebGUI::SQL->buildHash("select groupId,groupName from groups where showInForms=1 $where order by groupName");
 	return selectList({
 		options=>\%hash,
-		name=>$_[0]->{name},
+		name=>$params->{name},
 		value=>$value,
-		extras=>$_[0]->{extras},
-		size=>$_[0]->{size},
-		multiple=>$_[0]->{multiple}
+		extras=>$params->{extras},
+		size=>$params->{size},
+		multiple=>$params->{multiple},
+		defaultValue=>$params->{defaultValue}
 		});
 		
 }
@@ -881,10 +946,15 @@ The name field for this form element.
 
 The default value for this form element.
 
+=head3 defaultValue
+
+This will be used if no value is specified.
+
 =cut
 
 sub hidden {
-        return '<input type="hidden" name="'.$_[0]->{name}.'" value="'._fixQuotes(_fixMacros(_fixSpecialCharacters($_[0]->{value}))).'" />'."\n";
+	my $params = shift;
+        return '<input type="hidden" name="'.$params->{name}.'" value="'._fixQuotes(_fixMacros(_fixSpecialCharacters($params->{value}))).'" />'."\n";
 }
 
 
@@ -906,15 +976,21 @@ A hash reference where the key is the "name" of the hidden field.
 
 An array reference where each value in the array should be a name from the hash (if you want it to show up in the hidden list). 
 
+=head3 defaultValue
+
+This will be used if no value is specified. Should be passed as an array reference.
+
 =cut
 
 sub hiddenList {
+	my $params = shift;
         my ($output, $key, $item);
-        foreach $key (keys %{$_[0]->{options}}) {
-                foreach $item (@{$_[0]->{value}}) {
+	my $values = $params->{value} || $params->{defaultValue};
+        foreach $key (keys %{$params->{options}}) {
+                foreach $item (@{$values}) {
                         if ($item eq $key) {
 				$output .= hidden({
-					name=>$_[0]->{name},
+					name=>$params->{name},
 					value=>$key
 					});
                         }
@@ -957,22 +1033,21 @@ The number of characters tall this form element should be. There should be no re
 
 The number of characters wide this form element should be. There should be no reason for anyone to specify this.
 
-=head3 popupToggle
+=head3 defaultValue
 
-Defaults to "0". If set to "1" the rich editor will be a pop-up editor. If set to "0" the rich editor will be inline.
-
-B<NOTE:> WebGUI uses a great variety of rich editors. Not all of them are capable of inline mode, so even if you leave this set to "0" the editor may be a pop-up anyway.
+This will be used if no value is specified.
 
 =cut
 
 sub HTMLArea {
+	my $params = shift;
         my ($output, $rows, $columns, $htmlArea);
 	my $browser = HTTP::BrowserDetect->new($session{env}{HTTP_USER_AGENT});
 	my %var;
 
 	# Store all scalar options in template variables
-        foreach (keys %{$_[0]}) {
-           $var{"form.".$_} = $_[0]->{$_} unless (ref $_[0]->{$_});
+        foreach (keys %{$params}) {
+           $var{"form.".$_} = $params->{$_} unless (ref $params->{$_});
         }
 
 	# Supported Rich Editors
@@ -982,20 +1057,20 @@ sub HTMLArea {
 	$var{"classic.supported"} = ($browser->ie && $browser->version >= 5);
  
 	# Textarea field
-        $rows = $_[0]->{rows} || ($session{setting}{textAreaRows}+15);
-        $columns = $_[0]->{columns} || ($session{setting}{textAreaCols}+5);
+        $rows = $params->{rows} || ($session{setting}{textAreaRows}+15);
+        $columns = $params->{columns} || ($session{setting}{textAreaCols}+5);
         $var{textarea} = textarea({
-                name=>$_[0]->{name},
-                value=>$_[0]->{value},
-                wrap=>$_[0]->{wrap},
+                name=>$params->{name},
+                value=>$params->{value},
+                wrap=>$params->{wrap},
                 columns=>$columns,
                 rows=>$rows,
-                extras=>$_[0]->{extras}.' onBlur="fixChars(this.form.'.$_[0]->{name}.')" id="'.$_[0]->{name}.'"'.' mce_editable="true" '
+                extras=>$params->{extras}.' onBlur="fixChars(this.form.'.$params->{name}.')" id="'.$params->{name}.'"'.' mce_editable="true" ',
+		defaultValue=>$params->{defaultValue}
                 });
 
 	# Other variables
-	$var{"popup"} = ($session{user}{richEditorMode} eq "popup" || $_[0]->{popupToggle});
-	$var{"button"} = '<input type="button" onClick="openEditWindow(this.form.'.$_[0]->{name}.')" value="'
+	$var{"button"} = '<input type="button" onClick="openEditWindow(this.form.'.$params->{name}.')" value="'
                 .WebGUI::International::get(171).'" style="font-size: 8pt;"><br>';
 	if ($session{user}{richEditor} eq 'none') {
 		return $var{textarea};
@@ -1032,18 +1107,23 @@ If you want to add anything special to this form element like javascript actions
 
 The number of characters wide this form element should be. There should be no reason for anyone to specify this.
 
+=head3 defaultValue
+
+This will be used if no value is specified.
+
 =cut
 
 sub integer {
-        my $value = $_[0]->{value} || 0;
-        my $size = $_[0]->{size} || 11;
+	my $params = shift;
+        my $value = $params->{value} || $params->{defaultValue} || 0;
+        my $size = $params->{size} || 11;
 	WebGUI::Style::setScript($session{config}{extrasURL}.'/inputCheck.js',{ language=>'javascript' });
 	return text({
-		name=>$_[0]->{name},
+		name=>$params->{name},
 		value=>$value,
 		size=>$size,
-		extras=>'onKeyUp="doInputCheck(this.form.'.$_[0]->{name}.',\'0123456789-\')" '.$_[0]->{extras},
-		maxlength=>$_[0]->{maxlength}
+		extras=>'onKeyUp="doInputCheck(this.form.'.$params->{name}.',\'0123456789-\')" '.$params->{extras},
+		maxlength=>$params->{maxlength}
 		});
 }
 
@@ -1071,12 +1151,16 @@ If you want to add anything special to this form element like javascript actions
 
  'onChange="this.form.submit()"'
 
+=head3 defaultValue
+
+This will be used if no value is specified.
+
 =cut
 
 sub interval {
-        my (%units, $output, $intervalValue, $unitsValue);
-        $intervalValue = (defined $_[0]->{intervalValue}) ? $_[0]->{intervalValue} : 1;
-        $unitsValue = $_[0]->{unitsValue} || "seconds";
+	my $params = shift;
+        my (%units);
+        my $value =  $params->{value} || $params->{defaultValue} || 1;
         tie %units, 'Tie::IxHash';
 	%units = ('seconds'=>WebGUI::International::get(704),
 		'minutes'=>WebGUI::International::get(705),
@@ -1085,14 +1169,15 @@ sub interval {
                 'weeks'=>WebGUI::International::get(701),
                 'months'=>WebGUI::International::get(702),
                 'years'=>WebGUI::International::get(703));
-	$output = integer({
-		name=>$_[0]->{name}.'_interval',
-		value=>$intervalValue,
-		extras=>$_[0]->{extras}
+	my ($interval, $units) = WebGUI::DateTime::secondsToInterval($value);
+	my $output = integer({
+		name=>$params->{name}.'_interval',
+		value=>$interval,
+		extras=>$params->{extras}
 		});
 	$output .= selectList({
-		name=>$_[0]->{name}.'_units',
-		value=>[$unitsValue],
+		name=>$params->{name}.'_units',
+		value=>[$units],
 		options=>\%units
 		});
 	return $output;
@@ -1127,15 +1212,19 @@ If you want to add anything special to this form element like javascript actions
 
 The number of characters wide this form element should be. There should be no reason for anyone to specify this. Defaults to "30" unless overridden in the settings.
 
+=head3 defaultValue
+
+This will be used if no value is specified.
+
 =cut
 
 sub password {
-        my ($size, $maxLength, $value);
-	$value = _fixQuotes($_[0]->{value});
-        $maxLength = $_[0]->{maxlength} || 35;
-        $size = $_[0]->{size} || $session{setting}{textBoxSize} || 30;
-        return '<input type="password" name="'.$_[0]->{name}.'" value="'.$value.'" size="'.
-		$size.'" maxlength="'.$maxLength.'" '.$_[0]->{extras}.'>';
+	my $params = shift;
+	my $value = _fixQuotes($params->{value}||$params->{defaultValue});
+        my $maxLength = $params->{maxlength} || 35;
+        my $size = $params->{size} || $session{setting}{textBoxSize} || 30;
+        return '<input type="password" name="'.$params->{name}.'" value="'.$value.'" size="'.
+		$size.'" maxlength="'.$maxLength.'" '.$params->{extras}.'>';
 }
 
 #-------------------------------------------------------------------
@@ -1166,17 +1255,23 @@ If you want to add anything special to this form element like javascript actions
 
 The number of characters wide this form element should be. There should be no reason for anyone to specify this.
 
+=head3 defaultValue
+
+This will be used if no value is specified.
+
 =cut
 
 sub phone {
+	my $params = shift;
 	WebGUI::Style::setScript($session{config}{extrasURL}.'/inputCheck.js',{ language=>'javascript' });
-        my $maxLength = $_[0]->{maxlength} || 30;
+        my $maxLength = $params->{maxlength} || 30;
 	return text({
-		name=>$_[0]->{name},
+		name=>$params->{name},
 		maxlength=>$maxLength,
-		extras=>'onKeyUp="doInputCheck(this.form.'.$_[0]->{name}.',\'0123456789-()+ \')" '.$_[0]->{extras},
-		value=>$_[0]->{value},
-		size=>$_[0]->{size}
+		extras=>'onKeyUp="doInputCheck(this.form.'.$params->{name}.',\'0123456789-()+ \')" '.$params->{extras},
+		value=>$params->{value},
+		size=>$params->{size},
+		defaultValue=>$params->{defaultValue}
 		});
 }
 
@@ -1204,13 +1299,17 @@ If you want to add anything special to this form element like javascript actions
 
  'onChange="this.form.submit()"'
 
+=head3 defaultValue
+
+This will be used if no value is specified. 
 
 =cut
 
 sub radio {
-        my ($checkedText);
-        $checkedText = ' checked="1"' if ($_[0]->{checked});
-        return '<input type="radio" name="'.$_[0]->{name}.'" value="'.$_[0]->{value}.'"'.$checkedText.' '.$_[0]->{extras}.'>';
+	my $params = shift;
+        my $checkedText = ' checked="1"' if ($params->{checked});
+	my $value = $params->{value}||$params->{defaultValue};
+        return '<input type="radio" name="'.$params->{name}.'" value="'.$value.'"'.$checkedText.' '.$params->{extras}.'>';
 }
 
 #-------------------------------------------------------------------
@@ -1241,21 +1340,27 @@ If you want to add anything special to this form element like javascript actions
 
  'onChange="this.form.submit()"'
 
+=head3 defaultValue
+
+This will be used if no value is specified. 
+
 =cut
 
 sub radioList {
+	my $params = shift;
         my ($output, $key, $checked);
-        foreach $key (keys %{$_[0]->{options}}) {
+	my $value = $params->{value} || $params->{defaultValue};
+        foreach $key (keys %{$params->{options}}) {
 		$checked = 0;
-                $checked = 1 if ($key eq $_[0]->{value});
+                $checked = 1 if ($key eq $value);
 		$output .= radio({
-			name=>$_[0]->{name},
+			name=>$params->{name},
 			value=>$key,
 			checked=>$checked,
-			extras=>$_[0]->{extras}
+			extras=>$params->{extras}
 			});
-		$output .= ' '.$_[0]->{options}->{$key};
-                if ($_[0]->{vertical}) {
+		$output .= ' '.$params->{options}->{$key};
+                if ($params->{vertical}) {
                         $output .= "<br />\n";
                 } else {
                         $output .= " &nbsp; &nbsp;\n";
@@ -1300,30 +1405,36 @@ If you want to add anything special to this form element like javascript actions
 
 A boolean value for whether or not the values in the options hash should be sorted.
 
+=head3 defaultValue
+
+This will be used if no value is specified. Should be passed as an array reference.
+
 =cut
 
 sub selectList {
+	my $params = shift;
 	my ($output, $key, $item, $size, $multiple);
-	$size = $_[0]->{size} || 1;
-	$multiple = ' multiple="1"' if ($_[0]->{multiple});
-       	$output = '<select name="'.$_[0]->{name}.'" size="'.$size.'" '.$_[0]->{extras}.$multiple.'>';
+	$size = $params->{size} || 1;
+	$multiple = ' multiple="1"' if ($params->{multiple});
+       	$output = '<select name="'.$params->{name}.'" size="'.$size.'" '.$params->{extras}.$multiple.'>';
+	my $values = $params->{value} || $params->{defaultValue};
 	my %options;
         tie %options, 'Tie::IxHash';
-       	if ($_[0]->{sortByValue}) {
-               	foreach my $optionKey (sort {"\L${$_[0]->{options}}{$a}" cmp "\L${$_[0]->{options}}{$b}" } keys %{$_[0]->{options}}) {
-                         $options{$optionKey} = ${$_[0]->{options}}{$optionKey};
+       	if ($params->{sortByValue}) {
+               	foreach my $optionKey (sort {"\L${$params->{options}}{$a}" cmp "\L${$params->{options}}{$b}" } keys %{$params->{options}}) {
+                         $options{$optionKey} = ${$params->{options}}{$optionKey};
                	}
        	} else {
-               	%options = %{$_[0]->{options}};
+               	%options = %{$params->{options}};
        	}
        	foreach $key (keys %options) {
            	$output .= '<option value="'.$key.'"';
-          	 foreach $item (@{$_[0]->{value}}) {
+          	 foreach $item (@{$values}) {
              		if ($item eq $key) {
              			$output .= ' selected="1"';
              		}
            	}
-           	$output .= '>'.${$_[0]->{options}}{$key}.'</option>';
+           	$output .= '>'.${$params->{options}}{$key}.'</option>';
 	}
 	$output	.= '</select>'; 
 	return $output;
@@ -1338,7 +1449,7 @@ Returns a submit button.
 
 =head3 value
 
-The button text for this submit button. Defaults to "save".
+The button text for this submit button. 
 
 =head3 extras
 
@@ -1346,14 +1457,18 @@ If you want to add anything special to this form element like javascript actions
 
  'onChange="this.form.submit()"'
 
+=head3 defaultValue
+
+This will be used if no value is specified. Defaults to "save".
+
 =cut
 
 sub submit {
-        my ($label, $extras, $subtext, $class, $output, $name, $value, $wait);
-        $value = $_[0]->{value} || WebGUI::International::get(62);
-        $value = _fixQuotes($value);
-	$wait = WebGUI::International::get(452);
-	return '<input type="submit" value="'.$value.'" onClick="this.value=\''.$wait.'\'" '.$_[0]->{extras}.'>';
+	my $params = shift;
+        my $value = $params->{value} || $params->{defaultValue} || WebGUI::International::get(62);
+        my $value = _fixQuotes($value);
+	my $wait = WebGUI::International::get(452);
+	return '<input type="submit" value="'.$value.'" onClick="this.value=\''.$wait.'\'" '.$params->{extras}.'>';
 
 }
 
@@ -1369,7 +1484,7 @@ The name field for this form element. Defaults to "templateId".
 
 =head3 value 
 
-The unique identifier for the selected template. Defaults to "1".
+The unique identifier for the selected template.
 
 =head3 namespace
 
@@ -1381,16 +1496,21 @@ If you want to add anything special to this form element like javascript actions
 
  'onChange="this.form.submit()"'
 
+=head3 defaultValue
+
+This will be used if no value is specified.
+
 =cut
 
 sub template {
-        my $templateId = $_[0]->{value} || 1;
-	my $name = $_[0]->{name} || "templateId";
+	my $params = shift;
+        my $templateId = $params->{value} || $params->{defaultValue};
+	my $name = $params->{name} || "templateId";
         return selectList({
                 name=>$name,
-                options=>WebGUI::Template::getList($_[0]->{namespace}),
+                options=>WebGUI::Template::getList($params->{namespace}),
                 value=>[$templateId],
-		extras=>$_[0]->{extras}
+		extras=>$params->{extras}
                 });
 }
 
@@ -1422,17 +1542,21 @@ If you want to add anything special to this form element like javascript actions
 
 The number of characters wide this form element should be. There should be no reason for anyone to specify this.
 
+=head3 defaultValue
+
+This will be used if no value is specified.
+
 =cut
 
 sub text {
-        my ($size, $maxLength, $value);
-        $value = _fixSpecialCharacters($_[0]->{value});
+	my $params = shift;
+        my $value = _fixSpecialCharacters($params->{value}||$params->{defaultValue});
 	$value = _fixQuotes($value);
 	$value = _fixMacros($value);
-        $maxLength = $_[0]->{maxlength} || 255;
-        $size = $_[0]->{size} || $session{setting}{textBoxSize} || 30;
-        return '<input type="text" name="'.$_[0]->{name}.'" value="'.$value.'" size="'.
-                $size.'" maxlength="'.$maxLength.'" '.$_[0]->{extras}.' />';
+        my $maxLength = $params->{maxlength} || 255;
+        my $size = $params->{size} || $session{setting}{textBoxSize} || 30;
+        return '<input type="text" name="'.$params->{name}.'" value="'.$value.'" size="'.
+                $size.'" maxlength="'.$maxLength.'" '.$params->{extras}.' />';
 }
 
 #-------------------------------------------------------------------
@@ -1467,18 +1591,22 @@ The number of characters tall this form element should be. There should be no re
 
 The number of characters wide this form element should be. There should be no reason for anyone to specify this.
 
+=head3 defaultValue
+
+This will be used if no value is specified.
+
 =cut
 
 sub textarea {
-        my ($columns, $value, $rows, $wrap);
-	$wrap = $_[0]->{wrap} || "virtual";
-	$rows = $_[0]->{rows} || $session{setting}{textAreaRows} || 5;
-	$columns = $_[0]->{columns} || $session{setting}{textAreaCols} || 50;
-	$value = _fixSpecialCharacters($_[0]->{value});
+	my $params = shift;
+	my $wrap = $params->{wrap} || "virtual";
+	my $rows = $params->{rows} || $session{setting}{textAreaRows} || 5;
+	my $columns = $params->{columns} || $session{setting}{textAreaCols} || 50;
+	my $value = _fixSpecialCharacters($params->{value} || $params->{defaultValue});
 	$value = _fixTags($value);
 	$value = _fixMacros($value);
-        return '<textarea name="'.$_[0]->{name}.'" cols="'.$columns.'" rows="'.$rows.'" wrap="'.
-		$wrap.'" '.$_[0]->{extras}.'>'.$value.'</textarea>';
+        return '<textarea name="'.$params->{name}.'" cols="'.$columns.'" rows="'.$rows.'" wrap="'.
+		$wrap.'" '.$params->{extras}.'>'.$value.'</textarea>';
 }
 
 #-------------------------------------------------------------------
@@ -1493,7 +1621,7 @@ The name field for this form element.
 
 =head3 value
 
-The default value for this form element. Defaults to the current time (like "15:03:42").
+The default value for this form element. 
 
 =head3 maxlength
 
@@ -1509,20 +1637,25 @@ If you want to add anything special to this form element like javascript actions
 
 The number of characters wide this form element should be. There should be no reason for anyone to specify this. Defaults to 8.
 
+=head3 defaultValue
+
+This will be used if no value is specified. Defaults to now.
+
 =cut
 
 sub timeField {
-        my $value = WebGUI::DateTime::secondsToTime($_[0]->{value});
+	my $params = shift;
+        my $value = WebGUI::DateTime::secondsToTime($params->{value}||$params->{defaultValue});
 	WebGUI::Style::setScript($session{config}{extrasURL}.'/inputCheck.js',{ language=>'javascript' });
 	my $output = text({
-		name=>$_[0]->{name},
+		name=>$params->{name},
 		value=>$value,
-		size=>$_[0]->{size} || 8,
-		extras=>'onKeyUp="doInputCheck(this.form.'.$_[0]->{name}.',\'0123456789:\')" '.$_[0]->{extras},
-		maxlength=>$_[0]->{maxlength} || 8
+		size=>$params->{size} || 8,
+		extras=>'onKeyUp="doInputCheck(this.form.'.$params->{name}.',\'0123456789:\')" '.$params->{extras},
+		maxlength=>$params->{maxlength} || 8
 		});
 	$output .= '<input type="button" style="font-size: 8pt;" onClick="window.timeField = this.form.'.
-		$_[0]->{name}.';clockSet = window.open(\''.$session{config}{extrasURL}.
+		$params->{name}.';clockSet = window.open(\''.$session{config}{extrasURL}.
 		'/timeChooser.html\',\'timeChooser\',\'WIDTH=230,HEIGHT=100\');return false" value="'.
 		WebGUI::International::get(970).'">';
 	return $output;
@@ -1556,17 +1689,23 @@ If you want to add anything special to this form element like javascript actions
 
 The number of characters wide this form element should be. There should be no reason for anyone to specify this.
 
+=head3 defaultValue
+
+This will be used if no value is specified.
+
 =cut
 
 sub url {
-        my $maxLength = $_[0]->{maxlength} || 2048;
+	my $params = shift;
+        my $maxLength = $params->{maxlength} || 2048;
 	WebGUI::Style::setScript($session{config}{extrasURL}.'/addHTTP.js',{ language=>'javascript' });
 	return text({
-		name=>$_[0]->{name},
-		value=>$_[0]->{value},
-		extras=>$_[0]->{extras}.' onBlur="addHTTP(this.form.'.$_[0]->{name}.')"',
-		size=>$_[0]->{size},
-		maxlength=>$maxLength
+		name=>$params->{name},
+		value=>$params->{value},
+		extras=>$params->{extras}.' onBlur="addHTTP(this.form.'.$params->{name}.')"',
+		size=>$params->{size},
+		maxlength=>$maxLength,
+		defaultValue=>$params->{defaultValue}
 		});
 }
 
@@ -1594,16 +1733,21 @@ If you want to add anything special to this form element like javascript actions
 
  'onChange="this.form.submit()"'
 
+=head3 defaultValue
+
+This will be used if no value is specified.
+
 =cut
 
 sub whatNext {
-        my ($name);
-        $name = $_[0]->{name} || "proceed";
+	my $params = shift;
+        my $name = $params->{name} || "proceed";
         return selectList({
-                options=>$_[0]->{options},
+                options=>$params->{options},
                 name=>$name,
-                value=>[$_[0]->{value}],
-                extras=>$_[0]->{extras}
+                value=>[$params->{value}],
+                extras=>$params->{extras},
+		defaultValue=>[$params->{defaultValue}]
                 });
 
 }
@@ -1628,28 +1772,34 @@ If you want to add anything special to this form element like javascript actions
 
  'onChange="this.form.submit()"'
 
+=head3 defaultValue
+
+This will be used if no value is specified. Defaults to 1.
+
 =cut
 
 sub yesNo {
+	my $params = shift;
         my ($subtext, $checkYes, $checkNo, $class, $output, $name, $label, $extras, $value);
-	if ($_[0]->{value}) {
+	my $value = $params->{value}||$params->{defaultValue};
+	if ($value) {
 		$checkYes = 1;
 	} else {
 		$checkNo = 1;
 	}
 	$output = radio({
 		checked=>$checkYes,
-		name=>$_[0]->{name},
+		name=>$params->{name},
 		value=>1,
-		extras=>$_[0]->{extras}
+		extras=>$params->{extras}
 		});
 	$output .= WebGUI::International::get(138);
 	$output .= '&nbsp;&nbsp;&nbsp;';
 	$output .= radio({
                 checked=>$checkNo,
-                name=>$_[0]->{name},
+                name=>$params->{name},
                 value=>0,
-                extras=>$_[0]->{extras}
+                extras=>$params->{extras}
                 });
         $output .= WebGUI::International::get(139);
 	return $output;
@@ -1683,17 +1833,23 @@ If you want to add anything special to this form element like javascript actions
 
 The number of characters wide this form element should be. There should be no reason for anyone to specify this.
 
+=head3 defaultValue
+
+This will be used if no value is specified.
+
 =cut
 
 sub zipcode {
+	my $params = shift;
 	WebGUI::Style::setScript($session{config}{extrasURL}.'/inputCheck.js',{ language=>'javascript' });
-        my $maxLength = $_[0]->{maxlength} || 10;
+        my $maxLength = $params->{maxlength} || 10;
 	return text({
-		name=>$_[0]->{name},
+		name=>$params->{name},
 		maxlength=>$maxLength,
-		extras=>'onKeyUp="doInputCheck(this.form.'.$_[0]->{name}.',\'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ- \')" '.$_[0]->{extras},
-		value=>$_[0]->{value},
-		size=>$_[0]->{size}
+		extras=>'onKeyUp="doInputCheck(this.form.'.$params->{name}.',\'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ- \')" '.$params->{extras},
+		value=>$params->{value},
+		size=>$params->{size},
+		defaultValue=>$params->{defaultValue}
 		});
 }
 
