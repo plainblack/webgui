@@ -833,7 +833,7 @@ sub www_viewStatisticalOverview {
 	$output = '<h1>'.WebGUI::International::get(58,$_[0]->get("namespace")).'</h1>';
 	$output .= '<a href="'.WebGUI::URL::page('func=deleteAllResponses&wid='.$_[0]->get("wobjectId"))
                 .'">'.WebGUI::International::get(73,$_[0]->get("namespace")).'</a><p/>';
-	$p = WebGUI::Paginator->new(WebGUI::URL::page('op=viewStatisticalOverview'));
+	$p = WebGUI::Paginator->new(WebGUI::URL::page('func=viewStatisticalOverview&wid='.$_[0]->get("wobjectId")));
 	$p->setDataByQuery("select Survey_questionId,question,answerFieldType,allowComment from Survey_question 
 		where Survey_id=".$_[0]->get("Survey_id")." order by sequenceNumber");
 	$questions = $p->getPageData;
