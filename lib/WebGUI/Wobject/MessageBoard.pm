@@ -207,64 +207,20 @@ sub www_postReplySave {
 
 #-------------------------------------------------------------------
 sub www_showMessage {
-	my (@data, $html, %message);
-	tie %message, 'Tie::CPHash';
-	%message = WebGUI::Discussion::getMessage($session{form}{mid});
-	if ($message{messageId}) {
-		$html .= '<h1>'.$message{subject}.'</h1>';
-		$html .= '<table width="100%" cellpadding=3 cellspacing=1 border=0><tr><td class="tableHeader">';
-        	$html .= '<b>'.WebGUI::International::get(7,$namespace).'</b> <a href="'.
-			WebGUI::URL::page('op=viewProfile&uid='.$message{userId}).'">'.$message{username}.'</a><br>';
-        	$html .= "<b>".WebGUI::International::get(8,$namespace)."</b> ".
-			epochToHuman($message{dateOfPost},"%z %Z")."<br>";
-        	$html .= "<b>".WebGUI::International::get(9,$namespace)."</b> ".
-			$message{wobjectId}."-".$message{rid}."-".$message{pid}."-".$message{messageId}."<br>";
-        	$html .= '</td>';
-		$html .= '<td rowspan=2 valign="top" class="tableMenu" nowrap>';
-		$html .= '<a href="'.WebGUI::URL::page('func=postReply&mid='.$session{form}{mid}.
-			'&wid='.$session{form}{wid})
-			.'">'.WebGUI::International::get(13,$namespace).'</a><br>';
-       	 	if (_canEditMessage($_[0],$session{form}{mid})) {
-			$html .= '<a href="'.WebGUI::URL::page('func=editMessage&mid='.$session{form}{mid}.
-				'&wid='.$session{form}{wid}).'">'.WebGUI::International::get(12,$namespace).'</a><br>';
-                	$html .= '<a href="'.WebGUI::URL::page('func=deleteMessage&mid='.$session{form}{mid}.
-                        	'&wid='.$session{form}{wid}).'">'.WebGUI::International::get(22,$namespace).'</a><br>';
-		}
-        	$html .= '<a href="'.WebGUI::URL::page().'">'.WebGUI::International::get(11,$namespace).'</a><br>';
-		@data = WebGUI::SQL->quickArray("select max(messageId) from discussion where wobjectId=$message{wobjectId} and pid=0 and messageId<$message{rid}");
-        	if ($data[0] ne "") {
-                $html .= '<a href="'.WebGUI::URL::page('func=showMessage&mid='.$data[0].'&wid='.
-			$session{form}{wid}).'">&laquo; '.WebGUI::International::get(10,$namespace).'</a><br>';
-        	}
-        	@data = WebGUI::SQL->quickArray("select min(messageId) from discussion where wobjectId=$message{wobjectId} and pid=0 and messageId>$message{rid}");
-        	if ($data[0] ne "") {
-                	$html .= '<a href="'.WebGUI::URL::page('func=showMessage&mid='.$data[0].'&wid='.
-			$session{form}{wid}).'">'.WebGUI::International::get(14,$namespace).' &raquo;</a><br>';
-        	}
-		$html .= '</tr><tr><td class="tableData">';
-		$html .= $message{message};
-		$html .= '</td></tr></table>';
-		$html .= '<table border=0 cellpadding=2 cellspacing=1 width="100%">';
-		$html .= '<tr><td class="tableHeader">'.WebGUI::International::get(229).
-			'</td><td class="tableHeader">'.WebGUI::International::get(15,$namespace).
-			'</td><td class="tableHeader">'.WebGUI::International::get(16,$namespace).'</td></tr>';
-		@data = WebGUI::SQL->quickArray("select messageId,subject,username,dateOfPost,userId from discussion where messageId=$message{rid}");
-		$data[1] = WebGUI::HTML::filter($data[1],'all');
-		$html .= '<tr';
-		if ($session{form}{mid} eq $message{rid}) {
-			$html .= ' class="highlight"';
-		}
-		$html .= '><td class="tableData"><a href="'.WebGUI::URL::page('func=showMessage&mid='.$data[0].'&wid='.
-			$message{wobjectId}).'">'.substr($data[1],0,30).'</a></td><td class="tableData"><a href="'.
-			WebGUI::URL::page('op=viewProfile&uid='.$data[4]).'">'.$data[2].
-			'</a></td><td class="tableData">'.
-			epochToHuman($data[3],"%z %Z").'</td></tr>';
-		$html .= WebGUI::Discussion::traverseReplyTree($message{rid},1);
-		$html .= "</table>";
-	} else { 
-		$html = WebGUI::International::get(402);
+	my ($output, $submenu);
+	$submenu = '<a href="'.WebGUI::URL::page('func=postReply&mid='.$session{form}{mid}.
+		'&wid='.$session{form}{wid})
+		.'">'.WebGUI::International::get(13,$namespace).'</a><br>';
+       	 if (_canEditMessage($_[0],$session{form}{mid})) {
+		$submenu .= '<a href="'.WebGUI::URL::page('func=editMessage&mid='.$session{form}{mid}.
+			'&wid='.$session{form}{wid}).'">'.WebGUI::International::get(12,$namespace).'</a><br>';
+                $submenu .= '<a href="'.WebGUI::URL::page('func=deleteMessage&mid='.$session{form}{mid}.
+                       	'&wid='.$session{form}{wid}).'">'.WebGUI::International::get(22,$namespace).'</a><br>';
 	}
-	return $html;
+        $submenu .= '<a href="'.WebGUI::URL::page().'">'.WebGUI::International::get(11,$namespace).'</a><br>';
+	$output = WebGUI::Discussion::showMessage($submenu);
+	$output .= WebGUI::Discussion::showReplyTree();
+	return $output;
 }
 
 #-------------------------------------------------------------------

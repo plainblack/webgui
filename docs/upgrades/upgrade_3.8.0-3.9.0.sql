@@ -81,11 +81,14 @@ INSERT INTO international VALUES (13,'FAQ','English','Turn [top] link on?');
 INSERT INTO international VALUES (14,'FAQ','English','Q');
 INSERT INTO international VALUES (15,'FAQ','English','A');
 INSERT INTO international VALUES (16,'FAQ','English','[top]');
-
-
-
-
-
+INSERT INTO international VALUES (509,'WebGUI','English','Discussion Layout');
+INSERT INTO international VALUES (510,'WebGUI','English','Flat');
+INSERT INTO international VALUES (511,'WebGUI','English','Threaded');
+INSERT INTO userProfileField VALUES ('discussionLayout','WebGUI::International::get(509)',1,0,'select','{\r\n  threaded=>WebGUI::International::get(511),\r\n  flat=>WebGUI::International::get(510)\r\n}','[threaded]',5,4,0);
+INSERT INTO international VALUES (512,'WebGUI','English','Next Thread');
+INSERT INTO international VALUES (513,'WebGUI','English','Previous Thread');
+delete from international where internationalId=10 and namespace='MessageBoard';
+delete from international where internationalId=14 and namespace='MessageBoard';
 
 
 
