@@ -252,7 +252,7 @@ sub getEditForm {
 sub www_edit {
         my $self = shift;
 	return WebGUI::Privilege::insufficient() unless $self->canEdit;
-	$self->getAdminConsole->setHelp("web services client add/edit");
+	$self->getAdminConsole->setHelp("web services client add/edit","WSClient");
         return $self->getAdminConsole->render($self->getEditForm->print,WebGUI::International::get("20","WSClient"));
 }
 

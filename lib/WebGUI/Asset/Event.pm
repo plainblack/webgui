@@ -457,7 +457,7 @@ sub www_deleteEventConfirm {
 sub www_edit {
 	my $self = shift;
 	return WebGUI::Privilege::insufficient() unless $self->canEdit;
-	$self->getAdminConsole->setHelp("event add/edit");
+	$self->getAdminConsole->setHelp("event add/edit","EventsCalendar");
 	return $self->getAdminConsole->render($self->getEditForm->print,WebGUI::International::get('13', 'EventsCalendar'));
 }
 

@@ -528,7 +528,7 @@ sub www_addStyledEvent {
 sub www_edit {
 	my $self = shift;
 	return WebGUI::Privilege::insufficient() unless $self->canEdit;
-	$self->getAdminConsole->setHelp("events calendar add/edit");
+	$self->getAdminConsole->setHelp("events calendar add/edit","EventsCalendar");
 	return $self->getAdminConsole->render($self->getEditForm->print,WebGUI::International::get("12","EventsCalendar"));
 }
 

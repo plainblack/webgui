@@ -354,7 +354,7 @@ sub view {
 sub www_edit {
         my $self = shift;
 	return WebGUI::Privilege::insufficient() unless $self->canEdit;
-	$self->getAdminConsole->setHelp("poll add/edit");
+	$self->getAdminConsole->setHelp("poll add/edit","Poll");
         return $self->getAdminConsole->render($self->getEditForm->print,WebGUI::International::get("9","Poll"));
 }
 

@@ -136,6 +136,7 @@ sub edit {
 		-label=>WebGUI::International::get("upload files", "FilePile"),
 		-value=>$self->getUploadControl
 		);
+        $self->getAdminConsole->setHelp("file pile add/edit","FilePile");
 	return $self->getAdminConsole->render($tabform->print,WebGUI::International::get("add pile", "FilePile"));
 }
 

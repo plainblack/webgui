@@ -166,6 +166,7 @@ sub view {
 sub www_edit {
         my $self = shift;
         return WebGUI::Privilege::insufficient() unless $self->canEdit;
+        $self->getAdminConsole->setHelp("snippet add/edit","Snippet");
         return $self->getAdminConsole->render($self->getEditForm->print,"Edit Snippet");
 }
 

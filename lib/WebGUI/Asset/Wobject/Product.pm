@@ -453,7 +453,7 @@ sub www_deleteSpecificationConfirm {
 sub www_edit {
    my $self = shift;
    return WebGUI::Privilege::insufficient() unless $self->canEdit;
-   $self->getAdminConsole->setHelp("product add/edit");
+   $self->getAdminConsole->setHelp("product add/edit","Product");
    return $self->getAdminConsole->render($self->getEditForm->print,WebGUI::International::get("6","Product"));
 }
 

@@ -672,7 +672,7 @@ sub www_deleteTabConfirm {
 sub www_edit {
         my $self = shift;
 	return WebGUI::Privilege::insufficient() unless $self->canEdit;
-	$self->getAdminConsole->setHelp("data form add/edit");
+	$self->getAdminConsole->setHelp("data form add/edit","DataForm");
         return $self->getAdminConsole->render($self->getEditForm->print,WebGUI::International::get("7","DataForm"));
 }
 

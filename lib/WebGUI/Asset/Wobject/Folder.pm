@@ -180,6 +180,7 @@ sub view {
 sub www_edit {
         my $self = shift;
 	return WebGUI::Privilege::insufficient() unless $self->canEdit;
+        $self->getAdminConsole->setHelp("folder add/edit","Folder");
         return $self->getAdminConsole->render($self->getEditForm->print,"Edit Folder");
 }
 

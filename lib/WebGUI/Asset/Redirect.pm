@@ -132,6 +132,7 @@ sub getName {
 sub www_edit {
         my $self = shift;
         return WebGUI::Privilege::insufficient() unless $self->canEdit;
+        $self->getAdminConsole->setHelp("redirect add/edit", "Redirect");
         return $self->getAdminConsole->render($self->getEditForm->print,"Edit Redirect");
 }
 

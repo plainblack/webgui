@@ -128,7 +128,7 @@ sub view {
 sub www_edit {
         my $self = shift;
 	return WebGUI::Privilege::insufficient() unless $self->canEdit;
-	$self->getAdminConsole->setHelp("message board add/edit");
+	$self->getAdminConsole->setHelp("message board add/edit","MessageBoard");
         return $self->getAdminConsole->render($self->getEditForm->print,WebGUI::International::get("6","MessageBoard"));
 }
 
