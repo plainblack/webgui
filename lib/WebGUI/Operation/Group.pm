@@ -209,6 +209,21 @@ sub www_deleteGroupGrouping {
 }
 
 #-------------------------------------------------------------------
+sub www_deleteGrouping {
+        return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
+        if (($session{user}{userId} == $session{form}{uid} || $session{form}{uid} == 3) && $session{form}{gid} == 3) {
+                return _submenu(WebGUI::Privilege::vitalComponent());
+        }
+        my @users = $session{cgi}->param('uid');
+        my @groups = $session{cgi}->param("gid");
+        foreach my $user (@users) {
+                my $u = WebGUI::User->new($user);
+                $u->deleteFromGroups(\@groups);
+        }
+        return WebGUI::Operation::Group::www_manageUsersInGroup();
+}
+                                                                                                                                                       
+#-------------------------------------------------------------------
 sub www_deleteGroupingSecondary {
         return WebGUI::Privilege::adminOnly() unless _hasSecondaryPrivilege($session{form}{gid});
         if ($session{user}{userId} eq $session{form}{uid}) {
@@ -315,6 +330,35 @@ sub www_editGroupSave {
 	$g->dbQuery($session{form}{dbQuery});
 	$g->dbCacheTimeout(WebGUI::FormProcessor::interval("dbCacheTimeout"));
         return www_listGroups();
+}
+
+#-------------------------------------------------------------------
+sub www_editGrouping {
+	return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
+	my $f = WebGUI::HTMLForm->new;
+        $f->hidden("op","editGroupingSave");
+        $f->hidden("uid",$session{form}{uid});
+        $f->hidden("gid",$session{form}{gid});
+	my $u = WebGUI::User->new($session{form}{uid});
+	my $g = WebGUI::Group->new($session{form}{gid});
+        $f->readOnly($u->username,WebGUI::International::get(50));
+        $f->readOnly($g->name,WebGUI::International::get(84));
+	$f->date("expireDate",WebGUI::International::get(369),WebGUI::Grouping::userGroupExpireDate($session{form}{uid},$session{form}{gid}));
+	$f->yesNo(
+		-name=>"groupAdmin",
+		-label=>WebGUI::International::get(977),
+		-value=>WebGUI::Grouping::userGroupAdmin($session{form}{uid},$session{form}{gid})
+		);
+	$f->submit;
+        return _submenu($f->print,'370');
+}
+
+#-------------------------------------------------------------------
+sub www_editGroupingSave {
+	return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
+        WebGUI::Grouping::userGroupExpireDate($session{form}{uid},$session{form}{gid},setToEpoch($session{form}{expireDate}));
+        WebGUI::Grouping::userGroupAdmin($session{form}{uid},$session{form}{gid},$session{form}{groupAdmin});
+        return www_manageUsersInGroup();
 }
 
 #-------------------------------------------------------------------
@@ -461,10 +505,6 @@ sub www_manageUsersInGroup {
 			value=>$session{form}{gid}
 			})
 		.WebGUI::Form::hidden({
-			name=>"return",
-			value=>"manageUsersInGroup"
-			})
-		.WebGUI::Form::hidden({
 			name=>"op",
 			value=>"deleteGrouping"
 			});
@@ -482,7 +522,7 @@ sub www_manageUsersInGroup {
 				name=>"uid",
 				value=>$row->{userId}
 				})
-                        .deleteIcon('op=deleteGrouping&return=manageUsersInGroup&uid='.$row->{userId}.'&gid='.$session{form}{gid})
+                        .deleteIcon('op=deleteGrouping&uid='.$row->{userId}.'&gid='.$session{form}{gid})
                         .editIcon('op=editGrouping&uid='.$row->{userId}.'&gid='.$session{form}{gid})
                         .'</td>';
                 $output .= '<td class="tableData"><a href="'.WebGUI::URL::page('op=editUser&uid='.$row->{userId}).'">'.$row->{username}.'</a></td>';

@@ -127,11 +127,6 @@ our $I18N = {
 		lastUpdated => 1031514049
 	},
 
-	'458' => {
-		message => q|Edit this user's groups.|,
-		lastUpdated => 1031514049
-	},
-
 	'517' => {
 		message => q|Turn Admin Off!|,
 		lastUpdated => 1031514049
@@ -6176,8 +6171,8 @@ Privileges and styles assigned to pages in the package will not be copied when t
 	},
 
 	'457' => {
-		message => q|Edit this user's account.|,
-		lastUpdated => 1031514049
+		message => q|Edit this user.|,
+		lastUpdated => 1099014049
 	},
 
 	'821' => {
