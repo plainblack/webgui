@@ -1,14 +1,18 @@
 package WebGUI::Wobject;
 
-#-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2002 Plain Black Software.
-#-------------------------------------------------------------------
-# Please read the legal notices (docs/legal.txt) and the license
-# (docs/license.txt) that came with this distribution before using
-# this software.
-#-------------------------------------------------------------------
-# http://www.plainblack.com                     info@plainblack.com
-#-------------------------------------------------------------------
+=head1 LEGAL
+
+ -------------------------------------------------------------------
+  WebGUI is Copyright 2001-2002 Plain Black Software.
+ -------------------------------------------------------------------
+  Please read the legal notices (docs/legal.txt) and the license
+  (docs/license.txt) that came with this distribution before using
+  this software.
+ -------------------------------------------------------------------
+  http://www.plainblack.com                     info@plainblack.com
+ -------------------------------------------------------------------
+
+=cut
 
 use CGI::Carp qw(fatalsToBrowser);
 use DBI;
@@ -24,6 +28,27 @@ use WebGUI::SQL;
 use WebGUI::Template;
 use WebGUI::URL;
 use WebGUI::Utility;
+
+=head1 NAME
+
+ Package WebGUI::Wobject
+
+=head1 SYNOPSIS
+
+ use WebGUI::Wobject;
+ our @ISA = qw(WebGUI::Wobject);
+
+ See the subclasses in lib/WebGUI/Wobjects for details.
+
+=head1 DESCRIPTION
+
+ An abstract class for all other wobjects to extend. 
+
+=head1 METHODS
+
+ These methods are available from this class:
+
+=cut
 
 #-------------------------------------------------------------------
 sub _reorderWobjects {
@@ -112,6 +137,13 @@ sub get {
 
 #-------------------------------------------------------------------
 
+=head2 inDateRange ( )
+
+ Returns a boolean value of whether the wobject should be displayed
+ based upon it's start and end dates.
+
+=cut
+
 sub inDateRange {
 	if ($_[0]->get("startDate") < time() && $_[0]->get("startDate") > time()) {
 		return 1;
@@ -147,6 +179,17 @@ sub new {
 }
 
 #-------------------------------------------------------------------
+
+=head2 processMacros ( output )
+
+ Decides whether or not macros should be processed and returns the
+ appropriate output.
+
+=item output
+
+ An HTML blob to be processed for macros.
+
+=cut
 
 sub processMacros {
 	if ($_[0]->get("processMacros")) {
@@ -231,6 +274,13 @@ sub set {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_cut ( )
+
+ Moves this instance to the clipboard.
+
+=cut
+
 sub www_cut {
         if (WebGUI::Privilege::canEditPage()) {
 		$_[0]->set({pageId=>2});
@@ -242,6 +292,13 @@ sub www_cut {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_delete ( )
+
+ Prompts a user to confirm whether they wish to delete this instance.
+
+=cut
+
 sub www_delete {
         my ($output);
         if (WebGUI::Privilege::canEditPage()) {
@@ -263,6 +320,13 @@ sub www_delete {
 }
 
 #-------------------------------------------------------------------
+
+=head2  www_deleteConfirm ( )
+
+ Moves this instance to the trash.
+
+=cut
+
 sub www_deleteConfirm {
         if (WebGUI::Privilege::canEditPage()) {
 		$_[0]->set({pageId=>3});
@@ -274,6 +338,19 @@ sub www_deleteConfirm {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_edit ( formRows ) 
+
+ Displays the common properties of any/all wobjects. 
+
+ NOTE: This method should be extended by all wobjects.
+
+=item formRows
+
+ The custom form rows from the wobject subclass edit page.
+
+=cut
+
 sub www_edit {
         my ($f, $title, $templatePosition, $endDate);
 	$title = $_[0]->get("title") || $_[0]->get("namespace");
@@ -297,6 +374,15 @@ sub www_edit {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_editSave ( )
+
+ Saves the default properties of any/all wobjects.
+
+ NOTE: This method should be extended by all subclasses.
+
+=cut
+
 sub www_editSave {
 	my ($title, $templatePosition, $startDate, $endDate);
 	$title = $session{form}{title} || $_[0]->get("namespace");
@@ -316,6 +402,13 @@ sub www_editSave {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_moveBottom ( )
+
+ Moves this instance to the bottom of the page.
+
+=cut
+
 sub www_moveBottom {
         if (WebGUI::Privilege::canEditPage()) {
 		$_[0]->set({sequenceNumber=>99999});
@@ -327,6 +420,13 @@ sub www_moveBottom {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_moveDown ( )
+
+ Moves this instance down one spot on the page.
+
+=cut
+
 sub www_moveDown {
 	my ($wid, $thisSeq);
         if (WebGUI::Privilege::canEditPage()) {
@@ -345,6 +445,13 @@ sub www_moveDown {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_moveTop ( )
+
+ Moves this instance to the top of the page.
+
+=cut
+
 sub www_moveTop {
         if (WebGUI::Privilege::canEditPage()) {
                 $_[0]->set({sequenceNumber=>0});
@@ -356,6 +463,13 @@ sub www_moveTop {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_moveUp ( )
+
+ Moves this instance up one spot on the page.
+
+=cut
+
 sub www_moveUp {
         my ($wid, $thisSeq);
         if (WebGUI::Privilege::canEditPage()) {
@@ -374,6 +488,13 @@ sub www_moveUp {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_paste ( )
+
+ Moves this instance from the clipboard to the current page.
+
+=cut
+
 sub www_paste {
         my ($output, $nextSeq);
         if (WebGUI::Privilege::canEditPage()) {
