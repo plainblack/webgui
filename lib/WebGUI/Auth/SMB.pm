@@ -16,8 +16,8 @@ use WebGUI::HTMLForm;
 use WebGUI::Form;
 use WebGUI::Session;
 use WebGUI::Utility;
-use Authen::Smb;
-use warnings;
+#use Authen::Smb;
+#use warnings;
 
 our @ISA = qw(WebGUI::Auth);
 
@@ -81,10 +81,11 @@ sub authenticate {
 	my $userData = $self->getParams;
     if($userData->{smbLogin}){
 	   $smb = Authen::Smb::authen($userData->{smbLogin}, $password, $userData->{smbPDC}, $userData->{smbBDC}, $userData->{smbDomain});
-	   $error .= "<li>".$smbError{$smb} if($smb > 0);
+	   $error = "<li>".$smbError{$smb} if($smb > 0)
 	}else{
 	   $error .= "<li>".WebGUI::International::get(5,'Auth/SMB');
 	}
+	$self->user(WebGUI::User->new(1)) if $error ne "";
     $self->error($error);
 	return $error eq "";	 
 }
