@@ -136,7 +136,7 @@ sub www_view {
    }
 
    $cookiebox = $_[0]->get("cookiebox").'/'.$_[0]->get("namespace").'_cookie_'.WebGUI::URL::escape($session{var}{sessionId}).'.jar';
-   $jar = HTTP::Cookies->new(File => $cookiebox, AutoSave => 1);
+   $jar = HTTP::Cookies->new(File => $cookiebox, AutoSave => 1, Ignore_Discard => 1);
 
    if($session{form}{wid} == $_[0]->get("wobjectId") && $session{form}{func}!~/editSave/i) {
       $proxiedUrl = $session{form}{FormAction} || $session{form}{proxiedUrl} || $_[0]->get("proxiedUrl") ;
