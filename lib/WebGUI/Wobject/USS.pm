@@ -389,8 +389,9 @@ sub www_view {
 sub www_viewSubmission {
 	return "" unless ($session{form}{sid});
 	my ($output, $submission, $file, @data, %var, $replies);
-	WebGUI::SQL->write("update USS_submission set views=views+1 where USS_submissionId=$session{form}{sid}");
 	$submission = $_[0]->getCollateral("USS_submission","USS_submissionId",$session{form}{sid});
+	return $_[0]->www_view unless ($submission->{USS_submissionId});
+	WebGUI::SQL->write("update USS_submission set views=views+1 where USS_submissionId=$session{form}{sid}");
 	$var{title} = $submission->{title};
 	$var{content} = WebGUI::HTML::filter($submission->{content},$session{setting}{filterContributedHTML});
 	$var{content} =~ s/\^\-\;//g;
@@ -410,7 +411,7 @@ sub www_viewSubmission {
         $var{"post.url"} = WebGUI::URL::page('func=editSubmission&sid=new&wid='.$_[0]->get("wobjectId"));
         $var{"post.label"} = WebGUI::International::get(20,$namespace);
 	@data = WebGUI::SQL->quickArray("select max(USS_submissionId) from USS_submission 
-        	where wobjectId=$submission->{wobjectId} and USS_submissionId<$submission->{USS_submissionId}
+        	where wobjectId=".$_[0]->get("wobjectId")." and USS_submissionId<$submission->{USS_submissionId}
 		and (userId=$submission->{userId} or status='Approved')");
         $var{"previous.more"} = ($data[0] ne "");
        	$var{"previous.url"} = WebGUI::URL::page('func=viewSubmission&sid='.$data[0].'&wid='.$session{form}{wid});
