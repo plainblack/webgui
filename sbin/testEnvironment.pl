@@ -224,31 +224,15 @@ if ($error ne "") {
 			print "\nFound config file ........................ ".$file."\n";
 			print "Verifying file ........................... ";
 			my ($config);
-			$config = new Data::Config $dir.$file;
+			$config = Parse::PlainConfig->new('DELIM' => '=',
+                		'FILE' => $dir.$file,
+                		'PURGE' => 1);
 			unless (defined $config) {
-				print "Couldn't open it.";
+				print "Couldn't open the config file.";
 				$prereq = 0;
-			} elsif ($config->param('dsn') =~ /\s$/) {
-        			print "DSN cannot end with a space.";
-				$prereq = 0;
-			} elsif ($config->param('dsn') !~ /\DBI\:\w+\:\w+/) {
+			} elsif ($config->get('dsn') !~ /\DBI\:\w+\:\w+/) {
 				print "DSN is improperly formatted.";
 				$prereq = 0;
-			} elsif ($config->param('dbuser') =~ /\s$/) {
-				print "dbuser cannot end with a space.";
-				$prereq = 0;
-			} elsif ($config->param('dbpass') =~ /\s$/) {
-				print "dbpass cannot end with a space.";
-				$prereq = 0;
-                        } elsif ($config->param('extras') =~ /\s$/) {
-                                print "extras cannot end with a space.";
-                                $prereq = 0;
-                        } elsif ($config->param('uploadsPath') =~ /\s$/) {
-                                print "uploadsPath cannot end with a space.";
-                                $prereq = 0;
-                        } elsif ($config->param('uploadsURL') =~ /\s$/) {
-                                print "uploadsURL cannot end with a space.";
-                                $prereq = 0;
 			} else {
 				print "OK\n";
 			}
@@ -263,7 +247,7 @@ if ($error ne "") {
 				###################################
 
 				print "Uploads folder ........................... ";
-                        	if (opendir(DIR,$config->param('uploadsPath'))) {
+                        	if (opendir(DIR,$config->get('uploadsPath'))) {
 					print "OK\n";
 					closedir(DIR);
 				} else {
@@ -276,7 +260,7 @@ if ($error ne "") {
 
                                 print "Database driver .......................... ";
 				my (@driver);
-				@driver = split(/:/,$config->param('dsn'));
+				@driver = split(/:/,$config->get('dsn'));
                                 if ($dbDrivers =~ m/$driver[1]/) {
                                         print "OK\n";
                                 } else {
@@ -289,7 +273,7 @@ if ($error ne "") {
 
 				print "Database connection ...................... ";
 				my ($dbh, $test);
-				unless (eval {$dbh = DBI->connect($config->param('dsn'),$config->param('dbuser'),$config->param('dbpass'))}) {
+				unless (eval {$dbh = DBI->connect($config->get('dsn'),$config->get('dbuser'),$config->get('dbpass'))}) {
 					print "Can't connect with info provided!\n";
 				} else {
 					print "OK\n";
