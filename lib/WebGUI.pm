@@ -70,10 +70,10 @@ sub page {
 				if (WebGUI::Privilege::canViewPage()) {
 					$cmd = "WebGUI::Wobject::".${$wobject}{namespace};
 					$w = eval{$cmd->new($wobject)};
-					WebGUI::ErrorHandler::fatalError("Couldn't instanciate wojbect: ${$wobject}{namespace}. Root Cause: ".$@) if($@);
+					WebGUI::ErrorHandler::fatalError("Couldn't instanciate wobject: ${$wobject}{namespace}. Root Cause: ".$@) if($@);
 					$cmd = "www_".$session{form}{func};
 					$wobjectOutput = eval{$w->$cmd};
-					WebGUI::ErrorHandler::fatalError("Web method doesn't exist in wojbect: ${$wobject}{namespace} / $session{form}{func}. Root Cause: ".$@) if($@);
+					WebGUI::ErrorHandler::fatalError("Web method doesn't exist in wobject: ${$wobject}{namespace} / $session{form}{func}. Root Cause: ".$@) if($@);
 				} else {
 					$wobjectOutput = WebGUI::Privilege::noAccess();
 				}
@@ -135,12 +135,12 @@ sub page {
 				$wobject = \%hash;
 				$cmd = "WebGUI::Wobject::".${$wobject}{namespace};
 				$w = eval{$cmd->new($wobject)};
-				WebGUI::ErrorHandler::fatalError("Couldn't instanciate wojbect: ${$wobject}{namespace}. Root cause: ".$@) if($@);
+				WebGUI::ErrorHandler::fatalError("Couldn't instanciate wobject: ${$wobject}{namespace}. Root cause: ".$@) if($@);
 				if ($w->inDateRange) {
 					$contentHash{${$wobject}{templatePosition}} .= '<div class="wobject'.${$wobject}{namespace}.'" id="wobjectId'.${$wobject}{wobjectId}.'">';
 					$contentHash{${$wobject}{templatePosition}} .= '<a name="'.${$wobject}{wobjectId}.'"></a>';
 					$contentHash{${$wobject}{templatePosition}} .= eval{$w->www_view};
-					WebGUI::ErrorHandler::fatalError("No view method in wojbect: ${$wobject}{namespace}. Root cause: ".$@) if($@);
+					WebGUI::ErrorHandler::fatalError("No view method in wobject: ${$wobject}{namespace}. Root cause: ".$@) if($@);
 					$contentHash{${$wobject}{templatePosition}} .= "</div>\n\n";
 				}
 			}
