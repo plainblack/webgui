@@ -18,7 +18,7 @@ our $I18N = {
 		lastUpdated => 1099344172,
 	},
 
-    'asset, add/edit' => {
+    'asset add/edit body' => {
         message => q|
 <p>
 <b>Title</b><br>
@@ -69,8 +69,12 @@ A short description of an asset.  It is used in default meta tags, site maps and
         |,
         context => q|Describing the form to add or edit an Asset.|,
         lastUpdated => 1100462749,
-    }
-	
+    },
+
+    'asset add/edit title' => {
+        message => q|Asset, Add/Edit|,
+        lastUpdated => 1100463645,
+	},
 
 };
 
