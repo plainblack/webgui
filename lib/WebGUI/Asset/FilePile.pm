@@ -72,7 +72,7 @@ sub edit {
 	}
 	$tabform->addTab("properties",WebGUI::International::get("properties","Asset"));
 	$tabform->getTab("properties")->yesNo(
-               	-name=>"hideFromNavigation",
+               	-name=>"isHidden",
                	-value=>1,
                	-label=>WebGUI::International::get(886),
                	-uiLevel=>6

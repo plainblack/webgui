@@ -77,6 +77,12 @@ save you many hours of grief.
 	been moved from outside the content system, to inside it as assets
 	in the new asset tree.
 
+ * If you are using the SMB auth module, please note that it has been removed
+	from this release. It has been long deprecated and is no longer an
+	official part of WebGUI. It will be made available in the user
+	contribs section of plainblack.com for people wishing to continue to
+	use/maintain it.
+
 
 6.2.10
 --------------------------------------------------------------------

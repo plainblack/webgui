@@ -79,6 +79,10 @@
  - Enhanced the user import script to allow you to update existing accounts,
    group expirations, etc, in addition to just importing new accounts. (Nick
    Roberts)
+ - fix [ 1118861 ] WebGUI::Group->find() broken! (fix)
+ - Removed the long deprecated SMB auth module. It will be added to the user
+   contribs area in case someone wishes to use/maintain it.
+ - fix [ 1122377 ] 6.2.9 - USS sequence ordering bugs
 
 
 

@@ -358,9 +358,8 @@ If specified, expireOffset is set to this value.
 =cut
 
 sub expireOffset {
-        my ($class, $value);
-        $class = shift;
-        $value = shift;
+        my $class = shift;
+        my $value = shift;
         if (defined $value) {
                 $class->{_group}{"expireOffset"} = $value;
                 WebGUI::SQL->write("update groups set expireOffset=".quote($value).",
@@ -383,6 +382,7 @@ The name of the group you wish to instanciate.
 =cut
 
 sub find {
+	my $class = shift;
 	my $name = shift;
 	my ($groupId) = WebGUI::SQL->quickArray("select groupId from groups where groupName=".quote($name));
 	return WebGUI::Group->new($groupId);

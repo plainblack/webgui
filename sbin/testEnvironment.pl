@@ -246,13 +246,6 @@ if (eval { require Image::Magick }) {
         print "Not installed. Thumbnailing will be disabled.\n";
 }
 
-print "Authen::Smb module (optional) ............ ";
-if (eval { require Authen::Smb }) {
-        print "OK\n";
-} else {
-        print "Not installed. You cannot use SMB authentication.\n";
-}
-
 # this is here to insure they installed correctly.
 
 if ($prereq) {
