@@ -1,3 +1,4 @@
+@import "tabs-position.css";
 .tab {
 	display: inline; 
 	text-decoration: none;
@@ -12,13 +13,11 @@
 
 .tabBody {
 	width: auto;
-         position: relative;
          padding: 8px 12px 12px 12px;
          z-index: 500;
      }
 
 div.tabs {
-         position: relative;
         top: 2px;
         left: 8px;
          white-space: nowrap;
