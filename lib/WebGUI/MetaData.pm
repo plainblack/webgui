@@ -78,7 +78,7 @@ The fieldId to be deleted.
 
 sub deleteField {
 	my $fieldId = shift;
-	return unless ($fieldId =~ /^\d+$/);
+	return unless ($fieldId =~ /^\d+$/ || length($fieldId) == 22);
         WebGUI::SQL->write("delete from metaData_properties where fieldId = ".quote($fieldId));
         WebGUI::SQL->write("delete from metaData_values where fieldId = ".quote($fieldId));
 }
