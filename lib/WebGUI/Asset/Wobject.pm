@@ -429,6 +429,15 @@ sub processPropertiesFromFormPost {
 
 #-------------------------------------------------------------------
 
+sub processStyle {
+	my $self = shift;
+	my $output = shift;
+	return WebGUI::Style::process($output,$self->get("styleTemplateId"));
+}
+
+
+#-------------------------------------------------------------------
+
 =head2 processTemplate ( vars, templateId ) 
 
 Returns the content generated from this template.
@@ -671,7 +680,7 @@ sub www_view {
 		}
 #		$cache->set($output, $ttl) if ($useCache && !WebGUI::HTTP::isRedirect());
 	}
-	return WebGUI::Style::process($output,$self->get("styleTemplateId"));
+	return $self->processStyle($output);
 }
 
 1;
