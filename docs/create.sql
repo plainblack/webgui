@@ -300,6 +300,7 @@ CREATE TABLE MailForm_field (
   name varchar(255) NOT NULL default '',
   status char(1) NOT NULL default '0',
   type varchar(30) NOT NULL default '',
+  width int(11) default NULL,
   possibleValues text,
   defaultValue text,
   PRIMARY KEY  (MailForm_fieldId)

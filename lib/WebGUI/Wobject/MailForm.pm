@@ -190,6 +190,7 @@ sub www_editField {
         $f->select("status",\%fieldStatus,WebGUI::International::get(22,$namespace),$status); 
         my $type = [ $field{type} ||= "text" ];
         $f->select("type",\%fieldTypes,WebGUI::International::get(23,$namespace),$type);
+	$f->integer("width",WebGUI::International::get(8, $namespace),$field{width} || $_[0]->get("width") || 45);
         $f->textarea("possibleValues",WebGUI::International::get(24,$namespace),$field{possibleValues});
         $f->text("defaultValue",WebGUI::International::get(25,$namespace),$field{defaultValue});
         $f->yesNo("proceed",WebGUI::International::get(15,$namespace));
@@ -205,14 +206,15 @@ sub www_editFieldSave {
         if ($session{form}{fid} eq "new") {
             ($seq) = WebGUI::SQL->quickArray("select max(sequenceNumber) from MailForm_field where wobjectId=".$_[0]->get("wobjectId"));
             $session{form}{fid} = getNextId("MailForm_fieldId");
-            WebGUI::SQL->write("insert into MailForm_field (wobjectId,MailForm_fieldId,sequenceNumber) values
-                (".$_[0]->get("wobjectId").",$session{form}{fid},".($seq+1).")");
+            WebGUI::SQL->write("insert into MailForm_field (wobjectId,MailForm_fieldId,sequenceNumber, width) values
+                (".$_[0]->get("wobjectId").",$session{form}{fid},".($seq+1).", $session{form}{width} )");
         }
         WebGUI::SQL->write("update MailForm_field set name=".quote($session{form}{name}).
     		", status=".quote($session{form}{status}).
     		", type=".quote($session{form}{type}).
     		", possibleValues=".quote($session{form}{possibleValues}).
     		", defaultValue=".quote($session{form}{defaultValue}).
+    		", width=".quote($session{form}{width}).
     		" where MailForm_fieldId=$session{form}{fid}");
         if ($session{form}{proceed}) {
             $session{form}{fid} = "new";
@@ -309,6 +311,7 @@ sub www_view {
 		}
 		$f->raw($row);
 	}
+	
 	$f->submit(WebGUI::International::get(73, $namespace));
 	$output .= $f->print;
 	
@@ -325,27 +328,31 @@ sub _createField {
 	SWITCH: for ($data->{type}) {
 		/^text$/ && do {
 			# maxlength, extras, subtext
-			$f->text($name, $data->{name}, $data->{defaultValue}, 255, "", "", $self->get("width"));
+			$f->text($name, $data->{name}, $data->{defaultValue}, 255, "", "", 
+                                 $data->{width} || $self->get("width"));
 			last SWITCH;
 		};
 		/^email$/ && do {
 			# maxlength, extras, subtext
-			$f->email($name, $data->{name}, $data->{defaultValue}, 255, "", "", $self->get("width"));
+			$f->email($name, $data->{name}, $data->{defaultValue}, 255, "", "", 
+				  $data->{width} || $self->get("width"));
 			last SWITCH;
 		};
 		/^url$/ && do {
 			# maxlength, extras, subtext
-			$f->url($name, $data->{name}, $data->{defaultValue}, 255, "", "", $self->get("width"));
+			$f->url($name, $data->{name}, $data->{defaultValue}, 255, "", "", 
+				$data->{width} || $self->get("width"));
 			last SWITCH;
 		};
 		/^textarea$/ && do {
 			# subtext, extras, wrap, rows, cols
-			$f->textarea($name, $data->{name}, $data->{defaultValue}, "", "", "", 10, $self->get("width") - 9);
+			$f->textarea($name, $data->{name}, $data->{defaultValue}, "", "", "", 10, 
+				     $data->{width} || $self->get("width") - 9);
 			last SWITCH;
 		};
 		/^date$/ && do {
 			# extras, subtext
-			$f->date($name, $data->{name}, $data->{defaultValue}, "", "", 15); # use small size for a date box
+			$f->date($name, $data->{name}, $data->{defaultValue}, "", "", $data->{width} || 15); # use small size for a date box
 			last SWITCH;
 		};
 		/^yesNo$/ && do {
