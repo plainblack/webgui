@@ -178,7 +178,7 @@ sub form {
         $f->raw('</td></tr>');
         $f->raw('</table>');
         $f->raw('</td><td width="15%">');
-        $f->select("numResults",\%results,'',[$numResults]);
+        $f->selectList("numResults",\%results,'',[$numResults]);
         $f->raw('<p/>');
         $f->submit(WebGUI::International::get(170));
         $f->raw('</td>');
