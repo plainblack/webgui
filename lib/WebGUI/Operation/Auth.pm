@@ -16,11 +16,13 @@ package WebGUI::Operation::Auth;
 use strict qw(vars subs);
 use URI;
 use WebGUI::ErrorHandler;
+use WebGUI::Operation::Shared;
 use WebGUI::Session;
 use WebGUI::SQL;
 use WebGUI::URL;
 use WebGUI::User;
 use WebGUI::Utility;
+
 
 #-------------------------------------------------------------------
 
@@ -56,7 +58,7 @@ sub www_auth {
       WebGUI::ErrorHandler::security("access uncallable auth method on page '".$session{page}{title}."' [".$session{page}{pageId}."].");
 	  return WebGUI::International::get(1077);
    }
-   return $authMethod->$methodCall;   
+   return WebGUI::Operation::Shared::userStyle($authMethod->$methodCall);   
 }
 
 #-------------------------------------------------------------------

@@ -244,4 +244,8 @@ alter table IndexedSearch_docInfo change wobject_groupIdView groupIdView varchar
 update USS set sortBy='lineage' where sortBy='sequenceNumber';
 delete from settings where name='trackPageStatistics';
 drop table pageStatistics;
+delete from settings where name='snippetPreviewLength';
+delete from incrementer where incrementerId in ('collateralFolderId','themeId','themeComponentId');
+
+
 

@@ -198,7 +198,7 @@ sub www_editProfile {
 	$vars->{'profile.form.elements'} = \@array;
     $vars->{'profile.form.submit'} = WebGUI::Form::submit({});
     $vars->{'profile.accountOptions'} = WebGUI::Operation::Shared::accountOptions();
-	return WebGUI::Asset::Template->new("PBtmpl0000000000000051")->process($vars);
+	return WebGUI::Operation::Shared::userStyle(WebGUI::Asset::Template->new("PBtmpl0000000000000051")->process($vars));
 }
 
 #-------------------------------------------------------------------
@@ -261,7 +261,7 @@ sub www_viewProfile {
 	if ($session{user}{userId} eq $session{form}{uid}) {
        $vars->{'profile.accountOptions'} = WebGUI::Operation::Shared::accountOptions();
 	}
-    return WebGUI::Asset::Template->new("PBtmpl0000000000000052")->process($vars);
+    return WebGUI::Operation::Shared::userStyle(WebGUI::Asset::Template->new("PBtmpl0000000000000052")->process($vars));
 }
 
 1;

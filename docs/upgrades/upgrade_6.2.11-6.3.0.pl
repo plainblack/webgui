@@ -755,9 +755,10 @@ $conf->write;
 
 
 
-print "\tMiscellaneous other changes.\n" unless ($quiet);
-WebGUI::SQL->write("delete from settings where name='snippetPreviewLength'");
-WebGUI::SQL->write("delete from incrementer where incrementerId in ('collateralFolderId','themeId','themeComponentId')");
+print "\tSetting user function style\n" unless ($quiet);
+my ($defaultPageId) = WebGUI::SQL->quickArray("select value from settings where name='defaultPage'");
+my ($styleId) = WebGUI::SQL->quickArray("select styleTemplateId from wobject where assetId=".quote($defaultPageId));
+WebGUI::SQL->write("insert into settings (name,value) values ('userFunctionStyleId',".quote($styleId).")");
 
 
 

@@ -215,6 +215,11 @@ sub www_editSettings {
                 -value=>$session{setting}{passiveProfilingEnabled},
                 -extras=>' onChange="alert(\''.$i18n->get("Illegal Warning","Asset").'\')" '
         );
+	$tabform->getTab("user")->yesNo(
+		-name=>"userFunctionStyleId",
+		-label=>"User Function Style",
+		-value=>$session{setting}{userFunctionStyleId}
+		);
 # auth settings 
 	WebGUI::Style::setScript($session{config}{extrasURL}."/swapLayers.js",{language=>"Javascript"});
    	$tabform->getTab("auth")->raw('<script language="JavaScript" > var active="'.$session{setting}{authMethod}.'"; </script>');

@@ -426,7 +426,7 @@ sub www_redeemSubscriptionCode {
 	$f->submit;
 	$var{codeForm} = $f->print;
 
-	return WebGUI::Asset::Template->new("PBtmpl0000000000000053")->process(\%var);
+	return WebGUI::Operation::Shared::userStyle(WebGUI::Asset::Template->new("PBtmpl0000000000000053")->process(\%var));
 }
 
 1;

@@ -17,6 +17,7 @@ use WebGUI::Grouping;
 use WebGUI::International;
 use WebGUI::Session;
 use WebGUI::SQL;
+use WebGUI::Style;
 
 our @ISA = qw(Exporter);
 our @EXPORT = qw(&menuWrapper);
@@ -83,5 +84,17 @@ sub menuWrapper {
         $output .= '</td></tr></table>';
         return $output;
 }
+
+#-------------------------------------------------------------------
+sub userStyle {
+	my $output = shift;
+	if ($output) {
+		return WebGUI::Style::process($output,$session{setting}{userFunctionStyleId});
+	} else {
+		return undef;
+	}
+}
+
+
 
 1;

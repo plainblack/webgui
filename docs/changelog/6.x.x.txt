@@ -71,6 +71,8 @@
  - fix [ 1003509 ] Admin mode breaks page layout with users not in Admin Group
  - Removed the page stats tracking function as it was killing people's sites.
    We recommend AWStats instead (www.awstats.org)
+ - Added the ability to switch the style for user functions like profiles,
+   authentication, etc.
 
 
 

@@ -64,7 +64,7 @@ sub www_viewMessageLog {
    $vars->{'message.multiplePages'} = ($p->getNumberOfPages > 1);
    $vars->{'message.accountOptions'} = WebGUI::Operation::Shared::accountOptions();
 
-   return WebGUI::Asset::Template->new("PBtmpl0000000000000050")->process($vars);
+   return WebGUI::Operation::Shared::userStyle(WebGUI::Asset::Template->new("PBtmpl0000000000000050")->process($vars));
 }
 
 #-------------------------------------------------------------------
@@ -91,7 +91,7 @@ sub www_viewMessageLogMessage {
    
    $vars->{'message.text'} = $data->{message};
    $vars->{'message.accountOptions'} = WebGUI::Operation::Shared::accountOptions();
-   return WebGUI::Asset::Template->new("PBtmpl0000000000000049")->process($vars);
+   return WebGUI::Operation::Shared::userStyle(WebGUI::Asset::Template->new("PBtmpl0000000000000049")->process($vars));
 }
 
 1;
