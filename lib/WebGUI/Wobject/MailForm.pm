@@ -358,6 +358,8 @@ sub _createField {
 	my $name = WebGUI::URL::urlize($data->{name});
 	my $f = WebGUI::HTMLForm->new( 'noTable' );
 
+	$session{form}{$name} =~ s/\^.*?\;//gs ; # remove macro's from user input
+
 	SWITCH: for ($data->{type}) {
 		/^text$/ && do {
 			$f->text(
