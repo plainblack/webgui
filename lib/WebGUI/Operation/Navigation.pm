@@ -93,7 +93,7 @@ sub www_deleteNavigationConfirm {
 	WebGUI::SQL->write("delete from Navigation where navigationId = $session{form}{navigationId}");
 
 	# Also delete cache
-	WebGUI::Cache->new("", "Navigation-".$session{config}{configFile})->deleteByRegex("m/^$session{form}{navigationId}-/");
+	WebGUI::Page->recacheNavigation;
 	return www_listNavigation();
 }
 
@@ -275,8 +275,8 @@ sub www_editNavigationSave {
 						  reverse     = ".quote($session{form}{'reverse'})."
 				where navigationId = $session{form}{navigationId}"); 
 	# Delete from cache
-	WebGUI::Cache->new("", "Navigation-".$session{config}{configFile})->deleteByRegex("m/^$session{form}{navigationId}-/");
 	
+	WebGUI::Page->recacheNavigation;
 	return www_listNavigation();  
 }
 
