@@ -481,7 +481,7 @@ sub formHeader {
 
  The name field for this form element.
 
-=item groupId 
+=item value 
 
  The selected group id(s) for this form element.  This should be passed
  as an array reference. Defaults to "7" (Everyone).
@@ -506,7 +506,7 @@ sub formHeader {
 
 sub group {
         my (%hash, $value);
-	$value = $_[0]->{groupId};
+	$value = $_[0]->{value};
 	if ($$value[0] eq "") { #doing long form otherwise arrayRef didn't work
 		$value = [7];
 	}
