@@ -11,12 +11,12 @@ package WebGUI::Operation::Clipboard;
 #-------------------------------------------------------------------
 
 use strict;
+use WebGUI::AdminConsole;
 use WebGUI::DateTime;
 use WebGUI::Grouping;
 use WebGUI::HTMLForm;
 use WebGUI::Icon;
 use WebGUI::International;
-use WebGUI::Operation::Shared;
 use WebGUI::Page;
 use WebGUI::Paginator;
 use WebGUI::Privilege;
@@ -26,21 +26,29 @@ use WebGUI::TabForm;
 use WebGUI::URL;
 use WebGUI::Utility;
 
+
 #-------------------------------------------------------------------
 sub _submenu {
-        my (%menu);
-        tie %menu, 'Tie::IxHash';
-	$menu{WebGUI::URL::page('op=manageClipboard')} = WebGUI::International::get(949);
+        my $workarea = shift;
+        my $title = shift;
+        $title = WebGUI::International::get($title) if ($title);
+	my $help = shift;
+        my $ac = WebGUI::AdminConsole->new;
+	if ($help) {
+		$ac->setHelp($help);
+	}
+        $ac->setAdminFunction("clipboard");
+	$ac->addSubmenuItem(WebGUI::URL::page('op=manageClipboard'), WebGUI::International::get(949));
 	if ($session{form}{systemClipboard} ne "1") {
-		$menu{WebGUI::URL::page('op=emptyClipboard')} = WebGUI::International::get(950);
+		$ac->addSubmenuItem(WebGUI::URL::page('op=emptyClipboard'), WebGUI::International::get(950));
 	}
 	if ( ($session{setting}{sharedClipboard} ne "1") && (WebGUI::Grouping::isInGroup(3)) ) {
-		$menu{WebGUI::URL::page('op=manageClipboard&systemClipboard=1')} = WebGUI::International::get(954);
+		$ac->addSubmenuItem(WebGUI::URL::page('op=manageClipboard&systemClipboard=1'), WebGUI::International::get(954));
 		if ($session{form}{systemClipboard} eq "1") {
-			$menu{WebGUI::URL::page('op=emptyClipboard&systemClipboard=1')} = WebGUI::International::get(959);
+			$ac->addSubmenuItem(WebGUI::URL::page('op=emptyClipboard&systemClipboard=1'), WebGUI::International::get(959));
 		}
 	}
-        return menuWrapper($_[0],\%menu);
+        return $ac->render($workarea, $title);
 }
 
 
@@ -48,12 +56,12 @@ sub _submenu {
 sub www_deleteClipboardItem {
 	return WebGUI::Privilege::insufficient() unless (WebGUI::Grouping::isInGroup(4));
         my ($output);
+	my $help;
 	if ($session{form}{wid} ne "") {
-        	$output .= helpIcon("wobject delete");
+        	$help = "wobject delete";
 	} elsif ($session{form}{pageId} ne "") {
-        	$output .= helpIcon("page delete");
+        	$help = "page delete";
 	}
-        $output .= '<h1>'.WebGUI::International::get(42).'</h1>';
         $output .= WebGUI::International::get(956).'<p>';
 	if ($session{form}{wid} ne "") {
         	$output .= '<div align="center"><a href="'.WebGUI::URL::page('op=deleteClipboardItemConfirm&wid='
@@ -64,7 +72,7 @@ sub www_deleteClipboardItem {
 	}
         $output .= '&nbsp;&nbsp;&nbsp;&nbsp;<a href="'.WebGUI::URL::page().'">'
 		.WebGUI::International::get(45).'</a></div>';
-        return $output;
+        return _submenu($output,"42",$help);
 }
 
 #-------------------------------------------------------------------
@@ -119,8 +127,6 @@ sub www_deleteClipboardItemConfirm {
 sub www_emptyClipboard {
 	return WebGUI::Privilege::insufficient() unless (WebGUI::Grouping::isInGroup(4));
         my ($output);
-	$output = helpIcon("clipboard empty");
-        $output .= '<h1>'.WebGUI::International::get(42).'</h1>';
         $output .= WebGUI::International::get(951).'<p>';
 	if ( ($session{setting}{sharedClipboard} ne "1") && (WebGUI::Grouping::isInGroup(3)) ) {
         	$output .= '<div align="center"><a href="'.WebGUI::URL::page('op=emptyClipboardConfirm&systemClipboard=1')
@@ -129,9 +135,9 @@ sub www_emptyClipboard {
         	$output .= '<div align="center"><a href="'.WebGUI::URL::page('op=emptyClipboardConfirm')
                 	.'">'.WebGUI::International::get(44).'</a>';
 	}
-        $output .= '&nbsp;&nbsp;&nbsp;&nbsp;<a href="'.WebGUI::URL::page().'">'
+        $output .= '&nbsp;&nbsp;&nbsp;&nbsp;<a href="'.WebGUI::URL::page("op=manageClipboard").'">'
                 .WebGUI::International::get(45).'</a></div>';
-        return $output;
+        return _submenu($output,"42","clipboard empty");
 }
 
 #-------------------------------------------------------------------
@@ -181,20 +187,18 @@ sub www_emptyClipboardConfirm {
 sub www_manageClipboard {
 	return WebGUI::Privilege::insufficient() unless (WebGUI::Grouping::isInGroup(4));
 
-	my ($sth, @data, @row, @sorted_row, $i, $p, $allUsers);
-	my $output = helpIcon("clipboard manage");
+	my ($sth, @data, @row, @sorted_row, $i, $p, $allUsers, $title);
+	my $output;
 
 	# Add appropriate html page header
 	if ($session{setting}{sharedClipboard} eq "1") {
 		$allUsers = 1;
-        	$output .= '<h1>'. WebGUI::International::get(948) .'</h1>';
 	} elsif ($session{form}{systemClipboard} eq "1") {
 		return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
 		$allUsers = 1;
-        	$output .= '<h1>'. WebGUI::International::get(955) .'</h1>';
+        	$title = '955';
 	} else {
 		$allUsers = 0;
-        	$output .= '<h1>'. WebGUI::International::get(948) .'</h1>';
 	}
 	
 	# Generate list of pages in clipboard
@@ -331,7 +335,7 @@ sub www_manageClipboard {
         $output .= $p->getPage($session{form}{pn});
         $output .= '</table>';
         $output .= $p->getBarTraditional($session{form}{pn});
-        return _submenu($output);
+        return _submenu($output, $title, "clipboard manage");
 }
 
 1;

@@ -11,99 +11,27 @@ package WebGUI::Operation::Statistics;
 #-------------------------------------------------------------------
 
 use strict;
+use WebGUI::AdminConsole;
 use WebGUI::Cache;
-use WebGUI::DateTime;
 use WebGUI::Grouping;
-use WebGUI::Icon;
 use WebGUI::International;
-use WebGUI::Operation::Shared;
-use WebGUI::Paginator;
 use WebGUI::Privilege;
 use WebGUI::Session;
 use WebGUI::SQL;
 
 #-------------------------------------------------------------------
 sub _submenu {
-        my (%menu);
-        tie %menu, 'Tie::IxHash';
-	$menu{WebGUI::URL::page("op=viewActiveSessions")} = WebGUI::International::get(423);
-	$menu{WebGUI::URL::page("op=viewLoginHistory")} = WebGUI::International::get(424);
-	$menu{WebGUI::URL::page("op=viewPageReport")} = WebGUI::International::get(796);
-#	$menu{WebGUI::URL::page("op=viewTrafficReport")} = WebGUI::International::get(797);
-	$menu{WebGUI::URL::page('op=viewStatistics')} = WebGUI::International::get(144);
-        return menuWrapper($_[0],\%menu);
-}
-
-#-------------------------------------------------------------------
-sub www_killSession {
-        return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
-	WebGUI::Session::end($session{form}{sid});
-	return www_viewActiveSessions();
-}
-
-#-------------------------------------------------------------------
-sub www_viewActiveSessions {
-        return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
-	my ($output, $p, @row, $i, $sth, %data);
-	tie %data, 'Tie::CPHash';
-        $output = '<h1>'.WebGUI::International::get(425).'</h1>';
-	$sth = WebGUI::SQL->read("select users.username,users.userId,userSession.sessionId,userSession.expires,
-		userSession.lastPageView,userSession.lastIP from users,userSession where users.userId=userSession.userId
-		and users.userId<>1 order by users.username,userSession.lastPageView desc");
-	while (%data = $sth->hash) {
-                $row[$i] = '<tr class="tableData"><td>'.$data{username}.' ('.$data{userId}.')</td>';
-                $row[$i] .= '<td>'.$data{sessionId}.'</td>';
-                $row[$i] .= '<td>'.epochToHuman($data{expires}).'</td>';
-                $row[$i] .= '<td>'.epochToHuman($data{lastPageView}).'</td>';
-                $row[$i] .= '<td>'.$data{lastIP}.'</td>';
-		$row[$i] .= '<td align="center">'.deleteIcon("op=killSession&sid=$data{sessionId}").'</td></tr>';
-                $i++;
+	my $workarea = shift;
+	my $title = shift;
+	$title = WebGUI::International::get($title) if ($title);
+	my $ac = WebGUI::AdminConsole->new;
+	$ac->setAdminFunction("statistics");
+	if ($session{setting}{trackPageStatistics}) {
+		$ac->addSubmenuItem( WebGUI::URL::page("op=viewPageReport"), WebGUI::International::get(796));
+#		$ac->addSubmenuItem( WebGUI::URL::page("op=viewTrafficReport"), WebGUI::International::get(797));
+		$ac->addSubmenuItem( WebGUI::URL::page('op=viewStatistics'), WebGUI::International::get(144));
 	}
-	$sth->finish;
-	$p = WebGUI::Paginator->new(WebGUI::URL::page('op=viewActiveSessions'));
-	$p->setDataByArrayRef(\@row);
-        $output .= '<table border=1 cellpadding=5 cellspacing=0 align="center">';
-        $output .= '<tr class="tableHeader"><td>'.WebGUI::International::get(428).'</td>';
-        $output .= '<td>'.WebGUI::International::get(435).'</td>';
-        $output .= '<td>'.WebGUI::International::get(432).'</td>';
-        $output .= '<td>'.WebGUI::International::get(430).'</td>';
-        $output .= '<td>'.WebGUI::International::get(431).'</td>';
-	$output .= '<td>'.WebGUI::International::get(436).'</td></tr>';
-        $output .= $p->getPage($session{form}{pn});
-        $output .= '</table>';
-        $output .= $p->getBarTraditional($session{form}{pn});
-	return _submenu($output);
-}
-
-#-------------------------------------------------------------------
-sub www_viewLoginHistory {
-        return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
-	my ($output, $p, @row, $i, $sth, %data);
-	tie %data, 'Tie::CPHash';
-        $output = '<h1>'.WebGUI::International::get(426).'</h1>';
-	$sth = WebGUI::SQL->read("select * from users,userLoginLog where users.userId=userLoginLog.userId order by userLoginLog.timeStamp desc");	
-	while (%data = $sth->hash) {
-		$data{username} = 'unknown user' if ($data{userId} eq "0");
-		$row[$i] = '<tr class="tableData"><td>'.$data{username}.' ('.$data{userId}.')</td>';
-		$row[$i] .= '<td>'.$data{status}.'</td>';
-		$row[$i] .= '<td>'.epochToHuman($data{timeStamp},"%H:%n%p %M/%D/%y").'</td>';
-		$row[$i] .= '<td>'.$data{ipAddress}.'</td>';
-		$row[$i] .= '<td>'.$data{userAgent}.'</td></tr>';
-		$i++;
-	}
-	$sth->finish;
-	$p = WebGUI::Paginator->new(WebGUI::URL::page('op=viewLoginHistory'));
-	$p->setDataByArrayRef(\@row);
-	$output .= '<table border=1 cellpadding=5 cellspacing=0 align="center">';
-	$output .= '<tr class="tableHeader"><td>'.WebGUI::International::get(428).'</td>';
-	$output .= '<td>'.WebGUI::International::get(434).'</td>';
-	$output .= '<td>'.WebGUI::International::get(429).'</td>';
-	$output .= '<td>'.WebGUI::International::get(431).'</td>';
-	$output .= '<td>'.WebGUI::International::get(433).'</td></tr>';
-        $output .= $p->getPage($session{form}{pn});
-        $output .= '</table>';
-        $output .= $p->getBar($session{form}{pn});
-	return _submenu($output);
+        return $ac->render($workarea, $title);
 }
 
 #-------------------------------------------------------------------
@@ -111,7 +39,6 @@ sub www_viewPageReport {
         return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
 	my ($output, $count, $user, $data, $sth, %page, $pageId);
 	tie %page, "Tie::IxHash";
-	$output = '<h1>Page Statistics</h1>';
 	unless ($session{setting}{trackPageStatistics}) {
 		$output .= WebGUI::International::get(802);
 	} else {
@@ -146,7 +73,7 @@ sub www_viewPageReport {
 		}
 		$output .= '</table>';
 	}
-	return _submenu($output);
+	return _submenu($output,"page statistics");
 }
 
 #-------------------------------------------------------------------
@@ -160,9 +87,8 @@ sub www_viewStatistics {
 		$version = $cache->setByHTTP($url,43200);
 	}
 	chomp $version;
-        $output .= '<h1>'.WebGUI::International::get(437).'</h1>';
 	$output .= '<table>';
-	$output .= '<tr><td align="right" class="tableHeader">'.WebGUI::International::get(145).':</td><td class="tableData">'.$WebGUI::VERSION.'</td></tr>';
+	$output .= '<tr><td align="right" class="tableHeader">'.WebGUI::International::get(145).':</td><td class="tableData">'.$WebGUI::VERSION.'-'.$WebGUI::STATUS.'</td></tr>';
 	if ($version ne $WebGUI::VERSION) {
 		my @rev = split(/\./,$version);
 		

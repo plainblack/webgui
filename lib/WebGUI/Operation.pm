@@ -77,6 +77,7 @@ Returns a hash reference containing operation and package names.
 
 sub getOperations {
 	return {
+	  'adminConsole' => 'WebGUI::Operation::Admin',
           'switchOffAdmin' => 'WebGUI::Operation::Admin',
           'switchOnAdmin' => 'WebGUI::Operation::Admin',
           'auth' => 'WebGUI::Operation::Auth',
@@ -200,9 +201,9 @@ sub getOperations {
           'viewPageReport' => 'WebGUI::Operation::Statistics',
           'viewStatistics' => 'WebGUI::Operation::Statistics',
           'viewTrafficReport' => 'WebGUI::Operation::Statistics',
-          'killSession' => 'WebGUI::Operation::Statistics',
-          'viewLoginHistory' => 'WebGUI::Operation::Statistics',
-          'viewActiveSessions' => 'WebGUI::Operation::Statistics',
+          'killSession' => 'WebGUI::Operation::ActiveSessions',
+          'viewLoginHistory' => 'WebGUI::Operation::LoginHistory',
+          'viewActiveSessions' => 'WebGUI::Operation::ActiveSessions',
           'makePrintable' => 'WebGUI::Operation::Style',
           'setPersonalStyle' => 'WebGUI::Operation::Style',
           'unsetPersonalStyle' => 'WebGUI::Operation::Style',

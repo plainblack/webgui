@@ -182,6 +182,12 @@ our $I18N = {
 		lastUpdated => 1077078526
 	},
 
+	'navigation' => {
+		message => q|Navigation|,
+		lastUpdated => 1077078526,
+		context => q|Title of the navigation manager in the admin console.|
+	},
+
 };
 
 1;

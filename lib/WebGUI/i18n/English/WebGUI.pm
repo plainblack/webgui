@@ -118,7 +118,8 @@ our $I18N = {
 
 	'437' => {
 		message => q|Statistics|,
-		lastUpdated => 1031514049
+		lastUpdated => 1031514049,
+                context => q|Title of the statistics viewer for the admin console.|
 	},
 
 	'463' => {
@@ -330,8 +331,8 @@ The URL of the web site for this theme's designer. If you are in the business of
 	},
 
 	'948' => {
-		message => q|Manage Clipboard|,
-		lastUpdated => 1052850265
+		message => q|Clipboard|,
+		lastUpdated => 1099360884 
 	},
 
 	'378' => {
@@ -2687,17 +2688,13 @@ Settings relating to users (beyond profile information), like authentication inf
 
 	'426' => {
 		message => q|Login History|,
-		lastUpdated => 1031514049
+		lastUpdated => 1031514049,
+                context => q|Title of the login history viewer for the admin console.|
 	},
 
 	'542' => {
 		message => q|Previous..|,
 		lastUpdated => 1031514049
-	},
-
-	'996' => {
-		message => q|Manage Database Links|,
-		lastUpdated => 1056151382
 	},
 
 	'369' => {
@@ -3549,7 +3546,8 @@ Loops come with special condition variables of their own. They are __FIRST__, __
 
 	'425' => {
 		message => q|Active Sessions|,
-		lastUpdated => 1031514049
+		lastUpdated => 1031514049,
+                context => q|Title of the active sessions manager for the admin console.|
 	},
 
 	'745' => {
@@ -3787,11 +3785,6 @@ You also cannot import a theme from a version of WebGUI that is newer than the o
 
 	'368' => {
 		message => q|Add a new group to this user.|,
-		lastUpdated => 1031514049
-	},
-
-	'424' => {
-		message => q|View login history.|,
 		lastUpdated => 1031514049
 	},
 
@@ -5177,11 +5170,6 @@ You can organize collateral into different folders, but names must be unique, ev
 		lastUpdated => 1068703399
 	},
 
-	'423' => {
-		message => q|View active sessions.|,
-		lastUpdated => 1031514049
-	},
-
 	'612' => {
 		message => q|There is no need to ever actually delete a user. If you are concerned with locking out a user, then simply change their password. If you truely wish to delete a user, then please keep in mind that there are consequences. If you delete a user any content that they added to the site via wobjects (like message boards and user contributions) will remain on the site. However, if another user tries to visit the deleted user's profile they will get an error message. Also if the user ever is welcomed back to the site, there is no way to give him/her access to his/her old content items except by re-adding the user to the users table manually.
 <p>
@@ -5912,8 +5900,8 @@ Start typing! Or better yet, copy the snippet from some other electronic documen
 	},
 
 	'955' => {
-		message => q|Manage System Clipboard|,
-		lastUpdated => 1052850265
+		message => q|System Clipboard|,
+		lastUpdated => 1099360884
 	},
 
 	'407' => {
@@ -7463,6 +7451,79 @@ config file.</p>
 		lastUpdated =>1092930637,
                 context => q|Label of the cancel button|
         },
+
+	'users' => {
+		message => q|Users|,
+		lastUpdated =>1092930637,
+                context => q|Title of the user manager for the admin console.|
+        },
+
+	'trash' => {
+		message => q|Trash|,
+		lastUpdated =>1092930637,
+                context => q|Title of the trash manager for the admin console.|
+        },
+
+	'databases' => {
+		message => q|Databases|,
+		lastUpdated =>1092930637,
+                context => q|Title of the database manager for the admin console.|
+        },
+	
+	'groups' => {
+		message => q|Groups|,
+		lastUpdated =>1092930637,
+                context => q|Title of the group manager for the admin console.|
+        },
+	
+	'packages' => {
+		message => q|Packages|,
+		lastUpdated =>1092930637,
+                context => q|Title of the package manager for the admin console.|
+        },
+	
+	'settings' => {
+		message => q|Settings|,
+		lastUpdated =>1092930637,
+                context => q|Title of the settings manager for the admin console.|
+        },
+	
+	'templates' => {
+		message => q|Templates|,
+		lastUpdated =>1092930637,
+                context => q|Title of the templates manager for the admin console.|
+        },
+	
+	'themes' => {
+		message => q|Themes|,
+		lastUpdated =>1092930637,
+                context => q|Title of the themes manager for the admin console.|
+        },
+	
+	'help' => {
+		message => q|Help|,
+		lastUpdated =>1092930637,
+                context => q|Title of the help index for the admin console.|
+        },
+	
+	'content filters' => {
+		message => q|Content Filters|,
+		lastUpdated =>1092930637,
+                context => q|Title of the content filters manager for the admin console.|
+        },
+	
+	'user profile settings' => {
+		message => q|User Profile Settings|,
+		lastUpdated =>1092930637,
+                context => q|Title of the user profile settings manager for the admin console.|
+        },
+	
+	'page statistics' => {
+		message => q|Page Statistics|,
+		lastUpdated =>1092930637,
+                context => q|Title of the page statistics viewer for the admin console.|
+        },
+	
 
 };
 

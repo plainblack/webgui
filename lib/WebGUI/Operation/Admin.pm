@@ -11,9 +11,17 @@ package WebGUI::Operation::Admin;
 #-------------------------------------------------------------------
 
 use strict;
+use WebGUI::AdminConsole;
 use WebGUI::Grouping;
 use WebGUI::Session;
 use WebGUI::SQL;
+
+#-------------------------------------------------------------------
+sub www_adminConsole {
+	return "" unless (WebGUI::Grouping::isInGroup(12));
+	my $ac = WebGUI::AdminConsole->new;
+	return $ac->render;
+}
 
 #-------------------------------------------------------------------
 sub www_switchOffAdmin {

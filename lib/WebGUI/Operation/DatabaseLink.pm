@@ -12,12 +12,12 @@ package WebGUI::Operation::DatabaseLink;
 
 use strict;
 use Tie::CPHash;
+use WebGUI::AdminConsole;
 use WebGUI::DatabaseLink;
 use WebGUI::Grouping;
 use WebGUI::Icon;
 use WebGUI::Id;
 use WebGUI::International;
-use WebGUI::Operation::Shared;
 use WebGUI::Paginator;
 use WebGUI::Privilege;
 use WebGUI::Session;
@@ -26,16 +26,23 @@ use WebGUI::URL;
 
 #-------------------------------------------------------------------
 sub _submenu {
-        my (%menu);
-        tie %menu, 'Tie::IxHash';
-	$menu{WebGUI::URL::page('op=editDatabaseLink&dlid=new')} = WebGUI::International::get(982);
+        my $workarea = shift;
+        my $title = shift;
+        $title = WebGUI::International::get($title) if ($title);
+        my $help = shift;
+        my $ac = WebGUI::AdminConsole->new;
+        if ($help) {
+                $ac->setHelp($help);
+        }
+        $ac->setAdminFunction("databases");
+	$ac->addSubmenuItem(WebGUI::URL::page('op=editDatabaseLink&dlid=new'), WebGUI::International::get(982));
 	if (($session{form}{op} eq "editDatabaseLink" && $session{form}{dlid} ne "new") || $session{form}{op} eq "deleteDatabaseLink") {
-                $menu{WebGUI::URL::page('op=editDatabaseLink&dlid='.$session{form}{dlid})} = WebGUI::International::get(983);
-                $menu{WebGUI::URL::page('op=copyDatabaseLink&dlid='.$session{form}{dlid})} = WebGUI::International::get(984);
-		$menu{WebGUI::URL::page('op=deleteDatabaseLink&dlid='.$session{form}{dlid})} = WebGUI::International::get(985);
-		$menu{WebGUI::URL::page('op=listDatabaseLinks')} = WebGUI::International::get(986);
+                $ac->addSubmenuItem(WebGUI::URL::page('op=editDatabaseLink&dlid='.$session{form}{dlid}), WebGUI::International::get(983));
+                $ac->addSubmenuItem(WebGUI::URL::page('op=copyDatabaseLink&dlid='.$session{form}{dlid}), WebGUI::International::get(984));
+		$ac->addSubmenuItem(WebGUI::URL::page('op=deleteDatabaseLink&dlid='.$session{form}{dlid}), WebGUI::International::get(985));
+		$ac->addSubmenuItem(WebGUI::URL::page('op=listDatabaseLinks'), WebGUI::International::get(986));
 	}
-        return menuWrapper($_[0],\%menu);
+        return $ac->render($workarea, $title);
 }
 
 #-------------------------------------------------------------------
@@ -53,8 +60,6 @@ sub www_copyDatabaseLink {
 sub www_deleteDatabaseLink {
         return WebGUI::Privilege::insufficient unless (WebGUI::Grouping::isInGroup(3));
         my ($output);
-        $output .= helpIcon("database link delete");
-	$output .= '<h1>'.WebGUI::International::get(987).'</h1>';
         $output .= WebGUI::International::get(988).'<p>';
         foreach my $using (WebGUI::DatabaseLink::whatIsUsing($session{form}{dlid})) {
         	if ($using->{title}) {
@@ -69,7 +74,7 @@ sub www_deleteDatabaseLink {
 		.'">'.WebGUI::International::get(44).'</a>';
         $output .= '&nbsp;&nbsp;&nbsp;&nbsp;<a href="'.WebGUI::URL::page('op=listDatabaseLinks').
 		'">'.WebGUI::International::get(45).'</a></div>';
-        return _submenu($output);
+        return _submenu($output,"987","database link delete");
 }
 
 #-------------------------------------------------------------------
@@ -89,8 +94,6 @@ sub www_editDatabaseLink {
 	} else {
                	%db = WebGUI::SQL->quickHash("select * from databaseLink where databaseLinkId=".quote($session{form}{dlid}));
 	}
-        $output .= helpIcon("database link add/edit");
-	$output .= '<h1>'.WebGUI::International::get(990).'</h1>';
 	$f = WebGUI::HTMLForm->new;
         $f->hidden("op","editDatabaseLinkSave");
         $f->hidden("dlid",$session{form}{dlid});
@@ -101,7 +104,7 @@ sub www_editDatabaseLink {
         $f->password("identifier",WebGUI::International::get(995),$db{identifier});
         $f->submit;
 	$output .= $f->print;
-        return _submenu($output);
+        return _submenu($output,"990","database link add/edit");
 }
 
 #-------------------------------------------------------------------
@@ -120,8 +123,6 @@ sub www_editDatabaseLinkSave {
 sub www_listDatabaseLinks {
         return WebGUI::Privilege::adminOnly() unless(WebGUI::Grouping::isInGroup(3));
         my ($output, $p, $sth, %data, @row, $i);
-        $output = helpIcon("database links manage");
-	$output .= '<h1>'.WebGUI::International::get(996).'</h1>';
         $sth = WebGUI::SQL->read("select * from databaseLink order by title");
 	$row[$i] = '<tr><td valign="top" class="tableData"></td><td valign="top" class="tableData">'.WebGUI::International::get(1076).'</td></tr>';
 	$i++;
@@ -141,7 +142,7 @@ sub www_listDatabaseLinks {
         $output .= $p->getPage;
         $output .= '</table>';
         $output .= $p->getBarTraditional;
-        return _submenu($output);
+        return _submenu($output,"database links manage");
 }
 
 

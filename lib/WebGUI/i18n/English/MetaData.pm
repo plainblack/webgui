@@ -76,6 +76,12 @@ our $I18N = {
 		lastUpdated => 1089039511
 	},
 
+	'content profiling' => {
+		message => q|Content Profiling|,
+		lastUpdated => 1089039511,
+		context => q|The title of the content profiling manager for the admin console.|
+	},
+
 };
 
 1;

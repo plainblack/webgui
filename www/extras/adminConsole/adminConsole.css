@@ -1,0 +1,77 @@
+
+.adminConsoleTitleIcon {
+	position: absolute;
+	top: 0px;
+	left: 20px;
+	width: 72px;
+	height: 72px;
+	text-align: center;
+ 	border: 1px solid #ddd;
+}
+
+.adminConsoleTitle {
+	position: absolute;
+	top: 0px;
+	left: 102px;
+	font-size: 60px;
+	text-align: left;
+}
+
+.adminConsoleWorkArea {
+ 	border: 1px solid #ddd;
+	margin: 90px 220px 50px 10px;
+	padding: 5px;
+}
+
+.adminConsoleMenu {
+	position: absolute;
+	top: 85px;
+	right: 20px;
+	width: 180px;
+/* 	border: 1px solid #ddd; 
+	padding: 5px; */
+}
+
+.adminConsoleMainMenu {
+ 	border: 1px solid #ddd;
+	padding: 5px;
+	margin: 5px;
+}
+
+.adminConsoleSubmenu {
+ 	border: 1px solid #ddd;
+	padding: 5px;
+	margin: 5px;
+}
+
+.adminConsoleUtilityMenu {
+ 	border: 1px solid #ddd;
+	padding: 5px;
+	margin: 5px;
+}
+
+.adminConsoleHidden {
+	display: none;
+	height: 0px;
+}
+
+.adminConsoleApplication {
+	float: left;
+	padding: 15px;
+	text-align: center;
+	width: 100px;
+}
+
+.adminConsoleSpacer {
+	clear: both;
+}
+
+.adminConsoleToggle {
+	display: block;
+}
+
+.adminConsoleHelpIcon {
+	position: absolute;
+	top: 85px;
+	right: 220px;
+}

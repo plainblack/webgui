@@ -1,4 +1,5 @@
 6.3.0
+ - Added a new, more user-friendly administrative console.
  - bugfix [ 1045114 ] Columns randomly ordered in SQLReport (Len Kranendonk ,
    tnx brother for reporting)
  - Sped up Navigation.pm
@@ -19,6 +20,7 @@
  - bugfix [ 991070 ] 5.5.4 Editor(s) replacing ^ symbol
  - bugfix [ 1022287 ] WYSIWYG-Editor Add new web link
  - bugfix [ 1055153 ] Turn Admin ON with SSL and IE.
+ - Fixed a redirect loop problem.
 
 
 6.2.8
