@@ -42,6 +42,7 @@ sub www_editUserSettings {
                 $f->integer("sessionTimeout",WebGUI::International::get(142),$session{setting}{sessionTimeout});
                 $f->yesNo("anonymousRegistration",WebGUI::International::get(118),$session{setting}{anonymousRegistration});
                 $f->yesNo("alertOnNewUser",WebGUI::International::get(534),$session{setting}{alertOnNewUser});
+                $f->text("runOnRegistration",WebGUI::International::get(559),$session{setting}{runOnRegistration});
 		$f->group("onNewUserAlertGroup",WebGUI::International::get(535),[$session{setting}{onNewUserAlertGroup}]);
                 $f->yesNo("useKarma",WebGUI::International::get(539),$session{setting}{useKarma});
                 $f->integer("karmaPerLogin",WebGUI::International::get(540),$session{setting}{karmaPerLogin});
@@ -74,6 +75,7 @@ sub www_editUserSettingsSave {
 		_saveSetting("ldapPasswordName");
 		_saveSetting("anonymousRegistration");
 		_saveSetting("usernameBinding");
+		_saveSetting("runOnRegistration");
                 return www_manageSettings();
         } else {
                 return WebGUI::Privilege::adminOnly();

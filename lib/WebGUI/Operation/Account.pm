@@ -19,6 +19,7 @@ use WebGUI::DateTime;
 use WebGUI::ErrorHandler;
 use WebGUI::HTMLForm;
 use WebGUI::International;
+use WebGUI::Macro;
 use WebGUI::Mail;
 use WebGUI::MessageLog;
 use WebGUI::Paginator;
@@ -253,6 +254,7 @@ sub www_createAccountSave {
 		}
                 WebGUI::Session::start($u->userId);
 		_logLogin($u->userId,"success");
+		system(WebGUI::Macro::process($session{setting}{runOnRegistration})) if ($session{setting}{runOnRegistration} ne "");
 		WebGUI::MessageLog::addInternationalizedEntry('',$session{setting}{onNewUserAlertGroup},'',536) if ($session{setting}{alertOnNewUser});
         } else {
                 $output = "<h1>".WebGUI::International::get(70)."</h1>".$error.www_createAccount();
