@@ -489,6 +489,26 @@ sub www_editSubmission {
 		name=>"userDefined5",
 		value=>$submission->{userDefined5}
 		});
+	$var{'userDefined1.form.htmlarea'} = WebGUI::Form::HTMLArea({
+		name=>"userDefined1",
+		value=>$submission->{userDefined1}
+		});
+	$var{'userDefined2.form.htmlarea'} = WebGUI::Form::HTMLArea({
+		name=>"userDefined2",
+		value=>$submission->{userDefined2}
+		});
+	$var{'userDefined3.form.htmlarea'} = WebGUI::Form::HTMLArea({
+		name=>"userDefined3",
+		value=>$submission->{userDefined3}
+		});
+	$var{'userDefined4.form.htmlarea'} = WebGUI::Form::HTMLArea({
+		name=>"userDefined4",
+		value=>$submission->{userDefined4}
+		});
+	$var{'userDefined5.form.htmlarea'} = WebGUI::Form::HTMLArea({
+		name=>"userDefined5",
+		value=>$submission->{userDefined5}
+		});
 	$var{'userDefined1.value'} = $submission->{userDefined1};
 	$var{'userDefined2.value'} = $submission->{userDefined2};
 	$var{'userDefined3.value'} = $submission->{userDefined3};
