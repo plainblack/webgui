@@ -883,7 +883,6 @@ sub www_edit {
 		($var{'preview.synopsis'}, $var{'preview.content'}) = $self->getSynopsisAndContentFromFormPost;
 		$var{'preview.content'} = $self->formatContent($var{'preview.content'},$session{form}{contentType});
 	}
-	$var{'form.preview'} = WebGUI::Form::submit({value=>"Preview"});
 	$var{'form.footer'} = WebGUI::Form::formFooter();
 	$var{usePreview} = $self->getThread->getParent->get("usePreview");
 	$var{'user.isVisitor'} = ($session{user}{userId} eq '1');
@@ -936,7 +935,7 @@ sub www_edit {
 			});
 	}
 	$var{'form.submit'} = WebGUI::Form::submit({
-		extras=>"onclick=\"this.value='".WebGUI::International::get(452)."';tinyMCE.triggerSave(); this.form.func.value='editSave'; this.form.submit();\""
+		extras=>"onclick=\"this.value='".WebGUI::International::get(452)."'; this.form.func.value='editSave'; this.form.submit();\""
 		});
 	$var{'form.preview'} = WebGUI::Form::submit({
 		value=>WebGUI::International::get("preview","Collaboration")

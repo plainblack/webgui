@@ -259,7 +259,10 @@ sub cascadeLineage {
 	my $oldLineage = shift || $self->get("lineage");
 	WebGUI::Cache->new($self->getId)->deleteByRegex(/^asset_/);
 	WebGUI::Cache->new($self->getId)->deleteByRegex(/^lineage_$oldLineage/);
-	WebGUI::SQL->write("update asset set lineage=concat(".quote($newLineage).", lastUpdatedBy=".quote($session{user}{userId}).", lastUpdated=".time().", substring(lineage from ".(length($oldLineage)+1).")) 
+	WebGUI::SQL->write("update asset set 
+		lineage=concat(".quote($newLineage).",substring(lineage from ".(length($oldLineage)+1).")), 
+		lastUpdatedBy=".quote($session{user}{userId}).", 
+		lastUpdated=".time()." 
 		where lineage like ".quote($oldLineage.'%'));
 }
 
@@ -770,7 +773,7 @@ sub getAssetManagerControl {
 		';
 	$output .= "<script>\n";
 	$output .= "/* assetId, url, title */\nvar crumbtrail = [\n";
-	my $ancestors = $self->getLineage(["self","ancestors"],{returnObjects=>1});
+	my $ancestors = $self->getLineage(["self","ancestors"],{returnQuickReadObjects=>1});
 	my @dataArray;
 	foreach my $ancestor (@{$ancestors}) {
 		my $title = $ancestor->get("title");
@@ -1846,7 +1849,7 @@ sub paste {
 	my $self = shift;
 	my $assetId = shift;
 	my $pastedAsset = WebGUI::Asset->new($assetId);	
-	if ($self->getId eq $pastedAsset->get("parentId") || $pastedAsset->setParent($self->getId)) {
+	if ($self->getId eq $pastedAsset->get("parentId") || $pastedAsset->setParent($self)) {
 		$pastedAsset->republish;
 		$pastedAsset->updateHistory("pasted to parent ".$self->getId);
 		return 1;
@@ -2003,31 +2006,31 @@ sub purgeTree {
 
 #-------------------------------------------------------------------
 
-=head2 setParent ( newParentId )
+=head2 setParent ( newParent )
 
-Moves an asset to a new Parent specified by newParentId and returns 1, otherwise returns 0.
+Moves an asset to a new Parent and returns 1 if successful, otherwise returns 0.
 
-=head3 newParentId
+=head3 newParent
 
-String representing new parentId of Asset. newParentId must not be the same as the assetId, nor the same as the Asset's current parentId. 
+An asset object reference representing the new parent to paste the asset to.
 
 =cut
 
 sub setParent {
 	my $self = shift;
-	my $newParentId = shift;
-	return 0 if ($newParentId eq $self->get("parentId")); # don't move it to where it already is
-	return 0 if ($newParentId eq $self->getId); # don't move it to itself
-	my $parent = WebGUI::Asset->new($newParentId);
-	if (defined $parent) {
+	my $newParent = shift;
+	return 0 unless (defined $newParent); # can't move it if a parent object doesn't exist
+	return 0 if ($newParent->getId eq $self->get("parentId")); # don't move it to where it already is
+	return 0 if ($newParent->getId eq $self->getId); # don't move it to itself
+	if (defined $newParent) {
 		my $oldLineage = $self->get("lineage");
-		my $lineage = $parent->get("lineage").$parent->getNextChildRank; 
+		my $lineage = $newParent->get("lineage").$newParent->getNextChildRank; 
 		return 0 if ($lineage =~ m/^$oldLineage/); # can't move it to its own child
 		WebGUI::SQL->beginTransaction;
-		WebGUI::SQL->write("update asset set parentId=".quote($parent->getId).", lastUpdatedBy=".quote($session{user}{userId}).", lastUpdated=".time()." where assetId=".quote($self->getId));
+		WebGUI::SQL->write("update asset set parentId=".quote($newParent->getId).", lastUpdatedBy=".quote($session{user}{userId}).", lastUpdated=".time()." where assetId=".quote($self->getId));
 		$self->cascadeLineage($lineage);
 		WebGUI::SQL->commit;
-		$self->updateHistory("moved to parent ".$parent->getId);
+		$self->updateHistory("moved to parent ".$newParent->getId);
 		$self->{_properties}{lineage} = $lineage;
 		return 1;
 	}
@@ -2191,9 +2194,9 @@ sub update {
                 }
                 if (scalar(@setPairs) > 0) {
                         WebGUI::SQL->write("update ".$definition->{tableName}." set ".join(",",@setPairs)." where assetId=".quote($self->getId));
+        		$self->setSize;
                 }
         }
-        $self->setSize;
         WebGUI::SQL->commit;
         return 1;
 }
@@ -2222,8 +2225,8 @@ sub updateHistory {
 	WebGUI::SQL->beginTransaction;
 	WebGUI::SQL->write("insert into assetHistory (assetId, userId, actionTaken, dateStamp) values (
 		".quote($self->getId).", ".quote($userId).", ".quote($action).", ".$dateStamp.")");
+	WebGUI::SQL->write("update asset set lastUpdated=".$dateStamp.", lastUpdatedBy=".quote($userId)." where assetId=".quote($self->getId));
 	WebGUI::SQL->commit;
-	$self->update({lastUpdated=>$dateStamp,lastUpdatedBy=>$userId});
 }
 
 #-------------------------------------------------------------------
@@ -3011,7 +3014,7 @@ Main page to manage assets. Renders an AdminConsole with a list of assets. If ca
 sub www_manageAssets {
 	my $self = shift;
 	return WebGUI::Privilege::insufficient() unless $self->canEdit;
-	my $children = $self->getLineage(["children"],{returnObjects=>1});
+	my $children = $self->getLineage(["children"],{returnQuickReadObjects=>1});
 	my $output = $self->getAssetManagerControl($children);
 	$output .= ' <div class="adminConsoleSpacer">
             &nbsp;
@@ -3197,7 +3200,7 @@ Returns a www_manageAssets() method. Sets a new parent via the results of a form
 sub www_setParent {
 	my $self = shift;
 	return WebGUI::Privilege::insufficient() unless $self->canEdit;
-	my $newParent = $session{form}{assetId};
+	my $newParent = WebGUI::Asset->new($session{form}{assetId});
 	$self->setParent($newParent) if (defined $newParent);
 	return $self->www_manageAssets();
 

@@ -1,4 +1,9 @@
 6.5.1
+ - Fixed a bug in the lineage tree that caused funky ranks to be created when
+   pasting assets.
+ - Fixed a bug in the collaboration system that caused posts to not post
+   unless rich edit was turned on.
+ - Improved pasting performance.
  - fix [ 1157196 ] manage system clipboard wrong title
  - fix [ 1154150 ] No time in forum overview
 
