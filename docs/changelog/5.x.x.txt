@@ -14,6 +14,7 @@
  - Bugfix [ 889761 ] Editing Page/Wobject Settings Crashes Netscape 4
  - Bugfix [ 878601 ] ui level and page owner bug
  - Bugfix [ 881586 ] Forum overview
+ - bugfix [ 881599 ] edit Posts
 
 
 5.5.4
