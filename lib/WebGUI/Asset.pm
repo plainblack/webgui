@@ -2634,8 +2634,8 @@ sub www_editTreeSave {
 	my ($urlBaseBy, $urlBase, $endOfUrl);
 	my $changeUrl = WebGUI::FormProcessor::yesNo("change_url");
 	if ($changeUrl) {
-		$urlBaseBy = WebGUI::FormProcessor::selectList("urlBaseBy");
-		$urlBase = WebGUI::FormProcessor::text("urlBase");
+		$urlBaseBy = WebGUI::FormProcessor::selectList("baseUrlBy");
+		$urlBase = WebGUI::FormProcessor::text("baseUrl");
 		$endOfUrl = WebGUI::FormProcessor::selectList("endOfUrl");
 	}
 	my $descendants = $self->getLineage(["self","descendants"],{returnObjects=>1});	
@@ -2645,7 +2645,7 @@ sub www_editTreeSave {
 			if ($urlBaseBy eq "parentUrl") {
 				delete $descendant->{_parent};
 				$data{url} = $descendant->getParent->get("url")."/";
-			} elsif ($urlBaseBy eq "specifiedUrl") {
+			} elsif ($urlBaseBy eq "specifiedBase") {
 				$data{url} = $urlBase."/";
 			} else {
 				$data{url} = "";
