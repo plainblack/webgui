@@ -16,6 +16,7 @@ use WebGUI::International;
 use WebGUI::Operation::Account ();
 use WebGUI::Session;
 use WebGUI::SQL;
+use WebGUI::URL;
 
 #-------------------------------------------------------------------
 sub adminOnly {
@@ -24,9 +25,9 @@ sub adminOnly {
         $output = '<h1>'.WebGUI::International::get(35).'</h1>';
 	$output .= WebGUI::International::get(36);
 	$output .= '<ul>';
-	$sth = WebGUI::SQL->read("select users.username, users.email from users,groupings where users.userId=groupings.userId and groupings.groupId=3 order by users.username");
+	$sth = WebGUI::SQL->read("select users.username,users.userId from users,groupings where users.userId=groupings.userId and groupings.groupId=3 order by users.username");
 	while (@data = $sth->array) {
-		$output .= '<li>'.$data[0].' (<a href="mailto:'.$data[1].'">'.$data[1].'</a>)';
+		$output .= '<li><a href="'.WebGUI::URL::page('op=viewProfile&uid='.$data[1]).'">'.$data[0].'</a>';
 	}
 	$sth->finish;
 	$output .= '</ul><p>';
