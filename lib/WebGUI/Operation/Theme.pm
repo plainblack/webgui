@@ -13,6 +13,7 @@ package WebGUI::Operation::Theme;
 use strict;
 use Tie::IxHash;
 use Tie::CPHash;
+use WebGUI::AdminConsole;
 use WebGUI::Attachment;
 use WebGUI::Collateral;
 use WebGUI::Grouping;
@@ -22,7 +23,6 @@ use WebGUI::Icon;
 use WebGUI::Id;
 use WebGUI::International;
 use WebGUI::Node;
-use WebGUI::Operation::Shared;
 use WebGUI::Paginator;
 use WebGUI::Privilege;
 use WebGUI::Session;
@@ -46,18 +46,26 @@ sub _getComponentTypes {
 
 #-------------------------------------------------------------------
 sub _submenu {
-        my (%menu);
-        tie %menu, 'Tie::IxHash';
-	$menu{WebGUI::URL::page('op=editTheme&themeId=new')} = WebGUI::International::get(901);
-	$menu{WebGUI::URL::page('op=importTheme')} = WebGUI::International::get(924);
+        my $workarea = shift;
+        my $title = shift;
+        $title = WebGUI::International::get($title) if ($title);
+        my $help = shift;
+        my $ac = WebGUI::AdminConsole->new;
+        if ($help) {
+                $ac->setHelp($help);
+        }
+        $ac->setAdminFunction("themes");
+	$ac->addSubmenuItem(WebGUI::URL::page('op=editTheme&themeId=new'), WebGUI::International::get(901));
+	$ac->addSubmenuItem(WebGUI::URL::page('op=importTheme'), WebGUI::International::get(924));
 	unless (isIn($session{form}{op}, qw(deleteThemeConfirm viewTheme listThemes)) || $session{form}{themeId} eq "new") {
-                $menu{WebGUI::URL::page('op=editTheme&themeId='.$session{form}{themeId})} = WebGUI::International::get(919);
-		$menu{WebGUI::URL::page('op=deleteTheme&themeId='.$session{form}{themeId})} = WebGUI::International::get(918);
-		$menu{WebGUI::URL::page('op=exportTheme&themeId='.$session{form}{themeId})} = WebGUI::International::get(920);
+                $ac->addSubmenuItem(WebGUI::URL::page('op=editTheme&themeId='.$session{form}{themeId}), WebGUI::International::get(919));
+		$ac->addSubmenuItem(WebGUI::URL::page('op=deleteTheme&themeId='.$session{form}{themeId}), WebGUI::International::get(918));
+		$ac->addSubmenuItem(WebGUI::URL::page('op=exportTheme&themeId='.$session{form}{themeId}), WebGUI::International::get(920));
 	}
-	$menu{WebGUI::URL::page('op=listThemes')} = WebGUI::International::get(900);
-        return menuWrapper($_[0],\%menu);
+	$ac->addSubmenuItem(WebGUI::URL::page('op=listThemes'), WebGUI::International::get(900));
+        return $ac->render($workarea, $title);
 }
+
 
 #-------------------------------------------------------------------
 sub www_addThemeComponent {
@@ -67,7 +75,6 @@ sub www_addThemeComponent {
         push(@q,{query=>"select collateralType,collateralId,name from collateral where collateralType='file' order by name",type=>"file"});
         push(@q,{query=>"select collateralType,collateralId,name from collateral where collateralType='image' order by name",type=>"image"});
         push(@q,{query=>"select collateralType,collateralId,name from collateral where collateralType='snippet' order by name",type=>"snippet"});
-        $output .= '<h1>'.WebGUI::International::get(909).'</h1>';
 	my $selectList = '<select name="id" multiple="1" size="10">';
 	foreach my $row (@q) {
 		my $comp = WebGUI::SQL->buildHashRef($row->{query});
@@ -97,7 +104,7 @@ sub www_addThemeComponent {
                 );
         $f->submit;
         $output .= $f->print;
-        return _submenu($output);
+        return _submenu($output,"909");
 }
 
 #-------------------------------------------------------------------
@@ -118,15 +125,13 @@ sub www_addThemeComponentSave {
 #-------------------------------------------------------------------
 sub www_deleteTheme {
         return WebGUI::Privilege::insufficient unless (WebGUI::Grouping::isInGroup(9));
-        my $output = helpIcon("theme delete");
-	$output .= '<h1>'.WebGUI::International::get(42).'</h1>';
-        $output .= WebGUI::International::get(907).'<p>';
+        my $output = WebGUI::International::get(907).'<p>';
         $output .= '<div align="center"><a href="'.
 		WebGUI::URL::page('op=deleteThemeConfirm&themeId='.$session{form}{themeId})
 		.'">'.WebGUI::International::get(44).'</a>';
         $output .= '&nbsp;&nbsp;&nbsp;&nbsp;<a href="'.WebGUI::URL::page('op=listThemes').
 		'">'.WebGUI::International::get(45).'</a></div>';
-        return _submenu($output);
+        return _submenu($output,'42',"theme delete");
 }
 
 #-------------------------------------------------------------------
@@ -156,14 +161,13 @@ sub www_deleteThemeConfirm {
 #-------------------------------------------------------------------
 sub www_deleteThemeComponent {
         return WebGUI::Privilege::insufficient unless (WebGUI::Grouping::isInGroup(9));
-        my $output = '<h1>'.WebGUI::International::get(42).'</h1>';
-        $output .= WebGUI::International::get(908).'<p>';
+        my $output = WebGUI::International::get(908).'<p>';
         $output .= '<div align="center"><a href="'.
                 WebGUI::URL::page('op=deleteThemeComponentConfirm&themeId='.$session{form}{themeId})
                 .'&themeComponentId='.$session{form}{themeComponentId}.'">'.WebGUI::International::get(44).'</a>';
         $output .= '&nbsp;&nbsp;&nbsp;&nbsp;<a href="'.WebGUI::URL::page('op=listThemes').
                 '">'.WebGUI::International::get(45).'</a></div>';
-        return _submenu($output);
+        return _submenu($output,'42');
 }
 
 #-------------------------------------------------------------------
@@ -180,8 +184,6 @@ sub www_editTheme {
 	unless($session{form}{themeId} eq "new") {
                	$theme = WebGUI::SQL->quickHashRef("select * from theme where themeId=".quote($session{form}{themeId}));
 	}
-        $output .= helpIcon("theme add/edit");
-	$output .= '<h1>'.WebGUI::International::get(902).'</h1>';
 	$f = WebGUI::HTMLForm->new;
         $f->hidden("op","editThemeSave");
         $f->hidden("themeId",$session{form}{themeId});
@@ -231,7 +233,7 @@ sub www_editTheme {
 		}
 		$sth->finish;
 	}
-        return _submenu($output);
+        return _submenu($output,'902',"theme add/edit");
 }
 
 #-------------------------------------------------------------------
@@ -302,8 +304,6 @@ sub www_exportTheme {
 #-------------------------------------------------------------------
 sub www_importTheme {
         return WebGUI::Privilege::insufficient unless (WebGUI::Grouping::isInGroup(9));
-	my $output = helpIcon("theme import");
-	$output .= '<h1>'.WebGUI::International::get(927).'</h1>';
 	my $f = WebGUI::HTMLForm->new;
 	$f->hidden(
 		-name=>"op",
@@ -314,18 +314,15 @@ sub www_importTheme {
 		-label=>WebGUI::International::get(921)
 		);
 	$f->submit(WebGUI::International::get(929));
-	$output .= $f->print;
-	return _submenu($output);
+	return _submenu($f->print,'927',"theme import");
 }
 
 #-------------------------------------------------------------------
 sub www_importThemeValidate {
         return WebGUI::Privilege::insufficient unless (WebGUI::Grouping::isInGroup(9));
-	my $output = helpIcon("theme import");
-	$output .= '<h1>'.WebGUI::International::get(927).'</h1>';
 	my $a = WebGUI::Attachment->new("","temp");
 	my $filename = $a->save("themePackage");
-	return $output.WebGUI::International::get(935) unless ($filename =~ /\.theme.tar.gz$/);
+	return _submenu(WebGUI::International::get(935)) unless ($filename =~ /\.theme.tar.gz$/);
 	my $subnode = time();
 	my $extracted = WebGUI::Node->new("temp",$subnode);
 	$extracted->untar($filename);
@@ -361,16 +358,17 @@ sub www_importThemeValidate {
 		-label=>WebGUI::International::get(923),
 		-value=>$theme->{versionNumber}
 		);
+	my $output;
 	if ($theme->{webguiVersion} > $WebGUI::VERSION) {
-		$output .= WebGUI::International::get(926);
+		$output = WebGUI::International::get(926);
 	} elsif (isIn($theme->{name},@themes)) {
-		$output .= WebGUI::International::get(925);
+		$output = WebGUI::International::get(925);
 	} else {
-		$output .= WebGUI::International::get(928);
+		$output = WebGUI::International::get(928);
 		$f->submit(WebGUI::International::get(929));
 	}
 	$output .= "<p>".$f->print;
-	return _submenu($output);
+	return _submenu($output,'927',"theme import");
 }
 
 #-------------------------------------------------------------------
@@ -416,9 +414,7 @@ sub www_importThemeSave {
 #-------------------------------------------------------------------
 sub www_listThemes {
         return WebGUI::Privilege::insufficient unless (WebGUI::Grouping::isInGroup(9));
-        my (@data, @row, $i, $p);
-        my $output = helpIcon("themes manage");
-	$output .= '<h1>'.WebGUI::International::get(899).'</h1>';
+        my ($output,@data, @row, $i, $p);
         my $sth = WebGUI::SQL->read("select themeId,name,original from theme order by name");
         while (@data = $sth->array) {
                 $row[$i] = '<tr><td valign="top" class="tableData">'.deleteIcon('op=deleteTheme&themeId='.$data[0]);
@@ -438,7 +434,7 @@ sub www_listThemes {
 	$output .= $p->getPage($session{form}{pn});
 	$output .= '</table>';
 	$output .= $p->getBarTraditional($session{form}{pn});
-        return _submenu($output);
+        return _submenu($output,undef,"themes manage");
 }
 
 #-------------------------------------------------------------------
@@ -446,7 +442,6 @@ sub www_viewTheme {
         return WebGUI::Privilege::insufficient unless (WebGUI::Grouping::isInGroup(9));
         my ($output, $theme, $f);
         $theme = WebGUI::SQL->quickHashRef("select * from theme where themeId=".quote($session{form}{themeId}));
-        $output .= '<h1>'.WebGUI::International::get(930).'</h1>';
         $f = WebGUI::HTMLForm->new;
         $f->readOnly(
 		-value=>$session{form}{themeId},
@@ -492,7 +487,7 @@ sub www_viewTheme {
                                 $output .= $name.' ('.$componentTypes->{template}.')<br>';
                 }
                 $sth->finish;
-        return _submenu($output);
+        return _submenu($output,'930');
 }
 
 1;

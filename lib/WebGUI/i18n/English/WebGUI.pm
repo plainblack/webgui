@@ -3587,11 +3587,6 @@ The translated label for the link to the home page or the text that you supply t
 		lastUpdated => 1031514049
 	},
 
-	'899' => {
-		message => q|Manage Themes|,
-		lastUpdated => 1050189012
-	},
-
 	'865' => {
 		message => q|Notify user about expiration?|,
 		lastUpdated => 1044126938
