@@ -169,6 +169,11 @@ sub www_postSave {
 }
 
 #-------------------------------------------------------------------
+sub www_search {
+	return WebGUI::Discussion::search();
+}
+
+#-------------------------------------------------------------------
 sub www_showMessage {
 	my ($output, $submenu);
 	$submenu = '<a href="'.WebGUI::URL::page('func=post&replyTo='.$session{form}{mid}.'&wid='.$session{form}{wid})
@@ -179,6 +184,7 @@ sub www_showMessage {
                 $submenu .= '<a href="'.WebGUI::URL::page('func=deleteMessage&mid='.$session{form}{mid}.
                        	'&wid='.$session{form}{wid}).'">'.WebGUI::International::get(22,$namespace).'</a><br>';
 	}
+	$submenu .= '<a href="'.WebGUI::URL::page('func=search&wid='.$_[0]->get("wobjectId")).'">'.WebGUI::International::get(364).'</a><br>';
         $submenu .= '<a href="'.WebGUI::URL::page().'">'.WebGUI::International::get(11,$namespace).'</a><br>';
 	$output = WebGUI::Discussion::showMessage($submenu);
 	$output .= WebGUI::Discussion::showReplyTree();
@@ -199,7 +205,8 @@ sub www_view {
 	$html .= '<table width="100%" cellpadding=2 cellspacing=1 border=0><tr>'.
 		'<td align="right" valign="bottom" class="tableMenu"><a href="'.
 		WebGUI::URL::page('func=post&mid=new&wid='.$_[0]->get("wobjectId")).'">'.
-		WebGUI::International::get(17,$namespace).'</a></td></tr></table>';
+		WebGUI::International::get(17,$namespace).'</a> &middot; <a href="'.WebGUI::URL::page('func=search&wid='.$_[0]->get("wobjectId")).'">'
+			.WebGUI::International::get(364).'</a></td></tr></table>';
 	$html .= '<table border=0 cellpadding=2 cellspacing=1 width="100%">';
 	$html .= '<tr><td class="tableHeader">'.WebGUI::International::get(229).'</td>
 		<td class="tableHeader">'.WebGUI::International::get(15,$namespace).'</td>

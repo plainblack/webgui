@@ -101,7 +101,7 @@ sub epochToHuman {
 	$date[4]++; 		# offset the months starting from 0
 	$date[5] += 1900;	# original value is Year-1900
 	$date[6]++;		# offset for weekdays starting from 0
-	$output = $_[1];
+	$output = $_[1] || "%z %Z";
   #---dealing with percent symbol
 	$output =~ s/\%\%/\%/g;
   #---date format preference

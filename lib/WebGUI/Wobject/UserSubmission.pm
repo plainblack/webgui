@@ -130,7 +130,9 @@ sub _traditionalView {
         $sth->finish;
         $output .= '<table width="100%" cellpadding=2 cellspacing=1 border=0><tr>'.
                 '<td align="right" class="tableMenu"><a href="'.WebGUI::URL::page('func=editSubmission&sid=new&wid='.
-                $_[0]->get("wobjectId")).'">'.WebGUI::International::get(20,$namespace).'</a></td></tr></table>';
+                $_[0]->get("wobjectId")).'">'.WebGUI::International::get(20,$namespace).'</a> &middot; <a href="'
+		.WebGUI::URL::page('func=search&wid='.$_[0]->get("wobjectId")).'">'
+		.WebGUI::International::get(364).'</a></td></tr></table>';
         $p = WebGUI::Paginator->new(WebGUI::URL::page(),\@row,$_[0]->get("submissionsPerPage"));
         $output .= '<table width="100%" cellspacing=1 cellpadding=2 border=0>';
         $output .= '<tr><td class="tableHeader">'.WebGUI::International::get(99);
@@ -521,6 +523,64 @@ sub www_postSave {
 }
 
 #-------------------------------------------------------------------
+sub www_search {
+	if ($session{form}{sid} ne "") {
+		return WebGUI::Discussion::search();
+	} else {
+        	my ($p, $i, $output, $constraints, $image, $sql, $sth, %submission, @row, $url);
+        	$output = WebGUI::Search::form({wid=>"$session{form}{wid}",func=>'search'});
+        	$constraints = WebGUI::Search::buildConstraints([qw(username title content)]);
+        	if ($constraints ne "") {
+                	tie %submission, 'Tie::CPHash';
+                	$url = WebGUI::URL::page('func=search&wid='.$session{form}{wid}
+                        	.'&all='.WebGUI::URL::escape($session{form}{all})
+                        	.'&exactPhrase='.WebGUI::URL::escape($session{form}{exactPhrase}).'&atLeastOne='
+                        	.WebGUI::URL::escape($session{form}{atLeastOne}).'&numResults='.$session{form}{numResults}
+                        	.'&without='.WebGUI::URL::escape($session{form}{without}));
+                	$output .= '<table border=0 cellpadding=2 cellspacing=1 width="100%">';
+			$output .= '<tr><td class="tableHeader">'.WebGUI::International::get(99);
+        		if ($_[0]->get("displayThumbnails")) {
+                		$output .= '<td class="tableHeader">'.WebGUI::International::get(52,$namespace).'</td>';
+        		}
+        		$output .= '</td><td class="tableHeader">'.WebGUI::International::get(13,$namespace).
+                		'</td><td class="tableHeader">'.WebGUI::International::get(21,$namespace).'</td></tr>';
+                	$sql = "select * from UserSubmission_submission where wobjectId=$session{form}{wid} ";
+                	$sql .= " and ".$constraints." order by dateSubmitted desc";
+                	$sth = WebGUI::SQL->read($sql);
+                	while (%submission = $sth->hash) {
+				$submission{title} = WebGUI::HTML::filter($submission{title},'all');
+                		$row[$i] = '<tr><td class="tableData">
+                        		<a href="'.WebGUI::URL::page('wid='.$_[0]->get("wobjectId").'&func=viewSubmission&sid='
+					.$submission{submissionId}).'">'.$submission{title}.'</a>';
+                		if ($submission{userId} == $session{user}{userId}) {
+                        		$row[$i] .= ' ('.$submissionStatus{$submission{status}}.')';
+                		}
+                		$row[$i] .= '</td>';
+                		if ($_[0]->get("displayThumbnails")) {
+                        		if ($submission{image} ne "") {
+                                		$image = WebGUI::Attachment->new($submission{image},$_[0]->get("wobjectId"),$submission{submissionId});
+                                		$row[$i] .= '<td class="tableData"><a href="'.WebGUI::URL::page('wid='.$_[0]->get("wobjectId")
+						.'&func=viewSubmission&sid='
+                                        	.$submission{submissionId}).'"><img src="'.$image->getThumbnail.'" border="0"></a></td>';
+                        		} else {
+                                		$row[$i] .= '<td class="tableData"></td>';
+                       	 		}
+                		}
+                		$row[$i] .= '<td class="tableData">'.epochToHuman($submission{dateSubmitted},"%z").
+                        		'</td><td class="tableData"><a href="'.WebGUI::URL::page('op=viewProfile&uid='.
+                        		$submission{userId}).'">'.$submission{username}.'</a></td></tr>';
+                	}
+                	$sth->finish;
+                	$p = WebGUI::Paginator->new($url,\@row,$session{form}{numResults});
+                	$output .= $p->getPage($session{form}{pn});
+                	$output .= '</table>';
+                	$output .= $p->getBarTraditional($session{form}{pn});
+        	}
+        	return $output;
+	}
+}
+
+#-------------------------------------------------------------------
 sub www_showMessage {
         my ($submenu, $output);
         $submenu .= '<a href="'.WebGUI::URL::page('func=post&replyTo='.$session{form}{mid}.'&wid='.$session{form}{wid}.'&sid='.$session{form}{sid})
@@ -531,6 +591,8 @@ sub www_showMessage {
                 $submenu .= '<a href="'.WebGUI::URL::page('func=deleteMessage&mid='.$session{form}{mid}.
                                 '&wid='.$session{form}{wid}.'&sid='.$session{form}{sid}).'">'.WebGUI::International::get(43,$namespace).'</a><br>';
         }
+	$submenu .= '<a href="'.WebGUI::URL::page('func=search&sid='.$session{form}{sid}.'&wid='.$_[0]->get("wobjectId")).'">'
+		.WebGUI::International::get(364).'</a><br>';
         $submenu .= '<a href="'.WebGUI::URL::page('func=viewSubmission&wid='.$session{form}{wid}.
 		'&sid='.$session{form}{sid}).'">'.WebGUI::International::get(45,$namespace).'</a><br>';
         $submenu .= '<a href="'.WebGUI::URL::page().'">'.WebGUI::International::get(28,$namespace).'</a><br>';
@@ -595,6 +657,7 @@ sub www_viewSubmission {
 		$output .= '<a href="'.WebGUI::URL::page('func=post&mid=new&wid='.$_[0]->get("wobjectId")
 			.'&sid='.$session{form}{sid}).'">'.WebGUI::International::get(47,$namespace).'</a><br>';
 	}
+	$output .= '<a href="'.WebGUI::URL::page('func=search&wid='.$_[0]->get("wobjectId")).'">'.WebGUI::International::get(364).'</a><br>';
         $output .= '<a href="'.WebGUI::URL::page().'">'.WebGUI::International::get(28,$namespace).'</a><br>';
 	$output .= '</td</tr><tr><td class="tableData">';
   #---content

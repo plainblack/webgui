@@ -395,7 +395,7 @@ sub new {
 	$class = shift;
 	$currentURL = shift;
 	$rowRef = shift;
-	$rowsPerPage = shift || 50;
+	$rowsPerPage = shift || 25;
 	$formVar = shift || "pn";
 	$pageRef = _generatePages($rowRef,$rowsPerPage);
         bless {_url => $currentURL, _rpp => $rowsPerPage, _rowRef => $rowRef,
