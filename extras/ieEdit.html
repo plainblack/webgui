@@ -6,19 +6,13 @@ var L_INSERT_TEXT = "Insert";
 var L_LINKIMGBORDER_TEXT = "Display a border around the image link";
 var L_LINKSELECT_TEXT = "Select a community page: ";
 var L_LINKSELECTPAGE_TEXT = "Select Page";
-var L_LINKWEB_TEXT = "or type in a URL to a page on the Web: ";
-var L_PUTITLEBGCOLOR_TEXT = "Set the Background Color";
-var L_PUTITLEFONTFACE_TEXT = "Set the Font Style";
-var L_PUTITLEFONTSIZE_TEXT = "Set The Font Size";
-var L_PUTITLEIMAGE_TEXT = "Insert/ Edit Image";
-var L_PUTITLELINK_TEXT = "Insert/ Edit a link";
-var L_PUTITLENEWTABLE_TEXT = "Create/ Edit Table";
-var L_PUTITLEPARAGRAPHSTYLE_TEXT = "Set the Paragraph Style";
-var L_PUTITLETEXTCOLOR_TEXT = "Set the Text Color";
-var L_STYLEFORMATTED_TEXT = "Preformatted";
-var L_STYLEHEADING_TEXT = "Heading ";
-var L_STYLENORMAL_TEXT = "Normal";
-var L_STYLESAMPLE_TEXT = "Sample Text";
+var L_LINKWEB_TEXT = "Type in a URL below:";
+var L_PUTITLEFONTFACE_TEXT = "Font Family...";
+var L_PUTITLEFONTSIZE_TEXT = "Font Size...";
+var L_PUTITLELINK_TEXT = "Link...";
+var L_PUTITLENEWTABLE_TEXT = "Table...";
+var L_PUTITLETEXTCOLOR_TEXT = "Font Color...";
+var L_STYLESAMPLE_TEXT = "ABC abc 123";
 var L_TABLEBG_TEXT = "Background";
 var L_TABLEBORDERS_TEXT = "Borders";
 var L_TABLEINPUTBGCOLOR_TEXT = "Background Color: ";
@@ -35,20 +29,19 @@ var L_TABLEINSERTROW_TEXT = "Insert Row";
 var L_TABLEINSERTCELL_TEXT = "Insert Column";
 var L_TABLEINSERT_TEXT = "Insert Table";
 var L_TABLEUPDATE_TEXT = "Update Table";
-var L_TABLENEW_TEXT = "New Table";
+var L_TABLENEW_TEXT = "Create Table";
 var L_TABLEEDIT_TEXT = "Edit Table";
 var L_TIPB_TEXT = "Bold";
 var L_TIPBGCOLOR_TEXT = "Background Color";
 var L_TIPCJ_TEXT = "Center Justify";
 var L_TIPCOPY_TEXT = "Copy Text";
 var L_TIPCUT_TEXT = "Cut Text";
-var L_TIPDINDENT_TEXT = "Decrease Indent";
-var L_TIPFGCOLOR_TEXT = "Text Color";
+var L_TIPDONE_TEXT = "Click here when finished editing!";
+var L_TIPFGCOLOR_TEXT = "Font Color";
 var L_TIPFSIZE_TEXT = "Font Size";
-var L_TIPFSTYLE_TEXT = "Font Style";
+var L_TIPFSTYLE_TEXT = "Font Family";
 var L_TIPI_TEXT = "Italic";
-var L_TIPIINDENT_TEXT = "Increase Indent";
-var L_TIPLINE_TEXT = "Insert Line";
+var L_TIPLINE_TEXT = "Horizontal Rule";
 var L_TIPLINK_TEXT = "Insert Link";
 var L_TIPLJ_TEXT = "Left Justify";
 var L_TIPOL_TEXT = "Numbered List";
@@ -59,8 +52,8 @@ var L_TIPTABLE_TEXT = "Insert Table";
 var L_TIPU_TEXT = "Underline";
 var L_TIPUL_TEXT = "Bulleted List";
 var L_MODETITLE_TEXT = "Advanced HTML Mode";
-var L_MODETITLE_TEXT = "Use HTML to create your page.";
-var L_MODEDESC_TEXT = " - Edit the HTML formatting commands directly.";
+var L_MODETITLE_TEXT = "Click here to edit the HTML directly.";
+var L_MODEDESC_TEXT = "";
 var L_CUSTOMFONT_TEXT = "Other Font...";
 var L_CUSTOMFONTENTRY_TEXT = "Enter the name of your font:";
 var L_SAMPLEFONTENTRY_TEXT = "Arial, Geneva, Sans-serif";
@@ -96,20 +89,20 @@ function _CFont(szDef,szText,bSymbol) {
 return new Array(szDef,szText,bSymbol);
 };
 defaultFonts = new Array();
-defaultFonts[0] = _CFont(L_FONTARIALDEF_TEXT, L_FONTARIAL_TEXT, false);
-defaultFonts[1] = _CFont(L_FONTARIALBLACKDEF_TEXT, L_FONTARIALBLACK_TEXT, false);
-defaultFonts[2] = _CFont(L_FONTVERDANADEF_TEXT, L_FONTVERDANA_TEXT, false);
-defaultFonts[3] = _CFont(L_FONTTIMESNEWROMANDEF_TEXT, L_FONTTIMESNEWROMAN_TEXT, false);
-defaultFonts[4] = _CFont(L_GARAMONDDEF_TEXT,L_GARAMOND_TEXT, false);
-defaultFonts[5] = _CFont(L_LUCIDAHANDDEF_TEXT,L_LUCIDAHAND_TEXT, false);
-defaultFonts[6] = _CFont(L_FONTCOURIERNEWDEF_TEXT, L_FONTCOURIERNEW_TEXT, false);
+defaultFonts[0] = _CFont(L_FONTARIALDEF_TEXT, L_FONTARIAL_TEXT, true);
+defaultFonts[1] = _CFont(L_FONTARIALBLACKDEF_TEXT, L_FONTARIALBLACK_TEXT, true);
+defaultFonts[2] = _CFont(L_FONTVERDANADEF_TEXT, L_FONTVERDANA_TEXT, true);
+defaultFonts[3] = _CFont(L_FONTTIMESNEWROMANDEF_TEXT, L_FONTTIMESNEWROMAN_TEXT, true);
+defaultFonts[4] = _CFont(L_GARAMONDDEF_TEXT,L_GARAMOND_TEXT, true);
+defaultFonts[5] = _CFont(L_LUCIDAHANDDEF_TEXT,L_LUCIDAHAND_TEXT, true);
+defaultFonts[6] = _CFont(L_FONTCOURIERNEWDEF_TEXT, L_FONTCOURIERNEW_TEXT, true);
 defaultFonts[7] = _CFont(L_WEBDINGSDEF_TEXT, L_WEBDINGS_TEXT, true);
 defaultFonts[8] = _CFont(L_WINGDINGSDEF_TEXT, L_WINGDINGS_TEXT, true);
 // Width of each toolbar button
 // Entry 5-8 are specify "Paragraph","Font Style", and "Font Size" respectively
 // Update widths if localized
 var L_TOOLBARGIF_TEXT = "toolbar.gif";
-var aSizes = new Array(25,25,25,7,80,76,71,7,25,25,25,8,25,25,25,8,25,25,25,25,8,25,25,25,8,25,25);
+var aSizes = new Array(25,25,8,25,25,25,8,25,25,8,25,25,25,8,25,25,25,8,50);
 function setHTML(szHTML) 
 {
 if (g_state.bMode)
@@ -325,7 +318,7 @@ function _initEditor() {
 g_state = new _CState()
 window.onresize = _setSize
 var sz = ""
-sz += ""+ "<STYLE>"+	".DataBound{border:1 solid #999999;margin:1;font-family:Courier;background:#F1F1F1}\n"+	".textMode {border-top: 1px black solid;font: 10pt courier}\n.NOBORDER TD {border:1px gray solid}"+	"BODY {border: 1px white solid;border-top: none;}"+ "</STYLE>"+ "<BODY ONCONTEXTMENU=\"return false\">"+	"<DIV></DIV>"+ "</BODY>"
+sz += ""+ "<STYLE>"+	".DataBound{border:1 solid #999999;margin:1;font-family:Courier;background:#F1F1F1}\n"+	".textMode {border-top: 1px black solid;font: 10pt courier}\n.NOBORDER TD {border:1px gray solid}"+	"BODY {border: 1px white solid;border-top: none;}"+ "</STYLE>"+ "<BODY ONCONTEXTMENU=\"return false\">"+	"<DIV>"+window.opener.formObj.value+"</DIV>"+ "</BODY>"
 _CPopup_Init()
 idEditbox.document.designMode = "on"
 idEditbox.document.open("text/html","replace")
@@ -389,9 +382,9 @@ if (parent.RTEButton) parent.RTEButton(self, el.id)
 }
 function _drawToolbar()
 {
-var aIds = new Array("cut","copy","paste","bar1","formatblock","fontstyle","fontsize","bar2","bold","italic","underline","bar3","left","center","right","bar4","orderedlist","unorderedlist","outdent","indent","bar5","line","link","table","bar6","bgcolor","textcolor")
-var aTips = new Array(L_TIPCUT_TEXT,L_TIPCOPY_TEXT,L_TIPPASTE_TEXT,"",L_TIPP_TEXT,L_TIPFSTYLE_TEXT,L_TIPFSIZE_TEXT,"",L_TIPB_TEXT,L_TIPI_TEXT,L_TIPU_TEXT,"",L_TIPLJ_TEXT,L_TIPCJ_TEXT,L_TIPRJ_TEXT,"",L_TIPOL_TEXT,L_TIPUL_TEXT,L_TIPDINDENT_TEXT,L_TIPIINDENT_TEXT,"",L_TIPLINE_TEXT,L_TIPLINK_TEXT,L_TIPTABLE_TEXT,"",L_TIPBGCOLOR_TEXT,L_TIPFGCOLOR_TEXT)
-var aCommand = new Array("_Format('cut')","_Format('copy')","_Format('paste')",null,"_CPopup_Show('formatblock')","_CPopup_Show('font')","_CPopup_Show('fontsize')",null,"_Format('bold')","_Format('italic')","_Format('underline')",null,"_Format('Justify','Left')","_Format('Justify','Center')","_Format('Justify','Right')",null,"_Format('insertorderedlist')","_Format('insertunorderedlist')","_Format('outdent')","_Format('indent')",null,"_Format('InsertHorizontalRule')","_CPopup_Show('Link')","_CPopup_Show('Table')",null,"_CPopup_Show('BackColor')","_CPopup_Show('ForeColor')")
+var aIds = new Array("bold","italic","bar3","left","center","right","bar4","orderedlist","unorderedlist","bar5","line","link","table","bar6","textcolor","fontstyle","fontsize","bar7","done")
+var aTips = new Array(L_TIPB_TEXT,L_TIPI_TEXT,"",L_TIPLJ_TEXT,L_TIPCJ_TEXT,L_TIPRJ_TEXT,"",L_TIPOL_TEXT,L_TIPUL_TEXT,"",L_TIPLINE_TEXT,L_TIPLINK_TEXT,L_TIPTABLE_TEXT,"",L_TIPFGCOLOR_TEXT,L_TIPFSTYLE_TEXT,L_TIPFSIZE_TEXT,"",L_TIPDONE_TEXT)
+var aCommand = new Array("_Format('bold')","_Format('italic')",null,"_Format('Justify','Left')","_Format('Justify','Center')","_Format('Justify','Right')",null,"_Format('insertorderedlist')","_Format('insertunorderedlist')",null,"_Format('InsertHorizontalRule')","_CPopup_Show('Link')","_CPopup_Show('Table')",null,"_CPopup_Show('ForeColor')","_CPopup_Show('font')","_CPopup_Show('fontsize')",null,"doneEditing()")
 var sz = "<DIV ID=idStandardBar><NOBR>", iLeft=0, iHeight=24
 for (var i = 0 ; i < aSizes.length; i++) 
 {
@@ -515,23 +508,21 @@ window.onload	= _initEditor
 <TR ID=tbTopBar><TD ID=tbUpLeft></TD><TD COLSPAN=2 ID=tbUpMiddle></TD><TD ID=tbUpRight></TD></TR>
 <TR><TD ID=tbMidLeft></TD>
 <TD ID=tbContents><SCRIPT>_drawToolbar()</SCRIPT></TD></form>
-<TD ID=tbButtons ALIGN=right><input type="button" onClick="sendContentAndClose();" value="done" style="font-size: 8pt;"></TD><TD ID=tbMidRight></TD>
+<TD ID=tbButtons ALIGN=right></TD><TD ID=tbMidRight></TD>
 </TR>
 <TR ID=tbbottomBar><TD ID=tbLowLeft></TD><TD COLSPAN=2 ID=tbLowMiddle></TD><TD ID=tbLowRight></TD></TR>
 </TABLE>
 <IFRAME NAME="idPopup" STYLE="HEIGHT: 200px; LEFT: 25px; MARGIN-TOP: 8px; POSITION: absolute; VISIBILITY: hidden; WIDTH: 200px; Z-INDEX: -1"></IFRAME>
 <IFRAME ID="EditBox" NAME="idEditbox" WIDTH="100%" HEIGHT="100%" ONFOCUS="_CPopup_Hide()"></IFRAME>
-<DIV ID="tbmode" style="visibility : hidden;"><SCRIPT>_drawModeSelect()</SCRIPT></DIV>
+<DIV ID="tbmode" style="visibility: hidden;"><SCRIPT>_drawModeSelect()</SCRIPT></DIV>
 </DIV>
 <script language="JavaScript">
-function sendContentAndClose() {
+function doneEditing() {
 	window.blur(); 
 	window.opener.focus();
-	window.opener.setContent("<div style='background-color:" +getBGColor() + "'>"+getHTML()+"</div>");
+	window.opener.setContent(getHTML());
 	window.close();
 }
-appendHTML(window.opener.formObj.value);
-//idEditbox.document.body.innerHTML=window.opener.formObj.value;
 </script>
 </BODY>	
 </HTML>

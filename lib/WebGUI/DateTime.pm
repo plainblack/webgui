@@ -132,7 +132,23 @@ sub humanToEpoch {
 
 #-------------------------------------------------------------------
 sub setToEpoch {
+	my @date = localtime(time());
  	my ($month, $day, $year) = split(/\//,$_[0]);
+	if (int($year) < 2038 && int($year) > 1900) {
+		$year = int($year);
+	} else {
+		$year = $date[5]+1900;
+	}
+        if (int($month) < 13 && int($month) > 0) {
+                $month = int($month);
+        } else {
+                $month = $date[4]++;
+        }
+        if (int($day) < 32 && int($day) > 0) {
+                $day = int($day);
+        } else {
+                $day = $date[3];
+        }
 	return humanToEpoch($year.'-'.$month.'-'.$day.' 00:00:00');
 }
 

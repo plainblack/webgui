@@ -1,5 +1,7 @@
 package WebGUI::Widget::EventsCalendar;
 
+our $namespace = "EventsCalendar";
+
 #-------------------------------------------------------------------
 # WebGUI is Copyright 2001 Plain Black Software.
 #-------------------------------------------------------------------
@@ -23,7 +25,8 @@ use WebGUI::Widget;
 
 #-------------------------------------------------------------------
 sub purge {
-        WebGUI::SQL->write("delete from event where widgetId=$_[0]",$_[1]);
+        WebGUI::SQL->write("delete from EventsCalendar where widgetId=$_[0]",$_[1]);
+        WebGUI::SQL->write("delete from EventsCalendar_event where widgetId=$_[0]",$_[1]);
         purgeWidget($_[0],$_[1]);
 }
 
@@ -36,10 +39,10 @@ sub widgetName {
 sub www_add {
         my ($output);
       	if (WebGUI::Privilege::canEditPage()) {
-                $output = '<a href="'.$session{page}{url}.'?op=viewHelp&hid=38"><img src="'.$session{setting}{lib}.'/help.gif" border="0" align="right"></a>';
+                $output = '<a href="'.$session{page}{url}.'?op=viewHelp&hid=1&namespace='.$namespace.'"><img src="'.$session{setting}{lib}.'/help.gif" border="0" align="right"></a>';
 		$output .= '<h1>'.WebGUI::International::get(188).'</h1>';
 		$output .= '<form method="post" enctype="multipart/form-data" action="'.$session{page}{url}.'">';
-                $output .= WebGUI::Form::hidden("widget","EventsCalendar");
+                $output .= WebGUI::Form::hidden("widget",$namespace);
                 $output .= WebGUI::Form::hidden("func","addSave");
                 $output .= '<table>';
                 $output .= '<tr><td class="formDescription">'.WebGUI::International::get(99).'</td><td>'.WebGUI::Form::text("title",20,30,'Events Calendar').'</td></tr>';
@@ -60,6 +63,7 @@ sub www_addSave {
 	my ($widgetId);
 	if (WebGUI::Privilege::canEditPage()) {
 		$widgetId = create();	
+                WebGUI::SQL->write("insert into FAQ values ($widgetId)",$session{dbh});
 		return "";
 	} else {
 		return WebGUI::Privilege::insufficient();
@@ -124,7 +128,7 @@ sub www_addEventSave {
 		}
 		$i = 0;
 		while ($eventId[$i] > 0) {
-                	WebGUI::SQL->write("insert into event values ($eventId[$i], $session{form}{wid}, ".quote($session{form}{name}).", ".quote($session{form}{description}).", '".$startDate[$i]."', '".$endDate[$i]."', $recurringEventId)",$session{dbh});
+                	WebGUI::SQL->write("insert into EventsCalendar_event values ($eventId[$i], $session{form}{wid}, ".quote($session{form}{name}).", ".quote($session{form}{description}).", '".$startDate[$i]."', '".$endDate[$i]."', $recurringEventId)",$session{dbh});
 			$i++;
 		}
                 return www_edit();
@@ -154,9 +158,9 @@ sub www_deleteEventConfirm {
         my ($output);
         if (WebGUI::Privilege::canEditPage()) {
 		if ($session{form}{rid} > 0) {
-			WebGUI::SQL->write("delete from event where recurringEventId=$session{form}{rid}",$session{dbh});
+			WebGUI::SQL->write("delete from EventsCalendar_event where recurringEventId=$session{form}{rid}",$session{dbh});
 		} else {
-			WebGUI::SQL->write("delete from event where eventId=$session{form}{eid}",$session{dbh});
+			WebGUI::SQL->write("delete from EventsCalendar_event where eventId=$session{form}{eid}",$session{dbh});
 		}
                 return www_edit();
         } else {
@@ -170,7 +174,7 @@ sub www_edit {
 	tie %data, 'Tie::CPHash';
         if (WebGUI::Privilege::canEditPage()) {
 		%data = WebGUI::SQL->quickHash("select * from widget where widget.widgetId=$session{form}{wid}",$session{dbh});
-                $output = '<a href="'.$session{page}{url}.'?op=viewHelp&hid=38"><img src="'.$session{setting}{lib}.'/help.gif" border="0" align="right"></a>';
+                $output = '<a href="'.$session{page}{url}.'?op=viewHelp&hid=1&namespace='.$namespace.'"><img src="'.$session{setting}{lib}.'/help.gif" border="0" align="right"></a>';
 		$output .= '<h1>'.WebGUI::International::get(197).'</h1>';
 		$output .= '<form method="post" enctype="multipart/form-data" action="'.$session{page}{url}.'">';
                 $output .= WebGUI::Form::hidden("wid",$session{form}{wid});
@@ -184,7 +188,7 @@ sub www_edit {
                 $output .= '</table></form>';
                 $output .= '<p><a href="'.$session{page}{url}.'?func=addEvent&wid='.$session{form}{wid}.'">Add New Event</a><p>';
                 $output .= '<table border=1 cellpadding=3 cellspacing=0>';
-		$sth = WebGUI::SQL->read("select eventId, name, recurringEventId from event where widgetId='$session{form}{wid}' order by startDate",$session{dbh});
+		$sth = WebGUI::SQL->read("select eventId, name, recurringEventId from EventsCalendar_event where widgetId='$session{form}{wid}' order by startDate",$session{dbh});
 		while (@event = $sth->array) {
                 	$output .= '<tr><td><a href="'.$session{page}{url}.'?func=editEvent&wid='.$session{form}{wid}.'&eid='.$event[0].'"><img src="'.$session{setting}{lib}.'/edit.gif" border=0></a><a href="'.$session{page}{url}.'?func=deleteEvent&wid='.$session{form}{wid}.'&eid='.$event[0].'&rid='.$event[2].'"><img src="'.$session{setting}{lib}.'/delete.gif" border=0></a></td><td>'.$event[1].'</td></tr>';
 		}
@@ -211,7 +215,7 @@ sub www_editEvent {
         my ($output, %event);
 	tie %event, 'Tie::CPHash';
         if (WebGUI::Privilege::canEditPage()) {
-                %event = WebGUI::SQL->quickHash("select * from event where eventId='$session{form}{eid}'",$session{dbh});
+                %event = WebGUI::SQL->quickHash("select * from EventsCalendar_event where eventId='$session{form}{eid}'",$session{dbh});
                 $output = '<h1>'.WebGUI::International::get(198).'</h1>';
 		$output .= '<form method="post" enctype="multipart/form-data" action="'.$session{page}{url}.'">';
                 $output .= WebGUI::Form::hidden("wid",$session{form}{wid});
@@ -236,7 +240,7 @@ sub www_editEvent {
 sub www_editEventSave {
         my ($eventId);
         if (WebGUI::Privilege::canEditPage()) {
-                WebGUI::SQL->write("update event set name=".quote($session{form}{name}).", description=".quote($session{form}{description}).", startDate='".setToEpoch($session{form}{startDate})."', endDate='".setToEpoch($session{form}{endDate})."' where eventId=$session{form}{eid}",$session{dbh});
+                WebGUI::SQL->write("update EventsCalendar_event set name=".quote($session{form}{name}).", description=".quote($session{form}{description}).", startDate='".setToEpoch($session{form}{startDate})."', endDate='".setToEpoch($session{form}{endDate})."' where eventId=$session{form}{eid}",$session{dbh});
                 return www_edit();
         } else {
                 return WebGUI::Privilege::insufficient();
@@ -245,7 +249,7 @@ sub www_editEventSave {
 
 #-------------------------------------------------------------------
 sub www_view {
-	my (%data, @event, $output, $widgetId, $sth);
+	my (%data, @event, $output, $widgetId, $sth, $flag, @previous);
 	tie %data, 'Tie::CPHash';
 	$widgetId = shift;
 	%data = WebGUI::SQL->quickHash("select * from widget where widget.widgetId='$widgetId'",$session{dbh});
@@ -256,14 +260,26 @@ sub www_view {
 		if ($data{description} ne "") {
 			$output .= $data{description}.'<p>';
 		}
-		$sth = WebGUI::SQL->read("select name, description, startDate, endDate from event where widgetId='$widgetId' and startDate>".(time()-86400)." order by startDate",$session{dbh});
+		$sth = WebGUI::SQL->read("select name, description, startDate, endDate from EventsCalendar_event where widgetId='$widgetId' and endDate>".(time()-86400)." order by startDate,endDate",$session{dbh});
 		while (@event = $sth->array) {
-			$output .= "<b>".epochToHuman($event[2],"%c")." ".epochToHuman($event[2],"%D");
-			if (epochToHuman($event[2],"%D") ne epochToHuman($event[3],"%D")) {
-				$output .= "-".epochToHuman($event[3],"%D");
+			unless ($event[2] == $previous[0] && $event[3] == $previous[1]) {
+				$output .= "<b>".epochToHuman($event[2],"%c")." ".epochToHuman($event[2],"%D");
+				if (epochToHuman($event[2],"%y") ne epochToHuman($event[3],"%y")) {
+					$output .= ", ".epochToHuman($event[2],"%y");
+					$flag = 1;
+				}
+				if ($flag || epochToHuman($event[2],"%c") ne epochToHuman($event[3],"%c")) {
+					$output .= " - ".epochToHuman($event[3],"%c");
+					$output .= " ".epochToHuman($event[3],"%D");
+				} elsif (epochToHuman($event[2],"%D") ne epochToHuman($event[3],"%D")) {
+					$output .= " - ".epochToHuman($event[3],"%D");
+				}
+				$flag = 0;
+				$output .= ", ".epochToHuman($event[3],"%y");
+				$output .= "</b>";
+				$output .= "<hr size=1>";
 			}
-			$output .= ", ".epochToHuman($event[2],"%y")."</b>";
-			$output .= "<hr size=1>";
+			@previous = ($event[2],$event[3]);
 			$output .= '<span class="eventTitle">'.$event[0].'</span>';
 			if ($event[1] ne "") {
 				$output .= ' - ';
@@ -282,7 +298,5 @@ sub www_view {
 
 
 
-
-
-
 1;
+

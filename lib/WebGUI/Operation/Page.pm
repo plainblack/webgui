@@ -59,7 +59,7 @@ sub _reorderPages {
 sub www_addPage {
 	my ($output);
 	if (WebGUI::Privilege::canEditPage()) {
-		$output = '<a href="'.$session{page}{url}.'?op=viewHelp&hid=1"><img src="'.$session{setting}{lib}.'/help.gif" border="0" align="right"></a>';
+		$output = '<a href="'.$session{page}{url}.'?op=viewHelp&hid=1&namespace=WebGUI"><img src="'.$session{setting}{lib}.'/help.gif" border="0" align="right"></a>';
 		$output .= '<h1>'.WebGUI::International::get(98).'</h1>';
 		$output .= '<form method="post" action="'.$session{page}{url}.'">';
 		$output .= WebGUI::Form::hidden("op","addPageSave");
@@ -111,7 +111,7 @@ sub www_deletePage {
 	if ($session{page}{pageId} < 26) {
 		return WebGUI::Privilege::vitalComponent();
 	} elsif (WebGUI::Privilege::canEditPage()) {
-		$output .= '<a href="'.$session{page}{url}.'?op=viewHelp&hid=3"><img src="'.$session{setting}{lib}.'/help.gif" border="0" align="right"></a>';
+		$output .= '<a href="'.$session{page}{url}.'?op=viewHelp&hid=3&namespace=WebGUI"><img src="'.$session{setting}{lib}.'/help.gif" border="0" align="right"></a>';
 		$output .= '<h1>'.WebGUI::International::get(42).'</h1>';
 		$output .= WebGUI::International::get(101).'<p>';
 		$output .= '<div align="center"><a href="'.$session{page}{url}.'?op=deletePageConfirm">'.WebGUI::International::get(44).'</a>';
@@ -142,7 +142,7 @@ sub www_editPage {
 	tie %hash, "Tie::IxHash";
         if (WebGUI::Privilege::canEditPage()) {
 		%yesNo = ("0"=>"No", "1"=>"Yes");
-                $output = '<a href="'.$session{page}{url}.'?op=viewHelp&hid=1"><img src="'.$session{setting}{lib}.'/help.gif" border="0" align="right"></a>';
+                $output = '<a href="'.$session{page}{url}.'?op=viewHelp&hid=1&namespace=WebGUI"><img src="'.$session{setting}{lib}.'/help.gif" border="0" align="right"></a>';
 		$output .= '<h1>'.WebGUI::International::get(102).'</h1>';
 		$output .= '<form method="post" action="'.$session{page}{url}.'">';
                 $output .= WebGUI::Form::hidden("op","editPageSave");

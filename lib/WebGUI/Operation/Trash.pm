@@ -47,7 +47,7 @@ sub _recursePageTree {
 sub www_purgeTrash {
         my ($output);
         if (WebGUI::Privilege::isInGroup(3)) {
-                $output = '<a href="'.$session{page}{url}.'?op=viewHelp&hid=46"><img src="'.$session{setting}{lib}.'/help.gif" border="0" align="right"></a><h1>'.WebGUI::International::get(42).'</h1>';
+                $output = '<a href="'.$session{page}{url}.'?op=viewHelp&hid=46&namespace=WebGUI"><img src="'.$session{setting}{lib}.'/help.gif" border="0" align="right"></a><h1>'.WebGUI::International::get(42).'</h1>';
                 $output .= WebGUI::International::get(162).'<p>';
                 $output .= '<div align="center"><a href="'.$session{page}{url}.'?op=purgeTrashConfirm">'.WebGUI::International::get(44).'</a>';
                 $output .= '&nbsp;&nbsp;&nbsp;&nbsp;<a href="'.$session{page}{url}.'">'.WebGUI::International::get(45).'</a></div>';

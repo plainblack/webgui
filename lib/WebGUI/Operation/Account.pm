@@ -26,7 +26,7 @@ use WebGUI::SQL;
 use WebGUI::Utility;
 
 our @ISA = qw(Exporter);
-our @EXPORT = qw(&www_createAccount &www_deactivateAccount &www_deactivateAccountConfirm &www_displayAccount &www_displayLogin &www_login &www_logout &www_recoverPassword &www_recoverPasswordFinish &www_saveAccount &www_updateAccount);
+our @EXPORT = qw(&www_viewProfile &www_editProfile &www_editProfileSave &www_createAccount &www_deactivateAccount &www_deactivateAccountConfirm &www_displayAccount &www_displayLogin &www_login &www_logout &www_recoverPassword &www_recoverPasswordFinish &www_saveAccount &www_updateAccount);
 our %ldapStatusCode = ( 0=>'success (0)', 1=>'Operations Error (1)', 2=>'Protocol Error (2)', 3=>'Time Limit Exceeded (3)', 4=>'Size Limit Exceeded (4)', 5=>'Compare False (5)', 6=>'Compare True (6)', 7=>'Auth Method Not Supported (7)', 8=>'Strong Auth Required (8)', 9=>'Referral (10)', 11=>'Admin Limit Exceeded (11)', 12=>'Unavailable Critical Extension (12)', 13=>'Confidentiality Required (13)', 14=>'Sasl Bind In Progress (14)', 15=>'No Such Attribute (16)', 17=>'Undefined Attribute Type (17)', 18=>'Inappropriate Matching (18)', 19=>'Constraint Violation (19)', 20=>'Attribute Or Value Exists (20)', 21=>'Invalid Attribute Syntax (21)', 32=>'No Such Object (32)', 33=>'Alias Problem (33)', 34=>'Invalid DN Syntax (34)', 36=>'Alias Dereferencing Problem (36)', 48=>'Inappropriate Authentication (48)', 49=>'Invalid Credentials (49)', 50=>'Insufficient Access Rights (50)', 51=>'Busy (51)', 52=>'Unavailable (52)', 53=>'Unwilling To Perform (53)', 54=>'Loop Detect (54)', 64=>'Naming Violation (64)', 65=>'Object Class Violation (65)', 66=>'Not Allowed On Non Leaf (66)', 67=>'Not Allowed On RDN (67)', 68=>'Entry Already Exists (68)', 69=>'Object Class Mods Prohibited (69)', 71=>'Affects Multiple DSAs (71)', 80=>'other (80)');
 
 #-------------------------------------------------------------------
@@ -41,7 +41,7 @@ sub _hasBadPassword {
 #-------------------------------------------------------------------
 sub _hasBadUsername {
 	my ($otherUser);
-	($otherUser) = WebGUI::SQL->quickArray("select username from users where lcase(username)=lcase('$_[0]')",$session{dbh});
+	($otherUser) = WebGUI::SQL->quickArray("select username from users where username='$_[0]'",$session{dbh});
 	if (($otherUser ne "" && $otherUser ne $session{user}{username}) || $_[0] eq "") {
 		return 1;
 	} else {
@@ -165,6 +165,8 @@ sub www_displayAccount {
 				$output .= '<li><a href="'.$session{page}{url}.'?op=switchOnAdmin">'.WebGUI::International::get(63).'</a>';
 			}
 		}
+		$output .= '<li><a href="'.$session{page}{url}.'?op=editProfile">'.WebGUI::International::get(341).'</a>';
+		$output .= '<li><a href="'.$session{page}{url}.'?op=viewProfile&uid='.$session{user}{userId}.'">'.WebGUI::International::get(343).'</a>';
 		$output .= '<li><a href="'.$session{page}{url}.'?op=logout">'.WebGUI::International::get(64).'</a>';
 		$output .= '<li><a href="'.$session{page}{url}.'?op=deactivateAccount">'.WebGUI::International::get(65).'</a></ul></div>';
         } else {
@@ -198,6 +200,83 @@ sub www_displayLogin {
 		$output .= '</ul></div>';
 	}
 	return $output;
+}
+
+#-------------------------------------------------------------------
+sub www_editProfile {
+	my ($output, %gender, @array);
+	%gender = ('male'=>WebGUI::International::get(339),'female'=>WebGUI::International::get(340));
+        if ($session{user}{userId} != 1) {
+               	$output .= '<h1>'.WebGUI::International::get(338).'</h1>';
+                $output .= '<form method="post" action="'.$session{page}{url}.'"> ';
+                $output .= WebGUI::Form::hidden("op","editProfileSave");
+                $output .= WebGUI::Form::hidden("uid",$session{user}{userId});
+                $output .= '<table>';
+		if ($session{setting}{profileName}) {
+			$output .= '<tr><td class="formDescription" valign="top">'.WebGUI::International::get(314).'</td><td>'.WebGUI::Form::text("firstName",20,50,$session{user}{firstName}).'</td></tr>';
+                	$output .= '<tr><td class="formDescription" valign="top">'.WebGUI::International::get(315).'</td><td>'.WebGUI::Form::text("middleName",20,50,$session{user}{middleName}).'</td></tr>';
+                	$output .= '<tr><td class="formDescription" valign="top">'.WebGUI::International::get(316).'</td><td>'.WebGUI::Form::text("lastName",20,50,$session{user}{lastName}).'</td></tr>';
+		}
+		if ($session{setting}{profileExtraContact}) {
+                	$output .= '<tr><td class="formDescription" valign="top">'.WebGUI::International::get(317).'</td><td>'.WebGUI::Form::text("icq",20,30,$session{user}{icq}).'</td></tr>';
+                	$output .= '<tr><td class="formDescription" valign="top">'.WebGUI::International::get(318).'</td><td>'.WebGUI::Form::text("aim",20,30,$session{user}{aim}).'</td></tr>';
+                	$output .= '<tr><td class="formDescription" valign="top">'.WebGUI::International::get(319).'</td><td>'.WebGUI::Form::text("msnIM",20,30,$session{user}{msnIM}).'</td></tr>';
+                	$output .= '<tr><td class="formDescription" valign="top">'.WebGUI::International::get(320).'</td><td>'.WebGUI::Form::text("yahooIM",20,30,$session{user}{yahooIM}).'</td></tr>';
+                	$output .= '<tr><td class="formDescription" valign="top">'.WebGUI::International::get(321).'</td><td>'.WebGUI::Form::text("cellPhone",20,30,$session{user}{cellPhone}).'</td></tr>';
+                	$output .= '<tr><td class="formDescription" valign="top">'.WebGUI::International::get(322).'</td><td>'.WebGUI::Form::text("pager",20,30,$session{user}{pager}).'</td></tr>';
+		}
+		if ($session{setting}{profileHome}) {
+                	$output .= '<tr><td class="formDescription" valign="top">'.WebGUI::International::get(323).'</td><td>'.WebGUI::Form::text("homeAddress",20,128,$session{user}{homeAddress}).'</td></tr>';
+                	$output .= '<tr><td class="formDescription" valign="top">'.WebGUI::International::get(324).'</td><td>'.WebGUI::Form::text("homeCity",20,30,$session{user}{homeCity}).'</td></tr>';
+                	$output .= '<tr><td class="formDescription" valign="top">'.WebGUI::International::get(325).'</td><td>'.WebGUI::Form::text("homeState",20,30,$session{user}{homeState}).'</td></tr>';
+                	$output .= '<tr><td class="formDescription" valign="top">'.WebGUI::International::get(326).'</td><td>'.WebGUI::Form::text("homeZip",20,15,$session{user}{homeZip}).'</td></tr>';
+                	$output .= '<tr><td class="formDescription" valign="top">'.WebGUI::International::get(327).'</td><td>'.WebGUI::Form::text("homeCountry",20,30,$session{user}{homeCountry}).'</td></tr>';
+                	$output .= '<tr><td class="formDescription" valign="top">'.WebGUI::International::get(328).'</td><td>'.WebGUI::Form::text("homePhone",20,30,$session{user}{homePhone}).'</td></tr>';
+		}
+		if ($session{setting}{profileWork}) {
+                	$output .= '<tr><td class="formDescription" valign="top">'.WebGUI::International::get(329).'</td><td>'.WebGUI::Form::text("workAddress",20,128,$session{user}{workAddress}).'</td></tr>';
+                	$output .= '<tr><td class="formDescription" valign="top">'.WebGUI::International::get(330).'</td><td>'.WebGUI::Form::text("workCity",20,30,$session{user}{workCity}).'</td></tr>';
+                	$output .= '<tr><td class="formDescription" valign="top">'.WebGUI::International::get(331).'</td><td>'.WebGUI::Form::text("workState",20,30,$session{user}{workState}).'</td></tr>';
+                	$output .= '<tr><td class="formDescription" valign="top">'.WebGUI::International::get(332).'</td><td>'.WebGUI::Form::text("workZip",20,15,$session{user}{workZip}).'</td></tr>';
+			$output .= '<tr><td class="formDescription" valign="top">'.WebGUI::International::get(333).'</td><td>'.WebGUI::Form::text("workCountry",20,30,$session{user}{workCountry}).'</td></tr>';
+                	$output .= '<tr><td class="formDescription" valign="top">'.WebGUI::International::get(334).'</td><td>'.WebGUI::Form::text("workPhone",20,30,$session{user}{workPhone}).'</td></tr>';
+		}
+		if ($session{setting}{profileMisc}) {
+			$array[0] = $session{user}{gender};
+                	$output .= '<tr><td class="formDescription" valign="top">'.WebGUI::International::get(335).'</td><td>'.WebGUI::Form::selectList("gender",\%gender,\@array).'</td></tr>';
+                	$output .= '<tr><td class="formDescription" valign="top">'.WebGUI::International::get(336).'</td><td>'.WebGUI::Form::text("birthdate",20,30,$session{user}{birthdate}).'</td></tr>';
+                	$output .= '<tr><td class="formDescription" valign="top">'.WebGUI::International::get(337).'</td><td>'.WebGUI::Form::text("homepage",20,2048,$session{user}{homepage}).'</td></tr>';
+		}
+                $output .= '<tr><td></td><td>'.WebGUI::Form::submit(WebGUI::International::get(62)).'</td></tr>';
+                $output .= '</table>';
+                $output .= '</form>';
+                $output .= '<div class="accountOptions"><ul>';
+                if (WebGUI::Privilege::isInGroup(3) || WebGUI::Privilege::isInGroup(4)) {
+                        if ($session{var}{adminOn}) {
+                                $output .= '<li><a href="'.$session{page}{url}.'?op=switchOffAdmin">'.WebGUI::International::get(12).'</a>';
+                        } else {
+                                $output .= '<li><a href="'.$session{page}{url}.'?op=switchOnAdmin">'.WebGUI::International::get(63).'</a>';
+                        }
+                }
+                $output .= '<li><a href="'.$session{page}{url}.'?op=displayAccount">'.WebGUI::International::get(342).'</a>';
+		$output .= '<li><a href="'.$session{page}{url}.'?op=viewProfile&uid='.$session{user}{userId}.'">'.WebGUI::International::get(343).'</a>';
+                $output .= '<li><a href="'.$session{page}{url}.'?op=logout">'.WebGUI::International::get(64).'</a>';
+                $output .= '<li><a href="'.$session{page}{url}.'?op=deactivateAccount">'.WebGUI::International::get(65).'</a>';
+		$output .= '</ul></div>';
+        } else {
+                $output .= www_displayLogin();
+        }
+	return $output;
+}
+
+#-------------------------------------------------------------------
+sub www_editProfileSave {
+        if ($session{user}{userId} != 1) {
+		WebGUI::SQL->write("update users set firstName=".quote($session{form}{firstName}).", middleName=".quote($session{form}{middleName}).", lastName=".quote($session{form}{lastName}).", icq=".quote($session{form}{icq}).", aim=".quote($session{form}{aim}).", msnIM=".quote($session{form}{msnIM}).", yahooIM=".quote($session{form}{yahooIM}).", homeAddress=".quote($session{form}{homeAddress}).", homeCity=".quote($session{form}{homeCity}).", homeState=".quote($session{form}{homeState}).", homeZip=".quote($session{form}{homeZip}).", homeCountry=".quote($session{form}{homeCountry}).", homePhone=".quote($session{form}{homePhone}).", workAddress=".quote($session{form}{workAddress}).", workCity=".quote($session{form}{workCity}).", workState=".quote($session{form}{workState}).", workZip=".quote($session{form}{workZip}).", workCountry=".quote($session{form}{workCountry}).", workPhone=".quote($session{form}{workPhone}).", cellPhone=".quote($session{form}{cellPhone}).", pager=".quote($session{form}{pager}).", gender=".quote($session{form}{gender}).", birthdate=".quote($session{form}{birthdate}).", homepage=".quote($session{form}{homepage})." where userId=".$session{form}{uid},$session{dbh});
+		return www_displayAccount();
+	} else {
+		return www_displayLogin();
+	}
 }
 
 #-------------------------------------------------------------------
@@ -386,6 +465,92 @@ sub www_updateAccount {
 	} else {
 		$output .= www_displayLogin();
 	}
+        return $output;
+}
+
+#-------------------------------------------------------------------
+sub www_viewProfile {
+        my ($output, %user);
+	%user = WebGUI::SQL->quickHash("select * from users where userId='$session{form}{uid}'",$session{dbh});
+	if ($user{username} eq "") {
+		WebGUI::Privilege::notMember();
+        } elsif ($session{user}{userId} != 1) {
+                $output .= '<h1>'.WebGUI::International::get(347).' '.$user{username}.'</h1>';
+                $output .= '<table>';
+		if ($user{email} ne "") {
+                	$output .= '<tr><td class="tableHeader" valign="top">'.WebGUI::International::get(56).'</td><td class="tableData"><a href="mailto:'.$user{email}.'">'.$user{email}.'</a></td></tr>';
+		}
+                if ($session{setting}{profileName}) {
+			if ($user{firstName} ne "") {
+                        	$output .= '<tr><td class="tableHeader" valign="top">'.WebGUI::International::get(314).'</td><td class="tableData">'.$user{firstName}.' '.$user{middleName}.' '.$user{lastName}.'</td></tr>';
+			}
+                }
+                if ($session{setting}{profileExtraContact}) {
+			if ($user{icq} ne "") {
+                        	$output .= '<tr><td class="tableHeader" valign="top">'.WebGUI::International::get(317).'</td><td class="tableData">'.$user{icq}.'</td></tr>';
+			}
+			if ($user{aim} ne "") {
+                        	$output .= '<tr><td class="tableHeader" valign="top">'.WebGUI::International::get(318).'</td><td class="tableData">'.$user{aim}.'</td></tr>';
+			}
+			if ($user{msnIM} ne "") {
+                        	$output .= '<tr><td class="tableHeader" valign="top">'.WebGUI::International::get(319).'</td><td class="tableData">'.$user{msnIM}.'</td></tr>';
+			}
+			if ($user{yahooIM} ne "") {
+                        	$output .= '<tr><td class="tableHeader" valign="top">'.WebGUI::International::get(320).'</td><td class="tableData">'.$user{yahooIM}.'</td></tr>';
+			}
+			if ($user{cellPhone} ne "") {
+                        	$output .= '<tr><td class="tableHeader" valign="top">'.WebGUI::International::get(321).'</td><td class="tableData">'.$user{cellPhone}.'</td></tr>';
+			}
+			if ($user{pager} ne "") {
+                        	$output .= '<tr><td class="tableHeader" valign="top">'.WebGUI::International::get(322).'</td><td class="tableData">'.$user{pager}.'</td></tr>';
+			}
+                }
+                if ($session{setting}{profileHome}) {
+			if ($user{homeAddress} ne "") {
+                        	$output .= '<tr><td class="tableHeader" valign="top">'.WebGUI::International::get(323).'</td><td class="tableData">'.$user{homeAddress}.'<br>'.$user{homeCity}.', '.$user{homeState}.' '.$user{homeZip}.' '.$user{homeCountry}.'</td></tr>';
+			}
+			if ($user{homePhone} ne "") {
+                        	$output .= '<tr><td class="tableHeader" valign="top">'.WebGUI::International::get(328).'</td><td class="tableData">'.$user{homePhone}.'</td></tr>';
+			}
+                }
+                if ($session{setting}{profileWork}) {
+			if ($user{workAddress} ne "") {
+                        	$output .= '<tr><td class="tableHeader" valign="top">'.WebGUI::International::get(329).'</td><td class="tableData">'.$user{workAddress}.'<br>'.$user{workCity}.', '.$user{workState}.' '.$user{workZip}.' '.$user{workCountry}.'</td></tr>';
+			}
+			if ($user{workPhone} ne "") {
+                        	$output .= '<tr><td class="tableHeader" valign="top">'.WebGUI::International::get(334).'</td><td class="tableData">'.$user{workPhone}.'</td></tr>';
+			}
+                }
+                if ($session{setting}{profileMisc}) {
+			if ($user{gender} ne "") {
+                        	$output .= '<tr><td class="tableHeader" valign="top">'.WebGUI::International::get(335).'</td><td class="tableData">'.$user{gender}.'</td></tr>';
+			}
+			if ($user{birthdate} ne "") {
+                        	$output .= '<tr><td class="tableHeader" valign="top">'.WebGUI::International::get(336).'</td><td class="tableData">'.$user{birthdate}.'</td></tr>';
+			}
+			if ($user{homepage} ne "") {
+				$output .= '<tr><td class="tableHeader" valign="top">'.WebGUI::International::get(337).'</td><td class="tableData"><a href="'.$user{homepage}.'">'.$user{homepage}.'</a></td></tr>';
+			}
+                }
+                $output .= '</table>';
+		if ($session{user}{userId} == $session{form}{uid}) {
+                	$output .= '<div class="accountOptions"><ul>';
+                	if (WebGUI::Privilege::isInGroup(3) || WebGUI::Privilege::isInGroup(4)) {
+                        	if ($session{var}{adminOn}) {
+                                	$output .= '<li><a href="'.$session{page}{url}.'?op=switchOffAdmin">'.WebGUI::International::get(12).'</a>';
+                        	} else {
+                                	$output .= '<li><a href="'.$session{page}{url}.'?op=switchOnAdmin">'.WebGUI::International::get(63).'</a>';
+                        	}
+                	}
+                	$output .= '<li><a href="'.$session{page}{url}.'?op=displayAccount">'.WebGUI::International::get(342).'</a>';
+			$output .= '<li><a href="'.$session{page}{url}.'?op=editProfile">'.WebGUI::International::get(341).'</a>';
+                	$output .= '<li><a href="'.$session{page}{url}.'?op=logout">'.WebGUI::International::get(64).'</a>';
+                	$output .= '<li><a href="'.$session{page}{url}.'?op=deactivateAccount">'.WebGUI::International::get(65).'</a>';
+                	$output .= '</ul></div>';
+		}
+        } else {
+                	$output .= WebGUI::Privilege::insufficient();
+        }
         return $output;
 }
 

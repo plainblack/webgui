@@ -27,7 +27,7 @@ our @EXPORT = qw(&www_addGroup &www_addGroupSave &www_deleteGroup &www_deleteGro
 sub www_addGroup {
         my ($output);
         if (WebGUI::Privilege::isInGroup(3)) {
-                $output .= '<a href="'.$session{page}{url}.'?op=viewHelp&hid=17"><img src="'.$session{setting}{lib}.'/help.gif" border="0" align="right"></a>';
+                $output .= '<a href="'.$session{page}{url}.'?op=viewHelp&hid=17&namespace=WebGUI"><img src="'.$session{setting}{lib}.'/help.gif" border="0" align="right"></a>';
 		$output .= '<h1>'.WebGUI::International::get(83).'</h1>';
 		$output .= '<form method="post" action="'.$session{page}{url}.'"> ';
                 $output .= WebGUI::Form::hidden("op","addGroupSave");
@@ -61,7 +61,7 @@ sub www_deleteGroup {
         if ($session{form}{gid} < 26) {
                 return WebGUI::Privilege::vitalComponent();
         } elsif (WebGUI::Privilege::isInGroup(3)) {
-                $output .= '<a href="'.$session{page}{url}.'?op=viewHelp&hid=15"><img src="'.$session{setting}{lib}.'/help.gif" border="0" align="right"></a>';
+                $output .= '<a href="'.$session{page}{url}.'?op=viewHelp&hid=15&namespace=WebGUI"><img src="'.$session{setting}{lib}.'/help.gif" border="0" align="right"></a>';
 		$output .= '<h1>'.WebGUI::International::get(42).'</h1>';
                 $output .= WebGUI::International::get(86).'<p>';
                 $output .= '<div align="center"><a href="'.$session{page}{url}.'?op=deleteGroupConfirm&gid='.$session{form}{gid}.'">'.WebGUI::International::get(44).'</a>';
@@ -87,11 +87,11 @@ sub www_deleteGroupConfirm {
 
 #-------------------------------------------------------------------
 sub www_editGroup {
-        my ($output, $sth, %group, $user);
+        my ($output, $sth, %group, @user);
 	tie %group, 'Tie::CPHash';
         if (WebGUI::Privilege::isInGroup(3)) {
                 %group = WebGUI::SQL->quickHash("select * from groups where groupId=$session{form}{gid}",$session{dbh});
-                $output .= '<a href="'.$session{page}{url}.'?op=viewHelp&hid=17"><img src="'.$session{setting}{lib}.'/help.gif" border="0" align="right"></a>';
+                $output .= '<a href="'.$session{page}{url}.'?op=viewHelp&hid=17&namespace=WebGUI"><img src="'.$session{setting}{lib}.'/help.gif" border="0" align="right"></a>';
 		$output .= '<h1>'.WebGUI::International::get(87).'</h1>';
 		$output .= ' <form method="post" action="'.$session{page}{url}.'"> ';
                 $output .= WebGUI::Form::hidden("op","editGroupSave");
@@ -101,9 +101,9 @@ sub www_editGroup {
                 $output .= '<tr><td class="formDescription" valign="top">'.WebGUI::International::get(85).'</td><td>'.WebGUI::Form::textArea("description",$group{description}).'</td></tr>';
                 $output .= '<tr><td></td><td>'.WebGUI::Form::submit(WebGUI::International::get(62)).'</td></tr>';
                 $output .= '<tr><td class="formDescription" valign="top">'.WebGUI::International::get(88).'</td><td valign="top">';
-		$sth = WebGUI::SQL->read("select users.username from users,groupings where groupings.groupId=$session{form}{gid} and groupings.userId=users.userId order by users.username",$session{dbh});
-		while (($user) = $sth->array) {
-			$output .= $user."<br>";
+		$sth = WebGUI::SQL->read("select users.username,users.userId from users,groupings where groupings.groupId=$session{form}{gid} and groupings.userId=users.userId order by users.username",$session{dbh});
+		while (@user = $sth->array) {
+			$output .= '<a href="'.$session{page}{url}.'?op=editUser&uid='.$user[1].'"><img src="'.$session{setting}{lib}.'/edit.gif" border=0></a> <a href="'.$session{page}{url}.'?op=viewProfile&uid='.$user[1].'">'.$user[0].'</a><br>';
 		}
 		$sth->finish;
 		$output .= '<br></td></tr>';
@@ -130,7 +130,7 @@ sub www_listGroups {
         my ($output, $pn, $sth, @data, @row, $i, $itemsPerPage);
         if (WebGUI::Privilege::isInGroup(3)) {
                 $itemsPerPage = 50;
-                $output = '<a href="'.$session{page}{url}.'?op=viewHelp&hid=10"><img src="'.$session{setting}{lib}.'/help.gif" border="0" align="right"></a>';
+                $output = '<a href="'.$session{page}{url}.'?op=viewHelp&hid=10&namespace=WebGUI"><img src="'.$session{setting}{lib}.'/help.gif" border="0" align="right"></a>';
 		$output .= '<h1>'.WebGUI::International::get(89).'</h1>';
 		$output .= '<div align="center"><a href="'.$session{page}{url}.'?op=addGroup">'.WebGUI::International::get(90).'</a></div>';
                 $output .= '<table border=1 cellpadding=5 cellspacing=0 align="center">';

@@ -1,5 +1,7 @@
 package WebGUI::Widget::Article;
 
+our $namespace = "Article";
+
 #-------------------------------------------------------------------
 # WebGUI is Copyright 2001 Plain Black Software.
 #-------------------------------------------------------------------
@@ -36,10 +38,10 @@ sub widgetName {
 sub www_add {
         my ($output);
       	if (WebGUI::Privilege::canEditPage()) {
-                $output = '<a href="'.$session{page}{url}.'?op=viewHelp&hid=23"><img src="'.$session{setting}{lib}.'/help.gif" border="0" align="right"></a>';
+                $output = '<a href="'.$session{page}{url}.'?op=viewHelp&hid=1&namespace='.$namespace.'"><img src="'.$session{setting}{lib}.'/help.gif" border="0" align="right"></a>';
 		$output .= '<h1>'.WebGUI::International::get(173).'</h1>';
 		$output .= '<form method="post" enctype="multipart/form-data" action="'.$session{page}{url}.'">';
-                $output .= WebGUI::Form::hidden("widget","Article");
+                $output .= WebGUI::Form::hidden("widget",$namespace);
                 $output .= WebGUI::Form::hidden("func","addSave");
                 $output .= '<table>';
                 $output .= '<tr><td class="formDescription">'.WebGUI::International::get(99).'</td><td>'.WebGUI::Form::text("title",20,30,'Article').'</td></tr>';
@@ -160,7 +162,7 @@ sub www_view {
 	my (%data, @test, $output, $widgetId);
 	tie %data, 'Tie::CPHash';
 	$widgetId = shift;
-	%data = WebGUI::SQL->quickHash("select widget.title, widget.displayTitle, widget.processMacros, Article.body, Article.image, Article.linkTitle, Article.linkURL, Article.attachment, Article.convertCarriageReturns from widget,Article where widget.widgetId='$widgetId' and widget.WidgetId=Article.widgetId and Article.startDate<".time()." and Article.endDate>".time()."",$session{dbh});
+	%data = WebGUI::SQL->quickHash("select * from widget,Article where widget.widgetId='$widgetId' and widget.WidgetId=Article.widgetId and Article.startDate<".time()." and Article.endDate>".time()."",$session{dbh});
 	if (defined %data) {
 		if ($data{displayTitle} == 1) {
 			$output = "<h1>".$data{title}."</h1>";

@@ -205,8 +205,9 @@ sz += ""
 +	"STYLE=\"margin:0pt;padding:0pt\""
 +	">"
 +	"<FONT FACE=\"" + defaultFonts[i][0] + "\">" 
-+	defaultFonts[i][1] 
-+	"</FONT>"
++	"ABC abc 123"
+// +	defaultFonts[i][1] 
++	"</FONT> "
 +	(defaultFonts[i][2] ? ("(" + defaultFonts[i][1] + ")") : "")
 +	"</TD>"
 + "</TR>"
@@ -573,8 +574,10 @@ if (g_state.aLinks.length>0)
 sz += ""
 + "<TR>"
 +	"<TD>" 
+/*
 +	L_LINKSELECT_TEXT 
 +	"<SELECT ID=pageList ONCHANGE=\"parent._CLinkPopupRenderer__UpdateURL(this.document,this[this.selectedIndex].value)\">"
+
 +	"<OPTION VALUE=''>" 
 +	"=="
 +	L_LINKSELECTPAGE_TEXT
@@ -590,6 +593,7 @@ sz += ""
 + "</OPTION>"
 }
 sz += "</SELECT>"
+*/
 }
 var arTypes = new Array("http","ftp","mailto")
 var arText = new Array("http://","ftp://","mailto:")

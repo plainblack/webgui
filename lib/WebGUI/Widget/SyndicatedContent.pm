@@ -1,5 +1,7 @@
 package WebGUI::Widget::SyndicatedContent;
 
+our $namespace = "SyndicatedContent";
+
 #-------------------------------------------------------------------
 # WebGUI is Copyright 2001 Plain Black Software.
 #-------------------------------------------------------------------
@@ -36,10 +38,10 @@ sub widgetName {
 sub www_add {
         my ($output);
       	if (WebGUI::Privilege::canEditPage()) {
-                $output = '<a href="'.$session{page}{url}.'?op=viewHelp&hid=36"><img src="'.$session{setting}{lib}.'/help.gif" border="0" align="right"></a>';
+                $output = '<a href="'.$session{page}{url}.'?op=viewHelp&hid=1&namespace='.$namespace.'"><img src="'.$session{setting}{lib}.'/help.gif" border="0" align="right"></a>';
 		$output .= '<h1>'.WebGUI::International::get(272).'</h1>';
 		$output .= '<form method="post" enctype="multipart/form-data" action="'.$session{page}{url}.'">';
-                $output .= WebGUI::Form::hidden("widget","SyndicatedContent");
+                $output .= WebGUI::Form::hidden("widget",$namespace);
                 $output .= WebGUI::Form::hidden("func","addSave");
                 $output .= '<table>';
                 $output .= '<tr><td class="formDescription">'.WebGUI::International::get(99).'</td><td>'.WebGUI::Form::text("title",20,30,'Syndicated Content').'</td></tr>';
@@ -74,7 +76,7 @@ sub www_edit {
 	tie %data, 'Tie::CPHash';
         if (WebGUI::Privilege::canEditPage()) {
 		%data = WebGUI::SQL->quickHash("select * from widget,SyndicatedContent where widget.widgetId=$session{form}{wid}",$session{dbh});
-                $output = '<a href="'.$session{page}{url}.'?op=viewHelp&hid=36"><img src="'.$session{setting}{lib}.'/help.gif" border="0" align="right"></a>';
+                $output = '<a href="'.$session{page}{url}.'?op=viewHelp&hid=1&namespace='.$namespace.'"><img src="'.$session{setting}{lib}.'/help.gif" border="0" align="right"></a>';
 		$output .= '<h1>'.WebGUI::International::get(274).'</h1>';
 		$output .= '<form method="post" enctype="multipart/form-data" action="'.$session{page}{url}.'">';
                 $output .= WebGUI::Form::hidden("wid",$session{form}{wid});

@@ -1,5 +1,5 @@
 package WebGUI;
-our $VERSION = "2.2.0";
+our $VERSION = "2.3.0";
 
 #-------------------------------------------------------------------
 # WebGUI is Copyright 2001 Plain Black Software.
@@ -63,7 +63,7 @@ sub _displayAdminBar {
 			$session{page}{url}.'?op=viewStatistics'=>WebGUI::International::get(144)
 		);
 	}
-        %hash = ( $session{page}{url}=>WebGUI::International::get(82), 
+        %hash = ( $session{page}{url}.'?'=>WebGUI::International::get(82), 
 		$session{page}{url}.'?op=switchOffAdmin'=>WebGUI::International::get(12),
 		$session{page}{url}.'?op=viewHelpIndex'=>WebGUI::International::get(13),
 		$session{page}{url}.'?op=viewPendingSubmissions'=>WebGUI::International::get(14), 
@@ -170,3 +170,5 @@ sub page {
 
 
 1;
+
+

@@ -73,7 +73,7 @@ sub canViewPage {
 sub insufficient {
 	my ($output);
 	$output = '<h1>'.WebGUI::International::get(37).'</h1>';
-	$output .= WebGUI::International::get(37);
+	$output .= WebGUI::International::get(38);
 	$output .= '<p>';
 	$output = WebGUI::Macro::process($output);
 	return $output;
@@ -103,6 +103,15 @@ sub noAccess {
 }
 
 #-------------------------------------------------------------------
+sub notMember {
+	my ($output);
+	$output = '<h1>'.WebGUI::International::get(345).'</h1>';
+	$output .= WebGUI::International::get(346);
+	$output .= '<p>';
+	return $output;
+}
+
+#-------------------------------------------------------------------
 sub vitalComponent {
 	my ($output);
         $output = '<h1>'.WebGUI::International::get(40).'</h1>';
@@ -117,3 +126,4 @@ sub vitalComponent {
 
 
 1;
+

@@ -20,7 +20,7 @@ use WebGUI::SQL;
 use WebGUI::Utility;
 
 our @ISA = qw(Exporter);
-our @EXPORT = qw(&www_editAuthenticationSettings &www_editAuthenticationSettingsSave &www_editCompanyInformation &www_editCompanyInformationSave &www_editFileSettings &www_editFileSettingsSave &www_editMailSettings &www_editMailSettingsSave &www_editMiscSettings &www_editMiscSettingsSave &www_manageSettings);
+our @EXPORT = qw(&www_editProfileSettings &www_editProfileSettingsSave &www_editAuthenticationSettings &www_editAuthenticationSettingsSave &www_editCompanyInformation &www_editCompanyInformationSave &www_editFileSettings &www_editFileSettingsSave &www_editMailSettings &www_editMailSettingsSave &www_editMiscSettings &www_editMiscSettingsSave &www_manageSettings);
 
 #-------------------------------------------------------------------
 sub www_editAuthenticationSettings {
@@ -28,7 +28,7 @@ sub www_editAuthenticationSettings {
         %authMethod = ('WebGUI'=>'WebGUI', 'LDAP'=>'LDAP');
         %yesNo = ('yes'=>WebGUI::International::get(138), 'no'=>WebGUI::International::get(139));
         if (WebGUI::Privilege::isInGroup(3)) {
-                $output .= '<a href="'.$session{page}{url}.'?op=viewHelp&hid=2"><img src="'.$session{setting}{lib}.'/help.gif" border="0" align="right"></a>';
+                $output .= '<a href="'.$session{page}{url}.'?op=viewHelp&hid=2&namespace=WebGUI"><img src="'.$session{setting}{lib}.'/help.gif" border="0" align="right"></a>';
                 $output .= '<h1>'.WebGUI::International::get(117).'</h1>';
                 $output .= ' <form method="post" action="'.$session{page}{url}.'"> ';
                 $output .= WebGUI::Form::hidden("op","editAuthenticationSettingsSave");
@@ -72,7 +72,7 @@ sub www_editAuthenticationSettingsSave {
 sub www_editCompanyInformation {
         my ($output);
         if (WebGUI::Privilege::isInGroup(3)) {
-                $output .= '<a href="'.$session{page}{url}.'?op=viewHelp&hid=6"><img src="'.$session{setting}{lib}.'/help.gif" border="0" align="right"></a>';
+                $output .= '<a href="'.$session{page}{url}.'?op=viewHelp&hid=6&namespace=WebGUI"><img src="'.$session{setting}{lib}.'/help.gif" border="0" align="right"></a>';
 		$output .= '<h1>'.WebGUI::International::get(124).'</h1>';
 		$output .= ' <form method="post" action="'.$session{page}{url}.'"> ';
                 $output .= WebGUI::Form::hidden("op","editCompanyInformationSave");
@@ -105,7 +105,7 @@ sub www_editCompanyInformationSave {
 sub www_editFileSettings {
         my ($output);
         if (WebGUI::Privilege::isInGroup(3)) {
-                $output .= '<a href="'.$session{page}{url}.'?op=viewHelp&hid=11"><img src="'.$session{setting}{lib}.'/help.gif" border="0" align="right"></a>';
+                $output .= '<a href="'.$session{page}{url}.'?op=viewHelp&hid=11&namespace=WebGUI"><img src="'.$session{setting}{lib}.'/help.gif" border="0" align="right"></a>';
 		$output .= '<h1>'.WebGUI::International::get(128).'</h1>';
 		$output .= ' <form method="post" action="'.$session{page}{url}.'"> ';
                 $output .= WebGUI::Form::hidden("op","editFileSettingsSave");
@@ -140,7 +140,7 @@ sub www_editFileSettingsSave {
 sub www_editMailSettings {
         my ($output);
         if (WebGUI::Privilege::isInGroup(3)) {
-                $output .= '<a href="'.$session{page}{url}.'?op=viewHelp&hid=13"><img src="'.$session{setting}{lib}.'/help.gif" border="0" align="right"></a>';
+                $output .= '<a href="'.$session{page}{url}.'?op=viewHelp&hid=13&namespace=WebGUI"><img src="'.$session{setting}{lib}.'/help.gif" border="0" align="right"></a>';
                 $output .= '<h1>'.WebGUI::International::get(133).'</h1>';
                 $output .= ' <form method="post" action="'.$session{page}{url}.'"> ';
                 $output .= WebGUI::Form::hidden("op","editMailSettingsSave");
@@ -172,7 +172,7 @@ sub www_editMiscSettings {
         my ($output, @array, %notFoundPage);
         %notFoundPage = (1=>WebGUI::International::get(136), 4=>WebGUI::International::get(137));
         if (WebGUI::Privilege::isInGroup(3)) {
-                $output .= '<a href="'.$session{page}{url}.'?op=viewHelp&hid=24"><img src="'.$session{setting}{lib}.'/help.gif" border="0" align="right"></a>';
+                $output .= '<a href="'.$session{page}{url}.'?op=viewHelp&hid=24&namespace=WebGUI"><img src="'.$session{setting}{lib}.'/help.gif" border="0" align="right"></a>';
                 $output .= '<h1>'.WebGUI::International::get(140).'</h1>';
                 $output .= ' <form method="post" action="'.$session{page}{url}.'"> ';
                 $output .= WebGUI::Form::hidden("op","editMiscSettingsSave");
@@ -201,10 +201,53 @@ sub www_editMiscSettingsSave {
 }
 
 #-------------------------------------------------------------------
+sub www_editProfileSettings {
+        my ($output, @array, %yesNo);
+        %yesNo = ('1'=>WebGUI::International::get(138), '0'=>WebGUI::International::get(139));
+        if (WebGUI::Privilege::isInGroup(3)) {
+                $output .= '<a href="'.$session{page}{url}.'?op=viewHelp&hid=22&namespace=WebGUI"><img src="'.$session{setting}{lib}.'/help.gif" border="0" align="right"></a>';
+                $output .= '<h1>'.WebGUI::International::get(308).'</h1>';
+                $output .= ' <form method="post" action="'.$session{page}{url}.'"> ';
+                $output .= WebGUI::Form::hidden("op","editProfileSettingsSave");
+                $output .= '<table>';
+		$array[0] = $session{setting}{profileName};
+                $output .= '<tr><td class="formDescription" valign="top">'.WebGUI::International::get(309).'</td><td>'.WebGUI::Form::selectList("profileName",\%yesNo,\@array).'</td></tr>';
+		$array[0] = $session{setting}{profileExtraContact};
+                $output .= '<tr><td class="formDescription" valign="top">'.WebGUI::International::get(310).'</td><td>'.WebGUI::Form::selectList("profileExtraContact",\%yesNo,\@array).'</td></tr>';
+		$array[0] = $session{setting}{profileHome};
+                $output .= '<tr><td class="formDescription" valign="top">'.WebGUI::International::get(311).'</td><td>'.WebGUI::Form::selectList("profileHome",\%yesNo,\@array).'</td></tr>';
+		$array[0] = $session{setting}{profileWork};
+                $output .= '<tr><td class="formDescription" valign="top">'.WebGUI::International::get(312).'</td><td>'.WebGUI::Form::selectList("profileWork",\%yesNo,\@array).'</td></tr>';
+		$array[0] = $session{setting}{profileMisc};
+                $output .= '<tr><td class="formDescription" valign="top">'.WebGUI::International::get(313).'</td><td>'.WebGUI::Form::selectList("profileMisc",\%yesNo,\@array).'</td></tr>';
+                $output .= '<tr><td></td><td>'.WebGUI::Form::submit(WebGUI::International::get(62)).'</td></tr>';
+                $output .= '</table>';
+                $output .= '</form> ';
+        } else {
+                $output = WebGUI::Privilege::adminOnly();
+        }
+        return $output;
+}
+
+#-------------------------------------------------------------------
+sub www_editProfileSettingsSave {
+        if (WebGUI::Privilege::isInGroup(3)) {
+                WebGUI::SQL->write("update settings set value=".quote($session{form}{profileName})." where name='profileName'",$session{dbh});
+                WebGUI::SQL->write("update settings set value=".quote($session{form}{profileExtraContact})." where name='profileExtraContact'",$session{dbh});
+                WebGUI::SQL->write("update settings set value=".quote($session{form}{profileHome})." where name='profileHome'",$session{dbh});
+                WebGUI::SQL->write("update settings set value=".quote($session{form}{profileWork})." where name='profileWork'",$session{dbh});
+                WebGUI::SQL->write("update settings set value=".quote($session{form}{profileMisc})." where name='profileMisc'",$session{dbh});
+                return www_manageSettings();
+        } else {
+                return WebGUI::Privilege::adminOnly();
+        }
+}
+
+#-------------------------------------------------------------------
 sub www_manageSettings {
         my ($output);
         if (WebGUI::Privilege::isInGroup(3)) {
-                $output .= '<a href="'.$session{page}{url}.'?op=viewHelp&hid=12"><img src="'.$session{setting}{lib}.'/help.gif" border="0" align="right"></a>';
+                $output .= '<a href="'.$session{page}{url}.'?op=viewHelp&hid=12&namespace=WebGUI"><img src="'.$session{setting}{lib}.'/help.gif" border="0" align="right"></a>';
                 $output .= '<h1>'.WebGUI::International::get(143).'</h1>';
                 $output .= '<ul>';
                 $output .= '<li><a href="'.$session{page}{url}.'?op=editAuthenticationSettings">'.WebGUI::International::get(117).'</a>';
@@ -212,6 +255,7 @@ sub www_manageSettings {
                 $output .= '<li><a href="'.$session{page}{url}.'?op=editFileSettings">'.WebGUI::International::get(128).'</a>';
                 $output .= '<li><a href="'.$session{page}{url}.'?op=editMailSettings">'.WebGUI::International::get(133).'</a>';
                 $output .= '<li><a href="'.$session{page}{url}.'?op=editMiscSettings">'.WebGUI::International::get(140).'</a>';
+                $output .= '<li><a href="'.$session{page}{url}.'?op=editProfileSettings">'.WebGUI::International::get(308).'</a>';
                 $output .= '</ul>';
         } else {
                 $output = WebGUI::Privilege::adminOnly();

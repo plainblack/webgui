@@ -1,5 +1,7 @@
 package WebGUI::Widget::FAQ;
 
+our $namespace = "FAQ";
+
 #-------------------------------------------------------------------
 # WebGUI is Copyright 2001 Plain Black Software.
 #-------------------------------------------------------------------
@@ -23,9 +25,9 @@ use WebGUI::Widget;
 #-------------------------------------------------------------------
 sub _reorderQuestions {
         my ($sth, $i, $qid);
-        $sth = WebGUI::SQL->read("select questionId from faqQuestion where widgetId=$_[0] order by sequenceNumber",$session{dbh});
+        $sth = WebGUI::SQL->read("select questionId from FAQ_question where widgetId=$_[0] order by sequenceNumber",$session{dbh});
         while (($qid) = $sth->array) {
-                WebGUI::SQL->write("update faqQuestion set sequenceNumber='$i' where questionId=$qid",$session{dbh});
+                WebGUI::SQL->write("update FAQ_question set sequenceNumber='$i' where questionId=$qid",$session{dbh});
                 $i++;
         }
         $sth->finish;
@@ -33,7 +35,8 @@ sub _reorderQuestions {
 
 #-------------------------------------------------------------------
 sub purge {
-        WebGUI::SQL->write("delete from faqQuestion where widgetId=$_[0]",$_[1]);
+        WebGUI::SQL->write("delete from FAQ where widgetId=$_[0]",$_[1]);
+        WebGUI::SQL->write("delete from FAQ_question where widgetId=$_[0]",$_[1]);
         purgeWidget($_[0],$_[1]);
 }
 
@@ -46,10 +49,10 @@ sub widgetName {
 sub www_add {
         my ($output);
       	if (WebGUI::Privilege::canEditPage()) {
-		$output = '<a href="'.$session{page}{url}.'?op=viewHelp&hid=40"><img src="'.$session{setting}{lib}.'/help.gif" border="0" align="right"></a>';
+		$output = '<a href="'.$session{page}{url}.'?op=viewHelp&hid=1&namespace='.$namespace.'"><img src="'.$session{setting}{lib}.'/help.gif" border="0" align="right"></a>';
                 $output = '<h1>'.WebGUI::International::get(206).'</h1>';
 		$output .= '<form method="post" enctype="multipart/form-data" action="'.$session{page}{url}.'">';
-                $output .= WebGUI::Form::hidden("widget","FAQ");
+                $output .= WebGUI::Form::hidden("widget",$namespace);
                 $output .= WebGUI::Form::hidden("func","addSave");
                 $output .= '<table>';
                 $output .= '<tr><td class="formDescription">'.WebGUI::International::get(99).'</td><td>'.WebGUI::Form::text("title",20,30,'F.A.Q.').'</td></tr>';
@@ -70,6 +73,7 @@ sub www_addSave {
 	my ($widgetId);
 	if (WebGUI::Privilege::canEditPage()) {
 		$widgetId = create();
+		WebGUI::SQL->write("insert into FAQ values ($widgetId)",$session{dbh});
 		return "";
 	} else {
 		return WebGUI::Privilege::insufficient();
@@ -100,9 +104,9 @@ sub www_addQuestion {
 sub www_addQuestionSave {
         my ($questionId, $nextSeq);
         if (WebGUI::Privilege::canEditPage()) {
-		($nextSeq) = WebGUI::SQL->quickArray("select max(sequenceNumber)+1 from faqQuestion where widgetId=$session{form}{wid}",$session{dbh});
+		($nextSeq) = WebGUI::SQL->quickArray("select max(sequenceNumber)+1 from FAQ_question where widgetId=$session{form}{wid}",$session{dbh});
                 $questionId = getNextId("questionId");
-                WebGUI::SQL->write("insert into faqQuestion values ($session{form}{wid}, $questionId, ".quote($session{form}{question}).", ".quote($session{form}{answer}).", '$nextSeq')",$session{dbh});
+                WebGUI::SQL->write("insert into FAQ_question values ($session{form}{wid}, $questionId, ".quote($session{form}{question}).", ".quote($session{form}{answer}).", '$nextSeq')",$session{dbh});
                 return www_edit();
         } else {
                 return WebGUI::Privilege::insufficient();
@@ -127,7 +131,7 @@ sub www_deleteQuestion {
 sub www_deleteQuestionConfirm {
         my ($output);
         if (WebGUI::Privilege::canEditPage()) {
-		WebGUI::SQL->write("delete from faqQuestion where questionId=$session{form}{qid}",$session{dbh});
+		WebGUI::SQL->write("delete from FAQ_question where questionId=$session{form}{qid}",$session{dbh});
 		_reorderQuestions($session{form}{wid});
                 return www_edit();
         } else {
@@ -141,7 +145,7 @@ sub www_edit {
 	tie %data, 'Tie::CPHash';
         if (WebGUI::Privilege::canEditPage()) {
 		%data = WebGUI::SQL->quickHash("select * from widget where widget.widgetId=$session{form}{wid}",$session{dbh});
-		$output = '<a href="'.$session{page}{url}.'?op=viewHelp&hid=40"><img src="'.$session{setting}{lib}.'/help.gif" border="0" align="right"></a>';
+		$output = '<a href="'.$session{page}{url}.'?op=viewHelp&hid=1&namespace='.$namespace.'"><img src="'.$session{setting}{lib}.'/help.gif" border="0" align="right"></a>';
                 $output = '<h1>'.WebGUI::International::get(211).'</h1>';
 		$output .= '<form method="post" enctype="multipart/form-data" action="'.$session{page}{url}.'">';
                 $output .= WebGUI::Form::hidden("wid",$session{form}{wid});
@@ -155,7 +159,7 @@ sub www_edit {
                 $output .= '</table></form>';
                 $output .= '<p><a href="'.$session{page}{url}.'?func=addQuestion&wid='.$session{form}{wid}.'">'.WebGUI::International::get(212).'</a><p>';
                 $output .= '<table border=1 cellpadding=3 cellspacing=0>';
-		$sth = WebGUI::SQL->read("select questionId,question from faqQuestion where widgetId='$session{form}{wid}' order by sequenceNumber",$session{dbh});
+		$sth = WebGUI::SQL->read("select questionId,question from FAQ_question where widgetId='$session{form}{wid}' order by sequenceNumber",$session{dbh});
 		while (@question = $sth->array) {
                 	$output .= '<tr><td><a href="'.$session{page}{url}.'?func=editQuestion&wid='.$session{form}{wid}.'&qid='.$question[0].'"><img src="'.$session{setting}{lib}.'/edit.gif" border=0></a><a href="'.$session{page}{url}.'?func=deleteQuestion&wid='.$session{form}{wid}.'&qid='.$question[0].'"><img src="'.$session{setting}{lib}.'/delete.gif" border=0></a><a href="'.$session{page}{url}.'?func=moveQuestionUp&wid='.$session{form}{wid}.'&qid='.$question[0].'"><img src="'.$session{setting}{lib}.'/upArrow.gif" border=0></a><a href="'.$session{page}{url}.'?func=moveQuestionDown&wid='.$session{form}{wid}.'&qid='.$question[0].'"><img src="'.$session{setting}{lib}.'/downArrow.gif" border=0></a></td><td>'.$question[1].'</td></tr>';
 		}
@@ -182,7 +186,7 @@ sub www_editQuestion {
         my ($output, %question);
 	tie %question, 'Tie::CPHash';
         if (WebGUI::Privilege::canEditPage()) {
-                %question = WebGUI::SQL->quickHash("select * from faqQuestion where questionId='$session{form}{qid}'",$session{dbh});
+                %question = WebGUI::SQL->quickHash("select * from FAQ_question where questionId='$session{form}{qid}'",$session{dbh});
                 $output = '<h1>'.WebGUI::International::get(213).'</h1>';
 		$output .= '<form method="post" enctype="multipart/form-data" action="'.$session{page}{url}.'">';
                 $output .= WebGUI::Form::hidden("wid",$session{form}{wid});
@@ -203,7 +207,7 @@ sub www_editQuestion {
 #-------------------------------------------------------------------
 sub www_editQuestionSave {
         if (WebGUI::Privilege::canEditPage()) {
-                WebGUI::SQL->write("update faqQuestion set question=".quote($session{form}{question}).", answer=".quote($session{form}{answer})." where questionId=$session{form}{qid}",$session{dbh});
+                WebGUI::SQL->write("update FAQ_question set question=".quote($session{form}{question}).", answer=".quote($session{form}{answer})." where questionId=$session{form}{qid}",$session{dbh});
                 return www_edit();
         } else {
                 return WebGUI::Privilege::insufficient();
@@ -214,11 +218,11 @@ sub www_editQuestionSave {
 sub www_moveQuestionDown {
         my (@data, $thisSeq);
         if (WebGUI::Privilege::canEditPage()) {
-                ($thisSeq) = WebGUI::SQL->quickArray("select sequenceNumber from faqQuestion where questionId=$session{form}{qid}",$session{dbh});
-                @data = WebGUI::SQL->quickArray("select questionId from faqQuestion where widgetId=$session{form}{wid} and sequenceNumber=$thisSeq+1 group by widgetId",$session{dbh});
+                ($thisSeq) = WebGUI::SQL->quickArray("select sequenceNumber from FAQ_question where questionId=$session{form}{qid}",$session{dbh});
+                @data = WebGUI::SQL->quickArray("select questionId from FAQ_question where widgetId=$session{form}{wid} and sequenceNumber=$thisSeq+1 group by widgetId",$session{dbh});
                 if ($data[0] ne "") {
-                        WebGUI::SQL->write("update faqQuestion set sequenceNumber=sequenceNumber+1 where questionId=$session{form}{qid}",$session{dbh});
-                        WebGUI::SQL->write("update faqQuestion set sequenceNumber=sequenceNumber-1 where questionId=$data[0]",$session{dbh});
+                        WebGUI::SQL->write("update FAQ_question set sequenceNumber=sequenceNumber+1 where questionId=$session{form}{qid}",$session{dbh});
+                        WebGUI::SQL->write("update FAQ_question set sequenceNumber=sequenceNumber-1 where questionId=$data[0]",$session{dbh});
                 }
                 return www_edit();
         } else {
@@ -230,11 +234,11 @@ sub www_moveQuestionDown {
 sub www_moveQuestionUp {
         my (@data, $thisSeq);
         if (WebGUI::Privilege::canEditPage()) {
-                ($thisSeq) = WebGUI::SQL->quickArray("select sequenceNumber from faqQuestion where questionId=$session{form}{qid}",$session{dbh});
-                @data = WebGUI::SQL->quickArray("select questionId from faqQuestion where widgetId=$session{form}{wid} and sequenceNumber=$thisSeq-1 group by widgetId",$session{dbh});
+                ($thisSeq) = WebGUI::SQL->quickArray("select sequenceNumber from FAQ_question where questionId=$session{form}{qid}",$session{dbh});
+                @data = WebGUI::SQL->quickArray("select questionId from FAQ_question where widgetId=$session{form}{wid} and sequenceNumber=$thisSeq-1 group by widgetId",$session{dbh});
                 if ($data[0] ne "") {
-                        WebGUI::SQL->write("update faqQuestion set sequenceNumber=sequenceNumber-1 where questionId=$session{form}{qid}",$session{dbh});
-                        WebGUI::SQL->write("update faqQuestion set sequenceNumber=sequenceNumber+1 where questionId=$data[0]",$session{dbh});
+                        WebGUI::SQL->write("update FAQ_question set sequenceNumber=sequenceNumber-1 where questionId=$session{form}{qid}",$session{dbh});
+                        WebGUI::SQL->write("update FAQ_question set sequenceNumber=sequenceNumber+1 where questionId=$data[0]",$session{dbh});
                 }
                 return www_edit();
         } else {
@@ -256,7 +260,7 @@ sub www_view {
 			$output .= $data{description};
 		}
 		$output .= '<ul>';
-		$sth = WebGUI::SQL->read("select questionId,question,answer from faqQuestion where widgetId='$widgetId' order by sequenceNumber",$session{dbh});
+		$sth = WebGUI::SQL->read("select questionId,question,answer from FAQ_question where widgetId='$widgetId' order by sequenceNumber",$session{dbh});
 		while (@question = $sth->array) {
 			$output .= '<li><a href="#'.$question[0].'">'.$question[1].'</a>';
 			$qNa .= '<a name="'.$question[0].'"><span class="faqQuestion">'.$question[1].'</span></a><br>'.$question[2].'<p>';

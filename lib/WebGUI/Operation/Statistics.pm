@@ -24,7 +24,7 @@ our @EXPORT = qw(&www_viewStatistics);
 sub www_viewStatistics {
         my ($output, $data);
         if (WebGUI::Privilege::isInGroup(3)) {
-                $output .= '<a href="'.$session{page}{url}.'?op=viewHelp&hid=12"><img src="'.$session{setting}{lib}.'/help.gif" border="0" align="right"></a>';
+                $output .= '<a href="'.$session{page}{url}.'?op=viewHelp&hid=12&namespace=WebGUI"><img src="'.$session{setting}{lib}.'/help.gif" border="0" align="right"></a>';
                 $output .= '<h1>'.WebGUI::International::get(144).'</h1>';
 		$output .= '<table>';
 		$output .= '<tr><td class="tableHeader">'.WebGUI::International::get(145).'</td><td class="tableData">'.$WebGUI::VERSION.'</td></tr>';

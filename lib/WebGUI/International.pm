@@ -18,20 +18,25 @@ my %international;
 
 #-------------------------------------------------------------------
 sub get {
-        my ($output, $language);
+        my ($output, $language, $namespace);
 	if ($session{user}{language} ne "") {
 		$language = $session{user}{language};
-	} elsif ($_[1] ne "") {
-		$language = $_[1];
+	} elsif ($_[2] ne "") {
+		$language = $_[2];
 	} else {
 		$language = "English";
+	}
+	if ($_[1] ne "") {
+		$namespace = $_[1];
+	} else {
+		$namespace = "WebGUI";
 	}
 	if (defined $international{$language}{$_[0]}) { 		# a little caching never hurts =)
 		$output = $international{$language}{$_[0]};
 	} else {
-		($output) = WebGUI::SQL->quickArray("select message from international where internationalId=$_[0] and language='$language'",$session{dbh});
+		($output) = WebGUI::SQL->quickArray("select message from international where internationalId=$_[0] and namespace='$namespace' and language='$language'",$session{dbh});
 		if ($output eq "" && $language ne "English") {
-			$output = get($_[0],"English");
+			$output = get($_[0],$namespace,"English");
 		}
 	}
 	return $output;

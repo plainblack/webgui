@@ -27,7 +27,7 @@ our @EXPORT = qw(&www_copyStyle &www_addStyle &www_addStyleSave &www_deleteStyle
 sub www_addStyle {
         my ($output);
         if (WebGUI::Privilege::isInGroup(3)) {
-                $output .= '<a href="'.$session{page}{url}.'?op=viewHelp&hid=16"><img src="'.$session{setting}{lib}.'/help.gif" border="0" align="right"></a>';
+                $output .= '<a href="'.$session{page}{url}.'?op=viewHelp&hid=16&namespace=WebGUI"><img src="'.$session{setting}{lib}.'/help.gif" border="0" align="right"></a>';
 		$output .= '<h1>'.WebGUI::International::get(150).'</h1>';
 		$output .= ' <form method="post" action="'.$session{page}{url}.'"> ';
                 $output .= WebGUI::Form::hidden("op","addStyleSave");
@@ -75,7 +75,7 @@ sub www_deleteStyle {
         if ($session{form}{sid} < 26) {
 		return WebGUI::Privilege::vitalComponent();
         } elsif (WebGUI::Privilege::isInGroup(3)) {
-                $output .= '<a href="'.$session{page}{url}.'?op=viewHelp&hid=4"><img src="'.$session{setting}{lib}.'/help.gif" border="0" align="right"></a><h1>'.WebGUI::International::get(42).'</h1>';
+                $output .= '<a href="'.$session{page}{url}.'?op=viewHelp&hid=4&namespace=WebGUI"><img src="'.$session{setting}{lib}.'/help.gif" border="0" align="right"></a><h1>'.WebGUI::International::get(42).'</h1>';
                 $output .= WebGUI::International::get(155).'<p>';
                 $output .= '<div align="center"><a href="'.$session{page}{url}.'?op=deleteStyleConfirm&sid='.$session{form}{sid}.'">'.WebGUI::International::get(44).'</a>';
                 $output .= '&nbsp;&nbsp;&nbsp;&nbsp;<a href="'.$session{page}{url}.'?op=listStyles">'.WebGUI::International::get(45).'</a></div>';
@@ -104,7 +104,7 @@ sub www_editStyle {
 	tie %style, 'Tie::CPHash';
         if (WebGUI::Privilege::isInGroup(3)) {
                 %style = WebGUI::SQL->quickHash("select * from style where styleId=$session{form}{sid}",$session{dbh});
-                $output .= '<a href="'.$session{page}{url}.'?op=viewHelp&hid=16"><img src="'.$session{setting}{lib}.'/help.gif" border="0" align="right"></a>';
+                $output .= '<a href="'.$session{page}{url}.'?op=viewHelp&hid=16&namespace=WebGUI"><img src="'.$session{setting}{lib}.'/help.gif" border="0" align="right"></a>';
 		$output .= '<h1>'.WebGUI::International::get(156).'</h1>';
 		$output .= ' <form method="post" action="'.$session{page}{url}.'"> ';
                 $output .= WebGUI::Form::hidden("op","editStyleSave");
@@ -138,7 +138,7 @@ sub www_listStyles {
         my ($output, $pn, $sth, @data, @row, $i, $itemsPerPage);
         if (WebGUI::Privilege::isInGroup(3)) {
                 $itemsPerPage = 50;
-                $output = '<a href="'.$session{page}{url}.'?op=viewHelp&hid=9"><img src="'.$session{setting}{lib}.'/help.gif" border="0" align="right"></a>';
+                $output = '<a href="'.$session{page}{url}.'?op=viewHelp&hid=9&namespace=WebGUI"><img src="'.$session{setting}{lib}.'/help.gif" border="0" align="right"></a>';
 		$output .= '<h1>'.WebGUI::International::get(157).'</h1>';
 		$output .= '<div align="center"><a href="'.$session{page}{url}.'?op=addStyle">'.WebGUI::International::get(158).'</a></div>';
                 $output .= '<table border=1 cellpadding=5 cellspacing=0 align="center">';

@@ -1,5 +1,7 @@
 package WebGUI::Widget::Poll;
 
+our $namespace = "Poll";
+
 #-------------------------------------------------------------------
 # WebGUI is Copyright 2001 Plain Black Software.
 #-------------------------------------------------------------------
@@ -62,14 +64,14 @@ sub _viewResults {
                         $output .= $poll{description}.'<p>';
                 }
 		$output .= '<span class="pollQuestion">'.$poll{question}.'</span>';
-		($totalResponses) = WebGUI::SQL->quickArray("select count(*) from pollAnswer where widgetId=$widgetId",$session{dbh});
+		($totalResponses) = WebGUI::SQL->quickArray("select count(*) from Poll_answer where widgetId=$widgetId",$session{dbh});
 		if ($totalResponses < 1) {
 			$totalResponses = 1;
 		}
 		for ($i=1; $i<=20; $i++) {
 			if ($poll{'a'.$i} =~ /\w/) {
 				$output .= '<span class="pollAnswer"><hr size=1>'.$poll{'a'.$i}.'<br></span>';
-                		@data = WebGUI::SQL->quickArray("select count(*), answer from pollAnswer where answer='a$i' and widgetId=$widgetId group by answer",$session{dbh});
+                		@data = WebGUI::SQL->quickArray("select count(*), answer from Poll_answer where answer='a$i' and widgetId=$widgetId group by answer",$session{dbh});
 				$output .= '<table cellpadding=0 cellspacing=0 border=0><tr><td width="'.round($poll{graphWidth}*$data[0]/$totalResponses).'" class="pollColor"><img src="'.$session{setting}{lib}.'/spacer.gif" height="1" width="1"></td><td class="pollAnswer">&nbsp;&nbsp;'.round(100*$data[0]/$totalResponses).'%</td></tr></table>';
 			}
                 }
@@ -80,7 +82,7 @@ sub _viewResults {
 
 #-------------------------------------------------------------------
 sub purge {
-        WebGUI::SQL->write("delete from pollAnswer where widgetId=$_[0]",$_[1]);
+        WebGUI::SQL->write("delete from Poll_answer where widgetId=$_[0]",$_[1]);
         WebGUI::SQL->write("delete from Poll where widgetId=$_[0]",$_[1]);
         purgeWidget($_[0],$_[1]);
 }
@@ -95,10 +97,10 @@ sub www_add {
         my ($output, %hash, @array);
 	tie %hash, "Tie::IxHash";
       	if (WebGUI::Privilege::canEditPage()) {
-                $output = '<a href="'.$session{page}{url}.'?op=viewHelp&hid=28"><img src="'.$session{setting}{lib}.'/help.gif" border="0" align="right"></a>';
+                $output = '<a href="'.$session{page}{url}.'?op=viewHelp&hid=1&namespace='.$namespace.'"><img src="'.$session{setting}{lib}.'/help.gif" border="0" align="right"></a>';
 		$output .= '<h1>'.WebGUI::International::get(251).'</h1>';
 		$output .= '<form method="post" enctype="multipart/form-data" action="'.$session{page}{url}.'">';
-                $output .= WebGUI::Form::hidden("widget","Poll");
+                $output .= WebGUI::Form::hidden("widget",$namespace);
                 $output .= WebGUI::Form::hidden("func","addSave");
                 $output .= '<table>';
                 $output .= '<tr><td class="formDescription">'.WebGUI::International::get(99).'</td><td>'.WebGUI::Form::text("title",20,30,'Poll').'</td></tr>';
@@ -141,7 +143,7 @@ sub www_edit {
 	tie %data, 'Tie::CPHash';
         if (WebGUI::Privilege::canEditPage()) {
 		%data = WebGUI::SQL->quickHash("select * from widget,Poll where widget.widgetId=Poll.widgetId and widget.widgetId=$session{form}{wid}",$session{dbh});
-                $output = '<a href="'.$session{page}{url}.'?op=viewHelp&hid=28"><img src="'.$session{setting}{lib}.'/help.gif" border="0" align="right"></a>';
+                $output = '<a href="'.$session{page}{url}.'?op=viewHelp&hid=1&namespace='.$namespace.'"><img src="'.$session{setting}{lib}.'/help.gif" border="0" align="right"></a>';
 		$output .= '<h1>'.WebGUI::International::get(258).'</h1>';
 		$output .= '<form method="post" enctype="multipart/form-data" action="'.$session{page}{url}.'">';
                 $output .= WebGUI::Form::hidden("wid",$session{form}{wid});
@@ -182,7 +184,7 @@ sub www_editSave {
 #-------------------------------------------------------------------
 sub www_resetVotes {
 	if (WebGUI::Privilege::canEditPage()) {
-		WebGUI::SQL->write("delete from pollAnswer where widgetId='$session{form}{wid}'",$session{dbh});
+		WebGUI::SQL->write("delete from Poll_answer where widgetId='$session{form}{wid}'",$session{dbh});
 	}
 	return "";
 }
@@ -195,7 +197,7 @@ sub www_view {
 	if ($data{active} eq "0") {
 		$output = _viewResults($_[0]);
 	} elsif (WebGUI::Privilege::isInGroup($data{voteGroup},$session{user}{userId})) {
-		($hasVoted) = WebGUI::SQL->quickArray("select count(*) from pollAnswer where widgetId=$_[0] and ((userId=$session{user}{userId} and userId<>1) or (userId=1 and ipAddress='$session{env}{REMOTE_ADDR}'))",$session{dbh});
+		($hasVoted) = WebGUI::SQL->quickArray("select count(*) from Poll_answer where widgetId=$_[0] and ((userId=$session{user}{userId} and userId<>1) or (userId=1 and ipAddress='$session{env}{REMOTE_ADDR}'))",$session{dbh});
 		if ($hasVoted) {
 			$output = _viewResults($_[0]);
 		} else {
@@ -212,7 +214,7 @@ sub www_vote {
 	my ($voteGroup);
 	($voteGroup) = WebGUI::SQL->quickArray("select voteGroup from Poll where widgetId='$session{form}{wid}'",$session{dbh});
         if (WebGUI::Privilege::isInGroup($voteGroup,$session{user}{userId})) {
-        	WebGUI::SQL->write("insert into pollAnswer values ($session{form}{wid}, '$session{form}{answer}', $session{user}{userId}, '$session{env}{REMOTE_ADDR}')",$session{dbh});
+        	WebGUI::SQL->write("insert into Poll_answer values ($session{form}{wid}, '$session{form}{answer}', $session{user}{userId}, '$session{env}{REMOTE_ADDR}')",$session{dbh});
 	}
 	return "";
 }
