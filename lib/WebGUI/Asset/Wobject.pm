@@ -322,10 +322,10 @@ sub processTemplate {
               	.editIcon('func=edit',$self->get("url"))
              	.moveUpIcon('func=promote',$self->get("url"))
              	.moveDownIcon('func=demote',$self->get("url"))
-              #	.moveTopIcon('func=moveTop&wid='.${$wobject}{wobjectId})
-              #	.moveBottomIcon('func=moveBottom&wid='.${$wobject}{wobjectId})
             	.cutIcon('func=cut',$self->get("url"))
             	.copyIcon('func=copy',$self->get("url"));
+              #	.moveTopIcon('func=moveTop&wid='.${$wobject}{wobjectId})
+              #	.moveBottomIcon('func=moveBottom&wid='.${$wobject}{wobjectId})
        # if (${$wobject}{namespace} ne "WobjectProxy" && isIn("WobjectProxy",@{$session{config}{wobjects}})) {
         #     	$wobjectToolbar .= shortcutIcon('func=createShortcut');
         #}

@@ -466,7 +466,8 @@ sub getNextChildRank {
 
 sub getParent {
 	my $self = shift;
-	return WebGUI::Asset->newByDynamicClass($self->get("parentId"));	
+	$self->{_parent} = WebGUI::Asset->newByDynamicClass($self->get("parentId")) unless (exists $self->{_parent});
+	return $self->{_parent};
 }
 
 sub getParentLineage {
@@ -612,6 +613,24 @@ sub paste {
 	return 0;
 }
 
+sub processPropertiesFromFormPost {
+	my $self = shift;
+	my %data;
+	foreach my $definition (@{$self->definition}) {
+		foreach my $property (keys %{$definition->{properties}}) {
+			$data{$property} = WebGUI::FormProcessor::process(
+				$property,
+				$definition->{properties}{fieldType},
+				$definition->{properties}{defaultValue}
+				);
+		}
+	}
+	$data{title} = "Untitled" unless ($data{title});
+	$data{menuTitle} = $data{title} unless ($data{menuTitle});
+	$data{url} = $self->getParent->get("url").'/'.$data{menuTitle} unless ($data{url});
+	$self->update(\%data);
+}
+
 sub promote {
 	my $self = shift;
 	my ($sisterLineage) = WebGUI::SQL->quickArray("select max(lineage) from asset 
@@ -747,7 +766,12 @@ sub update {
 
 sub www_add {
 	my $self = shift;
-	my $newAsset = WebGUI::Asset->newByDynamicClass("new",$session{form}{class},$self->get);
+	my %properties = %{$self->get};
+	delete $properties{title};
+	delete $properties{menuTitle};
+	delete $properties{url};
+	delete $properties{description};
+	my $newAsset = WebGUI::Asset->newByDynamicClass("new",$session{form}{class},\%properties);
 	return $newAsset->www_edit();
 }
 
@@ -830,20 +854,11 @@ sub www_editSave {
 	my $object;
 	if ($session{form}{assetId} eq "new") {
 		$object = $self->addChild({className=>$session{form}{class}});	
+		$object->{_parent} = $self;
 	} else {
 		$object = $self;
 	}
-	my %data;
-	foreach my $definition (@{$object->definition}) {
-		foreach my $property (keys %{$definition->{properties}}) {
-			$data{$property} = WebGUI::FormProcessor::process(
-				$property,
-				$definition->{properties}{fieldType},
-				$definition->{properties}{defaultValue}
-				);
-		}
-	}
-	$object->update(\%data);
+	$object->processPropertiesFromFormPost;
 	return $self->www_manageAssets if ($session{form}{afterEdit} eq "assetManager" && $session{form}{assetId} eq "new");
 	return $object->getParent->www_manageAssets if ($session{form}{afterEdit} eq "assetManager");
 	return $object->www_view;

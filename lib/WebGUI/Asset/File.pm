@@ -17,8 +17,10 @@ package WebGUI::Asset::File;
 use strict;
 use WebGUI::Asset;
 use WebGUI::HTTP;
+use WebGUI::Icon;
 use WebGUI::Session;
 use WebGUI::Storage;
+use WebGUI::Template;
 
 our @ISA = qw(WebGUI::Asset);
 
@@ -138,6 +140,33 @@ sub getName {
 } 
 
 
+sub processPropertiesFromFormPost {
+	my $self = shift;
+	$self->SUPER::processPropertiesFromFormPost;
+	my $storage = WebGUI::Storage->create;
+	my $filename = $storage->addFileFromFormPost("file");
+	if (defined $filename) {
+		my $oldVersions;
+		if ($self->get("filename")) { # do file versioning
+			my @old = split("\n",$self->get("olderVersions"));
+			push(@old,$self->get("storageId")."|".$self->get("filename"));
+			$oldVersions = join("\n",@old);
+		}
+		my %data;
+		$data{filename} = $filename;
+		$data{storageId} = $storage->getId;
+		$data{olderVersions} = $oldVersions;
+		$data{title} = $filename unless ($session{form}{title});
+		$data{menuTitle} = $filename unless ($session{form}{menuTitle});
+		$data{url} = $self->getParent->getUrl.'/'.$filename unless ($session{form}{url});
+		$self->update(\%data);
+		$self->setSize($storage->getFileSize($filename));
+	} else {
+		$storage->delete;
+	}
+}
+
+
 #-------------------------------------------------------------------
 
 =head2 purge
@@ -161,18 +190,24 @@ sub purge {
 sub view {
 	my $self = shift;
 	my $storage = WebGUI::Storage->get($self->get("storageId"));
-use WebGUI::Utility;
-	if (isIn($storage->getFileExtension($self->get("filename")),qw("jpg","png","gif"))) {
-		return '<a href="'.$storage->getUrl($self->get("filename")).'"><img src="'.$storage->getUrl($self->get("filename")).'" alt="test" border="0" /></a>';
-	} else {
-		return '<a href="'.$storage->getUrl($self->get("filename")).'"><img src="'.$storage->getFileIconUrl($self->get("filename")).'" alt="test" border="0" />'.$self->get("filename").'</a>';
-	}
+	my $toolbar = deleteIcon('func=delete',$self->get("url"),WebGUI::International::get(43))
+              	.editIcon('func=edit',$self->get("url"))
+             	.moveUpIcon('func=promote',$self->get("url"))
+             	.moveDownIcon('func=demote',$self->get("url"))
+            	.cutIcon('func=cut',$self->get("url"))
+            	.copyIcon('func=copy',$self->get("url"));
+	my %var = %{$self->get};
+	$var{controls} = $toolbar;
+	$var{fileUrl} = $storage->getUrl($self->get("filename"));
+	$var{fileIcon} = $storage->getFileIconUrl($self->get("filename"));
+	return WebGUI::Template::process("1","FileAsset",\%var);
 }
 
 
-sub view2 {
 
+sub www_view {
 	my $self = shift;
+	return WebGUI::Privilege::noAccess() unless $self->canView;
 	if ($session{var}{adminOn}) {
 		return $self->www_edit;
 	}
@@ -180,44 +215,6 @@ sub view2 {
 	WebGUI::HTTP::setRedirect($storage->getUrl($self->get("filename")));
 	return "";
 }
-
-#-------------------------------------------------------------------
-
-=head2 www_editSave
-
-Gathers data from www_edit and persists it.
-
-=cut
-
-sub www_editSave {
-	my $self = shift;
-	my $output = $self->SUPER::www_editSave();
-	my $storage = WebGUI::Storage->create;
-	my $filename = $storage->addFileFromFormPost("file");
-	if (defined $filename) {
-		my $oldVersions;
-		if ($self->get($filename)) { # do file versioning
-			my @old = split("\n",$self->get("olderVersions"));
-			push(@old,$self->get("storageId")."|".$self->get("filename"));
-			$oldVersions = join("\n",@old);
-		}
-		$self->update({
-			filename=>$filename,
-			storageId=>$storage->getId,
-			olderVersions=>$oldVersions
-			});
-		$self->setSize($storage->getFileSize($filename));
-	} else {
-		$storage->delete;
-	}
-	return $output;
-}
-
-#sub www_view {
-#	my $self = shift;
-#	return WebGUI::Privilege::noAccess() unless $self->canView;
-#	return $self->view;
-#}
 
 
 1;
