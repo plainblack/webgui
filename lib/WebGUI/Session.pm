@@ -153,9 +153,18 @@ Cleans up a WebGUI session information from memory and disconnects from any reso
 =cut
 
 sub close {
-	$session{'dbh'}->disconnect();
+	$session{asset}->DESTROY() if (exists $session{asset});
+	foreach my $slavedbh (@{$session{slave}}) {
+		$slavedbh->disconnect();
+	}
+	$session{dbh}->disconnect() if (exists $session{dbh});
+	$session{cgi}->DESTROY() if (exists $session{cgi});
 	undef %session;
 	$ENV{PATH_INFO} = "/"; #work around to fix a bug in mod_perl (win32)
+}
+#-------------------------------------------------------------------
+sub DESTROY {
+	WebGUI::Session::close();
 }
 
 #-------------------------------------------------------------------

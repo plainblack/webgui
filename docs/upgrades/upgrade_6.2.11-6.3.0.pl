@@ -1439,7 +1439,7 @@ sub walkTree {
 				$groupIdEdit = $wobject->{groupIdEdit};
 				$ownerId = $wobject->{ownerId};
 			}
-			$className = 'WebGUI::Asset::Wobject::'.$wobject->{namespace};
+			my $className = 'WebGUI::Asset::Wobject::'.$wobject->{namespace};
 			WebGUI::SQL->write("insert into asset (assetId, parentId, lineage, className, state, title, menuTitle, url, startDate, 
 				endDate, isHidden, ownerUserId, groupIdView, groupIdEdit, encryptPage, assetSize) values (".quote($wobjectId).",
 				".quote($pageId).", ".quote($wobjectLineage).", ".quote($className).",'published',".quote($wobject->{title}||'Untitled').",
