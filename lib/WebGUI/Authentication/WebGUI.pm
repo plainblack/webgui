@@ -109,7 +109,7 @@ sub userFormSave {
 #-------------------------------------------------------------------
 sub userFormValidate {
         my ($error);
-        if ($session{form}{'authWebGUI.identifier'} ne $session{form}{identifierConfirm}) {
+        if ($session{form}{'authWebGUI.identifier'} ne $session{form}{'authWebGUI.identifierConfirm'}) {
                 $error = '<li>'.WebGUI::International::get(3,'Auth/WebGUI');
         }
         if ($session{form}{'authWebGUI.identifier'} eq "") {
