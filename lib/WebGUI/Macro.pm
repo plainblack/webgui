@@ -60,9 +60,13 @@ sub process {
         if ($output =~ /\^\^/) {
                 $output =~ s/\^\^/\^/g;
         }
-  #---page url---
+  #---script url---
         if ($output =~ /\^\//) {
                 $output =~ s/\^\//$session{env}{SCRIPT_NAME}/g;
+        }
+  #---page url---
+        if ($output =~ /\^\\/) {
+                $output =~ s/\^\\/$session{page}{url}/g;
         }
   #---username---
         if ($output =~ /\^\@/) {
@@ -126,6 +130,20 @@ sub process {
         	$temp = '<a href="'.$session{env}{SCRIPT_NAME}.'/home">Home</a>';
         	$output =~ s/\^H/$temp/g;
 	}
+  #---2 level current level menu (vertical)---
+        if ($output =~ /\^j/) {
+                $temp = '<span class="verticalMenu">';
+                $temp .= _traversePageTree($session{page}{pageId},0,2);
+                $temp .= '</span>';
+                $output =~ s/\^j/$temp/g;
+        }
+  #---3 level current level menu (vertical)---
+        if ($output =~ /\^J/) {
+                $temp = '<span class="verticalMenu">';
+                $temp .= _traversePageTree($session{page}{pageId},0,3);
+                $temp .= '</span>';
+                $output =~ s/\^J/$temp/g;
+        }
   #---login box---
 	if ($output =~ /\^L/) {
 		$temp = '<div class="loginBox">';

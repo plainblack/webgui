@@ -98,7 +98,7 @@ sub open {
         foreach ($config->param) {
                 $CONFIG{$_} = $config->param($_);
         }
-        $dbh = DBI->connect($CONFIG{dsn}, $CONFIG{dbuser}, $CONFIG{dbpass});
+        $dbh = DBI->connect($CONFIG{dsn}, $CONFIG{dbuser}, $CONFIG{dbpass}, { RaiseError => 1, AutoCommit => 1 });
         $query = CGI->new();
         foreach ($query->param) {
                 $FORM{$_} = $query->param($_);

@@ -1,0 +1,52 @@
+
+##################################################################
+#              Quick And Dirty Install Instructions              #
+##################################################################
+
+The following is a rough overview of how to install WebGUI. For
+more detailed instructions read the WebGUI installation 
+documentation.
+   
+   http://www.plainblack.com/index.pl/installation
+
+QnD INSTALL INSTRUCTIONS:
+
+1. Install Perl 5.6.x or greater.
+
+2. Install the following Perl modules:
+
+   LWP
+   Tie::IxHash
+   DBI
+   XML::RSS
+   Mysql
+   Digest::MD5
+   Net::LDAP
+
+3. Install Apache (with or without mod_perl) and set up your config.
+
+4. Install MySQL.
+
+5. Install MnoGO Search (http://www.mnogosearch.org).
+
+6. Extract WebGUI into your webroot.
+
+7. Run the following Database commands. (You should modify the
+   commands to match your database, username, and password.)
+
+   mysql -e "create database WebGUI"
+   mysql -e "grant all privileges on WebGUI.* to webgui@localhost identified by 'password'"
+   mysql -e "flush privileges"
+   mysql -uwebgui -ppassword WebGUI < docs/create.sql
+
+8. Edit "etc/WebGUI.conf" to patch your DB settings and log directory.
+
+9. Run the following command from your WebGUI directory to determine
+   whether you've configured your system correctly.
+
+   perl testEnvironment.pl
+
+   If it returns all "OK" then you're done. The default admin account 
+   info is "Admin" and "123qwe".
+
+

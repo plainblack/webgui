@@ -12,7 +12,9 @@ package WebGUI::Operation::Account;
 
 use Digest::MD5 qw(md5_base64);
 use Exporter;
+use Net::LDAP;
 use strict;
+use URI;
 use WebGUI::Form;
 use WebGUI::Privilege;
 use WebGUI::Session;
@@ -21,6 +23,7 @@ use WebGUI::Utility;
 
 our @ISA = qw(Exporter);
 our @EXPORT = qw(&www_createAccount &www_deactivateAccount &www_deactivateAccountConfirm &www_displayAccount &www_displayLogin &www_login &www_logout &www_recoverPassword &www_recoverPasswordFinish &www_saveAccount &www_updateAccount);
+our %ldapStatusCode = ( 0=>'success (0)', 1=>'Operations Error (1)', 2=>'Protocol Error (2)', 3=>'Time Limit Exceeded (3)', 4=>'Size Limit Exceeded (4)', 5=>'Compare False (5)', 6=>'Compare True (6)', 7=>'Auth Method Not Supported (7)', 8=>'Strong Auth Required (8)', 9=>'Referral (10)', 11=>'Admin Limit Exceeded (11)', 12=>'Unavailable Critical Extension (12)', 13=>'Confidentiality Required (13)', 14=>'Sasl Bind In Progress (14)', 15=>'No Such Attribute (16)', 17=>'Undefined Attribute Type (17)', 18=>'Inappropriate Matching (18)', 19=>'Constraint Violation (19)', 20=>'Attribute Or Value Exists (20)', 21=>'Invalid Attribute Syntax (21)', 32=>'No Such Object (32)', 33=>'Alias Problem (33)', 34=>'Invalid DN Syntax (34)', 36=>'Alias Dereferencing Problem (36)', 48=>'Inappropriate Authentication (48)', 49=>'Invalid Credentials (49)', 50=>'Insufficient Access Rights (50)', 51=>'Busy (51)', 52=>'Unavailable (52)', 53=>'Unwilling To Perform (53)', 54=>'Loop Detect (54)', 64=>'Naming Violation (64)', 65=>'Object Class Violation (65)', 66=>'Not Allowed On Non Leaf (66)', 67=>'Not Allowed On RDN (67)', 68=>'Entry Already Exists (68)', 69=>'Object Class Mods Prohibited (69)', 71=>'Affects Multiple DSAs (71)', 80=>'other (80)');
 
 #-------------------------------------------------------------------
 sub _hasBadPassword {
@@ -35,7 +38,7 @@ sub _hasBadPassword {
 sub _hasBadUsername {
 	my ($otherUser);
 	($otherUser) = WebGUI::SQL->quickArray("select username from user where lcase(username)=lcase('$_[0]')",$session{dbh});
-	if ($otherUser ne "" || $_[0] eq "") {
+	if (($otherUser ne "" && $otherUser ne $session{user}{username}) || $_[0] eq "") {
 		return 1;
 	} else {
 		return 0;
@@ -65,8 +68,15 @@ sub www_createAccount {
 		$output .= WebGUI::Form::hidden("op","saveAccount");
 		$output .= '<table>';
 		$output .= '<tr><td class="formDescription">Username</td><td>'.WebGUI::Form::text("username",20,30).'</td></tr>';
-		$output .= '<tr><td class="formDescription">Password</td><td>'.WebGUI::Form::password("identifier1",20,30).'</td></tr>';
-		$output .= '<tr><td class="formDescription">Password (confirm)</td><td>'.WebGUI::Form::password("identifier2",20,30).'</td></tr>';
+		if ($session{setting}{authMethod} eq "LDAP") {
+			$output .= WebGUI::Form::hidden("identifier1","ldap-password");
+			$output .= WebGUI::Form::hidden("identifier2","ldap-password");
+			$output .= '<tr><td class="formDescription">'.$session{setting}{ldapIdName}.'</td><td>'.WebGUI::Form::text("ldapId",20,100).'</td></tr>';
+			$output .= '<tr><td class="formDescription">'.$session{setting}{ldapPasswordName}.'</td><td>'.WebGUI::Form::password("ldapPassword",20,100).'</td></tr>';
+		} else {
+			$output .= '<tr><td class="formDescription">Password</td><td>'.WebGUI::Form::password("identifier1",20,30).'</td></tr>';
+			$output .= '<tr><td class="formDescription">Password (confirm)</td><td>'.WebGUI::Form::password("identifier2",20,30).'</td></tr>';
+		}
 		$output .= '<tr><td class="formDescription" valign="top">Email Address</td><td>'.WebGUI::Form::text("email",20,255).'<span class="formSubtext"><br>This is only necessary if you wish to use features that require Email.</span></td></tr>';
 		$output .= '<tr><td class="formDescription" valign="top"><a href="http://www.icq.com">ICQ</a> UIN</td><td>'.WebGUI::Form::text("icq",20,30).'<span class="formSubtext"><br>This is only necessary if you wish to use features that require ICQ.</span></td></tr>';
 		$output .= '<tr><td></td><td>'.WebGUI::Form::submit("create").'</td></tr>';
@@ -110,8 +120,12 @@ sub www_displayAccount {
         	$output .= WebGUI::Form::hidden("op","updateAccount");
         	$output .= '<table>';
         	$output .= '<tr><td class="formDescription">username</td><td>'.WebGUI::Form::text("username",20,30,$session{user}{username}).'</td></tr>';
-        	$output .= '<tr><td class="formDescription">password</td><td>'.WebGUI::Form::password("identifier1",20,30,"password").'</td></tr>';
-        	$output .= '<tr><td class="formDescription">password (confirm)</td><td>'.WebGUI::Form::password("identifier2",20,30,"password").'</td></tr>';
+		if ($session{user}{authMethod} eq "LDAP") {
+        		$output .= WebGUI::Form::hidden("identifier","password");
+		} else {
+        		$output .= '<tr><td class="formDescription">password</td><td>'.WebGUI::Form::password("identifier1",20,30,"password").'</td></tr>';
+        		$output .= '<tr><td class="formDescription">password (confirm)</td><td>'.WebGUI::Form::password("identifier2",20,30,"password").'</td></tr>';
+		}
         	$output .= '<tr><td class="formDescription" valign="top">email address</td><td>'.WebGUI::Form::text("email",20,255,$session{user}{email}).'<span class="formSubtext"><br>This is only necessary if you wish to use features that require Email.</span></td></tr>';
         	$output .= '<tr><td class="formDescription" valign="top"><a href="http://www.icq.com">ICQ</a> UIN</td><td>'.WebGUI::Form::text("icq",20,30,$session{user}{icq}).'<span class="formSubtext"><br>This is only necessary if you wish to use features that require ICQ.</span></td></tr>';
 		$output .= '<tr><td></td><td>'.WebGUI::Form::submit("update").'</td></tr>';
@@ -154,13 +168,39 @@ sub www_displayLogin {
 
 #-------------------------------------------------------------------
 sub www_login {
-	my ($uid,$pass);
-	($uid,$pass) = WebGUI::SQL->quickArray("select userId,identifier from user where username=".quote($session{form}{username}),$session{dbh});
-	if (Digest::MD5::md5_base64($session{form}{identifier}) eq $pass && $session{form}{identifier} ne "") {
+	my ($uri, $port, $ldap, %args, $auth, $error, $uid,$pass,$authMethod, $ldapURL, $connectDN, $success);
+	($uid,$pass,$authMethod, $ldapURL, $connectDN) = WebGUI::SQL->quickArray("select userId,identifier,authMethod,ldapURL,connectDN from user where username=".quote($session{form}{username}),$session{dbh});
+	if ($authMethod eq "LDAP") {
+                $uri = URI->new($ldapURL);
+                if ($uri->port < 1) {
+                        $port = 389;
+                } else {
+                        $port = $uri->port;
+                }
+                %args = (port => $port);
+                $ldap = Net::LDAP->new($uri->host, %args) or $error = "Cannot connect to LDAP server.";
+                $auth = $ldap->bind($connectDN, $session{form}{identifier});
+                $ldap->unbind;
+                if ($auth->code == 48 || $auth->code == 49) {
+			$error = "The account information you supplied is invalid. Either the account does not exist or the username/password combination was incorrect.";
+		} elsif ($auth->code > 0) {
+			$error .= 'LDAP error "'.$ldapStatusCode{$auth->code}.'" occured. Please contact your system administrator for assistance. ';
+		} else {
+			$success = 1;
+		}
+	} else {
+		if (Digest::MD5::md5_base64($session{form}{identifier}) eq $pass && $session{form}{identifier} ne "") {
+			$success = 1;
+		} else {
+			$error = "The account information you supplied is invalid. Either the account does not exist or the username/password combination was incorrect.";
+		}
+	}
+	if ($success) {
 		_login($uid,$pass);
 		return "";
 	} else {
-		return "<h1>Invalid Account</h1>The account information you supplied is invalid. Either the account does not exist or the username/password combination was incorrect.".www_displayLogin();
+		WebGUI::ErrorHandler::warn($error);
+		return "<h1>Error</h1>".$error.www_displayLogin();
 	}
 }
 
@@ -216,24 +256,46 @@ sub www_recoverPasswordFinish {
 
 #-------------------------------------------------------------------
 sub www_saveAccount {
-	my ($output, $error, $uid, $encryptedPassword);
+	my ($uri, $ldap, $port, %args, $search, $connectDN, $auth, $output, $error, $uid, $encryptedPassword);
 	if (_hasBadUsername($session{form}{username})) {
-		$error = '<b>Error:</b> The account name <b>'.$session{form}{username}.'</b> is in use by another member of this site. Please try a different username, perhaps "'.$session{form}{username}.'too" or "'.$session{form}{username}.'01"<p>';
+		$error = 'The account name "'.$session{form}{username}.'" is in use by another member of this site. Please try a different username, perhaps "'.$session{form}{username}.'too" or "'.$session{form}{username}.'01" ';
 	}
 	if (_hasBadPassword($session{form}{identifier1},$session{form}{identifier2})) {
-		$error .= '<b>Error:</b> Your passwords did not match. Please try again.<p>';
+		$error .= 'Your passwords did not match. Please try again. ';
+	}
+	if ($session{setting}{authMethod} eq "LDAP") {
+		$uri = URI->new($session{setting}{ldapURL});
+		if ($uri->port < 1) {
+			$port = 389;
+		} else {
+			$port = $uri->port;
+		}
+		%args = (port => $port);
+		$ldap = Net::LDAP->new($uri->host, %args) or $error .= "Cannot connect to LDAP server. ";
+		$ldap->bind;
+		$search = $ldap->search (base => $uri->dn, filter => $session{setting}{ldapId}."=".$session{form}{ldapId});
+		$connectDN = "cn=".$search->entry(0)->get_value("cn");
+		$ldap->unbind;
+		$ldap = Net::LDAP->new($uri->host, %args) or $error .= "Cannot connect to LDAP server. ";
+		$auth = $ldap->bind(dn=>$connectDN, password=>$session{form}{ldapPassword});
+		if ($auth->code == 48 || $auth->code == 49) {
+			$error .= "Either your ".$session{setting}{ldapIdName}." or ".$session{setting}{ldapPasswordName}." were invalid. ";
+		} elsif ($auth->code > 0) {
+			$error .= 'LDAP error "'.$ldapStatusCode{$auth->code}.'" occured. Please contact your system administrator for assistance. ';
+		}
+		$ldap->unbind;
 	}
 	if ($error eq "") {
 		$encryptedPassword = Digest::MD5::md5_base64($session{form}{identifier1});
 		$uid = getNextId("userId");
-		WebGUI::SQL->write("insert into user set userId=$uid, username=".quote($session{form}{username}).", identifier=".quote($encryptedPassword).", email=".quote($session{form}{email}).", icq=".quote($session{form}{icq}),$session{dbh});
+		WebGUI::SQL->write("insert into user set userId=$uid, username=".quote($session{form}{username}).", identifier=".quote($encryptedPassword).", authMethod=".quote($session{setting}{authMethod}).", ldapURL=".quote($session{setting}{ldapURL}).", connectDN=".quote($connectDN).", email=".quote($session{form}{email}).", icq=".quote($session{form}{icq}),$session{dbh});
 		WebGUI::SQL->write("insert into groupings set groupId=2,userId=$uid",$session{dbh});
 		_login($uid,$encryptedPassword);
 		$output .= 'Account created successfully!<p>';
 		$output .= www_displayAccount();
 	} else {
-		$output = $error;
-		$output = www_createAccount();
+		WebGUI::ErrorHandler::warn($error);
+		$output = "<h1>Error</h1>".$error.www_createAccount();
 	}
 	return $output;
 }
@@ -261,7 +323,7 @@ sub www_updateAccount {
                 	$output .= www_displayAccount();
         	} else {
                 	$output = $error;
-                	$output = www_createAccount();
+                	$output .= www_createAccount();
         	}
 	} else {
 		$output .= www_displayLogin();

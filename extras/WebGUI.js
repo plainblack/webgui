@@ -41,8 +41,8 @@ function getShowMeText() {
 	return formObj.value;
 }
 
-function image(obj) {
-	obj.value = obj.value+'<img src="'+prompt("Enter the text to center:", "http://somesite.com/image.jpg")+'" border="0">';
+function imageAdd(obj) {
+	obj.value = obj.value+'<img src="'+prompt("Enter the image URL:", "http://somesite.com/image.jpg")+'" border="0">';
 }
 
 function italicText(obj) {

@@ -26,13 +26,18 @@ our @EXPORT = qw(&www_addUser &www_addUserSave &www_deleteUser &www_deleteUserCo
 
 #-------------------------------------------------------------------
 sub www_addUser {
-        my ($output, %hash);
+        my ($output, %hash, @array);
         if (WebGUI::Privilege::isInGroup(3)) {
                 $output .= '<a href="'.$session{page}{url}.'?op=viewHelp&hid=5"><img src="'.$session{setting}{lib}.'/help.gif" border="0" align="right"></a><h1>Add User</h1> <form method="post" action="'.$session{page}{url}.'"> ';
                 $output .= WebGUI::Form::hidden("op","addUserSave");
                 $output .= '<table>';
                 $output .= '<tr><td class="formDescription">Username</td><td>'.WebGUI::Form::text("username",20,30).'</td></tr>';
-                $output .= '<tr><td class="formDescription">Password</td><td>'.WebGUI::Form::password("identifier",20,30).'</td></tr>';
+               	$output .= '<tr><td class="formDescription">Password</td><td>'.WebGUI::Form::password("identifier",20,30).'</td></tr>';
+		%hash = ('WebGUI'=>'WebGUI', 'LDAP'=>'LDAP');
+		$array[0] = $session{setting}{authMethod};
+               	$output .= '<tr><td class="formDescription">Authentication Method</td><td>'.WebGUI::Form::selectList("authMethod",\%hash, \@array).'</td></tr>';
+                $output .= '<tr><td class="formDescription">LDAP URL</td><td>'.WebGUI::Form::text("ldapURL",20,2048,$session{setting}{ldapURL}).'</td></tr>';
+                $output .= '<tr><td class="formDescription">Connect DN</td><td>'.WebGUI::Form::text("connectDN",20,255).'</td></tr>';
                 $output .= '<tr><td class="formDescription" valign="top">Email address</td><td>'.WebGUI::Form::text("email",20,255).'</td></tr>';
                 $output .= '<tr><td class="formDescription" valign="top"><a href="http://www.icq.com">ICQ</a> UIN</td><td>'.WebGUI::Form::text("icq",20,30).'</td></tr>';
                 %hash = WebGUI::SQL->buildHash("select groupId,groupName from groups where groupName<>'Reserved' order by groupName",$session{dbh});
@@ -53,7 +58,7 @@ sub www_addUserSave {
                 $encryptedPassword = Digest::MD5::md5_base64($session{form}{identifier});
                 $passwordStatement = ', identifier='.quote($encryptedPassword);
 		$uid = getNextId("userId");
-                WebGUI::SQL->write("insert into user set userId=$uid, username=".quote($session{form}{username}).$passwordStatement.", email=".quote($session{form}{email}).", icq=".quote($session{form}{icq}),$session{dbh});
+                WebGUI::SQL->write("insert into user set userId=$uid, username=".quote($session{form}{username}).$passwordStatement.", authMethod=".quote($session{form}{authMethod}).", ldapURL=".quote($session{form}{ldapURL}).", connectDN=".quote($session{form}{connectDN}).", email=".quote($session{form}{email}).", icq=".quote($session{form}{icq}),$session{dbh});
                 @groups = $session{cgi}->param('groups');
                 foreach $gid (@groups) {
                         WebGUI::SQL->write("insert into groupings set groupId=$gid, userId=$uid",$session{dbh});
@@ -99,9 +104,14 @@ sub www_editUser {
                 $output .= WebGUI::Form::hidden("op","editUserSave");
                 $output .= WebGUI::Form::hidden("uid",$session{form}{uid});
                 $output .= '<table>';
-                $output .= '<tr><td class="formDescription">username</td><td>'.WebGUI::Form::text("username",20,30,$user{username}).'</td></tr>';
-                $output .= '<tr><td class="formDescription">password</td><td>'.WebGUI::Form::password("identifier",20,30,"password").'</td></tr>';
-                $output .= '<tr><td class="formDescription" valign="top">email address</td><td>'.WebGUI::Form::text("email",20,255,$user{email}).'</td></tr>';
+                $output .= '<tr><td class="formDescription">Username</td><td>'.WebGUI::Form::text("username",20,30,$user{username}).'</td></tr>';
+                $output .= '<tr><td class="formDescription">Password</td><td>'.WebGUI::Form::password("identifier",20,30,"password").'</td></tr>';
+		%hash = ('WebGUI'=>'WebGUI', 'LDAP'=>'LDAP');
+		$array[0] = $user{authMethod};
+                $output .= '<tr><td class="formDescription" valign="top">Authentication Method</td><td>'.WebGUI::Form::selectList("authMethod",\%hash,\@array).'</td></tr>';
+                $output .= '<tr><td class="formDescription" valign="top">LDAP URL</td><td>'.WebGUI::Form::text("ldapURL",20,2048,$user{ldapURL}).'</td></tr>';
+                $output .= '<tr><td class="formDescription" valign="top">Connect DN</td><td>'.WebGUI::Form::text("connectDN",20,255,$user{connectDN}).'</td></tr>';
+                $output .= '<tr><td class="formDescription" valign="top">Email Address</td><td>'.WebGUI::Form::text("email",20,255,$user{email}).'</td></tr>';
                 $output .= '<tr><td class="formDescription" valign="top"><a href="http://www.icq.com">ICQ</a> UIN</td><td>'.WebGUI::Form::text("icq",20,30,$user{icq}).'</td></tr>';
 		%hash = WebGUI::SQL->buildHash("select groupId,groupName from groups where groupName<>'Reserved' order by groupName",$session{dbh});
 		@array = WebGUI::SQL->buildArray("select groupId from groupings where userId=$session{form}{uid}",$session{dbh});
@@ -124,7 +134,7 @@ sub www_editUserSave {
                         $passwordStatement = ', identifier='.quote($encryptedPassword);
                 }
                 $encryptedPassword = Digest::MD5::md5_base64($session{form}{identifier1});
-                WebGUI::SQL->write("update user set username=".quote($session{form}{username}).$passwordStatement.", email=".quote($session{form}{email}).", icq=".quote($session{form}{icq})." where userId=".$session{form}{uid},$session{dbh});
+                WebGUI::SQL->write("update user set username=".quote($session{form}{username}).$passwordStatement.", authMethod=".quote($session{form}{authMethod}).", ldapURL=".quote($session{form}{ldapURL}).", connectDN=".quote($session{form}{connectDN}).", email=".quote($session{form}{email}).", icq=".quote($session{form}{icq})." where userId=".$session{form}{uid},$session{dbh});
 		WebGUI::SQL->write("delete from groupings where userId=$session{form}{uid}",$session{dbh});
 		@groups = $session{cgi}->param('groups');
 		foreach $gid (@groups) {

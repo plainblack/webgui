@@ -70,8 +70,16 @@ if (eval { require Digest::MD5 }) {
         print "Please install.\n";
 }
 
+print "Net::LDAP module:\t";
+if (eval { require Net::LDAP }) {
+        print "OK\n";
+} else {
+        print "Please install.\n";
+}
+
+# this is here to insure they installed correctly.
 print "WebGUI modules:\t\t";
-if (eval { require WebGUI }) {
+if (eval { require WebGUI } && eval { require WebGUI::SQL }) {
         print "OK\n";
 } else {
         print "Please install.\n";
@@ -89,7 +97,6 @@ if (eval { require Data::Config }) {
 ###################################
 
 print "Config file:\t\t";
-use Data::Config;
 my ($config);
 $config = new Data::Config './etc/WebGUI.conf';
 unless (defined $config) {
@@ -111,8 +118,6 @@ unless (defined $config) {
 ###################################
 
 print "Database connection:\t";
-use DBI;
-use WebGUI::SQL;
 my ($dbh, $test);
 $dbh = DBI->connect($config->param('dsn'), $config->param('dbuser'), $config->param('dbpass'));
 unless (defined $dbh) {
@@ -137,7 +142,6 @@ print "Latest version:\t\t";
 use LWP::UserAgent;
 use HTTP::Request;
 use HTTP::Headers;
-use WebGUI;
 my ($header, $userAgent, $request, $response, $version, $referer);
 $userAgent = new LWP::UserAgent;
 $userAgent->agent("WebGUI-Check/1.0");
