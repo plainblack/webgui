@@ -114,8 +114,8 @@ sub getIndexerParams {
                         fieldsToIndex => ["username", "subject", "message"],
                         contentType => 'discussion',
                         url => 'WebGUI::URL::append($data{urlizedTitle},"func=viewSubmission&wid=$data{wid}&sid=$data{sid}&forumOp=viewThread&forumPostId=$data{forumPostId}&forumId=$data{forumId}")',
-                        headerShortcut => 'select subject from forumPost where forumPostId = $data{forumPostId}',
-                        bodyShortcut => 'select message from forumPost where forumPostId = $data{forumPostId}',
+                        headerShortcut => 'select subject from forumPost where forumPostId = \'$data{forumPostId}\'',
+                        bodyShortcut => 'select message from forumPost where forumPostId = \'$data{forumPostId}\'',
 	        	},
 		USS_submission => {
                         sql => "select USS_submission.title as title,
@@ -145,8 +145,8 @@ sub getIndexerParams {
                         fieldsToIndex => ["username", "title", "content", "image", "attachment"],
                         contentType => 'wobjectDetail',
                         url => 'WebGUI::URL::append($data{urlizedTitle}, "func=viewSubmission&wid=$data{wid}&sid=$data{sid}")',
-                        headerShortcut => 'select title from USS_submission where USS_submissionId = $data{sid}',
-                        bodyShortcut => 'select content from USS_submission where USS_submissionId = $data{sid}',
+                        headerShortcut => 'select title from USS_submission where USS_submissionId = \'$data{sid}\'',
+                        bodyShortcut => 'select content from USS_submission where USS_submissionId = \'$data{sid}\'',
                 }
 	};
 }

@@ -137,11 +137,11 @@ sub getIndexerParams {
                                         and page.startDate < $now
                                         and page.endDate > $now",
                         fieldsToIndex => ["question",
-                                          'select answer from Survey_answer where Survey_questionId = $data{Survey_questionId}' ],
+                                          'select answer from Survey_answer where Survey_questionId = \'$data{Survey_questionId}\'' ],
                         contentType => 'wobjectDetail',
                         url => 'WebGUI::URL::append($data{urlizedTitle}, "func=view&wid=$data{wid}")',
-                        headerShortcut => 'select title from wobject where wobjectId = $data{wid}',
-                        bodyShortcut => 'select description from wobject where wobjectId = $data{wid}',
+                        headerShortcut => 'select title from wobject where wobjectId = \'$data{wid}\'',
+                        bodyShortcut => 'select description from wobject where wobjectId = \'$data{wid}\'',
 
                 }
 	};

@@ -669,7 +669,7 @@ sub search {
 			$sql .= " AND $filterElement in (".quoteAndJoin($filter->{$filterElement}).")";
 		}
 		# No trash or other garbage
-		$sql .= " AND (pageId > 999 or pageId < 0 or pageId = 1) ";
+		$sql .= " AND isSystem<>1 ";
 		# Keep @fts_docIds list order
 		$sql .= " ORDER BY FIELD(docID,$docIds)" unless $noFtsSearch;
 		my $filteredDocIds = WebGUI::SQL->buildArrayRef($sql);

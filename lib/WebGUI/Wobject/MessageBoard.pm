@@ -67,8 +67,8 @@ sub getIndexerParams {
                         fieldsToIndex => ["title", "description"],
                         contentType => 'wobject',
                         url => '$data{urlizedTitle}."#".$data{wid}',
-                        headerShortcut => 'select title from MessageBoard_forums where wobjectId = $data{wid}',
-                        bodyShortcut => 'select description from MessageBoard_forums where wobjectId = $data{wid}',
+                        headerShortcut => 'select title from MessageBoard_forums where wobjectId = \'$data{wid}\'',
+                        bodyShortcut => 'select description from MessageBoard_forums where wobjectId = \'$data{wid}\'',
                 	},
         	MessageBoard_Forum => {
                         sql => "select  forumPost.forumPostId,
@@ -98,8 +98,8 @@ sub getIndexerParams {
                         fieldsToIndex => ["username", "subject", "message"],
                         contentType => 'discussion',
                         url => 'WebGUI::URL::append($data{urlizedTitle},"func=view&wid=$data{wid}&forumOp=viewThread&forumPostId=$data{forumPostId}&forumId=$data{forumId}")',
-                        headerShortcut => 'select subject from forumPost where forumPostId = $data{forumPostId}',
-                        bodyShortcut => 'select message from forumPost where forumPostId = $data{forumPostId}',
+                        headerShortcut => 'select subject from forumPost where forumPostId = \'$data{forumPostId}\'',
+                        bodyShortcut => 'select message from forumPost where forumPostId = \'$data{forumPostId}\'',
         		}
 		};
 }

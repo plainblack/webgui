@@ -22,6 +22,8 @@
  - bugfix [ 1027129 ] view message causes error
  - bugfix [ 1024079 ] "Software error" message
  - Fixed a bunch of POD errors.
+ - Fixed some errors in the search engine indexer related to the new GUID
+   system.
 
 
 6.2.1

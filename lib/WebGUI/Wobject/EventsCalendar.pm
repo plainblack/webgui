@@ -76,8 +76,8 @@ sub getIndexerParams {
                         fieldsToIndex => ["description", "name"],
                         contentType => 'wobjectDetail',
                         url => 'WebGUI::URL::append($data{urlizedTitle},"func=viewEvent&wid=$data{wid}&eid=$data{eid}")',
-                        headerShortcut => 'select name from EventsCalendar_event where EventsCalendar_eventId=$data{eid}',
-                        bodyShortcut => 'select description from EventsCalendar_event where EventsCalendar_eventId=$data{eid}',
+                        headerShortcut => 'select name from EventsCalendar_event where EventsCalendar_eventId=\'$data{eid}\'',
+                        bodyShortcut => 'select description from EventsCalendar_event where EventsCalendar_eventId=\'$data{eid}\'',
                 }
 	};
 }

@@ -93,8 +93,8 @@ sub getIndexerParams {
                         fieldsToIndex => ["fileTitle", "downloadFile", "briefSynopsis", "alternateVersion1", "alternateVersion2"],
                         contentType => 'wobjectDetail',
                         url => '$data{urlizedTitle}."#".$data{wid}',
-                        headerShortcut => 'select fileTitle from FileManager_file where FileManager_fileId = $data{fid}',
-                        bodyShortcut => 'select briefSynopsis from FileManager_file where FileManager_fileId = $data{fid}',
+                        headerShortcut => 'select fileTitle from FileManager_file where FileManager_fileId = \'$data{fid}\'',
+                        bodyShortcut => 'select briefSynopsis from FileManager_file where FileManager_fileId = \'$data{fid}\'',
                 }
 	};
 }

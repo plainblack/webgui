@@ -116,8 +116,8 @@ sub getIndexerParams {
                                           "productNumber", "benefit", "feature", "name", "value", "units"],
                         contentType => 'wobjectDetail',
                         url => 'WebGUI::URL::append($data{urlizedTitle}, "func=view&wid=$data{wid}")',
-                        headerShortcut => 'select title from wobject where wobjectId = $data{wid}',
-                        bodyShortcut => 'select description from wobject where wobjectId = $data{wid}',
+                        headerShortcut => 'select title from wobject where wobjectId = \'$data{wid}\'',
+                        bodyShortcut => 'select description from wobject where wobjectId = \'$data{wid}\'',
                 }
 	};
 }
