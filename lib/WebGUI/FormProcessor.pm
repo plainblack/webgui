@@ -266,6 +266,30 @@ sub float {
 
 #-------------------------------------------------------------------
 
+=head2 group ( name )
+
+Returns a group Id. Defaults to 2 (registered users).
+
+=over 
+
+=item name
+
+The name of the form variable to retrieve.
+
+=back
+
+=cut
+
+sub group {
+	my $value = selectList($_[0]);
+	if (defined $value) {
+		return $value;
+	}
+	return 2;
+}
+
+#-------------------------------------------------------------------
+
 =head2 hidden ( name )
 
 Returns a string.
