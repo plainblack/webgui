@@ -88,3 +88,83 @@ create table layout (
 	printableStyleTemplateId varchar(22) not null
 );
 
+INSERT INTO settings VALUES ('commerceCheckoutCanceledTemplateId','1');
+INSERT INTO settings VALUES ('commerceConfirmCheckoutTemplateId','1');
+INSERT INTO settings VALUES ('commercePaymentPlugin','PayFlowPro');
+INSERT INTO settings VALUES ('commerceSendDailyReportTo','martin@geefmegeld.nl');
+INSERT INTO settings VALUES ('commerceTransactionErrorTemplateId','1');
+INSERT INTO template VALUES ('1','Subscription code redemption','<tmpl_if batchDescription>\r\nBatch: <tmpl_var batchDescription>\r\n</tmpl_if>\r\n\r\n<tmpl_var message><br>\r\n<tmpl_var codeForm>','Operation/RedeemSubscription',1,1);
+INSERT INTO template VALUES ('1','Subscriptionitem default template','<h2><tmpl_var name></h2>\r\n<tmpl_var description><br>\r\n<br>\r\n<br>\r\n$ <tmpl_var price><br>\r\n<a href=\"<tmpl_var url>\">Subscribe now</a><br>','Macro/SubscriptionItem',1,1);
+INSERT INTO template VALUES ('1','Default transaction error template','<table border=\"1\" cellpadding=\"5\" cellspacing=\"0\">\r\n  <tr>\r\n    <th>Transaction description</th>\r\n    <th>Price</th>\r\n    <th>Status</th>\r\n    <th>Error</th>\r\n  </tr>\r\n<tmpl_loop resultLoop>\r\n  <tr>\r\n    <td align=\"left\"><tmpl_var purchaseDescription></td>\r\n    <td align=\"right\"><tmpl_var purchaseAmount></td>\r\n    <td><tmpl_var status></td>\r\n    <td align=\"left\"><tmpl_var error> (<tmpl_var errorCode>)</td>\r\n  </tr>\r\n</tmpl_loop>\r\n</table><br>\r\n<br>\r\n\r\n<tmpl_var statusExplanation>','Commerce/TransactionError',1,1);
+INSERT INTO template VALUES ('1','Default checkout confirmation template','<tmpl_var title><br>\r\n<br>\r\n<ul>\r\n<tmpl_loop errorLoop>\r\n<li><tmpl_var message></li>\r\n</tmpl_loop>\r\n</ul>\r\n\r\n<tmpl_if recurringItems>\r\n<table border=\"0\" cellpadding=\"5\">\r\n<tmpl_loop recurringLoop>\r\n  <tr>\r\n    <td align=\"left\"><b>Subscription \"<tmpl_var name>\"</b></td>\r\n    <td> : </td>\r\n    <td align=\"left\">$ <tmpl_var price> every <tmpl_var period></td>\r\n  </tr>\r\n</tmpl_loop>\r\n</table><br>\r\n<br>\r\n</tmpl_if>\r\n<tmpl_var form>','Commerce/ConfirmCheckout',1,1);
+INSERT INTO template VALUES ('1','Default view purchase history template','<table border=\"0\">\r\n<tmpl_loop purchaseHistoryLoop>\r\n	<tr>\r\n		<td><b><tmpl_var initDate></b></td>\r\n		<td><b><tmpl_var completionDate></b></td>\r\n		<td align=\"right\"><b>$ <tmpl_var amount></b></td>\r\n		<td><b><tmpl_var status></b></td>\r\n		<td><tmpl_if canCancel><a href=\"<tmpl_var cancelUrl>\">Cancel</a></tmpl_if></td>\r\n	</tr>\r\n	<tmpl_loop itemLoop>\r\n	<tr>\r\n		<td \"align=right\"><tmpl_var quantity> x </td>\r\n		<td \"align=left\"><tmpl_var itemName></td>\r\n		<td \"align=right\">$ <tmpl_var amount></td>\r\n	</tr>\r\n	</tmpl_loop>\r\n</tmpl_loop>\r\n</table>','Commerce/ViewPurchaseHistory',1,1);
+INSERT INTO template VALUES ('1','Default cancel checkout template','<tmpl_var message>','Commerce/CheckoutCanceled',1,1);
+CREATE TABLE shoppingCart (
+  sessionId varchar(22) NOT NULL default '',
+  itemId varchar(64) NOT NULL default '',
+  itemType varchar(40) NOT NULL default '',
+  quantity int(4) NOT NULL default '0',
+  PRIMARY KEY  (sessionId,itemId,itemType)
+) TYPE=MyISAM;
+CREATE TABLE subscription (
+  subscriptionId varchar(22) NOT NULL default '',
+  name varchar(128) default NULL,
+  price float default '0',
+  description mediumtext,
+  subscriptionGroup varchar(22) NOT NULL default '',
+  duration varchar(12) NOT NULL default 'Monthly',
+  executeOnSubscription varchar(128) default NULL,
+  karma int(4) default '0',
+  deleted int(1) default '0',
+  PRIMARY KEY  (subscriptionId)
+) TYPE=MyISAM;
+CREATE TABLE subscriptionCodeBatch (
+  batchId varchar(22) NOT NULL default '',
+  name varchar(128) default NULL,
+  description mediumtext NOT NULL,
+  subscriptionId varchar(22) NOT NULL default '',
+  PRIMARY KEY  (batchId)
+) TYPE=MyISAM;
+CREATE TABLE subscriptionCode (
+  batchId varchar(22) NOT NULL default '',
+  code varchar(64) NOT NULL default '',
+  status varchar(10) NOT NULL default 'Unused',
+  dateCreated int(11) NOT NULL default '0',
+  dateUsed int(11) NOT NULL default '0',
+  expires int(11) NOT NULL default '0',
+  usedBy varchar(22) NOT NULL default '0',
+  PRIMARY KEY  (code)
+) TYPE=MyISAM;
+CREATE TABLE subscriptionCodeSubscriptions (
+  code varchar(64) NOT NULL default '',
+  subscriptionId varchar(22) NOT NULL default '',
+  UNIQUE KEY code (code,subscriptionId)
+) TYPE=MyISAM;
+CREATE TABLE transaction (
+  transactionId varchar(22) NOT NULL default '',
+  userId varchar(22) NOT NULL default '',
+  amount float NOT NULL default '0',
+  gatewayId varchar(128) default NULL,
+  gateway varchar(64) NOT NULL default '',
+  recurring tinyint(1) NOT NULL default '0',
+  initDate int(11) NOT NULL default '0',
+  completionDate int(11) default '0',
+  status varchar(10) NOT NULL default 'Pending',
+  lastPayedTerm int(6) NOT NULL default '0',
+  PRIMARY KEY  (transactionId)
+) TYPE=MyISAM;
+CREATE TABLE transactionItem (
+  transactionId varchar(22) NOT NULL default '',
+  itemName varchar(64) NOT NULL default '',
+  amount float NOT NULL default '0',
+  quantity int(4) NOT NULL default '0',
+  itemId varchar(64) NOT NULL default '',
+  itemType varchar(40) NOT NULL default ''
+) TYPE=MyISAM;
+CREATE TABLE commerceSettings (
+  fieldName varchar(64) NOT NULL default '',
+  fieldValue varchar(255) NOT NULL default '',
+  namespace varchar(64) NOT NULL default '',
+  type varchar(10) NOT NULL default ''
+) TYPE=MyISAM;
+
