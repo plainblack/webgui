@@ -223,7 +223,11 @@ our $HELP = {
 			{
 				tag => 'groups manage',
 				namespace => 'WebGUI'
-			}
+			},
+			{
+				tag => 'database links manage',
+				namespace => 'WebGUI'
+			},
 		]
 	},
 	'group delete' => {
@@ -251,10 +255,24 @@ our $HELP = {
 		body => 'settings help',
 		related => []
 	},
+	'groups default' => {
+		title => 'groups default title',
+		body => 'groups default body',
+		related => [
+			{
+				tag => 'groups manage',
+				namespace => 'WebGUI'
+			}
+		]
+	},
 	'groups manage' => {
 		title => '660',
 		body => '615',
 		related => [
+			{
+				tag => 'groups default',
+				namespace => 'WebGUI'
+			},
 			{
 				tag => 'group add/edit',
 				namespace => 'WebGUI'
