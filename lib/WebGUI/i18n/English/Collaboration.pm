@@ -1,6 +1,11 @@
 package WebGUI::i18n::English::Collaboration;
 
 our $I18N = {
+	'display last reply' => {
+		message => q|Display last reply?|,
+		lastUpdated => 1109618544,
+	},
+
 	'preview' => {
 		message => q|Preview|,
 		lastUpdated => 1109618544,

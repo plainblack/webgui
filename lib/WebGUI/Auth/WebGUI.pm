@@ -230,6 +230,7 @@ sub createAccountSave {
 			WebGUI::International::get('email address validation email subject','AuthWebGUI'),
 			WebGUI::International::get('email address validation email body','AuthWebGUI')."\n\n".WebGUI::URL::getSiteURL().WebGUI::URL::page("op=auth&method=validateEmail&key=".$key),
 			);
+		$self->SUPER::deactivateAccount("deactivateAccountConfirm");
 		$self->logout;
 		return $self->displayLogin(WebGUI::International::get('check email for validation','AuthWebGUI'));
 	}

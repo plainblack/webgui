@@ -1562,7 +1562,7 @@ sub submit {
         $value = _fixQuotes($value);
 	my $wait = WebGUI::International::get(452);
 	my $extras = $params->{extras} || 'onclick="this.value=\''.$wait.'\'"';
-	return '<input type="submit" value="'.$value.'" '.$params->{extras}.' />';
+	return '<input type="submit" value="'.$value.'" '.$extras.' />';
 
 }
 

@@ -62,7 +62,19 @@ sub appendPostListTemplateVars {
 		for (my $i=0;$i<=$post->get("rating");$i++) {
 			push(@rating_loop,{'rating_loop.count'=>$i});
 		}
-		my $lastPost = $post->WebGUI::Asset::Post::Thread::getLastPost();
+		my $lastPost = $post->getLastPost();
+		my %lastReply;
+		if ($self->get("displayLastReply")) {
+			%lastReply = (
+				"lastReply.url"=>$lastPost->getUrl(),
+                        	"lastReply.title"=>$lastPost->get("title"),
+                        	"lastReply.user.isVisitor"=>$lastPost->get("ownerUserId") eq "1",
+                        	"lastReply.username"=>$lastPost->get("username"),
+                       	 	"lastReply.userProfile.url"=>$lastPost->WebGUI::Asset::Post::getPosterProfileUrl(),
+                        	"lastReply.dateSubmitted.human"=>epochToHuman($lastPost->get("dateSubmitted"),"%z"),
+                        	"lastReply.timeSubmitted.human"=>epochToHuman($lastPost->get("dateSubmitted"),"%Z")
+				);
+		}
                 push(@{$var->{post_loop}}, {
 			%{$post->get},
                         "id"=>$post->getId,
@@ -78,13 +90,6 @@ sub appendPostListTemplateVars {
                         "timeUpdated.human"=>epochToHuman($post->get("dateUpdated"),"%Z"),
                         "userProfile.url"=>$post->getPosterProfileUrl,
                         "user.isVisitor"=>$post->get("ownerUserId") eq "1",
-                        "lastReply.url"=>$lastPost->getUrl(),
-                        "lastReply.title"=>$lastPost->get("title"),
-                        "lastReply.user.isVisitor"=>$lastPost->get("ownerUserId") eq "1",
-                        "lastReply.username"=>$lastPost->get("username"),
-                        "lastReply.userProfile.url"=>$lastPost->WebGUI::Asset::Post::getPosterProfileUrl(),
-                        "lastReply.dateSubmitted.human"=>epochToHuman($lastPost->get("dateSubmitted"),"%z"),
-                        "lastReply.timeSubmitted.human"=>epochToHuman($lastPost->get("dateSubmitted"),"%Z"),
         		"edit.url"=>$post->getEditUrl,
 			'controls'=>$controls,
 			'inDateRange'=>$inDateRange,
@@ -92,7 +97,8 @@ sub appendPostListTemplateVars {
                         "isThird"=>(($i+1)%3==0),
                         "isFourth"=>(($i+1)%4==0),
                         "isFifth"=>(($i+1)%5==0),
-                	"user.isPoster"=>$post->isPoster
+                	"user.isPoster"=>$post->isPoster,
+			%lastReply
                         });
 		$i++;
 	}
@@ -247,6 +253,10 @@ sub definition {
                 tableName=>'Collaboration',
                 className=>'WebGUI::Asset::Wobject::Collaboration',
                 properties=>{
+			displayLastReply =>{
+				fieldType=>"yesNo",
+				defaultValue=>0
+				},
 			allowReplies =>{
 				fieldType=>"yesNo",
 				defaultValue=>1
@@ -389,6 +399,11 @@ sub duplicate {
 sub getEditForm {
 	my $self = shift;
 	my $tabform = $self->SUPER::getEditForm;
+   	$tabform->getTab("display")->yesNo(
+      		-value=>$self->getValue('displayLastReply'),
+		-label=>WebGUI::International::get('display last reply', 'Collaboration'),
+		-name=>"displayLastReply"
+   		);
    	$tabform->getTab("display")->template(
       		-value=>$self->getValue('collaborationTemplateId'),
       		-namespace=>"Collaboration",

@@ -7,6 +7,9 @@
  - fix [ 1157196 ] manage system clipboard wrong title
  - fix [ 1154150 ] No time in forum overview
  - fix [ 1152434 ] Last Reply column is blank in a forum [mwilson]
+ - fix [ 1158944 ] Validate email addresses?
+ - fix [ 1157311 ] Edit User Profile fails on Windows/Firefox
+
 
 6.5.0
  - Added content prototypes.

@@ -131,11 +131,11 @@ sub getIcon {
 sub getLastPost {
 	my $self = shift;
 	my $lastPostId = $self->get("lastPostId");
-	my $lastPost = 0;
+	my $lastPost;
 	if ($lastPostId) {
-		$lastPost = WebGUI::Asset->new($lastPostId);
+		$lastPost = WebGUI::Asset::Post::Thread->new($lastPostId);
 	}
-	return $lastPost if ($lastPost);
+	return $lastPost if (defined $lastPost);
 	return $self;	
 }
 
