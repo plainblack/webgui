@@ -23,14 +23,18 @@ use WebGUI::URL;
 use WebGUI::Utility;
 
 our @ISA = qw(Exporter);
-our @EXPORT = qw(&www_viewPageTree &www_movePageUp &www_movePageDown &www_cutPage &www_deletePage &www_deletePageConfirm &www_editPage &www_editPageSave &www_pastePage);
+our @EXPORT = qw(&www_viewPageTree &www_movePageUp &www_movePageDown &www_cutPage &www_deletePage &www_deletePageConfirm 
+	&www_editPage &www_editPageSave &www_pastePage);
 
 #-------------------------------------------------------------------
 sub _recursivelyChangePrivileges {
         my ($sth, $pageId);
         $sth = WebGUI::SQL->read("select pageId from page where parentId=$_[0]");
         while (($pageId) = $sth->array) {
-        	WebGUI::SQL->write("update page set ownerId=$session{form}{ownerId}, ownerView=$session{form}{ownerView}, ownerEdit=$session{form}{ownerEdit}, groupId='$session{form}{groupId}', groupView=$session{form}{groupView}, groupEdit=$session{form}{groupEdit}, worldView=$session{form}{worldView}, worldEdit=$session{form}{worldEdit} where pageId=$pageId");
+        	WebGUI::SQL->write("update page set ownerId=$session{form}{ownerId}, ownerView=$session{form}{ownerView}, 
+			ownerEdit=$session{form}{ownerEdit}, groupId='$session{form}{groupId}', groupView=$session{form}{groupView}, 
+			groupEdit=$session{form}{groupEdit}, worldView=$session{form}{worldView}, worldEdit=$session{form}{worldEdit} 
+			where pageId=$pageId");
                 _recursivelyChangePrivileges($pageId);
         }
 	$sth->finish;
@@ -158,8 +162,6 @@ sub www_editPage {
                 $f->text("title",WebGUI::International::get(99),$page{title});
 		$f->text("menuTitle",WebGUI::International::get(411),$page{menuTitle});
                 $f->text("urlizedTitle",WebGUI::International::get(104),$page{urlizedTitle});
-		#%hash = WebGUI::Template::getList();
-		#$f->select("templateId",\%hash,WebGUI::International::get(356),[$page{templateId}]);
 		$f->readOnly(WebGUI::Template::selectTemplate($page{templateId}),WebGUI::International::get(356));
 		$f->textarea("synopsis",WebGUI::International::get(412),$page{synopsis});
 		$f->textarea("metatags",WebGUI::International::get(100),$page{metaTags});
