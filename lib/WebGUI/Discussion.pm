@@ -398,13 +398,15 @@ sub showMessage {
                         	.'">'.WebGUI::International::get(577).'</a><br>';
 		} 
         	@data = WebGUI::SQL->quickArray("select max(messageId) from discussion 
-			where wobjectId=$message{wobjectId} and pid=0 and messageId<$message{rid}".$sqlAdd);
+			where wobjectId=$message{wobjectId} and pid=0 and messageId<$message{rid} 
+			and (userId=$session{user}{userId} or status='Approved') ".$sqlAdd);
         	if ($data[0] ne "") {
                 	$html .= '<a href="'.WebGUI::URL::page('func=showMessage&mid='.$data[0].'&sid='.$session{form}{sid}.'&wid='.
                         	$session{form}{wid}).'">&laquo; '.WebGUI::International::get(513).'</a><br>';
         	}
         	@data = WebGUI::SQL->quickArray("select min(messageId) from discussion 
-			where wobjectId=$message{wobjectId} and pid=0 and messageId>$message{rid}".$sqlAdd);
+			where wobjectId=$message{wobjectId} and pid=0 and messageId>$message{rid}
+			and (userId=$session{user}{userId} or status='Approved')".$sqlAdd);
         	if ($data[0] ne "") {
                 	$html .= '<a href="'.WebGUI::URL::page('func=showMessage&mid='.$data[0].'&sid='.$session{form}{sid}.'&wid='.
                         	$session{form}{wid}).'">'.WebGUI::International::get(512).' &raquo;</a><br>';
