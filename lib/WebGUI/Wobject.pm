@@ -239,6 +239,7 @@ sub duplicate {
 		endDate => $_[0]->get("endDate"),
 		templatePosition => $_[0]->get("templatePosition")
 		});
+	WebGUI::Discussion::duplicate($_[0]->get("wobjectId"),$w->get("wobjectId")) unless ($_[2]);
         return $w->get("wobjectId");
 }
 
@@ -464,6 +465,7 @@ sub purge {
         WebGUI::SQL->write("delete from wobject where wobjectId=".$_[0]->get("wobjectId"));
 	$node = WebGUI::Node->new($_[0]->get("wobjectId"));
 	$node->delete;
+	WebGUI::Discussion::purge($_[0]->get("wobjectId"));
 }
 
 #-------------------------------------------------------------------
@@ -1001,6 +1003,35 @@ sub www_postSave {
         } else {
                 return WebGUI::Privilege::insufficient();
         }
+}
+
+#-------------------------------------------------------------------
+
+=head2 www_search ( )
+
+ Searches an attached discussion.
+
+=cut
+
+sub www_search {
+        return WebGUI::Discussion::search();
+}
+
+#-------------------------------------------------------------------
+
+=head2 www_showMessage ( )
+
+ Shows a message from a discussion.
+
+=cut
+
+sub www_showMessage {
+        my ($output, $defaultMid);
+        ($defaultMid) = WebGUI::SQL->quickArray("select min(messageId) from discussion where wobjectId=".$_[0]->get("wobjectId"));
+        $session{form}{mid} = $session{form}{mid} || $defaultMid || 0;
+        $output = WebGUI::Discussion::showMessage($_[1],$_[0]);
+        $output .= WebGUI::Discussion::showThreads();
+        return $output;
 }
 
 #-------------------------------------------------------------------

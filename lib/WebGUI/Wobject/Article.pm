@@ -14,7 +14,6 @@ use strict;
 use Tie::CPHash;
 use WebGUI::Attachment;
 use WebGUI::DateTime;
-use WebGUI::Discussion;
 use WebGUI::HTML;
 use WebGUI::HTMLForm;
 use WebGUI::Icon;
@@ -48,13 +47,6 @@ sub duplicate {
 		alignImage=>$_[0]->get("alignImage"),
 		allowDiscussion=>$_[0]->get("allowDiscussion")
 		});
-	WebGUI::Discussion::duplicate($_[0]->get("wobjectId"),$w->get("wobjectId"));
-}
-
-#-------------------------------------------------------------------
-sub purge {
-	WebGUI::Discussion::purge($_[0]->get("wobjectId"));
-	$_[0]->SUPER::purge();
 }
 
 #-------------------------------------------------------------------
@@ -152,13 +144,7 @@ sub www_editSave {
 
 #-------------------------------------------------------------------
 sub www_showMessage {
-        my ($submenu, $output, $defaultMid);
-        ($defaultMid) = WebGUI::SQL->quickArray("select min(messageId) from discussion where wobjectId=$session{form}{wid}");
-	$session{form}{mid} = $defaultMid if ($session{form}{mid} eq "");
-        $submenu = '<a href="'.WebGUI::URL::page().'">'.WebGUI::International::get(27,$namespace).'</a><br>';
-	$output = WebGUI::Discussion::showMessage($submenu,$_[0]);
-	$output .= WebGUI::Discussion::showThreads();
-        return $output;
+	return $_[0]->SUPER::www_showMessage('<a href="'.WebGUI::URL::page().'">'.WebGUI::International::get(27,$namespace).'</a><br>');
 }
 
 #-------------------------------------------------------------------

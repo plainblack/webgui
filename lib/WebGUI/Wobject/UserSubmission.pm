@@ -190,7 +190,7 @@ sub _weblogView {
 sub duplicate {
         my ($sth, $file, %row, $newSubmissionId, $w);
 	tie %row, 'Tie::CPHash';
-	$w = $_[0]->SUPER::duplicate($_[1]);
+	$w = $_[0]->SUPER::duplicate($_[1],1);
         $w = WebGUI::Wobject::UserSubmission->new({wobjectId=>$w,namespace=>$namespace});
         $w->set({
 		groupToContribute=>$_[0]->get("groupToContribute"),
@@ -221,7 +221,6 @@ sub duplicate {
 #-------------------------------------------------------------------
 sub purge {
         WebGUI::SQL->write("delete from UserSubmission_submission where wobjectId=".$_[0]->get("wobjectId"));
-	WebGUI::Discussion::purge($_[0]->get("wobjectId"));
 	$_[0]->SUPER::purge();
 }
 
@@ -520,13 +519,9 @@ sub www_search {
 
 #-------------------------------------------------------------------
 sub www_showMessage {
-        my ($submenu, $output);
-        $submenu .= '<a href="'.WebGUI::URL::page('func=viewSubmission&wid='.$session{form}{wid}.
-		'&sid='.$session{form}{sid}).'">'.WebGUI::International::get(45,$namespace).'</a><br>';
-        $submenu .= '<a href="'.WebGUI::URL::page().'">'.WebGUI::International::get(28,$namespace).'</a><br>';
-	$output = WebGUI::Discussion::showMessage($submenu,$_[0]);
-        $output .= WebGUI::Discussion::showThreads();
-        return $output;
+	return $_[0]->SUPER::www_showMessage('<a href="'.WebGUI::URL::page('func=viewSubmission&wid='.$session{form}{wid}
+		.'&sid='.$session{form}{sid}).'">'.WebGUI::International::get(45,$namespace).'</a><br>'
+        	.'<a href="'.WebGUI::URL::page().'">'.WebGUI::International::get(28,$namespace).'</a><br>');
 }
 
 #-------------------------------------------------------------------

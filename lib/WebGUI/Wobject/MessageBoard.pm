@@ -43,13 +43,6 @@ sub duplicate {
         $w->set({
 		messagesPerPage=>$_[0]->get("messagesPerPage")
 		});
-	WebGUI::Discussion::duplicate($_[0]->get("wobjectId"),$w->get("wobjectId"));
-}
-
-#-------------------------------------------------------------------
-sub purge {
-	WebGUI::Discussion::purge($_[0]->get("wobjectId"));
-	$_[0]->SUPER::purge();
 }
 
 #-------------------------------------------------------------------
@@ -89,17 +82,8 @@ sub www_editSave {
 }
 
 #-------------------------------------------------------------------
-sub www_search {
-	return WebGUI::Discussion::search();
-}
-
-#-------------------------------------------------------------------
 sub www_showMessage {
-	my ($output, $submenu);
-        $submenu = '<a href="'.WebGUI::URL::page().'">'.WebGUI::International::get(11,$namespace).'</a><br>';
-	$output = WebGUI::Discussion::showMessage($submenu,$_[0]);
-	$output .= WebGUI::Discussion::showReplyTree();
-	return $output;
+        return $_[0]->SUPER::www_showMessage('<a href="'.WebGUI::URL::page().'">'.WebGUI::International::get(11,$namespace).'</a><br>');
 }
 
 #-------------------------------------------------------------------
