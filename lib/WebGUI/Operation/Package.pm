@@ -24,7 +24,7 @@ our @EXPORT = qw(&www_deployPackage &www_selectPackageToDeploy);
 #-------------------------------------------------------------------
 sub _duplicateWobjects {
 	my ($sth, $wobject, $cmd, %hash, $extra, $w);
-	$sth = WebGUI::SQL->read("select * from wobject where pageId=$_[0]");
+	$sth = WebGUI::SQL->read("select * from wobject where pageId=$_[0] order by sequenceNumber");
 	while ($wobject = $sth->hashRef) {
 		$extra = WebGUI::SQL->quickHashRef("select * from ${$wobject}{namespace} where wobjectId=${$wobject}{wobjectId}");
 		tie %hash, 'Tie::CPHash';
@@ -39,16 +39,62 @@ sub _duplicateWobjects {
 
 #-------------------------------------------------------------------
 sub _recursePageTree {
-	my ($a, %package, %newParent, $newPageId, $urlizedTitle);
+	my ($a, %package, %newParent, $newPageId, $sequenceNumber, $urlizedTitle);
 	tie %newParent, 'Tie::CPHash';
 	tie %package, 'Tie::CPHash';
 	%newParent = WebGUI::SQL->quickHash("select * from page where pageId=$_[1]");
 	_duplicateWobjects($_[0],$_[1]);
+	($sequenceNumber) = WebGUI::SQL->quickArray("select max(sequenceNumber) from page where parentId=$_[1]");
 	$a = WebGUI::SQL->read("select * from page where parentId=$_[0]");
 	while (%package = $a->hash) {
 		$newPageId = getNextId("pageId");
+		$sequenceNumber++;
 		$urlizedTitle = WebGUI::URL::makeUnique($package{urlizedTitle});
-                WebGUI::SQL->write("insert into page values ($newPageId,$_[1],".quote($package{title}).",$newParent{styleId},$session{user}{userId},$newParent{ownerView},$newParent{ownerEdit},$newParent{groupId},$newParent{groupView},$newParent{groupEdit},$newParent{worldView},$newParent{worldEdit},$package{sequenceNumber},".quote($package{metaTags}).",".quote($urlizedTitle).",".$package{defaultMetaTags}.",".quote($package{menuTitle}).",".quote($package{synopsis}).",".quote($package{templateId}).")");
+                WebGUI::SQL->write("insert into page (
+			pageId,
+			parentId,
+			title,
+			styleId,
+			ownerId,
+			ownerView,
+			ownerEdit,
+			groupId,
+			groupView,
+			groupEdit,
+			worldView,
+			worldEdit,
+			sequenceNumber,
+			metaTags,
+			urlizedTitle,
+			defaultMetaTags,
+			menuTitle,
+			synopsis,
+			templateId,
+			startDate,
+			endDate
+			) values (
+			$newPageId,
+			$_[1],
+			".quote($package{title}).",
+			$newParent{styleId},
+			$session{user}{userId},
+			$newParent{ownerView},
+			$newParent{ownerEdit},
+			$newParent{groupId},
+			$newParent{groupView},
+			$newParent{groupEdit},
+			$newParent{worldView},
+			$newParent{worldEdit},
+			$sequenceNumber,
+			".quote($package{metaTags}).",
+			".quote($urlizedTitle).",
+			".$package{defaultMetaTags}.",
+			".quote($package{menuTitle}).",
+			".quote($package{synopsis}).",
+			".quote($package{templateId}).",
+			$newParent{startDate},
+			$newParent{endDate}
+			)");
 		_recursePageTree($package{pageId},$newPageId);
 	}
 	$a->finish;
