@@ -26,6 +26,7 @@ QnD INSTALL INSTRUCTIONS:
    Cache::FileCache (optional)
 
 3. Install Apache (preferably with mod_perl) and set up your config.
+   If you are using Apache 2, see the additional instructions below.
 
 4. Install MySQL.
 
@@ -49,4 +50,22 @@ QnD INSTALL INSTRUCTIONS:
    If it returns all "OK" then you're done. The default admin account 
    info is "Admin" and "123qwe".
 
+##################################################################
+#          Apache 2/mod_perl 1.99+ Additional Instructions       #
+##################################################################
 
+In order to get WebGUI to run under Apache 2, several files need to 
+be modified after you have completed all of the steps above.
+
+1. In "sbin/preload.perl", comment out the following mod_perl 1 line:
+   # use Apache::Registry (); 
+
+2. Uncomment the next line:
+   use ModPerl::Registry (); 
+
+3. In "www/index.pl", comment out the following line:
+   # $webguiRoot = "..";
+
+4. Uncomment the next line, making sure to change this to your own
+   full path to WebGUI:
+   $webguiRoot = "/data/WebGUI"; 

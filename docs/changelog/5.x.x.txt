@@ -1,5 +1,6 @@
 5.5.1
  - Fixed bug #829806 preventing users from updating thier passwords from the updateAccount form.
+ - Added Apache 2 instructions to install.txt. (Thanks to Andy Grundman.)
 
 
 5.5.0
