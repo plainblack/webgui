@@ -19,6 +19,7 @@ Translation..........................Andreas Ljunggren
                                      Jose Caneira
                                      Mattias Kunkel / WERU AG
                                      Ricardo Markiewicz
+                                     Michael Ugilt
 
 Perl.................................Larry Wall / O'Reilly
 RSSLite..............................Scott Thomason
