@@ -45,6 +45,9 @@
  - BugFix: [ 997885 ] Root move left bug. 
  - Changed 'lft' and 'rgt' database field names to 'nestedSetLeft' and 'nestedSetRight'. (Martin Kamerbeek)
  - Added WebGUI::Session::getScratch().
+ - Added template variables user.canPost and user.canView in forum_loop to MessageBoard / RFE[864134] (Leendert Bottelberghs)
+ - Made flat thread work like flat thread -> messages sorted by submission date / RFE[995982]. (Leendert Bottelberghs)
+
 
 
 6.1.1
