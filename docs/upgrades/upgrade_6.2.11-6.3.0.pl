@@ -120,7 +120,6 @@ WebGUI::SQL->write("alter table DataForm_entry add column assetId varchar(22)");
 WebGUI::SQL->write("alter table DataForm_entryData add column assetId varchar(22)");
 WebGUI::SQL->write("alter table DataForm_field add column assetId varchar(22)");
 WebGUI::SQL->write("alter table DataForm_tab add column assetId varchar(22)");
-WebGUI::SQL->write("alter table USS_submission add column assetId varchar(22) not null");
 WebGUI::SQL->write("alter table Product_feature add assetId varchar(22) not null");
 WebGUI::SQL->write("alter table Product_benefit add assetId varchar(22) not null");
 WebGUI::SQL->write("alter table Product_specification add assetId varchar(22) not null");
@@ -516,6 +515,139 @@ WebGUI::SQL->write("drop table collateral");
 
 
 
+print "\tMigrating forum templates to collaboration templates\n" unless ($quiet);
+my $sth = WebGUI::SQL->read("select templateId,template,namespace from template where namespace in ('Forum','Forum/Thread','Forum/Notification', 'Forum/Search', 'Forum/PostForm')");
+while (my ($id, $template, $namespace) = $sth->array) {
+	my $newNamespace;
+	if ($namespace eq "Forum") {
+		$newNamespace = "Collaboration";
+		$template = '<a name="<tmpl_var assetId>"></a><tmpl_if session.var.adminOn><p><tmpl_var controls></p></tmpl_if>'.$template;
+	} elsif ($namespace eq "Forum/PostForm") {
+		$newNamespace = "Collaboration/PostForm";
+	} elsif ($namespace eq "Forum/Search") {
+		$newNamespace = "Collaboration/Search";
+	} elsif ($namespace eq "Forum/Notification") {
+		$newNamespace = "Collaboration/Notification";
+	} elsif ($namespace eq "Forum/Thread") {
+		$newNamespace = "Collaboration/Thread";
+	}
+	$template =~ s/\<tmpl_var\s+callback\.url\>//ixsg;
+	$template =~ s/\<tmpl_var\s+callback\.label\>//ixsg;
+	$template =~ s/\<tmpl_var\s+forum\.description\>//ixsg;
+	$template =~ s/\<tmpl_var\s+forum\.title\>//ixsg;
+	$template =~ s/forum\.//ixsg;
+	$template =~ s/thread\.list\.url/collaboration.url/ixsg;
+	$template =~ s/thread\.new\.url/add.url/ixsg;
+	$template =~ s/thread\.new\.label/add.label/ixsg;
+	$template =~ s/thread\.root\.subject/title/ixsg;
+	$template =~ s/thread\.root\.url/url/ixsg;
+	$template =~ s/thread\.root\.epoch/dateSubmitted/ixsg;
+	$template =~ s/thread\.root\.url/url/ixsg;
+	$template =~ s/thread\.root\.date/dateSubmitted.human/ixsg;
+	$template =~ s/thread\.root\.time/timeSubmitted.human/ixsg;
+	$template =~ s/thread\.root\.user\.profile/userProfile.url/ixsg;
+	$template =~ s/thread\.root\.user\.alias/username/ixsg;
+	$template =~ s/thread\.root\.user\.name/username/ixsg;
+	$template =~ s/thread\.root\.user\.id/ownerUserId/ixsg;
+	$template =~ s/thread\.root\.user\.isVisitor/user.isVisitor/ixsg;
+	$template =~ s/thread\.root\..status/status/ixsg;
+	$template =~ s/thread\.last\.subject/lastReply.title/ixsg;
+	$template =~ s/thread\.last\.epoch/lastReply.dateSubmitted/ixsg;
+	$template =~ s/thread\.last\.date/lastReply.dateSubmitted.human/ixsg;
+	$template =~ s/thread\.last\.time/lastReply.timeSubmitted.human/ixsg;
+	$template =~ s/thread\.last\.user.profile/lastReply.userProfile.url/ixsg;
+	$template =~ s/thread\.last\.user.name/lastReply.username/ixsg;
+	$template =~ s/thread\.last\.user.id/lastReply.ownerUserId/ixsg;
+	$template =~ s/thread\.last\./lastReply./ixsg;
+	$template =~ s/thread\.//ixsg;
+	$template =~ s/post\.subject/title/ixsg;
+	$template =~ s/post\.message/content/ixsg;
+	$template =~ s/post\.time\.value/timeSubmitted.human/ixsg;
+	$template =~ s/post\.date\.value/dateSubmitted.human/ixsg;
+	$template =~ s/post\.date\.epoch/dateSubmitted/ixsg;
+	$template =~ s/post\.canEdit/user.canEdit/ixsg;
+	$template =~ s/post\.user\.name/username/ixsg;
+	$template =~ s/post\.user\.alias/username/ixsg;
+	$template =~ s/post\.id/assetId/ixsg;
+	$template =~ s/post\.user\.id/ownerUserId/ixsg;
+	$template =~ s/post\.user\.profile/userProfile.url/ixsg;
+	$template =~ s/post\.//ixsg;
+	$template =~ s/form\.begin/form.header/ixsg;
+	$template =~ s/form\.end/form.footer/ixsg;
+	$template =~ s/message\.form/content.form/ixsg;
+	$template =~ s/subject\.form/title.form/ixsg;
+	$template =~ s/newpost\.isNewMessage/isNewPost/ixsg;
+	$template =~ s/newpost\.header/newpost.header.label/ixsg;
+	$template =~ s/newpost\.//ixsg;
+	$template =~ s/firstPage/pagination.firstPage/ixsg;
+	$template =~ s/lastPage/pagination.lastPage/ixsg;
+	$template =~ s/nextPage/pagination.nextPage/ixsg;
+	$template =~ s/previousPage/pagination.previousPage/ixsg;
+	$template =~ s/pageList/pagination.pageList.upTo10/ixsg;
+	$template =~ s/multiplePages/pagination.pageCount.isMultiple/ixsg;
+	$template =~ s/numberOfPages/pagination.pageCount/ixsg;
+	$template =~ s/pageNumber/pagination.pageNumber/ixsg;
+	$template =~ s/thread_loop/post_loop/ixsg;
+	$template =~ s/depth_loop/indent_loop/ixsg;
+	$template =~ s/back\.url/collaboration.url/ixsg;
+	$template =~ s/list\.label/back.label/ixsg;
+	$template =~ s/-=:\s+:=-//ixsg;
+	$template =~ s/previous\.more/previous.url/ixsg;
+	$template =~ s/next\.more/next.url/ixsg;
+	$template = '<a name="<tmpl_var assetId>"></a> <tmpl_if session.var.adminOn> <p><tmpl_var controls></p> </tmpl_if>'.$template;
+	WebGUI::SQL->write("update template set template=".quote($template).", namespace=".quote($newNamespace)." where templateId=".quote($id)." and namespace=".quote($namespace)); 
+}
+$sth->finish;
+
+
+
+print "\tMigrating USS templates to collaboration templates\n" unless ($quiet);
+my $sth = WebGUI::SQL->read("select templateId,template,namespace from template where namespace in ('USS','USS/Submission','USS/SubmissionForm')");
+while (my ($id, $template, $namespace) = $sth->array) {
+	my $newNamespace;
+	if ($namespace eq "USS") {
+		$template =~ s/post\.url/add.url/ixsg;
+		$newNamespace = "Collaboration";
+	} elsif ($namespace eq "USS/SubmissionForm") {
+		$newNamespace = "Collaboration/PostForm";
+	} elsif ($namespace eq "USS/Submission") {
+		$newNamespace = "Collaboration/Thread";
+	}
+	$template =~ s/\<tmpl_var\s+search\.form\>//ixsg;
+	$template =~ s/\<tmpl_var\s+leave\.url\>//ixsg;
+	$template =~ s/\<tmpl_var\s+leave\.label\>//ixsg;
+	$template =~ s/submission\.id/assetId/ixsg;
+	$template =~ s/submission\.content\.full/content/ixsg;
+	$template =~ s/submission\.content/synopsis/ixsg;
+	$template =~ s/submission\.responses/replies/ixsg;
+	$template =~ s/submission\.userId/ownerUserId/ixsg;
+	$template =~ s/submission\.date/dateSubmitted.human/ixsg;
+	$template =~ s/submission\.date.updated/dateUpdated.human/ixsg;
+	$template =~ s/submission\.userProfile/userProfile.url/ixsg;
+	$template =~ s/submission\.currentUser/isCurrentUser/ixsg;
+	$template =~ s/submission\.//ixsg;
+	$template =~ s/user\.Profile/userProfile.url/ixsg;
+	$template =~ s/user\.id/ownerUserId/ixsg;
+	$template =~ s/user\.id/ownerUserId/ixsg;
+	$template =~ s/user\.username/username/ixsg;
+	$template =~ s/date\.epoch/dateSubmitted/ixsg;
+	$template =~ s/date\.human/dateSubmitted.human/ixsg;
+	$template =~ s/date\.updated\.epoch/dateUpdated/ixsg;
+	$template =~ s/date\.updated\.human/dateUpdated.human/ixsg;
+	$template =~ s/date\.updated\.label/date.label/ixsg;
+	$template =~ s/status\.status/status/ixsg;
+	$template =~ s/views\.count/views/ixsg;
+	$template =~ s/post\.url/edit.url/ixsg;
+	$template =~ s/previous\.more/previous.url/ixsg;
+	$template =~ s/next\.more/next.url/ixsg;
+	$template =~ s/canReply/user.canReply/ixsg;
+	$template =~ s/back\.url/collaboration.url/ixsg;
+	$template =~ s/submissions_loop/post_loop/ixsg;
+	$template = '<a name="<tmpl_var assetId>"></a> <tmpl_if session.var.adminOn> <p><tmpl_var controls></p> </tmpl_if>'.$template;
+	WebGUI::SQL->write("update template set template=".quote($template).", namespace=".quote($newNamespace)." where templateId=".quote($id)." and namespace=".quote($namespace)); 
+}
+$sth->finish;
+
 
 
 print "\tConverting template system to asset tree\n" unless ($quiet);
@@ -684,133 +816,6 @@ while (my ($id, $snip) = $sth->array) {
 $sth->finish;
 
 
-
-print "\tMigrating forum templates to collaboration templates\n" unless ($quiet);
-my $sth = WebGUI::SQL->read("select assetId,template,namespace from template where namespace in ('Forum','Forum/Thread','Forum/Notification', 'Forum/Search', 'Forum/PostForm')");
-while (my ($id, $template, $namespace) = $sth->array) {
-	if ($namespace eq "Forum") {
-		$namespace = "Collaboration";
-		$template = '<a name="<tmpl_var assetId>"></a><tmpl_if session.var.adminOn><p><tmpl_var controls></p></tmpl_if>'.$template;
-	} elsif ($namespace eq "Forum/PostForm") {
-		$namespace = "Collaboration/PostForm";
-	} elsif ($namespace eq "Forum/Search") {
-		$namespace = "Collaboration/Search";
-	} elsif ($namespace eq "Forum/Notification") {
-		$namespace = "Collaboration/Notification";
-	} elsif ($namespace eq "Forum/Thread") {
-		$namespace = "Collaboration/Thread";
-	}
-	$template =~ s/\<tmpl_var\s+callback\.url\>//ixsg;
-	$template =~ s/\<tmpl_var\s+callback\.label\>//ixsg;
-	$template =~ s/\<tmpl_var\s+forum\.description\>//ixsg;
-	$template =~ s/\<tmpl_var\s+forum\.title\>//ixsg;
-	$template =~ s/forum\.//ixsg;
-	$template =~ s/thread\.list\.url/collaboration.url/ixsg;
-	$template =~ s/thread\.new\.url/add.url/ixsg;
-	$template =~ s/thread\.new\.label/add.label/ixsg;
-	$template =~ s/thread\.root\.subject/title/ixsg;
-	$template =~ s/thread\.root\.url/url/ixsg;
-	$template =~ s/thread\.root\.epoch/dateSubmitted/ixsg;
-	$template =~ s/thread\.root\.url/url/ixsg;
-	$template =~ s/thread\.root\.date/dateSubmitted.human/ixsg;
-	$template =~ s/thread\.root\.time/timeSubmitted.human/ixsg;
-	$template =~ s/thread\.root\.user\.profile/userProfile.url/ixsg;
-	$template =~ s/thread\.root\.user\.alias/username/ixsg;
-	$template =~ s/thread\.root\.user\.name/username/ixsg;
-	$template =~ s/thread\.root\.user\.id/ownerUserId/ixsg;
-	$template =~ s/thread\.root\.user\.isVisitor/user.isVisitor/ixsg;
-	$template =~ s/thread\.root\..status/status/ixsg;
-	$template =~ s/thread\.last\.subject/lastReply.title/ixsg;
-	$template =~ s/thread\.last\.epoch/lastReply.dateSubmitted/ixsg;
-	$template =~ s/thread\.last\.date/lastReply.dateSubmitted.human/ixsg;
-	$template =~ s/thread\.last\.time/lastReply.timeSubmitted.human/ixsg;
-	$template =~ s/thread\.last\.user.profile/lastReply.userProfile.url/ixsg;
-	$template =~ s/thread\.last\.user.name/lastReply.username/ixsg;
-	$template =~ s/thread\.last\.user.id/lastReply.ownerUserId/ixsg;
-	$template =~ s/thread\.last\./lastReply./ixsg;
-	$template =~ s/thread\.//ixsg;
-	$template =~ s/post\.subject/title/ixsg;
-	$template =~ s/post\.message/content/ixsg;
-	$template =~ s/post\.time\.value/timeSubmitted.human/ixsg;
-	$template =~ s/post\.date\.value/dateSubmitted.human/ixsg;
-	$template =~ s/post\.date\.epoch/dateSubmitted/ixsg;
-	$template =~ s/post\.canEdit/user.canEdit/ixsg;
-	$template =~ s/post\.user\.name/username/ixsg;
-	$template =~ s/post\.user\.alias/username/ixsg;
-	$template =~ s/post\.id/assetId/ixsg;
-	$template =~ s/post\.user\.id/ownerUserId/ixsg;
-	$template =~ s/post\.user\.profile/userProfile.url/ixsg;
-	$template =~ s/post\.//ixsg;
-	$template =~ s/form\.begin/form.header/ixsg;
-	$template =~ s/form\.end/form.footer/ixsg;
-	$template =~ s/message\.form/content.form/ixsg;
-	$template =~ s/subject\.form/title.form/ixsg;
-	$template =~ s/newpost\.isNewMessage/isNewPost/ixsg;
-	$template =~ s/newpost\.header/newpost.header.label/ixsg;
-	$template =~ s/newpost\.//ixsg;
-	$template =~ s/firstPage/pagination.firstPage/ixsg;
-	$template =~ s/lastPage/pagination.lastPage/ixsg;
-	$template =~ s/nextPage/pagination.nextPage/ixsg;
-	$template =~ s/previousPage/pagination.previousPage/ixsg;
-	$template =~ s/pageList/pagination.pageList.upTo10/ixsg;
-	$template =~ s/multiplePages/pagination.pageCount.isMultiple/ixsg;
-	$template =~ s/numberOfPages/pagination.pageCount/ixsg;
-	$template =~ s/pageNumber/pagination.pageNumber/ixsg;
-	$template =~ s/thread_loop/post_loop/ixsg;
-	$template =~ s/depth_loop/indent_loop/ixsg;
-	$template =~ s/back\.url/collaboration.url/ixsg;
-	$template =~ s/list\.label/back.label/ixsg;
-	$template =~ s/-=:\s+:=-//ixsg;
-	$template =~ s/previous\.more/previous.url/ixsg;
-	$template =~ s/next\.more/next.url/ixsg;
-	WebGUI::SQL->write("update template set template=".quote($template).", namespace=".quote($namespace)." where assetId=".quote($id)); 
-}
-$sth->finish;
-
-
-print "\tMigrating USS templates to collaboration templates\n" unless ($quiet);
-my $sth = WebGUI::SQL->read("select assetId,template,namespace from template where namespace in ('USS','USS/Submission','USS/SubmissionForm')");
-while (my ($id, $template, $namespace) = $sth->array) {
-	if ($namespace eq "USS") {
-		$template =~ s/post\.url/add.url/ixsg;
-		$namespace = "Collaboration";
-	} elsif ($namespace eq "USS/SubmissionForm") {
-		$namespace = "Collaboration/PostForm";
-	} elsif ($namespace eq "USS/Submission") {
-		$namespace = "Collaboration/Thread";
-	}
-	$template =~ s/\<tmpl_var\s+search\.form\>//ixsg;
-	$template =~ s/\<tmpl_var\s+leave\.url\>//ixsg;
-	$template =~ s/\<tmpl_var\s+leave\.label\>//ixsg;
-	$template =~ s/submission\.id/assetId/ixsg;
-	$template =~ s/submission\.content/synopsis/ixsg;
-	$template =~ s/submission\.content\.full/content/ixsg;
-	$template =~ s/submission\.responses/replies/ixsg;
-	$template =~ s/submission\.userId/ownerUserId/ixsg;
-	$template =~ s/submission\.date/dateSubmitted.human/ixsg;
-	$template =~ s/submission\.date.updated/dateUpdated.human/ixsg;
-	$template =~ s/submission\.userProfile/userProfile.url/ixsg;
-	$template =~ s/submission\.currentUser/isCurrentUser/ixsg;
-	$template =~ s/submission\.//ixsg;
-	$template =~ s/user\.Profile/userProfile.url/ixsg;
-	$template =~ s/user\.id/ownerUserId/ixsg;
-	$template =~ s/user\.id/ownerUserId/ixsg;
-	$template =~ s/user\.username/username/ixsg;
-	$template =~ s/date\.epoch/dateSubmitted/ixsg;
-	$template =~ s/date\.human/dateSubmitted.human/ixsg;
-	$template =~ s/date\.updated\.epoch/dateUpdated/ixsg;
-	$template =~ s/date\.updated\.human/dateUpdated.human/ixsg;
-	$template =~ s/date\.updated\.label/date.label/ixsg;
-	$template =~ s/status\.status/status/ixsg;
-	$template =~ s/views\.count/views/ixsg;
-	$template =~ s/post\.url/edit.url/ixsg;
-	$template =~ s/previous\.more/previous.url/ixsg;
-	$template =~ s/next\.more/next.url/ixsg;
-	$template =~ s/canReply/user.canReply/ixsg;
-	$template =~ s/back\.url/collaboration.url/ixsg;
-	WebGUI::SQL->write("update template set template=".quote($template).", namespace=".quote($namespace)." where assetId=".quote($id)); 
-}
-$sth->finish;
 
 
 print "\tDeleting files which are no longer used.\n" unless ($quiet);
@@ -1048,7 +1053,7 @@ sub walkTree {
 		my $b = WebGUI::SQL->read("select * from wobject where pageId=".quote($page->{pageId})." order by sequenceNumber");
 		while (my $wobject = $b->hashRef) {
 			print "\t\t\tConverting wobject ".$wobject->{wobjectId}."\n" unless ($quiet);
-			my ($namespace) = WebGUI::SQL->quickHashRef("select * from ".$wobject->{namespace}." where wobjectId=".quote($wobject->{wobjectId}));
+			my $namespace = WebGUI::SQL->quickHashRef("select * from ".$wobject->{namespace}." where wobjectId=".quote($wobject->{wobjectId}));
 			my $wobjectId = WebGUI::Id::generate();
 			my $wobjectLineage = $pageLineage.sprintf("%06d",$rank);
 			my $wobjectUrl = fixUrl($wobjectId,$pageUrl."/".$wobject->{title});
@@ -1260,7 +1265,7 @@ sub walkTree {
 						startDate => $submission->{startDate},
 						endDate => $submission->{endDate},
 						url => fixUrl('notknownyet',$submission->{title}),
-						className=>'WebGUI::Asset::USS_submission',
+						className=>'WebGUI::Asset::Post::Thread',
 						state=>'published',
 						ownerUserId=>$submission->{userId},
 						groupIdView=>$page->{groupIdView},
