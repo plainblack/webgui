@@ -69,7 +69,7 @@ These subroutines are available from this package:
 
 #-------------------------------------------------------------------
 sub _setupSessionVars {
-	my (%vars, $uid, $encryptedPassword);
+	my (%vars, $uid);
 	tie %vars, 'Tie::CPHash';
 	if ($_[0] ne "") {
 		%vars = WebGUI::SQL->quickHash("select * from userSession where sessionId=".quote($_[0]));

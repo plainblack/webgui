@@ -440,6 +440,7 @@ sub www_editUserGroup {
                 $output .= '<td class="tableData">'.epochToHuman($row->{expireDate},"%z").'</td></tr>';
         }
         $output .= '</table>'.WebGUI::Form::formFooter();
+	$output .= $p->getBarTraditional;
         $output .= '<p><h1>'.WebGUI::International::get(605).'</h1>';
 	$output .= WebGUI::Operation::Group::getGroupSearchForm("editUserGroup",{uid=>$session{form}{uid}});
 	my ($groupCount) = WebGUI::SQL->quickArray("select count(*) from users");

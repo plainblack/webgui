@@ -144,7 +144,7 @@ sub process {
 			WebGUI::URL::page('op=listUsers')=>WebGUI::International::get(7),
 			WebGUI::URL::page('op=viewStatistics')=>WebGUI::International::get(144),
 			WebGUI::URL::page('op=listDatabaseLinks')=>WebGUI::International::get(981),
-			WebGUI::URL::page('op=listNavigation')=>'Manage navigation.'
+			WebGUI::URL::page('op=listNavigation')=>WebGUI::International::get("manage navigation","Navigation")
 		);
 	} elsif (WebGUI::Grouping::isInGroup(11)) {
                 %hash = (

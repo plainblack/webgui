@@ -292,11 +292,11 @@ sub getResponseDrivenQuestionIds {
 	if ($previousResponse->{Survey_answerId}) {
 	        ($questionId) = WebGUI::SQL->quickArray("select gotoQuestion from Survey_answer where 
 			Survey_answerId=".quote($previousResponse->{Survey_answerId}));
-	        unless ($questionId > 0) { 
+	        unless ($questionId) { 
 			($questionId) = WebGUI::SQL->quickArray("select gotoQuestion from Survey_question where 
 				Survey_questionId=".quote($previousResponse->{Survey_questionId}));
 		}
-		unless ($questionId > 0) { # terminate survey
+		unless ($questionId) { # terminate survey
 			$self->completeResponse($responseId);	
 			return ();
 		}
@@ -854,12 +854,12 @@ sub www_respond {
 	return "" unless ($session{scratch}{$varname});
 	my $userId = ($self->get("anonymous")) ? substr(md5_hex($session{user}{userId}),0,8) : $session{user}{userId};
 	foreach my $key (keys %{$session{form}}) {
-		if ($key =~ /answerId_(\d+)/) {
+		if ($key =~ /^answerId_(.+)$/) {
 			my $id = $1;
 			my ($previousResponse) = WebGUI::SQL->quickArray("select count(*) from Survey_questionResponse
 				where Survey_answerId=".quote($session{form}{"answerId_".$id})." and Survey_responseId=".quote($session{scratch}{$varname}));
 			next if ($previousResponse);
-			my $answer = $self->getCollateral("Survey_answer","Survey_answerId",quote($session{form}{"answerId_".$id}));
+			my $answer = $self->getCollateral("Survey_answer","Survey_answerId",$session{form}{"answerId_".$id});
 			my $response = $session{form}{"textResponse_".$id} || $answer->{answer};
 			WebGUI::SQL->write("insert into Survey_questionResponse (Survey_answerId,Survey_questionId,Survey_responseId,Survey_id,comment,response,dateOfResponse) values (
 				".quote($answer->{Survey_answerId}).", ".quote($answer->{Survey_questionId}).", ".quote($session{scratch}{$varname}).", ".quote($answer->{Survey_id}).",
@@ -955,7 +955,7 @@ sub www_viewGradebook {
 	$var->{title} = WebGUI::International::get(71,$self->get("namespace"));
 	my $p = WebGUI::Paginator->new(WebGUI::URL::page('func=viewGradebook&wid='.$self->get("wobjectId")));
 	$p->setDataByQuery("select userId,username,ipAddress,Survey_responseId,startDate,endDate from Survey_response 
-		where isComplete=1 and Survey_id=".$self->get("Survey_id")." order by username,ipAddress,startDate");
+		where isComplete=1 and Survey_id=".quote($self->get("Survey_id"))." order by username,ipAddress,startDate");
 	my $users = $p->getPageData;
 	($var->{'question.count'}) = WebGUI::SQL->quickArray("select count(*) from Survey_question where Survey_id=".quote($self->get("Survey_id")));
 	if ($var->{'question.count'} > $self->get("questionsPerResponse")) {

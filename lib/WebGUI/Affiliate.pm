@@ -50,9 +50,9 @@ account if possible.
 =cut
 
 sub grabReferral {
-	if ($session{user}{userId} != 1 && $session{user}{referringAffiliate} > 0) {
+	if ($session{user}{userId} ne "1" && $session{user}{referringAffiliate}) {
 		return "";
-	} elsif ($session{user}{userId} != 1 && (($session{user}{referringAffiliate} == 0 && $session{scratch}{referringAffiliate} > 0) || $session{form}{affiliateId} ne "")) {
+	} elsif ($session{user}{userId} ne "1" && (($session{user}{referringAffiliate} eq "0" && $session{scratch}{referringAffiliate}) || $session{form}{affiliateId})) {
 		my $u = WebGUI::User->new($session{user}{userId});
 		$u->referringAffiliate($session{scratch}{referringAffiliate});
 	} elsif ($session{user}{userId} != 1) {

@@ -1,5 +1,5 @@
 insert into webguiVersion values ('6.2.3','upgrade',unix_timestamp());
-update collateralFolder set parentId='-1' where parentId='0';
+update collateralFolder set parentId='-1' where collateralFolderId='0';
 
 delete from template where namespace='Navigation' and templateId='6';
 

@@ -66,7 +66,7 @@ sub new {
       -properties         => $property,
       -useMetaData	  => 1,
       -extendedProperties => {
-         call             => {
+         callMethod             => {
             fieldType     => 'textarea',
          },
          debugMode        => {
@@ -165,9 +165,9 @@ sub www_edit {
       -value => $_[0]->get('proxy'),
    );
    $properties->text (
-      -name  => 'call',
+      -name  => 'callMethod',
       -label => WebGUI::International::get(4, $_[0]->get('namespace')),
-      -value => $_[0]->get('call'),
+      -value => $_[0]->get('callMethod'),
    );
    $properties->textarea ( 
       -name  => 'params',
@@ -262,7 +262,7 @@ sub www_view {
 
    # snag our SOAP call and preprocess if needed
    if ($self->get('preprocessMacros')) {
-      $call = WebGUI::Macro::process($self->get("call"));
+      $call = WebGUI::Macro::process($self->get("callMethod"));
       $param_str = WebGUI::Macro::process($self->get("params"));
    }
 

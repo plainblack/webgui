@@ -1728,6 +1728,8 @@ sub www_post {
 	if ($var->{'newpost.isNewMessage'}) {
 		$var->{'subscribe.label'} = WebGUI::International::get(873);
 		return WebGUI::Privilege::insufficient() unless ($forum->canPost);
+		my $u = WebGUI::User->new($session{user}{userId});
+		$u->karma($forum->get("karmaPerPost"),"Forum (".$forum->get("forumId").")","Forum Post") if ($session{setting}{useKarma});
 		if ($forum->isModerator) {
 			$var->{'lock.label'} = WebGUI::International::get(1012);
 			$var->{'lock.form'} = WebGUI::Form::yesNo({

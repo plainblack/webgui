@@ -73,6 +73,7 @@ print "\tResetting user languages.\n" unless ($quiet);
 my ($defaultLangId) = WebGUI::SQL->quickArray("select dataDefault from userProfileField where fieldName='language'");
 $defaultLangId =~ s/\[//;
 $defaultLangId =~ s/\]//;
+$defaultLangId = 1 if ($defaultLangId > 21);
 my $langs = {
 	1 => "English",
 	2 => "German",
@@ -97,7 +98,9 @@ WebGUI::SQL->write("update userProfileData set fieldData='".$langs->{$defaultLan
 WebGUI::SQL->write("update userProfileData set fieldData='English' where fieldName='language' and fieldData=1");
 WebGUI::SQL->write("alter table page change languageId languageId varchar(50) not null default 'English'");
 foreach my $key (keys %{$langs}) {
-	WebGUI::SQL->write("update page set languageId=".quote($langs->{$key})." where languageId=".$key);
+	my $langId = $key;
+	$langId = 1 if ($key > 21);
+	WebGUI::SQL->write("update page set languageId=".quote($langs->{$langId})." where languageId=".$key);
 }
 
 #--------------------------------------------

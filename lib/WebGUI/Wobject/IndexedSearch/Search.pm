@@ -67,7 +67,7 @@ sub _recurseCrumbTrail {
         my ($sth, %data, $output);
         tie %data, 'Tie::CPHash';
         %data = WebGUI::SQL->quickHash("select pageId,parentId,menuTitle,urlizedTitle from page where pageId=".quote($_[0]));
-        if ($data{pageId} > 1) {
+        if ($data{pageId}) {
                 $output .= _recurseCrumbTrail($data{parentId});
         }
         if ($data{menuTitle} ne "") {

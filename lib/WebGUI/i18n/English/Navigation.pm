@@ -1,6 +1,12 @@
 package WebGUI::i18n::English::Navigation;
 
 our $I18N = {
+	'manage navigation' => {
+		message => q|Manage Navigation|,
+		lastUpdated => 1077081255,
+		context=>q|Used in the Admin Bar|
+	},
+
 	'33' => {
 		message => q|Error: This identifier is already in use. Please use an unique value.|,
 		lastUpdated => 1077081255

@@ -310,7 +310,7 @@ sub build {
 				
 				# Some information about my mother
 				my $mother = WebGUI::Page->getPage($page->{parentId});
-				if ($page->{parentId} > 0) {
+				if ($page->{parentId} ne "0") {
 					foreach (qw(title urlizedTitle parentId pageId)) {
 						$pageData->{"page.mother.$_"} = $mother->get($_);
 					}

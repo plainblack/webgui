@@ -533,6 +533,7 @@ sub www_manageUsersInGroup {
                 $output .= '<td class="tableData">'.epochToHuman($row->{expireDate},"%z").'</td></tr>';
         }
         $output .= '</table>'.WebGUI::Form::formFooter();
+	$output .= $p->getBarTraditional;
 	$output .= '<p><h1>'.WebGUI::International::get(976).'</h1>';
 	$output .= WebGUI::Operation::User::getUserSearchForm("manageUsersInGroup",{gid=>$session{form}{gid}});
 	my ($userCount) = WebGUI::SQL->quickArray("select count(*) from users");

@@ -128,7 +128,7 @@ sub www_editTemplate {
 		$f = WebGUI::HTMLForm->new;
                 $f->hidden("op","editTemplateSave");
 		$f->readOnly($session{form}{tid},WebGUI::International::get(503));
-                $f->hidden("action2",$session{form}{afterEdit});
+                $f->raw('<input type="hidden" name="op2" value="'.$session{form}{afterEdit}.' />');
 		if ($session{form}{tid} eq "new") {
 			$namespaces = WebGUI::SQL->buildHashRef("select distinct(namespace),namespace 
 				from template order by namespace");
@@ -164,7 +164,7 @@ sub www_editTemplateSave {
 			name=>$session{form}{name},
 			template=>$session{form}{template}
 			});
-		if ($session{form}{action2} eq "") {
+		if ($session{form}{op2} eq "") {
                 	return www_listTemplates();
 		} else {
 			return "";

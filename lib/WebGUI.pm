@@ -79,30 +79,31 @@ sub _getPageInfo {
 }
 
 #-------------------------------------------------------------------	
-sub _processAction {
-	my ($urlString, %form, $pair, @pairs, @param);
-	$urlString = WebGUI::URL::unescape($_[0]);
-	@pairs = split(/\&/,$urlString);
-	foreach $pair (@pairs) {
-		@param = split(/\=/,$pair);
-		$form{$param[0]} = $param[1];
-	}
-	$session{form} = \%form;
-}
-
-
-#-------------------------------------------------------------------	
 sub _processOperations {
 	my ($cmd, $output);
-        if (exists $session{form}{op}) {
-                if ($session{form}{op} =~ /^[A-Za-z]+$/) {
-                        $cmd = "WebGUI::Operation::www_".$session{form}{op};
+	my $op = $session{form}{op};
+	my $opNumber = shift || 1;
+        if ($op) {
+                if ($op =~ /^[A-Za-z]+$/) {
+                        $cmd = "WebGUI::Operation::www_".$op;
                         $output = eval($cmd);
-                        WebGUI::ErrorHandler::security("call a non-existent operation: $session{form}{op}. Root cause: ".$@) if($@);
+                        WebGUI::ErrorHandler::security("call a non-existent operation: $op. Root cause: ".$@) if($@);
                 } else {
-                        WebGUI::ErrorHandler::security("execute an invalid operation: ".$session{form}{op});
+                        WebGUI::ErrorHandler::security("execute an invalid operation: ".$op);
                 }
         }
+	$opNumber++;
+	if ($output eq "" && exists $session{form}{"op".$opNumber}) {
+		my $urlString = WebGUI::URL::unescape($session{form}{"op".$opNumber});
+		my @pairs = split(/\&/,$urlString);
+		my %form;
+		foreach my $pair (@pairs) {
+			my @param = split(/\=/,$pair);
+			$form{$param[0]} = $param[1];
+		}
+		$session{form} = \%form;
+		$output = _processOperations($opNumber);
+	}
 	return $output;
 }
 
@@ -114,8 +115,6 @@ sub page {
 	my $pageUrl = shift;
 	my $fastcgi = shift;
 	WebGUI::Session::open($webguiRoot,$configFile,$fastcgi) unless ($useExistingSession);
-
-# JT: don't forget to do something with action 2
 	my $page = _getPageInfo($pageUrl);
 	my $output = _processOperations();
 	if ($output ne "") {

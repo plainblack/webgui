@@ -12,6 +12,7 @@ package WebGUI::Wobject::EventsCalendar;
 
 use strict;
 use Tie::CPHash;
+use WebGUI::Cache;
 use WebGUI::DateTime;
 use WebGUI::FormProcessor;
 use WebGUI::HTMLForm;
@@ -28,6 +29,14 @@ use WebGUI::Utility;
 use WebGUI::Wobject;
 
 our @ISA = qw(WebGUI::Wobject);
+
+
+#-------------------------------------------------------------------
+sub deleteCache {
+	my $self = shift;
+	my $cache = WebGUI::Cache->new("EventsCalendar_".$self->wid);
+	$cache->delete;
+}
 
 
 #-------------------------------------------------------------------
@@ -233,6 +242,7 @@ sub www_edit {
 #-------------------------------------------------------------------
 sub www_editSave {
 	$_[0]->SUPER::www_editSave();
+	$_[0]->deleteCache;
 	if ($session{form}{proceed} eq "addEvent") {
 		$session{form}{eid} = "new";
 		return $_[0]->www_editEvent;
@@ -308,6 +318,7 @@ sub www_editEvent {
 #-------------------------------------------------------------------
 sub www_editEventSave {
 	return WebGUI::Privilege::insufficient() unless ($_[0]->canEdit);
+	$_[0]->deleteCache;
 	my (@startDate, @endDate, $until, @eventId, $i, $recurringEventId);
         $startDate[0] = WebGUI::FormProcessor::dateTime("startDate");
 	$startDate[0] = time() unless ($startDate[0] > 0);
@@ -368,6 +379,9 @@ sub www_editEventSave {
 sub www_view {
 	$_[0]->logView() if ($session{setting}{passiveProfilingEnabled});
 	my ( $junk, $sameDate, $p, @list, $date, $flag, %previous, $maxDate, $minDate);
+	my $cache = WebGUI::Cache->new("EventsCalendar_".$_[0]->wid);
+	my $monthloop = $cache->get;
+ unless (defined $monthloop) {
 	# figure out the date range
 	tie %previous, 'Tie::CPHash';
 	if ($_[0]->get("startMonth") eq "first") {
@@ -409,14 +423,7 @@ sub www_view {
 			$session{form}{calPn} = 1;
 		}
 	}
-
-	# create template variables
-	my %var;
-	$var{"addevent.url"} = WebGUI::URL::page('func=editEvent&eid=new&wid='.$_[0]->get("wobjectId"));
-	$var{"addevent.label"} = WebGUI::International::get(20,$_[0]->get("namespace"));
-	my @monthloop;
 	for (my $i=1;$i<$monthCount;$i++) {
-	#	if ($session{form}{calPn} == ($i)) {
 			my $thisMonth = WebGUI::DateTime::addToDate($minDate,0,($i-1),0);
 			my ($monthStart, $monthEnd) = WebGUI::DateTime::monthStartEnd($thisMonth);
 			my @thisMonthDate = WebGUI::DateTime::epochToArray($thisMonth);
@@ -506,7 +513,7 @@ sub www_view {
 					});
         			$dayOfWeekCounter++;
 			}
-			push(@monthloop, {
+			push(@$monthloop, {
 				'daysInMonth'=>$daysInMonth,
 				'day_loop'=>\@dayloop,
 				'prepad_loop'=>\@prepad,
@@ -514,13 +521,17 @@ sub www_view {
 				'month'=>WebGUI::DateTime::getMonthName($date[1]),
 				'year'=>$date[0]
 				});
-	#	}
-	#	$row[$i-1] = "page";
 	}
+	$cache->set($monthloop,3600);
+   }
+	# create template variables
 	$p = WebGUI::Paginator->new(WebGUI::URL::page("func=view&wid=".$_[0]->get("wobjectId")),$_[0]->get("paginateAfter"),"calPn");
-	$p->setDataByArrayRef(\@monthloop);
+	$p->setDataByArrayRef($monthloop);
+	my %var;
 	$var{month_loop} = $p->getPageData;
 	$p->appendTemplateVars(\%var);
+	$var{"addevent.url"} = WebGUI::URL::page('func=editEvent&eid=new&wid='.$_[0]->get("wobjectId"));
+	$var{"addevent.label"} = WebGUI::International::get(20,$_[0]->get("namespace"));
 	$var{'sunday.label'} = WebGUI::DateTime::getDayName(7);
 	$var{'monday.label'} = WebGUI::DateTime::getDayName(1);
 	$var{'tuesday.label'} = WebGUI::DateTime::getDayName(2);

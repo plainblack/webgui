@@ -13,6 +13,7 @@ package WebGUI::Wobject::USS;
 use strict;
 use Tie::CPHash;
 use WebGUI::Attachment;
+use WebGUI::Cache;
 use WebGUI::DateTime;
 use WebGUI::Forum;
 use WebGUI::Forum::UI;
@@ -58,6 +59,15 @@ sub _xml_encode {
         $_[0] =~ s/\]\]>/\]\]&gt;/g;
         return $_[0];
 }
+
+#-------------------------------------------------------------------
+sub deleteCachedSubmission {
+	my $self = shift;
+	my $submissionId = shift;
+	my $cache = WebGUI::Cache->new("USS_submission_".$submissionId);
+	$cache->delete;
+}
+
 
 #-------------------------------------------------------------------
 sub duplicate {
@@ -247,14 +257,16 @@ sub viewSubmissionAsPage {
 
 #-------------------------------------------------------------------
 sub www_approveSubmission {
+	my $self = shift;
 	my (%submission);
 	tie %submission, 'Tie::CPHash';
         if (WebGUI::Grouping::isInGroup(4,$session{user}{userId}) || WebGUI::Grouping::isInGroup(3,$session{user}{userId})) {
 		%submission = WebGUI::SQL->quickHash("select * from USS_submission where USS_submissionId=".quote($session{form}{sid}));
                 WebGUI::SQL->write("update USS_submission set status='Approved' where USS_submissionId=".quote($session{form}{sid}));
 		WebGUI::MessageLog::addInternationalizedEntry($submission{userId},'',WebGUI::URL::page('func=viewSubmission&wid='.
-			$session{form}{wid}.'&sid='.$session{form}{sid}),4,$_[0]->get("namespace"));
+			$session{form}{wid}.'&sid='.$session{form}{sid}),4,$self->get("namespace"));
 		WebGUI::MessageLog::completeEntry($session{form}{mlog});
+		$self->deleteCachedSubmission;
                 return WebGUI::Operation::www_viewMessageLog();
         } else {
                 return WebGUI::Privilege::insufficient();
@@ -269,13 +281,15 @@ sub www_copy {
 
 #-------------------------------------------------------------------
 sub www_deleteFile {
+	my $self = shift;
 	my ($owner) = WebGUI::SQL->quickArray("select userId from USS_submission where USS_submissionId=".quote($session{form}{sid}));
-        if ($owner eq $session{user}{userId} || WebGUI::Grouping::isInGroup($_[0]->get("groupToApprove"))) {
-		$_[0]->setCollateral("USS_submission","USS_submissionId",{
+        if ($owner eq $session{user}{userId} || WebGUI::Grouping::isInGroup($self->get("groupToApprove"))) {
+		$self->setCollateral("USS_submission","USS_submissionId",{
 			$session{form}{file}=>'',
 		 	USS_submissionId=>$session{form}{sid}
 			},0,0);
-                return $_[0]->www_editSubmission();
+		$self->deleteCachedSubmission;
+                return $self->www_editSubmission();
         } else {
                 return WebGUI::Privilege::insufficient();
         }
@@ -283,9 +297,10 @@ sub www_deleteFile {
 
 #-------------------------------------------------------------------
 sub www_deleteSubmission {
+	my $self = shift;
 	my ($owner) = WebGUI::SQL->quickArray("select userId from USS_submission where USS_submissionId=".quote($session{form}{sid}));
-        if ($owner eq $session{user}{userId} || WebGUI::Grouping::isInGroup($_[0]->get("groupToApprove"))) {
-		return $_[0]->confirm(WebGUI::International::get(17,$_[0]->get("namespace")),
+        if ($owner eq $session{user}{userId} || WebGUI::Grouping::isInGroup($self->get("groupToApprove"))) {
+		return $self->confirm(WebGUI::International::get(17,$self->get("namespace")),
 			WebGUI::URL::page('func=deleteSubmissionConfirm&wid='.$session{form}{wid}.'&sid='.$session{form}{sid}));
         } else {
                 return WebGUI::Privilege::insufficient();
@@ -294,8 +309,9 @@ sub www_deleteSubmission {
 
 #-------------------------------------------------------------------
 sub www_deleteSubmissionConfirm {
+	my $self = shift;
 	my ($owner, $forumId, $pageId) = WebGUI::SQL->quickArray("select userId,forumId,pageId from USS_submission where USS_submissionId=".quote($session{form}{sid}));
-        if ($owner eq $session{user}{userId} || WebGUI::Grouping::isInGroup($_[0]->get("groupToApprove"))) {
+        if ($owner eq $session{user}{userId} || WebGUI::Grouping::isInGroup($self->get("groupToApprove"))) {
 		my ($inUseElsewhere) = WebGUI::SQL->quickArray("select count(*) from USS_submission where forumId=".quote($forumId));
                 unless ($inUseElsewhere > 1) {
 			my $forum = WebGUI::Forum->new($forumId);
@@ -303,7 +319,8 @@ sub www_deleteSubmissionConfirm {
 		}
 		my $page = WebGUI::Page->new($pageId);
 		$page->purge;
-		$_[0]->deleteCollateral("USS_submission","USS_submissionId",$session{form}{sid});
+		$self->deleteCachedSubmission;
+		$self->deleteCollateral("USS_submission","USS_submissionId",$session{form}{sid});
 		my $file = WebGUI::Attachment->new("",$session{form}{wid},$session{form}{sid});
 		$file->deleteNode;
                 return "";
@@ -314,14 +331,16 @@ sub www_deleteSubmissionConfirm {
 
 #-------------------------------------------------------------------
 sub www_denySubmission {
+	my $self = shift;
 	my (%submission);
 	tie %submission, 'Tie::CPHash';
         if (WebGUI::Grouping::isInGroup(4,$session{user}{userId}) || WebGUI::Grouping::isInGroup(3,$session{user}{userId})) {
 		%submission = WebGUI::SQL->quickHash("select * from USS_submission where USS_submissionId=".quote($session{form}{sid}));
                 WebGUI::SQL->write("update USS_submission set status='Denied' where USS_submissionId=".quote($session{form}{sid}));
                 WebGUI::MessageLog::addInternationalizedEntry($submission{userId},'',WebGUI::URL::page('func=viewSubmission&wid='.
-			$session{form}{wid}.'&sid='.$session{form}{sid}),5,$_[0]->get("namespace"));
+			$session{form}{wid}.'&sid='.$session{form}{sid}),5,$self->get("namespace"));
                 WebGUI::MessageLog::completeEntry($session{form}{mlog});
+		$self->deleteCachedSubmission;
                 return WebGUI::Operation::www_viewMessageLog();
         } else {
                 return WebGUI::Privilege::insufficient();
@@ -674,6 +693,7 @@ sub www_editSubmissionSave {
 		my $page = WebGUI::Page->new($submission->{pageId});
                	$page->set(\%pageVars);
 		$_[0]->setCollateral("USS_submission", "USS_submissionId", \%hash, 1, 0, "USS_id", $_[0]->get("USS_id"));
+		$_[0]->deleteCachedSubmission;
                 return $_[0]->www_viewSubmission();
         } else {
                 return WebGUI::Privilege::insufficient();
@@ -715,7 +735,7 @@ sub www_view {
 	WebGUI::Style::setLink($var{"rss.url"},{ rel=>'alternate', type=>'application/rss+xml', title=>'RSS' });
 	if ($session{scratch}{search}) {
                 $numResults = $session{scratch}{numResults};
-       		$constraints = WebGUI::Search::buildConstraints([qw(USS_submission.username USS_submission.title USS_submission.content)]);
+       		$constraints = WebGUI::Search::buildConstraints([qw(USS_submission.username USS_submission.title USS_submission.content USS_submission.userDefined1 USS_submission.userDefined2 USS_submission.userDefined3 USS_submission.userDefined4 USS_submission.userDefined5)]);
 	}
 	if ($constraints ne "") {
         	$constraints = "USS_submission.status='Approved' and ".$constraints;
@@ -746,6 +766,9 @@ sub www_view {
 	$i = 0;
 	my $imageURL = "";
 	foreach $row (@$page) {
+		my $cache = WebGUI::Cache->new("USS_submission_".$row->{USS_submissionId});
+		my $submission = $cache->get;
+		unless (defined $submission) {
 		$page->[$i]->{content} = WebGUI::HTML::filter($page->[$i]->{content},$_[0]->get("filterContent"));
                 $page->[$i]->{content} =~ s/\n/\^\-\;/ unless ($page->[$i]->{content} =~ m/\^\-\;/);
 		$page->[$i]->{content} = WebGUI::HTML::format($page->[$i]->{content},$page->[$i]->{contentType});
@@ -779,7 +802,7 @@ sub www_view {
 		  $inDateRange = 1;
 		}
 		else { $inDateRange = 0; }
-                push (@submission,{
+                $submission = {
                         "submission.id"=>$page->[$i]->{USS_submissionId},
                         "submission.url"=>WebGUI::URL::gateway($page->[$i]->{urlizedTitle}),
                         "submission.content"=>$content[0],
@@ -798,7 +821,6 @@ sub www_view {
                         "submission.image"=>$imageURL,
                         "submission.date"=>epochToHuman($page->[$i]->{dateSubmitted}),
                         "submission.date.updated"=>epochToHuman($page->[$i]->{dateUpdated}),
-                        "submission.currentUser"=>($session{user}{userId} eq $page->[$i]->{userId} && $session{user}{userId} != 1),
                         "submission.userProfile"=>WebGUI::URL::page('op=viewProfile&uid='.$page->[$i]->{userId}),
         		"submission.edit.url"=>WebGUI::URL::page($quickurl.'editSubmission'),
                         "submission.secondColumn"=>(($i+1)%2==0),
@@ -807,7 +829,11 @@ sub www_view {
                         "submission.fifthColumn"=>(($i+1)%5==0),
 			'submission.controls'=>$controls,
 			'submission.inDateRange'=>$inDateRange
-                        });
+                        };
+		$cache->set($submission,3600);
+		}
+                $submission->{"submission.currentUser"}=($session{user}{userId} eq $submission->{"submission.userId"} && $session{user}{userId} != 1);
+		push(@submission,$submission);
 		$i++;
 	}
 	$var{submissions_loop} = \@submission;

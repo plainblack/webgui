@@ -24,7 +24,7 @@ sub process {
         @param = WebGUI::Macro::getParams($_[0]);
 	my $append = 'op=makePrintable';
 	if ($session{env}{REQUEST_URI} =~ /op\=/) {
-		$append = 'action2='.WebGUI::URL::escape($append);
+		$append = 'op2='.WebGUI::URL::escape($append);
 	}
         $temp = WebGUI::URL::append($session{env}{REQUEST_URI},$append);
 	if ($param[1] ne "") {

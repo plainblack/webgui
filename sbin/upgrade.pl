@@ -172,7 +172,7 @@ foreach my $file (@files) {
 			($config{$file}{version}) = WebGUI::SQL->quickArray("select webguiVersion from webguiVersion 
 				order by dateApplied desc, webguiVersion desc limit 1",$dbh);
 			$dbh->disconnect;
-			rmtree($config->get("uploadsPath".$slash."temp"));
+			rmtree($config->get("uploadsPath").$slash."temp");
 		} else {
 			delete $config{$file};
 			print "\tSkipping non-MySQL database.\n" unless ($quiet);

@@ -416,6 +416,10 @@ our $HELP = {
 			{
 				tag => 'settings manage',
 				namespace => 'WebGUI'
+			},
+			{
+				tag => 'navigation macros',
+				namespace => 'WebGUI'
 			}
 		]
 	},
@@ -470,7 +474,7 @@ our $HELP = {
 				namespace => 'WebGUI'
 			},
 			{
-				tag => 'navigation macro',
+				tag => 'navigation macros',
 				namespace => 'WebGUI'
 			},
 			{
@@ -691,7 +695,7 @@ our $HELP = {
 			}
 		]
 	},
-	'navigation macro' => {
+	'navigation macros' => {
 		title => '841',
 		body => '842',
 		related => [
@@ -1060,7 +1064,7 @@ our $HELP = {
 		body => '1093',
 		related => [
 			{
-				tag => 'navigation macro',
+				tag => 'navigation macros',
 				namespace => 'WebGUI'
 			},
 			{
@@ -1082,7 +1086,7 @@ our $HELP = {
 		body => '1095',
 		related => [
 			{
-				tag => 'navigation macro',
+				tag => 'navigation macros',
 				namespace => 'WebGUI'
 			},
 			{
@@ -1100,7 +1104,7 @@ our $HELP = {
 		body => '1097',
 		related => [
 			{
-				tag => 'navigation macro',
+				tag => 'navigation macros',
 				namespace => 'WebGUI'
 			},
 			{

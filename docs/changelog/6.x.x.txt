@@ -3,6 +3,25 @@
  - Removed debugging from the events calendar that should have been removed
    before the last release.
  - bugfix [ 1033670 ] JAVASCRIPT BUG
+ - bugfix [ 1034374 ] no pagination on groups
+ - bugfix [ 1035466 ] Pagination Broken - "Manage Users in Group"
+ - bugfix [ 1034900 ] unquoted themeID causing SQL error
+ - bugfix [ 1035510 ] USS search and user defined fields
+ - bugfix [ 1034373 ] No root path(s) specified
+ - bugfix [ 1035751 ] AdminBar.pm has message hardcoded, can't be translated.
+ - bugfix [ 1037161 ] Upgrade fail to change custom language to English
+ - bugfix [ 1036797 ] Bugs in Survey.pm (dapperedodo)
+ - bugfix [ 1036636 ] collateral folders missing
+ - bugfix [ 1036012 ] Themes broken
+ - Added a performance cache to the USS. Our testing indicates most USS' will see
+   more than 900% increase in performance.
+ - Added a performance cache to the Events Calendar. Our testing indicates
+   that most Events Calendars will see more than 33000% increase in
+   performance. No that's not a typo.
+ - bugfix [ 1035901 ] Comparision logic based on int ids
+ - bugfix [ 1035891 ] DBMS reserved keyword in webgui wsclient table
+ - bugfix [ 1035055 ] Forum Karma
+ - bugfix [ 1034381 ] action2 not working
 
 
 6.2.5

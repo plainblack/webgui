@@ -114,7 +114,7 @@ sub www_addThemeComponentSave {
 		$id = $2;	
 	        my $componentId = WebGUI::Id::generate();
         	WebGUI::SQL->write("insert into themeComponent (themeId,themeComponentId,type,id)
-                	        values ($session{form}{themeId}, $componentId, ".quote($type).", ".quote($id).")");
+                	        values (".quote($session{form}{themeId}).", ".quote($componentId).", ".quote($type).", ".quote($id).")");
 	}
         return www_editTheme();
 }
@@ -122,7 +122,6 @@ sub www_addThemeComponentSave {
 #-------------------------------------------------------------------
 sub www_deleteTheme {
         return WebGUI::Privilege::insufficient unless (WebGUI::Grouping::isInGroup(9));
-	return WebGUI::Privilege::vitalComponent() if ($session{form}{themeId} < 1000 && $session{form}{themeId} > 0);
         my $output = helpIcon("theme delete");
 	$output .= '<h1>'.WebGUI::International::get(42).'</h1>';
         $output .= WebGUI::International::get(907).'<p>';
@@ -137,15 +136,14 @@ sub www_deleteTheme {
 #-------------------------------------------------------------------
 sub www_deleteThemeConfirm {
         return WebGUI::Privilege::insufficient unless (WebGUI::Grouping::isInGroup(9));
-	return WebGUI::Privilege::vitalComponent() if ($session{form}{themeId} < 1000 && $session{form}{themeId} > 0);
-	my $theme = WebGUI::SQL->quickHashRef("select * from theme where themeId=".$session{form}{themeId});
+	my $theme = WebGUI::SQL->quickHashRef("select * from theme where themeId=".quote($session{form}{themeId}));
 	unless ($theme->{original}) {
         	WebGUI::SQL->write("delete from collateralFolder where name=".quote($theme->{name}));
-                my $sth = WebGUI::SQL->read("select type,Id from themeComponent where themeId=".$session{form}{themeId});
+                my $sth = WebGUI::SQL->read("select type,Id from themeComponent where themeId=".quote($session{form}{themeId}));
                 while (my $component = $sth->hashRef) {
 			if ($component->{type} eq "template") {
 				my ($id,$namespace) = split("_",$component->{id});
-				WebGUI::SQL->write("delete from template where templateId=".$id
+				WebGUI::SQL->write("delete from template where templateId=".quote($id)
 					." and namespace=".quote($namespace));
 			} else {
 				my $c = WebGUI::Collateral->new($component->{id});
@@ -154,15 +152,14 @@ sub www_deleteThemeConfirm {
                 }
                 $sth->finish;
 	}
-        WebGUI::SQL->write("delete from theme where themeId=".$session{form}{themeId});
-        WebGUI::SQL->write("delete from themeComponent where themeId=".$session{form}{themeId});
+        WebGUI::SQL->write("delete from theme where themeId=".quote($session{form}{themeId}));
+        WebGUI::SQL->write("delete from themeComponent where themeId=".quote($session{form}{themeId}));
         return www_listThemes();
 }
 
 #-------------------------------------------------------------------
 sub www_deleteThemeComponent {
         return WebGUI::Privilege::insufficient unless (WebGUI::Grouping::isInGroup(9));
-        return WebGUI::Privilege::vitalComponent() if ($session{form}{themeId} < 1000 && $session{form}{themeId} > 0);
         my $output = '<h1>'.WebGUI::International::get(42).'</h1>';
         $output .= WebGUI::International::get(908).'<p>';
         $output .= '<div align="center"><a href="'.
@@ -176,8 +173,7 @@ sub www_deleteThemeComponent {
 #-------------------------------------------------------------------
 sub www_deleteThemeComponentConfirm {
         return WebGUI::Privilege::insufficient unless (WebGUI::Grouping::isInGroup(9));
-        return WebGUI::Privilege::vitalComponent() if ($session{form}{themeId} < 1000 && $session{form}{themeId} > 0);
-        WebGUI::SQL->write("delete from themeComponent where themeComponentId=".$session{form}{themeComponentId});
+        WebGUI::SQL->write("delete from themeComponent where themeComponentId=".quote($session{form}{themeComponentId}));
         return www_editTheme();
 }
 
@@ -186,7 +182,7 @@ sub www_editTheme {
         return WebGUI::Privilege::insufficient unless (WebGUI::Grouping::isInGroup(9));
         my ($output, $theme, $f);
 	unless($session{form}{themeId} eq "new") {
-               	$theme = WebGUI::SQL->quickHashRef("select * from theme where themeId=$session{form}{themeId}");
+               	$theme = WebGUI::SQL->quickHashRef("select * from theme where themeId=".quote($session{form}{themeId}));
 	}
         $output .= helpIcon("theme add/edit");
 	$output .= '<h1>'.WebGUI::International::get(902).'</h1>';
@@ -219,7 +215,7 @@ sub www_editTheme {
 		my $query = "select collateral.name as name, themeComponent.themeComponentId as componentId,
 				collateral.collateralType as componentType from themeComponent, collateral 
 				where collateral.collateralId=themeComponent.id and themeComponent.type=collateral.collateralType
-				and themeComponent.themeId=$session{form}{themeId} order by name";
+				and themeComponent.themeId=".quote($session{form}{themeId})." order by name";
 		my $sth = WebGUI::SQL->read($query);
 		while (my $component = $sth->hashRef) {
 			$output .= deleteIcon('op=deleteThemeComponent&themeId='.$session{form}{themeId}
@@ -228,11 +224,11 @@ sub www_editTheme {
 		}
 		$sth->finish;
 		$sth = WebGUI::SQL->read("select themeComponentId,id from themeComponent 
-			where type='template' and themeId=".$session{form}{themeId});
+			where type='template' and themeId=".quote($session{form}{themeId}));
 		while (my $data = $sth->hashRef) {
 			my ($templateId,$namespace) = split("_",$data->{id});
 			my ($name) = WebGUI::SQL->quickArray("select name from template where
-				templateId=".$templateId." and namespace=".quote($namespace));
+				templateId=".quote($templateId)." and namespace=".quote($namespace));
 			$output .= deleteIcon('op=deleteThemeComponent&themeId='.$session{form}{themeId}
 				.'&themeComponentId='.$data->{themeComponentId})
 				.' '.$name.' ('.$componentTypes->{template}.'/'.$namespace.')<br>';
@@ -248,10 +244,10 @@ sub www_editThemeSave {
 	if ($session{form}{themeId} eq "new") {
 		$session{form}{themeId} = WebGUI::Id::generate();
 		WebGUI::SQL->write("insert into theme (themeId,webguiVersion,original,versionNumber) 
-			values ($session{form}{themeId},".quote($WebGUI::VERSION).",1,0)");
+			values (".quote($session{form}{themeId}).",".quote($WebGUI::VERSION).",1,0)");
 	}
         WebGUI::SQL->write("update theme set name=".quote($session{form}{name}).", designer=".quote($session{form}{designer}).",
-		designerURL=".quote($session{form}{designerURL})." where themeId=".$session{form}{themeId});
+		designerURL=".quote($session{form}{designerURL})." where themeId=".quote($session{form}{themeId}));
 	if ($session{form}{proceed} eq "addComponent") {
 		return www_addThemeComponent();
 	}
@@ -266,9 +262,9 @@ sub www_exportTheme {
 	my $tempId = "theme".$session{form}{themeId};
 	my $propertyFile = WebGUI::Attachment->new("_theme.properties","temp",$tempId);
 	WebGUI::SQL->write("update theme set versionNumber=versionNumber+1, webguiVersion=".quote($WebGUI::VERSION)
-		." where themeId=".$session{form}{themeId});
-	my $theme = WebGUI::SQL->quickHashRef("select * from theme where themeId=".$session{form}{themeId});
-	my $sth = WebGUI::SQL->read("select * from themeComponent where themeId=".$session{form}{themeId});
+		." where themeId=".quote($session{form}{themeId}));
+	my $theme = WebGUI::SQL->quickHashRef("select * from theme where themeId=".quote($session{form}{themeId}));
+	my $sth = WebGUI::SQL->read("select * from themeComponent where themeId=".quote($session{form}{themeId}));
 	while (my $component = $sth->hashRef) {
 		my $key = $component->{themeComponentId};
 		$theme->{components}{$key}{type} = $component->{type};
@@ -294,7 +290,7 @@ sub www_exportTheme {
 		} elsif ($component->{type} eq "template") {
 			my ($id, $namespace) = split("_",$component->{id});
 			$theme->{components}{$key}{properties} = WebGUI::SQL->quickHashRef("select * from template 
-				where templateId=".$id." and namespace=".quote($namespace));
+				where templateId=".quote($id)." and namespace=".quote($namespace));
 		}
 	}
 	$sth->finish;
@@ -388,10 +384,10 @@ sub www_importThemeSave {
 	my $theme = $propertiesFile->getHashref;
 	my $themeId = WebGUI::Id::generate();
 	WebGUI::SQL->write("insert into theme (themeId,name,designer,designerURL,webguiVersion,versionNumber,original) values
-		($themeId, ".quote($theme->{name}).", ".quote($theme->{designer}).", ".quote($theme->{designerURL})
+		(".quote($themeId).", ".quote($theme->{name}).", ".quote($theme->{designer}).", ".quote($theme->{designerURL})
 		.", ".quote($theme->{webguiVersion}).", $theme->{versionNumber}, 0)");
 	my $collateralFolderId = WebGUI::Id::generate();
-	WebGUI::SQL->write("insert into collateralFolder (collateralFolderId,name,parentId) values ($collateralFolderId,
+	WebGUI::SQL->write("insert into collateralFolder (collateralFolderId,name,parentId) values (".quote($collateralFolderId).",
 		".quote($theme->{name}).", 0)");
 	foreach my $key (keys %{$theme->{components}}) {
 		my $type = $theme->{components}{$key}{type};
@@ -406,7 +402,7 @@ sub www_importThemeSave {
 			my $id = $theme->{components}{$key}{properties}{$type."Id"};
 			$id .= "_".$theme->{components}{$key}{properties}{namespace} if ($type eq "template");
 			WebGUI::SQL->write("insert into themeComponent (themeId,themeComponentId,type,id) 
-				values ($themeId, ".WebGUI::Id::generate().", ".quote($type).", ".quote($id).")");
+				values (".quote($themeId).", ".quote(WebGUI::Id::generate()).", ".quote($type).", ".quote($id).")");
 		} elsif (isIn($type, qw(image file snippet))) {
 			$theme->{components}{$key}{properties}{collateralFolderId} = $collateralFolderId;
 			my $c = WebGUI::Collateral->new("new");
@@ -414,7 +410,7 @@ sub www_importThemeSave {
 			$c->saveFromFilesystem($propertiesFile->getNode->getPath.$session{os}{slash}
 				.$theme->{components}{$key}{properties}{filename});
 			WebGUI::SQL->write("insert into themeComponent (themeId,themeComponentId,type,id) 
-				values ($themeId, ".WebGUI::Id::generate().", ".quote($type).", "
+				values (".quote($themeId).", ".quote(WebGUI::Id::generate()).", ".quote($type).", "
 				.quote($c->get("collateralId")).")");
 		}
 	}
@@ -453,7 +449,7 @@ sub www_listThemes {
 sub www_viewTheme {
         return WebGUI::Privilege::insufficient unless (WebGUI::Grouping::isInGroup(9));
         my ($output, $theme, $f);
-        $theme = WebGUI::SQL->quickHashRef("select * from theme where themeId=$session{form}{themeId}");
+        $theme = WebGUI::SQL->quickHashRef("select * from theme where themeId=".quote($session{form}{themeId}));
         $output .= '<h1>'.WebGUI::International::get(930).'</h1>';
         $f = WebGUI::HTMLForm->new;
         $f->readOnly(
@@ -485,18 +481,18 @@ sub www_viewTheme {
         my $query = "select collateral.name as name, themeComponent.themeComponentId as componentId,
                                 collateral.collateralType as componentType from themeComponent, collateral
                                 where collateral.collateralId=themeComponent.id and themeComponent.type=collateral.collateralType
-                                and themeComponent.themeId=$session{form}{themeId} order by name";
+                                and themeComponent.themeId=".quote($session{form}{themeId})." order by name";
             my $sth = WebGUI::SQL->read($query);
              while (my $component = $sth->hashRef) {
                       $output .= $component->{name}.' ('.$componentTypes->{$component->{componentType}}.')<br>';
                }
              $sth->finish;
             $sth = WebGUI::SQL->read("select themeComponentId,id from themeComponent
-                        where type='template' and themeId=".$session{form}{themeId});
+                        where type='template' and themeId=".quote($session{form}{themeId}));
                 while (my $data = $sth->hashRef) {
                         my ($templateId,$namespace) = split("_",$data->{id});
                         my ($name) = WebGUI::SQL->quickArray("select name from template where
-                                templateId=".$templateId." and namespace=".quote($namespace));
+                                templateId=".quote($templateId)." and namespace=".quote($namespace));
                                 $output .= $name.' ('.$componentTypes->{template}.')<br>';
                 }
                 $sth->finish;
