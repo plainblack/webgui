@@ -437,7 +437,7 @@ sub reorderCollateral {
 	my $i = 1;
         my $sth = WebGUI::SQL->read("select $keyName from $table where $setName=".quote($setValue)." order by sequenceNumber");
         while (my ($id) = $sth->array) {
-                WebGUI::SQL->write("update $keyName set sequenceNumber=$i where $setName=".quote($setValue)." and $keyName=".quote($id));
+                WebGUI::SQL->write("update $table set sequenceNumber=$i where $setName=".quote($setValue)." and $keyName=".quote($id));
                 $i++;
         }
         $sth->finish;
