@@ -13,6 +13,7 @@ package WebGUI::Operation::Page;
 use Exporter;
 use strict;
 use WebGUI::DateTime;
+use WebGUI::Grouping;
 use WebGUI::HTMLForm;
 use WebGUI::Icon;
 use WebGUI::International;
@@ -339,7 +340,8 @@ sub www_editPage {
 		}
 		my $clause; 
 		if (WebGUI::Privilege::isInGroup(3)) {
-			$clause = "userId<>1 and status='Active'";
+			my $contentManagers = WebGUI::Grouping::getUsersInGroup(4);
+			$clause = "userId in ($session{user}{userId},".join(",",@$contentManagers).")";
 		} else {
 			$clause = "userId=$page{ownerId}";
                 }
