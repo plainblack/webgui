@@ -68,16 +68,16 @@ sub generateHTML {
 #-------------------------------------------------------------------
 sub updateSyndicatedContent {
 	my ($sth, @data, %rss, $html);
-	$sth = WebGUI::SQL->read("select widget.widgetId, SyndicatedContent.rssURL, SyndicatedContent.content from widget,SyndicatedContent where widget.WidgetId=SyndicatedContent.widgetId and widget.pageId<>3",$dbh);
+	$sth = WebGUI::SQL->read("select wobject.wobjectId, SyndicatedContent.rssURL, SyndicatedContent.content from wobject,SyndicatedContent where wobject.wobjectId=SyndicatedContent.wobjectId and wobject.pageId<>3",$dbh);
 	while (@data = $sth->array) {
 		%rss = getRSS($data[1]);
 		$html = generateHTML(%rss);
 		if ($html ne "") {
-			WebGUI::SQL->write("update SyndicatedContent set content=".$dbh->quote($html).", lastFetched=".time()." where widgetId=$data[0]",$dbh);
+			WebGUI::SQL->write("update SyndicatedContent set content=".$dbh->quote($html).", lastFetched=".time()." where wobjectId=$data[0]",$dbh);
 		} elsif (substr($data[2],6) ne "Unable" && substr($data[2],7) ne "Not yet") {
 			# then just leave the existing content in place
 		} else {
-			WebGUI::SQL->write("update SyndicatedContent set content='Unable to fetch content. Perhaps the RSS is improperly formated.', lastFetched=".time()." where widgetId=$data[0]",$dbh);
+			WebGUI::SQL->write("update SyndicatedContent set content='Unable to fetch content. Perhaps the RSS is improperly formated.', lastFetched=".time()." where wobjectId=$data[0]",$dbh);
 		}
 	}
 	$sth->finish;

@@ -1,6 +1,4 @@
-package WebGUI::Widget::SyndicatedContent;
-
-our $namespace = "SyndicatedContent";
+package WebGUI::Wobject::SyndicatedContent;
 
 #-------------------------------------------------------------------
 # WebGUI is Copyright 2001-2002 Plain Black Software.
@@ -15,32 +13,43 @@ our $namespace = "SyndicatedContent";
 use strict;
 use Tie::CPHash;
 use WebGUI::DateTime;
+use WebGUI::HTMLForm;
+use WebGUI::Icon;
 use WebGUI::International;
 use WebGUI::Macro;
 use WebGUI::Privilege;
 use WebGUI::Session;
-use WebGUI::Shortcut;
 use WebGUI::SQL;
-use WebGUI::Widget;
+use WebGUI::Wobject;
+
+our @ISA = qw(WebGUI::Wobject);
+our $namespace = "SyndicatedContent";
+our $name = WebGUI::International::get(2,$namespace);
 
 #-------------------------------------------------------------------
 sub duplicate {
-        my (%data, $newWidgetId, $pageId);
-        tie %data, 'Tie::CPHash';
-        %data = getProperties($namespace,$_[0]);
-	$pageId = $_[1] || $data{pageId};
-        $newWidgetId = create($pageId,$namespace,$data{title},$data{displayTitle},$data{description},$data{processMacros},$data{templatePosition});
-	WebGUI::SQL->write("insert into SyndicatedContent values ($newWidgetId, ".quote($data{rssUrl}).", ".quote($data{content}).", ".quote($data{lastFetched}).")");
+	my ($w);
+	$w = $_[0]->SUPER::duplicate($_[1]);
+        $w = WebGUI::Wobject::Article->new({wobjectId=>$w,namespace=>$namespace});
+	$w->set({
+		rssUrl=>$_[0]->get("rssUrl"),
+		rssUrl=>$_[0]->get("content"),
+		rssUrl=>$_[0]->get("lastFetched")
+		});
 }
 
 #-------------------------------------------------------------------
-sub purge {
-        purgeWidget($_[0],$_[1],$namespace);
+sub new {
+        my ($self, $class, $property);
+        $class = shift;
+        $property = shift;
+        $self = WebGUI::Wobject->new($property);
+        bless $self, $class;
 }
 
 #-------------------------------------------------------------------
-sub widgetName {
-	return WebGUI::International::get(2,$namespace);
+sub set {
+        $_[0]->SUPER::set($_[1], [qw(rssUrl content lastFetched)]);
 }
 
 #-------------------------------------------------------------------
@@ -85,7 +94,7 @@ sub www_addSave {
 #-------------------------------------------------------------------
 sub www_copy {
         if (WebGUI::Privilege::canEditPage()) {
-                duplicate($session{form}{wid});
+		$_[0]->duplicate;
                 return "";
         } else {
                 return WebGUI::Privilege::insufficient();
@@ -94,30 +103,20 @@ sub www_copy {
 
 #-------------------------------------------------------------------
 sub www_edit {
-        my ($output, %data, %hash, @array);
-	tie %data, 'Tie::CPHash';
-	tie %hash, 'Tie::IxHash';
+        my ($output, $f);
         if (WebGUI::Privilege::canEditPage()) {
-		%data = getProperties($namespace,$session{form}{wid});
-                $output = helpLink(1,$namespace);
+                $output = helpIcon(1,$namespace);
 		$output .= '<h1>'.WebGUI::International::get(4,$namespace).'</h1>';
-		$output .= formHeader();
-                $output .= WebGUI::Form::hidden("wid",$session{form}{wid});
-                $output .= WebGUI::Form::hidden("func","editSave");
-                $output .= '<table>';
-                $output .= tableFormRow(WebGUI::International::get(99),WebGUI::Form::text("title",20,128,$data{title}));
-                $output .= tableFormRow(WebGUI::International::get(174),WebGUI::Form::checkbox("displayTitle","1",$data{displayTitle}));
-                $output .= tableFormRow(WebGUI::International::get(175),WebGUI::Form::checkbox("processMacros","1",$data{processMacros}));
-		%hash = WebGUI::Widget::getPositions();
-                $array[0] = $data{templatePosition};
-                $output .= tableFormRow(WebGUI::International::get(363),WebGUI::Form::selectList("templatePosition",\%hash,\@array));
-                $output .= tableFormRow(WebGUI::International::get(85),WebGUI::Form::textArea("description",$data{description},50,10,1));
-                $output .= tableFormRow(WebGUI::International::get(1,$namespace),WebGUI::Form::text("rssUrl",20,2048,$data{rssUrl}));
-                $output .= formSave();
-		$output .= '<tr><td><br></td></tr>';
-                $output .= tableFormRow(WebGUI::International::get(5,$namespace),WebGUI::DateTime::epochToHuman($data{lastFetched},"%m/%d/%y %h:%n%p"));
-                $output .= tableFormRow(WebGUI::International::get(6,$namespace),$data{content});
-                $output .= '</table></form>';
+		$f = WebGUI::HTMLForm->new;
+		$f->url("rssUrl",WebGUI::International::get(1,$namespace),$_[0]->get("rssUrl"));
+		if ($_[0]->get("wobjectId") ne "new") {
+                	$f->readOnly(WebGUI::DateTime::epochToHuman($_[0]->get("lastFetched"),"%z %Z"),WebGUI::International::get(5,$namespace));
+                	$f->readOnly($_[0]->get("content"),WebGUI::International::get(6,$namespace));
+		} else {
+			$f->hidden("content","Not yet fetched!");
+			$f->hidden("lastFetched",time());
+		}
+		$output .= $_[0]->SUPER::www_edit($f->printRowsOnly);
                 return $output;
         } else {
                 return WebGUI::Privilege::insufficient();
@@ -126,9 +125,13 @@ sub www_edit {
 
 #-------------------------------------------------------------------
 sub www_editSave {
+	my ($property);
         if (WebGUI::Privilege::canEditPage()) {
-		update();
-                WebGUI::SQL->write("update SyndicatedContent set rssUrl=".quote($session{form}{rssUrl})." where widgetId=$session{form}{wid}");
+		$_[0]->SUPER::www_editSave();
+		$property->{rssUrl} = $session{form}{rssUrl};
+		$property->{content} = $session{form}{content} if ($session{form}{content} ne "");
+		$property->{lastFetched} = $session{form}{lastFetched} if ($session{form}{lastFetched} ne "");
+		$_[0]->set($property);
                 return "";
         } else {
                 return WebGUI::Privilege::insufficient();
@@ -137,23 +140,14 @@ sub www_editSave {
 
 #-------------------------------------------------------------------
 sub www_view {
-	my (%data, $output);
-	tie %data, 'Tie::CPHash';
-	%data = getProperties($namespace,$_[0]);
-	if (defined %data) {
-		if ($data{displayTitle} == 1) {
-			$output = "<h1>".$data{title}."</h1>";
-		}
-		if ($data{description} ne "") {
-			$output .= $data{description}.'<p>';
-                }
-		$output .= $data{content};
-	}
-	if ($data{processMacros}) {
-		$output = WebGUI::Macro::process($output);
-	}
+	my ($output);
+	$output = $_[0]->displayTitle;
+	$output .= $_[0]->description;
+	$output = $_[0]->processMacros($output);
+	$output .= $_[0]->get("content");
 	return $output;
 }
 
 
 1;
+
