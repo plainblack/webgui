@@ -596,8 +596,10 @@ sub unconditionalRead {
         my ($sth,$dbh);
 	$dbh = $_[2] || $WebGUI::Session::session{dbh};
         $sth = $dbh->prepare($_[1]) or WebGUI::ErrorHandler::warn("Unconditional read failed: ".$_[1]." : ".DBI->errstr);
-        $sth->execute or WebGUI::ErrorHandler::warn("Unconditional read failed: ".$_[1]." : ".DBI->errstr);
-        bless ({_sth => $sth}, $_[0]);
+        if ($sth) {
+        	$sth->execute or WebGUI::ErrorHandler::warn("Unconditional read failed: ".$_[1]." : ".DBI->errstr);
+        	bless ({_sth => $sth}, $_[0]);
+        }       
 }
 
 
