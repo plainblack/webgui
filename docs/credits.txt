@@ -20,10 +20,13 @@ Translation..........................Andreas Ljunggren
                                      Jose Caneira
                                      Mattias Kunkel / WERU AG
                                      Ricardo Markiewicz
+                                     Ryan McCombs
                                      Michael Ugilt
 
 Perl.................................Larry Wall / O'Reilly
 RSSLite..............................Scott Thomason
 IE Rich Edit.........................Brattli
 Data::Config.........................Sébastien Aperghis-Tramoni
+HTML::TagFilter......................William Ross
+
 
