@@ -303,6 +303,41 @@ The name of this attachment.
 		lastUpdated => 1111464988,
 	},
 
+	'notification template title' => {
+		message => q|Notification Template|,
+                lastUpdated => 1111253044,
+        },
+
+	'notification template body' => {
+		message => q|The following variables are available in the Notification Template:
+<p>
+
+All variables from the Post Template Variables.
+<p>
+
+<b>url</b><br>
+The URL to the post that triggered the notification.
+<p>
+
+<b>notification.subscription.message</b><br>
+Internationalized message that a new message has been posted to a thread that the
+user subscribed to.
+<p>
+
+|,
+		lastUpdated => 1111465141,
+	},
+
+        '875' => {
+                message => q|A new message has been posted to one of your subscriptions.|,
+                lastUpdated => 1111470216,
+        },
+
+	'523' => {
+		message => q|Notification|,
+		lastUpdated => 1031514049
+	},
+
 };
 
 1;

@@ -15,6 +15,7 @@ our $HELP = {
 			},
 		]
 	},
+
 	'post template variables' => {
 		title => 'post template variables title',
 		body => 'post template variables body',
@@ -25,6 +26,22 @@ our $HELP = {
 			},
 		]
 	},
+
+	'notification template' => {
+		title => 'notification template title',
+		body => 'notification template body',
+		related => [
+			{
+				tag => 'template language',
+				namespace => 'Template'
+			},
+			{
+				tag => 'post template variables',
+				namespace => 'Post'
+			},
+		]
+	},
+
 };
 
 1;
