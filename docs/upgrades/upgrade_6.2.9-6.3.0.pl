@@ -583,6 +583,7 @@ $sth->finish;
 print "\tDeleting files which are no longer used.\n" unless ($quiet);
 #unlink("../../lib/WebGUI/Page.pm");
 #unlink("../../lib/WebGUI/Operation/Page.pm");
+#unlink("../../lib/WebGUI/Operation/Package.pm");
 #unlink("../../lib/WebGUI/Template.pm");
 #unlink("../../lib/WebGUI/Operation/Template.pm");
 #unlink("../../lib/WebGUI/Operation/Root.pm");
