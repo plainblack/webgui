@@ -171,7 +171,7 @@ sub www_editForum {
         $session{page}{useAdminStyle} = 1;
 	my $forumMeta;
 	if ($session{form}{forumId} ne "new") {
-		$forumMeta = WebGUI::SQL->quickHashRef("select title,description from MessageBoard_forums where forumId=".$session{form}{forumId});
+		$forumMeta = WebGUI::SQL->quickHashRef("select title,description from MessageBoard_forums where forumId=".quote($session{form}{forumId}));
 	}
 	my $forum = WebGUI::Forum->new($session{form}{forumId});
 	my $f = WebGUI::HTMLForm->new;
@@ -203,7 +203,7 @@ sub www_editForumSave {
  	return WebGUI::Privilege::insufficient() unless ($_[0]->canEdit);
 	my $forumId = WebGUI::Forum::UI::forumPropertiesSave();
 	if ($session{form}{forumId} eq "new") {
-		my ($seq) = WebGUI::SQL->quickArray("select max(sequenceNumber) from MessageBoard_forums where wobjectId=".$_[0]->get("wobjectId"));
+		my ($seq) = WebGUI::SQL->quickArray("select max(sequenceNumber) from MessageBoard_forums where wobjectId=".quote($_[0]->get("wobjectId")));
 		$seq++;
 		WebGUI::SQL->write("insert into MessageBoard_forums (wobjectId, forumId, title, description, sequenceNumber) values ("
 			.quote($_[0]->get("wobjectId")).", ".quote($forumId).", ".quote($session{form}{title}).", ".quote($session{form}{description})
@@ -236,7 +236,7 @@ sub www_view {
 	my $count = 1;
 	my @forum_loop;
 	my $caller;
-	my $sth = WebGUI::SQL->read("select * from MessageBoard_forums where wobjectId=".$_[0]->get("wobjectId")." order by sequenceNumber");
+	my $sth = WebGUI::SQL->read("select * from MessageBoard_forums where wobjectId=".quote($_[0]->get("wobjectId"))." order by sequenceNumber");
 	while (my $forumMeta = $sth->hashRef) {
 		my $callback = WebGUI::URL::page("func=view&wid=".$_[0]->get("wobjectId")."&forumId=".$forumMeta->{forumId});
 		if ($session{form}{forumOp}) { 
@@ -281,7 +281,9 @@ sub www_view {
 				'forum.lastPost.user.id' => $lastPost->get("userId"),
 				'forum.lastPost.user.name' => $lastPost->get("username"),
 				'forum.lastPost.user.profile' => WebGUI::Forum::UI::formatUserProfileURL($lastPost->get("userId")),
-					'forum.lastPost.user.isVisitor' => ($lastPost->get("userId") == 1)
+				'forum.lastPost.user.isVisitor' => ($lastPost->get("userId") == 1),
+				'forum.user.canView' => $forum->canView,
+				'forum.user.canPost' => $forum->canPost
 				});
 			$count++;
 		}
