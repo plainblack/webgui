@@ -17,6 +17,7 @@ use WebGUI::DateTime;
 use WebGUI::HTMLForm;
 use WebGUI::Icon;
 use WebGUI::International;
+use WebGUI::Macro;
 use WebGUI::Mail;
 use WebGUI::Operation::Shared;
 use WebGUI::Paginator;
@@ -152,7 +153,7 @@ sub www_editInternationalMessage {
         $f->submit;
 	($message) = WebGUI::SQL->quickArray("select message from international where internationalId=".$session{form}{iid}." 
 		and namespace='".$session{form}{namespace}."' and languageId=1");
-	$f->readOnly($message,"English");
+	$f->readOnly(WebGUI::Macro::negate($message),"English");
         $output .= $f->print;
         return _submenu($output);
 }
@@ -314,7 +315,7 @@ sub www_listInternationalMessages {
         $output .= $p->getPage($session{form}{pn});
 	$output .= '</table>';
         $output .= $p->getBarTraditional($session{form}{pn});
-        return _submenu($output);
+        return _submenu(WebGUI::Macro::negate($output));
 }
 
 #-------------------------------------------------------------------

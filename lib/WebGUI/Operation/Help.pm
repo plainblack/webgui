@@ -18,6 +18,7 @@ use WebGUI::DateTime;
 use WebGUI::HTMLForm;
 use WebGUI::Icon;
 use WebGUI::International;
+use WebGUI::Macro;
 use WebGUI::Operation::Shared;
 use WebGUI::Session;
 use WebGUI::SQL;
@@ -228,7 +229,7 @@ sub www_viewHelp {
 	$output .= '<p><b>'.WebGUI::International::get(94).':<ul>';
 	$output .= _seeAlso($help{seeAlso});
         $output .= '<li><a href="'.WebGUI::URL::page('op=viewHelpIndex').'">'.WebGUI::International::get(95).'</a></ul>';
-        return $output;
+        return WebGUI::Macro::negate($output);
 }
 
 #-------------------------------------------------------------------
