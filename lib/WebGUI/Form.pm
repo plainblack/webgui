@@ -992,7 +992,7 @@ If you want to add anything special to this form element like javascript actions
 
 sub interval {
         my (%units, $output, $intervalValue, $unitsValue);
-        $intervalValue = $_[0]->{intervalValue} || 1;
+        $intervalValue = (defined $_[0]->{intervalValue}) ? $_[0]->{intervalValue} : 1;
         $unitsValue = $_[0]->{unitsValue} || "seconds";
         tie %units, 'Tie::IxHash';
 	%units = ('seconds'=>WebGUI::International::get(704),
