@@ -23,7 +23,7 @@ sub adminOnly {
 	if($session{env}{MOD_PERL}) {
         	my $r = Apache->request;
                 if(defined($r)) {
-                	$r->custom_response(403, $session{page}{url} );
+                	$r->custom_response(403, '<!--Admin Only-->' );
                         $r->status(403);
                 }
         } else {
@@ -92,7 +92,7 @@ sub insufficient {
 	if($session{env}{MOD_PERL}) {
                 my $r = Apache->request;
                 if(defined($r)) {
-                        $r->custom_response(403, $session{page}{url} );
+                        $r->custom_response(403, '<!--Insufficient Privileges-->' );
                         $r->status(403);
                 }
         } else {
@@ -128,7 +128,7 @@ sub noAccess {
 	if($session{env}{MOD_PERL}) {
                 my $r = Apache->request;
                 if(defined($r)) {
-                        $r->custom_response(403, $session{page}{url} );
+                        $r->custom_response(403, '<!--No Access-->' );
                         $r->status(403);
                 }
         } else {
@@ -150,7 +150,7 @@ sub notMember {
 	if($session{env}{MOD_PERL}) {
                 my $r = Apache->request;
                 if(defined($r)) {
-                        $r->custom_response(403, $session{page}{url} );
+                        $r->custom_response(403, '<!--Not A Member-->' );
                         $r->status(403);
                 }
         } else {
