@@ -65,6 +65,7 @@ sub get {
 	my $type = lc($session{setting}{siteicon});
         $type =~ s/.*\.(.*?)$/$1/;
         $header .= '</title>
+		<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset='.($session{header}{charset}||$session{language}{characterSet}||"ISO-8859-1").'">
 		<link REL="icon" HREF="'.$session{setting}{siteicon}.'" TYPE="image/'.$type.'">
 		<LINK REL="SHORTCUT ICON" HREF="'.$session{setting}{favicon}.'">
 	'.$style{styleSheet}.$session{page}{metaTags};
