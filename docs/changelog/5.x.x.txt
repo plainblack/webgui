@@ -11,6 +11,7 @@
  - Fixed a bug in the forum where new replies defaulted to always subscribing
    the user to the thread.
  - Bugfix [ 822324 ]: From field not working in DataForm when mailing to group
+ - Fixed typos in importCollateral.pl
 
 
 5.5.1

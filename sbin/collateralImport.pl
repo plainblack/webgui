@@ -42,7 +42,7 @@ GetOptions(
         'configFile=s'=>\$configFile,
 	'folderId=i'=>\$folderId,
         'help'=>\$help,
-        'override'=>$override,
+        'override'=>\$override,
         'pathToFiles=s'=>\$pathToFiles,
         'quiet'=>\$quiet,
         'thumbnailSize=i'=>\$thumbnailSize,
@@ -152,7 +152,7 @@ sub addFiles {
 #-----------------------------------------
 sub setPrivileges {
         print "Setting filesystem privileges.\n" unless ($quiet);
-        if ($session{os}{type} = "Linuxish") {
+        if ($session{os}{type} eq "Linuxish") {
                 unless (system("chown -R ".$webUser." ".$session{config}{uploadsPath})) {
                         print "Privileges set.\n" unless ($quiet);
                 } else {
