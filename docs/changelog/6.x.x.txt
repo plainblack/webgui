@@ -6,6 +6,8 @@
    to static files.
  - Added a warning to the Passive Profiling feature that it may be illegal to
    use that feature in some countries.
+ - Fixed a problem where hidden form tags were not escaping macros properly.
+ - Fixed an XHTML problem with hidden form tags.
 
 
 6.2.4
