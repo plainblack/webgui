@@ -20,10 +20,9 @@ sub process {
 	my $epoch = time();
 	my $sth = WebGUI::SQL->read("select sessionId from userSession where expires<".$epoch);
 	while (my ($sessionId) = $sth->array) {
-		WebGUI::SQL->write("delete from userSessionScratch where sessionId=".quote($sessionId));
+		WebGUI::Session::end($sessionId);
 	}
 	$sth->finish;
-	WebGUI::SQL->write("delete from userSession where expires<".$epoch);
 }
 
 1;

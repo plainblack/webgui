@@ -58,6 +58,7 @@ if (opendir (CONFDIR,$confdir)) {
 					&$cmd();
 				}
 			}
+			WebGUI::Session::end($session{var}{sessionId});
 			WebGUI::Session::close();
 		}
 	}
