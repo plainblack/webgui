@@ -14,8 +14,6 @@ use Digest::MD5 qw(md5_base64);
 use Exporter;
 use Net::LDAP;
 use strict qw(vars subs);
-#use warnings;
-#use strict;
 use URI;
 use WebGUI::DateTime;
 use WebGUI::ErrorHandler;
@@ -138,7 +136,7 @@ sub www_createAccount {
 		unless ($session{setting}{authMethod} ne "WebGUI" && $session{setting}{usernameBinding}) {
 			$f->text("username",WebGUI::International::get(50),$session{form}{username});
 		}
-		unless ($session{setting}{authMethod} eq 'WebGUI') {
+		if ($session{setting}{authMethod} ne 'WebGUI') {
 			$f->text("loginId", 'loginName');
 		}
  
