@@ -370,18 +370,22 @@ sub www_editUserProfileSave {
 
 #-------------------------------------------------------------------
 sub www_listUsers {
-	my ($output, $sth, %data, @row, $p, $i, $search);
+	my ($output, $sth, %data, $f, @row, $p, $i, $search);
 	tie %data, 'Tie::CPHash';
         if (WebGUI::Privilege::isInGroup(3)) {
 		$output = helpIcon(8);
 		$output .= '<h1>'.WebGUI::International::get(149).'</h1>';
 		$output .= '<table class="tableData" align="center" width="75%"><tr><td>';
 		$output .= '<a href="'.WebGUI::URL::page('op=addUser').'">'.WebGUI::International::get(169).'</a>';
-		$output .= '</td>'.formHeader().'<td align="right">';
-		$output .= WebGUI::Form::hidden("op","listUsers");
-		$output .= WebGUI::Form::text("keyword",20,50);
-		$output .= WebGUI::Form::submit(WebGUI::International::get(170));
-		$output .= '</td></form></tr></table><p>';
+		$output .= '</td>';
+		$f = WebGUI::HTMLForm->new(1);
+		$f->raw('<td align="right">');
+		$f->hidden("op","listUsers");
+		$f->text("keyword",'',$session{form}{keyword});
+		$f->submit(WebGUI::International::get(170));
+		$f->raw('</td>');
+		$output .= $f->print;
+		$output .= '</tr></table><p>';
 		if ($session{form}{keyword} ne "") {
 			$search = " where (users.username like '%".$session{form}{keyword}."%') ";
 		}
