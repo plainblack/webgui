@@ -39,12 +39,6 @@ my $macros = $conf->get("macros");
 delete $macros->{"\\"};
 $macros->{"\\\\"} = "Backslash_pageUrl";
 $conf->set("macros"=>$macros);
-my $wobjects = $conf->get("wobjects");
-my @newWobjects = qw(SOAPClient);
-foreach (@{$wobjects}) {
-	push(@newWobjects, $_);
-}
-$conf->set("wobjects"=>\@newWobjects);
 $conf->set("searchAndReplace"=>undef);
 $conf->write;
 

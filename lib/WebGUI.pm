@@ -225,7 +225,9 @@ sub _processOperations {
 sub page {
 	my ($cache, $debug, $positions, $wobjectOutput, $pageEdit, $httpHeader, $content, $operationOutput, $template);
 	WebGUI::Session::open($_[0],$_[1]);
-        my $useCache = ($session{form}{op} eq "" && $session{form}{wid} eq "" && $session{form}{makePrintable} eq "" && not $session{var}{adminOn});
+        my $useCache = ($session{form}{op} eq "" && $session{form}{wid} eq "" && $session{form}{makePrintable} eq "" 
+		&& (($session{page}{cacheTimeout} > 10 && $session{user}{userId} !=1) || ($session{page}{cacheTimeout} > 10 && $session{user}{userId} == 1)) 
+		&& not $session{var}{adminOn});
         if ($useCache) {
                 $cache = WebGUI::Cache->new("page_".$session{page}{pageId}."_".$session{user}{userId});
                 $content = $cache->get;

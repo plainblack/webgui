@@ -19,6 +19,9 @@
    usernames in the database. (Thanks to Martin Kamerbeek.)
  - Fixed a bug in the 5.4.3-5.4.4 upgrade script that some users experienced
    with null values in their DataForm.
+ - If the Cache Timeout on a given page is set to 10 seconds or less, that
+   page will not be cached.
+
 
 5.4.4
  - Updated Finnish translation. (Thanks to Markus Hynna.)
