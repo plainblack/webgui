@@ -453,7 +453,7 @@ WebGUI::SQL->setRow("Navigation","assetId",{
 	assetId=>$collateralRootId,
 	templateId=>"PBtmpl0000000000000078"
 	},undef,$collateralRootId);
-my %folderCache = ('0'=>$collateralRootId);
+my %folderCache = ('0'=>{id=>$collateralRootId,lineage=>$collateralRootLineage});
 my %folderNameCache;
 my $collateralRankCounter = 1;
 my $sth = WebGUI::SQL->read("select * from collateralFolder where collateralFolderId <> '0'");
