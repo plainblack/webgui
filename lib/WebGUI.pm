@@ -15,6 +15,7 @@ use strict qw(vars subs);
 use Tie::CPHash;
 use Tie::IxHash;
 use WebGUI::ErrorHandler;
+use WebGUI::Icon;
 use WebGUI::International;
 use WebGUI::Operation;
 use WebGUI::Privilege;
@@ -28,18 +29,16 @@ use WebGUI::Utility;
 
 #-------------------------------------------------------------------
 sub _displayAdminBar {
-	my ($widgetName, $key, %hash2, $miscSelect, $adminSelect, $clipboardSelect, 
-		$widget, @widgetArray, %hash, $output, $contentSelect);
+	my (%hash2, $miscSelect, $adminSelect, $clipboardSelect, 
+		%hash, $output, $contentSelect, $key);
 	tie %hash, "Tie::IxHash";
 	tie %hash2, "Tie::IxHash";
   #--content adder
-	@widgetArray = @_;
 	$hash{WebGUI::URL::page()} = WebGUI::International::get(1);
 	$hash{WebGUI::URL::page('op=addPage')} = WebGUI::International::get(2);
 	$hash{WebGUI::URL::page('op=selectPackageToDeploy')} = WebGUI::International::get(376);
-	foreach $widget (@widgetArray) {
-		$widgetName = "WebGUI::Widget::".$widget."::widgetName";
-		$hash2{WebGUI::URL::page('func=add&widget='.$widget)} = &$widgetName;
+	foreach $key (keys %{$session{wobject}}) {
+		$hash2{WebGUI::URL::page('func=edit&wid=new&namespace='.$key)} = $session{wobject}{$key};
 	}
 	%hash2 = sortHash(%hash2);
 	%hash = (%hash, %hash2);
@@ -51,7 +50,7 @@ sub _displayAdminBar {
 	foreach $key (keys %hash) {
 		$hash2{WebGUI::URL::page('op=pastePage&pageId='.$key)} = $hash{$key};
 	}
-        %hash = WebGUI::SQL->buildHash("select widgetId,title from widget where pageId=2 order by title");
+        %hash = WebGUI::SQL->buildHash("select wobjectId,title from wobject where pageId=2 order by title");
         foreach $key (keys %hash) {
                 $hash2{WebGUI::URL::page('func=paste&wid='.$key)} = $hash{$key};
         }
@@ -123,35 +122,13 @@ sub _displayAdminBar {
 }
 
 #-------------------------------------------------------------------
-sub _loadWidgets {
-	my ($widgetDir, @files, $file, $use, @widget, $i);
-        if ($^O =~ /Win/i) {
-                $widgetDir = "\\lib\\WebGUI\\Widget";
-        } else {
-                $widgetDir = "/lib/WebGUI/Widget";
-        }
-	opendir (DIR,$session{config}{webguiRoot}.$widgetDir) or WebGUI::ErrorHandler::fatalError("Can't open widget directory!");
-	@files = readdir(DIR);
-	foreach $file (@files) {
-        	if ($file =~ /(.*?)\.pm$/) {
-			$widget[$i] = $1;
-                        $use = "use WebGUI::Widget::".$widget[$i];
-                        eval($use);
-			$i++;
-		}
-	}
-	closedir(DIR);
-	return @widget;
-}
-
-#-------------------------------------------------------------------
 sub page {
-	my ($debug, %contentHash, $cmd, $pageEdit, $widgetPage, $widgetType, $functionOutput, @availableWidgets, @widgetList, $sth, $httpHeader, $header, $footer, $content, $operationOutput, $adminBar);
+	my ($debug, %contentHash, $w, $cmd, $pageEdit, $wobject, $wobjectOutput, $extra, 
+		$sth, $httpHeader, $header, $footer, $content, $operationOutput, $adminBar, %hash);
 	WebGUI::Session::open($_[0],$_[1]);
 	# For some reason we have to pre-cache the templates when running under mod_perl
 	# so that's what we're doing with this next command.
 	WebGUI::Template::loadTemplates();
-	@availableWidgets = _loadWidgets();
 	if ($session{form}{debug}==1 && WebGUI::Privilege::isInGroup(3)) {
 		$debug = '<table bgcolor="#ffffff" style="color: #000000; font-size: 10pt; font-family: helvetica;">';
 		while (my ($section, $hash) = each %session) {
@@ -171,44 +148,66 @@ sub page {
 		$cmd = "WebGUI::Operation::www_".$session{form}{op};
 		$operationOutput = &$cmd();
 	}
-	if (exists $session{form}{func}) {
-		if (exists $session{form}{widget}) {
-			$widgetType = $session{form}{widget};
-			$widgetPage = $session{page}{pageId};
+	if (exists $session{form}{func} && exists $session{form}{wid}) {
+		if ($session{form}{wid} eq "new") {
+			$wobject = {wobjectId=>$session{form}{wid},namespace=>$session{form}{namespace},pageId=>$session{page}{pageId}};
 		} else {
-			($widgetType,$widgetPage) = WebGUI::SQL->quickArray("select namespace,pageId from widget where widgetId='$session{form}{wid}'");
+			$wobject = WebGUI::SQL->quickHashRef("select * from wobject where wobject.wobjectId=".$session{form}{wid});	
+			$extra = WebGUI::SQL->quickHashRef("select * from ${$wobject}{namespace} where wobjectId=${$wobject}{wobjectId}");
+                        tie %hash, 'Tie::CPHash';
+                        %hash = (%{$wobject},%{$extra});
+                        $wobject = \%hash;
 		}
-                if ($widgetType ne "") {
-			 if ($widgetPage != $session{page}{pageId} && $widgetPage != 2) {
-				$functionOutput = WebGUI::International::get(417);
-				WebGUI::ErrorHandler::warn($session{user}{username}." [".$session{user}{userId}."] attempted to access widget [".$session{form}{wid}."] on page '".$session{page}{title}."' [".$session{page}{pageId}."].");
-			} else {
-                        	$cmd = "WebGUI::Widget::".$widgetType."::www_".$session{form}{func};
-                        	$functionOutput = &$cmd();
-			}
-                } else {
-                        $functionOutput = WebGUI::International::get(381);
-                }
+		if (${$wobject}{pageId} != $session{page}{pageId} && ${$wobject}{pageId} != 2) {
+			$wobjectOutput = WebGUI::International::get(417);
+			WebGUI::ErrorHandler::warn($session{user}{username}." [".$session{user}{userId}."] attempted to access wobject [".$session{form}{wid}."] on page '".$session{page}{title}."' [".$session{page}{pageId}."].");
+		} else {
+			$cmd = "WebGUI::Wobject::".${$wobject}{namespace};
+			$w = $cmd->new($wobject);
+			$cmd = "www_".$session{form}{func};
+                       	$wobjectOutput = $w->$cmd;
+		}
+                # $wobjectOutput = WebGUI::International::get(381); # bad error
 	}
 	if ($operationOutput ne "") {
 		$contentHash{A} = $operationOutput;
 		$content = WebGUI::Template::Default::generate(\%contentHash);
-	} elsif ($functionOutput ne "") {
-		$contentHash{A} = $functionOutput;
+	} elsif ($wobjectOutput ne "") {
+		$contentHash{A} = $wobjectOutput;
 		$content = WebGUI::Template::Default::generate(\%contentHash);
 	} else {
 		if (WebGUI::Privilege::canViewPage()) {
 			if ($session{var}{adminOn}) {
-                        	$pageEdit = '<br><img src="'.$session{setting}{lib}.'/page.gif" border=0 alt="Page Settings:"><a href="'.WebGUI::URL::page('op=editPage').'"><img src="'.$session{setting}{lib}.'/edit.gif" border=0 alt="Edit Page"></a><a href="'.WebGUI::URL::page('op=cutPage').'"><img src="'.$session{setting}{lib}.'/cut.gif" border=0 alt="Cut Page"></a><a href="'.WebGUI::URL::page('op=deletePage').'"><img src="'.$session{setting}{lib}.'/delete.gif" border=0 alt="Delete Page"></a><a href="'.WebGUI::URL::page('op=movePageUp').'"><img src="'.$session{setting}{lib}.'/pageUp.gif" border=0 alt="Move Page Up"></a><a href="'.WebGUI::URL::page('op=movePageDown').'"><img src="'.$session{setting}{lib}.'/pageDown.gif" border=0 alt="Move Page Down"></a></span>'."\n\n";
+                        	$pageEdit = "\n<br>"
+					.pageIcon()
+					.editIcon('op=editPage')
+					.moveUpIcon('op=movePageUp')
+					.moveDownIcon('op=movePageDown')
+					.cutIcon('op=cutPage')
+					.deleteIcon('op=deletePage')
+					."\n";
                 	}	
-			$sth = WebGUI::SQL->read("select widgetId, namespace, templatePosition from widget where pageId=".$session{page}{pageId}." order by sequenceNumber, widgetId");
-			while (@widgetList = $sth->array) {
+			$sth = WebGUI::SQL->read("select * from wobject where pageId=$session{page}{pageId} order by sequenceNumber, wobjectId");
+			while ($wobject = $sth->hashRef) {
 				if ($session{var}{adminOn}) {
-                       			$contentHash{$widgetList[2]} .= '<hr><a href="'.WebGUI::URL::page('func=edit&wid='.$widgetList[0]).'"><img src="'.$session{setting}{lib}.'/edit.gif" border=0 alt="Edit"></a><a href="'.WebGUI::URL::page('func=cut&wid='.$widgetList[0]).'"><img src="'.$session{setting}{lib}.'/cut.gif" border=0 alt="Cut"></a><a href="'.WebGUI::URL::page('func=copy&wid='.$widgetList[0]).'"><img src="'.$session{setting}{lib}.'/copy.gif" border=0 alt="Copy"></a><a href="'.WebGUI::URL::page('wid='.$widgetList[0].'&func=delete').'"><img src="'.$session{setting}{lib}.'/delete.gif" border=0 alt="Delete"></a><a href="'.WebGUI::URL::page('func=moveUp&wid='.$widgetList[0]).'"><img src="'.$session{setting}{lib}.'/upArrow.gif" border=0 alt="Move Up"></a><a href="'.WebGUI::URL::page('func=moveDown&wid='.$widgetList[0]).'"><img src="'.$session{setting}{lib}.'/downArrow.gif" border=0 alt="Move Down"></a><a href="'.WebGUI::URL::page('func=jumpUp&wid='.$widgetList[0]).'"><img src="'.$session{setting}{lib}.'/jumpUp.gif" border=0 alt="Move to Top"></a><a href="'.WebGUI::URL::page('func=jumpDown&wid='.$widgetList[0]).'"><img src="'.$session{setting}{lib}.'/jumpDown.gif" border=0 alt="Move to Bottom"></a><br>';
+                       			$contentHash{${$wobject}{templatePosition}} .= "\n<hr>"
+						.editIcon('func=edit&wid='.${$wobject}{wobjectId})
+						.moveUpIcon('func=moveUp&wid='.${$wobject}{wobjectId})
+						.moveDownIcon('func=moveDown&wid='.${$wobject}{wobjectId})
+						.moveTopIcon('func=moveTop&wid='.${$wobject}{wobjectId})
+						.moveBottomIcon('func=moveBottom&wid='.${$wobject}{wobjectId})
+						.copyIcon('func=copy&wid='.${$wobject}{wobjectId})
+						.cutIcon('func=cut&wid='.${$wobject}{wobjectId})
+						.deleteIcon('func=delete&wid='.${$wobject}{wobjectId})
+						.'<br>';
 				}
-				$cmd = "WebGUI::Widget::".$widgetList[1]."::www_view";
-				$contentHash{$widgetList[2]} .= '<a name="'.$widgetList[0].'"></a>'.
-					&$cmd($widgetList[0])."<p>\n\n";
+				$extra = WebGUI::SQL->quickHashRef("select * from ${$wobject}{namespace} where wobjectId=${$wobject}{wobjectId}");
+				tie %hash, 'Tie::CPHash';
+				%hash = (%{$wobject},%{$extra});
+				$wobject = \%hash;
+				$cmd = "WebGUI::Wobject::".${$wobject}{namespace};
+				$w = $cmd->new($wobject);
+				$contentHash{${$wobject}{templatePosition}} .= '<a name="'.${$wobject}{wobjectId}.'"></a>'.$w->www_view."<p>\n\n";
 			}
 			$sth->finish;
 			$cmd = "use WebGUI::Template::".$session{page}{template};
@@ -221,7 +220,7 @@ sub page {
 		}
 	}
 	if ($session{var}{adminOn}) {
-		$adminBar = _displayAdminBar(@availableWidgets);
+		$adminBar = _displayAdminBar();
 	}
 	if ($session{header}{redirect} ne "") {
 		return $session{header}{redirect};
