@@ -82,7 +82,7 @@ WebGUI::SQL->write("delete from groupings where groupId=5");
 #--------------------------------------------
 print "\tMigrating extra columns to page templates.\n" unless ($quiet);
 my $a = WebGUI::SQL->read("select a.wobjectId, a.templatePosition, a.sequenceNumber,  a.pageId, b.templateId, c.width, c.class, c.spacer from wobject a 
-	left join page b on a.pageId=b.pageId left join ExtraColumn c on a.wobjectId=c.wobjectId where a.namespace='ExtraColumn'");
+	, page b , ExtraColumn c where a.pageId=b.pageId and a.wobjectId=c.wobjectId and a.namespace='ExtraColumn'");
 while (my $data = $a->hashRef) {
 	my ($template, $name) = WebGUI::SQL->quickArray("select template,name from template where namespace='Page' and templateId=".$data->{templateId});
 	$name .= " w/ Extra Column";
@@ -249,7 +249,7 @@ while (my ($wobjectId) = $a->array) {
 		WebGUI::SQL->write("update USS_submission set sequenceNumber=$seq, USS_id=$ussId where USS_submissionId=$subId");
 		$seq++;
 	}
-	$b->finsih;
+	$b->finish;
 	$ussId++;
 }
 $a->finish;
@@ -306,6 +306,7 @@ WebGUI::SQL->write("delete from template where namespace='FAQ'");
 my $a = WebGUI::SQL->read("select a.wobjectId,a.groupIdEdit,a.ownerId,a.lastEdited,b.username,a.dateAdded from wobject a left join users b on
 	a.ownerId=b.userId where a.namespace='FAQ'");
 while (my $data = $a->hashRef) {
+	$data->{lastEdited} = 0 unless ($data->{lastEdited});
 	$ussId = getNextId("USS_id");
 	WebGUI::SQL->write("insert into USS (wobjectId,	USS_id, groupToContribute, submissionsPerPage, filterContent, sortBy, sortOrder, 
 		submissionFormTemplateId) values (
@@ -372,6 +373,7 @@ WebGUI::SQL->write("delete from template where namespace='LinkList'");
 my $a = WebGUI::SQL->read("select a.wobjectId,a.groupIdEdit,a.ownerId,a.lastEdited,b.username,a.dateAdded from wobject a left join users b on
 	a.ownerId=b.userId where a.namespace='LinkList'");
 while (my $data = $a->hashRef) {
+	$data->{lastEdited} = 0 unless ($data->{lastEdited});
 	$ussId = getNextId("USS_id");
 	WebGUI::SQL->write("insert into USS (wobjectId,	USS_id, groupToContribute, submissionsPerPage, filterContent, sortBy, sortOrder, 
 		submissionFormTemplateId) values (
@@ -407,7 +409,10 @@ while (my $data = $sth->hashRef) {
 	my $id = undef;
 	next if ($data->{databaseLinkId} > 0);
 	foreach my $dsn (keys %dblink) {
-		if ($dsn eq $data->{dsn} && $dblink{$dsn}{user} eq $data->{username}) {
+print $dsn."\n";
+print $dblink{$dsn}{user}."\n";
+		if ($dsn eq $data->{DSN} ){ #&& $dblink{$dsn}{user} eq $data->{username}) {
+print "got here";
 			$id = $dblink{$dsn}{id};
 			last;
 		}
