@@ -67,12 +67,16 @@ sub page {
 					.$session{form}{wid}."] on page '".$session{page}{title}."' ["
 					.$session{page}{pageId}."].");
 			} else {
-				$cmd = "WebGUI::Wobject::".${$wobject}{namespace};
-				$w = eval{$cmd->new($wobject)};
-				WebGUI::ErrorHandler::fatalError("Couldn't instanciate wojbect: ${$wobject}{namespace}. Root Cause: ".$@) if($@);
-				$cmd = "www_".$session{form}{func};
-				$wobjectOutput = eval{$w->$cmd};
-				WebGUI::ErrorHandler::fatalError("Web method doesn't exist in wojbect: ${$wobject}{namespace} / $session{form}{func}. Root Cause: ".$@) if($@);
+				if (WebGUI::Privilege::canViewPage()) {
+					$cmd = "WebGUI::Wobject::".${$wobject}{namespace};
+					$w = eval{$cmd->new($wobject)};
+					WebGUI::ErrorHandler::fatalError("Couldn't instanciate wojbect: ${$wobject}{namespace}. Root Cause: ".$@) if($@);
+					$cmd = "www_".$session{form}{func};
+					$wobjectOutput = eval{$w->$cmd};
+					WebGUI::ErrorHandler::fatalError("Web method doesn't exist in wojbect: ${$wobject}{namespace} / $session{form}{func}. Root Cause: ".$@) if($@);
+				} else {
+					$wobjectOutput = WebGUI::Privilege::noAccess();
+				}
 			}
 		}
 	}
