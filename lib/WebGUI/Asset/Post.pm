@@ -768,9 +768,13 @@ Sets the status of this post to pending.
 
 sub setStatusPending {
         my ($self) = @_;
-        $self->update({status=>'pending'});
-        WebGUI::MessageLog::addInternationalizedEntry('',$self->getThread->getParent->get("moderateGroupId"),
-                $self->getUrl("func=view"),578,'WebGUI','pending');
+	if (WebGUI::Grouping::isInGroup($self->getThread->getParent->get("moderateGroupId"))) {
+		$self->setStatusApproved;
+	} else {
+        	$self->update({status=>'pending'});
+        	WebGUI::MessageLog::addInternationalizedEntry('',$self->getThread->getParent->get("moderateGroupId"),
+                	$self->getUrl("func=view"),578,'WebGUI','pending');
+	}
 }
 
 

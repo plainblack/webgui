@@ -21,6 +21,8 @@
  - fix [ 1170264 ] can't copy file
  - fix [ 1170242 ] cs email url
  - fix [ 1171110 ] nav ancestor
+ - fix [ 1171574 ] purgeList doesn't purgeList
+ - fix [ 1170244 ] cs notification
 
 
 6.5.4 
