@@ -282,7 +282,8 @@ sub www_view {
 		map {$url .= "&languages=".WebGUI::URL::escape($_)} $session{cgi}->param('languages');
 		map {$url .= "&contentTypes=".WebGUI::URL::escape($_)} $session{cgi}->param('contentTypes');
 		$url .= "&paginateAfter=".$self->getValue("paginateAfter");
-		my $p = WebGUI::Paginator->new(WebGUI::URL::page($url), $results, $self->getValue("paginateAfter"));
+		my $p = WebGUI::Paginator->new(WebGUI::URL::page($url), $self->getValue("paginateAfter"));
+		$p->setDataByArrayRef($results);
 		$var{startNr} = 1;
 		if($session{form}{pn}) {
 			$var{startNr} = (($session{form}{pn} - 1) * $self->getValue("paginateAfter")) + 1;

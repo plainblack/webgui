@@ -62,6 +62,21 @@ These methods are available from this package:
 =cut
 
 #-------------------------------------------------------------------
+sub _recurseCrumbTrail {
+        my ($sth, %data, $output);
+        tie %data, 'Tie::CPHash';
+        %data = WebGUI::SQL->quickHash("select pageId,parentId,menuTitle,urlizedTitle from page where pageId=$_[0]");
+        if ($data{pageId} > 1) {
+                $output .= _recurseCrumbTrail($data{parentId});
+        }
+        if ($data{menuTitle} ne "") {
+                $output .= '<a class="crumbTrail" href="'.WebGUI::URL::gateway($data{urlizedTitle})
+                        .'">'.$data{menuTitle}.'</a> &gt; ';
+        }
+        return $output;
+}
+
+#-------------------------------------------------------------------
 
 =head2 close ( )
 
@@ -213,8 +228,8 @@ sub getDetails {
 			$data{header} = $self->highlight($data{header},undef, $options{highlightColors}) if ($options{highlight});
 			$data{location} = WebGUI::URL::gateway($data{location});
 		}
-	#	$data{crumbTrail} = WebGUI::Macro::C_crumbTrail::_recurseCrumbTrail($data{pageId}, ' > ');
-	#	$data{crumbTrail} =~ s/\s*>\s*$//;
+		$data{crumbTrail} = _recurseCrumbTrail($data{pageId});
+		$data{crumbTrail} =~ s/\s*\&gt;\s*$//;
 		push(@searchDetails, \%data);
 	}
 	$sth->finish;
