@@ -1819,17 +1819,26 @@ The Internationalized label for turning on or off Admin (depending on the state 
 
 
 <b>&#94;AOIHits();</b><br>
-Displays the number of views for a metadata property/value pair. Example: &#94;AOIHits(contenttype,sport); would display 99 if this user has looked at content that was tagged "contenttype = sport" 99 times.
-<p>
+This macro is for displaying Areas of Interest Hits, which is based on passive profiling
+of which wobjects are viewed by users, on a per user basis.  The macro takes two arguments,
+a metadata property and metadata value, and returns how many times the current user has
+viewed content with that property and value.<br>
+&#94;AOIHits(contenttype,sport); would display 99 if this user has looked at content that was tagged "contenttype = sport" 99 times.
 
+<p>
 <b>&#94;AOIRank();</b><br>
-Diplays the highest ranked metadata property for this user. Example &#94;AOIRank(contenttype); would display "sport" if this user has looked mostly to content tagged "contenttype = sport". Optionally the rank can also be displayed. Example &#94;AOIRank(contenttype, 2); would return the second highest ranked contenttype.
+This macro is for displaying Areas of Interest Rankings, which is based on passive profiling
+of which wobjects are viewed most frequently by users, on a per user basis.  The macro
+takes up to two arguments, a metadata property and the rank of the metadata value to
+be returned.  If the rank is left out, it defaults to 1, the highest rank.<br>
+&#94;AOIRank(contenttype); would display "sport" if the current user has looked at content tagged "contenttype = sport" the most.<br>
+&#94;AOIRank(contenttype, 2); would return the second highest ranked value for contenttype.
 <p>
 
 <b>&#94;CanEditText();</b><br>
 Display a message to a user that can edit the current page.
 <p>
-<i>Example:</i> &#94;CanEditText(^AdminToggle;);
+<i>Example:</i> &#94;CanEditText(&#94;AdminToggle;);
 <p>
 
 <b>&#94;EditableToggle; or &#94;EditableToggle();</b><br>
@@ -1953,7 +1962,7 @@ The user id of the currently logged in user.
 <p>
 
 |,
-		lastUpdated => 1089730066
+		lastUpdated => 1099514961
 	},
 
 	'329' => {
@@ -4744,12 +4753,12 @@ div.tabs {
 	},
 
 	'786' => {
-		message => q|WebGUI's collateral management system allows you to upload files and text to a central repository for use elsewhere in your content.
+		message => q|WebGUI's collateral management system allows you to upload files and text to a central repository for use elsewhere in your site.
 <p/>
 You can organize collateral into different folders, but names must be unique, even if they are in different folders or of different types.  If you attempt to use a name that is already in use, WebGUI will rename the file for you by appending and/or incrementing a number to the end of the name.
 <p/>
 |,
-		lastUpdated => 1096524433
+		lastUpdated => 1099512407
 	},
 
 	'440' => {
