@@ -48,6 +48,43 @@ shown here.
 		context => q|label for Image asset form|,
 		lastUpdated => 1106765841
 	},
+	
+	'image size' => {
+		message => q|Image Size|,
+		context => q|label for Image asset form|,
+		lastUpdated => 1106765841
+	},
+	
+	'image size' => {
+		message => q|Image Size|,
+		context => q|label for Image asset form|,
+		lastUpdated => 1106765841
+	},
+	
+	'edit image' => {
+		message => q|Edit Image|,
+		context => q|label to edit the image|,
+		lastUpdated => 1106765841
+	},
+	
+	'resize image' => {
+		message => q|Resize Image|,
+		context => q|label to resize the image|,
+		lastUpdated => 1106765841
+	},
+	
+	'new width' => {
+		message => q|New Width|,
+		context => q|label to resize the image|,
+		lastUpdated => 1106765841
+	},
+	
+	'new height' => {
+		message => q|New Height|,
+		context => q|label to resize the image|,
+		lastUpdated => 1106765841
+	},
+	
 
 };
 

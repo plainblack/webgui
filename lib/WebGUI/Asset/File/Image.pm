@@ -17,6 +17,7 @@ package WebGUI::Asset::File::Image;
 use strict;
 use WebGUI::Asset::File;
 use WebGUI::Storage::Image;
+use WebGUI::HTMLForm;
 use WebGUI::HTTP;
 use WebGUI::Session;
 use WebGUI::Utility;
@@ -129,6 +130,11 @@ sub getEditForm {
 			-label=>WebGUI::International::get('thumbnail', 'Image'),
 			-value=>'<a href="'.$self->getFileUrl.'"><img src="'.$self->getThumbnailUrl.'?noCache='.time().'" alt="thumbnail" /></a>'
 			);
+		my ($x, $y) = $self->getStorageLocation->getSizeInPixels($self->get("filename"));
+        	$tabform->getTab("properties")->readOnly(
+			-label=>WebGUI::International::get('image size', 'Image'),
+			-value=>$x.' x '.$y
+			);
 	}
 	return $tabform;
 }
@@ -205,7 +211,40 @@ sub view {
 sub www_edit {
         my $self = shift;
         return WebGUI::Privilege::insufficient() unless $self->canEdit;
-        return $self->getAdminConsole->render($self->getEditForm->print,"Edit Image");
+	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=resize'),WebGUI::International::get("resize image","Image")) if ($self->get("filename"));
+        return $self->getAdminConsole->render($self->getEditForm->print,WebGUI::International::get("edit image","Image"));
+}
+
+#-------------------------------------------------------------------
+sub www_resize {
+        my $self = shift;
+        return WebGUI::Privilege::insufficient() unless $self->canEdit;
+	if ($session{form}{newWidth} || $session{form}{newHeight}) {
+		$self->getStorageLocation->resize($self->get("filename"),$session{form}{newWidth},$session{form}{newHeight});
+		$self->setSize($self->getStorageLocation->getFileSize($self->get("filename")));
+	}
+	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=edit'),WebGUI::International::get("edit image","Image"));
+	my $f = WebGUI::HTMLForm->new(-action=>$self->getUrl);
+	$f->hidden(
+		-name=>"func",
+		-value=>"resize"
+		);
+	my ($x, $y) = $self->getStorageLocation->getSizeInPixels($self->get("filename"));
+       	$f->readOnly(
+		-label=>WebGUI::International::get('image size', 'Image'),
+		-value=>$x.' x '.$y
+		);
+	$f->integer(
+		-label=>WebGUI::International::get('new width','Image'),
+		-name=>"newWidth"
+		);
+	$f->integer(
+		-label=>WebGUI::International::get('new height','Image'),
+		-name=>"newHeight"
+		);
+	$f->submit;
+	my $image = '<div align="center"><img src="'.$self->getStorageLocation->getUrl($self->get("filename")).'" border="1" alt="'.$self->get("filename").'" /></div>';
+        return $self->getAdminConsole->render($f->print.$image,WebGUI::International::get("resize image","Image"));
 }
 
 #-------------------------------------------------------------------

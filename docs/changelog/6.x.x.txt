@@ -8,6 +8,8 @@
  - Added isAdminOn(), switchOnAdmin(), and switchOffAdmin() to WebGUI::Session
    to eliminate all of the previously cryptic means of doing those things.
  - Added a temporary file storage mechanism to WebGUI::Storage.
+ - Added an image resizer to the image asset.
+ - Image Magick is now required to run WebGUI.
  - Fixed resetting votes on Poll would crash it.
  - Fixed not being able to set display title and other yes no questions to no.
  - Fixed a bug where URLs would become unreachable when using SSL.
@@ -33,7 +35,7 @@
  - bugfix [ 1154247 ] Title and menuTitle set to 'untitled' if url is changed
  - bugfix [ 1150982 ] Subscribe to forum thread causes error
  - bugfix [ 1151216 ] The Latest News is blank on demo.plainblack.com
- - Image Magick is now required to run WebGUI.
+ - bugfix [ 1149458 ] CVS 6.3 -> ENV variables have changed for mod_perl 2.0
 
 
 6.3.0
