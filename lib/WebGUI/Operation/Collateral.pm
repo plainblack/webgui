@@ -66,7 +66,8 @@ sub www_deleteCollateral {
 #-------------------------------------------------------------------
 sub www_deleteCollateralConfirm {
 	return WebGUI::Privilege::insufficient unless (WebGUI::Privilege::isInGroup(4));
-	my $node = WebGUI::Node("images",$session{form}{cid});
+	my $node = WebGUI::Node->new("images",$session{form}{cid});
+	$node->delete;
 	WebGUI::SQL->write("delete from collateral where collateralId=".$session{form}{cid});
 	return www_listCollateral();
 }

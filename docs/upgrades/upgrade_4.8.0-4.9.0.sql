@@ -7,7 +7,7 @@ alter table users drop column identifier;
 alter table users drop column ldapURL;
 alter table users drop column connectDN;
 insert into international (internationalId,languageId,namespace,message,lastUpdated) values (814,1,'WebGUI','Back to styles.', 1038022043);
-
+alter table collateral change parameters parameters text;
 
 
 
