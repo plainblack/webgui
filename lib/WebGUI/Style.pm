@@ -125,10 +125,10 @@ sub process {
 		$var{'head.tags'} .= ' />'."\n";
 	}
 	# generate additional javascript tags
-	foreach my $url (keys %{$session{page}{head}{javascript}}) {
-		$var{'head.tags'} .= '<script src="'.$url.'"';
-		foreach my $name (keys %{$session{page}{head}{javascript}{$url}}) {
-			$var{'head.tags'} .= ' '.$name.'="'.$session{page}{head}{javascript}{$url}{$name}.'"';
+	foreach my $tag (@{$session{page}{head}{javascript}}) {
+		$var{'head.tags'} .= '<script';
+		foreach my $name (keys %{$tag}) {
+			$var{'head.tags'} .= ' '.$name.'="'.$tag->{$name}.'"';
 		}
 		$var{'head.tags'} .= '></script>'."\n";
 	}
@@ -140,7 +140,6 @@ sub process {
 		}
 		$var{'head.tags'} .= ' />'."\n";
 	}
-	$var{'head.tags'} .= $session{page}{metaTags};
 	if ($session{var}{adminOn}) {
                 # This "triple incantation" panders to the delicate tastes of various browsers for reliable cache suppression.
 		$var{'head.tags'} .= '
@@ -149,20 +148,113 @@ sub process {
                 	<meta http-equiv="Expires" content="0" />
 			';
         }
-	if ($session{page}{defaultMetaTags}) {
- 		$var{'head.tags'} .= '
-			<meta http-equiv="Keywords" name="Keywords" content="'.$session{page}{title}.', '.$session{setting}{companyName}.'" />
-			';
-                if ($session{page}{synopsis}) {
-                        $var{'head.tags'} .= '
-				<meta http-equiv="Description" name="Description" content="'.$session{page}{synopsis}.'" />
-				';
-                }
-        }
 	return WebGUI::Template::process($templateId,"style",\%var);
 }	
 
 
+#-------------------------------------------------------------------
+
+=head2 setLink ( url, params )
+
+Sets a <link> tag into the <head> of this rendered page for this page view. This is typically used for dynamically adding references to CSS and RSS documents.
+
+=over
+
+=item url
+
+The URL to the document you are linking.
+
+=item params
+
+A hash reference containing the other parameters to be included in the link tag, such as "rel" and "type".
+
+=back
+
+=cut
+
+sub setLink {
+	my $url = shift;
+	my $params = shift;
+	$session{page}{head}{link}{$url} = $params;
+}
+
+
+
+#-------------------------------------------------------------------
+
+=head2 setMeta ( params )
+
+Sets a <meta> tag into the <head> of this rendered page for this page view. 
+
+=over
+
+=item params
+
+A hash reference containing the parameters of the meta tag.
+
+=back
+
+=cut
+
+sub setMeta {
+	my $params = shift;
+	push(@{$session{page}{head}{meta}},$params);
+}
+
+
+
+#-------------------------------------------------------------------
+
+=head2 setRawHeadTags ( tags )
+
+Sets data to be output into the <head> of the current rendered page for this page view.
+
+=over
+
+=item tags
+
+A raw string containing tags. This is just a raw string so you must actually pass in the full tag to use this call.
+
+=back
+
+=cut
+
+sub setRawHeadTags {
+	my $tags = shift;
+	$session{page}{head}{raw} .= $tags;
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 setScript ( url, params )
+
+Sets a <script> tag into the <head> of this rendered page for this page view. This is typically used for dynamically adding references to Javascript or ECMA script.
+
+=over
+
+=item url
+
+The URL to your script.
+
+=item params
+
+A hash reference containing the additional parameters to include in the script tag, such as "type" and "language".
+
+=back
+
+=cut
+
+sub setScript {
+	my $url = shift;
+	my $params = shift;
+	$params->{src} = $url;
+	my $found = 0;
+	foreach my $script (@{$session{page}{head}{javascript}}) {
+		$found = 1 if ($script->{src} eq $url);
+	}
+	push(@{$session{page}{head}{javascript}},$params) unless ($found);	
+}
+
 
 1;
-

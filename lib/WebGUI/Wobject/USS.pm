@@ -27,8 +27,9 @@ use WebGUI::Operation;
 use WebGUI::Paginator;
 use WebGUI::Privilege;
 use WebGUI::Session;
-use WebGUI::Template;
 use WebGUI::SQL;
+use WebGUI::Style;
+use WebGUI::Template;
 use WebGUI::URL;
 use WebGUI::User;
 use WebGUI::Utility;
@@ -657,6 +658,7 @@ sub www_view {
 	$var{"search.Form"} = WebGUI::Search::form({wid=>$_[0]->get("wobjectId"),func=>'view',search=>1});
 	$var{"search.url"} = WebGUI::Search::toggleURL("wid=".$_[0]->get("wobjectId")."&func=view");
         $var{"rss.url"} = WebGUI::URL::page('func=viewRSS&wid='.$_[0]->get("wobjectId"));
+	WebGUI::Style::setLink($var{"rss.url"},{ rel=>'alternate', type=>'application/rss+xml', title=>'RSS' });
 	if ($session{scratch}{search}) {
                 $numResults = $session{scratch}{numResults};
        		$constraints = WebGUI::Search::buildConstraints([qw(username title content)]);

@@ -20,6 +20,7 @@ use WebGUI::DateTime;
 use WebGUI::International;
 use WebGUI::Session;
 use WebGUI::SQL;
+use WebGUI::Style;
 use WebGUI::Template;
 use WebGUI::URL;
 
@@ -74,10 +75,6 @@ All of the functions in this package accept the input of a hash reference contai
 
 =cut
 
-#-------------------------------------------------------------------
-sub _cssFile {
-        return '<link rel="stylesheet" type="text/css" media="all" href="'.$session{config}{extrasURL}.'/'.$_[0].'" />'."\n";
-}
 
 #-------------------------------------------------------------------
 sub _fixMacros {
@@ -108,10 +105,6 @@ sub _fixTags {
 	return $value;
 }
 
-#-------------------------------------------------------------------
-sub _javascriptFile {
-        return '<script language="JavaScript" src="'.$session{config}{extrasURL}.'/'.$_[0].'"></script>'."\n";
-}
 
 #-------------------------------------------------------------------
 
@@ -394,18 +387,17 @@ By default a date is placed in the "value" field. Set this to "1" to turn off th
 sub date {
 	my $value = epochToSet($_[0]->{value}) unless ($_[0]->{noDate} && $_[0]->{value} eq '');
         my $size = $_[0]->{size} || 10;
-        my $output = _cssFile("calendar/calendar-win2k-1.css")
-		._javascriptFile('calendar/calendar.js')
-        	._javascriptFile('calendar/lang/calendar-en.js')
-        	._javascriptFile('calendar/calendar-setup.js');
-	$output .= text({
+	WebGUI::Style::setScript($session{config}{extrasURL}.'/calendar/calendar.js',{ language=>'javascript' });
+	WebGUI::Style::setScript($session{config}{extrasURL}.'/calendar/lang/calendar-en.js',{ language=>'javascript' });
+	WebGUI::Style::setScript($session{config}{extrasURL}.'/calendar/calendar-setup.js',{ language=>'javascript' });
+	WebGUI::Style::setLink($session{config}{extrasURL}.'/calendar/calendar-win2k-1.css', { rel=>"stylesheet", type=>"text/css", media=>"all" });
+	return text({
 		name=>$_[0]->{name},
 		value=>$value,
 		size=>$size,
 		extras=>'id="'.$_[0]->{name}.'Id" '.$_[0]->{extras},
 		maxlength=>10
-		});
-	$output .= '<script type="text/javascript"> 
+		}) . '<script type="text/javascript"> 
 			Calendar.setup({ 
 				inputField : "'.$_[0]->{name}.'Id", 
 				ifFormat : "%Y-%m-%d", 
@@ -414,7 +406,6 @@ sub date {
 				mondayFirst : false
 				}); 
 			</script>';
-	return $output;
 }
 
 
@@ -445,18 +436,17 @@ Extra parameters to add to the date/time form element such as javascript or styl
 
 sub dateTime {
 	my $value = epochToSet($_[0]->{value},1);
-        my $output = _cssFile("calendar/calendar-win2k-1.css")
-                ._javascriptFile('calendar/calendar.js')
-                ._javascriptFile('calendar/lang/calendar-en.js')
-                ._javascriptFile('calendar/calendar-setup.js');
-        $output .= text({
+	WebGUI::Style::setScript($session{config}{extrasURL}.'/calendar/calendar.js',{ language=>'javascript' });
+	WebGUI::Style::setScript($session{config}{extrasURL}.'/calendar/lang/calendar-en.js',{ language=>'javascript' });
+	WebGUI::Style::setScript($session{config}{extrasURL}.'/calendar/calendar-setup.js',{ language=>'javascript' });
+	WebGUI::Style::setLink($session{config}{extrasURL}.'/calendar/calendar-win2k-1.css', { rel=>"stylesheet", type=>"text/css", media=>"all" });
+        return text({
                 name=>$_[0]->{name},
                 value=>$value,
                 size=>19,
                 extras=>'id="'.$_[0]->{name}.'Id" '.$_[0]->{extras},
                 maxlength=>19
-                });
-        $output .= '<script type="text/javascript">
+                }) . '<script type="text/javascript">
                         Calendar.setup({
                                 inputField : "'.$_[0]->{name}.'Id",
                                 ifFormat : "%Y-%m-%d %H:%M:%S",
@@ -465,7 +455,6 @@ sub dateTime {
                                 mondayFirst : false
                                 });
                         </script>';
-	return $output;
 }
 
 
@@ -505,9 +494,8 @@ The number of characters wide this form element should be. There should be no re
 =cut
 
 sub email {
-        my ($output);
-	$output = _javascriptFile('emailCheck.js');;
-	$output .= text({
+	WebGUI::Style::setScript($session{config}{extrasURL}.'/emailCheck.js',{ language=>'javascript' });
+	my $output .= text({
 		name=>$_[0]->{name},
 		value=>$_[0]->{value},
 		size=>$_[0]->{size},
@@ -771,15 +759,14 @@ The number of characters wide this form element should be. There should be no re
 sub float {
         my $value = $_[0]->{value} || 0;
         my $size = $_[0]->{size} || 11;
-        my $output = _javascriptFile('inputCheck.js');
-	$output .= text({
+	WebGUI::Style::setScript($session{config}{extrasURL}.'/inputCheck.js',{ language=>'javascript' });
+	return text({
 		name=>$_[0]->{name},
 		value=>$value,
 		size=>$size,
 		extras=>'onKeyUp="doInputCheck(this.form.'.$_[0]->{name}.',\'0123456789.\')" '.$_[0]->{extras},
 		maxlength=>$_[0]->{maxlength}
 		});
-	return $output;
 }
 
 
@@ -1030,18 +1017,16 @@ The number of characters wide this form element should be. There should be no re
 =cut
 
 sub integer {
-        my ($output, $size, $value);
-        $value = $_[0]->{value} || 0;
-        $size = $_[0]->{size} || 11;
-        $output = _javascriptFile('inputCheck.js');
-	$output .= text({
+        my $value = $_[0]->{value} || 0;
+        my $size = $_[0]->{size} || 11;
+	WebGUI::Style::setScript($session{config}{extrasURL}.'/inputCheck.js',{ language=>'javascript' });
+	return text({
 		name=>$_[0]->{name},
 		value=>$value,
 		size=>$size,
 		extras=>'onKeyUp="doInputCheck(this.form.'.$_[0]->{name}.',\'0123456789-\')" '.$_[0]->{extras},
 		maxlength=>$_[0]->{maxlength}
 		});
-	return $output;
 }
 
 #-------------------------------------------------------------------
@@ -1178,16 +1163,15 @@ The number of characters wide this form element should be. There should be no re
 =cut
 
 sub phone {
-        my $output = _javascriptFile('inputCheck.js');
+	WebGUI::Style::setScript($session{config}{extrasURL}.'/inputCheck.js',{ language=>'javascript' });
         my $maxLength = $_[0]->{maxLength} || 30;
-	$output .= text({
+	return text({
 		name=>$_[0]->{name},
 		maxlength=>$maxLength,
 		extras=>'onKeyUp="doInputCheck(this.form.'.$_[0]->{name}.',\'0123456789-()+ \')" '.$_[0]->{extras},
 		value=>$_[0]->{value},
 		size=>$_[0]->{size}
 		});
-	return $output;
 }
 
 #-------------------------------------------------------------------
@@ -1540,8 +1524,8 @@ The number of characters wide this form element should be. There should be no re
 
 sub timeField {
         my $value = WebGUI::DateTime::secondsToTime($_[0]->{value});
-        my $output = _javascriptFile('inputCheck.js');
-	$output .= text({
+	WebGUI::Style::setScript($session{config}{extrasURL}.'/inputCheck.js',{ language=>'javascript' });
+	my $output = text({
 		name=>$_[0]->{name},
 		value=>$value,
 		size=>$_[0]->{size} || 8,
@@ -1591,15 +1575,14 @@ The number of characters wide this form element should be. There should be no re
 
 sub url {
         my $maxLength = $_[0]->{maxlength} || 2048;
-	my $output = _javascriptFile('addHTTP.js');
-	$output .= text({
+	WebGUI::Style::setScript($session{config}{extrasURL}.'/addHTTP.js',{ language=>'javascript' });
+	return text({
 		name=>$_[0]->{name},
 		value=>$_[0]->{value},
 		extras=>$_[0]->{extras}.' onBlur="addHTTP(this.form.'.$_[0]->{name}.')"',
 		size=>$_[0]->{size},
 		maxlength=>$maxLength
 		});
-	return $output;
 }
 
 #-------------------------------------------------------------------
@@ -1730,16 +1713,15 @@ The number of characters wide this form element should be. There should be no re
 =cut
 
 sub zipcode {
-        my $output = _javascriptFile('inputCheck.js');
+	WebGUI::Style::setScript($session{config}{extrasURL}.'/inputCheck.js',{ language=>'javascript' });
         my $maxLength = $_[0]->{maxLength} || 10;
-	$output .= text({
+	return text({
 		name=>$_[0]->{name},
 		maxlength=>$maxLength,
 		extras=>'onKeyUp="doInputCheck(this.form.'.$_[0]->{name}.',\'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ- \')" '.$_[0]->{extras},
 		value=>$_[0]->{value},
 		size=>$_[0]->{size}
 		});
-	return $output;
 }
 
 

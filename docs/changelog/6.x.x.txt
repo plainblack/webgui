@@ -36,6 +36,15 @@
  - Rmoved the httpHeader, httpRedirect, and setCookie subs from
    WebGUI::Session and created a new class called WebGUI::HTTP for them. See
    docs/migration.txt for details.
+ - The USS automatically adds an RSS feed link tag to the head of any page
+   it's on.
+ - Added a new API for dynamically adding javascript, css, xml, rss, and meta
+   information to the page. See WebGUI::Style for details.
+ - Fixed a long standing annoyance that javascripts used by the WebGUI::Form
+   would be loaded multiple times if there were multiple fields of the same
+   type in the same form.
+ - Sped up the page editing page by 50% by rearranging the javascript on the
+   page.
 
 
 6.0.3

@@ -18,6 +18,7 @@ use warnings;
 use HTML::Template;
 use strict;
 use Tie::IxHash;
+use WebGUI::DateTime;
 use WebGUI::ErrorHandler;
 use WebGUI::Grouping;
 use WebGUI::HTMLForm;
@@ -27,9 +28,9 @@ use WebGUI::Macro;
 use WebGUI::Persistent::Tree;
 use WebGUI::Session;
 use WebGUI::SQL;
+use WebGUI::Style;
 use WebGUI::Template;
 use WebGUI::Utility;
-use WebGUI::DateTime;
 
 our @ISA = qw(WebGUI::Persistent::Tree);
 
@@ -388,6 +389,11 @@ Generates the content of the page.
 sub generate {
         return WebGUI::Privilege::noAccess() unless (canView());
 	my %var;
+	if ($session{page}{defaultMetaTags}) {
+		WebGUI::Style::setMeta({'http-equiv'=>"Keywords", name=>"Keywords", content=>join(",",$session{page}{title},$session{page}{menuTitle})});
+		WebGUI::Style::setMeta({'http-equiv'=>"Description", name=>"Description", content=>$session{page}{synopsis}}) if ($session{page}{synopsis});
+        }
+	WebGUI::Style::setRawHeadTags($session{page}{metaTags});
 	if ($session{page}{redirectURL} && !$session{var}{adminOn}) {
 		WebGUI::HTTP::setRedirect(WebGUI::Macro::process($session{page}{redirectURL}));
 	}
