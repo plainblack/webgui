@@ -459,6 +459,6 @@ INSERT INTO template VALUES (2,'Default Email','<tmpl_var edit.url>\n\n<tmpl_loo
 INSERT INTO template VALUES (3,'Default Acknowlegement','<tmpl_var acknowlegement>\n<p />\n<table border=\"0\">\n<tmpl_loop field_loop>\n<tmpl_unless field.isMailField><tmpl_unless field.hidden>\n  <tr><td class=\"tableHeader\"><tmpl_var field.label></td>\n  <td class=\"tableData\"><tmpl_var field.value></td></tr>\n</tmpl_unless></tmpl_unless>\n</tmpl_loop>\n</table>\n<p />\n<a href=\"<tmpl_var back.url>\"><tmpl_var back.label></a>','DataForm');
 alter table groups add column scratchFilter text;
 insert into international (internationalId,languageId,namespace,message,lastUpdated,context) values (945,1,'WebGUI','Scratch Filter', 1052560369,'There is a type of session variable called a "scratch" variable. So a scratch filter allows you to add someone to a group based upon a scratch variable.');
-
+update userProfileField set dataType='selectList' where dataType='select';
 
 
