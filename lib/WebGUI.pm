@@ -278,14 +278,10 @@ sub page {
 		my $ttl;
 		if ($session{user}{userId} == 1) {
 			$ttl = $session{page}{cacheTimeoutVisitor};
-			WebGUI::ErrorHandler::warn("setting visitor cache");
 		} else {
 			$ttl = $session{page}{cacheTimeout};
-			WebGUI::ErrorHandler::warn("setting user cache");
 		}
 		$cache->set($content, $ttl) if ($useCache);
-	} else {
-			WebGUI::ErrorHandler::warn("using cache");
 	}
 	$debug = _generateDebug();
 	WebGUI::Session::close();
