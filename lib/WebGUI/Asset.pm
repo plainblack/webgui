@@ -62,6 +62,8 @@ A lineage is a concatenated series of sequence numbers, each six digits long, th
  getAdminConsole
  getAssetAdderLinks
  getAssetManagerControl
+ getAssetsInClipboard
+ getAssetsInTrash
  getEditForm
  getFirstChild
  getIcon
@@ -327,7 +329,7 @@ sub definition {
 
 =head2 demote ( )
 
-Keeps the same rank of lineage, swaps with sister below.
+Swaps lineage with sister below. Returns 1 if there is a sister to swap. Otherwise returns 0.
 
 =cut
 
@@ -375,7 +377,7 @@ sub duplicate {
 
 =head2 fixUrl ( string )
 
-Makes string into a URL, removing invalid characters and making it unique.
+Returns a URL, removing invalid characters and making it unique.
 
 =head3 string
 
@@ -507,7 +509,7 @@ sub getAssetAdderLinks {
 
 =head2 getAssetManagerControl ( children )
 
-Returns HTML code for the Asset Manager Control Page. English only.
+Returns a text string of HTML code for the Asset Manager Control Page. English only.
 
 =cut
 
@@ -565,6 +567,21 @@ sub getAssetManagerControl {
 	return $output;
 }
 
+#-------------------------------------------------------------------
+
+=head2 getAssetsInClipboard ( [limitToUser,userId] )
+
+Returns an array reference of title, assetId, and classname to the assets in the clipboard.
+
+=head3 limitToUser
+
+If True, only return assets last updated by userId.
+
+=head3 userId
+
+If not specified, uses current user.
+
+=cut
 
 sub getAssetsInClipboard {
 	my $self = shift;
@@ -587,6 +604,21 @@ sub getAssetsInClipboard {
 	return \@assets;
 }
 
+#-------------------------------------------------------------------
+
+=head2 getAssetsInTrash ( [limitToUser,userId] )
+
+Returns an array reference of title, assetId, and classname to the assets in the Trash.
+
+=head3 limitToUser
+
+If True, only return assets last updated by userId.
+
+=head3 userId
+
+If not specified, uses current user.
+
+=cut
 
 sub getAssetsInTrash {
 	my $self = shift;
@@ -615,7 +647,7 @@ sub getAssetsInTrash {
 
 =head2 getEditForm ( )
 
-Creates a TabForm to edit parameters of an Asset.
+Creates and returns a tabform to edit parameters of an Asset.
 
 =cut
 
@@ -828,7 +860,7 @@ Returns an array reference of lineages of relatives based upon rules.
 
 =head3 relatives
 
-An arrary reference of relatives to retrieve. Valid parameters are "siblings", "children", "ancestors", "self", "descendants", "pedigree"
+An array reference of relatives to retrieve. Valid parameters are "siblings", "children", "ancestors", "self", "descendants", "pedigree"
 
 =head3 rules
 
@@ -1145,13 +1177,9 @@ sub hasChildren {
 
 #-------------------------------------------------------------------
 
-=head2 new ( class,assetId||"new" [,overrideProperties] )
+=head2 new ( assetId||"new" [,overrideProperties] )
 
-Constructor. This does not create an asset. 
-
-=head class
-
-A hash of a class.
+Constructor. This does not create an asset. Returns a new object if it can, otherwise returns undef.
 
 =head3 assetId
 
@@ -1203,13 +1231,17 @@ sub new {
 
 #-------------------------------------------------------------------
 
-=head2 newByDynamicClass ( assetId,className [,overrideProperties] )
+=head2 newByDynamicClass ( assetId [,className,overrideProperties] )
 
-Returns an Asset object.
+Returns a new Asset object based upon the className. Returns a "notFoundPage" Asset if className is not specified and can't be looked up.
+
+=assetId
+
+Must be a valid assetId
 
 =head3 className
 
-String of class to use. 
+String of class to use. Defaults to className of assetId, if it can be found in the asset table. 
 
 =head3 overrideProperties
 
@@ -1266,7 +1298,7 @@ Constructor.
 
 =head3 properties
 
-A Properties Hash Ref.
+A properties hash reference. The className of the properties hash must be valid.
 
 =cut
 
@@ -1282,13 +1314,13 @@ sub newByPropertyHashRef {
 
 #-------------------------------------------------------------------
 
-=head2 newByUrl ( url )
+=head2 newByUrl ( [url] )
 
 Returns a new Asset object based upon current url, given url or defaultPage.
 
 =head3 url
 
-String representing a URL. 
+Optional string representing a URL. 
 
 =cut
 
@@ -1326,7 +1358,7 @@ sub republish {
 
 =head2 paste ( assetId )
 
-Returns 1 if can paste to a Parent. Sets the Asset to published. Otherwise returns 0.
+Returns 1 if can paste an asset to a Parent. Sets the Asset to published. Otherwise returns 0.
 
 =head3 assetId
 
@@ -1376,7 +1408,7 @@ sub processPropertiesFromFormPost {
 
 =head2 promote ( )
 
-Keeps the same rank of lineage, swaps with sister above.
+Keeps the same rank of lineage, swaps with sister above. Returns 1 if there is a sister to swap. Otherwise returns 0.
 
 =cut
 
@@ -1425,7 +1457,7 @@ sub purge {
 
 =head2 purgeTree ( )
 
-Updates current Asset with data from Form.
+Returns 1. Purges self and all descendants.
 
 =cut
 
@@ -1437,6 +1469,18 @@ sub purgeTree {
 	}
 	return 1;
 }
+
+#-------------------------------------------------------------------
+
+=head2 setParent ( newParentId )
+
+Moves an asset to a new Parent specified by newParentId and returns 1, otherwise returns 0.
+
+=head3 newParentId
+
+String representing new parentId of Asset. newParentId must not be the same as the assetId, nor the same as the Asset's current parentId. 
+
+=cut
 
 sub setParent {
 	my $self = shift;
@@ -1458,6 +1502,18 @@ sub setParent {
 	}
 	return 0;
 }
+
+#-------------------------------------------------------------------
+
+=head2 setrank ( newRank )
+
+Returns 1. Changes rank of Asset.
+
+=head3 newRank
+
+Value of new Rank.
+
+=cut
 
 sub setRank {
 	my $self = shift;
@@ -1486,6 +1542,18 @@ sub setRank {
 	return 1;
 }
 
+#-------------------------------------------------------------------
+
+=head2 setSize ( [extra] )
+
+Updates the asset table with the size of the Asset.
+
+=head3 extra
+
+Optional numeric value to adjust the calculated asset size.
+
+=cut
+
 sub setSize {
 	my $self = shift;
 	my $extra = shift;
@@ -1495,6 +1563,18 @@ sub setSize {
 	}
 	WebGUI::SQL->write("update asset set assetSize=".(length($sizetest)+$extra)." where assetId=".quote($self->getId));
 }
+
+#-------------------------------------------------------------------
+
+=head2 swapRank ( second [,first] )
+
+Returns 1. Swaps current rank with second rank. 
+
+=head3 first
+
+If specified, swaps second rank with first rank.
+
+=cut
 
 sub swapRank {
 	my $self = shift;
@@ -1510,6 +1590,13 @@ sub swapRank {
 	return 1;
 }
 
+#-------------------------------------------------------------------
+
+=head2 trash ( )
+
+Removes asset from lineage, places it in trash state. The "gap" in the lineage is changed in state to limbo.
+
+=cut
 
 sub trash {
 	my $self = shift;
@@ -1520,6 +1607,18 @@ sub trash {
 	$self->{_properties}{state} = "trash";
 	$self->updateHistory("trashed");
 }
+
+#-------------------------------------------------------------------
+
+=head2 update ( properties )
+
+Returns 1. Updates properties of an Asset to given or default values.
+
+=head3 properties
+
+Hash reference of properties and values to set.
+
+=cut
 
 sub update {
 	my $self = shift;
@@ -1551,6 +1650,22 @@ sub update {
 	return 1;
 }
 
+#-------------------------------------------------------------------
+
+=head2 updateHistory ( action [,userId] )
+
+Updates the assetHistory table with the asset, user, action, and timestamp.
+
+=head3 action
+
+String representing type of action taken on an Asset.
+
+=head3 userId
+
+If not specified, current user is used.
+
+=cut
+
 sub updateHistory {
 	my $self = shift;
 	my $action = shift;
@@ -1563,9 +1678,25 @@ sub updateHistory {
 	WebGUI::SQL->commit;
 }
 
+#-------------------------------------------------------------------
+
+=head2 view ( )
+
+Returns "".
+
+=cut
+
 sub view {
 	return "";
 }
+
+#-------------------------------------------------------------------
+
+=head2 www_add ( )
+
+
+
+=cut
 
 sub www_add {
 	my $self = shift;
@@ -1582,6 +1713,14 @@ sub www_add {
 	return $newAsset->www_edit();
 }
 
+#-------------------------------------------------------------------
+
+=head2 www_copy ( )
+
+
+
+=cut
+
 sub www_copy {
 	my $self = shift;
 	return $self->getAdminConsole->render(WebGUI::Privilege::insufficient()) unless $self->canEdit;
@@ -1589,6 +1728,14 @@ sub www_copy {
 	$newAsset->cut;
 	return "";
 }
+
+#-------------------------------------------------------------------
+
+=head2 www_copyList ( )
+
+
+
+=cut
 
 sub www_copyList {
 	my $self = shift;
@@ -1605,12 +1752,28 @@ sub www_copyList {
 	return $self->www_manageAssets();
 }
 
+#-------------------------------------------------------------------
+
+=head2 www_cut ( )
+
+
+
+=cut
+
 sub www_cut {
 	my $self = shift;
 	return $self->getAdminConsole->render(WebGUI::Privilege::insufficient()) unless $self->canEdit;
 	$self->cut;
 	return $self->getParent->www_view;
 }
+
+#-------------------------------------------------------------------
+
+=head2 www_cutList ( )
+
+
+
+=cut
 
 sub www_cutList {
 	my $self = shift;
@@ -1624,12 +1787,28 @@ sub www_cutList {
 	return $self->www_manageAssets();
 }
 
+#-------------------------------------------------------------------
+
+=head2 www_delete
+
+
+
+=cut
+
 sub www_delete {
 	my $self = shift;
 	return $self->getAdminConsole->render(WebGUI::Privilege::insufficient()) unless $self->canEdit;
 	$self->trash;
 	return $self->getParent->www_view;
 }
+
+#-------------------------------------------------------------------
+
+=head2 www_deleteList
+
+
+
+=cut
 
 sub www_deleteList {
 	my $self = shift;
@@ -1643,6 +1822,14 @@ sub www_deleteList {
 	return $self->www_manageAssets();
 }
 
+#-------------------------------------------------------------------
+
+=head2 www_demote ( )
+
+
+
+=cut
+
 sub www_demote {
 	my $self = shift;
 	return $self->getAdminConsole->render(WebGUI::Privilege::insufficient()) unless $self->canEdit;
@@ -1650,11 +1837,27 @@ sub www_demote {
 	return "";
 }
 
+#-------------------------------------------------------------------
+
+=head2 www_edit ( )
+
+
+
+=cut
+
 sub www_edit {
 	my $self = shift;
 	return $self->getAdminConsole->render(WebGUI::Privilege::insufficient()) unless $self->canEdit;
 	return $self->getAdminConsole->render($self->getEditForm->print);
 }
+
+#-------------------------------------------------------------------
+
+=head2 www_editSave ( )
+
+
+
+=cut
 
 sub www_editSave {
 	my $self = shift;
@@ -1675,6 +1878,14 @@ sub www_editSave {
 	}
 	return $object->www_view;
 }
+
+#-------------------------------------------------------------------
+
+=head2 www_editTree ( )
+
+
+
+=cut
 
 sub www_editTree {
 	my $self = shift;
@@ -1829,6 +2040,14 @@ sub www_editTree {
 	return $ac->render($tabform->print, "Edit Branch");
 }
 
+#-------------------------------------------------------------------
+
+=head2 www_editTreeSave ( )
+
+
+
+=cut
+
 sub www_editTreeSave {
 	my $self = shift;
 	return $self->getAdminConsole->render(WebGUI::Privilege::insufficient()) unless ($self->canEdit);
@@ -1878,6 +2097,14 @@ sub www_editTreeSave {
 	return $self->www_manageAssets;
 }
 
+#-------------------------------------------------------------------
+
+=head2 www_emptyClipboard ( )
+
+
+
+=cut
+
 sub www_emptyClipboard {
 	my $self = shift;
 	my $ac = WebGUI::AdminConsole->new("clipboard");
@@ -1888,6 +2115,14 @@ sub www_emptyClipboard {
 	}
 	return $self->www_manageClipboard();
 }
+
+#-------------------------------------------------------------------
+
+=head2 www_emptyTrash ( )
+
+
+
+=cut
 
 sub www_emptyTrash {
 	my $self = shift;
@@ -1900,6 +2135,14 @@ sub www_emptyTrash {
 	return $self->www_manageTrash();
 }
 
+
+#-------------------------------------------------------------------
+
+=head2 www_manageAssets ( )
+
+
+
+=cut
 
 sub www_manageAssets {
 	my $self = shift;
@@ -1939,6 +2182,14 @@ sub www_manageAssets {
 	return $self->getAdminConsole->render($output);
 }
 
+#-------------------------------------------------------------------
+
+=head2 www_manageClipboard ( )
+
+
+
+=cut
+
 sub www_manageClipboard {
 	my $self = shift;
 	my $ac = WebGUI::AdminConsole->new("clipboard");
@@ -1963,6 +2214,13 @@ sub www_manageClipboard {
 	return $ac->render($self->getAssetManagerControl(\@assets), $header);
 }
 
+#-------------------------------------------------------------------
+
+=head2 www_manageTrash ( )
+
+
+
+=cut
 
 sub www_manageTrash {
 	my $self = shift;
@@ -1989,12 +2247,28 @@ sub www_manageTrash {
 }
 
 
+#-------------------------------------------------------------------
+
+=head2 www_paste ( )
+
+
+
+=cut
+
 sub www_paste {
 	my $self = shift;
 	return $self->getAdminConsole->render(WebGUI::Privilege::insufficient()) unless $self->canEdit;
 	$self->paste($session{form}{assetId});
 	return "";
 }
+
+#-------------------------------------------------------------------
+
+=head2 www_pasteList ( )
+
+
+
+=cut
 
 sub www_pasteList {
 	my $self = shift;
@@ -2005,12 +2279,28 @@ sub www_pasteList {
 	return $self->www_manageAssets();
 }
 
+#-------------------------------------------------------------------
+
+=head2 www_promote ( )
+
+
+
+=cut
+
 sub www_promote {
 	my $self = shift;
 	return $self->getAdminConsole->render(WebGUI::Privilege::insufficient()) unless $self->canEdit;
 	$self->promote;
 	return "";
 }
+
+#-------------------------------------------------------------------
+
+=head2 www_setParent ( )
+
+
+
+=cut
 
 sub www_setParent {
 	my $self = shift;
@@ -2021,6 +2311,14 @@ sub www_setParent {
 
 }
 
+#-------------------------------------------------------------------
+
+=head2 www_setRank ( )
+
+
+
+=cut
+
 sub www_setRank {
 	my $self = shift;
 	return $self->getAdminConsole->render(WebGUI::Privilege::insufficient()) unless $self->canEdit;
@@ -2028,6 +2326,14 @@ sub www_setRank {
 	$self->setRank($newRank) if (defined $newRank);
 	return $self->www_manageAssets();
 }
+
+#-------------------------------------------------------------------
+
+=head2 www_view ( )
+
+
+
+=cut
 
 sub www_view {
 	my $self = shift;
