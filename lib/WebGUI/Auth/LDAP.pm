@@ -311,7 +311,7 @@ sub editUserSettingsForm {
    my $self = shift;
    my $f = WebGUI::HTMLForm->new;
    $f->text("ldapUserRDN",WebGUI::International::get(9,'Auth/LDAP'),$session{setting}{ldapUserRDN});
-   $f->text("ldapURL",WebGUI::International::get(5,'Auth/LDAP'),$session{setting}{ldapURL});
+   $f->url("ldapURL",WebGUI::International::get(5,'Auth/LDAP'),$session{setting}{ldapURL});
    $f->text("ldapId",WebGUI::International::get(6,'Auth/LDAP'),$session{setting}{ldapId});
    $f->text("ldapIdName",WebGUI::International::get(7,'Auth/LDAP'),$session{setting}{ldapIdName});
    $f->text("ldapPasswordName",WebGUI::International::get(8,'Auth/LDAP'),$session{setting}{ldapPasswordName});
