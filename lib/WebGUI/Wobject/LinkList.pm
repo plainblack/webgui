@@ -118,8 +118,11 @@ sub www_deleteLinkConfirm {
 
 #-------------------------------------------------------------------
 sub www_edit {
-        my ($f, $output, @link, $sth, $indent, $lineSpacing, $bullet);
+        my ($proceed, $f, $output, @link, $sth, $indent, $lineSpacing, $bullet);
         if (WebGUI::Privilege::canEditPage()) {
+                if ($_[0]->get("wobjectId") eq "new") {
+                        $proceed = 1;
+                }
 		$bullet = $_[0]->get("bullet") || '&middot;';
 		$lineSpacing = $_[0]->get("lineSpacing") || 1;
 		$indent = $_[0]->get("indent") || 5;
@@ -129,7 +132,7 @@ sub www_edit {
                 $f->integer("indent",WebGUI::International::get(1,$namespace),$indent);
                 $f->integer("lineSpacing",WebGUI::International::get(2,$namespace),$lineSpacing);
                 $f->text("bullet",WebGUI::International::get(4,$namespace),$bullet);
-		$f->yesNo("proceed",WebGUI::International::get(5,$namespace),1);
+		$f->yesNo("proceed",WebGUI::International::get(5,$namespace),$proceed);
 		$output .= $_[0]->SUPER::www_edit($f->printRowsOnly);
 		unless ($_[0]->get("wobjectId") eq "new") {
                 	$output .= '<p><a href="'.WebGUI::URL::page('func=editLink&lid=new&wid='.$_[0]->get("wobjectId"))

@@ -107,12 +107,15 @@ sub www_deleteQuestionConfirm {
 
 #-------------------------------------------------------------------
 sub www_edit {
-        my ($f, $output, @question, $sth);
+        my ($f, $output, @question, $sth, $proceed);
         if (WebGUI::Privilege::canEditPage()) {
+                if ($_[0]->get("wobjectId") eq "new") {
+                        $proceed = 1;
+                }
 		$output = helpIcon(1,$namespace);
                 $output = '<h1>'.WebGUI::International::get(8,$namespace).'</h1>';
 		$f = WebGUI::HTMLForm->new;
-		$f->yesNo("proceed",WebGUI::International::get(1,$namespace),1);
+		$f->yesNo("proceed",WebGUI::International::get(1,$namespace),$proceed);
 		$output = $_[0]->SUPER::www_edit($f->printRowsOnly);
 		unless ($_[0]->get("wobjectId") eq "new") {
                 	$output .= '<p><a href="'.WebGUI::URL::page('func=editQuestion&wid='.$_[0]->get("wobjectId"))
