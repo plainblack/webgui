@@ -23,7 +23,7 @@ use WebGUI::ErrorHandler;
 use WebGUI::International;
 use WebGUI::Session;
 use WebGUI::SQL;
-
+use File::Path;
 
 =head1 NAME
 
@@ -193,16 +193,29 @@ sub process {
 	my $namespace = shift || "page";
 	my $vars = shift;
 	my $file = _getTemplateFile($templateId,$namespace);
+	my $fileCacheDir = $session{config}{uploadsPath}.$session{os}{slash}."temp".$session{os}{slash}."templatecache";
 	my %params = (
 		filename=>$file->getPath,
 		global_vars=>1,
    		loop_context_vars=>1,
 		die_on_bad_params=>0,
 		no_includes=>1,
-		file_cache_dir=>$session{config}{uploadsPath}.$session{os}{slash}."temp".$session{os}{slash}."templatecache",
+		file_cache_dir=>$fileCacheDir,
 		strict=>0
 		);
-	if ($session{config}{templateCacheType} eq "file") {
+	my $error=0;
+        if ($session{config}{templateCacheType} =~ /file/) {
+                eval { mkpath($fileCacheDir) };
+                if($@) {
+                        WebGUI::ErrorHandler::warn("Could not create dir $fileCacheDir: $@\nTemplate file caching disabled");
+			$error++;
+		}
+		if(not -w $fileCacheDir) {
+			WebGUI::ErrorHandler::warn("Directory $fileCacheDir is not writable. Template file caching is disabled");
+			$error++;
+		}
+	}
+	if ($session{config}{templateCacheType} eq "file" && not $error) {
 		$params{file_cache} = 1;
 	} elsif ($session{config}{templateCacheType} eq "memory") {
 		$params{cache} = 1;
@@ -210,12 +223,18 @@ sub process {
 		$params{shared_cache} = 1;
 	} elsif ($session{config}{templateCacheType} eq "memory-ipc") {
 		$params{double_cache} = 1;
-	} elsif ($session{config}{templateCacheType} eq "memory-file") {
+	} elsif ($session{config}{templateCacheType} eq "memory-file" && not $error) {
 		$params{double_file_cache} = 1;
 	}
+
+	my $template;
 	unless (-f $file->getPath) {
-        	my ($template) = WebGUI::SQL->quickArray("select template from template where templateId=".$templateId." and namespace=".quote($namespace),WebGUI::SQL->getSlave);
+        	($template) = WebGUI::SQL->quickArray("select template from template where templateId=".$templateId." and namespace=".quote($namespace),WebGUI::SQL->getSlave);
 		$file->saveFromScalar($template);
+	}
+	unless (-f $file->getPath) {
+		WebGUI::ErrorHandler::warn("Could not create file ".$file->getPath."\nTemplate file caching is disabled");
+		$params{scalarref} = \$template;
 	}
 	return _execute(\%params,$vars);
 }
