@@ -38,7 +38,7 @@ A lineage is a concatenated series of sequence numbers, each six digits long, th
  
  use WebGUI::Asset;
 
- _formatFuntion
+ _formatFunction
  addSubmenuItem
  getAdminConsoleParams
  getAdminFunction
@@ -55,7 +55,7 @@ These methods are available from this class:
 
 #-------------------------------------------------------------------
 
-=head2 formatFunction ( function )
+=head2 _formatFunction ( function )
 
 Returns a Hash of title, icon, url, and canUse. title is the Internationalized title of the function. icon is the function icon, currently in extras/adminConsole/. url is current page with func= or op= depending on if the function is a function or operation. canUse checks if the current user is in the function group.
 
@@ -325,6 +325,7 @@ Constructor.
 
 =head3 id
 
+If supplied, updates the _function of the AdminFunction.
 
 =cut
 
