@@ -4,6 +4,7 @@
 
 The following people/companies are responsible for WebGUI:
 
+
 WebGUI Core..........................JT Smith / Plain Black
 
 Contributing Developers..............Peter Beardsley / Appropriate Solutions, Inc.
@@ -28,18 +29,25 @@ Contributing Translators.............Andreas Ljunggren
                                      Michael Ugilt
                                      Zhou Xiaopeng
 
-Perl.................................Larry Wall / O'Reilly
 
-XML::RSSLite.........................Jerrad Pierce
-                                     Scott Thomason
+The following are people/companies who didn't directly contribute
+to WebGUI, but who's work has made WebGUI possible:
+
+
+Perl.................................Larry Wall / O'Reilly
 
 IE Rich Edit.........................Brattli
 
 Data::Config.........................Sébastien Aperghis-Tramoni
 
+HTML::CalendarMonthSimple............Gregor Mosheh
+
 HTML::TagFilter......................William Ross
 
-HTML::CalendarMonthSimple............Gregor Mosheh
+HTML::Template.......................Sam Tregar
+
+XML::RSSLite.........................Jerrad Pierce
+                                     Scott Thomason
 
 
 
