@@ -357,7 +357,7 @@ sub view {
 		}
 		$absoluteDepthOfLastPage = $pageData->{"page.absDepth"};
 		$pageData->{"page.hasChild"} = $asset->hasChildren;
-		my $parent = $self->getParent;
+		my $parent = $asset->getParent;
 		if (defined $parent) {
 			foreach my $property (@interestingProperties) {
 				$pageData->{"page.parent.".$property} = $parent->get($property);

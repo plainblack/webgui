@@ -15,7 +15,7 @@
  - fix [ 1168084 ] file uploads don't work.
  - fix [ 1167720 ] Folder::view() subfolder_loop - missing.. [mwilson]
  - fix [ 1169379 ] eventscalendar wobjects have wrong scope after upgrade
-
+ - fix [ 1168812 ] navigation sometimes fails to use correct... [mwilson]
 
 6.5.3
  - Sorted templates into folders named after their respective namespaces
