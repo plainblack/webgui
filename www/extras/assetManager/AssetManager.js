@@ -1,11 +1,14 @@
 //--------Constructor--------------------
 
+//Manages an array of assets.
+
 function AssetManager(assetArrayData,headerArrayData,labels,crumbtrail) {	
+
+	//create all the objects used by the manager
 	this.tools = new Tools();
 	this.contextMenu = new ContextMenu();
 	this.display = new Display();
 	this.eventManager = new EventManager();
-
 
 	this.keys = new Array();
 	this.keys[0] = "rank"; 
@@ -34,31 +37,30 @@ function AssetManager(assetArrayData,headerArrayData,labels,crumbtrail) {
 	this.getSelectedAssetIds = AssetManager_getSelectedAssetIds;
 }
 
+//returns a reference to the asset manager
 function AssetManager_getManager() {
-	//debug(manager.assetArrayData);
 	return manager;	
 }
 
+//renders the full asset manager
 function AssetManager_renderAssets() {
-
-
 	var gridStr = '<table border="0" cellspacing="0" id="am_grid" class="am-grid"><tbody id="am_grid_body"><tr id="am_grid.headers" class="am-grid-headers">';
 	var eventStr='';
 	var id = "";
 		
 	for (i=0;i<this.columnHeadings.length;i++) {
-		id = 'am_grid.headers.' + i;		
+		id = 'am_grid.headers.' + i;				
 		gridStr+= '<td id="' + id + '" class="am-grid-header-' + i + '">' + this.columnHeadings[i] + '</td>';	
 		eventStr += 'document.getElementById("' + id + '").onclick=AssetManager_getManager().eventManager.gridHeaderClick;';			
+		eventStr += 'document.getElementById("' + id + '").onmouseover=AssetManager_getManager().eventManager.gridHeaderMouseOver;';			
+		eventStr += 'document.getElementById("' + id + '").onmouseout=AssetManager_getManager().eventManager.gridHeaderMouseOut;';			
 	}
 
 	gridStr+= '</tr>';
-//['Rank','Title','Type','Last Updated','Size'];
 	for (i=0;i<this.assetArrayData.length;i++) {
 		id = 'am_grid.row.'+ i;
 		gridStr += '<tr id="'+ id + '" class="am-grid-row">';
 		
-		/* rank, title, type, lastUpdate, size, url, assetId */						
 		asset = new Asset();
 		
 		asset.rank = this.assetArrayData[i][0];
@@ -72,9 +74,6 @@ function AssetManager_renderAssets() {
 		this.assets[i]=asset;
 						
 		//add the row events
-//		eventStr += 'document.getElementById("' + id + '").onclick=Grid_rowClicked;';	
-//		eventStr += 'document.getElementById("' + id + '").onmouseover=Grid_rowMouseOver;';	
-//		eventStr += 'document.getElementById("' + id + '").onmouseout=Grid_rowMouseOut;';	
 		eventStr += 'document.getElementById("' + id + '").ondblclick=AssetManager_getManager().eventManager.assetDoubleClick;';	
 		eventStr += 'document.getElementById("' + id + '").onmousedown=AssetManager_getManager().eventManager.assetMouseDown;';	
 		eventStr += 'document.getElementById("' + id + '").oncontextmenu=AssetManager_getManager().eventManager.assetRightClick;';	
@@ -90,7 +89,6 @@ function AssetManager_renderAssets() {
 				gridStr +='<img src="' + asset.icon + '" border="0"/>';				
 			}
 			gridStr+=this.assetArrayData[i][k] + '</td>';	
-//			eventStr += 'document.getElementById("' + id + '").asset = AssetManager_getManager().assets[' + i + '];';
 		}
 	}
 		gridStr+='</tr>';
@@ -100,11 +98,11 @@ function AssetManager_renderAssets() {
 	document.getElementById("workspace").innerHTML=gridStr;
 	eval(eventStr);
 	
-	this.buildCrumbTrail();
-	
-	
-	}
+	this.buildCrumbTrail();		
+}
 
+
+//builds the asset crumb trail
 function AssetManager_buildCrumbTrail() {
 	var crumbtrail = document.getElementById("crumbtrail");
 	var contents = '<table><tr>';
@@ -130,8 +128,6 @@ function AssetManager_buildCrumbTrail() {
 		asset.title = this.crumbtrail[i][2];
 		asset.url = this.crumbtrail[i][1];
 		asset.assetId = this.crumbtrail[i][0];
-
-
 		asset.div = document.getElementById(this.crumbtrail[i][0]);
 
 		asset.div.ondblclick=AssetManager_getManager().eventManager.assetDoubleClick;	
@@ -140,25 +136,21 @@ function AssetManager_buildCrumbTrail() {
 
 		asset.isParent = true;
 		document.getElementById(this.crumbtrail[i][0]).asset = asset;
-		this.assets[this.assets.length] = asset;
-		
-	}		
-			
+		this.assets[this.assets.length] = asset;		
+	}					
 }
 		
-function AssetManager_getAsset(obj) {   	
-   
+//returns an asset based on a div object
+function AssetManager_getAsset(obj) {   	   
     while (obj.tagName!=this.display.topLevelElement && !obj.asset) {
         obj=this.display.dom? obj.parentNode : obj.parentElement    
-    }
-   
+    }   
 	return obj.asset;   
 }
 
+//displays the right click context menu
 function AssetManager_displayContextMenu(x,y,asset) {
-
-    var arr = new Array();
-    
+    var arr = new Array();    
     if (this.display.overObjects.length == 1) {
     	arr[arr.length] = new ContextMenuItem(this.labels["go"],"javascript:manager.display.contextMenu.owner.go()");
    	 	arr[arr.length] = new ContextMenuItem("<img src='/extras/assetManager/breakerLine.gif'>","");
@@ -212,6 +204,7 @@ function AssetManager_remove() {
 	}
 }
 
+//returns the asset IDS of all selected assets
 function AssetManager_getSelectedAssetIds() {
 	var assetIds = "";
 	for (i=0;i<this.display.overObjects.length;i++) {
@@ -220,6 +213,7 @@ function AssetManager_getSelectedAssetIds() {
 	return assetIds;
 }
 
+//Sorts the asset grid based on a column index
 function AssetManager_sortGrid(columnIndex) {
 
 	var prop = this.keys[columnIndex];	
@@ -247,8 +241,7 @@ function AssetManager_sortGrid(columnIndex) {
 	}else {
 		colHeader.sortOrder=">";
 		document.getElementById('am_grid.headers.' + columnIndex).innerHTML = this.columnHeadings[columnIndex] + ' <img src="/extras/assetManager/down.gif" />';				
-	}	
-	
+	}		
 	
 	var rowArray = new Array();
 	

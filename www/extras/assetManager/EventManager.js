@@ -11,6 +11,8 @@ function EventManager() {
     document.onkeyup=EventManager_keyUp;
 
 	this.gridHeaderClick = EventManager_gridHeaderClick;
+	this.gridHeaderMouseOver = EventManager_gridHeaderMouseOver;
+	this.gridHeaderMouseOut = EventManager_gridHeaderMouseOut;
     this.assetDoubleClick = EventManager_assetDoubleClick;
     this.assetRightClick = EventManager_assetRightClick;
     this.assetMouseDown = EventManager_assetMouseDown;
@@ -18,6 +20,28 @@ function EventManager() {
 }
 
 //---------Method Implementations -------------
+
+function EventManager_gridHeaderMouseOver(e) {
+    var dom = document.getElementById&&!document.all;
+    e=dom? e : event;
+
+	if (!manager.display.dragEnabled) {
+	    var obj =dom? e.target : e.srcElement
+		var parts = obj.className.split("-");
+		obj.className="am-grid-header-over-" + parts[parts.length -1];
+	}
+}
+
+function EventManager_gridHeaderMouseOut(e) {
+    var dom = document.getElementById&&!document.all;
+    e=dom? e : event;
+    var obj =dom? e.target : e.srcElement
+
+	var parts = obj.className.split("-");
+
+	obj.className="am-grid-header-" + parts[parts.length -1];
+
+}
 
 function EventManager_keyDown(e) {
     var dom = document.getElementById&&!document.all;
@@ -64,6 +88,8 @@ function EventManager_assetMouseDown(e) {
     var dom = document.getElementById&&!document.all;
     e=dom? e : event;
 
+	Display_adjustScrollBars(e);
+
     if (e.button==2) {
 	    //this is a hack to get the context menu stuff to work right in IE
    	 	if (!dom) {
@@ -91,6 +117,8 @@ function EventManager_documentMouseDown(e) {
     		manager.display.dragStart(asset.div,e.clientX,e.clientY);
     		return;
     	}
+    }else {
+    	manager.display.clearSelectedAssets();
     }
                               
     if (e.button != 2) {
@@ -116,8 +144,6 @@ function EventManager_documentMouseUp(e) {
     
     }
     manager.display.dragStop();
-    //if (obj) manager.display.selectActivity(obj);
-    
     return false;
 } 
 
@@ -133,7 +159,6 @@ function EventManager_gridHeaderClick(e) {
     var e=dom? e : event;
     var obj =dom? e.target : e.srcElement
    	
-   	var parts = obj.id.split(".");
-   	
+   	var parts = obj.id.split(".");   	
    	AssetManager_getManager().sortGrid(parts[parts.length-1]);   	
 }

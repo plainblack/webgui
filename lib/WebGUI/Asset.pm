@@ -279,38 +279,39 @@ sub getEditForm {
                 -value=>$self->get("url"),
                 -uiLevel=>3
                 );
-	$tabform->getTab("properties")->yesNo(
-                -name=>"isHidden",
-                -value=>$self->get("isHidden"),
-                -label=>WebGUI::International::get(886),
-                -uiLevel=>6
-                );
-        $tabform->getTab("properties")->yesNo(
-                -name=>"newWindow",
-                -value=>$self->get("newWindow"),
-                -label=>WebGUI::International::get(940),
-                -uiLevel=>6
-                );
-        $tabform->getTab("properties")->yesNo(
-                -name=>"encryptPage",
-                -value=>$self->get("encryptPage"),
-                -label=>WebGUI::International::get('encrypt page'),
-                -uiLevel=>6
-                );
         $tabform->getTab("properties")->textarea(
                 -name=>"synopsis",
                 -label=>WebGUI::International::get(412),
                 -value=>$self->get("synopsis"),
                 -uiLevel=>3
                 );
-	$tabform->addTab("privileges",WebGUI::International::get(107),6);
-	$tabform->getTab("privileges")->dateTime(
+	$tabform->addTab("display",WebGUI::International::get(105),5);
+	$tabform->getTab("display")->yesNo(
+                -name=>"isHidden",
+                -value=>$self->get("isHidden"),
+                -label=>WebGUI::International::get(886),
+                -uiLevel=>6
+                );
+        $tabform->getTab("display")->yesNo(
+                -name=>"newWindow",
+                -value=>$self->get("newWindow"),
+                -label=>WebGUI::International::get(940),
+                -uiLevel=>6
+                );
+	$tabform->addTab("security",WebGUI::International::get(107),6);
+        $tabform->getTab("security")->yesNo(
+                -name=>"encryptPage",
+                -value=>$self->get("encryptPage"),
+                -label=>WebGUI::International::get('encrypt page'),
+                -uiLevel=>6
+                );
+	$tabform->getTab("security")->dateTime(
                 -name=>"startDate",
                 -label=>WebGUI::International::get(497),
                 -value=>$self->get("startDate"),
                 -uiLevel=>6
                 );
-        $tabform->getTab("privileges")->dateTime(
+        $tabform->getTab("security")->dateTime(
                 -name=>"endDate",
                 -label=>WebGUI::International::get(498),
                 -value=>$self->get("endDate"),
@@ -331,7 +332,7 @@ sub getEditForm {
                 $clause = "userId=".quote($self->get("ownerUserId"));
         }
         my $users = WebGUI::SQL->buildHashRef("select userId,username from users where $clause order by username");
-        $tabform->getTab("privileges")->selectList(
+        $tabform->getTab("security")->selectList(
                -name=>"ownerUserId",
                -options=>$users,
                -label=>WebGUI::International::get(108),
@@ -339,13 +340,13 @@ sub getEditForm {
                -subtext=>$subtext,
                -uiLevel=>6
                );
-        $tabform->getTab("privileges")->group(
+        $tabform->getTab("security")->group(
                -name=>"groupIdView",
                -label=>WebGUI::International::get(872),
                -value=>[$self->get("groupIdView")],
                -uiLevel=>6
                );
-        $tabform->getTab("privileges")->group(
+        $tabform->getTab("security")->group(
                -name=>"groupIdEdit",
                -label=>WebGUI::International::get(871),
                -value=>[$self->get("groupIdEdit")],
@@ -355,6 +356,12 @@ sub getEditForm {
 	return $tabform;
 }
 
+
+sub getFirstDescendant {
+	my $self = shift;
+	$self->{_firstDescendant} = WebGUI::Asset->newByLineage($self->get("lineage").$self->formatRank(1)) unless (exists $self->{_firstDescendant});
+	return $self->{_firstDescendant};
+}
 
 sub getIcon {
 	my $self = shift;
@@ -452,7 +459,7 @@ sub getLineageLength {
 }
 
 sub getName {
-	return WebGUI::International::get('asset','Asset');
+	return WebGUI::International::get("asset","Asset");
 }
 
 sub getNextChildRank {
@@ -560,16 +567,6 @@ sub new {
 	return undef;
 }
 
-sub newByPropertyHashRef {
-	my $class = shift;
-	my $properties = shift;
-	my $className = $properties->{className};
-	my $cmd = "use ".$className;
-        eval ($cmd);
-        WebGUI::ErrorHandler::fatalError("Couldn't compile asset package: ".$className.". Root cause: ".$@) if ($@);
-	bless {_properties => $properties}, $className;
-}
-
 sub newByDynamicClass {
 	my $class = shift;
 	my $assetId = shift;
@@ -591,6 +588,23 @@ sub newByDynamicClass {
 	return $assetObject;
 }
 
+
+sub newByLineage {
+	my $class = shift;
+        my $lineage = shift;
+        my $asset = WebGUI::SQL->quickHashRef("select assetId, className from asset where lineage=".quote($lineage));
+	return WebGUI::Asset->newByDynamicClass($asset->{assetId}, $asset->{className});
+}
+
+sub newByPropertyHashRef {
+	my $class = shift;
+	my $properties = shift;
+	my $className = $properties->{className};
+	my $cmd = "use ".$className;
+        eval ($cmd);
+        WebGUI::ErrorHandler::fatalError("Couldn't compile asset package: ".$className.". Root cause: ".$@) if ($@);
+	bless {_properties => $properties}, $className;
+}
 
 sub newByUrl {
 	my $class = shift;
@@ -786,7 +800,7 @@ sub www_add {
 	my %properties = (
 		groupIdView => $self->get("groupIdView"),
 		groupIdEdit => $self->get("groupIdEdit"),
-		ownerId => $self->get("ownerId"),
+		ownerUserId => $self->get("ownerUserId"),
 		encryptPage => $self->get("encryptPage"),
 		isHidden => $self->get("isHidden"),
 		startDate => $self->get("startDate"),
@@ -909,7 +923,7 @@ sub www_manageAssets {
 		<div id="contextMenu" class="contextMenu"></div>
    		<div id="propertiesWindow" class="propertiesWindow"></div>
    		<div id="crumbtrail"></div>
-   		<div id="workspace" style="height: 200px;">Retrieving Assets...</div>
+   		<div id="workspace">Retrieving Assets...</div>
    		<div id="dragImage" class="dragIdentifier">hello</div>
 		';
 	$output .= "<script>\n";

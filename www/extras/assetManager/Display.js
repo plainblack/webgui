@@ -1,30 +1,19 @@
 
 //--------Constructor--------------------
 
+//creates a new Display object.  The display object manages selected assets, the drag functionality, and highlighting.
+
 function Display() {
     this.dom=document.getElementById&&!document.all;
-    this.baseX=0;
-    this.baseY=0;
-    this.width=0;
-    this.height=0;
-    this.rootNode="";
-    this.packageNS = "";
     this.focusObjects = new Array();
     this.overObjects = new Array();
-    this.overCrumbtrail = null;
     this.topLevelElement=this.dom? "HTML" : "BODY"
     this.scrollJump = 25;
     this.dragEnabled = false;
-    this.displayPropertiesWindow = Display_displayPropertiesWindow;
-    this.hidePropertiesWindow = Display_hidePropertiesWindow;
     this.dragStart = Display_dragStart;
     this.adjustScrollBars = Display_adjustScrollBars;
     this.dragStop = Display_dragStop;
-    this.activityLists = new Array();
     this.spy = Display_spy;
-    this.currentTemp=null;
-    this.temp1 = 0;
-    this.temp2=0;
     this.move = Display_move;
     this.x = 0;
     this.y = 0;
@@ -33,8 +22,6 @@ function Display() {
     this.contextMenu=new ContextMenu();
     this.bringToFront = Display_bringToFront;
     this.lastZIndex = 1000;
-    this.dragableObjectClasses = new Array();
-    this.registerDragableClass = Display_registerDragableClass;
     this.keyDown = Display_keyDown;
     this.keyUp = Display_keyUp;
     this.selectAsset = Display_selectAsset;
@@ -44,115 +31,59 @@ function Display() {
 
 //---------Method Implementations -------------
 
-function Display_registerDragableClass(objectClassName,classNameDuringDrag) {
-    var obj = new Object();
-    obj.clazzName = objectClassName;
-    obj.clazzNameDuringDrag = classNameDuringDrag;
-    this.dragableObjectClasses[this.dragableObjectClasses.length] = obj;    
-}
-
+//changes the z index of obj to be greater than all other elements
 function Display_bringToFront(obj) {
     this.lastZIndex++;
     obj.style.zIndex = this.lastZIndex; 
 }
 
-function Display_hidePropertiesWindow() {
-    manager.tools.hideObject(document.getElementById("propertiesWindow"));
-}
-
-function Display_displayPropertiesWindow(html) {    
-    temp = "<table border='1' cellspacing='0'><tr><td><table border='0'><tr bgcolor='#000000'><td width='325' class='dragable'><font color='#FFFFFF'>" + manager.labels['properties'] + "</font></td><td align='right'><a href='javascript:manager.display.hidePropertiesWindow()'>X</a></td></tr><tr><td colspan='2'>" + html + "</td></tr></table></td></tr></table>";    
-    
-    propWindow = document.getElementById("propertiesWindow");        
-    propWindow.innerHTML=temp;
-    propWindow.style.top=50 + document.body.scrollTop;
-    propWindow.style.left=50 + document.body.scrollLeft;
-    manager.tools.showObject(propWindow);  
-    this.bringToFront(propWindow);
-}
-
-
+//called to enable dragging on an element
 function Display_dragStart(firedobj,xCoordinate,yCoordinate) {
+
     if (!firedobj) return;
     
-    if (this.shiftKeyDown) return;
-    
-	
-        
-    while (firedobj.tagName!=this.topLevelElement && !firedobj.asset && firedobj.className != "dragable") {
+    if (this.shiftKeyDown || this.controlKeyDown) return;
+    	                    
+    //traverse up the dom tree until you find the asset    
+    while (firedobj.tagName!=this.topLevelElement && !firedobj.asset) {
         firedobj=manager.display.dom? firedobj.parentNode : firedobj.parentElement    
     }
-
     
-    if ((!firedobj.asset || firedobj.asset.isParent) && firedobj.className != "dragable") {
+    if ((!firedobj.asset || firedobj.asset.isParent)) {
         return;
     }
 
     this.dragEnabled=true;
 
-//    while (firedobj.tagName!=this.topLevelElement) {
- //       for (i =0;i<this.dragableObjectClasses.length;i++) {
- //           if (firedobj.className==this.dragableObjectClasses[i].clazzName) {
-     			                
-								
-                this.pageHeight = window.document.body.scrollHeight;
-                this.pageWidth = window.document.body.scrollWidth;
+    this.pageHeight = document.documentElement.scrollHeight;
+    this.pageWidth = document.documentElement.scrollWidth;
 
-                if (firedobj.asset) {
-	                this.focusObjects[0]=firedobj.asset;
-	            }else {
-	            	this.focusObjects[0] = firedobj;
-	            }
+    this.focusObjects[0]=firedobj.asset;
                 
-                //this.bringToFront(this.focusObject);
-                
-                //hack to get the transparency - need to make generic
-//                this.focusObject.dragDescriptor = this.dragableObjectClasses[i];
- //               this.focusObject.className=this.dragableObjectClasses[i].clazzNameDuringDrag;
-
-				if (firedobj.asset) {
-					this.bringToFront(document.getElementById("dragImage"));
-					document.getElementById("dragImage").innerHTML = "&nbsp;&nbsp;" + firedobj.asset.title + "&nbsp;&nbsp;";
-				}else {
-					this.temp1=parseInt(this.focusObjects[0].style.left+0)
-                	this.temp2=parseInt(this.focusObjects[0].style.top+0)
-                }
-                this.x=xCoordinate;
-                this.y=yCoordinate;
-                return false;
-     //       }
-
-   //      }
- //        firedobj=display.dom? firedobj.parentNode : firedobj.parentElement    
-   // }
-    //return false;
+	this.bringToFront(document.getElementById("dragImage"));
+	document.getElementById("dragImage").innerHTML = "&nbsp;&nbsp;" + firedobj.asset.title + "&nbsp;&nbsp;";
+    this.x=xCoordinate;
+    this.y=yCoordinate;
+    return false;
 }
 
+//called on mouse up if dragging was enabled
 function Display_dragStop() {
     if (this.dragEnabled) {
 
         this.dragEnabled = false;
 		document.getElementById("dragImage").style.display="none";           
 
-        //if (this.focusObjects.dragDescriptor.clazzName == "activityMenuItem") {
-            if (this.overObjects[0] && this.overObjects[0].assetId && this.overObjects[0] != this.focusObjects[0]) {
-		            
-		            if (this.overObjects[0].isParent) {
-			            this.focusObjects[0].setParent(this.overObjects[0]);			            
-    				}else {
-    					this.focusObjects[0].setRank(this.overObjects[0].rank);    				
-    				}    				    				
-            }        
-            //this.focusObject.style.top=0;
-            //this.focusObject.style.left=0;
-        }
-        
-        //this.focusObject.className = this.focusObject.dragDescriptor.clazzName;
-
-    //}
+        if (this.overObjects[0] && this.overObjects[0].assetId && this.overObjects[0] != this.focusObjects[0]) {		            
+	        if (this.overObjects[0].isParent) {
+		        this.focusObjects[0].setParent(this.overObjects[0]);			            
+    		}else {
+    			this.focusObjects[0].setRank(this.overObjects[0].rank);    				
+    		}    				    				
+        }        
+    }        
 }
-
-
+//checks to see if an asset is already in the overObjects array
 function Display_isSelected(asset) {
 		//check to see if obj is already in array
 		var inArray=false;
@@ -164,67 +95,69 @@ function Display_isSelected(asset) {
 		return false;
 }
 
+//adds an asset to the overobjects array
 function Display_selectAsset(asset) {	
-//    	debug(this.overObjects.length);
     	if (!this.controlKeyDown && !this.shiftKeyDown) {
     		for (i=0;i<this.overObjects.length;i++) {
-    			this.overObjects[i].div.className="am-grid-row";
+    			
+    			if (asset.isParent) {
+					this.overObjects[i].div.className="am-crumbtrail";
+				}else {
+	    			this.overObjects[i].div.className="am-grid-row";				
+				}
     		}
    			this.overObjects=new Array();
     	}
     	
-
+	
 		if (!this.isSelected(asset)) {	
 			this.overObjects[this.overObjects.length] = asset;    	
-   	    	asset.div.className="am-grid-row-over";
+    			if (asset.isParent) {
+		   	    	asset.div.className="am-crumbtrail-over";
+				}else {
+		   	    	asset.div.className="am-grid-row-over";
+				}						
 		}
 }
-
+//Clears out the over objects array
 function Display_clearSelectedAssets() {	
     		for (i=0;i<this.overObjects.length;i++) {
-    			this.overObjects[i].div.style.backgroundColor="white";
+    			if (this.overObjects[i].isParent) {
+	    			this.overObjects[i].div.className="am-crumbtrail";
+				}else {
+    				this.overObjects[i].div.className="am-grid-row";
+				}
+
+
     		}
    			this.overObjects=new Array();
 }
-
-
+//called on mouse move.  checks to see if mouse cursor is over an asset when dragging
 function Display_move(e){
     
-    if (this.dragEnabled){        
-
+    if (this.dragEnabled){        		
         this.adjustScrollBars(e);
 
-        if (this.focusObjects[0].className=="dragable") {	        	        
-	        this.focusObjects[0].style.left=this.dom? this.temp1+e.clientX-this.x: this.temp1+event.clientX-this.x    	    
-    	    this.focusObjects[0].style.top=this.dom? this.temp2+e.clientY-this.y : this.temp2+event.clientY-this.y       
-        }else {
-	        var act = this.spy(this.dom? e.pageX: (e.clientX + document.body.scrollLeft),this.dom? e.pageY: (e.clientY + document.body.scrollTop));
+		var topScroll = document.documentElement.scrollTop;
+		var leftScroll =document.documentElement.scrollLeft; 
+
+	    var act = this.spy(this.dom? e.pageX: (e.clientX + document.documentElement.scrollLeft),this.dom? e.pageY: (e.clientY + document.documentElement.scrollTop));
    		       		    
-   		    if (act && act.asset) {
-	   		    this.selectAsset(act.asset);
-			}else {
-				this.clearSelectedAssets();
-			}			
+   		if (act && act.asset) {
+	   		this.selectAsset(act.asset);
+		}else {
+			this.clearSelectedAssets();
+		}			
 					
-			if (this.overObjects[0] != this.focusObjects[0]) {
-			    //var act = this.spy(this.dom? e.pageX: (e.clientX + document.body.scrollLeft),this.dom? e.pageY: (e.clientY + document.body.scrollTop));
-			    var act = this.spy(this.dom? e.pageX: (e.clientX + window.scrollX),this.dom? e.pageY: (e.clientY + window.scrollY));
-				document.getElementById("dragImage").style.display = "block";
-//				document.getElementById("dragImage").style.top = this.dom? (e.clientY+ 15 + document.body.scrollTop) + "px" : (event.clientY + 15) + "px";
-				document.getElementById("dragImage").style.top = this.dom? (e.clientY+ 15 + window.scrollY) + "px" : (event.clientY + 15) + "px";
-
-//				debug(document.body.scrollTop);
-				//debug(window.scrollY);
-				//document.getElementById("dragImage").style.left = this.dom? (e.clientX + 5 + document.body.scrollTop) + "px" : (event.clientX + 5) + "px";
-				document.getElementById("dragImage").style.left = this.dom? (e.clientX + 5 + window.scrollX) + "px" : (event.clientX + 5) + "px";
-	        	
-	        }          
-        }        
-
-        return false
+		//change the position of the drag icon box
+		document.getElementById("dragImage").style.display = "block";
+		document.getElementById("dragImage").style.top = this.dom? (e.clientY+ 15 + topScroll) + "px" : (event.clientY + 15 + topScroll) + "px";
+		document.getElementById("dragImage").style.left = this.dom? (e.clientX + 5 + leftScroll) + "px" : (event.clientX + 5 + leftScroll) + "px";
     }
+    return false
 }
 
+//check to see if the mouse cursor is over and asset.  If so, returns the asset
 function Display_spy(x,y) {
     var returnObj = null;
                
@@ -244,22 +177,19 @@ function Display_spy(x,y) {
             x1+=fObj.offsetLeft;
             fObj=fObj.offsetParent;
         }
-        
-                                                                                
+                                                                                    
         if (x >x1 && x < (x1 + obj.offsetWidth)) {
-            if (y> y1 && y< (y1 + obj.offsetHeight)) {                    
-                    //for (j=0;j<obj.bpm.children.length;j++) {
-                    //     if (y>(y1 + obj.bpm.children[j].offsetTop) && y < (y1 + obj.bpm.children[j].offsetTop + obj.bpm.children[j].offsetHeight)) {                            
-                            return obj;
-                    //     }
-                    //}
+			//add 13 pixels for ie since border widths are included in calculation
+			var fudge = this.dom? 0:13;
+            if (y> y1 && y< (y1 + obj.offsetHeight + fudge)) {                    
+	            return obj;
             }
         }
-    }
-                                                                                
+    }                                                                                
     return returnObj;
 }
 
+//called on keyDown.  Does the right thing (ex.  delete, cut, copy, ect)
 function Display_keyDown(e) {
     if (e.keyCode==16) {
     	this.shiftKeyDown = true;
@@ -270,6 +200,7 @@ function Display_keyDown(e) {
     }
 }
 
+//called on keyUp.  Does the right thing (ex.  delete, cut, copy, ect)
 function Display_keyUp(e) {
     if (e.keyCode==16) {
     	this.shiftKeyDown = false;
@@ -278,42 +209,46 @@ function Display_keyUp(e) {
     }
 }
 
-
-//checks to see if the scroll bars need to be adjusted
+//checks to see if the scroll bars need to be adjusted.  Called durring dragging
 function Display_adjustScrollBars(e) {
         var scrY=0;
         var scrX=0;
 
-        if (e.clientY > document.body.clientHeight-this.scrollJump) {
-            if (e.clientY + document.body.scrollTop < this.pageHeight - (this.scrollJump + 40)) {
+		var topScroll = document.documentElement.scrollTop;
+		var leftScroll = document.documentElement.scrollLeft;
+		var innerHeight = document.documentElement.clientHeight;
+		var innerWidth = document.documentElement.clientWidth;
+		
+        if (e.clientY > innerHeight-this.scrollJump) {
+            if (e.clientY + topScroll < this.pageHeight - (this.scrollJump + 40)) {
                 scrY=this.scrollJump;
-                window.scroll(document.body.scrollLeft,document.body.scrollTop + scrY);
+                window.scroll(leftScroll,topScroll + scrY);
                 this.y-=scrY;
             }
         }else if (e.clientY < this.scrollJump) {
-            if (document.body.scrollTop < this.scrollJump) {
-                scrY = document.body.scrollTop;
+            if (topScroll < this.scrollJump) {
+                scrY = topScroll;
             }else {
                 scrY=this.scrollJump;
             }
-            window.scroll(document.body.scrollLeft,document.body.scrollTop - scrY);
+            window.scroll(leftScroll,topScroll - scrY);
             this.y+=scrY;
         }
 
 
-        if (e.clientX > document.body.clientWidth-this.scrollJump) {
-            if (e.clientX + document.body.scrollLeft < this.pageWidth - (this.scrollJump + 40)) {
+        if (e.clientX > innerWidth-this.scrollJump) {
+            if (e.clientX + leftScroll < this.pageWidth - (this.scrollJump + 40)) {
                 scrX=this.scrollJump;
-                window.scroll(document.body.scrollLeft + scrX,document.body.scrollTop);
+                window.scroll(leftScroll + scrX,topScroll);
                 this.x-=scrX;
             }
         }else if (e.clientX < this.scrollJump) {
-            if (document.body.scrollLeft < this.scrollJump) {
-                scrX = document.body.scrollLeft;
+            if (leftScroll < this.scrollJump) {
+                scrX = leftScroll;
             }else {
                 scrX=this.scrollJump;
             }
-            window.scroll(document.body.scrollLeft - scrX,document.body.scrollTop);
+            window.scroll(leftScroll - scrX,topScroll);
             this.x+=scrX;
         }
 }

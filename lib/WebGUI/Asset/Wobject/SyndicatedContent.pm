@@ -82,7 +82,7 @@ sub getEditForm {
 		-label=>WebGUI::International::get(1,"SyndicatedContent"),
 		-value=>$self->getValue("rssUrl")
 		);
-	$tabform->getTab("layout")->integer(
+	$tabform->getTab("display")->integer(
 		-name=>"maxHeadlines",
 		-label=>WebGUI::International::get(3,"SyndicatedContent"),
 		-value=>$self->getValue("maxHeadlines")

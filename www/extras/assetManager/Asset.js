@@ -1,6 +1,7 @@
 
 //--------Constructor--------------------
 
+//Creates a new asset object.
 function Asset() {
 		//properties
         this.url = "";
@@ -64,20 +65,6 @@ function Asset_go() {
 function Asset_view() {
 	location.href = "http://" + manager.tools.getHostName(location.href) + this.url;		
 }
-
-//function Asset_displayProperties() {
-//    html = "<table border='0'><tr><td class=\"propertiesMenuName\">Title:</td><td class=\"propertiesMenuValue\">" + this.title + "</td></tr>";
-//    html+="<tr><td class=\"propertiesMenuName\">Rank:</td><td class=\"propertiesMenuValue\">" + this.rank + "</td></tr>"
-//    html+="<tr><td class=\"propertiesMenuName\">Asset ID:</td><td class=\"propertiesMenuValue\">" + this.assetId + "</td></tr>"
-//    html+="<tr><td class=\"propertiesMenuName\">Asset Type:</td><td class=\"propertiesMenuValue\">" + this.type + "</td></tr>"
-//    html+="<tr><td class=\"propertiesMenuName\">Size:</td><td class=\"propertiesMenuValue\">" + this.size + "</td></tr>"
-//    html+="<tr><td class=\"propertiesMenuName\">Last Updated:</td><td class=\"propertiesMenuValue\">" + this.lastUpdate + "</td></tr>"
-//    html+="</table>";   
-//    manager.display.displayPropertiesWindow(html);
-//}
-
-
-
 
 
 

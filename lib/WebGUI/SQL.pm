@@ -707,7 +707,7 @@ sub rows {
 
 #-------------------------------------------------------------------
 
-=head2 setRow ( table, key, data [, dbh ] )
+=head2 setRow ( table, key, data [, dbh, id ] )
 
 Inserts/updates a row of data into the database. Returns the value of the key.
 
@@ -717,22 +717,26 @@ The name of the table to use.
 
 =head3 key
 
-The name of the primary key of the table.
+The name of the primary key of the table. 
 
 =head3 data
 
-A hash reference containing column names and values to be set.
+A hash reference containing column names and values to be set. If the field matching the key parameter is set to "new" then a new row will be created.
 
 =head3 dbh
 
 A database handler to use. Defaults to the WebGUI database handler.
 
+=head3 id
+
+Use this ID to create a new row. Same as setting the key value to "new" except that we'll use this passed in id instead.
+
 =cut
 
 sub setRow {
-        my ($self, $table, $keyColumn, $data, $dbh) = @_;
-        if ($data->{$keyColumn} eq "new") {
-                $data->{$keyColumn} = WebGUI::Id::generate();
+        my ($self, $table, $keyColumn, $data, $dbh, $id) = @_;
+        if ($data->{$keyColumn} eq "new" || $id) {
+                $data->{$keyColumn} = $id || WebGUI::Id::generate();
                 WebGUI::SQL->write("insert into $table ($keyColumn) values (".quote($data->{$keyColumn}).")", $dbh);
         }
         my (@pairs);

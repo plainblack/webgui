@@ -1347,7 +1347,7 @@ How should this user be notified when they get a new WebGUI message?
 	},
 
 	'107' => {
-		message => q|Privileges|,
+		message => q|Security|,
 		lastUpdated => 1031514049
 	},
 
@@ -2061,8 +2061,8 @@ The title of the page is what your users will use to navigate through the site. 
 A shorter or altered title to appear in navigation. If left blank this will default to <i>Title</i>.
 <p>
 
-<b>Page URL</b><br>
-You may either specify a URL for the page, or if you leave this blank, a URL based on the <b>Title</b> will be generated.
+<b>URL</b><br>
+You may either specify a URL for the asset, or if you leave this blank, a URL based on the <b>Title</b> will be generated.
 <p>
 
 <b>Redirect URL</b><br>
@@ -2082,7 +2082,7 @@ Select yes to hide this page from the navigation menus and site maps.
 Select yes to open this page in a new window. This is often used in conjunction with the <b>Redirect URL</b> parameter.
 <p>
 
-<b>Encrypt page?</b><br>
+<b>Encrypt content?</b><br>
 Select yes to serve this page over SSL.
 <p>
 
@@ -2121,9 +2121,6 @@ If you don't wish to specify meta tags yourself, WebGUI can generate meta tags b
 
 <b>Style</b><br>
 By default, when you create a page, it inherits a few traits from its parent. One of those traits is style. Choose from the list of styles if you would like to change the appearance of this page. See <i>Add Style</i> for more details.
-<p>
-
-If you select "Yes" below the style pull-down menu, all of the pages below this page will take on the style you've chosen for this page.
 <p>
 
 <b>Printable Style</b><br>
@@ -3935,8 +3932,9 @@ Large sites using external group data will be making many calls to the external 
 	},
 
 	'104' => {
-		message => q|Page URL|,
-		lastUpdated => 1031514049
+		message => q|URL|,
+		lastUpdated => 1031514049,
+		context => q|asset property|
 	},
 
 	'412' => {
@@ -5395,11 +5393,6 @@ Start typing! Or better yet, copy the snippet from some other electronic documen
 		lastUpdated => 1060433369
 	},
 
-	'106' => {
-		message => q|Select "Yes" to change all the pages under this page to this style.|,
-		lastUpdated => 1031514049
-	},
-
 	'707' => {
 		message => q|Show debugging?|,
 		lastUpdated => 1031514049
@@ -6353,7 +6346,7 @@ What group should be alerted when a new user registers?
 	},
 
 	'105' => {
-		message => q|Layout|,
+		message => q|Display|,
 		lastUpdated => 1046638916
 	},
 
@@ -6614,9 +6607,9 @@ config file.</p>
                 context => q|option for Rich Editor in profile|
         },
 	'encrypt page' => {
-                message => q|Encrypt page?|,
+                message => q|Encrypt content?|,
                 lastUpdated =>1092748557,
-                context => q|page property|
+                context => q|asset property|
         },
 	'Forum, Post Preview Template Title' => {
 		message => q|Forum Post Preview Template|,

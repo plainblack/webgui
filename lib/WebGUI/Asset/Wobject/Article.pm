@@ -35,18 +35,18 @@ sub definition {
 		tableName=>'Article',
 		className=>'WebGUI::Asset::Wobject::Article',
 		properties=>{
-				linkURL=>{
-					fieldType=>'url',
-					defaultValue=>undef
-					},
-				linkTitle=>{
-					fieldType=>'text',
-					defaultValue=>undef
-					},
-				convertCarriageReturns=>{
-					fieldType=>'yesNo',
-					defaultValue=>0
-					}
+			linkURL=>{
+				fieldType=>'url',
+				defaultValue=>undef
+				},
+			linkTitle=>{
+				fieldType=>'text',
+				defaultValue=>undef
+				},
+			convertCarriageReturns=>{
+				fieldType=>'yesNo',
+				defaultValue=>0
+				}
 			}
 		});
         return $class->SUPER::definition($definition);
@@ -70,7 +70,7 @@ sub getEditForm {
 		-value=>$self->getValue("linkURL"),
 		-uiLevel=>3
 		);
-	$tabform->getTab("layout")->yesNo(
+	$tabform->getTab("display")->yesNo(
 		-name=>"convertCarriageReturns",
 		-label=>WebGUI::International::get(10,"Article"),
 		-value=>$self->getValue("convertCarriageReturns"),

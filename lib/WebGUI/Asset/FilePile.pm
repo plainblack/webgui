@@ -81,13 +81,13 @@ sub edit {
                 -uiLevel=>6
        	        );
 	$tabform->addTab("privileges",WebGUI::International::get(107),6);
-	$tabform->getTab("privileges")->dateTime(
+	$tabform->getTab("security")->dateTime(
                	-name=>"startDate",
                 -label=>WebGUI::International::get(497),
        	        -value=>$self->get("startDate"),
                	-uiLevel=>6
                 );
-       	$tabform->getTab("privileges")->dateTime(
+       	$tabform->getTab("security")->dateTime(
                	-name=>"endDate",
                 -label=>WebGUI::International::get(498),
        	        -value=>$self->get("endDate"),
@@ -108,7 +108,7 @@ sub edit {
                	$clause = "userId=".quote($self->get("ownerUserId"));
        	}
        	my $users = WebGUI::SQL->buildHashRef("select userId,username from users where $clause order by username");
-       	$tabform->getTab("privileges")->selectList(
+       	$tabform->getTab("security")->selectList(
        		-name=>"ownerUserId",
               	-options=>$users,
        	       	-label=>WebGUI::International::get(108),
@@ -116,13 +116,13 @@ sub edit {
        		-subtext=>$subtext,
        		-uiLevel=>6
        		);
-      	$tabform->getTab("privileges")->group(
+      	$tabform->getTab("security")->group(
        		-name=>"groupIdView",
        		-label=>WebGUI::International::get(872),
        		-value=>[$self->get("groupIdView")],
        		-uiLevel=>6
        		);
-      	$tabform->getTab("privileges")->group(
+      	$tabform->getTab("security")->group(
        		-name=>"groupIdEdit",
        		-label=>WebGUI::International::get(871),
        		-value=>[$self->get("groupIdEdit")],

@@ -161,36 +161,36 @@ sub duplicate {
 sub getEditForm {
 	my $self = shift;
 	my $tabform = $self->getEditForm;
-        $tabform->getTab("layout")->template(
+        $tabform->getTab("display")->template(
                 -name=>"submissionTemplateId",
                 -value=>$self->getValue("submissionTemplateId"),
                 -namespace=>$self->get("namespace")."/Submission",
                 -label=>WebGUI::International::get(73,$self->get("namespace")),
                 -afterEdit=>'func=edit&wid='.$self->get("wobjectId")
                 );
-        $tabform->getTab("layout")->template(
+        $tabform->getTab("display")->template(
                 -name=>"submissionFormTemplateId",
                 -value=>$self->getValue("submissionFormTemplateId"),
                 -namespace=>$self->get("namespace")."/SubmissionForm",
                 -label=>WebGUI::International::get(87,$self->get("namespace")),
                 -afterEdit=>'func=edit&wid='.$self->get("wobjectId")
                 );
-        $tabform->getTab("privileges")->group(
+        $tabform->getTab("security")->group(
 		-name=>"groupToApprove",
 		-label=>WebGUI::International::get(1,$self->get("namespace")),
 		-value=>[$self->getValue("groupToApprove")]
 		);
-        $tabform->getTab("privileges")->group(
+        $tabform->getTab("security")->group(
 		-name=>"groupToContribute",
 		-label=>WebGUI::International::get(2,$self->get("namespace")),
 		-value=>[$self->getValue("groupToContribute")]
 		);
-        $tabform->getTab("layout")->integer(
+        $tabform->getTab("display")->integer(
 		-name=>"submissionsPerPage",
 		-label=>WebGUI::International::get(6,$self->get("namespace")),
 		-value=>$self->getValue("submissionsPerPage")
 		);
-        $tabform->getTab("privileges")->selectList(
+        $tabform->getTab("security")->selectList(
 		-name=>"defaultStatus",
 		-options=>{
 			Approved=>status('Approved'),
@@ -209,10 +209,10 @@ sub getEditForm {
         } else {
                 $tabform->getTab("properties")->hidden("karmaPerSubmission",$self->getValue("karmaPerSubmission"));
         }
-	$tabform->getTab("layout")->filterContent(
+	$tabform->getTab("display")->filterContent(
 		-value=>$self->getValue("filterContent")
 		);
-	$tabform->getTab("layout")->selectList(
+	$tabform->getTab("display")->selectList(
 		-name=>"sortBy",
 		-value=>[$self->getValue("sortBy")],
 		-options=>{
@@ -223,7 +223,7 @@ sub getEditForm {
 			},
 		-label=>WebGUI::International::get(79,$self->get("namespace"))
 		);
-	$tabform->getTab("layout")->selectList(
+	$tabform->getTab("display")->selectList(
 		-name=>"sortOrder",
 		-value=>[$self->getValue("sortOrder")],
 		-options=>{

@@ -175,51 +175,43 @@ Returns the TabForm object that will be used in generating the edit page for thi
 sub getEditForm {
 	my $self = shift;
 	my $tabform = $self->SUPER::getEditForm();
-	$tabform->addTab("layout",WebGUI::International::get(105),5);
-	$tabform->getTab("layout")->yesNo(
+	$tabform->getTab("display")->yesNo(
                 -name=>"displayTitle",
                 -label=>WebGUI::International::get(174),
                 -value=>$self->getValue("displayTitle"),
                 -uiLevel=>5
                 );
-	$tabform->getTab("layout")->template(
+	$tabform->getTab("display")->template(
                 -value=>$self->getValue("templateId"),
                 -namespace=>$self->get("namespace"),
                 -afterEdit=>'func=edit&amp;wid='.$self->get("wobjectId")."&amp;namespace=".$self->get("namespace")
                 );
-         $tabform->getTab("layout")->template(
+         $tabform->getTab("display")->template(
 		-name=>"styleTemplateId",
 		-label=>WebGUI::International::get(1073),
 		-value=>$self->getValue("styleTemplateId"),
 		-namespace=>'style',
 		-afterEdit=>'op=editPage&amp;npp='.$session{form}{npp}
 		);
-         $tabform->getTab("layout")->template(
+         $tabform->getTab("display")->template(
 		-name=>"printableStyleTemplateId",
 		-label=>WebGUI::International::get(1079),
 		-value=>$self->getValue("printableStyleTemplateId"),
 		-namespace=>'style',
 		-afterEdit=>'op=editPage&amp;npp='.$session{form}{npp}
 		);
-#	if ($childCount) {
-               	$tabform->getTab("layout")->yesNo(
-			-name=>"recurseStyle",
-			-subtext=>' &nbsp; '.WebGUI::International::get(106),
-			-uiLevel=>9
-			);
-#	}
 	$tabform->getTab("properties")->HTMLArea(
                 -name=>"description",
                 -label=>WebGUI::International::get(85),
                 -value=>$self->getValue("description")
                 );
-        $tabform->getTab("properties")->interval(
+        $tabform->getTab("display")->interval(
                 -name=>"cacheTimeout",
                 -label=>WebGUI::International::get(895),
                 -value=>$self->getValue("cacheTimeout"),
                 -uiLevel=>8
                 );
-        $tabform->getTab("properties")->interval(
+        $tabform->getTab("display")->interval(
                 -name=>"cacheTimeoutVisitor",
                 -label=>WebGUI::International::get(896),
                 -value=>$self->getValue("cacheTimeoutVisitor"),
@@ -228,20 +220,6 @@ sub getEditForm {
 	return $tabform;
 }
 
-
-
-#-------------------------------------------------------------------
-
-=head2 getName ( )
-
-This method should be overridden by all wobjects and should return an internationalized human friendly name for the wobject. This method only exists in the super class for reverse compatibility and will try to look up the name based on the old name definition.
-
-=cut
-
-sub getName {
-	my $self = shift;
-	return $self->get("className");
-} 
 
 
 

@@ -69,7 +69,7 @@ create table asset (
 	index (parentId)
 );
 
-insert into asset (assetId, parentId, lineage, state, className, title, menuTitle, url, isSystem, ownerUserId, groupIdView, groupIdEdit) values ('theroot', 'infinity', '000001','published','WebGUI::Asset','Root','Root','root',1,'3','3','3');
+insert into asset (assetId, parentId, lineage, state, className, title, menuTitle, url, isSystem, ownerUserId, groupIdView, groupIdEdit) values ('PBasset000000000000001', 'infinity', '000001','published','WebGUI::Asset','Root','Root','root',1,'3','3','3');
 
 create table assetHistory (
 	assetId varchar(22) not null,

@@ -4,7 +4,6 @@
 function Tools() {
     this.dom=document.getElementById&&!document.all;
     this.topLevelElement=this.dom? "HTML" : "BODY"
-    this.getActivity = Tools_getActivity;
     this.debug = Tools_debug;
     this.debugEnabled = false;
     this.getElementChildren = Tools_getElementChildren;
@@ -52,11 +51,6 @@ function Tools_cancelEvent() {
     return false;
 }
 
-//recurses up a tree to get any activity of className activity 
-function Tools_getActivity(obj) {
-   	var parts = obj.id.split(".");    	    	
-   	return manager.assets[parts[0] + "." + parts[1] + "." + parts[2]];
-}
 
 //shows a positionable element by toggling the style display property
 function Tools_showObject(obj) {
