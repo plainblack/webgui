@@ -102,15 +102,10 @@ sub www_editSettings {
                 -value=>$session{setting}{metaDataEnabled}
         	);
 # user interface settings
-	$tabform->getTab("ui")->yesNo(
-		-name=>"sharedClipboard",
-		-label=>$i18n->get(947),
-		-value=>$session{setting}{sharedClipboard}
-		);
-	$tabform->getTab("ui")->yesNo(
-		-name=>"sharedTrash",
-		-label=>$i18n->get(946),
-		-value=>$session{setting}{sharedTrash}
+	$tabform->getTab("ui")->text(
+		-name=>"richEditCss",
+		-label=>"Rich Edit CSS URL",
+		-value=>$session{setting}{richEditCss}
 		);
         $tabform->getTab("ui")->integer(
 		-name=>"textAreaRows",

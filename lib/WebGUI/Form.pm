@@ -1151,8 +1151,8 @@ sub HTMLArea {
            $var{"form.".$_} = $params->{$_} unless (ref $params->{$_});
         }
 	# Textarea field
-        $rows = $params->{rows} || ($session{setting}{textAreaRows}+15);
-        $columns = $params->{columns} || ($session{setting}{textAreaCols}+5);
+        $rows = $params->{rows} || ($session{setting}{textAreaRows}+20);
+        $columns = $params->{columns} || ($session{setting}{textAreaCols}+10);
         $var{textarea} = textarea({
                 name=>$params->{name},
                 value=>$params->{value},

@@ -2171,11 +2171,6 @@ will be modified to make it unique.|,
 		lastUpdated => 1031514049
 	},
 
-	'947' => {
-		message => q|Use shared clipboard?|,
-		lastUpdated => 1052850265
-	},
-
 	'810' => {
 		message => q|send|,
 		lastUpdated => 1037579743
@@ -2649,11 +2644,6 @@ One package that many people create is a Page/Article package. It is often the c
 	'1039' => {
 		message => q|Back|,
 		lastUpdated => 1066073289
-	},
-
-	'946' => {
-		message => q|Use shared trash?|,
-		lastUpdated => 1052850265
 	},
 
 	'1005' => {
