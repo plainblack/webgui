@@ -1921,7 +1921,7 @@ sub www_postSave {
 	}
 	if ($session{form}{forumPostId} > 0) { # edit
 		my $post = WebGUI::Forum::Post->new($session{form}{forumPostId});
-		return WebGUI::Privilege::insufficient unless ($post->getThread->getForum->canPost);
+		return WebGUI::Privilege::insufficient unless ($post->canEdit);
 		if ($post->getThread->getForum->get("addEditStampToPosts")) {
 			$postData{message} .= "\n\n --- (".WebGUI::International::get(1029)." "
                         .WebGUI::DateTime::epochToHuman(WebGUI::DateTime::time())." ".WebGUI::International::get(1030)

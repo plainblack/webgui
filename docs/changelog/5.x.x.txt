@@ -31,6 +31,8 @@
  - Updated the German translation. (Thanks to Andreas Graf.)
  - Fixed a security problem where users could access a forum they didn't have
    privileges to view if they created a specific URL.
+ - Fixed a security problem where users could edit a forum post they didn't
+   create if they generated a proper URL.
 
 
 5.5.0
