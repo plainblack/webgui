@@ -6,40 +6,55 @@ you migrate your WebGUI 5.x plugins to the new API's.
 
 CONTENTS
 
-  I. Wobject Migration
- II. Macro Migration
-III. Authentication Migration
- IV. Scheduler Migration
-  V. System Changes Affecting Migration
+1. Wobject Migration
+2. Macro Migration
+3. Authentication Migration
+4. Scheduler Migration
+5. System Changes Affecting Migration
 
 
 
-I. Wobject Migration
+1. Wobject Migration
 --------------------
+
+1.1 Nothing Yet
+
 There have currently been no changes to the Wobject API.
 
 
 
-II. Macro Migration
+2. Macro Migration
 -------------------
+
+2.1 Nothing Yet
+
 There have currently been no changes to the macro API.
 
 
 
-III. Authentication Migration
+3. Authentication Migration
 -----------------------------
+
+3.1 Nothing Yet
+
 There have currently been no changes to the authentication API.
 
 
 
-IV. Scheduler Migration
+4. Scheduler Migration
 -----------------------
+
+4.1 Nothing Yet
+
 There have currently been no changes to the scheduler API.
 
 
 
-V. System Changes Affecting Migration
+5. System Changes Affecting Migration
 -------------------------------------
+
+5.1 Nothing Yet
+
 There have currently been no changes to the system that would affect any normal
 use of the API's by plugins.
 
