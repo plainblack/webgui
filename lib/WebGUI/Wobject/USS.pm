@@ -617,7 +617,9 @@ sub www_viewSubmission {
 		$var{"attachment.name"} = $file->getFilename;
         }	
 	if ($_[0]->get("allowDiscussion")) {
-		$var{"replies"} = WebGUI::Forum::UI::www_viewForum($callback,$submission->{forumId});
+		$var{"replies"} = WebGUI::Forum::UI::www_viewForum(
+			{callback=>$callback,title=>$submission->{title},forumId=>$submission->{forumId}},
+			$submission->{forumId});
 	}
 	return WebGUI::Template::process(WebGUI::Template::get($_[0]->get("submissionTemplateId"),"USS/Submission"), \%var);
 }

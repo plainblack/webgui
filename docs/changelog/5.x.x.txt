@@ -1,6 +1,8 @@
 5.5.2
  - Fixed a bug introduced in the last version that only occurs if there was
    one forum in a message board.
+ - Fixed a bug introduced in the last version when replying to USS
+   submissions.
 
 
 5.5.1
