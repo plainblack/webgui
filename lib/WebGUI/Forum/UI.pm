@@ -2046,7 +2046,7 @@ sub www_search {
         	$var{'post.user.label'} = WebGUI::International::get(244);
 		my $constraints = WebGUI::Search::buildConstraints([qw(a.subject a.username a.message)]);
 		my $query = "select a.forumPostId, a.subject, a.userId, a.username, a.dateOfPost from forumPost a left join forumThread b
-			on a.forumThreadId=b.forumThreadId where b.forumId=".$forum->get("forumId")." and 
+			on a.forumThreadId=b.forumThreadId where b.forumId=".quote($forum->get("forumId"))." and 
 			(a.status='approved' or a.status='archived') and $constraints order by a.dateOfPost desc";
 		my $p = WebGUI::Paginator->new(WebGUI::URL::append($caller->{callback},"forumOp=search&amp;doit=1&amp;forumId=".$forum->get("forumId")), $numResults);
 		$p->setDataByQuery($query) if $constraints;
