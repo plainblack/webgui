@@ -1,3 +1,8 @@
+6.2.1
+ - Fixed a GUID quoting bug in WebGUI.pm setCollateral.
+
+
+
 6.2.0
  - Added generateContent.pl script to generate content offline. This script is
    not backwards compatible with previous WebGUI versions. (Thanks to

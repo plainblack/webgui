@@ -1119,7 +1119,7 @@ sub setCollateral {
 	$_[0]->{_property}{lastEdited} = time();
         $_[0]->{_property}{editedBy} = $session{user}{userId};
 	WebGUI::SQL->write("update wobject set lastEdited=".$_[0]->{_property}{lastEdited}
-		.", editedBy=".$_[0]->{_property}{editedBy}." where wobjectId=".quote($_[0]->wid));
+		.", editedBy=".quote($_[0]->{_property}{editedBy})." where wobjectId=".quote($_[0]->wid));
 	$_[0]->reorderCollateral($table,$keyName,$setName,$setValue) if ($properties->{sequenceNumber} < 0);
 	return $properties->{$keyName};
 }
