@@ -86,6 +86,10 @@ sub definition {
                 tableName=>'Post',
                 className=>'WebGUI::Asset::Post',
                 properties=>{
+			storageId => {
+				fieldType=>"hidden",
+				defaultValue=>undef
+				},
 			threadId => {
 				fieldType=>"hidden",
 				defaultValue=>undef
@@ -328,8 +332,9 @@ sub getSynopsisAndContentFromFormPost {
 #-------------------------------------------------------------------
 sub getTemplateVars {
 	my $self = shift;
-	my %var = %{$self->get};
+	my %var = (%{$self->get});
 	$var{"userId"} = $self->get("ownerUserId");
+	$var{"user.isPoster"} = ($self->get("ownerUserId") eq $session{user}{userId});
 
 	$var{"dateSubmitted.human"} = epochToHuman($self->get("dateSubmitted"));
 	$var{"dateUpdated.human"} = epochToHuman($self->get("dateUpdated"));
@@ -378,6 +383,38 @@ sub getThread {
 		$self->{_thread} = WebGUI::Asset::Post::Thread->new($self->get("threadId"));
 	}
 	return $self->{_thread};	
+}
+
+
+#-------------------------------------------------------------------
+sub getUploadControl {
+	my $self = shift;
+	my $existingFiles = shift;
+	WebGUI::Style::setScript($session{config}{extrasURL}.'/FileUploadControl.js',{type=>"text/javascript"});
+	my $uploadControl = '<div id="fileUploadControl"> </div>
+		<script>
+		var images = new Array();
+		var fileLimit = '.$self->getThread->getParent->get("attachmentsPerPost").';
+		';
+	opendir(DIR,$session{config}{extrasPath}.'/fileIcons');
+	my @files = readdir(DIR);
+	closedir(DIR);
+	foreach my $file (@files) {
+		unless ($file eq "." || $file eq "..") {
+			my $ext = $file;
+			$ext =~ s/(.*?)\.gif/$1/;
+			$uploadControl .= 'images["'.$ext.'"] = "'.$session{config}{extrasURL}.'/fileIcons/'.$file.'";'."\n";
+		}
+	}
+	$uploadControl .= 'var uploader = new FileUploadControl("fileUploadControl", images);
+	uploader.addRow();
+	</script>';
+	if ($self->get("storageId")) {
+		foreach my $filename (@{$self->getStorageLocation->getFiles}) {
+			$uploadControl .= '<a href="'.$self->getStorageLocation->getFileUrl($filename).'">'.$filename.'</a><br />';	
+		}
+	}
+	return $uploadControl;
 }
 
 
@@ -806,22 +843,7 @@ sub www_edit {
 			value=>$content
 			});
 	}
- #       if ($submission->{image} ne "") {
-#		$var{'image.form'} = '<a href="'.WebGUI::URL::page('func=deleteFile&amp;file=image&amp;wid='.$session{form}{wid}
-#			.'&amp;sid='.$submission->{USS_submissionId}).'">'.WebGUI::International::get(391).'</a>';
- #       } else {
-#		$var{'image.form'} = WebGUI::Form::file({
-#			name=>"image"
-#			});
- #       }
- #       if ($submission->{attachment} ne "") {
-#		$var{'attachment.form'} = '<a href="'.WebGUI::URL::page('func=deleteFile&amp;file=attachment&amp;wid='
-#			.$session{form}{wid}.'&amp;sid='.$submission->{USS_submissionId}).'">'.WebGUI::International::get(391).'</a>';
- #       } else {
-#		$var{'attachment.form'} = WebGUI::Form::file({
-#			name=>"attachment"
-#			});
- #       }
+	$var{'attachment.form'} = $self->getUploadControl;
         $var{'contentType.form'} = WebGUI::Form::contentType({
                 name=>'contentType',
                 value=>$self->getValue("contentType") || "mixed"

@@ -170,6 +170,7 @@ sub getName {
 	return "File";
 } 
 
+#-------------------------------------------------------------------
 sub getStorageLocation {
 	my $self = shift;
 	unless (exists $self->{_storageLocation}) {
@@ -179,6 +180,7 @@ sub getStorageLocation {
 }
 
 
+#-------------------------------------------------------------------
 sub processPropertiesFromFormPost {
 	my $self = shift;
 	$self->SUPER::processPropertiesFromFormPost;

@@ -69,6 +69,14 @@ save you many hours of grief.
 	subscriptionCodeBatch, subscriptionCodeSubscriptions, transaction,
 	transactionItem
 
+ * Due to the sweeping changes in this release the migration script may not
+	work perfectly on your site. It should get you 90% of the way there,
+	but it will be up to you to fix the problems it can't catch. Some of
+	the things to look out for are Collaboration System (formerly USS
+	and forum) templates. Also look at images and navigations as they've
+	been moved from outside the content system, to inside it as assets
+	in the new asset tree.
+
 
 6.2.10
 --------------------------------------------------------------------

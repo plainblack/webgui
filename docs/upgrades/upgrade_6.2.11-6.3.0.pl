@@ -540,7 +540,6 @@ while (my ($id, $template, $namespace) = $sth->array) {
 	$template =~ s/thread\.new\.url/add.url/ixsg;
 	$template =~ s/thread\.new\.label/add.label/ixsg;
 	$template =~ s/thread\.root\.subject/title/ixsg;
-	$template =~ s/thread\.root\.url/url/ixsg;
 	$template =~ s/thread\.root\.epoch/dateSubmitted/ixsg;
 	$template =~ s/thread\.root\.url/url/ixsg;
 	$template =~ s/thread\.root\.date/dateSubmitted.human/ixsg;
@@ -550,7 +549,7 @@ while (my ($id, $template, $namespace) = $sth->array) {
 	$template =~ s/thread\.root\.user\.name/username/ixsg;
 	$template =~ s/thread\.root\.user\.id/ownerUserId/ixsg;
 	$template =~ s/thread\.root\.user\.isVisitor/user.isVisitor/ixsg;
-	$template =~ s/thread\.root\..status/status/ixsg;
+	$template =~ s/thread\.root\.status/status/ixsg;
 	$template =~ s/thread\.last\.subject/lastReply.title/ixsg;
 	$template =~ s/thread\.last\.epoch/lastReply.dateSubmitted/ixsg;
 	$template =~ s/thread\.last\.date/lastReply.dateSubmitted.human/ixsg;
@@ -610,25 +609,39 @@ while (my ($id, $template, $namespace) = $sth->array) {
 		$newNamespace = "Collaboration";
 	} elsif ($namespace eq "USS/SubmissionForm") {
 		$newNamespace = "Collaboration/PostForm";
+		if ($template =~ /image\.form/ixsg && $template =~ /attachment\.form/ixsg) {
+			$template =~ s/\<tmpl_var\s+image\.form\>//ixsg;
+			$template =~ s/\<tmpl_var\s+image\.label\>//ixsg;
+		} elsif ($template =~ /image\.form/) {
+			$template =~ s/image\.form/attachment.form/ixsg;
+		}
 	} elsif ($namespace eq "USS/Submission") {
 		$newNamespace = "Collaboration/Thread";
+		if ($template =~ /attachment\.box/ixsg) {
+			my $box = '<div><a href="<tmpl_var attachment.url>"><img src="<tmpl_var attachment.icon>" border="0"> <tmpl_var attachment.name></a></div>';
+			$template =~ s/\<tmpl_var\s+attachment\.box\>/$box/ixsg;
+		}
 	}
 	$template =~ s/\<tmpl_var\s+search\.form\>//ixsg;
 	$template =~ s/\<tmpl_var\s+leave\.url\>//ixsg;
 	$template =~ s/\<tmpl_var\s+leave\.label\>//ixsg;
+	$template =~ s/canPost/user.canPost/ixsg;
+	$template =~ s/canModerate/user.canModerate/ixsg;
+	$template =~ s/isCurrentUser/user.isPoster/ixsg;
 	$template =~ s/submission\.id/assetId/ixsg;
+	$template =~ s/submission\.isNew/isNewPost/ixsg;
 	$template =~ s/submission\.content\.full/content/ixsg;
 	$template =~ s/submission\.content/synopsis/ixsg;
 	$template =~ s/submission\.responses/replies/ixsg;
 	$template =~ s/submission\.userId/ownerUserId/ixsg;
-	$template =~ s/submission\.date/dateSubmitted.human/ixsg;
 	$template =~ s/submission\.date.updated/dateUpdated.human/ixsg;
+	$template =~ s/submission\.date/dateSubmitted.human/ixsg;
 	$template =~ s/submission\.userProfile/userProfile.url/ixsg;
 	$template =~ s/submission\.currentUser/isCurrentUser/ixsg;
 	$template =~ s/submission\.//ixsg;
 	$template =~ s/user\.Profile/userProfile.url/ixsg;
 	$template =~ s/user\.id/ownerUserId/ixsg;
-	$template =~ s/user\.id/ownerUserId/ixsg;
+	$template =~ s/user\.alias/username/ixsg;
 	$template =~ s/user\.username/username/ixsg;
 	$template =~ s/date\.epoch/dateSubmitted/ixsg;
 	$template =~ s/date\.human/dateSubmitted.human/ixsg;
@@ -641,6 +654,10 @@ while (my ($id, $template, $namespace) = $sth->array) {
 	$template =~ s/previous\.more/previous.url/ixsg;
 	$template =~ s/next\.more/next.url/ixsg;
 	$template =~ s/canReply/user.canReply/ixsg;
+	$template =~ s/title\.value/title/ixsg;
+	$template =~ s/body\.form\.textarea/content.form/ixsg;
+	$template =~ s/body\.form/content.form/ixsg;
+	$template =~ s/body\.value/content/ixsg;
 	$template =~ s/back\.url/collaboration.url/ixsg;
 	$template =~ s/submissions_loop/post_loop/ixsg;
 	$template = '<a name="<tmpl_var assetId>"></a> <tmpl_if session.var.adminOn> <p><tmpl_var controls></p> </tmpl_if>'.$template;

@@ -305,6 +305,7 @@ create table Post (
   userDefined3 text,
   userDefined4 text,
   userDefined5 text,
+  storageId varchar(22),
   rating int not null default 0
 );
 

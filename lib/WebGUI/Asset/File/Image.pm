@@ -16,14 +16,12 @@ package WebGUI::Asset::File::Image;
 
 use strict;
 use WebGUI::Asset::File;
+use WebGUI::Storage::Image;
 use WebGUI::HTTP;
 use WebGUI::Session;
 use WebGUI::Utility;
 
 
-# do a check to see if they've installed Image::Magick
-my  $hasImageMagick = 1;
-eval " use Image::Magick; "; $hasImageMagick=0 if $@;
 
 our @ISA = qw(WebGUI::Asset::File);
 
@@ -101,33 +99,7 @@ sub generateThumbnail {
 	if (defined $thumbnailSize) {
 		$self->update({thumbnailSize=>$thumbnailSize});
 	}
-	if (defined $self->get("filename") && $hasImageMagick) {
-		my $storage = $self->getStorageLocation;
-                my $image = Image::Magick->new;
-                my $error = $image->Read($storage->getPath($self->get("filename")));
-		if ($error) {
-			WebGUI::ErrorHandler::warn("Couldn't read image for thumbnail creation: ".$error);
-			return 0;
-		}
-                my ($x, $y) = $image->Get('width','height');
-                my $n = $self->get("thumbnailSize");
-                if ($x > $n || $y > $n) {
-                        my $r = $x>$y ? $x / $n : $y / $n;
-                        $image->Scale(width=>($x/$r),height=>($y/$r));
-                }
-                if (isIn($storage->getFileExtension($self->get("filename")), qw(tif tiff bmp))) {
-                        $error = $image->Write($storage->getPath.$session{os}{slash}.'thumb-'.$self->get("filename").'.png');
-                } else {
-                        $error = $image->Write($storage->getPath.$session{os}{slash}.'thumb-'.$self->get("filename"));
-                }
-		if ($error) {
-			WebGUI::ErrorHandler::warn("Couldn't create thumbnail: ".$error);
-			return 0;
-		}
-		return 1;
-	}
-	WebGUI::ErrorHandler::warn("Can't generate a thumbnail when you haven't uploaded a file.");
-	return 0; # couldn't generate thumbnail
+	$self->getStorageLocation->generateThumbnail($self->get("filename"),$self->get("thumbnailSize"));
 }
 
 
@@ -184,12 +156,23 @@ sub getName {
 } 
 
 
+#-------------------------------------------------------------------
+sub getStorageLocation {
+	my $self = shift;
+	unless (exists $self->{_storageLocation}) {
+		$self->{_storageLocation} = WebGUI::Storage::Image->get($self->get("storageId"));
+	}
+	return $self->{_storageLocation};
+}
+
+#-------------------------------------------------------------------
 sub getThumbnailUrl {
 	my $self = shift;
-	return $self->getStorageLocation->getUrl("thumb-".$self->get("filename"));
+	return $self->getStorageLocation->getThumbnailUrl;
 }
 
 
+#-------------------------------------------------------------------
 sub processPropertiesFromFormPost {
 	my $self = shift;
 	$self->SUPER::processPropertiesFromFormPost;
@@ -200,6 +183,7 @@ sub processPropertiesFromFormPost {
 	$self->generateThumbnail;
 }
 
+#-------------------------------------------------------------------
 sub view {
 	my $self = shift;
 	my %var = %{$self->get};

@@ -74,6 +74,8 @@
    We recommend AWStats instead (www.awstats.org)
  - Added the ability to switch the style for user functions like profiles,
    authentication, etc.
+ - Merged the forum and USS into a new asset type called the Collaboration
+   System with all the best features of each system.
 
 
 
