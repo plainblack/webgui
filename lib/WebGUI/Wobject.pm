@@ -1112,7 +1112,7 @@ sub setCollateral {
 				$sql .= $key."=".quote($properties->{$key});
 			}
 		}
-		$sql .= " where $keyName='".quote($properties->{$keyName})."'";
+		$sql .= " where $keyName=".quote($properties->{$keyName});
 		WebGUI::ErrorHandler::audit("edited ".$table." ".$properties->{$keyName});
 	}
   	WebGUI::SQL->write($sql);

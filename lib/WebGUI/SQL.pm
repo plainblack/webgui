@@ -19,6 +19,7 @@ use Exporter;
 use strict;
 use Tie::IxHash;
 use WebGUI::ErrorHandler;
+use WebGUI::Id;
 use WebGUI::Session;
 use WebGUI::Utility;
 
@@ -805,8 +806,8 @@ A database handler to use. Defaults to the WebGUI database handler.
 sub setRow {
         my ($self, $table, $keyColumn, $data, $dbh) = @_;
         if ($data->{$keyColumn} eq "new") {
-                $data->{$keyColumn} = getNextId($keyColumn);
-                WebGUI::SQL->write("insert into $table ($keyColumn) values ($data->{$keyColumn})", $dbh);
+                $data->{$keyColumn} = WebGUI::Id::generate();
+                WebGUI::SQL->write("insert into $table ($keyColumn) values (".quote($data->{$keyColumn}).")", $dbh);
         }
         my (@pairs);
         foreach my $key (keys %{$data}) {

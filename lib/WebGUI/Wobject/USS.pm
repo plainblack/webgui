@@ -67,7 +67,7 @@ sub duplicate {
 	tie %row, 'Tie::CPHash';
 	my $w = $_[0]->SUPER::duplicate($_[1],1);
 	$w = WebGUI::Wobject::USS->new({wobjectId=>$w});
-        my $sth = WebGUI::SQL->read("select * from USS_submission where USS_id=".$_[0]->get("USS_id"));
+        my $sth = WebGUI::SQL->read("select * from USS_submission where USS_id=".quote($_[0]->get("USS_id")));
         while (%row = $sth->hash) {
                 my $newSubmissionId = WebGUI::Id::generate();
 		my $file = WebGUI::Attachment->new($row{image},$_[0]->get("wobjectId"),$row{USS_submissionId});
@@ -209,16 +209,16 @@ sub new {
 
 #-------------------------------------------------------------------
 sub purge {
-	my $sth = WebGUI::SQL->read("select forumId from USS_submission where USS_id=".$_[0]->get("USS_id"));
+	my $sth = WebGUI::SQL->read("select forumId from USS_submission where USS_id=".quote($_[0]->get("USS_id")));
 	while (my ($forumId) = $sth->array) {
-		my ($inUseElsewhere) = WebGUI::SQL->quickArray("select count(*) from USS_submission where forumId=".$forumId);
+		my ($inUseElsewhere) = WebGUI::SQL->quickArray("select count(*) from USS_submission where forumId=".quote($forumId));
 		unless ($inUseElsewhere > 1) {
 			my $forum = WebGUI::Forum->new($forumId);
 			$forum->purge;
 		}
 	}
 	$sth->finish;
-        WebGUI::SQL->write("delete from USS_submission where USS_id=".$_[0]->get("USS_id"));
+        WebGUI::SQL->write("delete from USS_submission where USS_id=".quote($_[0]->get("USS_id")));
 	$_[0]->SUPER::purge();
 }
 
@@ -238,7 +238,7 @@ sub www_approveSubmission {
 	my (%submission);
 	tie %submission, 'Tie::CPHash';
         if (WebGUI::Grouping::isInGroup(4,$session{user}{userId}) || WebGUI::Grouping::isInGroup(3,$session{user}{userId})) {
-		%submission = WebGUI::SQL->quickHash("select * from USS_submission where USS_submissionId=$session{form}{sid}");
+		%submission = WebGUI::SQL->quickHash("select * from USS_submission where USS_submissionId=".quote($session{form}{sid}));
                 WebGUI::SQL->write("update USS_submission set status='Approved' where USS_submissionId=".quote($session{form}{sid}));
 		WebGUI::MessageLog::addInternationalizedEntry($submission{userId},'',WebGUI::URL::page('func=viewSubmission&wid='.
 			$session{form}{wid}.'&sid='.$session{form}{sid}),4,$_[0]->get("namespace"));
@@ -251,7 +251,7 @@ sub www_approveSubmission {
 
 #-------------------------------------------------------------------
 sub www_deleteFile {
-	my ($owner) = WebGUI::SQL->quickArray("select userId from USS_submission where USS_submissionId=$session{form}{sid}");
+	my ($owner) = WebGUI::SQL->quickArray("select userId from USS_submission where USS_submissionId=".quote($session{form}{sid}));
         if ($owner == $session{user}{userId} || WebGUI::Grouping::isInGroup($_[0]->get("groupToApprove"))) {
 		$_[0]->setCollateral("USS_submission","USS_submissionId",{
 			$session{form}{file}=>'',
@@ -265,7 +265,7 @@ sub www_deleteFile {
 
 #-------------------------------------------------------------------
 sub www_deleteSubmission {
-	my ($owner) = WebGUI::SQL->quickArray("select userId from USS_submission where USS_submissionId=$session{form}{sid}");
+	my ($owner) = WebGUI::SQL->quickArray("select userId from USS_submission where USS_submissionId=".quote($session{form}{sid}));
         if ($owner == $session{user}{userId} || WebGUI::Grouping::isInGroup($_[0]->get("groupToApprove"))) {
 		return $_[0]->confirm(WebGUI::International::get(17,$_[0]->get("namespace")),
 			WebGUI::URL::page('func=deleteSubmissionConfirm&wid='.$session{form}{wid}.'&sid='.$session{form}{sid}));
@@ -276,9 +276,9 @@ sub www_deleteSubmission {
 
 #-------------------------------------------------------------------
 sub www_deleteSubmissionConfirm {
-	my ($owner, $forumId) = WebGUI::SQL->quickArray("select userId,forumId from USS_submission where USS_submissionId=$session{form}{sid}");
+	my ($owner, $forumId) = WebGUI::SQL->quickArray("select userId,forumId from USS_submission where USS_submissionId=".quote($session{form}{sid}));
         if ($owner == $session{user}{userId} || WebGUI::Grouping::isInGroup($_[0]->get("groupToApprove"))) {
-		my ($inUseElsewhere) = WebGUI::SQL->quickArray("select count(*) from USS_submission where forumId=".$forumId);
+		my ($inUseElsewhere) = WebGUI::SQL->quickArray("select count(*) from USS_submission where forumId=".quote($forumId));
                 unless ($inUseElsewhere > 1) {
 			my $forum = WebGUI::Forum->new($forumId);
 			$forum->purge;
@@ -297,7 +297,7 @@ sub www_denySubmission {
 	my (%submission);
 	tie %submission, 'Tie::CPHash';
         if (WebGUI::Grouping::isInGroup(4,$session{user}{userId}) || WebGUI::Grouping::isInGroup(3,$session{user}{userId})) {
-		%submission = WebGUI::SQL->quickHash("select * from USS_submission where USS_submissionId=$session{form}{sid}");
+		%submission = WebGUI::SQL->quickHash("select * from USS_submission where USS_submissionId=".quote($session{form}{sid}));
                 WebGUI::SQL->write("update USS_submission set status='Denied' where USS_submissionId=".quote($session{form}{sid}));
                 WebGUI::MessageLog::addInternationalizedEntry($submission{userId},'',WebGUI::URL::page('func=viewSubmission&wid='.
 			$session{form}{wid}.'&sid='.$session{form}{sid}),5,$_[0]->get("namespace"));
@@ -665,7 +665,7 @@ sub www_view {
 	if ($constraints ne "") {
         	$constraints = "status='Approved' and ".$constraints;
 	} else {
-		$constraints = "(status='Approved' or (userId=$session{user}{userId} and userId<>1))";
+		$constraints = "(status='Approved' or (userId=".quote($session{user}{userId})." and userId<>1))";
 	}
         $var{canModerate} = WebGUI::Grouping::isInGroup($_[0]->get("groupToApprove"),$session{user}{userId});
 	$var{"title.label"} = WebGUI::International::get(99);
@@ -677,7 +677,7 @@ sub www_view {
 	$p = WebGUI::Paginator->new(WebGUI::URL::page('func=view&wid='.$_[0]->get("wobjectId")),$numResults);
 	$p->setDataByQuery("select USS_submissionId, content, title, userId, status, image, dateSubmitted, dateUpdated, 
 		username, contentType, forumId, userDefined1, userDefined2, userDefined3, userDefined4, userDefined5 from USS_submission 
-		where USS_id=".$_[0]->get("USS_Id")." and $constraints order by ".$_[0]->getValue("sortBy")." ".$_[0]->getValue("sortOrder"));
+		where USS_id=".quote($_[0]->get("USS_Id"))." and $constraints order by ".$_[0]->getValue("sortBy")." ".$_[0]->getValue("sortOrder"));
 	$page = $p->getPageData;
 	$i = 0;
 	my $imageURL = "";
@@ -695,7 +695,7 @@ sub www_view {
 			$imageURL = "";
                 }
 		($responses) = WebGUI::SQL->quickArray("select count(*) from forumPost left join forumThread on
-			forumThread.forumThreadId=forumPost.forumThreadId where forumThread.forumId=".$row->{forumId},WebGUI::SQL->getSlave);
+			forumThread.forumThreadId=forumPost.forumThreadId where forumThread.forumId=".quote($row->{forumId}),WebGUI::SQL->getSlave);
 		my $quickurl = 'wid='.$_[0]->get("wobjectId").'&amp;sid='.$page->[$i]->{USS_submissionId}.'&amp;func=';
 		my $controls = deleteIcon($quickurl.'deleteSubmission')
 			.editIcon($quickurl.'editSubmission');
@@ -765,7 +765,7 @@ sub www_viewRSS {
         my $res = WebGUI::SQL->read
           ("select USS_submissionId, content, title, " .
            "dateSubmitted, username from USS_submission " .
-           "where USS_id = " .$session{dbh}->quote($_[0]->get("USS_id")) . " and status='Approved' " .
+           "where USS_id = " .quote($_[0]->get("USS_id")) . " and status='Approved' " .
            "order by ".$_[0]->getValue("sortBy")." ".$_[0]->getValue("sortOrder")." limit " . $numResults,WebGUI::SQL->getSlave);
         
         while (my $row = $res->{_sth}->fetchrow_arrayref()) {
@@ -840,14 +840,14 @@ sub www_viewSubmission {
         $var{"post.url"} = WebGUI::URL::page('func=editSubmission&sid=new&wid='.$_[0]->get("wobjectId"));
         $var{"post.label"} = WebGUI::International::get(20,$_[0]->get("namespace"));
 	@data = WebGUI::SQL->quickArray("select max(USS_submissionId) from USS_submission 
-        	where USS_id=".$_[0]->get("USS_id")." and USS_submissionId<$submission->{USS_submissionId}
-		and (userId=$submission->{userId} or status='Approved')",WebGUI::SQL->getSlave);
+        	where USS_id=".quote($_[0]->get("USS_id"))." and USS_submissionId<".quote($submission->{USS_submissionId})."
+		and (userId=".quote($submission->{userId})." or status='Approved')",WebGUI::SQL->getSlave);
         $var{"previous.more"} = ($data[0] ne "");
        	$var{"previous.url"} = WebGUI::URL::page('func=viewSubmission&sid='.$data[0].'&wid='.$session{form}{wid});
 	$var{"previous.label"} = WebGUI::International::get(58,$_[0]->get("namespace"));
         @data = WebGUI::SQL->quickArray("select min(USS_submissionId) from USS_submission 
-                where USS_id=$submission->{USS_id} and USS_submissionId>$submission->{USS_submissionId}
-		and (userId=$submission->{userId} or status='Approved')",WebGUI::SQL->getSlave);
+                where USS_id=".quote($submission->{USS_id})." and USS_submissionId>".quote($submission->{USS_submissionId})."
+		and (userId=".quote($submission->{userId})." or status='Approved')",WebGUI::SQL->getSlave);
         $var{"next.more"} = ($data[0] ne "");
         $var{"next.url"} = WebGUI::URL::page('func=viewSubmission&sid='.$data[0].'&wid='.$session{form}{wid});
 	$var{"next.label"} = WebGUI::International::get(59,$_[0]->get("namespace"));

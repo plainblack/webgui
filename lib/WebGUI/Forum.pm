@@ -159,7 +159,7 @@ Deccrements this forum's reply counter.
 
 sub decrementReplies {
         my ($self) = @_;
-        WebGUI::SQL->write("update forum set replies=replies-1 where forumId=".$self->get("forumId"));
+        WebGUI::SQL->write("update forum set replies=replies-1 where forumId=".quote($self->get("forumId")));
 }
 
 #-------------------------------------------------------------------
@@ -172,7 +172,7 @@ Decrements this forum's thread counter.
 
 sub decrementThreads {
         my ($self) = @_;
-        WebGUI::SQL->write("update forum set threads=threads-1 where forumId=".$self->get("forumId"));
+        WebGUI::SQL->write("update forum set threads=threads-1 where forumId=".quote($self->get("forumId")));
 }
 
 #-------------------------------------------------------------------
@@ -267,7 +267,7 @@ The unique identifier of the post being added.
 
 sub incrementReplies {
         my ($self, $lastPostDate, $lastPostId) = @_;
-        WebGUI::SQL->write("update forum set replies=replies+1, lastPostId=$lastPostId, lastPostDate=$lastPostDate where forumId=".$self->get("forumId"));
+        WebGUI::SQL->write("update forum set replies=replies+1, lastPostId=$lastPostId, lastPostDate=$lastPostDate where forumId=".quote($self->get("forumId")));
 }
                                                                                                                                                              
 #-------------------------------------------------------------------
@@ -292,7 +292,7 @@ The unique identifier of the post that was just added.
 
 sub incrementThreads {
         my ($self, $lastPostDate, $lastPostId) = @_;
-        WebGUI::SQL->write("update forum set threads=threads+1, lastPostId=$lastPostId, lastPostDate=$lastPostDate where forumId=".$self->get("forumId"));
+        WebGUI::SQL->write("update forum set threads=threads+1, lastPostId=$lastPostId, lastPostDate=$lastPostDate where forumId=".quote($self->get("forumId")));
 }
                                                                                                                                                              
 #-------------------------------------------------------------------
@@ -305,7 +305,7 @@ Increments the views counter on this forum.
 
 sub incrementViews {
         my ($self) = @_;
-        WebGUI::SQL->write("update forum set views=views+1 where forumId=".$self->get("forumId"));
+        WebGUI::SQL->write("update forum set views=views+1 where forumId=".quote($self->get("forumId")));
 }
                                                                                                                                                              
 #-------------------------------------------------------------------
@@ -327,7 +327,7 @@ The user to check for the subscription. Defaults to $session{user}{userId}.
 sub isSubscribed {
 	my ($self, $userId) = @_;
         $userId = $session{user}{userId} unless ($userId);
-        my ($isSubscribed) = WebGUI::SQL->quickArray("select count(*) from forumSubscription where forumId=".$self->get("forumId")." and userId=$userId");
+        my ($isSubscribed) = WebGUI::SQL->quickArray("select count(*) from forumSubscription where forumId=".quote($self->get("forumId"))." and userId=".quote($userId));
         return $isSubscribed;
 }
 
@@ -384,22 +384,22 @@ Destroys this forum and everything it contains.
 sub purge {
 	my ($self) = @_;
 	return unless ($self->get("forumId"));
-	my $a = WebGUI::SQL->read("select * from forumThread where forumId=".$self->get("forumId"));
+	my $a = WebGUI::SQL->read("select * from forumThread where forumId=".quote($self->get("forumId")));
 	while (my ($threadId) = $a->array) {
-		my $b = WebGUI::SQL->read("select * from forumPost where forumThreadId=".$threadId);
+		my $b = WebGUI::SQL->read("select * from forumPost where forumThreadId=".quote($threadId));
 		while (my ($postId) = $b->array) {
-			WebGUI::SQL->write("delete from forumPostAttachment where forumPostId=".$postId);
-			WebGUI::SQL->write("delete from forumPostRating where forumPostId=".$postId);
+			WebGUI::SQL->write("delete from forumPostAttachment where forumPostId=".quote($postId));
+			WebGUI::SQL->write("delete from forumPostRating where forumPostId=".quote($postId));
 		}
 		$b->finish;
-		WebGUI::SQL->write("delete from forumThreadSubscription where forumThreadId=".$threadId);
-		WebGUI::SQL->write("delete from forumRead where forumThreadId=".$threadId);
-		WebGUI::SQL->write("delete from forumPost where forumThreadId=".$threadId);
+		WebGUI::SQL->write("delete from forumThreadSubscription where forumThreadId=".quote($threadId));
+		WebGUI::SQL->write("delete from forumRead where forumThreadId=".quote($threadId));
+		WebGUI::SQL->write("delete from forumPost where forumThreadId=".quote($threadId));
 	}
 	$a->finish;
-	WebGUI::SQL->write("delete from forumSubscription where forumId=".$self->get("forumId"));
-	WebGUI::SQL->write("delete from forumThread where forumId=".$self->get("forumId"));
-	WebGUI::SQL->write("delete from forum where forumId=".$self->get("forumId"));
+	WebGUI::SQL->write("delete from forumSubscription where forumId=".quote($self->get("forumId")));
+	WebGUI::SQL->write("delete from forumThread where forumId=".quote($self->get("forumId")));
+	WebGUI::SQL->write("delete from forum where forumId=".quote($self->get("forumId")));
 }
 
 #-------------------------------------------------------------------
@@ -412,9 +412,9 @@ Calculates the rating of this forum from its threads and stores the new value in
 
 sub recalculateRating {
         my ($self) = @_;
-        my ($count) = WebGUI::SQL->quickArray("select count(*) from forumThread where forumId=".$self->get("forumId")." and rating>0");
+        my ($count) = WebGUI::SQL->quickArray("select count(*) from forumThread where forumId=".quote($self->get("forumId"))." and rating>0");
         $count = $count || 1;
-        my ($sum) = WebGUI::SQL->quickArray("select sum(rating) from forumThread where forumId=".$self->get("forumId")." and rating>0");
+        my ($sum) = WebGUI::SQL->quickArray("select sum(rating) from forumThread where forumId=".quote($self->get("forumId"))." and rating>0");
         my $average = round($sum/$count);
         $self->set({rating=>$average});
 }
@@ -492,7 +492,7 @@ sub subscribe {
         my ($self, $userId) = @_;
         $userId = $session{user}{userId} unless ($userId);
         unless ($self->isSubscribed($userId)) {
-                WebGUI::SQL->write("insert into forumSubscription (forumId, userId) values (".$self->get("forumId").",$userId)");
+                WebGUI::SQL->write("insert into forumSubscription (forumId, userId) values (".quote($self->get("forumId")).",".quote($userId).")");
         }
 }
                                                                                                                                                              
@@ -516,7 +516,7 @@ sub unsubscribe {
         my ($self, $userId) = @_;
         $userId = $session{user}{userId} unless ($userId);
         if ($self->isSubscribed($userId)) {
-                WebGUI::SQL->write("delete from forumSubscription where forumId=".$self->get("forumId")." and userId=$userId");
+                WebGUI::SQL->write("delete from forumSubscription where forumId=".quote($self->get("forumId"))." and userId=".quote($userId));
         }
 }
 

@@ -38,7 +38,7 @@ sub _submenu {
 #-------------------------------------------------------------------
 sub www_deleteReplacement {
 	return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
-	WebGUI::SQL->write("delete from replacements where replacementId=$session{form}{replacementId}");
+	WebGUI::SQL->write("delete from replacements where replacementId=".quote($session{form}{replacementId}));
 	return www_listReplacements();
 }
 

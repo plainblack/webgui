@@ -55,8 +55,11 @@ This function generates a global unique id.
 
 sub generate {
   	my($s,$us)=gettimeofday();
-  	my($v)=sprintf("%06d%10d%06d%255s",$us,$s,$$,$session{config}{defaultSiteName});
-	return Digest::MD5::md5_base64($v);
+  	my($v)=sprintf("%06d%10d%06d%255s",$us,$s,$$,$WebGUI::Session::session{config}{defaultSiteName});
+	my $id = Digest::MD5::md5_base64($v);
+	$id =~ s/\+/_/g;
+	$id =~ s/\//-/g;
+	return $id;
 }
 
 1;
