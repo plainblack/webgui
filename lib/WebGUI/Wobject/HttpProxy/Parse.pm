@@ -122,6 +122,11 @@ sub start {
       			if ($val =~ /^\?/) {   # link that starts with ?  i.e. <a href="?var=hello">
 				my @urlBase = split(/\?/, $self->{Url}); 
 				$val = URI::URL::url($urlBase[0] . $val);
+
+                        # catch internal # anchors
+                        } elsif ($val =~ /^#/){
+                                $val = URI::URL::url($val);
+                        
       			} else {
         			$val = URI::URL::url($val)->abs($self->{Url},1); # make absolute
       			}
