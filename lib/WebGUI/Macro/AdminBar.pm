@@ -12,8 +12,8 @@ package WebGUI::Macro::AdminBar;
 
 use strict qw(refs vars);
 use Tie::IxHash;
-use WebGUI::Form;
 use WebGUI::International;
+use WebGUI::Macro;
 use WebGUI::Privilege;
 use WebGUI::Session;
 use WebGUI::SQL;
@@ -23,7 +23,10 @@ use WebGUI::Utility;
 #-------------------------------------------------------------------
 sub process {
 	return "" unless ($session{var}{adminOn});
-	my (%hash2, $miscSelect, $adminSelect, $clipboardSelect, %hash, $output, $contentSelect, $r, $i, @item, $query);
+	my @param = WebGUI::Macro::getParams($_[0]);
+        my $templateId = $param[0] || 1;
+        my %var;
+	my (%hash2, %hash, $r, $i, @item, $query);
 	tie %hash, "Tie::IxHash";
 	tie %hash2, "Tie::IxHash";
   #--content adder
@@ -42,15 +45,21 @@ sub process {
 		$hash{WebGUI::URL::page('func=edit&wid=new&namespace='.$namespace)} = $w->name;;
 	}
 	%hash = sortHash(%hash);
-	%hash = (%{{WebGUI::URL::page()=>WebGUI::International::get(1)}},%hash);
-        $contentSelect = WebGUI::Form::selectList({
-		name=>"contentSelect",
-		options=>\%hash,
-		extras=>'onChange="goContent()"'
-		});
+	$var{'addcontent.label'} = WebGUI::International::get(1);
+	my @addcontent;
+	my $i = 0;
+	foreach my $key (keys %hash) {
+		push(@addcontent,{
+			'addcontent.url'=>$key,
+			'addcontent.label'=>$hash{$key},
+			'addcontent.count'=>$i
+			});
+		$i++;
+	}
+	$var{'addcontent_loop'} = \@addcontent;
   #--clipboard paster
 	%hash2 = ();
-	$hash2{WebGUI::URL::page()} = WebGUI::International::get(3);
+	$var{'clipboard.label'} = WebGUI::International::get(3);
 
 	# get pages and store in array of arrays in order to integrate with wobjects and sort by buffer date
 	if ($session{setting}{sharedClipboard} eq "1") {
@@ -92,12 +101,17 @@ sub process {
 		$hash2{ $sorted_item[$i][1] } = $sorted_item[$i][2];
 	}
 	@sorted_item = ();
-
-        $clipboardSelect = WebGUI::Form::selectList({
-		name=>"clipboardSelect",
-		options=>\%hash2,
-		extras=>'onChange="goClipboard()"'
-		});
+	my @clipboard;
+	$i = 0;
+	foreach my $key (keys %hash2) {
+		push(@clipboard,{
+			'clipboard.url'=>$key,
+			'clipboard.label'=>$hash2{$key},
+			'clipboard.count'=>$i
+			});
+		$i++;
+	}
+	$var{'clipboard_loop'} = \@clipboard;
    #--admin functions
 	%hash = ();
 	if (WebGUI::Privilege::isInGroup(3)) {
@@ -156,35 +170,22 @@ sub process {
 	);
 	%hash = sortHash(%hash);
         %hash = ( 
-		''=>WebGUI::International::get(82), 
 		WebGUI::URL::page('op=switchOffAdmin')=>WebGUI::International::get(12),
 		%hash
 	);
-	$adminSelect = WebGUI::Form::selectList({
-		name=>"adminSelect",
-		options=>\%hash,
-		extras=>'onChange="goAdmin()"'
-		});
-  #--output admin bar
-	$output = '
-	<div class="adminBar"><table class="adminBar" width="100%" cellpadding="3" cellspacing="0" border="0"><tr>
-	<script language="JavaScript" type="text/javascript">	<!--
-	function goContent(){
-		location = document.content.contentSelect.options[document.content.contentSelect.selectedIndex].value
+	$var{'admin.label'} = WebGUI::International::get(82);
+	my @admin;
+	$i = 0;
+	foreach my $key (keys %hash) {	
+		push(@admin,{
+			'admin.url'=>$key,
+			'admin.label'=>$hash{$key},
+			'admin.count'=>$i
+			});
+		$i++;
 	}
-        function goAdmin(){
-                location = document.admin.adminSelect.options[document.admin.adminSelect.selectedIndex].value
-        }
-        function goClipboard(){
-                location = document.clipboard.clipboardSelect.options[document.clipboard.clipboardSelect.selectedIndex].value
-        }
-	//-->	</script>
-	<form name="content"> <td>'.$contentSelect.'</td> </form>
-	<form name="clipboard"> <td align="center">'.$clipboardSelect.'</td> </form>
-        <form name="admin"> <td align="center">'.$adminSelect.'</td> </form> 
-	</tr></table></div>
-	';
-	return $output;
+	$var{'admin_loop'} = \@admin;
+	return WebGUI::Template::process(WebGUI::Template::get($templateId,"Macro/AdminBar"),\%var);
 }
 
 
