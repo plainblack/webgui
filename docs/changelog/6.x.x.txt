@@ -1,4 +1,5 @@
 6.5.5
+ - fix [ 1171569 ] add/edit sql report help link has wrong namespace
  - Fixed a bug in the collaboration system that caused replies to fail.
  - Fixed an inefficency in the asset system that caused a lot of extra work on
    the server when pasting.
