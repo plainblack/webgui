@@ -19,7 +19,7 @@ sub create {
 	my $forumPostId = WebGUI::SQL->setRow("forumPost","forumPostId", $data);
 	$self = WebGUI::Forum::Post->new($forumPostId);
 	if ($data->{parentId} > 0) {
-		$self->getThread->addReply($forumPostId,$self->get("dateOfPost"));
+		$self->getThread->addReply($forumPostId,$self->get("dateOfPost"),$self->get("forumPostId"));
 	}
 	return $self;
 }
@@ -81,7 +81,7 @@ sub new {
 
 sub set {
 	my ($self, $data) = @_;
-	$data->{forumPostId} = $self->get("forumPostId") unless ($data->{forumId});
+	$data->{forumPostId} = $self->get("forumPostId") unless ($data->{forumPostId});
 	WebGUI::SQL->setRow("forumPost","forumPostId",$data);
 	$self->{_properties} = $data;
 }

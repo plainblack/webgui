@@ -97,7 +97,9 @@ sub _getPostTemplateVars {
 	$var->{'post.date.label'} = WebGUI::International::get(239);
         $var->{'post.date.epoch'} = $post->get("dateOfPost");
         $var->{'post.time.value'} = _formatPostTime($post->get("dateOfPost"));
-	$var->{'post.views.value'} = $post->get("views");
+	$var->{'post.rating.value'} = $post->get("rating")+0;
+	$var->{'post.rating.label'} = WebGUI::International::get(0);
+	$var->{'post.views.value'} = $post->get("views")+0;
 	$var->{'post.views.label'} = WebGUI::International::get(514);
 	$var->{'post.status.value'} = _formatStatus($post->get("status"));
 	$var->{'post.status.label'} = WebGUI::International::get(553);
@@ -107,6 +109,7 @@ sub _getPostTemplateVars {
 	$var->{'post.user.name'} = $post->get("username");
 	$var->{'post.user.Id'} = $post->get("userId");
 	$var->{'post.user.Profile'} = _formatUserProfileURL($post->get("userId"));
+	$var->{'post.url'} = _formatThreadURL($callback,$post->get("forumPostId"));
 	$var->{'post.id'} = $post->get("forumPostId");
 	$var->{'post.reply.label'} = WebGUI::International::get(577);
 	$var->{'post.reply.url'} = _formatReplyPostURL($callback,$post->get("forumPostId"));
@@ -129,10 +132,10 @@ sub _recurseThread {
 	my ($post, $thread, $forum, $depth, $callback) = @_;
 	my @depth_loop;
 	for (my $i=0; $i<$depth; $i++) {
-		push(@depth_loop,"");
+		push(@depth_loop,{depth=>$i});
 	}
 	my @post_loop;
-	push (@post_loop, _getPostTemplateVars($post, $thread, $forum, $callback, {'indent_loop'=>\@depth_loop}));
+	push (@post_loop, _getPostTemplateVars($post, $thread, $forum, $callback, {'post.indent_loop'=>\@depth_loop}));
 	my $replies = $post->getReplies;
 	foreach my $reply (@{$replies}) {
 		@post_loop = (@post_loop,@{_recurseThread($reply, $thread, $forum, $depth+1, $callback)});
@@ -259,6 +262,10 @@ sub www_post {
 		$subject = $post->get("subject");
 		$message = $post->get("message");
 		$forum = $post->getThread->getForum;
+		$var->{'form.begin'} .= WebGUI::Form::hidden({
+			name=>"forumPostId",
+			value=>$post->get("forumPostId")
+			});
 	}
 	$var->{'contentType.label'} = WebGUI::International::get(1007);
 	$var->{'contentType.form'} = WebGUI::Form::contentType({
@@ -304,24 +311,37 @@ sub www_postSave {
 	my $threadId = $session{form}{forumThreadId};
 	my $postId = $session{form}{forumPostId};
 	my $thread;
-	if ($session{form}{parentId} > 0) {
+	my %postData = (
+		message=>$session{form}{message},
+		subject=>$session{form}{subject}
+		);
+	my %postDataNew = (
+		userId=>$session{user}{userId},
+		username=>($session{form}{visitorName} || $session{user}{alias}),
+                contentType=>$session{form}{contentType}
+		);
+	if ($session{form}{parentId} > 0) { # reply
+		%postData = (%postData, %postDataNew);
 		my $parentPost = WebGUI::Forum::Post->new($session{form}{parentId});
-		$forumId = $parentPost->getThread->get("forumId");
-		$threadId = $parentPost->get("forumThreadId");
-		return www_viewThread($callback,$postId);
+		$parentPost->getThread->subscribe($session{user}{userId}) if ($session{form}{subscribe});
+		$parentPost->getThread->lock if ($session{form}{isLocked});
+		$postData{forumThreadId} = $parentPost->getThread->get("forumThreadId");
+		$postData{parentId} = $session{form}{parentId};
+		my $post = WebGUI::Forum::Post->create(\%postData);
+		return www_viewThread($callback,$post->get("forumPostId"));
 	}
-	if ($forumId) {
+	if ($session{form}{forumPostId} > 0) { # edit
+		my $post = WebGUI::Forum::Post->new($session{form}{forumPostId});
+		$post->set(\%postData);	
+		return www_viewThread($callback,$post->get("forumPostId"));
+	}
+	if ($forumId) { # new post
+		%postData = (%postData, %postDataNew);
 		$thread = WebGUI::Forum::Thread->create({
 			forumId=>$forumId,
 			isSticky=>$session{form}{isSticky},
 			isLocked=>$session{form}{isLocked}
-			}, {
-			subject=>$session{form}{subject},
-			message=>$session{form}{message},
-			userId=>$session{user}{userId},
-			username=>($session{form}{visitorName} || $session{user}{alias}),
-			contentType=>$session{form}{contentType}
-			});
+			}, \%postData);
 		$thread->subscribe($session{user}{userId}) if ($session{form}{subscribe});
 		return viewForum($callback, $forumId);
 	}
