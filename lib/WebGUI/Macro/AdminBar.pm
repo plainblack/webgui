@@ -149,7 +149,7 @@ sub process {
 	} elsif (WebGUI::Grouping::isInGroup(11)) {
                 %hash = (
 			WebGUI::URL::page('op=listGroupsSecondary')=>WebGUI::International::get(5), 
-			WebGUI::URL::page('op=addUserSecondary')=>WebGUI::International::get(169),
+			WebGUI::URL::page('op=addUser')=>WebGUI::International::get(169),
                         %hash
                 );
         }
