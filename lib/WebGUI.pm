@@ -112,7 +112,8 @@ sub page {
 	my $configFile = shift;
 	my $useExistingSession = shift;   # used for static page generation functions where  you may generate more than one page at a time.
 	my $pageUrl = shift;
-	WebGUI::Session::open($webguiRoot,$configFile) unless ($useExistingSession);
+	my $fastcgi = shift;
+	WebGUI::Session::open($webguiRoot,$configFile,$fastcgi) unless ($useExistingSession);
 
 # JT: don't forget to do something with action 2
 	my $page = _getPageInfo($pageUrl);

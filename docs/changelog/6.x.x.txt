@@ -77,6 +77,7 @@
    original.page.url that will allow you to link to the original content from
    the shortcut.
  - bugfix [ 1016271 ]. all posts go to last forum in MB (Leendert Bottelberghs).
+ - Added FastCGI support. (Kevin Wilson)
 
 
 6.1.1

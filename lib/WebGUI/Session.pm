@@ -285,7 +285,7 @@ sub getScratch {
 
 #-------------------------------------------------------------------
 
-=head2 open ( webguiRoot [ , configFile ] )
+=head2 open ( webguiRoot, configFile [ , fastcgi ] )
 
 Opens a closed ( or new ) WebGUI session.
 
@@ -299,6 +299,10 @@ The path to the WebGUI files.
 
 The filename of the config file that WebGUI should operate from.
 
+=item fastcgi
+
+A pointer to a Fast CGI object.
+
 =back
 
 =cut
@@ -306,6 +310,7 @@ The filename of the config file that WebGUI should operate from.
 sub open {
 	my $webguiRoot = shift;
 	my $configFile = shift;
+	my $fastcgi = shift;
 	my ($key);
 	###----------------------------
 	### operating system specific things
@@ -338,7 +343,7 @@ sub open {
 	###----------------------------
 	### CGI object
 	$CGI::POST_MAX=1024 * $session{setting}{maxAttachmentSize};
-	$session{cgi} = CGI->new();
+	$session{cgi} = $fastcgi || CGI->new();
         if ($session{cgi}->cgi_error =~ /^413/) {
 		$session{http}{status} = $session{cgi}->cgi_error;
 		WebGUI::ErrorHandler::warn("File upload too big. May need to adjust Max File Size setting.");
