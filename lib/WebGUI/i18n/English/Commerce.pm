@@ -66,16 +66,16 @@ our $I18N = {
 	'help manage commerce body' => {
 		message => q|The commerce system of WebGUI is highly configurable. You can set the following properties:<br>
 <br>
-<b>Confirm checkout template</b><br>
+<b>^International("confirm checkout template","Commerce");</b><br>
 This template is shown when a user is asked to confirm his purchase. The form data for the payment gateway is also shown here.<br>
 <br>
-<b>Transaction error template	</b><br>
+<b>^International("transaction error template","Commerce");</b><br>
 This is the template that's shown if any error occurs during the payment process. This could be a declined credit card or a false cvv2 code, for instance. Also an 'error' is triggered by a fraud protection filter or some other service that requires manual interaction from the merchant.<br>
 <br>
-<b>Checkout canceled template</b><br>
+<b>^International("checkout canceled template","Commerce");</b><br>
 This is the template that the user sees when he cancels the transaction. This normally only occurs with remote-side payment gateways (like PayPal). This is because a site-side payment gateway usually uses a single step process.<br>
 <br>
-<b>Send daily report to</b>
+<b>^International("daily report email","Commerce");</b>
 Everyday the scheduler plugin that checks and updates subscriptions send a report on on the successful and failed term payments. Here you can set to which email address it should send this report.<br>
 <br>
 <h2>Payment plugins</h2>
@@ -219,20 +219,20 @@ Your password.<br>|,
 		message => q|The status codes have the following meaning:<br>
 <table border="0" cellspacing="0" cellpadding="5">
 	<tr>
-		<td valign="top" align="right"><b>OK</b></td>
+		<td valign="top" align="right"><b>^International("ok","Commerce");</b></td>
 		<td valign="top" align="left">This means that this transaction has been completed successfully. You have purchased the product.</td>
 	</tr><tr>
-		<td valign="top" align="right"><b>Pending</b></td>
+		<td valign="top" align="right"><b>^International("pending","Commerce");</b></td>
 		<td valign="top" align="left">This means that this transaction is under review. This could have a number of causes, and normally this transaction is processed within a short time.</td>
 	</tr><tr>
-		<td valign="top" align="right"><b>Transaction Error</b></td>
+		<td valign="top" align="right"><b>^International("transaction error","Commerce");</b></td>
 		<td valign="top" align="left">An unrecoverable error happened while processing the transaction.</td>
 	</tr><tr>
-		<td valign="top" align="right"><b>Connection Error</b></td>
+		<td valign="top" align="right"><b>^International("transaction error","Commerce");</b></td>
 		<td valign="top" align="left">Something went wrong with the connection to the payment gateway. The admin has been notified.</td>
 	</tr>
 </table>|,
-		lastUpdated => 1101772638,
+		lastUpdated => 1110148219,
 		context => q|A message that explains the status codes that are returned in the transaction error template.|
 	},
 
