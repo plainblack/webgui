@@ -359,7 +359,9 @@ sub group {
         $name = shift;
         $label = shift;
 	$value = shift;
-	$value = [7] if ($value eq ""); #doing long form otherwise arrayRef didn't work
+	if ($$value[0] eq "") { #doing long form otherwise arrayRef didn't work
+		$value = [7];
+	}
 	$size = shift || 1;
 	$multiple = shift;
 	$multiple = ' multiple="1" ' if ($multiple);

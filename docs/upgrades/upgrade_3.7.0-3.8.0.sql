@@ -63,7 +63,10 @@ alter table DownloadManager_file change widgetId wobjectId int not null;
 delete from International where helpId=13 and namespace='DownloadManager';
 INSERT INTO international VALUES (22,'DownloadManager','English','Proceed to add download?');
 
-
+insert into wobject (wobjectId, pageId, title, displayTitle, processMacros, description, dateAdded, addedBy, namespace, lastEdited, editedBy, templatePosition, sequenceNumber, startDate, endDate) select widgetId, pageId, title, displayTitle, processMacros, description, dateAdded, addedBy, namespace, lastEdited, editedBy, templatePosition, sequenceNumber, dateAdded, 1336444487 from widget where namespace='MessageBoard';
+delete from widget where namespace='MessageBoard';
+alter table MessageBoard change widgetId wobjectId int not null;
+alter table discussion change widgetId wobjectId int not null;
 
 
 

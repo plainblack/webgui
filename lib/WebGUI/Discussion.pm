@@ -51,7 +51,7 @@ sub duplicate {
         my ($sth, %data, $newMessageId, $oldSubId, $newSubId);
 	$oldSubId = $_[2] || 0;
 	$newSubId = $_[3] || 0;
-        $sth = WebGUI::SQL->read("select * from discussion where widgetId=$_[0] and pid=0 and subId=$oldSubId order by messageId");
+        $sth = WebGUI::SQL->read("select * from discussion where wobjectId=$_[0] and pid=0 and subId=$oldSubId order by messageId");
         while (%data = $sth->hash) {
                 $newMessageId = getNextId("messageId");
 		WebGUI::SQL->write("insert into discussion values ($newMessageId, $newMessageId, $_[1], 0, $data{userId}, ".quote($data{username}).", ".quote($data{subject}).", ".quote($data{message}).", $data{dateOfPost}, $newSubId)");
@@ -213,8 +213,8 @@ sub postReplySave {
 }
 
 #-------------------------------------------------------------------
-sub purgeWidget {
-	WebGUI::SQL->write("delete from discussion where widgetId=$_[0]",$_[1]);
+sub purge {
+	WebGUI::SQL->write("delete from discussion where wobjectId=$_[0]");
 }
 
 #-------------------------------------------------------------------
@@ -226,8 +226,8 @@ sub showMessage {
         	$html = '<table width="100%" cellpadding=3 cellspacing=1 border=0><tr><td class="tableHeader">';
         	$html .= '<b>'.WebGUI::International::get(237).'</b>'.$message{subject}.'<br>';
         	$html .= '<b>'.WebGUI::International::get(238).'</b> <a href="'.WebGUI::URL::page('op=viewProfile&uid='.$message{userId}).'">'.$message{username}.'</a><br>';
-        	$html .= "<b>".WebGUI::International::get(239)."</b> ".epochToHuman($message{dateOfPost},"%w, %c %D, %y at %H:%n%p")."<br>";
-        	$html .= "<b>".WebGUI::International::get(240)."</b> ".$message{widgetId}."-".$message{rid}."-".$message{pid}."-".$message{messageId}."<br>";
+        	$html .= "<b>".WebGUI::International::get(239)."</b> ".epochToHuman($message{dateOfPost},"%z %Z")."<br>";
+        	$html .= "<b>".WebGUI::International::get(240)."</b> ".$message{wobjectId}."-".$message{rid}."-".$message{pid}."-".$message{messageId}."<br>";
         	$html .= '</td></tr><tr><td class="tableData">';
         	$html .= $message{message};
         	$html .= '</td></tr></table>';
@@ -266,7 +266,7 @@ sub traverseReplyTree {
                 if ($session{form}{mid} eq $data[0]) {
                         $html .= ' class="highlight"';
                 }
-                $html .= '><td class="tableData">'.$depth.'<a href="'.WebGUI::URL::page('func=showMessage&mid='.$data[0].'&wid='.$session{form}{wid}.'&sid='.$session{form}{sid}).'">'.substr($data[1],0,30).'</a></td><td class="tableData"><a href="'.WebGUI::URL::page('op=viewProfile&uid='.$data[4]).'">'.$data[2].'</a></td><td class="tableData">'.epochToHuman($data[3],"%M/%D %H:%n%p").'</td></tr>';
+                $html .= '><td class="tableData">'.$depth.'<a href="'.WebGUI::URL::page('func=showMessage&mid='.$data[0].'&wid='.$session{form}{wid}.'&sid='.$session{form}{sid}).'">'.substr($data[1],0,30).'</a></td><td class="tableData"><a href="'.WebGUI::URL::page('op=viewProfile&uid='.$data[4]).'">'.$data[2].'</a></td><td class="tableData">'.epochToHuman($data[3],"%z %Z").'</td></tr>';
                 $html .= traverseReplyTree($data[0],$_[1]+1);
         }
         $sth->finish;
