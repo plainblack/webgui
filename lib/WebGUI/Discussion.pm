@@ -249,14 +249,29 @@ sub post {
 		$message{subject} = "Re: ".$message{subject} unless ($message{subject} =~ /^Re:/);
 		$session{form}{mid} = "new";
 		$f->hidden("replyTo",$session{form}{replyTo});
+		unless (WebGUI::Privilege::isInGroup(1)) {
+			unless(_isSubscribed($session{user}{userId},$message{rid})) {
+				$f->yesNo(
+					-name=>"subscribe",
+					-value=>0,
+					-label=>WebGUI::International::get(873)
+					);
+			}
+		}
        		if ($session{user}{userId} == 1) {
                		$f->text("visitorName",WebGUI::International::get(438));
         	}
 	} elsif ($session{form}{mid} eq "new") { 	# is an entirely new thread
 		$header = WebGUI::International::get(231);
-        	if ($session{user}{userId} == 1) {
+        	if (WebGUI::Privilege::isInGroup(1)) {
        	        	$f->text("visitorName",WebGUI::International::get(438));
-       		}
+       		} else {
+			$f->yesNo(
+                                -name=>"subscribe",
+                                -value=>1,
+                                -label=>WebGUI::International::get(873)
+                                );
+		}
 		$message{message} = $signature;
 	} else {					# is editing an existing message
 		$header = WebGUI::International::get(228);
@@ -329,6 +344,9 @@ sub postSave {
                                 .'&sid='.$session{form}{sid}.'&mid='.$session{form}{mid}),875);
                 }
                 $sth->finish;
+		if ($session{form}{subscribe}) {
+         	       subscribeToThread($session{user}{userId},$rid);
+        	}
 	} elsif ($session{setting}{addEditStampToPosts}) {
 		$session{form}{message} = "\n --- (Edited at ".epochToHuman(time())." by $session{user}{username}) --- \n\n"
 			.$session{form}{message};
@@ -427,7 +445,7 @@ sub showMessage {
                 	$html .= '<a href="'.WebGUI::URL::page('func=showMessage&mid='.$data[0].'&sid='.$session{form}{sid}.'&wid='.
                         	$session{form}{wid}).'">'.WebGUI::International::get(512).' &raquo;</a><br>';
         	}
-		if ($session{user}{userId} != 1) {
+		unless (WebGUI::Privilege::isInGroup(1)) {
                         if (_isSubscribed($session{user}{userId},$message{rid})) {
                                 $html .= '<a href="'.WebGUI::URL::page('func=unsubscribeFromThread&mid='.$session{form}{mid}.
                                         '&wid='.$session{form}{wid}.'&sid='.$session{form}{sid}.'&threadId='.$message{rid}).'">'
@@ -601,9 +619,10 @@ sub status {
 
 #-------------------------------------------------------------------
 sub subscribeToThread {
-        unless (_isSubscribed($session{user}{userId},$session{form}{threadId})) {
-                WebGUI::SQL->write("insert into discussionSubscription (threadId,userId) values (
-                $session{form}{threadId}, $session{user}{userId})");
+	my $userId = $_[0] || $session{user}{userId};
+	my $threadId = $_[1] || $session{form}{threadId};
+        unless (_isSubscribed($userId,$threadId)) {
+                WebGUI::SQL->write("insert into discussionSubscription (threadId,userId) values ($threadId, $userId)");
         }
         return "";
 }
