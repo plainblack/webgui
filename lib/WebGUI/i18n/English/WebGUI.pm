@@ -164,8 +164,9 @@ Returns the path to the WebGUI "extras" folder, which contains things like WebGU
 This macro allows you to set a javascript in the head section of the page. Just pass in the URL to the javascript file.
 <p>
 
-<b>&#94;LastModified; or &#94;LastModified();</b><br>
-Displays the date that the current page was last modified based upon the wobjects on the page. By default, the date is displayed based upon the user's date preferences. Optionally, it can take two parameters. The first is text to display before the date. The second is a date format string (see the D (date) macro for details.
+<b>&#94;LastModified;</b><br>
+<b>&#94;LastModified(<i>"text"</i>,<i>"date format"</i>);</b><br>
+Displays the date that the current page was last modified based upon the wobjects on the page. By default, the date is displayed based upon the user's date preferences. Optionally, it can take two parameters. The first is text to display before the date. The second is a date format string (see the date macro, &#94;D;, for details.
 <p>
 <i>Example:</i> &#94;LastModified("Updated: ","%c %D, %y");
 <p>
@@ -178,7 +179,10 @@ Displays the title of the current page.
 <B>NOTE:</b> If you begin using admin functions or the in-depth functions of any wobject, the page title will become a link that will quickly bring you back to the page.
 <p>
 
-<b>&#94;r; or &#94;r(); - Make Page Printable</b><br>
+<b>&#94;r; - Make Page Printable</b><br>
+<b>&#94;r(<i>link text</i>)</b><br>
+<b>&#94;r("",<i>custom style name</i>)</b><br>
+<b>&#94;r("",<i>custom style name</i>,<i>custom template name</i>)</b><br>
 Creates a link to alter the style from a page to make it printable.
 
 <p>
@@ -191,7 +195,7 @@ Normally, the default style to make the page printable is the "Make Page Printab
 
 <p>
 
-The third argument allows a different template be used to generate the HTML code for presenting the link and text.  The following variables are available in the template:
+The third argument allows a different template be used to generate the HTML code for presenting the link and text, by specifying the name of the template.  The following variables are available in the template:
 
 <p/>
 <b>printable.url</b><br/>
@@ -214,13 +218,13 @@ Returns the title of the root of the current page. For instance, the main root i
 This macro allows you to set a cascading style sheet in the head section of the page. Just pass in the URL to the CSS file.
 <p>
 
-<b>&#94;Spacer();</b><br>
+<b>&#94;Spacer(<i>"width"</i>,<i>"height"</i>);</b><br>
 Create a spacer in your layout. Great for creating blocks of color with divs and tables. It takes two parameters, width and height.
 <p>
 <i>Example:</i> &#94;Spacer("100","50");
 <p>
 
-<b>&#94;RawHeadTags();</b><br>
+<b>&#94;RawHeadTags(<i>"header tags"</i>);</b><br>
 This macro allows you to set some arbitrary tags in the head section of the page. Just pass in the text.
 <p>
 
@@ -230,7 +234,7 @@ The URL for your company specified in the settings by your Administrator.
 
 
 |,
-		lastUpdated => 1101775246 
+		lastUpdated => 1101885686,
 	},
 
 	'1021' => {
@@ -3047,7 +3051,7 @@ Loops come with special condition variables of their own. They are __FIRST__, __
 <b>&#94;File();</b><br/>
 &#94;File(<i>collateralFileName</i>);<BR>
 &#94;File(<i>collateralFileName</i>,<i>templateName</i>);<BR>
-This macro builds a quick link to a file in the Collateral Manager. It creates an icon for the file and outputs the files' name. Then it links them both to the file for downloading.    The following variables are available for use in the template:
+This macro builds a quick link to a file in the Collateral Manager. It creates an icon for the file and outputs the files' name. Then it links them both to the file for downloading.  The following variables are available for use in the template:
 <p/>
 <b>file.url</b><br/>
 The URL to the file.
@@ -3123,18 +3127,20 @@ Using parameters<br>
 
 
 <b>&#94;Snippet();</b><br/>
+&#94;Snippet(<i>snippet name</i>);<br/>
 This macro retrieves the contents of a snippet in the collateral management system and inserts it into the page. You can optionally specify up to 9 additional parameters that will be replace these special characters in the snippet: ^1; ^2; ^3; ^4; ^5; ^6; ^7; ^8; ^9;
 <p />
 <i>Example:</i> &#94;Snippet("flash code");
 <p />
 
 <b>&#94;Thumbnail();</b><br/>
+&#94;Thumbnail(<i>image name</i>);<br/>
 This macro retrieves the URL for the thumbnail of any image in the collateral management system.
 <p/>
 <i>Example:</i> &#94;Thumbnail("logo");
 <p/>
 |,
-		lastUpdated => 1101855785,
+		lastUpdated => 1101886126,
 	},
 
 	'736' => {
@@ -5362,12 +5368,12 @@ Start typing! Or better yet, copy the snippet from some other electronic documen
 		message => q|WebGUI macros are used to create dynamic content within otherwise static content. For instance, you may wish to show which user is logged in on every page, or you may wish to have a dynamically built menu or crumb trail. 
 <p>
 
-Macros always begin with a caret (&#94;) and follow with at least one other character and ended with a semicolon (;). Some macros can be extended/configured by taking the format of &#94;<i>x</i>("<b>config text</b>");.  When providing  multiple arguments to a macro, they should be separated by only commas:<br>
-&#94;<i>x</i>(<b>"First argument",2</b>);
+Macros always begin with a caret (&#94;) and follow with at least one other character and ended with a semicolon (;). Some macros can be extended/configured by taking the format of <b>&#94;x</b>("<i>config text</i>");.  When providing  multiple arguments to a macro, they should be separated by only commas:<br>
+<b>&#94;x</b>(<i>"First argument",2</i>);
 <p>
 
 |,
-		lastUpdated => 1094406922
+		lastUpdated => 1101885876,
 	},
 
 	'823' => {
