@@ -230,40 +230,66 @@ sub getIcon {
                 $icon .= "doc.gif";
         } elsif (isIn($extension, qw(txt log sql config conf pm cnf readme))) {
                 $icon .= "txt.gif";
-	} elsif (isIn($extension, qw(xlt csv xls))) {
+        } elsif ($extension eq "pdf") {
+                $icon .= "pdf.gif";
+	} elsif (isIn($extension, qw(xlt csv xls xla xlc xld))) {
                 $icon .= "xls.gif";
-        } elsif (isIn($extension, qw(ram mpeg mpg wav mp3 avi))) {
+        } elsif (isIn($extension, qw(zip arj cab))) {
+                $icon .= "zip.gif";
+        } elsif (isIn($extension, qw(mpeg mpg wav mp3 avi))) {
                 $icon .= "wav.gif";
         } elsif (isIn($extension, qw(html htm xml))) {
                 $icon .= "html.gif";
         } elsif (isIn($extension, qw(exe com bat pif))) {
                 $icon .= "exe.gif";
-        } elsif (isIn($extension, qw(vsd vdx))) {
-                $icon .= "vsd.gif";
-        } elsif (isIn($extension, qw(sit hqx))) {
-                $icon .= "sit.gif";
-        } elsif (isIn($extension, qw(dwg dwf dxf))) {
-                $icon .= "dwg.gif";
-        } elsif (isIn($extension, qw(indd p65))) {
-                $icon .= "indd.gif";
-        } elsif (isIn($extension, qw(tgz gz tar Z))) {
-                $icon .= "gz.gif";
-        } elsif ($extension eq "rar") {
-                $icon .= "rar.gif";
         } elsif ($extension eq "mdb") {
                 $icon .= "mdb.gif";
         } elsif ($extension eq "ppt") {
                 $icon .= "ppt.gif";
-        } elsif (isIn($extension, qw(psd eps ai))) {
+        } elsif (isIn($extension, qw(psd eps ai ps))) {
                 $icon .= "psd.gif";
         } elsif (isIn($extension, qw(tiff tif bmp psp gif jpg jpeg png))) {
                 $icon .= "psp.gif";
-        } elsif ($extension eq "zip") {
-                $icon .= "zip.gif";
-        } elsif ($extension eq "mov") {
+        } elsif (isIn($extension, qw(sxi sdd sdp sti kpr))) {
+                $icon .= "sxi.gif";
+        } elsif (isIn($extension, qw(vsd vdx))) {
+                $icon .= "vsd.gif";
+        } elsif (isIn($extension, qw(sit hqx sea))) {
+                $icon .= "sit.gif";
+        } elsif (isIn($extension, qw(dwg dwf dxf))) {
+                $icon .= "dwg.gif";
+        } elsif (isIn($extension, qw(sxw sdw sxg stw abw aw kwd rtx rtf))) {
+                $icon .= "sxw.gif";
+        } elsif (isIn($extension, qw(sxc 123 wk1 wk3 wk4 wks sdc stc as gnumeric ksp oleo sylk slk tsv tab))) {
+                $icon .= "sxc.gif";
+        } elsif (isIn($extension, qw(indd p65 mif))) {
+                $icon .= "indd.gif";
+        } elsif (isIn($extension, qw(tgz gz tar Z))) {
+                $icon .= "gz.gif";
+        } elsif ($extension eq "rpm") {
+                $icon .= "rpm.gif";
+        } elsif (isIn($extension, qw(ra ram))) {
+                $icon .= "ra.gif";
+        } elsif (isIn($extension, qw(java class jar))) {
+                $icon .= "java.gif";
+        } elsif (isIn($extension, qw(iso cif))) {
+                $icon .= "iso.gif";
+        } elsif (isIn($extension, qw(rar ace))) {
+                $icon .= "rar.gif";
+        } elsif (isIn($extension, qw(mov pic pict))) {
                 $icon .= "mov.gif";
-        } elsif ($extension eq "pdf") {
-                $icon .= "pdf.gif";
+        } elsif ($extension eq "lyx") {
+                $icon .= "lyx.gif";
+        } elsif ($extension eq "sxm") {
+                $icon .= "sxm.gif";
+        } elsif ($extension eq "sxd") {
+                $icon .= "sxd.gif";
+        } elsif ($extension eq "mrproject") {
+                $icon .= "mrproject.gif";
+        } elsif ($extension eq "css") {
+                $icon .= "css.gif";
+        } elsif ($extension eq "dia") {
+                $icon .= "dia.gif";
 	} else {
 		$icon .= "unknown.gif";
 	}
