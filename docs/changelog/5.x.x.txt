@@ -1,6 +1,8 @@
 5.5.3
  - Lowercase file extension in importCollateral.pl while determinating file
    type.
+ - Fixed a typo in the Forum Threads that caused an error upon deleting a
+   post.
 
 
 5.5.2

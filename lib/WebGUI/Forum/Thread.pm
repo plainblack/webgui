@@ -110,7 +110,7 @@ Decrements the replies counter for this thread.
 
 =cut
 
-sub deccrementReplies {
+sub decrementReplies {
         my ($self) = @_;
         WebGUI::SQL->write("update forumThread set replies=replies-1 where forumThreadId=".$self->get("forumThreadId"));
 	$self->getForum->decrementReplies;
