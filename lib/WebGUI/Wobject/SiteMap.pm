@@ -39,11 +39,11 @@ sub _traversePageTree {
                 if ($alphabetic) {
                         $orderBy = 'title';
                 } else {
-                        $orderBy = 'sequenceNumber';
+                        $orderBy = 'nestedSetLeft';
                 }
-                $sth = WebGUI::SQL->read("select urlizedTitle, menuTitle, title, pageId, synopsis from page where parentId=".quote($parent)." and hideFromNavigation = 0 order by $orderBy");
+                $sth = WebGUI::SQL->read("select urlizedTitle, menuTitle, title, pageId, synopsis, isSystem from page where parentId=".quote($parent)." and hideFromNavigation = 0 order by $orderBy");
                 while ($data = $sth->hashRef) {
-                        if (($data->{pageId}<0 || $data->{pageId}>999 || $data->{pageId}==1) && WebGUI::Page::canView($data->{pageId})) {
+                        if (!$data->{isSystem} && WebGUI::Page::canView($data->{pageId})) {
 				push(@pages,{ 
                                 	"page.indent" => $indentString,
 					"page.url" => WebGUI::URL::gateway($data->{urlizedTitle}),
