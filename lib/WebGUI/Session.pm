@@ -111,8 +111,15 @@ sub _setupSessionVars {
 		if ($vars{sessionId} ne "") {
 			$session{scratch} = WebGUI::SQL->buildHashRef("select name,value from userSessionScratch
                 		where sessionId=".quote($_[0]));
-			WebGUI::SQL->write("update userSession set lastPageView="._time().", lastIP='$ENV{REMOTE_ADDR}', 
-				expires=".(_time()+$session{setting}{sessionTimeout})." where sessionId='$_[0]'");
+			if (($session{setting}{proxiedClientAddress} eq "1") && ($ENV{HTTP_X_FORWARDED_FOR} ne "")) {
+				WebGUI::SQL->write("update userSession set lastPageView="._time().", 
+				lastIP='$ENV{HTTP_X_FORWARDED_FOR}', 
+				expires=".(_time()+$session{setting}{sessionTimeout})
+				." where sessionId='$_[0]'");
+			} else {
+				WebGUI::SQL->write("update userSession set lastPageView="._time().", lastIP='$ENV{REMOTE_ADDR}', 
+					expires=".(_time()+$session{setting}{sessionTimeout})." where sessionId='$_[0]'");
+			}
 		} else {
 			start(1,$_[0]);
                 }
@@ -409,6 +416,10 @@ sub open {
 	###----------------------------
 	### evironment variables from web server
 	$session{env} = \%ENV;
+	### check to see if client is proxied and adjust remote_addr as necessary
+	if (($session{setting}{proxiedClientAddress} eq "1") && ($ENV{HTTP_X_FORWARDED_FOR} ne "")) {
+		$session{env}{REMOTE_ADDR} = $ENV{HTTP_X_FORWARDED_FOR};
+	}
 	###----------------------------
 	### form variables
 	foreach ($session{cgi}->param) {
@@ -608,8 +619,13 @@ Session id will be generated if not specified. In almost every case you should l
 sub start {
 	my ($sessionId);
 	$sessionId = $_[1] || crypt((_time()*rand(1000)),rand(99));
-	WebGUI::SQL->write("insert into userSession values ('$sessionId', ".
-		(_time()+$session{setting}{sessionTimeout}).", "._time().", 0, '$ENV{REMOTE_ADDR}', $_[0])");
+	if (($session{setting}{proxiedClientAddress} eq "1") && ($ENV{HTTP_X_FORWARDED_FOR} ne "")) {
+		WebGUI::SQL->write("insert into userSession values ('$sessionId', ".
+			(_time()+$session{setting}{sessionTimeout}).", "._time().", 0, '$ENV{HTTP_X_FORWARDED_FOR}', $_[0])");
+	} else {
+		WebGUI::SQL->write("insert into userSession values ('$sessionId', ".
+			(_time()+$session{setting}{sessionTimeout}).", "._time().", 0, '$ENV{REMOTE_ADDR}', $_[0])");
+	}
 	setCookie("wgSession",$sessionId);
 	refreshSessionVars($sessionId);
 }

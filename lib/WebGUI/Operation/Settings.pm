@@ -155,6 +155,7 @@ sub www_editMiscSettings {
         $f->hidden("op","saveSettings");
 	$f->yesNo("sharedClipboard",WebGUI::International::get(947),$session{setting}{sharedClipboard});
 	$f->yesNo("sharedTrash",WebGUI::International::get(946),$session{setting}{sharedTrash});
+	$f->yesNo("proxiedClientAddress",WebGUI::International::get(973),$session{setting}{proxiedClientAddress});
 	$f->yesNo("preventProxyCache",WebGUI::International::get(400),$session{setting}{preventProxyCache});
 	$f->yesNo("showDebug",WebGUI::International::get(707),$session{setting}{showDebug});
 	$f->yesNo("trackPageStatistics",WebGUI::International::get(749),$session{setting}{trackPageStatistics});
