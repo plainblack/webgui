@@ -64,12 +64,11 @@ sub www_viewHelp {
 #-------------------------------------------------------------------
 sub www_viewHelpIndex {
 	return WebGUI::Privilege::insufficient() unless (WebGUI::Grouping::isInGroup(7));
-	my %helpIndex;
-	tie %helpIndex, "Tie::IxHash";
+        my @helpIndex;
 	my $i;
         my $dir = $session{config}{webguiRoot}.$session{os}{slash}."lib".$session{os}{slash}."WebGUI".$session{os}{slash}."Help";
         opendir (DIR,$dir) or WebGUI::ErrorHandler::fatal("Can't open Help directory!");
-        my @files = readdir(DIR);
+        my @files = grep { /\.pm$/} readdir(DIR);
         closedir(DIR);
         foreach my $file (@files) {
                 if ($file =~ /(.*?)\.pm$/) {
@@ -81,7 +80,8 @@ sub www_viewHelpIndex {
                                 $cmd = "\$".$cmd."::HELP";
                                 my $help = eval($cmd);
 				foreach my $key (keys %{$help}) {
-					$helpIndex{$key."_".$namespace} = WebGUI::International::get($help->{$key}{title},$namespace);
+                                        push @helpIndex, [$namespace, $key,
+                                                          WebGUI::International::get($help->{$key}{title},$namespace)];
 					$i++;
 				}
                         } else {
@@ -92,15 +92,14 @@ sub www_viewHelpIndex {
 	my $output = '<table width="100%" class="content"><tr><td valign="top">';
 	my $halfway = round($i/2);
 	$i = 0;
-	%helpIndex = sortHash(%helpIndex);
-	foreach my $key (keys %helpIndex) {
-		my ($id,$namespace) = split("_",$key);
-		my $help = _get($id,$namespace);
-		$output .= '<p><a href="'._link($id,$namespace).'">'.$helpIndex{$key}.'</a></p>';
-		$i++;
-		if ($i == $halfway) {
-			$output .= '</td><td valign="top">';
-		}	
+        @helpIndex = sort { $a->[2] <=> $b->[2] } @helpIndex;
+        foreach my $helpEntry (@helpIndex) {
+                my ($namespace, $id, $title) = @{ $helpEntry };
+                $output .= '<p><a href="'._link($id,$namespace).'">'.$title.'</a></p>';
+                $i++;
+                if ($i == $halfway) {
+                        $output .= '</td><td valign="top">';
+                }	
 	}
 	$output .= '</td></tr></table>';
 	return WebGUI::AdminConsole->new("help")->render($output);
