@@ -405,6 +405,33 @@ sub checkList {
         $self->{_data} .= $output;
 }
 
+sub codearea {
+        my ($output);
+        my ($self, @p) = @_;
+        my ($name, $label, $value, $subtext, $extras, $wrap, $rows, $columns, $uiLevel, $defaultValue) =
+                rearrange([qw(name label value subtext extras wrap rows columns uiLevel defaultValue)], @p);
+        if (_uiLevelChecksOut($uiLevel)) {
+                $output = WebGUI::Form::codearea({
+                        "name"=>$name,
+                        "value"=>$value,
+                        "wrap"=>$wrap,
+                        "columns"=>$columns,
+                        "rows"=>$rows,
+                        "extras"=>$extras,
+			defaultValue =>$defaultValue
+                        });
+                $output .= _subtext($subtext);
+        	$output = $self->_tableFormRow($label,$output);
+        } else {
+                $output = WebGUI::Form::hidden({
+                        "name"=>$name,
+                        "value"=>$value,
+			defaultValue=>$defaultValue
+                        });
+        }
+        $self->{_data} .= $output;
+}
+
 #-------------------------------------------------------------------
 
 =head2 combo ( name, options [, label, value, size, multiple, extras, subtext, uiLevel, defaultValue ] )

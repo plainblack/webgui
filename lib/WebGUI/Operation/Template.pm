@@ -124,7 +124,7 @@ sub www_editTemplate {
 		}
                 $f->hidden("tid",$session{form}{tid});
                 $f->text("name",WebGUI::International::get(528),$template{name});
-                $f->textarea(
+                $f->codearea(
 			-name=>"template",
 			-label=>WebGUI::International::get(504),
 			-value=>$template{template},

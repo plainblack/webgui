@@ -237,6 +237,15 @@ sub checkList {
 	return $output;
 }
 
+
+sub codearea {
+	my $params = shift;
+	WebGUI::Style::setScript($session{config}{extrasURL}.'/TabFix.js',{type=>"text/javascript"});
+	$params->{extras} = 'style="width: 99%; min-width: 440px; height: 400px" onkeypress="TabFix_keyPress(event.type)" onkeydown="TabFix_keyDown(event.type)"';
+	my $output = textarea($params);
+	return $output;
+}
+
 #-------------------------------------------------------------------
 
 =head2 combo ( hashRef )
@@ -426,9 +435,9 @@ sub date {
 	my $params = shift;
 	my $value = epochToSet($params->{value}||$params->{defaultValue}) unless ($params->{noDate} && $params->{value} eq '');
         my $size = $params->{size} || 10;
-	WebGUI::Style::setScript($session{config}{extrasURL}.'/calendar/calendar.js',{ language=>'javascript' });
-	WebGUI::Style::setScript($session{config}{extrasURL}.'/calendar/lang/calendar-en.js',{ language=>'javascript' });
-	WebGUI::Style::setScript($session{config}{extrasURL}.'/calendar/calendar-setup.js',{ language=>'javascript' });
+	WebGUI::Style::setScript($session{config}{extrasURL}.'/calendar/calendar.js',{ type=>'text/javascript' });
+	WebGUI::Style::setScript($session{config}{extrasURL}.'/calendar/lang/calendar-en.js',{ type=>'text/javascript' });
+	WebGUI::Style::setScript($session{config}{extrasURL}.'/calendar/calendar-setup.js',{ type=>'text/javascript' });
 	WebGUI::Style::setLink($session{config}{extrasURL}.'/calendar/calendar-win2k-1.css', { rel=>"stylesheet", type=>"text/css", media=>"all" });
 	return text({
 		name=>$params->{name},
