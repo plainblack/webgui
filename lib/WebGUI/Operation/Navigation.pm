@@ -115,7 +115,7 @@ sub www_editNavigation {
 		$config->{showUnprivilegedPages} = 0;
 		$config->{'reverse'} = 0;
 	}
-	my $output = helpIcon(79).'<h1>'.WebGUI::International::get(22, 'Navigation').'</h1>';
+	my $output = helpIcon(83).'<h1>'.WebGUI::International::get(22, 'Navigation').'</h1>';
 	tie my (%tabs) , 'Tie::IxHash';
 	%tabs = (
 		properties=>{
@@ -276,7 +276,7 @@ sub www_editNavigationSave {
 #-------------------------------------------------------------------
 sub www_listNavigation {
 	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::isInGroup(3));
-	my $output .= helpIcon(80).'<h1>'.WebGUI::International::get(34,'Navigation').'</h1>';
+	my $output .= helpIcon(84).'<h1>'.WebGUI::International::get(34,'Navigation').'</h1>';
 	my $sth = WebGUI::SQL->read("select navigationId, identifier from Navigation order by identifier");
 	my $i = 0;
 	my @row = ();
