@@ -19,6 +19,7 @@ use strict qw(vars refs);
 use WebGUI::DateTime;
 use WebGUI::Form;
 use WebGUI::International;
+use WebGUI::Privilege;
 use WebGUI::Session;
 use WebGUI::SQL;
 
