@@ -486,12 +486,12 @@ sub _htmlAreaCreateTree {
 
 #-------------------------------------------------------------------
 sub www_htmlArealistCollateral {
-	my (@parents, $output, $sth, $data, $folderId, $parent, $indent);
+	my (@parents, $sth, $data, $indent);
 	$session{form}{makePrintable}=1; $session{form}{style}=-10;	# Special style for this output
 	return "<b>Only Content Managers are allowed to use WebGUI Collateral</b>" unless (WebGUI::Privilege::isInGroup(4));
 
-	$output .= '<table border="0" cellspacing="0" cellpadding="0" width="100%">';
-	$folderId = $session{form}{fid} || 0;
+	my $output = '<table border="0" cellspacing="0" cellpadding="0" width="100%">';
+	my $folderId = $session{form}{fid} || 0;
 	my $parent = $folderId;
 	# push parent folders in array so it can be reversed
 	unshift(@parents, $parent);

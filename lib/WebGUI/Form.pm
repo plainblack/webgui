@@ -39,6 +39,7 @@ Base forms package. Eliminates some of the normal code work that goes along with
  $html = WebGUI::Form::checkList({name=>"dayOfWeek", options=>\%days});
  $html = WebGUI::Form::combo({name=>"fruit",options=>\%fruit});
  $html = WebGUI::Form::date({name=>"endDate", value=>$endDate});
+ $html = WebGUI::Form::dateTime({name=>"begin", value=>$begin});
  $html = WebGUI::Form::email({name=>"emailAddress"});
  $html = WebGUI::Form::fieldType({name=>"fieldType",types=>\%supportedTypes});
  $html = WebGUI::Form::file({name=>"image"});
@@ -60,6 +61,7 @@ Base forms package. Eliminates some of the normal code work that goes along with
  $html = WebGUI::Form::template({name=>"templateId"});
  $html = WebGUI::Form::text({name=>"firstName"});
  $html = WebGUI::Form::textarea({name=>"emailMessage"});
+ $html = WebGUI::Form::timeField({name=>"begin", value=>$begin});
  $html = WebGUI::Form::url({name=>"homepage"});
  $html = WebGUI::Form::yesNo({name=>"happy"});
  $html = WebGUI::Form::zipcode({name=>"workZip"});
@@ -289,7 +291,7 @@ By default a date is placed in the "value" field. Set this to "1" to turn off th
 =cut
 
 sub date {
-        my ($subtext, $noDate, $class, $output, $name, $label, $extras, $size, $value);
+        my ($subtext, $noDate, $class, $name, $label, $extras, $size, $value);
 	$value = epochToSet($_[0]->{value});
         $size = $_[0]->{size} || 10;
 	$value = "" if ($_[0]->{noDate});
@@ -344,7 +346,7 @@ sub dateTime {
 		value=>$_[0]->{value},
 		extras=>$_[0]->{dateExtras}
 		});
-	$output .= time({
+	$output .= timeField({
 		name=>$_[0]->{name}."_time",
 		value=>WebGUI::DateTime::getSecondsFromEpoch($_[0]->{value}),
 		extras=>$_[0]->{timeExtras}
@@ -446,8 +448,8 @@ sub fieldType {
 	foreach $type (@{$_[0]->{types}}) {
 		if ($type eq "text") {
 			$hash{text} = WebGUI::International::get(475);
-		} elsif ($type eq "time") {
-        		$hash{time} = WebGUI::International::get(971);
+		} elsif ($type eq "timeField") {
+        		$hash{timeField} = WebGUI::International::get(971);
 		} elsif ($type eq "dateTime") {
         		$hash{dateTime} = WebGUI::International::get(972);
 		} elsif ($type eq "textarea") {
@@ -1413,7 +1415,7 @@ sub textarea {
 
 #-------------------------------------------------------------------
 
-=head2 time ( hashRef )
+=head2 timeField ( hashRef )
 
 Returns a time field, 24 hour format.
 
@@ -1445,7 +1447,7 @@ The number of characters wide this form element should be. There should be no re
 
 =cut
 
-sub time {
+sub timeField {
         my $value = WebGUI::DateTime::secondsToTime($_[0]->{value});
         my $output = _javascriptFile('inputCheck.js');
 	$output .= text({

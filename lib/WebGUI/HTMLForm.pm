@@ -56,6 +56,11 @@ Package that makes HTML forms typed data and significantly reduces the code need
 	-label=>"End Date",
 	-value=>$endDate
 	);
+ $f->dateTime(
+	-name=>"endDate",
+	-label=>"End Date",
+	-value=>$endDate
+	);
  $f->email(
 	-name=>"emailAddress",
 	-label=>"Email Address"
@@ -141,6 +146,11 @@ Package that makes HTML forms typed data and significantly reduces the code need
  $f->textarea(
 	-name=>"emailMessage",
 	-label=>"Email Message"
+	);
+ $f->timeField(
+	-name=>"endDate",
+	-label=>"End Date",
+	-value=>$endDate
 	);
  $f->url(
 	-name=>"homepage",
@@ -1985,7 +1995,7 @@ sub textarea {
 
 #-------------------------------------------------------------------
 
-=head2 time ( name [ label, value, extras, subtext, size, noDate, uiLevel ] )
+=head2 timeField ( name [ label, value, extras, subtext, size, noDate, uiLevel ] )
 
 Adds a date row to this form.
 
@@ -2025,7 +2035,7 @@ The UI level for this field. See the WebGUI developer's site for details. Defaul
 
 =cut
 
-sub time {
+sub timeField {
         my ($output);
         my ($self, @p) = @_;
         my ($name, $label, $value, $extras, $subtext, $size, $uiLevel) =

@@ -278,7 +278,7 @@ sub isInGroup {
 		}
 	}
 	### Check for groups of groups.
-	my $groups = WebGUI::Grouping::getGroupsInGroup($gid,1);
+	$groups = WebGUI::Grouping::getGroupsInGroup($gid,1);
 	foreach (@{$groups}) {
 		$session{isInGroup}{$_} = isInGroup($_, $uid);
 		if ($session{isInGroup}{$_}) {

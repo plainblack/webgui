@@ -55,7 +55,7 @@ This package helps in the processing of the form variables that are returned fro
  $value = WebGUI::FormProcessor::template("templateId");
  $value = WebGUI::FormProcessor::text("firstName");
  $value = WebGUI::FormProcessor::textarea("emailMessage");
- $value = WebGUI::FormProcessor::time("wakeupCall");
+ $value = WebGUI::FormProcessor::timeField("wakeupCall");
  $value = WebGUI::FormProcessor::url("homepage");
  $value = WebGUI::FormProcessor::yesNo("happy");
  $value = WebGUI::FormProcessor::zipcode("workZip");
@@ -170,8 +170,8 @@ The name of the form variable to retrieve.
 =cut
 
 sub dateTime {
-	my $date = WebGUI::FormProcessor::date($_[0]."_date");
-	my $time = WebGUI::FormProcessor::time($_[0]."_time");
+	my $date = date($_[0]."_date");
+	my $time = timeField($_[0]."_time");
 	my $epoch = $date+$time;
 	return $epoch;
 }
@@ -193,7 +193,7 @@ The name of the form variable to retrieve.
 =cut
 
 sub email {
-	if ($session{form}{$_[0]} =~ /^[\w-\.]{1,}\@([\da-zA-Z-]{1,}\.){1,}[\da-zA-Z-]{2,3}$/i) {
+	if ($session{form}{$_[0]} =~ /^([A-Z0-9]+[._]?){1,}[A-Z0-9]+\@(([A-Z0-9]+[-]?){1,}[A-Z0-9]+\.){1,}[A-Z]{2,4}$/i) {
 		return $session{form}{$_[0]};
 	}
 	return undef;
@@ -614,7 +614,7 @@ sub textarea {
 
 #-------------------------------------------------------------------
 
-=head2 time ( name )
+=head2 timeField ( name )
 
 Returns the number of seconds since 00:00:00 on a 24 hour clock.
 
@@ -628,7 +628,7 @@ The name of the form variable to retrieve.
 
 =cut
 
-sub time {
+sub timeField {
 	return WebGUI::DateTime::timeToSeconds($session{form}{$_[0]});
 }
 
@@ -650,12 +650,11 @@ The name of the form variable to retrieve.
 =cut
 
 sub url {
-	if ($session{form}{$_[0]} =~ /^[\w-\.]{1,}\@([\da-zA-Z-]{1,}\.){1,}[\da-zA-Z-]{2,3}$/i) {
-		if ($session{form}{$_[0]} =~ /mailto:/) {
-			return $session{form}{$_[0]};
-		}
+	if ($session{form}{$_[0]} =~ /mailto:/) {
+		return $session{form}{$_[0]};
+	} elsif ($session{form}{$_[0]} =~ /^([A-Z0-9]+[._]?){1,}[A-Z0-9]+\@(([A-Z0-9]+[-]?){1,}[A-Z0-9]+\.){1,}[A-Z]{2,4}$/i) {
 		return "mailto:".$session{form}{$_[0]};
-	} elsif ($session{form}{$_[0]} =~ /:/) {
+	} elsif ($session{form}{$_[0]} =~ /:\/\//) {
 		return $session{form}{$_[0]};
 	}
 	return "http://".$session{form}{$_[0]};
