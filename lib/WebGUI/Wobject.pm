@@ -19,6 +19,7 @@ use DBI;
 use strict qw(subs vars);
 use Tie::IxHash;
 use WebGUI::DateTime;
+use WebGUI::Discussion;
 use WebGUI::FormProcessor;
 use WebGUI::HTML;
 use WebGUI::HTMLForm;
