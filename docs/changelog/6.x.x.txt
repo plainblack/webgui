@@ -33,7 +33,7 @@
    Dillon).
  - Bugfix [ 927266 ] WG 6.0.1 Data Form Issue
  - Fixed a problem where replacements weren't being applied to forum subjects.
-
+ - Fixed the edit controls on the USS.
 
 
 
