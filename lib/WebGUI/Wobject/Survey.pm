@@ -900,7 +900,7 @@ sub www_view {
 		}
 		if ($var->{'response.Id'}) {
 			$var->{'questions.soFar.count'} = $self->getQuestionResponseCount($var->{'response.Id'});
-			($var->{'questions.correct.Count'}) = WebGUI::SQL->quickArray("select count(*) from Survey_questionResponse a, Survey_answer b where a.Survey_responseId="
+			($var->{'questions.correct.count'}) = WebGUI::SQL->quickArray("select count(*) from Survey_questionResponse a, Survey_answer b where a.Survey_responseId="
 				.$var->{'response.Id'}." and a.Survey_answerId=b.Survey_answerId and b.isCorrect=1");
 			if ($var->{'questions.soFar.count'} > 0) {
 				$var->{'questions.correct.percent'} = round(($var->{'questions.correct.count'}/$var->{'questions.soFar.count'})*100)
@@ -946,7 +946,10 @@ sub www_viewGradebook {
 	$p->setDataByQuery("select userId,username,ipAddress,Survey_responseId,startDate,endDate from Survey_response 
 		where isComplete=1 and Survey_id=".$self->get("Survey_id")." order by username,ipAddress,startDate");
 	my $users = $p->getPageData;
-	($var->{'question.Count'}) = WebGUI::SQL->quickArray("select count(*) from Survey_question where Survey_id=".$self->get("Survey_id"));
+	($var->{'question.count'}) = WebGUI::SQL->quickArray("select count(*) from Survey_question where Survey_id=".$self->get("Survey_id"));
+	if ($var->{'question.count'} > $self->get("questionsPerResponse")) {
+		$var->{'question.count'} = $self->get("questionsPerResponse");
+	}
 	$var->{'response.user.label'} = WebGUI::International::get(67,$self->get("namespace"));
 	$var->{'response.count.label'} = WebGUI::International::get(52,$self->get("namespace"));
 	$var->{'response.percent.label'} = WebGUI::International::get(54,$self->get("namespace"));
@@ -960,7 +963,7 @@ sub www_viewGradebook {
 					.'&amp;responseId='.$user->{Survey_responseId}),
 			'response.user.name'=>($user->{userId} == 1) ? $user->{ipAddress} : $user->{username},
 			'response.count.correct' => $correctCount,
-			'response.percent' => round(($correctCount/$var->{'question.Count'})*100)
+			'response.percent' => round(($correctCount/$var->{'question.count'})*100)
 			});
 	}
 	$var->{response_loop} = \@responseloop;

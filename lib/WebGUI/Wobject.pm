@@ -433,7 +433,10 @@ The value of the column defined by "setName" to select a data set from.
 sub moveCollateralDown {
         my ($id, $seq, $setName, $setValue);
 	$setName = $_[4] || "wobjectId";
-	$setValue = $_[5] || $_[0]->get($setName);
+        $setValue = $_[5];
+	unless (defined $setValue) {
+		$setValue = $_[0]->get($setName);
+	}
         ($seq) = WebGUI::SQL->quickArray("select sequenceNumber from $_[1] where $_[2]=$_[3] and $setName=".quote($setValue));
         ($id) = WebGUI::SQL->quickArray("select $_[2] from $_[1] where $setName=".quote($setValue)
 		." and sequenceNumber=$seq+1");
@@ -483,7 +486,10 @@ The value of the column defined by "setName" to select a data set from.
 sub moveCollateralUp {
         my ($id, $seq, $setValue, $setName);
         $setName = $_[4] || "wobjectId";
-        $setValue = $_[5] || $_[0]->get($setName);
+        $setValue = $_[5];
+	unless (defined $setValue) {
+		$setValue = $_[0]->get($setName);
+	}
         ($seq) = WebGUI::SQL->quickArray("select sequenceNumber from $_[1] where $_[2]=$_[3] and $setName=".quote($setValue));
         ($id) = WebGUI::SQL->quickArray("select $_[2] from $_[1] where $setName=".quote($setValue)
 		." and sequenceNumber=$seq-1");

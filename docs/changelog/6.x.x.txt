@@ -27,6 +27,13 @@
  - Bugfix [ 942865 ] urlizedTitle problem. (Thanks to tr0nd).
  - Bugfix [ 940008 ] error deleting parts of a survey in 6.0.1 (Thanks to
    Andreas Sexauer.)
+ - Bugfix [ 927855 ] Grading problems using a subset of the questions with
+   Survey
+ - Bugfix [ 914798 ] Calendar displays events from wrong year (Thanks to Frank
+   Dillon).
+ - Bugfix [ 927266 ] WG 6.0.1 Data Form Issue
+
+
 
 
 6.0.1
