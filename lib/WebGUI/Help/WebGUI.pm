@@ -931,56 +931,6 @@ our $HELP = {
 			}
 		]
 	},
-	'gradebook report template' => {
-		title => '1087',
-		body => '1088',
-		related => [
-			{
-				tag => 'pagination template variables',
-				namespace => 'WebGUI'
-			},
-			{
-				tag => 'survey template',
-				namespace => 'Survey'
-			},
-			{
-				tag => 'survey template common vars',
-				namespace => 'Survey'
-			}
-		]
-	},
-	'survey response template' => {
-		title => '1089',
-		body => '1090',
-		related => [
-			{
-				tag => 'survey template common vars',
-				namespace => 'Survey'
-			},
-			{
-				tag => 'survey add/edit',
-				namespace => 'Survey'
-			}
-		]
-	},
-	'statistical overview report template' => {
-		title => '1091',
-		body => '1092',
-		related => [
-			{
-				tag => 'pagination template variables',
-				namespace => 'WebGUI'
-			},
-			{
-				tag => 'survey template common vars',
-				namespace => 'Survey'
-			},
-			{
-				tag => 'survey add/edit',
-				namespace => 'Survey'
-			}
-		]
-	},
 	'navigation add/edit' => {
 		title => '1098',
 		body => '1093',

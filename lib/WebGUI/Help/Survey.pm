@@ -8,7 +8,27 @@ our $HELP = {
 			{
 				tag => 'wobjects using',
 				namespace => 'WebGUI'
-			}
+			},
+			{
+				tag => 'survey template',
+				namespace => 'Survey'
+			},
+			{
+				tag => 'survey template common vars',
+				namespace => 'Survey'
+			},
+			{
+				tag => 'gradebook report template',
+				namespace => 'Survey'
+			},
+			{
+				tag => 'survey response template',
+				namespace => 'Survey'
+			},
+			{
+				tag => 'statistical overview report template',
+				namespace => 'Survey'
+			},
 		]
 	},
 	'survey template' => {
@@ -35,6 +55,56 @@ our $HELP = {
 		related => [
 			{
 				tag => 'survey template',
+				namespace => 'Survey'
+			}
+		]
+	},
+	'gradebook report template' => {
+		title => '1087',
+		body => '1088',
+		related => [
+			{
+				tag => 'pagination template variables',
+				namespace => 'WebGUI'
+			},
+			{
+				tag => 'survey template',
+				namespace => 'Survey'
+			},
+			{
+				tag => 'survey template common vars',
+				namespace => 'Survey'
+			}
+		]
+	},
+	'survey response template' => {
+		title => '1089',
+		body => '1090',
+		related => [
+			{
+				tag => 'survey template common vars',
+				namespace => 'Survey'
+			},
+			{
+				tag => 'survey add/edit',
+				namespace => 'Survey'
+			}
+		]
+	},
+	'statistical overview report template' => {
+		title => '1091',
+		body => '1092',
+		related => [
+			{
+				tag => 'pagination template variables',
+				namespace => 'WebGUI'
+			},
+			{
+				tag => 'survey template common vars',
+				namespace => 'Survey'
+			},
+			{
+				tag => 'survey add/edit',
 				namespace => 'Survey'
 			}
 		]
