@@ -491,7 +491,8 @@ sub _instantiate_soap {
 
          WebGUI::ErrorHandler::warn('proxy=' . $self->get('proxy'))
             if $self->get('debugMode');
-         $soap->proxy($self->get('proxy'));
+         $soap->proxy($self->get('proxy'),
+            options => {compress_threshold => 10000});
       }
    }
 
