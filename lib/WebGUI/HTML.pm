@@ -159,7 +159,6 @@ sub format {
                 }
         } elsif ($contentType eq "text") {
                 $content =~ s/\t/&nbsp;&nbsp;&nbsp;&nbsp;/g;
-                $content =~ s/ /&nbsp;/g;
                 $content =~ s/\n/\<br \/\>/g;
         } elsif ($contentType eq "code") {
                 $content =~ s/&/&amp;/g;
