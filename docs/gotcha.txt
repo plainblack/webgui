@@ -7,6 +7,12 @@ upgrading from one version to the next, or even between multiple
 versions. Be sure to heed the warnings contained herein as they will
 save you many hours of grief.
 
+3.8.0
+--------------------------------------------------------------------
+ * Widgets are being replaced with Wobjects. The Widget interface
+	will remain in WebGUI until version 5.0.0, but it is
+	depricated and use is not recommended.
+
 3.6.0
 --------------------------------------------------------------------
  * You need to get a new Perl module called HTML::Parser before you 
