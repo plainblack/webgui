@@ -269,14 +269,18 @@ sub www_editDownloadSave {
 #-------------------------------------------------------------------
 sub www_moveDownloadDown {
 	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
-	$_[0]->moveCollateralDown("FileManager_file","FileManager_fileId",$session{form}{did});
+        WebGUI::Session::setScratch($namespace.".".$_[0]->get("wobjectId").".sortDirection","-delete-");
+        WebGUI::Session::setScratch($namespace.".".$_[0]->get("wobjectId").".sort","-delete-");
+	$_[0]->moveCollateralUp("FileManager_file","FileManager_fileId",$session{form}{did});
 	return "";
 }
 
 #-------------------------------------------------------------------
 sub www_moveDownloadUp {
 	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
-	$_[0]->moveCollateralUp("FileManager_file","FileManager_fileId",$session{form}{did});
+        WebGUI::Session::setScratch($namespace.".".$_[0]->get("wobjectId").".sortDirection","-delete-");
+        WebGUI::Session::setScratch($namespace.".".$_[0]->get("wobjectId").".sort","-delete-");
+	$_[0]->moveCollateralDown("FileManager_file","FileManager_fileId",$session{form}{did});
 	return "";
 }
 
@@ -307,7 +311,7 @@ sub www_view {
 			[qw(fileTitle downloadFile alternateVersion1 alternateVersion2 briefSynopsis)]);
 		$sql .= " and ".$constraints if ($constraints ne "");
 	}
-	$sort = $session{scratch}{$namespace.".".$_[0]->get("wobjectId").".sort"} || "dateUploaded";
+	$sort = $session{scratch}{$namespace.".".$_[0]->get("wobjectId").".sort"} || "sequenceNumber";
 	$sortDirection = $session{scratch}{$namespace.".".$_[0]->get("wobjectId").".sortDirection"} || "desc";
 	$sql .= " order by $sort $sortDirection";
 	$p = WebGUI::Paginator->new($url,[],$numResults);
