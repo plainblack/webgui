@@ -15,6 +15,12 @@ save you many hours of grief.
 	respectively. Please delete imImport.pl and dmImport.pl from
 	your sbin folder.
 
+ * The upgrade files for versions below 3.0.0 and previousVersion.sql
+	have been removed from the distribution in order to make the
+	distribution smaller. If you need these files you can still
+	find them in the CVS repository at
+	http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/pbwebgui/WebGUI/docs/ 
+
 
 4.9.2
 --------------------------------------------------------------------
