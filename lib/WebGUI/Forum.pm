@@ -358,6 +358,7 @@ sub new {
 		$properties->{searchTemplateId} = $master->{searchTemplateId};
 		$properties->{notificationTemplateId} = $master->{notificationTemplateId};
 		$properties->{postFormTemplateId} = $master->{postFormTemplateId};
+		$properties->{postPreviewTemplateId} = $master->{postPreviewTemplateId};
 		$properties->{archiveAfter} = $master->{archiveAfter};
 		$properties->{allowRichEdit} = $master->{allowRichEdit};
 		$properties->{allowReplacements} = $master->{allowReplacements};
@@ -369,6 +370,8 @@ sub new {
 		$properties->{attachmentsPerPost} = $master->{attachmentsPerPost};
 		$properties->{addEditStampToPosts} = $master->{addEditStampsToPost};
 		$properties->{postsPerPage} = $master->{postsPerPage};
+		$properties->{usePreview} = $master->{usePreview};
+
 	}
 	bless {_properties=>$properties}, $class;
 }

@@ -79,6 +79,7 @@ User interface package for forums.
  $hashRef = WebGUI::Forum::UI::getPostTemplateVars($post, $thread, $forum, $caller);
  $hashRef = WebGUI::Forum::UI::getThreadTemplateVars($caller, $post);
  $arrayRef = WebGUI::Forum::UI::recurseThread($post, $thread, $forum, $depth, $caller, $postId);
+ $arrayRef = WebGUI::Forum::UI::getFlatThread($post, $thread, $forum, $caller, $postId);
 
  WebGUI::Forum::UI::notifySubscribers($post, $thread, $forum, $caller);
  WebGUI::Forum::UI::setPostApproved($caller, $post);
@@ -96,6 +97,7 @@ User interface package for forums.
  $html = WebGUI::Forum::UI::www_forumUnsubscribe($callback);
  $html = WebGUI::Forum::UI::www_nextThread($callback);
  $html = WebGUI::Forum::UI::www_post($callback);
+ $html = WebGUI::Forum::UI::www_postPreview($callback);
  $html = WebGUI::Forum::UI::www_postSave($callback);
  $html = WebGUI::Forum::UI::www_previousThread($callback);
  $html = WebGUI::Forum::UI::www_ratePost($callback);
@@ -866,6 +868,20 @@ sub forumProperties {
 		-value=>$forum->get("postFormTemplateId")
 		);
 	$f->template(
+		-name=>"postPreviewTemplateId",
+		-label=>WebGUI::International::get('Forum, Post Preview Template'),
+		-namespace=>"Forum/PostPreview",
+		-uiLevel=>5,
+		-value=>$forum->get("postPreviewTemplateId")
+		);
+        $f->yesNo(
+                -name=>"usePreview",
+                -label=>WebGUI::International::get('Forum, use preview'),
+                -value=>$forum->get("usePreview"),
+                -uiLevel=>9
+                );
+
+	$f->template(
 		-name=>"notificationTemplateId",
 		-label=>WebGUI::International::get(1035),
 		-namespace=>"Forum/Notification",
@@ -981,6 +997,7 @@ sub forumPropertiesSave {
 		searchTemplateId=>$session{form}{searchTemplateId},
 		notificationTemplateId=>$session{form}{notificationTemplateId},
 		postFormTemplateId=>$session{form}{postFormTemplateId},
+		postPreviewTemplateId=>$session{form}{postPreviewTemplateId},
 		editTimeout=>WebGUI::FormProcessor::interval("editTimeout"),
 		archiveAfter=>WebGUI::FormProcessor::interval("archiveAfter"),
 		addEditStampToPosts=>$session{form}{addEditStampToPosts},
@@ -993,7 +1010,8 @@ sub forumPropertiesSave {
 		groupToView=>$session{form}{groupToView},
 		groupToPost=>$session{form}{groupToPost},
 		moderatePosts=>$session{form}{moderatePosts},
-		groupToModerate=>$session{form}{groupToModerate}
+		groupToModerate=>$session{form}{groupToModerate},
+		usePreview=>$session{form}{usePreview}
 		);
 	my $forum;
 	if ($session{form}{forumId} eq "new") {
@@ -1035,7 +1053,10 @@ sub forumOp {
 		my $forumId = $session{form}{forumId};
 		if ($session{form}{forumPostId}) {
 			my $post = WebGUI::Forum::Post->new($session{form}{forumPostId});
-			$forumId = $post->getThread->get("forumId");
+			if($session{form}{forumPostId} ne ''){
+				$forumId = $post->getThread->get("forumId");
+			}
+
 		} elsif ($session{form}{forumThreadId}) {
 			my $thread = WebGUI::Forum::Thread->new($session{form}{forumThreadId});
 			$forumId = $thread->get("forumId");
@@ -1473,7 +1494,7 @@ sub recurseThread {
 }
 #-------------------------------------------------------------------
 
-=head2 recurseThread ( post, thread, forum, caller, currentPost )
+=head2 getFlatThread ( post, thread, forum, caller, currentPost )
 
 Returns an array reference with the template variables from all the posts in a thread in flat mode. In flat mode
 messages are ordered by submission date, so threading is not maintained.
@@ -1945,9 +1966,10 @@ sub www_post {
 			name=>'visitorName'
 			});
 	}
+	my $forumOp = ($forum->get("usePreview"))? "postPreview" : "postSave";
 	$var->{'form.begin'} .= WebGUI::Form::hidden({
 		name=>'forumOp',
-		value=>'postSave'
+		value=>$forumOp
 		});
 	$var->{'form.submit'} = WebGUI::Form::submit();
 	$var->{'subject.label'} = WebGUI::International::get(229);
@@ -1956,8 +1978,70 @@ sub www_post {
 		value=>$subject
 		});
 	$var->{'form.end'} = WebGUI::Form::formFooter();
-	return WebGUI::Template::process($forum->get("postformTemplateId"),"Forum/PostForm", $var); 
+	return WebGUI::Template::process($forum->get("postformTemplateId"),"Forum/PostForm", $var);
 }
+#-------------------------------------------------------------------
+
+=head2 www_postPreview ( caller )
+
+The web method to generate a preview of a posting.
+
+=over
+
+=item caller
+
+A hash reference containing information passed from the calling object.
+
+=back
+
+=cut
+
+sub www_postPreview {
+	my ($caller) = @_;
+
+
+	my $forumId = $session{form}{forumId};
+	my $threadId = $session{form}{forumThreadId};
+	my $postId = $session{form}{forumPostId};
+	my $subject = $session{form}{subject};
+	$subject = WebGUI::International::get(232) if ($subject eq "");
+	$subject .= ' '.WebGUI::International::get(233) if ($session{form}{message} eq "");
+	if ( $subject ne "") { # subjects could never contain anything other than text
+                $subject = WebGUI::HTML::filter(WebGUI::HTML::processReplacements($subject),"all");
+	}
+	my $newPost = WebGUI::Forum::Post->new();
+
+	$newPost->{_properties}->{message} = $session{form}{message};
+	$newPost->{_properties}->{subject} = $subject;
+	$newPost->{_properties}->{contentType} = $session{form}{contentType};
+	$newPost->{_properties}->{userId} = $session{user}{userId};
+	$newPost->{_properties}->{username} = ($session{form}{visitorName} || $session{user}{alias});
+	$newPost->{_properties}->{dateOfPost} = WebGUI::DateTime::time();
+
+
+	my $var = getPostTemplateVars($newPost, WebGUI::Forum::Thread->new($threadId), WebGUI::Forum->new($forumId), $caller);
+	$var->{'newpost.header'} = WebGUI::International::get('Forum, Preview Heading');
+
+	$var->{'form.begin'} = WebGUI::Form::formHeader({
+		action=>$caller->{callback}
+		});
+	$var->{'form.begin'} .= WebGUI::Form::hidden({name=>'forumId', value=>$forumId});
+	$var->{'form.begin'} .= WebGUI::Form::hidden({name=>'forumThreadId', value=>$threadId});
+	$var->{'form.begin'} .= WebGUI::Form::hidden({name=>'forumPostId', value=>$postId});
+	$var->{'form.begin'} .= WebGUI::Form::hidden({name=>'parentId', value=>$session{form}{parentId}});
+	$var->{'form.begin'} .= WebGUI::Form::hidden({name=>'subject', value=>$subject});
+	$var->{'form.begin'} .= WebGUI::Form::hidden({name=>'message', value=>$session{form}{message}});
+	$var->{'form.begin'} .= WebGUI::Form::hidden({name=>'contentType', value=>$session{form}{contentType}});
+	$var->{'form.begin'} .= WebGUI::Form::hidden({name=>'visitorName', value=>$session{form}{visitorName}});
+	$var->{'form.begin'} .= WebGUI::Form::hidden({name=>'subscribe', value=>$session{form}{subscribe}});
+	$var->{'form.begin'} .= WebGUI::Form::hidden({name=>'isLocked', value=>$session{form}{isLocked}});
+	$var->{'form.begin'} .= WebGUI::Form::hidden({name=>'isSticky', value=>$session{form}{isSticky}});
+	$var->{'form.begin'} .= WebGUI::Form::hidden({name=>'forumOp', value=>"postSave"});
+	$var->{'form.submit'} = WebGUI::Form::submit();
+	$var->{'form.end'} = WebGUI::Form::formFooter();
+	return WebGUI::Template::process(1,"Forum/PostPreview", $var);
+}
+
 
 #-------------------------------------------------------------------
 

@@ -7232,6 +7232,21 @@ config file.</p>
 		message => q|Threads Per Page|,
 		lastUpdated =>1092652208,
 		context => q|Field label for Edit Forum|
+	},
+	'Forum, Preview Heading' => {
+		message => q|Message Preview|,
+		lastUpdated =>1092745088,
+		context => q|Label for Forum Preview heading|
+	},
+	'Forum, Post Preview Template' => {
+		message => q|Post Preview Template|,
+		lastUpdated =>1092748557,
+		context => q|Label for Forum Settings|
+	},
+	'Forum, use preview' => {
+		message => q|Use Post Preview?|,
+		lastUpdated =>1092748557,
+		context => q|Label for Forum Settings|
 	}
 
 };
