@@ -1154,7 +1154,7 @@ sub selectList {
 				$output .= ' selected="1"';
 			}
 		}
-		$output .= ' />'.${$_[0]->{options}}{$key};
+		$output .= '>'.${$_[0]->{options}}{$key}.'</option>';
 	}
 	$output	.= '</select>'; 
 	return $output;
