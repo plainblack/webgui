@@ -4,17 +4,6 @@ use WebGUI::Session;
 
 our $HELP = {
 
-        'asset macros' => {
-		title => 'asset macros title',
-		body => 'asset macros body',
-		related => [
-			{
-				tag => 'macros using',
-				namespace => 'WebGUI'
-			},
-		]
-	},
-
 	'asset fields' => {
 		title => 'asset fields title',
 		body => 'asset fields body',
