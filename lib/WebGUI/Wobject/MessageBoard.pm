@@ -199,7 +199,7 @@ sub www_editForum {
 		my ($sth, $data, %MBoards);
 		tie %MBoards, "Tie::IxHash";
 		$MBoards{0} = WebGUI::International::get(92, $_[0]->get("namespace"));
-		$sth = WebGUI::SQL->read("SELECT wobject.wobjectId, wobject.title as wobjectTitle, page.title as pageTitle FROM wobject LEFT JOIN page using(pageId) WHERE wobject.namespace='MessageBoard' and page.pageId NOT IN (2,3,4,5) AND wobject.wobjectId!=".quote($_[0]->get("wobjectId"))." order by page.title ASC");
+		$sth = WebGUI::SQL->read("SELECT wobject.wobjectId, wobject.title as wobjectTitle, page.title as pageTitle FROM wobject LEFT JOIN page using(pageId) WHERE wobject.namespace='MessageBoard' and page.pageId NOT IN ('2','3','4','5') AND wobject.wobjectId!=".quote($_[0]->get("wobjectId"))." order by page.title ASC");
 		while ($data = $sth->hashRef){
 			$MBoards{$data->{wobjectId}} = $data->{pageTitle}." - ".$data->{wobjectTitle};
 		}
