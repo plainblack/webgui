@@ -70,7 +70,7 @@ sub _getSessionVars {
 
 #-------------------------------------------------------------------
 sub _getUserInfo {
-	my (%user, $uid, %profile);
+	my (%default, $key, %user, $uid, %profile);
 	tie %user, 'Tie::CPHash';
 	$uid = $_[0] || 1;
 	%user = WebGUI::SQL->quickHash("select * from users where userId='$uid'", $_[1]);
@@ -79,7 +79,12 @@ sub _getUserInfo {
 	}
 	%profile = WebGUI::SQL->buildHash("select userProfileField.fieldName, userProfileData.fieldData from userProfileData, userProfileField where userProfileData.fieldName=userProfileField.fieldName and userProfileData.userId=$user{userId}", $_[1]);
 	%user = (%user, %profile);
-	$user{language} = 'English' if ($user{language} eq "");
+	%default = WebGUI::SQL->buildHash("select fieldName, dataDefault from userProfileField where profileCategoryId=4", $_[1]);
+	foreach $key (keys %default) {
+		if ($user{$key} eq "") {
+			$user{$key} = eval($default{$key});
+		}
+	}
 	return \%user;
 }
 
