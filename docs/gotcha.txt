@@ -8,6 +8,19 @@ versions. Be sure to heed the warnings contained herein as they will
 save you many hours of grief.
 
 
+5.3.1
+--------------------------------------------------------------------
+ * If you downloaded and installed 5.3.0 from scratch (not an 
+	upgrade) then you've likely noticed it didn't work. The
+	create script for new installs was faulty due to a build
+	process problem. You'll need to drop the database and start
+	the install from scratch with 5.3.1.
+
+	NOTE: Users upgrading from another version to 5.3.0 or 5.3.1
+	should have no problems and can disregard this message.
+
+
+
 5.3.0
 --------------------------------------------------------------------
  * If you are not using sbin/upgrade.pl then you'll need to do all
