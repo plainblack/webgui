@@ -289,6 +289,8 @@ sub getIcon {
                 $icon .= "sxm.gif";
         } elsif ($extension eq "sxd") {
                 $icon .= "sxd.gif";
+        } elsif ($extension eq "mpp") {
+		$icon .= "mpp.png";
         } elsif ($extension eq "mrproject") {
                 $icon .= "mrproject.gif";
         } elsif ($extension eq "css") {
