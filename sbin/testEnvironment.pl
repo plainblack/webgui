@@ -10,8 +10,8 @@
 
 # Yeah if you're looking at this code you're probably thinking to
 # yourself, "What a #$@*ing mess!" That's what we think too. But
-# if you know Perl well enough to know that this sux, then you
-# probably don't need to use this script cuz you know how to
+# if you know Perl well enough to know that this sucks, then you
+# probably don't need to use this script because you know how to
 # install Perl modules and such.
 
 our $webguiRoot;
@@ -26,7 +26,7 @@ use CPAN;
 
 print "\nWebGUI is checking your system environment:\n\n";
 
-my ($os, $prereq, $dbi);
+my ($os, $prereq, $dbi, $dbDrivers);
 $prereq = 1;
 
 if ($^O =~ /Win/i) {
@@ -115,6 +115,7 @@ if (eval { require DBI }) {
 print "Avalable database drivers ................ ";
 if ($dbi) {
 	print join(", ",DBI->available_drivers);
+	$dbDrivers = join(", ",DBI->available_drivers);
 } else {
 	print "None";
 	$prereq = 0;
@@ -290,9 +291,18 @@ if ($error ne "") {
 			} elsif ($config->param('dbuser') =~ /\s$/) {
 				print "dbuser cannot end with a space.";
 				$prereq = 0;
-			} elsif ($config->param('dbuser') =~ /\s$/) {
+			} elsif ($config->param('dbpass') =~ /\s$/) {
 				print "dbpass cannot end with a space.";
 				$prereq = 0;
+                        } elsif ($config->param('extras') =~ /\s$/) {
+                                print "extras cannot end with a space.";
+                                $prereq = 0;
+                        } elsif ($config->param('uploadsPath') =~ /\s$/) {
+                                print "uploadsPath cannot end with a space.";
+                                $prereq = 0;
+                        } elsif ($config->param('uploadsURL') =~ /\s$/) {
+                                print "uploadsURL cannot end with a space.";
+                                $prereq = 0;
 			} else {
 				print "OK\n";
 			}
@@ -303,13 +313,38 @@ if ($error ne "") {
 			} else {
 
 				###################################
+				# Checking uploads folder
+				###################################
+
+				print "Uploads folder ........................... ";
+                        	if (opendir(DIR,$config->param('uploadsPath'))) {
+					print "OK\n";
+					closedir(DIR);
+				} else {
+					print "Appears to be missing!\n";
+				}
+
+                                ###################################
+                                # Checking for database driver 
+                                ###################################
+
+                                print "Database driver .......................... ";
+				my (@driver);
+				@driver = split(/:/,$config->param('dsn'));
+                                if ($dbDrivers =~ m/$driver[1]/) {
+                                        print "OK\n";
+                                } else {
+                                        print "Not installed!\n";
+                                }
+
+				###################################
 				# Checking database
 				###################################
 
 				print "Database connection ...................... ";
 				my ($dbh, $test);
 				unless (eval {$dbh = DBI->connect($config->param('dsn'),$config->param('dbuser'),$config->param('dbpass'))}) {
-					print "Can't connect with info provided. Skipping.\n";
+					print "Can't connect with info provided!\n";
 				} else {
 					print "OK\n";
 					$dbh->disconnect();
