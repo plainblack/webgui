@@ -3,17 +3,16 @@ use strict;
 
 use lib "/data/WebGUI/lib";
 
-print "Staring WebGUI ".$WebGUI::VERSION."\t\t";
+print "Starting WebGUI ".$WebGUI::VERSION."\t\t";
 $ENV{GATEWAY_INTERFACE} =~ /^CGI-Perl/ or die "GATEWAY_INTERFACE not Perl!";
 
 use Apache::Registry (); 
-use Apache::DBI ();
+#use Apache::DBI (); # Uncomment if you want to enable connection pooling. Not recommended on low memory - high traffic systems.
 use CGI (); CGI->compile(':all');
 use CGI::Carp ();
 use DBI ();
 use DBD::mysql ();
 use URI::Escape ();
-#use HTML::Parser (); # commented because it is causing problems with attachments
 use Data::Config ();
 use Date::Calc ();
 use HTML::CalendarMonthSimple ();
@@ -25,8 +24,9 @@ use Net::SMTP ();
 use File::Copy ();
 use File::Path ();
 use FileHandle ();
-#use HTML::TagFilter (); # commented because it is causing problems with attachments
 use POSIX ();
+#use HTML::Parser (); # commented because it is causing problems with attachments
+#use HTML::TagFilter (); # commented because it is causing problems with attachments
 use WebGUI ();
 
 print "[  OK  ]";
