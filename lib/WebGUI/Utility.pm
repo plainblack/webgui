@@ -274,15 +274,21 @@ sub randomizeHash {
 
 #-------------------------------------------------------------------
 
-=head2 round ( real )
+=head2 round ( float [, significantDigits ] )
 
-Returns an integer after rounding a real number.
+Returns an integer after rounding a floating point number.
 
 =over
 
-=item real
+=item float
 
 Any floating point number.
+
+=item significantDigits
+
+The number of digits to leave after the decimal point. Defaults to 0.
+
+NOTE: If you set this higher than 0 then you'll get back another floating point number rather than an integer.
 
 =back
 
