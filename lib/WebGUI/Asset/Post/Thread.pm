@@ -107,6 +107,7 @@ sub definition {
 
 sub DESTROY {
 	my $self = shift;
+	return unless defined $self;
 	$self->{_next}->DESTROY if (exists $self->{_next});
 	$self->{_previous}->DESTROY if (exists $self->{_previous});
 	$self->SUPER::DESTROY;

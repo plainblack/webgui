@@ -108,6 +108,25 @@ sub generateThumbnail {
 
 #-------------------------------------------------------------------
 
+=head2 getFiles ( )
+
+Returns an array reference of the files in this storage location.
+
+=cut
+
+sub getFiles {
+	my $self = shift;
+	my $files = $self->SUPER::getFiles;
+	my @newFiles;
+	foreach my $file (@{$files}) {
+		next if $file =~ /^thumb-/;
+		push (@newFiles,$file);
+	}
+	return \@newFiles;
+}
+
+#-------------------------------------------------------------------
+
 =head2 getThumbnailUrl ( filename ) 
 
 Returns the URL to a thumbnail for a given image.

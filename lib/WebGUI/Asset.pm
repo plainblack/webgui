@@ -1534,7 +1534,7 @@ sub hasChildren {
 		} elsif (exists $self->{_lastChild}) {
 			$self->{_hasChildren} = 1;
 		} else {
-			my ($hasChildren) = WebGUI::SQL->read("select count(*) from asset where parentId=".quote($self->getId));
+			my ($hasChildren) = WebGUI::SQL->quickArray("select count(*) from asset where parentId=".quote($self->getId));
 			$self->{_hasChildren} = $hasChildren;
 		}
 	}
@@ -1832,6 +1832,7 @@ sub processTemplate {
 	if (defined $template) {
 		return $template->process(\%vars);
 	} else {
+		WebGUI::ErrorHandler::warn("Can't instanciate template $templateId for asset ".$self->getId);
 		return "Error: Can't instanciate template ".$templateId;
 	}
 }

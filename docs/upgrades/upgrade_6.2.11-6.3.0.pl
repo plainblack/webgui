@@ -1014,12 +1014,7 @@ while (my ($id, $template, $namespace) = $sth->array) {
 	$template =~ s/back\.url/collaboration.url/ixsg;
 	$template =~ s/submissions_loop/post_loop/ixsg;
 	$template = '<a name="<tmpl_var assetId>"></a> <tmpl_if session.var.adminOn> <p><tmpl_var controls></p> </tmpl_if>'.$template;
-	my $replies = '<a name="<tmpl_var assetId>"></a> 
-<tmpl_if session.var.adminOn> 
-	<p><tmpl_var controls></p>
-</tmpl_if>
-
-
+	my $replies = '<tmpl_if user.canReply>
 <style>
 	.postBorder {
 		border: 1px solid #cccccc;
@@ -1325,7 +1320,9 @@ while (my ($id, $template, $namespace) = $sth->array) {
 			<a href="<tmpl_var subscribe.url>">[<tmpl_var subscribe.label>]</a>
 		</tmpl_if>
 	</tmpl_unless>
-</div>';
+</div>
+</tmpl_if>
+';
 	$template =~ s/<tmpl_var\s+replies>/$replies/ixsg;
 	WebGUI::SQL->write("update template set template=".quote($template).", namespace=".quote($newNamespace)." where templateId=".quote($id)." and namespace=".quote($namespace)); 
 }
@@ -1521,7 +1518,11 @@ while (my ($id, $desc) = $sth->array) {
 	WebGUI::SQL->write("update wobject set description=".quote(replaceMacros($desc))." where assetId=".quote($id));
 }
 $sth->finish;
-
+my $sth = WebGUI::SQL->read("select assetId, content from Post");
+while (my ($id, $desc) = $sth->array) {
+	WebGUI::SQL->write("update Post set content=".quote(replaceMacros($desc))." where assetId=".quote($id));
+}
+$sth->finish;
 my $sth = WebGUI::SQL->read("select assetId, snippet from snippet");
 while (my ($id, $snip) = $sth->array) {
 	WebGUI::SQL->write("update snippet set snippet=".quote(replaceMacros($snip))." where assetId=".quote($id));

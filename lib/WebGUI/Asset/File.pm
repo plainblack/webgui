@@ -99,10 +99,10 @@ sub duplicate {
 sub getBox {
 	my $self = shift;
 	my %var;
-       	$var{"attachment.icon"} = $self->getFileIcon;
+       	$var{"attachment.icon"} = $self->getFileIconUrl;
        	$var{"attachment.url"} = $self->getFileUrl;
        	$var{"attachment.name"} = $self->get("filename");
-       	$var{"attachment.size"} = $self->getStorageLocation->getSize;
+       	$var{"attachment.size"} = $self->getStorageLocation->getFileSize;
        	$var{"attachment.type"} = $self->getStorageLocation->getFileExtension;
        	return $self->processTemplate(\%var,"PBtmpl0000000000000003");
 }

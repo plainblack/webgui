@@ -341,11 +341,11 @@ sub view {
 			# these next two variables can be very inefficient, consider getting rid of them
 			my $parentsFirstChild = $parent->getFirstChild;
 			if (defined $parentsFirstChild) {
-				$pageData->{"page.isRankedFirst"} = ($asset->getId == $parentsFirstChild->getId);
+				$pageData->{"page.isRankedFirst"} = ($asset->getId eq $parentsFirstChild->getId);
 			}
 			my $parentsLastChild = $parent->getLastChild;
 			if (defined $parentsLastChild) {
-				$pageData->{"page.isRankedLast"} = ($asset->getId == $parentsLastChild->getId);
+				$pageData->{"page.isRankedLast"} = ($asset->getId eq $parentsLastChild->getId);
 			}
 		}
 		push(@{$var->{page_loop}}, $pageData);	

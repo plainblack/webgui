@@ -140,7 +140,7 @@ sub view {
 	foreach my $child (@{$children}) {
 		if (ref $child eq "WebGUI::Asset::File") {
 			$var{"attachment.box"} = $child->getBox;
-			$var{"attachment.icon"} = $child->getFileIcon;
+			$var{"attachment.icon"} = $child->getFileIconUrl;
 			$var{"attachment.url"} = $child->getFileUrl;
 			$var{"attachment.name"} = $child->get("filename");
 		} elsif (ref $child eq "WebGUI::Asset::File::Image") {
