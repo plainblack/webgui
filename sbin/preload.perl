@@ -58,7 +58,8 @@ use Tie::IxHash ();
 use WebGUI ();
 use WebGUI::Attachment ();
 use WebGUI::Authentication ();
-use WebGUI::Cache;
+use WebGUI::Cache ();
+use WebGUI::Collateral ();
 use WebGUI::DateTime ();
 #use WebGUI::Discussion (); # compile problems when this is included
 use WebGUI::ErrorHandler ();
