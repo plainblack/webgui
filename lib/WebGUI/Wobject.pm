@@ -19,7 +19,6 @@ use DBI;
 use strict qw(subs vars);
 use Tie::IxHash;
 use WebGUI::DateTime;
-use WebGUI::Discussion;
 use WebGUI::FormProcessor;
 use WebGUI::HTML;
 use WebGUI::HTMLForm;
@@ -158,74 +157,6 @@ sub description {
 
 #-------------------------------------------------------------------
 
-=head2 discussionProperties ( )
-
-Returns a formRow list of discussion properties, which may be attached to any Wobject.
-
-=cut
-
-sub discussionProperties {
-        my ($f,$editTimeout,$interval, $units, $groupToModerate,%moderationType,$moderationType);
-        %moderationType = (before=>WebGUI::International::get(567),after=>WebGUI::International::get(568));
-        $f = WebGUI::HTMLForm->new;
-        if ($_[0]->get("wobjectId") eq "new") {
-                $editTimeout = 3600;
-                $moderationType = 'after';
-        } else {
-                $editTimeout = $_[0]->get("editTimeout");
-                $moderationType = $_[0]->get("moderationType");
-        }
-	my $filterPost = $_[0]->get("filterPost") || "most";
-	$f->filterContent(
-		-name=>"filterPost",
-		-value=>$filterPost,
-		-label=>WebGUI::International::get(1,"Discussion"),
-		-uiLevel=>7
-		);
-        $groupToModerate = $_[0]->get("groupToModerate") || 4;
-        $f->group(
-		-name=>"groupToPost",
-		-label=>WebGUI::International::get(564),
-		-value=>[$_[0]->get("groupToPost")],
-		-uiLevel=>7
-		);
-	($interval, $units) = WebGUI::DateTime::secondsToInterval($editTimeout);
-        $f->interval(
-		-name=>"editTimeout",
-		-label=>WebGUI::International::get(566),
-		-intervalValue=>$interval,
-		-unitsValue=>$units,
-		-uiLevel=>7
-		);
-        if ($session{setting}{useKarma} && $session{user}{uiLevel} >= 7) {
-                $f->integer("karmaPerPost",WebGUI::International::get(541),$_[0]->get("karmaPerPost"));
-        } else {
-                $f->hidden("karmaPerPost",$_[0]->get("karmaPerPost"));
-        }
-        $f->group(
-		-name=>"groupToModerate",
-		-label=>WebGUI::International::get(565),
-		-value=>[$groupToModerate],
-		-uiLevel=>7
-		);
-        $f->selectList(
-		-name=>"moderationType",
-		-options=>\%moderationType,
-		-label=>WebGUI::International::get(569),
-		-value=>[$moderationType],
-		-uiLevel=>7
-		);
-        $f->yesNo(
-                -name=>"addEditStampToPosts",
-                -label=>WebGUI::International::get(524,"Discussion"),
-                -value=>$_[0]->get("addEditStampToPosts"),
-                -uiLevel=>9
-                );
-        return $f->printRowsOnly;
-}
-
-#-------------------------------------------------------------------
-
 =head2 displayTitle ( )
 
 Returns this instance's title if displayTitle is set to yes.
@@ -280,7 +211,6 @@ sub duplicate {
         	WebGUI::ErrorHandler::warn("Couldn't duplicate wobject ".$properties{namespace}." because: ".$@);
 	}
 	$w->set(\%properties);
-	WebGUI::Discussion::duplicate($_[0]->get("wobjectId"),$w->get("wobjectId")) unless ($_[2]);
         return $w->get("wobjectId");
 }
 
@@ -678,37 +608,12 @@ sub new {
 		bufferPrevId=>{
 			fieldType=>"hidden"
 			}, 
+		forumId=>{
+			fieldType=>"hidden"
+			},
 		allowDiscussion=>{
 			fieldType=>"yesNo",
 			defaultValue=>0
-			},
-		moderationType=>{
-			fieldType=>"selectList",
-			defaultValue=>"after"
-			},
-		groupToModerate=>{
-			fieldType=>"group",
-			defaultValue=>4
-			}, 
-		groupToPost=>{
-			fieldType=>"group",
-			defaultValue=>2
-			},
- 		karmaPerPost=>{
-			fieldType=>"integer",
-			defaultValue=>0
-			} ,
-		editTimeout=>{
-			defaultValue=>1,
-			fieldType=>"interval"
-			}, 
-		filterPost=>{
-			fieldType=>"filter",
-			defaultValue=>"javascript",
-			}, 
-		addEditStampToPosts=>{
-			fieldType=>"yesNo",
-			defaultValue=>1,
 			},
 		title=>{
 			fieldType=>"text",
@@ -845,7 +750,6 @@ sub purge {
         WebGUI::SQL->write("delete from wobject where wobjectId=".$_[0]->get("wobjectId"));
 	$node = WebGUI::Node->new($_[0]->get("wobjectId"));
 	$node->delete;
-	WebGUI::Discussion::purge($_[0]->get("wobjectId"));
 }
 
 
@@ -1075,23 +979,6 @@ sub uiLevel {
 
 #-------------------------------------------------------------------
 
-=head2 www_approvePost ( )
-
-Sets the status flag on a discussion message to "approved".
-
-=cut
-
-sub www_approvePost {
-        if (WebGUI::Privilege::isInGroup($_[0]->get("groupToModerate"))) {
-                return WebGUI::Discussion::approvePost();
-        } else {
-                return WebGUI::Privilege::insufficient();
-        }
-}
-
-
-#-------------------------------------------------------------------
-
 =head2 www_copy ( )
 
 Copies this instance to the clipboard.
@@ -1235,54 +1122,6 @@ sub www_deleteFileConfirm {
 
 #-------------------------------------------------------------------
 
-=head2 www_deleteMessage ( )
-
-Displays a message asking for confirmation to delete a message from a discussion.
-
-=cut
-
-sub www_deleteMessage {
-        if (WebGUI::Discussion::canEditMessage($_[0],$session{form}{mid})) {
-                return WebGUI::Discussion::deleteMessage();
-        } else {
-                return WebGUI::Privilege::insufficient();
-        }
-}
-
-#-------------------------------------------------------------------
-
-=head2 www_deleteMessageConfirm ( )
-
-Deletes a message from a discussion.
-
-=cut
-
-sub www_deleteMessageConfirm {
-        if (WebGUI::Discussion::canEditMessage($_[0],$session{form}{mid})) {
-                return WebGUI::Discussion::deleteMessageConfirm();
-        } else {
-                return WebGUI::Privilege::insufficient();
-        }
-}
-
-#-------------------------------------------------------------------
-
-=head2 www_denyPost ( )
-
-Sets the status flag on a discussion message to "denied".
-
-=cut
-
-sub www_denyPost {
-        if (WebGUI::Privilege::isInGroup($_[0]->get("groupToModerate"))) {
-                return WebGUI::Discussion::denyPost();
-        } else {
-                return WebGUI::Privilege::insufficient();
-        }
-}
-
-#-------------------------------------------------------------------
-
 =head2 www_edit ( [ -properties, -layout, -privileges, -helpId, -heading, -headingId ] ) 
 
 Displays the common properties of any/all wobjects. 
@@ -1342,7 +1181,7 @@ sub www_edit {
 	if ($_[0]->{_useDiscussion}) {
 		$tabs{discussion} = {
 			label=>WebGUI::International::get(892),
-			uiLevel=>7
+			uiLevel=>5
 			};
 	}
 	$f = WebGUI::TabForm->new(\%tabs);
@@ -1452,7 +1291,7 @@ sub www_edit {
                 	-value=>$_[0]->get("allowDiscussion"),
                 	-uiLevel=>5
                 	);
-		$f->getTab("discussion")->raw($_[0]->discussionProperties);
+		$f->getTab("discussion")->raw(WebGUI::Forum::UI::forumProperties($_[0]->get("forumId")));
 	}
 	my $output;
 	$output = helpIcon($helpId,$_[0]->get("namespace")) if ($helpId);
@@ -1500,25 +1339,9 @@ sub www_editSave {
 		$set{$key} = $temp if (defined $temp);
 	}
 	%set = (%set, %{$_[1]});
+	$set{forumId} = WebGUI::Forum::UI::forumPropertiesSave()  if ($_[0]->{_useDiscussion});
 	$_[0]->set(\%set);
 	return "";
-}
-
-#-------------------------------------------------------------------
-
-=head2 www_lockThread ( )
-
-Locks a discussion thread from the current message down.
-
-=cut
-
-sub www_lockThread {
-        if (WebGUI::Privilege::isInGroup($_[0]->get("groupToModerate"))) {
-                WebGUI::Discussion::lockThread();
-                return $_[0]->www_showMessage;
-        } else {
-                return WebGUI::Privilege::insufficient();
-        }
 }
 
 #-------------------------------------------------------------------
@@ -1630,120 +1453,6 @@ sub www_paste {
         } else {
                 return WebGUI::Privilege::insufficient();
         }
-}
-
-#-------------------------------------------------------------------
-
-=head2 www_post ( )
-
-Displays a discussion message post form.
-
-=cut
-
-sub www_post {
-        if (WebGUI::Privilege::isInGroup($_[0]->get("groupToPost"))) {
-                return WebGUI::Discussion::post($_[0]);
-        } else {
-                return WebGUI::Privilege::insufficient();
-        }
-}
-
-#-------------------------------------------------------------------
-
-=head2 www_post ( )
-
-Saves a message post to a discussion.
-
-=cut 
-
-sub www_postSave {
-        if (WebGUI::Privilege::isInGroup($_[0]->get("groupToPost"))) {
-                WebGUI::Discussion::postSave($_[0]);
-                return $_[0]->www_showMessage();
-        } else {
-                return WebGUI::Privilege::insufficient();
-        }
-}
-
-#-------------------------------------------------------------------
-
-=head2 www_search ( )
-
-Searches an attached discussion.
-
-=cut
-
-sub www_search {
-        return WebGUI::Discussion::search();
-}
-
-#-------------------------------------------------------------------
-
-=head2 www_showMessage ( [menuItem] )
-
-Shows a message from a discussion.
-
-=over
-
-=item menuItem
-
-You can optionally extend this method by passing in an HTML string of menu items to be added to the menu of this display.
-
-=back
-
-=cut
-
-sub www_showMessage {
-        my ($output, $defaultMid);
-        ($defaultMid) = WebGUI::SQL->quickArray("select min(messageId) from discussion where wobjectId=".$_[0]->get("wobjectId"));
-        $session{form}{mid} = $session{form}{mid} || $defaultMid || 0;
-        $output = WebGUI::Discussion::showMessage($_[1],$_[0]);
-        $output .= WebGUI::Discussion::showReplyTree($_[0]);
-        return $output;
-}
-
-#-------------------------------------------------------------------
-
-=head2 www_subscribeToThread ( )
-
-Subscribes the current user to a specified discussion thread.
-
-=cut
-
-sub www_subscribeToThread {
-	WebGUI::Discussion::subscribeToThread();
-	return $_[0]->www_showMessage();
-}
-
-
-#-------------------------------------------------------------------
-
-=head2 www_unlockThread ( )
-
-Unlocks a discussion thread from the current message on down.
-
-=cut
-
-sub www_unlockThread {
-        if (WebGUI::Privilege::isInGroup($_[0]->get("groupToModerate"))) {
-                WebGUI::Discussion::unlockThread();
-                return $_[0]->www_showMessage;
-        } else {
-                return WebGUI::Privilege::insufficient();
-        }
-}
-
-#-------------------------------------------------------------------
-
-=head2 www_subscribeToThread ( )
-
-Unsubscribes the current user from a specified discussion thread.
-
-=cut
-
-sub www_unsubscribeFromThread {
-        WebGUI::Discussion::unsubscribeFromThread();
-        return $_[0]->www_showMessage();
 }
 
 #-------------------------------------------------------------------

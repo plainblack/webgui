@@ -169,5 +169,19 @@ delete from international where languageId=1 and namespace='WebGUI' and internat
 insert into international (internationalId,languageId,namespace,message,lastUpdated,context) values (874,1,'WebGUI','Unsubscribe from thread.', 1065876868,NULL);
 delete from international where languageId=1 and namespace='WebGUI' and internationalId=873;
 insert into international (internationalId,languageId,namespace,message,lastUpdated,context) values (873,1,'WebGUI','Subscribe to thread.', 1065876827,NULL);
+alter table forum add column views int not null default 0;
+alter table forum add column replies int not null default 0;
+alter table forum add column rating int not null default 0;
+alter table wobject add column forumId int;
+delete from international where languageId=1 and namespace='WebGUI' and internationalId=567;
+delete from international where languageId=1 and namespace='WebGUI' and internationalId=568;
+delete from international where languageId=1 and namespace='WebGUI' and internationalId=569;
+update international set internationalId=1024, namespace='WebGUI' where internationalId=1 and namespace='Discussion';
+update international set internationalId=1025, namespace='WebGUI' where internationalId=524 and namespace='Discussion';
+insert into international (internationalId,languageId,namespace,message,lastUpdated,context) values (1028,1,'WebGUI','Moderate posts?', 1065966284,'Asking the admin whether they wish to moderate the posts in a discussion or just allow all posts to go out.');
+insert into international (internationalId,languageId,namespace,message,lastUpdated,context) values (1027,1,'WebGUI','Allow replacements?', 1065966244,'Asking the admin whether they wish to allow text replacements in a discussion.');
+insert into international (internationalId,languageId,namespace,message,lastUpdated,context) values (1026,1,'WebGUI','Allow rich edit?', 1065966219,'Asking the admin whether they wish to allow rich edit in a discussion.');
+update international set internationalId=1029, namespace='WebGUI' where internationalId=525 and namespace='Discussion';
+update international set internationalId=1030, namespace='WebGUI' where internationalId=526 and namespace='Discussion';
 
 

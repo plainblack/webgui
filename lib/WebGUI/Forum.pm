@@ -6,7 +6,7 @@ use WebGUI::Paginator;
 use WebGUI::Privilege;
 use WebGUI::Session;
 use WebGUI::SQL;
-
+use WebGUI::Utility;
 
 sub canPost {
         my ($self, $userId) = @_;
@@ -43,6 +43,16 @@ sub isModerator {
 	return WebGUI::Privilege::isInGroup($self->get("groupToModerate"), $userId);
 }
 
+sub incrementReplies {
+        my ($self) = @_;
+        WebGUI::SQL->write("update forum set replies=replies+1 where forumId=".$self->get("forumId"));
+}
+                                                                                                                                                             
+sub incrementViews {
+        my ($self) = @_;
+        WebGUI::SQL->write("update forum set views=views+1 where forumId=".$self->get("forumId"));
+}
+                                                                                                                                                             
 sub isSubscribed {
 	my ($self, $userId) = @_;
         $userId = $session{user}{userId} unless ($userId);
@@ -54,6 +64,15 @@ sub new {
 	my ($self, $forumId) = @_;
 	my $properties = WebGUI::SQL->getRow("forum","forumId",$forumId);
 	bless {_properties=>$properties}, $self;
+}
+
+sub recalculateRating {
+        my ($self) = @_;
+        my ($count) = WebGUI::SQL->quickArray("select count(*) from forumThread where forumId=".$self->get("forumId")." and rating>0");
+        $count = $count || 1;
+        my ($sum) = WebGUI::SQL->quickArray("select sum(rating) from forumThread where forumId=".$self->get("forumId")." and rating>0");
+        my $average = round($sum/$count);
+        $self->set({rating=>$average});
 }
 
 sub set {

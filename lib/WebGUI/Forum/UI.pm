@@ -3,6 +3,7 @@ package WebGUI::Forum::UI;
 use strict qw(vars subs);
 use WebGUI::DateTime;
 use WebGUI::Form;
+use WebGUI::FormProcessor;
 use WebGUI::Forum;
 use WebGUI::Forum::Post;
 use WebGUI::Forum::Thread;
@@ -12,67 +13,71 @@ use WebGUI::Session;
 use WebGUI::Template;
 
 
-sub _chopSubject {
-	return substr(_formatSubject($_[0]),0,30);
+sub chopSubject {
+	return substr(formatSubject($_[0]),0,30);
 }
 
-sub _formatApprovePostURL {
+sub formatApprovePostURL {
 	return WebGUI::URL::append($_[0],"forumOp=approvePost&amp;forumPostId=".$_[1]."&amp;mlog=".$session{form}{mlog});
 }
 
-sub _formatDeletePostURL {
+sub formatDeletePostURL {
 	return WebGUI::URL::append($_[0],"forumOp=deletePost&amp;forumPostId=".$_[1]);
 }
 
-sub _formatDenyPostURL {
+sub formatDenyPostURL {
 	return WebGUI::URL::append($_[0],"forumOp=denyPost&amp;forumPostId=".$_[1]."&amp;mlog=".$session{form}{mlog});
 }
 
-sub _formatEditPostURL {
+sub formatEditPostURL {
 	return WebGUI::URL::append($_[0],"forumOp=post&amp;forumPostId=".$_[1]);
 }
 
-sub _formatForumSubscribeURL {
+sub formatForumURL {
+	return WebGUI::URL::append($_[0],"forumOp=viewForum&amp;forumId=".$_[1]);
+}
+
+sub formatForumSubscribeURL {
 	return WebGUI::URL::append($_[0],"forumOp=forumSubscribe&amp;forumId=".$_[1]);
 }
 
-sub _formatForumUnsubscribeURL {
+sub formatForumUnsubscribeURL {
 	return WebGUI::URL::append($_[0],"forumOp=forumUnsubscribe&amp;forumId=".$_[1]);
 }
 
-sub _formatNextThreadURL {
+sub formatNextThreadURL {
 	return WebGUI::URL::append($_[0],"forumOp=nextThread&amp;forumThreadId=".$_[1]);
 }
 
-sub _formatNewThreadURL {
+sub formatNewThreadURL {
 	return WebGUI::URL::append($_[0],"forumOp=post&amp;forumId=".$_[1]);
 }
 
-sub _formatPostDate {
+sub formatPostDate {
 	return WebGUI::DateTime::epochToHuman($_[0],"%z");
 }
 
-sub _formatPostTime {
+sub formatPostTime {
 	return WebGUI::DateTime::epochToHuman($_[0],"%Z");
 }
 
-sub _formatPreviousThreadURL {
+sub formatPreviousThreadURL {
 	return WebGUI::URL::append($_[0],"forumOp=previousThread&amp;forumThreadId=".$_[1]);
 }
 
-sub _formatRatePostURL {
+sub formatRatePostURL {
 	return WebGUI::URL::append($_[0],"forumOp=ratePost&amp;forumPostId=".$_[1]."&amp;rating=".$_[2]);
 }
 
-sub _formatReplyPostURL {
+sub formatReplyPostURL {
 	return WebGUI::URL::append($_[0],"forumOp=post&amp;parentId=".$_[1]);
 }
 
-sub _formatSubject {
+sub formatSubject {
 	return WebGUI::HTML::filter($_[0],"all");
 }
 
-sub _formatStatus {
+sub formatStatus {
         if ($_[0] eq "approved") {
                 return WebGUI::International::get(560);
         } elsif ($_[0] eq "denied") {
@@ -82,23 +87,130 @@ sub _formatStatus {
         }
 }
 
-sub _formatThreadSubscribeURL {
+sub formatThreadSubscribeURL {
 	return WebGUI::URL::append($_[0],"forumOp=threadSubscribe&amp;forumPostId=".$_[1]);
 }
 
-sub _formatThreadUnsubscribeURL {
+sub formatThreadUnsubscribeURL {
 	return WebGUI::URL::append($_[0],"forumOp=threadUnsubscribe&amp;forumPostId=".$_[1]);
 }
 
-sub _formatThreadURL {
+sub formatThreadURL {
 	return WebGUI::URL::append($_[0],"forumOp=viewThread&amp;forumPostId=".$_[1]."#".$_[1]);
 }
 
-sub _formatUserProfileURL {
+sub formatUserProfileURL {
 	return WebGUI::URL::page("op=viewProfile&amp;uid=".$_[0]);
 }
 
-sub _getPostTemplateVars {
+sub forumProperties {
+	my ($forumId) = @_;
+	my $forum = WebGUI::Forum->new($forumId);
+        my $f = WebGUI::HTMLForm->new;
+	$f->hidden(
+		-name=>"forumId",
+		-value=>$forumId || "new"
+		);
+        my ($interval, $units) = WebGUI::DateTime::secondsToInterval(($forum->get("editTimeout") || 3600));
+        $f->interval(
+                -name=>"editTimeout",
+                -label=>WebGUI::International::get(566),
+                -intervalValue=>$interval,
+                -unitsValue=>$units,
+                -uiLevel=>9
+                );
+        $f->yesNo(
+                -name=>"addEditStampToPosts",
+                -label=>WebGUI::International::get(1025),
+                -value=>$forum->get("addEditStampToPosts"),
+                -uiLevel=>9
+                );
+	$f->yesNo(
+		-name=>"allowRichEdit",
+		-value=>$forum->get("allowRichEdit"),
+		-uiLevel=>7,
+		-label=>WebGUI::International::get(1026)
+		);
+	$f->yesNo(
+		-name=>"allowReplacements",
+		-value=>$forum->get("allowReplacements"),
+		-uiLevel=>7,
+		-label=>WebGUI::International::get(1027)
+		);
+        $f->filterContent(
+                -name=>"filterPosts",
+                -value=>$forum->get("filterPosts") || "most",
+                -label=>WebGUI::International::get(1024),
+                -uiLevel=>7
+                );
+        if ($session{setting}{useKarma}) {
+                $f->integer(
+			-name=>"karmaPerPost",
+			-label=>WebGUI::International::get(541),
+			-value=>$forum->get("karmaPerPost"),
+			-uiLevel=>7
+			);
+        } else {
+                $f->hidden(
+			-name=>"karmaPerPost",
+			-value=>$forum->get("karmaPerPost")
+			);
+        }
+        $f->group(
+                -name=>"groupToPost",
+                -label=>WebGUI::International::get(564),
+                -value=>[$forum->get("groupToPost")],
+                -uiLevel=>5
+                );
+	$f->yesNo(
+		-name=>"moderatePosts",
+		-label=>WebGUI::International::get(1028),
+		-uiLevel=>5,
+		-value=>$forum->get("moderatePosts")
+		);
+	my $groupToModerate = $forum->get("groupToModerate") || 4;
+        $f->group(
+                -name=>"groupToModerate",
+                -label=>WebGUI::International::get(565),
+                -value=>[$groupToModerate],
+                -uiLevel=>5
+                );
+        return $f->printRowsOnly;
+}
+
+sub forumPropertiesSave {
+	my %data = (
+		editTimeout=>WebGUI::FormProcessor::interval("editTimeout"),
+		addEditStampToPosts=>$session{form}{addEditStampToPosts},
+		allowRichEdit=>$session{form}{allowRichEdit},
+		allowReplacements=>$session{form}{allowReplacements},
+		filterPosts=>$session{form}{filterPosts},
+		karmaPerPost=>$session{form}{karmaPerPost},
+		groupToPost=>$session{form}{groupToPost},
+		moderatePosts=>$session{form}{moderatePosts},
+		groupToModerate=>$session{form}{groupToModerate}
+		);
+	my $forum;
+	if ($session{form}{forumId} eq "new") {
+		$forum = WebGUI::Forum->create(\%data);
+	} else {
+		$forum = WebGUI::Forum->new($session{form}{forumId});
+		$forum->set(\%data);
+	}
+	return $forum->get("forumId");
+}
+
+sub forumOp {
+        my ($callback) = @_;
+	if ($session{form}{forumOp} =~ /^[A-Za-z]+$/) {
+        	my $cmd = "www_".$session{form}{forumOp};
+        	return &$cmd($callback);
+	} else {
+		WebGUI::ErrorHandler::security("execute an invalid forum operation: ".$session{form}{forumOp});
+	}
+}
+
+sub getPostTemplateVars {
         my ($post, $thread, $forum, $callback, $var) = @_;
 	$var->{'post.subject.label'} = WebGUI::International::get(229);
         $var->{'post.subject'} = WebGUI::HTML::filter($post->get("subject"),"none");
@@ -128,15 +240,15 @@ sub _getPostTemplateVars {
                 $sth->finish;
         }
 	$var->{'user.canPost'} = $forum->canPost;
-        $var->{'post.date.value'} = _formatPostDate($post->get("dateOfPost"));
+        $var->{'post.date.value'} = formatPostDate($post->get("dateOfPost"));
 	$var->{'post.date.label'} = WebGUI::International::get(245);
         $var->{'post.date.epoch'} = $post->get("dateOfPost");
-        $var->{'post.time.value'} = _formatPostTime($post->get("dateOfPost"));
+        $var->{'post.time.value'} = formatPostTime($post->get("dateOfPost"));
 	$var->{'post.rating.value'} = $post->get("rating")+0;
 	$var->{'post.rating.label'} = WebGUI::International::get(1020);
 	$var->{'post.views.value'} = $post->get("views")+0;
 	$var->{'post.views.label'} = WebGUI::International::get(514);
-	$var->{'post.status.value'} = _formatStatus($post->get("status"));
+	$var->{'post.status.value'} = formatStatus($post->get("status"));
 	$var->{'post.status.label'} = WebGUI::International::get(553);
 	$var->{'post.isLocked'} = $thread->isLocked;
 	$var->{'post.isModerator'} = $forum->isModerator;
@@ -145,53 +257,28 @@ sub _getPostTemplateVars {
 	$var->{'post.user.label'} = WebGUI::International::get(244);
 	$var->{'post.user.name'} = $post->get("username");
 	$var->{'post.user.Id'} = $post->get("userId");
-	$var->{'post.user.Profile'} = _formatUserProfileURL($post->get("userId"));
-	$var->{'post.url'} = _formatThreadURL($callback,$post->get("forumPostId"));
+	$var->{'post.user.Profile'} = formatUserProfileURL($post->get("userId"));
+	$var->{'post.url'} = formatThreadURL($callback,$post->get("forumPostId"));
 	$var->{'post.id'} = $post->get("forumPostId");
 	$var->{'post.rate.label'} = WebGUI::International::get(1021);
-	$var->{'post.rate.url.1'} = _formatRatePostURL($callback,$post->get("forumPostId"),1);
-	$var->{'post.rate.url.2'} = _formatRatePostURL($callback,$post->get("forumPostId"),2);
-	$var->{'post.rate.url.3'} = _formatRatePostURL($callback,$post->get("forumPostId"),3);
-	$var->{'post.rate.url.4'} = _formatRatePostURL($callback,$post->get("forumPostId"),4);
-	$var->{'post.rate.url.5'} = _formatRatePostURL($callback,$post->get("forumPostId"),5);
+	$var->{'post.rate.url.1'} = formatRatePostURL($callback,$post->get("forumPostId"),1);
+	$var->{'post.rate.url.2'} = formatRatePostURL($callback,$post->get("forumPostId"),2);
+	$var->{'post.rate.url.3'} = formatRatePostURL($callback,$post->get("forumPostId"),3);
+	$var->{'post.rate.url.4'} = formatRatePostURL($callback,$post->get("forumPostId"),4);
+	$var->{'post.rate.url.5'} = formatRatePostURL($callback,$post->get("forumPostId"),5);
 	$var->{'post.hasRated'} = $post->hasRated;
 	$var->{'post.reply.label'} = WebGUI::International::get(577);
-	$var->{'post.reply.url'} = _formatReplyPostURL($callback,$post->get("forumPostId"));
+	$var->{'post.reply.url'} = formatReplyPostURL($callback,$post->get("forumPostId"));
 	$var->{'post.edit.label'} = WebGUI::International::get(575);
-	$var->{'post.edit.url'} = _formatEditPostURL($callback,$post->get("forumPostId"));
+	$var->{'post.edit.url'} = formatEditPostURL($callback,$post->get("forumPostId"));
 	$var->{'post.delete.label'} = WebGUI::International::get(576);
-	$var->{'post.delete.url'} = _formatDeletePostURL($callback,$post->get("forumPostId"));
+	$var->{'post.delete.url'} = formatDeletePostURL($callback,$post->get("forumPostId"));
 	$var->{'post.approve.label'} = WebGUI::International::get(572);
-	$var->{'post.approve.url'} = _formatApprovePostURL($callback,$post->get("forumPostId"));
+	$var->{'post.approve.url'} = formatApprovePostURL($callback,$post->get("forumPostId"));
 	$var->{'post.deny.label'} = WebGUI::International::get(574);
-	$var->{'post.deny.url'} = _formatDenyPostURL($callback,$post->get("forumPostId"));
+	$var->{'post.deny.url'} = formatDenyPostURL($callback,$post->get("forumPostId"));
 	$var->{'post.full'} = WebGUI::Template::process(WebGUI::Template::get(1,"Forum/Post"), $var); 
 	return $var;
-}
-
-sub _recurseThread {
-	my ($post, $thread, $forum, $depth, $callback, $currentPost) = @_;
-	my @depth_loop;
-	for (my $i=0; $i<$depth; $i++) {
-		push(@depth_loop,{depth=>$i});
-	}
-	my @post_loop;
-	push (@post_loop, _getPostTemplateVars($post, $thread, $forum, $callback, {
-		'post.indent_loop'=>\@depth_loop,
-		'post.indent.depth'=>$depth,
-		'post.isCurrent'=>($currentPost == $post->get("forumPostId"))
-		}));
-	my $replies = $post->getReplies;
-	foreach my $reply (@{$replies}) {
-		@post_loop = (@post_loop,@{_recurseThread($reply, $thread, $forum, $depth+1, $callback, $currentPost)});
-	}	
-	return \@post_loop;
-}
-
-sub forumOp {
-	my ($callback) = @_;
-	my $cmd = "www_".$session{form}{forumOp};
-        return &$cmd($callback);
 }
 
 sub notifySubscribers {
@@ -210,7 +297,7 @@ sub notifySubscribers {
 	my $var = {
 		'notify.subscription.message' => WebGUI::International::get(875)
 		};
-	$var = _getPostTemplateVars($post, $thread, $forum, $callback, $var);
+	$var = getPostTemplateVars($post, $thread, $forum, $callback, $var);
 	my $subject = WebGUI::International::get(523);
        	my $message = WebGUI::Template::process(WebGUI::Template::get(1,"Forum/Notification"), $var);
 	foreach my $userId (keys %subscribers) {
@@ -218,80 +305,25 @@ sub notifySubscribers {
 	}
 }
 
-sub viewForum {
-	my ($callback, $forumId) = @_;
-	my (%var, @thread_loop);
-	my $forum = WebGUI::Forum->new($forumId);
-	$var{'user.isVisitor'} = ($session{user}{userId} == 1);
-	$var{'thread.new.url'} = _formatNewThreadURL($callback,$forumId);
-	$var{'thread.new.label'} = WebGUI::International::get(1018);
-	$var{'forum.subscribe.label'} = WebGUI::International::get(1022);
-	$var{'forum.subscribe.url'} = _formatForumSubscribeURL($callback,$forumId);
-	$var{'forum.unsubscribe.label'} = WebGUI::International::get(1023);
-	$var{'forum.unsubscribe.url'} = _formatForumUnsubscribeURL($callback,$forumId);
-	$var{'user.isSubscribed'} = $forum->isSubscribed;
-	$var{'user.canPost'} = $forum->canPost;
-	$var{'thread.subject.label'} = WebGUI::International::get(229);
-	$var{'thread.date.label'} = WebGUI::International::get(245);
-	$var{'thread.user.label'} = WebGUI::International::get(244);
-	$var{"thread.views.label"} = WebGUI::International::get(514);
-        $var{"thread.replies.label"} = WebGUI::International::get(1016);
-	$var{'thread.rating.label'} = WebGUI::International::get(1020);
-        $var{"thread.last.label"} = WebGUI::International::get(1017);
-	my $p = WebGUI::Paginator->new($callback);
-	$p->setDataByQuery("select * from forumThread where forumId=".$forumId." order by isSticky desc, lastPostDate desc");
-	$var{firstPage} = $p->getFirstPageLink;
-        $var{lastPage} = $p->getLastPageLink;
-        $var{nextPage} = $p->getNextPageLink;
-        $var{pageList} = $p->getPageLinks;
-        $var{previousPage} = $p->getPreviousPageLink;
-        $var{multiplePages} = ($p->getNumberOfPages > 1);
-	my $threads = $p->getPageData;
-	foreach my $thread (@$threads) {
-		my $root = WebGUI::Forum::Post->new($thread->{rootPostId});
-		my $last;
-		if ($thread->{rootPostId} == $thread->{lastPostId}) { #saves the lookup if it's the same id
-			$last = $root;
-		} else {
-			$last = WebGUI::Forum::Post->new($thread->{lastPostId});
-		}
-		my @rating_loop;
-		for (my $i=0;$i<=$thread->{rating};$i++) {
-			push(@rating_loop,{'thread.rating_loop.count'=>$i});
-		}
-		push(@thread_loop,{
-			'thread.views'=>$thread->{views},
-			'thread.replies'=>$thread->{replies},
-			'thread.rating'=>$thread->{rating},
-			'thread.rating_loop'=>\@rating_loop,
-			'thread.isSticky'=>$thread->{isSticky},
-			'thread.isLocked'=>$thread->{isLocked},
-			'thread.root.subject'=>_chopSubject($root->get("subject")),
-			'thread.root.url'=>_formatThreadURL($callback,$root->get("forumPostId")),
-			'thread.root.epoch'=>$root->get("dateOfPost"),
-			'thread.root.date'=>_formatPostDate($root->get("dateOfPost")),
-			'thread.root.time'=>_formatPostTime($root->get("dateOfPost")),
-			'thread.root.user.profile'=>_formatUserProfileURL($root->get("userId")),
-			'thread.root.user.name'=>$root->get("username"),
-			'thread.root.user.id'=>$root->get("userId"),
-			'thread.root.user.isVisitor'=>($root->get("userId") == 1),
-			'thread.root.status'=>_formatStatus($root->get("status")),
-			'thread.last.subject'=>_chopSubject($last->get("subject")),
-			'thread.last.url'=>_formatThreadURL($callback,$last->get("forumPostId")),
-			'thread.last.epoch'=>$last->get("dateOfPost"),
-			'thread.last.date'=>_formatPostDate($last->get("dateOfPost")),
-			'thread.last.time'=>_formatPostTime($last->get("dateOfPost")),
-			'thread.last.user.profile'=>_formatUserProfileURL($last->get("userId")),
-			'thread.last.user.name'=>$last->get("username"),
-			'thread.last.user.id'=>$last->get("userId"),
-			'thread.last.user.isVisitor'=>($root->get("userId") == 1),
-			'thread.last.status'=>_formatStatus($last->get("status"))
-			});
-	}
-	$var{thread_loop} = \@thread_loop;
-	return WebGUI::Template::process(WebGUI::Template::get(1,"Forum"), \%var); 
-}	
-
+sub recurseThread {
+        my ($post, $thread, $forum, $depth, $callback, $currentPost) = @_;
+        my @depth_loop;
+        for (my $i=0; $i<$depth; $i++) {
+                push(@depth_loop,{depth=>$i});
+        }
+        my @post_loop;
+        push (@post_loop, getPostTemplateVars($post, $thread, $forum, $callback, {
+                'post.indent_loop'=>\@depth_loop,
+                'post.indent.depth'=>$depth,
+                'post.isCurrent'=>($currentPost == $post->get("forumPostId"))
+                }));
+        my $replies = $post->getReplies;
+        foreach my $reply (@{$replies}) {
+                @post_loop = (@post_loop,@{recurseThread($reply, $thread, $forum, $depth+1, $callback, $currentPost)});
+        }
+        return \@post_loop;
+}
+                                                                                                                                                             
 sub www_approvePost {
 	my ($callback) = @_;
 	my $post = WebGUI::Forum::Post->new($session{form}{forumPostId});
@@ -317,7 +349,7 @@ sub www_deletePostConfirm {
 	my $post = WebGUI::Forum::Post->new($session{form}{forumPostId});
 	return WebGUI::Privilege::insufficient() unless ($post->getThread->getForum->isModerator);
 	$post->setStatusDeleted;
-       	return viewForum($callback,$post->getThread->get("forumId"));
+       	return www_viewForum($callback,$post->getThread->get("forumId"));
 }
 
 sub www_denyPost {
@@ -333,7 +365,7 @@ sub www_forumSubscribe {
 	my $forum = WebGUI::Forum->new($session{form}{forumId});
 	return WebGUI::Privilege::insufficient() unless ($forum->canPost && $session{user}{userId} != 1);
 	$forum->subscribe;
-	return viewForum($callback, $session{form}{forumId});
+	return www_viewForum($callback, $session{form}{forumId});
 }
 
 sub www_forumUnsubscribe {
@@ -341,7 +373,7 @@ sub www_forumUnsubscribe {
 	my $forum = WebGUI::Forum->new($session{form}{forumId});
 	return WebGUI::Privilege::insufficient() unless ($session{user}{userId} != 1);
 	$forum->unsubscribe;
-	return viewForum($callback, $session{form}{forumId});
+	return www_viewForum($callback, $session{form}{forumId});
 }
 
 sub www_nextThread {
@@ -351,7 +383,7 @@ sub www_nextThread {
 	if (defined $nextThreadRoot) {
 		return www_viewThread($callback,$nextThreadRoot);
 	} else {
-		return viewForum($callback,$thread->get("forumId"));
+		return www_viewForum($callback,$thread->get("forumId"));
 	}
 }
 
@@ -378,7 +410,7 @@ sub www_post {
 			value=>$reply->get("forumPostId")
 			});
 		$forum = $reply->getThread->getForum;
-		$var = _getPostTemplateVars($reply, $reply->getThread, $forum, $callback, $var);
+		$var = getPostTemplateVars($reply, $reply->getThread, $forum, $callback, $var);
 
 		$subject = $reply->get("subject");
 		$subject = "Re: ".$subject unless ($subject =~ /^Re:/);
@@ -493,6 +525,11 @@ sub www_postSave {
 	if ($session{form}{forumPostId} > 0) { # edit
 		my $post = WebGUI::Forum::Post->new($session{form}{forumPostId});
 		return WebGUI::Privilege::insufficient unless ($post->getThread->getForum->canPost);
+		if ($post->getThread->getForum->get("addEditStampToPosts")) {
+			$postData{message} .= "\n\n --- (".WebGUI::International::get(1029)." "
+                        .WebGUI::DateTime::epochToHuman(WebGUI::DateTime::time())." ".WebGUI::International::get(1030)
+                        ." $session{user}{username}) --- \n";
+		}
 		$post->set(\%postData);	
 		return www_viewThread($callback,$post->get("forumPostId"));
 	}
@@ -506,7 +543,7 @@ sub www_postSave {
 			isLocked=>$session{form}{isLocked}
 			}, \%postData);
 		$thread->subscribe($session{user}{userId}) if ($session{form}{subscribe});
-		return viewForum($callback, $forumId);
+		return www_viewForum($callback, $forumId);
 	}
 }
 
@@ -517,7 +554,7 @@ sub www_previousThread {
 	if (defined $previousThreadRoot) {
 		return www_viewThread($callback,$previousThreadRoot);
 	} else {
-		return viewForum($callback,$thread->get("forumId"));
+		return www_viewForum($callback,$thread->get("forumId"));
 	}
 }
 
@@ -545,6 +582,81 @@ sub www_threadUnsubscribe {
 	return www_viewThread($callback, $session{form}{forumPostId});
 }
 
+sub www_viewForum {
+	my ($callback, $forumId) = @_;
+	$forumId = $session{form}{forumId} unless ($forumId);
+	my (%var, @thread_loop);
+	my $forum = WebGUI::Forum->new($forumId);
+	$var{'user.isVisitor'} = ($session{user}{userId} == 1);
+	$var{'thread.new.url'} = formatNewThreadURL($callback,$forumId);
+	$var{'thread.new.label'} = WebGUI::International::get(1018);
+	$var{'forum.subscribe.label'} = WebGUI::International::get(1022);
+	$var{'forum.subscribe.url'} = formatForumSubscribeURL($callback,$forumId);
+	$var{'forum.unsubscribe.label'} = WebGUI::International::get(1023);
+	$var{'forum.unsubscribe.url'} = formatForumUnsubscribeURL($callback,$forumId);
+	$var{'user.isSubscribed'} = $forum->isSubscribed;
+	$var{'user.canPost'} = $forum->canPost;
+	$var{'thread.subject.label'} = WebGUI::International::get(229);
+	$var{'thread.date.label'} = WebGUI::International::get(245);
+	$var{'thread.user.label'} = WebGUI::International::get(244);
+	$var{"thread.views.label"} = WebGUI::International::get(514);
+        $var{"thread.replies.label"} = WebGUI::International::get(1016);
+	$var{'thread.rating.label'} = WebGUI::International::get(1020);
+        $var{"thread.last.label"} = WebGUI::International::get(1017);
+	my $p = WebGUI::Paginator->new($callback);
+	$p->setDataByQuery("select * from forumThread where forumId=".$forumId." order by isSticky desc, lastPostDate desc");
+	$var{firstPage} = $p->getFirstPageLink;
+        $var{lastPage} = $p->getLastPageLink;
+        $var{nextPage} = $p->getNextPageLink;
+        $var{pageList} = $p->getPageLinks;
+        $var{previousPage} = $p->getPreviousPageLink;
+        $var{multiplePages} = ($p->getNumberOfPages > 1);
+	my $threads = $p->getPageData;
+	foreach my $thread (@$threads) {
+		my $root = WebGUI::Forum::Post->new($thread->{rootPostId});
+		my $last;
+		if ($thread->{rootPostId} == $thread->{lastPostId}) { #saves the lookup if it's the same id
+			$last = $root;
+		} else {
+			$last = WebGUI::Forum::Post->new($thread->{lastPostId});
+		}
+		my @rating_loop;
+		for (my $i=0;$i<=$thread->{rating};$i++) {
+			push(@rating_loop,{'thread.rating_loop.count'=>$i});
+		}
+		push(@thread_loop,{
+			'thread.views'=>$thread->{views},
+			'thread.replies'=>$thread->{replies},
+			'thread.rating'=>$thread->{rating},
+			'thread.rating_loop'=>\@rating_loop,
+			'thread.isSticky'=>$thread->{isSticky},
+			'thread.isLocked'=>$thread->{isLocked},
+			'thread.root.subject'=>chopSubject($root->get("subject")),
+			'thread.root.url'=>formatThreadURL($callback,$root->get("forumPostId")),
+			'thread.root.epoch'=>$root->get("dateOfPost"),
+			'thread.root.date'=>formatPostDate($root->get("dateOfPost")),
+			'thread.root.time'=>formatPostTime($root->get("dateOfPost")),
+			'thread.root.user.profile'=>formatUserProfileURL($root->get("userId")),
+			'thread.root.user.name'=>$root->get("username"),
+			'thread.root.user.id'=>$root->get("userId"),
+			'thread.root.user.isVisitor'=>($root->get("userId") == 1),
+			'thread.root.status'=>formatStatus($root->get("status")),
+			'thread.last.subject'=>chopSubject($last->get("subject")),
+			'thread.last.url'=>formatThreadURL($callback,$last->get("forumPostId")),
+			'thread.last.epoch'=>$last->get("dateOfPost"),
+			'thread.last.date'=>formatPostDate($last->get("dateOfPost")),
+			'thread.last.time'=>formatPostTime($last->get("dateOfPost")),
+			'thread.last.user.profile'=>formatUserProfileURL($last->get("userId")),
+			'thread.last.user.name'=>$last->get("username"),
+			'thread.last.user.id'=>$last->get("userId"),
+			'thread.last.user.isVisitor'=>($root->get("userId") == 1),
+			'thread.last.status'=>formatStatus($last->get("status"))
+			});
+	}
+	$var{thread_loop} = \@thread_loop;
+	return WebGUI::Template::process(WebGUI::Template::get(1,"Forum"), \%var); 
+}	
+
 sub www_viewThread {
 	my ($callback, $postId) = @_;
 	$postId = $session{form}{forumPostId} unless ($postId);
@@ -552,27 +664,27 @@ sub www_viewThread {
 	$post->markRead($session{user}{userId});
 	my $thread = $post->getThread;
 	my $forum = $thread->getForum;
-	my $var = _getPostTemplateVars($post, $thread, $forum, $callback);
+	my $var = getPostTemplateVars($post, $thread, $forum, $callback);
 	my $root = WebGUI::Forum::Post->new($thread->get("rootPostId"));
 	$var->{'user.canPost'} = $forum->canPost;
 	$var->{'user.isSubscribed'} = $thread->isSubscribed;
 	$var->{'user.isVisitor'} = ($session{user}{userId} == 1);
-	$var->{'thread.subscribe.url'} = _formatThreadSubscribeURL($callback,$postId);
+	$var->{'thread.subscribe.url'} = formatThreadSubscribeURL($callback,$postId);
 	$var->{'thread.subscribe.label'} = WebGUI::International::get(873);
-	$var->{'thread.unsubscribe.url'} = _formatThreadUnsubscribeURL($callback,$postId);
+	$var->{'thread.unsubscribe.url'} = formatThreadUnsubscribeURL($callback,$postId);
 	$var->{'thread.unsubscribe.label'} = WebGUI::International::get(874);
-	$var->{post_loop} = _recurseThread($root, $thread, $forum, 0, $callback, $postId);
+	$var->{post_loop} = recurseThread($root, $thread, $forum, 0, $callback, $postId);
 	$var->{'thread.layout.isFlat'} = ($session{user}{discussionLayout} eq "flat");
 	$var->{'thread.layout.isNested'} = ($session{user}{discussionLayout} eq "nested");
 	$var->{'thread.layout.isThreaded'} = ($session{user}{discussionLayout} eq "threaded" || !($var->{'thread.layout.isNested'} || $var->{'thread.layout.isFlat'}));
         $var->{'thread.subject.label'} = WebGUI::International::get(229);
         $var->{'thread.date.label'} = WebGUI::International::get(245);
         $var->{'thread.user.label'} = WebGUI::International::get(244);
- 	$var->{'thread.new.url'} = _formatNewThreadURL($callback,$thread->get("forumId"));
+ 	$var->{'thread.new.url'} = formatNewThreadURL($callback,$thread->get("forumId"));
 	$var->{'thread.new.label'} = WebGUI::International::get(1018);
-	$var->{'thread.previous.url'} = _formatPreviousThreadURL($callback,$thread->get("forumThreadId"));
+	$var->{'thread.previous.url'} = formatPreviousThreadURL($callback,$thread->get("forumThreadId"));
 	$var->{'thread.previous.label'} = WebGUI::International::get(513);
-	$var->{'thread.next.url'} = _formatNextThreadURL($callback,$thread->get("forumThreadId"));
+	$var->{'thread.next.url'} = formatNextThreadURL($callback,$thread->get("forumThreadId"));
 	$var->{'thread.next.label'} = WebGUI::International::get(512);
 	$var->{'thread.list.url'} = $callback;
 	$var->{'thread.list.label'} = WebGUI::International::get(1019);

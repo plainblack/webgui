@@ -75,11 +75,13 @@ sub incrementReplies {
         my ($self, $dateOfReply, $replyId) = @_;
         WebGUI::SQL->write("update forumThread set replies=replies+1, lastPostId=$replyId, lastPostDate=$dateOfReply 
 		where forumThreadId=".$self->get("forumThreadId"));
+	$self->getForum->incrementReplies;
 }
 
 sub incrementViews {
         my ($self) = @_;
         WebGUI::SQL->write("update forumThread set views=views+1 where forumThreadId=".$self->get("forumThreadId"));
+	$self->getForum->incrementViews;
 }
                                                                                                                                                              
 sub isSticky {
@@ -117,6 +119,7 @@ sub recalculateRating {
         my ($sum) = WebGUI::SQL->quickArray("select sum(rating) from forumPost where forumThreadId=".$self->get("forumThreadId")." and rating>0");
         my $average = round($sum/$count);
         $self->set({rating=>$average});
+	$self->getForum->recalculateRating;
 }
                                                                                                                                                              
 sub set {

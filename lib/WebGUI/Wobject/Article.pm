@@ -14,6 +14,7 @@ use strict;
 use Tie::CPHash;
 use WebGUI::Attachment;
 use WebGUI::DateTime;
+use WebGUI::Forum;
 use WebGUI::Forum::UI;
 use WebGUI::HTML;
 use WebGUI::HTMLForm;
@@ -118,11 +119,6 @@ sub www_editSave {
 }
 
 #-------------------------------------------------------------------
-sub www_showMessage {
-	return $_[0]->SUPER::www_showMessage('<a href="'.WebGUI::URL::page().'">'.WebGUI::International::get(27,$_[0]->get("namespace")).'</a><br>');
-}
-
-#-------------------------------------------------------------------
 sub www_view {
 	my ($file, %var);
 	if ($_[0]->get("image") ne "") {
@@ -182,23 +178,24 @@ sub www_view {
 		$var{"attachment.icon"} = $file->getIcon;
 		$var{"attachment.url"} = $file->getURL;
 		$var{"attachment.name"} = $file->getFilename;
-	}
+	}	
+	my $callback = WebGUI::URL::page("func=view&amp;wid=".$_[0]->get("wobjectId"));
 	if ($_[0]->get("allowDiscussion")) {
-		($var{"replies.count"}) = WebGUI::SQL->quickArray("select count(*) from discussion 
-			where wobjectId=".$_[0]->get("wobjectId"));
-		$var{"replies.URL"} = WebGUI::URL::page('func=showMessage&wid='.$_[0]->get("wobjectId"));
+		my $forum = WebGUI::Forum->new($_[0]->get("forumId"));
+		$var{"replies.count"} = $forum->get("replies");
+		$var{"replies.URL"} = WebGUI::Forum::UI::formatForumURL($callback,$forum->get("forumId"));
 		$var{"replies.label"} = WebGUI::International::get(28,$_[0]->get("namespace"));
-        	$var{"post.URL"} = WebGUI::URL::page('func=post&mid=new&wid='.$_[0]->get("wobjectId"));
+		$var{"post.URL"} = WebGUI::Forum::UI::formatNewThreadURL($callback,$forum->get("forumId"));
         	$var{"post.label"} = WebGUI::International::get(24,$_[0]->get("namespace"));
 	}
-	 my $templateId = $_[0]->getValue("templateId");
+	my $templateId = $_[0]->getValue("templateId");
         if ($session{form}{func} eq "editSave") {
                 $templateId = $_[0]->get("templateId");
         }
 	if ($session{form}{forumOp}) {
-		return WebGUI::Forum::UI::forumOp(WebGUI::URL::page("func=view&amp;wid=".$_[0]->get("wobjectId")));
+		return WebGUI::Forum::UI::forumOp($callback,$_[0]->get("forumId"));
 	} else {
-		return $_[0]->processTemplate($templateId,\%var).WebGUI::Forum::UI::viewForum(WebGUI::URL::page("func=view&amp;wid=".$_[0]->get("wobjectId")),1);
+		return $_[0]->processTemplate($templateId,\%var);
 	}
 }
 

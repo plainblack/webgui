@@ -185,9 +185,13 @@ sub _processFunctions {
                                                 $cmd = "WebGUI::Wobject::".${$wobject}{namespace};
                                                 $w = eval{$cmd->new($wobject)};
                                                 WebGUI::ErrorHandler::fatalError("Couldn't instanciate wobject: ${$wobject}{namespace}. Root Cause: ".$@) if($@);
-                                                $cmd = "www_".$session{form}{func};
-                                                $output = eval{$w->$cmd};
-                                                WebGUI::ErrorHandler::fatalError("Wobject runtime error: ${$wobject}{namespace} / $session{form}{func}. Root cause: ".$@) if($@);
+                				if ($session{form}{func} =~ /^[A-Za-z]+$/) {
+                                                	$cmd = "www_".$session{form}{func};
+                                                	$output = eval{$w->$cmd};
+                                                	WebGUI::ErrorHandler::fatalError("Wobject runtime error: ${$wobject}{namespace} / $session{form}{func}. Root cause: ".$@) if($@);
+						} else {
+							WebGUI::ErrorHandler::security("execute an invalid function: ".$session{form}{func});
+						}
                                         } else {
                                                 $output = WebGUI::Privilege::noAccess();
                                         }
