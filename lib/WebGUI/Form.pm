@@ -684,6 +684,14 @@ sub HTMLArea {
                		$output .= '</script>'."\n";
 			$htmlArea = 1;
 		}
+        } elsif ($session{user}{richEditor} eq "midas" && (($browser->ie && $browser->version >= 6) || ($browser->gecko && $browser->version >= 1.3))) {
+                        $output .= '<script language="JavaScript">
+                                var formObj; var extrasDir="'.$session{config}{extrasURL}.'";
+                                function openEditWindow(obj) {
+                                        formObj = obj;
+                                        window.open("'.$session{config}{extrasURL}.'/midas/editor.html","editWindow","width=600,height=400,resizable=1");                    }
+                                </script>';
+                        $output .= $button;
 	} elsif ($session{user}{richEditor} eq "classic" && $browser->ie && $browser->version >= 5) {
 			$output .= '<script language="JavaScript">
 				var formObj; var extrasDir="'.$session{config}{extrasURL}.'";
