@@ -87,6 +87,39 @@ sub description {
 
 #-------------------------------------------------------------------
 
+=head2 discussionProperties ( )
+
+ Returns a formRow list of discussion properties, which may be
+ attached to any Wobject.
+
+=cut
+
+sub discussionProperties {
+        my ($f,$editTimeout,$groupToModerate,%moderationType,$moderationType);
+        %moderationType = (before=>WebGUI::International::get(567),after=>WebGUI::International::get(568));
+        $f = WebGUI::HTMLForm->new;
+        if ($_[0]->get("wobjectId") eq "new") {
+                $editTimeout = 1;
+                $moderationType = 'after';
+        } else {
+                $editTimeout = $_[0]->get("editTimeout");
+                $moderationType = $_[0]->get("moderationType");
+        }
+        $groupToModerate = $_[0]->get("groupToModerate") || 4;
+        $f->group("groupToPost",WebGUI::International::get(564),[$_[0]->get("groupToPost")]);
+        $f->integer("editTimeout",WebGUI::International::get(566),$editTimeout);
+        if ($session{setting}{useKarma}) {
+                $f->integer("karmaPerPost",WebGUI::International::get(541),$_[0]->get("karmaPerPost"));
+        } else {
+                $f->hidden("karmaPerPost",$_[0]->get("karmaPerPost"));
+        }
+        $f->group("groupToModerate",WebGUI::International::get(565),[$groupToModerate]);
+        $f->select("moderationType",\%moderationType,WebGUI::International::get(569),[$moderationType]);
+        return $f->printRowsOnly;
+}
+
+#-------------------------------------------------------------------
+
 =head2 displayTitle ( )
 
  Returns this instance's title if displayTitle is set to yes.
@@ -293,7 +326,7 @@ sub set {
 	$sql = "update wobject set";
 	foreach $key (keys %{$_[1]}) {
 		$_[0]->{_property}{$key} = ${$_[1]}{$key};
-		if (isIn($key, qw(title displayTitle description processMacros pageId templatePosition startDate endDate sequenceNumber))) {
+		if (isIn($key, qw(moderationType groupToModerate groupToPost karmaPerPost editTimeout title displayTitle description processMacros pageId templatePosition startDate endDate sequenceNumber))) {
         		$sql .= " ".$key."=".quote(${$_[1]}{$key}).",";
 		}
                 if (isIn($key, @{$_[2]})) {
@@ -440,7 +473,12 @@ sub www_editSave {
 		templatePosition=>$templatePosition,
 		startDate=>$startDate,
 		endDate=>$endDate,
-		description=>$session{form}{description}
+		description=>$session{form}{description},
+		karmaPerPost=>$session{form}{karmaPerPost},
+		groupToPost=>$session{form}{groupToPost},
+		groupToModerate=>$session{form}{groupToModerate},
+		editTimeout=>$session{form}{editTimeout},
+		moderationType=>$session{form}{moderationType}
 	});
 	return "";
 }

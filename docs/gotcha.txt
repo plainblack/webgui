@@ -7,6 +7,14 @@ upgrading from one version to the next, or even between multiple
 versions. Be sure to heed the warnings contained herein as they will
 save you many hours of grief.
 
+4.2.0
+--------------------------------------------------------------------
+ * All Discussion properties have been reset to enable the new
+	discussion moderation features. If you are using discussions
+	on your site, you'll need to set these properties back to
+	whatever you were using. Note that none of the actual
+	discussion data has been changed or lost.
+
 4.1.0
 --------------------------------------------------------------------
  * Between 3.6.5 and now, much of the WebGUI filesystem has changed
@@ -17,7 +25,6 @@ save you many hours of grief.
 	WebGUI distribution in its place. Then copy any necessary
 	files (like conf files) from WebGUI.old to your new WebGUI
 	folder.
-
 
 3.10.0 && 3.10.1
 --------------------------------------------------------------------

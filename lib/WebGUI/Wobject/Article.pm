@@ -31,22 +31,6 @@ our $name = WebGUI::International::get(1,$namespace);
 
 
 #-------------------------------------------------------------------
-sub _canEditMessage {
-        my (%message);
-        tie %message, 'Tie::CPHash';
-        %message = WebGUI::Discussion::getMessage($_[1]);
-        if (
-                (time()-$message{dateOfPost}) < 3600*$_[0]->get("editTimeout")
-                && $message{userId} eq $session{user}{userId}
-                || WebGUI::Privilege::isInGroup($_[0]->get("groupToModerate"))
-                ) {
-                return 1;
-        } else {
-                return 0;
-        }
-}
-
-#-------------------------------------------------------------------
 sub duplicate {
 	my ($file, $w);
 	$w = $_[0]->SUPER::duplicate($_[1]);
@@ -62,11 +46,7 @@ sub duplicate {
 		attachment=>$_[0]->get("attachment"),
 		convertCarriageReturns=>$_[0]->get("convertCarriageReturns"),
 		alignImage=>$_[0]->get("alignImage"),
-		allowDiscussion=>$_[0]->get("allowDiscussion"),
-		groupToPost=>$_[0]->get("groupToPost"),
-		groupToModerate=>$_[0]->get("groupToModerate"),
-		karmaPerPost=>$_[0]->get("karmaPerPost"),
-		editTimeout=>$_[0]->get("editTimeout")
+		allowDiscussion=>$_[0]->get("allowDiscussion")
 		});
 	WebGUI::Discussion::duplicate($_[0]->get("wobjectId"),$w->get("wobjectId"));
 }
@@ -88,8 +68,16 @@ sub purge {
 
 #-------------------------------------------------------------------
 sub set {
-        $_[0]->SUPER::set($_[1],
-		[qw(karmaPerPost image linkTitle linkURL attachment convertCarriageReturns alignImage allowDiscussion groupToPost groupToModerate editTimeout)]);
+        $_[0]->SUPER::set($_[1],[qw(image linkTitle linkURL attachment convertCarriageReturns alignImage allowDiscussion)]);
+}
+
+#-------------------------------------------------------------------
+sub www_approvePost {
+        if (WebGUI::Privilege::isInGroup($_[0]->get("groupToModerate"))) {
+                return WebGUI::Discussion::approvePost();
+        } else {
+                return WebGUI::Privilege::insufficient();
+        }
 }
 
 #-------------------------------------------------------------------
@@ -124,7 +112,7 @@ sub www_deleteImage {
 
 #-------------------------------------------------------------------
 sub www_deleteMessage {
-	if (_canEditMessage($_[0],$session{form}{mid})) {
+	if (WebGUI::Discussion::canEditMessage($_[0],$session{form}{mid})) {
                 return WebGUI::Discussion::deleteMessage();
         } else {
                 return WebGUI::Privilege::insufficient();
@@ -133,8 +121,17 @@ sub www_deleteMessage {
 
 #-------------------------------------------------------------------
 sub www_deleteMessageConfirm {
-	if (_canEditMessage($_[0],$session{form}{mid})) {
+	if (WebGUI::Discussion::canEditMessage($_[0],$session{form}{mid})) {
                 return WebGUI::Discussion::deleteMessageConfirm();
+        } else {
+                return WebGUI::Privilege::insufficient();
+        }
+}
+
+#-------------------------------------------------------------------
+sub www_denyPost {
+        if (WebGUI::Privilege::isInGroup($_[0]->get("groupToModerate"))) {
+                return WebGUI::Discussion::denyPost();
         } else {
                 return WebGUI::Privilege::insufficient();
         }
@@ -177,14 +174,7 @@ sub www_edit {
 		$f->yesNo("convertCarriageReturns",WebGUI::International::get(10,$namespace),$_[0]->get("convertCarriageReturns")
 			,'',' &nbsp; <span style="font-size: 8pt;">'.WebGUI::International::get(11,$namespace).'</span>');
 		$f->yesNo("allowDiscussion",WebGUI::International::get(18,$namespace),$_[0]->get("allowDiscussion"));
-		$f->group("groupToPost",WebGUI::International::get(19,$namespace),[$_[0]->get("groupToPost")]);
-		$f->group("groupToModerate",WebGUI::International::get(20,$namespace),[$groupToModerate]);
-		$f->integer("editTimeout",WebGUI::International::get(21,$namespace),$editTimeout);
-                if ($session{setting}{useKarma}) {
-                        $f->integer("karmaPerPost",WebGUI::International::get(541),$_[0]->get("karmaPerPost"));
-                } else {
-                        $f->hidden("karmaPerPost",$_[0]->get("karmaPerPost"));
-                }
+		$f->raw($_[0]->SUPER::discussionProperties);
 		$output .= $_[0]->SUPER::www_edit($f->printRowsOnly);
                 return $output;
         } else {
@@ -208,10 +198,6 @@ sub www_editSave {
 		$property{linkTitle} = $session{form}{linkTitle};
 		$property{linkURL} = $session{form}{linkURL};
 		$property{allowDiscussion} = $session{form}{allowDiscussion};
-		$property{groupToModerate} = $session{form}{groupToModerate};
-		$property{karmaPerPost} = $session{form}{karmaPerPost};
-		$property{groupToPost} = $session{form}{groupToPost};
-		$property{editTimeout} = $session{form}{editTimeout};
 		$_[0]->set(\%property);
                 return "";
         } else {
@@ -220,8 +206,18 @@ sub www_editSave {
 }
 
 #-------------------------------------------------------------------
+sub www_lockThread {
+        if (WebGUI::Privilege::isInGroup($_[0]->get("groupToModerate"))) {
+                WebGUI::Discussion::lockThread();
+		return $_[0]->www_showMessage;
+        } else {
+                return WebGUI::Privilege::insufficient();
+        }
+}
+
+#-------------------------------------------------------------------
 sub www_post {
-        if (WebGUI::Privilege::isInGroup($_[0]->get("groupToPost"),$session{user}{userId})) {
+        if (WebGUI::Privilege::isInGroup($_[0]->get("groupToPost"))) {
                 return WebGUI::Discussion::post();
         } else {
                 return WebGUI::Privilege::insufficient();
@@ -230,8 +226,8 @@ sub www_post {
 
 #-------------------------------------------------------------------
 sub www_postSave {
-        if (WebGUI::Privilege::isInGroup($_[0]->get("groupToPost"),$session{user}{userId})) {
-                WebGUI::Discussion::postSave($_[0]->get("karmaPerPost"));
+        if (WebGUI::Privilege::isInGroup($_[0]->get("groupToPost"))) {
+                WebGUI::Discussion::postSave($_[0]);
                 return $_[0]->www_showMessage();
         } else {
                 return WebGUI::Privilege::insufficient();
@@ -243,18 +239,20 @@ sub www_showMessage {
         my ($submenu, $output, $defaultMid);
         ($defaultMid) = WebGUI::SQL->quickArray("select min(messageId) from discussion where wobjectId=$session{form}{wid}");
 	$session{form}{mid} = $defaultMid if ($session{form}{mid} eq "");
-        $submenu = '<a href="'.WebGUI::URL::page('func=post&replyTo='.$session{form}{mid}.'&wid='.$session{form}{wid})
-        	.'">'.WebGUI::International::get(24,$namespace).'</a><br>';
-	if (_canEditMessage($_[0],$session{form}{mid})) {
-        	$submenu .= '<a href="'.WebGUI::URL::page('func=post&mid='.$session{form}{mid}.
-                	'&wid='.$session{form}{wid}).'">'.WebGUI::International::get(25,$namespace).'</a><br>';
-                $submenu .= '<a href="'.WebGUI::URL::page('func=deleteMessage&mid='.$session{form}{mid}.
-			'&wid='.$session{form}{wid}).'">'.WebGUI::International::get(26,$namespace).'</a><br>';
-        }
-        $submenu .= '<a href="'.WebGUI::URL::page().'">'.WebGUI::International::get(27,$namespace).'</a><br>';
-	$output = WebGUI::Discussion::showMessage($submenu);
+        $submenu = '<a href="'.WebGUI::URL::page().'">'.WebGUI::International::get(27,$namespace).'</a><br>';
+	$output = WebGUI::Discussion::showMessage($submenu,$_[0]);
 	$output .= WebGUI::Discussion::showThreads();
         return $output;
+}
+
+#-------------------------------------------------------------------
+sub www_unlockThread {
+        if (WebGUI::Privilege::isInGroup($_[0]->get("groupToModerate"))) {
+                WebGUI::Discussion::unlockThread();
+		return $_[0]->www_showMessage;
+        } else {
+                return WebGUI::Privilege::insufficient();
+        }
 }
 
 #-------------------------------------------------------------------
