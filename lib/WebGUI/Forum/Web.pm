@@ -121,7 +121,12 @@ sub viewForum {
 	my $threads = $p->getPageData;
 	foreach my $thread (@{$threads}) {
 		my $root = WebGUI::Forum::Post->new($thread->{rootPostId});
-		my $last = WebGUI::Forum::Post->new($thread->{lastPostId});
+		my $last;
+		if ($thread->{rootPostId} == $thread->{lastPostId}) { #saves the lookup if it's the same id
+			$last = $root;
+		} else {
+			$last = WebGUI::Forum::Post->new($thread->{lastPostId});
+		}
 		push(@thread_loop,{
 			'thread.views'=>$thread->{views},
 			'thread.replies'=>$thread->{replies},
@@ -166,6 +171,7 @@ sub www_post {
 	$var->{isReply} = ($session{form}{parentId} ne "");
 	$var->{isEdit} = ($session{form}{forumPostId} ne "");
 	$var->{isVisitor} = ($session{user}{userId} == 1);
+	$var->{isNewMessage} = ($var->{isNewThread} || $var->{isReply});
 	$var->{'form.begin'} = WebGUI::Form::formHeader({
 		action=>$callback
 		});
@@ -187,15 +193,24 @@ sub www_post {
 			value=>$session{form}{forumId}
 			});
 		$forum = WebGUI::Forum->new($session{form}{forumId});
+		if ($forum->isModerator) {
+			$var->{'sticky.label'} = WebGUI::International::get(1013);
+			$var->{'sticky.form'} = WebGUI::Form::yesNo({
+				name=>'isSticky',
+				value=>0
+				});
+		}
+	}
+	if ($var->{isNewMessage}) {
 		$var->{'subscribe.label'} = WebGUI::International::get(873);
 		$var->{'subscribe.form'} = WebGUI::Form::yesNo({
 			name=>'subscribe',
 			value=>1
 			});
 		if ($forum->isModerator) {
-			$var->{'sticky.label'} = 'Make Sticky';
-			$var->{'sticky.form'} = WebGUI::Form::yesNo({
-				name=>'sticky',
+			$var->{'lock.label'} = WebGUI::International::get(1012);
+			$var->{'lock.form'} = WebGUI::Form::yesNo({
+				name=>'isLocked',
 				value=>0
 				});
 		}
@@ -206,6 +221,10 @@ sub www_post {
 		$message = $post->get("message");
 		$forum = $post->getThread->getForum;
 	}
+	$var->{'contentType.label'} = WebGUI::International::get(1007);
+	$var->{'contentType.form'} = WebGUI::Form::contentType({
+		name=>'contentType'
+		});
 	$var->{isModerator} = $forum->isModerator;
 	$var->{allowReplacements} = $forum->get("allowReplacements");
 	if ($forum->get("allowRichEdit")) {
@@ -244,15 +263,28 @@ sub www_postSave {
 	my ($callback) = @_;
 	my $forumId = $session{form}{forumId};
 	my $threadId = $session{form}{forumThreadId};
+	my $postId = $session{form}{forumPostId};
+	my $thread;
 	if ($session{form}{parentId} > 0) {
 		my $parentPost = WebGUI::Forum::Post->new($session{form}{parentId});
 		$forumId = $parentPost->getThread->get("forumId");
 		$threadId = $parentPost->get("forumThreadId");
+		return www_viewThread($callback,$postId);
 	}
-	if ($threadId < 1) {
-		$threadId = WebGUI::Forum::Thread->create({
-			forumId=>$forumId
+	if ($forumId) {
+		$thread = WebGUI::Forum::Thread->create({
+			forumId=>$forumId,
+			isSticky=>$session{form}{isSticky},
+			isLocked=>$session{form}{isLocked}
+			}, {
+			subject=>$session{form}{subject},
+			message=>$session{form}{message},
+			userId=>$session{user}{userId},
+			username=>($session{form}{visitorName} || $session{user}{alias}),
+			contentType=>$session{form}{contentType}
 			});
+		$thread->subscribe($session{user}{userId}) if ($session{form}{subscribe});
+		return viewForum($callback, $forumId);
 	}
 }
 

@@ -35,6 +35,7 @@ This package helps in the processing of the form variables that are returned fro
  $value = WebGUI::FormProcessor::checkbox("whichOne");
  $value = WebGUI::FormProcessor::checkList("dayOfWeek");
  $value = WebGUI::FormProcessor::combo("fruit");
+ $value = WebGUI::FormProcessor::contentType("text");
  $value = WebGUI::FormProcessor::date("endDate");
  $value = WebGUI::FormProcessor::dateTime("whenToDoIt");
  $value = WebGUI::FormProcessor::email("emailAddress");
@@ -131,6 +132,26 @@ sub combo {
 	return selectList($_[0]);
 }
 
+
+#-------------------------------------------------------------------
+
+=head2 contentType ( name )
+
+Returns a content type. Defaults to "mixed".
+
+=over 
+
+=item name
+
+The name of the form variable to retrieve.
+
+=back
+
+=cut
+
+sub contentType {
+	return ($session{form}{$_[0]} || "mixed");
+}
 
 #-------------------------------------------------------------------
 

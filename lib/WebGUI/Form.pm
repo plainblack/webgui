@@ -38,10 +38,11 @@ Base forms package. Eliminates some of the normal code work that goes along with
  $html = WebGUI::Form::checkbox({name=>"whichOne", value=>"red"});
  $html = WebGUI::Form::checkList({name=>"dayOfWeek", options=>\%days});
  $html = WebGUI::Form::combo({name=>"fruit",options=>\%fruit});
+ $html = WebGUI::Form::contentType({name=>"contentType");
  $html = WebGUI::Form::date({name=>"endDate", value=>$endDate});
  $html = WebGUI::Form::dateTime({name=>"begin", value=>$begin});
  $html = WebGUI::Form::email({name=>"emailAddress"});
- $html = WebGUI::Form::fieldType({name=>"fieldType",types=>\%supportedTypes});
+ $html = WebGUI::Form::fieldType({name=>"fieldType");
  $html = WebGUI::Form::file({name=>"image"});
  $html = WebGUI::Form::formHeader();
  $html = WebGUI::Form::filterContent({value=>"javascript"});
@@ -256,6 +257,63 @@ sub combo {
 	return $output;
 }
 
+#-------------------------------------------------------------------
+
+=head2 contentType ( hashRef )
+
+Returns a content type select list field. This is usually used to help tell WebGUI how to treat posted content.
+
+=over
+
+=item name
+
+The name field for this form element.
+
+=item types 
+
+An array reference of field types to be displayed. The types are "mixed", "html", "code", and "text".  Defaults to all.
+
+=item value
+
+The default value for this form element. Defaults to "mixed".
+
+=item extras
+
+If you want to add anything special to this form element like javascript actions, or stylesheet information, you'd add it in here as follows:
+
+ 'onChange="this.form.submit()"'
+
+=back
+
+=cut
+
+sub contentType {
+	my (%hash, $output, $type);
+ 	tie %hash, 'Tie::IxHash';
+	# NOTE: What you are about to see is bad code. Do not attempt this
+	# without adult supervision. =) It was done this way because a huge
+	# if/elsif construct executes much more quickly than a bunch of
+	# unnecessary database hits.
+	my @types = qw(mixed html code text);
+	$_[0]->{types} = \@types unless ($_[0]->{types});
+	foreach $type (@{$_[0]->{types}}) {
+		if ($type eq "text") {
+			$hash{text} = WebGUI::International::get(1010);
+		} elsif ($type eq "mixed") {
+			$hash{code} = WebGUI::International::get(1008);
+		} elsif ($type eq "code") {
+			$hash{code} = WebGUI::International::get(1011);
+		} elsif ($type eq "html") {
+        		$hash{html} = WebGUI::International::get(1009);
+		}
+	}
+	return selectList({
+		options=>\%hash,
+		name=>$_[0]->{name},
+		value=>$_[0]->{value},
+		extras=>$_[0]->{extras}
+		});
+}
 #-------------------------------------------------------------------
 
 =head2 date ( hashRef )

@@ -26,14 +26,14 @@ create table forumReplacement (
 
 create table forumPost (
   forumPostId int not null primary key,
-  parentId int not null,
+  parentId int not null default 0,
   forumThreadId int not null,
   userId int not null,
   username varchar(30),
   subject varchar(255),
   message text,
   dateOfPost int,
-  views int,
+  views int not null default 0,
   status varchar(30) not null default 'approved',
   contentType varchar(30) not null default 'some html'
 );
@@ -113,4 +113,22 @@ INSERT INTO international VALUES (71,'SyndicatedContent',1,'Syndicated content i
 insert into international (internationalId,languageId,namespace,message,lastUpdated) values (90,1,'DataForm','Delete this entry.',1057208065);
 delete from template where templateId=1 and namespace='DataForm';
 INSERT INTO template VALUES (1,'Mail Form','<tmpl_if displayTitle>\n    <h1><tmpl_var title></h1>\n</tmpl_if>\n\n<tmpl_loop error_loop>\n  <li><b><tmpl_var error.message></b>\n</tmpl_loop>\n\n\n<tmpl_if description>\n    <tmpl_var description><p />\n</tmpl_if>\n\n<tmpl_if canEdit>\n      <a href=\"<tmpl_var entryList.url>\"><tmpl_var entryList.label></a>\n      &middot; <a href=\"<tmpl_var export.tab.url>\"><tmpl_var export.tab.label></a>\n      <tmpl_if entryId>\n        &middot; <a href=\"<tmpl_var delete.url>\"><tmpl_var delete.label></a>\n      </tmpl_if>\n      <tmpl_if session.var.adminOn>\n          &middot; <a href=\"<tmpl_var addField.url>\"><tmpl_var addField.label></a>\n     </tmpl_if>\n   <p /> \n</tmpl_if>\n\n<tmpl_var form.start>\n<table>\n<tmpl_loop field_loop>\n  <tmpl_unless field.isHidden>\n     <tr><td class=\"formDescription\" valign=\"top\">\n        <tmpl_if session.var.adminOn><tmpl_if canEdit><tmpl_var field.controls></tmpl_if></tmpl_if>\n        <tmpl_var field.label>\n     </td><td class=\"tableData\" valign=\"top\">\n       <tmpl_if field.isDisplayed>\n            <tmpl_var field.value>\n       <tmpl_else>\n            <tmpl_var field.form>\n       </tmpl_if>\n        <tmpl_if field.required>*</tmpl_if>\n        <span class=\"formSubtext\"><br /><tmpl_var field.subtext></span>\n     </td></tr>\n  </tmpl_unless>\n</tmpl_loop>\n<tr><td></td><td><tmpl_var form.send></td></tr>\n</table>\n\n<tmpl_var form.end>\n','DataForm');
+
+insert into incrementer values ('forumId',1000);
+insert into incrementer values ('forumThreadId',1000);
+insert into incrementer values ('forumPostId',1000);
+delete from international where languageId=1 and namespace='WebGUI' and internationalId=1010;
+insert into international (internationalId,languageId,namespace,message,lastUpdated,context) values (1010,1,'WebGUI','Text', 1060433369,'A content type of text.');
+delete from international where languageId=1 and namespace='WebGUI' and internationalId=1011;
+insert into international (internationalId,languageId,namespace,message,lastUpdated,context) values (1011,1,'WebGUI','Code', 1060433339,'A content type of source code.');
+delete from international where languageId=1 and namespace='WebGUI' and internationalId=1009;
+insert into international (internationalId,languageId,namespace,message,lastUpdated,context) values (1009,1,'WebGUI','HTML', 1060433286,'A content type of HTML.');
+delete from international where languageId=1 and namespace='WebGUI' and internationalId=1008;
+insert into international (internationalId,languageId,namespace,message,lastUpdated,context) values (1008,1,'WebGUI','Mixed Text and HTML', 1060433234,'A content type of mixed HTML and text.');
+delete from international where languageId=1 and namespace='WebGUI' and internationalId=1007;
+insert into international (internationalId,languageId,namespace,message,lastUpdated,context) values (1007,1,'WebGUI','Content Type', 1060432032,'The type of content to be posted, like HTML, source code, text, etc.');
+delete from international where languageId=1 and namespace='WebGUI' and internationalId=1013;
+insert into international (internationalId,languageId,namespace,message,lastUpdated,context) values (1013,1,'WebGUI','Make sticky?', 1060434033,'A message indicating whether the moderator wants to make this message stay at the top of the discussion.');
+delete from international where languageId=1 and namespace='WebGUI' and internationalId=1012;
+insert into international (internationalId,languageId,namespace,message,lastUpdated,context) values (1012,1,'WebGUI','Lock this thread?', 1060433963,'A message indicating whether the moderator wants to lock the thread as he posts.');
 

@@ -51,6 +51,9 @@ Package that makes HTML forms typed data and significantly reduces the code need
 	-options=>\%fruit,
 	-label=>"Choose a fruit or enter your own."
 	);
+ $f->contentType(
+	-name=>"contentType"
+	);
  $f->date(
 	-name=>"endDate",
 	-label=>"End Date",
@@ -67,7 +70,6 @@ Package that makes HTML forms typed data and significantly reduces the code need
 	);
  $f->fieldType(
 	-name=>"dataType",
-	-options=>\%supportedTypes,
 	-label=>"Type of Field"
 	);
  $f->file(
@@ -418,6 +420,73 @@ sub combo {
         $self->{_data} .= $output;
 }
 
+#-------------------------------------------------------------------
+
+=head2 contentType ( name, types [ label, value, extras, subtext, uiLevel ] )
+
+Adds a content type select list field to this form.
+
+=over
+
+=item name
+
+The name field for this form element.
+
+=item types
+
+An array reference of field types to be displayed. The valid types are "code", "mixed", "html", and "text". Defaults to all types.
+
+=item label
+
+The left column label for this form row. Defaults to "Content Type".
+
+=item value
+
+The default value for this form element.
+
+=item extras
+
+If you want to add anything special to this form element like javascript actions, or stylesheet information, you'd add it in here as follows:
+
+ 'onChange="this.form.submit()"'
+
+=item subtext
+
+Extra text to describe this form element or to provide special instructions.
+
+=item uiLevel
+
+The UI level for this field. See the WebGUI developer's site for details. Defaults to "3".
+
+=back
+
+=cut
+
+sub contentType {
+        my ($output);
+        my ($self, @p) = @_;
+        my ($name, $types, $label, $value, $extras, $subtext, $uiLevel) =
+                rearrange([qw(name types label value extras subtext uiLevel)], @p);
+	$uiLevel = 3 if ($uiLevel eq "");
+        if (_uiLevelChecksOut($uiLevel)) {
+		$label = WebGUI::International::get(1007) unless ($label);
+                $output = WebGUI::Form::fieldType({
+                        "name"=>$name,
+                        "types"=>$types,
+                        "value"=>$value,
+                        "extras"=>$extras
+                        });
+                $output .= _subtext($subtext);
+                $output = $self->_tableFormRow($label,$output);
+        } else {
+                $output = WebGUI::Form::hiddenList({
+                        "name"=>$name,
+                        types=>$types,
+                        "value"=>$value
+                        });
+        }
+        $self->{_data} .= $output;
+}
 #-------------------------------------------------------------------
 
 =head2 date ( name [ label, value, extras, subtext, size, noDate, uiLevel ] )

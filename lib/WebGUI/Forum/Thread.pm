@@ -1,6 +1,7 @@
 package WebGUI::Forum::Thread;
 
 use strict;
+use WebGUI::DateTime;
 use WebGUI::Forum;
 use WebGUI::Forum::Post;
 use WebGUI::Session;
@@ -8,7 +9,7 @@ use WebGUI::SQL;
 
 sub addReply {
         my ($self, $dateOfReply) = @_;
-        WebGUI::SQL->write("update forumThread set replies=replies+1, lastR where forumThreadId=".$self->get("forumThreadId"));
+        WebGUI::SQL->write("update forumThread set replies=replies+1, lastReply=".WebGUI::DateTime::time()." where forumThreadId=".$self->get("forumThreadId"));
 	#add method to notify users for subscriptions
 }
 
@@ -20,17 +21,16 @@ sub addView {
 sub create {
 	my ($self, $data, $postData) = @_;
 	$data->{forumThreadId} = "new";
-	my $forumThreadId = WebGUI::SQL->setRow("forumThread","forumThreadId",$data);
-	$self = WebGUI::Forum::Thread->new($forumThreadId);
-	$postData->{forumThreadId} = $forumThreadId;
+	$postData->{forumThreadId} = WebGUI::SQL->setRow("forumThread","forumThreadId", $data);
+	$self = WebGUI::Forum::Thread->new($postData->{forumThreadId});
 	$postData->{parentId} = 0;
-	my $post = WebGUI::Discuss::Post->create($postData);
+	my $post = WebGUI::Forum::Post->create($postData);
 	$self->set({
 		rootPostId=>$post->get("forumPostId"),
 		lastPostId=>$post->get("forumPostId"),
 		lastPostDate=>$post->get("dateOfPost")
 		});
-	$self->{_post}{$post->{forumPostId}} = $post;
+	$self->{_post}{$post->get("forumPostId")} = $post;
 	return $self;
 }
 

@@ -272,8 +272,8 @@ Specify the name of one of the incrementers in the incrementer table.
 
 sub getNextId {
         my ($id);
-        ($id) = WebGUI::SQL->quickArray("select nextValue from incrementer where incrementerId='$_[0]'",$_[1]);
-        WebGUI::SQL->write("update incrementer set nextValue=nextValue+1 where incrementerId='$_[0]'",$_[1]);
+        ($id) = WebGUI::SQL->quickArray("select nextValue from incrementer where incrementerId='$_[0]'");
+        WebGUI::SQL->write("update incrementer set nextValue=nextValue+1 where incrementerId='$_[0]'");
         return $id;
 }
 
@@ -636,7 +636,7 @@ A database handler to use. Defaults to the WebGUI database handler.
 sub setRow {
         my ($self, $table, $keyColumn, $data, $dbh) = @_;
         if ($data->{$keyColumn} eq "new") {
-                $data->{$keyColumn} = WebGUI::SQL->getNextId($keyColumn);
+                $data->{$keyColumn} = getNextId($keyColumn);
                 WebGUI::SQL->write("insert into $table ($keyColumn) values ($data->{$keyColumn})", $dbh);
         }
         my (@pairs);

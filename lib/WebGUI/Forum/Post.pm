@@ -14,9 +14,9 @@ sub addView {
 
 sub create {
 	my ($self, $data) = @_;
-	$data->{forumPostId} = "new";
 	$data->{dateOfPost} = WebGUI::DateTime::time();
-	my $forumPostId = WebGUI::SQL->setRow("forumPost","forumPostId",$data);
+	$data->{forumPostId} = "new";
+	my $forumPostId = WebGUI::SQL->setRow("forumPost","forumPostId", $data);
 	$self = WebGUI::Forum::Post->new($forumPostId);
 	if ($data->{parentId} > 0) {
 		$self->getThread->addReply($forumPostId,$self->get("dateOfPost"));
@@ -34,10 +34,10 @@ sub get {
 
 sub getReplies {
 	my ($self) = @_;
-	my @replies;
+	my @replies = ();
 	my $sth = WebGUI::SQL->read("select forumPostId from forumPost where parentId=".$self->get("forumPostId")." order by forumPostId");
-	while (my ($postId) = $sth->array) {
-		push(@replies,WebGUI::Forum::Post->new($postId));
+	while (my @data = $sth->array) {
+		push(@replies,WebGUI::Forum::Post->new($data[0]));
 	}
 	$sth->finish;
 	return \@replies;
