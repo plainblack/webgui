@@ -454,7 +454,7 @@ sub www_manageUsersInGroupSecondary {
 	my $existingUsers = WebGUI::Grouping::getUsersInGroup($session{form}{gid});
 	push(@{$existingUsers},"1");
 	push(@{$existingUsers},"3");
-	my $users = WebGUI::SQL->buildHashRef("select userId,username from users where status='Active' and userId not in (".join(",",@{$existingUsers}).")");
+	my $users = WebGUI::SQL->buildHashRef("select userId,username from users where status='Active' and userId not in (".join(",",@{$existingUsers}).") order by username");
 	$f->selectList(
 		-name=>"users",
 		-label=>WebGUI::International::get(976),
