@@ -303,6 +303,7 @@ sub www_editUserGroupSave {
 sub www_editUserProfile {
         my ($output, $f, $a, %user, %data, $method, $values, $category, $label, $default, $previousCategory);
         if (WebGUI::Privilege::isInGroup(3)) {
+		$output = helpIcon(32);
                 $output .= '<h1>'.WebGUI::International::get(455).'</h1>';
                 $f = WebGUI::HTMLForm->new;
                 $f->hidden("op","editUserProfileSave");
