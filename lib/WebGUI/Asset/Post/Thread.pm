@@ -186,6 +186,7 @@ sub getNextThread {
 				order by ".$self->getParent->getValue("sortBy")." asc 
 				",WebGUI::SQL->getSlave)
 			);
+		delete $self->{_next} unless ($self->{_next}->{_properties}{className} =~ /Thread/);
 	};
 	return $self->{_next};
 }
@@ -218,6 +219,7 @@ sub getPreviousThread {
 						)
 				order by ".$self->getParent->getValue("sortBy")." desc ",WebGUI::SQL->getSlave)
 			);
+		delete $self->{_previous} unless ($self->{_previous}->{_properties}{className} =~ /Thread/);
 	};
 	return $self->{_previous};
 }

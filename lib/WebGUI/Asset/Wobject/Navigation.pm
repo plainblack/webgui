@@ -272,19 +272,19 @@ sub view {
 		my $skip = 0;
 		my $pageLineage = $asset->get("lineage");
 		foreach my $lineage (@linesToSkip) {
-			$skip = 1 if ($lineage =~ m/^$pageLineage/);
+			$skip = 1 if ($pageLineage =~ m/^$lineage/);
 		}
 		next if ($skip);
 		if ($asset->get("isHidden") && !$self->get("showHiddenPages")) {
-			push (@linesToSkip,$asset->getId);
+			push (@linesToSkip,$asset->get("lineage")) unless ($asset->get("lineage") eq "000001");
 			next;
 		}
 		if ($asset->get("isSystem") && !$self->get("showSystemPages")) {
-			push (@linesToSkip,$asset->getId);
+			push (@linesToSkip,$asset->get("lineage")) unless ($asset->get("lineage") eq "000001");
 			next;
 		}
 		unless ($self->get("showUnprivilegedPages") || $asset->canView) {
-			push (@linesToSkip,$asset->getId);
+			push (@linesToSkip,$asset->get("lineage")) unless ($asset->get("lineage") eq "000001");
 			next;
 		}
 		my $pageData = {};

@@ -217,7 +217,6 @@ sub view {
 	
 	
 	my $self = shift;  
-	return WebGUI::Privilege::noAccess() unless $self->canView;
 	#define default view month range.  Note that this could be different from 
 	#the range a user is allowed to view - set by the events calendar limitations.
 	my $monthRangeLength = int($self->getValue("paginateAfter"));

@@ -138,7 +138,13 @@ sub process {
         }
 	$var{'head.tags'} .= generateAdditionalHeadTags();
 	$var{'head.tags'} .= "\n<!-- macro head tags -->\n";
-	my $output = WebGUI::Asset::Template->new($templateId)->process(\%var);
+	my $style = WebGUI::Asset::Template->new($templateId);
+	my $output;
+	if (defined $style) {
+		$output = $style->process(\%var);
+	} else {
+		$output = "WebGUI was unable to instanciate your style template.".$var{'body.content'};
+	}
 	$output = WebGUI::Macro::process($output);
 	my $macroHeadTags = generateAdditionalHeadTags();
 	$macroHeadTags = WebGUI::Macro::process($macroHeadTags);

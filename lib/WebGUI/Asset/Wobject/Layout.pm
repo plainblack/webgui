@@ -156,7 +156,7 @@ sub view {
 					push(@{$vars{"position".$i."_loop"}},{
 						id=>$child->getId,
 						content=>$child->view
-						});	
+						}) if $child->canView;	
 					push(@found, $child->getId);
 				}
 			}
@@ -169,7 +169,7 @@ sub view {
 			push(@{$vars{"position1_loop"}},{
 				id=>$child->getId,
 				content=>$child->view
-				});
+				}) if $child->canView;
 		}
 	}
 	$vars{showAdmin} = ($session{var}{adminOn} && $self->canEdit);

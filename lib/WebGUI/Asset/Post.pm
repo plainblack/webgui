@@ -157,7 +157,6 @@ sub definition {
 sub DESTROY {
 	my $self = shift;
 	$self->{_thread}->DESTROY if (exists $self->{_thread});
-	$self->{_storageLocation}->DESTROY if (exists $self->{_storageLocation});
 	$self->SUPER::DESTROY;
 }
 

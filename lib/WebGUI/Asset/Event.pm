@@ -43,7 +43,7 @@ sub definition {
 	my $class = shift;
   my $definition = shift;
   push(@{$definition}, {
-    tableName=>'EventsCalendar_Event',
+    tableName=>'EventsCalendar_event',
     className=>'WebGUI::Asset::Event',
     properties=>{
 			description => {
@@ -392,7 +392,7 @@ sub www_deleteEventConfirm {
 	my $self = shift;
 	return WebGUI::Privilege::insufficient() unless ($self->canEdit);
 	if ($session{form}{rid} ne "") {
-		my $where = "EventsCalendar_Event.EventsCalendar_recurringId=".quote($session{form}{rid});
+		my $where = "EventsCalendar_event.EventsCalendar_recurringId=".quote($session{form}{rid});
 		my $series = $self->getParent->getLineage(["descendants"],{returnObjects=>1, 
 		joinClass=>"WebGUI::Asset::Event",whereClause=>$where});
 		foreach my $trashedEvent (@{$series}) {

@@ -444,7 +444,9 @@ Completely remove an asset from existence.
 
 sub DESTROY {
 	my $self = shift;
-	$self->{_parent}->DESTROY if (exists $self->{_parent});
+	# something bad happens when the following is enabled, not sure why
+	# must check this out later
+	#$self->{_parent}->DESTROY if (exists $self->{_parent});
 	$self->{_firstChild}->DESTROY if (exists $self->{_firstChild});
 	$self->{_lastChild}->DESTROY if (exists $self->{_lastChild});
 	$self = undef;
