@@ -1255,7 +1255,7 @@ sub www_edit {
 		   	push (@$contentManagers, $session{user}{userId});
 		   	$clause = "userId in (".join(",",@$contentManagers).")";
 	    	} else {
-		   	$clause = "userId=".$_[0]->get("ownerId");
+		   	$clause = "userId=".$_[0]->getValue("ownerId");
 	    	}
 		my $users = WebGUI::SQL->buildHashRef("select userId,username from users where $clause order by username");
 		$f->getTab("privileges")->selectList(
