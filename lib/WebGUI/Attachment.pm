@@ -580,6 +580,7 @@ sub save {
 			$_[0]->{_filename} = "";
 			return "";
 		}
+		close $filename;
 		return $_[0]->getFilename;
 	} else {
 		return "";
