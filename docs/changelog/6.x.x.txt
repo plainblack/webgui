@@ -85,6 +85,8 @@
  - bugfix [ 1016258 ] Empty Trash Typo (Tavis Parker).
  - bugfix [ 1017727 ] Redirect URL (on edit page) not redirecting
  - RFE [ 718739 ]. USS Submission Start/End Dates (Thanks to Roy Johnson).
+ - bugfix [ 1008039 ] When adding javascript to description, the script is
+   doubled
 
 
 6.1.1

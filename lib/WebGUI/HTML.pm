@@ -66,17 +66,27 @@ The HTML segment you want cleaned.
 =cut
 
 sub cleanSegment {
-	my $value = $_[0];
-	if ($value =~ s/\r/\n/g) {
-		$value =~ s/\n\n/\n/g
+	my $html = shift;
+	# remove windows carriage returns
+	if ($html =~ s/\r/\n/g) {
+		$html =~ s/\n\n/\n/g
 	}
-	$value =~ m/(\<style.*?\/style\>)/ixsg;
-	my $style = $1;
-	$value =~ m/(\<script.*?\/script\>)/ixsg;
-	my $script = $1;
-	$value =~ s/\A.*?\<body.*?\>(.*?)/$1/ixsg;
-        $value =~ s/(.*?)\<\/body\>.*?\z/$1/ixsg;
-	return $script.$style.$value;
+	# remove meta tags
+	$html =~ s/\<meta.*?\>//ixsg;
+	# remove link tags
+	$html =~ s/\<link.*?\>//ixsg;
+	# remove title tags 
+	$html =~ s/\<title\>.*?\<\/title\>//ixsg;
+	# remove head tags 
+	$html =~ s/\<head.*?\>//ixsg;
+	$html =~ s/\<\/head>//ixsg;
+	# remove body tags 
+	$html =~ s/\<body.*?\>//ixsg;
+	$html =~ s/\<\/body>//ixsg;
+	# remove html tags 
+	$html =~ s/\<html>//ixsg;
+	$html =~ s/\<\/html>//ixsg;
+	return $html;
 }
 
 #-------------------------------------------------------------------
