@@ -51,10 +51,16 @@ These subroutines are available from this package:
 #-------------------------------------------------------------------
 sub _getSiteURL {
 	my $site;
-	if ($session{setting}{hostToUse} eq "sitename") {
-		$site = $session{config}{sitename} || $session{env}{HTTP_HOST};
+	my @sitenames;
+	if (ref $session{config}{sitename} eq "ARRAY") {
+		@sitenames = @{$session{config}{sitename}};
 	} else {
-		$site = $session{env}{HTTP_HOST} || $session{config}{sitename};
+		push(@sitenames,$session{config}{sitename});
+	}
+	if ($session{setting}{hostToUse} eq "sitename" || !isIn($session{env}{HTTP_HOST},@sitenames)) {
+		$site = $session{config}{defaultSitename};
+	} else {
+		$site = $session{env}{HTTP_HOST} || $session{config}{defaultSitename};
 	}
 	my $proto = "http://";
 	if ($session{env}{SERVER_PORT} == 443) {

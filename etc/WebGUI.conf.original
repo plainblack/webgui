@@ -1,6 +1,6 @@
-sitename = www.mycompany.com
+sitename = www.mycompany.com, mycompany.com
 
-dsn = DBI:mysql:WebGUI
+dsn = DBI:mysql:www_mycompany_com
 dbuser = webgui
 dbpass = password
 

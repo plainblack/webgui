@@ -11,6 +11,7 @@
  - Bugfix [ 909579 ] possible package problem 5.5.4
  - Bugfix [ 918136 ] upgrade to 5.5.5 sql inserts wrong version number
  - Bugfix [ 917338 ] Typo in 5.5.5 Email Data Form
+ - Bugfix [ 932243 ] Security bug: Env Host can be spoofed
 
 
 

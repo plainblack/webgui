@@ -407,6 +407,11 @@ sub open {
 	$session{config}{extrasURL} = $session{config}{extrasURL} || $session{config}{extras} || "/extras";
 	$session{config}{extras} = $session{config}{extras} || $session{config}{extrasURL}; # for backward compatibility
 	$session{config}{extrasPath} = $session{config}{extrasPath} || "/data/WebGUI/www/extras";
+	if (ref $session{config}{sitename} eq "ARRAY") {
+		$session{config}{defaultSitename} = $session{config}{sitename}[0];
+	} else {
+		$session{config}{defaultSitename} = $session{config}{sitename};
+	}
 	###----------------------------
 	### default database handler object
 	$session{dbh} = DBI->connect($session{config}{dsn},$session{config}{dbuser},$session{config}{dbpass},{ RaiseError=>0,AutoCommit=>1 });

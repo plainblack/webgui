@@ -7,6 +7,12 @@ upgrading from one version to the next, or even between multiple
 versions. Be sure to heed the warnings contained herein as they will
 save you many hours of grief.
 
+5.5.6
+--------------------------------------------------------------------
+ * You need to add all of your site aliases to the sitename variable
+	in your WebGUI config file.
+
+
 5.5.0
 --------------------------------------------------------------------
  * If you have any custom Message Board templates they will be

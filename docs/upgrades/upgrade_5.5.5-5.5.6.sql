@@ -1,4 +1,7 @@
 insert into webguiVersion values ('5.5.6','upgrade',unix_timestamp());
 delete from international where internationalId=81 and namespace='DataForm';
 INSERT INTO international VALUES (81,'DataForm',1,'Acknowledgement Template',1052064282,'A template to display whatever data there is to display.');
+delete from international where internationalId=71 and namespace='DataForm';
+INSERT INTO international VALUES (71,'DataForm',1,'This wobject creates a simple multipurpose data-entry form.\r\n<br><br>\r\n\r\n<b>Acknowledgement</b><br>\r\nThis message will be displayed to the user after they submit their data..\r\n<p>\r\n\r\n<b>Mail entries?</b></br>\r\nIf set to yes, some additional fields will be added to your form for dealing with email. These fields will then be used to email any date entered into the form to a person of your choice.\r\n<p>\r\n<b>NOTE:</b> The \"To\" field that is added as a result of setting this to yes can accept a standard email address, or a WebGUI username or a WebGUI group name.\r\n<p>\r\n\r\n<b>Template</b><br>\r\nChoose a template for your form.\r\n<p>\r\n\r\n<b>Email Template</b><br>\r\nChoose a template for the data that will be sent via email.\r\n<p>\r\n\r\n<b>Acknowledgement Template</b><br>\r\nChoose a template that will be used to display the acknowlegement.\r\n<p>\r\n\r\n<b>List Template</b><br>\r\nChoose a template that will be used to display the list of stored records in this Data Form.\r\n<p>',1053885941,NULL);
+
 
