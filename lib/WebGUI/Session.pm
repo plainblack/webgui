@@ -49,6 +49,7 @@ TIP: The $session variable is a case-insensitive hash. The contents of the has v
  use WebGUI::Session;
  WebGUI::Session::close();
  WebGUI::Session::convertVisitorToUser($sessionId,$userId);
+ WebGUI::Session::deleteAllScratch($name);
  WebGUI::Session::deleteScratch($name);
  WebGUI::Session::end($sessionId);
  WebGUI::Session::open($webguiRoot,$configFilename);
@@ -219,6 +220,29 @@ sub convertVisitorToUser {
 	undef $session{gotGroupsForUser};       # user ids.
 	$session{var}{userId} = $_[1];
 	refreshUserInfo($_[1]);
+}
+
+#-------------------------------------------------------------------
+
+=head2 deleteAllScratch ( name )
+
+Deletes a scratch variable for all users. This function should be used with care.
+
+=over
+
+=item name
+
+The name of the scratch variable.
+
+=back
+
+=cut
+
+sub deleteAllScratch {
+        my ($name) = @_;
+        return "" if ($name eq "");
+        WebGUI::SQL->write("delete from userSessionScratch where name=".quote($name));
+        $session{scratch}{$name} = "";
 }
 
 #-------------------------------------------------------------------
