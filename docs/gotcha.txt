@@ -16,6 +16,11 @@ save you many hours of grief.
 	any third-party plug-ins you have installed have been updated
 	to work with 6.2 before upgrading.
 
+ * A new configuration option has been introduced: 
+	exportPath = /path/to/export/dir
+	If exportPath is defined in the WebGUI config file, a new 
+	"Export" icon will appear in the page toolbar.
+
 
 6.1.0
 --------------------------------------------------------------------
