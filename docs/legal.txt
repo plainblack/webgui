@@ -1,0 +1,22 @@
+WebGUI is Copyright 2001 Plain Black Software. All rights reserved.
+
+WebGUI is a trademark of Plain Black Software.
+
+WebGUI may be distributed under the GNU General Public license. A copy of that license is distributed with this code in a file called "license.txt". If you are unable to retrieve that license for any reason, you may find a copy of it here: http://www.opensource.org/licenses/gpl-license.html
+
+For more information about Plain Black Software or WebGUI, please visit http://www.plainblack.com or email info@plainblack.com.
+
+It is illegal to remove or tamper with the notices at the top of each file, or this file, or the license file. The notice at the top of each file looks like the following:
+
+#-------------------------------------------------------------------
+# WebGUI is Copyright 2001 Plain Black Software.
+#-------------------------------------------------------------------
+# Please read the legal notices (docs/legal.txt) and the license
+# (docs/license.txt) that came with this distribution before using
+# this software.
+#-------------------------------------------------------------------
+# http://www.plainblack.com                     info@plainblack.com
+#-------------------------------------------------------------------
+
+
+
