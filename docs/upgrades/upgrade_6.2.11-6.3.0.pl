@@ -85,19 +85,16 @@ WebGUI::SQL->write("alter table DataForm_entryData add column assetId varchar(22
 WebGUI::SQL->write("alter table DataForm_field add column assetId varchar(22)");
 WebGUI::SQL->write("alter table DataForm_tab add column assetId varchar(22)");
 WebGUI::SQL->write("alter table USS_submission add column assetId varchar(22) not null");
-
-# Frank Dillon 20050201 --
-# Converting Product Wobjects to Assets. --
-WebGUI::SQL->write("alter table Product_feature add assetId varchar(22)");
-WebGUI::SQL->write("alter table Product_benefit add assetId varchar(22)");
-WebGUI::SQL->write("alter table Product_specification add assetId varchar(22)");
+WebGUI::SQL->write("alter table Product_feature add assetId varchar(22) not null");
+WebGUI::SQL->write("alter table Product_benefit add assetId varchar(22) not null");
+WebGUI::SQL->write("alter table Product_specification add assetId varchar(22) not null");
 WebGUI::SQL->write("alter table Product_accessory drop primary key");
-WebGUI::SQL->write("alter table Product_accessory add assetId varchar(22)");
-WebGUI::SQL->write("alter table Product_accessory add accessoryAssetId varchar(22)");
+WebGUI::SQL->write("alter table Product_accessory add assetId varchar(22) not null");
+WebGUI::SQL->write("alter table Product_accessory add accessoryAssetId varchar(22) not null");
 WebGUI::SQL->write("alter table Product_accessory add primary key (assetId,accessoryAssetId)");
 WebGUI::SQL->write("alter table Product_related drop primary key");
-WebGUI::SQL->write("alter table Product_related add assetId varchar(22)");
-WebGUI::SQL->write("alter table Product_related add relatedAssetId varchar(22)");
+WebGUI::SQL->write("alter table Product_related add assetId varchar(22) not null");
+WebGUI::SQL->write("alter table Product_related add relatedAssetId varchar(22) not null");
 WebGUI::SQL->write("alter table Product_related add primary key (assetId,relatedAssetId)");
 
 
