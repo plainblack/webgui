@@ -41,82 +41,42 @@ sub _duplicateWobjects {
 
 #-------------------------------------------------------------------
 sub _recursePageTree {
-	my ($a, %package, %newParent, $newPageId, $sequenceNumber, $urlizedTitle);
+	my ($a, %package, %newParent,$currentPage,$page);
 	tie %newParent, 'Tie::CPHash';
 	tie %package, 'Tie::CPHash';
-	%newParent = WebGUI::SQL->quickHash("select * from page where pageId=".quote($_[1]));
+	%newParent = WebGUI::SQL->quickHash("select * from page where pageId=$_[1]");
 	_duplicateWobjects($_[0],$_[1]);
-	($sequenceNumber) = WebGUI::SQL->quickArray("select max(sequenceNumber) from page where parentId=".quote($_[1]));
-	$a = WebGUI::SQL->read("select * from page where parentId=".quote($_[0])." order by sequenceNumber");
+	$a = WebGUI::SQL->read("select * from page where parentId=$_[0] order by sequenceNumber");
 	while (%package = $a->hash) {
-		$newPageId = WebGUI::Id::generate();
-		$sequenceNumber++;
-		$urlizedTitle = WebGUI::Page::makeUnique($package{urlizedTitle});
-                WebGUI::SQL->write("insert into page (
-			pageId,
-			parentId,
-			title,
-			styleId,
-			ownerId,
-			groupIdView,
-			groupIdEdit,
-			sequenceNumber,
-			metaTags,
-			urlizedTitle,
-			defaultMetaTags,
-			menuTitle,
-			synopsis,
-			templateId,
-			startDate,
-			endDate,
-			redirectURL,
-			userDefined1,
-			userDefined2,
-			userDefined3,
-			userDefined4,
-			userDefined5,
-			hideFromNavigation,
-			newWindow,
-			encryptPage,
-			cacheTimeout,
-			cacheTimeoutVisitor,
-			printableStyleId,
-			wobjectPrivileges
-			) values (
-			$newPageId,
-			".quote($_[1]).",
-			".quote($package{title}).",
-			$newParent{styleId},
-			$session{user}{userId},
-			$newParent{groupIdView},
-			$newParent{groupIdEdit},
-			$sequenceNumber,
-			".quote($package{metaTags}).",
-			".quote($urlizedTitle).",
-			".$package{defaultMetaTags}.",
-			".quote($package{menuTitle}).",
-			".quote($package{synopsis}).",
-			".quote($package{templateId}).",
-			$newParent{startDate},
-			$newParent{endDate},
-			".quote($newParent{redirectURL}).",
-			".quote($newParent{userDefined1}).",
-			".quote($newParent{userDefined2}).",
-			".quote($newParent{userDefined3}).",
-			".quote($newParent{userDefined4}).",
-			".quote($newParent{userDefined5}).",
-			$package{hideFromNavigation},
-			$package{newWindow},
-			$package{encryptPage},
-			$package{cacheTimeout},
-			$package{cacheTimeoutVisitor},
-			".quote($package{printableStyleId}).",
-			$package{wobjectPrivileges}
-			)");
-		_recursePageTree($package{pageId},$newPageId);
+		$currentPage = WebGUI::Page->getPage($_[1]);
+		$page = $currentPage->add;
+		$page->set({
+			title => $package{title},
+			styleId => $newParent{styleId},
+			printableStyleId => $package{printableStyleId},
+			ownerId => $session{user}{userId},
+			groupIdView => $newParent{groupIdView},
+			groupIdEdit => $newParent{groupIdEdit},
+			newWindow => $package{newWindow},
+			wobjectPrivileges => $package{wobjectPrivileges},
+			hideFromNavigation => $package{hideFromNavigation},
+			startDate => $newParent{startDate},
+			endDate => $newParent{endDate},
+			cacheTimeout => $package{cacheTimeout},
+			cacheTimeoutVisitor => $package{cacheTimeoutVisitor},
+			metaTags => $package{metaTags},
+			urlizedTitle => WebGUI::Page::makeUnique($package{urlizedTitle}),
+			redirectURL => $newParent{redirectURL},
+			defaultMetaTags => $package{defaultMetaTags},
+			templateId => $package{templateId},
+			menuTitle => $package{menuTitle},
+			synopsis => $package{synopsis}
+		});
+		_recursePageTree($package{pageId},$page->get('pageId'));
 	}
 	$a->finish;
 }
+
 
 #-------------------------------------------------------------------
 sub www_deployPackage {

@@ -414,8 +414,8 @@ sub www_listCollateral {
 	WebGUI::Session::setScratch("collateralPageNumber",$session{form}{pn});
 	WebGUI::Session::setScratch("collateralFolderId",$session{form}{fid});
 	$folderId = $session{scratch}{collateralFolderId} || 0;
-	$constraints = "collateralFolderId=".$folderId;
-	$constraints .= " and userId=$session{scratch}{collateralUser}" if ($session{scratch}{collateralUser});
+	$constraints = "collateralFolderId=".quote($folderId);
+	$constraints .= " and userId=".quote($session{scratch}{collateralUser}) if ($session{scratch}{collateralUser});
 	$constraints .= " and collateralType=".quote($session{scratch}{collateralType}) if ($session{scratch}{collateralType});
 	$constraints .= " and name like ".quote('%'.$session{scratch}{keyword}.'%') if ($session{scratch}{keyword});
 	$p = WebGUI::Paginator->new(WebGUI::URL::page('op=listCollateral'),"",$session{scratch}{collateralPageNumber});

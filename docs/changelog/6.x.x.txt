@@ -12,6 +12,12 @@
  - bugfix [ 1025755 ] UILevel can't be set to beginner (0)
  - bugfix [ 1006981 ] Syndicated Content doesn't show channel description (Don
    Ji).
+ - bugfix [ 996585 ] Fixed Package Add incompatibility w/new page tree in
+   6.1.1 (OpenTech)
+ - bugfix [ 1024073 ] Problem with Collateral Management (ID?)
+ - bugfix [ 1023688 ] upgrade.pl from 6.03 - 6.10 using 6.2.1 beta
+ - bugfix [ 1024079 ] "Software error" message
+
 
 
 6.2.1

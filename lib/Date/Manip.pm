@@ -3455,6 +3455,7 @@ sub Date_TimeZone {
     }
     $in->close;
   }
+  push(@tz,"EST5EDT"); # if all else fails
 
   # Now parse each one to find the first valid one.
   foreach $tz (@tz) {
