@@ -240,7 +240,7 @@ sub insufficient {
 
 #-------------------------------------------------------------------
 
-=head2 isInGroup ( groupId [ , userId ] )
+=head2 isInGroup ( [ groupId [ , userId ] ] )
 
 Returns a boolean (0|1) value signifying that the user has the required privileges. Always returns true for Admins.
 
@@ -248,7 +248,7 @@ Returns a boolean (0|1) value signifying that the user has the required privileg
 
 =item groupId
 
-The group that you wish to verify against the user.
+The group that you wish to verify against the user. Defaults to group with Id 3 (the Admin group).
 
 =item userId
 
@@ -263,6 +263,9 @@ sub isInGroup {
 	($gid, $uid) = @_;
 	$uid = $session{user}{userId} if ($uid eq "");
 
+	unless (defined $gid) {
+		$gid = 3;
+	}
 
 	### The following several checks are to increase performance. If this section were removed, everything would continue to work as normal. 
         if ($gid == 7) {
