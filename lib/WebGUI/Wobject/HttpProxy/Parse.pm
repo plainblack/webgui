@@ -128,6 +128,7 @@ sub start {
             					$self->{FormAction} = $val;  # set FormAction to include hidden field later
             					$val = WebGUI::URL::page;    # Form Action returns to us
           				} else {
+						$val =~ s/\n//g;	# Bugfix 757068
             					$val = WebGUI::URL::page('proxiedUrl='.WebGUI::URL::escape($val).
                                      			'&wid='.$self->{wid}.'&func=view'); # return to us
           				}
