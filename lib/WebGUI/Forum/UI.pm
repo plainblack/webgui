@@ -1194,7 +1194,6 @@ sub getPostTemplateVars {
         	}
 	} elsif ($post->get("contentType") eq "text") {
                	$var->{'post.message'} =~ s/\t/&nbsp;&nbsp;&nbsp;&nbsp;/g;
-               	$var->{'post.message'} =~ s/ /&nbsp;/g;
                	$var->{'post.message'} =~ s/\n/\<br \/\>/g;
 	} elsif ($post->get("contentType") eq "code") {
                	$var->{'post.message'} =~ s/&/&amp;/g;
