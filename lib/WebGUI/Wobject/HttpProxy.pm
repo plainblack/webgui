@@ -56,10 +56,7 @@ sub new {
 				}, 
 			followRedirect=>{
 				defaultValue=>0
-				}, 
-			cookiebox=>{
-				defaultValue=>'/tmp'
-				}
+				} 
 			}
                 );
         bless $self, $class;
@@ -108,11 +105,6 @@ sub www_edit {
 		-label=>WebGUI::International::get(4,$_[0]->get("namespace")),
 		-value=>[$_[0]->getValue("timeout")]
 		);
-	$properties->text(
-		-name=>"cookiebox", 
-		-label=>WebGUI::International::get(9,$_[0]->get("namespace")),
-		-value=>$_[0]->getValue("cookiebox")
-		);
         return $_[0]->SUPER::www_edit(
 		-properties=>$properties->printRowsOnly,
 		-layout=>$layout->printRowsOnly,
@@ -125,20 +117,19 @@ sub www_edit {
 
 #-------------------------------------------------------------------
 sub www_view {
-   my (%formdata, @formUpload, $jar, $redirect, $cookiebox, $response, $header, 
-       $output, $userAgent, $proxiedUrl, $request, $content);
+   my (%formdata, @formUpload, $redirect, $response, $header, 
+       $userAgent, $proxiedUrl, $request, $content);
 
-   $output = $_[0]->displayTitle;
-   $output .= $_[0]->description;
+   	my $output = $_[0]->displayTitle;
+   	$output .= $_[0]->description;
 
-   if(not(-w $_[0]->get("cookiebox") && -r $_[0]->get("cookiebox"))) {
-      return "<b>Error while opening cookie directory ".$_[0]->get("cookiebox")."</b><p><i>$!</i>";
-   }
-
-   $cookiebox = WebGUI::URL::escape($session{var}{sessionId});
-   $cookiebox =~ s/[^A-Za-z0-9\-\.\_]//g;  #removes all funky characters
-   $cookiebox = $_[0]->get("cookiebox").'/'.$_[0]->get("namespace").'_cookie_'.$cookiebox.'.jar';
-   $jar = HTTP::Cookies->new(File => $cookiebox, AutoSave => 1, Ignore_Discard => 1);
+   	my $node = WebGUI::Node->new("temp",$_[0]->get("namespace")."_cookies");
+	$node->create;
+	my $cookiebox = WebGUI::URL::escape($session{var}{sessionId});
+   	$cookiebox =~ s/[^A-Za-z0-9\-\.\_]//g;  #removes all funky characters
+   	$cookiebox .= '.cookie';
+	$cookiebox = $node->getPath.$session{os}{slash}.$cookiebox;
+   	my $jar = HTTP::Cookies->new(File => $cookiebox, AutoSave => 1, Ignore_Discard => 1);
 
    if($session{form}{wid} == $_[0]->get("wobjectId") && $session{form}{func}!~/editSave/i) {
       $proxiedUrl = $session{form}{FormAction} || $session{form}{proxiedUrl} || $_[0]->get("proxiedUrl") ;
