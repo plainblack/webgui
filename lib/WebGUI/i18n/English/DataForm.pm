@@ -620,7 +620,10 @@ A conditional indicating whether this field exists for the mail subsystem of the
 		lastUpdated=>1095701013,
 		context=>q|Tells the user that there is no tab to set the field to.|
 		},
-
+	'Field Position' => {
+		message =>q|Field Position|,
+		lastUpdated=>1095701013
+	}
 };
 
 1;

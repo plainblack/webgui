@@ -648,6 +648,13 @@ sub www_editField {
 		-label=>WebGUI::International::get(21,$_[0]->get("namespace")),
 		-value=>$field{name}
 		);
+	if($field{sequenceNumber} && ! $field{isMailField}) {
+		$f->integer(
+			-name=>"position",
+			-label=>WebGUI::International::get('Field Position',$_[0]->get("namespace")),
+			-value=>$field{sequenceNumber}
+		);	
+	}
 	$f->select(
 		-name=>"tid",
 		-options=>$tab,
@@ -740,6 +747,10 @@ sub www_editFieldSave {
 		vertical=>$session{form}{vertical},
 		extras=>$session{form}{extras},
 		}, "1","1", _tonull("DataForm_tabId",$session{form}{tid}));
+	if($session{form}{position}) {
+		WebGUI::SQL->write("update DataForm_field set sequenceNumber=".quote($session{form}{position}).
+					" where DataForm_fieldId=".quote($session{form}{fid}));
+	}
 	$_[0]->reorderCollateral("DataForm_field","DataForm_fieldId", _tonull("DataForm_tabId",$session{form}{tid})) if ($session{form}{fid} ne "new");
         if ($session{form}{proceed} eq "addField") {
             	$session{form}{fid} = "new";
