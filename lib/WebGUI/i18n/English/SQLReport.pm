@@ -27,7 +27,7 @@ Placeholder Parameters are delimited by commas.<br>
 There are four input types:
 <ul><b>Integer</b><br>A simple number</ul>
 <ul><b>Form</b><br>Form fields begin with "form:".</ul>
-<ul><b>Query results</b><br>Query results begin with "query1:" through "query4:". Query results are populated with data from prior queries. So when the second query is initiated, it can used the results returned by query1. When query 5 is initated it can use the results from queries 1 through 4.</ul>
+<ul><b>Query results</b><br>Query results begin with "query1:" through "query4:". Query results are populated with data from prior queries. So when the second query is initiated, it can used the results returned by query1. When query 5 is initiated it can use the results from queries 1 through 4.</ul>
 <ul><b>String</b><br>Anything else is a string</ul>
 
 <p>Example:
@@ -56,7 +56,7 @@ How many rows should be displayed before splitting the results into separate pag
 
 
 |,
-		lastUpdated => 1099546465
+		lastUpdated => 1101774391
 	},
 
 	'61' => {
