@@ -83,7 +83,6 @@ macros=# => Hash_userId, \
         SubscriptionItem => SubscriptionItem, \
         SubscriptionItemPurchaseUrl => SubscriptionItemPurchaseUrl, \
         Thumbnail => Thumbnail, \
-        ThumbnailLinker => ThumbnailLinker, \
         User => User, \
         a => a_account, \
         c => c_companyName, \
