@@ -6,7 +6,7 @@ our $HELP = {
 		body => '71',
 		related => [
 			{
-				tag => 'web services client template',
+				tag => 'ws client template',
 				namespace => 'WSClient'
 			},
 			{
@@ -20,7 +20,7 @@ our $HELP = {
 		body => '73',
 		related => [
 			{
-				tag => 'web services client add/edit',
+				tag => 'ws client add/edit',
 				namespace => 'WSClient'
 			},
 			{
