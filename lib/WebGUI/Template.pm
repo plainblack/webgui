@@ -231,10 +231,10 @@ sub process {
 	unless (-f $file->getPath) {
         	($template) = WebGUI::SQL->quickArray("select template from template where templateId=".$templateId." and namespace=".quote($namespace),WebGUI::SQL->getSlave);
 		$file->saveFromScalar($template);
-	}
-	unless (-f $file->getPath) {
-		WebGUI::ErrorHandler::warn("Could not create file ".$file->getPath."\nTemplate file caching is disabled");
-		$params{scalarref} = \$template;
+		unless (-f $file->getPath) {
+	                WebGUI::ErrorHandler::warn("Could not create file ".$file->getPath."\nTemplate file caching is disabled");
+        	        $params{scalarref} = \$template;
+        	}
 	}
 	return _execute(\%params,$vars);
 }
