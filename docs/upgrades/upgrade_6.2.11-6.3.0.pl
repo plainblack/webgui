@@ -1616,6 +1616,7 @@ $macros->{"AssetProxy"} = "AssetProxy";
 $macros->{"RandomAssetProxy"} = "RandomAssetProxy";
 $macros->{"FileUrl"} = "FileUrl";
 $macros->{"PageUrl"} = "PageUrl";
+$macros->{"Page"} = "Page";
 $conf->set("paymentPlugins"=>"ITransact");
 $conf->set("macros"=>$macros);
 $conf->set("assets"=>[

@@ -388,6 +388,13 @@ sub www_edit {
 }
 
 #-------------------------------------------------------------------
+sub www_view {
+	my $self = shift;
+	return $self->SUPER::www_view(1);
+}
+
+
+#-------------------------------------------------------------------
 sub _buildPageList {
 	my ($self, @userSpecifiedRoots, @roots, @allowedRoots, $pageId, @pages);
 	$self = shift;

@@ -127,6 +127,7 @@ sub getName {
 } 
 
 
+
 #-------------------------------------------------------------------
 sub www_edit {
         my $self = shift;
@@ -145,10 +146,10 @@ A web executable method that redirects the user to the specified page, or displa
 sub www_view {
 	my $self = shift;
 	if ($session{var}{adminOn}) {
-		return $self->www_edit;
+		return $self->getContainer->www_view;
 	}
 	WebGUI::HTTP::setRedirect($self->get("redirectUrl"));
-	return "";
+	return undef;
 }
 
 

@@ -2,6 +2,25 @@
  - Fixed a bug in the collaboration system that caused replies to fail.
  - Fixed an inefficency in the asset system that caused a lot of extra work on
    the server when pasting.
+ - Fixed a bug in the groups system where group expiration intervals weren't
+   saving properly.
+ - fix [ 1170879 ] "default extension" is added to asset's URL upon every Save
+ - fix [ 1170200 ] folder view template file_loop -> always current time
+ - fix [ 1170650 ] Group problem
+ - fix [ 1170245 ] paste returns deleted content
+ - Fixed a problem with the FormProcessor url sub that wouldn't allow URLs to
+   start with / or a macro.
+ - fix [ 1171447 ] Poll shows no result
+ - fix [ 1171060 ] delete file from cs
+ - fix [ 1170290 ] 6.2.x->6.5.4 doesn't add Page macro to config file
+ - fix [ 1171469 ] [edited] post insert wrong timezone
+ - Updated the macro picker in the rich editor.
+ - fix [ 1171505 ] Previewing a post appends signature every time.
+ - fix [ 1170095 ] Sort-by fields don't.
+ - fix [ 1165645 ] Search not working
+ - fix [ 1170264 ] can't copy file
+ - fix [ 1170242 ] cs email url
+ - fix [ 1171110 ] nav ancestor
 
 
 6.5.4 

@@ -95,6 +95,7 @@ sub duplicate {
 	my $newAsset = $self->SUPER::duplicate(shift);
 	my $newStorage = $self->getStorageLocation->copy;
 	$newAsset->update({storageId=>$newStorage->getId,olderVersions=>''});
+	return $newAsset;
 }
 
 

@@ -340,8 +340,8 @@ sub view {
 		$pageData->{"page.isChild"} = ($asset->get("parentId") eq $current->getId);
 		$pageData->{"page.isParent"} = ($asset->getId eq $current->get("parentId"));
 		$pageData->{"page.isCurrent"} = ($asset->getId eq $current->getId);
-		$pageData->{"page.isDescendant"} = ( $currentLineage =~ m/^$pageLineage/ && !$pageData->{"page.isCurrent"});
-		$pageData->{"page.isAnscestor"} = ( $pageLineage =~ m/^$currentLineage/ && !$pageData->{"page.isCurrent"});
+		$pageData->{"page.isDescendant"} = ( $pageLineage =~ m/^$currentLineage/ && !$pageData->{"page.isCurrent"});
+		$pageData->{"page.isAncestor"} = ( $currentLineage =~ m/^$pageLineage/ && !$pageData->{"page.isCurrent"});
 		my $currentBranchLineage = substr($currentLineage,0,12);
 		$pageData->{"page.inBranchRoot"} = ($currentBranchLineage =~ m/^$pageLineage/);
 		$pageData->{"page.isSibling"} = (

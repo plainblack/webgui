@@ -159,7 +159,7 @@ sub view {
 				title=>$child->get("title"),
 				synopsis=>$child->get("synopsis"),
 				size=>WebGUI::Utility::formatBytes($child->get("assetSize")),
-				"date.epoch"=>$child->get("dateStamp"),
+				"date.epoch"=>$child->get("lastUpdated"),
 				"icon.small"=>$child->getIcon(1),
 				"icon.big"=>$child->getIcon,
 				type=>$child->getName,

@@ -100,6 +100,18 @@ sub definition {
 }
 
 
+#-------------------------------------------------------------------
+
+=head2 deletePageCache ( )
+
+Deletes the rendered page cache for this wobject.
+
+=cut
+
+sub deletePageCache {
+	my $self = shift;
+        WebGUI::Cache->new("wobject_".$self->getId."_".$session{user}{userId})->delete;
+}
 
 #-------------------------------------------------------------------
 
@@ -395,6 +407,12 @@ sub processMacros {
 }
 
 
+#-------------------------------------------------------------------
+sub processPropertiesFromFormPost {
+	my $self = shift;
+	$self->SUPER::processPropertiesFromFormPost;
+	$self->deletePageCache;
+}
 
 
 #-------------------------------------------------------------------
@@ -553,13 +571,14 @@ sub setCollateral {
 
 #-------------------------------------------------------------------
 
-=head2 www_view ( )
+=head2 www_view ( [ disableCache ] )
 
 Renders self->view based upon current style, subject to timeouts. Returns Privilege::noAccess() if canView is False.
 
 =cut
 sub www_view {
 	my $self = shift;
+	my $disableCache = shift;
 	return WebGUI::Privilege::noAccess() unless $self->canView;
 	if ($self->get("encryptPage") && $session{env}{HTTPS} ne "on") {
                 WebGUI::HTTP::setRedirect($self->getUrl);
@@ -569,12 +588,12 @@ sub www_view {
 	my $cache;
 	my $output;
         my $useCache = (
-		$session{form}{op} eq "" && $session{form}{pn} eq "" &&
-		(
-			( $self->get("cacheTimeout") > 10 && $session{user}{userId} ne '1') || 
-			( $self->get("cacheTimeoutVisitor") > 10 && $session{user}{userId} eq '1')
-		) && 
-		not $session{var}{adminOn}
+		$session{form}{op} eq "" && $session{form}{pn} eq "" 
+		&& (
+			( $self->get("cacheTimeout") > 10 && $session{user}{userId} ne '1') 
+			|| ( $self->get("cacheTimeoutVisitor") > 10 && $session{user}{userId} eq '1')
+		) 
+		&& !( $session{var}{adminOn} || $disableCache)
 	);
 	if ($useCache) {
                	$cache = WebGUI::Cache->new("wobject_".$self->getId."_".$session{user}{userId});

@@ -621,7 +621,7 @@ sub url {
 		return $session{form}{$_[0]};
 	} elsif (_checkEmailAddy($session{form}{$_[0]})) {
 		return "mailto:".$session{form}{$_[0]};
-	} elsif ($session{form}{$_[0]} =~ /:\/\//) {
+	} elsif ($session{form}{$_[0]} =~ /^\// || $session{form}{$_[0]} =~ /:\/\// || $session{form}{$_[0]} =~ /^\^/) {
 		return $session{form}{$_[0]};
 	}
 	return "http://".$session{form}{$_[0]};

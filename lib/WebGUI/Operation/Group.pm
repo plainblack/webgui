@@ -265,7 +265,11 @@ sub www_editGroup {
 	$f->readOnly($g->groupId,WebGUI::International::get(379));
         $f->text("groupName",WebGUI::International::get(84),$g->name);
         $f->textarea("description",WebGUI::International::get(85),$g->description);
-        $f->interval("expireOffset",WebGUI::International::get(367), WebGUI::DateTime::secondsToInterval($g->expireOffset));
+        $f->interval(
+		-name=>"expireOffset",
+		-label=>WebGUI::International::get(367), 
+		-value=>$g->expireOffset
+		);
 	$f->yesNo(
 		-name=>"expireNotify",
 		-value=>$g->expireNotify,
@@ -332,7 +336,11 @@ sub www_editGroup {
 		-value=>$g->dbQuery,
 		-label=>WebGUI::International::get(1005)
 		);
-	$f->interval("dbCacheTimeout",WebGUI::International::get(1004), WebGUI::DateTime::secondsToInterval($g->dbCacheTimeout));
+	$f->interval(
+		-name=>"dbCacheTimeout",
+		-label=>WebGUI::International::get(1004), 
+		-value=>$g->dbCacheTimeout
+		);
 	$f->submit;
 	$output .= $f->print;
         return _submenu($output,'87',"group add/edit");

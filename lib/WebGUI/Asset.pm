@@ -97,7 +97,6 @@ A lineage is a concatenated series of sequence numbers, each six digits long, th
  newByLineage
  newByPropertyHashRef
  newByUrl
- republish
  paste
  processPropertiesFromFormPost
  promote
@@ -302,14 +301,14 @@ sub checkExportPath {
 
 =head2 cut ( )
 
-Removes asset from lineage, places it in clipboard state. The "gap" in the lineage is changed in state to limbo.
+Removes asset from lineage, places it in clipboard state. The "gap" in the lineage is changed in state to clipboard-limbo.
 
 =cut
 
 sub cut {
 	my $self = shift;
 	WebGUI::SQL->beginTransaction;
-	WebGUI::SQL->write("update asset set state='limbo', lastUpdatedBy=".quote($session{user}{userId}).", lastUpdated=".time()." where lineage like ".quote($self->get("lineage").'%'));
+	WebGUI::SQL->write("update asset set state='clipboard-limbo', lastUpdatedBy=".quote($session{user}{userId}).", lastUpdated=".time()." where lineage like ".quote($self->get("lineage").'%')." and state='published'");
 	WebGUI::SQL->write("update asset set state='clipboard', lastUpdatedBy=".quote($session{user}{userId}).", lastUpdated=".time()." where assetId=".quote($self->getId));
 	WebGUI::SQL->commit;
 	$self->updateHistory("cut");
@@ -591,7 +590,9 @@ sub fixUrl {
 	if (length($url) > 250) {
 		$url = substr($url,220);
 	}
-	$url .= ".".$session{setting}{urlExtension} if ($url =~ /\./ && $session{setting}{urlExtension} ne "");
+	if ($session{setting}{urlExtension} ne "" && !($url =~ /\./)) {
+		$url .= ".".$session{setting}{urlExtension};
+	}
 	my ($test) = WebGUI::SQL->quickArray("select url from asset where assetId<>".quote($self->getId)." and url=".quote($url));
         if ($test) {
                 my @parts = split(/\./,$url);
@@ -812,6 +813,10 @@ sub getAssetManagerControl {
 	$output .= "var manager = new AssetManager(assets,columnHeadings,labels,crumbtrail);\n";
 	$output .= "manager.assetType='".$controlType."';\n" if (defined $controlType);
 	$output .= "manager.disableDisplay(0);\n" if (defined $removeRank);
+	if ($controlType eq "ManageTrash" || $controlType eq "ManageClipboard") {
+	#	$output .= "manager.displayCrumbTrail = false;\n";
+	#	$output .= "manager.sortEnabled = false;\n";
+	}
 	$output .= "manager.renderAssets();\n";
 	$output .= "</script>\n";
 	return $output;
@@ -1177,7 +1182,7 @@ A hash reference comprising modifiers to relative listing. Rules include:
 
 =head4 statesToInclude
 
-An array reference containing a list of states that should be returned. Defaults to 'published'. Options include 'published', 'trash', 'cliboard', and 'limbo'.
+An array reference containing a list of states that should be returned. Defaults to 'published'. Options include 'published', 'trash', 'cliboard', 'clipboard-limbo' and 'trash-limbo'.
 
 =head4 endingLineageLength
 
@@ -1846,20 +1851,6 @@ sub newByUrl {
 
 #-------------------------------------------------------------------
 
-=head2 republish ( )
-
-Sets Asset properties state to published.
-
-=cut
-
-sub republish {
-	my $self = shift;
-	WebGUI::SQL->write("update asset set state='published', lastUpdatedBy=".quote($session{user}{userId}).", lastUpdated=".time()." where lineage like ".quote($self->get("lineage").'%'));
-	$self->{_properties}{state} = "published";
-}
-
-#-------------------------------------------------------------------
-
 =head2 paste ( assetId )
 
 Returns 1 if can paste an asset to a Parent. Sets the Asset to published. Otherwise returns 0.
@@ -1873,9 +1864,10 @@ Alphanumeric ID tag of Asset.
 sub paste {
 	my $self = shift;
 	my $assetId = shift;
-	my $pastedAsset = WebGUI::Asset->new($assetId);	
+	my $pastedAsset = WebGUI::Asset->newByDynamicClass($assetId);	
 	if ($self->getId eq $pastedAsset->get("parentId") || $pastedAsset->setParent($self)) {
-		$pastedAsset->republish;
+		WebGUI::SQL->write("update asset set state='published', lastUpdatedBy=".quote($session{user}{userId}).", lastUpdated=".time()." where lineage like ".quote($self->get("lineage").'%')." and (state='clipboard' or state='clipboard-limbo')");
+		$self->{_properties}{state} = "published";
 		$pastedAsset->updateHistory("pasted to parent ".$self->getId);
 		return 1;
 	}
@@ -1905,7 +1897,11 @@ sub processPropertiesFromFormPost {
 	}
 	$data{title} = "Untitled" unless ($data{title});
 	$data{menuTitle} = $data{title} unless ($data{menuTitle});
-	$data{url} = $self->getParent->get("url").'/'.$data{menuTitle} unless ($data{url});
+	unless ($data{url}) {
+		$data{url} = $self->getParent->get("url");
+		$data{url} =~ s/(.*)\..*/$1/;
+		$data{url} .= '/'.$data{menuTitle};
+	}
 	$self->update(\%data);
 	foreach my $form (keys %{$session{form}}) {
 		if ($form =~ /^metadata_(\d+)$/) {
@@ -1992,6 +1988,20 @@ sub promote {
 
 #-------------------------------------------------------------------
 
+=head2 publish ( )
+
+Sets an asset and it's descendants to a state of 'published' regardless of it's current state.
+
+=cut
+
+sub publish {
+	my $self = shift;
+	WebGUI::SQL->write("update asset set state='published', lastUpdatedBy=".quote($session{user}{userId}).", lastUpdated=".time()." where lineage like ".quote($self->get("lineage").'%'));
+	$self->{_properties}{state} = "published";
+}
+
+#-------------------------------------------------------------------
+
 =head2 purge ( )
 
 Returns 1. Deletes an asset from tables and removes anything bound to that asset.
@@ -2022,7 +2032,7 @@ Returns 1. Purges self and all descendants.
 
 sub purgeTree {
 	my $self = shift;
-	my $descendants = $self->getLineage(["self","descendants"],{returnObjects=>1, invertTree=>1, statesToInclude=>['trash','limbo']});
+	my $descendants = $self->getLineage(["self","descendants"],{returnObjects=>1, invertTree=>1, statesToInclude=>['trash','trash-limbo']});
 	foreach my $descendant (@{$descendants}) {
 		$descendant->purge;
 	}
@@ -2153,14 +2163,14 @@ sub swapRank {
 
 =head2 trash ( )
 
-Removes asset from lineage, places it in trash state. The "gap" in the lineage is changed in state to limbo.
+Removes asset from lineage, places it in trash state. The "gap" in the lineage is changed in state to trash-limbo.
 
 =cut
 
 sub trash {
 	my $self = shift;
 	WebGUI::SQL->beginTransaction;
-	WebGUI::SQL->write("update asset set state='limbo', lastUpdatedBy=".quote($session{user}{userId}).", lastUpdated=".time()." where lineage like ".quote($self->get("lineage").'%'));
+	WebGUI::SQL->write("update asset set state='trash-limbo', lastUpdatedBy=".quote($session{user}{userId}).", lastUpdated=".time()." where lineage like ".quote($self->get("lineage").'%'));
 	WebGUI::SQL->write("update asset set state='trash', lastUpdatedBy=".quote($session{user}{userId}).", lastUpdated=".time()." where assetId=".quote($self->getId));
 	WebGUI::SQL->commit;
 	$self->{_properties}{state} = "trash";
@@ -2263,7 +2273,11 @@ Returns "".
 =cut
 
 sub view {
-	return "";
+	my $self = shift;
+	if ($session{var}{adminOn}) {
+		return $self->getToolbar;
+	}
+	return undef;
 }
 
 #-------------------------------------------------------------------
@@ -2329,7 +2343,7 @@ sub www_copy {
 
 Copies to clipboard assets in a list, then returns self calling method www_manageAssets(), if canEdit. Otherwise returns AdminConsole rendered insufficient privilege.
 
-=cut
+cut
 
 sub www_copyList {
 	my $self = shift;
@@ -3217,6 +3231,43 @@ sub www_promote {
 	return WebGUI::Privilege::insufficient() unless $self->canEdit;
 	$self->promote;
 	return $self->getContainer->www_view;
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 www_restoreList ( )
+
+Restores a piece of content from the trash back to it's original location.
+
+=cut
+
+sub www_purgeList {
+	my $self = shift;
+	return WebGUI::Privilege::insufficient() unless $self->canEdit;
+	foreach my $id ($session{cgi}->param("assetId")) {
+		my $asset = WebGUI::Asset->newByDynamicClass($id);
+		$asset->purge;
+	}
+	return $self->www_manageTrash();
+}
+
+#-------------------------------------------------------------------
+
+=head2 www_restoreList ( )
+
+Restores a piece of content from the trash back to it's original location.
+
+=cut
+
+sub www_restoreList {
+	my $self = shift;
+	return WebGUI::Privilege::insufficient() unless $self->canEdit;
+	foreach my $id ($session{cgi}->param("assetId")) {
+		my $asset = WebGUI::Asset->newByDynamicClass($id);
+		$asset->publish;
+	}
+	return $self->www_manageTrash();
 }
 
 

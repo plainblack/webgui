@@ -394,7 +394,7 @@ sub getTemplateVars {
 	$var{"reply.url"} = $self->getReplyUrl;
         $var{'reply.withquote.url'} = $self->getReplyUrl(1);
 
-        $var{'url'} = $self->getUrl.'#'.$self->getId;
+        $var{'url'} = WebGUI::URL::getSiteURL().$self->getUrl.'#'.$self->getId;
 
         $var{'rating.value'} = $self->get("rating")+0;
         $var{'rate.url.1'} = $self->getRateUrl(1);
@@ -467,7 +467,9 @@ sub getUploadControl {
 	if ($self->get("storageId")) {
 		my $i;
 		foreach my $filename (@{$self->getStorageLocation->getFiles}) {
-			$uploadControl .= '<a href="'.$self->getStorageLocation->getUrl($filename).'">'.$filename.'</a><br />';	
+			$uploadControl .= deleteIcon("func=deleteFile&filename=".$filename,$self->get("url"),WebGUI::International::get("delete file warning","Collaboration"))	
+				.' <a href="'.$self->getStorageLocation->getUrl($filename).'">'.$filename.'</a>'
+				.'<br />';
 			$i++;
 		}
 		return $uploadControl unless ($i < $maxAttachments);
@@ -650,7 +652,7 @@ sub processPropertiesFromFormPost {
 	$data{endDate} = $self->getThread->getParent->get("endDate") unless ($session{form}{endDate});
 	($data{synopsis}, $data{content}) = $self->getSynopsisAndContentFromFormPost;
         if ($self->getThread->getParent->get("addEditStampToPosts")) {
-        	$data{content} .= "\n\n --- (Edited on ".WebGUI::DateTime::epochToHuman()." by ".$session{user}{alias}.") --- \n";
+        	$data{content} .= "\n\n --- (Edited on ".WebGUI::DateTime::epochToHuman(undef,"%z %Z [GMT%O]")." by ".$session{user}{alias}.") --- \n";
 		if ($self->getValue("contentType") eq "mixed" || $self->getValue("contentType") eq "html") {
 			$data{content} = '<p>'.$data{content}.'</p>';
 		}
@@ -810,6 +812,14 @@ sub www_approve {
 }
 
 #-------------------------------------------------------------------
+sub www_deleteFile {
+	my $self = shift;
+	$self->getStorageLocation->deleteFile($session{form}{filename}) if $self->canEdit;
+	return $self->www_edit;
+}
+
+
+#-------------------------------------------------------------------
 
 =head2 www_deny ( )
 
@@ -883,7 +893,7 @@ sub www_edit {
 				value=>$session{form}{subscribe} || 1
 				});
 		}
-                $content .= "\n\n".$session{user}{signature} if ($session{user}{signature});
+                $content .= "\n\n".$session{user}{signature} if ($session{user}{signature} && !$session{form}{content});
 	} else { # edit
 		return WebGUI::Privilege::insufficient() unless ($self->canEdit);
         	$var{'form.header'} = WebGUI::Form::formHeader({action=>$self->getUrl})

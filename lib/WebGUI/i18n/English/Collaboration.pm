@@ -1,6 +1,11 @@
 package WebGUI::i18n::English::Collaboration;
 
 our $I18N = {
+	'delete file warning' => {
+		message => q|Are you sure you wish to delete this file?|,
+		lastUpdated => 1109618544,
+	},
+
 	'display last reply' => {
 		message => q|Display last reply?|,
 		lastUpdated => 1109618544,

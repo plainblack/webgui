@@ -1026,6 +1026,14 @@ sub _xml_encode {
 }
 
 #-------------------------------------------------------------------
+sub www_view {
+	my $self = shift;
+	my $disableCache = ($session{form}{sortBy} ne "");
+	return $self->SUPER::www_view($disableCache);
+}
+
+
+#-------------------------------------------------------------------
 # print out RSS 2.0 feed describing the items visible on the first page
 sub www_viewRSS {
 	my $self = shift;
@@ -1075,6 +1083,7 @@ sub www_viewRSS {
 	WebGUI::HTTP::setMimeType("text/xml");
         return $xml;
 }
+
 
 
 

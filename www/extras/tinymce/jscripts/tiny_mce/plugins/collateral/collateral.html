@@ -21,16 +21,11 @@ function returnSelected(in_values) {
 
 
 <select name="textPulldown" onchange="returnSelected(this.value)">
-<option value=''>Collateral...</option>
-<option value='^I("logo");'>Image</option>
-<option value='^SI("logo","100");'>Scaled Image</option>
-<option value='^Thumbnail("logo");'>Thumbnail</option>
-<option value='^ThumbnailLinker("logo");'>Linked Thumbnail</option>
-<option value='^File("product specs");'>File with Icon</option>
-<option value='^i("status report");'>File URL</option>
-<option value='^RandomImage("collateral folder");'>Random Image</option>
-<option value='^RandomSnippet("collateral folder");'>Random Snippet</option>
-<option value='^Snippet("flash code");'>Snippet</option>
+<option value=''>Assets...</option>
+<option value='^AssetProxy(url);'>Asset Proxy</option>
+<option value='^RandomAssetProxy(url);'>Random Asset Proxy</option>
+<option value='^FileUrl(assetUrl);'>File URL</option>
+<option value='^Page(property name);'>Asset Property</option>
 </select>
 
 
@@ -56,7 +51,7 @@ function returnSelected(in_values) {
 <option value='^Navigation(rootmenu);'>Root Menu (Horizontal)</option>
 <option value='^H;'>Home Link</option>
 <option value='^/;'>System URL</option>
-<option value='^\;'>Current Page URL</option>
+<option value='^PageUrl;'>Current Page URL</option>
 </select>
 
 
@@ -87,7 +82,7 @@ function returnSelected(in_values) {
 <option value='^r;'>Make Page Printable</option>
 <option value='^RootTitle;'>Root Title</option>
 <option value='^Extras;'>Extras Folder</option>
-<option value='^AdminBar(2);'>Admin Bar</option>
+<option value='^AdminBar;'>Admin Bar</option>
 </select>
 
 
