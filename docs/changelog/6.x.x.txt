@@ -1,6 +1,11 @@
 6.3.0
  - bugfix [ 1045114 ] Columns randomly ordered in SQLReport (Len Kranendonk ,
    tnx brother for reporting)
+ - Sped up Navigation.pm
+ - bugfix [1041937] List Roots broken
+ - bugfix [1042680] collateralImport.pl --folderId
+ - Fixed typo in Wobjects/IndexedSearch.pm
+
 
 6.2.7
  - Expanded upon the help for URL extensions.
