@@ -284,7 +284,7 @@ The unique id for this question.
 	},
 
 	'91' => {
-		message => q|The following template variables are available in all survey templates.
+		message => q|The following template variables are available in all survey templates.<p>
 
 <b>user.canViewReports</b><br>
 A boolean indicating whether the user has the privileges to view survey reports.
@@ -498,8 +498,8 @@ The default label for survey.url.
 	},
 
 	'17' => {
-		message => q|Edit Question|,
-		lastUpdated => 1035436091
+		message => q|Survey Question, Add/Edit|,
+		lastUpdated => 1110068088,
 	},
 
 	'1' => {
@@ -655,9 +655,32 @@ The default label for survey.url.
 	'4' => {
 		message => q|Surveys allow you to gather information from your users. In the case of WebGUI surveys, you can also use them to test your user's knowledge.
 <p/>
+Surveys are Wobjects and Assets, so they have the properties of both.  Survery have these unique properties:<p/>
+
+<b>Template</b><br/>
+This template is used to display the Survey itself.
+<p/>
+
+<b>Survey Template Response</b><br/>
+This template is used to display the questions and answers for the user to pick.
+<p/>
+
+<b>Gradebook Template</b><br/>
+This template is used to display, on a user-by-user basis how many questions they got
+correct and what percentage answered were correct.
+<p/>
+
+<b>Statistical Overview Template</b><br/>
+This template is used to display a statistical overview of the all responses
+to the Survey.
+<p/>
 
 <b>Question Order</b><br/>
 The order the questions will be asked. Sequential displays the questions in the order you create them. Random displays the questions randomly. Response driven displays the questions in order based on the responses of the users.
+<p/>
+
+<b>Questions per page</b><br/>
+The number of questions that will be displayed per page.  The default is 1.
 <p/>
 
 <b>Mode</b><br/>
@@ -668,21 +691,29 @@ By default the Survey is in survey mode. This allows it to ask questions of your
 Select whether or not the survey will record and display information that can identify a user and their responses.  If left at the default value of "No", the survey will record the user's IP address as well as their WebGUI User ID and Username if logged in.  This info will then be available in the survey's reports.  If set to "Yes", these three fields will contain scrambled data that can not be traced to a particular user.
 <p/>
 
+<b>Maximum Responses Per User?</b><br/>
+The number of times the user can attempt to get the correct answer on each question.  The
+default is 1.
+<p/>
+
+<b>Questions Per Response?</b><br/>
+The total number of people who can take the survey.
+<p/>
+
 <b>Who can take the survey?</b><br/>
 Which users can participate in the survey?
 <p/>
-
 
 <b>Who can view reports?</b><br/>
 Who can view the results of the survey?
 <p/>
 
-
 <b>What next?</b><br/>
-If you leave this set at its default, then you will add a question directly after adding the survey.
+After creating a new Survey, you may either starting adding questions or go back to the page where
+the survey was added.
 <p/>
 |,
-		lastUpdated => 1059069492
+		lastUpdated => 1110059528
 	},
 
 	'34' => {
@@ -1019,6 +1050,44 @@ A comment.
 		context => q|Form label indicating the response template.|
 	},
 
+	'745' => {
+		message => q|Go back to the page.|,
+		lastUpdated => 1110006174,
+	},
+
+	'45' => {
+		message => q|No, I made a mistake.|,
+		lastUpdated => 1110006259,
+	},
+
+        'question add/edit body' => {
+		message => q|
+<p><b>Question</b><br />
+This is the question that the user will be asked.
+</p>
+
+<p><b>Allow comment?</b><br />
+If set to Yes, then the user will be allowed to add a comment to their response to this question.
+</p>
+
+<p><b>Randomize answers?</b><br />
+If set to Yes, then the answers will be shuffled for each user.
+</p>
+
+<p><b>What next?</b><br />
+After defining the question, you may supply an answer:
+<ul>
+<li>Multiple Choice</il>
+<li>Text</il>
+<li>Frequency</il>
+<li>Opinion</il>
+</ul>
+or you may return to the survey.
+</p>
+
+             |,
+		lastUpdated => 1110006259,
+	},
 
 };
 

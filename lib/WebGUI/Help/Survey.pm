@@ -6,8 +6,16 @@ our $HELP = {
 		body => '4',
 		related => [
 			{
+				tag => 'asset fields',
+				namespace => 'Asset'
+			},
+			{
 				tag => 'wobjects using',
 				namespace => 'Wobject'
+			},
+			{
+				tag => 'question add/edit',
+				namespace => 'Survey'
 			},
 			{
 				tag => 'survey template',
@@ -27,6 +35,16 @@ our $HELP = {
 			},
 			{
 				tag => 'statistical overview report template',
+				namespace => 'Survey'
+			},
+		]
+	},
+	'question add/edit' => {
+		title => '17',
+		body => 'question add/edit body',
+		related => [
+			{
+				tag => 'survey add/edit',
 				namespace => 'Survey'
 			},
 		]
