@@ -245,10 +245,8 @@ sub getUiLevel {
 
 
 #-------------------------------------------------------------------
-sub www_view {
+sub view {
 	my $self = shift;
-        $self->logView() if ($session{setting}{passiveProfilingEnabled});
-
         # Initiate an empty debug loop
         $self->{_debug_loop} = [] ;
 	
