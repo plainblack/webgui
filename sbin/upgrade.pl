@@ -30,7 +30,7 @@ my $override;
 my $quiet;
 my $mysql = "/usr/bin/mysql";
 my $mysqldump = "/usr/bin/mysqldump";
-my $backupDir = "/data/backups";
+my $backupDir = "/tmp/backups";
 my $skipBackup;
 my $doit;
 

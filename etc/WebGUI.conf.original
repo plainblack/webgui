@@ -4,7 +4,7 @@ dsn = DBI:mysql:www_example_com
 dbuser = webgui
 dbpass = password
 
-logfile = /data/webgui.log
+logfile = /var/log/webgui.log
 
 extrasURL = /extras
 extrasPath = /data/WebGUI/www/extras
