@@ -56,35 +56,35 @@ our $I18N = {
 		message => q|With the shortcut you can mirror an asset. This is useful if you want to reuse the same content in multiple sections of your site.
 <p>
 
-<b>NOTE:</b> The shortcut is not available through the Add Content menu, but instead through the shortcut icon on each wobject's toolbar.
+<b>NOTE:</b> The shortcut is not available through the Add Content menu, but instead through the shortcut icon on each Asset's toolbar.
 <p>
 
 <b>Asset to Mirror</b><br>
-Provides a link to the original wobject being mirrored.
+Provides a link to the original asset being mirrored.
 <p>
 
 <b>Override title?</b><br>
-Set to "yes" to use the title of the shortcut instead of the original title of the wobject.
+Set to "yes" to use the title of the shortcut instead of the original title of the asset.
 <p>
 
 <b>Override description?</b><br>
-Set to "yes" to use the description of the shortcut instead of the original description of the wobject.
+Set to "yes" to use the description of the shortcut instead of the original description of the asset.
 <p>
 
 <b>Override display title?</b><br>
-Set to "yes" to use the display title setting of the shortcut instead of the original display title setting of the wobject.
+Set to "yes" to use the display title setting of the shortcut instead of the original display title setting of the asset.
 <p>
 
 <b>Override template?</b><br>
-Set to "yes" to use the template of the shortcut of the original template of the wobject.
+Set to "yes" to use the template of the shortcut of the original template of the asset.
 <p>
 
 <b>Shortcut by alternate criteria?</b><br>
-Set to "yes" to enable selecting a wobject based upon custom criteria. Metadata must be enabled for this option to function properly.
+Set to "yes" to enable selecting a asset based upon custom criteria. Metadata must be enabled for this option to function properly.
 <p>
 
 <b>Resolve Multiples?</b><br>
-Sets the order to use when multiple wobjects are selected. Random means that if multiple assets match the shortcut criteria then the shortcut will select a random asset.<br>
+Sets the order to use when multiple assets are selected. Random means that if multiple assets match the shortcut criteria then the shortcut will select a random asset.<br>
 Most Recent will select the most recent asset that match the shortcut criteria.
 <p>
 
@@ -95,7 +95,7 @@ A property or value must be quoted if it contains spaces. Feel free to use the c
 <b>NOTE:</b> Shortcut will automatically add a template variable to the asset it's mirroring called 'originalURL'. You can use that to link to the original content that's being mirrored.
 <p>
 |,
-		lastUpdated => 1109524349,
+		lastUpdated => 1109561313,
 	},
 
 	'greater than' => {
