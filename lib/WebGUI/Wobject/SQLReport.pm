@@ -180,9 +180,9 @@ sub www_view {
 	               			$output .= $template[2];
                                		$output .= WebGUI::International::get(18,$namespace).'<p>';
                	        	} else {
-					$url = WebGUI::URL::page();
+					$url = WebGUI::URL::page('&wid='.$_[0]->get("wobjectId").'&func=view');
 					foreach (keys %{$session{form}}) {
-						unless ($_ eq "pn") {
+						unless ($_ eq "pn" || $_ eq "wid" || $_ eq "func") {
 							$url = WebGUI::URL::append($url, WebGUI::URL::escape($_)
 								.'='.WebGUI::URL::escape($session{form}{$_}));
 						}

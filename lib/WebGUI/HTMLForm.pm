@@ -417,7 +417,7 @@ sub email {
         $size = shift || $session{setting}{textBoxSize} || 30;
 	$output = '<script language="javascript" src="'.$session{config}{extras}.'/emailCheck.js"></script>';
         $output .= '<input type="text" name="'.$name.'" value="'.$value.'" size="'.
-                $size.'" maxlength="'.$maxLength.'" onBlur="emailCheck(this.value)" '.$extras.'>';
+                $size.'" maxlength="'.$maxLength.'" onChange="emailCheck(this.value)" '.$extras.'>';
         $output .= _subtext($subtext);
         $output = _tableFormRow($label,$output) unless ($class->{_noTable});
         $class->{_data} .= $output;
