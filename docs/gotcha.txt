@@ -16,6 +16,19 @@ save you many hours of grief.
 
  * See docs/migration.txt for changes in the template system.
 
+ * See docs/migration.txt for changes in the Internationalization
+	and help systems.
+
+ * If you're using any third-party plug-ins, you'll need to get
+	updated versions to work with 6.1.
+
+ * If you're using a language other than English on your current site,
+ 	you'll need to obtain a language pack from either the user
+	contributions or one of the WebGUI Worldwide sites.
+
+ * Each user's language has been reset to the default language for
+	the site as specified in the profile settings.
+
 
 6.0.2
 --------------------------------------------------------------------

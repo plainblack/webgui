@@ -22,9 +22,9 @@ use warnings;
 our @ISA = qw(WebGUI::Auth);
 
 my %smbError = (
-	1 => WebGUI::International::get(2,'Auth/SMB'),
-	2 => WebGUI::International::get(3,'Auth/SMB'),
-	3 => WebGUI::International::get(4,'Auth/SMB')
+	1 => WebGUI::International::get(2,'AuthSMB'),
+	2 => WebGUI::International::get(3,'AuthSMB'),
+	3 => WebGUI::International::get(4,'AuthSMB')
 );
 
 
@@ -45,10 +45,10 @@ sub addUserForm {
 	my $login = $session{form}{'authSMB.smbLogin'} || $userData->{smbLogin};
 
 	my $f = WebGUI::HTMLForm->new;
-	$f->text("authSMB.smbPDC",WebGUI::International::get(5,'Auth/SMB'),$pdc);
-	$f->text("authSMB.smbBDC",WebGUI::International::get(6,'Auth/SMB'),$bdc);
-	$f->text("authSMB.smbDomain",WebGUI::International::get(7,'Auth/SMB'),$domain);
-	$f->text("authSMB.smbLogin",WebGUI::International::get(8,'Auth/SMB'),$login);
+	$f->text("authSMB.smbPDC",WebGUI::International::get(5,'AuthSMB'),$pdc);
+	$f->text("authSMB.smbBDC",WebGUI::International::get(6,'AuthSMB'),$bdc);
+	$f->text("authSMB.smbDomain",WebGUI::International::get(7,'AuthSMB'),$domain);
+	$f->text("authSMB.smbLogin",WebGUI::International::get(8,'AuthSMB'),$login);
 	return $f->printRowsOnly;
 }
 
@@ -83,7 +83,7 @@ sub authenticate {
 	   $smb = Authen::Smb::authen($userData->{smbLogin}, $password, $userData->{smbPDC}, $userData->{smbBDC}, $userData->{smbDomain});
 	   $error = "<li>".$smbError{$smb} if($smb > 0)
 	}else{
-	   $error .= "<li>".WebGUI::International::get(5,'Auth/SMB');
+	   $error .= "<li>".WebGUI::International::get(5,'AuthSMB');
 	}
 	$self->user(WebGUI::User->new(1)) if $error ne "";
     $self->error($error);
@@ -102,9 +102,9 @@ sub createAccount {
    } 	
    $vars->{'create.message'} = $_[0] if ($_[0]);
    $vars->{'create.form.loginId'} = WebGUI::Form::text({"name"=>"authSMB.loginId","value"=>$session{form}{"authSMB.loginId"}});
-   $vars->{'create.form.loginId.label'} = WebGUI::International::get(8,'Auth/SMB');
+   $vars->{'create.form.loginId.label'} = WebGUI::International::get(8,'AuthSMB');
    $vars->{'create.form.password'} = WebGUI::Form::password({"name"=>"authSMB.identifier","value"=>$session{form}{"authSMB.identifier"}});
-   $vars->{'create.form.password.label'} = WebGUI::International::get(9,'Auth/SMB');
+   $vars->{'create.form.password.label'} = WebGUI::International::get(9,'AuthSMB');
    $vars->{'create.form.hidden'} = WebGUI::Form::hidden({"name"=>"confirm","value"=>$session{form}{confirm}});
    return $self->SUPER::createAccount("createAccountSave",$vars);
 }
@@ -169,7 +169,7 @@ sub displayAccount {
 	  $vars->{'account.form.karma.label'} = WebGUI::International::get(537);
    }
    $vars->{'account.options'} = WebGUI::Operation::Shared::accountOptions();
-   return WebGUI::Template::process(1,'Auth/SMB/Account', $vars);
+   return WebGUI::Template::process(1,'AuthSMB/Account', $vars);
 }
 
 #-------------------------------------------------------------------
@@ -218,9 +218,9 @@ sub editUserFormSave {
 sub editUserSettingsForm {
    my $self = shift;
    my $f = WebGUI::HTMLForm->new;
-   $f->text("smbPDC",WebGUI::International::get(5,'Auth/SMB'),$session{setting}{smbPDC});
-   $f->text("smbBDC",WebGUI::International::get(6,'Auth/SMB'),$session{setting}{smbBDC});
-   $f->text("smbDomain",WebGUI::International::get(7,'Auth/SMB'),$session{setting}{smbDomain});
+   $f->text("smbPDC",WebGUI::International::get(5,'AuthSMB'),$session{setting}{smbPDC});
+   $f->text("smbBDC",WebGUI::International::get(6,'AuthSMB'),$session{setting}{smbBDC});
+   $f->text("smbDomain",WebGUI::International::get(7,'AuthSMB'),$session{setting}{smbDomain});
    $f->yesNo(
              -name=>"smbSendWelcomeMessage",
              -value=>$session{setting}{smbSendWelcomeMessage},

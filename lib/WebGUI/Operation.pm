@@ -18,7 +18,6 @@ use WebGUI::Operation::Collateral;
 use WebGUI::Operation::DatabaseLink;
 use WebGUI::Operation::Group;
 use WebGUI::Operation::Help;
-use WebGUI::Operation::International;
 use WebGUI::Operation::MessageLog;
 use WebGUI::Operation::Package;
 use WebGUI::Operation::Page;

@@ -46,7 +46,7 @@ sub _isValidLDAPUser {
    my $self = shift;
    my ($uri, $error, $ldap, $search, $auth, $connectDN);
    
-   $uri = URI->new($session{setting}{ldapURL}) or $error = WebGUI::International::get(2,'Auth/LDAP');
+   $uri = URI->new($session{setting}{ldapURL}) or $error = WebGUI::International::get(2,'AuthLDAP');
    if($error ne ""){
       $self->error($error);
 	  return 0;
@@ -62,7 +62,7 @@ sub _isValidLDAPUser {
                    $connectDN = $search->entry(0)->get_value($session{setting}{ldapUserRDN});
                 }
                 $ldap->unbind;
-                $ldap = Net::LDAP->new($uri->host, (port=>$uri->port)) or $error .= WebGUI::International::get(2,'Auth/LDAP');
+                $ldap = Net::LDAP->new($uri->host, (port=>$uri->port)) or $error .= WebGUI::International::get(2,'AuthLDAP');
                 $auth = $ldap->bind(dn=>$connectDN, password=>$session{form}{'authLDAP.identifier'});
                 if ($auth->code == 48 || $auth->code == 49) {
                    $error .= '<li>'.WebGUI::International::get(68);
@@ -77,11 +77,11 @@ sub _isValidLDAPUser {
                WebGUI::ErrorHandler::warn("Invalid LDAP information for registration of LDAP ID: ".$session{form}{'authLDAP.ldapId'});
             }
 	 } else {
-	     $error = WebGUI::International::get(2,'Auth/LDAP');
+	     $error = WebGUI::International::get(2,'AuthLDAP');
 		 WebGUI::ErrorHandler::warn("Couldn't bind to LDAP server: ".$session{setting}{ldapURL});
 	 }
   } else {
-     $error = WebGUI::International::get(2,'Auth/LDAP');
+     $error = WebGUI::International::get(2,'AuthLDAP');
 	 WebGUI::ErrorHandler::warn("Couldn't create LDAP object: ".$uri->host);
   }
   $self->error($error);
@@ -102,8 +102,8 @@ sub addUserForm {
 	my $connectDN = $session{form}{'authLDAP.connectDN'} || $userData->{connectDN};
 	
 	my $f = WebGUI::HTMLForm->new;
-	$f->url("authLDAP.ldapUrl",WebGUI::International::get(3,'Auth/LDAP'),$ldapUrl);
-	$f->text("authLDAP.connectDN",WebGUI::International::get(4,'Auth/LDAP'),$connectDN);
+	$f->url("authLDAP.ldapUrl",WebGUI::International::get(3,'AuthLDAP'),$ldapUrl);
+	$f->text("authLDAP.connectDN",WebGUI::International::get(4,'AuthLDAP'),$connectDN);
 	return $f->printRowsOnly;
 }
 
@@ -133,8 +133,8 @@ sub authenticate {
 	my $userData = $self->getParams;
 		
 	
-	$error .= WebGUI::International::get(12,'Auth/LDAP') if ($userData->{ldapUrl} eq "");
-	$error .= WebGUI::International::get(11,'Auth/LDAP') if ($userData->{connectDN} eq "");
+	$error .= WebGUI::International::get(12,'AuthLDAP') if ($userData->{ldapUrl} eq "");
+	$error .= WebGUI::International::get(11,'AuthLDAP') if ($userData->{connectDN} eq "");
 	
 	$self->error($error);
     if($error ne ""){
@@ -143,7 +143,7 @@ sub authenticate {
 	}
 	
 	if($uri = URI->new($userData->{ldapUrl})) {
-	   $ldap = Net::LDAP->new($uri->host, (port=>$uri->port)) or $error .= WebGUI::International::get(2,'Auth/LDAP');
+	   $ldap = Net::LDAP->new($uri->host, (port=>$uri->port)) or $error .= WebGUI::International::get(2,'AuthLDAP');
 	   if($error ne ""){
 	      $self->user(WebGUI::User->new(1));
 	      return 0 ;
@@ -157,7 +157,7 @@ sub authenticate {
 	   }
 	   $ldap->unbind;
 	}else{
-	   $error .= WebGUI::International::get(13,'Auth/LDAP');
+	   $error .= WebGUI::International::get(13,'AuthLDAP');
 	   WebGUI::ErrorHandler::warn("Could not process this LDAP URL: ".$userData->{ldapUrl});
 	}
 	if($error ne ""){
@@ -261,7 +261,7 @@ sub displayAccount {
 	  $vars->{'account.form.karma.label'} = WebGUI::International::get(537);
    }
    $vars->{'account.options'} = WebGUI::Operation::Shared::accountOptions();
-   return WebGUI::Template::process(1,'Auth/LDAP/Account', $vars);
+   return WebGUI::Template::process(1,'AuthLDAP/Account', $vars);
 }
 
 #-------------------------------------------------------------------
@@ -310,11 +310,11 @@ sub editUserFormSave {
 sub editUserSettingsForm {
    my $self = shift;
    my $f = WebGUI::HTMLForm->new;
-   $f->text("ldapUserRDN",WebGUI::International::get(9,'Auth/LDAP'),$session{setting}{ldapUserRDN});
-   $f->url("ldapURL",WebGUI::International::get(5,'Auth/LDAP'),$session{setting}{ldapURL});
-   $f->text("ldapId",WebGUI::International::get(6,'Auth/LDAP'),$session{setting}{ldapId});
-   $f->text("ldapIdName",WebGUI::International::get(7,'Auth/LDAP'),$session{setting}{ldapIdName});
-   $f->text("ldapPasswordName",WebGUI::International::get(8,'Auth/LDAP'),$session{setting}{ldapPasswordName});
+   $f->text("ldapUserRDN",WebGUI::International::get(9,'AuthLDAP'),$session{setting}{ldapUserRDN});
+   $f->url("ldapURL",WebGUI::International::get(5,'AuthLDAP'),$session{setting}{ldapURL});
+   $f->text("ldapId",WebGUI::International::get(6,'AuthLDAP'),$session{setting}{ldapId});
+   $f->text("ldapIdName",WebGUI::International::get(7,'AuthLDAP'),$session{setting}{ldapIdName});
+   $f->text("ldapPasswordName",WebGUI::International::get(8,'AuthLDAP'),$session{setting}{ldapPasswordName});
    $f->yesNo(
              -name=>"ldapSendWelcomeMessage",
              -value=>$session{setting}{ldapSendWelcomeMessage},

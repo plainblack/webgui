@@ -125,4 +125,19 @@ In 6.1 we completely rewrote the underlying template framework to add template
 caching. Any plug-ins that use WebGUI::Template, must be updated to reflect
 the new API.
 
+5.7 Internationalization and Help Change
+
+In 6.1 we moved the internationalization out of the database and into compiled
+perl modules. This helps tremendously in performance. It also allows for
+text-based tags to be used instead of integers for international ids. If
+you've written any plug-ins that use the internationalization system, you'll
+need to migrate them to the new system. We've created a tool that will
+auto-generate the new help and internationalization files from an existing 6.0
+database. You can get it from the "tools" module in CVS or in the user
+contributions area on plainblack.com. The utility is called:
+gen61i18nfrom60data.pl
+
+We also made the International API object oriented. The old procedural version
+is still intact as well. See WebGUI::International for API changes.
+
 

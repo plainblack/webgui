@@ -16,9 +16,7 @@ package WebGUI::International;
 
 
 use strict;
-use WebGUI::Cache;
 use WebGUI::Session;
-use WebGUI::SQL;
 
 
 =head1 NAME
@@ -75,29 +73,20 @@ An integer that specifies the language that the user should see.  Defaults to th
 sub get {
         my ($id, $language, $namespace);
 	if (ref($_[0]) eq "WebGUI::International") {
-		$id = $_[1] || 0;
+		$id = $_[1];
 		$namespace = $_[2] || $_[0]->{_namespace} || "WebGUI";
-		$language = $_[3] || $_[0]->{_language} || $session{user}{language} || 1;
+		$language = $_[3] || $_[0]->{_language} || $session{user}{language} || "English";
 	} else {
-		$id = $_[0] || 0;
+		$id = $_[0];
 		$namespace = $_[1] || "WebGUI";
-		$language = $_[2] || $session{user}{language} || 1;
+		$language = $_[2] || $session{user}{language} || "English";
 	}
-	my $cachetag = $session{config}{configFile}."-International";
-	if ($session{config}{useSharedInternationalCache}) {
-		$cachetag = "International";
-	}
-	my $cache = WebGUI::Cache->new($language."_".$namespace."_".$id,$cachetag);
-	my $output = $cache->get;
-	if (not defined $output) {
-		($output) = WebGUI::SQL->quickArray("select message from international 
-			where internationalId=$id and namespace='$namespace' and languageId='$language'");
-		if ($output eq "" && $language ne 1) {
-			$output = get($id,$namespace,1);
-		}
-		$cache->set($output, 3600);
-	}
-	return $output;
+	my $cmd = "WebGUI::i18n::".$language."::".$namespace;
+	my $load = "use ".$cmd;
+	eval($load);
+	$cmd = "\$".$cmd."::I18N->{'".$id."'}";
+	my $output = eval($cmd);	
+	return $output || get($id,$namespace,"English");
 }
 
 
@@ -111,7 +100,24 @@ Returns a hash reference to the languages (languageId/lanugage) installed on thi
 
 sub getLanguages {
         my ($hashRef);
-        $hashRef = WebGUI::SQL->buildHashRef("select languageId,language from language");
+	my $dir = $session{config}{webguiRoot}.$session{os}{slash}."lib".$session{os}{slash}."WebGUI".$session{os}{slash}."i18n";
+	opendir (DIR,$dir) or WebGUI::ErrorHandler::fatalError("Can't open I18N directory!");
+	my @files = readdir(DIR);
+	closedir(DIR);
+	foreach my $file (@files) {
+		if ($file =~ /(.*?)\.pm$/) {
+			my $language = $1;
+			my $cmd = "WebGUI::i18n::".$language;
+			my $load = "use ".$cmd;
+			eval($load);
+			unless ($@) {
+				$cmd = "\$".$cmd."::I18N->{'label'}";
+				$hashRef->{$language} = eval($cmd);	
+			} else {
+				WebGUI::ErrorHandler::warn("Language failed to compile: $language. ".$@);
+			}
+		}
+	}
         return $hashRef;
 }
 

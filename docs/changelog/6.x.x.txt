@@ -18,15 +18,20 @@
    benefits and detriments. This allows you to increase scalability and
    performance at a cost of either memory or disk space or both. The gains
    here are primarily enjoyed by large heavy traffic sites that use lots of 
-   templates.
+   complex templates.
  - Added convenience methods to Wobject superclass for internationalization,
    wobject ID, and namespace.
  - Added an object-oriented interface to the internationalization system. The
    old procedural interface still works as well.
  - Added on the wire compression to HTTP transport for WSClient wobject.  This
    will have no effect on clients/servers that can't support compression.
- - A small patch from Roy Johnson to deal with different types of WSDLs in th
-   WS Client.
+ - A small patch from Roy Johnson to deal with different types of WSDLs in the
+   WSClient.
+ - Moved to a compiled internationalization and help system. At a cost of 3
+   megabytes of RAM, it provides a boost in performance of over 35%. More
+   importantly though, it cuts the number of database queries in half on an
+   average page, which leads to much greater scalability. See
+   docs/migration.txt for API changes.
  - Added the ability to select session v. global caches to WSClient.
 
 
