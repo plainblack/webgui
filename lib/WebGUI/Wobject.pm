@@ -500,6 +500,25 @@ sub moveCollateralUp {
 
 #-------------------------------------------------------------------
 
+=head2 name ( )
+
+This method should be overridden by all wobjects and should return an internationalized human friendly name for the wobject. This method only exists in the super class for reverse compatibility and will try to look up the name based on the old name definition.
+
+=cut
+
+sub name {
+	my $cmd = "\$WebGUI::Wobject::".$_[0]->get("namespace")."::name";
+	my $name = eval($cmd);
+	if ($@) {
+		WebGUI::ErrorHandler::warn($_[0]->get("namespace")." does not appear to have any sort of name definition at all.");
+		return $_[0]->get("namespace");
+	} else {
+		return $name;
+	}
+}
+
+#-------------------------------------------------------------------
+
 =head2 new ( properties [, extendedProperties, allowDiscussion] )
 
 Constructor.
@@ -544,10 +563,14 @@ sub new {
 	my $properties = shift;
 	my $extendedProperties = shift;
 	my $allowDiscussion = shift || 0;
+	my $wobjectProperties = [qw(userDefined1 userDefined2 userDefined3 userDefined4 userDefined5 
+		moderationType groupToModerate groupToPost karmaPerPost editTimeout filterPost addEditStampToPosts
+		title displayTitle description pageId templatePosition startDate endDate sequenceNumber)];
         bless({
 		_property=>$properties, 
 		_extendedProperties=>$extendedProperties,
-		_allowDiscussion=>$allowDiscussion
+		_allowDiscussion=>$allowDiscussion,
+		_wobjectProperties=>$wobjectProperties
 		}, 
 		$self);
 }
@@ -672,23 +695,15 @@ sub reorderCollateral {
 
 #-------------------------------------------------------------------
 
-=head2 set ( [ hashRef, arrayRef ] )
+=head2 set ( [ hashRef ] )
 
 Stores the values specified in hashRef to the database.
-
-NOTE: This method should be extended by all subclasses.
 
 =over
 
 =item hashRef 
 
-A hash reference of the properties of this wobject instance. This method will accept any name/value pair and associate it with this wobject instance in memory, but will only store the following fields to the database:
-
- title, displayTitle, description, pageId, templatePosition, startDate, endDate, sequenceNumber
-
-=item arrayRef
-
-An array reference containing a list of properties associated with this Wobject class. The items in the list should marry up to fields in the Wobject extention table for this class.
+A hash reference of the properties to set for this wobject instance. 
 
 =back
 
@@ -696,47 +711,50 @@ An array reference containing a list of properties associated with this Wobject 
 
 sub set {
 	my ($key, $sql, @update, $i);
-	if ($_[0]->{_property}{wobjectId} eq "new") {
-		$_[0]->{_property}{wobjectId} = getNextId("wobjectId");
-		$_[0]->{_property}{pageId} = ${$_[1]}{pageId} || $session{page}{pageId};
-		$_[0]->{_property}{sequenceNumber} = _getNextSequenceNumber($_[0]->{_property}{pageId});
-		$_[0]->{_property}{addedBy} = $session{user}{userId};
-		$_[0]->{_property}{dateAdded} = time();
+	my $self = shift;
+	my $properties = shift;
+	my $extendedProperties = shift || $self->{_extendedProperties}; # shift for backward compatibility.
+	if ($self->{_property}{wobjectId} eq "new") {
+		$self->{_property}{wobjectId} = getNextId("wobjectId");
+		$self->{_property}{pageId} = ${$_[1]}{pageId} || $session{page}{pageId};
+		$self->{_property}{sequenceNumber} = _getNextSequenceNumber($self->{_property}{pageId});
+		$self->{_property}{addedBy} = $session{user}{userId};
+		$self->{_property}{dateAdded} = time();
 		WebGUI::SQL->write("insert into wobject 
 			(wobjectId, namespace, dateAdded, addedBy, sequenceNumber, pageId) 
 			values (
-			".$_[0]->{_property}{wobjectId}.", 
-			".quote($_[0]->{_property}{namespace}).",
-			".$_[0]->{_property}{dateAdded}.",
-			".$_[0]->{_property}{addedBy}.",
-			".$_[0]->{_property}{sequenceNumber}.",
-			".$_[0]->{_property}{pageId}."
+			".$self->{_property}{wobjectId}.", 
+			".quote($self->{_property}{namespace}).",
+			".$self->{_property}{dateAdded}.",
+			".$self->{_property}{addedBy}.",
+			".$self->{_property}{sequenceNumber}.",
+			".$self->{_property}{pageId}."
 			)");
-		WebGUI::SQL->write("insert into ".$_[0]->{_property}{namespace}." (wobjectId) 
-			values (".$_[0]->{_property}{wobjectId}.")");
+		WebGUI::SQL->write("insert into ".$self->{_property}{namespace}." (wobjectId) 
+			values (".$self->{_property}{wobjectId}.")");
 	}
-	$_[0]->{_property}{lastEdited} = time();
-	$_[0]->{_property}{editedBy} = $session{user}{userId};
+	$self->{_property}{lastEdited} = time();
+	$self->{_property}{editedBy} = $session{user}{userId};
 	$sql = "update wobject set";
-	foreach $key (keys %{$_[1]}) {
-		$_[0]->{_property}{$key} = ${$_[1]}{$key};
-		if (isIn($key, qw(userDefined1 userDefined2 userDefined3 userDefined4 userDefined5 moderationType groupToModerate groupToPost karmaPerPost editTimeout title displayTitle description pageId templatePosition startDate endDate sequenceNumber))) {
-        		$sql .= " ".$key."=".quote(${$_[1]}{$key}).",";
+	foreach $key (keys %{$properties}) {
+		$properties->{_property}{$key} = ${$properties}{$key};
+		if (isIn($key, @{$self->{_wobjectProperties}})) {
+        		$sql .= " ".$key."=".quote(${$properties}{$key}).",";
 		}
-                if (isIn($key, @{$_[2]})) {
-                        $update[$i] .= " ".$key."=".quote($_[1]->{$key});
+                if (isIn($key, @{$extendedProperties})) {
+                        $update[$i] .= " ".$key."=".quote($properties->{$key});
                         $i++;
                 }
 	}
-	$sql .= " lastEdited=".$_[0]->{_property}{lastEdited}.", 
-		editedBy=".$_[0]->{_property}{editedBy}." 
-		where wobjectId=".$_[0]->{_property}{wobjectId};
+	$sql .= " lastEdited=".$self->{_property}{lastEdited}.", 
+		editedBy=".$self->{_property}{editedBy}." 
+		where wobjectId=".$self->{_property}{wobjectId};
 	WebGUI::SQL->write($sql);
 	if (@update) {
-        	WebGUI::SQL->write("update ".$_[0]->{_property}{namespace}." set ".join(",",@update)." 
-			where wobjectId=".$_[0]->{_property}{wobjectId});
+        	WebGUI::SQL->write("update ".$self->{_property}{namespace}." set ".join(",",@update)." 
+			where wobjectId=".$self->{_property}{wobjectId});
 	}
-	WebGUI::ErrorHandler::audit("edited Wobject ".$_[0]->{_property}{wobjectId});	
+	WebGUI::ErrorHandler::audit("edited Wobject ".$self->{_property}{wobjectId});	
 }
 
 
@@ -1091,6 +1109,9 @@ sub www_edit {
 		-value=>$_[0]->get("description")
 		);
 	$f->raw($_[1]);
+	if ($_[0]->{_allowDiscussion}) {
+		$f->raw($_[0]->discussionProperties);
+	}
 	$f->submit;
 	return $f->print; 
 }
@@ -1129,6 +1150,8 @@ sub www_editSave {
 		groupToModerate=>$session{form}{groupToModerate},
 		editTimeout=>$session{form}{editTimeout},
 		moderationType=>$session{form}{moderationType},
+		filterPost=>$session{form}{filterPost},
+		addEditStampToPosts=>$session{form}{addEditStampToPosts}
 		%{$_[1]}
 	});
 	return "";

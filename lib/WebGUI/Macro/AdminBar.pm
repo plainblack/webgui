@@ -32,11 +32,14 @@ sub process {
 		$hash{WebGUI::URL::page('op=selectPackageToDeploy')} = WebGUI::International::get(376);
 	}
 	foreach my $namespace (@{$session{config}{wobjects}}) {
-		my $cmd = "WebGUI::Wobject::".$namespace."::uiLevel";
-                next if (eval($cmd) > $session{user}{uiLevel});
-		$cmd = "\$WebGUI::Wobject::".$namespace."::name";
-		$hash{WebGUI::URL::page('func=edit&wid=new&namespace='.$namespace)} = eval($cmd);
-		WebGUI::ErrorHandler::warn("Could use wobject $namespace because: ".$@) if ($@);
+		my $cmd = "WebGUI::Wobject::".$namespace;	
+		my $w = eval{$cmd->new({namespace=>$namespace,wobjectId=>"new"})};
+		if ($@) {
+			WebGUI::ErrorHandler::warn("Could use wobject $namespace because: ".$@);
+			next;
+		}
+                next if ($w->uiLevel > $session{user}{uiLevel});
+		$hash{WebGUI::URL::page('func=edit&wid=new&namespace='.$namespace)} = $w->name;;
 	}
 	%hash = sortHash(%hash);
 	%hash = (%{{WebGUI::URL::page()=>WebGUI::International::get(1)}},%hash);

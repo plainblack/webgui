@@ -26,7 +26,6 @@ use WebGUI::Wobject;
 
 our @ISA = qw(WebGUI::Wobject);
 our $namespace = "Article";
-our $name = WebGUI::International::get(1,$namespace);
 
 
 #-------------------------------------------------------------------
@@ -50,8 +49,13 @@ sub duplicate {
 }
 
 #-------------------------------------------------------------------
-sub set {
-        $_[0]->SUPER::set($_[1],[qw(image templateId linkTitle linkURL attachment convertCarriageReturns allowDiscussion)]);
+sub name {
+	return WebGUI::International::get(1,$namespace);
+}
+
+#-------------------------------------------------------------------
+sub new {
+	$_[0]->SUPER::new($_[1],[qw(image templateId linkTitle linkURL attachment convertCarriageReturns allowDiscussion)],1);
 }
 
 #-------------------------------------------------------------------
@@ -108,7 +112,6 @@ sub www_edit {
 		-value=>$_[0]->get("allowDiscussion"),
 		-uiLevel=>5
 		);
-	$f->raw($_[0]->SUPER::discussionProperties);
 	$output .= $_[0]->SUPER::www_edit($f->printRowsOnly);
         return $output;
 }
