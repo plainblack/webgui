@@ -13,6 +13,7 @@ package WebGUI::Template;
 use HTML::Template;
 use strict;
 use WebGUI::ErrorHandler;
+use WebGUI::International;
 use WebGUI::Session;
 use WebGUI::SQL;
 
@@ -34,33 +35,33 @@ sub getList {
 
 #-------------------------------------------------------------------
 sub process {
-	my ($t, $html);
+	my ($t, $test, $html);
 	$html = $_[0];
-	$t = HTML::Template->new(
-   		scalarref=>\$html,
-		global_vars=>1,
-   		loop_context_vars=>1,
-		die_on_bad_params=>0,
-		strict=>0
-		);
-        while (my ($section, $hash) = each %session) {
-		next unless (ref $hash eq 'HASH');
-        	while (my ($key, $value) = each %$hash) {
-                	if (ref $value eq 'ARRAY') {
-				next;
-                        	#$value = '['.join(', ',@$value).']';
-			} elsif (ref $value eq 'HASH') {
-				next;
-				#$value = '{'.join(', ',map {"$_ => $value->{$_}"} keys %$value).'}';
-                      	}
-                        unless (lc($key) eq "password" || lc($key) eq "identifier") {
-                        	$t->param("session.".$section.".".$key=>$value);
-                        }
-                }
-        } 
-	$t->param(%{$_[1]});
-	$t->param("webgui.version"=>$WebGUI::VERSION);
-	return $t->output;
+	eval {
+		$t = HTML::Template->new(
+   			scalarref=>\$html,
+			global_vars=>1,
+   			loop_context_vars=>1,
+			die_on_bad_params=>0,
+			strict=>0
+			);
+	};
+	unless ($@) {
+	        while (my ($section, $hash) = each %session) {
+			next unless (ref $hash eq 'HASH');
+        		while (my ($key, $value) = each %$hash) {
+        	                unless (lc($key) eq "password" || lc($key) eq "identifier") {
+                	        	$t->param("session.".$section.".".$key=>$value);
+                        	}
+	                }
+        	} 
+		$t->param(%{$_[1]});
+		$t->param("webgui.version"=>$WebGUI::VERSION);
+		return $t->output;
+	} else {
+		WebGUI::ErrorHandler::warn("Error in template. ".$@);
+		return WebGUI::International::get(848).$html;
+	}
 }
 
 
