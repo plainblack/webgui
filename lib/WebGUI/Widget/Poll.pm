@@ -113,7 +113,7 @@ sub www_add {
                 $output .= tableFormRow(WebGUI::International::get(85),WebGUI::Form::textArea("description",'',50,5,1));
                 $output .= tableFormRow(WebGUI::International::get(3,$namespace),WebGUI::Form::checkbox("active",1,1));
                 $output .= tableFormRow(WebGUI::International::get(4,$namespace),
-			WebGUI::Form::groupList("voteGroup",1));
+			WebGUI::Form::groupList("voteGroup",7));	# Group "Everyone"
                 $output .= tableFormRow(WebGUI::International::get(5,$namespace),
 			WebGUI::Form::text("graphWidth",20,3,150));
                 $output .= tableFormRow(WebGUI::International::get(6,$namespace),WebGUI::Form::text("question",50,255));
