@@ -25,8 +25,8 @@ our $I18N = {
 		lastUpdated => 1099344172,
 	},
 
-    'asset fields body' => {
-        message => q|
+        'asset fields body' => {
+                message => q|
 <P><B>Asset ID</B><BR>This is the unique identifier WebGUI uses to keep track of this Asset instance. Normal users should never need to be concerned with the Asset ID, but some advanced users may need to know it for things like SQL Reports. The Asset ID is not editable.</P>
 
 <p>
@@ -70,12 +70,12 @@ Should this page be served over SSL?
 
 <p>
 <b>Start Date</b><br>
-The date when users may begin viewing this page. Note that before this date only content managers with the rights to edit this page will see it.
+The date when users may begin viewing this page. Before this date only Content Managers with the rights to edit this page will see it.
 </p>
 
 <p>
 <b>End Date</b><br>
-The date when users will stop viewing this page. Note that after this date only content managers with the rights to edit this page will see it.
+The date when users will stop viewing this page. After this date only Content Managers with the rights to edit this page will see it.
 </p>
 
 <p>
@@ -138,7 +138,30 @@ argument.
 		message => q|Asset|,
         	lastUpdated => 1100463645,
 		context => 'The default name of all assets.'
-	}
+	},
+
+	'snippet' => {
+		message => q|Snippet|,
+        	lastUpdated => 1104629663,
+		context => 'Default name of all snippets'
+	},
+
+	'snippet add/edit title' => {
+		message => q|Snippet, Add/Edit|,
+        	lastUpdated => 1104630516,
+	},
+
+	'snippet add/edit body' => {
+                message => q|<P>Snippets are bits of text that may be reused on your site. Thinks like java scripts, style sheets, flash animations, or even slogans are all great snippets. Best of all, if you need to change the text, you can change it in only one location.</P>
+
+<P>Since Snippets are Assets, so they have all the properties that Assets do.</P>
+
+<P><b>Snippet</b><br/>
+This is the snippet.  Either type it in or copy and paste it into the form field.
+|,
+                context => 'Describing snippets and its sole field.',
+        	lastUpdated => 1104630518,
+	},
 
 };
 

@@ -1,12 +1,13 @@
 package WebGUI::Help::Asset;
 
 our $HELP = {
-	'asset add/edit' => {
-		title => 'asset add/edit title',
-		body => 'asset add/edit body',
+	'asset fields' => {
+		title => 'asset fields title',
+		body => 'asset fields body',
 		related => [
 		]
 	},
+
         'asset macros' => {
 		title => 'asset macros title',
 		body => 'asset macros body',
@@ -17,6 +18,18 @@ our $HELP = {
 			},
 		]
 	},
+
+        'snippet add/edit' => {
+		title => 'snippet add/edit title',
+		body => 'snippet add/edit body',
+		related => [
+			{
+				tag => 'asset fields',
+				namespace => 'Asset'
+			},
+		]
+	},
+
 };
 
 1;
