@@ -154,6 +154,7 @@ sub _setupUserInfo {
                		}
        		}
 		$session{user}{alias} = $session{user}{username} if ($session{user}{alias} =~ /^\W+$/);
+		$session{user}{alias} = $session{user}{username} if ($session{user}{alias} eq "");
 	}
 }
 
