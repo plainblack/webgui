@@ -21,11 +21,11 @@ use WebGUI::URL;
 sub process {
         my ($sth, %data, $output);
         tie %data, 'Tie::CPHash';
-        %data = WebGUI::SQL->quickHash("select pageId,parentId,title,urlizedTitle from page where pageId=$session{page}{pageId}");
+        %data = WebGUI::SQL->quickHash("select pageId,parentId,title,urlizedTitle from page where pageId=".($_[0] || $session{page}{parentId}));
 	if ($data{parentId} == 0) {
 		$output = $data{title} || $session{page}{title};
 	} else {
-                $output = _recurse($data{parentId},$_[1]);
+                $output = &process($data{parentId},$_[1]);
 	}
 	return $output;
 }
