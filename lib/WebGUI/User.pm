@@ -295,7 +295,7 @@ sub ldapURL {
 =cut
 
 sub new {
-        my (%default, $class, $userId, %default, $value, $key, %user, %profile);
+        my ($class, $userId, %default, $value, $key, %user, %profile);
 	tie %user, 'Tie::CPHash';
         $class = shift;
         $userId = shift || 1;
