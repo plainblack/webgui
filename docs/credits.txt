@@ -5,18 +5,18 @@
 The following people/companies are responsible for WebGUI:
 
 
-WebGUI Core..........................JT Smith / Plain Black LLC
+WebGUI Core..........................JT Smith / Plain Black
 
-Contributing Developers..............Peter Beardsley / Appropriate Solutions, Inc.
+Contributing Developers..............Peter Beardsley / Appropriate Solutions
                                      Richard Caelius / 100 World
                                      Richard Clark
                                      Doug Collinge
                                      Flavio Curti
-                                     Jeff Depons / Web Den Interactive
-                                     Frank Dillon / Web Den Interactive
-                                     Junying Du / Web Den Interactive
+                                     Jeff Depons / WDI
+                                     Frank Dillon / WDI
+                                     Junying Du / WDI
                                      Ed Van Duinen / UNC
-                                     Greg Fast / Web Den Interactive
+                                     Greg Fast / WDI
                                      Chris Gebhardt / OpenServe
                                      Andy Grundman
                                      Koen de Jonge / ProcoliX
@@ -26,22 +26,24 @@ Contributing Developers..............Peter Beardsley / Appropriate Solutions, In
                                      Christophe Marcant
                                      Tavis Parker / ParkerOne Consulting
                                      Daniel Quinlan
-                                     Jeff Szpak / Plain Black LLC
-                                     Sean Tu / Web Den Interactive
+                                     Jeff Szpak / Plain Black
+                                     Sean Tu / WDI
 
 Contributing Translators.............AGOFER Ltda.
                                      Natalia Almazova
                                      Joeri de Bruin / ProcoliX
                                      Jose Caneira
                                      Andreas Graf
-                                     Emiliano Grilli
+                                     Emiliano Grilli / Webopen
                                      Ehab Heikal
                                      Bart Jol / ProcoliX
                                      Mattias Kunkel / WERU AG
+                                     Nils-Magne Kvammen
                                      Andreas Ljunggren
                                      Ricardo Markiewicz
                                      Ryan McCombs
                                      orosor@yahoo.com.tw
+                                     Paolo Pigati / Webopen
                                      Michael Ugilt
                                      Zhou Xiaopeng
 
