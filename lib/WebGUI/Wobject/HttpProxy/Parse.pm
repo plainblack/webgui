@@ -54,6 +54,7 @@ sub new {
   	$self->{Filtered} ="";
   	$self->{FormAction} = "";
   	$self->{FormActionIsDefined} = 0;
+	$self->{recurseCheck} = 0;
   	$self;
 }
 
@@ -62,6 +63,7 @@ sub filter {
   	my $self=shift;
   	$self->parse($self->{Content}); # Make paths absolute and let them return to us
   	$self->eof;
+	return "<p>Error: Can't proxy a HttpProxy object inside a HttpProxy object.</p>" if ($self->{recurseCheck});
   	return $self->{Filtered};
 }
 
@@ -99,6 +101,7 @@ sub start {
   	for (keys %$attr) {
     		$self->output(" $_=\"");
     		my $val = $attr->{$_};
+		$self->{recurseCheck} = 1 if($val =~ /proxiedUrl=/i); # We're proxying ourself.
     		if ((lc($tag) eq "input" || lc($tag) eq "textarea" || lc($tag) eq "select") 
        			&& (lc($_) eq "name" || lc($_) eq "submit")) {  # Rewrite input type names
       			$val = 'HttpProxy_' . $val;
