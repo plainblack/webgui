@@ -328,7 +328,7 @@ sub file {
 =item value
 
  The default value(s) for this form element. This should be passed
- as an array reference.
+ as an array reference. Defaults to "7" (Everyone).
 
 =item size
 
@@ -359,6 +359,7 @@ sub group {
         $name = shift;
         $label = shift;
 	$value = shift;
+	$value = [7] if ($value eq ""); #doing long form otherwise arrayRef didn't work
 	$size = shift || 1;
 	$multiple = shift;
 	$multiple = ' multiple="1" ' if ($multiple);
@@ -1180,7 +1181,7 @@ sub yesNo {
         $class = shift;
         $name = shift;
         $label = shift;
-        $value = shift;
+        $value = shift || 0;
         $extras = shift;
         $subtext = shift;
         $output = '<input type="radio" name="'.$name.'" value="1"';

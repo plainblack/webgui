@@ -56,6 +56,13 @@ delete from widget where namespace='LinkList';
 alter table LinkList_link change widgetId wobjectId int not null;
 alter table LinkList change widgetId wobjectId int not null;
 
+insert into wobject (wobjectId, pageId, title, displayTitle, processMacros, description, dateAdded, addedBy, namespace, lastEdited, editedBy, templatePosition, sequenceNumber, startDate, endDate) select widgetId, pageId, title, displayTitle, processMacros, description, dateAdded, addedBy, namespace, lastEdited, editedBy, templatePosition, sequenceNumber, dateAdded, 1336444487 from widget where namespace='DownloadManager';
+delete from widget where namespace='DownloadManager';
+alter table DownloadManager change widgetId wobjectId int not null;
+alter table DownloadManager_file change widgetId wobjectId int not null;
+delete from International where helpId=13 and namespace='DownloadManager';
+INSERT INTO international VALUES (22,'DownloadManager','English','Proceed to add download?');
+
 
 
 

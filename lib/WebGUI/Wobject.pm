@@ -406,7 +406,7 @@ sub www_edit {
 	$f->hidden("wid",$_[0]->get("wobjectId"));
 	$f->hidden("namespace",$_[0]->get("namespace")) if ($_[0]->get("wobjectId") eq "new");
 	$f->hidden("func","editSave");
-	$f->submit;
+	$f->submit if ($_[0]->get("wobjectId") ne "new");
 	$f->readOnly($_[0]->get("wobjectId"),WebGUI::International::get(499));
 	$f->text("title",WebGUI::International::get(99),$title);
 	$f->yesNo("displayTitle",WebGUI::International::get(174),$displayTitle);
