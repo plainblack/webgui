@@ -19,15 +19,16 @@ use WebGUI::SQL;
 
 #-----------------------------------------
 sub process {
-	my @date = WebGUI::DateTime::localtime();
+	my @date = WebGUI::DateTime::localtime(WebGUI::DateTime::time());
         if ($date[4] == 1) { # only occurs at 1am on the day in question.
-		my $now = time();
+		my $now = WebGUI::DateTime::time();
         	my $a = WebGUI::SQL->read("select groupId,expireNotifyOffset,expireNotifyMessage from groups
 			where expireNotify=1");
         	while (my $group = $a->hashRef) {
 			my $start = $now + (86400 * $group->{expireNotifyOffset});
 			my $end = $start + 86400;
-			my $b = WebGUI::SQL->read("select userId from groupings where expireDate>=".$start." and expireDate<=".$end);
+			my $b = WebGUI::SQL->read("select userId from groupings where groupId=".$group->{groupId}." and 
+				expireDate>=".$start." and expireDate<=".$end);
 			while (my ($userId) = $b->array) { 
 				WebGUI::MessageLog::addEntry($userId,"",WebGUI::International::get(867),$group->{expireNotifyMessage});
 			}

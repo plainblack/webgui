@@ -118,7 +118,7 @@ sub addUsersToGroups {
 			my ($isIn) = WebGUI::SQL->quickArray("select count(*) from groupings where groupId=$gid and userId=$uid");
 			unless ($isIn) {
                 		WebGUI::SQL->write("insert into groupings (groupId,userId,expireDate) 
-					values ($gid, $uid, ".(time()+$expireOffset).")");
+					values ($gid, $uid, ".(WebGUI::DateTime::time()+$expireOffset).")");
 			}
 		}
         }

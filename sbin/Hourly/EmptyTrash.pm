@@ -18,7 +18,7 @@ use WebGUI::SQL;
 
 #-----------------------------------------
 sub process {
-        my @date = WebGUI::DateTime::localtime();
+        my @date = WebGUI::DateTime::localtime(WebGUI::DateTime::time());
 	if ($date[1] == $session{config}{EmptyTrash_day} && $date[4] == 1) { # only occurs at 1am on the day in question.
 		WebGUI::ErrorHandler::audit("emptying system trash");
 		WebGUI::Operation::Trash::_recursePageTree(3);

@@ -484,14 +484,14 @@ Returns an array of time elements. The elements are: years, months, days, hours,
 
 =item epoch
 
-The number of seconds since January 1, 1970.
+The number of seconds since January 1, 1970. Defaults to now.
 
 =back
 
 =cut
 
 sub localtime {
-	return Date::Calc::Localtime($_[0]);
+	return Date::Calc::Localtime($_[0]||WebGUI::DateTime::time());
 }
 
 #-------------------------------------------------------------------
