@@ -272,6 +272,9 @@ sub www_displayLogin {
 	} else {
         	$output .= '<h1>'.WebGUI::International::get(66).'</h1>';
 		$f = WebGUI::HTMLForm->new;
+                if ($session{setting}{encryptLogin}) {
+                        $f->{_header} =~ s/http:/https:/;
+                }
 		$f->hidden("op","login");
         	$f->text("username",WebGUI::International::get(50));
         	$f->password("identifier",WebGUI::International::get(51));

@@ -50,6 +50,7 @@ sub www_editUserSettings {
         $f->integer("karmaPerLogin",WebGUI::International::get(540),$session{setting}{karmaPerLogin});
         $f->interval("sessionTimeout",WebGUI::International::get(142),WebGUI::DateTime::secondsToInterval($session{setting}{sessionTimeout}));
 	$f->yesNo("selfDeactivation",WebGUI::International::get(885),$session{setting}{selfDeactivation});
+	$f->yesNo("encryptLogin",WebGUI::International::get(1006),$session{setting}{encryptLogin});
 	foreach (@{$session{config}{authMethods}}) {
                 $options->{$_} = $_;
         }
