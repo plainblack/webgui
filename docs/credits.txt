@@ -22,6 +22,7 @@ Contributing Translators.............Andreas Ljunggren
                                      Jose Caneira
                                      Emiliano Grilli
                                      Mattias Kunkel / WERU AG
+                                     orosor@yahoo.com.tw
                                      Ricardo Markiewicz
                                      Ryan McCombs
                                      Michael Ugilt
