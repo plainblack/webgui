@@ -1,12 +1,12 @@
-# MySQL dump 8.14
-#
-# Host: localhost    Database: WebGUI
-#--------------------------------------------------------
-# Server version	3.23.41
+-- MySQL dump 8.21
+--
+-- Host: localhost    Database: WebGUI
+---------------------------------------------------------
+-- Server version	3.23.49
 
-#
-# Table structure for table 'Article'
-#
+--
+-- Table structure for table 'Article'
+--
 
 CREATE TABLE Article (
   wobjectId int(11) NOT NULL default '0',
@@ -20,15 +20,16 @@ CREATE TABLE Article (
   PRIMARY KEY  (wobjectId)
 ) TYPE=MyISAM;
 
-#
-# Dumping data for table 'Article'
-#
+--
+-- Dumping data for table 'Article'
+--
+
 
 INSERT INTO Article VALUES (-2,NULL,'','',NULL,0,'right',0);
 
-#
-# Table structure for table 'DownloadManager'
-#
+--
+-- Table structure for table 'DownloadManager'
+--
 
 CREATE TABLE DownloadManager (
   wobjectId int(11) NOT NULL default '0',
@@ -37,14 +38,15 @@ CREATE TABLE DownloadManager (
   PRIMARY KEY  (wobjectId)
 ) TYPE=MyISAM;
 
-#
-# Dumping data for table 'DownloadManager'
-#
+--
+-- Dumping data for table 'DownloadManager'
+--
 
 
-#
-# Table structure for table 'DownloadManager_file'
-#
+
+--
+-- Table structure for table 'DownloadManager_file'
+--
 
 CREATE TABLE DownloadManager_file (
   downloadId int(11) NOT NULL default '0',
@@ -60,14 +62,15 @@ CREATE TABLE DownloadManager_file (
   PRIMARY KEY  (downloadId)
 ) TYPE=MyISAM;
 
-#
-# Dumping data for table 'DownloadManager_file'
-#
+--
+-- Dumping data for table 'DownloadManager_file'
+--
 
 
-#
-# Table structure for table 'EventsCalendar'
-#
+
+--
+-- Table structure for table 'EventsCalendar'
+--
 
 CREATE TABLE EventsCalendar (
   wobjectId int(11) NOT NULL default '0',
@@ -76,14 +79,15 @@ CREATE TABLE EventsCalendar (
   PRIMARY KEY  (wobjectId)
 ) TYPE=MyISAM;
 
-#
-# Dumping data for table 'EventsCalendar'
-#
+--
+-- Dumping data for table 'EventsCalendar'
+--
 
 
-#
-# Table structure for table 'EventsCalendar_event'
-#
+
+--
+-- Table structure for table 'EventsCalendar_event'
+--
 
 CREATE TABLE EventsCalendar_event (
   eventId int(11) NOT NULL default '1',
@@ -96,14 +100,15 @@ CREATE TABLE EventsCalendar_event (
   PRIMARY KEY  (eventId)
 ) TYPE=MyISAM;
 
-#
-# Dumping data for table 'EventsCalendar_event'
-#
+--
+-- Dumping data for table 'EventsCalendar_event'
+--
 
 
-#
-# Table structure for table 'ExtraColumn'
-#
+
+--
+-- Table structure for table 'ExtraColumn'
+--
 
 CREATE TABLE ExtraColumn (
   wobjectId int(11) NOT NULL default '0',
@@ -113,14 +118,15 @@ CREATE TABLE ExtraColumn (
   PRIMARY KEY  (wobjectId)
 ) TYPE=MyISAM;
 
-#
-# Dumping data for table 'ExtraColumn'
-#
+--
+-- Dumping data for table 'ExtraColumn'
+--
 
 
-#
-# Table structure for table 'FAQ'
-#
+
+--
+-- Table structure for table 'FAQ'
+--
 
 CREATE TABLE FAQ (
   wobjectId int(11) NOT NULL default '0',
@@ -130,14 +136,15 @@ CREATE TABLE FAQ (
   PRIMARY KEY  (wobjectId)
 ) TYPE=MyISAM;
 
-#
-# Dumping data for table 'FAQ'
-#
+--
+-- Dumping data for table 'FAQ'
+--
 
 
-#
-# Table structure for table 'FAQ_question'
-#
+
+--
+-- Table structure for table 'FAQ_question'
+--
 
 CREATE TABLE FAQ_question (
   wobjectId int(11) NOT NULL default '0',
@@ -148,14 +155,15 @@ CREATE TABLE FAQ_question (
   PRIMARY KEY  (questionId)
 ) TYPE=MyISAM;
 
-#
-# Dumping data for table 'FAQ_question'
-#
+--
+-- Dumping data for table 'FAQ_question'
+--
 
 
-#
-# Table structure for table 'Item'
-#
+
+--
+-- Table structure for table 'Item'
+--
 
 CREATE TABLE Item (
   wobjectId int(11) NOT NULL default '0',
@@ -164,14 +172,15 @@ CREATE TABLE Item (
   PRIMARY KEY  (wobjectId)
 ) TYPE=MyISAM;
 
-#
-# Dumping data for table 'Item'
-#
+--
+-- Dumping data for table 'Item'
+--
 
 
-#
-# Table structure for table 'LinkList'
-#
+
+--
+-- Table structure for table 'LinkList'
+--
 
 CREATE TABLE LinkList (
   wobjectId int(11) NOT NULL default '0',
@@ -181,14 +190,15 @@ CREATE TABLE LinkList (
   PRIMARY KEY  (wobjectId)
 ) TYPE=MyISAM;
 
-#
-# Dumping data for table 'LinkList'
-#
+--
+-- Dumping data for table 'LinkList'
+--
 
 
-#
-# Table structure for table 'LinkList_link'
-#
+
+--
+-- Table structure for table 'LinkList_link'
+--
 
 CREATE TABLE LinkList_link (
   wobjectId int(11) NOT NULL default '0',
@@ -201,14 +211,15 @@ CREATE TABLE LinkList_link (
   PRIMARY KEY  (linkId)
 ) TYPE=MyISAM;
 
-#
-# Dumping data for table 'LinkList_link'
-#
+--
+-- Dumping data for table 'LinkList_link'
+--
 
 
-#
-# Table structure for table 'MailForm'
-#
+
+--
+-- Table structure for table 'MailForm'
+--
 
 CREATE TABLE MailForm (
   wobjectId int(11) NOT NULL default '0',
@@ -227,14 +238,15 @@ CREATE TABLE MailForm (
   storeEntries char(1) default NULL
 ) TYPE=MyISAM;
 
-#
-# Dumping data for table 'MailForm'
-#
+--
+-- Dumping data for table 'MailForm'
+--
 
 
-#
-# Table structure for table 'MailForm_entry'
-#
+
+--
+-- Table structure for table 'MailForm_entry'
+--
 
 CREATE TABLE MailForm_entry (
   entryId int(11) NOT NULL default '0',
@@ -246,14 +258,15 @@ CREATE TABLE MailForm_entry (
   PRIMARY KEY  (entryId)
 ) TYPE=MyISAM;
 
-#
-# Dumping data for table 'MailForm_entry'
-#
+--
+-- Dumping data for table 'MailForm_entry'
+--
 
 
-#
-# Table structure for table 'MailForm_entry_data'
-#
+
+--
+-- Table structure for table 'MailForm_entry_data'
+--
 
 CREATE TABLE MailForm_entry_data (
   entryId int(11) NOT NULL default '0',
@@ -263,14 +276,15 @@ CREATE TABLE MailForm_entry_data (
   value text
 ) TYPE=MyISAM;
 
-#
-# Dumping data for table 'MailForm_entry_data'
-#
+--
+-- Dumping data for table 'MailForm_entry_data'
+--
 
 
-#
-# Table structure for table 'MailForm_field'
-#
+
+--
+-- Table structure for table 'MailForm_field'
+--
 
 CREATE TABLE MailForm_field (
   wobjectId int(11) NOT NULL default '0',
@@ -284,14 +298,15 @@ CREATE TABLE MailForm_field (
   PRIMARY KEY  (mailFieldId)
 ) TYPE=MyISAM;
 
-#
-# Dumping data for table 'MailForm_field'
-#
+--
+-- Dumping data for table 'MailForm_field'
+--
 
 
-#
-# Table structure for table 'MessageBoard'
-#
+
+--
+-- Table structure for table 'MessageBoard'
+--
 
 CREATE TABLE MessageBoard (
   wobjectId int(11) NOT NULL default '0',
@@ -299,14 +314,15 @@ CREATE TABLE MessageBoard (
   PRIMARY KEY  (wobjectId)
 ) TYPE=MyISAM;
 
-#
-# Dumping data for table 'MessageBoard'
-#
+--
+-- Dumping data for table 'MessageBoard'
+--
 
 
-#
-# Table structure for table 'Poll'
-#
+
+--
+-- Table structure for table 'Poll'
+--
 
 CREATE TABLE Poll (
   wobjectId int(11) NOT NULL default '0',
@@ -338,14 +354,15 @@ CREATE TABLE Poll (
   PRIMARY KEY  (wobjectId)
 ) TYPE=MyISAM;
 
-#
-# Dumping data for table 'Poll'
-#
+--
+-- Dumping data for table 'Poll'
+--
 
 
-#
-# Table structure for table 'Poll_answer'
-#
+
+--
+-- Table structure for table 'Poll_answer'
+--
 
 CREATE TABLE Poll_answer (
   wobjectId int(11) NOT NULL default '0',
@@ -354,14 +371,15 @@ CREATE TABLE Poll_answer (
   ipAddress varchar(50) default NULL
 ) TYPE=MyISAM;
 
-#
-# Dumping data for table 'Poll_answer'
-#
+--
+-- Dumping data for table 'Poll_answer'
+--
 
 
-#
-# Table structure for table 'Product'
-#
+
+--
+-- Table structure for table 'Product'
+--
 
 CREATE TABLE Product (
   wobjectId int(11) NOT NULL default '0',
@@ -376,14 +394,15 @@ CREATE TABLE Product (
   PRIMARY KEY  (wobjectId)
 ) TYPE=MyISAM;
 
-#
-# Dumping data for table 'Product'
-#
+--
+-- Dumping data for table 'Product'
+--
 
 
-#
-# Table structure for table 'Product_accessory'
-#
+
+--
+-- Table structure for table 'Product_accessory'
+--
 
 CREATE TABLE Product_accessory (
   wobjectId int(11) NOT NULL default '0',
@@ -392,14 +411,15 @@ CREATE TABLE Product_accessory (
   PRIMARY KEY  (wobjectId,AccessoryWobjectId)
 ) TYPE=MyISAM;
 
-#
-# Dumping data for table 'Product_accessory'
-#
+--
+-- Dumping data for table 'Product_accessory'
+--
 
 
-#
-# Table structure for table 'Product_feature'
-#
+
+--
+-- Table structure for table 'Product_feature'
+--
 
 CREATE TABLE Product_feature (
   wobjectId int(11) NOT NULL default '0',
@@ -409,14 +429,15 @@ CREATE TABLE Product_feature (
   PRIMARY KEY  (productFeatureId)
 ) TYPE=MyISAM;
 
-#
-# Dumping data for table 'Product_feature'
-#
+--
+-- Dumping data for table 'Product_feature'
+--
 
 
-#
-# Table structure for table 'Product_related'
-#
+
+--
+-- Table structure for table 'Product_related'
+--
 
 CREATE TABLE Product_related (
   wobjectId int(11) NOT NULL default '0',
@@ -425,14 +446,15 @@ CREATE TABLE Product_related (
   PRIMARY KEY  (wobjectId,RelatedWobjectId)
 ) TYPE=MyISAM;
 
-#
-# Dumping data for table 'Product_related'
-#
+--
+-- Dumping data for table 'Product_related'
+--
 
 
-#
-# Table structure for table 'Product_specification'
-#
+
+--
+-- Table structure for table 'Product_specification'
+--
 
 CREATE TABLE Product_specification (
   wobjectId int(11) NOT NULL default '0',
@@ -444,14 +466,15 @@ CREATE TABLE Product_specification (
   PRIMARY KEY  (productSpecificationId)
 ) TYPE=MyISAM;
 
-#
-# Dumping data for table 'Product_specification'
-#
+--
+-- Dumping data for table 'Product_specification'
+--
 
 
-#
-# Table structure for table 'SQLReport'
-#
+
+--
+-- Table structure for table 'SQLReport'
+--
 
 CREATE TABLE SQLReport (
   wobjectId int(11) NOT NULL default '0',
@@ -467,14 +490,15 @@ CREATE TABLE SQLReport (
   PRIMARY KEY  (wobjectId)
 ) TYPE=MyISAM;
 
-#
-# Dumping data for table 'SQLReport'
-#
+--
+-- Dumping data for table 'SQLReport'
+--
 
 
-#
-# Table structure for table 'SiteMap'
-#
+
+--
+-- Table structure for table 'SiteMap'
+--
 
 CREATE TABLE SiteMap (
   wobjectId int(11) NOT NULL default '0',
@@ -487,15 +511,16 @@ CREATE TABLE SiteMap (
   PRIMARY KEY  (wobjectId)
 ) TYPE=MyISAM;
 
-#
-# Dumping data for table 'SiteMap'
-#
+--
+-- Dumping data for table 'SiteMap'
+--
+
 
 INSERT INTO SiteMap VALUES (-1,0,0,5,'&middot;',1,1);
 
-#
-# Table structure for table 'SyndicatedContent'
-#
+--
+-- Table structure for table 'SyndicatedContent'
+--
 
 CREATE TABLE SyndicatedContent (
   wobjectId int(11) NOT NULL default '0',
@@ -505,14 +530,15 @@ CREATE TABLE SyndicatedContent (
   PRIMARY KEY  (wobjectId)
 ) TYPE=MyISAM;
 
-#
-# Dumping data for table 'SyndicatedContent'
-#
+--
+-- Dumping data for table 'SyndicatedContent'
+--
 
 
-#
-# Table structure for table 'UserSubmission'
-#
+
+--
+-- Table structure for table 'UserSubmission'
+--
 
 CREATE TABLE UserSubmission (
   wobjectId int(11) NOT NULL default '0',
@@ -527,14 +553,15 @@ CREATE TABLE UserSubmission (
   PRIMARY KEY  (wobjectId)
 ) TYPE=MyISAM;
 
-#
-# Dumping data for table 'UserSubmission'
-#
+--
+-- Dumping data for table 'UserSubmission'
+--
 
 
-#
-# Table structure for table 'UserSubmission_submission'
-#
+
+--
+-- Table structure for table 'UserSubmission_submission'
+--
 
 CREATE TABLE UserSubmission_submission (
   wobjectId int(11) NOT NULL default '0',
@@ -552,14 +579,15 @@ CREATE TABLE UserSubmission_submission (
   PRIMARY KEY  (submissionId)
 ) TYPE=MyISAM;
 
-#
-# Dumping data for table 'UserSubmission_submission'
-#
+--
+-- Dumping data for table 'UserSubmission_submission'
+--
 
 
-#
-# Table structure for table 'WobjectProxy'
-#
+
+--
+-- Table structure for table 'WobjectProxy'
+--
 
 CREATE TABLE WobjectProxy (
   wobjectId int(11) NOT NULL default '0',
@@ -567,14 +595,15 @@ CREATE TABLE WobjectProxy (
   PRIMARY KEY  (wobjectId)
 ) TYPE=MyISAM;
 
-#
-# Dumping data for table 'WobjectProxy'
-#
+--
+-- Dumping data for table 'WobjectProxy'
+--
 
 
-#
-# Table structure for table 'discussion'
-#
+
+--
+-- Table structure for table 'discussion'
+--
 
 CREATE TABLE discussion (
   messageId int(11) NOT NULL default '0',
@@ -593,14 +622,15 @@ CREATE TABLE discussion (
   PRIMARY KEY  (messageId)
 ) TYPE=MyISAM;
 
-#
-# Dumping data for table 'discussion'
-#
+--
+-- Dumping data for table 'discussion'
+--
 
 
-#
-# Table structure for table 'groupings'
-#
+
+--
+-- Table structure for table 'groupings'
+--
 
 CREATE TABLE groupings (
   groupId int(11) NOT NULL default '0',
@@ -609,18 +639,19 @@ CREATE TABLE groupings (
   PRIMARY KEY  (groupId,userId)
 ) TYPE=MyISAM;
 
-#
-# Dumping data for table 'groupings'
-#
+--
+-- Dumping data for table 'groupings'
+--
+
 
 INSERT INTO groupings VALUES (5,3,2114402400);
 INSERT INTO groupings VALUES (4,3,2114402400);
 INSERT INTO groupings VALUES (3,3,2114402400);
 INSERT INTO groupings VALUES (6,3,2114402400);
 
-#
-# Table structure for table 'groups'
-#
+--
+-- Table structure for table 'groups'
+--
 
 CREATE TABLE groups (
   groupId int(11) NOT NULL default '0',
@@ -631,9 +662,10 @@ CREATE TABLE groups (
   PRIMARY KEY  (groupId)
 ) TYPE=MyISAM;
 
-#
-# Dumping data for table 'groups'
-#
+--
+-- Dumping data for table 'groups'
+--
+
 
 INSERT INTO groups VALUES (1,'Visitors','This is the public group that has no privileges.',314496000,1000000000);
 INSERT INTO groups VALUES (2,'Registered Users','All registered users belong to this group automatically. There are no associated privileges other than that the user has an account and is logged in.',314496000,1000000000);
@@ -645,9 +677,9 @@ INSERT INTO groups VALUES (7,'Everyone','A group that automatically includes all
 INSERT INTO groups VALUES (8,'Template Managers','Users that have privileges to edit templates for this site.',314496000,1000000000);
 INSERT INTO groups VALUES (9,'Image Managers','Users that have privileges to add, edit, and delete images from the image manager. Content managers can view by default',314496000,1000000000);
 
-#
-# Table structure for table 'help'
-#
+--
+-- Table structure for table 'help'
+--
 
 CREATE TABLE help (
   helpId int(11) NOT NULL default '0',
@@ -659,9 +691,10 @@ CREATE TABLE help (
   KEY helpId (helpId)
 ) TYPE=MyISAM;
 
-#
-# Dumping data for table 'help'
-#
+--
+-- Dumping data for table 'help'
+--
+
 
 INSERT INTO help VALUES (20,'WebGUI',670,625,'26,WebGUI;');
 INSERT INTO help VALUES (1,'DownloadManager',61,71,'2,DownloadManager;21,WebGUI;');
@@ -726,9 +759,9 @@ INSERT INTO help VALUES (3,'Product',42,43,'1,Product;');
 INSERT INTO help VALUES (4,'Product',44,45,'1,Product;');
 INSERT INTO help VALUES (5,'Product',46,47,'1,Product;');
 
-#
-# Table structure for table 'imageGroup'
-#
+--
+-- Table structure for table 'imageGroup'
+--
 
 CREATE TABLE imageGroup (
   imageGroupId int(11) NOT NULL default '0',
@@ -737,15 +770,16 @@ CREATE TABLE imageGroup (
   description varchar(255) default NULL
 ) TYPE=MyISAM;
 
-#
-# Dumping data for table 'imageGroup'
-#
+--
+-- Dumping data for table 'imageGroup'
+--
+
 
 INSERT INTO imageGroup VALUES (0,'Root',0,'Top level');
 
-#
-# Table structure for table 'images'
-#
+--
+-- Table structure for table 'images'
+--
 
 CREATE TABLE images (
   imageId int(11) NOT NULL default '0',
@@ -759,14 +793,15 @@ CREATE TABLE images (
   PRIMARY KEY  (imageId)
 ) TYPE=MyISAM;
 
-#
-# Dumping data for table 'images'
-#
+--
+-- Dumping data for table 'images'
+--
 
 
-#
-# Table structure for table 'incrementer'
-#
+
+--
+-- Table structure for table 'incrementer'
+--
 
 CREATE TABLE incrementer (
   incrementerId varchar(50) NOT NULL default '',
@@ -774,9 +809,10 @@ CREATE TABLE incrementer (
   PRIMARY KEY  (incrementerId)
 ) TYPE=MyISAM;
 
-#
-# Dumping data for table 'incrementer'
-#
+--
+-- Dumping data for table 'incrementer'
+--
+
 
 INSERT INTO incrementer VALUES ('groupId',26);
 INSERT INTO incrementer VALUES ('messageId',1);
@@ -801,9 +837,9 @@ INSERT INTO incrementer VALUES ('languageId',1000);
 INSERT INTO incrementer VALUES ('mailFieldId',1000);
 INSERT INTO incrementer VALUES ('mailEntryId',1000);
 
-#
-# Table structure for table 'international'
-#
+--
+-- Table structure for table 'international'
+--
 
 CREATE TABLE international (
   internationalId int(11) NOT NULL default '0',
@@ -813,9 +849,10 @@ CREATE TABLE international (
   PRIMARY KEY  (internationalId,namespace,languageId)
 ) TYPE=MyISAM;
 
-#
-# Dumping data for table 'international'
-#
+--
+-- Dumping data for table 'international'
+--
+
 
 INSERT INTO international VALUES (367,'WebGUI',1,'Expire After');
 INSERT INTO international VALUES (1,'Article',3,'Artikel');
@@ -5684,7 +5721,7 @@ INSERT INTO international VALUES (634,'WebGUI',1,'<b>Default Home Page</b><br>\r
 INSERT INTO international VALUES (638,'WebGUI',1,'Templates are used to affect how pages are laid out in WebGUI. For instance, most sites these days have more than just a menu and one big text area. Many of them have three or four columns preceeded by several headers and/or banner areas. WebGUI accomodates complex layouts through the use of Templates. There are several templates that come with WebGUI to make life easier for you, but you can create as many as you\'d like.');
 INSERT INTO international VALUES (639,'WebGUI',1,'<b>Template Name</b><br>\r\nGive this template a descriptive name so that you\'ll know what it is when you\'re applying the template to a page.\r\n</i></p><p><i>\r\n\r\n<b>Template</b><br>\r\nCreate your template by placing the special macros ^0; ^1; ^2;  and so on in your template to represent the different content areas. Typically this is done by using a table to position the content. The following is an example of a template with two content areas side by side:\r\n</i></p><p><i>\r\n</i></p><pre><i>\r\n&lt;table&gt;\r\n  &lt;tr&gt;\r\n    &lt;td&gt;^0;&lt;/td&gt;\r\n    &lt;td&gt;^1;&lt;/td&gt;\r\n  &lt;/tr&gt;\r\n&lt;/table&gt;\r\n</i></pre><i>\r\n</i><p><i>\r\nAlso be sure to take a look at the templates that come with WebGUI for ideas.\r\n');
 INSERT INTO international VALUES (640,'WebGUI',1,'It is not a good idea to delete templates as you never know what kind of adverse affect it may have on your site (some pages may still be using the template). If you should choose to delete a template, all the pages still using the template will be set to the \"Default\" template.');
-INSERT INTO international VALUES (624,'WebGUI',1,'WebGUI macros are used to create dynamic content within otherwise static content. For instance, you may wish to show which user is logged in on every page, or you may wish to have a dynamically built menu or crumb trail. \r\n</i></p><p><i>\r\nMacros always begin with a carat (^) and follow with at least one other character and ended with w semicolon (;). Some macros can be extended/configured by taking the format of ^<i>x</i>(\"<b>config text</b>\");. The following is a description of all the macros in the WebGUI system.\r\n</i></p><p><i>\r\n\r\n<b>^a; or ^a(); - My Account Link</b><br>\r\nA link to your account information. In addition you can change the link text by creating a macro like this <b>^a(\"Account Info\");</b>. \r\n</i></p><p><i>\r\n<i>Notes:</i> You can also use the special case ^a(linkonly); to return only the URL to the account page and nothing more. Also, the .myAccountLink style sheet class is tied to this macro.\r\n</i></p><p><i>\r\n\r\n<b>^AdminBar;</b><br>\r\nPlaces the administrative tool bar on the page. This is a required element in the \"body\" segment of the Style Manager.\r\n</i></p><p><i>\r\n\r\n<b>^AdminText();</b><br>\r\nDisplays a small text message to a user who is in admin mode. Example: ^AdminText(\"You are in admin mode!\");\r\n</i></p><p><i>\r\n\r\n<b>^AdminToggle;</b><br>\r\nPlaces a link on the page which is only visible to content managers and adminstrators. The link toggles on/off admin mode.\r\n</i></p><p><i>\r\n\r\n<b>^C; or ^C(); - Crumb Trail</b><br>\r\nA dynamically generated crumb trail to the current page. You can optionally specify a delimeter to be used between page names by using ^C(::);. The default delimeter is &gt;.\r\n</i></p><p><i>\r\n<i>Note:</i> The .crumbTrail style sheet class is tied to this macro.\r\n</i></p><p><i>\r\n\r\n<b>^c; - Company Name</b><br>\r\nThe name of your company specified in the settings by your Administrator.\r\n</i></p><p><i>\r\n\r\n<b>^D; or ^D(); - Date</b><br>\r\nThe current date and time.\r\n</i></p><p><i>\r\nYou can configure the date by using date formatting symbols. For instance, if you created a macro like this <b>^D(\"%c %D, %y\");</b> it would output <b>September 26, 2001</b>. The following are the available date formatting symbols:\r\n</i><i>\r\n</i><i>\r\n</i><i>\r\n</i><i>\r\n</i><i>\r\n</i><i>\r\n</i><i>\r\n</i><i>\r\n</i><i>\r\n</i><i>\r\n</i><i>\r\n</i><i>\r\n</i><i>\r\n</i><i>\r\n</i><i>\r\n</i><i>\r\n</i><i>\r\n</i><i>\r\n</i><table><tbody><tr><td>%%</td><td>%</td></tr><tr><td>%y</td><td>4 digit year</td></tr><tr><td>%Y</td><td>2 digit year</td></tr><tr><td>%m</td><td>2 digit month</td></tr><tr><td>%M</td><td>variable digit month</td></tr><tr><td>%c</td><td>month name</td></tr><tr><td>%d</td><td>2 digit day of month</td></tr><tr><td>%D</td><td>variable digit day of month</td></tr><tr><td>%w</td><td>day of week name</td></tr><tr><td>%h</td><td>2 digit base 12 hour</td></tr><tr><td>%H</td><td>variable digit base 12 hour</td></tr><tr><td>%j</td><td>2 digit base 24 hour</td></tr><tr><td>%J</td><td>variable digit base 24 hour</td></tr><tr><td>%p</td><td>lower case am/pm</td></tr><tr><td>%P</td><td>upper case AM/PM</td></tr><tr><td>%z</td><td>user preference date format</td></tr><tr><td>%Z</td><td>user preference time format</td></tr></tbody></table><i>\r\n</i></p><p><i>\r\n\r\n<b>^e; - Company Email Address</b><br>\r\nThe email address for your company specified in the settings by your Administrator.\r\n</i></p><p><i>\r\n\r\n<b>^Env()</b><br>\r\nCan be used to display a web server environment variable on a page. The environment variables available on each server are different, but you can find out which ones your web server has by going to: http://www.yourwebguisite.com/env.pl\r\n</i></p><p><i>\r\nThe macro should be specified like this ^Env(\"REMOTE_ADDR\");\r\n</i></p><p><i>\r\n\r\n<b>^Execute();</b><br>\r\nAllows a content manager or administrator to execute an external program. Takes the format of <b>^Execute(\"/this/file.sh\");</b>.\r\n</i></p><p><i>\r\n\r\n<b>^Extras;</b><br>\r\nReturns the path to the WebGUI \"extras\" folder, which contains things like WebGUI icons.\r\n</i></p><p><i>\r\n\r\n<b>^FlexMenu;</b><br>\r\nThis menu macro creates a top-level menu that expands as the user selects each menu item.\r\n</i></p><p><i>\r\n\r\n<b>^FormParam();</b><br>\r\nThis macro is mainly used in generating dynamic queries in SQL Reports. Using this macro you can pull the value of any form field simply by specifing the name of the form field, like this: ^FormParam(\"phoneNumber\");\r\n</i></p><p><i>\r\n\r\n<b>^GroupText();</b><br>\r\nDisplays a small text message to the user if they belong to the specified group. Example: ^GroupText(\"Visitors\",\"You need an account to do anything cool on this site!\");\r\n</i></p><p><i>\r\n\r\n\r\n<b>^H; or ^H(); - Home Link</b><br>\r\nA link to the home page of this site.  In addition you can change the link text by creating a macro like this <b>^H(\"Go Home\");</b>.\r\n</i></p><p><i>\r\n<i>Notes:</i> You can also use the special case ^H(linkonly); to return only the URL to the home page and nothing more. Also, the .homeLink style sheet class is tied to this macro.\r\n</i></p><p><i>\r\n\r\n<b>^I(); - Image Manager Image with Tag</b><br>\r\nThis macro returns an image tag with the parameters for an image defined in the image manager. Specify the name of the image using a tag like this <b>^I(\"imageName\")</b>;.\r\n</i></p><p><i>\r\n\r\n<b>^i(); - Image Manager Image Path</b><br>\r\nThis macro returns the path of an image uploaded using the Image Manager. Specify the name of the image using a tag like this <b>^i(\"imageName\");</b>.\r\n</i></p><p><i>\r\n\r\n<b>^Include();</b><br>\r\nAllows a content manager or administrator to include a file from the local filesystem. Takes the format of <b>^Include(\"/this/file.html\")</b>;\r\n</i></p><p><i>\r\n\r\n<b>^L; or ^L(); - Login</b><br>\r\nA small login form. You can also configure this macro. You can set the width of the login box like this ^L(20);. You can also set the message displayed after the user is logged in like this ^L(20,Hi ^a(^@;);. Click %here% if you wanna log out!)\r\n</i></p><p><i>\r\n<i>Note:</i> The .loginBox style sheet class is tied to this macro.\r\n</i></p><p><i>\r\n\r\n<b>^M; or ^M(); - Current Menu (Vertical)</b><br>\r\nA vertical menu containing the sub-pages at the current level. In addition, you may configure this macro by specifying how many levels deep the menu should go. By default it will show only the first level. To go three levels deep create a macro like this <b>^M(3);</b>. If you set the macro to \"0\" it will track the entire site tree.\r\n</i></p><p><i>\r\n\r\n<b>^m; - Current Menu (Horizontal)</b><br>\r\nA horizontal menu containing the sub-pages at the current level. You can optionally specify a delimeter to be used between page names by using ^m(:--:);. The default delimeter is ·.\r\n</i></p><p><i>\r\n\r\n<b>^P; or ^P(); - Previous Menu (Vertical)</b><br>\r\nA vertical menu containing the sub-pages at the previous level. In addition, you may configure this macro by specifying how many levels deep the menu should go. By default it will show only the first level. To go three levels deep create a macro like this <b>^P(3);</b>. If you set the macro to \"0\" it will track the entire site tree.\r\n</i></p><p><i>\r\n\r\n<b>^p; - Previous Menu (Horizontal)</b><br>\r\nA horizontal menu containing the sub-pages at the previous level. You can optionally specify a delimeter to be used between page names by using ^p(:--:);. The default delimeter is ·.\r\n</i></p><p><i>\r\n\r\n<b>^Page();</b><br>\r\nThis can be used to retrieve information about the current page. For instance it could be used to get the page URL like this ^Page(\"urlizedTitle\"); or to get the menu title like this ^Page(\"menuTitle\");.\r\n</i></p><p><i>\r\n\r\n<b>^PageTitle;</b><br>\r\nDisplays the title of the current page.\r\n</i></p><p><i>\r\n<i>Note:</i> If you begin using admin functions or the indepth functions of any wobject, the page title will become a link that will quickly bring you back to the page.\r\n</i></p><p><i>\r\n\r\n<b>^r; or ^r(); - Make Page Printable</b><br>\r\nCreates a link to remove the style from a page to make it printable.  In addition, you can change the link text by creating a macro like this <b>^r(\"Print Me!\");</b>.\r\n</i></p><p><i>\r\nBy default, when this link is clicked, the current page\'s style is replaced with the \"Make Page Printable\" style in the Style Manager. However, that can be overridden by specifying the name of another style as the second parameter, like this: ^r(\"Print!\",\"WebGUI\");\r\n</i></p><p><i>\r\n<i>Notes:</i> You can also use the special case ^r(linkonly); to return only the URL to the make printable page and nothing more. Also, the .makePrintableLink style sheet class is tied to this macro.\r\n</i></p><p><i>\r\n\r\n\r\n<b>^rootmenu; or ^rootmenu(); (Horizontal)</b><br>\r\nCreates a horizontal menu of the various roots on your system (except for the WebGUI system roots). You can optionally specify a menu delimiter like this: ^rootmenu(|);\r\n</i></p><p><i>\r\n\r\n\r\n<b>^RootTitle;</b><br>\r\nReturns the title of the root of the current page. For instance, the main root in WebGUI is the \"Home\" page. Many advanced sites have many roots and thus need a way to display to the user which root they are in.\r\n</i></p><p><i>\r\n\r\n<b>^S(); - Specific SubMenu (Vertical)</b><br>\r\nThis macro allows you to get the submenu of any page, starting with the page you specified. For instance, you could get the home page submenu by creating a macro that looks like this <b>^S(\"home\",0);</b>. The first value is the urlized title of the page and the second value is the depth you\'d like the menu to go. By default it will show only the first level. To go three levels deep create a macro like this <b>^S(\"home\",3);</b>.\r\n</i></p><p><i>\r\n\r\n<b>^s(); - Specific SubMenu (Horizontal)</b><br>\r\nThis macro allows you to get the submenu of any page, starting with the page you specified. For instance, you could get the home page submenu by creating a macro that looks like this <b>^s(\"home\");</b>. The value is the urlized title of the page.  You can optionally specify a delimeter to be used between page names by using ^s(\"home\",\":--:\");. The default delimeter is ·.\r\n</i></p><p><i>\r\n\r\n<b>^Synopsis; or ^Synopsis(); Menu</b><br>\r\nThis macro allows you to get the submenu of a page along with the synopsis of each link. You may specify an integer to specify how many levels deep to traverse the page tree.\r\n</i></p><p><i>\r\n<i>Notes:</i> The .synopsis_sub, .synopsis_summary, and .synopsis_title style sheet classes are tied to this macro.\r\n</i></p><p><i>\r\n\r\n<b>^T; or ^T(); - Top Level Menu (Vertical)</b><br>\r\nA vertical menu containing the main pages of the site (aka the sub-pages from the home page). In addition, you may configure this macro by specifying how many levels deep the menu should go. By default it will show only the first level. To go three levels deep create a macro like this <b>^T(3);</b>. If you set the macro to \"0\" it will track the entire site tree.\r\n</i></p><p><i>\r\n\r\n<b>^t; - Top Level Menu (Horizontal)</b><br>\r\nA vertical menu containing the main pages of the site (aka the sub-pages from the home page). You can optionally specify a delimeter to be used between page names by using ^t(:--:);. The default delimeter is ·.\r\n</i></p><p><i>\r\n\r\n<b>^Thumbnail();</b><br>\r\nReturns the URL of a thumbnail for an image from the image manager. Specify the name of the image like this <b>^Thumbnail(\"imageName\");</b>.\r\n</i></p><p><i>\r\n\r\n<b>^ThumbnailLinker();</b><br>\r\nThis is a good way to create a quick and dirty screenshots page or a simple photo gallery. Simply specify the name of an image in the Image Manager like this: ^ThumbnailLinker(\"My Grandmother\"); and this macro will create a thumnail image with a title under it that links to the full size version of the image.\r\n</i></p><p><i>\r\n\r\n<b>^u; - Company URL</b><br>\r\nThe URL for your company specified in the settings by your Administrator.\r\n</i></p><p><i>\r\n\r\n<b>^URLEncode();</b><br>\r\nThis macro is mainly useful in SQL reports, but it could be useful elsewhere as well. It takes the input of a string and URL Encodes it so that the string can be passed through a URL. It\'s syntax looks like this: ^URLEncode(\"Is this my string?\");</i></p><p><i>\r\n\r\n<b>^/; - System URL</b><br>\r\nThe URL to the gateway script (example: <i>/index.pl/</i>).\r\n</i></p><p><i>\r\n\r\n<b>^\\; - Page URL</b><br>\r\nThe URL to the current page (example: <i>/index.pl/pagename</i>).\r\n</i></p><p><i>\r\n\r\n<b>^@; - Username</b><br>\r\nThe username of the currently logged in user.\r\n</i></p><p><i>\r\n\r\n<b>^?; - Search</b><br>\r\nAdd a search box to the page. The search box is tied to WebGUI\'s built-in search engine.\r\n</i></p><p><i>\r\n<i>Note: The .searchBox style sheet class is tied to this macro.\r\n</i></i></p><p><i><i>\r\n\r\n<b>^#; - User ID</b><br>\r\nThe user id of the currently logged in user.\r\n</i></i></p><p><i><i>\r\n\r\n<b>^*; or ^*(); - Random Number</b><br>\r\nA randomly generated number. This is often used on images (such as banner ads) that you want to ensure do not cache. In addition, you may configure this macro like this <b>^*(100);</b> to create a random number between 0 and 100.\r\n</i></i></p><p><i><i>\r\n\r\n<b>^-;,^0;,^1;,^2;,^3;, etc.</b><br>\r\nThese macros are reserved for system/wobject-specific functions as in the SQL Report wobject and the Body in the Style Manager.\r\n');
+INSERT INTO international VALUES (624,'WebGUI',1,'WebGUI macros are used to create dynamic content within otherwise static content. For instance, you may wish to show which user is logged in on every page, or you may wish to have a dynamically built menu or crumb trail. \r\n</i></p><p><i>\r\nMacros always begin with a carat (^) and follow with at least one other character and ended with w semicolon (;). Some macros can be extended/configured by taking the format of ^<i>x</i>(\"<b>config text</b>\");. The following is a description of all the macros in the WebGUI system.\r\n</i></p><p><i>\r\n\r\n<b>^a; or ^a(); - My Account Link</b><br>\r\nA link to your account information. In addition you can change the link text by creating a macro like this <b>^a(\"Account Info\");</b>. \r\n</i></p><p><i>\r\n<i>Notes:</i> You can also use the special case ^a(linkonly); to return only the URL to the account page and nothing more. Also, the .myAccountLink style sheet class is tied to this macro.\r\n</i></p><p><i>\r\n\r\n<b>^AdminBar;</b><br>\r\nPlaces the administrative tool bar on the page. This is a required element in the \"body\" segment of the Style Manager.\r\n</i></p><p><i>\r\n\r\n<b>^AdminText();</b><br>\r\nDisplays a small text message to a user who is in admin mode. Example: ^AdminText(\"You are in admin mode!\");\r\n</i></p><p><i>\r\n\r\n<b>^AdminToggle;</b><br>\r\nPlaces a link on the page which is only visible to content managers and adminstrators. The link toggles on/off admin mode.\r\n</i></p><p><i>\r\n\r\n<b>^C; or ^C(); - Crumb Trail</b><br>\r\nA dynamically generated crumb trail to the current page. You can optionally specify a delimeter to be used between page names by using ^C(::);. The default delimeter is >.\r\n</i></p><p><i>\r\n<i>Note:</i> The .crumbTrail style sheet class is tied to this macro.\r\n</i></p><p><i>\r\n\r\n<b>^c; - Company Name</b><br>\r\nThe name of your company specified in the settings by your Administrator.\r\n</i></p><p><i>\r\n\r\n<b>^D; or ^D(); - Date</b><br>\r\nThe current date and time.\r\n</i></p><p><i>\r\nYou can configure the date by using date formatting symbols. For instance, if you created a macro like this <b>^D(\"%c %D, %y\");</b> it would output <b>September 26, 2001</b>. The following are the available date formatting symbols:\r\n</i><i>\r\n</i><i>\r\n</i><i>\r\n</i><i>\r\n</i><i>\r\n</i><i>\r\n</i><i>\r\n</i><i>\r\n</i><i>\r\n</i><i>\r\n</i><i>\r\n</i><i>\r\n</i><i>\r\n</i><i>\r\n</i><i>\r\n</i><i>\r\n</i><i>\r\n</i><i>\r\n</i><table><tbody><tr><td>%%</td><td>%</td></tr><tr><td>%y</td><td>4 digit year</td></tr><tr><td>%Y</td><td>2 digit year</td></tr><tr><td>%m</td><td>2 digit month</td></tr><tr><td>%M</td><td>variable digit month</td></tr><tr><td>%c</td><td>month name</td></tr><tr><td>%d</td><td>2 digit day of month</td></tr><tr><td>%D</td><td>variable digit day of month</td></tr><tr><td>%w</td><td>day of week name</td></tr><tr><td>%h</td><td>2 digit base 12 hour</td></tr><tr><td>%H</td><td>variable digit base 12 hour</td></tr><tr><td>%j</td><td>2 digit base 24 hour</td></tr><tr><td>%J</td><td>variable digit base 24 hour</td></tr><tr><td>%p</td><td>lower case am/pm</td></tr><tr><td>%P</td><td>upper case AM/PM</td></tr><tr><td>%z</td><td>user preference date format</td></tr><tr><td>%Z</td><td>user preference time format</td></tr></tbody></table><i>\r\n</i></p><p><i>\r\n\r\n<b>^e; - Company Email Address</b><br>\r\nThe email address for your company specified in the settings by your Administrator.\r\n</i></p><p><i>\r\n\r\n<b>^Env()</b><br>\r\nCan be used to display a web server environment variable on a page. The environment variables available on each server are different, but you can find out which ones your web server has by going to: http://www.yourwebguisite.com/env.pl\r\n</i></p><p><i>\r\nThe macro should be specified like this ^Env(\"REMOTE_ADDR\");\r\n</i></p><p><i>\r\n\r\n<b>^Execute();</b><br>\r\nAllows a content manager or administrator to execute an external program. Takes the format of <b>^Execute(\"/this/file.sh\");</b>.\r\n</i></p><p><i>\r\n\r\n<b>^Extras;</b><br>\r\nReturns the path to the WebGUI \"extras\" folder, which contains things like WebGUI icons.\r\n</i></p><p><i>\r\n\r\n<b>^FlexMenu;</b><br>\r\nThis menu macro creates a top-level menu that expands as the user selects each menu item.\r\n</i></p><p><i>\r\n\r\n<b>^FormParam();</b><br>\r\nThis macro is mainly used in generating dynamic queries in SQL Reports. Using this macro you can pull the value of any form field simply by specifing the name of the form field, like this: ^FormParam(\"phoneNumber\");\r\n</i></p><p><i>\r\n\r\n<b>^GroupText();</b><br>\r\nDisplays a small text message to the user if they belong to the specified group. Example: ^GroupText(\"Visitors\",\"You need an account to do anything cool on this site!\");\r\n</i></p><p><i>\r\n\r\n\r\n<b>^H; or ^H(); - Home Link</b><br>\r\nA link to the home page of this site.  In addition you can change the link text by creating a macro like this <b>^H(\"Go Home\");</b>.\r\n</i></p><p><i>\r\n<i>Notes:</i> You can also use the special case ^H(linkonly); to return only the URL to the home page and nothing more. Also, the .homeLink style sheet class is tied to this macro.\r\n</i></p><p><i>\r\n\r\n<b>^I(); - Image Manager Image with Tag</b><br>\r\nThis macro returns an image tag with the parameters for an image defined in the image manager. Specify the name of the image using a tag like this <b>^I(\"imageName\")</b>;.\r\n</i></p><p><i>\r\n\r\n<b>^i(); - Image Manager Image Path</b><br>\r\nThis macro returns the path of an image uploaded using the Image Manager. Specify the name of the image using a tag like this <b>^i(\"imageName\");</b>.\r\n</i></p><p><i>\r\n\r\n<b>^Include();</b><br>\r\nAllows a content manager or administrator to include a file from the local filesystem. Takes the format of <b>^Include(\"/this/file.html\")</b>;\r\n</i></p><p><i>\r\n\r\n<b>^L; or ^L(); - Login</b><br>\r\nA small login form. You can also configure this macro. You can set the width of the login box like this ^L(20);. You can also set the message displayed after the user is logged in like this ^L(20,Hi ^a(^@;);. Click %here% if you wanna log out!)\r\n</i></p><p><i>\r\n<i>Note:</i> The .loginBox style sheet class is tied to this macro.\r\n</i></p><p><i>\r\n\r\n<b>^M; or ^M(); - Current Menu (Vertical)</b><br>\r\nA vertical menu containing the sub-pages at the current level. In addition, you may configure this macro by specifying how many levels deep the menu should go. By default it will show only the first level. To go three levels deep create a macro like this <b>^M(3);</b>. If you set the macro to \"0\" it will track the entire site tree.\r\n</i></p><p><i>\r\n\r\n<b>^m; - Current Menu (Horizontal)</b><br>\r\nA horizontal menu containing the sub-pages at the current level. You can optionally specify a delimeter to be used between page names by using ^m(:--:);. The default delimeter is ·.\r\n</i></p><p><i>\r\n\r\n<b>^P; or ^P(); - Previous Menu (Vertical)</b><br>\r\nA vertical menu containing the sub-pages at the previous level. In addition, you may configure this macro by specifying how many levels deep the menu should go. By default it will show only the first level. To go three levels deep create a macro like this <b>^P(3);</b>. If you set the macro to \"0\" it will track the entire site tree.\r\n</i></p><p><i>\r\n\r\n<b>^p; - Previous Menu (Horizontal)</b><br>\r\nA horizontal menu containing the sub-pages at the previous level. You can optionally specify a delimeter to be used between page names by using ^p(:--:);. The default delimeter is ·.\r\n</i></p><p><i>\r\n\r\n<b>^Page();</b><br>\r\nThis can be used to retrieve information about the current page. For instance it could be used to get the page URL like this ^Page(\"urlizedTitle\"); or to get the menu title like this ^Page(\"menuTitle\");.\r\n</i></p><p><i>\r\n\r\n<b>^PageTitle;</b><br>\r\nDisplays the title of the current page.\r\n</i></p><p><i>\r\n<i>Note:</i> If you begin using admin functions or the indepth functions of any wobject, the page title will become a link that will quickly bring you back to the page.\r\n</i></p><p><i>\r\n\r\n<b>^r; or ^r(); - Make Page Printable</b><br>\r\nCreates a link to remove the style from a page to make it printable.  In addition, you can change the link text by creating a macro like this <b>^r(\"Print Me!\");</b>.\r\n</i></p><p><i>\r\nBy default, when this link is clicked, the current page\'s style is replaced with the \"Make Page Printable\" style in the Style Manager. However, that can be overridden by specifying the name of another style as the second parameter, like this: ^r(\"Print!\",\"WebGUI\");\r\n</i></p><p><i>\r\n<i>Notes:</i> You can also use the special case ^r(linkonly); to return only the URL to the make printable page and nothing more. Also, the .makePrintableLink style sheet class is tied to this macro.\r\n</i></p><p><i>\r\n\r\n\r\n<b>^rootmenu; or ^rootmenu(); (Horizontal)</b><br>\r\nCreates a horizontal menu of the various roots on your system (except for the WebGUI system roots). You can optionally specify a menu delimiter like this: ^rootmenu(|);\r\n</i></p><p><i>\r\n\r\n\r\n<b>^RootTitle;</b><br>\r\nReturns the title of the root of the current page. For instance, the main root in WebGUI is the \"Home\" page. Many advanced sites have many roots and thus need a way to display to the user which root they are in.\r\n</i></p><p><i>\r\n\r\n<b>^S(); - Specific SubMenu (Vertical)</b><br>\r\nThis macro allows you to get the submenu of any page, starting with the page you specified. For instance, you could get the home page submenu by creating a macro that looks like this <b>^S(\"home\",0);</b>. The first value is the urlized title of the page and the second value is the depth you\'d like the menu to go. By default it will show only the first level. To go three levels deep create a macro like this <b>^S(\"home\",3);</b>.\r\n</i></p><p><i>\r\n\r\n<b>^s(); - Specific SubMenu (Horizontal)</b><br>\r\nThis macro allows you to get the submenu of any page, starting with the page you specified. For instance, you could get the home page submenu by creating a macro that looks like this <b>^s(\"home\");</b>. The value is the urlized title of the page.  You can optionally specify a delimeter to be used between page names by using ^s(\"home\",\":--:\");. The default delimeter is ·.\r\n</i></p><p><i>\r\n\r\n<b>^Synopsis; or ^Synopsis(); Menu</b><br>\r\nThis macro allows you to get the submenu of a page along with the synopsis of each link. You may specify an integer to specify how many levels deep to traverse the page tree.\r\n</i></p><p><i>\r\n<i>Notes:</i> The .synopsis_sub, .synopsis_summary, and .synopsis_title style sheet classes are tied to this macro.\r\n</i></p><p><i>\r\n\r\n<b>^T; or ^T(); - Top Level Menu (Vertical)</b><br>\r\nA vertical menu containing the main pages of the site (aka the sub-pages from the home page). In addition, you may configure this macro by specifying how many levels deep the menu should go. By default it will show only the first level. To go three levels deep create a macro like this <b>^T(3);</b>. If you set the macro to \"0\" it will track the entire site tree.\r\n</i></p><p><i>\r\n\r\n<b>^t; - Top Level Menu (Horizontal)</b><br>\r\nA vertical menu containing the main pages of the site (aka the sub-pages from the home page). You can optionally specify a delimeter to be used between page names by using ^t(:--:);. The default delimeter is ·.\r\n</i></p><p><i>\r\n\r\n<b>^Thumbnail();</b><br>\r\nReturns the URL of a thumbnail for an image from the image manager. Specify the name of the image like this <b>^Thumbnail(\"imageName\");</b>.\r\n</i></p><p><i>\r\n\r\n<b>^ThumbnailLinker();</b><br>\r\nThis is a good way to create a quick and dirty screenshots page or a simple photo gallery. Simply specify the name of an image in the Image Manager like this: ^ThumbnailLinker(\"My Grandmother\"); and this macro will create a thumnail image with a title under it that links to the full size version of the image.\r\n</i></p><p><i>\r\n\r\n<b>^u; - Company URL</b><br>\r\nThe URL for your company specified in the settings by your Administrator.\r\n</i></p><p><i>\r\n\r\n<b>^URLEncode();</b><br>\r\nThis macro is mainly useful in SQL reports, but it could be useful elsewhere as well. It takes the input of a string and URL Encodes it so that the string can be passed through a URL. It\'s syntax looks like this: ^URLEncode(\"Is this my string?\");</i></p><p><i>\r\n\r\n<b>^User();</b><br>\r\nThis macro will allow you to display any information from a user\'s account or profile. For instance, if you wanted to display a user\'s email address you\'d create this macro: ^User(\"email\");\r\n<p>\r\n\r\n<b>^/; - System URL</b><br>\r\nThe URL to the gateway script (example: <i>/index.pl/</i>).\r\n</i></p><p><i>\r\n\r\n<b>^\\; - Page URL</b><br>\r\nThe URL to the current page (example: <i>/index.pl/pagename</i>).\r\n</i></p><p><i>\r\n\r\n<b>^@; - Username</b><br>\r\nThe username of the currently logged in user.\r\n</i></p><p><i>\r\n\r\n<b>^?; - Search</b><br>\r\nAdd a search box to the page. The search box is tied to WebGUI\'s built-in search engine.\r\n</i></p><p><i>\r\n<i>Note: The .searchBox style sheet class is tied to this macro.\r\n</i></i></p><p><i><i>\r\n\r\n<b>^#; - User ID</b><br>\r\nThe user id of the currently logged in user.\r\n</i></i></p><p><i><i>\r\n\r\n<b>^*; or ^*(); - Random Number</b><br>\r\nA randomly generated number. This is often used on images (such as banner ads) that you want to ensure do not cache. In addition, you may configure this macro like this <b>^*(100);</b> to create a random number between 0 and 100.\r\n</i></i></p><p><i><i>\r\n\r\n<b>^-;,^0;,^1;,^2;,^3;, etc.</b><br>\r\nThese macros are reserved for system/wobject-specific functions as in the SQL Report wobject and the Body in the Style Manager.\r\n');
 INSERT INTO international VALUES (670,'WebGUI',1,'Image, Add/Edit');
 INSERT INTO international VALUES (673,'WebGUI',1,'Image, Delete');
 INSERT INTO international VALUES (676,'WebGUI',1,'Images, Manage');
@@ -5746,9 +5783,9 @@ INSERT INTO international VALUES (46,'Product',1,'Related Product, Add/Edit');
 INSERT INTO international VALUES (47,'Product',1,'Related products are products that are comparable or complimentary to other products.\r\n</b></b></i></i></p><p><i><i><b><b>\r\n\r\n<b>Related products</b><br>\r\nChoose from the list of products you\'ve already entered.\r\n</b></b></i></i></p><p><i><i><b><b>\r\n\r\n<b>Add another related product?</b><br>\r\nSelect \"Yes\" if you have another related product to add.');
 INSERT INTO international VALUES (30,'UserSubmission',1,'Karma Per Submission');
 
-#
-# Table structure for table 'karmaLog'
-#
+--
+-- Table structure for table 'karmaLog'
+--
 
 CREATE TABLE karmaLog (
   userId int(11) NOT NULL default '0',
@@ -5758,14 +5795,15 @@ CREATE TABLE karmaLog (
   dateModified int(11) NOT NULL default '1026097656'
 ) TYPE=MyISAM;
 
-#
-# Dumping data for table 'karmaLog'
-#
+--
+-- Dumping data for table 'karmaLog'
+--
 
 
-#
-# Table structure for table 'language'
-#
+
+--
+-- Table structure for table 'language'
+--
 
 CREATE TABLE language (
   languageId int(11) NOT NULL default '0',
@@ -5774,9 +5812,10 @@ CREATE TABLE language (
   PRIMARY KEY  (languageId)
 ) TYPE=MyISAM;
 
-#
-# Dumping data for table 'language'
-#
+--
+-- Dumping data for table 'language'
+--
+
 
 INSERT INTO language VALUES (1,'English','ISO-8859-1');
 INSERT INTO language VALUES (2,'Deutsch','ISO-8859-1');
@@ -5787,9 +5826,9 @@ INSERT INTO language VALUES (6,'Svenska','ISO-8859-1');
 INSERT INTO language VALUES (7,'¼òÌåÖÐÎÄ (Chinese Simple)','gb2312');
 INSERT INTO language VALUES (8,'Italiano','ISO-8859-1');
 
-#
-# Table structure for table 'messageLog'
-#
+--
+-- Table structure for table 'messageLog'
+--
 
 CREATE TABLE messageLog (
   messageLogId int(11) NOT NULL default '0',
@@ -5802,14 +5841,15 @@ CREATE TABLE messageLog (
   PRIMARY KEY  (messageLogId,userId)
 ) TYPE=MyISAM;
 
-#
-# Dumping data for table 'messageLog'
-#
+--
+-- Dumping data for table 'messageLog'
+--
 
 
-#
-# Table structure for table 'page'
-#
+
+--
+-- Table structure for table 'page'
+--
 
 CREATE TABLE page (
   pageId int(11) NOT NULL default '0',
@@ -5836,9 +5876,10 @@ CREATE TABLE page (
   PRIMARY KEY  (pageId)
 ) TYPE=MyISAM;
 
-#
-# Dumping data for table 'page'
-#
+--
+-- Dumping data for table 'page'
+--
+
 
 INSERT INTO page VALUES (1,0,'Home',-6,3,1,1,1,1,0,1,0,0,'','home',1,'Home',NULL,1,946710000,2082783600);
 INSERT INTO page VALUES (4,0,'Page Not Found',-6,3,1,1,1,1,0,1,0,21,'','page_not_found',0,'Page Not Found',NULL,1,946710000,2082783600);
@@ -5846,9 +5887,9 @@ INSERT INTO page VALUES (3,0,'Trash',5,3,1,1,3,1,1,0,0,22,'','trash',0,'Trash',N
 INSERT INTO page VALUES (2,0,'Clipboard',4,3,1,1,4,1,1,0,0,23,'','clipboard',0,'Clipboard',NULL,1,946710000,2082783600);
 INSERT INTO page VALUES (5,0,'Packages',1,3,0,0,6,1,1,0,0,24,'','packages',0,'Packages',NULL,1,946710000,2082783600);
 
-#
-# Table structure for table 'settings'
-#
+--
+-- Table structure for table 'settings'
+--
 
 CREATE TABLE settings (
   name varchar(255) NOT NULL default '',
@@ -5856,9 +5897,10 @@ CREATE TABLE settings (
   PRIMARY KEY  (name)
 ) TYPE=MyISAM;
 
-#
-# Dumping data for table 'settings'
-#
+--
+-- Dumping data for table 'settings'
+--
+
 
 INSERT INTO settings VALUES ('maxAttachmentSize','300');
 INSERT INTO settings VALUES ('sessionTimeout','28000');
@@ -5898,9 +5940,9 @@ INSERT INTO settings VALUES ('karmaPerLogin','1');
 INSERT INTO settings VALUES ('runOnRegistration','');
 INSERT INTO settings VALUES ('maxImageSize','100000');
 
-#
-# Table structure for table 'style'
-#
+--
+-- Table structure for table 'style'
+--
 
 CREATE TABLE style (
   styleId int(11) NOT NULL default '0',
@@ -5910,9 +5952,10 @@ CREATE TABLE style (
   PRIMARY KEY  (styleId)
 ) TYPE=MyISAM;
 
-#
-# Dumping data for table 'style'
-#
+--
+-- Dumping data for table 'style'
+--
+
 
 INSERT INTO style VALUES (-3,'WebGUI','<style>\r\n\r\n.content, body {\r\n  background-color: #000000;\r\n  color: #C9E200;\r\n  font-family: helvetica, arial;\r\n  font-size: 10pt;\r\n  scrollbar-base-color: #000000;\r\n  scrollbar-track-color: #444444;\r\n  scrollbar-face-color: #000000;\r\n  scrollbar-highlight-color: #555555;\r\n  scrollbar-3dlight-color: #444444;\r\n  scrollbar-darkshadow-color: #222222;\r\n  scrollbar-shadow-color: #333333;\r\n  scrollbar-arrow-color: #ED4400;\r\n}\r\n\r\nselect, input, textarea {\r\n  color: #000000;\r\n  background-color: #C9E200;\r\n}\r\n\r\nA {\r\n  color: #ED4400;\r\n}\r\n\r\nA:visited {\r\n  color: #ffffff;\r\n}\r\n\r\n.verticalMenu {\r\n  font-size: 10pt;\r\n}\r\n\r\n.verticalMenu A, .verticalMenu A:visited {\r\n  color: #000000;\r\n}\r\n\r\n.verticalMenu A:hover {\r\n  color: #ED4400;\r\n}\r\n\r\n.selectedMenuItem A,.selectedMenuItem A:visited {\r\n  color: #ED4400;\r\n}\r\n\r\n.loginBox {\r\n  font-size: 10pt;\r\n}\r\n\r\nH1 {\r\n  font-family: helvetica, arial;\r\n  font-size: 16pt;\r\n}\r\n\r\nsearchBox {\r\n  font-size: 10pt;\r\n}\r\n\r\n.pagination {\r\n  font-family: helvetica, arial;\r\n  font-size: 8pt;\r\n  text-align: center;\r\n}\r\n\r\n.adminBar {\r\n        background-color: #dddddd;\r\n        font-size: 8pt;\r\n        font-family: helvetica, arial;\r\n        color: #000055;\r\n}\r\n\r\n.formDescription {\r\n  font-family: helvetica, arial;\r\n  font-size: 10pt;\r\n  font-weight: bold;\r\n}\r\n\r\n.formSubtext {\r\n  font-family: helvetica, arial;\r\n  font-size: 8pt;\r\n}\r\n\r\n.highlight {\r\n  background-color: #444444;\r\n}\r\n\r\n.tableMenu {\r\n  background-color: #444444;\r\n  font-size: 8pt;\r\n  font-family: Helvetica, Arial;\r\n}\r\n\r\n.tableMenu a {\r\n  text-decoration: none;\r\n}\r\n\r\n.tableHeader {\r\n  background-color: #555555;\r\n  font-size: 10pt;\r\n  font-family: Helvetica, Arial;\r\n}\r\n\r\n.tableData {\r\n  font-size: 10pt;\r\n  font-family: Helvetica, Arial;\r\n}\r\n\r\n.pollAnswer {\r\n  font-family: Helvetica, Arial;\r\n  font-size: 8pt;\r\n}\r\n\r\n.pollColor {\r\n  background-color: #C9E200;\r\n}\r\n\r\n.pollQuestion {\r\n  font-face: Helvetica, Arial;\r\n  font-weight: bold;\r\n}\r\n\r\n.faqQuestion {\r\n  font-size: 12pt;\r\n  color: #aaaaaa;\r\n}\r\n</style>','^AdminBar;\r\n\r\n<body bgcolor=\"#000000\" text=\"#C9E200\" link=\"#ED4400\" marginwidth=\"0\" leftmargin=\"0\">\r\n<table width=\"100%\" cellpadding=0 cellspacing=0 border=0>\r\n<tr><td valign=\"top\" width=\"200\">\r\n<a href=\"/\"><img src=\"^Extras;styles/webgui/logo.gif\" border=0></a>\r\n<table cellpadding=0 border=0 cellspacing=0>\r\n<tr><td colspan=3><img src=\"^Extras;styles/webgui/menuTop.gif\" width=\"200\"></td></tr>\r\n<tr>\r\n  <td bgcolor=\"#C9E200\"><img src=\"^Extras;spacer.gif\" width=5></td>\r\n  <td bgcolor=\"#C9E200\">^FlexMenu;</td>\r\n  <td bgcolor=\"#C9E200\"><img src=\"^Extras;spacer.gif\" width=5></td>\r\n</tr>\r\n<tr><td colspan=3><img src=\"^Extras;styles/webgui/menuBottom.gif\" width=\"200\"></td></tr>\r\n</table>\r\n^L;\r\n</td>\r\n<td><img src=\"^Extras;spacer.gif\" width=20></td>\r\n<td valign=\"top\" width=\"100%\">\r\n\r\n\r\n\r\n^-;\r\n\r\n</td></tr></table>\r\n<p>\r\n<div align=\"center\">\r\n<a href=\"/\"><img src=\"^Extras;styles/webgui/icon.gif\" border=0></a><br>\r\n©2001-2002 Plain Black Software<br>\r\n</div>\r\n</body>');
 INSERT INTO style VALUES (2,'Fail Safe','<style>\r\n.adminBar {\r\n        background-color: #dddddd;\r\n        font-size: 8pt;\r\n        font-family: helvetica, arial;\r\n        color: #000055;\r\n}\r\n</style>','^AdminBar;\n\n<body>\r\n^H; / ^t; / ^m; / ^a;\r\n<hr>\n\n^-;\n\n<hr>\r\n^H; / ^t; / ^m; / ^a;\r\n</body>');
@@ -5926,9 +5969,9 @@ INSERT INTO style VALUES (5,'Trash','<style>\r\n.adminBar {\r\n        backgroun
 INSERT INTO style VALUES (1,'Packages','<style>\r\n.adminBar {\r\n        background-color: #dddddd;\r\n        font-size: 8pt;\r\n        font-family: helvetica, arial;\r\n        color: #000055;\r\n}\r\n</style>','^AdminBar;\n\n<body>\r\n<table width=\"100%\">\r\n<tr><td><span style=\"font-size: 36pt;\">Packages</span>\r\n</td>\r\n<td align=\"right\">^H; / ^a;</td></tr>\r\n<tr><td bgcolor=\"#000000\" colspan=\"2\"><img src=\"^Extras;spacer.gif\" height=\"1\"></td></tr>\r\n</table>\r\n<table width=\"100%\"><tr><td valign=\"top\" width=\"30%\"><b>PACKAGES</b><br>^FlexMenu;</td><td width=\"1\" bgcolor=\"#000000\"><img src=\"^Extras;spacer.gif\" width=\"1\"></td><td valign=\"top\" width=\"70%\"><b>CONTENT</b><br>\n\n^-;\n\n</td></tr></table>\r\n<table width=\"100%\">\r\n<tr><td bgcolor=\"#000000\" colspan=\"2\"><img src=\"^Extras;spacer.gif\" height=\"1\"></td></tr>\r\n</table>\r\n^H; / ^a;\r\n</body>');
 INSERT INTO style VALUES (-6,'WebGUI 4','<META NAME=\"Keywords\" CONTENT=\"WebGUI Content Management System\">\r\n<style>\r\n<!--\r\nbody {font-family: Arial, Helvetica, sans-serif; }\r\na:active {color: #00CCCC; text-decoration: none; background-color: #FFFFCC; }\r\na:visited {color: #003399; text-decoration: none; }\r\na:link {color: #003399; text-decoration: none; }\r\n.myAccountLink {font-weight: bold; }\r\n.verticalMenu, .tableMenu {font-family: \"Times New Roman\", Times, serif; font-style: italic; }\r\n.crumbTrail {color: #990000; font-weight: bold; }\r\nh1 {color: #990000; }\r\nh2 {color: #990000; }\r\nh3 {color: #990000; }\r\nhr {size: 2px; color: #003399;}\r\n\r\n\r\n.highlight {\r\n  background-color: #cccccc;\r\n}\r\n\r\n.tableHeader {\r\n  background-color: #eeeeee;\r\n  font-size: 13px;\r\n}\r\n\r\n.tableData {\r\n  font-size: 13px;\r\n  background-color: #fafafa;\r\n}\r\n\r\n.pollAnswer {\r\n  font-family: Helvetica, Arial;\r\n  font-size: 11px;\r\n}\r\n\r\n.pollColor {\r\n  background-color: #ae2155;\r\n  border: thin solid #000000;\r\n}\r\n\r\n.pollQuestion {\r\n  font-weight: bold;\r\n}\r\n\r\n.faqQuestion {\r\n  font-size: 12pt;\r\n  font-weight: bold;\r\n}\r\n.faqQuestion A {\r\n  text-decoration: none;\r\n  color: black;\r\n}\r\n\r\n-->\r\n</style>','<body bgcolor=\"#FFFFFF\" text=\"#000000\" leftmargin=\"0\" topmargin=\"0\">\r\n<table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\" align=\"center\">\r\n<tr><!-- top row -->\r\n<td align=\"left\" valign=\"top\"><a href=\"^H(linkonly);\"><img\r\n\r\n    src=\"^Extras;styles/webgui/webgui4.jpg\"\r\n    width=\"142\"\r\n    height=\"48\"\r\n    alt=\"WebGUI\" border=\"0\"></a></td>\r\n<td valign=\"top\">^AdminBar;</td>\r\n<td align=\"right\">\r\n<a href=\"^r(linkonly);\"><img src=\"^Extras;styles/webgui/print.png\" border=\"0\" alt=\"Print!\"></a>\r\n</td>\r\n</tr><tr>\r\n</tr>\r\n</table>\r\n<table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\" align=\"center\">\r\n<tr>\r\n <td colspan=\"2\" height=\"1\"\r\n     background=\"^Extras;styles/webgui/purplepixel.jpg\">\r\n </td>\r\n</tr>\r\n<tr><!-- row for username and crumbtrail -->\r\n <td width=\"120\"\r\n     height=\"20\"\r\n     align=\"left\"\r\n     valign=\"middle\"><table border=\"0\"><tr><td><strong>User:</strong>\r\n     ^a(^@;);</td></tr></table></td>\r\n <td align=\"left\"\r\n     valign=\"middle\"><strong>Location:</strong> ^C;</td>\r\n</tr>\r\n<tr>\r\n <td colspan=\"2\" height=\"1\"\r\n     background=\"^Extras;styles/webgui/purplepixel.jpg\">\r\n </td>\r\n</tr>\r\n</table>\r\n<table width=\"100%\" border=\"0\" cellspacing=\"0\" height=\"50%\" cellpadding=\"0\" align=\"center\">\r\n<tr><!-- row for verticalmenu and content -->\r\n <td width=\"120\"\r\n     align=\"left\"\r\n     valign=\"top\">\r\n   <!-- extra table -->\r\n   <table border=\"0\">\r\n   <tr><td>^FlexMenu;</td></tr>\r\n   <tr><td height=\"30\"></td></tr>\r\n   </table>\r\n   <!-- /extra table -->\r\n </td>\r\n <td align=\"left\"\r\n     valign=\"top\">\r\n\r\n\r\n^-;\r\n\r\n\r\n\r\n<p>\r\n</td>\r\n</tr>\r\n<tr>\r\n <td colspan=\"2\" height=\"1\"\r\n     background=\"^Extras;styles/webgui/purplepixel.jpg\">\r\n </td>\r\n</tr>\r\n<tr><!-- row for date, printable and WebGUI link -->\r\n <td height=\"20\"\r\n     align=\"center\">^D(\"%c %D %y\");</td><td align=\"center\">Powered by <a href=\"http://www.plainblack.com/webgui\">WebGUI</a></td>\r\n</tr>\r\n</table>\r\n</body>\r\n\r\n');
 
-#
-# Table structure for table 'template'
-#
+--
+-- Table structure for table 'template'
+--
 
 CREATE TABLE template (
   templateId int(11) NOT NULL default '0',
@@ -5937,9 +5980,10 @@ CREATE TABLE template (
   PRIMARY KEY  (templateId)
 ) TYPE=MyISAM;
 
-#
-# Dumping data for table 'template'
-#
+--
+-- Dumping data for table 'template'
+--
+
 
 INSERT INTO template VALUES (1,'Default','<table cellpadding=\"0\" cellspacing=\"0\" border=\"0\" width=\"100%\">\r\n<tr>\r\n  <td valign=\"top\" class=\"content\">^0;</td>\r\n</tr>\r\n</table>');
 INSERT INTO template VALUES (2,'News','<table cellpadding=\"3\" cellspacing=\"0\" border=\"0\" width=\"100%\">\r\n<tr>\r\n  <td valign=\"top\" class=\"content\" colspan=\"2\" width=\"100%\">^0;</td></tr>\r\n<tr>\r\n  <td valign=\"top\" class=\"content\" width=\"50%\">^1;</td>\r\n  <td valign=\"top\" class=\"content\" width=\"50%\">^2;</td>\r\n</tr>\r\n<tr>\r\n  <td valign=\"top\" class=\"content\" colspan=\"2\" width=\"100%\">^3;</td>\r\n</tr>\r\n</table>\r\n');
@@ -5949,9 +5993,9 @@ INSERT INTO template VALUES (5,'Left Column','<table cellpadding=\"3\" cellspaci
 INSERT INTO template VALUES (6,'Right Column','<table cellpadding=\"3\" cellspacing=\"0\" border=\"0\" width=\"100%\">\r\n<tr>\r\n  <td valign=\"top\" class=\"content\" width=\"66%\">^0;</td>\r\n  <td valign=\"top\" class=\"content\" width=\"34%\">^1;</td>\r\n</tr>\r\n</table>\r\n');
 INSERT INTO template VALUES (7,'Side By Side','<table cellpadding=\"3\" cellspacing=\"0\" border=\"0\" width=\"100%\">\r\n<tr>\r\n  <td valign=\"top\" class=\"content\" width=\"50%\">^0;</td>\r\n  <td valign=\"top\" class=\"content\" width=\"50%\">^1;</td>\r\n</tr>\r\n</table>\r\n');
 
-#
-# Table structure for table 'userLoginLog'
-#
+--
+-- Table structure for table 'userLoginLog'
+--
 
 CREATE TABLE userLoginLog (
   userId int(11) default NULL,
@@ -5961,14 +6005,15 @@ CREATE TABLE userLoginLog (
   userAgent text
 ) TYPE=MyISAM;
 
-#
-# Dumping data for table 'userLoginLog'
-#
+--
+-- Dumping data for table 'userLoginLog'
+--
 
 
-#
-# Table structure for table 'userProfileCategory'
-#
+
+--
+-- Table structure for table 'userProfileCategory'
+--
 
 CREATE TABLE userProfileCategory (
   profileCategoryId int(11) NOT NULL default '0',
@@ -5977,9 +6022,10 @@ CREATE TABLE userProfileCategory (
   PRIMARY KEY  (profileCategoryId)
 ) TYPE=MyISAM;
 
-#
-# Dumping data for table 'userProfileCategory'
-#
+--
+-- Dumping data for table 'userProfileCategory'
+--
+
 
 INSERT INTO userProfileCategory VALUES (1,'WebGUI::International::get(449,\"WebGUI\");',6);
 INSERT INTO userProfileCategory VALUES (2,'WebGUI::International::get(440,\"WebGUI\");',2);
@@ -5989,9 +6035,9 @@ INSERT INTO userProfileCategory VALUES (5,'WebGUI::International::get(443,\"WebG
 INSERT INTO userProfileCategory VALUES (6,'WebGUI::International::get(442,\"WebGUI\");',4);
 INSERT INTO userProfileCategory VALUES (7,'WebGUI::International::get(444,\"WebGUI\");',5);
 
-#
-# Table structure for table 'userProfileData'
-#
+--
+-- Table structure for table 'userProfileData'
+--
 
 CREATE TABLE userProfileData (
   userId int(11) NOT NULL default '0',
@@ -6000,16 +6046,17 @@ CREATE TABLE userProfileData (
   PRIMARY KEY  (userId,fieldName)
 ) TYPE=MyISAM;
 
-#
-# Dumping data for table 'userProfileData'
-#
+--
+-- Dumping data for table 'userProfileData'
+--
+
 
 INSERT INTO userProfileData VALUES (1,'language','1');
 INSERT INTO userProfileData VALUES (3,'language','1');
 
-#
-# Table structure for table 'userProfileField'
-#
+--
+-- Table structure for table 'userProfileField'
+--
 
 CREATE TABLE userProfileField (
   fieldName varchar(128) NOT NULL default '',
@@ -6025,9 +6072,10 @@ CREATE TABLE userProfileField (
   PRIMARY KEY  (fieldName)
 ) TYPE=MyISAM;
 
-#
-# Dumping data for table 'userProfileField'
-#
+--
+-- Dumping data for table 'userProfileField'
+--
+
 
 INSERT INTO userProfileField VALUES ('email','WebGUI::International::get(56,\"WebGUI\");',1,1,'email',NULL,NULL,1,2,1);
 INSERT INTO userProfileField VALUES ('firstName','WebGUI::International::get(314,\"WebGUI\");',1,0,'text',NULL,NULL,1,3,1);
@@ -6064,9 +6112,9 @@ INSERT INTO userProfileField VALUES ('timeFormat','WebGUI::International::get(46
 INSERT INTO userProfileField VALUES ('discussionLayout','WebGUI::International::get(509)',1,0,'select','{\r\n  threaded=>WebGUI::International::get(511),\r\n  flat=>WebGUI::International::get(510)\r\n}','[\'threaded\']',5,4,0);
 INSERT INTO userProfileField VALUES ('INBOXNotifications','WebGUI::International::get(518)',1,0,'select','{ \r\n  none=>WebGUI::International::get(519),\r\n email=>WebGUI::International::get(520),\r\n  emailToPager=>WebGUI::International::get(521),\r\n  icq=>WebGUI::International::get(522)\r\n}','[\'email\']',6,4,0);
 
-#
-# Table structure for table 'userSession'
-#
+--
+-- Table structure for table 'userSession'
+--
 
 CREATE TABLE userSession (
   sessionId varchar(60) NOT NULL default '',
@@ -6078,14 +6126,15 @@ CREATE TABLE userSession (
   PRIMARY KEY  (sessionId)
 ) TYPE=MyISAM;
 
-#
-# Dumping data for table 'userSession'
-#
+--
+-- Dumping data for table 'userSession'
+--
 
 
-#
-# Table structure for table 'users'
-#
+
+--
+-- Table structure for table 'users'
+--
 
 CREATE TABLE users (
   userId int(11) NOT NULL default '0',
@@ -6100,16 +6149,17 @@ CREATE TABLE users (
   PRIMARY KEY  (userId)
 ) TYPE=MyISAM;
 
-#
-# Dumping data for table 'users'
-#
+--
+-- Dumping data for table 'users'
+--
+
 
 INSERT INTO users VALUES (1,'Visitor','No Login','WebGUI',NULL,NULL,1019867418,1019867418,0);
 INSERT INTO users VALUES (3,'Admin','RvlMjeFPs2aAhQdo/xt/Kg','WebGUI','','',1019867418,1019935552,0);
 
-#
-# Table structure for table 'webguiVersion'
-#
+--
+-- Table structure for table 'webguiVersion'
+--
 
 CREATE TABLE webguiVersion (
   webguiVersion varchar(10) default NULL,
@@ -6117,15 +6167,16 @@ CREATE TABLE webguiVersion (
   dateApplied int(11) default NULL
 ) TYPE=MyISAM;
 
-#
-# Dumping data for table 'webguiVersion'
-#
+--
+-- Dumping data for table 'webguiVersion'
+--
 
-INSERT INTO webguiVersion VALUES ('4.3.0','intitial install',unix_timestamp());
 
-#
-# Table structure for table 'wobject'
-#
+INSERT INTO webguiVersion VALUES ('4.4.0','intitial install',unix_timestamp());
+
+--
+-- Table structure for table 'wobject'
+--
 
 CREATE TABLE wobject (
   wobjectId int(11) NOT NULL default '0',
@@ -6151,9 +6202,10 @@ CREATE TABLE wobject (
   PRIMARY KEY  (wobjectId)
 ) TYPE=MyISAM;
 
-#
-# Dumping data for table 'wobject'
-#
+--
+-- Dumping data for table 'wobject'
+--
+
 
 INSERT INTO wobject VALUES (-1,4,'SiteMap',0,'Page Not Found',1,'The page you were looking for could not be found on this system. Perhaps it has been deleted or renamed. The following list is a site map of this site. If you don\'t find what you\'re looking for on the site map, you can always start from the <a href=\"^/;\">Home Page</a>.',1,1001744792,3,1016077239,3,0,1001744792,1336444487,2,1,4,0,'after');
 INSERT INTO wobject VALUES (-2,1,'Article',1,'Welcome to WebGUI!',1,'<DIV>\r\n<P class=MsoNormal style=\"MARGIN: 0in 0in 0pt\">If you’re reading this message it means that you’ve got WebGUI up and running. Good job! The installation is not trivial.</P>\r\n<P class=MsoNormal style=\"MARGIN: 0in 0in 0pt\"> <?xml:namespace prefix = o ns = \"urn:schemas-microsoft-com:office:office\" /><o:p></o:p></P>\r\n<P class=MsoNormal style=\"MARGIN: 0in 0in 0pt\">In order to do anything useful with your new installation you’ll need to log in as the default administrator account. Follow these steps to get started:</P>\r\n<P class=MsoNormal style=\"MARGIN: 0in 0in 0pt\"> <o:p></o:p></P>\r\n<OL style=\"MARGIN-TOP: 0in\" type=1>\r\n<LI class=MsoNormal style=\"MARGIN: 0in 0in 0pt; mso-list: l1 level1 lfo2; tab-stops: list .5in\"><A href=\"^\\;?op=displayLogin\">Click here to log in.</A> (username: Admin password: 123qwe) \r\n<LI class=MsoNormal style=\"MARGIN: 0in 0in 0pt; mso-list: l1 level1 lfo2; tab-stops: list .5in\"><A href=\"^\\;?op=switchOnAdmin\">Click here to turn the administrative interface on.</A></LI></OL>\r\n<P class=MsoNormal style=\"MARGIN: 0in 0in 0pt\"> Now that you’re in as the administrator, you should <A href=\"^\\;?op=displayAccount\">change your password</A> so no one else can log in and mess with your site. You might also want to <A href=\"^\\;?op=addUser\">create another account </A>for yourself with Administrative privileges in case you can\'t log in with the Admin account for some reason.</P>\r\n<P class=MsoNormal style=\"MARGIN: 0in 0in 0pt\"> <o:p></o:p></P>\r\n<P class=MsoNormal style=\"MARGIN: 0in 0in 0pt\">You’ll notice three menus at the top of your screen. Those are your administrative menus. Going from left to right they are <I>Content</I>, <I>Clipboard</I>, and <I>Admin</I>. The content menu allows you to add new pages and content to your site. The clipboard menu is currently empty, but if you cut or copy anything from any of your pages, it will end up there. The admin menu controls things like system settings and users.</P>\r\n<P class=MsoNormal style=\"MARGIN: 0in 0in 0pt\"> <o:p></o:p></P>\r\n<P class=MsoNormal style=\"MARGIN: 0in 0in 0pt\">For more information about how to administer WebGUI consider getting a copy of <I><A href=\"http://www.plainblack.com/ruling_webgui\">Ruling WebGUI</A></I>. Plain Black Software also provides several <A href=\"http://www.plainblack.com/support_programs\">Support Programs </A>for WebGUI if you run into trouble.</P>\r\n<P class=MsoNormal style=\"MARGIN: 0in 0in 0pt\"> <o:p></o:p></P>Enjoy your new WebGUI site!\r\n</DIV>',1,1023555430,3,1023555630,3,0,1023512400,1338872400,2,1,4,0,'after');
