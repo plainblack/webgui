@@ -27,7 +27,7 @@ use WebGUI::Utility;
 #-------------------------------------------------------------------
 sub page {
 	my ($debug, %contentHash, $w, $cmd, $pageEdit, $wobject, $wobjectOutput, $extra, $originalWobject, $proxyWobjectId,
-		$sth, $httpHeader, $header, $footer, $content, $operationOutput, $adminBar, %hash);
+		$sth, $httpHeader, $header, $footer, $content, $operationOutput, $adminBar, %hash, $canEdit);
 	WebGUI::Session::open($_[0],$_[1]);
 	if (exists $session{form}{op}) {
 		$cmd = "WebGUI::Operation::www_".$session{form}{op};
@@ -91,18 +91,21 @@ sub page {
 	} else {
 		if (WebGUI::Privilege::canViewPage()) {
 			if ($session{var}{adminOn}) {
-				$pageEdit = "\n<br>"
-					.pageIcon()
-					.deleteIcon('op=deletePage')
-					.editIcon('op=editPage')
-					.moveUpIcon('op=movePageUp')
-					.moveDownIcon('op=movePageDown')
-					.cutIcon('op=cutPage')
-					."\n";
+				$canEdit = WebGUI::Privilege::canEditPage();
+				if ($canEdit) {
+					$pageEdit = "\n<br>"
+						.pageIcon()
+						.deleteIcon('op=deletePage')
+						.editIcon('op=editPage')
+						.moveUpIcon('op=movePageUp')
+						.moveDownIcon('op=movePageDown')
+						.cutIcon('op=cutPage')
+						."\n";
+				}
 			}	
 			$sth = WebGUI::SQL->read("select * from wobject where pageId=$session{page}{pageId} order by sequenceNumber, wobjectId");
 			while ($wobject = $sth->hashRef) {
-				if ($session{var}{adminOn}) {
+				if ($session{var}{adminOn} && $canEdit) {
 					$contentHash{${$wobject}{templatePosition}} .= "\n<hr>"
 						.deleteIcon('func=delete&wid='.${$wobject}{wobjectId})
 						.editIcon('func=edit&wid='.${$wobject}{wobjectId})
