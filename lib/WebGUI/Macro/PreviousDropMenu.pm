@@ -38,7 +38,7 @@ sub _draw {
 sub process {
         my ($temp, @param, $tree);
         @param = WebGUI::Macro::getParams($_[0]);
-	$param[2] = 99 unless ($param[2]);
+	$param[1] = 99 unless ($param[1]);
 	if ($param[0] ne "") {
                	$tree = WebGUI::Navigation::tree($session{page}{parentId},$param[0]);
         } else {
