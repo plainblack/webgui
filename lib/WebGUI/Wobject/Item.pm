@@ -85,8 +85,9 @@ sub www_view {
 	my ($file, %var);
 	if ($_[0]->get("attachment") ne "") {
 		$file = WebGUI::Attachment->new($_[0]->get("attachment"),$_[0]->get("wobjectId"));
-		$var{attachmentURL} = $file->getURL;
-		$var{attachmentIcon} = $file->getIcon;
+		$var{attachment.name} = $file->getFilename;
+		$var{attachment.URL} = $file->getURL;
+		$var{attachment.Icon} = $file->getIcon;
 	}
         return $_[0]->processMacros($_[0]->processTemplate($_[0]->get("templateId"),\%var));
 }	
