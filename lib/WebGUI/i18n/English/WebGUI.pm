@@ -5491,25 +5491,38 @@ A comment.
 
 	'1097' => {
 		message => q|<STRONG>config.button</STRONG>&nbsp;<BR>A "Edit / Manage" button for this navigation item.<BR>
-<P><STRONG>page_loop</STRONG><BR>A loop containing page information.</P>
+<P><STRONG>page.current.menuTitle</STRONG><BR>The pageId of the current page.</P>
+<P><STRONG>page.current.title</STRONG><BR>The title of the current page.</P>
+<P><STRONG>page.current.urlizedTitle</STRONG><BR>The URL of the current page.</P>
+<P><STRONG>page.current.pageId</STRONG><BR>The pageId of the current page.</P>
+<P><STRONG>page.current.parentId</STRONG><BR>The parentId of the current page.</P>
+<P><STRONG>page.current.ownerId</STRONG><BR>The ownerId of the current page.</P>
+<P><STRONG>page.current.synopsis</STRONG><BR>The synopsis of the current page.</P>
+<P><STRONG>page.current.newWindow</STRONG><BR>A conditional indicating whether the current page should be opened in a new window.</P>
+<P><STRONG>page.current.encryptLogin</STRONG><BR>A conditional indicating whether the current page should be served over SSL.</P>
+<P><STRONG>page_loop</STRONG><BR>A loop containing page information in nested, hierarchial order.</P>
+<P><STRONG>unfolded_page_loop</STRONG><BR>This loop contains the same data as <STRONG>page_loop</STRONG> but the order is different.  <STRONG>unfolded_page_loop</STRONG> returns it's pages in an unfolded manner; grouped by parent id. You'll probably need <STRONG>page_loop</STRONG>, but there are (CSS) menus that need <STRONG>unfolded_page_loop</STRONG> to work properly.</P>
+<p>Both <STRONG>page_loop</STRONG> and <STRONG>unfolded_page_loop</STRONG> have the following
+loop variables:</p>
 <BLOCKQUOTE dir=ltr style="MARGIN-RIGHT: 0px">
-<P dir=ltr><STRONG>page.menuTitle<BR></STRONG>The menu title of this page.</P>
-<P dir=ltr><STRONG>page.title<BR></STRONG>The title of this page.</P>
-<P><STRONG>page.urlizedTitle<BR></STRONG>The urlized title of this pagepage.url.</P>
-<P><STRONG>page.url<BR></STRONG>The url of this page.</P>
+<P dir=ltr><STRONG>page.menuTitle</STRONG><BR>The menu title of this page.</P>
+<P dir=ltr><STRONG>page.title</STRONG><BR>The title of this page.</P>
+<P dir=ltr><STRONG>page.urlizedTitle</STRONG><BR>The urlizedTitle of this page.</P>
+<P dir=ltr><STRONG>page.url</STRONG><BR>The complete URL to this page.</P>
 <P dir=ltr><STRONG>page.pageId</STRONG><BR>The pageId of this page.</P>
-<P dir=ltr><STRONG>page.parentId</STRONG><BR>The ParentId&nbsp;of this page.</P>
-<P dir=ltr><STRONG>page.ownerId<BR></STRONG>The ownerId of this page.</P>
-<P dir=ltr><STRONG>page.synopsis<BR></STRONG>The synopsis of this page.</P>
-<P dir=ltr><STRONG>page.newWindow</STRONG><BR>A condition indicating whether this page should be opened in a new window.</P>
+<P dir=ltr><STRONG>page.parentId</STRONG><BR>The parentId of this page.</P>
+<P dir=ltr><STRONG>page.ownerId</STRONG><BR>The ownerId of this page.</P>
+<P dir=ltr><STRONG>page.synopsis</STRONG><BR>The synopsis of this page.</P>
+<P dir=ltr><STRONG>page.newWindow</STRONG><BR>A conditional indicating whether this page should be opened in a new window.</P>
+<P dir=ltr><STRONG>page.encryptLogin</STRONG><BR>A conditional indicating whether this page should be served over SSL.</P>
 <P dir=ltr><STRONG>page.absDepth</STRONG><BR>The absolute depth of this page&nbsp;(relative to nameless root).</P>
 <P><STRONG>page.relDepth</STRONG><BR>The relative depth of this page (relative to starting point).</P>
 <P><STRONG>page.isCurrent</STRONG><BR>A condition indicating whether this page is current page.</P>
 <P><STRONG>page.isHidden</STRONG><BR>A condition indicating whether this page is a hidden page.<BR><EM>(Note: This variable is only visible if "Show hidden pages" is switched on.)</EM></P>
 <P><STRONG>page.isSystem</STRONG><BR>A condition indicating whether this page is a system page (Trash, Clipboard, etc).<BR><EM>(Note: This variable is only visible if "Show system pages" is switched on.)</EM></P>
-<P><STRONG>page.isViewable<BR></STRONG>A condition indicating whether the user has permission to view it.<BR><EM>(Note: This variable is only visible if "Show unprivileged pages" is switched on.)</EM></P>
-<P><STRONG>page.indent<BR></STRONG>A variable containing the indent for current page. The default indent is three spaces. Use the <STRONG>page.indent_loop </STRONG>if you need a more flexible indent.</P>
-<P><STRONG>page.indent_loop<BR></STRONG>A loop that runs <STRONG>page.relDepth </STRONG>times.</P>
+<P><STRONG>page.isViewable</STRONG><BR>A condition indicating whether the user has permission to view it.<BR><EM>(Note: This variable is only visible if "Show unprivileged pages" is switched on.)</EM></P>
+<P><STRONG>page.indent</STRONG><BR>A variable containing the indent for current page. The default indent is three spaces. Use the <STRONG>page.indent_loop</STRONG> if you need a more flexible indent.</P>
+<P><STRONG>page.indent_loop</STRONG><BR>A loop that runs <STRONG>page.relDepth</STRONG> times.</P>
 <BLOCKQUOTE dir=ltr style="MARGIN-RIGHT: 0px">
 <P><STRONG>indent</STRONG><BR>A number representing the loop count. </P></BLOCKQUOTE>
 <P dir=ltr><STRONG>page.isRoot</STRONG><BR>A condition indication whether this page is a root page.</P>
@@ -5518,9 +5531,9 @@ A comment.
 <P dir=ltr><STRONG>page.hasDaughter</STRONG><BR>A condition indication whether this page has a daughter. In other words: It evaluates to true if this page is a mother.</P>
 <P dir=ltr><STRONG>page.isMyAncestor</STRONG><BR>A condition indication whether this page is an ancestor of current page.</P>
 <P dir=ltr><STRONG>page.isMyDaughter</STRONG><BR>A condition indication whether this page is a daughter of current page.</P>
-<P dir=ltr><STRONG>page.isMyMother<BR></STRONG>A condition indication whether this page is the mother of current page.</P>
-<P dir=ltr><STRONG>page.mother.title<BR></STRONG>The title of the mother of this&nbsp;page.</P>
-<P dir=ltr><STRONG>page.mother.urlizedTitle<BR></STRONG>The urlized title of the mother of this page.</P>
+<P dir=ltr><STRONG>page.isMyMother</STRONG><BR>A condition indication whether this page is the mother of current page.</P>
+<P dir=ltr><STRONG>page.mother.title</STRONG><BR>The title of the mother of this&nbsp;page.</P>
+<P dir=ltr><STRONG>page.mother.urlizedTitle</STRONG><BR>The urlized title of the mother of this page.</P>
 <P dir=ltr><STRONG>page.mother.pageId</STRONG><BR>The pageId of the mother of this page.</P>
 <P dir=ltr><STRONG>page.mother.parentId</STRONG><BR>The parentId of the mother of this page.</P>
 <P dir=ltr><STRONG>page.depthIs1 , page.depthIs2 , page.depthIs3 , page.depthIs4 , page.depthIsN<BR></STRONG>A condition indicating whether the depth of this page is N. This variable is useful if you want to style a certain level.</P>
@@ -5531,9 +5544,8 @@ A comment.
 <P dir=ltr><STRONG>page.depthDiff</STRONG><BR>The difference in depth of this page and the page processed before it. This only has a value when you go up in depth. If you go down, this would be always 1 and going down a level can be detected with <STRONG>page.isLeftMost</STRONG>.</P>
 <P dir=ltr><STRONG>page.depthDiffIs1, page.depthDiffIs2, page.depthDiffIs3, page.depthDiffIsN</STRONG><BR>True if the <STRONG>page.depthDiff</STRONG> variable is N.</P>
 <P dir=ltr><STRONG>page.depthDiff_loop</STRONG><BR>A loop that runs <STRONG>page.depthDiff</STRONG> times. This loop contains no loop variables.</P></BLOCKQUOTE>
-<P><STRONG>unfolded_page_loop</STRONG><BR>This loop contains the same data as <STRONG>page_loop</STRONG> but the order is different. <STRONG>page_loop</STRONG> returns it's pages in a nested order: the pages are returned in a hierarchical order. <STRONG>unfolded_page_loop</STRONG>, however, returns it's pages in an unfolded manner: it's returned pages are grouped by parent id. You'll probably need <STRONG>page_loop</STRONG>, but there are (CSS) menus that need <STRONG>unfolded_page_loop</STRONG> to work properly.</P>
 <P dir=ltr>&nbsp;</P>|,
-		lastUpdated => 1078207966
+		lastUpdated => 1097119432
 	},
 
 	'893' => {
