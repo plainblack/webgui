@@ -137,7 +137,7 @@ sub userFormSave {
 sub userFormValidate {
         my ($error);
 	# the grandfather clause
-	my ($curentUsername) = WebGUI::SQL->quickArray("select username from users where userId=".$session{user}{userId});
+	my ($currentUsername) = WebGUI::SQL->quickArray("select username from users where userId=".$session{user}{userId});
 	unless ($currentUsername eq $session{form}{"authWebGUI.username"}) {
         	if ($session{form}{"authWebGUI.username"} =~ /^\s/ || $session{form}{"authWebGUI.username"} =~ /\s$/) {
                		$error = '<li>'.WebGUI::International::get(724);
