@@ -206,7 +206,18 @@ The description of the forum.
 		message => q|Are you certain you wish to delete this forum and all the posts it contains?|,
 		lastUpdated => 1066055963
 	},
-
+	'90' => {
+		message => q|Move Forum|,
+		lastUpdated =>1093435103
+	},
+	'91' => {
+		message => q|<br>Select the Message Board you want to move the forum to.|,
+		lastUpdated =>1093435103
+	},
+	'92' => {
+		message => q|--- No Change ---|,
+		lastUpdated =>1093435103
+	}
 };
 
 1;
