@@ -768,7 +768,7 @@ sub getAssetManagerControl {
 	$output .= "labels['purge'] = 'Purge';\n";
 	$output .= "labels['go'] = 'Go';\n";
 	$output .= "labels['properties'] = 'Properties';\n";
-	$output .= "labels['editTree'] = 'Edit Tree';\n";
+	$output .= "labels['editTree'] = 'Edit Branch';\n";
 	$output .= "var manager = new AssetManager(assets,columnHeadings,labels,crumbtrail);\n";
 	$output .= "manager.assetType='".$controlType."';\n" if (defined $controlType);
 	$output .= "manager.disableDisplay(0);\n" if (defined $removeRank);
@@ -1333,6 +1333,7 @@ Returns an asset hash of the parent of current Asset.
 
 sub getParent {
 	my $self = shift;
+	return $self if ($self->get("assetId") eq "PBasset000000000000001");
 	$self->{_parent} = WebGUI::Asset->newByDynamicClass($self->get("parentId")) unless (exists $self->{_parent});
 	return $self->{_parent};
 }
@@ -2616,7 +2617,9 @@ sub www_editTreeSave {
 		}
 		$descendant->update(\%data);
 	}
-	return $self->www_manageAssets;
+	delete $self->{_parent};
+	$session{asset} = $self->getParent;
+	return $self->getParent->www_manageAssets;
 }
 
 #-------------------------------------------------------------------
@@ -2812,7 +2815,7 @@ sub www_manageAssets {
 	$output .= ' <div class="adminConsoleSpacer">
             &nbsp;
         </div>
-		<div style="float: left; padding-right: 30px; font-size: 14px;"><b>'.WebGUI::International::get(1083).'</b><br />';
+		<div style="float: left; padding-right: 30px; font-size: 14px;"><fieldset><legend>'.WebGUI::International::get(1083).'</legend>';
 	foreach my $link (@{$self->getAssetAdderLinks("proceed=manageAssets",1)}) {
 		$output .= '<a href="'.$link->{url}.'">'.$link->{label}.'</a><br />';
 	}
@@ -2820,7 +2823,7 @@ sub www_manageAssets {
 	foreach my $link (@{$self->getAssetAdderLinks("proceed=manageAssets")}) {
 		$output .= '<a href="'.$link->{url}.'">'.$link->{label}.'</a><br />';
 	}
-	$output .= '</div>'; 
+	$output .= '</fieldset></div>'; 
 	my %options;
 	tie %options, 'Tie::IxHash';
 	my $hasClips = 0;
@@ -2829,14 +2832,14 @@ sub www_manageAssets {
 		$hasClips = 1;
         }
 	if ($hasClips) {
-		$output .= '<div style="float: left; padding-right: 30px; font-size: 14px;"><b>'.WebGUI::International::get(1082).'</b><br />'
+		$output .= '<div style="float: left; padding-right: 30px; font-size: 14px;"><fieldset><legend>'.WebGUI::International::get(1082).'</legend>'
 			.WebGUI::Form::formHeader()
 			.WebGUI::Form::hidden({name=>"func",value=>"pasteList"})
-			.WebGUI::Form::checkList({name=>"assetId",options=>\%options})
+			.WebGUI::Form::checkList({name=>"assetId",vertical=>1,options=>\%options})
 			.'<br />'
 			.WebGUI::Form::submit({value=>"Paste"})
 			.WebGUI::Form::formFooter()
-			.' </div> ';
+			.' </fieldset></div> ';
 	}
 	$output .= '
     <div class="adminConsoleSpacer">

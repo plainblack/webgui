@@ -261,7 +261,7 @@ sub view {
 sub www_approve {
 	my $self = shift;
         return WebGUI::Privilege::insufficient() unless ($self->canModerate);
-	$self->set({"status"=>'Approved'});
+	$self->update({"status"=>'Approved'});
 	WebGUI::MessageLog::addInternationalizedEntry($self->get("ownerUserId"),'',$self->getUrl,4,"USS");
 	if ($session{form}{mlog}) {
 		WebGUI::MessageLog::completeEntry($session{form}{mlog});
@@ -275,7 +275,7 @@ sub www_approve {
 sub www_deny {
 	my $self = shift;
         return WebGUI::Privilege::insufficient() unless ($self->canModerate);
-	$self->set({status=>'Denied'});
+	$self->update({status=>'Denied'});
 	WebGUI::MessageLog::addInternationalizedEntry($self->get("ownerUserId"),'',$self->getUrl,5,"USS");
 	if ($session{form}{mlog}) {
 		WebGUI::MessageLog::completeEntry($session{form}{mlog});
