@@ -44,7 +44,7 @@ our @ISA = qw(WebGUI::Wobject);
 
 #-------------------------------------------------------------------
 sub name {
-   return WebGUI::International::get(1, $_[0]->get('namespace'));
+   return WebGUI::International::get(1, $_[0]->get("namespace"));
 }
 
 #-------------------------------------------------------------------
@@ -114,8 +114,8 @@ sub new {
          sharedCache      => {
             fieldType     => 'integer',
             defaultValue  => '0',
-         },
-      },
+         }
+      }
    );
    bless $self, $class;
 }

@@ -119,7 +119,7 @@ This option will only display if you have Data::Structure::Util installed.  SOAP
 By default, SOAP calls are cached uniquely for each user session.  By selecting "Global" call returns can be shared between users.<p></p>
 
 <b>Cache expires</b><br>
-Number of seconds a SOAP return will be cached.  Set to 1 to essentially skip caching.|
+Number of seconds a SOAP return will be cached.  Set to 1 to essentially skip caching.|,
 
 	27=> q|Cache expires|,
 	28 => q|Cache|,
