@@ -1,7 +1,7 @@
 5.5.1
  - Fixed bug #829806 preventing users from updating thier passwords from the updateAccount form.
  - Added Apache 2 instructions to install.txt. (Thanks to Andy Grundman.)
-
+ - Fixed bug [ 831628 ] Subscription notifications sent in wrong language.
 
 5.5.0
  - Rewrote the discussion system and added many new features in the process.

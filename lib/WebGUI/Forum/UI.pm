@@ -1329,14 +1329,19 @@ sub notifySubscribers {
 		$subscribers{$userId} = $userId unless ($userId == $post->get("userId"));	# make sure we don't send unnecessary messages 
 	}
         $sth->finish;
-	my $var = {
-		'notify.subscription.message' => WebGUI::International::get(875)
-		};
-	$var = getPostTemplateVars($post, $thread, $forum, $callback, $var);
-	my $subject = WebGUI::International::get(523);
-       	my $message = WebGUI::Template::process(WebGUI::Template::get($forum->get("notificationTemplateId"),"Forum/Notification"), $var);
+	my %lang;
 	foreach my $userId (keys %subscribers) {
-               	WebGUI::MessageLog::addEntry($userId,"",$subject,$message);
+		my $u = WebGUI::User->new($userId);
+		unless (exists $lang{$u->get("language")}) {
+			$lang{$u->get("language")}{var} = {
+				'notify.subscription.message' => WebGUI::International::get(875,$u->get("language"))
+				};
+			$lang{$u->get("language")}{var} = getPostTemplateVars($post, $thread, $forum, $callback, $lang{$u->get("language")}{var});
+			$lang{$u->get("language")}{subject} = WebGUI::International::get(523,$u->get("language"));
+       			$lang{$u->get("language")}{message} = WebGUI::Template::process(WebGUI::Template::get($forum->get("notificationTemplateId"),"Forum/Notification"), 
+				$lang{$u->get("language")}{var});
+		}
+               	WebGUI::MessageLog::addEntry($userId,"",$lang{$u->get("language")}{subject},$lang{$u->get("language")}{message});
 	}
 }
 
