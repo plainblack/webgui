@@ -50,6 +50,10 @@ save you many hours of grief.
 	the new configurable navigation system. See migration.txt
 	for additional details.
 
+ * The old realtime search subsystem has been replaced with the new
+	indexed search wobject. As such we've removed the ^?; macro.
+	If you were using the ^?; macro then you'll need to set up
+	a search wobject to replace it.
  
 
 5.5.0

@@ -27,7 +27,6 @@ use WebGUI::Operation::ProfileSettings;
 use WebGUI::Operation::Replacements;
 use WebGUI::Operation::Root;
 use WebGUI::Operation::Scratch;
-use WebGUI::Operation::Search;
 use WebGUI::Operation::Settings;
 use WebGUI::Operation::Statistics;
 use WebGUI::Operation::Style;

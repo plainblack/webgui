@@ -87,4 +87,8 @@ webgui.
  - Added a variation on Len's Advanced Search wobject. Thanks to Len
    Kranendonk for creating the original version for the WebGUI community
    contest.
+ - Removed the old realtime search subsystem in favor of the new search
+   wobject.
+
+
 

@@ -510,6 +510,7 @@ foreach my $macro (keys %{$macros}) {
 		|| $macros->{$macro} eq "SpecificDropMenu" 
 		|| $macros->{$macro} eq "TopDropMenu" 
 		|| $macros->{$macro} eq "Synopsis" 
+		|| $macros->{$macro} eq "Question_search" 
 		) {
 		$newMacros{$macro} = $macros->{$macro};
 	}
@@ -571,6 +572,8 @@ unlink("../../lib/WebGUI/Macro/rootmenuHorizontal.pm");
 unlink("../../lib/WebGUI/Macro/RootTab.pm");
 unlink("../../lib/WebGUI/Macro/SpecificDropMenu.pm");
 unlink("../../lib/WebGUI/Macro/TopDropMenu.pm");
+unlink("../../lib/WebGUI/Macro/Question_search.pm");
+unlink("../../lib/WebGUI/Operation/Search.pm");
 rmtree("../../lib/WebGUI/Authentication");
 rmtree("../../www/extras/toolbar/default");
 
