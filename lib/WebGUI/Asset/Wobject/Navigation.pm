@@ -365,6 +365,13 @@ sub view {
 		}
 		$absoluteDepthOfLastPage = $pageData->{"page.absDepth"};
 		$pageData->{"page.hasChild"} = $asset->hasChildren;
+                ++$var->{"currentPage.hasSibling"}
+                        if $pageData->{"page.isSibling"};
+                ++$var->{"currentPage.hasViewableSiblings"}
+                        if ($pageData->{"page.isSibling"} && $pageData->{"isViewable"});
+                ++$var->{"currentPage.hasViewableChildren"}
+                        if ($pageData->{"page.isChild"} && $pageData->{"isViewable"});
+
 		my $parent = $asset->getParent;
 		if (defined $parent) {
 			foreach my $property (@interestingProperties) {

@@ -89,6 +89,9 @@ the Navigation Template to determine who can see them in the menu.</P>
 <P><STRONG>currentPage.newWindow</STRONG><BR>A conditional indicating whether the base page should be opened in a new window.</P>
 <P><STRONG>currentPage.hasChild</STRONG><BR>A conditional indicating whether the base page has daughters.</P>
 <P><STRONG>currentPage.isHome</STRONG><BR>A conditional indicating whether the base page is the default page for the site.</P>
+<P><STRONG>currentPage.hasSibling</STRONG><BR>A conditional indicating whether the base page has siblings.</P>
+<P><STRONG>currentPage.hasViewableSiblings</STRONG><BR>A conditional indicating whether the base page has siblings that are viewable by the current user.</P>
+<P><STRONG>currentPage.hasViewableChildren</STRONG><BR>A conditional indicating whether the base page has children that are viewable by the current user.</P>
 <P><STRONG>page_loop</STRONG><BR>A loop containing page information in nested, hierarchical order.</P>
 <P><STRONG>unfolded_page_loop</STRONG><BR>This loop contains the same data as <STRONG>page_loop</STRONG> but the order is different.  <STRONG>unfolded_page_loop</STRONG> returns it's pages in an unfolded manner; grouped by parent id. You'll probably need <STRONG>page_loop</STRONG>, but there are (CSS) menus that need <STRONG>unfolded_page_loop</STRONG> to work properly.</P>
 <p>Both <STRONG>page_loop</STRONG> and <STRONG>unfolded_page_loop</STRONG> have the following
