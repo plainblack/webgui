@@ -31,7 +31,7 @@ use WebGUI::ErrorHandler;
 use WebGUI::HTTP;
 use WebGUI::Node;
 use WebGUI::Session;
-use Template;
+use WebGUI::Template;
 use WebGUI::URL;
 use WebGUI::Utility;
 
