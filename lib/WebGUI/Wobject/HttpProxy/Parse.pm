@@ -19,7 +19,6 @@ use WebGUI::URL;
 use vars qw(@ISA);
 @ISA = qw(HTML::Parser);
 
-
  
 my %linkElements =            # from HTML::Element.pm
   (
@@ -33,6 +32,8 @@ my %linkElements =            # from HTML::Element.pm
    frame  => 'src',
    applet => 'codebase',
    area   => 'href',
+   script   => 'src',
+   iframe  => 'src',
   );
   
 my %tag_attr;
@@ -91,7 +92,6 @@ sub end {
 	$_[0]->output("</$_[1]>") 
 }
 
-
 sub start {
   	my $self = shift;
   	my ($tag, $attr, $attrseq, $origtext) = @_;
@@ -114,7 +114,7 @@ sub start {
         			$val = URI::URL::url($val)->abs($self->{Url},1); # make absolute
       			}
       			if ($val->scheme eq "http") {
-        			if (lc($tag) ne "img") { # no rewrite for images
+        			if (lc($tag) ne "img" && lc($tag) ne "script" && lc($tag) ne "iframe") { # no rewrite for some 
           				if (lc($tag) eq "form" && lc($_) eq "action") {  # Found FORM ACTION
 	    					$self->{FormActionIsDefined}=1;
             					$self->{FormAction} = $val;  # set FormAction to include hidden field later
