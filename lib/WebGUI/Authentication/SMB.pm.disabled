@@ -106,7 +106,7 @@ sub registrationFormValidate {
         if ($smb > 0) {
                 $error = '<li>'. $smbError{$smb} . "pdc: $pdc, bdc: $bdc, domain: $ntDomain";
         }
-       	return $error;
+       	return ($session{form}{'authSMB.loginId'}, $error);
 }
 
 
@@ -123,7 +123,7 @@ sub settingsForm {
 
 #-------------------------------------------------------------------
 sub userForm {
-	return "";
+	return undef;
 }
 
 #-------------------------------------------------------------------
@@ -132,7 +132,7 @@ sub userFormSave {
 
 #-------------------------------------------------------------------
 sub userFormValidate {
-	return "";
+	return ($session{user}{username},"");
 }
 
 1;

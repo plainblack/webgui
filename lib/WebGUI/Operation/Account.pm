@@ -63,23 +63,15 @@ sub _accountOptions {
 }
 
 #-------------------------------------------------------------------
-sub _hasBadUsername {
-	my ($error,$otherUser);
-	if ($_[0] =~ /^\s/ || $_[0] =~ /\s$/) {
-		$error = '<li>'.WebGUI::International::get(724);
-	} 
-	if ($_[0] eq "") {
-		$error .= '<li>'.WebGUI::International::get(725);
+sub _checkForDuplicateUsername {
+	my $username = $_[0];
+	my ($otherUser) = WebGUI::SQL->quickArray("select count(*) from users where username=".quote($username));
+	if ($otherUser && $username ne $session{user}{username}) {
+		return '<li>'.WebGUI::International::get(77).' "'.$username.'too", "'.$username.'2", '
+                	.'"'.$username.'_'.WebGUI::DateTime::epochToHuman(time(),"%y").'"';
+	} else {
+		return "";
 	}
-	unless ($_[0] =~ /^[A-Za-z0-9\-\_\.\,\@]+$/) {
-		$error .= '<li>'.WebGUI::International::get(747);
-	}
-	($otherUser) = WebGUI::SQL->quickArray("select username from users where username='$_[0]'");
-	if ($otherUser ne "" && $otherUser ne $session{user}{username}) {
-		$error .= '<li>'.WebGUI::International::get(77).' "'.$_[0].'too", "'.$_[0].'2", '
-                	.'"'.$_[0].'_'.WebGUI::DateTime::epochToHuman(time(),"%y").'"';
-	}
-	return $error;
 }
 
 #-------------------------------------------------------------------
@@ -122,9 +114,6 @@ sub www_createAccount {
 
         	$f = WebGUI::HTMLForm->new();
 		$f->hidden("op","createAccountSave");
-		unless ($session{setting}{authMethod} ne "WebGUI" && $session{setting}{usernameBinding}) {
-			$f->text("username",WebGUI::International::get(50),$session{form}{username});
-		}
 		$f->raw(WebGUI::Authentication::registrationForm());
         	$a = WebGUI::SQL->read("select * from userProfileField,userProfileCategory 
 			where userProfileField.profileCategoryId=userProfileCategory.profileCategoryId 
@@ -179,15 +168,10 @@ sub www_createAccount {
 sub www_createAccountSave {
         my ($profile, $u, $username, $uri, $temp, $ldap, $port, %args, $search, $cmd, 
 		$connectDN, $auth, $output, $error, $uid,  $encryptedPassword, $fieldName);
-        if ($session{setting}{authMethod} ne "WebGUI" && $session{setting}{usernameBinding}) {
-		$username = $session{form}{loginId};
-        } else {
-                $username = $session{form}{username};
-        }
-	$error = _hasBadUsername($username);
-	$error .= WebGUI::Authentication::registrationFormValidate();
+	($username, $error) = WebGUI::Authentication::registrationFormValidate();
 	($profile, $temp) = _validateProfileData();
 	$error .= $temp;
+	$error .= _checkForDuplicateUsername($username);
         if ($error eq "") {
 		$u = WebGUI::User->new("new");
 		$u->username($username);
@@ -244,20 +228,18 @@ sub www_deactivateAccountConfirm {
 sub www_displayAccount {
         my ($output, %hash, @array, $f);
 	if ($session{user}{userId} != 1) {
-        	$output .= '<h1>'.WebGUI::International::get(61).'</h1>';
-		$f = WebGUI::HTMLForm->new;
-        	$f->hidden("op","updateAccount");
-		$f->readOnly($session{user}{karma},WebGUI::International::get(537)) if ($session{setting}{useKarma});
-
-		if ($session{user}{authMethod} ne "WebGUI" && $session{setting}{usernameBinding}) {
-			$f->hidden("username",$session{user}{username});
-        		$f->readOnly($session{user}{username},WebGUI::International::get(50));
+        	$output = '<h1>'.WebGUI::International::get(61).'</h1>';
+		my $form = WebGUI::Authentication::userForm();
+		unless (defined $form) {
+			$output .= WebGUI::International::get(856);
 		} else {
-        		$f->text("username",WebGUI::International::get(50),$session{user}{username});
+			$f = WebGUI::HTMLForm->new;
+        		$f->hidden("op","updateAccount");
+			$f->readOnly($session{user}{karma},WebGUI::International::get(537)) if ($session{setting}{useKarma});
+			$f->raw($form);
+			$f->submit;
+			$output .= $f->print;
 		}
-		$f->raw(WebGUI::Authentication::userForm());
-		$f->submit;
-		$output .= $f->print;
 		$output .= _accountOptions();
         } else {
                 $output .= www_displayLogin();
@@ -472,13 +454,13 @@ sub www_recoverPasswordFinish {
 
 #-------------------------------------------------------------------
 sub www_updateAccount {
-        my ($output, $error, $encryptedPassword, $passwordStatement, $u);
+        my ($output, $username, $error, $encryptedPassword, $passwordStatement, $u);
         if ($session{user}{userId} != 1) {
-		$error = WebGUI::Authentication::userFormValidate();
-		$error .= _hasBadUsername($session{form}{username});
+		($username, $error) = WebGUI::Authentication::userFormValidate();
+		$error .= _checkForDuplicateUsername($username);
         	if ($error eq "") {
 			$u = WebGUI::User->new($session{user}{userId});
-			$u->username($session{form}{username});
+			$u->username($username);
 			WebGUI::Authentication::userFormSave();
                 	$output .= '<li>'.WebGUI::International::get(81).'<p>';
 			WebGUI::Session::refreshUserInfo($u->userId);

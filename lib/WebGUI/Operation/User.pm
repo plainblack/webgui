@@ -224,7 +224,7 @@ sub www_editUser {
 		Selfdestructed	=>WebGUI::International::get(819)
 		);
 	$f->select("status",\%status,WebGUI::International::get(816),[$u->status]);
-       	$f->select("authMethod",$session{authentication},WebGUI::International::get(164),[$session{setting}{authMethod}]);
+       	$f->select("authMethod",$session{authentication},WebGUI::International::get(164),[$u->authMethod]);
 	foreach (keys %{$session{authentication}}) {
 		$f->raw(WebGUI::Authentication::adminForm($u->userId,$_));
  	}

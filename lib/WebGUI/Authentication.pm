@@ -69,9 +69,8 @@ These functions are available from this package:
 sub _execute {
 	my ($authMethod, $function, $params) = @_;
         my $cmd = "WebGUI::Authentication::".$authMethod."::".$function;
-        my $result = eval {&$cmd($params)};
-        WebGUI::ErrorHandler::fatalError("Missing method in Authentication module: $authMethod. ".$@) if($@);
-	return $result;
+        return eval {&$cmd($params)} unless ($@);
+        WebGUI::ErrorHandler::fatalError("Missing method in Authentication module: $authMethod. ".$@);
 }
 
 #-------------------------------------------------------------------
@@ -289,7 +288,7 @@ sub registrationFormSave {
 
 =head2 registrationFormValidate ( )
 
-Returns an error string if there are any problems with the form data.
+Returns the WebGUI username to user for this user, and returns an error string if there are any problems with the form data. 
 
 =cut
 
@@ -387,7 +386,7 @@ sub userFormSave {
 
 =head2 userFormValidate ( )
 
-Returns an error string if there are any problems with the form data.
+Returns the WebGUI username to use for this user, and returns an error string if there are any problems with the form data.
 
 =cut
 

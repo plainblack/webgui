@@ -52,7 +52,7 @@ sub www_editUserSettings {
         $f->integer("karmaPerLogin",WebGUI::International::get(540),$session{setting}{karmaPerLogin});
         $f->interval("sessionTimeout",WebGUI::International::get(142),WebGUI::DateTime::secondsToInterval($session{setting}{sessionTimeout}));
         $f->select("authMethod",$session{authentication},WebGUI::International::get(119),[$session{setting}{authMethod}]);
-        $f->yesNo("usernameBinding",WebGUI::International::get(306),$session{setting}{usernameBinding});
+        #$f->yesNo("usernameBinding",WebGUI::International::get(306),$session{setting}{usernameBinding});
 	$f->yesNo("selfDeactivation","Allow users to deactivate their account",$session{setting}{selfDeactivation});
 	foreach (keys %{$session{authentication}}) {
 		$f->raw(WebGUI::Authentication::settingsForm($_));
