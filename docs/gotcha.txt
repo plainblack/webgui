@@ -37,7 +37,7 @@ save you many hours of grief.
 
 	perl -MCPAN -e shell
 	install Archive::Tar
-	install Compress:Zlib
+	install Compress::Zlib
 	exit
 
 
