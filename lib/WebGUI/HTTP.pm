@@ -51,6 +51,7 @@ Generates an HTTP header.
 =cut
 
 sub getHeader {
+	return undef if ($session{page}{noHttpHeader});	
 	my $header;
 	unless (exists $session{http}{location}) {
 		unless ($session{http}{charset}) {
