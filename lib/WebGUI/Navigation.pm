@@ -81,7 +81,9 @@ sub drawHorizontal {
 		} else {
 			$output .= ' '.$seperator.' ';
 		}
-                $output .= '<a class="'.$class.'" href="'.$tree->{$pageId}{url}.'">';
+                $output .= '<a class="'.$class.'"';
+		$output .= ' target="_blank"' if ($tree->{$pageId}{newWindow});
+		$output .= ' href="'.$tree->{$pageId}{url}.'">';
 		if ($pageId == $session{page}{pageId}) {
                        $output .= '<span class="selectedMenuItem">'.$tree->{$pageId}{title}.'</span>';
 		} else {
@@ -136,7 +138,9 @@ sub drawVertical {
                 $leading .= "<br>";
         }
 	foreach $pageId (keys %{$tree}) {
-		$output .= $padding.$bullet.'<a class="'.$class.'" href="'.$tree->{$pageId}{url}.'">';
+		$output .= $padding.$bullet.'<a class="'.$class.'"';
+		$output .= ' target="_blank"' if ($tree->{$pageId}{newWindow});
+		$output .= ' href="'.$tree->{$pageId}{url}.'">';
                 if ($pageId == $session{page}{pageId}) {
                        $output .= '<span class="selectedMenuItem">'.$tree->{$pageId}{title}.'</span>';
                 } else {
@@ -152,17 +156,21 @@ sub drawVertical {
 
 =head2 tree ( parentId [, toLevel ] )
 
-Generates and returns a hash reference containing a page tree with keys of "url", "title", and "sub" with orignating keys of page ids.  The tree looks like this:
+Generates and returns a hash reference containing a page tree with keys of "url", "title", "fullTitle", "synopsis", "newWindow" and "sub" with orignating keys of page ids.  The tree looks like this:
 
  root
   |-pageId
   |  |-url
   |  |-title
+  |  |-fullTitle
   |  |-synopsis
+  |  |-newWindow
   |  `-sub (pageId)
   |     |-url
   |     |-title
+  |     |-fullTitle
   |     |-synopsis
+  |     |-newWindow
   |     `-sub (pageId)
   |        `-etc
   `-pageId
@@ -189,13 +197,16 @@ sub tree {
 	tie %tree, 'Tie::IxHash';
 	tie %data, 'Tie::CPHash';
        	if ($depth < $toLevel) {
-               	$sth = WebGUI::SQL->read("select urlizedTitle, menuTitle, pageId, synopsis, hideFromNavigation from page 
+               	$sth = WebGUI::SQL->read("select urlizedTitle, menuTitle, pageId, synopsis, hideFromNavigation, 
+			newWindow, title from page 
 			where parentId='$parentId' order by sequenceNumber");
                	while (%data = $sth->hash) {
                        	if (!($data{hideFromNavigation}) && WebGUI::Privilege::canViewPage($data{pageId})) {
 				$tree{$data{pageId}}{url} = WebGUI::URL::gateway($data{urlizedTitle}); 
 				$tree{$data{pageId}}{title} = $data{menuTitle}; 
 				$tree{$data{pageId}}{synopsis} = $data{synopsis}; 
+				$tree{$data{pageId}}{fullTitle} = $data{title};
+				$tree{$data{pageId}}{newWindow} = $data{newWindow};
                	                $tree{$data{pageId}}{sub} = tree($data{pageId},$toLevel,($depth+1));
                        	}
                 }

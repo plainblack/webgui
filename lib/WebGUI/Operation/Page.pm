@@ -266,17 +266,29 @@ sub www_editPage {
 			-value=>$page{menuTitle},
 			-uiLevel=>1
 			);
+                $f->getTab("properties")->text(
+			-name=>"urlizedTitle",
+			-label=>WebGUI::International::get(104),
+			-value=>$page{urlizedTitle},
+			-uiLevel=>3
+			);
+                $f->getTab("properties")->url(
+			-name=>"redirectURL",
+			-label=>WebGUI::International::get(715),
+			-value=>$page{redirectURL},
+			-uiLevel=>9
+			);
 		$f->getTab("properties")->yesNo(
 			-name=>"hideFromNavigation",
 			-value=>$page{hideFromNavigation},
 			-label=>WebGUI::International::get(886),
 			-uiLevel=>6
 			);
-                $f->getTab("properties")->text(
-			-name=>"urlizedTitle",
-			-label=>WebGUI::International::get(104),
-			-value=>$page{urlizedTitle},
-			-uiLevel=>3
+		$f->getTab("properties")->yesNo(
+			-name=>"newWindow",
+			-value=>$page{newWindow},
+			-label=>WebGUI::International::get(940),
+			-uiLevel=>6
 			);
 		$f->getTab("properties")->select(
 			-name=>"languageId",
@@ -284,12 +296,6 @@ sub www_editPage {
 			-value=>[$page{languageId}],
 			-uiLevel=>1,
 			-options=>WebGUI::International::getLanguages()
-			);
-                $f->getTab("properties")->url(
-			-name=>"redirectURL",
-			-label=>WebGUI::International::get(715),
-			-value=>$page{redirectURL},
-			-uiLevel=>9
 			);
 		$f->getTab("properties")->textarea(
 			-name=>"synopsis",
@@ -444,6 +450,7 @@ sub www_editPageSave {
 		ownerId=$session{form}{ownerId}, 
 		groupIdView=$session{form}{groupIdView}, 
 		groupIdEdit=$session{form}{groupIdEdit}, 
+		newWindow=$session{form}{newWindow},
 		hideFromNavigation=$session{form}{hideFromNavigation},
 		startDate=$session{form}{startDate},
 		endDate=$session{form}{endDate},
