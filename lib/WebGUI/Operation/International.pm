@@ -18,6 +18,7 @@ use WebGUI::HTMLForm;
 use WebGUI::Icon;
 use WebGUI::International;
 use WebGUI::Mail;
+use WebGUI::Operation::Shared;
 use WebGUI::Paginator;
 use WebGUI::Session;
 use WebGUI::SQL;
@@ -55,21 +56,20 @@ sub _export {
 
 #-------------------------------------------------------------------
 sub _submenu {
-	my ($output);
-	$output = '<table width="100%"><tr>';
-	$output .= '<td valign="top" class="content">'.$_[0].'</td>';
-	$output .= '<td valign="top" class="tableMenu" nowrap="1">';
+        my (%menu);
+        tie %menu, 'Tie::IxHash';
 	if ($session{form}{lid} == 1) {
-		$output .= '<li><a href="'.WebGUI::URL::page('op=addInternationalMessage&lid=1').'">Add new message.</a>';
+		$menu{WebGUI::URL::page('op=addInternationalMessage&lid=1')} = "Add new message.";
 	}
-	$output .= '<li><a href="'.WebGUI::URL::page('op=listInternationalMessages&lid='.$session{form}{lid}).'">'.WebGUI::International::get(594).'</a>';
-	$output .= '<li><a href="'.WebGUI::URL::page('op=editLanguage&lid='.$session{form}{lid}).'">'.WebGUI::International::get(598).'</a>';
-	$output .= '<li><a href="'.WebGUI::URL::page('op=exportTranslation&lid='.$session{form}{lid}).'">'.WebGUI::International::get(718).'</a>';
-	$output .= '<li><a href="'.WebGUI::URL::page('op=submitTranslation&lid='.$session{form}{lid}).'">'.WebGUI::International::get(593).'</a>';
-	$output .= '<li><a href="'.WebGUI::URL::page('op=listLanguages').'">'.WebGUI::International::get(585).'</a>';
-	$output .= '<li><a href="'.WebGUI::URL::page().'">'.WebGUI::International::get(493).'</a>';
-	$output .= '</td></tr></table>';
-	return $output;
+        if ($session{form}{lid} ne "") {
+		$menu{WebGUI::URL::page('op=listInternationalMessages&lid='.$session{form}{lid})} = 
+			WebGUI::International::get(594);
+		$menu{WebGUI::URL::page('op=editLanguage&lid='.$session{form}{lid})} = WebGUI::International::get(598);
+		$menu{WebGUI::URL::page('op=exportTranslation&lid='.$session{form}{lid})} = WebGUI::International::get(718);
+		$menu{WebGUI::URL::page('op=submitTranslation&lid='.$session{form}{lid})} = WebGUI::International::get(593);
+        }
+	$menu{WebGUI::URL::page('op=listLanguages')} = WebGUI::International::get(585);
+        return menuWrapper($_[0],\%menu);
 }
 
 #-------------------------------------------------------------------
@@ -121,63 +121,53 @@ sub www_deleteLanguage {
 
 #-------------------------------------------------------------------
 sub www_deleteLanguageConfirm {
-        if ($session{form}{lid} < 1000 && $session{form}{lid} > 0) {
-                return WebGUI::Privilege::vitalComponent();
-        } elsif (WebGUI::Privilege::isInGroup(3)) {
-                WebGUI::SQL->write("delete from language where languageId=".$session{form}{lid});
-                WebGUI::SQL->write("delete from international where languageId=".$session{form}{lid});
-                WebGUI::SQL->write("delete from help where languageId=".$session{form}{lid});
-                WebGUI::SQL->write("delete from userProfileData where fieldName='language' and fieldData=".$session{form}{lid});
-                return www_listLanguages();
-        } else {
-                return WebGUI::Privilege::adminOnly();
-        }
+	return WebGUI::Privilege::adminOnly() unless (WebGUI::Privilege::isInGroup(3));
+        return WebGUI::Privilege::vitalComponent() if ($session{form}{lid} < 1000 && $session{form}{lid} > 0);
+        WebGUI::SQL->write("delete from language where languageId=".$session{form}{lid});
+        WebGUI::SQL->write("delete from international where languageId=".$session{form}{lid});
+        WebGUI::SQL->write("delete from help where languageId=".$session{form}{lid});
+        WebGUI::SQL->write("delete from userProfileData where fieldName='language' and fieldData=".$session{form}{lid});
+        return www_listLanguages();
 }
 
 #-------------------------------------------------------------------
 sub www_editInternationalMessage {
         my ($output, $message, $f, $language);
-        if (WebGUI::Privilege::isInGroup(3)) {
-		($language) = WebGUI::SQL->quickArray("select language from language where languageId=".$session{form}{lid});
-                $output = '<h1>'.WebGUI::International::get(597).'</h1>';
-                $f = WebGUI::HTMLForm->new;
-                $f->readOnly($session{form}{iid},WebGUI::International::get(601));
-                $f->hidden("lid",$session{form}{lid});
-		$f->hidden("status",$session{form}{status});
-                $f->hidden("iid",$session{form}{iid});
-                $f->hidden("pn",$session{form}{pn});
-                $f->hidden("namespace",$session{form}{namespace});
-                $f->hidden("op","editInternationalMessageSave");
-                ($message) = WebGUI::SQL->quickArray("select message from international where internationalId=".$session{form}{iid}." 
-                        and namespace='".$session{form}{namespace}."' and languageId=".$session{form}{lid});
-                $f->textarea("message",$language,$message);
-                $f->submit;
-		($message) = WebGUI::SQL->quickArray("select message from international where internationalId=".$session{form}{iid}." 
-			and namespace='".$session{form}{namespace}."' and languageId=1");
-		$f->readOnly($message,"English");
-                $output .= $f->print;
-                return _submenu($output);
-        } else {
-                return WebGUI::Privilege::adminOnly();
-        }
+        return WebGUI::Privilege::adminOnly() unless (WebGUI::Privilege::isInGroup(3));
+	($language) = WebGUI::SQL->quickArray("select language from language where languageId=".$session{form}{lid});
+        $output = '<h1>'.WebGUI::International::get(597).'</h1>';
+        $f = WebGUI::HTMLForm->new;
+        $f->readOnly($session{form}{iid},WebGUI::International::get(601));
+        $f->hidden("lid",$session{form}{lid});
+	$f->hidden("status",$session{form}{status});
+        $f->hidden("iid",$session{form}{iid});
+        $f->hidden("pn",$session{form}{pn});
+        $f->hidden("namespace",$session{form}{namespace});
+        $f->hidden("op","editInternationalMessageSave");
+        ($message) = WebGUI::SQL->quickArray("select message from international where internationalId=".$session{form}{iid}." 
+                and namespace='".$session{form}{namespace}."' and languageId=".$session{form}{lid});
+        $f->textarea("message",$language,$message);
+        $f->submit;
+	($message) = WebGUI::SQL->quickArray("select message from international where internationalId=".$session{form}{iid}." 
+		and namespace='".$session{form}{namespace}."' and languageId=1");
+	$f->readOnly($message,"English");
+        $output .= $f->print;
+        return _submenu($output);
 }
 
 #-------------------------------------------------------------------
 sub www_editInternationalMessageSave {
-        if (WebGUI::Privilege::isInGroup(3)) {
-		if ($session{form}{status} eq "missing") {
-                	WebGUI::SQL->write("insert into international (message,namespace,languageId,internationalId,lastUpdated) 
-				values (".quote($session{form}{message}).",".quote($session{form}{namespace})
-				.",".$session{form}{lid}.",".$session{form}{iid}.", ".time().")");
-		} else {
-                	WebGUI::SQL->write("update international set message=".quote($session{form}{message}).", lastUpdated="
-				.time()." where namespace=".quote($session{form}{namespace})." 
-                        	and languageId=".$session{form}{lid}." and internationalId=".$session{form}{iid});
-		}
-                return www_listInternationalMessages();
-        } else {
-                return WebGUI::Privilege::adminOnly();
-        }
+        return WebGUI::Privilege::adminOnly() unless (WebGUI::Privilege::isInGroup(3));
+	if ($session{form}{status} eq "missing") {
+               	WebGUI::SQL->write("insert into international (message,namespace,languageId,internationalId,lastUpdated) 
+			values (".quote($session{form}{message}).",".quote($session{form}{namespace})
+			.",".$session{form}{lid}.",".$session{form}{iid}.", ".time().")");
+	} else {
+               	WebGUI::SQL->write("update international set message=".quote($session{form}{message}).", lastUpdated="
+			.time()." where namespace=".quote($session{form}{namespace})." 
+                       	and languageId=".$session{form}{lid}." and internationalId=".$session{form}{iid});
+	}
+        return www_listInternationalMessages();
 }
 
 #-------------------------------------------------------------------
@@ -216,18 +206,15 @@ sub www_editLanguage {
 
 #-------------------------------------------------------------------
 sub www_editLanguageSave {
-        if (WebGUI::Privilege::isInGroup(3)) {
-                if ($session{form}{lid} eq "new") {
-			$session{form}{lid} = getNextId("languageId");
-			WebGUI::SQL->write("insert into language (languageId) values ($session{form}{lid})");
-                }
-		WebGUI::SQL->write("update language set language=".quote($session{form}{language}).", 
-			characterSet=".quote($session{form}{characterSet}).", toolbar=".quote($session{form}{toolbar})."
-			where languageId=".$session{form}{lid});
-                return www_editLanguage();
-        } else {
-                return WebGUI::Privilege::adminOnly();
+        return WebGUI::Privilege::adminOnly() unless (WebGUI::Privilege::isInGroup(3));
+        if ($session{form}{lid} eq "new") {
+		$session{form}{lid} = getNextId("languageId");
+		WebGUI::SQL->write("insert into language (languageId) values ($session{form}{lid})");
         }
+	WebGUI::SQL->write("update language set language=".quote($session{form}{language}).", 
+		characterSet=".quote($session{form}{characterSet}).", toolbar=".quote($session{form}{toolbar})."
+		where languageId=".$session{form}{lid});
+        return www_editLanguage();
 }
 
 #-------------------------------------------------------------------
@@ -238,105 +225,99 @@ sub www_exportTranslation {
 
 #-------------------------------------------------------------------
 sub www_listInternationalMessages {
+        return WebGUI::Privilege::adminOnly() unless (WebGUI::Privilege::isInGroup(3));
         my ($output, $sth, $key, $p, $search, $status,%data, %list, $deprecated, $i, $missing, @row, $f, $outOfDate, $ok);
         tie %data, 'Tie::CPHash';
-        if (WebGUI::Privilege::isInGroup(3)) {
-                %data = WebGUI::SQL->quickHash("select language from language where languageId=".$session{form}{lid});
-                $missing = '<b>'.WebGUI::International::get(596).'</b>';
-                $outOfDate = '<b>'.WebGUI::International::get(719).'</b>';
-                $ok = WebGUI::International::get(720);
-		$deprecated = WebGUI::International::get(723);
-                $output = '<h1>'.WebGUI::International::get(595).' ('.$data{language}.')</h1>';
-		$f = WebGUI::HTMLForm->new(1);
-		$f->hidden("op","listInternationalMessages");
-		$f->hidden("lid",$session{form}{lid});
-		$f->text("search","",$session{form}{search});
-		$f->submit("search");
-		$output .= $f->print;
-		if ($session{form}{search} ne "") {
-			$search = " and message like ".quote("%".$session{form}{search}."%");
-		}
-                $sth = WebGUI::SQL->read("select * from international where languageId=".$session{form}{lid}.$search);
-                while (%data = $sth->hash) {
-                        $list{"z-".$data{namespace}."-".$data{internationalId}}{id} = $data{internationalId};
-                        $list{"z-".$data{namespace}."-".$data{internationalId}}{namespace} = $data{namespace};
-                        $list{"z-".$data{namespace}."-".$data{internationalId}}{message} = $data{message};
-                        $list{"z-".$data{namespace}."-".$data{internationalId}}{lastUpdated} = $data{lastUpdated};
-                        $list{"z-".$data{namespace}."-".$data{internationalId}}{status} = "deleted";
-                }
-                $sth->finish;
-                $sth = WebGUI::SQL->read("select * from international where languageId=1".$search);
-                while (%data = $sth->hash) {
-			$key = $data{namespace}."-".$data{internationalId};
-                        unless ($list{"z-".$key}) {
-                                $list{"a-".$key}{namespace} = $data{namespace};
-                                $list{"a-".$key}{id} = $data{internationalId};
-                                $list{"a-".$key}{status} = "missing";
-                        } else {
-				if ($list{"z-".$key}{lastUpdated} < $data{lastUpdated}) {
-                                	$list{"o-".$key} = $list{"z-".$key};
-					delete($list{"z-".$key});
-                                	$list{"o-".$key}{status} = "updated";
-				} else {
-                                	$list{"q-".$key} = $list{"z-".$key};
-					delete($list{"z-".$key});
-                                	$list{"q-".$key}{status} = "ok";
-				}
-			}
-                }
-                $sth->finish;
-                foreach $key (sort {$a cmp $b} keys %list) {
-			if ($list{$key}{status} eq "updated") {
-				$status = $outOfDate;
-			} elsif ($list{$key}{status} eq "missing") {
-				$status = $missing;
-			} elsif ($list{$key}{status} eq "deleted") {
-				$status = $deprecated;
-			} else {
-				$status = $ok;
-			}
-			$row[$i] = '<tr valign="top"><td nowrap="1">'.$status."</td><td>"
-				.editIcon('op=editInternationalMessage&lid='.$session{form}{lid}
-                		.'&iid='.$list{$key}{id}.'&namespace='.$list{$key}{namespace}.'&pn='.$session{form}{pn}
-				."&status=".$list{$key}{status})."</td><td>".$list{$key}{namespace}."</td><td>"
-				.$list{$key}{id}."</td><td>".$list{$key}{message}."</td></tr>\n";
-			$i++;
-                }
-                $p = WebGUI::Paginator->new(WebGUI::URL::page('op=listInternationalMessages&lid='.$session{form}{lid}),\@row,100);
-                $output .= $p->getBarTraditional($session{form}{pn});
-		$output .= '<table style="font-size: 11px;" width="100%">';
-		$output .= '<tr><td class="tableHeader">'.WebGUI::International::get(434).'</td><td class="tableHeader">'.
-			WebGUI::International::get(575).'</td><td class="tableHeader">'.WebGUI::International::get(721)
-			.'</td><td class="tableHeader">'.WebGUI::International::get(722)
-			.'</td><td class="tableHeader" width="100%">'.WebGUI::International::get(230).'</td></tr>';
-                $output .= $p->getPage($session{form}{pn});
-		$output .= '</table>';
-                $output .= $p->getBarTraditional($session{form}{pn});
-                return _submenu($output);
-        } else {
-                return WebGUI::Privilege::adminOnly();
+        %data = WebGUI::SQL->quickHash("select language from language where languageId=".$session{form}{lid});
+        $missing = '<b>'.WebGUI::International::get(596).'</b>';
+        $outOfDate = '<b>'.WebGUI::International::get(719).'</b>';
+        $ok = WebGUI::International::get(720);
+	$deprecated = WebGUI::International::get(723);
+        $output = '<h1>'.WebGUI::International::get(595).' ('.$data{language}.')</h1>';
+	$f = WebGUI::HTMLForm->new(1);
+	$f->hidden("op","listInternationalMessages");
+	$f->hidden("lid",$session{form}{lid});
+	$f->text("search","",$session{form}{search});
+	$f->submit("search");
+	$output .= $f->print;
+	if ($session{form}{search} ne "") {
+		$search = " and message like ".quote("%".$session{form}{search}."%");
+	}
+        $sth = WebGUI::SQL->read("select * from international where languageId=".$session{form}{lid}.$search);
+        while (%data = $sth->hash) {
+                $list{"z-".$data{namespace}."-".$data{internationalId}}{id} = $data{internationalId};
+                $list{"z-".$data{namespace}."-".$data{internationalId}}{namespace} = $data{namespace};
+                $list{"z-".$data{namespace}."-".$data{internationalId}}{message} = $data{message};
+                $list{"z-".$data{namespace}."-".$data{internationalId}}{lastUpdated} = $data{lastUpdated};
+                $list{"z-".$data{namespace}."-".$data{internationalId}}{status} = "deleted";
         }
+        $sth->finish;
+        $sth = WebGUI::SQL->read("select * from international where languageId=1".$search);
+        while (%data = $sth->hash) {
+		$key = $data{namespace}."-".$data{internationalId};
+                unless ($list{"z-".$key}) {
+                        $list{"a-".$key}{namespace} = $data{namespace};
+                        $list{"a-".$key}{id} = $data{internationalId};
+                        $list{"a-".$key}{status} = "missing";
+                } else {
+			if ($list{"z-".$key}{lastUpdated} < $data{lastUpdated}) {
+                               	$list{"o-".$key} = $list{"z-".$key};
+				delete($list{"z-".$key});
+                               	$list{"o-".$key}{status} = "updated";
+			} else {
+                               	$list{"q-".$key} = $list{"z-".$key};
+				delete($list{"z-".$key});
+                               	$list{"q-".$key}{status} = "ok";
+			}
+		}
+        }
+        $sth->finish;
+        foreach $key (sort {$a cmp $b} keys %list) {
+		if ($list{$key}{status} eq "updated") {
+			$status = $outOfDate;
+		} elsif ($list{$key}{status} eq "missing") {
+			$status = $missing;
+		} elsif ($list{$key}{status} eq "deleted") {
+			$status = $deprecated;
+		} else {
+			$status = $ok;
+		}
+		$row[$i] = '<tr valign="top"><td nowrap="1">'.$status."</td><td>"
+			.editIcon('op=editInternationalMessage&lid='.$session{form}{lid}
+               		.'&iid='.$list{$key}{id}.'&namespace='.$list{$key}{namespace}.'&pn='.$session{form}{pn}
+			."&status=".$list{$key}{status})."</td><td>".$list{$key}{namespace}."</td><td>"
+			.$list{$key}{id}."</td><td>".$list{$key}{message}."</td></tr>\n";
+		$i++;
+        }
+        $p = WebGUI::Paginator->new(WebGUI::URL::page('op=listInternationalMessages&lid='.$session{form}{lid}),\@row,100);
+        $output .= $p->getBarTraditional($session{form}{pn});
+	$output .= '<table style="font-size: 11px;" width="100%">';
+	$output .= '<tr><td class="tableHeader">'.WebGUI::International::get(434).'</td><td class="tableHeader">'.
+		WebGUI::International::get(575).'</td><td class="tableHeader">'.WebGUI::International::get(721)
+		.'</td><td class="tableHeader">'.WebGUI::International::get(722)
+		.'</td><td class="tableHeader" width="100%">'.WebGUI::International::get(230).'</td></tr>';
+        $output .= $p->getPage($session{form}{pn});
+	$output .= '</table>';
+        $output .= $p->getBarTraditional($session{form}{pn});
+        return _submenu($output);
 }
 
 #-------------------------------------------------------------------
 sub www_listLanguages {
         my ($output, $sth, %data);
 	tie %data, 'Tie::CPHash';
-	if (WebGUI::Privilege::isInGroup(3)) {
-		$output = '<h1>'.WebGUI::International::get(586).'</h1>';
-		$output .= '<a href="'.WebGUI::URL::page('op=editLanguage&lid=new').'">'.WebGUI::International::get(584).'</a>';
-		$output .= '<p>';
-		$sth = WebGUI::SQL->read("select languageId,language from language where languageId<>1 order by language");
-		while (%data = $sth->hash) {
-			$output .= deleteIcon("op=deleteLanguage&lid=".$data{languageId})
-				.editIcon("op=editLanguage&lid=".$data{languageId})
-				.' '.$data{language}.'<br>';
-		}
-		$sth->finish;
-        	return $output;
-	} else {
-                return WebGUI::Privilege::adminOnly();
-        }
+	return WebGUI::Privilege::adminOnly() unless (WebGUI::Privilege::isInGroup(3));
+	$output = '<h1>'.WebGUI::International::get(586).'</h1>';
+	$output .= '<a href="'.WebGUI::URL::page('op=editLanguage&lid=new').'">'.WebGUI::International::get(584).'</a>';
+	$output .= '<p>';
+	$sth = WebGUI::SQL->read("select languageId,language from language where languageId<>1 order by language");
+	while (%data = $sth->hash) {
+		$output .= deleteIcon("op=deleteLanguage&lid=".$data{languageId})
+			.editIcon("op=editLanguage&lid=".$data{languageId})
+			.' '.$data{language}.'<br>';
+	}
+	$sth->finish;
+       	return _submenu($output);
 }
 
 #-------------------------------------------------------------------

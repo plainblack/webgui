@@ -55,8 +55,8 @@ sub _submenu {
         tie %menu, 'Tie::IxHash';
 	%menu = %{$_[1]};
 	if (($session{form}{op} eq "editHelp" && $session{form}{hid} ne "new") || $session{form}{op} eq "deleteHelp") {
-		$menu(WebGUI::URL::page('op=editHelpIndex&hid='.$session{form}{hid}) = "Edit this help.";
-		$menu(WebGUI::URL::page('op=deleteHelpIndex&hid='.$session{form}{hid}) = "Delete this help.";
+		$menu{WebGUI::URL::page('op=editHelpIndex&hid='.$session{form}{hid})} = "Edit this help.";
+		$menu{WebGUI::URL::page('op=deleteHelpIndex&hid='.$session{form}{hid})} = "Delete this help.";
 	}
 	$menu{WebGUI::URL::page('op=viewHelpIndex')} = WebGUI::International::get(13);
         return menuWrapper($_[0],\%menu);
@@ -189,7 +189,7 @@ sub www_exportHelp {
 #-------------------------------------------------------------------
 sub www_manageHelp {
         my ($sth, @help, $output);
-	return "" unless (WebGUI::Privilege::isInGroup(3)) {	
+	return "" unless (WebGUI::Privilege::isInGroup(3));
        	$output = '<h1>Manage Help</h1>';
 	$output .= 'This interface is for WebGUI developers only. If you\'re not a developer, leave this alone. Also, 
 		this interface works <b>ONLY</b> under MySQL and is not supported by Plain Black under any
