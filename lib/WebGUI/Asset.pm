@@ -620,8 +620,8 @@ sub processPropertiesFromFormPost {
 		foreach my $property (keys %{$definition->{properties}}) {
 			$data{$property} = WebGUI::FormProcessor::process(
 				$property,
-				$definition->{properties}{fieldType},
-				$definition->{properties}{defaultValue}
+				$definition->{properties}{$property}{fieldType},
+				$definition->{properties}{$property}{defaultValue}
 				);
 		}
 	}

@@ -48,6 +48,8 @@
  - bugfix [1073753]. bug in WebGUI::Search (Leendert Bottelberghs).
  - Added an e-commerce system. Thanks to Atomic Learning for funding this
    feature. 
+ - Added new asset type: File Pile. This allows you to do a mass upload of
+   files and images.
 
 6.2.9
  - bugfix [ 1058105 ] input tag has to be closed with /
