@@ -139,7 +139,7 @@ sub post {
 		$footer = formatHeader($message{subject},$message{userId},$message{username},$message{dateOfPost},$message{views})
 			.'<p>'.formatMessage($message{message});
 		$message{message} = "";
-		$message{subject} = formatSubject("Re: ".$message{subject});
+		$message{subject} = formatSubject("Re: ".$message{subject}) unless ($message{subject} =~ /^Re:/);
 		$session{form}{mid} = "new";
 		$f->hidden("replyTo",$session{form}{replyTo});
         	if ($session{user}{userId} == 1) {
