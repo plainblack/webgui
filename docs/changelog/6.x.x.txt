@@ -13,6 +13,7 @@
  - fix [ 1167937 ] Asset Manager and No-Cache Imcompatible
  - fix [ 1167917 ] Link to Page Tree and No-Cache Imcompatible
  - fix [ 1168084 ] file uploads don't work.
+ - fix [ 1167720 ] Folder::view() subfolder_loop - missing.. [mwilson]
 
 
 6.5.3
