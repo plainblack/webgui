@@ -783,25 +783,6 @@ insert into international values (601,'WebGUI',1,'International ID');
 insert into international values (602,'WebGUI',1,'Edit Help');
 insert into international values (603,'WebGUI',1,'Action');
 insert into international values (604,'WebGUI',1,'Object');
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 CREATE TABLE MailForm (
   wobjectId int(11) NOT NULL default '0',
   width int(11) NOT NULL default '0',
@@ -884,3 +865,6 @@ INSERT INTO help VALUES (2, 'MailForm', 1, 'Add/Edit', 'Mail Form Fields', 'You 
 
 INSERT INTO helpSeeAlso VALUES (13, 2, 'MailForm');
 INSERT INTO helpSeeAlso VALUES (14, 1, 'MailForm');
+alter table karmaLog add column dateModified int not null default 1026097656;
+
+

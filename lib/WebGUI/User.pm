@@ -239,7 +239,7 @@ sub identifier {
 sub karma {
 	if (defined $_[1] && defined $_[2] && defined $_[3]) {
 		WebGUI::SQL->write("update users set karma=karma+$_[1] where userId=".$_[0]->userId);
-        	WebGUI::SQL->write("insert into karmaLog values (".$_[0]->userId.",$_[1],".quote($_[2]).",".quote($_[3]).")");
+        	WebGUI::SQL->write("insert into karmaLog values (".$_[0]->userId.",$_[1],".quote($_[2]).",".quote($_[3]).",".time().")");
 	}
         return $_[0]->{_user}{karma};
 }
