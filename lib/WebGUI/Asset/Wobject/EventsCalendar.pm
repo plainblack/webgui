@@ -43,7 +43,7 @@ sub definition {
 	my $class = shift;
 	my $definition = shift;
 	push(@{$definition}, {
-		tableName=>'eventscalendar',
+		tableName=>'EventsCalendar',
 		className=>'WebGUI::Asset::Wobject::EventsCalendar',
 		properties=>{
 			templateId =>{

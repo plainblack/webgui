@@ -145,7 +145,17 @@ WebGUI::SQL->write("alter table EventsCalendar_event drop primary key");
 WebGUI::SQL->write("alter table Navigation rename tempoldnav");
 WebGUI::SQL->write("create table Navigation (assetId varchar(22) not null primary key, assetsToInclude text, startType varchar(35), startPoint varchar(255), endPoint varchar(35), showSystemPages int not null default 0, showHiddenPages int not null default 0, showUnprivilegedPages int not null default 0, templateId varchar(22) not null)");
 my @wobjects = qw(SiteMap Article Poll Survey USS WSClient DataForm FileManager EventsCalendar HttpProxy IndexedSearch MessageBoard Product SQLReport SyndicatedContent WobjectProxy);
-my @otherWobjects = WebGUI::SQL->buildArray("select distinct(namespace) from wobject where namespace not in (".quoteAndJoin(\@wobjects).")");
+my @otherWobjects = ();
+my @temp = WebGUI::SQL->buildArray("select distinct(namespace) from wobject where namespace not in (".quoteAndJoin(\@wobjects).")");
+foreach my $other (@temp) {
+	my $test = WebGUI::SQL->unconditionalRead("select * from $other");
+	if ($test->errorCode < 1) {
+		push(@otherWobjects,$other);
+	} else {
+		print "\t\t WARNING: A wobject instance of $other exists in your database without a namespace table.\n" unless ($quiet);
+	}
+	$test->finish;
+}
 my @allWobjects = (@wobjects,@otherWobjects);
 foreach my $namespace (@allWobjects) {
 	WebGUI::SQL->write("alter table ".$namespace." add column assetId varchar(22) not null");
@@ -513,7 +523,7 @@ while (my $data = $sth->hashRef) {
 	my $url = fixUrl($collateralId,$data->{name});
 	$macroCache{$data->{name}} = $macroCache{$data->{collateralId}} = $url;
 	WebGUI::SQL->write("insert into asset (assetId, parentId, lineage, className, state, title, menuTitle, 
-		url, ownerUserId, groupIdView, groupIdEdit, fileSize, lastUpdated) values (".
+		url, ownerUserId, groupIdView, groupIdEdit, assetSize, lastUpdated) values (".
 		quote($collateralId).", ".quote($parentId).", ".quote($baseLineage.sprintf("%06d",$rank)).", 
 		'".$class."','published',".quote($data->{name}).", ".
 		quote($data->{name}).", ".quote($url).", ".quote($data->{userId}).", 
@@ -1382,20 +1392,20 @@ sub walkTree {
 		WebGUI::SQL->write("insert into asset (assetId, parentId, lineage, className, state, title, menuTitle, url, startDate, 
 			endDate, synopsis, newWindow, isHidden, ownerUserId, groupIdView, groupIdEdit, encryptPage, assetSize,
 			extraHeadTags ) values (".quote($pageId).",
-			".quote($newParentId).", ".quote($pageLineage).", ".quote($className).",'published',".quote($page->{title}).",
-			".quote($page->{menuTitle}).", ".quote($pageUrl).", ".quote($page->{startDate}).", ".quote($page->{endDate}).",
-			".quote($page->{synopsis}).", ".quote($page->{newWindow}).", ".quote($page->{hideFromNavigation}).", ".quote($page->{ownerId}).",
-			".quote($page->{groupIdView}).", ".quote($page->{groupIdEdit}).", ".quote($page->{encryptPage}).",
+			".quote($newParentId).", ".quote($pageLineage).", ".quote($className).",'published',".quote($page->{title}||"Untitled").",
+			".quote($page->{menuTitle}||"Untitled").", ".quote($pageUrl).", ".quote($page->{startDate}).", ".quote($page->{endDate}).",
+			".quote($page->{synopsis}).", ".quote($page->{newWindow}).", ".quote($page->{hideFromNavigation}).", ".quote($page->{ownerId}||'3').",
+			".quote($page->{groupIdView}||'7').", ".quote($page->{groupIdEdit}.'3').", ".quote($page->{encryptPage}).",
 			".length($page->{title}.$page->{menuTitle}.$page->{synopsis}.$page->{urlizedTitle}).", ".quote($page->{metaTags}).")");
 		if ($page->{redirectURL} ne "") {
 			WebGUI::SQL->write("insert into redirect (assetId, redirectUrl) values (".quote($pageId).",".quote($page->{redirectURL}).")");
 		} else {
 			WebGUI::SQL->write("insert into wobject (assetId, styleTemplateId, printableStyleTemplateId, 
 				cacheTimeout, cacheTimeoutVisitor, displayTitle, namespace) values (
-				".quote($pageId).", ".quote($page->{styleId}).",  
-				".quote($page->{printableStyleId}).", ".quote($page->{cacheTimeout}).",".quote($page->{cacheTimeoutVisitor}).",
+				".quote($pageId).", ".quote($page->{styleId}||'1').",  
+				".quote($page->{printableStyleId}||'1').", ".quote($page->{cacheTimeout}).",".quote($page->{cacheTimeoutVisitor}).",
 				0,'Layout')");
-			WebGUI::SQL->write("insert into Layout (assetId,templateId) values (".quote($pageId).", ".quote($page->{templateId}).")");
+			WebGUI::SQL->write("insert into Layout (assetId,templateId) values (".quote($pageId).", ".quote($page->{templateId}||'1').")");
 		}
 		my $rank = 1;
 		print "\t\tFinding wobjects on page ".$page->{pageId}."\n" unless ($quiet);
@@ -1431,34 +1441,33 @@ sub walkTree {
 				print "\t\t\tMigrating attachments for Article ".$wobject->{wobjectId}."\n" unless ($quiet);
 				if ($namespace->{attachment}) {
 					my $attachmentId = WebGUI::Id::generate();
+					my $storageId = copyFile($namespace->{attachment},$wobject->{wobjectId});
 					WebGUI::SQL->write("insert into asset (assetId, parentId, lineage, className, state, title, menuTitle, 
-						url, startDate, endDate, isHidden, ownerUserId, groupIdView, groupIdEdit) values (".
+						url, startDate, endDate, isHidden, ownerUserId, groupIdView, groupIdEdit,assetSize) values (".
 						quote($attachmentId).", ".quote($wobjectId).", ".quote($wobjectLineage.sprintf("%06d",1)).", 
 						'WebGUI::Asset::File','published',".quote($namespace->{attachment}).", ".
 						quote($namespace->{attachment}).", ".quote(fixUrl($attachmentId,$wobjectUrl.'/'.$namespace->{attachment})).", 
 						".quote($wobject->{startDate}).", ".quote($wobject->{endDate}).", 1, ".quote($ownerId).", 
-						".quote($groupIdView).", ".quote($groupIdEdit).")");
-					my $storageId = copyFile($namespace->{attachment},$wobject->{wobjectId});
-					WebGUI::SQL->write("insert into FileAsset (assetId, filename, storageId, fileSize) values (
-						".quote($attachmentId).", ".quote($namespace->{attachment}).", ".quote($storageId).",
-						".quote(getFileSize($storageId,$namespace->{attachment})).")");
+						".quote($groupIdView).", ".quote($groupIdEdit).","
+						.quote(getFileSize($storageId,$namespace->{attachment})).")");
+					WebGUI::SQL->write("insert into FileAsset (assetId, filename, storageId) values (
+						".quote($attachmentId).", ".quote($namespace->{attachment}).", ".quote($storageId).")");
 				}
 				if ($namespace->{image}) {
 					my $rank = 1;
 					$rank ++ if ($namespace->{attachment});
 					my $imageId = WebGUI::Id::generate();
+					my $storageId = copyFile($namespace->{image},$wobject->{wobjectId});
+					copyFile('thumb-'.$namespace->{image},$wobject->{wobjectId},$storageId);
 					WebGUI::SQL->write("insert into asset (assetId, parentId, lineage, className, state, title, menuTitle, 
-						url, startDate, endDate, isHidden, ownerUserId, groupIdView, groupIdEdit) values (".
+						url, startDate, endDate, isHidden, ownerUserId, groupIdView, groupIdEdit,assetSize) values (".
 						quote($imageId).", ".quote($wobjectId).", ".quote($wobjectLineage.sprintf("%06d",$rank)).", 
 						'WebGUI::Asset::File::Image','published',".quote($namespace->{image}).", ".
 						quote($namespace->{image}).", ".quote(fixUrl($imageId,$wobjectUrl.'/'.$namespace->{image})).", 
 						".quote($wobject->{startDate}).", ".quote($wobject->{endDate}).", 1, ".quote($ownerId).", 
-						".quote($groupIdView).", ".quote($groupIdEdit).")");
-					my $storageId = copyFile($namespace->{image},$wobject->{wobjectId});
-					copyFile('thumb-'.$namespace->{image},$wobject->{wobjectId},$storageId);
-					WebGUI::SQL->write("insert into FileAsset (assetId, filename, storageId, fileSize) values (
-						".quote($imageId).", ".quote($namespace->{image}).", ".quote($storageId).",
-						".quote(getFileSize($storageId,$namespace->{image})).")");
+						".quote($groupIdView).", ".quote($groupIdEdit).",".quote(getFileSize($storageId,$namespace->{image})).")");
+					WebGUI::SQL->write("insert into FileAsset (assetId, filename, storageId) values (
+						".quote($imageId).", ".quote($namespace->{image}).", ".quote($storageId).")");
 					WebGUI::SQL->write("insert into ImageAsset (assetId, thumbnailSize) values (".quote($imageId).",
 						".quote($session{setting}{thumbnailSize}).")");
 				}
@@ -1508,10 +1517,10 @@ sub walkTree {
 						} else {
 							$class = 'WebGUI::Asset::File';
 						}
-						WebGUI::SQL->write("insert into FileAsset (assetId, filename, storageId, fileSize) values (
+						WebGUI::SQL->write("insert into FileAsset (assetId, filename, storageId) values (
 							".quote($newId).", ".quote($data->{$field}).", ".quote($storageId).")");
 						WebGUI::SQL->write("insert into asset (assetId, parentId, lineage, className, state, title, menuTitle, 
-							url, startDate, endDate, isHidden, ownerUserId, groupIdView, groupIdEdit, synopsis, fileSize
+							url, startDate, endDate, isHidden, ownerUserId, groupIdView, groupIdEdit, synopsis, assetSize
 							) values (".
 							quote($newId).", ".quote($wobjectId).", ".quote($wobjectLineage.sprintf("%06d",1)).", 
 							'".$class."','published',".quote($data->{fileTitle}).", ".
@@ -2060,12 +2069,16 @@ sub copyFile {
 	mkdir($node);
 	$node .= $session{os}{slash}.$id;
 	mkdir($node);
-	print "Moving File".$session{config}{uploadsPath}.$session{os}{slash}.$oldPath.$session{os}{slash}.$filename."\n";
 	my $a = FileHandle->new($session{config}{uploadsPath}.$session{os}{slash}.$oldPath.$session{os}{slash}.$filename,"r");
-   	    binmode($a);
-        my $b = FileHandle->new(">".$node.$session{os}{slash}.$filename);
-        binmode($b);
-        copy($a,$b);
+	if (defined $a) {
+   	    	binmode($a);
+        	my $b = FileHandle->new(">".$node.$session{os}{slash}.$filename);
+		if (defined $b) {
+			print "Moving File".$session{config}{uploadsPath}.$session{os}{slash}.$oldPath.$session{os}{slash}.$filename."\n";
+        		binmode($b);
+        		copy($a,$b);
+		}
+	}
 	return $id;
 }
 
