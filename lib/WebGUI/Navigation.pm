@@ -255,9 +255,8 @@ sub build {
 				$pageData->{"page.relDepth"} = $pageData->{"page.absDepth"} - $startPageDepth;
 				$pageData->{"page.isCurrent"} = ($page->{'pageId'} == $session{page}{pageId});
 				$pageData->{"page.isHidden"} = $page->{'hideFromNavigation'};
-				$pageData->{"page.isSystem"} = (($page->{'pageId'} < 1000 && $page->{'pageId'} > 1) || 
-							$page->{'pageId'} == 0);
-
+				$pageData->{"page.isSystem"} = ($page->{'pageId'} =~ /^\d+$/ &&
+								($page->{'pageId'} < 1000 && $page->{'pageId'} >= 0));
 				
 				# indent
 				my $indent = 0;
@@ -286,7 +285,7 @@ sub build {
 
 				# Check showSystemPages
 				next if (! $self->{_showSystemPages} && $pageData->{"page.isSystem"}); 
-			
+	
 				# Deal with hidden pages
 				next if($page->{'hideFromNavigation'} && ! $self->{_showHiddenPages});
 
