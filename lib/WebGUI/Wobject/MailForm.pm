@@ -52,7 +52,7 @@ sub duplicate {
 	});
 	$sth = WebGUI::SQL->read("select * from MailForm_field where wobjectId=".$_[0]->get("wobjectId"));
     while (%data = $sth->hash) {
-        $newFieldId = getNextId("mailFieldId");
+        $newFieldId = getNextId("MailForm_fieldId");
         WebGUI::SQL->write(
         	"insert into MailForm_field values (".$w->get("wobjectId").", $newFieldId, $data{sequenceNumber}, ".
         	quote($data{name}).", ".
@@ -92,8 +92,8 @@ sub www_deleteField {
 #-------------------------------------------------------------------
 sub www_deleteFieldConfirm {
 	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
-	$_[0]->deleteCollateral("MailForm_field","mailFieldId",$session{form}{fid});
-	$_[0]->reorderCollateral("MailForm_field","mailFieldId");
+	$_[0]->deleteCollateral("MailForm_field","MailForm_fieldId",$session{form}{fid});
+	$_[0]->reorderCollateral("MailForm_field","MailForm_fieldId");
        	return "";
 }
 
@@ -183,7 +183,7 @@ sub www_editField {
 		yesNo => "Yes/No",
 		select => "Drop-Down Box" );
     
-        %field = WebGUI::SQL->quickHash("select * from MailForm_field where mailFieldId='$session{form}{fid}'");
+        %field = WebGUI::SQL->quickHash("select * from MailForm_field where MailForm_fieldId='$session{form}{fid}'");
         $output = helpIcon(2,$_[0]->get("namespace"));
         $output .= '<h1>'.WebGUI::International::get(20,$namespace).'</h1>';
         $f = WebGUI::HTMLForm->new;
@@ -210,8 +210,8 @@ sub www_editFieldSave {
     my ($seq);
         if ($session{form}{fid} eq "new") {
             ($seq) = WebGUI::SQL->quickArray("select max(sequenceNumber) from MailForm_field where wobjectId=".$_[0]->get("wobjectId"));
-            $session{form}{fid} = getNextId("mailFieldId");
-            WebGUI::SQL->write("insert into MailForm_field (wobjectId,mailFieldId,sequenceNumber) values
+            $session{form}{fid} = getNextId("MailForm_fieldId");
+            WebGUI::SQL->write("insert into MailForm_field (wobjectId,MailForm_fieldId,sequenceNumber) values
                 (".$_[0]->get("wobjectId").",$session{form}{fid},".($seq+1).")");
         }
         WebGUI::SQL->write("update MailForm_field set name=".quote($session{form}{name}).
@@ -219,7 +219,7 @@ sub www_editFieldSave {
     		", type=".quote($session{form}{type}).
     		", possibleValues=".quote($session{form}{possibleValues}).
     		", defaultValue=".quote($session{form}{defaultValue}).
-    		" where mailFieldId=$session{form}{fid}");
+    		" where MailForm_fieldId=$session{form}{fid}");
         if ($session{form}{proceed}) {
             $session{form}{fid} = "new";
             return $_[0]->www_editField();
@@ -231,14 +231,14 @@ sub www_editFieldSave {
 #-------------------------------------------------------------------
 sub www_moveFieldDown {
 	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
-	$_[0]->moveCollateralDown("MailForm_field","mailFieldId",$session{form}{fid});
+	$_[0]->moveCollateralDown("MailForm_field","MailForm_fieldId",$session{form}{fid});
 	return "";
 }
 
 #-------------------------------------------------------------------
 sub www_moveFieldUp {
 	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
-	$_[0]->moveCollateralUp("MailForm_field","mailFieldId",$session{form}{fid});
+	$_[0]->moveCollateralUp("MailForm_field","MailForm_fieldId",$session{form}{fid});
 	return "";
 }
 
@@ -300,13 +300,13 @@ sub www_view {
 			# but show for admins
 			if ($session{var}{adminOn}) {
 				$row = "<tr><td class='formDescription' valign='middle'>\u".$data{name}." (hidden)&nbsp;</td><td class='tableData' valign='middle'>".$data{defaultValue};
-				$row .= $_[0]->_fieldAdminIcons($data{mailFieldId});
+				$row .= $_[0]->_fieldAdminIcons($data{MailForm_fieldId});
 			}
 		} elsif ($data{status} == 2) {
 			# read-only field
 			$row = "<tr><td class='formDescription' valign='middle'>\u".$data{name}."&nbsp;</td><td class='tableData' valign='middle'>".$data{defaultValue};
 			if ($session{var}{adminOn}) {
-				$row .= $_[0]->_fieldAdminIcons($data{mailFieldId});
+				$row .= $_[0]->_fieldAdminIcons($data{MailForm_fieldId});
 			}
 			$row .= "</td></tr>";
 		} else {
@@ -391,7 +391,7 @@ sub _createField {
 	
 	my $row = '<tr><td class="formDescription" valign="top">'.$data->{name}.'</td><td class="tableData">'.$f->printRowsOnly();
 	if ($session{var}{adminOn}) {
-		$row .= $self->_fieldAdminIcons($data->{mailFieldId});
+		$row .= $self->_fieldAdminIcons($data->{MailForm_fieldId});
 	}
 	$row .= '</td></tr>';
 	return $row;
@@ -440,7 +440,7 @@ sub www_send {
 	$session{form}{bccField} = $_[0]->get("bccField") unless ($session{form}{bccField});
 	
 	# store results
-	my $entryId = getNextId("mailEntryId");
+	my $entryId = getNextId("MailForm_entryId");
 	if ($_[0]->get("storeEntries")) {
 		WebGUI::SQL->write("insert into MailForm_entry values ($entryId, ".$_[0]->get("wobjectId").", ".$session{user}{userId}.", ".quote($session{user}{username}).", ".quote($session{env}{REMOTE_ADDR}).", ".quote(time()).")");
 	}

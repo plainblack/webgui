@@ -39,7 +39,7 @@ sub duplicate {
 		});
         $sth = WebGUI::SQL->read("select * from LinkList_link where wobjectId=".$_[0]->get("wobjectId"));
         while (@row = $sth->array) {
-                $newLinkId = getNextId("linkId");
+                $newLinkId = getNextId("LinkList_linkId");
                 WebGUI::SQL->write("insert into LinkList_link values (".$w->get("wobjectId").", $newLinkId, "
 			.quote($row[2]).", ".quote($row[3]).", ".quote($row[4]).", '$row[5]', '$row[6]')");
         }
@@ -67,8 +67,8 @@ sub www_deleteLink {
 #-------------------------------------------------------------------
 sub www_deleteLinkConfirm {
 	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
-	$_[0]->deleteCollateral("LinkList_link","linkId",$session{form}{lid});
-	$_[0]->reorderCollateral("LinkList_link","linkId");
+	$_[0]->deleteCollateral("LinkList_link","LinkList_linkId",$session{form}{lid});
+	$_[0]->reorderCollateral("LinkList_link","LinkList_linkId");
         return "";
 }
 
@@ -115,7 +115,7 @@ sub www_editLink {
         my ($output, %link, $f, $linkId, $newWindow);
 	tie %link, 'Tie::CPHash';
 	$linkId = $session{form}{lid} || "new";
-        %link = WebGUI::SQL->quickHash("select * from LinkList_link where linkId='$session{form}{lid}'");
+        %link = WebGUI::SQL->quickHash("select * from LinkList_link where LinkList_linkId='$session{form}{lid}'");
         if ($linkId eq "new") {
        	        $newWindow = 1;
         } else {
@@ -140,8 +140,8 @@ sub www_editLink {
 #-------------------------------------------------------------------
 sub www_editLinkSave {
 	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
-	$_[0]->setCollateral("LinkList_link", "linkId", {
-                linkId => $session{form}{lid},
+	$_[0]->setCollateral("LinkList_link", "LinkList_linkId", {
+                LinkList_linkId => $session{form}{lid},
                 description => $session{form}{description},
                 newWindow => $session{form}{newWindow},
                 url => $session{form}{url},
@@ -158,14 +158,14 @@ sub www_editLinkSave {
 #-------------------------------------------------------------------
 sub www_moveLinkDown {
 	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
-        $_[0]->moveCollateralDown("LinkList_link","linkId",$session{form}{lid});
+        $_[0]->moveCollateralDown("LinkList_link","LinkList_linkId",$session{form}{lid});
 	return "";
 }
 
 #-------------------------------------------------------------------
 sub www_moveLinkUp {
 	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
-        $_[0]->moveCollateralUp("LinkList_link","linkId",$session{form}{lid});
+        $_[0]->moveCollateralUp("LinkList_link","LinkList_linkId",$session{form}{lid});
 	return "";
 }
 
@@ -188,10 +188,10 @@ sub www_view {
 	$sth = WebGUI::SQL->read("select * from LinkList_link where wobjectId=".$_[0]->get("wobjectId")." order by sequenceNumber");
 	while (%link = $sth->hash) {
 		if ($session{var}{adminOn}) {
-			$output .= deleteIcon('func=deleteLink&wid='.$_[0]->get("wobjectId").'&lid='.$link{linkId})
-			.editIcon('func=editLink&wid='.$_[0]->get("wobjectId").'&lid='.$link{linkId})
-			.moveUpIcon('func=moveLinkUp&wid='.$_[0]->get("wobjectId").'&lid='.$link{linkId})
-			.moveDownIcon('func=moveLinkDown&wid='.$_[0]->get("wobjectId").'&lid='.$link{linkId})
+			$output .= deleteIcon('func=deleteLink&wid='.$_[0]->get("wobjectId").'&lid='.$link{LinkList_linkId})
+			.editIcon('func=editLink&wid='.$_[0]->get("wobjectId").'&lid='.$link{LinkList_linkId})
+			.moveUpIcon('func=moveLinkUp&wid='.$_[0]->get("wobjectId").'&lid='.$link{LinkList_linkId})
+			.moveDownIcon('func=moveLinkDown&wid='.$_[0]->get("wobjectId").'&lid='.$link{LinkList_linkId})
 			.' ';
 		} else {
 			$output .= $indent.$_[0]->get("bullet");

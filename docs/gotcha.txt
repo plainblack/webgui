@@ -15,6 +15,19 @@ save you many hours of grief.
 	third-party or custom plug-ins, you can disregard this
 	warning.
 
+ * DownloadManager.pm in lib/WebGUI/Wobject has been renamed to
+ 	FileManager.pm. Please delete DownloadManager.pm from your
+	installation after upgrading.
+
+ * UserSubmission.pm in lib/WebGUI/Wobject has been renamed to
+        USS.pm. Please delete UserSubmission.pm from your 
+	installation after upgrading.
+
+ * Many of WebGUI's default data structures have been altered. If
+	you are using SQL Reports that access WebGUI's data
+	structures directly, please be sure to alter them after
+	the upgrade.
+
 4.6.3
 --------------------------------------------------------------------
  * It has been reported that some people had a duplicate key error

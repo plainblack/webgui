@@ -39,7 +39,7 @@ sub duplicate {
 		});
         $sth = WebGUI::SQL->read("select * from FAQ_question where wobjectId=".$_[0]->get("wobjectId"));
         while (%data = $sth->hash) {
-                $newQuestionId = getNextId("questionId");
+                $newQuestionId = getNextId("FAQ_questionId");
                 WebGUI::SQL->write("insert into FAQ_question values (".$w->get("wobjectId").", $newQuestionId, "
 			.quote($data{question}).", ".quote($data{answer}).", $data{sequenceNumber})");
         }
@@ -71,8 +71,8 @@ sub www_deleteQuestion {
 sub www_deleteQuestionConfirm {
         my ($output);
         if (WebGUI::Privilege::canEditPage()) {
-		$_[0]->deleteCollateral("FAQ_question","questionId",$session{form}{qid});
-		$_[0]->reorderCollateral("FAQ_question","questionId");
+		$_[0]->deleteCollateral("FAQ_question","FAQ_questionId",$session{form}{qid});
+		$_[0]->reorderCollateral("FAQ_question","FAQ_questionId");
                 return "";
         } else {
                 return WebGUI::Privilege::insufficient();
@@ -124,7 +124,7 @@ sub www_editQuestion {
         my ($output, %question, $f);
 	tie %question, 'Tie::CPHash';
         if (WebGUI::Privilege::canEditPage()) {
-                %question = WebGUI::SQL->quickHash("select * from FAQ_question where questionId='$session{form}{qid}'");
+                %question = WebGUI::SQL->quickHash("select * from FAQ_question where FAQ_questionId='$session{form}{qid}'");
 		$output = helpIcon(2,$namespace);
                 $output .= '<h1>'.WebGUI::International::get(10,$namespace).'</h1>';
 		$f = WebGUI::HTMLForm->new;
@@ -148,8 +148,8 @@ sub www_editQuestion {
 sub www_editQuestionSave {
 	my ($seq);
         if (WebGUI::Privilege::canEditPage()) {
-		$_[0]->setCollateral("FAQ_question", "questionId", {
-                        questionId => $session{form}{qid},
+		$_[0]->setCollateral("FAQ_question", "FAQ_questionId", {
+                        FAQ_questionId => $session{form}{qid},
                         question => $session{form}{question},
                         answer => $session{form}{answer}
                         });
@@ -167,14 +167,14 @@ sub www_editQuestionSave {
 #-------------------------------------------------------------------
 sub www_moveQuestionDown {
 	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
-	$_[0]->moveCollateralDown("FAQ_question","questionId",$session{form}{qid});
+	$_[0]->moveCollateralDown("FAQ_question","FAQ_questionId",$session{form}{qid});
 	return "";
 }
 
 #-------------------------------------------------------------------
 sub www_moveQuestionUp {
 	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
-	$_[0]->moveCollateralUp("FAQ_question","questionId",$session{form}{qid});
+	$_[0]->moveCollateralUp("FAQ_question","FAQ_questionId",$session{form}{qid});
 	return "";
 }
 
@@ -196,16 +196,16 @@ sub www_view {
 	$sth = WebGUI::SQL->read("select * from FAQ_question where wobjectId=".$_[0]->get("wobjectId")." order by sequenceNumber");
 	while (%question = $sth->hash) {
 		if ($_[0]->get("tocOn")) {
-			$output .= '<li><a href="#'.$question{questionId}.'"><span class="faqQuestion">'.$question{question}.'</span></a>';
+			$output .= '<li><a href="#'.$question{FAQ_questionId}.'"><span class="faqQuestion">'.$question{question}.'</span></a>';
 		}
 		if ($session{var}{adminOn}) {
-			$qNa .= deleteIcon('func=deleteQuestion&wid='.$_[0]->get("wobjectId").'&qid='.$question{questionId})
-				.editIcon('func=editQuestion&wid='.$_[0]->get("wobjectId").'&qid='.$question{questionId})
-				.moveUpIcon('func=moveQuestionUp&wid='.$_[0]->get("wobjectId").'&qid='.$question{questionId})
-				.moveDownIcon('func=moveQuestionDown&wid='.$_[0]->get("wobjectId").'&qid='.$question{questionId})
+			$qNa .= deleteIcon('func=deleteQuestion&wid='.$_[0]->get("wobjectId").'&qid='.$question{FAQ_questionId})
+				.editIcon('func=editQuestion&wid='.$_[0]->get("wobjectId").'&qid='.$question{FAQ_questionId})
+				.moveUpIcon('func=moveQuestionUp&wid='.$_[0]->get("wobjectId").'&qid='.$question{FAQ_questionId})
+				.moveDownIcon('func=moveQuestionDown&wid='.$_[0]->get("wobjectId").'&qid='.$question{FAQ_questionId})
 				.' ';
 		}
-		$qNa .= '<a name="'.$question{questionId}.'"><span class="faqQuestion">';
+		$qNa .= '<a name="'.$question{FAQ_questionId}.'"><span class="faqQuestion">';
 		if ($_[0]->get("qaOn")) {
 			$qNa .= $q.': ';
 		}

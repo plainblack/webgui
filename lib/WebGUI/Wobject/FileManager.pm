@@ -1,4 +1,4 @@
-package WebGUI::Wobject::DownloadManager;
+package WebGUI::Wobject::FileManager;
 
 #-------------------------------------------------------------------
 # WebGUI is Copyright 2001-2002 Plain Black LLC.
@@ -26,7 +26,7 @@ use WebGUI::Utility;
 use WebGUI::Wobject;
 
 our @ISA = qw(WebGUI::Wobject);
-our $namespace = "DownloadManager";
+our $namespace = "FileManager";
 our $name = WebGUI::International::get(1,$namespace);
 
 #-------------------------------------------------------------------
@@ -56,21 +56,21 @@ sub duplicate {
         my ($file, $w, %row, $sth, $newDownloadId);
 	tie %row, 'Tie::CPHash';
         $w = $_[0]->SUPER::duplicate($_[1]);
-        $w = WebGUI::Wobject::DownloadManager->new({wobjectId=>$w,namespace=>$namespace});
+        $w = WebGUI::Wobject::FileManager->new({wobjectId=>$w,namespace=>$namespace});
         $w->set({
 		paginateAfter=>$_[0]->get("paginateAfter"),
 		displayThumbnails=>$_[0]->get("displayThumbnails")
 		});
-        $sth = WebGUI::SQL->read("select * from DownloadManager_file where wobjectId=".$_[0]->get("wobjectId"));
+        $sth = WebGUI::SQL->read("select * from FileManager_file where wobjectId=".$_[0]->get("wobjectId"));
         while (%row = $sth->hash) {
-                $newDownloadId = getNextId("downloadId");
-		$file = WebGUI::Attachment->new($row{downloadFile},$_[0]->get("wobjectId"),$row{downloadId});
+                $newDownloadId = getNextId("FileManager_fileId");
+		$file = WebGUI::Attachment->new($row{downloadFile},$_[0]->get("wobjectId"),$row{FileManager_fileId});
 		$file->copy($w->get("wobjectId"),$newDownloadId);
-                $file = WebGUI::Attachment->new($row{alternateVersion1},$_[0]->get("wobjectId"),$row{downloadId});
+                $file = WebGUI::Attachment->new($row{alternateVersion1},$_[0]->get("wobjectId"),$row{FileManager_fileId});
                 $file->copy($w->get("wobjectId"),$newDownloadId);
-                $file = WebGUI::Attachment->new($row{alternateVersion2},$_[0]->get("wobjectId"),$row{downloadId});
+                $file = WebGUI::Attachment->new($row{alternateVersion2},$_[0]->get("wobjectId"),$row{FileManager_fileId});
                 $file->copy($w->get("wobjectId"),$newDownloadId);
-                WebGUI::SQL->write("insert into DownloadManager_file values ($newDownloadId, ".$w->get("wobjectId").", ".
+                WebGUI::SQL->write("insert into FileManager_file values ($newDownloadId, ".$w->get("wobjectId").", ".
 			quote($row{fileTitle}).", ".quote($row{downloadFile}).", $row{groupToView}, ".
 			quote($row{briefSynopsis}).", $row{dateUploaded}, $row{sequenceNumber}, ".
 			quote($row{alternateVersion1}).", ".quote($row{alternateVersion2}).")");
@@ -80,7 +80,7 @@ sub duplicate {
 
 #-------------------------------------------------------------------
 sub purge {
-	WebGUI::SQL->write("delete from DownloadManager_file where wobjectId=".$_[0]->get("wobjectId"));
+	WebGUI::SQL->write("delete from FileManager_file where wobjectId=".$_[0]->get("wobjectId"));
 	$_[0]->SUPER::purge();
 }
 
@@ -97,7 +97,7 @@ sub uiLevel {
 #-------------------------------------------------------------------
 sub www_deleteFile {
 	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
-	$_[0]->setCollateral("DownloadManager_file","downloadId",{$session{form}{file}=>''},0,0);
+	$_[0]->setCollateral("FileManager_file","FileManager_fileId",{$session{form}{file}=>''},0,0);
        	return $_[0]->www_editDownload();
 }
 
@@ -114,8 +114,8 @@ sub www_deleteDownloadConfirm {
         my ($output, $file);
         $file = WebGUI::Attachment->new("",$session{form}{wid},$session{form}{did});
         $file->deleteNode;
-	$_[0]->deleteCollateral("DownloadManager_file","downloadId",$session{form}{did});
-        $_[0]->reorderCollateral("DownloadManager_file","downloadId");
+	$_[0]->deleteCollateral("FileManager_file","FileManager_fileId",$session{form}{did});
+        $_[0]->reorderCollateral("FileManager_file","FileManager_fileId");
         return "";
 }
 
@@ -123,7 +123,7 @@ sub www_deleteDownloadConfirm {
 sub www_download {
 	my (%download, $file);
 	tie %download,'Tie::CPHash';
-	%download = WebGUI::SQL->quickHash("select * from DownloadManager_file where downloadId=$session{form}{did}");
+	%download = WebGUI::SQL->quickHash("select * from FileManager_file where FileManager_fileId=$session{form}{did}");
 	if (WebGUI::Privilege::isInGroup($download{groupToView})) {
 		if ($session{form}{alternateVersion} == 1) {
                         $file = WebGUI::Attachment->new($download{alternateVersion1},
@@ -186,7 +186,7 @@ sub www_editDownload {
 	if ($session{form}{did} eq "") {
 		$session{form}{did} = "new";
 	} else {
-		%download = WebGUI::SQL->quickHash("select * from DownloadManager_file where downloadId='$session{form}{did}'");
+		%download = WebGUI::SQL->quickHash("select * from FileManager_file where FileManager_fileId='$session{form}{did}'");
 	}
         $output .= helpIcon(2,$namespace);
         $output .= '<h1>'.WebGUI::International::get(10,$namespace).'</h1>';
@@ -228,14 +228,14 @@ sub www_editDownload {
 sub www_editDownloadSave {
 	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
         my ($file, %files);
-	$files{downloadId} = $_[0]->setCollateral("DownloadManager_file", "downloadId", {
-        	downloadId => $session{form}{did},
+	$files{FileManager_fileId} = $_[0]->setCollateral("FileManager_file", "FileManager_fileId", {
+        	FileManager_fileId => $session{form}{did},
                 fileTitle => $session{form}{fileTitle},
                 briefSynopsis => $session{form}{briefSynopsis},
                 dateUploaded => time(),
                 groupToView => $session{form}{groupToView}
                 });
-	$_[0]->reorderCollateral("DownloadManager_file","downloadId");
+	$_[0]->reorderCollateral("FileManager_file","FileManager_fileId");
         $file = WebGUI::Attachment->new("",$session{form}{wid},$session{form}{did});
 	$file->save("downloadFile");
 	$files{downloadFile} = $file->getFilename;
@@ -246,7 +246,7 @@ sub www_editDownloadSave {
         $file = WebGUI::Attachment->new("",$session{form}{wid},$session{form}{did});
 	$file->save("alternateVersion2");
 	$files{alternateVersion2} = $file->getFilename;
-	$_[0]->setCollateral("DownloadManager_file", "downloadId", \%files);
+	$_[0]->setCollateral("FileManager_file", "FileManager_fileId", \%files);
         if ($session{form}{proceed}) {
         	$session{form}{did} = "new";
         	return $_[0]->www_editDownload();
@@ -258,14 +258,14 @@ sub www_editDownloadSave {
 #-------------------------------------------------------------------
 sub www_moveDownloadDown {
 	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
-	$_[0]->moveCollateralDown("DownloadManager_file","downloadId",$session{form}{did});
+	$_[0]->moveCollateralDown("FileManager_file","FileManager_fileId",$session{form}{did});
 	return "";
 }
 
 #-------------------------------------------------------------------
 sub www_moveDownloadUp {
 	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
-	$_[0]->moveCollateralUp("DownloadManager_file","downloadId",$session{form}{did});
+	$_[0]->moveCollateralUp("FileManager_file","FileManager_fileId",$session{form}{did});
 	return "";
 }
 
@@ -287,7 +287,7 @@ sub www_view {
 	$url = WebGUI::URL::append($url,"sortDirection=$session{form}{sortDirection}") if ($session{form}{sortDirection});
 	$url = WebGUI::URL::append($url,"sort=$session{form}{sort}") if ($session{form}{sort});
 	$session{form}{sort} = "sequenceNumber" if ($session{form}{sort} eq "");
-	$sql = "select * from DownloadManager_file where wobjectId=".$_[0]->get("wobjectId")." ";
+	$sql = "select * from FileManager_file where wobjectId=".$_[0]->get("wobjectId")." ";
 	$constraints = WebGUI::Search::buildConstraints([qw(fileTitle downloadFile alternateVersion1 alternateVersion2 briefSynopsis)]);
 	$sql .= " and ".$constraints if ($constraints ne "");
 	$sql .= " order by $session{form}{sort} ";
@@ -311,33 +311,33 @@ sub www_view {
 	while (%download = $sth->hash) {
 		if (WebGUI::Privilege::isInGroup($download{groupToView})) {
 			$file = WebGUI::Attachment->new($download{downloadFile},
-				$_[0]->get("wobjectId"), $download{downloadId});
+				$_[0]->get("wobjectId"), $download{FileManager_fileId});
 			$row[$i] = '<tr><td class="tableData" valign="top">';
 			if ($session{var}{adminOn}) {
-				$row[$i] .= deleteIcon('func=deleteDownload&wid='.$_[0]->get("wobjectId").'&did='.$download{downloadId})
-					.editIcon('func=editDownload&wid='.$_[0]->get("wobjectId").'&did='.$download{downloadId})
-					.moveUpIcon('func=moveDownloadUp&wid='.$_[0]->get("wobjectId").'&did='.$download{downloadId})
-					.moveDownIcon('func=moveDownloadDown&wid='.$_[0]->get("wobjectId").'&did='.$download{downloadId})
+				$row[$i] .= deleteIcon('func=deleteDownload&wid='.$_[0]->get("wobjectId").'&did='.$download{FileManager_fileId})
+					.editIcon('func=editDownload&wid='.$_[0]->get("wobjectId").'&did='.$download{FileManager_fileId})
+					.moveUpIcon('func=moveDownloadUp&wid='.$_[0]->get("wobjectId").'&did='.$download{FileManager_fileId})
+					.moveDownIcon('func=moveDownloadDown&wid='.$_[0]->get("wobjectId").'&did='.$download{FileManager_fileId})
 					.' ';
 			}
 			$row[$i] .= '<a href="'.WebGUI::URL::page('func=download&wid='.$_[0]->get("wobjectId").
-				'&did='.$download{downloadId}).'">'.$download{fileTitle}.'</a>&nbsp;&middot;&nbsp;<a href="'.
+				'&did='.$download{FileManager_fileId}).'">'.$download{fileTitle}.'</a>&nbsp;&middot;&nbsp;<a href="'.
 				WebGUI::URL::page('func=download&wid='.
-				$_[0]->get("wobjectId").'&did='.$download{downloadId}).'"><img src="'.$file->getIcon.
+				$_[0]->get("wobjectId").'&did='.$download{FileManager_fileId}).'"><img src="'.$file->getIcon.
 				'" border=0 width=16 height=16 align="middle">'.$file->getType.'/'.$file->getSize.'</a>';
 			if ($download{alternateVersion1}) {
                                	$alt1 = WebGUI::Attachment->new($download{alternateVersion1},
-					$_[0]->get("wobjectId"), $download{downloadId});
+					$_[0]->get("wobjectId"), $download{FileManager_fileId});
                                	$row[$i] .= ' &middot; <a href="'.WebGUI::URL::page('func=download&wid='.
-					$_[0]->get("wobjectId").'&did='.$download{downloadId}.'&alternateVersion=1')
+					$_[0]->get("wobjectId").'&did='.$download{FileManager_fileId}.'&alternateVersion=1')
 					.'"><img src="'.$alt1->getIcon.'" border=0 width=16 height=16 align="middle">'.
                                        	$alt1->getType.'/'.$alt1->getSize.'</a>';
 			}
 			if ($download{alternateVersion2}) {
                                	$alt2 = WebGUI::Attachment->new($download{alternateVersion2}, 
-					$_[0]->get("wobjectId"), $download{downloadId});
+					$_[0]->get("wobjectId"), $download{FileManager_fileId});
                                	$row[$i] .= ' &middot; <a href="'.WebGUI::URL::page('func=download&wid='.
-					$_[0]->get("wobjectId").'&did='.$download{downloadId}.'&alternateVersion=2')
+					$_[0]->get("wobjectId").'&did='.$download{FileManager_fileId}.'&alternateVersion=2')
 					.'"><img src="'.$alt2->getIcon.'" border=0 width=16 height=16 align="middle">'.
                                        	$alt2->getType.'/'.$alt2->getSize.'</a>';
 			}

@@ -58,13 +58,13 @@ sub _calendarLayout {
 			|| epochToHuman($event{endDate},"%M %y") eq $thisMonth) {
 			$message = "";
                         if ($session{var}{adminOn}) {
-                                $message = deleteIcon('func=deleteEvent&wid='.$_[0]->get("wobjectId").'&eid='.$event{eventId}
-                                        .'&rid='.$event{recurringEventId})
-                                        .editIcon('func=editEvent&wid='.$_[0]->get("wobjectId").'&eid='.$event{eventId})
+                                $message = deleteIcon('func=deleteEvent&wid='.$_[0]->get("wobjectId").'&eid='.$event{EventsCalendar_eventId}
+                                        .'&rid='.$event{EventsCalendar_recurringEventId})
+                                        .editIcon('func=editEvent&wid='.$_[0]->get("wobjectId").'&eid='.$event{EventsCalendar_eventId})
                                         .' ';
                         }
 			$message .= '<a href="'.WebGUI::URL::page('wid='.$_[0]->get("wobjectId")
-				.'&func=viewEvent&eid='.$event{eventId}).'">'.$event{name}.'</a>';
+				.'&func=viewEvent&eid='.$event{EventsCalendar_eventId}).'">'.$event{name}.'</a>';
 			$message .= '<br>';
                         if ($event{startDate} == $event{endDate}) {
                         	$calendar->addcontent(epochToHuman($event{startDate},"%D"),$message);
@@ -93,11 +93,11 @@ sub duplicate {
 		paginateAfter=>$_[0]->get("paginateAfter")
 		});
 	$sth = WebGUI::SQL->read("select * from EventsCalendar_event where wobjectId="
-		.$_[0]->get("wobjectId")." order by recurringEventId");
+		.$_[0]->get("wobjectId")." order by EventsCalendar_recurringEventId");
 	while (@row = $sth->array) {
-		$newEventId = getNextId("eventId");
+		$newEventId = getNextId("EventsCalendar_eventId");
 		if ($row[6] > 0 && $row[6] != $previousRecurringEventId) {
-			$row[6] = getNextId("recurringEventId");
+			$row[6] = getNextId("EventsCalendar_recurringEventId");
 			$previousRecurringEventId = $row[6];
 		}
                	WebGUI::SQL->write("insert into EventsCalendar_event values ($newEventId, ".$w->get("wobjectId").", ".
@@ -138,9 +138,9 @@ sub www_deleteEvent {
 sub www_deleteEventConfirm {
 	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
 	if ($session{form}{rid} > 0) {
-		$_[0]->deleteCollateral("EventsCalendar_event","recurringEventId",$session{form}{rid});
+		$_[0]->deleteCollateral("EventsCalendar_event","EventsCalendar_recurringEventId",$session{form}{rid});
 	} else {
-		$_[0]->deleteCollateral("EventsCalendar_event","eventId",$session{form}{eid});
+		$_[0]->deleteCollateral("EventsCalendar_event","EventsCalendar_eventId",$session{form}{eid});
 	}
         return "";
 }
@@ -206,7 +206,7 @@ sub www_editEvent {
 		$f->raw("</td><tr>");
 		$special = $f->printRowsOnly;
 	} else {
-               	%event = WebGUI::SQL->quickHash("select * from EventsCalendar_event where eventId='$session{form}{eid}'");
+               	%event = WebGUI::SQL->quickHash("select * from EventsCalendar_event where EventsCalendar_eventId='$session{form}{eid}'");
 		$f = WebGUI::HTMLForm->new;
 		$f->hidden("until");
 		$special = $f->printRowsOnly;
@@ -234,19 +234,19 @@ sub www_editEventSave {
 	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
 	my (@startDate, @endDate, $until, @eventId, $i, $recurringEventId);
 	if ($session{form}{eid} eq "new") {
-		$session{form}{eid} = getNextId("eventId");
+		$session{form}{eid} = getNextId("EventsCalendar_eventId");
        		$startDate[0] = setToEpoch($session{form}{startDate});
                	$endDate[0] = setToEpoch($session{form}{endDate});
                	$until = setToEpoch($session{form}{until});
-               	$eventId[0] = getNextId("eventId");
+               	$eventId[0] = getNextId("EventsCalendar_eventId");
 		$session{form}{interval} = 1 if ($session{form}{interval} < 1);
                	if ($session{form}{recursEvery} eq "never") {
                        	$recurringEventId = 0;
                	} else {
-                       	$recurringEventId = getNextId("recurringEventId");
+                       	$recurringEventId = getNextId("EventsCalendar_recurringEventId");
                        	while ($startDate[$i] < $until) {
                                	$i++;
-                               	$eventId[$i] = getNextId("eventId");
+                               	$eventId[$i] = getNextId("EventsCalendar_eventId");
 				if ($session{form}{recursEvery} eq "day") {
                                		$startDate[$i] = addToDate($startDate[0],0,0,($i*$session{form}{interval}));
                                		$endDate[$i] = addToDate($endDate[0],0,0,($i*$session{form}{interval}));
@@ -274,7 +274,7 @@ sub www_editEventSave {
 	} else {
                	WebGUI::SQL->write("update EventsCalendar_event set name=".quote($session{form}{name}).", 
 			description=".quote($session{form}{description}).", startDate='".setToEpoch($session{form}{startDate})."', 
-			endDate='".setToEpoch($session{form}{endDate})."' where eventId=$session{form}{eid}");
+			endDate='".setToEpoch($session{form}{endDate})."' where EventsCalendar_eventId=$session{form}{eid}");
 	}
 	if ($session{form}{proceed}) {
 		$session{form}{eid} = "new";
@@ -341,9 +341,9 @@ sub www_view {
 			}
 			%previous = %event;
 			if ($session{var}{adminOn}) {
-				$row[$i] .= deleteIcon('func=deleteEvent&wid='.$_[0]->get("wobjectId").'&eid='.$event{eventId}
-					.'&rid='.$event{recurringEventId})
-					.editIcon('func=editEvent&wid='.$_[0]->get("wobjectId").'&eid='.$event{eventId})
+				$row[$i] .= deleteIcon('func=deleteEvent&wid='.$_[0]->get("wobjectId").'&eid='.$event{EventsCalendar_eventId}
+					.'&rid='.$event{EventsCalendar_recurringEventId})
+					.editIcon('func=editEvent&wid='.$_[0]->get("wobjectId").'&eid='.$event{EventsCalendar_eventId})
 					.' ';
 			}
 			$row[$i] .= '<span class="eventTitle">'.$event{name}.'</span>';
@@ -365,7 +365,7 @@ sub www_view {
 sub www_viewEvent {
 	my ($output, %event);
 	tie %event, 'Tie::CPHash';
-	%event = WebGUI::SQL->quickHash("select * from EventsCalendar_event where eventId=$session{form}{eid}");
+	%event = WebGUI::SQL->quickHash("select * from EventsCalendar_event where EventsCalendar_eventId=$session{form}{eid}");
 	$output = '<h1>'.$event{name}.'</h1>';
 	$output .= '<table width="100%" cellspacing="0" cellpadding="5" border="0">';
 	$output .= '<tr>';
@@ -377,7 +377,7 @@ sub www_viewEvent {
         	$output .= '<a href="'.WebGUI::URL::page('func=editEvent&eid='.$session{form}{eid}.'&wid='
 			.$session{form}{wid}).'">'.WebGUI::International::get(575).'</a><br>';
                 $output .= '<a href="'.WebGUI::URL::page('func=deleteEvent&eid='.$session{form}{eid}.
-                        '&wid='.$session{form}{wid}.'&rid='.$event{recurringEventId}).'">'
+                        '&wid='.$session{form}{wid}.'&rid='.$event{EventsCalendar_recurringEventId}).'">'
                         .WebGUI::International::get(576).'</a><br>';
         }
 	$output .= '</td></tr>';
