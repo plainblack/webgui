@@ -96,4 +96,6 @@ webgui.
  - Added a view privileges setting to each forum.
  - Bugfix [ 822805 ] Emptying trash can cause fatal error
    (Thanks to Steve Simms.)
+ - Changed the upgrade system to stop after an error so the sys admin can fix
+   the problem before continuing.
 

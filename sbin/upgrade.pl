@@ -221,6 +221,7 @@ foreach my $config (keys %config) {
 				print "OK\n" unless ($quiet);
 			} else {
 				print "Failed!\n" unless ($quiet);
+				fatalError();
 			}
 		}
 		print "\tUpgrading to ".$upgrade{$upgrade}{to}."..." unless ($quiet);
@@ -232,12 +233,14 @@ foreach my $config (keys %config) {
 			print "OK\n" unless ($quiet);
 		} else {
                 	print "Failed!\n" unless ($quiet);
+			fatalError();
                 }
 		if ($upgrade{$upgrade}{pl} ne "") {
 			my $cmd = $perl." ".$upgrade{$upgrade}{pl}." --configFile=".$config;
 			$cmd .= " --quiet" if ($quiet);
 			if (system($cmd)) {
 				print "\tProcessing upgrade executable failed!\n";
+				fatalError();
 			}
 		}
 		$config{$config}{version} = $upgrade{$upgrade}{to};
@@ -290,6 +293,18 @@ sub checkVersion {
 		return 0;
 	}
 }
+
+#-----------------------------------------
+sub fatalError {
+	print <<STOP;
+
+The upgrade process failed and has stopped so you can either restore
+from backup, or attempt to fix the problem and continue.
+
+STOP
+	exit;
+}
+
 
 #-----------------------------------------
 sub _parseDSN {
