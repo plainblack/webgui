@@ -174,8 +174,7 @@ sub www_editNavigation {
                 -value=>[$session{form}{stopAtLevel} || $config->{stopAtLevel}]
                 );
 	tie my %depths, 'Tie::IxHash';
-	%depths = (		'0'	=> '0 levels',
-				'1'	=> '1 level',
+	%depths = (		'1'	=> '1 level',
 				'2'	=> '2 levels',
 				'3'	=> '3 levels',
 				'4'	=> '4 levels',
