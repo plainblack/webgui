@@ -40,7 +40,7 @@ sub www_listRoots {
         my ($output, $p, $sth, %data, @row, $i);
         $output = helpIcon("root manage");
 	$output .= '<h1>'.WebGUI::International::get(408).'</h1>';
-        $sth = WebGUI::SQL->read("select * from page where title<>'Reserved' and parentId=0 order by title");
+        $sth = WebGUI::SQL->read("select * from page where title<>'Reserved' and parentId='0' order by title");
         while (%data = $sth->hash) {
                 $row[$i] = '<tr><td valign="top" class="tableData">'
 			.deleteIcon('op=deletePage',$data{urlizedTitle})
