@@ -27,7 +27,7 @@ sub _newPositionFormat {
 #-------------------------------------------------------------------
 sub countPositions {
         my ($template, $i);
-        ($template) = WebGUI::SQL->quickArray("select template from template where templateId=".$_[0]);
+        $template = get($_[0]);
         $i = 1;
         while ($template =~ m/template\.position$i/) {
                 $i++;
@@ -48,7 +48,10 @@ sub draw {
 
 #-------------------------------------------------------------------
 sub get {
-        my ($template) = WebGUI::SQL->quickArray("select template from template where templateId=".$_[0]);
+	my $templateId = $_[0] || 1;
+	my $namespace = $_[1] || "Page";
+        my ($template) = WebGUI::SQL->quickArray("select template from template 
+		where templateId=".$templateId." and namespace=".quote($namespace));
 	$template =~ s/\^(\d+)\;/_newPositionFormat($1)/eg; #compatibility with old-style templates
         return $template;
 }
@@ -57,7 +60,7 @@ sub get {
 sub getList {
         my (%list);
 	tie %list, 'Tie::IxHash';
-	%list = WebGUI::SQL->buildHash("select templateId,name from template order by name");
+	%list = WebGUI::SQL->buildHash("select templateId,name from template where namespace='Page' order by name");
         return \%list;
 }
 

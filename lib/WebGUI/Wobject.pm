@@ -30,6 +30,7 @@ use WebGUI::Template;
 use WebGUI::URL;
 use WebGUI::Utility;
 
+
 =head1 NAME
 
  Package WebGUI::Wobject
@@ -451,13 +452,13 @@ sub moveCollateralUp {
 
 #-------------------------------------------------------------------
 
-=head2 new ( hashRef )
+=head2 new ( properties )
 
  Constructor.
 
  NOTE: This method should never need to be overridden or extended.
 
-=item hashRef 
+=item properties
 
  A hash reference containing at minimum "wobjectId" and "namespace"
  and wobjectId may be set to "new" if you're creating a new
@@ -472,7 +473,7 @@ sub moveCollateralUp {
 =cut
 
 sub new {
-        bless {_property => $_[1] }, $_[0];
+        bless {_property => $_[1]}, $_[0];
 }
 
 #-------------------------------------------------------------------
@@ -721,6 +722,37 @@ sub setCollateral {
 	return $properties->{$keyName};
 }
 
+
+#-------------------------------------------------------------------
+
+=head2 templateProperties 
+
+ Returns a list of template properties.
+
+=cut
+
+sub templateProperties {
+	my ($f, $templates, $templateId, $subtext);
+	$templateId = $_[0]->get("templateId") || 1;
+	if ($_[0]->get("wobjectId") ne "new" && $session{user}{uiLevel} >= 5) {
+		$subtext = '<a href="'.WebGUI::URL::page("op=editTemplate&tid=".$templateId."&return="
+			.WebGUI::URL::escape("func=edit&wid=".$_[0]->get("wobjectId"))).'">'
+			.WebGUI::International::get(741).'</a> / <a href="'.WebGUI::URL::page("op=listTemplates").'">'
+			.WebGUI::International::get(742).'</a>';
+	}
+	$templates = WebGUI::SQL->buildHashRef("select templateId,name from template where namespace="
+		.quote($_[0]->get("namespace"))." order by name");
+	$f = WebGUI::HTMLForm->new;
+	$f->select(
+		-name=>"templateId",
+		-options=>$templates,
+		-label=>WebGUI::International::get(740),
+		-value=>[$templateId],
+		-uiLevel=>1,
+		-subtext=>$subtext
+		);
+	return $f->printRowsOnly;
+}
 
 #-------------------------------------------------------------------
 

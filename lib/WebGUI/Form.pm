@@ -46,6 +46,7 @@ use WebGUI::URL;
  WebGUI::Form::radioList({name="dayOfWeek", options=>\%days});
  WebGUI::Form::selectList({name=>"dayOfWeek", options=>\%days, value=>\@array"});
  WebGUI::Form::submit;
+ WebGUI::Form::template({name=>"templateId"});
  WebGUI::Form::text({name=>"firstName"});
  WebGUI::Form::textarea({name=>"emailMessage"});
  WebGUI::Form::url({name=>"homepage"});
@@ -395,9 +396,9 @@ sub formHeader {
 
  The name field for this form element.
 
-=item value
+=item groupId 
 
- The default value(s) for this form element. This should be passed
+ The selected group id(s) for this form element.  This should be passed
  as an array reference. Defaults to "7" (Everyone).
 
 =item size
@@ -420,7 +421,7 @@ sub formHeader {
 
 sub group {
         my (%hash, $value);
-	$value = $_[0]->{value};
+	$value = $_[0]->{groupId};
 	if ($$value[0] eq "") { #doing long form otherwise arrayRef didn't work
 		$value = [7];
 	}
@@ -963,6 +964,39 @@ sub submit {
         $value = _fixQuotes($value);
 	$wait = WebGUI::International::get(452);
         return '<input type="submit" value="'.$value.'" onClick="this.value=\''.$wait.'\'" '.$_[0]->{extras}.'>';
+}
+
+#-------------------------------------------------------------------
+
+=head2 template ( hashRef )
+
+ Returns a select list of templates.
+
+=item name
+
+ The name field for this form element.
+
+=item value 
+
+ The unique identifier for the selected template. Defaults to "1".
+
+=item namespace
+
+ The namespace for the list of templates to return. If this is
+ omitted, all templates will be displayed.
+
+=cut
+
+sub template {
+        my ($templates, $templateId, $where);
+        $templateId = $_[0]->{value} || 1;
+        $templates = WebGUI::SQL->buildHashRef("select templateId,name from template where namespace="
+		.quote($_[0]->{namespace})." order by name");
+        return selectList({
+                name=>$_[0]->{name},
+                options=>$templates,
+                value=>[$templateId]
+                });
 }
 
 #-------------------------------------------------------------------

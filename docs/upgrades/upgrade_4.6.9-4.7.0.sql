@@ -76,6 +76,11 @@ alter table Product_feature change productFeatureId Product_featureId int not nu
 alter table Product_specification change productSpecificationId Product_specificationId int not null;
 update wobject set templatePosition=templatePosition+1;
 alter table template add column namespace varchar(35) not null default 'Page';
+delete from international where languageId=1 and namespace='WebGUI' and internationalId=363;
+insert into international (internationalId,languageId,namespace,message,lastUpdated) values (363,1,'WebGUI','Page Template Position', 1034736999);
+alter table Product change Product_templateId templateId int not null default 1;
+alter table template drop primary key;
+alter table template add primary key (templateId,namespace);
 
 
 

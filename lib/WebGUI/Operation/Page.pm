@@ -196,11 +196,6 @@ sub www_editPage {
 			-value=>$page{redirectURL},
 			-uiLevel=>8
 			);
-		$f->readOnly(
-			-value=>WebGUI::Template::select($page{templateId}),
-			-label=>WebGUI::International::get(356),
-			-uiLevel=>5
-			);
 		$f->textarea(
 			-name=>"synopsis",
 			-label=>WebGUI::International::get(412),
@@ -237,6 +232,11 @@ sub www_editPage {
 			-subtext=>' &nbsp; '.WebGUI::International::get(106),
 			-uiLevel=>9
 			);
+                $f->readOnly(
+                        -value=>WebGUI::Template::select($page{templateId}),
+                        -label=>WebGUI::International::get(356),
+                        -uiLevel=>5
+                        );
 		$f->raw(
 			-value=>'<tr><td colspan=2><hr size=1><b>'.WebGUI::International::get(107).'</b></td></tr>',
 			-uiLevel=>9

@@ -50,6 +50,7 @@ use WebGUI::SQL;
  $f->readOnly("34","Page ID");
  $f->select("dayOfWeek",\%days,"Which day?");
  $f->submit;
+ $f->template("templateId","Page Template");
  $f->text("firstName", "First Name");
  $f->textarea("emailMessage","Email Message");
  $f->url("homepage","Home Page");
@@ -606,7 +607,7 @@ sub group {
                 $output = WebGUI::Form::hiddenList({
 			name=>$name,
                         options=>$hashRef,
-                        value=>$value
+                        groupId=>$value
                         });
         }
         $self->{_data} .= $output;
@@ -1420,6 +1421,41 @@ sub submit {
                 });
         $output .= _subtext($subtext);
         $output = $self->_tableFormRow($label,$output);
+        $self->{_data} .= $output;
+}
+
+#-------------------------------------------------------------------
+
+=head2 template ( name [, value, label, namespace, return, extras, uiLevel ] )
+
+=cut
+
+sub template {
+        my ($output, $subtext);
+        my ($self, @p) = @_;
+        my ($name, $value, $label, $namespace, $afterEdit, $extras, $uiLevel) = 
+		rearrange([name, value, label, namespace, afterEdit, extras, uiLevel], @p);
+        if (_uiLevelChecksOut($uiLevel)) {
+        	if ($afterEdit) {
+                	$subtext = '<a href="'.WebGUI::URL::page("op=editTemplate&tid=".$value."&afterEdit="
+                        	.WebGUI::URL::escape($afterEdit)).'">'.WebGUI::International::get(741).'</a> / ';
+        	}
+        	$subtext .= '<a href="'.WebGUI::URL::page("op=listTemplates&namespace=$namespace").'">'
+			.WebGUI::International::get(742).'</a>';
+        	$output = WebGUI::Form::template({
+                	name=>$name,
+                	value=>$value,
+                	namespace=>$namespace,
+                	extras=>$extras
+                	});
+                $output .= _subtext($subtext);
+                $output = $self->_tableFormRow($label,$output);
+        } else {
+                $output = WebGUI::Form::hidden({
+                        name=>$name,
+                        value=>$value
+                        });
+        }
         $self->{_data} .= $output;
 }
 
