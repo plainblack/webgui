@@ -64,6 +64,7 @@ use WebGUI::DateTime ();
 #use WebGUI::Discussion (); # compile problems when this is included
 use WebGUI::ErrorHandler ();
 use WebGUI::Form ();
+use WebGUI::FormProcessor ();
 use WebGUI::Group ();
 use WebGUI::Grouping ();
 use WebGUI::HTMLForm ();
