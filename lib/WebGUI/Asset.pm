@@ -552,6 +552,7 @@ Returns a text string of HTML code for the Asset Manager Control Page. English o
 sub getAssetManagerControl {
 	my $self = shift;
 	my $children = shift;
+	my $controlType = shift;
 	WebGUI::Style::setLink($session{config}{extrasURL}.'/assetManager/assetManager.css', {rel=>"stylesheet",type=>"text/css"});
 	WebGUI::Style::setScript($session{config}{extrasURL}.'/assetManager/Tools.js', {type=>"text/javascript"});
 	WebGUI::Style::setScript($session{config}{extrasURL}.'/assetManager/ContextMenu.js', {type=>"text/javascript"});
@@ -559,6 +560,9 @@ sub getAssetManagerControl {
 	WebGUI::Style::setScript($session{config}{extrasURL}.'/assetManager/Display.js', {type=>"text/javascript"});
 	WebGUI::Style::setScript($session{config}{extrasURL}.'/assetManager/EventManager.js', {type=>"text/javascript"});
 	WebGUI::Style::setScript($session{config}{extrasURL}.'/assetManager/AssetManager.js', {type=>"text/javascript"});
+	WebGUI::Style::setScript($session{config}{extrasURL}.'/assetManager/AssetManagerAsset.js', {type=>"text/javascript"});
+	WebGUI::Style::setScript($session{config}{extrasURL}.'/assetManager/CrumbTrailAsset.js', {type=>"text/javascript"});
+	WebGUI::Style::setScript($session{config}{extrasURL}.'/assetManager/'.$controlType.'.js', {type=>"text/javascript"}) if (defined $controlType);
 	my $output = '
 		<div id="contextMenu" class="contextMenu"></div>
    		<div id="propertiesWindow" class="propertiesWindow"></div>
@@ -596,10 +600,14 @@ sub getAssetManagerControl {
 	$output .= "labels['move'] = 'Move';\n";
 	$output .= "labels['view'] = 'View';\n";
 	$output .= "labels['delete'] = 'Delete';\n";
+	$output .= "labels['restore'] = 'Restore';\n";
+	$output .= "labels['purge'] = 'Purge';\n";
 	$output .= "labels['go'] = 'Go';\n";
 	$output .= "labels['properties'] = 'Properties';\n";
 	$output .= "labels['editTree'] = 'Edit Tree';\n";
-	$output .= "var manager = new AssetManager(assets,columnHeadings,labels,crumbtrail);  manager.renderAssets();\n</script>\n";
+	$output .= "var manager = new AssetManager(assets,columnHeadings,labels,crumbtrail);\n";
+	$output .= "manager.assetType='".$controlType."';\n" if (defined $controlType);
+	$output .= "manager.renderAssets();\n</script>\n";
 	return $output;
 }
 
@@ -2310,7 +2318,7 @@ sub www_manageClipboard {
 		$limit = 1;
 	}
 	foreach my $assetData (@{$self->getAssetsInClipboard($limit)}) {
-		push(@assets,WebGUI::Asset->newByDynamicClass($assetData->{assetId},$assetData->{className}));
+		push(@assets,WebGUI::Asset->newByDynamicClass($assetData->{assetId},"ManageClipboard",$assetData->{className}));
 	}
 	return $ac->render($self->getAssetManagerControl(\@assets), $header);
 }
@@ -2344,7 +2352,7 @@ sub www_manageTrash {
 	foreach my $assetData (@{$self->getAssetsInTrash($limit)}) {
 		push(@assets,WebGUI::Asset->newByDynamicClass($assetData->{assetId},$assetData->{className}));
 	}
-	return $ac->render($self->getAssetManagerControl(\@assets), $header);
+	return $ac->render($self->getAssetManagerControl(\@assets,"ManageTrash"), $header);
 }
 
 

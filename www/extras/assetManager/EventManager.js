@@ -13,9 +13,6 @@ function EventManager() {
 	this.gridHeaderClick = EventManager_gridHeaderClick;
 	this.gridHeaderMouseOver = EventManager_gridHeaderMouseOver;
 	this.gridHeaderMouseOut = EventManager_gridHeaderMouseOut;
-    this.assetDoubleClick = EventManager_assetDoubleClick;
-    this.assetRightClick = EventManager_assetRightClick;
-    this.assetMouseDown = EventManager_assetMouseDown;
  
 }
 
@@ -57,49 +54,7 @@ function EventManager_keyUp(e) {
     return false;
 }
 
-function EventManager_assetDoubleClick(e) {
-    var dom = document.getElementById&&!document.all;
-    var e=dom? e : event;
-    var obj =dom? e.target : e.srcElement
-   	
-   	AssetManager_getManager().getAsset(obj).go();   	
-}
 
-function EventManager_assetRightClick(e) {
-    var dom = document.getElementById&&!document.all;
-    e=dom? e : event;
-    
-    if (!dom) { 
-        e.cancelBubble = true;
-        e.returnValue = false;
-    }
-
-    obj =dom? e.target : e.srcElement
-
-   	var asset = manager.getAsset(obj);
-       
-    manager.display.contextMenu.owner = asset;
-    manager.displayContextMenu(e.clientX,e.clientY,asset);
-    
-    return false;
-} 
-
-function EventManager_assetMouseDown(e) {
-    var dom = document.getElementById&&!document.all;
-    e=dom? e : event;
-
-	Display_adjustScrollBars(e);
-
-    if (e.button==2) {
-	    //this is a hack to get the context menu stuff to work right in IE
-   	 	if (!dom) {
-     	    e.cancelBubble = true;
-        	e.returnValue = false;
-    	}
-    }    
-
-    return false;
-} 
 
 function EventManager_documentMouseDown(e) {
     var dom = document.getElementById&&!document.all;
@@ -117,8 +72,10 @@ function EventManager_documentMouseDown(e) {
     		manager.display.dragStart(asset.div,e.clientX,e.clientY);
     		return;
     	}
-    }else {
-    	manager.display.clearSelectedAssets();
+    }else {    	
+    	if (manager.display.contextMenu.owner == null) {
+	    	manager.display.clearSelectedAssets();
+    	}
     }
                               
     if (e.button != 2) {
@@ -138,7 +95,7 @@ function EventManager_documentMouseUp(e) {
     if (manager.display.contextMenu.owner && (!asset || asset.assetId != manager.display.contextMenu.owner.assetId)) {
         manager.display.contextMenu.hide();
     }else {
-    	if (!asset) {
+    	if (!asset &&  manager.display.contextMenu.owner == null) {
 	    	manager.display.clearSelectedAssets();
     	}
     

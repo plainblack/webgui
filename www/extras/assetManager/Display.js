@@ -55,7 +55,7 @@ function Display_dragStart(firedobj,xCoordinate,yCoordinate) {
         firedobj=manager.display.dom? firedobj.parentNode : firedobj.parentElement    
     }
     
-    if ((!firedobj.asset || firedobj.asset.isParent)) {
+    if ((!firedobj.asset || !firedobj.asset.dragEnabled)) {
         return;
     }
 
@@ -103,38 +103,28 @@ function Display_isSelected(asset) {
 
 //adds an asset to the overobjects array
 function Display_selectAsset(asset) {	
+    	if (this.controlKeyDown || this.shiftKeyDown) {
+    		if (!asset.allowMultiSelect) {
+    			return;
+    		}
+    	}
+    	
     	if (!this.controlKeyDown && !this.shiftKeyDown) {
-    		for (i=0;i<this.overObjects.length;i++) {
-    			
-    			if (asset.isParent) {
-					this.overObjects[i].div.className="am-crumbtrail";
-				}else {
-	    			this.overObjects[i].div.className="am-grid-row";				
-				}
+    		for (i=0;i<this.overObjects.length;i++) {    			    		
+    			this.overObjects[i].deselect();
     		}
    			this.overObjects=new Array();
     	}
-    	
-	
+    		
 		if (!this.isSelected(asset)) {	
 			this.overObjects[this.overObjects.length] = asset;    	
-    			if (asset.isParent) {
-		   	    	asset.div.className="am-crumbtrail-over";
-				}else {
-		   	    	asset.div.className="am-grid-row-over";
-				}						
+		   	asset.select();
 		}
 }
 //Clears out the over objects array
 function Display_clearSelectedAssets() {	
     		for (i=0;i<this.overObjects.length;i++) {
-    			if (this.overObjects[i].isParent) {
-	    			this.overObjects[i].div.className="am-crumbtrail";
-				}else {
-    				this.overObjects[i].div.className="am-grid-row";
-				}
-
-
+    			this.overObjects[i].deselect();
     		}
    			this.overObjects=new Array();
 }
