@@ -36,6 +36,7 @@ use WebGUI::SQL;
  $f->combo("fruit",\%fruit,"Choose a fruit or enter your own.");
  $f->date("endDate","End Date",$endDate);
  $f->email("emailAddress","Email Address");
+ $f->fieldType("dataType",\%supportedTypes,"Type of Field");
  $f->file("image","Image to Upload");
  $f->group("groupToPost","Who can post?");
  $f->hidden("wid","55");
@@ -48,7 +49,7 @@ use WebGUI::SQL;
  $f->radioList("dayOfWeek",\%days,"Which day?");
  $f->raw("text");
  $f->readOnly("34","Page ID");
- $f->select("dayOfWeek",\%days,"Which day?");
+ $f->selectList("dayOfWeek",\%days,"Which day?");
  $f->submit;
  $f->template("templateId","Page Template");
  $f->text("firstName", "First Name");
@@ -481,6 +482,88 @@ sub email {
         $self->{_data} .= $output;
 }
 
+
+#-------------------------------------------------------------------
+
+=head2 fieldType ( name, types [ label, value, size, multiple, extras, subtext, uiLevel ] )
+
+ Adds a field type select list field to this form. This is primarily 
+ useful for building dynamic form builders.
+
+=item name
+
+ The name field for this form element.
+
+=item types
+
+ An array reference of field types to be displayed. The field names
+ are the names of the methods from this forms package. Note that not
+ all field types are supported.
+
+=item label
+
+ The left column label for this form row.
+
+=item value
+
+ The default value(s) for this form element. This should be passed
+ as an array reference.
+
+=item size
+
+ The number of characters tall this form element should be. Defaults
+ to "1".
+
+=item multiple
+
+ A boolean value for whether this select list should allow multiple
+ selections. Defaults to "0".
+
+=item extras
+
+ If you want to add anything special to this form element like
+ javascript actions, or stylesheet information, you'd add it in
+ here as follows:
+
+   'onChange="this.form.submit()"'
+
+=item subtext
+
+ Extra text to describe this form element or to provide special
+ instructions.
+
+=item uiLevel
+
+ The UI level for this field. See the WebGUI developer's site for
+ details. Defaults to "0".
+
+=cut
+
+sub fieldType {
+        my ($output);
+        my ($self, @p) = @_;
+        my ($name, $types, $label, $value, $size, $multiple, $extras, $subtext, $uiLevel) =
+                rearrange([name, types, label, value, size, multiple, extras, subtext, uiLevel], @p);
+        if (_uiLevelChecksOut($uiLevel)) {
+                $output = WebGUI::Form::fieldTypes({
+                        name=>$name,
+                        types=>$types,
+                        value=>$value,
+                        multiple=>$multiple,
+                        size=>$size,
+                        extras=>$extras
+                        });
+                $output .= _subtext($subtext);
+                $output = $self->_tableFormRow($label,$output);
+        } else {
+                $output = WebGUI::Form::hiddenList({
+                        name=>$name,
+                        types=>$types,
+                        value=>$value
+                        });
+        }
+        $self->{_data} .= $output;
+}
 
 #-------------------------------------------------------------------
 
@@ -1305,7 +1388,20 @@ sub readOnly {
 
 #-------------------------------------------------------------------
 
-=head2 select ( name, options [ label, value, size, multiple, extras, subtext, uiLevel ] )
+=head2 select
+
+ Use of this method is depricated. Use selectList instead.
+
+=cut
+
+sub select {
+	my $self = shift;
+	return $self->selectList(@_);
+}
+
+#-------------------------------------------------------------------
+
+=head2 selectList ( name, options [ label, value, size, multiple, extras, subtext, uiLevel ] )
 
  Adds a select list row to this form.
 
@@ -1356,7 +1452,7 @@ sub readOnly {
 
 =cut
 
-sub select {
+sub selectList {
         my ($output);
         my ($self, @p) = @_;
         my ($name, $options, $label, $value, $size, $multiple, $extras, $subtext, $uiLevel) =

@@ -29,36 +29,39 @@ use WebGUI::URL;
 
  use WebGUI::Form;
 
- WebGUI::Form::checkbox({name=>"whichOne", value=>"red"});
- WebGUI::Form::checkList({name=>"dayOfWeek", options=>\%days});
- WebGUI::Form::combo({name=>"fruit",options=>\%fruit});
- WebGUI::Form::date({name=>"endDate", value=>$endDate});
- WebGUI::Form::email({name=>"emailAddress"});
- WebGUI::Form::file({name=>"image"});
- WebGUI::Form::group({name=>"groupToPost"});
- WebGUI::Form::hidden({name=>"wid",value=>"55"});
- WebGUI::Form::HTMLArea({name=>"description"});
- WebGUI::Form::integer({name=>"size"});
- WebGUI::Form::interval({name=>"timeToLive", interval=>12, units=>"hours"});
- WebGUI::Form::password({name=>"identifier"});
- WebGUI::Form::phone({name=>"cellPhone"});
- WebGUI::Form::radio({name=>"whichOne", value=>"red"});
- WebGUI::Form::radioList({name="dayOfWeek", options=>\%days});
- WebGUI::Form::selectList({name=>"dayOfWeek", options=>\%days, value=>\@array"});
- WebGUI::Form::submit;
- WebGUI::Form::template({name=>"templateId"});
- WebGUI::Form::text({name=>"firstName"});
- WebGUI::Form::textarea({name=>"emailMessage"});
- WebGUI::Form::url({name=>"homepage"});
- WebGUI::Form::yesNo({name=>"happy"});
- WebGUI::Form::zipcode({name=>"workZip"});
+ $html = WebGUI::Form::checkbox({name=>"whichOne", value=>"red"});
+ $html = WebGUI::Form::checkList({name=>"dayOfWeek", options=>\%days});
+ $html = WebGUI::Form::combo({name=>"fruit",options=>\%fruit});
+ $html = WebGUI::Form::date({name=>"endDate", value=>$endDate});
+ $html = WebGUI::Form::email({name=>"emailAddress"});
+ $html = WebGUI::Form::fieldType({name=>"fieldType",types=>\%supportedTypes});
+ $html = WebGUI::Form::file({name=>"image"});
+ $html = WebGUI::Form::formHeader();
+ $html = WebGUI::Form::group({name=>"groupToPost"});
+ $html = WebGUI::Form::hidden({name=>"wid",value=>"55"});
+ $html = WebGUI::Form::hiddenList({name=>"wid",value=>"55",options=>\%options});
+ $html = WebGUI::Form::HTMLArea({name=>"description"});
+ $html = WebGUI::Form::integer({name=>"size"});
+ $html = WebGUI::Form::interval({name=>"timeToLive", interval=>12, units=>"hours"});
+ $html = WebGUI::Form::password({name=>"identifier"});
+ $html = WebGUI::Form::phone({name=>"cellPhone"});
+ $html = WebGUI::Form::radio({name=>"whichOne", value=>"red"});
+ $html = WebGUI::Form::radioList({name="dayOfWeek", options=>\%days});
+ $html = WebGUI::Form::selectList({name=>"dayOfWeek", options=>\%days, value=>\@array"});
+ $html = WebGUI::Form::submit();
+ $html = WebGUI::Form::template({name=>"templateId"});
+ $html = WebGUI::Form::text({name=>"firstName"});
+ $html = WebGUI::Form::textarea({name=>"emailMessage"});
+ $html = WebGUI::Form::url({name=>"homepage"});
+ $html = WebGUI::Form::yesNo({name=>"happy"});
+ $html = WebGUI::Form::zipcode({name=>"workZip"});
 
 =head1 DESCRIPTION
 
  Base forms package. Eliminates some of the normal code work that goes
- along with creating forms. Used by the PowerForm package.
+ along with creating forms. Used by the HTMLForm package.
 
-=head1 METHODS
+=head1 FUNCTIONS 
 
  All of the functions in this package accept the input of a hash
  reference containing the parameters to populate the form element.
@@ -278,7 +281,7 @@ sub date {
 
 =head2 email ( hashRef )
 
- Adds an email address row to this form.
+ Returns an email address field.
 
 =item name
 
@@ -318,6 +321,88 @@ sub email {
 	return $output;
 }
 
+
+#-------------------------------------------------------------------
+
+=head2 fieldType ( hashRef )
+
+ Returns a field type select list field. This is primarily useful for
+ building dynamic form builders.
+
+=item name
+
+ The name field for this form element.
+
+=item types 
+
+ An array reference of field types to be displayed. The field names
+ are the names of the methods from this forms package. Note that not
+ all field types are supported.
+
+=item value
+
+ The default value(s) for this form element. This should be passed
+ as an array reference.
+
+=item size
+
+ The number of characters tall this form element should be. Defaults
+ to "1".
+
+=item multiple
+
+ A boolean value for whether this select list should allow multiple
+ selections. Defaults to "0".
+
+=item extras
+
+ If you want to add anything special to this form element like
+ javascript actions, or stylesheet information, you'd add it in
+ here as follows:
+
+   'onChange="this.form.submit()"'
+
+=cut
+
+sub fieldType {
+	my (%hash, $output, $type);
+ 	tie %hash, 'Tie::IxHash';
+	# NOTE: What you are about to see is bad code. Do not attempt this
+	# without adult supervision. =) It was done this way because a huge
+	# if/elsif construct executes much more quickly than a bunch of
+	# unnecessary database hits.
+	foreach $type (@$_[0]->{types}) {
+		if ($type eq "text") {
+			$hash{text} = WebGUI::International::get(475);
+		} elsif ($type eq "textarea") {
+        		$hash{textarea} = WebGUI::International::get(476);
+		} elsif ($type eq "HTMLArea") {
+        		$hash{HTMLArea} = WebGUI::International::get(477);
+		} elsif ($type eq "url") {
+        		$hash{url} = WebGUI::International::get(478);
+		} elsif ($type eq "date") {
+        		$hash{date} = WebGUI::International::get(479);
+		} elsif ($type eq "email") {
+        		$hash{email} = WebGUI::International::get(480);
+		} elsif ($type eq "phone") {
+        		$hash{phone} = WebGUI::International::get(481);
+		} elsif ($type eq "integer") {
+        		$hash{integer} = WebGUI::International::get(482);
+		} elsif ($type eq "yesNo") {
+        		$hash{yesNo} = WebGUI::International::get(483);
+		} elsif ($type eq "selectList") {
+        		$hash{selectList} = WebGUI::International::get(484);
+		}
+	}
+	return selectList({
+		options=>\%hash,
+		name=>$_[0]->{name},
+		value=>$_[0]->{value},
+		multiple=>$_[0]->{multiple},
+		extras=>$_[0]->{extras},
+		size=>$_[0]->{size}
+		});
+}
 
 #-------------------------------------------------------------------
 
@@ -646,7 +731,7 @@ sub integer {
 
 =head2 interval ( hashRef )
 
- Adds a time interval row to this form.
+ Returns a time interval field.
 
 =item name
 
@@ -828,7 +913,7 @@ sub radio {
 
 =head2 radioList ( hashRef )
 
- Adds a radio button list row to this form.
+ Returns a radio button list field.
 
 =item name
 
@@ -884,7 +969,7 @@ sub radioList {
 
 =head2 selectList ( hashRef )
 
- Adds a select list field.
+ Returns a select list field.
 
 =item name
 
