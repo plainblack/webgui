@@ -14,6 +14,7 @@
  - Bugfix [ 949923 ] Collateral changes owner when editing
  - Bugfix [ 949923 ] Collateral changes owner when editing
  - Bugfix [ 948050 ] Correct email address not accepted (fix)
+ - Bugfix [ 938211 ] FIX: DeleteExpiredEvents.pm ignores offset
 
 
 

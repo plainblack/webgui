@@ -20,7 +20,7 @@ use WebGUI::SQL;
 sub process {
 	if ($session{config}{DeleteExpiredEvents_offset} ne "") {
 		WebGUI::SQL->write("delete from EventsCalendar_event where endDate < "
-			.(time()-(86400*$session{config}{DeleteExpiredEvents}{offset})));
+			.(time()-(86400*$session{config}{DeleteExpiredEvents_offset})));
 	}
 }
 
