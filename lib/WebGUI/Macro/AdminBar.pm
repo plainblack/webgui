@@ -36,7 +36,7 @@ sub process {
 	$var{'packages.label'} = WebGUI::International::get(376);
 	my @packages;
 	my $i;
-	my $sth = WebGUI::SQL->read("select pageId,title from page where parentId=5");
+	my $sth = WebGUI::SQL->read("select pageId,title from page where parentId='5'");
         while (my %data = $sth->hash) {
 		$data{title} =~ s/'//g;
 		push(@packages, {
@@ -84,9 +84,9 @@ sub process {
 
 	# get pages and store in array of arrays in order to integrate with wobjects and sort by buffer date
 	if ($session{setting}{sharedClipboard} eq "1") {
-		$query = "select bufferDate,pageId,title from page where parentId=2 order by bufferDate";
+		$query = "select bufferDate,pageId,title from page where parentId='2' order by bufferDate";
 	} else {
-		$query = "select bufferDate,pageId,title from page where parentId=2 "
+		$query = "select bufferDate,pageId,title from page where parentId='2' "
 			." and bufferUserId=".quote($session{user}{userId})
 			." order by bufferDate";
 	}
