@@ -66,6 +66,24 @@ INSERT INTO international VALUES (44,'UserSubmission','English','Group To Modera
 INSERT INTO international VALUES (51,'UserSubmission','English','Display thumbnails?');
 alter table UserSubmission add column displayThumbnails int not null default 0;
 INSERT INTO international VALUES (52,'UserSubmission','English','Thumbnail');
+alter table UserSubmission add column layout varchar(30) not null default 'traditional';
+INSERT INTO international VALUES (53,'UserSubmission','English','Layout');
+INSERT INTO international VALUES (54,'UserSubmission','English','Web Log');
+INSERT INTO international VALUES (55,'UserSubmission','English','Traditional');
+INSERT INTO international VALUES (56,'UserSubmission','English','Photo Gallery');
+INSERT INTO international VALUES (57,'UserSubmission','English','Responses');
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
