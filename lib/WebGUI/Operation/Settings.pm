@@ -25,7 +25,7 @@ use WebGUI::URL;
 
 our @ISA = qw(Exporter);
 our @EXPORT = qw(&www_saveSettings &www_editUserSettings &www_editCompanyInformation 
-	&www_editPrivilegeSettings &www_editMailSettings &www_editMiscSettings 
+	&www_editPrivilegeSettings &www_editMessagingSettings &www_editMiscSettings 
 	&www_editContentSettings &www_manageSettings);
 
 #-------------------------------------------------------------------
@@ -46,8 +46,6 @@ sub www_editUserSettings {
         $f->hidden("op","saveSettings");
         $f->yesNo("anonymousRegistration",WebGUI::International::get(118),$session{setting}{anonymousRegistration});
         $f->text("runOnRegistration",WebGUI::International::get(559),$session{setting}{runOnRegistration});
-        $f->yesNo("alertOnNewUser",WebGUI::International::get(534),$session{setting}{alertOnNewUser});
-	$f->group("onNewUserAlertGroup",WebGUI::International::get(535),[$session{setting}{onNewUserAlertGroup}]);
         $f->yesNo("useKarma",WebGUI::International::get(539),$session{setting}{useKarma});
         $f->integer("karmaPerLogin",WebGUI::International::get(540),$session{setting}{karmaPerLogin});
         $f->interval("sessionTimeout",WebGUI::International::get(142),WebGUI::DateTime::secondsToInterval($session{setting}{sessionTimeout}));
@@ -109,16 +107,28 @@ sub www_editContentSettings {
 }
 
 #-------------------------------------------------------------------
-sub www_editMailSettings {
+sub www_editMessagingSettings {
 	WebGUI::Privilege::adminOnly() unless (WebGUI::Privilege::isInGroup(3));
         my ($output, $f);
         $output .= helpIcon(13);
         $output .= '<h1>'.WebGUI::International::get(133).'</h1>';
 	$f = WebGUI::HTMLForm->new;
         $f->hidden("op","saveSettings");
+        $f->text("smtpServer",WebGUI::International::get(135),$session{setting}{smtpServer});
+	$f->yesNo(
+		-name=>"sendWelcomeMessage",
+		-value=>$session{setting}{sendWelcomeMessage},
+		-label=>WebGUI::International::get(868)
+		);
+	$f->textarea(
+		-name=>"welcomeMessage",
+		-value=>$session{setting}{welcomeMessage},
+		-label=>WebGUI::International::get(869)
+		);
         $f->textarea("recoverPasswordEmail",WebGUI::International::get(134),$session{setting}{recoverPasswordEmail});
         $f->textarea("mailFooter",WebGUI::International::get(824),$session{setting}{mailFooter});
-        $f->text("smtpServer",WebGUI::International::get(135),$session{setting}{smtpServer});
+        $f->yesNo("alertOnNewUser",WebGUI::International::get(534),$session{setting}{alertOnNewUser});
+        $f->group("onNewUserAlertGroup",WebGUI::International::get(535),[$session{setting}{onNewUserAlertGroup}]);
 	$f->submit;
 	$output .= $f->print;
         return _submenu($output);
@@ -164,7 +174,7 @@ sub www_manageSettings {
         $output .= '<ul>';
         $output .= '<li><a href="'.WebGUI::URL::page('op=editCompanyInformation').'">'.WebGUI::International::get(124).'</a>';
         $output .= '<li><a href="'.WebGUI::URL::page('op=editContentSettings').'">'.WebGUI::International::get(525).'</a>';
-        $output .= '<li><a href="'.WebGUI::URL::page('op=editMailSettings').'">'.WebGUI::International::get(133).'</a>';
+        $output .= '<li><a href="'.WebGUI::URL::page('op=editMessagingSettings').'">'.WebGUI::International::get(133).'</a>';
         $output .= '<li><a href="'.WebGUI::URL::page('op=editMiscSettings').'">'.WebGUI::International::get(140).'</a>';
         $output .= '<li><a href="'.WebGUI::URL::page('op=editPrivilegeSettings').'">'.WebGUI::International::get(710).'</a>';
         $output .= '<li><a href="'.WebGUI::URL::page('op=editProfileSettings').'">'.WebGUI::International::get(308).'</a>';

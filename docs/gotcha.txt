@@ -8,6 +8,15 @@ versions. Be sure to heed the warnings contained herein as they will
 save you many hours of grief.
 
 
+5.1.0
+--------------------------------------------------------------------
+ * If you were using the DeleteExpiredGroupings hourly plug-in prior
+	to this version, please note that its configuration has 
+	changed. It is now configurable per group through the WebGUI 
+	user interface.  You may remove any config file variables 
+	you were previously using to configure it.
+
+
 4.9.4
 --------------------------------------------------------------------
  * The "extras" property in the config file has been renamed to
