@@ -16,6 +16,7 @@ package WebGUI::TabForm;
 
 
 use strict;
+use Tie::IxHash;
 use WebGUI::Form;
 use WebGUI::HTMLForm;
 use WebGUI::Session;
@@ -187,18 +188,19 @@ A string containing the link to the tab-CascadingStyleSheet
 =cut
 
 sub new {
-	my ($cancel, $class, $tabs, $css);
-	$class = shift;
-	$tabs = shift;
-	$css = shift || $session{config}{extrasURL}.'/tabs/tabs.css';
-	foreach my $key (keys %{$tabs}) {
-		$tabs->{$key}{form} = WebGUI::HTMLForm->new;
+	my $class = shift;
+	my $startingTabs = shift;
+	my $css = shift || $session{config}{extrasURL}.'/tabs/tabs.css';
+	my %tabs;
+	tie %tabs, 'Tie::IxHash';
+	foreach my $key (keys %{$startingTabs}) {
+		$tabs{$key}{form} = WebGUI::HTMLForm->new;
 	}
-	$cancel = WebGUI::Form::button({
+	my $cancel = WebGUI::Form::button({
 			value=>WebGUI::International::get('cancel'),
 			extras=>q|onClick="location.href='|.WebGUI::URL::page().q|'"|
 			});
-	bless {	_cancel=>$cancel, _submit=>WebGUI::Form::submit(), _form=>WebGUI::Form::formHeader(), _hidden=>"", _tab=>$tabs, _css=>$css }, $class;
+	bless {	_cancel=>$cancel, _submit=>WebGUI::Form::submit(), _form=>WebGUI::Form::formHeader(), _hidden=>"", _tab=>\%tabs, _css=>$css }, $class;
 }
 
 

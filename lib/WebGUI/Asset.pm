@@ -28,7 +28,8 @@ sub addChild {
 		values (".quote($id).",".quote($self->getId).", ".quote($lineage).", 
 		'published', ".quote($properties->{className}).", ".quote($id).",
 		997995720, 9223372036854775807)");
-	foreach my $definition (@{$self->definition}) {
+	my $tempAsset = WebGUI::Asset->newByDynamicClass("new",$properties->{className});
+	foreach my $definition (@{$tempAsset->definition}) {
 		unless ($definition->{tableName} eq "asset") {
 			WebGUI::SQL->write("insert into ".$definition->{tableName}." (assetId) values (".quote($id).")");
 		}
@@ -206,6 +207,7 @@ sub getAdminConsole {
 
 sub getAssetAdderLinks {
 	my $self = shift;
+	my $addToUrl = shift;
 	my @links;
 	foreach my $class (@{$session{config}{assets}}) {
 		my $load = "use ".$class;
@@ -217,9 +219,11 @@ sub getAssetAdderLinks {
 			if ($@) {
 				WebGUI::ErrorHandler::warn("Couldn't get the name of ".$class." because ".$@);
 			} else {
+				my $url = $self->getUrl("func=add&class=".$class);
+				$url .= "&".$addToUrl if ($addToUrl);
 				push(@links, {
 					label=>$label,
-					url=>$self->getUrl("func=add&class=".$class)
+					url=>$url
 					});
 			}
 		}
@@ -234,10 +238,14 @@ sub getEditForm {
 		name=>"func",
 		value=>"editSave"
 		});
-	if ($session{form}{addNew}) {
+	if ($self->getId eq "new") {
 		$tabform->hidden({
-			name=>"addNew",
-			value=>"1"
+			name=>"assetId",
+			value=>"new"
+			});
+		$tabform->hidden({
+			name=>"class",
+			value=>$session{form}{class}
 			});
 	}
 	if ($session{form}{afterEdit}) {
@@ -549,6 +557,7 @@ sub newByDynamicClass {
 	my $class = shift;
 	my $assetId = shift;
 	my $className = shift;
+	my $overrideProperties = shift;
 	unless (defined $className) {
         	($className) = WebGUI::SQL->quickArray("select className from asset where assetId=".quote($assetId));
 	}
@@ -560,7 +569,7 @@ sub newByDynamicClass {
 	my $cmd = "use ".$className;
         eval ($cmd);
         WebGUI::ErrorHandler::fatalError("Couldn't compile asset package: ".$className.". Root cause: ".$@) if ($@);
-        my $assetObject = eval{$className->new($assetId)};
+        my $assetObject = eval{$className->new($assetId,$overrideProperties)};
         WebGUI::ErrorHandler::fatalError("Couldn't create asset instance for ".$assetId.". Root cause: ".$@) if ($@);
 	return $assetObject;
 }
@@ -733,6 +742,11 @@ sub update {
 	return 1;
 }
 
+sub www_add {
+	my $self = shift;
+	my $newAsset = WebGUI::Asset->newByDynamicClass("new",$session{form}{class},$self->get);
+	return $newAsset->www_edit();
+}
 
 sub www_copy {
 	my $self = shift;
@@ -810,8 +824,14 @@ sub www_edit {
 
 sub www_editSave {
 	my $self = shift;
+	my $object;
+	if ($session{form}{assetId} eq "new") {
+		$object = $self->addChild({className=>$session{form}{class}});	
+	} else {
+		$object = $self;
+	}
 	my %data;
-	foreach my $definition (@{$self->definition}) {
+	foreach my $definition (@{$object->definition}) {
 		foreach my $property (keys %{$definition->{properties}}) {
 			$data{$property} = WebGUI::FormProcessor::process(
 				$property,
@@ -820,9 +840,9 @@ sub www_editSave {
 				);
 		}
 	}
-	$self->update(\%data);
+	$object->update(\%data);
 	return $self->www_manageAssets if ($session{form}{afterEdit} eq "assetManager");
-	return "";
+	return $object->www_view;
 }
 
 sub www_editTree {
@@ -886,12 +906,12 @@ sub www_manageAssets {
 	$output .= "labels['properties'] = 'Properties';\n";
 	$output .= "labels['editTree'] = 'Edit Tree';\n";
 	$output .= "var manager = new AssetManager(assets,columnHeadings,labels,crumbtrail);  manager.renderAssets();\n</script>\n";
-	$output .= '<div style="font-size: 18px;">'.WebGUI::International::get(1).'
+	$output .= '<div style="font-size: 18px;">
     <div class="adminConsoleSpacer">
             &nbsp;
         </div>
 		<div style="float: left; padding-right: 30px; font-size: 14px;"><b>'.WebGUI::International::get(1083).'</b><br />';
-	foreach my $link (@{$self->getAssetAdderLinks}) {
+	foreach my $link (@{$self->getAssetAdderLinks("afterEdit=assetManager")}) {
 		$output .= '<a href="'.$link->{url}.'">'.$link->{label}.'</a><br />';
 	}
 	$output .= '</div>'; 
@@ -949,7 +969,7 @@ sub www_promote {
 sub www_setParent {
 	my $self = shift;
 	return WebGUI::Privilege::insufficient() unless $self->canEdit;
-	my $newParent = shift;
+	my $newParent = $session{form}{assetId};
 	$self->setParent($newParent) if (defined $newParent);
 	return $self->www_manageAssets();
 
