@@ -569,6 +569,16 @@ sub www_editSubmission {
                 name=>'contentType',
                 value=>[$submission->{contentType}]
                 });
+	$var{'startDate.label'} = WebGUI::International::get(497);
+	$var{'endDate.label'} = WebGUI::International::get(498);
+	$var{'startDate.form'} = WebGUI::Form::dateTime({
+		name  => 'startDate',
+		value => ($submission->{startDate} || $_[0]->get("startDate"))
+		});
+	$var{'endDate.form'} = WebGUI::Form::dateTime({
+		name  => 'endDate',
+		value => ($submission->{endDate} || $_[0]->get("endDate"))
+		});
 	$var{'form.submit'} = WebGUI::Form::submit();
 	$var{'form.footer'} = WebGUI::Form::formFooter();
 	return $_[0]->processTemplate($_[0]->get("submissionFormTemplateId"),\%var,"USS/SubmissionForm");
@@ -610,6 +620,8 @@ sub www_editSubmissionSave {
 		$hash{userDefined3} = $session{form}{userDefined3};
 		$hash{userDefined4} = $session{form}{userDefined4};
 		$hash{userDefined5} = $session{form}{userDefined5};
+		$hash{startDate} = WebGUI::DateTime::humanToEpoch($session{form}{startDate});
+		$hash{endDate} = WebGUI::DateTime::humanToEpoch($session{form}{endDate}); 
 		$hash{contentType} = $session{form}{contentType};
                 $file = WebGUI::Attachment->new("",$session{form}{wid},$session{form}{sid});
 		$file->save("image");
@@ -684,7 +696,7 @@ sub www_view {
 	$var{"submission.edit.label"} = WebGUI::International::get(27,$_[0]->get("namespace"));
 	$p = WebGUI::Paginator->new(WebGUI::URL::page('func=view&wid='.$_[0]->get("wobjectId")),$numResults);
 	$p->setDataByQuery("select USS_submissionId, content, title, userId, status, image, dateSubmitted, dateUpdated, 
-		username, contentType, forumId, userDefined1, userDefined2, userDefined3, userDefined4, userDefined5 from USS_submission 
+		username, contentType, forumId, userDefined1, userDefined2, userDefined3, userDefined4, userDefined5, startDate, endDate from USS_submission 
 		where USS_id=".quote($_[0]->get("USS_Id"))." and $constraints order by ".$_[0]->getValue("sortBy")." ".$_[0]->getValue("sortOrder"));
 	$page = $p->getPageData;
 	$i = 0;
@@ -716,6 +728,13 @@ sub www_view {
 					.moveDownIcon($quickurl.'moveSubmissionDown');
 			}
 		}
+		my $inDateRange;
+		if ($page->[$i]->{startDate} < WebGUI::DateTime::time() &&
+		    $page->[$i]->{endDate}   > WebGUI::DateTime::time())
+		{
+		  $inDateRange = 1;
+		}
+		else { $inDateRange = 0; }
                 push (@submission,{
                         "submission.id"=>$page->[$i]->{USS_submissionId},
                         "submission.url"=>WebGUI::URL::page($quickurl.'viewSubmission'),
@@ -742,7 +761,8 @@ sub www_view {
                         "submission.thirdColumn"=>(($i+1)%3==0),
                         "submission.fourthColumn"=>(($i+1)%4==0),
                         "submission.fifthColumn"=>(($i+1)%5==0),
-			'submission.controls'=>$controls
+			'submission.controls'=>$controls,
+			'submission.inDateRange'=>$inDateRange
                         });
 		$i++;
 	}

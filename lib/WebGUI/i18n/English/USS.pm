@@ -231,6 +231,10 @@ A translated text label that prompts the user to edit a particular submission.
 A loop containing each submission.
 <blockquote>
 
+<b>submission.inDateRange</b>
+A boolean value indicating whether or not the submission is within the specified date range.
+<p/>
+
 <b>submission.id</b><br/>
 A unique identifier for this submission.
 <p/>
@@ -792,6 +796,22 @@ A label for the contentType.form variable.
 
 <b>contentType.form</b><br>
 A field allowing the user to select the type of content contained in the form.body field.
+<p>
+
+<b>startDate.label</b><br>
+A label for the startDate.form variable.
+<p>
+
+<b>startDate.form</b><br>
+A field allowing the user to select the first date the submission should be visible on the USS list.
+<p>
+
+<b>endDate.label</b><br>
+A label for the endDate.form variable.
+<p>
+
+<b>endDate.form</b><br>
+A field allowing the user to select the last date the submission should be visible on the USS list.
 <p>
 
 <b>form.submit</b><br>
