@@ -20,6 +20,8 @@ QnD INSTALL INSTRUCTIONS:
    Digest::MD5
    Date::Calc
    HTML::Parser 
+   Archive::Tar
+   Compress::Zlib
    Image::Magick (optional)
    Cache::FileCache (optional)
 

@@ -135,6 +135,32 @@ if (eval { require HTML::Parser }) {
         }
 }
 
+print "Archive::Tar module ...................... ";
+if (eval { require Archive::Tar }) {
+        print "OK\n";
+} else {
+	if ($< == 0 && $os eq "Linuxish") {
+                print "Attempting to install...\n";
+                CPAN::Shell->install("Archive::Tar");
+        } else {
+                print "Please install.\n";
+		$prereq = 0;
+        }
+}
+
+print "Compress::Zlib module .................... ";
+if (eval { require Compress::Zlib }) {
+        print "OK\n";
+} else {
+	if ($< == 0 && $os eq "Linuxish") {
+                print "Attempting to install...\n";
+                CPAN::Shell->install("Compress::Zlib");
+        } else {
+                print "Please install.\n";
+		$prereq = 0;
+        }
+}
+
 print "Net::SMTP module ......................... ";
 if (eval { require Net::SMTP }) {
         print "OK\n";

@@ -19,6 +19,14 @@ save you many hours of grief.
  
 	sitename = www.mycompany.com
 
+ * You'll need to add two new Perl modules on some platforms. They are
+	Compress::Zlib and Archive::Tar.
+
+	perl -MCPAN -e shell
+	install Archive::Tar
+	install Compress:Zlib
+	exit
+
 
 5.2.0
 --------------------------------------------------------------------
