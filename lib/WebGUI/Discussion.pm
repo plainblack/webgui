@@ -211,6 +211,7 @@ sub formatHeader {
 sub formatMessage {
         my $output;
 	$output = WebGUI::HTML::filter($_[0],$_[1]);
+	$output = WebGUI::HTML::searchAndReplace($output);
 	unless ($output =~ /\<div\>/ig || $output =~ /\<br\>/ig || $output =~ /\<p\>/ig) {
 		$output =~ s/\n/\<br\>/g;
 	}

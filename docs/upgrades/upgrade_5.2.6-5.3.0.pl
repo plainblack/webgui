@@ -19,7 +19,7 @@ GetOptions(
 
 print "\tUpdating config file.\n" unless ($quiet);
 
-my $pathToConfig = '../../etc/'.$configFile;
+my $pathToConfig = '../../etc/'.$configFile; print"debug:$pathToConfig\n";
 my $conf = Parse::PlainConfig->new('DELIM' => '=', 'FILE' => $pathToConfig);
 my $macros = $conf->get("macros");
 $macros->{RootTab} = "RootTab";
@@ -41,8 +41,19 @@ foreach my $i ($wobjects) {
 	}
 }
 $conf->set("wobjects"=>$wobjects);
-$conf->write;
+$conf->set("searchAndReplace"=>{ ":)"  => "<img src='/extras/smileys/smile01.gif' align='absMiddle' border='0'>", 
+        			 ":-)" => "<img src='/extras/smileys/smile01.gif' align='absMiddle' border='0'>",
+				 ":("  => "<img src='/extras/smileys/smile02.gif' align='absMiddle' border='0'>", 
+        			 ":-(" => "<img src='/extras/smileys/smile02.gif' align='absMiddle' border='0'>",
+			         ";)"  => "<img src='/extras/smileys/smile03.gif' align='absMiddle' border='0'>",
+ 			         ";-)" => "<img src='/extras/smileys/smile03.gif' align='absMiddle' border='0'>",
+			         ":D"  => "<img src='/extras/smileys/smile04.gif' align='absMiddle' border='0'>",
+			         ":p"  => "<img src='/extras/smileys/smile09.gif' align='absMiddle' border='0'>",
+			         ":O"  => "<img src='/extras/smileys/smile11.gif' align='absMiddle' border='0'>",
+        			 "WebGUI" => "<a href='http://www.plainblack.com/webgui'>WebGUI</a>"});
 
+$conf->write;
+exit;
 
 print "\tRemoving unneeded files.\n" unless ($quiet);
 
