@@ -42,7 +42,7 @@ this.toolbar = [
     ['fontsize'],
 //    ['fontstyle'],
 //    ['linebreak'],
-    ['undo','redo','find','separator'],
+    ['undo','redo','word','find','separator'],
     ['bold','italic','underline','separator'],
     ['strikethrough','subscript','superscript','separator'],
     ['justifyleft','justifycenter','justifyright','separator'],
@@ -85,6 +85,7 @@ this.fontstyles = [     // make sure these exist in the header of page the conte
 
 this.btnList = {
     // buttonName:    commandID,               title,                onclick,                   image,             
+    "word":           ['word',                 'MS-Word cleanup', 'editor_action(this.id)',  'ed_word.gif'],
     "undo":           ['Undo',                 'Undo Ctrl+z',        'editor_action(this.id)',  'ed_undo.gif'],
     "redo":           ['Redo',                 'Redo Ctrl+y',        'editor_action(this.id)',  'ed_redo.gif'],
     "find":	      ['Find',	     	       'Find',	             'editor_action(this.id)',  'ed_find.gif'],
@@ -350,6 +351,64 @@ function editor_action(button_id) {
   else if (cmdID == 'custom3') {  // insert some text
     editor_insertHTML(objname, "It's easy to add buttons that insert text!");
   }
+  else if (cmdID == 'word') {
+  var oTags = editdoc.all.tags("SPAN");
+  if (oTags != null) {
+  for (var i = oTags.length - 1; i >= 0; i--) {
+  oTags[i].outerHTML = oTags[i].innerHTML;
+  }
+}
+
+oTags = editdoc.all.tags("FONT");
+if (oTags != null) {
+for (var i = oTags.length - 1; i >= 0; i--) {
+oTags[i].outerHTML = oTags[i].innerHTML;
+}
+}
+
+  oTags = editdoc.all.tags("P");
+  if (oTags != null) {
+  for (var i = oTags.length - 1; i >= 0; i--) {
+  cleanEmptyTag(oTags[i]);
+  }
+}
+  oTags = editdoc.all.tags("H1");
+  if (oTags != null) {
+  for (var i = oTags.length - 1; i >= 0; i--) {
+  cleanEmptyTag(oTags[i]);
+}
+}
+  oTags = editdoc.all.tags("H2");
+  if (oTags != null) {
+  for (var i = oTags.length - 1; i >= 0; i--) {
+  cleanEmptyTag(oTags[i]);
+}
+}
+  oTags = editdoc.all.tags("H3");
+  if (oTags != null) {
+  for (var i = oTags.length - 1; i >= 0; i--) {
+  cleanEmptyTag(oTags[i]);
+}
+}
+  oTags = editdoc.all.tags("H4");
+  if (oTags != null) {
+  for (var i = oTags.length - 1; i >= 0; i--) {
+  cleanEmptyTag(oTags[i]);
+}
+}
+  oTags = editdoc.all.tags("OL");
+  if (oTags != null) {
+  for (var i = oTags.length - 1; i >= 0; i--) {
+  cleanEmptyTag(oTags[i]);
+}
+}
+  oTags = editdoc.all.tags("UL");
+  if (oTags != null) {
+  for (var i = oTags.length - 1; i >= 0; i--) {
+  cleanEmptyTag(oTags[i]);              }
+}
+}
+
 
   //
   // END OF CUSTOM BUTTONS
@@ -471,6 +530,63 @@ function editor_action(button_id) {
   editor_event(objname);
 }
 
+/* ---------------------------------------------------------------------- *\
+  Function    : MS-Word clean-up
+  Description : replace textarea with wysiwyg editor
+  Usage       : editor_generate("textarea_id",[height],[width]);
+  Arguments   : objname - ID of textarea to replace
+                w       - width of wysiwyg editor
+                h       - height of wysiwyg editor
+\* ---------------------------------------------------------------------- */
+function cleanEmptyTag(oElem) {
+if (oElem.hasChildNodes) {
+var tmp = oElem
+for (var k = tmp.children.length; k >= 0; k--) {
+if (tmp.children[k] != null) {
+cleanEmptyTag(tmp.children[k]);
+}
+}
+
+}
+
+var oAttribs = oElem.attributes;
+if (oAttribs != null) {
+for (var j = oAttribs.length - 1; j >=0; j--) {
+var oAttrib = oAttribs[j];
+if (oAttrib.nodeValue != null) {
+oAttribs.removeNamedItem('class')
+}
+        }
+        }
+        oElem.style.cssText = '';
+if (oElem.innerHTML == '' || oElem.innerHTML == '&nbsp;') {
+oElem.outerHTML = '';   }
+}
+
+function cleanTable(oElem) {
+        oElem.style.cssText = '';
+        var oAttribs = oElem.attributes;
+        if (oAttribs != null) {
+                for (var j = oAttribs.length - 1; j >=0; j--) {
+                        var oAttrib = oAttribs[j];
+                        if (oAttrib.nodeValue != null) {
+                                oAttribs.removeNamedItem('class')
+                        }
+                }
+        }
+        var oTR = oElem.rows;
+        if (oTR != null) {
+                for (var r = oTR.length - 1; r >= 0; r--) {
+                        oTR[r].style.cssText = '';
+                }
+        }
+        var oTD = oElem.cells;
+        if (oTD != null) {
+                for (var t = oTD.length - 1; t >= 0; t--) {
+                        oTD[t].style.cssText = '';
+                }
+        }
+}
 /* ---------------------------------------------------------------------- *\
   Function    : editor_event
   Description : called everytime an editor event occurs
