@@ -297,6 +297,7 @@ sub www_displayAccount {
         	$output .= '<h1>'.WebGUI::International::get(61).'</h1>';
 		$f = WebGUI::HTMLForm->new;
         	$f->hidden("op","updateAccount");
+		$f->readOnly($session{user}{karma},WebGUI::International::get(537)) if ($session{setting}{useKarma});
 		if ($session{user}{authMethod} eq "LDAP" && $session{setting}{usernameBinding}) {
 			$f->hidden("username",$session{user}{username});
         		$f->readOnly($session{user}{username},WebGUI::International::get(50));
