@@ -81,8 +81,8 @@ sub _recursivelyChangeProperties {
 
 	_changeWobjectPrivileges($page->get("pageId")) unless $session{form}{wobjectPrivileges};
 
-	$page->walk_down({
-		callback => sub {
+	$page->traversePreOrder(
+		sub {
 			$currentPage = shift;
 			if (WebGUI::Page::canEdit($currentPage->get('pageId'))) {
 				$currentPage->setWithoutRecache({
@@ -99,9 +99,9 @@ sub _recursivelyChangeProperties {
 			}
 			return 1;
 		}
-	});
+	);
 	
-	WebGUI::Page->recachePageTree;
+	WebGUI::Page->recacheNavigation;
 }
 
 #-------------------------------------------------------------------
@@ -194,10 +194,10 @@ sub _traversePageTree {
 
 	tie %wobject, 'Tie::CPHash';
         $spacer = '<img src="'.$session{config}{extrasURL}.'/spacer.gif" width=12>';
-	
 	$page = WebGUI::Page->getPage($top);
-	$page->walk_down({
-		callback => sub {
+
+	$page->traversePreOrder(
+		sub {
 			($currentPage, $options) = @_;
 			$currentPageId = $currentPage->get('pageId');
 			$currentUrlizedTitle = $currentPage->get('urlizedTitle');
@@ -221,9 +221,8 @@ sub _traversePageTree {
 				}
 				$wobjects->finish;
 			}
-		},
-		_depth => $initialDepth || 0
-	});
+		}
+	);
                 
         return $output;
 }
@@ -614,7 +613,8 @@ Moves page down in the context of it's sisters.
 =cut
 sub www_movePageDown {
   if (WebGUI::Page::canEdit($session{page}{pageId})) {
-    WebGUI::Page->moveDown($session{page}{pageId});
+    my $page = WebGUI::Page->getPage;
+    $page->moveRight;
     return "";
   } else {
     return WebGUI::Privilege::insufficient();
@@ -631,7 +631,8 @@ Moves page up in the context of it's sisters.
 =cut
 sub www_movePageUp {
   if (WebGUI::Page::canEdit($session{page}{pageId})) {
-    WebGUI::Page->moveUp($session{page}{pageId});
+    my $page = WebGUI::Page->getPage;
+    $page->moveLeft;
     return "";
   } else {
     return WebGUI::Privilege::insufficient();
@@ -647,8 +648,8 @@ Same as www_movePageUp wit this difference that this module returns the www_view
 
 =cut
 sub www_moveTreePageUp {
-  if (WebGUI::Page::canEdit($session{page}{pageId})) {
-    WebGUI::Page->moveUp($session{page}{pageId});
+  if (WebGUI::Page::canEdit($session{form}{pageId})) {
+    WebGUI::Page->getPage($session{form}{pageId})->moveLeft;
     return www_viewPageTree();
   } else {
     return WebGUI::Privilege::insufficient();
@@ -664,8 +665,8 @@ Same as www_movePageDown with this difference that this module returns the www_v
 
 =cut
 sub www_moveTreePageDown {
-  if (WebGUI::Page::canEdit($session{page}{pageId})) {
-    WebGUI::Page->moveDown($session{page}{pageId});
+  if (WebGUI::Page::canEdit($session{form}{pageId})) {
+    WebGUI::Page->getPage($session{form}{pageId})->moveRight;
     return www_viewPageTree();
   } else {
     return WebGUI::Privilege::insufficient();
@@ -682,8 +683,8 @@ Another way to look at is that the mother of the current page becomes the elder 
 
 =cut
 sub www_moveTreePageLeft {
-  if (WebGUI::Page::canEdit($session{page}{pageId})) {
-    WebGUI::Page->moveLeft($session{page}{pageId});
+  if (WebGUI::Page::canEdit($session{form}{pageId})) {
+    WebGUI::Page->getPage($session{form}{pageId})->moveUp;
     return www_viewPageTree();
   } else {
     return WebGUI::Privilege::insufficient();
@@ -692,8 +693,8 @@ sub www_moveTreePageLeft {
 
 #-------------------------------------------------------------------
 sub www_moveTreePageRight {
-  if (WebGUI::Page::canEdit($session{page}{pageId})) {
-    WebGUI::Page->moveRight($session{page}{pageId});
+  if (WebGUI::Page::canEdit($session{form}{pageId})) {
+    WebGUI::Page->getPage($session{form}{pageId})->moveDown;
     return www_viewPageTree();
   } else {
     return WebGUI::Privilege::insufficient();

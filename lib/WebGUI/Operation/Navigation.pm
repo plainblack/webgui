@@ -29,6 +29,7 @@ use WebGUI::SQL;
 use WebGUI::URL;
 use WebGUI::Utility;
 use WebGUI::TabForm;
+use WebGUI::Cache;
 
 our @ISA = qw(Exporter);
 our @EXPORT = qw(&www_listNavigation &www_editNavigation &www_editNavigationSave &www_copyNavigation
@@ -90,6 +91,9 @@ sub www_deleteNavigationConfirm {
                 return WebGUI::Privilege::vitalComponent();
         }
 	WebGUI::SQL->write("delete from Navigation where navigationId = $session{form}{navigationId}");
+
+	# Also delete cache
+	WebGUI::Cache->new("", "Navigation-".$session{config}{configFile})->deleteByRegex("m/^$session{form}{navigationId}-/");
 	return www_listNavigation();
 }
 
@@ -270,6 +274,9 @@ sub www_editNavigationSave {
 						  identifier  = ".quote($session{form}{identifier}).",
 						  reverse     = ".quote($session{form}{'reverse'})."
 				where navigationId = $session{form}{navigationId}"); 
+	# Delete from cache
+	WebGUI::Cache->new("", "Navigation-".$session{config}{configFile})->deleteByRegex("m/^$session{form}{navigationId}-/");
+	
 	return www_listNavigation();  
 }
 
@@ -336,6 +343,10 @@ sub www_previewNavigation {
 		</font>
 		</td><td class="tableData" valign="top">
 		) . $nav->build . qq(</td></tr></table>);
+	
+	# Because of the way the system is set up, the preview is cached. So let's remove it again...
+	WebGUI::Cache->new($nav->{_identifier}."$session{page}{pageId}", "Navigation-".$session{config}{configFile})->delete;
+	
 	return $output; 
 }
 

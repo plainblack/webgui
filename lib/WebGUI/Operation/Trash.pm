@@ -53,11 +53,11 @@ sub _purgeUserTrash {
 
         # Delete pages and all subpages
 	$page = WebGUI::Page->getPage(3);
-	foreach $currentPage ($page->daughters) {
-		print "page: ".$currentPage->get('menuTitle')." - UID: ".$currentPage->get('bufferUserId')."\n\n\n<br>";
+	foreach ($page->daughters) {
+		$currentPage = WebGUI::Page->new($_);
 		if ($currentPage->get('bufferUserId') == $userId) {
 			foreach $currentWobjectPage ($currentPage->self_and_descendants) {
-				_purgeWobjects($currentWobjectPage->get('pageId'));
+				_purgeWobjects($currentWobjectPage->{'pageId'});
 			}
 			$currentPage->purge;
 		}
@@ -209,7 +209,7 @@ sub www_deleteTrashItemConfirm {
 		}
 		
 		foreach my $currentPage ($page->self_and_descendants) {
-			_purgeWobjects($currentPage->get("pageId"));
+			_purgeWobjects($currentPage->{"pageId"});
 		}
 
 		$page->purge;
@@ -254,11 +254,12 @@ sub www_emptyTrashConfirm {
 	}
 	if ($allUsers eq "1") {
 		$page = WebGUI::Page->getPage(3);
-		foreach $currentPage ($page->daughters) {
+		foreach ($page->daughters) {
+			$currentPage = WebGUI::Page->new($_);
 			foreach $currentWobjectPage ($currentPage->self_and_descendants) {
-				_purgeWobjects($currentPage->get("pageId"));
+				_purgeWobjects($currentWobjectPage->{"pageId"});
 			}
-			$page->purge;
+			$currentPage->purge;
 		}
 		_purgeWobjects(3);
         	WebGUI::ErrorHandler::audit("emptied system trash");

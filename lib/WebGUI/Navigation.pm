@@ -96,62 +96,43 @@ sub _levels {
         %levels = (     'root' => {
                                 name => WebGUI::International::get(1,'Navigation'),
                                 handler => sub {
-                                                return WebGUI::Page->getPage()->root;
+                                                return WebGUI::Page->getAnonymousRoot;
                                         },
                                 },
                         'WebGUIroot' => {
                                 name => WebGUI::International::get(2,'Navigation'),
                                 handler => sub {
-                                                my $p = WebGUI::Page->getPage;
-                                                my @ancestors = reverse $p->ancestors;
-                                                if(scalar(@ancestors) == 1) { # I am WebGUI root. I have one ancestor, which
-                                                        return $p;             # is nameless root. Return myself
-                                                } elsif(scalar(@ancestors) > 1) { # I am a page under WebGUI root.
-                                                        return $ancestors[1];     # 1st element of ancestors is WebGUI root
-                                                } else {
-                                                        return undef;         # huh ? No root ???
-                                                }
+						return WebGUI::Page->getWebGUIRoot;
                                         },
                                 },
                         'top' => {
                                 name => WebGUI::International::get(3,'Navigation'),
                                 handler => sub {
-                                                my $p = WebGUI::Page->getPage;
-                                                my @ancestors = reverse $p->ancestors;
-                                                if(scalar(@ancestors) == 2) {   # I am top, my ancestors are nameless root
-                                                        return $p;              # and my WebGUI root. Return myself.
-                                                } elsif(scalar(@ancestors) > 2) { # I am a page under top, so return the
-                                                        return $ancestors[2];     # 2nd element of ancestors is top.
-                                                } else {                        # No top page or I am root.
-                                                        return ($p->daughters)[0]; # 1st element
-                                                }
+						return WebGUI::Page->getTop;
                                         },
                                 },
                         'grandmother' => {
                                 name => WebGUI::International::get(4,'Navigation'),
                                 handler => sub {
-                                                my $p = WebGUI::Page->getPage();
-                                                return $p->mother->mother;
+                                                return WebGUI::Page->getGrandmother;
                                         },
                                 },
                         'mother' => {
                                 name => WebGUI::International::get(5,'Navigation'),
                                 handler => sub {
-                                                my $p = WebGUI::Page->getPage();
-                                                return $p->mother;
+                                                return WebGUI::Page->getMother;
                                         },
                                 },
                         'current' => {
                                 name => WebGUI::International::get(6,'Navigation'),
                                 handler => sub {
-                                                return WebGUI::Page->getPage();
+                                                return WebGUI::Page->getPage;
                                         },
                                 },
                         'daughter' => {
                                 name => WebGUI::International::get(7,'Navigation'),
                                 handler => sub {
-                                                my $p = WebGUI::Page->getPage;
-                                                return ($p->daughters)[0]; # 1st daughter
+						return WebGUI::Page->getFirstDaughter;
                                         },
                                 },
                 );
@@ -241,102 +222,128 @@ sub build {
 	my $var = {'page_loop' => []};
 	my $p = $self->_getStartPageObject();
 	my $method = $self->_methods()->{$self->{_method}}{method};
-	my @pages = eval $method;
-	if ($@) {
-		WebGUI::ErrorHandler::warn("Error in WebGUI::Navigation::build while trying to execute $method".$@);
-	}
 
-	# Store current page properties in template var
-	my $currentPage = WebGUI::Page->getPage();
-	foreach my $property (@interestingPageProperties) {
-		$var->{'page.current.'.$property} = $currentPage->get($property);
-	}
+	my $cache = WebGUI::Cache->new($self->{_identifier}.'-'.$session{page}{pageId}, "Navigation-".$session{config}{configFile});
+	my $cacheContent = $cache->get;
 
-	if (@pages) {
-		my $startPageDepth = ($p->ancestors);
-		my $maxDepth = $startPageDepth + $self->{_depth};
-		my $minDepth = $startPageDepth - $self->{_depth};
-
-		foreach my $page (@pages) {
-			my $pageData = {};
-
-			# Initial page info
-                        $pageData->{"page.url"} = WebGUI::URL::gateway($page->get('urlizedTitle'));
-                        $pageData->{"page.absDepth"} = scalar($page->ancestors);
-                        $pageData->{"page.relDepth"} = $pageData->{"page.absDepth"} - $startPageDepth;
-                        $pageData->{"page.isCurrent"} = ($page->get('pageId') == $session{page}{pageId});
-			$pageData->{"page.isHidden"} = $page->get('hideFromNavigation');
-			$pageData->{"page.isSystem"} = (($page->get('pageId') < 1000 && $page->get('pageId') > 1) || 
-							$page->get('pageId') == 0);
-			$pageData->{"page.isViewable"} = WebGUI::Page::canView($page->get('pageId'));
-
-			# indent
-			my $indent = 0;
-			if ($self->{_method} eq 'pedigree' 	# reverse traversing 
-			    || $self->{_method} eq 'ancestors' 		# needs another way to calculate
-			    || $self->{_method} eq 'self_and_ancestors') {	# the indent
-				if ($self->{_stopAtLevel} <= $startPageDepth && $self->{_stopAtLevel} > 0) {
-					$indent = $pageData->{"page.absDepth"} - ($self->{_stopAtLevel} - 1) - 1;
-				} elsif ($self->{_stopAtLevel} > $startPageDepth && $self->{_stopAtLevel} > 0) {
-					$indent = 0;
-				} else {
-					$indent = $pageData->{"page.absDepth"} - 1;
-				}
-			} else {
-				$indent = $pageData->{"page.absDepth"} - $startPageDepth - 1;
-			}
-			$pageData->{"page.indent_loop"} = [];
-			push(@{$pageData->{"page.indent_loop"}},{'indent'=>$_}) for(1..$indent);
-                        $pageData->{"page.indent"} = "&nbsp;&nbsp;&nbsp;" x $indent;
-
-			# Check if in depth range
-			next if ($pageData->{"page.absDepth"} > $maxDepth || $pageData->{"page.absDepth"} < $minDepth);
+	my @page_loop;
 	
-			# Check stopAtLevel
-			next if ($pageData->{"page.absDepth"} < $self->{_stopAtLevel});
+	unless (defined $cacheContent) {
+		# The loop was not cached
+		my @pages = eval $method;
+		if ($@) {
+			WebGUI::ErrorHandler::warn("Error in WebGUI::Navigation::build while trying to execute $method".$@);
+		}
 
-			# Check showSystemPages
-			next if (! $self->{_showSystemPages} && $pageData->{"page.isSystem"}); 
+		# Store current page properties in template var
+		my $currentPage = WebGUI::Page->getPage();
+		foreach my $property (@interestingPageProperties) {
+			$var->{'page.current.'.$property} = $currentPage->get($property);
+		}
+
+		if (@pages) {
+			my $startPageDepth = ($p->ancestors);
+			my $maxDepth = $startPageDepth + $self->{_depth};
+			my $minDepth = $startPageDepth - $self->{_depth};
+
+			foreach my $page (@pages) {
+				my $pageData = {};
+
+				# Initial page info
+				$pageData->{"page.url"} = WebGUI::URL::gateway($page->{'urlizedTitle'});
+				$pageData->{"page.absDepth"} = $page->{'depth'} + 1;
+				$pageData->{"page.relDepth"} = $pageData->{"page.absDepth"} - $startPageDepth;
+				$pageData->{"page.isCurrent"} = ($page->{'pageId'} == $session{page}{pageId});
+				$pageData->{"page.isHidden"} = $page->{'hideFromNavigation'};
+				$pageData->{"page.isSystem"} = (($page->{'pageId'} < 1000 && $page->{'pageId'} > 1) || 
+							$page->{'pageId'} == 0);
+				
+				# indent
+				my $indent = 0;
+				if ($self->{_method} eq 'pedigree' 	# reverse traversing 
+				    || $self->{_method} eq 'ancestors' 		# needs another way to calculate
+				    || $self->{_method} eq 'self_and_ancestors') {	# the indent
+					if ($self->{_stopAtLevel} <= $startPageDepth && $self->{_stopAtLevel} > 0) {
+						$indent = $pageData->{"page.absDepth"} - ($self->{_stopAtLevel} - 1) - 1;
+					} elsif ($self->{_stopAtLevel} > $startPageDepth && $self->{_stopAtLevel} > 0) {
+						$indent = 0;
+					} else {
+						$indent = $pageData->{"page.absDepth"} - 1;
+					}
+				} else {
+					$indent = $pageData->{"page.absDepth"} - $startPageDepth - 1;
+				}
+				$pageData->{"page.indent_loop"} = [];
+				push(@{$pageData->{"page.indent_loop"}},{'indent'=>$_}) for(1..$indent);
+				$pageData->{"page.indent"} = "&nbsp;&nbsp;&nbsp;" x $indent;
+
+				# Check if in depth range
+				next if ($pageData->{"page.absDepth"} > $maxDepth || $pageData->{"page.absDepth"} < $minDepth);
+				
+				# Check stopAtLevel
+				next if ($pageData->{"page.absDepth"} < $self->{_stopAtLevel});
+
+				# Check showSystemPages
+				next if (! $self->{_showSystemPages} && $pageData->{"page.isSystem"}); 
 			
-			# Check privileges
-			next if (! $pageData->{"page.isViewable"} && ! $self->{_showUnprivilegedPages});
+				# Deal with hidden pages
+				next if($page->{'hideFromNavigation'} && ! $self->{_showHiddenPages});
 
-			# Deal with hidden pages
-			next if($page->get('hideFromNavigation') && ! $self->{_showHiddenPages});
+				# Put page properties in $pageData hashref
+				foreach my $property (@interestingPageProperties) {
+					$pageData->{"page.".$property} = $page->{$property};
+				}
+				$pageData->{"page.isRoot"} = (! $page->{'parentId'});
+				$pageData->{"page.isTop"} = ($pageData->{"page.absDepth"} == 2);
+				$pageData->{"page.hasDaughter"} = ($page->{'rgt'} - $page->{'lft'} > 1);
+				$pageData->{"page.isMyDaughter"} = ($page->{'parentId'} == 
+									$currentPage->get('pageId'));
+				$pageData->{"page.isMyMother"} = ($page->{'pageId'} ==
+									$currentPage->get('parentId'));
+				$pageData->{"page.inCurrentRoot"} = 
+					(($page->{'lft'} > $currentPage->get('lft')) && ($page->{'rgt'} < $currentPage->get('rgt'))) ||
+					(($page->{'lft'} < $currentPage->get('lft')) && ($page->{'rgt'} > $currentPage->get('rgt')));
+				# Some information about my mother
+				if ($page->{parentId} > 0) {
+					my $mother = WebGUI::Page->getPage($page->{parentId});
+					foreach (qw(title urlizedTitle parentId pageId)) {
+						$pageData->{"page.mother.$_"} = $mother->get($_);
+					}
+				}
+				# Some information about my depth
+				$pageData->{"page.depthIs".$pageData->{"page.absDepth"}} = 1;
+				$pageData->{"page.relativeDepthIs".$pageData->{"page.absDepth"}} = 1;
 
-			# Put page properties in $pageData hashref
-			foreach my $property (@interestingPageProperties) {
-				$pageData->{"page.".$property} = $page->get($property);
-			}
-			$pageData->{"page.isRoot"} = (! $page->get('parentId'));
-			$pageData->{"page.isTop"} = ($pageData->{"page.absDepth"} == 2);
-			$pageData->{"page.hasDaughter"} = scalar($page->daughters);
-			$pageData->{"page.isMyDaughter"} = ($page->get('parentId') == 
-								$currentPage->get('pageId'));
-			$pageData->{"page.isMyMother"} = ($page->get('pageId') ==
-                                                                $currentPage->get('parentId'));
-
-			# Some information about my mother
-			if(ref($page->mother)) {
-				foreach (qw(title urlizedTitle parentId pageId)) {
-					$pageData->{"page.mother.$_"} = $page->mother->get($_);
+				# Store $pageData in page_loop. Mind the order.
+				if ($self->{_reverse}) {
+					unshift(@page_loop, $pageData);
+				} else {
+				
+					push(@page_loop, $pageData);
 				}
 			}
-			# Some information about my depth
-			$pageData->{"page.depthIs".$pageData->{"page.absDepth"}} = 1;
-			$pageData->{"page.relativeDepthIs".$pageData->{"page.absDepth"}} = 1;
+		}
 
-			# Store $pageData in page_loop. Mind the order.
-			if ($self->{_reverse}) {
-				unshift(@{$var->{page_loop}}, $pageData);
-			} else {
-				push(@{$var->{page_loop}}, $pageData);
-			}
+		# We had a cache miss, so let's put the data in cache
+		$cache->set(\@page_loop, 3600*24);
+	} else {
+		# We had a cache hit
+		@page_loop = @{$cacheContent};
+	}
+	
+	# Do the user-dependent checks (which cannot be cached globally)
+	foreach my $pageData (@page_loop) {
+		$pageData->{"page.isViewable"} = WebGUI::Page::canView($pageData->{'pageId'});
+
+		# Check privileges
+		unless (! $pageData->{"page.isViewable"} && ! $self->{_showUnprivilegedPages}) {
+			push (@{$var->{page_loop}}, $pageData);
 		}
 	}
 
 	# Configure button
 	$var->{'config.button'} = $self->_getEditButton();
+	
 	if ($self->{_template}) {
 		return WebGUI::Template::processRaw($self->{_template}, $var);
 	} else {

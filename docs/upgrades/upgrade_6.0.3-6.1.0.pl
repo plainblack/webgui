@@ -75,6 +75,54 @@ foreach my $key (keys %{$langs}) {
 	WebGUI::SQL->write("update page set languageId=".quote($langs->{$key})." where languageId=".$key);
 }
 
+print "\tConverting page tree to the Nested Set model.\n";
+sub walk_down {
+	my($pageId, $o) = @_[0,1];
+
+	my $callback = $o->{callback};
+	my $callbackback = $o->{callbackback};
+	my $callback_status = 1;
+
+	$callback_status = &{ $callback }( $pageId, $o ) if $callback;
+	if($callback_status) {
+		# Keep recursing unless callback returned false... and if there's
+		# anything to recurse into, of course.
+		my @daughters = WebGUI::SQL->buildArray("select pageId from page where parentId=$pageId and pageId != 0");
+		if(@daughters) {
+			$o->{'_depth'} += 1;
+			foreach my $one (@daughters) {
+				walk_down($one, $o);
+			}
+			$o->{'_depth'} -= 1;
+		}
+		if($callbackback){
+			scalar( &{ $callbackback }( $pageId, $o ) );
+		}
+	}
+	return;
+}
+
+my $counter = 0;
+
+WebGUI::SQL->write("alter table page add column (lft int(11))");
+WebGUI::SQL->write("alter table page add column (rgt int(11))");
+WebGUI::SQL->write("alter table page add column (id int(11))");
+WebGUI::SQL->write("alter table page add column (depth int(3))");
+WebGUI::SQL->write("insert into page (pageId, parentId) values (0, -1)");
+WebGUI::SQL->write("update page set id=pageId");
+walk_down(0, {
+	callback => sub {
+		WebGUI::SQL->write("update page set depth=".($_[1]->{_depth}-1).", lft=$counter where pageId=".$_[0]);
+		$counter++;
+		return 1;
+	},
+	callbackback => sub {
+		WebGUI::SQL->write("update page set rgt=$counter where pageId=".$_[0]);
+		$counter++;
+		return 1;
+	}
+});
+
 WebGUI::Session::close();
 
 
