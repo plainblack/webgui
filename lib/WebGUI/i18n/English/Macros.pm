@@ -20,7 +20,7 @@ our $I18N = {
 ##Get list of all macros by namespace/module name
 my $dir = join $session{os}{slash}, $session{config}{webguiRoot},"lib","WebGUI","Macro";
 opendir (DIR,$dir) or WebGUI::ErrorHandler::fatal("Can't open Macro directory: $dir!");
-my @macros = map { s/\.pm//; $_; }
+my @macros = map { s/Macro_//; s/\.pm//; $_; }
              grep { /\.pm$/ }
              readdir(DIR);  ##list of namespaces
 closedir(DIR);
