@@ -570,17 +570,7 @@ sub www_view {
 			." and ((userId=$session{user}{userId} and userId<>1) or (userId=1 and 
 			ipAddress='$session{env}{REMOTE_ADDR}')) order by dateOfResponse desc");
 		$questionOrder = $_[0]->get("questionOrder");
-		unless ($previousResponse) {
-			if ($questionOrder eq "random") {
-				my @questions = WebGUI::SQL->buildArray("select Survey_questionId from Survey_question
-					where Survey_id=".$_[0]->get("Survey_id"));
-				$question = $_[0]->getCollateral("Survey_question","Survey_questionId",
-					$questions[rand($#questions+1)]);
-			} else {
-				$question = WebGUI::SQL->quickHashRef("select * from Survey_question
-					where Survey_id=".$_[0]->get("Survey_id")." order by sequenceNumber");
-			}
-		} else {
+		if ($previousResponse->{Survey_questionId}) {
 			if ($questionOrder eq "random") {
 				my @questions = WebGUI::SQL->buildArray("select Survey_questionId from Survey_response
 					where Survey_id=".$_[0]->get("Survey_id")." and ((userId=$session{user}{userId} 
@@ -612,6 +602,19 @@ sub www_view {
 					.$_[0]->get("Survey_id")." and sequenceNumber>".$previousQuestion->{sequenceNumber}
 					." order by sequenceNumber");
 			}
+		} else {
+                        if ($questionOrder eq "random") {
+                                my @questions = WebGUI::SQL->buildArray("select Survey_questionId from Survey_question
+                                        where Survey_id=".$_[0]->get("Survey_id"));
+                                $question = $_[0]->getCollateral("Survey_question","Survey_questionId",
+                                        $questions[rand($#questions+1)]);
+				if ($question->{Survey_questionId} eq "new") {
+					delete $question->{Survey_questionId};
+				}
+                        } else {
+                                $question = WebGUI::SQL->quickHashRef("select * from Survey_question
+                                        where Survey_id=".$_[0]->get("Survey_id")." order by sequenceNumber");
+                        }
 		}
 		if ($question->{Survey_questionId}) {
 			$output .= $question->{question};
