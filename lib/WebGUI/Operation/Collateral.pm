@@ -575,7 +575,7 @@ sub www_htmlAreaviewCollateral {
 	my($output, $collateral, $file, $x, $y, $image, $error);
         $session{page}{makePrintable}=1; $session{page}{printableStyleId}=10;
         $output .= '<table align="center" border="0" cellspacing="0" cellpadding="2" width="100%" height="100%">';
-	if($session{form}{cid} == 0 || ! WebGUI::Grouping::isInGroup(4)) {
+	if($session{form}{cid} eq "" || ! WebGUI::Grouping::isInGroup(4)) {
 		$output .= '<tr><td align="center" valign="middle" width="100%" height="100%">';
 		$output .= '<p align="center"><br><img src="'.$session{config}{extrasURL}.'/htmlArea/images/icon.gif" 
 			    border="0"></p>';
