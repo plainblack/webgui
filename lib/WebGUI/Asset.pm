@@ -42,7 +42,10 @@ Package to manipulate items in WebGUI's asset system. Replaces Collateral.
 
 =head1 SYNOPSIS
 
-A lineage is a concatonated series of sequence numbers, each six digits long, that explain an asset's position in its familiy tree. Lineage describes who the asset's anscestors are, how many ancestors the asset has in its family tree (lineage length), and the asset's position (rank) amongst its siblings. In addition, lineage provides enough information about an asset to generate a list of its siblings and descendants quite easily.
+An asset is the basic class of content in WebGUI. This handles security, urls, and other basic information common to all content items.
+
+
+A lineage is a concatenated series of sequence numbers, each six digits long, that explain an asset's position in its familiy tree. Lineage describes who the asset's anscestors are, how many ancestors the asset has in its family tree (lineage length), and the asset's position (rank) amongst its siblings. In addition, lineage provides enough information about an asset to generate a list of its siblings and descendants.
  
 
  use WebGUI::Asset;
@@ -87,12 +90,14 @@ A lineage is a concatonated series of sequence numbers, each six digits long, th
  processPropertiesFromFormPost
  promote
  purge
+ purgetree
  setParent
  setRank
  setSize
  swapRank
  trash
  update
+ updateHistory
  view
  www_add
  www_copy
@@ -106,7 +111,11 @@ A lineage is a concatonated series of sequence numbers, each six digits long, th
  www_editSave
  www_editTree (NYI)
  www_editTreeSave (NYI)
+ www_emptyClipboard
+ www_emptyTrash
  www_manageAssets
+ www_manageClipboard
+ www_manageTrash
  www_paste
  www_pasteList
  www_promote
@@ -124,15 +133,11 @@ These methods are available from this class:
 
 =head2 addChild ( properties )
 
-Adds a child asset to a parent. 
-Creates a new AssetID for child.
-Makes the parent know that it has children. 
-Adds a new asset to the asset table.
+Adds a child asset to a parent. Creates a new AssetID for child. Makes the parent know that it has children. Adds a new asset to the asset table. Returns the newly created Asset.
 
 =head3 properties
 
-A hash reference containing a list of properties to associate with the child.
-The only used property value is "className"
+A hash reference containing a list of properties to associate with the child. The only used property value is "className"
 
 =cut
 
@@ -165,9 +170,7 @@ sub addChild {
 
 =head2 canEdit ( [userId] )
 
-Verifies group and user permissions to be able to edit asset.
-Returns 1 if owner is userId, otherwise returns the result checking if the 
-user is a member of the group that can edit.
+Verifies group and user permissions to be able to edit asset. Returns 1 if owner is userId, otherwise returns the result checking if the user is a member of the group that can edit.
 
 =head3 userId
 
@@ -187,14 +190,9 @@ sub canEdit {
 
 =head2 canView ( [userId] )
 
-Verifies group and user permissions to be able to view asset.
-Returns 1 if user is owner of asset. 
-Returns 1 if within the visibility date range of the asset AND user
-in the View group of asset.
-Otherwise, returns the result of the canEdit.
+Verifies group and user permissions to be able to view asset. Returns 1 if user is owner of asset. Returns 1 if within the visibility date range of the asset AND user in the View group of asset. Otherwise, returns the result of the canEdit.
 
-Only the owner and the editors can always see the asset, 
-regardless of time/date restrictions on the asset.
+Only the owner and the editors can always see the asset, regardless of time/date restrictions on the asset.
 
 =head3 userId
 
@@ -245,8 +243,7 @@ sub cascadeLineage {
 
 =head2 cut ( )
 
-Removes asset from lineage, places it in clipboard state. The "gap" in the
-lineage is changed in state to limbo.
+Removes asset from lineage, places it in clipboard state. The "gap" in the lineage is changed in state to limbo.
 
 =cut
 
@@ -264,8 +261,7 @@ sub cut {
 
 =head2 definition ( [ definition ] )
 
-Basic definition of an Asset. Properties, default values. 
-Returns the definition containing tableName,className,properties
+Basic definition of an Asset. Properties, default values. Returns the definition containing tableName,className,properties
 
 =head3 definition
 
@@ -365,10 +361,7 @@ sub DESTROY {
 
 =head2 duplicate ( )
 
-Duplicates an argument.
-
-Calls addChild with itself as an argument.
-Returns $newAsset;
+Duplicates an argument. Calls addChild with itself as an argument. Returns a new Asset object.
 
 =cut
 
@@ -412,11 +405,11 @@ sub fixUrl {
 
 =head2 formatRank ( value )
 
-Returns the lineage as six digits with leading zeros.
+Returns a rank as six digits with leading zeros.
 
 =head3 value
 
-An integer up to 6 digits. Primarily for lineage.
+An integer up to 6 digits. Would normally be one section (rank) of a lineage.
 
 =cut
 
@@ -434,9 +427,7 @@ Returns a reference to a list of properties (or specified property) of an Asset.
 
 =head3 propertyName
 
-Any of the values associated with the properties of an Asset.
-Default choices are "title", "menutTitle", "synopsis", "url", "groupIdEdit",
-"groupIdView", "ownerUserId", "startDate", "endDate",  and "assetSize".
+Any of the values associated with the properties of an Asset. Default choices are "title", "menutTitle", "synopsis", "url", "groupIdEdit", "groupIdView", "ownerUserId", "startDate", "endDate",  and "assetSize".
 
 =cut
 
@@ -472,14 +463,11 @@ sub getAdminConsole {
 
 =head2 getAssetAdderLinks ( [addToUrl] )
 
-Returns an array that contains a label (name of the class of Asset) and url 
-(url link to function to add the class).
+Returns an array that contains a label (name of the class of Asset) and url (url link to function to add the class).
 
 =head3 addToUrl
 
-Any text to append to the getAssetAdderLinks URL. Usually another variable to
-pass in the url. If addToURL is specified, the character & and the text in 
-addToUrl is appended to the returned url.
+Any text to append to the getAssetAdderLinks URL. Usually another variable to pass in the url. If addToURL is specified, the character & and the text in addToUrl is appended to the returned url.
 
 =cut
 
@@ -514,6 +502,14 @@ sub getAssetAdderLinks {
 	}
 	return \@links;
 }
+
+#-------------------------------------------------------------------
+
+=head2 getAssetManagerControl ( children )
+
+
+
+=cut
 
 sub getAssetManagerControl {
 	my $self = shift;
@@ -916,7 +912,7 @@ sub getName {
 
 =head2 getNextChildRank ( )
 
-Returns a formatted 6 digit number of the next rank a child will get.
+Returns a 6 digit number with leading zeros of the next rank a child will get.
 
 =cut
 
@@ -970,11 +966,11 @@ sub getParentLineage {
 
 =head2 getRank ( [lineage] )
 
-Returns the rank of current Asset.
+Returns the rank of current Asset by returning the last six digit-entry of a lineage without leading zeros (may return less than 6 digits).
 
 =head3 lineage
 
-Optional lineage of another Asset.
+Optional specified lineage. 
 
 =cut
 
@@ -1075,7 +1071,7 @@ sub getValue {
 
 =head2 hasChildren ( )
 
-Returns 1 or the count of Assets with the same parentId as current Asset. 
+Returns 1 or the count of Assets with the same parentId as current Asset (Which may be zero).
 
 =cut
 
