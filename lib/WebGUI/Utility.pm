@@ -307,69 +307,58 @@ sub round {
 
 #-------------------------------------------------------------------
 
-=head2 sortHash ( hashRef )
+=head2 sortHash ( hash )
 
-Sorts a hash by its values. Returns a hash reference.
-
-TIP: This subroutine can screw up your hash if the values aren't all unique.
+Sorts a hash by its values. Returns a hash.
 
 =over
 
-=item hashRef
+=item hash
 
-A reference to the hash to be sorted.
+A hash to be sorted.
 
 =back
 
 =cut
 
 sub sortHash {
-	my (%hash, %reversedHash, %newHash, $key);
+	my ( %hash, %newHash );
 	tie %hash, "Tie::IxHash";
-	tie %reversedHash, "Tie::IxHash";
 	tie %newHash, "Tie::IxHash";
-        %hash = @_;
-	%reversedHash = reverse %hash;
-	foreach $key (sort {$b cmp $a} keys %reversedHash) {
-        	$newHash{$key}=$reversedHash{$key};
-	}
-	%reversedHash = reverse %newHash;
-        return %reversedHash;
+	%hash = @_;
+	for my $key ( sort { $hash{$a} cmp $hash{$b} } keys %hash ) {
+    		$newHash{ $key } = $hash{ $key };
+  	}
+  	return %newHash;
 }
 
 #-------------------------------------------------------------------
 
-=head2 sortHashDecending 
+=head2 sortHashDecending ( hash )
 
-Sorts a hash in decending order by its values. Returns a hash reference.
-
-TIP: This subroutine can screw up your hash if the values aren't all unique.
+Sorts a hash in decending order by its values. Returns a hash.
 
 =over
 
-=item hashRef
+=item hash
 
-A reference to the hash to be sorted.
+A hash to be sorted.
 
 =back
 
 =cut
 
+
 sub sortHashDescending {
-        my (%hash, %reversedHash, %newHash, $key);
-        tie %hash, "Tie::IxHash";
-        tie %reversedHash, "Tie::IxHash";
-        tie %newHash, "Tie::IxHash";
-        %hash = @_;
-        %reversedHash = reverse %hash;
-        foreach $key (sort {$a cmp $b} keys %reversedHash) {
-                $newHash{$key}=$reversedHash{$key};
-        }
-        %reversedHash = reverse %newHash;
-        return %reversedHash;
+	my ( %hash, %newHash );
+  	tie %hash, "Tie::IxHash";
+  	tie %newHash, "Tie::IxHash";
+  	%hash = @_;
+  	for my $key ( sort { $hash{$b} cmp $hash{$a} } keys %hash ) {
+    		$newHash{ $key } = $hash{ $key };
+  	}
+ 	return %newHash;
 }
-
-
 
 1;
 
