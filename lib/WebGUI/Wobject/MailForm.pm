@@ -456,11 +456,12 @@ sub _createField {
 		/^select$/ && do {
 			# size, multiple, extras, subtext
 			my %selectOptions;
+			tie %selectOptions, 'Tie::IxHash';
 			# add an empty option if no default value is provided
 			foreach (split(/\n/, $data->{possibleValues})) {
 				$selectOptions{$_} = $_[0]->processMacros($_);
 			}
-			$f->select($name, \%selectOptions, $data->{name}, [ $data->{defaultValue} ], "", "", "", "");
+			$f->select($name, \%selectOptions, $data->{name}, [$data->{defaultValue}], "", "", "", "");
 			last SWITCH;
 		};
 	}
