@@ -4372,11 +4372,6 @@ config file.</p>
                 lastUpdated =>1092748557,
                 context => q|option for Rich Editor in profile|
         },
-	'encrypt page' => {
-                message => q|Encrypt content?|,
-                lastUpdated =>1092748557,
-                context => q|asset property|
-        },
 
 	'cancel' => {
 		message => q|cancel|,

@@ -40,36 +40,36 @@ our $I18N = {
 <P><B>^International("asset id","Asset");</B><BR>This is the unique identifier WebGUI uses to keep track of this Asset instance. Normal users should never need to be concerned with the Asset ID, but some advanced users may need to know it for things like SQL Reports. The Asset ID is not editable.</P>
 
 <p>
-<b>Title</b><br>
+<b>^International("99","Asset");</b><br>
 The title of the asset.  This should be descriptive, but not very long.  If left
 blank, this will be set to "Untitled".
 </p>
 <P><I>Note:</I> You should always specify a title, even if the Asset template will not use it. In various places on the site, like the Page Tree, Clipboard and Trash, the <B>Title</B> is used to distinguish this Asset from others.</p>
 
 <p>
-<b>Menu Title</b><br>
+<b>^International("411","Asset");</b><br>
 A shorter title that will appear in navigation.  If left blank, this will default
 to the <b>Title</b>.
 </p>
 
 <p>
-<b>URL</b><br>
+<b>^International("104","Asset");</b><br>
 The URL for this asset.  It must be unique.  If this field is left blank, then
 a URL will be made from the parent's URL and the <b>Menu Title</b>.
 </p>
 
 <p>
-<b>Synopsis</b><br>
+<b>^International("412","Asset");</b><br>
 A short description of this Asset. 
 </p>
 
 <p>
-<b>Hide from navigation?</b><br>
+<b>^International("886","Asset");</b><br>
 Whether or not this asset will be hidden from the navigation menu and site maps.
 </p>
 
 <p>
-<b>Open in new window?</b><br>
+<b>^International("886","Asset");</b><br>
 Select yes to open this asset in a new window.
 </p>
 
@@ -502,6 +502,11 @@ each wobject under the tab &quot;Metadata&quot; in the wobject properties.</p>
                    lastUpdated => 1031514049,
                    message => q|Back to site.|
                  }
+	'encrypt page' => {
+                message => q|Encrypt content?|,
+                lastUpdated =>1092748557,
+                context => q|asset property|
+        },
 };
 
 1;
