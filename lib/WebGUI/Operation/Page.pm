@@ -168,38 +168,149 @@ sub www_editPage {
 		$f->hidden("parentId",$page{parentId});
 		$f->hidden("op","editPageSave");
 		$f->submit if ($page{pageId} ne "new");
-		$f->raw('<tr><td colspan=2><b>'.WebGUI::International::get(103).'</b></td></tr>');
-		$f->readOnly($page{pageId},WebGUI::International::get(500));
+		$f->raw(
+			-value=>'<tr><td colspan=2><b>'.WebGUI::International::get(103).'</b></td></tr>',
+			-uiLevel=>5
+			);
+		$f->readOnly(
+			-value=>$page{pageId},
+			-label=>WebGUI::International::get(500),
+			-uiLevel=>3
+			);
                 $f->text("title",WebGUI::International::get(99),$page{title});
-		$f->text("menuTitle",WebGUI::International::get(411),$page{menuTitle});
-                $f->text("urlizedTitle",WebGUI::International::get(104),$page{urlizedTitle});
-                $f->url("redirectURL",WebGUI::International::get(715),$page{redirectURL});
-		$f->readOnly(WebGUI::Template::selectTemplate($page{templateId}),WebGUI::International::get(356));
-		$f->textarea("synopsis",WebGUI::International::get(412),$page{synopsis});
-		$f->textarea("metaTags",WebGUI::International::get(100),$page{metaTags});
-                $f->yesNo("defaultMetaTags",WebGUI::International::get(307),$page{defaultMetaTags});
-		$f->raw('<tr><td colspan=2><hr size=1><b>'.WebGUI::International::get(105).'</b></td></tr>');
+		$f->text(
+			-name=>"menuTitle",
+			-label=>WebGUI::International::get(411),
+			-value=>$page{menuTitle},
+			-uiLevel=>1
+			);
+                $f->text(
+			-name=>"urlizedTitle",
+			-label=>WebGUI::International::get(104),
+			-value=>$page{urlizedTitle},
+			-uiLevel=>3
+			);
+                $f->url(
+			-name=>"redirectURL",
+			-label=>WebGUI::International::get(715),
+			-value=>$page{redirectURL},
+			-uiLevel=>8
+			);
+		$f->readOnly(
+			-value=>WebGUI::Template::selectTemplate($page{templateId}),
+			-label=>WebGUI::International::get(356),
+			-uiLevel=>5
+			);
+		$f->textarea(
+			-name=>"synopsis",
+			-label=>WebGUI::International::get(412),
+			-value=>$page{synopsis},
+			-uiLevel=>3
+			);
+		$f->textarea(
+			-name=>"metaTags",
+			-label=>WebGUI::International::get(100),
+			-value=>$page{metaTags},
+			-uiLevel=>7
+			);
+                $f->yesNo(
+			-name=>"defaultMetaTags",
+			-label=>WebGUI::International::get(307),
+			-value=>$page{defaultMetaTags},
+			-uiLevel=>5
+			);
+		$f->raw(
+			-value=>'<tr><td colspan=2><hr size=1><b>'.WebGUI::International::get(105).'</b></td></tr>',
+			-uiLevel=>5
+			);
 		%hash = WebGUI::SQL->buildHash("select styleId,name from style where name<>'Reserved' order by name");
-                $f->select("styleId",\%hash,WebGUI::International::get(105),[$page{styleId}],'','','',
-			' &nbsp; <a href="'.WebGUI::URL::page('op=listStyles').'">'.WebGUI::International::get(6).'</a>');
-                $f->yesNo("recurseStyle",'','','',' &nbsp; '.WebGUI::International::get(106));
-		$f->raw('<tr><td colspan=2><hr size=1><b>'.WebGUI::International::get(107).'</b></td></tr>');
-        	$f->date("startDate",WebGUI::International::get(497),$page{startDate});
-        	$f->date("endDate",WebGUI::International::get(498),$page{endDate});
+                $f->select(
+			-name=>"styleId",
+			-options=>\%hash,
+			-label=>WebGUI::International::get(105),
+			-value=>[$page{styleId}],
+			-subtext=>' &nbsp; <a href="'.WebGUI::URL::page('op=listStyles').'">'.WebGUI::International::get(6).'</a>',
+			-uiLevel=>5
+			);
+                $f->yesNo(
+			-name=>"recurseStyle",
+			-subtext=>' &nbsp; '.WebGUI::International::get(106),
+			-uiLevel=>9
+			);
+		$f->raw(
+			-value=>'<tr><td colspan=2><hr size=1><b>'.WebGUI::International::get(107).'</b></td></tr>',
+			-uiLevel=>9
+			);
+        	$f->date(
+			-name=>"startDate",
+			-label=>WebGUI::International::get(497),
+			-value=>$page{startDate},
+			-uiLevel=>9
+			);
+        	$f->date(
+			-name=>"endDate",
+			-label=>WebGUI::International::get(498),
+			-value=>$page{endDate},
+			-uiLevel=>9
+			);
 		%hash = WebGUI::SQL->buildHash("select users.userId,users.username from users,groupings 
 			where (groupings.groupId=4 or groupings.groupId=3) and groupings.userId=users.userId 
 			order by users.username");
-		$f->select("ownerId",\%hash,WebGUI::International::get(108),[$page{ownerId}],'','','',
-			' &nbsp; <a href="'.WebGUI::URL::page('op=listUsers').'">'.WebGUI::International::get(7).'</a>');
-		$f->yesNo("ownerView",WebGUI::International::get(109),$page{ownerView});
-                $f->yesNo("ownerEdit",WebGUI::International::get(110),$page{ownerEdit});
-		$f->group("groupId",WebGUI::International::get(111),[$page{groupId}],'','','',
-			' &nbsp; <a href="'.WebGUI::URL::page('op=listGroups').'">'.WebGUI::International::get(5).'</a>');
-		$f->yesNo("groupView",WebGUI::International::get(112),$page{groupView});
-                $f->yesNo("groupEdit",WebGUI::International::get(113),$page{groupEdit});
-                $f->yesNo("worldView",WebGUI::International::get(114),$page{worldView});
-                $f->yesNo("worldEdit",WebGUI::International::get(115),$page{worldEdit});
-                $f->yesNo("recursePrivs",'','','',' &nbsp; '.WebGUI::International::get(116));
+		$f->select(
+			-name=>"ownerId",
+			-options=>\%hash,
+			-label=>WebGUI::International::get(108),
+			-value=>[$page{ownerId}],
+			-subtext=>' &nbsp; <a href="'.WebGUI::URL::page('op=listUsers').'">'.WebGUI::International::get(7).'</a>',
+			-uiLevel=>9
+			);
+		$f->yesNo(
+			-name=>"ownerView",
+			-label=>WebGUI::International::get(109),
+			-value=>$page{ownerView},
+			-uiLevel=>9
+			);
+                $f->yesNo(
+			-name=>"ownerEdit",
+			-label=>WebGUI::International::get(110),
+			-value=>$page{ownerEdit},
+			-uiLevel=>9
+			);
+		$f->group(
+			-name=>"groupId",
+			-label=>WebGUI::International::get(111),
+			-value=>[$page{groupId}],
+			-subtext=>' &nbsp; <a href="'.WebGUI::URL::page('op=listGroups').'">'.WebGUI::International::get(5).'</a>',
+			-uiLevel=>9
+			);
+		$f->yesNo(
+			-name=>"groupView",
+			-label=>WebGUI::International::get(112),
+			-value=>$page{groupView},
+			-uiLevel=>9
+			);
+                $f->yesNo(
+			-name=>"groupEdit",
+			-label=>WebGUI::International::get(113),
+			-value=>$page{groupEdit},
+			-uiLevel=>9);
+                $f->yesNo(
+			-name=>"worldView",
+			-label=>WebGUI::International::get(114),
+			-value=>$page{worldView},
+			-uiLevel=>9
+			);
+                $f->yesNo(
+			-name=>"worldEdit",
+			-label=>WebGUI::International::get(115),
+			-value=>$page{worldEdit},
+			-uiLevel=>9
+			);
+                $f->yesNo(
+			-name=>"recursePrivs",
+			-subtext=>' &nbsp; '.WebGUI::International::get(116),
+			-uiLevel=>9
+			);
 		$f->submit;
 		$output .= $f->print;
                 return $output;
