@@ -23,6 +23,8 @@
    wobject ID, and namespace.
  - Added an object-oriented interface to the internationalization system. The
    old procedural interface still works as well.
+ - Added on the wire compression to HTTP transport for WSClient wobject.  This
+   will have no effect on clients/servers that can't support compression.
 
 
 6.0.3
