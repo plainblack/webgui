@@ -392,6 +392,7 @@ sub www_view {
 		from USS_submission where wobjectId=".$_[0]->get("wobjectId")." and $constraints order by dateSubmitted desc");
 	$page = $p->getPageData;
 	$i = 0;
+	my $imageURL;
 	foreach $row (@$page) {
 		$page->[$i]->{content} = WebGUI::HTML::filter($page->[$i]->{content},$_[0]->get("filterContent"));
                 $page->[$i]->{content} =~ s/\n/\^\-\;/ unless ($page->[$i]->{content} =~ m/\^\-\;/);
@@ -399,8 +400,10 @@ sub www_view {
                 if ($page->[$i]->{image} ne "") {
                         $image = WebGUI::Attachment->new($page->[$i]->{image},$_[0]->get("wobjectId"),$page->[$i]->{USS_submissionId});
                         $thumbnail = $image->getThumbnail;
+			$imageURL = $image->getURL;
                 } else {
                         $thumbnail = "";
+			$imageURL;
                 }
 		($responses) = WebGUI::SQL->quickArray("select count(*) from discussion 
 			where wobjectId=".$_[0]->get("wobjectId")." and subId=".$row->{USS_submissionId});
@@ -413,6 +416,7 @@ sub www_view {
                         "submission.userId"=>$page->[$i]->{userId},
                         "submission.status"=>$page->[$i]->{status},
                         "submission.thumbnail"=>$thumbnail,
+                        "submission.image"=>$imageURL,
                         "submission.date"=>epochToHuman($page->[$i]->{dateSubmitted}),
                         "submission.currentUser"=>($session{user}{userId} == $page->[$i]->{userId}),
                         "submission.username"=>$page->[$i]->{username},
