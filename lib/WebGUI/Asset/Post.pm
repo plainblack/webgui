@@ -455,20 +455,22 @@ sub getThumbnailUrl {
 #-------------------------------------------------------------------
 sub getUploadControl {
 	my $self = shift;
+	my $maxAttachments = $self->getThread->getParent->getValue("attachmentsPerPost");
 	my $uploadControl;
+	return undef unless ($maxAttachments);
 	if ($self->get("storageId")) {
 		my $i;
 		foreach my $filename (@{$self->getStorageLocation->getFiles}) {
 			$uploadControl .= '<a href="'.$self->getStorageLocation->getUrl($filename).'">'.$filename.'</a><br />';	
 			$i++;
 		}
-		return $uploadControl unless ($i < $self->getThread->getParent->get("attachmentsPerPost"));
+		return $uploadControl unless ($i < $maxAttachments);
 	}
 	WebGUI::Style::setScript($session{config}{extrasURL}.'/FileUploadControl.js',{type=>"text/javascript"});
 	$uploadControl .= '<div id="fileUploadControl"> </div>
 		<script>
 		var images = new Array();
-		var fileLimit = '.$self->getThread->getParent->get("attachmentsPerPost").';
+		var fileLimit = '.$maxAttachments.';
 		';
 	opendir(DIR,$session{config}{extrasPath}.'/fileIcons');
 	my @files = readdir(DIR);
@@ -817,15 +819,16 @@ sub www_edit {
 			.WebGUI::Form::hidden({
                 		name=>"func",
 				value=>"add"
+				})
+			.WebGUI::Form::hidden({
+				name=>"assetId",
+				value=>"new"
+				})
+			.WebGUI::Form::hidden({
+				name=>"class",
+				value=>$session{form}{class}
 				});
         	$var{'isNewPost'} = 1;
-		$var{'form.header'} .= WebGUI::Form::hidden({
-			name=>"assetId",
-			value=>"new"
-			}).WebGUI::Form::hidden({
-			name=>"class",
-			value=>$session{form}{class}
-			});
 		if ($session{form}{class} eq "WebGUI::Asset::Post") { # new reply
 			$self->{_thread} = $self->getParent->getThread;
 			return WebGUI::Privilege::insufficient() unless ($self->getThread->canReply);
@@ -859,7 +862,7 @@ sub www_edit {
 				name=>"subscribe",
 				value=>$session{form}{subscribe} || 1
 				});
-                }
+		}
                 $content .= "\n\n".$session{user}{signature} if ($session{user}{signature});
 	} else { # edit
 		return WebGUI::Privilege::insufficient() unless ($self->canEdit);

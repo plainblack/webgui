@@ -53,7 +53,7 @@ sub www_auth {
    my $auth;
    ($auth) = WebGUI::SQL->quickArray("select authMethod from users where username=".quote($session{form}{username})) if($session{form}{username});
    my $authMethod = getInstance($auth);
-   my $methodCall = $session{form}{method} || $_[0];
+   my $methodCall = $session{form}{method} || $_[0] || "init";
    if(!$authMethod->isCallable($methodCall)){
       WebGUI::ErrorHandler::security("access uncallable auth method on page '".$session{page}{title}."' [".$session{page}{pageId}."].");
 	  return WebGUI::International::get(1077);

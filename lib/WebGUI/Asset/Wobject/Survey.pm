@@ -559,10 +559,10 @@ sub view {
 	while (my %data = $sth->hash) {
 		push(@edit,{
 			'question.edit.controls'=>
-				deleteIcon('func=deleteQuestionConfirm&qid='.$data{Survey_questionId}, $self->getUrl, WebGUI::International::get(44,'Survey')).
-				editIcon('func=editQuestion&qid='.$data{Survey_questionId}, $self->getUrl).
-				moveUpIcon('func=moveQuestionUp&qid='.$data{Survey_questionId}, $self->getUrl).
-				moveDownIcon('func=moveQuestionDown&qid='.$data{Survey_questionId}, $self->getUrl),
+				deleteIcon('func=deleteQuestionConfirm&qid='.$data{Survey_questionId}, $self->get("url"), WebGUI::International::get(44,'Survey')).
+				editIcon('func=editQuestion&qid='.$data{Survey_questionId}, $self->get("url")).
+				moveUpIcon('func=moveQuestionUp&qid='.$data{Survey_questionId}, $self->get("url")).
+				moveDownIcon('func=moveQuestionDown&qid='.$data{Survey_questionId}, $self->get("url")),
 			'question.edit.question'=>$data{question},
 			'question.edit.id'=>$data{Survey_questionId}
 			});

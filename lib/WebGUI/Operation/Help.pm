@@ -46,7 +46,7 @@ sub _seeAlso {
 
 #-------------------------------------------------------------------
 sub www_viewHelp {
-	return WebGUI::Privilege::insufficient() unless (WebGUI::Grouping::isInGroup(12));
+	return WebGUI::Privilege::insufficient() unless (WebGUI::Grouping::isInGroup(7));
 	my $ac = WebGUI::AdminConsole->new("help");
 	my $namespace = $session{form}{namespace} || "WebGUI";
 	my $help = _get($session{form}{hid},$namespace);
@@ -63,7 +63,7 @@ sub www_viewHelp {
 
 #-------------------------------------------------------------------
 sub www_viewHelpIndex {
-	return WebGUI::Privilege::insufficient() unless (WebGUI::Grouping::isInGroup(12));
+	return WebGUI::Privilege::insufficient() unless (WebGUI::Grouping::isInGroup(7));
 	my %helpIndex;
 	tie %helpIndex, "Tie::IxHash";
 	my $i;

@@ -225,7 +225,7 @@ sub getAdminFunction {
 			},
 			icon=>"help.gif",
 			op=>"viewHelpIndex",
-			group=>"12"
+			group=>"7"
 		},
 		"statistics"=>{
 			title=>{

@@ -501,7 +501,7 @@ each wobject under the tab &quot;Metadata&quot; in the wobject properties.</p>
         '493' => {
                    lastUpdated => 1031514049,
                    message => q|Back to site.|
-                 }
+                 },
 	'encrypt page' => {
                 message => q|Encrypt content?|,
                 lastUpdated =>1092748557,

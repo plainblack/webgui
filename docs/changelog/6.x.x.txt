@@ -4,6 +4,10 @@
    the start date.
  - fix [ 1157202 ] users can add themselves to Admins group
  - fix [ 1157218 ] user cannot view it's own profile
+ - fix [ 1157195 ] Problem with request when saving profile
+ - fix [ 1158117 ] Help Index Unavailable from RWG
+ - fix [ 1157453 ] Error on Edit Template / Save and Cancel
+ - fix [ 1157434 ] [CVS 6.5]edit question controls have incorrect URL in Survey
 
 
 6.4.0

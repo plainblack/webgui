@@ -213,7 +213,7 @@ sub _tableFormRow {
 	unless ($_[0]->{_noTable}) {
 		my $class = $_[0]->{_class};
 		$class = qq| class="$class" | if($class);
-        	return '<tr'.$class.'><td class="formDescription" valign="top">'.$_[1].'</td><td class="tableData">'.$_[2]."</td></tr>\n";
+        	return '<tr'.$class.'><td class="formDescription" valign="top">'.$_[1].'</td><td class="tableData" style="width: 95%;">'.$_[2]."</td></tr>\n";
 	} else {
 		return $_[2];
 	}
