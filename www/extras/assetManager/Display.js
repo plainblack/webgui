@@ -13,7 +13,8 @@ function Display() {
     
     this.focusObjects = new Array();
     this.overObjects = new Array();
-    this.topLevelElement=this.dom? "HTML" : "BODY"
+    //this.topLevelElement=this.dom? "HTML" : "BODY"
+    this.topLevelElement="HTML";
     this.scrollJump = 25;
     this.dragEnabled = false;
     this.dragStart = Display_dragStart;

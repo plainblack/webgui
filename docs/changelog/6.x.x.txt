@@ -1,3 +1,9 @@
+6.5.4 
+ - fix [ 1160953 ] JavaScript Errors in admin console - IE
+ - Fixed a drag and drop problem.
+ - fix [ 1168195 ] Asset manager: Space between Size and unit
+
+
 6.5.3
  - Sorted templates into folders named after their respective namespaces
    & re-enabled the manage button next to the template dropdown [mwilson]

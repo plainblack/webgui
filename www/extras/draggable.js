@@ -24,6 +24,7 @@ var contra = "";
 var pageHeight=0;
 var pageWidth=0;
 var scrollJump=50;
+var blankCount=1;
 
 //checks the key Events for copy and paste operations
 //ctrlC ctrlV shiftP shiftY
@@ -371,7 +372,7 @@ function dragable_appendBlankRow(parent) {
     var blank = document.getElementById("blank");
     blank.className="blank";
     blankClone = blank.cloneNode(true);
-    blankClone.id = "blank" + new Date().getTime();
+    blankClone.id = "blank" + new Date().getTime() + blankCount++;
     draggableObjectList[draggableObjectList.length] = blankClone;
     parent.appendChild(blankClone);
     blankClone.style.top=0;

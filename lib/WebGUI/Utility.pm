@@ -90,11 +90,11 @@ An integer representing the number of bytes to format.
 sub formatBytes {
 	my $size = shift;
         if ($size > 1048576) {
-                return round($size/1048576).'MB';
+                return round($size/1048576).' MB';
         } elsif ($size > 1024) {
-                return round($size/1024).'kB';
+                return round($size/1024).' kB';
         } else {
-		return $size.'B';
+		return $size.' B';
         }
 }
 

@@ -209,7 +209,7 @@ sub processPropertiesFromFormPost {
 		$data{olderVersions} = $oldVersions;
 		$data{title} = $filename unless ($session{form}{title});
 		$data{menuTitle} = $filename unless ($session{form}{menuTitle});
-		$data{url} = $self->getParent->getUrl.'/'.$filename unless ($session{form}{url});
+		$data{url} = $self->getParent->get('url').'/'.$filename unless ($session{form}{url});
 		$self->update(\%data);
 		$self->setSize($storage->getFileSize($filename));
 		$storage->setPrivileges($self->get("ownerUserId"), $self->get("groupIdView"), $self->get("groupIdEdit"));
