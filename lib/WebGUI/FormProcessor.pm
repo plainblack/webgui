@@ -648,7 +648,7 @@ The name of the form variable to retrieve.
 =cut
 
 sub timeField {
-	return WebGUI::DateTime::timeToSeconds($session{form}{$_[0]}-($session{user}{timeOffset}*3600));
+	return WebGUI::DateTime::timeToSeconds($session{form}{$_[0]})-($session{user}{timeOffset}*3600);
 }
 
 
