@@ -410,7 +410,7 @@ sub www_editUserProfile {
                 $values = eval $data{dataValues};
                 $method = $data{dataType};
                 $label = eval $data{fieldLabel};
-                if ($method eq "select") {
+                if ($method eq "selectList" || $method eq "checkList" || $method eq "radioList") {
                 	# note: this big if statement doesn't look elegant, but doing regular
                         # ORs caused problems with the array reference.
                         if ($session{form}{$data{fieldName}}) {
@@ -420,7 +420,12 @@ sub www_editUserProfile {
                         } else {
                                 $default = eval $data{dataDefault};
                         }
-                 	$f->select($data{fieldName},$values,$label,$default);
+                 	$f->$method(
+				-name=>$data{fieldName},
+				-options=>$values,
+				-label=>$label,
+				-value=>$default
+				);
                 } elsif ($method) {
 			if ($session{form}{$data{fieldName}}) {
                         	$default = $session{form}{$data{fieldName}};
@@ -429,7 +434,11 @@ sub www_editUserProfile {
                         } else {
                                 $default = eval $data{dataDefault};
                         }
-                        $f->$method($data{fieldName},$label,$default);
+                        $f->$method(
+				-name=>$data{fieldName},
+				-label=>$label,
+				-value=>$default
+				);
                 }
                 $previousCategory = $category;
         }

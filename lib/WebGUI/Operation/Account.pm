@@ -87,7 +87,10 @@ sub _logLogin {
 sub _validateProfileData {
 	my (%data, $error, $a, %field);
 	tie %field, 'Tie::CPHash';
-        $a = WebGUI::SQL->read("select dataType,fieldName,fieldLabel,required from userProfileField");
+        $a = WebGUI::SQL->read("select * from userProfileField,userProfileCategory
+                        where userProfileField.profileCategoryId=userProfileCategory.profileCategoryId
+                        and userProfileCategory.editable=1 and userProfileField.editable=1
+                        order by userProfileCategory.sequenceNumber,userProfileField.sequenceNumber");
         while (%field = $a->hash) {
 		$data{$field{fieldName}} = WebGUI::FormProcessor::process($field{fieldName},$field{dataType});
 		if ($field{required} && $data{$field{fieldName}} eq "") {
