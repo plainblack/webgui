@@ -66,6 +66,10 @@ Contributing Translators.............AGOFER Ltda.
                                      Michael Westlund
                                      Zhou Xiaopeng
 
+Binary Package Maintainers...........Alejandro Alberola / Boix i Oltra, S.L.
+                                     Daniel / ProcoliX
+                                     JT Smith / Plain Black
+
 
 The following are people/companies who didn't directly contribute
 to WebGUI, but who's work has made WebGUI possible:
