@@ -43,11 +43,11 @@ DBI->install_driver("mysql"); # Change to match your database driver.
 #----------------------------------------
 # Distributed utilities external to WebGUI.
 #----------------------------------------
-use Data::Config ();
 use HTML::CalendarMonthSimple ();
 #use HTML::Parser (); # commented because it is causing problems with attachments
 #use HTML::TagFilter (); # commented because it is causing problems with attachments
 use Net::LDAP ();
+use Parse::PlainConfig ();
 use Tie::CPHash ();
 use Tie::IxHash ();
 
@@ -95,10 +95,12 @@ use WebGUI::Operation::User ();
 use WebGUI::Page ();
 use WebGUI::Paginator ();
 use WebGUI::Privilege ();
+use WebGUI::ProxyParse ();
 use WebGUI::Search ();
 use WebGUI::Session ();
 use WebGUI::SQL ();
 use WebGUI::Style ();
+use WebGUI::TabForm ();
 use WebGUI::Template ();
 use WebGUI::URL ();
 use WebGUI::User ();

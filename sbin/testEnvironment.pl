@@ -161,6 +161,13 @@ if (eval { require Date::Calc }) {
         }
 }
 
+print "Cache::FileCache module (optional) ....... ";
+if (eval { require Cache::FileCache }) {
+        print "OK\n";
+} else {
+        print "Not installed. Caching not possible.\n";
+}
+
 print "Image::Magick module (optional) .......... ";
 if (eval { require Image::Magick }) {
         print "OK\n";

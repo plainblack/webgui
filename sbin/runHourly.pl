@@ -18,7 +18,6 @@ BEGIN {
 
 use DBI;
 use strict qw(subs vars);
-use Data::Config;
 use WebGUI::Session;
 use WebGUI::Utility;
 
