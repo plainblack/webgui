@@ -125,10 +125,6 @@ our $HELP = {
 				namespace => 'EventsCalendar'
 			},
 			{
-				tag => 'file manager add/edit',
-				namespace => 'FileManager'
-			},
-			{
 				tag => 'http proxy add/edit',
 				namespace => 'HttpProxy'
 			},
@@ -153,10 +149,6 @@ our $HELP = {
 				namespace => 'Product'
 			},
 			{
-				tag => 'site map add/edit',
-				namespace => 'SiteMap'
-			},
-			{
 				tag => 'sql report add/edit',
 				namespace => 'SQLReport'
 			},
@@ -167,14 +159,6 @@ our $HELP = {
 			{
 				tag => 'syndicated content add/edit',
 				namespace => 'SyndicatedContent'
-			},
-			{
-				tag => 'user submission system add/edit',
-				namespace => 'USS'
-			},
-			{
-				tag => 'wobject proxy add/edit',
-				namespace => 'WobjectProxy'
 			},
 			{
 				tag => 'wobjects using',
@@ -406,10 +390,6 @@ our $HELP = {
 				tag => 'settings',
 				namespace => 'WebGUI'
 			},
-			{
-				tag => 'user submission system add/edit',
-				namespace => 'USS'
-			}
 		]
 	},
 
@@ -430,10 +410,6 @@ our $HELP = {
 				namespace => 'EventsCalendar'
 			},
 			{
-				tag => 'file manager template',
-				namespace => 'FileManager'
-			},
-			{
 				tag => 'message board template',
 				namespace => 'MessageBoard'
 			},
@@ -448,10 +424,6 @@ our $HELP = {
 			{
 				tag => 'product template',
 				namespace => 'Product'
-			},
-			{
-				tag => 'site map template',
-				namespace => 'SiteMap'
 			},
 			{
 				tag => 'survey template',
@@ -469,10 +441,6 @@ our $HELP = {
 				tag => 'templates manage',
 				namespace => 'Template'
 			},
-			{
-				tag => 'user submission system template',
-				namespace => 'USS'
-			}
 		]
 	},
 

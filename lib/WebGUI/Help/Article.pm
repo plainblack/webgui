@@ -10,10 +10,6 @@ our $HELP = {
 				namespace => 'Article'
 			},
 			{
-				tag => 'forum discussion properties',
-				namespace => 'WebGUI'
-			},
-			{
 				tag => 'wobjects using',
 				namespace => 'WebGUI'
 			}
