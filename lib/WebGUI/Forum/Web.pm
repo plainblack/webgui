@@ -15,8 +15,24 @@ sub _chopSubject {
 	return substr(_formatSubject($_[0]),0,30);
 }
 
+sub _formatApprovePostURL {
+	return WebGUI::URL::append($_[0],"forumOp=approvePost&amp;forumPostId=".$_[1]."&amp;mlog=".$session{form}{mlog});
+}
+
+sub _formatDeletePostURL {
+	return WebGUI::URL::append($_[0],"forumOp=deletePost&amp;forumPostId=".$_[1]);
+}
+
+sub _formatDenyPostURL {
+	return WebGUI::URL::append($_[0],"forumOp=denyPost&amp;forumPostId=".$_[1]."&amp;mlog=".$session{form}{mlog});
+}
+
 sub _formatEditPostURL {
 	return WebGUI::URL::append($_[0],"forumOp=post&amp;forumPostId=".$_[1]);
+}
+
+sub _formatLeavePostPendingURL {
+	return WebGUI::URL::page("op=viewMessageLog");
 }
 
 sub _formatNextThreadURL {
@@ -66,7 +82,8 @@ sub _formatUserProfileURL {
 }
 
 sub _getPostTemplateVars {
-        my ($post, $thread, $forum, $var) = @_;
+        my ($post, $thread, $forum, $callback, $var) = @_;
+	$var->{'post.subject.label'} = WebGUI::International::get(237);
         $var->{'post.subject'} = WebGUI::HTML::filter($post->get("subject"),"none");
         $var->{'post.message'} = WebGUI::HTML::filter($post->get("message"),$forum->get("filterPosts"));
         if ($forum->get("allowReplacements")) {
@@ -77,30 +94,47 @@ sub _getPostTemplateVars {
                 $sth->finish;
         }
         $var->{'post.date'} = _formatPostDate($post->get("dateOfPost"));
+	$var->{'post.date.label'} = WebGUI::International::get(239);
         $var->{'post.time'} = _formatPostTime($post->get("dateOfPost"));
 	$var->{'post.views'} = $post->get("views");
+	$var->{'post.views.label'} = WebGUI::International::get(514);
 	$var->{'post.status'} = _formatStatus($post->get("status"));
+	$var->{'post.status.label'} = WebGUI::International::get(553);
 	$var->{'post.isLocked'} = $thread->isLocked;
 	$var->{'post.isModerator'} = $forum->isModerator;
+	$var->{'post.user.label'} = WebGUI::International::get(238);
 	$var->{'post.username'} = $post->get("username");
 	$var->{'post.userId'} = $post->get("userId");
 	$var->{'post.userProfile'} = _formatUserProfileURL($post->get("userId"));
 	$var->{'post.id'} = $post->get("forumPostId");
 	$var->{'post.full'} = WebGUI::Template::process(WebGUI::Template::get(1,"Forum/Post"), $var); 
+	$var->{'post.reply.label'} = WebGUI::International::get(577);
+	$var->{'post.reply.url'} = _formatReplyPostURL($callback,$post->get("forumPostId"));
+	$var->{'post.edit.label'} = WebGUI::International::get(575);
+	$var->{'post.edit.url'} = _formatEditPostURL($callback,$post->get("forumPostId"));
+	$var->{'post.delete.label'} = WebGUI::International::get(576);
+	$var->{'post.delete.url'} = _formatDeletePostURL($callback,$post->get("forumPostId"));
+	$var->{'post.approve.label'} = WebGUI::International::get(572);
+	$var->{'post.approve.url'} = _formatApprovePostURL($callback,$post->get("forumPostId"));
+	$var->{'post.deny.label'} = WebGUI::International::get(574);
+	$var->{'post.deny.url'} = _formatDenyPostURL($callback,$post->get("forumPostId"));
+	$var->{'post.pending.label'} = WebGUI::International::get(573);
+	$var->{'post.pending.url'} = _formatLeavePostPendingURL();
+	$var->{'post.tools.label'} = WebGUI::International::get(238);
 	return $var;
 }
 
 sub _recurseThread {
-	my ($post, $thread, $forum, $depth) = @_;
+	my ($post, $thread, $forum, $depth, $callback) = @_;
 	my @depth_loop;
 	for (my $i=0; $i<$depth; $i++) {
 		push(@depth_loop,"");
 	}
 	my @post_loop;
-	push (@post_loop, _getPostTemplateVars($post, $thread, $forum, {'indent_loop'=>\@depth_loop}));
+	push (@post_loop, _getPostTemplateVars($post, $thread, $forum, $callback, {'indent_loop'=>\@depth_loop}));
 	my $replies = $post->getReplies;
 	foreach my $reply (@{$replies}) {
-		@post_loop = (@post_loop,@{_recurseThread($reply, $thread, $forum, $depth+1)});
+		@post_loop = (@post_loop,@{_recurseThread($reply, $thread, $forum, $depth+1, $callback)});
 	}	
 	return \@post_loop;
 }
@@ -182,7 +216,7 @@ sub www_post {
 			value=>$reply->get("forumPostId")
 			});
 		$forum = $reply->getThread->getForum;
-		$var = _getPostTemplateVars($reply, $reply->getThread, $forum, $var);
+		$var = _getPostTemplateVars($reply, $reply->getThread, $forum, $callback, $var);
 
 		$subject = $reply->get("subject");
 		$subject = "Re: ".$subject unless ($subject =~ /^Re:/);
@@ -304,9 +338,9 @@ sub www_viewThread {
 	my $post = WebGUI::Forum::Post->new($postId);
 	my $thread = $post->getThread;
 	my $forum = $thread->getForum;
-	my $var = _getPostTemplateVars($post, $thread, $forum);
+	my $var = _getPostTemplateVars($post, $thread, $forum, $callback);
 	my $root = WebGUI::Forum::Post->new($thread->get("rootPostId"));
-	$var->{post_loop} = _recurseThread($root, $thread, $forum, 0);
+	$var->{post_loop} = _recurseThread($root, $thread, $forum, 0, $callback);
 	$var->{'thread.layout.isFlat'} = ($session{user}{discussionLayout} eq "flat");
 	$var->{'thread.layout.isThreaded'} = ($session{user}{discussionLayout} eq "threaded");
 	$var->{'thread.layout.isNested'} = ($session{user}{discussionLayout} eq "nested");
