@@ -192,6 +192,7 @@ sub www_view {
 	my (%var, @linkloop, $controls, $link, $sth);
 	$var{"addlink.url"} = WebGUI::URL::page('func=editLink&lid=new&wid='.$_[0]->get("wobjectId"));
 	$var{"addlink.label"} = WebGUI::International::get(13,$_[0]->get("namespace"));
+	$var{canEdit} = WebGUI::Privilege::canEditPage();
 	$sth = WebGUI::SQL->read("select * from LinkList_link where wobjectId=".$_[0]->get("wobjectId")." 
 		order by sequenceNumber");
 	while ($link = $sth->hashRef) {
