@@ -13,5 +13,7 @@
    wobject.
  - Migrated Link Lists to USS submissions and removed the Link List wobject.
  - Re-enabled the Date macro by default.
+ - Templatized the Login Box macro.
+ - Added the new WebGUI 6 design.
 
 

@@ -11,10 +11,11 @@ package WebGUI::Macro::L_loginBox;
 #-------------------------------------------------------------------
 
 use strict;
-use WebGUI::HTMLForm;
+use WebGUI::Form;
 use WebGUI::International;
 use WebGUI::Macro;
 use WebGUI::Session;
+use WebGUI::Template;
 use WebGUI::URL;
 
 #-------------------------------------------------------------------
@@ -24,44 +25,45 @@ sub _createURL {
 
 #-------------------------------------------------------------------
 sub process {
-        my ($temp,$boxSize,@param,$text,$f);
-	my $debug;
-        @param = WebGUI::Macro::getParams($_[0]);
-        $temp = '<div class="loginBox">';
-        if ($session{user}{userId} != 1) {
-                $text = $param[1];
-                if (not defined $text){
-                        $temp .= WebGUI::International::get(48);
-                        $temp .= ' <a href="'.WebGUI::URL::page('op=displayAccount').
-                                '">'.$session{user}{username}.'</a>. ';
-                        $temp .= WebGUI::International::get(49);
-                } else {
-                        $text =~ s/%(.*?)%/_createURL($1)/ge;
-                        $temp .= $text;
-                }
-        } else {
-                $boxSize = $param[0];
-                if (not defined $boxSize) {
-                        $boxSize = 12;
-                }
-                if (index(lc($ENV{HTTP_USER_AGENT}),"msie") < 0) {
-                        $boxSize = int($boxSize=$boxSize*2/3);
-                }
-                $f = WebGUI::HTMLForm->new(1);
-                $f->hidden("op","login");
-                $f->raw('<span class="formSubtext">'.WebGUI::International::get(50).'<br></span>');
-                $f->text("username",'','','','','',$boxSize);
-                $f->raw('<span class="formSubtext"><br>'.WebGUI::International::get(51).'<br></span>');
-                $f->password("identifier",'','','','','',$boxSize);
-                $f->raw('<span class="formSubtext"><br></span>');
-                $f->submit(WebGUI::International::get(52));
-                $temp .= $f->print;
-                if ($session{setting}{anonymousRegistration}) {
-                        $temp .= '<a href="'.WebGUI::URL::page('op=createAccount').'">'.WebGUI::International::get(407).'</a>';
-                }
+        my @param = WebGUI::Macro::getParams($_[0]);
+	my $templateId = $param[2] || 1;
+	my %var;	
+        $var{'user.isVisitor'} = ($session{user}{userId} == 1);
+	$var{'customText'} = $param[1];
+	$var{'customText'} =~ s/%(.*?)%/_createURL($1)/ge;
+	$var{'hello.label'} = WebGUI::International::get(48);
+	$var{'logout.url'} = WebGUI::URL::page("op=logout");
+	$var{'account.display.url'} = WebGUI::URL::page('op=displayAccount');
+        $var{'logout.label'} = WebGUI::International::get(49);
+        my $boxSize = $param[0];
+        $boxSize = 12 if (not defined $boxSize);
+        if (index(lc($ENV{HTTP_USER_AGENT}),"msie") < 0) {
+        	$boxSize = int($boxSize=$boxSize*2/3);
         }
-        $temp .= '</div>';
-        return $temp;
+	$var{'form.header'} = WebGUI::Form::formHeader()
+		.WebGUI::Form::hidden({
+			name=>"op",
+			value=>"login"
+			});
+	$var{'username.label'} = WebGUI::International::get(50);
+	$var{'username.form'} = WebGUI::Form::text({
+		name=>"username",
+		size=>$boxSize,
+		extras=>'class="loginBoxField"'
+		});
+        $var{'password.label'} = WebGUI::International::get(51);
+        $var{'password.form'} = WebGUI::Form::password({
+		name=>"identifier",
+		size=>$boxSize,
+		extras=>'class="loginBoxField"'
+		});
+        $var{'form.login'} = WebGUI::Form::submit({
+		value=>WebGUI::International::get(52),
+		extras=>'class="loginBoxButton"'
+		});
+        $var{'account.create.url'} = WebGUI::URL::page('op=createAccount');
+	$var{'account.create.label'} = WebGUI::International::get(407);
+        return WebGUI::Template::process(WebGUI::Template::get($templateId,"Macro/L_loginBox"),\%var); 
 }
 
 1;
