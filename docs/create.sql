@@ -2088,7 +2088,7 @@ INSERT INTO international VALUES (146,'WebGUI',5,'Sessões activas',1031510000);
 INSERT INTO international VALUES (147,'WebGUI',1,'Pages',1031514049);
 INSERT INTO international VALUES (147,'WebGUI',4,'Páginas',1031510000);
 INSERT INTO international VALUES (147,'WebGUI',5,'Páginas',1031510000);
-INSERT INTO international VALUES (148,'WebGUI',1,'Wobjects',1031514049);
+INSERT INTO international VALUES (148,'WebGUI',1,'Wobjects',1045312362);
 INSERT INTO international VALUES (148,'WebGUI',4,'Wobjects',1031510000);
 INSERT INTO international VALUES (148,'WebGUI',5,'Wobjects',1031510000);
 INSERT INTO international VALUES (108,'WebGUI',3,'Eigenaar',1038528474);
@@ -10115,6 +10115,7 @@ INSERT INTO international VALUES (881,'WebGUI',1,'None',1044705162);
 INSERT INTO international VALUES (880,'WebGUI',1,'Last Resort Editor',1044705137);
 INSERT INTO international VALUES (879,'WebGUI',1,'Classic Editor (Internet Explorer 5+)',1044705103);
 INSERT INTO international VALUES (73,'MailForm',21,'éÍÑ ÐÏÌÑ',1042025990);
+INSERT INTO international VALUES (888,'WebGUI',1,'Snippet Preview Length',1045312362);
 
 --
 -- Table structure for table 'karmaLog'
@@ -10606,7 +10607,7 @@ CREATE TABLE webguiVersion (
 --
 
 
-INSERT INTO webguiVersion VALUES ('5.1.0','initial install',unix_timestamp());
+INSERT INTO webguiVersion VALUES ('5.1.1','initial install',unix_timestamp());
 
 --
 -- Table structure for table 'wobject'
