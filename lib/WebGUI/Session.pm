@@ -204,6 +204,17 @@ sub _loadWobjects {
 }
 
 #-------------------------------------------------------------------
+# This routine returns an unique session Id.
+sub _uniqueSessionId {
+	my $sessionId = crypt((_time()*rand(1000)),rand(99));
+	my ($isDuplicate) = WebGUI::SQL->buildArray("select count(*) from userSession where sessionId =".quote($sessionId));
+	if ($isDuplicate) {
+		return _uniqueSessionId();
+	} else {
+		return $sessionId;
+	}
+}
+#-------------------------------------------------------------------
 
 =head2 close
 
@@ -619,7 +630,7 @@ Session id will be generated if not specified. In almost every case you should l
 
 sub start {
 	my ($sessionId);
-	$sessionId = $_[1] || crypt((_time()*rand(1000)),rand(99));
+	$sessionId = $_[1] || _uniqueSessionId();
 	if (($session{setting}{proxiedClientAddress} eq "1") && ($ENV{HTTP_X_FORWARDED_FOR} ne "")) {
 		WebGUI::SQL->write("insert into userSession values ('$sessionId', ".
 			(_time()+$session{setting}{sessionTimeout}).", "._time().", 0, '$ENV{HTTP_X_FORWARDED_FOR}', $_[0])");
