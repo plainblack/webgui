@@ -91,7 +91,7 @@ create table layout (
 INSERT INTO settings VALUES ('commerceCheckoutCanceledTemplateId','1');
 INSERT INTO settings VALUES ('commerceConfirmCheckoutTemplateId','1');
 INSERT INTO settings VALUES ('commercePaymentPlugin','PayFlowPro');
-INSERT INTO settings VALUES ('commerceSendDailyReportTo','martin@geefmegeld.nl');
+INSERT INTO settings VALUES ('commerceSendDailyReportTo','');
 INSERT INTO settings VALUES ('commerceTransactionErrorTemplateId','1');
 INSERT INTO template VALUES ('1','Subscription code redemption','<tmpl_if batchDescription>\r\nBatch: <tmpl_var batchDescription>\r\n</tmpl_if>\r\n\r\n<tmpl_var message><br>\r\n<tmpl_var codeForm>','Operation/RedeemSubscription',1,1);
 INSERT INTO template VALUES ('1','Subscriptionitem default template','<h2><tmpl_var name></h2>\r\n<tmpl_var description><br>\r\n<br>\r\n<br>\r\n$ <tmpl_var price><br>\r\n<a href=\"<tmpl_var url>\">Subscribe now</a><br>','Macro/SubscriptionItem',1,1);
