@@ -22,14 +22,19 @@ our @ISA = qw(Exporter);
 our @EXPORT = qw(&www_deployPackage &www_selectPackageToDeploy);
 
 #-------------------------------------------------------------------
-sub _duplicateWidgets {
-	my ($b, $widgetId, $widgetType, $func);
-	$b = WebGUI::SQL->read("select widgetId, namespace from widget where pageId=$_[0]");
-        while (($widgetId,$widgetType) = $b->array) {
-        	$func = "WebGUI::Widget::".$widgetType."::duplicate";
-                &$func($widgetId,$_[1]);
+sub _duplicateWobjects {
+	my ($sth, $wobject, $cmd, %hash, $extra, $w);
+	$sth = WebGUI::SQL->read("select * from wobject where pageId=$_[0]");
+        while ($wobject = $sth->hashRef) {
+		$extra = WebGUI::SQL->quickHashRef("select * from ${$wobject}{namespace} where wobjectId=${$wobject}{wobjectId}");
+		tie %hash, 'Tie::CPHash';
+		%hash = (%{$wobject},%{$extra});
+		$wobject = \%hash;
+                $cmd = "WebGUI::Wobject::".${$wobject}{namespace};
+                $w = $cmd->new($wobject);
+		$w->duplicate($_[1]);
         }
-        $b->finish;
+        $sth->finish;
 }
 
 #-------------------------------------------------------------------
@@ -38,7 +43,7 @@ sub _recursePageTree {
 	tie %newParent, 'Tie::CPHash';
 	tie %package, 'Tie::CPHash';
 	%newParent = WebGUI::SQL->quickHash("select * from page where pageId=$_[1]");
-	_duplicateWidgets($_[0],$_[1]);
+	_duplicateWobjects($_[0],$_[1]);
         $a = WebGUI::SQL->read("select * from page where parentId=$_[0]");
         while (%package = $a->hash) {
 		$newPageId = getNextId("pageId");
