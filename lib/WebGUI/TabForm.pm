@@ -60,6 +60,10 @@ The best and easiest way to use this package is to just call the methods on the 
 
  $tabform->get($tabname)->textarea( -name=>$name, -value=>$value, -label=>$label);
 
+=head1 SEE ALSO
+
+This package is an extension to WebGUI::HTMLForm. See that package for documentation of its methods.
+
 =head1 METHODS
 
 These methods are available from this class:
