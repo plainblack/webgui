@@ -27,7 +27,7 @@ use CGI::Carp qw(fatalsToBrowser);
 use strict;
 use WebGUI;
 use CGI::Fast;
-while my $fcgi = new CGI::Fast) {
+while (my $fcgi = new CGI::Fast) {
 	print WebGUI::page($webguiRoot,$configFile,"","",$fcgi);
 }
 
