@@ -4,6 +4,7 @@
  - Fixed a typo in the Forum Threads that caused an error upon deleting a
    post.
  - Bugfix [ 847198 ] no final newline when data form errors display
+ - Bugfix [ 699010 ] Need Approval option to Discussions like in USS
 
 
 5.5.2

@@ -420,7 +420,7 @@ sub www_view {
 	if ($constraints ne "") {
         	$constraints = "status='Approved' and ".$constraints;
 	} else {
-		$constraints = "(status='Approved' or userId=$session{user}{userId})";
+		$constraints = "(status='Approved' or (userId=$session{user}{userId} and userId<>1))";
 	}
 	$var{"title.label"} = WebGUI::International::get(99);
 	$var{"thumbnail.label"} = WebGUI::International::get(52,$_[0]->get("namespace"));
