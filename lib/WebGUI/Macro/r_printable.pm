@@ -22,7 +22,11 @@ use WebGUI::Utility;
 sub process {
         my ($temp, @param, $styleId);
         @param = WebGUI::Macro::getParams($_[0]);
-        $temp = WebGUI::URL::append($session{env}{REQUEST_URI},'op=makePrintable');
+	my $append = 'op=makePrintable';
+	if ($session{env}{REQUEST_URI} =~ /op\=/) {
+		$append = 'action2='.WebGUI::URL::escape($append);
+	}
+        $temp = WebGUI::URL::append($session{env}{REQUEST_URI},$append);
 	if ($param[1] ne "") {
 		($styleId) = WebGUI::SQL->quickArray("select styleId from style where name=".quote($param[1]));
 		if ($styleId != 0) {

@@ -1,6 +1,7 @@
 6.0.3
  - Fixed a recursive style change bug.
  - Bugfix [ 953593 ] perl -MWebGUI -e "" fails
+ - Bugfix [ 955397 ] Make Page Printable Macro Fails
 
 
 6.0.2
