@@ -250,7 +250,6 @@ sub www_createAccountSave {
 		foreach $fieldName (keys %{$profile}) {
 			$u->profileField($fieldName,${$profile}{$fieldName});
 		}
-		$u->addToGroups([2]);
                 WebGUI::Session::start($u->userId);
 		_logLogin($u->userId,"success");
 		WebGUI::MessageLog::addEntry('',$session{setting}{onNewUserAlertGroup},'',536) if ($session{setting}{alertOnNewUser});

@@ -113,13 +113,25 @@ sub isInGroup {
 	if ($uid eq "") {
 		$uid = $session{user}{userId};
 	}
-	### The "Everyone" group automatically returns true.
-	if ($gid == 7) {
-		return 1;	
+        ### The "Everyone" group automatically returns true.
+        if ($gid == 7) {
+                return 1;
+        }
+	### The "Visitor" group returns false, unless the user is visitor.
+	if ($gid == 1) {
+		if ($uid == 1) {
+			return 1;
+		} else {
+			return 0;
+		}
+	}
+	### The "Registered Users" group returns true if user is not visitor.
+	if ($gid==2 && $uid != 1) {
+		return 1;
 	}
         ### Lookup the actual grouping.
 	@data = WebGUI::SQL->quickArray("select count(*) from groupings where groupId='$gid' and userId='$uid' and expireDate>".time());
-	if ($data[0] > 0) {
+	if ($data[0] > 0 && $uid != 1) {
 		return 1;
 	}
         ### Get data for auxillary checks.

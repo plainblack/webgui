@@ -62,7 +62,7 @@ sub www_addUser {
                	$f->select("authMethod",\%hash,WebGUI::International::get(164),[$session{setting}{authMethod}]);
                 $f->url("ldapURL",WebGUI::International::get(165),$session{setting}{ldapURL});
                 $f->text("connectDN",WebGUI::International::get(166),$session{form}{connectDN});
-                $f->group("groups",WebGUI::International::get(89),[2],5,1);
+                $f->group("groups",WebGUI::International::get(89),[],5,1);
 		$f->submit;
 		$output .= $f->print;
         } else {
