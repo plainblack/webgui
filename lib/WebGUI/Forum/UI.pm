@@ -161,7 +161,7 @@ Formats the url to delete a post.
 
 =head3 callback
 
-The url to get back tot he calling object.
+The url to get back to the calling object.
 
 =head3 postId
 
@@ -181,7 +181,7 @@ Formats the url to deny a post.
 
 =head3 callback
 
-The url to get back tot he calling object.
+The url to get back to the calling object.
 
 =head3 postId
 
@@ -201,7 +201,7 @@ Formats the url to edit a post.
 
 =head3 callback
 
-The url to get back tot he calling object.
+The url to get back to the calling object.
 
 =head3 postId
 
@@ -221,7 +221,7 @@ Formats the url to the forum search engine.
 
 =head3 callback
 
-The url to get back tot he calling object.
+The url to get back to the calling object.
 
 =head3 forumId
 
@@ -241,7 +241,7 @@ Formats the url to change the default sort.
 
 =head3 callback
 
-The url to get back tot he calling object.
+The url to get back to the calling object.
 
 =head3 forumId
 
@@ -265,7 +265,7 @@ Formats the url to subscribe to the forum.
 
 =head3 callback
 
-The url to get back tot he calling object.
+The url to get back to the calling object.
 
 =head3 forumId
 
@@ -285,7 +285,7 @@ Formats the url to unsubscribe from the forum.
 
 =head3 callback
 
-The url to get back tot he calling object.
+The url to get back to the calling object.
 
 =head3 forumId
 
@@ -305,7 +305,7 @@ Formats the url to view the forum.
 
 =head3 callback
 
-The url to get back tot he calling object.
+The url to get back to the calling object.
 
 =head3 forumId
 
@@ -353,7 +353,7 @@ Formats the url to view the next thread.
 
 =head3 callback
 
-The url to get back tot he calling object.
+The url to get back to the calling object.
 
 =head3 postId
 
@@ -373,7 +373,7 @@ Formats the url to start a new thread.
 
 =head3 callback
 
-The url to get back tot he calling object.
+The url to get back to the calling object.
 
 =head3 forumId
 
@@ -425,7 +425,7 @@ Formats the url to view the previous thread.
 
 =head3 callback
 
-The url to get back tot he calling object.
+The url to get back to the calling object.
 
 =head3 postId
 
@@ -445,7 +445,7 @@ Formats the url to rate a post.
 
 =head3 callback
 
-The url to get back tot he calling object.
+The url to get back to the calling object.
 
 =head3 postId
 
@@ -469,7 +469,7 @@ Formats the url to reply to a post.
 
 =head3 callback
 
-The url to get back tot he calling object.
+The url to get back to the calling object.
 
 =head3 postId
 
@@ -524,7 +524,7 @@ Formats the url to change the layout of a thread.
 
 =head3 callback
 
-The url to get back tot he calling object.
+The url to get back to the calling object.
 
 =head3 postId
 
@@ -548,7 +548,7 @@ Formats the url to lock a thread.
 
 =head3 callback
 
-The url to get back tot he calling object.
+The url to get back to the calling object.
 
 =head3 postId
 
@@ -568,7 +568,7 @@ Formats the url to make a thread sticky.
 
 =head3 callback
 
-The url to get back tot he calling object.
+The url to get back to the calling object.
 
 =head3 postId
 
@@ -588,7 +588,7 @@ Formats the url to subscribe to a thread.
 
 =head3 callback
 
-The url to get back tot he calling object.
+The url to get back to the calling object.
 
 =head3 postId
 
@@ -608,7 +608,7 @@ Formats the url to unlock a thread.
 
 =head3 callback
 
-The url to get back tot he calling object.
+The url to get back to the calling object.
 
 =head3 postId
 
@@ -628,7 +628,7 @@ Formats the url to make a sticky thread no longer sticky.
 
 =head3 callback
 
-The url to get back tot he calling object.
+The url to get back to the calling object.
 
 =head3 postId
 
@@ -648,7 +648,7 @@ Formats the url to unsubscribe from a thread.
 
 =head3 callback
 
-The url to get back tot he calling object.
+The url to get back to the calling object.
 
 =head3 postId
 
@@ -668,7 +668,7 @@ Formats the url to view a thread.
 
 =head3 callback
 
-The url to get back tot he calling object.
+The url to get back to the calling object.
 
 =head3 postId
 
