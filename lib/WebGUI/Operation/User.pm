@@ -30,15 +30,21 @@ use WebGUI::Utility;
 our @ISA = qw(Exporter);
 our @EXPORT = qw(&www_editUserKarma &www_editUserKarmaSave &www_editUserGroup &www_editUserProfile &www_editUserProfileSave &www_addUserToGroupSave &www_deleteGrouping &www_editGrouping &www_editGroupingSave &www_becomeUser &www_addUser &www_addUserSave &www_deleteUser &www_deleteUserConfirm &www_editUser &www_editUserSave &www_listUsers);
 
+
 #-------------------------------------------------------------------
 sub _submenu {
 	my ($output, %menu);
 	tie %menu, 'Tie::IxHash';
 	$menu{WebGUI::URL::page("op=addUser")} = WebGUI::International::get(169);
-	unless ($session{form}{op} eq "listUsers" || $session{form}{op} eq "addUser" || $session{form}{op} eq "deleteUserConfirm") {
+	unless ($session{form}{op} eq "listUsers" 
+		|| $session{form}{op} eq "addUser" 
+		|| $session{form}{op} eq "deleteUserConfirm") {
 		$menu{WebGUI::URL::page("op=editUser&uid=".$session{form}{uid})} = WebGUI::International::get(457);
 		$menu{WebGUI::URL::page("op=editUserGroup&uid=".$session{form}{uid})} = WebGUI::International::get(458);
 		$menu{WebGUI::URL::page("op=editUserProfile&uid=".$session{form}{uid})} = WebGUI::International::get(459);
+		$menu{WebGUI::URL::page('op=viewProfile&uid='.$session{form}{uid})} = WebGUI::International::get(752);
+		$menu{WebGUI::URL::page('op=becomeUser&uid='.$session{form}{uid})} = WebGUI::International::get(751);
+		$menu{WebGUI::URL::page('op=deleteUser&uid='.$session{form}{uid})} = WebGUI::International::get(750);
 		if ($session{setting}{useKarma}) {
 			$menu{WebGUI::URL::page("op=editUserKarma&uid=".$session{form}{uid})} = WebGUI::International::get(555);
 		}
@@ -141,12 +147,11 @@ sub www_deleteUser {
                 $output .= helpIcon(7);
 		$output .= '<h1>'.WebGUI::International::get(42).'</h1>';
                 $output .= WebGUI::International::get(167).'<p>';
-                $output .= '<div align="center"><a href="'.
-			WebGUI::URL::page('op=deleteUserConfirm&uid='.$session{form}{uid}).
+                $output .= '<div align="center"><a href="'.WebGUI::URL::page('op=deleteUserConfirm&uid='.$session{form}{uid}).
 			'">'.WebGUI::International::get(44).'</a>';
                 $output .= '&nbsp;&nbsp;&nbsp;&nbsp;<a href="'.WebGUI::URL::page('op=listUsers').'">'.
 			WebGUI::International::get(45).'</a></div>'; 
-		return $output;
+		return _submenu($output);
         }
 }
 
@@ -384,12 +389,8 @@ sub www_listUsers {
 	}
 	$sth = WebGUI::SQL->read("select * from users $search order by users.username");
 	while (%data = $sth->hash) {
-		$row[$i] = '<tr class="tableData"><td>'
-			.deleteIcon('op=deleteUser&uid='.$data{userId})
-			.editIcon('op=editUser&uid='.$data{userId})
-			.becomeIcon('op=becomeUser&uid='.$data{userId});
-		$row[$i] .= '</td>';
-		$row[$i] .= '<td><a href="'.WebGUI::URL::page('op=viewProfile&uid='.$data{userId})
+		$row[$i] = '<tr class="tableData">';
+		$row[$i] .= '<td><a href="'.WebGUI::URL::page('op=editUser&uid='.$data{userId})
 			.'">'.$data{username}.'</a></td>';
 		#$row[$i] .= '<td class="tableData">'.epochToHuman($data{dateCreated},"%z").'</td>';
 		#$row[$i] .= '<td class="tableData">'.epochToHuman($data{lastUpdated},"%z").'</td>';
@@ -399,7 +400,7 @@ sub www_listUsers {
 	$sth->finish;
         $p = WebGUI::Paginator->new(WebGUI::URL::page('op=listUsers&keyword='.$session{form}{keyword}),\@row);
         $output .= '<table border=1 cellpadding=5 cellspacing=0 align="center">';
-	$output .= '<tr><td class="tableHeader"></td>
+	$output .= '<tr>
 		<td class="tableHeader">'.WebGUI::International::get(50).'</td></tr>';
 #		<td class="tableHeader">'.WebGUI::International::get(453).'</td>
 #		<td class="tableHeader">'.WebGUI::International::get(454).'</td></tr>';
