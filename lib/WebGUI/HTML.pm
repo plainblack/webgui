@@ -19,6 +19,8 @@ use strict;
 use WebGUI::Macro;
 use WebGUI::Session;
 use WebGUI::SQL;
+use HTML::Parser;
+use WebGUI::URL;
 
 =head1 NAME
 
@@ -34,6 +36,8 @@ A package for manipulating and massaging HTML.
  $html = WebGUI::HTML::cleanSegment($html);
  $html = WebGUI::HTML::filter($html);
  $html = WebGUI::HTML::format($content, $contentType);
+ $html = WebGUI::HTML::html2text($html);
+ $html = WebGUI::HTML::makeAbsolute($html);
  $html = WebGUI::HTML::processReplacements($html);
 
 =head1 METHODS
@@ -175,6 +179,134 @@ sub format {
 
 #-------------------------------------------------------------------
 
+=head2 html2text ( html )
+
+Converts html to text. It currently handles only text, so tables
+or forms are not converted.
+
+=over
+
+=item html
+
+The html segment you want to convert to text.
+
+=back
+
+=cut
+
+sub html2text {
+	my $html = shift;
+	$session{temp}{html2text}{text} = "";
+	delete($session{temp}{html2text}{inside});
+
+	my $tagHandler = sub {
+		my($tag, $num) = @_;
+		$session{temp}{html2text}{inside}{$tag} += $num;
+		if($tag eq "br" || $tag eq "p") {
+			$session{temp}{html2text}{text} .= "\n";
+		}
+	};
+	my $textHandler = sub {
+		return if $session{temp}{html2text}{inside}{script} || $session{temp}{html2text}{inside}{style};
+		if ($_[0] =~ /\S+/) {
+			$session{temp}{html2text}{text} .= $_[0];
+		}
+	};
+
+	HTML::Parser->new(api_version => 3,
+		  handlers    => [start => [$tagHandler, "tagname, '+1'"],
+				  end   => [$tagHandler, "tagname, '-1'"],
+				  text  => [$textHandler, "dtext"],
+				 ],
+		  marked_sections => 1,
+	)->parse($html);
+
+	return $session{temp}{html2text}{text};
+}
+
+#-------------------------------------------------------------------
+                                                                                                                             
+=head2 makeAbsolute ( html , [ baseURL ] )
+                                                                                                                             
+Returns html with all relative links converted to absolute.
+                                                                                                                             
+=over
+                                                                                                                             
+=item html
+                                                                                                                             
+The html to be made absolute.
+                                       
+=item baseURL
+
+The base URL to use. Defaults to current page's url.                                                                                      
+=back
+                                                                                                                             
+=cut
+                                                                                                                             
+sub makeAbsolute {
+	my $html = shift;
+	my $baseURL = shift; 
+
+	$session{temp}{makeAbsolute}{html} = "";
+
+	my $linkParser = sub {
+		my ($tagname, $attr, $text) = @_;
+		my %linkElements =            # from HTML::Element.pm
+		(
+			body   => 'background',
+			base   => 'href',
+			a      => 'href',
+			img    => [qw(src lowsrc usemap)], # lowsrc is a Netscape invention
+			form   => 'action',
+			input  => 'src',
+			'link'  => 'href',         # need quoting since link is a perl builtin
+			frame  => 'src',
+			iframe => 'src',
+			applet => 'codebase',
+			area   => 'href',
+			script   => 'src',
+			iframe  => 'src',
+		);
+
+		if(not exists $linkElements{$tagname}) {	# no need to touch this tag
+			$session{temp}{makeAbsolute}{html} .= $text;
+			return;
+		}
+		
+		# Build a hash with tag attributes
+		my %tag_attr;
+		for my $tag (keys %linkElements) {
+			my $tagval = $linkElements{$tag};
+			for my $attr (ref $tagval ? @$tagval : $tagval) {
+			$tag_attr{"$tag $attr"}++;
+			}
+		}
+
+		$session{temp}{makeAbsolute}{html} .= "<".$tagname;
+
+		foreach (keys %$attr) {
+			if($_ eq '/') {
+				$session{temp}{makeAbsolute}{html} .= '/';
+				next;
+			}
+			if ($tag_attr{"$tagname $_"}) {	# make this absolute
+				$attr->{$_} = WebGUI::URL::makeAbsolute($attr->{$_}, $baseURL);
+			}
+			$session{temp}{makeAbsolute}{html} .= qq' $_="$attr->{$_}"';
+		}
+	
+		$session{temp}{makeAbsolute}{html} .= '>';
+	};
+	HTML::Parser->new(
+			default_h => [ sub { $session{temp}{makeAbsolute}{html} .= shift }, 'text' ],
+			start_h   => [ $linkParser , 'tagname, attr, text' ],
+		)->parse($html);
+
+	return $session{temp}{makeAbsolute}{html};
+}
+
+#-------------------------------------------------------------------
+
 =head2 processReplacements ( content ) 
 
 Processes text using the WebGUI replacements system.
@@ -207,8 +339,6 @@ sub processReplacements {
 	}
 	return $content;
 }
-
-
 
 1;
 
