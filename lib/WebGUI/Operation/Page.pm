@@ -114,7 +114,7 @@ sub www_cutPage {
 #-------------------------------------------------------------------
 sub www_deletePage {
 	my ($output);
-	if ($session{page}{pageId} < 26) {
+	if ($session{page}{pageId} < 1000 && $session{page}{pageId} > 0) {
 		return WebGUI::Privilege::vitalComponent();
 	} elsif (WebGUI::Privilege::canEditPage()) {
 		$output .= helpIcon(3);
@@ -132,7 +132,7 @@ sub www_deletePage {
 
 #-------------------------------------------------------------------
 sub www_deletePageConfirm {
-        if ($session{page}{pageId} < 25) {
+	if ($session{page}{pageId} < 1000 && $session{page}{pageId} > 0) {
 		return WebGUI::Privilege::vitalComponent();
         } elsif (WebGUI::Privilege::canEditPage()) {
 		WebGUI::SQL->write("update page set parentId=3 where pageId=".$session{page}{pageId});
