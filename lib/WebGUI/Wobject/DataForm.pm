@@ -420,11 +420,11 @@ sub www_editField {
 	$f->integer(
 		-name=>"width",
 		-label=>WebGUI::International::get(8, $_[0]->get("namespace")),
-		-value=>($field{width} || 45)
+		-value=>($field{width} || 0)
 		);
 	$f->integer(
                 -name=>"rows",
-		-value=>$field{rows} || "5",
+		-value=>$field{rows} || 0,
 		-label=>WebGUI::International::get(27, $_[0]->get("namespace")),
 		-subtext=>WebGUI::International::get(28, $_[0]->get("namespace")),
 		);
