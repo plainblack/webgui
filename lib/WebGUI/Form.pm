@@ -1226,6 +1226,47 @@ sub url {
 
 #-------------------------------------------------------------------
 
+=head2 whatNext ( hashRef ] )
+
+ Returns a "What next?" select list for use with chained action forms
+ in WebGUI.
+
+=item options
+
+ A hash reference of the possible actions that could happen next.
+
+=item value
+
+ The selected element in this list. 
+
+=item name
+
+ The name field for this form element. Defaults to "proceed".
+
+=item extras
+
+ If you want to add anything special to this form element like
+ javascript actions, or stylesheet information, you'd add it in
+ here as follows:
+
+   'onChange="this.form.submit()"'
+
+=cut
+
+sub whatNext {
+        my ($name);
+        $name = $_[0]->{name} || "proceed";
+        return selectList({
+                options=>$_[0]->{options},
+                name=>$name,
+                value=>[$_[0]->{value}],
+                extras=>$_[0]->{extras}
+                });
+
+}
+
+#-------------------------------------------------------------------
+
 =head2 yesNo ( hashRef )
 
  Returns a yes/no radio field. 

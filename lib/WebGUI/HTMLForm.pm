@@ -690,7 +690,7 @@ sub group {
                 $output = WebGUI::Form::hiddenList({
 			name=>$name,
                         options=>$hashRef,
-                        groupId=>$value
+                        value=>$value
                         });
         }
         $self->{_data} .= $output;
@@ -1768,6 +1768,76 @@ sub url {
                         });
                 $output .= _subtext($subtext);
         	$output = $self->_tableFormRow($label,$output);
+        } else {
+                $output = WebGUI::Form::hidden({
+                        name=>$name,
+                        value=>$value
+                        });
+        }
+        $self->{_data} .= $output;
+}
+
+#-------------------------------------------------------------------
+
+=head2 whatNext ( hashRef ] )
+
+ Adds a "What next?" select list to this form for use with chained 
+ action forms in WebGUI.
+
+=item options
+
+ A hash reference of the possible actions that could happen next.
+
+=item value
+
+ The selected element in this list.
+
+=item name
+
+ The name field for this form element. Defaults to "proceed".
+
+=item label
+
+ The left column label for this form row.
+
+=item subtext
+
+ Extra text to describe this form element or to provide special
+ instructions.
+
+=item uiLevel
+
+ The UI level for this field. See the WebGUI developer's site for
+ details. Defaults to "1".
+
+=cut
+
+=item extras
+
+ If you want to add anything special to this form element like
+ javascript actions, or stylesheet information, you'd add it in
+ here as follows:
+
+   'onChange="this.form.submit()"'
+
+=cut
+
+sub whatNext {
+        my ($output);
+        my ($self, @p) = @_;
+        my ($options, $value, $name, $label, $subtext, $uiLevel, $extras) =
+                rearrange([options, value, name, label, subtext, uiLevel, extras], @p);
+	$uiLevel |= 1;
+	$label |= WebGUI::International::get(744);
+        if (_uiLevelChecksOut($uiLevel)) {
+                $output = WebGUI::Form::whatNext({
+                        name=>$name,
+			options=>$options,
+                        value=>$value,
+                        extras=>$extras
+                        });
+                $output .= _subtext($subtext);
+                $output = $self->_tableFormRow($label,$output);
         } else {
                 $output = WebGUI::Form::hidden({
                         name=>$name,
