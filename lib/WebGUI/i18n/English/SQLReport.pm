@@ -50,13 +50,13 @@ A question mark ? in the query represents a placeholder. Note that the ? is not 
 The administrator can configure common databases on which you can run SQL Reports, freeing you from having to know or enter the connectivity information.
 <p>
 
-<b>Paginate After</b>
+<b>Paginate After</b><br>
 How many rows should be displayed before splitting the results into separate pages? In other words, how many rows should be displayed per page?
 <p>
 
 
 |,
-		lastUpdated => 1082365505
+		lastUpdated => 1099546465
 	},
 
 	'61' => {
