@@ -21,7 +21,6 @@ save you many hours of grief.
 	Please see docs/migration.txt for details.
 
 
-
 5.5.0
 --------------------------------------------------------------------
  * If you have any custom Message Board templates they will be

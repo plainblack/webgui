@@ -180,9 +180,9 @@ sub www_viewStatistics {
 	$output .= '<tr><td align="right" class="tableHeader">'.WebGUI::International::get(794).':</td><td class="tableData">'.$data.'</td></tr>';
 	($data) = WebGUI::SQL->quickArray("select count(*) from wobject where wobjectId > 0 and pageId<>3");
 	$output .= '<tr><td align="right" class="tableHeader">'.WebGUI::International::get(148).':</td><td class="tableData">'.$data.'</td></tr>';
-	($data) = WebGUI::SQL->quickArray("select count(*) from style where styleId>1000");
+	($data) = WebGUI::SQL->quickArray("select count(*) from template where templateId>1000 and namespace='style'");
 	$output .= '<tr><td align="right" class="tableHeader">'.WebGUI::International::get(427).':</td><td class="tableData">'.$data.'</td></tr>';
-	($data) = WebGUI::SQL->quickArray("select count(*) from template where templateId>1000");
+	($data) = WebGUI::SQL->quickArray("select count(*) from template where templateId>1000 and namespace<>'style'");
 	$output .= '<tr><td align="right" class="tableHeader">'.WebGUI::International::get(792).':</td><td class="tableData">'.$data.'</td></tr>';
 	($data) = WebGUI::SQL->quickArray("select count(*) from collateral");
 	$output .= '<tr><td align="right" class="tableHeader">'.WebGUI::International::get(793).':</td><td class="tableData">'.$data.'</td></tr>';

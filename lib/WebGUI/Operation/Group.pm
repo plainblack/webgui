@@ -217,17 +217,9 @@ sub www_editGroup {
 		-value=>$g->autoDelete,
 		-label=>WebGUI::International::get(975)
 		);
-	my %databaseLinkOptions;
-	tie %databaseLinkOptions, 'Tie::IxHash',
-		"0"=>WebGUI::International::get(19,'SQLReport'),
-		WebGUI::DatabaseLink::getHash();
-	$f->selectList(
-		-name=>"databaseLinkId",
-		-options=>\%databaseLinkOptions,
-		-label=>WebGUI::International::get(20,'SQLReport'),
-		-value=>[$g->databaseLinkId],
-		-subtext=>(WebGUI::Privilege::isInGroup(3)) ? '<a href="'.WebGUI::URL::page("op=listDatabaseLinks").'">'.WebGUI::International::get(981).'</a>' : ""
-		);
+	$f->databaseLink(
+                -value=>[$g->databaseLinkId]
+                );
 	$f->textarea(
 		-name=>"dbQuery",
 		-value=>$g->dbQuery,

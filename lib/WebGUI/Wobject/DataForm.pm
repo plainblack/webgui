@@ -453,6 +453,7 @@ sub www_editSave {
 #-------------------------------------------------------------------
 sub www_editField {
 	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId")));
+        $session{page}{useAdminStyle} = 1;
     	my ($output, %field, $f, %fieldStatus);
     	tie %field, 'Tie::CPHash';
     	tie %fieldStatus, 'Tie::IxHash';

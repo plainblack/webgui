@@ -306,6 +306,7 @@ sub www_editSave {
 #-------------------------------------------------------------------
 sub www_editAnswer {
         return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId")));
+        $session{page}{useAdminStyle} = 1;
         my ($question, $output, $f, $answer);
         $answer = $_[0]->getCollateral("Survey_answer","Survey_answerId",$session{form}{aid});
         $output = '<h1>'.WebGUI::International::get(18,$_[0]->get("namespace")).'</h1>';
@@ -383,6 +384,7 @@ sub www_editAnswerSave {
 #-------------------------------------------------------------------
 sub www_editQuestion {
 	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId")));
+        $session{page}{useAdminStyle} = 1;
 	my ($output, $f, $question, $answerFieldType, $sth, %data);
 	tie %data, 'Tie::CPHash';
 	$question = $_[0]->getCollateral("Survey_question","Survey_questionId",$session{form}{qid});

@@ -128,6 +128,17 @@ sub www_editMiscSettings {
 			},
 		-label=>WebGUI::International::get(1069)
 		);
+	$f->yesNo(
+		-name=>"useAdminStyle",
+		-value=>$session{setting}{useAdminStyle},
+		-label=>WebGUI::International::get(1080)
+		);
+	$f->template(
+		-name=>"adminStyleId",
+		-namespace=>"style",
+		-value=>$session{setting}{adminStyleId},
+		-label=>WebGUI::International::get(1081)
+		);
 	$f->submit;
 	$output .= $f->print;
         return _submenu($output);

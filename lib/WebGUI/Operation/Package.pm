@@ -74,7 +74,8 @@ sub _recursePageTree {
 			hideFromNavigation,
 			newWindow,
 			cacheTimeout,
-			cacheTimeoutVisitor
+			cacheTimeoutVisitor,
+			printableStyleId
 			) values (
 			$newPageId,
 			$_[1],
@@ -101,7 +102,8 @@ sub _recursePageTree {
 			$package{hideFromNavigation},
 			$package{newWindow},
 			$package{cacheTimeout},
-			$package{cacheTimeoutVisitor}
+			$package{cacheTimeoutVisitor},
+			$package{printableStyleId}
 			)");
 		_recursePageTree($package{pageId},$newPageId);
 	}
@@ -111,6 +113,7 @@ sub _recursePageTree {
 #-------------------------------------------------------------------
 sub www_selectPackageToDeploy {
 	my ($output, %data, $sth, $flag);
+	$session{page}{useAdminStyle} = 1;
 	if (WebGUI::Privilege::canEditPage()) {
 		tie %data,'Tie::CPHash';
 		$output = helpIcon(30);

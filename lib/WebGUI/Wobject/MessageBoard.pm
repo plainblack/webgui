@@ -102,6 +102,7 @@ sub www_edit {
 #-------------------------------------------------------------------
 sub www_editForum {
  	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId")));
+        $session{page}{useAdminStyle} = 1;
 	my $forumMeta;
 	if ($session{form}{forumId} ne "new") {
 		$forumMeta = WebGUI::SQL->quickHashRef("select title,description from MessageBoard_forums where forumId=".$session{form}{forumId});

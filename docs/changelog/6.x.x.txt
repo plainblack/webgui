@@ -27,3 +27,5 @@
  - Added new Authentication System.
  - Collateral macros now return undef instead of the macro tag when no
    matching collateral is found.
+ - Added style personalization.
+ - Added admin style option.

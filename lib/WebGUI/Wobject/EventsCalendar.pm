@@ -318,6 +318,7 @@ sub www_editSave {
 #-------------------------------------------------------------------
 sub www_editEvent {
 	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId")));
+        $session{page}{useAdminStyle} = 1;
         my (%recursEvery, $special, $output, $f, %event);
 	tie %event, 'Tie::CPHash';
 	tie %recursEvery, 'Tie::IxHash';

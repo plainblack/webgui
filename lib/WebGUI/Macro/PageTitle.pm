@@ -16,7 +16,7 @@ use WebGUI::URL;
 
 #-------------------------------------------------------------------
 sub process {
-	if ($session{env}{QUERY_STRING} =~ /op/ || $session{env}{QUERY_STRING} =~ /func/) {
+	if ($session{form}{op} || $session{form}{func}) {
         	return '<a href="'.WebGUI::URL::page().'">'.$session{page}{title}.'</a>';
 	} else {
 		return $session{page}{title};

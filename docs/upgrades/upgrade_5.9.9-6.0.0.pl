@@ -447,7 +447,6 @@ while (my $authHash = $authSth->hashRef){
 
 #--------------------------------------------
 print "\tRemoving unneeded files and directories.\n" unless ($quiet);
-unlink("../../lib/WebGUI/Operation/Style.pm");
 unlink("../../lib/WebGUI/Wobject/Item.pm");
 unlink("../../lib/WebGUI/Wobject/LinkList.pm");
 unlink("../../lib/WebGUI/Wobject/FAQ.pm");

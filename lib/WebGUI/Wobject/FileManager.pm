@@ -184,6 +184,7 @@ sub www_editSave {
 #-------------------------------------------------------------------
 sub www_editDownload {
 	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId")));
+	$session{page}{useAdminStyle} = 1;
         my ($output, $file, $f);
 	$file = $_[0]->getCollateral("FileManager_file","FileManager_fileId",$session{form}{did});
         $output .= helpIcon(2,$_[0]->get("namespace"));

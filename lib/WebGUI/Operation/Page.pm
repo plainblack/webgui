@@ -69,7 +69,7 @@ sub _recursivelyChangeStyle {
 	$sth = WebGUI::SQL->read("select pageId from page where parentId=$_[0]");	
 	while (($pageId) = $sth->array) {
 		if (WebGUI::Privilege::canEditPage($pageId)) {
-			WebGUI::SQL->write("update page set styleId=$session{form}{styleId} where pageId=$pageId");
+			WebGUI::SQL->write("update page set styleId=$session{form}{styleId}, printableStyleId=$session{form}{printableStyleId} where pageId=$pageId");
 			_recursivelyChangeStyle($pageId);
 		}
 	}
@@ -248,6 +248,7 @@ use WebGUI::TabForm;
 #-------------------------------------------------------------------
 sub www_editPage {
         my ($f, $endDate, $output, $subtext, $childCount, %hash, %page);
+	$session{page}{useAdminStyle} = 1;
 	tie %hash, "Tie::IxHash";
 	tie %page, "Tie::CPHash";
         if (WebGUI::Privilege::canEditPage($session{form}{npp})) {
@@ -318,7 +319,7 @@ sub www_editPage {
 			-value=>$page{urlizedTitle},
 			-uiLevel=>3
 			);
-		$f->getTab("properties")->select(
+		$f->getTab("properties")->selectList(
 			-name=>"languageId",
 			-label=>WebGUI::International::get(304),
 			-value=>[$page{languageId}],
@@ -365,17 +366,17 @@ sub www_editPage {
                 	-unitsValue=>$data[1],
 			-uiLevel=>8
                 	);
-		if (WebGUI::Privilege::isInGroup(5)) {
-			$subtext = ' &nbsp; <a href="'.WebGUI::URL::page('op=listStyles')
-				.'">'.WebGUI::International::get(6).'</a>';
-		} else {
-			$subtext = "";
-		}
                 $f->getTab("layout")->template(
 			-name=>"styleId",
-			-label=>WebGUI::International::get(105),
-			-value=>$page{styleId},
-			-subtext=>$subtext,
+			-label=>WebGUI::International::get(912),
+			-value=>($page{styleId} || 2),
+			-namespace=>'style',
+			-uiLevel=>5
+			);
+                $f->getTab("layout")->template(
+			-name=>"printableStyleId",
+			-label=>WebGUI::International::get(1079),
+			-value=>($page{printableStyleId} || 3),
 			-namespace=>'style',
 			-uiLevel=>5
 			);
@@ -494,6 +495,7 @@ sub www_editPageSave {
         WebGUI::SQL->write("update page set 
 		title=".quote($session{form}{title}).", 
 		styleId=$session{form}{styleId}, 
+		printableStyleId=$session{form}{printableStyleId}, 
 		ownerId=$session{form}{ownerId}, 
 		groupIdView=$session{form}{groupIdView}, 
 		groupIdEdit=$session{form}{groupIdEdit}, 
@@ -604,6 +606,7 @@ sub www_pastePage {
 #-------------------------------------------------------------------
 sub www_viewPageTree {
 	my ($output);
+	$session{page}{useAdminStyle} = 1;
 	$output = '<h1>'.WebGUI::International::get(448).'</h1>';
 	$output .= _traversePageTree(0,0);
 	return $output;

@@ -1165,6 +1165,7 @@ An id this namespace of the WebGUI international system. This message will be re
 
 sub www_edit {
 	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId")));
+	$session{page}{useAdminStyle} = 1;
 	my ($self, @p) = @_;
         my ($properties, $layout, $privileges, $heading, $helpId, $headingId) = 
 		rearrange([qw(properties layout privileges heading helpId headingId)], @p);

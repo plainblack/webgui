@@ -22,11 +22,11 @@ use WebGUI::Utility;
 sub process {
         my ($temp, @param, $styleId);
         @param = WebGUI::Macro::getParams($_[0]);
-        $temp = WebGUI::URL::append($session{env}{REQUEST_URI},'makePrintable=1');
+        $temp = WebGUI::URL::append($session{env}{REQUEST_URI},'op=makePrintable');
 	if ($param[1] ne "") {
 		($styleId) = WebGUI::SQL->quickArray("select styleId from style where name=".quote($param[1]));
 		if ($styleId != 0) {
-			$temp = WebGUI::URL::append($temp,'style='.$styleId);
+			$temp = WebGUI::URL::append($temp,'styleId='.$styleId);
 		}
 	}
 	if ($param[0] ne "linkonly") {

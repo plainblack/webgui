@@ -116,6 +116,7 @@ sub purge {
 #-------------------------------------------------------------------
 sub www_addAccessory {
 	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId")));
+        $session{page}{useAdminStyle} = 1;
         my ($output, $f, $accessory, @usedAccessories);
 	$output = helpIcon(4,$_[0]->get("namespace"));
         $output .= '<h1>'.WebGUI::International::get(16,$_[0]->get("namespace")).'</h1>';
@@ -137,6 +138,7 @@ sub www_addAccessory {
 #-------------------------------------------------------------------
 sub www_addAccessorySave {
 	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId")));
+        $session{page}{useAdminStyle} = 1;
         my ($seq);
         ($seq) = WebGUI::SQL->quickArray("select max(sequenceNumber) from Product_accessory
                 where wobjectId=".$_[0]->get("wobjectId"));
@@ -326,6 +328,7 @@ sub www_editSave {
 #-------------------------------------------------------------------
 sub www_editBenefit {
 	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId")));
+        $session{page}{useAdminStyle} = 1;
         my ($output, $data, $f, $benefits);
 	$data = $_[0]->getCollateral("Product_benefit","Product_benefitId",$session{form}{bid});
         $output = helpIcon(6,$_[0]->get("namespace"));
@@ -361,6 +364,7 @@ sub www_editBenefitSave {
 #-------------------------------------------------------------------
 sub www_editFeature {
 	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId")));
+        $session{page}{useAdminStyle} = 1;
         my ($output, $data, $f, $features);
 	$data = $_[0]->getCollateral("Product_feature","Product_featureId",$session{form}{fid});
 	$output = helpIcon(2,$_[0]->get("namespace"));
@@ -396,6 +400,7 @@ sub www_editFeatureSave {
 #-------------------------------------------------------------------
 sub www_editSpecification {
 	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId")));
+        $session{page}{useAdminStyle} = 1;
         my ($output, $data, $f, $hashRef);
 	$data = $_[0]->getCollateral("Product_specification","Product_specificationId",$session{form}{sid});
 	$output = helpIcon(3,$_[0]->get("namespace"));

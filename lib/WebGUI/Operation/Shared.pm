@@ -66,6 +66,7 @@ our @EXPORT = qw(&menuWrapper);
 #-------------------------------------------------------------------
 sub menuWrapper {
         my ($output, $key);
+	$session{page}{useAdminStyle} = 1;
         $output = '<table width="100%" border="0" cellpadding="5" cellspacing="0">
 		<tr><td width="70%" class="tableData" valign="top">';
         $output .= $_[0];

@@ -89,6 +89,13 @@ sub process {
 	my %var;
 	$var{'body.content'} = shift;
 	my $templateId = shift;
+	if ($session{page}{makePrintable}) {
+		$templateId = $session{page}{printableStyleId};
+	} elsif ($session{page}{useAdminStyle} ne "" && $session{setting}{useAdminStyle}) {
+		$templateId = $session{setting}{adminStyleId};
+	} elsif ($session{scratch}{personalStyleId} ne "") {
+		$templateId = $session{scratch}{personalStyleId};
+	}
         my $type = lc($session{setting}{siteicon});
         $type =~ s/.*\.(.*?)$/$1/;
 	$var{'head.tags'} = '
