@@ -14,13 +14,17 @@ package Hourly::EmptyTrash;
 
 
 use strict;
+use WebGUI::DateTime;
 use WebGUI::Operation::Trash;
 use WebGUI::Session;
 use WebGUI::SQL;
 
 #-----------------------------------------
 sub process {
-	WebGUI::Operation::Trash::www_purgeTrashConfirm();
+        my @date = WebGUI::DateTime::localtime();
+	if ($date[1] == $session{config}{EmptyTrash_day} && $date[4] == 1) { # only occurs at 1am on the day in question.
+		WebGUI::Operation::Trash::www_purgeTrashConfirm();
+	}
 }
 
 1;
