@@ -1190,7 +1190,7 @@ sub www_delete {
 	my $self = shift;
         my ($output);
         if ($self->canEdit) {
-                $output = helpIcon(14);
+                $output = helpIcon("wobject delete");
 		$output .= '<h1>'.WebGUI::International::get(42).'</h1>';
                 $output .= WebGUI::International::get(43);
 		$output .= '<p>';

@@ -266,7 +266,7 @@ sub www_editProfileSettings {
 	my ($output, $a, %category, %field, $b);
 	tie %category, 'Tie::CPHash';
 	tie %field, 'Tie::CPHash';
-	$output = helpIcon(22);
+	$output = helpIcon("profile settings edit");
 	$output .= '<h1>'.WebGUI::International::get(308).'</h1>';
 	$a = WebGUI::SQL->read("select * from userProfileCategory order by sequenceNumber");
 	while (%category = $a->hash) {

@@ -101,7 +101,7 @@ sub www_edit {
 		-properties=>$properties->printRowsOnly,
 		-layout=>$layout->printRowsOnly,
 		-headingId=>12,
-		-helpId=>1
+		-helpId=>"article add/edit"
 		);
 }
 

@@ -38,7 +38,7 @@ sub _submenu {
 sub www_listRoots {
         return WebGUI::Privilege::adminOnly() unless(WebGUI::Grouping::isInGroup(3));
         my ($output, $p, $sth, %data, @row, $i);
-        $output = helpIcon(28);
+        $output = helpIcon("root manage");
 	$output .= '<h1>'.WebGUI::International::get(408).'</h1>';
         $sth = WebGUI::SQL->read("select * from page where title<>'Reserved' and parentId=0 order by title");
         while (%data = $sth->hash) {

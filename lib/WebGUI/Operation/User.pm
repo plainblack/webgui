@@ -64,7 +64,7 @@ sub _submenu {
 sub www_addUser {
     my ($output, $f, $cmd, $html, %status);
     return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3) || WebGUI::Grouping::isInGroup(11));
-    $output .= helpIcon(5);
+    $output .= helpIcon("user add/edit");
 	$output .= '<h1>'.WebGUI::International::get(163).'</h1>';
 	$output .= WebGUI::Form::_javascriptFile("swapLayers.js");
 	$output .= '<script language="JavaScript" > var active="'.$session{setting}{authMethod}.'"; </script>';
@@ -182,7 +182,7 @@ sub www_deleteUser {
         if ($session{form}{uid} < 26) {
 		return WebGUI::Privilege::vitalComponent();
         } else {
-                $output .= helpIcon(7);
+                $output .= helpIcon("user delete");
 		$output .= '<h1>'.WebGUI::International::get(42).'</h1>';
                 $output .= WebGUI::International::get(167).'<p>';
                 $output .= '<div align="center"><a href="'.WebGUI::URL::page('op=deleteUserConfirm&uid='.$session{form}{uid}).
@@ -244,7 +244,7 @@ sub www_editUser {
 	$u = WebGUI::User->new($session{form}{uid});
 	$output .= WebGUI::Form::_javascriptFile("swapLayers.js");
 	$output .= '<script language="JavaScript" > var active="'.$u->authMethod.'"; </script>';
-    $output .= helpIcon(5);
+    $output .= helpIcon("user add/edit");
 	$output .= '<h1>'.WebGUI::International::get(168).'</h1>';
 	$f = WebGUI::HTMLForm->new;
     $f->hidden("op","editUserSave");
@@ -357,7 +357,7 @@ sub www_editUserGroup {
 sub www_editUserKarma {
 	return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
         my ($output, $f, $a, %user, %data, $method, $values, $category, $label, $default, $previousCategory);
-        $output = helpIcon(36);
+        $output = helpIcon("karma using");
         $output .= '<h1>'.WebGUI::International::get(558).'</h1>';
         $f = WebGUI::HTMLForm->new;
         $f->hidden("op","editUserKarmaSave");
@@ -383,7 +383,7 @@ sub www_editUserProfile {
 	return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
         my ($output, $f, $a, %user, %data, $method, $values, $category, $label, $default, $previousCategory);
 	tie %data, 'Tie::CPHash';
-	$output = helpIcon(32);
+	$output = helpIcon("user profile edit");
         $output .= '<h1>'.WebGUI::International::get(455).'</h1>';
         $f = WebGUI::HTMLForm->new;
         $f->hidden("op","editUserProfileSave");
@@ -469,7 +469,7 @@ sub www_listUsers {
 	WebGUI::Session::setScratch("userSearchKeyword",$session{form}{keyword});
 	WebGUI::Session::setScratch("userSearchStatus",$session{form}{status});
 	my ($data, $rows, $p, %status, $selectedStatus);
-	my $output = helpIcon(8);
+	my $output = helpIcon("users manage");
 	$output .= '<h1>'.WebGUI::International::get(149).'</h1>';
 	$output .= '<div align="center">';
 	tie %status, 'Tie::IxHash';

@@ -232,7 +232,7 @@ sub www_edit {
       -privileges => $privileges->printRowsOnly,
       -properties => $properties->printRowsOnly,
       -headingId  => 20,
-      -helpId     => 1,
+      -helpId     => "web services client add/edit",
    );
 }
 

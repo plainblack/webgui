@@ -202,7 +202,7 @@ sub www_edit {
 		-properties=>$properties->printRowsOnly,
 		-privileges=>$privileges->printRowsOnly,
 		-headingId=>9,
-		-helpId=>1
+		-helpId=>"poll add/edit"
 		);
 	if ($_[0]->get("wobjectId") ne "new") {
 		$output .= '<p>';

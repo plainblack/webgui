@@ -165,7 +165,6 @@ sub www_viewStatistics {
 		$version = $cache->setByHTTP($url,43200);
 	}
 	chomp $version;
-        $output .= helpIcon(12);
         $output .= '<h1>'.WebGUI::International::get(437).'</h1>';
 	$output .= '<table>';
 	$output .= '<tr><td align="right" class="tableHeader">'.WebGUI::International::get(145).':</td><td class="tableData">'.$WebGUI::VERSION.'</td></tr>';

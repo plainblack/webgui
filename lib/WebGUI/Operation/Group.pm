@@ -116,7 +116,7 @@ sub www_deleteGroup {
 	return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
         my ($output);
         return WebGUI::Privilege::vitalComponent() if ($session{form}{gid} < 26);
-        $output .= helpIcon(15);
+        $output .= helpIcon("group delete");
 	$output .= '<h1>'.WebGUI::International::get(42).'</h1>';
         $output .= WebGUI::International::get(86).'<p>';
         $output .= '<div align="center"><a href="'.WebGUI::URL::page('op=deleteGroupConfirm&gid='.$session{form}{gid}).
@@ -161,7 +161,7 @@ sub www_editGroup {
 	} else {
 		$g = WebGUI::Group->new($session{form}{gid});
 	}
-        $output .= helpIcon(17);
+        $output .= helpIcon("group add/edit");
 	$output .= '<h1>'.WebGUI::International::get(87).'</h1>';
 	$f = WebGUI::HTMLForm->new;
         $f->hidden("op","editGroupSave");
@@ -299,7 +299,7 @@ sub www_emailGroupSend {
 sub www_listGroups {
 	return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
         my ($output, $p, $sth, @data, @row, $i, $userCount);
-        $output = helpIcon(10);
+        $output = helpIcon("groups manage");
 	$output .= '<h1>'.WebGUI::International::get(89).'</h1>';
         $sth = WebGUI::SQL->read("select groupId,groupName,description from groups 
 		where isEditable=1 order by groupName");

@@ -562,7 +562,7 @@ sub www_edit {
 		-layout=>$layout->printRowsOnly,
 		-privileges=>$privileges->printRowsOnly,
 		-headingId=>2,
-		-helpId=>1
+		-helpId=>"survey add/edit"
 		);
         return $output;
 }

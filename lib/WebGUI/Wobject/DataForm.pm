@@ -536,7 +536,7 @@ sub www_edit {
 	return $_[0]->SUPER::www_edit(
 		-properties=>$properties->printRowsOnly,
 		-layout=>$layout->printRowsOnly,
-		-helpId=>1,
+		-helpId=>"data form add/edit",
 		-headingId=>7
 		);
 }
@@ -619,7 +619,7 @@ sub www_editField {
         	%field = WebGUI::SQL->quickHash("select * from DataForm_field where DataForm_fieldId=$session{form}{fid}");
 	}
 	$tab = WebGUI::SQL->buildHashRef("select DataForm_tabId,label from DataForm_tab where wobjectId=".$_[0]->get("wobjectId"));
-        $output = helpIcon(2,$_[0]->get("namespace"));
+        $output = helpIcon("data form fields add/edit",$_[0]->get("namespace"));
         $output .= '<h1>'.WebGUI::International::get(20,$_[0]->get("namespace")).'</h1>';
         $f = WebGUI::HTMLForm->new;
         $f->hidden("wid",$_[0]->get("wobjectId"));
@@ -734,7 +734,7 @@ sub www_editTab {
 	unless ($session{form}{tid} eq "new") {	
         	%tab = WebGUI::SQL->quickHash("select * from DataForm_tab where DataForm_tabId=$session{form}{tid}");
 	}
-        $output = helpIcon(2,$_[0]->get("namespace"));
+        $output = helpIcon("data form fields add/edit",$_[0]->get("namespace"));
         $output .= '<h1>'.WebGUI::International::get(20,$_[0]->get("namespace")).'</h1>';
         $f = WebGUI::HTMLForm->new;
         $f->hidden("wid",$_[0]->get("wobjectId"));

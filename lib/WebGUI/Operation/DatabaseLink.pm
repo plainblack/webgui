@@ -57,7 +57,7 @@ sub www_copyDatabaseLink {
 sub www_deleteDatabaseLink {
         return WebGUI::Privilege::insufficient unless (WebGUI::Grouping::isInGroup(3));
         my ($output);
-        $output .= helpIcon(70);
+        $output .= helpIcon("database link delete");
 	$output .= '<h1>'.WebGUI::International::get(987).'</h1>';
         $output .= WebGUI::International::get(988).'<p>';
         foreach my $using (WebGUI::DatabaseLink::whatIsUsing($session{form}{dlid})) {
@@ -93,7 +93,7 @@ sub www_editDatabaseLink {
 	} else {
                	%db = WebGUI::SQL->quickHash("select * from databaseLink where databaseLinkId=$session{form}{dlid}");
 	}
-        $output .= helpIcon(69);
+        $output .= helpIcon("database link add/edit");
 	$output .= '<h1>'.WebGUI::International::get(990).'</h1>';
 	$f = WebGUI::HTMLForm->new;
         $f->hidden("op","editDatabaseLinkSave");
@@ -124,7 +124,7 @@ sub www_editDatabaseLinkSave {
 sub www_listDatabaseLinks {
         return WebGUI::Privilege::adminOnly() unless(WebGUI::Grouping::isInGroup(3));
         my ($output, $p, $sth, %data, @row, $i);
-        $output = helpIcon(68);
+        $output = helpIcon("database links manage");
 	$output .= '<h1>'.WebGUI::International::get(996).'</h1>';
         $sth = WebGUI::SQL->read("select * from databaseLink order by title");
 	$row[$i] = '<tr><td valign="top" class="tableData"></td><td valign="top" class="tableData">'.WebGUI::International::get(1076).'</td></tr>';

@@ -122,7 +122,7 @@ sub www_addThemeComponentSave {
 sub www_deleteTheme {
         return WebGUI::Privilege::insufficient unless (WebGUI::Grouping::isInGroup(9));
 	return WebGUI::Privilege::vitalComponent() if ($session{form}{themeId} < 1000 && $session{form}{themeId} > 0);
-        my $output = helpIcon(64);
+        my $output = helpIcon("theme delete");
 	$output .= '<h1>'.WebGUI::International::get(42).'</h1>';
         $output .= WebGUI::International::get(907).'<p>';
         $output .= '<div align="center"><a href="'.
@@ -162,8 +162,7 @@ sub www_deleteThemeConfirm {
 sub www_deleteThemeComponent {
         return WebGUI::Privilege::insufficient unless (WebGUI::Grouping::isInGroup(9));
         return WebGUI::Privilege::vitalComponent() if ($session{form}{themeId} < 1000 && $session{form}{themeId} > 0);
-        my $output = helpIcon(4);
-        $output .= '<h1>'.WebGUI::International::get(42).'</h1>';
+        my $output = '<h1>'.WebGUI::International::get(42).'</h1>';
         $output .= WebGUI::International::get(908).'<p>';
         $output .= '<div align="center"><a href="'.
                 WebGUI::URL::page('op=deleteThemeComponentConfirm&themeId='.$session{form}{themeId})
@@ -188,7 +187,7 @@ sub www_editTheme {
 	unless($session{form}{themeId} eq "new") {
                	$theme = WebGUI::SQL->quickHashRef("select * from theme where themeId=$session{form}{themeId}");
 	}
-        $output .= helpIcon(62);
+        $output .= helpIcon("theme add/edit");
 	$output .= '<h1>'.WebGUI::International::get(902).'</h1>';
 	$f = WebGUI::HTMLForm->new;
         $f->hidden("op","editThemeSave");
@@ -310,7 +309,7 @@ sub www_exportTheme {
 #-------------------------------------------------------------------
 sub www_importTheme {
         return WebGUI::Privilege::insufficient unless (WebGUI::Grouping::isInGroup(9));
-	my $output = helpIcon(63);
+	my $output = helpIcon("theme import");
 	$output .= '<h1>'.WebGUI::International::get(927).'</h1>';
 	my $f = WebGUI::HTMLForm->new;
 	$f->hidden(
@@ -329,7 +328,7 @@ sub www_importTheme {
 #-------------------------------------------------------------------
 sub www_importThemeValidate {
         return WebGUI::Privilege::insufficient unless (WebGUI::Grouping::isInGroup(9));
-	my $output = helpIcon(63);
+	my $output = helpIcon("theme import");
 	$output .= '<h1>'.WebGUI::International::get(927).'</h1>';
 	my $a = WebGUI::Attachment->new("","temp");
 	my $filename = $a->save("themePackage");
@@ -425,7 +424,7 @@ sub www_importThemeSave {
 sub www_listThemes {
         return WebGUI::Privilege::insufficient unless (WebGUI::Grouping::isInGroup(9));
         my (@data, @row, $i, $p);
-        my $output = helpIcon(61);
+        my $output = helpIcon("themes manage");
 	$output .= '<h1>'.WebGUI::International::get(899).'</h1>';
         my $sth = WebGUI::SQL->read("select themeId,name,original from theme order by name");
         while (@data = $sth->array) {

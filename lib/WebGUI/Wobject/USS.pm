@@ -391,7 +391,7 @@ sub www_edit {
 		-privileges=>$privileges->printRowsOnly,
 		-properties=>$properties->printRowsOnly,
 		-headingId=>18,
-		-helpId=>1
+		-helpId=>"user submission system add/edit"
 		);
 }
 

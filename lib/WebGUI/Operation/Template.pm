@@ -70,7 +70,7 @@ sub www_deleteTemplate {
         if ($session{form}{tid} < 1000 && $session{form}{tid} > 0) {
 		return WebGUI::Privilege::vitalComponent();
         } elsif (WebGUI::Grouping::isInGroup(8)) {
-                $output .= helpIcon(35);
+                $output .= helpIcon("template delete");
 		$output .= '<h1>'.WebGUI::International::get(42).'</h1>';
                 $output .= WebGUI::International::get(502).'<p>';
                 $output .= '<div align="center"><a href="'.
@@ -123,7 +123,7 @@ sub www_editTemplate {
                 	%template = WebGUI::SQL->quickHash("select * from template where templateId=$session{form}{tid} and
 				namespace=".quote($session{form}{namespace}));
 		}
-                $output .= helpIcon(34);
+                $output .= helpIcon("template add/edit");
 		$output .= '<h1>'.WebGUI::International::get(507).'</h1>';
 		$f = WebGUI::HTMLForm->new;
                 $f->hidden("op","editTemplateSave");
@@ -179,7 +179,7 @@ sub www_listTemplates {
         my ($output, $sth, @data, @row, $i, $p, $where);
         if (WebGUI::Grouping::isInGroup(8)) {
 		$where = "and namespace=".quote($session{form}{namespace}) if ($session{form}{namespace});
-                $output = helpIcon(33);
+                $output = helpIcon("templates manage");
 		$output .= '<h1>'.WebGUI::International::get(506).'</h1>';
                 $sth = WebGUI::SQL->read("select templateId,name,namespace from template where isEditable=1 $where order by namespace,name");
                 while (@data = $sth->array) {

@@ -205,7 +205,7 @@ sub www_edit {
 		-properties=>$properties->printRowsOnly,
 		-layout=>$layout->printRowsOnly,
 		-headingId=>9,
-		-helpId=>1
+		-helpId=>"file manager add/edit"
 		);
 }
 
@@ -227,7 +227,7 @@ sub www_editDownload {
 	$session{page}{useAdminStyle} = 1;
         my ($output, $file, $f);
 	$file = $_[0]->getCollateral("FileManager_file","FileManager_fileId",$session{form}{did});
-        $output .= helpIcon(2,$_[0]->get("namespace"));
+        $output .= helpIcon("file add/edit",$_[0]->get("namespace"));
         $output .= '<h1>'.WebGUI::International::get(10,$_[0]->get("namespace")).'</h1>';
 	$f = WebGUI::HTMLForm->new;
         $f->hidden("wid",$_[0]->get("wobjectId"));

@@ -42,32 +42,5 @@ sub www_unsetPersonalStyle {
 	return "";
 }
 
-#-------------------------------------------------------------------
-sub www_listRoots {
-        return WebGUI::Privilege::adminOnly() unless(WebGUI::Grouping::isInGroup(3));
-        my ($output, $p, $sth, %data, @row, $i);
-        $output = helpIcon(28);
-	$output .= '<h1>'.WebGUI::International::get(408).'</h1>';
-        $sth = WebGUI::SQL->read("select * from page where title<>'Reserved' and parentId=0 order by title");
-        while (%data = $sth->hash) {
-                $row[$i] = '<tr><td valign="top" class="tableData">'
-			.deleteIcon('op=deletePage',$data{urlizedTitle})
-			.editIcon('op=editPage',$data{urlizedTitle})
-			.cutIcon('op=cutPage',$data{urlizedTitle})
-			.'</td>';
-                $row[$i] .= '<td valign="top" class="tableData"><a href="'.WebGUI::URL::gateway($data{urlizedTitle}).'">'.$data{title}.'</a></td>';
-                $row[$i] .= '<td valign="top" class="tableData">'.$data{urlizedTitle}.'</td></tr>';
-                $i++;
-        }
-	$sth->finish;
-        $p = WebGUI::Paginator->new(WebGUI::URL::page('op=listRoots'));
-	$p->setDataByArrayRef(\@row);
-        $output .= '<table border=1 cellpadding=3 cellspacing=0 align="center">';
-        $output .= $p->getPage;
-        $output .= '</table>';
-        $output .= $p->getBarTraditional;
-        return _submenu($output);
-}
-
 
 1;

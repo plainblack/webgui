@@ -98,7 +98,7 @@ sub www_edit {
 		-properties=>$properties->printRowsOnly,
 		-privileges=>$privileges->printRowsOnly,
 		-headingId=>8,
-		-helpId=>1
+		-helpId=>"sql report add/edit"
 		);
 }
 

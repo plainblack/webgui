@@ -74,7 +74,7 @@ sub www_edit {
 		-properties=>$properties->printRowsOnly,
                 -layout=>$layout->printRowsOnly,
 		-headingId=>4,
-		-helpId=>1
+		-helpId=>"syndicated content add/edit"
 		);
 }
 

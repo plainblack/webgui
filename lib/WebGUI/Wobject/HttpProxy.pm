@@ -136,7 +136,7 @@ sub www_edit {
 		-properties=>$properties->printRowsOnly,
 		-layout=>$layout->printRowsOnly,
 		-privileges=>$privileges->printRowsOnly,
-		-helpId=>1,
+		-helpId=>"http proxy add/edit",
 		-headingId=>2
 		);
 }

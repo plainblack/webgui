@@ -264,7 +264,7 @@ sub www_deletePage {
 	if ($session{page}{pageId} < 1000 && $session{page}{pageId} > 0) {
 		return WebGUI::Privilege::vitalComponent();
 	} elsif (WebGUI::Page::canEdit()) {
-		$output .= helpIcon(3);
+		$output .= helpIcon("page delete");
 		$output .= '<h1>'.WebGUI::International::get(42).'</h1>';
 		$output .= WebGUI::International::get(101).'<p>';
 		$output .= '<div align="center"><a href="'.WebGUI::URL::page('op=deletePageConfirm').
@@ -348,7 +348,7 @@ sub www_editPage {
 			($childCount) = WebGUI::SQL->quickArray("select count(*) from page where parentId=$page{pageId}");
 		}
 		$page{endDate} = (addToDate(time(),10)) if ($page{endDate} < 0);
-                $output = helpIcon(1);
+                $output = helpIcon("page add/edit");
 		$output .= '<h1>'.WebGUI::International::get(102).'</h1>';
 		$f->hidden({name=>"pageId",value=>$page{pageId}});
 		$f->hidden({name=>"parentId",value=>$page{parentId}});

@@ -114,7 +114,7 @@ sub www_edit {
                 -properties=>$properties->printRowsOnly,
                 -layout=>$layout->printRowsOnly,
                 -headingId=>2,
-                -helpId=>1
+                -helpId=>"wobject proxy add/edit"
                 );
 
 }

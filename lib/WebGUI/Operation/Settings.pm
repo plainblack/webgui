@@ -40,7 +40,7 @@ sub _submenu {
 sub www_editCompanyInformation {
 	return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
         my ($output, $f);
-        $output .= helpIcon(6);
+        $output .= helpIcon("company information edit");
 	$output .= '<h1>'.WebGUI::International::get(124).'</h1>';
 	$f = WebGUI::HTMLForm->new;
         $f->hidden("op","saveSettings");
@@ -59,7 +59,7 @@ sub www_editContentSettings {
 	$pages = WebGUI::SQL->buildHashRef("select pageId,menuTitle from page order by menuTitle");
         %htmlFilter = ('none'=>WebGUI::International::get(420), 'most'=>WebGUI::International::get(421), 
 		'javascript'=>WebGUI::International::get(526), 'all'=>WebGUI::International::get(419));
-        $output .= helpIcon(29);
+        $output .= helpIcon("content settings edit");
         $output .= '<h1>'.WebGUI::International::get(525).'</h1>';
         $f = WebGUI::HTMLForm->new;
         $f->hidden("op","saveSettings");
@@ -92,7 +92,7 @@ sub www_editContentSettings {
 sub www_editMessagingSettings {
 	return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
         my ($output, $f);
-        $output .= helpIcon(13);
+        $output .= helpIcon("messaging settings edit");
         $output .= '<h1>'.WebGUI::International::get(133).'</h1>';
 	$f = WebGUI::HTMLForm->new;
         $f->hidden("op","saveSettings");
@@ -109,7 +109,7 @@ sub www_editMessagingSettings {
 sub www_editMiscSettings {
 	return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
         my ($output, $f);
-        $output .= helpIcon(24);
+        $output .= helpIcon("miscellaneous settings edit");
         $output .= '<h1>'.WebGUI::International::get(140).'</h1>';
 	$f = WebGUI::HTMLForm->new;
         $f->hidden("op","saveSettings");
@@ -148,7 +148,7 @@ sub www_editMiscSettings {
 sub www_editUserSettings {
    return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
    my ($output, $f, $cmd, $html);
-   $output .= helpIcon(2);
+   $output .= helpIcon("user settings edit");
    $output .= '<h1>'.WebGUI::International::get(117).'</h1>';
    $output .= WebGUI::Form::_javascriptFile("swapLayers.js");
    $output .= '<script language="JavaScript" > var active="'.$session{setting}{authMethod}.'"; </script>';
@@ -192,7 +192,7 @@ sub www_editUserSettings {
 sub www_manageSettings {
 	return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
         my ($output);
-        $output .= helpIcon(12);
+        $output .= helpIcon("settings manage");
         $output .= '<h1>'.WebGUI::International::get(143).'</h1>';
         $output .= '<ul>';
         $output .= '<li><a href="'.WebGUI::URL::page('op=editCompanyInformation').'">'.WebGUI::International::get(124).'</a>';

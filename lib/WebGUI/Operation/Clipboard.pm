@@ -54,9 +54,9 @@ sub www_deleteClipboardItem {
 	return WebGUI::Privilege::insufficient() unless (WebGUI::Grouping::isInGroup(4));
         my ($output);
 	if ($session{form}{wid} ne "") {
-        	$output .= helpIcon(14);
+        	$output .= helpIcon("wobject delete");
 	} elsif ($session{form}{pageId} ne "") {
-        	$output .= helpIcon(3);
+        	$output .= helpIcon("page delete");
 	}
         $output .= '<h1>'.WebGUI::International::get(42).'</h1>';
         $output .= WebGUI::International::get(956).'<p>';
@@ -124,7 +124,7 @@ sub www_deleteClipboardItemConfirm {
 sub www_emptyClipboard {
 	return WebGUI::Privilege::insufficient() unless (WebGUI::Grouping::isInGroup(4));
         my ($output);
-	$output = helpIcon(67);
+	$output = helpIcon("clipboard empty");
         $output .= '<h1>'.WebGUI::International::get(42).'</h1>';
         $output .= WebGUI::International::get(951).'<p>';
 	if ( ($session{setting}{sharedClipboard} ne "1") && (WebGUI::Grouping::isInGroup(3)) ) {
@@ -187,7 +187,7 @@ sub www_manageClipboard {
 	return WebGUI::Privilege::insufficient() unless (WebGUI::Grouping::isInGroup(4));
 
 	my ($sth, @data, @row, @sorted_row, $i, $p, $allUsers);
-	my $output = helpIcon(65);
+	my $output = helpIcon("clipboard manage");
 
 	# Add appropriate html page header
 	if ($session{setting}{sharedClipboard} eq "1") {

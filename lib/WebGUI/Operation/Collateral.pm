@@ -237,7 +237,7 @@ sub www_editCollateral {
                                 );
                 }
         } else {
-		$output .= helpIcon(20);
+		$output .= helpIcon("image add/edit");
                 $output .= '<h1>'.WebGUI::International::get(382).'</h1>';
 		if ($canEdit) {
                 	if ($collateral->{filename} ne "") {
@@ -421,7 +421,7 @@ sub www_listCollateral {
 	$p->setDataByQuery("select collateralId, name, filename, collateralType, dateUploaded, username, parameters 
 		from collateral where $constraints order by name");
 	$page = $p->getPageData;
-	$output = helpIcon(49);
+	$output = helpIcon("collateral manage");
 	$output .= '<h1>'.WebGUI::International::get(757).'</h1>';
 	$f = WebGUI::HTMLForm->new(1);
 	$f->hidden("op","listCollateral");

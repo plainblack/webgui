@@ -223,7 +223,7 @@ sub www_edit {
 	return $_[0]->SUPER::www_edit(
 		-properties=>$properties->printRowsOnly,
 		-layout=>$layout->printRowsOnly,
-		-helpId=>1,
+		-helpId=>"events calendar add/edit",
 		-headingId=>12
 		);
 }
@@ -268,7 +268,7 @@ sub www_editEvent {
 		$f->hidden("until");
 		$special = $f->printRowsOnly;
 	}
-	$output = helpIcon(2,$_[0]->get("namespace"));
+	$output = helpIcon("event add/edit",$_[0]->get("namespace"));
         $output .= '<h1>'.WebGUI::International::get(13,$_[0]->get("namespace")).'</h1>';
 	$f = WebGUI::HTMLForm->new;
         $f->hidden("wid",$_[0]->get("wobjectId"));

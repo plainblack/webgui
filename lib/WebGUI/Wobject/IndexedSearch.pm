@@ -1,5 +1,4 @@
 package WebGUI::Wobject::IndexedSearch;
-$VERSION = "1.4";
 
 #Test to see if Time::HiRes will load.
 my $hasTimeHiRes=1;
@@ -214,7 +213,7 @@ sub www_edit {
 		-layout=>$layout->printRowsOnly,
 		-privileges=>$privileges->printRowsOnly,
 		-heading=>"Edit Search",
-		-helpId=>1
+		-helpId=>"search add/edit"
 	);
 
 }

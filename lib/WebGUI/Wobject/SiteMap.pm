@@ -129,7 +129,7 @@ sub www_edit {
 		-properties=>$properties->printRowsOnly,
 		-layout=>$layout->printRowsOnly,
 		-headingId=>5,
-		-helpId=>1
+		-helpId=>"site map add/edit"
 		);
 }
 

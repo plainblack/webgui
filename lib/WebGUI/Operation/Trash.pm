@@ -169,9 +169,9 @@ sub www_deleteTrashItem {
 	return WebGUI::Privilege::insufficient() unless (WebGUI::Grouping::isInGroup(4));
         my ($output);
 	if ($session{form}{wid} ne "") {
-        	$output .= helpIcon(14);
+        	$output .= helpIcon("wobject delete");
 	} elsif ($session{form}{pageId} ne "") {
-        	$output .= helpIcon(3);
+        	$output .= helpIcon("page delete");
 	}
         $output .= '<h1>'.WebGUI::International::get(42).'</h1>';
         $output .= WebGUI::International::get(966).'<p>';
@@ -224,7 +224,7 @@ sub www_deleteTrashItemConfirm {
 sub www_emptyTrash {
 	return WebGUI::Privilege::insufficient() unless (WebGUI::Grouping::isInGroup(4));
         my ($output);
-	$output = helpIcon(46);
+	$output = helpIcon("trash empty");
         $output .= '<h1>'.WebGUI::International::get(42).'</h1>';
         $output .= WebGUI::International::get(162).'<p>';
         $output .= WebGUI::International::get(651).'<p>';
@@ -275,7 +275,7 @@ sub www_manageTrash {
 	return WebGUI::Privilege::insufficient() unless (WebGUI::Grouping::isInGroup(4));
 
 	my ($sth, @data, @row, @sorted_row, $i, $p, $allUsers);
-	my $output = helpIcon(66);
+	my $output = helpIcon("trash manage");
 
 	# Add appropriate html page header
 	if ($session{setting}{sharedTrash} eq "1") {

@@ -160,7 +160,7 @@ sub www_edit {
 	return $_[0]->SUPER::www_edit(
 		-properties=>$properties->printRowsOnly,
 		-headingId=>6,
-		-helpId=>1
+		-helpId=>"message board add/edit"
 		);
 }
 
@@ -194,7 +194,7 @@ sub www_editForum {
 		);
 	$f->raw(WebGUI::Forum::UI::forumProperties($forum->get("forumId")));
 	$f->submit;
-	return helpIcon(3,$_[0]->get("namespace")).'<h1>'.WebGUI::International::get(77,$_[0]->get("namespace")).'</h1>'.$f->print;
+	return helpIcon("forum add/edit",$_[0]->get("namespace")).'<h1>'.WebGUI::International::get(77,$_[0]->get("namespace")).'</h1>'.$f->print;
 }
 
 #-------------------------------------------------------------------

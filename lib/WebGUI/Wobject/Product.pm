@@ -166,7 +166,7 @@ sub www_addAccessory {
 	return WebGUI::Privilege::insufficient() unless ($_[0]->canEdit);
         $session{page}{useAdminStyle} = 1;
         my ($output, $f, $accessory, @usedAccessories);
-	$output = helpIcon(4,$_[0]->get("namespace"));
+	$output = helpIcon("product accessory add/edit",$_[0]->get("namespace"));
         $output .= '<h1>'.WebGUI::International::get(16,$_[0]->get("namespace")).'</h1>';
         $f = WebGUI::HTMLForm->new;
         $f->hidden("wid",$_[0]->get("wobjectId"));
@@ -203,7 +203,7 @@ sub www_addAccessorySave {
 sub www_addRelated {
 	return WebGUI::Privilege::insufficient() unless ($_[0]->canEdit);
         my ($output, $f, $related, @usedRelated);
-	$output = helpIcon(5,$_[0]->get("namespace"));
+	$output = helpIcon("product related add/edit",$_[0]->get("namespace"));
         $output .= '<h1>'.WebGUI::International::get(19,$_[0]->get("namespace")).'</h1>';
         $f = WebGUI::HTMLForm->new;
         $f->hidden("wid",$_[0]->get("wobjectId"));
@@ -341,7 +341,7 @@ sub www_edit {
 	$properties->raw($_[0]->fileProperty("warranty",15));
 	return $_[0]->SUPER::www_edit(
 		-properties=>$properties->printRowsOnly,
-		-helpId=>1,
+		-helpId=>"product add/edit",
 		-headingId=>6
 		);
 }
@@ -379,7 +379,7 @@ sub www_editBenefit {
         $session{page}{useAdminStyle} = 1;
         my ($output, $data, $f, $benefits);
 	$data = $_[0]->getCollateral("Product_benefit","Product_benefitId",$session{form}{bid});
-        $output = helpIcon(6,$_[0]->get("namespace"));
+        $output = helpIcon("product benefit add/edit",$_[0]->get("namespace"));
         $output .= '<h1>'.WebGUI::International::get(53,$_[0]->get("namespace")).'</h1>';
         $f = WebGUI::HTMLForm->new;
         $f->hidden("wid",$_[0]->get("wobjectId"));
@@ -415,7 +415,7 @@ sub www_editFeature {
         $session{page}{useAdminStyle} = 1;
         my ($output, $data, $f, $features);
 	$data = $_[0]->getCollateral("Product_feature","Product_featureId",$session{form}{fid});
-	$output = helpIcon(2,$_[0]->get("namespace"));
+	$output = helpIcon("product feature add/edit",$_[0]->get("namespace"));
         $output .= '<h1>'.WebGUI::International::get(22,$_[0]->get("namespace")).'</h1>';
         $f = WebGUI::HTMLForm->new;
         $f->hidden("wid",$_[0]->get("wobjectId"));
@@ -451,7 +451,7 @@ sub www_editSpecification {
         $session{page}{useAdminStyle} = 1;
         my ($output, $data, $f, $hashRef);
 	$data = $_[0]->getCollateral("Product_specification","Product_specificationId",$session{form}{sid});
-	$output = helpIcon(3,$_[0]->get("namespace"));
+	$output = helpIcon("product specification add/edit",$_[0]->get("namespace"));
         $output .= '<h1>'.WebGUI::International::get(25,$_[0]->get("namespace")).'</h1>';
         $f = WebGUI::HTMLForm->new;
         $f->hidden("wid",$_[0]->get("wobjectId"));
