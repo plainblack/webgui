@@ -240,30 +240,6 @@ sub www_cutPage {
 }
 
 #-------------------------------------------------------------------
-=head2 www_deletePage
-
-This function returns an 'Are you sure' page for moving the page to the trash.
-
-=cut
-sub www_deletePage {
-	my ($output);
-        if ($session{page}{isSystem}) {
-		return WebGUI::Privilege::vitalComponent();
-	} elsif (WebGUI::Page::canEdit()) {
-		$output .= helpIcon("page delete");
-		$output .= '<h1>'.WebGUI::International::get(42).'</h1>';
-		$output .= WebGUI::International::get(101).'<p>';
-		$output .= '<div align="center"><a href="'.WebGUI::URL::page('op=deletePageConfirm').
-			'">'.WebGUI::International::get(44).'</a>';
-		$output .= '&nbsp;&nbsp;&nbsp;&nbsp;<a href="'.WebGUI::URL::page().'">'.
-			WebGUI::International::get(45).'</a></div>';
-		return $output;
-	} else {
-		return WebGUI::Privilege::insufficient();
-	}
-}
-
-#-------------------------------------------------------------------
 =head2 www_deletePageConfirm
 
 Actually transfers the page to the trash.

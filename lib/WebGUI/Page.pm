@@ -543,7 +543,7 @@ sub generate {
 	}
 	$var{'page.canEdit'} = canEdit();
         $var{'page.controls'} = pageIcon()
-       		.deleteIcon('op=deletePage')
+       		.deleteIcon('op=deletePageConfirm','',WebGUI::International::get(101))
 		.editIcon('op=editPage')
 		.moveUpIcon('op=movePageUp')
 		.moveDownIcon('op=movePageDown')
@@ -552,7 +552,7 @@ sub generate {
 	my $sth = WebGUI::SQL->read("select * from wobject where pageId=".quote($session{page}{pageId})." order by sequenceNumber, wobjectId",WebGUI::SQL->getSlave);
         while (my $wobject = $sth->hashRef) {
 		my $wobjectToolbar = wobjectIcon()
-         		.deleteIcon('func=delete&wid='.${$wobject}{wobjectId})
+         		.deleteIcon('func=deleteConfirm&wid='.${$wobject}{wobjectId},'',WebGUI::International::get(43))
               		.editIcon('func=edit&wid='.${$wobject}{wobjectId})
              		.moveUpIcon('func=moveUp&wid='.${$wobject}{wobjectId})
              		.moveDownIcon('func=moveDown&wid='.${$wobject}{wobjectId})
