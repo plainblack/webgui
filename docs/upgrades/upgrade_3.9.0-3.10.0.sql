@@ -10,6 +10,15 @@ INSERT INTO international VALUES (530,'WebGUI','English','with <b>all</b> the wo
 INSERT INTO international VALUES (531,'WebGUI','English','with the <b>exact phrase</b>');
 INSERT INTO international VALUES (532,'WebGUI','English','with <b>at least one</b> of the words');
 INSERT INTO international VALUES (533,'WebGUI','English','<b>without</b> the words');
+INSERT INTO settings VALUES ('onNewUserAlertGroup','3');
+INSERT INTO settings VALUES ('alertOnNewUser','0');
+update international set message='Edit User Settings' where internationalId=117 and namespace='WebGUI' and language='English';
+INSERT INTO international VALUES (535,'WebGUI','English','Group To Alert On New User');
+INSERT INTO international VALUES (534,'WebGUI','English','Alert on new user?');
+INSERT INTO international VALUES (536,'WebGUI','English','A new user named ^@; has joined the site.');
+
+
+
 
 
 

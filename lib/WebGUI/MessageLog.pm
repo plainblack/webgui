@@ -12,6 +12,7 @@ package WebGUI::MessageLog;
 
 use strict;
 use Tie::CPHash;
+use WebGUI::Macro;
 use WebGUI::Mail;
 use WebGUI::Session;
 use WebGUI::SQL;
@@ -44,9 +45,10 @@ sub _getUserInfo {
 
 #-------------------------------------------------------------------
 sub addEntry {
-        my (@users, $messageLogId,$sth, $user, %message, %subject, $message, $subject);
+        my (@users, $messageLogId,$sth, $user, %message, %subject, $message, $subject, $namespace);
 	$messageLogId = getNextId("messageLogId");
-	%message = WebGUI::SQL->buildHash("select language,message from international where internationalId=$_[3] and namespace='$_[4]'");
+	$namespace = $_[4] || "WebGUI";
+	%message = WebGUI::SQL->buildHash("select language,message from international where internationalId=$_[3] and namespace='$namespace'");
 	%subject = WebGUI::SQL->buildHash("select language,message from international where internationalId=523 and namespace='WebGUI'");
 	if ($_[1] ne "") {
 		@users = WebGUI::SQL->quickArray("select userId from groupings where groupId=$_[1]");
@@ -57,8 +59,13 @@ sub addEntry {
 		if (${$user}{userId} ne "") {
 			WebGUI::SQL->write("insert into messageLog values ($messageLogId,".${$user}{userId}.",
 				".quote($message{${$user}{language}}).",".quote($_[2]).",".time().")");
+			$subject{${$user}{language}} = $subject{'English'} if ($subject{${$user}{language}} eq "");
 			$subject = $subject{${$user}{language}};
-			$message = $message{${$user}{language}}."\n".WebGUI::URL::append('http://'.$session{env}{HTTP_HOST}.$_[2],'mlog='.$messageLogId);
+			$message{${$user}{language}} = $message{'English'} if ($message{${$user}{language}} eq "");
+			$message = WebGUI::Macro::process($message{${$user}{language}});
+			if ($_[2] ne "") {
+				$message .= "\n".WebGUI::URL::append('http://'.$session{env}{HTTP_HOST}.$_[2],'mlog='.$messageLogId);
+			}
 			if (${$user}{INBOXNotifications} = "email") {
 				if (${$user}{email} ne "") {
 					WebGUI::Mail::send(${$user}{email},$subject,$message);

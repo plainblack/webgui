@@ -39,7 +39,10 @@ sub www_editAuthenticationSettings {
                 $output .= '<h1>'.WebGUI::International::get(117).'</h1>';
 		$f = WebGUI::HTMLForm->new;
                 $f->hidden("op","editAuthenticationSettingsSave");
-                $f->yesNo("anonymousRegistration",WebGUI::International::get(118),[$session{setting}{anonymousRegistration}]);
+                $f->integer("sessionTimeout",WebGUI::International::get(142),$session{setting}{sessionTimeout});
+                $f->yesNo("anonymousRegistration",WebGUI::International::get(118),$session{setting}{anonymousRegistration});
+                $f->yesNo("alertOnNewUser",WebGUI::International::get(534),$session{setting}{alertOnNewUser});
+		$f->group("onNewUserAlertGroup",WebGUI::International::get(535),[$session{setting}{onNewUserAlertGroup}]);
                 $f->select("authMethod",\%authMethod,WebGUI::International::get(119),[$session{setting}{authMethod}]);
                 $f->yesNo("usernameBinding",WebGUI::International::get(306),$session{setting}{usernameBinding});
                 $f->url("ldapURL",WebGUI::International::get(120),$session{setting}{ldapURL});
@@ -57,6 +60,9 @@ sub www_editAuthenticationSettings {
 #-------------------------------------------------------------------
 sub www_editAuthenticationSettingsSave {
         if (WebGUI::Privilege::isInGroup(3)) {
+		_saveSetting("sessionTimeout");
+		_saveSetting("onNewUserAlertGroup");
+		_saveSetting("alertOnNewUser");
 		_saveSetting("authMethod");
 		_saveSetting("ldapURL");
 		_saveSetting("ldapId");
@@ -221,7 +227,6 @@ sub www_editMiscSettings {
                 $output .= '<h1>'.WebGUI::International::get(140).'</h1>';
 		$f = WebGUI::HTMLForm->new;
                 $f->hidden("op","editMiscSettingsSave");
-                $f->integer("sessionTimeout",WebGUI::International::get(142),$session{setting}{sessionTimeout});
 		$f->yesNo("preventProxyCache",WebGUI::International::get(400),$session{setting}{preventProxyCache});
 		$f->select("onCriticalError",\%criticalError,WebGUI::International::get(413),[$session{setting}{onCriticalError}]);
 		$f->submit;
@@ -235,7 +240,6 @@ sub www_editMiscSettings {
 #-------------------------------------------------------------------
 sub www_editMiscSettingsSave {
         if (WebGUI::Privilege::isInGroup(3)) {
-		_saveSetting("sessionTimeout");
 		_saveSetting("preventProxyCache");
 		_saveSetting("onCriticalError");
                 return www_manageSettings(); 
@@ -251,13 +255,13 @@ sub www_manageSettings {
                 $output .= helpIcon(12);
                 $output .= '<h1>'.WebGUI::International::get(143).'</h1>';
                 $output .= '<ul>';
-                $output .= '<li><a href="'.WebGUI::URL::page('op=editAuthenticationSettings').'">'.WebGUI::International::get(117).'</a>';
                 $output .= '<li><a href="'.WebGUI::URL::page('op=editCompanyInformation').'">'.WebGUI::International::get(124).'</a>';
                 $output .= '<li><a href="'.WebGUI::URL::page('op=editContentSettings').'">'.WebGUI::International::get(525).'</a>';
                 $output .= '<li><a href="'.WebGUI::URL::page('op=editFileSettings').'">'.WebGUI::International::get(128).'</a>';
                 $output .= '<li><a href="'.WebGUI::URL::page('op=editMailSettings').'">'.WebGUI::International::get(133).'</a>';
                 $output .= '<li><a href="'.WebGUI::URL::page('op=editMiscSettings').'">'.WebGUI::International::get(140).'</a>';
                 $output .= '<li><a href="'.WebGUI::URL::page('op=editProfileSettings').'">'.WebGUI::International::get(308).'</a>';
+                $output .= '<li><a href="'.WebGUI::URL::page('op=editAuthenticationSettings').'">'.WebGUI::International::get(117).'</a>';
                 $output .= '</ul>';
         } else {
                 $output = WebGUI::Privilege::adminOnly();

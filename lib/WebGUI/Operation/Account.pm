@@ -20,6 +20,7 @@ use WebGUI::ErrorHandler;
 use WebGUI::HTMLForm;
 use WebGUI::International;
 use WebGUI::Mail;
+use WebGUI::MessageLog;
 use WebGUI::Paginator;
 use WebGUI::Privilege;
 use WebGUI::Session;
@@ -252,6 +253,7 @@ sub www_createAccountSave {
 		$u->addToGroups([2]);
                 WebGUI::Session::start($u->userId);
 		_logLogin($u->userId,"success");
+		WebGUI::MessageLog::addEntry('',$session{setting}{onNewUserAlertGroup},'',536) if ($session{setting}{alertOnNewUser});
         } else {
                 $output = "<h1>".WebGUI::International::get(70)."</h1>".$error.www_createAccount();
         }
