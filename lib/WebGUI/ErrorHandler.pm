@@ -77,20 +77,21 @@ sub fatalError {
 		print '<br>'.$session{setting}{companyName};
 		print '<br>'.$session{setting}{companyEmail};
 		print '<br>'.$session{setting}{companyURL};
+	} else {
+		print '<h3>Session Variables</h3><table bgcolor="#ffffff" style="color: #000000; font-size: 10pt; font-family: helvetica;">';
+        	while (my ($section, $hash) = each %session) {
+        		while (my ($key, $value) = each %$hash) {
+                		if (ref $value eq 'ARRAY') {
+                        		$value = '['.join(', ',@$value).']';
+                       	 	} elsif (ref $value eq 'HASH') {
+                                	$value = '{'.join(', ',map {"$_ => $value->{$_}"} keys %$value).'}';
+                        	}
+                        	print '<tr><td align="right"><b>'.$section.'.'.$key.':</b></td><td>'.$value.'</td>';
+                	}
+                	print '<tr height=10><td>&nbsp;</td><td>&nbsp</td></tr>';
+        	}
+        	print '</table>';
 	}
-	print '<h3>Session Variables</h3><table bgcolor="#ffffff" style="color: #000000; font-size: 10pt; font-family: helvetica;">';
-        while (my ($section, $hash) = each %session) {
-        	while (my ($key, $value) = each %$hash) {
-                	if (ref $value eq 'ARRAY') {
-                        	$value = '['.join(', ',@$value).']';
-                        } elsif (ref $value eq 'HASH') {
-                                $value = '{'.join(', ',map {"$_ => $value->{$_}"} keys %$value).'}';
-                        }
-                        print '<tr><td align="right"><b>'.$section.'.'.$key.':</b></td><td>'.$value.'</td>';
-                }
-                print '<tr height=10><td>&nbsp;</td><td>&nbsp</td></tr>';
-        }
-        print '</table>';
         exit;
 }
 

@@ -131,7 +131,11 @@ sub www_view {
         $output .= $_[0]->description;
 	$output .= WebGUI::International::get(17,$namespace)." ".$query."<p>" if ($_[0]->get("debugMode"));
 	if ($dsn =~ /\DBI\:\w+\:\w+/) {
-                $dbh = DBI->connect($dsn,$_[0]->get("username"),$_[0]->get("identifier"));
+                eval{$dbh = DBI->connect($dsn,$_[0]->get("username"),$_[0]->get("identifier"))};
+		if ($@) {
+			WebGUI::ErrorHandler::warn("SQL Report [".$_[0]->get("wobjectId")."] ".$@);
+			undef $dbh;
+		}
        	} else {
                	$output .= WebGUI::International::get(9,$namespace).'<p>' if ($_[0]->get("debugMode"));
 		WebGUI::ErrorHandler::warn("SQLReport [".$_[0]->get("wobjectId")."] The DSN specified is of an improper format.");
@@ -196,7 +200,7 @@ sub www_view {
 		$dbh->disconnect();
 	} else {
 		$output .= WebGUI::International::get(12,$namespace).'<p>' if ($_[0]->get("debugMode"));
-		WebGUI::ErrorHandler::warn("SQLReport [".$_[0]->get("wobjectId")."] Could not connect to remote database.");
+		WebGUI::ErrorHandler::warn("SQLReport [".$_[0]->get("wobjectId")."] Could not connect to database.");
 	}	
 	return $_[0]->processMacros($output);
 }

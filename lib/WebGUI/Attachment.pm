@@ -74,8 +74,10 @@ sub _createThumbnail {
 		WebGUI::ErrorHandler::warn("Couldn't read image for thumnail creation: ".$error) if $error;
 		($x, $y) = $image->Get('width','height');
 		$n = $_[1] || $session{setting}{thumbnailSize};
-		$r = $x>$y ? $x / $n : $y / $n;
-		$image->Scale(width=>($x/$r),height=>($y/$r));
+		if ($x > $n || $y > $n) {
+			$r = $x>$y ? $x / $n : $y / $n;
+			$image->Scale(width=>($x/$r),height=>($y/$r));
+		}
 		if (isIn($_[0]->getType, qw(tif tiff bmp))) {
 			$error = $image->Write($_[0]->{_node}->getPath.'/thumb-'.$_[0]->getFilename.'.png');
 		} else {

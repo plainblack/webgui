@@ -214,46 +214,43 @@ sub www_listHelpMessages {
         }
 }
 
-#-------------------------------------------------------------------
 sub www_listInternationalMessages {
         my ($output, $sth, $new, $key, $p, %data, %newList, %list, $i, $missing, @row, @split);
         tie %data, 'Tie::CPHash';
         tie %list, 'Tie::IxHash';
         tie %newList, 'Tie::IxHash';
         if (WebGUI::Privilege::isInGroup(3)) {
-		%data = WebGUI::SQL->quickHash("select language from language where languageId=".$session{form}{lid});
+                %data = WebGUI::SQL->quickHash("select language from language where languageId=".$session{form}{lid});
                 $missing = '<b>'.WebGUI::International::get(596).'</b>';
                 $output = '<h1>'.WebGUI::International::get(595).' ('.$data{language}.')</h1>';
-                $sth = WebGUI::SQL->read("select * from international where languageId=".$session{form}{lid});
+                $sth = WebGUI::SQL->read("select * from international where languageId=".$session{form}{lid}." order by namespace");
                 while (%data = $sth->hash) {
-			$list{$data{internationalId}."-".$data{namespace}} = $data{message};
+                        $list{$data{namespace}."-".$data{internationalId}} = "<em>[$data{namespace}]</em> - ".$data{message};
                 }
                 $sth->finish;
                 $sth = WebGUI::SQL->read("select * from international where languageId=1");
                 while (%data = $sth->hash) {
-			unless ($list{$data{internationalId}."-".$data{namespace}}) {
-				$list{"missing-".$data{internationalId}."-".$data{namespace}} = $missing;
-			}
+                        unless ($list{$data{namespace}."-".$data{internationalId}}) {
+                                $list{"missing-".$data{namespace}."-".$data{internationalId}} = "<em>[$data{namespace}]</em> - ".$missing;
+                        }
                 }
                 $sth->finish;
-		foreach $key (sort {$b cmp $a} keys %list) {
-                	$newList{$key}=$list{$key};
-        	}
-		foreach $key (keys %newList) {
-			@split = split(/-/,$key);
-			if ($split[0] eq "missing") {
-				$split[0] = $split[1];
-				$split[1] = $split[2];
-				$new = 1;
-			} else {
-				$new = 0;
-			}
-			$row[$i] = editIcon('op=editInternationalMessage&lid='.$session{form}{lid}.'&iid='.$split[0].'&namespace='.$split[1]
-				.'&pn='.$session{form}{pn}.'&missing='.$new)
-				.' '.$newList{$key}."<br>";
-			$i++;
-		}
-		$p = WebGUI::Paginator->new(WebGUI::URL::page('op=listInternationalMessages&lid='.$session{form}{lid}),\@row,100);
+                foreach $key (sort {$b cmp $a} keys %list) {
+                        $newList{$key}=$list{$key};
+                }
+                foreach $key (keys %newList) {
+                        @split = reverse(split(/-/,$key));
+                        if ($split[3] eq "missing") {
+                                $new = 1;
+                        } else {
+                                $new = 0;
+                        }
+                        $row[$i] = editIcon('op=editInternationalMessage&lid='.$session{form}{lid}.'&iid='.$split[0].'&namespace='.$split[1]
+                                .'&pn='.$session{form}{pn}.'&missing='.$new)
+                                .' '.$newList{$key}."<br>"; # add real message here
+                        $i++;
+                }
+                $p = WebGUI::Paginator->new(WebGUI::URL::page('op=listInternationalMessages&lid='.$session{form}{lid}),\@row,100);
                 $output .= $p->getPage($session{form}{pn});
                 $output .= $p->getBarTraditional($session{form}{pn});
                 return _submenu($output);
