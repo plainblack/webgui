@@ -134,7 +134,7 @@ sub checkbox {
         $extras = shift;
         $output = '<input type="checkbox" name="'.$name.'" value="'.$value.'"'.$checked.' '.$extras.'>';
 	$output .= _subtext($subtext);
-        $output = _tableFormRow($label,$output);
+        $output = _tableFormRow($label,$output) unless ($class->{_noTable});
         $class->{_data} .= $output;
 }
 
@@ -193,7 +193,7 @@ sub date {
 		'/calendar.html\',\'cal\',\'WIDTH=200,HEIGHT=250\');return false" value="'.
 		WebGUI::International::get(34).'">';
 	$output .= _subtext($subtext);
-        $output = _tableFormRow($label,$output);
+        $output = _tableFormRow($label,$output) unless ($class->{_noTable});
         $class->{_data} .= $output;
 }
 
@@ -256,7 +256,7 @@ sub email {
         $output .= '<input type="text" name="'.$name.'" value="'.$value.'" size="'.
                 $size.'" maxlength="'.$maxLength.'" onBlur="emailCheck(this.value)" '.$extras.'>';
         $output .= _subtext($subtext);
-        $output = _tableFormRow($label,$output);
+        $output = _tableFormRow($label,$output) unless ($class->{_noTable});
         $class->{_data} .= $output;
 }
 
@@ -305,7 +305,7 @@ sub file {
         $size = shift || $session{setting}{textBoxSize} || 30;
         $output = '<input type="file" name="'.$name.'" size="'.$size.'" '.$extras.'>';
 	$output .= _subtext($subtext);
-        $output = _tableFormRow($label,$output);
+        $output = _tableFormRow($label,$output) unless ($class->{_noTable});
 	$class->{_data} .= $output;
 }
 
@@ -378,7 +378,7 @@ sub group {
         }
         $output .= '</select>';
 	$output .= _subtext($subtext);
-        $output = _tableFormRow($label,$output);
+        $output = _tableFormRow($label,$output) unless ($class->{_noTable});
 	$class->{_data} .= $output;
 }
 
@@ -501,7 +501,7 @@ sub HTMLArea {
         $output .= '<textarea name="'.$name.'" cols="'.$columns.'" rows="'.$rows.'" wrap="'.$wrap.
                 '" onBlur="fixChars(this.form.'.$name.')" '.$extras.'>'.$value.'</textarea>';
 	$output .= _subtext($subtext);
-        $output = _tableFormRow($label,$output);
+        $output = _tableFormRow($label,$output) unless ($class->{_noTable});
         $class->{_data} .= $output;
 }
 
@@ -574,15 +574,20 @@ sub integer {
         $output .= '<input type="text" name="'.$name.'" value="'.$value.'" size="'.
                 $size.'" maxlength="'.$maxLength.'" onKeyUp="doNumCheck(this.form.'.$name.')" '.$extras.'>';
         $output .= _subtext($subtext);
-        $output = _tableFormRow($label,$output);
+        $output = _tableFormRow($label,$output) unless ($class->{_noTable});
         $class->{_data} .= $output;
 }
 
 #-------------------------------------------------------------------
 
-=head2 new ( [ action, extras, method, enctype ] )
+=head2 new ( [ noTable, action, extras, method, enctype ] )
 
  Constructor.
+
+=item noTable
+
+ If this is set to "1" then no table elements will be wrapped around
+ each form element. Defaults to "0".
 
 =item action
 
@@ -610,15 +615,18 @@ sub integer {
 =cut
 
 sub new {
-        my ($header, $footer, $enctype, $class, $method, $action, $extras);
+        my ($header, $footer, $noTable, $enctype, $class, $method, $action, $extras);
         $class = shift;
+	$noTable = shift || 0;
         $action = shift || WebGUI::URL::page();
         $method = shift || "POST";
         $extras = shift;
 	$enctype = shift || "multipart/form-data";
-	$header = '<form action="'.$action.'" enctype="'.$enctype.'" method="'.$method.'" '.$extras.'><table>';
-	$footer = '</table></form>';
-        bless {_header => $header, _footer => $footer, _data => ''}, $class;
+	$header = '<form action="'.$action.'" enctype="'.$enctype.'" method="'.$method.'" '.$extras.'>';
+	$header .= '<table>' unless ($noTable);
+	$footer = '</table>' unless ($noTable);
+	$footer .= '</form>';
+        bless {_noTable => $noTable, _header => $header, _footer => $footer, _data => ''}, $class;
 }
 
 #-------------------------------------------------------------------
@@ -679,7 +687,7 @@ sub password {
         $output = '<input type="password" name="'.$name.'" value="'.$value.'" size="'.
 		$size.'" maxlength="'.$maxLength.'" '.$extras.'>';
 	$output .= _subtext($subtext);
-	$output = _tableFormRow($label,$output);
+        $output = _tableFormRow($label,$output) unless ($class->{_noTable});
 	$class->{_data} .= $output;
 }
 
@@ -739,7 +747,7 @@ sub phone {
         $output .= '<input type="text" name="'.$name.'" value="'.$value.'" size="'.
                 $size.'" maxlength="'.$maxLength.'" '.$extras.'>';
         $output .= _subtext($subtext);
-        $output = _tableFormRow($label,$output);
+        $output = _tableFormRow($label,$output) unless ($class->{_noTable});
         $class->{_data} .= $output;
 }
 
@@ -817,8 +825,9 @@ sub readOnly {
         $value = shift;
         $label = shift;
 	$subtext = shift;
+	$output = $value;
 	$output .= _subtext($subtext);
-        $output = _tableFormRow($label,$value);
+        $output = _tableFormRow($label,$output) unless ($class->{_noTable});
         $class->{_data} .= $output;
 }
 
@@ -895,7 +904,7 @@ sub select {
 	}
 	$output	.= '</select>'; 
 	$output .= _subtext($subtext);
-        $output = _tableFormRow($label,$output);
+        $output = _tableFormRow($label,$output) unless ($class->{_noTable});
         $class->{_data} .= $output;
 }
 
@@ -939,7 +948,7 @@ sub submit {
 	$wait = WebGUI::International::get(452);
         $output = '<input type="submit" value="'.$value.'" onClick="this.value=\''.$wait.'\'" '.$extras.'>';
 	$output .= _subtext($subtext);
-	$output = _tableFormRow($label,$output); 
+        $output = _tableFormRow($label,$output) unless ($class->{_noTable});
 	$class->{_data} .= $output;
 }
 
@@ -999,7 +1008,7 @@ sub text {
         $output = '<input type="text" name="'.$name.'" value="'.$value.'" size="'.
                 $size.'" maxlength="'.$maxLength.'" '.$extras.'>';
 	$output .= _subtext($subtext);
-        $output = _tableFormRow($label,$output);
+        $output = _tableFormRow($label,$output) unless ($class->{_noTable});
         $class->{_data} .= $output;
 }
 
@@ -1065,7 +1074,7 @@ sub textarea {
         $output .= '<textarea name="'.$name.'" cols="'.$columns.'" rows="'.$rows.'" wrap="'.
 		$wrap.'" '.$extras.'>'.$value.'</textarea>';
 	$output .= _subtext($subtext);
-        $output = _tableFormRow($label,$output);
+        $output = _tableFormRow($label,$output) unless ($class->{_noTable});
         $class->{_data} .= $output;
 }
 
@@ -1128,7 +1137,7 @@ sub url {
         $output .= '<input type="text" name="'.$name.'" value="'.$value.'" size="'.
                 $size.'" maxlength="'.$maxLength.'" onBlur="addHTTP(this.form.'.$name.')" '.$extras.'>';
         $output .= _subtext($subtext);
-        $output = _tableFormRow($label,$output);
+        $output = _tableFormRow($label,$output) unless ($class->{_noTable});
         $class->{_data} .= $output;
 }
 
@@ -1182,7 +1191,7 @@ sub yesNo {
         $output .= ' checked="1"' if ($value == 0);
         $output .= $extras.'>'.WebGUI::International::get(139);
         $output .= _subtext($subtext);
-        $output = _tableFormRow($label,$output);
+        $output = _tableFormRow($label,$output) unless ($class->{_noTable});
         $class->{_data} .= $output;
 }
 
@@ -1242,7 +1251,7 @@ sub zipcode {
         $output = '<input type="text" name="'.$name.'" value="'.$value.'" size="'.
                 $size.'" maxlength="'.$maxLength.'" '.$extras.'>';
         $output .= _subtext($subtext);
-        $output = _tableFormRow($label,$output);
+        $output = _tableFormRow($label,$output) unless ($class->{_noTable});
         $class->{_data} .= $output;
 }
 

@@ -393,7 +393,12 @@ sub www_deleteConfirm {
 =cut
 
 sub www_edit {
-        my ($f, $title, $templatePosition, $endDate);
+        my ($f, $displayTitle, $title, $templatePosition, $endDate);
+        if ($_[0]->get("wobjectId") eq "new") {
+               	$displayTitle = 1;
+        } else {
+        	$displayTitle = $_[0]->get("displayTitle");
+        }
 	$title = $_[0]->get("title") || $_[0]->get("namespace");
 	$templatePosition = $_[0]->get("templatePosition") || 'A';
 	$endDate = $_[0]->get("endDate") || (time()+315360000);
@@ -403,7 +408,7 @@ sub www_edit {
 	$f->hidden("func","editSave");
 	$f->readOnly($_[0]->get("wobjectId"),WebGUI::International::get(499));
 	$f->text("title",WebGUI::International::get(99),$title);
-	$f->yesNo("displayTitle",WebGUI::International::get(174),$_[0]->get("displayTitle"));
+	$f->yesNo("displayTitle",WebGUI::International::get(174),$displayTitle);
 	$f->yesNo("processMacros",WebGUI::International::get(175),$_[0]->get("processMacros"));
 	$f->select("templatePosition",_getPositions(),WebGUI::International::get(363),[$templatePosition]);
 	$f->date("startDate",WebGUI::International::get(497),$_[0]->get("startDate"));

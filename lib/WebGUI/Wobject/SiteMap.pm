@@ -60,7 +60,7 @@ sub _traversePageTree {
 sub duplicate {
         my ($w, $f);
         $w = $_[0]->SUPER::duplicate($_[1]);
-        $w = WebGUI::Wobject::Item->new({wobjectId=>$w,namespace=>$namespace});
+        $w = WebGUI::Wobject::SiteMap->new({wobjectId=>$w,namespace=>$namespace});
         $w->set({
                 startAtThisLevel=>$_[0]->get("startAtThisLevel"),
                 indent=>$_[0]->get("indent"),

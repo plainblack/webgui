@@ -46,6 +46,10 @@ insert into wobject (wobjectId, pageId, title, displayTitle, processMacros, desc
 delete from widget where namespace='SiteMap';
 alter table SiteMap change widgetId wobjectId int not null;
 
+insert into wobject (wobjectId, pageId, title, displayTitle, processMacros, description, dateAdded, addedBy, namespace, lastEdited, editedBy, templatePosition, sequenceNumber, startDate, endDate) select widgetId, pageId, title, displayTitle, processMacros, description, dateAdded, addedBy, namespace, lastEdited, editedBy, templatePosition, sequenceNumber, dateAdded, 1336444487 from widget where namespace='Poll';
+delete from widget where namespace='Poll';
+alter table Poll change widgetId wobjectId int not null;
+alter table Poll_answer change widgetId wobjectId int not null;
 
 
 delete from international where language='Svenska';
