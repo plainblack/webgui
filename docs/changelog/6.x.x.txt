@@ -52,6 +52,7 @@
  - Made flat thread work like flat thread -> messages sorted by submission date / RFE[995982]. (Leendert Bottelberghs)
  - Upgraded DBIx::Tree::NestedSet to the latest version (0.15) (Martin Kamerbeek /Procolix)
  - Eliminated the use for the 'id' column in the page table (Martin Kamerbeek /Procolix)
+ - Implemented preview function for posting messages to a forum / RFE[991000] (Leendert Bottelberghs / United Knowledge)
 
 
 6.1.1
