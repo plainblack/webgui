@@ -18,6 +18,10 @@ document.write('.cMenuDivOuter { background-color: threedface; height: 9 }');
 document.write('.cMenuDivInner { margin: 0 4 0 4; border-width: 1; border-style: solid; border-color: threedshadow threedhighlight threedhighlight threedshadow; }');
 document.write('</style>\n');
 
+document.write('<SCR' + 'IPT LANGUAGE=VBScript\> \n');
+document.write('on error resume next \n');
+document.write('spellEnabled = (IsObject(CreateObject("Word.Application"))) \n');
+document.write('</SCR' + 'IPT\> \n');
 
 /* ---------------------------------------------------------------------- *\
   Function    : editor_defaultConfig
@@ -42,7 +46,7 @@ this.toolbar = [
     ['fontsize'],
 //    ['fontstyle'],
 //    ['linebreak'],
-    ['undo','redo','word','find','separator'],
+    ['undo','redo','word','spell','find','separator'],
     ['bold','italic','underline','separator'],
     ['strikethrough','subscript','superscript','separator'],
     ['justifyleft','justifycenter','justifyright','separator'],
@@ -85,7 +89,8 @@ this.fontstyles = [     // make sure these exist in the header of page the conte
 
 this.btnList = {
     // buttonName:    commandID,               title,                onclick,                   image,             
-    "word":           ['word',                 'MS-Word cleanup', 'editor_action(this.id)',  'ed_word.gif'],
+    "spell":          ['spell',                'Spell Check',        'editor_action(this.id);', 'ed_spellcheck.gif'],
+    "word":           ['word',                 'MS-Word cleanup',    'editor_action(this.id)',  'ed_word.gif'],
     "undo":           ['Undo',                 'Undo Ctrl+z',        'editor_action(this.id)',  'ed_undo.gif'],
     "redo":           ['Redo',                 'Redo Ctrl+y',        'editor_action(this.id)',  'ed_redo.gif'],
     "find":	      ['Find',	     	       'Find',	             'editor_action(this.id)',  'ed_find.gif'],
@@ -351,6 +356,13 @@ function editor_action(button_id) {
   else if (cmdID == 'custom3') {  // insert some text
     editor_insertHTML(objname, "It's easy to add buttons that insert text!");
   }
+  else if (cmdID == 'spell') {
+	if(typeof(spellEnabled) == 'undefined') alert('Unable to start MS Word for spell checking.\nActive X is not enabled for this site or MS Word is not available.');
+        editdoc.execCommand('copy');
+	if (editdoc.selection.createRange().text != "") {CheckDocument(); return true;}
+        else {alert('Nothing to spellcheck. Please select the text you want HTMLArea to check.\nTo avoid unexpected results, we recommend you to select complete paragraphs.');}
+  }
+
   else if (cmdID == 'word') {
   var oTags = editdoc.all.tags("SPAN");
   if (oTags != null) {
@@ -1317,5 +1329,22 @@ function getGlobalVar(varName, value) {
    } else {
      return this.cache[varName];
    }
+}
+
+function CheckDocument()
+{
+oShell= new
+ActiveXObject("WScript.Shell");
+oShell.SendKeys( "^c" ); // copy
+oWord = new ActiveXObject("Word.Application");
+oWord.Documents.Add();
+oWord.Selection.Paste();
+oWord.ActiveDocument.CheckSpelling();
+oWord.Selection.WholeStory();
+oWord.Selection.Copy();
+oWord.ActiveDocument.Close(0);
+oWord.Quit();
+var nRet= oShell.Popup( "HTMLArea finished checking your document.\nApply changes? Click OK to replace the corrected words.",0,"Spell Check Complete",33 );
+if ( nRet == 1 ) {oShell.SendKeys( "^v" );}// paste
 }
 
