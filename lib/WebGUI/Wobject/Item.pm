@@ -34,7 +34,8 @@ sub duplicate {
 	$w = WebGUI::Wobject::Item->new({wobjectId=>$w,namespace=>$namespace});
 	$w->set({
 		linkURL=>$_[0]->get("linkURL"),
-		attachment=>$_[0]->get("attachment")
+		attachment=>$_[0]->get("attachment"),
+		templateId=>$_[0]->get("templateId")
 		});
 	$f = WebGUI::Attachment->new($_[0]->get("attachment"),$_[0]->get("wobjectId"));
 	$f->copy($w->get("wobjectId"));
@@ -42,18 +43,26 @@ sub duplicate {
 
 #-------------------------------------------------------------------
 sub set {
-	$_[0]->SUPER::set($_[1],[qw(linkURL attachment)]);
+	$_[0]->SUPER::set($_[1],[qw(linkURL attachment templateId)]);
 }
 
 #-------------------------------------------------------------------
 sub www_edit {
 	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
-        my ($output, $f);
+        my ($output, $f, $template);
+	$template = $_[0]->get("templateId") || 1;
 	$output = helpIcon(1,$_[0]->get("namespace"));
 	$output .= '<h1>'.WebGUI::International::get(6,$namespace).'</h1>';
 	$f = WebGUI::HTMLForm->new;
 	$f->url("linkURL",WebGUI::International::get(1,$_[0]->get("namespace")),$_[0]->get("linkURL"));
 	$f->raw($_[0]->fileProperty("attachment",2));
+	$f->template(
+                -name=>"templateId",
+                -value=>$template,
+                -namespace=>$namespace,
+                -label=>WebGUI::International::get(72,$namespace),
+                -afterEdit=>'func=edit&wid='.$_[0]->get("wobjectId")
+                );
 	$output .= $_[0]->SUPER::www_edit($f->printRowsOnly);
         return $output;
 }
@@ -73,25 +82,13 @@ sub www_editSave {
 
 #-------------------------------------------------------------------
 sub www_view {
-	my (@test, $output, $file);
-	if ($_[0]->get("displayTitle")) {
-		$output = '<span class="itemTitle">'.$_[0]->get("title").'</span>';
-        	if ($_[0]->get("linkURL")) {
-        		$output = '<a href="'.$_[0]->get("linkURL").'">'.$output.'</span></a>';
-        	}
-	} 
+	my ($file, %var);
 	if ($_[0]->get("attachment") ne "") {
 		$file = WebGUI::Attachment->new($_[0]->get("attachment"),$_[0]->get("wobjectId"));
-		if ($_[0]->get("displayTitle")) {
-			$output .= ' - ';
-		}
-		$output .= '<a href="'.$file->getURL.'"><img src="'.$file->getIcon.'" border=0 alt="'.
-			$_[0]->get("attachment").'" width=16 height=16 border=0 align="middle"></a>';
+		$var{attachmentURL} = $file->getURL;
+		$var{attachmentIcon} = $file->getIcon;
 	}
-	if ($_[0]->get("description") ne "") {
-		$output .= ' - '.$_[0]->get("description");
-	}
-        return $_[0]->processMacros($output);
+        return $_[0]->processMacros($_[0]->processTemplate($_[0]->get("templateId"),\%var));
 }	
 
 
