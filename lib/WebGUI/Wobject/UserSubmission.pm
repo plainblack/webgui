@@ -428,36 +428,36 @@ sub www_editSave {
 
 #-------------------------------------------------------------------
 sub www_editSubmission {
-        my ($output, %submission, $f, @submission, $sth);
-	tie %submission, 'Tie::CPHash';
-        %submission = WebGUI::SQL->quickHash("select * from UserSubmission_submission where submissionId='$session{form}{sid}'");
-	if ($session{form}{sid} eq "new") {
-		$submission{convertCarriageReturns} = 1;
-		$submission{userId} = $session{user}{userId};
+        my ($output, $submission, $f, @submission, $sth);
+        $submission = $_[0]->getCollateral("UserSubmission_submission","submissionId",$session{form}{sid});
+	if ($submission->{submissionId} eq "new") {
+		$submission->{convertCarriageReturns} = 1;
+		$submission->{userId} = $session{user}{userId};
 	}
         if (WebGUI::Privilege::isInGroup($_[0]->get("groupToContribute")) 
-	 || $submission{userId} == $session{user}{userId} 
+	 || $submission->{userId} == $session{user}{userId} 
 	 || WebGUI::Privilege::isInGroup($_[0]->get("groupToApprove"))) {
                 $output = '<h1>'.WebGUI::International::get(19,$namespace).'</h1>';
 		$f = WebGUI::HTMLForm->new;
                 $f->hidden("wid",$session{form}{wid});
-                $f->hidden("sid",$session{form}{sid});
+                $f->hidden("sid",$submission->{submissionId});
                 $f->hidden("func","editSubmissionSave");
-                $f->text("title",WebGUI::International::get(35,$namespace),$submission{title});
-                $f->HTMLArea("content",WebGUI::International::get(31,$namespace),$submission{content});
-                if ($submission{image} ne "") {
-			$f->readOnly('<a href="'.WebGUI::URL::page('func=deleteImage&wid='.$session{form}{wid}.'&sid='.$session{form}{sid}).'">'
+                $f->text("title",WebGUI::International::get(35,$namespace),$submission->{title});
+                $f->HTMLArea("content",WebGUI::International::get(31,$namespace),$submission->{content});
+                if ($submission->{image} ne "") {
+			$f->readOnly('<a href="'.WebGUI::URL::page('func=deleteImage&wid='.$session{form}{wid}.'&sid='.$submission->{submissionId}).'">'
 				.WebGUI::International::get(391).'</a>',WebGUI::International::get(32,$namespace));
                 } else {
 			$f->file("image",WebGUI::International::get(32,$namespace));
                 }
-                if ($submission{attachment} ne "") {
-			$f->readOnly('<a href="'.WebGUI::URL::page('func=deleteAttachment&wid='.$session{form}{wid}.'&sid='.$session{form}{sid}).'">'
+                if ($submission->{attachment} ne "") {
+			$f->readOnly('<a href="'.WebGUI::URL::page('func=deleteAttachment&wid='.$session{form}{wid}
+				.'&sid='.$submission->{submissionId}).'">'
 				.WebGUI::International::get(391).'</a>',WebGUI::International::get(33,$namespace));
                 } else {
 			$f->file("attachment",WebGUI::International::get(33,$namespace));
                 }
-		$f->yesNo("convertCarriageReturns",WebGUI::International::get(34,$namespace),$submission{convertCarriageReturns},
+		$f->yesNo("convertCarriageReturns",WebGUI::International::get(34,$namespace),$submission->{convertCarriageReturns},
 			'',' &nbsp; '.WebGUI::International::get(38,$namespace));
 		$f->submit;
 		$output .= $f->print;
@@ -470,12 +470,11 @@ sub www_editSubmission {
 
 #-------------------------------------------------------------------
 sub www_editSubmissionSave {
-	my ($sqlAdd,$owner,$image,$attachment,$title,$u);
-	($owner) = WebGUI::SQL->quickArray("select userId from UserSubmission_submission where submissionId='$session{form}{sid}'");
-        if ($owner == $session{user}{userId} 
-	 || ($session{form}{sid} eq "new" && WebGUI::Privilege::isInGroup($_[0]->get("groupToContribute"))) 
-	 || WebGUI::Privilege::isInGroup($_[0]->get("groupToApprove"))) {
-		if ($session{form}{sid} eq "new") {
+	my ($sqlAdd,$submission,$image,$attachment,$title,$u);
+	$submission = $_[0]->getCollateral("UserSubmission_submission","submissionId",$session{form}{sid});
+        if ($submission->{owner} == $session{user}{userId} || ($submission->{submissionId} eq "new" 
+		&& WebGUI::Privilege::isInGroup($_[0]->get("groupToContribute"))) || WebGUI::Privilege::isInGroup($_[0]->get("groupToApprove"))) {
+		if ($submission->{submissionId} eq "new") {
 			$session{form}{sid} = getNextId("submissionId");
 			WebGUI::SQL->write("insert into UserSubmission_submission (wobjectId,submissionId,userId,username) 
 				values (".$_[0]->get("wobjectId").",$session{form}{sid},$session{user}{userId},".quote($session{user}{username}).")");

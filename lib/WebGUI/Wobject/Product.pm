@@ -527,8 +527,7 @@ sub www_editBenefit {
                 $output .= '<h1>'.WebGUI::International::get(53,$namespace).'</h1>';
                 $f = WebGUI::HTMLForm->new;
                 $f->hidden("wid",$_[0]->get("wobjectId"));
-                $session{form}{bid} = "new" if ($session{form}{bid} eq "");
-                $f->hidden("bid",$session{form}{bid});
+                $f->hidden("bid",$data->{productBenefitId});
                 $f->hidden("func","editBenefitSave");
                 $benefits = WebGUI::SQL->buildHashRef("select benefit,benefit from Product_benefit order by benefit");
                 $f->combo("benefit",$benefits,WebGUI::International::get(51,$namespace),[$data->{benefits}]);
@@ -570,8 +569,7 @@ sub www_editFeature {
                 $output .= '<h1>'.WebGUI::International::get(22,$namespace).'</h1>';
                 $f = WebGUI::HTMLForm->new;
                 $f->hidden("wid",$_[0]->get("wobjectId"));
-                $session{form}{fid} = "new" if ($session{form}{fid} eq "");
-                $f->hidden("fid",$session{form}{fid});
+                $f->hidden("fid",$data->{productFeatureId});
                 $f->hidden("func","editFeatureSave");
 		$features = WebGUI::SQL->buildHashRef("select feature,feature from Product_feature order by feature");
                 $f->combo("feature",$features,WebGUI::International::get(23,$namespace),[$data->{feature}]);
@@ -613,8 +611,7 @@ sub www_editSpecification {
                 $output .= '<h1>'.WebGUI::International::get(25,$namespace).'</h1>';
                 $f = WebGUI::HTMLForm->new;
                 $f->hidden("wid",$_[0]->get("wobjectId"));
-                $session{form}{sid} = "new" if ($session{form}{sid} eq "");
-                $f->hidden("sid",$session{form}{sid});
+                $f->hidden("sid",$data->{productSpecificationId});
                 $f->hidden("func","editSpecificationSave");
                 $hashRef = WebGUI::SQL->buildHashRef("select name,name from Product_specification order by name");
                 $f->combo("name",$hashRef,WebGUI::International::get(26,$namespace),[$data->{name}]);
@@ -662,8 +659,7 @@ sub www_editTemplate {
                 $output .= '<h1>'.WebGUI::International::get(58,$namespace).'</h1>';
                 $f = WebGUI::HTMLForm->new;
                 $f->hidden("wid",$_[0]->get("wobjectId"));
-                $session{form}{tid} = "new" if ($session{form}{tid} eq "");
-                $f->hidden("tid",$session{form}{tid});
+                $f->hidden("tid",$data->{productTemplateId});
                 $f->hidden("func","editTemplateSave");
 		$f->text("name",WebGUI::International::get(59,$namespace),$data->{name});
 		$f->HTMLArea("template",WebGUI::International::get(60,$namespace),$data->{template},'','','',($session{setting}{textAreaRows}+10));

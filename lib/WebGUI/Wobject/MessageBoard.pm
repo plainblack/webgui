@@ -199,6 +199,7 @@ sub www_unlockThread {
 #-------------------------------------------------------------------
 sub www_view {
 	my ($sth, %data, $html, $i, $pn, $lastId, @last, $replies);
+	tie %data, 'Tie::CPHash';
         if ($session{form}{pn} < 1) {
                 $pn = 0;
         } else {

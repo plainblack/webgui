@@ -277,12 +277,19 @@ sub get {
 
 =item keyValue
 
- An integer containing the key value.
+ An integer containing the key value. If key value is equal to "new"
+ or null, then an empty hashRef containing only keyName=>"new" will 
+ be returned to avoid strict errors.
 
 =cut
 
 sub getCollateral {
-	return WebGUI::SQL->quickHashRef("select * from $_[1] where $_[2]=".quote($_[3]));
+	my ($class, $tableName, $keyName, $keyValue) = @_;
+	if ($keyValue eq "new" || $keyValue eq "") {
+		return {$keyName=>"new"};
+	} else {
+		return WebGUI::SQL->quickHashRef("select * from $tableName where $keyName=".quote($keyValue));
+	}
 }
 
 
@@ -729,6 +736,11 @@ sub www_editSave {
         $startDate = setToEpoch($session{form}{startDate}) || $session{page}{startDate};
         $endDate = setToEpoch($session{form}{endDate}) || $session{page}{endDate};
 	$session{form}{description} = WebGUI::HTML::cleanSegment($session{form}{description});
+	$session{form}{karmaPerPost} ||= 0;
+	$session{form}{groupToPost} ||= 2;
+	$session{form}{editTimeout} = WebGUI::DateTime::intervalToSeconds($session{form}{editTimeout_interval},$session{form}{editTimeout_units}) || 0;
+	$session{form}{groupToModerate} ||= 3;
+	$session{form}{moderationType} ||= "after";
 	$_[0]->set({
 		title=>$title,
 		displayTitle=>$session{form}{displayTitle},
@@ -740,7 +752,7 @@ sub www_editSave {
 		karmaPerPost=>$session{form}{karmaPerPost},
 		groupToPost=>$session{form}{groupToPost},
 		groupToModerate=>$session{form}{groupToModerate},
-		editTimeout=>WebGUI::DateTime::intervalToSeconds($session{form}{editTimeout_interval},$session{form}{editTimeout_units}),
+		editTimeout=>$session{form}{editTimeout},
 		moderationType=>$session{form}{moderationType}
 	});
 	return "";

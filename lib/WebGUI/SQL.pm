@@ -271,7 +271,15 @@ sub hash {
 =cut
 
 sub hashRef {
-        return $_[0]->{_sth}->fetchrow_hashref() or WebGUI::ErrorHandler::fatalError("Couldn't fetch hashref. ".$_[0]->{_sth}->errstr);
+	my ($hashRef, %hash);
+        $hashRef = $_[0]->{_sth}->fetchrow_hashref();
+	tie %hash, 'Tie::CPHash';
+        if (defined $hashRef) {
+		%hash = %{$hashRef};
+                return \%hash;
+        } else {
+                return $hashRef;
+        }
 }
 
 
@@ -375,10 +383,13 @@ sub quickHash {
 =cut
 
 sub quickHashRef {
-        my ($sth, %hash);
-        tie %hash, "Tie::CPHash";
-        %hash = $_[0]->quickHash($_[1],$_[2]);
-        return \%hash;
+        my ($sth, $data);
+        $sth = WebGUI::SQL->new($_[1],$_[2]);
+        $data = $sth->hashRef;
+        $sth->finish;
+        if (defined $data) {
+                return $data;
+        }
 }
 
 #-------------------------------------------------------------------

@@ -44,6 +44,7 @@ sub _deleteReplyTree {
 #-------------------------------------------------------------------
 sub _duplicateReplyTree {
         my ($sth, %data, $newMessageId);
+	tie %data, 'Tie::CPHash';
         $sth = WebGUI::SQL->read("select * from discussion where pid=$_[0] order by messageId");
         while (%data = $sth->hash) {
                 $newMessageId = getNextId("messageId");
@@ -137,6 +138,7 @@ sub denyPost {
 #-------------------------------------------------------------------
 sub duplicate {
         my ($sth, %data, $newMessageId, $oldSubId, $newSubId);
+	tie %data, 'Tie::CPHash';
 	$oldSubId = $_[2] || 0;
 	$newSubId = $_[3] || 0;
         $sth = WebGUI::SQL->read("select * from discussion where wobjectId=$_[0] and pid=0 and subId=$oldSubId order by messageId");
@@ -312,7 +314,7 @@ sub postSave {
 			($session{form}{mid},$session{form}{wid},$session{form}{sid},$rid,$pid,$session{user}{userId},"
 			.quote($username).", '$status')");
 	} elsif ($session{setting}{addEditStampToPosts}) {
-		$session{form}{message} = "\n --- (Edited at ".localtime(time)." by $session{user}{username}) --- \n\n"
+		$session{form}{message} = "\n --- (Edited at ".epochToHuman(time())." by $session{user}{username}) --- \n\n"
 			.$session{form}{message};
 	}
 	WebGUI::SQL->write("update discussion set subject=".quote($session{form}{subject}).", 
@@ -515,6 +517,7 @@ sub showReplyTree {
 #-------------------------------------------------------------------
 sub showThreads {
         my ($sth, %data, $html, $sql);
+	tie %data, 'Tie::CPHash';
         $sql = "select * from discussion where wobjectId=$session{form}{wid}";
         $sql .= " and subId=$session{form}{sid}" if ($session{form}{sid});
 	$sql .= " and (status='Approved' or userId=$session{user}{userId})";

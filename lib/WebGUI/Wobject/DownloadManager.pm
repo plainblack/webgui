@@ -242,8 +242,9 @@ sub www_editDownload {
         if (WebGUI::Privilege::canEditPage()) {
 		if ($session{form}{did} eq "") {
 			$session{form}{did} = "new";
+		} else {
+			%download = WebGUI::SQL->quickHash("select * from DownloadManager_file where downloadId='$session{form}{did}'");
 		}
-		%download = WebGUI::SQL->quickHash("select * from DownloadManager_file where downloadId='$session{form}{did}'");
                 $output .= helpIcon(2,$namespace);
                 $output .= '<h1>'.WebGUI::International::get(10,$namespace).'</h1>';
 		$f = WebGUI::HTMLForm->new;
