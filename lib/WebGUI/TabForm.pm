@@ -151,14 +151,18 @@ A string containing the link to the tab-CascadingStyleSheet
 =cut
 
 sub new {
-	my ($class, $tabs, $css);
+	my ($cancel, $class, $tabs, $css);
 	$class = $_[0];
 	$tabs = $_[1];
 	$css = $_[2] || $session{config}{extrasURL}.'/tabs/tabs.css';
 	foreach my $key (keys %{$tabs}) {
 		$tabs->{$key}{form} = WebGUI::HTMLForm->new;
 	}
-	bless {	_submit=>WebGUI::Form::submit(), _form=>WebGUI::Form::formHeader(), _hidden=>"", _tab=>$tabs, _css=>$css }, $class;
+	$cancel = WebGUI::Form::button({
+			value=>WebGUI::International::get('cancel'),
+			extras=>q|onClick="location.href='|.WebGUI::URL::page().q|'"|
+			});
+	bless {	_cancel=>$cancel, _submit=>WebGUI::Form::submit(), _form=>WebGUI::Form::formHeader(), _hidden=>"", _tab=>$tabs, _css=>$css }, $class;
 }
 
 
@@ -191,7 +195,7 @@ sub print {
 		$form .= '</table></div>';
 		$i++;
 	}
-	$output .= '<div class="tabs">'.$tabs.$_[0]->{_submit}.'</div>';
+	$output .= '<div class="tabs">'.$tabs.$_[0]->{_submit}."&nbsp;&nbsp;".$_[0]->{_cancel}.'</div>';
 	$output .= $form;
 	$output .= WebGUI::Form::formFooter();
 	$output .= '<script>var numberOfTabs = '.($i-1).'; initTabs();</script>';

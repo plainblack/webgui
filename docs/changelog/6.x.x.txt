@@ -12,6 +12,7 @@
  - Bugfix [ 1055396 ] Template switching issue (Len Kranendonk)
  - WebGUI Operations are now dynamically loaded (Len Kranendonk) 
  - Added <input type="button"> button to Form.pm / HTMLForm.pm (Len Kranendonk)
+ - Added a "Cancel" button to each tab form (Len Kranendonk)
 
 6.2.7
  - Expanded upon the help for URL extensions.

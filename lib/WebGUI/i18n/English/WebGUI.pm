@@ -7467,6 +7467,12 @@ config file.</p>
 		lastUpdated =>1092930637,
 		context => q|help body forum post preview template|
 	},
+	'cancel' => {
+		message => q|cancel|,
+		lastUpdated =>1092930637,
+                context => q|Label of the cancel button|
+        },
+
 };
 
 1;
