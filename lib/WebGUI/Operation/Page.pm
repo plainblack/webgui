@@ -543,17 +543,17 @@ sub www_editPageSave {
 	if ($session{form}{pageId} eq "new") {
 		$pageId = $session{form}{parentId};
 	} else {
-		$page = WebGUI::Page->getPage($session{form}{pageId});
 		$pageId = $session{form}{pageId};
 	}
-	
 	return WebGUI::Privilege::insufficient() unless (WebGUI::Page::canEdit($pageId));
 
 	if ($session{form}{pageId} eq "new") {
-		$currentPage = WebGUI::Page->getPage($pageId);
+		$currentPage = WebGUI::Page->getPage($session{form}{parentId});
 		$page = $currentPage->add;
+		$page->set({parentId=>$session{form}{parentId}});
+	} else {
+		$page = WebGUI::Page->getPage($session{form}{pageId});
 	}
-
         $session{form}{title} = "no title" if ($session{form}{title} eq "");
         $session{form}{menuTitle} = $session{form}{title} if ($session{form}{menuTitle} eq "");
         my $url = $session{form}{urlizedTitle};

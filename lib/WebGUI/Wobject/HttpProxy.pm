@@ -212,7 +212,6 @@ sub www_view {
    	 $input_name =~ s/^HttpProxy_//;
    
             my $uploadFile = $session{cgi}->tmpFileName($session{form}{'HttpProxy_'.$input_name});
-   
             if(-r $uploadFile) { # Found uploaded file
       	       @formUpload=($uploadFile, qq/$session{form}{'HttpProxy_'.$input_name}/);
    	       $formdata{$input_name}=\@formUpload;

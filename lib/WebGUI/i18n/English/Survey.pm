@@ -705,6 +705,12 @@ If you leave this set at its default, then you will add a question directly afte
 		lastUpdated => 1033944535
 	},
 
+	'cannot delete the last answer' => {
+		message=>q|You cannot delete the last answer from a question. Every question must have at least one answer.|,
+		lastUpdated=>1083944535,
+		context=>q|This message is displayed when a user is trying to delete the last answer from a survey question.|	
+	},
+
 };
 
 1;

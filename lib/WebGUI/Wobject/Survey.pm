@@ -431,10 +431,17 @@ sub uiLevel {
 
 #-------------------------------------------------------------------
 sub www_deleteAnswer {
-        return WebGUI::Privilege::insufficient() unless ($_[0]->canEdit);
-        return $_[0]->confirm(WebGUI::International::get(45,$_[0]->get("namespace")),
-                WebGUI::URL::page('func=deleteAnswerConfirm&wid='.$_[0]->get("wobjectId").'&aid='
-		.$session{form}{aid}.'&qid='.$session{form}{qid}));
+	my $self = shift;
+        return WebGUI::Privilege::insufficient() unless ($self->canEdit);
+	my ($answerCount) = WebGUI::SQL->quickArray("select count(*) from Survey_answer where Survey_questionId=".quote($session{form}{qid}));
+	if ($answerCount > 1) {
+        	return $self->confirm(
+			$self->i18n(45),
+                	WebGUI::URL::page('func=deleteAnswerConfirm&wid='.$self->wid.'&aid='.$session{form}{aid}.'&qid='.$session{form}{qid})
+			);
+	} else {
+		return $self->i18n("cannot delete the last answer");
+	}
 }
 
 #-------------------------------------------------------------------

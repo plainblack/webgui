@@ -37,7 +37,7 @@ sub _generatePage {
 			pageId, pageTitle, wobjectId, wobjectFunction) values (".time().",".$session{user}{userId}
 			.",".quote($session{user}{username}).",
 			".quote($session{env}{REMOTE_ADDR}).", ".quote($session{env}{HTTP_USER_AGENT}).",
-			".quote($session{env}{HTTP_REFERER}).", ".$session{page}{pageId}.", 
+			".quote($session{env}{HTTP_REFERER}).", ".quote($session{page}{pageId}).", 
 			".quote($session{page}{title}).", ".quote($session{form}{wid}).", ".quote($session{form}{func}).")");
 	}
 	my $output = WebGUI::Style::process($content);

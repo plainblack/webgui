@@ -13,6 +13,13 @@
  - Fixed a problem with the new export mechanism where it would just stop and
    not report an error if it ran into a problem with creating folders and
    files.
+ - bugfix [ 1033998 ] ^RootTitle does not work 
+ - bugfix [ 1031987 ] no upgrade script in 6.2.4
+ - bugfix [ 1030998 ] HTML Collateral Manager Issues (Harlan Barnes)
+ - Updated some of the template help. (Colin Kuskie)
+ - bugfix [ 1023800 ] USS - Read more
+ - bugfix [ 1033204 ] parentId empty when creating new root
+ - bugfix [ 998252 ] No Answers in Survey Causes Endless Loop
 
 
 6.2.4

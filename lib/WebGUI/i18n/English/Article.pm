@@ -130,8 +130,12 @@ Checking this box will enable responses to your article much like Articles on Sl
 Articles have the special ability to change their template so that you can allow users to see different views of the article. You do this by creating a link with a URL like this (replace 999 with the template Id you wish to use):<p>
 &lt;a href="&lt;tmpl_var new.template&gt;999"&gt;Read more...&lt;/a&gt;
 <p>
+<b>description</b><br>
+The paginated description.
+<p>
+
 <b>description.full</b><br>
-The full description without any pagination. (For the paginated description use "description" instead.)
+The full description without any pagination.
 <p>
 
 <b>description.first.100words</b><br>
@@ -204,10 +208,17 @@ The URL to the thumbnail for the attached image.
 The URL to the attached image.
 <p/>
 
+<b>linkTitle</b><br/>
+The title of the link to display to the user.
+<p/>
+
+<b>linkURL</b><br/>
+The URL for the link to display to the user.
+<p/>
+
 <b>post.label</b><br/>
 The translated label to add a comment to this article.
 <p/>
-
 
 <b>post.URL</b><br/>
 The URL to add a comment to this article.
@@ -226,7 +237,7 @@ The URL to view the replies to this article.
 <p/>
 
 |,
-		lastUpdated => 1082370724
+		lastUpdated => 1095829149
 	},
 
 	'24' => {

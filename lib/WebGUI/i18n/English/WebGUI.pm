@@ -3412,9 +3412,10 @@ be http://www.mysite.com/thisPage#94
 
 	'826' => {
 		message => q|WebGUI has a powerful templating language built to give you maximum control over the layout of your content. The following is a list of the template language syntax.
-
+<p/><b>NOTES:</b><br/>
+Both the template language and template variables are case-insensitive.
 <p/>
-<b>NOTE:</b> Please note that the words <i>foo</i> and <i>bar</i> are used below as placeholders for the actual variable names that you'll use. They are not part of the template language.
+Please note that the words <i>foo</i> and <i>bar</i> are used below as placeholders for the actual variable names that you'll use. They are not part of the template language.
 
 <p/>
 <b>Variables</b><br/>
@@ -3481,9 +3482,8 @@ Loops come with special condition variables of their own. They are __FIRST__, __
    &lt;/TMPL_LOOP&gt;
 </pre>
 
-<p/>
-<b>NOTE:</b>Both the template language and template variables are case-insensitive.|,
-		lastUpdated => 1038865669
+<p/>|,
+		lastUpdated =>1095829149 
 	},
 
 	'354' => {

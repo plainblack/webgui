@@ -527,7 +527,7 @@ sub www_htmlArealistCollateral {
 	my $parent = $folderId;
 	# push parent folders in array so it can be reversed
 	unshift(@parents, $parent);
-	until($parent == 0) {
+	until($parent eq '0') {
 		($parent) = WebGUI::SQL->quickArray("select parentId from collateralFolder where collateralFolderId=".quote($parent));
 		unshift(@parents, $parent);
 	}
@@ -544,7 +544,7 @@ sub www_htmlArealistCollateral {
 	}
 	# Extend tree with closed folders in current folder
 	$sth = WebGUI::SQL->read("select collateralFolderId, name, description from collateralFolder
-		                  where parentId=".quote($folderId)." and collateralFolderId<>0 order by name");
+		                  where parentId=".quote($folderId)." and collateralFolderId <> '0' order by name");
         while ($data = $sth->hashRef) { 
 		my ($itemsInFolder) = WebGUI::SQL->quickArray("select count(*) from collateral where 
 							collateralFolderId = ".quote($data->{collateralFolderId}));
