@@ -14,6 +14,8 @@ save you many hours of grief.
 	the template language has changed slightly for greater
 	flexibility.
 
+ * All Link Lists have been reset to the default template.
+
 
 4.8.0
 --------------------------------------------------------------------

@@ -29,19 +29,18 @@ our $name = WebGUI::International::get(6,$namespace);
 
 #-------------------------------------------------------------------
 sub duplicate {
-        my ($w, $sth, @row, $newLinkId);
+        my ($w, $sth, $row);
 	$w = $_[0]->SUPER::duplicate($_[1]);
 	$w = WebGUI::Wobject::LinkList->new({wobjectId=>$w,namespace=>$namespace});
 	$w->set({
-		indent=>$_[0]->get("indent"),
-		bullet=>$_[0]->get("bullet"),
-		lineSpacing=>$_[0]->get("lineSpacing")
+		templateId=>$_[0]->get("templateId")
 		});
-        $sth = WebGUI::SQL->read("select * from LinkList_link where wobjectId=".$_[0]->get("wobjectId"));
-        while (@row = $sth->array) {
-                $newLinkId = getNextId("LinkList_linkId");
-                WebGUI::SQL->write("insert into LinkList_link values (".$w->get("wobjectId").", $newLinkId, "
-			.quote($row[2]).", ".quote($row[3]).", ".quote($row[4]).", '$row[5]', '$row[6]')");
+        $sth = WebGUI::SQL->read("select * from LinkList_link where wobjectId=".$_[0]->get("wobjectId")
+		." order by sequenceNumber");
+        while ($row = $sth->hashRef) {
+		$row->{LinkList_linkId} = "new";
+		$row->{wobjectId} = $w->get("wobjectId");
+		$_[0]->setCollateral("LinkList_link","LinkList_linkId",$row);
         }
         $sth->finish;
 }
@@ -54,7 +53,7 @@ sub purge {
 
 #-------------------------------------------------------------------
 sub set {
-        $_[0]->SUPER::set($_[1],[qw(indent bullet lineSpacing)]);
+        $_[0]->SUPER::set($_[1],[qw(templateId)]);
 }
 
 #-------------------------------------------------------------------
@@ -85,10 +84,21 @@ sub www_edit {
         $output = helpIcon(1,$namespace);
 	$output .= '<h1>'.WebGUI::International::get(10,$namespace).'</h1>';
 	$f = WebGUI::HTMLForm->new;
-        $f->integer("indent",WebGUI::International::get(1,$namespace),$indent);
-        $f->integer("lineSpacing",WebGUI::International::get(2,$namespace),$lineSpacing);
-        $f->text("bullet",WebGUI::International::get(4,$namespace),$bullet);
-	$f->yesNo("proceed",WebGUI::International::get(5,$namespace),$proceed);
+	$f->template(
+                -name=>"templateId",
+                -value=>$_[0]->get("templateId"),
+                -namespace=>$namespace,
+                -afterEdit=>'func=edit&wid='.$_[0]->get("wobjectId")
+                );
+        if ($_[0]->get("wobjectId") eq "new") {
+                $f->whatNext(
+                        -options=>{
+                                addLink=>WebGUI::International::get(74,$namespace),
+                                backToPage=>WebGUI::International::get(745)
+                                },
+                        -value=>"addLink"
+                        );
+        }
 	$output .= $_[0]->SUPER::www_edit($f->printRowsOnly);
         return $output;
 }
@@ -97,11 +107,10 @@ sub www_edit {
 sub www_editSave {
 	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
         $_[0]->SUPER::www_editSave({
-		indent=>$session{form}{indent},
-		bullet=>$session{form}{bullet},
-		lineSpacing=>$session{form}{lineSpacing}
+		templateId=>$session{form}{templateId}
 		});
-        if ($session{form}{proceed}) {
+        if ($session{form}{proceed} eq "addLink") {
+		$session{form}{lid} = "new";
                 $_[0]->www_editLink();
         } else {
                 return "";
@@ -111,26 +120,33 @@ sub www_editSave {
 #-------------------------------------------------------------------
 sub www_editLink {
 	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
-        my ($output, %link, $f, $linkId, $newWindow);
-	tie %link, 'Tie::CPHash';
-	$linkId = $session{form}{lid} || "new";
-        %link = WebGUI::SQL->quickHash("select * from LinkList_link where LinkList_linkId='$session{form}{lid}'");
-        if ($linkId eq "new") {
+        my ($output, $link, $f, $linkId, $newWindow);
+        $link = $_[0]->getCollateral("LinkList_link", "LinkList_linkId",$session{form}{lid});
+        if ($link->{LinkList_linkId} eq "new") {
        	        $newWindow = 1;
         } else {
-       	        $newWindow = $link{newWindow};
+       	        $newWindow = $link->{newWindow};
        	}
 	$output = helpIcon(2,$namespace);
         $output .= '<h1>'.WebGUI::International::get(12,$namespace).'</h1>';
 	$f = WebGUI::HTMLForm->new;
 	$f->hidden("wid",$_[0]->get("wobjectId"));
-        $f->hidden("lid",$linkId);
+        $f->hidden("lid",$link->{LinkList_linkId});
         $f->hidden("func","editLinkSave");
-	$f->text("name",WebGUI::International::get(99),$link{name});
-        $f->url("url",WebGUI::International::get(8,$namespace),$link{url});
+	$f->text("name",WebGUI::International::get(99),$link->{name});
+        $f->url("url",WebGUI::International::get(8,$namespace),$link->{url});
         $f->yesNo("newWindow",WebGUI::International::get(3,$namespace),$newWindow);
-        $f->textarea("description",WebGUI::International::get(85),$link{description});
-	$f->yesNo("proceed",WebGUI::International::get(5,$namespace));
+        $f->textarea("description",WebGUI::International::get(85),$link->{description});
+        if ($link->{LinkList_linkId} eq "new") {
+		$f->hidden("sequenceNumber",-1);
+                $f->whatNext(
+                        -options=>{
+                                addLink=>WebGUI::International::get(74,$namespace),
+                                backToPage=>WebGUI::International::get(745)
+                                },
+                        -value=>"addLink"
+                        );
+        }
 	$f->submit;
 	$output .= $f->print;
         return $output;
@@ -144,9 +160,10 @@ sub www_editLinkSave {
                 description => $session{form}{description},
                 newWindow => $session{form}{newWindow},
                 url => $session{form}{url},
-                name => $session{form}{name}
+                name => $session{form}{name},
+		sequenceNumber=>$session{form}{sequenceNumber}
                 });
-        if ($session{form}{proceed}) {
+        if ($session{form}{proceed} eq "addLink") {
 		$session{form}{lid} = "new";
                 return $_[0]->www_editLink();
         } else {
@@ -170,43 +187,27 @@ sub www_moveLinkUp {
 
 #-------------------------------------------------------------------
 sub www_view {
-	my ($i, $indent, $lineSpacing, %link, $output, $sth);
-	tie %link,'Tie::CPHash';
-        $output = $_[0]->displayTitle;
-        $output .= $_[0]->description;
-	if ($session{var}{adminOn}) {
-		$output .= '<p><a href="'.WebGUI::URL::page('func=editLink&lid=new&wid='.$_[0]->get("wobjectId"))
-			.'">'.WebGUI::International::get(13,$namespace).'</a><p>';
-	}
-	for ($i=0;$i<$_[0]->get("indent");$i++) {
-		$indent .= "&nbsp;";
-	}
-        for ($i=0;$i<$_[0]->get("lineSpacing");$i++) {
-                $lineSpacing .= "<br>";
-        }
-	$sth = WebGUI::SQL->read("select * from LinkList_link where wobjectId=".$_[0]->get("wobjectId")." order by sequenceNumber");
-	while (%link = $sth->hash) {
-		if ($session{var}{adminOn}) {
-			$output .= deleteIcon('func=deleteLink&wid='.$_[0]->get("wobjectId").'&lid='.$link{LinkList_linkId})
-			.editIcon('func=editLink&wid='.$_[0]->get("wobjectId").'&lid='.$link{LinkList_linkId})
-			.moveUpIcon('func=moveLinkUp&wid='.$_[0]->get("wobjectId").'&lid='.$link{LinkList_linkId})
-			.moveDownIcon('func=moveLinkDown&wid='.$_[0]->get("wobjectId").'&lid='.$link{LinkList_linkId})
-			.' ';
-		} else {
-			$output .= $indent.$_[0]->get("bullet");
-		}
-		$output .= '<a href="'.$link{url}.'"';
-		if ($link{newWindow}) {
-			$output .= ' target="_blank"';
-		}
-		$output .= '><span class="linkTitle">'.$link{name}.'</span></a>';
-		if ($link{description} ne "") {
-			$output .= ' - '.$link{description};
-		}
-		$output .= $lineSpacing;
+	my (%var, @linkloop, $controls, $link, $sth);
+	$var{"addlink.url"} = WebGUI::URL::page('func=editLink&lid=new&wid='.$_[0]->get("wobjectId"));
+	$var{"addlink.label"} = WebGUI::International::get(13,$namespace);
+	$sth = WebGUI::SQL->read("select * from LinkList_link where wobjectId=".$_[0]->get("wobjectId")." 
+		order by sequenceNumber");
+	while ($link = $sth->hashRef) {
+		$controls = deleteIcon('func=deleteLink&wid='.$_[0]->get("wobjectId").'&lid='.$link->{LinkList_linkId})
+			.editIcon('func=editLink&wid='.$_[0]->get("wobjectId").'&lid='.$link->{LinkList_linkId})
+			.moveUpIcon('func=moveLinkUp&wid='.$_[0]->get("wobjectId").'&lid='.$link->{LinkList_linkId})
+			.moveDownIcon('func=moveLinkDown&wid='.$_[0]->get("wobjectId").'&lid='.$link->{LinkList_linkId});
+		push(@linkloop, {
+			"link.url"=>$link->{url},
+			"link.controls"=>$controls,
+			"link.newWindow"=>$link->{newWindow},
+			"link.name"=>$link->{name},
+			"link.description"=>$link->{description}
+			});
 	}
 	$sth->finish;
-	return $_[0]->processMacros($output);
+	$var{link_loop} = \@linkloop;
+	return $_[0]->processMacros($_[0]->processTemplate($_[0]->get("templateId"),\%var));
 }
 
 

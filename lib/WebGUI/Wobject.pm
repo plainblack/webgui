@@ -607,7 +607,7 @@ sub purge {
 
 sub reorderCollateral {
         my ($sth, $i, $id, $setName, $setValue);
-	$i = 0;
+	$i = 1;
 	$setName = $_[3] || "wobjectId";
 	$setValue = $_[4] || $_[0]->get($setName);
         $sth = WebGUI::SQL->read("select $_[2] from $_[1] where $setName=".quote($setValue)." order by sequenceNumber");
@@ -755,10 +755,11 @@ sub setCollateral {
 		$dbkeys = "";
      		$dbvalues = "";
 		unless ($useSequence eq "0") {
-			
-			($seq) = WebGUI::SQL->quickArray("select max(sequenceNumber) from $table 
-                               	where $setName=".quote($setValue));
-			$properties->{sequenceNumber} = $seq+1;
+			unless (exists $properties->{sequenceNumber}) {
+				($seq) = WebGUI::SQL->quickArray("select max(sequenceNumber) from $table 
+                               		where $setName=".quote($setValue));
+				$properties->{sequenceNumber} = $seq+1;
+			}
 		} 
 		unless ($useWobjectId eq "0") {
 			$properties->{wobjectId} = $_[0]->get("wobjectId");
@@ -776,13 +777,16 @@ sub setCollateral {
 	} else {
 		$sql = "update $table set ";
 		foreach $key (keys %{$properties}) {
-			$sql .= ',' if ($counter++ > 0);
-			$sql .= $key."=".quote($properties->{$key});
+			unless ($key eq "sequenceNumber") {
+				$sql .= ',' if ($counter++ > 0);
+				$sql .= $key."=".quote($properties->{$key});
+			}
 		}
 		$sql .= " where $keyName='".$properties->{$keyName}."'";
 		WebGUI::ErrorHandler::audit("edited ".$table." ".$properties->{$keyName});
 	}
   	WebGUI::SQL->write($sql);
+	$_[0]->reorderCollateral($table,$keyName,$setName,$setValue) if ($properties->{sequenceNumber} < 1);
 	return $properties->{$keyName};
 }
 
