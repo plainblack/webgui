@@ -23,6 +23,8 @@
  - Updated the Finnish translation thanks to Markus Hynna.
  - Fixed a bug where visitors could potentially edit other visitor's USS
    submissions.
+ - Added some missing international entries that caused problems accessing
+   some of the online help.
 
 
 

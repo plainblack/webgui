@@ -239,8 +239,6 @@ delete from international where languageId=13 and namespace='WebGUI' and interna
 insert into international (internationalId,languageId,namespace,message,lastUpdated) values (135,13,'WebGUI','LÃ¤htevÃ¤n postin palvelin (SMTP)', 1065224408);
 delete from international where languageId=13 and namespace='WebGUI' and internationalId=467;
 insert into international (internationalId,languageId,namespace,message,lastUpdated) values (467,13,'WebGUI','Haluatko varmasti poistaa tÃ¤mÃ¤n kentÃ¤n ja kaiken tiedon joka on liitetty siihen?', 1065224234);
-delete from international where languageId=13 and namespace='MailForm' and internationalId=19;
-insert into international (internationalId,languageId,namespace,message,lastUpdated) values (19,13,'MailForm','Haluatko varmasti poistaa tÃ¤mÃ¤n kentÃ¤n?', 1065224221);
 delete from international where languageId=13 and namespace='WebGUI/Profile' and internationalId=467;
 insert into international (internationalId,languageId,namespace,message,lastUpdated) values (467,13,'WebGUI/Profile','Haluatko varmasti poistaa tÃ¤mÃ¤n kentÃ¤n ja kaiken tiedon joka on liitetty siihen?', 1065224204);
 delete from international where languageId=13 and namespace='WebGUI' and internationalId=775;
@@ -302,4 +300,7 @@ insert into international (internationalId,languageId,namespace,message,lastUpda
 delete from international where languageId=13 and namespace='DataForm' and internationalId=74;
 insert into international (internationalId,languageId,namespace,message,lastUpdated) values (74,13,'DataForm','LÃ¤hetÃ¤ tiedot sÃ¤hkÃ¶postilla?', 1063632515);
 
+delete from international where internationalId=72 and namespace='SQLReport';
+insert into international values (72,'SQLReport',1,'SQL Report Template',1082371148,'');
+delete from help where helpId=4 and namespace='WebGUI';
 
