@@ -639,7 +639,7 @@ sub www_process {
 #-------------------------------------------------------------------
 sub www_view {
 	my $var;
-	$var->{entryId} = $session{form}{entryId};
+	$var->{entryId} = $session{form}{entryId} if (WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId")));
 	if ($var->{entryId} eq "list" && WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId"))) {
 		return $_[0]->processTemplate($_[0]->get("listTemplateId"),$_[0]->getListTemplateVars,"DataForm/List");
 	}
