@@ -171,7 +171,7 @@ sub _traversePageTree {
 
 #-------------------------------------------------------------------
 sub www_cutPage {
-        if ($session{page}{pageId} < 26) {
+        if ($session{page}{pageId} < 26 && $session{page}{pageId} >= 0) {
                 return WebGUI::Privilege::vitalComponent();
         } elsif (WebGUI::Privilege::canEditPage()) {
                 WebGUI::SQL->write("update page set parentId=2, "
