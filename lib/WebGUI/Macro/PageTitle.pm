@@ -12,12 +12,22 @@ package WebGUI::Macro::PageTitle;
 
 use strict;
 use WebGUI::Session;
+use WebGUI::URL;
+
+#-------------------------------------------------------------------
+sub _replacement {
+	if ($session{env}{QUERY_STRING} =~ /op/ || $session{env}{QUERY_STRING} =~ /func/) {
+        	return '<a href="'.WebGUI::URL::page().'">'.$session{page}{title}.'</a>';
+	} else {
+		return $session{page}{title};
+	}
+}
 
 #-------------------------------------------------------------------
 sub process {
 	my ($output);
 	$output = $_[0];
-        $output =~ s/\^PageTitle\;/$session{page}{title}/g;
+        $output =~ s/\^PageTitle\;/_replacement()/ge;
 	return $output;
 }
 
