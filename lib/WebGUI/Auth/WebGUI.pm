@@ -384,7 +384,7 @@ sub new {
 sub recoverPassword {
    my $self = shift;
    return $self->displayLogin if($self->userId != 1);	
-   my $template = 'AuthWebGUI/Recovery';
+   my $template = 'Auth/WebGUI/Recovery';
    my $vars;
    $vars->{title} = WebGUI::International::get(71);
    $vars->{'recover.form.header'} = "\n\n".WebGUI::Form::formHeader({});
