@@ -1107,7 +1107,7 @@ The list of options for this list. Should be passed as a hash reference.
 
 =item value
 
-The default value(s) for this form element. This should be passed as an array reference.
+The default value for this form element. This should be passed as a scalar.
 
 =item vertical
 
@@ -1124,12 +1124,10 @@ If you want to add anything special to this form element like javascript actions
 =cut
 
 sub radioList {
-        my ($output, $key, $checked, $item);
+        my ($output, $key, $checked);
         foreach $key (keys %{$_[0]->{options}}) {
 		$checked = 0;
-		foreach $item (@{$_[0]->{value}}) {
-                        $checked = 1 if ($item eq $key);
-		}
+                $checked = 1 if ($key $_[0]->{value});
 		$output .= radio({
 			name=>$_[0]->{name},
 			value=>$key,

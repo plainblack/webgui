@@ -534,7 +534,7 @@ sub _createField {
 			last SWITCH;
 		};
 		/^radioList$/ && do {
-			my (%selectOptions, @defaultValues);
+			my (%selectOptions, $defaultValue);
                         my $vertical = 1;   # TODO: Make this configurable
                         $name = "field_".$data->{sequenceNumber} if ($name eq ""); # Empty fieldname not allowed
                         tie %selectOptions, 'Tie::IxHash';
@@ -543,19 +543,15 @@ sub _createField {
                                 $selectOptions{$_} = $_;
                         }
                         if ($session{form}{$name}) {
-                                @defaultValues = $session{cgi}->param($name);
+                                $defaultValue = $session{form}{$name};
                         } else {
-                                # put default values in array
-                                foreach (split(/\n/, $data->{defaultValue})) {
-                                        s/\s+$//; # remove trailing spaces
-                                        push(@defaultValues, $_);
-                                }
+				$defaultValue = $data->{defaultValue};
                         }
                         $f->radioList(
                                 -name=>$name,
                                 -options=>\%selectOptions,
                                 -label=>$data->{name},
-                                -value=>\@defaultValues,
+                                -value=>$defaultValue,
                                 -subtext=>$data->{subtext},
                                 -vertical=>$vertical
                                 );
@@ -633,7 +629,7 @@ sub www_send {
 			$value = ($value == 1) ? "yes" : "no";
 		} elsif ($data{type} eq "checkbox") {
 			$value = ($value) ? "checked" : "not checked";
-		} elsif ($data{type} eq "checkList" || $data{type} eq "radioList") {
+		} elsif ($data{type} eq "checkList") {
 			$data{name} = $urlizedName = "field_".$data{sequenceNumber} if ($urlizedName eq ""); 
 			my @values = $session{cgi}->param($urlizedName);
 			$value = join(", ",@values);

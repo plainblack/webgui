@@ -1373,7 +1373,7 @@ The left column label for this form row.
 
 =item value
 
-The default value for this form element.
+The default value for this form element. Should be passed as a scalar.
 
 =item vertical
 
