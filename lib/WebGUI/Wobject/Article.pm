@@ -39,49 +39,44 @@ sub duplicate {
         $file = WebGUI::Attachment->new($_[0]->get("attachment"),$_[0]->get("wobjectId"));
         $file->copy($w->get("wobjectId"));
 	$w->set({
+		templateId=>$_[0]->get("templateId"),
 		image=>$_[0]->get("image"),
 		linkTitle=>$_[0]->get("linkTitle"),
 		linkURL=>$_[0]->get("linkURL"),
 		attachment=>$_[0]->get("attachment"),
 		convertCarriageReturns=>$_[0]->get("convertCarriageReturns"),
-		alignImage=>$_[0]->get("alignImage"),
 		allowDiscussion=>$_[0]->get("allowDiscussion")
 		});
 }
 
 #-------------------------------------------------------------------
 sub set {
-        $_[0]->SUPER::set($_[1],[qw(image linkTitle linkURL attachment convertCarriageReturns alignImage allowDiscussion)]);
+        $_[0]->SUPER::set($_[1],[qw(image templateId linkTitle linkURL attachment convertCarriageReturns allowDiscussion)]);
 }
 
 #-------------------------------------------------------------------
 sub www_edit {
 	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
-        my ($output, $editTimeout, $groupToModerate, %hash, $f);
-	tie %hash, 'Tie::IxHash';
+        my ($output, $editTimeout, $groupToModerate, $f, $template);
 	if ($_[0]->get("wobjectId") eq "new") {
                 $editTimeout = 1;
         } else {
                 $editTimeout = $_[0]->get("editTimeout");
         }
+	$template = $_[0]->get("templateId") || 1;
 	$groupToModerate = $_[0]->get("groupToModerate") || 4;
         $output = helpIcon(1,$namespace);
 	$output .= '<h1>'.WebGUI::International::get(12,$namespace).'</h1>';
 	$f = WebGUI::HTMLForm->new;
+	$f->template(
+                -name=>"templateId",
+                -value=>$template,
+                -namespace=>$namespace,
+                -label=>WebGUI::International::get(356),
+                -afterEdit=>'func=edit&wid='.$_[0]->get("wobjectId")
+                );
 	$f->raw(
 		-value=>$_[0]->fileProperty("image",6),
-		-uiLevel=>3
-		);
-        %hash = (
-                right => WebGUI::International::get(15,$namespace),
-                left => WebGUI::International::get(16,$namespace),
-                center => WebGUI::International::get(17,$namespace)
-                );
-	$f->select(
-		-name=>"alignImage",
-		-options=>\%hash,
-		-label=>WebGUI::International::get(14,$namespace),
-		-value=>[$_[0]->get("alignImage")],
 		-uiLevel=>3
 		);
 	$f->raw(
@@ -129,9 +124,9 @@ sub www_editSave {
 	$attachment->save("attachment");
 	$property{image} = $image->getFilename if ($image->getFilename ne "");
 	$property{attachment} = $attachment->getFilename if ($attachment->getFilename ne "");
-	$property{alignImage} = $session{form}{alignImage};
 	$property{convertCarriageReturns} = $session{form}{convertCarriageReturns};
 	$property{linkTitle} = $session{form}{linkTitle};
+	$property{templateId} = $session{form}{templateId};
 	$property{linkURL} = $session{form}{linkURL};
 	$property{allowDiscussion} = $session{form}{allowDiscussion};
 	$_[0]->SUPER::www_editSave(\%property);
@@ -145,52 +140,28 @@ sub www_showMessage {
 
 #-------------------------------------------------------------------
 sub www_view {
-	my ($file, $output, $image, $replies, $body);
-	if ($_[0]->get("image") ne "") { # Images collide on successive articles if there is little text - prevent this.
-		$output = '<table width="100%" border="0" cellpadding="0" cellspacing="0"><tr><td>';
-	}
-	$output .= $_[0]->displayTitle;
+	my ($file, %var);
 	if ($_[0]->get("image") ne "") {
-		$image = WebGUI::Attachment->new($_[0]->get("image"),$_[0]->get("wobjectId"));
-		$image = '<img src="'.$image->getURL.'"';
-		if ($_[0]->get("alignImage") ne "center") {
-			$image .= ' align="'.$_[0]->get("alignImage").'"';
-		}
-		$image .= ' border="0">';
-		if ($_[0]->get("alignImage") eq "center") {
-			$output .= '<div align="center">'.$image.'</div>';
-		} else {
-			$output .= $image;
-		}
+		$file = WebGUI::Attachment->new($_[0]->get("image"),$_[0]->get("wobjectId"));
+		$var{image} = $file->getURL;
+		$var{thumbnail} = $file->getThumbnail;
 	}
-        $body = $_[0]->description;
+        $var{description} = $_[0]->description;
 	if ($_[0]->get("convertCarriageReturns")) {
-		$body =~ s/\n/\<br\>/g;
+		$var{description} =~ s/\n/\<br\>/g;
 	}
-	$output .= $body;
-        if ($_[0]->get("linkURL") ne "" && $_[0]->get("linkTitle") ne "") {
-        	$output .= '<p><a href="'.$_[0]->get("linkURL").'">'.$_[0]->get("linkTitle").'</a>';
-        }
 	if ($_[0]->get("attachment") ne "") {
 		$file = WebGUI::Attachment->new($_[0]->get("attachment"),$_[0]->get("wobjectId"));
-		$output .= $file->box;
+		$var{"attachment.box"} = $file->box;
+		$var{"attachment.icon"} = $file->getIcon;
+		$var{"attachment.url"} = $file->getURL;
 	}
-	if ($_[0]->get("image") ne "") {
-		$output .= "</td></tr></table>";
-	}
-	$output = $_[0]->processMacros($output);
-	if ($_[0]->get("allowDiscussion")) {
-		($replies) = WebGUI::SQL->quickArray("select count(*) from discussion where wobjectId=".$_[0]->get("wobjectId"));
-		$output .= '<p><table width="100%" cellspacing="2" cellpadding="1" border="0">';
-		$output .= '<tr><td align="center" width="50%" class="tableMenu"><a href="'.
-			WebGUI::URL::page('func=showMessage&wid='.$_[0]->get("wobjectId")).'">'.
-			WebGUI::International::get(28,$namespace).' ('.$replies.')</a></td>';
-		$output .= '<td align="center" width="50%" class="tableMenu"><a href="'.
-                	WebGUI::URL::page('func=post&mid=new&wid='.$_[0]->get("wobjectId")).'">'.
-                	WebGUI::International::get(24,$namespace).'</a></td></tr>';
-		$output .= '</table>';
-	}
-	return $output;
+	($var{"replies.count"}) = WebGUI::SQL->quickArray("select count(*) from discussion where wobjectId=".$_[0]->get("wobjectId"));
+	$var{"replies.URL"} = WebGUI::URL::page('func=showMessage&wid='.$_[0]->get("wobjectId"));
+	$var{"replies.label"} = WebGUI::International::get(28,$namespace);
+        $var{"post.URL"} = WebGUI::URL::page('func=post&mid=new&wid='.$_[0]->get("wobjectId"));
+        $var{"post.label"} = WebGUI::International::get(24,$namespace);
+	return $_[0]->processMacros($_[0]->displayTitle.$_[0]->processTemplate($_[0]->get("templateId"),\%var));
 }
 
 1;
