@@ -4,14 +4,17 @@ function addCriteria ( fieldname, opform, valform ) {
    var value = getValue(valform);
    var criteria = form.proxyCriteria.value;
    var conjunction = "";
-   var re = /^\s*$/;
-   if(! re.test(criteria)) {
+   if(! /^\s*$/.test(criteria)) {
    		conjunction = " " + getValue(form.conjunction) + " ";
    	}
+   //handle quotes
    if(/\s+/.test(fieldname)) {
 	fieldname = '"' + fieldname + '"';
    }
-   var statement = fieldname + " " + operator + " " + '"' + value + '"';
+   if(/^\D+$/.test(value)) {
+	value = '"' + value + '"';
+   }
+   var statement = fieldname + " " + operator + " " + value;
    form.proxyCriteria.value = criteria + conjunction + statement;
 }
 

@@ -33,6 +33,13 @@
 	font-size: 12px;
 }
 
+.qbButton {
+	height: 20px;
+        font-size: 12px;
+	border-width: 1px;
+	-moz-border-radius: 0px;
+}
+
 .qbText {
 	background-color: white;
 	text-align: left;

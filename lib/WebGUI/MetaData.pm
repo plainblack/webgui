@@ -20,6 +20,7 @@ use WebGUI::Session;
 use WebGUI::SQL;
 use WebGUI::Macro;
 use Tie::IxHash;
+use WebGUI::ErrorHandler;
 
 =head1 NAME
 
@@ -294,7 +295,7 @@ sub getWobjectByCriteria {
 	if ($wobjectId) {
 		$scratchId = "WobjectProxy_" . $wobjectId;
 		if($session{scratch}{$scratchId}) {
-			return $session{scratch}{$scratchId};
+			return $session{scratch}{$scratchId} unless ($session{var}{adminOn});
 		}
 	}
 
@@ -360,7 +361,7 @@ sub getWobjectByCriteria {
 
 	# No matching wobjects found.
         if (scalar(@wids) == 0) {
-                return undef;
+                return undef; # fall back to the originally mirrored wobject.
 	}
 	my $wid;
 	# Grab a wid from the results

@@ -281,7 +281,7 @@ sub _drawQueryBuilder {
 			    </td>
 			    <td class="qbtd"></td>
 			    <td class="qbtdright">
-				<input class="qbselect" type=button value=Add onclick="addCriteria('$fieldLabel', this.form.$opFieldName, this.form.$valFieldName)"></td>
+				<input class="qbButton" type=button value=Add onclick="addCriteria('$fieldLabel', this.form.$opFieldName, this.form.$valFieldName)"></td>
 			  </tr>
 			|;
 	}
