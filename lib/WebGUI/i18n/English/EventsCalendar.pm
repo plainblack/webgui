@@ -7,50 +7,81 @@ our $I18N = {
 	},
 
 	'71' => {
-		message => q|Events calendars are used on many intranets to keep track of internal dates that affect a whole organization. Also, Events Calendars on consumer sites are a great way to let your customers know what events you'll be attending and what promotions you'll be having.
-<br><br>
-
-<b>Main Template</b><br>
-Choose a layout for the events calendar.
-<br><br>
-
-<b>Event Template</b><br>
-Choose a layout for the individual events within the calendars.
-<br><br>
+		message => q|<p>Events calendars are used on many intranets to keep track of internal dates that affect a whole organization. Also, Events Calendars on consumer sites are a great way to let your customers know what events you'll be attending and what promotions you'll be having.
+<p>
 
 <b>Start Month</b><br>
-Choose the start month for your calendar. If you choose "current" the calendar will always start on the current month, therefore it will change from month to month. If you choose "first in the calendar" then it will start at whatever the earliest date in the calendar is.
-<br><br>
+Choose the start month for your calendar.
+<blockquote>
+<dl>
+<dt>First in the calendar</dt>
+<dd>The calendar will start at whatever the earliest date in the calendar is.</dd>
+
+<dt>Now!</dt>
+<dd>The calendar will start on the current date and time.  It will advance and not show events that have already passed.</dd>
+
+<dt>Current</dt>
+<dd>The calendar will always start on the current month.  It is similar to "Now!" but advances from month to month.  This allows events in the current month that have passed to still be displayed.</dd>
+
+<dt>January</dt>
+<dd>The calendar will always start on January of the current year.</dd>
+</dl>
+</blockquote>
+
+<p>
 
 <b>End Month</b><br>
-Choose the end month for your calendar. If you choose "show X months from start", then only X months worth of information will ever be displayed. If you choose "current" then the calendar will end on the month you are currently in. If you choose "last in calendar" then the calendar will end on the last date entered into the calendar.
-<br><br>
+Choose the end month for your calendar.
+<blockquote>
+<dl>
+<dt>Last in the calendar</dt>
+<dd>The calendar will end at the last date in the calendar.</dd>
 
+<dt>Show 12 months from the start</dt>
+<dt>Show 9 months from the start</dt>
+<dt>Show 6 months from the start</dt>
+<dt>Show 3 months from the start</dt>
+<dd>Show N months from the start month.  If the start month is variable, then this provides a sliding window into the events in this calendar.</dd>
+
+<dt>Current</dt>
+<dd>The calendar will always end on the current month.</dd>
+
+</dl>
+</blockquote>
+<p>
 <b>Default Month</b><br>
 Choose which month for this calendar to start on when a visitor comes to the page containing the calendar.
-<br><br>
 
+<p>
 <b>Is master?</b><br>
 If set to yes then this calendar will display events from all other calendars in the system.
-<br><br>
 
-<b>Paginate After</b><br>
-When using a list-style calendar, how many events should be shown per page?
-<br><br>
+<p>
 <b>Proceed to add event?</b><br>
 Leave this set to yes if you want to add events to the Events Calendar directly after creating it.
-<br><br>
 
-<i>Note:</i> Events that have already happened will not be displayed on the events calendar.
-<br><br>
+<p>
+<b>Main Template</b><br>
+Choose a layout for the events calendar.
+
+<p>
+<b>Event Template</b><br>
+Choose a layout for the individual events within the calendars.
+
+<p>
+<b>Paginate After</b><br>
+When using a list-style calendar, how many events should be shown per page?
+
+<p>
 <hr size="1">
 <i><b>Note:</b></i> The following style is specific to the Events Calendar.
-<br><br>
+
+<p>
 <b>.eventTitle </b><br>
 The title of an individual event.
 
 |,
-		lastUpdated => 1066572488
+		lastUpdated => 1099551537,
 	},
 
 	'80' => {
@@ -303,35 +334,35 @@ A label representing "Saturday".
 
 
 <b>sunday.label.short</b><br>
-A label representing the abbreviated version of "Sunday".
+The first initial of the label for "Sunday".
 <p>
 
 <b>monday.label.short</b><br>
-A label representing the abbreviated version of "Monday".
+The first initial of the label for "Monday".
 <p>
 
 <b>tuesday.label.short</b><br>
-A label representing the abbreviated version of "Tuesday".
+The first initial of the label for "Tuesday".
 <p>
 
 <b>wednesday.label.short</b><br>
-A label representing the abbreviated version of "Wednesday".
+The first initial of the label for "Wednesday".
 <p>
 
 <b>thursday.label.short</b><br>
-A label representing the abbreviated version of "Thursday".
+The first initial of the label for "Thursday".
 <p>
 
 <b>friday.label.short</b><br>
-A label representing the abbreviated version of "Friday".
+The first initial of the label for "Friday".
 <p>
 
 <b>saturday.label.short</b><br>
-A label representing the abbreviated version of "Saturday".
+The first initial of the label for "Saturday".
 <p>
 
 |,
-		lastUpdated => 1078520840
+		lastUpdated => 1099548964
 	},
 
 	'83' => {
@@ -415,7 +446,7 @@ A label representing the abbreviated version of "Saturday".
 	},
 
 	'97' => {
-		message => q|The following is the list of template variables available in event templates.
+		message => q|The following is the list of template variables available in when displaying an event from the calendar.
 <p/>
 
 <b>title</b><br/>
@@ -486,7 +517,7 @@ The URL to view the event after this one.
 The description of this event.
 <p/>
 |,
-		lastUpdated => 1078568518
+		lastUpdated => 1099536774
 	},
 
 	'9' => {
@@ -545,12 +576,12 @@ The date and time when the event ends.
 How many times and how often the event recurs.
 
 <p>
-
 <b>What next?</b><br>
 Select "add new event" if you'd like to add another event, otherwise select "go back to page".
+This option is only available when adding an Events Calendar, not editing one.
 <p>
 |,
-		lastUpdated => 1096221250
+		lastUpdated => 1099549204
 	},
 
 	'19' => {
