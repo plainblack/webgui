@@ -38,7 +38,7 @@ sub www_search {
         if ($constraints ne "") {
 		tie %page, 'Tie::CPHash';
                 $sth = WebGUI::SQL->read("select page.urlizedTitle,page.title,wobject.wobjectId,page.pageId from page,wobject where $constraints 
-			and page.pageId=wobject.pageId and (page.pageId > 25 or page.pageId=1) 
+			and page.pageId=wobject.pageId and (page.pageId > 999 or page.pageId<=1) 
 			and page.pageId<>$session{page}{pageId} order by lastEdited");
                 while (%page = $sth->hash) {
 			if (WebGUI::Privilege::canViewPage($page{pageId})) {
