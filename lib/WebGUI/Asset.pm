@@ -40,6 +40,8 @@ sub addChild {
 	}
 	WebGUI::SQL->commit;
 	my $newAsset = WebGUI::Asset->newByDynamicClass($id, $properties->{className});
+	$self->updateHistory("added child ".$id);
+	$newAsset->updateHistory("created");
 	$newAsset->update($properties);
 	return $newAsset;
 }
@@ -81,6 +83,7 @@ sub cut {
 	WebGUI::SQL->write("update asset set state='limbo' where lineage like ".quote($self->get("lineage").'%'));
 	WebGUI::SQL->write("update asset set state='clipboard' where assetId=".quote($self->getId));
 	WebGUI::SQL->commit;
+	$self->updateHistory("cut");
 	$self->{_properties}{state} = "clipboard";
 }
 
@@ -248,6 +251,61 @@ sub getAssetAdderLinks {
 	}
 	return \@links;
 }
+
+sub getAssetManagerControl {
+	my $self = shift;
+	my $children = shift;
+	WebGUI::Style::setLink($session{config}{extrasURL}.'/assetManager/assetManager.css', {rel=>"stylesheet",type=>"text/css"});
+	WebGUI::Style::setScript($session{config}{extrasURL}.'/assetManager/Tools.js', {type=>"text/javascript"});
+	WebGUI::Style::setScript($session{config}{extrasURL}.'/assetManager/ContextMenu.js', {type=>"text/javascript"});
+	WebGUI::Style::setScript($session{config}{extrasURL}.'/assetManager/Asset.js', {type=>"text/javascript"});
+	WebGUI::Style::setScript($session{config}{extrasURL}.'/assetManager/Display.js', {type=>"text/javascript"});
+	WebGUI::Style::setScript($session{config}{extrasURL}.'/assetManager/EventManager.js', {type=>"text/javascript"});
+	WebGUI::Style::setScript($session{config}{extrasURL}.'/assetManager/AssetManager.js', {type=>"text/javascript"});
+	my $output = '
+		<div id="contextMenu" class="contextMenu"></div>
+   		<div id="propertiesWindow" class="propertiesWindow"></div>
+   		<div id="crumbtrail"></div>
+   		<div id="workspace">Retrieving Assets...</div>
+   		<div id="dragImage" class="dragIdentifier">hello</div>
+		';
+	$output .= "<script>\n";
+	$output .= "/* assetId, url, title */\nvar crumbtrail = [\n";
+	my $ancestors = $self->getLineage(["self","ancestors"],{returnObjects=>1});
+	my @dataArray;
+	foreach my $ancestor (@{$ancestors}) {
+		my $title = $ancestor->get("title");
+		$title =~ s/\'/\\\'/g;
+		push(@dataArray,"['".$ancestor->getId."','".$ancestor->getUrl."','".$title."']\n");
+	}
+	$output .= join(",",@dataArray);
+	$output .= "];\n";
+	$output .= "var columnHeadings = ['Rank','Title','Type','Last Updated','Size'];\n";
+	$output .= "/*rank, title, type, lastUpdate, size, url, assetId, icon */\nvar assets = [\n";
+	@dataArray = ();
+	foreach my $child (@{$children}) {
+		my $title = $child->get("title");
+		$title =~ s/\'/\\\'/g;
+		push(@dataArray, '['.$child->getRank.",'".$title."','".$child->getName."','".WebGUI::DateTime::epochToHuman($child->get("lastUpdated"))."','".formatBytes($child->get("assetSize"))."','".$child->getUrl."','".$child->getId."','".$child->getIcon(1)."']\n");
+#my $hasChildren = "false";
+		#$hasChildren = "true" if ($child->hasChildren);
+		#$output .= $hasChildren;
+	}
+	$output .= join(",",@dataArray);
+	$output .= "];\n var labels = new Array();\n";
+	$output .= "labels['edit'] = 'Edit';\n";
+	$output .= "labels['cut'] = 'Cut';\n";
+	$output .= "labels['copy'] = 'Copy';\n";
+	$output .= "labels['move'] = 'Move';\n";
+	$output .= "labels['view'] = 'View';\n";
+	$output .= "labels['delete'] = 'Delete';\n";
+	$output .= "labels['go'] = 'Go';\n";
+	$output .= "labels['properties'] = 'Properties';\n";
+	$output .= "labels['editTree'] = 'Edit Tree';\n";
+	$output .= "var manager = new AssetManager(assets,columnHeadings,labels,crumbtrail);  manager.renderAssets();\n</script>\n";
+	return $output;
+}
+
 
 sub getEditForm {
 	my $self = shift;
@@ -450,6 +508,10 @@ sub getLineage {
 		$mod .= ")";
 		push(@whereModifiers,$mod);
 	}
+	# we need to include children
+	if (isIn("children",@{$relatives})) {
+		push(@whereModifiers,"(parentId=".quote($self->getId).")");
+	}
 	# now lets add in all of the siblings in every level between ourself and the asset we wish to pedigree
 	if (isIn("pedigree",@{$relatives}) && exists $rules->{assetToPedigree}) {
 		my @mods;
@@ -475,7 +537,8 @@ sub getLineage {
 	# based upon all available criteria, let's get some assets
 	my $columns = "assetId, className, parentId";
 	$columns = "*" if ($rules->{returnQuickReadObjects});
-	my $sql = "select $columns from asset where $where order by lineage";
+	my $sortOrder = ($rules->{invertTree}) ? "desc" : "asc"; 
+	my $sql = "select $columns from asset where $where order by lineage $sortOrder";
 	my @lineage;
 	my %relativeCache;
 	my $sth = WebGUI::SQL->read($sql);
@@ -710,6 +773,7 @@ sub paste {
 	my $pastedAsset = WebGUI::Asset->new($assetId);	
 	if ($self->getId eq $pastedAsset->get("parentId") || $pastedAsset->setParent($self->getId)) {
 		$pastedAsset->republish;
+		$pastedAsset->updateHistory("pasted to parent ".$self->getId);
 		return 1;
 	}
 	return 0;
@@ -748,13 +812,30 @@ sub promote {
 
 sub purge {
 	my $self = shift;
-	# NOTE to self, still need to delete all children too
+	$self->updateHistory("purged");
 	WebGUI::SQL->beginTransaction;
 	foreach my $definition (@{$self->definition}) {
 		WebGUI::SQL->write("delete from ".$definition->{tableName}." where assetId=".quote($self->getId));
 	}
 	WebGUI::SQL->commit;
+	# eliminate anything bound to this asset
+	my $sth = WebGUI::SQL->read("select assetId,className from asset where boundToId=".quote($self->getId));
+	while (my ($id, $class) = $sth->array) {
+		my $asset = WebGUI::Asset->newByDynamicClass($id,$class);
+		if (defined $asset) {
+			$asset->purgeTree;
+		}	
+	}
 	$self = undef;
+	return 1;
+}
+
+sub purgeTree {
+	my $self = shift;
+	my $descendants = $self->getLineage(["self","descendants"],{returnObjects=>1, invertTree=>1});
+	foreach my $descendant (@{$descendants}) {
+		$descendant->purge;
+	}
 	return 1;
 }
 
@@ -772,6 +853,7 @@ sub setParent {
 		WebGUI::SQL->write("update asset set parentId=".quote($parent->getId)." where assetId=".quote($self->getId));
 		$self->cascadeLineage($lineage);
 		WebGUI::SQL->commit;
+		$self->updateHistory("moved to parent ".$parent->getId);
 		$self->{_properties}{lineage} = $lineage;
 		return 1;
 	}
@@ -796,6 +878,7 @@ sub setRank {
 		if (isBetween($sibling->getRank, $newRank, $currentRank)) {
 			$sibling->cascadeLineage($previous);
 			$previous = $sibling->get("lineage");
+			$sibling->updateHistory("changed rank");
 		}
 	}
 	$self->cascadeLineage($previous,$temp);
@@ -824,6 +907,7 @@ sub swapRank {
 	$self->cascadeLineage($first,$second);
 	$self->cascadeLineage($second,$temp);
 	WebGUI::SQL->commit;
+	$self->updateHistory("swapped lineage between ".$first." and ".$second);
 	return 1;
 }
 
@@ -835,6 +919,7 @@ sub trash {
 	WebGUI::SQL->write("update asset set state='trash' where assetId=".quote($self->getId));
 	WebGUI::SQL->commit;
 	$self->{_properties}{state} = "trash";
+	$self->updateHistory("trashed");
 }
 
 sub update {
@@ -866,6 +951,18 @@ sub update {
 	return 1;
 }
 
+sub updateHistory {
+	my $self = shift;
+	my $action = shift;
+	my $userId = shift || $session{user}{userId};
+	my $dateStamp = time();
+	WebGUI::SQL->beginTransaction;
+	WebGUI::SQL->write("insert into assetHistory (assetId, userId, actionTaken, dateStamp) values (
+		".quote($self->getId).", ".quote($userId).", ".quote($action).", ".$dateStamp.")");
+	$self->update({lastUpdated=>$dateStamp,lastUpdatedBy=>$userId});
+	WebGUI::SQL->commit;
+}
+
 sub view {
 	return "";
 }
@@ -887,7 +984,7 @@ sub www_add {
 
 sub www_copy {
 	my $self = shift;
-	return WebGUI::Privilege::insufficient() unless $self->canEdit;
+	return $self->getAdminConsole->render(WebGUI::Privilege::insufficient()) unless $self->canEdit;
 	my $newAsset = $self->duplicate;
 	$newAsset->cut;
 	return "";
@@ -895,7 +992,7 @@ sub www_copy {
 
 sub www_copyList {
 	my $self = shift;
-	return WebGUI::Privilege::insufficient() unless $self->canEdit;
+	return $self->getAdminConsole->render(WebGUI::Privilege::insufficient()) unless $self->canEdit;
 	my $newAsset = $self->duplicate;
 	$newAsset->cut;
 	foreach my $assetId ($session{cgi}->param("assetId")) {
@@ -910,14 +1007,14 @@ sub www_copyList {
 
 sub www_cut {
 	my $self = shift;
-	return WebGUI::Privilege::insufficient() unless $self->canEdit;
+	return $self->getAdminConsole->render(WebGUI::Privilege::insufficient()) unless $self->canEdit;
 	$self->cut;
 	return $self->getParent->www_view;
 }
 
 sub www_cutList {
 	my $self = shift;
-	return WebGUI::Privilege::insufficient() unless $self->canEdit;
+	return $self->getAdminConsole->render(WebGUI::Privilege::insufficient()) unless $self->canEdit;
 	foreach my $assetId ($session{cgi}->param("assetId")) {
 		my $asset = WebGUI::Asset->newByDynamicClass($assetId);
 		if ($asset->canEdit) {
@@ -929,14 +1026,14 @@ sub www_cutList {
 
 sub www_delete {
 	my $self = shift;
-	return WebGUI::Privilege::insufficient() unless $self->canEdit;
+	return $self->getAdminConsole->render(WebGUI::Privilege::insufficient()) unless $self->canEdit;
 	$self->trash;
 	return $self->getParent->www_view;
 }
 
 sub www_deleteList {
 	my $self = shift;
-	return WebGUI::Privilege::insufficient() unless $self->canEdit;
+	return $self->getAdminConsole->render(WebGUI::Privilege::insufficient()) unless $self->canEdit;
 	foreach my $assetId ($session{cgi}->param("assetId")) {
 		my $asset = WebGUI::Asset->newByDynamicClass($assetId);
 		if ($asset->canEdit) {
@@ -948,19 +1045,20 @@ sub www_deleteList {
 
 sub www_demote {
 	my $self = shift;
-	return WebGUI::Privilege::insufficient() unless $self->canEdit;
+	return $self->getAdminConsole->render(WebGUI::Privilege::insufficient()) unless $self->canEdit;
 	$self->demote;
 	return "";
 }
 
 sub www_edit {
 	my $self = shift;
-	return WebGUI::Privilege::insufficient() unless $self->canEdit;
+	return $self->getAdminConsole->render(WebGUI::Privilege::insufficient()) unless $self->canEdit;
 	return $self->getAdminConsole->render($self->getEditForm->print);
 }
 
 sub www_editSave {
 	my $self = shift;
+	return $self->getAdminConsole->render(WebGUI::Privilege::insufficient()) unless $self->canEdit;
 	my $object;
 	if ($session{form}{assetId} eq "new") {
 		$object = $self->addChild({className=>$session{form}{class}});	
@@ -969,6 +1067,7 @@ sub www_editSave {
 		$object = $self;
 	}
 	$object->processPropertiesFromFormPost;
+	$object->updateHistory("edited");
 	return $self->www_manageAssets if ($session{form}{afterEdit} eq "assetManager" && $session{form}{assetId} eq "new");
 	return $object->getParent->www_manageAssets if ($session{form}{afterEdit} eq "assetManager");
 	return $object->www_view;
@@ -982,59 +1081,46 @@ sub www_editTreeSave {
 	return "not yet implemented";
 }
 
+sub www_emptyClipboard {
+	my $self = shift;
+	my $ac = WebGUI::AdminConsole->new("clipboard");
+	return $ac->render(WebGUI::Privilege::insufficient()) unless (WebGUI::Grouping::isInGroup(4));
+	my $limit;
+	unless ($session{form}{systemTrash} && WebGUI::Grouping::isInGroup(3)) {
+		$limit = "and lastUpdatedBy=".quote($session{user}{userId});
+	}
+	my $sth = WebGUI::SQL->read("select assetId,className from asset where state='clipboard' $limit");
+	while (my ($id, $class) = $sth->array) {
+		my $asset = WebGUI::Asset->newByDynamicClass($id,$class);
+		$asset->trash;
+	}
+	$sth->finish;
+	return $self->www_manageClipboard();
+}
+
+sub www_emptyTrash {
+	my $self = shift;
+	my $ac = WebGUI::AdminConsole->new("trash");
+	return $ac->render(WebGUI::Privilege::insufficient()) unless (WebGUI::Grouping::isInGroup(4));
+	my $limit;
+	unless ($session{form}{systemTrash} && WebGUI::Grouping::isInGroup(3)) {
+		$limit = "and lastUpdatedBy=".quote($session{user}{userId});
+	}
+	my $sth = WebGUI::SQL->read("select assetId,className from asset where state='trash' $limit");
+	while (my ($id, $class) = $sth->array) {
+		my $asset = WebGUI::Asset->newByDynamicClass($id,$class);
+		$asset->purgeTree;
+	}
+	$sth->finish;
+	return $self->www_manageTrash();
+}
+
+
 sub www_manageAssets {
 	my $self = shift;
-	return WebGUI::Privilege::insufficient() unless $self->canEdit;
-	WebGUI::Style::setLink($session{config}{extrasURL}.'/assetManager/assetManager.css', {rel=>"stylesheet",type=>"text/css"});
-	WebGUI::Style::setScript($session{config}{extrasURL}.'/assetManager/Tools.js', {type=>"text/javascript"});
-	WebGUI::Style::setScript($session{config}{extrasURL}.'/assetManager/ContextMenu.js', {type=>"text/javascript"});
-	WebGUI::Style::setScript($session{config}{extrasURL}.'/assetManager/Asset.js', {type=>"text/javascript"});
-	WebGUI::Style::setScript($session{config}{extrasURL}.'/assetManager/Display.js', {type=>"text/javascript"});
-	WebGUI::Style::setScript($session{config}{extrasURL}.'/assetManager/EventManager.js', {type=>"text/javascript"});
-	WebGUI::Style::setScript($session{config}{extrasURL}.'/assetManager/AssetManager.js', {type=>"text/javascript"});
+	return $self->getAdminConsole->render(WebGUI::Privilege::insufficient()) unless $self->canEdit;
 	my $children = $self->getLineage(["descendants"],{returnObjects=>1, endingLineageLength=>$self->getLineageLength+1});
-	my $output;
-	$output = '
-		<div id="contextMenu" class="contextMenu"></div>
-   		<div id="propertiesWindow" class="propertiesWindow"></div>
-   		<div id="crumbtrail"></div>
-   		<div id="workspace">Retrieving Assets...</div>
-   		<div id="dragImage" class="dragIdentifier">hello</div>
-		';
-	$output .= "<script>\n";
-	$output .= "/* assetId, url, title */\nvar crumbtrail = [\n";
-	my $ancestors = $self->getLineage(["self","ancestors"],{returnObjects=>1});
-	my @dataArray;
-	foreach my $ancestor (@{$ancestors}) {
-		my $title = $ancestor->get("title");
-		$title =~ s/\'/\\\'/g;
-		push(@dataArray,"['".$ancestor->getId."','".$ancestor->getUrl."','".$title."']\n");
-	}
-	$output .= join(",",@dataArray);
-	$output .= "];\n";
-	$output .= "var columnHeadings = ['Rank','Title','Type','Last Updated','Size'];\n";
-	$output .= "/*rank, title, type, lastUpdate, size, url, assetId, icon */\nvar assets = [\n";
-	@dataArray = ();
-	foreach my $child (@{$children}) {
-		my $title = $child->get("title");
-		$title =~ s/\'/\\\'/g;
-		push(@dataArray, '['.$child->getRank.",'".$title."','".$child->getName."','".WebGUI::DateTime::epochToHuman($child->get("lastUpdated"))."','".formatBytes($child->get("assetSize"))."','".$child->getUrl."','".$child->getId."','".$child->getIcon(1)."']\n");
-#my $hasChildren = "false";
-		#$hasChildren = "true" if ($child->hasChildren);
-		#$output .= $hasChildren;
-	}
-	$output .= join(",",@dataArray);
-	$output .= "];\n var labels = new Array();\n";
-	$output .= "labels['edit'] = 'Edit';\n";
-	$output .= "labels['cut'] = 'Cut';\n";
-	$output .= "labels['copy'] = 'Copy';\n";
-	$output .= "labels['move'] = 'Move';\n";
-	$output .= "labels['view'] = 'View';\n";
-	$output .= "labels['delete'] = 'Delete';\n";
-	$output .= "labels['go'] = 'Go';\n";
-	$output .= "labels['properties'] = 'Properties';\n";
-	$output .= "labels['editTree'] = 'Edit Tree';\n";
-	$output .= "var manager = new AssetManager(assets,columnHeadings,labels,crumbtrail);  manager.renderAssets();\n</script>\n";
+	my $output = $self->getAssetManagerControl($children);
 	$output .= ' <div class="adminConsoleSpacer">
             &nbsp;
         </div>
@@ -1069,17 +1155,70 @@ sub www_manageAssets {
 	return $self->getAdminConsole->render($output);
 }
 
+sub www_manageClipboard {
+	my $self = shift;
+	my $ac = WebGUI::AdminConsole->new("clipboard");
+	return $ac->render(WebGUI::Privilege::insufficient()) unless (WebGUI::Grouping::isInGroup(4));
+	my @assets;
+	my ($header, $limit);
+        $ac->setHelp("clipboard manage");
+	if ($session{form}{systemTrash} && WebGUI::Grouping::isInGroup(3)) {
+		$header = WebGUI::International::get(965);
+		$ac->addSubmenuItem($self->getUrl('func=manageClipboard'), WebGUI::International::get(949));
+		$ac->addSubmenuItem($self->getUrl('func=emptyClipboard&systemClipboard=1'), WebGUI::International::get(959), 
+			'onclick="return window.confirm(\''.WebGUI::International::get(951).'\')"');
+	} else {
+		$ac->addSubmenuItem($self->getUrl('func=manageClipboard&systemClipboard=1'), WebGUI::International::get(954));
+		$ac->addSubmenuItem($self->getUrl('func=emptyClipboard'), WebGUI::International::get(950),
+			'onclick="return window.confirm(\''.WebGUI::International::get(951).'\')"');
+		$limit = "and lastUpdatedBy=".quote($session{user}{userId});
+	}
+	my $sth = WebGUI::SQL->read("select assetId,className from asset where state='clipboard' $limit");
+	while (my ($id, $class) = $sth->array) {
+		push(@assets,WebGUI::Asset->newByDynamicClass($id,$class));
+	}
+	$sth->finish;
+	return $ac->render($self->getAssetManagerControl(\@assets), $header);
+}
+
+
+sub www_manageTrash {
+	my $self = shift;
+	my $ac = WebGUI::AdminConsole->new("trash");
+	return $ac->render(WebGUI::Privilege::insufficient()) unless (WebGUI::Grouping::isInGroup(4));
+	my @assets;
+	my ($header, $limit);
+        $ac->setHelp("trash manage");
+	if ($session{form}{systemTrash} && WebGUI::Grouping::isInGroup(3)) {
+		$header = WebGUI::International::get(965);
+		$ac->addSubmenuItem($self->getUrl('func=manageTrash'), WebGUI::International::get(10));
+		$ac->addSubmenuItem($self->getUrl('func=emptyTrash&systemTrash=1'), WebGUI::International::get(967), 
+			'onclick="return window.confirm(\''.WebGUI::International::get(651).'\')"');
+	} else {
+		$ac->addSubmenuItem($self->getUrl('func=manageTrash&systemTrash=1'), WebGUI::International::get(964));
+		$ac->addSubmenuItem($self->getUrl('func=emptyTrash'), WebGUI::International::get(11),
+			'onclick="return window.confirm(\''.WebGUI::International::get(651).'\')"');
+		$limit = "and lastUpdatedBy=".quote($session{user}{userId});
+	}
+	my $sth = WebGUI::SQL->read("select assetId,className from asset where state='trash' $limit");
+	while (my ($id, $class) = $sth->array) {
+		push(@assets,WebGUI::Asset->newByDynamicClass($id,$class));
+	}
+	$sth->finish;
+	return $ac->render($self->getAssetManagerControl(\@assets), $header);
+}
+
 
 sub www_paste {
 	my $self = shift;
-	return WebGUI::Privilege::insufficient() unless $self->canEdit;
+	return $self->getAdminConsole->render(WebGUI::Privilege::insufficient()) unless $self->canEdit;
 	$self->paste($session{form}{assetId});
 	return "";
 }
 
 sub www_pasteList {
 	my $self = shift;
-	return WebGUI::Privilege::insufficient() unless $self->canEdit;
+	return $self->getAdminConsole->render(WebGUI::Privilege::insufficient()) unless $self->canEdit;
 	foreach my $clipId ($session{cgi}->param("assetId")) {
 		$self->paste($clipId);
 	}
@@ -1088,14 +1227,14 @@ sub www_pasteList {
 
 sub www_promote {
 	my $self = shift;
-	return WebGUI::Privilege::insufficient() unless $self->canEdit;
+	return $self->getAdminConsole->render(WebGUI::Privilege::insufficient()) unless $self->canEdit;
 	$self->promote;
 	return "";
 }
 
 sub www_setParent {
 	my $self = shift;
-	return WebGUI::Privilege::insufficient() unless $self->canEdit;
+	return $self->getAdminConsole->render(WebGUI::Privilege::insufficient()) unless $self->canEdit;
 	my $newParent = $session{form}{assetId};
 	$self->setParent($newParent) if (defined $newParent);
 	return $self->www_manageAssets();
@@ -1104,7 +1243,7 @@ sub www_setParent {
 
 sub www_setRank {
 	my $self = shift;
-	return WebGUI::Privilege::insufficient() unless $self->canEdit;
+	return $self->getAdminConsole->render(WebGUI::Privilege::insufficient()) unless $self->canEdit;
 	my $newRank = $session{form}{rank};
 	$self->setRank($newRank) if (defined $newRank);
 	return $self->www_manageAssets();

@@ -25,7 +25,6 @@ use WebGUI::Id;
 use WebGUI::International;
 use WebGUI::MessageLog;
 use WebGUI::Operation;
-use WebGUI::Page;
 use WebGUI::Paginator;
 use WebGUI::Privilege;
 use WebGUI::Session;

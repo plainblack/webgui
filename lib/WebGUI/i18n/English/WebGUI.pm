@@ -515,11 +515,6 @@ The URL of the web site for this theme's designer. If you are in the business of
 		lastUpdated => 1033832377
 	},
 
-	'966' => {
-		message => q|Are you certain that you wish to permanently purge/delete this item from the trash?|,
-		lastUpdated => 1101775259
-	},
-
 	'992' => {
 		message => q|Title|,
 		lastUpdated => 1056151382
@@ -533,11 +528,6 @@ The URL of the web site for this theme's designer. If you are in the business of
 	'933' => {
 		message => q|Theme, Edit|,
 		lastUpdated => 1050430737
-	},
-
-	'783' => {
-		message => q|Type|,
-		lastUpdated => 1036954378
 	},
 
 	'706' => {
@@ -1338,11 +1328,6 @@ How should this user be notified when they get a new WebGUI message?
 		lastUpdated => 1031514049
 	},
 
-	'953' => {
-		message => q|Previous Location|,
-		lastUpdated => 1052850265
-	},
-
 	'39' => {
 		message => q|You do not have sufficient privileges to access this page.|,
 		lastUpdated => 1031514049
@@ -1983,7 +1968,7 @@ By default, WebGUI has one big content area to place wobjects. However, by speci
 <p>
 
 <b>Synopsis</b><br>
-A short description of a page. It is used to populate default descriptive meta tags as well as to provide descriptions on Site Maps.
+A short description of a page. 
 <p>
 
 <b>Meta Tags</b><br>
@@ -2227,16 +2212,8 @@ will be modified to make it unique.|,
 	},
 
 	'651' => {
-		message => q|If you choose to empty your trash, any items contained in it will be lost forever. If you're unsure about a few items, it might be best to cut them to your clipboard before you empty the trash.
-<p>
-
-|,
+		message => q|Emptying your trash will remove these assets from your site forever. Are you sure you want to continue?|,
 		lastUpdated => 1031514049
-	},
-
-	'956' => {
-		message => q|Are you certain that you wish to move this item from the clipboard to the trash?|,
-		lastUpdated => 1052850265
 	},
 
 	'498' => {
@@ -3741,10 +3718,6 @@ on the page.
 The toolbar icon that allows the wobject to be repositioned via a click and drag interface.
 <p>
 
-<b>wobject.namespace</b><br>
-The namespace of this wobject. This is also known as the wobject type, for instance Article, USS, SQLReport, and SiteMap are all namespaces.
-<p>
-
 <b>wobject.id</b><br>
 The unique identifier for this wobject.
 <p>
@@ -4222,11 +4195,6 @@ The description of this forum as passed by the calling object.
 
 	'521' => {
 		message => q|I would like to be notified via email to pager.|,
-		lastUpdated => 1031514049
-	},
-
-	'162' => {
-		message => q|Are you certain that you wish to purge all the pages and wobjects in the trash?|,
 		lastUpdated => 1031514049
 	},
 
@@ -5533,11 +5501,6 @@ Privileges and styles assigned to pages in the package will not be copied when t
 	'696' => {
 		message => q|Trash, Empty|,
 		lastUpdated => 1031514049
-	},
-
-	'963' => {
-		message => q|Trash Date|,
-		lastUpdated => 1052850265
 	},
 
 	'ends with' => {

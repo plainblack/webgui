@@ -29,9 +29,11 @@ sub addSubmenuItem {
 	my $self = shift;
 	my $url = shift;
 	my $label = shift;
+	my $extras = shift;
 	push (@{$self->{_submenuItem}}, {
 		url=>$url,
-		label=>$label
+		label=>$label,
+		extras=>$extras
 		});
 }
 
@@ -71,8 +73,8 @@ sub getAdminFunction {
 				namespace=>"WebGUI"
 			},
 			icon=>"clipboard.gif",
-			op=>"manageClipboard",
-			group=>"4"
+			func=>"manageClipboard",
+			group=>"12"
 		},
 		"trash"=>{
 			title=>{
@@ -80,8 +82,8 @@ sub getAdminFunction {
 				namespace=>"WebGUI"
 			},
 			icon=>"trash.gif",
-			op=>"manageTrash",
-			group=>"3"
+			func=>"manageTrash",
+			group=>"4"
 		},
 		"databases"=>{
 			title=>{
