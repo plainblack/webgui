@@ -153,7 +153,7 @@ sub _setupUserInfo {
                        		$r->user($session{user}{username});
                		}
        		}
-		$session{user}{alias} = $session{user}{username} unless ($session{user}{alias} =~ /[A..Za..z0..9]/);
+		$session{user}{alias} = $session{user}{username} if ($session{user}{alias} =~ /^\W+$/);
 	}
 }
 
