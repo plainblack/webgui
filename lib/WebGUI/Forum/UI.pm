@@ -230,7 +230,7 @@ The unique id for the forum.
 =cut
 
 sub formatForumSearchURL {
-	return WebGUI::URL::append($_[0],"forumOp=search&amp;forumId=".$_[1]);
+	return WebGUI::URL::append($_[0],"forumOp=search&amp;forumId=".quote($_[1]));
 }
 
 #-------------------------------------------------------------------
@@ -254,7 +254,7 @@ The sort by string. Can be views, rating, date replies, or lastreply.
 =cut
 
 sub formatForumSortByURL {
-	return WebGUI::URL::append($_[0],"forumOp=viewForum&amp;forumId=".$_[1]."&amp;sortBy=".$_[2]);
+	return WebGUI::URL::append($_[0],"forumOp=viewForum&amp;forumId=".quote($_[1])."&amp;sortBy=".$_[2]);
 }
 
 #-------------------------------------------------------------------
@@ -274,7 +274,7 @@ The unique id for the forum.
 =cut
 
 sub formatForumSubscribeURL {
-	return WebGUI::URL::append($_[0],"forumOp=forumSubscribe&amp;forumId=".$_[1]);
+	return WebGUI::URL::append($_[0],"forumOp=forumSubscribe&amp;forumId=".quote($_[1]));
 }
 
 #-------------------------------------------------------------------
@@ -294,7 +294,7 @@ The unique id for the forum.
 =cut
 
 sub formatForumUnsubscribeURL {
-	return WebGUI::URL::append($_[0],"forumOp=forumUnsubscribe&amp;forumId=".$_[1]);
+	return WebGUI::URL::append($_[0],"forumOp=forumUnsubscribe&amp;forumId=".quote($_[1]));
 }
 
 #-------------------------------------------------------------------
@@ -314,7 +314,7 @@ The unique id for the forum.
 =cut
 
 sub formatForumURL {
-	return WebGUI::URL::append($_[0],"forumOp=viewForum&forumId=".$_[1]);
+	return WebGUI::URL::append($_[0],"forumOp=viewForum&forumId=".quote($_[1]));
 }
 
 
@@ -382,7 +382,7 @@ The unique id for the forum.
 =cut
 
 sub formatNewThreadURL {
-	return WebGUI::URL::append($_[0],"forumOp=post&amp;forumId=".$_[1]);
+	return WebGUI::URL::append($_[0],"forumOp=post&amp;forumId=".quote($_[1]));
 }
 
 #-------------------------------------------------------------------
@@ -941,7 +941,7 @@ sub forumOp {
 			my $thread = WebGUI::Forum::Thread->new($session{form}{forumThreadId});
 			$forumId = $thread->get("forumId");
 		}
-		if ($forumId != $caller->{forumId}) {
+		if ($forumId ne $caller->{forumId}) {
 			WebGUI::ErrorHandler::security("view a forum (".$caller->{forumId}.") that does not belong to the calling object (".$caller->{callback}.")");
 			return WebGUI::Privilege::insufficient();
 		} 
@@ -1024,7 +1024,7 @@ sub getForumTemplateVars {
 	} else {
 		$query .= "lastPostDate desc";
 	}
-	my $p = WebGUI::Paginator->new(WebGUI::URL::append($callback,"forumOp=viewForum&amp;forumId=".$forum->get("forumId")),$forum->get("threadsPerPage"));
+	my $p = WebGUI::Paginator->new(WebGUI::URL::append($callback,"forumOp=viewForum&amp;forumId=".quote($forum->get("forumId"))),$forum->get("threadsPerPage"));
 	$p->setDataByQuery($query);
 	$var{firstPage} = $p->getFirstPageLink;
         $var{lastPage} = $p->getLastPageLink;
@@ -2048,7 +2048,7 @@ sub www_search {
 		my $query = "select a.forumPostId, a.subject, a.userId, a.username, a.dateOfPost from forumPost a left join forumThread b
 			on a.forumThreadId=b.forumThreadId where b.forumId=".quote($forum->get("forumId"))." and 
 			(a.status='approved' or a.status='archived') and $constraints order by a.dateOfPost desc";
-		my $p = WebGUI::Paginator->new(WebGUI::URL::append($caller->{callback},"forumOp=search&amp;doit=1&amp;forumId=".$forum->get("forumId")), $numResults);
+		my $p = WebGUI::Paginator->new(WebGUI::URL::append($caller->{callback},"forumOp=search&amp;doit=1&amp;forumId=".quote($forum->get("forumId"))), $numResults);
 		$p->setDataByQuery($query) if $constraints;
 		my @post_loop;
 		foreach my $row (@{$p->getPageData}) {
