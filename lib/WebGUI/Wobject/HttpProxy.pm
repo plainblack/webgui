@@ -60,8 +60,15 @@ sub new {
                                 },
 			followRedirect=>{
 				defaultValue=>0
-				} 
-			}
+				},
+			searchFor=>{
+                                defaultValue=>''
+                                },
+                        stopAt=>{
+                                defaultValue=>''
+                                },
+			},
+		-useTemplate=>1
                 );
         bless $self, $class;
 }
@@ -114,6 +121,16 @@ sub www_edit {
 		-label=>WebGUI::International::get(4,$_[0]->get("namespace")),
 		-value=>[$_[0]->getValue("timeout")]
 		);
+        $layout->text(
+                -name=>"searchFor",
+                -label=>WebGUI::International::get(13,$_[0]->get("namespace")),
+                -value=>$_[0]->getValue("searchFor")
+                );
+        $layout->text(
+                -name=>"stopAt",
+                -label=>WebGUI::International::get(14,$_[0]->get("namespace")),
+                -value=>$_[0]->getValue("stopAt")
+                );
         return $_[0]->SUPER::www_edit(
 		-properties=>$properties->printRowsOnly,
 		-layout=>$layout->printRowsOnly,
@@ -126,11 +143,7 @@ sub www_edit {
 
 #-------------------------------------------------------------------
 sub www_view {
-   my (%formdata, @formUpload, $redirect, $response, $header, 
-       $userAgent, $proxiedUrl, $request, $content, $ttl);
-
-   	my $output = $_[0]->displayTitle;
-   	$output .= $_[0]->description;
+   my (%var, %formdata, @formUpload, $redirect, $response, $header, $userAgent, $proxiedUrl, $request, $ttl);
 
    	my $node = WebGUI::Node->new("temp",$_[0]->get("namespace")."_cookies");
 	$node->create;
@@ -149,13 +162,13 @@ sub www_view {
 
    $redirect=0; 
 
-   return $output unless ($proxiedUrl ne "");
+   ssTemplate($_[0]->get("templateId"),{}) unless ($proxiedUrl ne "");
    
    my $cachedContent = WebGUI::Cache->new($proxiedUrl,"URL");
    my $cachedHeader = WebGUI::Cache->new($proxiedUrl,"HEADER");
-   $header = $cachedHeader->get;
-   $content = $cachedContent->get;
-   unless ($content && $session{env}{REQUEST_METHOD}=~/GET/i) {
+   $var{header} = $cachedHeader->get;
+   $var{content} = $cachedContent->get;
+   unless ($var{content} && $session{env}{REQUEST_METHOD}=~/GET/i) {
       $redirect=0; 
       until($redirect == 5) { # We follow max 5 redirects to prevent bouncing/flapping
       $userAgent = new LWP::UserAgent;
@@ -236,26 +249,38 @@ sub www_view {
    }
    
    if($response->is_success) {
-      $content = $response->content;
-      $header = $response->content_type; 
+      $var{content} = $response->content;
+      $var{header} = $response->content_type; 
       if($response->content_type eq "text/html" || 
-        ($response->content_type eq "" && $content=~/<html/gis)) {
-  
-         my $p = WebGUI::Wobject::HttpProxy::Parse->new($proxiedUrl, $content, $_[0]->get("wobjectId"),$_[0]->get("rewriteUrls"));
-         $content = $p->filter; # Rewrite content. (let forms/links return to us).
+        ($response->content_type eq "" && $var{content}=~/<html/gis)) {
+ 
+        $var{"search.for"} = $_[0]->getValue("searchFor");
+        $var{"stop.at"} = $_[0]->getValue("stopAt");
+	if ($var{"search.for"}) {
+		$var{content} =~ /^(.*?)\Q$var{"search.for"}\E(.*)$/gis;
+		$var{"content.leading"} = $1 || $var{content};
+		$var{content} = $2;
+	}
+	if ($var{"stop.at"}) {
+		$var{content} =~ /(.*?)\Q$var{"stop.at"}\E(.*)$/gis;
+		$var{content} = $1 || $var{content};
+		$var{"content.trailing"} = $2;
+	}
+         my $p = WebGUI::Wobject::HttpProxy::Parse->new($proxiedUrl, $var{content}, $_[0]->get("wobjectId"),$_[0]->get("rewriteUrls"));
+         $var{content} = $p->filter; # Rewrite content. (let forms/links return to us).
          $p->DESTROY; 
    
-         if ($content =~ /<frame/gis) {
-            $content = "<h1>HttpProxy: Can't display frames</h1>
+         if ($var{content} =~ /<frame/gis) {
+            $var{content} = "<h1>HttpProxy: Can't display frames</h1>
                         Try fetching it directly <a href='$proxiedUrl'>here.</a>";
          } else {
-            $content =~ s/\<style.*?\/style\>//isg if ($_[0]->get("removeStyle"));
-            $content = WebGUI::HTML::cleanSegment($content);
-            $content = WebGUI::HTML::filter($content, $_[0]->get("filterHtml"));
+            $var{content} =~ s/\<style.*?\/style\>//isg if ($_[0]->get("removeStyle"));
+            $var{content} = WebGUI::HTML::cleanSegment($var{content});
+            $var{content} = WebGUI::HTML::filter($var{content}, $_[0]->get("filterHtml"));
          }
       }
    } else { # Fetching page failed...
-      $content = "<b>Getting <a href='$proxiedUrl'>$proxiedUrl</a> failed</b>".
+      $var{content} = "<b>Getting <a href='$proxiedUrl'>$proxiedUrl</a> failed</b>".
    	      "<p><i>GET status line: ".$response->status_line."</i>";
    }
    if ($session{user}{userId} == 1) {
@@ -264,15 +289,15 @@ sub www_view {
           $ttl = $session{page}{cacheTimeout};
       }
 
-   $cachedContent->set($content,$ttl);
-   $cachedHeader->set($header,$ttl);
+   $cachedContent->set($var{content},$ttl);
+   $cachedHeader->set($var{header},$ttl);
    }
 
-   if($header ne "text/html") {
-	$session{header}{mimetype} = $header; 
-	return $content;
+   if($var{header} ne "text/html") {
+	$session{header}{mimetype} = $var{header}; 
+	return $var{content};
    } else {
-   	return $output.$content;
+   	return $_[0]->processTemplate($_[0]->get("templateId"),\%var); 
    }
 }
 1;
