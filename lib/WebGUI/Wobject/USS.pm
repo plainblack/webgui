@@ -323,7 +323,7 @@ sub www_view {
         $var{"post.url"} = WebGUI::URL::page('func=editSubmission&sid=new&wid='.$_[0]->get("wobjectId"));
 	$var{"post.label"} = WebGUI::International::get(20,$namespace);
         $var{"search.label"} = WebGUI::International::get(364);
-	$var{"search.Form"} = WebGUI::Search::form({wid=>"$session{form}{wid}",func=>'view',search=>1});
+	$var{"search.Form"} = WebGUI::Search::form({wid=>$_[0]->get("wobjectId"),func=>'view',search=>1});
 	$var{"search.url"} = WebGUI::Search::toggleURL();
 	if ($session{scratch}{search}) {
                 $numResults = $session{scratch}{numResults};
