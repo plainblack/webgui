@@ -357,7 +357,8 @@ sub www_editPage {
 		my $clause; 
 		if (WebGUI::Privilege::isInGroup(3)) {
 			my $contentManagers = WebGUI::Grouping::getUsersInGroup(4,1);
-			$clause = "userId in ($session{user}{userId},".join(",",@$contentManagers).")";
+			push (@$contentManagers, $session{user}{userId});
+			$clause = "userId in (".join(",",@$contentManagers).")";
 		} else {
 			$clause = "userId=$page{ownerId}";
                 }
