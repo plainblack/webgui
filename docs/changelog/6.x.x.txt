@@ -52,6 +52,9 @@
  - Added additional debugging to WebGUI::SQL.
  - Added a better user search mechanism, which works well even with 100,000
    users.
+ - Made some minor changes to grouping lookups that resulted in an average of
+   14 less database queries per page when in admin mode which results in a 30%
+   performance gain while in admin mode.
 
 
 6.0.3

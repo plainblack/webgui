@@ -233,8 +233,19 @@ sub getGroupsForUser {
 	my $clause = "and expireDate>".time() if ($withoutExpired);
 	if ($userId eq "") {
                 return [];
+        } elsif ($session{gotGroupsForUser}{$userId} == 1) {
+		my @groups;
+		foreach my $gid (keys %{$session{isInGroup}{$userId}}) {
+			push(@groups,$gid);
+		}
+		return \@groups;
         } else {
-                return WebGUI::SQL->buildArrayRef("select groupId from groupings where userId=$userId $clause");
+                my @groups = WebGUI::SQL->buildArray("select groupId from groupings where userId=$userId $clause");
+		foreach my $gid (@groups) {
+			$session{isInGroup}{$userId}{$gid} = 1;
+		}
+		$session{gotGroupsForUser}{$userId} = 1;
+		return \@groups;
         }
 }
 
@@ -264,7 +275,9 @@ sub getGroupsInGroup {
         my $groupId = shift;
         my $isRecursive = shift;
         my $loopCount = shift;
-        my $groups = WebGUI::SQL->buildArrayRef("select groupId from groupGroupings where inGroup=$groupId");
+	my $groupsLookedUp = shift;
+	my $extraWhere = "and groupId not in (".join(",",@{$groupsLookedUp}).")" if (defined @{$groupsLookedUp});
+        my $groups = WebGUI::SQL->buildArrayRef("select groupId from groupGroupings where inGroup=$groupId $extraWhere");
         if ($isRecursive) {
                 $loopCount++;
                 if ($loopCount > 99) {
@@ -273,7 +286,7 @@ sub getGroupsInGroup {
                 }
                 my @groupsOfGroups = @$groups;
                 foreach my $group (@$groups) {
-                        my $gog = getGroupsInGroup($group,1,$loopCount);
+                        my $gog = getGroupsInGroup($group,1,$loopCount,\@groupsOfGroups);
                         push(@groupsOfGroups, @$gog);
                 }
                 return \@groupsOfGroups;
@@ -335,29 +348,31 @@ The user that you wish to verify against the group. Defaults to the currently lo
 =cut
 
 sub isInGroup {
-        my ($gid, $uid, @data, %group, $groupId);
-        ($gid, $uid) = @_;
+        my (@data, %group, $groupId);
+        my ($gid, $uid, $secondRun) = @_;
         $gid = 3 unless (defined $gid);
         $uid = $session{user}{userId} if ($uid eq "");
         ### The following several checks are to increase performance. If this section were removed, everything would continue to work as normal. 
         return 1 if ($gid == 7);		# everyone is in the everyone group
         return 1 if ($gid == 1 && $uid == 1); 	# visitors are in the visitors group
-	return 0 if ($gid != 1 && $uid == 1); 	# visitors can't be in any group execpt the visitors group
+	return 0 if ($gid != 1 && $uid == 1); 	# visitors can't be in any group except the visitors group
         return 1 if ($gid==2 && $uid != 1); 	# if you're not a visitor, then you're a registered user
         ### Look to see if we've already looked up this group. 
-        if ($session{isInGroup}{$gid}{$uid} == 1) {
+        if ($session{isInGroup}{$uid}{$gid} == 1) {
                 return 1;
-        } elsif ($session{isInGroup}{$gid}{$uid} eq "0") {
+        } elsif ($session{isInGroup}{$uid}{$gid} eq "0") {
                 return 0;
         }
         ### Lookup the actual groupings.
-        my $groups = WebGUI::Grouping::getGroupsForUser($uid,1);
-        foreach (@{$groups}) {
-                $session{isInGroup}{$_}{$uid} = 1;
-        }
-        if ($session{isInGroup}{$gid}{$uid} == 1) {
-                return 1;
-        }
+	unless ($secondRun) {			# don't look up user groups if we've already done it once.
+	        my $groups = WebGUI::Grouping::getGroupsForUser($uid,1);
+	        foreach (@{$groups}) {
+	                $session{isInGroup}{$uid}{$_} = 1;
+        	}
+        	if ($session{isInGroup}{$uid}{$gid} == 1) {
+                	return 1;
+        	}
+	}
         ### Get data for auxillary checks.
         tie %group, 'Tie::CPHash';
         %group = WebGUI::SQL->quickHash("select karmaThreshold,ipFilter,scratchFilter,databaseLinkId,dbQuery,dbCacheTimeout from groups where groupId='$gid'");
@@ -371,7 +386,7 @@ sub isInGroup {
                 my @ips = split(";",$group{ipFilter});
                 foreach my $ip (@ips) {
                         if ($session{env}{REMOTE_ADDR} =~ /^$ip/) {
-                                $session{isInGroup}{$gid}{$uid} = 1;
+                                $session{isInGroup}{$uid}{$gid} = 1;
                                 return 1;
                         }
                 }
@@ -386,7 +401,7 @@ sub isInGroup {
                 foreach my $var (@vars) {
                         my ($name, $value) = split(/\=/,$var);
                         if ($session{scratch}{$name} eq $value) {
-                                $session{isInGroup}{$gid}{$uid} = 1;
+                                $session{isInGroup}{$uid}{$gid} = 1;
                                 return 1;
                         }
                 }
@@ -400,7 +415,7 @@ sub isInGroup {
                         ($karma) = WebGUI::SQL->quickHash("select karma from users where userId='$uid'");
                 }
                 if ($karma >= $group{karmaThreshold}) {
-                        $session{isInGroup}{$gid}{$uid} = 1;
+                        $session{isInGroup}{$uid}{$gid} = 1;
                         return 1;
                 }
         }
@@ -419,13 +434,13 @@ sub isInGroup {
                                         } else {
                                                 my ($result) = $sth->array;
                                                 if ($result == 1) {
-                                                        $session{isInGroup}{$gid}{$uid} = 1;
+                                                        $session{isInGroup}{$uid}{$gid} = 1;
                                                         if ($group{dbCacheTimeout} > 0) {
                                                                 WebGUI::Grouping::deleteUsersFromGroups([$uid],[$gid]);
                                                                 WebGUI::Grouping::addUsersToGroups([$uid],[$gid],$group{dbCacheTimeout});
                                                         }
                                                 } else {
-                                                        $session{isInGroup}{$gid}{$uid} = 0;
+                                                        $session{isInGroup}{$uid}{$gid} = 0;
                                                         WebGUI::Grouping::deleteUsersFromGroups([$uid],[$gid]) if ($group{dbCacheTimeout} > 0);
                                                 }
                                         }
@@ -434,20 +449,20 @@ sub isInGroup {
                                         WebGUI::ErrorHandler::warn("Database query for group ID $gid must use 'select 1'");
                                 }
                                 $dbLink->disconnect;
-                                return 1 if ($session{isInGroup}{$gid}{$uid});
+                                return 1 if ($session{isInGroup}{$uid}{$gid});
                         }
                 }
         }
         ### Check for groups of groups.
-        $groups = WebGUI::Grouping::getGroupsInGroup($gid,1);
+        my $groups = WebGUI::Grouping::getGroupsInGroup($gid,1);
         foreach (@{$groups}) {
-                $session{isInGroup}{$_}{$uid} = isInGroup($_, $uid);
-                if ($session{isInGroup}{$_}{$uid}) {
-                        $session{isInGroup}{$gid}{$uid} = 1; # cache current group also so we don't have to do the group in group check again
+                $session{isInGroup}{$uid}{$_} = isInGroup($_, $uid, 1);
+                if ($session{isInGroup}{$uid}{$_}) {
+                        $session{isInGroup}{$uid}{$gid} = 1; # cache current group also so we don't have to do the group in group check again
                         return 1;
                 }
         }
-        $session{isInGroup}{$gid}{$uid} = 0;
+        $session{isInGroup}{$uid}{$gid} = 0;
         return 0;
 }
 
