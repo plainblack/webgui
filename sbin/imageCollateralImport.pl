@@ -23,9 +23,6 @@ BEGIN {
 
 $| = 1;
 
-#use File::stat;
-#use File::Path;
-#use POSIX;
 use strict;
 use WebGUI::Attachment;
 use WebGUI::Session;
