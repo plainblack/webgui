@@ -224,7 +224,7 @@ sub www_confirmTransaction {
 
 #-------------------------------------------------------------------
 sub www_editCommerceSettings {
-	my (%tabs, $tabform, $jscript, $currentPlugin, $ac, $jscript, $i18n, $paymentPlugin);
+	my (%tabs, $tabform, $jscript, $currentPlugin, $ac, $jscript, $i18n, $paymentPlugin, @paymentPlugins, %paymentPlugins, @failedPaymentPlugins, $plugin);
 	return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
 	
 	$i18n = WebGUI::International->new('Commerce');
@@ -265,27 +265,46 @@ sub www_editCommerceSettings {
 		-value		=> $session{setting}{commerceSendDailyReportTo}
 		);
 
-	# payment plugin
-	$tabform->getTab('payment')->raw('<script language="JavaScript" > var activePayment="'.$paymentPlugin.'"; </script>');
-	$tabform->getTab("payment")->selectList(
-		-name		=> 'commercePaymentPlugin',
-		-options	=> {map {$_ => $_} @{$session{config}{paymentPlugins}}},
-		-label		=> $i18n->get('payment form'),
-		-value		=> [$paymentPlugin],
-		-extras		=> 'onChange="activePayment=operateHidden(this.options[this.selectedIndex].value,activePayment)"'
-		);
-
-	$jscript = '<script language="JavaScript">';
+	# Check which payment plugins will compile, and load them.
 	foreach (@{$session{config}{paymentPlugins}}) {
-		$currentPlugin = WebGUI::Commerce::Payment->load($_);
-		$tabform->getTab('payment')->raw('<tr id="'.$_.'"><td colspan="2" width="100%">'.
-			'<table border=0 cellspacing=0 cellpadding=0  width="100%">'.
-			$currentPlugin->configurationForm.'<tr><td width="304">&nbsp;</td><td width="496">&nbsp;</td></tr></table></td></tr>');
-			$jscript .= "document.getElementById(\"$_\").style.display='".(($_ eq $paymentPlugin)?"":"none")."';";
+		$plugin = WebGUI::Commerce::Payment->load($_);
+		if ($plugin) {
+			push(@paymentPlugins, $plugin);
+			$paymentPlugins{$_} = $_;
+		} else {
+			push(@failedPaymentPlugins, $_);
+		}
 	}
-	$jscript .= '</script>';	
+		
+	# payment plugin
+	if (%paymentPlugins) {
+		$tabform->getTab('payment')->raw('<script language="JavaScript" > var activePayment="'.$paymentPlugin.'"; </script>');
+		$tabform->getTab("payment")->selectList(
+			-name		=> 'commercePaymentPlugin',
+			-options	=> \%paymentPlugins, #{map {$_ => $_} @{$session{config}{paymentPlugins}}},
+			-label		=> $i18n->get('payment form'),
+			-value		=> [$paymentPlugin],
+			-extras		=> 'onChange="activePayment=operateHidden(this.options[this.selectedIndex].value,activePayment)"'
+			);
+			
+		$jscript = '<script language="JavaScript">';
+		foreach $currentPlugin (@paymentPlugins) {
+			$tabform->getTab('payment')->raw('<tr id="'.$currentPlugin->namespace.'"><td colspan="2" width="100%">'.
+				'<table border=0 cellspacing=0 cellpadding=0  width="100%">'.
+				$currentPlugin->configurationForm.'<tr><td width="304">&nbsp;</td><td width="496">&nbsp;</td></tr></table></td></tr>');
+			$jscript .= "document.getElementById(\"".$currentPlugin->namespace."\").style.display='".(($currentPlugin->namespace eq $paymentPlugin)?"":"none")."';";
+		}
+		$jscript .= '</script>';	
+		$tabform->getTab('payment')->raw($jscript);
+	} else {
+		$tabform->getTab('payment')->raw('<tr><td colspan="2" align="left">'.$i18n->get('no payment plugins selected').'</td></tr>');
+	}
+
+	if (@failedPaymentPlugins) {
+		$tabform->getTab('payment')->raw('<tr><td colspan="2" align="left"><br>'.$i18n->get('failed payment plugins').
+						'<br><ul><li>'.join('</li><li>', @failedPaymentPlugins).'</li></ul></td></tr>');
+	}
 	
-	$tabform->getTab('payment')->raw($jscript);
 	$tabform->submit;
 
 	WebGUI::Style::setScript($session{config}{extrasURL}.'/swapLayers.js',{language=>"Javascript"});

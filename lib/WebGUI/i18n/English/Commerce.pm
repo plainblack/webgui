@@ -355,6 +355,16 @@ A template loop containing the items that were checked out. The following templa
 		lastUpdated => 1101791348,
 		context => q|The title of the help page of the checkout error template.|
 	},
+	'no payment plugins selected' => {
+		message => q|There are no payment plugins to select. Please enable plugins in the config file.|,
+		lastUpdated => 0,
+		context => q|The message that's shown in the AdminConsole/Commerce menu when there are no payment plugins enabled.|
+	},
+	'failed payment plugins' => {
+		message => q|The following Payment Plugins failed to compile, please check your log for more information: |,
+		lastUpdated => 0,
+		context => q|The message that sais which payment plugins did not compile.|
+	},
 };
 
 1;
