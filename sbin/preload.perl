@@ -95,7 +95,6 @@ use WebGUI::SQL ();
 use WebGUI::Storage ();
 use WebGUI::Style ();
 use WebGUI::TabForm ();
-use WebGUI::Template ();
 use WebGUI::URL ();
 use WebGUI::User ();
 use WebGUI::Utility ();
@@ -104,7 +103,6 @@ use WebGUI::Utility ();
 #use WebGUI::Help::Article ();
 #use WebGUI::Help::Asset ();
 #use WebGUI::Help::AuthLDAP ();
-#use WebGUI::Help::AuthSMB ();
 #use WebGUI::Help::AuthWebGUI ();
 #use WebGUI::Help::DataForm ();
 #use WebGUI::Help::EventsCalendar ();
@@ -116,34 +114,21 @@ use WebGUI::Utility ();
 #use WebGUI::Help::SQLReport ();
 #use WebGUI::Help::Survey ();
 #use WebGUI::Help::SyndicatedContent ();
-#use WebGUI::Help::USS ();
+#use WebGUI::Help::Collaboration ();
 #use WebGUI::Help::WebGUI ();
-#use WebGUI::Help::WobjectProxy ();
+#use WebGUI::Help::Shortcut ();
 #use WebGUI::Help::WSClient ();
 
 # i18n
 use WebGUI::i18n::English ();
 use WebGUI::i18n::English::Article ();
+use WebGUI::i18n::English::Collaboration ();
 use WebGUI::i18n::English::Asset ();
 #use WebGUI::i18n::English::AuthLDAP ();
-#use WebGUI::i18n::English::AuthSMB ();
 use WebGUI::i18n::English::AuthWebGUI ();
-use WebGUI::i18n::English::DataForm ();
-use WebGUI::i18n::English::EventsCalendar ();
-use WebGUI::i18n::English::HttpProxy ();
-use WebGUI::i18n::English::IndexedSearch ();
-use WebGUI::i18n::English::MessageBoard ();
 use WebGUI::i18n::English::Navigation ();
-use WebGUI::i18n::English::Poll ();
-use WebGUI::i18n::English::Product ();
-use WebGUI::i18n::English::SQLReport ();
-use WebGUI::i18n::English::Survey ();
-use WebGUI::i18n::English::SyndicatedContent ();
-use WebGUI::i18n::English::USS ();
 use WebGUI::i18n::English::WebGUI ();
 use WebGUI::i18n::English::WebGUIProfile ();
-use WebGUI::i18n::English::WobjectProxy ();
-use WebGUI::i18n::English::WSClient ();
 
 # you can significantly reduce your memory usage by preloading the plugins used on your sites, only the most commonly used ones are preloaded by default
 
@@ -156,16 +141,13 @@ use WebGUI::Asset::Wobject ();
 use WebGUI::Asset::Wobject::Article ();
 use WebGUI::Asset::Wobject::Layout ();
 use WebGUI::Asset::Wobject::Navigation ();
-#use WebGUI::Asset::Wobject::USS ();
+use WebGUI::Asset::Wobject::Collaboration ();
 
 # auth methods
 use WebGUI::Auth::WebGUI ();
 
 #use Net::LDAP ();  # used by ldap authentication
 use WebGUI::Auth::LDAP ();
-
-#use Authen::Smb (); #uncomment when using this type of authentication.
-#use WebGUI::Auth::SMB ();
 
 # macros
 use WebGUI::Macro::AdminBar ();

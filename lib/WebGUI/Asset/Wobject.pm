@@ -501,7 +501,7 @@ sub setCollateral {
 	my $useAssetId = shift;
 	my $setName = shift || "assetId";
 	my $setValue = shift || $self->get($setName);
-	my ($key, $sql, $seq, $dbkeys, $dbvalues, $counter);
+	my ($key, $seq, $dbkeys, $dbvalues);
 	my $counter = 0;
 	my $sql;
 	if ($properties->{$keyName} eq "new" || $properties->{$keyName} eq "") {

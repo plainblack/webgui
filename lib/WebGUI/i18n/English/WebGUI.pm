@@ -46,11 +46,6 @@ our $I18N = {
 		lastUpdated => 1044705246
 	},
 
-	'1065' => {
-		message => q|Forum Post Form Template|,
-		lastUpdated => 1066581759
-	},
-
 	'358' => {
 		message => q|Left Column|,
 		lastUpdated => 1031514049
@@ -76,29 +71,9 @@ our $I18N = {
 		lastUpdated => 1031514049
 	},
 
-	'580' => {
-		message => q|Your message has been denied.|,
-		lastUpdated => 1031514049
-	},
-
-	'1031' => {
-		message => q|Forum Template|,
-		lastUpdated => 1066034528
-	},
-
-	'1020' => {
-		message => q|Rating|,
-		lastUpdated => 1065280882
-	},
-
 	'84' => {
 		message => q|Group Name|,
 		lastUpdated => 1031514049
-	},
-
-	'512' => {
-		message => q|Go to next thread|,
-		lastUpdated => 1065280309
 	},
 
 	'437' => {
@@ -583,176 +558,6 @@ The URL of the web site for this theme's designer. If you are in the business of
 		lastUpdated => 1031514049
 	},
 
-	'1068' => {
-		message => q|The following variables are available in the search template.
-<p>
-
-<b>callback.url</b><br>
-The url that links back to the calling object such as an Article or User Submission System.
-<p>
-
-<b>callback.label</b><br>
-The default label for callback.url.
-<p>
-
-<b>form.begin</b><br>
-The search form header.
-<p>
-
-<b>search.label</b><br>
-The default label for the search page.
-<p>
-
-<b>all.label</b><br>
-The default label for all.form.
-<p>
-
-<b>all.form</b><br>
-The form element for searching based on all words.
-<p>
-
-<b>exactphrase.label</b><br>
-The default label for exactphrase.form.
-<p>
-
-<b>exactphrase.form</b><br>
-The form element for searching based on an exact phrase.
-<p>
-
-<b>without.label</b><br>
-The default label for without.form.
-<p>
-
-<b>without.form</b><br>
-The form element for searching based on words that cannot be found in the text.
-<p>
-
-<b>atleastone.label</b><br>
-The default label for atleastone.form.
-<p>
-
-<b>atleastone.form</b><br>
-The form element for searching where at least one of the words must exist in the text.
-<p>
-
-<b>results.label</b><br>
-The default label for results.form.
-<p>
-
-<b>results.form</b><br>
-The form element for selecting how many results per page should be returned.
-<p>
-
-<b>form.search</b><br>
-The search button.
-<p>
-
-<b>form.end</b><br>
-The form footer.
-<p>
-
-<b>thread.list.url</b><br>
-A url that goes back to the thread list (aka forum).
-<p>
-
-<b>thread.list.label</b><br>
-The default label for thread.list.url.
-<p>
-
-<b>post.subject.label</b><br>
-The default label for the subject column.
-<p>
-
-<b>post.date.label</b><br>
-The default label for the date column.
-<p>
-
-<b>post.user.label</b><br>
-The default label for the author column.
-<p>
-
-<b>post_loop</b><br>
-A loop containing all of the search results.
-<p>
-
-<blockquote>
-
-<b>post.subject</b><br>
-The post subject.
-<p>
-
-<b>post.url</b><br>
-The url to view the post.
-<p>
-
-<b>post.epoch</b><br>
-The epoch date of the post.
-<p>
-
-<b>post.date</b><br>
-The human readable date of the post.
-<p>
-
-<b>post.time</b><br>
-The human readable time of the post.
-<p>
-
-<b>post.user.id</b><br>
-The userId of the poster.
-<p>
-
-<b>post.user.name</b><br>
-The username of the poster.
-<p>
-
-<b>post.user.alias</b><br>
-The current alias of the poster.
-<p>
-
-<b>post.user.profile</b><br>
-The url of the poster's profile.
-<p>
-
-</blockquote>
-
-<p>
-
-<b>firstpage</b><br>
-A link to the first page in a multi-page listing.
-<p>
-
-<b>lastpage</b><br>
-A link to the last page in a multi-page listing.
-<p>
-
-<b>nextpage</b><br>
-A link to the next page in a multi-page listing.
-<p>
-
-<b>pagelist</b><br>
-A series of links to every page in a multi-page listing.
-<p>
-
-<b>previouspage</b><br>
-A link to the previous page in a multi-page listing.
-<p>
-
-<b>multiplepages</b><br>
-A conditional indicating whether there are multiple pages or not.
-<p>
-
-<b>numberOfPages</b><br>
-The number of pages in a multiple page listing.
-<p>
-
-<b>pageNumber</b><br>
-The number of the current page in a multi-page listing.
-<p>
-
-|,
-		lastUpdated => 1099614588
-	},
-
 	'950' => {
 		message => q|Empty clipboard.|,
 		lastUpdated => 1052850265
@@ -760,11 +565,6 @@ The number of the current page in a multi-page listing.
 
 	'486' => {
 		message => q|Data Type|,
-		lastUpdated => 1031514049
-	},
-
-	'1025' => {
-		message => q|Add edit stamp to posts?|,
 		lastUpdated => 1031514049
 	},
 
@@ -817,210 +617,6 @@ Be aware that any database links you create here will be available to all conten
 		lastUpdated => 1031514049
 	},
 
-	'1061' => {
-		message => q|These are the template variables for the thread template.
-<p>
-
-<b>callback.url</b><br>
-The url to the calling object such as an article or a user submission.
-<p>
-
-<b>callback.label</b><br>
-The default label for callback.url
-<p>
-
-<b>user.canpost</b><br>
-A conditional indicating whether the current user can post a new message.
-<p>
-
-<b>user.isVisitor</b><br>
-A conditional indicating whether the current user is a visitor.
-<p>
-
-<b>user.isModerator</b><br>
-A conditional indicating whether the current user is a moderator.
-<p>
-
-<b>user.isSubscribed</b><br>
-A conditional indicating whether the current user is subscribed to this thread.
-<p>
-
-<b>thread.layout.nested.label</b><br>
-The default label for thread.layout.nested.url.
-<p>
-
-<b>thread.layout.nested.url</b><br>
-A url that will change the layout of the thread to nested.
-<p>
-
-<b>thread.layout.flat.url</b><br>
-A url that will change the layout of the thread to flat.
-<p>
-
-<b>thread.layout.flat.label</b><br>
-The default label for thread.layout.flat.url.
-<p>
-
-<b>thread.layout.threaded.label</b><br>
-The default label for thread.layout.threaded.url.
-<p>
-
-<b>thread.layout.threaded.url</b><br>
-A url that will change the layout of the thread to threaded.
-<p>
-
-<b>thread.layout.isThreaded</b><br>
-A conditional indicating whether the thread layout is threaded.
-<p>
-
-<b>thread.layout.isNested</b><br>
-A conditional indicating whether the thread layout is nested.
-<p>
-
-<b>thread.layout.isFlat</b><br>
-A conditional indicating whether the thread layout is flat.
-<p>
-
-<b>thread.subscribe.url</b><br>
-A url that will subscribe the current user to this thread.
-<p>
-
-<b>thread.subscribe.label</b><br>
-The default label for thread.subscribe.url.
-<p>
-
-<b>thread.unsubscribe.url</b><br>
-A url that will unsubscribe the current user from this thread.
-<p>
-
-<b>thread.unsubscribe.label</b><br>
-The default label for thread.unsubscribe.url.
-<p>
-
-<b>thread.isSticky</b><br>
-A conditional indicating whether the thread is sticky.
-<p>
-
-<b>thread.stick.url</b><br>
-A url that will make this thread sticky.
-<p>
-
-<b>thread.stick.label</b><br>
-The default label for thread.stick.url.
-<p>
-
-<b>thread.unstick.url</b><br>
-A url that will make a sticky thread unstick.
-<p>
-
-<b>thread.unstick.label</b><br>
-The default label for thread.unstick.url.
-<p>
-
-<b>thread.isLocked</b><br>
-A conditional indicating whether this thread is locked.
-<p>
-
-<b>thread.lock.url</b><br>
-A url that will lock this thread.
-<p>
-
-<b>thread.lock.label</b><br>
-The default label for thread.lock.url.
-<p>
-
-<b>thread.unlock.url</b><br>
-A url that will unlock this thread.
-<p>
-
-<b>thread.unlock.label</b><br>
-The default label for thread.unlock.url.
-<p>
-
-<b>post_loop</b><br>
-A loop containing all the posts in this thread.
-<p>
-
-<blockquote>
-
-<b>post.indent_loop</b><br>
-A loop to be used for indenting.
-<p>
-<blockquote>
-<b>depth</b><br>
-An integer indicating the depth. Not really useful, just hear to fill out the loop.
-</blockquote>
-<p>
-
-<b>post.indent.depth</b><br>
-An integer indicating how many levels deep this post is.
-<p>
-
-<b>post.isCurrent</b><br>
-A conditional indicating whether this post is the one selected for viewing by the user.
-<p>
-
-<b>NOTE:</b> All of the variables from the post template are also available here.
-
-</blockquote>
-
-<p>
-
-<b>thread.subject.label</b><br>
-The default label for subjects.
-<p>
-
-<b>thread.date.label</b><br>
-The default label for dates.
-<p>
-
-<b>thread.user.label</b><br>
-The default label for authors.
-<p>
-
-<b>thread.new.url</b><br>
-A url to create a new url.
-<p>
-
-<b>thread.new.label</b><br>
-The default label for thread.new.url.
-<p>
-
-<b>thread.previous.url</b><br>
-A url that will display the previous thread.
-<p>
-
-<b>thread.previous.label</b><br>
-The default label for thread.previous.url.
-<p>
-
-<b>thread.next.url</b><br>
-A url that will display the next thread.
-<p>
-
-<b>thread.next.label</b><br>
-The default label for thread.next.url.
-<p>
-
-<b>thread.list.url</b<br>
-A url to take the user back to the thread list (aka the forum).
-<p>
-
-<b>thread.list.label</b><br>
-The default label for thread.list.url.
-<p>
-
-<b>forum.title</b><br>
-The title of this forum as passed by the calling object.
-<p>
-
-<b>forum.description</b><br>
-The description of this forum as passed by the calling object.
-<p>
-
-|,
-		lastUpdated => 1099613369
-	},
 
 	'485' => {
 		message => q|Boolean (Checkbox)|,
@@ -1178,11 +774,6 @@ How should this user be notified when they get a new WebGUI message?
 		lastUpdated => 1031514049
 	},
 
-	'1040' => {
-		message => q|Lock|,
-		lastUpdated => 1066073923
-	},
-
 	'999' => {
 		message => q|Database Link, Delete|,
 		lastUpdated => 1056151382
@@ -1198,11 +789,6 @@ How should this user be notified when they get a new WebGUI message?
 		lastUpdated => 1031514049
 	},
 
-	'1012' => {
-		message => q|Lock this thread?|,
-		lastUpdated => 1060433963
-	},
-
 	'430' => {
 		message => q|Last Page View|,
 		lastUpdated => 1031514049
@@ -1216,11 +802,6 @@ How should this user be notified when they get a new WebGUI message?
 	'379' => {
 		message => q|Group ID|,
 		lastUpdated => 1031514049
-	},
-
-	'1032' => {
-		message => q|Thread Template|,
-		lastUpdated => 1066034586
 	},
 
 	'901' => {
@@ -1273,11 +854,6 @@ How should this user be notified when they get a new WebGUI message?
 		lastUpdated => 1031514049
 	},
 
-	'1056' => {
-		message => q|Forum Template|,
-		lastUpdated => 1066576831
-	},
-
 	'535' => {
 		message => q|Group To Alert On New User|,
 		lastUpdated => 1031514049
@@ -1286,11 +862,6 @@ How should this user be notified when they get a new WebGUI message?
 	'87' => {
 		message => q|Edit Group|,
 		lastUpdated => 1031514049
-	},
-
-	'1022' => {
-		message => q|Subscribe to discussion|,
-		lastUpdated => 1065875027
 	},
 
 	'77' => {
@@ -1305,11 +876,6 @@ How should this user be notified when they get a new WebGUI message?
 
 	'444' => {
 		message => q|Demographic Information|,
-		lastUpdated => 1031514049
-	},
-
-	'541' => {
-		message => q|Karma Per Post|,
 		lastUpdated => 1031514049
 	},
 
@@ -1394,11 +960,6 @@ As with any delete operation, you are prompted to be sure you wish to proceed wi
 	'734' => {
 		message => q|5 Adept|,
 		lastUpdated => 1033836678
-	},
-
-	'875' => {
-		message => q|A new message has been posted to one of your subscriptions.|,
-		lastUpdated => 1065874019
 	},
 
 	'1' => {
@@ -1511,16 +1072,6 @@ As with any delete operation, you are prompted to be sure you wish to proceed wi
 		lastUpdated => 1031514049
 	},
 
-	'874' => {
-		message => q|Unsubscribe from thread|,
-		lastUpdated => 1065876868
-	},
-
-	'1062' => {
-		message => q|Forum Notification Template|,
-		lastUpdated => 1066580520
-	},
-
 	'975' => {
 		message => q|Users can remove themselves?|,
 		lastUpdated => 1053778962
@@ -1534,11 +1085,6 @@ As with any delete operation, you are prompted to be sure you wish to proceed wi
 	'171' => {
 		message => q|rich edit|,
 		lastUpdated => 1031514049
-	},
-
-	'1033' => {
-		message => q|Post Template|,
-		lastUpdated => 1066034603
 	},
 
 	'445' => {
@@ -1795,11 +1341,6 @@ The user id of the currently logged in user.
 		lastUpdated => 1031514049
 	},
 
-	'1019' => {
-		message => q|Back to thread list|,
-		lastUpdated => 1065280160
-	},
-
 	'700' => {
 		message => q|Day(s)|,
 		lastUpdated => 1031514049
@@ -1845,11 +1386,6 @@ The user id of the currently logged in user.
 	'983' => {
 		message => q|Edit this database link.|,
 		lastUpdated => 1056151382
-	},
-
-	'515' => {
-		message => q|Add edit stamp to posts?|,
-		lastUpdated => 1031514049
 	},
 
 	'138' => {
@@ -1984,11 +1520,6 @@ If you leave this on the default setting you'll be redirected to the new page af
 		lastUpdated => 1031879593
 	},
 
-	'1067' => {
-		message => q|Forum Search Template|,
-		lastUpdated => 1066582842
-	},
-
 	'432' => {
 		message => q|Expires|,
 		lastUpdated => 1031514049
@@ -2037,20 +1568,6 @@ That particular example will help you get good ranking on search engines.
 	'911' => {
 		message => q|Component|,
 		lastUpdated => 1050232236
-	},
-
-	'1063' => {
-		message => q|These are the variables available in the forum notification template.
-
-<p>
-<b>notify.subscription.message</b><br>
-A message stating that the user is receiving the message because they subscribed to the forum or thread.
-<p>
-
-<b>NOTE:</b> The notification template also includes all the variables from the post template.
-<p>
-|,
-		lastUpdated => 1066580520
 	},
 
 	'17' => {
@@ -2126,11 +1643,6 @@ A message stating that the user is receiving the message because they subscribed
 	'126' => {
 		message => q|Company Email Address|,
 		lastUpdated => 1031514049
-	},
-
-	'1034' => {
-		message => q|Post Form Template|,
-		lastUpdated => 1066034620
 	},
 
 	'426' => {
@@ -2488,11 +2000,6 @@ The Connect DN is the <b>cn</b> (or common name) of a given user in your LDAP da
 		lastUpdated => 1044138790
 	},
 
-	'513' => {
-		message => q|Go to previous thread|,
-		lastUpdated => 1065280287
-	},
-
 	'groups default body' => {
 		message => q|There are several groups built into WebGUI:
 <p>
@@ -2686,11 +2193,6 @@ One package that many people create is a Page/Article package. It is often the c
 		lastUpdated => 1031514049
 	},
 
-	'1038' => {
-		message => q|Unstick|,
-		lastUpdated => 1066065454
-	},
-
 	'53' => {
 		message => q|Make Page Printable|,
 		lastUpdated => 1031514049
@@ -2702,7 +2204,7 @@ One package that many people create is a Page/Article package. It is often the c
 	},
 
 	'626' => {
-		message => q|Wobjects (formerly known as Widgets) are the true power of WebGUI. Wobjects are tiny pluggable applications built to run under WebGUI. Articles, message boards and polls are examples of wobjects.
+		message => q|Wobjects are the true power of WebGUI. Wobjects are tiny pluggable applications built to run under WebGUI. Articles, message boards and polls are examples of wobjects.
 <p>
 
 To add a wobject to a page, first go to that page, then select <b>Add Content...</b> from the upper left corner of your screen. Each wobject has it's own help so be sure to read the help if you're not sure how to use it.
@@ -2845,11 +2347,6 @@ Loops come with special condition variables of their own. They are __FIRST__, __
 	'583' => {
 		message => q|Max Image Size|,
 		lastUpdated => 1031514049
-	},
-
-	'1064' => {
-		message => q|Post a Message|,
-		lastUpdated => 1066580782
 	},
 
 	'951' => {
@@ -2998,16 +2495,6 @@ You also cannot import a theme from a version of WebGUI that is newer than the o
 	'1069' => {
 		message => q|Host To Use|,
 		lastUpdated => 1066641432
-	},
-
-	'1013' => {
-		message => q|Make sticky?|,
-		lastUpdated => 1060434033
-	},
-
-	'233' => {
-		message => q|(eom)|,
-		lastUpdated => 1031514049
 	},
 
 	'57' => {
@@ -3188,11 +2675,6 @@ The translated label for the link to the home page or the text that you supply t
 		lastUpdated => 1031514049
 	},
 
-	'1028' => {
-		message => q|Moderate posts?|,
-		lastUpdated => 1065966284
-	},
-
 	'812' => {
 		message => q|Your message has been sent.|,
 		lastUpdated => 1037580328
@@ -3203,203 +2685,6 @@ The translated label for the link to the home page or the text that you supply t
 		lastUpdated => 1036971944
 	},
 
-	'1059' => {
-		message => q|The following are the template variables available in the post template.
-<p>
-
-<b>callback.url</b><br>
-The url back to the calling object such as an article or user submission.
-<p>
-
-<b>callback.label</b><br>
-The default label for callback.url.
-<p>
-
-<b>post.subject</b><br>
-The subject of this post.
-<p>
-
-<b>post.subject.label</b><br>
-The default label for post.subject
-<p>
-
-<b>post.message</b><br>
-The message of this post.
-<p>
-
-<b>user.canPost</b><br>
-A conditional indicating whether the current user can post a new message.
-<p>
-
-<b>post.date.value</b><br>
-A human readable date for this post.
-<p>
-
-<b>post.date.epoch</b><br>
-The epoch date for this post.
-<p>
-
-<b>post.time.value</b><br>
-The human readable time for this post.
-<p>
-
-<b>post.date.label</b><br>
-The default label for post.date.value.
-<p>
-
-<b>post.rating.value</b><br>
-The average rating of this post.
-<p>
-
-<b>post.rating.label</b><br>
-The default label for post.date.value.
-<p>
-
-<b>post.views.value</b><br>
-The number of views for this post.
-<p>
-
-<b>post.views.label</b><br>
-The default label for post.views.value.
-<p>
-
-<b>post.status.value</b><Br>
-the status of this post.
-<p>
-
-<b>post.status.label</b><br>
-The default label for post.status.value.
-<p>
-
-<b>post.isLocked</b><br>
-A conditional indicating whether the thread this post is in is locked.
-<p>
-
-<b>post.isModerator</b><br>
-A conditional indicating whether the current user is a moderator.
-<p>
-
-<b>post.canEdit</b><br>
-A conditional indicating whether the current user can edit this post.
-<p>
-
-<b>post.user.isVisitor</b><br>
-A conditional indicating whether the poster was a visitor.
-<p>
-
-<b>post.user.id</b</b><br>
-The userId of the poster.
-<p>
-
-<b>post.user.name</b><br>
-The poster's username.
-<p>
-
-<b>post.user.alias</b><br>
-The poster's current alias.
-<p>
-
-<b>post.user.profile</b><br>
-The url to the poster's profile.
-<p>
-
-<b>post.url</b><br>
-The url to display this post.
-<p>
-
-<b>post.id</b><br>
-The unique id of this post.
-<p>
-
-<b>post.rate.label</b><br>
-The default label for post.rate.url.1.
-<p>
-
-<b>post.rate.url.1</b><br>
-The url to give this post a rating of 1.
-<p>
-
-<b>post.rate.url.2</b><br>
-The url to give this post a rating of 2.
-<p>
-
-
-<b>post.rate.url.3</b><br>
-The url to give this post a rating of 3.
-<p>
-
-
-<b>post.rate.url.4</b><br>
-The url to give this post a rating of 4.
-<p>
-
-
-<b>post.rate.url.5</b><br>
-The url to give this post a rating of 5.
-<p>
-
-<b>post.hasRated</b><br>
-A conditional indicating whether the current user has already rated this post.
-<p>
-
-<b>post.reply.label</b><br>
-The default label for post.reply.url.
-<p>
-
-<b>post.reply.url</b><br>
-The url to reply to this post.
-<p>
-
-<b>post.reply.withquote.url</b><br>
-The url to reply to this post and quote this post in doing so.
-<p>
-
-<b>post.edit.label</b><br>
-The default label for post.edit.url.
-<p>
-
-<b>post.edit.url</b><br>
-The url to edit this post.
-<p>
-
-<b>post.delete.url</b><br>
-The url to delete this post.
-<p>
-
-<b>post.delete.label</b><br>
-The default label for post.delete.url.
-<p>
-
-<b>post.approve.label</b><br>
-The default label for post.approve.url.
-<p>
-
-<b>post.approve.url</b><br>
-The url to approve this post.
-<p>
-
-<b>post.deny.url</b><br>
-The url to deny this post.
-<p>
-
-<b>post.deny.label</b><br>
-The default label for post.deny.url.
-<p>
-
-<b>post.full</b><br>
-The full post rendered using the post template. This would never be used in the post template directly, but is often used in other templates that embed the post template's variables.
-<p>
-
-<b>forum.title</b><br>
-The title of this forum as passed by the calling object.
-<p>
-
-<b>forum.description</b><br>
-The description of this forum as passed by the calling object.
-<p>
-|,
-		lastUpdated => 1099613407
-	},
 
 	'327' => {
 		message => q|Home Country|,
@@ -3554,11 +2839,6 @@ Large sites using external group data will be making many calls to the external 
 		lastUpdated => 1053278089
 	},
 
-	'894' => {
-		message => q|Allow discussion?|,
-		lastUpdated => 1031514049
-	},
-
 	'24' => {
 		message => q|October|,
 		lastUpdated => 1031514049
@@ -3709,19 +2989,9 @@ The toolbar for manipulating the properties of the page.
 		lastUpdated => 1031514049
 	},
 
-	'1037' => {
-		message => q|Make sticky|,
-		lastUpdated => 1066065402
-	},
-
 	'47' => {
 		message => q|Home|,
 		lastUpdated => 1031514049
-	},
-
-	'1054' => {
-		message => q|Forum (Discussion) Properties|,
-		lastUpdated => 1066583000
 	},
 
 	'681' => {
@@ -3772,307 +3042,6 @@ You can find out more about karma in <a href="http://www.plainblack.com/ruling_w
 		lastUpdated => 1031514049
 	},
 
-	'1057' => {
-		message => q|The following template variables are available in forum templates.
-<p>
-
-<b>callback.url</b><br>
-A url that points to the calling object, such as an article or user submission.
-<p>
-
-<b>callback.label</b><br>
-The default label for callback.url.
-<p>
-
-<b>user.isVisitor</b><br>
-A conditional indicating whether the user is a visitor.
-<p>
-
-<b>thread.new.url</b><br>
-The url to start a new thread.
-<p>
-
-<b>thread.new.label</b><br>
-The default label for thread.new.url.
-<p>
-
-<b>forum.search.label</b><br>
-The default label for forum.search.url.
-<p>
-
-<b>forum.search.url</b><br>
-The url to access the forum search engine.
-<p>
-
-
-<b>forum.subscribe.label</b><br>
-The default label for forum.subscribe.url.
-<p>
-
-<b>forum.subscribe.url</b><br>
-The url to subscribe to this forum.
-<p>
-
-<b>forum.unsubscribe.label</b><br>
-The default label for forum.subscribe.url.
-<p>
-
-<b>forum.unsubscribe.url</b><br>
-The url to unsubscribe from this forum.
-<p>
-
-<b>user.isSubscribed</b><br>
-A conditional indicating whether the current user is subscribed to this forum.
-<p>
-
-<b>user.isModerator</b><br>
-A conditional indicating whether the current user is a moderator for this forum.
-<p>
-
-<b>user.canPost</b><br>
-A conditional indicating whether the current user has the privileges necessary to post to this forum.
-<p>
-
-<b>thread.sortby.date.url</b><br>
-A url that will change the sorting options to be sorted by date.
-<p>
-
-<b>thread.sortedby.date</b><br>
-A conditional indicating that the thread is currently sorted by date.
-<p>
-
-<b>thread.sortby.lastreply.url</b><br>
-A url that will change the sorting options to be sorted by the date of the last reply to the thread.
-<p>
-
-<b>thread.sortedby.lastreply</b><br>
-A conditional indicating that the thread is currently sorted by last reply.
-<p>
-
-<b>thread.sortby.views.url</b><br>
-A url that will change the sorting options to be sorted by the number of views each thread has.
-<p>
-
-<b>thread.sortedby.views</b><br>
-A conditional indicating that the thread is currently sorted by views.
-<p>
-
-<b>thread.sortby.replies.url</b><br>
-A url that will change the sorting options to be sorted by the number of replies a thread has.
-<p>
-
-<b>thread.sortedby.replies</b><br>
-A conditional indicating that the thread is currently sorted by replies.
-<p>
-
-<b>thread.sortby.rating.url</b><br>
-A url that will change the sorting options to be sorted by the average rating of each thread.
-<p>
-
-<b>thread.sortedby.rating</b><br>
-A conditional indicating that the thread is currently sorted by rating.
-<p>
-
-<b>thread.sorted.asc</b><br>
-A conditional indicating that the thread is currently sorted in an ascending manner.
-<p>
-
-<b>thread.sorted.desc</b><br>
-A conditional indicating that the thread is currently sorted in an descending manner.
-<p>
-
-<b>thread.subject.label</b><br>
-A label for the subject column.
-<p>
-
-<b>thread.date.label</b><br>
-A label for the date column.
-<p>
-
-<b>thread.user.label</b><br>
-A label for the author column.
-<p>
-
-<b>thread.views.label</b><br>
-A label for the views column.
-<p>
-
-<b>thread.replies.label</b><br>
-A label for the replies column.
-<p>
-
-<b>thread.rating.label</b><br>
-A label for the rating column.
-<p>
-
-<b>thread.last.label</b><br>
-A label for the last reply column.
-<p>
-
-<b>firstpage</b><br>
-A link to the first page in a multi-page listing.
-<p>
-
-<b>lastpage</b><br>
-A link to the last page in a multi-page listing.
-<p>
-
-<b>nextpage</b><br>
-A link to the next page in a multi-page listing.
-<p>
-
-<b>pagelist</b><br>
-A series of links to every page in a multi-page listing.
-<p>
-
-<b>previouspage</b><br>
-A link to the previous page in a multi-page listing.
-<p>
-
-<b>multiplepages</b><br>
-A conditional indicating whether there are multiple pages or not.
-<p>
-
-<b>numberOfPages</b><br>
-The number of pages in a multiple page listing.
-<p>
-
-<b>pageNumber</b><br>
-The number of the current page in a multi-page listing.
-<p>
-
-<b>thread_loop</b><br>
-A loop containing all of the thread data.
-<p>
-
-<blockquote>
-
-<b>thread.views</b><br>
-The number of views this thread has had.
-<p>
-
-<b>thread.replies</b><br>
-The number of replies this thread has had.
-<p>
-
-<b>thread.rating</b><br>
-The average rating of all the posts in this thread.
-<p>
-
-<b>thread.rating_loop</b><br>
-<p>
-<blockquote>
-<b>thread.rating_loop.count</b><br>
-A counter for the rating. This can be used to "draw" a rating, such as adding a star for each rating, or some other visual approach.
-<p>
-</blockquote>
-
-<b>thread.isSticky</b><br>
-A conditional indicating whether the thread is sticky and hence will appear at the top of the forum listing.
-<p>
-
-<b>thread.isLocked</b><br>
-A conditional indicating whether the thread is locked from new posts.
-<p>
-
-<b>thread.root.subject</b><br>
-The subject of the root post in this thread.
-<p>
-
-<b>thread.root.url</b><br>
-The url to view the root post.
-<p>
-
-<b>thread.root.epoch</b><br>
-An epoch date of the root post.
-<p>
-
-<b>thread.root.date</b><br>
-A human readable date for the root post.
-<p>
-
-<b>thread.root.time</b><br>
-A human readable time for the root post.
-<p>
-
-<b>thread.root.user.id</b><br>
-The root poster's user id.
-<p>
-
-<b>thread.root.user.name</b><br>
-The username of the root poster.
-<p>
-
-<b>thread.root.user.alias</b><br>
-The alias of the root poster.
-<p>
-
-<b>thread.root.user.profile</b><br>
-The url of the root poster's profile.
-<p>
-
-<b>thread.root.user.isVisitor</b><br>
-A conditional indicating whether the root poster was a visitor.
-<p>
-
-<b>thread.root.status</b><br>
-The status of the root post.
-<p>
-
-<b>thread.last.subject</b><br>
-The subject of the last post made to this thread.
-<p>
-
-<b>thread.last.url</b><br>
-The url to the last post.
-<p>
-
-<b>thread.last.epoch</b><br>
-The post time of the last post represented as an epoch.
-<p>
-
-<b>thread.last.date</b><br>
-The human readable date of the last post.
-<p>
-
-<b>thread.last.time</b><br>
-The human readable time of the last post.
-<p>
-
-<b>thread.last.user.profile</b><br>
-The url of the last posters profile.
-<p>
-
-<b>thread.last.user.id</b><br>
-The userId of the last poster.
-<p>
-
-<b>thread.last.user.name</b><br>
-The username of the last poster.
-<p>
-
-<b>thread.last.user.isVisitor</b><br>
-A conditional indicating whether the last poster was a visitor.
-<p>
-
-<b>thread.last.status</b><br>
-The status of the last post.
-<p>
-
-<b>forum.title</b><br>
-The title of this forum as passed by the calling object.
-<p>
-
-<b>forum.description</b><br>
-The description of this forum as passed by the calling object.
-<p>
-
-
-
-</blockquote>
-|,
-		lastUpdated => 1101775435
-	},
 
 	'538' => {
 		message => q|Karma Threshold|,
@@ -4389,11 +3358,6 @@ A list of links to the 10 nearest in the paginator relative to the current page.
 		lastUpdated => 1031514049
 	},
 
-	'564' => {
-		message => q|Who can post?|,
-		lastUpdated => 1031514049
-	},
-
 	'905' => {
 		message => q|Theme Designer|,
 		lastUpdated => 1050191749
@@ -4535,11 +3499,6 @@ The local path of the directory where attachments are to be stored. (Perhaps /va
 	'1078' => {
 		message => q|There is already a user of this system with the email address you've entered.  Press "Save" if you still wish to create this user|,
 		lastUpdated => 1067951807
-	},
-
-	'1036' => {
-		message => q|Threads|,
-		lastUpdated => 1066038155
 	},
 
 	'896' => {
@@ -4754,11 +3713,6 @@ As with any delete operation, you are prompted to be sure you wish to proceed wi
 		lastUpdated => 1031514049
 	},
 
-	'892' => {
-		message => q|Discussion|,
-		lastUpdated => 1046637952
-	},
-
 	'942' => {
 		message => q|Radio List|,
 		lastUpdated => 1051464141
@@ -4799,11 +3753,6 @@ As with any delete operation, you are prompted to be sure you wish to proceed wi
 		lastUpdated => 1031514049
 	},
 
-	'1018' => {
-		message => q|Start a new thread|,
-		lastUpdated => 1065279960
-	},
-
 	'44' => {
 		message => q|Yes, I'm sure.|,
 		lastUpdated => 1031514049
@@ -4839,11 +3788,6 @@ As with any delete operation, you are prompted to be sure you wish to proceed wi
 		lastUpdated => 1031514049
 	},
 
-	'231' => {
-		message => q|Posting New Message...|,
-		lastUpdated => 1031514049
-	},
-
 	'551' => {
 		message => q|Notice|,
 		lastUpdated => 1031514049
@@ -4872,11 +3816,6 @@ As with any delete operation, you are prompted to be sure you wish to proceed wi
 	'697' => {
 		message => q|Karma, Using|,
 		lastUpdated => 1031514049
-	},
-
-	'1058' => {
-		message => q|Forum Post Template|,
-		lastUpdated => 1066576785
 	},
 
 	'987' => {
@@ -4922,11 +3861,6 @@ As with any delete operation, you are prompted to be sure you wish to proceed wi
 	'81' => {
 		message => q|Account updated successfully!|,
 		lastUpdated => 1031514049
-	},
-
-	'1023' => {
-		message => q|Unsubscribe from discussion|,
-		lastUpdated => 1065875186
 	},
 
 	'321' => {
@@ -4976,11 +3910,6 @@ Macros always begin with a caret (&#94;) and follow with at least one other char
 		lastUpdated => 1073152790
 	},
 
-	'1041' => {
-		message => q|Unlock|,
-		lastUpdated => 1066073967
-	},
-
 	'729' => {
 		message => q|0 Beginner|,
 		lastUpdated => 1033836631
@@ -4993,11 +3922,6 @@ Macros always begin with a caret (&#94;) and follow with at least one other char
 
 	'435' => {
 		message => q|Session Signature|,
-		lastUpdated => 1031514049
-	},
-
-	'401' => {
-		message => q|Are you certain you wish to delete this message and all messages under it in this thread?|,
 		lastUpdated => 1031514049
 	},
 
@@ -5137,119 +4061,6 @@ You can search users based on username and email address. You can do partial sea
 		lastUpdated => 1046637549
 	},
 
-	'1066' => {
-		message => q|These are the template variables available to the post form template.
-<p>
-
-<b>newpost.header</b><br>
-The default label for the heading of this form.
-<p>
-
-<b>newpost.isNewThread</b><br>
-A conditional indicating whether this post is a new thread.
-<p>
-
-<b>newpost.isReply</b><br>
-A conditional indicating whether this post is a reply.
-<p>
-
-<b>NOTE:</b> If the post is a reply, then the template variables from the post template are included and populated with the data from the original message.
-<p>
-
-<b>newpost.isEdit</b><br>
-A conditional indicating whether this post is an edit of an existing post.
-<p>
-
-<b>user.isVisitor</b><br>
-A conditional indicating whether the current user is a visitor.
-<p>
-
-<b>newpost.isNewMessage</b><br>
-A conditional basically opposite of newpost.isEdit.
-<p>
-
-<b>form.begin</b><br>
-The form header.
-<p>
-
-<b>sticky.label</b><br>
-The default label for sticky.form.
-<p>
-
-<b>sticky.form</b><br>
-A form element for making the thread sticky.
-<p>
-
-<b>subscribe.label</b><br>
-The default label for subscribe.form.
-<p>
-
-<b>subscribe.form</b><br>
-A form element for subscribing to the thread.
-<p>
-
-<b>lock.label</b><br>
-The default label for lock.form.
-<p>
-
-<b>lock.form</b><br>
-A form element for locking the thread.
-<p>
-
-<b>contenttype.label</b><br>
-The default label for contentType.form.
-<p>
-
-<b>contentType.form</b><br>
-A form element for selecting what type of content is being posted.
-<p>
-
-<b>user.isModerator</b><br>
-A conditional indicating whether the current user is a moderator.
-<p>
-
-<b>allowReplacements</b><br>
-A conditional indicating whether this forum uses content filters.
-<p>
-
-
-<b>message.label</b><br>
-The default label for message.form.
-<p>
-
-<b>message.form</b><br>
-The form element for the user to enter their message.
-<p>
-
-<b>visitorName.label</b><br>
-The default label for visitorName.form.
-<p>
-
-<b>visitorName.form</b><br>
-A form element that allows the user to enter a display name if they are a visitor.
-<p>
-
-<b>form.submit</b><br>
-The submit button for the form.
-<p>
-
-<b>subject.label</b><br>
-The default label for subject.form.
-<p>
-
-<b>subject.form</b><br>
-A form element that allows users to enter a subject for their message.
-<p>
-
-
-<b>form.end</b><br>
-The form footer.
-<p>
-
-|,
-		lastUpdated => 1101775486,
-	},
-
 	'702' => {
 		message => q|Month(s)|,
 		lastUpdated => 1031514049
@@ -5292,11 +4103,6 @@ Create your template by using template commands and variables, macros, and HTML.
 		lastUpdated => 1031514049
 	},
 
-	'873' => {
-		message => q|Subscribe to thread|,
-		lastUpdated => 1065876827
-	},
-
 	'636' => {
 		message => q|To create a package follow these simple steps:
 
@@ -5322,11 +4128,6 @@ Privileges and styles assigned to pages in the package will not be copied when t
 <p>
 |,
 		lastUpdated => 1038889481
-	},
-
-	'577' => {
-		message => q|Post Reply|,
-		lastUpdated => 1031514049
 	},
 
 	'561' => {
@@ -5510,109 +4311,6 @@ Privileges and styles assigned to pages in the package will not be copied when t
 		lastUpdated => 1078570360
 	},
 
-	'1055' => {
-		message => q|WebGUI has a very powerful built-in discussion system called Forums. Forums are
-        contained by the Message Board wobject, and may also be added to other wobjects
-        such as Articles or USS's.
-<p>
-Forums (aka Discussions) have many settable properties. The following is a comprehensive list:
-<p>
-
-<b>Forum Template</b><br>
-A template that controls the layout of the forum view.
-<p>
-
-<b>Thread Template</b><br>
-A template that controls the layout of the thread view.
-<p>
-
-<b>Post Template</b><br>
-A template that controls the layout of the post view.
-<p>
-
-<b>Search Template</b><br>
-A template that controls the layout of the search engine interface and search results.
-<p>
-
-<b>Post Form Template</b><br>
-A template that controls the form that users see when posting a new message.
-<p>
-
-<b>Post Preview Template</b><br>
-A template that controls the layout of the preview of a message posting.
-<p>
-
-<b>Use Post Preview</b><br>
-If set to yes a preview of the posted message will be shown before adding it to the forum.
-<p>
-
-<b>Notification Template</b><br>
-A template that controls the layout of subscription notification messages sent to users.
-<p>
-
-<b>Archive After</b><br>
-If a thread hasn't had a new message after this interval has expired then it will be flagged as "archived" and will only be accessible via the search engine.
-<p>
-
-<b>Edit Timeout</b><br>
-The interval of time that the user has to edit their message after their initial post.
-<p>
-<i>NOTE:</i> Don't set this limit too high. One of the great things about discussions is that they are an accurate record of who said what. If you allow editing for a long time, then a user has a chance to go back and change his/her mind a long time after the original statement was made.
-<p>
-
-<b>Add edit stamp to posts?</b><br>
-If set to yes then a string will be added to the bottom of a post each time its edited.
-<p>
-
-<b>Allow rich edit?</b><br>
-If set to yes then users will be able to use a rich editor when writing their posts.
-<p>
-
-<b>Use content filters?</b><br>
-If set to yes then content filters will be applied to the post. Content filters can be managed from the settings.
-<p>
-
-<b>Filter Post</b><br>
-Select what types of content you will filter from a user's post.
-<p>
-
-<b>Threads Per Page</b><br>
-The number of threads to display on a single page in a forum.
-<p>
-
-<b>Posts Per Page</b><br>
-The number of posts (within a thread) to display on a single page.
-<p>
-
-<b>Who can view?</b><br>
-A group that is allowed to view messages.
-<p>
-
-<b>Karma Per Post</b><br>
-How much karma should be given to a user when they post a message?  Note, karma
-must be enabled in the Admin Console -> Settings -> User form for property to
-be present. 
-<p>
-
-<b>Who can post?</b><br>
-A group that is allowed to post new messages.
-<p>
-
-<b>Moderate posts?</b><br>
-If set to yes then posts will be set to pending by default and will not be displayed until a moderator approves the message.
-<p>
-
-<b>Who can moderate?</b><br>
-A group that is allowed to moderate messages.
-<p>
-
-<b>Move Forum (Message Board only)</b><br>
-You can move an existing forum to another Message Board. If set to 'No Change' the forum will stay at the current board.  This option is only available when editing an existing Forum.
-<p>
-|,
-		lastUpdated => 1101775516,
-	},
-
 	'88' => {
 		message => q|Users In Group|,
 		lastUpdated => 1031514049
@@ -5709,16 +4407,6 @@ What group should be alerted when a new user registers?
 	'1070' => {
 		message => q|Config Sitename|,
 		lastUpdated => 1066641473
-	},
-
-	'1024' => {
-		message => q|Filter Post|,
-		lastUpdated => 1046607477
-	},
-
-	'1060' => {
-		message => q|Forum Thread Template|,
-		lastUpdated => 1066578513
 	},
 
 	'703' => {
@@ -5873,11 +4561,6 @@ A randomly generated number. This is often used on images (such as banner ads) t
 		lastUpdated => 1031514049
 	},
 
-	'1042' => {
-		message => q|Posts Per Page|,
-		lastUpdated => 1066394411
-	},
-
 	'356' => {
 		message => q|Template|,
 		lastUpdated => 1031514049
@@ -5967,26 +4650,7 @@ config file.</p>
                 lastUpdated => 1102031745,
                 context => q|Help body for Page Export operation|
         },
-	'Forum, Threads Per Page' => {
-		message => q|Threads Per Page|,
-		lastUpdated =>1092652208,
-		context => q|Field label for Edit Forum|
-	},
-	'Forum, Preview Heading' => {
-		message => q|Message Preview|,
-		lastUpdated =>1092745088,
-		context => q|Label for Forum Preview heading|
-	},
-	'Forum, Post Preview Template' => {
-		message => q|Post Preview Template|,
-		lastUpdated =>1092748557,
-		context => q|Label for Forum Settings|
-	},
-	'Forum, use preview' => {
-		message => q|Use Post Preview?|,
-		lastUpdated =>1092748557,
-		context => q|Label for Forum Settings|
-	},
+
 	'tinymce' => {
                 message => q|TinyMCE (IE, mozilla)|,
                 lastUpdated =>1092748557,
@@ -5997,21 +4661,7 @@ config file.</p>
                 lastUpdated =>1092748557,
                 context => q|asset property|
         },
-	'Forum, Post Preview Template Title' => {
-		message => q|Forum Post Preview Template|,
-		lastUpdated =>1092930637,
-		context => q|help title forum post preview template|
-	},
-	'Forum, Post Preview Template Body' => {
-		message => q|
-<p>This template uses the same template variables as the Forum Post Template.</p>
 
-
-
-|,
-		lastUpdated =>1099614353,
-		context => q|help body forum post preview template|
-	},
 	'cancel' => {
 		message => q|cancel|,
 		lastUpdated =>1092930637,

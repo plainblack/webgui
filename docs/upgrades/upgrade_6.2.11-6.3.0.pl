@@ -199,6 +199,7 @@ WebGUI::SQL->write("alter table WobjectProxy change proxyByCriteria shortcutByCr
 WebGUI::SQL->write("alter table WobjectProxy change proxyCriteria shortcutCriteria text not null");
 WebGUI::SQL->write("alter table WobjectProxy rename Shortcut");
 WebGUI::SQL->write("update asset set className='WebGUI::Asset::Shortcut' where className='WebGUI::Asset::Wobject::WobjectProxy'");
+WebGUI::SQL->write("delete from wobject where assetId is null or assetId = ''"); # protect ourselves from crap
 WebGUI::SQL->write("alter table wobject drop column wobjectId");
 WebGUI::SQL->write("alter table wobject add primary key (assetId)");
 WebGUI::SQL->write("alter table wobject drop column templateId");
@@ -247,7 +248,7 @@ WebGUI::SQL->write("alter table Product_related drop column wobjectId");
 WebGUI::SQL->write("alter table Product_specification drop column wobjectId");
 WebGUI::SQL->write("alter table Product_related drop column RelatedWobjectId");
 WebGUI::SQL->write("alter table Product_accessory drop column AccessoryWobjectId");
-# I sure hope all the events got a unique assetId, because if they didn't.......
+WebGUI::SQL->write("delete from EventsCalendar_event where assetId is null or assetId = ''"); # protect ourselves from crap
 WebGUI::SQL->write("alter table EventsCalendar_event add primary key (assetId)");
 WebGUI::SQL->write("alter table EventsCalendar_event drop column name");
 WebGUI::SQL->write("alter table EventsCalendar_event drop column wobjectId");
@@ -457,6 +458,7 @@ my %folderNameCache;
 my $collateralRankCounter = 1;
 my $sth = WebGUI::SQL->read("select * from collateralFolder where collateralFolderId <> '0'");
 while (my $data = $sth->hashRef) {
+	print "\t\tConverting folder ".$data->{collateralFolderId}."\n" unless ($quiet);
 	my $url = fixUrl('doesntexist',$data->{name});
 	$folderNameCache{$data->{name}} = $url;
 	my $folderId = WebGUI::SQL->setRow("asset","assetId",{
@@ -494,6 +496,7 @@ my $lastCollateralFolderId = 'nolastid';
 my ($parentId, $baseLineage, $rank);
 my $sth = WebGUI::SQL->read("select * from collateral order by collateralFolderId");
 while (my $data = $sth->hashRef) {
+	print "\t\tConverting collateral item ".$data->{collateralId}." for folder ".$data->{collateralFolderId}."\n" unless ($quiet);
 	unless ($lastCollateralFolderId eq $data->{collateralFolderId}) {
 		$rank = 1;
 		my $id = $data->{collateralFolderId};
@@ -1068,6 +1071,7 @@ $sth->finish;
 WebGUI::SQL->write("alter table template drop primary key");
 WebGUI::SQL->write("alter table template drop column templateId");
 WebGUI::SQL->write("alter table template drop column name");
+WebGUI::SQL->write("delete from  where assetId is null or assetId = ''"); # protect ourselves from crap
 WebGUI::SQL->write("alter table template add primary key (assetId)");
 my @wobjectTypes = qw(Article Poll Survey WSClient DataForm Layout EventsCalendar Navigation HttpProxy IndexedSearch MessageBoard Product SQLReport SyndicatedContent Shortcut);
 my @allWobjectTypes = (@wobjectTypes,@otherWobjects);
