@@ -43,7 +43,8 @@ sub _photogalleryView {
         my (@row, $i, $y, $image, $output, $p, $sth, %submission);
         tie %submission, 'Tie::CPHash';
         $sth = WebGUI::SQL->read("select title, image, submissionId, status, userId from UserSubmission_submission
-                where wobjectId=".$_[0]->get("wobjectId")." and (status='Approved' or userId=$session{user}{userId}) order by dateSubmitted desc");
+                where wobjectId=".$_[0]->get("wobjectId")." and (status='Approved' or userId=$session{user}{userId}) 
+		order by dateSubmitted desc");
         while (%submission = $sth->hash) {
                 $submission{title} = WebGUI::HTML::filter($submission{title},'all');
 		if ($y == 0) {
@@ -643,7 +644,7 @@ sub www_view {
 
 #-------------------------------------------------------------------
 sub www_viewSubmission {
-	my ($output, %submission, $file, $replies);
+	my ($output, %submission, $file, @data, $replies);
 	tie %submission, 'Tie::CPHash';
 	WebGUI::SQL->write("update UserSubmission_submission set views=views+1 where submissionId=$session{form}{sid}");
 	%submission = WebGUI::SQL->quickHash("select * from UserSubmission_submission where submissionId=$session{form}{sid}");
@@ -661,6 +662,20 @@ sub www_viewSubmission {
 	$output .= '<b>'.WebGUI::International::get(514).':</b> '.$submission{views}.'<br>';
 	$output .= '</td><td rowspan="2" class="tableMenu" nowrap valign="top">';
   #---menu
+	@data = WebGUI::SQL->quickArray("select max(submissionId) from UserSubmission_submission 
+        	where wobjectId=$submission{wobjectId} and submissionId<$submission{submissionId}
+		and (userId=$submission{userId} or status='Approved')");
+        if ($data[0] ne "") {
+        	$output .= '<a href="'.WebGUI::URL::page('func=viewSubmission&sid='.$data[0].'&wid='.
+                	$session{form}{wid}).'">&laquo; '.WebGUI::International::get(58,$namespace).'</a><br>';
+        }
+        @data = WebGUI::SQL->quickArray("select min(submissionId) from UserSubmission_submission 
+                where wobjectId=$submission{wobjectId} and submissionId>$submission{submissionId}
+		and (userId=$submission{userId} or status='Approved')");
+        if ($data[0] ne "") {
+                $output .= '<a href="'.WebGUI::URL::page('func=viewSubmission&sid='.$data[0].'&wid='.
+                        $session{form}{wid}).'">'.WebGUI::International::get(59,$namespace).' &raquo;</a><br>';
+        }
         if ($submission{userId} == $session{user}{userId} || WebGUI::Privilege::isInGroup($_[0]->get("groupToApprove"))) {
                 $output .= '<a href="'.WebGUI::URL::page('func=deleteSubmission&wid='.$session{form}{wid}.'&sid='.
 			$session{form}{sid}).'">'.WebGUI::International::get(37,$namespace).'</a><br>';

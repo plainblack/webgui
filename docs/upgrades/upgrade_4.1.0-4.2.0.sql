@@ -53,6 +53,8 @@ delete from international where namespace='Article' and internationalId=26;
 insert into international values (578,'WebGUI','English','You have a pending message to approve.');
 insert into international values (579,'WebGUI','English','Your message has been approved.');
 insert into international values (580,'WebGUI','English','Your message has been denied.');
+insert into international values (58,'UserSubmission','English','Previous Submission');
+insert into international values (59,'UserSubmission','English','Next Submission');
 
 
 
