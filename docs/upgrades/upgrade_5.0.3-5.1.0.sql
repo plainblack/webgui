@@ -55,8 +55,22 @@ insert into international (internationalId,languageId,namespace,message,lastUpda
 insert into international (internationalId,languageId,namespace,message,lastUpdated) values (869,1,'WebGUI','Welcome Message', 1044138730);
 insert into international (internationalId,languageId,namespace,message,lastUpdated) values (868,1,'WebGUI','Send welcome message?', 1044138691);
 insert into international (internationalId,languageId,namespace,message,lastUpdated) values (870,1,'WebGUI','Welcome', 1044139461);
-
-
+insert into international (internationalId,languageId,namespace,message,lastUpdated) values (872,1,'WebGUI','Who can view?', 1044218038);
+insert into international (internationalId,languageId,namespace,message,lastUpdated) values (871,1,'WebGUI','Who can edit?', 1044218026);
+alter table page add groupIdView int(11) not null default 3;
+alter table page add groupIdEdit int(11) not null default 3;
+update page set groupIdEdit = groupId where groupEdit = 1;
+update page set groupIdEdit = 3 where groupEdit = 0;
+update page set groupIdView = 7 where worldView = 1;
+update page set groupIdView = groupId where worldView = 0 and (groupView = 1 OR groupEdit = 1);
+update page set groupIdView = 3 where worldView = 0 and groupView = 0 and groupEdit = 0;
+alter table page drop column groupId;
+alter table page drop column groupView;
+alter table page drop column groupEdit;
+alter table page drop column worldView;
+alter table page drop column worldEdit;
+alter table page drop column ownerView;
+alter table page drop column ownerEdit;
 
 
 

@@ -33,10 +33,8 @@ sub _recursivelyChangePrivileges {
         $sth = WebGUI::SQL->read("select pageId from page where parentId=$_[0]");
         while (($pageId) = $sth->array) {
         	WebGUI::SQL->write("update page set startDate=$session{form}{startDate}, endDate=$session{form}{endDate},
-			ownerId=$session{form}{ownerId}, ownerView=$session{form}{ownerView}, 
-			ownerEdit=$session{form}{ownerEdit}, groupId='$session{form}{groupId}', groupView=$session{form}{groupView}, 
-			groupEdit=$session{form}{groupEdit}, worldView=$session{form}{worldView}, worldEdit=$session{form}{worldEdit} 
-			where pageId=$pageId");
+			ownerId=$session{form}{ownerId},  groupIdView=$session{form}{groupIdView}, 
+			groupIdEdit=$session{form}{groupIdEdit} where pageId=$pageId");
                 _recursivelyChangePrivileges($pageId);
         }
 	$sth->finish;
@@ -222,8 +220,6 @@ sub www_editPage {
 			$page{title} = $page{menuTitle} = $page{urlizedTitle} = $page{synopsis} = '';
 			$page{parentId} = $session{form}{npp};
 			$page{ownerId} = $session{user}{userId};
-			$page{ownerEdit} = 1;
-			$page{ownerView} = 1;
 		} else {
 			%page = %{$session{page}};
 			($childCount) = WebGUI::SQL->quickArray("select count(*) from page where parentId=$page{pageId}");
@@ -335,33 +331,25 @@ sub www_editPage {
 			-value=>$page{endDate},
 			-uiLevel=>9
 			);
-		%hash = WebGUI::SQL->buildHash("select users.userId,users.username from users,groupings 
-			where (groupings.groupId=4 or groupings.groupId=3) and groupings.userId=users.userId 
-			order by users.username");
 		if (WebGUI::Privilege::isInGroup(3)) {
 			$subtext = ' &nbsp; <a href="'.WebGUI::URL::page('op=listUsers').'">'
 				.WebGUI::International::get(7).'</a>';
 		} else {
 			$subtext = "";
 		}
+		my $clause; 
+		if (WebGUI::Privilege::isInGroup(3)) {
+			$clause = "userId<>1 and status='Active'";
+		} else {
+			$clause = "userId=$page{ownerId}";
+                }
+		my $users = WebGUI::SQL->buildHashRef("select userId,username from users where $clause order by username");
 		$f->select(
 			-name=>"ownerId",
-			-options=>\%hash,
+			-options=>$users,
 			-label=>WebGUI::International::get(108),
 			-value=>[$page{ownerId}],
 			-subtext=>$subtext,
-			-uiLevel=>9
-			);
-		$f->yesNo(
-			-name=>"ownerView",
-			-label=>WebGUI::International::get(109),
-			-value=>$page{ownerView},
-			-uiLevel=>9
-			);
-                $f->yesNo(
-			-name=>"ownerEdit",
-			-label=>WebGUI::International::get(110),
-			-value=>$page{ownerEdit},
 			-uiLevel=>9
 			);
 		if (WebGUI::Privilege::isInGroup(3)) {
@@ -371,35 +359,20 @@ sub www_editPage {
 			$subtext = "";
 		}
 		$f->group(
-			-name=>"groupId",
-			-label=>WebGUI::International::get(111),
-			-value=>[$page{groupId}],
+			-name=>"groupIdView",
+			-label=>WebGUI::International::get(872),
+			-value=>[$page{groupIdView}],
 			-subtext=>$subtext,
 			-uiLevel=>9
 			);
-		$f->yesNo(
-			-name=>"groupView",
-			-label=>WebGUI::International::get(112),
-			-value=>$page{groupView},
-			-uiLevel=>9
-			);
-                $f->yesNo(
-			-name=>"groupEdit",
-			-label=>WebGUI::International::get(113),
-			-value=>$page{groupEdit},
-			-uiLevel=>9);
-                $f->yesNo(
-			-name=>"worldView",
-			-label=>WebGUI::International::get(114),
-			-value=>$page{worldView},
-			-uiLevel=>9
-			);
-                $f->yesNo(
-			-name=>"worldEdit",
-			-label=>WebGUI::International::get(115),
-			-value=>$page{worldEdit},
-			-uiLevel=>9
-			);
+                $f->group(
+                        -name=>"groupIdEdit",
+                        -label=>WebGUI::International::get(871),
+                        -value=>[$page{groupIdEdit}],
+                        -subtext=>$subtext,
+			-excludeGroups=>[1,7],
+                        -uiLevel=>9
+                        );
 		if ($childCount) {
                 	$f->yesNo(
 				-name=>"recursePrivs",
@@ -417,7 +390,8 @@ sub www_editPage {
                                 	gotoNewPage=>WebGUI::International::get(823),
                                	 	backToPage=>WebGUI::International::get(847)
                                 	},
-                        	-value=>"gotoNewPage"
+                        	-value=>"gotoNewPage",
+				-uiLevel=>1
                         	);
         	}
 		$f->submit;
@@ -454,13 +428,8 @@ sub www_editPageSave {
 		title=".quote($session{form}{title}).", 
 		styleId=$session{form}{styleId}, 
 		ownerId=$session{form}{ownerId}, 
-		ownerView=$session{form}{ownerView}, 
-		ownerEdit=$session{form}{ownerEdit}, 
-		groupId='$session{form}{groupId}', 
-		groupView=$session{form}{groupView}, 
-		groupEdit=$session{form}{groupEdit}, 
-		worldView=$session{form}{worldView}, 
-		worldEdit=$session{form}{worldEdit},
+		groupIdView=$session{form}{groupIdView}, 
+		groupIdEdit=$session{form}{groupIdEdit}, 
 		startDate=$session{form}{startDate},
 		endDate=$session{form}{endDate},
 		metaTags=".quote($session{form}{metaTags}).", 

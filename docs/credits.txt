@@ -15,6 +15,7 @@ Contributing Developers..............Peter Beardsley / Appropriate Solutions, In
                                      Jeff Depons / Web Den Interactive
                                      Frank Dillon / Web Den Interactive
                                      Junying Du / Web Den Interactive
+                                     Ed Van Duinen / UNC
                                      Greg Fast / Web Den Interactive
                                      Chris Gebhardt / OpenServe
                                      Andy Grundman
