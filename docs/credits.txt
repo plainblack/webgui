@@ -5,15 +5,21 @@
 The following people/companies are responsible for WebGUI:
 
 WebGUI Core..........................JT Smith / Plain Black Software
-German Translation...................Mattias Kunkel / WERU AG
+
+Contributing Developers..............Peter Beardsley / Appropriate Solutions, Inc.
+                                     Richard Caelius
+                                     Flavio Curti
+                                     Frank Dillon
+                                     Koen de Jonge
+                                     Christophe Marcant
+
+Translation..........................Joeri de Bruin
+                                     Jose Caneira
+                                     Mattias Kunkel / WERU AG
+                                     Ricardo Markiewicz
+
 Perl.................................Larry Wall / O'Reilly
-Data::Config.........................Sébastien Aperghis-Tramoni
-IE Rich Edit.........................Brattli
-Spanish Translation..................Ricardo Markiewicz
-Portuguese Translation...............Jose Caneira
-Dutch Translation....................Joeri de Bruin
-mod_rewrite Support..................Peter Beardsley / Appropriate Solutions, Inc.
-Oracle testing.......................Richard Caelius
-Image Manager concept................Frank Dillon
 RSSLite..............................Scott Thomason
+IE Rich Edit.........................Brattli
+Data::Config.........................Sébastien Aperghis-Tramoni
 
