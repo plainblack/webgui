@@ -55,33 +55,6 @@ function returnSelected(in_values) {
 <option value='^\;'>Current Page URL</option>
 </select>
 
-<select onchange="returnSelected(this.value)">
-<option value=''>Programmer...</option>
-<option value='^D;'>Date</option>
-<option value='^Execute("/path/to/script");'>Execute a Script</option>
-<option value='^Include("/path/to/file.txt");'>Include a Text File</option>
-<option value='^SQL("select count(*) from users", "There are ^0; on this system.");'>Quick SQL Query</option>
-<option value='^User("urlizedTitle");'>User Property</option>
-<option value='^Env("HTTP_USER_AGENT");'>Environment Variable</option>
-<option value='^Page("urlizedTitle");'>Page Property</option>
-<option value='^International(300);'>Get an International Message</option>
-<option value='^If("1==1","1 is exactly 1","The universe has gone weird.");'>If Condition</option>
-<option value='^*(100);'>Random Number</option>
-<option value='^FormParam("phoneNumber");'>Form Parameter</option>
-<option value='^URLEncode("This string of text.");'>URL Encode</option>
-<option value='^-;'>Begin/End SQL Looping</option>
-<option value='^rownum;'>SQL Row Number</option>
-<option value='^0;'>SQL Column 1</option>
-<option value='^1;'>SQL Column 2</option>
-<option value='^2;'>SQL Column 3</option>
-<option value='^3;'>SQL Column 4</option>
-<option value='^4;'>SQL Column 5</option>
-<option value='^5;'>SQL Column 6</option>
-<option value='^6;'>SQL Column 7</option>
-<option value='^7;'>SQL Column 8</option>
-<option value='^8;'>SQL Column 9</option>
-<option value='^9;'>SQL Column 10</option>
-</select>
 
 <select onchange="returnSelected(this.value)">
 <option value=''>User...</option>
