@@ -217,7 +217,7 @@ sub www_checkoutSubmit {
 
 #-------------------------------------------------------------------
 sub www_completePendingTransaction {
-	return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
+	return WebGUI::AdminConsole->new("commerce")->render(WebGUI::Privilege::adminOnly()) unless (WebGUI::Grouping::isInGroup(3));
 
 	WebGUI::Commerce::Transaction->new($session{form}{tid})->completeTransaction;
 
@@ -247,7 +247,7 @@ sub www_confirmTransaction {
 #-------------------------------------------------------------------
 sub www_editCommerceSettings {
 	my (%tabs, $tabform, $jscript, $currentPlugin, $ac, $jscript, $i18n, $paymentPlugin, @paymentPlugins, %paymentPlugins, @failedPaymentPlugins, $plugin);
-	return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
+	return WebGUI::AdminConsole->new("commerce")->render(WebGUI::Privilege::adminOnly()) unless (WebGUI::Grouping::isInGroup(3));
 	
 	$i18n = WebGUI::International->new('Commerce');
 	
@@ -342,7 +342,7 @@ sub www_editCommerceSettings {
 
 #-------------------------------------------------------------------
 sub www_editCommerceSettingsSave {
-	return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
+	return WebGUI::AdminConsole->new("commerce")->render(WebGUI::Privilege::adminOnly()) unless (WebGUI::Grouping::isInGroup(3));
 	
 	foreach (keys(%{$session{form}})) {
 		# Store the plugin confiuration data in a special table for security and the general settings in the
@@ -365,7 +365,7 @@ sub www_editCommerceSettingsSave {
 #-------------------------------------------------------------------
 sub www_listPendingTransactions {
 	my ($p, $transactions, $output, $properties, $i18n);
-	return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
+	return WebGUI::AdminConsole->new("commerce")->render(WebGUI::Privilege::adminOnly()) unless (WebGUI::Grouping::isInGroup(3));
 	
 	$i18n = WebGUI::International->new("Commerce");
 

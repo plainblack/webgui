@@ -81,11 +81,6 @@ our $I18N = {
 		lastUpdated => 1031514049
 	},
 
-	'798' => {
-		message => q|Page Title|,
-		lastUpdated => 1036978688
-	},
-
 	'1031' => {
 		message => q|Forum Template|,
 		lastUpdated => 1066034528
@@ -1441,11 +1436,6 @@ As with any delete operation, you are prompted to be sure you wish to proceed wi
 		lastUpdated => 1056151382
 	},
 
-	'800' => {
-		message => q|Unique Visitors|,
-		lastUpdated => 1036978829
-	},
-
 	'381' => {
 		message => q|WebGUI received a malformed request and was unable to continue. Proprietary characters being passed through a form typically cause this. Please feel free to hit your back button and try again.|,
 		lastUpdated => 1031514049
@@ -1549,11 +1539,6 @@ As with any delete operation, you are prompted to be sure you wish to proceed wi
 	'1033' => {
 		message => q|Post Template|,
 		lastUpdated => 1066034603
-	},
-
-	'796' => {
-		message => q|View page statistics.|,
-		lastUpdated => 1036978043
 	},
 
 	'445' => {
@@ -2070,11 +2055,6 @@ A message stating that the user is receiving the message because they subscribed
 
 	'17' => {
 		message => q|March|,
-		lastUpdated => 1031514049
-	},
-
-	'427' => {
-		message => q|Styles|,
 		lastUpdated => 1031514049
 	},
 
@@ -2602,11 +2582,6 @@ The Groups page displays all groups that you are allowed to edit.  The form on t
 	'1076' => {
 		message => q|WebGUI Database|,
 		lastUpdated => 1070899134
-	},
-
-	'797' => {
-		message => q|View traffic statistics.|,
-		lastUpdated => 1036978191
 	},
 
 	'510' => {
@@ -3233,11 +3208,6 @@ The translated label for the link to the home page or the text that you supply t
 		lastUpdated => 1037580328
 	},
 
-	'795' => {
-		message => q|Roots|,
-		lastUpdated => 1036972103
-	},
-
 	'794' => {
 		message => q|Packages|,
 		lastUpdated => 1036971944
@@ -3628,11 +3598,6 @@ Large sites using external group data will be making many calls to the external 
 	'314' => {
 		message => q|First Name|,
 		lastUpdated => 1031514049
-	},
-
-	'801' => {
-		message => q|Wobject Interactions|,
-		lastUpdated => 1036978843
 	},
 
 	'985' => {
@@ -4899,11 +4864,6 @@ As with any delete operation, you are prompted to be sure you wish to proceed wi
 		lastUpdated => 1066492301
 	},
 
-	'148' => {
-		message => q|Wobjects|,
-		lastUpdated => 1045312362
-	},
-
 	'753' => {
 		message => q|Edit this group.|,
 		lastUpdated => 1036866979
@@ -5077,8 +5037,8 @@ Macros always begin with a caret (&#94;) and follow with at least one other char
 	},
 
 	'147' => {
-		message => q|Pages|,
-		lastUpdated => 1031514049
+		message => q|Assets|,
+		lastUpdated => 1091514049
 	},
 
 	'973' => {
@@ -5099,11 +5059,6 @@ Macros always begin with a caret (&#94;) and follow with at least one other char
 	'863' => {
 		message => q|Delete Offset|,
 		lastUpdated => 1044126633
-	},
-
-	'749' => {
-		message => q|Track page statistics?|,
-		lastUpdated => 1036736182
 	},
 
 	'531' => {
@@ -5816,11 +5771,6 @@ What group should be alerted when a new user registers?
 		lastUpdated => 1046638916
 	},
 
-	'799' => {
-		message => q|Page Views|,
-		lastUpdated => 1036978804
-	},
-
 	'925' => {
 		message => q|You already have another version of this theme installed. You must delete it before installing it again.|,
 		lastUpdated => 1050264954
@@ -5936,11 +5886,6 @@ A randomly generated number. This is often used on images (such as banner ads) t
 	'1042' => {
 		message => q|Posts Per Page|,
 		lastUpdated => 1066394411
-	},
-
-	'802' => {
-		message => q|WebGUI is not currently tracking page statistics. You can enable this feature in the settings.|,
-		lastUpdated => 1036979395
 	},
 
 	'356' => {

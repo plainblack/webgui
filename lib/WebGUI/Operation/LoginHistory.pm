@@ -23,7 +23,7 @@ use WebGUI::SQL;
 
 #-------------------------------------------------------------------
 sub www_viewLoginHistory {
-        return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
+        return WebGUI::AdminConsole->new("loginHistory")->render(WebGUI::Privilege::adminOnly()) unless (WebGUI::Grouping::isInGroup(3));
 	my ($output, $p, @row, $i, $sth, %data);
 	tie %data, 'Tie::CPHash';
 	$sth = WebGUI::SQL->read("select * from users,userLoginLog where users.userId=userLoginLog.userId order by userLoginLog.timeStamp desc");	

@@ -268,15 +268,6 @@ sub logView {
 # not sure what this will do in the new model
 #		WebGUI::PassiveProfiling::addPage();	# add wobjects on asset to passive profile log
 	}
- # disabled for the time being because it's dangerous
-                #       if ($session{form}{op} eq "" && $session{setting}{trackPageStatistics} && $session{form}{wid} ne "new") {
-                #               WebGUI::SQL->write("insert into pageStatistics (dateStamp, userId, username, ipAddress, userAgent, referer,
-                #                       assetId, assetTitle, wobjectId, wobjectFunction) values (".time().",".quote($session{user}{userId})
-                #                       .",".quote($session{user}{username}).",
-                #                       ".quote($session{env}{REMOTE_ADDR}).", ".quote($session{env}{HTTP_USER_AGENT}).",
-                #                       ".quote($session{env}{HTTP_REFERER}).", ".quote($session{asset}{assetId}).",
-                #                       ".quote($session{asset}{title}).", ".quote($session{form}{wid}).", ".quote($session{form}{func}).")");
-                #       }
 	return;
 }
 
@@ -570,7 +561,7 @@ Renders self->view based upon current style, subject to timeouts. Returns Privil
 sub www_view {
 	my $self = shift;
 	$self->logView();
-	return WebGUI::Privilege::noAccess() unless $self->canView;
+	return $self->processStyle(WebGUI::Privilege::noAccess()) unless $self->canView;
 	my $cache;
 	my $output;
         my $useCache = (

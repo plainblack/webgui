@@ -14,15 +14,12 @@ use strict;
 use Tie::IxHash;
 use Tie::CPHash;
 use WebGUI::AdminConsole;
-use WebGUI::Attachment;
-use WebGUI::Collateral;
 use WebGUI::Grouping;
 use WebGUI::HTMLForm;
 use WebGUI::HTTP;
 use WebGUI::Icon;
 use WebGUI::Id;
 use WebGUI::International;
-use WebGUI::Node;
 use WebGUI::Paginator;
 use WebGUI::Privilege;
 use WebGUI::Session;
@@ -389,6 +386,7 @@ sub www_importThemeSave {
 
 #-------------------------------------------------------------------
 sub www_listThemes {
+	return WebGUI::AdminConsole->new("themes")->render("Themes are disabled in this version of WebGUI. They will return in a future release.");
         return WebGUI::Privilege::insufficient unless (WebGUI::Grouping::isInGroup(9));
         my ($output,@data, @row, $i, $p);
         my $sth = WebGUI::SQL->read("select themeId,name,original from theme order by name");

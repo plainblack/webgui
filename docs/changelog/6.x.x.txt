@@ -64,6 +64,14 @@
  - Added an asset picker form control.
  - Shortcuts can now proxy every type of asset, not just wobjects.
  - Added a codearea form control.
+ - fix [ 1055362 ] Trash items show up in Search resultsA
+ - fix [ 1049367 ] /uploads/temp/templates/ shouldn't be public
+ - fix [ 1052801 ] wobjectproxy throws security error on editSubmission
+ - fix [ 1028921 ] Cannot drag n drop proxy wobjects
+ - fix [ 1003509 ] Admin mode breaks page layout with users not in Admin Group
+ - Removed the page stats tracking function as it was killing people's sites.
+   We recommend AWStats instead (www.awstats.org)
+
 
 
 6.2.11

@@ -26,7 +26,7 @@ use WebGUI::URL;
 
 #-------------------------------------------------------------------
 sub www_editSettings {
-	return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
+	return WebGUI::AdminConsole->new("settings")->render(WebGUI::Privilege::adminOnly()) unless (WebGUI::Grouping::isInGroup(3));
 	my $i18n = WebGUI::International->new("WebGUI");
 	my %tabs;
 	tie %tabs, 'Tie::IxHash';
@@ -164,11 +164,6 @@ sub www_editSettings {
 		-label=>$i18n->get(707),
 		-value=>$session{setting}{showDebug}
 		);
-	$tabform->getTab("misc")->yesNo(
-		-name=>"trackPageStatistics",
-		-label=>$i18n->get(749),
-		-value=>$session{setting}{trackPageStatistics}
-		);
 	$tabform->getTab("misc")->selectList(
 		-name=>"hostToUse",
 		-value=>[$session{setting}{hostToUse}],
@@ -250,7 +245,7 @@ sub www_editSettings {
 
 #-------------------------------------------------------------------
 sub www_saveSettings {
-	return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
+	return WebGUI::AdminConsole->new("settings")->render(WebGUI::Privilege::adminOnly()) unless (WebGUI::Grouping::isInGroup(3));
 	my ($key, $value);
 	foreach $key (keys %{$session{form}}) {
 		$value = $session{form}{$key};
