@@ -424,7 +424,7 @@ Saves the event or a new (series of) event(s).
 
 sub www_editSave {
 	my $self = shift;
-	my $object;
+	my $object = $self;
 	# Somebody please help me debug this... it was adding recurring events just fine; then 
 	# I changed something and it stopped working... :(  I suspect it has something to do 
 	# with processPropertiesFromFormPost.  It's as if $session{form}{recursEvery} always equals never.	
