@@ -2,6 +2,9 @@
  - Made a dramatic performance enhancement to the page tree system by
    restructuring an overused, and inefficent method.
  - bugfix [1024275]. Drag and drop not working (Leendert Bottelberghs).
+ - bugfix [ 1025671 ] Crash on manage page tree. (Leendert Bottelberghs)
+ - bugfix [ 1025271 ] Cut page not working. (Leendert Bottelberghs)
+ - bugfix [ 1024643 ] Unknown column error. (Leendert Bottelberghs)
 
 
 6.2.1
