@@ -409,7 +409,7 @@ sub www_editEventSave {
 
 #-------------------------------------------------------------------
 sub www_view {
-	my (%var, $sameDate, $p, @list, $date, $flag, %previous, @row, $i, $maxDate, $minDate);
+	my (%var, $junk, $sameDate, $p, @list, $date, $flag, %previous, @row, $i, $maxDate, $minDate);
 	tie %previous, 'Tie::CPHash';
 	$var{"addevent.url"} = WebGUI::URL::page('func=editEvent&eid=new&wid='.$_[0]->get("wobjectId"));
 	$var{"addevent.label"} = WebGUI::International::get(20,$namespace);
@@ -418,6 +418,7 @@ sub www_view {
 			where wobjectId=".$_[0]->get("wobjectId"));
 	}
 	$minDate = $minDate || time();
+	($minDate,$junk) = WebGUI::DateTime::dayStartEnd($minDate);
 	if ($_[0]->get("endMonth") eq "last") {
 		($maxDate) = WebGUI::SQL->quickArray("select max(endDate) from EventsCalendar_event where 
 			wobjectId=".$_[0]->get("wobjectId"));	
@@ -431,6 +432,7 @@ sub www_view {
 		$maxDate = WebGUI::DateTime::addToDate($minDate,0,3,0); 
 	}
 	$maxDate = $maxDate || time();
+	($junk,$maxDate) = WebGUI::DateTime::dayStartEnd($maxDate);
 	my $monthCount = WebGUI::DateTime::monthCount($minDate,$maxDate);
 	unless ($session{form}{pn}) {
 		$flag = 1;

@@ -35,6 +35,7 @@ our @EXPORT = qw(&localtime &time &addToTime &addToDate &epochToHuman &epochToSe
  use WebGUI::DateTime;
  $epoch =			WebGUI::DateTime::addToDate($epoch, $years, $months, $days);
  $epoch =			WebGUI::DateTime::addToTime($epoch, $hours, $minutes, $seconds);
+ ($startEpoch, $endEpoch) = 	WebGUI::DateTime::dayStartEnd($epoch);
  $dateString = 			WebGUI::DateTime::epochToHuman($epoch, $formatString);
  $setString = 			WebGUI::DateTime::epochToSet($epoch);
  $day = 			WebGUI::DateTime::getDayName($dayInteger);
@@ -123,6 +124,26 @@ sub addToTime {
         ($year,$month,$day, $hour,$min,$sec) = Date::Calc::Add_Delta_DHMS($year,$month,$day,$hour,$min,$sec,0,$_[1],$_[2],$_[3]);
         $newDate = Date::Calc::Date_to_Time($year,$month,$day, $hour,$min,$sec);
         return $newDate;
+}
+
+#-------------------------------------------------------------------
+
+=head2 dayStartEnd ( epoch )
+
+ Returns the epoch dates for the start and end of the day.
+
+=item epoch
+
+ The number of seconds since January 1, 1970.
+
+=cut
+
+sub dayStartEnd {
+        my ($year,$month,$day, $hour,$min,$sec, $start, $end);
+        ($year,$month,$day, $hour,$min,$sec) = Date::Calc::Time_to_Date($_[0]);
+        $start = Date::Calc::Date_to_Time($year,$month,$day,0,0,0)-43200;
+        $end = Date::Calc::Date_to_Time($year,$month,$day,23,59,59);
+        return ($start, $end);
 }
 
 #-------------------------------------------------------------------
