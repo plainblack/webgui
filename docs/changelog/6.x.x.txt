@@ -1,5 +1,8 @@
 6.2.6
  - Fixed a GUID bug in the Site Map wobject.
+ - Removed debugging from the events calendar that should have been removed
+   before the last release.
+ - bugfix [ 1033670 ] JAVASCRIPT BUG
 
 
 6.2.5

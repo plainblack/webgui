@@ -113,7 +113,7 @@ sub _selectPositions {
                 -value=>$_[0],
 		-namespace=>"page",
 		-afterEdit=>'op=editPage&amp;npp='.$session{form}{npp},
-                -extras=>'onChange="changeTemplatePreview(this.form.templateId.value)"'
+                -extras=>'onChange="changeTemplatePreview(\'this.form.templateId.value\')"'
                 );
         $output = '
         <script language="JavaScript">
@@ -152,7 +152,7 @@ sub _selectPositions {
                 if(pbw.bw){
                         oMessage=new makeChangeTextObj("templatePreview");
                         oMessage.css.visibility="visible";
-                        changeTemplatePreview('.$_[0].');
+                        changeTemplatePreview(\''.$_[0].'\');
                 }
         }
         onload=init

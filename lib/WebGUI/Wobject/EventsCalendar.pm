@@ -395,15 +395,10 @@ sub www_view {
 	} elsif ($_[0]->get("endMonth") eq "after3") {
 		$maxDate = WebGUI::DateTime::addToDate($minDate,0,3,0); 
 	}
-WebGUI::ErrorHandler::warn("Min:".$minDate);
-WebGUI::ErrorHandler::warn("Max:".$maxDate);
 
 	$maxDate = $maxDate || WebGUI::DateTime::time();
-WebGUI::ErrorHandler::warn("Max:".$maxDate);
 	($junk,$maxDate) = WebGUI::DateTime::dayStartEnd($maxDate);
-WebGUI::ErrorHandler::warn("Max:".$maxDate);
 	my $monthCount = WebGUI::DateTime::monthCount($minDate,$maxDate);
-WebGUI::ErrorHandler::warn("Count:".$monthCount);
 	unless ($session{form}{calPn}) {
 		$flag = 1;
 		if ($_[0]->get("defaultMonth") eq "current") {
