@@ -52,13 +52,10 @@ These subroutines are available from this package:
 sub _getSiteURL {
 	my $site = $session{env}{HTTP_HOST} || $session{config}{sitename};
 	my $proto = "http://";
-	my $port;
 	if ($session{env}{SERVER_PORT} == 443) {
 		$proto = "https://";
-	} elsif ($session{env}{SERVER_PORT} != 80) {
-		$port = ":".$session{env}{SERVER_PORT};
 	}
-	return $proto.$site.$port;
+	return $proto.$site;
 }
 
 #-------------------------------------------------------------------
