@@ -564,7 +564,9 @@ insert into international (internationalId,languageId,namespace,message,lastUpda
 alter table HttpProxy drop column cookiebox;
 delete from international where languageId=1 and namespace='HttpProxy' and internationalId=11;
 insert into international (internationalId,languageId,namespace,message,lastUpdated,context) values (11,1,'HttpProxy','The HTTP Proxy wobject is a very powerful tool. It enables you to embed external sites and applications into your site. For example, if you have a web mail system that you wish your staff could access through the intranet, then you could use the HTTP Proxy to accomplish that.\r\n\r\n<p>\r\n\r\n<b>URL</b><br>\r\nThe starting URL for the proxy.\r\n<p>\r\n\r\n<b>Follow redirects?</b><br>\r\nSometimes the URL to a page, is actually a redirection to another page. Do you wish to follow those redirections when they occur?\r\n<p>\r\n\r\n<b>Timeout</b><br>\r\nThe amount of time (in seconds) that WebGUI should wait for a connection before giving up on an external page.\r\n<p>\r\n\r\n<b>Remove style?</b><br>\r\nDo you wish to remove the stylesheet from the proxied content in favor of the stylesheet from your site?\r\n<p>\r\n\r\n<b>Filter Content</b><br>\r\nChoose the level of HTML filtering you wish to apply to the proxied content.\r\n<p>\r\n\r\n\r\n<b>Allow proxying of other domains?</b><br>\r\nIf you proxy a site like Yahoo! that links to other domains, do you wish to allow the user to follow the links to those other domains, or should the proxy stop them as they try to leave the original site you specified?\r\n<p>\r\n', 1053774887,NULL);
-
+delete from international where languageId=1 and namespace='Auth/LDAP' and internationalId=9;
+insert into international (internationalId,languageId,namespace,message,lastUpdated,context) values (9,1,'Auth/LDAP','User RDN', 1053777552,'Specifying the relative distinguished name to authenticate a user against an LDAP directory.');
+insert into settings values ("ldapUserRDN","cn");
 
 
 
