@@ -2,7 +2,7 @@ package DBIx::Tree::NestedSet::MySQL;
 
 use strict;
 use Carp;
-$DBIx::Tree::NestedSet::MySQL::VERSION='0.12';
+$DBIx::Tree::NestedSet::MySQL::VERSION='0.15';
 
 ################################################################################
 sub new{
@@ -82,15 +82,14 @@ sub _get_default_create_table_statement{
 sub _create_table_statement{
     my ($table,$id,$left,$right)=@_;
     return qq|
-      CREATE TABLE $table (
-			   $id mediumint(9) NOT NULL auto_increment,
-			   $left mediumint(9) NOT NULL default '0',
-			   $right mediumint(9) NOT NULL default '0',
-			   PRIMARY KEY  ($id),
-			   KEY $left ($left),
-			   KEY $right ($right)
-			  )
-	|;
+CREATE TABLE $table (
+   $id mediumint(9) NOT NULL auto_increment,
+   $left mediumint(9) NOT NULL default '0',
+   $right mediumint(9) NOT NULL default '0',
+   PRIMARY KEY  ($id),
+   KEY $left ($left),
+   KEY $right ($right)
+  )|;
 }
 ########################################
 

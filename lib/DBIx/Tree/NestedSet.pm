@@ -1,8 +1,9 @@
 package DBIx::Tree::NestedSet;
 
 use strict;
+use warnings;
 use Carp;
-$DBIx::Tree::NestedSet::VERSION='0.12';
+$DBIx::Tree::NestedSet::VERSION='0.15';
 
 #POD Below!!
 
@@ -15,6 +16,7 @@ sub new{
 	      dbh		=>	$params{dbh},
 	      left_column_name	=>	$params{left_column_name}	|| 'lft',
 	      right_column_name	=>	$params{right_column_name}	|| 'rght',
+	      no_id_creation    =>      $params{no_id_creation}         || '',
 	      table_name	=>	$params{table_name}		|| 'nested_set',
 	      id_name		=>	$params{id_name}		|| 'id',
 	      no_alter_table	=>	$params{no_alter_table}		|| undef,
@@ -55,13 +57,69 @@ sub new{
 
 
 ################################################################################
+sub get_table_name{
+    return $_[0]->{table_name};
+}
+########################################
+
+
+################################################################################
+sub get_left_column_name{
+    return $_[0]->{left_column_name};
+}
+########################################
+
+
+################################################################################
+sub get_right_column_name{
+    return $_[0]->{right_column_name};
+}
+########################################
+
+
+################################################################################
+sub get_id_name{
+    return $_[0]->{id_name};
+}
+########################################
+
+
+################################################################################
+sub get_dbh{
+    return $_[0]->{dbh};
+}
+########################################
+
+
+################################################################################
+sub get_db_type{
+    return $_[0]->{db_type};
+}
+########################################
+
+
+################################################################################
+sub get_no_alter_table{
+    return $_[0]->{no_alter_table};
+}
+########################################
+
+
+################################################################################
+sub get_no_locking{
+    return $_[0]->{no_locking};
+}
+########################################
+
+
+################################################################################
 sub get_root{
     my $self=shift;
     my $left=$self->{left_column_name};
     my $table=$self->{table_name};
-    my $id=$self->{id_name};
+    my $id_name=$self->{id_name};
     my ($min_left)=$self->{dbh}->selectrow_array("select min($left) from $table");
-    return scalar $self->{dbh}->selectrow_array("select $id from ".$self->{table_name}." where $left=?",undef,($min_left));
+    return scalar $self->{dbh}->selectrow_array("select $id_name from ".$self->{table_name}." where $left=?",undef,($min_left));
 }
 ########################################
 
@@ -83,57 +141,54 @@ sub _unlock_tables{
 
 
 ################################################################################
-sub _fix_root{
-    my $self=shift;
-    my $left=$self->{left_column_name};
-    my $right=$self->{right_column_name};
-    my $table=$self->{table_name};
-    $self->_lock_tables();
-    if (not defined $self->{_prepared_fix_table_root_SQL_statement}){
-	$self->{_prepared_fix_table_root_SQL_statement}=$self->{dbh}->prepare("update $table set $right = ? where $left = 1");
-    }
-    if(not defined $self->{_prepared_table_count_SQL_statement}){
-	$self->{_prepared_table_count_SQL_statement}=$self->{dbh}->prepare("select count(*) from $table");
-    }
-    my ($count)=$self->{dbh}->selectrow_array($self->{_prepared_table_count_SQL_statement});
-    $self->{_prepared_fix_table_root_SQL_statement}->execute($count * 2);
-    $self->_unlock_tables();
-}
-########################################
-
-
-################################################################################
 sub add_child_to_right{
     my($self,%params)=@_;
     my $dbh=$self->{dbh};
     my $left=$self->{left_column_name};
     my $right=$self->{right_column_name};
     my $table=$self->{table_name};
-    my $id=$self->{id_name};
+    my $id_name=$self->{id_name};
+    if((defined $params{id}) and ($id_name ne 'id')){
+	#If they have changed the id_name but still pass in the id to act upon via the "id" parameter,
+	#fix it here. This is for backwards compatibility
+	$params{$id_name}=$params{id} 
+    }
     $self->_lock_tables();
-    if(!$params{id} && scalar $dbh->selectrow_array("select count(*) from $table")){
+    if(!$params{$id_name} && scalar $dbh->selectrow_array("select count(*) from $table")){
 	#They haven't given us an id for this child.  Assume they want to add a child DIRECTLY 
 	#under the parent, as they can't have more than one root.
-	$params{id}=$self->get_root();
+	$params{$id_name}=$self->get_root();
     }
-    if(not defined $self->{_prepared_rightmost_SQL_statement}){
-	$self->{_prepared_rightmost_SQL_statement}=$dbh->prepare("SELECT $right FROM $table WHERE $id=?");
-    }
-    my ($rightmost)=$dbh->selectrow_array($self->{_prepared_rightmost_SQL_statement},undef,($params{id}));
-    if(not defined $self->{_prepared_rightmost_SQL_tree_fix_statement}){
-	$self->{_prepared_rightmost_SQL_tree_fix_statement}=
-	  $dbh->prepare(
-			"UPDATE $table SET $left = CASE WHEN $left > ? THEN $left + 2 ELSE $left END,
-$right = CASE WHEN $right >= ? THEN $right + 2  ELSE $right END WHERE $right >= ?"
-		       );
-    }
-    $self->{_prepared_rightmost_SQL_tree_fix_statement}->execute($rightmost,$rightmost,$rightmost);
-    my ($params,$values)=_get_params_and_values(\%params,$left,$right,$id);
+    my $prepared_rightmost_SQL_statement=
+      $dbh->prepare_cached("SELECT $right FROM $table WHERE $id_name=?",
+			   {dbi_dummy=>__FILE__.__LINE__}
+			  );
+
+    my ($rightmost)=$dbh->selectrow_array($prepared_rightmost_SQL_statement,undef,($params{$id_name}));
+    my $prepared_rightmost_SQL_tree_fix_statement=	  
+      $dbh->prepare_cached(
+		    "UPDATE $table SET $left = CASE WHEN $left > ? THEN $left + 2 ELSE $left END,
+$right = CASE WHEN $right >= ? THEN $right + 2  ELSE $right END WHERE $right >= ?",
+		    {dbi_dummy=>__FILE__.__LINE__}
+		   );
+    $prepared_rightmost_SQL_tree_fix_statement->execute($rightmost,$rightmost,$rightmost);
+    $prepared_rightmost_SQL_tree_fix_statement->finish();
+    my ($params,$values)=$self->_get_params_and_values(\%params,$left,$right,$id_name);
     my ($columns,$placeholders)=_prepare_columns_and_placeholders_for_adding_child_to_right($params,$left,$right);
     $self->_alter_table_if_needed($params);
-    my $insert=$dbh->prepare("INSERT INTO $table ($columns) VALUES($placeholders)");
+    if ($self->{no_id_creation}) {
+	#We are manually passing in IDs.  This is kinda a kludge to make the WebGUI folks happy.
+	$self->_alter_sql_for_provided_primary_key_edits(\$columns,\$placeholders,$values,\%params);
+    }
+    my $insert=$dbh->prepare_cached("INSERT INTO $table ($columns) VALUES($placeholders)",{dbi_dummy=>__FILE__.__LINE__});
     $insert->execute($rightmost||1,$rightmost||1,@$values);
-    my ($new_id)=$dbh->do("select max($id) from $table");
+    $insert->finish();
+    my $new_id;
+    if ($self->{no_id_creation}) {
+	$new_id=$params{provided_primary_key};
+    } else {
+	($new_id)=$dbh->selectrow_array("select max($id_name) from $table");
+    }
     $self->_unlock_tables();
     return $new_id;
 }
@@ -148,23 +203,26 @@ sub add_child_to_left{
     my $left=$self->{left_column_name};
     my $right=$self->{right_column_name};
     my $table=$self->{table_name};
-    my $id=$self->{id_name};
-    
+    my $id_name=$self->{id_name};
+    if((defined $params{id}) and ($id_name ne 'id')){
+	#If they have changed the id_name but still pass in the id to act upon via the "id" parameter,
+	#fix it here. This is for backwards compatibility
+	$params{$id_name}=$params{id} 
+    }
     $self->_lock_tables();
-    if(!$params{id} && scalar $dbh->selectrow_array("select count(*) from $table")){
+    if(!$params{$id_name} && scalar $dbh->selectrow_array("select count(*) from $table")){
 	#They haven't given us an id for this child.  Assume they want to add a child DIRECTLY 
 	#under the parent, as they can't have more than one root.
-	$params{id}=$self->get_root();
+	$params{$id_name}=$self->get_root();
     }
     
-    if(not defined $self->{_prepared_leftmost_SQL_statement}){
-	$self->{_prepared_leftmost_SQL_statement}=$dbh->prepare("SELECT $left FROM $table WHERE $id=?");
-    }
-    my ($leftmost)=$dbh->selectrow_array($self->{_prepared_leftmost_SQL_statement},undef,($params{id}));
-    if(not defined $self->{_prepared_leftmost_SQL_tree_fix_statement}){
-	$self->{_prepared_leftmost_SQL_tree_fix_statement}=
-	  $dbh->prepare(
-			qq|UPDATE $table 
+    my $prepared_leftmost_SQL_statement=$dbh->prepare_cached("SELECT $left FROM $table WHERE $id_name=?",{dbi_dummy=>__FILE__.__LINE__});
+    
+    my ($leftmost)=$dbh->selectrow_array($prepared_leftmost_SQL_statement,undef,($params{$id_name}));
+    $prepared_leftmost_SQL_statement->finish();
+    my $prepared_leftmost_SQL_tree_fix_statement=
+      $dbh->prepare_cached(
+			   qq|UPDATE $table 
 			SET $right = 
 			CASE WHEN $right > ? 
 			THEN $right + 2 
@@ -174,19 +232,41 @@ sub add_child_to_left{
 			THEN $left + 2  
 			ELSE $left 
 			END 
-			|
-		       );
-    }
-    $self->{_prepared_leftmost_SQL_tree_fix_statement}->execute($leftmost,$leftmost);
-    my ($params,$values)=_get_params_and_values(\%params,$left,$right,$id);
+			|,
+			   {dbi_dummy=>__FILE__.__LINE__}
+			  );
+    
+    $prepared_leftmost_SQL_tree_fix_statement->execute($leftmost,$leftmost);
+    $prepared_leftmost_SQL_tree_fix_statement->finish();
+    my ($params,$values)=$self->_get_params_and_values(\%params,$left,$right,$id_name);
     my ($columns,$placeholders)=_prepare_columns_and_placeholders_for_adding_child_to_left($params,$left,$right);
     $self->_alter_table_if_needed($params);
-    my $insert=$dbh->prepare("INSERT INTO $table ($columns) VALUES($placeholders)");
+    if ($self->{no_id_creation}) {
+	#We are manually passing in IDs.  This is kinda a kludge to make the WebGUI folks happy.
+	$self->_alter_sql_for_provided_primary_key_edits(\$columns,\$placeholders,$values,\%params);
+    }
+    my $insert=$dbh->prepare_cached("INSERT INTO $table ($columns) VALUES($placeholders)",{dbi_dummy=>__FILE__.__LINE__});
     $insert->execute($leftmost||1,$leftmost||1,@$values);
     $insert->finish();
-    my ($new_id)=$dbh->do("select max($id) from $table");
+    my $new_id;
+    if ($self->{no_id_creation}) {
+	$new_id=$params{provided_primary_key};
+    } else {
+	($new_id)=$dbh->selectrow_array("select max($id_name) from $table");
+    }
     $self->_unlock_tables();
     return $new_id;
+}
+########################################
+
+
+################################################################################
+sub _alter_sql_for_provided_primary_key_edits{
+    my($self,$columns,$placeholders,$values,$params)=@_;
+    my $id_name=$self->{id_name};
+    $$columns.=",$id_name";
+    $$placeholders.=',?';
+    push @$values, $params->{provided_primary_key};
 }
 ########################################
 
@@ -203,14 +283,15 @@ sub _alter_table_if_needed{
     my $right=$self->{right_column_name};
     my $table=$self->{table_name};
     my $dbh=$self->{dbh};
-    my $id=$self->{id_name};
+    my $id_name=$self->{id_name};
 
     #my %columns_we_are_requesting=map{$_=>1} @$params;
     my @columns_we_need_to_create;
     #With MySQL I could use "Explain $table" but I'd like this to be a bit more cross-RDBMS
-    my $get_columns=$dbh->prepare("select *,count(*) as _ignore_me_sdfas from nested_set group by $id");
+    my $get_columns=$dbh->prepare_cached("select *,count(*) as _ignore_me_sdfas from $table group by $id_name",
+					{dbi_dummy=>__FILE__.__LINE__});
     $get_columns->execute();
-    my %columns_that_we_have={};
+    my %columns_that_we_have=();
     foreach(@{$get_columns->{NAME}}){
 	$columns_that_we_have{$_}=1 if($_ ne '_ignore_me_sdfas');
     }
@@ -231,11 +312,12 @@ sub _alter_table_if_needed{
 
 ################################################################################
 sub _get_params_and_values{
-    my ($params,$left,$right,$id,$no_left_or_right)=@_;
+    my ($self,$params,$left,$right,$id_name,$no_left_or_right)=@_;
     my %ignore=(
 		$left=>1,
 		$right=>1,
-		$id=>1
+		$id_name=>1,
+		provided_primary_key=>1
 	       );
     my @params=($no_left_or_right) ? () :($left,$right); #Keep in order. . .
     my @values;
@@ -258,13 +340,22 @@ sub edit_node{
     my $left=$self->{left_column_name};
     my $right=$self->{right_column_name};
     my $table=$self->{table_name};
-    my $id=$self->{id_name};
+    my $id_name=$self->{id_name};
+    if((defined $params{id}) and ($id_name ne 'id')){
+	#If they have changed the id_name but still pass in the id to act upon via the "id" parameter,
+	#fix it here. This is for backwards compatibility
+	$params{$id_name}=$params{id};
+    }
     $self->_lock_tables();
-    my ($params,$values)=_get_params_and_values(\%params,$left,$right,$id,1);
+    my ($params,$values)=$self->_get_params_and_values(\%params,$left,$right,$id_name,1);
     my ($columns)=_prepare_columns_and_placeholders_for_edit($params);
     $self->_alter_table_if_needed($params);
-    my $update=$dbh->prepare("update $table set $columns where $id=?");
-    $update->execute(@$values,$params{id});
+    my $update=$dbh->prepare_cached(
+				    "update $table set $columns where $id_name=?",
+				    {dbi_dummy=>__FILE__.__LINE__}
+				   );
+    my $id_value=$params{$id_name};
+    $update->execute(@$values,$id_value);
     $update->finish();
     $self->_unlock_tables();
 }
@@ -311,8 +402,13 @@ sub get_id_by_key{
     my $right=$self->{right_column_name};
     my $table=$self->{table_name};
     my $key_name=$params{key_name};
-    my $id=$self->{id_name};
-    my $ids=$self->{dbh}->selectcol_arrayref("select $id from $table where $key_name = ?",undef,($params{key_value}));
+    my $id_name=$self->{id_name};
+    if((defined $params{id}) and ($id_name ne 'id')){
+	#If they have changed the id_name but still pass in the id to act upon via the "id" parameter,
+	#fix it here. This is for backwards compatibility
+	$params{$id_name}=$params{id};
+    }
+    my $ids=$self->{dbh}->selectcol_arrayref("select $id_name from $table where $key_name = ?",undef,($params{key_value}));
     return (@$ids > 1) ? $ids : $ids->[0] ;
 }
 ########################################
@@ -325,12 +421,22 @@ sub get_self_and_parents_flat{
     my $left=$self->{left_column_name};
     my $right=$self->{right_column_name};
     my $table=$self->{table_name};
-    my $id=$self->{id_name};
-#    my $node=$self->{node_column_name};
-    if(not defined $self->{_prepared_get_self_and_parents_flat_SQL_statement}){
-	$self->{_prepared_get_self_and_parents_flat_SQL_statement}=$dbh->prepare("select n2.* from $table as n1, $table as n2 where (n1.$left between n2.$left and n2.$right) and (n1.$id=?) order by n2.$left");
+    my $id_name=$self->{id_name};
+    if((defined $params{id}) and ($id_name ne 'id')){
+	#If they have changed the id_name but still pass in the id to act upon via the "id" parameter,
+	#fix it here. This is for backwards compatibility
+	$params{$id_name}=$params{id};
     }
-    my $tree_structure=$dbh->selectall_arrayref($self->{_prepared_get_self_and_parents_flat_SQL_statement},{Columns=>{}},($params{id} || 1));
+    my $prepared_get_self_and_parents_flat_SQL_statement=
+      $dbh->prepare_cached(
+			   "select n2.* from $table as n1, $table as n2 where (n1.$left between n2.$left and n2.$right) and (n1.$id_name=?) order by n2.$left",
+			   {dbi_dummy=>__FILE__.__LINE__}
+			  );
+    
+    my $tree_structure=$dbh->selectall_arrayref($prepared_get_self_and_parents_flat_SQL_statement,
+						{Columns=>{}},
+						($params{$id_name} || 1)
+					       );
     my $level=1;
     foreach(@$tree_structure){
 	$_->{level}=$level;
@@ -358,8 +464,14 @@ sub delete_self_and_children{
     my $left=$self->{left_column_name};
     my $right=$self->{right_column_name};
     my $table=$self->{table_name};
-    my $id=$self->{id_name};
-    if(!$params{id}){
+    my $id_name=$self->{id_name};
+    if((defined $params{id}) and ($id_name ne 'id')){
+	# If they have changed the name of the id field
+	# but still pass in IDs with the old "id" moniker, fix it here.
+
+	$params{$id_name}=$params{id};
+    }
+    if(!$params{$id_name}){
 	carp("You didn't give us an ID that we could start the delete from");
 	return [];
     } else {
@@ -369,21 +481,21 @@ sub delete_self_and_children{
 	    #We don't want to delete the starting node.
 	    #Start with the next level and go through them.
 
-	    my $outer_tree=$self->get_children_flat(id=>$params{id},depth=>1);
+	    my $outer_tree=$self->get_children_flat(id=>$params{$id_name},depth=>1);
 	    foreach my $outer_node(@$outer_tree){
-		my $temp_tree=$self->get_self_and_children_flat(id=>$outer_node->{$id});
-		$self->_delete_node(id=>$outer_node->{$id});
+		my $temp_tree=$self->get_self_and_children_flat(id=>$outer_node->{$id_name});
+		$self->_delete_node(id=>$outer_node->{$id_name});
 		foreach my $inner_node (@$temp_tree){
-		    push @$ids,$inner_node->{id};
+		    push @$ids,$inner_node->{$id_name};
 		}
 	    }
 	    
 	} else {
 	    #Delete it all. Hasta la bye-bye!
-	    my $tree=$self->get_self_and_children_flat(id=>$params{id});
+	    my $tree=$self->get_self_and_children_flat(id=>$params{$id_name});
 	    $self->_delete_node(%params);
 	    foreach my $node (@$tree){
-		push @$ids,$node->{id};
+		push @$ids,$node->{$id_name};
 	    }
 	}
 	$self->_unlock_tables();
@@ -407,18 +519,22 @@ sub _delete_node{
     my $left=$self->{left_column_name};
     my $right=$self->{right_column_name};
     my $table=$self->{table_name};
-    my $id=$self->{id_name};
+    my $id_name=$self->{id_name};
     my $dbh=$self->{dbh};
-    my $node_info=$self->get_hashref_of_info_by_id($params{id});
-
-    if(not defined $self->{_prepared_delete_node_delete_statement}){
-	$self->{_prepared_delete_node_delete_statement}=$dbh->prepare("delete from $table where $left between ? and ?");
-    }
-    $self->{_prepared_delete_node_delete_statement}->execute($node_info->{$left},$node_info->{$right});
+    my $node_info=$self->get_hashref_of_info_by_id($params{$id_name});
     
-    if(not defined $self->{_prepared_delete_node_fix_nodes}){
-	$self->{_prepared_delete_node_fix_nodes}=
-	  $dbh->prepare("UPDATE $table
+    my $prepared_delete_node_delete_statement=
+      $dbh->prepare_cached(
+			   "delete from $table where $left between ? and ?",
+			   {dbi_dummy=>__FILE__.__LINE__}
+			  );
+    
+    $prepared_delete_node_delete_statement->execute($node_info->{$left},$node_info->{$right});
+    $prepared_delete_node_delete_statement->finish();
+
+    my $prepared_delete_node_fix_nodes=
+      $dbh->prepare_cached(
+    "UPDATE $table
      SET $left = CASE
                  WHEN $left > ? THEN $left - (? - ? + 1)
                  ELSE $left
@@ -427,20 +543,20 @@ sub _delete_node{
                  WHEN $right > ? THEN $right - (? - ? + 1)
                  ELSE $right
                END
-   WHERE $right > ?
-");
-	
-    }
-    $self->{_prepared_delete_node_fix_nodes}->execute(
-						      $node_info->{$left},
-						      $node_info->{$right},
-						      $node_info->{$left},
-						      $node_info->{$right},
-						      $node_info->{$right},
-						      $node_info->{$left},
-						      $node_info->{$left},
-						     );
-
+   WHERE $right > ?",
+			   {dbi_dummy=>__FILE__.__LINE__}
+			  );
+    
+    $prepared_delete_node_fix_nodes->execute(
+					     $node_info->{$left},
+					     $node_info->{$right},
+					     $node_info->{$left},
+					     $node_info->{$right},
+					     $node_info->{$right},
+					     $node_info->{$left},
+					     $node_info->{$left},
+					    );
+    $prepared_delete_node_fix_nodes->finish();
 }
 ########################################
 
@@ -452,14 +568,17 @@ sub get_self_and_children_flat{
     my $left=$self->{left_column_name};
     my $right=$self->{right_column_name};
     my $table=$self->{table_name};
-    my $id=$self->{id_name};
-#    my $node=$self->{node_column_name};
+    my $id_name=$self->{id_name};
+    if((defined $params{id}) and ($id_name ne 'id')){
+	# If they have changed the id name but still pass in the ID value in the id parameter, fix it.
+	$params{$id_name}=$params{id} 
+    }
     my $id_SQL;
-    if (defined $params{id}) {
-	my ($left_value,$right_value)=$dbh->selectrow_array("select $left,$right from $table where $id=?",undef,($params{id}));
+    if (defined $params{$id_name}) {
+	my ($left_value,$right_value)=$dbh->selectrow_array("select $left,$right from $table where $id_name=?",undef,($params{$id_name}));
 	$id_SQL="and (n1.$left between " . $dbh->quote($left_value)." and ".$dbh->quote($right_value).") ";
     }
-    my $tree_structure=$dbh->selectall_arrayref("select count(n2.${id}) as level,n1.* from $table as n1, $table as n2 where (n1.$left between n2.$left and n2.$right) $id_SQL group by n1.${id} order by n1.$left",{Columns=>{}});
+    my $tree_structure=$dbh->selectall_arrayref("select count(n2.${id_name}) as level,n1.* from $table as n1, $table as n2 where (n1.$left between n2.$left and n2.$right) $id_SQL group by n1.${id_name} order by n1.$left",{Columns=>{}});
     my $start_level=$tree_structure->[0]->{level};
     if (defined $params{depth} && $tree_structure) {
 	#We wanna chop down the tree.
@@ -539,8 +658,11 @@ sub swap_nodes{
 
 ################################################################################
 sub get_hashref_of_info_by_id{
-    my $id=$_[0]->{id_name};
-    return $_[0]->{dbh}->selectrow_hashref("select * from ".$_[0]->{table_name}." where $id=?",undef,($_[1]));
+    my ($self,$value)=@_;
+    my $dbh=$self->{dbh};
+    my $id_name=$self->{id_name};
+    #This excessively explicit quoting is to work around the buggy Mandrake 10.0 version of DBD::mysql
+    return $dbh->selectrow_hashref("select * from ".$self->{table_name}." where $id_name = ".$dbh->quote($value));
 }
 ########################################
 
@@ -548,11 +670,12 @@ sub get_hashref_of_info_by_id{
 ################################################################################
 sub get_hashref_of_info_by_id_with_level{
     my $self=shift;
+    my $wanted_id=shift;
     my $left=$self->{left_column_name};
     my $right=$self->{right_column_name};
     my $table=$self->{table_name};
-    my $id=$self->{id_name};
-    return $self->{dbh}->selectrow_hashref("select count(n2.$id) as level,n1.* from $table as n1, $table as n2 where (n1.$left between n2.$left and n2.$right) and n1.$id=? group by n1.$id",undef,($_[1]));
+    my $id_name=$self->{id_name};
+    return $self->{dbh}->selectrow_hashref("select count(n2.$id_name) as level,n1.* from $table as n1, $table as n2 where (n1.$left between n2.$left and n2.$right) and n1.$id_name=? group by n1.$id_name",undef,($wanted_id));
 }
 ########################################
 
@@ -560,11 +683,12 @@ sub get_hashref_of_info_by_id_with_level{
 ################################################################################
 sub create_report{
     my ($self,%params)=@_;
-    my $ancestors=$self->get_self_and_children_flat(id => $params{id}||$self->get_root);
+    my $id_name=$self->{id_name};
+    my $ancestors=$self->get_self_and_children_flat(id => $params{$id_name}||$self->get_root);
     my $report;
     foreach (@$ancestors) {
 	$report.= (($_->{level} > 1) ? ((" " x ($params{indent_level} || 2)) x ($_->{level} - 1)) :'');
-	$report.= $_->{name}." (".$_->{id}.")(".$_->{level}.")\n";
+	$report.= $_->{name}." (".$_->{$id_name}.")(".$_->{level}.")\n";
     }
     return $report;
 }
@@ -587,21 +711,7 @@ sub get_default_create_table_statement{
 ########################################
 
 
-################################################################################
-sub DESTROY{
-    my $self=shift;
-    foreach(keys %$self){
-	if(substr($_,0,10) eq '_prepared_'){
-	    warn("Finished: $_\n") if (defined $self->{trace});
-	    $self->{$_}->finish();
-	}
-    }
-}
-########################################
-
-
 1;
-
 
 __END__
 
@@ -613,19 +723,97 @@ DBIx::Tree::NestedSet
 
 =head1 SYNOPSIS
 
-Implements a "Nested Set" parent/child tree.
+Implements a "Nested Set" parent/child tree. Example:
+
+ #!/usr/bin/perl
+ #This is in "scripts/tree_example.pl" of DBIx::Tree::NestedSet distribution
+ use strict;
+ use warnings;
+ use DBIx::Tree::NestedSet;
+ use DBI;
+
+ #Create the connection. We'll use SQLite for now.
+ #my $dbh=DBI->connect('DBI:mysql:test','user','pass') or die ($DBI::errstr);
+ my $dbh=DBI->connect('DBI:SQLite:test') or die ($DBI::errstr);
+
+ my $db_type='SQLite';
+ #my $db_type='MySQL';
+ my $tree=DBIx::Tree::NestedSet->new(
+				     dbh=>$dbh,
+				     db_type=>$db_type
+				    );
+
+ #Let's see how the table will be created for this driver
+ print "Default Create Table Statement for $db_type:\n";
+ print $tree->get_default_create_table_statement()."\n";
+
+ #Let's create it.
+ $tree->create_default_table();
+
+ #Create the root node.
+ my $root_id=$tree->add_child_to_right(name=>'Food');
+
+ #Second level
+ my $vegetable_id=$tree->add_child_to_right(id=>$root_id,name=>'Vegetable');
+ my $animal_id=$tree->add_child_to_right(id=>$root_id,name=>'Animal');
+ my $mineral_id=$tree->add_child_to_right(id=>$root_id,name=>'Mineral');
+
+ #Third Level, under "Vegetable"
+ foreach ('Froot','Beans','Legumes','Tubers') {
+     $tree->add_child_to_right(id=>$vegetable_id,name=>$_);
+ }
+
+ #Third Level, under "Animal"
+ foreach ('Beef','Chicken','Seafood') {
+     $tree->add_child_to_right(id=>$animal_id,name=>$_);
+ }
+
+ #Hey! We forgot pork! Since it's the other white meat,
+ #it should be first among the "Animal" crowd.
+ $tree->add_child_to_left(id=>$animal_id,name=>'Pork');
+
+ #Oops. Misspelling.
+ $tree->edit_node(
+		  id=>$tree->get_id_by_key(key_name=>'name',key_value=>'Froot'),
+		  name=>'Fruit'
+		 );
+
+ #Get the child nodes of the 2nd level "Animal" node
+ my $children=$tree->get_self_and_children_flat(id=>$animal_id);
+
+ #Grab the first node, which is "Animal" and the
+ #parent of this subtree.
+ my $parent=shift @$children;
+
+ print 'Parent Node: '.$parent->{name}."\n";
+
+ #Loop through the children and do something.
+ foreach my $child(@$children) {
+     print ' Child ID: '.$child->{id}.' '.$child->{name}."\n";
+ }
+
+ #Mineral? Get rid of it.
+ $tree->delete_self_and_children(id=>$mineral_id);
+
+ #Print the rudimentary report built into the module.
+ print "\nThe Complete Tree:\n";
+ print $tree->create_report();
 
 =head1 DESCRIPTION
 
 This module implements a "Nested Set" parent/child tree, and is focused (at least in my mind) towards offering methods that make developing web applications easier. It should be generally useful, though.
 
-See the "SEE ALSO" section for resources that explain the advantages and features of a nested set tree.  This module gives you arbitrary levels of categorization,  the ability to put in metadata associated with a category via simple method arguments and storage via DBI.  It's been tested on MySQL but I've taken pains to avoid using MySQL specific SQL statements.
+See the "SEE ALSO" section for resources that explain the advantages and features of a nested set tree.  This module gives you arbitrary levels of nodes,  the ability to put in metadata associated with a node via simple method arguments and storage via DBI.  
 
-The basic thing is that a nested set tree is "expensive" on updates because you have to edit quite a bit of the tree on inserts, deletes, or the movement of nodes.  Conversely, it is "cheaper" on just queries of the tree because nearly every action (getting children, getting parents, getting siblings, etc) can be done *with one SQL query*.  So if you're developing apps that require many reads and few updates to a tree (like pretty much every web app I've ever built) a nested set should offer significant performance advantages over the recursive queries required by an adjacency list model.
+There are currently drivers implemented for MySQL and SQLite. It should be trivial to write one for your RDBMS, see DBIx::Tree::NestedSet::MySQL for an example driver.
+
+A nested set tree is "expensive" on updates because you have to edit quite a bit of the tree on inserts, deletes, or the movement of nodes.  Conversely, it is "cheaper" on just queries of the tree because nearly every action (getting children, getting parents, getting siblings, etc) can be done B<with one SQL statement>.
+
+If you're developing apps that require many reads and few updates to a tree (like pretty much every web app I've ever built) a nested set should offer significant performance advantages over the recursive queries required by the typical adjacency list model.
 
 Whew. Say that fast three times.
 
-You'll need to create a table in your database and then pass options to new().  See the "Table Definition" section for an example "create table" statement.
+Use the create_default_table() method to create your Nested Set table in your RDBMS.
 
 =head1 METHODS
 
@@ -641,7 +829,7 @@ The DBI handle returned by DBI::connect().
 
 =item id_name
 
-The name of the unique ID associated with this category. Defaults to "id".
+The name of the unique ID associated with this node. Defaults to "id". If you change the name of the id, you should refer to it in every other method with the name you assigned here.
 
 =item left_column_name
 
@@ -657,11 +845,11 @@ The name of the table that describes the nested set. Defaults to "nested_set".
 
 =item No_RaiseError
 
-By default this module will turn on the "RaiseError" attribute in $dbh.  Setting the "No_RaiseError" value to true (because you do not want RaiseError enabled or because it is turned it on elsewhere) will disable this behavior.
+By default this module will turn on the "RaiseError" attribute in $dbh.  Setting the "No_RaiseError" value to true (because you do not want RaiseError enabled or because it is turned it on elsewhere) will disable this behavior. You should probably leave this alone.
 
 =item no_locking
 
-Setting this option to a true value will disable file locking for methods that alter the tree stored via DBI. Currently,  we lock the entire table, as most "editing" methods have the potential to edit every value on even minor changes.
+Setting this option to a true value will disable locking for methods that alter the tree stored via DBI. Currently,  we lock the entire table, as most "editing" methods have the potential to edit every value on even minor changes.
 
 =item no_alter_table
 
@@ -679,11 +867,17 @@ Will turn on DBI::trace() at the level you specify here and output some addition
 
 The type of RDBMS you're using, currently drivers are only implemented for MySQL and SQLite. Defaults to MySQL if not defined. Drivers abstract non-portable (or non-implemented) SQL. See L<DBIx::Tree::NestedSet::MySQL> and L<DBIx::Tree::NestedSet::SQLite> for examples.
 
+=item no_id_creation
+
+Set this to a true value if you want to manually provide primary keys for new nodes. You must ensure that the primary keys aren't duplicates on your own: this is your responsibility if you turn this option on. The default is false, meaning that the RDBMS will handle the creation of IDs via built in "auto increment" or "sequence" features.  If you do want to provide your own primary keys, remember to alter the table. Normally you should ignore this feature and let the RDBMS handle creating ids for you.
+
+See also: add_child_to_left(), add_child_to_right().
+
 =back
 
 Examples:
 
- #Create a nested set tree, including SQL
+ #Create a nested set tree object, including the default nested_set table
  my $tree=DBIx::Tree::NestedSet->new(dbh=>$dbh);
  $tree->create_default_table();
 
@@ -693,11 +887,11 @@ Examples:
 
 =head2 create_default_table
 
-Create a Nested Set table in the data source defined in $dbh that will work for the db_type you specify in new().  Any options (id_name, left_column_name, etc.) you pass to new() will be respected as well.
+Create a Nested Set table in the data source defined in $dbh that will work for the db_type you specify in new().  Any options (id_name, left_column_name, etc.) you pass to new() will be respected as well. This default table is defined in the driver file for your RDBMS.
 
 =head2 get_default_create_table_statement
 
-Return the SQL used to create the table above as a scalar.
+Return the SQL used to create the table above as a scalar, but don't create it.
 
 =head2 get_root
 
@@ -705,7 +899,7 @@ Gets the id of the "root" node of the tree.
 
 =head2 add_child_to_right
 
-This will add a child to the "right" of all its siblings.
+This will add a child to the "right" of all its siblings, kind of like "push()ing" onto the bottom of an array. It will be the last child under its parent.
 
 Takes the following parameters as a hash:
 
@@ -713,11 +907,11 @@ Takes the following parameters as a hash:
 
 =item id
 
-The ID of the parent node we want to add the child to. If you don't give an ID or the id isn't valid,  it will add the child under the root node.
+The ID of the parent node we want to add the child to. If you don't give an ID or the id isn't valid,  it will add the child under the root node. If you changed the name of "id" in new(), use that name here.
 
 =back
 
-Any other parameter passed in as a hash will cause the module to alter the table to add a column to hold it, and then store that data for you. Example:
+Any other parameter passed in as a hash will get stored in the table.  If the column doesn't exist, the module will alter the table to add it, and then store that data for you. Example:
 
 Say you have a table that looks like:
 
@@ -732,9 +926,9 @@ Say you have a table that looks like:
 
 and you execute:
 
- $tree->add_node_to_right(id=>$tree->get_root(),name=>'Foo Name',template=>'Bar');
+ $tree->add_child_to_right(id=>$tree->get_root(),name=>'Baked Goods',raisins=>'no');
 
-Then the module will create a node named "Foo Name" under the root as the "rightmost" child. The "template" column will be created and "Bar" will be put in this nodes "template" column. The table would then look like:
+Then the module will create a node named "Baked Goods" under the root as the "rightmost" child. The "raisins" column will be created and "no" will be put in it for this node. The table would then look like:
 
  +----------+--------------+------+-----+---------+----------------+
  | Field    | Type         | Null | Key | Default | Extra          |
@@ -743,28 +937,36 @@ Then the module will create a node named "Foo Name" under the root as the "right
  | lft      | mediumint(9) |      | MUL | 0       |                |
  | rght     | mediumint(9) |      | MUL | 0       |                |
  | name     | varchar(255) |      | MUL |         |                |
- | template | varchar(255) |      | MUL |         |                |
+ | raisins  | varchar(255) |      | MUL |         |                |
  +----------+--------------+------+-----+---------+----------------+
 
 Feel free to tweak the columns after the module creates them (or create them in advance, it doesn't really matter).  You may want to add indeces if you're going to be doing other selects on the nested_set table.
 
 This table altering behavior allows you to store metadata about a node simply, with a tradeoff that your metadata could be "flat" and potentially poorly normalized.
 
-Returns the id of the newly added child.
+This method returns the id of the newly added child.
+
+Note: If you are providing your own non-duplicate primary keys (via the "no_id_creation" option passed to "new()"), pass another parameter named "provided_primary_key" with the value of the primary key you want for this new node. The "provided_primary_key" will be used for this node.
+
+Example of providing your own primary key for a new node:
+
+ $tree->add_child_to_right(id=>$parent_id,name=>'Biscuits',provided_primary_key=>$new_unique_key);
+
+If you're letting the RDBMS handle generating ids for you (as you should), you can ignore this whole note.
 
 =head2 add_child_to_left
 
-Same as add_child_to_right, except this puts the child to the left of its siblings.
+Same as add_child_to_right, except this puts the child to the left of its siblings. It will be the first child under the parent node.
 
 =head2 edit_node
 
-Edits a node and will exhibit the same "table altering" behavior of add_child_to_right. Pass in parameters as a hash, and "id" controls which node you're editing.
+Edits a node and will exhibit the same "table altering" behavior of add_child_to_right or add_child_to_left. Pass in parameters as a hash, and "id" controls which node you're editing.
 
 Example:
 
  #All other values are retained, we're just changing the name of the node
  #with the id in "$edit_id"
- $tree->edit_node(id=>$edit_id,name=>'New Name');
+ $tree->edit_node(id=>$edit_id,name=>'Pizza');
 
 =head2 get_id_by_key
 
@@ -787,7 +989,9 @@ If there is more than one node found,  we return an array reference. Otherwise w
 Example:
 
  my $node=$tree->get_id_by_key(key_name=>'name',key_value=>'Foo Name');
- if(ref $node){
+ if (! $node){
+     #no matching node found.
+ elsif(ref $node eq 'ARRAY'){
      #We have more than one id returned.
  } else {
      #We have a single id/node.
@@ -795,7 +999,7 @@ Example:
 
 =head2 get_self_and_parents_flat
 
-This will get a node and it's parents down to the root node.  Takes the id of the starting node as a hash.
+This will get a node and its parents down to the root node.  Takes the id of the starting node as a hash.
 
 Returns an arrayref of hashrefs (AoH).  The hashrefs will have as keys the column names of the table, including those automatically added by the add_*() and edit_node() methods.
 
@@ -821,6 +1025,7 @@ Same as get_self_and_parents_flat but excludes the starting node.
 Similar to get_self_and_children, but deletes nodes from the starting id inclusively.  Returns an arrayref of the IDs that were deleted or a non-true value if none.
 
 Example:
+
  my $ids=$tree->delete_self_and_children(id=>$delete_from);
 
 Will delete from the ID in $delete_from and $ids will contain an arrayref of the deleted IDs. 
@@ -847,7 +1052,7 @@ Same as get_self_and_children_flat but excludes the starting node.
 
 =head2 swap_nodes
 
-Takes two parameters: first_id and second_id. It will "swap" the nodes represented by these ids, essentially replacing one node with the other.  Children will tag along and order will be preserved.  swap_nodes() can be used to reorder nodes in a tree OR swap nodes to different levels within a tree.
+Takes two parameters: first_id and second_id. It will "swap" the nodes represented by these ids, essentially replacing one node with the other.  Children will tag along.  swap_nodes() can be used to reorder nodes in a tree OR swap nodes to different levels within a tree. This method allows you to reorder nodes in the tree.
 
 Example:
 
@@ -868,7 +1073,7 @@ Example:
 
 =head2 get_hashref_of_info_by_id_with_level
 
-Just like get_hashref_of_info_by_id, except returns the "level" of the node within the tree as well, where the "root" node is level 1.  Computing the level is quite a bit more expensive, so you should use get_hashref_of_info_by_id normally.
+Just like get_hashref_of_info_by_id, except returns the "level" of the node within the tree as well, where the "root" node is level 1.  Computing the level is more expensive, so you should use get_hashref_of_info_by_id normally.
 
 =head2 create_report
 
@@ -895,7 +1100,7 @@ Will create a report starting from the "root" with 4 spaces of indentation per l
 
 =head1 TABLE DEFINITION
 
-The base "nested_set" table definition for MySQL is below. Please see each driver class (L<DBIx::Tree::NestedSet::MySQL> or L<DBIx::Tree::NestedSet::SQLite> currently) for create statements specific to your RDBMS.  Columns will be added when you pass extra parameters to methods noted above, unless "no_alter_table" is set to true in the constructor.
+The base "nested_set" table definition for MySQL is below. Please see each driver class (L<DBIx::Tree::NestedSet::MySQL> or L<DBIx::Tree::NestedSet::SQLite> currently) for create statements specific to your RDBMS.  Columns will be added when you pass extra parameters to methods noted above (even for SQLite), unless "no_alter_table" is set to true in the constructor.
 
 You can add columns you're going to use proactively, and/or "tweak" the columns after you've let this module create them.  Just make sure that you use valid SQL column names for the attributes you pass to the edit_node() and add_*() methods.
 
@@ -914,7 +1119,7 @@ This module has been tested on MySQL 3.x and 4.x and SQLite 2.x.
 
 =head1 WHY?
 
-I've implemented a couple different nested tree models in the past, from a flat "one column per level" monstrosity to a typical "adjacency list" parent/child model.  
+I've implemented a couple different nested tree models in the past, from a flat "one column per level" monstrosity to a typical "adjacency list" parent/child model.
 
 The "one column per level" model was a BEAR to work with, especially when it came to adding more levels, editing/deleting children and creating parent lists.
 
@@ -955,15 +1160,19 @@ For those last three links, the "Nested Set" discussion starts about halfway thr
 
 =head1 BUGS
 
-Yes. I'm sure there are some.  Please contact me if you find any.
+Yes. I'm sure there are some, but this module is in production in several non-trivial apps and it's working smoothly.  Please contact me if you find any, though.
 
-Things to avoid:
+Things to be aware of:
 
 =over 4
 
-=item *
+=item Custom Names
 
 Keep the names of columns, the table,  and any automagically added meta-data keys to fit m/^[_A-Za-z\d]+$/, which is A-Z, a-z, digits, and the underscore. And don't use SQL reserved words.
+
+=item Mandrake 10.0 users
+
+You should update to the latest version of DBI and DBD::mysql,  there was apparently a bug with placeholder counting that made this module barf on that distribution. I've worked around this bug, but I can't guarantee anything. Upgrade DBI and DBD::mysql just to be sure.
 
 =back
 
@@ -984,10 +1193,6 @@ The ability to associate other user-defined SQL statements with methods. "Pre-" 
 =item *
 
 Create methods to get children that DO implement "nested array" trees.
-
-=item *
-
-Do benchmarking to see how a nested set model performs under various scenarios.
 
 =item *
 

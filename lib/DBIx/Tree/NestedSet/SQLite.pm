@@ -2,7 +2,7 @@ package DBIx::Tree::NestedSet::SQLite;
 
 use strict;
 use Carp;
-$DBIx::Tree::NestedSet::SQLite::VERSION='0.12';
+$DBIx::Tree::NestedSet::SQLite::VERSION='0.15';
 
 ################################################################################
 sub new{
@@ -95,16 +95,11 @@ sub _create_default_table{
 ################################################################################
 sub _create_table_statements{
     my ($table,$id,$left,$right)=@_;
-    return(qq|
-	   CREATE TABLE $table (
-				$id integer primary key,
-				$left mediumint(9) NOT NULL,
-				$right mediumint(9) NOT NULL
-			       )
-	   |,
-	   qq|CREATE INDEX $left on $table($left)|,
-	   qq|CREATE INDEX $right on $table($right)|
-	  );
+    return(qq|CREATE TABLE $table ($id integer primary key,
+  $left mediumint(9) NOT NULL,
+  $right mediumint(9) NOT NULL)|,
+qq|CREATE INDEX $left on $table($left)|,
+qq|CREATE INDEX $right on $table($right)|);
 }
 ########################################
 
