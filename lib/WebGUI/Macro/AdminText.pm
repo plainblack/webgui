@@ -29,7 +29,7 @@ sub _replacement {
 #-------------------------------------------------------------------
 sub process {
         my ($output) = @_;
-	$output =~ s/\^AdminText\((.*?)\)\;/$1/ge;
+	$output =~ s/\^AdminText\((.*?)\)\;/_replacement($1)/ge;
         return $output;
 }
 
