@@ -8,6 +8,14 @@ versions. Be sure to heed the warnings contained herein as they will
 save you many hours of grief.
 
 
+5.3.2
+--------------------------------------------------------------------
+ * On some systems the ^\; macro is not specified properly in the
+	config file. It should be \\ even though the macro is only
+	\. We will probably replace this macro's identifer with a 
+	text identifier in the future to avoid this problem.
+
+
 5.3.1
 --------------------------------------------------------------------
  * If you downloaded and installed 5.3.0 from scratch (not an 
@@ -18,7 +26,6 @@ save you many hours of grief.
 
 	NOTE: Users upgrading from another version to 5.3.0 or 5.3.1
 	should have no problems and can disregard this message.
-
 
 
 5.3.0
