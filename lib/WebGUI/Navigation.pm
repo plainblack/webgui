@@ -226,7 +226,8 @@ sub build {
 	my $cache = WebGUI::Cache->new($self->{_identifier}.'-'.$session{page}{pageId}, "Navigation-".$session{config}{configFile});
 	my $cacheContent = $cache->get;
 
-	my @page_loop;
+	my (@page_loop, $lastPage, %unfolded);
+	tie %unfolded, "Tie::IxHash";
 	
 	unless (defined $cacheContent) {
 		# The loop was not cached
@@ -257,6 +258,7 @@ sub build {
 				$pageData->{"page.isHidden"} = $page->{'hideFromNavigation'};
 				$pageData->{"page.isSystem"} = (($page->{'pageId'} < 1000 && $page->{'pageId'} > 1) || 
 							$page->{'pageId'} == 0);
+
 				
 				# indent
 				my $indent = 0;
@@ -304,16 +306,30 @@ sub build {
 					(($page->{'lft'} > $currentPage->get('lft')) && ($page->{'rgt'} < $currentPage->get('rgt'))) ||
 					(($page->{'lft'} < $currentPage->get('lft')) && ($page->{'rgt'} > $currentPage->get('rgt')));
 				# Some information about my mother
+				
+				my $mother = WebGUI::Page->getPage($page->{parentId});
 				if ($page->{parentId} > 0) {
-					my $mother = WebGUI::Page->getPage($page->{parentId});
 					foreach (qw(title urlizedTitle parentId pageId)) {
 						$pageData->{"page.mother.$_"} = $mother->get($_);
 					}
 				}
+				
+				$pageData->{"page.isLeftMost"} = (($page->{'lft'} - 1) == $mother->get('lft'));
+				$pageData->{"page.isRightMost"} = (($page->{'rgt'} + 1) == $mother->get('rgt'));
+				my $depthDiff = ($lastPage) ? ($lastPage->{'page.absDepth'} - $pageData->{'page.absDepth'}) : 0;
+				if ($depthDiff > 0) {
+					$pageData->{"page.depthDiff"} = $depthDiff if ($depthDiff > 0);
+					$pageData->{"page.depthDiffIs".$depthDiff} = 1;
+					push(@{$pageData->{"page.depthDiff_loop"}},{}) for(1..$depthDiff);
+				}
+				
 				# Some information about my depth
 				$pageData->{"page.depthIs".$pageData->{"page.absDepth"}} = 1;
-				$pageData->{"page.relativeDepthIs".$pageData->{"page.absDepth"}} = 1;
+				$pageData->{"page.relativeDepthIs".$pageData->{"page.relDepth"}} = 1;
 
+				# We need a copy of the last page for the depthDiffLoop
+				$lastPage = $pageData;
+				
 				# Store $pageData in page_loop. Mind the order.
 				if ($self->{_reverse}) {
 					unshift(@page_loop, $pageData);
@@ -338,9 +354,14 @@ sub build {
 		# Check privileges
 		if ($pageData->{"page.isViewable"} || $self->{_showUnprivilegedPages}) {
 			push (@{$var->{page_loop}}, $pageData);
+			push (@{$unfolded{$pageData->{"page.parentId"}}}, $pageData);
 		}
 	}
 
+	foreach (values %unfolded) {
+		push(@{$var->{unfolded_page_loop}}, @{$_});
+	}
+	
 	# Configure button
 	$var->{'config.button'} = $self->_getEditButton();
 	

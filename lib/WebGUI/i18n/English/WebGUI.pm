@@ -6977,6 +6977,7 @@ Following a guide like the above will help you get good ranking on search engine
 <P><STRONG>indent</STRONG><BR>A number representing the loop count. </P></BLOCKQUOTE>
 <P dir=ltr><STRONG>page.isRoot</STRONG><BR>A condition indication whether this page is a root page.</P>
 <P dir=ltr><STRONG>page.isTop</STRONG><BR>A condition indication whether this page is a top page (daughter of root).</P>
+<P dir=ltr><STRONG>page.inCurrentRoot</STRONG><BR>This condition is true if this page is a descendant of the root page of the current page</P>
 <P dir=ltr><STRONG>page.hasDaughter</STRONG><BR>A condition indication whether this page has a daughter. In other words: It evaluates to true if this page is a mother.</P>
 <P dir=ltr><STRONG>page.isMyDaughter</STRONG><BR>A condition indication whether this page is a daughter of current page.</P>
 <P dir=ltr><STRONG>page.isMyMother<BR></STRONG>A condition indication whether this page is the mother of current page.</P>
@@ -6986,7 +6987,13 @@ Following a guide like the above will help you get good ranking on search engine
 <P dir=ltr><STRONG>page.mother.parentId</STRONG><BR>The parentId of the mother of this page.</P>
 <P dir=ltr><STRONG>page.depthIs1 , page.depthIs2 , page.depthIs3 , page.depthIs4 , page.depthIsN<BR></STRONG>A condition indicating whether the depth of this page is N. This variable is useful if you want to style a certain level.</P>
 <P dir=ltr>&lt;tmpl_if page.depthIs1&gt;<BR>&nbsp;&nbsp; &lt;img src="level1.gif"&gt;<BR>&lt;tmpl_else&gt;<BR>&nbsp;&nbsp; &lt;img src="defaultBullet.gif"&gt;<BR>&lt;/tmpl_if&gt;</P>
-<P dir=ltr><STRONG>page.relativeDepthIs1 , page.relativeDepthIs2 , page.relativeDepthIs3 , page.relativeDepthIsN</STRONG><BR>A condition indicating whether the relative depth of this page is N.</P></BLOCKQUOTE>
+<P dir=ltr><STRONG>page.relativeDepthIs1 , page.relativeDepthIs2 , page.relativeDepthIs3 , page.relativeDepthIsN</STRONG><BR>A condition indicating whether the relative depth of this page is N.</P>
+<P dir=ltr><STRONG>page.isLeftMost</STRONG><BR>This property is true if this page is the first within this level. Ie. has no left sister.</P>
+<P dir=ltr><STRONG>page.isRightMost</STRONG><BR>This property is true if this page is the last within this level. Ie. has no right sister.</P>
+<P dir=ltr><STRONG>page.depthDiff</STRONG><BR>The difference in depth of this page and the page processed before it. This only has a value when you go up in depth. If you go down, this would be always 1 and going down a level can be detected with <STRONG>page.isLeftMost</STRONG>.</P>
+<P dir=ltr><STRONG>page.depthDiffIs1, page.depthDiffIs2, page.depthDiffIs3, page.depthDiffIsN</STRONG><BR>True if the <STRONG>page.depthDiff</STRONG> variable is N.</P>
+<P dir=ltr><STRONG>page.depthDiff_loop</STRONG><BR>A loop that runs <STRONG>page.depthDiff</STRONG> times. This loop contains no loop variables.</P></BLOCKQUOTE>
+<P><STRONG>unfolded_page_loop</STRONG><BR>This loop contains the same data as <STRONG>page_loop</STRONG> but the order is different. <STRONG>page_loop</STRONG> returns it's pages in a nested order: the pages are returned in a hierarchical order. <STRONG>unfolded_page_loop</STRONG>, however, returns it's pages in an unfolded manner: it's returned pages are grouped by parent id. You'll probably need <STRONG>page_loop</STRONG>, but there are (CSS) menus that need <STRONG>unfolded_page_loop</STRONG> to work properly.</P>
 <P dir=ltr>&nbsp;</P>|,
 		lastUpdated => 1078207966
 	},
