@@ -1,3 +1,9 @@
+6.0.1
+
+ - Fixed a couple of formatting problems with the USS.
+
+
+
 6.0.0
 
  - HTTP header conforming P3P Compact Privacy Policy. This fixes IE6 cookie

@@ -679,9 +679,9 @@ sub www_view {
 	$i = 0;
 	my $imageURL;
 	foreach $row (@$page) {
+                $page->[$i]->{content} =~ s/\n/\^\-\;/ unless ($page->[$i]->{content} =~ m/\^\-\;/);
 		$page->[$i]->{content} = WebGUI::HTML::filter($page->[$i]->{content},$_[0]->get("filterContent"));
 		$page->[$i]->{content} = WebGUI::HTML::format($page->[$i]->{content},$page->[$i]->{contentType});
-                $page->[$i]->{content} =~ s/\n/\^\-\;/ unless ($page->[$i]->{content} =~ m/\^\-\;/);
                 @content = split(/\^\-\;/,$page->[$i]->{content});
                 if ($page->[$i]->{image} ne "") {
                         $image = WebGUI::Attachment->new($page->[$i]->{image},$_[0]->get("wobjectId"),$page->[$i]->{USS_submissionId});
@@ -824,7 +824,7 @@ sub www_viewSubmission {
 	$var{title} = $submission->{title};
 	$var{content} = WebGUI::HTML::filter($submission->{content},$_[0]->get("filterContent"));
 	$var{content} =~ s/\^\-\;//g;
-	$var{content} =~ WebGUI::HTML::format($submission->{content},$submission->{contentType});
+	$var{content} = WebGUI::HTML::format($var{content},$submission->{contentType});
         $var{"user.label"} = WebGUI::International::get(21,$_[0]->get("namespace"));
 	$var{"user.Profile"} = WebGUI::URL::page('op=viewProfile&uid='.$submission->{userId});
 	$var{"user.Id"} = $submission->{userId};
