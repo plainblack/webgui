@@ -868,7 +868,7 @@ Returns a reference to the container asset. If this asset is a container it retu
 
 sub getContainer {
 	my $self = shift;
-	if (WebGUI::Utility::isIn(ref $self, @{$session{config}{assetContainers}})) {
+	if (WebGUI::Utility::isIn($self->get("className"), @{$session{config}{assetContainers}})) {
 		return $self;
 	} else {
 		$session{asset} = $self->getParent;
@@ -2357,8 +2357,7 @@ sub www_editSave {
 		$session{asset} = $object;
 		return $object->$method();
 	}
-	$session{asset} = $object->getParent;
-	return $object->getParent->www_view;
+	return $self->getContainer->www_view;
 }
 
 #-------------------------------------------------------------------
