@@ -137,11 +137,13 @@ sub isInGroup {
         ### Get data for auxillary checks.
 	tie %group, 'Tie::CPHash';
 	%group = WebGUI::SQL->quickHash("select karmaThreshold from groups where groupId='$gid'");
-	tie %user, 'Tie::CPHash';
-	%user = WebGUI::SQL->quickHash("select karma from users where userId='$uid'");
         ### Check karma levels.
-	if ($user{karma} >= $group{karmaThreshold}) {
-		return 1;
+	if ($session{setting}{useKarma}) {
+		tie %user, 'Tie::CPHash';
+		%user = WebGUI::SQL->quickHash("select karma from users where userId='$uid'");
+		if ($user{karma} >= $group{karmaThreshold}) {
+			return 1;
+		}
 	}
 	### Admins can do anything!
         if ($gid != 3) {                        

@@ -81,7 +81,11 @@ sub www_editGroup {
                 $f->text("groupName",WebGUI::International::get(84),$group{groupName});
                 $f->textarea("description",WebGUI::International::get(85),$group{description});
                 $f->integer("expireAfter",WebGUI::International::get(367),$group{expireAfter});
-                $f->integer("karmaThreshold",WebGUI::International::get(538),$group{karmaThreshold});
+		if ($session{setting}{useKarma}) {
+                	$f->integer("karmaThreshold",WebGUI::International::get(538),$group{karmaThreshold});
+		} else {
+                	$f->hidden("karmaThreshold",$group{karmaThreshold});
+		}
 		$f->submit;
 		$output .= $f->print;
 		unless ($session{form}{gid} eq "new") {
