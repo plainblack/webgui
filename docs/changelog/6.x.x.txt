@@ -1,6 +1,7 @@
 6.2.2
  - Made a dramatic performance enhancement to the page tree system by
    restructuring an overused, and inefficent method.
+ - bugfix [1024275]. Drag and drop not working (Leendert Bottelberghs).
 
 
 6.2.1
