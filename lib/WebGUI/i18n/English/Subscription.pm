@@ -27,8 +27,8 @@ our $I18N = {
 
 	'delete subscription confirm' => {
 		message => q|Are you sure to delete this subscription?|,
-		lastUpdated => 1101228391,
-		context => q|Corfirmation question when deleting a subscription.|
+		lastUpdated => 1101754598,
+		context => q|Confirmation question when deleting a subscription.|
 	},
 
 	'subscriptionId' => {
@@ -58,7 +58,7 @@ our $I18N = {
 	'delete batch confirm' => {
 		message => q|Are you sure to delete this batch?|,
 		lastUpdated => 1101228391,
-		context => q|Corfirmation question when deleting a code batch.|
+		context => q|Confirmation question when deleting a code batch.|
 	},
 
 	'selection used' => {
@@ -87,12 +87,12 @@ our $I18N = {
 
 	'help edit subscription title' => {
 		message => q|Subscription, Add/Edit|,
-		lastUpadated => 1101228391,
+		lastUpdated => 1101228391,
 		context => q|The Add/Edit subscription help page title.|
 	},
 
 	'help edit subscription body' => {
-		message => q|A subscription will allow the user a piece of content wich he/she has
+		message => q|A subscription will allow the user a piece of content which he/she has
 payed for. The following is the list of properties attached to each
 Description.<br>
 <br>
@@ -109,14 +109,14 @@ Detailed description of the subscription.<br>
 When a user payed the fee, he/she will be added to this group.<br>
 <br>
 <b>Subscription period</b><br>
-This sets the length of one subscribtion term. Ie. You pay every month, or every half year.<br>
+This sets the length of one subscription term. ie. You pay every month, or every half year.<br>
 <br>
 <b>Execute on subscription</b><br>
-A (perl) script to call when someone has subscribed and payed.<br>
+A (Perl) script to call when someone has subscribed and payed.<br>
 <br>
 <b>Karma</b><br>
-The amount of karma wich is added to the user after he/she subscribes.<br>|,
-		lastUpdated => 1101228391,
+The amount of karma which is added to the user after he/she subscribes.<br>|,
+		lastUpdated => 1101754802,
 		context => q|The Add/Edit subscription help page text.|
 	},
 
@@ -217,8 +217,8 @@ The amount of karma wich is added to the user after he/she subscribes.<br>|,
 	},
 
 	'create batch error' => {
-		message => q|An error has occured:|,
-		lastUpdated => 1101228391,
+		message => q|An error has occurred:|,
+		lastUpdated => 1101754822,
 		context => q|Identifies an error in createSubscriptionCodeBatch.|
 	},
 
@@ -283,8 +283,8 @@ The amount of karma wich is added to the user after he/she subscribes.<br>|,
 	},
 
 	'help manage subscription codes body' => {
-		message => q|A subscription code is a 64 character code that is tied to a set of subscriptions. A user can redeem susch a code, and thus make himself subscribed for one term to all subscriptions the code is tied to, using the 'Redeem a subscription code' link in his account menu. Note that when redeeming a suscription code no money is charged.|,
-		lastUpdated => 0,
+		message => q|A subscription code is a 64 character code that is tied to a set of subscriptions. A user can redeem such a code, and thus make himself subscribed for one term to all subscriptions the code is tied to, using the 'Redeem a subscription code' link in his account menu. Note that when redeeming a subscription code no money is charged.|,
+		lastUpdated => 1101754831,
 		context => q|The content of the Manage Subscriptions codes help page.|
 	},
 
@@ -335,8 +335,8 @@ Description of the batch.<br>|,
 		context => q|The success message for the code redemption function.|
 	},
 	'redeem code failure' => {
-		message => q|You've entered a code that's wrong, allready being used or expired. Please enter another code below.|,
-		lastUpdated => 0,
+		message => q|You've entered a code that's wrong, already being used or expired. Please enter another code below.|,
+		lastUpdated => 1101754837,
 		context => q|The failure message for the code redemption function.|
 	},
 	'redeem code ask for code' => {
@@ -365,8 +365,8 @@ The form in which the user can enter his subscription code.<br>|,
 		context => q|The body of the help page of the code redemption template.|
 	},
 	'help redeem code template title' => {
-		message => q|Redeem subscripton code template|,
-		lastUpdated => 0,
+		message => q|Redeem subscription code template|,
+		lastUpdated => 1101754848,
 		context => q|The title of the help page of the code redemption template.|
 	},
 
