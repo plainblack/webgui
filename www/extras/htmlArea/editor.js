@@ -49,6 +49,7 @@ this.toolbar = [
     ['forecolor','backcolor','separator'],
     ['HorizontalRule','Createlink','InsertImage','InsertTable','htmlmode','separator'],
 	['Macros','separator'],
+    ['Smileys','separator'],
 
 //  ['custom1','custom2','custom3','separator'],
     ['popupeditor']]; //,'about']];
@@ -83,6 +84,7 @@ this.fontstyles = [     // make sure these exist in the header of page the conte
 
 this.btnList = {
     // buttonName:    commandID,               title,                onclick,                   image,             
+    "smileys":           ['Smileys',         'Insert Smiley',  'editor_action(this.id)',  'ed_smiley.gif'],
     "bold":           ['Bold',                 'Bold',               'editor_action(this.id)',  'ed_format_bold.gif'],
     "italic":         ['Italic',               'Italic',             'editor_action(this.id)',  'ed_format_italic.gif'],
     "underline":      ['Underline',            'Underline',          'editor_action(this.id)',  'ed_format_underline.gif'],
@@ -309,6 +311,14 @@ function editor_action(button_id) {
   //
   // CUSTOM BUTTONS START HERE
   //
+  // Insert a smiley
+  else if (cmdID == 'Smileys') {  // insert some text from a popup window
+    var myTitle = "Insert a Smiley";
+    var myText = showModalDialog(_editor_url + "popups/insert_smiley.pl",
+                                 myTitle,      // str or obj specified here can be read from dialog as "window.dialogArguments"
+                                 "resizable: yes; help: no; status: no; scroll: yes; ");
+    if (myText) { editor_insertHTML(objname, myText); }
+  }
 
   // Custom1
   else if (cmdID == 'custom1') {
