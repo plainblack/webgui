@@ -38,7 +38,7 @@ sub _submenu {
 
 #-------------------------------------------------------------------
 sub www_editUserSettings {
-	WebGUI::Privilege::adminOnly() unless (WebGUI::Privilege::isInGroup(3));
+	return WebGUI::Privilege::adminOnly() unless (WebGUI::Privilege::isInGroup(3));
         my ($output, $f, $cmd, $html, $options);
         $output .= helpIcon(2);
         $output .= '<h1>'.WebGUI::International::get(117).'</h1>';
@@ -64,7 +64,7 @@ sub www_editUserSettings {
 
 #-------------------------------------------------------------------
 sub www_editCompanyInformation {
-	WebGUI::Privilege::adminOnly() unless (WebGUI::Privilege::isInGroup(3));
+	return WebGUI::Privilege::adminOnly() unless (WebGUI::Privilege::isInGroup(3));
         my ($output, $f);
         $output .= helpIcon(6);
 	$output .= '<h1>'.WebGUI::International::get(124).'</h1>';
@@ -80,7 +80,7 @@ sub www_editCompanyInformation {
 
 #-------------------------------------------------------------------
 sub www_editContentSettings {
-	WebGUI::Privilege::adminOnly() unless (WebGUI::Privilege::isInGroup(3));
+	return WebGUI::Privilege::adminOnly() unless (WebGUI::Privilege::isInGroup(3));
         my ($output, %htmlFilter, $f, $pages);
 	$pages = WebGUI::SQL->buildHashRef("select pageId,menuTitle from page order by menuTitle");
         %htmlFilter = ('none'=>WebGUI::International::get(420), 'most'=>WebGUI::International::get(421), 
@@ -130,7 +130,7 @@ sub www_editContentSettings {
 
 #-------------------------------------------------------------------
 sub www_editMessagingSettings {
-	WebGUI::Privilege::adminOnly() unless (WebGUI::Privilege::isInGroup(3));
+	return WebGUI::Privilege::adminOnly() unless (WebGUI::Privilege::isInGroup(3));
         my ($output, $f);
         $output .= helpIcon(13);
         $output .= '<h1>'.WebGUI::International::get(133).'</h1>';
@@ -147,7 +147,7 @@ sub www_editMessagingSettings {
 
 #-------------------------------------------------------------------
 sub www_editMiscSettings {
-	WebGUI::Privilege::adminOnly() unless (WebGUI::Privilege::isInGroup(3));
+	return WebGUI::Privilege::adminOnly() unless (WebGUI::Privilege::isInGroup(3));
         my ($output, $f);
         $output .= helpIcon(24);
         $output .= '<h1>'.WebGUI::International::get(140).'</h1>';
@@ -163,7 +163,7 @@ sub www_editMiscSettings {
 
 #-------------------------------------------------------------------
 sub www_manageSettings {
-	WebGUI::Privilege::adminOnly() unless (WebGUI::Privilege::isInGroup(3));
+	return WebGUI::Privilege::adminOnly() unless (WebGUI::Privilege::isInGroup(3));
         my ($output);
         $output .= helpIcon(12);
         $output .= '<h1>'.WebGUI::International::get(143).'</h1>';
@@ -180,7 +180,7 @@ sub www_manageSettings {
 
 #-------------------------------------------------------------------
 sub www_saveSettings {
-	WebGUI::Privilege::adminOnly() unless (WebGUI::Privilege::isInGroup(3));
+	return WebGUI::Privilege::adminOnly() unless (WebGUI::Privilege::isInGroup(3));
 	my ($key, $value);
 	foreach $key (keys %{$session{form}}) {
 		$value = $session{form}{$key};

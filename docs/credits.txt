@@ -36,6 +36,7 @@ Contributing Translators.............AGOFER Ltda.
                                      Natalia Almazova
                                      Joeri de Bruin / ProcoliX
                                      Jose Caneira
+                                     Junying Du / WDI
                                      Andreas Graf
                                      Emiliano Grilli / Webopen
                                      Ehab Heikal
