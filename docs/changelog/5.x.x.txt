@@ -19,6 +19,8 @@
  - bugfix [ 884372 ] $session{header}{redirect} bug under mod_perl
  - Bugfix [ 884375 ] Fix for multiple forum posts caused by browser Refresh
  - Bugfix [ 886432 ] endless loop in group of groups
+ - bugfix [ 887447 ] editing messages
+ - Bugfix [ 893203 ] IO::Zlib not getting installed
 
 
 5.5.4
