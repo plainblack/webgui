@@ -49,8 +49,7 @@ sub www_editUserSettings {
         $f->yesNo("useKarma",WebGUI::International::get(539),$session{setting}{useKarma});
         $f->integer("karmaPerLogin",WebGUI::International::get(540),$session{setting}{karmaPerLogin});
         $f->interval("sessionTimeout",WebGUI::International::get(142),WebGUI::DateTime::secondsToInterval($session{setting}{sessionTimeout}));
-        #$f->yesNo("usernameBinding",WebGUI::International::get(306),$session{setting}{usernameBinding});
-	$f->yesNo("selfDeactivation","Allow users to deactivate their account",$session{setting}{selfDeactivation});
+	$f->yesNo("selfDeactivation",WebGUI::International::get(885),$session{setting}{selfDeactivation});
         $f->select("authMethod",$session{authentication},WebGUI::International::get(119),[$session{setting}{authMethod}]);
 	foreach (keys %{$session{authentication}}) {
 		$f->raw(WebGUI::Authentication::settingsForm($_));
@@ -79,11 +78,10 @@ sub www_editCompanyInformation {
 #-------------------------------------------------------------------
 sub www_editContentSettings {
 	WebGUI::Privilege::adminOnly() unless (WebGUI::Privilege::isInGroup(3));
-        my ($output, %htmlFilter, %editor, $f, $pages);
+        my ($output, %htmlFilter, $f, $pages);
 	$pages = WebGUI::SQL->buildHashRef("select pageId,menuTitle from page order by menuTitle");
         %htmlFilter = ('none'=>WebGUI::International::get(420), 'most'=>WebGUI::International::get(421), 
 		'javascript'=>WebGUI::International::get(526), 'all'=>WebGUI::International::get(419));
-        %editor = ('built-in'=>WebGUI::International::get(495), 'edit-on-pro'=>WebGUI::International::get(494));
         $output .= helpIcon(29);
         $output .= '<h1>'.WebGUI::International::get(525).'</h1>';
         $f = WebGUI::HTMLForm->new;
@@ -100,7 +98,6 @@ sub www_editContentSettings {
         $f->integer("textAreaRows",WebGUI::International::get(463),$session{setting}{textAreaRows});
         $f->integer("textAreaCols",WebGUI::International::get(464),$session{setting}{textAreaCols});
         $f->integer("textBoxSize",WebGUI::International::get(465),$session{setting}{textBoxSize});
-        $f->select("richEditor",\%editor,WebGUI::International::get(496),[$session{setting}{richEditor}]);
         $f->submit;
         $output .= $f->print;
         return _submenu($output);
