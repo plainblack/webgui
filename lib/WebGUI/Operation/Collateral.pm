@@ -516,7 +516,7 @@ sub _htmlAreaCreateTree {
 #-------------------------------------------------------------------
 sub www_htmlArealistCollateral {
 	my (@parents, $sth, $data, $indent);
-	$session{form}{makePrintable}=1; $session{form}{style}=10;	# Special style for this output
+        $session{page}{makePrintable}=1; $session{page}{printableStyleId}=10;
 	return "<b>Only Content Managers are allowed to use WebGUI Collateral</b>" unless (WebGUI::Privilege::isInGroup(4));
 
 	my $output = '<table border="0" cellspacing="0" cellpadding="0" width="100%">';
@@ -570,11 +570,11 @@ sub www_htmlArealistCollateral {
 #-------------------------------------------------------------------
 sub www_htmlAreaviewCollateral {
 	my($output, $collateral, $file, $x, $y, $image, $error);
-	$session{form}{makePrintable}=1; $session{form}{style}=10;     # Special style for this output
+        $session{page}{makePrintable}=1; $session{page}{printableStyleId}=10;
         $output .= '<table align="center" border="0" cellspacing="0" cellpadding="2" width="100%" height="100%">';
 	if($session{form}{cid} == 0 || ! WebGUI::Privilege::isInGroup(4)) {
 		$output .= '<tr><td align="center" valign="middle" width="100%" height="100%">';
-		$output .= '<p align="center"><br><img src="'.$session{config}{extrasURL}.'/styles/webgui/icon.gif" 
+		$output .= '<p align="center"><br><img src="'.$session{config}{extrasURL}.'/htmlArea/images/icon.gif" 
 			    border="0"></p>';
 		$output .= '<P align=center><STRONG>WebGUI Image Manager<BR>for htmlArea</STRONG></P>';
 		$output .= '</td></tr></table>';
@@ -607,7 +607,7 @@ sub www_htmlAreaviewCollateral {
 
 #-------------------------------------------------------------------
 sub www_htmlAreaUpload {
-	$session{form}{makePrintable}=1; $session{form}{style}=10;     # Special style for this output
+        $session{page}{makePrintable}=1; $session{page}{printableStyleId}=10;
 	return "<b>Only Content Managers are allowed to use WebGUI Collateral</b>" unless (WebGUI::Privilege::isInGroup(4));
 	return www_htmlArealistCollateral() if ($session{form}{image} eq "");
 	my($test, $file);
@@ -632,7 +632,7 @@ sub www_htmlAreaUpload {
 
 #-------------------------------------------------------------------
 sub www_htmlAreaDelete {
-	$session{form}{makePrintable}=1; $session{form}{style}=10;     # Special style for this output
+        $session{page}{makePrintable}=1; $session{page}{printableStyleId}=10;
 	return "<b>Only Content Managers are allowed to use WebGUI Collateral</b>" unless (WebGUI::Privilege::isInGroup(4));
 	if($session{form}{cid}) { # Delete Image
 	        my $collateral = WebGUI::Collateral->new($session{form}{cid});
@@ -649,7 +649,7 @@ sub www_htmlAreaDelete {
 
 #-------------------------------------------------------------------
 sub www_htmlAreaCreateFolder {
-	$session{form}{makePrintable}=1; $session{form}{style}=10;     # Special style for this output
+        $session{page}{makePrintable}=1; $session{page}{printableStyleId}=10;
 	return "<b>Only Content Managers are allowed to use WebGUI Collateral</b>" unless (WebGUI::Privilege::isInGroup(4));
         $session{form}{fid} = getNextId("collateralFolderId");
         WebGUI::Session::setScratch("collateralFolderId",$session{form}{fid});

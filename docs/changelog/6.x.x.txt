@@ -2,7 +2,8 @@
 
  - Fixed a couple of formatting problems with the USS.
  - Added Text::Balanced to the distro.
-
+ = Fixed bug [ 910145 ] htmlArea - insert image not working (Len Kranendonk /
+Andreas Graf).
 
 6.0.0
 
