@@ -420,7 +420,7 @@ sub www_view {
 			# get event information
 			my $query = "select * from EventsCalendar_event where ";
 			$query .= " wobjectId=".$_[0]->get("wobjectId")." and " unless ($_[0]->get("isMaster"));
-			$query .= " (endDate>=$monthStart or endDate<=$monthEnd) and (startDate>=$monthStart or startDate<=$monthEnd) order by startDate,endDate";
+			$query .= " (endDate>=$monthStart and endDate<=$monthEnd) and (startDate>=$monthStart and startDate<=$monthEnd) order by startDate,endDate";
 			my %events;
 			my %previous;
 			my $sth = WebGUI::SQL->read($query);
