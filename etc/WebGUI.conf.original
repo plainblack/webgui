@@ -3,20 +3,21 @@ assets = WebGUI::Asset::File::Image, \
 	WebGUI::Asset::Snippet, \
 	WebGUI::Asset::Template, \
 	WebGUI::Asset::Redirect, \
-	WebGUI::Asset::Wobject::Collaboration, \
-	WebGUI::Asset::Wobject::IndexedSearch, \
-	WebGUI::Asset::Wobject::Product, \
-	WebGUI::Asset::Wobject::Poll, \
-	WebGUI::Asset::Wobject::SyndicatedContent, \
-	WebGUI::Asset::Wobject::HttpProxy, \
-	WebGUI::Asset::Wobject::SQLReport, \
-	WebGUI::Asset::Wobject::WSClient, \
+	WebGUI::Asset::FilePile, \
 	WebGUI::Asset::Wobject::Article, \
-	WebGUI::Asset::Wobject::Navigation, \
-	WebGUI::Asset::Wobject::Survey, \
+	WebGUI::Asset::Wobject::Collaboration, \
 	WebGUI::Asset::Wobject::DataForm, \
+	WebGUI::Asset::Wobject::EventsCalendar, \
+	WebGUI::Asset::Wobject::HttpProxy, \
+	WebGUI::Asset::Wobject::IndexedSearch, \
 	WebGUI::Asset::Wobject::MessageBoard, \
-	WebGUI::Asset::FilePile
+	WebGUI::Asset::Wobject::Navigation, \
+	WebGUI::Asset::Wobject::Poll, \
+	WebGUI::Asset::Wobject::Product, \
+	WebGUI::Asset::Wobject::SQLReport, \
+	WebGUI::Asset::Wobject::Survey, \
+	WebGUI::Asset::Wobject::SyndicatedContent, \
+	WebGUI::Asset::Wobject::WSClient
 
 assetContainers = WebGUI::Asset::Wobject::Layout, \
 	WebGUI::Asset::Wobject::Folder
