@@ -53,6 +53,8 @@ Convert::ASN1........................Graham Barr
 
 Data::Config.........................Sébastien Aperghis-Tramoni
 
+Date::Manip..........................Sullivan Beck
+
 DBIx::FullTextSearch.................T.J. Mather
 
 DBIx::Tree::NestedSet................Dan Collis Puro

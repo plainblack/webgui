@@ -18,7 +18,6 @@ QnD INSTALL INSTRUCTIONS:
    DBI
    DBD::mysql
    Digest::MD5
-   Date::Calc
    HTML::Parser 
    Archive::Tar
    Compress::Zlib

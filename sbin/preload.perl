@@ -28,7 +28,6 @@ use Cache::FileCache ();
 use CGI (); CGI->compile(':all');
 use CGI::Carp ();
 use CGI::Util ();
-use Date::Calc ();
 use Digest::MD5 ();
 eval "use Image::Magick ();"; # eval, may not be installed
 use File::Copy ();
@@ -56,6 +55,7 @@ DBI->install_driver("mysql"); # Change to match your database driver.
 #use HTML::Parser (); # commented because it is causing problems with attachments
 #use HTML::TagFilter (); # commented because it is causing problems with attachments
 use Parse::PlainConfig ();
+use Date::Manip ();
 use Tie::CPHash ();
 use Tie::IxHash ();
 use Tree::DAG_Node ();

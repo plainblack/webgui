@@ -16,7 +16,7 @@ package WebGUI::Session;
 
 
 use CGI;
-use Date::Calc;
+use Date::Manip;
 use DBI;
 use Exporter;
 use strict;
@@ -128,7 +128,7 @@ sub _setupUserInfo {
 
 #-------------------------------------------------------------------
 sub _time {
-	return Date::Calc::Date_to_Time(Date::Calc::Today_and_Now());
+	return &UnixDate(&ParseDate("now")),"%s");
 }
 
 

@@ -187,19 +187,6 @@ if (eval { require Net::SMTP }) {
         }
 }
 
-print "Date::Calc module ........................ ";
-if (eval { require Date::Calc }) {
-        print "OK\n";
-} else {
-	if ($< == 0 && $os eq "Linuxish") {
-                print "Attempting to install...\n";
-                CPAN::Shell->install("Date::Calc");
-        } else {
-                print "Please install.\n";
-		$prereq = 0;
-        }
-}
-
 print "Cache::Cache module ...................... ";
 if (eval { require Cache::Cache }) {
         print "OK\n";

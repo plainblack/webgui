@@ -78,6 +78,9 @@
    the shortcut.
  - bugfix [ 1016271 ]. all posts go to last forum in MB (Leendert Bottelberghs).
  - Added FastCGI support. (Kevin Wilson)
+ - Replaced Date::Calc with Date::Manip to allow for dates before 1970 and
+   after 2035. (Emiliano Bruni)
+ - Added Date::Manip to the WebGUI distribution.
 
 
 6.1.1
