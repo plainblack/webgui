@@ -113,7 +113,7 @@ sub _setupSessionVars {
 			WebGUI::SQL->write("update userSession set lastPageView=".time().", lastIP='$ENV{REMOTE_ADDR}', 
 				expires=".(time()+$session{setting}{sessionTimeout})." where sessionId='$_[0]'");
 		} else {
-			start(1,$session{$_[0]});
+			start(1,$_[0]);
                 }
 	}
 	$session{var} = \%vars;
