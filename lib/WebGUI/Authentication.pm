@@ -18,18 +18,16 @@ sub saveParams {
 
 	($uid, $authMethod, $data) = @_;
 	foreach (keys(%$data)) {
-		my $sql = "replace into authentication set userId=$uid, authMethod=".quote($authMethod).", fieldData=".quote($$data{$_}).", fieldName=".quote($_);
-		WebGUI::SQL->write($sql);
+		WebGUI::SQL->write("delete from authentication where userId=$uid and authMethod=".quote($authMethod)." and fieldName=".quote($_));
+		WebGUI::SQL->write("insert into authentication (userId,authMethod,fieldData,fieldName) values ($uid,".quote($authMethod).",".quote($$data{$_}).",".quote($_).")");
 	}
 }
 
 sub getParams {
-	my ($uid, $authMethod, $data);
-
+	my ($uid, $authMethod);
 	$uid = shift;
 	$authMethod = shift;
-	$data = WebGUI::SQL->buildHashRef("select fieldName, fieldData from authentication where userId=$uid and authMethod='$authMethod'");
-	return $data;
+	return WebGUI::SQL->buildHashRef("select fieldName, fieldData from authentication where userId=$uid and authMethod='$authMethod'");
 }
 
 sub deleteParams {
