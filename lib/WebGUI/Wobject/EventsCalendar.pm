@@ -236,6 +236,8 @@ sub www_edit {
 	$properties->select(
 		-name=>"startMonth",
 		-options=>{
+			"january"=>WebGUI::International::get(15),
+			"now"=>WebGUI::International::get(98,$_[0]->get("namespace")),
 			"current"=>WebGUI::International::get(82,$_[0]->get("namespace")),
 			"first"=>WebGUI::International::get(83,$_[0]->get("namespace"))
 			},
@@ -433,9 +435,14 @@ sub www_view {
 	if ($_[0]->get("startMonth") eq "first") {
 		($minDate) = WebGUI::SQL->quickArray("select min(startDate) from EventsCalendar_event 
 			where wobjectId=".$_[0]->get("wobjectId"));
+	} elsif ($_[0]->get("startMonth") eq "january") {
+		$minDate = WebGUI::DateTime::humanToEpoch(WebGUI::DateTime::epochToHuman("","%y")."-01-01 00:00:00");
+	} else {
+		$minDate = WebGUI::DateTime::time();
 	}
-	$minDate = $minDate || WebGUI::DateTime::time();
-	($minDate,$junk) = WebGUI::DateTime::monthStartEnd($minDate);
+	unless ($_[0]->get("startMonth") eq "now") {
+		($minDate,$junk) = WebGUI::DateTime::monthStartEnd($minDate);
+	}
 	if ($_[0]->get("endMonth") eq "last") {
 		($maxDate) = WebGUI::SQL->quickArray("select max(endDate) from EventsCalendar_event where 
 			wobjectId=".$_[0]->get("wobjectId"));	

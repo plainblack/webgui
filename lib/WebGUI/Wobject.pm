@@ -646,7 +646,7 @@ sub new {
 			rearrange([qw(properties extendedProperties useDiscussion useTemplate)], @p);
 	} 
 	$useDiscussion = 0 unless ($useDiscussion);
-	$useTemplate = 0 unless ($useDiscussion);
+	$useTemplate = 0 unless ($useTemplate);
 	my $wobjectProperties = {
 		userDefined1=>{
 			fieldType=>"text"
@@ -742,6 +742,7 @@ sub new {
 		};
         bless({
 		_property=>$properties, 
+		_useTemplate=>$useTemplate,
 		_useDiscussion=>$useDiscussion,
 		_wobjectProperties=>$wobjectProperties,
 		_extendedProperties=>$extendedProperties
