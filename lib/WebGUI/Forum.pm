@@ -383,6 +383,7 @@ Destroys this forum and everything it contains.
 
 sub purge {
 	my ($self) = @_;
+	return unless ($self->get("forumId"));
 	my $a = WebGUI::SQL->read("select * from forumThread where forumId=".$self->get("forumId"));
 	while (my ($threadId) = $a->array) {
 		my $b = WebGUI::SQL->read("select * from forumPost where forumThreadId=".$threadId);
