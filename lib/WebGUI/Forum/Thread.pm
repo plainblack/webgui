@@ -1,5 +1,19 @@
 package WebGUI::Forum::Thread;
 
+=head1 LEGAL
+                                                                                                                                                             
+ -------------------------------------------------------------------
+  WebGUI is Copyright 2001-2003 Plain Black LLC.
+ -------------------------------------------------------------------
+  Please read the legal notices (docs/legal.txt) and the license
+  (docs/license.txt) that came with this distribution before using
+  this software.
+ -------------------------------------------------------------------
+  http://www.plainblack.com                     info@plainblack.com
+ -------------------------------------------------------------------
+                                                                                                                                                             
+=cut
+
 use strict;
 use WebGUI::DateTime;
 use WebGUI::Forum;
@@ -7,6 +21,22 @@ use WebGUI::Forum::Post;
 use WebGUI::Session;
 use WebGUI::SQL;
 use WebGUI::Utility;
+
+=head1 DESCRIPTION
+                                                                                                                                                             
+Data management class for forum threads.
+                                                                                                                                                             
+=head1 SYNOPSIS
+                                                                                                                                                             
+ use WebGUI::Forum;
+ $forum = WebGUI::Forum::Thread->create(\%params);
+ $forum = WebGUI::Forum::Thread->new($threadId);
+                                                                                                                                                             
+=head1 METHODS
+                                                                                                                                                             
+These methods are available from this class:
+                                                                                                                                                             
+=cut
 
 sub create {
 	my ($self, $data, $postData) = @_;

@@ -1,5 +1,19 @@
 package WebGUI::Forum::Post;
 
+=head1 LEGAL
+                                                                                                                                                             
+ -------------------------------------------------------------------
+  WebGUI is Copyright 2001-2003 Plain Black LLC.
+ -------------------------------------------------------------------
+  Please read the legal notices (docs/legal.txt) and the license
+  (docs/license.txt) that came with this distribution before using
+  this software.
+ -------------------------------------------------------------------
+  http://www.plainblack.com                     info@plainblack.com
+ -------------------------------------------------------------------
+                                                                                                                                                             
+=cut
+
 use strict;
 use WebGUI::DateTime;
 use WebGUI::Forum::Thread;
@@ -7,12 +21,60 @@ use WebGUI::Session;
 use WebGUI::SQL;
 use WebGUI::Utility;
 
+=head1 DESCRIPTION
+                                                                                                                                                             
+Data management class for forum posts.
+                                                                                                                                                             
+=head1 SYNOPSIS
+                                                                                                                                                             
+ use WebGUI::Forum::Post;
+ $forum = WebGUI::Forum::Post->create(\%params);
+ $forum = WebGUI::Forum::Post->new($postId);
+                                                                                                                                                             
+=head1 METHODS
+                                                                                                                                                             
+These methods are available from this class:
+                                                                                                                                                             
+=cut
+
+#-------------------------------------------------------------------
+
+=head2 canEdit ( [ userId ] )
+
+Returns a boolean indicating whether the user can edit the current post.
+
+=over
+
+=item userId
+
+The unique identifier to check privileges against. Defaults to the current user.
+
+=back
+
+=cut
+
 sub canEdit {
         my ($self, $userId) = @_;
 	$userId = $session{user}{userId} unless ($userId);
         return ($self->getThread->getForum->isModerator || ($self->get("userId") == $userId && $userId != 1 
 		&& $self->getThread->getForum->get("editTimeout") < (WebGUI::DateTime::time() - $self->get("dateOfPost"))));
 }
+
+#-------------------------------------------------------------------
+
+=head2 create ( [ data ] )
+
+Creates a new post.
+
+=over 
+
+=item data
+
+A hash reference containing the data to use to create the post. See the forumPost table for details.
+
+=back
+
+=cut
 
 sub create {
 	my ($self, $data) = @_;
@@ -28,6 +90,22 @@ sub create {
 	return $self;
 }
 
+#-------------------------------------------------------------------
+
+=head2 get ( [ param ] )
+
+Returns a hash reference containing all of the parameters of this post.
+
+=over
+
+=item param
+
+The name of a parameter to get. If specified then the method will return only the value for this parameter as a scalar.
+
+=back
+
+=cut
+
 sub get {
 	my ($self, $key) = @_;
 	if ($key eq "") {
@@ -35,6 +113,14 @@ sub get {
 	}
 	return $self->{_properties}->{$key};
 }
+
+#-------------------------------------------------------------------
+
+=head2 getReplies ( )
+
+Returns an array reference containing a list of post objects that are direct decendants to this post.
+
+=cut
 
 sub getReplies {
 	my ($self) = @_;
@@ -54,6 +140,14 @@ sub getReplies {
 	return \@replies;
 }
 
+#-------------------------------------------------------------------
+
+=head2 getThread ( )
+
+Returns the thread object that is related to this post.
+
+=cut
+
 sub getThread {
 	my ($self) = @_;
 	unless (exists $self->{_thread}) {
@@ -61,6 +155,26 @@ sub getThread {
 	}
 	return $self->{_thread};
 }
+
+#-------------------------------------------------------------------
+
+=head2 hasRated ( [ userId, ipAddress ] ) 
+
+Returns a boolean indicating whether this user has already rated this post.
+
+=over
+
+=item userId
+
+A unique identifier for a user to check. Defaults to the current user.
+
+=item ipAddress
+
+If the user ID equals 1 (visitor) then an IP address is used to distinguish the user. Defaults to the current user's ip address.
+
+=back
+
+=cut
 
 sub hasRated {
 	my ($self, $userId, $ipAddress) = @_;

@@ -1,5 +1,19 @@
 package WebGUI::Forum::UI;
 
+=head1 LEGAL
+                                                                                                                                                             
+ -------------------------------------------------------------------
+  WebGUI is Copyright 2001-2003 Plain Black LLC.
+ -------------------------------------------------------------------
+  Please read the legal notices (docs/legal.txt) and the license
+  (docs/license.txt) that came with this distribution before using
+  this software.
+ -------------------------------------------------------------------
+  http://www.plainblack.com                     info@plainblack.com
+ -------------------------------------------------------------------
+                                                                                                                                                             
+=cut
+
 use strict qw(vars subs);
 use WebGUI::DateTime;
 use WebGUI::Form;
@@ -13,6 +27,20 @@ use WebGUI::Search;
 use WebGUI::Session;
 use WebGUI::Template;
 
+
+=head1 DESCRIPTION
+                                                                                                                                                             
+User interface package for forums.
+
+=head1 SYNOPSIS
+                                                                                                                                                             
+ use WebGUI::Forum::UI;
+
+=head1 FUNCTIONS
+                                                                                                                                                             
+These functions are available from this package:
+                                                                                                                                                             
+=cut
 
 sub chopSubject {
 	return substr(formatSubject($_[0]),0,30);
