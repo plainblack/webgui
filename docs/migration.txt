@@ -35,22 +35,24 @@ There have currently been no changes to the macro API.
 3. Authentication Migration
 -----------------------------
 
-3.1 Nothing Yet
+3.1 Authentication Modules Changes
 
-There have currently been no changes to the authentication API.
-In 6.0 all Authentication modules will need to be rewritten as Auth modules according to the new
-Auth API in WebGUI::Auth.  
+Authentication in WebGUI is now completely Object Oriented.  The superclass WebGUI::Auth defines a loose set of rules by which
+to create authentication parameters.  Subclasses MUST be WebGUI::Auth objects, however they can define thier own rules
+for authentication.  No methods are required to be overwritten as it is up to the user to decide which methods may be called
+through WebGUI.  The only method that MUST be calllable is the init routine which should define the starting point for authentication.
+For instance, WebGUI's init method calls the displayLogin function.
 
-The following modules will no longer be needed:
-WebGUI::Authentication::WebGUI
-WebGUI::Authentication::LDAP
-WebGUI::Authentication::SMB
+Methods which remain compatible the auth modules distributed with WebGUI:
+www_createAccount
+www_deactivateAccount
+www_displayAccount
+www_displayLogin
+www_login
+www_logout
+www_recoverPassword
 
-WebGUI::Authentication
-WebGUI::Operation::Account
-
-Details to follow.
-
+There is no guarentee, however that any custom apps which call these routines will work for custom authentication instances.
 
 
 4. Scheduler Migration
