@@ -206,7 +206,7 @@ sub www_deletePageConfirm {
 
 #-------------------------------------------------------------------
 sub www_editPage {
-        my ($f, $endDate, $output, %hash, %page);
+        my ($f, $endDate, $output, $subtext, $childCount, %hash, %page);
 	tie %hash, "Tie::IxHash";
         if (WebGUI::Privilege::canEditPage($session{form}{npp})) {
 		$f = WebGUI::HTMLForm->new;
@@ -224,6 +224,7 @@ sub www_editPage {
 			$page{ownerView} = 1;
 		} else {
 			%page = %{$session{page}};
+			($childCount) = WebGUI::SQL->quickArray("select count(*) from page where parentId=$page{pageId}");
 		}
 		$page{endDate} = (addToDate(time(),10)) if ($page{endDate} < 0);
                 $output = helpIcon(1);
@@ -290,19 +291,27 @@ sub www_editPage {
 			-uiLevel=>5
 			);
 		%hash = WebGUI::SQL->buildHash("select styleId,name from style where name<>'Reserved' order by name");
+		if (WebGUI::Privilege::isInGroup($session{setting}{styleManagersGroup})) {
+			$subtext = ' &nbsp; <a href="'.WebGUI::URL::page('op=listStyles')
+				.'">'.WebGUI::International::get(6).'</a>';
+		} else {
+			$subtext = "";
+		}
                 $f->select(
 			-name=>"styleId",
 			-options=>\%hash,
 			-label=>WebGUI::International::get(105),
 			-value=>[$page{styleId}],
-			-subtext=>' &nbsp; <a href="'.WebGUI::URL::page('op=listStyles').'">'.WebGUI::International::get(6).'</a>',
+			-subtext=>$subtext,
 			-uiLevel=>5
 			);
-                $f->yesNo(
-			-name=>"recurseStyle",
-			-subtext=>' &nbsp; '.WebGUI::International::get(106),
-			-uiLevel=>9
-			);
+		if ($childCount) {
+                	$f->yesNo(
+				-name=>"recurseStyle",
+				-subtext=>' &nbsp; '.WebGUI::International::get(106),
+				-uiLevel=>9
+				);
+		}
                 $f->readOnly(
                         -value=>_selectPositions($page{templateId}),
                         -label=>WebGUI::International::get(356),
@@ -327,12 +336,18 @@ sub www_editPage {
 		%hash = WebGUI::SQL->buildHash("select users.userId,users.username from users,groupings 
 			where (groupings.groupId=4 or groupings.groupId=3) and groupings.userId=users.userId 
 			order by users.username");
+		if (WebGUI::Privilege::isInGroup(3)) {
+			$subtext = ' &nbsp; <a href="'.WebGUI::URL::page('op=listUsers').'">'
+				.WebGUI::International::get(7).'</a>';
+		} else {
+			$subtext = "";
+		}
 		$f->select(
 			-name=>"ownerId",
 			-options=>\%hash,
 			-label=>WebGUI::International::get(108),
 			-value=>[$page{ownerId}],
-			-subtext=>' &nbsp; <a href="'.WebGUI::URL::page('op=listUsers').'">'.WebGUI::International::get(7).'</a>',
+			-subtext=>$subtext,
 			-uiLevel=>9
 			);
 		$f->yesNo(
@@ -347,11 +362,17 @@ sub www_editPage {
 			-value=>$page{ownerEdit},
 			-uiLevel=>9
 			);
+		if (WebGUI::Privilege::isInGroup(3)) {
+			$subtext = ' &nbsp; <a href="'.WebGUI::URL::page('op=listGroups').'">'
+				.WebGUI::International::get(5).'</a>';
+		} else {
+			$subtext = "";
+		}
 		$f->group(
 			-name=>"groupId",
 			-label=>WebGUI::International::get(111),
 			-value=>[$page{groupId}],
-			-subtext=>' &nbsp; <a href="'.WebGUI::URL::page('op=listGroups').'">'.WebGUI::International::get(5).'</a>',
+			-subtext=>$subtext,
 			-uiLevel=>9
 			);
 		$f->yesNo(
@@ -377,11 +398,13 @@ sub www_editPage {
 			-value=>$page{worldEdit},
 			-uiLevel=>9
 			);
-                $f->yesNo(
-			-name=>"recursePrivs",
-			-subtext=>' &nbsp; '.WebGUI::International::get(116),
-			-uiLevel=>9
-			);
+		if ($childCount) {
+                	$f->yesNo(
+				-name=>"recursePrivs",
+				-subtext=>' &nbsp; '.WebGUI::International::get(116),
+				-uiLevel=>9
+				);
+		}
 		$f->raw(
                         -value=>'<tr><td colspan=2><hr size=1/></td></tr>',
                         -uiLevel=>5
