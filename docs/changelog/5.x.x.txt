@@ -5,6 +5,8 @@
  - Fixed a possible counting problem when looking for an infinite loop in
    groups of groups.
  - Fixed a bug in the LDAP module that required the RDN to be a URL.
+ - bugfix [962196] addHTTP problem.
+ - bugfix [962224] WebGUI::Operation::Statistics
 
 
 5.5.6
