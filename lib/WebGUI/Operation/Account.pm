@@ -437,8 +437,7 @@ sub www_recoverPasswordFinish {
         	        $password .= chr(ord('A') + randint(32));
         	}
         	$encryptedPassword = Digest::MD5::md5_base64($password);
-		my $u = WebGUI::User->new($userId);
-		$u->identifier($encryptedPassword);
+		WebGUI::Authentication::saveParams($userId,"WebGUI",{identifier=>$encryptedPassword});
 		$flag = 1;
 		$message = $session{setting}{recoverPasswordEmail};
 		$message .= "\n".WebGUI::International::get(50).": ".$username."\n";
