@@ -17,7 +17,7 @@
 our $webguiRoot;
 
 BEGIN {
-        $webguiRoot = $ARGV[0] || "/data/WebGUI";
+        $webguiRoot = $ARGV[0] || "..";
         unshift (@INC, $webguiRoot."/lib");
 }
 
