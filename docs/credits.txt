@@ -26,6 +26,7 @@ Contributing Developers..............Peter Beardsley / Appropriate Solutions
                                      Christophe Marcant
                                      Tavis Parker / ParkerOne Consulting
                                      Daniel Quinlan
+                                     Hal Roberts / Harvard
                                      Steve Simms
                                      Ben Simpson
                                      Jeff Szpak / Plain Black
