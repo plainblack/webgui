@@ -57,6 +57,7 @@ use Tree::DAG_Node ();
 # WebGUI modules.
 #----------------------------------------
 use WebGUI ();
+use WebGUI::Affiliate ();
 use WebGUI::Attachment ();
 use WebGUI::Authentication ();
 use WebGUI::Cache ();
@@ -64,10 +65,13 @@ use WebGUI::Collateral ();
 use WebGUI::CollateralFolder ();
 use WebGUI::DatabaseLink ();
 use WebGUI::DateTime ();
-#use WebGUI::Discussion (); # compile problems when this is included
 use WebGUI::ErrorHandler ();
 use WebGUI::Form ();
 use WebGUI::FormProcessor ();
+use WebGUI::Forum ();
+use WebGUI::Forum::Post ();
+use WebGUI::Forum::Thread ();
+use WebGUI::Forum::UI ();
 use WebGUI::Group ();
 use WebGUI::Grouping ();
 use WebGUI::HTMLForm ();
@@ -98,6 +102,7 @@ use WebGUI::Operation::International ();
 use WebGUI::Operation::Package ();
 use WebGUI::Operation::Page ();
 use WebGUI::Operation::ProfileSettings ();
+use WebGUI::Operation::Replacements ();
 use WebGUI::Operation::Root ();
 use WebGUI::Operation::Scratch ();
 use WebGUI::Operation::Search ();
