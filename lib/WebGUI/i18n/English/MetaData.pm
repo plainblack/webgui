@@ -133,7 +133,7 @@ each wobject under the tab &quot;Metadata&quot; in the wobject properties.</p>
     present content based upon the users Areas of Interest. Example:<br>
     type = &#94;AOIRank(contenttype);</li>
 </ul>|,
-                lastUpdated => 1099517844
+                lastUpdated => 1099517844,
                 context => q|Metadata help|
         },
 
