@@ -180,7 +180,7 @@ sub postSave {
                	$session{form}{subject} .= ' '.WebGUI::International::get(233);
         }
 	if ($session{form}{mid} eq "new") {
-	        if ($session{user}{userId} = 1) {
+	        if ($session{user}{userId} == 1) {
         	        if ($session{form}{visitorName} eq "") {
                 	        $username = $session{user}{username};
                 	} else {
