@@ -163,7 +163,7 @@ sub definition {
 #-------------------------------------------------------------------
 sub duplicate {
 	my $self = shift;
-	my $newAsset = $self->SUPER::duplicate;
+	my $newAsset = $self->SUPER::duplicate(shift);
        my (%dataField, %dataTab, $sthField, $sthTab, $newTabId);
        tie %dataTab, 'Tie::CPHash';
        tie %dataField, 'Tie::CPHash';

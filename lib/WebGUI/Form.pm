@@ -1051,20 +1051,11 @@ This will be used if no value is specified.
 sub HTMLArea {
 	my $params = shift;
         my ($output, $rows, $columns, $htmlArea);
-	my $browser = HTTP::BrowserDetect->new($session{env}{HTTP_USER_AGENT});
 	my %var;
-
 	# Store all scalar options in template variables
         foreach (keys %{$params}) {
            $var{"form.".$_} = $params->{$_} unless (ref $params->{$_});
         }
-
-	# Supported Rich Editors
-	$var{"htmlArea.supported"} = ($browser->ie && $browser->version >= 5.5);
-	$var{"midas.supported"} = (($browser->ie && $browser->version >= 6) || ($browser->gecko && $browser->version >= 1.3));
-	$var{"htmlArea3.supported"} = (($browser->ie && $browser->version >= 5.5) || $var{"midas.supported"});
-	$var{"classic.supported"} = ($browser->ie && $browser->version >= 5);
- 
 	# Textarea field
         $rows = $params->{rows} || ($session{setting}{textAreaRows}+15);
         $columns = $params->{columns} || ($session{setting}{textAreaCols}+5);
@@ -1077,7 +1068,6 @@ sub HTMLArea {
                 extras=>$params->{extras}.' onBlur="fixChars(this.form.'.$params->{name}.')" id="'.$params->{name}.'"'.' mce_editable="true" ',
 		defaultValue=>$params->{defaultValue}
                 });
-
 	# Other variables
 	$var{"button"} = '<input type="button" onClick="openEditWindow(this.form.'.$params->{name}.')" value="'
                 .WebGUI::International::get(171).'" style="font-size: 8pt;" /><br />';

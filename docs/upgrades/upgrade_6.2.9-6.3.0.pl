@@ -947,6 +947,9 @@ sub walkTree {
 			my $contentPositions = join("\.",@positions);
 			WebGUI::SQL->write("update Layout set contentPositions=".quote($contentPositions)." where assetId=".quote($pageId));
 		}
+		if ($page->{parentId} eq "5") {
+			WebGUI::SQL->write("update asset set isPackage=1 where assetId=".quote($pageId));
+		}
 		walkTree($page->{pageId},$pageId,$pageLineage,$rank);
 		$myRank++;
 	}

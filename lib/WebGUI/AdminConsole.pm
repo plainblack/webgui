@@ -200,15 +200,6 @@ sub getAdminFunction {
 			op=>"listGroups",
 			group=>"11"
 		},
-		"packages"=>{
-			title=>{
-				id=>"packages",
-				namespace=>"WebGUI"
-			},
-			icon=>"packages.gif",
-			op=>"managePackages",
-			group=>"4"
-		},
 		"settings"=>{
 			title=>{
 				id=>"settings",

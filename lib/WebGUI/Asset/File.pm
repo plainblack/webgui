@@ -99,6 +99,16 @@ sub getBox {
 
 #-------------------------------------------------------------------
 
+sub duplicate {
+	my $self = shift;
+	my $newAsset = $self->SUPER::duplicate(shift);
+	my $newStorage = $self->getStorageLocation->copy;
+	$newAsset->update({storageId=>$newStorage->getId,olderVersions=>''});
+}
+
+
+#-------------------------------------------------------------------
+
 =head2 getEditForm ()
 
 Returns the TabForm object that will be used in generating the edit page for this asset.

@@ -34,38 +34,29 @@ sub process {
 	tie %hash, "Tie::IxHash";
 	tie %hash2, "Tie::IxHash";
 	tie %cphash, "Tie::CPHash";
-  #--packages adder
 	$var{'packages.canAdd'} = ($session{user}{uiLevel} >= 7);
 	$var{'packages.label'} = WebGUI::International::get(376);
-	my @packages;
-	my $i;
-#	my $sth = WebGUI::SQL->read("select pageId,title from page where parentId='5'");
- #       while (my %data = $sth->hash) {
-#		$data{title} =~ s/'//g;
-#		push(@packages, {
- #       		'package.url'=>WebGUI::URL::page('op=deployPackage&pid='.$data{pageId}),
-  #             		'package.label'=>$data{title},
-#			'package.count'=>$i
-#			});
-#		$i++;
- #       }
-  #      $sth->finish;
-#	$var{package_loop} = \@packages;
-  #--contenttypes adder
 	$var{'contentTypes.label'} = WebGUI::International::get(1083);
 	$var{'addcontent.label'} = WebGUI::International::get(1);
-	foreach my $link (@{$session{asset}->getAssetAdderLinks}) {
-                push(@{$var{'contenttypes_loop'}},{'contenttype.url'=>$link->{url},'contenttype.label'=>$link->{label}});
-        }
-  #--clipboard paster
 	$var{'clipboard.label'} = WebGUI::International::get(1082);
 	if (exists $session{asset}) {
+		foreach my $package (@{$session{asset}->getPackageList}) {
+			my $title = $package->{title};
+			$title =~ s/'//g; # stops it from breaking the javascript menus
+                	push(@{$var{'package_loop'}},{
+				'package.url'=>$session{asset}->getUrl("func=deployPackage&assetId=".$package->{assetId}),
+				'package.label'=>$title
+				});
+        	}
+		foreach my $link (@{$session{asset}->getAssetAdderLinks}) {
+                	push(@{$var{'contenttypes_loop'}},{'contenttype.url'=>$link->{url},'contenttype.label'=>$link->{label}});
+        	}
 		foreach my $item (@{$session{asset}->getAssetsInClipboard(1)}) {
 			my $title = $item->{title};
 			$title =~ s/'//g; # stops it from breaking the javascript menus
 			push(@{$var{clipboard_loop}}, {
 				'clipboard.label'=>$title,
-				'clipboard.url'=>WebGUI::URL::page("func=paste&assetId=".$item->{assetId})
+				'clipboard.url'=>$session{asset}->getUrl("func=paste&assetId=".$item->{assetId})
 				});
 		}
 	}
@@ -89,7 +80,7 @@ sub process {
 	);
 	$var{'admin.label'} = WebGUI::International::get(82);
 	my @admin;
-	$i = 0;
+	my $i = 0;
 	foreach my $key (keys %hash) {	
 		push(@admin,{
 			'admin.url'=>$key,

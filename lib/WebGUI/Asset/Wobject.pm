@@ -166,21 +166,15 @@ sub confirm {
 
 #-------------------------------------------------------------------
 
-=head2 duplicate ( [ pageId ] )
+=head2 duplicate ( asset )
 
-Duplicates this wobject with a new wobject Id. Returns the new wobject Id.
-
-B<NOTE:> This method is meant to be extended by all sub-classes.
-
-=head3 pageId 
-
-If specified the wobject will be duplicated to this pageId, otherwise it will be duplicated to the clipboard.
+Extends the Asset duplicate method to also duplicate meta data.
 
 =cut
 
 sub duplicate {
 	my $self = shift;
-	my $newAsset = $self->SUPER::duplicate();
+	my $newAsset = $self->SUPER::duplicate(shift);
 	WebGUI::MetaData::MetaDataDuplicate($self->getId, $newAsset->getId);
         return $newAsset; 
 }

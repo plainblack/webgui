@@ -319,6 +319,10 @@ sub definition {
 				assetSize=>{
 					fieldType=>'hidden',
 					defaultValue=>0
+					},
+				isPackage=>{
+					fieldType=>'yesNo',
+					defaultValue=>0
 					}
                         }
                 });
@@ -344,6 +348,9 @@ sub demote {
 	}
 }
 
+
+
+
 #-------------------------------------------------------------------
 
 =head2 DESTROY ( )
@@ -359,17 +366,46 @@ sub DESTROY {
 	$self->{_lastChild}->DESTROY if (exists $self->{_lastChild});
 	$self = undef;
 }
+
+
 #-------------------------------------------------------------------
 
-=head2 duplicate ( )
+=head2 duplicate ( asset )
 
-Duplicates an argument. Calls addChild with itself as an argument. Returns a new Asset object.
+Duplicates an asset. Calls addChild with self as an arguement. Returns a new Asset object.
+
+=head3 asset
+
+The asset to duplicate. Defaults to self.
 
 =cut
 
 sub duplicate {
 	my $self = shift;
-	my $newAsset = $self->addChild($self->get);
+	my $assetToDuplicate = shift || $self;
+	my $newAsset = $self->addChild($assetToDuplicate->get);
+	return $newAsset;
+}
+
+#-------------------------------------------------------------------
+
+=head2 duplicateTree ( asset )
+
+Duplicates an asset and all it's descendants. Calls addChild with asset as an argument. Returns a new Asset object.
+
+=head3 asset
+
+The asset to duplicate. Defaults to self.
+
+=cut
+
+sub duplicateTree {
+	my $self = shift;
+	my $assetToDuplicate = shift || $self;
+	my $newAsset = $self->duplicate($assetToDuplicate);
+	foreach my $child (@{$assetToDuplicate->getLineage(["children"],{returnObjects=>1})}) {
+		$newAsset->duplicateTree($child);
+	}
 	return $newAsset;
 }
 
@@ -770,6 +806,12 @@ sub getEditForm {
                -excludeGroups=>[1,7],
                -uiLevel=>6
                );
+	$tabform->getTab("properties")->yesNo(
+		-name=>"isPackage",
+		-label=>"Make available as package?",
+		-value=>$self->getValue("isPackage"),
+		-uiLevel=>7
+		);
 	return $tabform;
 }
 
@@ -1013,6 +1055,30 @@ sub getNextChildRank {
 	}
 	return $self->formatRank($rank);
 }
+
+#-------------------------------------------------------------------
+
+=head getPackageList ( )
+
+Returns an array of hashes containing title, assetId, and className for all assets defined as packages.
+
+=cut
+
+sub getPackageList {
+	my $self = shift;
+	my @assets;
+	my $sth = WebGUI::SQL->read("select assetId, title, className from asset where isPackage=1 order by lastUpdated desc");
+	while (my ($id, $title, $class) = $sth->array) {
+		push(@assets, {
+			title => $title,
+			assetId => $id,
+			className => $class
+			});
+	}
+	$sth->finish;
+	return \@assets;
+}
+
 
 #-------------------------------------------------------------------
 
@@ -1836,6 +1902,28 @@ sub www_demote {
 	$self->demote;
 	return "";
 }
+
+#-------------------------------------------------------------------
+
+=head2 www_deployPackage ( ) 
+
+=cut
+
+sub www_deployPackage {
+	my $self = shift;
+	return $self->getAdminConsole->render(WebGUI::Privilege::insufficient()) unless $self->canEdit;
+	my $packageMasterAssetId = $session{form}{assetId};
+	if (defined $packageMasterAssetId) {
+		my $packageMasterAsset = WebGUI::Asset->newByDynamicClass($packageMasterAssetId);
+		if (defined $packageMasterAsset && $packageMasterAsset->canView) {
+			my $deployedTreeMaster = $self->duplicateTree($packageMasterAsset);
+			$deployedTreeMaster->update({isPackage=>0});
+		}
+	}
+	return "";
+}
+
+
 
 #-------------------------------------------------------------------
 

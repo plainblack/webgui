@@ -157,7 +157,7 @@ sub definition {
 #-------------------------------------------------------------------
 sub duplcate {
 	my $self = shift;
-	my $newAsset = $self->SUPER::duplicate;
+	my $newAsset = $self->SUPER::duplicate(shift);
 	my $sth = WebGUI::SQL->read("select * from Poll_answer where assetId=".quote($self->getId));
 	while (my $data = $sth->hashRef) {
 		$newAsset->setVote($data->{answer}, $data->{userId}, $data->{ipAddress});
