@@ -3162,7 +3162,7 @@ The URL to the home page.
 The translated label for the link to the home page or the text that you supply to the macro.
 <p/>
 <P><B>^/; - System URL</B><BR>The URL to the gateway script (example: <I>/index.pl/</I>). 
-<P><B>^\; - Page URL</B><BR>The URL to the current page (example: <I>/index.pl/pagename</I>). 
+<P><B>^PageUrl; - Page URL</B><BR>The URL to the current page (example: <I>/index.pl/pagename</I>). 
 <P><STRONG>^Navigation(crumbTrail);<BR></STRONG>A dynamically generated crumb trail to the current page.
 <P><B>NOTE:</B> The .crumbTrail style sheet class is tied to this macro. </P>
 <P><STRONG>^Navigation(FlexMenu);</STRONG><BR>This menu macro creates a top-level menu that expands as the user selects each menu item. </P>
@@ -3189,7 +3189,7 @@ The translated label for the link to the home page or the text that you supply t
 <P><B>.selectedMenuItem</B><BR>Use this class to highlight the current page in any of the menu macros. 
 <P><B>.verticalMenu </B><BR>The vertical menu (if you use a vertical menu macro). 
 <P><B>.horizontalMenu </B><BR>The horizontal menu (if you use a horizontal menu macro). </P>|,
-		lastUpdated => 1101775402
+		lastUpdated => 1104545184,
 	},
 
 	'511' => {
