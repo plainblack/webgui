@@ -244,7 +244,7 @@ sub page {
 	}
 	if ($operationOutput eq "" && $session{setting}{trackPageStatistics} && $session{form}{wid} ne "new") {
 		WebGUI::SQL->write("insert into pageStatistics (dateStamp, userId, username, ipAddress, userAgent, referer,
-			pageId, pageTitle, wobjectId, function) values (".time().",".$session{user}{userId}
+			pageId, pageTitle, wobjectId, wobjectFunction) values (".time().",".$session{user}{userId}
 			.",".quote($session{user}{username}).",
 			".quote($session{env}{REMOTE_ADDR}).", ".quote($session{env}{HTTP_USER_AGENT}).",
 			".quote($session{env}{HTTP_REFERER}).", ".$session{page}{pageId}.", 

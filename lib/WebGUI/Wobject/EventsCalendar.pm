@@ -61,7 +61,7 @@ sub _drawBigCalendar {
 			$message = "";
                         if ($canEdit) {
                                 $message = deleteIcon('func=deleteEvent&wid='.$_[0]->get("wobjectId").'&eid='.$event{EventsCalendar_eventId}
-                                        .'&rid='.$event{EventsCalendar_recurringEventId})
+                                        .'&rid='.$event{EventsCalendar_recurringId})
                                         .editIcon('func=editEvent&wid='.$_[0]->get("wobjectId").'&eid='.$event{EventsCalendar_eventId})
                                         .' ';
                         }
@@ -151,11 +151,11 @@ sub duplicate {
 		paginateAfter=>$_[0]->get("paginateAfter")
 		});
 	$sth = WebGUI::SQL->read("select * from EventsCalendar_event where wobjectId="
-		.$_[0]->get("wobjectId")." order by EventsCalendar_recurringEventId");
+		.$_[0]->get("wobjectId")." order by EventsCalendar_recurringId");
 	while (@row = $sth->array) {
 		$newEventId = getNextId("EventsCalendar_eventId");
 		if ($row[6] > 0 && $row[6] != $previousRecurringEventId) {
-			$row[6] = getNextId("EventsCalendar_recurringEventId");
+			$row[6] = getNextId("EventsCalendar_recurringId");
 			$previousRecurringEventId = $row[6];
 		}
                	WebGUI::SQL->write("insert into EventsCalendar_event values ($newEventId, ".$w->get("wobjectId").", ".
@@ -196,7 +196,7 @@ sub www_deleteEvent {
 sub www_deleteEventConfirm {
 	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
 	if ($session{form}{rid} > 0) {
-		$_[0]->deleteCollateral("EventsCalendar_event","EventsCalendar_recurringEventId",$session{form}{rid});
+		$_[0]->deleteCollateral("EventsCalendar_event","EventsCalendar_recurringId",$session{form}{rid});
 	} else {
 		$_[0]->deleteCollateral("EventsCalendar_event","EventsCalendar_eventId",$session{form}{eid});
 	}
@@ -371,7 +371,7 @@ sub www_editEventSave {
                	if ($session{form}{recursEvery} eq "never") {
                        	$recurringEventId = 0;
                	} else {
-                       	$recurringEventId = getNextId("EventsCalendar_recurringEventId");
+                       	$recurringEventId = getNextId("EventsCalendar_recurringId");
                        	while ($startDate[$i] < $until) {
                                	$i++;
                                	$eventId[$i] = getNextId("EventsCalendar_eventId");
@@ -499,7 +499,7 @@ sub www_view {
 			"list.url"=>WebGUI::URL::page('func=viewEvent&wid='.$_[0]->get("wobjectId").'&eid='
 				.$event->{EventsCalendar_eventId}),
 			"list.controls"=>deleteIcon('func=deleteEvent&wid='.$_[0]->get("wobjectId").'&eid='
-				.$event->{EventsCalendar_eventId}.'&rid='.$event->{EventsCalendar_recurringEventId})
+				.$event->{EventsCalendar_eventId}.'&rid='.$event->{EventsCalendar_recurringId})
 				.editIcon('func=editEvent&wid='.$_[0]->get("wobjectId").'&eid='.$event->{EventsCalendar_eventId})
 			});
 	}
@@ -527,7 +527,7 @@ sub www_viewEvent {
         $var{"edit.url"} = WebGUI::URL::page('func=editEvent&eid='.$session{form}{eid}.'&wid='.$session{form}{wid});
 	$var{"edit.label"} = WebGUI::International::get(575);
         $var{"delete.url"} = WebGUI::URL::page('func=deleteEvent&eid='.$session{form}{eid}.'&wid='
-		.$session{form}{wid}.'&rid='.$event{EventsCalendar_recurringEventId});
+		.$session{form}{wid}.'&rid='.$event{EventsCalendar_recurringId});
 	$var{"delete.label"} = WebGUI::International::get(576);
 	($id) = WebGUI::SQL->quickArray("select EventsCalendar_eventId from EventsCalendar_event 
 		where EventsCalendar_eventId<>$event{EventsCalendar_eventId} and

@@ -990,5 +990,9 @@ insert into international (internationalId,languageId,namespace,message,lastUpda
 INSERT INTO international VALUES (73,'MailForm',1,'Send',1039776778);
 INSERT INTO international VALUES (73,'MailForm',3,'Verstuur',1039776778);
 INSERT INTO international VALUES (73,'MailForm',2,'Versend',1039776778);
+alter table Survey_answer change goto gotoQuestion int;
+alter table pageStatistics change function wobjectFunction varchar(60);
+alter table EventsCalendar_event change EventsCalendar_recurringEventId EventsCalendar_recurringId int not null default 0;
+update incrementer set incrementerId='EventsCalendar_recurringId' where incrementerId='EventsCalendar_recurringEventId';
 
 

@@ -308,9 +308,9 @@ sub www_editAnswer {
 		$question = WebGUI::SQL->buildHashRef("select Survey_questionId,question 
 			from Survey_question where Survey_id=".$_[0]->get("Survey_id")." order by sequenceNumber");
 		$f->select(
-			-name=>"goto",
+			-name=>"gotoQuestion",
 			-options=>$question,
-			-value=>[$answer->{goto}],
+			-value=>[$answer->{gotoQuestion}],
 			-label=>WebGUI::International::get(21,$namespace)
 			);
 	}
@@ -342,7 +342,7 @@ sub www_editAnswerSave {
                 answer => $session{form}{answer},
                 isCorrect => $session{form}{isCorrect},
 		Survey_id=>$_[0]->get("Survey_id"),
-                goto => $session{form}{goto}
+                gotoQuestion => $session{form}{gotoQuestion}
                 },1,0,"Survey_Id");
 	if ($session{form}{proceed} eq "addQuestion") {
                 $session{form}{qid} = "new";
@@ -586,7 +586,7 @@ sub www_view {
 				}
 			}
 			if ($questionOrder eq "response" && $previousResponse->{Survey_answerId}) {
-				my ($responseDriver) = WebGUI::SQL->quickArray("select goto from Survey_answer where
+				my ($responseDriver) = WebGUI::SQL->quickArray("select gotoQuestion from Survey_answer where
 					Survey_answerId=".$previousResponse->{Survey_answerId});
 				if ($responseDriver) {
 					$question = $_[0]->getCollateral("Survey_question","Survey_questionId",$responseDriver);
