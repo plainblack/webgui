@@ -5,6 +5,7 @@
  - bugfix [ 1028746 ] All pages shown as Roots & PageTree not working
  - bugfix [ 1028561 ] Manage Users - Next Page Link Broken
  - bugfix [ 1028494 ] Folder not shown in Manage Collateral
+ - bugfix [ 1028446 ] Can't copy Navigation
 
 
 6.2.2

@@ -61,7 +61,7 @@ sub www_copyNavigation {
 	WebGUI::SQL->write("insert into Navigation (navigationId, identifier, depth, method, startAt, stopAtLevel,
 						templateId, showSystemPages, showHiddenPages, showUnprivilegedPages,
 						reverse)
-		values (".WebGUI::Id::generate().",
+		values (".quote(WebGUI::Id::generate()).",
                         ".quote($navigation{identifier}.' (copy)').", $navigation{depth}, ".quote($navigation{method}).
 			", ".quote($navigation{startAt}).", $navigation{stopAtLevel}, ".quote($navigation{templateId}).", 
 			$navigation{showSystemPages}, $navigation{showHiddenPages},$navigation{showUnprivilegedPages},
