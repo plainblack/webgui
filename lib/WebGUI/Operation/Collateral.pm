@@ -32,6 +32,7 @@ use WebGUI::Session;
 use WebGUI::SQL;
 use Tie::IxHash;
 use WebGUI::URL;
+use WebGUI::HTML;
 
 our @ISA = qw(Exporter);
 our @EXPORT = qw(&www_editCollateral &www_editCollateralSave &www_deleteCollateral 
@@ -276,7 +277,6 @@ sub www_editCollateralSave {
         	$file = WebGUI::Attachment->new("","images",$session{form}{cid});
        		$file->save("filename", $thumbnailSize);
 	} else {
-		print "<h1> thumbnailsize: $thumbnailSize</h1>";
 		$file = WebGUI::Attachment->new($collateral->{filename},"images", $session{form}{cid});
 		WebGUI::Attachment::_createThumbnail($file, $thumbnailSize);
 	}
@@ -372,7 +372,7 @@ sub www_editCollateralFolderSave {
 #-------------------------------------------------------------------
 sub www_listCollateral {
 	return WebGUI::Privilege::insufficient unless (WebGUI::Privilege::isInGroup(4));
-	my (%type, %user, $f, $row, $data, $sth, $url, $output, $parent, $p, $thumbnail, $file, $page, $constraints, $folderId);
+	my (%type, %user, $f, $row, $data, $sth, $url, $output, $parent, $p, $thumbnail, $file, $page, $constraints, $folderId, $crCount);
 	tie %type, 'Tie::IxHash';
 	tie %user, 'Tie::IxHash';
 	%type = (
@@ -396,7 +396,7 @@ sub www_listCollateral {
 	$constraints .= " and collateralType=".quote($session{scratch}{collateralType}) if ($session{scratch}{collateralType});
 	$constraints .= " and name like ".quote('%'.$session{scratch}{keyword}.'%') if ($session{scratch}{keyword});
 	$p = WebGUI::Paginator->new(WebGUI::URL::page('op=listCollateral'),[],"",$session{scratch}{collateralPageNumber});
-	$p->setDataByQuery("select collateralId, name, filename, collateralType, dateUploaded, username 
+	$p->setDataByQuery("select collateralId, name, filename, collateralType, dateUploaded, username, parameters 
 		from collateral where $constraints order by name");
 	$page = $p->getPageData;
 	$output = helpIcon(49);
@@ -456,6 +456,11 @@ sub www_listCollateral {
 		} elsif ($row->{filename} ne "" && $row->{collateralType} eq "file") {
 			$file = WebGUI::Attachment->new($row->{filename},"images",$row->{collateralId});
 			$thumbnail = '<a href="'.$url.'"><img src="'.$file->getIcon.'" border="0" /></a>';
+		} elsif ($row->{collateralType} eq "snippet") {
+			$crCount = $row->{parameters} =~ s/(\n[^\n]\r?|\r[^\r]\n?)/\&crarr;/gs;
+			$row->{parameters} = WebGUI::HTML::filter($row->{parameters},'all');
+			$thumbnail = substr($row->{parameters},0,$session{setting}{snippetsPreviewLength}+$crCount*6);
+			$thumbnail .= '...' if (length($row->{parameters}) > $session{setting}{snippetsPreviewLength});
 		} else {
 			$thumbnail = "";
 		}
