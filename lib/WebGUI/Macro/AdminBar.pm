@@ -30,7 +30,7 @@ sub process {
 	my (%cphash, %hash2, %hash, $r, $i, @item, $query);
 	tie %hash, "Tie::IxHash";
 	tie %hash2, "Tie::IxHash";
-	tie %cphash, "Tie:::CPHash";
+	tie %cphash, "Tie::CPHash";
   #--content adder
 	$hash{WebGUI::URL::page('op=editPage&npp='.$session{page}{pageId})} = WebGUI::International::get(2);
 	if ($session{user}{uiLevel} >= 7) {
