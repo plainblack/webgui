@@ -4674,22 +4674,33 @@ Just as the LDAP Identity Name is a label, so is the LDAP Password Name. Use thi
 Everything inside of WebGUI is an Asset: files, images, forums, threads in forums, posts in threads, templates, Wobjects (like Articles, DataForms, EventsCalendars) and more.
 <p>
 
-<b>sticky</b><br>
-If Posts and Threads are set to being "sticky", they will appear at the top of the Forum listing.
-<p>
-
 <b>locked</b><br>
 If Posts and Threads are "locked", no new posts can be added and no existing posts can be edited.
 <p>
 
+<b>Macros</b><br>
+Macros are used to create dynamic content within content that would otherwise be unchanging.  For
+example, showing today's date, or the name of the user on a page can be done with Macros.
+<p>
+
+<b>sticky</b><br>
+If Posts and Threads are set to being "sticky", they will appear at the top of the Forum listing.
+<p>
+
 <b>UI level</b><br>
-For WebGUI content managers and Administrators, the Asset and Wobject edit
+For WebGUI Content Managers and Admins, the Asset and Wobject edit
 screens can be configured to make them easier to use, based on each
 user's UI level.  The UI level can be altered by Admins in the user's profile.
 <p>
 
+<b>Wobjects</b><br>
+If you think of Assets as "things" inside of WebGUI, then Wobject are
+"things" that "do stuff".  Articles are used to display content, DataForms
+are for collecting data from users (and optionally emailing a copy), and
+Message Boards hold forums for users.  There are many different Wobjects in WebGUI.
+
 |,
-		lastUpdated => 1111800470,
+		lastUpdated => 1112141941,
 	},
 
 };
