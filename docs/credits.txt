@@ -45,6 +45,8 @@ Contributing Translators.............AGOFER Ltda.
                                      Jose Caneira
                                      Junying Du / WDI
                                      Marcelo Ennes / FIOCRUZ
+                                     GIT Consultors
+                                     Gordan Gledec 
                                      Andreas Graf
                                      Emiliano Grilli / Webopen
                                      Ehab Heikal
@@ -60,7 +62,6 @@ Contributing Translators.............AGOFER Ltda.
                                      orosor@yahoo.com.tw
                                      Paolo Pigati / Webopen
                                      Michael Ugilt
-                                     University of Zagreb, Croatia
                                      Hugo Van der Kooij 
                                      Michael Westlund
                                      Zhou Xiaopeng
