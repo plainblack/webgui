@@ -32,8 +32,8 @@ sub process {
                 $var{'toggle.url'} = WebGUI::URL::page('op=auth&method=logout');
                	$var{'toggle.text'} = $logout;
         }
-	if ($param[3]) {
-               	return WebGUI::Asset::Template->newByUrl($param[3])->process(\%var);
+	if ($param[2]) {
+               	return WebGUI::Asset::Template->newByUrl($param[2])->process(\%var);
 	} else {
                	return WebGUI::Asset::Template->new("PBtmpl0000000000000043")->process(\%var);
 	}
