@@ -121,7 +121,7 @@ sub process {
 	);
 	%hash = sortHash(%hash);
         %hash = ( 
-		WebGUI::URL::page()=>WebGUI::International::get(82), 
+		''=>WebGUI::International::get(82), 
 		WebGUI::URL::page('op=switchOffAdmin')=>WebGUI::International::get(12),
 		%hash
 	);
