@@ -124,6 +124,8 @@ sub process {
         $output = $_[0];
 	if ($session{var}{adminOn}) {
         	$output =~ s/\^AdminBar\;/_replacement()/ge;
+	} else {
+		$output =~ s/\^AdminBar\;//g;
 	}
         return $output;
 }
