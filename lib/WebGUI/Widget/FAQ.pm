@@ -110,7 +110,7 @@ sub www_deleteQuestion {
 	my ($output);
         if (WebGUI::Privilege::canEditPage()) {
 		$output = '<h1>Please Confirm</h1>';
-		$output = 'Are you certain that you want to delete this question?<p><div align="center"><a href="'.$session{page}{url}.'?func=deleteQuestionConfirm&wid='.$session{form}{wid}.'&qid='.$session{form}{qid}.'">Yes, I\'m sure.</a> &nbsp; <a href="'.$session{page}{url}.'?func=edit&wid='.$session{form}{wid}.'">No, I made a mistake.</a></div>';
+		$output .= 'Are you certain that you want to delete this question?<p><div align="center"><a href="'.$session{page}{url}.'?func=deleteQuestionConfirm&wid='.$session{form}{wid}.'&qid='.$session{form}{qid}.'">Yes, I\'m sure.</a> &nbsp; <a href="'.$session{page}{url}.'?func=edit&wid='.$session{form}{wid}.'">No, I made a mistake.</a></div>';
                 return $output;
         } else {
                 return WebGUI::Privilege::insufficient();

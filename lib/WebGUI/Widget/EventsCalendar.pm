@@ -65,7 +65,9 @@ sub www_addSave {
 
 #-------------------------------------------------------------------
 sub www_addEvent {
-        my ($output, $today);
+        my ($output, $today, %recursEvery);
+	tie %recursEvery, 'Tie::IxHash';
+	%recursEvery = ('never'=>'Happens Only Once','day'=>'Day','week'=>'Week');
         if (WebGUI::Privilege::canEditPage()) {
 		($today) = epochToSet(time());
                 $output = '<h1>Add Event</h1><form method="post" enctype="multipart/form-data" action="'.$session{page}{url}.'">';
@@ -76,6 +78,7 @@ sub www_addEvent {
                 $output .= '<tr><td class="formDescription">Description</td><td>'.WebGUI::Form::textArea("description",'',50,10,1).'</td></tr>';
                 $output .= '<tr><td class="formDescription">Start Date</td><td>'.WebGUI::Form::text("startDate",20,30,$today,1).'</td></tr>';
                 $output .= '<tr><td class="formDescription">End Date</td><td>'.WebGUI::Form::text("endDate",20,30,$today,1).'</td></tr>';
+                $output .= '<tr><td class="formDescription">Recurs every</td><td>'.WebGUI::Form::selectList("recursEvery",\%recursEvery).' until '.WebGUI::Form::text("until",20,30,$today,1).'</td></tr>';
                 $output .= '<tr><td></td><td>'.WebGUI::Form::submit("save").'</td></tr>';
                 $output .= '</table></form>';
                 return $output;
@@ -87,10 +90,36 @@ sub www_addEvent {
 
 #-------------------------------------------------------------------
 sub www_addEventSave {
-        my ($eventId);
+        my ($i, $recurringEventId, @startDate, @endDate, @eventId, $until);
         if (WebGUI::Privilege::canEditPage()) {
-                $eventId = getNextId("eventId");
-                WebGUI::SQL->write("insert into event values ($eventId, $session{form}{wid}, ".quote($session{form}{name}).", ".quote($session{form}{description}).", '".setToEpoch($session{form}{startDate})."', '".setToEpoch($session{form}{endDate})."')",$session{dbh});
+		$startDate[0] = setToEpoch($session{form}{startDate});
+		$endDate[0] = setToEpoch($session{form}{endDate});
+		$until = setToEpoch($session{form}{until});
+                $eventId[0] = getNextId("eventId");
+		if ($session{form}{recursEvery} eq "never") {
+			$recurringEventId = 0;
+		} elsif ($session{form}{recursEvery} eq "day") {
+			$recurringEventId = getNextId("recurringEventId");
+			while ($startDate[$i] < $until) {
+				$i++;
+				$eventId[$i] = getNextId("eventId");
+				$startDate[$i] = $startDate[0] + (86400 * $i);
+				$endDate[$i] = $endDate[0] + (86400 * $i);
+			}
+		} elsif ($session{form}{recursEvery} eq "week") {
+			$recurringEventId = getNextId("recurringEventId");
+                        while ($startDate[$i] < $until) {
+                                $i++;
+                                $eventId[$i] = getNextId("eventId");
+                                $startDate[$i] = $startDate[0] + (604800 * $i);
+                                $endDate[$i] = $endDate[0] + (604800 * $i);
+                        }
+		}
+		$i = 0;
+		while ($eventId[$i] > 0) {
+                	WebGUI::SQL->write("insert into event values ($eventId[$i], $session{form}{wid}, ".quote($session{form}{name}).", ".quote($session{form}{description}).", '".$startDate[$i]."', '".$endDate[$i]."', $recurringEventId)",$session{dbh});
+			$i++;
+		}
                 return www_edit();
         } else {
                 return WebGUI::Privilege::insufficient();
@@ -102,7 +131,11 @@ sub www_deleteEvent {
 	my ($output);
         if (WebGUI::Privilege::canEditPage()) {
 		$output = '<h1>Please Confirm</h1>';
-		$output = 'Are you certain that you want to delete this event?<p><div align="center"><a href="'.$session{page}{url}.'?func=deleteEventConfirm&wid='.$session{form}{wid}.'&eid='.$session{form}{eid}.'">Yes, I\'m sure.</a> &nbsp; <a href="'.$session{page}{url}.'?func=edit&wid='.$session{form}{wid}.'">No, I made a mistake.</a></div>';
+		$output .= 'Are you certain that you want to delete this event';
+		if ($session{form}{rid} > 0) {
+			$output .= ' <b>and</b> all of its recurring events';
+		}
+		$output .= '?<p><div align="center"><a href="'.$session{page}{url}.'?func=deleteEventConfirm&wid='.$session{form}{wid}.'&eid='.$session{form}{eid}.'&rid='.$session{form}{rid}.'">Yes, I\'m sure.</a> &nbsp; <a href="'.$session{page}{url}.'?func=edit&wid='.$session{form}{wid}.'">No, I made a mistake.</a></div>';
                 return $output;
         } else {
                 return WebGUI::Privilege::insufficient();
@@ -113,7 +146,11 @@ sub www_deleteEvent {
 sub www_deleteEventConfirm {
         my ($output);
         if (WebGUI::Privilege::canEditPage()) {
-		WebGUI::SQL->write("delete from event where eventId=$session{form}{eid}",$session{dbh});
+		if ($session{form}{rid} > 0) {
+			WebGUI::SQL->write("delete from event where recurringEventId=$session{form}{rid}",$session{dbh});
+		} else {
+			WebGUI::SQL->write("delete from event where eventId=$session{form}{eid}",$session{dbh});
+		}
                 return www_edit();
         } else {
                 return WebGUI::Privilege::insufficient();
@@ -138,9 +175,9 @@ sub www_edit {
                 $output .= '</table></form>';
                 $output .= '<p><a href="'.$session{page}{url}.'?func=addEvent&wid='.$session{form}{wid}.'">Add New Event</a><p>';
                 $output .= '<table border=1 cellpadding=3 cellspacing=0>';
-		$sth = WebGUI::SQL->read("select eventId, name from event where widgetId='$session{form}{wid}' order by startDate",$session{dbh});
+		$sth = WebGUI::SQL->read("select eventId, name, recurringEventId from event where widgetId='$session{form}{wid}' order by startDate",$session{dbh});
 		while (@event = $sth->array) {
-                	$output .= '<tr><td><a href="'.$session{page}{url}.'?func=editEvent&wid='.$session{form}{wid}.'&eid='.$event[0].'"><img src="'.$session{setting}{lib}.'/edit.gif" border=0></a><a href="'.$session{page}{url}.'?func=deleteEvent&wid='.$session{form}{wid}.'&eid='.$event[0].'"><img src="'.$session{setting}{lib}.'/delete.gif" border=0></a></td><td>'.$event[1].'</td></tr>';
+                	$output .= '<tr><td><a href="'.$session{page}{url}.'?func=editEvent&wid='.$session{form}{wid}.'&eid='.$event[0].'"><img src="'.$session{setting}{lib}.'/edit.gif" border=0></a><a href="'.$session{page}{url}.'?func=deleteEvent&wid='.$session{form}{wid}.'&eid='.$event[0].'&rid='.$event[2].'"><img src="'.$session{setting}{lib}.'/delete.gif" border=0></a></td><td>'.$event[1].'</td></tr>';
 		}
 		$sth->finish;
                 $output .= '</table>';

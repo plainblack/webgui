@@ -111,7 +111,7 @@ sub www_deleteLink {
 	my ($output);
         if (WebGUI::Privilege::canEditPage()) {
 		$output = '<h1>Please Confirm</h1>';
-		$output = 'Are you certain that you want to delete this link?<p><div align="center"><a href="'.$session{page}{url}.'?func=deleteLinkConfirm&wid='.$session{form}{wid}.'&lid='.$session{form}{lid}.'">Yes, I\'m sure.</a> &nbsp; <a href="'.$session{page}{url}.'?func=edit&wid='.$session{form}{wid}.'">No, I made a mistake.</a></div>';
+		$output .= 'Are you certain that you want to delete this link?<p><div align="center"><a href="'.$session{page}{url}.'?func=deleteLinkConfirm&wid='.$session{form}{wid}.'&lid='.$session{form}{lid}.'">Yes, I\'m sure.</a> &nbsp; <a href="'.$session{page}{url}.'?func=edit&wid='.$session{form}{wid}.'">No, I made a mistake.</a></div>';
                 return $output;
         } else {
                 return WebGUI::Privilege::insufficient();

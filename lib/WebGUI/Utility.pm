@@ -18,7 +18,7 @@ use WebGUI::Session;
 use WebGUI::SQL;
 
 our @ISA = qw(Exporter);
-our @EXPORT = qw(&getNextId &saveAttachment &round &urlizeTitle &quote);
+our @EXPORT = qw(&randint &getNextId &saveAttachment &round &urlizeTitle &quote);
 
 #-------------------------------------------------------------------
 sub getNextId {
@@ -33,6 +33,15 @@ sub getNextId {
 sub quote {
 	my $value = $_[0]; #had to add this here cuz Tie::CPHash variables cause problems otherwise.
 	return $session{dbh}->quote($value);
+}
+
+#-------------------------------------------------------------------
+sub randint {
+	my ($low, $high) = @_;
+	$low = 0 unless defined $low;
+	$high = 1 unless defined $high;
+	($low, $high) = ($high,$low) if $low > $high;
+	return $low + int( rand( $high - $low + 1 ) );
 }
 
 #-------------------------------------------------------------------

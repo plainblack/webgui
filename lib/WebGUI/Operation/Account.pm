@@ -15,7 +15,9 @@ use Exporter;
 use Net::LDAP;
 use strict;
 use URI;
+use WebGUI::ErrorHandler;
 use WebGUI::Form;
+use WebGUI::Mail;
 use WebGUI::Privilege;
 use WebGUI::Session;
 use WebGUI::SQL;
@@ -84,7 +86,12 @@ sub www_createAccount {
 		$output .= '<tr><td></td><td>'.WebGUI::Form::submit("create").'</td></tr>';
 		$output .= '</table>';
 		$output .= '</form> ';
-		$output .= '<div class="accountOptions"><ul><li><a href="'.$session{page}{url}.'?op=displayLogin">I already have an account.</a><li><a href="'.$session{page}{url}.'?op=recoverPassword">I forgot my password.</a></ul></div>';
+		$output .= '<div class="accountOptions"><ul>';
+		$output .= '<li><a href="'.$session{page}{url}.'?op=displayLogin">I already have an account.</a>';
+		if ($session{setting}{authMethod} eq "WebGUI") {
+			$output .= '<li><a href="'.$session{page}{url}.'?op=recoverPassword">I forgot my password.</a>';
+		}
+		$output .= '</ul></div>';
 	}
         return $output;
 }
@@ -167,7 +174,9 @@ sub www_displayLogin {
 		if ($session{setting}{anonymousRegistration} eq "yes") {
 			$output .= '<li><a href="'.$session{page}{url}.'?op=createAccount">Create a new account.</a>';
 		}
-		$output .= '<li><a href="'.$session{page}{url}.'?op=recoverPassword">I forgot my password.</a>';
+		if ($session{setting}{authMethod} eq "WebGUI") {
+			$output .= '<li><a href="'.$session{page}{url}.'?op=recoverPassword">I forgot my password.</a>';
+		}
 		$output .= '</ul></div>';
 	}
 	return $output;
@@ -190,8 +199,10 @@ sub www_login {
                 $ldap->unbind;
                 if ($auth->code == 48 || $auth->code == 49) {
 			$error = "The account information you supplied is invalid. Either the account does not exist or the username/password combination was incorrect.";
+			WebGUI::ErrorHandler::warn("Invalid login for user account: ".$session{form}{username});
 		} elsif ($auth->code > 0) {
 			$error .= 'LDAP error "'.$ldapStatusCode{$auth->code}.'" occured. Please contact your system administrator for assistance. ';
+			WebGUI::ErrorHandler::warn("LDAP error: ".$ldapStatusCode{$auth->code});
 		} else {
 			$success = 1;
 		}
@@ -200,13 +211,13 @@ sub www_login {
 			$success = 1;
 		} else {
 			$error = "The account information you supplied is invalid. Either the account does not exist or the username/password combination was incorrect.";
+			WebGUI::ErrorHandler::warn("Invalid login for user account: ".$session{form}{username});
 		}
 	}
 	if ($success) {
 		_login($uid,$pass);
 		return "";
 	} else {
-		WebGUI::ErrorHandler::warn($error);
 		return "<h1>Error</h1>".$error.www_displayLogin();
 	}
 }
@@ -252,7 +263,7 @@ sub www_recoverPasswordFinish {
         	$encryptedPassword = Digest::MD5::md5_base64($password);
 		WebGUI::SQL->write("update users set identifier='$encryptedPassword' where userId='$userId'",$session{dbh});
 		$flag = 1;
-		$message = 'Someone (probably you) requested your account information be sent. Your password has been reset. The following information represents your new account information:\nUser: '.$username.'\nPass: '.$password.'\n';
+		$message = "Someone (probably you) requested your account information be sent. Your password has been reset. The following represents your new account information:\nUser: ".$username."\nPass: ".$password."\n";
 		WebGUI::Mail::send($session{form}{email},"Account Information",$message);	
 	}
 	$sth->finish();
@@ -292,8 +303,10 @@ sub www_saveAccount {
 		$auth = $ldap->bind(dn=>$connectDN, password=>$session{form}{ldapPassword});
 		if ($auth->code == 48 || $auth->code == 49) {
 			$error .= "Either your ".$session{setting}{ldapIdName}." or ".$session{setting}{ldapPasswordName}." were invalid. ";
+			WebGUI::ErrorHandler::warn("Invalid LDAP information for registration of LDAP ID: ".$session{form}{ldapId});
 		} elsif ($auth->code > 0) {
 			$error .= 'LDAP error "'.$ldapStatusCode{$auth->code}.'" occured. Please contact your system administrator for assistance. ';
+			WebGUI::ErrorHandler::warn("LDAP error: ".$ldapStatusCode{$auth->code});
 		}
 		$ldap->unbind;
 	}
@@ -306,7 +319,6 @@ sub www_saveAccount {
 		$output .= 'Account created successfully!<p>';
 		$output .= www_displayAccount();
 	} else {
-		WebGUI::ErrorHandler::warn($error);
 		$output = "<h1>Error</h1>".$error.www_createAccount();
 	}
 	return $output;
