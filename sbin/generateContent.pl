@@ -23,7 +23,6 @@ use Getopt::Long;
 use strict qw(subs vars);
 use WebGUI;
 use WebGUI::Session;
-use WebGUI::Export;
 
 $|=1;
 
@@ -35,7 +34,6 @@ GetOptions(
 	'configFile:s'=>\$configFile,
 	'pageId:i'=>\$pageId,
 	'userId:i'=>\$userId,
-	'styleId:i'=>\$styleId,
 	'toFile:s'=>\$toFile,
 	'stripHTML'=>\$stripHTML,
 	'help'=>\$help,

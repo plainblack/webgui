@@ -5979,11 +5979,6 @@ A randomly generated number. This is often used on images (such as banner ads) t
                 lastUpdated => 1089039511,
                 context => q|Field label for the Export Page operation|
         },
-	'Alternate style' => {
-		message => q|Alternate style|,
-                lastUpdated => 1089039511,
-                context => q|Field label for the Export Page operation|
-        },
 	'Page Export Status' => {
                 message => q|Page Export Status|,
                 lastUpdated => 1089039511,

@@ -95,6 +95,8 @@ sub getOperations {
           'editDatabaseLink' => 'WebGUI::Operation::DatabaseLink',
           'editDatabaseLinkSave' => 'WebGUI::Operation::DatabaseLink',
           'listDatabaseLinks' => 'WebGUI::Operation::DatabaseLink',
+          'richEditPageTree' => 'WebGUI::Operation::RichEdit',
+          'richEditImage' => 'WebGUI::Operation::RichEdit',
           'manageUsersInGroup' => 'WebGUI::Operation::Group',
           'deleteGroup' => 'WebGUI::Operation::Group',
           'deleteGroupConfirm' => 'WebGUI::Operation::Group',
