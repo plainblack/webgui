@@ -6,7 +6,7 @@ The following is a rough overview of how to install WebGUI. For
 more detailed instructions read the WebGUI installation 
 documentation.
    
-   http://www.plainblack.com/index.pl/installation
+   http://plainblack.com/installation
 
 QnD INSTALL INSTRUCTIONS:
 
@@ -42,7 +42,7 @@ QnD INSTALL INSTRUCTIONS:
 
 7. Edit "etc/WebGUI.conf" to patch your DB settings and log directory.
 
-8. Run the following command from your WebGUI directory to determine
+8. Run the following command from your WebGUI/sbin directory to determine
    whether you've configured your system correctly.
 
    perl testEnvironment.pl
