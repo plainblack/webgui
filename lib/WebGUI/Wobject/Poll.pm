@@ -70,15 +70,6 @@ sub duplicate {
 }
 
 #-------------------------------------------------------------------
-sub new {
-        my ($self, $class, $property);
-        $class = shift;
-        $property = shift;
-        $self = WebGUI::Wobject->new($property);
-        bless $self, $class;
-}
-
-#-------------------------------------------------------------------
 sub purge {
         WebGUI::SQL->write("delete from Poll_answer where wobjectId=".$_[0]->get("wobjectId"));
 	$_[0]->SUPER::purge();
@@ -87,16 +78,6 @@ sub purge {
 #-------------------------------------------------------------------
 sub set {
         $_[0]->SUPER::set($_[1],[qw(active karmaPerVote graphWidth voteGroup question randomizeAnswers a1 a2 a3 a4 a5 a6 a7 a8 a9 a10 a11 a12 a13 a14 a15 a16 a17 a18 a19 a20)]);
-}
-
-#-------------------------------------------------------------------
-sub www_copy {
-        if (WebGUI::Privilege::canEditPage()) {
-		$_[0]->duplicate;
-                return "";
-        } else {
-                return WebGUI::Privilege::insufficient();
-        }
 }
 
 #-------------------------------------------------------------------

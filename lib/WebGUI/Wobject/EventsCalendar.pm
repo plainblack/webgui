@@ -107,15 +107,6 @@ sub duplicate {
 }
 
 #-------------------------------------------------------------------
-sub new {
-        my ($self, $class, $property);
-        $class = shift;
-        $property = shift;
-        $self = WebGUI::Wobject->new($property);
-        bless $self, $class;
-}
-
-#-------------------------------------------------------------------
 sub purge {
         WebGUI::SQL->write("delete from EventsCalendar_event where wobjectId=".$_[0]->get("wobjectId"));
 	$_[0]->SUPER::purge();
@@ -124,16 +115,6 @@ sub purge {
 #-------------------------------------------------------------------
 sub set {
         $_[0]->SUPER::set($_[1],[qw(calendarLayout paginateAfter)]);
-}
-
-#-------------------------------------------------------------------
-sub www_copy {
-        if (WebGUI::Privilege::canEditPage()) {
-		$_[0]->duplicate;
-                return "";
-        } else {
-                return WebGUI::Privilege::insufficient();
-        }
 }
 
 #-------------------------------------------------------------------

@@ -52,15 +52,6 @@ sub duplicate {
 }
 
 #-------------------------------------------------------------------
-sub new {
-        my ($self, $class, $property);
-        $class = shift;
-        $property = shift;
-        $self = WebGUI::Wobject->new($property);
-        bless $self, $class;
-}
-
-#-------------------------------------------------------------------
 sub purge {
 	WebGUI::Discussion::purge($_[0]->get("wobjectId"));
 	$_[0]->SUPER::purge();
@@ -81,16 +72,6 @@ sub www_approvePost {
 }
 
 #-------------------------------------------------------------------
-sub www_copy {
-        if (WebGUI::Privilege::canEditPage()) {
-                $_[0]->duplicate;
-                return "";
-        } else {
-                return WebGUI::Privilege::insufficient();
-        }
-}
-
-#-------------------------------------------------------------------
 sub www_deleteAttachment {
         if (WebGUI::Privilege::canEditPage()) {
 		$_[0]->set({attachment=>''});
@@ -105,24 +86,6 @@ sub www_deleteImage {
         if (WebGUI::Privilege::canEditPage()) {
 		$_[0]->set({image=>''});
                 return $_[0]->www_edit();
-        } else {
-                return WebGUI::Privilege::insufficient();
-        }
-}
-
-#-------------------------------------------------------------------
-sub www_deleteMessage {
-	if (WebGUI::Discussion::canEditMessage($_[0],$session{form}{mid})) {
-                return WebGUI::Discussion::deleteMessage();
-        } else {
-                return WebGUI::Privilege::insufficient();
-        }
-}
-
-#-------------------------------------------------------------------
-sub www_deleteMessageConfirm {
-	if (WebGUI::Discussion::canEditMessage($_[0],$session{form}{mid})) {
-                return WebGUI::Discussion::deleteMessageConfirm();
         } else {
                 return WebGUI::Privilege::insufficient();
         }

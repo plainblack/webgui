@@ -170,15 +170,6 @@ sub duplicate {
 }
 
 #-------------------------------------------------------------------
-sub new {
-        my ($self, $class, $property);
-        $class = shift;
-        $property = shift;
-        $self = WebGUI::Wobject->new($property);
-        bless $self, $class;
-}
-
-#-------------------------------------------------------------------
 sub purge {
         WebGUI::SQL->write("delete from Product_accessory where wobjectId=".$_[0]->get("wobjectId")." 
 		or accessoryWobjectId=".$_[0]->get("wobjectId"));
@@ -276,16 +267,6 @@ sub www_addRelatedSave {
                 } else {
                         return "";
                 }
-        } else {
-                return WebGUI::Privilege::insufficient();
-        }
-}
-
-#-------------------------------------------------------------------
-sub www_copy {
-        if (WebGUI::Privilege::canEditPage()) {
-                $_[0]->duplicate;
-                return "";
         } else {
                 return WebGUI::Privilege::insufficient();
         }

@@ -219,15 +219,6 @@ sub duplicate {
 }
 
 #-------------------------------------------------------------------
-sub new {
-        my ($self, $class, $property);
-        $class = shift;
-        $property = shift;
-        $self = WebGUI::Wobject->new($property);
-        bless $self, $class;
-}
-
-#-------------------------------------------------------------------
 sub purge {
         WebGUI::SQL->write("delete from UserSubmission_submission where wobjectId=".$_[0]->get("wobjectId"));
 	WebGUI::Discussion::purge($_[0]->get("wobjectId"));
@@ -266,16 +257,6 @@ sub www_approveSubmission {
 }
 
 #-------------------------------------------------------------------
-sub www_copy {
-        if (WebGUI::Privilege::canEditPage()) {
-		$_[0]->duplicate;
-                return "";
-        } else {
-                return WebGUI::Privilege::insufficient();
-        }
-}
-
-#-------------------------------------------------------------------
 sub www_deleteAttachment {
 	my ($owner);
 	($owner) = WebGUI::SQL->quickArray("select userId from UserSubmission_submission where submissionId=$session{form}{sid}");
@@ -294,24 +275,6 @@ sub www_deleteImage {
         if ($owner == $session{user}{userId} || WebGUI::Privilege::isInGroup($_[0]->get("groupToApprove"))) {
                 WebGUI::SQL->write("update UserSubmission_submission set image='' where submissionId=$session{form}{sid}");
                 return $_[0]->www_editSubmission();
-        } else {
-                return WebGUI::Privilege::insufficient();
-        }
-}
-
-#-------------------------------------------------------------------
-sub www_deleteMessage {
-        if (WebGUI::Discussion::canEditMessage($_[0],$session{form}{mid})) {
-                return WebGUI::Discussion::deleteMessage();
-        } else {
-                return WebGUI::Privilege::insufficient();
-        }
-}
-
-#-------------------------------------------------------------------
-sub www_deleteMessageConfirm {
-        if (WebGUI::Discussion::canEditMessage($_[0],$session{form}{mid})) {
-                return WebGUI::Discussion::deleteMessageConfirm();
         } else {
                 return WebGUI::Privilege::insufficient();
         }

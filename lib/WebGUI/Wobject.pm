@@ -406,7 +406,7 @@ sub moveCollateralUp {
 
  Constructor.
 
- NOTE: This method is meant to be extended by all sub-classes.
+ NOTE: This method should never need to be overridden or extended.
 
 =item hashRef 
 
@@ -617,6 +617,25 @@ sub setCollateral {
 
 #-------------------------------------------------------------------
 
+=head2 www_copy ( )
+
+ Copies this instance to the clipboard.
+
+ NOTE: Should never need to be overridden or extended.
+
+=cut
+
+sub www_copy {
+        if (WebGUI::Privilege::canEditPage()) {
+                $_[0]->duplicate;
+                return "";
+        } else {
+                return WebGUI::Privilege::insufficient();
+        }
+}
+
+#-------------------------------------------------------------------
+
 =head2 www_cut ( )
 
  Moves this instance to the clipboard.
@@ -675,6 +694,39 @@ sub www_deleteConfirm {
 		WebGUI::ErrorHandler::audit("moved Wobject ".$_[0]->{_property}{wobjectId}." to the trash.");
 		_reorderWobjects($_[0]->get("pageId"));
                 return "";
+        } else {
+                return WebGUI::Privilege::insufficient();
+        }
+}
+
+#-------------------------------------------------------------------
+
+=head2 www_deleteMessage ( )
+
+ Displays a message asking for confirmation to delete a message from
+ a discussion.
+
+=cut
+
+sub www_deleteMessage {
+        if (WebGUI::Discussion::canEditMessage($_[0],$session{form}{mid})) {
+                return WebGUI::Discussion::deleteMessage();
+        } else {
+                return WebGUI::Privilege::insufficient();
+        }
+}
+
+#-------------------------------------------------------------------
+
+=head2 www_deleteMessageConfirm ( )
+
+ Deletes a message from a discussion.
+
+=cut
+
+sub www_deleteMessageConfirm {
+        if (WebGUI::Discussion::canEditMessage($_[0],$session{form}{mid})) {
+                return WebGUI::Discussion::deleteMessageConfirm();
         } else {
                 return WebGUI::Privilege::insufficient();
         }

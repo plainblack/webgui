@@ -76,15 +76,6 @@ sub duplicate {
 }
 
 #-------------------------------------------------------------------
-sub new {
-	my ($self, $class, $property);
-	$class = shift;
-	$property = shift;
-	$self = WebGUI::Wobject->new($property);
-	bless $self, $class;
-}
-
-#-------------------------------------------------------------------
 sub purge {
     WebGUI::SQL->write("delete from MailForm_field where wobjectId=".$_[0]->get("wobjectId"));
     WebGUI::SQL->write("delete from MailForm_entry where wobjectId=".$_[0]->get("wobjectId"));
@@ -95,16 +86,6 @@ sub purge {
 #-------------------------------------------------------------------
 sub set {
 	$_[0]->SUPER::set($_[1],[@fields]);
-}
-
-#-------------------------------------------------------------------
-sub www_copy {
-	if (WebGUI::Privilege::canEditPage()) {
-		$_[0]->duplicate;
-		return "";
-	} else {
-		return WebGUI::Privilege::insufficient();
-	}
 }
 
 #-------------------------------------------------------------------
