@@ -153,11 +153,12 @@ delete from international where languageId=1 and namespace='WebGUI' and internat
 insert into international (internationalId,languageId,namespace,message,lastUpdated,context) values (512,1,'WebGUI','Go to next thread.', 1065280309,NULL);
 delete from international where languageId=1 and namespace='WebGUI' and internationalId=513;
 insert into international (internationalId,languageId,namespace,message,lastUpdated,context) values (513,1,'WebGUI','Go to previous thread.', 1065280287,NULL);
-delete from international where languageId=1 and namespace='WebGUI' and internationalId=1019;
 insert into international (internationalId,languageId,namespace,message,lastUpdated,context) values (1019,1,'WebGUI','Back to thread list.', 1065280160,'Return to the list of threads in a discussion.');
-delete from international where languageId=1 and namespace='WebGUI' and internationalId=1018;
 insert into international (internationalId,languageId,namespace,message,lastUpdated,context) values (1018,1,'WebGUI','Start a new thread.', 1065279960,'Add a new line of discussion to a forum.');
-delete from international where languageId=1 and namespace='WebGUI' and internationalId=1020;
 insert into international (internationalId,languageId,namespace,message,lastUpdated,context) values (1020,1,'WebGUI','Rating', 1065280882,'How useful/interesting a user thinks another poster\'s post is.');
 alter table forumThread add column status varchar(30) not null default 'approved';
+create table forumPostRating ( forumPostId int not null, userId int not null, ipAddress varchar(16), dateOfRating int, rating int not null);
+alter table forumPost add column rating int not null default 0;
+insert into international (internationalId,languageId,namespace,message,lastUpdated,context) values (1021,1,'WebGUI','Rate Message', 1065356764,'A label indicating that the following links are to be used for discussion post ratings.');
+alter table forumThread add column rating int not null;
 

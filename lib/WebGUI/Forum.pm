@@ -8,6 +8,12 @@ use WebGUI::Session;
 use WebGUI::SQL;
 
 
+sub canPost {
+        my ($self, $userId) = @_;
+        $userId = $session{user}{userId} unless ($userId);
+        return WebGUI::Privilege::isInGroup($self->get("groupToPost"));
+}
+
 sub create {
 	my ($self, $data) = @_;
 	$data->{forumId} = "new";

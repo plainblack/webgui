@@ -51,6 +51,10 @@ sub _formatPreviousThreadURL {
 	return WebGUI::URL::append($_[0],"forumOp=previousThread&amp;forumThreadId=".$_[1]);
 }
 
+sub _formatRatePostURL {
+	return WebGUI::URL::append($_[0],"forumOp=ratePost&amp;forumPostId=".$_[1]."&amp;rating=".$_[2]);
+}
+
 sub _formatReplyPostURL {
 	return WebGUI::URL::append($_[0],"forumOp=post&amp;parentId=".$_[1]);
 }
@@ -89,6 +93,7 @@ sub _getPostTemplateVars {
                 }
                 $sth->finish;
         }
+	$var->{canPost} = $forum->canPost;
         $var->{'post.date.value'} = _formatPostDate($post->get("dateOfPost"));
 	$var->{'post.date.label'} = WebGUI::International::get(245);
         $var->{'post.date.epoch'} = $post->get("dateOfPost");
@@ -109,6 +114,13 @@ sub _getPostTemplateVars {
 	$var->{'post.user.Profile'} = _formatUserProfileURL($post->get("userId"));
 	$var->{'post.url'} = _formatThreadURL($callback,$post->get("forumPostId"));
 	$var->{'post.id'} = $post->get("forumPostId");
+	$var->{'post.rate.label'} = WebGUI::International::get(1021);
+	$var->{'post.rate.url.1'} = _formatRatePostURL($callback,$post->get("forumPostId"),1);
+	$var->{'post.rate.url.2'} = _formatRatePostURL($callback,$post->get("forumPostId"),2);
+	$var->{'post.rate.url.3'} = _formatRatePostURL($callback,$post->get("forumPostId"),3);
+	$var->{'post.rate.url.4'} = _formatRatePostURL($callback,$post->get("forumPostId"),4);
+	$var->{'post.rate.url.5'} = _formatRatePostURL($callback,$post->get("forumPostId"),5);
+	$var->{'post.hasRated'} = $post->hasRated;
 	$var->{'post.reply.label'} = WebGUI::International::get(577);
 	$var->{'post.reply.url'} = _formatReplyPostURL($callback,$post->get("forumPostId"));
 	$var->{'post.edit.label'} = WebGUI::International::get(575);
@@ -153,14 +165,23 @@ sub viewForum {
 	my (%var, @thread_loop);
 	$var{'thread.new.url'} = _formatNewThreadURL($callback,$forumId);
 	$var{'thread.new.label'} = WebGUI::International::get(1018);
+	my $forum = WebGUI::Forum->new($forumId);
+	$var{canPost} = $forum->canPost;
 	$var{'thread.subject.label'} = WebGUI::International::get(229);
 	$var{'thread.date.label'} = WebGUI::International::get(245);
 	$var{'thread.user.label'} = WebGUI::International::get(244);
 	$var{"thread.views.label"} = WebGUI::International::get(514);
         $var{"thread.replies.label"} = WebGUI::International::get(1016);
+	$var{'thread.rating.label'} = WebGUI::International::get(1020);
         $var{"thread.last.label"} = WebGUI::International::get(1017);
 	my $p = WebGUI::Paginator->new($callback);
 	$p->setDataByQuery("select * from forumThread where forumId=".$forumId." order by isSticky desc, lastPostDate desc");
+	$var{firstPage} = $p->getFirstPageLink;
+        $var{lastPage} = $p->getLastPageLink;
+        $var{nextPage} = $p->getNextPageLink;
+        $var{pageList} = $p->getPageLinks;
+        $var{previousPage} = $p->getPreviousPageLink;
+        $var{multiplePages} = ($p->getNumberOfPages > 1);
 	my $threads = $p->getPageData;
 	foreach my $thread (@$threads) {
 		my $root = WebGUI::Forum::Post->new($thread->{rootPostId});
@@ -170,9 +191,15 @@ sub viewForum {
 		} else {
 			$last = WebGUI::Forum::Post->new($thread->{lastPostId});
 		}
+		my @rating_loop;
+		for (my $i=0;$i>=$thread->{rating};$i++) {
+			push(@rating_loop,{'thread.rating_loop.count'=>$i});
+		}
 		push(@thread_loop,{
 			'thread.views'=>$thread->{views},
 			'thread.replies'=>$thread->{replies},
+			'thread.rating'=>$thread->{rating},
+			'thread.rating_loop'=>\@rating_loop,
 			'thread.isSticky'=>$thread->{isSticky},
 			'thread.isLocked'=>$thread->{isLocked},
 			'thread.root.subject'=>_chopSubject($root->get("subject")),
@@ -263,6 +290,7 @@ sub www_post {
 		});
 	if ($var->{isReply}) {
 		my $reply = WebGUI::Forum::Post->new($session{form}{parentId});
+		return WebGUI::Privilege::insufficient unless ($reply->getThread->getForum->canPost);
 		$var->{'form.begin'} .= WebGUI::Form::hidden({
 			name=>'parentId',
 			value=>$reply->get("forumPostId")
@@ -283,6 +311,7 @@ sub www_post {
 			value=>$session{form}{forumId}
 			});
 		$forum = WebGUI::Forum->new($session{form}{forumId});
+		return WebGUI::Privilege::insufficient unless ($forum->canPost);
 		if ($forum->isModerator) {
 			$var->{'sticky.label'} = WebGUI::International::get(1013);
 			$var->{'sticky.form'} = WebGUI::Form::yesNo({
@@ -307,6 +336,7 @@ sub www_post {
 	}
 	if ($var->{isEdit}) {
 		my $post = WebGUI::Forum::Post->new($session{form}{forumPostId});
+		return WebGUI::Privilege::insufficient unless ($post->getThread->getForum->canPost);
 		$subject = $post->get("subject");
 		$message = $post->get("message");
 		$forum = $post->getThread->getForum;
@@ -358,7 +388,6 @@ sub www_postSave {
 	my $forumId = $session{form}{forumId};
 	my $threadId = $session{form}{forumThreadId};
 	my $postId = $session{form}{forumPostId};
-	my $thread;
 	my %postData = (
 		message=>$session{form}{message},
 		subject=>$session{form}{subject}
@@ -371,6 +400,7 @@ sub www_postSave {
 	if ($session{form}{parentId} > 0) { # reply
 		%postData = (%postData, %postDataNew);
 		my $parentPost = WebGUI::Forum::Post->new($session{form}{parentId});
+		return WebGUI::Privilege::insufficient unless ($parentPost->getThread->getForum->canPost);
 		$parentPost->getThread->subscribe($session{user}{userId}) if ($session{form}{subscribe});
 		$parentPost->getThread->lock if ($session{form}{isLocked});
 		$postData{forumThreadId} = $parentPost->getThread->get("forumThreadId");
@@ -380,12 +410,15 @@ sub www_postSave {
 	}
 	if ($session{form}{forumPostId} > 0) { # edit
 		my $post = WebGUI::Forum::Post->new($session{form}{forumPostId});
+		return WebGUI::Privilege::insufficient unless ($post->getThread->getForum->canPost);
 		$post->set(\%postData);	
 		return www_viewThread($callback,$post->get("forumPostId"));
 	}
 	if ($forumId) { # new post
 		%postData = (%postData, %postDataNew);
-		$thread = WebGUI::Forum::Thread->create({
+		my $forum = WebGUI::Forum->new($forumId);
+		return WebGUI::Privilege::insufficient unless ($forum->canPost);
+		my $thread = WebGUI::Forum::Thread->create({
 			forumId=>$forumId,
 			isSticky=>$session{form}{isSticky},
 			isLocked=>$session{form}{isLocked}
@@ -404,6 +437,14 @@ sub www_previousThread {
 	} else {
 		return viewForum($callback,$thread->get("forumId"));
 	}
+}
+
+sub www_ratePost {
+	my ($callback) = @_;
+	my $post = WebGUI::Forum::Post->new($session{form}{forumPostId});
+	return WebGUI::Privilege::insufficient() unless ($post->getThread->getForum->canPost);
+	$post->rate($session{form}{rating}) unless ($post->hasRated);
+	return www_viewThread($callback,$session{form}{forumPostId});
 }
 
 sub www_viewThread {
@@ -430,6 +471,7 @@ sub www_viewThread {
 	$var->{'thread.next.label'} = WebGUI::International::get(512);
 	$var->{'thread.list.url'} = $callback;
 	$var->{'thread.list.label'} = WebGUI::International::get(1019);
+	$var->{canPost} = $forum->canPost;
 	return WebGUI::Template::process(WebGUI::Template::get(1,"Forum/Thread"), $var); 
 }
 

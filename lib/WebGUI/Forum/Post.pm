@@ -5,6 +5,7 @@ use WebGUI::DateTime;
 use WebGUI::Forum::Thread;
 use WebGUI::Session;
 use WebGUI::SQL;
+use WebGUI::Utility;
 
 sub canEdit {
         my ($self, $userId) = @_;
@@ -54,6 +55,16 @@ sub getThread {
 	return $self->{_thread};
 }
 
+sub hasRated {
+	my ($self, $userId, $ipAddress) = @_;
+	$userId = $session{user}{userId} unless ($userId);
+	$ipAddress = $session{env}{REMOTE_ADDR} unless ($ipAddress);
+	my ($flag) = WebGUI::SQL->quickArray("select count(*) from forumPostRating where forumPostId="
+		.$self->get("forumPostId")." and ((userId=$userId and userId<>1) or (userId=1 and 
+		ipAddress='$ipAddress'))");
+	return $flag;
+}
+
 sub incrementViews {
 	my ($self) = @_;
 	WebGUI::SQL->write("update forumPost set views=views+1 where forumPostId=".$self->get("forumPostId"));
@@ -94,6 +105,25 @@ sub new {
 	} else {
 		return undef;
 	}
+}
+
+sub rate {
+	my ($self, $rating, $userId, $ipAddress) = @_;
+	$userId = $session{user}{userId} unless ($userId);
+	$ipAddress = $session{env}{REMOTE_ADDR} unless ($ipAddress);
+	WebGUI::SQL->write("insert into forumPostRating (forumPostId,userId,ipAddress,dateOfRating,rating) values ("
+		.$self->get("forumPostId").", $userId, ".quote($ipAddress).", ".WebGUI::DateTime::time().", $rating)");
+	$self->recalculateRating;
+}
+
+sub recalculateRating {
+	my ($self) = @_;
+	my ($count) = WebGUI::SQL->quickArray("select count(*) from forumPostRating where forumPostId=".$self->get("forumPostId"));
+        $count = $count || 1;
+        my ($sum) = WebGUI::SQL->quickArray("select sum(rating) from forumPostRating where forumPostId=".$self->get("forumPostId"));
+        my $average = round($sum/$count);
+        $self->set({rating=>$average});
+	$self->getThread->recalculateRating;
 }
 
 sub set {

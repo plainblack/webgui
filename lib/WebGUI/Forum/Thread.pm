@@ -6,6 +6,7 @@ use WebGUI::Forum;
 use WebGUI::Forum::Post;
 use WebGUI::Session;
 use WebGUI::SQL;
+use WebGUI::Utility;
 
 sub create {
 	my ($self, $data, $postData) = @_;
@@ -110,6 +111,15 @@ sub new {
 	}
 }
 
+sub recalculateRating {
+	my ($self) = @_;
+        my ($count) = WebGUI::SQL->quickArray("select count(*) from forumPost where forumThreadId=".$self->get("forumThreadId")." and rating>0");
+        $count = $count || 1;
+        my ($sum) = WebGUI::SQL->quickArray("select sum(rating) from forumPost where forumThreadId=".$self->get("forumThreadId")." and rating>0");
+        my $average = round($sum/$count);
+        $self->set({rating=>$average});
+}
+                                                                                                                                                             
 sub set {
 	my ($self, $data) = @_;
 	$data->{forumThreadId} = $self->get("forumThreadId") unless ($data->{forumThreadId});
