@@ -1,0 +1,54 @@
+0.12.0 
+ - Added stylesheet classes to the menu macros added in the last version.
+ - Fixed an intenting problem with the menu macros added in the last version.
+ - Added a function to SQL Reports to convert the carriage returns in a resultant dataset to into HTML breaks.
+ - Finished adding help to all the widgets.
+ - Added widget "jump" function to move widgets from top/bottom to top/bottom of pages more quickly.
+ - Added more exception handling for external DB connections.
+ - When you add a widget that requires a DSN it is automatically filled in with the WebGUI DSN (changeable of course).
+ - Added description and process macro fields to widgets that didn't have them, but should have.
+ - Added a default title to all widgets.
+ - Fixed some bugs that were causing user submissions to malfunction.
+ - Added horizontal and vertical previous level menu macros.
+ - Added a "make this page printable" macro and the functions to make it work.
+ - Fixed a bug with displaying message ids on message board.
+ - Fixed a bug where adding a user from the admin interface resulted in an invalid password.
+
+0.11.0
+ - Fixed a bug where the User ID macro didn't work.
+ - Fixed a bug where the URL macro didn't work.
+ - Fixed a formatting problem on the Events Calendar.
+ - Added help for some more widgets.
+ - Fixed a problem where SiteMap wasn't closing a database query properly.
+ - Added a full level, 2 level, and 3 level vertical menu macro.
+ - Made an exception in privilege system so that registered users can do anything visitors can do (like vote in polls marked visitor).
+ - Fixed a security flaw in the Poll that would allow a user to vote who was not in the proper group.
+ - Now tracking IP address in session.
+ - Fixed a bug where only the first SQL Report would work on a site.
+ - Reordered some syntax to allow better CSS control with FAQs.
+ - Added exception handling for remote data connects in MnoGo Search system in case the content manager types in faulty connection info or the required tables don't exist.
+ - Fixed a bug where message IDs weren't being properly generated for replies on message boards.
+
+0.10.0
+ - Added User Contributions widget.
+ - You can now click on the last item in the crumb trail.
+ - You can now specify the width of poll graphs.
+ - Fixed a bug where editing a poll would cause many blank entries to be added to the possible answers list.
+ - Fixed a bug where users were not being added to the registered users group upon creation.
+ - Fixed a bug where you could not add a link  to a link list.
+ - Added an attachment icon for attachment links in User Contributions and Articles.
+ - Fixed a bug where some of the javascript wizards weren't working due to a pathing problem.
+ - Fixed a bug in polls where it would tally the results from multiple polls into one poll.
+ - Fixed a bug where moving widgets and other objects could get all mixed up.
+ - You can now reorder pages to your liking.
+ - Added a help page for the SQL Reports widget because it's pretty complex. Hopefully we'll get to the other widgets in the near future.
+ - Combined the admin and misc. menus.
+ - Fixed a bug where macros weren't being processed on widget add even if the box was checked.
+ - Changed events calendar layout slightly and added a style sheet entry to it.
+ - Added the updated PBS look to the styles system.
+ - Changed the gateway application (index.pl) to alter the @INC for easier mod_perl integration.
+
+
+0.9.0
+ - This is the first public release of WebGUI.
+
