@@ -313,7 +313,7 @@ sub setCookie {
 
 sub setScratch {
 	return "" unless ($session{var}{sessionId});
-	if ($session{scratch}{$_[0]}) {
+	if ($session{scratch}{$_[0]} ne "") {
 		WebGUI::SQL->write("update userSessionScratch set value=".quote($_[1])."
 			where sessionId=".quote($session{var}{sessionId})." and name=".quote($_[0]));
 	} else {
