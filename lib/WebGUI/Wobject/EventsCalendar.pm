@@ -284,7 +284,7 @@ sub www_editSave {
 		defaultMonth=>$session{form}{defaultMonth},
 		paginateAfter=>$session{form}{paginateAfter}
 		});
-	if ($session{form}{proceed}) {
+	if ($session{form}{proceed} eq "addEvent") {
 		$session{form}{eid} = "new";
 		return $_[0]->www_editEvent;
 	} else {
@@ -337,7 +337,14 @@ sub www_editEvent {
 		-extras=>'onBlur="this.form.until.value=this.form.endDate.value;"'
 		);
 	$f->raw($special);
-	$f->yesNo("proceed",WebGUI::International::get(21,$namespace));
+	if ($session{form}{eid} eq "new") {
+                $f->whatNext(
+                        -options=>{
+                                addEvent=>WebGUI::International::get(91,$namespace),
+                                backToPage=>WebGUI::International::get(745)
+                                }
+                        );
+        }
 	$f->submit;
 	$output .= $f->print;
         return $output;
@@ -390,7 +397,7 @@ sub www_editEventSave {
 			description=".quote($session{form}{description}).", startDate='".setToEpoch($session{form}{startDate})."', 
 			endDate='".setToEpoch($session{form}{endDate})."' where EventsCalendar_eventId=$session{form}{eid}");
 	}
-	if ($session{form}{proceed}) {
+	if ($session{form}{proceed} eq "addEvent") {
 		$session{form}{eid} = "new";
 		return $_[0]->www_editEvent;
 	} else {
