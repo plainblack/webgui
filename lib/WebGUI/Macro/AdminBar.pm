@@ -63,7 +63,7 @@ sub process {
         $r = WebGUI::SQL->read($query);
         while (%hash = $r->hash) {
 		push @item, [	$hash{bufferDate},
-				WebGUI::URL::page('func=paste&wid='.$hash{wobjectId}),
+				WebGUI::URL::page('op=pastePage&pageId='.$hash{pageId}),
 				$hash{title} . ' ('. WebGUI::International::get(2) .')' ];
 	}
         $r->finish;
