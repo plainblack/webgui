@@ -248,10 +248,10 @@ sub getEditForm {
 		tie %recursEvery, 'Tie::IxHash';
 		%recursEvery = (
 			'never'=>WebGUI::International::get(4,"EventsCalendar"),
-			'day'=>WebGUI::International::get(700),
-			'week'=>WebGUI::International::get(701),
-			'month'=>WebGUI::International::get(702),
-			'year'=>WebGUI::International::get(703)
+			'day'=>WebGUI::International::get(700,"EventsCalendar"),
+			'week'=>WebGUI::International::get(701,"EventsCalendar"),
+			'month'=>WebGUI::International::get(702,"EventsCalendar"),
+			'year'=>WebGUI::International::get(703,"EventsCalendar"),
 		);
 		$tabform->getTab("properties")->raw(
 			'<tr><td class="formdescription" valign="top">'.WebGUI::International::get(8,"EventsCalendar").'</td><td class="tableData">'
@@ -338,9 +338,9 @@ sub view {
 	$var{"end.time"} = epochToHuman($self->getValue("eventEndDate"),"%Z");
 	$var{canEdit} = $self->canEdit;
 	$var{"edit.url"} = WebGUI::URL::page('func=edit');
-	$var{"edit.label"} = WebGUI::International::get(575);
+	$var{"edit.label"} = WebGUI::International::get(575,"EventsCalendar");
 	$var{"delete.url"} = WebGUI::URL::page('func=deleteEvent&rid='.$self->getValue("EventsCalendar_recurringId"));
-	$var{"delete.label"} = WebGUI::International::get(576);
+	$var{"delete.label"} = WebGUI::International::get(576,"EventsCalendar");
 #	my $query = "select EventsCalendar_eventId from EventsCalendar_event where EventsCalendar_eventId<>".quote($event->getValue("EventsCalendar_eventId});
 #	$query .= " and wobjectId=".quote($self->get("wobjectId")) unless ($self->get("isMaster"));
 #	$query .= " and startDate<=$event->getValue("startDate} order by startDate desc, endDate desc";
@@ -376,7 +376,7 @@ sub www_deleteEvent {
 	my $self = shift;
 	return WebGUI::Privilege::insufficient() unless ($self->canEdit);
 	my ($output);
-	$output = '<h1>'.WebGUI::International::get(42).'</h1>';
+	$output = '<h1>'.WebGUI::International::get(42,"EventsCalendar").'</h1>';
 	$output .= WebGUI::International::get(75,"EventsCalendar").'<p><blockquote>';
 	$output .= '<a href="'.WebGUI::URL::page('func=deleteEventConfirm').'">'.WebGUI::International::get(76,"EventsCalendar").'</a><p>';
 	$output .= '<a href="'.WebGUI::URL::page('func=deleteEventConfirm&rid='.$session{form}{rid}).'">'

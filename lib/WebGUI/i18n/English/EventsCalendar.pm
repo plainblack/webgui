@@ -910,6 +910,41 @@ This option is only available when adding an Events Calendar, not editing one.
 		lastUpdated => 1038190601
 	},
 
+	'575' => {
+		message => q|Edit|,
+		lastUpdated => 1031514049
+	},
+
+	'576' => {
+		message => q|Delete|,
+		lastUpdated => 1031514049
+	},
+
+	'700' => {
+		message => q|Day(s)|,
+		lastUpdated => 1031514049
+	},
+
+	'701' => {
+		message => q|Week(s)|,
+		lastUpdated => 1031514049
+	},
+
+	'702' => {
+		message => q|Month(s)|,
+		lastUpdated => 1031514049
+	},
+
+	'703' => {
+		message => q|Year(s)|,
+		lastUpdated => 1031514049
+	},
+
+	'42' => {
+		message => q|Please Confirm|,
+		lastUpdated => 1031514049
+	},
+
 };
 
 1;
