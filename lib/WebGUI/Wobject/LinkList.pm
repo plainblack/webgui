@@ -101,7 +101,7 @@ sub www_edit {
         }
 	return $_[0]->SUPER::www_edit(
 		-properties=>$properties->printRowsOnly,
-		-layout=>$layout->printRowsOnly
+		-layout=>$layout->printRowsOnly,
 		-headingId=>10,
 		-helpId=>1
 		);

@@ -139,8 +139,8 @@ sub www_edit {
 		);
         $properties->textarea(
 		-name=>"answers",
-		-value=>WebGUI::International::get(7,$_[0]->get("namespace")).
-		-subtext=>'<span class="formSubtext"><br>'.WebGUI::International::get(8,$_[0]->get("namespace")).'</span>',
+		-label=>WebGUI::International::get(7,$_[0]->get("namespace")),
+		-subtext=>('<span class="formSubtext"><br>'.WebGUI::International::get(8,$_[0]->get("namespace")).'</span>'),
 		-value=>$answers
 		);
 	$layout->yesNo(
