@@ -16,9 +16,10 @@ use WebGUI::Macro;
 
 #-------------------------------------------------------------------
 sub _replacement {
-        my (@param, $temp);
+        my (@param, $temp, $time);
         @param = WebGUI::Macro::getParams($_[0]);
-	$temp = epochToHuman(time(),$param[0]);
+	$time = $param[1] || time();
+	$temp = epochToHuman($time,$param[0]);
 	return $temp;
 }
 
