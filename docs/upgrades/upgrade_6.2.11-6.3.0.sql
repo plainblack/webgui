@@ -327,4 +327,4 @@ delete from template where namespace='Forum/PostPreview';
 insert into settings values ("richEditCss","^/;site.css");
 delete from settings where name in ('sharedTrash','sharedClipboard');
 
-
+alter table IndexedSearch add linkURL text;
