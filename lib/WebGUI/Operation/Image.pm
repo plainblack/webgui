@@ -236,7 +236,7 @@ sub www_listImages {
                         $i++;
                 }
                 $sth->finish;
-                $p = WebGUI::Paginator->new(WebGUI::URL::page('op=listImages'),\@row);
+                $p = WebGUI::Paginator->new(WebGUI::URL::page('op=listImages&gid='.$session{form}{gid}),\@row);
                 $output .= '<table border=1 cellpadding=5 cellspacing=0 align="center">';
                 $output .= $p->getPage($session{form}{pn});
                 $output .= '</table>';
