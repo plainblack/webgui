@@ -89,8 +89,15 @@ insert into wobject (wobjectId, pageId, title, displayTitle, processMacros, desc
 delete from widget where namespace='SyndicatedContent';
 alter table SyndicatedContent change widgetId wobjectId int not null;
 
+insert into wobject (wobjectId, pageId, title, displayTitle, processMacros, description, dateAdded, addedBy, namespace, lastEdited, editedBy, templatePosition, sequenceNumber, startDate, endDate) select widgetId, pageId, title, displayTitle, processMacros, description, dateAdded, addedBy, namespace, lastEdited, editedBy, templatePosition, sequenceNumber, dateAdded, 1336444487 from widget where namespace='UserSubmission';
+delete from widget where namespace='UserSubmission';
+delete from international where internationalId=36 and namespace='UserSubmission';
+alter table UserSubmission change widgetId wobjectId int not null;
+alter table UserSubmission_submission change widgetId wobjectId int not null;
 
 
+
+INSERT INTO international VALUES (38,'UserSubmission','English','(Select \"No\" if you\'re writing a HTML/Rich Edit submission.)');
 update international set message='Select \"Yes\" to change all the pages under this page to this style.' where internationalId='106' and namespace='WebGUI' and language='English';
 update international set message='Select \"Yes\" to change the privileges of all pages under this page to these privileges.' where internationalId='116' and namespace='WebGUI' and language='English';
 INSERT INTO international VALUES (500,'WebGUI','English','Page ID');
