@@ -2911,23 +2911,25 @@ A title for the database link.
 <p>
 
 Here are some examples for other databases.<br>
-<a href="http://search.cpan.org/author/TIMB/DBD-Oracle-1.14/Oracle.pm#CONNECTING_TO_ORACLE">Oracle</a>:
-<ul>DBI:Oracle:SID<br>
+<dl>
+<dt><a href="http://search.cpan.org/author/TIMB/DBD-Oracle-1.14/Oracle.pm#CONNECTING_TO_ORACLE">Oracle</a>:</dt>
+<dd>DBI:Oracle:SID<br>
 DBD::Oracle must be installed.<br>
 You must be using mod_perl and configure <b>PerlSetEnv ORACLE_HOME /home/oracle/product/8.1.7</b> in httpd.conf. Without setting ORACLE_HOME, you can connect using DBI:Oracle:host=myhost.com;sid=SID
-</ul>
+</dd>
 
-<a href="http://search.cpan.org/author/OYAMA/DBD-PgPP-0.04/PgPP.pm#THE_DBI_CLASS">PostgreSQL</a>:
-<ul>DBI:PgPP:dbname=DBNAME[;host=hOST]<br>
+<dt><a href="http://search.cpan.org/author/OYAMA/DBD-PgPP-0.04/PgPP.pm#THE_DBI_CLASS">PostgreSQL</a>:</dt>
+<dd>DBI:PgPP:dbname=DBNAME[;host=hOST]<br>
 DBD::PgPP must be installed.
-</ul>
+</dd>
 
 
-<a href="http://search.cpan.org/author/MEWP/DBD-Sybase-1.00/Sybase.pm#Specifying_other_connection_specific_parameters">Sybase</a>:
-<ul>DBI:Sybase:[server=SERVERNAME][database=DATABASE]<br>
+<dt><a href="http://search.cpan.org/author/MEWP/DBD-Sybase-1.00/Sybase.pm#Specifying_other_connection_specific_parameters">Sybase</a>:</dt>
+<dd>DBI:Sybase:[server=SERVERNAME][database=DATABASE]<br>
 DBD::Sybase must be installed.<br>
 You must be using mod_perl and configure <b>PerlSetEnv SYBASE /opt/sybase/11.0.2</b> in httpd.conf.
-</ul>
+</dd>
+</dl>
 
 <p>
 <b>Database User</b><br>
@@ -2939,7 +2941,7 @@ The username you use to connect to the DSN.
 The password you use to connect to the DSN.
 <p>
 |,
-		lastUpdated => 1056151382
+		lastUpdated => 1098920920
 	},
 
 	'556' => {
