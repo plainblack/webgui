@@ -32,7 +32,7 @@ sub _submenu {
         my (%menu);
         tie %menu, 'Tie::IxHash';
 	$menu{WebGUI::URL::page('op=editStyle&sid=new')} = WebGUI::International::get(158);
-	if (($session{form}{op} eq "editStyle" && $session{form}{sid} ne "new") || $session{form}{op} eq "deleteStyle") {
+	if (($session{form}{op} eq "editStyle" && $session{form}{sid} ne "new") || $session{form}{op} eq "deleteStyleConfirm") {
                 $menu{WebGUI::URL::page('op=editStyle&sid='.$session{form}{sid})} = WebGUI::International::get(803);
                 $menu{WebGUI::URL::page('op=copyStyle&sid='.$session{form}{sid})} = WebGUI::International::get(804);
 		$menu{WebGUI::URL::page('op=deleteStyle&sid='.$session{form}{sid})} = WebGUI::International::get(805);

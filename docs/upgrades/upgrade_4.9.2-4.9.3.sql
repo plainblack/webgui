@@ -2534,6 +2534,12 @@ drop table SiteMap;
 alter table SiteMap2 rename SiteMap;
 delete from international where languageId=1 and namespace='SiteMap' and internationalId=73;
 insert into international (internationalId,languageId,namespace,message,lastUpdated) values (73,1,'SiteMap','This is the list of template variables available for site map templates.\r\n<p/>\r\n\r\n<b>page_loop</b><br/>\r\nThis loop contains all of the pages in the site map.\r\n<blockquote>\r\n\r\n<b>page.indent</b><br/>\r\nThe indent spacer for this page indicating the depth of the page in the tree.\r\n<p/>\r\n\r\n<b>page.url</b><br/>\r\nThe URL to the page.\r\n<p/>\r\n\r\n<b>page.id</b><br/>\r\nThe unique identifier for this page that WebGUI uses internally.\r\n<p/>\r\n\r\n<b>page.title</b><br/>\r\nThe title of this page.\r\n<p/>\r\n\r\n<b>page.menutitle</b><br/>\r\nThe title of this page that appears in navigation.\r\n<p/>\r\n\r\n<b>page.synopsis</b><br/>\r\nThe description of the contents of this page (if any).\r\n<p/>\r\n\r\n<b>page.isRoot</b><br/>\r\nA condition indicating whether or not this page is a root.\r\n<p/>\r\n\r\n</blockquote>\r\n<p/>', 1039910987);
+insert into international (internationalId,languageId,namespace,message,lastUpdated) values (855,1,'WebGUI','List all templates.', 1039926498);
+insert into international (internationalId,languageId,namespace,message,lastUpdated) values (854,1,'WebGUI','List all templates like this one.', 1039926488);
+insert into international (internationalId,languageId,namespace,message,lastUpdated) values (853,1,'WebGUI','Delete this template.', 1039926459);
+insert into international (internationalId,languageId,namespace,message,lastUpdated) values (852,1,'WebGUI','Copy this template.', 1039926448);
+insert into international (internationalId,languageId,namespace,message,lastUpdated) values (851,1,'WebGUI','Edit this template.', 1039926394);
+
 
 
 
