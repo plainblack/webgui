@@ -727,9 +727,10 @@ This user's sex.
 
 <b>Birth Date</b><br>
 This user's date of birth.
+<p>
 
 <b>Language</b><br>
-What language should be used to display system related messages.
+The language used to display system related messages.
 <p>
 
 <b>Time Offset</b><br>
@@ -756,7 +757,7 @@ Should discussions be laid out flat or threaded? Flat puts all replies on one pa
 How should this user be notified when they get a new WebGUI message?
 
 |,
-		lastUpdated => 1102231342,
+		lastUpdated => 1111449957,
 	},
 
 	'351' => {
