@@ -542,12 +542,12 @@ sub www_viewEvent {
 		.$session{form}{wid}.'&rid='.$event{EventsCalendar_recurringId});
 	$var{"delete.label"} = WebGUI::International::get(576);
 	($id) = WebGUI::SQL->quickArray("select EventsCalendar_eventId from EventsCalendar_event 
-		where EventsCalendar_eventId<>$event{EventsCalendar_eventId} and
+		where EventsCalendar_eventId<>$event{EventsCalendar_eventId} and wobjectId=".$_[0]->get("wobjectId")." and
 		startDate<=$event{startDate} order by startDate desc, endDate desc");
 	$var{"previous.label"} = '&laquo;'.WebGUI::International::get(92,$_[0]->get("namespace"));
 	$var{"previous.url"} = WebGUI::URL::page("func=viewEvent&wid=".$_[0]->get("wobjectId")."&eid=".$id) if ($id);
         ($id) = WebGUI::SQL->quickArray("select EventsCalendar_eventId from EventsCalendar_event
-                where EventsCalendar_eventId<>$event{EventsCalendar_eventId} and 
+                where EventsCalendar_eventId<>$event{EventsCalendar_eventId} and wobjectId=".$_[0]->get("wobjectId")." and 
 		startDate>=$event{startDate} order by startDate, endDate");
         $var{"next.label"} = WebGUI::International::get(93,$_[0]->get("namespace")).'&raquo;';
         $var{"next.url"} = WebGUI::URL::page("func=viewEvent&wid=".$_[0]->get("wobjectId")."&eid=".$id) if ($id);
