@@ -24,7 +24,7 @@ use WebGUI::Utility;
 
 
 my (@files, $cmd, $namespace, $file, $slash, $confdir, %plugins, $plugdir, $exclude);
-$slash = ($^O =~ /Win/i) ? "\\" : "/";
+$slash = ($^O =~ /^Win/i) ? "\\" : "/";
 $confdir = $webguiRoot.$slash."etc".$slash;
 $plugdir = $webguiRoot.$slash."sbin".$slash."Hourly".$slash;
 
