@@ -7,6 +7,22 @@ upgrading from one version to the next, or even between multiple
 versions. Be sure to heed the warnings contained herein as they will
 save you many hours of grief.
 
+4.9.0
+--------------------------------------------------------------------
+ * If you created any templates using the previous two beta versions
+	(4.7.0 or 4.8.0) then you'll need to tweak your templates as
+	the template language has changed slightly for greater
+	flexibility.
+
+
+4.8.0
+--------------------------------------------------------------------
+ * If you are an administrator, but your userId is not 3 you will
+	notice that all the forms in WebGUI are shortened
+	considerably. This is due to the new UI Levels. If you wish
+	see all the form elements then use the user manager to edit
+	your user profile and set your UI Level to 9.
+
 4.7.0
 --------------------------------------------------------------------
  * WebGUI::HTMLForm->radioList has been changed to correct an API
