@@ -211,7 +211,11 @@ sub www_editPage {
         if (WebGUI::Privilege::canEditPage($session{form}{npp})) {
 		$f = WebGUI::HTMLForm->new;
 		if ($session{form}{npp} ne "") {
-			%page = WebGUI::SQL->quickHash("select * from page where pageId=$session{form}{npp}");
+			my $buildFromPage = $session{form}{npp};
+			if ($buildFromPage == 0) {
+				$buildFromPage = $session{setting}{defaultPage};
+			}
+			%page = WebGUI::SQL->quickHash("select * from page where pageId=$buildFromPage");
 			$page{templateId} = 1;
 			$page{pageId} = "new";
 			$page{title} = $page{menuTitle} = $page{urlizedTitle} = $page{synopsis} = '';
