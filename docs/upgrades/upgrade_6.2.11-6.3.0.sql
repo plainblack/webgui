@@ -322,3 +322,6 @@ create table Post_read (
  userId varchar(22) not null,
  readDate bigint
 );
+
+delete from template where namespace='Forum/PostPreview';
+

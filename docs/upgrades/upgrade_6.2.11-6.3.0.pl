@@ -23,6 +23,30 @@ GetOptions(
 
 WebGUI::Session::open("../..",$configFile);
 
+print "\tMerging Forum/Post and Forum/Thread templates.\n" unless ($quiet);
+my %threadTemplates;
+my $forums = WebGUI::SQL->read("select forumId, threadTemplateId, postTemplateId from forum where threadTemplateId<>'1' and postTemplateId<>'1'");
+while (my ($forumId, $threadTemplateId, $postTemplateId) = $forums->array) {
+	my $key = "Thread ".$threadTemplateId." | ".$postTemplateId;
+	unless (exists $threadTemplates{$key}) {
+		my ($threadTemplate) = WebGUI::SQL->quickArray("select template from template where namepsace='Forum/Thread' and templateId=".quote($threadTemplateId));
+		my ($postTemplate) = WebGUI::SQL->quickArray("select template from template where namespace='Forum/Post' and templateId=".quote($postTemplateId));
+		$threadTemplate =~ s/\<tmpl_var\s+post\.full\s*\>/$postTemplate/ixsg;
+		$threadTemplates{$key} = $threadTemplate;
+	}
+}
+$forums->finish;
+my ($defaultThreadTemplate) = WebGUI::SQL->quickArray("select template from template where namespace='Forum/Thread' and templateId='1'");
+my ($defaultPostTemplate) = WebGUI::SQL->quickArray("select template from template where namespace='Forum/Post' and  templateId='1'");
+$defaultThreadTemplate =~ s/\<tmpl_var\s+post\.full\s*\>/$defaultPostTemplate/ixsg;
+WebGUI::SQL->write("update template set template=".quote($defaultThreadTemplate)." where namespace='Forum/Thread' and templateId='1'");
+WebGUI::SQL->write("delete from template where namespace='Forum/Post' or (namespace='Forum/Thread' and templateId<>'1')");
+foreach my $key (%threadTemplates) {
+	WebGUI::SQL::write("insert into template (templateId, namespace, template, name) values (".quote(WebGUI::Id::generate()).", 'Forum/Thread',
+		".quote($threadTemplates{$key}).", ".quote($key).")");
+}
+
+
 print "\tFixing navigation template variables.\n" unless ($quiet);
 my $sth = WebGUI::SQL->read("select * from template where namespace in ('Navigation')");
 while (my $data = $sth->hashRef) {
@@ -1209,9 +1233,6 @@ sub getNewId {
                       'Auth/WebGUI/Account' => {
                                                  '1' => 'PBtmpl0000000000000010'
                                                },
-                      'Forum/PostPreview' => {
-                                               '1' => 'PBtmpl0000000000000030'
-                                             },
                       'MessageBoard' => {
                                           '1' => 'PBtmpl0000000000000047'
                                         },
