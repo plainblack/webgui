@@ -1,3 +1,8 @@
+6.0.2
+ - Fixed a bug where visitor contributed items in the USS were editable by all
+   visitors.
+
+
 6.0.1
 
  - Fixed a couple of formatting problems with the USS.

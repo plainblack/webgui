@@ -724,7 +724,7 @@ sub www_view {
                         "submission.image"=>$imageURL,
                         "submission.date"=>epochToHuman($page->[$i]->{dateSubmitted}),
                         "submission.date.updated"=>epochToHuman($page->[$i]->{dateUpdated}),
-                        "submission.currentUser"=>($session{user}{userId} == $page->[$i]->{userId}),
+                        "submission.currentUser"=>($session{user}{userId} == $page->[$i]->{userId} && $session{user}{userId} != 1),
                         "submission.userProfile"=>WebGUI::URL::page('op=viewProfile&uid='.$page->[$i]->{userId}),
         		"submission.edit.url"=>WebGUI::URL::page($quickurl.'editSubmission'),
                         "submission.secondColumn"=>(($i+1)%2==0),
