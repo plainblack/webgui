@@ -104,12 +104,12 @@ sub registrationForm {
 
 #-------------------------------------------------------------------
 sub registrationFormSave { 
-	my($uri, $ldap, $auth, $search, $connectDN, $uid);
+	my($$auth, $connectDN);
 	my $uid = shift;
-	$uri = URI->new($session{setting}{ldapURL});
-	$ldap = Net::LDAP->new($uri->host, (port=>$uri->port));
+	my $uri = URI->new($session{setting}{ldapURL});
+	my $ldap = Net::LDAP->new($uri->host, (port=>$uri->port));
 	$ldap->bind;
-	$search = $ldap->search (base => $uri->dn, filter => $session{setting}{ldapId}."=".$session{form}{'authLDAP.ldapId'});
+	my $search = $ldap->search (base => $uri->dn, filter => $session{setting}{ldapId}."=".$session{form}{'authLDAP.ldapId'});
 	if (defined $search->entry(0)) {
 		$connectDN = "cn=".$search->entry(0)->get_value("cn");
 	}
