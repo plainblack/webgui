@@ -352,7 +352,7 @@ sub get {
 	my $class = shift;
 	my $id = shift;
 	$id =~ m/^(.{2})(.{2})/;
-	bless {_id => $id, _part1 => $1, _part2 => $2}, $class;
+	bless {_id => $id, _part1 => $1, _part2 => $2}, ref($class)||$class;
 }
 
 #-------------------------------------------------------------------

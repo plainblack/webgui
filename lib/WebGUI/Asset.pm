@@ -766,11 +766,15 @@ sub update {
 
 sub www_add {
 	my $self = shift;
-	my %properties = %{$self->get};
-	delete $properties{title};
-	delete $properties{menuTitle};
-	delete $properties{url};
-	delete $properties{description};
+	my %properties = (
+		groupIdView => $self->get("groupIdView"),
+		groupIdEdit => $self->get("groupIdEdit"),
+		ownerId => $self->get("ownerId"),
+		encryptPage => $self->get("encryptPage"),
+		hideFromNavigation => $self->get("hideFromNavigation"),
+		startDate => $self->get("startDate"),
+		endDate => $self->get("endDate")
+		);
 	my $newAsset = WebGUI::Asset->newByDynamicClass("new",$session{form}{class},\%properties);
 	return $newAsset->www_edit();
 }

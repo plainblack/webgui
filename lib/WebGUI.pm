@@ -70,11 +70,14 @@ sub page {
 			$method = $session{form}{func};
 		}
 		$method = "www_".$method;
-		$output = $asset->$method();
-		if ($output eq "" && $method ne "view") {
-			$output = $asset->www_view;
+		$output = eval{$asset->$method()};
+		if ($@) {
+			WebGUI::ErrorHandler::fatalError("Couldn't call method ".$method." on asset for ".$asset->get("url")." (".$asset->getId."). Root cause: ".$@);
+		} else {
+			if ($output eq "" && $method ne "view") {
+				$output = $asset->www_view;
+			}
 		}
-		WebGUI::ErrorHandler::fatalError("Couldn't call method ".$method." on asset for ".$asset->get("url")." (".$asset->getId."). Root cause: ".$!) if ($!);
 	}
 	WebGUI::Affiliate::grabReferral();	# process affilliate tracking request
 	if (WebGUI::HTTP::isRedirect() && !$useExistingSession) {

@@ -19,6 +19,7 @@ use WebGUI::Asset::File;
 use WebGUI::HTTP;
 use WebGUI::Session;
 use WebGUI::Storage;
+use WebGUI::Utility;
 
 # do a check to see if they've installed Image::Magick
 my  $hasImageMagick = 1;
@@ -70,7 +71,11 @@ sub definition {
                                 thumbnailSize=>{
                                         fieldType=>'integer',
                                         defaultValue=>$session{setting}{thumbnailSize}
-                                        }
+                                        },
+				parameters=>{
+					fieldType=>'textarea',
+					defaultValue=>'border="0"'
+					}
                         }
                 });
         return $class->SUPER::definition($definition);
@@ -96,12 +101,12 @@ sub generateThumbnail {
 	if (defined $thumbnailSize) {
 		$self->update({thumbnailSize=>$thumbnailSize});
 	}
-	if ($self->getValue("filename") && $hasImageMagick) {
-		my $storage = WebGUI::Storage->new($self->get("storageId"));
+	if (defined $self->get("filename") && $hasImageMagick) {
+		my $storage = WebGUI::Storage->get($self->get("storageId"));
                 my $image = Image::Magick->new;
-                my $error = $image->Read($storage->getPath($storage->get("filename")));
+                my $error = $image->Read($storage->getPath($self->get("filename")));
 		if ($error) {
-			$self->_addError("Couldn't read image for thumnail creation: ".$error);
+			WebGUI::ErrorHandler::warn("Couldn't read image for thumbnail creation: ".$error);
 			return 0;
 		}
                 my ($x, $y) = $image->Get('width','height');
@@ -116,12 +121,12 @@ sub generateThumbnail {
                         $error = $image->Write($storage->getPath.$session{os}{slash}.'thumb-'.$self->get("filename"));
                 }
 		if ($error) {
-			$self->_addError("Couldn't create thumbnail: ".$error);
+			WebGUI::ErrorHandler::warn("Couldn't create thumbnail: ".$error);
 			return 0;
 		}
 		return 1;
 	}
-	$self->_addError("Can't generate a thumbnail when you haven't uploaded a file.");
+	WebGUI::ErrorHandler::warn("Can't generate a thumbnail when you haven't uploaded a file.");
 	return 0; # couldn't generate thumbnail
 }
 
@@ -142,11 +147,16 @@ sub getEditForm {
                	-label=>"Thumbnail Size",
 		-value=>$self->getValue("thumbnailSize")
                	);
+	$tabform->getTab("properties")->textarea(
+		-name=>"parameters",
+		-label=>"Parameters",
+		-value=>$self->getValue("parameters")
+		);
 	if ($self->get("filename") ne "") {
-		my $storage = WebGUI::Storage->new($self->get("storageId"));
+		my $storage = WebGUI::Storage->get($self->get("storageId"));
 		$tabform->getTab("properties")->readOnly(
 			-label=>"Thumbnail",
-			-value=>'<img src="'.$storage->getUrl($self->get("filename")).'" alt="thumbnail" />'
+			-value=>'<a href="'.$storage->getUrl($self->get("filename")).'"><img src="'.$storage->getUrl("thumb-".$self->get("filename")).'" alt="thumbnail" /></a>'
 			);
 	}
 	return $tabform;
@@ -174,21 +184,33 @@ sub getName {
 	return "Image";
 } 
 
-
-#-------------------------------------------------------------------
-
-=head2 www_editSave
-
-Gathers data from www_edit and persists it.
-
-=cut
-
-sub www_editSave {
+sub processPropertiesFromFormPost {
 	my $self = shift;
-	$self->SUPER::www_editSave();
+	$self->SUPER::processPropertiesFromFormPost;
+	my $parameters = $self->get("parameters");
+	unless ($parameters =~ /alt\=/) {
+		$self->update({parameters=>$parameters.' alt="'.$self->get("title").'"'});
+	}
 	$self->generateThumbnail;
-	return "";
 }
+
+sub view {
+	my $self = shift;
+	my $storage = WebGUI::Storage->get($self->get("storageId"));
+	my $toolbar = deleteIcon('func=delete',$self->get("url"),WebGUI::International::get(43))
+              	.editIcon('func=edit',$self->get("url"))
+             	.moveUpIcon('func=promote',$self->get("url"))
+             	.moveDownIcon('func=demote',$self->get("url"))
+            	.cutIcon('func=cut',$self->get("url"))
+            	.copyIcon('func=copy',$self->get("url"));
+	my %var = %{$self->get};
+	$var{controls} = $toolbar;
+	$var{fileUrl} = $storage->getUrl($self->get("filename"));
+	$var{fileIcon} = $storage->getFileIconUrl($self->get("filename"));
+	$var{thumbnail} = $storage->getUrl("thumb-".$self->get("filename"));
+	return WebGUI::Template::process("1","ImageAsset",\%var);
+}
+
 
 
 #-------------------------------------------------------------------
@@ -204,7 +226,7 @@ sub www_view {
 	if ($session{var}{adminOn}) {
 		return $self->www_edit;
 	}
-	my $storage = WebGUI::Storage->new($self->get("storageId"));
+	my $storage = WebGUI::Storage->get($self->get("storageId"));
 	WebGUI::HTTP::setRedirect($storage->getUrl($self->get("filename")));
 	return "";
 }
