@@ -18,8 +18,11 @@ use WebGUI::Session;
 #-------------------------------------------------------------------
 sub process {
         my @param = WebGUI::Macro::getParams($_[0]);
-	my $collateral = WebGUI::Collateral->find($param[0]);
-	return $collateral->getThumbnail;
+	if (my $collateral = WebGUI::Collateral->find($param[0])) {
+	        return $collateral->getThumbnail;
+        } else {
+                return undef;
+        }
 }
 
 

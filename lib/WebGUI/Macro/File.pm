@@ -18,8 +18,14 @@ use WebGUI::Session;
 #-------------------------------------------------------------------
 sub process {
         my @param = WebGUI::Macro::getParams($_[0]);
-	my $collateral = WebGUI::Collateral->find($param[0]);
-	return '<a href="'.$collateral->getURL.'"><img src="'.$collateral->getIcon.'" align="middle" border="0" /> '.$collateral->get("name").'</a>'; 
+        if (my $collateral = WebGUI::Collateral->find($param[0])) {
+                return '<a href="' . $collateral->getURL .
+                        '"><img src="' . $collateral->getIcon .
+                        '" align="middle" border="0" /> ' .
+                        $collateral->get("name") . '</a>';
+        } else {
+                return undef;
+        }
 }
 
 1;

@@ -28,8 +28,11 @@ sub process {
         }
 	my @snippets = WebGUI::SQL->buildArray("select collateralId from collateral 
 		where collateralType='snippet' and collateralFolderId=".$collateralFolderId);
-	my $collateral = WebGUI::Collateral->new($snippets[rand($#snippets+1)]);
-	return $collateral->get("parameters");
+	if (my $collateral = WebGUI::Collateral->new($snippets[rand($#snippets+1)])) {
+	        return $collateral->get("parameters");
+        } else {
+                return undef;
+        }
 }
 
 
