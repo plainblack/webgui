@@ -432,7 +432,7 @@ sub www_view {
 		where wobjectId=".$_[0]->get("wobjectId")." and $constraints order by ".$_[0]->getValue("sortBy")." ".$_[0]->getValue("sortOrder"));
 	$page = $p->getPageData;
 	$i = 0;
-	my $imageURL;
+	my $imageURL = "";
 	foreach $row (@$page) {
 		$page->[$i]->{content} = WebGUI::HTML::filter($page->[$i]->{content},$_[0]->get("filterContent"));
                 $page->[$i]->{content} =~ s/\n/\^\-\;/ unless ($page->[$i]->{content} =~ m/\^\-\;/);
@@ -443,7 +443,7 @@ sub www_view {
 			$imageURL = $image->getURL;
                 } else {
                         $thumbnail = "";
-			$imageURL;
+			$imageURL = "";
                 }
 		($responses) = WebGUI::SQL->quickArray("select count(*) from forumPost left join forumThread on
 			forumThread.forumThreadId=forumPost.forumThreadId where forumThread.forumId=".$row->{forumId});
