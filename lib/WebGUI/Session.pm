@@ -28,7 +28,7 @@ tie %session, 'Tie::CPHash';
 #-------------------------------------------------------------------
 sub _generateSessionId {
 	my ($sessionId);
-	$sessionId = crypt(time(),rand(99));
+	$sessionId = crypt((time()*rand(1000)),rand(99));
 	return $sessionId;
 }
 
