@@ -36,4 +36,6 @@
  - Added some processing functions to programatically add meta tags,
    javascript, and link tags to the head block of a page from anywhere within
 webgui.
+ - Fixed a bug in AdminBar's clipboard code where a standard hash was
+   used instead of a CPHash for database access.  (Thanks to Steve Simms.)
 

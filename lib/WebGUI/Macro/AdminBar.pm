@@ -11,6 +11,7 @@ package WebGUI::Macro::AdminBar;
 #-------------------------------------------------------------------
 
 use strict qw(refs vars);
+use Tie::CPHash;
 use Tie::IxHash;
 use WebGUI::International;
 use WebGUI::Macro;
@@ -26,9 +27,10 @@ sub process {
 	my @param = WebGUI::Macro::getParams($_[0]);
         my $templateId = $param[0] || 1;
         my %var;
-	my (%hash2, %hash, $r, $i, @item, $query);
+	my (%cphash, %hash2, %hash, $r, $i, @item, $query);
 	tie %hash, "Tie::IxHash";
 	tie %hash2, "Tie::IxHash";
+	tie %cphash, "Tie:::CPHash";
   #--content adder
 	$hash{WebGUI::URL::page('op=editPage&npp='.$session{page}{pageId})} = WebGUI::International::get(2);
 	if ($session{user}{uiLevel} >= 7) {
@@ -70,10 +72,10 @@ sub process {
 			." order by bufferDate";
 	}
         $r = WebGUI::SQL->read($query);
-        while (%hash = $r->hash) {
-		push @item, [	$hash{bufferDate},
-				WebGUI::URL::page('op=pastePage&pageId='.$hash{pageId}),
-				$hash{title} . ' ('. WebGUI::International::get(2) .')' ];
+        while (%cphash = $r->hash) {
+		push @item, [	$cphash{bufferDate},
+				WebGUI::URL::page('op=pastePage&pageId='.$cphash{pageId}),
+				$cphash{title} . ' ('. WebGUI::International::get(2) .')' ];
 	}
         $r->finish;
 
@@ -87,10 +89,10 @@ sub process {
 			." order by bufferDate";
 	}
         $r = WebGUI::SQL->read($query);
-        while (%hash = $r->hash) {
-		push @item, [	$hash{bufferDate},
-				WebGUI::URL::page('func=paste&wid='.$hash{wobjectId}),
-				$hash{title} . ' ('. $hash{namespace} .')' ];
+        while (%cphash = $r->hash) {
+		push @item, [	$cphash{bufferDate},
+				WebGUI::URL::page('func=paste&wid='.$cphash{wobjectId}),
+				$cphash{title} . ' ('. $cphash{namespace} .')' ];
 	}
         $r->finish;
 
