@@ -1726,7 +1726,7 @@ sub www_post {
 	my ($callback) = @_;
 	my ($subject, $message, $forum);
 	my $var;
-	$var->{'newpost.header'} = 'Post a Message';
+	$var->{'newpost.header'} = WebGUI::International::get(1064);
 	$var->{'newpost.isNewThread'} = ($session{form}{forumId} ne "");
 	$var->{'newpost.isReply'} = ($session{form}{parentId} ne "");
 	$var->{'newpost.isEdit'} = ($session{form}{forumPostId} ne "");
