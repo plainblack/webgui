@@ -34,7 +34,6 @@ our %status =("Approved"=>WebGUI::International::get(560),
         "Pending"=>WebGUI::International::get(562));
 
 
-
 #-------------------------------------------------------------------
 sub duplicate {
         my ($w);
@@ -89,7 +88,7 @@ sub www_showMessage {
 
 #-------------------------------------------------------------------
 sub www_view {
-	my ($data, $html, %var, @message_loop, $rows, $lastId, @last, $replies);
+	my ($p, $data, %var, @message_loop, $rows, @last, $replies);
 	$var{title} = $_[0]->processMacros($_[0]->get("title"));
 	$var{description} = $_[0]->processMacros($_[0]->get("description"));
 	$var{canPost} = WebGUI::Privilege::isInGroup($_[0]->get("groupToPost"));
@@ -115,7 +114,7 @@ sub www_view {
 		($replies) = WebGUI::SQL->quickArray("select count(*) from discussion 
 			where rid=$data->{messageId} and status='Approved'");
 		$replies--;
-		push(@message_loop,{
+		push (@message_loop,{
 			"last.url" => WebGUI::URL::page('func=showMessage&mid='.$last[0].'&wid='.$_[0]->get("wobjectId")),
 			"last.subject" => substr(WebGUI::HTML::filter($last[3],'all'),0,30),
 			"last.date" => epochToHuman($last[1]),
@@ -123,13 +122,13 @@ sub www_view {
 			"last.username" => $last[2],
 			"message.replies" => $replies,
 			"message.url" => WebGUI::URL::page('func=showMessage&mid='.$data->{messageId}.'&wid='.$_[0]->get("wobjectId")),
-			"message.subject" => substr($data{subject},0,30),
-			"message.currentUser" => ($data{userId} == $session{user}{userId}),
-			"message.status" => $status{$data{status}},
-			"message.userProfile" => WebGUI::URL::page('op=viewProfile&uid='.$data{userId}),
-			"message.username" => $data{username},
-			"message.date" => epochToHuman($data{dateOfPost}),
-			"message.views" => $data{views}
+			"message.subject" => substr($data->{subject},0,30),
+			"message.currentUser" => ($data->{userId} == $session{user}{userId}),
+			"message.status" => $status{$data->{status}},
+			"message.userProfile" => WebGUI::URL::page('op=viewProfile&uid='.$data->{userId}),
+			"message.username" => $data->{username},
+			"message.date" => epochToHuman($data->{dateOfPost}),
+			"message.views" => $data->{views}
 			});
         }
 	$var{message_loop} = \@message_loop;
