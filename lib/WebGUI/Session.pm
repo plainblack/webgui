@@ -312,15 +312,20 @@ sub setCookie {
 =cut
 
 sub setScratch {
-	return "" unless ($session{var}{sessionId});
-	if ($session{scratch}{$_[0]} ne "") {
-		WebGUI::SQL->write("update userSessionScratch set value=".quote($_[1])."
-			where sessionId=".quote($session{var}{sessionId})." and name=".quote($_[0]));
+	my ($name, $value) = @_;
+	return "" unless ($session{var}{sessionId} ne "" && $name ne "" && $value ne "");
+	if ($value eq "-delete-") {
+		WebGUI::SQL->write("delete from userSessionScratch where sessionId=".quote($session{var}{sessionId})
+			." and name=".quote($name));
+		$value = "";
+	} elsif ($session{scratch}{$name} ne "") {
+		WebGUI::SQL->write("update userSessionScratch set value=".quote($value)."
+			where sessionId=".quote($session{var}{sessionId})." and name=".quote($name));
 	} else {
 		WebGUI::SQL->write("insert into userSessionScratch (sessionId,name,value) values 
-			(".quote($session{var}{sessionId}).", ".quote($_[0]).", ".quote($_[1]).")");
+			(".quote($session{var}{sessionId}).", ".quote($name).", ".quote($value).")");
 	}
-	$session{scratch}{$_[0]} = $_[1];
+	$session{scratch}{$name} = $value;
 }
 
 #-------------------------------------------------------------------

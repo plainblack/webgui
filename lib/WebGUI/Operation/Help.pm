@@ -50,21 +50,16 @@ sub _seeAlso {
 
 #-------------------------------------------------------------------
 sub www_deleteHelp {
-	if ($session{user}{userId} != 3) {
-                return "";
-        } else {
+	return "" unless (WebGUI::Privilege::isInGroup(3));
 		my $output = '<h1>Confirm</h1>Are you sure? Deleting help is never a good idea. <a href="'
 			.WebGUI::URL::page("op=deleteHelpConfirm&hid=".$session{form}{hid}."&namespace=".$session{form}{namespace})
 			.'">Yes</a> / <a href="'.WebGUI::URL::page("op=manageHelp").'">No</a><p>';
 		return $output;
-	}
 }
 
 #-------------------------------------------------------------------
 sub www_deleteHelpConfirm {
-	if ($session{user}{userId} != 3) {
-                return "";
-        } else {
+	return "" unless (WebGUI::Privilege::isInGroup(3));
 		my ($titleId, $bodyId) = WebGUI::SQL->quickArray("select titleId,bodyId from help where helpId=".$session{form}{hid}."
 			and namespace=".quote($session{form}{namespace}));
 		WebGUI::SQL->write("delete from international where internationalId=$titleId
@@ -74,14 +69,11 @@ sub www_deleteHelpConfirm {
 		WebGUI::SQL->write("delete from help where helpId=".$session{form}{hid}." 
 			and namespace=".quote($session{form}{namespace}));
 		return www_manageHelp();
-	}
 }
 
 #-------------------------------------------------------------------
 sub www_editHelp {
-	if ($session{user}{userId} != 3) {
-                return "";
-        } else {
+	return "" unless (WebGUI::Privilege::isInGroup(3));
 		my ($output, $f, %data, %help, @seeAlso);
 		tie %data, 'Tie::IxHash';
 		tie %help, 'Tie::CPHash';
@@ -125,14 +117,11 @@ sub www_editHelp {
 		$f->submit;
 		$output .= $f->print;
 		return $output;
-	}
 }
 
 #-------------------------------------------------------------------
 sub www_editHelpSave {
-	if ($session{user}{userId} != 3) {
-                return "";
-        } else {
+	return "" unless (WebGUI::Privilege::isInGroup(3));
 		my (@seeAlso);
 		if ($session{form}{hid} eq "new") {
 			if ($session{form}{namespace_new} ne "") {
@@ -165,12 +154,11 @@ sub www_editHelpSave {
 		WebGUI::SQL->write("update help set seeAlso=".quote($session{form}{seeAlso})." 
 			where helpId=$session{form}{hid} and namespace=".quote($session{form}{namespace}));
 		return www_manageHelp();
-	}
 }
 
 #-------------------------------------------------------------------
 sub www_exportHelp {
-	return "" if ($session{user}{userId} != 3);
+	return "" unless (WebGUI::Privilege::isInGroup(3));
 	my ($export, $output, %help, $sth);
 	$export = "#export of WebGUI ".$WebGUI::VERSION." help system.\n\n";
 	$sth = WebGUI::SQL->read("select * from help");
@@ -187,7 +175,7 @@ sub www_exportHelp {
 #-------------------------------------------------------------------
 sub www_manageHelp {
         my ($sth, @help, $output);
-	if ($session{user}{userId} != 3) {	
+	unless (WebGUI::Privilege::isInGroup(3)) {	
 		return "";
 	} else {
         	$output = '<h1>Manage Help</h1>';

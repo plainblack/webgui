@@ -75,6 +75,7 @@ sub _replacement {
 			'http://validator.w3.org/check?uri=http%3A%2F%2F'.$session{env}{SERVER_NAME}.
 				WebGUI::URL::page()=>WebGUI::International::get(399),
 			WebGUI::URL::page('op=viewPageTree')=>WebGUI::International::get(447),
+                        WebGUI::URL::page('op=listCollateral')=>WebGUI::International::get(394),
 			%hash
 		);
 	}
@@ -93,12 +94,6 @@ sub _replacement {
         if (WebGUI::Privilege::isInGroup($session{setting}{templateManagersGroup},$session{user}{userId})) {
                 %hash = (
                         WebGUI::URL::page('op=listTemplates')=>WebGUI::International::get(508),
-                        %hash
-                );
-        }
-        if (WebGUI::Privilege::isInGroup($session{setting}{imageManagersGroup},$session{user}{userId})) {
-                %hash = (
-                        WebGUI::URL::page('op=listImages')=>WebGUI::International::get(394),
                         %hash
                 );
         }

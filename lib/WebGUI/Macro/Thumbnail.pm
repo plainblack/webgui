@@ -22,8 +22,8 @@ sub _replacement {
 	my (@param, %data, $image);
 	tie %data, 'Tie::CPHash';
         @param = WebGUI::Macro::getParams($_[0]);
-	%data = WebGUI::SQL->quickHash("select * from images where name='$param[0]'");
-	$image = WebGUI::Attachment->new($data{filename},"images",$data{imageId});
+	%data = WebGUI::SQL->quickHash("select filename,collateralId from collateral where name='$param[0]'");
+	$image = WebGUI::Attachment->new($data{filename},"images",$data{collateralId});
 	return $image->getThumbnail;
 }
 

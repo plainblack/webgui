@@ -27,6 +27,8 @@ use WebGUI::URL;
 
  use WebGUI::Paginator;
  $p = WebGUI::Paginator->new("/index.pl/page_name?this=that",\@row);
+ $p->setDataByQuery($sql);
+
  $html = $p->getBar;
  $html = $p->getBarAdvanced;
  $html = $p->getBarSimple;
@@ -201,7 +203,7 @@ sub getFirstPageLink {
         $text = '|&lt;'.WebGUI::International::get(404);
         if ($pn > 1) {
                 return '<a href="'.
-			WebGUI::URL::append($_[0]->{_url},($_[0]->{_pn}.'=1'))
+			WebGUI::URL::append($_[0]->{_url},($_[0]->{_formVar}.'=1'))
 			.'">'.$text.'</a>';
         } else {
                 return $text;
@@ -228,7 +230,7 @@ sub getLastPageLink {
         $text = WebGUI::International::get(405).'&gt;|';
         if ($pn != $_[0]->getNumberOfPages) {
                 return '<a href="'.
-			WebGUI::URL::append($_[0]->{_url},($_[0]->{_pn}.'='.$_[0]->getNumberOfPages))
+			WebGUI::URL::append($_[0]->{_url},($_[0]->{_formVar}.'='.$_[0]->getNumberOfPages))
 			.'">'.$text.'</a>';
         } else {
                 return $text;
@@ -254,7 +256,7 @@ sub getNextPageLink {
 	$pn = $_[1] || $_[0]->getPageNumber;
         $text = WebGUI::International::get(92).'&raquo;';
         if ($pn < $_[0]->getNumberOfPages) {
-                return '<a href="'.WebGUI::URL::append($_[0]->{_url},($_[0]->{_pn}.'='.($pn+1))).'">'.$text.'</a>';
+                return '<a href="'.WebGUI::URL::append($_[0]->{_url},($_[0]->{_formVar}.'='.($pn+1))).'">'.$text.'</a>';
         } else {
                 return $text;
         }
@@ -335,7 +337,7 @@ sub getPageData {
 =cut
 
 sub getPageNumber {
-        return $session{form}{$_[0]->{_pn}} || 1;
+        return $_[0]->{_pn} || 1;
 }
 
 #-------------------------------------------------------------------
@@ -359,7 +361,7 @@ sub getPageLinks {
 			$output .= ' '.($i+1).' ';
 		} else {
 			$output .= ' <a href="'.
-				WebGUI::URL::append($_[0]->{_url},($_[0]->{_pn}.'='.($i+1)))
+				WebGUI::URL::append($_[0]->{_url},($_[0]->{_formVar}.'='.($i+1)))
 				.'">'.($i+1).'</a> ';
 		}
 	}
@@ -385,7 +387,7 @@ sub getPreviousPageLink {
 	$pn = $_[1] || $_[0]->getPageNumber;
 	$text = '&laquo;'.WebGUI::International::get(91);
 	if ($pn > 1) {
-		return '<a href="'.WebGUI::URL::append($_[0]->{_url},($_[0]->{_pn}.'='.($pn-1))).'">'.$text.'</a>';
+		return '<a href="'.WebGUI::URL::append($_[0]->{_url},($_[0]->{_formVar}.'='.($pn-1))).'">'.$text.'</a>';
         } else {
         	return $text;
         }
@@ -394,7 +396,7 @@ sub getPreviousPageLink {
 
 #-------------------------------------------------------------------
 
-=head2 new ( currentURL, rowArrayRef [, paginateAfter, alternateFormVar ] )
+=head2 new ( currentURL, rowArrayRef [, paginateAfter, pageNumber, formVar ] )
 
  Constructor.
 
@@ -412,25 +414,49 @@ sub getPreviousPageLink {
  The number of rows to display per page. If left blank it defaults
  to 50.
 
-=item alternateFormVar
+=item pageNumber 
 
- By default the paginator uses a form variable of "pn" to denote the
+ By default the paginator uses a form variable of "pn" to determine the
  page number. If you wish it to use some other variable, then specify
- it here.
+ the page number here.
+
+=item formVar
+
+ Specify the form variable the paginator should use in it's links.
+ Defaults to "pn".
 
 =cut
 
 sub new {
-        my ($class, $currentURL, $rowsPerPage, $rowRef, $formVar, $pageRef);
+        my ($class, $currentURL, $rowsPerPage, $rowRef, $formVar, $pageRef, $pn);
 	$class = shift;
 	$currentURL = shift;
 	$rowRef = shift;
 	$rowsPerPage = shift || 25;
+	$pn = shift || $session{form}{$formVar};
 	$formVar = shift || "pn";
-        bless {_url => $currentURL, _rpp => $rowsPerPage, _rowRef => $rowRef, _pn => $formVar}, $class;
+        bless {_url => $currentURL, _rpp => $rowsPerPage, _rowRef => $rowRef, _formVar => $formVar, _pn => $pn}, $class;
 }
 
 #-------------------------------------------------------------------
+
+=head2 setDataByQuery ( query [, dbh ] )
+
+ Retrieves a data set from a database and replaces whatever data
+ set was passed in through the constructor.
+
+ NOTE: This retrieves only the current page's data for efficiency.
+
+=item query
+
+ An SQL query that will retrieve a data set.
+
+=item dbh
+
+ A DBI-style database handler. Defaults to the WebGUI site handler.
+
+=cut
+
 sub setDataByQuery {
 	my ($sth, $pageCount, $rowCount, $dbh, $sql, $self, @row, $data);
 	($self, $sql, $dbh) = @_;

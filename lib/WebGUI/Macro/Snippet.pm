@@ -1,4 +1,4 @@
-package WebGUI::Macro::I_imageWithTags;
+package WebGUI::Macro::Snippet;
 
 #-------------------------------------------------------------------
 # WebGUI is Copyright 2001-2002 Plain Black LLC.
@@ -12,19 +12,15 @@ package WebGUI::Macro::I_imageWithTags;
 
 use strict;
 use Tie::CPHash;
-use WebGUI::Attachment;
 use WebGUI::Macro;
 use WebGUI::Session;
 use WebGUI::SQL;
 
 #-------------------------------------------------------------------
 sub _replacement {
-	my (@param, $temp, %data, $image);
-	tie %data, 'Tie::CPHash';
+	my (@param, $temp);
         @param = WebGUI::Macro::getParams($_[0]);
-	%data = WebGUI::SQL->quickHash("select filename,parameters,collateralId from collateral where name=".quote($param[0]));
-	$image = WebGUI::Attachment->new($data{filename},"images",$data{collateralId});
-	$temp = '<img src="'.$image->getURL.'" '.$data{parameters}.' />'; 
+	($temp) = WebGUI::SQL->quickArray("select parameters from collateral where name=".quote($param[0]));
 	return $temp;
 }
 
@@ -32,7 +28,7 @@ sub _replacement {
 sub process {
 	my ($output, $temp);
 	$output = $_[0];
-	$output =~ s/\^I\((.*?)\)\;/_replacement($1)/ge;
+	$output =~ s/\^Snippet\((.*?)\)\;/_replacement($1)/ge;
 	return $output;
 }
 
