@@ -333,10 +333,10 @@ sub build {
 	
 	# Do the user-dependent checks (which cannot be cached globally)
 	foreach my $pageData (@page_loop) {
-		$pageData->{"page.isViewable"} = WebGUI::Page::canView($pageData->{'pageId'});
+		$pageData->{"page.isViewable"} = WebGUI::Page::canView($pageData->{'page.pageId'});
 
 		# Check privileges
-		unless (! $pageData->{"page.isViewable"} && ! $self->{_showUnprivilegedPages}) {
+		if ($pageData->{"page.isViewable"} || $self->{_showUnprivilegedPages}) {
 			push (@{$var->{page_loop}}, $pageData);
 		}
 	}
