@@ -1,5 +1,19 @@
 package WebGUI::AdminConsole;
 
+=head1 LEGAL
+
+ -------------------------------------------------------------------
+  WebGUI is Copyright 2001-2004 Plain Black Corporation.
+ -------------------------------------------------------------------
+  Please read the legal notices (docs/legal.txt) and the license
+  (docs/license.txt) that came with this distribution before using
+  this software.
+ -------------------------------------------------------------------
+  http://www.plainblack.com                     info@plainblack.com
+ -------------------------------------------------------------------
+
+=cut
+
 use strict;
 use WebGUI::Grouping;
 use WebGUI::International;
@@ -7,6 +21,49 @@ use WebGUI::Session;
 use WebGUI::Style;
 use WebGUI::Template;
 use WebGUI::URL;
+
+=head1 NAME
+
+Package WebGUI::Asset
+
+=head1 DESCRIPTION
+
+Package to manipulate items in WebGUI's asset system. Replaces Collateral.
+
+=head1 SYNOPSIS
+
+An asset is the basic class of content in WebGUI. This handles security, urls, and other basic information common to all content items.
+
+A lineage is a concatenated series of sequence numbers, each six digits long, that explain an asset's position in its familiy tree. Lineage describes who the asset's anscestors are, how many ancestors the asset has in its family tree (lineage length), and the asset's position (rank) amongst its siblings. In addition, lineage provides enough information about an asset to generate a list of its siblings and descendants.
+ 
+ use WebGUI::Asset;
+
+ _formatFuntion
+ addSubmenuItem
+ getAdminConsoleParams
+ getAdminFunction
+ new
+ render
+ setHelp
+ setIcon
+  
+=head1 METHODS
+
+These methods are available from this class:
+
+=cut
+
+#-------------------------------------------------------------------
+
+=head2 formatFunction ( function )
+
+Returns a Hash of title, icon, url, and canUse. title is the Internationalized title of the function. icon is the function icon, currently in extras/adminConsole/. url is current page with func= or op= depending on if the function is a function or operation. canUse checks if the current user is in the function group.
+
+=head3 function
+
+A hash ref to a function. Required.
+
+=cut
 
 sub _formatFunction {
 	my $self = shift;
@@ -25,6 +82,26 @@ sub _formatFunction {
 	};
 }
 
+#-------------------------------------------------------------------
+
+=head2 addSubmenuItem ( url, label, extras )
+
+Puts params into the current AdminConsole submenu.
+
+=head3 url
+
+A string representing a URL.
+
+=head3 label
+
+A (hopefully informative) string.
+
+=head3 extras
+
+Additional information.
+
+=cut
+
 sub addSubmenuItem {
 	my $self = shift;
 	my $url = shift;
@@ -37,6 +114,14 @@ sub addSubmenuItem {
 		});
 }
 
+#-------------------------------------------------------------------
+
+=head2 getAdminConsoleParams ( )
+
+Returns a Hash of title, url, canUse, and icon. title is the Internationalization of "Admin Console". url is the page with op=adminConsole, canUse checks if is in group 12. icon is image located in extras/adminConsole/adminConsole.gif.
+
+=cut
+
 sub getAdminConsoleParams {
 	return { 'title' => WebGUI::International::get("admin console","AdminConsole"),
 		url => WebGUI::URL::page("op=adminConsole"),
@@ -44,6 +129,18 @@ sub getAdminConsoleParams {
 		icon => $session{config}{extrasURL}."/adminConsole/adminConsole.gif"
 		};
 }
+
+#-------------------------------------------------------------------
+
+=head2 getAdminFunction ( [id] )
+
+Returns _formatFunction list of available AdminFunctions.
+
+=head3 id
+
+If present, returns a _formatFunction hash based upon the given parameter.
+
+=cut
 
 sub getAdminFunction {
 	my $self = shift;
@@ -238,6 +335,17 @@ sub getAdminFunction {
 	}
 }
 
+#-------------------------------------------------------------------
+
+=head2 new ( [id] )
+
+Constructor.
+
+=head3 id
+
+
+=cut
+
 sub new {
 	my $class = shift;
 	my $id = shift;
@@ -245,6 +353,20 @@ sub new {
 	$self{_function} = $class->getAdminFunction($id) if ($id);
 	bless \%self, $class;
 }
+
+#-------------------------------------------------------------------
+
+=head2 render ( application.workarea [,application.title] )
+
+Prepares internationalization of variables. Returns a Style-processed AdminConsole.
+
+=head3 application.workarea
+
+=head3 application.title
+
+A string that defaults to _function's title.
+
+=cut
 
 sub render {
 	my $self = shift;
@@ -270,12 +392,40 @@ sub render {
 	return WebGUI::Style::process(WebGUI::Template::process($session{setting}{AdminConsoleTemplate}, "AdminConsole", \%var),"adminConsole");
 }
 
+#-------------------------------------------------------------------
+
+=head2 setHelp ( id[,namespace] )
+
+Sets the _helpUrl to the urlized page.
+
+=head3 id
+
+If not provided, this method does nothing.
+
+=head3 namespace
+
+A string representing the namespace of the Help. Defaults to "WebGUI" as a namespace.
+
+=cut
+
 sub setHelp {
 	my $self = shift;
 	my $id = shift;
 	my $namespace = shift || "WebGUI";
 	$self->{_helpUrl} = WebGUI::URL::page('op=viewHelp&hid='.$id.'&namespace='.$namespace) if ($id);
 }
+
+#-------------------------------------------------------------------
+
+=head2 setIcon ( icon)
+
+Sets the _function icon to parameter.
+
+=head3 icon
+
+A string representing the location of the icon.
+
+=cut
 
 sub setIcon {
 	my $self = shift;
