@@ -376,7 +376,7 @@ sub getWobjectByCriteria {
 	}
 	my $wid;
 	# Grab a wid from the results
-	if ($order = 'random') {
+	if ($order == 'random') {
 		$wid = $wids[ rand @wids ];
 	} else { 
 				 #default order is mostRecent
