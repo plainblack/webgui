@@ -514,7 +514,7 @@ sub www_view {
 	#	}
 	#	$row[$i-1] = "page";
 	}
-	$p = WebGUI::Paginator->new(WebGUI::URL::page("func=view&wid=".$_[0]->get("wobjectId")),$_[0]->get("paginateAfter"),"calPn);
+	$p = WebGUI::Paginator->new(WebGUI::URL::page("func=view&wid=".$_[0]->get("wobjectId")),$_[0]->get("paginateAfter"),"calPn");
 	$p->setDataByArrayRef(\@monthloop);
 	$var{month_loop} = $p->getPageData;
 	$p->appendTemplateVars(\%var);
