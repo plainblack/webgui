@@ -52,7 +52,8 @@ sub _accountOptions {
 	$output .= '<li><a href="'.WebGUI::URL::page('op=logout').'">'.WebGUI::International::get(64).'</a>'; 
 
 	$output .= '<li><a href="'.WebGUI::URL::page('op=deactivateAccount').'">'.
-		WebGUI::International::get(65).'</a>' if ($session{setting}{selfDeactivation});
+		WebGUI::International::get(65).'</a>' if ($session{setting}{selfDeactivation}
+		&& !WebGUI::Privilege::isInGroup(3));
 	$output .= '</ul></div>';
 	return $output;
 }
