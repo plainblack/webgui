@@ -135,7 +135,9 @@ sub www_view {
       return "<b>Error while opening cookie directory ".$_[0]->get("cookiebox")."</b><p><i>$!</i>";
    }
 
-   $cookiebox = $_[0]->get("cookiebox").'/'.$_[0]->get("namespace").'_cookie_'.WebGUI::URL::escape($session{var}{sessionId}).'.jar';
+   $cookiebox = WebGUI::URL::escape($session{var}{sessionId});
+   $cookiebox =~ s/[^A-Za-z0-9\-\.\_]//g;  #removes all funky characters
+   $cookiebox = $_[0]->get("cookiebox").'/'.$_[0]->get("namespace").'_cookie_'.$cookiebox.'.jar';
    $jar = HTTP::Cookies->new(File => $cookiebox, AutoSave => 1, Ignore_Discard => 1);
 
    if($session{form}{wid} == $_[0]->get("wobjectId") && $session{form}{func}!~/editSave/i) {
