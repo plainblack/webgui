@@ -700,7 +700,7 @@ sub hidden {
 
 #-------------------------------------------------------------------
 
-=head2 HTMLArea ( name [ label, value, subtext, extras, wrap, rows, columns, uiLevel ] )
+=head2 HTMLArea ( name [ label, value, subtext, extras, wrap, rows, columns, uiLevel, popupToggle ] )
 
 Adds an HTML area row to this form. An HTML area is different than a standard text area in that it provides rich edit functionality and some special error trapping for HTML and other special characters.
 
@@ -744,6 +744,12 @@ The number of characters wide this form element should be. There should be no re
 
 The UI level for this field. See the WebGUI developer's site for details. Defaults to "0".
 
+=item popupToggle
+
+Defaults to "0". If set to "1" the rich editor will be a pop-up editor. If set to "0" the rich editor will be inline.
+
+NOTE: WebGUI uses a great variety of rich editors. Not all of them are capable of inline mode, so even if you leave this set to "0" the editor may be a pop-up anyway.
+
 =back
 
 =cut
@@ -751,8 +757,8 @@ The UI level for this field. See the WebGUI developer's site for details. Defaul
 sub HTMLArea {
         my ($output);
         my ($self, @p) = @_;
-        my ($name, $label, $value, $subtext, $extras, $wrap, $rows, $columns, $uiLevel) =
-                rearrange([qw(name label value subtext extras wrap rows columns uiLevel)], @p);
+        my ($name, $label, $value, $subtext, $extras, $wrap, $rows, $columns, $uiLevel, $popupToggle) =
+                rearrange([qw(name label value subtext extras wrap rows columns uiLevel popupToggle)], @p);
         if (_uiLevelChecksOut($uiLevel)) {
                 $output = WebGUI::Form::HTMLArea({
                         "name"=>$name,
@@ -760,7 +766,8 @@ sub HTMLArea {
                         "wrap"=>$wrap,
                         "columns"=>$columns,
                         "rows"=>$rows,
-                        "extras"=>$extras
+                        "extras"=>$extras,
+			"popupToggle"=>$popupToggle
                         });
                 $output .= _subtext($subtext);
                 $output = $self->_tableFormRow($label,$output);

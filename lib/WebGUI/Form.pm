@@ -633,6 +633,12 @@ The number of characters tall this form element should be. There should be no re
 
 The number of characters wide this form element should be. There should be no reason for anyone to specify this.
 
+=item popupToggle
+
+Defaults to "0". If set to "1" the rich editor will be a pop-up editor. If set to "0" the rich editor will be inline.
+
+NOTE: WebGUI uses a great variety of rich editors. Not all of them are capable of inline mode, so even if you leave this set to "0" the editor may be a pop-up anyway.
+
 =back
 
 =cut
@@ -653,12 +659,25 @@ sub HTMLArea {
 	} else {
 		my $browser = HTTP::BrowserDetect->new($session{env}{HTTP_USER_AGENT});
 		if ($browser->ie && $browser->version >= 5.5) {
-			$output .= '<script language="Javascript1.2" src="'.$session{config}{extrasURL}
-				.'/htmlArea/editor.js"></script>'."\n";
-                	$output .= '<script>'."\n";
-                	$output .= '_editor_url = "'.$session{config}{extrasURL}.'/htmlArea/";'."\n";
-                	$output .= '</script>'."\n";
-			$htmlArea = 1;
+			if ($_[0]->{popupToggle}) {
+				$output .= '<script language="JavaScript">
+                        	var formObj;
+                       		var extrasDir="'.$session{config}{extrasURL}.'";
+                       		function openEditWindow(obj) {
+                       			formObj = obj;
+                         		window.open("'.$session{config}{extrasURL}.'/htmlArea/editor.html","editWindow","width=490,height=400,resizable=1");                   }
+                       		function setContent(content) {
+                         		formObj.value = content;
+                       		} </script>';
+                        	$output .= $button;
+			} else {
+				$output .= '<script language="Javascript1.2" src="'.$session{config}{extrasURL}
+					.'/htmlArea/editor.js"></script>'."\n";
+                		$output .= '<script>'."\n";
+                		$output .= '_editor_url = "'.$session{config}{extrasURL}.'/htmlArea/";'."\n";
+                		$output .= '</script>'."\n";
+				$htmlArea = 1;
+			}
 		} elsif ($browser->ie && $browser->version >= 5) {
 			$output .= '<script language="JavaScript">
 			var formObj;

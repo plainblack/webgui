@@ -51,7 +51,7 @@ this.toolbar = [
 	['Macros','separator'],
 
 //  ['custom1','custom2','custom3','separator'],
-    ['popupeditor','about']];
+    ['popupeditor']]; //,'about']];
 
 this.fontnames = {
     "Arial":           "arial, helvetica, sans-serif",

@@ -1049,7 +1049,11 @@ sub www_edit {
 		-value=>$endDate,
 		-uiLevel=>9
 		);
-	$f->HTMLArea("description",WebGUI::International::get(85),$_[0]->get("description"));
+	$f->HTMLArea(
+		-name=>"description",
+		-label=>WebGUI::International::get(85),
+		-value=>$_[0]->get("description")
+		);
 	$f->raw($_[1]);
 	$f->submit;
 	return $f->print; 
