@@ -23,7 +23,7 @@ use WebGUI::Utility;
 
 =head1 NAME
 
- Package WebGUI::URL
+Package WebGUI::URL
 
 =head1 SYNOPSIS
 
@@ -38,14 +38,11 @@ use WebGUI::Utility;
 
 =head1 DESCRIPTION
 
- This package provides URL writing functionality. It is important that
- all WebGUI URLs be written using these methods so that they can contain
- any extra information that WebGUI needs to add to the URLs in order
- to function properly.
+This package provides URL writing functionality. It is important that all WebGUI URLs be written using these methods so that they can contain any extra information that WebGUI needs to add to the URLs in order to function properly.
 
 =head1 METHODS
 
- These subroutines are available from this package:
+These subroutines are available from this package:
 
 =cut
 
@@ -55,17 +52,21 @@ use WebGUI::Utility;
 
 =head2 append ( url, pairs ) 
 
- Returns a URL after adding some information to the end of it.
+Returns a URL after adding some information to the end of it.
+
+=over
 
 =item url
 
- The URL to append information to.
+The URL to append information to.
 
 =item pairs
 
- Name value pairs to add to the URL in the form of:
+Name value pairs to add to the URL in the form of:
 
  name1=value1&name2=value2&name3=value3
+
+=back
 
 =cut
 
@@ -84,13 +85,17 @@ sub append {
 
 =head2 escape ( string )
 
- Encodes a string to make it safe to pass in a URL.
+Encodes a string to make it safe to pass in a URL.
 
- NOTE: See WebGUI::URL::unescape()
+NOTE: See WebGUI::URL::unescape()
+
+=over
 
 =item string
 
- The string to escape.
+The string to escape.
+
+=back
 
 =cut
 
@@ -103,17 +108,21 @@ sub escape {
 
 =head2 gateway ( pageURL [ , pairs ] )
 
- Generate a URL based on WebGUI's gateway script.
+Generate a URL based on WebGUI's gateway script.
+
+=over
 
 =item pageURL
 
- The urlized title of a page that you wish to create a URL for.
+The urlized title of a page that you wish to create a URL for.
 
 =item pairs
 
- Name value pairs to add to the URL in the form of:
+Name value pairs to add to the URL in the form of:
 
  name1=value1&name2=value2&name3=value3
+
+=back
 
 =cut
 
@@ -133,12 +142,15 @@ sub gateway {
 
 =head2 makeCompliant ( string )
 
- Returns a string that has made into a WebGUI compliant URL.
+Returns a string that has made into a WebGUI compliant URL.
+
+=over
 
 =item string
 
- The string to make compliant. This is usually a page title or a
- filename.
+The string to make compliant. This is usually a page title or a filename.
+
+=back
 
 =cut 
 
@@ -158,13 +170,17 @@ sub makeCompliant {
 
 =head2 page ( [ pairs ] )
 
- Returns the URL of the current page.
+Returns the URL of the current page.
+
+=over
 
 =item pairs
 
- Name value pairs to add to the URL in the form of:
+Name value pairs to add to the URL in the form of:
 
  name1=value1&name2=value2&name3=value3
+
+=back
 
 =cut
 
@@ -184,13 +200,17 @@ sub page {
 
 =head2 unescape
 
- Decodes a string that was URL encoded.
+Decodes a string that was URL encoded.
 
- NOTE: See WebGUI::URL::escape()
+NOTE: See WebGUI::URL::escape()
+
+=over
 
 =item string
 
- The string to unescape.
+The string to unescape.
+
+=back
 
 =cut
 
@@ -202,12 +222,15 @@ sub unescape {
 
 =head2 urlize ( string )
 
- Same as makeCompliant except that it also lower-cases the string.
- This is mainly meant for WebGUI page URLs.
+Same as makeCompliant except that it also lower-cases the string.  This is mainly meant for WebGUI page URLs.
+
+=over
 
 =item string
 
  The string to urlize.
+
+=back
 
 =cut
 

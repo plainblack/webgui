@@ -25,7 +25,7 @@ use WebGUI::URL;
 
 =head1 NAME
 
- Package WebGUI::Navigation
+Package WebGUI::Navigation
 
 =head1 SYNOPSIS
 
@@ -37,11 +37,11 @@ use WebGUI::URL;
 
 =head1 DESCRIPTION
 
- A package used to generate navigation.
+A package used to generate navigation.
 
 =head1 METHODS
 
- These methods are available from this package:
+These methods are available from this package:
 
 =cut
 
@@ -49,21 +49,23 @@ use WebGUI::URL;
 
 =head2 drawHorizontal ( tree [ , seperator, class ] )
 
- Draws a vertical navigation system. Returns HTML.
+Draws a vertical navigation system. Returns HTML.
+
+=over
 
 =item tree
 
- The hash reference created by the tree method in this package.
+The hash reference created by the tree method in this package.
 
 =item seperator
 
- A string containing HTML to seperate each navigation item. Defaults 
- to "&middot;".
+A string containing HTML to seperate each navigation item. Defaults to "&middot;".
 
 =item class
 
- A stylesheet class for each link in the navigation. Defaults to
- "horizontalMenu".
+A stylesheet class for each link in the navigation. Defaults to "horizontalMenu".
+
+=back
 
 =cut
 
@@ -94,29 +96,31 @@ sub drawHorizontal {
 
 =head2 drawVertical ( tree [, bullet, class, spacing, indent ] )
 
- Draws a vertical navigation system. Returns HTML.
+Draws a vertical navigation system. Returns HTML.
+
+=over
 
 =item tree
 
- The hash reference created by the tree method in this package.
+The hash reference created by the tree method in this package.
 
 =item bullet
 
- A string containing HTML to generate a bullet that will be placed
- in front of each tree item. Defaults to none.
+A string containing HTML to generate a bullet that will be placed in front of each tree item. Defaults to none.
 
 =item class
 
- A stylesheet class for each link in the navigation. Defaults to
- "verticalMenu".
+A stylesheet class for each link in the navigation. Defaults to "verticalMenu".
 
 =item spacing
 
- An integer with the linespacing for the navigation. Defaults to 1.
+An integer with the linespacing for the navigation. Defaults to 1.
 
 =item indent
 
- An integer with the about of indenting to start with. Defaults to 0.
+An integer with the about of indenting to start with. Defaults to 0.
+
+=back
 
 =cut
 
@@ -148,9 +152,7 @@ sub drawVertical {
 
 =head2 tree ( parentId [, toLevel ] )
 
- Generates and returns a hash reference containing a page tree with
- keys of "url", "title", and "sub" with orignating keys of page ids.
- The tree looks like this:
+Generates and returns a hash reference containing a page tree with keys of "url", "title", and "sub" with orignating keys of page ids.  The tree looks like this:
 
  root
   |-pageId
@@ -166,14 +168,17 @@ sub drawVertical {
   `-pageId
      `-etc
 
+=over
+
 =item parentId
 
- The page id of where you'd like to start the tree.
+The page id of where you'd like to start the tree.
 
 =item toLevel
 
- The depth the tree should be traversed. Defaults to "0". If set to
- "0" the entire tree will be traversed.
+The depth the tree should be traversed. Defaults to "0". If set to "0" the entire tree will be traversed.
+
+=back
 
 =cut
 

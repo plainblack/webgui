@@ -34,7 +34,7 @@ use WebGUI::Utility;
 
 =head1 NAME
 
- Package WebGUI::Attachment
+Package WebGUI::Attachment
 
 =head1 SYNOPSIS
 
@@ -59,12 +59,12 @@ use WebGUI::Utility;
  $filename = $attachment->saveFromFilesystem($pathToFile);
 
 =head1 DESCRIPTION
- 
- Package to manipulate WebGUI Attachments.
+
+Package to manipulate WebGUI Attachments.
 
 =head1 METHODS
 
- These methods are available from this class:
+These methods are available from this class:
 
 =cut
 
@@ -73,7 +73,7 @@ use WebGUI::Utility;
 
 =head2 box ( )
 
- Displays the attachment in WebGUI's standard "Attachment Box".
+Displays the attachment in WebGUI's standard "Attachment Box".
 
 =cut
 
@@ -93,15 +93,19 @@ sub box {
 
 =head2 copy ( newNode [, newNodeSub ] )
  
- Copies an attachment from one node to another.
+Copies an attachment from one node to another.
+
+=over
 
 =item newNode
 
- Define the node to copy the attachment to.
+Define the node to copy the attachment to.
 
 =item newNodeSub
 
- If there is a subordinate element on this node define it here.
+If there is a subordinate element on this node define it here.
+
+=back
 
 =cut
 
@@ -142,12 +146,15 @@ sub copy {
 
 =head2 createThumbnail ( [ thumbnailSize ] )
 
- Generates a thumbnail for this attachment.
+Generates a thumbnail for this attachment.
+
+=over
 
 =item thumbnailSize
 
- Defaults to the global setting for thumbnail size. However, it
- can be overriden with this value. Specified in pixels.
+Defaults to the global setting for thumbnail size. However, it can be overriden with this value. Specified in pixels.
+
+=back
 
 =cut
 
@@ -177,7 +184,7 @@ sub createThumbnail {
 
 =head2 delete ( )
 
- Deletes an attachment from its node.
+Deletes an attachment from its node.
 
 =cut
 
@@ -190,7 +197,7 @@ sub delete {
 
 =head2 deleteNode ( )
 
- Deletes deletes this attachment's node (and everything in it).
+Deletes deletes this attachment's node (and everything in it).
 
 =cut
 
@@ -203,7 +210,7 @@ sub deleteNode {
 
 =head2 getFilename ( )
 
- Returns the attachment's filename.
+Returns the attachment's filename.
 
 =cut
 
@@ -216,7 +223,7 @@ sub getFilename {
 
 =head2 getIcon ( )
 
- Returns the full URL to the file icon for this attachment.
+Returns the full URL to the file icon for this attachment.
 
 =cut
 
@@ -299,7 +306,7 @@ sub getIcon {
 
 =head2 getPath ( )
 
- Returns a full path to an attachment.
+Returns a full path to an attachment.
 
 =cut
 
@@ -312,7 +319,7 @@ sub getPath {
 
 =head2 getSize ( )
 
- Returns the size of this file. 
+Returns the size of this file. 
 
 =cut
 
@@ -336,10 +343,7 @@ sub getSize {
 
 =head2 getThumbnail ( )
 
- Returns a full URL to the thumbnail for this attachment. Thumbnails
- are only created for jpg, gif, png, tif, and bmp with Image::Magick
- installed so getThumbnail only returns a thumbnail if the file is 
- one of those types and Image::Magick is installed.
+Returns a full URL to the thumbnail for this attachment. Thumbnails are only created for jpg, gif, png, tif, and bmp with Image::Magick installed so getThumbnail only returns a thumbnail if the file is one of those types and Image::Magick is installed.
 
 =cut
 
@@ -358,7 +362,7 @@ sub getThumbnail {
 
 =head2 getType ( )
 
- Returns the extension or type of this attachment.
+Returns the extension or type of this attachment.
 
 =cut
 
@@ -374,7 +378,7 @@ sub getType {
 
 =head2 getURL ( )
 
- Returns a full URL to an attachment.
+Returns a full URL to an attachment.
 
 =cut
 
@@ -387,7 +391,7 @@ sub getURL {
 
 =head2 isImage ( )
 
- Returns a 1 or 0 depending on whether the file is an image or not.
+Returns a 1 or 0 depending on whether the file is an image or not.
 
 =cut
 
@@ -399,22 +403,23 @@ sub isImage {
 
 =head2 new ( filename, node [, nodeSubordinate ] )
 
- Constructor.
+Constructor.
+
+=over
 
 =item filename
 
- What is the filename for this attachment. If you'll be uploading
- the attachment using the "save" method then you may leave this
- field blank.
+What is the filename for this attachment. If you'll be uploading the attachment using the "save" method then you may leave this field blank.
 
 =item node
 
- The node where this attachment is (or will be placed).
+The node where this attachment is (or will be placed).
 
 =item nodeSubordinate
 
- The subordinate element of the node where this attachment is (or
- will be placed).
+The subordinate element of the node where this attachment is (or will be placed).
+
+=back
 
 =cut
 
@@ -429,11 +434,15 @@ sub new {
 
 =head2 rename ( newFilename )
 
- Renames an attachment's filename.
+Renames an attachment's filename.
+
+=over
 
 =item newFilename
 
- Define the new filename for this attachment.
+Define the new filename for this attachment.
+
+=back
 
 =cut
 
@@ -447,13 +456,15 @@ sub rename {
 
 =head2 resizeImage ( [ imageSize ] )
 
- Resizes this attachment to the specified size. Use this method only
- if the attachment is an image.
+Resizes this attachment to the specified size. Use this method only if the attachment is an image.
+
+=over
 
 =item imageSize
 
- Defaults to the max image size setting. Specify a value in pixels
- to resize this image to.
+Defaults to the max image size setting. Specify a value in pixels to resize this image to.
+
+=back
 
 =cut
 
@@ -479,28 +490,23 @@ sub resizeImage {
 
 =head2 save ( formVariableName [, thumbnailSize, imageSize ] )
 
- Grabs an attachment from a form POST and saves it to a node. It 
- then returns the filename of the attachment.
+Grabs an attachment from a form POST and saves it to a node. It then returns the filename of the attachment.
+
+=over
 
 =item formVariableName
 
- Provide the form variable name to which the file being uploaded
- is assigned.
+Provide the form variable name to which the file being uploaded is assigned.
 
 =item thumbnailSize
 
- If an image is being uploaded a thumbnail will be generated
- automatically. By default, WebGUI will create a thumbnail of the
- size specified in the file settings. You can override that
- size by specifying one here. Size is measured in pixels of the
- longest side.
+If an image is being uploaded a thumbnail will be generated automatically. By default, WebGUI will create a thumbnail of the size specified in the file settings. You can override that size by specifying one here. Size is measured in pixels of the longest side.
 
 =item imageSize
 
- If a web image (gif, png, jpg, jpeg) is being uploaded it will be
- resized if it is larger than this value. By default images are
- resized to stay within the contraints of the Max Image Size
- setting in the file settings.
+If a web image (gif, png, jpg, jpeg) is being uploaded it will be resized if it is larger than this value. By default images are resized to stay within the contraints of the Max Image Size setting in the file settings.
+
+=back
 
 =cut
 
@@ -544,27 +550,23 @@ sub save {
 
 =head2 saveFromFilesystem ( pathToFile [, thumbnailSize, imageSize ] )
 
- Grabs an attachment from the server's file system and saves it to a node. It
- then returns the filename of the attachment.
+Grabs an attachment from the server's file system and saves it to a node. It then returns the filename of the attachment.
+
+=over
 
 =item pathToFile 
 
- Provide the local path to this file.
+Provide the local path to this file.
 
 =item thumbnailSize
 
- If an image is being grabbed a thumbnail will be generated
- automatically. By default, WebGUI will create a thumbnail of the
- size specified in the file settings. You can override that
- size by specifying one here. Size is measured in pixels of the
- longest side.
+If an image is being grabbed a thumbnail will be generated automatically. By default, WebGUI will create a thumbnail of the size specified in the file settings. You can override that size by specifying one here. Size is measured in pixels of the longest side.
 
 =item imageSize
 
- If a web image (gif, png, jpg, jpeg) is being grabbed it will be
- resized if it is larger than this value. By default images are
- resized to stay within the contraints of the Max Image Size
- setting in the file settings.
+If a web image (gif, png, jpg, jpeg) is being grabbed it will be resized if it is larger than this value. By default images are resized to stay within the contraints of the Max Image Size setting in the file settings.
+
+=back
 
 =cut
 

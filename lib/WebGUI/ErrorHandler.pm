@@ -18,9 +18,9 @@ use FileHandle;
 use WebGUI::Session;
 
 
-=head1 NAME
+=head1 NAME 
 
- Package WebGUI::ErrorHandler
+WebGUI::ErrorHandler
 
 =head1 SYNOPSIS
 
@@ -32,11 +32,11 @@ use WebGUI::Session;
 
 =head1 DESCRIPTION
 
- This package provides simple but effective error handling and logging for WebGUI.
+This package provides simple but effective error handling and logging for WebGUI.
 
 =head1 METHODS
 
- These functions are available from this package:
+These functions are available from this package:
 
 =cut
 
@@ -46,11 +46,15 @@ use WebGUI::Session;
 
 =head2 audit ( message )
 
- Inserts an AUDIT type message into the WebGUI log.
+Inserts an AUDIT type message into the WebGUI log.
+
+=over
 
 =item message
 
- Whatever message you wish to insert into the log.
+Whatever message you wish to insert into the log.
+
+=back
 
 =cut
 
@@ -67,10 +71,7 @@ sub audit {
 
 =head2 fatalError ( )
 
- Outputs an error message to the user and logs an error. Should only
- be called if the system cannot recover from an error, or if it would
- be unsafe to attempt to recover from an error (like compile errors
- or database errors).
+Outputs an error message to the user and logs an error. Should only be called if the system cannot recover from an error, or if it would be unsafe to attempt to recover from an error (like compile errors or database errors).
 
 =cut
 
@@ -159,11 +160,15 @@ sub fatalError {
 
 =head2 security ( message )
 
- Adds a SECURITY type message to the log.
+Adds a SECURITY type message to the log.
+
+=over
 
 =item message
 
- The message you wish to add to the log.
+The message you wish to add to the log.
+
+=back
 
 =cut
 
@@ -181,11 +186,15 @@ sub security {
 
 =head2 warn ( message )
 
- Adds a WARNING type message to the log.
+Adds a WARNING type message to the log.
+
+=over
 
 =item message
 
- The message you wish to add to the log.
+The message you wish to add to the log.
+
+=back
 
 =cut
 

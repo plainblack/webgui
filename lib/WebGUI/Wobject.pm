@@ -35,22 +35,22 @@ use WebGUI::Utility;
 
 =head1 NAME
 
- Package WebGUI::Wobject
+Package WebGUI::Wobject
 
 =head1 SYNOPSIS
 
  use WebGUI::Wobject;
  our @ISA = qw(WebGUI::Wobject);
 
- See the subclasses in lib/WebGUI/Wobjects for details.
+See the subclasses in lib/WebGUI/Wobjects for details.
 
 =head1 DESCRIPTION
 
- An abstract class for all other wobjects to extend. 
+An abstract class for all other wobjects to extend. 
 
 =head1 METHODS
 
- These methods are available from this class:
+These methods are available from this class:
 
 =cut
 
@@ -77,24 +77,25 @@ sub _getNextSequenceNumber {
 
 =head2 confirm ( message, yesURL, [ , noURL, vitalComparison ] )
 
+=over
+
 =item message
 
- A string containing the message to prompt the user for this action.
+A string containing the message to prompt the user for this action.
 
 =item yesURL
 
- A URL to the web method to execute if the user confirms the action.
+A URL to the web method to execute if the user confirms the action.
 
 =item noURL
 
- A URL to the web method to execute if the user denies the action.
- Defaults back to the current page.
+A URL to the web method to execute if the user denies the action.  Defaults back to the current page.
 
 =item vitalComparison
 
- A comparison expression to be used when checking whether the action
- should be allowed to continue. Typically this is used when the
- action is a delete of some sort.
+A comparison expression to be used when checking whether the action should be allowed to continue. Typically this is used when the action is a delete of some sort.
+
+=back
 
 =cut
 
@@ -119,19 +120,23 @@ sub confirm {
 
 =head2 deleteCollateral ( tableName, keyName, keyValue )
 
- Deletes a row of collateral data.
+Deletes a row of collateral data.
+
+=over
 
 =item tableName
 
- The name of the table you wish to delete the data from.
+The name of the table you wish to delete the data from.
 
 =item keyName
 
- The name of the column that is the primary key in the table.
+The name of the column that is the primary key in the table.
 
 =item keyValue
 
- An integer containing the key value.
+An integer containing the key value.
+
+=back
 
 =cut
 
@@ -145,7 +150,7 @@ sub deleteCollateral {
 
 =head2 description ( )
 
- Returns this instance's description if it exists.
+Returns this instance's description if it exists.
 
 =cut
 
@@ -159,8 +164,7 @@ sub description {
 
 =head2 discussionProperties ( )
 
- Returns a formRow list of discussion properties, which may be
- attached to any Wobject.
+Returns a formRow list of discussion properties, which may be attached to any Wobject.
 
 =cut
 
@@ -215,7 +219,7 @@ sub discussionProperties {
 
 =head2 displayTitle ( )
 
- Returns this instance's title if displayTitle is set to yes.
+Returns this instance's title if displayTitle is set to yes.
 
 =cut
 
@@ -231,15 +235,17 @@ sub displayTitle {
 
 =head2 duplicate ( [ pageId ] )
 
- Duplicates this wobject with a new wobject ID. Returns the new
- wobject Id.
+Duplicates this wobject with a new wobject ID. Returns the new wobject Id.
 
- NOTE: This method is meant to be extended by all sub-classes.
+NOTE: This method is meant to be extended by all sub-classes.
+
+=over
 
 =item pageId 
 
- If specified the wobject will be duplicated to this pageId,
- otherwise it will be duplicated to the clipboard.
+If specified the wobject will be duplicated to this pageId, otherwise it will be duplicated to the clipboard.
+
+=back
 
 =cut
 
@@ -273,18 +279,21 @@ sub duplicate {
 
 =head2 fileProperty ( name, labelId )
 
- Returns a file property form row which can be used in any Wobject
- properties page. 
+Returns a file property form row which can be used in any Wobject properties page. 
 
- NOTE: This method is meant for use with www_deleteFile.
+NOTE: This method is meant for use with www_deleteFile.
+
+=over
 
 =item name
 
- The name of the property that stores the filename.
+The name of the property that stores the filename.
 
 =item labelId
 
- The internationalId of the form label for this file.
+The internationalId of the form label for this file.
+
+=back
 
 =cut
 
@@ -308,13 +317,15 @@ sub fileProperty {
 
 =head2 get ( [ propertyName ] )
 
- Returns a hash reference containing all of the properties of this
- wobject instance.
+Returns a hash reference containing all of the properties of this wobject instance.
+
+=over
 
 =item propertyName
 
- If an individual propertyName is specified, then only that
- property value is returned as a scalar.
+If an individual propertyName is specified, then only that property value is returned as a scalar.
+
+=back
 
 =cut
 
@@ -331,21 +342,23 @@ sub get {
 
 =head2 getCollateral ( tableName, keyName, keyValue ) 
 
- Returns a hash reference containing a row of collateral data.
+Returns a hash reference containing a row of collateral data.
+
+=over
 
 =item tableName
 
- The name of the table you wish to retrieve the data from.
+The name of the table you wish to retrieve the data from.
 
 =item keyName
 
- The name of the column that is the primary key in the table.
+The name of the column that is the primary key in the table.
 
 =item keyValue
 
- An integer containing the key value. If key value is equal to "new"
- or null, then an empty hashRef containing only keyName=>"new" will 
- be returned to avoid strict errors.
+An integer containing the key value. If key value is equal to "new" or null, then an empty hashRef containing only keyName=>"new" will be returned to avoid strict errors.
+
+=back
 
 =cut
 
@@ -363,8 +376,7 @@ sub getCollateral {
 
 =head2 inDateRange ( )
 
- Returns a boolean value of whether the wobject should be displayed
- based upon it's start and end dates.
+Returns a boolean value of whether the wobject should be displayed based upon it's start and end dates.
 
 =cut
 
@@ -380,35 +392,31 @@ sub inDateRange {
 
 =head2 moveCollateralDown ( tableName, idName, id [ , setName, setValue ] )
 
- Moves a collateral data item down one position. This assumes that the
- collateral data table has a column called "wobjectId" that identifies
- the wobject, and a column called "sequenceNumber" that determines
- the position of the data item.
+Moves a collateral data item down one position. This assumes that the collateral data table has a column called "wobjectId" that identifies the wobject, and a column called "sequenceNumber" that determines the position of the data item.
+
+=over
 
 =item tableName
 
- A string indicating the table that contains the collateral data.
+A string indicating the table that contains the collateral data.
 
 =item idName
 
- A string indicating the name of the column that uniquely identifies
- this collateral data item.
+A string indicating the name of the column that uniquely identifies this collateral data item.
 
 =item id
 
- An integer that uniquely identifies this collateral data item.
+An integer that uniquely identifies this collateral data item.
 
 =item setName
 
- By default this method assumes that the collateral will have a
- wobject id in the table. However, since there is not always a wobject
- id to separate one data set from another, you may specify another
- field to do that.
+By default this method assumes that the collateral will have a wobject id in the table. However, since there is not always a wobject id to separate one data set from another, you may specify another field to do that.
 
 =item setValue
 
- The value of the column defined by "setName" to select a data set
- from.
+The value of the column defined by "setName" to select a data set from.
+
+=back
 
 =cut
 
@@ -434,35 +442,31 @@ sub moveCollateralDown {
 
 =head2 moveCollateralUp ( tableName, idName, id [ , setName, setValue ] )
 
- Moves a collateral data item up one position. This assumes that the
- collateral data table has a column called "wobjectId" that identifies
- the wobject, and a column called "sequenceNumber" that determines
- the position of the data item.
+Moves a collateral data item up one position. This assumes that the collateral data table has a column called "wobjectId" that identifies the wobject, and a column called "sequenceNumber" that determines the position of the data item.
+
+=over
 
 =item tableName
 
- A string indicating the table that contains the collateral data.
+A string indicating the table that contains the collateral data.
 
 =item idName
 
- A string indicating the name of the column that uniquely identifies
- this collateral data item.
+A string indicating the name of the column that uniquely identifies this collateral data item.
 
 =item id
 
- An integer that uniquely identifies this collateral data item.
+An integer that uniquely identifies this collateral data item.
 
 =item setName
 
- By default this method assumes that the collateral will have a
- wobject id in the table. However, since there is not always a wobject
- id to separate one data set from another, you may specify another
- field to do that.
+By default this method assumes that the collateral will have a wobject id in the table. However, since there is not always a wobject id to separate one data set from another, you may specify another field to do that.
 
 =item setValue
 
- The value of the column defined by "setName" to select a data set
- from.
+The value of the column defined by "setName" to select a data set from.
+
+=back
 
 =cut
 
@@ -488,21 +492,19 @@ sub moveCollateralUp {
 
 =head2 new ( properties )
 
- Constructor.
+Constructor.
 
- NOTE: This method should never need to be overridden or extended.
+NOTE: This method should never need to be overridden or extended.
+
+=over
 
 =item properties
 
- A hash reference containing at minimum "wobjectId" and "namespace"
- and wobjectId may be set to "new" if you're creating a new
- instance. This hash reference should be the one created by 
- WebGUI.pm and passed to the wobject subclass.
+A hash reference containing at minimum "wobjectId" and "namespace" and wobjectId may be set to "new" if you're creating a new instance. This hash reference should be the one created by WebGUI.pm and passed to the wobject subclass.
 
- NOTE: It may seem a little weird that the initial data for the
- wobject instance is coming from WebGUI.pm, but this was done
- to lessen database traffic thus increasing the speed of all
- wobjects.
+NOTE: It may seem a little weird that the initial data for the wobject instance is coming from WebGUI.pm, but this was done to lessen database traffic thus increasing the speed of all wobjects.
+
+=back
 
 =cut
 
@@ -517,9 +519,13 @@ sub new {
  Decides whether or not macros should be processed and returns the
  appropriate output.
 
+=over
+
 =item output
 
  An HTML blob to be processed for macros.
+
+=back
 
 =cut
 
@@ -535,18 +541,21 @@ sub processMacros {
 
 =head2 processTemplate ( templateId, vars ) 
 
- Returns the content generated from this template.
+Returns the content generated from this template.
 
- NOTE: Only for use in wobjects that support templates.
+NOTE: Only for use in wobjects that support templates.
+
+=over
 
 =item templateId
 
- An id referring to a particular template in the templates table.
+An id referring to a particular template in the templates table.
 
 =item hashRef
 
- A hash reference containing variables and loops to pass to the
- template engine.
+A hash reference containing variables and loops to pass to the template engine.
+
+=back
 
 =cut
 
@@ -562,10 +571,9 @@ sub processTemplate {
 
 =head2 purge ( )
 
- Removes this wobject from the database and all it's attachments
- from the filesystem.
+Removes this wobject from the database and all it's attachments from the filesystem.
 
- NOTE: This method is meant to be extended by all sub-classes.
+NOTE: This method is meant to be extended by all sub-classes.
 
 =cut
 
@@ -583,27 +591,27 @@ sub purge {
 
 =head2 reorderCollateral ( tableName, keyName [ , setName, setValue ] )
 
- Resequences collateral data. Typically useful after deleting a
- collateral item to remove the gap created by the deletion.
+Resequences collateral data. Typically useful after deleting a collateral item to remove the gap created by the deletion.
+
+=over
 
 =item tableName
 
- The name of the table to resequence.
+The name of the table to resequence.
 
 =item keyName
 
- The key column name used to determine which data needs sorting within the table.
+The key column name used to determine which data needs sorting within the table.
 
 =item setName
 
- Defaults to "wobjectId". This is used to define which data set to
- reorder.
+Defaults to "wobjectId". This is used to define which data set to reorder.
 
 =item setValue
 
- Used to define which data set to reorder. Defaults to the wobjectId
- for this instance. Defaults to the value of "setName" in the wobject
- properties.
+Used to define which data set to reorder. Defaults to the wobjectId for this instance. Defaults to the value of "setName" in the wobject properties.
+
+=back
 
 =cut
 
@@ -626,25 +634,23 @@ sub reorderCollateral {
 
 =head2 set ( [ hashRef, arrayRef ] )
 
- Stores the values specified in hashRef to the database.
+Stores the values specified in hashRef to the database.
 
- NOTE: This method should be extended by all subclasses.
+NOTE: This method should be extended by all subclasses.
+
+=over
 
 =item hashRef 
 
- A hash reference of the properties of this wobject instance. This
- method will accept any name/value pair and associate it with this
- wobject instance in memory, but will only store the following 
- fields to the database:
+A hash reference of the properties of this wobject instance. This method will accept any name/value pair and associate it with this wobject instance in memory, but will only store the following fields to the database:
 
- title, displayTitle, description, processMacros,
- pageId, templatePosition, startDate, endDate, sequenceNumber
+ title, displayTitle, description, processMacros, pageId, templatePosition, startDate, endDate, sequenceNumber
 
 =item arrayRef
 
- An array reference containing a list of properties associated
- with this Wobject class. The items in the list should marry
- up to fields in the Wobject extention table for this class.
+An array reference containing a list of properties associated with this Wobject class. The items in the list should marry up to fields in the Wobject extention table for this class.
+
+=back
 
 =cut
 
@@ -698,52 +704,39 @@ sub set {
 
 =head2 setCollateral ( tableName, keyName, properties [ , useSequenceNumber, useWobjectId, setName, setValue ] )
 
- Performs and insert/update of collateral data for any wobject's
- collateral data. Returns the primary key value for that row of
- data.
+Performs and insert/update of collateral data for any wobject's collateral data. Returns the primary key value for that row of data.
+
+=over
 
 =item tableName
 
- The name of the table to insert the data.
+The name of the table to insert the data.
 
 =item keyName
 
- The column name of the primary key in the table specified above.
- This must also be an incrementerId in the incrementer table.
+The column name of the primary key in the table specified above.  This must also be an incrementerId in the incrementer table.
 
 =item properties
 
- A hash reference containing the name/value pairs to be inserted
- into the database where the name is the column name. Note that
- the primary key should be specified in this list, and if it's value
- is "new" or null a new row will be created.
+A hash reference containing the name/value pairs to be inserted into the database where the name is the column name. Note that the primary key should be specified in this list, and if it's value is "new" or null a new row will be created.
 
 =item useSequenceNumber
 
- If set to "1", a new sequenceNumber will be generated and inserted
- into the row. Note that this means you must have a sequenceNumber
- column in the table. Also note that this requires the presence of
- the wobjectId column. Defaults to "1".
+If set to "1", a new sequenceNumber will be generated and inserted into the row. Note that this means you must have a sequenceNumber column in the table. Also note that this requires the presence of the wobjectId column. Defaults to "1".
 
 =item useWobjectId
 
- If set to "1", the current wobjectId will be inserted into the table
- upon creation of a new row. Note that this means the table better
- have a wobjectId column. Defaults to "1".
+If set to "1", the current wobjectId will be inserted into the table upon creation of a new row. Note that this means the table better have a wobjectId column. Defaults to "1".  
 
 =item setName
 
- If this collateral data set is not grouped by wobjectId, but by another
- column then specify that column here. The useSequenceNumber parameter
- will then use this column name instead of wobjectId to generate
- the sequenceNumber.
+If this collateral data set is not grouped by wobjectId, but by another column then specify that column here. The useSequenceNumber parameter will then use this column name instead of wobjectId to generate the sequenceNumber.
 
 =item setValue
 
- If you've specified a setName you may also set a value for that set.
- Defaults to the value for this id from the wobject properties.
+If you've specified a setName you may also set a value for that set.  Defaults to the value for this id from the wobject properties.
 
-=item 
+=back
 
 =cut
 
@@ -797,41 +790,9 @@ sub setCollateral {
 
 #-------------------------------------------------------------------
 
-=head2 templateProperties 
-
- Returns a list of template properties.
-
-=cut
-
-sub templateProperties {
-	my ($f, $templates, $templateId, $subtext);
-	$templateId = $_[0]->get("templateId") || 1;
-	if ($_[0]->get("wobjectId") ne "new" && $session{user}{uiLevel} >= 5) {
-		$subtext = '<a href="'.WebGUI::URL::page("op=editTemplate&tid=".$templateId."&return="
-			.WebGUI::URL::escape("func=edit&wid=".$_[0]->get("wobjectId"))).'">'
-			.WebGUI::International::get(741).'</a> / <a href="'.WebGUI::URL::page("op=listTemplates").'">'
-			.WebGUI::International::get(742).'</a>';
-	}
-	$templates = WebGUI::SQL->buildHashRef("select templateId,name from template where namespace="
-		.quote($_[0]->get("namespace"))." order by name");
-	$f = WebGUI::HTMLForm->new;
-	$f->select(
-		-name=>"templateId",
-		-options=>$templates,
-		-label=>WebGUI::International::get(740),
-		-value=>[$templateId],
-		-uiLevel=>1,
-		-subtext=>$subtext
-		);
-	return $f->printRowsOnly;
-}
-
-#-------------------------------------------------------------------
-
 =head2 uiLevel
 
- Returns the UI Level of a wobject. Defaults to "0" for all wobjects.
- Override to set the UI Level higher for a given wobject.
+Returns the UI Level of a wobject. Defaults to "0" for all wobjects.  Override to set the UI Level higher for a given wobject.
 
 =cut
 
@@ -843,7 +804,7 @@ sub uiLevel {
 
 =head2 www_approvePost ( )
 
- Sets the status flag on a discussion message to "approved".
+Sets the status flag on a discussion message to "approved".
 
 =cut
 
@@ -860,9 +821,9 @@ sub www_approvePost {
 
 =head2 www_copy ( )
 
- Copies this instance to the clipboard.
+Copies this instance to the clipboard.
 
- NOTE: Should never need to be overridden or extended.
+NOTE: Should never need to be overridden or extended.
 
 =cut
 
@@ -879,7 +840,7 @@ sub www_copy {
 
 =head2 www_cut ( )
 
- Moves this instance to the clipboard.
+Moves this instance to the clipboard.
 
 =cut
 
@@ -897,7 +858,7 @@ sub www_cut {
 
 =head2 www_delete ( )
 
- Prompts a user to confirm whether they wish to delete this instance.
+Prompts a user to confirm whether they wish to delete this instance.
 
 =cut
 
@@ -925,7 +886,7 @@ sub www_delete {
 
 =head2  www_deleteConfirm ( )
 
- Moves this instance to the trash.
+Moves this instance to the trash.
 
 =cut
 
@@ -944,7 +905,7 @@ sub www_deleteConfirm {
 
 =head2 www_deleteFile ( )
 
- Displays a confirmation message relating to the deletion of a file.
+Displays a confirmation message relating to the deletion of a file.
 
 =cut
 
@@ -960,7 +921,7 @@ sub www_deleteFile {
 
 =head2 www_deleteFileConfirm ( )
 
- Deletes a file from this instance.
+Deletes a file from this instance.
 
 =cut
 
@@ -974,8 +935,7 @@ sub www_deleteFileConfirm {
 
 =head2 www_deleteMessage ( )
 
- Displays a message asking for confirmation to delete a message from
- a discussion.
+Displays a message asking for confirmation to delete a message from a discussion.
 
 =cut
 
@@ -991,7 +951,7 @@ sub www_deleteMessage {
 
 =head2 www_deleteMessageConfirm ( )
 
- Deletes a message from a discussion.
+Deletes a message from a discussion.
 
 =cut
 
@@ -1007,7 +967,7 @@ sub www_deleteMessageConfirm {
 
 =head2 www_denyPost ( )
 
- Sets the status flag on a discussion message to "denied".
+Sets the status flag on a discussion message to "denied".
 
 =cut
 
@@ -1023,13 +983,17 @@ sub www_denyPost {
 
 =head2 www_edit ( formRows ) 
 
- Displays the common properties of any/all wobjects. 
+Displays the common properties of any/all wobjects. 
 
- NOTE: This method should be extended by all wobjects.
+NOTE: This method should be extended by all wobjects.
+
+=over
 
 =item formRows
 
- The custom form rows from the wobject subclass edit page.
+The custom form rows from the wobject subclass edit page.
+
+=back
 
 =cut
 
@@ -1097,9 +1061,9 @@ sub www_edit {
 
 =head2 www_editSave ( )
 
- Saves the default properties of any/all wobjects.
+Saves the default properties of any/all wobjects.
 
- NOTE: This method should be extended by all subclasses.
+NOTE: This method should be extended by all subclasses.
 
 =cut
 
@@ -1137,7 +1101,7 @@ sub www_editSave {
 
 =head2 www_lockThread ( )
 
- Locks a discussion thread from the current message down.
+Locks a discussion thread from the current message down.
 
 =cut
 
@@ -1154,7 +1118,7 @@ sub www_lockThread {
 
 =head2 www_moveBottom ( )
 
- Moves this instance to the bottom of the page.
+Moves this instance to the bottom of the page.
 
 =cut
 
@@ -1172,7 +1136,7 @@ sub www_moveBottom {
 
 =head2 www_moveDown ( )
 
- Moves this instance down one spot on the page.
+Moves this instance down one spot on the page.
 
 =cut
 
@@ -1197,7 +1161,7 @@ sub www_moveDown {
 
 =head2 www_moveTop ( )
 
- Moves this instance to the top of the page.
+Moves this instance to the top of the page.
 
 =cut
 
@@ -1215,7 +1179,7 @@ sub www_moveTop {
 
 =head2 www_moveUp ( )
 
- Moves this instance up one spot on the page.
+Moves this instance up one spot on the page.
 
 =cut
 
@@ -1240,7 +1204,7 @@ sub www_moveUp {
 
 =head2 www_paste ( )
 
- Moves this instance from the clipboard to the current page.
+Moves this instance from the clipboard to the current page.
 
 =cut
 
@@ -1260,7 +1224,7 @@ sub www_paste {
 
 =head2 www_post ( )
 
- Displays a discussion message post form.
+Displays a discussion message post form.
 
 =cut
 
@@ -1276,7 +1240,7 @@ sub www_post {
 
 =head2 www_post ( )
 
- Saves a message post to a discussion.
+Saves a message post to a discussion.
 
 =cut 
 
@@ -1293,7 +1257,7 @@ sub www_postSave {
 
 =head2 www_search ( )
 
- Searches an attached discussion.
+Searches an attached discussion.
 
 =cut
 
@@ -1305,12 +1269,15 @@ sub www_search {
 
 =head2 www_showMessage ( [menuItem] )
 
- Shows a message from a discussion.
+Shows a message from a discussion.
+
+=over
 
 =item menuItem
 
- You can optionally extend this method by passing in an HTML string
- of menu items to be added to the menu of this display.
+You can optionally extend this method by passing in an HTML string of menu items to be added to the menu of this display.
+
+=back
 
 =cut
 
@@ -1327,7 +1294,7 @@ sub www_showMessage {
 
 =head2 www_unlockThread ( )
 
- Unlocks a discussion thread from the current message on down.
+Unlocks a discussion thread from the current message on down.
 
 =cut
 
@@ -1344,8 +1311,7 @@ sub www_unlockThread {
 
 =head2 www_view ( )
 
- The default display mechanism for any wobject. This web method MUST
- be overridden.
+The default display mechanism for any wobject. This web method MUST be overridden.
 
 =cut
 

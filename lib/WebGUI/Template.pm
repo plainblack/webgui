@@ -26,7 +26,7 @@ use WebGUI::SQL;
 
 =head1 NAME
 
- Package WebGUI::Template
+Package WebGUI::Template
 
 =head1 SYNOPSIS
 
@@ -38,28 +38,32 @@ use WebGUI::SQL;
 
 =head1 DESCRIPTION
 
- This package contains utility methods for WebGUI's template system.
+This package contains utility methods for WebGUI's template system.
 
 =head1 METHODS
 
- These subroutines are available from this package:
+These subroutines are available from this package:
 
 =cut
 
 
 #-------------------------------------------------------------------
 
-=head get ( [ templateId, namespace ] )
+=head2 get ( [ templateId, namespace ] )
 
- Returns a template.
+Returns a template.
+
+=over
 
 =item templateId
 
- Defaults to "1". Specify the templateId of the template to retrieve.
+Defaults to "1". Specify the templateId of the template to retrieve.
 
 =item namespace
 
- Defaults to "Page". Specify the namespace of the template to retrieve.
+Defaults to "Page". Specify the namespace of the template to retrieve.
+
+=back
 
 =cut
 
@@ -76,12 +80,15 @@ sub get {
 
 =head2 getList ( [ namespace ] )
 
- Returns a hash reference containing template ids and template names
- of all the templates in the specified namespace.
+Returns a hash reference containing template ids and template names of all the templates in the specified namespace.
+
+=over
 
 =item namespace
 
- Defaults to "Page". Specify the namespace to build the list for.
+Defaults to "Page". Specify the namespace to build the list for.
+
+=back
 
 =cut
 
@@ -95,16 +102,19 @@ sub getList {
 
 =head2 process ( template [ , vars ] )
 
- Evaluate a template replacing template commands for HTML.
+Evaluate a template replacing template commands for HTML.
+
+=over
 
 =item template
 
- The template to process.
+The template to process.
 
 =item vars
 
- A hash reference containing template variables and loops. Automatically
- includes the entire WebGUI session.
+A hash reference containing template variables and loops. Automatically includes the entire WebGUI session.
+
+=back
 
 =cut
 

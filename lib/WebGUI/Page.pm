@@ -28,7 +28,7 @@ use WebGUI::Template;
 
 =head1 NAME
 
- Package WebGUI::Page
+Package WebGUI::Page
 
 =head1 SYNOPSIS
 
@@ -42,11 +42,11 @@ use WebGUI::Template;
 
 =head1 DESCRIPTION
 
- This package provides utility functions for WebGUI's page system.
+This package provides utility functions for WebGUI's page system.
 
 =head1 METHODS
 
- These functions are available from this package:
+These functions are available from this package:
 
 =cut
 
@@ -60,11 +60,15 @@ sub _newPositionFormat {
 
 =head2 countTemplatePositions ( templateId ) 
 
- Returns the number of template positions in the specified page template.
+Returns the number of template positions in the specified page template.
+
+=over
 
 =item templateId
 
- The id of the page template you wish to count.
+The id of the page template you wish to count.
+
+=back
 
 =cut
 
@@ -82,11 +86,15 @@ sub countTemplatePositions {
 
 =head2 drawTemplate ( templateId )
 
- Returns an HTML string containing a small representation of the page template.
+Returns an HTML string containing a small representation of the page template.
+
+=over
 
 =item templateId
 
- The id of the page template you wish to draw.
+The id of the page template you wish to draw.
+
+=back
 
 =cut
 
@@ -104,8 +112,7 @@ sub drawTemplate {
 
 =head2 getTemplateList
 
- Returns a hash reference containing template ids and template titles
- for all the page templates available in the system. 
+Returns a hash reference containing template ids and template titles for all the page templates available in the system. 
 
 =cut
 
@@ -117,11 +124,15 @@ sub getTemplateList {
 
 =head2 getTemplate ( templateId )
 
- Returns an HTML template.
+Returns an HTML template.
+
+=over
 
 =item templateId
 
- The id of the page template you wish to retrieve.
+The id of the page template you wish to retrieve.
+
+=back
 
 =cut
 
@@ -135,12 +146,15 @@ sub getTemplate {
 
 =head2 getTemplatePositions ( templateId ) 
 
- Returns a hash reference containing the positions available in
- the specified page template.
+Returns a hash reference containing the positions available in the specified page template.
+
+=over
 
 =item templateId
 
- The id of the page template you wish to retrieve the positions from.
+The id of the page template you wish to retrieve the positions from.
+
+=back
 
 =cut
 
@@ -157,15 +171,19 @@ sub getTemplatePositions {
 
 =head2 makeUnique ( pageURL, pageId )
 
- Returns a unique page URL.
+Returns a unique page URL.
+
+=over
 
 =item url
 
- The URL you're hoping for.
+The URL you're hoping for.
 
 =item pageId
 
- The page id of the page you're creating a URL for.
+The page id of the page you're creating a URL for.
+
+=back
 
 =cut
 

@@ -29,7 +29,7 @@ use WebGUI::Utility;
 
 =head1 NAME
 
- Package WebGUI::MessageLog
+Package WebGUI::MessageLog
 
 =head1 SYNOPSIS
 
@@ -40,11 +40,11 @@ use WebGUI::Utility;
 
 =head1 DESCRIPTION
 
- This package is WebGUI's notification system.
+This package is WebGUI's notification system.
 
 =head1 METHODS
 
- These functions are available from this package:
+These functions are available from this package:
 
 =cut
 
@@ -74,36 +74,39 @@ sub _notify {
 
 =head2 addEntry ( userId, groupId, subject, message [ , url, status ] )
 
- Adds an entry to the message log and sends out notification to users.
+Adds an entry to the message log and sends out notification to users.
+
+=over
 
 =item userId
 
- The id of the user that should receive this notification.
+The id of the user that should receive this notification.
 
- NOTE: This can be left blank if you're specifying a groupId.
+NOTE: This can be left blank if you're specifying a groupId.
 
 =item groupId
 
- The id of the group that should receive this notification.
+The id of the group that should receive this notification.
 
- NOTE: This can be left blank if you're specifying a userId.
+NOTE: This can be left blank if you're specifying a userId.
 
 =item subject
 
- The subject of the notification.
+The subject of the notification.
 
 =item message
 
- The content of the notification.
+The content of the notification.
 
 =item url
 
- The URL of any action that should be taken based upon this
- notification (if any).
+The URL of any action that should be taken based upon this notification (if any).
 
 =item status
 
- Defaults to 'notice'. Can be 'pending', 'notice', or 'completed'.
+Defaults to 'notice'. Can be 'pending', 'notice', or 'completed'.
+
+=back
 
 =cut
 
@@ -137,37 +140,39 @@ sub addEntry {
 
 =head2 addInternationalizedEntry ( userId, groupId, url, internationalId [ , namespace, status ] )
 
- Adds an entry to the message log using a translated message from
- the internationalization system and sends out notifications to users.
+Adds an entry to the message log using a translated message from the internationalization system and sends out notifications to users.
+
+=over
 
 =item userId
 
- The id of the user that should receive this notification.
+The id of the user that should receive this notification.
 
- NOTE: This can be left blank if you're specifying a groupId.
+NOTE: This can be left blank if you're specifying a groupId.
 
 =item groupId
 
- The id of the group that should receive this notification.
+The id of the group that should receive this notification.
 
- NOTE: This can be left blank if you're specifying a userId.
+NOTE: This can be left blank if you're specifying a userId.
 
 =item url
 
- The URL of any action that should be taken based upon this
- notification (if any).
+The URL of any action that should be taken based upon this notification (if any).
 
 =item internationalId
 
- The unique identifier from the internationalization system of the message to send.
+The unique identifier from the internationalization system of the message to send.
 
 =item namespace
 
- The namespace from the internationalization system of the message to send. Defaults to "WebGUI";
+The namespace from the internationalization system of the message to send. Defaults to "WebGUI";
 
 =item status
 
- Defaults to 'notice'. Can be 'pending', 'notice', or 'completed'.
+Defaults to 'notice'. Can be 'pending', 'notice', or 'completed'.
+
+=back
 
 =cut
 
@@ -207,11 +212,15 @@ sub addInternationalizedEntry {
 
 =head2 completeEntry ( messageLogId )
 
- Set a message log entry to complete.
+Set a message log entry to complete.
+
+=over
 
 =item messageLogId
 
- The id of the message to complete.
+The id of the message to complete.
+
+=back
 
 =cut
 

@@ -22,7 +22,7 @@ use WebGUI::Session;
 
 =head1 NAME
 
- Package WebGUI::Mail
+Package WebGUI::Mail
 
 =head1 SYNOPSIS
 
@@ -31,11 +31,11 @@ use WebGUI::Session;
 
 =head1 DESCRIPTION
 
- This package provides access to use SMTP based email services.
+This package provides access to use SMTP based email services.
 
 =head1 METHODS
 
- These methods are available from this class:
+These methods are available from this class:
 
 =cut
 
@@ -45,32 +45,35 @@ use WebGUI::Session;
 
 =head2 send ( to, subject, message [ , cc, from, bcc ] )
 
- Sends an SMTP email message to the specified user.
+Sends an SMTP email message to the specified user.
+
+=over
 
 =item to 
 
- An email address for the TO line.
+An email address for the TO line.
 
 =item subject
 
- The subject line for the email.
+The subject line for the email.
 
 =item message
 
- The message body for the email.
+The message body for the email.
 
 =item cc
 
- The email address for the CC line.
+The email address for the CC line.
 
 =item from
 
- The email address for the FROM line. Defaults to the email address
- specified in the Company Settings.
+The email address for the FROM line. Defaults to the email address specified in the Company Settings.
 
 =item bcc
 
- The email address for the BCC line.
+The email address for the BCC line.
+
+=back
 
 =cut
 

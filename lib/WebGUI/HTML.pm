@@ -20,7 +20,7 @@ use WebGUI::Session;
 
 =head1 NAME
 
- Package WebGUI::HTML
+Package WebGUI::HTML
 
 =head1 SYNOPSIS
 
@@ -30,11 +30,11 @@ use WebGUI::Session;
 
 =head1 DESCRIPTION
 
- A package for manipulating and massaging HTML.
+A package for manipulating and massaging HTML.
 
 =head1 METHODS
 
- These methods are available from this package:
+These methods are available from this package:
 
 =cut
 
@@ -43,16 +43,17 @@ use WebGUI::Session;
 
 =head2 cleanSegment ( html )
 
- Returns an HTML segment that has been stripped of the <BODY> tag
- and anything before it, as well as the </BODY> tag and anything
- after it. 
+Returns an HTML segment that has been stripped of the <BODY> tag and anything before it, as well as the </BODY> tag and anything after it. 
 
- NOTE: This filter does have one exception, it leaves anything before
- the <BODY> tag that is enclosed in <STYLE></STYLE> tags.
+NOTE: This filter does have one exception, it leaves anything before the <BODY> tag that is enclosed in <STYLE></STYLE> tags.
+
+=over
 
 =item html
 
- The HTML segment you want cleaned.
+The HTML segment you want cleaned.
+
+=back
 
 =cut
 
@@ -73,18 +74,19 @@ sub cleanSegment {
 
 =head2 filter ( html [, filter ] )
 
- Returns HTML with unwanted tags filtered out.
+Returns HTML with unwanted tags filtered out.
+
+=over
 
 =item html
 
- The HTML content you want filtered.
+The HTML content you want filtered.
 
 =item filter
 
- Choose from all, none, javascript, or most. Defaults to most. 
- All removes all HTML tags; none removes no HTML tags; javascript
- removes all references to javacript; and most removes all but 
- simple formatting tags like bold and italics.
+Choose from all, none, javascript, or most. Defaults to most.  All removes all HTML tags; none removes no HTML tags; javascript removes all references to javacript; and most removes all but simple formatting tags like bold and italics.
+
+=back
 
 =cut
 

@@ -27,7 +27,7 @@ our @EXPORT = qw(&quote &getNextId);
 
 =head1 NAME
 
- Package WebGUI::SQL
+Package WebGUI::SQL
 
 =head1 SYNOPSIS
 
@@ -58,13 +58,11 @@ our @EXPORT = qw(&quote &getNextId);
 
 =head1 DESCRIPTION
 
- Package for interfacing with SQL databases. This package
- implements Perl DBI functionality in a less code-intensive
- manner and adds some extra functionality.
+Package for interfacing with SQL databases. This package implements Perl DBI functionality in a less code-intensive manner and adds some extra functionality.
 
 =head1 METHODS
 
- These methods are available from this package:
+These methods are available from this package:
 
 =cut
 
@@ -73,7 +71,7 @@ our @EXPORT = qw(&quote &getNextId);
 
 =head2 array ( )
 
- Returns the next row of data as an array.
+Returns the next row of data as an array.
 
 =cut
 
@@ -86,16 +84,19 @@ sub array {
 
 =head2 buildArray ( sql [, dbh ] )
 
- Builds an array of data from a series of rows.
+Builds an array of data from a series of rows.
+
+=over
 
 =item sql
 
- An SQL query. The query must select only one column of data.
+An SQL query. The query must select only one column of data.
 
 =item dbh
 
- By default this method uses the WebGUI database handler. However,
- you may choose to pass in your own if you wish.
+By default this method uses the WebGUI database handler. However, you may choose to pass in your own if you wish.
+
+=back
 
 =cut
 
@@ -116,17 +117,19 @@ sub buildArray {
 
 =head2 buildHash ( sql [, dbh ] )
 
- Builds a hash of data from a series of rows.
+Builds a hash of data from a series of rows.
+
+=over
 
 =item sql
 
- An SQL query. The query must select only two columns of data, the
- first being the key for the hash, the second being the value.
+An SQL query. The query must select only two columns of data, the first being the key for the hash, the second being the value.
 
 =item dbh
 
- By default this method uses the WebGUI database handler. However,
- you may choose to pass in your own if you wish.
+By default this method uses the WebGUI database handler. However, you may choose to pass in your own if you wish.
+
+=back
 
 =cut
 
@@ -146,17 +149,19 @@ sub buildHash {
 
 =head2 buildHashRef ( sql [, dbh ] )
 
- Builds a hash reference of data from a series of rows.
+Builds a hash reference of data from a series of rows.
+
+=over
 
 =item sql
 
- An SQL query. The query must select only two columns of data, the
- first being the key for the hash, the second being the value.
+An SQL query. The query must select only two columns of data, the first being the key for the hash, the second being the value.  
 
 =item dbh
 
- By default this method uses the WebGUI database handler. However,
- you may choose to pass in your own if you wish.
+ By default this method uses the WebGUI database handler. However, you may choose to pass in your own if you wish.
+
+=back
 
 =cut
 
@@ -172,7 +177,7 @@ sub buildHashRef {
 
 =head2 errorCode {
 
- Returns an error code for the current handler.
+Returns an error code for the current handler.
 
 =cut
 
@@ -185,7 +190,7 @@ sub errorCode {
 
 =head2 errorMessage {
 
- Returns a text error message for the current handler.
+Returns a text error message for the current handler.
 
 =cut
 
@@ -198,7 +203,7 @@ sub errorMessage {
 
 =head2 finish ( )
 
- Ends a query after calling the "new" or "read" methods.
+Ends a query after calling the "new" or "read" methods.
 
 =cut
 
@@ -211,7 +216,7 @@ sub finish {
 
 =head2 getColumnNames {
 
- Returns an array of column names. Use with a "read" method.
+Returns an array of column names. Use with a "read" method.
 
 =cut
 
@@ -224,14 +229,17 @@ sub getColumnNames {
 
 =head2 getNextId ( idName )
 
- Increments an incrementer of the specified type and returns the
- value. NOTE: This is not a regular method, but is an exported
- subroutine.
+Increments an incrementer of the specified type and returns the value. 
+
+NOTE: This is not a regular method, but is an exported subroutine.
+
+=over
 
 =item idName
 
- Specify the name of one of the incrementers in the incrementer
- table.
+Specify the name of one of the incrementers in the incrementer table.
+
+=back
 
 =cut
 
@@ -245,10 +253,9 @@ sub getNextId {
 
 #-------------------------------------------------------------------
 
-=head2 hash
+=head2 hash ( )
 
- Returns the next row of data in the form of a hash. Must be
- executed on a statement handler returned by the "read" method.
+Returns the next row of data in the form of a hash. Must be executed on a statement handler returned by the "read" method.
 
 =cut
 
@@ -265,10 +272,9 @@ sub hash {
 
 #-------------------------------------------------------------------
 
-=head2 hashRef
+=head2 hashRef ( )
 
- Returns the next row of data in the form of a hash reference. Must
- be executed on a statement handler returned by the "read" method.
+Returns the next row of data in the form of a hash reference. Must be executed on a statement handler returned by the "read" method.
 
 =cut
 
@@ -289,16 +295,19 @@ sub hashRef {
 
 =head2 new ( sql [, dbh ] )
 
- Constructor. Returns a statement handler.
+Constructor. Returns a statement handler.
+
+=over
 
 =item sql
 
- An SQL query. 
+An SQL query. 
 
 =item dbh
 
- By default this method uses the WebGUI database handler. However,
- you may choose to pass in your own if you wish.
+By default this method uses the WebGUI database handler. However, you may choose to pass in your own if you wish.
+
+=back
 
 =cut
 
@@ -320,16 +329,19 @@ sub new {
 
 =head2 quickArray ( sql [, dbh ] )
 
- Executes a query and returns a single row of data as an array.
+Executes a query and returns a single row of data as an array.
+
+=over
 
 =item sql
 
- An SQL query.
+An SQL query.
 
 =item dbh
 
- By default this method uses the WebGUI database handler. However,
- you may choose to pass in your own if you wish.
+By default this method uses the WebGUI database handler. However, you may choose to pass in your own if you wish.
+
+=back
 
 =cut
 
@@ -346,17 +358,19 @@ sub quickArray {
 
 =head2 quickCSV ( sql [, dbh ] )
 
- Executes a query and returns a comma delimited text blob with column
- headers.
+Executes a query and returns a comma delimited text blob with column headers.
+
+=over
 
 =item sql
 
- An SQL query.
+An SQL query.
 
 =item dbh
 
- By default this method uses the WebGUI database handler. However,
- you may choose to pass in your own if you wish.
+By default this method uses the WebGUI database handler. However, you may choose to pass in your own if you wish.
+
+=back
 
 =cut
 
@@ -377,16 +391,19 @@ sub quickCSV {
 
 =head2 quickHash ( sql [, dbh ] )
 
- Executes a query and returns a single row of data as a hash.
+Executes a query and returns a single row of data as a hash.
+
+=over
 
 =item sql
 
- An SQL query.
+An SQL query.
 
 =item dbh
 
- By default this method uses the WebGUI database handler. However,
- you may choose to pass in your own if you wish.
+By default this method uses the WebGUI database handler. However, you may choose to pass in your own if you wish.
+
+=back
 
 =cut
 
@@ -406,17 +423,19 @@ sub quickHash {
 
 =head2 quickHashRef ( sql [, dbh ] )
 
- Executes a query and returns a single row of data as a hash
- reference.
+Executes a query and returns a single row of data as a hash reference.
+
+=over
 
 =item sql
 
- An SQL query.
+An SQL query.
 
 =item dbh
 
- By default this method uses the WebGUI database handler. However,
- you may choose to pass in your own if you wish.
+By default this method uses the WebGUI database handler. However, you may choose to pass in your own if you wish.
+
+=back
 
 =cut
 
@@ -436,17 +455,19 @@ sub quickHashRef {
 
 =head2 quickTab ( sql [, dbh ] )
 
- Executes a query and returns a tab delimited text blob with column
- headers.
+Executes a query and returns a tab delimited text blob with column headers.
+
+=over
 
 =item sql
 
- An SQL query.
+An SQL query.
 
 =item dbh
 
- By default this method uses the WebGUI database handler. However,
- you may choose to pass in your own if you wish.
+By default this method uses the WebGUI database handler. However, you may choose to pass in your own if you wish.
+
+=back
 
 =cut
 
@@ -466,13 +487,17 @@ sub quickTab {
 
 =head2 quote ( string ) 
 
- Returns a string quoted and ready for insert into the database.
- NOTE: This is not a regular method, but is an exported subroutine.
+Returns a string quoted and ready for insert into the database.  
+
+NOTE: This is not a regular method, but is an exported subroutine.
+
+=over
 
 =item string
 
- Any scalar variable that needs to be escaped to be inserted into
- the database.
+Any scalar variable that needs to be escaped to be inserted into the database.
+
+=back
 
 =cut
 
@@ -486,16 +511,19 @@ sub quote {
 
 =head2 read ( sql [, dbh ] )
 
- An alias of the "new" method. Returns a statement handler.
+An alias of the "new" method. Returns a statement handler.
+
+=over
 
 =item sql
 
- An SQL query.
+An SQL query.
 
 =item dbh
 
- By default this method uses the WebGUI database handler. However,
- you may choose to pass in your own if you wish.
+By default this method uses the WebGUI database handler. However, you may choose to pass in your own if you wish.
+
+=back
 
 =cut
 
@@ -508,8 +536,7 @@ sub read {
 
 =head2 rows ( )
 
- Returns the number of rows in a statement handler created by the
- "read" method.
+Returns the number of rows in a statement handler created by the "read" method.
 
 =cut
 
@@ -522,19 +549,19 @@ sub rows {
 
 =head2 unconditionalRead ( sql [, dbh ] )
 
- An alias of the "read" method except that it will not cause a fatal
- error in WebGUI if the query is invalid. This is useful for user
- generated queries such as those in the SQL Report. Returns a 
- statement handler.
+An alias of the "read" method except that it will not cause a fatal error in WebGUI if the query is invalid. This is useful for user generated queries such as those in the SQL Report. Returns a statement handler.
+
+=over
 
 =item sql
 
- An SQL query.
+An SQL query.
 
 =item dbh
 
- By default this method uses the WebGUI database handler. However,
- you may choose to pass in your own if you wish.
+By default this method uses the WebGUI database handler. However, you may choose to pass in your own if you wish.
+
+=back
 
 =cut
 
@@ -551,18 +578,19 @@ sub unconditionalRead {
 
 =head2 write ( sql [, dbh ] )
 
- A method specifically designed for writing to the database in an
- efficient manner. Writing can be accomplished using the "new"
- method, but it is not as efficient.
+A method specifically designed for writing to the database in an efficient manner. Writing can be accomplished using the "new" method, but it is not as efficient.
+
+=over
 
 =item sql
 
- An SQL insert or update.
+An SQL insert or update.
 
 =item dbh
 
- By default this method uses the WebGUI database handler. However,
- you may choose to pass in your own if you wish.
+By default this method uses the WebGUI database handler. However, you may choose to pass in your own if you wish.
+
+=back
 
 =cut
 

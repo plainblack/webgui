@@ -28,7 +28,7 @@ our @EXPORT = qw(&localtime &time &addToTime &addToDate &epochToHuman &epochToSe
 
 =head1 NAME
 
- Package WebGUI::DateTime
+Package WebGUI::DateTime
 
 =head1 SYNOPSIS
 
@@ -50,12 +50,11 @@ our @EXPORT = qw(&localtime &time &addToTime &addToDate &epochToHuman &epochToSe
 
 =head1 DESCRIPTION
 
- This package provides easy to use date math functions, which are
- normally a complete pain.
+This package provides easy to use date math functions, which are normally a complete pain.
 
 =head1 METHODS
 
- These functions are available from this package:
+These functions are available from this package:
 
 =cut
 
@@ -66,23 +65,27 @@ our @EXPORT = qw(&localtime &time &addToTime &addToDate &epochToHuman &epochToSe
 
 =head2 addToDate ( epoch [ , years, months, days ] )
 
- Returns an epoch date with the amount of time added.
+Returns an epoch date with the amount of time added.
+
+=over
 
 =item epoch
 
- The number of seconds since January 1, 1970.
+The number of seconds since January 1, 1970.
 
 =item years
 
- The number of years to add to the epoch.
+The number of years to add to the epoch.
 
 =item months
 
- The number of months to add to the epoch.
+The number of months to add to the epoch.
 
 =item days
 
- The number of days to add to the epoch. 
+The number of days to add to the epoch. 
+
+=back
 
 =cut
 
@@ -98,23 +101,27 @@ sub addToDate {
 
 =head2 addToTime ( epoch [ , hours, minutes, seconds ] )
 
- Returns an epoch date with the amount of time added.
+Returns an epoch date with the amount of time added.
+
+=over
 
 =item epoch
 
- The number of seconds since January 1, 1970.
+The number of seconds since January 1, 1970.
 
 =item hours
 
- The number of hours to add to the epoch.
+The number of hours to add to the epoch.
 
 =item minutes
 
- The number of minutes to add to the epoch.
+The number of minutes to add to the epoch.
 
 =item seconds
 
- The number of seconds to add to the epoch.
+The number of seconds to add to the epoch.
+
+=back
 
 =cut
 
@@ -130,11 +137,15 @@ sub addToTime {
 
 =head2 dayStartEnd ( epoch )
 
- Returns the epoch dates for the start and end of the day.
+Returns the epoch dates for the start and end of the day.
+
+=over
 
 =item epoch
 
- The number of seconds since January 1, 1970.
+The number of seconds since January 1, 1970.
+
+=back
 
 =cut
 
@@ -150,16 +161,17 @@ sub dayStartEnd {
 
 =head2 epochToHuman ( [ epoch, format ] )
 
- Returns a formated date string.
+Returns a formated date string.
+
+=over
 
 =item epoch
 
- The number of seconds since January 1, 1970. Defaults to NOW!
+The number of seconds since January 1, 1970. Defaults to NOW!
 
 =item format 
 
- A string representing the output format for the date. Defaults to
- '%z %Z'. You can use the following to format your date string:
+A string representing the output format for the date. Defaults to '%z %Z'. You can use the following to format your date string:
 
  %% = % (percent) symbol.
  %c = The calendar month name.
@@ -180,6 +192,8 @@ sub dayStartEnd {
  %Y = A two digit year. 
  %z = The current user's date format preference.
  %Z = The current user's time format preference.
+
+=back
 
 =cut
 
@@ -253,12 +267,15 @@ sub epochToHuman {
 
 =head2 epochToSet ( epoch )
 
- Returns a set date (used by WebGUI::HTMLForm->date) in the format
- of MM/DD/YYYY. 
+Returns a set date (used by WebGUI::HTMLForm->date) in the format of MM/DD/YYYY. 
+
+=over
 
 =item epoch
 
- The number of seconds since January 1, 1970.
+The number of seconds since January 1, 1970.
+
+=back
 
 =cut
 
@@ -270,12 +287,15 @@ sub epochToSet {
 
 =head2 getMonthName ( month )
 
- Returns a string containing the calendar month name in the language
- of the current user.
+Returns a string containing the calendar month name in the language of the current user.
+
+=over
 
 =item month
 
- An integer ranging from 1-12 representing the month.
+An integer ranging from 1-12 representing the month.
+
+=back
 
 =cut
 
@@ -311,13 +331,15 @@ sub getMonthName {
 
 =head2 getDayName ( day )
 
- Returns a string containing the weekday name in the language of the
- current user. 
+Returns a string containing the weekday name in the language of the current user. 
+
+=over
 
 =item day
 
- An integer ranging from 1-7 representing the day of the week (Sunday
- is 1 and Saturday is 7). 
+An integer ranging from 1-7 representing the day of the week (Sunday is 1 and Saturday is 7). 
+
+=back
 
 =cut
 
@@ -344,11 +366,15 @@ sub getDayName {
 
 =head2 humanToEpoch ( date )
 
- Returns an epoch date derived from the human date.
+Returns an epoch date derived from the human date.
+
+=over
 
 =item date
 
- The human date string. YYYY-MM-DD HH:MM:SS 
+The human date string. YYYY-MM-DD HH:MM:SS 
+
+=back
 
 =cut
 
@@ -371,16 +397,19 @@ sub humanToEpoch {
 
 =head2 intervalToSeconds ( interval, units )
 
- Returns the number of seconds derived from the interval.
+Returns the number of seconds derived from the interval.
+
+=over
 
 =item interval
 
- An integer which represents the amount of time for the interval.
+An integer which represents the amount of time for the interval.
 
 =item units
 
- A string which represents the units of the interval. The string
- must be 'years', 'months', 'days', 'hours', 'minutes', or 'seconds'. 
+A string which represents the units of the interval. The string must be 'years', 'months', 'days', 'hours', 'minutes', or 'seconds'. 
+
+=back
 
 =cut
 
@@ -406,13 +435,15 @@ sub intervalToSeconds {
 
 =head2 localtime ( epoch )
 
- Returns an array of time elements. The elements are: years, months,
- days, hours, minutes, seconds, day of year, day of week, daylight
- savings time.
+Returns an array of time elements. The elements are: years, months, days, hours, minutes, seconds, day of year, day of week, daylight savings time.
+
+=over
 
 =item epoch
 
- The number of seconds since January 1, 1970.
+The number of seconds since January 1, 1970.
+
+=back
 
 =cut
 
@@ -423,16 +454,19 @@ sub localtime {
 #-------------------------------------------------------------------
 =head2 monthCount ( startEpoch, endEpoch )
 
- Returns the number of months between the start and end dates
- (inclusive).
+Returns the number of months between the start and end dates (inclusive).
+
+=over
 
 =item startEpoch
 
- An epoch datestamp corresponding to the first month.
+An epoch datestamp corresponding to the first month.
 
 =item endEpoch
 
- An epoch datestamp corresponding to the last month.
+An epoch datestamp corresponding to the last month.
+
+=back
 
 =cut
 
@@ -448,11 +482,15 @@ sub monthCount {
 
 =head2 monthStartEnd ( epoch )
 
- Returns the epoch dates for the start and end of the month.
+Returns the epoch dates for the start and end of the month.
+
+=over
 
 =item epoch
 
- The number of seconds since January 1, 1970.
+The number of seconds since January 1, 1970.
+
+=back
 
 =cut
 
@@ -469,12 +507,15 @@ sub monthStartEnd {
 
 =head2 secondsToInterval ( seconds )
 
- Returns an interval and units derived the number of seconds.
+Returns an interval and units derived the number of seconds.
+
+=over
 
 =item seconds
 
- The number of seconds in the interval. 
+The number of seconds in the interval. 
 
+=back
 
 =cut
 
@@ -509,11 +550,15 @@ sub secondsToInterval {
 
 =head2 setToEpoch ( set )
 
- Returns an epoch date.
+Returns an epoch date.
+
+=over
 
 =item set
 
- A string in the format of MM/DD/YYYY.
+A string in the format of MM/DD/YYYY.
+
+=back
 
 =cut
 
@@ -542,7 +587,7 @@ sub setToEpoch {
 
 =head2 time ( )
 
- Returns an epoch date.
+Returns an epoch date for now.
 
 =cut
 

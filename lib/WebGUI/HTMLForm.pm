@@ -25,7 +25,7 @@ use WebGUI::SQL;
 
 =head1 NAME
 
- Package WebGUI::HTMLForm
+Package WebGUI::HTMLForm
 
 =head1 SYNOPSIS
 
@@ -60,8 +60,7 @@ use WebGUI::SQL;
  $f->yesNo("happy","Are you happy?");
  $f->zipcode("workZip","Office Zip Code");
 
- Alternatively each of these methods can also be called with the
- tag element syntax like this:
+Alternatively each of these methods can also be called with the tag element syntax like this:
 
  $f->checkbox(
 	-"name"=>"whichOne", 
@@ -75,12 +74,11 @@ use WebGUI::SQL;
 
 =head1 DESCRIPTION
 
- Package that makes HTML forms typed data and significantly
- reduces the code needed for properties pages in WebGUI. 
+Package that makes HTML forms typed data and significantly reduces the code needed for properties pages in WebGUI. 
 
 =head1 METHODS
 
- These methods are available from this class:
+These methods are available from this class:
 
 =cut
 
@@ -115,41 +113,41 @@ sub _uiLevelChecksOut {
 
 =head2 checkbox ( name [ label, checked, subtext, value, extras, uiLevel ] )
 
- Adds a checkbox row to this form.
+Adds a checkbox row to this form.
+
+=over
 
 =item name
 
- The name field for this form element.
+The name field for this form element.
 
 =item label
 
- The left column label for this form row.
+The left column label for this form row.
 
 =item checked 
 
- If you'd like this box to be defaultly checked, set this to "1".
+If you'd like this box to be defaultly checked, set this to "1".
 
 =item subtext
- 
- Extra text to describe this form element or to provide special
- instructions.
+
+Extra text to describe this form element or to provide special instructions.
 
 =item value
 
- The default value for this form element. Defaults to "1".
+The default value for this form element. Defaults to "1".
 
 =item extras
 
- If you want to add anything special to this form element like
- javascript actions, or stylesheet information, you'd add it in
- here as follows:
+If you want to add anything special to this form element like javascript actions, or stylesheet information, you'd add it in here as follows:
 
-   'onChange="this.form.submit()"'
+ 'onChange="this.form.submit()"'
 
 =item uiLevel
 
- The UI level for this field. See the WebGUI developer's site for
- details. Defaults to "0".
+The UI level for this field. See the WebGUI developer's site for details. Defaults to "0".
+
+=back
 
 =cut
 
@@ -182,47 +180,45 @@ sub checkbox {
 
 =head2 checkList ( name, options [ label, value, vertical, extras, subtext, uiLevel ] )
 
- Adds a checkbox list row to this form.
+Adds a checkbox list row to this form.
+
+=over
 
 =item name
 
- The name field for this form element.
+The name field for this form element.
 
 =item options
- The list of options for this list. Should be passed as a
- hash reference.
+
+The list of options for this list. Should be passed as a hash reference.
 
 =item label
 
- The left column label for this form row.
+The left column label for this form row.
 
 =item value
 
- The default value(s) for this form element. This should be passed
- as an array reference.
+The default value(s) for this form element. This should be passed as an array reference.
 
 =item vertical
 
- If set to "1" the radio button elements will be laid out
- horizontally. Defaults to "0".
+If set to "1" the radio button elements will be laid out horizontally. Defaults to "0".
 
 =item extras
 
- If you want to add anything special to this form element like
- javascript actions, or stylesheet information, you'd add it in
- here as follows:
+If you want to add anything special to this form element like javascript actions, or stylesheet information, you'd add it in here as follows:
 
-   'onChange="this.form.submit()"'
+ 'onChange="this.form.submit()"'
 
 =item subtext
 
- Extra text to describe this form element or to provide special
- instructions.
+Extra text to describe this form element or to provide special instructions.
 
 =item uiLevel
 
- The UI level for this field. See the WebGUI developer's site for
- details. Defaults to "0".
+The UI level for this field. See the WebGUI developer's site for details. Defaults to "0".
+
+=back
 
 =cut
 
@@ -255,54 +251,49 @@ sub checkList {
 
 =head2 combo ( name, options [ label, value, size, multiple, extras, subtext, uiLevel ] )
 
- Adds a combination select list / text box row to this form. If the
- text box is filled out it will have a value stored in "name"_new
- where name is the first field passed into this method.
+Adds a combination select list / text box row to this form. If the text box is filled out it will have a value stored in "name"_new where name is the first field passed into this method.
+
+=over
 
 =item name
 
- The name field for this form element.
+The name field for this form element.
 
 =item options
- The list of options for this select list. Should be passed as a
- hash reference.
+
+The list of options for this select list. Should be passed as a hash reference.
 
 =item label
 
- The left column label for this form row.
+The left column label for this form row.
 
 =item value
 
- The default value(s) for this form element. This should be passed
- as an array reference.
+The default value(s) for this form element. This should be passed as an array reference.
 
 =item size
 
- The number of characters tall this form element should be. Defaults
- to "1".
+The number of characters tall this form element should be. Defaults to "1".
 
 =item multiple
 
- A boolean value for whether this select list should allow multiple
- selections. Defaults to "0".
+A boolean value for whether this select list should allow multiple selections. Defaults to "0".
 
 =item extras
 
- If you want to add anything special to this form element like
- javascript actions, or stylesheet information, you'd add it in
- here as follows:
+If you want to add anything special to this form element like javascript actions, or stylesheet information, you'd add it in here as follows:
 
-   'onChange="this.form.submit()"'
+ 'onChange="this.form.submit()"'
 
 =item subtext
 
- Extra text to describe this form element or to provide special
- instructions.
+Extra text to describe this form element or to provide special instructions.
 
 =item uiLevel
 
- The UI level for this field. See the WebGUI developer's site for
- details. Defaults to "0".
+The UI level for this field. See the WebGUI developer's site for details. Defaults to "0".
+
+=back
 
 =cut
 
@@ -336,47 +327,45 @@ sub combo {
 
 =head2 date ( name [ label, value, extras, subtext, size, noDate, uiLevel ] )
 
- Adds a date row to this form.
+Adds a date row to this form.
+
+=over
 
 =item name
 
- The name field for this form element.
+The name field for this form element.
 
 =item label
 
- The left column label for this form row.
+The left column label for this form row.
 
 =item value
 
- The default date. Pass as an epoch value. Defaults to today.
+The default date. Pass as an epoch value. Defaults to today.
 
 =item extras
 
- If you want to add anything special to this form element like
- javascript actions, or stylesheet information, you'd add it in
- here as follows:
+If you want to add anything special to this form element like javascript actions, or stylesheet information, you'd add it in here as follows:
 
-   'onChange="this.form.submit()"'
+ 'onChange="this.form.submit()"'
 
 =item subtext
 
- Extra text to describe this form element or to provide special
- instructions.
+Extra text to describe this form element or to provide special instructions.
 
 =item size
 
- The number of characters wide this form element should be. There
- should be no reason for anyone to specify this.
+The number of characters wide this form element should be. There should be no reason for anyone to specify this.
 
 =item noDate
 
- By default a date is placed in the "value" field. Set this to "1"
- to turn off the default date.
+By default a date is placed in the "value" field. Set this to "1" to turn off the default date.
 
 =item uiLevel
 
- The UI level for this field. See the WebGUI developer's site for
- details. Defaults to "0".
+The UI level for this field. See the WebGUI developer's site for details. Defaults to "0".
+
+=back
 
 =cut
 
@@ -410,46 +399,45 @@ sub date {
 
 =head2 email ( name [ label, value, maxlength, extras, subtext, size, uiLevel ] )
 
- Adds an email address row to this form.
+Adds an email address row to this form.
+
+=over
 
 =item name
 
- The name field for this form element.
+The name field for this form element.
 
 =item label
 
- The left column label for this form row.
+The left column label for this form row.
 
 =item value
 
- The default value for this form element.
+The default value for this form element.
 
 =item maxlength
 
- The maximum number of characters to allow in this form element.
+The maximum number of characters to allow in this form element.
 
 =item extras
 
- If you want to add anything special to this form element like
- javascript actions, or stylesheet information, you'd add it in
- here as follows:
+If you want to add anything special to this form element like javascript actions, or stylesheet information, you'd add it in here as follows:
 
-   'onChange="this.form.submit()"'
+ 'onChange="this.form.submit()"'
 
 =item subtext
 
- Extra text to describe this form element or to provide special
- instructions.
+Extra text to describe this form element or to provide special instructions.
 
 =item size
 
- The number of characters wide this form element should be. There
- should be no reason for anyone to specify this.
+The number of characters wide this form element should be. There should be no reason for anyone to specify this.
 
 =item uiLevel
 
- The UI level for this field. See the WebGUI developer's site for
- details. Defaults to "0".
+The UI level for this field. See the WebGUI developer's site for details. Defaults to "0".
+
+=back
 
 =cut
 
@@ -482,55 +470,49 @@ sub email {
 
 =head2 fieldType ( name, types [ label, value, size, multiple, extras, subtext, uiLevel ] )
 
- Adds a field type select list field to this form. This is primarily 
- useful for building dynamic form builders.
+Adds a field type select list field to this form. This is primarily useful for building dynamic form builders.
+
+=over
 
 =item name
 
- The name field for this form element.
+The name field for this form element.
 
 =item types
 
- An array reference of field types to be displayed. The field names
- are the names of the methods from this forms package. Note that not
- all field types are supported.
+An array reference of field types to be displayed. The field names are the names of the methods from this forms package. Note that not all field types are supported.
 
 =item label
 
- The left column label for this form row.
+The left column label for this form row.
 
 =item value
 
- The default value(s) for this form element. This should be passed
- as an array reference.
+The default value(s) for this form element. This should be passed as an array reference.
 
 =item size
 
- The number of characters tall this form element should be. Defaults
- to "1".
+The number of characters tall this form element should be. Defaults to "1".
 
 =item multiple
 
- A boolean value for whether this select list should allow multiple
- selections. Defaults to "0".
+A boolean value for whether this select list should allow multiple selections. Defaults to "0".
 
 =item extras
 
- If you want to add anything special to this form element like
- javascript actions, or stylesheet information, you'd add it in
- here as follows:
+If you want to add anything special to this form element like javascript actions, or stylesheet information, you'd add it in here as follows:
 
-   'onChange="this.form.submit()"'
+ 'onChange="this.form.submit()"'
 
 =item subtext
 
- Extra text to describe this form element or to provide special
- instructions.
+Extra text to describe this form element or to provide special instructions.
 
 =item uiLevel
 
- The UI level for this field. See the WebGUI developer's site for
- details. Defaults to "0".
+The UI level for this field. See the WebGUI developer's site for details. Defaults to "0".
+
+=back
 
 =cut
 
@@ -564,38 +546,37 @@ sub fieldType {
 
 =head2 file ( name [ label, subtext, extras, size, uiLevel ] )
 
- Adds a file browse row to this form.
+Adds a file browse row to this form.
+
+=over
 
 =item name
 
- The name field for this form element.
+The name field for this form element.
 
 =item label
 
- The left column label for this form row.
+The left column label for this form row.
 
 =item subtext
 
- Extra text to describe this form element or to provide special
- instructions.
+Extra text to describe this form element or to provide special instructions.
 
 =item extras
 
- If you want to add anything special to this form element like
- javascript actions, or stylesheet information, you'd add it in
- here as follows:
+If you want to add anything special to this form element like javascript actions, or stylesheet information, you'd add it in here as follows:
 
-   'onChange="this.form.submit()"'
+ 'onChange="this.form.submit()"'
 
 =item size
 
- The number of characters wide this form element should be. There
- should be no reason for anyone to specify this.
+The number of characters wide this form element should be. There should be no reason for anyone to specify this.
 
 =item uiLevel
 
- The UI level for this field. See the WebGUI developer's site for
- details. Defaults to "0".
+The UI level for this field. See the WebGUI developer's site for details. Defaults to "0".
+
+=back
 
 =cut
 
@@ -620,48 +601,45 @@ sub file {
 
 =head2 group ( name [ label, value, size, multiple, extras, subtext, uiLevel ] )
 
- Adds a group pull-down to this form. A group pull down
- provides a select list that provides name value pairs for all the
- groups in the WebGUI system.
+Adds a group pull-down to this form. A group pull down provides a select list that provides name value pairs for all the groups in the WebGUI system.
+
+=over
 
 =item name
 
- The name field for this form element.
+The name field for this form element.
 
 =item label
 
- The left column label for this form row.
+The left column label for this form row.
 
 =item value
 
- The default value(s) for this form element. This should be passed
- as an array reference. Defaults to "7" (Everyone).
+The default value(s) for this form element. This should be passed as an array reference. Defaults to "7" (Everyone).
 
 =item size
 
- How many rows should be displayed at once?
+How many rows should be displayed at once?
 
 =item multiple
 
- Set to "1" if multiple groups should be selectable.
+Set to "1" if multiple groups should be selectable.
 
 =item extras
 
- If you want to add anything special to this form element like
- javascript actions, or stylesheet information, you'd add it in
- here as follows:
+If you want to add anything special to this form element like javascript actions, or stylesheet information, you'd add it in here as follows:
 
-   'onChange="this.form.submit()"'
+ 'onChange="this.form.submit()"'
 
 =item subtext
 
- Extra text to describe this form element or to provide special
- instructions.
+Extra text to describe this form element or to provide special instructions.
 
 =item uiLevel
 
- The UI level for this field. See the WebGUI developer's site for
- details. Defaults to "0".
+The UI level for this field. See the WebGUI developer's site for details. Defaults to "0".
+
+=back
 
 =cut
 
@@ -695,15 +673,19 @@ sub group {
 
 =head2 hidden ( name [ value ] )
 
- Adds a hidden row to this form.
+Adds a hidden row to this form.
+
+=over
 
 =item name
 
- The name field for this form element.
+The name field for this form element.
 
 =item value
 
- The default value for this form element.
+The default value for this form element.
+
+=back
 
 =cut
 
@@ -720,55 +702,49 @@ sub hidden {
 
 =head2 HTMLArea ( name [ label, value, subtext, extras, wrap, rows, columns, uiLevel ] )
 
- Adds an HTML area row to this form. An HTML area is different than 
- a standard text area in that it provides rich edit functionality
- and some special error trapping for HTML and other special
- characters.
+Adds an HTML area row to this form. An HTML area is different than a standard text area in that it provides rich edit functionality and some special error trapping for HTML and other special characters.
+
+=over
 
 =item name
 
- The name field for this form element.
+The name field for this form element.
 
 =item label
 
- The left column label for this form row.
+The left column label for this form row.
 
 =item value
 
- The default value for this form element.
+The default value for this form element.
 
 =item subtext
 
- Extra text to describe this form element or to provide special
- instructions.
+Extra text to describe this form element or to provide special instructions.
 
 =item extras
 
- If you want to add anything special to this form element like
- javascript actions, or stylesheet information, you'd add it in
- here as follows:
+If you want to add anything special to this form element like javascript actions, or stylesheet information, you'd add it in here as follows:
 
-   'onChange="this.form.submit()"'
+ 'onChange="this.form.submit()"'
 
 =item wrap
 
- The method for wrapping text in the text area. Defaults to
- "virtual". There should be almost no reason to specify this.
+The method for wrapping text in the text area. Defaults to "virtual". There should be almost no reason to specify this.
 
 =item rows
 
- The number of characters tall this form element should be. There
- should be no reason for anyone to specify this.
+The number of characters tall this form element should be. There should be no reason for anyone to specify this.
 
 =item columns
 
- The number of characters wide this form element should be. There
- should be no reason for anyone to specify this.
+The number of characters wide this form element should be. There should be no reason for anyone to specify this.
 
 =item uiLevel
 
- The UI level for this field. See the WebGUI developer's site for
- details. Defaults to "0".
+The UI level for this field. See the WebGUI developer's site for details. Defaults to "0".
+
+=back
 
 =cut
 
@@ -801,47 +777,45 @@ sub HTMLArea {
 
 =head2 integer ( name [ label, value, maxlength, extras, subtext, size, uiLevel ] )
 
- Adds an integer row to this form.
+Adds an integer row to this form.
+
+=over
 
 =item name
 
- The name field for this form element.
+The name field for this form element.
 
 =item label
 
- The left column label for this form row.
+The left column label for this form row.
 
 =item value
 
- The default value for this form element.
+The default value for this form element.
 
 =item maxlength
 
- The maximum number of characters to allow in this form element.
- Defaults to 11.
+The maximum number of characters to allow in this form element.  Defaults to 11.
 
 =item extras
 
- If you want to add anything special to this form element like
- javascript actions, or stylesheet information, you'd add it in
- here as follows:
+If you want to add anything special to this form element like javascript actions, or stylesheet information, you'd add it in here as follows:
 
-   'onChange="this.form.submit()"'
+ 'onChange="this.form.submit()"'
 
 =item subtext
 
- Extra text to describe this form element or to provide special
- instructions.
+Extra text to describe this form element or to provide special instructions.
 
 =item size
 
- The number of characters wide this form element should be. There
- should be no reason for anyone to specify this.
+The number of characters wide this form element should be. There should be no reason for anyone to specify this.
 
 =item uiLevel
 
- The UI level for this field. See the WebGUI developer's site for
- details. Defaults to "0".
+The UI level for this field. See the WebGUI developer's site for details. Defaults to "0".
+
+=back
 
 =cut
 
@@ -873,46 +847,41 @@ sub integer {
 
 =head2 interval ( name [ label, intervalValue, unitsValue, extras, subtext, uiLevel ] )
 
- Adds a time interval row to this form.
+Adds a time interval row to this form.
+
+=over
 
 =item name
 
- The the base name for this form element. This form element actually
- returns two values under different names. They are name_interval and
- name_units.
+The the base name for this form element. This form element actually returns two values under different names. They are name_interval and name_units.
 
 =item label
 
- The left column label for this form row.
+The left column label for this form row.
 
 =item intervalValue
 
- The default value for interval portion of this form element. Defaults
- to '1'.
+The default value for interval portion of this form element. Defaults to '1'.
 
 =item unitsValue
 
- The default value for units portion of this form element. Defaults
- to 'seconds'. Possible values are 'seconds', 'minutes', 'hours',
- 'days', 'weeks', 'months', and 'years'.
+The default value for units portion of this form element. Defaults to 'seconds'. Possible values are 'seconds', 'minutes', 'hours', 'days', 'weeks', 'months', and 'years'.
 
 =item extras
 
- If you want to add anything special to this form element like
- javascript actions, or stylesheet information, you'd add it in
- here as follows:
+If you want to add anything special to this form element like javascript actions, or stylesheet information, you'd add it in here as follows:
 
-   'onChange="this.form.submit()"'
+ 'onChange="this.form.submit()"'
 
 =item subtext
 
- Extra text to describe this form element or to provide special
- instructions.
+Extra text to describe this form element or to provide special instructions.
 
 =item uiLevel
 
- The UI level for this field. See the WebGUI developer's site for
- details. Defaults to "0".
+The UI level for this field. See the WebGUI developer's site for details. Defaults to "0".
+
+=back
 
 =cut
 
@@ -948,44 +917,39 @@ sub interval {
 
 =head2 new ( [ noTable, action, method, extras, enctype, tableExtras ] )
 
- Constructor.
+Constructor.
+
+=over
 
 =item noTable
 
- If this is set to "1" then no table elements will be wrapped around
- each form element. Defaults to "0".
+If this is set to "1" then no table elements will be wrapped around each form element. Defaults to "0".
 
 =item action
 
- The Action URL for the form information to be submitted to. This
- defaults to the current page.
+The Action URL for the form information to be submitted to. This defaults to the current page.
 
 =item method
 
- The form's submission method. This defaults to "POST" and probably
- shouldn't be changed.
+The form's submission method. This defaults to "POST" and probably shouldn't be changed.
 
 =item extras
 
- If you want to add anything special to your form like javascript
- actions, or stylesheet information, you'd add it in here as
- follows:
+If you want to add anything special to your form like javascript actions, or stylesheet information, you'd add it in here as follows:
 
-   '"name"="myForm" onChange="myForm.submit()"'
+ '"name"="myForm" onChange="myForm.submit()"'
 
 =item enctype 
 
- The ecapsulation type for this form. This defaults to
- "multipart/form-data" and should probably never be changed.
+The ecapsulation type for this form. This defaults to "multipart/form-data" and should probably never be changed.
 
 =item tableExtras
 
- If you want to add anything special to the form's table like 
- a name or stylesheet information, you'd add it in here as
- follows:
+If you want to add anything special to the form's table like a name or stylesheet information, you'd add it in here as follows:
 
-   '"name"="myForm" class="formTable"'
+ '"name"="myForm" class="formTable"'
 
+=back
 
 =cut
 
@@ -1011,48 +975,45 @@ sub new {
 
 =head2 password ( name [ label, value, subtext, maxlength, extras, size, uiLevel ] )
 
- Adds a password row to this form. 
+Adds a password row to this form. 
+
+=over
 
 =item name 
 
- The name field for this form element.
+The name field for this form element.
 
 =item label 
 
- The left column label for this form row.
+The left column label for this form row.
 
 =item value
 
- The default value for this form element.
+The default value for this form element.
 
 =item subtext
 
- Extra text to describe this form element or to provide special
- instructions.
+Extra text to describe this form element or to provide special instructions.
 
 =item maxlength 
 
- The maximum number of characters to allow in this form element.
- Defaults to "35".
+The maximum number of characters to allow in this form element.  Defaults to "35".
 
 =item extras
 
- If you want to add anything special to this form element like 
- javascript actions, or stylesheet information, you'd add it in 
- here as follows:
+If you want to add anything special to this form element like javascript actions, or stylesheet information, you'd add it in here as follows:
 
-   'onChange="this.form.submit()"'
+ 'onChange="this.form.submit()"'
 
 =item size 
 
- The number of characters wide this form element should be. There
- should be no reason for anyone to specify this. Defaults to "30"
- unless overridden in the settings.
+The number of characters wide this form element should be. There should be no reason for anyone to specify this. Defaults to "30" unless overridden in the settings.
 
 =item uiLevel
 
- The UI level for this field. See the WebGUI developer's site for
- details. Defaults to "0".
+The UI level for this field. See the WebGUI developer's site for details. Defaults to "0".
+
+=back
 
 =cut
 
@@ -1084,46 +1045,45 @@ sub password {
 
 =head2 phone ( name [ label, value, maxlength, extras, subtext, size, uiLevel ] )
 
- Adds a text row to this form.
+Adds a text row to this form.
+
+=over
 
 =item name
 
- The name field for this form element.
+The name field for this form element.
 
 =item label
 
- The left column label for this form row.
+The left column label for this form row.
 
 =item value
 
- The default value for this form element.
+The default value for this form element.
 
 =item maxlength
 
- The maximum number of characters to allow in this form element.
+The maximum number of characters to allow in this form element.
 
 =item extras
 
- If you want to add anything special to this form element like
- javascript actions, or stylesheet information, you'd add it in
- here as follows:
+If you want to add anything special to this form element like javascript actions, or stylesheet information, you'd add it in here as follows:
 
-   'onChange="this.form.submit()"'
+ 'onChange="this.form.submit()"'
 
 =item subtext
 
- Extra text to describe this form element or to provide special
- instructions.
+Extra text to describe this form element or to provide special instructions.
 
 =item size
 
- The number of characters wide this form element should be. There
- should be no reason for anyone to specify this.
+The number of characters wide this form element should be. There should be no reason for anyone to specify this.
 
 =item uiLevel
 
- The UI level for this field. See the WebGUI developer's site for
- details. Defaults to "0".
+The UI level for this field. See the WebGUI developer's site for details. Defaults to "0".
+
+=back
 
 =cut
 
@@ -1155,7 +1115,7 @@ sub phone {
 
 =head2 print ( )
 
- Returns the HTML for this form object.
+Returns the HTML for this form object.
 
 =cut
 
@@ -1167,8 +1127,7 @@ sub print {
 
 =head2 printRowsOnly ( )
 
- Returns the HTML for this form object except for the form header
- and footer.
+Returns the HTML for this form object except for the form header and footer.
 
 =cut
 
@@ -1180,41 +1139,41 @@ sub printRowsOnly {
 
 =head2 radio ( name [ label, checked, value, subtext, extras, uiLevel ] )
 
- Adds a radio button row to this form.
+Adds a radio button row to this form.
+
+=over
 
 =item name
 
- The name field for this form element.
+The name field for this form element.
 
 =item label
 
- The left column label for this form row.
+The left column label for this form row.
 
 =item checked
 
- If you'd like this radio button to be defaultly checked, set this to "1".
+If you'd like this radio button to be defaultly checked, set this to "1".
 
 =item value
 
- The default value for this form element.
+The default value for this form element.
 
 =item subtext
 
- Extra text to describe this form element or to provide special
- instructions.
+Extra text to describe this form element or to provide special instructions.
 
 =item extras
 
- If you want to add anything special to this form element like
- javascript actions, or stylesheet information, you'd add it in
- here as follows:
+If you want to add anything special to this form element like javascript actions, or stylesheet information, you'd add it in here as follows:
 
-   'onChange="this.form.submit()"'
+ 'onChange="this.form.submit()"'
 
 =item uiLevel
 
- The UI level for this field. See the WebGUI developer's site for
- details. Defaults to "0".
+The UI level for this field. See the WebGUI developer's site for details. Defaults to "0".
+
+=back
 
 =cut
 
@@ -1247,47 +1206,45 @@ sub radio {
 
 =head2 radioList ( name, options [ label, value, vertical, extras, subtext, uiLevel ] )
 
- Adds a radio button list row to this form.
+Adds a radio button list row to this form.
+
+=over
 
 =item name
 
- The name field for this form element.
+The name field for this form element.
 
 =item options
 
- The list of options for this list. Should be passed as a
- hash reference.
+The list of options for this list. Should be passed as a hash reference.
 
 =item label
 
- The left column label for this form row.
+The left column label for this form row.
 
 =item value
 
- The default value for this form element.
+The default value for this form element.
 
 =item vertical
 
- If set to "1" the radio button elements will be laid out 
- horizontally. Defaults to "0".
+If set to "1" the radio button elements will be laid out horizontally. Defaults to "0".
 
 =item extras
 
- If you want to add anything special to this form element like
- javascript actions, or stylesheet information, you'd add it in
- here as follows:
+If you want to add anything special to this form element like javascript actions, or stylesheet information, you'd add it in here as follows:
 
-   'onChange="this.form.submit()"'
+ 'onChange="this.form.submit()"'
 
 =item subtext
 
- Extra text to describe this form element or to provide special
- instructions.
+Extra text to describe this form element or to provide special instructions.
 
 =item uiLevel
 
- The UI level for this field. See the WebGUI developer's site for
- details. Defaults to "0".
+The UI level for this field. See the WebGUI developer's site for details. Defaults to "0".
+
+=back
 
 =cut
 
@@ -1320,13 +1277,15 @@ sub radioList {
 
 =head2 raw ( value, uiLevel )
 
- Adds raw data to the form. This is primarily useful with the 
- printRowsOnly method and if you generate your own form elements.
+Adds raw data to the form. This is primarily useful with the printRowsOnly method and if you generate your own form elements.
+
+=over
 
 =item uiLevel
 
- The UI level for this field. See the WebGUI developer's site for
- details. Defaults to "0".
+The UI level for this field. See the WebGUI developer's site for details. Defaults to "0".
+
+=back
 
 =cut
 
@@ -1344,27 +1303,27 @@ sub raw {
 
 =head2 readOnly ( value [ label, subtext, uiLevel ] )
 
- Adds a read only row to this form. This is mainly used for
- displaying not editable properties, but it can also be used to
- quickly insert custom form elements.
+Adds a read only row to this form. This is mainly used for displaying not editable properties, but it can also be used to quickly insert custom form elements.
+
+=over
 
 =item value 
 
- The read only value.
+The read only value.
 
 =item label
 
- The left column label for this form row.
+The left column label for this form row.
 
 =item subtext
 
- Extra text to describe this form element or to provide special
- instructions.
+Extra text to describe this form element or to provide special instructions.
 
 =item uiLevel
 
- The UI level for this field. See the WebGUI developer's site for
- details. Defaults to "0".
+The UI level for this field. See the WebGUI developer's site for details. Defaults to "0".
+
+=back
 
 =cut
 
@@ -1385,7 +1344,7 @@ sub readOnly {
 
 =head2 select
 
- Use of this method is depricated. Use selectList instead.
+Use of this method is depricated. Use selectList instead.
 
 =cut
 
@@ -1398,52 +1357,49 @@ sub select {
 
 =head2 selectList ( name, options [ label, value, size, multiple, extras, subtext, uiLevel ] )
 
- Adds a select list row to this form.
+Adds a select list row to this form.
+
+=over
 
 =item name
 
- The name field for this form element.
+The name field for this form element.
 
 =item options 
- The list of options for this select list. Should be passed as a
- hash reference.
+
+The list of options for this select list. Should be passed as a hash reference.
 
 =item label
 
- The left column label for this form row.
+The left column label for this form row.
 
 =item value
 
- The default value(s) for this form element. This should be passed
- as an array reference.
+The default value(s) for this form element. This should be passed as an array reference.
 
 =item size 
 
- The number of characters tall this form element should be. Defaults
- to "1".
+The number of characters tall this form element should be. Defaults to "1".
 
 =item multiple
 
- A boolean value for whether this select list should allow multiple
- selections. Defaults to "0".
+A boolean value for whether this select list should allow multiple selections. Defaults to "0".
 
 =item extras
 
- If you want to add anything special to this form element like
- javascript actions, or stylesheet information, you'd add it in
- here as follows:
+If you want to add anything special to this form element like javascript actions, or stylesheet information, you'd add it in here as follows:
 
-   'onChange="this.form.submit()"'
+ 'onChange="this.form.submit()"'
 
 =item subtext
 
- Extra text to describe this form element or to provide special
- instructions.
+Extra text to describe this form element or to provide special instructions.
 
 =item uiLevel
 
- The UI level for this field. See the WebGUI developer's site for
- details. Defaults to "0".
+The UI level for this field. See the WebGUI developer's site for details. Defaults to "0".
+
+=back
 
 =cut
 
@@ -1477,28 +1433,29 @@ sub selectList {
 
 =head2 submit ( value [ label, extras, subtext ] )
 
- Adds a submit button row to this form.
+Adds a submit button row to this form.
+
+=over
 
 =item value
 
- The button text for this submit button. Defaults to "save".
+The button text for this submit button. Defaults to "save".
 
 =item label
 
- The left column label for this form row.
+The left column label for this form row.
 
 =item extras
 
- If you want to add anything special to this form element like
- javascript actions, or stylesheet information, you'd add it in
- here as follows:
+If you want to add anything special to this form element like javascript actions, or stylesheet information, you'd add it in here as follows:
 
-   'onChange="this.form.submit()"'
+ 'onChange="this.form.submit()"'
 
 =item subtext
 
- Extra text to describe this form element or to provide special
- instructions.
+Extra text to describe this form element or to provide special instructions.
+
+=back
 
 =cut
 
@@ -1518,6 +1475,42 @@ sub submit {
 #-------------------------------------------------------------------
 
 =head2 template ( name [, value, label, namespace, afterEdit, extras, uiLevel ] )
+
+Adds a template select list to the form.
+
+=over
+
+=item name
+
+The name of this form element.
+
+=item value
+
+The default value for this form element.
+
+=item label
+
+The left column label for this form row.
+
+=item namespace
+
+The namespace (or type) of templates to show in this list. Defaults to "Page".
+
+=item afterEdit
+
+A URL that will be acted upon after editing a template. Typically there is a link next to the select list that reads "Edit this template" and this is the URL to go to after editing is complete.
+
+=item extras
+
+If you want to add anything special to this form element like javascript actions, or stylesheet information, you'd add it in here as follows:
+
+ 'onChange="this.form.submit()"'
+
+=item uiLevel
+
+The UI level for this field. See the WebGUI developer's site for details. Defaults to "0".
+
+=back
 
 =cut
 
@@ -1559,46 +1552,45 @@ sub template {
 
 =head2 text ( name [ label, value, maxlength, extras, subtext, size, uiLevel ] )
 
- Adds a text row to this form.
+Adds a text row to this form.
+
+=over
 
 =item name
 
- The name field for this form element.
+The name field for this form element.
 
 =item label
 
- The left column label for this form row.
+The left column label for this form row.
 
 =item value
 
- The default value for this form element.
+The default value for this form element.
 
 =item maxlength
 
- The maximum number of characters to allow in this form element.
+The maximum number of characters to allow in this form element.
 
 =item extras
 
- If you want to add anything special to this form element like
- javascript actions, or stylesheet information, you'd add it in
- here as follows:
+If you want to add anything special to this form element like javascript actions, or stylesheet information, you'd add it in here as follows:
 
-   'onChange="this.form.submit()"'
+ 'onChange="this.form.submit()"'
 
 =item subtext
 
- Extra text to describe this form element or to provide special
- instructions.
+Extra text to describe this form element or to provide special instructions.
 
 =item size
 
- The number of characters wide this form element should be. There
- should be no reason for anyone to specify this.
+The number of characters wide this form element should be. There should be no reason for anyone to specify this.
 
 =item uiLevel
 
- The UI level for this field. See the WebGUI developer's site for
- details. Defaults to "0".
+The UI level for this field. See the WebGUI developer's site for details. Defaults to "0".
+
+=back
 
 =cut
 
@@ -1630,52 +1622,49 @@ sub text {
 
 =head2 textarea ( name [ label, value, subtext, extras, wrap, rows, columns, uiLevel ] )
 
- Adds a text area row to this form.
+Adds a text area row to this form.
+
+=over
 
 =item name
 
- The name field for this form element.
+The name field for this form element.
 
 =item label
 
- The left column label for this form row.
+The left column label for this form row.
 
 =item value
 
- The default value for this form element.
+The default value for this form element.
 
 =item subtext
 
- Extra text to describe this form element or to provide special
- instructions.
+Extra text to describe this form element or to provide special instructions.
 
 =item extras
 
- If you want to add anything special to this form element like
- javascript actions, or stylesheet information, you'd add it in
- here as follows:
+If you want to add anything special to this form element like javascript actions, or stylesheet information, you'd add it in here as follows:
 
-   'onChange="this.form.submit()"'
+ 'onChange="this.form.submit()"'
 
 =item wrap
 
- The method for wrapping text in the text area. Defaults to
- "virtual". There should be almost no reason to specify this.
+The method for wrapping text in the text area. Defaults to "virtual". There should be almost no reason to specify this.
 
 =item rows 
 
- The number of characters tall this form element should be. There
- should be no reason for anyone to specify this.
+The number of characters tall this form element should be. There should be no reason for anyone to specify this.
 
 =item columns
 
- The number of characters wide this form element should be. There
- should be no reason for anyone to specify this.
- 
+The number of characters wide this form element should be. There should be no reason for anyone to specify this.
+
 =item uiLevel
 
- The UI level for this field. See the WebGUI developer's site for
- details. Defaults to "0".
+The UI level for this field. See the WebGUI developer's site for details. Defaults to "0".
+
+=back
 
 =cut
 
@@ -1708,47 +1697,45 @@ sub textarea {
 
 =head2 url ( name [ label, value, maxlength, extras, subtext, size, uiLevel ] )
 
- Adds a URL row to this form.
+Adds a URL row to this form.
+
+=over
 
 =item name
 
- The name field for this form element.
+The name field for this form element.
 
 =item label
 
- The left column label for this form row.
+The left column label for this form row.
 
 =item value
 
- The default value for this form element.
+The default value for this form element.
 
 =item maxlength
 
- The maximum number of characters to allow in this form element.
- Defaults to 2048.
+The maximum number of characters to allow in this form element.  Defaults to 2048.
 
 =item extras
 
- If you want to add anything special to this form element like
- javascript actions, or stylesheet information, you'd add it in
- here as follows:
+If you want to add anything special to this form element like javascript actions, or stylesheet information, you'd add it in here as follows:
 
-   'onChange="this.form.submit()"'
+ 'onChange="this.form.submit()"'
 
 =item subtext
 
- Extra text to describe this form element or to provide special
- instructions.
+Extra text to describe this form element or to provide special instructions.
 
 =item size
 
- The number of characters wide this form element should be. There
- should be no reason for anyone to specify this.
+The number of characters wide this form element should be. There should be no reason for anyone to specify this.
 
 =item uiLevel
 
- The UI level for this field. See the WebGUI developer's site for
- details. Defaults to "0".
+The UI level for this field. See the WebGUI developer's site for details. Defaults to "0".
+
+=back
 
 =cut
 
@@ -1780,44 +1767,41 @@ sub url {
 
 =head2 whatNext ( options [, value, name, label, subtext, uiLevel, extras ] )
 
- Adds a "What next?" select list to this form for use with chained 
- action forms in WebGUI.
+Adds a "What next?" select list to this form for use with chained action forms in WebGUI.
+
+=over
 
 =item options
 
- A hash reference of the possible actions that could happen next.
+A hash reference of the possible actions that could happen next.
 
 =item value
 
- The selected element in this list.
+The selected element in this list.
 
 =item name
 
- The name field for this form element. Defaults to "proceed".
+The name field for this form element. Defaults to "proceed".
 
 =item label
 
- The left column label for this form row.
+The left column label for this form row.
 
 =item subtext
 
- Extra text to describe this form element or to provide special
- instructions.
+Extra text to describe this form element or to provide special instructions.
 
 =item uiLevel
 
- The UI level for this field. See the WebGUI developer's site for
- details. Defaults to "1".
-
-=cut
+The UI level for this field. See the WebGUI developer's site for details. Defaults to "1".
 
 =item extras
 
- If you want to add anything special to this form element like
- javascript actions, or stylesheet information, you'd add it in
- here as follows:
+If you want to add anything special to this form element like javascript actions, or stylesheet information, you'd add it in here as follows:
 
-   'onChange="this.form.submit()"'
+ 'onChange="this.form.submit()"'
+
+=back
 
 =cut
 
@@ -1850,38 +1834,37 @@ sub whatNext {
 
 =head2 yesNo ( name [ label, value, extras, subtext, uiLevel ] )
 
- Adds a yes/no radio menu to this form.
+Adds a yes/no radio menu to this form.
+
+=over
 
 =item name
 
- The name field for this form element.
+The name field for this form element.
 
 =item label
 
- The left column label for this form row.
+The left column label for this form row.
 
 =item value
 
- The default value(s) for this form element. Valid values are "1" 
- and "0". Defaults to "1".
+The default value(s) for this form element. Valid values are "1" and "0". Defaults to "1".
 
 =item extras
 
- If you want to add anything special to this form element like
- javascript actions, or stylesheet information, you'd add it in
- here as follows:
+If you want to add anything special to this form element like javascript actions, or stylesheet information, you'd add it in here as follows:
 
-   'onChange="this.form.submit()"'
+ 'onChange="this.form.submit()"'
 
 =item subtext
 
- Extra text to describe this form element or to provide special
- instructions.
+Extra text to describe this form element or to provide special instructions.
 
 =item uiLevel
 
- The UI level for this field. See the WebGUI developer's site for
- details. Defaults to "0".
+The UI level for this field. See the WebGUI developer's site for details. Defaults to "0".
+
+=back
 
 =cut
 
@@ -1912,46 +1895,45 @@ sub yesNo {
 
 =head2 zipcode ( name [ label, value, maxlength, extras, subtext, size, uiLevel ] )
 
- Adds a zip code row to this form.
+Adds a zip code row to this form.
+
+=over
 
 =item name
 
- The name field for this form element.
+The name field for this form element.
 
 =item label
 
- The left column label for this form row.
+The left column label for this form row.
 
 =item value
 
- The default value for this form element.
+The default value for this form element.
 
 =item maxlength
 
- The maximum number of characters to allow in this form element.
+The maximum number of characters to allow in this form element.
 
 =item extras
 
- If you want to add anything special to this form element like
- javascript actions, or stylesheet information, you'd add it in
- here as follows:
+If you want to add anything special to this form element like javascript actions, or stylesheet information, you'd add it in here as follows:
 
-   'onChange="this.form.submit()"'
+ 'onChange="this.form.submit()"'
 
 =item subtext
 
- Extra text to describe this form element or to provide special
- instructions.
+Extra text to describe this form element or to provide special instructions.
 
 =item size
 
- The number of characters wide this form element should be. There
- should be no reason for anyone to specify this.
+The number of characters wide this form element should be. There should be no reason for anyone to specify this.
 
 =item uiLevel
 
- The UI level for this field. See the WebGUI developer's site for
- details. Defaults to "0".
+The UI level for this field. See the WebGUI developer's site for details. Defaults to "0".
+
+=back
 
 =cut
 

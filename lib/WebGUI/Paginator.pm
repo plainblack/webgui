@@ -21,7 +21,7 @@ use WebGUI::URL;
 
 =head1 NAME
 
- Package WebGUI::Paginator
+Package WebGUI::Paginator
 
 =head1 SYNOPSIS
 
@@ -45,11 +45,11 @@ use WebGUI::URL;
 
 =head1 DESCRIPTION
 
- Package that paginates rows of arbitrary data for display on the web.
+Package that paginates rows of arbitrary data for display on the web.
 
 =head1 METHODS
 
- These methods are available from this class:
+These methods are available from this class:
 
 =cut
 
@@ -58,13 +58,15 @@ use WebGUI::URL;
 
 =head2 getBar ( [ pageNumber ] )
 
- Returns the pagination bar including First, Previous, Next, and
- last links. If there's only one page, nothing is returned.
+Returns the pagination bar including First, Previous, Next, and last links. If there's only one page, nothing is returned.
+
+=over
 
 =item pageNumber
- 
- Defaults to the page you're currently viewing. This is mostly here 
- as an override and probably has no real use.
+
+Defaults to the page you're currently viewing. This is mostly here as an override and probably has no real use.
+
+=back
 
 =cut
 
@@ -91,14 +93,15 @@ sub getBar {
 
 =head2 getBarAdvanced ( [ pageNumber ] )
 
- Returns the pagination bar including First, Previous, Page Numbers,
- Next, and Last links. If there's only one page, nothing is 
- returned.
+Returns the pagination bar including First, Previous, Page Numbers, Next, and Last links. If there's only one page, nothing is returned.
+
+=over
 
 =item pageNumber
 
- Defaults to the page you're currently viewing. This is mostly here
- as an override and probably has no real use.
+Defaults to the page you're currently viewing. This is mostly here as an override and probably has no real use.
+
+=back
 
 =cut
 
@@ -127,13 +130,15 @@ sub getBarAdvanced {
 
 =head2 getBarSimple ( [ pageNumber ] )
 
- Returns the pagination bar including only Previous and Next links.
- If there's only one page, nothing is returned.
+Returns the pagination bar including only Previous and Next links. If there's only one page, nothing is returned.
+
+=over
 
 =item pageNumber
 
- Defaults to the page you're currently viewing. This is mostly here
- as an override and probably has no real use.
+Defaults to the page you're currently viewing. This is mostly here as an override and probably has no real use.
+
+=back
 
 =cut 
 
@@ -156,14 +161,15 @@ sub getBarSimple {
 
 =head2 getBarTraditional ( [ pageNumber ] )
 
- Returns the pagination bar including Previous, Page Numbers,
- and Next links. If there's only one page, nothing is
- returned.
+Returns the pagination bar including Previous, Page Numbers, and Next links. If there's only one page, nothing is returned.
+
+=over
 
 =item pageNumber
 
- Defaults to the page you're currently viewing. This is mostly here
- as an override and probably has no real use.
+Defaults to the page you're currently viewing. This is mostly here as an override and probably has no real use.
+
+=back
 
 =cut
 
@@ -188,12 +194,15 @@ sub getBarTraditional {
 
 =head2 getFirstPageLink ( [ pageNumber ] )
 
- Returns a link to the first page's data.
+Returns a link to the first page's data.
+
+=over
 
 =item pageNumber
 
- Defaults to the page you're currently viewing. This is mostly here
- as an override and probably has no real use.
+Defaults to the page you're currently viewing. This is mostly here as an override and probably has no real use.
+
+=back
 
 =cut
 
@@ -215,12 +224,15 @@ sub getFirstPageLink {
 
 =head2 getLastPageLink ( [ pageNumber ] )
 
- Returns a link to the last page's data.
+Returns a link to the last page's data.
+
+=over
 
 =item pageNumber
 
- Defaults to the page you're currently viewing. This is mostly here
- as an override and probably has no real use.
+Defaults to the page you're currently viewing. This is mostly here as an override and probably has no real use.
+
+=back
 
 =cut
 
@@ -242,12 +254,15 @@ sub getLastPageLink {
 
 =head2 getNextPageLink ( [ pageNumber ] )
 
- Returns a link to the next page's data.
+Returns a link to the next page's data.
+
+=over
 
 =item pageNumber
 
- Defaults to the page you're currently viewing. This is mostly here
- as an override and probably has no real use.
+Defaults to the page you're currently viewing. This is mostly here as an override and probably has no real use.
+
+=back
 
 =cut
 
@@ -267,7 +282,7 @@ sub getNextPageLink {
 
 =head2 getNumberOfPages ( )
 
- Returns the number of pages in this paginator.
+Returns the number of pages in this paginator.
 
 =cut
 
@@ -282,15 +297,17 @@ sub getNumberOfPages {
 
 =head2 getPage ( [ pageNumber ] )
 
- Returns the data from the page specified as a string. 
+Returns the data from the page specified as a string. 
 
- NOTE: This is really only useful if you passed in an array reference
- of strings when you created this object.
+NOTE: This is really only useful if you passed in an array reference of strings when you created this object.
+
+=over
 
 =item pageNumber
 
- Defaults to the page you're currently viewing. This is mostly here
- as an override and probably has no real use.
+Defaults to the page you're currently viewing. This is mostly here as an override and probably has no real use.
+
+=back
 
 =cut
 
@@ -303,12 +320,15 @@ sub getPage {
 
 =head2 getPageData ( [ pageNumber ] )
 
- Returns the data from the page specified as an array reference.
+Returns the data from the page specified as an array reference.
+
+=over
 
 =item pageNumber
 
- Defaults to the page you're currently viewing. This is mostly here
- as an override and probably has no real use.
+Defaults to the page you're currently viewing. This is mostly here as an override and probably has no real use.
+
+=back
 
 =cut
 
@@ -331,8 +351,7 @@ sub getPageData {
 
 =head2 getPageNumber ( )
 
- Returns the current page number. If no page number can be found
- then it returns 1.
+Returns the current page number. If no page number can be found then it returns 1.
 
 =cut
 
@@ -344,12 +363,15 @@ sub getPageNumber {
 
 =head2 getPageLinks ( [ pageNumber ] )
 
- Returns links to all pages in this paginator.
+Returns links to all pages in this paginator.
+
+=over
 
 =item pageNumber
 
- Defaults to the page you're currently viewing. This is mostly here
- as an override and probably has no real use.
+Defaults to the page you're currently viewing. This is mostly here as an override and probably has no real use.
+
+=back
 
 =cut
 
@@ -373,12 +395,15 @@ sub getPageLinks {
 
 =head2 getPreviousPageLink ( [ pageNumber ] )
 
- Returns a link to the previous page's data. 
+Returns a link to the previous page's data. 
+
+=over
 
 =item pageNumber
 
- Defaults to the page you're currently viewing. This is mostly here
- as an override and probably has no real use.
+Defaults to the page you're currently viewing. This is mostly here as an override and probably has no real use.
+
+=back
 
 =cut
 
@@ -398,32 +423,31 @@ sub getPreviousPageLink {
 
 =head2 new ( currentURL, rowArrayRef [, paginateAfter, pageNumber, formVar ] )
 
- Constructor.
+Constructor.
+
+=over
 
 =item currentURL
 
- The URL of the current page including attributes. The page number
- will be appended to this in all links generated by the paginator.
+The URL of the current page including attributes. The page number will be appended to this in all links generated by the paginator.
 
 =item rowArrayRef
 
- An array reference to all the rows of data for this page.
+An array reference to all the rows of data for this page.
 
 =item paginateAfter
 
- The number of rows to display per page. If left blank it defaults
- to 50.
+The number of rows to display per page. If left blank it defaults to 50.
 
 =item pageNumber 
 
- By default the paginator uses a form variable of "pn" to determine the
- page number. If you wish it to use some other variable, then specify
- the page number here.
+By default the paginator uses a form variable of "pn" to determine the page number. If you wish it to use some other variable, then specify the page number here.
 
 =item formVar
 
- Specify the form variable the paginator should use in it's links.
- Defaults to "pn".
+Specify the form variable the paginator should use in it's links.  Defaults to "pn".
+
+=back
 
 =cut
 
@@ -442,18 +466,21 @@ sub new {
 
 =head2 setDataByQuery ( query [, dbh ] )
 
- Retrieves a data set from a database and replaces whatever data
- set was passed in through the constructor.
+Retrieves a data set from a database and replaces whatever data set was passed in through the constructor.
 
- NOTE: This retrieves only the current page's data for efficiency.
+NOTE: This retrieves only the current page's data for efficiency.
+
+=over
 
 =item query
 
- An SQL query that will retrieve a data set.
+An SQL query that will retrieve a data set.
 
 =item dbh
 
- A DBI-style database handler. Defaults to the WebGUI site handler.
+A DBI-style database handler. Defaults to the WebGUI site handler.
+
+=back
 
 =cut
 

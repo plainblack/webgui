@@ -25,7 +25,7 @@ our @EXPORT = qw(&helpIcon &becomeIcon &cutIcon &copyIcon &deleteIcon &editIcon 
 
 =head1 NAME
 
- Package WebGUI::Icon
+Package WebGUI::Icon
 
 =head1 SYNOPSIS
 
@@ -46,14 +46,11 @@ our @EXPORT = qw(&helpIcon &becomeIcon &cutIcon &copyIcon &deleteIcon &editIcon 
 
 =head1 DESCRIPTION
 
- A package for generating user interface buttons. The subroutines 
- found herein do nothing other than to create a short way of doing 
- much longer repetitive tasks. They simply make the programmer's life 
- easier through fewer keystrokes and less cluttered code.
+A package for generating user interface buttons. The subroutines found herein do nothing other than to create a short way of doing much longer repetitive tasks. They simply make the programmer's life easier through fewer keystrokes and less cluttered code.
 
 =head1 METHODS
 
- These subroutines are available from this package:
+These subroutines are available from this package:
 
 =cut
 
@@ -61,16 +58,19 @@ our @EXPORT = qw(&helpIcon &becomeIcon &cutIcon &copyIcon &deleteIcon &editIcon 
 
 =head2 becomeIcon ( urlParameters [, pageURL ] )
 
- Generates a button with the word "Become" printed on it.
+Generates a button with the word "Become" printed on it.
+
+=over
 
 =item urlParameters 
 
- Any URL parameters that need to be tacked on to the current URL
- to accomplish whatever function this button represents.
+Any URL parameters that need to be tacked on to the current URL to accomplish whatever function this button represents.
 
 =item pageURL
 
- The URL to any page. Defaults to the current page.
+The URL to any page. Defaults to the current page.
+
+=back
 
 =cut
 
@@ -86,16 +86,19 @@ sub becomeIcon {
 
 =head2 copyIcon ( urlParameters [, pageURL ] )
 
- Generates a button with the word "Copy" printed on it.
+Generates a button with the word "Copy" printed on it.
+
+=over
 
 =item urlParameters
 
- Any URL parameters that need to be tacked on to the current URL
- to accomplish whatever function this button represents.
+Any URL parameters that need to be tacked on to the current URL to accomplish whatever function this button represents.
 
 =item pageURL
 
- The URL to any page. Defaults to the current page.
+The URL to any page. Defaults to the current page.
+
+=back
 
 =cut
 
@@ -111,16 +114,19 @@ sub copyIcon {
 
 =head2 cutIcon ( urlParameters [, pageURL ] )
 
- Generates a button with the word "Cut" printed on it.
+Generates a button with the word "Cut" printed on it.
+
+=over
 
 =item urlParameters
 
- Any URL parameters that need to be tacked on to the current URL
- to accomplish whatever function this button represents.
+Any URL parameters that need to be tacked on to the current URL to accomplish whatever function this button represents.
 
 =item pageURL
 
- The URL to any page. Defaults to the current page.
+The URL to any page. Defaults to the current page.
+
+=back
 
 =cut
 
@@ -136,16 +142,19 @@ sub cutIcon {
 
 =head2 deleteIcon ( urlParameters [, pageURL ] )
 
- Generates a button with an "X" printed on it.
+Generates a button with an "X" printed on it.
+
+=over
 
 =item urlParameters
 
- Any URL parameters that need to be tacked on to the current URL
- to accomplish whatever function this button represents.
+Any URL parameters that need to be tacked on to the current URL to accomplish whatever function this button represents.
 
 =item pageURL
 
- The URL to any page. Defaults to the current page.
+The URL to any page. Defaults to the current page.
+
+=back
 
 =cut
 
@@ -161,16 +170,19 @@ sub deleteIcon {
 
 =head2 editIcon ( urlParameters [, pageURL ] )
 
- Generates a button with the word "Edit" printed on it.
+Generates a button with the word "Edit" printed on it.
+
+=over
 
 =item urlParameters
 
- Any URL parameters that need to be tacked on to the current URL
- to accomplish whatever function this button represents.
+Any URL parameters that need to be tacked on to the current URL to accomplish whatever function this button represents.
 
 =item pageURL
 
- The URL to any page. Defaults to the current page.
+The URL to any page. Defaults to the current page.
+
+=back
 
 =cut
 
@@ -186,17 +198,19 @@ sub editIcon {
 
 =head2 helpIcon ( helpId [, namespace ] )
 
- Generates a button with the word "Help" printed on it.
+Generates a button with the word "Help" printed on it.
+
+=over
 
 =item helpId 
 
- The id in the help table that relates to the help documentation
- for your function.
+The id in the help table that relates to the help documentation for your function.
 
 =item namespace
 
- If your help documentation is not in the WebGUI namespace, then
- you must specify the namespace for this help.
+If your help documentation is not in the WebGUI namespace, then you must specify the namespace for this help.
+
+=back
 
 =cut
 
@@ -212,16 +226,19 @@ sub helpIcon {
 
 =head2 moveBottomIcon ( urlParameters [, pageURL ] )
 
- Generates a button with a double down arrow printed on it.
+Generates a button with a double down arrow printed on it.
+
+=over
 
 =item urlParameters
 
- Any URL parameters that need to be tacked on to the current URL
- to accomplish whatever function this button represents.
+Any URL parameters that need to be tacked on to the current URL to accomplish whatever function this button represents.
 
 =item pageURL
 
- The URL to any page. Defaults to the current page.
+The URL to any page. Defaults to the current page.
+
+=back
 
 =cut
 
@@ -237,16 +254,19 @@ sub moveBottomIcon {
 
 =head2 moveDownIcon ( urlParameters [, pageURL ] )
 
- Generates a button with a down arrow printed on it.
+Generates a button with a down arrow printed on it.
+
+=over
 
 =item urlParameters
 
- Any URL parameters that need to be tacked on to the current URL
- to accomplish whatever function this button represents.
+Any URL parameters that need to be tacked on to the current URL to accomplish whatever function this button represents.
 
 =item pageURL
 
- The URL to any page. Defaults to the current page.
+The URL to any page. Defaults to the current page.
+
+=back
 
 =cut
 
@@ -262,16 +282,19 @@ sub moveDownIcon {
 
 =head2 moveTopIcon ( urlParameters [, pageURL ] )
 
- Generates a button with a double up arrow printed on it.
+Generates a button with a double up arrow printed on it.
+
+=over
 
 =item urlParameters
 
- Any URL parameters that need to be tacked on to the current URL
- to accomplish whatever function this button represents.
+Any URL parameters that need to be tacked on to the current URL to accomplish whatever function this button represents.
 
 =item pageURL
 
- The URL to any page. Defaults to the current page.
+The URL to any page. Defaults to the current page.
+
+=back
 
 =cut
 
@@ -287,16 +310,19 @@ sub moveTopIcon {
 
 =head2 moveUpIcon ( urlParameters [, pageURL ] )
 
- Generates a button with an up arrow printed on it.
+Generates a button with an up arrow printed on it.
+
+=over
 
 =item urlParameters
 
- Any URL parameters that need to be tacked on to the current URL
- to accomplish whatever function this button represents.
+Any URL parameters that need to be tacked on to the current URL to accomplish whatever function this button represents.
 
 =item pageURL
 
- The URL to any page. Defaults to the current page.
+The URL to any page. Defaults to the current page.
+
+=back
 
 =cut
 
@@ -312,9 +338,7 @@ sub moveUpIcon {
 
 =head2 pageIcon ( )
 
- Generates an icon that looks like a page. It's purpose is to
- represent whether you're looking at page properties or Wobject
- properties. 
+Generates an icon that looks like a page. It's purpose is to represent whether you're looking at page properties or Wobject properties. 
 
 =cut
 
@@ -326,16 +350,19 @@ sub pageIcon {
 
 =head2 viewIcon ( urlParameters [, pageURL ] )
 
- Generates a button with the word "View" printed on it.
+Generates a button with the word "View" printed on it.
+
+=over
 
 =item urlParameters
 
- Any URL parameters that need to be tacked on to the current URL
- to accomplish whatever function this button represents.
+Any URL parameters that need to be tacked on to the current URL to accomplish whatever function this button represents.
 
 =item pageURL
 
- The URL to any page. Defaults to the current page.
+The URL to any page. Defaults to the current page.
+
+=back
 
 =cut
 
@@ -351,9 +378,7 @@ sub viewIcon {
 
 =head2 wobjectIcon ( )
 
- Generates an icon that looks like a wobject. It's purpose is to
- represent whether you're looking at page properties or Wobject
- properties.
+Generates an icon that looks like a wobject. It's purpose is to represent whether you're looking at page properties or Wobject properties.
 
 =cut
 

@@ -22,7 +22,7 @@ use WebGUI::Session;
 
 =head1 NAME
 
- Package WebGUI::Node
+Package WebGUI::Node
 
 =head1 SYNOPSIS
 
@@ -35,15 +35,12 @@ use WebGUI::Session;
  $node->getURL;
 
 =head1 DESCRIPTION
- 
- Package to manipulate WebGUI storage nodes. The nodes system is a
- two-tiered filesystem hash that WebGUI uses to keep attachment
- data separated. There should be no need for anyone other than
- Plain Black Software to use this package.
+
+Package to manipulate WebGUI storage nodes. The nodes system is a two-tiered filesystem hash that WebGUI uses to keep attachment data separated. There should be no need for anyone other than Plain Black Software to use this package.
 
 =head1 METHODS
 
- These methods are available from this package:
+These methods are available from this package:
 
 =cut
 
@@ -52,7 +49,7 @@ use WebGUI::Session;
 
 =head2 create ( )
  
- Creates this node on the file system.
+Creates this node on the file system.
 
 =cut
 
@@ -76,7 +73,7 @@ sub create {
 
 =head2 delete ( )
 
- Deletes this node and its contents (if any) from the filesystem. 
+Deletes this node and its contents (if any) from the filesystem. 
 
 =cut
 
@@ -89,7 +86,7 @@ sub delete {
 
 =head2 getPath ( )
 
- Returns a full path to this node.
+Returns a full path to this node.
 
 =cut
 
@@ -107,7 +104,7 @@ sub getPath {
 
 =head2 getURL ( )
 
- Returns a full URL to this node.
+Returns a full URL to this node.
 
 =cut
 
@@ -125,7 +122,19 @@ sub getURL {
 
 =head2 new ( node1 [, node2 ] )
 
- Constructor.
+Constructor.
+
+=over
+
+=item node1
+
+ The first level of the hash heirarchy.
+
+=item node2
+
+ The second level of the hash heirarchy.
+
+=back
 
 =cut
 

@@ -27,7 +27,7 @@ our @EXPORT = qw(&makeTabSafe &makeArrayTabSafe &randomizeHash &commify &randomi
 
 =head1 NAME
 
- Package WebGUI::Utility
+Package WebGUI::Utility
 
 =head1 SYNOPSIS
 
@@ -47,12 +47,11 @@ our @EXPORT = qw(&makeTabSafe &makeArrayTabSafe &randomizeHash &commify &randomi
 
 =head1 DESCRIPTION
 
- This package provides miscellaneous but useful utilities to the
- WebGUI programmer.
+This package provides miscellaneous but useful utilities to the WebGUI programmer.
 
 =head1 METHODS
 
- These subroutines are available from this package:
+These subroutines are available from this package:
 
 =cut
 
@@ -61,11 +60,15 @@ our @EXPORT = qw(&makeTabSafe &makeArrayTabSafe &randomizeHash &commify &randomi
 
 =head2 commify ( integer )
 
- Returns a number with commas applied at each third character.
+Returns a number with commas applied at each third character.
+
+=over
 
 =item integer
 
- Any old number will do.
+Any old number will do.
+
+=back
 
 =cut
 
@@ -79,15 +82,19 @@ sub commify {
 
 =head2 isIn ( value, list )
 
- Returns a boolean value as to whether the value is in the array.
+Returns a boolean value as to whether the value is in the array.
+
+=over
 
 =item value
 
- The value to check for.
+The value to check for.
 
 =item list
 
- An array to look for the value in.
+An array to look for the value in.
+
+=back
 
 =cut
 
@@ -115,13 +122,15 @@ sub isIn {
 
 =head2 makeArrayCommaSafe ( array )
 
- Searches through an array looking for commas and replaces them with
- semi-colons. Also replaces carriage returns with spaces. This is 
- useful for exporting comma separated data.
+Searches through an array looking for commas and replaces them with semi-colons. Also replaces carriage returns with spaces. This is useful for exporting comma separated data.
+
+=over
 
 =item array
 
- A reference to the array to look through.
+A reference to the array to look through.
+
+=back
 
 =cut
 
@@ -137,13 +146,15 @@ sub makeArrayCommaSafe {
 
 =head2 makeArrayTabSafe ( array )
 
- Searches through an array looking for tabs and replaces them with
- four spaces. Also replaces carriage returns with a space. This is
- useful for exporting tab separated data.
+Searches through an array looking for tabs and replaces them with four spaces. Also replaces carriage returns with a space. This is useful for exporting tab separated data.
+
+=over
 
 =item array
 
  A reference to the array to look through.
+
+=back
 
 =cut
 
@@ -159,11 +170,15 @@ sub makeArrayTabSafe {
 
 =head2 makeCommaSafe ( text )
 
- Replaces commas with semi-colons and carriage returns with spaces.
+Replaces commas with semi-colons and carriage returns with spaces.
+
+=over
 
 =item text
 
- The text to search through.
+The text to search through.
+
+=back
 
 =cut
 
@@ -177,13 +192,17 @@ sub makeCommaSafe {
 
 #-------------------------------------------------------------------
 
-=head2 makeCommaSafe ( text )
+=head2 makeTabSafe ( text )
 
- Replaces tabs with four spaces and carriage returns with a space each.
+Replaces tabs with four spaces and carriage returns with a space each.
+
+=over
 
 =item text
 
- The text to search through.
+The text to search through.
+
+=back
 
 =cut
 
@@ -199,15 +218,19 @@ sub makeTabSafe {
 
 =head2 randint ( low, high )
 
- Returns an integer between the low and high number.
+Returns an integer between the low and high number.
+
+=over
 
 =item low
 
- The lowest possible value. Defaults to 0.
+The lowest possible value. Defaults to 0.
 
 =item high
 
- The highest possible value. Defaults to 1.
+The highest possible value. Defaults to 1.
+
+=back
 
 =cut
 
@@ -223,11 +246,15 @@ sub randint {
 
 =head2 randomizeArray ( array )
 
- Resorts an array in random order.
+Resorts an array in random order.
+
+=over
 
 =item array
 
- A reference to the array to randomize.
+A reference to the array to randomize.
+
+=back
 
 =cut
 
@@ -247,11 +274,15 @@ sub randomizeArray {
 
 =head2 randomizeHash ( hashRef )
 
- Resorts a hash tied to IxHash in random order. Returns a hash reference.
+Resorts a hash tied to IxHash in random order. Returns a hash reference.
+
+=over
 
 =item hashRef
 
- A reference hash to randomize.
+A reference hash to randomize.
+
+=back
 
 =cut
 
@@ -273,11 +304,15 @@ sub randomizeHash {
 
 =head2 round ( real )
 
- Returns an integer after rounding a real number.
+Returns an integer after rounding a real number.
+
+=over
 
 =item real
 
- Any floating point number.
+Any floating point number.
+
+=back
 
 =cut
 
@@ -289,13 +324,17 @@ sub round {
 
 =head2 sortHash ( hashRef )
 
- Sorts a hash by its values. Returns a hash reference.
+Sorts a hash by its values. Returns a hash reference.
 
- TIP: This subroutine can screw up your hash if the values aren't all unique.
+TIP: This subroutine can screw up your hash if the values aren't all unique.
+
+=over
 
 =item hashRef
 
- A reference to the hash to be sorted.
+A reference to the hash to be sorted.
+
+=back
 
 =cut
 
@@ -317,13 +356,17 @@ sub sortHash {
 
 =head2 sortHashDecending 
 
- Sorts a hash in decending order by its values. Returns a hash reference.
+Sorts a hash in decending order by its values. Returns a hash reference.
 
- TIP: This subroutine can screw up your hash if the values aren't all unique.
+TIP: This subroutine can screw up your hash if the values aren't all unique.
+
+=over
 
 =item hashRef
 
- A reference to the hash to be sorted.
+A reference to the hash to be sorted.
+
+=back
 
 =cut
 

@@ -24,7 +24,7 @@ use WebGUI::Authentication;
 
 =head1 NAME
 
- Package WebGUI::User
+Package WebGUI::User
 
 =head1 SYNOPSIS
 
@@ -45,12 +45,11 @@ use WebGUI::Authentication;
 
 =head1 DESCRIPTION
 
- This package provides an object-oriented way of managing WebGUI
- users as well as getting/setting a users's profile data.
+This package provides an object-oriented way of managing WebGUI users as well as getting/setting a users's profile data.
 
 =head1 METHODS
 
- These methods are available from this class:
+These methods are available from this class:
 
 =cut
 
@@ -66,11 +65,15 @@ sub _create {
 
 =head2 addToGroups ( groups )
 
- Adds this user to the specified groups.
+Adds this user to the specified groups.
+
+=over
 
 =item groups
 
- An array reference containing a list of groups.
+An array reference containing a list of groups.
+
+=back
 
 =cut
 
@@ -89,13 +92,15 @@ sub addToGroups {
 
 =head2 authMethod ( [ value ] )
 
- Returns the authentication method for this user.
+Returns the authentication method for this user.
+
+=over
 
 =item value
 
- If specified, the authMethod is set to this value. The only valid
- values are "WebGUI" and "LDAP". When a new account is created,
- authMethod is defaulted to "WebGUI".
+If specified, the authMethod is set to this value. The only valid values are "WebGUI" and "LDAP". When a new account is created, authMethod is defaulted to "WebGUI".
+
+=back
 
 =cut
 
@@ -115,7 +120,7 @@ sub authMethod {
 
 =head2 dateCreated ( )
 
- Returns the epoch for when this user was created.
+Returns the epoch for when this user was created.
 
 =cut
 
@@ -127,7 +132,7 @@ sub dateCreated {
 
 =head2 delete ( )
 
- Deletes this user.
+Deletes this user.
 
 =cut
 
@@ -146,11 +151,15 @@ sub delete {
 
 =head2 deleteFromGroups ( groups )
 
- Deletes this user from the specified groups.
+Deletes this user from the specified groups.
+
+=over
 
 =item groups
 
- An array reference containing a list of groups.
+An array reference containing a list of groups.
+
+=back
 
 =cut
 
@@ -182,23 +191,23 @@ sub identifier {
 
 =head2 karma ( amount, source, description )
 
- Returns the current level of karma this user has earned. 
+Returns the current level of karma this user has earned. 
+
+=over
 
 =item amount
 
- An integer to modify this user's karma by. Note that this number can
- be positive or negative.
+An integer to modify this user's karma by. Note that this number can be positive or negative.
 
 =item source
 
- A descriptive source for this karma. Typically it would be something
- like "MessageBoard (49)" or "Admin (3)". Source is used to track
- where a karma modification came from.
+A descriptive source for this karma. Typically it would be something like "MessageBoard (49)" or "Admin (3)". Source is used to track where a karma modification came from.
 
 =item description
 
- A description of why this user's karma was modified. For instance it
- could be "Message Board Post" or "He was a good boy!".
+A description of why this user's karma was modified. For instance it could be "Message Board Post" or "He was a good boy!".
+
+=back
 
 =cut
 
@@ -214,7 +223,7 @@ sub karma {
 
 =head2 lastUpdated ( )
 
- Returns the epoch for when this user was last modified.
+Returns the epoch for when this user was last modified.
 
 =cut
 
@@ -226,14 +235,15 @@ sub lastUpdated {
 
 =head2 new ( userId )
 
- Constructor.
+Constructor.
+
+=over
 
 =item userId 
 
- The userId of the user you're creating an object reference for. If
- left blank it will default to "1" (Visitor). If specified as "new"
- then a new user account will be created and assigned the next
- available userId.
+The userId of the user you're creating an object reference for. If left blank it will default to "1" (Visitor). If specified as "new" then a new user account will be created and assigned the next available userId.
+
+=back
 
 =cut
 
@@ -265,17 +275,19 @@ sub new {
 
 =head2 profileField ( fieldName [ value ] )
 
- Returns a profile field's value. If "value" is specified, it also
- sets the field to that value. 
+Returns a profile field's value. If "value" is specified, it also sets the field to that value. 
+
+=over
 
 =item fieldName 
 
- The profile field name such as "language" or "email" or 
- "cellPhone".
+The profile field name such as "language" or "email" or "cellPhone".
 
 =item value
 
- The value to set the profile field name to.
+The value to set the profile field name to.
+
+=back
 
 =cut
 
@@ -297,12 +309,15 @@ sub profileField {
 
 =head2 status ( [ value ] )
 
- Returns the status of the user. 
+Returns the status of the user. 
+
+=over
 
 =item value
 
- If specified, the status is set to this value. 
- Possible values are 'Active', 'Selfdestructed' and 'Deactivated'.
+If specified, the status is set to this value.  Possible values are 'Active', 'Selfdestructed' and 'Deactivated'.
+
+=back
 
 =cut
 
@@ -322,11 +337,15 @@ sub status {
 
 =head2 username ( [ value ] )
 
- Returns the username. 
+Returns the username. 
+
+=over
 
 =item value
 
- If specified, the username is set to this value. 
+If specified, the username is set to this value. 
+
+=back
 
 =cut
 
@@ -346,7 +365,7 @@ sub username {
 
 =head2 userId ( )
 
- Returns the userId for this user.
+Returns the userId for this user.
 
 =cut
 

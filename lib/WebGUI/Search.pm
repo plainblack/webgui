@@ -25,7 +25,7 @@ use WebGUI::SQL;
 
 =head1 NAME
 
- Package WebGUI::Search
+Package WebGUI::Search
 
 =head1 SYNOPSIS
 
@@ -35,12 +35,11 @@ use WebGUI::SQL;
 
 =head1 DESCRIPTION
 
- A package built to take the hassle out of creating advanced search
- functionality in WebGUI applications.
+A package built to take the hassle out of creating advanced search functionality in WebGUI applications.
 
 =head1 METHODS
 
- These methods are available from this package:
+These methods are available from this package:
 
 =cut
 
@@ -49,37 +48,31 @@ use WebGUI::SQL;
 
 =head2 buildConstraints ( fieldList ) { [ all, atLeastOne, exactPhrase, without ] }
 
- Generates and returns the constraints to an SQL where clause based
- upon input from the user.
+Generates and returns the constraints to an SQL where clause based upon input from the user.
+
+=over
 
 =item fieldList
 
- An array reference that contains a list of the fields (table 
- columns) to be considered when searching.
+An array reference that contains a list of the fields (table columns) to be considered when searching.
 
 =item all
 
- A form param with a comma or space separated list of key words to
- search for in the fields of the fieldList. All the words listed
- here must be found to be true.
+A form param with a comma or space separated list of key words to search for in the fields of the fieldList. All the words listed here must be found to be true.
 
 =item atLeastOne
 
- A form param with a comma or space separated list of key words to
- search for in the fields of the fieldList. Any of the words may
- match in any of the fields for this to be true.
+A form param with a comma or space separated list of key words to search for in the fields of the fieldList. Any of the words may match in any of the fields for this to be true.
 
 =item exactPhrase
 
- A form param with a phrase to search for in the fields of the
- fieldList. The exact phrase must be found in one of the fields
- to be true.
+A form param with a phrase to search for in the fields of the fieldList. The exact phrase must be found in one of the fields to be true.
 
 =item without
 
- A form param with a comma or space separated list of key words to
- search for in the fields of the fieldList. None of the words may
- be found in any of the fields for this to be true.
+A form param with a comma or space separated list of key words to search for in the fields of the fieldList. None of the words may be found in any of the fields for this to be true.
+
+=back
 
 =cut
 
@@ -143,17 +136,19 @@ sub buildConstraints {
 
 =head2 form ( hiddenFields ) { [ numResults ] }
 
- Generates and returns the advanced search form.
+Generates and returns the advanced search form.
+
+=over
 
 =item hiddenFields
 
- A hash reference that contains any name/value pairs that should be
- included as hidden fields in the search form.
+A hash reference that contains any name/value pairs that should be included as hidden fields in the search form.
 
 =item numResults
 
- A form param that can optionally specify the number of results to
- display. Defaults to 25.
+A form param that can optionally specify the number of results to display. Defaults to 25.
+
+=back
 
 =cut
 
@@ -201,6 +196,22 @@ sub form {
 }
 
 #-------------------------------------------------------------------
+
+=head2 toggleURL ( [ pairs ] )
+
+Returns a URL that toggles the value "search" in the user's scratch
+variables on and off.
+
+=over
+
+=item pairs
+
+URL name value pairs (this=that&foo=bar) to be passed with this toggle.
+
+=back
+
+=cut
+
 sub toggleURL {
 	WebGUI::Session::setScratch("search",$session{form}{search});
 	my $url;

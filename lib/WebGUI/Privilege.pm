@@ -24,7 +24,7 @@ use WebGUI::URL;
 
 =head1 NAME
 
- Package WebGUI::Privilege
+Package WebGUI::Privilege
 
 =head1 SYNOPSIS
 
@@ -41,12 +41,11 @@ use WebGUI::URL;
 
 =head1 DESCRIPTION
 
- This package provides access to the WebGUI security system
- and security messages. 
+This package provides access to the WebGUI security system and security messages. 
 
 =head1 FUNCTIONS 
 
- These functions are available from this package:
+These functions are available from this package:
 
 =cut
 
@@ -54,9 +53,7 @@ use WebGUI::URL;
 
 =head2 adminOnly ( )
 
- Returns a message stating that this functionality can only be used
- by administrators. This method also sets the HTTP header status to 
- 401.
+Returns a message stating that this functionality can only be used by administrators. This method also sets the HTTP header status to 401.
 
 =cut
 
@@ -87,13 +84,15 @@ sub adminOnly {
 
 =head2 canEditPage ( [ pageId ] )
 
- Returns a boolean (0|1) value signifying that the user has the
- required privileges.
+Returns a boolean (0|1) value signifying that the user has the required privileges.
+
+=over
 
 =item pageId
 
- The unique identifier for the page that you wish to check the
- privileges on. Defaults to the current page id.
+The unique identifier for the page that you wish to check the privileges on. Defaults to the current page id.
+
+=back
 
 =cut
 
@@ -123,14 +122,15 @@ sub canEditPage {
 
 =head2 canViewPage ( [ pageId ] )
 
- Returns a boolean (0|1) value signifying that the user has the
- required privileges. Always returns true for Admins and users that
- have the rights to edit this page.
+Returns a boolean (0|1) value signifying that the user has the required privileges. Always returns true for Admins and users that have the rights to edit this page.
+
+=over
 
 =item pageId
 
- The unique identifier for the page that you wish to check the
- privileges on. Defaults to the current page id.
+The unique identifier for the page that you wish to check the privileges on. Defaults to the current page id.
+
+=back
 
 =cut
 
@@ -165,9 +165,7 @@ sub canViewPage {
 
 =head2 insufficient ( )
 
- Returns a message stating that the user does not have the required
- privileges to perform the operation they requested. This method 
- also sets the HTTP header status to 401. 
+Returns a message stating that the user does not have the required privileges to perform the operation they requested. This method also sets the HTTP header status to 401. 
 
 =cut
 
@@ -193,17 +191,19 @@ sub insufficient {
 
 =head2 isInGroup ( groupId [ , userId ] )
 
- Returns a boolean (0|1) value signifying that the user has the
- required privileges. Always returns true for Admins.
+Returns a boolean (0|1) value signifying that the user has the required privileges. Always returns true for Admins.
+
+=over
 
 =item groupId
 
- The group that you wish to verify against the user.
+The group that you wish to verify against the user.
 
 =item userId
 
- The user that you wish to verify against the group. Defaults to the
- currently logged in user.
+The user that you wish to verify against the group. Defaults to the currently logged in user.
+
+=back
 
 =cut
 
@@ -277,9 +277,7 @@ sub isInGroup {
 
 =head2 noAccess ( )
 
- Returns a message stating that the user does not have the privileges
- necessary to access this page. This method also sets the HTTP header 
- status to 401.
+Returns a message stating that the user does not have the privileges necessary to access this page. This method also sets the HTTP header status to 401.
 
 =cut
 
@@ -308,9 +306,7 @@ sub noAccess {
 
 =head2 notMember ( )
 
- Returns a message stating that the user they requested information
- about is no longer active on this server. This method also sets the 
- HTTP header status to 400.
+Returns a message stating that the user they requested information about is no longer active on this server. This method also sets the HTTP header status to 400.
 
 =cut
 
@@ -335,9 +331,7 @@ sub notMember {
 
 =head2 vitalComponent ( )
 
- Returns a message stating that the user made a request to delete
- something that should never delete. This method also sets the HTTP
- header status to 403. 
+Returns a message stating that the user made a request to delete something that should never delete. This method also sets the HTTP header status to 403. 
 
 =cut
 

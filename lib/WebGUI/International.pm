@@ -22,7 +22,7 @@ my %international;
 
 =head1 NAME
 
- Package WebGUI::International
+Package WebGUI::International
 
 =head1 SYNOPSIS
 
@@ -32,11 +32,11 @@ my %international;
 
 =head1 DESCRIPTION
 
- This package provides an interface to the internationalization system. 
+This package provides an interface to the internationalization system. 
 
 =head1 FUNCTIONS
 
- These functions are available from this package:
+These functions are available from this package:
 
 =cut
 
@@ -45,25 +45,23 @@ my %international;
 
 =head2 get ( internationalId [ , namespace, languageId ] )
 
- Returns the internationalized message string for the user's language.
- If there is no internationalized message, this method will
- return the English string.
+Returns the internationalized message string for the user's language.  If there is no internationalized message, this method will return the English string.
+
+=over
 
 =item internationalId
 
- An integer that relates to a message in the international table
- in the WebGUI database.
+An integer that relates to a message in the international table in the WebGUI database.
 
 =item namespace
 
- A string that relates to the namespace field in the international
- table in the WebGUI database. Defaults to 'WebGUI'.
+A string that relates to the namespace field in the international table in the WebGUI database. Defaults to 'WebGUI'.
 
 =item languageId
 
- An integer that specifies the language that the user should see.
- Defaults to the user's defined language. If the user hasn't specified
- a default language it defaults to '1' (English).
+An integer that specifies the language that the user should see.  Defaults to the user's defined language. If the user hasn't specified a default language it defaults to '1' (English).
+
+=back
 
 =cut
 
@@ -97,8 +95,7 @@ sub get {
 
 =head2 getLanguages ( )
 
- Returns a hash reference to the languages (languageId/lanugage) 
- installed on this WebGUI system.  
+Returns a hash reference to the languages (languageId/lanugage) installed on this WebGUI system.  
 
 =cut
 

@@ -21,7 +21,7 @@ use WebGUI::URL;
 
 =head1 NAME
 
- Package WebGUI::Profile
+Package WebGUI::Profile
 
 =head1 SYNOPSIS
 
@@ -30,11 +30,11 @@ use WebGUI::URL;
 
 =head1 DESCRIPTION
 
- Package that allows getting and setting of user profile information.
+Package that allows getting and setting of user profile information.
 
 =head1 METHODS
 
- These methods are available from this class:
+These methods are available from this class:
 
 =cut
 
@@ -43,7 +43,7 @@ use WebGUI::URL;
 
 =head2 get ( )
 
- Returns a profile hash for this user.
+Returns a profile hash for this user.
 
 =cut
 
@@ -58,11 +58,15 @@ sub get {
 
 =head2 new ( userId )
 
- Constructor.
+Constructor.
+
+=over
 
 =item userId 
 
  The userId for the profile you wish to manipulate.
+
+=back
 
 =cut
 
@@ -75,17 +79,21 @@ sub new {
 
 #-------------------------------------------------------------------
 
-=head setAttribute ( attributeName, value ) 
+=head2 setAttribute ( attributeName, value ) 
 
- Sets the value of an attribute.
+Sets the value of an attribute.
+
+=over
 
 =item attributeName
 
- An attribute of the user profile.
+An attribute of the user profile.
 
 =item value
 
- The value to set the above named attribute to.
+The value to set the above named attribute to.
+
+=back
 
 =cut
 

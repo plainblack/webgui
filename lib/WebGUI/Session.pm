@@ -33,7 +33,7 @@ tie %session, 'Tie::CPHash';
 
 =head1 NAME
 
- Package WebGUI::Session
+Package WebGUI::Session
 
 =head1 SYNOPSIS
 
@@ -53,23 +53,15 @@ tie %session, 'Tie::CPHash';
 
 =head1 DESCRIPTION
 
- This package is the heart and lifeblood of WebGUI. Without it WebGUI
- could not exist. By using this package a package gains access to
- WebGUI's $session variable which contains everything WebGUI needs to
- know to operate.
+This package is the heart and lifeblood of WebGUI. Without it WebGUI could not exist. By using this package a package gains access to WebGUI's $session variable which contains everything WebGUI needs to know to operate.
 
- NOTE: It is important to distinguish the difference between a WebGUI
- session and a user session. A user session is attached to a WebGUI
- session. A WebGUI session is all of the basic data the WebGUI needs
- to operate.
+NOTE: It is important to distinguish the difference between a WebGUI session and a user session. A user session is attached to a WebGUI session. A WebGUI session is all of the basic data the WebGUI needs to operate.
 
- TIP: The $session variable is a case-insensitive hash. The contents
- of the has vary, but can be seen by adding debug=1 to the end of any
- WebGUI URL while logged in as an admin user.
+TIP: The $session variable is a case-insensitive hash. The contents of the has vary, but can be seen by adding debug=1 to the end of any WebGUI URL while logged in as an admin user.
 
 =head1 METHODS
 
- These subroutines are available from this package:
+These subroutines are available from this package:
 
 =cut
 
@@ -248,8 +240,7 @@ sub _loadWobjects {
 
 =head2 close
 
- Cleans up a WebGUI session information from memory and disconnects from
- any resources opened by the session.
+Cleans up a WebGUI session information from memory and disconnects from any resources opened by the session.
 
 =cut
 
@@ -263,15 +254,19 @@ sub close {
 
 =head2 convertVisitorToUser ( sessionId, userId )
 
- Converts a visitor session to a user session.
+Converts a visitor session to a user session.
+
+=over
 
 =item sessionId
 
- The session to convert.
+The session to convert.
 
 =item userId
 
- The user for the session to become.
+The user for the session to become.
+
+=back
 
 =cut
 
@@ -285,11 +280,15 @@ sub convertVisitorToUser {
 
 =head2 end ( sessionId ) 
 
- Removes the specified user session from memory and database.
+Removes the specified user session from memory and database.
+
+=over
 
 =item sessionId
 
- The session to end.
+The session to end.
+
+=back
 
 =cut
 
@@ -305,7 +304,7 @@ sub end {
 
 =head2 httpHeader ( ) 
 
- Generates an HTTP header.
+Generates an HTTP header.
 
 =cut
 
@@ -328,11 +327,15 @@ sub httpHeader {
 
 =head2 httpRedirect ( url )
 
- Generates an HTTP header for redirect.
+Generates an HTTP header for redirect.
+
+=over
 
 =item url
 
- The URL to redirect to.
+The URL to redirect to.
+
+=back
 
 =cut
 
@@ -345,15 +348,19 @@ sub httpRedirect {
 
 =head2 open ( webguiRoot [ , configFile ] )
 
- Opens a closed ( or new ) WebGUI session.
+Opens a closed ( or new ) WebGUI session.
+
+=over
 
 =item webguiRoot
 
- The path to the WebGUI files.
+The path to the WebGUI files.
 
 =item configFile
 
- The filename of the config file that WebGUI should operate from.
+The filename of the config file that WebGUI should operate from.
+
+=back
 
 =cut
 
@@ -461,12 +468,15 @@ sub open {
 
 =head2 refreshPageInfo ( [ pageId ] ) 
 
- Updates the WebGUI session to reflect new page information.
+Updates the WebGUI session to reflect new page information.
+
+=over
 
 =item pageId
 
- Defaults to page id "1". Specify the page id to change this WebGUI
- session to use.
+Defaults to page id "1". Specify the page id to change this WebGUI session to use.
+
+=back
 
 =cut
 
@@ -484,13 +494,17 @@ sub refreshPageInfo {
 
 =head2 refreshSessionVars ( sessionId )
 
- Updates the user session variables from the database.
+Updates the user session variables from the database.
 
- NOTE: This also updates the user information.
+NOTE: This also updates the user information.
+
+=over
 
 =item sessionId
 
- The session id to update.
+The session id to update.
+
+=back
 
 =cut
 
@@ -503,12 +517,15 @@ sub refreshSessionVars {
 
 =head2 refreshUserInfo ( userId ) 
 
- Refreshes the user's information from the database into this user
- session.
+Refreshes the user's information from the database into this user session.
+
+=over
 
 =item userId
 
  The user id to refresh into this session.
+
+=back
 
 =cut
 
@@ -521,21 +538,23 @@ sub refreshUserInfo {
 
 =head2 setCookie ( name, value [ , timeToLive ] ) 
 
- Sends a cookie to the browser.
+Sends a cookie to the browser.
+
+=over
 
 =item name
 
- The name of the cookie to set. Must be unique from all other cookies
- from this domain or it will overwrite that cookie.
+The name of the cookie to set. Must be unique from all other cookies from this domain or it will overwrite that cookie.
 
 =item value
 
- The value to set.
+The value to set.
 
 =item timeToLive
 
- The time that the cookie should remain in the browser. Defaults to
- "+10y" (10 years from now).
+The time that the cookie should remain in the browser. Defaults to "+10y" (10 years from now).
+
+=back
 
 =cut
 
@@ -556,19 +575,19 @@ sub setCookie {
 
 =head2 setScratch ( name, value )
 
- Sets a scratch variable for this user session. Scratch variables are
- just arbitrary bits of data that a programmer may wish to store in
- a user session from page to page.
+Sets a scratch variable for this user session. Scratch variables are just arbitrary bits of data that a programmer may wish to store in a user session from page to page.
+
+=over
 
 =item name
 
- The name of the scratch variable.
+The name of the scratch variable.
 
 =item value
 
- The value of the scratch variable. If the value is blank but defined
- or if it is set to "-delete-" then the scratch variable will be
- removed from the user session.
+The value of the scratch variable. If the value is blank but defined or if it is set to "-delete-" then the scratch variable will be removed from the user session.
+
+=back
 
 =cut
 
@@ -593,16 +612,19 @@ sub setScratch {
 
 =head2 start ( userId [ , sessionId ] )
 
- Start a new user session.
+Start a new user session.
+
+=over
 
 =item userId
 
- The user id of the user to create a session for.
+The user id of the user to create a session for.
 
 =item sessionId
 
- Session id will be generated if not specified. In almost every case
- you should let the system generate the session id.
+Session id will be generated if not specified. In almost every case you should let the system generate the session id.
+
+=back
 
 =cut
 

@@ -25,7 +25,7 @@ use WebGUI::Template;
 
 =head1 NAME
 
- Package WebGUI::Style
+Package WebGUI::Style
 
 =head1 SYNOPSIS
 
@@ -34,11 +34,11 @@ use WebGUI::Template;
 
 =head1 DESCRIPTION
 
- This package contains utility methods for WebGUI's style system.
+This package contains utility methods for WebGUI's style system.
 
 =head1 METHODS
 
- These subroutines are available from this package:
+These subroutines are available from this package:
 
 =cut
 
@@ -47,7 +47,7 @@ use WebGUI::Template;
 
 =head2 get ( )
 
- Returns a style based upon the current WebGUI session information.
+Returns a style based upon the current WebGUI session information.
 
 =cut
 
