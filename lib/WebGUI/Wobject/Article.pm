@@ -189,10 +189,6 @@ sub www_view {
                 $templateId = $session{form}{overrideTemplateId};
         }
 	if ($session{form}{forumOp}) {
-		unless ($!= $self->get("wobjectId")) {
-                        WebGUI::ErrorHandler::security("access a forum that was not related to this message board (".$self->get("wobjectId").")");
-                        return WebGUI::Privilege::insufficient();
-                }
 		return WebGUI::Forum::UI::forumOp({
 			callback=>$callback,
 			title=>$self->get("title"),
