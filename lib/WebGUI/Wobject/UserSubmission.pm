@@ -36,7 +36,7 @@ our $name = WebGUI::International::get(29,$namespace);
 sub duplicate {
         my ($sth, $file, @row, $newSubmissionId, $w);
 	$w = $_[0]->SUPER::duplicate($_[1]);
-        $w = WebGUI::Wobject::DownloadManager->new({wobjectId=>$w,namespace=>$namespace});
+        $w = WebGUI::Wobject::UserSubmission->new({wobjectId=>$w,namespace=>$namespace});
         $w->set({
 		groupToContribute=>$_[0]->get("groupToContribute"),
 		submissionsPerPage=>$_[0]->get("submissionsPerPage"),
