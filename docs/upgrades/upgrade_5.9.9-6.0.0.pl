@@ -606,10 +606,7 @@ sub _positionFormat6x {
 			<tmpl_if wobject.canView> 
 				<div class="wobject"> <div class="wobject<tmpl_var wobject.namespace>" id="wobjectId<tmpl_var wobject.id>">
 				<tmpl_if session.var.adminOn> <tmpl_if wobject.canEdit>
-					<tmpl_var wobject.controls>
-					<tmpl_if page.canEdit>
-						<tmpl_var wobject.controls.drag>
-					</tmpl_if>
+					<tmpl_var wobject.controls><tmpl_if page.canEdit><tmpl_var wobject.controls.drag></tmpl_if>
 				</tmpl_if> </tmpl_if>
 				<tmpl_if wobject.isInDateRange>
                       			<a name="<tmpl_var wobject.id>"></a>
