@@ -87,6 +87,7 @@ sub www_view {
 		$rssFile = $cache->setByHTTP($_[0]->get("rssUrl"),3600);
 	}
 	$rssFile =~ s#(<title>)(.*?)(</title>)#$1.encode_entities(decode_entities($2)).$3#ges; 
+	$rssFile =~ s#(<description>)(.*?)(</description>)#$1.encode_entities(decode_entities($2)).$3#ges; 
 	eval{parseRSS(\%rss, \$rssFile)};
 	if ($@) {
 		WebGUI::ErrorHandler::warn($_[0]->get("rssUrl")." ".$@);
