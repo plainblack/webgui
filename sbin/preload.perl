@@ -155,7 +155,7 @@ use WebGUI::Asset::Snippet ();
 use WebGUI::Asset::Wobject::Article ();
 use WebGUI::Asset::Wobject::Layout ();
 use WebGUI::Asset::Wobject::Navigation ();
-use WebGUI::Asset::Wobject::USS ();
+#use WebGUI::Asset::Wobject::USS ();
 
 # auth methods
 use WebGUI::Auth::WebGUI ();
