@@ -473,7 +473,7 @@ sub moveCollateralUp {
         $setValue = $_[5] || $_[0]->get($setName);
         ($seq) = WebGUI::SQL->quickArray("select sequenceNumber from $_[1] where $_[2]=$_[3] and $setName=".quote($setValue));
         ($id) = WebGUI::SQL->quickArray("select $_[2] from $_[1] where $setName=".quote($setValue)
-		." and sequenceNumber=$seq-1 group by $setValue");
+		." and sequenceNumber=$seq-1 group by $setName");
         if ($id ne "") {
                 WebGUI::SQL->write("update $_[1] set sequenceNumber=sequenceNumber-1 where $_[2]=$_[3] and $setName="
 			.quote($setValue));
