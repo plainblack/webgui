@@ -1,3 +1,7 @@
+6.6.0
+ - Added a new admin panel for inline content editing.
+ - Tweaked the preloader so WebGUI uses a little less memory per process.
+
 6.5.5
  - fix [ 1171569 ] add/edit sql report help link has wrong namespace
  - Fixed a bug in the collaboration system that caused replies to fail.

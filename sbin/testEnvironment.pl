@@ -66,9 +66,6 @@ checkModule("HTML::Highlight",0.20);
 checkModule("HTML::TagFilter",0.07);
 checkModule("HTML::Template",2.6);
 checkModule("Parse::PlainConfig",1.1);
-checkModule("Parse::RecDescent",1.94);
-checkModule("HTTP::BrowserDetect",0.97);
-checkModule("Text::Balanced",1.95);
 checkModule("XML::RSSLite",0.11);
 checkModule("DBIx::FullTextSearch",0.73);
 

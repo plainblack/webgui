@@ -15,7 +15,6 @@ package WebGUI::Form;
 =cut
 
 use strict;
-use HTTP::BrowserDetect;
 use Tie::IxHash;
 use WebGUI::Asset;
 use WebGUI::Asset::Template;

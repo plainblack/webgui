@@ -23,42 +23,55 @@ use ModPerl::Registry (); # Uncomment this for use with mod_perl 2.0
 #----------------------------------------
 # System controlled Perl modules.
 #----------------------------------------
-use Cache::FileCache ();
+
+
+
 use CGI (); CGI->compile(':all');
 use CGI::Carp ();
 use CGI::Util ();
-use Digest::MD5 ();
-use Image::Magick ();
 use File::Copy ();
 use File::Path ();
 use FileHandle ();
-use Net::SMTP ();
 use POSIX ();
 use URI::Escape ();
-use SOAP::Lite ();
+use HTTP::Request ();
+use HTTP::Headers ();
+use Digest::MD5 ();
+use DBI ();
+use HTML::Parser ();
+use HTML::TagFilter ();
+use HTML::Template ();
+use Parse::PlainConfig ();
+use Net::SMTP ();
+use Cache::Cache ();
+use Tie::IxHash ();
+use Tie::CPHash ();
 use Time::HiRes ();
+use Date::Manip ();
+use Image::Magick ();
+use XML::Simple ();
+
+####
+# less commonly used so you may not want them to load into memory
+###
+#use Compress::Zlib (); # used only by themes
+#use Archive::Tar (); # used only by themes
+#use IO::Zlib (); # used only by themes
+#use SOAP::Lite (); # used only by WS Client
+#use Net::LDAP (); # used only by LDAP authentication module
+#use XML::RSSLite (); # used only by syndicated content wobject
+#use DBIx::FullTextSearch (); #used only by search engine
+#use HTML::Highlight (); # used only by search engine
+
 
 
 #----------------------------------------
 # Database connectivity.
 #----------------------------------------
-#use Apache::DBI (); # Uncomment if you want to enable connection pooling. Not recommended on low memory systems.
-use DBI ();
+#use Apache::DBI (); # Uncomment if you want to enable connection pooling. Not recommended on low memory systems, or systems using database slaves
 DBI->install_driver("mysql"); # Change to match your database driver.
 
 
-
-#----------------------------------------
-# Distributed utilities external to WebGUI.
-#----------------------------------------
-#use HTML::Parser (); # commented because it is causing problems with attachments
-#use HTML::TagFilter (); # commented because it is causing problems with attachments
-use Parse::PlainConfig ();
-use Date::Manip ();
-use Tie::CPHash ();
-use Tie::IxHash ();
-# use XML::RSSLite ();
-use XML::Simple ();
 
 #----------------------------------------
 # WebGUI modules.
