@@ -221,10 +221,11 @@ sub www_editNavigation {
                 -label=>WebGUI::International::get(29,'Navigation'),
                 -value=>$session{form}{'reverse'} || $config->{'reverse'}
         );
+	# window.open('', 'navPreview', 'toolbar=no,width=400,height=300,status=no,location=no,scrollbars=yes,resizable=yes');
 	my $previewButton = qq{
                            <INPUT TYPE="button" VALUE="Preview" NAME="preview"
                             OnClick="
-                                window.open('', 'navPreview', 'toolbar=no,width=400,height=300,status=no,location=no,scrollbars=yes,resizable=yes');
+                                window.open('', 'navPreview', 'toolbar=no,status=no,location=no,scrollbars=yes,resizable=yes');
                                 this.form.op.value='previewNavigation';
                                 this.form.target = 'navPreview';
                                 this.form.submit()">};
@@ -292,8 +293,10 @@ sub www_listNavigation {
         return _submenu($output);
 }
 
+#-------------------------------------------------------------------
 sub www_previewNavigation {
-	$session{page}{useEmptyStyle} = 1;
+	#$session{page}{useEmptyStyle} = 1;
+	$session{page}{useAdminStyle} = 1;
 	$session{var}{adminOn} = 0;
 	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::isInGroup(3));
 	my $nav = WebGUI::Navigation->new(	depth=>$session{form}{depth},
@@ -306,7 +309,28 @@ sub www_previewNavigation {
 						showUnprivilegedPages=>$session{form}{showUnprivilegedPages},
 	                       			'reverse'=>$session{form}{'reverse'},
                                 );
-	return $nav->build;
+	my $output = qq(
+		<h1>Navigation Preview</h1>
+		<table width="100%" border="0" cellpadding="5" cellspacing="0">
+		<tr><td class="tableHeader" valign="top">
+		Configuration
+		</td><td class="tableHeader" valign="top">Output</td></tr>
+		<tr><td class="tableData" valign="top">
+		<font size=1>
+			Identifier: $session{form}{identifier}<br>
+			startAt: $session{form}{startAt}<br>
+			method: $session{form}{method}<br>
+			stopAtLevel: $session{form}{stopAtLevel}<br>
+			depth: $session{form}{depth}<br>
+			templateId: $session{form}{templateId}<br>
+			reverse: $session{form}{'reverse'}<br>
+			showSystemPages: $session{form}{showSystemPages}<br>
+			showHiddenPages: $session{form}{showHiddenPages}<br>
+			showUnprivilegedPages: $session{form}{showUnprivilegedPages}<br>
+		</font>
+		</td><td class="tableData" valign="top">
+		) . $nav->build . qq(</td></tr></table>);
+	return $output; 
 }
 
 1;
