@@ -18,6 +18,7 @@ use CGI::Util qw(rearrange);
 use strict qw(vars refs);
 use WebGUI::DateTime;
 use WebGUI::Form;
+use WebGUI::Icon;
 use WebGUI::International;
 use WebGUI::Privilege;
 use WebGUI::Session;
@@ -1086,6 +1087,9 @@ sub group {
         my ($name, $label, $value, $size, $multiple, $extras, $subtext, $uiLevel, $excludeGroups) =
                 rearrange([qw(name label value size multiple extras subtext uiLevel excludeGroups)], @p);
         if (_uiLevelChecksOut($uiLevel)) {
+		if (WebGUI::Privilege::isInGroup(3)) {
+			$subtext = manageIcon("op=listGroups").$subtext;
+		}
                 $output = WebGUI::Form::group({
                         "name"=>$name,
                         "size"=>$size,
@@ -1961,14 +1965,10 @@ sub template {
         if (_uiLevelChecksOut($uiLevel)) {
 		$label = $label || WebGUI::International::get(356);
 		if (WebGUI::Privilege::isInGroup(8)) {
-			#disabled until we can resolve the "new" wobject problem
-        		#if ($afterEdit) {
-                	#	$subtext = '<a href="'.WebGUI::URL::page("op=editTemplate&tid=".$value."&namespace=".$namespace
-			#		."&afterEdit="
-                        #		.WebGUI::URL::escape($afterEdit)).'">'.WebGUI::International::get(741).'</a> / ';
-        		#}
-        		$subtext .= '<a href="'.WebGUI::URL::page("op=listTemplates&namespace=$namespace").'">'
-				.WebGUI::International::get(742).'</a>';
+        		if ($afterEdit) {
+                		$subtext = editIcon("op=editTemplate&tid=".$value."&namespace=".$namespace."&afterEdit=".WebGUI::URL::escape($afterEdit));
+        		}
+        		$subtext .= manageIcon("op=listTemplates&namespace=$namespace");
 		}
         	$output = WebGUI::Form::template({
                 	"name"=>$name,

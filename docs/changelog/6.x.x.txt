@@ -80,6 +80,7 @@ webgui.
  - Added Cool Menus to the navigation system. (Thanks to Thomas Brattli,
    http://www.dhtmlcentral.com)
  - Added a config file option for per-site International message caching.
+ - Added an override in the user profile for toolbar icon set.
 
 
 

@@ -1,6 +1,7 @@
 #!/usr/bin/perl
 
 use lib "../../lib";
+use File::Path;
 use Getopt::Long;
 use Parse::PlainConfig;
 use strict;
@@ -528,11 +529,8 @@ unlink("../../lib/WebGUI/Wobject/FAQ.pm");
 unlink("../../lib/WebGUI/Wobject/ExtraColumn.pm");
 unlink("../../lib/WebGUI/Authentication.pm");
 unlink("../../lib/WebGUI/Operation/Account.pm");
-unlink("../../lib/WebGUI/Authentication/WebGUI.pm");
-unlink("../../lib/WebGUI/Authentication/LDAP.pm");
-unlink("../../lib/WebGUI/Authentication/SMB.pm");
-rmdir("../../lib/WebGUI/Authentication");
-
+rmtree("../../lib/WebGUI/Authentication");
+rmtree("../../www/extras/toolbar/default");
 
 #--------------------------------------------
 print "\tMigrating wobject privileges.\n" unless ($quiet);

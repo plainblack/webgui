@@ -100,12 +100,11 @@ sub _selectPositions {
         my ($templates, $output, $f, $key);
         $f = WebGUI::HTMLForm->new(1);
         $templates = WebGUI::Page::getTemplateList();
-	$f->selectList(
-                -name=>"templateId",
-                -options=>$templates,
-                -value=>[$_[0]],
-                -extras=>'onChange="changeTemplatePreview(this.form.templateId.value)"',
-                -subtext=>' &nbsp; <a href="'.WebGUI::URL::page("op=listTemplates&namespace=Page").'">'.WebGUI::International::get(742).'</a>'
+	$f->template(
+                -value=>$_[0],
+		-namespace=>"page",
+		-afterEdit=>'op=editPage&amp;npp='.$session{form}{npp},
+                -extras=>'onChange="changeTemplatePreview(this.form.templateId.value)"'
                 );
         $output = '
         <script language="JavaScript">
@@ -428,6 +427,7 @@ sub www_editPage {
 			-label=>WebGUI::International::get(912),
 			-value=>($page{styleId} || 2),
 			-namespace=>'style',
+			-afterEdit=>'op=editPage&amp;npp='.$session{form}{npp},
 			-uiLevel=>5
 			);
                 $f->getTab("layout")->template(
@@ -435,6 +435,7 @@ sub www_editPage {
 			-label=>WebGUI::International::get(1079),
 			-value=>($page{printableStyleId} || 3),
 			-namespace=>'style',
+			-afterEdit=>'op=editPage&amp;npp='.$session{form}{npp},
 			-uiLevel=>5
 			);
 		if ($childCount) {
@@ -462,8 +463,7 @@ sub www_editPage {
 			-uiLevel=>6
 			);
 		if (WebGUI::Privilege::isInGroup(3)) {
-			$subtext = ' &nbsp; <a href="'.WebGUI::URL::page('op=listUsers').'">'
-				.WebGUI::International::get(7).'</a>';
+			$subtext = manageIcon('op=listUsers');
 		} else {
 			$subtext = "";
 		}
@@ -484,24 +484,16 @@ sub www_editPage {
 			-subtext=>$subtext,
 			-uiLevel=>6
 			);
-		if (WebGUI::Privilege::isInGroup(3)) {
-			$subtext = ' &nbsp; <a href="'.WebGUI::URL::page('op=listGroups').'">'
-				.WebGUI::International::get(5).'</a>';
-		} else {
-			$subtext = "";
-		}
 		$f->getTab("privileges")->group(
 			-name=>"groupIdView",
 			-label=>WebGUI::International::get(872),
 			-value=>[$page{groupIdView}],
-			-subtext=>$subtext,
 			-uiLevel=>6
 			);
                 $f->getTab("privileges")->group(
                         -name=>"groupIdEdit",
                         -label=>WebGUI::International::get(871),
                         -value=>[$page{groupIdEdit}],
-                        -subtext=>$subtext,
 			-excludeGroups=>[1,7],
                         -uiLevel=>6
                         );

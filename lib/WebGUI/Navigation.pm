@@ -70,7 +70,8 @@ These methods are available from this package:
 #-------------------------------------------------------------------
 sub _getEditButton {
         my $self = shift;
-        return editIcon("op=editNavigation&navigationId=".$self->{_navigationId}."&identifier=".$self->{_identifier});
+        return editIcon("op=editNavigation&navigationId=".$self->{_navigationId}."&identifier=".$self->{_identifier})
+		.manageIcon("op=listNavigation");
 }
 
 #-------------------------------------------------------------------

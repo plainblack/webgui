@@ -1223,7 +1223,7 @@ sub www_edit {
 		$f->getTab("layout")->template(
                 	-value=>$_[0]->getValue("templateId"),
                 	-namespace=>$_[0]->get("namespace"),
-                	-afterEdit=>'func=edit&wid='.$_[0]->get("wobjectId")
+                	-afterEdit=>'func=edit&amp;wid='.$_[0]->get("wobjectId")."&amp;namespace=".$_[0]->get("namespace")
                 	);
 	}
 	$f->getTab("layout")->selectList(
