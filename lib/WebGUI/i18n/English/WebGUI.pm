@@ -698,7 +698,7 @@ The correct answer for this question.
 <p>
 
 <b>callback.url</b><br>
-The url that links back to the calling object such as an article or user submission.
+The url that links back to the calling object such as an Article or User Submission System.
 <p>
 
 <b>callback.label</b><br>
@@ -848,7 +848,7 @@ A link to the previous page in a multi-page listing.
 <p>
 
 <b>multiplepages</b><br>
-A condition indicating whether there are multiple pages or not.
+A conditional indicating whether there are multiple pages or not.
 <p>
 
 <b>numberOfPages</b><br>
@@ -860,7 +860,7 @@ The number of the current page in a multi-page listing.
 <p>
 
 |,
-		lastUpdated => 1066582842
+		lastUpdated => 1099614588
 	},
 
 	'950' => {
@@ -940,19 +940,19 @@ The default label for callback.url
 <p>
 
 <b>user.canpost</b><br>
-A condition indicating whether the current user can post a new message.
+A conditional indicating whether the current user can post a new message.
 <p>
 
 <b>user.isVisitor</b><br>
-A condition indicating whether the current user is a visitor.
+A conditional indicating whether the current user is a visitor.
 <p>
 
 <b>user.isModerator</b><br>
-A condition indicating whether the current user is a moderator.
+A conditional indicating whether the current user is a moderator.
 <p>
 
 <b>user.isSubscribed</b><br>
-A condition indicating whether the current user is subscribed to this thread.
+A conditional indicating whether the current user is subscribed to this thread.
 <p>
 
 <b>thread.layout.nested.label</b><br>
@@ -980,15 +980,15 @@ A url that will change the layout of the thread to threaded.
 <p>
 
 <b>thread.layout.isThreaded</b><br>
-A condition indicating whether the thread layout is threaded.
+A conditional indicating whether the thread layout is threaded.
 <p>
 
 <b>thread.layout.isNested</b><br>
-A condition indicating whether the thread layout is nested.
+A conditional indicating whether the thread layout is nested.
 <p>
 
 <b>thread.layout.isFlat</b><br>
-A condition indicating whether the thread layout is flat.
+A conditional indicating whether the thread layout is flat.
 <p>
 
 <b>thread.subscribe.url</b><br>
@@ -1008,7 +1008,7 @@ The default label for thread.unsubscribe.url.
 <p>
 
 <b>thread.isSticky</b><br>
-A condition indicating whether the thread is sticky.
+A conditional indicating whether the thread is sticky.
 <p>
 
 <b>thread.stick.url</b><br>
@@ -1028,7 +1028,7 @@ The default label for thread.unstick.url.
 <p>
 
 <b>thread.isLocked</b><br>
-A condition indicating whether this thread is locked.
+A conditional indicating whether this thread is locked.
 <p>
 
 <b>thread.lock.url</b><br>
@@ -1067,7 +1067,7 @@ An integer indicating how many levels deep this post is.
 <p>
 
 <b>post.isCurrent</b><br>
-A condition indicating whether this post is the one selected for viewing by the user.
+A conditional indicating whether this post is the one selected for viewing by the user.
 <p>
 
 <b>NOTE:</b> All of the variables from the post template are also available here.
@@ -1129,7 +1129,7 @@ The description of this forum as passed by the calling object.
 <p>
 
 |,
-		lastUpdated => 1097356661
+		lastUpdated => 1099613369
 	},
 
 	'485' => {
@@ -3644,12 +3644,12 @@ The url back to the calling object such as an article or user submission.
 The default label for callback.url.
 <p>
 
-<b>post.subject.label</b><br>
-The default label for post.subject
-<p>
-
 <b>post.subject</b><br>
 The subject of this post.
+<p>
+
+<b>post.subject.label</b><br>
+The default label for post.subject
 <p>
 
 <b>post.message</b><br>
@@ -3657,7 +3657,7 @@ The message of this post.
 <p>
 
 <b>user.canPost</b><br>
-A condition indicating whether the current user can post a new message.
+A conditional indicating whether the current user can post a new message.
 <p>
 
 <b>post.date.value</b><br>
@@ -3701,19 +3701,19 @@ The default label for post.status.value.
 <p>
 
 <b>post.isLocked</b><br>
-A condition indicating whether the thread this post is in is locked.
+A conditional indicating whether the thread this post is in is locked.
 <p>
 
 <b>post.isModerator</b><br>
-A condition indicating whether the current user is a moderator.
+A conditional indicating whether the current user is a moderator.
 <p>
 
 <b>post.canEdit</b><br>
-A condition indicating whether the current user can edit this post.
+A conditional indicating whether the current user can edit this post.
 <p>
 
 <b>post.user.isVisitor</b><br>
-A condition indicating whether the poster was a visitor.
+A conditional indicating whether the poster was a visitor.
 <p>
 
 <b>post.user.id</b</b><br>
@@ -3768,7 +3768,7 @@ The url to give this post a rating of 5.
 <p>
 
 <b>post.hasRated</b><br>
-A condition indicating whether the current user has already rated this post.
+A conditional indicating whether the current user has already rated this post.
 <p>
 
 <b>post.reply.label</b><br>
@@ -3826,11 +3826,8 @@ The title of this forum as passed by the calling object.
 <b>forum.description</b><br>
 The description of this forum as passed by the calling object.
 <p>
-
-
-
 |,
-		lastUpdated => 1068919407
+		lastUpdated => 1099613407
 	},
 
 	'327' => {
@@ -4066,11 +4063,11 @@ The loop that defines a page position and contains a list of wobjects for that p
 <blockquote>
 
 <b>wobject.canView</b><br>
-A condition indicating whether the current user has the privileges to view this wobject. 
+A conditional indicating whether the current user has the privileges to view this wobject. 
 <p>
 
 <b>wobject.canEdit</b><br>
-A condition indicating whether the current user has the privileges to edit this wobject.
+A conditional indicating whether the current user has the privileges to edit this wobject.
 <p>
 
 <b>wobject.controls</b><br>
@@ -4086,7 +4083,7 @@ The unique identifier for this wobject.
 <p>
 
 <b>wobject.isInDateRange</b><br>
-A condition indicating whether the wobject is scheduled to be displayed right now. The variable <i>wobject.canView</i> already takes this into account, but content managers can always view content, so this is an extra check so they don't have to see the wobject if it's not scheduled to appear yet, or if it's end date has already passed.
+A conditional indicating whether the wobject is scheduled to be displayed right now. The variable <i>wobject.canView</i> already takes this into account, but content managers can always view content, so this is an extra check so they don't have to see the wobject if it's not scheduled to appear yet, or if it's end date has already passed.
 <p>
 
 <b>wobject.content</b><br>
@@ -4101,7 +4098,7 @@ The content produced by the wobject.
 <p>
 
 <b>page.canEdit</b><br>
-A condition indicating whether the current user has the privileges to edit this page.
+A conditional indicating whether the current user has the privileges to edit this page.
 <p>
 
 <b>page.controls</b><br>
@@ -4111,7 +4108,7 @@ The toolbar for manipulating the properties of the page.
 
 
 |,
-		lastUpdated => 1070028702
+		lastUpdated => 1099613418
 	},
 
 	'754' => {
@@ -4250,7 +4247,7 @@ The default label for callback.url.
 <p>
 
 <b>user.isVisitor</b><br>
-A condition indicating whether the user is a visitor.
+A conditional indicating whether the user is a visitor.
 <p>
 
 <b>thread.new.url</b><br>
@@ -4287,15 +4284,15 @@ The url to unsubscribe from this forum.
 <p>
 
 <b>user.isSubscribed</b><br>
-A condition indicating whether the current user is subscribed to this forum.
+A conditional indicating whether the current user is subscribed to this forum.
 <p>
 
 <b>user.isModerator</b><br>
-A condition indicating whether the current user is a moderator for this forum.
+A conditional indicating whether the current user is a moderator for this forum.
 <p>
 
 <b>user.canPost</b><br>
-A condition indicating whether the current user has the privileges necessary to post to this forum.
+A conditional indicating whether the current user has the privileges necessary to post to this forum.
 <p>
 
 <b>thread.sortby.date.url</b><br>
@@ -4303,7 +4300,7 @@ A url that will change the sorting options to be sorted by date.
 <p>
 
 <b>thread.sortedby.date</b><br>
-A condition indicating that the thread is currently sorted by date.
+A conditional indicating that the thread is currently sorted by date.
 <p>
 
 <b>thread.sortby.lastreply.url</b><br>
@@ -4311,7 +4308,7 @@ A url that will change the sorting options to be sorted by the date of the last 
 <p>
 
 <b>thread.sortedby.lastreply</b><br>
-A condition indicating that the thread is currently sorted by lastreply.
+A conditional indicating that the thread is currently sorted by lastreply.
 <p>
 
 <b>thread.sortby.views.url</b><br>
@@ -4319,7 +4316,7 @@ A url that will change the sorting options to be sorted by the number of views e
 <p>
 
 <b>thread.sortedby.views</b><br>
-A condition indicating that the thread is currently sorted by views.
+A conditional indicating that the thread is currently sorted by views.
 <p>
 
 <b>thread.sortby.replies.url</b><br>
@@ -4327,7 +4324,7 @@ A url that will change the sorting options to be sorted by the number of replies
 <p>
 
 <b>thread.sortedby.replies</b><br>
-A condition indicating that the thread is currently sorted by replies.
+A conditional indicating that the thread is currently sorted by replies.
 <p>
 
 <b>thread.sortby.rating.url</b><br>
@@ -4335,15 +4332,15 @@ A url that will change the sorting options to be sorted by the average rating of
 <p>
 
 <b>thread.sortedby.rating</b><br>
-A condition indicating that the thread is currently sorted by rating.
+A conditional indicating that the thread is currently sorted by rating.
 <p>
 
 <b>thread.sorted.asc</b><br>
-A condition indicating that the thread is currently sorted in an ascending manner.
+A conditional indicating that the thread is currently sorted in an ascending manner.
 <p>
 
 <b>thread.sorted.desc</b><br>
-A condition indicating that the thread is currently sorted in an descending manner.
+A conditional indicating that the thread is currently sorted in an descending manner.
 <p>
 
 <b>thread.subject.label</b><br>
@@ -4395,7 +4392,7 @@ A link to the previous page in a multi-page listing.
 <p>
 
 <b>multiplepages</b><br>
-A condition indicating whether there are multiple pages or not.
+A conditional indicating whether there are multiple pages or not.
 <p>
 
 <b>numberOfPages</b><br>
@@ -4433,11 +4430,11 @@ A counter for the rating. This can be used to "draw" a rating, such as adding a 
 </blockquote>
 
 <b>thread.isSticky</b><br>
-A condition indicating whether the thread is sticky and hence will appear at the top of the forum listing.
+A conditional indicating whether the thread is sticky and hence will appear at the top of the forum listing.
 <p>
 
 <b>thread.isLocked</b><br>
-A condition indicating whether the thread is locked from new posts.
+A conditional indicating whether the thread is locked from new posts.
 <p>
 
 <b>thread.root.subject</b><br>
@@ -4477,7 +4474,7 @@ The url of the root poster's profile.
 <p>
 
 <b>thread.root.user.isVisitor</b><br>
-A condition indicating whether the root poster was a visitor.
+A conditional indicating whether the root poster was a visitor.
 <p>
 
 <b>thread.root.status</b><br>
@@ -4517,7 +4514,7 @@ The username of the last poster.
 <p>
 
 <b>thread.last.user.isVisitor</b><br>
-A condition indicating whether the last poster was a visitor.
+A conditional indicating whether the last poster was a visitor.
 <p>
 
 <b>thread.last.status</b><br>
@@ -4536,7 +4533,7 @@ The description of this forum as passed by the calling object.
 
 </blockquote>
 |,
-		lastUpdated => 1068919452
+		lastUpdated => 1099613459
 	},
 
 	'538' => {
@@ -5997,11 +5994,11 @@ A form element for selecting what type of content is being posted.
 <p>
 
 <b>user.isModerator</b><br>
-A condition indicating whether the current user is a moderator.
+A conditional indicating whether the current user is a moderator.
 <p>
 
 <b>allowReplacements</b><br>
-A condition indicating whether this forum uses content filters.
+A conditional indicating whether this forum uses content filters.
 <p>
 
 
@@ -6385,7 +6382,9 @@ How big (in pixels) should the thumbnail for this image be?
 	},
 
 	'1055' => {
-		message => q|WebGUI has a very powerful built-in discussion system. It can be attached to anything and is attached to many wobjects.
+		message => q|WebGUI has a very powerful built-in discussion system called Forums. Forums are
+        contained by the Message Board wobject, and may also be added to other wobjects
+        sush as Articles or USS's.
 <p>
 Forums (aka Discussions) have many settable properties. The following is a comprehensive list:
 <p>
@@ -6456,8 +6455,14 @@ The number of threads to display on a single page in a forum.
 The number of posts (within a thread) to display on a single page.
 <p>
 
+<b>Who can view?</b><br>
+A group that is allowed to view messages.
+<p>
+
 <b>Karma Per Post</b><br>
-How much karma should be given to a user when they post a message?
+How much karma should be given to a user when they post a message?  Note, karma
+must be enabled in the Admin Console -> Settings -> User form for property to
+be present. 
 <p>
 
 <b>Who can post?</b><br>
@@ -6473,10 +6478,10 @@ A group that is allowed to moderate messages.
 <p>
 
 <b>Move Forum (Message Board only)</b><br>
-You can move an existing forum to another Message Board. If set to 'No Change' the forum will stay at the current board.
+You can move an existing forum to another Message Board. If set to 'No Change' the forum will stay at the current board.  This option is only available when editing an existing Forum.
 <p>
 |,
-		lastUpdated => 1068708617
+		lastUpdated => 1099613976,
 	},
 
 	'793' => {
@@ -6900,12 +6905,12 @@ config file.</p>
 	},
 	'Forum, Post Preview Template Body' => {
 		message => q|
-<p>This template uses the same template variable as the Forum Post Template.</p>
+<p>This template uses the same template variables as the Forum Post Template.</p>
 
 
 
 |,
-		lastUpdated =>1092930637,
+		lastUpdated =>1099614353,
 		context => q|help body forum post preview template|
 	},
 	'cancel' => {
