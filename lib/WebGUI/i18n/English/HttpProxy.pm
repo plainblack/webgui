@@ -19,8 +19,8 @@ The starting URL for the proxy.
 Sometimes the URL to a page is actually a redirection to another page. Do you wish to follow those redirections when they occur?
 <p>
 
-<b>Rewrite urls?</b><br>
-Switch this to No if you want to deeplink an external page.
+<b>Rewrite URLs?</b><br>
+Switch this to No if you want to deep link an external page.
 <p>
 
 <b>Timeout</b><br>
@@ -49,7 +49,7 @@ A search string used as ending point. Content after this point is not displayed.
 If you proxy a site like Yahoo! that links to other domains, do you wish to allow the user to follow the links to those other domains, or should the proxy stop them as they try to leave the original site you specified?
 <p>
 |,
-		lastUpdated => 1053774887
+		lastUpdated => 1101773206
 	},
 
 	'3' => {
@@ -63,8 +63,8 @@ If you proxy a site like Yahoo! that links to other domains, do you wish to allo
 	},
 
 	'12' => {
-		message => q|Rewrite urls ?|,
-		lastUpdated => 1055908341
+		message => q|Rewrite URLs ?|,
+		lastUpdated => 1101773211
 	},
 
 	'2' => {
