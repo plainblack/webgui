@@ -439,6 +439,12 @@ sub open {
 	### CGI object
 	$CGI::POST_MAX=1024 * $session{setting}{maxAttachmentSize};
 	$session{cgi} = CGI->new();
+        if ($session{cgi}->cgi_error =~ /^413/) {
+		$session{header}{status} = $session{cgi}->cgi_error;
+		WebGUI::ErrorHandler::warn("File upload too big. May need to adjust Max File Size setting.");
+		$CGI::POST_MAX=-1;
+		$session{cgi} = CGI->new();
+        }
 	###----------------------------
 	### header variables
 	$session{header}{mimetype} = 'text/html';

@@ -514,6 +514,7 @@ If a web image (gif, png, jpg, jpeg) is being uploaded it will be resized if it 
 
 sub save {
 	my ($type, $file, $filename, $bytesread, $buffer, $urlizedFilename, $path);
+	return "" if ($session{header}{status} =~ /^413/);
 	$filename = $session{cgi}->upload($_[1]);
 	if (defined $filename) {
 		if ($filename =~ /([^\/\\]+)$/) {
