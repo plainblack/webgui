@@ -1,6 +1,7 @@
 #!/usr/bin/perl
 
 use lib "../../lib";
+use FileHandle;
 use Getopt::Long;
 use strict;
 use WebGUI::Id;
@@ -50,6 +51,7 @@ WebGUI::SQL->write("delete from settings where name in ('siteicon','favicon')");
 
 
 #print "\tConverting Pages, Wobjects, and Forums to Assets\n" unless ($quiet);
+#print "\t\tHold on cuz this is going to take a long time...\n" unless ($quiet);
 #walkTree('0','theroot','000001','0');
 
 WebGUI::Session::close();
@@ -108,13 +110,44 @@ sub walkTree {
 			WebGUI::SQL->write("insert into asset (assetId, parentId, lineage, className, state, title, menuTitle, url, startDate, 
 				endDate, isHidden, ownerUserId, groupIdView, groupIdEdit, encryptPage) values (".quote($wobjectId).",
 				".quote($pageId).", ".quote($wobjectLineage).", ".quote($className).",'published',".quote($page->{title}).",
-				".quote($page->{title}).", ".quote($wobjectUrl).", ".quote($wobject->startDate).", ".quote($wobject->{endDate}).",
+				".quote($page->{title}).", ".quote($wobjectUrl).", ".quote($wobject->{startDate}).", ".quote($wobject->{endDate}).",
 				1, ".quote($ownerId).", ".quote($groupIdView).", ".quote($groupIdEdit).", ".quote($page->{encryptPage}).")");
 			WebGUI::SQL->write("update wobject set assetId=".quote($wobjectId));
 			WebGUI::SQL->write("update ".$wobject->{namespace}." set assetId=".quote($wobjectId));
 			if ($namespace eq "Article") {
-				# migrate attachment to file asset
-				# migrate image to image asset
+				if ($namespace->{attachment}) {
+					my $attachmentId = WebGUI::Id::generate();
+					WebGUI::SQL->write("insert into asset (assetId, parentId, lineage, className, state, title, menuTitle, 
+						url, startDate, endDate, isHidden, ownerUserId, groupIdView, groupIdEdit, boundToId) values (".
+						quote($attachmentId).", ".quote($wobjectId).", ".quote($wobjectLineage.sprintf("%06d",1)).", 
+						'WebGUI::Asset::File','published',".quote($namespace->{attachment}).", ".
+						quote($namespace->{attachment}).", ".quote(fixUrl($wobjectUrl.$namespace->{attachment})).", 
+						".quote($wobject->{startDate}).", ".quote($wobject->{endDate}).", 1, ".quote($ownerId).", 
+						".quote($groupIdView).", ".quote($groupIdEdit).", ".quote($wobjectId).")");
+					my $storageId = copyFile($namespace->{attachment},$wobject->{wobjectId});
+					WebGUI::SQL->write("insert into FileAsset (assetId, filename, storageId, fileSize) values (
+						".quote($attachmentId).", ".quote($namespace->{attachment}).", ".quote($storageId).",
+						".quote(getFileSize($storageId,$namespace->{attachment})).")");
+				}
+				if ($namespace->{image}) {
+					my $rank = 1;
+					$rank ++ if ($namespace->{attachment});
+					my $imageId = WebGUI::Id::generate();
+					WebGUI::SQL->write("insert into asset (assetId, parentId, lineage, className, state, title, menuTitle, 
+						url, startDate, endDate, isHidden, ownerUserId, groupIdView, groupIdEdit, boundToId) values (".
+						quote($imageId).", ".quote($wobjectId).", ".quote($wobjectLineage.sprintf("%06d",$rank)).", 
+						'WebGUI::Asset::File::Image','published',".quote($namespace->{attachment}).", ".
+						quote($namespace->{image}).", ".quote(fixUrl($wobjectUrl.$namespace->{image})).", 
+						".quote($wobject->{startDate}).", ".quote($wobject->{endDate}).", 1, ".quote($ownerId).", 
+						".quote($groupIdView).", ".quote($groupIdEdit).", ".quote($wobjectId).")");
+					my $storageId = copyFile($namespace->{image},$wobject->{wobjectId});
+					copyFile('thumb-'.$namespace->{image},$wobject->{wobjectId},$storageId);
+					WebGUI::SQL->write("insert into FileAsset (assetId, filename, storageId, fileSize) values (
+						".quote($imageId).", ".quote($namespace->{image}).", ".quote($storageId).",
+						".quote(getFileSize($storageId,$namespace->{image})).")");
+					WebGUI::SQL->write("insert into ImageAsset (assetId, thumbnailSize) values (".quote($imageId).",
+						".quote($session{setting}{thumbnailSize}).")");
+				}
 				# migrate forums
 			} elsif ($namespace eq "SiteMap") {
 				my $navident = 'SiteMap_'.$namespace->{wobjectId};
@@ -203,4 +236,32 @@ sub fixUrl {
                 $url = fixUrl($url);
         }
         return $url;
+}
+
+sub copyFile {
+	my $filename = shift;
+	my $oldPath = shift;
+	my $id = shift || WebGUI::Id::generate();
+	$id =~ m/^(.{2})(.{2})/;
+	my $node = $session{config}{uploadsPath}.$session{os}{slash}.$1;
+	mkdir($node);
+	$node .= $session{os}{slash}.$2;
+	mkdir($node);
+	$node .= $session{os}{slash}.$id;
+	mkdir($node);
+	my $a = FileHandle->new($session{config}{uploadPath}.$session{os}{slash}.$oldPath.$session{os}{slash}.$filename,"r");
+        binmode($a);
+        my $b = FileHandle->new(">".$node.$session{os}{slash}.$filename);
+        binmode($b);
+        cp($a,$b);
+	return $id;
+}
+
+sub getFileSize {
+	my $id = shift;
+	my $filename = shift;
+	$id =~ m/^(.{2})(.{2})/;
+	my $path = $session{config}{uploadsPath}.$session{os}{slash}.$1.$session{os}{slash}.$2.$session{os}{slash}.$id.$session{os}{slash}.$filename;
+	my (@attributes) = stat($path);
+	return $attributes[7];
 }
