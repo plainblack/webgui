@@ -436,11 +436,6 @@ sub shortcutIcon {
 
 #-------------------------------------------------------------------
 
-=head2 pasteIcon ( urlParameters [, pageURL ] )
-
-
-#-------------------------------------------------------------------
-
 =head2 viewIcon ( urlParameters [, pageURL ] )
 
 Generates a button with the word "View" printed on it.

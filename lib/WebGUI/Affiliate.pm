@@ -29,14 +29,14 @@ Tracks where users come from.
 NOTE: This package is experimental as is not officially supported yet.
 
 =head1 SYNOPSIS
-                                                                                                                                                             
+
  use WebGUI::Affiliate;
  WebGUI::Affiliate::grabReferral();
-                                                                                                                                                             
+
 =head1 FUNCTIONS
-                                                                                                                                                             
+
 These functions are available from this package:
-                                                                                                                                                             
+
 =cut
                                                                                                                                                              
 

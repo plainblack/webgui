@@ -33,6 +33,11 @@ Package WebGUI::CollateralFolder
 
 This is a management package for the collateral folder system.
 
+=head2 SYNOPSIS
+
+ use WebGUI::CollateralFolder;
+ $collateralFolder->recursiveDelete;
+
 =head1 METHODS
 
 For inherited methods see L<WebGUI::Persistent::Tree>.
