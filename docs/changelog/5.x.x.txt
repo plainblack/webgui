@@ -5,7 +5,9 @@
  - Fixed bug [ 828071 ] USS doubles the number of replies
  - Fixed bug [ 831784 ] Pagination in Messeboard with multiple boards
  - Fixed bug [ 836133 ] forum title and description are not template variables
- - Fixed bug [ 811175 ] no check on uniqueness of session Id while generating one
+ - Fixed bug [ 840939 ] check on uniqueness of email address while
+   creating/modifying account.
+ - Fixed bug [ 811175 ] check on uniqueness of session Id while generating one
  - Fixed bug [ 789461 ] added an option to terminate a answer-driven Survey
  - Fixed bug [ 815856 ] added a patch for htmlArea which solves a problem with relative links
  - Fixed bug [ 824171 ] page statistics are now tracked only if contenttype is "text/html"
