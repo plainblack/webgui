@@ -8,7 +8,7 @@ our $VERSION = "4.1.0";
 # (docs/license.txt) that came with this distribution before using
 # this software.
 #-------------------------------------------------------------------
-# http://www.plainblack.com                     info@plainblack.com
+# http://www.plainblack.com			info@plainblack.com
 #-------------------------------------------------------------------
 
 use strict qw(vars subs);
@@ -46,7 +46,7 @@ sub page {
 	if (exists $session{form}{op}) {
 		$cmd = "WebGUI::Operation::www_".$session{form}{op};
 		$operationOutput = eval($cmd);
-               	WebGUI::ErrorHandler::warn("Non-existent operation called: $session{form}{op}.") if($@);
+		WebGUI::ErrorHandler::warn("Non-existent operation called: $session{form}{op}.") if($@);
 	}
 	if (exists $session{form}{func} && exists $session{form}{wid}) {
 		if ($session{form}{wid} eq "new") {
@@ -55,9 +55,9 @@ sub page {
 			$wobject = WebGUI::SQL->quickHashRef("select * from wobject where wobject.wobjectId=".$session{form}{wid});	
 			unless (${$wobject}{namespace} eq "") {
 				$extra = WebGUI::SQL->quickHashRef("select * from ${$wobject}{namespace} where wobjectId=${$wobject}{wobjectId}");
-                        	tie %hash, 'Tie::CPHash';
-                        	%hash = (%{$wobject},%{$extra});
-                        	$wobject = \%hash;
+				tie %hash, 'Tie::CPHash';
+				%hash = (%{$wobject},%{$extra});
+				$wobject = \%hash;
 			} else {
 				WebGUI::ErrorHandler::warn("Wobject [$session{form}{wid}] appears to be missing or corrupt, but was requested "
 					."by $session{user}{username} [$session{user}{userId}].");
@@ -65,19 +65,19 @@ sub page {
 			}
 		}
 		if ($wobject) {
-                	if (${$wobject}{pageId} != $session{page}{pageId} && ${$wobject}{pageId} != 2) {
-                		$wobjectOutput = WebGUI::International::get(417);
-                		WebGUI::ErrorHandler::warn($session{user}{username}." [".$session{user}{userId}."] attempted to access wobject ["
-                        		.$session{form}{wid}."] on page '".$session{page}{title}."' [".$session{page}{pageId}."].");
-                	} else {
-                        	$cmd = "WebGUI::Wobject::".${$wobject}{namespace};
-                        	$w = eval{$cmd->new($wobject)};
-                		WebGUI::ErrorHandler::fatalError("Couldn't instanciate wojbect: ${$wobject}{namespace}.") if($@);
-                        	$cmd = "www_".$session{form}{func};
-                        	$wobjectOutput = eval{$w->$cmd};
-                		WebGUI::ErrorHandler::fatalError("Web method doesn't exist in wojbect: ${$wobject}{namespace} / $session{form}{func}.") if($@);
-                	}
-                	# $wobjectOutput = WebGUI::International::get(381); # bad error
+			if (${$wobject}{pageId} != $session{page}{pageId} && ${$wobject}{pageId} != 2) {
+				$wobjectOutput = WebGUI::International::get(417);
+				WebGUI::ErrorHandler::warn($session{user}{username}." [".$session{user}{userId}."] attempted to access wobject ["
+					.$session{form}{wid}."] on page '".$session{page}{title}."' [".$session{page}{pageId}."].");
+			} else {
+				$cmd = "WebGUI::Wobject::".${$wobject}{namespace};
+				$w = eval{$cmd->new($wobject)};
+				WebGUI::ErrorHandler::fatalError("Couldn't instanciate wojbect: ${$wobject}{namespace}.") if($@);
+				$cmd = "www_".$session{form}{func};
+				$wobjectOutput = eval{$w->$cmd};
+				WebGUI::ErrorHandler::fatalError("Web method doesn't exist in wojbect: ${$wobject}{namespace} / $session{form}{func}.") if($@);
+			}
+			# $wobjectOutput = WebGUI::International::get(381); # bad error
 		}
 	}
 	if ($operationOutput ne "") {
@@ -89,7 +89,7 @@ sub page {
 	} else {
 		if (WebGUI::Privilege::canViewPage()) {
 			if ($session{var}{adminOn}) {
-                        	$pageEdit = "\n<br>"
+				$pageEdit = "\n<br>"
 					.pageIcon()
 					.editIcon('op=editPage')
 					.moveUpIcon('op=movePageUp')
@@ -97,11 +97,11 @@ sub page {
 					.cutIcon('op=cutPage')
 					.deleteIcon('op=deletePage')
 					."\n";
-                	}	
+			}	
 			$sth = WebGUI::SQL->read("select * from wobject where pageId=$session{page}{pageId} order by sequenceNumber, wobjectId");
 			while ($wobject = $sth->hashRef) {
 				if ($session{var}{adminOn}) {
-                       			$contentHash{${$wobject}{templatePosition}} .= "\n<hr>"
+					$contentHash{${$wobject}{templatePosition}} .= "\n<hr>"
 						.editIcon('func=edit&wid='.${$wobject}{wobjectId})
 						.moveUpIcon('func=moveUp&wid='.${$wobject}{wobjectId})
 						.moveDownIcon('func=moveDown&wid='.${$wobject}{wobjectId})
@@ -120,10 +120,11 @@ sub page {
 				$w = eval{$cmd->new($wobject)};
 				WebGUI::ErrorHandler::fatalError("Couldn't instanciate wojbect: ${$wobject}{namespace}.") if($@);
 				if ($w->inDateRange) {
+					$contentHash{${$wobject}{templatePosition}} .= '<div class="wobject'.${$wobject}{namespace}.'" id=wobjectId'.${$wobject}{wobjectId}.'>';
 					$contentHash{${$wobject}{templatePosition}} .= '<a name="'.${$wobject}{wobjectId}.'"></a>';
 					$contentHash{${$wobject}{templatePosition}} .= eval{$w->www_view};
 					WebGUI::ErrorHandler::fatalError("No view method in wojbect: ${$wobject}{namespace}.") if($@);
-					$contentHash{${$wobject}{templatePosition}} .= "<p>\n\n";
+					$contentHash{${$wobject}{templatePosition}} .= "</div>\n\n";
 				}
 			}
 			$sth->finish;
