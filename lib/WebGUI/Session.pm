@@ -191,24 +191,11 @@ sub _loadAuthentication {
 
 #-------------------------------------------------------------------
 sub _loadMacros {
-	my ($namespace, $cmd, @files, $file, $dir, $exclude);
-	$dir = $session{config}{webguiRoot}.$session{os}{slash}."lib".$session{os}{slash}."WebGUI".$session{os}{slash}."Macro";
-	opendir (DIR,$dir) or WebGUI::ErrorHandler::fatalError("Can't open macro directory!");
-	@files = readdir(DIR);
-	foreach $file (@files) {
-		if ($file =~ /(.*?)\.pm$/) {
-			$namespace = $1;
-			$cmd = "use WebGUI::Macro::".$1;
-			eval($cmd);
-			WebGUI::ErrorHandler::fatalError("Macro failed to compile: $namespace.".$@) if($@);
-			$exclude = $session{config}{excludeMacro};
-                        $exclude =~ s/ //g;
-                        unless (isIn($namespace, split(/,/,$exclude))) {
-				$session{macro}{$namespace} = $namespace;
-			}
-		}
+	foreach my $key (keys %{$session{config}{macros}}) {
+		my $cmd = "use WebGUI::Macro::".$session{config}{macros}{$key};
+		eval($cmd);
+		WebGUI::ErrorHandler::fatalError("Macro failed to compile: $key.".$@) if($@);
 	}
-	closedir(DIR);
 }
 
 #-------------------------------------------------------------------

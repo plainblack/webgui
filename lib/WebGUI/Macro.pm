@@ -91,8 +91,8 @@ A string of HTML to be processed.
 sub process {
         my ($macro, $cmd, $output, $temp);
 	$output = $_[0];
-        foreach $macro (keys %{$session{macro}}) {
-		$cmd = "WebGUI::Macro::".$macro."::process";
+        foreach $macro (keys %{$session{config}{macros}}) {
+		$cmd = "WebGUI::Macro::".$session{config}{macros}{$macro}."::process";
 		$temp = eval{&$cmd($output)};
 		if ($@) {
 			WebGUI::ErrorHandler::warn("Processing failed on macro: $macro: ".$@);

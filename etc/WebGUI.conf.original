@@ -14,3 +14,54 @@ wobjects = Article, EventsCalendar, ExtraColumn, FAQ, FileManager, HttpProxy, \
 	Item, LinkList, MailForm, MessageBoard, Poll, Product, SiteMap, \
 	SQLReport, Survey, SyndicatedContent, USS, WobjectProxy
 
+macros = a => a_account, \
+	AdminBar => AdminBar, \
+	AdminText => AdminText, \
+	AdminToggle => AdminToggle, \
+	@ => At_username, \
+	\ => Backslash_pageUrl, \
+	c => c_companyName, \
+	C => C_crumbTrail, \
+	D => D_date, \
+	e => e_companyEmail, \
+	Env => Env, \
+	Execute => Execute, \
+	Extras => Extras, \
+	File => File, \
+	FlexMenu => FlexMenu, \
+	FormParam => FormParam, \
+	GroupText => GroupText, \
+	# => Hash_userId, \
+	H => H_homeLink, \
+	i => i_imageNoTags, \
+	I => I_imageWithTags, \
+	Include => Include, \
+	International => International, \
+	L => L_loginBox, \
+	LoginToggle => LoginToggle, \
+	m => m_currentMenuHorizontal, \
+	M => M_currentMenuVertical, \
+	Page => Page, \
+	PageTitle => PageTitle, \
+	p => p_previousMenuHorizontal, \
+	P => P_previousMenuVertical, \
+	? => Question_search, \
+	rootmenu => rootmenuHorizontal, \
+	RootTitle => RootTitle, \
+	r => r_printable, \
+	/ => Slash_gatewayUrl, \
+	Snippet => Snippet, \
+	* => Splat_random, \
+	SQL => SQL, \
+	s => s_specificMenuHorizontal, \
+	S => S_specificMenuVertical, \
+	Synopsis => Synopsis, \
+	ThumbnailLinker => ThumbnailLinker, \
+	Thumbnail => Thumbnail, \
+	t => t_topMenuHorizontal, \
+	T => T_topMenuVertical, \
+	u => u_companyUrl, \
+	URLEncode => URLEncode, \
+	User => User
+
+
