@@ -32,45 +32,39 @@ our @fields = qw(width fromField fromStatus toField toStatus
 
 #-------------------------------------------------------------------
 sub duplicate {
-	my ($w, %data, $newFieldId, $sth);
+	my ($w, %data, $sth);
 	tie %data, 'Tie::CPHash';
 	$w = $_[0]->SUPER::duplicate($_[1]);
 	$w = WebGUI::Wobject::MailForm->new({wobjectId=>$w,namespace=>$namespace});
 	$w->set({
 		width=>$_[0]->get("width"),
-        fromField=>$_[0]->get("fromField"),
-        fromStatus=>$_[0]->get("fromStatus"),
-        toField=>$_[0]->get("toField"),
-        toStatus=>$_[0]->get("toStatus"),
-        ccField=>$_[0]->get("ccField"),
-        ccStatus=>$_[0]->get("ccStatus"),
-        bccField=>$_[0]->get("bccField"),
-        bccStatus=>$_[0]->get("bccStatus"),
-        subjectField=>$_[0]->get("subjectField"),
-        subjectStatus=>$_[0]->get("subjectStatus"),		
+        	fromField=>$_[0]->get("fromField"),
+        	fromStatus=>$_[0]->get("fromStatus"),
+        	toField=>$_[0]->get("toField"),
+        	toStatus=>$_[0]->get("toStatus"),
+        	ccField=>$_[0]->get("ccField"),
+        	ccStatus=>$_[0]->get("ccStatus"),
+        	bccField=>$_[0]->get("bccField"),
+        	bccStatus=>$_[0]->get("bccStatus"),
+        	subjectField=>$_[0]->get("subjectField"),
+        	subjectStatus=>$_[0]->get("subjectStatus"),		
 		acknowledgement=>$_[0]->get("acknowledgement"),
 		storeEntries=>$_[0]->get("storeEntries"),
-	});
+		});
 	$sth = WebGUI::SQL->read("select * from MailForm_field where wobjectId=".$_[0]->get("wobjectId"));
-    while (%data = $sth->hash) {
-        $newFieldId = getNextId("MailForm_fieldId");
-        WebGUI::SQL->write(
-        	"insert into MailForm_field values (".$w->get("wobjectId").", $newFieldId, $data{sequenceNumber}, ".
-        	quote($data{name}).", ".
-        	quote($data{status}).", ".
-        	quote($data{type}).", ".
-        	quote($data{possibleValues}).", ".
-        	quote($data{defaultValue}).")" );
-    }
-    $sth->finish;	
+    	while (%data = $sth->hash) {
+		$data{MailForm_fieldId} = "new";
+		$w->setCollateral("MailForm_field","MailForm_fieldId",\%data);
+    	}
+    	$sth->finish;	
 }
 
 #-------------------------------------------------------------------
 sub purge {
-    WebGUI::SQL->write("delete from MailForm_field where wobjectId=".$_[0]->get("wobjectId"));
-    WebGUI::SQL->write("delete from MailForm_entry where wobjectId=".$_[0]->get("wobjectId"));
-    WebGUI::SQL->write("delete from MailForm_entryData where wobjectId=".$_[0]->get("wobjectId"));
-    $_[0]->SUPER::purge();
+    	WebGUI::SQL->write("delete from MailForm_field where wobjectId=".$_[0]->get("wobjectId"));
+    	WebGUI::SQL->write("delete from MailForm_entry where wobjectId=".$_[0]->get("wobjectId"));
+    	WebGUI::SQL->write("delete from MailForm_entryData where wobjectId=".$_[0]->get("wobjectId"));
+    	$_[0]->SUPER::purge();
 }
 
 #-------------------------------------------------------------------
