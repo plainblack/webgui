@@ -611,6 +611,7 @@ insert into help (helpId,namespace,titleId,bodyId,seeAlso) values (4, 'DataForm'
 update userProfileField set dataType='date' where fieldName='birthdate';
 delete from international where languageId=1 and namespace='EventsCalendar' and internationalId=98;
 insert into international (internationalId,languageId,namespace,message,lastUpdated,context) values (98,1,'EventsCalendar','Now!', 1053888477,'"Something is going to happen now." This will be used to select a range in an events calendar. Now is the date and time right down to the current second.');
+update language set toolbar='dutch' where languageId=3;
 
 
 

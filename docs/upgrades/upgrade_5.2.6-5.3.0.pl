@@ -24,6 +24,8 @@ print "\tUpdating config file.\n" unless ($quiet);
 my $pathToConfig = '../../etc/'.$configFile;
 my $conf = Parse::PlainConfig->new('DELIM' => '=', 'FILE' => $pathToConfig);
 my $macros = $conf->get("macros");
+delete $macros->{"\\"};
+$macros->{"\\\\"} = "Backslash_pageUrl";
 $macros->{RootTab} = "RootTab";
 $macros->{RandomSnippet} = "RandomSnippet";
 $macros->{RandomImage} = "RandomImage";
