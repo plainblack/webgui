@@ -28,7 +28,7 @@ sub process {
 	$temp = WebGUI::URL::gateway($temp);
 	if ($param[0] ne "linkonly") {
 		my %var;
-       		$var{'homelink.url'} = WebGUI::URL::gateway($temp);
+       		$var{'homelink.url'} = $temp;
        		if ($param[0] ne "") {
                		$var{'homeLink.text'} = $param[0];
        		} else {
