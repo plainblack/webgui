@@ -302,6 +302,8 @@ sub www_listSubscriptionCodes {
 		$where = " and t1.batchId=".quote($session{form}{bid});
 		$ops = '&bid='.$session{form}{bid}.'&selection=b';
 		$delete = '<a href="'.WebGUI::URL::page('op=deleteSubscriptionCodeBatch'.$ops).'">'.$i18n->get('delete codes').'</a>';
+	} else {
+		return _submenu($output, 'listSubscriptionCodes title', 'subscription codes manage');
 	}
 	
 	$p = WebGUI::Paginator->new('op=listSubscriptionCodes'.$ops);
