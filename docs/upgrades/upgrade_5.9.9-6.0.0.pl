@@ -842,7 +842,7 @@ $replace{'t'} = {
 my ($sth, $data, $code, $table, $column, %identifier);
 foreach $table (keys %dbFields){
 	$sth = WebGUI::SQL->read("SELECT * FROM $table ");
-	die "Cannot read from table $table " if ($!);
+	die "Cannot read from table $table ".$! if ($!);
 	while ($data = $sth->hashRef){
 		foreach $column (@{$dbFields{$table}{fields}}){
 			$code = $data->{$column};
