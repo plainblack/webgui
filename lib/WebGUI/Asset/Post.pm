@@ -850,6 +850,9 @@ sub www_edit {
 			$var{'reply.title'} = $self->getParent->get("title");
 			$var{'reply.synopsis'} = $self->getParent->get("synopsis");
 			$var{'reply.content'} = $self->getParent->formatContent;
+			for my $i (1..5) {	
+				$var{'reply.userDefined'.$i} = WebGUI::HTML::filter($self->getParent->get('userDefined'.$i),"macros");
+			}
 			unless ($session{form}{content} || $session{form}{title}) {
                 		$content = "[quote]".$self->getParent->get("content")."[/quote]" if ($session{form}{withQuote});
                 		$title = $self->getParent->get("title");
@@ -897,6 +900,9 @@ sub www_edit {
 		$var{'preview.title'} = WebGUI::HTML::filter($session{form}{title},"all");
 		($var{'preview.synopsis'}, $var{'preview.content'}) = $self->getSynopsisAndContentFromFormPost;
 		$var{'preview.content'} = $self->formatContent($var{'preview.content'},$session{form}{contentType});
+		for my $i (1..5) {	
+			$var{'preview.userDefined'.$i} = WebGUI::HTML::filter($session{form}{'userDefined'.$i},"macros");
+		}
 	}
 	$var{'form.footer'} = WebGUI::Form::formFooter();
 	$var{usePreview} = $self->getThread->getParent->get("usePreview");
@@ -919,7 +925,7 @@ sub www_edit {
 			name=>"userDefined".$x,
 			value=>$self->getValue("userDefined".$x)
 			});
-		$var{'userDefined'.$x.'.form.textarea'} = WebGUI::Form::HTMLArea({
+		$var{'userDefined'.$x.'.form.htmlarea'} = WebGUI::Form::HTMLArea({
 			name=>"userDefined".$x,
 			value=>$self->getValue("userDefined".$x)
 			});

@@ -121,6 +121,7 @@ sub appendTemplateLabels {
 	$var->{"by.label"} = $i18n->get("by");
         $var->{'body.label'} = $i18n->get("body");
 	$var->{"back.label"} = $i18n->get("back");
+	$var->{'compensation.label'} = $i18n->get("compensation");
 	$var->{'contentType.label'} = $i18n->get("contentType");
 	$var->{"date.label"} = $i18n->get("date");
 	$var->{"delete.label"} = $i18n->get("delete");
@@ -129,8 +130,13 @@ sub appendTemplateLabels {
 	$var->{"edit.label"} = $i18n->get("edit");
 	$var->{'endDate.label'} = $i18n->get("endDate");
         $var->{'exactphrase.label'} = $i18n->get("exactPhrase");
-	$var->{"layout.flat.label"} = $i18n->get("flatLayout");
 	$var->{'image.label'} = $i18n->get("image");
+	$var->{"job.header.label"} = $i18n->get("edit job");
+	$var->{"job.title.label"} = $i18n->get("job title");
+	$var->{"job.description.label"} = $i18n->get("job description");
+	$var->{"job.requirements.label"} = $i18n->get("job requirements");
+	$var->{"location.label"} = $i18n->get("location");
+	$var->{"layout.flat.label"} = $i18n->get("flatLayout");
 	$var->{'link.header.label'} = $i18n->get("edit link");
 	$var->{"lastReply.label"} = $i18n->get("lastReply");
 	$var->{"lock.label"} = $i18n->get("lock");

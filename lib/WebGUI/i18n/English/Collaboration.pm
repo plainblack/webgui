@@ -236,6 +236,36 @@ our $I18N = {
 		lastUpdated => 1109696029,
 	},
 
+	'edit job' => {
+		message => q|Edit Job Posting|,
+		lastUpdated => 1109696029,
+	},
+
+	'job description' => {
+		message => q|Job Description|,
+		lastUpdated => 1109696029,
+	},
+
+	'job title' => {
+		message => q|Job Title|,
+		lastUpdated => 1109696029,
+	},
+
+	'job requirements' => {
+		message => q|Job Requirements|,
+		lastUpdated => 1109696029,
+	},
+
+	'location' => {
+		message => q|Location|,
+		lastUpdated => 1109696029,
+	},
+
+	'compensation' => {
+		message => q|Compensation|,
+		lastUpdated => 1109696029,
+	},
+
 	'synopsis' => {
 		message => q|Synopsis|,
 		lastUpdated => 1109696029,
