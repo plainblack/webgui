@@ -4,6 +4,9 @@
  - Bugfix [ 955397 ] Make Page Printable Macro Fails
  - Bugfix [ 959762 ] Mail Form Template problem (fix)
  - Bugfix [ 952908 ] Manage database option is not available
+ - Bugfix [ 955501 ] Pagination link in SQL Report contains all
+   form-parameters
+ - Bugfix [ 956221 ] article template
 
 
 

@@ -118,7 +118,7 @@ sub www_view {
 		if ($query =~ /^select/i || $query =~ /^show/i || $query =~ /^describe/i) {
 			my $url = WebGUI::URL::page('&wid='.$_[0]->get("wobjectId").'&func=view');
 			foreach (keys %{$session{form}}) {
-				unless ($_ eq "pn" || $_ eq "wid" || $_ eq "func") {
+				unless ($_ eq "pn" || $_ eq "wid" || $_ eq "func" || $_ =~ /identifier/i || $_ =~ /password/i) {
 					$url = WebGUI::URL::append($url, WebGUI::URL::escape($_)
 						.'='.WebGUI::URL::escape($session{form}{$_}));
 				}
