@@ -74,6 +74,20 @@ sub _getNextSequenceNumber {
 }
 
 #-------------------------------------------------------------------
+sub _validateField {
+	my ($key, $type) = @_;
+	if ($type eq "date") {
+        	return WebGUI::DateTime::setToEpoch($session{form}{$key});
+        } elsif ($type eq "interval") {
+        	return (WebGUI::DateTime::intervalToSeconds($session{form}{$key."_interval"},$session{form}{$key."_units"}) || 0);
+        } elsif ($type eq "HTMLArea") {
+        	return WebGUI::HTML::cleanSegment($session{form}{$key});
+        } else {
+		return $session{form}{$key};
+	}
+}
+
+#-------------------------------------------------------------------
 
 =head2 confirm ( message, yesURL, [ , noURL, vitalComparison ] )
 
@@ -630,7 +644,8 @@ sub new {
 			defaultValue=>0
 			} ,
 		editTimeout=>{
-			defaultValue=>1
+			defaultValue=>1,
+			fieldType=>"interval"
 			}, 
 		filterPost=>{
 			defaultValue=>"javascript",
@@ -642,7 +657,9 @@ sub new {
 		displayTitle=>{
 			defaultValue=>1
 			}, 
-		description=>{},
+		description=>{
+			fieldType=>"HTMLArea"
+			},
  		pageId=>{
 			defaultValue=>$session{page}{pageId}
 			}, 
@@ -650,10 +667,12 @@ sub new {
 			defaultValue=>1
 			}, 
 		startDate=>{
-			defaultValue=>$session{page}{startDate}
+			defaultValue=>$session{page}{startDate},
+			fieldType=>"date"
 			},
 		endDate=>{
-			defaultValue=>$session{page}{endDate}
+			defaultValue=>$session{page}{endDate},
+			fieldType=>"date"
 			},
 		sequenceNumber=>{}
 		};
@@ -1283,15 +1302,13 @@ sub www_editSave {
 	my %set;
 	foreach (keys %{$_[0]->{_wobjectProperties}}) {
 		if (exists $session{form}{$_}) {
-			$set{$_} = $session{form}{$_} || $_[0]->{_wobjectProperties}{$_}{defaultValue};
+			$set{$_} = _validateField($_,$_[0]->{_wobjectProperties}{$_}{fieldType}) || $_[0]->{_wobjectProperties}{$_}{defaultValue};
 		}
 	}
 	$set{title} = $session{form}{title} || $_[0]->name;
-	$set{description} = WebGUI::HTML::cleanSegment($set{description});
-	$set{editTimeout} = WebGUI::DateTime::intervalToSeconds($session{form}{editTimeout_interval},$session{form}{editTimeout_units}) || 0;
 	foreach (keys %{$_[0]->{_extendedProperties}}) {
 		if (exists $session{form}{$_}) {
-			$set{$_} = $session{form}{$_} || $_[0]->{_extendedProperties}{$_}{defaultValue};
+			$set{$_} = _validateField($_,$_[0]->{_extendedProperties}{$_}{fieldType}) || $_[0]->{_extendedProperties}{$_}{defaultValue};
 		}
 	}
 	%set = (%set, %{$_[1]});
