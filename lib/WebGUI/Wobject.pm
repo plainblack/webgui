@@ -498,6 +498,33 @@ sub processMacros {
 
 #-------------------------------------------------------------------
 
+=head2 processTemplate ( templateId, vars ) 
+
+ Returns the content generated from this template.
+
+ NOTE: Only for use in wobjects that support templates.
+
+=item templateId
+
+ An id referring to a particular template in the templates table.
+
+=item hashRef
+
+ A hash reference containing variables and loops to pass to the
+ template engine.
+
+=cut
+
+sub processTemplate {
+	my %vars = (
+		%{$_[0]->{_property}},
+		%{$_[2]}
+		);
+	return WebGUI::Template::process(WebGUI::Template::get($_[1]), \%vars);
+}
+
+#-------------------------------------------------------------------
+
 =head2 purge ( )
 
  Removes this wobject from the database and all it's attachments
@@ -754,7 +781,7 @@ sub www_copy {
 
 sub www_cut {
         if (WebGUI::Privilege::canEditPage()) {
-		$_[0]->set({pageId=>2, templatePosition=>0});
+		$_[0]->set({pageId=>2, templatePosition=>1});
 		_reorderWobjects($session{page}{pageId});
                 return "";
         } else {
@@ -800,7 +827,7 @@ sub www_delete {
 
 sub www_deleteConfirm {
         if (WebGUI::Privilege::canEditPage()) {
-		$_[0]->set({pageId=>3, templatePosition=>0});
+		$_[0]->set({pageId=>3, templatePosition=>1});
 		WebGUI::ErrorHandler::audit("moved Wobject ".$_[0]->{_property}{wobjectId}." to the trash.");
 		_reorderWobjects($_[0]->get("pageId"));
                 return "";
@@ -910,7 +937,7 @@ sub www_edit {
         	$displayTitle = $_[0]->get("displayTitle");
         }
 	$title = $_[0]->get("title") || $_[0]->get("namespace");
-	$templatePosition = $_[0]->get("templatePosition") || '0';
+	$templatePosition = $_[0]->get("templatePosition") || 1;
 	$startDate = $_[0]->get("startDate") || $session{page}{startDate};
 	$endDate = $_[0]->get("endDate") || $session{page}{endDate};
 	$f = WebGUI::HTMLForm->new;
@@ -975,7 +1002,7 @@ sub www_edit {
 sub www_editSave {
 	my ($title, $templatePosition, $startDate, $endDate);
 	$title = $session{form}{title} || $_[0]->get("namespace");
-        $templatePosition = $session{form}{templatePosition} || '0';
+        $templatePosition = $session{form}{templatePosition} || 1;
         $startDate = setToEpoch($session{form}{startDate}) || $session{page}{startDate};
         $endDate = setToEpoch($session{form}{endDate}) || $session{page}{endDate};
 	$session{form}{description} = WebGUI::HTML::cleanSegment($session{form}{description});
@@ -1118,7 +1145,7 @@ sub www_paste {
         if (WebGUI::Privilege::canEditPage()) {
 		($nextSeq) = WebGUI::SQL->quickArray("select max(sequenceNumber) from wobject where pageId=$session{page}{pageId}");
 		$nextSeq += 1;
-		$_[0]->set({sequenceNumber=>$nextSeq, pageId=>$session{page}{pageId}, templatePosition=>0});
+		$_[0]->set({sequenceNumber=>$nextSeq, pageId=>$session{page}{pageId}, templatePosition=>1});
                 return "";
         } else {
                 return WebGUI::Privilege::insufficient();
