@@ -129,6 +129,27 @@ sub createAccountSave {
    $properties->{passwordTimeout} = $session{setting}{webguiPasswordTimeout};
       
    return $self->SUPER::createAccountSave($username,$properties,$password,$profile);
+   #my $u = WebGUI::User->new("new");
+   #$self->user($u);
+   #my $userId = $u->userId;
+   #$u->username($username);
+   #$u->authMethod($self->authMethod);
+   #$u->karma($session{setting}{karmaPerLogin},"Login","Just for logging in.") if ($session{setting}{useKarma});
+   #WebGUI::Operation::Profile::saveProfileFields($u,$profile);
+   
+   #my %properties;
+   #$properties{identifier} = Digest::MD5::md5_base64($password);
+   #$properties{passwordLastUpdated} = $lastUpdated;
+   #$properties{passwordTimeout} = $session{setting}{webguiPasswordTimeout};
+   #$self->saveParams($userId,$self->authMethod,\%properties);
+   #my $authInfo = "\n\n".WebGUI::International::get(50).": ".$username."\n".WebGUI::International::get(51).": ".$password."\n\n";
+   #WebGUI::MessageLog::addEntry($self->userId,"",WebGUI::International::get(870),$session{setting}{webguiWelcomeMessage}.$authInfo) if ($session{setting}{webguiSendWelcomeMessage});
+   
+   #WebGUI::Session::convertVisitorToUser($session{var}{sessionId},$userId);
+   #$self->_logLogin($userId,"success");
+   #system(WebGUI::Macro::process($session{setting}{runOnRegistration})) if ($session{setting}{runOnRegistration} ne "");
+   #WebGUI::MessageLog::addInternationalizedEntry('',$session{setting}{onNewUserAlertGroup},'',536) if ($session{setting}{alertOnNewUser});
+   #return "";
 }
 
 #-------------------------------------------------------------------
