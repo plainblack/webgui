@@ -1,14 +1,18 @@
 package WebGUI::International;
 
-#-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2002 Plain Black LLC.
-#-------------------------------------------------------------------
-# Please read the legal notices (docs/legal.txt) and the license
-# (docs/license.txt) that came with this distribution before using
-# this software.
-#-------------------------------------------------------------------
-# http://www.plainblack.com                     info@plainblack.com
-#-------------------------------------------------------------------
+=head1 LEGAL
+
+ -------------------------------------------------------------------
+  WebGUI is Copyright 2001-2002 Plain Black LLC.
+ -------------------------------------------------------------------
+  Please read the legal notices (docs/legal.txt) and the license
+  (docs/license.txt) that came with this distribution before using
+  this software.
+ -------------------------------------------------------------------
+  http://www.plainblack.com                     info@plainblack.com
+ -------------------------------------------------------------------
+
+=cut
 
 use strict;
 use WebGUI::Session;
@@ -16,7 +20,53 @@ use WebGUI::SQL;
 
 my %international;
 
+=head1 NAME
+
+ Package WebGUI::International
+
+=head1 SYNOPSIS
+
+ use WebGUI::International;
+ $string = 	WebGUI::International::get($internationalId,$namespace,$languageId);
+ %languages =	WebGUI::International::getLanguages();
+
+=head1 DESCRIPTION
+
+ This package provides an interface to the internationalization system. 
+
+=head1 FUNCTIONS
+
+ These functions are available from this package:
+
+=cut
+
+
 #-------------------------------------------------------------------
+
+=head2 get ( internationalId [ , namespace, languageId ] )
+
+ Returns the internationalized message string for the user's language.
+ If there is no internationalized message, this method will
+ return the English string.
+
+=item internationalId
+
+ An integer that relates to a message in the international table
+ in the WebGUI database.
+
+=item namespace
+
+ A string that relates to the namespace field in the international
+ table in the WebGUI database. Defaults to 'WebGUI'.
+
+=item languageId
+
+ An integer that specifies the language that the user should see.
+ Defaults to the user's defined language. If the user hasn't specified
+ a default language it defaults to '1' (English).
+
+=cut
+
 sub get {
         my ($output, $language, $namespace);
 	if ($_[2] ne "") {
@@ -34,7 +84,8 @@ sub get {
 	if (defined $international{$language}{$_[0]}) { 		# a little caching never hurts =)
 		$output = $international{$language}{$_[0]};
 	} else {
-		($output) = WebGUI::SQL->quickArray("select message from international where internationalId=$_[0] and namespace='$namespace' and languageId='$language'");
+		($output) = WebGUI::SQL->quickArray("select message from international 
+			where internationalId=$_[0] and namespace='$namespace' and languageId='$language'");
 		if ($output eq "" && $language ne 1) {
 			$output = get($_[0],$namespace,1);
 		}
@@ -43,6 +94,14 @@ sub get {
 }
 
 #-------------------------------------------------------------------
+
+=head2 getLanguages ( )
+
+ Returns a hash reference to the languages (languageId/lanugage) 
+ installed on this WebGUI system.  
+
+=cut
+
 sub getLanguages {
         my ($hashRef);
         $hashRef = WebGUI::SQL->buildHashRef("select languageId,language from language");

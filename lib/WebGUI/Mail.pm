@@ -1,23 +1,78 @@
 package WebGUI::Mail;
 
-#-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2002 Plain Black LLC.
-#-------------------------------------------------------------------
-# Please read the legal notices (docs/legal.txt) and the license
-# (docs/license.txt) that came with this distribution before using
-# this software.
-#-------------------------------------------------------------------
-# http://www.plainblack.com                     info@plainblack.com
-#-------------------------------------------------------------------
+=head1 LEGAL
+
+ -------------------------------------------------------------------
+  WebGUI is Copyright 2001-2002 Plain Black LLC.
+ -------------------------------------------------------------------
+  Please read the legal notices (docs/legal.txt) and the license
+  (docs/license.txt) that came with this distribution before using
+  this software.
+ -------------------------------------------------------------------
+  http://www.plainblack.com                     info@plainblack.com
+ -------------------------------------------------------------------
+
+=cut
 
 use Net::SMTP;
 use strict;
 use WebGUI::ErrorHandler;
 use WebGUI::Session;
 
+=head1 NAME
+
+ Package WebGUI::Mail
+
+=head1 SYNOPSIS
+
+ use WebGUI::Mail;
+ WebGUI::Mail::send($to,$subject,$message);
+
+=head1 DESCRIPTION
+
+ This package provides access to use SMTP based email services.
+
+=head1 METHODS
+
+ These methods are available from this class:
+
+=cut
+
+
+
 #-------------------------------------------------------------------
-#eg: send("jt@jt.com","hi, how are you","this is my message","bob@bob.com","you@ther.com");
-#eg: send(to,subject,message,cc,from,bcc);
+
+=head2 send ( to, subject, message [ , cc, from, bcc ] )
+
+ Sends an SMTP email message to the specified user.
+
+=item to 
+
+ An email address for the TO line.
+
+=item subject
+
+ The subject line for the email.
+
+=item message
+
+ The message body for the email.
+
+=item cc
+
+ The email address for the CC line.
+
+=item from
+
+ The email address for the FROM line. Defaults to the email address
+ specified in the Company Settings.
+
+=item bcc
+
+ The email address for the BCC line.
+
+=cut
+
 sub send {
         my ($smtp, $message, $from);
 	$from = $_[4] || ($session{setting}{companyName}.' <'.$session{setting}{companyEmail}.'>');

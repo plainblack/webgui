@@ -46,7 +46,7 @@ use WebGUI::URL;
 
 =head1 DESCRIPTION
 
- This package proovides an object-oriented way of managing WebGUI
+ This package provides an object-oriented way of managing WebGUI
  users as well as getting/setting a users's profile data.
 
 =head1 METHODS
