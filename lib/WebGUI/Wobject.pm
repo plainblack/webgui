@@ -35,6 +35,7 @@ use WebGUI::TabForm;
 use WebGUI::Template;
 use WebGUI::URL;
 use WebGUI::Utility;
+use WebGUI::MetaData;
 
 =head1 NAME
 
@@ -245,6 +246,7 @@ sub duplicate {
 		$properties{bufferDate} = time();
 		$properties{bufferPrevId} = {};
 	}
+	my $orginalWid = $properties{wobjectId};
 	delete $properties{wobjectId};
 	my $cmd = "WebGUI::Wobject::".$properties{namespace};
         my $w = eval{$cmd->new({namespace=>$properties{namespace},wobjectId=>"new"})};
@@ -252,6 +254,7 @@ sub duplicate {
         	WebGUI::ErrorHandler::warn("Couldn't duplicate wobject ".$properties{namespace}." because: ".$@);
 	}
 	$w->set(\%properties);
+	WebGUI::MetaData::MetaDataDuplicate($orginalWid, $w->get("wobjectId"));
         return $w->get("wobjectId");
 }
 
@@ -464,6 +467,19 @@ sub inDateRange {
 }
 
 #-------------------------------------------------------------------
+                                                                                                                             
+=head2 logView ( )
+              
+Logs the view of the wobject to the passive profiling mechanism.                                                                                                               
+=cut
+
+sub logView {
+	my $self = shift;
+	WebGUI::PassiveProfiling::add($self->get("wobjectId"));
+	return;
+}
+
+#-------------------------------------------------------------------
 
 =head2 moveCollateralDown ( tableName, idName, id [ , setName, setValue ] )
 
@@ -610,7 +626,7 @@ sub namespace {
 
 #-------------------------------------------------------------------
 
-=head2 new ( -properties, -extendedProperties [, -useDiscussion ] )
+=head2 new ( -properties, -extendedProperties [, -useDiscussion , -useTemplate , -useMetaData ] )
 
 Constructor.
 
@@ -666,6 +682,10 @@ NOTE: This is used to define the wobject and should only be passed in by a wobje
 
 Defaults to "0". If set to "1" this will add a template field to the wobject to enable content managers to select a template to layout this wobject.
 
+=item -useMetaData
+                                                                                                                             
+Defaults to "0". If set to "1" this will add a Metadata properties tab to this wobject to enable content managers to set Metadata values.
+
 NOTE: This is used to define the wobject and should only be passed in by a wobject subclass.
 
 =back
@@ -674,15 +694,16 @@ NOTE: This is used to define the wobject and should only be passed in by a wobje
 
 sub new {
 	my ($self, @p) = @_;
- 	my ($properties, $extendedProperties, $useTemplate, $useDiscussion);
+ 	my ($properties, $extendedProperties, $useTemplate, $useDiscussion, $useMetaData);
 	if (ref $_[1] eq "HASH") {
 		$properties = $_[1]; # reverse compatibility prior to 5.2
 	} else {
-		($properties, $extendedProperties, $useDiscussion, $useTemplate) = 
-			rearrange([qw(properties extendedProperties useDiscussion useTemplate)], @p);
+		($properties, $extendedProperties, $useDiscussion, $useTemplate, $useMetaData) = 
+			rearrange([qw(properties extendedProperties useDiscussion useTemplate useMetaData)], @p);
 	} 
 	$useDiscussion = 0 unless ($useDiscussion);
 	$useTemplate = 0 unless ($useTemplate);
+	$useMetaData = 0 unless ($useMetaData && $session{setting}{metaDataEnabled});
 	my $wobjectProperties = {
 		userDefined1=>{
 			fieldType=>"text"
@@ -774,6 +795,7 @@ sub new {
 		_property=>\%fullProperties, 
 		_useTemplate=>$useTemplate,
 		_useDiscussion=>$useDiscussion,
+		_useMetaData=>$useMetaData,
 		_wobjectProperties=>$wobjectProperties,
 		_extendedProperties=>$extendedProperties
 		}, 
@@ -864,6 +886,7 @@ sub purge {
 	}
 	WebGUI::SQL->write("delete from ".$_[0]->get("namespace")." where wobjectId=".$_[0]->get("wobjectId"));
         WebGUI::SQL->write("delete from wobject where wobjectId=".$_[0]->get("wobjectId"));
+	WebGUI::MetaData::metaDataDelete($_[0]->get("wobjectId"));
 	my $node = WebGUI::Node->new($_[0]->get("wobjectId"));
 	$node->delete;
 }
@@ -1327,6 +1350,12 @@ sub www_edit {
 			uiLevel=>5
 			};
 	}
+	if($self->{_useMetaData}) {
+		$tabs{metadata} = {
+			label=>WebGUI::International::get('Metadata','MetaData'),
+			uiLevel=>5
+			};
+	}
 	$f = WebGUI::TabForm->new(\%tabs);
 	$f->hidden({name=>"wid",value=>$self->get("wobjectId")});
 	$f->hidden({name=>"namespace",value=>$self->get("namespace")}) if ($self->get("wobjectId") eq "new");
@@ -1436,6 +1465,20 @@ sub www_edit {
                 	);
 		$f->getTab("discussion")->raw(WebGUI::Forum::UI::forumProperties($self->get("forumId")));
 	}
+	if ($self->{_useMetaData}) {
+		my $meta = WebGUI::MetaData::getMetaDataFields($self->get("wobjectId"));
+		foreach my $field (keys %$meta) {
+			my $fieldType = $meta->{$field}{fieldType} || "text";
+			$f->getTab("metadata")->dynamicField($fieldType,
+						-name=>"metadata_".$meta->{$field}{fieldId},
+						-label=>$meta->{$field}{fieldName},
+						-uiLevel=>5,
+						-value=>$meta->{$field}{value},
+						-extras=>qq/title="$meta->{$field}{description}"/,
+						-possibleValues=>$meta->{$field}{possibleValues}
+				);
+        	}
+	}
 	my $output;
 	$output = helpIcon($helpId,$self->get("namespace")) if ($helpId);
 	$heading = WebGUI::International::get($headingId,$self->get("namespace")) if ($headingId);
@@ -1486,6 +1529,7 @@ sub www_editSave {
 	%set = (%set, %{$extras});
 	$set{forumId} = WebGUI::Forum::UI::forumPropertiesSave()  if ($self->{_useDiscussion});
 	$self->set(\%set);
+	WebGUI::MetaData::metaDataSave($self->get("wobjectId")) if ($self->{_useMetaData});
 	return "";
 }
 
