@@ -299,7 +299,7 @@ sub www_showMessage {
 
 #-------------------------------------------------------------------
 sub www_view {
-	my (%var, $p, $constraints, %data, $sth, @submission, @content, $image, $i, $url, $thumbnail, $responses);
+	my (%var, $row, $page, $p, $constraints, %data, $sth, @submission, @content, $image, $i, $url, $thumbnail, $responses);
 	tie %data, 'Tie::CPHash';
 	$var{"label.readmore"} = WebGUI::International::get(46,$namespace);
 	$var{"label.responses"} = WebGUI::International::get(57,$namespace);
@@ -338,10 +338,7 @@ sub www_view {
 		} else {
 			$thumbnail = "";
 		}
-		($responses) = WebGUI::SQL->quickArray("select count(*) from discussion
-                        where wobjectId=".$_[0]->get("wobjectId")." and subId=$data{USS_submissionId}");
 		push (@submission,{
-			"submission.responses"=>$responses,
 			"submission.id"=>$data{USS_submissionId},
 			"submission.url"=>WebGUI::URL::page('wid='.$_[0]->get("wobjectId").'&func=viewSubmission&sid='.$data{USS_submissionId}),
 			"submission.content"=>$content[0],
@@ -349,7 +346,7 @@ sub www_view {
 			"submission.userId"=>$data{userId},
 			"submission.status"=>$data{status},
 			"submission.thumbnail"=>$thumbnail,
-			"submission.date"=>epochToHuman($data{dateSubmitted}),
+			"submission.date"=>$data{dateSubmitted},
 			"submission.currentUser"=>($session{user}{userId} == $data{userId}),
 			"submission.username"=>$data{username},
 			"submission.userProfile"=>WebGUI::URL::page('op=viewProfile&uid='.$data{userId}),
@@ -366,7 +363,17 @@ sub www_view {
                 .WebGUI::URL::escape($session{form}{atLeastOne}).'&numResults='.$session{form}{numResults}
                 .'&without='.WebGUI::URL::escape($session{form}{without}));
 	$p = WebGUI::Paginator->new($url, \@submission, $_[0]->get("submissionsPerPage"));
-	$var{submissions_loop} = $p->getPageData;
+	#post processing page data for greater speed
+	$page = $p->getPageData;
+	$i = 0;
+	foreach $row (@$page) {
+		$page->[$i]->{"submission.date"} = epochToHuman($row->{"submission.date"});
+		($responses) = WebGUI::SQL->quickArray("select count(*) from discussion
+                        where wobjectId=".$_[0]->get("wobjectId")." and subId=".$row->{"submission.id"});
+		$page->[$i]->{"submission.responses"} = $responses;
+		$i++;
+	}
+	$var{submissions_loop} = $page;
 	$var{firstPage} = $p->getFirstPageLink;
 	$var{lastPage} = $p->getLastPageLink;
 	$var{nextPage} = $p->getNextPageLink;
