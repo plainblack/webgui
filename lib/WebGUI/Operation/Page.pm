@@ -33,6 +33,11 @@ our @EXPORT = qw(&www_viewPageTree &www_movePageUp &www_movePageDown
         &www_moveTreePageDown &www_moveTreePageLeft &www_moveTreePageRight);
 
 #-------------------------------------------------------------------
+=head2 _changeWobjectPrivileges ( page )
+
+This private function changes the privileges of all wobjects on page.
+
+=cut
 sub _changeWobjectPrivileges {
    my($wobject,$sth);
    $sth = WebGUI::SQL->read("select wobjectId from wobject where pageId=".quote($_[0]));
@@ -47,23 +52,39 @@ sub _changeWobjectPrivileges {
 }			
 
 #-------------------------------------------------------------------
+=head2 _recursivelyChangeProperties ( page )
+
+This private function set an entire subtree with $page as root to the same privilege and/or 
+style settings. These properties are set to be a duplicate of those in page.
+
+=over
+
+=item page
+
+This is the page whose ancestors should be changed. This must be an WebGUI::Page instance.
+
+=back
+
+=cut
 # This combines _recusivelyChangePrivileges and _recusivelyChangeStyle, since there's no use in walking down a tree twice.
 sub _recursivelyChangeProperties {
-	my $page = shift;
+	my ($page, $currentPage);
+	$page = shift;
 
 	_changeWobjectPrivileges($page->get("pageId")) unless $session{form}{wobjectPrivileges};
 
 	$page->walk_down({
 		callback => sub {
-			if (WebGUI::Privilege::canEditPage($page->get('pageId'))) {
-				$page->setWithoutRecache({
+			$currentPage = shift;
+			if (WebGUI::Privilege::canEditPage($currentPage->get('pageId'))) {
+				$currentPage->setWithoutRecache({
 					startDate		=> WebGUI::FormProcessor::dateTime("startDate"),
 					endDate			=> WebGUI::FormProcessor::dateTime("endDate"),
 					ownerId			=> $session{form}{ownerId},
 					groupIdView		=> $session{form}{groupIdView},
 					groupIdEdit		=> $session{form}{groupIdEdit}
 				}) if ($session{form}{recursePrivs});
-				$page->setWithoutRecache({
+				$currentPage->setWithoutRecache({
 					styleId => $session{form}{styleId}
 				}) if ($session{form}{recurseStyle});
 			}
@@ -72,17 +93,6 @@ sub _recursivelyChangeProperties {
 	});
 	
 	WebGUI::Page->recachePageTree;
-}
-
-#-------------------------------------------------------------------
-sub _reorderPages {
-        my ($sth, $i, $pid);
-        $sth = WebGUI::SQL->read("select pageId from page where parentId=$_[0] order by sequenceNumber");
-        while (($pid) = $sth->array) {
-                $i++;
-                WebGUI::SQL->write("update page set sequenceNumber='$i' where pageId=$pid");
-        }
-        $sth->finish;
 }
 
 #-------------------------------------------------------------------
@@ -152,43 +162,73 @@ sub _selectPositions {
 }
 
 #-------------------------------------------------------------------
+=head2 _traversePageTree( pageId [, initialDepth ] )
+
+Walks down the page tree from page with id pageId and returns an indented list of the pages it
+walks over. Also prints edit/delete/move buttons.
+
+=item pageId
+
+The id of the page you want to start from
+
+=item initialDepth
+
+The depth the tree should start with. Defaults to zero.
+
+=over
+
+=back
+
+=cut
 sub _traversePageTree {
-        my ($a, $b, %page, %wobject, $output, $depth, $i, $spacer);
-	tie %page, 'Tie::CPHash';
+        my ($top, $initialDepth, %wobject, $output, $spacer, $page, $currentPage, $options, $currentPageId, $currentUrlizedTitle, $wobjects);
+	($top, $initialDepth) = @_;
+
 	tie %wobject, 'Tie::CPHash';
         $spacer = '<img src="'.$session{config}{extrasURL}.'/spacer.gif" width=12>';
-        for ($i=1;$i<=$_[1];$i++) {
-                $depth .= $spacer;
-        }
-        $a = WebGUI::SQL->read("select pageId,urlizedTitle,title from page where (pageId<2 or pageId>999) and parentId='$_[0]' order by sequenceNumber");
-        while (%page = $a->hash) {
-		if (WebGUI::Privilege::canEditPage($page{pageId})) {
-                	$output .= $depth
-				.pageIcon()
-				.deleteIcon('op=deletePage',$page{urlizedTitle})
-                                .moveLeftIcon(sprintf('op=moveTreePageLeft&pageId=%s',$page{pageId}),$page{urlizedTitle})
-                                .moveUpIcon(sprintf('op=moveTreePageUp&pageId=%s',$page{pageId}),$page{urlizedTitle})
-                                .moveDownIcon(sprintf('op=moveTreePageDown&pageId=%s',$page{pageId}),$page{urlizedTitle})
-                                .moveRightIcon(sprintf('op=moveTreePageRight&pageId=%s',$page{pageId}),$page{urlizedTitle})
-				.editIcon('op=editPage',$page{urlizedTitle})
-				.' <a href="'.WebGUI::URL::gateway($page{urlizedTitle}).'">'.$page{title}.'</a><br>';
-			$b = WebGUI::SQL->read("select * from wobject where pageId=$page{pageId}");
-			while (%wobject = $b->hash) {
-                		$output .= $depth.$spacer
-					.wobjectIcon()
-					.deleteIcon('func=delete&wid='.$wobject{wobjectId},$page{urlizedTitle})
-					.editIcon('func=edit&wid='.$wobject{wobjectId},$page{urlizedTitle})
-					.' '. $wobject{title}.'<br>';
+	
+	$page = WebGUI::Page->getPage($top);
+	$page->walk_down({
+		callback => sub {
+			($currentPage, $options) = @_;
+			$currentPageId = $currentPage->get('pageId');
+			$currentUrlizedTitle = $currentPage->get('urlizedTitle');
+			if ($currentPageId < 2 || $currentPageId > 999) {
+				$output .= $spacer x $options->{_depth}
+					.pageIcon()
+					.deleteIcon('op=deletePage',$currentUrlizedTitle)
+                	                .moveLeftIcon(sprintf('op=moveTreePageLeft&pageId=%s',$currentPageId), $currentUrlizedTitle)
+                        	        .moveUpIcon(sprintf('op=moveTreePageUp&pageId=%s',$currentPageId), $currentUrlizedTitle)
+					.moveDownIcon(sprintf('op=moveTreePageDown&pageId=%s',$currentPageId), $currentUrlizedTitle)
+					.moveRightIcon(sprintf('op=moveTreePageRight&pageId=%s',$currentPageId), $currentUrlizedTitle)
+					.editIcon('op=editPage', $currentUrlizedTitle)
+					.' <a href="'.WebGUI::URL::gateway($currentUrlizedTitle).'">'.$currentPage->get('title').'</a><br>';
+				$wobjects = WebGUI::SQL->read("select * from wobject where pageId=$currentPageId");
+				while (%wobject = $wobjects->hash) {
+					$output .= $spacer x $options->{_depth} . $spacer
+						.wobjectIcon()
+						.deleteIcon('func=delete&wid='.$wobject{wobjectId},$currentUrlizedTitle)
+						.editIcon('func=edit&wid='.$wobject{wobjectId},$currentUrlizedTitle)
+						.' '. $wobject{title}.'<br>';
+				}
+				$wobjects->finish;
 			}
-			$b->finish;
-		}
-                $output .= _traversePageTree($page{pageId},$_[1]+1);
-        }
-        $a->finish;
+		},
+		_depth => $initialDepth || 0
+	});
+                
         return $output;
 }
 
 #-------------------------------------------------------------------
+=head2 www_cutPage
+
+This will cut the page defined by $session{page}{pageId} (ie. the current page) and all it's
+children from the pagetree and place it on the clipboard.
+
+=back
+
+=cut
 sub www_cutPage {
 	my ($page);
         if ($session{page}{pageId} < 26 && $session{page}{pageId} >= 0) {
@@ -204,6 +244,13 @@ sub www_cutPage {
 }
 
 #-------------------------------------------------------------------
+=head2 www_deletePage
+
+This function returns an 'Are you sure' page for moving the page to the trash.
+
+=back
+
+=cut
 sub www_deletePage {
 	my ($output);
 	if ($session{page}{pageId} < 1000 && $session{page}{pageId} > 0) {
@@ -223,24 +270,35 @@ sub www_deletePage {
 }
 
 #-------------------------------------------------------------------
+=head2 www_deletePageConfirm
+
+Actually transfers the page to the trash.
+
+=back 
+
+=cut
 sub www_deletePageConfirm {
 	if ($session{page}{pageId} < 1000 && $session{page}{pageId} > 0) {
 		return WebGUI::Privilege::vitalComponent();
         } elsif (WebGUI::Privilege::canEditPage()) {
-                WebGUI::SQL->write("update page set parentId=3, "
-                        ."bufferUserId=".$session{user}{userId}.", "
-                        ."bufferDate=".time().", "
-                        ."bufferPrevId=".$session{page}{parentId}." "
-                        ."where pageId=".$session{page}{pageId});
-		_reorderPages($session{page}{parentId});
+		my $page = WebGUI::Page->getPage($session{page}{pageId});
+		$page->delete;
 		WebGUI::Session::refreshPageInfo($session{page}{parentId});
                 return "";
         } else {
                 return WebGUI::Privilege::insufficient();
         }
 }
+
 use WebGUI::TabForm;
 #-------------------------------------------------------------------
+=head2 www_editPage
+
+Displays the properties for a page.
+
+=back
+
+=cut
 sub www_editPage {
         my ($f, $endDate, $output, $subtext, $childCount, %hash, %page);
 	$session{page}{useAdminStyle} = 1;
@@ -478,6 +536,13 @@ sub www_editPage {
 }
 
 #-------------------------------------------------------------------
+=head2 www_editPageSave
+
+Stores the data from www_editPage to the database and tree cache.
+
+=back
+
+=cut
 sub www_editPageSave {
         my ($pageId, $currentPage, $page);
 	
@@ -491,7 +556,7 @@ sub www_editPageSave {
 	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage($pageId));
 
 	if ($session{form}{pageId} eq "new") {
-		$currentPage = WebGUI::Page->getPage($session{page}{pageId});
+		$currentPage = WebGUI::Page->getPage($pageId);
 		$page = $currentPage->add;
 	}
 
@@ -536,6 +601,13 @@ sub www_editPageSave {
 }
 
 #-------------------------------------------------------------------
+=head2 www_moqvePageDown
+
+Moves page down in the context of it's sisters.
+
+=back
+
+=cut
 sub www_movePageDown {
   if (WebGUI::Privilege::canEditPage($session{page}{pageId})) {
     WebGUI::Page->moveDown($session{page}{pageId});
@@ -546,6 +618,13 @@ sub www_movePageDown {
 }
 
 #-------------------------------------------------------------------
+=head2 www_movePageDown
+
+Moves page up in the context of it's sisters.
+
+=back
+
+=cut
 sub www_movePageUp {
   if (WebGUI::Privilege::canEditPage($session{page}{pageId})) {
     WebGUI::Page->moveUp($session{page}{pageId});
@@ -556,6 +635,13 @@ sub www_movePageUp {
 }
 
 #-------------------------------------------------------------------
+=head2 www_moveTreePageUp
+
+Same as www_movePageUp wit this difference that this module returns the www_viewPageTree method.
+
+=back
+
+=cut
 sub www_moveTreePageUp {
   if (WebGUI::Privilege::canEditPage($session{page}{pageId})) {
     WebGUI::Page->moveUp($session{page}{pageId});
@@ -566,6 +652,13 @@ sub www_moveTreePageUp {
 }
 
 #-------------------------------------------------------------------
+=head2 www_moveTreePageDown
+
+Same as www_movePageDown with this difference that this module returns the www_viewPageTree method.
+
+=back
+
+=cut
 sub www_moveTreePageDown {
   if (WebGUI::Privilege::canEditPage($session{page}{pageId})) {
     WebGUI::Page->moveDown($session{page}{pageId});
@@ -576,6 +669,14 @@ sub www_moveTreePageDown {
 }
 
 #-------------------------------------------------------------------
+=head2 www_moveTreePageLeft
+
+Move the page one level left in the tree. In other words, the page is moved up one place in the hierarchy.
+Another way to look at is that the mother of the current page becomes the elder sister of the current page.
+
+=back
+
+=cut
 sub www_moveTreePageLeft {
   if (WebGUI::Privilege::canEditPage($session{page}{pageId})) {
     WebGUI::Page->moveLeft($session{page}{pageId});
@@ -633,6 +734,13 @@ sub www_rearrangeWobjects {
 
 
 #-------------------------------------------------------------------
+=head2 www_viewPageTree
+
+Returns a HTML formatted indented pagetree complete with edit/delete/cut/move buttons
+
+=back
+
+=cut
 sub www_viewPageTree {
 	my ($output);
 	$session{page}{useAdminStyle} = 1;
