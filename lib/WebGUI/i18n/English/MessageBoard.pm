@@ -177,36 +177,9 @@ A conditional indicating whether there is more than one forum.
 		lastUpdated => 1066584548
 	},
 
-	'78' => {
-		message => q|Forum, Add/Edit|,
-		lastUpdated => 1066584480
-	},
-
 	'2' => {
 		message => q|Message Board|,
 		lastUpdated => 1031514049
-	},
-
-	'79' => {
-		message => q|A message board can contain one or more forums. The following is the list of properties attached to each forum.
-
-<p>
-
-<b>Title</b><br>
-The title of the forum.
-<p>
-
-<b>Description</b><br>
-The description of the forum.
-<p>
-
-|,
-		lastUpdated => 1100231810
-	},
-
-	'77' => {
-		message => q|Edit Forum|,
-		lastUpdated => 1066061199
 	},
 
 	'73' => {
@@ -217,18 +190,6 @@ The description of the forum.
 	'76' => {
 		message => q|Are you certain you wish to delete this forum and all the posts it contains?|,
 		lastUpdated => 1066055963
-	},
-	'90' => {
-		message => q|Move Forum|,
-		lastUpdated =>1093435103
-	},
-	'91' => {
-		message => q|<br>Select the Message Board you want to move the forum to.|,
-		lastUpdated =>1093435103
-	},
-	'92' => {
-		message => q|--- No Change ---|,
-		lastUpdated =>1093435103
 	}
 };
 

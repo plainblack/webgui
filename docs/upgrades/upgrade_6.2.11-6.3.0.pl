@@ -237,6 +237,7 @@ WebGUI::SQL->write("drop table forumPostAttachment");
 WebGUI::SQL->write("drop table forumSubscription");
 WebGUI::SQL->write("drop table forumThread");
 WebGUI::SQL->write("drop table forumThreadSubscription");
+WebGUI::SQL->write("drop table MessageBoard_forums");
 
 # start migrating non-wobject stuff into assets
 my %migration;
@@ -829,6 +830,7 @@ print "\tDeleting files which are no longer used.\n" unless ($quiet);
 #rmtree("../../lib/DBIx/Tree");
 #unlink("../../lib/WebGUI/Help/WobjectProxy.pm");
 #unlink("../../lib/WebGUI/i18n/English/WobjectProxy.pm");
+#unlink("../../lib/WebGUI/Wobject/MessageBoard.pm");
 #unlink("../../lib/WebGUI/Wobject/WobjectProxy.pm");
 #rmtree("../../www/extras/wobject/WobjectProxy");
 
@@ -866,6 +868,7 @@ $conf->set("assets"=>[
 		'WebGUI::Asset::Wobject::Survey',
 		'WebGUI::Asset::Wobject::Product',
 		'WebGUI::Asset::Wobject::Collaboration',
+		'WebGUI::Asset::Wobject::MessageBoard',
 		'WebGUI::Asset::Redirect',
 		'WebGUI::Asset::Template',
 		'WebGUI::Asset::FilePile',
@@ -1074,8 +1077,8 @@ sub walkTree {
 					print "\t\t\tMigrating forum for Article ".$wobject->{wobjectId}."\n" unless ($quiet);
 					$rank++;
 					migrateForum($wobject->{forumId},$pageId,$pageLineage,$rank, $wobject->{title},$wobject->{description},
-						$wobject->{startDate}, $wobject->{endDate}, $wobject->{ownerId}, $wobject->{groupIdView},
-						$wobject->{groupIdView},$page->{styleId}, $page->{printableStyleId});
+						$wobject->{startDate}, $wobject->{endDate}, $wobject->{ownerId}, $wobject->{groupIdEdit},
+						$page->{styleId}, $page->{printableStyleId});
 				}
 				rmtree($session{config}{uploadsPath}.'/'.$wobject->{wobjectId});
 			} elsif ($wobject->{namespace} eq "SiteMap") {
@@ -1212,7 +1215,15 @@ sub walkTree {
 				WebGUI::SQL->write("update WobjectProxy set description=".quote($wobject->{description})." where
 					assetId=".quote($wobjectId));
 			} elsif ($wobject->{namespace} eq "MessageBoard") {
-				# migrate forums
+				my $forums = WebGUI::SQL->read("select forumId, title, description from MessageBoard_forums where wobjectId=".quote($wobject->{wobjectId})." order by sequenceNumber");
+				my $i = 1;
+				while (my ($fid, $title, $desc) = $forums->array) {
+					migrateForum($fid,$wobjectId,$wobjectLineage,$i, $title,$desc,
+						$wobject->{startDate}, $wobject->{endDate}, $wobject->{ownerId}, $wobject->{groupIdEdit},
+						$page->{styleId}, $page->{printableStyleId});
+					$i++;
+				}
+				$forums->finish;
 			} elsif (isIn($wobject->{namespace}, qw(DataForm Poll))) {
 				print "\t\t\tMigrating wobject collateral data\n" unless ($quiet);
 				foreach my $table (qw(DataForm_entry DataForm_entryData DataForm_field DataForm_tab Poll_answer)) {
@@ -1261,7 +1272,6 @@ sub migrateForum {
 	my $startDate = shift;
 	my $endDate = shift;
 	my $userId = shift;
-	my $viewGroup = shift;
 	my $editGroup = shift;
 	my $styleId = shift;
 	my $printId = shift;
@@ -1291,6 +1301,7 @@ sub migrateForum {
                 $data->{postsPerPage} = $master->{postsPerPage};
                 $data->{usePreview} = $master->{usePreview};
 	}
+	my $viewGroup = $data->{groupToView};
 	my $newId = WebGUI::SQL->setRow("asset","assetId",{
 		assetId=>"new",
 		parentId=>$newParentId,

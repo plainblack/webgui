@@ -12,6 +12,7 @@ assets = WebGUI::Asset::File::Image, \
 	WebGUI::Asset::Wobject::Article, \
 	WebGUI::Asset::Wobject::Navigation, \
 	WebGUI::Asset::Wobject::Survey, \
+	WebGUI::Asset::Wobject::MessageBoard, \
 	WebGUI::Asset::FilePile
 
 assetContainers = WebGUI::Asset::Wobject::Layout, \
