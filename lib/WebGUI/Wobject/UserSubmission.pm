@@ -55,14 +55,12 @@ sub _canEditMessage {
 
 #-------------------------------------------------------------------
 sub _photogalleryView {
-        my (@row, $i, $y, $image, $output, $p, $sth, %submission, $responses);
+        my (@row, $i, $y, $image, $output, $p, $sth, %submission);
         tie %submission, 'Tie::CPHash';
-        $sth = WebGUI::SQL->read("select * from UserSubmission_submission
+        $sth = WebGUI::SQL->read("select title, image, submissionId, status, userId from UserSubmission_submission
                 where wobjectId=".$_[0]->get("wobjectId")." and (status='Approved' or userId=$session{user}{userId}) order by dateSubmitted desc");
         while (%submission = $sth->hash) {
                 $submission{title} = WebGUI::HTML::filter($submission{title},'all');
-                ($responses) = WebGUI::SQL->quickArray("select count(*) from discussion
-                        where wobjectId=".$_[0]->get("wobjectId")." and subId=$submission{submissionId}");
 		if ($y == 0) {
 			$row[$i] .= '<td>';
 		}
@@ -103,7 +101,7 @@ sub _photogalleryView {
 sub _traditionalView {
 	my (@row, $i, $image, $output, $p, $sth, %submission);
 	tie %submission, 'Tie::CPHash';
-        $sth = WebGUI::SQL->read("select * from UserSubmission_submission
+        $sth = WebGUI::SQL->read("select title, userId, status, image, dateSubmitted, username from UserSubmission_submission
                 where wobjectId=".$_[0]->get("wobjectId")." and (status='Approved' or userId=$session{user}{userId}) order by dateSubmitted desc");
         while (%submission = $sth->hash) {
                 $submission{title} = WebGUI::HTML::filter($submission{title},'all');
