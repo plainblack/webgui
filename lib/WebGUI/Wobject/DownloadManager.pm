@@ -383,10 +383,10 @@ sub www_view {
 				$_[0]->get("wobjectId"), $download{downloadId});
 			$row[$i] = '<tr><td class="tableData" valign="top">';
 			if ($session{var}{adminOn}) {
-				$row[$i] .= deleteIcon('func=deleteDownload&wid='.$session{form}{wid}.'&did='.$download{downloadId})
-					.editIcon('func=editDownload&wid='.$session{form}{wid}.'&did='.$download{downloadId})
-					.moveUpIcon('func=moveDownloadUp&wid='.$session{form}{wid}.'&did='.$download{downloadId})
-					.moveDownIcon('func=moveDownloadDown&wid='.$session{form}{wid}.'&did='.$download{downloadId})
+				$row[$i] .= deleteIcon('func=deleteDownload&wid='.$_[0]->get("wobjectId").'&did='.$download{downloadId})
+					.editIcon('func=editDownload&wid='.$_[0]->get("wobjectId").'&did='.$download{downloadId})
+					.moveUpIcon('func=moveDownloadUp&wid='.$_[0]->get("wobjectId").'&did='.$download{downloadId})
+					.moveDownIcon('func=moveDownloadDown&wid='.$_[0]->get("wobjectId").'&did='.$download{downloadId})
 					.' ';
 			}
 			$row[$i] .= '<a href="'.WebGUI::URL::page('func=download&wid='.$_[0]->get("wobjectId").
