@@ -97,7 +97,6 @@ use WebGUI::Operation::User ();
 use WebGUI::Page ();
 use WebGUI::Paginator ();
 use WebGUI::Privilege ();
-use WebGUI::ProxyParse ();
 use WebGUI::Search ();
 use WebGUI::Session ();
 use WebGUI::SQL ();

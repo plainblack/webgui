@@ -84,6 +84,8 @@ foreach my $macro (@macroList) {
 	                        $alias[0] = "?";
         	        } elsif ($alias[0] eq "At") {
                 	        $alias[0] = "\@";
+	                } elsif ($alias[0] eq "rootmenuHorizontal") {
+        	                $alias[0] = "rootmenu";
 	                } elsif ($alias[0] eq "Hash") {
         	                $alias[0] = "#";
 			}
