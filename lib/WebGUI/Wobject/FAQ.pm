@@ -145,7 +145,6 @@ sub www_editQuestion {
 
 #-------------------------------------------------------------------
 sub www_editQuestionSave {
-	my ($seq);
         if (WebGUI::Privilege::canEditPage()) {
 		$_[0]->setCollateral("FAQ_question", "FAQ_questionId", {
                         FAQ_questionId => $session{form}{qid},

@@ -45,7 +45,7 @@ sub _generateDebug {
                                         $debug .= '<tr><td align="right"><b>'.$section.'.'.$key.':</b></td><td>'.$value.'</td>';
                                 }
                         }
-                        $debug .= '<tr height=10><td>&nbsp;</td><td>&nbsp</td></tr>';
+                        $debug .= '<tr><td colspan="2">&nbsp;</td></tr>';
                 }
                 $debug .='</table>';
         }
@@ -211,7 +211,7 @@ sub _processOperations {
 
 #-------------------------------------------------------------------
 sub page {
-	my ($positions, $wobjectOutput, $pageEdit, $httpHeader, $content, $operationOutput, $template);
+	my ($debug, $positions, $wobjectOutput, $pageEdit, $httpHeader, $content, $operationOutput, $template);
 	WebGUI::Session::open($_[0],$_[1]);
 	$operationOutput = _processOperations();
 	$wobjectOutput = _processFunctions();
@@ -249,8 +249,9 @@ sub page {
 		),
 		$positions
 	);
+	$debug = _generateDebug();
 	WebGUI::Session::close();
-	return $httpHeader.$content._generateDebug();
+	return $httpHeader.$content.$debug;
 }
 
 
