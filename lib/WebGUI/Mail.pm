@@ -92,7 +92,7 @@ sub send {
         $message .= "BCC: $_[5]\n" if ($_[5]);
         $message .= "Subject: ".$_[1]."\n";
 	$message .= "Date: ".WebGUI::DateTime::epochToHuman("","%W, %d %C %y %j:%n:%s %O")."\n";
-	$message .= "Content-Type: text/plain; charset=UTF-8","charset")."\n";
+	$message .= "Content-Type: text/plain; charset=UTF-8\n";
         $message .= "\n";
 	$message = WebGUI::Macro::process($message);
         #body
