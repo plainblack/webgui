@@ -1,0 +1,180 @@
+<!-- note: this version of the special character inserter is optimized for IE 5.5+ only -->
+<html>
+<head>
+<title>Insert Special Character</title>
+<script language="javascript">
+function _CloseOnEsc() {
+if (event.keyCode == 27) { window.close(); return; }
+}
+
+function Init() {                                                       // run on page load
+document.body.onkeypress = _CloseOnEsc;
+}
+
+function View(charcode) {                                               // preview character
+document.all.Chars.value =  '&' + charcode + ';'; 
+}
+
+
+function Set(code) {                                                    // select character
+window.returnValue = code;                                           // set return value
+window.close();                                                      // close dialog
+}
+</script>
+<style type="text/css">
+<!--
+
+td { font-family: MS Shell, Arial, Verdana; 
+font-size: 8pt; font-weight:bold}
+
+-->
+</style>
+</head>
+<body bgcolor="#ECE9D8" topmargin=0 leftmargin=0 onload="Init()">
+<form name="sel" method=get onSubmit="Set(document.all.Chars.value); return false;">
+<table width=486 align="center" border=0 cellspacing=1 cellpadding=2 bgcolor="#808080" style="cursor: hand;">
+<tr>
+<td align="center" width=16 bgcolor="#FFFFFF" onMouseOver=View('nbsp') onClick=Set('&nbsp;')>&nbsp;</td>
+<td align="center" width=16 bgcolor="#FFFFFF" onMouseOver=View('quot') onClick=Set('&quot;')>&quot;</td>
+<td align="center" width=16 bgcolor="#FFFFFF" onMouseOver=View('iexcl') onClick=Set('&iexcl;')>&iexcl;</td>
+<td align="center" width=16 bgcolor="#FFFFFF" onMouseOver=View('cent') onClick=Set('&cent;')>&cent;</td>
+<td align="center" width=16 bgcolor="#FFFFFF" onMouseOver=View('pound') onClick=Set('&pound;')>&pound;</td>
+<td align="center" width=16 bgcolor="#FFFFFF" onMouseOver=View('curren') onClick=Set('&curren;')>&curren;</td>
+<td align="center" width=16 bgcolor="#FFFFFF" onMouseOver=View('yen') onClick=Set('&yen;')>&yen;</td>
+<td align="center" width=16 bgcolor="#FFFFFF" onMouseOver=View('brvbar') onClick=Set('&brvbar;')>&brvbar;</td>
+<td align="center" width=16 bgcolor="#FFFFFF" onMouseOver=View('sect') onClick=Set('&sect;')>&sect;</td>
+<td align="center" width=16 bgcolor="#FFFFFF" onMouseOver=View('uml') onClick=Set('&uml;')>&uml;</td>
+<td align="center" width=16 bgcolor="#FFFFFF" onMouseOver=View('copy') onClick=Set('&copy;')>&copy;</td>
+<td align="center" width=16 bgcolor="#FFFFFF" onMouseOver=View('ordf') onClick=Set('&ordf;')>&ordf;</td>
+<td align="center" width=16 bgcolor="#FFFFFF" onMouseOver=View('laquo') onClick=Set('&laquo;')>&laquo;</td>
+<td align="center" width=16 bgcolor="#FFFFFF" onMouseOver=View('not') onClick=Set('&not;')>&not</td>
+<td align="center" width=16 bgcolor="#FFFFFF" onMouseOver=View('shy') onClick=Set('&shy;')>&shy;</td>
+<td align="center" width=16 bgcolor="#FFFFFF" onMouseOver=View('reg') onClick=Set('&reg;')>&reg;</td>
+<td align="center" width=16 bgcolor="#FFFFFF" onMouseOver=View('macr') onClick=Set('&macr;')>&macr;</td>
+<td align="center" width=16 bgcolor="#FFFFFF" onMouseOver=View('deg') onClick=Set('&deg;')>&deg;</td>
+<td align="center" width=16 bgcolor="#FFFFFF" onMouseOver=View('plusmn') onClick=Set('&plusmn;')>&plusmn;</td>
+<td align="center" width=16 bgcolor="#FFFFFF" onMouseOver=View('sup2') onClick=Set('&sup2;')>&sup2;</td>
+<td align="center" width=16 bgcolor="#FFFFFF" onMouseOver=View('sup3') onClick=Set('&sup3;')>&sup3;</td>
+<td align="center" width=16 bgcolor="#FFFFFF" onMouseOver=View('acute') onClick=Set('&acute;')>&acute;</td>
+<td align="center" width=16 bgcolor="#FFFFFF" onMouseOver=View('micro') onClick=Set('&micro;')>&micro;</td>    <td align="center" width=16 bgcolor="#FFFFFF" onMouseOver=View('para') onClick=Set('&para;')>&para;</td>
+<td align="center" width=16 bgcolor="#FFFFFF" onMouseOver=View('middot') onClick=Set('&middot;')>&middot;</td>
+<td align="center" width=16 bgcolor="#FFFFFF" onMouseOver=View('cedil') onClick=Set('&cedil;')>&cedil;</td>
+<td align="center" width=16 bgcolor="#FFFFFF" onMouseOver=View('sup1') onClick=Set('&sup1;')>&sup1;</td>
+<td align="center" width=16 bgcolor="#FFFFFF" onMouseOver=View('ordm') onClick=Set('&ordm;')>&ordm;</td>
+<td align="center" width=16 bgcolor="#FFFFFF" onMouseOver=View('raquo') onClick=Set('&raquo;')>&raquo;</td>
+<td align="center" width=16 bgcolor="#FFFFFF" onMouseOver=View('frac14') onClick=Set('&frac14;')>&frac14;</td>
+<td align="center" width=16 bgcolor="#FFFFFF" onMouseOver=View('frac12') onClick=Set('&frac12;')>&frac12;</td>
+<td align="center" width=16 bgcolor="#FFFFFF" onMouseOver=View('frac34') onClick=Set('&frac34;')>&frac34;</td>
+</tr>
+<tr>
+<td align="center" width=16 bgcolor="#FFFFFF" onMouseOver=View('iquest') onClick=Set('&iquest;')>&iquest;</td>
+<td align="center" width=16 bgcolor="#FFFFFF" onMouseOver=View('times') onClick=Set('&times;')>&times;</td>
+<td align="center" width=16 bgcolor="#FFFFFF" onMouseOver=View('Oslash') onClick=Set('&Oslash;')>&Oslash;</td>
+<td align="center" width=16 bgcolor="#FFFFFF" onMouseOver=View('divide') onClick=Set('&divide;')>&divide;</td>
+<td align="center" width=16 bgcolor="#FFFFFF" onMouseOver=View('oslash') onClick=Set('&oslash;')>&oslash;</td>
+<td align="center" width=16 bgcolor="#FFFFFF" onMouseOver=View('fnof') onClick=Set('&fnof;')>&fnof;</td>
+<td align="center" width=16 bgcolor="#FFFFFF" onMouseOver=View('circ') onClick=Set('&circ;')>&circ;</td>
+<td align="center" width=16 bgcolor="#FFFFFF" onMouseOver=View('tilde') onClick=Set('&tilde;')>&tilde;</td>
+<td align="center" width=16 bgcolor="#FFFFFF" onMouseOver=View('ndash') onClick=Set('&ndash;')>&ndash;</td>
+<td align="center" width=16 bgcolor="#FFFFFF" onMouseOver=View('mdash') onClick=Set('&mdash;')>&mdash;</td>
+<td align="center" width=16 bgcolor="#FFFFFF" onMouseOver=View('lsquo') onClick=Set('&lsquo;')>&lsquo;</td>
+<td align="center" width=16 bgcolor="#FFFFFF" onMouseOver=View('rsquo') onClick=Set('&rsquo;')>&rsquo;</td>
+<td align="center" width=16 bgcolor="#FFFFFF" onMouseOver=View('sbquo') onClick=Set('&sbquo;')>&sbquo;</td>
+<td align="center" width=16 bgcolor="#FFFFFF" onMouseOver=View('ldquo') onClick=Set('&ldquo;')>&ldquo;</td>
+<td align="center" width=16 bgcolor="#FFFFFF" onMouseOver=View('rdquo') onClick=Set('&rdquo;')>&rdquo;</td>
+<td align="center" width=16 bgcolor="#FFFFFF" onMouseOver=View('bdquo') onClick=Set('&bdquo;')>&bdquo;</td>
+<td align="center" width=16 bgcolor="#FFFFFF" onMouseOver=View('dagger') onClick=Set('&dagger;')>&dagger;</td>
+<td align="center" width=16 bgcolor="#FFFFFF" onMouseOver=View('Dagger') onClick=Set('&Dagger;')>&Dagger;</td>
+<td align="center" width=16 bgcolor="#FFFFFF" onMouseOver=View('bull') onClick=Set('&bull;')>&bull;</td>
+<td align="center" width=16 bgcolor="#FFFFFF" onMouseOver=View('hellip') onClick=Set('&hellip;')>&hellip;</td>
+<td align="center" width=16 bgcolor="#FFFFFF" onMouseOver=View('permil') onClick=Set('&permil;')>&permil;</td>
+<td align="center" width=16 bgcolor="#FFFFFF" onMouseOver=View('lsaquo') onClick=Set('&lsaquo;')>&lsaquo;</td>
+<td align="center" width=16 bgcolor="#FFFFFF" onMouseOver=View('rsaquo') onClick=Set('&rsaquo;')>&rsaquo;</td>
+<td align="center" width=16 bgcolor="#FFFFFF" onMouseOver=View('euro') onClick=Set('&euro;')>&euro;</td>
+<td align="center" width=16 bgcolor="#FFFFFF" onMouseOver=View('trade') onClick=Set('&trade;')>&trade;</td>
+<td align="center" width=16 bgcolor="#FFFFFF" onMouseOver=View('Agrave') onClick=Set('&Agrave;')>&Agrave;</td>
+<td align="center" width=16 bgcolor="#FFFFFF" onMouseOver=View('Aacute') onClick=Set('&Aacute;')>&Aacute;</td>
+<td align="center" width=16 bgcolor="#FFFFFF" onMouseOver=View('Acirc') onClick=Set('&Acirc;')>&Acirc;</td>
+<td align="center" width=16 bgcolor="#FFFFFF" onMouseOver=View('Atilde') onClick=Set('&Atilde;')>&Atilde;</td>
+<td align="center" width=16 bgcolor="#FFFFFF" onMouseOver=View('Auml') onClick=Set('&Auml;')>&Auml;</td>
+<td align="center" width=16 bgcolor="#FFFFFF" onMouseOver=View('Aring') onClick=Set('&Aring;')>&Aring;</td>
+<td align="center" width=16 bgcolor="#FFFFFF" onMouseOver=View('AElig') onClick=Set('&AElig;')>&AElig;</td>
+</tr>
+<tr>
+<td align="center" width=16 bgcolor="#FFFFFF" onMouseOver=View('Ccedil') onClick=Set('&Ccedil;')>&Ccedil;</td>
+<td align="center" width=16 bgcolor="#FFFFFF" onMouseOver=View('Egrave') onClick=Set('&Egrave;')>&Egrave;</td>
+<td align="center" width=16 bgcolor="#FFFFFF" onMouseOver=View('Eacute') onClick=Set('&Eacute;')>&Eacute;</td>
+<td align="center" width=16 bgcolor="#FFFFFF" onMouseOver=View('Ecirc') onClick=Set('&Ecirc;')>&Ecirc;</td>
+<td align="center" width=16 bgcolor="#FFFFFF" onMouseOver=View('Euml') onClick=Set('&Euml;')>&Euml;</td>
+<td align="center" width=16 bgcolor="#FFFFFF" onMouseOver=View('Igrave') onClick=Set('&Igrave;')>&Igrave;</td>
+<td align="center" width=16 bgcolor="#FFFFFF" onMouseOver=View('Iacute') onClick=Set('&Iacute;')>&Iacute;</td>
+<td align="center" width=16 bgcolor="#FFFFFF" onMouseOver=View('Icirc') onClick=Set('&Icirc;')>&Icirc;</td>
+<td align="center" width=16 bgcolor="#FFFFFF" onMouseOver=View('Iuml') onClick=Set('&Iuml;')>&Iuml;</td>
+<td align="center" width=16 bgcolor="#FFFFFF" onMouseOver=View('ETH') onClick=Set('&ETH;')>&ETH;</td>
+<td align="center" width=16 bgcolor="#FFFFFF" onMouseOver=View('Ntilde') onClick=Set('&Ntilde;')>&Ntilde;</td>
+<td align="center" width=16 bgcolor="#FFFFFF" onMouseOver=View('Ograve') onClick=Set('&Ograve;')>&Ograve;</td>
+<td align="center" width=16 bgcolor="#FFFFFF" onMouseOver=View('Oacute') onClick=Set('&Oacute;')>&Oacute;</td>
+<td align="center" width=16 bgcolor="#FFFFFF" onMouseOver=View('Ocirc') onClick=Set('&Ocirc;')>&Ocirc;</td>
+<td align="center" width=16 bgcolor="#FFFFFF" onMouseOver=View('Otilde') onClick=Set('&Otilde;')>&Otilde;</td>
+<td align="center" width=16 bgcolor="#FFFFFF" onMouseOver=View('Ouml') onClick=Set('&;Ouml')>&Ouml;</td>
+<td align="center" width=16 bgcolor="#FFFFFF" onMouseOver=View('times') onClick=Set('&times;')>&times;</td>
+<td align="center" width=16 bgcolor="#FFFFFF" onMouseOver=View('slash') onClick=Set('&Oslash;')>&Oslash;</td>
+<td align="center" width=16 bgcolor="#FFFFFF" onMouseOver=View('Ugrave') onClick=Set('&Ugrave;')>&Ugrave;</td>
+<td align="center" width=16 bgcolor="#FFFFFF" onMouseOver=View('Uacute') onClick=Set('&Uacute;')>&Uacute;</td>
+<td align="center" width=16 bgcolor="#FFFFFF" onMouseOver=View('Ucirc') onClick=Set('&Ucirc;')>&Ucirc;</td>
+<td align="center" width=16 bgcolor="#FFFFFF" onMouseOver=View('Uuml') onClick=Set('&Uuml;')>&Uuml;</td>
+<td align="center" width=16 bgcolor="#FFFFFF" onMouseOver=View('Yacute') onClick=Set('&Yacute;')>&Yacute;</td>
+<td align="center" width=16 bgcolor="#FFFFFF" onMouseOver=View('THORN') onClick=Set('&THORN;')>&THORN;</td>
+<td align="center" width=16 bgcolor="#FFFFFF" onMouseOver=View('szlig') onClick=Set('&szlig;')>&szlig;</td>
+<td align="center" width=16 bgcolor="#FFFFFF" onMouseOver=View('agrave') onClick=Set('&agrave;')>&agrave;</td>
+<td align="center" width=16 bgcolor="#FFFFFF" onMouseOver=View('aacute') onClick=Set('&aacute;')>&aacute;</td>
+<td align="center" width=16 bgcolor="#FFFFFF" onMouseOver=View('acirc') onClick=Set('&acirc;')>&acirc;</td>
+<td align="center" width=16 bgcolor="#FFFFFF" onMouseOver=View('atilde') onClick=Set('&atilde;')>&atilde;</td>
+<td align="center" width=16 bgcolor="#FFFFFF" onMouseOver=View('auml') onClick=Set('&auml;')>&auml;</td>
+<td align="center" width=16 bgcolor="#FFFFFF" onMouseOver=View('aring') onClick=Set('&aring;')>&aring;</td>
+<td align="center" width=16 bgcolor="#FFFFFF" onMouseOver=View('aelig') onClick=Set('&aelig;')>&aelig;</td>
+</tr>
+<tr>
+<td align="center" width=16 bgcolor="#FFFFFF" onMouseOver=View('ccedil') onClick=Set('&ccedil;')>&ccedil;</td>
+<td align="center" width=16 bgcolor="#FFFFFF" onMouseOver=View('egrave') onClick=Set('&egrave;')>&egrave;</td>
+<td align="center" width=16 bgcolor="#FFFFFF" onMouseOver=View('eacute') onClick=Set('&eacute;')>&eacute;</td>
+<td align="center" width=16 bgcolor="#FFFFFF" onMouseOver=View('ecirc') onClick=Set('&ecirc;')>&ecirc;</td>
+<td align="center" width=16 bgcolor="#FFFFFF" onMouseOver=View('euml') onClick=Set('&euml;')>&euml;</td>
+<td align="center" width=16 bgcolor="#FFFFFF" onMouseOver=View('igrave') onClick=Set('&igrave;')>&igrave;</td>
+<td align="center" width=16 bgcolor="#FFFFFF" onMouseOver=View('iacute') onClick=Set('&iacute;')>&iacute;</td>
+<td align="center" width=16 bgcolor="#FFFFFF" onMouseOver=View('icirc') onClick=Set('&icirc;')>&icirc;</td>
+<td align="center" width=16 bgcolor="#FFFFFF" onMouseOver=View('iuml') onClick=Set('&iuml;')>&iuml;</td>
+<td align="center" width=16 bgcolor="#FFFFFF" onMouseOver=View('eth') onClick=Set('&eth;')>&eth;</td>
+<td align="center" width=16 bgcolor="#FFFFFF" onMouseOver=View('ntilde') onClick=Set('&ntilde;')>&ntilde;</td>
+<td align="center" width=16 bgcolor="#FFFFFF" onMouseOver=View('ograve') onClick=Set('&ograve;')>&ograve;</td>
+<td align="center" width=16 bgcolor="#FFFFFF" onMouseOver=View('oacute') onClick=Set('&oacute;')>&oacute;</td>
+<td align="center" width=16 bgcolor="#FFFFFF" onMouseOver=View('ocirc') onClick=Set('&ocirc;')>&ocirc;</td>
+<td align="center" width=16 bgcolor="#FFFFFF" onMouseOver=View('otilde') onClick=Set('&otilde;')>&otilde;</td>
+<td align="center" width=16 bgcolor="#FFFFFF" onMouseOver=View('ouml') onClick=Set('&ouml;')>&ouml;</td>
+<td align="center" width=16 bgcolor="#FFFFFF" onMouseOver=View('divide') onClick=Set('&divide;')>&divide;</td>
+<td align="center" width=16 bgcolor="#FFFFFF" onMouseOver=View('oslash') onClick=Set('&oslash;')>&oslash;</td>
+<td align="center" width=16 bgcolor="#FFFFFF" onMouseOver=View('ugrave') onClick=Set('&ugrave;')>&ugrave;</td>
+<td align="center" width=16 bgcolor="#FFFFFF" onMouseOver=View('uacute') onClick=Set('&uacute;')>&uacute;</td>
+<td align="center" width=16 bgcolor="#FFFFFF" onMouseOver=View('ucirc') onClick=Set('&ucirc;')>&ucirc;</td>
+<td align="center" width=16 bgcolor="#FFFFFF" onMouseOver=View('uuml') onClick=Set('&uuml;')>&uuml;</td>
+<td align="center" width=16 bgcolor="#FFFFFF" onMouseOver=View('yacute') onClick=Set('&yacute;')>&yacute;</td>
+<td align="center" width=16 bgcolor="#FFFFFF" onMouseOver=View('thorn') onClick=Set('&thorn;')>&thorn;</td>
+<td align="center" width=16 bgcolor="#FFFFFF" onMouseOver=View('yuml') onClick=Set('&yuml;')>&yuml;</td>
+<td align="center" width=16 bgcolor="#FFFFFF" onMouseOver=View('OELIG') onClick=Set('&OElig;')>&OElig;</td>
+<td align="center" width=16 bgcolor="#FFFFFF" onMouseOver=View('oelig') onClick=Set('&oelig;')>&oelig;</td>
+<td align="center" width=16 bgcolor="#FFFFFF" onMouseOver=View('Scaron') onClick=Set('&Scaron;')>&Scaron;</td>
+<td align="center" width=16 bgcolor="#FFFFFF" onMouseOver=View('scaron') onClick=Set('&scaron;')>&scaron;</td>
+<td align="center" width=16 bgcolor="#FFFFFF" onMouseOver=View('Yuml') onClick=Set('&Yuml;')>&Yuml;</td>
+<td align="center" width=16 bgcolor="#FFFFFF" onMouseOver=View('cent') onClick=Set('&cent;')>&cent;</td>
+<td align="center" width=16 bgcolor="#FFFFFF" onMouseOver=View('#064') onClick=Set('&#064;')>@</td>
+</tr>
+</table>
+<DIV ALIGN="center"><table name="distab" border=0 cellspacing=0 cellpadding=4 width=40%>
+<tr name="t1">
+<td name="c1" bgcolor="buttonface" valign=center>Charactercode:&nbsp;<input type="text" name="Chars" value="" size=8></td>
+<td name="c3" bgcolor="buttonface" width=100%></td>
+</tr>
+</table></DIV>
+
+</form>
+</body></html>

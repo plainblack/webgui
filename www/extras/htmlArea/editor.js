@@ -46,7 +46,7 @@ this.toolbar = [
     ['fontsize'],
 //    ['fontstyle'],
 //    ['linebreak'],
-    ['undo','redo','word','spell','find','separator'],
+    ['undo','redo','word','spell','find','specchar','separator'],
     ['bold','italic','underline','separator'],
     ['strikethrough','subscript','superscript','separator'],
     ['justifyleft','justifycenter','justifyright','separator'],
@@ -89,6 +89,7 @@ this.fontstyles = [     // make sure these exist in the header of page the conte
 
 this.btnList = {
     // buttonName:    commandID,               title,                onclick,                   image,             
+    "specchar":       ['SpecChar',             'Insert Special Characters', 'editor_action(this.id)', 'ed_spec_char.gif'],
     "spell":          ['spell',                'Spell Check',        'editor_action(this.id);', 'ed_spellcheck.gif'],
     "word":           ['word',                 'MS-Word cleanup',    'editor_action(this.id)',  'ed_word.gif'],
     "undo":           ['Undo',                 'Undo Ctrl+z',        'editor_action(this.id)',  'ed_undo.gif'],
@@ -321,6 +322,13 @@ function editor_action(button_id) {
   //
   // CUSTOM BUTTONS START HERE
   //
+  // special characters
+  else if (cmdID == 'SpecChar') {
+    var newchar = showModalDialog(_editor_url + "popups/insert_char.html", '', "dialogWidth:493px; dialogHeight: 140px; resizable: no; help: no; status: no; scroll: no;");
+    if (newchar == '') {return;}
+    else {editor_insertHTML(objname,newchar);}
+  }
+
   // Insert a smiley
   else if (cmdID == 'Smileys') {  // insert some text from a popup window
     var myTitle = "Insert a Smiley";
