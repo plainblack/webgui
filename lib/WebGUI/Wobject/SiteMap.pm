@@ -37,7 +37,8 @@ sub _traversePageTree {
                 $sth = WebGUI::SQL->read("select urlizedTitle, menuTitle, title, pageId, synopsis from page 
 			where parentId='$parent' order by sequenceNumber");
                 while ($data = $sth->hashRef) {
-                        if (($data->{pageId}>999 || $data->{pageId}==1) && WebGUI::Privilege::canViewPage($data->{pageId})) {
+                        if (($data->{pageId}<0 || $data->{pageId}>999 || $data->{pageId}==1) && WebGUI::Privilege::canViewPage($data->{pageId})) {
+WebGUI::ErrorHandler::warn("got here");
 				push(@pages,{ 
                                 	"page.indent" => $indentString,
 					"page.url" => WebGUI::URL::gateway($data->{urlizedTitle}),
@@ -45,7 +46,8 @@ sub _traversePageTree {
 					"page.title" => $data->{title},
 					"page.menuTitle" => $data->{menuTitle},
 					"page.synopsis" => $data->{synopsis},
-					"page.isRoot" => ($parent == 0)
+					"page.isRoot" => ($parent == 0),
+					"page.isTop" => ($currentDepth == 0 || ($currentDepth == 1 && $parent == 0))
 					});
                                 push(@pages,@{_traversePageTree($data->{pageId},($currentDepth+1),$depth,$indent)});
                         }
@@ -90,35 +92,37 @@ sub new {
 sub www_edit {
 	my $options = WebGUI::SQL->buildHashRef("select pageId,title from page where parentId=0 
 		and (pageId=1 or pageId>999) order by title");
-        my $f = WebGUI::HTMLForm->new;
-	$f->template(
+        my $layout = WebGUI::HTMLForm->new;
+        my $properties = WebGUI::HTMLForm->new;
+	$layout->template(
                 -name=>"templateId",
                 -value=>$_[0]->getValue("templateId"),
                 -namespace=>$_[0]->get("namespace"),
                 -afterEdit=>'func=edit&wid='.$_[0]->get("wobjectId")
                 );
-        $f->select(
+        $properties->select(
 		-name=>"startAtThisLevel",
 		-label=>WebGUI::International::get(3,$_[0]->get("namespace")),
-		-value=>[$_[0]->getValue("startLevel")],
+		-value=>[$_[0]->getValue("startAtThisLevel")],
 		-options=>{
                	 	0=>WebGUI::International::get(75,$_[0]->get("namespace")),
                 	$session{page}{pageId}=>WebGUI::International::get(74,$_[0]->get("namespace")),
                 	%{$options}
                 	}
 		);
-        $f->integer(
+        $layout->integer(
 		-name=>"depth",
 		-label=>WebGUI::International::get(4,$_[0]->get("namespace")),
 		-value=>$_[0]->getValue("depth")
 		);
-	$f->integer(
+	$layout->integer(
 		-name=>"indent",
 		-label=>WebGUI::International::get(6,$_[0]->get("namespace")),
 		-value=>$_[0]->getValue("indent")
 		);
 	return $_[0]->SUPER::www_edit(
-		-layout=>$f->printRowsOnly,
+		-properties=>$properties->printRowsOnly,
+		-layout=>$layout->printRowsOnly,
 		-headingId=>5,
 		-helpId=>1
 		);
