@@ -149,3 +149,14 @@ div.tabs {
    	background-color: #dddddd; 
 }
 
+/* form stuff */
+
+.formDescription {
+	font-family: helvetica, arial;
+	font-size: 14px;
+}
+
+.formSubtext {
+	font-family: helvetica, arial;
+	font-size: 11px;
+}
