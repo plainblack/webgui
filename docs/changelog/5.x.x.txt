@@ -19,6 +19,7 @@
  - Fixed bug [ 837143 ] Pagination broken on Survey report
  - Fixed bug [ 831331 ] translation errors
  - Fixed bug [ 834792 ] Karma Decay triggers SQL error
+ - Fixed bug [ 832284 ] Pagination broken in Messageboard with Search
 
 
 5.5.0

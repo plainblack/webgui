@@ -169,7 +169,8 @@ sub www_view {
 		my ($title, $description);
 		if ($session{form}{forumId} ne "") {
 			($title,$description) = WebGUI::SQL->quickArray("select title,description from MessageBoard_forums where forumId=".$session{form}{forumId});
-			$callback = WebGUI::URL::append("forumId=".$session{form}{forumId});
+			my $forumParam = "forumId=".$session{form}{forumId};
+			$callback = WebGUI::URL::append($callback,$forumParam);
 		}
 		return WebGUI::Forum::UI::forumOp($callback,$title,$description);
 	}

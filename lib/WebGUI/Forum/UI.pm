@@ -2057,7 +2057,7 @@ sub www_search {
         	$var{'post.user.label'} = WebGUI::International::get(244);
 		my $query = "select forumPostId,subject,userId,username,dateOfPost from forumPost where (status='approved' or status='archived') and ";
 		$query .= WebGUI::Search::buildConstraints([qw(subject username message)]);
-		my $p = WebGUI::Paginator->new(WebGUI::URL::append($caller->{callback},"forumOp=search&amp;forumId=".$forum->get("forumId")),"", $numResults);
+		my $p = WebGUI::Paginator->new(WebGUI::URL::append($caller->{callback},"forumOp=search&amp;doit=1&amp;forumId=".$forum->get("forumId")),"", $numResults);
 		$p->setDataByQuery($query);
 		my @post_loop;
 		foreach my $row (@{$p->getPageData}) {
