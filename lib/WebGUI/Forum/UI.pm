@@ -1316,7 +1316,23 @@ sub getThreadTemplateVars {
         $var->{'thread.lock.label'} = WebGUI::International::get(1040);
         $var->{'thread.unlock.url'} = formatThreadUnlockURL($callback,$post->get("forumPostId"));
         $var->{'thread.unlock.label'} = WebGUI::International::get(1041);
-        $var->{post_loop} = recurseThread($root, $thread, $forum, 0, $caller, $post->get("forumPostId"));
+	my $p = WebGUI::Paginator->new(WebGUI::URL::append($callback,"forumOp=viewThread&amp;forumPostId=".$post->get("forumPostId")."&amp;layout=$layout"),$forum->get("postsPerPage"));
+        if($layout eq "flat"){
+		$p->setDataByArrayRef(getFlatThread($root, $thread, $forum, $caller, $post->get("forumPostId")));
+		$var->{post_loop} = $p->getPageData();
+	}else{
+		$p->setDataByArrayRef(recurseThread($root, $thread, $forum, 0, $caller, $post->get("forumPostId")));
+		$var->{post_loop} = $p->getPageData();
+	}
+	$var->{firstPage} = $p->getFirstPageLink;
+        $var->{lastPage} = $p->getLastPageLink;
+        $var->{nextPage} = $p->getNextPageLink;
+        $var->{pageList} = $p->getPageLinks;
+        $var->{previousPage} = $p->getPreviousPageLink;
+        $var->{multiplePages} = ($p->getNumberOfPages > 1);
+        $var->{numberOfPages} = $p->getNumberOfPages;
+        $var->{pageNumber} = $p->getPageNumber;
+
         $var->{'thread.subject.label'} = WebGUI::International::get(229);
         $var->{'thread.date.label'} = WebGUI::International::get(245);
         $var->{'thread.user.label'} = WebGUI::International::get(244);
@@ -1394,7 +1410,7 @@ sub notifySubscribers {
 
 #-------------------------------------------------------------------
 
-=head2 recurseThread ( post, thread, forum, depth, caller, currentPost ) 
+=head2 recurseThread ( post, thread, forum, depth, caller, currentPost )
 
 Returns an array reference with the template variables from all the posts in a thread.
 
@@ -1447,6 +1463,51 @@ sub recurseThread {
         	}
 	}
         return \@post_loop;
+}
+#-------------------------------------------------------------------
+
+=head2 recurseThread ( post, thread, forum, caller, currentPost )
+
+Returns an array reference with the template variables from all the posts in a thread in flat mode. In flat mode
+messages are ordered by submission date, so threading is not maintained.
+
+=over
+
+=item post
+
+A post object.
+
+=item thread
+
+A thread object.
+
+=item forum
+
+A forum object.
+
+=item caller
+
+A hash reference containing information passed from the calling object.
+
+=item currentPost
+
+The unique id of the post that was selected by the user in this thread.
+
+=back
+
+=cut
+
+sub getFlatThread {
+	my ($post, $thread, $forum, $caller, $currentPost) = @_;
+	my (@post_loop, @posts);
+	@posts = WebGUI::SQL->buildArray("SELECT forumPostId FROM forumPost WHERE forumThreadId=".quote($thread->get("forumThreadId"))." ORDER BY dateOfPost");
+	foreach my $postId (@posts){
+		my $post = WebGUI::Forum::Post->new($postId);
+		push (@post_loop, getPostTemplateVars($post,$thread, $forum, $caller, {
+			'post.isCurrent'=>($currentPost == $post->get("forumPostId"))
+			}));
+	}
+	return \@post_loop;
 }
 
 #-------------------------------------------------------------------
