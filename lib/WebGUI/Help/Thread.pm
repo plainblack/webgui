@@ -13,6 +13,14 @@ our $HELP = {
 				tag => 'post template variables',
 				namespace => 'Post'
 			},
+			{
+				tag => 'collaboration template labels',
+				namespace => 'Collaboration'
+			},
+			{
+				tag => 'pagination template variables',
+				namespace => 'WebGUI'
+			},
 		]
 	},
 
