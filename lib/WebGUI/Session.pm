@@ -235,6 +235,12 @@ sub open {
 	###----------------------------
 	### current user's account and profile information (from users and userProfileData tables)
 	$session{user} = _getUserInfo($session{var}{userId},$session{dbh});
+	if ($session{env}{MOD_PERL}) {
+                my $r = Apache->request;
+                if(defined($r)) {
+			$r->connection->user($session{user}{username});
+		}
+	}
 	###----------------------------
 	### current page's properties (from page table)
 	$session{page} = _getPageInfo("",$session{dbh},$session{setting}{notFoundPage},$session{config}{scripturl});
