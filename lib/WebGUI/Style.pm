@@ -17,6 +17,7 @@ package WebGUI::Style;
 
 use strict;
 use Tie::CPHash;
+use WebGUI::International;
 use WebGUI::Session;
 use WebGUI::SQL;
 use WebGUI::Template;
@@ -102,7 +103,7 @@ sub process {
         $type =~ s/.*\.(.*?)$/$1/;
 	$var{'head.tags'} = '
 		<meta name="generator" content="WebGUI '.$WebGUI::VERSION.'" />
-		<meta http-equiv="Content-Type" content="text/html; charset='.($session{header}{charset}||$session{language}{characterSet}||"ISO-8859-1").'" />
+		<meta http-equiv="Content-Type" content="text/html; charset='.WebGUI::International::getLanguage($session{page}{languageId},"charset").'" />
 		<link rel="icon" href="'.$session{setting}{siteicon}.'" type="image/'.$type.'" />
 		<link rel="SHORTCUT ICON" href="'.$session{setting}{favicon}.'" />
 		'.$session{page}{head}{raw}.'

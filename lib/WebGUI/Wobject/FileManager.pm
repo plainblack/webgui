@@ -15,6 +15,7 @@ use Tie::CPHash;
 use WebGUI::DateTime;
 use WebGUI::Grouping;
 use WebGUI::HTMLForm;
+use WebGUI::HTTP;
 use WebGUI::Icon;
 use WebGUI::International;
 use WebGUI::Paginator;
@@ -175,7 +176,7 @@ sub www_download {
 				$session{form}{wid},
 				$session{form}{did});
 		}
-		$session{header}{redirect} = WebGUI::Session::httpRedirect($file->getURL);
+		WebGUI::HTTP::setRedirect($file->getURL);
 		return "";
 	} else {
 		return WebGUI::Privilege::insufficient();

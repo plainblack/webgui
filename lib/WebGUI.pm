@@ -17,6 +17,7 @@ use WebGUI::Affiliate;
 use WebGUI::Cache;
 use WebGUI::ErrorHandler;
 use WebGUI::Grouping;
+use WebGUI::HTTP;
 use WebGUI::International;
 use WebGUI::Macro;
 use WebGUI::Operation;
@@ -156,17 +157,13 @@ sub page {
         	$wobjectOutput = _processFunctions();
 	}
 	if ($output ne "") {
-		$output = WebGUI::Session::httpHeader().$output;
-	} elsif ($session{header}{mimetype} ne "text/html") {
-		$output = WebGUI::Session::httpHeader().$operationOutput.$wobjectOutput;
+		# using cache
+	} elsif (WebGUI::HTTP::getMimeType() ne "text/html") {
+		$output = $operationOutput.$wobjectOutput;
 	} elsif ($operationOutput ne "") {
-		$output = WebGUI::Session::httpHeader()._generatePage($operationOutput);
-        } elsif ($session{page}{redirectURL} && !$session{var}{adminOn}) {
-              	$output = WebGUI::Session::httpRedirect(WebGUI::Macro::process($session{page}{redirectURL}));
-        } elsif (exists $session{header}{redirect}) {
-                $output = $session{header}{redirect};
+		$output = _generatePage($operationOutput);
 	} elsif ($wobjectOutput ne "") {
-		$output = WebGUI::Session::httpHeader()._generatePage($wobjectOutput);
+		$output = _generatePage($wobjectOutput);
 	} else {
 		$output = _generatePage(WebGUI::Page::generate());
 		my $ttl;
@@ -176,10 +173,10 @@ sub page {
 			$ttl = $session{page}{cacheTimeout};
 		}
 		$cache->set($output, $ttl) if ($useCache);
-		$output = WebGUI::Session::httpHeader().$output;
 	}
+	my $httpHeader = WebGUI::HTTP::getHeader();
 	WebGUI::Session::close();
-	return $output;
+	return $httpHeader.$output;
 }
 
 

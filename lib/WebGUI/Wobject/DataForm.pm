@@ -17,6 +17,7 @@ use WebGUI::DateTime;
 use WebGUI::Form;
 use WebGUI::FormProcessor;
 use WebGUI::HTMLForm;
+use WebGUI::HTTP;
 use WebGUI::Icon;
 use WebGUI::International;
 use WebGUI::Macro;
@@ -787,8 +788,7 @@ sub www_editTabSave {
 #-------------------------------------------------------------------
 sub www_exportTab {
 	return WebGUI::Privilege::insufficient() unless ($_[0]->canEdit);
-	$session{header}{filename} = WebGUI::URL::urlize($_[0]->get("title")).".tab";
-	$session{header}{mimetype} = "text/plain";
+	WebGUI::HTTP::setFilename(WebGUI::URL::urlize($_[0]->get("title")).".tab","text/plain");
 	my %fields = WebGUI::SQL->buildHash("select DataForm_fieldId,name from DataForm_field where wobjectId=".$_[0]->get("wobjectId")." order by sequenceNumber");
 	my $select = "select a.DataForm_entryId as entryId, a.ipAddress, a.username, a.userId, a.submissionDate";
 	my $from = " from DataForm_entry a";

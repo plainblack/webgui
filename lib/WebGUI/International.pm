@@ -31,6 +31,7 @@ This package provides an interface to the internationalization system.
 
  use WebGUI::International;
  $string = WebGUI::International::get($internationalId,$namespace);
+ $hashRef = WebGUI::International::getLanguage($lang);
  %languages = WebGUI::International::getLanguages();
 
 This package can also be used in object-oriented (OO) style.
@@ -95,6 +96,47 @@ sub get {
 
 #-------------------------------------------------------------------
 
+=head2 getLanguage ( [ languageId , propertyName] )
+
+Returns a hash reference to a particular language's properties.
+
+=over
+
+=item languageId
+
+Defaults to "English". The language to retrieve the properties for.
+
+=item propertyName
+
+If this is specified, only the value of the property will be returned, instead of the hash reference to all properties. The valid values are "charset", "toolbar", and "label".
+
+=back
+
+=cut
+
+sub getLanguage {
+	my $language = shift || "English";
+	my $property = shift;
+	my $cmd = "WebGUI::i18n::".$language;
+	my $load = "use ".$cmd;
+	eval($load);
+	unless ($@) {
+		$cmd = "\$".$cmd."::LANGUAGE";
+		my $hashRef = eval($cmd);	
+		WebGUI::ErrorHandler::warn("Failed to retrieve language properties because ".$@) if ($@);
+		if ($property) {
+			return $hashRef->{$property};
+		} else {
+			return $hashRef;
+		}
+	} else {
+		WebGUI::ErrorHandler::warn("Language failed to compile: $language. ".$@);
+	}
+}
+
+
+#-------------------------------------------------------------------
+
 =head2 getLanguages ( )
 
 Returns a hash reference to the languages (languageId/lanugage) installed on this WebGUI system.  
@@ -110,15 +152,7 @@ sub getLanguages {
 	foreach my $file (@files) {
 		if ($file =~ /(.*?)\.pm$/) {
 			my $language = $1;
-			my $cmd = "WebGUI::i18n::".$language;
-			my $load = "use ".$cmd;
-			eval($load);
-			unless ($@) {
-				$cmd = "\$".$cmd."::I18N->{'label'}";
-				$hashRef->{$language} = eval($cmd);	
-			} else {
-				WebGUI::ErrorHandler::warn("Language failed to compile: $language. ".$@);
-			}
+			$hashRef->{$language} = getLanguage($language,"label");
 		}
 	}
         return $hashRef;

@@ -70,7 +70,10 @@ my $langs = {
 WebGUI::SQL->write("update userProfileField set dataDefault=".quote("['".$langs->{$defaultLangId}."']")." where fieldName='language'");
 WebGUI::SQL->write("update userProfileData set fieldData='".$langs->{$defaultLangId}."' where fieldName='language' and fieldData<>1");
 WebGUI::SQL->write("update userProfileData set fieldData='English' where fieldName='language' and fieldData=1");
-
+WebGUI::SQL->write("alter table page change languageId languageId varchar(50) not null default 'English'");
+foreach my $key (keys %{$langs}) {
+	WebGUI::SQL->write("update page set languageId=".quote($langs->{$key})." where languageId=".$key);
+}
 
 WebGUI::Session::close();
 

@@ -21,7 +21,9 @@ use Tie::IxHash;
 use WebGUI::ErrorHandler;
 use WebGUI::Grouping;
 use WebGUI::HTMLForm;
+use WebGUI::HTTP;
 use WebGUI::Icon;
+use WebGUI::Macro;
 use WebGUI::Persistent::Tree;
 use WebGUI::Session;
 use WebGUI::SQL;
@@ -386,6 +388,9 @@ Generates the content of the page.
 sub generate {
         return WebGUI::Privilege::noAccess() unless (canView());
 	my %var;
+	if ($session{page}{redirectURL} && !$session{var}{adminOn}) {
+		WebGUI::HTTP::setRedirect(WebGUI::Macro::process($session{page}{redirectURL}));
+	}
 	$var{'page.canEdit'} = canEdit();
         $var{'page.controls'} = pageIcon()
        		.deleteIcon('op=deletePage')

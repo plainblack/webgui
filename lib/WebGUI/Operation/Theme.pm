@@ -18,6 +18,7 @@ use WebGUI::Attachment;
 use WebGUI::Collateral;
 use WebGUI::Grouping;
 use WebGUI::HTMLForm;
+use WebGUI::HTTP;
 use WebGUI::Icon;
 use WebGUI::International;
 use WebGUI::Node;
@@ -301,7 +302,7 @@ sub www_exportTheme {
 	my $packageName = WebGUI::URL::makeCompliant($theme->{name}).".theme.tar.gz";
 	$propertyFile->getNode->tar($packageName);
 	my $export = WebGUI::Attachment->new($packageName,"temp");
-	$session{header}{redirect} = WebGUI::Session::httpRedirect($export->getURL);
+	WebGUI::HTTP::setRedirect($export->getURL);
 	return "";
 }
 

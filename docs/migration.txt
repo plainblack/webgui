@@ -140,4 +140,11 @@ gen61i18nfrom60data.pl
 We also made the International API object oriented. The old procedural version
 is still intact as well. See WebGUI::International for API changes.
 
+5.8 WebGUI::Session Changes
+
+In 6.1 we changed the session API to remove functions that didn't really
+belong in WebGUI::Session. The main changes of interest are that you no longer
+do HTTP redirects and set cookies via session. Take a look at WebGUI::HTTP for
+details.
+
 

@@ -15,6 +15,7 @@ use Tie::CPHash;
 use WebGUI::DateTime;
 use WebGUI::Grouping;
 use WebGUI::HTMLForm;
+use WebGUI::HTTP;
 use WebGUI::Icon;
 use WebGUI::International;
 use WebGUI::Privilege;
@@ -780,16 +781,14 @@ sub www_editQuestionSave {
 #-------------------------------------------------------------------
 sub www_exportAnswers {
         return "" unless (WebGUI::Grouping::isInGroup($_[0]->get("groupToViewReports")));
-        $session{header}{filename} = WebGUI::URL::escape($_[0]->get("title")."_answers.tab");
-        $session{header}{mimetype} = "text/tab";
+	WebGUI::HTTP::setFilename(WebGUI::URL::escape($_[0]->get("title")."_answers.tab"),"text/tab");
         return WebGUI::SQL->quickTab("select * from Survey_answer where Survey_id=".$_[0]->get("Survey_id"));
 }
 
 #-------------------------------------------------------------------
 sub www_exportComposite {
 	return "" unless (WebGUI::Grouping::isInGroup($_[0]->get("groupToViewReports")));
-	$session{header}{filename} = WebGUI::URL::escape($_[0]->get("title")."_composite.tab");
-	$session{header}{mimetype} = "text/tab";
+	WebGUI::HTTP::setFilename(WebGUI::URL::escape($_[0]->get("title")."_composite.tab"),"text/tab");
 	return WebGUI::SQL->quickTab("select b.question, c.response, a.userId, a.username, a.ipAddress, c.comment, c.dateOfResponse from Survey_response a 
 		left join Survey_questionResponse c on a.Survey_responseId=c.Survey_responseId 
 		left join Survey_question b on c.Survey_questionId=b.Survey_questionId 
@@ -799,16 +798,14 @@ sub www_exportComposite {
 #-------------------------------------------------------------------
 sub www_exportQuestions {
         return "" unless (WebGUI::Grouping::isInGroup($_[0]->get("groupToViewReports")));
-        $session{header}{filename} = WebGUI::URL::escape($_[0]->get("title")."_questions.tab");
-        $session{header}{mimetype} = "text/tab";
+	WebGUI::HTTP::setFilename(WebGUI::URL::escape($_[0]->get("title")."_questions.tab"),"text/tab");
         return WebGUI::SQL->quickTab("select * from Survey_question where Survey_id=".$_[0]->get("Survey_id"));
 }
 
 #-------------------------------------------------------------------
 sub www_exportResponses {
         return "" unless (WebGUI::Grouping::isInGroup($_[0]->get("groupToViewReports")));
-        $session{header}{filename} = WebGUI::URL::escape($_[0]->get("title")."_responses.tab");
-        $session{header}{mimetype} = "text/tab";
+	WebGUI::HTTP::setFilename(WebGUI::URL::escape($_[0]->get("title")."_responses.tab"),"text/tab");
         return WebGUI::SQL->quickTab("select * from Survey_response where Survey_id=".$_[0]->get("Survey_id"));
 }
 

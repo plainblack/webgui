@@ -51,13 +51,10 @@ TIP: The $session variable is a case-insensitive hash. The contents of the has v
  WebGUI::Session::convertVisitorToUser($sessionId,$userId);
  WebGUI::Session::deleteScratch($name);
  WebGUI::Session::end($sessionId);
- $header = WebGUI::Session::httpHeader();
- $header = WebGUI::Session::httpRedirect($url);
  WebGUI::Session::open($webguiRoot,$configFilename);
  WebGUI::Session::refreshPageInfo($pageId);
  WebGUI::Session::refreshSessionVars($sessionId);
  WebGUI::Session::refreshUserInfo($userId);
- WebGUI::Session::setCookie($name,$value);
  WebGUI::Session::setScratch($name,$value);
  WebGUI::Session::start($userId);
 
@@ -91,7 +88,7 @@ sub _setupPageInfo {
 						$r->status(404);
 					}
 				} else {
-					$session{header}{status} = '404';
+					$session{http}{status} = '404';
 				}
 			}
 		} else {
@@ -270,53 +267,6 @@ sub end {
 	}
 }
 
-#-------------------------------------------------------------------
-
-=head2 httpHeader ( ) 
-
-Generates an HTTP header.
-
-=cut
-
-sub httpHeader {
-	unless ($session{header}{charset}) {
-		$session{header}{charset} = $session{language}{characterSet} || "ISO-8859-1";
-	}
-	if ($session{header}{filename} && $session{header}{mimetype} eq "text/html") {
-		$session{header}{mimetype} = "application/octet-stream";
-	}
-	if ($session{setting}{preventProxyCache}) {
-                $session{header}{expires} = "-1d";
-        }
-	return $session{cgi}->header( 
-		-type => $session{header}{mimetype},
-		-charset => $session{header}{charset},
-		-cookie => $session{header}{cookie}, 
-		-status => $session{header}{status},
-		-attachment => $session{header}{filename},
-		-expires => $session{header}{expires}
-		);
-}
-
-#-------------------------------------------------------------------
-
-=head2 httpRedirect ( url )
-
-Generates an HTTP header for redirect.
-
-=over
-
-=item url
-
-The URL to redirect to.
-
-=back
-
-=cut
-
-sub httpRedirect {
-	return $session{cgi}->redirect($_[0]);
-}
 
 #-------------------------------------------------------------------
 
@@ -393,14 +343,11 @@ sub open {
 	$CGI::POST_MAX=1024 * $session{setting}{maxAttachmentSize};
 	$session{cgi} = CGI->new();
         if ($session{cgi}->cgi_error =~ /^413/) {
-		$session{header}{status} = $session{cgi}->cgi_error;
+		$session{http}{status} = $session{cgi}->cgi_error;
 		WebGUI::ErrorHandler::warn("File upload too big. May need to adjust Max File Size setting.");
 		$CGI::POST_MAX=-1;
 		$session{cgi} = CGI->new();
         }
-	###----------------------------
-	### header variables
-	$session{header}{mimetype} = 'text/html';
 	###----------------------------
 	### evironment variables from web server
 	$session{env} = \%ENV;
@@ -498,42 +445,6 @@ sub refreshUserInfo {
 	$session{isInGroup} = ();
 }
 
-#-------------------------------------------------------------------
-
-=head2 setCookie ( name, value [ , timeToLive ] ) 
-
-Sends a cookie to the browser.
-
-=over
-
-=item name
-
-The name of the cookie to set. Must be unique from all other cookies from this domain or it will overwrite that cookie.
-
-=item value
-
-The value to set.
-
-=item timeToLive
-
-The time that the cookie should remain in the browser. Defaults to "+10y" (10 years from now).
-
-=back
-
-=cut
-
-sub setCookie {
-        my $ttl = $_[2] || '+10y';
-        #my $domain = $session{env}{SERVER_NAME} if ($session{env}{HTTP_USER_AGENT} =~ m/MSIE/i);
-	my $domain;
-        push @{$session{header}{cookie}}, $session{cgi}->cookie(
-                -name=>$_[0],
-                -value=>$_[1],
-                -expires=>$ttl,
-                -path=>'/',
-                -domain=>$domain
-                );
-}
 
 #-------------------------------------------------------------------
 
@@ -601,7 +512,12 @@ sub start {
 		WebGUI::SQL->write("insert into userSession values ('$sessionId', ".
 			(_time()+$session{setting}{sessionTimeout}).", "._time().", 0, '$ENV{REMOTE_ADDR}', $_[0])");
 	}
-	setCookie("wgSession",$sessionId);
+	push @{$session{http}{cookie}}, $session{cgi}->cookie(
+                -name=>"wgSession",
+                -value=>$sessionId,
+                -expires=>'+10y',
+                -path=>'/'
+                );
 	refreshSessionVars($sessionId);
 }
 

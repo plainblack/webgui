@@ -23,6 +23,7 @@ use WebGUI::ErrorHandler;
 use WebGUI::FormProcessor;
 use WebGUI::HTML;
 use WebGUI::HTMLForm;
+use WebGUI::HTTP;
 use WebGUI::Icon;
 use WebGUI::International;
 use WebGUI::Macro;
@@ -558,8 +559,8 @@ sub login {
    _logLogin($uid,"success");
    
    if ($session{scratch}{redirectAfterLogin}) {
-      $session{header}{redirect} = WebGUI::Session::httpRedirect($session{scratch}{redirectAfterLogin});
-	  WebGUI::Session::deleteScratch("redirectAfterLogin");
+		WebGUI::HTTP::setRedirect($session{scratch}{redirectAfterLogin});
+	  	WebGUI::Session::deleteScratch("redirectAfterLogin");
    }
    return "";
 }

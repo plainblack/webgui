@@ -19,6 +19,7 @@ use WebGUI::Forum::UI;
 use WebGUI::Grouping;
 use WebGUI::HTML;
 use WebGUI::HTMLForm;
+use WebGUI::HTTP;
 use WebGUI::Icon;
 use WebGUI::International;
 use WebGUI::MessageLog;
@@ -793,9 +794,7 @@ sub www_viewRSS {
 </channel>
 </rss>
 ~;
-
-        $session{header}{mimetype} = 'text/xml';
-        
+	WebGUI::HTTP::setMimeType("text/xml");
         return $xml;
 }
 

@@ -76,7 +76,7 @@ sub _getBaseURL {
 	if ($session{user}{toolbar} ne "useLanguageDefault") {
 		$url .= $session{user}{toolbar};
 	} else {
-		$url .= $session{language}{toolbar};
+		$url .= WebGUI::International::getLanguage($session{user}{language},"toolbar");
 	}
 	$url .= '/';	
 	return $url;

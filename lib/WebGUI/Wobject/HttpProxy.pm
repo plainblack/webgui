@@ -17,6 +17,7 @@ use HTTP::Cookies;
 use HTTP::Request::Common;
 use HTML::Entities;
 use WebGUI::HTMLForm;
+use WebGUI::HTTP;
 use WebGUI::Icon;
 use WebGUI::International;
 use WebGUI::Privilege;
@@ -297,7 +298,7 @@ sub www_view {
    }
 
    if($var{header} ne "text/html") {
-	$session{header}{mimetype} = $var{header}; 
+	WebGUI::HTTP::setMimeType($var{header});
 	return $var{content};
    } else {
    	return $_[0]->processTemplate($_[0]->get("templateId"),\%var); 

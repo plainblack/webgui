@@ -22,6 +22,7 @@ use WebGUI::Forum;
 use WebGUI::Forum::Post;
 use WebGUI::Forum::Thread;
 use WebGUI::HTML;
+use WebGUI::HTTP;
 use WebGUI::MessageLog;
 use WebGUI::Search;
 use WebGUI::Session;
@@ -1959,7 +1960,7 @@ sub www_postSave {
 			}, \%postData);
 		$thread->subscribe($session{user}{userId}) if ($session{form}{subscribe});
 		setPostStatus($caller,$thread->getPost($thread->get("rootPostId")));
-		$session{header}{redirect} = WebGUI::Session::httpRedirect(formatForumURL($caller->{callback}, $forumId));
+		WebGUI::HTTP::setRedirect(formatForumURL($caller->{callback}, $forumId));
 		return "";
 	}
 }
@@ -2323,7 +2324,7 @@ sub www_viewThread {
 	# If POST, cause redirect, so new post is displayed using GET instead of POST
         if ($session{env}{REQUEST_METHOD} =~ /POST/i) { 
                 my $url= formatThreadURL($caller-> {callback}, $postId); 
-                $session{header}{redirect} = WebGUI::Session::httpRedirect($url);
+		WebGUI::HTTP::setRedirect($url);
                 return "";
         }
         my $post = WebGUI::Forum::Post->new($postId);

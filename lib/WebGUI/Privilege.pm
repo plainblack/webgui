@@ -15,6 +15,7 @@ package WebGUI::Privilege;
 =cut
 
 use strict;
+use WebGUI::HTTP;
 use WebGUI::International;
 use WebGUI::Session;
 
@@ -50,15 +51,7 @@ Returns a message stating that this functionality can only be used by administra
 =cut
 
 sub adminOnly {
-	if($session{env}{MOD_PERL}) {
-        	my $r = Apache->request;
-                if(defined($r)) {
-                	$r->custom_response(401, '<!--Admin Only-->' );
-                        $r->status(401);
-                }
-        } else {
-		$session{header}{status} = 401;
-	}
+	WebGUI::HTTP::setStatus("401 Admin Only");
 	my ($output, $sth, @data);
         $output = '<h1>'.WebGUI::International::get(35).'</h1>';
 	$output .= WebGUI::International::get(36);
@@ -75,15 +68,7 @@ Returns a message stating that the user does not have the required privileges to
 =cut
 
 sub insufficient {
-	if($session{env}{MOD_PERL}) {
-                my $r = Apache->request;
-                if(defined($r)) {
-                        $r->custom_response(401, '<!--Insufficient Privileges-->' );
-                        $r->status(401);
-                }
-        } else {
-		$session{header}{status} = 401;
-	}
+	WebGUI::HTTP::setStatus("401 Insufficient Privileges");
 	my ($output);
 	$output = '<h1>'.WebGUI::International::get(37).'</h1>';
 	$output .= WebGUI::International::get(38);
@@ -101,24 +86,16 @@ Returns a message stating that the user does not have the privileges necessary t
 =cut
 
 sub noAccess {
-   if($session{env}{MOD_PERL}) {
-      my $r = Apache->request;
-      if(defined($r)) {
-         $r->custom_response(401, '<!--No Access-->' );
-         $r->status(401);
-      }
-   } else {
-      $session{header}{status} = 401;
-   }
-   my ($output);
-   if ($session{user}{userId} <= 1) {
-      $output = WebGUI::Operation::Auth::www_auth("init");
-   } else {
-      $output = '<h1>'.WebGUI::International::get(37).'</h1>';
-      $output .= WebGUI::International::get(39);
-      $output .= '<p>';
-   }
-   return $output;
+	WebGUI::HTTP::setStatus("401 No Access");
+   	my ($output);
+   	if ($session{user}{userId} <= 1) {
+      		$output = WebGUI::Operation::Auth::www_auth("init");
+   	} else {
+      		$output = '<h1>'.WebGUI::International::get(37).'</h1>';
+      		$output .= WebGUI::International::get(39);
+      		$output .= '<p>';
+   	}
+   	return $output;
 }
 
 #-------------------------------------------------------------------
@@ -130,15 +107,7 @@ Returns a message stating that the user they requested information about is no l
 =cut
 
 sub notMember {
-	if($session{env}{MOD_PERL}) {
-                my $r = Apache->request;
-                if(defined($r)) {
-                        $r->custom_response(400, '<!--Not A Member-->' );
-                        $r->status(400);
-                }
-        } else {
-		$session{header}{status} = 400;
-	}
+	WebGUI::HTTP::setStatus("400 Not A Member");
 	my ($output);
 	$output = '<h1>'.WebGUI::International::get(345).'</h1>';
 	$output .= WebGUI::International::get(346);
@@ -155,24 +124,13 @@ Returns a message stating that the user made a request to delete something that 
 =cut
 
 sub vitalComponent {
-        if($session{env}{MOD_PERL}) {
-                my $r = Apache->request;
-                if(defined($r)) {
-                        $r->custom_response(403, '<!--Vital Component-->' );
-                        $r->status(403);
-                }
-        } else {
-                $session{header}{status} = 403;
-        }
+	WebGUI::HTTP::setStatus("403 Vital Component");
 	my ($output);
         $output = '<h1>'.WebGUI::International::get(40).'</h1>';
 	$output .= WebGUI::International::get(41);
 	$output .= '<p>';
 	return $output;
 }
-
-
-
 
 
 

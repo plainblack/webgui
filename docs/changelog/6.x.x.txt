@@ -33,6 +33,9 @@
    average page, which leads to much greater scalability. See
    docs/migration.txt for API changes.
  - Added the ability to select session v. global caches to WSClient.
+ - Rmoved the httpHeader, httpRedirect, and setCookie subs from
+   WebGUI::Session and created a new class called WebGUI::HTTP for them. See
+   docs/migration.txt for details.
 
 
 6.0.3
