@@ -2,6 +2,52 @@
 
 //Manages an array of assets.
 
+//*****************Configuring the asset manager.*****************
+
+//to create a new asset manager
+//var manager = new AssetManager(assets,columnHeadings,labels,crumbtrail); 
+//manager.renderAssets();
+
+//available properties.  Properties should be set prior to the render asset call.
+
+//*********************************************************
+//assetType - defaults to "Asset"
+
+//The following example starts the asset manager with a different asset type.
+
+//var manager = new AssetManager(assets,columnHeadings,labels,crumbtrail); 
+//manager.assetType="MyNewAsset"
+//manager.renderAssets();
+
+//*********************************************************
+//sortEnabled = true - enables or disables sorting of the grid.  Defaults to true
+
+//The following example starts the asset manager with sorting disabled.
+
+//var manager = new AssetManager(assets,columnHeadings,labels,crumbtrail); 
+//manager.sortEnabled=false;
+//manager.renderAssets();
+
+//*********************************************************
+//displayCrumbTrail = Enables or disables display of the crumbtrail. Defaults to true
+
+//The following example starts the asset manager with the crumb trail disabled
+
+//var manager = new AssetManager(assets,columnHeadings,labels,crumbtrail); 
+//manager.displayCrumbTrail=false;
+//manager.renderAssets();
+      
+//**********************************************************
+//To disable display item in the grid,  the disableDisplay function can be called on the asset manager.  The function takes the index of the item to disable from the columnHeadings array.
+
+//The following example disables the rank and title
+
+//var manager = new AssetManager(assets,columnHeadings,labels,crumbtrail); 
+//manager.disableDisplay(0);
+//manager.disableDisplay(1);
+//manager.renderAssets();
+
+//Constructor
 function AssetManager(assetArrayData,headerArrayData,labels,crumbtrail) {	
 
 	//create all the objects used by the manager
@@ -17,14 +63,12 @@ function AssetManager(assetArrayData,headerArrayData,labels,crumbtrail) {
 	this.keys[3] = "lastUpdate";
 	this.keys[4] = "size";
 
-	this.parentURL = "";
-
 	this.assetType = "Asset";
-
-			
+	this.sortEnabled = true;
+	this.displayCrumbTrail = true;		
+				
 	this.labels = labels;
 	this.crumbtrail = crumbtrail;		
-	this.parentURL = "d";		
 	this.renderAssets = AssetManager_renderAssets;
 	this.assetArrayData = assetArrayData;
 	this.columnHeadings = headerArrayData;
@@ -32,11 +76,14 @@ function AssetManager(assetArrayData,headerArrayData,labels,crumbtrail) {
 	this.getAsset= AssetManager_getAsset;
 	this.buildCrumbTrail = AssetManager_buildCrumbTrail;
 	this.displayContextMenu = AssetManager_displayContextMenu;
-	this.remove = AssetManager_remove;
-	this.cut = AssetManager_cut;
-	this.copy = AssetManager_copy;
 	this.sortGrid = AssetManager_sortGrid;
 	this.getSelectedAssetIds = AssetManager_getSelectedAssetIds;
+	this.disabledDisplayItems = new Array();
+
+	this.disableDisplay = function(headerIndex) {
+		this.disabledDisplayItems[this.disabledDisplayItems.length] = headerIndex;
+	}
+
 }
 
 //returns a reference to the asset manager
@@ -54,6 +101,15 @@ function AssetManager_renderAssets() {
 	var id = "";
 		
 	for (i=0;i<this.columnHeadings.length;i++) {
+		var disabled = false;
+		for (j = 0; j<this.disabledDisplayItems.length;j++) {
+			if (i == this.disabledDisplayItems[j]) {
+				disabled = true;
+			}
+		}
+		
+		if (disabled) continue;
+		
 		id = 'am_grid.headers.' + i;				
 		gridStr+= '<td id="' + id + '" class="am-grid-header-' + i + '">' + this.columnHeadings[i] + '</td>';	
 		if (this.sortEnabled) {
@@ -68,7 +124,7 @@ function AssetManager_renderAssets() {
 		id = 'am_grid.row.'+ i;
 		gridStr += '<tr id="'+ id + '" class="am-grid-row">';
 				
-		asset = eval("new " + this.assetType + "()");
+		asset = eval("new " + this.assetType + "()");		
 		asset.rank = this.assetArrayData[i][0];
 		asset.title = this.assetArrayData[i][1];
 		asset.type = this.assetArrayData[i][2];
@@ -85,8 +141,17 @@ function AssetManager_renderAssets() {
 
 		eventStr += 'document.getElementById("' + id + '").asset = AssetManager_getManager().assets[' + assetIndex + '];';
 		eventStr += 'AssetManager_getManager().assets[' + assetIndex + '].div = document.getElementById("' + id + '");';
-												
+					
 		for (k=0;k<this.columnHeadings.length;k++) {
+			var disabled = false;
+			for (j = 0; j<this.disabledDisplayItems.length;j++) {
+				if (k == this.disabledDisplayItems[j]) {
+					disabled = true;
+				}
+			}
+		
+			if (disabled) continue;
+
 			id = 'am_grid.row' + '.' + i + '.col.' + k;
 			gridStr+= '<td id="' + id  + '" class="am-grid-col-' + k +'">';
 			
@@ -109,6 +174,8 @@ function AssetManager_renderAssets() {
 
 //builds the asset crumb trail
 function AssetManager_buildCrumbTrail() {
+	
+	
 	var crumbtrail = document.getElementById("crumbtrail");
 	var contents = '<table><tr>';
 	
@@ -120,13 +187,13 @@ function AssetManager_buildCrumbTrail() {
 			contents += "<td>&nbsp;/&nbsp;</td>";
 		}	
 	}
-	
-	this.parentURL = "http://" + this.tools.getHostName(location.href) + this.crumbtrail[this.crumbtrail.length -1][1];
-	
+		
 	contents += '</tr></table>';	
 	
-	crumbtrail.innerHTML = contents;
-			
+	if (this.displayCrumbTrail) {
+		crumbtrail.innerHTML = contents;
+	}
+	
 	//build assets attach the div properties
 	var lastAsset = null;
 	for (i=0; i< this.crumbtrail.length; i++ ) {
@@ -138,8 +205,10 @@ function AssetManager_buildCrumbTrail() {
 		lastAsset = asset;
 		asset.isParent = true;
 		asset.labels = this.labels;
-		asset.div = document.getElementById(this.crumbtrail[i][0]);
-		document.getElementById(this.crumbtrail[i][0]).asset = asset;
+		if (this.displayCrumbTrail) {
+			asset.div = document.getElementById(this.crumbtrail[i][0]);
+			document.getElementById(this.crumbtrail[i][0]).asset = asset;
+		}
 		this.assets[this.assets.length] = asset;		
 	}					
 
@@ -159,30 +228,6 @@ function AssetManager_displayContextMenu(x,y,asset) {
     manager.contextMenu.render(asset.getContextMenu(),x,y,asset);    
 }
 
-
-//Copy an asset to the clipboard (copy)
-//------------------------------
-//url + ?||& + func=copy
-function AssetManager_copy() {
-	location.href = this.tools.addParamDelimiter(this.parentURL) + "func=copyList"  + this.getSelectedAssetIds();		
-}
-
-//Cut an asset to the clipboard (cut)
-//-----------------------------
-//url + ?||& + func=cut
-function AssetManager_cut() {
-	location.href = this.tools.addParamDelimiter(this.parentURL) + "func=cutList"  + this.getSelectedAssetIds();	
-}
-
-//Delete an asset. (delete)
-//----------------
-//url + ?||& + func=delete (do a javascript confirm on this)
-function AssetManager_remove() {	
-	if (window.confirm("Are you sure you want to delete this asset?  Click OK to continue, or Cancel if you made a mistake.")) {								
-		location.href = this.tools.addParamDelimiter(this.parentURL) + "func=deleteList"  + this.getSelectedAssetIds();		
-	}
-}
-
 //returns the asset IDS of all selected assets
 function AssetManager_getSelectedAssetIds() {	
 	var assetIds = "";
@@ -194,14 +239,13 @@ function AssetManager_getSelectedAssetIds() {
 
 //Sorts the asset grid based on a column index
 function AssetManager_sortGrid(columnIndex) {
-
 	var prop = this.keys[columnIndex];	
 
 	var tableBody = document.getElementById("am_grid_body");
 
 	//remove the arrows from the other column headers
 	for (i=0;i< this.columnHeadings.length;i++) {
-		if (i != columnIndex) {
+		if (i != columnIndex && document.getElementById('am_grid.headers.' + i)) {						
 			document.getElementById('am_grid.headers.' + i).innerHTML = this.columnHeadings[i];		
 			document.getElementById('am_grid.headers.' + i).sortOrder = "<";
 		}

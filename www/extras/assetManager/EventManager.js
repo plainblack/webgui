@@ -72,10 +72,6 @@ function EventManager_documentMouseDown(e) {
     		manager.display.dragStart(asset.div,e.clientX,e.clientY);
     		return;
     	}
-    }else {    	
-    	if (manager.display.contextMenu.owner == null) {
-	    	manager.display.clearSelectedAssets();
-    	}
     }
                               
     if (e.button != 2) {
@@ -88,19 +84,23 @@ function EventManager_documentMouseUp(e) {
     var dom = document.getElementById&&!document.all;
     e=dom? e : event;    
     obj =dom? e.target : e.srcElement
-    //obj = manager.tools.getActivity(obj);
-   
     var asset = manager.getAsset(obj);
                         
+    if (asset && e.button == 2) {
+		return false;
+    }    
+           
     if (manager.display.contextMenu.owner && (!asset || asset.assetId != manager.display.contextMenu.owner.assetId)) {
         manager.display.contextMenu.hide();
     }else {
-    	if (!asset &&  manager.display.contextMenu.owner == null) {
-	    	manager.display.clearSelectedAssets();
-    	}
-    
     }
+
+   	if (!asset && obj.id.indexOf("contextMenuItem") == -1) {
+    	manager.display.clearSelectedAssets();
+   	}    
+
     manager.display.dragStop();
+        
     return false;
 } 
 

@@ -714,6 +714,7 @@ sub getAssetManagerControl {
 	my $self = shift;
 	my $children = shift;
 	my $controlType = shift;
+	my $removeRank = shift;
 	WebGUI::Style::setLink($session{config}{extrasURL}.'/assetManager/assetManager.css', {rel=>"stylesheet",type=>"text/css"});
 	WebGUI::Style::setScript($session{config}{extrasURL}.'/assetManager/Tools.js', {type=>"text/javascript"});
 	WebGUI::Style::setScript($session{config}{extrasURL}.'/assetManager/ContextMenu.js', {type=>"text/javascript"});
@@ -768,7 +769,9 @@ sub getAssetManagerControl {
 	$output .= "labels['editTree'] = 'Edit Tree';\n";
 	$output .= "var manager = new AssetManager(assets,columnHeadings,labels,crumbtrail);\n";
 	$output .= "manager.assetType='".$controlType."';\n" if (defined $controlType);
-	$output .= "manager.renderAssets();\n</script>\n";
+	$output .= "manager.disableDisplay(0);\n" if (defined $removeRank);
+	$output .= "manager.renderAssets();\n";
+	$output .= "</script>\n";
 	return $output;
 }
 
@@ -2884,7 +2887,7 @@ sub www_manageTrash {
 	foreach my $assetData (@{$self->getAssetsInTrash($limit)}) {
 		push(@assets,WebGUI::Asset->newByDynamicClass($assetData->{assetId},$assetData->{className}));
 	}
-	return $ac->render($self->getAssetManagerControl(\@assets,"ManageTrash"), $header);
+	return $ac->render($self->getAssetManagerControl(\@assets,"ManageTrash",1), $header);
 }
 
 

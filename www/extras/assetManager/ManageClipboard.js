@@ -17,6 +17,10 @@ asset.getContextMenu = function () {
 	return arr;    
 }	
 	
+asset.restore = function() {
+	location.href = this.parent.getWrappedURL() + "func=pasteList"  + AssetManager_getManager().getSelectedAssetIds();	
+}
+		
 	return asset;
 	
 }		

@@ -6,6 +6,7 @@
 
 //Constructor for a context menu 
 function ContextMenu() {
+    
     this.render = ContextMenu_render;
     this.hide = ContextMenu_hide;
     this.owner = null;
@@ -62,14 +63,14 @@ function ContextMenu_render(contextMenuItemArray,x,y,owner) {
 
 
     if (y > parseInt(this.contextMenu.offsetHeight)) {
-//        this.contextMenu.style.top = (y + document.body.scrollTop - this.contextMenu.offsetHeight -1) + "px";
-        this.contextMenu.style.top = (y + window.scrollY - this.contextMenu.offsetHeight -1) + "px";
+        this.contextMenu.style.top = (y + manager.display.documentElement.scrollTop - this.contextMenu.offsetHeight -1) + "px";
+//        this.contextMenu.style.top = (y + window.scrollY - this.contextMenu.offsetHeight -1) + "px";
     }else {
-  //      this.contextMenu.style.top = (y + document.body.scrollTop + 3) + "px";
-        this.contextMenu.style.top = (y + window.scrollY + 3) + "px";
+        this.contextMenu.style.top = (y + manager.display.documentElement.scrollTop + 3) + "px";
+  //      this.contextMenu.style.top = (y + window.scrollY + 3) + "px";
     }
-    //this.contextMenu.style.left= (x + document.body.scrollLeft) + "px";
-    this.contextMenu.style.left= (x + window.scrollX) + "px";
+    this.contextMenu.style.left= (x + manager.display.documentElement.scrollLeft) + "px";
+//    this.contextMenu.style.left= (x + window.scrollX) + "px";
 
 
     manager.display.bringToFront(this.contextMenu);
