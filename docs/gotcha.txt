@@ -14,6 +14,11 @@ save you many hours of grief.
 	they will cease to function. Please contact the developer
 	of the widget immediately to have them upgrade it to
 	a Wobject.
+ * The "Registered Users" group no longer has the privilege of 
+	doing whatever "Visitors" can do. Instead we have created
+	a new group called "Everyone", which means registered users
+	and visitors alike can do whatever is assigned those
+	privileges.
 
 3.6.0
 --------------------------------------------------------------------
