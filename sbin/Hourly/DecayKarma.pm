@@ -18,7 +18,7 @@ use WebGUI::SQL;
 #-----------------------------------------
 sub process {
 	if ($session{config}{DecayKarma_minimumKarma} ne "" && $session{config}{DecayKarma_decayFactor}) {
-		WebGUI::SQL->write("update users set karma=".karma-$session{config}{DecayKarma_decayFactor}
+		WebGUI::SQL->write("update users set karma=karma-".$session{config}{DecayKarma_decayFactor}
 			." where karma > ".$session{config}{DecayKarma_minimumKarma});
 	}
 }
