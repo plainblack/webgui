@@ -134,7 +134,8 @@ sub www_addLink {
 sub www_addLinkSave {
         my ($linkId, $nextSeq);
         if (WebGUI::Privilege::canEditPage()) {
-		($nextSeq) = WebGUI::SQL->quickArray("select max(sequenceNumber)+1 from LinkList_link where widgetId=$session{form}{wid}");
+		($nextSeq) = WebGUI::SQL->quickArray("select max(sequenceNumber) from LinkList_link where widgetId=$session{form}{wid}");
+		$nextSeq += 1;
                 $linkId = getNextId("linkId");
                 WebGUI::SQL->write("insert into LinkList_link values ($session{form}{wid}, $linkId, ".quote($session{form}{name}).", ".quote($session{form}{url}).", ".quote($session{form}{description}).", '$nextSeq', '$session{form}{newWindow}')");
                 return www_edit();

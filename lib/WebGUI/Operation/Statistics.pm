@@ -124,9 +124,11 @@ sub www_viewStatistics {
 		$output .= '<tr><td class="tableHeader">'.WebGUI::International::get(145).'</td><td class="tableData">'.$WebGUI::VERSION.' ('.WebGUI::International::get(349).': '.$version.')</td></tr>';
 		($data) = WebGUI::SQL->quickArray("select count(*) from userSession");
 		$output .= '<tr><td class="tableHeader">'.WebGUI::International::get(146).'</td><td class="tableData">'.$data.' (<a href="'.WebGUI::URL::page("op=viewActiveSessions").'">'.WebGUI::International::get(423).'</a> / <a href="'.WebGUI::URL::page("op=viewLoginHistory").'">'.WebGUI::International::get(424).'</a>)</td></tr>';
-		($data) = WebGUI::SQL->quickArray("select count(*)+1 from page where parentId>25");
+		($data) = WebGUI::SQL->quickArray("select count(*) from page where parentId>25");
+		$data += 1;
 		$output .= '<tr><td class="tableHeader">'.WebGUI::International::get(147).'</td><td class="tableData">'.$data.'</td></tr>';
-		($data) = WebGUI::SQL->quickArray("select count(*)-1 from widget");
+		($data) = WebGUI::SQL->quickArray("select count(*) from widget");
+		$data -= 1;
 		$output .= '<tr><td class="tableHeader">'.WebGUI::International::get(148).'</td><td class="tableData">'.$data.'</td></tr>';
 		($data) = WebGUI::SQL->quickArray("select count(*) from style where styleId>25");
 		$output .= '<tr><td class="tableHeader">'.WebGUI::International::get(427).'</td><td class="tableData">'.$data.'</td></tr>';

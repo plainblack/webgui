@@ -22,10 +22,14 @@ sub _replacement {
                 $temp = "SECURITY VIOLATION";
         } else {
 		$file = FileHandle->new($param[0],"r");
-		while (<$file>) {
-       			$temp .= $_;
+		if ($file) {
+			while (<$file>) {
+       				$temp .= $_;
+			}
+			$file->close;
+		} else {
+			$temp = "INCLUDED FILE DOES NOT EXIST";
 		}
-		$file->close;
 	}
 	return $temp;
 }

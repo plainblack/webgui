@@ -364,7 +364,6 @@ sub www_view {
 		WebGUI::International::get(17,$namespace).'</a></td></tr></table>';
 	$html .= '<table border=0 cellpadding=2 cellspacing=1 width="100%">';
 	$html .= '<tr><td class="tableHeader">'.WebGUI::International::get(229).'</td><td class="tableHeader">'.WebGUI::International::get(15,$namespace).'</td><td class="tableHeader">'.WebGUI::International::get(18,$namespace).'</td><td class="tableHeader">'.WebGUI::International::get(19,$namespace).'</td><td class="tableHeader">'.WebGUI::International::get(20,$namespace).'</td></tr>';
-	#$sth = WebGUI::SQL->read("select messageId,subject,count(*)-1,username,dateOfPost,max(dateOfPost),max(messageId) from discussion where widgetId=$_[0] group by rid order by messageId desc");
 	$sth = WebGUI::SQL->read("select messageId,subject,username,dateOfPost,userId from discussion where widgetId=$_[0] and pid=0 order by messageId desc");
 	while (@data = $sth->array) {
 		$data[1] = WebGUI::HTML::filter($data[1],'all');

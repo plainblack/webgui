@@ -213,7 +213,8 @@ sub www_addDownloadSave {
 		$alt1->save("alternateVersion1");
 		$alt2 = WebGUI::Attachment->new("",$session{form}{wid},$downloadId);
 		$alt2->save("alternateVersion2");
-		($sequenceNumber) = WebGUI::SQL->quickArray("select count(*)+1 from DownloadManager_file where widgetId=$session{form}{wid}");
+		($sequenceNumber) = WebGUI::SQL->quickArray("select count(*) from DownloadManager_file where widgetId=$session{form}{wid}");
+		$sequenceNumber += 1;
                 WebGUI::SQL->write("insert into DownloadManager_file values (".
 			$downloadId.
 			", ".$session{form}{wid}. 

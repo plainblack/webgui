@@ -312,7 +312,7 @@ sub www_editSave {
 		}
                 $attachment = WebGUI::Attachment->new("",$session{form}{wid});
 		$attachment->save("attachment");
-		if ($attachment ne "") {
+		if ($attachment->getFilename ne "") {
                         $sqlAdd .= ', attachment='.quote($attachment->getFilename);
                 }
                 WebGUI::SQL->write("update Article set alignImage=".quote($session{form}{alignImage}).

@@ -40,7 +40,8 @@ sub _reorderWidgets {
 sub create {
 	my ($widgetId, $nextSeq);
 	$widgetId = getNextId("widgetId");
-	($nextSeq) = WebGUI::SQL->quickArray("select max(sequenceNumber)+1 from widget where pageId=$_[0]");
+	($nextSeq) = WebGUI::SQL->quickArray("select max(sequenceNumber) from widget where pageId=$_[0]");
+	$nextSeq += 1;
         WebGUI::SQL->write("insert into widget values ($widgetId, $_[0], '$_[1]', '$nextSeq', ".quote($_[2]).", '$_[3]', ".quote($_[4]).", '$_[5]', ".time().", '$session{user}{userId}', 0, 0, '$_[6]')");
 	return $widgetId;
 }
@@ -180,7 +181,8 @@ sub www_moveUp {
 sub www_paste {
         my ($output, $nextSeq);
         if (WebGUI::Privilege::canEditPage()) {
-		($nextSeq) = WebGUI::SQL->quickArray("select max(sequenceNumber)+1 from widget where pageId=$session{page}{pageId}");
+		($nextSeq) = WebGUI::SQL->quickArray("select max(sequenceNumber) from widget where pageId=$session{page}{pageId}");
+		$nextSeq += 1;
                 WebGUI::SQL->write("update widget set pageId=$session{page}{pageId}, sequenceNumber='$nextSeq' where widgetId=$session{form}{wid}");
                	_reorderWidgets($session{page}{pageId});
                 return "";

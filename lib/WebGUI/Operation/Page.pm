@@ -96,7 +96,8 @@ sub www_addPage {
 sub www_addPageSave {
 	my ($urlizedTitle, $nextSeq, $parentId, $menuTitle);
 	if (WebGUI::Privilege::canEditPage()) {
-		($nextSeq) = WebGUI::SQL->quickArray("select max(sequenceNumber)+1 from page where parentId=$session{page}{pageId}");
+		($nextSeq) = WebGUI::SQL->quickArray("select max(sequenceNumber) from page where parentId=$session{page}{pageId}");
+		$nextSeq += 1;
 		if ($session{form}{title} eq "") {
 			$session{form}{title} = "no title";
 		}
@@ -242,7 +243,10 @@ sub www_editPageSave {
                 if ($session{form}{title} eq "") {
                         $session{form}{title} = "no title";
                 }
-		$urlizedTitle = WebGUI::URL::makeUnique(WebGUI::URL::urlize($session{form}{urlizedTitle}));
+		$urlizedTitle = WebGUI::URL::makeUnique(
+			WebGUI::URL::urlize($session{form}{urlizedTitle}),
+			$session{page}{pageId}
+			);
                 WebGUI::SQL->write("update page set title=".quote($session{form}{title}).", styleId=$session{form}{styleId}, ownerId=$session{form}{ownerId}, ownerView=$session{form}{ownerView}, ownerEdit=$session{form}{ownerEdit}, groupId='$session{form}{groupId}', groupView=$session{form}{groupView}, groupEdit=$session{form}{groupEdit}, worldView=$session{form}{worldView}, worldEdit=$session{form}{worldEdit}, metaTags=".quote($session{form}{metaTags}).", urlizedTitle='$urlizedTitle', defaultMetaTags='$session{form}{defaultMetaTags}', template='$session{form}{template}', menuTitle=".quote($session{form}{menuTitle}).", synopsis=".quote($session{form}{synopsis})." where pageId=$session{page}{pageId}");
 		if ($session{form}{recurseStyle} eq "yes") {
 			_recursivelyChangeStyle($session{page}{pageId});
@@ -292,7 +296,8 @@ sub www_movePageUp {
 #-------------------------------------------------------------------
 sub www_pastePage {
         my ($output, $nextSeq);
-		($nextSeq) = WebGUI::SQL->quickArray("select max(sequenceNumber)+1 from page where parentId=$session{page}{pageId}");
+		($nextSeq) = WebGUI::SQL->quickArray("select max(sequenceNumber) from page where parentId=$session{page}{pageId}");
+		$nextSeq += 1;
         if (WebGUI::Privilege::canEditPage()) {
                 WebGUI::SQL->write("update page set parentId=$session{page}{pageId}, sequenceNumber='$nextSeq' where pageId=$session{form}{pageId}");
 		_reorderPages($session{page}{pageId});

@@ -129,7 +129,8 @@ sub www_addQuestion {
 sub www_addQuestionSave {
         my ($questionId, $nextSeq);
         if (WebGUI::Privilege::canEditPage()) {
-		($nextSeq) = WebGUI::SQL->quickArray("select max(sequenceNumber)+1 from FAQ_question where widgetId=$session{form}{wid}");
+		($nextSeq) = WebGUI::SQL->quickArray("select max(sequenceNumber) from FAQ_question where widgetId=$session{form}{wid}");
+		$nextSeq += 1;
                 $questionId = getNextId("questionId");
                 WebGUI::SQL->write("insert into FAQ_question values ($session{form}{wid}, $questionId, ".quote($session{form}{question}).", ".quote($session{form}{answer}).", '$nextSeq')");
                 return www_edit();

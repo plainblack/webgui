@@ -19,6 +19,7 @@ use WebGUI::SQL;
 #-------------------------------------------------------------------
 sub getStyle {
 	my ($header, $footer, @style, %style);
+	tie %style, 'Tie::CPHash';
 	if ($session{form}{makePrintable}) {
 		%style = WebGUI::SQL->quickHash("select header,footer,styleSheet from style where styleId=3");
 		$header = '<html><!-- WebGUI '.$session{wg}{version}.' -->'."\n";
