@@ -418,6 +418,13 @@ sub build {
 			foreach my $property (@interestingPageProperties) {
 				$pageData->{"page.".$property} = $page->get($property);
 			}
+			$pageData->{"page.isRoot"} = (! $page->get('parentId'));
+			$pageData->{"page.isTop"} = ($pageData->{"page.absDepth"} == 2);
+			$pageData->{"page.hasDaughter"} = scalar($page->daughters);
+			$pageData->{"page.isMyDaughter"} = ($page->get('parentId') == 
+								WebGUI::Page->getPage()->get('pageId'));
+			$pageData->{"page.isMyMother"} = ($page->get('pageId') ==
+                                                                WebGUI::Page->getPage()->get('parentId'));
 
 			# Some information about my mother
 			if(ref($page->mother)) {
@@ -425,6 +432,9 @@ sub build {
 					$pageData->{"page.mother.$_"} = $page->mother->get($_);
 				}
 			}
+			# Some information about my depth
+			$pageData->{"page.depthIs".$pageData->{"page.absDepth"}} = 1;
+			$pageData->{"page.relativeDepthIs".$pageData->{"page.absDepth"}} = 1;
 
 			# Store $pageData in page_loop. Mind the order.
 			if ($self->{_reverse}) {
