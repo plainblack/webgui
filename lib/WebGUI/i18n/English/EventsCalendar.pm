@@ -295,6 +295,23 @@ our $I18N = {
 		message => q|Untitled Event|,
 		lastUpdated => 1108397891
 	},
+	'558' => {
+		message => q|Previous|,
+		lastUpdated => 1108397891
+	},
+	'559' => {
+		message => q|Next|,
+		lastUpdated => 1108397891
+	},
+	'560' => {
+		message => q|Month|,
+		lastUpdated => 1108397891
+	},
+	'561' => {
+		message => q|Months|,
+		lastUpdated => 1108397891
+	},
+
 	'90' => {
 		message => q|Default Month|,
 		lastUpdated => 1038190708
