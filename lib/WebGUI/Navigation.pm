@@ -248,7 +248,6 @@ sub build {
 
 			foreach my $page (@pages) {
 				my $pageData = {};
-
 				# Initial page info
 				$pageData->{"page.url"} = WebGUI::URL::gateway($page->{'urlizedTitle'});
 			        if ($page->{'encryptPage'}) {
@@ -256,7 +255,7 @@ sub build {
 				}
 				$pageData->{"page.absDepth"} = $page->{'depth'} + 1;
 				$pageData->{"page.relDepth"} = $pageData->{"page.absDepth"} - $startPageDepth;
-				$pageData->{"page.isCurrent"} = ($page->{'pageId'} == $session{page}{pageId});
+				$pageData->{"page.isCurrent"} = ($page->{'pageId'} eq $session{page}{pageId});
 				$pageData->{"page.isHidden"} = $page->{'hideFromNavigation'};
 				$pageData->{"page.isSystem"} = $page->{isSystem};
 				
@@ -286,7 +285,7 @@ sub build {
 				next if ($pageData->{"page.absDepth"} < $self->{_stopAtLevel});
 
 				# Check showSystemPages
-			#	next if (! $self->{_showSystemPages} && $pageData->{"page.isSystem"}); 
+				next if (! $self->{_showSystemPages} && $pageData->{"page.isSystem"}); 
 	
 				# Deal with hidden pages, don't ever hide pages if admin mode is on
 				next if(($page->{'hideFromNavigation'} && ! $self->{_showHiddenPages}) && (! $session{var}{adminOn}));
@@ -298,17 +297,15 @@ sub build {
 				$pageData->{"page.isRoot"} = (! $page->{'parentId'});
 				$pageData->{"page.isTop"} = ($pageData->{"page.absDepth"} == 2);
 				$pageData->{"page.hasDaughter"} = ($page->{'nestedSetRight'} - $page->{'nestedSetLeft'} > 1);
-				$pageData->{"page.isMyDaughter"} = ($page->{'parentId'} == 
-									$currentPage->get('pageId'));
-				$pageData->{"page.isMyMother"} = ($page->{'pageId'} ==
-									$currentPage->get('parentId'));
+				$pageData->{"page.isMyDaughter"} = ($page->{'parentId'} eq $currentPage->get('pageId'));
+				$pageData->{"page.isMyMother"} = ($page->{'pageId'} eq $currentPage->get('parentId'));
 				$pageData->{"page.inCurrentRoot"} = 
 					(($page->{'nestedSetLeft'} > $currentPage->get('nestedSetLeft')) && ($page->{'nestedSetRight'} < $currentPage->get('nestedSetRight'))) ||
 					(($page->{'nestedSetLeft'} < $currentPage->get('nestedSetLeft')) && ($page->{'nestedSetRight'} > $currentPage->get('nestedSetRight')));
 
 				# Anchestor info
                                 foreach my $ancestor ($currentPage->ancestors) {
-                                        $pageData->{"page.isMyAncestor"} += ($ancestor->{'pageId'} == $page->{'pageId'});
+                                        $pageData->{"page.isMyAncestor"} += ($ancestor->{'pageId'} eq $page->{'pageId'});
                                 }
 				
 				# Some information about my mother
@@ -346,7 +343,7 @@ sub build {
 		}
 
 		# We had a cache miss, so let's put the data in cache
-	#	$cache->set(\@page_loop, 3600*24) unless $session{var}{adminOn};
+		$cache->set(\@page_loop, 3600*24) unless $session{var}{adminOn};
 	} else {
 		# We had a cache hit
 		@page_loop = @{$cacheContent};
@@ -355,7 +352,6 @@ sub build {
 	# Do the user-dependent checks (which cannot be cached globally)
 	foreach my $pageData (@page_loop) {
 		$pageData->{"page.isViewable"} = WebGUI::Page::canView($pageData->{'page.pageId'});
-
 		# Check privileges
 		if ($pageData->{"page.isViewable"} || $self->{_showUnprivilegedPages}) {
 			push (@{$var->{page_loop}}, $pageData);

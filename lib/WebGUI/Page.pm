@@ -150,7 +150,7 @@ sub _processWobjectFunctions {
 						and WobjectProxy.proxiedWobjectId=".quote(${$wobject}{wobjectId}),WebGUI::SQL->getSlave);
 				  	${$wobject}{_WobjectProxy} = $proxyWobjectId;
 				}
-				unless (${$wobject}{pageId} == $session{page}{pageId}                                                                
+				unless (${$wobject}{pageId} eq $session{page}{pageId}                                                                
 					|| ${$wobject}{pageId} == 2                                                                
 					|| ${$wobject}{pageId} == 3                                                                
 					|| ${$wobject}{_WobjectProxy} ne "") {                                        
@@ -261,7 +261,7 @@ sub canEdit {
         } else {
                 %page = %{$session{page}};
         }
-        if ($session{user}{userId} == $page{ownerId}) {
+        if ($session{user}{userId} eq $page{ownerId}) {
                 return 1;
         } else {
 		return WebGUI::Grouping::isInGroup($page{groupIdEdit});
@@ -355,7 +355,7 @@ sub canView {
         } else {
                 %page = WebGUI::SQL->quickHash("select ownerId,groupIdView,startDate,endDate from page where pageId=".quote($pageId),WebGUI::SQL->getSlave);
         }
-        if ($session{user}{userId} == $page{ownerId}) {
+        if ($session{user}{userId} eq $page{ownerId}) {
                 return 1;
         } elsif ($page{startDate} < WebGUI::DateTime::time() && $page{endDate} > WebGUI::DateTime::time() && WebGUI::Grouping::isInGroup($page{groupIdView})) {
                 return 1;
@@ -1533,7 +1533,7 @@ sub self_and_sisters_splitted {
 
 	$haveAllLeftSisters = 0;
 	foreach ($self->self_and_sisters) {
-		if ($_->{pageId} == $self->get('pageId')) {
+		if ($_->{pageId} eq $self->get('pageId')) {
 			$currentPage = $_;
 			$haveAllLeftSisters = 1;
 		} elsif ($haveAllLeftSisters) {
