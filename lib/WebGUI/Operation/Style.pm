@@ -78,7 +78,7 @@ sub www_editStyle {
 	tie %style, 'Tie::CPHash';
         if (WebGUI::Privilege::isInGroup(5)) {
 		if ($session{form}{sid} eq "new") {
-			$style{body} = "<body>\n\n^-;\n\n</body>";
+			$style{body} = "^AdminBar;\n\n<body>\n\n^-;\n\n</body>";
 			$style{styleSheet} = "<style>\n\n</style>";
 		} else {
                 	%style = WebGUI::SQL->quickHash("select * from style where styleId=$session{form}{sid}");
@@ -107,7 +107,7 @@ sub www_editStyleSave {
 			$session{form}{sid} = getNextId("styleId");
 			WebGUI::SQL->write("insert into style (styleId) values ($session{form}{sid})");
 		}
-		$session{form}{body} = "^-;" if ($session{form}{body} eq "");
+		$session{form}{body} = "^AdminBar;\n\n<body>\n\n^-;\n\n</body>" if ($session{form}{body} eq "");
                 WebGUI::SQL->write("update style set name=".quote($session{form}{name}).", body=".quote($session{form}{body}).",
 			styleSheet=".quote($session{form}{styleSheet})." where styleId=".$session{form}{sid});
                 return www_listStyles();
