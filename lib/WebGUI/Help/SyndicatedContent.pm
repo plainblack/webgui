@@ -22,6 +22,10 @@ our $HELP = {
 			{
 				tag => 'syndicated content add/edit',
 				namespace => 'SyndicatedContent'
+			},
+			{
+				tag => 'wobject template',
+				namespace => 'WebGUI'
 			}
 		]
 	},

@@ -546,6 +546,14 @@ our $HELP = {
 				namespace => 'MessageBoard'
 			},
 			{
+				tag => 'pagination template variables',
+				namespace => 'WebGUI'
+			},
+			{
+				tag => 'poll template',
+				namespace => 'Poll'
+			},
+			{
 				tag => 'product template',
 				namespace => 'Product'
 			},
@@ -554,8 +562,16 @@ our $HELP = {
 				namespace => 'SiteMap'
 			},
 			{
+				tag => 'survey template',
+				namespace => 'Survey'
+			},
+			{
 				tag => 'syndicated content template',
 				namespace => 'SyndicatedContent'
+			},
+			{
+				tag => 'template language',
+				namespace => 'WebGUI'
 			},
 			{
 				tag => 'templates manage',
