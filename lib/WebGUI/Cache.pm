@@ -24,7 +24,7 @@ use HTTP::Request;
 use LWP::UserAgent;
 use WebGUI::ErrorHandler;
 use WebGUI::Session;
-
+use Data::Serializer;
 
 =head1 NAME
 
@@ -114,7 +114,23 @@ sub get {
         }
 }
 
+#-------------------------------------------------------------------
 
+=head2 getDataStructure ( )
+
+Retrieves an datastructure from the filesystem cache. 
+
+=cut
+
+sub getDataStructure {
+	my ($serializer);
+        if (_canCache()) {
+		$serializer = Data::Serializer->new(serializer	=> 'Storable');
+                return $serializer->deserialize($_[0]->{_cache}->get($_[0]->{_key}));
+        } else {
+                return $_[0]->{_cache};
+        }
+}
 
 #-------------------------------------------------------------------
 
@@ -175,6 +191,39 @@ sub set {
 	}
 }
 
+#-------------------------------------------------------------------
+
+=head2 setDataStructure ( content [, ttl ] )
+
+Saves a (complex) datastructure to the filesystem cache. This is the way to go is you want to cache
+something other then a scalar. You can put any hash, array or object in here. You can also cache a scalar 
+with this method but if you only need to cache a scalar, though, it's better to use set because set saves
+diskspace, memory and processing time.
+
+=over
+
+=item content
+
+A reference to whatever data structure you want to cache.
+
+=item ttl
+
+The time to live for this data structure. This is the amount of time (in seconds) that the structure will remain 
+in the cache. Defaults to "60".
+
+=back
+
+=cut
+
+sub setDataStructure {
+	my $ttl = $_[2] || 60;
+	if (_canCache()) {
+		$serializer = Data::Serializer->new(serializer => 'Storable');
+		$_[0]->{_cache}->set($_[0]->{_key},$serializer->serialize($_[1]),$ttl);
+	} else {
+		$_[0]->{_cache} = $_[1];
+	}
+}
 
 #-------------------------------------------------------------------
 
