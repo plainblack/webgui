@@ -34,12 +34,12 @@ my $doit;
 
 GetOptions(
         'help'=>\$help,
-        'override'=>$override,
+        'override'=>\$override,
         'quiet'=>\$quiet,
-	'mysql'=>\$mysql,
+	'mysql=s'=>\$mysql,
 	'doit'=>\$doit,
-	'mysqldump'=>\$mysqldump,
-	'backupDir'=>\$backupDir,
+	'mysqldump=s'=>\$mysqldump,
+	'backupDir=s'=>\$backupDir,
 	'skipbackup'=>\$skipBackup
 );
 
