@@ -849,7 +849,7 @@ sub www_viewSubmission {
         $var{"next.more"} = ($data[0] ne "");
         $var{"next.url"} = WebGUI::URL::page('func=viewSubmission&sid='.$data[0].'&wid='.$session{form}{wid});
 	$var{"next.label"} = WebGUI::International::get(59,$_[0]->get("namespace"));
-        $var{canEdit} = ($submission->{userId} == $session{user}{userId} || WebGUI::Privilege::isInGroup($_[0]->get("groupToApprove")));
+        $var{canEdit} = (($submission->{userId} == $session{user}{userId} || WebGUI::Privilege::isInGroup($_[0]->get("groupToApprove"))) && $session{user}{userId} != 1);
         $var{"delete.url"} = WebGUI::URL::page('func=deleteSubmission&wid='.$session{form}{wid}.'&sid='.$session{form}{sid});
 	$var{"delete.label"} = WebGUI::International::get(37,$_[0]->get("namespace"));
         $var{"edit.url"} = WebGUI::URL::page('func=editSubmission&wid='.$session{form}{wid}.'&sid='.$session{form}{sid});

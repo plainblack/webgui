@@ -21,6 +21,8 @@
    for your new submission.
  - Bugfix [ 952949 ] Survey Export Composite Fails
  - Updated the Finnish translation thanks to Markus Hynna.
+ - Fixed a bug where visitors could potentially edit other visitor's USS
+   submissions.
 
 
 
