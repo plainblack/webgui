@@ -47,6 +47,15 @@ webgui.
  - Added a limit option to the page list in the paginator.
  - Fixed a bug in AdminBar's clipboard code where a standard hash was
    used instead of a CPHash for database access.  (Thanks to Steve Simms.)
- - Added caching of complex data structures to WebGUI::Cache (Martin Kamerbeek / Procolix)
+ - Added caching of complex data structures to WebGUI::Cache (Martin Kamerbeek
+   / Procolix). Note that this now requires Data::Serialzier to be installed.
  - Implemented an object oriented interface to the page tree and converted
    WebGUI::Operation::Page to use it. (Martin Kamerbeek / Procolix)
+ - Added two new methods (isEditable and showInForms) to the groups API to
+   make it easier to automagically create and use groups programatically without 
+   disrupting the user experience.
+ - The everyone and registered users group are no longer magic in that there
+   are physical linkages between them and users. The magic was getting too
+   hard to maintain and users were confused by it.
+ 
+

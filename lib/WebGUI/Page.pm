@@ -278,6 +278,7 @@ sub generate {
 		.moveUpIcon('op=movePageUp')
 		.moveDownIcon('op=movePageDown')
 		.cutIcon('op=cutPage');
+	my @wobjectsinpage;
 	my $sth = WebGUI::SQL->read("select * from wobject where pageId=".$session{page}{pageId}." order by sequenceNumber, wobjectId");
         while (my $wobject = $sth->hashRef) {
 		my $wobjectToolbar = wobjectIcon()
@@ -330,8 +331,10 @@ sub generate {
 			'wobject.content'=>eval{$w->www_view}
 			});
 		WebGUI::ErrorHandler::fatalError("Wobject runtime error: ${$wobject}{namespace}. Root cause: ".$@) if($@);
+		push(@wobjectsinpage,{'wobject.id'=>${$wobject}{wobjectId}});
 	}
 	$sth->finish;
+	$var{"wobjectid_list"} = \@wobjectsinpage;
 	return WebGUI::Template::process(getTemplate(),\%var);
 }
 

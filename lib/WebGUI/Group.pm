@@ -35,8 +35,8 @@ This package provides an object-oriented way of managing WebGUI groups and group
  $g = WebGUI::Group->new(3); or  $g = WebGUI::User->new("new");
  $g = WebGUI::Group->find("Registered Users");
 
- $integer =    	$g->autoAdd;
- $integer =    	$g->autoDelete;
+ $boolean =    	$g->autoAdd(1);
+ $boolean =    	$g->autoDelete(1);
  $epoch =     	$g->dateCreated;
  $integer =	$g->deleteOffset(14);
  $text =       	$g->description("Those really smart dudes.");
@@ -45,11 +45,14 @@ This package provides an object-oriented way of managing WebGUI groups and group
  $integer =	$g->expireNotifyOffset(-14);
  $integer =    	$g->expireOffset(360000);
  $integer =    	$g->groupId;
+ $boolean = 	$g->isEditable(1);
  $integer =   	$g->karmaThreshold(5000);
  $string =     	$g->ipFilter("10.;192.168.1.");
  $epoch =     	$g->lastUpdated;
  $string =     	$g->name("Nerds");
  $string =     	$g->scratchFilter("www_location=International;somesetting=1");
+ $boolean = 	$g->showInForms(1);
+ 
 
  $g->addGroups(\@arr);
  $g->deleteGroups(\@arr);
@@ -466,6 +469,35 @@ sub ipFilter {
 
 #-------------------------------------------------------------------
 
+=head2 isEditable ( [ value ] )
+
+Returns a boolean value indicating whether the group should be managable from the group manager. System level groups and groups autocreated by wobjects would use this parameter.
+
+=over
+
+=item value
+
+If specified, isEditable is set to this value.
+
+=back
+
+=cut
+
+sub isEditable {
+        my ($class, $value);
+        $class = shift;
+        $value = shift;
+        if (defined $value) {
+                $class->{_group}{"isEditable"} = $value;
+                WebGUI::SQL->write("update groups set isEditable=".quote($value).",
+                        lastUpdated=".time()." where groupId=$class->{_groupId}");
+        }
+        return $class->{_group}{"isEditable"};
+}
+
+
+#-------------------------------------------------------------------
+
 =head2 lastUpdated ( )
 
 Returns the epoch for when this group was last modified.
@@ -572,6 +604,37 @@ sub scratchFilter {
 }
 
 #-------------------------------------------------------------------
+
+=head2 showInForms ( [ value ] )
+
+Returns a boolean value indicating whether the group should show in forms that display a list of groups. System level groups and groups autocreated by wobjects would use this parameter.
+
+=over
+
+=item value
+
+If specified, showInForms is set to this value.
+
+=back
+
+=cut
+
+sub showInForms {
+        my ($class, $value);
+        $class = shift;
+        $value = shift;
+        if (defined $value) {
+                $class->{_group}{"showInForms"} = $value;
+                WebGUI::SQL->write("update groups set showInForms=".quote($value).",
+                        lastUpdated=".time()." where groupId=$class->{_groupId}");
+        }
+        return $class->{_group}{"showInForms"};
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 lastUpdated ( )
 
 =head2 dbQuery ( [ value ] )
 

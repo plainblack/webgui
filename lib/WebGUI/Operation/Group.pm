@@ -302,7 +302,7 @@ sub www_listGroups {
         $output = helpIcon(10);
 	$output .= '<h1>'.WebGUI::International::get(89).'</h1>';
         $sth = WebGUI::SQL->read("select groupId,groupName,description from groups 
-		where groupId<>1 and groupId<>2 and groupId<>7 order by groupName");
+		where isEditable=1 order by groupName");
         while (@data = $sth->array) {
                 $row[$i] = '<tr>';
                 $row[$i] .= '<td valign="top" class="tableData"><a href="'

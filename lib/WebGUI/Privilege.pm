@@ -262,11 +262,12 @@ sub isInGroup {
 	my ($gid, $uid, @data, %group, $groupId);
 	($gid, $uid) = @_;
 	$uid = $session{user}{userId} if ($uid eq "");
-        ### The "Everyone" group automatically returns true.
+
+
+	#The next 3 checks are to increase performance. If this section were removed, everything would continue to work as normal. 
         if ($gid == 7) {
                 return 1;
         }
-	### The "Visitor" group returns false, unless the user is visitor.
 	if ($gid == 1) {
 		if ($uid == 1) {
 			return 1;
@@ -274,10 +275,12 @@ sub isInGroup {
 			return 0;
 		}
 	}
-	### The "Registered Users" group returns true if user is not visitor.
 	if ($gid==2 && $uid != 1) {
 		return 1;
 	}
+
+
+
 	### Use session to cache multiple lookups of the same group.
 	if ($session{isInGroup}{$gid}{$uid} || $session{isInGroup}{3}{$uid}) {
 		return 1;

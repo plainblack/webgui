@@ -20,6 +20,11 @@ save you many hours of grief.
  * The Authentication Module API has been completely rewritten.
 	Please see docs/migration.txt for details.
 
+ * The Paginator API has been significantly changed.
+	Please see docs/migration.txt for details.
+
+ * WebGUI now requires Data::Serializer to be installed.
+ 
 
 5.5.0
 --------------------------------------------------------------------

@@ -55,15 +55,15 @@ sub _recursivelyChangeProperties {
 
 	$page->walk_down({
 		callback => sub {
-			if (WebGUI::Privilege::canEditPage($_[0]->get('pageId'))) {
-				$_[0]->setWithoutRecache({
+			if (WebGUI::Privilege::canEditPage($page->get('pageId'))) {
+				$page->setWithoutRecache({
 					startDate		=> WebGUI::FormProcessor::dateTime("startDate"),
 					endDate			=> WebGUI::FormProcessor::dateTime("endDate"),
 					ownerId			=> $session{form}{ownerId},
 					groupIdView		=> $session{form}{groupIdView},
 					groupIdEdit		=> $session{form}{groupIdEdit}
 				}) if ($session{form}{recursePrivs});
-				$_[0]->setWithoutRecache({
+				$page->setWithoutRecache({
 					styleId => $session{form}{styleId}
 				}) if ($session{form}{recurseStyle});
 			}
@@ -74,7 +74,7 @@ sub _recursivelyChangeProperties {
 	WebGUI::Page->recachePageTree;
 }
 
--------------------------------------------------------------------
+#-------------------------------------------------------------------
 sub _reorderPages {
         my ($sth, $i, $pid);
         $sth = WebGUI::SQL->read("select pageId from page where parentId=$_[0] order by sequenceNumber");

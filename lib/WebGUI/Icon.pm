@@ -471,7 +471,7 @@ Generates an icon that looks like a wobject. It's purpose is to represent whethe
 =cut
 
 sub wobjectIcon {
-        return '<img src="'.$session{config}{extrasURL}.'/toolbar/'.$session{language}{toolbar}.'/wobject.gif" align="middle" border="0" alt="Wobject Settings" title="Wobject Settings" />';
+        return '<img  class="dragTrigger" src="'.$session{config}{extrasURL}.'/toolbar/'.$session{language}{toolbar}.'/wobject.gif" align="middle" border="0" alt="Wobject Settings" title="Wobject Settings" />';
 }
 
 
