@@ -25,6 +25,8 @@
  - Bugfix 859816 : DataForm - security issues. Tnx Gabor for reporting.
  - ^t; now starts in current root rather then in site root.
  - Added new Authentication System.
+ - Added switches to prevent users from chaning usernames and passwords
+ - Added security switches that log when users update passwords or recover passwords via email
  - Collateral macros now return undef instead of the macro tag when no
    matching collateral is found.
  - Added style personalization.
