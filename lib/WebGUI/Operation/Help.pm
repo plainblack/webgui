@@ -56,7 +56,7 @@ sub www_viewHelp {
 	}
     	$ac->addSubmenuItem(WebGUI::URL::page('op=viewHelpIndex'),WebGUI::International::get(95));
     	return $ac->render(
-		WebGUI::Macro::negate(WebGUI::International::get($help->{body},$namespace)), 
+		WebGUI::Macro::process(WebGUI::International::get($help->{body},$namespace)), 
 		WebGUI::International::get(93).': '.WebGUI::International::get($help->{title},$namespace)
 		);
 }
