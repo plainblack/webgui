@@ -18,6 +18,17 @@ use WebGUI::Session;
 use WebGUI::SQL;
 
 #-------------------------------------------------------------------
+sub countPositions {
+        my ($template, $i);
+        ($template) = WebGUI::SQL->quickArray("select template from template where templateId=".$_[0]);
+        $i = 0;
+        while ($template =~ m/\^$i\;/) {
+                $i++;
+        }
+        return $i;
+}
+
+#-------------------------------------------------------------------
 sub generate {
         my ($output, $content, %template);
 	%template = WebGUI::SQL->quickHash("select * from template where templateId=".$_[1]);
@@ -36,7 +47,7 @@ sub getList {
 
 #-------------------------------------------------------------------
 sub getPositions {
-	my ($cmd, %hash, $template, $i);
+	my (%hash, $template, $i);
 	tie %hash, "Tie::IxHash";
 	($template) = WebGUI::SQL->quickArray("select template from template where templateId=".$_[0]);
 	$i = 0;
