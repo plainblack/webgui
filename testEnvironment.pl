@@ -60,6 +60,13 @@ if (eval { require Tie::CPHash }) {
         print "Please install.\n";
 }
 
+print "Net::SMTP module:\t";
+if (eval { require Net::SMTP }) {
+        print "OK\n";
+} else {
+        print "Please install.\n";
+}
+
 print "XML::RSS module:\t";
 if (eval { require XML::RSS }) {
         print "OK\n";

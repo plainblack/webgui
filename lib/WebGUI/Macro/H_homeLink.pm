@@ -20,10 +20,10 @@ sub process {
 	$output = $_[0];
   #---home link---
         if ($output =~ /\^H(.*)\^\/H/) {
-                $temp = '<a href="'.$session{env}{SCRIPT_NAME}.'/home">'.$1.'</a>';
+                $temp = '<a class="homeLink" href="'.$session{env}{SCRIPT_NAME}.'/home">'.$1.'</a>';
                 $output =~ s/\^H(.*)\^\/H/$temp/g;
         } elsif ($output =~ /\^H/) {
-        	$temp = '<a href="'.$session{env}{SCRIPT_NAME}.'/home">'.WebGUI::International::get(47).'</a>';
+        	$temp = '<a class="homeLink" href="'.$session{env}{SCRIPT_NAME}.'/home">'.WebGUI::International::get(47).'</a>';
         	$output =~ s/\^H/$temp/g;
 	}
 	return $output;

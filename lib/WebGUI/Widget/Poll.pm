@@ -158,7 +158,7 @@ sub www_edit {
                 $output .= '<tr><td class="formDescription">'.WebGUI::International::get(254).'</td><td>'.WebGUI::Form::text("graphWidth",20,3,$data{graphWidth}).'</td></tr>';
                 $output .= '<tr><td class="formDescription">'.WebGUI::International::get(255).'</td><td>'.WebGUI::Form::text("question",50,255,$data{question}).'</td></tr>';
                 $output .= '<tr><td class="formDescription">'.WebGUI::International::get(256).'<span><br>'.WebGUI::International::get(257).'</span></td><td>'.WebGUI::Form::textArea("answers",$data{a1}."\n".$data{a2}."\n".$data{a3}."\n".$data{a4}."\n".$data{a5}."\n".$data{a6}."\n".$data{a7}."\n".$data{a8}."\n".$data{a9}."\n".$data{a10}."\n".$data{a11}."\n".$data{a12}."\n".$data{a13}."\n".$data{a14}."\n".$data{a15}."\n".$data{a16}."\n".$data{a17}."\n".$data{a18}."\n".$data{a19}."\n".$data{a20}."\n",50,8,0,'on').'</td></tr>';
-                $output .= '<tr><td></td><td>'.WebGUI::Form::submit(WebGUI::International::get(62)).'</td></tr>';
+                $output .= '<tr><td></td><td>'.WebGUI::Form::submit(WebGUI::International::get(62)).' &nbsp;&nbsp;&nbsp; <a href="'.$session{page}{url}.'?func=resetVotes&wid='.$session{form}{wid}.'">'.WebGUI::International::get(305).'</a></td></tr>';
                 $output .= '</table></form>';
                 return $output;
         } else {
@@ -177,6 +177,14 @@ sub www_editSave {
         } else {
                 return WebGUI::Privilege::insufficient();
         }
+}
+
+#-------------------------------------------------------------------
+sub www_resetVotes {
+	if (WebGUI::Privilege::canEditPage()) {
+		WebGUI::SQL->write("delete from pollAnswer where widgetId='$session{form}{wid}'",$session{dbh});
+	}
+	return "";
 }
 
 #-------------------------------------------------------------------

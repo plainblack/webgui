@@ -131,7 +131,7 @@ sub www_deleteAttachment {
 	my ($owner);
 	($owner) = WebGUI::SQL->quickArray("select userId from submission where submissionId=$session{form}{sid}",$session{dbh});
         if ($owner == $session{user}{userId}) {
-                WebGUI::SQL->write("update submission set attachment='' where widgetId=$session{form}{wid}",$session{dbh});
+                WebGUI::SQL->write("update submission set attachment='' where submissionId=$session{form}{sid}",$session{dbh});
                 return www_editSubmission();
         } else {
                 return WebGUI::Privilege::insufficient();
@@ -143,7 +143,7 @@ sub www_deleteImage {
 	my ($owner);
 	($owner) = WebGUI::SQL->quickArray("select userId from submission where submissionId=$session{form}{sid}",$session{dbh});
         if ($owner == $session{user}{userId}) {
-                WebGUI::SQL->write("update submission set image='' where widgetId=$session{form}{wid}",$session{dbh});
+                WebGUI::SQL->write("update submission set image='' where submissionId=$session{form}{sid}",$session{dbh});
                 return www_editSubmission();
         } else {
                 return WebGUI::Privilege::insufficient();

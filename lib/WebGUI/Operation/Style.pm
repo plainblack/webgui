@@ -21,7 +21,7 @@ use WebGUI::SQL;
 use WebGUI::Utility;
 
 our @ISA = qw(Exporter);
-our @EXPORT = qw(&www_addStyle &www_addStyleSave &www_deleteStyle &www_deleteStyleConfirm &www_editStyle &www_editStyleSave &www_listStyles);
+our @EXPORT = qw(&www_copyStyle &www_addStyle &www_addStyleSave &www_deleteStyle &www_deleteStyleConfirm &www_editStyle &www_editStyleSave &www_listStyles);
 
 #-------------------------------------------------------------------
 sub www_addStyle {
@@ -55,6 +55,18 @@ sub www_addStyleSave {
                 $output = WebGUI::Privilege::adminOnly();
         }
         return $output;
+}
+
+#-------------------------------------------------------------------
+sub www_copyStyle {
+	my (%style);
+        if (WebGUI::Privilege::isInGroup(3)) {
+		%style = WebGUI::SQL->quickHash("select * from style where styleId=$session{form}{sid}",$session{dbh});
+                WebGUI::SQL->write("insert into style values (".getNextId("styleId").", ".quote('Copy of '.$style{name}).", ".quote($style{header}).", ".quote($style{footer}).", ".quote($style{styleSheet}).")",$session{dbh});
+                return www_listStyles();
+        } else {
+                return WebGUI::Privilege::adminOnly();
+        }
 }
 
 #-------------------------------------------------------------------
@@ -132,7 +144,7 @@ sub www_listStyles {
                 $output .= '<table border=1 cellpadding=5 cellspacing=0 align="center">';
                 $sth = WebGUI::SQL->read("select styleId,name from style where name<>'Reserved' order by name",$session{dbh});
                 while (@data = $sth->array) {
-                        $row[$i] = '<tr><td valign="top"><a href="'.$session{page}{url}.'?op=deleteStyle&sid='.$data[0].'"><img src="'.$session{setting}{lib}.'/delete.gif" border=0></a><a href="'.$session{page}{url}.'?op=editStyle&sid='.$data[0].'"><img src="'.$session{setting}{lib}.'/edit.gif" border=0></a></td>';
+                        $row[$i] = '<tr><td valign="top"><a href="'.$session{page}{url}.'?op=deleteStyle&sid='.$data[0].'"><img src="'.$session{setting}{lib}.'/delete.gif" border=0></a><a href="'.$session{page}{url}.'?op=editStyle&sid='.$data[0].'"><img src="'.$session{setting}{lib}.'/edit.gif" border=0></a><a href="'.$session{page}{url}.'?op=copyStyle&sid='.$data[0].'"><img src="'.$session{setting}{lib}.'/copy.gif" border=0></a></td>';
                         $row[$i] .= '<td valign="top">'.$data[1].'</td></tr>';
                         $i++;
                 }

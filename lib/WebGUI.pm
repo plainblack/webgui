@@ -1,5 +1,5 @@
 package WebGUI;
-our $VERSION = "2.1.1";
+our $VERSION = "2.2.0";
 
 #-------------------------------------------------------------------
 # WebGUI is Copyright 2001 Plain Black Software.
@@ -60,7 +60,7 @@ sub _displayAdminBar {
 			$session{env}{SCRIPT_NAME}.'/clipboard'=>WebGUI::International::get(9),
 			$session{env}{SCRIPT_NAME}.'/trash'=>WebGUI::International::get(10),
 			$session{page}{url}.'?op=purgeTrash'=>WebGUI::International::get(11),
-			$session{page}{url}.'?op=/viewStatistics'=>WebGUI::International::get(144)
+			$session{page}{url}.'?op=viewStatistics'=>WebGUI::International::get(144)
 		);
 	}
         %hash = ( $session{page}{url}=>WebGUI::International::get(82), 

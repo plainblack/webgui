@@ -27,7 +27,7 @@ sub process {
 			$temp .= WebGUI::International::get(48);
                 	$temp .= ' '.$session{user}{username}.'. ';
 			$temp .= WebGUI::International::get(49);
-			$temp = WebGUI::Macro::Backslash::process($temp);
+			$temp = WebGUI::Macro::Backslash_pageUrl::process($temp);
         	} else {
                 	$temp .= '<form method="post" action="'.$session{page}{url}.'"> ';
                 	$temp .= WebGUI::Form::hidden("op","login").'<span class="formSubtext">';

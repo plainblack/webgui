@@ -25,7 +25,7 @@ sub _recurseCrumbTrail {
                 $output .= _recurseCrumbTrail($data{parentId});
         }
         if ($data{title} ne "") {
-                $output .= '<a href="'.$session{env}{SCRIPT_NAME}.'/'.$data{urlizedTitle}.'">'.$data{title}.'</a> &gt; '
+                $output .= '<a class="crumbTrail" href="'.$session{env}{SCRIPT_NAME}.'/'.$data{urlizedTitle}.'">'.$data{title}.'</a> &gt; '
 ;
         }
         return $output;

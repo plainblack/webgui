@@ -20,10 +20,10 @@ sub process {
 	$output = $_[0];
   #---account link---
 	if ($output =~ /\^a(.*)\^\/a/) {
-        	$temp = '<a href="'.$session{page}{url}.'?op=displayAccount">'.$1.'</a>';
+        	$temp = '<a class="myAccountLink" href="'.$session{page}{url}.'?op=displayAccount">'.$1.'</a>';
                 $output =~ s/\^a(.*)\^\/a/$temp/g;
 	} elsif ($output =~ /\^a/) {
-        	$temp = '<a href="'.$session{page}{url}.'?op=displayAccount">'.WebGUI::International::get(46).'</a>';
+        	$temp = '<a class="myAccountLink" href="'.$session{page}{url}.'?op=displayAccount">'.WebGUI::International::get(46).'</a>';
         	$output =~ s/\^a/$temp/g;
 	}
 	return $output;

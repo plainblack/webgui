@@ -66,6 +66,7 @@ sub www_addPage {
 		$output .= '<table>';
 		$output .= '<tr><td class="formDescription">'.WebGUI::International::get(99).'</td><td>'.WebGUI::Form::text("title",20,30,$session{form}{title}).'</td></tr>';
 		$output .= '<tr><td class="formDescription">'.WebGUI::International::get(100).'</td><td>'.WebGUI::Form::textArea("metaTags",$session{form}{metaTags}).'</td></tr>';
+                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(307).'</td><td>'.WebGUI::Form::checkbox("defaultMetaTags",1,1).'</td></tr>';
 		$output .= '<tr><td></td><td>'.WebGUI::Form::submit(WebGUI::International::get(62)).'</td></tr>';
 		$output .= '</table></form>';	
 		return $output;
@@ -83,7 +84,7 @@ sub www_addPageSave {
 		while (($test) = WebGUI::SQL->quickArray("select urlizedTitle from page where urlizedTitle='$urlizedTitle'",$session{dbh})) {
 			$urlizedTitle .= 2;
 		}
-		WebGUI::SQL->write("insert into page values (".getNextId("pageId").", $session{page}{pageId}, ".quote($session{form}{title}).", $session{page}{styleId}, $session{user}{userId}, $session{page}{ownerView}, $session{page}{ownerEdit}, $session{page}{groupId}, $session{page}{groupView}, $session{page}{groupEdit}, $session{page}{worldView}, $session{page}{worldEdit}, '$nextSeq', ".quote($session{form}{metaTags}).", '$urlizedTitle')",$session{dbh});
+		WebGUI::SQL->write("insert into page values (".getNextId("pageId").", $session{page}{pageId}, ".quote($session{form}{title}).", $session{page}{styleId}, $session{user}{userId}, $session{page}{ownerView}, $session{page}{ownerEdit}, $session{page}{groupId}, $session{page}{groupView}, $session{page}{groupEdit}, $session{page}{worldView}, $session{page}{worldEdit}, '$nextSeq', ".quote($session{form}{metaTags}).", '$urlizedTitle', '$session{form}{defaultMetaTags}')",$session{dbh});
 		return "";
 	} else {
 		return WebGUI::Privilege::insufficient();
@@ -150,6 +151,7 @@ sub www_editPage {
                 $output .= '<tr><td class="formDescription">'.WebGUI::International::get(99).'</td><td>'.WebGUI::Form::text("title",20,30,$session{page}{title}).'</td></tr>';
                 $output .= '<tr><td class="formDescription">'.WebGUI::International::get(104).'</td><td>'.WebGUI::Form::text("urlizedTitle",20,30,$session{page}{urlizedTitle}).'</td></tr>';
                 $output .= '<tr><td class="formDescription">'.WebGUI::International::get(100).'</td><td>'.WebGUI::Form::textArea("metaTags",$session{page}{metaTags}).'</td></tr>';
+                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(307).'</td><td>'.WebGUI::Form::checkbox("defaultMetaTags",1,$session{page}{defaultMetaTags}).'</td></tr>';
 		$output .= '<tr><td colspan=2><hr size=1><b>'.WebGUI::International::get(105).'</b></td></tr>';
 		%hash = WebGUI::SQL->buildHash("select styleId,name from style where name<>'Reserved' order by name",$session{dbh});
 		$array[0] = $session{page}{styleId};
@@ -191,7 +193,7 @@ sub www_editPageSave {
                 while (($test) = WebGUI::SQL->quickArray("select urlizedTitle from page where urlizedTitle='$urlizedTitle' and pageId<>$session{page}{pageId}",$session{dbh})) {
                         $urlizedTitle .= 2;
                 }
-                WebGUI::SQL->write("update page set title=".quote($session{form}{title}).", styleId=$session{form}{styleId}, ownerId=$session{form}{ownerId}, ownerView=$session{form}{ownerView}, ownerEdit=$session{form}{ownerEdit}, groupId='$session{form}{groupId}', groupView=$session{form}{groupView}, groupEdit=$session{form}{groupEdit}, worldView=$session{form}{worldView}, worldEdit=$session{form}{worldEdit}, metaTags=".quote($session{form}{metaTags}).", urlizedTitle='$urlizedTitle' where pageId=$session{page}{pageId}",$session{dbh});
+                WebGUI::SQL->write("update page set title=".quote($session{form}{title}).", styleId=$session{form}{styleId}, ownerId=$session{form}{ownerId}, ownerView=$session{form}{ownerView}, ownerEdit=$session{form}{ownerEdit}, groupId='$session{form}{groupId}', groupView=$session{form}{groupView}, groupEdit=$session{form}{groupEdit}, worldView=$session{form}{worldView}, worldEdit=$session{form}{worldEdit}, metaTags=".quote($session{form}{metaTags}).", urlizedTitle='$urlizedTitle', defaultMetaTags='$session{form}{defaultMetaTags}' where pageId=$session{page}{pageId}",$session{dbh});
 		if ($session{form}{recurseStyle} eq "yes") {
 			_recursivelyChangeStyle($session{page}{pageId});
 		}

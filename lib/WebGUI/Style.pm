@@ -30,9 +30,11 @@ sub getStyle {
 			<head>
 			<title>'.$session{page}{title}.'</title>'
 			.$style{styleSheet}
-			.$session{page}{metaTags}
-			.'</head>'
-			.$style{header};
+			.$session{page}{metaTags};
+		if ($session{page}{defaultMetaTags}) {
+			$header .= '<meta http-equiv="Keywords" name="Keywords" content="'.$session{page}{title}.', '.$session{setting}{companyName}.'">';
+		}
+		$header .= '</head>'.$style{header};
 		$footer = $style{footer}.'
 			</html>';
 		$header = WebGUI::Macro::process($header);

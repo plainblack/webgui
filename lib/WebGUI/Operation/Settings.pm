@@ -28,7 +28,7 @@ sub www_editAuthenticationSettings {
         %authMethod = ('WebGUI'=>'WebGUI', 'LDAP'=>'LDAP');
         %yesNo = ('yes'=>WebGUI::International::get(138), 'no'=>WebGUI::International::get(139));
         if (WebGUI::Privilege::isInGroup(3)) {
-                $output .= '<a href="'.$session{page}{url}.'?op=viewHelp&hid=12"><img src="'.$session{setting}{lib}.'/help.gif" border="0" align="right"></a>';
+                $output .= '<a href="'.$session{page}{url}.'?op=viewHelp&hid=2"><img src="'.$session{setting}{lib}.'/help.gif" border="0" align="right"></a>';
                 $output .= '<h1>'.WebGUI::International::get(117).'</h1>';
                 $output .= ' <form method="post" action="'.$session{page}{url}.'"> ';
                 $output .= WebGUI::Form::hidden("op","editAuthenticationSettingsSave");
@@ -37,6 +37,8 @@ sub www_editAuthenticationSettings {
                 $output .= '<tr><td class="formDescription" valign="top">'.WebGUI::International::get(118).'</td><td>'.WebGUI::Form::selectList("anonymousRegistration",\%yesNo, \@array).'</td></tr>';
                 $array[0] = $session{setting}{authMethod};
                 $output .= '<tr><td class="formDescription" valign="top">'.WebGUI::International::get(119).'</td><td>'.WebGUI::Form::selectList("authMethod",\%authMethod, \@array).'</td></tr>';
+                $array[0] = $session{setting}{usernameBinding};
+                $output .= '<tr><td class="formDescription" valign="top">'.WebGUI::International::get(306).'</td><td>'.WebGUI::Form::selectList("usernameBinding",\%yesNo, \@array).'</td></tr>';
                 $output .= '<tr><td class="formDescription" valign="top">'.WebGUI::International::get(120).'</td><td>'.WebGUI::Form::text("ldapURL",30,2048,$session{setting}{ldapURL}).'</td></tr>';
                 $output .= '<tr><td class="formDescription" valign="top">'.WebGUI::International::get(121).'</td><td>'.WebGUI::Form::text("ldapId",30,100,$session{setting}{ldapId}).'</td></tr>';
                 $output .= '<tr><td class="formDescription" valign="top">'.WebGUI::International::get(122).'</td><td>'.WebGUI::Form::text("ldapIdName",30,100,$session{setting}{ldapIdName}).'</td></tr>';
@@ -59,6 +61,7 @@ sub www_editAuthenticationSettingsSave {
                 WebGUI::SQL->write("update settings set value=".quote($session{form}{ldapIdName})." where name='ldapIdName'",$session{dbh});
                 WebGUI::SQL->write("update settings set value=".quote($session{form}{ldapPasswordName})." where name='ldapPasswordName'",$session{dbh});
                 WebGUI::SQL->write("update settings set value=".quote($session{form}{anonymousRegistration})." where name='anonymousRegistration'",$session{dbh});
+                WebGUI::SQL->write("update settings set value=".quote($session{form}{usernameBinding})." where name='usernameBinding'",$session{dbh});
                 return www_manageSettings();
         } else {
                 return WebGUI::Privilege::adminOnly();
@@ -69,7 +72,7 @@ sub www_editAuthenticationSettingsSave {
 sub www_editCompanyInformation {
         my ($output);
         if (WebGUI::Privilege::isInGroup(3)) {
-                $output .= '<a href="'.$session{page}{url}.'?op=viewHelp&hid=12"><img src="'.$session{setting}{lib}.'/help.gif" border="0" align="right"></a>';
+                $output .= '<a href="'.$session{page}{url}.'?op=viewHelp&hid=6"><img src="'.$session{setting}{lib}.'/help.gif" border="0" align="right"></a>';
 		$output .= '<h1>'.WebGUI::International::get(124).'</h1>';
 		$output .= ' <form method="post" action="'.$session{page}{url}.'"> ';
                 $output .= WebGUI::Form::hidden("op","editCompanyInformationSave");
@@ -102,7 +105,7 @@ sub www_editCompanyInformationSave {
 sub www_editFileSettings {
         my ($output);
         if (WebGUI::Privilege::isInGroup(3)) {
-                $output .= '<a href="'.$session{page}{url}.'?op=viewHelp&hid=12"><img src="'.$session{setting}{lib}.'/help.gif" border="0" align="right"></a>';
+                $output .= '<a href="'.$session{page}{url}.'?op=viewHelp&hid=11"><img src="'.$session{setting}{lib}.'/help.gif" border="0" align="right"></a>';
 		$output .= '<h1>'.WebGUI::International::get(128).'</h1>';
 		$output .= ' <form method="post" action="'.$session{page}{url}.'"> ';
                 $output .= WebGUI::Form::hidden("op","editFileSettingsSave");
@@ -126,7 +129,7 @@ sub www_editFileSettingsSave {
                 WebGUI::SQL->write("update settings set value=".quote($session{form}{lib})." where name='lib'",$session{dbh});
                 WebGUI::SQL->write("update settings set value=".quote($session{form}{maxAttachmentSize})." where name='maxAttachmentSize'",$session{dbh});
                 WebGUI::SQL->write("update settings set value=".quote($session{form}{attachmentDirectoryWeb})." where name='attachmentDirectoryWeb'",$session{dbh});
-                WebGUI::SQL->write("update settings set value=".quote($session{form}{attachmentDirectoryLocal})." wherename='attachmentDirectoryLocal'",$session{dbh});
+                WebGUI::SQL->write("update settings set value=".quote($session{form}{attachmentDirectoryLocal})." where name='attachmentDirectoryLocal'",$session{dbh});
                 return www_manageSettings();
         } else {
                 return WebGUI::Privilege::adminOnly();
@@ -137,7 +140,7 @@ sub www_editFileSettingsSave {
 sub www_editMailSettings {
         my ($output);
         if (WebGUI::Privilege::isInGroup(3)) {
-                $output .= '<a href="'.$session{page}{url}.'?op=viewHelp&hid=12"><img src="'.$session{setting}{lib}.'/help.gif" border="0" align="right"></a>';
+                $output .= '<a href="'.$session{page}{url}.'?op=viewHelp&hid=13"><img src="'.$session{setting}{lib}.'/help.gif" border="0" align="right"></a>';
                 $output .= '<h1>'.WebGUI::International::get(133).'</h1>';
                 $output .= ' <form method="post" action="'.$session{page}{url}.'"> ';
                 $output .= WebGUI::Form::hidden("op","editMailSettingsSave");
@@ -169,7 +172,7 @@ sub www_editMiscSettings {
         my ($output, @array, %notFoundPage);
         %notFoundPage = (1=>WebGUI::International::get(136), 4=>WebGUI::International::get(137));
         if (WebGUI::Privilege::isInGroup(3)) {
-                $output .= '<a href="'.$session{page}{url}.'?op=viewHelp&hid=12"><img src="'.$session{setting}{lib}.'/help.gif" border="0" align="right"></a>';
+                $output .= '<a href="'.$session{page}{url}.'?op=viewHelp&hid=24"><img src="'.$session{setting}{lib}.'/help.gif" border="0" align="right"></a>';
                 $output .= '<h1>'.WebGUI::International::get(140).'</h1>';
                 $output .= ' <form method="post" action="'.$session{page}{url}.'"> ';
                 $output .= WebGUI::Form::hidden("op","editMiscSettingsSave");
@@ -191,7 +194,7 @@ sub www_editMiscSettingsSave {
         if (WebGUI::Privilege::isInGroup(3)) {
                 WebGUI::SQL->write("update settings set value=".quote($session{form}{sessionTimeout})." where name='sessionTimeout'",$session{dbh});
                 WebGUI::SQL->write("update settings set value=".quote($session{form}{notFoundPage})." where name='notFoundPage'",$session{dbh});
-                return "";
+                return www_manageSettings(); 
         } else {
                 return WebGUI::Privilege::adminOnly();
 	}

@@ -26,7 +26,7 @@ sub process {
                 } else {
                         $temp .= '?makePrintable=1';
                 }
-                $temp = '<a href="'.$temp.'">'.$1.'</a>';
+                $temp = '<a class="makePrintable" href="'.$temp.'">'.$1.'</a>';
                 $output =~ s/\^r(.*)\^\/r/$temp/g;
         } elsif ($output =~ /\^r/) {
                 $temp = $session{env}{REQUEST_URI};
@@ -35,7 +35,7 @@ sub process {
 		} else {
 			$temp .= '?makePrintable=1';
 		}
-		$temp = '<a href="'.$temp.'">';
+		$temp = '<a class="makePrintable" href="'.$temp.'">';
 		$temp .= WebGUI::International::get(53); 
 		$temp .= '</a>';
                 $output =~ s/\^r/$temp/g;
