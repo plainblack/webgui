@@ -243,7 +243,9 @@ sub www_cutPage {
 		
         } elsif (WebGUI::Page::canEdit()) {
 		$page = WebGUI::Page->getPage($session{page}{pageId});
+		my $parentId = $page->get("parentId") || 1;
 		$page->cut;
+		WebGUI::Session::refreshPageInfo($parentId);
                 return "";
         } else {
                 return WebGUI::Privilege::insufficient();

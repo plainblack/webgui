@@ -87,7 +87,8 @@
  - Snippets can now take up to 9 optional parameters as replacements similar
    to the SQL macro. Thanks to Andreas Ljunggren.
  - bugfix [ 990710 ] Users can't change own passwords
-
+ - Fixed a bug where the user was redirected to the clipboard after cutting a
+   page.
 
 
 6.0.3
