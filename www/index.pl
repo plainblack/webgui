@@ -10,11 +10,12 @@
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
-my $webguiRoot = "..";
-my $configFile = "WebGUI.conf";
+our ($webguiRoot, $configFile);
 
 BEGIN {
-        unshift (@INC, "../lib");
+        $configFile = "WebGUI.conf";
+        $webguiRoot = "/data/WebGUI";
+        unshift (@INC, $webguiRoot."/lib");
 }
 
 #-----------------DO NOT MODIFY BELOW THIS LINE--------------------
