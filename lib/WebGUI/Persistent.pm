@@ -149,7 +149,7 @@ Should be true for fields that need to be quoted in database queries.
 
 =back
 
-=head2 table
+=item table
 
 This must be set to the name of the table that this class represents.
 
@@ -255,9 +255,13 @@ sub minimumFields {
 
 =head2 multiDelete( -where => @whereClauses, %p )
 
+=over
+
 =item -where
 
 See multiNew().
+
+=back
 
 =cut
 
@@ -286,6 +290,8 @@ Unrecognised parameters are combined to form the where clause:
 
 Additional, more complicated parameters maybe passed using the -where option.
 
+=over
+
 =item -where
 
 If provided -where must be an array reference, which is evaluated to generate
@@ -310,6 +316,8 @@ option is true.
 =item -minimumFields
 
 If true the minimum fields are selected from the database.
+
+=back
 
 =cut
 
@@ -339,6 +347,8 @@ sub multiNew {
 
 =head2 new 
 
+=over
+
 =item -properties
 
 If a hash reference of property names to values is provided to this method,
@@ -361,6 +371,8 @@ See multiNew().
 =item -noSet
 
 If true this stops the set() method from doing writing to the database.
+
+=back
 
 =cut
 

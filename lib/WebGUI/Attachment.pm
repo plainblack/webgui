@@ -652,7 +652,7 @@ sub saveFromFilesystem {
 
 #-------------------------------------------------------------------
 
-=head saveFromHashref ( hashref ) 
+=head2 saveFromHashref ( hashref ) 
 
 Stores a hash reference as an attachment.
 

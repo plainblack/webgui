@@ -373,7 +373,7 @@ sub expireOffset {
 
 #-------------------------------------------------------------------
 
-=head find ( name )
+=head2 find ( name )
 
 An alternative to the constructor "new", use find as a constructor by name rather than id.
 

@@ -578,7 +578,7 @@ Returns a string of text.
 
 =over 
 
-=itemname
+=item name
 
 The name of the form variable to retrieve.
 

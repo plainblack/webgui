@@ -192,6 +192,8 @@ The URL of the document to retrieve. It must begin with the standard "http://".
 
 The time to live for this content. This is the amount of time (in seconds) that the content will remain in the cache. Defaults to "60".
 
+=back
+
 =cut
 
 sub setByHTTP {
