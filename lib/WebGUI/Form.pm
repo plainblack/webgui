@@ -15,6 +15,7 @@ package WebGUI::Form;
 =cut
 
 use strict;
+use HTTP::BrowserDetect;
 use WebGUI::DateTime;
 use WebGUI::International;
 use WebGUI::Session;
@@ -639,7 +640,9 @@ sub hiddenList {
 =cut
 
 sub HTMLArea {
-        my ($output, $rows, $columns);
+        my ($output, $rows, $columns, $htmlArea);
+        my $button = '<input type="button" onClick="openEditWindow(this.form.'.$_[0]->{name}.')" value="'
+		.WebGUI::International::get(171).'" style="font-size: 8pt;"><br>';
         $output = '<script language="JavaScript">function fixChars(element) {element.value = element.value.replace(/~V/mg,"-");}</script>';
 	if ($session{setting}{richEditor} eq "edit-on-pro") {
 		$output .= '<script language="JavaScript">
@@ -650,15 +653,64 @@ sub HTMLArea {
 			}
 			</script>';
 	} else {
-	 	$output .= '<script language="Javascript1.2" src="'.$session{config}{extras}.'/htmlArea/editor.js"></script>'."\n";
-                $output .= '<script>'."\n";
-                $output .= '_editor_url = "'.$session{config}{extras}.'/htmlArea/";'."\n";
-                $output .= '</script>'."\n";
-        }
-        if ($session{setting}{richEditor} ne "built-in") {
-           	$output .= '<input type="button" onClick="openEditWindow(this.form.'.$_[0]->{name}.')" value="'.
-                      WebGUI::International::get(171).'" style="font-size: 8pt;"><br>';
-        }
+		my $browser = HTTP::BrowserDetect->new($session{env}{HTTP_USER_AGENT});
+		if ($browser->ie && $browser->version >= 5.5) {
+			$output .= '<script language="Javascript1.2" src="'.$session{config}{extras}
+				.'/htmlArea/editor.js"></script>'."\n";
+                	$output .= '<script>'."\n";
+                	$output .= '_editor_url = "'.$session{config}{extras}.'/htmlArea/";'."\n";
+                	$output .= '</script>'."\n";
+                	$output .= '<script language="JavaScript">
+                       		var formObj;
+                       		var extrasDir="'.$session{config}{extras}.'";
+                       		function openEditWindow(obj) {
+                       		formObj = obj;
+                       		if (navigator.userAgent.substr(navigator.userAgent.indexOf("MSIE")+5,1)>=5)
+                         		window.open("'.$session{config}{extras}.'/ieEdit.html","editWindow","width=490,height=400,resizable=1");
+                       		else
+                        		 window.open("'.$session{config}{extras}.'/nonIeEdit.html","editWindow","width=500,height=410");
+                       		}
+                       		function setContent(content) {
+                         		formObj.value = content;
+                       		} </script>';
+			$htmlArea = 1;
+		} elsif ($browser->ie && $browser->version >= 5) {
+			$output .= '<script language="JavaScript">
+			var formObj;
+	               var extrasDir="'.$session{config}{extras}.'";
+        	       function openEditWindow(obj) {
+	               formObj = obj;
+                	 window.open("'.$session{config}{extras}.'/ie5edit.html","editWindow","width=490,height=400,resizable=1");			}
+        	       function setContent(content) {
+                	 formObj.value = content;
+	               } </script>';
+			$output .= $button;
+### UNCOMMENT THIS WHEN MOZILLA 1.3 COMES OUT
+#		} elsif ($browser->gecko && $browser->version >= 1.3) {
+#			$output .= '<script language="JavaScript">
+ #                       var formObj;
+  ##                     var extrasDir="'.$session{config}{extras}.'";
+    #                   function openEditWindow(obj) {
+     #                  formObj = obj;
+      #                   window.open("'.$session{config}{extras}.'/wendedit.html","editWindow","width=490,height=400,resizable=1");			}
+       #                function setContent(content) {
+        #                 formObj.value = content;
+         #              } </script>';
+	#		$output .= $button;
+		} else {
+			$output .= '<script language="JavaScript">
+			var formObj;
+	               var extrasDir="'.$session{config}{extras}.'";
+        	       function openEditWindow(obj) {
+	               formObj = obj;
+        	         window.open("'.$session{config}{extras}.'/lastResortEdit.html","editWindow","width=500,height=410");
+			}
+        	       function setContent(content) {
+                	 formObj.value = content;
+	               } </script>';
+			$output .= $button;
+		}
+	}
 	$rows = $_[0]->{rows} || ($session{setting}{textAreaRows}+7);
 	$columns = $_[0]->{columns} || ($session{setting}{textAreaCols}+5);
         $output .= textarea({
@@ -669,7 +721,7 @@ sub HTMLArea {
                 rows=>$rows,
                 extras=>$_[0]->{extras}.' onBlur="fixChars(this.form.'.$_[0]->{name}.')"'
                 });
-        if ($session{setting}{richEditor} eq "built-in") {
+        if ($htmlArea) {
             	$output .= '<script language="Javascript1.2">'."\n";
             	$output .= 'editor_generate("'.$_[0]->{name}.'");'."\n";
             	$output .= '</script>'."\n";

@@ -59,6 +59,8 @@ HTML::TagFilter......................William Ross
 
 HTML::Template.......................Sam Tregar
 
+HTTP::BrowserDetect..................Lee Semel
+
 Net::LDAP............................Graham Barr
 
 Tie::CPHash..........................Christopher J. Madsen

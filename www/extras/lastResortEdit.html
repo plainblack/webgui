@@ -1,0 +1,108 @@
+<html>
+<head>
+<title>Edit Window</title>
+<script language="JavaScript">
+/*
+
+#-------------------------------------------------------------------
+# WebGUI is Copyright 2001-2002 Plain Black LLC.
+#-------------------------------------------------------------------
+# Please read the legal notices (docs/legal.txt) and the license
+# (docs/license.txt) that came with this distribution before using
+# this software.
+#-------------------------------------------------------------------
+# http://www.plainblack.com                     info@plainblack.com
+#-------------------------------------------------------------------
+
+*/
+
+var color;
+var formObj;
+
+function boldText(obj) {
+	obj.value = obj.value+'<b>'+prompt("Enter the text to bold:", "")+'</b>';
+}
+
+function centerText(obj) {
+	obj.value = obj.value+'<div align="center">'+prompt("Enter the text to center:", "")+'</div>';
+}
+
+function colorText(obj) {
+	formObj = obj;
+	window.open(window.opener.extrasDir+"/colorPicker.html","colorPicker","width=438,height=258");
+}
+
+function copyright(obj) {
+        obj.value = obj.value+'&copy;';
+}
+
+function email(obj) {
+	var email = prompt("Enter the Email address:", "");
+	obj.value = obj.value+'<a href="mailto:'+email+'">'+email+'</a>';
+}
+
+function getShowMeText() {
+	return formObj.value;
+}
+
+function imageAdd(obj) {
+	obj.value = obj.value+'<img src="'+prompt("Enter the image URL:", "http://somesite.com/image.jpg")+'" border="0">';
+}
+
+function italicText(obj) {
+	obj.value = obj.value+'<i>'+prompt("Enter the text to italicize:", "")+'</i>';
+}
+
+function list(obj) {
+	var item;
+	obj.value = obj.value+'<ul>';
+	obj.value = obj.value+'<li>'+prompt("Enter the first item in the list:", "");
+	while (item = prompt("Enter the next item in the list (cancel when done):", "")) {
+		obj.value = obj.value+'<li>'+item;
+	}
+	obj.value = obj.value+'</ul>';
+}
+
+function registered(obj) {
+        obj.value = obj.value+'&reg;';
+}
+
+function setColor(remoteColor) {
+	formObj.value = formObj.value+'<span style="color: #'+remoteColor+';">'+prompt("Enter the text to color:","")+'</span>';	
+}
+
+function showMe(obj) {
+	formObj = obj;
+	window.open(window.opener.extrasDir+"/viewer.html","showMeViewer","width=500,height=300,scrollbars=1");
+}
+
+function trademark(obj) {
+        obj.value = obj.value+'<font size="-2"><sup>TM</sup></font>';
+}
+
+function url(obj) {
+	obj.value = obj.value+'<a href="'+prompt("Enter the URL of the link:", "http://www.google.com")+'">'+prompt("Enter the title of the link:", "Google")+'</a>';
+}
+</script>
+</head>
+<body onLoad="document.edit.editor.value=window.opener.formObj.value">
+<form name="edit">
+<input type="button" onClick="colorText(this.form.editor)" value="color" style="font-size: 8pt;">
+<input type="button" onClick="boldText(this.form.editor)" value="bold" style="font-size: 8pt;">
+<input type="button" onClick="italicText(this.form.editor)" value="italics" style="font-size: 8pt;">
+<input type="button" onClick="centerText(this.form.editor)" value="center" style="font-size: 8pt;">
+<input type="button" onClick="list(this.form.editor)" value="list" style="font-size: 8pt;">
+<input type="button" onClick="url(this.form.editor)" value="link" style="font-size: 8pt;">
+<input type="button" onClick="email(this.form.editor)" value="email" style="font-size: 8pt;">
+<input type="button" onClick="imageAdd(this.form.editor)" value="image" style="font-size: 8pt;">
+<input type="button" onClick="copyright(this.form.editor)" value="(C)" style="font-size: 8pt;">
+<input type="button" onClick="registered(this.form.editor)" value="(R)" style="font-size: 8pt;">
+<input type="button" onClick="trademark(this.form.editor)" value="TM" style="font-size: 8pt;">
+<br>
+<textarea name="editor" rows=20 cols=55></textarea>
+<br>
+<input type="button" onClick="showMe(this.form.editor)" value="show me" style="font-size: 8pt;">
+<input type="button" onClick="window.blur(); window.opener.focus();window.opener.setContent(this.form.editor.value);window.close();" value="done" style="font-size: 8pt;">
+</form>
+</body>
+</html>
