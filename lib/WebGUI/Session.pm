@@ -138,7 +138,7 @@ sub _setupUserInfo {
 			from userProfileData, userProfileField where userProfileData.fieldName=userProfileField.fieldName 
 			and userProfileData.userId='$user{userId}'");
 		%user = (%user, %profile);
-		$user{language} = $session{page}{languageId} if ($user{userId} == 1);
+		$user{language} = $session{page}{languageId} if ($user{userId} == 1 || $user{language} eq '');
 		%default = WebGUI::SQL->buildHash("select fieldName, dataDefault from userProfileField 
 			where profileCategoryId=4");
 		foreach $key (keys %default) {
@@ -433,7 +433,7 @@ sub open {
 	_setupUserInfo($session{var}{userId});
 	###----------------------------
 	### language settings
-	$session{language} = WebGUI::SQL->quickHashRef("select * from language where languageId=$session{user}{language}");
+	$session{language} = WebGUI::SQL->quickHashRef("select * from language where languageId=".quote($session{user}{language}));
 	###----------------------------
 	### loading plugins
 }
