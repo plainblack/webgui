@@ -569,7 +569,7 @@ sub www_view {
 	my $cache;
 	my $output;
         my $useCache = (
-		$session{form}{op} eq "" && 
+		$session{form}{op} eq "" && $session{form}{pn} eq "" &&
 		(
 			( $self->get("cacheTimeout") > 10 && $session{user}{userId} ne '1') || 
 			( $self->get("cacheTimeoutVisitor") > 10 && $session{user}{userId} eq '1')

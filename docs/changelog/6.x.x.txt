@@ -1,6 +1,11 @@
 6.5.3
  - fix [ 1161457 ] Data fomr - list all entries: Logfile Error
  - fix [ 1161461 ] Data form - Add field - wrong destination
+ - fix [ 1164382 ] User Profiling WebGUI::International::get(304,"WebGUI");
+ - fix [ 1164251 ] message preview
+ - fix [ 1164208 ] Unable to move freely between pages of a forum
+ - fix [ 1160034 ] 6.5.0 - newly added posts do not appear
+ - fix [ 1027992 ] pagination in forum doesn't take you to correct page
  - fix [ 1149585 ] visitor as admin
 
 

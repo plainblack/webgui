@@ -15,6 +15,7 @@ use Tie::CPHash;
 use WebGUI::Asset;
 use WebGUI::Asset::Template;
 use WebGUI::Asset::Post::Thread;
+use WebGUI::Cache;
 use WebGUI::DateTime;
 use WebGUI::Grouping;
 use WebGUI::HTML;
@@ -665,6 +666,9 @@ sub processPropertiesFromFormPost {
 		$storage->generateThumbnail($filename);
 	}
 	$session{form}{proceed} = "redirectToParent";
+	# clear some cache
+	WebGUI::Cache->new("wobject_".$self->getThread->getParent->getId."_".$session{user}{userId})->delete;
+	WebGUI::Cache->new("cspost_".($self->getParent->getId)."_".$session{user}{userId}."_".$session{scratch}{discussionLayout}."_1")->delete;
 }
                                                                                                                                                        
 
@@ -840,6 +844,9 @@ sub www_edit {
 			$self->{_thread} = $self->getParent->getThread;
 			return WebGUI::Privilege::insufficient() unless ($self->getThread->canReply);
 			$var{isReply} = 1;
+			$var{'reply.title'} = $self->getParent->get("title");
+			$var{'reply.synopsis'} = $self->getParent->get("synopsis");
+			$var{'reply.content'} = $self->getParent->formatContent;
 			unless ($session{form}{content} || $session{form}{title}) {
                 		$content = "[quote]".$self->getParent->get("content")."[/quote]" if ($session{form}{withQuote});
                 		$title = $self->getParent->get("title");

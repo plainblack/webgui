@@ -1,6 +1,11 @@
 package WebGUI::i18n::English::WebGUI;
 
 our $I18N = {
+	'304' => {
+		message => q|Language|,
+		lastUpdated => 1031514049
+	},
+
 	'559' => {
 		message => q|Run On Registration|,
 		lastUpdated => 1031514049

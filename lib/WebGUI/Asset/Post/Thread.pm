@@ -608,12 +608,14 @@ sub view {
 	} else {
 		$sql .= "asset.lineage";
 	}
-	$p->setDataByQuery($sql);
+	my $currentPageUrl = $session{env}{PATH_INFO};
+	$currentPageUrl =~ s/^\///;
+	$p->setDataByQuery($sql, undef, undef, undef, "url", $currentPageUrl);
 	foreach my $dataSet (@{$p->getPageData()}) {
 		my $reply = WebGUI::Asset::Post->newByPropertyHashRef($dataSet);
 		$reply->{_thread} = $self; # caching thread for better performance
 		my %replyVars = %{$reply->getTemplateVars};
-		$replyVars{isCurrent} = ('/'.$reply->get("url") eq $session{env}{PATH_INFO});
+		$replyVars{isCurrent} = ($reply->get("url") eq $currentPageUrl);
 		$replyVars{isThreadRoot} = $self->getId eq $reply->getId;
 		$replyVars{depth} = $reply->getLineageLength - $self->getLineageLength;
 		$replyVars{depthX10} = $replyVars{depth}*10;

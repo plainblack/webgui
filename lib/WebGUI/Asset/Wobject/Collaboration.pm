@@ -346,23 +346,23 @@ sub definition {
 				},
 			notificationTemplateId =>{
 				fieldType=>"template",
-				defaultValue=>undef
+				defaultValue=>'PBtmpl0000000000000027'
 				},
 			searchTemplateId =>{
 				fieldType=>"template",
-				defaultValue=>undef
+				defaultValue=>'PBtmpl0000000000000031'
 				},
 			postFormTemplateId =>{
 				fieldType=>"template",
-				defaultValue=>undef
+				defaultValue=>'PBtmpl0000000000000029'
 				},
 			threadTemplateId =>{
 				fieldType=>"template",
-				defaultValue=>undef
+				defaultValue=>'PBtmpl0000000000000032'
 				},
 			collaborationTemplateId =>{
 				fieldType=>"template",
-				defaultValue=>undef
+				defaultValue=>'PBtmpl0000000000000026'
 				},
 			karmaPerPost =>{
 				fieldType=>"integer",

@@ -476,7 +476,7 @@ sub setDataByArrayRef {
 
 #-------------------------------------------------------------------
 
-=head2 setDataByQuery ( query [, dbh, unconditional, placeholders ] )
+=head2 setDataByQuery ( query [, dbh, unconditional, placeholders, dynamicPageNumberKey, dynamicPageNumberValue ] )
 
 Retrieves a data set from a database and replaces whatever data set was passed in through the constructor.
 
@@ -498,11 +498,19 @@ A boolean indicating that the query should be read unconditionally. Defaults to 
 
 An array reference containing a list of values to be used in the placeholders defined in the SQL statement.
 
+=head3 dynamicPageNumberKey
+
+One of the field names being returned from this query. If this is set, the paginator will dynamically assign a page number based upon this key matching the dynamicPageNumberValue. Note that this only applies if the default page number is 1.
+
+=head3 dynamicPageNumberValue
+
+A value to match the dynamicPageNumberKey.
+
 =cut
 
 sub setDataByQuery {
 	my ($sth, $rowCount, @row);
-	my ($self, $sql, $dbh, $unconditional, $placeholders) = @_;
+	my ($self, $sql, $dbh, $unconditional, $placeholders, $dynamicPageNumberKey, $dynamicPageNumberValue) = @_;
 	$dbh ||= WebGUI::SQL->getSlave;
 	if ($unconditional) {
 		$sth = WebGUI::SQL->unconditionalRead($sql,$dbh,$placeholders);
@@ -510,6 +518,7 @@ sub setDataByQuery {
 	} else {
 		$sth = WebGUI::SQL->read($sql,$dbh,$placeholders);
 	}
+	my $defaultPageNumber = $self->getPageNumber;
 	$self->{_totalRows} = $sth->rows;
 	$self->{_columnNames} = [ $sth->getColumnNames ];
 	my $pageCount = 1;
@@ -518,10 +527,18 @@ sub setDataByQuery {
 		if ($rowCount/$self->{_rpp} > $pageCount) {	
 			$pageCount++;
 		}
-		if ($pageCount == $self->getPageNumber) {
-			push(@row,$data);	
+		if (defined $dynamicPageNumberKey && $defaultPageNumber == 1) {
+			if ($data->{$dynamicPageNumberKey} eq $dynamicPageNumberValue) {
+				$self->{_pn} = $pageCount;
+				$dynamicPageNumberKey = undef;
+			}
+			push(@row,$data);
 		} else {
-			push(@row,{});
+			if ($pageCount == $self->getPageNumber) {
+				push(@row,$data);	
+			} else {
+				push(@row,{});
+			}
 		}
 	}
 	$sth->finish;
