@@ -8,6 +8,7 @@
    use that feature in some countries.
  - Fixed a problem where hidden form tags were not escaping macros properly.
  - Fixed an XHTML problem with hidden form tags.
+ - Bugfix [ 1033561 ] HTMLArea 3 not working (Len Kranendonk)
 
 
 6.2.4
