@@ -24,16 +24,12 @@ our @EXPORT = qw(&www_deployPackage &www_selectPackageToDeploy);
 
 #-------------------------------------------------------------------
 sub _duplicateWobjects {
-	my ($sth, $wobject, $cmd, %hash, $extra, $w, %properties);
+	my (%properties);
 	tie %properties, 'Tie::CPHash';
-	$sth = WebGUI::SQL->read("select * from wobject where pageId=$_[0] order by sequenceNumber");
-	while ($wobject = $sth->hashRef) {
-		$extra = WebGUI::SQL->quickHashRef("select * from ${$wobject}{namespace} where wobjectId=${$wobject}{wobjectId}");
-		tie %hash, 'Tie::CPHash';
-		%hash = (%{$wobject},%{$extra});
-		$wobject = \%hash;
-		$cmd = "WebGUI::Wobject::".${$wobject}{namespace};
-		$w = $cmd->new($wobject);
+	my $sth = WebGUI::SQL->read("select * from wobject where pageId=$_[0] order by sequenceNumber");
+	while (my $wobject = $sth->hashRef) {
+		my $cmd = "WebGUI::Wobject::".${$wobject}{namespace};
+		my $w = $cmd->new($wobject);
 		$w->duplicate($_[1]);
 	}
 	$sth->finish;

@@ -16,7 +16,6 @@ use Tie::CPHash;
 use WebGUI::Affiliate;
 use WebGUI::Cache;
 use WebGUI::ErrorHandler;
-use WebGUI::Icon;
 use WebGUI::International;
 use WebGUI::Macro;
 use WebGUI::Operation;
@@ -25,109 +24,27 @@ use WebGUI::Session;
 use WebGUI::SQL;
 use WebGUI::Style;
 use WebGUI::Page;
-use WebGUI::Template;
 use WebGUI::URL;
-use WebGUI::Utility;
 
-
-#-------------------------------------------------------------------	
-sub _generateDebug {
-        if ($session{setting}{showDebug} || ($session{form}{debug}==1 && WebGUI::Privilege::isInGroup(3))) {
-		return WebGUI::ErrorHandler::showDebug();
-        }
-	return "";
-}
 
 #-------------------------------------------------------------------	
 sub _generatePage {
-	my ($canEdit, $pageEdit, $sth, $wobject, %contentHash, $originalWobject, $sql, $extra, %hash, $cmd, $w, $template,$canEditWobject);
-	if (WebGUI::Privilege::canViewPage()) {
-        	if ($session{var}{adminOn}) {
-                	$canEdit = WebGUI::Privilege::canEditPage();
-                        if ($canEdit) {
-                        	$pageEdit = "\n<br>"
-                                	.pageIcon()
-                                        .deleteIcon('op=deletePage')
-                                        .editIcon('op=editPage')
-                                        .moveUpIcon('op=movePageUp')
-                                        .moveDownIcon('op=movePageDown')
-                                        .cutIcon('op=cutPage')
-                                        ."\n";
-                        }
-                }
-                $sth = WebGUI::SQL->read("select * from wobject where pageId=$session{page}{pageId} 
-			order by sequenceNumber, wobjectId");
-                while ($wobject = $sth->hashRef) {
-	        	$canEditWobject = WebGUI::Privilege::canEditWobject($wobject->{wobjectId}); 
-                        if ($session{var}{adminOn} && $canEditWobject) {
-                        	$contentHash{"page.position".${$wobject}{templatePosition}} .= "\n<hr>"
-                                	.wobjectIcon()
-                                        .deleteIcon('func=delete&wid='.${$wobject}{wobjectId})
-                                        .editIcon('func=edit&wid='.${$wobject}{wobjectId})
-                                        .moveUpIcon('func=moveUp&wid='.${$wobject}{wobjectId})
-                                        .moveDownIcon('func=moveDown&wid='.${$wobject}{wobjectId})
-                                        .moveTopIcon('func=moveTop&wid='.${$wobject}{wobjectId})
-                                        .moveBottomIcon('func=moveBottom&wid='.${$wobject}{wobjectId})
-                                        .cutIcon('func=cut&wid='.${$wobject}{wobjectId})
-                                        .copyIcon('func=copy&wid='.${$wobject}{wobjectId});
-				if (${$wobject}{namespace} ne "WobjectProxy" && isIn("WobjectProxy",@{$session{config}{wobjects}})) {
-                                        $contentHash{"page.position".${$wobject}{templatePosition}} .= 
-						shortcutIcon('func=createShortcut&wid='.${$wobject}{wobjectId})
-				}
-                                $contentHash{"page.position".${$wobject}{templatePosition}} .= '<br>';
-                        }
-                        
-		        if(!WebGUI::Privilege::canViewWobject($wobject->{wobjectId})){ next; }  
-			if (${$wobject}{namespace} eq "WobjectProxy") {
-                                $originalWobject = $wobject;
-                                my ($wobjectProxy) = WebGUI::SQL->quickHashRef("select * from WobjectProxy where wobjectId=".${$wobject}{wobjectId});
-                                $wobject = WebGUI::SQL->quickHashRef("select * from wobject where wobject.wobjectId=".$wobjectProxy->{proxiedWobjectId});
-                                if (${$wobject}{namespace} eq "") {
-                                        $wobject = $originalWobject;
-                                } else {
-                                        ${$wobject}{startDate} = ${$originalWobject}{startDate};
-                                        ${$wobject}{endDate} = ${$originalWobject}{endDate};
-                                        ${$wobject}{templatePosition} = ${$originalWobject}{templatePosition};
-                                        ${$wobject}{_WobjectProxy} = ${$originalWobject}{wobjectId};
-					if ($wobjectProxy->{overrideTitle}) {
-						${$wobject}{title} = ${$originalWobject}{title};
-					}
-					if ($wobjectProxy->{overrideDisplayTitle}) {
-						${$wobject}{displayTitle} = ${$originalWobject}{displayTitle};
-					}
-					if ($wobjectProxy->{overrideDescription}) {
-						${$wobject}{description} = ${$originalWobject}{description};
-					}
-					if ($wobjectProxy->{overrideTemplate}) {
-						${$wobject}{templateId} = $wobjectProxy->{proxiedTemplateId};
-					}
-                                }
-                        }
-                        $extra = WebGUI::SQL->quickHashRef("select * from ".$wobject->{namespace}." 
-				where wobjectId=".$wobject->{wobjectId});
-                        tie %hash, 'Tie::CPHash';
-                        %hash = (%{$wobject},%{$extra});
-                        $wobject = \%hash;
-                        $cmd = "WebGUI::Wobject::".${$wobject}{namespace};
-                        $w = eval{$cmd->new($wobject)};
-                        WebGUI::ErrorHandler::fatalError("Couldn't instanciate wobject: ${$wobject}{namespace}. Root cause: ".$@) if($@);
-			if ($w->inDateRange) {
-                        	$contentHash{"page.position".${$wobject}{templatePosition}} .= '<div class="wobject"><div class="wobject'
-					.${$wobject}{namespace}.'" id="wobjectId'.${$wobject}{wobjectId}.'">';
-                                $contentHash{"page.position".${$wobject}{templatePosition}} .= '<a name="'
-					.${$wobject}{wobjectId}.'"></a>';
-                                $contentHash{"page.position".${$wobject}{templatePosition}} .= eval{$w->www_view};
-                                WebGUI::ErrorHandler::fatalError("Wobject runtime error: ${$wobject}{namespace}. Root cause: ".$@) if($@);
-                                $contentHash{"page.position".${$wobject}{templatePosition}} .= "</div></div>\n\n";
-			}
-		}
-                $sth->finish;
-                $template = $session{page}{templateId};
-	} else {
-                $contentHash{"page.position1"} = WebGUI::Privilege::noAccess();
+	my $content = shift;
+	if ($session{form}{op} eq "" && $session{setting}{trackPageStatistics} && $session{form}{wid} ne "new") {
+		WebGUI::SQL->write("insert into pageStatistics (dateStamp, userId, username, ipAddress, userAgent, referer,
+			pageId, pageTitle, wobjectId, wobjectFunction) values (".time().",".$session{user}{userId}
+			.",".quote($session{user}{username}).",
+			".quote($session{env}{REMOTE_ADDR}).", ".quote($session{env}{HTTP_USER_AGENT}).",
+			".quote($session{env}{HTTP_REFERER}).", ".$session{page}{pageId}.", 
+			".quote($session{page}{title}).", ".quote($session{form}{wid}).", ".quote($session{form}{func}).")");
+	}
+	my $output = WebGUI::Macro::process(WebGUI::Style::process($content));
+        if ($session{setting}{showDebug} || ($session{form}{debug}==1 && WebGUI::Privilege::isInGroup(3))) {
+		$output .= WebGUI::ErrorHandler::showDebug();
         }
-	return (\%contentHash,$template,$pageEdit);
+	return $output;
 }
+
 
 #-------------------------------------------------------------------	
 sub _processAction {
@@ -223,64 +140,48 @@ sub _processOperations {
 
 #-------------------------------------------------------------------
 sub page {
-	my ($cache, $debug, $positions, $wobjectOutput, $pageEdit, $httpHeader, $content, $operationOutput, $template);
 	WebGUI::Session::open($_[0],$_[1]);
         my $useCache = ($session{form}{op} eq "" && $session{form}{wid} eq "" && $session{form}{makePrintable} eq "" 
 		&& (($session{page}{cacheTimeout} > 10 && $session{user}{userId} !=1) || ($session{page}{cacheTimeout} > 10 && $session{user}{userId} == 1)) 
 		&& not $session{var}{adminOn});
+	my ($output, $cache);
         if ($useCache) {
                 $cache = WebGUI::Cache->new("page_".$session{page}{pageId}."_".$session{user}{userId});
-                $content = $cache->get;
+                $output = $cache->get;
         }
-	$operationOutput = _processOperations();
+	my $operationOutput = _processOperations();
 	WebGUI::Affiliate::grabReferral();
-	$wobjectOutput = _processFunctions();
+	my $wobjectOutput = _processFunctions();
 	if ($operationOutput eq "" && $wobjectOutput eq "" && $session{form}{action2} ne "") {
 		_processAction($session{form}{action2});
 		$operationOutput = _processOperations();
         	$wobjectOutput = _processFunctions();
 	}
-	if ($operationOutput eq "" && $session{setting}{trackPageStatistics} && $session{form}{wid} ne "new" && $session{header}{mimetype} eq "text/html") {
-		WebGUI::SQL->write("insert into pageStatistics (dateStamp, userId, username, ipAddress, userAgent, referer,
-			pageId, pageTitle, wobjectId, wobjectFunction) values (".time().",".$session{user}{userId}
-			.",".quote($session{user}{username}).",
-			".quote($session{env}{REMOTE_ADDR}).", ".quote($session{env}{HTTP_USER_AGENT}).",
-			".quote($session{env}{HTTP_REFERER}).", ".$session{page}{pageId}.", 
-			".quote($session{page}{title}).", ".quote($session{form}{wid}).", ".quote($session{form}{func}).")");
-	}
-	if ($session{header}{mimetype} ne "text/html") {
-		$httpHeader = WebGUI::Session::httpHeader();
-		WebGUI::Session::close();
-		return $httpHeader.$operationOutput.$wobjectOutput;
+	if ($output ne "") {
+		$output = WebGUI::Session::httpHeader().$output;
+	} elsif ($session{header}{mimetype} ne "text/html") {
+		$output = WebGUI::Session::httpHeader().$operationOutput.$wobjectOutput;
 	} elsif ($operationOutput ne "") {
-		$positions->{"page.position1"} = $operationOutput;
+		$output = WebGUI::Session::httpHeader()._generatePage($operationOutput);
         } elsif ($session{page}{redirectURL} && !$session{var}{adminOn}) {
-                $httpHeader = WebGUI::Session::httpRedirect(WebGUI::Macro::process($session{page}{redirectURL}));
-                WebGUI::Session::close();
-                return $httpHeader;
+              	$output = WebGUI::Session::httpRedirect(WebGUI::Macro::process($session{page}{redirectURL}));
         } elsif ($session{header}{redirect} ne "") {
-                $httpHeader = $session{header}{redirect};
-                WebGUI::Session::close();
-                return $httpHeader;
+                $output = $session{header}{redirect};
 	} elsif ($wobjectOutput ne "") {
-		$positions->{"page.position1"} = $wobjectOutput;
-	} elsif (!($useCache && defined $content)) {
-		($positions, $template, $pageEdit) = _generatePage();
-	}
-	$httpHeader = WebGUI::Session::httpHeader();
-	unless ($useCache && defined $content) {
-		$content = WebGUI::Macro::process(WebGUI::Template::process(WebGUI::Style::get($pageEdit.WebGUI::Page::getTemplate($template)), $positions));
+		$output = WebGUI::Session::httpHeader()._generatePage($wobjectOutput);
+	} else {
+		$output = _generatePage(WebGUI::Page::generate());
 		my $ttl;
 		if ($session{user}{userId} == 1) {
 			$ttl = $session{page}{cacheTimeoutVisitor};
 		} else {
 			$ttl = $session{page}{cacheTimeout};
 		}
-		$cache->set($content, $ttl) if ($useCache);
+		$cache->set($output, $ttl) if ($useCache);
+		$output = WebGUI::Session::httpHeader().$output;
 	}
-	$debug = _generateDebug();
 	WebGUI::Session::close();
-	return $httpHeader.$content.$debug;
+	return $output;
 }
 
 

@@ -365,19 +365,18 @@ sub www_editPage {
                 	-unitsValue=>$data[1],
 			-uiLevel=>8
                 	);
-		%hash = WebGUI::SQL->buildHash("select styleId,name from style where name<>'Reserved' order by name");
 		if (WebGUI::Privilege::isInGroup(5)) {
 			$subtext = ' &nbsp; <a href="'.WebGUI::URL::page('op=listStyles')
 				.'">'.WebGUI::International::get(6).'</a>';
 		} else {
 			$subtext = "";
 		}
-                $f->getTab("layout")->select(
+                $f->getTab("layout")->template(
 			-name=>"styleId",
-			-options=>\%hash,
 			-label=>WebGUI::International::get(105),
-			-value=>[$page{styleId}],
+			-value=>$page{styleId},
 			-subtext=>$subtext,
+			-namespace=>'style',
 			-uiLevel=>5
 			);
 		if ($childCount) {

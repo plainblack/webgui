@@ -1,2 +1,14 @@
 insert into webguiVersion values ('6.0.0','upgrade',unix_timestamp());
-
+delete from international where internationalId=158 and namespace='WebGUI';
+delete from international where internationalId=803 and namespace='WebGUI';
+delete from international where internationalId=804 and namespace='WebGUI';
+delete from international where internationalId=805 and namespace='WebGUI';
+delete from international where internationalId=814 and namespace='WebGUI';
+delete from international where internationalId=156 and namespace='WebGUI';
+delete from international where internationalId=155 and namespace='WebGUI';
+delete from international where internationalId=380 and namespace='WebGUI';
+delete from international where internationalId=151 and namespace='WebGUI';
+delete from international where internationalId=501 and namespace='WebGUI';
+delete from international where internationalId=154 and namespace='WebGUI';
+delete from international where internationalId=157 and namespace='WebGUI';
+delete from style where name='Reserved';

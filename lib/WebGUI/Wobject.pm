@@ -663,8 +663,12 @@ sub new {
 			fieldType=>"hidden"
 			}
 		};
+	my %fullProperties;
+	my $extra = WebGUI::SQL->quickHashRef("select * from ".$properties->{namespace}." where wobjectId='".$properties->{wobjectId}."'");
+        tie %fullProperties, 'Tie::CPHash';
+        %fullProperties = (%{$properties},%{$extra});
         bless({
-		_property=>$properties, 
+		_property=>\%fullProperties, 
 		_useTemplate=>$useTemplate,
 		_useDiscussion=>$useDiscussion,
 		_wobjectProperties=>$wobjectProperties,

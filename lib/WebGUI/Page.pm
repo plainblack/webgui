@@ -20,10 +20,12 @@ use strict;
 use Tie::IxHash;
 use WebGUI::ErrorHandler;
 use WebGUI::HTMLForm;
+use WebGUI::Icon;
+use WebGUI::Persistent::Tree;
 use WebGUI::Session;
 use WebGUI::SQL;
 use WebGUI::Template;
-use WebGUI::Persistent::Tree;
+use WebGUI::Utility;
 
 our @ISA = qw(WebGUI::Persistent::Tree);
 
@@ -40,8 +42,9 @@ This package provides utility functions for WebGUI's page system.
  use WebGUI::Page;
  $integer = WebGUI::Page::countTemplatePositions($templateId);
  $html = WebGUI::Page::drawTemplate($templateId);
+ $html = WebGUI::Page::generate();
  $hashRef = WebGUI::Page::getTemplateList();
- $template = WebGUI::Page::getTemplate($templateId);
+ $template = WebGUI::Page::getTemplate();
  $hashRef = WebGUI::Page::getTemplatePositions($templateId);
  $url = WebGUI::Page::makeUnique($url,$pageId);
 
@@ -50,12 +53,6 @@ This package provides utility functions for WebGUI's page system.
 These functions are available from this package:
 
 =cut
-
-#-------------------------------------------------------------------
-
-sub _newPositionFormat {
-	return "<tmpl_var page.position".($_[0]+1).">";
-}
 
 #-------------------------------------------------------------------
 
@@ -112,7 +109,7 @@ sub countTemplatePositions {
         my ($template, $i);
         $template = getTemplate($_[0]);
         $i = 1;
-        while ($template =~ m/page\.position$i/) {
+        while ($template =~ m/position$i\_loop/) {
                 $i++;
         }
         return $i-1;
@@ -164,9 +161,86 @@ sub drawTemplate {
 	$template = WebGUI::Macro::negate($template);
 	$template =~ s/\<script.*?\>.*?\<\/script\>//gi;
 	$template =~ s/\<table.*?\>/\<table cellspacing=0 cellpadding=3 width=100 height=80 border=1\>/ig;
-	$template =~ s/\<tmpl_var\s+page\.position(\d+)\>/$1/ig;
+	$template =~ s/\<tmpl_loop\s+position(\d+)\_loop\>.*?\<\/tmpl\_loop\>/$1/ig;
 	return $template;
 }
+
+
+#-------------------------------------------------------------------
+
+=head2 generate ( )
+
+Generates the content of the page.
+
+=cut
+
+sub generate {
+        return WebGUI::Privilege::noAccess() unless (WebGUI::Privilege::canViewPage());
+	my %var;
+	$var{'page.canEdit'} = WebGUI::Privilege::canEditPage();
+        $var{'page.toolbar'} = pageIcon()
+       		.deleteIcon('op=deletePage')
+		.editIcon('op=editPage')
+		.moveUpIcon('op=movePageUp')
+		.moveDownIcon('op=movePageDown')
+		.cutIcon('op=cutPage');
+	my $sth = WebGUI::SQL->read("select * from wobject where pageId=".$session{page}{pageId}." order by sequenceNumber, wobjectId");
+        while (my $wobject = $sth->hashRef) {
+		my $wobjectToolbar = wobjectIcon()
+         		.deleteIcon('func=delete&wid='.${$wobject}{wobjectId})
+              		.editIcon('func=edit&wid='.${$wobject}{wobjectId})
+             		.moveUpIcon('func=moveUp&wid='.${$wobject}{wobjectId})
+             		.moveDownIcon('func=moveDown&wid='.${$wobject}{wobjectId})
+              		.moveTopIcon('func=moveTop&wid='.${$wobject}{wobjectId})
+              		.moveBottomIcon('func=moveBottom&wid='.${$wobject}{wobjectId})
+            		.cutIcon('func=cut&wid='.${$wobject}{wobjectId})
+            		.copyIcon('func=copy&wid='.${$wobject}{wobjectId});
+             	if (${$wobject}{namespace} ne "WobjectProxy" && isIn("WobjectProxy",@{$session{config}{wobjects}})) {
+             		$wobjectToolbar .= shortcutIcon('func=createShortcut&wid='.${$wobject}{wobjectId});
+         	}
+       		if (${$wobject}{namespace} eq "WobjectProxy") {
+          		my $originalWobject = $wobject;
+      			my ($wobjectProxy) = WebGUI::SQL->quickHashRef("select * from WobjectProxy where wobjectId=".${$wobject}{wobjectId});
+        		$wobject = WebGUI::SQL->quickHashRef("select * from wobject where wobject.wobjectId=".$wobjectProxy->{proxiedWobjectId});
+           		if (${$wobject}{namespace} eq "") {
+             			$wobject = $originalWobject;
+         		} else {
+           			${$wobject}{startDate} = ${$originalWobject}{startDate};
+          			${$wobject}{endDate} = ${$originalWobject}{endDate};
+          			${$wobject}{templatePosition} = ${$originalWobject}{templatePosition};
+             			${$wobject}{_WobjectProxy} = ${$originalWobject}{wobjectId};
+           			if ($wobjectProxy->{overrideTitle}) {
+             				${$wobject}{title} = ${$originalWobject}{title};
+            			}
+         			if ($wobjectProxy->{overrideDisplayTitle}) {
+           				${$wobject}{displayTitle} = ${$originalWobject}{displayTitle};
+           			}
+        			if ($wobjectProxy->{overrideDescription}) {
+         				${$wobject}{description} = ${$originalWobject}{description};
+         			}
+         			if ($wobjectProxy->{overrideTemplate}) {
+       					${$wobject}{templateId} = $wobjectProxy->{proxiedTemplateId};
+       				}
+        		}
+      		}
+                my $cmd = "WebGUI::Wobject::".${$wobject}{namespace};
+                my $w = eval{$cmd->new($wobject)};
+                WebGUI::ErrorHandler::fatalError("Couldn't instanciate wobject: ${$wobject}{namespace}. Root cause: ".$@) if($@);
+		push(@{$var{'position'.$wobject->{templatePosition}.'_loop'}},{
+                        'wobject.canView'=>WebGUI::Privilege::canViewWobject($wobject->{wobjectId}),
+        		'wobject.canEdit'=>WebGUI::Privilege::canEditWobject($wobject->{wobjectId}),
+			'wobject.toolbar'=>$wobjectToolbar,
+			'wobject.namespace'=>$wobject->{namespace},
+			'wobject.id'=>$wobject->{wobjectId},
+			'wobject.isInDateRange'=>$w->inDateRange,
+			'wobject.content'=>eval{$w->www_view}
+			});
+		WebGUI::ErrorHandler::fatalError("Wobject runtime error: ${$wobject}{namespace}. Root cause: ".$@) if($@);
+	}
+	$sth->finish;
+	return WebGUI::Template::process(getTemplate(),\%var);
+}
+
 
 #-------------------------------------------------------------------
 
@@ -177,12 +251,12 @@ Returns a hash reference containing template ids and template titles for all the
 =cut
 
 sub getTemplateList {
-	return WebGUI::Template::getList("Page");
+	return WebGUI::Template::getList("page");
 }
 
 #-------------------------------------------------------------------
 
-=head2 getTemplate ( templateId )
+=head2 getTemplate ( [ templateId ] )
 
 Returns an HTML template.
 
@@ -190,16 +264,15 @@ Returns an HTML template.
 
 =item templateId
 
-The id of the page template you wish to retrieve.
+The id of the page template you wish to retrieve. Defaults to the current page's template id.
 
 =back
 
 =cut
 
 sub getTemplate {
-	my $template = WebGUI::Template::get($_[0],"Page");
-	$template =~ s/\^(\d+)\;/_newPositionFormat($1)/eg; #compatibility with old-style templates
-        return $template;
+	my $templateId = $_[0] || $session{page}{templateId};
+	return WebGUI::Template::get($templateId,"page");
 }
 
 #-------------------------------------------------------------------
