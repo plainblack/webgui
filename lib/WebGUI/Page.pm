@@ -14,7 +14,7 @@ package WebGUI::Page;
 
 =cut
 
-
+use warnings;
 use HTML::Template;
 use strict;
 use Tie::IxHash;
@@ -111,6 +111,11 @@ sub classSettings {
 		menuTitle    		=> { quote => 1 },
 		synopsis     		=> { quote => 1 },
 
+		# The clipboard/trash properties.
+		bufferUserId		=> { },
+		bufferDate		=> { },
+		bufferPrevId		=> { },
+		
 		# The userdefined database entries.
 		userDefined1 => { quote => 1 },
 		userDefined2 => { quote => 1 },
@@ -205,7 +210,7 @@ sub cut {
 			bufferPrevId	=> $parentId,
 		});
 	}
-
+	
 	return $self;
 }
 	
@@ -249,7 +254,7 @@ sub delete {
 	my ($self, $trash, $parentId);
 	$self = shift;
 	$parentId = $self->get("parentId");
-	
+
 	# Place page in trash (pageId 3)
 	$trash = WebGUI::Page->getPage(3);
 
@@ -472,7 +477,7 @@ The id of the page requested.
 
 =cut
 sub getPage {
-	my ($cache, $pageLookup, $node, $self, $pageId, $tree);
+	my ($cache, $pageLookup, $node, $self, $pageId, $tree, $pageInBranche);
 	($self, $pageId) = @_;
 
 	unless (defined $pageId) {
@@ -481,40 +486,28 @@ sub getPage {
 	
 	WebGUI::ErrorHandler::fatalError("Illegal pageId: '$pageId'") unless ($pageId =~ /^-?\d+$/);
 
-	# Only fetch from cache if cache is enabled in the config file
-	if ($session{config}{usePageCache}) {
-		# Fetch the correct pagetree from cache
-		$cache = WebGUI::Cache->new('pageLookup', 'PageTree-'.$session{config}{configFile});
-		$pageLookup = $cache->getDataStructure;
-		$cache = WebGUI::Cache->new('root-'.$pageLookup->{$pageId},'PageTree-'.$session{config}{configFile});
-		$tree = $cache->getDataStructure;
-		
-		unless (defined $tree) {
-			#Handle cache miss. The way it's done here costs twice the amount of time that's needed to build
-			#a tree. This shouldn't matter that much, though, since cache-misses should occur almost never.
-			WebGUI::Page->recachePageTree;
-			$tree = WebGUI::Page->getTree()->{0};
-		}
-	# No caching
-	} else {
-		# Do it the diehard way. Just build a complete tree from the database. This will most definately work, but
-		# not too fast. A more elegant aproach would be overlaoding every Tree::DAG_Node method WebGUI::Page inherits
-		# and dynamically load the data from the db.
-		$tree = WebGUI::Page->getTree()->{0};
-
-		# Caching the tree in the session hash might be a good idea, to reduce tree building to only once per session.
-		# $session{page}{tree} = $tree;
+	# Fetch the correct pagetree from cache
+	$cache = WebGUI::Cache->new('root-0','PageTree-'.$session{config}{configFile});
+	$tree = $cache->getDataStructure;
+	
+	# If the tree is cached then use it.
+	if (defined $tree) {
+		$node = $tree->{$pageId};
+	} 
+	# If the tree isn't cached or if the requested page is not in the cached tree, recache.
+	if (!defined $tree || !$node) {
+		# Handle cache miss. The way it's done here costs twice the amount of time that's needed to build
+		# a tree. This shouldn't matter that much, though, since cache-misses should occur almost never.
+		WebGUI::Page->recachePageTree;
+		$node = WebGUI::Page->getTree()->{$pageId};
+		undef $pageInBranche;
 	}
-
-	# Select the correct node from the tree
-	$tree->walk_down({
-		callback => sub {
-			if ($_[0]->get('pageId') == $pageId) {
-				$node = $_[0];
-				return 0;
-			}
-			return 1;
-		}});
+	
+	# If there's still no page in node something's really wrong.
+	if (!$node) {
+		WebGUI::ErrorHandler::fatalError("Page is not in database! pageId: $pageId");
+	}
+	
 	return $node;
 }
 
@@ -542,7 +535,7 @@ sub  move{
 
 	# Make sure a page is not moved to itself.
 	return 0 if ($self->get("pageId") == $newMother->get("pageId"));
-	
+
 	$parentId = $self->get("parentId");
 	
 	# Lower the sequence numbers of the following sisters
@@ -586,7 +579,8 @@ sub paste{
 	my ($self, $newMother);
 	($self, $newMother) = @_;
 	return $self if ($self->get("pageId") == $newMother->get("pageId"));
-	return WebGUI::ErrorHandler::fatalError("You cannot paste a page that's not on the clipboard.") unless ($self->get("parentId") == 2);
+	return WebGUI::ErrorHandler::fatalError("You cannot paste a page that's not on the clipboard. parentId:".
+		$self->get("parentId").", pageId:".$self->get("pageId")) unless ($self->get("parentId") == 2);
 	
 	# Place page in clipboard (pageId 2)
 	if ($self->move($newMother)) {
@@ -650,35 +644,7 @@ sub recachePageTree {
 
 	# Cache complete forrest. 
 	$cache = WebGUI::Cache->new('root-0','PageTree-'.$session{config}{configFile});
-	$cache->setDataStructure($forrest->{0});
-	$pageLookup{0} = 0;
-	
-	@pageRoots = $forrest->{0}->daughters;
-	$serializer = Data::Serializer->new(serializer => 'Storable');
-
-	# Cache per tree.
-	foreach $currentTree (@pageRoots) {
-		# Disconnect the tree from the dummy root.
-		$currentTree->unlink_from_mother;
-		
-		# Cache forrest per tree.
-		$cache = WebGUI::Cache->new('root-'.$currentTree->get('pageId'),'PageTree-'.$session{config}{configFile});
-		$cache->setDataStructure($currentTree);
-
-		# Create URL lookup table.
-		$currentTree->walk_down({ 
-			callback => sub {
-				$_[1]->{_pageLookup}->{$_[0]->get('pageId')} = $_[1]->{_root};
-				return 1;
-				}, 
-			_root => $currentTree->get('pageId'), 
-			_pageLookup => \%pageLookup
-			}); 
-	}
-
-	# Put the lookup table into cache
-	$cache = WebGUI::Cache->new('pageLookup','PageTree-'.$session{config}{configFile});
-	$cache->setDataStructure(\%pageLookup);
+	$cache->setDataStructure($forrest);
 	
 	return "";
 }
