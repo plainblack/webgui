@@ -1,7 +1,7 @@
-package WebGUI::Help::WobjectProxy;
+package WebGUI::Help::Shortcut;
 
 our $HELP = {
-	'wobject proxy add/edit' => {
+	'shortcut add/edit' => {
 		title => '5',
 		body => '6',
 		related => [

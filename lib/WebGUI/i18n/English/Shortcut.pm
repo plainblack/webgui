@@ -1,4 +1,4 @@
-package WebGUI::i18n::English::WobjectProxy;
+package WebGUI::i18n::English::Shortcut;
 
 our $I18N = {
 	'Criteria' => {
@@ -32,7 +32,7 @@ our $I18N = {
 	},
 
 	'2' => {
-		message => q|Edit Wobject Proxy|,
+		message => q|Edit Shortcut|,
 		lastUpdated => 1031514049
 	},
 
@@ -42,51 +42,51 @@ our $I18N = {
 	},
 
 	'1' => {
-		message => q|Wobject To Proxy|,
+		message => q|Asset to Mirror|,
 		lastUpdated => 1031514049
 	},
 
 	'6' => {
-		message => q|With the Wobject Proxy (aka Shortcut) you can mirror a wobject from another page to any other page. This is useful if you want to reuse the same content in multiple sections of your site.
+		message => q|With the shortcut you can mirror an asset. This is useful if you want to reuse the same content in multiple sections of your site.
 <p>
 
-<b>NOTE:</b> The wobject proxy is not available through the Add Content menu, but instead through the shortcut icon on each wobject's toolbar.
+<b>NOTE:</b> The shortcut is not available through the Add Content menu, but instead through the shortcut icon on each wobject's toolbar.
 <p>
 
-<b>Wobject To Proxy</b><br>
+<b>Asset to Mirror</b><br>
 Provides a link to the original wobject being proxied.
 <p>
 
 <b>Override title?</b><br>
-Set to "yes" to use the title of the wobject proxy instead of the original title of the wobject.
+Set to "yes" to use the title of the shortcut instead of the original title of the wobject.
 <p>
 
 <b>Override description?</b><br>
-Set to "yes" to use the description of the wobject proxy instead of the original description of the wobject.
+Set to "yes" to use the description of the shortcut instead of the original description of the wobject.
 <p>
 
 <b>Override display title?</b><br>
-Set to "yes" to use the display title setting of the wobject proxy instead of the original display title setting of the wobject.
+Set to "yes" to use the display title setting of the shortcut instead of the original display title setting of the wobject.
 <p>
 
 <b>Override template?</b><br>
-Set to "yes" to use the template of the wobject proxy instead of the original template of the wobject.
+Set to "yes" to use the template of the shortcut of the original template of the wobject.
 <p>
 
-<b>Proxy by alternate criteria?</b><br>
+<b>Shortcut by alternate criteria?</b><br>
 Set to "yes" to enable selecting a wobject based upon custom criteria. Metadata must be enabled for this option to function properly.
 <p>
 
 <b>Resolve Multiples?</b><br>
-Sets the order to use when multiple wobjects are selected. Random means that if multiple wobjects match the proxy criteria then the wobject proxy will select a random wobject to proxy.<br>
-Most Recent will select the most recent wobject that match the proxy criteria.
+Sets the order to use when multiple wobjects are selected. Random means that if multiple assets match the shortcut criteria then the shortcut will select a random asset.<br>
+Most Recent will select the most recent asset that match the shortcut criteria.
 <p>
 
 <b>Criteria</b><br>
-A statement to determinate what to proxy, in the form of "color = blue and weight != heavy". Multiple expressions may be joined with "and" and "or". <br>
+A statement to determinate what to mirror, in the form of "color = blue and weight != heavy". Multiple expressions may be joined with "and" and "or". <br>
 A property or value must be quoted if it contains spaces. Feel free to use the criteria builder to build your statements.
 <p>
-<b>NOTE:</b> Wobject Proxy will automatically add a template variable to the wobject it's proxying called 'original.page.url'. You can use that to link to the original content that's being proxied.
+<b>NOTE:</b> Shortcut will automatically add a template variable to the asset it's mirroring called 'original.page.url'. You can use that to link to the original content that's being proxied.
 <p>
 |,
 		lastUpdated => 1101795461,
@@ -98,7 +98,7 @@ A property or value must be quoted if it contains spaces. Feel free to use the c
 	},
 
 	'3' => {
-		message => q|Wobject Proxy|,
+		message => q|Shortcut|,
 		lastUpdated => 1031514049
 	},
 
@@ -107,8 +107,8 @@ A property or value must be quoted if it contains spaces. Feel free to use the c
 		lastUpdated => 1053183804
 	},
 
-	'Proxy by alternate criteria?' => {
-		message => q|Proxy by alternate criteria?|,
+	'Shortcut by alternate criteria?' => {
+		message => q|Shortcut by alternate criteria?|,
 		lastUpdated => 1053183804
 	},
 
@@ -133,7 +133,7 @@ A property or value must be quoted if it contains spaces. Feel free to use the c
 	},
 
 	'4' => {
-		message => q|Wobject proxying failed. Perhaps the proxied wobject has been deleted.|,
+		message => q|Asset mirroring failed. Perhaps the original asset has been deleted.|,
 		lastUpdated => 1031514049
 	},
 
@@ -153,7 +153,7 @@ A property or value must be quoted if it contains spaces. Feel free to use the c
 	},
 
 	'5' => {
-		message => q|Wobject Proxy, Add/Edit|,
+		message => q|Shortcut, Add/Edit|,
 		lastUpdated => 1031514049
 	},
 
