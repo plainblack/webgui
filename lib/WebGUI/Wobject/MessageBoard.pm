@@ -303,7 +303,7 @@ sub www_view {
 				'forum.lastPost.subject' => $lastPost->get("subject"),
 				'forum.lastPost.user.id' => $lastPost->get("userId"),
 				'forum.lastPost.user.name' => $lastPost->get("username"),
-				'forum.lastPost.user.alias' => WebGUI::User->new($lastPost->get("userId"))->profileField("alias");
+				'forum.lastPost.user.alias' => WebGUI::User->new($lastPost->get("userId"))->profileField("alias"),
 				'forum.lastPost.user.profile' => WebGUI::Forum::UI::formatUserProfileURL($lastPost->get("userId")),
 				'forum.lastPost.user.isVisitor' => ($lastPost->get("userId") == 1),
 				'forum.user.canView' => $forum->canView,
