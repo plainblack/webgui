@@ -28,6 +28,7 @@
  - Bugfix: [ 1000205 ] Password Recovery Doesn't Work
  - Bugfix: [ 1003594 ] Fixed Navigation Cacheing bug
  - Bugfix: [ 1000299 ] laodAllConfigs should be loadAllConfigs?
+ - Bugfix: [ 995088 ] Error in printable macro 6.1.1
 
 
 6.1.1

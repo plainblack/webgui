@@ -42,7 +42,7 @@ sub process {
        		} else {
                		$var{'printable.text'} = WebGUI::International::get(53);
        		}
-         	$temp =  WebGUI::Template::process(WebGUI::Template::getByName($param[2],"Macro/r_printable"), "Macro/r_printable", \%var);
+         	$temp =  WebGUI::Template::process(WebGUI::Template::getIdByName($param[2],"Macro/r_printable"), "Macro/r_printable", \%var);
 	}
 	return $temp;
 }
