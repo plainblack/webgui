@@ -69,7 +69,7 @@ sub _getPageInfo {
                         } else {
                                 $session{http}{status} = '404';
                         }
-			$pageData = WebGUI::SQL->quickHashRef($sql."pageId=".quote($session{setting}{pageNotFound}));
+			$pageData = WebGUI::SQL->quickHashRef($sql."pageId=".quote($session{setting}{defaultPage}));
                 }
         } else {
 		$pageData = WebGUI::SQL->quickHashRef($sql."pageId=".quote($session{setting}{defaultPage}));
