@@ -6,7 +6,6 @@ use File::Path;
 use Getopt::Long;
 use strict;
 use WebGUI::Id;
-use WebGUI::Page;
 use WebGUI::Session;
 use WebGUI::SQL;
 use WebGUI::URL;
