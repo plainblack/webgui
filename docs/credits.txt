@@ -40,39 +40,6 @@ Contributing Developers..............Peter Beardsley / Appropriate Solutions
                                      Sean Tu / WDI
                                      Madsen Wikholm
 
-Contributing Translators.............AGOFER Ltda.
-                                     Natalia Almazova
-                                     Paco Avila
-                                     BNC Distribution
-                                     Indigo-Profit-Hosting
-                                     Joeri de Bruin / ProcoliX
-                                     Jose Caneira
-                                     Junying Du / WDI
-                                     Marcelo Ennes / FIOCRUZ
-                                     Gordan Gledec 
-                                     Andreas Graf
-                                     Emiliano Grilli / Webopen
-                                     Ehab Heikal
-                                     Markus Hynna
-                                     Bart Jol / ProcoliX
-                                     Mattias Kunkel / WERU AG
-                                     Nils-Magne Kvammen
-                                     Nuspace Pty Ltd
-                                     Andreas Ljunggren
-                                     Ricardo Markiewicz
-                                     Ryan McCombs
-                                     Leo Noordergraaf
-                                     orosor@yahoo.com.tw
-                                     Paolo Pigati / Webopen
-                                     Michael Ugilt
-                                     Hugo Van der Kooij 
-                                     Michael Westlund
-                                     Zhou Xiaopeng
-
-Binary Package Maintainers...........Alejandro Alberola / Boix i Oltra, S.L.
-                                     Daniel / ProcoliX
-                                     JT Smith / Plain Black
-
 
 The following are people/companies who didn't directly contribute
 to WebGUI, but who's work has made WebGUI possible:
