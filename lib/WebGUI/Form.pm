@@ -115,7 +115,7 @@ sub checkbox {
         my ($checkedText, $value);
         $checkedText = ' checked="1"' if ($_[0]->{checked});
         $value = $_[0]->{value} || 1;
-        return '<input type="checkbox" name="'.$_[1]->{name}.'" value="'.$value.'"'.$checkedText.' '.$_[0]->{extras}.'>';
+        return '<input type="checkbox" name="'.$_[0]->{name}.'" value="'.$value.'"'.$checkedText.' '.$_[0]->{extras}.'>';
 }
 
 #-------------------------------------------------------------------
