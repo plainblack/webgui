@@ -101,7 +101,7 @@ sub _photogalleryView {
 sub _traditionalView {
 	my (@row, $i, $image, $output, $p, $sth, %submission);
 	tie %submission, 'Tie::CPHash';
-        $sth = WebGUI::SQL->read("select title, userId, status, image, dateSubmitted, username from UserSubmission_submission
+        $sth = WebGUI::SQL->read("select submissionId, title, userId, status, image, dateSubmitted, username from UserSubmission_submission
                 where wobjectId=".$_[0]->get("wobjectId")." and (status='Approved' or userId=$session{user}{userId}) order by dateSubmitted desc");
         while (%submission = $sth->hash) {
                 $submission{title} = WebGUI::HTML::filter($submission{title},'all');
