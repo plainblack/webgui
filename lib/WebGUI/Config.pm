@@ -97,7 +97,7 @@ sub laodAllConfigs {
 	my @files = readdir(DIR);
 	closedir(DIR);
 	foreach my $file (@files) {
-		if ($file =~ /\.conf$/) {
+		if ($file =~ /\.conf$/ && !($file =~ /^demo\d/)) {
 			print "\tLoading ".$file."\n";	
 			$config{$file} = readConfig($webguiPath,$file);
 		}
