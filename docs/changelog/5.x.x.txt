@@ -1,3 +1,6 @@
+5.5.8
+ - bugfix [ 991366 ] 5.5.7 typo in Macro/Synopsis.pm
+
 5.5.7
  - bugfix [ 935552 ] USS bug (w/ and w/o img mixed posts). 
  - bugfix [ 926610 ] WebGUI::Wobject::Article
