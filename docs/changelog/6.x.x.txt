@@ -1,6 +1,6 @@
 6.5.3
  - Sorted templates into folders named after their respective namespaces
- - & re-enabled the manage button next to the template dropdown [mwilson]
+   & re-enabled the manage button next to the template dropdown [mwilson]
  - fix [ 1161457 ] Data fomr - list all entries: Logfile Error
  - fix [ 1161461 ] Data form - Add field - wrong destination
  - fix [ 1164382 ] User Profiling WebGUI::International::get(304,"WebGUI");
@@ -23,9 +23,14 @@
  - fix [ 1118789 ] 6.2.11 - L_loginBox display with empty 1st param [colink]
  - fix [ 1165635 ] IndexedSearch - double toolbar in AdminMode [mwilson]
  - fix [ 1165598 ] Auth module numeric comparisons against Ids
- - Fixed a bunch of Collaboration System template problems.
  - fix [ 1165829 ] i18n/english/Eventscalendar.pm: double entrys [mwilson]
  - fix [ 1165386 ] Templates page overlap [mwilson]
+ - Rebuilt all of the Collaboration System templates from scratch. They were
+   all pretty messed up from the merging of the forum, USS, Link List, and FAQ
+   wobjects.
+ - fix [ 1165759 ] PB.com contrib. templates dont show links
+ - fix [ 1165439 ] No way to upload on USS template in collaboration system
+ - fix [ 1165438 ] Issues with Job listing template of Collaboration system
  - fix [ 1166071 ] Create New User allows blank username [mwilson]
  - fix [ 1166133 ] DataForm www_edit and www_editField's "proceed" [mwilson] 
  - fix [ 1164211 ] DataForm export tab deliniated always contains.. [mwilson]

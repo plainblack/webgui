@@ -829,6 +829,8 @@ sub view {
         $var{'user.isModerator'} = $self->canModerate;
         $var{'user.isVisitor'} = ($session{user}{userId} eq '1');
 	$var{'user.isSubscribed'} = $self->isSubscribed;
+	$var{'sortby.title.url'} = $self->getSortByUrl("title");
+	$var{'sortby.username.url'} = $self->getSortByUrl("username");
 	$var{'sortby.date.url'} = $self->getSortByUrl("dateSubmitted");
 	$var{'sortby.lastreply.url'} = $self->getSortByUrl("lastreply");
 	$var{'sortby.views.url'} = $self->getSortByUrl("views");

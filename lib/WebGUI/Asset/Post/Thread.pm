@@ -41,6 +41,7 @@ sub canSubscribe {
 #-------------------------------------------------------------------
 sub createSubscriptionGroup {
 	my $self = shift;
+	return if ($self->get("subscriptionGroupId"));
 	my $group = WebGUI::Group->new("new");
 	$group->name($self->getId);
 	$group->description("The group to store subscriptions for the thread ".$self->getId);
@@ -513,6 +514,7 @@ Subscribes the user to this thread.
 
 sub subscribe {
 	my $self = shift;
+	$self->createSubscriptionGroup;
         WebGUI::Grouping::addUsersToGroups([$session{user}{userId}],[$self->get("subscriptionGroupId")]);
 }
 
