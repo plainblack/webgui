@@ -42,8 +42,8 @@ sub process {
 		$a = WebGUI::SQL->read("select pageId from page where parentId=3 and bufferDate<" . $purgeDate);
 		while (($pageId) = $a->array) {
 			WebGUI::ErrorHandler::audit("purging expired page ". $pageId ." from trash");
-			_recursePageTree($pageId);
-			_purgeWobjects($pageId);
+			WebGUI::Operation::Trash::_recursePageTree($pageId);
+			WebGUI::Operation::Trash::_purgeWobjects($pageId);
 			WebGUI::SQL->write("delete from page where pageId=$pageId");
 		}
 		$a->finish;
