@@ -239,7 +239,7 @@ sub getTree {
 
      unless (ref($self)) {
           if ($class->useDummyRoot()) {
-               $self = $class->dummyRoot(); 
+               $nodes->{0} = $self = $class->dummyRoot(); 
           }
 
           if (!defined($maxDepth)) {
@@ -302,6 +302,26 @@ sub minimumFields {
           push @$fields, 'sequenceNumber' if ($class->properties->{sequenceNumber});
      }
      return $class->classData->{minimumFields};
+}
+
+#-------------------------------------------------------------------
+
+sub name {
+     my $self = shift;
+     return $self->keyColumn().':'.$self->get($self->keyColumn());
+}
+
+#-------------------------------------------------------------------
+
+# Avoid a bug in Tree::DAG_Node. 
+# When a new node is created and has no daughters. This sometimes causes
+# problems for Tree::DAG_Node::walk_down()
+
+sub new {
+     my $class = shift;
+     my $self = $class->SUPER::new(@_);
+     $self->{daughters} ||= [] if $self;
+     return $self;
 }
 
 #-------------------------------------------------------------------
