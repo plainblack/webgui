@@ -22,6 +22,7 @@ Contributing Translators.............Andreas Ljunggren
                                      Joeri de Bruin / ProcoliX
                                      Jose Caneira
                                      Emiliano Grilli
+                                     Ehab Heikal
                                      Mattias Kunkel / WERU AG
                                      orosor@yahoo.com.tw
                                      Ricardo Markiewicz
