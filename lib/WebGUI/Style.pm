@@ -60,15 +60,14 @@ sub get {
         }
         %style = WebGUI::SQL->quickHash("select * from style where styleId=$styleId");
         @body = split(/\^\-\;/,$style{body});
-        $header = $session{setting}{docTypeDec}."\n".'<!-- WebGUI '.$WebGUI::VERSION.' --> <html> <head> <title>';
-        $header .= $session{page}{title}.' - '.$session{setting}{companyName};
-	my $type = lc($session{setting}{siteicon});
+        my $type = lc($session{setting}{siteicon});
         $type =~ s/.*\.(.*?)$/$1/;
-        $header .= '</title>
-		<meta http-equiv="Content-Type" content="text/html; charset='.($session{header}{charset}||$session{language}{characterSet}||"ISO-8859-1").'" />
-		<link rel="icon" href="'.$session{setting}{siteicon}.'" type="image/'.$type.'" />
-		<link rel="SHORTCUT ICON" href="'.$session{setting}{favicon}.'" />
-	'.$style{styleSheet}.$session{page}{metaTags};
+        $header = $session{setting}{docTypeDec}.'
+        <!-- WebGUI '.$WebGUI::VERSION.' -->
+        <html> <head>
+                <title>'.$session{page}{title}.' - '.$session{setting}{companyName}.'</title>
+        ';
+        $header .= $style{styleSheet}.$session{page}{metaTags};
         if ($session{var}{adminOn}) {
                 # This "triple incantation" panders to the delicate tastes of various browsers for reliable cache suppression.
                 $header .= '<meta http-equiv="Pragma" content="no-cache" />';
@@ -78,14 +77,21 @@ sub get {
         if ($session{page}{defaultMetaTags}) {
                 $header .= '<meta http-equiv="Keywords" name="Keywords" content="'.$session{page}{title}
                         .', '.$session{setting}{companyName}.'" />';
-                $header .= '<meta http-equiv="Description" name="Description" content="'.$session{page}{synopsis}.'" />';
-
+                if ($session{page}{synopsis}) {
+                        $header .= '<meta http-equiv="Description" name="Description" content="'.$session{page}{synopsis}.'" />';
+                }
         }
-        $header .= '</head>'.$body[0];
+        $header .= '
+                <meta http-equiv="Content-Type"
+                content="text/html; charset='.($session{header}{charset}||$session{language}{characterSet}||"ISO-8859-1").'" />
+                <link rel="icon" href="'.$session{setting}{siteicon}.'" type="image/'.$type.'" />
+                <link rel="SHORTCUT ICON" href="'.$session{setting}{favicon}.'" />
+        </head>
+        ';
+        $header .= $body[0];
         $footer = $body[1].' </html>';
         return $header.$_[0].$footer;
 }
-
 
 
 

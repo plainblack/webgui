@@ -74,13 +74,6 @@ sub adminOnly {
 	my ($output, $sth, @data);
         $output = '<h1>'.WebGUI::International::get(35).'</h1>';
 	$output .= WebGUI::International::get(36);
-	$output .= '<ul>';
-	$sth = WebGUI::SQL->read("select users.username,users.userId from users,groupings where users.userId=groupings.userId and groupings.groupId=3 order by users.username");
-	while (@data = $sth->array) {
-		$output .= '<li><a href="'.WebGUI::URL::page('op=viewProfile&uid='.$data[1]).'">'.$data[0].'</a>';
-	}
-	$sth->finish;
-	$output .= '</ul><p>';
 	return $output;
 }
 
@@ -117,7 +110,6 @@ sub canEditPage {
 	}
 }
 
-#Added by Frank Dillon.  Wobject API not used due to possible performance issues
 #-------------------------------------------------------------------
 
 =head2 canEditWobject ( wobjectId )
@@ -186,7 +178,6 @@ sub canViewPage {
         }
 }
 
-#Added by Frank Dillon.  Wobject API not used due to possible performance issues
 #-------------------------------------------------------------------
 
 =head2 canViewWobject ( wobjectId  )

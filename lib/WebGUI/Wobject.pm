@@ -208,7 +208,7 @@ sub discussionProperties {
 		-value=>[$groupToModerate],
 		-uiLevel=>7
 		);
-        $f->select(
+        $f->selectList(
 		-name=>"moderationType",
 		-options=>\%moderationType,
 		-label=>WebGUI::International::get(569),
@@ -1101,7 +1101,7 @@ NOTE: Should never need to be overridden or extended.
 =cut
 
 sub www_copy {
-        return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
+        return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId")));
         $_[0]->duplicate;
         return "";
 }
@@ -1117,7 +1117,7 @@ NOTE: Should never need to be overridden or extended.
 =cut
 
 sub www_createShortcut {
-        return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
+        return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId")));
 	my $w = WebGUI::Wobject::WobjectProxy->new({wobjectId=>"new",namespace=>"WobjectProxy"});
 	$w->set({
 		pageId=>2,
@@ -1141,7 +1141,7 @@ Moves this instance to the clipboard.
 =cut
 
 sub www_cut {
-        return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
+        return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId")));
 	$_[0]->set({
 		pageId=>2, 
 		templatePosition=>1,
@@ -1163,7 +1163,7 @@ Prompts a user to confirm whether they wish to delete this instance.
 
 sub www_delete {
         my ($output);
-        if (WebGUI::Privilege::canEditPage()) {
+        if (WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId"))) {
                 $output = helpIcon(14);
 		$output .= '<h1>'.WebGUI::International::get(42).'</h1>';
                 $output .= WebGUI::International::get(43);
@@ -1190,7 +1190,7 @@ Moves this instance to the trash.
 =cut
 
 sub www_deleteConfirm {
-        if (WebGUI::Privilege::canEditPage()) {
+        if (WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId"))) {
 		$_[0]->set({pageId=>3, templatePosition=>1,
                         bufferUserId=>$session{user}{userId},
                         bufferDate=>time(),
@@ -1212,7 +1212,7 @@ Displays a confirmation message relating to the deletion of a file.
 =cut
 
 sub www_deleteFile {
-	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
+	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId")));
         return $_[0]->confirm(WebGUI::International::get(728),
                 WebGUI::URL::page('func=deleteFileConfirm&wid='.$_[0]->get("wobjectId").'&file='.$session{form}{file}),
                 WebGUI::URL::page('func=edit&wid='.$_[0]->get("wobjectId"))
@@ -1228,7 +1228,7 @@ Deletes a file from this instance.
 =cut
 
 sub www_deleteFileConfirm {
-	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
+	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId")));
         $_[0]->set({$session{form}{file}=>''});
         return $_[0]->www_edit();
 }
@@ -1310,7 +1310,7 @@ An id this namespace of the WebGUI international system. This message will be re
 =cut
 
 sub www_edit {
-	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
+	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId")));
 	my ($self, @p) = @_;
         my ($properties, $layout, $privileges, $heading, $helpId, $headingId) = 
 		rearrange([qw(properties layout privileges heading helpId headingId)], @p);
@@ -1368,7 +1368,7 @@ sub www_edit {
                 	-afterEdit=>'func=edit&wid='.$_[0]->get("wobjectId")
                 	);
 	}
-	$f->getTab("layout")->select(
+	$f->getTab("layout")->selectList(
 		-name=>"templatePosition",
 		-label=>WebGUI::International::get(363),
 		-value=>[$templatePosition],
@@ -1404,7 +1404,7 @@ sub www_edit {
 		   	$clause = "userId=".$_[0]->get("ownerId");
 	    	}
 		my $users = WebGUI::SQL->buildHashRef("select userId,username from users where $clause order by username");
-		$f->getTab("privileges")->select(
+		$f->getTab("privileges")->selectList(
 		   -name=>"ownerId",
 		   -options=>$users,
 		   -label=>WebGUI::International::get(108),
@@ -1480,7 +1480,7 @@ A hash reference of extra properties to set.
 =cut
 
 sub www_editSave {
-	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
+	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId")));
 	my %set;
 	foreach my $key (keys %{$_[0]->{_wobjectProperties}}) {
 		my $temp = WebGUI::FormProcessor::process(
@@ -1530,7 +1530,7 @@ Moves this instance to the bottom of the page.
 =cut
 
 sub www_moveBottom {
-        if (WebGUI::Privilege::canEditPage()) {
+        if (WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId"))) {
 		$_[0]->set({sequenceNumber=>99999});
 		_reorderWobjects($_[0]->get("pageId"));
                 return "";
@@ -1549,7 +1549,7 @@ Moves this instance down one spot on the page.
 
 sub www_moveDown {
 	my ($wid, $thisSeq);
-        if (WebGUI::Privilege::canEditPage()) {
+        if (WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId"))) {
 		($thisSeq) = WebGUI::SQL->quickArray("select sequenceNumber from wobject where wobjectId=".$_[0]->get("wobjectId"));
 		($wid) = WebGUI::SQL->quickArray("select wobjectId from wobject where pageId=".$_[0]->get("pageId")
 			." and sequenceNumber=".($thisSeq+1));
@@ -1573,7 +1573,7 @@ Moves this instance to the top of the page.
 =cut
 
 sub www_moveTop {
-        if (WebGUI::Privilege::canEditPage()) {
+        if (WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId"))) {
                 $_[0]->set({sequenceNumber=>0});
                 _reorderWobjects($_[0]->get("pageId"));
                 return "";
@@ -1592,7 +1592,7 @@ Moves this instance up one spot on the page.
 
 sub www_moveUp {
         my ($wid, $thisSeq);
-        if (WebGUI::Privilege::canEditPage()) {
+        if (WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId"))) {
                 ($thisSeq) = WebGUI::SQL->quickArray("select sequenceNumber from wobject where wobjectId=".$_[0]->get("wobjectId"));
                 ($wid) = WebGUI::SQL->quickArray("select wobjectId from wobject where pageId=".$_[0]->get("pageId")
 			." and sequenceNumber=".($thisSeq-1));
@@ -1617,7 +1617,7 @@ Moves this instance from the clipboard to the current page.
 
 sub www_paste {
         my ($output, $nextSeq);
-        if (WebGUI::Privilege::canEditPage()) {
+        if (WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId"))) {
 		($nextSeq) = WebGUI::SQL->quickArray("select max(sequenceNumber) from wobject where pageId=$session{page}{pageId}");
 		$nextSeq += 1;
 		WebGUI::SQL->write("UPDATE wobject SET "

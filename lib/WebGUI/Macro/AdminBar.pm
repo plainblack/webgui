@@ -118,8 +118,7 @@ sub process {
 	if (WebGUI::Privilege::isInGroup(4)) {
         	%hash = ( 
 			WebGUI::URL::page('op=listRoots')=>WebGUI::International::get(410),
-			'http://validator.w3.org/check?uri=http%3A%2F%2F'.$session{env}{SERVER_NAME}.
-				WebGUI::URL::page()=>WebGUI::International::get(399),
+			'http://validator.w3.org/check?uri='.WebGUI::URL::escape(WebGUI::URL::page())=>WebGUI::International::get(399),
 			WebGUI::URL::page('op=manageClipboard')=>WebGUI::International::get(949),
                         WebGUI::URL::page('op=listCollateral')=>WebGUI::International::get(394),
 			WebGUI::URL::page('op=viewPageTree')=>WebGUI::International::get(447),

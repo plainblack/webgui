@@ -525,10 +525,13 @@ sub www_editField {
 sub www_editFieldSave {
 	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId")));
 	$session{form}{name} = $session{form}{label} if ($session{form}{name} eq "");
+	$session{form}{name} = WebGUI::URL::urlize($session{form}{name});
+        $session{form}{name} =~ s/\-//g;
+        $session{form}{name} =~ s/\///g;
 	$_[0]->setCollateral("DataForm_field","DataForm_fieldId",{
 		DataForm_fieldId=>$session{form}{fid},
 		width=>$session{form}{width},
-		name=>WebGUI::URL::urlize($session{form}{name}),
+		name=>$session{form}{name},
 		label=>$session{form}{label},
 		status=>$session{form}{status},
 		type=>$session{form}{type},

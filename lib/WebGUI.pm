@@ -57,10 +57,7 @@ sub _generatePage {
                 $sth = WebGUI::SQL->read("select * from wobject where pageId=$session{page}{pageId} 
 			order by sequenceNumber, wobjectId");
                 while ($wobject = $sth->hashRef) {
-				
-				#-- Added by Frank Dillon.  Includes WebGUI::Privilege::canEditWobject() as part of the checksum of $canEdit
-	            $canEditWobject = $canEdit && WebGUI::Privilege::canEditWobject($wobject->{wobjectId}); 
-		        #-- End Changes
+	        	$canEditWobject = WebGUI::Privilege::canEditWobject($wobject->{wobjectId}); 
                         if ($session{var}{adminOn} && $canEditWobject) {
                         	$contentHash{"page.position".${$wobject}{templatePosition}} .= "\n<hr>"
                                 	.wobjectIcon()
@@ -79,9 +76,7 @@ sub _generatePage {
                                 $contentHash{"page.position".${$wobject}{templatePosition}} .= '<br>';
                         }
                         
-				#-- Added by Frank Dillon.  Checks if user has privilege to view the wobject
 		        if(!WebGUI::Privilege::canViewWobject($wobject->{wobjectId})){ next; }  
-		        #-- End Changes		
 						
 						if (${$wobject}{namespace} eq "WobjectProxy") {
                                 $originalWobject = $wobject;
@@ -108,9 +103,6 @@ sub _generatePage {
 					}
                                 }
                         }
-                        #-- Removed by Frank Dillon.  Statement repeated below
-                        #my $sql = "select * from ".$wobject->{namespace}." where wobjectId=".$wobject->{wobjectId}; 
-		                #-- End Changes
                         $extra = WebGUI::SQL->quickHashRef("select * from ".$wobject->{namespace}." 
 				where wobjectId=".$wobject->{wobjectId});
                         tie %hash, 'Tie::CPHash';
@@ -119,9 +111,6 @@ sub _generatePage {
                         $cmd = "WebGUI::Wobject::".${$wobject}{namespace};
                         $w = eval{$cmd->new($wobject)};
                         WebGUI::ErrorHandler::fatalError("Couldn't instanciate wobject: ${$wobject}{namespace}. Root cause: ".$@) if($@);
-                        #-- Changes by Frank Dillon.  Check for date range done in WebGUI::Privilege::canViewWobject()
-                        #if ($w->inDateRange) { 
-		                #-- End Changes
                         	$contentHash{"page.position".${$wobject}{templatePosition}} .= '<div class="wobject"><div class="wobject'
 					.${$wobject}{namespace}.'" id="wobjectId'.${$wobject}{wobjectId}.'">';
                                 $contentHash{"page.position".${$wobject}{templatePosition}} .= '<a name="'
@@ -129,9 +118,6 @@ sub _generatePage {
                                 $contentHash{"page.position".${$wobject}{templatePosition}} .= eval{$w->www_view};
                                 WebGUI::ErrorHandler::fatalError("Wobject runtime error: ${$wobject}{namespace}. Root cause: ".$@) if($@);
                                 $contentHash{"page.position".${$wobject}{templatePosition}} .= "</div></div>\n\n";
-                        #-- Changes by Frank Dillon.  Remove close bracket for if statement
-                        #}
-		                #-- End Changes 
 		}
                 $sth->finish;
                 $template = $session{page}{templateId};

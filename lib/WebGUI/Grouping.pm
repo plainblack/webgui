@@ -225,7 +225,11 @@ If set to "1" then the listing will not include expired groupings. Defaults to "
 
 sub getGroupsForUser {
 	my $clause = "and expireDate>".time() if ($_[1]);
-        return WebGUI::SQL->buildArrayRef("select groupId from groupings where userId=$_[0] $clause");
+	if ($_[0] eq "") {
+                return [];
+        } else {
+                return  WebGUI::SQL->buildArrayRef("select groupId from groupings where userId=$_[0] $clause");
+        }
 }
 
 
