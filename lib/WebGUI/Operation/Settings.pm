@@ -37,7 +37,7 @@ sub www_editAuthenticationSettings {
                 $output .= '<h1>'.WebGUI::International::get(117).'</h1>';
 		$f = WebGUI::HTMLForm->new;
                 $f->hidden("op","editAuthenticationSettingsSave");
-                $f->select("anonymousRegistration",WebGUI::International::get(118),$session{setting}{anonymousRegistration});
+                $f->yesNo("anonymousRegistration",WebGUI::International::get(118),[$session{setting}{anonymousRegistration}]);
                 $f->select("authMethod",\%authMethod,WebGUI::International::get(119),[$session{setting}{authMethod}]);
                 $f->yesNo("usernameBinding",WebGUI::International::get(306),$session{setting}{usernameBinding});
                 $f->url("ldapURL",WebGUI::International::get(120),$session{setting}{ldapURL});
