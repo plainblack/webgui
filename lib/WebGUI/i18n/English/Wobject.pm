@@ -127,7 +127,7 @@ As with any delete operation, you are prompted to be sure you wish to proceed wi
           '671' => {
                      lastUpdated => 1047858549,
                      message => q|Wobjects, Using|
-                   }
+                   },
 
 };
 
