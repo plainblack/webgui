@@ -14,9 +14,9 @@ use strict;
 use Tie::CPHash;
 use WebGUI::DateTime;
 use WebGUI::HTML;
+use WebGUI::HTMLForm;
 use WebGUI::International;
 use WebGUI::Session;
-use WebGUI::Shortcut;
 use WebGUI::SQL;
 use WebGUI::URL;
 
@@ -85,39 +85,32 @@ sub deleteMessageConfirm {
 }
 
 #-------------------------------------------------------------------
-sub editMessage {
-        my ($html, %message);
-	tie %message, 'Tie::CPHash';
-        %message = getMessage($session{form}{mid});
-        $html = '<h1>'.WebGUI::International::get(228).'</h1>';
-        $html .= formHeader().'<table>';
-        $html .= WebGUI::Form::hidden("func","editMessageSave");
-        $html .= WebGUI::Form::hidden("wid",$session{form}{wid});
-        $html .= WebGUI::Form::hidden("sid",$session{form}{sid});
-        $html .= WebGUI::Form::hidden("mid",$session{form}{mid});
-        $html .= '<tr><td class="formDescription">'.WebGUI::International::get(229).
-		'</td><td>'.WebGUI::Form::text("subject",30,255,$message{subject}).'</td></tr>';
-        $html .= '<tr><td class="formDescription" valign="top">'.WebGUI::International::get(230).
-		'</td><td>'.WebGUI::Form::textArea("message",$message{message},50,6,1).'</td></tr>';
-        $html .= '<tr><td></td><td>'.WebGUI::Form::submit(WebGUI::International::get(62)).'</td></tr>';
-        $html .= '</table></form>';
-	$html .= showMessage();
-        return $html;
+sub formatHeader {
+	my $output;
+	$output = '<b>'.WebGUI::International::get(237).'</b> '.formatSubject($_[0]).'<br>';
+        $output .= '<b>'.WebGUI::International::get(238).'</b> 
+		<a href="'.WebGUI::URL::page('op=viewProfile&uid='.$_[1]).'">'.$_[2].'</a><br>';
+        $output .= "<b>".WebGUI::International::get(239)."</b> ".epochToHuman($_[3],"%z %Z")."<br>";
+	return $output;
 }
 
 #-------------------------------------------------------------------
-sub editMessageSave {
-        if ($session{form}{subject} eq "") {
-        	$session{form}{subject} = WebGUI::International::get(232);
-        }
-        if ($session{form}{message} eq "") {
-                $session{form}{subject} .= ' '.WebGUI::International::get(233);
-        }
-        WebGUI::SQL->write("update discussion set subject=".quote($session{form}{subject}).
-		", message=".quote("\n --- (Edited at ".localtime(time).
-		" by $session{user}{username}) --- \n\n".$session{form}{message}).
-		", subId='$session{form}{sid}' where messageId=$session{form}{mid}");
-        return showMessage();
+sub formatMessage {
+        my $output;
+	$output = $_[0];
+	$output = WebGUI::HTML::filter($output);
+	unless ($output =~ /\<div\>/ig || $output =~ /\<br\>/ig || $output =~ /\<p\>/ig) {
+		$output =~ s/\n/\<br\>/g;
+	}
+        return $output;
+}
+
+#-------------------------------------------------------------------
+sub formatSubject {
+        my $output;
+        $output = $_[0];
+        $output = WebGUI::HTML::filter($output,'all');
+        return $output;
 }
 
 #-------------------------------------------------------------------
@@ -125,90 +118,86 @@ sub getMessage {
 	my (%message);
         tie %message, 'Tie::CPHash';
         %message = WebGUI::SQL->quickHash("select * from discussion where messageId='$_[0]'");
-	$message{subject} = WebGUI::HTML::filter($message{subject},'all');
-	$message{message} = WebGUI::HTML::filter($message{message},$session{setting}{filterContributedHTML});
-	unless ($message{message} =~ /\<div\>/ig || $message{message} =~ /\<br\>/ig || $message{message} =~ /\<p\>/ig) {
-		$message{message} =~ s/\n/\<br\>/g;
-	}
 	return %message;
 }
 
 #-------------------------------------------------------------------
-sub postNewMessage {
-	my ($html);
-	$html = '<h1>'.WebGUI::International::get(231).'</h1>';
-	$html .= formHeader().'<table>';
-	$html .= WebGUI::Form::hidden("func","postNewMessageSave");
-	$html .= WebGUI::Form::hidden("wid",$session{form}{wid});
-	$html .= WebGUI::Form::hidden("sid",$session{form}{sid});
-	if ($session{user}{userId} == 1) {
-		$html .= tableFormRow(WebGUI::International::get(438),WebGUI::Form::text("visitorName",30,35));
+sub post {
+	my ($html, $header, $footer, $f, %message);
+	tie %message, 'Tie::CPHash';
+	$f = WebGUI::HTMLForm->new;
+	if ($session{form}{replyTo} ne "") { 		# is a reply
+		$header = WebGUI::International::get(234);
+		%message = getMessage($session{form}{replyTo});
+		$footer = formatHeader($message{subject},$message{userId},$message{username},$message{dateOfPost}).'<p>'.formatMessage($message{message});
+		$message{message} = "";
+		$message{subject} = formatSubject("Re: ".$message{subject});
+		$session{form}{mid} = "new";
+		$f->hidden("replyTo",$session{form}{replyTo});
+        	if ($session{user}{userId} == 1) {
+                	$f->text("visitorName",WebGUI::International::get(438));
+        	}
+	} elsif ($session{form}{mid} eq "new") { 	# is an entirely new thread
+		$header = WebGUI::International::get(231);
+        	if ($session{user}{userId} == 1) {
+                	$f->text("visitorName",WebGUI::International::get(438));
+        	}
+	} else {					# is editing an existing message
+		$header = WebGUI::International::get(228);
+		%message = getMessage($session{form}{mid});
+		$footer = formatHeader($message{subject},$message{userId},$message{username},$message{dateOfPost}).'<p>'.formatMessage($message{message});
+		$message{subject} = formatSubject($message{subject});
 	}
-	$html .= '<tr><td class="formDescription">'.WebGUI::International::get(229).'</td><td>'.WebGUI::Form::text("subject",30,255).'</td></tr>';
-	$html .= '<tr><td class="formDescription" valign="top">'.WebGUI::International::get(230).'</td><td>'.WebGUI::Form::textArea("message",'',50,6,1).'</td></tr>';
-        $html .= '<tr><td></td><td>'.WebGUI::Form::submit(WebGUI::International::get(62)).'</td></tr>';
-	$html .= '</table></form>';
+        $f->hidden("func","postSave");
+        $f->hidden("wid",$session{form}{wid});
+        $f->hidden("sid",$session{form}{sid});
+        $f->hidden("mid",$session{form}{mid});
+	$f->text("subject",WebGUI::International::get(229),$message{subject});
+	$f->HTMLArea("message",WebGUI::International::get(230),$message{message});
+	$f->submit;
+	$html = '<h1>'.$header.'</h1>';
+	$html .= $f->print;
+	$html .= '<p/>'.$footer;
 	return $html;
 }
 
 #-------------------------------------------------------------------
-sub postNewMessageSave {
-	my ($mid, $visitor);
-        if ($session{form}{subject} eq "") {
-        	$session{form}{subject} = WebGUI::International::get(232);
-        }
-	if ($session{form}{message} eq "") {
-        	$session{form}{subject} .= ' '.WebGUI::International::get(233);
-        }
-	if ($session{form}{visitorName} eq "") {
-		$visitor = $session{user}{username};
-	} else {
-		$visitor = $session{form}{visitorName};
-	}
-	$mid = getNextId("messageId");
-	WebGUI::SQL->write("insert into discussion values ($mid, $mid, $session{form}{wid}, 0, $session{user}{userId}, ".quote($visitor).", ".quote($session{form}{subject}).", ".quote($session{form}{message}).", ".time().", '$session{form}{sid}')");
-	return "";
-}
-
-#-------------------------------------------------------------------
-sub postReply {
-	my ($html, $subject);
-	($subject) = WebGUI::SQL->quickArray("select subject from discussion where messageId=$session{form}{mid}");
-	$subject = "Re: ".$subject;
-        $html = '<h1>'.WebGUI::International::get(234).'</h1>';
-        $html .= formHeader().'<table>';
-        $html .= WebGUI::Form::hidden("func","postReplySave");
-        $html .= WebGUI::Form::hidden("wid",$session{form}{wid});
-        $html .= WebGUI::Form::hidden("sid",$session{form}{sid});
-        $html .= WebGUI::Form::hidden("mid",$session{form}{mid});
-	if ($session{user}{userId} == 1) {
-		$html .= tableFormRow(WebGUI::International::get(438),WebGUI::Form::text("visitorName",30,35));
-	}
-	$html .= '<tr><td class="formDescription">'.WebGUI::International::get(229).'</td><td>'.WebGUI::Form::text("subject",30,255,$subject).'</td></tr>';
-	$html .= '<tr><td class="formDescription" valign="top">'.WebGUI::International::get(230).'</td><td>'.WebGUI::Form::textArea("message",'',50,6,1).'</td></tr>';
-        $html .= '<tr><td></td><td>'.WebGUI::Form::submit(WebGUI::International::get(62)).'</td></tr>';
-	$html .= '</table></form>';
-	$html .= showMessage();
-	return $html;
-}
-
-#-------------------------------------------------------------------
-sub postReplySave {
-	my ($rid, $mid, $visitor);
+sub postSave {
+	my ($rid, $username, $pid);
         if ($session{form}{subject} eq "") {
         	$session{form}{subject} = WebGUI::International::get(232);
         }
  	if ($session{form}{message} eq "") {
                	$session{form}{subject} .= ' '.WebGUI::International::get(233);
         }
-        if ($session{form}{visitorName} eq "") {
-                $visitor = $session{user}{username};
-        } else {
-                $visitor = $session{form}{visitorName};
-        }
-	$mid = getNextId("messageId");
-	($rid) = WebGUI::SQL->quickArray("select rid from discussion where messageId=$session{form}{mid}");
-	WebGUI::SQL->write("insert into discussion values ($mid, $rid, $session{form}{wid}, $session{form}{mid}, $session{user}{userId}, ".quote($visitor).", ".quote($session{form}{subject}).", ".quote($session{form}{message}).", ".time().", '$session{form}{sid}')");
+	if ($session{form}{mid} eq "new") {
+	        if ($session{user}{userId} = 1) {
+        	        if ($session{form}{visitorName} eq "") {
+                	        $username = $session{user}{username};
+                	} else {
+                	        $username = $session{form}{visitorName};
+                	}
+        	} else {
+                	$username = $session{user}{username};
+        	}
+		if ($session{form}{sid} eq "") {
+			$session{form}{sid} = 0;
+		}
+		$session{form}{mid} = getNextId("messageId");
+		if ($session{form}{replyTo} ne "") {
+			($rid) = WebGUI::SQL->quickArray("select rid from discussion where messageId=$session{form}{replyTo}");
+			$pid = $session{form}{replyTo};
+		} else {
+			$rid = $session{form}{mid};
+			$pid = 0;
+		}
+		WebGUI::SQL->write("insert into discussion (messageId, wobjectId, subId, rid, pid, userId, username) values
+			($session{form}{mid},$session{form}{wid},$session{form}{sid},$rid,$pid,$session{user}{userId},".quote($username).")");
+	} elsif ($session{setting}{addEditStampToPosts}) {
+		$session{form}{message} = "\n --- (Edited at ".localtime(time)." by $session{user}{username}) --- \n\n".$session{form}{message};
+	}
+	WebGUI::SQL->write("update discussion set subject=".quote($session{form}{subject}).", 
+		message=".quote($session{form}{message}).", dateOfPost=".time()." where messageId=$session{form}{mid}");
 	return "";
 }
 
@@ -230,9 +219,7 @@ sub showMessage {
         if ($message{messageId}) {
                 $html .= '<h1>'.$message{subject}.'</h1>';
                 $html .= '<table width="100%" cellpadding=3 cellspacing=1 border=0><tr><td class="tableHeader">';
-                $html .= '<b>'.WebGUI::International::get(238).'</b> 
-			<a href="'.WebGUI::URL::page('op=viewProfile&uid='.$message{userId}).'">'.$message{username}.'</a><br>';
-                $html .= "<b>".WebGUI::International::get(239)."</b> ".epochToHuman($message{dateOfPost},"%z %Z")."<br>";
+		$html .= formatHeader($message{subject},$message{userId},$message{username},$message{dateOfPost});
                 $html .= '</td>';
                 $html .= '<td rowspan=2 valign="top" class="tableMenu" nowrap>';
 		$html .= $_[0];
@@ -249,7 +236,7 @@ sub showMessage {
                         	$session{form}{wid}).'">'.WebGUI::International::get(512).' &raquo;</a><br>';
         	}
                 $html .= '</tr><tr><td class="tableData">';
-                $html .= $message{message}.'<p>';
+                $html .= formatMessage($message{message}).'<p>';
                 $html .= '</td></tr></table>';
         } else {
                 $html = WebGUI::International::get(402);
@@ -296,15 +283,10 @@ sub showThreads {
        	$html .= '<table border=0 cellpadding=2 cellspacing=1 width="100%">';
 	if ($session{user}{discussionLayout} eq "flat") {
 		while (%data = $sth->hash) {
-			$html .= '<tr><td class="tableHeader"><b>'.WebGUI::International::get(237).'</b> '.$data{subject}.'<br>';
-			$html .= '<b>'.WebGUI::International::get(238).'</b>
-                        	<a href="'.WebGUI::URL::page('op=viewProfile&uid='.$data{userId}).'">'.$data{username}.'</a><br>';
-                	$html .= "<b>".WebGUI::International::get(239)."</b> ".epochToHuman($data{dateOfPost},"%z %Z")."<br>";
+			$html .= '<tr><td class="tableHeader">';
+			$html .= formatHeader($data{subject},$data{userId},$data{username},$data{dateOfPost});
 			$html .= '</td></tr>';
-			unless ($data{message} =~ /\<div\>/ig || $data{message} =~ /\<br\>/ig || $data{message} =~ /\<p\>/ig) {
-                		$data{message} =~ s/\n/\<br\>/g;
-        		}		
-			$html .= '<tr><td class="tableData">'.$data{message}.'</td></tr>';
+			$html .= '<tr><td class="tableData">'.formatMessage($data{message}).'</td></tr>';
 		}
 	} else {
         	$html .= '<table border=0 cellpadding=2 cellspacing=1 width="100%">';

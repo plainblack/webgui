@@ -418,25 +418,6 @@ sub www_editSave {
 }
 
 #-------------------------------------------------------------------
-sub www_editMessage {
-        if (_canEditMessage($_[0],$session{form}{mid})) {
-                return WebGUI::Discussion::editMessage();
-        } else {
-                return WebGUI::Privilege::insufficient();
-        }
-}
-
-#-------------------------------------------------------------------
-sub www_editMessageSave {
-        if (_canEditMessage($_[0],$session{form}{mid})) {
-                WebGUI::Discussion::editMessageSave();
-                return $_[0]->www_showMessage();
-        } else {
-                return WebGUI::Privilege::insufficient();
-        }
-}
-
-#-------------------------------------------------------------------
 sub www_editSubmission {
         my ($output, %submission, $f, @submission, $sth);
 	tie %submission, 'Tie::CPHash';
@@ -521,37 +502,18 @@ sub www_editSubmissionSave {
 }
 
 #-------------------------------------------------------------------
-sub www_postNewMessage {
+sub www_post {
         if (WebGUI::Privilege::isInGroup($_[0]->get("groupToPost"),$session{user}{userId})) {
-                return WebGUI::Discussion::postNewMessage();
+                return WebGUI::Discussion::post();
         } else {
                 return WebGUI::Privilege::insufficient();
         }
 }
 
 #-------------------------------------------------------------------
-sub www_postNewMessageSave {
+sub www_postSave {
         if (WebGUI::Privilege::isInGroup($_[0]->get("groupToPost"),$session{user}{userId})) {
-                WebGUI::Discussion::postNewMessageSave();
-		return $_[0]->www_viewSubmission();
-        } else {
-                return WebGUI::Privilege::insufficient();
-        }
-}
-
-#-------------------------------------------------------------------
-sub www_postReply {
-        if (WebGUI::Privilege::isInGroup($_[0]->get("groupToPost"),$session{user}{userId})) {
-                return WebGUI::Discussion::postReply();
-        } else {
-                return WebGUI::Privilege::insufficient();
-        }
-}
-
-#-------------------------------------------------------------------
-sub www_postReplySave {
-        if (WebGUI::Privilege::isInGroup($_[0]->get("groupToPost"),$session{user}{userId})) {
-                WebGUI::Discussion::postReplySave();
+                WebGUI::Discussion::postSave();
                 return $_[0]->www_showMessage();
         } else {
                 return WebGUI::Privilege::insufficient();
@@ -561,10 +523,10 @@ sub www_postReplySave {
 #-------------------------------------------------------------------
 sub www_showMessage {
         my ($submenu, $output);
-        $submenu .= '<a href="'.WebGUI::URL::page('func=postReply&mid='.$session{form}{mid}.'&wid='.$session{form}{wid}.'&sid='.$session{form}{sid})
+        $submenu .= '<a href="'.WebGUI::URL::page('func=post&replyTo='.$session{form}{mid}.'&wid='.$session{form}{wid}.'&sid='.$session{form}{sid})
                         .'">'.WebGUI::International::get(39,$namespace).'</a><br>';
         if (_canEditMessage($_[0],$session{form}{mid})) {
-        	$submenu .= '<a href="'.WebGUI::URL::page('func=editMessage&mid='.$session{form}{mid}.
+        	$submenu .= '<a href="'.WebGUI::URL::page('func=post&mid='.$session{form}{mid}.
                 	'&wid='.$session{form}{wid}.'&sid='.$session{form}{sid}).'">'.WebGUI::International::get(42,$namespace).'</a><br>';
                 $submenu .= '<a href="'.WebGUI::URL::page('func=deleteMessage&mid='.$session{form}{mid}.
                                 '&wid='.$session{form}{wid}.'&sid='.$session{form}{sid}).'">'.WebGUI::International::get(43,$namespace).'</a><br>';
@@ -628,7 +590,7 @@ sub www_viewSubmission {
 			WebGUI::International::get(26,$namespace).'</a><br>';
         }
 	if ($_[0]->get("allowDiscussion")) {
-		$output .= '<a href="'.WebGUI::URL::page('func=postNewMessage&wid='.$_[0]->get("wobjectId")
+		$output .= '<a href="'.WebGUI::URL::page('func=post&mid=new&wid='.$_[0]->get("wobjectId")
 			.'&sid='.$session{form}{sid}).'">'.WebGUI::International::get(47,$namespace).'</a><br>';
 	}
         $output .= '<a href="'.WebGUI::URL::page().'">'.WebGUI::International::get(28,$namespace).'</a><br>';

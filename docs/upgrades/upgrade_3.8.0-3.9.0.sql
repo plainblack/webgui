@@ -89,7 +89,7 @@ INSERT INTO international VALUES (512,'WebGUI','English','Next Thread');
 INSERT INTO international VALUES (513,'WebGUI','English','Previous Thread');
 delete from international where internationalId=10 and namespace='MessageBoard';
 delete from international where internationalId=14 and namespace='MessageBoard';
-
+INSERT INTO settings VALUES ('addEditStampToPosts','1');
 
 
 

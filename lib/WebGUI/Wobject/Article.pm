@@ -213,55 +213,18 @@ sub www_editSave {
 }
 
 #-------------------------------------------------------------------
-sub www_editMessage {
-	if (_canEditMessage($_[0],$session{form}{mid})) {
-                return WebGUI::Discussion::editMessage();
-        } else {
-                return WebGUI::Privilege::insufficient();
-        }
-}
-
-#-------------------------------------------------------------------
-sub www_editMessageSave {
-	if (_canEditMessage($_[0],$session{form}{mid})) {
-                WebGUI::Discussion::editMessageSave();
-                return $_[0]->www_showMessage();
-        } else {
-                return WebGUI::Privilege::insufficient();
-        }
-}
-
-#-------------------------------------------------------------------
-sub www_postNewMessage {
+sub www_post {
         if (WebGUI::Privilege::isInGroup($_[0]->get("groupToPost"),$session{user}{userId})) {
-                return WebGUI::Discussion::postNewMessage();
+                return WebGUI::Discussion::post();
         } else {
                 return WebGUI::Privilege::insufficient();
         }
 }
 
 #-------------------------------------------------------------------
-sub www_postNewMessageSave {
+sub www_postSave {
         if (WebGUI::Privilege::isInGroup($_[0]->get("groupToPost"),$session{user}{userId})) {
-                return WebGUI::Discussion::postNewMessageSave();
-        } else {
-                return WebGUI::Privilege::insufficient();
-        }
-}
-
-#-------------------------------------------------------------------
-sub www_postReply {
-        if (WebGUI::Privilege::isInGroup($_[0]->get("groupToPost"),$session{user}{userId})) {
-                return WebGUI::Discussion::postReply();
-        } else {
-                return WebGUI::Privilege::insufficient();
-        }
-}
-
-#-------------------------------------------------------------------
-sub www_postReplySave {
-        if (WebGUI::Privilege::isInGroup($_[0]->get("groupToPost"),$session{user}{userId})) {
-                WebGUI::Discussion::postReplySave();
+                WebGUI::Discussion::postSave();
                 return $_[0]->www_showMessage();
         } else {
                 return WebGUI::Privilege::insufficient();
@@ -273,10 +236,10 @@ sub www_showMessage {
         my ($submenu, $output, $defaultMid);
         ($defaultMid) = WebGUI::SQL->quickArray("select min(messageId) from discussion where wobjectId=$session{form}{wid}");
 	$session{form}{mid} = $defaultMid if ($session{form}{mid} eq "");
-        $submenu = '<a href="'.WebGUI::URL::page('func=postReply&mid='.$session{form}{mid}.'&wid='.$session{form}{wid})
+        $submenu = '<a href="'.WebGUI::URL::page('func=post&replyTo='.$session{form}{mid}.'&wid='.$session{form}{wid})
         	.'">'.WebGUI::International::get(24,$namespace).'</a><br>';
 	if (_canEditMessage($_[0],$session{form}{mid})) {
-        	$submenu .= '<a href="'.WebGUI::URL::page('func=editMessage&mid='.$session{form}{mid}.
+        	$submenu .= '<a href="'.WebGUI::URL::page('func=post&mid='.$session{form}{mid}.
                 	'&wid='.$session{form}{wid}).'">'.WebGUI::International::get(25,$namespace).'</a><br>';
                 $submenu .= '<a href="'.WebGUI::URL::page('func=deleteMessage&mid='.$session{form}{mid}.
 			'&wid='.$session{form}{wid}).'">'.WebGUI::International::get(26,$namespace).'</a><br>';
@@ -330,7 +293,7 @@ sub www_view {
 			WebGUI::URL::page('func=showMessage&wid='.$_[0]->get("wobjectId")).'">'.
 			WebGUI::International::get(28,$namespace).' ('.$replies.')</a></td>';
 		$output .= '<td align="center" width="50%" class="tableMenu"><a href="'.
-                	WebGUI::URL::page('func=postNewMessage&wid='.$_[0]->get("wobjectId")).'">'.
+                	WebGUI::URL::page('func=post&mid=new&wid='.$_[0]->get("wobjectId")).'">'.
                 	WebGUI::International::get(24,$namespace).'</a></td></tr>';
 		$output .= '</table>';
 	}
