@@ -68,11 +68,11 @@ our $HELP = {
 			},
 			{
 				tag => 'template language',
-				namespace => 'WebGUI'
+				namespace => 'Template'
 			},
 			{
 				tag => 'templates manage',
-				namespace => 'WebGUI'
+				namespace => 'Template'
 			}
 		]
 	},
@@ -343,48 +343,7 @@ our $HELP = {
 			}
 		]
 	},
-	'templates manage' => {
-		title => '683',
-		body => '638',
-		related => [
-			{
-				tag => 'themes manage',
-				namespace => 'WebGUI'
-			},
-			{
-				tag => 'template add/edit',
-				namespace => 'WebGUI'
-			},
-			{
-				tag => 'template delete',
-				namespace => 'WebGUI'
-			},
-			{
-				tag => 'template language',
-				namespace => 'WebGUI'
-			}
-		]
-	},
-	'template add/edit' => {
-		title => '684',
-		body => '639',
-		related => [
-			{
-				tag => 'templates manage',
-				namespace => 'WebGUI'
-			}
-		]
-	},
-	'template delete' => {
-		title => '685',
-		body => '640',
-		related => [
-			{
-				tag => 'templates manage',
-				namespace => 'WebGUI'
-			}
-		]
-	},
+
 	'macros using' => {
 		title => '669',
 		body => '624',
@@ -461,16 +420,7 @@ our $HELP = {
 			}
 		]
 	},
-	'template language' => {
-		title => '825',
-		body => '826',
-		related => [
-			{
-				tag => 'templates manage',
-				namespace => 'WebGUI'
-			}
-		]
-	},
+
 	'wobject template' => {
 		title => '827',
 		body => '828',
@@ -521,11 +471,11 @@ our $HELP = {
 			},
 			{
 				tag => 'template language',
-				namespace => 'WebGUI'
+				namespace => 'Template'
 			},
 			{
 				tag => 'templates manage',
-				namespace => 'WebGUI'
+				namespace => 'Template'
 			},
 			{
 				tag => 'user submission system template',
@@ -543,7 +493,7 @@ our $HELP = {
 			},
 			{
 				tag => 'templates manage',
-				namespace => 'WebGUI'
+				namespace => 'Template'
 			}
 		]
 	},
@@ -611,7 +561,7 @@ our $HELP = {
 		related => [
 			{
 				tag => 'templates manage',
-				namespace => 'WebGUI'
+				namespace => 'Template'
 			},
 			{
 				tag => 'theme delete',
