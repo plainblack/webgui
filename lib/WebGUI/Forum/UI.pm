@@ -1096,7 +1096,7 @@ sub getForumTemplateVars {
         $var{"thread.replies.label"} = WebGUI::International::get(1016);
 	$var{'thread.rating.label'} = WebGUI::International::get(1020);
         $var{"thread.last.label"} = WebGUI::International::get(1017);
-	my $query = "select * from forumThread where forumId=".$forum->get("forumId")." and ";
+	my $query = "select * from forumThread where forumId=".quote($forum->get("forumId"))." and ";
 	if ($forum->isModerator) {
 		$query .= "(status='approved' or status='pending')";
 	} else {
