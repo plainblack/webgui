@@ -7,7 +7,7 @@ our $HELP = {
 		related => [
 			{
 				tag => 'wobjects using',
-				namespace => 'WebGUI'
+				namespace => 'Wobject'
 			},
 			{
 				tag => 'search template',
@@ -21,7 +21,7 @@ our $HELP = {
 		related => [
 			{
 				tag => 'wobjects using',
-				namespace => 'WebGUI'
+				namespace => 'Wobject'
 			},
 			{
 				tag => 'search add/edit',

@@ -10,8 +10,8 @@ our $HELP = {
 				namespace => 'Asset'
 			},
 			{
-				tag => 'wobjects add/edit',
-				namespace => 'WebGUI'
+				tag => 'wobject add/edit',
+				namespace => 'Wobject'
 			},
 			{
 				tag => 'http proxy template',

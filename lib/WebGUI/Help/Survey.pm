@@ -7,7 +7,7 @@ our $HELP = {
 		related => [
 			{
 				tag => 'wobjects using',
-				namespace => 'WebGUI'
+				namespace => 'Wobject'
 			},
 			{
 				tag => 'survey template',
@@ -45,7 +45,7 @@ our $HELP = {
 			},
 			{
 				tag => 'wobject template',
-				namespace => 'WebGUI'
+				namespace => 'Wobject'
 			}
 		]
 	},

@@ -11,7 +11,7 @@ our $HELP = {
 			},
 			{
 				tag => 'wobjects using',
-				namespace => 'WebGUI'
+				namespace => 'Wobject'
 			}
 		]
 	},
@@ -29,7 +29,7 @@ our $HELP = {
 			},
 			{
 				tag => 'wobject template',
-				namespace => 'WebGUI'
+				namespace => 'Wobject'
 			}
 		]
 	},

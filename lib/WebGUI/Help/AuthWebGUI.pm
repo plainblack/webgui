@@ -7,7 +7,7 @@ our $HELP = {
 		related => [
 			{
 				tag => 'wobject template',
-				namespace => 'WebGUI'
+				namespace => 'Wobject'
 			}
 		]
 	},
@@ -17,7 +17,7 @@ our $HELP = {
 		related => [
 			{
 				tag => 'wobject template',
-				namespace => 'WebGUI'
+				namespace => 'Wobject'
 			}
 		]
 	},
@@ -27,7 +27,7 @@ our $HELP = {
 		related => [
 			{
 				tag => 'wobject template',
-				namespace => 'WebGUI'
+				namespace => 'Wobject'
 			}
 		]
 	},
@@ -37,7 +37,7 @@ our $HELP = {
 		related => [
 			{
 				tag => 'wobject template',
-				namespace => 'WebGUI'
+				namespace => 'Wobject'
 			}
 		]
 	},
@@ -47,7 +47,7 @@ our $HELP = {
 		related => [
 			{
 				tag => 'wobject template',
-				namespace => 'WebGUI'
+				namespace => 'Wobject'
 			}
 		]
 	},

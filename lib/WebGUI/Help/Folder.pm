@@ -12,7 +12,7 @@ our $HELP = {
 			},
 			{
 				tag => 'wobject add/edit',
-				namespace => 'WebGUI'
+				namespace => 'Wobject'
 			},
 			{
 				tag => 'folder template',

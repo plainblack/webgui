@@ -158,10 +158,10 @@ A comparison expression to be used when checking whether the action should be al
 sub confirm {
         return WebGUI::Privilege::vitalComponent() if ($_[4]);
 	my $noURL = $_[3] || $_[0]->getUrl;
-        my $output = '<h1>'.WebGUI::International::get(42).'</h1>';
+        my $output = '<h1>'.WebGUI::International::get(42,'Wobject').'</h1>';
         $output .= $_[1].'<p>';
-        $output .= '<div align="center"><a href="'.$_[2].'">'.WebGUI::International::get(44).'</a>';
-        $output .= ' &nbsp; <a href="'.$noURL.'">'.WebGUI::International::get(45).'</a></div>';
+        $output .= '<div align="center"><a href="'.$_[2].'">'.WebGUI::International::get(44,'Wobject').'</a>';
+        $output .= ' &nbsp; <a href="'.$noURL.'">'.WebGUI::International::get(45,'Wobject').'</a></div>';
         return $output;
 }
 
@@ -213,38 +213,38 @@ sub getEditForm {
 	my $tabform = $self->SUPER::getEditForm();
 	$tabform->getTab("display")->yesNo(
                 -name=>"displayTitle",
-                -label=>WebGUI::International::get(174),
+                -label=>WebGUI::International::get(174,'Wobject'),
                 -value=>$self->getValue("displayTitle"),
                 -uiLevel=>5
                 );
          $tabform->getTab("display")->template(
 		-name=>"styleTemplateId",
-		-label=>WebGUI::International::get(1073),
+		-label=>WebGUI::International::get(1073,'Wobject'),
 		-value=>$self->getValue("styleTemplateId"),
 		-namespace=>'style',
 		-afterEdit=>'op=editPage&amp;npp='.$session{form}{npp}
 		);
          $tabform->getTab("display")->template(
 		-name=>"printableStyleTemplateId",
-		-label=>WebGUI::International::get(1079),
+		-label=>WebGUI::International::get(1079,'Wobject'),
 		-value=>$self->getValue("printableStyleTemplateId"),
 		-namespace=>'style',
 		-afterEdit=>'op=editPage&amp;npp='.$session{form}{npp}
 		);
 	$tabform->getTab("properties")->HTMLArea(
                 -name=>"description",
-                -label=>WebGUI::International::get(85),
+                -label=>WebGUI::International::get(85,'Wobject'),
                 -value=>$self->getValue("description")
                 );
         $tabform->getTab("display")->interval(
                 -name=>"cacheTimeout",
-                -label=>WebGUI::International::get(895),
+                -label=>WebGUI::International::get(895,'Wobject'),
                 -value=>$self->getValue("cacheTimeout"),
                 -uiLevel=>8
                 );
         $tabform->getTab("display")->interval(
                 -name=>"cacheTimeoutVisitor",
-                -label=>WebGUI::International::get(896),
+                -label=>WebGUI::International::get(896,'Wobject'),
                 -value=>$self->getValue("cacheTimeoutVisitor"),
                 -uiLevel=>8
                 );

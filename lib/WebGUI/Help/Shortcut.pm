@@ -7,7 +7,7 @@ our $HELP = {
 		related => [
 			{
 				tag => 'wobjects using',
-				namespace => 'WebGUI'
+				namespace => 'Wobject'
 			},
                         {
                                 tag => 'metadata manage',
@@ -23,7 +23,7 @@ our $HELP = {
 		related => [
 			{
 				tag => 'wobjects using',
-				namespace => 'WebGUI'
+				namespace => 'Wobject'
 			},
                         {
                                 tag => 'template language',
