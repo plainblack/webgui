@@ -149,6 +149,7 @@ sub www_listImages {
 			$imageGroupId = $session{form}{gid};
 		} else {
 			$imageGroupId = 0;
+			$session{form}{gid} = 0;
 		}
                 %data = WebGUI::SQL->quickHash("select parentId,name from imageGroup where imageGroupId=".$imageGroupId);
 		if($session{form}{pid} ne "") { 
@@ -294,8 +295,6 @@ sub www_deleteImageGroupConfirm {
 	my ($image, %data);
 	tie %data, 'Tie::CPHash';
         if (WebGUI::Privilege::isInGroup(9)) {
-		# FIXME reparent all children of this group to this group's parent
-		# or delete all children....this would also have to delete all images
 		%data = WebGUI::SQL->quickHash("select parentId from imageGroup where imageGroupId=$session{form}{gid}");
 		WebGUI::SQL->write("update images set imageGroupId=$data{parentId} where imageGroupId=$session{form}{gid}");
 		WebGUI::SQL->write("update imageGroup set parentId=$data{parentId} where parentId=$session{form}{gid}");
@@ -318,7 +317,7 @@ sub www_editImageGroup {
 		} else {
 			%data = WebGUI::SQL->quickHash("select * from imageGroup where imageGroupId=$session{form}{gid}");
 		}
-                %parent_data = WebGUI::SQL->quickHash("select name from imageGroup where imageGroupId=$data{parentId}");
+                %parent_data = WebGUI::SQL->quickHash("select name from imageGroup where imageGroupId=$session{form}{pid}");
                 $output = helpIcon(20);
                 $output .= '<h1>'.WebGUI::International::get(545).'</h1>';
 		$f = WebGUI::HTMLForm->new;
