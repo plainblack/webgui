@@ -96,9 +96,7 @@ sub close {
 
 Creates a new DBIx::FullTextSearch index. 
 
-=over
-
-=item %options
+=head3 %options
 
 Options to pass to DBIx::FullTextSearch. 
 The default options that are used are:
@@ -106,8 +104,6 @@ The default options that are used are:
 ( backend => column, word_length => 20, stoplist => undef )
 
 Please refer to the DBIx::FullTextSearch documentation for a complete list of options.
-
-=back
 
 =cut
 
@@ -142,13 +138,9 @@ sub create {
 
 Returns true if tableName exists in database.
 
-=over
-
-=item tableName
+=head3 tableName
 
 The name of table.
-
-=back
 
 =cut
 
@@ -163,27 +155,23 @@ sub existsTable {
 
 Returns an array reference containing details for each docId.
 
-=over
-
-=item docIdList
+=head3 docIdList
 
 An array reference containing docIds.
 
-=item previewLength
+=head3 previewLength
 
 The maximum number of characters in each of the context sections. Defaults to "80".
 
-=item highlight
+=head3 highlight
 
 A boolean indicating whether or not to enable highlight. Defaults to "1".
 
-=item highlightColors
+=head3 highlightColors
 
 A reference to an array of CSS color identificators.
 
-=item 
-
-=back
+=head3 
 
 =cut
 
@@ -335,23 +323,19 @@ sub _queryToWords {
 
 highlight words or patterns in HTML documents.
 
-=over
-
-=item text
+=head3 text
 
 The text to highlight
 
-=item query
+=head3 query
 
 A query containing the words to highlight. Defaults to the last used $search->search query.
 Special case: When query contains only an asterisk '*', no highlighting is applied.
 
-=item colors
+=head3 colors
 
 A reference to an array of CSS color identificators.
  
-=back
-
 =cut
 
 sub highlight {
@@ -376,67 +360,63 @@ This method doesn't store the document itself. Instead, it stores information ab
 in the document in such a structured way that it makes easy and fast to look up what 
 documents contain certain words and return id's of the documents.
 
-=over
-
-=item text
+=head3 text
 
 The text to index.
 
-=item location
+=head3 location
 
 The location of the document. Most likely an URL.
 
-=item contentType
+=head3 contentType
 
 The content type of this document. 
 
-=item docId
+=head3 docId
 
 The unique Id of this document. Defaults to the next empty docId.
 
-=item pageId
+=head3 pageId
 
 The pageId of the page on which this document resides. Defaults to 0.
 
-=item wobjectId
+=head3 wobjectId
 
 The wobjectID of the wobject that holds this document. Defaults to 0.
 
-=item ownerId
+=head3 ownerId
 
 The ownerId of the document. Defaults to 3.
 
-=item languageId
+=head3 languageId
 
 The languageId of this document. Defaults to undef.
 
-=item namespace
+=head3 namespace
 
 The namespace of this document. Defaults to 'WebGUI'.
 
-=item page_groupIdView
+=head3 page_groupIdView
 
 Id of group authorized to view this page. Defaults to '7' (everyone)
 
-=item wobject_groupIdView
+=head3 wobject_groupIdView
 
 Id of group authorized to view this wobject. Defaults to '7' (everyone)
 
-=item wobject_special_groupIdView
+=head3 wobject_special_groupIdView
 
 Id of group authorized to view the details of this wobject. 
 
-=item headerShortcut
+=head3 headerShortcut
 
 An sql statement that returns the header (title, question, subject, name, whatever)
 of this document.
 
-=item bodyShortcut
+=head3 bodyShortcut
 
 An sql statement that returns the body (description, answer, message, whatever)
 of this document.
-
-=back
 
 =cut
 
@@ -485,17 +465,13 @@ sub indexDocument {
 
 Constructor.
 
-=over
-
-=item indexName
+=head3 indexName
 
 The name of the index to open. Defaults to 'default'.
 
-=item $dbh
+=head3 $dbh
 
 Database handler to use. Defaults to $WebGUI::Session::session{dbh}.
-
-=back
 
 =cut
 
@@ -539,23 +515,19 @@ sub open {
 Returns a context preview in which words from a search query appear in the resulting documents. 
 The words are always in the middle of each of the sections.
 
-=over
-
-=item text
+=head3 text
 
 The text to preview
 
-=item previewLength
+=head3 previewLength
 
 The maximum number of characters in each of the context sections. Defaults to 80.
 A preview length of "0" means no preview, 
 while a negative preview length returns the complete text.
 
-=item query
+=head3 query
 
 A query containing the words to highlight. Defaults to the last used $search->search query.
-
-=back
 
 =cut
 
@@ -596,13 +568,9 @@ sub preview {
 
 Like create, but first drops the existing index. Useful when rebuilding the index.
 
-=over
-
-=item %options
+=head3 %options
 
 Options to pass to WebGUI::IndexedSearch->create() 
-
-=back
 
 =cut
 
@@ -624,9 +592,7 @@ sub recreate {
 Returns an array reference of docId's of documents that match the query. 
 If the search has no results, undef is returned.
 
-=over
-
-=item query
+=head3 query
 
 user input string. Will be parsed into can-include, must-include and must-not-include words and phrases.
 Special case: when query is an asterisk (*), then no full text search is done, and results are returned
@@ -636,7 +602,7 @@ Examples are:
 		+"this is a phrase" -koo +bar foo
 		(foo OR baz) AND (bar OR caz)
 
-=item filter
+=head3 filter
 
 A hash reference containing filter elements.
 
@@ -645,8 +611,6 @@ Example:
                 language => [ 1, 3 ],
                 namespace => [ 'Article', 'USS' ]
         }
-
-=back
 
 =cut
 

@@ -61,13 +61,9 @@ These subroutines are available from this package:
 
 Returns a number with commas applied at each third character.
 
-=over
-
-=item integer
+=head3 integer
 
 Any old number will do.
-
-=back
 
 =cut
 
@@ -83,17 +79,13 @@ sub commify {
 
 Returns a boolean value as to whether the value is in the array.
 
-=over
-
-=item value
+=head3 value
 
 The value to check for.
 
-=item list
+=head3 list
 
 An array to look for the value in.
-
-=back
 
 =cut
 
@@ -109,13 +101,9 @@ sub isIn {
 
 Searches through an array looking for commas and replaces them with semi-colons. Also replaces carriage returns with spaces. This is useful for exporting comma separated data.
 
-=over
-
-=item array
+=head3 array
 
 A reference to the array to look through.
-
-=back
 
 =cut
 
@@ -130,13 +118,9 @@ sub makeArrayCommaSafe {
 
 Searches through an array looking for tabs and replaces them with four spaces. Also replaces carriage returns with a space. This is useful for exporting tab separated data.
 
-=over
-
-=item array
+=head3 array
 
  A reference to the array to look through.
-
-=back
 
 =cut
 
@@ -151,13 +135,9 @@ sub makeArrayTabSafe {
 
 Replaces commas with semi-colons and carriage returns with spaces.
 
-=over
-
-=item text
+=head3 text
 
 The text to search through.
-
-=back
 
 =cut
 
@@ -173,13 +153,9 @@ sub makeCommaSafe {
 
 Replaces tabs with four spaces and carriage returns with a space each.
 
-=over
-
-=item text
+=head3 text
 
 The text to search through.
-
-=back
 
 =cut
 
@@ -196,17 +172,13 @@ sub makeTabSafe {
 
 Returns an integer between the low and high number.
 
-=over
-
-=item low
+=head3 low
 
 The lowest possible value. Defaults to 0.
 
-=item high
+=head3 high
 
 The highest possible value. Defaults to 1.
-
-=back
 
 =cut
 
@@ -224,13 +196,9 @@ sub randint {
 
 Resorts an array in random order.
 
-=over
-
-=item array
+=head3 array
 
 A reference to the array to randomize.
-
-=back
 
 =cut
 
@@ -251,13 +219,9 @@ sub randomizeArray {
 
 Resorts a hash tied to IxHash in random order. Returns a hash reference.
 
-=over
-
-=item hashRef
+=head3 hashRef
 
 A reference hash to randomize.
-
-=back
 
 =cut
 
@@ -278,19 +242,15 @@ sub randomizeHash {
 
 Returns an integer after rounding a floating point number.
 
-=over
-
-=item float
+=head3 float
 
 Any floating point number.
 
-=item significantDigits
+=head3 significantDigits
 
 The number of digits to leave after the decimal point. Defaults to 0.
 
-NOTE: If you set this higher than 0 then you'll get back another floating point number rather than an integer.
-
-=back
+B<NOTE:> If you set this higher than 0 then you'll get back another floating point number rather than an integer.
 
 =cut
 
@@ -305,13 +265,9 @@ sub round {
 
 Sorts a hash by its values. Returns a hash.
 
-=over
-
-=item hash
+=head3 hash
 
 A hash to be sorted.
-
-=back
 
 =cut
 
@@ -330,13 +286,9 @@ sub sortHash {
 
 Sorts a hash in decending order by its values. Returns a hash.
 
-=over
-
-=item hash
+=head3 hash
 
 A hash to be sorted.
-
-=back
 
 =cut
 

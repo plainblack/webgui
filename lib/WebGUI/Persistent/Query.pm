@@ -97,32 +97,24 @@ sub buildWhereElement {
 
 =head2 new( %p )
 
-=over
-
-=item properties
+=head3 properties
 
 A hashref of field name to a hash reference of property settings. 
 
 Currently used settings are:
 
-=over
-
-=item * quote
+=head3 * quote
 
 If true values for this field are automatically quoted.
 
-=back
-
-=item table
+=head3 table
 
 The name of the table to query.
 
-=item where
+=head3 where
 
 A hash reference or array reference of arguments to build a where clause from.
 See parseWhereArgs for details.
-
-=back
 
 =cut
 
@@ -172,13 +164,11 @@ sub _parsePart {
 Recursivley parses a list of where arguments joining them with "AND" or "OR". Arguments 
 may take a number of forms:
 
-=over
-
-=item * scalar
+=head3 * scalar
 
 ("A = 1") is left unchanged.
 
-=item * array reference
+=head3 * array reference
 
 An array reference causes the joining argument to switch from 'AND' to 'OR' 
 (or visa-versa) for its contents:
@@ -189,7 +179,7 @@ becomes:
 
 "(A = 1 OR C = 2)"
 
-=item * hash reference
+=head3 * hash reference
 
 These are a convienent way of being able to dynamically build up complex 
 queries gradually.
@@ -199,8 +189,6 @@ queries gradually.
 becomes:
 
 "A = 1 AND C = 2"
-
-=back
 
 This routine is flexiable enough to be able to parse arguments of the form:
 

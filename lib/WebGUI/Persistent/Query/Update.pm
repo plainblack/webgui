@@ -81,30 +81,22 @@ sub buildSet {
 
 =head2 new( %p )
 
-=over
-
-=item data
+=head3 data
 
 A hash reference of field name to value.
 
-=item properties
+=head3 properties
 
-=over
-
-=item * quote
+=head3 * quote
 
 If true values for this field are automatically quoted.
 
-=back
+=head3 table
 
-=item table
-
-=item where
+=head3 where
 
 A hash reference or array reference of arguments to build a where clause from.
 See WebGUI::Persistent::Query::parseWhereArgs for details.
-
-=back
 
 =cut
 

@@ -72,17 +72,13 @@ sub _create {
 
 Adds this user to the specified groups.
 
-=over
-
-=item groups
+=head3 groups
 
 An array reference containing a list of groups.
 
-=item expireOffset
+=head3 expireOffset
 
 An override for the default offset of the grouping. Specified in seconds.
-
-=back
 
 =cut
 
@@ -96,13 +92,9 @@ sub addToGroups {
 
 Returns the authentication method for this user.
 
-=over
-
-=item value
+=head3 value
 
 If specified, the authMethod is set to this value. The only valid values are "WebGUI" and "LDAP". When a new account is created, authMethod is defaulted to "WebGUI".
-
-=back
 
 =cut
 
@@ -160,13 +152,9 @@ sub delete {
 
 Deletes this user from the specified groups.
 
-=over
-
-=item groups
+=head3 groups
 
 An array reference containing a list of groups.
-
-=back
 
 =cut
 
@@ -194,21 +182,17 @@ sub identifier {
 
 Returns the current level of karma this user has earned. 
 
-=over
-
-=item amount
+=head3 amount
 
 An integer to modify this user's karma by. Note that this number can be positive or negative.
 
-=item source
+=head3 source
 
 A descriptive source for this karma. Typically it would be something like "MessageBoard (49)" or "Admin (3)". Source is used to track where a karma modification came from.
 
-=item description
+=head3 description
 
 A description of why this user's karma was modified. For instance it could be "Message Board Post" or "He was a good boy!".
-
-=back
 
 =cut
 
@@ -238,13 +222,9 @@ sub lastUpdated {
 
 Constructor.
 
-=over
-
-=item userId 
+=head3 userId 
 
 The userId of the user you're creating an object reference for. If left blank it will default to "1" (Visitor). If specified as "new" then a new user account will be created and assigned the next available userId.
-
-=back
 
 =cut
 
@@ -278,17 +258,13 @@ sub new {
 
 Returns a profile field's value. If "value" is specified, it also sets the field to that value. 
 
-=over
-
-=item fieldName 
+=head3 fieldName 
 
 The profile field name such as "language" or "email" or "cellPhone".
 
-=item value
+=head3 value
 
 The value to set the profile field name to.
-
-=back
 
 =cut
 
@@ -313,13 +289,9 @@ sub profileField {
 
 Returns the unique identifier of the affiliate that referred this user to the site. 
 
-=over
-
-=item value
+=head3 value
 
 An integer containing the unique identifier of the affiliate.
-
-=back
 
 =cut
 
@@ -341,13 +313,9 @@ sub referringAffiliate {
 
 Returns the status of the user. 
 
-=over
-
-=item value
+=head3 value
 
 If specified, the status is set to this value.  Possible values are 'Active', 'Selfdestructed' and 'Deactivated'.
-
-=back
 
 =cut
 
@@ -369,13 +337,9 @@ sub status {
 
 Returns the username. 
 
-=over
-
-=item value
+=head3 value
 
 If specified, the username is set to this value. 
-
-=back
 
 =cut
 

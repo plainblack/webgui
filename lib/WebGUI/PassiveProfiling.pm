@@ -47,13 +47,9 @@ These functions/methods are available from this package:
 
 Adds a wobjectId to the passive profile log.
 
-=over
-
-=item wobjectId
+=head3 wobjectId
 
 The wobjectId to add.
-
-=back
 
 =cut
 
@@ -77,13 +73,9 @@ sub add {
 Adds all wobjects on current page to the passive profile log.
 Optionally you can specify an alternate pageId.
                                                                                                                              
-=over
-                                                                                                                             
-=item pageId
+=head3 pageId
                                                                                                                              
 The pageId of the page you want to log.
-                                                                                                                             
-=back
                                                                                                                              
 =cut
 
@@ -104,13 +96,9 @@ sub addPage {
 Summarizes passive profile log data using the metadata attributes. An entry
 is logged in the passiveProfileAOI table.
 
-=over
-
-=item hashRef
+=head3 hashRef
 
 A hashRef with userId and wobjectId.
-
-=back
 
 =cut
 

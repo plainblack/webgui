@@ -58,19 +58,15 @@ These subroutines are available from this package:
 
 Returns a URL after adding some information to the end of it.
 
-=over
-
-=item url
+=head3 url
 
 The URL to append information to.
 
-=item pairs
+=head3 pairs
 
 Name value pairs to add to the URL in the form of:
 
  name1=value1&name2=value2&name3=value3
-
-=back
 
 =cut
 
@@ -91,15 +87,11 @@ sub append {
 
 Encodes a string to make it safe to pass in a URL.
 
-NOTE: See WebGUI::URL::unescape()
+B<NOTE:> See WebGUI::URL::unescape()
 
-=over
-
-=item string
+=head3 string
 
 The string to escape.
-
-=back
 
 =cut
 
@@ -114,19 +106,15 @@ sub escape {
 
 Generate a URL based on WebGUI's gateway script.
 
-=over
-
-=item pageURL
+=head3 pageURL
 
 The urlized title of a page that you wish to create a URL for.
 
-=item pairs
+=head3 pairs
 
 Name value pairs to add to the URL in the form of:
 
  name1=value1&name2=value2&name3=value3
-
-=back
 
 =cut
 
@@ -147,18 +135,14 @@ sub gateway {
                                                                                                                              
 Returns an absolute url.
                                                                                                                              
-=over
-                                                                                                                             
-=item url
+=head3 url
                                                                                                                              
 The url to make absolute.
                                                                                                                             
-=item baseURL
+=head3 baseURL
 
 The base URL to use. This defaults to current page url.
  
-=back
-                                                                                                                             
 =cut
                                                                                                                              
 sub makeAbsolute {
@@ -223,13 +207,9 @@ sub getSiteURL {
 
 Returns a string that has made into a WebGUI compliant URL.
 
-=over
-
-=item string
+=head3 string
 
 The string to make compliant. This is usually a page title or a filename.
-
-=back
 
 =cut 
 
@@ -253,15 +233,11 @@ sub makeCompliant {
 
 Returns the URL of the current page.
 
-=over
-
-=item pairs
+=head3 pairs
 
 Name value pairs to add to the URL in the form of:
 
  name1=value1&name2=value2&name3=value3
-
-=back
 
 =cut
 
@@ -282,15 +258,11 @@ sub page {
 
 Decodes a string that was URL encoded.
 
-NOTE: See WebGUI::URL::escape()
+B<NOTE:> See WebGUI::URL::escape()
 
-=over
-
-=item string
+=head3 string
 
 The string to unescape.
-
-=back
 
 =cut
 
@@ -304,13 +276,9 @@ sub unescape {
 
 Returns a url that is safe for WebGUI pages.
 
-=over
-
-=item string
+=head3 string
 
  The string to urlize.
-
-=back
 
 =cut
 

@@ -53,15 +53,11 @@ These methods are available from this package:
 
 Returns an HTML segment that has been stripped of the <BODY> tag and anything before it, as well as the </BODY> tag and anything after it. It's main purpose is to get rid of META tags and other garbage from an HTML page that will be used as a segment inside of another page.
 
-NOTE: This filter does have one exception, it leaves anything before the <BODY> tag that is enclosed in <STYLE></STYLE> or <SCRIPT></SCRIPT> tags.
+B<NOTE:> This filter does have one exception, it leaves anything before the <BODY> tag that is enclosed in <STYLE></STYLE> or <SCRIPT></SCRIPT> tags.
 
-=over
-
-=item html
+=head3 html
 
 The HTML segment you want cleaned.
-
-=back
 
 =cut
 
@@ -95,17 +91,13 @@ sub cleanSegment {
 
 Returns HTML with unwanted tags filtered out.
 
-=over
-
-=item html
+=head3 html
 
 The HTML content you want filtered.
 
-=item filter
+=head3 filter
 
 Choose from "all", "none", "macros", "javascript", or "most". Defaults to "most". "all" removes all HTML tags and macros; "none" removes no HTML tags; "javascript" removes all references to javacript and macros; "macros" removes all macros, but nothing else; and "most" removes all but simple formatting tags like bold and italics.
-
-=back
 
 =cut
 
@@ -151,17 +143,13 @@ sub filter {
 
 Formats various text types into HTML.
 
-=over
-
-=item content
+=head3 content
 
 The text content to be formatted.
 
-=item contentType
+=head3 contentType
 
 The content type to use as formatting. Valid types are 'html', 'text', 'code', and 'mixed'. Defaults to mixed. See also the contentType method in WebGUI::Form, WebGUI::HTMLForm, and WebGUI::FormProcessor.
-
-=back
 
 =cut
 
@@ -194,13 +182,9 @@ sub format {
 Converts html to text. It currently handles only text, so tables
 or forms are not converted.
 
-=over
-
-=item html
+=head3 html
 
 The html segment you want to convert to text.
-
-=back
 
 =cut
 
@@ -240,18 +224,14 @@ sub html2text {
                                                                                                                              
 Returns html with all relative links converted to absolute.
                                                                                                                              
-=over
-                                                                                                                             
-=item html
+=head3 html
                                                                                                                              
 The html to be made absolute.
                                        
-=item baseURL
+=head3 baseURL
 
 The base URL to use. Defaults to current page's url.                                                                                      
 
-=back
-                                                                                                                             
 =cut
                                                                                                                              
 sub makeAbsolute {
@@ -322,13 +302,9 @@ sub makeAbsolute {
 
 Processes text using the WebGUI replacements system.
 
-=over
-
-=item content
+=head3 content
 
 The content to be processed through the replacements filter.
-
-=back
 
 =cut
 

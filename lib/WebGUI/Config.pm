@@ -50,17 +50,13 @@ These subroutines are available from this package:
 
 Returns a hash reference containing the configuration data. It tries to get the data out of the memory cache first, but reads the config file directly if necessary.
 
-=over
-
-=item webguiRoot
+=head3 webguiRoot
 
 The path to the WebGUI installation.
 
-=item configFile
+=head3 configFile
 
 The filename of the config file to read.
-
-=back
 
 =cut
 
@@ -81,13 +77,9 @@ sub getConfig {
 
 Reads all the config file data for all defined sites into an in-memory cache.
 
-=over
-
-=item webguiRoot
+=head3 webguiRoot
 
 The path to the WebGUI installation.
-
-=back
 
 =cut
 
@@ -111,17 +103,13 @@ sub loadAllConfigs {
 
 Returns a hash reference containing the configuration data. It reads the config data directly from the file.
 
-=over
-
-=item webguiRoot
+=head3 webguiRoot
 
 The path to the WebGUI installation.
 
-=item configFile
+=head3 configFile
 
 The filename of the config file to read.
-
-=back
 
 =cut
 

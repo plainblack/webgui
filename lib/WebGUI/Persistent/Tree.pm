@@ -148,37 +148,29 @@ sub canUp     { $_[0]->left_sister  }
 This class method must be overridden to return a hash reference with one or
 more of the following keys.
 
-=over
-
-=item useDummyRoot
+=head3 useDummyRoot
 
 This should be set to true for classes that don't store their root node in
 the database.
 
-=item properties
+=head3 properties
 
 This should be a hash reference keyed by the field names of the table that 
 this class refers to (and should be able to be manipulated with this classes
 get() and set() methods). The values of the hash reference should be hash
 references containing settings for each field.
 
-=over
-
-=item * defaultValue 
+=head3 * defaultValue 
 
 The default value for this field (optional).
 
-=item * key
+=head3 * key
 
 Should be true for the primary key column (one field must be set in this way).
 
-=item * quote
+=head3 * quote
 
 Should be true for fields that need to be quoted in database queries.
-
-=back
-
-=back
 
 =cut
 

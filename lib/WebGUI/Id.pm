@@ -31,7 +31,7 @@ Package WebGUI::Id
 
 This package generates global unique ids, sometimes called GUIDs. A global unique ID is guaranteed to be unique everywhere and at everytime.
 
-NOTE: There is no such thing as perfectly unique ID's, but the chances of a duplicate ID are so minute that they are effectively unique.
+B<NOTE:> There is no such thing as perfectly unique ID's, but the chances of a duplicate ID are so minute that they are effectively unique.
 
 =head1 SYNOPSIS
 

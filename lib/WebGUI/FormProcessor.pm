@@ -77,13 +77,9 @@ sub _checkEmailAddy {
 
 Returns an array or a carriage return ("\n") separated scalar depending upon whether you're returning the values into an array or a scalar.
 
-=over 
-
-=item name
+=head3 name
 
 The name of the form variable to retrieve.
-
-=back
 
 =cut
 
@@ -98,13 +94,9 @@ sub checkbox {
 
 Returns an array or a carriage return ("\n") separated scalar depending upon whether you're returning the values into an array or a scalar.
 
-=over 
-
-=item name
+=head3 name
 
 The name of the form variable to retrieve.
-
-=back
 
 =cut
 
@@ -119,13 +111,9 @@ sub checkList {
 
 Returns either an array of values or a scalar value depending upon what you request.
 
-=over 
-
-=item name
+=head3 name
 
 The name of the form variable to retrieve.
-
-=back
 
 =cut
 
@@ -143,13 +131,9 @@ sub combo {
 
 Returns a content type. Defaults to "mixed".
 
-=over 
-
-=item name
+=head3 name
 
 The name of the form variable to retrieve.
-
-=back
 
 =cut
 
@@ -163,13 +147,9 @@ sub contentType {
 
 Returns an epoch datestamp.
 
-=over 
-
-=item name
+=head3 name
 
 The name of the form variable to retrieve.
-
-=back
 
 =cut
 
@@ -184,13 +164,9 @@ sub date {
 
 Returns an epoch datestamp.
 
-=over 
-
-=item name
+=head3 name
 
 The name of the form variable to retrieve.
-
-=back
 
 =cut
 
@@ -204,13 +180,9 @@ sub dateTime {
 
 Returns an email address.
 
-=over 
-
-=item name
+=head3 name
 
 The name of the form variable to retrieve.
-
-=back
 
 =cut
 
@@ -228,13 +200,9 @@ sub email {
 
 Returns a field type. Defaults to "text".
 
-=over 
-
-=item name
+=head3 name
 
 The name of the form variable to retrieve.
-
-=back
 
 =cut
 
@@ -249,13 +217,9 @@ sub fieldType {
 
 Returns a scalar filter type. Defaults to "most".
 
-=over 
-
-=item name
+=head3 name
 
 The name of the form variable to retrieve.
-
-=back
 
 =cut
 
@@ -270,13 +234,9 @@ sub filter {
 
 Returns a floating point (decimal) number. Defaults to "0.0".
 
-=over 
-
-=item name
+=head3 name
 
 The name of the form variable to retrieve.
-
-=back
 
 =cut
 
@@ -294,13 +254,9 @@ sub float {
 
 Returns a group Id. Defaults to 2 (registered users).
 
-=over 
-
-=item name
+=head3 name
 
 The name of the form variable to retrieve.
-
-=back
 
 =cut
 
@@ -318,13 +274,9 @@ sub group {
 
 Returns a string.
 
-=over 
-
-=item name
+=head3 name
 
 The name of the form variable to retrieve.
-
-=back
 
 =cut
 
@@ -339,13 +291,9 @@ sub hidden {
 
 Returns an array or a carriage return ("\n") separated scalar depending upon whether you're returning the values into an array or a scalar.
 
-=over 
-
-=item name
+=head3 name
 
 The name of the form variable to retrieve.
-
-=back
 
 =cut
 
@@ -360,13 +308,9 @@ sub hiddenList {
 
 Returns a string of HTML that has been cleaned of header information.
 
-=over 
-
-=item name
+=head3 name
 
 The name of the form variable to retrieve.
-
-=back
 
 =cut
 
@@ -381,13 +325,9 @@ sub HTMLArea {
 
 Returns an integer. Defaults to "0".
 
-=over 
-
-=item name
+=head3 name
 
 The name of the form variable to retrieve.
-
-=back
 
 =cut
 
@@ -405,13 +345,9 @@ sub integer {
 
 Returns an interval in seconds. Defaults to "0".
 
-=over 
-
-=item name
+=head3 name
 
 The name of the form variable to retrieve.
-
-=back
 
 =cut
 
@@ -426,13 +362,9 @@ sub interval {
 
 Returns a string.
 
-=over 
-
-=item name
+=head3 name
 
 The name of the form variable to retrieve.
-
-=back
 
 =cut
 
@@ -447,13 +379,9 @@ sub password {
 
 Returns a string filtered to allow only digits, spaces, and these special characters: + - ( )
 
-=over 
-
-=item name
+=head3 name
 
 The name of the form variable to retrieve.
-
-=back
 
 =cut
 
@@ -471,21 +399,17 @@ sub phone {
 
 Returns whatever would be the expected result of the method type that was specified. This method also checks to make sure that the field is not returning a string filled with nothing but whitespace.
 
-=over 
-
-=item name
+=head3 name
 
 The name of the form variable to retrieve.
 
-=item type
+=head3 type
 
 The type of form element this variable came from. Defaults to "text" if not specified.
 
-=item default
+=head3 default
 
 The default value for this variable. If the variable is undefined then the default value will be returned instead.
-
-=back
 
 =cut
 
@@ -510,13 +434,9 @@ sub process {
 
 Returns a string.
 
-=over 
-
-=item name
+=head3 name
 
 The name of the form variable to retrieve.
-
-=back
 
 =cut
 
@@ -531,13 +451,9 @@ sub radio {
 
 Returns a string.
 
-=over 
-
-=item name
+=head3 name
 
 The name of the form variable to retrieve.
-
-=back
 
 =cut
 
@@ -552,13 +468,9 @@ sub radioList {
 
 Returns an array or a carriage return ("\n") separated scalar depending upon whether you're returning the values into an array or a scalar.
 
-=over 
-
-=item name
+=head3 name
 
 The name of the form variable to retrieve.
-
-=back
 
 =cut
 
@@ -574,13 +486,9 @@ sub selectList {
 
 Returns a template id. Defaults to "1".
 
-=over 
-
-=item name
+=head3 name
 
 The name of the form variable to retrieve.
-
-=back
 
 =cut
 
@@ -598,13 +506,9 @@ sub template {
 
 Returns a string of text.
 
-=over 
-
-=item name
+=head3 name
 
 The name of the form variable to retrieve.
-
-=back
 
 =cut
 
@@ -619,13 +523,9 @@ sub text {
 
 Returns a string of text.
 
-=over 
-
-=item name
+=head3 name
 
 The name of the form variable to retrieve.
-
-=back
 
 =cut
 
@@ -641,13 +541,9 @@ sub textarea {
 Returns the number of seconds since 00:00:00 on a 24 hour clock. Note, this will adjust for the user's time offset in the reverse manner that the form field
 adjusts for it in order to make the times come out appropriately.
 
-=over 
-
-=item name
+=head3 name
 
 The name of the form variable to retrieve.
-
-=back
 
 =cut
 
@@ -662,13 +558,9 @@ sub timeField {
 
 Returns a URL.
 
-=over 
-
-=item name
+=head3 name
 
 The name of the form variable to retrieve.
-
-=back
 
 =cut
 
@@ -690,13 +582,9 @@ sub url {
 
 Returns either a 1 or 0 representing yes and no. Defaults to "0".
 
-=over 
-
-=item name
+=head3 name
 
 The name of the form variable to retrieve.
-
-=back
 
 =cut
 
@@ -714,13 +602,9 @@ sub yesNo {
 
 Returns a string which allows uppercase alpha characters, digits, spaces, and hypens (dashes).
 
-=over 
-
-=item name
+=head3 name
 
 The name of the form variable to retrieve.
-
-=back
 
 =cut
 

@@ -81,27 +81,19 @@ sub buildQuery {
 
 =head2 new( %p )
 
-=over
-
-=item data
+=head3 data
 
 A hash reference of field name to value.
 
-=item properties
+=head3 properties
 
-=over
-
-=item * quote
+=head3 * quote
 
 If true values for this field are automatically quoted.
 
-=back
-
-=item table
+=head3 table
 
 The name of the table to query.
-
-=back
 
 =cut
 

@@ -122,25 +122,21 @@ sub canView {
 
 =head2 confirm ( message, yesURL, [ , noURL, vitalComparison ] )
 
-=over
-
-=item message
+=head3 message
 
 A string containing the message to prompt the user for this action.
 
-=item yesURL
+=head3 yesURL
 
 A URL to the web method to execute if the user confirms the action.
 
-=item noURL
+=head3 noURL
 
 A URL to the web method to execute if the user denies the action.  Defaults back to the current page.
 
-=item vitalComparison
+=head3 vitalComparison
 
 A comparison expression to be used when checking whether the action should be allowed to continue. Typically this is used when the action is a delete of some sort.
-
-=back
 
 =cut
 
@@ -161,21 +157,17 @@ sub confirm {
 
 Deletes a row of collateral data.
 
-=over
-
-=item tableName
+=head3 tableName
 
 The name of the table you wish to delete the data from.
 
-=item keyName
+=head3 keyName
 
 The name of the column that is the primary key in the table.
 
-=item keyValue
+=head3 keyValue
 
 An integer containing the key value.
-
-=back
 
 =cut
 
@@ -221,15 +213,11 @@ sub displayTitle {
 
 Duplicates this wobject with a new wobject Id. Returns the new wobject Id.
 
-NOTE: This method is meant to be extended by all sub-classes.
+B<NOTE:> This method is meant to be extended by all sub-classes.
 
-=over
-
-=item pageId 
+=head3 pageId 
 
 If specified the wobject will be duplicated to this pageId, otherwise it will be duplicated to the clipboard.
-
-=back
 
 =cut
 
@@ -266,19 +254,15 @@ sub duplicate {
 
 Returns a file property form row which can be used in any Wobject properties page. 
 
-NOTE: This method is meant for use with www_deleteFile.
+B<NOTE:> This method is meant for use with www_deleteFile.
 
-=over
-
-=item name
+=head3 name
 
 The name of the property that stores the filename.
 
-=item labelId
+=head3 labelId
 
 The internationalId of the form label for this file.
-
-=back
 
 =cut
 
@@ -304,13 +288,9 @@ sub fileProperty {
 
 Returns a hash reference containing all of the properties of this wobject instance.
 
-=over
-
-=item propertyName
+=head3 propertyName
 
 If an individual propertyName is specified, then only that property value is returned as a scalar.
-
-=back
 
 =cut
 
@@ -329,21 +309,17 @@ sub get {
 
 Returns a hash reference containing a row of collateral data.
 
-=over
-
-=item tableName
+=head3 tableName
 
 The name of the table you wish to retrieve the data from.
 
-=item keyName
+=head3 keyName
 
 The name of the column that is the primary key in the table.
 
-=item keyValue
+=head3 keyValue
 
 An integer containing the key value. If key value is equal to "new" or null, then an empty hashRef containing only keyName=>"new" will be returned to avoid strict errors.
-
-=back
 
 =cut
 
@@ -363,13 +339,9 @@ sub getCollateral {
 
 Returns the default value for a wobject property.
 
-=over
-
-=item propertyName
+=head3 propertyName
 
 The name of the property to retrieve the default value for.
-
-=back
 
 =cut
 
@@ -402,13 +374,9 @@ sub getIndexerParams {
 
 Returns a value for a wobject property however possible. It first looks in form variables for the property, then looks to the value stored in the wobject instance, and if all else fails it returns the default value for the property.
 
-=over
-
-=item propertyName
+=head3 propertyName
 
 The name of the property to retrieve the value for.
-
-=back
 
 =cut
 
@@ -431,17 +399,13 @@ sub getValue {
 
 Returns an internationalized message.
 
-=over
-
-=item id
+=head3 id
 
 The identifier for the internationalized message.
 
-=item namespace
+=head3 namespace
 
 The namespace for the internationalized message. Defaults to the namespace of the wobject.
-
-=back
 
 =cut
 
@@ -487,29 +451,25 @@ sub logView {
 
 Moves a collateral data item down one position. This assumes that the collateral data table has a column called "wobjectId" that identifies the wobject, and a column called "sequenceNumber" that determines the position of the data item.
 
-=over
-
-=item tableName
+=head3 tableName
 
 A string indicating the table that contains the collateral data.
 
-=item idName
+=head3 idName
 
 A string indicating the name of the column that uniquely identifies this collateral data item.
 
-=item id
+=head3 id
 
 An integer that uniquely identifies this collateral data item.
 
-=item setName
+=head3 setName
 
 By default this method assumes that the collateral will have a wobject id in the table. However, since there is not always a wobject id to separate one data set from another, you may specify another field to do that.
 
-=item setValue
+=head3 setValue
 
 The value of the column defined by "setName" to select a data set from.
-
-=back
 
 =cut
 
@@ -537,29 +497,25 @@ sub moveCollateralDown {
 
 Moves a collateral data item up one position. This assumes that the collateral data table has a column called "wobjectId" that identifies the wobject, and a column called "sequenceNumber" that determines the position of the data item.
 
-=over
-
-=item tableName
+=head3 tableName
 
 A string indicating the table that contains the collateral data.
 
-=item idName
+=head3 idName
 
 A string indicating the name of the column that uniquely identifies this collateral data item.
 
-=item id
+=head3 id
 
 An integer that uniquely identifies this collateral data item.
 
-=item setName
+=head3 setName
 
 By default this method assumes that the collateral will have a wobject id in the table. However, since there is not always a wobject id to separate one data set from another, you may specify another field to do that.
 
-=item setValue
+=head3 setValue
 
 The value of the column defined by "setName" to select a data set from.
-
-=back
 
 =cut
 
@@ -629,17 +585,15 @@ sub namespace {
 
 Constructor.
 
-NOTE: This method should never need to be overridden or extended.
+B<NOTE:> This method should never need to be overridden or extended.
 
-=over
-
-=item -properties
+=head3 -properties
 
 A hash reference containing at minimum "wobjectId" and "namespace". wobjectId may be set to "new" if you're creating a new instance. This hash reference should be the one created by WebGUI.pm and passed to the wobject subclass.
 
-NOTE: It may seem a little weird that the initial data for the wobject instance is coming from WebGUI.pm, but this was done to lessen database traffic thus increasing the speed of all wobjects.
+B<NOTE:> It may seem a little weird that the initial data for the wobject instance is coming from WebGUI.pm, but this was done to lessen database traffic thus increasing the speed of all wobjects.
 
-=item -extendedProperties
+=head3 -extendedProperties
 
 A hash reference containing the properties that extend the wobject class. They should match the properties that are added to this wobject's namespace table in the database. So if this wobject has a namespace of "MyWobject" and a table definition that looks like this:
 
@@ -677,25 +631,23 @@ Then the extended property list would be:
 			}
  	}
 
-NOTE: This is used to define the wobject and should only be passed in by a wobject subclass.
+B<NOTE:> This is used to define the wobject and should only be passed in by a wobject subclass.
 
-=item -useDiscussion
+=head3 -useDiscussion
 
 Defaults to "0". If set to "1" this will add a discussion properties tab to this wobject to enable content managers to set the properties of a discussion attached to this wobject.
 
-NOTE: This is used to define the wobject and should only be passed in by a wobject subclass.
+B<NOTE:> This is used to define the wobject and should only be passed in by a wobject subclass.
 
-=item -useTemplate
+=head3 -useTemplate
 
 Defaults to "0". If set to "1" this will add a template field to the wobject to enable content managers to select a template to layout this wobject.
 
-=item -useMetaData
+=head3 -useMetaData
                                                                                                                              
 Defaults to "0". If set to "1" this will add a Metadata properties tab to this wobject to enable content managers to set Metadata values.
 
-NOTE: This is used to define the wobject and should only be passed in by a wobject subclass.
-
-=back
+B<NOTE:> This is used to define the wobject and should only be passed in by a wobject subclass.
 
 =cut
 
@@ -816,13 +768,9 @@ sub new {
  Decides whether or not macros should be processed and returns the
  appropriate output.
 
-=over
-
-=item output
+=head3 output
 
  An HTML blob to be processed for macros.
-
-=back
 
 =cut
 
@@ -836,23 +784,19 @@ sub processMacros {
 
 Returns the content generated from this template.
 
-NOTE: Only for use in wobjects that support templates.
+B<NOTE:> Only for use in wobjects that support templates.
 
-=over
-
-=item templateId
+=head3 templateId
 
 An id referring to a particular template in the templates table.
 
-=item hashRef
+=head3 hashRef
 
 A hash reference containing variables and loops to pass to the template engine.
 
-=item namespace
+=head3 namespace
 
 A namespace to use for the template. Defaults to the wobject's namespace.
-
-=back
 
 =cut
 
@@ -885,7 +829,7 @@ sub processTemplate {
 
 Removes this wobject from the database and all it's attachments from the filesystem.
 
-NOTE: This method is meant to be extended by all sub-classes.
+B<NOTE:> This method is meant to be extended by all sub-classes.
 
 =cut
 
@@ -911,25 +855,21 @@ sub purge {
 
 Resequences collateral data. Typically useful after deleting a collateral item to remove the gap created by the deletion.
 
-=over
-
-=item tableName
+=head3 tableName
 
 The name of the table to resequence.
 
-=item keyName
+=head3 keyName
 
 The key column name used to determine which data needs sorting within the table.
 
-=item setName
+=head3 setName
 
 Defaults to "wobjectId". This is used to define which data set to reorder.
 
-=item setValue
+=head3 setValue
 
 Used to define which data set to reorder. Defaults to the wobjectId for this instance. Defaults to the value of "setName" in the wobject properties.
-
-=back
 
 =cut
 
@@ -954,13 +894,9 @@ sub reorderCollateral {
 
 Stores the values specified in hashRef to the database.
 
-=over
-
-=item hashRef 
+=head3 hashRef 
 
 A hash reference of the properties to set for this wobject instance. 
-
-=back
 
 =cut
 
@@ -1039,37 +975,33 @@ sub set {
 
 Performs and insert/update of collateral data for any wobject's collateral data. Returns the primary key value for that row of data.
 
-=over
-
-=item tableName
+=head3 tableName
 
 The name of the table to insert the data.
 
-=item keyName
+=head3 keyName
 
 The column name of the primary key in the table specified above.  This must also be an incrementerId in the incrementer table.
 
-=item properties
+=head3 properties
 
 A hash reference containing the name/value pairs to be inserted into the database where the name is the column name. Note that the primary key should be specified in this list, and if it's value is "new" or null a new row will be created.
 
-=item useSequenceNumber
+=head3 useSequenceNumber
 
 If set to "1", a new sequenceNumber will be generated and inserted into the row. Note that this means you must have a sequenceNumber column in the table. Also note that this requires the presence of the wobjectId column. Defaults to "1".
 
-=item useWobjectId
+=head3 useWobjectId
 
 If set to "1", the current wobjectId will be inserted into the table upon creation of a new row. Note that this means the table better have a wobjectId column. Defaults to "1".  
 
-=item setName
+=head3 setName
 
 If this collateral data set is not grouped by wobjectId, but by another column then specify that column here. The useSequenceNumber parameter will then use this column name instead of wobjectId to generate the sequenceNumber.
 
-=item setValue
+=head3 setValue
 
 If you've specified a setName you may also set a value for that set.  Defaults to the value for this id from the wobject properties.
-
-=back
 
 =cut
 
@@ -1156,7 +1088,7 @@ sub wid {
 
 Copies this instance to the clipboard.
 
-NOTE: Should never need to be overridden or extended.
+B<NOTE:> Should never need to be overridden or extended.
 
 =cut
 
@@ -1173,7 +1105,7 @@ sub www_copy {
 
 Creates a shortcut (using the wobject proxy) of this wobject on the clipboard.
 
-NOTE: Should never need to be overridden or extended.
+B<NOTE:> Should never need to be overridden or extended.
 
 =cut
 
@@ -1306,25 +1238,21 @@ sub www_deleteFileConfirm {
 
 Displays the common properties of any/all wobjects. 
 
-=over
-
-=item -properties, -layout, -privileges 
+=head3 -properties, -layout, -privileges 
 
 WebGUI::HTMLForm objects that extend these tabs.
 
-=item -helpId
+=head3 -helpId
 
 An id in this namespace in the WebGUI help system for this edit page. If specified a help link will be created on the edit page.
 
-=item -heading
+=head3 -heading
 
 A text string to put in the heading of this page.
 
-=item -headingId
+=head3 -headingId
 
 An id this namespace of the WebGUI international system. This message will be retrieved and displayed in the heading of this edit page.
-
-=back
 
 =cut
 
@@ -1521,15 +1449,11 @@ sub www_edit {
 
 Saves the default properties of any/all wobjects.
 
-NOTE: This method should only need to be extended if you need to do some special validation.
+B<NOTE:> This method should only need to be extended if you need to do some special validation.
 
-=over
-
-=item hashRef
+=head3 hashRef
 
 A hash reference of extra properties to set.
-
-=back
 
 =cut
 

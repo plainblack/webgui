@@ -123,13 +123,9 @@ These functions are available from this package:
 
 Cuts a subject string off at 30 characters.
 
-=over
-
-=item subject
+=head3 subject
 
 The string to format.
-
-=back
 
 =cut
 
@@ -143,17 +139,13 @@ sub chopSubject {
 
 Formats the URL to approve a post.
 
-=over
-
-=item callback
+=head3 callback
 
 The url to get back to the calling object.
 
-=item postId
+=head3 postId
 
 The unique id for the post.
-
-=back
 
 =cut
 
@@ -167,17 +159,13 @@ sub formatApprovePostURL {
 
 Formats the url to delete a post.
 
-=over
-
-=item callback
+=head3 callback
 
 The url to get back tot he calling object.
 
-=item postId
+=head3 postId
 
 The unique id for the post.
-
-=back
 
 =cut
 
@@ -191,17 +179,13 @@ sub formatDeletePostURL {
 
 Formats the url to deny a post.
 
-=over
-
-=item callback
+=head3 callback
 
 The url to get back tot he calling object.
 
-=item postId
+=head3 postId
 
 The unique id for the post.
-
-=back
 
 =cut
 
@@ -215,17 +199,13 @@ sub formatDenyPostURL {
 
 Formats the url to edit a post.
 
-=over
-
-=item callback
+=head3 callback
 
 The url to get back tot he calling object.
 
-=item postId
+=head3 postId
 
 The unique id for the post.
-
-=back
 
 =cut
 
@@ -239,17 +219,13 @@ sub formatEditPostURL {
 
 Formats the url to the forum search engine.
 
-=over
-
-=item callback
+=head3 callback
 
 The url to get back tot he calling object.
 
-=item forumId
+=head3 forumId
 
 The unique id for the forum.
-
-=back
 
 =cut
 
@@ -263,21 +239,17 @@ sub formatForumSearchURL {
 
 Formats the url to change the default sort.
 
-=over
-
-=item callback
+=head3 callback
 
 The url to get back tot he calling object.
 
-=item forumId
+=head3 forumId
 
 The unique id for the forum.
 
-=item sortBy 
+=head3 sortBy 
 
 The sort by string. Can be views, rating, date replies, or lastreply.
-
-=back
 
 =cut
 
@@ -291,17 +263,13 @@ sub formatForumSortByURL {
 
 Formats the url to subscribe to the forum.
 
-=over
-
-=item callback
+=head3 callback
 
 The url to get back tot he calling object.
 
-=item forumId
+=head3 forumId
 
 The unique id for the forum.
-
-=back
 
 =cut
 
@@ -315,17 +283,13 @@ sub formatForumSubscribeURL {
 
 Formats the url to unsubscribe from the forum.
 
-=over
-
-=item callback
+=head3 callback
 
 The url to get back tot he calling object.
 
-=item forumId
+=head3 forumId
 
 The unique id for the forum.
-
-=back
 
 =cut
 
@@ -339,17 +303,13 @@ sub formatForumUnsubscribeURL {
 
 Formats the url to view the forum.
 
-=over
-
-=item callback
+=head3 callback
 
 The url to get back tot he calling object.
 
-=item forumId
+=head3 forumId
 
 The unique id for the forum.
-
-=back
 
 =cut
 
@@ -364,17 +324,13 @@ sub formatForumURL {
 
 Formats a post message for display.
 
-=over
-
-=item post
+=head3 post
 
 The post object for this message.
 
-=item forum
+=head3 forum
 
 The forum object for this message. Defaults to post->getThread->getForum.
-
-=back
 
 =cut
 
@@ -395,17 +351,13 @@ sub formatMessage {
 
 Formats the url to view the next thread. 
 
-=over
-
-=item callback
+=head3 callback
 
 The url to get back tot he calling object.
 
-=item postId
+=head3 postId
 
 The unique id for the post.
-
-=back
 
 =cut
 
@@ -419,17 +371,13 @@ sub formatNextThreadURL {
 
 Formats the url to start a new thread. 
 
-=over
-
-=item callback
+=head3 callback
 
 The url to get back tot he calling object.
 
-=item forumId
+=head3 forumId
 
 The unique id for the forum.
-
-=back
 
 =cut
 
@@ -443,13 +391,9 @@ sub formatNewThreadURL {
 
 Formats the date as human readable according to the user's profile. 
 
-=over
-
-=item epoch
+=head3 epoch
 
 The date represented as the number of seconds since January 1, 1970.
-
-=back
 
 =cut
 
@@ -463,13 +407,9 @@ sub formatPostDate {
 
 Formats the time as human readable according to the user's profile. 
 
-=over
-
-=item epoch
+=head3 epoch
 
 The date represented as the number of seconds since January 1, 1970.
-
-=back
 
 =cut
 
@@ -483,17 +423,13 @@ sub formatPostTime {
 
 Formats the url to view the previous thread. 
 
-=over
-
-=item callback
+=head3 callback
 
 The url to get back tot he calling object.
 
-=item postId
+=head3 postId
 
 The unique id for the post.
-
-=back
 
 =cut
 
@@ -507,21 +443,17 @@ sub formatPreviousThreadURL {
 
 Formats the url to rate a post. 
 
-=over
-
-=item callback
+=head3 callback
 
 The url to get back tot he calling object.
 
-=item postId
+=head3 postId
 
 The unique id for the post.
 
-=item rating
+=head3 rating
 
 An integer between 1 and 5 (5 = best).
-
-=back
 
 =cut
 
@@ -535,25 +467,21 @@ sub formatRatePostURL {
 
 Formats the url to reply to a post.
 
-=over
-
-=item callback
+=head3 callback
 
 The url to get back tot he calling object.
 
-=item postId
+=head3 postId
 
 The unique id for the post.
 
-=item forumId
+=head3 forumId
 
 The unique id for the forum.
 
-=item withQuote 
+=head3 withQuote 
 
 If specified the reply with automatically quote the parent post.
-
-=back
 
 =cut
 
@@ -569,13 +497,9 @@ sub formatReplyPostURL {
 
 Returns an internationalized string for the status based upon the key.
 
-=over
-
-=item status
+=head3 status
 
 A string key. Can be approved, archived, deleted, denied, or pending.
-
-=back
 
 =cut
 
@@ -598,21 +522,17 @@ sub formatStatus {
 
 Formats the url to change the layout of a thread.
 
-=over
-
-=item callback
+=head3 callback
 
 The url to get back tot he calling object.
 
-=item postId
+=head3 postId
 
 The unique id for the post.
 
-=item layout
+=head3 layout
 
 A string indicating the type of layout to use. Can be flat, nested, or threaded.
-
-=back
 
 =cut
 
@@ -626,17 +546,13 @@ sub formatThreadLayoutURL {
 
 Formats the url to lock a thread.
 
-=over
-
-=item callback
+=head3 callback
 
 The url to get back tot he calling object.
 
-=item postId
+=head3 postId
 
 The unique id for the post.
-
-=back
 
 =cut
 
@@ -650,17 +566,13 @@ sub formatThreadLockURL {
 
 Formats the url to make a thread sticky.
 
-=over
-
-=item callback
+=head3 callback
 
 The url to get back tot he calling object.
 
-=item postId
+=head3 postId
 
 The unique id for the post.
-
-=back
 
 =cut
 
@@ -674,17 +586,13 @@ sub formatThreadStickURL {
 
 Formats the url to subscribe to a thread. 
 
-=over
-
-=item callback
+=head3 callback
 
 The url to get back tot he calling object.
 
-=item postId
+=head3 postId
 
 The unique id for the post.
-
-=back
 
 =cut
 
@@ -698,17 +606,13 @@ sub formatThreadSubscribeURL {
 
 Formats the url to unlock a thread.
 
-=over
-
-=item callback
+=head3 callback
 
 The url to get back tot he calling object.
 
-=item postId
+=head3 postId
 
 The unique id for the post.
-
-=back
 
 =cut
 
@@ -722,17 +626,13 @@ sub formatThreadUnlockURL {
 
 Formats the url to make a sticky thread no longer sticky. 
 
-=over
-
-=item callback
+=head3 callback
 
 The url to get back tot he calling object.
 
-=item postId
+=head3 postId
 
 The unique id for the post.
-
-=back
 
 =cut
 
@@ -746,17 +646,13 @@ sub formatThreadUnstickURL {
 
 Formats the url to unsubscribe from a thread.
 
-=over
-
-=item callback
+=head3 callback
 
 The url to get back tot he calling object.
 
-=item postId
+=head3 postId
 
 The unique id for the post.
-
-=back
 
 =cut
 
@@ -770,17 +666,13 @@ sub formatThreadUnsubscribeURL {
 
 Formats the url to view a thread.
 
-=over
-
-=item callback
+=head3 callback
 
 The url to get back tot he calling object.
 
-=item postId
+=head3 postId
 
 The unique id for the post.
-
-=back
 
 =cut
 
@@ -794,13 +686,9 @@ sub formatThreadURL {
 
 Formats the url to view a users profile.
 
-=over
-
-=item userId
+=head3 userId
 
 The unique id for the user.
-
-=back
 
 =cut
 
@@ -814,13 +702,9 @@ sub formatUserProfileURL {
 
 Returns a forum containing the editable properties of a forum.
 
-=over
-
-=item forumId
+=head3 forumId
 
 The unique id of the forum.
-
-=back
 
 =cut
 
@@ -1029,9 +913,7 @@ sub forumPropertiesSave {
 
 Returns the output of the various www_ subroutines.
 
-=over
-
-=item caller
+=head3 caller
 
 A hash reference containing information passed from the calling object. The following are hash keys that should be passed:
 
@@ -1042,8 +924,6 @@ title: The title of the parent object for display in the forum templates.
 description: The description of the parent object for display in the fourm templates.
 
 forumId: The ID of the forum that is attached to the calling object.
-
-=back
 
 =cut
 
@@ -1078,17 +958,13 @@ sub forumOp {
 
 Returns a hash reference compatible with WebGUI's templating system.
 
-=over
-
-=item caller
+=head3 caller
 
 A hash reference containing information passed from the calling object.
 
-=item forum
+=head3 forum
 
 The unique id for the forum.
-
-=back
 
 =cut
 
@@ -1211,29 +1087,25 @@ sub getForumTemplateVars {
 
 Returns a hash reference compatible with WebGUI's templating system containing the template variables for a post.
 
-=over
-
-=item post
+=head3 post
 
 A post object.
 
-=item thread
+=head3 thread
 
 A thread object.
 
-=item forum
+=head3 forum
 
 A forum object.
 
-=item caller
+=head3 caller
 
 A hash reference containing information passed from the calling object.
 
-=item var
+=head3 var
 
 A hash reference to be prepended to the hashref being returned.
-
-=back
 
 =cut
 
@@ -1297,17 +1169,13 @@ sub getPostTemplateVars {
 
 Returns a hash reference compatible with WebGUI's template system containing the template variables for the thread.
 
-=over
-
-=item caller
+=head3 caller
 
 A hash reference containing information passed from the calling object.
 
-=item post
+=head3 post
 
 A post object.
-
-=back
 
 =cut
 
@@ -1391,25 +1259,21 @@ sub getThreadTemplateVars {
 
 Send notifications to the thread and forum subscribers that a new post has been made.
 
-=over
-
-=item post
+=head3 post
 
 A post object.
 
-=item thread
+=head3 thread
 
 A thread object.
 
-=item forum
+=head3 forum
 
 A forum object.
 
-=item caller
+=head3 caller
 
 A hash reference containing information passed from the calling object.
-
-=back
 
 =cut
 
@@ -1450,33 +1314,29 @@ sub notifySubscribers {
 
 Returns an array reference with the template variables from all the posts in a thread.
 
-=over
-
-=item post
+=head3 post
 
 A post object.
 
-=item thread
+=head3 thread
 
 A thread object.
 
-=item forum
+=head3 forum
 
 A forum object.
 
-=item depth
+=head3 depth
 
 An integer representing the depth of the current recurrsion. Starts at 0.
 
-=item caller
+=head3 caller
 
 A hash reference containing information passed from the calling object.
 
-=item currentPost
+=head3 currentPost
 
 The unique id of the post that was selected by the user in this thread.
-
-=back
 
 =cut
 
@@ -1507,29 +1367,25 @@ sub recurseThread {
 Returns an array reference with the template variables from all the posts in a thread in flat mode. In flat mode
 messages are ordered by submission date, so threading is not maintained.
 
-=over
-
-=item post
+=head3 post
 
 A post object.
 
-=item thread
+=head3 thread
 
 A thread object.
 
-=item forum
+=head3 forum
 
 A forum object.
 
-=item caller
+=head3 caller
 
 A hash reference containing information passed from the calling object.
 
-=item currentPost
+=head3 currentPost
 
 The unique id of the post that was selected by the user in this thread.
-
-=back
 
 =cut
 
@@ -1552,17 +1408,13 @@ sub getFlatThread {
 
 Sets the post to approved and sends any necessary notifications.
 
-=over
-
-=item caller
+=head3 caller
 
 A hash reference containing information passed from the calling object.
 
-=item post
+=head3 post
 
 A post object.
-
-=back
 
 =cut
 
@@ -1581,17 +1433,13 @@ sub setPostApproved {
 
 Sets the post to deleted and sends any necessary notifications.
 
-=over
-
-=item caller
+=head3 caller
 
 A hash reference containing information passed from the calling object.
 
-=item post
+=head3 post
 
 A post object.
-
-=back
 
 =cut
 
@@ -1606,17 +1454,13 @@ sub setPostDeleted {
 
 Sets the post to denied and sends any necessary notifications.
 
-=over
-
-=item caller
+=head3 caller
 
 A hash reference containing information passed from the calling object.
 
-=item post
+=head3 post
 
 A post object.
-
-=back
 
 =cut
 
@@ -1632,17 +1476,13 @@ sub setPostDenied {
 
 Sets the post to pending and sends any necessary notifications.
 
-=over
-
-=item caller
+=head3 caller
 
 A hash reference containing information passed from the calling object.
 
-=item post
+=head3 post
 
 A post object.
-
-=back
 
 =cut
 
@@ -1659,17 +1499,13 @@ sub setPostPending {
 
 Sets a new post's status based upon forum settings.
 
-=over
-
-=item caller
+=head3 caller
 
 A hash reference containing information passed from the calling object.
 
-=item post
+=head3 post
 
 A post object.
-
-=back
 
 =cut
 
@@ -1688,13 +1524,9 @@ sub setPostStatus {
 
 The web method to approve a post.
 
-=over
-
-=item caller
+=head3 caller
 
 A hash reference containing information passed from the calling object.
-
-=back
 
 =cut
 
@@ -1712,13 +1544,9 @@ sub www_approvePost {
 
 The web method to prompt a user as to whether they actually want to delete a post.
 
-=over
-
-=item caller
+=head3 caller
 
 A hash reference containing information passed from the calling object.
-
-=back
 
 =cut
 
@@ -1740,13 +1568,9 @@ sub www_deletePost {
 
 The web method to delete a post.
 
-=over
-
-=item caller
+=head3 caller
 
 A hash reference containing information passed from the calling object.
-
-=back
 
 =cut
 
@@ -1764,13 +1588,9 @@ sub www_deletePostConfirm {
 
 The web method to deny a post.
 
-=over
-
-=item caller
+=head3 caller
 
 A hash reference containing information passed from the calling object.
-
-=back
 
 =cut
 
@@ -1788,13 +1608,9 @@ sub www_denyPost {
 
 The web method to subscribe to a forum.
 
-=over
-
-=item caller
+=head3 caller
 
 A hash reference containing information passed from the calling object.
-
-=back
 
 =cut
 
@@ -1812,13 +1628,9 @@ sub www_forumSubscribe {
 
 The web method to unsubscribe from a forum.
 
-=over
-
-=item caller
+=head3 caller
 
 A hash reference containing information passed from the calling object.
-
-=back
 
 =cut
 
@@ -1836,13 +1648,9 @@ sub www_forumUnsubscribe {
 
 The web method to display the next thread in the forum.
 
-=over
-
-=item caller
+=head3 caller
 
 A hash reference containing information passed from the calling object.
-
-=back
 
 =cut
 
@@ -1863,13 +1671,9 @@ sub www_nextThread {
 
 The web method to display the post form.
 
-=over
-
-=item caller
+=head3 caller
 
 A hash reference containing information passed from the calling object.
-
-=back
 
 =cut
 
@@ -1994,13 +1798,9 @@ sub www_post {
 
 The web method to generate a preview of a posting.
 
-=over
-
-=item caller
+=head3 caller
 
 A hash reference containing information passed from the calling object.
-
-=back
 
 =cut
 
@@ -2057,13 +1857,9 @@ sub www_postPreview {
 
 The web method to save the data from the post form.
 
-=over
-
-=item caller
+=head3 caller
 
 A hash reference containing information passed from the calling object.
-
-=back
 
 =cut
 
@@ -2138,13 +1934,9 @@ sub www_postSave {
 
 The web method to view the previous thread in this forum.
 
-=over
-
-=item caller
+=head3 caller
 
 A hash reference containing information passed from the calling object.
-
-=back
 
 =cut
 
@@ -2165,13 +1957,9 @@ sub www_previousThread {
 
 The web method to rate a post.
 
-=over
-
-=item caller
+=head3 caller
 
 A hash reference containing information passed from the calling object.
-
-=back
 
 =cut
 
@@ -2189,13 +1977,9 @@ sub www_ratePost {
 
 The web method to display and use the forum search interface.
 
-=over
-
-=item caller
+=head3 caller
 
 A hash reference containing information passed from the calling object.
-
-=back
 
 =cut
 
@@ -2296,13 +2080,9 @@ sub www_search {
 
 The web method to lock a thread.
 
-=over
-
-=item caller
+=head3 caller
 
 A hash reference containing information passed from the calling object.
-
-=back
 
 =cut
 
@@ -2320,13 +2100,9 @@ sub www_threadLock {
 
 The web method to make a thread sticky.
 
-=over
-
-=item caller
+=head3 caller
 
 A hash reference containing information passed from the calling object.
-
-=back
 
 =cut
 
@@ -2344,13 +2120,9 @@ sub www_threadStick {
 
 The web method to subscribe to a thread.
 
-=over
-
-=item caller
+=head3 caller
 
 A hash reference containing information passed from the calling object.
-
-=back
 
 =cut
 
@@ -2368,13 +2140,9 @@ sub www_threadSubscribe {
 
 The web method to unlock a thread.
 
-=over
-
-=item caller
+=head3 caller
 
 A hash reference containing information passed from the calling object.
-
-=back
 
 =cut
 
@@ -2392,13 +2160,9 @@ sub www_threadUnlock {
 
 The web method to make a sticky thread normal again. 
 
-=over
-
-=item caller
+=head3 caller
 
 A hash reference containing information passed from the calling object.
-
-=back
 
 =cut
 
@@ -2416,13 +2180,9 @@ sub www_threadUnstick {
 
 The web method to unsubscribe from a thread.
 
-=over
-
-=item caller
+=head3 caller
 
 A hash reference containing information passed from the calling object.
-
-=back
 
 =cut
 
@@ -2440,17 +2200,13 @@ sub www_threadUnsubscribe {
 
 The web method to display a forum. 
 
-=over
-
-=item caller
+=head3 caller
 
 The url to get back to the calling object.
 
-=item forumId 
+=head3 forumId 
 
 Specify a forumId and call this method directly, rather than over the web.
-
-=back
 
 =cut
 
@@ -2483,17 +2239,13 @@ sub www_viewForum {
 
 The web method to display a thread. 
 
-=over
-
-=item caller
+=head3 caller
 
 A hash reference containing information passed from the calling object.
 
-=item postId 
+=head3 postId 
 
 Specify a postId and call this method directly, rather than over the web.
-
-=back
 
 =cut
 

@@ -68,13 +68,9 @@ These methods are available from this class:
 
 Returns a boolean indicating whether the user can edit the current post.
 
-=over
-
-=item userId
+=head3 userId
 
 The unique identifier to check privileges against. Defaults to the current user.
-
-=back
 
 =cut
 
@@ -91,13 +87,9 @@ sub canEdit {
 
 Returns a boolean indicating whether the user can view the current post.
 
-=over
-
-=item userId
+=head3 userId
 
 The unique identifier to check privileges against. Defaults to the current user.
-
-=back
 
 =cut
 
@@ -123,13 +115,9 @@ sub canView {
 
 Creates a new post.
 
-=over 
-
-=item data
+=head3 data
 
 A hash reference containing the data to use to create the post. See the forumPost table for details.
-
-=back
 
 =cut
 
@@ -148,13 +136,9 @@ sub create {
 
 Returns a hash reference containing all of the parameters of this post.
 
-=over
-
-=item param
+=head3 param
 
 The name of a parameter to get. If specified then the method will return only the value for this parameter as a scalar.
-
-=back
 
 =cut
 
@@ -214,17 +198,13 @@ sub getThread {
 
 Returns a boolean indicating whether this user has already rated this post.
 
-=over
-
-=item userId
+=head3 userId
 
 A unique identifier for a user to check. Defaults to the current user.
 
-=item ipAddress
+=head3 ipAddress
 
 If the user ID equals 1 (visitor) then an IP address is used to distinguish the user. Defaults to the current user's ip address.
-
-=back
 
 =cut
 
@@ -259,13 +239,9 @@ sub incrementViews {
 
 Returns a boolean indicating whether this post is marked read for the user.
 
-=over
-
-=item userId
+=head3 userId
 
 A unique id for a user that you want to check. Defaults to the current user.
-
-=back
 
 =cut
 
@@ -299,13 +275,9 @@ sub isReply {
 
 Marks this post read for this user.
 
-=over
-
-=item userId
+=head3 userId
 
 A unique identifier for a user. Defaults to the current user.
-
-=back
 
 =cut
 
@@ -325,13 +297,9 @@ sub markRead {
 
 Constructor.
 
-=over
-
-=item postId
+=head3 postId
 
 The unique identifier for the post object you wish to retrieve.
-
-=back
 
 =cut
 
@@ -351,21 +319,17 @@ sub new {
 
 Stores a rating against this post.
 
-=over
-
-=item rating
+=head3 rating
 
 An integer between 1 and 5 (5 being best) to rate this post with.
 
-=item userId
+=head3 userId
 
 The unique id for the user rating this post. Defaults to the current user.
 
-=item ipAddress
+=head3 ipAddress
 
 The ip address of the user doing the rating. Defaults to the current user's IP.
-
-=back
 
 =cut
 
@@ -402,13 +366,9 @@ sub recalculateRating {
 
 Sets properties to the database and the object.
 
-=over
-
-=item data
+=head3 data
 
 A hash reference containing the properties to set. See the forumPost table for details.
-
-=back
 
 =cut
 
@@ -511,13 +471,9 @@ sub setStatusPending {
 
 Negates the markRead method.
 
-=over
-
-=item userId
+=head3 userId
 
 The unique id of the user marking unread. Defaults to the current user.
-
-=back
 
 =cut
 

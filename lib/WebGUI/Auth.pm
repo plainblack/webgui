@@ -162,13 +162,9 @@ sub authenticate {
 
 Gets or sets the authMethod in the Auth Object
 
-=over
-
-=item authMethod
+=head3 authMethod
 
    A string which sets the auth method for an instance of this class
-
-=back
 
 =cut
 
@@ -184,22 +180,18 @@ sub authMethod {
 
 Superclass method that performs general functionality for creating new accounts.
 
-=over
-
-=item method
+=head3 method
 
 Auth method that the form for creating users should call
    
-=item vars
+=head3 vars
    
 Array ref of template vars from subclass
    
-=item template
+=head3 template
 
 Template that this class should use for display purposes
 
-=back
-  
 =cut
 
 sub createAccount {
@@ -231,26 +223,22 @@ sub createAccount {
 
 Superclass method that performs general functionality for saving new accounts.
 
-=over
-
-=item username
+=head3 username
 
 Username for the account being created
    
-=item properties
+=head3 properties
    
 Properties from the subclass that should be saved as authentication parameters
    
-=item password
+=head3 password
 
 Password entered by the user.  This is only used in for sending the user a notification by email of his/her username/password
 
-=item profile
+=head3 profile
    
 Hashref of profile values returned by the function WebGUI::Operation::Profile::validateProfileData()
    
-=back
-  
 =cut
 
 sub createAccountSave {
@@ -290,14 +278,10 @@ sub createAccountSave {
 
 Superclass method that displays a confirm message for deactivating a user's account.
 
-=over
-
-=item method
+=head3 method
 
 Auth method that the form for creating users should call
    
-=back
-  
 =cut
 
 sub deactivateAccount {
@@ -351,22 +335,18 @@ sub deleteParams {
 
 Superclass method that performs general functionality for viewing editable fields related to a user's account.
 
-=over
-
-=item method
+=head3 method
 
 Auth method that the form for updating a user's account should call
    
-=item vars
+=head3 vars
    
 Array ref of template vars from subclass
    
-=item template
+=head3 template
 
 Template that this class should use for display purposes
 
-=back
-  
 =cut
 
 sub displayAccount {
@@ -397,22 +377,18 @@ sub displayAccount {
 
 Superclass method that performs general functionality for creating new accounts.
 
-=over
-
-=item method
+=head3 method
 
 Auth method that the form for performing the login routine should call
    
-=item vars
+=head3 vars
    
 Array ref of template vars from subclass
    
-=item template
+=head3 template
 
 Template that this class should use for display purposes
 
-=back
-  
 =cut
 
 sub displayLogin {
@@ -503,13 +479,9 @@ sub getParams {
 
 Returns a setting for this authMethod instance.  If none is specified, returns the system authMethod setting
 
-=over
-
-=item setting
+=head3 setting
 
 Specify a setting to retrieve
-
-=back
 
 =cut
 
@@ -595,21 +567,17 @@ sub logout {
 
 Constructor.
 
-=over
-
-=item authMethod
+=head3 authMethod
   
 This object's authentication method
   
-=item userId
+=head3 userId
 
 userId for the user requesting authentication.  This defaults to $session{user}{userId}
   
-=item callable
+=head3 callable
 
 Array reference of methods allowed to be called externally;  
-
-=back
 
 =cut
 
@@ -654,13 +622,9 @@ sub profile {
 adds elements to the callable routines list.  This list determines whether or not a method in this instance is 
 allowed to be called externally
 
-=over
-
-=item callableMethods
+=head3 callableMethods
 
 Array reference containing a list of methods for this authentication instance that can be called externally
-
-=back
 
 =cut
 
@@ -676,21 +640,17 @@ sub setCallable {
 
 Saves the user's authentication parameters to the database.
 
-=over
-
-=item userId
+=head3 userId
 
 Specify a user id.
 
-=item authMethod
+=head3 authMethod
 
 Specify the authentication method to save these paramaters under.
 
-=item data
+=head3 data
 
 A hash reference containing parameter names and values to be saved.
-
-=back
 
 =cut
 

@@ -66,13 +66,9 @@ These functions are available from this package:
 
 Inserts an AUDIT type message into the WebGUI log.
 
-=over
-
-=item message
+=head3 message
 
 Whatever message you wish to insert into the log.
-
-=back
 
 =cut
 
@@ -224,13 +220,9 @@ sub getWarnings {
 
 Adds a SECURITY type message to the log.
 
-=over
-
-=item message
+=head3 message
 
 The message you wish to add to the log.
-
-=back
 
 =cut
 
@@ -340,13 +332,9 @@ sub showWarnings {
 
 Generates a stamp to be added to the log file. Use this in conjunction with your message for writeLog().
 
-=over
-
-=item type
+=head3 type
 
 The type of message this is. You may use whatever type you wish. WebGUI currently uses AUDIT, WARNING, FATAL, and SECURITY.
-
-=back
 
 =cut
 
@@ -361,13 +349,9 @@ sub stamp {
 
 Adds a WARNING type message to the log.
 
-=over
-
-=item message
+=head3 message
 
 The message you wish to add to the log.
-
-=back
 
 =cut
 
@@ -383,13 +367,9 @@ sub warn {
 
 Writes a message to the log.
 
-=over 
-
-=item message
+=head3 message
 
 The message you wish to write to the log.
-
-=back
 
 =cut
 

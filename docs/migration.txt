@@ -164,4 +164,10 @@ update your code and database tables to take advantage of this. Some of the more
 important ID's that have been changed are User Ids, Group Ids, and Wobject Ids.
 See WebGUI::Id for more information.
 
+5.10 POD
+
+We've switched to a new Plain Old Documentation (POD) format. See Ruling
+WebGUI for details.
+
+
 

@@ -124,36 +124,28 @@ more of the following keys.
       }
  }
 
-=over
-
-=item properties
+=head3 properties
 
 This should be a hash reference keyed by the field names of the table that 
 this class refers to (and should be able to be manipulated with this classes
 get() and set() methods). The values of the hash reference should be hash
 references containing settings for each field.
 
-=over
-
-=item * defaultValue 
+=head3 * defaultValue 
 
 The default value for this field (optional).
 
-=item * key
+=head3 * key
 
 Should be true for the primary key column (one field must be set in this way).
 
-=item * quote
+=head3 * quote
 
 Should be true for fields that need to be quoted in database queries.
 
-=back
-
-=item table
+=head3 table
 
 This must be set to the name of the table that this class represents.
-
-=back
 
 =cut
 
@@ -255,13 +247,9 @@ sub minimumFields {
 
 =head2 multiDelete( -where => @whereClauses, %p )
 
-=over
-
-=item -where
+=head3 -where
 
 See multiNew().
-
-=back
 
 =cut
 
@@ -290,9 +278,7 @@ Unrecognised parameters are combined to form the where clause:
 
 Additional, more complicated parameters maybe passed using the -where option.
 
-=over
-
-=item -where
+=head3 -where
 
 If provided -where must be an array reference, which is evaluated to generate
 an Sql where clause using the properties in classSettings. Any left over named
@@ -307,17 +293,15 @@ Evaluates to:
 
  A in (1,2) AND (B = 3 OR C = 'hello') AND D = (B * 3)
 
-=item -fields
+=head3 -fields
 
 This maybe an array reference of fields to be selected from the database,
 otherwise, all fields in properties are selected unless the -minimumFields
 option is true.
 
-=item -minimumFields
+=head3 -minimumFields
 
 If true the minimum fields are selected from the database.
-
-=back
 
 =cut
 
@@ -347,32 +331,28 @@ sub multiNew {
 
 =head2 new 
 
-=over
-
-=item -properties
+=head3 -properties
 
 If a hash reference of property names to values is provided to this method,
 then the database is not queried. This is mainly used for creating new rows
 by calling set afterwards (if not specified the value of the key column is
 set to 'new', so that when set() is called, and insert takes place).
 
-=item -where
+=head3 -where
 
 See multiNew().
 
-=item -fields
+=head3 -fields
 
 See multiNew().
 
-=item -minimumFields
+=head3 -minimumFields
 
 See multiNew().
 
-=item -noSet
+=head3 -noSet
 
 If true this stops the set() method from doing writing to the database.
-
-=back
 
 =cut
 

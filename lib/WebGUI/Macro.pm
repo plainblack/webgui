@@ -28,7 +28,7 @@ Package WebGUI::Macro
 
 This package is the interface to the WebGUI macro system.
 
-NOTE: This entire system is likely to be replaced in the near future.  It has served WebGUI well since the very beginning but lacks the speed and flexibility that WebGUI users will require in the future.
+B<NOTE:> This entire system is likely to be replaced in the near future.  It has served WebGUI well since the very beginning but lacks the speed and flexibility that WebGUI users will require in the future.
 
 =head1 SYNOPSIS
 
@@ -71,13 +71,9 @@ $nestedMacro = qr /(\^                     # Start with carat
 
 Removes all the macros from the HTML segment.
 
-=over
-
-=item html
+=head3 html
 
 The segment to be filtered.
-
-=back
 
 =cut
 
@@ -96,13 +92,9 @@ sub filter {
 
 A simple, but error prone mechanism for getting a prameter list from a string. Returns an array of parameters.
 
-=over
-
-=item parameterString
+=head3 parameterString
 
 A string containing a comma separated list of paramenters.
-
-=back
 
 =cut
 
@@ -124,13 +116,9 @@ sub getParams {
 
 Nullifies all macros in this content segment.
 
-=over
-
-=item html
+=head3 html
 
 A string of HTML to be processed.
-
-=back
 
 =cut
 
@@ -147,13 +135,9 @@ sub negate {
 
 Runs all the WebGUI macros to and replaces them in the HTML with their output.
 
-=over
-
-=item html
+=head3 html
 
 A string of HTML to be processed.
-
-=back
 
 =cut
 

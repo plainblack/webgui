@@ -89,17 +89,13 @@ sub _getBaseURL {
 
 Generates a button with the word "Copy" printed on it.
 
-=over
-
-=item urlParameters
+=head3 urlParameters
 
 Any URL parameters that need to be tacked on to the current URL to accomplish whatever function this button represents.
 
-=item pageURL
+=head3 pageURL
 
 The URL to any page. Defaults to the current page.
-
-=back
 
 =cut
 
@@ -117,17 +113,13 @@ sub copyIcon {
 
 Generates a button with the word "Cut" printed on it.
 
-=over
-
-=item urlParameters
+=head3 urlParameters
 
 Any URL parameters that need to be tacked on to the current URL to accomplish whatever function this button represents.
 
-=item pageURL
+=head3 pageURL
 
 The URL to any page. Defaults to the current page.
-
-=back
 
 =cut
 
@@ -145,17 +137,13 @@ sub cutIcon {
 
 Generates a button that represents a delete operation.
 
-=over
-
-=item urlParameters
+=head3 urlParameters
 
 Any URL parameters that need to be tacked on to the current URL to accomplish whatever function this button represents.
 
-=item pageURL
+=head3 pageURL
 
 The URL to any page. Defaults to the current page.
-
-=back
 
 =cut
 
@@ -185,17 +173,13 @@ sub dragIcon {
 
 Generates a button with the word "Edit" printed on it.
 
-=over
-
-=item urlParameters
+=head3 urlParameters
 
 Any URL parameters that need to be tacked on to the current URL to accomplish whatever function this button represents.
 
-=item pageURL
+=head3 pageURL
 
 The URL to any page. Defaults to the current page.
-
-=back
 
 =cut
 
@@ -213,17 +197,13 @@ sub editIcon {
 
 Generates an export button.
 
-=over
-
-=item urlParameters
+=head3 urlParameters
 
 Any URL parameters that need to be tacked on to the current URL to accomplish whatever function this button represents.
 
-=item pageURL
+=head3 pageURL
 
 The URL to any page. Defaults to the current page.
-
-=back
 
 =cut
 
@@ -266,17 +246,13 @@ sub getToolbarOptions {
 
 Generates a button with the word "Help" printed on it.
 
-=over
-
-=item helpId 
+=head3 helpId 
 
 The id in the help table that relates to the help documentation for your function.
 
-=item namespace
+=head3 namespace
 
 If your help documentation is not in the WebGUI namespace, then you must specify the namespace for this help.
-
-=back
 
 =cut
 
@@ -294,17 +270,13 @@ sub helpIcon {
 
 Generates a button that represents a management function.
 
-=over
-
-=item urlParameters
+=head3 urlParameters
 
 Any URL parameters that need to be tacked on to the current URL to accomplish whatever function this button represents.
 
-=item pageURL
+=head3 pageURL
 
 The URL to any page. Defaults to the current page.
-
-=back
 
 =cut
 
@@ -322,17 +294,13 @@ sub manageIcon {
 
 Generates a button with a double down arrow printed on it.
 
-=over
-
-=item urlParameters
+=head3 urlParameters
 
 Any URL parameters that need to be tacked on to the current URL to accomplish whatever function this button represents.
 
-=item pageURL
+=head3 pageURL
 
 The URL to any page. Defaults to the current page.
-
-=back
 
 =cut
 
@@ -350,17 +318,13 @@ sub moveBottomIcon {
 
 Generates a button with a down arrow printed on it.
 
-=over
-
-=item urlParameters
+=head3 urlParameters
 
 Any URL parameters that need to be tacked on to the current URL to accomplish whatever function this button represents.
 
-=item pageURL
+=head3 pageURL
 
 The URL to any page. Defaults to the current page.
-
-=back
 
 =cut
 
@@ -378,17 +342,13 @@ sub moveDownIcon {
 
 Generates a button with a left arrow printed on it.
 
-=over
-
-=item urlParameters
+=head3 urlParameters
 
 Any URL parameters that need to be tacked on to the current URL to accomplish whatever function this button represents.
 
-=item pageURL
+=head3 pageURL
 
 The URL to any page. Defaults to the current page.
-
-=back
 
 =cut
 
@@ -406,17 +366,13 @@ sub moveLeftIcon {
 
 Generates a button with a right arrow printed on it.
 
-=over
-
-=item urlParameters
+=head3 urlParameters
 
 Any URL parameters that need to be tacked on to the current URL to accomplish whatever function this button represents.
 
-=item pageURL
+=head3 pageURL
 
 The URL to any page. Defaults to the current page.
-
-=back
 
 =cut
 
@@ -434,17 +390,13 @@ sub moveRightIcon {
 
 Generates a button with a double up arrow printed on it.
 
-=over
-
-=item urlParameters
+=head3 urlParameters
 
 Any URL parameters that need to be tacked on to the current URL to accomplish whatever function this button represents.
 
-=item pageURL
+=head3 pageURL
 
 The URL to any page. Defaults to the current page.
-
-=back
 
 =cut
 
@@ -462,17 +414,13 @@ sub moveTopIcon {
 
 Generates a button with an up arrow printed on it.
 
-=over
-
-=item urlParameters
+=head3 urlParameters
 
 Any URL parameters that need to be tacked on to the current URL to accomplish whatever function this button represents.
 
-=item pageURL
+=head3 pageURL
 
 The URL to any page. Defaults to the current page.
-
-=back
 
 =cut
 
@@ -502,17 +450,13 @@ sub pageIcon {
 
 Generates a button with the word "Paste" printed on it.
 
-=over
-
-=item urlParameters
+=head3 urlParameters
 
 Any URL parameters that need to be tacked on to the current URL to accomplish whatever function this button represents.
 
-=item pageURL
+=head3 pageURL
 
 The URL to any page. Defaults to the current page.
-
-=back
 
 =cut
 
@@ -530,17 +474,13 @@ sub pasteIcon {
 
 Generates a button with a shortcut symbol printed on it, similar to the shortcut icon in Microsoft Windows or the link Icon in Gnome.
 
-=over
-
-=item urlParameters
+=head3 urlParameters
 
 Any URL parameters that need to be tacked on to the current URL to accomplish whatever function this button represents.
 
-=item pageURL
+=head3 pageURL
 
 The URL to any page. Defaults to the current page.
-
-=back
 
 =cut
 
@@ -558,17 +498,13 @@ sub shortcutIcon {
 
 Generates a button with the word "View" printed on it.
 
-=over
-
-=item urlParameters
+=head3 urlParameters
 
 Any URL parameters that need to be tacked on to the current URL to accomplish whatever function this button represents.
 
-=item pageURL
+=head3 pageURL
 
 The URL to any page. Defaults to the current page.
-
-=back
 
 =cut
 

@@ -81,13 +81,9 @@ sub _create {
 
 Adds groups to this group.
 
-=over
-
-=item groups
+=head3 groups
 
 An array reference containing the list of group ids to add to this group.
-
-=back
 
 =cut
 
@@ -101,13 +97,9 @@ sub addGroups {
 
 Returns an boolean stating whether users can add themselves to this group.
 
-=over
-
-=item value
+=head3 value
 
 If specified, the autoAdd is set to this value.
-
-=back
 
 =cut
 
@@ -130,13 +122,9 @@ sub autoAdd {
 
 Returns an boolean stating whether users can delete themselves from this group.
 
-=over
-
-=item value
+=head3 value
 
 If specified, the autoDelete is set to this value.
-
-=back
 
 =cut
 
@@ -186,13 +174,9 @@ sub delete {
 
 Deletes groups from this group.
 
-=over
-
-=item groups
+=head3 groups
 
 An array reference containing the list of group ids to delete from this group.
-
-=back
 
 =cut
 
@@ -207,13 +191,9 @@ sub deleteGroups {
 
 Returns the number of days after the expiration to delete the grouping.
 
-=over
-
-=item value
+=head3 value
 
 If specified, deleteOffset is set to this value. Defaults to "-14".
-
-=back
 
 =cut
 
@@ -236,13 +216,9 @@ sub deleteOffset {
 
 Returns the description of this group.
 
-=over
-
-=item value
+=head3 value
 
 If specified, the description is set to this value.
-
-=back
 
 =cut
 
@@ -265,13 +241,9 @@ sub description {
 
 Returns a boolean value whether or not to notify the user of the group expiry.
 
-=over
-
-=item value
+=head3 value
 
 If specified, expireNotify is set to this value.
-
-=back
 
 =cut
 
@@ -294,13 +266,9 @@ sub expireNotify {
 
 Returns the message to send to the user about expiration.
 
-=over
-
-=item value
+=head3 value
 
 If specified, expireNotifyMessage is set to this value.
-
-=back
 
 =cut
 
@@ -324,13 +292,9 @@ sub expireNotifyMessage {
 
 Returns the number of days after the expiration to notify the user.
 
-=over
-
-=item value
+=head3 value
 
 If specified, expireNotifyOffset is set to this value. 
-
-=back
 
 =cut
 
@@ -353,13 +317,9 @@ sub expireNotifyOffset {
 
 Returns the number of seconds any grouping with this group should expire after.
 
-=over
-
-=item value
+=head3 value
 
 If specified, expireOffset is set to this value.
-
-=back
 
 =cut
 
@@ -382,13 +342,9 @@ sub expireOffset {
 
 An alternative to the constructor "new", use find as a constructor by name rather than id.
 
-=over
-
-=item name
+=head3 name
 
 The name of the group you wish to instanciate.
-
-=back
 
 =cut
 
@@ -417,13 +373,9 @@ sub groupId {
 
 Returns the amount of karma required to be in this group.
 
-=over
-
-=item value
+=head3 value
 
 If specified, the karma threshold is set to this value.
-
-=back
 
 =cut
 
@@ -446,13 +398,9 @@ sub karmaThreshold {
 
 Returns the ip address range(s) the user must be a part of to belong to this group.
 
-=over
-
-=item value
+=head3 value
 
 If specified, the ipFilter is set to this value.
-
-=back
 
 =cut
 
@@ -475,13 +423,9 @@ sub ipFilter {
 
 Returns a boolean value indicating whether the group should be managable from the group manager. System level groups and groups autocreated by wobjects would use this parameter.
 
-=over
-
-=item value
+=head3 value
 
 If specified, isEditable is set to this value.
-
-=back
 
 =cut
 
@@ -517,13 +461,9 @@ sub lastUpdated {
 
 Returns the name of this group.
 
-=over
-
-=item value
+=head3 value
 
 If specified, the name is set to this value.
-
-=back
 
 =cut
 
@@ -546,13 +486,9 @@ sub name {
 
 Constructor.
 
-=over
-
-=item groupId
+=head3 groupId
 
 The groupId of the group you're creating an object reference for. If specified as "new" then a new group will be created and assigned the next available groupId. If left blank then the object methods will just return default values for everything.
-
-=back
 
 =cut
 
@@ -583,13 +519,9 @@ sub new {
 
 Returns the name of this group.
 
-=over
-
-=item value
+=head3 value
 
 If specified, the name is set to this value.
-
-=back
 
 =cut
 
@@ -611,13 +543,9 @@ sub scratchFilter {
 
 Returns a boolean value indicating whether the group should show in forms that display a list of groups. System level groups and groups autocreated by wobjects would use this parameter.
 
-=over
-
-=item value
+=head3 value
 
 If specified, showInForms is set to this value.
-
-=back
 
 =cut
 
@@ -642,13 +570,9 @@ sub showInForms {
 
 Returns the dbQuery for this group.
 
-=over
-
-=item value
+=head3 value
 
 If specified, the dbQuery is set to this value.
-
-=back
 
 =cut
 
@@ -670,13 +594,9 @@ sub dbQuery {
 
 Returns the databaseLinkId for this group.
 
-=over
-
-=item value
+=head3 value
 
 If specified, the databaseLinkId is set to this value.
-
-=back
 
 =cut
 
@@ -698,13 +618,9 @@ sub databaseLinkId {
 
 Returns the dbCacheTimeout for this group.
 
-=over
-
-=item value
+=head3 value
 
 If specified, the dbCacheTimeout is set to this value.
-
-=back
 
 =cut
 

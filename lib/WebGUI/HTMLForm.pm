@@ -218,39 +218,35 @@ sub _uiLevelChecksOut {
 
 Adds a checkbox row to this form.
 
-=over
-
-=item name
+=head3 name
 
 The name field for this form element.
 
-=item label
+=head3 label
 
 The left column label for this form row.
 
-=item checked 
+=head3 checked 
 
 If you'd like this box to be defaultly checked, set this to "1".
 
-=item subtext
+=head3 subtext
 
 Extra text to describe this form element or to provide special instructions.
 
-=item value
+=head3 value
 
 The default value for this form element. Defaults to "1".
 
-=item extras
+=head3 extras
 
 If you want to add anything special to this form element like javascript actions, or stylesheet information, you'd add it in here as follows:
 
  'onChange="this.form.submit()"'
 
-=item uiLevel
+=head3 uiLevel
 
 The UI level for this field. See the WebGUI developer's site for details. Defaults to "0".
-
-=back
 
 =cut
 
@@ -285,43 +281,39 @@ sub checkbox {
 
 Adds a checkbox list row to this form.
 
-=over
-
-=item name
+=head3 name
 
 The name field for this form element.
 
-=item options
+=head3 options
 
 The list of options for this list. Should be passed as a hash reference.
 
-=item label
+=head3 label
 
 The left column label for this form row.
 
-=item value
+=head3 value
 
 The default value(s) for this form element. This should be passed as an array reference.
 
-=item vertical
+=head3 vertical
 
 If set to "1" the radio button elements will be laid out horizontally. Defaults to "0".
 
-=item extras
+=head3 extras
 
 If you want to add anything special to this form element like javascript actions, or stylesheet information, you'd add it in here as follows:
 
  'onChange="this.form.submit()"'
 
-=item subtext
+=head3 subtext
 
 Extra text to describe this form element or to provide special instructions.
 
-=item uiLevel
+=head3 uiLevel
 
 The UI level for this field. See the WebGUI developer's site for details. Defaults to "0".
-
-=back
 
 =cut
 
@@ -356,47 +348,43 @@ sub checkList {
 
 Adds a combination select list / text box row to this form. If the text box is filled out it will have a value stored in "name"_new where name is the first field passed into this method.
 
-=over
-
-=item name
+=head3 name
 
 The name field for this form element.
 
-=item options
+=head3 options
 
 The list of options for this select list. Should be passed as a hash reference.
 
-=item label
+=head3 label
 
 The left column label for this form row.
 
-=item value
+=head3 value
 
 The default value(s) for this form element. This should be passed as an array reference.
 
-=item size
+=head3 size
 
 The number of characters tall this form element should be. Defaults to "1".
 
-=item multiple
+=head3 multiple
 
 A boolean value for whether this select list should allow multiple selections. Defaults to "0".
 
-=item extras
+=head3 extras
 
 If you want to add anything special to this form element like javascript actions, or stylesheet information, you'd add it in here as follows:
 
  'onChange="this.form.submit()"'
 
-=item subtext
+=head3 subtext
 
 Extra text to describe this form element or to provide special instructions.
 
-=item uiLevel
+=head3 uiLevel
 
 The UI level for this field. See the WebGUI developer's site for details. Defaults to "0".
-
-=back
 
 =cut
 
@@ -432,39 +420,35 @@ sub combo {
 
 Adds a content type select list field to this form.
 
-=over
-
-=item name
+=head3 name
 
 The name field for this form element.
 
-=item types
+=head3 types
 
 An array reference of field types to be displayed. The valid types are "code", "mixed", "html", and "text". Defaults to all types.
 
-=item label
+=head3 label
 
 The left column label for this form row. Defaults to "Content Type".
 
-=item value
+=head3 value
 
 The default value for this form element.
 
-=item extras
+=head3 extras
 
 If you want to add anything special to this form element like javascript actions, or stylesheet information, you'd add it in here as follows:
 
  'onChange="this.form.submit()"'
 
-=item subtext
+=head3 subtext
 
 Extra text to describe this form element or to provide special instructions.
 
-=item uiLevel
+=head3 uiLevel
 
 The UI level for this field. See the WebGUI developer's site for details. Defaults to "3".
-
-=back
 
 =cut
 
@@ -501,35 +485,31 @@ sub contentType {
 
 Adds a database link select list to the form.
 
-=over
-
-=item name
+=head3 name
 
 The name of this form element.
 
-=item value
+=head3 value
 
 The default value for this form element.
 
-=item label
+=head3 label
 
 The left column label for this form row. Defaults to "Database Link".
 
-=item afterEdit
+=head3 afterEdit
 
 A URL that will be acted upon after editing a database link. Typically there is a link next to the select list that reads "Edit this database link" and this is the URL to go to after editing is complete.
 
-=item extras
+=head3 extras
 
 If you want to add anything special to this form element like javascript actions, or stylesheet information, you'd add it in here as follows:
 
  'onChange="this.form.submit()"'
 
-=item uiLevel
+=head3 uiLevel
 
 The UI level for this field. See the WebGUI developer's site for details. Defaults to "5".
-
-=back
 
 =cut
 
@@ -570,43 +550,39 @@ sub databaseLink {
 
 Adds a date row to this form.
 
-=over
-
-=item name
+=head3 name
 
 The name field for this form element.
 
-=item label
+=head3 label
 
 The left column label for this form row.
 
-=item value
+=head3 value
 
 The default date. Pass as an epoch value. Defaults to today.
 
-=item extras
+=head3 extras
 
 If you want to add anything special to this form element like javascript actions, or stylesheet information, you'd add it in here as follows:
 
  'onChange="this.form.submit()"'
 
-=item subtext
+=head3 subtext
 
 Extra text to describe this form element or to provide special instructions.
 
-=item size
+=head3 size
 
 The number of characters wide this form element should be. There should be no reason for anyone to specify this.
 
-=item noDate
+=head3 noDate
 
 By default a date is placed in the "value" field. Set this to "1" to turn off the default date.
 
-=item uiLevel
+=head3 uiLevel
 
 The UI level for this field. See the WebGUI developer's site for details. Defaults to "0".
-
-=back
 
 =cut
 
@@ -642,33 +618,29 @@ sub date {
 
 Adds a date time row to this form.
 
-=over
-
-=item name
+=head3 name
 
 The name field for this form element.
 
-=item label
+=head3 label
 
 The left column label for this form row.
 
-=item value
+=head3 value
 
 The default date and time. Pass as an epoch value. Defaults to today and now.
 
-=item subtext
+=head3 subtext
 
 Extra text to describe this form element or to provide special instructions.
 
-=item uiLevel
+=head3 uiLevel
 
 The UI level for this field. See the WebGUI developer's site for details. Defaults to "0".
 
-=item extras 
+=head3 extras 
 
 Extra parameters such as javascript or style sheet information that you wish to add to the form element.
-
-=back
 
 =cut
 
@@ -703,17 +675,13 @@ Adds a dynamic field to this form. This is primarily useful for building dynamic
 Because of the dynamic nature of this field, it supports only the -option=>value 
 way of specifying parameters.
                                                                                                                              
-=over
-                                                                                                                             
-=item fieldType
+=head3 fieldType
 
 The field type to use. The field name is the name of the method from this forms package.
 
-=item options
+=head3 options
 
 The field options. See the documentation for the desired field for more information.
-                                                                                                                             
-=back
                                                                                                                              
 =cut
 
@@ -746,43 +714,39 @@ sub dynamicField {
 
 Adds an email address row to this form.
 
-=over
-
-=item name
+=head3 name
 
 The name field for this form element.
 
-=item label
+=head3 label
 
 The left column label for this form row.
 
-=item value
+=head3 value
 
 The default value for this form element.
 
-=item maxlength
+=head3 maxlength
 
 The maximum number of characters to allow in this form element.
 
-=item extras
+=head3 extras
 
 If you want to add anything special to this form element like javascript actions, or stylesheet information, you'd add it in here as follows:
 
  'onChange="this.form.submit()"'
 
-=item subtext
+=head3 subtext
 
 Extra text to describe this form element or to provide special instructions.
 
-=item size
+=head3 size
 
 The number of characters wide this form element should be. There should be no reason for anyone to specify this.
 
-=item uiLevel
+=head3 uiLevel
 
 The UI level for this field. See the WebGUI developer's site for details. Defaults to "0".
-
-=back
 
 =cut
 
@@ -817,43 +781,39 @@ sub email {
 
 Adds a field type select list field to this form. This is primarily useful for building dynamic form builders.
 
-=over
-
-=item name
+=head3 name
 
 The name field for this form element.
 
-=item types
+=head3 types
 
 An array reference of field types to be displayed. The field names are the names of the methods from this forms package. Note that not all field types are supported. Defaults to all types.
 
-=item label
+=head3 label
 
 The left column label for this form row.
 
-=item value
+=head3 value
 
 The default value for this form element.
 
-=item size
+=head3 size
 
 The number of characters tall this form element should be. Defaults to "1".
 
-=item extras
+=head3 extras
 
 If you want to add anything special to this form element like javascript actions, or stylesheet information, you'd add it in here as follows:
 
  'onChange="this.form.submit()"'
 
-=item subtext
+=head3 subtext
 
 Extra text to describe this form element or to provide special instructions.
 
-=item uiLevel
+=head3 uiLevel
 
 The UI level for this field. See the WebGUI developer's site for details. Defaults to "0".
-
-=back
 
 =cut
 
@@ -889,35 +849,31 @@ sub fieldType {
 
 Adds a file browse row to this form.
 
-=over
-
-=item name
+=head3 name
 
 The name field for this form element.
 
-=item label
+=head3 label
 
 The left column label for this form row.
 
-=item subtext
+=head3 subtext
 
 Extra text to describe this form element or to provide special instructions.
 
-=item extras
+=head3 extras
 
 If you want to add anything special to this form element like javascript actions, or stylesheet information, you'd add it in here as follows:
 
  'onChange="this.form.submit()"'
 
-=item size
+=head3 size
 
 The number of characters wide this form element should be. There should be no reason for anyone to specify this.
 
-=item uiLevel
+=head3 uiLevel
 
 The UI level for this field. See the WebGUI developer's site for details. Defaults to "0".
-
-=back
 
 =cut
 
@@ -944,36 +900,32 @@ sub file {
 
 Adds a content filter select list to the form for use with the WebGUI::HTML::filter() function.
 
-=over
-
-=item name
+=head3 name
 
 The name field for this form element. Defaults to "filterContent".
 
-=item label
+=head3 label
 
 The left column label for this form row. Defaults to "Filter Content" (internationalized).
 
-=item value
+=head3 value
 
 The default value for this form element. 
 
-=item extras
+=head3 extras
 
 If you want to add anything special to this form element like javascript actions, or stylesheet information, you'd add it in here
 as follows:
 
  'onChange="this.form.submit()"'
 
-=item subtext
+=head3 subtext
 
 Extra text to describe this form element or to provide special instructions.
 
-=item uiLevel
+=head3 uiLevel
 
 The UI level for this field. See the WebGUI developer's site for details. Defaults to "0".
-
-=back
 
 =cut
 
@@ -1007,43 +959,39 @@ sub filterContent {
 
 Adds an integer row to this form.
 
-=over
-
-=item name
+=head3 name
 
 The name field for this form element.
 
-=item label
+=head3 label
 
 The left column label for this form row.
 
-=item value
+=head3 value
 
 The default value for this form element.
 
-=item maxlength
+=head3 maxlength
 
 The maximum number of characters to allow in this form element.  Defaults to 11.
 
-=item extras
+=head3 extras
 
 If you want to add anything special to this form element like javascript actions, or stylesheet information, you'd add it in here as follows:
 
  'onChange="this.form.submit()"'
 
-=item subtext
+=head3 subtext
 
 Extra text to describe this form element or to provide special instructions.
 
-=item size
+=head3 size
 
 The number of characters wide this form element should be. There should be no reason for anyone to specify this.
 
-=item uiLevel
+=head3 uiLevel
 
 The UI level for this field. See the WebGUI developer's site for details. Defaults to "0".
-
-=back
 
 =cut
 
@@ -1079,47 +1027,43 @@ sub float {
 
 Adds a group pull-down to this form. A group pull down provides a select list that provides name value pairs for all the groups in the WebGUI system.
 
-=over
-
-=item name
+=head3 name
 
 The name field for this form element.
 
-=item label
+=head3 label
 
 The left column label for this form row.
 
-=item value
+=head3 value
 
 The default value(s) for this form element. This should be passed as an array reference. Defaults to "7" (Everyone).
 
-=item size
+=head3 size
 
 How many rows should be displayed at once?
 
-=item multiple
+=head3 multiple
 
 Set to "1" if multiple groups should be selectable.
 
-=item extras
+=head3 extras
 
 If you want to add anything special to this form element like javascript actions, or stylesheet information, you'd add it in here as follows:
 
  'onChange="this.form.submit()"'
 
-=item subtext
+=head3 subtext
 
 Extra text to describe this form element or to provide special instructions.
 
-=item uiLevel
+=head3 uiLevel
 
 The UI level for this field. See the WebGUI developer's site for details. Defaults to "0".
 
-=item excludeGroups
+=head3 excludeGroups
 
 An array reference containing a list of groups to exclude from the list.
-
-=back
 
 =cut
 
@@ -1159,17 +1103,13 @@ sub group {
 
 Adds a hidden row to this form.
 
-=over
-
-=item name
+=head3 name
 
 The name field for this form element.
 
-=item value
+=head3 value
 
 The default value for this form element.
-
-=back
 
 =cut
 
@@ -1188,53 +1128,49 @@ sub hidden {
 
 Adds an HTML area row to this form. An HTML area is different than a standard text area in that it provides rich edit functionality and some special error trapping for HTML and other special characters.
 
-=over
-
-=item name
+=head3 name
 
 The name field for this form element.
 
-=item label
+=head3 label
 
 The left column label for this form row.
 
-=item value
+=head3 value
 
 The default value for this form element.
 
-=item subtext
+=head3 subtext
 
 Extra text to describe this form element or to provide special instructions.
 
-=item extras
+=head3 extras
 
 If you want to add anything special to this form element like javascript actions, or stylesheet information, you'd add it in here as follows:
 
  'onChange="this.form.submit()"'
 
-=item wrap
+=head3 wrap
 
 The method for wrapping text in the text area. Defaults to "virtual". There should be almost no reason to specify this.
 
-=item rows
+=head3 rows
 
 The number of characters tall this form element should be. There should be no reason for anyone to specify this.
 
-=item columns
+=head3 columns
 
 The number of characters wide this form element should be. There should be no reason for anyone to specify this.
 
-=item uiLevel
+=head3 uiLevel
 
 The UI level for this field. See the WebGUI developer's site for details. Defaults to "0".
 
-=item popupToggle
+=head3 popupToggle
 
 Defaults to "0". If set to "1" the rich editor will be a pop-up editor. If set to "0" the rich editor will be inline.
 
-NOTE: WebGUI uses a great variety of rich editors. Not all of them are capable of inline mode, so even if you leave this set to "0" the editor may be a pop-up anyway.
-
-=back
+B<NOTE:> WebGUI uses a great variety of rich editors. Not all of them are capable of inline mode, so even if you leave this set to "0" the editor may be a pop-up anyway.
 
 =cut
 
@@ -1270,43 +1206,39 @@ sub HTMLArea {
 
 Adds an integer row to this form.
 
-=over
-
-=item name
+=head3 name
 
 The name field for this form element.
 
-=item label
+=head3 label
 
 The left column label for this form row.
 
-=item value
+=head3 value
 
 The default value for this form element.
 
-=item maxlength
+=head3 maxlength
 
 The maximum number of characters to allow in this form element.  Defaults to 11.
 
-=item extras
+=head3 extras
 
 If you want to add anything special to this form element like javascript actions, or stylesheet information, you'd add it in here as follows:
 
  'onChange="this.form.submit()"'
 
-=item subtext
+=head3 subtext
 
 Extra text to describe this form element or to provide special instructions.
 
-=item size
+=head3 size
 
 The number of characters wide this form element should be. There should be no reason for anyone to specify this.
 
-=item uiLevel
+=head3 uiLevel
 
 The UI level for this field. See the WebGUI developer's site for details. Defaults to "0".
-
-=back
 
 =cut
 
@@ -1340,39 +1272,35 @@ sub integer {
 
 Adds a time interval row to this form.
 
-=over
-
-=item name
+=head3 name
 
 The the base name for this form element. This form element actually returns two values under different names. They are name_interval and name_units.
 
-=item label
+=head3 label
 
 The left column label for this form row.
 
-=item intervalValue
+=head3 intervalValue
 
 The default value for interval portion of this form element. Defaults to '1'.
 
-=item unitsValue
+=head3 unitsValue
 
 The default value for units portion of this form element. Defaults to 'seconds'. Possible values are 'seconds', 'minutes', 'hours', 'days', 'weeks', 'months', and 'years'.
 
-=item extras
+=head3 extras
 
 If you want to add anything special to this form element like javascript actions, or stylesheet information, you'd add it in here as follows:
 
  'onChange="this.form.submit()"'
 
-=item subtext
+=head3 subtext
 
 Extra text to describe this form element or to provide special instructions.
 
-=item uiLevel
+=head3 uiLevel
 
 The UI level for this field. See the WebGUI developer's site for details. Defaults to "0".
-
-=back
 
 =cut
 
@@ -1410,37 +1338,33 @@ sub interval {
 
 Constructor.
 
-=over
-
-=item noTable
+=head3 noTable
 
 If this is set to "1" then no table elements will be wrapped around each form element. Defaults to "0".
 
-=item action
+=head3 action
 
 The Action URL for the form information to be submitted to. This defaults to the current page.
 
-=item method
+=head3 method
 
 The form's submission method. This defaults to "POST" and probably shouldn't be changed.
 
-=item extras
+=head3 extras
 
 If you want to add anything special to your form like javascript actions, or stylesheet information, you'd add it in here as follows:
 
  '"name"="myForm" onChange="myForm.submit()"'
 
-=item enctype 
+=head3 enctype 
 
 The ecapsulation type for this form. This defaults to "multipart/form-data" and should probably never be changed.
 
-=item tableExtras
+=head3 tableExtras
 
 If you want to add anything special to the form's table like a name or stylesheet information, you'd add it in here as follows:
 
  '"name"="myForm" class="formTable"'
-
-=back
 
 =cut
 
@@ -1468,43 +1392,39 @@ sub new {
 
 Adds a password row to this form. 
 
-=over
-
-=item name 
+=head3 name 
 
 The name field for this form element.
 
-=item label 
+=head3 label 
 
 The left column label for this form row.
 
-=item value
+=head3 value
 
 The default value for this form element.
 
-=item subtext
+=head3 subtext
 
 Extra text to describe this form element or to provide special instructions.
 
-=item maxlength 
+=head3 maxlength 
 
 The maximum number of characters to allow in this form element.  Defaults to "35".
 
-=item extras
+=head3 extras
 
 If you want to add anything special to this form element like javascript actions, or stylesheet information, you'd add it in here as follows:
 
  'onChange="this.form.submit()"'
 
-=item size 
+=head3 size 
 
 The number of characters wide this form element should be. There should be no reason for anyone to specify this. Defaults to "30" unless overridden in the settings.
 
-=item uiLevel
+=head3 uiLevel
 
 The UI level for this field. See the WebGUI developer's site for details. Defaults to "0".
-
-=back
 
 =cut
 
@@ -1538,43 +1458,39 @@ sub password {
 
 Adds a text row to this form.
 
-=over
-
-=item name
+=head3 name
 
 The name field for this form element.
 
-=item label
+=head3 label
 
 The left column label for this form row.
 
-=item value
+=head3 value
 
 The default value for this form element.
 
-=item maxlength
+=head3 maxlength
 
 The maximum number of characters to allow in this form element.
 
-=item extras
+=head3 extras
 
 If you want to add anything special to this form element like javascript actions, or stylesheet information, you'd add it in here as follows:
 
  'onChange="this.form.submit()"'
 
-=item subtext
+=head3 subtext
 
 Extra text to describe this form element or to provide special instructions.
 
-=item size
+=head3 size
 
 The number of characters wide this form element should be. There should be no reason for anyone to specify this.
 
-=item uiLevel
+=head3 uiLevel
 
 The UI level for this field. See the WebGUI developer's site for details. Defaults to "0".
-
-=back
 
 =cut
 
@@ -1632,39 +1548,35 @@ sub printRowsOnly {
 
 Adds a radio button row to this form.
 
-=over
-
-=item name
+=head3 name
 
 The name field for this form element.
 
-=item label
+=head3 label
 
 The left column label for this form row.
 
-=item checked
+=head3 checked
 
 If you'd like this radio button to be defaultly checked, set this to "1".
 
-=item value
+=head3 value
 
 The default value for this form element.
 
-=item subtext
+=head3 subtext
 
 Extra text to describe this form element or to provide special instructions.
 
-=item extras
+=head3 extras
 
 If you want to add anything special to this form element like javascript actions, or stylesheet information, you'd add it in here as follows:
 
  'onChange="this.form.submit()"'
 
-=item uiLevel
+=head3 uiLevel
 
 The UI level for this field. See the WebGUI developer's site for details. Defaults to "0".
-
-=back
 
 =cut
 
@@ -1699,43 +1611,39 @@ sub radio {
 
 Adds a radio button list row to this form.
 
-=over
-
-=item name
+=head3 name
 
 The name field for this form element.
 
-=item options
+=head3 options
 
 The list of options for this list. Should be passed as a hash reference.
 
-=item label
+=head3 label
 
 The left column label for this form row.
 
-=item value
+=head3 value
 
 The default value for this form element. Should be passed as a scalar.
 
-=item vertical
+=head3 vertical
 
 If set to "1" the radio button elements will be laid out horizontally. Defaults to "0".
 
-=item extras
+=head3 extras
 
 If you want to add anything special to this form element like javascript actions, or stylesheet information, you'd add it in here as follows:
 
  'onChange="this.form.submit()"'
 
-=item subtext
+=head3 subtext
 
 Extra text to describe this form element or to provide special instructions.
 
-=item uiLevel
+=head3 uiLevel
 
 The UI level for this field. See the WebGUI developer's site for details. Defaults to "0".
-
-=back
 
 =cut
 
@@ -1770,13 +1678,9 @@ sub radioList {
 
 Adds raw data to the form. This is primarily useful with the printRowsOnly method and if you generate your own form elements.
 
-=over
-
-=item uiLevel
+=head3 uiLevel
 
 The UI level for this field. See the WebGUI developer's site for details. Defaults to "0".
-
-=back
 
 =cut
 
@@ -1796,25 +1700,21 @@ sub raw {
 
 Adds a read only row to this form. This is mainly used for displaying not editable properties, but it can also be used to quickly insert custom form elements.
 
-=over
-
-=item value 
+=head3 value 
 
 The read only value.
 
-=item label
+=head3 label
 
 The left column label for this form row.
 
-=item subtext
+=head3 subtext
 
 Extra text to describe this form element or to provide special instructions.
 
-=item uiLevel
+=head3 uiLevel
 
 The UI level for this field. See the WebGUI developer's site for details. Defaults to "0".
-
-=back
 
 =cut
 
@@ -1844,51 +1744,47 @@ sub select {
 
 Adds a select list row to this form.
 
-=over
-
-=item name
+=head3 name
 
 The name field for this form element.
 
-=item options 
+=head3 options 
 
 The list of options for this select list. Should be passed as a hash reference.
 
-=item label
+=head3 label
 
 The left column label for this form row.
 
-=item value
+=head3 value
 
 The default value(s) for this form element. This should be passed as an array reference.
 
-=item size 
+=head3 size 
 
 The number of characters tall this form element should be. Defaults to "1".
 
-=item multiple
+=head3 multiple
 
 A boolean value for whether this select list should allow multiple selections. Defaults to "0".
 
-=item extras
+=head3 extras
 
 If you want to add anything special to this form element like javascript actions, or stylesheet information, you'd add it in here as follows:
 
  'onChange="this.form.submit()"'
 
-=item subtext
+=head3 subtext
 
 Extra text to describe this form element or to provide special instructions.
 
-=item uiLevel
+=head3 uiLevel
 
 The UI level for this field. See the WebGUI developer's site for details. Defaults to "0".
 
-=item sortByValue
+=head3 sortByValue
 
 A boolean value for whether the values in the options hash should be sorted.
-
-=back
 
 =cut
 
@@ -1925,27 +1821,23 @@ sub selectList {
 
 Adds a submit button row to this form.
 
-=over
-
-=item value
+=head3 value
 
 The button text for this submit button. Defaults to "save".
 
-=item label
+=head3 label
 
 The left column label for this form row.
 
-=item extras
+=head3 extras
 
 If you want to add anything special to this form element like javascript actions, or stylesheet information, you'd add it in here as follows:
 
  'onChange="this.form.submit()"'
 
-=item subtext
+=head3 subtext
 
 Extra text to describe this form element or to provide special instructions.
-
-=back
 
 =cut
 
@@ -1968,39 +1860,35 @@ sub submit {
 
 Adds a template select list to the form.
 
-=over
-
-=item name
+=head3 name
 
 The name of this form element.
 
-=item value
+=head3 value
 
 The default value for this form element.
 
-=item label
+=head3 label
 
 The left column label for this form row.
 
-=item namespace
+=head3 namespace
 
 The namespace (or type) of templates to show in this list. Defaults to "Page".
 
-=item afterEdit
+=head3 afterEdit
 
 A URL that will be acted upon after editing a template. Typically there is a link next to the select list that reads "Edit this template" and this is the URL to go to after editing is complete.
 
-=item extras
+=head3 extras
 
 If you want to add anything special to this form element like javascript actions, or stylesheet information, you'd add it in here as follows:
 
  'onChange="this.form.submit()"'
 
-=item uiLevel
+=head3 uiLevel
 
 The UI level for this field. See the WebGUI developer's site for details. Defaults to "0".
-
-=back
 
 =cut
 
@@ -2040,43 +1928,39 @@ sub template {
 
 Adds a text row to this form.
 
-=over
-
-=item name
+=head3 name
 
 The name field for this form element.
 
-=item label
+=head3 label
 
 The left column label for this form row.
 
-=item value
+=head3 value
 
 The default value for this form element.
 
-=item maxlength
+=head3 maxlength
 
 The maximum number of characters to allow in this form element.
 
-=item extras
+=head3 extras
 
 If you want to add anything special to this form element like javascript actions, or stylesheet information, you'd add it in here as follows:
 
  'onChange="this.form.submit()"'
 
-=item subtext
+=head3 subtext
 
 Extra text to describe this form element or to provide special instructions.
 
-=item size
+=head3 size
 
 The number of characters wide this form element should be. There should be no reason for anyone to specify this.
 
-=item uiLevel
+=head3 uiLevel
 
 The UI level for this field. See the WebGUI developer's site for details. Defaults to "0".
-
-=back
 
 =cut
 
@@ -2110,47 +1994,43 @@ sub text {
 
 Adds a text area row to this form.
 
-=over
-
-=item name
+=head3 name
 
 The name field for this form element.
 
-=item label
+=head3 label
 
 The left column label for this form row.
 
-=item value
+=head3 value
 
 The default value for this form element.
 
-=item subtext
+=head3 subtext
 
 Extra text to describe this form element or to provide special instructions.
 
-=item extras
+=head3 extras
 
 If you want to add anything special to this form element like javascript actions, or stylesheet information, you'd add it in here as follows:
 
  'onChange="this.form.submit()"'
 
-=item wrap
+=head3 wrap
 
 The method for wrapping text in the text area. Defaults to "virtual". There should be almost no reason to specify this.
 
-=item rows 
+=head3 rows 
 
 The number of characters tall this form element should be. There should be no reason for anyone to specify this.
 
-=item columns
+=head3 columns
 
 The number of characters wide this form element should be. There should be no reason for anyone to specify this.
 
-=item uiLevel
+=head3 uiLevel
 
 The UI level for this field. See the WebGUI developer's site for details. Defaults to "0".
-
-=back
 
 =cut
 
@@ -2185,39 +2065,35 @@ sub textarea {
 
 Adds a date row to this form.
 
-=over
-
-=item name
+=head3 name
 
 The name field for this form element.
 
-=item label
+=head3 label
 
 The left column label for this form row.
 
-=item value
+=head3 value
 
 The default time. Pass as a number of seconds. Defaults to 0.
 
-=item extras
+=head3 extras
 
 If you want to add anything special to this form element like javascript actions, or stylesheet information, you'd add it in here as follows:
 
  'onChange="this.form.submit()"'
 
-=item subtext
+=head3 subtext
 
 Extra text to describe this form element or to provide special instructions.
 
-=item size
+=head3 size
 
 The number of characters wide this form element should be. There should be no reason for anyone to specify this.
 
-=item uiLevel
+=head3 uiLevel
 
 The UI level for this field. See the WebGUI developer's site for details. Defaults to "0".
-
-=back
 
 =cut
 
@@ -2251,43 +2127,39 @@ sub timeField {
 
 Adds a URL row to this form.
 
-=over
-
-=item name
+=head3 name
 
 The name field for this form element.
 
-=item label
+=head3 label
 
 The left column label for this form row.
 
-=item value
+=head3 value
 
 The default value for this form element.
 
-=item maxlength
+=head3 maxlength
 
 The maximum number of characters to allow in this form element.  Defaults to 2048.
 
-=item extras
+=head3 extras
 
 If you want to add anything special to this form element like javascript actions, or stylesheet information, you'd add it in here as follows:
 
  'onChange="this.form.submit()"'
 
-=item subtext
+=head3 subtext
 
 Extra text to describe this form element or to provide special instructions.
 
-=item size
+=head3 size
 
 The number of characters wide this form element should be. There should be no reason for anyone to specify this.
 
-=item uiLevel
+=head3 uiLevel
 
 The UI level for this field. See the WebGUI developer's site for details. Defaults to "0".
-
-=back
 
 =cut
 
@@ -2321,39 +2193,35 @@ sub url {
 
 Adds a "What next?" select list to this form for use with chained action forms in WebGUI.
 
-=over
-
-=item options
+=head3 options
 
 A hash reference of the possible actions that could happen next.
 
-=item value
+=head3 value
 
 The selected element in this list.
 
-=item name
+=head3 name
 
 The name field for this form element. Defaults to "proceed".
 
-=item label
+=head3 label
 
 The left column label for this form row.
 
-=item subtext
+=head3 subtext
 
 Extra text to describe this form element or to provide special instructions.
 
-=item uiLevel
+=head3 uiLevel
 
 The UI level for this field. See the WebGUI developer's site for details. Defaults to "1".
 
-=item extras
+=head3 extras
 
 If you want to add anything special to this form element like javascript actions, or stylesheet information, you'd add it in here as follows:
 
  'onChange="this.form.submit()"'
-
-=back
 
 =cut
 
@@ -2388,35 +2256,31 @@ sub whatNext {
 
 Adds a yes/no radio menu to this form.
 
-=over
-
-=item name
+=head3 name
 
 The name field for this form element.
 
-=item label
+=head3 label
 
 The left column label for this form row.
 
-=item value
+=head3 value
 
 The default value(s) for this form element. Valid values are "1" and "0". Defaults to "1".
 
-=item extras
+=head3 extras
 
 If you want to add anything special to this form element like javascript actions, or stylesheet information, you'd add it in here as follows:
 
  'onChange="this.form.submit()"'
 
-=item subtext
+=head3 subtext
 
 Extra text to describe this form element or to provide special instructions.
 
-=item uiLevel
+=head3 uiLevel
 
 The UI level for this field. See the WebGUI developer's site for details. Defaults to "0".
-
-=back
 
 =cut
 
@@ -2449,43 +2313,39 @@ sub yesNo {
 
 Adds a zip code row to this form.
 
-=over
-
-=item name
+=head3 name
 
 The name field for this form element.
 
-=item label
+=head3 label
 
 The left column label for this form row.
 
-=item value
+=head3 value
 
 The default value for this form element.
 
-=item maxlength
+=head3 maxlength
 
 The maximum number of characters to allow in this form element.
 
-=item extras
+=head3 extras
 
 If you want to add anything special to this form element like javascript actions, or stylesheet information, you'd add it in here as follows:
 
  'onChange="this.form.submit()"'
 
-=item subtext
+=head3 subtext
 
 Extra text to describe this form element or to provide special instructions.
 
-=item size
+=head3 size
 
 The number of characters wide this form element should be. There should be no reason for anyone to specify this.
 
-=item uiLevel
+=head3 uiLevel
 
 The UI level for this field. See the WebGUI developer's site for details. Defaults to "0".
-
-=back
 
 =cut
 

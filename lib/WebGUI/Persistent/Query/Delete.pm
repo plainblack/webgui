@@ -63,32 +63,24 @@ sub buildQuery {
 
 =head2 new( %p )
 
-=over
-
-=item properties
+=head3 properties
 
 A hashref of field name to a hash reference of property settings. 
 
 Currently used settings are:
 
-=over
-
-=item * quote
+=head3 * quote
 
 If true values for this field are automatically quoted.
 
-=back
-
-=item table
+=head3 table
 
 The name of the table to query.
 
-=item where
+=head3 where
 
 A hash reference or array reference of arguments to build a where clause from.
 See parseWhereArgs for details.
-
-=back
 
 =cut
 

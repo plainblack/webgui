@@ -83,25 +83,21 @@ sub dateToEpoch {
 
 Returns an epoch date with the amount of time added.
 
-=over
-
-=item epoch
+=head3 epoch
 
 The number of seconds since January 1, 1970.
 
-=item years
+=head3 years
 
 The number of years to add to the epoch.
 
-=item months
+=head3 months
 
 The number of months to add to the epoch.
 
-=item days
+=head3 days
 
 The number of days to add to the epoch. 
-
-=back
 
 =cut
 
@@ -121,25 +117,21 @@ sub addToDate {
 
 Returns an epoch date with the amount of time added.
 
-=over
-
-=item epoch
+=head3 epoch
 
 The number of seconds since January 1, 1970.
 
-=item hours
+=head3 hours
 
 The number of hours to add to the epoch.
 
-=item minutes
+=head3 minutes
 
 The number of minutes to add to the epoch.
 
-=item seconds
+=head3 seconds
 
 The number of seconds to add to the epoch.
-
-=back
 
 =cut
 
@@ -159,13 +151,9 @@ sub addToTime {
 
 Returns an epoch date.
 
-=over
-
-=item date
+=head3 date
 
 An array of the format year, month, day, hour, min, sec.
-
-=back
 
 =cut
 
@@ -188,13 +176,9 @@ sub arrayToEpoch {
 
 Returns the epoch dates for the start and end of the day.
 
-=over
-
-=item epoch
+=head3 epoch
 
 The number of seconds since January 1, 1970.
-
-=back
 
 =cut
 
@@ -212,13 +196,9 @@ sub dayStartEnd {
 
 Returns a date array in the form of year, month, day, hour, min, sec.
 
-=over
-
-=item epoch
+=head3 epoch
 
 An epoch date.
-
-=back
 
 =cut
 
@@ -234,13 +214,11 @@ sub epochToArray {
 
 Returns a formated date string.
 
-=over
-
-=item epoch
+=head3 epoch
 
 The number of seconds since January 1, 1970. Defaults to NOW!
 
-=item format 
+=head3 format 
 
 A string representing the output format for the date. Defaults to '%z %Z'. You can use the following to format your date string:
 
@@ -267,8 +245,6 @@ A string representing the output format for the date. Defaults to '%z %Z'. You c
  %Y = A two digit year. 
  %z = The current user's date format preference.
  %Z = The current user's time format preference.
-
-=back
 
 =cut
 
@@ -359,17 +335,13 @@ sub epochToHuman {
 
 Returns a set date (used by WebGUI::HTMLForm->date) in the format of YYYY-MM-DD. 
 
-=over
-
-=item epoch
+=head3 epoch
 
 The number of seconds since January 1, 1970.
 
-=item withTime
+=head3 withTime
 
 A boolean indicating that the time should be added to the output, thust turning the format into YYYY-MM-DD HH:MM:SS.
-
-=back
 
 =cut
 
@@ -386,13 +358,9 @@ sub epochToSet {
 
 Returns a string containing the calendar month name in the language of the current user.
 
-=over
-
-=item month
+=head3 month
 
 An integer ranging from 1-12 representing the month.
-
-=back
 
 =cut
 
@@ -430,13 +398,9 @@ sub getMonthName {
 
 Returns a string containing the weekday name in the language of the current user. 
 
-=over
-
-=item day
+=head3 day
 
 An integer ranging from 1-7 representing the day of the week (Sunday is 1 and Saturday is 7). 
-
-=back
 
 =cut
 
@@ -465,13 +429,9 @@ sub getDayName {
 
 Returns the total number of days in the month.
 
-=over
-
-=item epoch
+=head3 epoch
 
 An epoch date.
-
-=back
 
 =cut
 
@@ -488,17 +448,13 @@ sub getDaysInMonth {
 
 Returns the number of days between two epoch dates.
 
-=over
-
-=item start
+=head3 start
 
 An epoch date.
 
-=item end
+=head3 end
 
 An epoch date.
-
-=back
 
 =cut
 
@@ -518,13 +474,9 @@ sub getDaysInInterval {
 
 Returns the position (1 - 7) of the first day in the month.
 
-=over
-
-=item epoch
+=head3 epoch
 
 An epoch date.
-
-=back
 
 =cut
 
@@ -548,13 +500,9 @@ sub getFirstDayInMonthPosition {
 
 Calculates the number of seconds into the day of an epoch date the epoch datestamp is.
 
-=over
-
-=item epoch
+=head3 epoch
 
 The number of seconds since January 1, 1970 00:00:00.
-
-=back
 
 =cut
 
@@ -570,13 +518,9 @@ sub getSecondsFromEpoch {
 
 Returns an epoch date derived from the human date.
 
-=over
-
-=item date
+=head3 date
 
 The human date string. YYYY-MM-DD HH:MM:SS 
-
-=back
 
 =cut
 
@@ -601,17 +545,13 @@ sub humanToEpoch {
 
 Returns the number of seconds derived from the interval.
 
-=over
-
-=item interval
+=head3 interval
 
 An integer which represents the amount of time for the interval.
 
-=item units
+=head3 units
 
 A string which represents the units of the interval. The string must be 'years', 'months', 'weeks', 'days', 'hours', 'minutes', or 'seconds'. 
-
-=back
 
 =cut
 
@@ -639,13 +579,9 @@ sub intervalToSeconds {
 
 Returns an array of time elements. The elements are: years, months, days, hours, minutes, seconds, day of year, day of week, daylight savings.
 
-=over
-
-=item epoch
+=head3 epoch
 
 The number of seconds since January 1, 1970. Defaults to now.
-
-=back
 
 =cut
 
@@ -667,17 +603,13 @@ sub localtime {
 
 Returns the number of months between the start and end dates (inclusive).
 
-=over
-
-=item startEpoch
+=head3 startEpoch
 
 An epoch datestamp corresponding to the first month.
 
-=item endEpoch
+=head3 endEpoch
 
 An epoch datestamp corresponding to the last month.
-
-=back
 
 =cut
 
@@ -697,13 +629,9 @@ sub monthCount {
 
 Returns the epoch dates for the start and end of the month.
 
-=over
-
-=item epoch
+=head3 epoch
 
 The number of seconds since January 1, 1970.
-
-=back
 
 =cut
 
@@ -721,13 +649,9 @@ sub monthStartEnd {
 
 Returns an interval and units derived the number of seconds.
 
-=over
-
-=item seconds
+=head3 seconds
 
 The number of seconds in the interval. 
-
-=back
 
 =cut
 
@@ -764,13 +688,9 @@ sub secondsToInterval {
 
 Returns a time string of the format HH::MM::SS on a 24 hour clock. See also timeToSeconds().
 
-=over
-
-=item seconds
+=head3 seconds
 
 A number of seconds. 
-
-=back
 
 =cut
 
@@ -791,13 +711,9 @@ sub secondsToTime {
 
 Returns an epoch date.
 
-=over
-
-=item set
+=head3 set
 
 A string in the format of YYYY-MM-DD or YYYY-MM-DD HH:MM:SS.
-
-=back
 
 =cut
 
@@ -842,13 +758,9 @@ sub time {
 
 Returns the seconds since 00:00:00 on a 24 hour clock.
 
-=over
-
-=item timeString
+=head3 timeString
 
 A string that looks similar to this: 15:05:32
-
-=back
 
 =cut
 

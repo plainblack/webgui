@@ -119,39 +119,33 @@ sub buildSelectFields {
 
 =head2 new( %p )
 
-=over
-
-=item fields
+=head3 fields
 
 An array reference of field names (optional).
 
-=item groupBy
+=head3 groupBy
 
 An array reference of fields to group results by
 
-=item limit
+=head3 limit
 
 A scalar limit.
 
-=item orderBy
+=head3 orderBy
 
 An array reference of fields to order results by
 
-=item properties
+=head3 properties
 
-=over
-
-=item * quote
+=head3 * quote
 
 If true values for this field are automatically quoted.
 
-=back
-
-=item table
+=head3 table
 
 The name of the table to query.
 
-=item where
+=head3 where
 
 A hash reference or array reference of arguments to build a where clause from.
 See WebGUI::Persistent::Query::parseWhereArgs for details.

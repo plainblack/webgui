@@ -86,13 +86,9 @@ sub getRequiredProfileFields {
  Checks the value of the email address passed in to see if it is duplicated in the system.  Returns true of false.  Will return false if the email address passed in is
  same as the email address of the current user.
  
-=over
-
-=item email
+=head3 email
    
    email address to check for duplication
-
-=back
 
 =cut
 

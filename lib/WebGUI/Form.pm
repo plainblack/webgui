@@ -115,27 +115,23 @@ sub _fixTags {
 
 Returns a checkbox form element.
 
-=over
-
-=item name
+=head3 name
 
 The name field for this form element.
 
-=item checked 
+=head3 checked 
 
 If you'd like this box to be defaultly checked, set this to "1".
 
-=item value
+=head3 value
 
 The default value for this form element. Defaults to "1".
 
-=item extras
+=head3 extras
 
 If you want to add anything special to this form element like javascript actions, or stylesheet information, you'd add it in here as follows:
 
  'onChange="this.form.submit()"'
-
-=back
 
 =cut
 
@@ -152,31 +148,27 @@ sub checkbox {
 
 Returns checkbox list.
 
-=over
-
-=item name
+=head3 name
 
 The name field for this form element.
 
-=item options
+=head3 options
 
 The list of options for this list. Should be passed as a hash reference.
 
-=item value
+=head3 value
 
 The default value(s) for this form element. This should be passed as an array reference.
 
-=item vertical
+=head3 vertical
 
 If set to "1" the radio button elements will be laid out horizontally. Defaults to "0".
 
-=item extras
+=head3 extras
 
 If you want to add anything special to this form element like javascript actions, or stylesheet information, you'd add it in here as follows:
 
  'onChange="this.form.submit()"'
-
-=back
 
 =cut
 
@@ -211,35 +203,31 @@ sub checkList {
 
 Returns a select list and a text field. If the text box is filled out it will have a value stored in "name"_new.
 
-=over
-
-=item name
+=head3 name
 
 The name field for this form element.
 
-=item options
+=head3 options
 
 The list of options for the select list. Should be passed as a hash reference.
 
-=item value
+=head3 value
 
 The default value(s) for this form element. This should be passed as an array reference.
 
-=item size
+=head3 size
 
 The number of characters tall this form element should be. Defaults to "1".
 
-=item multiple
+=head3 multiple
 
 A boolean value for whether this select list should allow multiple selections. Defaults to "0".
 
-=item extras
+=head3 extras
 
 If you want to add anything special to this form element like javascript actions, or stylesheet information, you'd add it in here as follows:
 
  'onChange="this.form.submit()"'
-
-=back
 
 =cut
 
@@ -265,27 +253,23 @@ sub combo {
 
 Returns a content type select list field. This is usually used to help tell WebGUI how to treat posted content.
 
-=over
-
-=item name
+=head3 name
 
 The name field for this form element.
 
-=item types 
+=head3 types 
 
 An array reference of field types to be displayed. The types are "mixed", "html", "code", and "text".  Defaults to all.
 
-=item value
+=head3 value
 
 The default value for this form element. Defaults to "mixed".
 
-=item extras
+=head3 extras
 
 If you want to add anything special to this form element like javascript actions, or stylesheet information, you'd add it in here as follows:
 
  'onChange="this.form.submit()"'
-
-=back
 
 =cut
 
@@ -324,17 +308,13 @@ sub contentType {
                                                                                                                                                              
 Returns a select list of database links.
                                                                                                                                                              
-=over
-                                                                                                                                                             
-=item name
+=head3 name
                                                                                                                                                              
 The name field for this form element. Defaults to "databaseLinkId".
                                                                                                                                                              
-=item value
+=head3 value
                                                                                                                                                              
 The unique identifier for the selected template. Defaults to "0", which is the WebGUI database.
-                                                                                                                                                             
-=back
                                                                                                                                                              
 =cut
                                                                                                                                                              
@@ -359,31 +339,27 @@ sub databaseLink {
 
 Returns a date field.
 
-=over
-
-=item name
+=head3 name
 
 The name field for this form element.
 
-=item value
+=head3 value
 
 The default date. Pass as an epoch value. Defaults to today.
 
-=item extras
+=head3 extras
 
 If you want to add anything special to this form element like javascript actions, or stylesheet information, you'd add it in here as follows:
 
  'onChange="this.form.submit()"'
 
-=item size
+=head3 size
 
 The number of characters wide this form element should be. There should be no reason for anyone to specify this.
 
-=item noDate
+=head3 noDate
 
 By default a date is placed in the "value" field. Set this to "1" to turn off the default date.
-
-=back
 
 =cut
 
@@ -419,21 +395,17 @@ sub date {
 
 Returns a date/time field.
 
-=over
-
-=item name
+=head3 name
 
 The the base name for this form element. This form element actually returns two values under different names. They are name_date and name_time.
 
-=item value
+=head3 value
 
 The date and time. Pass as an epoch value. Defaults to today and now.
 
-=item extras 
+=head3 extras 
 
 Extra parameters to add to the date/time form element such as javascript or stylesheet information.
-
-=back
 
 =cut
 
@@ -466,17 +438,13 @@ sub dateTime {
                                                                                                                          
 Returns a dynamic configurable field.
                                                                                                                          
-=over
-                                                                                                                         
-=item fieldType
+=head3 fieldType
 
 The field type to use. The field name is the name of the method from this forms package.
 
-=item options
+=head3 options
 
 The field options. See the documentation for the desired field for more information.
-                                                                                                                         
-=back
                                                                                                                          
 =cut
 
@@ -520,31 +488,27 @@ sub dynamicField {
 
 Returns an email address field.
 
-=over
-
-=item name
+=head3 name
 
 The name field for this form element.
 
-=item value
+=head3 value
 
 The default value for this form element.
 
-=item maxlength
+=head3 maxlength
 
 The maximum number of characters to allow in this form element.
 
-=item extras
+=head3 extras
 
 If you want to add anything special to this form element like javascript actions, or stylesheet information, you'd add it in here as follows:
 
  'onChange="this.form.submit()"'
 
-=item size
+=head3 size
 
 The number of characters wide this form element should be. There should be no reason for anyone to specify this.
-
-=back
 
 =cut
 
@@ -566,31 +530,27 @@ sub email {
 
 Returns a field type select list field. This is primarily useful for building dynamic form builders.
 
-=over
-
-=item name
+=head3 name
 
 The name field for this form element.
 
-=item types 
+=head3 types 
 
 An array reference of field types to be displayed. The field names are the names of the methods from this forms package. Note that not all field types are supported. Defaults to all.
 
-=item value
+=head3 value
 
 The default value for this form element.
 
-=item size
+=head3 size
 
 The number of characters tall this form element should be. Defaults to "1".
 
-=item extras
+=head3 extras
 
 If you want to add anything special to this form element like javascript actions, or stylesheet information, you'd add it in here as follows:
 
  'onChange="this.form.submit()"'
-
-=back
 
 =cut
 
@@ -658,23 +618,19 @@ sub fieldType {
 
 Returns a file upload field.
 
-=over
-
-=item name
+=head3 name
 
 The name field for this form element.
 
-=item extras
+=head3 extras
 
 If you want to add anything special to this form element like javascript actions, or stylesheet information, you'd add it in here as follows:
 
  'onChange="this.form.submit()"'
 
-=item size
+=head3 size
 
 The number of characters wide this form element should be. There should be no reason for anyone to specify this.
-
-=back
 
 =cut
 
@@ -691,23 +647,19 @@ sub file {
 
 Returns a select list containing the content filter options. This is for use with WebGUI::HTML::filter().
 
-=over
-
-=item name
+=head3 name
 
 The name field for this form element. This defaults to "filterContent".
 
-=item value
+=head3 value
 
 The default value for this form element. 
 
-=item extras
+=head3 extras
 
 If you want to add anything special to this form element like javascript actions, or stylesheet information, you'd add it in here as follows:
 
  'onChange="this.form.submit()"'
-
-=back
 
 =cut
 
@@ -749,25 +701,21 @@ sub formFooter {
 
 Returns a form header.
 
-=over
-
-=item action
+=head3 action
 
 The form action. Defaults to the current page.
 
-=item method
+=head3 method
 
 The form method. Defaults to "POST".
 
-=item enctype
+=head3 enctype
 
 The form enctype. Defaults to "multipart/form-data".
 
-=item extras
+=head3 extras
 
 If you want to add anything special to the form header like javascript actions or stylesheet info, then use this.
-
-=back
 
 =cut
 
@@ -796,31 +744,27 @@ sub formHeader {
 
 Returns an floating point field.
 
-=over
-
-=item name
+=head3 name
 
 The name field for this form element.
 
-=item value
+=head3 value
 
 The default value for this form element.
 
-=item maxlength
+=head3 maxlength
 
 The maximum number of characters to allow in this form element.  Defaults to 11.
 
-=item extras
+=head3 extras
 
 If you want to add anything special to this form element like javascript actions, or stylesheet information, you'd add it in here as follows:
 
  'onChange="this.form.submit()"'
 
-=item size
+=head3 size
 
 The number of characters wide this form element should be. There should be no reason for anyone to specify this.
-
-=back
 
 =cut
 
@@ -846,35 +790,31 @@ sub float {
 
 Returns a group pull-down field. A group pull down provides a select list that provides name value pairs for all the groups in the WebGUI system.  
 
-=over
-
-=item name
+=head3 name
 
 The name field for this form element.
 
-=item value 
+=head3 value 
 
 The selected group id(s) for this form element.  This should be passed as an array reference. Defaults to "7" (Everyone).
 
-=item size
+=head3 size
 
 How many rows should be displayed at once?
 
-=item multiple
+=head3 multiple
 
 Set to "1" if multiple groups should be selectable.
 
-=item extras
+=head3 extras
 
 If you want to add anything special to this form element like javascript actions, or stylesheet information, you'd add it in here as follows:
 
  'onChange="this.form.submit()"'
 
-=item excludeGroups
+=head3 excludeGroups
 
 An array reference containing a list of groups to exclude from the list.
-
-=back
 
 =cut
 
@@ -907,17 +847,13 @@ sub group {
 
 Returns a hidden field.
 
-=over
-
-=item name
+=head3 name
 
 The name field for this form element.
 
-=item value
+=head3 value
 
 The default value for this form element.
-
-=back
 
 =cut
 
@@ -932,21 +868,17 @@ sub hidden {
 
 Returns a list of hidden fields. This is primarily to be used by the HTMLForm package, but we decided to make it a public method in case anybody else had a use for it.
 
-=over
-
-=item name
+=head3 name
 
 The name of this field.
 
-=item options 
+=head3 options 
 
 A hash reference where the key is the "name" of the hidden field.
 
-=item value
+=head3 value
 
 An array reference where each value in the array should be a name from the hash (if you want it to show up in the hidden list). 
-
-=back
 
 =cut
 
@@ -973,41 +905,37 @@ sub hiddenList {
 
 Returns an HTML area. An HTML area is different than a standard text area in that it provides rich edit functionality and some special error trapping for HTML and other special characters.
 
-=over
-
-=item name
+=head3 name
 
 The name field for this form element.
 
-=item value
+=head3 value
 
 The default value for this form element.
 
-=item extras
+=head3 extras
 
 If you want to add anything special to this form element like javascript actions, or stylesheet information, you'd add it in here as follows:
 
  'onChange="this.form.submit()"'
 
-=item wrap
+=head3 wrap
 
 The method for wrapping text in the text area. Defaults to "virtual". There should be almost no reason to specify this.
 
-=item rows
+=head3 rows
 
 The number of characters tall this form element should be. There should be no reason for anyone to specify this.
 
-=item columns
+=head3 columns
 
 The number of characters wide this form element should be. There should be no reason for anyone to specify this.
 
-=item popupToggle
+=head3 popupToggle
 
 Defaults to "0". If set to "1" the rich editor will be a pop-up editor. If set to "0" the rich editor will be inline.
 
-NOTE: WebGUI uses a great variety of rich editors. Not all of them are capable of inline mode, so even if you leave this set to "0" the editor may be a pop-up anyway.
-
-=back
+B<NOTE:> WebGUI uses a great variety of rich editors. Not all of them are capable of inline mode, so even if you leave this set to "0" the editor may be a pop-up anyway.
 
 =cut
 
@@ -1056,31 +984,27 @@ sub HTMLArea {
 
 Returns an integer field.
 
-=over
-
-=item name
+=head3 name
 
 The name field for this form element.
 
-=item value
+=head3 value
 
 The default value for this form element.
 
-=item maxlength
+=head3 maxlength
 
 The maximum number of characters to allow in this form element.  Defaults to 11.
 
-=item extras
+=head3 extras
 
 If you want to add anything special to this form element like javascript actions, or stylesheet information, you'd add it in here as follows:
 
  'onChange="this.form.submit()"'
 
-=item size
+=head3 size
 
 The number of characters wide this form element should be. There should be no reason for anyone to specify this.
-
-=back
 
 =cut
 
@@ -1103,27 +1027,23 @@ sub integer {
 
 Returns a time interval field.
 
-=over
-
-=item name
+=head3 name
 
 The the base name for this form element. This form element actually returns two values under different names. They are name_interval and name_units.
 
-=item intervalValue
+=head3 intervalValue
 
 The default value for interval portion of this form element. Defaults to '1'.
 
-=item unitsValue
+=head3 unitsValue
 
 The default value for units portion of this form element. Defaults to 'seconds'. Possible values are 'seconds', 'minutes', 'hours', 'days', 'weeks', 'months', and 'years'.
 
-=item extras
+=head3 extras
 
 If you want to add anything special to this form element like javascript actions, or stylesheet information, you'd add it in here as follows:
 
  'onChange="this.form.submit()"'
-
-=back
 
 =cut
 
@@ -1159,31 +1079,27 @@ sub interval {
 
 Returns a password field. 
 
-=over
-
-=item name 
+=head3 name 
 
 The name field for this form element.
 
-=item value
+=head3 value
 
 The default value for this form element.
 
-=item maxlength 
+=head3 maxlength 
 
 The maximum number of characters to allow in this form element. Defaults to "35".
 
-=item extras
+=head3 extras
 
 If you want to add anything special to this form element like javascript actions, or stylesheet information, you'd add it in here as follows:
 
  'onChange="this.form.submit()"'
 
-=item size 
+=head3 size 
 
 The number of characters wide this form element should be. There should be no reason for anyone to specify this. Defaults to "30" unless overridden in the settings.
-
-=back
 
 =cut
 
@@ -1202,31 +1118,27 @@ sub password {
 
 Returns a telephone number field.
 
-=over
-
-=item name
+=head3 name
 
 The name field for this form element.
 
-=item value
+=head3 value
 
 The default value for this form element.
 
-=item maxlength
+=head3 maxlength
 
 The maximum number of characters to allow in this form element.
 
-=item extras
+=head3 extras
 
 If you want to add anything special to this form element like javascript actions, or stylesheet information, you'd add it in here as follows:
 
  'onChange="this.form.submit()"'
 
-=item size
+=head3 size
 
 The number of characters wide this form element should be. There should be no reason for anyone to specify this.
-
-=back
 
 =cut
 
@@ -1248,28 +1160,24 @@ sub phone {
 
 Returns a radio button.
 
-=over
-
-=item name
+=head3 name
 
 The name field for this form element.
 
-=item checked
+=head3 checked
 
 If you'd like this radio button to be defaultly checked, set this to "1".
 
-=item value
+=head3 value
 
 The default value for this form element.
 
-=item extras
+=head3 extras
 
 If you want to add anything special to this form element like javascript actions, or stylesheet information, you'd add it in here as follows:
 
  'onChange="this.form.submit()"'
 
-
-=back
 
 =cut
 
@@ -1285,31 +1193,27 @@ sub radio {
 
 Returns a radio button list field.
 
-=over
-
-=item name
+=head3 name
 
 The name field for this form element.
 
-=item options
+=head3 options
 
 The list of options for this list. Should be passed as a hash reference.
 
-=item value
+=head3 value
 
 The default value for this form element. This should be passed as a scalar.
 
-=item vertical
+=head3 vertical
 
 If set to "1" the radio button elements will be laid out horizontally. Defaults to "0".
 
-=item extras
+=head3 extras
 
 If you want to add anything special to this form element like javascript actions, or stylesheet information, you'd add it in here as follows:
 
  'onChange="this.form.submit()"'
-
-=back
 
 =cut
 
@@ -1340,39 +1244,35 @@ sub radioList {
 
 Returns a select list field.
 
-=over
-
-=item name
+=head3 name
 
 The name field for this form element.
 
-=item options 
+=head3 options 
 
 The list of options for this select list. Should be passed as a hash reference.
 
-=item value
+=head3 value
 
 The default value(s) for this form element. This should be passed as an array reference.
 
-=item size 
+=head3 size 
 
 The number of characters tall this form element should be. Defaults to "1".
 
-=item multiple
+=head3 multiple
 
 A boolean value for whether this select list should allow multiple selections. Defaults to "0".
 
-=item extras
+=head3 extras
 
 If you want to add anything special to this form element like javascript actions, or stylesheet information, you'd add it in here as follows:
 
  'onChange="this.form.submit()"'
 
-=item sortByValue
+=head3 sortByValue
 
 A boolean value for whether or not the values in the options hash should be sorted.
-
-=back
 
 =cut
 
@@ -1410,19 +1310,15 @@ sub selectList {
 
 Returns a submit button.
 
-=over
-
-=item value
+=head3 value
 
 The button text for this submit button. Defaults to "save".
 
-=item extras
+=head3 extras
 
 If you want to add anything special to this form element like javascript actions, or stylesheet information, you'd add it in here as follows:
 
  'onChange="this.form.submit()"'
-
-=back
 
 =cut
 
@@ -1440,27 +1336,23 @@ sub submit {
 
 Returns a select list of templates.
 
-=over
-
-=item name
+=head3 name
 
 The name field for this form element. Defaults to "templateId".
 
-=item value 
+=head3 value 
 
 The unique identifier for the selected template. Defaults to "1".
 
-=item namespace
+=head3 namespace
 
 The namespace for the list of templates to return. If this is omitted, all templates will be displayed.
 
-=item extras
+=head3 extras
 
 If you want to add anything special to this form element like javascript actions, or stylesheet information, you'd add it in here as follows:
 
  'onChange="this.form.submit()"'
-
-=back
 
 =cut
 
@@ -1481,31 +1373,27 @@ sub template {
 
 Returns a text input field.
 
-=over
-
-=item name
+=head3 name
 
 The name field for this form element.
 
-=item value
+=head3 value
 
 The default value for this form element.
 
-=item maxlength
+=head3 maxlength
 
 The maximum number of characters to allow in this form element.
 
-=item extras
+=head3 extras
 
 If you want to add anything special to this form element like javascript actions, or stylesheet information, you'd add it in here as follows:
 
  'onChange="this.form.submit()"'
 
-=item size
+=head3 size
 
 The number of characters wide this form element should be. There should be no reason for anyone to specify this.
-
-=back
 
 =cut
 
@@ -1526,35 +1414,31 @@ sub text {
 
 Returns a text area field.
 
-=over
-
-=item name
+=head3 name
 
 The name field for this form element.
 
-=item value
+=head3 value
 
 The default value for this form element.
 
-=item extras
+=head3 extras
 
 If you want to add anything special to this form element like javascript actions, or stylesheet information, you'd add it in here as follows:
 
  'onChange="this.form.submit()"'
 
-=item wrap
+=head3 wrap
 
 The method for wrapping text in the text area. Defaults to "virtual". There should be almost no reason to specify this.
 
-=item rows 
+=head3 rows 
 
 The number of characters tall this form element should be. There should be no reason for anyone to specify this.
 
-=item columns
+=head3 columns
 
 The number of characters wide this form element should be. There should be no reason for anyone to specify this.
-
-=back
 
 =cut
 
@@ -1576,31 +1460,27 @@ sub textarea {
 
 Returns a time field, 24 hour format.
 
-=over
-
-=item name
+=head3 name
 
 The name field for this form element.
 
-=item value
+=head3 value
 
 The default value for this form element. Defaults to the current time (like "15:03:42").
 
-=item maxlength
+=head3 maxlength
 
 The maximum number of characters to allow in this form element.  Defaults to 8.
 
-=item extras
+=head3 extras
 
 If you want to add anything special to this form element like javascript actions, or stylesheet information, you'd add it in here as follows:
 
  'onChange="this.form.submit()"'
 
-=item size
+=head3 size
 
 The number of characters wide this form element should be. There should be no reason for anyone to specify this. Defaults to 8.
-
-=back
 
 =cut
 
@@ -1627,31 +1507,27 @@ sub timeField {
 
 Returns a URL field.
 
-=over
-
-=item name
+=head3 name
 
 The name field for this form element.
 
-=item value
+=head3 value
 
 The default value for this form element.
 
-=item maxlength
+=head3 maxlength
 
 The maximum number of characters to allow in this form element.  Defaults to 2048.
 
-=item extras
+=head3 extras
 
 If you want to add anything special to this form element like javascript actions, or stylesheet information, you'd add it in here as follows:
 
  'onChange="this.form.submit()"'
 
-=item size
+=head3 size
 
 The number of characters wide this form element should be. There should be no reason for anyone to specify this.
-
-=back
 
 =cut
 
@@ -1673,27 +1549,23 @@ sub url {
 
 Returns a "What next?" select list for use with chained action forms in WebGUI.
 
-=over
-
-=item options
+=head3 options
 
 A hash reference of the possible actions that could happen next.
 
-=item value
+=head3 value
 
 The selected element in this list. 
 
-=item name
+=head3 name
 
 The name field for this form element. Defaults to "proceed".
 
-=item extras
+=head3 extras
 
 If you want to add anything special to this form element like javascript actions, or stylesheet information, you'd add it in here as follows:
 
  'onChange="this.form.submit()"'
-
-=back
 
 =cut
 
@@ -1715,23 +1587,19 @@ sub whatNext {
 
 Returns a yes/no radio field. 
 
-=over
-
-=item name
+=head3 name
 
 The name field for this form element.
 
-=item value
+=head3 value
 
 The default value(s) for this form element. Valid values are "1" and "0". Defaults to "1".
 
-=item extras
+=head3 extras
 
 If you want to add anything special to this form element like javascript actions, or stylesheet information, you'd add it in here as follows:
 
  'onChange="this.form.submit()"'
-
-=back
 
 =cut
 
@@ -1766,31 +1634,27 @@ sub yesNo {
 
 Returns a zip code field.
 
-=over
-
-=item name
+=head3 name
 
 The name field for this form element.
 
-=item value
+=head3 value
 
 The default value for this form element.
 
-=item maxlength
+=head3 maxlength
 
 The maximum number of characters to allow in this form element.
 
-=item extras
+=head3 extras
 
 If you want to add anything special to this form element like javascript actions, or stylesheet information, you'd add it in here as follows:
 
  'onChange="this.form.submit()"'
 
-=item size
+=head3 size
 
 The number of characters wide this form element should be. There should be no reason for anyone to specify this.
-
-=back
 
 =cut
 

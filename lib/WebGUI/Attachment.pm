@@ -111,17 +111,13 @@ sub box {
  
 Copies an attachment from one node to another.
 
-=over
-
-=item newNode
+=head3 newNode
 
 Define the node to copy the attachment to.
 
-=item newNodeSub
+=head3 newNodeSub
 
 If there is a subordinate element on this node define it here.
-
-=back
 
 =cut
 
@@ -164,13 +160,9 @@ sub copy {
 
 Generates a thumbnail for this attachment.
 
-=over
-
-=item thumbnailSize
+=head3 thumbnailSize
 
 Defaults to the global setting for thumbnail size. However, it can be overriden with this value. Specified in pixels.
-
-=back
 
 =cut
 
@@ -456,21 +448,17 @@ sub isImage {
 
 Constructor.
 
-=over
-
-=item filename
+=head3 filename
 
 What is the filename for this attachment. If you'll be uploading the attachment using the "save" method then you may leave this field blank.
 
-=item node
+=head3 node
 
 The node where this attachment is (or will be placed).
 
-=item nodeSubordinate
+=head3 nodeSubordinate
 
 The subordinate element of the node where this attachment is (or will be placed).
-
-=back
 
 =cut
 
@@ -487,13 +475,9 @@ sub new {
 
 Renames an attachment's filename.
 
-=over
-
-=item newFilename
+=head3 newFilename
 
 Define the new filename for this attachment.
-
-=back
 
 =cut
 
@@ -512,13 +496,9 @@ sub rename {
 
 Resizes this attachment to the specified size. Use this method only if the attachment is an image.
 
-=over
-
-=item imageSize
+=head3 imageSize
 
 Defaults to the max image size setting. Specify a value in pixels to resize this image to.
-
-=back
 
 =cut
 
@@ -546,21 +526,17 @@ sub resizeImage {
 
 Grabs an attachment from a form POST and saves it to a node. It then returns the filename of the attachment.
 
-=over
-
-=item formVariableName
+=head3 formVariableName
 
 Provide the form variable name to which the file being uploaded is assigned.
 
-=item thumbnailSize
+=head3 thumbnailSize
 
 If an image is being uploaded a thumbnail will be generated automatically. By default, WebGUI will create a thumbnail of the size specified in the file settings. You can override that size by specifying one here. Size is measured in pixels of the longest side.
 
-=item imageSize
+=head3 imageSize
 
 If a web image (gif, png, jpg, jpeg) is being uploaded it will be resized if it is larger than this value. By default images are resized to stay within the contraints of the Max Image Size setting in the file settings.
-
-=back
 
 =cut
 
@@ -608,21 +584,17 @@ sub save {
 
 Grabs an attachment from the server's file system and saves it to a node. It then returns the filename of the attachment.
 
-=over
-
-=item pathToFile 
+=head3 pathToFile 
 
 Provide the local path to this file.
 
-=item thumbnailSize
+=head3 thumbnailSize
 
 If an image is being grabbed a thumbnail will be generated automatically. By default, WebGUI will create a thumbnail of the size specified in the content settings. You can override that size by specifying one here. Size is measured in pixels of the longest side.
 
-=item imageSize
+=head3 imageSize
 
 If a web image (gif, png, jpg, jpeg) is being grabbed it will be resized if it is larger than this value. By default images are resized to stay within the contraints of the Max Image Size setting in the content settings.
-
-=back
 
 =cut
 
@@ -672,13 +644,9 @@ sub saveFromFilesystem {
 
 Stores a hash reference as an attachment.
 
-=over
-
-=item hashref
+=head3 hashref
 
 A hash reference containing the data you wish to persist to the filesystem.
-
-=back
 
 =cut
 
@@ -696,13 +664,9 @@ sub saveFromHashref {
 
 Stores a scalar as a text attachment.
 
-=over
-
-=item scalar
+=head3 scalar
 
 A scalar variable containing the content to write to the filesystem.
-
-=back
 
 =cut
 

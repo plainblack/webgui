@@ -150,17 +150,13 @@ sub getURL {
 
 Constructor.
 
-=over
-
-=item node1
+=head3 node1
 
  The first level of the hash heirarchy.
 
-=item node2
+=head3 node2
 
  The second level of the hash heirarchy.
-
-=back
 
 =cut
 
@@ -175,21 +171,17 @@ sub new {
 
 Archives this node into a tar file and then compresses it with a zlib algorithm.
 
-=over
-
-=item filename
+=head3 filename
 
 The name of the tar file to be created. Should ideally end with ".tar.gz".
 
-=item node1
+=head3 node1
 
 The node where you would like to create this tar file. Defaults to "temp".
 
-=item node2
+=head3 node2
 
 If you need a second level node to store the file, then specify it here.
-
-=back
 
 =cut
 
@@ -217,21 +209,17 @@ sub tar {
 
 Unarchives a file into this node.
 
-=over
-
-=item filename
+=head3 filename
 
 The name of the tar file to be untarred.
 
-=item node1
+=head3 node1
 
 The node where the tar file exists. Defaults to "temp".
 
-=item node2
+=head3 node2
 
 If the file exists in a sub-node, then specifiy it here.
-
-=back
 
 =cut
 

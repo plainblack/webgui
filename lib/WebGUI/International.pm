@@ -53,21 +53,17 @@ These functions/methods are available from this package:
 
 Returns the internationalized message string for the user's language.  If there is no internationalized message, this method will return the English string.
 
-=over
-
-=item internationalId
+=head3 internationalId
 
 An integer that relates to a message in the international table in the WebGUI database.
 
-=item namespace
+=head3 namespace
 
 A string that relates to the namespace field in the international table in the WebGUI database. Defaults to 'WebGUI'.
 
-=item languageId
+=head3 languageId
 
 An integer that specifies the language that the user should see.  Defaults to the user's defined language. If the user hasn't specified a default language it defaults to '1' (English).
-
-=back
 
 =cut
 
@@ -100,17 +96,13 @@ sub get {
 
 Returns a hash reference to a particular language's properties.
 
-=over
-
-=item languageId
+=head3 languageId
 
 Defaults to "English". The language to retrieve the properties for.
 
-=item propertyName
+=head3 propertyName
 
 If this is specified, only the value of the property will be returned, instead of the hash reference to all properties. The valid values are "charset", "toolbar", and "label".
-
-=back
 
 =cut
 
@@ -165,17 +157,13 @@ sub getLanguages {
 
 The constructor for the International function if using it in OO mode.
 
-=over
-
-=item namespace
+=head3 namespace
 
 Specify a default namespace. Defaults to "WebGUI".
 
-=item languageId
+=head3 languageId
 
 Specify a default language. Defaults to user preference.
-
-=back
 
 =cut
 

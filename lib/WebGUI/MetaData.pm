@@ -70,13 +70,9 @@ sub getFieldTypes {
 
 Deletes a field from the metadata system.
 
-=over
-
-=item fieldId
+=head3 fieldId
 
 The fieldId to be deleted.
-
-=back
 
 =cut
 
@@ -94,18 +90,14 @@ sub deleteField {
 Returns a hash reference containing metadata field properties
 for a single field.
 
-=over
-
-=item fieldId
+=head3 fieldId
 
 The fieldId for which you want to retrieve field properties.
 
-=item wobjectId
+=head3 wobjectId
 
 If specified, the method will not only get the field properties,
 but the value for this wobjectId as well.
-
-=back
 
 =cut
 
@@ -129,18 +121,14 @@ If a wobjectId is specified, the metadata values for that wobject
 are included as well. You can limit the output to a certain
 field by specifying a fieldId.
 
-=over
-
-=item wobjectId 
+=head3 wobjectId 
 
 If specified, the hashRef will contain the metadata values for 
 this wobject.
 
-=item fieldId
+=head3 fieldId
 
 If specified, the hashRef will contain only this field.
-
-=back
 
 =cut
 
@@ -176,13 +164,9 @@ sub getMetaDataFields {
 
 Saves posted metadata for requested wobjectId
 
-=over
-
-=item wobjectId
+=head3 wobjectId
 
 The Id from the wobject you want to save metadata for.
-
-=back
 
 =cut
 
@@ -217,13 +201,9 @@ sub metaDataSave {
 
 Deletes the metadata for requested wobjectId
 
-=over
-
-=item wobjectId
+=head3 wobjectId
 
 The Id from the wobject you want to delete metadata for.
-
-=back
 
 =cut
 
@@ -238,17 +218,13 @@ sub metaDataDelete {
 
 Duplicates Metadata
 
-=over
-
-=item fromWobjectId
+=head3 fromWobjectId
 
 The original wobject Id
 
-=item toWobjectId
+=head3 toWobjectId
 
 The new wobject Id
-
-=back
 
 =cut
 
@@ -271,9 +247,7 @@ sub MetaDataDuplicate {
 This function will search for a wobject that match a metadata criteria set.
 If no wobject is found, undef will be returned.
 
-=over
-
-=item hashRef
+=head3 hashRef
 
 A typical hashRef for this function will look like:
 
@@ -286,8 +260,6 @@ A typical hashRef for this function will look like:
 Most of the time this will be a:
 
 WebGUI::SQL->quickHashRef("select * from WobjectProxy where wobjectId=$proxiedId");
-
-=back
 
 =cut
 

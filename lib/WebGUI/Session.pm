@@ -40,7 +40,7 @@ Package WebGUI::Session
 
 This package is the heart and lifeblood of WebGUI. Without it WebGUI could not exist. By using this package a package gains access to WebGUI's $session variable which contains everything WebGUI needs to know to operate.
 
-NOTE: It is important to distinguish the difference between a WebGUI session and a user session. A user session is attached to a WebGUI session. A WebGUI session is all of the basic data the WebGUI needs to operate.
+B<NOTE:> It is important to distinguish the difference between a WebGUI session and a user session. A user session is attached to a WebGUI session. A WebGUI session is all of the basic data the WebGUI needs to operate.
 
 TIP: The $session variable is a case-insensitive hash. The contents of the has vary, but can be seen by adding debug=1 to the end of any WebGUI URL while logged in as an admin user.
 
@@ -163,17 +163,13 @@ sub close {
 
 Converts a visitor session to a user session.
 
-=over
-
-=item sessionId
+=head3 sessionId
 
 The session to convert.
 
-=item userId
+=head3 userId
 
 The user for the session to become.
-
-=back
 
 =cut
 
@@ -194,13 +190,9 @@ sub convertVisitorToUser {
 
 Deletes a scratch variable for all users. This function must be used with care.
 
-=over
-
-=item name
+=head3 name
 
 The name of the scratch variable.
-
-=back
 
 =cut
 
@@ -217,13 +209,9 @@ sub deleteAllScratch {
 
 Deletes a scratch variable.
 
-=over
-
-=item name
+=head3 name
 
 The name of the scratch variable.
-
-=back
 
 =cut
 
@@ -240,13 +228,9 @@ sub deleteScratch {
 
 Removes the specified user session from memory and database.
 
-=over
-
-=item sessionId
+=head3 sessionId
 
 The session to end.
-
-=back
 
 =cut
 
@@ -268,13 +252,9 @@ sub end {
 
 Retrieves the current value of a scratch variable.
 
-=over
-
-=item varName
+=head3 varName
 
 The name of the variable set with setScratch().
-
-=back
 
 =cut
 
@@ -289,21 +269,17 @@ sub getScratch {
 
 Opens a closed ( or new ) WebGUI session.
 
-=over
-
-=item webguiRoot
+=head3 webguiRoot
 
 The path to the WebGUI files.
 
-=item configFile
+=head3 configFile
 
 The filename of the config file that WebGUI should operate from.
 
-=item fastcgi
+=head3 fastcgi
 
 A pointer to a Fast CGI object.
-
-=back
 
 =cut
 
@@ -385,13 +361,9 @@ sub open {
 
 Updates the WebGUI session to reflect new page information.
 
-=over
-
-=item pageId
+=head3 pageId
 
 Specify which page you want to change to.
-
-=back
 
 =cut
 
@@ -406,15 +378,11 @@ sub refreshPageInfo {
 
 Updates the user session variables from the database.
 
-NOTE: This also updates the user information.
+B<NOTE:> This also updates the user information.
 
-=over
-
-=item sessionId
+=head3 sessionId
 
 The session id to update.
-
-=back
 
 =cut
 
@@ -429,13 +397,9 @@ sub refreshSessionVars {
 
 Refreshes the user's information from the database into this user session.
 
-=over
-
-=item userId
+=head3 userId
 
  The user id to refresh into this session.
-
-=back
 
 =cut
 
@@ -451,17 +415,13 @@ sub refreshUserInfo {
 
 Sets a scratch variable for this user session. Scratch variables are just arbitrary bits of data that a programmer may wish to store in a user session from page to page.
 
-=over
-
-=item name
+=head3 name
 
 The name of the scratch variable.
 
-=item value
+=head3 value
 
 The value of the scratch variable. If the value is blank but defined or if it is set to "-delete-" then the scratch variable will be removed from the user session.
-
-=back
 
 =cut
 
@@ -487,17 +447,13 @@ sub setScratch {
 
 Start a new user session.
 
-=over
-
-=item userId
+=head3 userId
 
 The user id of the user to create a session for.
 
-=item sessionId
+=head3 sessionId
 
 Session id will be generated if not specified. In almost every case you should let the system generate the session id.
-
-=back
 
 =cut
 

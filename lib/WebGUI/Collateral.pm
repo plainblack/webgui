@@ -101,13 +101,9 @@ sub deleteFile {
 
 An alternative to the constructor "new", use find as a constructor by name rather than id.
 
-=over
-
-=item name
+=head3 name
 
 The name of the collateral item you wish to instanciate.
-
-=back
 
 =cut
 
@@ -122,13 +118,9 @@ sub find {
 
 Returns a hash reference containing all of the properties of this collateral item.
 
-=over
-
-=item propertyName
+=head3 propertyName
 
 If an individual propertyName is specified, then only that property value is returned as a scalar.
-
-=back
 
 =cut
 
@@ -147,13 +139,9 @@ sub get {
 
 Constructor.
 
-=over
-
-=item collateralId 
+=head3 collateralId 
 
 The unique identifier for this piece of collateral. If set to "new" an id will be generated.
-
-=back
 
 =cut
 
@@ -244,15 +232,11 @@ sub multiNew {
 
 Sets the value of a property for this collateral item. 
 
-=over
-
-=item properties 
+=head3 properties 
 
 A hash reference containing the list of properties to set. The valid property names are "name", "parameters", "userId", "username", "collateralFolderId", "collateralType", and "thumbnailSize". 
 
 If username or userId are not specified, the current user will be used.
-
-=back
 
 =cut
 

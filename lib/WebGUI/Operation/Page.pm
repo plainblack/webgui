@@ -69,13 +69,9 @@ sub _changeWobjectPrivileges {
 This private function set an entire subtree with $page as root to the same privilege and/or 
 style settings. These properties are set to be a duplicate of those in page.
 
-=over
-
-=item page
+=head3 page
 
 This is the page whose ancestors should be changed. This must be an WebGUI::Page instance.
-
-=back
 
 =cut
 # This combines _recusivelyChangePrivileges and _recusivelyChangeStyle, since there's no use in walking down a tree twice.
@@ -179,17 +175,13 @@ sub _selectPositions {
 Walks down the page tree from page with id pageId and returns an indented list of the pages it
 walks over. Also prints edit/delete/move buttons.
 
-=item pageId
+=head3 pageId
 
 The id of the page you want to start from
 
-=item initialDepth
+=head3 initialDepth
 
 The depth the tree should start with. Defaults to zero.
-
-=over
-
-=back
 
 =cut
 sub _traversePageTree {
@@ -232,8 +224,6 @@ sub _traversePageTree {
 This will cut the page defined by $session{page}{pageId} (ie. the current page) and all it's
 children from the pagetree and place it on the clipboard.
 
-=back
-
 =cut
 sub www_cutPage {
 	my ($page);
@@ -255,8 +245,6 @@ sub www_cutPage {
 =head2 www_deletePage
 
 This function returns an 'Are you sure' page for moving the page to the trash.
-
-=back
 
 =cut
 sub www_deletePage {
@@ -282,8 +270,6 @@ sub www_deletePage {
 
 Actually transfers the page to the trash.
 
-=back 
-
 =cut
 sub www_deletePageConfirm {
         if ($session{page}{isSystem}) {
@@ -302,8 +288,6 @@ sub www_deletePageConfirm {
 =head2 www_editPage
 
 Displays the properties for a page.
-
-=back
 
 =cut
 sub www_editPage {
@@ -550,8 +534,6 @@ sub www_editPage {
 
 Stores the data from www_editPage to the database and tree cache.
 
-=back
-
 =cut
 sub www_editPageSave {
         my ($pageId, $currentPage, $page);
@@ -619,8 +601,6 @@ sub www_editPageSave {
 
 Displays the export page administrative interface
 
-=back
-
 =cut
 
 sub www_exportPage {
@@ -672,8 +652,6 @@ sub www_exportPage {
 
 Displays the export status page
 
-=back
-
 =cut
 
 
@@ -704,8 +682,6 @@ sub www_exportPageStatus {
 
 Executes the export process and displays real time status. This operation is displayed
 by exportPageStatus in an IFRAME.
-
-=back
 
 =cut
 
@@ -800,8 +776,6 @@ sub _checkExportPath {
 
 Moves page down in the context of it's sisters.
 
-=back
-
 =cut
 sub www_movePageDown {
   if (WebGUI::Page::canEdit($session{page}{pageId})) {
@@ -817,8 +791,6 @@ sub www_movePageDown {
 =head2 www_movePageDown
 
 Moves page up in the context of it's sisters.
-
-=back
 
 =cut
 sub www_movePageUp {
@@ -836,8 +808,6 @@ sub www_movePageUp {
 
 Same as www_movePageUp wit this difference that this module returns the www_viewPageTree method.
 
-=back
-
 =cut
 sub www_moveTreePageUp {
   if (WebGUI::Page::canEdit($session{form}{pageId})) {
@@ -852,8 +822,6 @@ sub www_moveTreePageUp {
 =head2 www_moveTreePageDown
 
 Same as www_movePageDown with this difference that this module returns the www_viewPageTree method.
-
-=back
 
 =cut
 sub www_moveTreePageDown {
@@ -870,8 +838,6 @@ sub www_moveTreePageDown {
 
 Move the page one level left in the tree. In other words, the page is moved up one place in the hierarchy.
 Another way to look at is that the mother of the current page becomes the elder sister of the current page.
-
-=back
 
 =cut
 sub www_moveTreePageLeft {
@@ -934,8 +900,6 @@ sub www_rearrangeWobjects {
 =head2 www_viewPageTree
 
 Returns a HTML formatted indented pagetree complete with edit/delete/cut/move buttons
-
-=back
 
 =cut
 sub www_viewPageTree {

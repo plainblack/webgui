@@ -50,29 +50,25 @@ These methods are available from this package:
 
 Generates and returns the constraints to an SQL where clause based upon input from the user.
 
-=over
-
-=item fieldList
+=head3 fieldList
 
 An array reference that contains a list of the fields (table columns) to be considered when searching.
 
-=item all
+=head3 all
 
 A form param with a comma or space separated list of key words to search for in the fields of the fieldList. All the words listed here must be found to be true.
 
-=item atLeastOne
+=head3 atLeastOne
 
 A form param with a comma or space separated list of key words to search for in the fields of the fieldList. Any of the words may match in any of the fields for this to be true.
 
-=item exactPhrase
+=head3 exactPhrase
 
 A form param with a phrase to search for in the fields of the fieldList. The exact phrase must be found in one of the fields to be true.
 
-=item without
+=head3 without
 
 A form param with a comma or space separated list of key words to search for in the fields of the fieldList. None of the words may be found in any of the fields for this to be true.
-
-=back
 
 =cut
 
@@ -138,17 +134,13 @@ sub buildConstraints {
 
 Generates and returns the advanced search form.
 
-=over
-
-=item hiddenFields
+=head3 hiddenFields
 
 A hash reference that contains any name/value pairs that should be included as hidden fields in the search form.
 
-=item numResults
+=head3 numResults
 
 A form param that can optionally specify the number of results to display. Defaults to 25.
-
-=back
 
 =cut
 
@@ -202,13 +194,9 @@ sub form {
 Returns a URL that toggles the value "search" in the user's scratch
 variables on and off.
 
-=over
-
-=item pairs
+=head3 pairs
 
 URL name value pairs (this=that&foo=bar) to be passed with this toggle.
-
-=back
 
 =cut
 

@@ -79,41 +79,37 @@ sub _notify {
 
 Adds an entry to the message log and sends out notification to users.
 
-=over
-
-=item userId
+=head3 userId
 
 The id of the user that should receive this notification.
 
-NOTE: This can be left blank if you're specifying a groupId.
+B<NOTE:> This can be left blank if you're specifying a groupId.
 
-=item groupId
+=head3 groupId
 
 The id of the group that should receive this notification.
 
-NOTE: This can be left blank if you're specifying a userId.
+B<NOTE:> This can be left blank if you're specifying a userId.
 
-=item subject
+=head3 subject
 
 The subject of the notification.
 
-=item message
+=head3 message
 
 The content of the notification.
 
-=item url
+=head3 url
 
 The URL of any action that should be taken based upon this notification (if any).
 
-=item status
+=head3 status
 
 Defaults to 'notice'. Can be 'pending', 'notice', or 'completed'.
 
-=item from
+=head3 from
 
 The addressee email address. Defaults to company email.
-
-=back
 
 =cut
 
@@ -151,37 +147,33 @@ sub addEntry {
 
 Adds an entry to the message log using a translated message from the internationalization system and sends out notifications to users.
 
-=over
-
-=item userId
+=head3 userId
 
 The id of the user that should receive this notification.
 
-NOTE: This can be left blank if you're specifying a groupId.
+B<NOTE:> This can be left blank if you're specifying a groupId.
 
-=item groupId
+=head3 groupId
 
 The id of the group that should receive this notification.
 
-NOTE: This can be left blank if you're specifying a userId.
+B<NOTE:> This can be left blank if you're specifying a userId.
 
-=item url
+=head3 url
 
 The URL of any action that should be taken based upon this notification (if any).
 
-=item internationalId
+=head3 internationalId
 
 The unique identifier from the internationalization system of the message to send.
 
-=item namespace
+=head3 namespace
 
 The namespace from the internationalization system of the message to send. Defaults to "WebGUI";
 
-=item status
+=head3 status
 
 Defaults to 'notice'. Can be 'pending', 'notice', or 'completed'.
-
-=back
 
 =cut
 
@@ -226,13 +218,9 @@ sub addInternationalizedEntry {
 
 Set a message log entry to complete.
 
-=over
-
-=item messageLogId
+=head3 messageLogId
 
 The id of the message to complete.
-
-=back
 
 =cut
 

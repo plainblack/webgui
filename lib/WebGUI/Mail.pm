@@ -48,33 +48,29 @@ These methods are available from this class:
 
 Sends an SMTP email message to the specified user.
 
-=over
-
-=item to 
+=head3 to 
 
 An email address for the TO line.
 
-=item subject
+=head3 subject
 
 The subject line for the email.
 
-=item message
+=head3 message
 
 The message body for the email.
 
-=item cc
+=head3 cc
 
 The email address for the CC line.
 
-=item from
+=head3 from
 
 The email address for the FROM line. Defaults to the email address specified in the Company Settings.
 
-=item bcc
+=head3 bcc
 
 The email address for the BCC line.
-
-=back
 
 =cut
 

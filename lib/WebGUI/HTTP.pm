@@ -115,21 +115,17 @@ sub getStatus {
 
 Sends a cookie to the browser.
 
-=over
-
-=item name
+=head3 name
 
 The name of the cookie to set. Must be unique from all other cookies from this domain or it will overwrite that cookie.
 
-=item value
+=head3 value
 
 The value to set.
 
-=item timeToLive
+=head3 timeToLive
 
 The time that the cookie should remain in the browser. Defaults to "+10y" (10 years from now).
-
-=back
 
 =cut
 
@@ -152,17 +148,13 @@ sub setCookie {
 
 Override the default filename for the document, which is usually the page url. Usually used with setMimeType().
 
-=over
-
-=item filename
+=head3 filename
 
 The filename to set.
 
-=item mimetype
+=head3 mimetype
 
 The mimetype for this file. Defaults to "application/octet-stream".
-
-=back
 
 =cut
 
@@ -180,15 +172,11 @@ sub setFilename {
 
 Override mime type for the document, which is defaultly "text/html". Also see setFilename().
 
-NOTE: By setting the mime type to something other than "text/html" WebGUI will automatically not process the normal page contents. Instead it will return only the content of your Wobject function or Operation.
+B<NOTE:> By setting the mime type to something other than "text/html" WebGUI will automatically not process the normal page contents. Instead it will return only the content of your Wobject function or Operation.
 
-=over
-
-=item mimetype
+=head3 mimetype
 
 The mime type for the document.
-
-=back
 
 =cut
 
@@ -203,13 +191,9 @@ sub setMimeType {
 Disables the printing of a HTTP header. Useful in situations when content is not
 returned to a browser (export to disk for example).
 
-=over
-
-=item boolean 
+=head3 boolean 
 
 Any value other than 0 will disable header printing.
-
-=back
 
 =cut
 
@@ -223,13 +207,9 @@ sub setNoHeader {
 
 Sets the necessary information in the HTTP header to redirect to another URL.
 
-=over
-
-=item url
+=head3 url
 
 The URL to redirect to.
-
-=back
 
 =cut
 
@@ -245,13 +225,9 @@ sub setRedirect {
 
 Sets the HTTP status code.
 
-=over
-
-=item status
+=head3 status
 
 An HTTP status code. It takes the form of "NNN Message" where NNN is a 3 digit status number and Message is some text explaining the status number.
-
-=back
 
 =cut
 

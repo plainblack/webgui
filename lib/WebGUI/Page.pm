@@ -193,13 +193,9 @@ sub _processWobjectFunctions {
 Adds page to the right of the children of the object this method is invoked 
 on. Returns the new page object.
 
-=over
-
-=item page
+=head3 page
 
 A WebGUI::Page instance to be added to the children of the current object.
-
-=back
 
 =cut
 
@@ -242,13 +238,9 @@ sub ancestors {
         
 Returns a boolean (0|1) value signifying that the user has the required privileges.
         
-=over           
-        
-=item pageId
+=head3 pageId
 
 The unique identifier for the page that you wish to check the privileges on. Defaults to the current page id.
-
-=back
 
 =cut
 
@@ -336,13 +328,9 @@ sub canMoveUp {
 
 Returns a boolean (0|1) value signifying that the user has the required privileges. Always returns users that have the rights to edit this page.
 
-=over
-
-=item pageId
+=head3 pageId
 
 The unique identifier for the page that you wish to check the privileges on. Defaults to the current page id.
-
-=back
 
 =cut
 
@@ -370,13 +358,9 @@ sub canView {
 
 Returns the number of template positions in the specified page template.
 
-=over
-
-=item templateId
+=head3 templateId
 
 The id of the page template you wish to count.
-
-=back
 
 =cut
 
@@ -440,13 +424,9 @@ sub daughters {
 Deletes the cached version of a specified page. Note that this is something else than the 
 cached page tree. This funtion should be invoked in a non-OO context;
 
-=over
-
-=item pageId
+=head3 pageId
 
 The id of the page to decache. Defaults to the current page id.
-
-=back
 
 =cut
 
@@ -506,13 +486,9 @@ sub descendants {
 
 Returns an HTML string containing a small representation of the page template.
 
-=over
-
-=item templateId
+=head3 templateId
 
 The id of the page template you wish to draw.
-
-=back
 
 =cut
 
@@ -662,13 +638,9 @@ sub generation {
 
 Returns a hash reference of all the page properties.
 
-=over
-
-=item property
+=head3 property
 
 Returns a scalar containing the value of the specififed proeprty.
-
-=back
 
 =cut
 
@@ -704,14 +676,10 @@ sub getAnonymousRoot {
 Return the first (leftmost) daughter of the current node when called in instance context,
 returns the first daughter of 'pageId' when called in class context.
 
-=over
-
-=item pageId
+=head3 pageId
 
 Only required if called in class context. The pageId of the page of which you want the 
 daughter of. Defaults to the current page.
-
-=back
 
 =cut
 
@@ -737,14 +705,10 @@ sub getFirstDaughter {
 Returns the grandmother of the current node, or, when called in class context, the garndmother
 of 'pageId'.
 
-=over
-
-=item pageId
+=head3 pageId
 
 Only required if called in class context. The pageId of the page of which you want the
 grandmother of. Defaults to the current page.
-
-=back
 
 =cut
 
@@ -769,14 +733,10 @@ sub getGrandmother {
 Returns the left sister of the current node, or, when called in class context, the left sister
 of 'pageId'.
 
-=over
-
-=item pageId
+=head3 pageId
 
 Only required if called in class context. The pageId of the page of which you want the
 left sister of. Defaults to the current page.
-
-=back
 
 =cut
 
@@ -800,14 +760,10 @@ sub getLeftSister {
 Returns the mother of the current node, or, when called in class context, the left sister
 of 'pageId'.
 
-=over
-
-=item pageId
+=head3 pageId
 
 Only required if called in class context. The pageId of the page of which you want the
 mother of. Defaults to the current page.
-
-=back
 
 =cut
 
@@ -832,13 +788,9 @@ sub getMother {
 
 Returns the page identified by 'pageId'.
 
-=over
-
-=item pageId
+=head3 pageId
 
 The pageId of the page you want. Defaults to the current page.
-
-=back
 
 =cut
 
@@ -857,14 +809,10 @@ sub getPage {
 Returns the right sister of the current node, or, when called in class context, the right sister
 of 'pageId'.
 
-=over
-
-=item pageId
+=head3 pageId
 
 Only required if called in class context. The pageId of the page of which you want the
 right sister of. Defaults to the current page.
-
-=back
 
 =cut
 
@@ -889,14 +837,10 @@ sub getRightSister {
 Returns the top page (child of a WebGUI root, depth = 1) of the current node, or, when called in class 
 context, the top of 'pageId'.
 
-=over
-
-=item pageId
+=head3 pageId
 
 Only required if called in class context. The pageId of the page of which you want the
 top page of. Defaults to the current page.
-
-=back
 
 =cut
 
@@ -936,13 +880,9 @@ sub getTemplateList {
 
 Returns an HTML template.
 
-=over
-
-=item templateId
+=head3 templateId
 
 The id of the page template you wish to retrieve. Defaults to the current page's template id.
-
-=back
 
 =cut
 
@@ -958,13 +898,9 @@ sub getTemplate {
 
 Returns a hash reference containing the positions available in the specified page template.
 
-=over
-
-=item templateId
+=head3 templateId
 
 The id of the page template you wish to retrieve the positions from.
-
-=back
 
 =cut
 
@@ -984,14 +920,10 @@ sub getTemplatePositions {
 Returns the WebGUI root (depth = 0) of the current node, or, when called in class 
 context, the WebGUI root of 'pageId'.
 
-=over
-
-=item pageId
+=head3 pageId
 
 Only required if called in class context. The pageId of the page of which you want the
 WebGUI root of. Defaults to the current page.
-
-=back
 
 =cut
 
@@ -1061,17 +993,13 @@ sub leaves_under {
 
 Returns a unique page URL.
 
-=over
-
-=item url
+=head3 url
 
 The URL you're hoping for.
 
-=item pageId
+=head3 pageId
 
 The page id of the page you're creating a URL for.
-
-=back
 
 =cut
 
@@ -1103,13 +1031,9 @@ sub makeUnique {
 Moves a page to another page (ie. makes the page you execute this method on a child of newMother).
 Returns 1 if the move was succesfull, 0 otherwise.
 
-=over
-
-=item newMother
+=head3 newMother
 
 The page under which the current page should be moved. This should be an WebGUI::Page object.
-
-=back
 
 =cut
 
@@ -1324,13 +1248,9 @@ containing page properties. You can use the latter if you already have page prop
 something like it for example), and save a (redundant) database query. You can of course also use it to fool the 
 system with dummy pages and do all kinds of magic that I can't imagine with it.
 
-=over 
-
-=item pageId || { properties }
+=head3 pageId || { properties }
 
 You can pass either a pageId or a properties hashref. See above for an explanation
-
-=back
 
 =cut
 
@@ -1362,13 +1282,9 @@ sub new {
 
 Pastes a page under newMother.
 
-=over
-
-=item newMother
+=head3 newMother
 
 The page under which the current page should be pasted. This should be an WebGUI::Page object.
-
-=back
 
 =cut
 
@@ -1581,13 +1497,9 @@ the state of the tree is saved to the database.
 This method purges the Navigation cache. Note that if you have to save a lot of properties in row, it's better to use 
 setWithoutRecache, and call recacheNavigation manually. This saves some time.
 
-=over
-
-=item properties
+=head3 properties
 
 The properties you want to set. This parameter is optional and should be a hashref of the form {propertyA => valueA, propertyB => valueB, etc...}
-
-=back
 
 =cut
 
@@ -1608,13 +1520,9 @@ sub set {
 See set. The only difference with set is that the cached version of the pagetree is not updated. This means that you must
 update it manually by invoking recachePageTree afterwards.
 
-=over
-
-=item properties
+=head3 properties
 
 The properties you want to set. This parameter is optional and should be a hashref of the form {propertyA => valueA, propertyB => valueB, etc...}
-
-=back
 
 =cut
 
@@ -1639,14 +1547,10 @@ Traverses the tree from this node down in pre-order fashion and excutes (maps) t
 onto each node. Also maps onto this node except if it is the anonymous root. This has some but very limited 
 compatibility with the callback property of the walk_down method of Tree::DAG_Node.
 
-=over
-
-=item mappingFunction
+=head3 mappingFunction
 
 This should be a coderef pointing to your mapping function. The arguments that are passed to this function are
 a page object and a hashref containing only _depth for now.
-
-=back
 
 =cut
 

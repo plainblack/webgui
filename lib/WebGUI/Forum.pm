@@ -68,13 +68,9 @@ These methods are available from this class:
 
 Returns a boolean whether the user has the privileges required to post.
 
-=over
-
-=item userId
+=head3 userId
 
 Defaults to $session{user}{userId}. Specify a user ID to check privileges for.
-
-=back
 
 =cut
 
@@ -90,13 +86,9 @@ sub canPost {
 
 Returns a boolean whether the user has the privileges required to view the forum.
 
-=over
-
-=item userId
+=head3 userId
 
 Defaults to $session{user}{userId}. Specify a user ID to check privileges for.
-
-=back
 
 =cut
 
@@ -112,9 +104,7 @@ sub canView {
 
 Creates a new forum. Returns a forum object.
 
-=over
-
-=item forumParams
+=head3 forumParams
 
 A hash reference containing a list of the parameters to default the forum to. The valid parameters are: 
 
@@ -137,8 +127,6 @@ notificationTemplateId - Template ID
 archiveAfter - interval
 postsPerPage - integer
 masterForumId - Forum ID
- 
-=back
  
 =cut
  
@@ -181,13 +169,9 @@ sub decrementThreads {
 
 Returns a hash reference containing all of the properties of the forum.
 
-=over
-
-=item param
+=head3 param
 
 If specified then this method will return the value of this one parameter as a scalar. Param is the name of the parameter to return. See the forum table for details.
-
-=back
 
 =cut
                                                                                                                                                              
@@ -205,13 +189,9 @@ sub get {
 
 Returns a thread object.
 
-=over
-
-=item threadId
+=head3 threadId
 
 The unique identifier of a thread in this forum.
-
-=back
 
 =cut
 
@@ -229,13 +209,9 @@ sub getThread {
 
 Returns a boolean indicating whether the user is a moderator.
 
-=over
-
-=item userId
+=head3 userId
 
 Defaults to $session{user}{userId}. A user id to test for moderator privileges.
-
-=back
 
 =cut
 
@@ -251,17 +227,13 @@ sub isModerator {
 
 Increments this forum's reply counter.
 
-=over
-
-=item lastPostDate
+=head3 lastPostDate
 
 The date of the post being added.
 
-=item lastPostId
+=head3 lastPostId
 
 The unique identifier of the post being added.
-
-=back
 
 =cut
 
@@ -276,17 +248,13 @@ sub incrementReplies {
 
 Increments the thread counter for this forum.
 
-=over
-
-=item lastPostDate
+=head3 lastPostDate
 
 The date of the post that was just added.
 
-=item lastPostId
+=head3 lastPostId
 
 The unique identifier of the post that was just added.
-
-=back
 
 =cut
 
@@ -314,13 +282,9 @@ sub incrementViews {
 
 Returns a boolean indicating whether the user is subscribed to the forum.
 
-=over
-
-=item userId
+=head3 userId
 
 The user to check for the subscription. Defaults to $session{user}{userId}.
-
-=back
 
 =cut
 
@@ -337,13 +301,9 @@ sub isSubscribed {
 
 Constructor.
 
-=over
-
-=item forumId
+=head3 forumId
 
 The unique identifier of the forum to retrieve the object for.
-
-=back
 
 =cut
 
@@ -428,13 +388,9 @@ sub recalculateRating {
 
 Sets the forum properties both in the object and to the database.
 
-=over
-
-=item data
+=head3 data
 
 A hash reference containing the properties to set. See the forum table for details.
-
-=back
 
 =cut
 
@@ -453,17 +409,13 @@ sub set {
 
 Sets the pertinent details for the last post. Can also be done directly using the set method.
 
-=over
-
-=item lastPostDate
+=head3 lastPostDate
 
 The epoch date of the post.
 
-=item lastPostId
+=head3 lastPostId
 
 The unique id of the post.
-
-=back
 
 =cut
 
@@ -481,13 +433,9 @@ sub setLastPost {
 
 Subscribes a user to this forum.
 
-=over
-
-=item userId
+=head3 userId
 
 The unique identifier of the user to subscribe. Defaults to the current user.
-
-=back
 
 =cut
 
@@ -505,13 +453,9 @@ sub subscribe {
 
 Unsubscribes a user from this forum.
 
-=over
-
-=item userId
+=head3 userId
 
 The unique identifier of the user to unsubscribe. Defaults to the current user.
-
-=back
 
 =cut
 

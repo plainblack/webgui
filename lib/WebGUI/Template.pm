@@ -93,17 +93,13 @@ sub _execute {
 
 Returns a hash reference containing all of the template parameters.
 
-=over
-
-=item templateId
+=head3 templateId
 
 Defaults to "1". Specify the templateId of the template to retrieve.
 
-=item namespace
+=head3 namespace
 
 Defaults to "page". Specify the namespace of the template to retrieve.
-
-=back
 
 =cut
 
@@ -120,13 +116,9 @@ sub get {
 
 Returns a hash reference containing template ids and template names of all the templates in the specified namespace.
 
-=over
-
-=item namespace
+=head3 namespace
 
 Defaults to "page". Specify the namespace to build the list for.
-
-=back
 
 =cut
 
@@ -142,17 +134,13 @@ sub getList {
 
 Returns a template ID by looking up the name for it.
 
-=over
-
-=item name
+=head3 name
 
 The name to look up.
 
-=item namespace
+=head3 namespace
 
 The namespace to focus on when searching.
-
-=back
 
 =cut
 
@@ -171,21 +159,17 @@ sub getIdByName {
 
 Evaluate a template replacing template commands for HTML.
 
-=over
-
-=item templateId
+=head3 templateId
 
 Defaults to "1". Specify the templateId of the template to retrieve.
 
-=item namespace
+=head3 namespace
 
 Defaults to "page". Specify the namespace of the template to retrieve.
 
-=item vars
+=head3 vars
 
 A hash reference containing template variables and loops. Automatically includes the entire WebGUI session.
-
-=back
 
 =cut
 
@@ -247,17 +231,13 @@ sub process {
 
 Evaluate a template replacing template commands for HTML.
 
-=over
-
-=item template
+=head3 template
 
 A scalar variable containing the template.
 
-=item vars
+=head3 vars
 
 A hash reference containing template variables and loops. Automatically includes the entire WebGUI session.
-
-=back
 
 =cut
 
@@ -280,9 +260,7 @@ sub processRaw {
 
 Store a template and it's metadata.
 
-=over
-
-=item data
+=head3 data
 
 A hash reference containing the data to be stored. At minimum the hash reference must include "templateId" and "namespace". The following are the elements allowed to be stored.
 
@@ -297,8 +275,6 @@ A hash reference containing the data to be stored. At minimum the hash reference
  showInForms - A boolean indicating whether this template should appear when using the "template" subroutine in WebGUI::Form.
 
  isEditable - A boolean indicating whether this template should be editable through the template manager. 
-
-=back
 
 =cut
 

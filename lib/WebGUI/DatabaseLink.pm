@@ -65,13 +65,9 @@ sub getList {
 
 Returns a hash containing a single database link.
 
-=over
-
-=item databaseLinkId
+=head3 databaseLinkId
 
 A valid databaseLinkId
-
-=back
 
 =cut
 
@@ -85,13 +81,9 @@ sub get {
 Returns an array of hashrefs containing items which use a database link.  This method will
 need to be updated any time a new item starts using Database Links.
 
-=over
-
-=item databaseLinkId
+=head3 databaseLinkId
 
 A valid databaseLinkId
-
-=back
 
 =cut
 
@@ -178,13 +170,9 @@ sub dbh {
 
 Constructor.
 
-=over
-
-=item databaseLinkId
+=head3 databaseLinkId
 
 The databaseLinkId of the databaseLink you're creating an object reference for. 
-
-=back
 
 =cut
 

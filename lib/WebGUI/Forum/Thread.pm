@@ -75,17 +75,13 @@ These methods are available from this class:
 
 Creates a new thread, including the root post in that thread.
 
-=over
-
-=item data
+=head3 data
 
 The properties of this thread. See the forumThread table for details.
 
-=item postData
+=head3 postData
 
 The properties of the root post in this thread. See the forumPost table and the WebGUI::Forum::Post->create method for details.
-
-=back
 
 =cut
 
@@ -126,13 +122,9 @@ sub decrementReplies {
 
 Returns a hash reference containing all the properties of this thread.
 
-=over
-
-=item param
+=head3 param
 
 The name of a specific property. If specified only the value of that property will be return as a scalar.
-
-=back
 
 =cut
 
@@ -184,13 +176,9 @@ sub getNextThread {
 
 Returns a post object.
 
-=over
-
-=item postId
+=head3 postId
 
 The unique id of the post object you wish to retrieve.
-
-=back
 
 =cut
 
@@ -239,17 +227,13 @@ sub isLocked {
 
 Increments the replies counter for this thread.
 
-=over
-
-=item lastPostDate
+=head3 lastPostDate
 
 The date of the reply that caused the replies counter to be incremented.
 
-=item lastPostId
+=head3 lastPostId
 
 The id of the reply that caused the replies counter to be incremented.
-
-=back
 
 =cut
 
@@ -293,13 +277,9 @@ sub isSticky {
 
 Returns a boolean indicating whether the user is subscribed to this thread.
 
-=over
-
-=item userId
+=head3 userId
 
 The unique id of the user to check. Defaults to the current user.
-
-=back
 
 =cut
 
@@ -330,13 +310,9 @@ sub lock {
 
 Constructor.
 
-=over
-
-=item threadId
+=head3 threadId
 
 The unique id of the thread object you wish to retrieve.
-
-=back
 
 =cut
 
@@ -374,13 +350,9 @@ sub recalculateRating {
 
 Sets properties for this thread both to the object and to the database.
 
-=over
-
-=item data
+=head3 data
 
 A hash reference containing the properties to set. See the forumThread table for details.
-
-=back
 
 =cut
 
@@ -399,17 +371,13 @@ sub set {
 
 Sets the pertinent details for the last post. Can also be done directly using the set method.
 
-=over
-
-=item lastPostDate
+=head3 lastPostDate
 
 The epoch date of the post.
 
-=item lastPostId
+=head3 lastPostId
 
 The unique id of the post.
-
-=back
 
 =cut
 
@@ -507,13 +475,9 @@ sub stick {
 
 Subscribes the user to this thread.
 
-=over
-
-=item userId
+=head3 userId
 
 The unique id of the user. Defaults to the current user.
-
-=back
 
 =cut
 
@@ -557,13 +521,9 @@ sub unstick {
 
 Negates the subscribe method.
 
-=over
-
-=item userId
+=head3 userId
 
 The unique id of the user to unsubscribe. Defaults to the current user.
-
-=back
 
 =cut
 

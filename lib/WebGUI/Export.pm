@@ -64,13 +64,9 @@ These methods are available from this package:
 
 Executes the export and returns html content.
 
-=over
-
-=item filename 
+=head3 filename 
 
 Full path to a file. 
-
-=back
 
 =cut
 
@@ -149,64 +145,60 @@ Constructor.
 Options can be set when a new Export object is constructed, or
 afterwards with the set method. None of the options is required.
 
-=over
-
-=item pageId
+=head3 pageId
 
 Sets the page to be generated. Defaults to current page.
  
-=item styleId
+=head3 styleId
 
 Use this to override the default styleId.
 Defaults to the page styleId. 
 
-=item userId
+=head3 userId
 
 Runs the export as this user. Defaults to 1 (Visitor).
 
-=item altSiteURL
+=head3 altSiteURL
 
 Use this to override the absolute site URL. A valid value
 would be "http://www.site.com/". Setting this negates the effect
 of the relativeUrls option.
 
-=item noCache
+=head3 noCache
 
 Is set to true by default. This will make sure
 that the exported page is generated and not fetched from cache.
 
-=item noHttpHeader
+=head3 noHttpHeader
 
 Turns off the inclusion of a HTTP header. By default this option
 is set to true.
 
-=item adminOn
+=head3 adminOn
 
 Turns on / off the adminbar in the generated page. Is false by
 default.
 
-=item stripHTML
+=head3 stripHTML
 
 Strips HTML from the document and outputs only text. Is disabled
 by default.
 
-=item relativeUrls
+=head3 relativeUrls
 
 If set, all navigation URL's will be constructed relative. By default
 all links will be made absolute. This option is negated if altSiteURL
 is set.
 
-=item extrasURL
+=head3 extrasURL
 
 You can specify an alternate URL for the extras location. By default
 the extrasURL setting from the config file is used.
 
-=item uploadsURL
+=head3 uploadsURL
 
 You can specify an alternate URL for the uploads location. By default
 the uploadsURL setting from the config file is used.
-
-=back
 
 =cut
 
@@ -239,13 +231,9 @@ sub new {
 
 Gets the value for key from the class.
 
-=over
-
-=item key 
+=head3 key 
 
 See documentation on the "new" constructor for an overview of all options.
-
-=back
 
 =cut
 
@@ -261,13 +249,9 @@ sub get {
 
 Sets properties for this export to the object.
 
-=over
-
-=item options
+=head3 options
 
 See documentation on the "new" constructor for an overview of all options.
-
-=back
 
 =cut
 

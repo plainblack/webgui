@@ -26,7 +26,7 @@ Package WebGUI::Affiliate
 
 Tracks where users come from.
 
-NOTE: This package is experimental as is not officially supported yet.
+B<NOTE:> This package is experimental as is not officially supported yet.
 
 =head1 SYNOPSIS
 

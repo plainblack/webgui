@@ -63,13 +63,9 @@ sub delete {
 
 Remove content from the filesystem cache where the key meets the condition of the regular expression.
 
-=over
-
-=item regex
+=head3 regex
 
 A regular expression that will match keys in the current namespace. Example: m/^navigation_.*/
-
-=back
 
 =cut
 
@@ -100,17 +96,13 @@ sub get {
 
 Constructor.
 
-=over
-
-=item key 
+=head3 key 
 
 A key unique to this namespace. It is used to uniquely identify the cached content.
 
-=item namespace
+=head3 namespace
 
 Defaults to the config filename for the current site. The only reason to override the default is if you want the cached content to be shared among all WebGUI instances on this machine. A common alternative namespace is "URL", which is typically used when caching content using the setByHTTP method.
-
-=back
 
 =cut
 
@@ -130,17 +122,13 @@ sub new {
 
 Save content to the filesystem cache.
 
-=over
-
-=item content
+=head3 content
 
 A scalar variable containing the content to be set.
 
-=item ttl
+=head3 ttl
 
 The time to live for this content. This is the amount of time (in seconds) that the content will remain in the cache. Defaults to "60".
-
-=back
 
 =cut
 
@@ -156,17 +144,13 @@ sub set {
 
 Retrieves a document via HTTP and stores it in the cache and returns the content as a string.
 
-=over
-
-=item url
+=head3 url
 
 The URL of the document to retrieve. It must begin with the standard "http://".
 
-=item ttl
+=head3 ttl
 
 The time to live for this content. This is the amount of time (in seconds) that the content will remain in the cache. Defaults to "60".
-
-=back
 
 =cut
 

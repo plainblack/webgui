@@ -387,14 +387,10 @@ If no identifier is specified, the class identifier will be used.
 
 This routine can be called both as a method or as a function.
 
-=over
-
-=item identifier
+=head3 identifier
 
 The configuration to use. Config is stored in the table Navigation
 in the database.
-
-=back
 
 =cut
 
@@ -441,14 +437,12 @@ sub getMethodNames {
 
 Constructor.
 
-=over
-
-=item identifier
+=head3 identifier
 
 The configuration to use. Config is stored in the table Navigation
 in the database.
 
-=item options
+=head3 options
 
 Instead of using an existing configuration, you can also drop
 in your own parameters of the form: option => value. 
@@ -459,8 +453,6 @@ $custom = WebGUI::Navigation->new(
                                 method=>'self_and_sisters',
                                 template=>'<tmpl_loop page_loop><tmpl_var page.title><br></tmpl_loop>'
                                 );
-
-=back
 
 =cut
 

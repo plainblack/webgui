@@ -103,13 +103,9 @@ sub array {
 
 Starts a transaction sequence. To be used with commit and rollback. Any writes after this point will not be applied to the database until commit is called.
 
-=over
-
-=item dbh
+=head3 dbh
 
 A database handler. Defaults to the WebGUI default database handler.
-
-=back
 
 =cut
 
@@ -126,17 +122,13 @@ sub beginTransaction {
 
 Builds an array of data from a series of rows.
 
-=over
-
-=item sql
+=head3 sql
 
 An SQL query. The query must select only one column of data.
 
-=item dbh
+=head3 dbh
 
 By default this method uses the WebGUI database handler. However, you may choose to pass in your own if you wish.
-
-=back
 
 =cut
 
@@ -158,17 +150,13 @@ sub buildArray {
 
 Builds an array reference of data from a series of rows.
 
-=over
-
-=item sql
+=head3 sql
 
 An SQL query. The query must select only one column of data.
 
-=item dbh
+=head3 dbh
 
 By default this method uses the WebGUI database handler. However, you may choose to pass in your own if you wish.
-
-=back
 
 =cut
 
@@ -183,17 +171,13 @@ sub buildArrayRef {
 
 Builds a hash of data from a series of rows.
 
-=over
-
-=item sql
+=head3 sql
 
 An SQL query. The query must select at least two columns of data, the first being the key for the hash, the second being the value. If the query selects more than two columns, then the last column will be the value and the remaining columns will be joined together by an underscore "_" to form a complex key.
 
-=item dbh
+=head3 dbh
 
 By default this method uses the WebGUI database handler. However, you may choose to pass in your own if you wish.
-
-=back
 
 =cut
 
@@ -217,17 +201,13 @@ sub buildHash {
 
 Builds a hash reference of data from a series of rows.
 
-=over
-
-=item sql
+=head3 sql
 
 An SQL query. The query must select at least two columns of data, the first being the key for the hash, the second being the value. If the query selects more than two columns, then the last column will be the value and the remaining columns will be joined together by an underscore "_" to form a complex key.
 
-=item dbh
+=head3 dbh
 
  By default this method uses the WebGUI database handler. However, you may choose to pass in your own if you wish.
-
-=back
 
 =cut
 
@@ -245,13 +225,9 @@ sub buildHashRef {
 
 Ends a transaction sequence. To be used with beginTransaction. Applies all of the writes since beginTransaction to the database.
 
-=over
-
-=item dbh
+=head3 dbh
 
 A database handler. Defaults to the WebGUI default database handler.
-
-=back
 
 =cut
 
@@ -294,13 +270,9 @@ sub errorMessage {
 
 Executes a prepared SQL statement.
 
-=over
-
-=item values
+=head3 values
 
 A list of values to be used in the placeholders defined in the prepared statement.
-
-=back
 
 =cut
 
@@ -344,15 +316,11 @@ sub getColumnNames {
 
 Increments an incrementer of the specified type and returns the value. 
 
-NOTE: This is not a regular method, but is an exported subroutine.
+B<NOTE:> This is not a regular method, but is an exported subroutine.
 
-=over
-
-=item idName
+=head3 idName
 
 Specify the name of one of the incrementers in the incrementer table.
-
-=back
 
 =cut
 
@@ -369,25 +337,21 @@ sub getNextId {
 
 Returns a row of data as a hash reference from the specified table.
 
-=over
-
-=item table
+=head3 table
 
 The name of the table to retrieve the row of data from.
 
-=item key
+=head3 key
 
 The name of the column to use as the retrieve key. Should be a primary or unique key in the table.
 
-=item keyValue
+=head3 keyValue
 
 The value to search for in the key column.
 
-=item dbh
+=head3 dbh
 
 A database handler to use. Defaults to the WebGUI database handler.
-
-=back
 
 =cut
 
@@ -462,17 +426,13 @@ sub hashRef {
 
 Returns a statement handler. To be used in creating prepared statements. Use with the execute method.
 
-=over
-
-=item sql
+=head3 sql
 
 An SQL statement. Can use the "?" placeholder for maximum performance on multiple statements with the execute method.
 
-=item dbh
+=head3 dbh
 
 A database handler. Defaults to the WebGUI default database handler.
-
-=back
 
 =cut
 
@@ -495,17 +455,13 @@ sub prepare {
 
 Executes a query and returns a single row of data as an array.
 
-=over
-
-=item sql
+=head3 sql
 
 An SQL query.
 
-=item dbh
+=head3 dbh
 
 By default this method uses the WebGUI database handler. However, you may choose to pass in your own if you wish.
-
-=back
 
 =cut
 
@@ -524,17 +480,13 @@ sub quickArray {
 
 Executes a query and returns a comma delimited text blob with column headers.
 
-=over
-
-=item sql
+=head3 sql
 
 An SQL query.
 
-=item dbh
+=head3 dbh
 
 By default this method uses the WebGUI database handler. However, you may choose to pass in your own if you wish.
-
-=back
 
 =cut
 
@@ -557,17 +509,13 @@ sub quickCSV {
 
 Executes a query and returns a single row of data as a hash.
 
-=over
-
-=item sql
+=head3 sql
 
 An SQL query.
 
-=item dbh
+=head3 dbh
 
 By default this method uses the WebGUI database handler. However, you may choose to pass in your own if you wish.
-
-=back
 
 =cut
 
@@ -589,17 +537,13 @@ sub quickHash {
 
 Executes a query and returns a single row of data as a hash reference.
 
-=over
-
-=item sql
+=head3 sql
 
 An SQL query.
 
-=item dbh
+=head3 dbh
 
 By default this method uses the WebGUI database handler. However, you may choose to pass in your own if you wish.
-
-=back
 
 =cut
 
@@ -623,17 +567,13 @@ sub quickHashRef {
 
 Executes a query and returns a tab delimited text blob with column headers.
 
-=over
-
-=item sql
+=head3 sql
 
 An SQL query.
 
-=item dbh
+=head3 dbh
 
 By default this method uses the WebGUI database handler. However, you may choose to pass in your own if you wish.
-
-=back
 
 =cut
 
@@ -655,19 +595,15 @@ sub quickTab {
 
 Returns a string quoted and ready for insert into the database.  
 
-NOTE: This is not a regular method, but is an exported subroutine.
+B<NOTE:> This is not a regular method, but is an exported subroutine.
 
-=over
-
-=item string
+=head3 string
 
 Any scalar variable that needs to be escaped to be inserted into the database.
 
-=item dbh
+=head3 dbh
 
 The database handler. Defaults to the WebGUI database handler.
-
-=back
 
 =cut
 
@@ -683,19 +619,15 @@ sub quote {
 
 Returns a comma seperated string quoted and ready for insert/select into/from the database.  This is typically used for a statement like "select * from someTable where field in (".quoteAndJoin(\@strings).")".
 
-NOTE: This is not a regular method, but is an exported subroutine.
+B<NOTE:> This is not a regular method, but is an exported subroutine.
 
-=over
-
-=item arrayRef 
+=head3 arrayRef 
 
 An array reference containing strings to be quoted.
 
-=item dbh
+=head3 dbh
 
 The database handler. Defaults to the WebGUI database handler.
-
-=back
 
 =cut
 
@@ -716,17 +648,13 @@ sub quoteAndJoin {
 
 Returns a statement handler. This is a utility method that runs both a prepare and execute all in one.
 
-=over
-
-=item sql
+=head3 sql
 
 An SQL query.
 
-=item dbh
+=head3 dbh
 
 By default this method uses the WebGUI database handler. However, you may choose to pass in your own if you wish.
-
-=back
 
 =cut
 
@@ -746,13 +674,9 @@ sub read {
 
 Ends a transaction sequence. To be used with beginTransaction. Cancels all of the writes since beginTransaction.
 
-=over
-
-=item dbh
+=head3 dbh
 
 A database handler. Defaults to the WebGUI default database handler.
-
-=back
 
 =cut
 
@@ -782,25 +706,21 @@ sub rows {
 
 Inserts/updates a row of data into the database. Returns the value of the key.
 
-=over
-
-=item table
+=head3 table
 
 The name of the table to use.
 
-=item key
+=head3 key
 
 The name of the primary key of the table.
 
-=item data
+=head3 data
 
 A hash reference containing column names and values to be set.
 
-=item dbh
+=head3 dbh
 
 A database handler to use. Defaults to the WebGUI database handler.
-
-=back
 
 =cut
 
@@ -829,17 +749,13 @@ sub setRow {
 
 An alias of the "read" method except that it will not cause a fatal error in WebGUI if the query is invalid. This is useful for user generated queries such as those in the SQL Report. Returns a statement handler.
 
-=over
-
-=item sql
+=head3 sql
 
 An SQL query.
 
-=item dbh
+=head3 dbh
 
 By default this method uses the WebGUI database handler. However, you may choose to pass in your own if you wish.
-
-=back
 
 =cut
 
@@ -864,17 +780,13 @@ sub unconditionalRead {
 
 A method specifically designed for writing to the database in an efficient manner. 
 
-=over
-
-=item sql
+=head3 sql
 
 An SQL insert or update.
 
-=item dbh
+=head3 dbh
 
 By default this method uses the WebGUI database handler. However, you may choose to pass in your own if you wish.
-
-=back
 
 =cut
 

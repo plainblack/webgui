@@ -77,7 +77,7 @@ These methods are available from this class:
 
 Replaces the default form header with a new definition.
 
-NOTE: This uses the same syntax of the WebGUI::Form::formHeader() method.
+B<NOTE:> This uses the same syntax of the WebGUI::Form::formHeader() method.
 
 =cut
 
@@ -92,13 +92,9 @@ sub formHeader {
 
 Returns a WebGUI::HTMLForm object based upon a tab name created in the constructor.
 
-=over
-
-=item tabName
+=head3 tabName
 
 The name of the tab to return the form object for.
-
-=back
 
 =cut
 
@@ -113,7 +109,7 @@ sub getTab {
 
 Adds a hidden field to the form.
 
-NOTE: This uses the same syntax of the WebGUI::Form::hidden() method.
+B<NOTE:> This uses the same syntax of the WebGUI::Form::hidden() method.
 
 =cut
 
@@ -128,9 +124,7 @@ sub hidden {
 
 Constructor.
 
-=over
-
-=item tabHashRef
+=head3 tabHashRef
 
 A hash reference containing the definition of the tabs. It should be constructed like this:
 
@@ -148,14 +142,12 @@ A hash reference containing the definition of the tabs. It should be constructed
                 }
         );
 
-=item cssString
+=head3 cssString
 
 A string containing the link to the tab-CascadingStyleSheet
 
  default = extrasPath.'/tabs/tabs.css'
 	
-=back
-
 =cut
 
 sub new {
@@ -213,7 +205,7 @@ sub print {
 
 Replaces the default submit button with a new definition.
 
-NOTE: This uses the same syntax of the WebGUI::Form::submit() method.
+B<NOTE:> This uses the same syntax of the WebGUI::Form::submit() method.
 
 =cut
 

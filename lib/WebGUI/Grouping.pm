@@ -58,17 +58,13 @@ These functions are available from this package:
 
 Adds groups to a group.
 
-=over
-
-=item groups
+=head3 groups
 
 An array reference containing the list of group ids to add.
 
-=item toGroups
+=head3 toGroups
 
 An array reference containing the list of group ids to add the first list to.
-
-=back
 
 =cut
 
@@ -92,21 +88,17 @@ sub addGroupsToGroups {
 
 Adds users to the specified groups.
 
-=over
-
-=item users 
+=head3 users 
 
 An array reference containing a list of users.
 
-=item groups
+=head3 groups
 
 An array reference containing a list of groups.
 
-=item expireOffset
+=head3 expireOffset
 
 An override for the default offset of the grouping. Specified in seconds.
-
-=back
 
 =cut
 
@@ -134,17 +126,13 @@ sub addUsersToGroups {
 
 Deletes groups from these groups.
 
-=over
-
-=item groups
+=head3 groups
 
 An array reference containing the list of group ids to delete.
 
-=item fromGroups 
+=head3 fromGroups 
 
 An array reference containing the list of group ids to delete from.
-
-=back
 
 =cut
 
@@ -163,17 +151,13 @@ sub deleteGroupsFromGroups {
 
 Deletes a list of users from the specified groups.
 
-=over
-
-=item users
+=head3 users
 
 An array reference containing a list of users.
 
-=item groups
+=head3 groups
 
 An array reference containing a list of groups.
-
-=back
 
 =cut
 
@@ -192,13 +176,9 @@ sub deleteUsersFromGroups {
 
 Returns an array reference containing a list of groups the specified group is in.
 
-=over
-
-=item groupId
+=head3 groupId
 
 A unique identifier for the group.
-
-=back
 
 =cut
 
@@ -213,17 +193,13 @@ sub getGroupsForGroup {
 
 Returns an array reference containing a list of groups the specified user is in.
 
-=over
-
-=item userId
+=head3 userId
 
 A unique identifier for the user.
 
-=item withoutExpired
+=head3 withoutExpired
 
 If set to "1" then the listing will not include expired groupings. Defaults to "0".
-
-=back
 
 =cut
 
@@ -252,17 +228,13 @@ sub getGroupsForUser {
 
 Returns an array reference containing a list of groups that belong to the specified group.
 
-=over
-
-=item groupId
+=head3 groupId
 
 A unique identifier for the group.
 
-=item recursive
+=head3 recursive
 
 A boolean value to determine whether the method should return the groups directly in the group, or to follow the entire groups of groups hierarchy. Defaults to "0".
-
-=back
 
 =cut
 
@@ -302,17 +274,13 @@ sub getGroupsInGroup {
 
 Returns an array reference containing a list of users that belong to the specified group.
 
-=over
-
-=item groupId
+=head3 groupId
 
 A unique identifier for the group.
 
-=item recursive
+=head3 recursive
 
 A boolean value to determine whether the method should return the users directly in the group or to follow the entire groups of groups hierarchy. Defaults to "0".
-
-=back
 
 =cut
 
@@ -334,17 +302,13 @@ sub getUsersInGroup {
 
 Returns a boolean (0|1) value signifying that the user has the required privileges. Always returns true for Admins.
 
-=over
-
-=item groupId
+=head3 groupId
 
 The group that you wish to verify against the user. Defaults to group with Id 3 (the Admin group).
 
-=item userId
+=head3 userId
 
 The user that you wish to verify against the group. Defaults to the currently logged in user.
-
-=back
 
 =cut
 
@@ -477,21 +441,17 @@ sub isInGroup {
 
 Returns a 1 or 0 depending upon whether the user is a sub-admin for this group.
 
-=over
-
-=item userId
+=head3 userId
 
 An integer that is the unique identifier for a user.
 
-=item groupId
+=head3 groupId
 
 An integer that is the unique identifier for a group.
 
-=item value
+=head3 value
 
 If specified the admin flag will be set to this value.
-
-=back
 
 =cut
 
@@ -511,21 +471,17 @@ sub userGroupAdmin {
 
 Returns the epoch date that this grouping will expire.
 
-=over
-
-=item userId
+=head3 userId
 
 An integer that is the unique identifier for a user.
 
-=item groupId
+=head3 groupId
 
 An integer that is the unique identifier for a group.
 
-=item epoch
+=head3 epoch
 
 If specified the expire date will be set to this value.
-
-=back
 
 =cut
 
