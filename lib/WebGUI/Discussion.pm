@@ -219,22 +219,31 @@ sub purge {
 
 #-------------------------------------------------------------------
 sub showMessage {
-	my ($html, %message);
-	tie %message, 'Tie::CPHash';
-	%message = getMessage($session{form}{mid});
-	if ($message{messageId}) {
-        	$html = '<table width="100%" cellpadding=3 cellspacing=1 border=0><tr><td class="tableHeader">';
-        	$html .= '<b>'.WebGUI::International::get(237).'</b>'.$message{subject}.'<br>';
-        	$html .= '<b>'.WebGUI::International::get(238).'</b> <a href="'.WebGUI::URL::page('op=viewProfile&uid='.$message{userId}).'">'.$message{username}.'</a><br>';
-        	$html .= "<b>".WebGUI::International::get(239)."</b> ".epochToHuman($message{dateOfPost},"%z %Z")."<br>";
-        	$html .= "<b>".WebGUI::International::get(240)."</b> ".$message{wobjectId}."-".$message{rid}."-".$message{pid}."-".$message{messageId}."<br>";
-        	$html .= '</td></tr><tr><td class="tableData">';
-        	$html .= $message{message};
-        	$html .= '</td></tr></table>';
-	} else {
-		$html = WebGUI::International::get(402);
+        my (@data, $html, %message, $defaultMid, $sql);
+        tie %message, 'Tie::CPHash';
+	$sql = "select min(messageId) from discussion where wobjectId=$session{form}{wid}";
+	if ($session{form}{sid}) {
+		$sql .= " and subId=$session{form}{sid}";
 	}
-	return $html;
+        ($defaultMid) = WebGUI::SQL->quickArray($sql);
+        $session{form}{mid} = $defaultMid if ($session{form}{mid} eq "");
+        %message = getMessage($session{form}{mid});
+        if ($message{messageId}) {
+                $html .= '<h1>'.$message{subject}.'</h1>';
+                $html .= '<table width="100%" cellpadding=3 cellspacing=1 border=0><tr><td class="tableHeader">';
+                $html .= '<b>'.WebGUI::International::get(238).'</b> 
+			<a href="'.WebGUI::URL::page('op=viewProfile&uid='.$message{userId}).'">'.$message{username}.'</a><br>';
+                $html .= "<b>".WebGUI::International::get(239)."</b> ".epochToHuman($message{dateOfPost},"%z %Z")."<br>";
+                $html .= '</td>';
+                $html .= '<td rowspan=2 valign="top" class="tableMenu" nowrap>';
+		$html .= $_[0];
+                $html .= '</tr><tr><td class="tableData">';
+                $html .= $message{message}.'<p>';
+                $html .= '</td></tr></table>';
+        } else {
+                $html = WebGUI::International::get(402);
+        }
+        return $html;
 }
 
 #-------------------------------------------------------------------
