@@ -26,6 +26,10 @@ save you many hours of grief.
  * WebGUI now requires the following Perl modules to be installed:
 	Data::Serializer
 	SOAP::Lite
+
+   WARNING: Be sure you install these modules BEFORE you attempt to
+	upgrade or the upgrade will fail and you'll have a mess to
+	clean up!
  
 
 5.5.0
