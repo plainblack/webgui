@@ -93,7 +93,7 @@ sub www_addUser {
 
 #-------------------------------------------------------------------
 sub www_addUserSave {
-        my (@groups, $uid, $u, $gid, $encryptedPassword, $expireAfter, $cmd);
+        my (@groups, $uid, $u, $gid, $encryptedPassword, $cmd);
 	return WebGUI::Privilege::adminOnly() unless (WebGUI::Privilege::isInGroup(3));
 	($uid) = WebGUI::SQL->quickArray("select userId from users where username=".quote($session{form}{username}));
 	unless ($uid) {

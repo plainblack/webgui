@@ -103,17 +103,16 @@ An array reference containing a list of groups.
 
 sub addUsersToGroups {
         foreach my $gid (@{$_[1]}) {
-        	my ($expireAfter) = WebGUI::SQL->quickArray("select expireAfter from groups where groupId=$gid");
+        	my ($expireOffset) = WebGUI::SQL->quickArray("select expireOffset from groups where groupId=$gid");
 		foreach my $uid (@{$_[0]}) {
 			my ($isIn) = WebGUI::SQL->quickArray("select count(*) from groupings where groupId=$gid and userId=$uid");
 			unless ($isIn) {
                 		WebGUI::SQL->write("insert into groupings (groupId,userId,expireDate) 
-					values ($gid, $uid, ".(time()+$expireAfter).")");
+					values ($gid, $uid, ".(time()+$expireOffset).")");
 			}
 		}
         }
 }
-
 
 #-------------------------------------------------------------------
 

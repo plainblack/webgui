@@ -34,14 +34,18 @@ This package provides an object-oriented way of managing WebGUI groups and group
  use WebGUI::Group;
  $g = WebGUI::Group->new(3); or  $g = WebGUI::User->new("new");
 
- $dateCreated =     	$g->dateCreated;
- $description =        	$g->description("Those really smart dudes.");
- $expireAfter =        	$g->expireAfter(360000);
- $groupId =     	$g->groupId;
- $karmaThreshold =     	$g->karmaThreshold(5000);
- $ipFilter =        	$g->ipFilter("10.;192.168.1.");
- $lastUpdated =     	$g->lastUpdated;
- $name =            	$g->name("Nerds");
+ $epoch =     	$g->dateCreated;
+ $integer =	$g->deleteOffset(14);
+ $text =       	$g->description("Those really smart dudes.");
+ $integer =	$g->expireNotify(1);
+ $integer = 	$g->expireNotifyMessage("You're outta here!");
+ $integer =	$g->expireNotifyOffset(-14);
+ $integer =    	$g->expireOffset(360000);
+ $integer =    	$g->groupId;
+ $integer =   	$g->karmaThreshold(5000);
+ $string =     	$g->ipFilter("10.;192.168.1.");
+ $epoch =     	$g->lastUpdated;
+ $string =     	$g->name("Nerds");
 
  $g->addGroups(\@arr);
  $g->deleteGroups(\@arr);
@@ -57,7 +61,7 @@ These methods are available from this class:
 #-------------------------------------------------------------------
 sub _create {
         my $groupId = getNextId("groupId");
-        WebGUI::SQL->write("insert into groups (groupId,dateCreated,expireAfter,karmaThreshold) values 
+        WebGUI::SQL->write("insert into groups (groupId,dateCreated,expireOffset,karmaThreshold) values 
 		($groupId,".time().",314496000,1000000000)");
         return $groupId;
 }
@@ -132,6 +136,35 @@ sub deleteGroups {
 
 #-------------------------------------------------------------------
 
+=head2 deleteOffset ( [ value ] )
+
+Returns the number of days after the expiration to delete the grouping.
+
+=over
+
+=item value
+
+If specified, deleteOffset is set to this value. Defaults to "-14".
+
+=back
+
+=cut
+
+sub deleteOffset {
+        my ($class, $value);
+        $class = shift;
+        $value = shift;
+        if (defined $value) {
+                $class->{_group}{"deleteOffset"} = $value;
+                WebGUI::SQL->write("update groups set deleteOffset=$value,
+                        lastUpdated=".time()." where groupId=$class->{_groupId}");
+        }
+        return $class->{_group}{"deleteOffset"};
+}
+
+
+#-------------------------------------------------------------------
+
 =head2 description ( [ value ] )
 
 Returns the description of this group.
@@ -161,7 +194,95 @@ sub description {
 
 #-------------------------------------------------------------------
 
-=head2 expireAfter ( [ value ] )
+=head2 expireNotify ( [ value ] )
+
+Returns a boolean value whether or not to notify the user of the group expiry.
+
+=over
+
+=item value
+
+If specified, expireNotify is set to this value.
+
+=back
+
+=cut
+
+sub expireNotify {
+        my ($class, $value);
+        $class = shift;
+        $value = shift;
+        if (defined $value) {
+                $class->{_group}{"expireNotify"} = $value;
+                WebGUI::SQL->write("update groups set expireNotify=$value,
+                        lastUpdated=".time()." where groupId=$class->{_groupId}");
+        }
+        return $class->{_group}{"expireNotify"};
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 expireNotifyMessage ( [ value ] )
+
+Returns the message to send to the user about expiration.
+
+=over
+
+=item value
+
+If specified, expireNotifyMessage is set to this value.
+
+=back
+
+=cut
+
+sub expireNotifyMessage {
+        my ($class, $value);
+        $class = shift;
+        $value = shift;
+        if (defined $value) {
+                $class->{_group}{"expireNotifyMessage"} = $value;
+                WebGUI::SQL->write("update groups set expireNotifyMessage=".quote($value).",
+                        lastUpdated=".time()." where groupId=$class->{_groupId}");
+        }
+        return $class->{_group}{"expireNotifyMessage"};
+}
+
+
+
+#-------------------------------------------------------------------
+
+=head2 expireNotifyOffset ( [ value ] )
+
+Returns the number of days after the expiration to notify the user.
+
+=over
+
+=item value
+
+If specified, expireNotifyOffset is set to this value. 
+
+=back
+
+=cut
+
+sub expireNotifyOffset {
+        my ($class, $value);
+        $class = shift;
+        $value = shift;
+        if (defined $value) {
+                $class->{_group}{"expireNotifyOffset"} = $value;
+                WebGUI::SQL->write("update groups set expireNotifyOffset=$value,
+                        lastUpdated=".time()." where groupId=$class->{_groupId}");
+        }
+        return $class->{_group}{"expireNotifyOffset"};
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 expireOffset ( [ value ] )
 
 Returns the number of seconds any grouping with this group should expire after.
 
@@ -169,22 +290,22 @@ Returns the number of seconds any grouping with this group should expire after.
 
 =item value
 
-If specified, expireAfter is set to this value.
+If specified, expireOffset is set to this value.
 
 =back
 
 =cut
 
-sub expireAfter {
+sub expireOffset {
         my ($class, $value);
         $class = shift;
         $value = shift;
         if (defined $value) {
-                $class->{_group}{"expireAfter"} = $value;
-                WebGUI::SQL->write("update groups set expireAfter=".quote($value).",
+                $class->{_group}{"expireOffset"} = $value;
+                WebGUI::SQL->write("update groups set expireOffset=".quote($value).",
                         lastUpdated=".time()." where groupId=$class->{_groupId}");
         }
-        return $class->{_group}{"expireAfter"};
+        return $class->{_group}{"expireOffset"};
 }
 
 
@@ -324,9 +445,12 @@ sub new {
 	$groupId = shift;
         $groupId = _create() if ($groupId eq "new");
 	if ($groupId eq "") {
-		$group{expireAfter} = 314496000;
+		$group{expireOffset} = 314496000;
 		$group{karmaThreshold} = 1000000000;
 		$group{groupName} = "New Group";
+		$group{expireNotifyOffset} = -14;
+		$group{deleteOffset} = 14;
+		$group{expireNotify} = 0;
 	} else {
         	%group = WebGUI::SQL->quickHash("select * from groups where groupId='$groupId'");
 	}

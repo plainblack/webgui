@@ -28,6 +28,21 @@ INSERT INTO userProfileField VALUES ('publicEmail','WebGUI::International::get(8
 insert into international (internationalId,languageId,namespace,message,lastUpdated) values (862,1,'WebGUI','This user\'s profile is not public.', 1043881275);
 alter table groups add column dateCreated int not null default 997938000;
 alter table groups add column lastUpdated int not null default 997938000;
+alter table groups add column deleteOffset int not null default 14;
+alter table groups add column expireNotifyOffset int not null default -14;
+alter table groups add column expireNotifyMessage text;
+alter table groups add column expireNotify int not null default 0;
+alter table groups change expireAfter expireOffset int not null default 314496000;
+insert into international (internationalId,languageId,namespace,message,lastUpdated) values (866,1,'WebGUI','Expire Notifcation Message', 1044127055);
+insert into international (internationalId,languageId,namespace,message,lastUpdated) values (865,1,'WebGUI','Notify user about expiration?', 1044126938);
+insert into international (internationalId,languageId,namespace,message,lastUpdated) values (864,1,'WebGUI','Expire Notification Offset', 1044126838);
+insert into international (internationalId,languageId,namespace,message,lastUpdated) values (863,1,'WebGUI','Delete Offset', 1044126633);
+delete from international where languageId=1 and namespace='WebGUI' and internationalId=367;
+insert into international (internationalId,languageId,namespace,message,lastUpdated) values (367,1,'WebGUI','Expire Offset', 1044126611);
+insert into international (internationalId,languageId,namespace,message,lastUpdated) values (867,1,'WebGUI','Loss of Privilege', 1044133143);
+
+
+
 
 
 

@@ -108,7 +108,27 @@ sub www_editGroup {
 	$f->readOnly($g->groupId,WebGUI::International::get(379));
         $f->text("groupName",WebGUI::International::get(84),$g->name);
         $f->textarea("description",WebGUI::International::get(85),$g->description);
-        $f->interval("expireAfter",WebGUI::International::get(367), WebGUI::DateTime::secondsToInterval($g->expireAfter));
+        $f->interval("expireOffset",WebGUI::International::get(367), WebGUI::DateTime::secondsToInterval($g->expireOffset));
+	$f->yesNo(
+		-name=>"expireNotify",
+		-value=>$g->expireNotify,
+		-label=>WebGUI::International::get(865)
+		);
+	$f->integer(
+		-name=>"expireNotifyOffset",
+		-value=>$g->expireNotifyOffset,
+		-label=>WebGUI::International::get(864)
+		);
+        $f->textarea(
+                -name=>"expireNotifyMessage",
+		-value=>$g->expireNotifyMessage,
+		-label=>WebGUI::International::get(866)
+                );
+        $f->integer(
+                -name=>"deleteOffset",
+                -value=>$g->deleteOffset,
+                -label=>WebGUI::International::get(863)
+                );
 	if ($session{setting}{useKarma}) {
                	$f->integer("karmaThreshold",WebGUI::International::get(538),$g->karmaThreshold);
 	}
@@ -128,9 +148,13 @@ sub www_editGroupSave {
 	my $g = WebGUI::Group->new($session{form}{gid});
 	$g->description($session{form}{description});
 	$g->name($session{form}{groupName});
-	$g->expireAfter(WebGUI::DateTime::intervalToSeconds($session{form}{expireAfter_interval},$session{form}{expireAfter_units}));
+	$g->expireOffset(WebGUI::DateTime::intervalToSeconds($session{form}{expireOffset_interval},$session{form}{expireOffset_units}));
 	$g->karmaThreshold($session{form}{karmaThreshold});
 	$g->ipFilter($session{form}{ipFilter});
+	$g->expireNotify($session{form}{expireNotify});
+	$g->expireNotifyOffset($session{form}{expireNotifyOffset});
+	$g->expireNotifyMessage($session{form}{expireNotifyMessage});
+	$g->deleteOffset($session{form}{deleteOffset});
         return www_listGroups();
 }
 

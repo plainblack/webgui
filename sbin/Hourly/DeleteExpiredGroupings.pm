@@ -17,9 +17,14 @@ use WebGUI::SQL;
 
 #-----------------------------------------
 sub process {
-	if ($session{config}{DeleteExpiredGroupings_offset} ne "") {
-		WebGUI::SQL->write("delete from groupings where expireDate < "
-			.(time()-(86400*$session{config}{DeleteExpiredGroupings_offset})));
+	my @date = WebGUI::DateTime::localtime();
+        if ($date[4] == 3) { # only occurs at 3am on the day in question.
+        	my $sth = WebGUI::SQL->read("select groupId,deleteOffset from groups");
+        	while (my $data = $sth->hashRef) {
+        		WebGUI::SQL->write("delete from groupings where groupId=$data->{groupId} and expireDate < "
+                        	.(time()-(86400*$data->{deleteOffset})));
+        	}
+	        $sth->finish;
 	}
 }
 

@@ -17,6 +17,7 @@ package WebGUI::MessageLog;
 
 use strict;
 use Tie::CPHash;
+use WebGUI::DateTime;
 use WebGUI::International;
 use WebGUI::Macro;
 use WebGUI::Mail;
@@ -126,7 +127,8 @@ sub addEntry {
 	foreach $user (@users) {
 		$u = WebGUI::User->new($user);
 		if ($u->userId ne "") {
-			WebGUI::SQL->write("insert into messageLog values ($messageLogId,".$u->userId.",
+			WebGUI::SQL->write("insert into messageLog (messageLogId, userId, message, url, dateOfEntry,
+				subject, status) values ($messageLogId,".$u->userId.",
 				".quote($message).",".quote($url).",".time().",".quote($subject).", ".quote($status).")");
 			if ($url ne "") {
 				$message .= "\n".WebGUI::URL::append('http://'.$session{env}{HTTP_HOST}.$url,'mlog='.$messageLogId);

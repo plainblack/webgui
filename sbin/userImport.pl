@@ -56,7 +56,7 @@ $|=1;
 
 print "Starting...\n";
 
-my ($i, $dbh, @row, %user, @field, $userId, $first, $dup, $lineNumber, $expireAfter, @group);
+my ($i, $dbh, @row, %user, @field, $userId, $first, $dup, $lineNumber, $expireOffset, @group);
 $first = 1;
 $dbh = connectToDb();
 open(FILE,"<".$usersFile);
@@ -109,13 +109,13 @@ while(<FILE>) {
                                                 values ($user{userId},'LDAP','$_',".$dbh->quote($user{$_}).")");
                                 }
 			}
-			($expireAfter) = WebGUI::SQL->quickArray("select expireAfter from groups where groupId=2",$dbh);
+			($expireOffset) = WebGUI::SQL->quickArray("select expireOffset from groups where groupId=2",$dbh);
 			$user{groups} =~ s/ //g;
 			@group = split(/,/,$user{groups});
 			foreach (@group) {
-				($expireAfter) = WebGUI::SQL->quickArray("select expireAfter from groups where groupId=$_",$dbh);
+				($expireOffset) = WebGUI::SQL->quickArray("select expireOffset from groups where groupId=$_",$dbh);
 				WebGUI::SQL->write("insert into groupings (groupId,userId,expireDate) values 
-					($user{userId},$_,".(time()+$expireAfter).")",$dbh);
+					($user{userId},$_,".(time()+$expireOffset).")",$dbh);
 			}
   		}
 	}
