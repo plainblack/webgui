@@ -12,30 +12,34 @@ package WebGUI::Macro::r_printable;
 
 use strict;
 use WebGUI::International;
+use WebGUI::Macro;
 use WebGUI::Session;
+use WebGUI::Utility;
 
 #-------------------------------------------------------------------
 sub process {
-	my ($output, $temp);
-	$output = $_[0];
-  #---remove style for printing link---
-        if ($output =~ /\^r(.*)\^\/r/) {
-                $temp = $session{env}{REQUEST_URI};
-                if ($temp =~ /\?/) {
-                        $temp .= '&makePrintable=1';
+        my ($output, $temp, @param);
+        $output = $_[0];
+        while ($output =~ /\^r(.*?)\;/) {
+                @param = WebGUI::Macro::getParams($1);
+                $temp = appendToUrl($session{env}{REQUEST_URI},'makePrintable=1');
+		$temp = '<a class="makePrintableLink" href="'.$temp.'">';
+                if ($param[0] ne "") {
+                        $temp .= $param[0];
                 } else {
-                        $temp .= '?makePrintable=1';
+                        $temp .= WebGUI::International::get(53);
                 }
-                $temp = '<a class="makePrintable" href="'.$temp.'">'.$1.'</a>';
+		$temp .= '</a>';
+                $output =~ s/\^r(.*?)\;/$temp/;
+        }
+        #---everything below this line will go away in a later rev.
+        if ($output =~ /\^r(.*)\^\/r/) {
+                $temp = appendToUrl($session{env}{REQUEST_URI},'makePrintable=1');
+                $temp = '<a class="makePrintableLink" href="'.$temp.'">'.$1.'</a>';
                 $output =~ s/\^r(.*)\^\/r/$temp/g;
         } elsif ($output =~ /\^r/) {
-                $temp = $session{env}{REQUEST_URI};
-		if ($temp =~ /\?/) {
-			$temp .= '&makePrintable=1';
-		} else {
-			$temp .= '?makePrintable=1';
-		}
-		$temp = '<a class="makePrintable" href="'.$temp.'">';
+                $temp = appendToUrl($session{env}{REQUEST_URI},'makePrintable=1');
+		$temp = '<a class="makePrintableLink" href="'.$temp.'">';
 		$temp .= WebGUI::International::get(53); 
 		$temp .= '</a>';
                 $output =~ s/\^r/$temp/g;

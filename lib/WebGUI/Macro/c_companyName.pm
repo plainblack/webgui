@@ -17,7 +17,10 @@ use WebGUI::Session;
 sub process {
 	my ($output);
 	$output = $_[0];
-  #---company name---
+        while ($output =~ /\^c(.*?)\;/) {
+                $output =~ s/\^c(.*?)\;/$session{setting}{companyName}/;
+        }
+        #---everything below this line will go away in a later rev.
 	if ($output =~ /\^c/) {
 		$output =~ s/\^c/$session{setting}{companyName}/g;
 	}

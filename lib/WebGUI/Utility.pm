@@ -14,11 +14,24 @@ use CGI;
 use Exporter;
 use FileHandle;
 use strict;
+use WebGUI::International;
 use WebGUI::Session;
 use WebGUI::SQL;
 
 our @ISA = qw(Exporter);
-our @EXPORT = qw(&randint &getNextId &saveAttachment &round &urlize &quote);
+our @EXPORT = qw(&paginate &appendToUrl &randint &getNextId &saveAttachment &round &urlize &quote);
+
+#-------------------------------------------------------------------
+sub appendToUrl {
+	my ($url);
+	$url = $_[0];
+	if ($url =~ /\?/) {
+		$url .= '&'.$_[1];
+	} else {
+		$url .= '?'.$_[1];
+	}
+	return $url;
+}
 
 #-------------------------------------------------------------------
 sub getNextId {
@@ -26,6 +39,36 @@ sub getNextId {
 	($id) = WebGUI::SQL->quickArray("select nextValue from incrementer where incrementerId='$_[0]'",$session{dbh});
 	WebGUI::SQL->write("update incrementer set nextValue=nextValue+1 where incrementerId='$_[0]'",$session{dbh});
         return $id;
+}
+
+#-------------------------------------------------------------------
+sub paginate {
+	my ($pn, $i, $dataRows, $prevNextBar, $itemsPerPage, @row, $url);
+	$itemsPerPage = $_[0];
+	$url = $_[1];
+	@row = @{$_[2]};
+	if ($session{form}{pn} < 1) {
+		$pn = 0;
+	} else {
+		$pn = $session{form}{pn};
+	}
+	for ($i=($itemsPerPage*$pn); $i<($itemsPerPage*($pn+1));$i++) {
+		$dataRows .= $row[$i];
+	}
+	$prevNextBar = '<div class="pagination">';
+	if ($pn > 0) {
+		$prevNextBar .= '<a href="'.appendToUrl($url,('pn='.($pn-1))).'">&laquo;'.WebGUI::International::get(91).'</a>';
+	} else {
+		$prevNextBar .= '&laquo;'.WebGUI::International::get(91);
+	}
+	$prevNextBar .= ' &middot; ';
+	if (($pn+1) < (($#row+1)/$itemsPerPage)) {
+		$prevNextBar .= '<a href="'.appendToUrl($url,('pn='.($pn+1))).'">'.WebGUI::International::get(92).'&raquo;</a>';
+	} else {
+		$prevNextBar .= WebGUI::International::get(92).'&raquo;';
+	}
+	$prevNextBar .= '</div>';
+	return ($dataRows, $prevNextBar);
 }
 
 #-------------------------------------------------------------------

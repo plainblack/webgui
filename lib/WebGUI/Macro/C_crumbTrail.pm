@@ -35,7 +35,11 @@ sub _recurseCrumbTrail {
 sub process {
 	my ($output, $temp);
 	$output = $_[0];
-  #---crumb trail---
+        while ($output =~ /\^C(.*?)\;/) {
+        	$temp = '<span class="crumbTrail">'._recurseCrumbTrail($session{page}{parentId}).'<a href="'.$session{page}{url}.'">'.$session{page}{title}.'</a></span>';
+                $output =~ s/\^C(.*?)\;/$temp/;
+        }
+        #---everything below this line will go away in a later rev.
 	if ($output =~ /\^C/) {
         	$temp = '<span class="crumbTrail">'._recurseCrumbTrail($session{page}{parentId}).'<a href="'.$session{page}{url}.'">'.$session{page}{title}.'</a></span>';
         	$output =~ s/\^C/$temp/g;

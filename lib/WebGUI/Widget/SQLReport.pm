@@ -129,7 +129,7 @@ sub www_view {
 		if ($data{description} ne "") {
 			$output .= $data{description}.'<p>';
                 }
-		@template = split(/\^\-/,$data{template});
+		@template = split(/\^\-\;/,$data{template});
 		$output .= $template[0];
 	        if ($data{DSN} =~ /\DBI\:\w+\:\w+/) {
         	        $dbh = DBI->connect($data{DSN},$data{username},$data{identifier});
@@ -147,7 +147,7 @@ sub www_view {
 			if (defined $sth) {
 				while (@result = $sth->array) {
 					$temp = $template[1];
-					$temp =~ s/\^(\d)/$result[$1]/g;
+					$temp =~ s/\^(\d)\;/$result[$1]/g;
 					if ($data{convertCarriageReturns}) {
 						$temp =~ s/\n/\<br\>/g;
 					}

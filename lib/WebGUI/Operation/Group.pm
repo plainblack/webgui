@@ -127,9 +127,8 @@ sub www_editGroupSave {
 
 #-------------------------------------------------------------------
 sub www_listGroups {
-        my ($output, $pn, $sth, @data, @row, $i, $itemsPerPage);
+        my ($output, $dataRows, $prevNextBar, $sth, @data, @row, $i);
         if (WebGUI::Privilege::isInGroup(3)) {
-                $itemsPerPage = 50;
                 $output = '<a href="'.$session{page}{url}.'?op=viewHelp&hid=10&namespace=WebGUI"><img src="'.$session{setting}{lib}.'/help.gif" border="0" align="right"></a>';
 		$output .= '<h1>'.WebGUI::International::get(89).'</h1>';
 		$output .= '<div align="center"><a href="'.$session{page}{url}.'?op=addGroup">'.WebGUI::International::get(90).'</a></div>';
@@ -141,28 +140,12 @@ sub www_listGroups {
                         $row[$i] .= '<td valign="top">'.$data[2].'</td></tr>';
                         $i++;
                 }
-                if ($session{form}{pn} < 1) {
-                        $pn = 0;
-                } else {
-                        $pn = $session{form}{pn};
-                }
-                for ($i=($itemsPerPage*$pn); $i<($itemsPerPage*($pn+1));$i++) {
-                        $output .= $row[$i];
-                }
+		$sth->finish;
+                ($dataRows, $prevNextBar) = paginate(50,$session{page}{url}.'?op=listGroups',\@row);
+                $output .= '<table border=1 cellpadding=5 cellspacing=0 align="center">';
+                $output .= $dataRows;
                 $output .= '</table>';
-                $output .= '<div class="pagination">';
-                if ($pn > 0) {
-                        $output .= '<a href="'.$session{page}{url}.'?pn='.($pn-1).'&op=listGroups">&laquo;'.WebGUI::International::get(91).'</a>';
-                } else {
-                        $output .= '&laquo;'.WebGUI::International::get(91);
-                }
-                $output .= ' &middot; ';
-                if ($pn < round($#row/$itemsPerPage)) {
-                        $output .= '<a href="'.$session{page}{url}.'?pn='.($pn+1).'&op=listGroups">'.WebGUI::International::get(92).'&raquo;</a>';
-                } else {
-                        $output .= WebGUI::International::get(92).'&raquo;';
-                }
-                $output .= '</div>';
+                $output .= $prevNextBar;
                 return $output;
         } else {
                 return WebGUI::Privilege::adminOnly();

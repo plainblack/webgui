@@ -17,7 +17,10 @@ use WebGUI::Session;
 sub process {
 	my ($output, $temp, @data, $sth, $first);
 	$output = $_[0];
-  #---company URL---
+        while ($output =~ /\^u(.*?)\;/) {
+                $output =~ s/\^u(.*?)\;/$session{setting}{companyURL}/;
+        }
+        #---everything below this line will go away in a later rev.
         if ($output =~ /\^u/) {
                 $output =~ s/\^u/$session{setting}{companyURL}/g;
         }

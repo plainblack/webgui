@@ -26,8 +26,29 @@ use WebGUI::SQL;
 use WebGUI::Utility;
 
 our @ISA = qw(Exporter);
-our @EXPORT = qw(&www_viewProfile &www_editProfile &www_editProfileSave &www_createAccount &www_deactivateAccount &www_deactivateAccountConfirm &www_displayAccount &www_displayLogin &www_login &www_logout &www_recoverPassword &www_recoverPasswordFinish &www_saveAccount &www_updateAccount);
+our @EXPORT = qw(&www_viewMessageLog &www_viewProfile &www_editProfile &www_editProfileSave &www_createAccount &www_deactivateAccount &www_deactivateAccountConfirm &www_displayAccount &www_displayLogin &www_login &www_logout &www_recoverPassword &www_recoverPasswordFinish &www_saveAccount &www_updateAccount);
 our %ldapStatusCode = ( 0=>'success (0)', 1=>'Operations Error (1)', 2=>'Protocol Error (2)', 3=>'Time Limit Exceeded (3)', 4=>'Size Limit Exceeded (4)', 5=>'Compare False (5)', 6=>'Compare True (6)', 7=>'Auth Method Not Supported (7)', 8=>'Strong Auth Required (8)', 9=>'Referral (10)', 11=>'Admin Limit Exceeded (11)', 12=>'Unavailable Critical Extension (12)', 13=>'Confidentiality Required (13)', 14=>'Sasl Bind In Progress (14)', 15=>'No Such Attribute (16)', 17=>'Undefined Attribute Type (17)', 18=>'Inappropriate Matching (18)', 19=>'Constraint Violation (19)', 20=>'Attribute Or Value Exists (20)', 21=>'Invalid Attribute Syntax (21)', 32=>'No Such Object (32)', 33=>'Alias Problem (33)', 34=>'Invalid DN Syntax (34)', 36=>'Alias Dereferencing Problem (36)', 48=>'Inappropriate Authentication (48)', 49=>'Invalid Credentials (49)', 50=>'Insufficient Access Rights (50)', 51=>'Busy (51)', 52=>'Unavailable (52)', 53=>'Unwilling To Perform (53)', 54=>'Loop Detect (54)', 64=>'Naming Violation (64)', 65=>'Object Class Violation (65)', 66=>'Not Allowed On Non Leaf (66)', 67=>'Not Allowed On RDN (67)', 68=>'Entry Already Exists (68)', 69=>'Object Class Mods Prohibited (69)', 71=>'Affects Multiple DSAs (71)', 80=>'other (80)');
+
+#-------------------------------------------------------------------
+sub _accountOptions {
+	my ($output);
+	$output = '<div class="accountOptions"><ul>';
+	if (WebGUI::Privilege::isInGroup(3) || WebGUI::Privilege::isInGroup(4)) {
+		if ($session{var}{adminOn}) {
+			$output .= '<li><a href="'.$session{page}{url}.'?op=switchOffAdmin">'.WebGUI::International::get(12).'</a>';
+		} else {
+			$output .= '<li><a href="'.$session{page}{url}.'?op=switchOnAdmin">'.WebGUI::International::get(63).'</a>';
+		}
+	}
+	$output .= '<li><a href="'.$session{page}{url}.'?op=displayAccount">'.WebGUI::International::get(342).'</a>';
+	$output .= '<li><a href="'.$session{page}{url}.'?op=editProfile">'.WebGUI::International::get(341).'</a>';
+	$output .= '<li><a href="'.$session{page}{url}.'?op=viewProfile&uid='.$session{user}{userId}.'">'.WebGUI::International::get(343).'</a>';
+	$output .= '<li><a href="'.$session{page}{url}.'?op=viewMessageLog">'.WebGUI::International::get(354).'</a>';
+	$output .= '<li><a href="'.$session{page}{url}.'?op=logout">'.WebGUI::International::get(64).'</a>'; 
+	$output .= '<li><a href="'.$session{page}{url}.'?op=deactivateAccount">'.WebGUI::International::get(65).'</a>';
+	$output .= '</ul></div>';
+	return $output;
+}
 
 #-------------------------------------------------------------------
 sub _hasBadPassword {
@@ -157,18 +178,7 @@ sub www_displayAccount {
 		$output .= '<tr><td></td><td>'.WebGUI::Form::submit(WebGUI::International::get(62)).'</td></tr>';
         	$output .= '</table>';
         	$output .= '</form> ';
-		$output .= '<div class="accountOptions"><ul>';
-		if (WebGUI::Privilege::isInGroup(3) || WebGUI::Privilege::isInGroup(4)) {
-			if ($session{var}{adminOn}) {
-				$output .= '<li><a href="'.$session{page}{url}.'?op=switchOffAdmin">'.WebGUI::International::get(12).'</a>';
-			} else {
-				$output .= '<li><a href="'.$session{page}{url}.'?op=switchOnAdmin">'.WebGUI::International::get(63).'</a>';
-			}
-		}
-		$output .= '<li><a href="'.$session{page}{url}.'?op=editProfile">'.WebGUI::International::get(341).'</a>';
-		$output .= '<li><a href="'.$session{page}{url}.'?op=viewProfile&uid='.$session{user}{userId}.'">'.WebGUI::International::get(343).'</a>';
-		$output .= '<li><a href="'.$session{page}{url}.'?op=logout">'.WebGUI::International::get(64).'</a>';
-		$output .= '<li><a href="'.$session{page}{url}.'?op=deactivateAccount">'.WebGUI::International::get(65).'</a></ul></div>';
+		$output .= _accountOptions();
         } else {
                 $output .= www_displayLogin();
 	}
@@ -250,19 +260,7 @@ sub www_editProfile {
                 $output .= '<tr><td></td><td>'.WebGUI::Form::submit(WebGUI::International::get(62)).'</td></tr>';
                 $output .= '</table>';
                 $output .= '</form>';
-                $output .= '<div class="accountOptions"><ul>';
-                if (WebGUI::Privilege::isInGroup(3) || WebGUI::Privilege::isInGroup(4)) {
-                        if ($session{var}{adminOn}) {
-                                $output .= '<li><a href="'.$session{page}{url}.'?op=switchOffAdmin">'.WebGUI::International::get(12).'</a>';
-                        } else {
-                                $output .= '<li><a href="'.$session{page}{url}.'?op=switchOnAdmin">'.WebGUI::International::get(63).'</a>';
-                        }
-                }
-                $output .= '<li><a href="'.$session{page}{url}.'?op=displayAccount">'.WebGUI::International::get(342).'</a>';
-		$output .= '<li><a href="'.$session{page}{url}.'?op=viewProfile&uid='.$session{user}{userId}.'">'.WebGUI::International::get(343).'</a>';
-                $output .= '<li><a href="'.$session{page}{url}.'?op=logout">'.WebGUI::International::get(64).'</a>';
-                $output .= '<li><a href="'.$session{page}{url}.'?op=deactivateAccount">'.WebGUI::International::get(65).'</a>';
-		$output .= '</ul></div>';
+                $output .= _accountOptions();
         } else {
                 $output .= www_displayLogin();
         }
@@ -406,18 +404,23 @@ sub www_saveAccount {
 		$ldap = Net::LDAP->new($uri->host, %args) or $error .= WebGUI::International::get(79);
 		$ldap->bind;
 		$search = $ldap->search (base => $uri->dn, filter => $session{setting}{ldapId}."=".$session{form}{ldapId});
-		$connectDN = "cn=".$search->entry(0)->get_value("cn");
-		$ldap->unbind;
-		$ldap = Net::LDAP->new($uri->host, %args) or $error .= WebGUI::International::get(79);
-		$auth = $ldap->bind(dn=>$connectDN, password=>$session{form}{ldapPassword});
-		if ($auth->code == 48 || $auth->code == 49) {
+		if (defined $search->entry(0)) {
+			$connectDN = "cn=".$search->entry(0)->get_value("cn");
+			$ldap->unbind;
+			$ldap = Net::LDAP->new($uri->host, %args) or $error .= WebGUI::International::get(79);
+			$auth = $ldap->bind(dn=>$connectDN, password=>$session{form}{ldapPassword});
+			if ($auth->code == 48 || $auth->code == 49) {
+				$error .= WebGUI::International::get(68);
+				WebGUI::ErrorHandler::warn("Invalid LDAP information for registration of LDAP ID: ".$session{form}{ldapId});
+			} elsif ($auth->code > 0) {
+				$error .= 'LDAP error "'.$ldapStatusCode{$auth->code}.'" occured. '.WebGUI::International::get(69);
+				WebGUI::ErrorHandler::warn("LDAP error: ".$ldapStatusCode{$auth->code});
+			}
+			$ldap->unbind;
+		} else {
 			$error .= WebGUI::International::get(68);
-			WebGUI::ErrorHandler::warn("Invalid LDAP information for registration of LDAP ID: ".$session{form}{ldapId});
-		} elsif ($auth->code > 0) {
-			$error .= 'LDAP error "'.$ldapStatusCode{$auth->code}.'" occured. '.WebGUI::International::get(69);
-			WebGUI::ErrorHandler::warn("LDAP error: ".$ldapStatusCode{$auth->code});
+                        WebGUI::ErrorHandler::warn("Invalid LDAP information for registration of LDAP ID: ".$session{form}{ldapId});
 		}
-		$ldap->unbind;
 	}
 	if ($error eq "") {
 		$encryptedPassword = Digest::MD5::md5_base64($session{form}{identifier1});
@@ -467,6 +470,43 @@ sub www_updateAccount {
 	} else {
 		$output .= www_displayLogin();
 	}
+        return $output;
+}
+
+#-------------------------------------------------------------------
+sub www_viewMessageLog {
+        my (@data, $output, $sth, @row, $i, $dataRows, $prevNextBar);
+        if (WebGUI::Privilege::isInGroup(2,$session{user}{userId})) {
+                $output = '<h1>'.WebGUI::International::get(159).'</h1>';
+                $sth = WebGUI::SQL->read("select messageLogId,message,url,dateOfEntry from messageLog where userId=$session{user}{userId} order by dateOfEntry desc",$session{dbh});
+                while (@data = $sth->array) {
+                        $row[$i] = '<tr><td class="tableData">';
+                        if ($data[2] ne "") {
+				$data[2] = appendToUrl($data[2],'mlog='.$data[0]);
+                                $row[$i] .= '<a href="'.$data[2].'">';
+                        }
+                        $row[$i] .= $data[1];
+                        if ($data[2] ne "") {
+                                $row[$i] .= '</a>';
+                        }
+                        $row[$i] .= '</td><td class="tableData">'.epochToHuman($data[3],"%m/%d/%Y").'</td></tr>';
+                        $i++;
+                }
+                $sth->finish;
+                ($dataRows, $prevNextBar) = paginate(50,$session{page}{url}.'?op=viewMessageLog',\@row);
+                $output .= '<table width="100%" cellspacing=1 cellpadding=2 border=0>';
+                $output .= '<tr><td class="tableHeader">'.WebGUI::International::get(351).'</td><td class="tableHeader">'.WebGUI::International::get(352).'</td></tr>';
+                if ($dataRows eq "") {
+                        $output .= '<tr><td rowspan=2 class="tableData">'.WebGUI::International::get(353).'</td></tr>';
+                } else {
+                        $output .= $dataRows;
+                }
+                $output .= '</table>';
+                $output .= $prevNextBar;
+		$output .= _accountOptions();
+        } else {
+                $output = WebGUI::Privilege::insufficient();
+        }
         return $output;
 }
 
@@ -536,19 +576,7 @@ sub www_viewProfile {
                 }
                 $output .= '</table>';
 		if ($session{user}{userId} == $session{form}{uid}) {
-                	$output .= '<div class="accountOptions"><ul>';
-                	if (WebGUI::Privilege::isInGroup(3) || WebGUI::Privilege::isInGroup(4)) {
-                        	if ($session{var}{adminOn}) {
-                                	$output .= '<li><a href="'.$session{page}{url}.'?op=switchOffAdmin">'.WebGUI::International::get(12).'</a>';
-                        	} else {
-                                	$output .= '<li><a href="'.$session{page}{url}.'?op=switchOnAdmin">'.WebGUI::International::get(63).'</a>';
-                        	}
-                	}
-                	$output .= '<li><a href="'.$session{page}{url}.'?op=displayAccount">'.WebGUI::International::get(342).'</a>';
-			$output .= '<li><a href="'.$session{page}{url}.'?op=editProfile">'.WebGUI::International::get(341).'</a>';
-                	$output .= '<li><a href="'.$session{page}{url}.'?op=logout">'.WebGUI::International::get(64).'</a>';
-                	$output .= '<li><a href="'.$session{page}{url}.'?op=deactivateAccount">'.WebGUI::International::get(65).'</a>';
-                	$output .= '</ul></div>';
+                	$output .= _accountOptions();
 		}
         } else {
                 	$output .= WebGUI::Privilege::insufficient();

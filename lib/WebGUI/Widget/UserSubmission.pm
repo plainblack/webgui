@@ -17,6 +17,8 @@ use Tie::CPHash;
 use WebGUI::DateTime;
 use WebGUI::International;
 use WebGUI::Macro;
+use WebGUI::MessageLog;
+use WebGUI::Operation;
 use WebGUI::Privilege;
 use WebGUI::Session;
 use WebGUI::SQL;
@@ -51,8 +53,10 @@ sub www_add {
                 $output .= '<tr><td class="formDescription">'.WebGUI::International::get(175).'</td><td>'.WebGUI::Form::checkbox("processMacros",1).'</td></tr>';
                 $output .= '<tr><td class="formDescription">'.WebGUI::International::get(85).'</td><td>'.WebGUI::Form::textArea("description",'',50,5,1).'</td></tr>';
                 %hash = WebGUI::SQL->buildHash("select groupId,groupName from groups where groupName<>'Reserved' order by groupName",$session{dbh});
+		$array[0] = 4;
+                $output .= '<tr><td class="formDescription" valign="top">'.WebGUI::International::get(1,$namespace).'</td><td>'.WebGUI::Form::selectList("groupToApprove",\%hash,\@array).'</td></tr>';
 		$array[0] = 2;
-                $output .= '<tr><td class="formDescription" valign="top">'.WebGUI::International::get(279).'</td><td>'.WebGUI::Form::selectList("groupToContribute",\%hash,\@array).'</td></tr>';
+                $output .= '<tr><td class="formDescription" valign="top">'.WebGUI::International::get(2,$namespace).'</td><td>'.WebGUI::Form::selectList("groupToContribute",\%hash,\@array).'</td></tr>';
                 $output .= '<tr><td class="formDescription">'.WebGUI::International::get(280).'</td><td>'.WebGUI::Form::text("submissionsPerPage",20,2,50).'</td></tr>';
                 %hash = ("Approved"=>WebGUI::International::get(281),"Denied"=>WebGUI::International::get(282),"Pending"=>WebGUI::International::get(283));
                 $output .= '<tr><td class="formDescription" valign="top">'.WebGUI::International::get(284).'</td><td>'.WebGUI::Form::selectList("defaultStatus",\%hash,'',1).'</td></tr>';
@@ -70,7 +74,7 @@ sub www_addSave {
 	my ($widgetId);
 	if (WebGUI::Privilege::canEditPage()) {
 		$widgetId = create();
-		WebGUI::SQL->write("insert into UserSubmission values ($widgetId, $session{form}{groupToContribute}, '$session{form}{submissionsPerPage}', '$session{form}{defaultStatus}')",$session{dbh});
+		WebGUI::SQL->write("insert into UserSubmission values ($widgetId, $session{form}{groupToContribute}, '$session{form}{submissionsPerPage}', '$session{form}{defaultStatus}', $session{form}{groupToApprove})",$session{dbh});
 		return "";
 	} else {
 		return WebGUI::Privilege::insufficient();
@@ -110,9 +114,9 @@ sub www_addSubmission {
 
 #-------------------------------------------------------------------
 sub www_addSubmissionSave {
-        my ($title, $submissionId, $image, $attachment, $status, $groupToContribute);
-	($status, $groupToContribute) = WebGUI::SQL->quickArray("select defaultStatus,groupToContribute from UserSubmission where widgetId=$session{form}{wid}",$session{dbh});
-        if (WebGUI::Privilege::isInGroup($groupToContribute,$session{user}{userId})) {
+        my ($title, $submissionId, $image, $attachment, %userSubmission);
+	%userSubmission = WebGUI::SQL->quickHash("select * from UserSubmission where widgetId=$session{form}{wid}",$session{dbh});
+        if (WebGUI::Privilege::isInGroup($userSubmission{groupToContribute},$session{user}{userId})) {
                 $submissionId = getNextId("submissionId");
                 $image = saveAttachment("image",$session{form}{wid},$submissionId);
                 $attachment = saveAttachment("attachment",$session{form}{wid},$submissionId);
@@ -121,8 +125,26 @@ sub www_addSubmissionSave {
 		} else {
 			$title = WebGUI::International::get(290);
 		}
-                WebGUI::SQL->write("insert into UserSubmission_submission values ($session{form}{wid}, $submissionId, ".quote($title).", ".time().", ".quote($session{user}{username}).", '$session{user}{userId}', ".quote($session{form}{content}).", ".quote($image).", ".quote($attachment).", '$status', '$session{form}{convertCarriageReturns}')",$session{dbh});
+                WebGUI::SQL->write("insert into UserSubmission_submission values ($session{form}{wid}, $submissionId, ".quote($title).", ".time().", ".quote($session{user}{username}).", '$session{user}{userId}', ".quote($session{form}{content}).", ".quote($image).", ".quote($attachment).", '$userSubmission{defaultStatus}', '$session{form}{convertCarriageReturns}')",$session{dbh});
+		if ($userSubmission{defaultStatus} ne "Approved") {
+			WebGUI::MessageLog::addEntry('',$userSubmission{groupToApprove},$session{page}{url}.'?func=viewSubmission&wid='.$session{form}{wid}.'&sid='.$submissionId,3,$namespace);
+		}
                 return "";
+        } else {
+                return WebGUI::Privilege::insufficient();
+        }
+}
+
+#-------------------------------------------------------------------
+sub www_approveSubmission {
+	my (%userSubmission, %submission);
+        if (WebGUI::Privilege::isInGroup(4,$session{user}{userId}) || WebGUI::Privilege::isInGroup(3,$session{user}{userId})) {
+		%submission = WebGUI::SQL->quickHash("select * from UserSubmission_submission where submissionId=$session{form}{sid}",$session{dbh});
+		%userSubmission = WebGUI::SQL->quickHash("select * from UserSubmission where widgetId=$session{form}{wid}",$session{dbh});
+                WebGUI::SQL->write("update UserSubmission_submission set status='Approved' where submissionId=$session{form}{sid}",$session{dbh});
+		WebGUI::MessageLog::addEntry($submission{userId},'',$session{page}{url}.'?func=viewSubmission&wid='.$session{form}{wid}.'&sid='.$session{form}{sid},4,$namespace);
+		WebGUI::MessageLog::completeEntry($session{form}{mlog});
+                return WebGUI::Operation::www_viewMessageLog();
         } else {
                 return WebGUI::Privilege::insufficient();
         }
@@ -180,9 +202,26 @@ sub www_deleteSubmissionConfirm {
 }
 
 #-------------------------------------------------------------------
+sub www_denySubmission {
+	my (%submission, %userSubmission);
+        if (WebGUI::Privilege::isInGroup(4,$session{user}{userId}) || WebGUI::Privilege::isInGroup(3,$session{user}{userId})) {
+		%submission = WebGUI::SQL->quickHash("select * from UserSubmission_submission where submissionId=$session{form}{sid}",$session{dbh});
+                %userSubmission = WebGUI::SQL->quickHash("select * from UserSubmission where widgetId=$session{form}{wid}",$session{dbh});
+                WebGUI::SQL->write("update UserSubmission_submission set status='Denied' where submissionId=$session{form}{sid}",$session{dbh}
+);
+                WebGUI::MessageLog::addEntry($submission{userId},'',$session{page}{url}.'?func=viewSubmission&wid='.$session{form}{wid}.'&sid='.$session{form}{sid},5,$namespace);
+                WebGUI::MessageLog::completeEntry($session{form}{mlog});
+                return WebGUI::Operation::www_viewMessageLog();
+        } else {
+                return WebGUI::Privilege::insufficient();
+        }
+}
+
+#-------------------------------------------------------------------
 sub www_edit {
         my ($output, %data, @array, $sth, %hash);
 	tie %data, 'Tie::CPHash';
+	tie %hash, 'Tie::IxHash';
         if (WebGUI::Privilege::canEditPage()) {
 		%data = WebGUI::SQL->quickHash("select * from widget,UserSubmission where widget.widgetId=$session{form}{wid} and widget.widgetId=UserSubmission.widgetId",$session{dbh});
                 $output = '<a href="'.$session{page}{url}.'?op=viewHelp&hid=1&namespace='.$namespace.'"><img src="'.$session{setting}{lib}.'/help.gif" border="0" align="right"></a>';
@@ -195,9 +234,11 @@ sub www_edit {
                 $output .= '<tr><td class="formDescription">'.WebGUI::International::get(174).'</td><td>'.WebGUI::Form::checkbox("displayTitle","1",$data{displayTitle}).'</td></tr>';
                 $output .= '<tr><td class="formDescription">'.WebGUI::International::get(175).'</td><td>'.WebGUI::Form::checkbox("processMacros","1",$data{processMacros}).'</td></tr>';
                 $output .= '<tr><td class="formDescription">'.WebGUI::International::get(85).'</td><td>'.WebGUI::Form::textArea("description",$data{description}).'</td></tr>';
-		$array[0] = $data{groupToContribute};
+		$array[0] = $data{groupToApprove};
 		%hash = WebGUI::SQL->buildHash("select groupId,groupName from groups where groupName<>'Reserved' order by groupName",$session{dbh});
-                $output .= '<tr><td class="formDescription" valign="top">'.WebGUI::International::get(279).'</td><td>'.WebGUI::Form::selectList("groupToContribute",\%hash,\@array,1).'</td></tr>';
+                $output .= '<tr><td class="formDescription" valign="top">'.WebGUI::International::get(1,$namespace).'</td><td>'.WebGUI::Form::selectList("groupToApprove",\%hash,\@array,1).'</td></tr>';
+		$array[0] = $data{groupToContribute};
+                $output .= '<tr><td class="formDescription" valign="top">'.WebGUI::International::get(2,$namespace).'</td><td>'.WebGUI::Form::selectList("groupToContribute",\%hash,\@array,1).'</td></tr>';
                 $output .= '<tr><td class="formDescription">'.WebGUI::International::get(280).'</td><td>'.WebGUI::Form::text("submissionsPerPage",20,2,$data{submissionsPerPage}).'</td></tr>';
                 %hash = ("Approved"=>WebGUI::International::get(281),"Denied"=>WebGUI::International::get(282),"Pending"=>WebGUI::International::get(283));
 		$array[0] = $data{defaultStatus};
@@ -214,7 +255,7 @@ sub www_edit {
 sub www_editSave {
         if (WebGUI::Privilege::canEditPage()) {
 		update();
-		WebGUI::SQL->write("update UserSubmission set groupToContribute=$session{form}{groupToContribute}, submissionsPerPage=$session{form}{submissionsPerPage}, defaultStatus='$session{form}{defaultStatus}' where widgetId=$session{form}{wid}",$session{dbh});
+		WebGUI::SQL->write("update UserSubmission set groupToContribute=$session{form}{groupToContribute}, groupToApprove=$session{form}{groupToApprove}, submissionsPerPage=$session{form}{submissionsPerPage}, defaultStatus='$session{form}{defaultStatus}' where widgetId=$session{form}{wid}",$session{dbh});
                 return "";
         } else {
                 return WebGUI::Privilege::insufficient();
@@ -258,10 +299,10 @@ sub www_editSubmission {
 
 #-------------------------------------------------------------------
 sub www_editSubmissionSave {
-	my ($owner,$status,$image,$attachment,$title);
+	my ($owner,%userSubmission,$image,$attachment,$title);
 	($owner) = WebGUI::SQL->quickArray("select userId from UserSubmission_submission where submissionId=$session{form}{sid}",$session{dbh});
         if ($owner == $session{user}{userId}) {
-		($status) = WebGUI::SQL->quickArray("select defaultStatus from UserSubmission where widgetId=$session{form}{wid}",$session{dbh});
+		%userSubmission = WebGUI::SQL->quickHash("select * from UserSubmission where widgetId=$session{form}{wid}",$session{dbh});
                 $image = saveAttachment("image",$session{form}{wid},$session{form}{sid});
 		if ($image ne "") {
 			$image = 'image='.quote($image).', ';
@@ -275,7 +316,10 @@ sub www_editSubmissionSave {
                 } else {
                         $title = WebGUI::International::get(290);
                 }
-                WebGUI::SQL->write("update UserSubmission_submission set dateSubmitted=".time().", convertCarriageReturns='$session{form}{convertCarriageReturns}', title=".quote($title).", content=".quote($session{form}{content}).", ".$image.$attachment." status='$status' where submissionId=$session{form}{sid}",$session{dbh});
+                WebGUI::SQL->write("update UserSubmission_submission set dateSubmitted=".time().", convertCarriageReturns='$session{form}{convertCarriageReturns}', title=".quote($title).", content=".quote($session{form}{content}).", ".$image.$attachment." status='$userSubmission{defaultStatus}' where submissionId=$session{form}{sid}",$session{dbh});
+		if ($userSubmission{defaultStatus} ne "Approved") {
+			WebGUI::MessageLog::addEntry('',$userSubmission{groupToApprove},$session{page}{url}.'?func=viewSubmission&wid='.$session{form}{wid}.'&sid='.$session{form}{sid},3,$namespace);
+		}
                 return www_viewSubmission();
         } else {
                 return WebGUI::Privilege::insufficient();
@@ -284,7 +328,7 @@ sub www_editSubmissionSave {
 
 #-------------------------------------------------------------------
 sub www_view {
-	my (%data, @submission, $output, $widgetId, $sth, @row, $i, $pn);
+	my (%data, @submission, $output, $widgetId, $sth, @row, $i, $dataRows, $prevNextBar);
 	tie %data, 'Tie::CPHash';
 	$widgetId = shift;
 	%data = WebGUI::SQL->quickHash("select * from widget,UserSubmission where widget.widgetId=$widgetId and widget.widgetId=UserSubmission.widgetId",$session{dbh});
@@ -305,30 +349,12 @@ sub www_view {
 		}
 		$sth->finish;
 		$output .= '<table width="100%" cellpadding=3 cellspacing=0 border=0><tr><td align="right" class="tableMenu"><a href="'.$session{page}{url}.'?func=addSubmission&wid='.$widgetId.'">'.WebGUI::International::get(294).'</a></td></tr></table>';
+                ($dataRows, $prevNextBar) = paginate($data{submissionsPerPage},$session{page}{url},\@row);
 		$output .= '<table width="100%" cellspacing=1 cellpadding=2 border=0>';
 		$output .= '<tr><td class="tableHeader">'.WebGUI::International::get(99).'</td><td class="tableHeader">'.WebGUI::International::get(287).'</td><td class="tableHeader">'.WebGUI::International::get(296).'</td></tr>';
-		if ($session{form}{pn} < 1) {
-			$pn = 0;
-		} else {
-			$pn = $session{form}{pn}; 
-		}
-		for ($i=($data{submissionsPerPage}*$pn); $i<($data{submissionsPerPage}*($pn+1));$i++) {
-			$output .= $row[$i];
-		}
-		$output .= '</table>';
-        	$output .= '<div class="pagination">';
-        	if ($pn > 0) {
-                	$output .= '<a href="'.$session{page}{url}.'?pn='.($pn-1).'&wid='.$widgetId.'">&laquo;'.WebGUI::International::get(91).'</a>';
-        	} else {
-                	$output .= '&laquo;'.WebGUI::International::get(91);
-        	}
-        	$output .= ' &middot; ';
-        	if ($pn < round($#row/$data{submissionsPerPage})) {
-                	$output .= '<a href="'.$session{page}{url}.'?pn='.($pn+1).'&wid='.$widgetId.'">'.WebGUI::International::get(91).'&raquo;</a>';
-        	} else {
-                	$output .= WebGUI::International::get(92).'&raquo;';
-        	}
-        	$output .= '</div>';
+                $output .= $dataRows;
+                $output .= '</table>';
+                $output .= $prevNextBar;
 	}
 	return $output;
 }
@@ -352,22 +378,15 @@ sub www_viewSubmission {
                 $output .= '<a href="'.$session{page}{url}.'?func=editSubmission&wid='.$session{form}{wid}.'&sid='.$session{form}{sid}.'">'.WebGUI::International::get(302).'</a><br>';
         }
         if ($submission{status} eq "Pending" && (WebGUI::Privilege::isInGroup(3,$session{user}{userId}) || WebGUI::Privilege::isInGroup(4,$session{user}{userId}))) {
-                $output .= '<a href="'.$session{page}{url}.'?op=approveSubmission&sid='.$session{form}{sid}.'">'.WebGUI::International::get(299).'</a><br>';
-                $output .= '<a href="'.$session{page}{url}.'?op=viewPendingSubmissions">'.WebGUI::International::get(300).'</a><br>';
-                $output .= '<a href="'.$session{page}{url}.'?op=denySubmission&sid='.$session{form}{sid}.'">'.WebGUI::International::get(301).'</a><br>';
+                $output .= '<a href="'.$session{page}{url}.'?func=approveSubmission&wid='.$session{form}{wid}.'&sid='.$session{form}{sid}.'&mlog='.$session{form}{mlog}.'">'.WebGUI::International::get(299).'</a><br>';
+                $output .= '<a href="'.$session{page}{url}.'?op=viewMessageLog">'.WebGUI::International::get(300).'</a><br>';
+                $output .= '<a href="'.$session{page}{url}.'?func=denySubmission&wid='.$session{form}{wid}.'&sid='.$session{form}{sid}.'&mlog='.$session{form}{mlog}.'">'.WebGUI::International::get(301).'</a><br>';
         }
 	$output .= '</td</tr><tr><td class="tableData">';
   #---content
 	if ($submission{image} ne "") {
 		$output .= '<img src="'.$session{setting}{attachmentDirectoryWeb}.'/'.$session{form}{wid}.'/'.$session{form}{sid}.'/'.$submission{image}.'" hspace=3 align="right">';
 	}
-	if ($submission{status} eq "Pending" && (WebGUI::Privilege::isInGroup(3,$session{user}{userId}) || WebGUI::Privilege::isInGroup(4,$session{user}{userId}))) {
-		$output .= '<div align="center">';
-                $output .= '<a href="'.$session{page}{url}.'?op=approveSubmission&sid='.$session{form}{sid}.'">'.WebGUI::International::get(299).'</a> &middot; ';
-                $output .= '<a href="'.$session{page}{url}.'?op=viewPendingSubmissions">'.WebGUI::International::get(300).'</a> &middot; ';
-                $output .= '<a href="'.$session{page}{url}.'?op=denySubmission&sid='.$session{form}{sid}.'">'.WebGUI::International::get(301).'</a> ';
-		$output .= '</div>';
-        }
 	if ($submission{convertCarriageReturns}) {
 		$submission{content} =~ s/\n/\<br\>/g;
 	}	

@@ -1,5 +1,5 @@
 package WebGUI;
-our $VERSION = "2.3.4";
+our $VERSION = "2.4.0";
 
 #-------------------------------------------------------------------
 # WebGUI is Copyright 2001 Plain Black Software.
@@ -66,7 +66,6 @@ sub _displayAdminBar {
         %hash = ( $session{page}{url}.'?'=>WebGUI::International::get(82), 
 		$session{page}{url}.'?op=switchOffAdmin'=>WebGUI::International::get(12),
 		$session{page}{url}.'?op=viewHelpIndex'=>WebGUI::International::get(13),
-		$session{page}{url}.'?op=viewPendingSubmissions'=>WebGUI::International::get(14), 
 		%hash
 	);
         $adminSelect = WebGUI::Form::selectList("adminSelect",\%hash,"","","","goAdmin()");

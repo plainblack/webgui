@@ -12,13 +12,25 @@ package WebGUI::Macro::a_account;
 
 use strict;
 use WebGUI::International;
+use WebGUI::Macro;
 use WebGUI::Session;
 
 #-------------------------------------------------------------------
 sub process {
-	my ($output, $temp);
+	my ($output, $temp, @param);
 	$output = $_[0];
-  #---account link---
+        while ($output =~ /\^a(.*?)\;/) {
+                @param = WebGUI::Macro::getParams($1);
+		$temp = '<a class="myAccountLink" href="'.$session{page}{url}.'?op=displayAccount">';
+		if ($param[0] ne "") {
+			$temp .= $param[0];
+		} else {
+			$temp .= WebGUI::International::get(46);
+		}
+		$temp .= '</a>';
+                $output =~ s/\^a(.*?)\;/$temp/;
+        }
+	#---everything below this line will go away in a later rev.
 	if ($output =~ /\^a(.*)\^\/a/) {
         	$temp = '<a class="myAccountLink" href="'.$session{page}{url}.'?op=displayAccount">'.$1.'</a>';
                 $output =~ s/\^a(.*)\^\/a/$temp/g;

@@ -1,0 +1,33 @@
+####################################################################
+#                      WebGUI Upgrade Gotchas                      #
+####################################################################
+
+This file contains a list of any changes you should be aware of when
+upgrading from one version to the next, or even between multiple
+versions. Be sure to heed the warnings contained herein as they will
+save you many hours of grief.
+
+
+2.4.0
+--------------------------------------------------------------------
+ * You must convert your old macros to the new format by version
+	3.0.0 or they will become unusable.
+ * The "extras" and "uploads" directories have been moved into the
+	"www" directory so that aliases do not need to be created
+	in your web server.
+
+2.3.2
+--------------------------------------------------------------------
+ * Upgrade scripts are no longer available from the Plain Black
+	web site. They are now included in every distribution under
+	"docs/upgrades".
+
+2.1.0
+--------------------------------------------------------------------
+ * The Widget and Macro architecture will be changing severely
+	between now and 3.0.0. If you're using or creating any
+	third-party widgets they will cease to function over the
+	course of this development. Before upgrading, be certain
+	that the Macro or Widget complies with all new 
+	specifications.
+

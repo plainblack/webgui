@@ -32,7 +32,7 @@ if ($ARGV[0] eq "--help" || $ARGV[0] eq "/?" || $ARGV[0] eq "/help" || $ARGV[0] 
 
 print "\nWebGUI is checking your system environment...\n\n";
 
-our $os;
+my $os;
 if ($^O =~ /Win/i) {
 	$os = "Microsoftish";
 } else {
@@ -74,6 +74,20 @@ if (eval { require LWP }) {
 	} else {
         	print "Please install.\n";
 	}
+}
+
+print "HTTP::Request module:\t";
+if (eval { require HTTP::Request }) {
+        print "OK\n";
+} else {
+        print "Please install LWP.\n";
+}
+
+print "HTTP::Headers module:\t";
+if (eval { require HTTP::Headers }) {
+        print "OK\n";
+} else {
+        print "Please install LWP.\n";
 }
 
 print "Digest::MD5 module:\t";
@@ -226,9 +240,6 @@ unless (eval { $dbh = DBI->connect($config->param('dsn'), $config->param('dbuser
 ###################################
 
 print "Latest version:\t\t";
-use LWP::UserAgent;
-use HTTP::Request;
-use HTTP::Headers;
 my ($header, $userAgent, $request, $response, $version, $referer);
 $userAgent = new LWP::UserAgent;
 $userAgent->agent("WebGUI-Check/2.0");

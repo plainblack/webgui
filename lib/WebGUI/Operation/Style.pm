@@ -33,8 +33,8 @@ sub www_addStyle {
                 $output .= WebGUI::Form::hidden("op","addStyleSave");
                 $output .= '<table>';
                 $output .= '<tr><td class="formDescription" valign="top">'.WebGUI::International::get(151).'</td><td>'.WebGUI::Form::text("name",20,30).'</td></tr>';
-                $output .= '<tr><td class="formDescription" valign="top">'.WebGUI::International::get(152).'</td><td>'.WebGUI::Form::textArea("header",'',50,10,1).'</td></tr>';
-                $output .= '<tr><td class="formDescription" valign="top">'.WebGUI::International::get(153).'</td><td>'.WebGUI::Form::textArea("footer",'',50,10,1).'</td></tr>';
+                $output .= '<tr><td class="formDescription" valign="top">'.WebGUI::International::get(152).'</td><td>'.WebGUI::Form::textArea("header",'',50,10).'</td></tr>';
+                $output .= '<tr><td class="formDescription" valign="top">'.WebGUI::International::get(153).'</td><td>'.WebGUI::Form::textArea("footer",'',50,10).'</td></tr>';
                 $output .= '<tr><td class="formDescription" valign="top">'.WebGUI::International::get(154).'</td><td>'.WebGUI::Form::textArea("styleSheet","<style>\n\n</style>",50,10).'</td></tr>';
                 $output .= '<tr><td></td><td>'.WebGUI::Form::submit(WebGUI::International::get(62)).'</td></tr>';
                 $output .= '</table>';
@@ -111,8 +111,8 @@ sub www_editStyle {
                 $output .= WebGUI::Form::hidden("sid",$session{form}{sid});
                 $output .= '<table>';
                 $output .= '<tr><td class="formDescription" valign="top">'.WebGUI::International::get(151).'</td><td>'.WebGUI::Form::text("name",20,30,$style{name}).'</td></tr>';
-                $output .= '<tr><td class="formDescription" valign="top">'.WebGUI::International::get(152).'</td><td>'.WebGUI::Form::textArea("header",$style{header},50,10,1).'</td></tr>';
-                $output .= '<tr><td class="formDescription" valign="top">'.WebGUI::International::get(153).'</td><td>'.WebGUI::Form::textArea("footer",$style{footer},50,10,1).'</td></tr>';
+                $output .= '<tr><td class="formDescription" valign="top">'.WebGUI::International::get(152).'</td><td>'.WebGUI::Form::textArea("header",$style{header},50,10).'</td></tr>';
+                $output .= '<tr><td class="formDescription" valign="top">'.WebGUI::International::get(153).'</td><td>'.WebGUI::Form::textArea("footer",$style{footer},50,10).'</td></tr>';
                 $output .= '<tr><td class="formDescription" valign="top">'.WebGUI::International::get(154).'</td><td>'.WebGUI::Form::textArea("styleSheet",$style{styleSheet},50,10).'</td></tr>';
                 $output .= '<tr><td></td><td>'.WebGUI::Form::submit(WebGUI::International::get(62)).'</td></tr>';
                 $output .= '</table>';
@@ -135,41 +135,23 @@ sub www_editStyleSave {
 
 #-------------------------------------------------------------------
 sub www_listStyles {
-        my ($output, $pn, $sth, @data, @row, $i, $itemsPerPage);
+        my ($output, $sth, @data, @row, $i, $prevNextBar, $dataRows);
         if (WebGUI::Privilege::isInGroup(3)) {
-                $itemsPerPage = 50;
                 $output = '<a href="'.$session{page}{url}.'?op=viewHelp&hid=9&namespace=WebGUI"><img src="'.$session{setting}{lib}.'/help.gif" border="0" align="right"></a>';
 		$output .= '<h1>'.WebGUI::International::get(157).'</h1>';
 		$output .= '<div align="center"><a href="'.$session{page}{url}.'?op=addStyle">'.WebGUI::International::get(158).'</a></div>';
-                $output .= '<table border=1 cellpadding=5 cellspacing=0 align="center">';
                 $sth = WebGUI::SQL->read("select styleId,name from style where name<>'Reserved' order by name",$session{dbh});
                 while (@data = $sth->array) {
                         $row[$i] = '<tr><td valign="top"><a href="'.$session{page}{url}.'?op=deleteStyle&sid='.$data[0].'"><img src="'.$session{setting}{lib}.'/delete.gif" border=0></a><a href="'.$session{page}{url}.'?op=editStyle&sid='.$data[0].'"><img src="'.$session{setting}{lib}.'/edit.gif" border=0></a><a href="'.$session{page}{url}.'?op=copyStyle&sid='.$data[0].'"><img src="'.$session{setting}{lib}.'/copy.gif" border=0></a></td>';
                         $row[$i] .= '<td valign="top">'.$data[1].'</td></tr>';
                         $i++;
                 }
-                if ($session{form}{pn} < 1) {
-                        $pn = 0;
-                } else {
-                        $pn = $session{form}{pn};
-                }
-                for ($i=($itemsPerPage*$pn); $i<($itemsPerPage*($pn+1));$i++) {
-                        $output .= $row[$i];
-                }
-                $output .= '</table>';
-                $output .= '<div class="pagination">';
-                if ($pn > 0) {
-                        $output .= '<a href="'.$session{page}{url}.'?pn='.($pn-1).'&op=listStyles">&laquo;Previous Page</a>';
-                } else {
-                        $output .= '&laquo;Previous Page';
-                }
-                $output .= ' &middot; ';
-                if ($pn < round($#row/$itemsPerPage)) {
-                        $output .= '<a href="'.$session{page}{url}.'?pn='.($pn+1).'&op=listStyles">Next Page&raquo;</a>';
-                } else {
-                        $output .= 'Next Page&raquo;';
-                }
-                $output .= '</div>';
+		$sth->finish;
+		($dataRows, $prevNextBar) = paginate(50,$session{page}{url}.'?op=listStyles',\@row);
+                $output .= '<table border=1 cellpadding=5 cellspacing=0 align="center">';
+		$output .= $dataRows;
+		$output .= '</table>';
+		$output .= $prevNextBar;
                 return $output;
         } else {
                 return WebGUI::Privilege::adminOnly();

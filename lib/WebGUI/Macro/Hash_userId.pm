@@ -16,8 +16,11 @@ use WebGUI::Session;
 #-------------------------------------------------------------------
 sub process {
 	my ($output);
-  #---uid---
 	$output = $_[0];
+        while ($output =~ /\^\#(.*?)\;/) {
+                $output =~ s/\^\#(.*?)\;/$session{user}{userId}/;
+        }
+        #---everything below this line will go away in a later rev.
         if ($output =~ /\^\#/) {
                 $output =~ s/\^\#/$session{user}{userId}/g;
         }

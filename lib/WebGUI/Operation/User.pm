@@ -81,6 +81,7 @@ sub www_becomeUser {
 		($password) = WebGUI::SQL->quickArray("select identifier from users where userId='$session{form}{uid}'",$session{dbh});
         	WebGUI::Session::end($session{var}{sessionId});
         	$cookieInfo = $session{form}{uid}."|".crypt($password,"yJ");
+		WebGUI::Session::end($cookieInfo);
 		WebGUI::Session::start($cookieInfo);
         	WebGUI::Session::setCookie("wgSession",$cookieInfo);
 		$output = "";
@@ -205,9 +206,8 @@ sub www_editUserSave {
 
 #-------------------------------------------------------------------
 sub www_listUsers {
-	my ($output, $sth, @data, @row, $pn, $i, $itemsPerPage, $search);
+	my ($output, $sth, @data, @row, $dataRows, $prevNextBar, $i, $search);
         if (WebGUI::Privilege::isInGroup(3)) {
-		$itemsPerPage = 50;
 		$output = '<a href="'.$session{page}{url}.'?op=viewHelp&hid=8&namespace=WebGUI"><img src="'.$session{setting}{lib}.'/help.gif" border="0" align="right"></a>';
 		$output .= '<h1>'.WebGUI::International::get(149).'</h1>';
 		$output .= '<table class="tableData" align="center" width="75%"><tr><td>';
@@ -220,7 +220,6 @@ sub www_listUsers {
 		if ($session{form}{keyword} ne "") {
 			$search = " and (username like '%".$session{form}{keyword}."%' or email like '%".$session{form}{keyword}."%') ";
 		}
-		$output .= '<table border=1 cellpadding=5 cellspacing=0 align="center">';
 		$sth = WebGUI::SQL->read("select userId,username,email from users where username<>'Reserved' $search order by username",$session{dbh});
 		while (@data = $sth->array) {
 			$row[$i] = '<tr class="tableData"><td>';
@@ -233,28 +232,12 @@ sub www_listUsers {
 			$row[$i] .= '<td><a href="mailto:'.$data[2].'">'.$data[2].'</a></td></tr>';
 			$i++;
 		}
-		if ($session{form}{pn} < 1) {
-                        $pn = 0;
-                } else {
-                        $pn = $session{form}{pn};
-                }
-                for ($i=($itemsPerPage*$pn); $i<($itemsPerPage*($pn+1));$i++) {
-                        $output .= $row[$i];
-                }
+		$sth->finish;
+                ($dataRows, $prevNextBar) = paginate(50,$session{page}{url}.'?op=listUsers',\@row);
+                $output .= '<table border=1 cellpadding=5 cellspacing=0 align="center">';
+                $output .= $dataRows;
                 $output .= '</table>';
-                $output .= '<div class="pagination">';
-                if ($pn > 0) {
-                        $output .= '<a href="'.$session{page}{url}.'?pn='.($pn-1).'&op=listUsers">&laquo;'.WebGUI::International::get(91).'</a>';
-                } else {
-                        $output .= '&laquo;'.WebGUI::International::get(91);
-                }
-                $output .= ' &middot; ';
-                if ($pn < round($#row/$itemsPerPage)) {
-                        $output .= '<a href="'.$session{page}{url}.'?pn='.($pn+1).'&op=listUsers">'.WebGUI::International::get(92).'&raquo;</a>';
-                } else {
-                        $output .= WebGUI::International::get(92).'&raquo;';
-                }
-                $output .= '</div>';
+                $output .= $prevNextBar;
 		return $output;
         } else {
                 return WebGUI::Privilege::adminOnly();

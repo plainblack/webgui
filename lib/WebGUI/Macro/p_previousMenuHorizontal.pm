@@ -11,6 +11,7 @@ package WebGUI::Macro::p_previousMenuHorizontal;
 #-------------------------------------------------------------------
 
 use strict;
+use WebGUI::Macro;
 use WebGUI::Privilege;
 use WebGUI::Session;
 use WebGUI::SQL;
@@ -19,7 +20,25 @@ use WebGUI::SQL;
 sub process {
 	my ($output, $temp, @data, $sth, $first);
 	$output = $_[0];
-  #---previous menu horizontal ---
+        while ($output =~ /\^p(.*?)\;/) {
+                $temp = '<span class="horizontalMenu">';
+                $first = 1;
+                $sth = WebGUI::SQL->read("select title,urlizedTitle,pageId from page where parentId=$session{page}{parentId} order by sequenceNumber",$session{dbh});
+                while (@data = $sth->array) {
+                        if (WebGUI::Privilege::canViewPage($data[2])) {
+                                if ($first) {
+                                        $first = 0;
+                                } else {
+                                        $temp .= " &middot; ";
+                                }
+                                $temp .= '<a class="horizontalMenu" href="'.$session{env}{SCRIPT_NAME}.'/'.$data[1].'">'.$data[0].'</a>';
+                        }
+                }
+                $sth->finish;
+                $temp .= '</span>';
+                $output =~ s/\^p(.*?)\;/$temp/;
+        }
+        #---everything below this line will go away in a later rev.
         if ($output =~ /\^p/) {
                 $temp = '<span class="horizontalMenu">';
                 $first = 1;

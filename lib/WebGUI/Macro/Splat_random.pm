@@ -11,13 +11,23 @@ package WebGUI::Macro::Splat_random;
 #-------------------------------------------------------------------
 
 use strict;
+use WebGUI::Macro;
 use WebGUI::Utility;
 
 #-------------------------------------------------------------------
 sub process {
-	my ($output, $temp);
-	$output = $_[0];
-  #---random number---
+        my ($output, $temp, @param);
+        $output = $_[0];
+        while ($output =~ /\^\*(.*?)\;/) {
+                @param = WebGUI::Macro::getParams($1);
+                if ($param[0] ne "") {
+                	$temp = round(rand()*$1);
+                } else {
+                	$temp = round(rand()*1000000000);
+                }
+                $output =~ s/\^\*(.*?)\;/$temp/;
+        }
+        #---everything below this line will go away in a later rev.
         if ($output =~ /\^\*(.*)\^\/\*/) {
                 $temp = round(rand()*$1);
                 $output =~ s/\^\*(.*)\^\/\*/$temp/g;

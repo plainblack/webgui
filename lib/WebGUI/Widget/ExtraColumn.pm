@@ -83,7 +83,7 @@ sub www_edit {
                 $output .= '<tr><td class="formDescription">'.WebGUI::International::get(201).'</td><td>'.WebGUI::Form::text("spacer",20,3,$data{spacer}).'</td></tr>';
                 $output .= '<tr><td class="formDescription">'.WebGUI::International::get(202).'</td><td>'.WebGUI::Form::text("width",20,3,$data{width}).'</td></tr>';
                 $output .= '<tr><td class="formDescription">'.WebGUI::International::get(203).'</td><td>'.WebGUI::Form::text("class",20,50,$data{class}).'</td></tr>';
-                $output .= '<tr><td></td><td>'.WebGUI::Form::submit(WebGUI::International::get(204)).'</td></tr>';
+                $output .= '<tr><td></td><td>'.WebGUI::Form::submit(WebGUI::International::get(62)).'</td></tr>';
                 $output .= '</table></form>';
                 return $output;
         } else {

@@ -11,14 +11,26 @@ package WebGUI::Macro::P_previousMenuVertical;
 #-------------------------------------------------------------------
 
 use strict;
+use WebGUI::Macro;
 use WebGUI::Macro::Shared;
 use WebGUI::Session;
 
 #-------------------------------------------------------------------
 sub process {
-	my ($output, $temp);
-	$output = $_[0];
-  #---previous menu vertical---
+        my ($output, $temp, @param);
+        $output = $_[0];
+        while ($output =~ /\^P(.*?)\;/) {
+                @param = WebGUI::Macro::getParams($1);
+                $temp = '<span class="verticalMenu">';
+                if ($param[0] ne "") {
+                        $temp .= traversePageTree($session{page}{parentId},0,$param[0]);
+                } else {
+                        $temp .= traversePageTree($session{page}{parentId},0,1);
+                }
+                $temp .= '</span>';
+                $output =~ s/\^P(.*?)\;/$temp/;
+        }
+        #---everything below this line will go away in a later rev.
         if ($output =~ /\^P(.*)\^\/P/) {
                 $temp = '<span class="verticalMenu">';
                 $temp .= traversePageTree($session{page}{parentId},0,$1);

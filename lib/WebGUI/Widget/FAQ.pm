@@ -96,7 +96,7 @@ sub www_addQuestion {
                 $output .= WebGUI::Form::hidden("func","addQuestionSave");
                 $output .= '<table>';
                 $output .= '<tr><td class="formDescription">'.WebGUI::International::get(208).'</td><td>'.WebGUI::Form::textArea("question",'',50,3).'</td></tr>';
-                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(209).'</td><td>'.WebGUI::Form::textArea("answer").'</td></tr>';
+                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(209).'</td><td>'.WebGUI::Form::textArea("answer",'',50,10,1).'</td></tr>';
                 $output .= '<tr><td></td><td>'.WebGUI::Form::submit(WebGUI::International::get(62)).'</td></tr>';
                 $output .= '</table></form>';
                 return $output;
@@ -200,7 +200,7 @@ sub www_editQuestion {
                 $output .= WebGUI::Form::hidden("func","editQuestionSave");
                 $output .= '<table>';
                 $output .= '<tr><td class="formDescription">'.WebGUI::International::get(208).'</td><td>'.WebGUI::Form::textArea("question",$question{question},50,3).'</td></tr>';
-                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(209).'</td><td>'.WebGUI::Form::textArea("answer",$question{answer}).'</td></tr>';
+                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(209).'</td><td>'.WebGUI::Form::textArea("answer",$question{answer},50,10,1).'</td></tr>';
                 $output .= '<tr><td></td><td>'.WebGUI::Form::submit(WebGUI::International::get(62)).'</td></tr>';
                 $output .= '</table></form>';
                 return $output;

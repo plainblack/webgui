@@ -12,13 +12,25 @@ package WebGUI::Macro::H_homeLink;
 
 use strict;
 use WebGUI::International;
+use WebGUI::Macro;
 use WebGUI::Session;
 
 #-------------------------------------------------------------------
 sub process {
-	my ($output, $temp);
-	$output = $_[0];
-  #---home link---
+        my ($output, $temp, @param);
+        $output = $_[0];
+        while ($output =~ /\^H(.*?)\;/) {
+                @param = WebGUI::Macro::getParams($1);
+                $temp = '<a class="homeLink" href="'.$session{env}{SCRIPT_NAME}.'/home">';
+                if ($param[0] ne "") {
+                        $temp .= $param[0];
+                } else {
+                        $temp .= WebGUI::International::get(47);
+                }
+                $temp .= '</a>';
+                $output =~ s/\^H(.*?)\;/$temp/;
+        }
+        #---everything below this line will go away in a later rev.
         if ($output =~ /\^H(.*)\^\/H/) {
                 $temp = '<a class="homeLink" href="'.$session{env}{SCRIPT_NAME}.'/home">'.$1.'</a>';
                 $output =~ s/\^H(.*)\^\/H/$temp/g;

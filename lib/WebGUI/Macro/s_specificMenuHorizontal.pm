@@ -20,7 +20,27 @@ use WebGUI::SQL;
 sub process {
 	my ($output, $temp, @data, $pageTitle, $parentId, $sth, $first);
 	$output = $_[0];
-  #---any page sub menu vertical---
+        while ($output =~ /\^s(.*?)\;/) {
+                $pageTitle = $1;
+                $temp = '<span class="horizontalMenu">';
+                $first = 1;
+                ($parentId) = WebGUI::SQL->quickArray("select pageId from page where urlizedTitle='$pageTitle'",$session{dbh});
+                $sth = WebGUI::SQL->read("select title,urlizedTitle,pageId from page where parentId='$parentId' order by sequenceNumber",$session{dbh});
+                while (@data = $sth->array) {
+                        if (WebGUI::Privilege::canViewPage($data[2])) {
+                                if ($first) {
+                                        $first = 0;
+                                } else {
+                                        $temp .= " &middot; ";
+                                }
+                                $temp .= '<a class="horizontalMenu" href="'.$session{env}{SCRIPT_NAME}.'/'.$data[1].'">'.$data[0].'</a>';
+                        }
+                }
+                $sth->finish;
+                $temp .= '</span>';
+                $output =~ s/\^s(.*?)\;/$temp/;
+        }
+        #---everything below this line will go away in a later rev.
         if ($output =~ /\^s(.*)\^\/s/) {
 		$pageTitle = $1;
                 $temp = '<span class="horizontalMenu">';

@@ -19,7 +19,6 @@ use WebGUI::Operation::Page;
 use WebGUI::Operation::Settings;
 use WebGUI::Operation::Statistics;
 use WebGUI::Operation::Style;
-use WebGUI::Operation::Submission;
 use WebGUI::Operation::Trash;
 use WebGUI::Operation::User;
 

@@ -15,6 +15,20 @@ use WebGUI::ErrorHandler;
 use WebGUI::Session;
 
 #-------------------------------------------------------------------
+sub getParams {
+        my ($data, @param);
+        $data = $_[0];
+        $data = substr($data,1,length($data)-2);
+        push(@param, $+) while $data =~ m {
+                "([^\"\\]*(?:\\.[^\"\\]*)*)",?
+                |       ([^,]+),?
+                |       ,
+        }gx;
+        push(@param, undef) if substr($data,-1,1) eq ',';
+	return @param;
+}
+
+#-------------------------------------------------------------------
 sub process {
         my (@files, $file, $cmd, $output, $macroDir);
 	$output = $_[0];
@@ -37,6 +51,7 @@ sub process {
         closedir(DIR);
   #---script url---
   # slash has to go last because it is also used as the end character for configurable widgets 
+  # this will disappear in a future rev as it is depricated
         if ($output =~ /\^\//) {
                 $output =~ s/\^\//$session{env}{SCRIPT_NAME}/g;
         }
