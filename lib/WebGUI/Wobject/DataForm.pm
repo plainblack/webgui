@@ -864,6 +864,9 @@ sub www_process {
 			$hadErrors = 1;
 			delete $var->{entryId};
 		}
+		if ($row{status} eq "hidden") {
+                        $value = WebGUI::Macro::process($row{defaultValue});
+                }
 		unless ($hadErrors) {
 			my ($exists) = WebGUI::SQL->quickArray("select count(*) from DataForm_entryData where DataForm_entryId=$entryId
 				and DataForm_fieldId=".quote($row{DataForm_fieldId}));

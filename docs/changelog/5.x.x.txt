@@ -15,6 +15,9 @@
  - bugfix [ 938266 ] Fix: 5.5.4 Synopsis ignores hideFromNav (Thanks to 
    Nicklous Roberts.)
  - bugfix [ 961056 ] pages erroneously owned by visitor
+ - bugfix [ 913847 ] Minutes on times can not be updated.
+ - bugfix [ 939070 ] 5.5.4: Macros do not work in DataForm fields
+
 
 
 5.5.6

@@ -81,6 +81,7 @@
  - Dropped page tree caching and stepped onto Navigation caching. This helps
    scalability a lot. Thanks to Martin Kamerbeek / Procolix
  - bugfix [ 977201 ] ws client bug
+ - bugfix [ 969740 ] Messageboard: Deleting of postings
 
 
 
