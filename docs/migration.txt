@@ -33,6 +33,10 @@ In WebGUI 6.3 we made the first major change to the Wobject API. This should
 be the last major change until versioning is introduced in 6.7. In order to
 migrate your wobjects you will probably want to look at lib/WebGUI/Asset.pm,
 and lib/WebGUI/Asset/Wobject.pm as well as the wobjects that come with WebGUI.
+
+NOTE: Interweaved in the tips below are VIM regular expressions that can help
+the conversion process.
+
 The following tips should also help make your migration easer:
 
 	1.2.1 The wobjectId field has been changed to assetId. In addition the Wobject ID 
@@ -42,12 +46,29 @@ The following tips should also help make your migration easer:
 	Old: WebGUI::URL::page("func=edit&wid=".$self->get("wobjectId"))
 	New: $self->getUrl("func=edit")
 	
+	Remove wid part from urls. Wid part at end:
+    	:%s/&wid=["']\.\(\$self\|\$_\[0\]\)->get(['"]wobjectId["']))/')/gc
+
+	Remove wid part from urls. Wid not at end:
+	:%s/&wid=["']\.\(\$self\|\$_\[0\]\)->get(['"]wobjectId["']).['"]//gc
+
+	Wid first form param:
+	:%s/['"]wid=["']\.\(\$self\|\$_\[0\]\)->get(['"]wobjectId["']).\(['"]\)&/\2/gc
+
+	Find remaining wids in URLs:
+    	/wid=
+
 	1.2.2 You can no longer assume that your forms and links are on the page they need 
 	to be to be called. Therefore use the getUrl() method inherited from Asset to
 	build your forms and links. 
 	
 	EXAMPLE: WebGUI::Form::formHeader({action=>$self->getUrl});
 	
+	:%s/WebGUI::URL::page/$self->getURL/gc
+	:%s/WebGUI::URL::page/$_[0]->getURL/gc
+	:%s/WebGUI::HTMLForm->new\(();\|;\)/WebGUI::HTMLForm->new(-action=>$self->getUrl);/gc
+	:%s/WebGUI::Form::formHeader\(();\|;\)/WebGUI::Form::formHeader({-action=>$self->getUrl});/gc
+
 	1.2.3 Your wobject instance data (the data in the wobject table and the namespace
 	table) will automatically be assigned an assetId. The wobjectId field in the
 	namespace table will be left in place so that you have a reference of what the
@@ -73,6 +94,8 @@ The following tips should also help make your migration easer:
 	Old: WebGUI::International::get("label",$self->get("namespace"));
 	New: WebGUI::International::get("label","Example");
 
+	:%s/\($self\|$_\[0\]\)->get(["']namespace["'])/'Survey'/gc
+
 	1.2.7 Convert your www_edit() method into the two methods getEditForm() and
 	www_edit(). See other wobjects for details.
 
@@ -97,6 +120,8 @@ The following tips should also help make your migration easer:
 	way that the Article wobject does.
 
 	1.2.14 The parameters for the wobject processTemplate() method have changed.
+
+	:%s/processTemplate(\([^,]*\),\([^,]*\)\(,[^,]*\)\=)/processTemplate(\2,\1)/gc
 
 	1.2.15 If you were using the template system directly rather than
 	using the wobject processTemplate() method, please note that it has
