@@ -38,7 +38,6 @@ sub _traversePageTree {
 			where parentId='$parent' order by sequenceNumber");
                 while ($data = $sth->hashRef) {
                         if (($data->{pageId}<0 || $data->{pageId}>999 || $data->{pageId}==1) && WebGUI::Privilege::canViewPage($data->{pageId})) {
-WebGUI::ErrorHandler::warn("got here");
 				push(@pages,{ 
                                 	"page.indent" => $indentString,
 					"page.url" => WebGUI::URL::gateway($data->{urlizedTitle}),
