@@ -210,7 +210,7 @@ sub www_postNewMessageSave {
         		$session{form}{subject} .= ' (eom)';
                 }
 		$mid = getNextId("messageId");
-		WebGUI::SQL->write("insert into message values ($mid, $mid, $session{form}{wid}, 0, $session{user}{userId}, ".quote($session{user}{username}).", ".quote($session{form}{subject}).", ".quote($session{form}{message}).", dateOfPost=".time().")",$session{dbh});
+		WebGUI::SQL->write("insert into message values ($mid, $mid, $session{form}{wid}, 0, $session{user}{userId}, ".quote($session{user}{username}).", ".quote($session{form}{subject}).", ".quote($session{form}{message}).", ".time().")",$session{dbh});
 		return "";
 	} else {
 		return WebGUI::Privilege::insufficient();
@@ -257,7 +257,7 @@ sub www_postReplySave {
                 }
 		$mid = getNextId("messageId");
 		($rid) = WebGUI::SQL->quickArray("select rid from message where messageId=$session{form}{mid}",$session{dbh});
-		WebGUI::SQL->write("insert into message values ($mid, $rid, $session{form}{wid}, $session{form}{mid}, $session{user}{userId}, ".quote($session{user}{username}).", ".quote($session{form}{subject}).", ".quote($session{form}{message}).", dateOfPost=".time().")", $session{dbh});
+		WebGUI::SQL->write("insert into message values ($mid, $rid, $session{form}{wid}, $session{form}{mid}, $session{user}{userId}, ".quote($session{user}{username}).", ".quote($session{form}{subject}).", ".quote($session{form}{message}).", ".time().")", $session{dbh});
 		return www_showMessage();
 	} else {
 		return WebGUI::Privilege::insufficient();
@@ -274,15 +274,14 @@ sub www_showMessage {
                 $html .= $board{title};
         }
 	$html .= '</td><td align="right" valign="bottom" class="boardMenu">';
-	@data = WebGUI::SQL->quickArray("select unix_timestamp()-unix_timestamp(dateOfPost) from message where messageId=$session{form}{mid}",$session{dbh});
-	if ($data[0] < 3600*$board{editTimeout} && $message{'userId'} eq $session{user}{userId}) {
+	if ((time()-$message{dateOfPost}) < 3600*$board{editTimeout} && $message{'userId'} eq $session{user}{userId}) {
 		$html .= '<a href="'.$session{page}{url}.'?func=editMessage&mid='.$session{form}{mid}.'&wid='.$session{form}{wid}.'">Edit Message</a> &middot; ';
 	}
 	$html .= '<a href="'.$session{page}{url}.'?func=postReply&mid='.$session{form}{mid}.'&wid='.$session{form}{wid}.'">Post Reply</a></td></tr></table>';
 	$html .= '<table width="100%"><tr><td class="tableHeader">';
 	$html .= "<b>Subject:</b> ".$message{subject}."<br>";
 	$html .= "<b>Author:</b> ".$message{username}."<br>";
-	$html .= "<b>Date:</b> ".$message{dateOfPost}."<br>";
+	$html .= "<b>Date:</b> ".epochToHuman($message{dateOfPost},"%w, %c %D, %y at %H:%n%p")."<br>";
 	$html .= "<b>Message ID:</b> ".$message{widgetId}."-".$message{rid}."-".$message{pid}."-".$message{messageId}."<br>";
 	$html .= '</td>';
 	$html .= '</tr><tr><td colspan=2 class="boardMessage">';

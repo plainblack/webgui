@@ -66,7 +66,7 @@ sub _viewResults {
 			if ($poll{'a'.$i} =~ /\w/) {
 				$output .= '<span class="pollAnswer"><hr size=1>'.$poll{'a'.$i}.'<br></span>';
                 		@data = WebGUI::SQL->quickArray("select count(*), answer from pollAnswer where answer='a$i' and widgetId=$widgetId group by answer",$session{dbh});
-				$output .= '<table cellpadding=0 cellspacing=0 border=0><tr><td width="'.round($poll{graphWidth}*$data[0]/$totalResponses).'" class="pollColor"></td><td class="pollAnswer">&nbsp;&nbsp;'.round(100*$data[0]/$totalResponses).'%</td></tr></table>';
+				$output .= '<table cellpadding=0 cellspacing=0 border=0><tr><td width="'.round($poll{graphWidth}*$data[0]/$totalResponses).'" class="pollColor"><img src="'.$session{setting}{lib}.'/spacer.gif" height="1" width="1"></td><td class="pollAnswer">&nbsp;&nbsp;'.round(100*$data[0]/$totalResponses).'%</td></tr></table>';
 			}
                 }
 		$output .= '<span class="pollAnswer"><hr size=1><b>Total Votes:</b> '.$totalResponses.'</span>';
