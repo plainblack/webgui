@@ -2,6 +2,10 @@
  - Added generateContent.pl script to generate content offline. This script is
    not backwards compatible with previous WebGUI versions. (Thanks to
    DonorWare for funding this feature.)
+ - Extended the WobjectProxy to select content based upon alternate criteria.
+   (Thanks to DonorWare for funding this feature.)
+ - Added a criteria builder to the WobjectProxy. (Thanks to DonorWare for
+   funding this feature.)
  - Added metadata functionality to wobjects. (Thanks to DonorWare for funding
    this feature.)
  - Added a new passive profiling mechanism. (Thanks to DonorWare for funding
