@@ -19,6 +19,7 @@ use WebGUI::FormProcessor;
 use WebGUI::HTMLForm;
 use WebGUI::Icon;
 use WebGUI::International;
+use WebGUI::Macro;
 use WebGUI::MessageLog;
 use WebGUI::Privilege;
 use WebGUI::Session;
@@ -197,7 +198,7 @@ sub getRecordTemplateVars {
 		if (defined $formValue) {
 			$data{value} = $formValue;
 		} elsif (not exists $data{value}) {
-			$data{value} = $data{defaultValue};
+			$data{value} = WebGUI::Macro::process($data{defaultValue});
 		}
 		my $hidden = (($data{status} eq "hidden" || ($data{isMailField} && !$self->get("mailData"))) && !$session{var}{adminOn});
 		push(@fields,{
