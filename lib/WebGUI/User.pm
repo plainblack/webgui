@@ -214,13 +214,33 @@ sub identifier {
 
 #-------------------------------------------------------------------
 
-=head2 karma ( )
+=head2 karma ( amount, source, description )
 
  Returns the current level of karma this user has earned. 
+
+=item amount
+
+ An integer to modify this user's karma by. Note that this number can
+ be positive or negative.
+
+=item source
+
+ A descriptive source for this karma. Typically it would be something
+ like "MessageBoard (49)" or "Admin (3)". Source is used to track
+ where a karma modification came from.
+
+=item description
+
+ A description of why this user's karma was modified. For instance it
+ could be "Message Board Post" or "He was a good boy!".
 
 =cut
 
 sub karma {
+	if (defined $_[1] && defined $_[2] && defined $_[3]) {
+		WebGUI::SQL->write("update users set karma=karma+$_[1] where userId=$_[0]");
+        	WebGUI::SQL->write("insert into karmaLog values ($_[0]->userId,$_[1],".quote($_[2]).",".quote($_[3]).")");
+	}
         return $_[0]->{_user}{karma};
 }
 
@@ -254,8 +274,7 @@ sub ldapURL {
         $value = shift;
         if (defined $value) {
                 $class->{_user}{"ldapURL"} = $value;
-                WebGUI::SQL->write("update users set ldapURL=".quote($value).",
-                        lastUpdated=".time()." where userId=$class->{_userId}");
+                WebGUI::SQL->write("update users set ldapURL=".quote($value).", lastUpdated=".time()." where userId=$class->{_userId}");
         }
         return $class->{_user}{"ldapURL"};
 }
