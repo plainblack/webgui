@@ -14,7 +14,6 @@ use strict;
 use Tie::CPHash;
 use WebGUI::Attachment;
 use WebGUI::DateTime;
-use WebGUI::Discussion;
 use WebGUI::HTML;
 use WebGUI::HTMLForm;
 use WebGUI::Icon;
@@ -24,6 +23,7 @@ use WebGUI::Operation;
 use WebGUI::Paginator;
 use WebGUI::Privilege;
 use WebGUI::Session;
+use WebGUI::Template;
 use WebGUI::SQL;
 use WebGUI::URL;
 use WebGUI::User;
@@ -39,154 +39,6 @@ our %submissionStatus =("Approved"=>WebGUI::International::get(560),
 	"Pending"=>WebGUI::International::get(562));
 
 #-------------------------------------------------------------------
-sub _photogalleryView {
-        my (@row, $i, $y, $image, $output, $p, $sth, %submission);
-        tie %submission, 'Tie::CPHash';
-        $sth = WebGUI::SQL->read("select title, image, USS_submissionId, status, userId from USS_submission
-                where wobjectId=".$_[0]->get("wobjectId")." and (status='Approved' or userId=$session{user}{userId}) 
-		order by dateSubmitted desc");
-        while (%submission = $sth->hash) {
-                $submission{title} = WebGUI::HTML::filter($submission{title},'all');
-		if ($y == 0) {
-			$row[$i] .= '<td>';
-		}
-                $row[$i] .= '<td align="center" class="tableData">';
-                if ($_[0]->get("displayThumbnails")) {
-                        $image = WebGUI::Attachment->new($submission{image},$_[0]->get("wobjectId"),$submission{USS_submissionId});
-                        $row[$i] .= '<a href="'.WebGUI::URL::page('wid='.$_[0]->get("wobjectId").'&func=viewSubmission&sid='
-                        	.$submission{USS_submissionId}).'"><img src="'.$image->getThumbnail.'" border="0"/></a><br/>';
-                }
-		$row[$i] .= '<a href="'.WebGUI::URL::page('wid='.$_[0]->get("wobjectId").'&func=viewSubmission&sid='
-                                .$submission{USS_submissionId}).'">'.$submission{title}.'</a>';
-                if ($submission{userId} == $session{user}{userId}) {
-                        $row[$i] .= ' ('.$submissionStatus{$submission{status}}.')';
-                }
-                $row[$i] .= '</td>';
-                if ($y == 2) {
-                        $row[$i] .= '</tr>';
-			$y = -1;
-                }
-                $i++;
-		$y++;
-        }
-        $sth->finish;
-        if (WebGUI::Privilege::isInGroup($_[0]->get("groupToContribute"))) {
-                $output .= '<a href="'.WebGUI::URL::page('func=editSubmission&sid=new&wid='.$_[0]->get("wobjectId")).'">'
-                        .WebGUI::International::get(20,$namespace).'</a> &middot; ';
-        }
-	$output .= '<a href="'.WebGUI::URL::page('func=search&wid='.$_[0]->get("wobjectId")).'">'.WebGUI::International::get(364).'</a><p/>';
-        $output .= '<table width="100%" cellpadding=2 cellspacing=1 border=0>';
-        $p = WebGUI::Paginator->new(WebGUI::URL::page(),\@row,$_[0]->get("submissionsPerPage"));
-        $output .= $p->getPage($session{form}{pn});
-        $output .= '</table>';
-        $output .= $p->getBarTraditional($session{form}{pn});
-        return $output;
-}
-
-#-------------------------------------------------------------------
-sub _traditionalView {
-	my (@row, $i, $image, $output, $p, $sth, %submission);
-	tie %submission, 'Tie::CPHash';
-        $sth = WebGUI::SQL->read("select USS_submissionId, title, userId, status, image, dateSubmitted, username from USS_submission
-                where wobjectId=".$_[0]->get("wobjectId")." and (status='Approved' or userId=$session{user}{userId}) order by dateSubmitted desc");
-        while (%submission = $sth->hash) {
-                $submission{title} = WebGUI::HTML::filter($submission{title},'all');
-                $row[$i] = '<tr><td class="tableData">
-                        <a href="'.WebGUI::URL::page('wid='.$_[0]->get("wobjectId").'&func=viewSubmission&sid='.$submission{USS_submissionId}).'">
-                        '.$submission{title}.'</a>';
-                if ($submission{userId} == $session{user}{userId}) {
-                        $row[$i] .= ' ('.$submissionStatus{$submission{status}}.')';
-                }
-                $row[$i] .= '</td>';
-                if ($_[0]->get("displayThumbnails")) {
-                        if ($submission{image} ne "") {
-                                $image = WebGUI::Attachment->new($submission{image},$_[0]->get("wobjectId"),$submission{USS_submissionId});
-                                $row[$i] .= '<td class="tableData"><a href="'.WebGUI::URL::page('wid='.$_[0]->get("wobjectId").'&func=viewSubmission&sid='
-                                        .$submission{USS_submissionId}).'"><img src="'.$image->getThumbnail.'" border="0"></a></td>';
-                        } else {
-                                $row[$i] .= '<td class="tableData"></td>';
-                        }
-                }
-                $row[$i] .= '<td class="tableData">'.epochToHuman($submission{dateSubmitted},"%z").
-                        '</td><td class="tableData"><a href="'.WebGUI::URL::page('op=viewProfile&uid='.
-                        $submission{userId}).'">'.$submission{username}.'</a></td></tr>';
-                $i++;
-        }
-        $sth->finish;
-        $output .= '<table width="100%" cellpadding=2 cellspacing=1 border=0><tr>'.
-                '<td align="right" class="tableMenu">';
-	if (WebGUI::Privilege::isInGroup($_[0]->get("groupToContribute"))) {
-		$output .= '<a href="'.WebGUI::URL::page('func=editSubmission&sid=new&wid='.
-                $_[0]->get("wobjectId")).'">'.WebGUI::International::get(20,$namespace).'</a> &middot; ';
-	}
-	$output .= '<a href="'
-		.WebGUI::URL::page('func=search&wid='.$_[0]->get("wobjectId")).'">'
-		.WebGUI::International::get(364).'</a></td></tr></table>';
-        $p = WebGUI::Paginator->new(WebGUI::URL::page(),\@row,$_[0]->get("submissionsPerPage"));
-        $output .= '<table width="100%" cellspacing=1 cellpadding=2 border=0>';
-        $output .= '<tr><td class="tableHeader">'.WebGUI::International::get(99);
-        if ($_[0]->get("displayThumbnails")) {
-                $output .= '<td class="tableHeader">'.WebGUI::International::get(52,$namespace).'</td>';
-        }
-        $output .= '</td><td class="tableHeader">'.WebGUI::International::get(13,$namespace).
-                '</td><td class="tableHeader">'.WebGUI::International::get(21,$namespace).'</td></tr>';
-        $output .= $p->getPage($session{form}{pn});
-        $output .= '</table>';
-        $output .= $p->getBarTraditional($session{form}{pn});
-	return $output;
-}
-
-#-------------------------------------------------------------------
-sub _weblogView {
-        my (@row, $i, $image, $output, $p, $sth, %submission, $responses);
-        tie %submission, 'Tie::CPHash';
-        $sth = WebGUI::SQL->read("select * from USS_submission
-                where wobjectId=".$_[0]->get("wobjectId")." and (status='Approved' or userId=$session{user}{userId}) order by dateSubmitted desc");
-        while (%submission = $sth->hash) {
-                $submission{title} = WebGUI::HTML::filter($submission{title},'all');
-		$submission{content} = WebGUI::HTML::filter($submission{content});
-		($submission{content}) = split(/\^\-\;/,$submission{content});
-		($responses) = WebGUI::SQL->quickArray("select count(*) from discussion 
-			where wobjectId=".$_[0]->get("wobjectId")." and subId=$submission{USS_submissionId}");
-		$row[$i] = '<tr><td class="tableHeader">'.$submission{title};
-                if ($submission{userId} == $session{user}{userId}) {
-                        $row[$i] .= ' ('.$submissionStatus{$submission{status}}.')';
-                }
-		$row[$i] .= '</td></tr><tr><td class="tableData"><b>';
-                if ($_[0]->get("displayThumbnails")) {
-                        if ($submission{image} ne "") {
-                                $image = WebGUI::Attachment->new($submission{image},$_[0]->get("wobjectId"),$submission{USS_submissionId});
-                                $row[$i] .= '<a href="'.WebGUI::URL::page('wid='.$_[0]->get("wobjectId").'&func=viewSubmission&sid='
-                                        .$submission{USS_submissionId}).'"><img src="'.$image->getThumbnail.'" border="0" align="right"/></a>';
-                        }
-                }
-		$row[$i] .= WebGUI::International::get(40,$namespace)
-                        .' <a href="'.WebGUI::URL::page('op=viewProfile&uid='.$submission{userId}).'">'.$submission{username}.'</a>'
-			.' - '.epochToHuman($submission{dateSubmitted},"%z \@ %Z").'</b><br/>'
-			.$submission{content}.'<p/> (<a href="'.WebGUI::URL::page('func=viewSubmission&wid='
-			.$_[0]->get("wobjectId").'&sid='.$submission{USS_submissionId}).'">'.WebGUI::International::get(46,$namespace)
-			.'</a>';
-		if ($_[0]->get("allowDiscussion")) {
-			$row[$i] .= ' | '.$responses.' '.WebGUI::International::get(57,$namespace)
-		}
-		$row[$i] .= ')<p/></td></tr>';
-                $i++;
-        }
-        $sth->finish;
-	if (WebGUI::Privilege::isInGroup($_[0]->get("groupToContribute"))) {
-        	$output .= '<a href="'.WebGUI::URL::page('func=editSubmission&sid=new&wid='.$_[0]->get("wobjectId")).'">'
-			.WebGUI::International::get(20,$namespace).'</a> &middot; ';
-	}
-	$output .= '<a href="'.WebGUI::URL::page('func=search&wid='.$_[0]->get("wobjectId")).'">'.WebGUI::International::get(364).'</a><p/>';
-        $output .= '<table width="100%" cellpadding=2 cellspacing=1 border=0>';
-        $p = WebGUI::Paginator->new(WebGUI::URL::page(),\@row,$_[0]->get("submissionsPerPage"));
-        $output .= $p->getPage($session{form}{pn});
-        $output .= '</table>';
-        $output .= $p->getBarSimple($session{form}{pn});
-        return $output;
-}
-
-#-------------------------------------------------------------------
 sub duplicate {
         my ($sth, $file, %row, $newSubmissionId, $w);
 	tie %row, 'Tie::CPHash';
@@ -199,8 +51,8 @@ sub duplicate {
 		groupToApprove=>$_[0]->get("groupToApprove"),
 		allowDiscussion=>$_[0]->get("allowDiscussion"),
 		karmaPerSubmission=>$_[0]->get("karmaPerSubmission"),
-		layout=>$_[0]->get("layout"),
-		displayThumbnails=>$_[0]->get("displayThumbnails")
+		templateId=>$_[0]->get("templateId"),
+		submissionTemplateId=>$_[0]->get("submissionTemplateId")
 		});
         $sth = WebGUI::SQL->read("select * from USS_submission where wobjectId=".$_[0]->get("wobjectId"));
         while (%row = $sth->hash) {
@@ -227,7 +79,7 @@ sub purge {
 #-------------------------------------------------------------------
 sub set {
         $_[0]->SUPER::set($_[1],[qw(submissionsPerPage groupToContribute groupToApprove defaultStatus  
-		displayThumbnails karmaPerSubmission layout allowDiscussion)]);
+		submissionTemplateId templateId karmaPerSubmission allowDiscussion)]);
 }
 
 #-------------------------------------------------------------------
@@ -302,18 +154,27 @@ sub www_denySubmission {
 #-------------------------------------------------------------------
 sub www_edit {
 	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
-        my (%layout, $layout, $output, $f, $defaultStatus, $submissionsPerPage, $groupToApprove);
-	%layout = (traditional=>WebGUI::International::get(55,$namespace),
-		weblog=>WebGUI::International::get(54,$namespace),
-		photogallery=>WebGUI::International::get(56,$namespace));
-	$layout = $_[0]->get("layout") || "traditional";
+        my ($output, $f, $defaultStatus, $submissionsPerPage, $groupToApprove);
 	$groupToApprove = $_[0]->get("groupToApprove") || 4;
 	$submissionsPerPage = $_[0]->get("submissionsPerPage") || 50;
 	$defaultStatus = $_[0]->get("defaultStatus") || "Approved";
         $output = helpIcon(1,$namespace);
 	$output .= '<h1>'.WebGUI::International::get(18,$namespace).'</h1>';
 	$f = WebGUI::HTMLForm->new;
-        $f->select("layout",\%layout,WebGUI::International::get(53,$namespace),[$layout]);
+	$f->template(
+                -name=>"templateId",
+                -value=>$_[0]->get("templateId"),
+                -namespace=>$namespace,
+                -label=>WebGUI::International::get(72,$namespace),
+                -afterEdit=>'func=edit&wid='.$_[0]->get("wobjectId")
+                );
+        $f->template(
+                -name=>"submissionTemplateId",
+                -value=>$_[0]->get("submissionTemplateId"),
+                -namespace=>$namespace."/Submission",
+                -label=>WebGUI::International::get(73,$namespace),
+                -afterEdit=>'func=edit&wid='.$_[0]->get("wobjectId")
+                );
         $f->group("groupToApprove",WebGUI::International::get(1,$namespace),[$groupToApprove]);
         $f->group("groupToContribute",WebGUI::International::get(2,$namespace),[$_[0]->get("groupToContribute")]);
         $f->integer("submissionsPerPage",WebGUI::International::get(6,$namespace),$submissionsPerPage);
@@ -323,7 +184,6 @@ sub www_edit {
         } else {
                 $f->hidden("karmaPerSubmission",$_[0]->get("karmaPerSubmission"));
         }
-	$f->yesNo("displayThumbnails",WebGUI::International::get(51,$namespace),$_[0]->get("displayThumbnails"));
 	$f->yesNo("allowDiscussion",WebGUI::International::get(48,$namespace),$_[0]->get("allowDiscussion"));
 	$f->raw($_[0]->SUPER::discussionProperties);
 	$output .= $_[0]->SUPER::www_edit($f->printRowsOnly);
@@ -340,8 +200,8 @@ sub www_editSave {
 		defaultStatus=>$session{form}{defaultStatus},
 		karmaPerSubmission=>$session{form}{karmaPerSubmission},
 		allowDiscussion=>$session{form}{allowDiscussion},
-		layout=>$session{form}{layout},
-		displayThumbnails=>$session{form}{displayThumbnails}
+		templateId=>$session{form}{templateId},
+		submissionTemplateId=>$session{form}{submissionTemplateId}
 		});
         return "";
 }
@@ -394,31 +254,30 @@ sub www_editSubmissionSave {
 		|| ($submission->{USS_submissionId} eq "new" 
 		&& WebGUI::Privilege::isInGroup($_[0]->get("groupToContribute"))) 
 		|| WebGUI::Privilege::isInGroup($_[0]->get("groupToApprove"))) {
-                $hash{title} = $session{form}{title} || WebGUI::International::get(16,$namespace);
                 if ($session{form}{sid} eq "new") {
 			$hash{username} = $session{user}{username};
 			$hash{userId} = $session{user}{userId};
+			$hash{USS_submissionId} = "new";
 			if ($session{setting}{useKarma}) {
                         	$u = WebGUI::User->new($session{user}{userId});
                         	$u->karma($_[0]->get("karmaPerSubmission"),$namespace." (".$_[0]->get("wobjectId")
                                 	."/".$session{form}{sid}.")","User submission.");
 			}
-			
+			$session{form}{sid} = $_[0]->setCollateral("USS_submission","USS_submissionId",\%hash,0);
+			%hash = ();
                 }
+                $hash{title} = WebGUI::HTML::filter($session{form}{title},'all') || WebGUI::International::get(16,$namespace);
 		$hash{USS_submissionId} = $session{form}{sid};
 		$hash{dateSubmitted} = time();
 		$hash{content} = $session{form}{content};
-		$hash{convertCarriageReturns} => $session{form}{convertCarriageReturns};
+		$hash{convertCarriageReturns} = $session{form}{convertCarriageReturns};
 		$hash{status} = $_[0]->get("defaultStatus");
-		$session{form}{sid} = $_[0]->setCollateral("USS_submission", "USS_submissionId",\%hash,0);
-		%hash = ();
-		$hash{USS_submissionId} = $session{form}{sid};
                 $file = WebGUI::Attachment->new("",$session{form}{wid},$session{form}{sid});
 		$file->save("image");
-		$hash{image} = $file->getFilename;
+		$hash{image} = $file->getFilename if ($file->getFilename ne "");
                 $file = WebGUI::Attachment->new("",$session{form}{wid},$session{form}{sid});
 		$file->save("attachment");
-		$hash{attachment} = $file->getFilename;
+		$hash{attachment} = $file->getFilename if ($file->getFilename ne "");
 		$_[0]->setCollateral("USS_submission", "USS_submissionId", \%hash, 0);
 		if ($_[0]->get("defaultStatus") ne "Approved") {
 			WebGUI::MessageLog::addInternationalizedEntry('',$_[0]->get("groupToApprove"),
@@ -432,65 +291,6 @@ sub www_editSubmissionSave {
 }
 
 #-------------------------------------------------------------------
-sub www_search {
-	if ($session{form}{sid} ne "") {
-		return WebGUI::Discussion::search();
-	} else {
-        	my ($p, $i, $output, $constraints, $image, $sql, $sth, %submission, @row, $url);
-        	$output = WebGUI::Search::form({wid=>"$session{form}{wid}",func=>'search'});
-        	$constraints = WebGUI::Search::buildConstraints([qw(username title content)]);
-        	if ($constraints ne "") {
-                	tie %submission, 'Tie::CPHash';
-                	$url = WebGUI::URL::page('func=search&wid='.$session{form}{wid}
-                        	.'&all='.WebGUI::URL::escape($session{form}{all})
-                        	.'&exactPhrase='.WebGUI::URL::escape($session{form}{exactPhrase}).'&atLeastOne='
-                        	.WebGUI::URL::escape($session{form}{atLeastOne}).'&numResults='.$session{form}{numResults}
-                        	.'&without='.WebGUI::URL::escape($session{form}{without}));
-                	$output .= '<table border=0 cellpadding=2 cellspacing=1 width="100%">';
-			$output .= '<tr><td class="tableHeader">'.WebGUI::International::get(99);
-        		if ($_[0]->get("displayThumbnails")) {
-                		$output .= '<td class="tableHeader">'.WebGUI::International::get(52,$namespace).'</td>';
-        		}
-        		$output .= '</td><td class="tableHeader">'.WebGUI::International::get(13,$namespace).
-                		'</td><td class="tableHeader">'.WebGUI::International::get(21,$namespace).'</td></tr>';
-                	$sql = "select * from USS_submission where wobjectId=$session{form}{wid} ";
-                	$sql .= " and (status='Approved' or userId=$session{user}{userId}) and ".$constraints." order by dateSubmitted desc";
-                	$sth = WebGUI::SQL->read($sql);
-                	while (%submission = $sth->hash) {
-				$submission{title} = WebGUI::HTML::filter($submission{title},'all');
-                		$row[$i] = '<tr><td class="tableData">
-                        		<a href="'.WebGUI::URL::page('wid='.$_[0]->get("wobjectId").'&func=viewSubmission&sid='
-					.$submission{USS_submissionId}).'">'.$submission{title}.'</a>';
-                		if ($submission{userId} == $session{user}{userId}) {
-                        		$row[$i] .= ' ('.$submissionStatus{$submission{status}}.')';
-                		}
-                		$row[$i] .= '</td>';
-                		if ($_[0]->get("displayThumbnails")) {
-                        		if ($submission{image} ne "") {
-                                		$image = WebGUI::Attachment->new($submission{image},$_[0]->get("wobjectId"),$submission{USS_submissionId});
-                                		$row[$i] .= '<td class="tableData"><a href="'.WebGUI::URL::page('wid='.$_[0]->get("wobjectId")
-						.'&func=viewSubmission&sid='
-                                        	.$submission{USS_submissionId}).'"><img src="'.$image->getThumbnail.'" border="0"></a></td>';
-                        		} else {
-                                		$row[$i] .= '<td class="tableData"></td>';
-                       	 		}
-                		}
-                		$row[$i] .= '<td class="tableData">'.epochToHuman($submission{dateSubmitted},"%z").
-                        		'</td><td class="tableData"><a href="'.WebGUI::URL::page('op=viewProfile&uid='.
-                        		$submission{userId}).'">'.$submission{username}.'</a></td></tr>';
-				$i++;
-                	}
-                	$sth->finish;
-                	$p = WebGUI::Paginator->new($url,\@row,$session{form}{numResults});
-                	$output .= $p->getPage($session{form}{pn});
-                	$output .= '</table>';
-                	$output .= $p->getBarTraditional($session{form}{pn});
-        	}
-        	return $output;
-	}
-}
-
-#-------------------------------------------------------------------
 sub www_showMessage {
 	return $_[0]->SUPER::www_showMessage('<a href="'.WebGUI::URL::page('func=viewSubmission&wid='.$session{form}{wid}
 		.'&sid='.$session{form}{sid}).'">'.WebGUI::International::get(45,$namespace).'</a><br>'
@@ -499,91 +299,149 @@ sub www_showMessage {
 
 #-------------------------------------------------------------------
 sub www_view {
-	my ($output);
-	$output = $_[0]->displayTitle;
-        $output .= $_[0]->description;
-	$output = $_[0]->processMacros($output);
-	if ($_[0]->get("layout") eq "weblog") {
-		$output .= $_[0]->_weblogView;
-	} elsif ($_[0]->get("layout") eq "photogallery") {
-		$output .= $_[0]->_photogalleryView;
-	} else {
-		$output .= $_[0]->_traditionalView;
+	my (%var, $p, $constraints, %data, $sth, @submission, @content, $image, $i, $url, $thumbnail, $responses);
+	tie %data, 'Tie::CPHash';
+	$var{"label.readmore"} = WebGUI::International::get(46,$namespace);
+	$var{"label.responses"} = WebGUI::International::get(57,$namespace);
+        $var{description} = $_[0]->processMacros($_[0]->get("description"));
+	if (WebGUI::Privilege::isInGroup($_[0]->get("groupToContribute"))) {
+                $var{post} = '<a href="'.WebGUI::URL::page('func=editSubmission&sid=new&wid='
+			.$_[0]->get("wobjectId")).'">'.WebGUI::International::get(20,$namespace).'</a>';
+        }
+	unless ($session{form}{search}) {
+		$url = 'func=view&search=1&wid='.$_[0]->get("wobjectId");
 	}
-	return $output;
+        $var{search} = '<a href="'.WebGUI::URL::page($url).'">'.WebGUI::International::get(364).'</a>';
+	if ($session{form}{search}) {
+		$var{searchForm} = WebGUI::Search::form({wid=>"$session{form}{wid}",func=>'view',search=>1});
+	}
+       	$constraints = WebGUI::Search::buildConstraints([qw(username title content)]);
+	if ($constraints ne "") {
+        	$constraints = "status='Approved' and ".$constraints;
+	} else {
+		$constraints = "(status='Approved' or userId=$session{user}{userId})";
+	}
+	$var{"label.title"} = WebGUI::International::get(99);
+	$var{"label.thumbnail"} = WebGUI::International::get(52,$namespace);
+	$var{"label.date"} = WebGUI::International::get(13,$namespace);
+	$var{"label.by"} = WebGUI::International::get(21,$namespace);
+	$sth = WebGUI::SQL->read("select USS_submissionId, content, title, userId, status, image, dateSubmitted, username 
+		from USS_submission where wobjectId=".$_[0]->get("wobjectId")." and $constraints order by dateSubmitted desc");
+        while (%data = $sth->hash) {
+		$i++;
+		$data{content} = WebGUI::HTML::filter($data{content},$session{setting}{filterContributedHTML});
+		$data{content} =~ s/\n/\^\-\;/ unless ($data{content} =~ m/\^\-\;/);
+		@content = split(/\^\-\;/,$data{content});
+		if ($data{image} ne "") {
+			$image = WebGUI::Attachment->new($data{image},$_[0]->get("wobjectId"),$data{USS_submissionId});
+			$thumbnail = $image->getThumbnail;
+		} else {
+			$thumbnail = "";
+		}
+		($responses) = WebGUI::SQL->quickArray("select count(*) from discussion
+                        where wobjectId=".$_[0]->get("wobjectId")." and subId=$data{USS_submissionId}");
+		push (@submission,{
+			"submission.responses"=>$responses,
+			"submission.id"=>$data{USS_submissionId},
+			"submission.url"=>WebGUI::URL::page('wid='.$_[0]->get("wobjectId").'&func=viewSubmission&sid='.$data{USS_submissionId}),
+			"submission.content"=>$content[0],
+			"submission.title"=>$data{title},
+			"submission.userId"=>$data{userId},
+			"submission.status"=>$data{status},
+			"submission.thumbnail"=>$thumbnail,
+			"submission.date"=>epochToHuman($data{dateSubmitted}),
+			"submission.currentUser"=>($session{user}{userId} == $data{userId}),
+			"submission.username"=>$data{username},
+			"submission.userProfile"=>WebGUI::URL::page('op=viewProfile&uid='.$data{userId}),
+			"submission.secondColumn"=>($i%2==0),
+			"submission.thirdColumn"=>($i%3==0),
+			"submission.fourthColumn"=>($i%4==0),
+			"submission.fifthColumn"=>($i%5==0),
+			});
+	}
+	$sth->finish;
+	$url = WebGUI::URL::page('func=view&search='.$session{form}{search}.'&wid='.$_[0]->get("wobjectId")
+        	.'&all='.WebGUI::URL::escape($session{form}{all})
+                .'&exactPhrase='.WebGUI::URL::escape($session{form}{exactPhrase}).'&atLeastOne='
+                .WebGUI::URL::escape($session{form}{atLeastOne}).'&numResults='.$session{form}{numResults}
+                .'&without='.WebGUI::URL::escape($session{form}{without}));
+	$p = WebGUI::Paginator->new($url, \@submission, $_[0]->get("submissionsPerPage"));
+	$var{submissions_loop} = $p->getPageData;
+	$var{firstPage} = $p->getFirstPageLink;
+	$var{lastPage} = $p->getLastPageLink;
+	$var{nextPage} = $p->getNextPageLink;
+	$var{pageList} = $p->getPageLinks;
+	$var{previousPage} = $p->getPreviousPageLink;
+	$var{multiplePages} = ($p->getNumberOfPages > 1);
+	return $_[0]->processMacros($_[0]->displayTitle).$_[0]->processTemplate($_[0]->get("templateId"),\%var);
 }
 
 #-------------------------------------------------------------------
 sub www_viewSubmission {
-	my ($output, %submission, $file, @data, $replies);
-	tie %submission, 'Tie::CPHash';
+	my ($output, $submission, $file, @data, %var, $replies);
 	WebGUI::SQL->write("update USS_submission set views=views+1 where USS_submissionId=$session{form}{sid}");
-	%submission = WebGUI::SQL->quickHash("select * from USS_submission where USS_submissionId=$session{form}{sid}");
-	$submission{title} = WebGUI::HTML::filter($submission{title},'all');
-	$submission{content} = WebGUI::HTML::filter($submission{content},$session{setting}{filterContributedHTML});
-	$submission{content} =~ s/\^\-\;//g;
-       	$output = "<h1>".$submission{title}."</h1>";
-	$output .= '<table width="100%" cellpadding=2 cellspacing=1 border=0>';
-	$output .= '<tr><td valign="top" class="tableHeader" width="100%">';
-  #---header
-	$output .= '<b>'.WebGUI::International::get(22,$namespace).'</b> <a href="'.
-		WebGUI::URL::page('op=viewProfile&uid='.$submission{userId}).'">'.$submission{username}.'</a><br>';
-	$output .= '<b>'.WebGUI::International::get(23,$namespace).'</b> '.epochToHuman($submission{dateSubmitted},"%z %Z")."<br>";
-	$output .= '<b>'.WebGUI::International::get(14,$namespace).':</b> '.$submissionStatus{$submission{status}}.'<br>';
-	$output .= '<b>'.WebGUI::International::get(514).':</b> '.$submission{views}.'<br>';
-	$output .= '</td><td rowspan="2" class="tableMenu" nowrap="1" valign="top">';
-  #---menu
+	$submission = $_[0]->getCollateral("USS_submission","USS_submissionId",$session{form}{sid});
+	$var{title} = $submission->{title};
+	$var{content} = WebGUI::HTML::filter($submission->{content},$session{setting}{filterContributedHTML});
+	$var{content} =~ s/\^\-\;//g;
+	$var{content} =~ s/\n/\<br\>/g if ($submission->{convertCarriageReturns});
+        $var{"label.by"} = WebGUI::International::get(21,$namespace);
+	$var{userProfile} = WebGUI::URL::page('op=viewProfile&uid='.$submission->{userId});
+	$var{userId} = $submission->{userId};
+	$var{username} = $submission->{username};
+	$var{"label.date"} = WebGUI::International::get(13,$namespace);
+	$var{date} = epochToHuman($submission->{dateSubmitted});
+	$var{"label.status"} = WebGUI::International::get(14,$namespace);
+	$var{status} = $submissionStatus{$submission->{status}};
+	$var{"label.views"} = WebGUI::International::get(514);
+	$var{views} = $submission->{views};
 	@data = WebGUI::SQL->quickArray("select max(USS_submissionId) from USS_submission 
-        	where wobjectId=$submission{wobjectId} and USS_submissionId<$submission{USS_submissionId}
-		and (userId=$submission{userId} or status='Approved')");
+        	where wobjectId=$submission->{wobjectId} and USS_submissionId<$submission->{USS_submissionId}
+		and (userId=$submission->{userId} or status='Approved')");
         if ($data[0] ne "") {
-        	$output .= '<a href="'.WebGUI::URL::page('func=viewSubmission&sid='.$data[0].'&wid='.
-                	$session{form}{wid}).'">&laquo; '.WebGUI::International::get(58,$namespace).'</a><br>';
+        	$var{previousSubmission} = '<a href="'.WebGUI::URL::page('func=viewSubmission&sid='.$data[0].'&wid='.
+                	$session{form}{wid}).'">&laquo; '.WebGUI::International::get(58,$namespace).'</a>';
         }
         @data = WebGUI::SQL->quickArray("select min(USS_submissionId) from USS_submission 
-                where wobjectId=$submission{wobjectId} and USS_submissionId>$submission{USS_submissionId}
-		and (userId=$submission{userId} or status='Approved')");
+                where wobjectId=$submission->{wobjectId} and USS_submissionId>$submission->{USS_submissionId}
+		and (userId=$submission->{userId} or status='Approved')");
         if ($data[0] ne "") {
-                $output .= '<a href="'.WebGUI::URL::page('func=viewSubmission&sid='.$data[0].'&wid='.
-                        $session{form}{wid}).'">'.WebGUI::International::get(59,$namespace).' &raquo;</a><br>';
+                $var{nextSubmission} = '<a href="'.WebGUI::URL::page('func=viewSubmission&sid='.$data[0].'&wid='.
+                        $session{form}{wid}).'">'.WebGUI::International::get(59,$namespace).' &raquo;</a>';
         }
-        if ($submission{userId} == $session{user}{userId} || WebGUI::Privilege::isInGroup($_[0]->get("groupToApprove"))) {
-                $output .= '<a href="'.WebGUI::URL::page('func=deleteSubmission&wid='.$session{form}{wid}.'&sid='.
-			$session{form}{sid}).'">'.WebGUI::International::get(37,$namespace).'</a><br>';
-                $output .= '<a href="'.WebGUI::URL::page('func=editSubmission&wid='.$session{form}{wid}.'&sid='.
-			$session{form}{sid}).'">'.WebGUI::International::get(27,$namespace).'</a><br>';
+        if ($submission->{userId} == $session{user}{userId} || WebGUI::Privilege::isInGroup($_[0]->get("groupToApprove"))) {
+                $var{deleteSubmission} = '<a href="'.WebGUI::URL::page('func=deleteSubmission&wid='.$session{form}{wid}.'&sid='.
+			$session{form}{sid}).'">'.WebGUI::International::get(37,$namespace).'</a>';
+                $var{editSubmission} = '<a href="'.WebGUI::URL::page('func=editSubmission&wid='.$session{form}{wid}.'&sid='.
+			$session{form}{sid}).'">'.WebGUI::International::get(27,$namespace).'</a>';
         }
-        if ($submission{status} ne "Approved" && WebGUI::Privilege::isInGroup($_[0]->get("groupToApprove"),$session{user}{userId})) {
-                $output .= '<a href="'.WebGUI::URL::page('func=approveSubmission&wid='.$session{form}{wid}.
+        if ($submission->{status} ne "Approved" && WebGUI::Privilege::isInGroup($_[0]->get("groupToApprove"),$session{user}{userId})) {
+                $var{approveSubmission} = '<a href="'.WebGUI::URL::page('func=approveSubmission&wid='.$session{form}{wid}.
 			'&sid='.$session{form}{sid}.'&mlog='.$session{form}{mlog}).'">'.
-			WebGUI::International::get(572).'</a><br>';
-                $output .= '<a href="'.WebGUI::URL::page('op=viewMessageLog').'">'.
-			WebGUI::International::get(573).'</a><br>';
-                $output .= '<a href="'.WebGUI::URL::page('func=denySubmission&wid='.$session{form}{wid}.
+			WebGUI::International::get(572).'</a>';
+                $var{leaveSubmission} = '<a href="'.WebGUI::URL::page('op=viewMessageLog').'">'.
+			WebGUI::International::get(573).'</a>';
+                $var{denySubmission} = '<a href="'.WebGUI::URL::page('func=denySubmission&wid='.$session{form}{wid}.
 			'&sid='.$session{form}{sid}.'&mlog='.$session{form}{mlog}).'">'.
-			WebGUI::International::get(574).'</a><br>';
+			WebGUI::International::get(574).'</a>';
         }
 	if ($_[0]->get("allowDiscussion")) {
-		$output .= '<a href="'.WebGUI::URL::page('func=post&mid=new&wid='.$_[0]->get("wobjectId")
-			.'&sid='.$session{form}{sid}).'">'.WebGUI::International::get(47,$namespace).'</a><br>';
+		$var{postReply} = '<a href="'.WebGUI::URL::page('func=post&mid=new&wid='.$_[0]->get("wobjectId")
+			.'&sid='.$session{form}{sid}).'">'.WebGUI::International::get(47,$namespace).'</a>';
 	}
-	$output .= '<a href="'.WebGUI::URL::page('func=search&wid='.$_[0]->get("wobjectId")).'">'.WebGUI::International::get(364).'</a><br>';
-        $output .= '<a href="'.WebGUI::URL::page().'">'.WebGUI::International::get(28,$namespace).'</a><br>';
-	$output .= '</td</tr><tr><td class="tableData">';
-  #---content
-	if ($submission{image} ne "") {
-		$file = WebGUI::Attachment->new($submission{image},$session{form}{wid},$session{form}{sid});
-		$output .= '<img src="'.$file->getURL.'"><p>';
+	$var{search} = '<a href="'.WebGUI::URL::page('search=1&func=view&wid='.$_[0]->get("wobjectId")).'">'
+		.WebGUI::International::get(364).'</a>';
+        $var{backToList} = '<a href="'.WebGUI::URL::page().'">'.WebGUI::International::get(28,$namespace).'</a>';
+	if ($submission->{image} ne "") {
+		$file = WebGUI::Attachment->new($submission->{image},$session{form}{wid},$session{form}{sid});
+		$var{image} = $file->getURL;
+		$var{thumbnail} = $file->getThumbnail;
 	}
-	if ($submission{convertCarriageReturns}) {
-		$submission{content} =~ s/\n/\<br\>/g;
-	}	
-	$output .= $submission{content}.'<p>';
-	if ($submission{attachment} ne "") {
-		$file = WebGUI::Attachment->new($submission{attachment},$session{form}{wid},$session{form}{sid});
-		$output .= $file->box;
+	if ($submission->{attachment} ne "") {
+		$file = WebGUI::Attachment->new($submission->{attachment},$session{form}{wid},$session{form}{sid});
+		$var{attachment} = $file->box;
         }		
-	$output .= '</td></tr></table>';
+	$output = WebGUI::Template::process(WebGUI::Template::get($_[0]->get("submissionTemplateId"),"USS/Submission"), \%var);
         if ($_[0]->get("allowDiscussion")) {
 		$output .= WebGUI::Discussion::showThreads();
         }

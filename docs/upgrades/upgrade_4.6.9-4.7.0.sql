@@ -1045,6 +1045,23 @@ INSERT INTO style VALUES (-7,'Smooth Blues','<style>\r\n.pageBorder {\r\n	backgr
 alter table Item add column templateId int not null default 1;
 insert into international (internationalId,languageId,namespace,message,lastUpdated) values (72,1,'Item','Template', 1036267550);
 INSERT INTO template VALUES (1,'Default Item','<tmpl_if displaytitle>\r\n   <tmpl_if linkurl>\r\n       <a href=\"<tmpl_var linkurl>\">\r\n    </tmpl_if>\r\n     <span class=\"itemTitle\"><tmpl_var title></span>\r\n   <tmpl_if linkurl>\r\n      </a>\r\n    </tmpl_if>\r\n</tmpl_if>\r\n\r\n<tmpl_if attachment>\r\n   <tmpl_if displaytitle> - </tmpl_if>\r\n   <a href=\"<tmpl_var attachmenturl>\"><img src=\"<tmpl_var attachmentIcon>\" border=0 alt=\"<tmpl_var attachment>\" width=16 height=16 border=0 align=\"middle\"></a>\r\n</tmpl_if>\r\n\r\n<tmpl_if description>\r\n  - <tmpl_var description>\r\n</tmpl_if>','Item');
+alter table USS add column templateId int not null default 1;
+update USS set templateId=2 where layout='traditional' and displayThumbnails=1;
+update USS set templateId=3 where layout='weblog';
+update USS set templateId=4 where layout='photogallery';
+alter table USS drop column layout;
+alter table USS drop column displayThumbnails;
+delete from international where namespace='USS' and internationalId=54;
+delete from international where namespace='USS' and internationalId=55;
+delete from international where namespace='USS' and internationalId=56;
+alter table USS add column submissionTemplateId int not null default 1;
+insert into international (internationalId,languageId,namespace,message,lastUpdated) values (73,1,'USS','Submission Template', 1036277524);
+insert into international (internationalId,languageId,namespace,message,lastUpdated) values (72,1,'USS','Main Template', 1036277516);
+delete from international where namespace='USS' and internationalId=22;
+delete from international where namespace='USS' and internationalId=23;
+delete from international where namespace='USS' and internationalId=40;
+
+
 
 
 
