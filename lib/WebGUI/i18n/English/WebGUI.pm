@@ -6324,7 +6324,8 @@ Privileges and styles assigned to pages in the package will not be copied when t
 
 	'149' => {
 		message => q|Users|,
-		lastUpdated => 1031514049
+		lastUpdated => 1031514049,
+                context => q|Title of the user manager for the admin console.|
 	},
 
 	'625' => {
@@ -6971,12 +6972,6 @@ config file.</p>
 		message => q|cancel|,
 		lastUpdated =>1092930637,
                 context => q|Label of the cancel button|
-        },
-
-	'users' => {
-		message => q|Users|,
-		lastUpdated =>1092930637,
-                context => q|Title of the user manager for the admin console.|
         },
 
 	'trash' => {

@@ -43,7 +43,7 @@ sub getAdminFunction {
 		},
 		"users"=>{
 			title=>{
-				id=>"users",
+				id=>"149",
 				namespace=>"WebGUI"
 			},
 			icon=>"users.gif",

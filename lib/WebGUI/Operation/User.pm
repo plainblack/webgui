@@ -13,6 +13,7 @@ package WebGUI::Operation::User;
 use strict qw(vars subs);
 use Tie::CPHash;
 use Tie::IxHash;
+use WebGUI::AdminConsole;
 use WebGUI::DateTime;
 use WebGUI::FormProcessor;
 use WebGUI::Group;
@@ -20,7 +21,6 @@ use WebGUI::Grouping;
 use WebGUI::HTMLForm;
 use WebGUI::Icon;
 use WebGUI::International;
-use WebGUI::Operation::Shared;
 use WebGUI::Operation::Auth;
 use WebGUI::Paginator;
 use WebGUI::Privilege;
@@ -34,30 +34,37 @@ use WebGUI::Utility;
 
 #-------------------------------------------------------------------
 sub _submenu {
-	my ($output, %menu);
-	tie %menu, 'Tie::IxHash';
+        my $workarea = shift;
+        my $title = shift;
+        $title = WebGUI::International::get($title) if ($title);
+        my $help = shift;
+        my $ac = WebGUI::AdminConsole->new;
+        if ($help) {
+                $ac->setHelp($help);
+        }
+        $ac->setAdminFunction("trash");
 	if (WebGUI::Grouping::isInGroup(3)) {
-		$menu{WebGUI::URL::page("op=addUser")} = WebGUI::International::get(169);
+		$ac->addSubmenuItem(WebGUI::URL::page("op=addUser"), WebGUI::International::get(169));
 		unless ($session{form}{op} eq "listUsers" 
 			|| $session{form}{op} eq "addUser" 
 			|| $session{form}{op} eq "deleteUserConfirm") {
-			$menu{WebGUI::URL::page("op=editUser&uid=".$session{form}{uid})} = WebGUI::International::get(457);
-			$menu{WebGUI::URL::page("op=editUserGroup&uid=".$session{form}{uid})} = WebGUI::International::get(458);
-			$menu{WebGUI::URL::page("op=editUserProfile&uid=".$session{form}{uid})} = WebGUI::International::get(459);
-			$menu{WebGUI::URL::page('op=viewProfile&uid='.$session{form}{uid})} = WebGUI::International::get(752);
-			$menu{WebGUI::URL::page('op=becomeUser&uid='.$session{form}{uid})} = WebGUI::International::get(751);
-			$menu{WebGUI::URL::page('op=deleteUser&uid='.$session{form}{uid})} = WebGUI::International::get(750);
+			$ac->addSubmenuItem(WebGUI::URL::page("op=editUser&uid=".$session{form}{uid}), WebGUI::International::get(457));
+			$ac->addSubmenuItem(WebGUI::URL::page("op=editUserGroup&uid=".$session{form}{uid}), WebGUI::International::get(458));
+			$ac->addSubmenuItem(WebGUI::URL::page("op=editUserProfile&uid=".$session{form}{uid}), WebGUI::International::get(459));
+			$ac->addSubmenuItem(WebGUI::URL::page('op=viewProfile&uid='.$session{form}{uid}), WebGUI::International::get(752));
+			$ac->addSubmenuItem(WebGUI::URL::page('op=becomeUser&uid='.$session{form}{uid}), WebGUI::International::get(751));
+			$ac->addSubmenuItem(WebGUI::URL::page('op=deleteUser&uid='.$session{form}{uid}), WebGUI::International::get(750));
 			if ($session{setting}{useKarma}) {
-				$menu{WebGUI::URL::page("op=editUserKarma&uid=".$session{form}{uid})} = WebGUI::International::get(555);
+				$ac->addSubmenuItem(WebGUI::URL::page("op=editUserKarma&uid=".$session{form}{uid}), WebGUI::International::get(555));
 			}
 		}
-		$menu{WebGUI::URL::page("op=listUsers")} = WebGUI::International::get(456);
+		$ac->addSubmenuItem(WebGUI::URL::page("op=listUsers"), WebGUI::International::get(456));
 	} else {
-		$menu{WebGUI::URL::page("op=addUser")} = WebGUI::International::get(169);
+		$ac->addSubmenuItem(WebGUI::URL::page("op=addUser"), WebGUI::International::get(169));
 	}
-	return menuWrapper($_[0],\%menu); 
+        return $ac->render($workarea, $title);
 }
-
+                                                                                                                                                       
 
 #-------------------------------------------------------------------
 sub doUserSearch {
@@ -150,8 +157,6 @@ sub getUserSearchForm {
 sub www_addUser {
     my ($output, $f, $cmd, $html, %status);
     return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3) || WebGUI::Grouping::isInGroup(11));
-    $output .= helpIcon("user add/edit");
-	$output .= '<h1>'.WebGUI::International::get(163).'</h1>';
 	WebGUI::Style::setScript($session{config}{extrasURL}."/swapLayers.js", {language=>"JavaScript"});
 	$output .= '<script language="JavaScript" > var active="'.$session{setting}{authMethod}.'"; </script>';
 			
@@ -203,7 +208,7 @@ sub www_addUser {
 	$f->submit;
 	$output .= $f->print;
 	$output .= $jscript;
-    return _submenu($output);
+    	return _submenu($output,'163',"user add/edit");
 }
 
 #-------------------------------------------------------------------
@@ -251,7 +256,7 @@ sub www_becomeUser {
 sub www_deleteGrouping {
 	return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
 	if (($session{user}{userId} == $session{form}{uid} || $session{form}{uid} == 3) && $session{form}{gid} == 3) {
-		return WebGUI::Privilege::vitalComponent();
+		return _submenu(WebGUI::Privilege::vitalComponent());
         }
         my @users = $session{cgi}->param('uid');
 	my @groups = $session{cgi}->param("gid");
@@ -270,16 +275,14 @@ sub www_deleteUser {
         my ($output);
 	return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
         if ($session{form}{uid} == 1 || $session{form}{uid} == 3) {
-		return WebGUI::Privilege::vitalComponent();
+		return _submenu(WebGUI::Privilege::vitalComponent());
         } else {
-                $output .= helpIcon("user delete");
-		$output .= '<h1>'.WebGUI::International::get(42).'</h1>';
                 $output .= WebGUI::International::get(167).'<p>';
                 $output .= '<div align="center"><a href="'.WebGUI::URL::page('op=deleteUserConfirm&uid='.$session{form}{uid}).
 			'">'.WebGUI::International::get(44).'</a>';
                 $output .= '&nbsp;&nbsp;&nbsp;&nbsp;<a href="'.WebGUI::URL::page('op=listUsers').'">'.
 			WebGUI::International::get(45).'</a></div>'; 
-		return _submenu($output);
+		return _submenu($output,'42',"user delete");
         }
 }
 
@@ -299,7 +302,6 @@ sub www_deleteUserConfirm {
 #-------------------------------------------------------------------
 sub www_editGrouping {
 	return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
-        my $output .= '<h1>'.WebGUI::International::get(370).'</h1>';
 	my $f = WebGUI::HTMLForm->new;
         $f->hidden("op","editGroupingSave");
         $f->hidden("uid",$session{form}{uid});
@@ -315,8 +317,7 @@ sub www_editGrouping {
 		-value=>WebGUI::Grouping::userGroupAdmin($session{form}{uid},$session{form}{gid})
 		);
 	$f->submit;
-	$output .= $f->print;
-        return _submenu($output);
+        return _submenu($f->print,'370');
 }
 
 #-------------------------------------------------------------------
@@ -334,8 +335,6 @@ sub www_editUser {
 	$u = WebGUI::User->new($session{form}{uid});
 	WebGUI::Style::setScript($session{config}{extrasURL}."/swapLayers.js", {language=>"JavaScript"});
 	$output .= '<script language="JavaScript" > var active="'.$u->authMethod.'"; </script>';
-    $output .= helpIcon("user add/edit");
-	$output .= '<h1>'.WebGUI::International::get(168).'</h1>';
 	$f = WebGUI::HTMLForm->new;
     $f->hidden("op","editUserSave");
     $f->hidden("uid",$session{form}{uid});
@@ -378,7 +377,7 @@ sub www_editUser {
 	$f->submit;
 	$output .= $f->print;
 	$output .= $jscript;
-	return _submenu($output);
+	return _submenu($output,'168',"user add/edit");
 }
 
 #-------------------------------------------------------------------
@@ -407,8 +406,7 @@ sub www_editUserGroup {
 	return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
 	my %hash;
 	tie %hash, 'Tie::CPHash';
-        my $output = '<h1>'.WebGUI::International::get(372).'</h1>';
-        $output .= WebGUI::Form::formHeader()
+        my $output .= WebGUI::Form::formHeader()
                 .WebGUI::Form::hidden({
                         name=>"uid",
                         value=>$session{form}{uid}
@@ -464,15 +462,13 @@ sub www_editUserGroup {
 		);
         $f->submit;
 	$output .= $f->print;
-	return _submenu($output);
+	return _submenu($output,'372');
 }
 
 #-------------------------------------------------------------------
 sub www_editUserKarma {
 	return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
         my ($output, $f, $a, %user, %data, $method, $values, $category, $label, $default, $previousCategory);
-        $output = helpIcon("karma using");
-        $output .= '<h1>'.WebGUI::International::get(558).'</h1>';
         $f = WebGUI::HTMLForm->new;
         $f->hidden("op","editUserKarmaSave");
         $f->hidden("uid",$session{form}{uid});
@@ -480,7 +476,7 @@ sub www_editUserKarma {
 	$f->text("description",WebGUI::International::get(557));
         $f->submit;
         $output .= $f->print;
-        return _submenu($output);
+        return _submenu($output,'558',"karma using");
 }
 
 #-------------------------------------------------------------------
@@ -497,8 +493,6 @@ sub www_editUserProfile {
 	return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
         my ($output, $f, $a, %user, %data, $method, $values, $category, $label, $default, $previousCategory);
 	tie %data, 'Tie::CPHash';
-	$output = helpIcon("user profile edit");
-        $output .= '<h1>'.WebGUI::International::get(455).'</h1>';
         $f = WebGUI::HTMLForm->new;
         $f->hidden("op","editUserProfileSave");
         $f->hidden("uid",$session{form}{uid});
@@ -552,7 +546,7 @@ sub www_editUserProfile {
         $a->finish;
         $f->submit;
         $output .= $f->print;
-	return _submenu($output);
+	return _submenu($output,'455',"user profile edit");
 }
 
 #-------------------------------------------------------------------
@@ -573,9 +567,7 @@ sub www_editUserProfileSave {
 sub www_listUsers {
 	return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
 	my %status;
-	my $output = helpIcon("users manage");
-	$output .= '<h1>'.WebGUI::International::get(149).'</h1>';
-	$output .= getUserSearchForm("listUsers");
+	my $output = getUserSearchForm("listUsers");
 	my ($userCount) = WebGUI::SQL->quickArray("select count(*) from users");
 	return _submenu($output) unless ($session{form}{doit} || $userCount<250);
 	tie %status, 'Tie::IxHash';
@@ -619,7 +611,7 @@ sub www_listUsers {
 	}
         $output .= '</table>';
         $output .= $p->getBarTraditional;
-	return _submenu($output);
+	return _submenu($output,undef,"users manage");
 }
 
 1;
