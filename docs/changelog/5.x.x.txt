@@ -7,6 +7,8 @@
    deleted.
  - Fixed bug [ 843591 ] Fatal error while creating a new Message Board if
    there are no Forums yet.
+ - Fixed bug [ 844196 ] Time formats
+
 
 5.5.1
  - Fixed bug #829806 preventing users from updating thier passwords from the updateAccount form.

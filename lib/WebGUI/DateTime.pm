@@ -258,10 +258,10 @@ sub epochToHuman {
 	$hour12 = $hour;
 	if ($hour12 > 12) {
 		$hour12 = $hour12 - 12;
-		if ($hour12 == 0) {
-			$hour12 = 12;
-		}
 	}	
+	if ($hour12 == 0) {
+		$hour12 = 12;
+	}
 	$value = sprintf("%02d",$hour12);
 	$output =~ s/\%h/$value/g;
 	$output =~ s/\%H/$hour12/g;
