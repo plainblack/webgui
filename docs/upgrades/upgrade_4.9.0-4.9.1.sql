@@ -15,6 +15,6 @@ alter table discussion add index MessageBoard2 (wobjectId,rid,status);
 alter table USS_submission change userId userId int not null default 1;
 alter table USS_submission change status status varchar(30) not null default 'Approved';
 alter table USS_submission add index test (wobjectId,status,userId);
-
+alter table MailForm_entryData add index MailForm1 (MailForm_entryId,sequenceNumber);
 
 
