@@ -14,6 +14,7 @@ use strict;
 use Tie::CPHash;
 use WebGUI::Attachment;
 use WebGUI::DateTime;
+use WebGUI::Forum::UI;
 use WebGUI::HTML;
 use WebGUI::HTMLForm;
 use WebGUI::Icon;
@@ -353,13 +354,6 @@ sub www_editSubmissionSave {
 }
 
 #-------------------------------------------------------------------
-sub www_showMessage {
-	return $_[0]->SUPER::www_showMessage('<a href="'.WebGUI::URL::page('func=viewSubmission&wid='.$session{form}{wid}
-		.'&sid='.$session{form}{sid}).'">'.WebGUI::International::get(45,$_[0]->get("namespace")).'</a><br>'
-        	.'<a href="'.WebGUI::URL::page().'">'.WebGUI::International::get(28,$_[0]->get("namespace")).'</a><br>');
-}
-
-#-------------------------------------------------------------------
 sub www_view {
 	my (%var, $row, $page, $p, $constraints, @submission, @content, $image, $i, $numResults, $thumbnail, $responses);
 	$numResults = $_[0]->get("submissionsPerPage");
@@ -499,9 +493,10 @@ sub www_viewRSS {
 #-------------------------------------------------------------------
 sub www_viewSubmission {
 	return "" unless ($session{form}{sid});
-	my ($output, $submission, $file, @data, %var, $replies);
-	$submission = $_[0]->getCollateral("USS_submission","USS_submissionId",$session{form}{sid});
+	my ($file, @data, %var, $replies);
+	my $submission = $_[0]->getCollateral("USS_submission","USS_submissionId",$session{form}{sid});
 	return $_[0]->www_view unless ($submission->{USS_submissionId});
+	my $callback = WebGUI::URL::page("func=viewSubmission&amp;wid=".$_[0]->get("wobjectId")."&amp;sid=".$submission->{USS_submissionId});
 	WebGUI::SQL->write("update USS_submission set views=views+1 where USS_submissionId=$session{form}{sid}");
 	$var{title} = $submission->{title};
 	$var{content} = WebGUI::HTML::filter($submission->{content},$_[0]->get("filterContent"));
@@ -563,8 +558,14 @@ sub www_viewSubmission {
 		$var{"attachment.url"} = $file->getURL;
 		$var{"attachment.icon"} = $file->getIcon;
 		$var{"attachment.name"} = $file->getFilename;
-        }		
-	$var{"replies"} = WebGUI::Discussion::showThreads($_[0]);
+        }	
+	if ($_[0]->get("allowDiscussion")) {
+		if ($session{form}{forumOp}) {
+			$var{"replies"} = WebGUI::Forum::UI::forumOp($callback);
+		} else {
+			$var{"replies"} = WebGUI::Forum::UI::www_viewForum($callback,$submission->{forumId});
+		}
+	}
 	return WebGUI::Template::process(WebGUI::Template::get($_[0]->get("submissionTemplateId"),"USS/Submission"), \%var);
 }
 
