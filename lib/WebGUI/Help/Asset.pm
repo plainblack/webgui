@@ -7,6 +7,16 @@ our $HELP = {
 		related => [
 		]
 	},
+        'asset macros' => {
+		title => 'asset macros title',
+		body => 'asset macros body',
+		related => [
+			{
+				tag => 'macros using',
+				namespace => 'WebGUI'
+			},
+		]
+	},
 };
 
 1;

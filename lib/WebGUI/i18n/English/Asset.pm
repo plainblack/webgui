@@ -74,7 +74,35 @@ A short description of an asset.  It is used in default meta tags, site maps and
     'asset add/edit title' => {
         message => q|Asset, Add/Edit|,
         lastUpdated => 1100463645,
-	},
+    },
+
+    'asset macros title' => {
+        message => q|Asset Macros|,
+        lastUpdated => 1104544909,
+    },
+
+    'asset macros body' => {
+        message => q|<P>These macros are used to access Assets on your site.</P>
+<P><B>&#94;AssetProxy</B>();<BR>
+<B>&#94;AssetProxy</B>(<i>Asset URL</i>);<BR>
+This macro is used to render an Asset and display it inline according
+to its template.  Any Asset can be displayed, including Navigations,
+images, links to files for downloading, snippets or for displaying
+content from another part of the site on this page.
+
+<P><B>&#94;FileUrl</B>();<BR>
+<B>&#94;FileUrl</B>(<i>Asset URL</i>);<BR>
+This macro is used to return a filesystem URL to an Asset that isn't in the database (file, image, snippet) identified by its Asset URL.
+
+<P><B>&#94;RandomAssetProxy</B>();<BR>
+<B>&#94;RandomAssetProxy</B>(<i>Asset URL</i>);<BR>
+This macro works similarly to the &#94;<B>AssetProxy</B>(); macro except instead of displaying the
+Asset, it picks a random Asset from the descendents of the Asset whose URL is supplied as the
+argument.
+</p>
+        |,
+        lastUpdated => 1104545608,
+    },
 
 	'asset' => {
 		message => q|Asset|,
