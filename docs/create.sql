@@ -16,7 +16,8 @@ CREATE TABLE Article (
   image varchar(255) default NULL,
   linkTitle varchar(255) default NULL,
   linkURL text,
-  attachment varchar(255) default NULL
+  attachment varchar(255) default NULL,
+  convertCarriageReturns int(11) NOT NULL default '0'
 ) TYPE=MyISAM;
 
 #
