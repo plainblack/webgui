@@ -598,7 +598,7 @@ sub www_viewSubmission {
         $var{"deny.url"} = WebGUI::URL::page('func=denySubmission&wid='.$session{form}{wid}.'&sid='.$session{form}{sid}.'&mlog='.$session{form}{mlog});
 	$var{"deny.label"} = WebGUI::International::get(574);
 	$var{"canReply"} = ($_[0]->get("allowDiscussion"));
-	$var{"reply.url"} = WebGUI::URL::page('func=post&mid=new&wid='.$_[0]->get("wobjectId").'&sid='.$session{form}{sid});
+	$var{"reply.url"} = WebGUI::Forum::UI::formatNewThreadURL($callback,$submission->{forumId});
 	$var{"reply.label"} = WebGUI::International::get(47,$_[0]->get("namespace"));
 	$var{"search.url"} = WebGUI::Search::toggleURL();
 	$var{"search.label"} = WebGUI::International::get(364);

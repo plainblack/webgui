@@ -3,6 +3,8 @@
    one forum in a message board.
  - Fixed a bug introduced in the last version when replying to USS
    submissions.
+ - Fixed a bug introduced in 5.5.0 because the reply.url variable in the USS
+   submission template didn't get updated to reflect the new forum system.
 
 
 5.5.1
