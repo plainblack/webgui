@@ -1,10 +1,5 @@
-package RSSLite;
-##
-## Copyright (c) 2000 Scott Thomason. All rights reserved.
-## This program is free software; you can redistribute it 
-## and/or modify it under the same terms as Perl itself.
-##
-
+#!/usr/bin/perl
+package XML::RSSLite;
 use strict;
 use vars qw(@ISA @EXPORT @EXPORT_OK %EXPORT_TAGS $VERSION);
 use Exporter;
@@ -13,10 +8,7 @@ use Exporter;
 @EXPORT_OK = qw/parseXML usableXML 
                 isRSS    isRDF    isSN    isWL
                 xml_content_string xml_content_array/;
-$VERSION = '0.06';
-
-use Carp;
-use Data::Dumper;
+$VERSION = '0.08';
 
 
 sub parseXML {
@@ -57,9 +49,9 @@ sub preprocess {
   ##
   $$cr =~ s|<(/*)rss\d+:(.*?)>|<$1$2>|g;
   $$cr =~ s|<([^<> ]+)\s+(.+?)\s+/>|<$1 $2></$1>|g;
-  $$cr =~ s/\r\n?/\n/g;
+  $$cr =~ s/[\012\015]{1,2}/\n/g;
   $$cr =~ s/&(?!([a-zA-Z0-9]+|#\d+);)/&amp;/g;
-  $$cr =~ s/[^\s\d\w!@#\$%^&\*i\(\)\-\+=:;"'<>,\.\/\?]/ /g;
+  $$cr =~ y/\~\[\n 0-9a-zA-Z_\!\@\#\$\%\^\&\*\(\)\-\+\=\:\;\"\'\<\>\,\.\/?\]/ /c;
 
   ## Tidy up for debugging by starting open tags on new line
 # $content =~ s|(?!\n)<(?!/)|\n<|gs;
@@ -86,9 +78,9 @@ sub postprocess {
 
       # See if you can use misplaced url in title for empty links
       if (not $i->{'link'}) {
-        if ($i->{'title'} =~ /^http:/) {
+        if ($i->{'title'} =~ /^(?:ht)|ftp:/) {
           $i->{'link'} = $i->{'title'};
-        } elsif ($i->{'title'} =~ /"(http.*?)"/) {
+        } elsif ($i->{'title'} =~ /"((?:ht)|ftp.*?)"/) {
           $i->{'link'} = $1;
           $i->{'title'} =~ s/<.*?>//;
         } else {
@@ -116,6 +108,10 @@ sub postprocess {
         }
       }
 
+      #If we don't have a title, use the link
+      if (not $i->{'title'}) {
+	$i->{'title'} = $i->{'link'};
+      }
       $i->{'link'} =~ s/ //g;
     }
   }
@@ -147,6 +143,7 @@ sub parseRSS {
       $ia{$1} = trim($2);
     }
     push(@{$rr->{'items'}}, \%ia); 
+#XXX test blanks here
   }
 }
 
@@ -335,4 +332,130 @@ sub trim {
 }
 
 1;
+__END__
 
+=pod
+
+=head1 NAME
+
+XML::RSSLite - Perl extension for "relaxed" RSS parsing
+
+=head1 SYNOPSIS
+
+  use XML::RSSLite;
+
+  . . .
+
+  parseXML(\%result, \$content);
+
+  print "=== Channel ===\n",
+        "Title: $result{'title'}\n",
+        "Desc:  $result{'description'}\n",
+        "Link:  $result{'link'}\n\n";
+
+  foreach $item (@{$result{'items'}}) {
+  print "  --- Item ---\n",
+        "  Title: $item->{'title'}\n",
+        "  Desc:  $item->{'description'}\n",
+        "  Link:  $item->{'link'}\n\n";
+  }
+
+=head1 DESCRIPTION
+
+This module attempts to extract the maximum amount of content from
+available documents, and is less concerned with XML compliance than
+alternatives. Rather than rely on XML::Parser, it uses heuristics and good
+old-fashioned Perl regular expressions. It stores the data in a simple
+hash structure, and "aliases" certain tags so that when done, you can
+count on having the minimal data necessary for re-constructing a valid
+RSS file. This means you get the basic title, description, and link for a
+channel and its items. Anything else present in the hash is a bonus :)
+
+This module extracts more usable links by parsing "scriptingNews" and
+"weblog" formats in addition to RDF & RSS. It also "sanitizes" the
+output for best results. The munging includes:
+
+=over
+
+=item Remove html tags to leave plain text
+
+=item Remove characters other than 0-9~!@#$%^&*()-+=a-zA-Z[];',.:"<>?\s
+
+=item Use <url> tags when <link> is empty
+
+=item Use misplaced urls in <title> when <link> is empty 
+
+=item Exract links from <a href=...> if required   
+
+=item Limit links to ftp and http
+
+=item Join relative urls to the site base
+
+=back
+
+=head2 EXPORT
+
+=over
+
+=item parseXML($outHashRef, $inScalarRef)
+
+I<$inScalarRef> is a reference to a scalar containing the document to be
+parsed, the contents will effectively be destroyed. I<$outHashRef> is a
+reference to the hash within which to store the parsed content.
+
+=item usableXML($inScalarRef)
+
+Test whether or not B<XML::RSSLite> understands the content of the referenced
+document.
+
+=back
+
+=head2 EXPORTABLE
+
+=over
+
+=item isRDF($inScalarRef)
+
+Tests if a referenced document is RDF.
+
+=item isRSS($inScalarRef)
+
+Tests if a referenced document is RSS.
+
+=item isSN($inScalarRef)
+
+Tests if a referenced document is scriptingNews.
+
+=item isWL($inScalarRef)
+
+Tests if a referenced document is weblog.
+
+=back
+
+=head1 BUGS
+
+Sometimes the title of an item will be missed,
+the condition will presist until additional items have been added
+to the document. As a stop gap, when this happens the item title
+is set equal to the item link.
+
+It may take awhile for the tuits to fix this to accumulate.
+feel free to submit a patch.
+
+=head1 SEE ALSO
+
+perl(1), C<XML::RSS>
+
+=head1 AUTHOR
+
+Jerrad Pierce <jpierce@cpan.org>.
+
+Scott Thomason <scott@industrial-linux.org>
+
+=head1 LICENSE
+
+Portions Copyright (c) 2002 Jerrad Pierce, (c) 2000 Scott Thomason.
+All rights reserved. This program is free software; you can redistribute it 
+and/or modify it under the same terms as Perl itself.
+
+=cut
