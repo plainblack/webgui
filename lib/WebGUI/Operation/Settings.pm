@@ -11,7 +11,7 @@ package WebGUI::Operation::Settings;
 #-------------------------------------------------------------------
 
 use Exporter;
-use strict qw(Vars Subs);
+use strict qw(vars subs);
 use WebGUI::Authentication;
 use WebGUI::DateTime;
 use WebGUI::HTMLForm;
@@ -39,7 +39,7 @@ sub _submenu {
 #-------------------------------------------------------------------
 sub www_editUserSettings {
 	WebGUI::Privilege::adminOnly() unless (WebGUI::Privilege::isInGroup(3));
-        my ($output, $f, $cmd, $html);
+        my ($output, $f, $cmd, $html, $options);
         $output .= helpIcon(2);
         $output .= '<h1>'.WebGUI::International::get(117).'</h1>';
 	$f = WebGUI::HTMLForm->new;
