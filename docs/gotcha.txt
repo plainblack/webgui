@@ -34,6 +34,8 @@ save you many hours of grief.
 	process. Be sure to copy them to a save place before 
 	upgrading.
 
+ * All FAQ's have been reset to use the default template.
+
 4.6.3
 --------------------------------------------------------------------
  * It has been reported that some people had a duplicate key error

@@ -1028,6 +1028,20 @@ insert into international (internationalId,languageId,namespace,message,lastUpda
 insert into international (internationalId,languageId,namespace,message,lastUpdated) values (4,1,'Survey','', 1033944306);
 insert into international (internationalId,languageId,namespace,message,lastUpdated) values (2,1,'Survey','Edit Survey', 1033943825);
 insert into international (internationalId,languageId,namespace,message,lastUpdated) values (1,1,'Survey','Survey', 1033942924);
+delete from international where namespace='FAQ' and internationalId=14;
+delete from international where namespace='FAQ' and internationalId=15;
+delete from international where namespace='FAQ' and internationalId=16;
+alter table FAQ drop column tocOn;
+alter table FAQ drop column qaOn;
+alter table FAQ drop column topOn;
+alter table FAQ add column templateId int not null default 1;
+delete from international where namespace='FAQ' and internationalId=1;
+insert into international (internationalId,languageId,namespace,message,lastUpdated) values (75,1,'FAQ','Add a question.', 1036260753);
+insert into international (internationalId,languageId,namespace,message,lastUpdated) values (74,1,'FAQ','Template', 1036260684);
+INSERT INTO template VALUES (1,'Default FAQ','<a name=\"top\"></a>\r\n\r\n<tmpl_if description>\r\n<tmpl_var description><p>\r\n</tmpl_if>\r\n\r\n<tmpl_var addquestion><p>\r\n\r\n<ul>\r\n<tmpl_loop toc_loop>\r\n<li><a href=\"#<tmpl_var questionid>\"><span class=\"faqQuestion\"><tmpl_var question></span></a>\r\n</tmpl_loop>\r\n</ul>\r\n\r\n<tmpl_loop qa_loop>\r\n<tmpl_var controls><a name=\"<tmpl_var questionid>\"><span class=\"faqQuestion\"><tmpl_var question></span></a><br>\r\n<tmpl_var answer>\r\n<p/><a href=\"#top\">[top]</a><p/>\r\n</tmpl_loop>\r\n\r\n','FAQ');
+INSERT INTO template VALUES (2,'Q and A','<tmpl_if description>\r\n<tmpl_var description><p>\r\n</tmpl_if>\r\n\r\n<tmpl_var addquestion><p>\r\n\r\n<tmpl_loop qa_loop>\r\n<tmpl_var controls><b>Q: <tmpl_var question></b><br>\r\nA: <tmpl_var answer>\r\n<p/>\r\n</tmpl_loop>\r\n\r\n','FAQ');
+INSERT INTO template VALUES (3,'Topics','<tmpl_if description>\r\n<tmpl_var description><p>\r\n</tmpl_if>\r\n\r\n<tmpl_var addquestion><p>\r\n\r\n<tmpl_loop qa_loop>\r\n<tmpl_var controls><h2><tmpl_var question></h2>\r\n<tmpl_var answer>\r\n<p/>\r\n</tmpl_loop>\r\n\r\n','FAQ');
+
 
 
 

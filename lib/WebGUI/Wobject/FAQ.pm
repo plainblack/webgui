@@ -54,112 +54,113 @@ sub purge {
 
 #-------------------------------------------------------------------
 sub set {
-        $_[0]->SUPER::set($_[1],[qw(topOn tocOn qaOn)]);
+        $_[0]->SUPER::set($_[1],[qw(templateId)]);
 }
 
 #-------------------------------------------------------------------
 sub www_deleteQuestion {
-        if (WebGUI::Privilege::canEditPage()) {
-		return $_[0]->confirm(WebGUI::International::get(7,$namespace),
-			WebGUI::URL::page('func=deleteQuestionConfirm&wid='.$_[0]->get("wobjectId").'&qid='.$session{form}{qid}));
-        } else {
-                return WebGUI::Privilege::insufficient();
-        }
+        return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
+	return $_[0]->confirm(WebGUI::International::get(7,$namespace),
+		WebGUI::URL::page('func=deleteQuestionConfirm&wid='.$_[0]->get("wobjectId").'&qid='.$session{form}{qid}));
 }
 
 #-------------------------------------------------------------------
 sub www_deleteQuestionConfirm {
-        my ($output);
-        if (WebGUI::Privilege::canEditPage()) {
-		$_[0]->deleteCollateral("FAQ_question","FAQ_questionId",$session{form}{qid});
-		$_[0]->reorderCollateral("FAQ_question","FAQ_questionId");
-                return "";
-        } else {
-                return WebGUI::Privilege::insufficient();
-        }
+        return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
+	$_[0]->deleteCollateral("FAQ_question","FAQ_questionId",$session{form}{qid});
+	$_[0]->reorderCollateral("FAQ_question","FAQ_questionId");
+        return "";
 }
 
 #-------------------------------------------------------------------
 sub www_edit {
-        my ($f, $output, $proceed);
-        if (WebGUI::Privilege::canEditPage()) {
-                if ($_[0]->get("wobjectId") eq "new") {
-                        $proceed = 1;
-                }
-		$output = helpIcon(1,$namespace);
-                $output .= '<h1>'.WebGUI::International::get(8,$namespace).'</h1>';
-		$f = WebGUI::HTMLForm->new;
-		$f->yesNo("tocOn",WebGUI::International::get(11,$namespace),$_[0]->get("tocOn"));
-		$f->yesNo("qaOn",WebGUI::International::get(12,$namespace),$_[0]->get("qaOn"));
-		$f->yesNo("topOn",WebGUI::International::get(13,$namespace),$_[0]->get("topOn"));
-		$f->yesNo("proceed",WebGUI::International::get(1,$namespace),$proceed);
-		$output .= $_[0]->SUPER::www_edit($f->printRowsOnly);
-                return $output;
-        } else {
-                return WebGUI::Privilege::insufficient();
-        }
+        my ($f, $output, $template);
+        return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
+	$template = $_[0]->get("templateId") || 1;
+	$output = helpIcon(1,$namespace);
+        $output .= '<h1>'.WebGUI::International::get(8,$namespace).'</h1>';
+	$f = WebGUI::HTMLForm->new;
+	$f->template(
+              	-name=>"templateId",
+               	-value=>$template,
+               	-namespace=>$namespace,
+               	-label=>WebGUI::International::get(74,$namespace),
+               	-afterEdit=>'func=edit&wid='.$_[0]->get("wobjectId")
+               	);
+	if ($_[0]->get("wobjectId") eq "new") {
+		$f->whatNext(
+                       	-options=>{
+                               	addQuestion=>WebGUI::International::get(75,$namespace),
+                               	backToPage=>WebGUI::International::get(745)
+                               	},
+                       	-value=>"addQuestion"
+                       	);
+	}
+	$output .= $_[0]->SUPER::www_edit($f->printRowsOnly);
+        return $output;
 }
 
 #-------------------------------------------------------------------
 sub www_editSave {
-        if (WebGUI::Privilege::canEditPage()) {
-		$_[0]->SUPER::www_editSave({
-                        tocOn=>$session{form}{tocOn},
-                        topOn=>$session{form}{topOn},
-                        qaOn=>$session{form}{qaOn}
-			});
-		if ($session{form}{proceed}) {
-			$_[0]->www_editQuestion();
-		} else {
-			return "";
-		}
-        } else {
-                return WebGUI::Privilege::insufficient();
-        }
+        return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
+	$_[0]->SUPER::www_editSave({
+        	templateId=>$session{form}{templateId}
+		});
+	if ($session{form}{proceed} eq "addQuestion") {
+		$session{form}{qid} = "new";
+		return $_[0]->www_editQuestion();
+	}
+	return "";
 }
 
 #-------------------------------------------------------------------
 sub www_editQuestion {
-        my ($output, %question, $f);
-	tie %question, 'Tie::CPHash';
-        if (WebGUI::Privilege::canEditPage()) {
-                %question = WebGUI::SQL->quickHash("select * from FAQ_question where FAQ_questionId='$session{form}{qid}'");
-		$output = helpIcon(2,$namespace);
-                $output .= '<h1>'.WebGUI::International::get(10,$namespace).'</h1>';
-		$f = WebGUI::HTMLForm->new;
-		$f->hidden("wid",$_[0]->get("wobjectId"));
-		$session{form}{qid} = "new" if ($session{form}{qid} eq "");
-                $f->hidden("qid",$session{form}{qid});
-                $f->hidden("func","editQuestionSave");
-                $f->textarea("question",WebGUI::International::get(5,$namespace),$question{question});
-                $f->HTMLArea("answer",WebGUI::International::get(6,$namespace),$question{answer});
-		$f->yesNo("proceed",WebGUI::International::get(1,$namespace));
-		$f->submit;
-                $output .= $f->print;
-                return $output;
-        } else {
-                return WebGUI::Privilege::insufficient();
+        my ($output, $question, $f);
+        return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
+        $question = $_[0]->getCollateral("FAQ_question","FAQ_questionId",$session{form}{qid});
+	$output = helpIcon(2,$namespace);
+        $output .= '<h1>'.WebGUI::International::get(10,$namespace).'</h1>';
+	$f = WebGUI::HTMLForm->new;
+	$f->hidden("wid",$_[0]->get("wobjectId"));
+        $f->hidden("qid",$question->{FAQ_questionId});
+        $f->hidden("func","editQuestionSave");
+        $f->textarea(
+		-name=>"question",
+		-label=>WebGUI::International::get(5,$namespace),
+		-value=>$question->{question}
+		);
+        $f->HTMLArea(
+		-name=>"answer",
+		-label=>WebGUI::International::get(6,$namespace),
+		-value=>$question->{answer}
+		);
+	if ($question->{FAQ_questionId} eq "new") {
+                $f->whatNext(
+                	-options=>{
+                        	addQuestion=>WebGUI::International::get(75,$namespace),
+                                backToPage=>WebGUI::International::get(745)
+                                },
+                        -value=>"addQuestion"
+                        );
         }
+	$f->submit;
+        $output .= $f->print;
         return $output;
 }
 
 #-------------------------------------------------------------------
 sub www_editQuestionSave {
-        if (WebGUI::Privilege::canEditPage()) {
-		$_[0]->setCollateral("FAQ_question", "FAQ_questionId", {
-                        FAQ_questionId => $session{form}{qid},
-                        question => $session{form}{question},
-                        answer => $session{form}{answer}
-                        });
-		if ($session{form}{proceed}) {
-			$session{form}{qid} = "new";
-			return $_[0]->www_editQuestion();
-		} else {
-                	return "";
-		}
-        } else {
-                return WebGUI::Privilege::insufficient();
-        }
+        return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
+	$_[0]->setCollateral("FAQ_question", "FAQ_questionId", {
+        	FAQ_questionId => $session{form}{qid},
+                question => $session{form}{question},
+                answer => $session{form}{answer}
+                });
+	if ($session{form}{proceed} eq "addQuestion") {
+		$session{form}{qid} = "new";
+		return $_[0]->www_editQuestion();
+	}
+        return "";
 }
 
 #-------------------------------------------------------------------
@@ -178,48 +179,37 @@ sub www_moveQuestionUp {
 
 #-------------------------------------------------------------------
 sub www_view {
-	my (%question, $top, $q, $a, $output, $sth, $qNa);
+	my (%question, $output, $controls, $sth, %var, @qa, @toc);
 	tie %question,'Tie::CPHash';
 	$output = $_[0]->displayTitle;
-	$output .= '<a name="top"></a>';
-	$output .= $_[0]->description;
-	$top = WebGUI::International::get(16,$namespace);
-	$q = WebGUI::International::get(14,$namespace);
-	$a = WebGUI::International::get(15,$namespace);
 	if ($session{var}{adminOn}) {
-		$output .= '<a href="'.WebGUI::URL::page('func=editQuestion&wid='.$_[0]->get("wobjectId")).'">'
+		$var{addquestion} .= '<a href="'.WebGUI::URL::page('func=editQuestion&wid='.$_[0]->get("wobjectId")).'">'
 			.WebGUI::International::get(9,$namespace).'</a>';
 	}
-	$output .= '<ul>';
 	$sth = WebGUI::SQL->read("select * from FAQ_question where wobjectId=".$_[0]->get("wobjectId")." order by sequenceNumber");
 	while (%question = $sth->hash) {
-		if ($_[0]->get("tocOn")) {
-			$output .= '<li><a href="#'.$question{FAQ_questionId}.'"><span class="faqQuestion">'.$question{question}.'</span></a>';
-		}
+		push(@toc,{
+			questionId=>$question{FAQ_questionId},
+			question=>$question{question}
+			});
 		if ($session{var}{adminOn}) {
-			$qNa .= deleteIcon('func=deleteQuestion&wid='.$_[0]->get("wobjectId").'&qid='.$question{FAQ_questionId})
+			$controls = deleteIcon('func=deleteQuestion&wid='.$_[0]->get("wobjectId").'&qid='.$question{FAQ_questionId})
 				.editIcon('func=editQuestion&wid='.$_[0]->get("wobjectId").'&qid='.$question{FAQ_questionId})
 				.moveUpIcon('func=moveQuestionUp&wid='.$_[0]->get("wobjectId").'&qid='.$question{FAQ_questionId})
 				.moveDownIcon('func=moveQuestionDown&wid='.$_[0]->get("wobjectId").'&qid='.$question{FAQ_questionId})
 				.' ';
 		}
-		$qNa .= '<a name="'.$question{FAQ_questionId}.'"><span class="faqQuestion">';
-		if ($_[0]->get("qaOn")) {
-			$qNa .= $q.': ';
-		}
-		$qNa .= $question{question}.'</span></a><br>';
-                if ($_[0]->get("qaOn")) {
-                        $qNa .= $a.': ';
-                }
-		$qNa .= $question{answer};
-		if ($_[0]->get("topOn")) {
-			$qNa .= '<p/><a href="#top">'.$top.'</a>';
-		}
-		$qNa .= '<p>';
+                push(@qa,{
+                        questionId=>$question{FAQ_questionId},
+                        answer=>$question{answer},
+			question=>$question{question},
+			controls=>$controls
+                        });
 	}
 	$sth->finish;
-	$output .= '</ul>'.$qNa;
-	return $_[0]->processMacros($output);
+	$var{toc_loop} = \@toc;
+	$var{qa_loop} = \@qa;
+	return $_[0]->processMacros($output.$_[0]->processTemplate($_[0]->get("templateId"),\%var));
 }
 
 
