@@ -1300,15 +1300,15 @@ A hash reference of extra properties to set.
 sub www_editSave {
 	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
 	my %set;
-	foreach (keys %{$_[0]->{_wobjectProperties}}) {
-		if (exists $session{form}{$_}) {
-			$set{$_} = _validateField($_,$_[0]->{_wobjectProperties}{$_}{fieldType}) || $_[0]->{_wobjectProperties}{$_}{defaultValue};
+	foreach my $key (keys %{$_[0]->{_wobjectProperties}}) {
+		if (exists $session{form}{$key}) {
+			$set{$key} = _validateField($key,$_[0]->{_wobjectProperties}{$key}{fieldType}) || $_[0]->{_wobjectProperties}{$key}{defaultValue};
 		}
 	}
 	$set{title} = $session{form}{title} || $_[0]->name;
-	foreach (keys %{$_[0]->{_extendedProperties}}) {
-		if (exists $session{form}{$_}) {
-			$set{$_} = _validateField($_,$_[0]->{_extendedProperties}{$_}{fieldType}) || $_[0]->{_extendedProperties}{$_}{defaultValue};
+	foreach my $key (keys %{$_[0]->{_extendedProperties}}) {
+		if (exists $session{form}{$key}) {	
+			$set{$key} = _validateField($key,$_[0]->{_extendedProperties}{$key}{fieldType}) || $_[0]->{_extendedProperties}{$key}{defaultValue};
 		}
 	}
 	%set = (%set, %{$_[1]});

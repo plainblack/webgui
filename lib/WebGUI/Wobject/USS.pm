@@ -64,7 +64,7 @@ sub new {
         my $property = shift;
         my $self = WebGUI::Wobject->new(
                 -properties=>$property,
-		-useDiscussion=>1<
+		-useDiscussion=>1,
                 -extendedProperties=>{
 			submissionsPerPage=>{
 				defaultValue=>50
@@ -85,9 +85,6 @@ sub new {
 				defaultValue=>1 
 				},
 			karmaPerSubmission=>{
-				defaultValue=>0
-				},
-			allowDiscussion=>{
 				defaultValue=>0
 				},
 			filterContent=>{
@@ -252,21 +249,6 @@ sub www_edit {
 		);
 }
 
-#-------------------------------------------------------------------
-sub www_editSave {
-	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
-	$_[0]->SUPER::www_editSave({
-		submissionsPerPage=>$session{form}{submissionsPerPage},
-		groupToContribute=>$session{form}{groupToContribute},
-		groupToApprove=>$session{form}{groupToApprove},
-		defaultStatus=>$session{form}{defaultStatus},
-		karmaPerSubmission=>$session{form}{karmaPerSubmission},
-		templateId=>$session{form}{templateId},
-		submissionTemplateId=>$session{form}{submissionTemplateId},
-		filterContent=>$session{form}{filterContent}
-		});
-        return "";
-}
 
 #-------------------------------------------------------------------
 sub www_editSubmission {
