@@ -1,0 +1,171 @@
+<!-- based on insimage.dlg -->
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD W3 HTML 3.2//EN">
+<HTML id=dlgFind STYLE="width: 460px; height: 350px; ">
+   <HEAD>
+      <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+      <meta http-equiv="MSThemeCompatible" content="Yes">
+      <TITLE>
+         Cell Properties
+      </TITLE>
+      <style>
+        html, body, button, div, input, select, fieldset { font-family: MS Shell Dlg; font-size: 8pt; position: absolute; };
+      </style>
+<script>
+opener = window.dialogArguments;
+var editor_obj = opener.document.all["_" + opener.getGlobalVar('_editor_field') + "_editor"];
+var td = opener.getGlobalVar('_editor_cell');
+</script>
+<SCRIPT defer>
+function _CloseOnEsc() {
+  if (event.keyCode == 27) { window.close(); return; }
+}
+window.onerror = HandleError
+function HandleError(message, url, line) {
+  var str = "An error has occurred in this dialog." + "\n\n"
+  + "Error: " + line + "\n" + message;
+  alert(str);
+  window.close();
+  return true;
+}
+function Init() {
+  // event handlers  
+  document.body.onkeypress = _CloseOnEsc;
+  btnOK.onclick = new Function("btnOKClick()");
+  align.selectedIndex = 0;
+  for (var i=0; i< align.length; i++) {
+     if (align[i].value.toLowerCase() == td.align.toLowerCase()) {
+        align.selectedIndex = i;
+     }
+  }
+  vAlign.selectedIndex = 0;
+  for (var i=0; i< vAlign.length; i++) {
+     if (vAlign[i].value.toLowerCase() == td.vAlign.toLowerCase()) {
+        vAlign.selectedIndex = i;
+     }
+  }
+  if (td.background != 'undefined') {
+     background.value = td.background;
+  } else {
+     background.value = '';
+  }
+  bgColor.value = td.bgColor;
+  borderColor.value = td.borderColor;
+  borderColorDark.value = td.borderColorDark;
+  borderColorLight.value = td.borderColorLight;
+  height.value = td.height;
+  id.value = td.id;
+  title.value = td.title;
+  if (td.width != 'undefined') {
+     width.value = td.width;
+  } else {
+     width.value = '';
+  }
+  colSpan.value = td.colSpan;
+  rowSpan.value = td.rowSpan;
+  noWrap.checked = td.noWrap;
+}
+function radioValue(radioobject){
+   for (var i=0; i < radioobject.length; i++) {
+      if (direction[i].checked) {
+         return radioobject[i].value;
+      }
+   }
+} 
+function btnOKClick() {
+   td.align = align[align.selectedIndex].value;
+   td.vAlign = vAlign[vAlign.selectedIndex].value;
+   td.background = background.value;
+   td.bgColor = bgColor.value;
+   td.borderColor = borderColor.value;
+   td.borderColorDark = borderColorDark.value;
+   td.borderColorLight = borderColorLight.value;
+   td.height = height.value ;
+   td.id = id.value ;
+   td.title = title.value ;
+   td.width = width.value ;
+   td.colSpan = colSpan.value ;
+   td.rowSpan = rowSpan.value ;
+   td.noWrap = noWrap.checked;
+
+   window.close();
+   return true;
+}
+</SCRIPT>
+   </HEAD>
+   <BODY id=bdy onload="Init()" style="background: threedface; color: windowtext;" scroll=no>
+      <DIV id=divHeight style="left: 1em;                    top: 1em; width: 10em; height: 1.9em; ">
+        Height:
+      </DIV>
+      <INPUT ID=height type=text style="left: 10em;          top: 0.8em; width: 3em; height: 1.9em; " tabIndex=10 onfocus="select()">
+      <DIV id=divWidth style="left: 1em;                     top: 3em; width: 10em; height: 1.9em; ">
+        Width:
+      </DIV>
+      <INPUT ID=width type=text style="left: 10em;           top: 2.8em; width: 3em; height: 1.9em; " tabIndex=20 onfocus="select()">
+      <DIV id=divId style="left: 1em;                        top: 5em; width: 10em; height: 1.2168em; ">
+        Id:
+      </DIV>
+      <INPUT ID=id type=text style="left: 10em;              top: 4.8em; width: 31em; height: 1.9em; " tabIndex=30 onfocus="select()">
+      <DIV id=divAlign style="left: 1em;                     top: 7em; width: 10em; height: 1.2168em; ">
+        Align:
+      </DIV>
+      <select name="align" style="left: 10em;                top: 6.8em; width: 6em; height: 1.9em; " tabIndex=40 onfocus="select()">
+           <option value="">Not set</option>
+           <option value="center">center</option>
+           <option value="justify">Justify</option>
+           <option value="left">Left</option>
+           <option value="right">Right</option>
+      </select>
+      <DIV id=divvAlign style="left: 1em;                    top: 9em; width: 10em; height: 1.2168em; ">
+        Vertical Align:
+      </DIV>
+      <select name="vAlign" style="left: 10em;               top: 8.8em; width: 6em; height: 1.9em; " tabIndex=50 onfocus="select()">
+           <option value="">Not set</option>
+           <option value="middle">Middle</option>
+           <option value="baseline">Baseline</option>
+           <option value="bottom">Bottom</option>
+           <option value="top">Top</option>
+      </select>
+      <DIV id=divBackground style="left: 1em;                top: 11em; width: 10em; height: 1.2168em; ">
+        Background Image:
+      </DIV>
+      <INPUT ID=background type=text style="left: 10em;      top: 10.8em; width: 31em; height: 1.9em; " tabIndex=60 onfocus="select()">
+      <DIV id=divBgColor style="left: 1em;                   top: 13em; width: 10em; height: 1.2168em; ">
+        Background Color:
+      </DIV>
+      <INPUT ID=bgColor type=text style="left: 10em;         top: 12.8em; width: 5em; height: 1.9em; " tabIndex=70 onfocus="select()">
+      <DIV id=divBorderColor style="left: 1em;               top: 15em; width: 10em; height: 1.2168em; ">
+        Border Color:
+      </DIV>
+      <INPUT ID=borderColor type=text style="left: 10em;     top: 14.8em; width: 5em; height: 1.9em; " tabIndex=80 onfocus="select()">
+      <DIV id=divBorderColorDark style="left: 1em;           top: 17em; width: 10em; height: 1.2168em; ">
+        Border Color Dark:
+      </DIV>
+      <INPUT ID=borderColorDark type=text style="left: 10em; top: 16.8em; width: 5em; height: 1.9em; " tabIndex=90 onfocus="select()">
+      <DIV id=divBorderCOlorLight style="left: 1em;          top: 19em; width: 10em; height: 1.2168em; ">
+        Border Color Light:
+      </DIV>
+      <INPUT ID=borderColorLight type=text style="left: 10em; top: 18.8em; width: 5em; height: 1.9em; " tabIndex=100 onfocus="select()">
+      <DIV id=divTitle style="left: 1em;                      top: 21em; width: 31em; height: 1.2168em; ">
+        Tooltip:
+      </DIV>
+      <INPUT ID=title type=text style="left: 10em;            top: 20.8em; width: 31em; height: 1.9em; " tabIndex=110 onfocus="select()">
+      <DIV id=divColSpan style="left: 1em;                    top: 23em; width: 10em; height: 1.9em; ">
+        Colspan:
+      </DIV>
+      <INPUT ID=colSpan type=text style="left: 10em;          top: 22.8em; width: 3em; height: 1.9em; " tabIndex=120 onfocus="select()">
+      <DIV id=divrowSpan style="left: 1em;                    top: 25em; width: 10em; height: 1.9em; ">
+        Rowspan:
+      </DIV>
+      <INPUT ID=rowSpan type=text style="left: 10em;          top: 24.8em; width: 3em; height: 1.9em; " tabIndex=140 onfocus="select()">
+      <DIV id=divrowSpan style="left: 35em;                   top: 25em; width: 10em; height: 1.9em; ">
+        No Wrap:
+      </DIV>
+      <input ID=noWrap  type=checkbox  style="left: 39.6em;   top: 25em; width: 1.5em; height: 1.5em; " tabIndex=150 onfocus="select()">
+      <BUTTON ID=btnOK style="left: 10em;                     top: 27.5em; width: 8.5em; height: 2.2em; " type=submit tabIndex=160> 
+         OK
+      </BUTTON>
+      <BUTTON ID=btnCancel style="left: 19em;                 top: 27.5em; width: 8.5em; height: 2.2em; " type=reset tabIndex=170 onClick="window.close();">
+         Cancel
+      </BUTTON>
+   </BODY>
+</HTML>

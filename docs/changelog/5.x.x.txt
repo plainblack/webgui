@@ -13,6 +13,7 @@
  - Templatized the HttpProxy wobject. (Thanks to Len Kranendonk.)
  - Added a "Search for" and "Stop at" option to HttpProxy. (Thanks to Len Kranendonk.)
  - Fixed a bug in the PreviousDropMenu macro.
+ - Enhanced HTMLArea editor to include table editing. (Thanks to IRV.)
 
 
 5.4.3

@@ -61,6 +61,10 @@ this.toolbar = [
     ['HorizontalRule','Createlink','InsertImage','InsertTable','htmlmode','separator'],
 	['Macros','separator'],
     ['Smileys','separator'],
+	
+// inserted by lvn : table actions
+    ['TableProperties','RowProperties','InsertRowBefore','InsertRowAfter','DeleteRow','InsertColumnBefore','InsertColumnAfter','DeleteColumn','CellProperties','InsertCellBefore','InsertCellAfter','DeleteCell','SplitCell','MergeCells','SplitRow','MergeRows','separator'],
+// end insert by lvn
 
 //  ['custom1','custom2','custom3','separator'],
     ['popupeditor']]; //,'about']];
@@ -130,6 +134,27 @@ this.btnList = {
 	"macros": ['Macros','Insert a WebGUI Macro','editor_action(this.id)','macro.gif'],
     "custom3":           ['custom3',         'Purpose of button 3',  'editor_action(this.id)',  'ed_custom.gif'],
    // end: custom buttons
+
+// inserted by lvn : table operations
+    "tableproperties":    ['TableProperties',   'Table Properties',  'editor_action(this.id)',  'ed_tableprop.gif'],
+    "rowproperties":      ['RowProperties',     'Row Properties',    'editor_action(this.id)',  'ed_rowprop.gif'],
+    "insertrowbefore":    ['InsertRowBefore',   'Insert Row Before', 'editor_action(this.id)',  'ed_insabove.gif'],
+    "insertrowafter":     ['InsertRowAfter',    'Insert Row After',  'editor_action(this.id)',  'ed_insunder.gif'],
+    "deleterow":          ['DeleteRow',         'Delete Row',        'editor_action(this.id)',  'ed_delrow.gif'],
+    "insertcolumnbefore": ['InsertColumnBefore','Insert Column Before',  'editor_action(this.id)',  'ed_insleft.gif'],
+    "insertcolumnafter":  ['InsertColumnAfter', 'Insert Column Afer','editor_action(this.id)',  'ed_insright.gif'],
+    "deletecolumn":       ['DeleteColumn',      'Delete Column',  '   editor_action(this.id)',  'ed_delcol.gif'],
+    "cellproperties":     ['CellProperties',    'Cell Properties',   'editor_action(this.id)',  'ed_cellprop.gif'],
+    "insertcellbefore":   ['InsertCellBefore',  'Insert Cell Before','editor_action(this.id)',  'ed_inscellft.gif'],
+    "insertcellafter":    ['InsertCellAfter',   'Insert Cell After', 'editor_action(this.id)',  'ed_inscelrgt.gif'],
+    "deletecell":         ['DeleteCell',        'Delete Cell',       'editor_action(this.id)',  'ed_delcel.gif'],
+    "splitcell":          ['SplitCell',         'Split Cell',        'editor_action(this.id)',  'ed_splitcel.gif'],
+    "mergecells":         ['MergeCells',        'Merge Cells',       'editor_action(this.id)',  'ed_mergecels.gif'],
+    "splitrow":           ['SplitRow',          'Split row',         'editor_action(this.id)',  'ed_splitrow.gif'],
+    "mergerows":          ['MergeRows',         'Merge rows',        'editor_action(this.id)',  'ed_mergerows.gif'],
+
+// end insert by lvn
+
 
     "help":           ['showhelp',             'Help using editor',  'editor_action(this.id)',  'ed_help.gif']};
 
@@ -312,6 +337,23 @@ function editor_action(button_id) {
                 'toolbar=no,location=no,directories=no,status=yes,menubar=no,scrollbars=yes,resizable=yes,width=640,height=480');
     return;
   }
+  
+  // inserted by lvn : showborders
+
+  if (cmdID == 'ShowBorder'){
+     var btnObj = document.all["_" +objname+ "_ShowBorder"];
+     if (config.showborders){ // toggle is on : put borders off
+        nullBorders(editor_obj.contentWindow.document,'hide');
+        btnObj.className = 'btn';
+        config.showborders = false;
+     } else {
+        nullBorders(editor_obj.contentWindow.document,'show');
+        btnObj.className = 'btnDown';
+        config.showborders = true;
+     }
+     return;
+  }
+// end insert by lvn 
 
   // check editor mode (don't perform actions in textedit mode)
   if (editor_obj.tagName.toLowerCase() == 'textarea') { return; }
@@ -365,7 +407,37 @@ function editor_action(button_id) {
                                  "resizable: yes; help: no; status: no; scroll: no; ");
     if (myText) { editor_insertHTML(objname, myText); }
   }
-
+    
+  // inserted by lvn : table operations
+  else if ( cmdID == 'TableProperties' ||
+       cmdID == 'RowProperties' ||
+       cmdID == 'InsertRowBefore' ||
+       cmdID == 'InsertRowAfter' ||
+       cmdID == 'DeleteRow' ||
+       cmdID == 'InsertColumnBefore' ||
+       cmdID == 'InsertColumnAfter' ||
+       cmdID == 'DeleteColumn' ||
+       cmdID == 'CellProperties' ||
+       cmdID == 'InsertCellBefore' ||
+       cmdID == 'InsertCellAfter' ||
+       cmdID == 'SplitCell' ||
+       cmdID == 'MergeRows' ||
+       cmdID == 'SplitRow' ||
+       cmdID == 'MergeCells' ||
+       cmdID == 'DeleteCell' ) {
+     // table operations
+     var table_src_element = editdoc.selection.createRange().parentElement();
+     while (table_src_element != null && table_src_element.tagName != 'TD' && table_src_element.tagName != 'TH'){
+        table_src_element = table_src_element.parentElement;
+     }
+     if (table_src_element == null) {
+        alert('Table operations not allowed here');
+     } else {
+        tables_action(button_id,table_src_element);
+     }
+  }
+// end insert by lvn
+  
   // Custom3
   else if (cmdID == 'custom3') {  // insert some text
     editor_insertHTML(objname, "It's easy to add buttons that insert text!");
@@ -492,19 +564,6 @@ oTags[i].outerHTML = oTags[i].innerHTML;
                         var tar_attribute = '';
                         var linkText = '';
 
-		  
-			// a few tests.
-      var elmSelectedImage;
-      var htmlSelectionControl = "Control";
-      var grngMaster = editdoc.selection.createRange();
-	    if (editdoc.selection.type == htmlSelectionControl) {   
-	       // alright! here we have an image.
-         elmSelectedImage = grngMaster.item(0);	
-	 			 highlightedText = elmSelectedImage.outerHTML; 				 
-		  }
-		  
-			else { // else NOT an image
-			
                   if (editdoc.selection.createRange().parentElement().outerHTML.search(/^\<[A|a]/) != -1) {
 
                           var fullElement = editdoc.selection.createRange().parentElement().outerHTML;
@@ -531,7 +590,6 @@ oTags[i].outerHTML = oTags[i].innerHTML;
                                 linkText = lt[0];
 
                         }
-      }
 
                         var myValues = new Object();
                         myValues.highlightedText = highlightedText;
@@ -548,16 +606,10 @@ oTags[i].outerHTML = oTags[i].innerHTML;
                                 }
                         }
                         else {
-			  if (myText) { 
-   			  if (editdoc.selection.type == htmlSelectionControl) {
-	          grngMaster.execCommand('Delete');
-					}
- 				  editor_insertHTML(objname, unescape(myText) ); // this function ALWAYS puts in an absolute link 
-				} 
+                          if (myText) { editor_insertHTML(objname, unescape(myText) ); } // this function ALWAYS puts in an absolute link
                         }
 
           }
-
 
     // insert image
     else if (cmdID.toLowerCase() == 'insertimage'){
@@ -576,7 +628,269 @@ oTags[i].outerHTML = oTags[i].innerHTML;
   }
 
   editor_event(objname);
+  // inserted by lvn 
+  editor_obj.focus();
+// end insert by lvn 	
 }
+
+// inserted by lvn : table operations 
+/* ---------------------------------------------------------------------- *\
+  Function    : tables_action
+  Description : perform an action on selected table
+  Usage       :
+  Arguments   : table_action - objectname + action to execute
+                td - startpoint cell
+\* ---------------------------------------------------------------------- */
+
+function tables_action(table_action,td) {
+
+  // operations only valid on table cells
+  if (td.tagName == 'TD' || td.tagName == 'TH' ) {
+     var TableParts = table_action.split("_");
+     var objname    = table_action.replace(/^_(.*)_[^_]*$/, '$1');
+     var cmdID      = TableParts[ TableParts.length-1 ];
+     var editor_obj = document.all["_" +objname + "_editor"];
+     var config     = document.all[objname].config;
+     var tr,td,tbody,table,newtr;
+     // get the table object model
+     tr = td.parentNode;
+     while(tr != null && tr.tagName != 'TR'){tr = tr.parentNode;}
+     if (tr != null) {
+        var tbody = tr.parentNode;
+        while(tbody != null && tbody.tagName != 'TBODY' && tbody.tagName != 'THEAD' && tbody.tagName != 'TFOOT'){tbody = tbody.parentNode;}
+        if (tbody != null) {
+           table = tbody.parentNode;
+           while(table!= null && table.tagName != 'TABLE'){table = table.parentNode;}
+        }
+     }
+     // only execute commands if table object model is complete
+     if (table != null) {
+        // local functions to insert rowdetails and columns
+        function insertRowDetails(tr,newtr) {
+           //for (var i=0;i < tr.childNodes.length;i++) {
+           for (var i=0;i < tr.cells.length;i++) {
+              newtr.insertCell(-1);
+           }
+        }
+        function insertColumn(tbody,where) {
+           //for (var i=0;i < tbody.childNodes.length;i++) {
+           for (var i=0;i < tbody.rows.length;i++) {
+              //tr = tbody.childNodes(i);
+              tr = tbody.rows(i);
+              //if (where > tr.childNodes.length){
+              if (where > tr.cells.length){
+                 tr.insertCell();
+              } else {
+                 tr.insertCell(where);
+              }
+           }
+        }
+        function deleteColumn(tbody,where) {
+           //for (var i=0;i <  tbody.childNodes.length;i++) {
+           for (var i=0;i <  tbody.rows.length;i++) {
+             //var tr = tbody.childNodes(i);
+             var tr = tbody.rows(i);
+             //if (tr.childNodes.length - 1 < where){
+             if (tr.cells.length - 1 < where){
+                //tr.deleteCell(tr.childNodes.length - 1);
+                tr.deleteCell(tr.cells.length - 1);
+             } else {
+                tr.deleteCell(where);
+             }
+             //tr = tbody.childNodes(i);
+             tr = tbody.rows(i);
+             //if (tr.childNodes.length == 0){
+             if (tr.cells.length == 0){
+                tbody.deleteRow(i);
+             }
+           }  
+        }
+        function splitCell(tbody,currTr,currTd){
+           if (currTd.colSpan > 1) {
+              // rowspan > 1 just insert cell and decrease colspan
+              currTd.colSpan = currTd.colSpan - 1;
+              currTr.insertCell(currTd.cellIndex + 1);
+           } else {
+              // rowspan = 1 increase colspan for all other rows and insert cell in current row
+              for (var i=0;i <  tbody.rows.length;i++) {
+                 var tr = tbody.rows(i);
+                 var td = tr.cells(currTd.cellIndex);
+                 if (i == currTr.rowIndex) {
+                    tr.insertCell(currTd.cellIndex + 1);
+                 } else {
+                    td.colSpan = td.colSpan + 1;
+                 }
+              }
+           }
+        } 
+        // commented out!
+        /* function mergeCells(tbody,currTr,currTd){
+           // check if leftmost of cells to merge
+           var left = false;
+           for (var i=0;i <  tbody.rows.length;i++) {
+              var tr = tbody.rows(i);
+              var allTd = tr.cells;
+              if (currTd.cellIndex + 2 > allTd.length) {
+                 left = false;
+                 break;
+              } else { 
+                 var td = tr.cells(currTd.cellIndex);              
+                 if (i != currTr.rowIndex) {
+                    if (td.colSpan > 1) {
+                       left = true;
+                    } else {
+                       left = false;
+                       break;
+                    }
+                 }
+              }
+           }
+           if (left){
+              for (var i=0;i < tbody.rows.length;i++){
+                 var tr = tbody.rows(i);
+                 var td = tr.cells(currTd.cellIndex);
+                 if (currTd.cellIndex + 2 > tr.length) {
+                    alert("You can't merge cells here.");
+                    return;
+                 } else {
+                    var mergeCell = tr.cells(currTd.cellIndex + 1);
+                    if (i == currTr.rowIndex) {
+                       // merge the contents of the current cell with the one on the right
+                       currTd.innerHTML = currTd.innerHTML + mergeCell.innerHTML;
+                       currTr.deleteCell(currTd.cellIndex + 1);
+                    } else {
+                       // decrease colspan for non current rows
+                       td.colSpan = td.colSpan - 1;
+                    }
+                 }
+              }
+           } else {
+              alert('Select the leftmost cell of the split to merge.');
+           }
+        } */
+        function mergeCells(tbody,currTr,currTd){ 
+        //first check if there are cells to the right 
+           if (currTd.cellIndex < currTr.cells.length-1) { 
+              //get current colspan and cell to be merged's colspan 
+              //add the two together to get the new one, 
+              //move the conetent and delete the right one 
+              var currColSpan = currTd.colSpan ; 
+              var mergeCellColSpan = currTr.cells(currTd.cellIndex+1).colSpan; 
+              var mergeCell = currTr.cells(currTd.cellIndex+1); 
+              currTd.innerHTML = currTd.innerHTML + mergeCell.innerHTML; 
+              currTr.deleteCell(currTd.cellIndex + 1); 
+              currTd.colSpan = currColSpan+mergeCellColSpan ; 
+           } else { 
+              alert('Select the leftmost cell of the split to merge.'); 
+           } 
+        } 
+        function splitRow(tbody,currTr,currTd){
+           // check rowspan on other cells
+           if (currTd.rowSpan > 1){
+             currTd.rowSpan = currTd.rowSpan - 1;
+             var tr = tbody.rows(currTr.rowIndex + 1);
+             var where = 0;
+             for (var i=0;i <  currTr.cells.length;i++) {
+                if (i < currTd.cellIndex){
+                   if (currTr.cells(i).rowSpan < 2){where++;}
+                }
+             }   
+             tr.insertCell(where);
+           } else {
+              for (var i=0;i <  currTr.cells.length;i++) {
+                 var td = currTr.cells(i);
+                 if (i == currTd.cellIndex) {
+                    tr = tbody.insertRow(currTr.rowIndex + 1);
+                    tr.insertCell(0);
+                 } else {
+                    td.rowSpan = td.rowSpan + 1;
+                 }
+              }
+           }
+        }
+        function mergeRows(tbody,currTr,currTd){
+           // check if topmost of cells to merge
+           var top = false;
+           if (currTd.rowSpan < 2){
+              for (var i=0;i <  currTr.cells.length;i++) {
+                 if (i !== currTd.cellIndex) {
+                    if (currTr.cells(i).rowSpan > 1){
+                       top = true;
+                       break;
+                    }
+                 }
+              }
+           }
+           if (top){
+              return;
+           } else {
+              alert('Select the topmost row of the split to merge.');
+           }
+        }
+        // execute the operation depending on the given command
+        switch(cmdID) {
+           case 'CreateCaption'      : table.createCaption();break;
+           case 'DeleteCaption'      : table.deleteCaption();break;
+           case 'CreateTHead'        : table.createTHead();break;
+           case 'DeleteTHead'        : table.deleteTHead();break;
+           case 'CreateTFoot'        : table.createTFoot();break;
+           case 'DeleteTFoot'        : table.deleteTFoot();break;
+           case 'InsertRowTop'       : newtr = tbody.insertRow(0);insertRowDetails(tr,newtr);break;
+           case 'InsertRowBottom'    : newtr = tbody.insertRow(-1);insertRowDetails(tr,newtr);break;
+           case 'InsertRowBefore'    : newtr = tbody.insertRow(tr.rowIndex);insertRowDetails(tr,newtr);break;
+           case 'InsertRowAfter'     : newtr = tbody.insertRow(tr.rowIndex+1);insertRowDetails(tr,newtr);break;
+           case 'InsertRowStart'     : newtr = tbody.insertRow(0);insertRowDetails(tr,newtr);break;
+           case 'DeleteRow'          : tbody.deleteRow(tr.rowIndex);break;
+           case 'InsertColumnLeft'   : insertColumn(tbody,0);break;
+           case 'InsertColumnRight'  : insertColumn(tbody,-1);break;
+           case 'InsertColumnBefore' : insertColumn(tbody,td.cellIndex);break;
+           case 'InsertColumnAfter'  : insertColumn(tbody,td.cellIndex+1);break;
+           case 'DeleteColumn'       : deleteColumn(tbody,td.cellIndex);break;
+           case 'InsertCellLeft'     : tr.insertCell(0);break;
+           case 'InsertCellRight'    : tr.insertCell(-1);break;
+           case 'InsertCellBefore'   : tr.insertCell(td.cellIndex);break;
+           case 'InsertCellAfter'    : tr.insertCell(td.cellIndex+1);break;
+           case 'InsertCellStart'    : tr.insertCell(0);break;
+           case 'DeleteCell'         : tr.deleteCell(td.cellIndex);break;
+           case 'SplitCell'          : splitCell(tbody,tr,td);break;
+           case 'MergeCells'         : mergeCells(tbody,tr,td);break;
+           case 'SplitRow'           : splitRow(tbody,tr,td);break;
+           case 'MergeRows'          : mergeRows(tbody,tr,td);break;
+// inserted by lvn : property pallettes
+           case 'TableProperties'    : nullBorders(editor_obj.contentWindow.document,'hide'); 
+                                       setGlobalVar('_editor_field',objname);
+                                       setGlobalVar('_editor_table',table);
+                                       showModalDialog(_editor_url + "popups/tableprop.html?"+objname,
+                                                       window,
+                                                       "resizable: yes; help: no; status: no; scroll: no; ");
+                                       td.focus();
+                                       break;
+           case 'RowProperties'      : setGlobalVar('_editor_field',objname);
+                                       setGlobalVar('_editor_row',tr);
+                                       showModalDialog(_editor_url + "popups/rowprop.html?"+objname,
+                                                       window,
+                                                       "resizable: yes; help: no; status: no; scroll: no; ");
+                                       td.focus();
+                                       break;
+           case 'CellProperties'     : setGlobalVar('_editor_field',objname);
+                                       setGlobalVar('_editor_cell',td);
+                                       showModalDialog(_editor_url + "popups/cellprop.html?"+objname,
+                                                       window,
+                                                       "resizable: yes; help: no; status: no; scroll: no; ");
+                                       td.focus();
+                                       break;
+// end insert lvn property pallettes
+           default                   : break;
+        }
+        // if 0 table borders and the switch to show them is on: show them
+        if (config.showborders){ // toggle is on : show null borders
+           nullBorders(editor_obj.contentWindow.document,'show');
+        }
+     }
+  } 
+  return;
+}
+// end insert by lvn 
 
 /* ---------------------------------------------------------------------- *\
   Function    : MS-Word clean-up
@@ -808,6 +1122,42 @@ function editor_updateToolbar(objname,action) {
       if (btnObj.disabled  != false)   { btnObj.disabled = false; }
     }
   }
+  
+  // inserted by lvn: table operations
+// disable table handling buttons when not in a table cell
+  var table_src_element = null;
+  // only works on non-control ranges
+  if (editdoc.selection.type != 'Control'){
+     table_src_element = editdoc.selection.createRange().parentElement();
+     while (table_src_element != null && table_src_element.tagName != 'TD' && table_src_element.tagName != 'TH'){
+        table_src_element = table_src_element.parentElement;
+     }
+  }
+  // check if buttons are set in the config
+  var IDList = Array('TableProperties','RowProperties','InsertRowBefore','InsertRowAfter','DeleteRow','InsertColumnBefore','InsertColumnAfter','DeleteColumn','CellProperties','InsertCellBefore','InsertCellAfter','DeleteCell','SplitCell','MergeCells','SplitRow','MergeRows');
+  for (var i=0; i<IDList.length; i++) {
+    var found = false;
+    for (var j=0;j<config.toolbar.length;j++){
+       if(config.toolbar[j]) {
+          for (var k=0;k<config.toolbar[j].length;k++){
+            if ( IDList[i] ==  config.toolbar[j][k]){found = true;}
+          }
+       }
+    }
+    // if in cell enable buttons, else disable them
+    if (found) {
+       var btnObj = document.all["_" +objname+ "_" +IDList[i]];
+       if (table_src_element == null) {
+          btnObj.disabled = true;
+          btnObj.className = 'btnNA'; 
+       } else {
+          btnObj.disabled = false;
+          btnObj.className = 'btn'; 
+       }
+    }
+  }
+// end insert by lvn
+  
 }
 
 /* ---------------------------------------------------------------------- *\
@@ -835,6 +1185,54 @@ function editor_updateOutput(objname) {
   document.all[objname].value = contents;
 
 }
+
+// inserted by lvn
+/* ---------------------------------------------------------------------- *\
+  Function    : nullBorders
+  Description : show 'dotted' borders for tables with border=0
+  Usage       : nullBorders(doc,status);
+  Arguments   : doc - document object in wich the borders must be shown
+                status - show or hide 
+\* ---------------------------------------------------------------------- */
+
+function nullBorders(doc,status) {
+  // show table borders
+  var edit_Tables = doc.body.getElementsByTagName("TABLE");
+  for (i=0; i < edit_Tables.length; i++) {
+      if (edit_Tables[i].border == '' || edit_Tables[i].border == '0' ) {
+         if (status == 'show' ) {
+            edit_Tables[i].style.border = "1px dotted #C0C0C0";
+         } else {
+            edit_Tables[i].removeAttribute("style");
+         }
+      }
+      edit_Rows = edit_Tables[i].rows;
+      for (j=0; j < edit_Rows.length; j++) {
+	  edit_Cells = edit_Rows[j].cells;
+          for (k=0; k < edit_Cells.length; k++) {
+             if (edit_Tables[i].border == '' || edit_Tables[i].border == '0' ) {
+                if (!edit_Cells[k].border || edit_Cells[k].border == '' || edit_Cells[k].border == '0' ) {
+                   if (status == 'show' ) {
+	              edit_Cells[k].style.border = "1px dotted #C0C0C0";
+                   } else {
+                      edit_Cells[k].removeAttribute("style");
+                   }
+                }
+             } else {
+                if ( edit_Cells[k].border == '0' ) {
+                   if (status == 'show' ) {
+                      edit_Cells[k].style.border = "1px dotted #C0C0C0";
+                   } else {
+                      edit_Cells[k].removeAttribute("style");
+                   }
+                }
+             }
+          } 
+      }
+   }
+}
+
+// end insert by lvn
 
 /* ---------------------------------------------------------------------- *\
   Function    : editor_filterOutput
@@ -882,7 +1280,6 @@ function editor_filterOutput(objname) {
     var matchTag = /<\/?(\w+)((?:[^'">]*|'[^']*'|"[^"]*")*)>/g;   // this will match tags, but still doesn't handle container tags (textarea, comments, etc)
 
   contents = contents.replace(matchTag, filterTag);
-  contents = contents.replace(/http:\/\/www\.___relativelink___\.com\//g, ""); 
 
   // remove nextlines from output (if requested)
   if (config.replaceNextlines) { 
@@ -932,9 +1329,16 @@ function editor_setmode(objname, mode) {
     editor_obj = document.all["_" +objname + "_editor"];
     editor_obj.value = contents;
     editor_event(objname);
-
+	// inserted by lvn
+    if (config.showborders) {
+      editor_updateToolbar(objname, "disable");
+      config.showborders =  true;
+    } else {
+    // end insert by lvn
     editor_updateToolbar(objname, "disable");  // disable toolbar items
-
+	// insert by lvn
+    }
+    // end insert by lvn
     // set event handlers
     editor_obj.onkeydown   = function() { editor_event(objname); }
     editor_obj.onkeypress  = function() { editor_event(objname); }
@@ -983,11 +1387,13 @@ function editor_setmode(objname, mode) {
       + '<body contenteditable="true" topmargin=1 leftmargin=1'
 
 // still working on this
-//      + ' oncontextmenu="parent.editor_cMenu_generate(window,\'' +objname+ '\');"'
+	  // updated by lvn: table actions (uncommented next line to show in popupmenu)
+      + ' oncontextmenu="parent.editor_cMenu_generate(window,\'' +objname+ '\');"'
       +'>'
       + contents
       + '</body>\n'
       + '</html>\n';
+	  
 
     // write to editor window
     var editdoc = editor_obj.contentWindow.document;
@@ -1011,9 +1417,32 @@ function editor_setmode(objname, mode) {
     editdoc.body.onpaste   = function() { editor_event(objname, 100); }
     editdoc.body.onblur    = function() { editor_event(objname, -1); }
 
+	// inserted by lvn
+    // show table borders
+    if (config.showborders) {
+        nullBorders(editdoc,'show');
+        var btnObj = document.all["_" +objname+ "_ShowBorder"];
+        if(btnObj) { btnObj.className = 'btnDown'; }
+    }
+    // end insert by lvn
+
     // bring focus to editor
     if (mode != 'init') {             // don't focus on page load, only on mode switch
       editor_focus(editor_obj);
+	  // insert by lvn : check editor changes)
+    } else { 
+         if (config.checkChanges == 1) { 
+            var localVar = getGlobalVar("objnames");
+            if (localVar == null){
+               setGlobalVar("objnames",objname);
+            } else {
+               localVar = localVar + ',' + objname;
+               setGlobalVar("objnames",localVar);
+            }
+            setGlobalVar("_" +objname + "_initialText",editdoc.body.innerHTML);
+            if (window.onbeforeunload == null){window.onbeforeunload = function() {discardOnExit();}}
+         }
+// end insert by lvn
     }
 
   }
@@ -1225,7 +1654,10 @@ function _isMouseOver(obj,event) {       // determine if mouse is over object
 function editor_cMenu_generate(editorWin,objname) {
   var parentWin = window;
   editorWin.event.returnValue = false;  // cancel default context menu
-
+// inserted by lvn : table operations
+  var table_object      = document.all["_" +objname + "_editor"];
+  var table_src_element = table_object.contentWindow.event.srcElement;
+// end insert bylvn
   // define content menu options
   var cMenuOptions = [ // menu name, shortcut displayed, javascript code
     ['Cut', 'Ctrl-X', function() {}],
@@ -1239,6 +1671,52 @@ function editor_cMenu_generate(editorWin,objname) {
     ['About this editor...', '', function() {
       alert("about this editor");
     }]];
+	
+	// inserted by lvn: table operations
+   // (uncomment to have more elements in popup menu)
+   if (table_src_element.tagName == 'TD') {
+      // set the contextmenu for tableactions when clicked in a table
+      cMenuOptions = [
+   //    ['Insert Table' , ''            , function() {editor_action('_' + objname + '_' + 'InsertTable');}],
+   //    ['Delete Table' , ''            , function() {tables_action('_' + objname + '_' + 'DeleteTable',table_src_element);}],
+   //    ['Insert Caption' , ''          , function() {tables_action('_' + objname + '_' + 'CreateCaption',table_src_element);}],
+   //    ['Delete Caption' , ''          , function() {tables_action('_' + objname + '_' + 'DeleteCaption',table_src_element);}],
+   //    ['Insert Head' , ''             , function() {tables_action('_' + objname + '_' + 'CreateTHead',table_src_element);}],
+   //    ['Delete Head' , ''             , function() {tables_action('_' + objname + '_' + 'DeleteTHead',table_src_element);}],
+   //    ['Insert Foot' , ''             , function() {tables_action('_' + objname + '_' + 'CreateTFoot',table_src_element);}],
+   //    ['Delete Foot' , ''             , function() {tables_action('_' + objname + '_' + 'DeleteTFoot',table_src_element);}],
+   //    ['Insert Row at Top'   , ''     , function() {tables_action('_' + objname + '_' + 'InsertRowTop',table_src_element );}],
+   //    ['Insert Row at Bottom'   , ''  , function() {tables_action('_' + objname + '_' + 'InsertRowBottom',table_src_element );}],
+         ['Insert Row before'   , ''     , function() {tables_action('_' + objname + '_' + 'InsertRowBefore',table_src_element );}],
+         ['Insert Row after'   , ''      , function() {tables_action('_' + objname + '_' + 'InsertRowAfter',table_src_element );}],
+         ['Delete Row'   , ''            , function() {tables_action('_' + objname + '_' + 'DeleteRow',table_src_element );}],
+   //    ['Insert Column leftmost', ''   , function() {tables_action('_' + objname + '_' + 'InsertColumnLeft',table_src_element );}],
+   //    ['Insert Column righttmost', '' , function() {tables_action('_' + objname + '_' + 'InsertColumnRight',table_src_element );}],
+         ['Insert Column before', ''     , function() {tables_action('_' + objname + '_' + 'InsertColumnBefore',table_src_element );}],
+         ['Insert Column after', ''      , function() {tables_action('_' + objname + '_' + 'InsertColumnAfter',table_src_element );}],
+         ['Delete Column', ''            , function() {tables_action('_' + objname + '_' + 'DeleteColumn',table_src_element );}],
+   //    ['Insert Cell leftmost', ''     , function() {tables_action('_' + objname + '_' + 'InsertCellLeft',table_src_element );}],
+   //    ['Insert Cell rightmost'  , ''  , function() {tables_action('_' + objname + '_' + 'InsertCellRight',table_src_element );}],
+         ['Insert Cell before'  , ''     , function() {tables_action('_' + objname + '_' + 'InsertCellBefore',table_src_element );}],
+         ['Insert Cell after'  , ''      , function() {tables_action('_' + objname + '_' + 'InsertCellAfter',table_src_element );}],
+         ['Delete Cell'  , ''            , function() {tables_action('_' + objname + '_' + 'DeleteCell',table_src_element );}],
+         ['Split Cell'  , ''             , function() {tables_action('_' + objname + '_' + 'SplitCell',table_src_element );}],
+         ['Merge Cells'  , ''            , function() {tables_action('_' + objname + '_' + 'MergeCells',table_src_element );}],
+         ['Split Row'  , ''              , function() {tables_action('_' + objname + '_' + 'SplitRow',table_src_element );}],
+         ['Merge Rows'  , ''             , function() {tables_action('_' + objname + '_' + 'MergeRows',table_src_element );}],
+// inserted by lvn : property pallettes
+         ['Table Properties'  , ''       , function() {tables_action('_' + objname + '_' + 'TableProperties',table_src_element );}],
+         ['Row Properties'  , ''         , function() {tables_action('_' + objname + '_' + 'RowProperties',table_src_element );}],
+         ['Cell Properties'  , ''        , function() {tables_action('_' + objname + '_' + 'CellProperties',table_src_element );}]
+// end insert lvn property pallettes
+      ];
+   } else {
+      // reset to de default browser contextmenu
+      editorWin.event.returnValue = true;
+      return;
+   }
+// end insert by lvn
+	
     editor_cMenu.options = cMenuOptions; // save options
 
   // generate context menu
@@ -1367,6 +1845,25 @@ function getGlobalVar(varName, value) {
      return this.cache[varName];
    }
 }
+
+// insert by lvn : check editor changes
+/* ---------------------------------------------------------------------- *\
+  Function    : discardOnExit
+  Description : check if contents have been changed and ask user confirmation
+                to discard changes
+  Usage       : discardOnExit();
+\* ---------------------------------------------------------------------- */
+function discardOnExit(){
+   var objNames = getGlobalVar("objnames").split(",");
+   for (var i=0;i < objNames.length;i++){
+       if (document.all["_" +objNames[i] + "_editor"].contentWindow.document.body.innerHTML 
+           != getGlobalVar("_" + objNames[i] + "_initialText")) {
+          event.returnValue = "Your document has been changed. Discard changes?";
+       }
+   }
+}
+// end insert by lvn
+
 
 function CheckDocument()
 {

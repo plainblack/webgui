@@ -1,0 +1,223 @@
+<!-- based on insimage.dlg -->
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD W3 HTML 3.2//EN">
+<HTML id=dlgFind STYLE="width: 420px; height: 200px; ">
+   <HEAD>
+      <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+      <meta http-equiv="MSThemeCompatible" content="Yes">
+      <TITLE>
+         Row Properties
+      </TITLE>
+      <style>
+        html, body, button, div, input, select, fieldset { font-family: MS Shell Dlg; font-size: 8pt; position: absolute; };
+      </style>
+<script>
+opener = window.dialogArguments;
+var editor_obj = opener.document.all["_" + opener.getGlobalVar('_editor_field') + "_editor"];
+var tr = opener.getGlobalVar('_editor_row');
+</script>
+<SCRIPT defer>
+function _CloseOnEsc() {
+  if (event.keyCode == 27) { window.close(); return; }
+}
+window.onerror = HandleError
+function HandleError(message, url, line) {
+  var str = "An error has occurred in this dialog." + "\n\n"
+  + "Error: " + line + "\n" + message;
+  alert(str);
+  window.close();
+  return true;
+}
+function Init() {
+  // event handlers  
+  document.body.onkeypress = _CloseOnEsc;
+  btnOK.onclick = new Function("btnOKClick()");
+  align.selectedIndex = 0;
+  for (var i=0; i< align.length; i++) {
+     if (align[i].value.toLowerCase() == tr.align.toLowerCase()) {
+        align.selectedIndex = i;
+     }
+  }
+  vAlign.selectedIndex = 0;
+  for (var i=0; i< vAlign.length; i++) {
+     if (vAlign[i].value.toLowerCase() == tr.vAlign.toLowerCase()) {
+        vAlign.selectedIndex = i;
+     }
+  }
+  //if (tr.bgColor == ''){
+     bgColor.innerText = ' ' + tr.bgColor.toUpperCase();
+  //}
+  bgColor.style.backgroundColor = tr.bgColor;
+  //if (tr.borderColor == ''){
+     borderColor.innerText = ' ' + tr.borderColor.toUpperCase();
+  //}
+  borderColor.style.backgroundColor = tr.borderColor;
+  //if (tr.borderColorDark == ''){
+     borderColorDark.innerText = ' ' + tr.borderColorDark.toUpperCase();
+  //}
+  borderColorDark.style.backgroundColor = tr.borderColorDark;
+  //if (tr.borderColorLight == ''){
+     borderColorLight.innerText = ' ' + tr.borderColorLight.toUpperCase();
+  //}
+  borderColorLight.style.backgroundColor = tr.borderColorLight;
+  if (tr.height == null){
+    height.value = '';
+    heightExt.value = '';
+  } else { 
+     if (tr.height.search(/%/) < 0) {
+        height.value = tr.height;
+        heightExt.value = '';
+     } else {
+        height.value = tr.height.split('%')[0]; 
+        heightExt.value = '%';
+     }
+  }   
+  if (tr.width == null){
+    width.value = '';
+    widthExt.value = '';
+  } else { 
+     if (tr.width.search(/%/) < 0) {
+        widthExt.value = '';
+        width.value = tr.width;
+     } else {
+        width.value = tr.width.split('%')[0]; 
+        widthExt.value = '%';
+     }
+  } 
+  id.value = tr.id;
+  title.value = tr.title;
+}
+function radioValue(radioobject){
+   for (var i=0; i < radioobject.length; i++) {
+      if (direction[i].checked) {
+         return radioobject[i].value;
+      }
+   }
+} 
+function _isValidNumber(txtBox) {
+  if (txtBox == '') {
+     return true;
+  } else {  
+     var val = parseInt(txtBox);
+     if (isNaN(val) || val < 0 || val > 9999) { return false; }
+     return true;
+  }
+}
+function btnOKClick() {
+   if (!_isValidNumber(height.value)) {
+      alert("You must specify a number between 0 and 9999 for height!");
+      heigth.focus();
+      return;
+   }
+   if (height.value == ''){heightExt.value = '';}
+   if (!_isValidNumber(width.value)) {
+      alert("You must specify a number between 0 and 9999 for width!");
+      width.focus();
+      return;
+   }
+   if (width.value == ''){widthExt.value = '';}
+   tr.align = align[align.selectedIndex].value;
+   tr.vAlign = vAlign[vAlign.selectedIndex].value;
+   tr.bgColor = bgColor.style.backgroundColor;
+   tr.borderColor = borderColor.style.backgroundColor;
+   tr.borderColorDark = borderColorDark.style.backgroundColor;
+   tr.borderColorLight = borderColorLight.style.backgroundColor;
+//   tr.bgColor = bgColor.value;
+//   tr.borderColor = borderColor.value;
+//   tr.borderColorDark = borderColorDark.value;
+//   tr.borderColorLight = borderColorLight.value;
+   tr.height = height.value + heightExt.value;
+   tr.id = id.value ;
+   if (title.value == ''){
+      if (tr.getAttribute('title') != null){tr.removeAttribute('title');}
+   } else {tr.title = title.value;}
+   if (width.value == ''){
+      if (tr.getAttribute('width') != null){tr.removeAttribute('width');}
+   } else {tr.width = width.value + widthExt.value;}
+
+   window.close();
+   return true;
+}
+function setColors (but) {
+   but.style.borderStyle = 'inset';
+   var color=showModalDialog('set_color.html',but.style.backgroundColor,'resizable:no;help:no;status:no;scroll:no;');
+   if (color == '' || color == null){
+     but.innerText = '';
+     but.style.backgroundColor = '';
+   } else {
+     but.innerText = ' #' + color.toUpperCase();
+     but.style.backgroundColor =  color;
+   }
+   but.style.borderStyle = 'outset';
+   return;
+}
+</SCRIPT>
+   </HEAD>
+   <BODY id=bdy onload="Init()" style="background: threedface; color: windowtext;" scroll=no>
+      <DIV id=divHeight style="left: 1em;                    top: 1em; width: 10em; height: 1.9em; ">
+        Height:
+      </DIV>
+      <INPUT ID=height type=text style="left: 10em;          top: 0.8em; width: 3em; height: 1.9em; " tabIndex=10 onfocus="select()">
+      <select name="heightExt" style="left: 13.2em;          top: 0.8em; width: 6em; height: 1.9em; " tabIndex=20>
+         <option value="">Pixels</option>
+         <option value="%" selected>Percent</option>
+      </select>
+      <DIV id=divWidth style="left: 20em;                     top: 1em; width: 10em; height: 1.9em; ">
+        Width:
+      </DIV>
+      <INPUT ID=width type=text style="left: 27.9em;           top: 0.8em; width: 3em; height: 1.9em; " tabIndex=30 onfocus="select()">
+      <select name="widthExt" style="left: 31.1em;           top: 0.8em; width: 6em; height: 1.9em; " tabIndex=40>
+         <option value="">Pixels</option>
+         <option value="%" selected>Percent</option>
+      </select>
+      <DIV id=divId style="left: 1em;                        top: 3em; width: 10em; height: 1.2168em; ">
+        Id:
+      </DIV>
+      <INPUT ID=id type=text style="left: 10em;              top: 2.8em; width: 27.04em; height: 1.9em; " tabIndex=50 onfocus="select()">
+      <DIV id=divTitle style="left: 1em;                     top: 5em; width: 31em; height: 1.2168em; ">
+        Tooltip:
+      </DIV>
+      <INPUT ID=title type=text style="left: 10em;           top: 4.8em; width: 27.04em; height: 1.9em; " tabIndex=60 onfocus="select()">
+      <DIV id=divAlign style="left: 1em;                     top: 7em; width: 10em; height: 1.2168em; ">
+        Horizontal Align:
+      </DIV>
+      <select name="align" style="left: 10em;                top: 6.8em; width: 6em; height: 1.9em; " tabIndex=70">
+           <option value="">Not set</option>
+           <option value="center">center</option>
+           <option value="justify">Justify</option>
+           <option value="left">Left</option>
+           <option value="right">Right</option>
+      </select>
+      <DIV id=divvAlign style="left: 20em;                    top: 7em; width: 10em; height: 1.2168em; ">
+        Vertical Align:
+      </DIV>
+      <select name="vAlign" style="left: 31em;               top: 6.8em; width: 6em; height: 1.9em; " tabIndex=80">
+           <option value="">Not set</option>
+           <option value="middle">Middle</option>
+           <option value="baseline">Baseline</option>
+           <option value="bottom">Bottom</option>
+           <option value="top">Top</option>
+      </select>
+      <DIV id=divBgColor style="left: 1em;                   top: 9em; width: 10em; height: 1.2168em; ">
+        Background Color:
+      </DIV>
+      <DIV id=bgColor style="left: 10em;                     top: 9em; width: 6em; height: 1.2168em;border-style: outset; border-width: thin;" onclick="setColors(this);"></DIV>
+      <DIV id=divBorderColor style="left: 20em;              top: 9em; width: 10em; height: 1.2168em; ">
+        Border Color:
+      </DIV>
+      <DIV id=borderColor style="left: 31em;                 top: 9em; width: 6em; height: 1.2168em;border-style: outset; border-width: thin;" onclick="setColors(this);"></DIV>
+      <DIV id=divBorderColorDark style="left: 1em;           top: 11em; width: 10em; height: 1.2168em; ">
+        Border Color Dark:
+      </DIV>
+      <DIV id=borderColorDark style="left: 10em;             top: 11em; width: 6em; height: 1.2168em;border-style: outset; border-width: thin;" onclick="setColors(this);"></DIV>
+      <DIV id=divBorderCOlorLight style="left: 20em;          top: 11em; width: 10em; height: 1.2168em; ">
+        Border Color Light:
+      </DIV>
+      <DIV id=borderColorLight style="left: 31em;            top: 11em; width: 6em; height: 1.2168em;border-style: outset; border-width: thin;" onclick="setColors(this);"></DIV>
+      <BUTTON ID=btnOK style="left: 10em;                     top: 13em; width: 8.5em; height: 2.2em; " type=submit tabIndex=90> 
+         OK
+      </BUTTON>
+      <BUTTON ID=btnCancel style="left: 19.9em;                 top: 13em; width: 8.5em; height: 2.2em; " type=reset tabIndex=100 onClick="window.close();">
+         Cancel
+      </BUTTON>
+   </BODY>
+</HTML>

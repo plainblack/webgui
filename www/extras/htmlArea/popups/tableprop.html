@@ -1,0 +1,302 @@
+<!-- based on insimage.dlg -->
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD W3 HTML 3.2//EN">
+<HTML id=dlgFind STYLE="width: 420px; height: 290px; ">
+   <HEAD>
+      <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+      <meta http-equiv="MSThemeCompatible" content="Yes">
+      <TITLE>
+         Table Properties
+      </TITLE>
+      <style>
+        html, body, button, div, input, select, fieldset { font-family: MS Shell Dlg; font-size: 8pt; position: absolute; };
+      </style>
+<script>
+opener = window.dialogArguments;
+var editor_obj = opener.document.all["_" + opener.getGlobalVar('_editor_field') + "_editor"];
+var table = opener.getGlobalVar('_editor_table');
+</script>
+<SCRIPT defer>
+function _CloseOnEsc() {
+  if (event.keyCode == 27) { window.close(); return; }
+}
+window.onerror = HandleError
+function HandleError(message, url, line) {
+  var std = "An error has occurred in this dialog." + "\n\n"
+  + "Error: " + line + "\n" + message;
+  alert(std);
+  window.close();
+  return true;
+}
+function Init() {
+  // event handlers  
+  document.body.onkeypress = _CloseOnEsc;
+  btnOK.onclick = new Function("btnOKClick()");
+  align.selectedIndex = 0;
+  for (var i=0; i< align.length; i++) {
+     if (align[i].value.toLowerCase() == table.align.toLowerCase()) {
+        align.selectedIndex = i;
+     }
+  }
+  bgColor.innerText = ' ' + table.bgColor.toUpperCase();
+  bgColor.style.backgroundColor = table.bgColor;
+  border.value = table.border;
+  borderColor.innerText = ' ' + table.borderColor.toUpperCase();
+  borderColor.style.backgroundColor = table.borderColor;
+  borderColorDark.innerText = ' ' + table.borderColorDark.toUpperCase();
+  borderColorDark.style.backgroundColor = table.borderColorDark;
+  borderColorLight.innerText = ' ' + table.borderColorLight.toUpperCase();
+  borderColorLight.style.backgroundColor = table.borderColorLight;
+  if (table.height == null){
+    height.value = '';
+    heightExt.value = '';
+  } else { 
+     if (table.height.search(/%/) < 0) {
+        height.value = table.height;
+        heightExt.value = '';
+     } else {
+        height.value = table.height.split('%')[0]; 
+        heightExt.value = '%';
+     }
+  }   
+  if (table.width == null){
+    width.value = '';
+    widthExt.value = '';
+  } else { 
+     if (table.width.search(/%/) < 0) {
+        widthExt.value = '';
+        width.value = table.width;
+     } else {
+        width.value = table.width.split('%')[0]; 
+        widthExt.value = '%';
+     }
+  } 
+  id.value = table.id;
+  title.value = table.title;
+  if (table.background == null) {
+     background.value = '';
+  } else {
+     background.value = table.background;
+  }
+  cellPadding.value = table.cellPadding;
+  cellSpacing.value = table.cellSpacing;
+  if (table.caption) {
+     caption.value = table.caption.innerText;
+  }
+  rules.selectedIndex = 0;
+  for (var i=0; i< rules.length; i++) {
+     if (rules[i].value.toLowerCase() == table.rules.toLowerCase()) {
+        rules.selectedIndex = i;
+     }
+  }
+  frame.selectedIndex = 0;
+  for (var i=0; i< frame.length; i++) {
+     if (frame[i].value.toLowerCase() == table.frame.toLowerCase()) {
+        frame.selectedIndex = i;
+     }
+  }
+}
+function radioValue(radioobject){
+   for (var i=0; i < radioobject.length; i++) {
+      if (direction[i].checked) {
+         return radioobject[i].value;
+      }
+   }
+} 
+function _isValidNumber(txtBox) {
+  if (txtBox == '') {
+     return true;
+  } else {  
+     var val = parseInt(txtBox);
+     if (isNaN(val) || val < 0 || val > 9999) { return false; }
+     return true;
+  }
+}
+function btnOKClick() {
+   if (!_isValidNumber(height.value)) {
+      alert("You must specify a number between 0 and 9999 for height!");
+      heigth.focus();
+      return;
+   }
+   if (height.value == ''){heightExt.value = '';}
+   if (!_isValidNumber(width.value)) {
+      alert("You must specify a number between 0 and 9999 for width!");
+      width.focus();
+      return;
+   }
+   if (!_isValidNumber(border.value)) {
+      alert("You must specify a number between 0 and 9999 for border!");
+      border.focus();
+      return;
+   }
+   if (width.value == ''){widthExt.value = '';}
+   table.align = align[align.selectedIndex].value;
+   table.bgColor = bgColor.style.backgroundColor;
+   table.borderColor = borderColor.style.backgroundColor;
+   table.borderColorDark = borderColorDark.style.backgroundColor;
+   table.borderColorLight = borderColorLight.style.backgroundColor;
+   table.height = height.value + heightExt.value;
+   table.id = id.value ;
+   if (title.value == ''){
+      if (table.getAttribute('title') != null){table.removeAttribute('title');}
+   } else {table.title = title.value;}
+   if (width.value == ''){
+      if (table.getAttribute('width') != null){table.removeAttribute('width');}
+   } else {table.width = width.value + widthExt.value;}
+   if (background.value == '' ){
+      if (table.getAttribute('background') != null){table.removeAttribute('background');}
+   } else {table.background = background.value;}
+   if (!_isValidNumber(cellPadding.value)) {
+      alert("You must specify a number between 0 and 9999 for cellPadding!");
+      cellPadding.focus();
+      return;
+   }
+   if (cellPadding.value == ''){
+      if (table.getAttribute('cellPadding') != null){table.removeAttribute('cellPadding');}
+   } else {table.cellPadding = cellPadding.value;}
+   if (!_isValidNumber(cellSpacing.value)) {
+      alert("You must specify a number between 0 and 9999 for cellSpacing!");
+      cellSpacing.focus();
+      return;
+   }
+   if (cellSpacing.value == ''){
+      if (table.getAttribute('cellSpacing') != null){table.removeAttribute('cellSpacing');}
+   } else {table.cellSpacing = cellSpacing.value;}
+   if (table.caption) {
+      if (caption.value == '') {
+         table.deleteCaption();
+      } else {
+         table.caption.innerText = caption.value ;
+      }
+   } else {
+      if (caption.value != '') {
+         table.createCaption();
+         table.caption.innerText = caption.value;
+      }
+   }
+   table.frame = frame[frame.selectedIndex].value;
+   table.rules = rules[rules.selectedIndex].value;
+   if (border.value == '' || border.value == 0){
+      if (table.getAttribute('border') != null){table.removeAttribute('border');}
+   } else {table.border = border.value;}
+   window.close();
+   return true;
+}
+function setColors (but) {
+   but.style.borderStyle = 'inset';
+   var color=showModalDialog('set_color.html',but.style.backgroundColor,'resizable:no;help:no;status:no;scroll:no;');
+   if (color == '' || color == null){
+     but.innerText = '';
+     but.style.backgroundColor = '';
+   } else {
+     but.innerText = ' #' + color.toUpperCase();
+     but.style.backgroundColor =  color;
+   }
+   but.style.borderStyle = 'outset';
+   return;
+}
+</SCRIPT>
+   </HEAD>
+   <BODY id=bdy onload="Init()" style="background: threedface; color: windowtext;" scroll=no>
+      <DIV id=divHeight style="left: 1em;                    top: 1em; width: 10em; height: 1.9em; ">
+        Height:
+      </DIV>
+      <INPUT ID=height type=text style="left: 10em;          top: 0.8em; width: 3em; height: 1.9em; " tabIndex=10 onfocus="select()">
+      <select name="heightExt" style="left: 13.2em;          top: 0.8em; width: 6em; height: 1.9em; " tabIndex=20>
+         <option value="">Pixels</option>
+         <option value="%" selected>Percent</option>
+      </select>
+      <DIV id=divWidth style="left: 19.4em;                     top: 1em; width: 10em; height: 1.9em; ">
+        Width:
+      </DIV>
+      <INPUT ID=width type=text style="left: 22.7em;         top: 0.8em; width: 3em; height: 1.9em; " tabIndex=30 onfocus="select()">
+      <select name="widthExt" style="left: 25.8em;           top: 0.8em; width: 6em; height: 1.9em; " tabIndex=40>
+         <option value="">Pixels</option>
+         <option value="%" selected>Percent</option>
+      </select>
+      <DIV id=divBorder style="left: 32em;                   top: 1em; width: 10em; height: 1.9em; ">
+        Border:
+      </DIV>
+      <INPUT ID=border type=text style="left: 35.5em;        top: 0.8em; width: 1.5em; height: 1.9em; " tabIndex=50 onfocus="select()">
+
+      <DIV id=divId style="left: 1em;                        top: 3em; width: 10em; height: 1.2168em; ">
+        Id:
+      </DIV>
+      <INPUT ID=id type=text style="left: 10em;              top: 2.8em; width: 27.04em; height: 1.9em; " tabIndex=60 onfocus="select()">
+      <DIV id=divCaption style="left: 1em;                   top: 5em; width: 10em; height: 1.2168em; ">
+        Caption:
+      </DIV>
+      <INPUT ID=caption type=text style="left: 10em;         top: 4.8em; width: 27.04em; height: 1.9em; " tabIndex=70 onfocus="select()">
+      <DIV id=divTitle style="left: 1em;                     top: 7em; width: 31em; height: 1.2168em; ">
+        Tooltip:
+      </DIV>
+      <INPUT ID=title type=text style="left: 10em;           top: 6.8em; width: 27.04em; height: 1.9em; " tabIndex=80 onfocus="select()">
+      <DIV id=divBackground style="left: 1em;                top: 9em; width: 10em; height: 1.2168em; ">
+        Background Image:
+      </DIV>
+      <INPUT ID=background type=text style="left: 10em;      top: 8.8em; width: 27.04em; height: 1.9em; " tabIndex=90 onfocus="select()">
+      <DIV id=divFrame style="left: 1em;                     top: 11em; width: 10em; height: 1.2168em; ">
+        Frame:
+      </DIV>
+      <select ID=frame style="left: 10em;                    top:10.8em; width: 27.04em; height: 1.9em; " tabIndex=100 onfocus="select()">
+           <option value="">Not set</option>
+           <option value="above">Border on the top side of the border frame is displayed</option>
+           <option value="below">Border on the bottom side of the table frame is displayed</option>
+           <option value="border">Borders on all sides of the table frame are displayed</option>
+           <option value="box">Borders on all sides of the table frame are displayed</option>
+           <option value="hsides">Borders on the top and bottom sides of the table frame are displayed</option>
+           <option value="lhs">Border on the left side of the table frame is displayed</option>
+           <option value="rhs">Border on the right side of the table frame is displayed</option>
+           <option value="vsides">Borders on the left and right sides of the table frame are displayed</option>
+      </select>
+      <DIV id=divRules style="left: 1em;                     top: 13em; width: 10em; height: 1.2168em; ">
+        Rules:
+      </DIV>
+      <select ID=rules style="left: 10em;                    top:12.8em; width: 27.04em; height: 1.9em; " tabIndex=110 onfocus="select()">
+           <option value="">Not set</option>
+           <option value="all">Borders are displayed on all rows and columns</option>
+           <option value="cols">Borders are displayed between all table columns</option>
+           <option value="none">All interior table borders are removed</option>
+           <option value="rows">Horizontal borders are displayed between all table rows</option>
+      </select>
+      <DIV id=divAlign style="left: 1em;                     top: 15em; width: 10em; height: 1.2168em; ">
+        Horizontal Align:
+      </DIV>
+      <select name="align" style="left: 10em;                top: 14.8em; width: 6em; height: 1.9em; " tabIndex=120>
+           <option value="">Not set</option>
+           <option value="center">center</option>
+           <option value="justify">Justify</option>
+           <option value="left">Left</option>
+           <option value="right">Right</option>
+      </select>
+      <DIV id=divcellPadding style="left: 17em;              top: 15em; width: 10em; height: 1.9em; ">
+        Cell Padding:
+      </DIV>
+      <INPUT ID=cellPadding type=text style="left: 23.5em;   top: 14.8em; width: 3em; height: 1.9em; " tabIndex=130 onfocus="select()">
+      <DIV id=divcellSpacing style="left: 27.5em;            top: 15em; width: 10em; height: 1.9em; ">
+        Cell Spacing:
+      </DIV>
+      <INPUT ID=cellSpacing type=text style="left: 34em;     top: 14.8em; width: 3em; height: 1.9em; " tabIndex=140 onfocus="select()">
+      <DIV id=divBgColor style="left: 1em;                   top: 17em; width: 10em; height: 1.2168em; ">
+        Background Color:
+      </DIV>
+      <DIV id=bgColor style="left: 10em;                     top: 17em; width: 6em; height: 1.2168em;border-style: outset; border-width: thin;" onclick="setColors(this);"></DIV>
+      <DIV id=divBorderColor style="left: 20em;              top: 17em; width: 10em; height: 1.2168em; ">
+        Border Color:
+      </DIV>
+      <DIV id=borderColor style="left: 31em;                 top: 17em; width: 6em; height: 1.2168em;border-style: outset; border-width: thin;" onclick="setColors(this);"></DIV>
+      <DIV id=divBorderColorDark style="left: 1em;           top: 19em; width: 10em; height: 1.2168em; ">
+        Border Color Dark:
+      </DIV>
+      <DIV id=borderColorDark style="left: 10em;             top: 19em; width: 6em; height: 1.2168em;border-style: outset; border-width: thin;" onclick="setColors(this);"></DIV>
+      <DIV id=divBorderCOlorLight style="left: 20em;         top: 19em; width: 10em; height: 1.2168em; ">
+        Border Color Light:
+      </DIV>
+      <DIV id=borderColorLight style="left: 31em;            top: 19em; width: 6em; height: 1.2168em;border-style: outset; border-width: thin;" onclick="setColors(this);"></DIV>
+      <BUTTON ID=btnOK style="left: 10em;                    top: 21em; width: 8.5em; height: 2.2em; " type=submit tabIndex=150> 
+         OK
+      </BUTTON>
+      <BUTTON ID=btnCancel style="left: 19.9em;              top: 21em; width: 8.5em; height: 2.2em; " type=reset tabIndex=160 onClick="window.close();">
+         Cancel
+      </BUTTON>
+   </BODY>
+</HTML>
