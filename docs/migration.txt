@@ -103,5 +103,13 @@ way, including the constructor. We removed depricated parameters from the method
 which will cause pagination not to function in items that have not been updated. 
 
 
+5.4 Dynamic Plug-in Loading
+
+In 6.1 plug-ins (Wobjects, Macros, and Auth) are all dynamically loaded. They
+used to be statically loaded at session open time. If you are writing
+something that uses a macro, wobject, or auth module outside of the usual
+mechanisms that call those plug-ins, then you'll need to write a piece of code
+to load the plug-in at use time.
+
 
 

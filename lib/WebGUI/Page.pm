@@ -363,6 +363,9 @@ sub generate {
         		}
       		}
                 my $cmd = "WebGUI::Wobject::".${$wobject}{namespace};
+		my $load = 'use '.$cmd;
+		eval($load);
+		WebGUI::ErrorHandler::warn("Wobject failed to compile: $cmd.".$@) if($@);
                 my $w = eval{$cmd->new($wobject)};
                 WebGUI::ErrorHandler::fatalError("Couldn't instanciate wobject: ${$wobject}{namespace}. Root cause: ".$@) if($@);
 		push(@{$var{'position'.$wobject->{templatePosition}.'_loop'}},{

@@ -170,37 +170,6 @@ sub _time {
 
 
 #-------------------------------------------------------------------
-sub _loadAuthentication {
-	foreach my $namespace (@{$session{config}{authMethods}}) {
-		my $cmd = "use WebGUI::Auth::".$namespace;
-		eval($cmd);
-		if ($@) {
-			WebGUI::ErrorHandler::warn("Authentication module failed to compile: $namespace. ".$@);
-		}
-	}
-}
-
-#-------------------------------------------------------------------
-sub _loadMacros {
-	foreach my $key (keys %{$session{config}{macros}}) {
-		my $cmd = "use WebGUI::Macro::".$session{config}{macros}{$key};
-		eval($cmd);
-		WebGUI::ErrorHandler::fatalError("Macro failed to compile: $key.".$@) if($@);
-	}
-}
-
-#-------------------------------------------------------------------
-sub _loadWobjects {
-	foreach my $namespace (@{$session{config}{wobjects}}) {
-		my $cmd = "use WebGUI::Wobject::".$namespace;
-		eval($cmd);
-		if ($@) {
-			WebGUI::ErrorHandler::warn("Wobject failed to compile: $namespace. ".$@);
-		}
-	}
-}
-
-#-------------------------------------------------------------------
 # This routine returns an unique session Id.
 sub _uniqueSessionId {
 	my $sessionId = crypt((_time()*rand(1000)),rand(99));
@@ -467,9 +436,6 @@ sub open {
 	$session{language} = WebGUI::SQL->quickHashRef("select * from language where languageId=$session{user}{language}");
 	###----------------------------
 	### loading plugins
-	_loadWobjects();
-	_loadMacros();
-	_loadAuthentication();  
 }
 
 #-------------------------------------------------------------------

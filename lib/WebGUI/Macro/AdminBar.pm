@@ -52,6 +52,9 @@ sub process {
 	$var{'contentTypes.label'} = WebGUI::International::get(1083);
 	foreach my $namespace (@{$session{config}{wobjects}}) {
 		my $cmd = "WebGUI::Wobject::".$namespace;	
+		my $load = "use ".$cmd;
+		eval($load);
+		WebGUI::ErrorHandler::warn("Wobject failed to compile: $cmd.".$@) if($@);
 		my $w = eval{$cmd->new({namespace=>$namespace,wobjectId=>"new"})};
 		if ($@) {
 			WebGUI::ErrorHandler::warn("Could not use wobject $namespace because: ".$@);

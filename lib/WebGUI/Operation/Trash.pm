@@ -42,6 +42,9 @@ sub _purgeUserTrash {
                         where wobjectId=".$base->{wobjectId});
                 %properties = (%{$base}, %{$extended});
                 $cmd = "WebGUI::Wobject::".$properties{namespace};
+		my $load = "use ".$cmd;
+		eval($load);
+		WebGUI::ErrorHandler::warn("Wobject failed to compile: $cmd.".$@) if($@);
                 $w = $cmd->new(\%properties);
                 $w->purge;
         }
@@ -70,6 +73,9 @@ sub _purgeWobject {
 			where wobjectId=".$base->{wobjectId});
 		%properties = (%{$base}, %{$extended});
         	$cmd = "WebGUI::Wobject::".$properties{namespace};
+		my $load = "use ".$cmd;
+		eval($load);
+		WebGUI::ErrorHandler::warn("Wobject failed to compile: $cmd.".$@) if($@);
                 $w = $cmd->new(\%properties);
 		$w->purge;
         }
@@ -86,6 +92,9 @@ sub _purgeWobjects {
 			where wobjectId=".$base->{wobjectId});
 		%properties = (%{$base}, %{$extended});
         	$cmd = "WebGUI::Wobject::".$properties{namespace};
+		my $load = "use ".$cmd;
+		eval($load);
+		WebGUI::ErrorHandler::warn("Wobject failed to compile: $cmd.".$@) if($@);
                 $w = $cmd->new(\%properties);
 		$w->purge;
         }

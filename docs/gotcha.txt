@@ -8,6 +8,11 @@ versions. Be sure to heed the warnings contained herein as they will
 save you many hours of grief.
 
 
+6.1.0
+--------------------------------------------------------------------
+ * See docs/migration.txt for changes in plug-in coding.
+
+
 6.0.2
 --------------------------------------------------------------------
  * You need to add all of your site aliases to the sitename variable

@@ -94,6 +94,9 @@ sub _processFunctions {
                                 } else {
                                         if (WebGUI::Privilege::canViewPage()) {
                                                 $cmd = "WebGUI::Wobject::".${$wobject}{namespace};
+						my $load = "use ".$cmd; # gotta load the wobject before you can use it
+						eval($load);
+						WebGUI::ErrorHandler::warn("Wobject failed to compile: $cmd.".$@) if($@);
                                                 $w = eval{$cmd->new($wobject)};
                                                 WebGUI::ErrorHandler::fatalError("Couldn't instanciate wobject: ${$wobject}{namespace}. Root Cause: ".$@) if($@);
                 				if ($session{form}{func} =~ /^[A-Za-z]+$/) {

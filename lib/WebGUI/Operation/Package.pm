@@ -29,6 +29,9 @@ sub _duplicateWobjects {
 	my $sth = WebGUI::SQL->read("select * from wobject where pageId=$_[0] order by sequenceNumber");
 	while (my $wobject = $sth->hashRef) {
 		my $cmd = "WebGUI::Wobject::".${$wobject}{namespace};
+		my $load = "use ".$cmd;
+		eval($load);
+		WebGUI::ErrorHandler::warn("Wobject failed to compile: $cmd.".$@) if($@);
 		my $w = $cmd->new($wobject);
 		$w->duplicate($_[1]);
 	}

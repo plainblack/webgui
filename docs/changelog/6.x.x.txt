@@ -3,6 +3,10 @@
  - Added a --history option to upgrade.pl that displays the upgrade history
    for each site.
  - Fixed a typo in User.pm
+ - All plugins are now dynamically loaded. This provides a performance gain of
+   over 100% in CGI mode, 10% in mod_perl mode, and less memory usage in
+   mod_perl mode.
+
 
 
 6.0.3

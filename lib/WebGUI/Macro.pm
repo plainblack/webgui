@@ -167,7 +167,11 @@ sub process {
       			$params = &process($params); # recursive process params
 		}
 		if ($session{config}{macros}{$searchString} ne "") {
-      			my $cmd = "WebGUI::Macro::".$session{config}{macros}{$searchString}."::process";
+      			my $cmd = "WebGUI::Macro::".$session{config}{macros}{$searchString};
+			my $load = "use ".$cmd;
+			eval($load);
+			WebGUI::ErrorHandler::warn("Macro failed to compile: $cmd.".$@) if($@);
+      			$cmd = $cmd."::process";
 			my $result = eval{&$cmd($params)};
 			if ($@) {
 				WebGUI::ErrorHandler::warn("Processing failed on macro: $macro: ".$@);

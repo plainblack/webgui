@@ -41,6 +41,9 @@ sub getInstance {
 	my $userId = $_[1];
 	#Create Auth Object
 	my $cmd = "WebGUI::Auth::".$authMethod;
+	my $load = "use ".$cmd;
+	WebGUI::ErrorHandler::fatalError("Authentication module failed to compile: $cmd.".$@) if($@);
+	eval($load);
     my $auth = eval{$cmd->new($authMethod,$userId)};
     WebGUI::ErrorHandler::fatalError("Couldn't instanciate authentication module: $authMethod. Root cause: ".$@) if($@);
 	return $auth;
