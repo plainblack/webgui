@@ -7,6 +7,8 @@
  - Fixed a bug in the LDAP module that required the RDN to be a URL.
  - bugfix [962196] addHTTP problem.
  - bugfix [962224] WebGUI::Operation::Statistics
+ - bugfix [966470] WebGUI::User. Session not properly killed when deleting user.
+ - bugfix [966466] WebGUI::Session. System crash when user language missing.
 
 
 5.5.6
