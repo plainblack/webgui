@@ -165,17 +165,22 @@ sub www_moveForumUp {
 #-------------------------------------------------------------------
 sub www_view {
 	my $callback = WebGUI::URL::page("func=view&amp;wid=".$_[0]->get("wobjectId"));
+	if ($session{form}{forumId} eq "" || $session{form}{forumId} eq "new") {
+		($session{form}{forumId}) = WebGUI::SQL->quickArray("select forumId from MessageBoard_forums 
+			where wobjectId=".$_[0]->get("wobjectId")." order by sequenceNumber");
+	}
+	my ($forumId, $title, $description) = WebGUI::SQL->quickArray("select forumId, title, description from MessageBoard_forums 
+		where wobjectId=".$_[0]->get("wobjectId")." and forumId=".$session{form}{forumId});
+	my $forumParam = "forumId=".$forumId;
+	$callback = WebGUI::URL::append($callback,$forumParam);
+	my $caller = {
+		callback=>$callback,
+                title=>$title,
+                description=>$description,
+                forumId=>$forumId
+		};
 	if ($session{form}{forumOp}) {
-		my ($forumId, $title, $description) = WebGUI::SQL->quickArray("select forumId, title, description from MessageBoard_forums 
-			where wobjectId=".$_[0]->get("wobjectId")." and forumId=".$session{form}{forumId});
-		my $forumParam = "forumId=".$forumId;
-		$callback = WebGUI::URL::append($callback,$forumParam);
-		return WebGUI::Forum::UI::forumOp({
-			callback=>$callback,
-			title=>$title,
-			description=>$description,
-			forumId=>$forumId
-			});
+		return WebGUI::Forum::UI::forumOp($caller);
 	}
 	my %var;
 	$var{title} = $_[0]->get("title");
@@ -194,7 +199,7 @@ sub www_view {
 	while (my $forumMeta = $sth->hashRef) {
 		my $forum = WebGUI::Forum->new($forumMeta->{forumId});
 		if ($count == 1) {
-			$var{'default.listing'} = WebGUI::Forum::UI::www_viewForum($callback,$forumMeta->{forumId});
+			$var{'default.listing'} = WebGUI::Forum::UI::www_viewForum($caller,$forumMeta->{forumId});
 			$var{'default.description'} = $forumMeta->{description};
 			$var{'default.title'} = $forumMeta->{title};
 			$var{'default.controls'} = $_[0]->_formatControls($forum->get("forumId"));
