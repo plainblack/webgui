@@ -300,7 +300,7 @@ sub contentType {
 		if ($type eq "text") {
 			$hash{text} = WebGUI::International::get(1010);
 		} elsif ($type eq "mixed") {
-			$hash{code} = WebGUI::International::get(1008);
+			$hash{mixed} = WebGUI::International::get(1008);
 		} elsif ($type eq "code") {
 			$hash{code} = WebGUI::International::get(1011);
 		} elsif ($type eq "html") {

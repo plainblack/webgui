@@ -645,7 +645,7 @@ sub setRow {
                         push(@pairs, $key.'='.quote($data->{$key}));
                 }
         }
-        WebGUI::SQL->write("update $table set ".join(", ", @pairs), $dbh);
+        WebGUI::SQL->write("update $table set ".join(", ", @pairs)." where ".$keyColumn."=".quote($data->{$keyColumn}), $dbh);
 	return $data->{$keyColumn};
 }
 

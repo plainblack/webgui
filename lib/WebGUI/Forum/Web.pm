@@ -119,7 +119,7 @@ sub viewForum {
 	my $p = WebGUI::Paginator->new($callback);
 	$p->setDataByQuery("select * from forumThread where forumId=".$forumId." order by isSticky desc, lastPostDate desc");
 	my $threads = $p->getPageData;
-	foreach my $thread (@{$threads}) {
+	foreach my $thread (@$threads) {
 		my $root = WebGUI::Forum::Post->new($thread->{rootPostId});
 		my $last;
 		if ($thread->{rootPostId} == $thread->{lastPostId}) { #saves the lookup if it's the same id
@@ -186,6 +186,10 @@ sub www_post {
 
 		$subject = $reply->get("subject");
 		$subject = "Re: ".$subject unless ($subject =~ /^Re:/);
+		$var->{'subscribe.form'} = WebGUI::Form::yesNo({
+			name=>'subscribe',
+			value=>0
+			});
 	}
 	if ($var->{isNewThread}) {
 		$var->{'form.begin'} .= WebGUI::Form::hidden({
@@ -200,13 +204,13 @@ sub www_post {
 				value=>0
 				});
 		}
-	}
-	if ($var->{isNewMessage}) {
-		$var->{'subscribe.label'} = WebGUI::International::get(873);
 		$var->{'subscribe.form'} = WebGUI::Form::yesNo({
 			name=>'subscribe',
 			value=>1
 			});
+	}
+	if ($var->{isNewMessage}) {
+		$var->{'subscribe.label'} = WebGUI::International::get(873);
 		if ($forum->isModerator) {
 			$var->{'lock.label'} = WebGUI::International::get(1012);
 			$var->{'lock.form'} = WebGUI::Form::yesNo({
