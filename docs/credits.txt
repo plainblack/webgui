@@ -21,7 +21,7 @@ Contributing Developers..............Peter Beardsley / Appropriate Solutions
                                      Greg Fast / WDI
                                      Chris Gebhardt / OpenServe
                                      Andy Grundman
-                                     IRV
+                                     Irving Carrion
                                      Chris Jackson
                                      Koen de Jonge / ProcoliX
                                      Martin Kamerbeek / ProcoliX
