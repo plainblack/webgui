@@ -111,7 +111,7 @@ each wobject under the tab &quot;Metadata&quot; in the wobject properties.</p>
 ?&quot; setting to Yes in the Manage Settings menu.</p>
 <p>Usage of metadata:</p>
 <ul>
-  <li><b>Passive Profiling</b><br>
+  <li><p><b>Passive Profiling</b><br>
     When passive profiling is switched on, every wobject viewed by a user will
     be logged.  The WebGUI scheduler summarizes the profiling information on a regular
     basis.
@@ -119,22 +119,21 @@ each wobject under the tab &quot;Metadata&quot; in the wobject properties.</p>
     ranking based upon the user's Areas of Interest (AOI).<br>
     By default the summarizer runs once a day. However you can change that by
     setting: <b>passiveProfileInterval = &lt;number of seconds&gt;</b> in the
-    WebGUI config file. <br>
+    WebGUI config file.</p>
   </li>
-  <li><b>Areas of Interest Ranking</b><br>
+  <li><p><b>Areas of Interest Ranking</b><br>
     Metadata in combination with passive profiling produces AOI (Areas of
     Interest) information. You can retrieve the value of a metadata property
-    with the &#94;AOIRank(); and &#AOIHits(); macros.
-  <li><b>Show content based upon criteria<br>
-    </b>The Wobject Proxy allows you to select content based upon criteria like:<br>
-    contenttype = sport AND source != newspaper<br>
-    <br>
+    with the &#94;AOIRank(); and &#AOIHits(); macros.</p>
+  <li><p><b>Show content based upon criteria<br>
+    </b>The Wobject Proxy allows you to select content based upon criteria like:<blockquote>
+    contenttype = sport AND source != newspaper</blockquote>
     You can use the AOI macro's described above in the criteria, so you can
     present content based upon the users Areas of Interest. Example:<br>
-    type = &#94;AOIRank(contenttype);</li>
+    type = &#94;AOIRank(contenttype);</p></li>
 </ul>|,
-                lastUpdated => 1099517844,
-                context => q|Metadata help|
+                context => q|Metadata help|,
+                lastUpdated => 1099530955
         },
 
 	'Metadata, Edit property' => {
