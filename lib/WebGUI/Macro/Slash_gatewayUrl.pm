@@ -16,7 +16,7 @@ use WebGUI::URL;
 
 #-------------------------------------------------------------------
 sub process {
-	return WebGUI::URL::getSiteURL();
+	return WebGUI::URL::getScriptURL();
 }
 
 
