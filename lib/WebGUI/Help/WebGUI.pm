@@ -11,20 +11,6 @@ our $HELP = {
 			}
 		]
 	},
-	'root manage' => {
-		title => '678',
-		body => '633',
-		related => [
-			{
-				tag => 'page add/edit',
-				namespace => 'WebGUI'
-			},
-			{
-				tag => 'page delete',
-				namespace => 'WebGUI'
-			}
-		]
-	},
 	'packages creating' => {
 		title => '681',
 		body => '636',

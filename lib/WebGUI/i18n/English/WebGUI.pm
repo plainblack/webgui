@@ -1569,11 +1569,6 @@ As with any delete operation, you are prompted to be sure you wish to proceed wi
 		lastUpdated => 1050191766
 	},
 
-	'678' => {
-		message => q|Root, Manage|,
-		lastUpdated => 1031514049
-	},
-
 	'496' => {
 		message => q|Editor To Use|,
 		lastUpdated => 1031514049
@@ -1946,14 +1941,6 @@ The user id of the currently logged in user.
 	'888' => {
 		message => q|Snippet Preview Length|,
 		lastUpdated => 1045312362
-	},
-
-	'633' => {
-		message => q|Simply put, roots are pages with no parent. The first and most important root in WebGUI is the "Home" page. Many people will never add any additional roots, but a few power users will. Those power users will create new roots for many different reasons. Perhaps they'll create a staging area for content managers. Or maybe a hidden area for Admin tools. Or possibly even a new root just to place their search engine.
-<p>
-
-|,
-		lastUpdated => 1031514049
 	},
 
 	'1011' => {
