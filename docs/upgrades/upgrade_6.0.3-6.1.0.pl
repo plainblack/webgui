@@ -113,7 +113,7 @@ sub walk_down {
 	if($callback_status) {
 		# Keep recursing unless callback returned false... and if there's
 		# anything to recurse into, of course.
-		my @daughters = WebGUI::SQL->buildArray("select pageId from page where parentId=$pageId and pageId != 0");
+		my @daughters = WebGUI::SQL->buildArray("select pageId from page where parentId=$pageId and pageId != 0 order by sequenceNumber");
 		if(@daughters) {
 			$o->{'_depth'} += 1;
 			foreach my $one (@daughters) {
