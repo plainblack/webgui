@@ -11,7 +11,7 @@
  - Bugfix [ 952374 ] Images in Articel doesn't work anymore
  - Bugfix [ 952137 ] error deleting default content after install
  - Bugfix [ 947141 ] Bug in Forum - No Subject!!!
-
+ - Bugfix [ 949923 ] Collateral changes owner when editing
 
 
 

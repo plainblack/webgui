@@ -165,6 +165,8 @@ sub www_editCollateral {
 	$f->hidden("op","editCollateralSave");
 	$f->hidden("collateralType",$collateral->{collateralType});
 	$f->hidden("cid",$collateral->{collateralId});
+	$f->hidden("userId", $collateral->{userId});
+	$f->hidden("userName", $collateral->{userName});
 	$f->readOnly(
 		-label=>WebGUI::International::get(767),
 		-value=>$collateral->{collateralId}
