@@ -92,7 +92,7 @@ sub www_viewHelpIndex {
 	my $output = '<table width="100%" class="content"><tr><td valign="top">';
 	my $halfway = round($i/2);
 	$i = 0;
-        @helpIndex = sort { $a->[2] <=> $b->[2] } @helpIndex;
+        @helpIndex = sort { $a->[2] cmp $b->[2] } @helpIndex;
         foreach my $helpEntry (@helpIndex) {
                 my ($namespace, $id, $title) = @{ $helpEntry };
                 $output .= '<p><a href="'._link($id,$namespace).'">'.$title.'</a></p>';
