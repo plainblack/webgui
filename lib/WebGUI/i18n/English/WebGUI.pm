@@ -2447,7 +2447,7 @@ The password you use to connect to the DSN.
 		message => q|You can add wobjects by selecting from the <I>Add Content</I> pulldown menu. You can edit them by clicking on the "Edit" button that appears directly above an instance of a particular wobject while in Admin mode. 
 <P>Almost all wobjects share some properties. Those properties are: 
 <P><B>Wobject ID</B><BR>This is the unique identifier WebGUI uses to keep track of this wobject instance. Normal users should never need to be concerned with the Wobject ID, but some advanced users may need to know it for things like SQL Reports. The Wobject ID is not editable.
-<P><B>Title</B> The title of the wobject. This is typically displayed at the top of each wobject. 
+<P><B>Title</B><BR> The title of the wobject. This is typically displayed at the top of each wobject. 
 <P><I>Note:</I> You should always specify a title even if you are going to turn it off (with the next property). This is because the title shows up in the trash and clipboard and you'll want to be able to distinguish which wobject is which. 
 <P><B>Display title?</B><BR>Do you wish to display the title you specified? On some sites, displaying the title is not necessary. 
 <P><B>Metadata</B><BR>Under the Metadata tab you can set the metadata properties for this content. Metadata must be enabled in the Manage Settings menu.
@@ -2459,7 +2459,7 @@ The password you use to connect to the DSN.
 <P><B>Who can edit?</B><BR>Choose the group that can edit this wobject. The group assigned editing rights can also always view the wobject. </P>
 <P><B>Description</B><BR>A content area in which you can place as much content as you wish. For instance, even before an FAQ there is usually a paragraph describing what is contained in the FAQ. 
 <P></P>|,
-		lastUpdated => 1101775352
+		lastUpdated => 1104622115,
 	},
 
 	'991' => {
