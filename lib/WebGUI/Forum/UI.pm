@@ -1266,6 +1266,9 @@ sub getThreadTemplateVars {
 	my $callback = $caller->{callback};
         $post->markRead($session{user}{userId});
         my $thread = $post->getThread;
+	if (($post->get("status") eq "denied" && $session{user}{userId} != $post->get("userId")) || $post->get("status") eq "deleted") {
+		$post = $thread->getPost($thread->get("rootPostId"));
+	}
         my $forum = $thread->getForum;
         my $var = getPostTemplateVars($post, $thread, $forum, $caller);
         my $root = WebGUI::Forum::Post->new($thread->get("rootPostId"));
@@ -2289,7 +2292,11 @@ sub www_viewThread {
 	$postId = $session{form}{forumPostId} unless ($postId);
         my $post = WebGUI::Forum::Post->new($postId);
 	my $var = getThreadTemplateVars($caller, $post);
-	return WebGUI::Template::process(WebGUI::Template::get($post->getThread->getForum->get("threadTemplateId"),"Forum/Thread"), $var); 
+	if (($post->get("forumPostId") == $post->getThread->get("rootPostId") && $post->get("status") eq "denied" && $session{user}{userId} != $post->get("userId")) || $post->get("status") eq "deleted") {
+		return www_viewForum($caller, $post->getThread->getForum->get("forumId"));
+	} else {	
+		return WebGUI::Template::process(WebGUI::Template::get($post->getThread->getForum->get("threadTemplateId"),"Forum/Thread"), $var); 
+	}
 }
 
 

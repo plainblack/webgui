@@ -22,6 +22,7 @@
  - Fixed bug [ 832284 ] Pagination broken in Messageboard with Search
  - Fixed bug [ 838091 ] Read-Only Forum User Cannot Subscribe
  - Fixed bug [ 839524 ] Editing forum settings defaults all template names
+ - Fixed bug [ 841194 ] denied post security problem
  
 
 5.5.0
