@@ -90,6 +90,7 @@ sub www_addInternationalMessage {
 		WebGUI::SQL->buildHashRef("select namespace,namespace from international where languageId=1 order by namespace")
 		,"Namespace",['WebGUI']);
 	$f->textarea("message","Message");
+	$f->textarea("context","Context");
 	$f->submit;
 	$output .= $f->print;
 	return _submenu($output);
@@ -102,8 +103,10 @@ sub www_addInternationalMessageSave {
 		and namespace=".quote($session{form}{namespace}));
 	$nextId++;
 	my $namespace = $session{form}{namespace_new} || $session{form}{namespace};
- 	WebGUI::SQL->write("insert into international (languageId, internationalId, namespace, message, lastUpdated) values
-		(1,$nextId,".quote($namespace).",".quote($session{form}{message}).",".time().")");
+ 	WebGUI::SQL->write("insert into international (languageId, internationalId, namespace, message, lastUpdated, 
+		context) values
+		(1,$nextId,".quote($namespace).",".quote($session{form}{message}).",".time().",
+		".quote($session{form}{context}).")");
 	return "<b>Message was added with id $nextId.</b>".www_listInternationalMessages();
 }
 
@@ -135,7 +138,7 @@ sub www_deleteLanguageConfirm {
 
 #-------------------------------------------------------------------
 sub www_editInternationalMessage {
-        my ($output, $message, $f, $language);
+        my ($output, $message, $context, $f, $language);
         return WebGUI::Privilege::adminOnly() unless (WebGUI::Privilege::isInGroup(3));
 	($language) = WebGUI::SQL->quickArray("select language from language where languageId=".$session{form}{lid});
         $output = '<h1>'.WebGUI::International::get(597).'</h1>';
@@ -151,9 +154,13 @@ sub www_editInternationalMessage {
                 and namespace='".$session{form}{namespace}."' and languageId=".$session{form}{lid});
         $f->textarea("message",$language,$message);
         $f->submit;
-	($message) = WebGUI::SQL->quickArray("select message from international where internationalId=".$session{form}{iid}." 
+	($message, $context) = WebGUI::SQL->quickArray("select message,context from international where internationalId=".$session{form}{iid}." 
 		and namespace='".$session{form}{namespace}."' and languageId=1");
 	$f->readOnly(WebGUI::Macro::negate($message),"English");
+        $f->readOnly(
+		-label=>"Message Context",
+		-value=>$context
+		);
         $output .= $f->print;
         return _submenu($output);
 }
