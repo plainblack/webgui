@@ -162,7 +162,7 @@ sub www_view {
 
    $redirect=0; 
 
-   ssTemplate($_[0]->get("templateId"),{}) unless ($proxiedUrl ne "");
+   return $_[0]->processTemplate($_[0]->get("templateId"),{}) unless ($proxiedUrl ne "");
    
    my $cachedContent = WebGUI::Cache->new($proxiedUrl,"URL");
    my $cachedHeader = WebGUI::Cache->new($proxiedUrl,"HEADER");
