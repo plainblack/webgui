@@ -255,13 +255,11 @@ sub www_view {
 	# Do the search
 	my $startTime = Time::HiRes::time();
 	my $filter = $self->_buildFilter;
-
 	my $search = WebGUI::Wobject::IndexedSearch::Search->new($self->getValue('indexName'));
 	$search->open;
 	my $results = $search->search($var{query},$filter);
 	$var{duration} = Time::HiRes::time() - $startTime;
 	$var{duration} = sprintf("%.3f", $var{duration}); # Duration rounded to 3 decimal places
-
 	# Let's see if the search returned any results
 	if (defined ($results)) {
 		$var{numberOfResults} = scalar(@$results);
@@ -423,7 +421,6 @@ sub _buildPageList {
 			push (@roots, $_) if (isIn($_, @allowedRoots));
 		}
 	}
-		
 	foreach $pageId (@roots) {
 		WebGUI::Page->new($pageId)->traversePreOrder(
 			sub {
@@ -447,9 +444,9 @@ sub _buildFilter {
 
 	# languages
 	if($session{form}{languages} && ! isIn('any', $session{cgi}->param('languages'))) {
-		$filter{languageId} = [ map { quote($_) } $session{cgi}->param('languages') ];
+		$filter{languageId} = [ $session{cgi}->param('languages') ];
 	} elsif ($self->getValue('languages') !~ /any/i) {
-		$filter{languageId} = [ map { quote($_) } split(/\n/, $self->getValue('languages')) ];
+		$filter{languageId} = [ split(/\n/, $self->getValue('languages')) ];
 	}
         push(@{$filter{languageId}}, '0') if (exists $filter{languageId}); # Some content (i.e. profiles) 
 									   # don't have a language. They 
@@ -457,14 +454,14 @@ sub _buildFilter {
 	
 	# content-types
 	if($session{form}{contentTypes} && ! isIn('any', $session{cgi}->param('contentTypes'))) {
-		$filter{contentType} = [ map { quote($_) } $session{cgi}->param('contentTypes') ];
+		$filter{contentType} = [ $session{cgi}->param('contentTypes') ];
 
 		# contentType "content" is a shortcut for "page", "wobject" and "wobjectDetail"
 		if (isIn('content', $session{cgi}->param('contentTypes'))) {
-			push(@{$filter{contentType}}, map { quote($_) } qw/page wobject wobjectDetail/);
+			push(@{$filter{contentType}}, qw/page wobject wobjectDetail/);
 		}
 	} elsif ($self->getValue('contentTypes') !~ /any/i) {
-		$filter{contentType} = [ map { quote($_) } split(/\n/, $self->getValue('contentTypes')) ];
+		$filter{contentType} = [ split(/\n/, $self->getValue('contentTypes')) ];
 	}
 
 	# users
@@ -478,14 +475,14 @@ sub _buildFilter {
 			push(@{$filter{ownerId}}, quote($user)) if ($user =~ /^\d+$/);
 		}
 	} elsif ($self->getValue('users') !~ /any/i) {
-		$filter{ownerId} = [ map { quote($_) } split(/\n/, $self->getValue('users')) ];
+		$filter{ownerId} = [ split(/\n/, $self->getValue('users')) ];
 	}
 
 	# namespaces
 	if($session{form}{namespaces} && ! isIn('any', $session{cgi}->param('namespaces'))) {
-		$filter{namespace} = [ map { quote($_) } $session{cgi}->param('namespaces') ];
+		$filter{namespace} = [ $session{cgi}->param('namespaces') ];
 	} elsif ($self->getValue('namespaces') !~ /any/i) {
-		$filter{namespace} = [ map { quote($_) } split(/\n/, $self->getValue('namespaces')) ];
+		$filter{namespace} = [ split(/\n/, $self->getValue('namespaces')) ];
 	}
 
 	# delete $filter{ownerId} if it is an empty array reference
