@@ -28,17 +28,6 @@ our $name = WebGUI::International::get(6,$namespace);
 
 
 #-------------------------------------------------------------------
-sub _reorderLinks {
-        my ($sth, $i, $lid);
-        $sth = WebGUI::SQL->read("select linkId from LinkList_link where wobjectId=$_[0] order by sequenceNumber");
-        while (($lid) = $sth->array) {
-                WebGUI::SQL->write("update LinkList_link set sequenceNumber='$i' where linkId=$lid");
-                $i++;
-        }
-        $sth->finish;
-}
-
-#-------------------------------------------------------------------
 sub duplicate {
         my ($w, $sth, @row, $newLinkId);
 	$w = $_[0]->SUPER::duplicate($_[1]);
@@ -83,7 +72,7 @@ sub www_deleteLinkConfirm {
         my ($output);
         if (WebGUI::Privilege::canEditPage()) {
 		$_[0]->deleteCollateral("LinkList_link","linkId",$session{form}{lid});
-		_reorderLinks($session{form}{wid});
+		$_[0]->reorderCollateral("LinkList_link","linkId");
                 return "";
         } else {
                 return WebGUI::Privilege::insufficient();

@@ -503,6 +503,36 @@ sub purge {
 	WebGUI::Discussion::purge($_[0]->get("wobjectId"));
 }
 
+
+#-------------------------------------------------------------------
+
+=head2 reorderCollateral ( tableName, keyName )
+
+ Resequences collateral data. Typically useful after deleting a
+ collateral item to remove the gap created by the deletion.
+
+=item tableName
+
+ The name of the table to resequence.
+
+=item keyName
+
+ The key column name used to determine which data needs sorting within the table.
+
+=cut
+
+sub reorderCollateral {
+        my ($sth, $i, $id);
+        $sth = WebGUI::SQL->read("select $_[2] from $_[1] where wobjectId=".$_[0]->get("wobjectId")." order by sequenceNumber");
+        while (($id) = $sth->array) {
+                WebGUI::SQL->write("update $_[1] set sequenceNumber='$i' where wobjectId=$_[0] and $_[2]=$id");
+                $i++;
+        }
+        $sth->finish;
+}
+
+
+
 #-------------------------------------------------------------------
 
 =head2 set ( [ hashRef, arrayRef ] )

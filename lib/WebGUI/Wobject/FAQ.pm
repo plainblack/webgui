@@ -27,17 +27,6 @@ our $name = WebGUI::International::get(2,$namespace);
 
 
 #-------------------------------------------------------------------
-sub _reorderQuestions {
-        my ($sth, $i, $qid);
-        $sth = WebGUI::SQL->read("select questionId from FAQ_question where wobjectId=$_[0] order by sequenceNumber");
-        while (($qid) = $sth->array) {
-                WebGUI::SQL->write("update FAQ_question set sequenceNumber='$i' where questionId=$qid");
-                $i++;
-        }
-        $sth->finish;
-}
-
-#-------------------------------------------------------------------
 sub duplicate {
         my ($w, %data, $newQuestionId, $sth);
 	tie %data, 'Tie::CPHash';
@@ -83,7 +72,7 @@ sub www_deleteQuestionConfirm {
         my ($output);
         if (WebGUI::Privilege::canEditPage()) {
 		$_[0]->deleteCollateral("FAQ_question","questionId",$session{form}{qid});
-		_reorderQuestions($_[0]->get("wobjectId"));
+		$_[0]->reorderCollateral("FAQ_question","questionId");
                 return "";
         } else {
                 return WebGUI::Privilege::insufficient();

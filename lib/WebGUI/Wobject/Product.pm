@@ -28,68 +28,6 @@ our $name = WebGUI::International::get(1,$namespace);
 
 
 #-------------------------------------------------------------------
-sub _reorderAccessories {
-        my ($sth, $i, $id);
-        $sth = WebGUI::SQL->read("select accessoryWobjectId from
-                Product_accessory where wobjectId=$_[0] order by sequenceNumber");
-        while (($id) = $sth->array) {
-                WebGUI::SQL->write("update Product_accessory set sequenceNumber='$i' 
-		where wobjectId=$_[0] and accessoryWobjectId=$id");
-                $i++;
-        }
-        $sth->finish;
-}
-
-#-------------------------------------------------------------------
-sub _reorderBenefits {
-        my ($sth, $i, $id);
-        $sth = WebGUI::SQL->read("select productBenefitId from
-                Product_benefit where wobjectId=$_[0] order by sequenceNumber");
-        while (($id) = $sth->array) {
-                WebGUI::SQL->write("update Product_benefit set sequenceNumber='$i' where productBenefitId=$id");
-                $i++;
-        }
-        $sth->finish;
-}
-
-#-------------------------------------------------------------------
-sub _reorderFeatures {
-        my ($sth, $i, $id);
-        $sth = WebGUI::SQL->read("select productFeatureId from 
-		Product_feature where wobjectId=$_[0] order by sequenceNumber");
-        while (($id) = $sth->array) {
-                WebGUI::SQL->write("update Product_feature set sequenceNumber='$i' where productFeatureId=$id");
-                $i++;
-        }
-        $sth->finish;
-}
-
-#-------------------------------------------------------------------
-sub _reorderRelated {
-        my ($sth, $i, $id);
-        $sth = WebGUI::SQL->read("select relatedWobjectId from
-                Product_related where wobjectId=$_[0] order by sequenceNumber");
-        while (($id) = $sth->array) {
-                WebGUI::SQL->write("update Product_related set sequenceNumber='$i'
-                where wobjectId=$_[0] and relatedWobjectId=$id");
-                $i++;
-        }
-        $sth->finish;
-}
-
-#-------------------------------------------------------------------
-sub _reorderSpecifications {
-        my ($sth, $i, $id);
-        $sth = WebGUI::SQL->read("select productSpecificationId from
-                Product_specification where wobjectId=$_[0] order by sequenceNumber");
-        while (($id) = $sth->array) {
-                WebGUI::SQL->write("update Product_specification set sequenceNumber='$i' where productSpecificationId=$id");
-                $i++;
-        }
-        $sth->finish;
-}
-
-#-------------------------------------------------------------------
 sub duplicate {
         my ($w, $file, %data, $newId, $sth);
 	tie %data, 'Tie::CPHash';
@@ -283,7 +221,7 @@ sub www_deleteAccessoryConfirm {
         if (WebGUI::Privilege::canEditPage()) {
 		WebGUI::SQL->write("delete from Product_accessory where wobjectId=$session{form}{wid} 
 			and accessoryWobjectId=$session{form}{aid}");
-		_reorderAccessories($_[0]->get("wobjectId"));
+		$_[0]->reorderCollateral("Product_accessory","accessoryWobjectId");
                 return "";
         } else {
                 return WebGUI::Privilege::insufficient();
@@ -302,7 +240,7 @@ sub www_deleteBenefit {
 sub www_deleteBenefitConfirm {
         if (WebGUI::Privilege::canEditPage()) {
 		$_[0]->deleteCollateral("Product_benefit","productBenefitId",$session{form}{bid});
-                _reorderBenefits($_[0]->get("wobjectId"));
+		$_[0]->reorderCollateral("Product_benefit","productBenefitId");
                 return "";
         } else {
                 return WebGUI::Privilege::insufficient();
@@ -321,7 +259,7 @@ sub www_deleteFeature {
 sub www_deleteFeatureConfirm {
         if (WebGUI::Privilege::canEditPage()) {
 		$_[0]->deleteCollateral("Product_feature","productFeatureId",$session{form}{fid});
-                _reorderFeatures($_[0]->get("wobjectId"));
+		$_[0]->reorderCollateral("Product_feature","productFeatureId");
                 return "";
         } else {
                 return WebGUI::Privilege::insufficient();
@@ -341,7 +279,7 @@ sub www_deleteRelatedConfirm {
         if (WebGUI::Privilege::canEditPage()) {
                 WebGUI::SQL->write("delete from Product_related where wobjectId=$session{form}{wid}
                         and relatedWobjectId=$session{form}{rid}");
-                _reorderRelated($_[0]->get("wobjectId"));
+		$_[0]->reorderCollateral("Product_related","relatedWobjectId");
                 return "";
         } else {
                 return WebGUI::Privilege::insufficient();
@@ -360,7 +298,7 @@ sub www_deleteSpecification {
 sub www_deleteSpecificationConfirm {
         if (WebGUI::Privilege::canEditPage()) {
 		$_[0]->deleteCollateral("Product_specification","productSpecificationId",$session{form}{sid});
-                _reorderSpecifications($_[0]->get("wobjectId"));
+		$_[0]->reorderCollateral("Product_specification","productSpecificationId");
                 return "";
         } else {
                 return WebGUI::Privilege::insufficient();

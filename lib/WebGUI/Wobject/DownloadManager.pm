@@ -51,18 +51,6 @@ sub sortByColumn {
 }
 
 
-
-#-------------------------------------------------------------------
-sub _reorderDownloads {
-        my ($sth, $i, $did);
-        $sth = WebGUI::SQL->read("select downloadId from DownloadManager_file where wobjectId=$_[0] order by sequenceNumber");
-        while (($did) = $sth->array) {
-                WebGUI::SQL->write("update DownloadManager_file set sequenceNumber='$i' where downloadId=$did");
-                $i++;
-        }
-        $sth->finish;
-}
-
 #-------------------------------------------------------------------
 sub duplicate {
         my ($file, $w, %row, $sth, $newDownloadId);
@@ -136,7 +124,7 @@ sub www_deleteDownloadConfirm {
                 $file = WebGUI::Attachment->new("",$session{form}{wid},$session{form}{did});
                 $file->deleteNode;
 		$_[0]->deleteCollateral("DownloadManager_file","downloadId",$session{form}{did});
-                _reorderDownloads($session{form}{wid});
+                $_[0]->reorderCollateral("DownloadManager_file","downloadId");
                 return "";
         } else {
                 return WebGUI::Privilege::insufficient();
@@ -268,7 +256,7 @@ sub www_editDownloadSave {
                         dateUploaded => time(),
                         groupToView => $session{form}{groupToView}
                         });
-		_reorderDownloads($_[0]->get("wobjectId"));
+		$_[0]->reorderCollateral("DownloadManager_file","downloadId");
                 $file = WebGUI::Attachment->new("",$session{form}{wid},$session{form}{did});
 		$file->save("downloadFile");
 		$files{downloadFile} = $file->getFilename;

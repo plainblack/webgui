@@ -30,17 +30,6 @@ our @fields = qw(width fromField fromStatus toField toStatus
 	ccField ccStatus bccField bccStatus subjectField subjectStatus acknowledgement storeEntries);
 
 #-------------------------------------------------------------------
-sub _reorderFields {
-    my ($sth, $i, $fid);
-    $sth = WebGUI::SQL->read("select mailFieldId from MailForm_field where wobjectId=$_[0] order by sequenceNumber");
-    while (($fid) = $sth->array) {
-            WebGUI::SQL->write("update MailForm_field set sequenceNumber='$i' where mailFieldId=$fid");
-            $i++;
-    }
-    $sth->finish;
-}
-
-#-------------------------------------------------------------------
 sub duplicate {
 	my ($w, %data, $newFieldId, $sth);
 	tie %data, 'Tie::CPHash';
@@ -104,7 +93,7 @@ sub www_deleteFieldConfirm {
     	my ($output);
     	if (WebGUI::Privilege::canEditPage()) {
 		$_[0]->deleteCollateral("MailForm_field","mailFieldId",$session{form}{fid});
-        	_reorderFields($_[0]->get("wobjectId"));
+		$_[0]->reorderCollateral("MailForm_field","mailFieldId");
         	return "";
     	} else {
         	return WebGUI::Privilege::insufficient();
