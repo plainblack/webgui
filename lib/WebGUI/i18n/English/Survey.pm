@@ -1,9 +1,13 @@
 package WebGUI::i18n::English::Survey;
 
 our $I18N = {
-	88 => q|Survey Template|,
+	'88' => {
+		message => q|Survey Template|,
+		lastUpdated => 1078223096
+	},
 
-	91 => q|The following template variables are available in all survey templates.
+	'91' => {
+		message => q|The following template variables are available in all survey templates.
 
 <b>user.canViewReports</b><br>
 A boolean indicating whether the user has the privileges to view survey reports.
@@ -73,168 +77,414 @@ The URL to view the survey. Usually used to get back to the survey after looking
 The default label for survey.url.
 <p>
 |,
-
-	83 => q|Questions Per Page|,
-
-	84 => q|Max Responses Per User|,
-
-	76 => q|Start Time|,
-
-	80 => q|seconds|,
-
-	85 => q|Questions Per Response|,
-
-	77 => q|End Time|,
-
-	78 => q|Total Time|,
-
-	48 => q|You are not currently eligible to participate in this survey. |,
-
-	47 => q|You have completed this quiz.|,
-
-	46 => q|Thank you for taking the time to complete our survey.|,
-
-	74 => q|Are you certain you wish to delete all the responses?|,
-
-	72 => q|Are you certain you wish to delete this user's responses?|,
-
-	57 => q|Comments|,
-
-	66 => q|Responses|,
-
-	65 => q|Export composite summary.|,
-
-	64 => q|Export responses.|,
-
-	63 => q|Export questions.|,
-
-	62 => q|Export answers.|,
-
-	61 => q|View grade book.|,
-
-	90 => q|Survey Template Common Vars|,
-
-	79 => q|minutes|,
-
-	52 => q|Score|,
-
-	51 => q|Comments?|,
-
-	50 => q|Next|,
-
-	49 => q|You may not take this quiz at this time.|,
-
-	58 => q|Statistical Overview|,
-
-	73 => q|Delete all the responses.|,
-
-	71 => q|Grade Book|,
-
-	70 => q|Individual Responses|,
-
-	69 => q|Delete this user's responses.|,
-
-	67 => q|User|,
-
-	56 => q|View comments.|,
-
-	55 => q|View responses.|,
-
-	54 => q|Percentage|,
-
-	53 => q|Responses|,
-
-	59 => q|View statistical overview.|,
-
-	75 => q|Edit this question.|,
-
-	60 => q|Back to survey.|,
-
-	45 => q|Are you certain you wish to delete this answer and its responses?|,
-
-	44 => q|Are you certain you wish to delete this question, its answers and responses?|,
-
-	34 => q|Agree|,
-
-	33 => q|Strongly Agree|,
-
-	32 => q|False|,
-
-	31 => q|True|,
-
-	27 => q|Add an opinion (agree/disagree) answer scale.|,
-
-	25 => q|Add a true/false answer.|,
-
-	26 => q|Add a frequency (always/never) answer scale.|,
-
-	43 => q|Never|,
-
-	42 => q|Occasionally|,
-
-	41 => q|Frequently|,
-
-	40 => q|Always|,
-
-	39 => q|Not Applicable|,
-
-	38 => q|Strongly Disagree|,
-
-	37 => q|Disagree|,
-
-	36 => q|Somewhat Disagree|,
-
-	35 => q|Somewhat Agree|,
-
-	30 => q|Add a new question.|,
-
-	29 => q|Add a text answer.|,
-
-	24 => q|Add a multiple choice answer.|,
-
-	28 => q|Add a question.|,
-
-	23 => q|Add a new answer.|,
-
-	22 => q|Answer Type|,
-
-	21 => q|Go To|,
-
-	20 => q|Is this answer correct?|,
-
-	19 => q|Answer|,
-
-	18 => q|Edit Answer|,
-
-	17 => q|Edit Question|,
-
-	16 => q|Randomize answers?|,
-
-	15 => q|Allow comment?|,
-
-	14 => q|Question|,
-
-	13 => q|Who can view reports?|,
-
-	12 => q|Who can take the survey?|,
-
-	11 => q|Mode|,
-
-	10 => q|Quiz|,
-
-	9 => q|Survey|,
-
-	8 => q|Question Order|,
-
-	7 => q|Response Driven|,
-
-	6 => q|Random|,
-
-	5 => q|Sequential|,
-
-	3 => q|Survey, Add/Edit|,
-
-	4 => q|Surveys allow you to gather information from your users. In the case of WebGUI surveys, you can also use them to test your user's knowledge.
+		lastUpdated => 1078223067
+	},
+
+	'83' => {
+		message => q|Questions Per Page|,
+		lastUpdated => 1075639327,
+		context => q|Ask the user how many questions should be displayed per page on the survey.|
+	},
+
+	'84' => {
+		message => q|Max Responses Per User|,
+		lastUpdated => 1075639389,
+		context => q|Ask the user how many responses the user should be able to submit to the survey.|
+	},
+
+	'76' => {
+		message => q|Start Time|,
+		lastUpdated => 1038782111
+	},
+
+	'80' => {
+		message => q|seconds|,
+		lastUpdated => 1038789602
+	},
+
+	'85' => {
+		message => q|Questions Per Response|,
+		lastUpdated => 1075639549,
+		context => q|Ask the user how many questions should be displayed to the user per time taking the survey.|
+	},
+
+	'77' => {
+		message => q|End Time|,
+		lastUpdated => 1038782119
+	},
+
+	'78' => {
+		message => q|Total Time|,
+		lastUpdated => 1038782125
+	},
+
+	'48' => {
+		message => q|You are not currently eligible to participate in this survey. |,
+		lastUpdated => 1037499301
+	},
+
+	'47' => {
+		message => q|You have completed this quiz.|,
+		lastUpdated => 1037499131
+	},
+
+	'46' => {
+		message => q|Thank you for taking the time to complete our survey.|,
+		lastUpdated => 1037499049
+	},
+
+	'74' => {
+		message => q|Are you certain you wish to delete all the responses?|,
+		lastUpdated => 1037574455
+	},
+
+	'72' => {
+		message => q|Are you certain you wish to delete this user's responses?|,
+		lastUpdated => 1037573460
+	},
+
+	'57' => {
+		message => q|Comments|,
+		lastUpdated => 1037556124
+	},
+
+	'66' => {
+		message => q|Responses|,
+		lastUpdated => 1037557127
+	},
+
+	'65' => {
+		message => q|Export composite summary.|,
+		lastUpdated => 1037556821
+	},
+
+	'64' => {
+		message => q|Export responses.|,
+		lastUpdated => 1037556721
+	},
+
+	'63' => {
+		message => q|Export questions.|,
+		lastUpdated => 1037556710
+	},
+
+	'62' => {
+		message => q|Export answers.|,
+		lastUpdated => 1037556697
+	},
+
+	'61' => {
+		message => q|View grade book.|,
+		lastUpdated => 1037556642
+	},
+
+	'90' => {
+		message => q|Survey Template Common Vars|,
+		lastUpdated => 1078223067
+	},
+
+	'79' => {
+		message => q|minutes|,
+		lastUpdated => 1038789595
+	},
+
+	'52' => {
+		message => q|Score|,
+		lastUpdated => 1037506007
+	},
+
+	'51' => {
+		message => q|Comments?|,
+		lastUpdated => 1037499470
+	},
+
+	'50' => {
+		message => q|Next|,
+		lastUpdated => 1037499410
+	},
+
+	'49' => {
+		message => q|You may not take this quiz at this time.|,
+		lastUpdated => 1037499363
+	},
+
+	'58' => {
+		message => q|Statistical Overview|,
+		lastUpdated => 1037556179
+	},
+
+	'73' => {
+		message => q|Delete all the responses.|,
+		lastUpdated => 1037573893
+	},
+
+	'71' => {
+		message => q|Grade Book|,
+		lastUpdated => 1037573252
+	},
+
+	'70' => {
+		message => q|Individual Responses|,
+		lastUpdated => 1037573240
+	},
+
+	'69' => {
+		message => q|Delete this user's responses.|,
+		lastUpdated => 1037573082
+	},
+
+	'67' => {
+		message => q|User|,
+		lastUpdated => 1037558860
+	},
+
+	'56' => {
+		message => q|View comments.|,
+		lastUpdated => 1037555787
+	},
+
+	'55' => {
+		message => q|View responses.|,
+		lastUpdated => 1037555778
+	},
+
+	'54' => {
+		message => q|Percentage|,
+		lastUpdated => 1037555267
+	},
+
+	'53' => {
+		message => q|Responses|,
+		lastUpdated => 1037555255
+	},
+
+	'59' => {
+		message => q|View statistical overview.|,
+		lastUpdated => 1037556614
+	},
+
+	'75' => {
+		message => q|Edit this question.|,
+		lastUpdated => 1038778819
+	},
+
+	'60' => {
+		message => q|Back to survey.|,
+		lastUpdated => 1037556626
+	},
+
+	'45' => {
+		message => q|Are you certain you wish to delete this answer and its responses?|,
+		lastUpdated => 1035951913
+	},
+
+	'44' => {
+		message => q|Are you certain you wish to delete this question, its answers and responses?|,
+		lastUpdated => 1035951626
+	},
+
+	'34' => {
+		message => q|Agree|,
+		lastUpdated => 1037498914
+	},
+
+	'33' => {
+		message => q|Strongly Agree|,
+		lastUpdated => 1037498857
+	},
+
+	'32' => {
+		message => q|False|,
+		lastUpdated => 1037498832
+	},
+
+	'31' => {
+		message => q|True|,
+		lastUpdated => 1037498842
+	},
+
+	'27' => {
+		message => q|Add an opinion (agree/disagree) answer scale.|,
+		lastUpdated => 1035948010
+	},
+
+	'25' => {
+		message => q|Add a true/false answer.|,
+		lastUpdated => 1035947960
+	},
+
+	'26' => {
+		message => q|Add a frequency (always/never) answer scale.|,
+		lastUpdated => 1035947924
+	},
+
+	'43' => {
+		message => q|Never|,
+		lastUpdated => 1037574752
+	},
+
+	'42' => {
+		message => q|Occasionally|,
+		lastUpdated => 1037574859
+	},
+
+	'41' => {
+		message => q|Frequently|,
+		lastUpdated => 1037574786
+	},
+
+	'40' => {
+		message => q|Always|,
+		lastUpdated => 1037574725
+	},
+
+	'39' => {
+		message => q|Not Applicable|,
+		lastUpdated => 1037574804
+	},
+
+	'38' => {
+		message => q|Strongly Disagree|,
+		lastUpdated => 1037498903
+	},
+
+	'37' => {
+		message => q|Disagree|,
+		lastUpdated => 1037498886
+	},
+
+	'36' => {
+		message => q|Somewhat Disagree|,
+		lastUpdated => 1037498872
+	},
+
+	'35' => {
+		message => q|Somewhat Agree|,
+		lastUpdated => 1037498927
+	},
+
+	'30' => {
+		message => q|Add a new question.|,
+		lastUpdated => 1035944708
+	},
+
+	'29' => {
+		message => q|Add a text answer.|,
+		lastUpdated => 1035874640
+	},
+
+	'24' => {
+		message => q|Add a multiple choice answer.|,
+		lastUpdated => 1035874502
+	},
+
+	'28' => {
+		message => q|Add a question.|,
+		lastUpdated => 1035872173
+	},
+
+	'23' => {
+		message => q|Add a new answer.|,
+		lastUpdated => 1035864494
+	},
+
+	'22' => {
+		message => q|Answer Type|,
+		lastUpdated => 1035864413
+	},
+
+	'21' => {
+		message => q|Go To|,
+		lastUpdated => 1035506057
+	},
+
+	'20' => {
+		message => q|Is this answer correct?|,
+		lastUpdated => 1035436321
+	},
+
+	'19' => {
+		message => q|Answer|,
+		lastUpdated => 1035436296
+	},
+
+	'18' => {
+		message => q|Edit Answer|,
+		lastUpdated => 1035436102
+	},
+
+	'17' => {
+		message => q|Edit Question|,
+		lastUpdated => 1035436091
+	},
+
+	'16' => {
+		message => q|Randomize answers?|,
+		lastUpdated => 1035429242
+	},
+
+	'15' => {
+		message => q|Allow comment?|,
+		lastUpdated => 1035429212
+	},
+
+	'14' => {
+		message => q|Question|,
+		lastUpdated => 1035428770
+	},
+
+	'13' => {
+		message => q|Who can view reports?|,
+		lastUpdated => 1033949863
+	},
+
+	'12' => {
+		message => q|Who can take the survey?|,
+		lastUpdated => 1033949789
+	},
+
+	'11' => {
+		message => q|Mode|,
+		lastUpdated => 1033949647
+	},
+
+	'10' => {
+		message => q|Quiz|,
+		lastUpdated => 1033949566
+	},
+
+	'9' => {
+		message => q|Survey|,
+		lastUpdated => 1033949540
+	},
+
+	'8' => {
+		message => q|Question Order|,
+		lastUpdated => 1033949393
+	},
+
+	'7' => {
+		message => q|Response Driven|,
+		lastUpdated => 1033944729
+	},
+
+	'6' => {
+		message => q|Random|,
+		lastUpdated => 1033944643
+	},
+
+	'5' => {
+		message => q|Sequential|,
+		lastUpdated => 1033944535
+	},
+
+	'3' => {
+		message => q|Survey, Add/Edit|,
+		lastUpdated => 1038890559
+	},
+
+	'4' => {
+		message => q|Surveys allow you to gather information from your users. In the case of WebGUI surveys, you can also use them to test your user's knowledge.
 <p/>
 
 <b>Question Order</b><br/>
@@ -263,16 +513,34 @@ Who can view the results of the survey?
 If you leave this set at its default, then you will add a question directly after adding the survey.
 <p/>
 |,
+		lastUpdated => 1059069492
+	},
 
-	2 => q|Edit Survey|,
+	'2' => {
+		message => q|Edit Survey|,
+		lastUpdated => 1033943825
+	},
 
-	1 => q|Survey|,
+	'1' => {
+		message => q|Survey|,
+		lastUpdated => 1033942924
+	},
 
-	87 => q|Click here to start a new response.|,
+	'87' => {
+		message => q|Click here to start a new response.|,
+		lastUpdated => 1075639972,
+		context => q|A label indicating that the user could start a new survey/quiz response by clicking.|
+	},
 
-	86 => q|Progress|,
+	'86' => {
+		message => q|Progress|,
+		lastUpdated => 1075639914,
+		context => q|A label indicating how far the user has progressed through the survey
+|
+	},
 
-	89 => q|The following template variables are available for the Survey.
+	'89' => {
+		message => q|The following template variables are available for the Survey.
 <p>
 
 <b>question.add.url</b><br>
@@ -430,10 +698,18 @@ The unique id for this question.
 
 </blockquote>
 |,
+		lastUpdated => 1078223096
+	},
 
-	81 => q|Anonymous responses?|,
+	'81' => {
+		message => q|Anonymous responses?|,
+		lastUpdated => 1059069492
+	},
 
-	82 => q|Terminate Survey|,
+	'82' => {
+		message => q|Terminate Survey|,
+		lastUpdated => 1068901816
+	},
 
 };
 

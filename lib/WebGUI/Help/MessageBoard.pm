@@ -2,8 +2,8 @@ package WebGUI::Help::MessageBoard;
 
 our $HELP = {
 	'message board add/edit' => {
-		title => 61,
-		body => 71,
+		title => '61',
+		body => '71',
 		related => [
 			{
 				tag => 'forum add/edit',
@@ -20,8 +20,8 @@ our $HELP = {
 		]
 	},
 	'message board template' => {
-		title => 73,
-		body => 74,
+		title => '73',
+		body => '74',
 		related => [
 			{
 				tag => 'forum notification template',
@@ -58,8 +58,8 @@ our $HELP = {
 		]
 	},
 	'forum add/edit' => {
-		title => 78,
-		body => 79,
+		title => '78',
+		body => '79',
 		related => [
 			{
 				tag => 'forum discussion properties',

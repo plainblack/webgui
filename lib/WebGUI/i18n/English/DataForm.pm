@@ -1,59 +1,139 @@
 package WebGUI::i18n::English::DataForm;
 
 our $I18N = {
-	1 => q|Data Form|,
+	'1' => {
+		message => q|Data Form|,
+		lastUpdated => 1052045252
+	},
 
-	2 => q|Your email subject here|,
+	'2' => {
+		message => q|Your email subject here|,
+		lastUpdated => 1031514049
+	},
 
-	3 => q|Thank you for your feedback!|,
+	'3' => {
+		message => q|Thank you for your feedback!|,
+		lastUpdated => 1031514049
+	},
 
-	4 => q|Hidden|,
+	'4' => {
+		message => q|Hidden|,
+		lastUpdated => 1031514049
+	},
 
-	5 => q|Displayed|,
+	'5' => {
+		message => q|Displayed|,
+		lastUpdated => 1031514049
+	},
 
-	6 => q|Modifiable|,
+	'6' => {
+		message => q|Modifiable|,
+		lastUpdated => 1031514049
+	},
 
-	7 => q|Edit Data Form|,
+	'7' => {
+		message => q|Edit Data Form|,
+		lastUpdated => 1052045309
+	},
 
-	8 => q|Width|,
+	'8' => {
+		message => q|Width|,
+		lastUpdated => 1031514049
+	},
 
-	10 => q|From|,
+	'10' => {
+		message => q|From|,
+		lastUpdated => 1031514049
+	},
 
-	11 => q|To|,
+	'11' => {
+		message => q|To|,
+		lastUpdated => 1052047848
+	},
 
-	12 => q|Cc|,
+	'12' => {
+		message => q|Cc|,
+		lastUpdated => 1031514049
+	},
 
-	13 => q|Bcc|,
+	'13' => {
+		message => q|Bcc|,
+		lastUpdated => 1031514049
+	},
 
-	14 => q|Subject|,
+	'14' => {
+		message => q|Subject|,
+		lastUpdated => 1031514049
+	},
 
-	16 => q|Acknowledgement|,
+	'16' => {
+		message => q|Acknowledgement|,
+		lastUpdated => 1031514049
+	},
 
-	17 => q|Mail Sent|,
+	'17' => {
+		message => q|Mail Sent|,
+		lastUpdated => 1031514049
+	},
 
-	18 => q|Go back!|,
+	'18' => {
+		message => q|Go back!|,
+		lastUpdated => 1031514049
+	},
 
-	19 => q|Are you certain that you want to delete this field?|,
+	'19' => {
+		message => q|Are you certain that you want to delete this field?|,
+		lastUpdated => 1031514049
+	},
 
-	20 => q|Edit Field|,
+	'20' => {
+		message => q|Edit Field|,
+		lastUpdated => 1031514049
+	},
 
-	21 => q|Field Name|,
+	'21' => {
+		message => q|Field Name|,
+		lastUpdated => 1031514049
+	},
 
-	22 => q|Status|,
+	'22' => {
+		message => q|Status|,
+		lastUpdated => 1031514049
+	},
 
-	23 => q|Type|,
+	'23' => {
+		message => q|Type|,
+		lastUpdated => 1031514049
+	},
 
-	24 => q|Possible Values|,
+	'24' => {
+		message => q|Possible Values|,
+		lastUpdated => 1031514049
+	},
 
-	25 => q|Default Value(s)|,
+	'25' => {
+		message => q|Default Value(s)|,
+		lastUpdated => 1053855043
+	},
 
-	79 => q|Subtext|,
+	'79' => {
+		message => q|Subtext|,
+		lastUpdated => 1051482497,
+		context => q|A small piece of text under a form element. Gives extra description.|
+	},
 
-	61 => q|Data Form, Add/Edit|,
+	'61' => {
+		message => q|Data Form, Add/Edit|,
+		lastUpdated => 1053885941
+	},
 
-	62 => q|Data Form Fields, Add/Edit|,
+	'62' => {
+		message => q|Data Form Fields, Add/Edit|,
+		lastUpdated => 1052047004
+	},
 
-	71 => q|This wobject creates a simple multipurpose data-entry form.
+	'71' => {
+		message => q|This wobject creates a simple multipurpose data-entry form.
 <br><br>
 
 <b>Acknowledgement</b><br>
@@ -81,8 +161,11 @@ Choose a template that will be used to display the acknowlegement.
 <b>List Template</b><br>
 Choose a template that will be used to display the list of stored records in this Data Form.
 <p>|,
+		lastUpdated => 1053885941
+	},
 
-	83 => q|The following template variables are available for Data Form templates.
+	'83' => {
+		message => q|The following template variables are available for Data Form templates.
 <p/>
 
 <b>acknowledgement</b><br>
@@ -230,8 +313,11 @@ The end of the form.
 <p>
 
 *Only available if the user has already submitted the form.|,
+		lastUpdated => 1053948922
+	},
 
-	72 => q|You may add as many additional fields to your Data Form as you like.
+	'72' => {
+		message => q|You may add as many additional fields to your Data Form as you like.
 <br><br>
 
 <b>Label</b><br>
@@ -272,38 +358,94 @@ Enter the default value (if any) for the field.  For Yes/No fields, enter "yes" 
 <p>
 
 |,
+		lastUpdated => 1053855075
+	},
 
-	80 => q|Email Template|,
+	'80' => {
+		message => q|Email Template|,
+		lastUpdated => 1052044326,
+		context => q|A template that will construct the email to be sent.|
+	},
 
-	73 => q|Send|,
+	'73' => {
+		message => q|Send|,
+		lastUpdated => 1039776778
+	},
 
-	27 => q|Height|,
+	'27' => {
+		message => q|Height|,
+		lastUpdated => 1045210016
+	},
 
-	28 => q|Optional for text area and HTML area.|,
+	'28' => {
+		message => q|Optional for text area and HTML area.|,
+		lastUpdated => 1052048005
+	},
 
-	100 => q|Are you certain that you want to delete this tab ?|,
+	'100' => {
+		message => q|Are you certain that you want to delete this tab ?|,
+		lastUpdated => 
+	},
 
-	101 => q|Label|,
+	'101' => {
+		message => q|Label|,
+		lastUpdated => 
+	},
 
-	84 => q|Export tab delimited.|,
+	'84' => {
+		message => q|Export tab delimited.|,
+		lastUpdated => 1052088598,
+		context => q|Save the data with tabs as separaters.|
+	},
 
-	82 => q|Data Form Template|,
+	'82' => {
+		message => q|Data Form Template|,
+		lastUpdated => 1053885798
+	},
 
-	81 => q|Acknowlegement Template|,
+	'81' => {
+		message => q|Acknowlegement Template|,
+		lastUpdated => 1052064282,
+		context => q|A template to display whatever data there is to display.|
+	},
 
-	77 => q|Label|,
+	'77' => {
+		message => q|Label|,
+		lastUpdated => 1051467316,
+		context => q|The text in front of a form field. (Like "Context" or "Message".)|
+	},
 
-	76 => q|Add a field.|,
+	'76' => {
+		message => q|Add a field.|,
+		lastUpdated => 1051464925,
+		context => q|As in "Add a field element to this form."|
+	},
 
-	75 => q|Required|,
+	'75' => {
+		message => q|Required|,
+		lastUpdated => 1051463599,
+		context => q|A field that cannot be blank.|
+	},
 
-	74 => q|Mail data?|,
+	'74' => {
+		message => q|Mail data?|,
+		lastUpdated => 1051463006,
+		context => q|As in, "Do you wish to email someone this data?"|
+	},
 
-	85 => q|One per line.|,
+	'85' => {
+		message => q|One per line.|,
+		lastUpdated => 1053855146,
+		context => q|Telling the user to add one entry per line.|
+	},
 
-	88 => q|Data Form List Template|,
+	'88' => {
+		message => q|Data Form List Template|,
+		lastUpdated => 1053885702
+	},
 
-	89 => q|The following variables are available to the Data Form List template:
+	'89' => {
+		message => q|The following variables are available to the Data Form List template:
 <p>
 
 <b>back.url</b><br>
@@ -400,24 +542,55 @@ A conditional indicating whether this field exists for the mail subsystem of the
 </blockquote>
 
 </blockquote>|,
+		lastUpdated => 1053885702
+	},
 
-	87 => q|List Template|,
+	'87' => {
+		message => q|List Template|,
+		lastUpdated => 1053884753,
+		context => q|Prompt the user to select a template for the list view of the data form.|
+	},
 
-	86 => q|List all entries.|,
+	'86' => {
+		message => q|List all entries.|,
+		lastUpdated => 1053882548,
+		context => q|A label that links to  all Data Form entries made to date.|
+	},
 
-	29 => q|is required|,
+	'29' => {
+		message => q|is required|,
+		lastUpdated => 1031515049
+	},
 
-	102 => q|Subtext|,
+	'102' => {
+		message => q|Subtext|,
+		lastUpdated => 
+	},
 
-	106 => q|Tab Template|,
+	'106' => {
+		message => q|Tab Template|,
+		lastUpdated => 
+	},
 
-	105 => q|Add a Tab|,
+	'105' => {
+		message => q|Add a Tab|,
+		lastUpdated => 
+	},
 
-	104 => q|Tab|,
+	'104' => {
+		message => q|Tab|,
+		lastUpdated => 
+	},
 
-	103 => q|Add new Tab|,
+	'103' => {
+		message => q|Add new Tab|,
+		lastUpdated => 
+	},
 
-	90 => q|Delete this entry.|,
+	'90' => {
+		message => q|Delete this entry.|,
+		lastUpdated => 1057208065
+	},
 
 };
 

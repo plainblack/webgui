@@ -2,8 +2,8 @@ package WebGUI::Help::USS;
 
 our $HELP = {
 	'user submission system add/edit' => {
-		title => 61,
-		body => 71,
+		title => '61',
+		body => '71',
 		related => [
 			{
 				tag => 'forum discussion properties',
@@ -28,8 +28,8 @@ our $HELP = {
 		]
 	},
 	'submission form template' => {
-		title => 93,
-		body => 94,
+		title => '93',
+		body => '94',
 		related => [
 			{
 				tag => 'user submission system add/edit',
@@ -38,8 +38,8 @@ our $HELP = {
 		]
 	},
 	'user submission system template' => {
-		title => 74,
-		body => 75,
+		title => '74',
+		body => '75',
 		related => [
 			{
 				tag => 'pagination template variables',
@@ -56,8 +56,8 @@ our $HELP = {
 		]
 	},
 	'submission template' => {
-		title => 76,
-		body => 77,
+		title => '76',
+		body => '77',
 		related => [
 			{
 				tag => 'user submission system add/edit',

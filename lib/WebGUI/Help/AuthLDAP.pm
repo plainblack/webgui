@@ -11,9 +11,9 @@ our $HELP = {
 			}
 		]
 	},
-	'ldap authentication anonymous registration template' => {
-		title => 'create-1',
-		body => 'create-2',
+	'ldap authentication login template' => {
+		title => 'login-1',
+		body => 'login-2',
 		related => [
 			{
 				tag => 'wobject template',
@@ -21,9 +21,9 @@ our $HELP = {
 			}
 		]
 	},
-	'ldap authentication login template' => {
-		title => 'login-1',
-		body => 'login-2',
+	'ldap authentication anonymous registration template' => {
+		title => 'create-1',
+		body => 'create-2',
 		related => [
 			{
 				tag => 'wobject template',

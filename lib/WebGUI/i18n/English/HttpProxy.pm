@@ -1,9 +1,13 @@
 package WebGUI::i18n::English::HttpProxy;
 
 our $I18N = {
-	10 => q|HTTP Proxy, Add/Edit|,
+	'10' => {
+		message => q|HTTP Proxy, Add/Edit|,
+		lastUpdated => 1047858432
+	},
 
-	11 => q|The HTTP Proxy wobject is a very powerful tool. It enables you to embed external sites and applications into your site. For example, if you have a web mail system that you wish your staff could access through the intranet, then you could use the HTTP Proxy to accomplish that.
+	'11' => {
+		message => q|The HTTP Proxy wobject is a very powerful tool. It enables you to embed external sites and applications into your site. For example, if you have a web mail system that you wish your staff could access through the intranet, then you could use the HTTP Proxy to accomplish that.
 
 <p>
 
@@ -45,28 +49,65 @@ A search string used as ending point. Content after this point is not displayed.
 If you proxy a site like Yahoo! that links to other domains, do you wish to allow the user to follow the links to those other domains, or should the proxy stop them as they try to leave the original site you specified?
 <p>
 |,
+		lastUpdated => 1053774887
+	},
 
-	3 => q|HTTP Proxy|,
+	'3' => {
+		message => q|HTTP Proxy|,
+		lastUpdated => 1031510000
+	},
 
-	2 => q|Edit HTTP Proxy|,
+	'2' => {
+		message => q|Edit HTTP Proxy|,
+		lastUpdated => 1031510000
+	},
 
-	1 => q|URL|,
+	'1' => {
+		message => q|URL|,
+		lastUpdated => 1031510000
+	},
 
-	4 => q|Timeout|,
+	'4' => {
+		message => q|Timeout|,
+		lastUpdated => 1047837283
+	},
 
-	5 => q|Allow proxying of other domains?|,
+	'5' => {
+		message => q|Allow proxying of other domains?|,
+		lastUpdated => 1047835817
+	},
 
-	6 => q|Remove style?|,
+	'6' => {
+		message => q|Remove style?|,
+		lastUpdated => 1047837230
+	},
 
-	8 => q|Follow redirects?|,
+	'8' => {
+		message => q|Follow redirects?|,
+		lastUpdated => 1047837255
+	},
 
-	9 => q|Cookie Jar|,
+	'9' => {
+		message => q|Cookie Jar|,
+		lastUpdated => 1047835842
+	},
 
-	12 => q|Rewrite urls ?|,
+	'12' => {
+		message => q|Rewrite urls ?|,
+		lastUpdated => 1055908341
+	},
 
-	13 => q|Search for|,
+	'13' => {
+		message => q|Search for|,
+		lastUpdated => 1060433963,
+		context => q|A string used as starting point when proxying parts of remote content.|
+	},
 
-	14 => q|Stop at|,
+	'14' => {
+		message => q|Stop at|,
+		lastUpdated => 1060433963,
+		context => q|A string used as ending point when proxying parts of remote content.|
+	},
 
 };
 

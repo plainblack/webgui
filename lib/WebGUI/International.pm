@@ -86,7 +86,7 @@ sub get {
 	my $load = "use ".$cmd;
 	eval($load);
 	WebGUI::ErrorHandler::warn($cmd." failed to compile because ".$@) if ($@);
-	$cmd = "\$".$cmd."::I18N->{'".$id."'}";
+	$cmd = "\$".$cmd."::I18N->{'".$id."'}{message}";
 	my $output = eval($cmd);	
 	WebGUI::ErrorHandler::warn("Couldn't get value from ".$cmd." because ".$@) if ($@);
 	$output = get($id,$namespace,"English") if ($output eq "" && $language ne "English");

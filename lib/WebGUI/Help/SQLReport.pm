@@ -2,8 +2,8 @@ package WebGUI::Help::SQLReport;
 
 our $HELP = {
 	'sql report add/edit' => {
-		title => 61,
-		body => 71,
+		title => '61',
+		body => '71',
 		related => [
 			{
 				tag => 'sql report template',
@@ -16,8 +16,8 @@ our $HELP = {
 		]
 	},
 	'sql report template' => {
-		title => 72,
-		body => 73,
+		title => '72',
+		body => '73',
 		related => [
 			{
 				tag => 'pagination template variables',

@@ -11,9 +11,9 @@ our $HELP = {
 			}
 		]
 	},
-	'smb authentication anonymous registration template' => {
-		title => 'create-1',
-		body => 'create-2',
+	'smb authentication login template' => {
+		title => 'login-1',
+		body => 'login-2',
 		related => [
 			{
 				tag => 'wobject template',
@@ -21,9 +21,9 @@ our $HELP = {
 			}
 		]
 	},
-	'smb authentication login template' => {
-		title => 'login-1',
-		body => 'login-2',
+	'smb authentication anonymous registration template' => {
+		title => 'create-1',
+		body => 'create-2',
 		related => [
 			{
 				tag => 'wobject template',

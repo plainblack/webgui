@@ -1,15 +1,28 @@
 package WebGUI::i18n::English::SyndicatedContent;
 
 our $I18N = {
-	1 => q|URL to RSS File|,
+	'1' => {
+		message => q|URL to RSS File|,
+		lastUpdated => 1031514049
+	},
 
-	2 => q|Syndicated Content|,
+	'2' => {
+		message => q|Syndicated Content|,
+		lastUpdated => 1031514049
+	},
 
-	4 => q|Edit Syndicated Content|,
+	'4' => {
+		message => q|Edit Syndicated Content|,
+		lastUpdated => 1031514049
+	},
 
-	61 => q|Syndicated Content, Add/Edit|,
+	'61' => {
+		message => q|Syndicated Content, Add/Edit|,
+		lastUpdated => 1047855741
+	},
 
-	71 => q|Syndicated content is content that is pulled from another site using the RDF/RSS specification. This technology is often used to pull headlines from various news sites like <a href="http://www.cnn.com/">CNN</a> and  <a href="http://slashdot.org/">Slashdot</a>. It can, of course, be used for other things like sports scores, stock market info, etc.
+	'71' => {
+		message => q|Syndicated content is content that is pulled from another site using the RDF/RSS specification. This technology is often used to pull headlines from various news sites like <a href="http://www.cnn.com/">CNN</a> and  <a href="http://slashdot.org/">Slashdot</a>. It can, of course, be used for other things like sports scores, stock market info, etc.
 <br><br>
 
 <b>URL to RSS file</b><br>
@@ -35,10 +48,16 @@ Select a template for this content.
 <p><b>Maximum Headlines</b><br>
 Enter the maximum number of headlines that should be displayed.  For an aggregate feed, the system will display an equal number of headlines from each source, even if doing so requires displaying more than the requested maximum number of headlines.  Set to zero to allow any number of headlines.
 <p>|,
+		lastUpdated => 1047855741
+	},
 
-	72 => q|Syndicated Content Template|,
+	'72' => {
+		message => q|Syndicated Content Template|,
+		lastUpdated => 1047855526
+	},
 
-	73 => q|The following are the template variables available to the Syndicated Content template.
+	'73' => {
+		message => q|The following are the template variables available to the Syndicated Content template.
 
 <p>
 
@@ -71,8 +90,13 @@ The description of the content.
 A URL directly to the original content.
 
 </blockquote>|,
+		lastUpdated => 1047855526
+	},
 
-	3 => q|Maximum Number of Headlines|,
+	'3' => {
+		message => q|Maximum Number of Headlines|,
+		lastUpdated => 1057208065
+	},
 
 };
 

@@ -2,8 +2,8 @@ package WebGUI::Help::SyndicatedContent;
 
 our $HELP = {
 	'syndicated content add/edit' => {
-		title => 61,
-		body => 71,
+		title => '61',
+		body => '71',
 		related => [
 			{
 				tag => 'syndicated content template',
@@ -16,8 +16,8 @@ our $HELP = {
 		]
 	},
 	'syndicated content template' => {
-		title => 72,
-		body => 73,
+		title => '72',
+		body => '73',
 		related => [
 			{
 				tag => 'syndicated content add/edit',

@@ -1,39 +1,88 @@
 package WebGUI::i18n::English::Article;
 
 our $I18N = {
-	1 => q|Article|,
+	'1' => {
+		message => q|Article|,
+		lastUpdated => 1031514049
+	},
 
-	3 => q|Start Date|,
+	'3' => {
+		message => q|Start Date|,
+		lastUpdated => 1031514049
+	},
 
-	4 => q|End Date|,
+	'4' => {
+		message => q|End Date|,
+		lastUpdated => 1031514049
+	},
 
-	6 => q|Image|,
+	'6' => {
+		message => q|Image|,
+		lastUpdated => 1031514049
+	},
 
-	7 => q|Link Title|,
+	'7' => {
+		message => q|Link Title|,
+		lastUpdated => 1031514049
+	},
 
-	8 => q|Link URL|,
+	'8' => {
+		message => q|Link URL|,
+		lastUpdated => 1031514049
+	},
 
-	9 => q|Attachment|,
+	'9' => {
+		message => q|Attachment|,
+		lastUpdated => 1031514049
+	},
 
-	10 => q|Convert carriage returns?|,
+	'10' => {
+		message => q|Convert carriage returns?|,
+		lastUpdated => 1031514049
+	},
 
-	11 => q|(Select "Yes" only if you aren't adding &lt;br&gt; manually.)|,
+	'11' => {
+		message => q|(Select "Yes" only if you aren't adding &lt;br&gt; manually.)|,
+		lastUpdated => 1031514049
+	},
 
-	12 => q|Edit Article|,
+	'12' => {
+		message => q|Edit Article|,
+		lastUpdated => 1031514049
+	},
 
-	13 => q|Delete|,
+	'13' => {
+		message => q|Delete|,
+		lastUpdated => 1031514049
+	},
 
-	22 => q|Author|,
+	'22' => {
+		message => q|Author|,
+		lastUpdated => 1031514049
+	},
 
-	23 => q|Date|,
+	'23' => {
+		message => q|Date|,
+		lastUpdated => 1031514049
+	},
 
-	24 => q|Post Response|,
+	'24' => {
+		message => q|Post Response|,
+		lastUpdated => 1031514049
+	},
 
-	28 => q|View Responses|,
+	'28' => {
+		message => q|View Responses|,
+		lastUpdated => 1031514049
+	},
 
-	61 => q|Article, Add/Edit|,
+	'61' => {
+		message => q|Article, Add/Edit|,
+		lastUpdated => 1066583066
+	},
 
-	71 => q|Articles are the Swiss Army knife of WebGUI. Most pieces of static content can be added via the Article.
+	'71' => {
+		message => q|Articles are the Swiss Army knife of WebGUI. Most pieces of static content can be added via the Article.
 <br><br>
 
 NOTE: You can create a multi-paged article by placing the seperator macro (^-;) at various places through-out your article.
@@ -75,8 +124,11 @@ Checking this box will enable responses to your article much like Articles on Sl
 
 
 |,
+		lastUpdated => 1066583066
+	},
 
-	73 => q|The following template variables are available for article templates.
+	'73' => {
+		message => q|The following template variables are available for article templates.
 <p/>
 
 <b>new.template</b><br>
@@ -179,8 +231,13 @@ The URL to view the replies to this article.
 <p/>
 
 |,
+		lastUpdated => 1082370724
+	},
 
-	72 => q|Article Template|,
+	'72' => {
+		message => q|Article Template|,
+		lastUpdated => 1038794871
+	},
 
 };
 

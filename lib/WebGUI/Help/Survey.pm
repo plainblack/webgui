@@ -2,8 +2,8 @@ package WebGUI::Help::Survey;
 
 our $HELP = {
 	'survey add/edit' => {
-		title => 3,
-		body => 4,
+		title => '3',
+		body => '4',
 		related => [
 			{
 				tag => 'wobjects using',
@@ -12,8 +12,8 @@ our $HELP = {
 		]
 	},
 	'survey template' => {
-		title => 88,
-		body => 89,
+		title => '88',
+		body => '89',
 		related => [
 			{
 				tag => 'survey template common vars',
@@ -30,8 +30,8 @@ our $HELP = {
 		]
 	},
 	'survey template common vars' => {
-		title => 90,
-		body => 91,
+		title => '90',
+		body => '91',
 		related => [
 			{
 				tag => 'survey template',

@@ -2,8 +2,8 @@ package WebGUI::Help::EventsCalendar;
 
 our $HELP = {
 	'events calendar add/edit' => {
-		title => 61,
-		body => 71,
+		title => '61',
+		body => '71',
 		related => [
 			{
 				tag => 'event add/edit',
@@ -20,8 +20,8 @@ our $HELP = {
 		]
 	},
 	'event add/edit' => {
-		title => 72,
-		body => 73,
+		title => '72',
+		body => '73',
 		related => [
 			{
 				tag => 'event template',
@@ -34,8 +34,8 @@ our $HELP = {
 		]
 	},
 	'events calendar template' => {
-		title => 94,
-		body => 95,
+		title => '94',
+		body => '95',
 		related => [
 			{
 				tag => 'events calendar add/edit',
@@ -52,8 +52,8 @@ our $HELP = {
 		]
 	},
 	'event template' => {
-		title => 96,
-		body => 97,
+		title => '96',
+		body => '97',
 		related => [
 			{
 				tag => 'event add/edit',

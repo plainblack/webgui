@@ -2,8 +2,8 @@ package WebGUI::Help::Product;
 
 our $HELP = {
 	'product add/edit' => {
-		title => 38,
-		body => 39,
+		title => '38',
+		body => '39',
 		related => [
 			{
 				tag => 'product related add/edit',
@@ -36,8 +36,8 @@ our $HELP = {
 		]
 	},
 	'product feature add/edit' => {
-		title => 40,
-		body => 41,
+		title => '40',
+		body => '41',
 		related => [
 			{
 				tag => 'product benefit add/edit',
@@ -50,8 +50,8 @@ our $HELP = {
 		]
 	},
 	'product specification add/edit' => {
-		title => 42,
-		body => 43,
+		title => '42',
+		body => '43',
 		related => [
 			{
 				tag => 'product add/edit',
@@ -60,8 +60,8 @@ our $HELP = {
 		]
 	},
 	'product accessory add/edit' => {
-		title => 44,
-		body => 45,
+		title => '44',
+		body => '45',
 		related => [
 			{
 				tag => 'product add/edit',
@@ -70,8 +70,8 @@ our $HELP = {
 		]
 	},
 	'product related add/edit' => {
-		title => 46,
-		body => 47,
+		title => '46',
+		body => '47',
 		related => [
 			{
 				tag => 'product add/edit',
@@ -80,8 +80,8 @@ our $HELP = {
 		]
 	},
 	'product benefit add/edit' => {
-		title => 49,
-		body => 50,
+		title => '49',
+		body => '50',
 		related => [
 			{
 				tag => 'product feature add/edit',
@@ -94,8 +94,8 @@ our $HELP = {
 		]
 	},
 	'product template' => {
-		title => 62,
-		body => 63,
+		title => '62',
+		body => '63',
 		related => [
 			{
 				tag => 'product add/edit',

@@ -1,53 +1,123 @@
 package WebGUI::i18n::English::EventsCalendar;
 
 our $I18N = {
-	89 => q|Show 3 months from start.|,
+	'89' => {
+		message => q|Show 3 months from start.|,
+		lastUpdated => 1038190646
+	},
 
-	2 => q|Events Calendar|,
+	'2' => {
+		message => q|Events Calendar|,
+		lastUpdated => 1031514049
+	},
 
-	4 => q|Happens only once.|,
+	'4' => {
+		message => q|Happens only once.|,
+		lastUpdated => 1031514049
+	},
 
-	20 => q|Add an event.|,
+	'20' => {
+		message => q|Add an event.|,
+		lastUpdated => 1031514049
+	},
 
-	93 => q|Next Event|,
+	'93' => {
+		message => q|Next Event|,
+		lastUpdated => 1038202290
+	},
 
-	8 => q|Recurs every|,
+	'8' => {
+		message => q|Recurs every|,
+		lastUpdated => 1031514049
+	},
 
-	9 => q|until|,
+	'9' => {
+		message => q|until|,
+		lastUpdated => 1031514049
+	},
 
-	78 => q|Don't delete anything, I made a mistake.|,
+	'78' => {
+		message => q|Don't delete anything, I made a mistake.|,
+		lastUpdated => 1031514049
+	},
 
-	12 => q|Edit Events Calendar|,
+	'12' => {
+		message => q|Edit Events Calendar|,
+		lastUpdated => 1031514049
+	},
 
-	13 => q|Edit Event|,
+	'13' => {
+		message => q|Edit Event|,
+		lastUpdated => 1031514049
+	},
 
-	90 => q|Default Month|,
+	'90' => {
+		message => q|Default Month|,
+		lastUpdated => 1038190708
+	},
 
-	14 => q|Start Date|,
+	'14' => {
+		message => q|Start Date|,
+		lastUpdated => 1031514049
+	},
 
-	15 => q|End Date|,
+	'15' => {
+		message => q|End Date|,
+		lastUpdated => 1031514049
+	},
 
-	19 => q|Paginate After|,
+	'19' => {
+		message => q|Paginate After|,
+		lastUpdated => 1031514049
+	},
 
-	77 => q|Delete this event <b>and</b> all of its recurrences.|,
+	'77' => {
+		message => q|Delete this event <b>and</b> all of its recurrences.|,
+		lastUpdated => 1031514049
+	},
 
-	82 => q|Current.|,
+	'82' => {
+		message => q|Current.|,
+		lastUpdated => 1038190803
+	},
 
-	88 => q|Show 6 months from start.|,
+	'88' => {
+		message => q|Show 6 months from start.|,
+		lastUpdated => 1038190632
+	},
 
-	76 => q|Delete only this event.|,
+	'76' => {
+		message => q|Delete only this event.|,
+		lastUpdated => 1031514049
+	},
 
-	80 => q|Event Template|,
+	'80' => {
+		message => q|Event Template|,
+		lastUpdated => 1038190379
+	},
 
-	75 => q|Which do you wish to do?|,
+	'75' => {
+		message => q|Which do you wish to do?|,
+		lastUpdated => 1031514049
+	},
 
-	85 => q|Last in the calendar.|,
+	'85' => {
+		message => q|Last in the calendar.|,
+		lastUpdated => 1038190764
+	},
 
-	81 => q|Start Month|,
+	'81' => {
+		message => q|Start Month|,
+		lastUpdated => 1038190442
+	},
 
-	61 => q|Events Calendar, Add/Edit|,
+	'61' => {
+		message => q|Events Calendar, Add/Edit|,
+		lastUpdated => 1066572488
+	},
 
-	71 => q|Events calendars are used on many intranets to keep track of internal dates that affect a whole organization. Also, Events Calendars on consumer sites are a great way to let your customers know what events you'll be attending and what promotions you'll be having.
+	'71' => {
+		message => q|Events calendars are used on many intranets to keep track of internal dates that affect a whole organization. Also, Events Calendars on consumer sites are a great way to let your customers know what events you'll be attending and what promotions you'll be having.
 <br><br>
 
 <b>Main Template</b><br>
@@ -90,10 +160,16 @@ Leave this set to yes if you want to add events to the Events Calendar directly 
 The title of an individual event.
 
 |,
+		lastUpdated => 1066572488
+	},
 
-	72 => q|Event, Add/Edit|,
+	'72' => {
+		message => q|Event, Add/Edit|,
+		lastUpdated => 1038887363
+	},
 
-	73 => q|<b>Title</b><br>
+	'73' => {
+		message => q|<b>Title</b><br>
 The title for this event.
 <p>
 
@@ -118,22 +194,46 @@ Select a recurrence interval for this event.
 Select "add new event" if you'd like to add another event, otherwise select "go back to page".
 <p>
 |,
+		lastUpdated => 1038887363
+	},
 
-	83 => q|First in the calendar.|,
+	'83' => {
+		message => q|First in the calendar.|,
+		lastUpdated => 1038190781
+	},
 
-	87 => q|Show 9 months from start.|,
+	'87' => {
+		message => q|Show 9 months from start.|,
+		lastUpdated => 1038190626
+	},
 
-	92 => q|Previous Event|,
+	'92' => {
+		message => q|Previous Event|,
+		lastUpdated => 1038202281
+	},
 
-	86 => q|Show 12 months from start.|,
+	'86' => {
+		message => q|Show 12 months from start.|,
+		lastUpdated => 1038190601
+	},
 
-	91 => q|Add a new event.|,
+	'91' => {
+		message => q|Add a new event.|,
+		lastUpdated => 1038190852
+	},
 
-	84 => q|End Month|,
+	'84' => {
+		message => q|End Month|,
+		lastUpdated => 1038190527
+	},
 
-	96 => q|Event Template|,
+	'96' => {
+		message => q|Event Template|,
+		lastUpdated => 1078568518
+	},
 
-	97 => q|The following is the list of template variables available in event templates.
+	'97' => {
+		message => q|The following is the list of template variables available in event templates.
 <p/>
 
 <b>title</b><br/>
@@ -204,10 +304,16 @@ The URL to view the event after this one.
 The description of this event.
 <p/>
 |,
+		lastUpdated => 1078568518
+	},
 
-	94 => q|Events Calendar Template|,
+	'94' => {
+		message => q|Events Calendar Template|,
+		lastUpdated => 1078520840
+	},
 
-	95 => q|The following template variables are available for you to customize your events calendar.
+	'95' => {
+		message => q|The following template variables are available for you to customize your events calendar.
 <p/>
 <b>addevent.url</b><br/>
 The URL to add an event to the calendar.
@@ -449,10 +555,20 @@ A label representing the abbreviated version of "Saturday".
 <p>
 
 |,
+		lastUpdated => 1078520840
+	},
 
-	98 => q|Now!|,
+	'98' => {
+		message => q|Now!|,
+		lastUpdated => 1053888477,
+		context => q|"Something is going to happen now." This will be used to select a range in an events calendar. Now is the date and time right down to the current second.|
+	},
 
-	99 => q|Is master?|,
+	'99' => {
+		message => q|Is master?|,
+		lastUpdated => 1066511974,
+		context => q|Ask the user if this calendar should act as a master calendar.|
+	},
 
 };
 

@@ -1,23 +1,47 @@
 package WebGUI::i18n::English::MessageBoard;
 
 our $I18N = {
-	2 => q|Message Board|,
+	'2' => {
+		message => q|Message Board|,
+		lastUpdated => 1031514049
+	},
 
-	6 => q|Edit Message Board|,
+	'6' => {
+		message => q|Edit Message Board|,
+		lastUpdated => 1031514049
+	},
 
-	77 => q|Edit Forum|,
+	'77' => {
+		message => q|Edit Forum|,
+		lastUpdated => 1066061199,
+		context => q|A title for the forum editing page.|
+	},
 
-	76 => q|Are you certain you wish to delete this forum and all the posts it contains?|,
+	'76' => {
+		message => q|Are you certain you wish to delete this forum and all the posts it contains?|,
+		lastUpdated => 1066055963,
+		context => q|A question prompting the admin whether they truely want to delete a forum from a message board.|
+	},
 
-	61 => q|Message Board, Add/Edit|,
+	'61' => {
+		message => q|Message Board, Add/Edit|,
+		lastUpdated => 1066584548
+	},
 
-	71 => q|Message boards, also called Forums and/or Discussions, are a great way to add community to any site or intranet. Many companies use message boards internally to collaborate on projects.
+	'71' => {
+		message => q|Message boards, also called Forums and/or Discussions, are a great way to add community to any site or intranet. Many companies use message boards internally to collaborate on projects.
 <br><br>
 |,
+		lastUpdated => 1066584548
+	},
 
-	78 => q|Forum, Add/Edit|,
+	'78' => {
+		message => q|Forum, Add/Edit|,
+		lastUpdated => 1066584480
+	},
 
-	79 => q|A message board can contain one or more forums. The following is the list of properties attached to each forum.
+	'79' => {
+		message => q|A message board can contain one or more forums. The following is the list of properties attached to each forum.
 
 <p>
 
@@ -30,12 +54,22 @@ The description of the forum.
 <p>
 
 <b>NOTE:</b> All of the properties of the forum system are also here. See that help page for details.|,
+		lastUpdated => 1066584480
+	},
 
-	75 => q|Add a forum|,
+	'75' => {
+		message => q|Add a forum|,
+		lastUpdated => 1066038194,
+		context => q|A label for a link that allows an admin to add a forum to a message board.|
+	},
 
-	73 => q|Message Board Template|,
+	'73' => {
+		message => q|Message Board Template|,
+		lastUpdated => 1066584179
+	},
 
-	74 => q|The following is the list of template variables available in message board templates.
+	'74' => {
+		message => q|The following is the list of template variables available in message board templates.
 <p/>
 
 <b>forum.add.url</b><br>
@@ -173,6 +207,8 @@ The controls for the default forum.
 A condition indicating whether there is more than one forum.
 <p>
 |,
+		lastUpdated => 1066584179
+	},
 
 };
 

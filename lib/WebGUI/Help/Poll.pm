@@ -2,8 +2,8 @@ package WebGUI::Help::Poll;
 
 our $HELP = {
 	'poll add/edit' => {
-		title => 61,
-		body => 71,
+		title => '61',
+		body => '71',
 		related => [
 			{
 				tag => 'poll template',
@@ -16,8 +16,8 @@ our $HELP = {
 		]
 	},
 	'poll template' => {
-		title => 73,
-		body => 74,
+		title => '73',
+		body => '74',
 		related => [
 			{
 				tag => 'poll add/edit',

@@ -1,95 +1,228 @@
 package WebGUI::i18n::English::USS;
 
 our $I18N = {
-	1 => q|Who can approve?|,
+	'1' => {
+		message => q|Who can approve?|,
+		lastUpdated => 1031514049
+	},
 
-	2 => q|Who can contribute?|,
+	'2' => {
+		message => q|Who can contribute?|,
+		lastUpdated => 1031514049
+	},
 
-	92 => q|Open in new window?|,
+	'92' => {
+		message => q|Open in new window?|,
+		lastUpdated => 1031514049
+	},
 
-	3 => q|You have a new user submission to approve.|,
+	'3' => {
+		message => q|You have a new user submission to approve.|,
+		lastUpdated => 1031514049
+	},
 
-	4 => q|Your submission has been approved.|,
+	'4' => {
+		message => q|Your submission has been approved.|,
+		lastUpdated => 1031514049
+	},
 
-	85 => q|Question|,
+	'85' => {
+		message => q|Question|,
+		lastUpdated => 1031514049
+	},
 
-	5 => q|Your submission has been denied.|,
+	'5' => {
+		message => q|Your submission has been denied.|,
+		lastUpdated => 1031514049
+	},
 
-	86 => q|Answer|,
+	'86' => {
+		message => q|Answer|,
+		lastUpdated => 1031514049
+	},
 
-	6 => q|Submissions Per Page|,
+	'6' => {
+		message => q|Submissions Per Page|,
+		lastUpdated => 1031514049
+	},
 
-	91 => q|URL|,
+	'91' => {
+		message => q|URL|,
+		lastUpdated => 1031514049
+	},
 
-	83 => q|Add a new question.|,
+	'83' => {
+		message => q|Add a new question.|,
+		lastUpdated => 1031514049
+	},
 
-	84 => q|Edit Question|,
+	'84' => {
+		message => q|Edit Question|,
+		lastUpdated => 1031514049
+	},
 
-	90 => q|Edit Link|,
+	'90' => {
+		message => q|Edit Link|,
+		lastUpdated => 1031514049
+	},
 
-	12 => q|(Uncheck if you're writing an HTML submission.)|,
+	'12' => {
+		message => q|(Uncheck if you're writing an HTML submission.)|,
+		lastUpdated => 1031514049
+	},
 
-	89 => q|Add a new link.|,
+	'89' => {
+		message => q|Add a new link.|,
+		lastUpdated => 1031514049
+	},
 
-	13 => q|Date Submitted|,
+	'13' => {
+		message => q|Date Submitted|,
+		lastUpdated => 1031514049
+	},
 
-	14 => q|Status|,
+	'14' => {
+		message => q|Status|,
+		lastUpdated => 1031514049
+	},
 
-	15 => q|Edit/Delete|,
+	'15' => {
+		message => q|Edit/Delete|,
+		lastUpdated => 1031514049
+	},
 
-	16 => q|Untitled|,
+	'16' => {
+		message => q|Untitled|,
+		lastUpdated => 1031514049
+	},
 
-	17 => q|Are you certain you wish to delete this submission?|,
+	'17' => {
+		message => q|Are you certain you wish to delete this submission?|,
+		lastUpdated => 1031514049
+	},
 
-	59 => q|Next Submission|,
+	'59' => {
+		message => q|Next Submission|,
+		lastUpdated => 1031514049
+	},
 
-	18 => q|Edit User Submission System|,
+	'18' => {
+		message => q|Edit User Submission System|,
+		lastUpdated => 1031514049
+	},
 
-	19 => q|Edit Submission|,
+	'19' => {
+		message => q|Edit Submission|,
+		lastUpdated => 1031514049
+	},
 
-	20 => q|Post New Submission|,
+	'20' => {
+		message => q|Post New Submission|,
+		lastUpdated => 1031514049
+	},
 
-	21 => q|Submitted By|,
+	'21' => {
+		message => q|Submitted By|,
+		lastUpdated => 1031514049
+	},
 
-	27 => q|Edit|,
+	'27' => {
+		message => q|Edit|,
+		lastUpdated => 1031514049
+	},
 
-	28 => q|Return To Submissions List|,
+	'28' => {
+		message => q|Return To Submissions List|,
+		lastUpdated => 1031514049
+	},
 
-	29 => q|User Submission System|,
+	'29' => {
+		message => q|User Submission System|,
+		lastUpdated => 1031514049
+	},
 
-	31 => q|Content|,
+	'31' => {
+		message => q|Content|,
+		lastUpdated => 1031514049
+	},
 
-	32 => q|Image|,
+	'32' => {
+		message => q|Image|,
+		lastUpdated => 1031514049
+	},
 
-	33 => q|Attachment|,
+	'33' => {
+		message => q|Attachment|,
+		lastUpdated => 1031514049
+	},
 
-	35 => q|Title|,
+	'35' => {
+		message => q|Title|,
+		lastUpdated => 1031514049
+	},
 
-	37 => q|Delete|,
+	'37' => {
+		message => q|Delete|,
+		lastUpdated => 1031514049
+	},
 
-	58 => q|Previous Submission|,
+	'58' => {
+		message => q|Previous Submission|,
+		lastUpdated => 1031514049
+	},
 
-	39 => q|Post a Reply|,
+	'39' => {
+		message => q|Post a Reply|,
+		lastUpdated => 1031514049
+	},
 
-	41 => q|Date|,
+	'41' => {
+		message => q|Date|,
+		lastUpdated => 1031514049
+	},
 
-	46 => q|Read more...|,
+	'46' => {
+		message => q|Read more...|,
+		lastUpdated => 1031514049
+	},
 
-	47 => q|Post a Response|,
+	'47' => {
+		message => q|Post a Response|,
+		lastUpdated => 1031514049
+	},
 
-	48 => q|Allow discussion?|,
+	'48' => {
+		message => q|Allow discussion?|,
+		lastUpdated => 1031514049
+	},
 
-	51 => q|Display thumbnails?|,
+	'51' => {
+		message => q|Display thumbnails?|,
+		lastUpdated => 1031514049
+	},
 
-	52 => q|Thumbnail|,
+	'52' => {
+		message => q|Thumbnail|,
+		lastUpdated => 1031514049
+	},
 
-	53 => q|Layout|,
+	'53' => {
+		message => q|Layout|,
+		lastUpdated => 1031514049
+	},
 
-	57 => q|Responses|,
+	'57' => {
+		message => q|Responses|,
+		lastUpdated => 1031514049
+	},
 
-	76 => q|Submission Template|,
+	'76' => {
+		message => q|Submission Template|,
+		lastUpdated => 1038867009
+	},
 
-	77 => q|The following are the template variables used in a submission template. Submission templates are used to display the individual submissions in a user submission system.
+	'77' => {
+		message => q|The following are the template variables used in a submission template. Submission templates are used to display the individual submissions in a user submission system.
 <p/>
 
 <b>title</b><br/>
@@ -302,14 +435,26 @@ The filename of the attached file.
 
 
 |,
+		lastUpdated => 1070197000
+	},
 
-	30 => q|Karma Per Submission|,
+	'30' => {
+		message => q|Karma Per Submission|,
+		lastUpdated => 1031514049
+	},
 
-	73 => q|Submission Template|,
+	'73' => {
+		message => q|Submission Template|,
+		lastUpdated => 1036277524
+	},
 
-	61 => q|User Submission System, Add/Edit|,
+	'61' => {
+		message => q|User Submission System, Add/Edit|,
+		lastUpdated => 1047859664
+	},
 
-	71 => q|User Submission Systems (USS) are a great way to add a sense of community to any site as well as get free content from your users. The User Submission System name is misleading to some people, because they immediately think of users as visitors. However, users are also staff, or business partners, or even yourself. With the USS you can select who can add new content, and even who can moderate that content.
+	'71' => {
+		message => q|User Submission Systems (USS) are a great way to add a sense of community to any site as well as get free content from your users. The User Submission System name is misleading to some people, because they immediately think of users as visitors. However, users are also staff, or business partners, or even yourself. With the USS you can select who can add new content, and even who can moderate that content.
 <br><br>
 User Submission systems are so versatile that they allow you to create all kinds of applications, just by editing a few templates. Example applications are Photo Galleries, FAQs, Link Lists, Guest Books, Classifieds, and more.
 
@@ -370,20 +515,46 @@ Checking this box will enable responses to your article much like Articles on Sl
 
 
 |,
+		lastUpdated => 1070199700
+	},
 
-	82 => q|Descending|,
+	'82' => {
+		message => q|Descending|,
+		lastUpdated => 1066636432,
+		context => q|When a list is the reverse of chronological, alphabetical, or numeric order. The opposite of Ascending.|
+	},
 
-	81 => q|Ascending|,
+	'81' => {
+		message => q|Ascending|,
+		lastUpdated => 1066636389,
+		context => q|When a list is in chronological, alphabetical, or numeric order.|
+	},
 
-	80 => q|Sort Order|,
+	'80' => {
+		message => q|Sort Order|,
+		lastUpdated => 1066636329,
+		context => q|The direction of a sort.|
+	},
 
-	79 => q|Sort By|,
+	'79' => {
+		message => q|Sort By|,
+		lastUpdated => 1066636255,
+		context => q|A field to order a list with.|
+	},
 
-	78 => q|Date Updated|,
+	'78' => {
+		message => q|Date Updated|,
+		lastUpdated => 1066636183,
+		context => q|A label for describing the date when something was changed.|
+	},
 
-	74 => q|User Submission System Template|,
+	'74' => {
+		message => q|User Submission System Template|,
+		lastUpdated => 1038865585
+	},
 
-	75 => q|This is the listing of template variables available in user submission system templates.
+	'75' => {
+		message => q|This is the listing of template variables available in user submission system templates.
 <p/>
 
 <b>readmore.label</b><br/>
@@ -557,14 +728,28 @@ The administrative toolbar for each submission.
 <p/>
 
 |,
+		lastUpdated => 1082367203
+	},
 
-	87 => q|Submission Form Template|,
+	'87' => {
+		message => q|Submission Form Template|,
+		lastUpdated => 1070027660,
+		context => q|Prompt the user to select a template for the USS submission form.|
+	},
 
-	88 => q|Sequence|,
+	'88' => {
+		message => q|Sequence|,
+		lastUpdated => 1070027660,
+		context => q|A type of ordering in the USS that will allow the admin to specify (or sequence) the order of the results.|
+	},
 
-	93 => q|Submission Form Template|,
+	'93' => {
+		message => q|Submission Form Template|,
+		lastUpdated => 1070199365
+	},
 
-	94 => q|The following template variables are available to you when building your submission form templates.
+	'94' => {
+		message => q|The following template variables are available to you when building your submission form templates.
 <p>
 
 <b>submission.isNew</b><br>
@@ -699,6 +884,8 @@ A submit button.
 The bottom of the form.
 <p>
 |,
+		lastUpdated => 1070199365
+	},
 
 };
 

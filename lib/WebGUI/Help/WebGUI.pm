@@ -2,8 +2,8 @@ package WebGUI::Help::WebGUI;
 
 our $HELP = {
 	'image add/edit' => {
-		title => 670,
-		body => 625,
+		title => '670',
+		body => '625',
 		related => [
 			{
 				tag => 'collateral manage',
@@ -12,8 +12,8 @@ our $HELP = {
 		]
 	},
 	'root manage' => {
-		title => 678,
-		body => 633,
+		title => '678',
+		body => '633',
 		related => [
 			{
 				tag => 'page add/edit',
@@ -26,8 +26,8 @@ our $HELP = {
 		]
 	},
 	'packages creating' => {
-		title => 681,
-		body => 636,
+		title => '681',
+		body => '636',
 		related => [
 			{
 				tag => 'package add',
@@ -44,8 +44,8 @@ our $HELP = {
 		]
 	},
 	'package add' => {
-		title => 680,
-		body => 635,
+		title => '680',
+		body => '635',
 		related => [
 			{
 				tag => 'packages creating',
@@ -54,8 +54,8 @@ our $HELP = {
 		]
 	},
 	'search engine using' => {
-		title => 675,
-		body => 630,
+		title => '675',
+		body => '630',
 		related => [
 			{
 				tag => 'style macros',
@@ -64,8 +64,8 @@ our $HELP = {
 		]
 	},
 	'company information edit' => {
-		title => 656,
-		body => 611,
+		title => '656',
+		body => '611',
 		related => [
 			{
 				tag => 'settings manage',
@@ -74,8 +74,8 @@ our $HELP = {
 		]
 	},
 	'trash empty' => {
-		title => 696,
-		body => 651,
+		title => '696',
+		body => '651',
 		related => [
 			{
 				tag => 'trash manage',
@@ -84,8 +84,8 @@ our $HELP = {
 		]
 	},
 	'profile settings edit' => {
-		title => 672,
-		body => 627,
+		title => '672',
+		body => '627',
 		related => [
 			{
 				tag => 'settings manage',
@@ -94,8 +94,8 @@ our $HELP = {
 		]
 	},
 	'miscellaneous settings edit' => {
-		title => 674,
-		body => 629,
+		title => '674',
+		body => '629',
 		related => [
 			{
 				tag => 'settings manage',
@@ -104,8 +104,8 @@ our $HELP = {
 		]
 	},
 	'style template' => {
-		title => 1073,
-		body => 1074,
+		title => '1073',
+		body => '1074',
 		related => [
 			{
 				tag => 'style macros',
@@ -126,8 +126,8 @@ our $HELP = {
 		]
 	},
 	'messaging settings edit' => {
-		title => 663,
-		body => 618,
+		title => '663',
+		body => '618',
 		related => [
 			{
 				tag => 'settings manage',
@@ -136,8 +136,8 @@ our $HELP = {
 		]
 	},
 	'wobjects using' => {
-		title => 671,
-		body => 626,
+		title => '671',
+		body => '626',
 		related => [
 			{
 				tag => 'macros using',
@@ -158,8 +158,8 @@ our $HELP = {
 		]
 	},
 	'wobject add/edit' => {
-		title => 677,
-		body => 632,
+		title => '677',
+		body => '632',
 		related => [
 			{
 				tag => 'article add/edit',
@@ -224,8 +224,8 @@ our $HELP = {
 		]
 	},
 	'style sheets using' => {
-		title => 668,
-		body => 623,
+		title => '668',
+		body => '623',
 		related => [
 			{
 				tag => 'page template',
@@ -238,8 +238,8 @@ our $HELP = {
 		]
 	},
 	'group add/edit' => {
-		title => 667,
-		body => 622,
+		title => '667',
+		body => '622',
 		related => [
 			{
 				tag => 'groups manage',
@@ -248,8 +248,8 @@ our $HELP = {
 		]
 	},
 	'user settings edit' => {
-		title => 652,
-		body => 607,
+		title => '652',
+		body => '607',
 		related => [
 			{
 				tag => 'settings manage',
@@ -258,8 +258,8 @@ our $HELP = {
 		]
 	},
 	'group delete' => {
-		title => 665,
-		body => 620,
+		title => '665',
+		body => '620',
 		related => [
 			{
 				tag => 'groups manage',
@@ -268,8 +268,8 @@ our $HELP = {
 		]
 	},
 	'wobject delete' => {
-		title => 664,
-		body => 619,
+		title => '664',
+		body => '619',
 		related => [
 			{
 				tag => 'wobjects using',
@@ -278,8 +278,8 @@ our $HELP = {
 		]
 	},
 	'settings manage' => {
-		title => 662,
-		body => 617,
+		title => '662',
+		body => '617',
 		related => [
 			{
 				tag => 'company information edit',
@@ -308,8 +308,8 @@ our $HELP = {
 		]
 	},
 	'groups manage' => {
-		title => 660,
-		body => 615,
+		title => '660',
+		body => '615',
 		related => [
 			{
 				tag => 'group add/edit',
@@ -326,8 +326,8 @@ our $HELP = {
 		]
 	},
 	'users manage' => {
-		title => 658,
-		body => 613,
+		title => '658',
+		body => '613',
 		related => [
 			{
 				tag => 'groups manage',
@@ -348,8 +348,8 @@ our $HELP = {
 		]
 	},
 	'user delete' => {
-		title => 657,
-		body => 612,
+		title => '657',
+		body => '612',
 		related => [
 			{
 				tag => 'users manage',
@@ -358,8 +358,8 @@ our $HELP = {
 		]
 	},
 	'user profile edit' => {
-		title => 682,
-		body => 637,
+		title => '682',
+		body => '637',
 		related => [
 			{
 				tag => 'users manage',
@@ -368,8 +368,8 @@ our $HELP = {
 		]
 	},
 	'user add/edit' => {
-		title => 655,
-		body => 610,
+		title => '655',
+		body => '610',
 		related => [
 			{
 				tag => 'users manage',
@@ -378,8 +378,8 @@ our $HELP = {
 		]
 	},
 	'page delete' => {
-		title => 653,
-		body => 608,
+		title => '653',
+		body => '608',
 		related => [
 			{
 				tag => 'page add/edit',
@@ -388,8 +388,8 @@ our $HELP = {
 		]
 	},
 	'page add/edit' => {
-		title => 642,
-		body => 606,
+		title => '642',
+		body => '606',
 		related => [
 			{
 				tag => 'page template',
@@ -402,8 +402,8 @@ our $HELP = {
 		]
 	},
 	'content settings edit' => {
-		title => 679,
-		body => 634,
+		title => '679',
+		body => '634',
 		related => [
 			{
 				tag => 'settings manage',
@@ -412,8 +412,8 @@ our $HELP = {
 		]
 	},
 	'templates manage' => {
-		title => 683,
-		body => 638,
+		title => '683',
+		body => '638',
 		related => [
 			{
 				tag => 'themes manage',
@@ -434,8 +434,8 @@ our $HELP = {
 		]
 	},
 	'template add/edit' => {
-		title => 684,
-		body => 639,
+		title => '684',
+		body => '639',
 		related => [
 			{
 				tag => 'templates manage',
@@ -444,8 +444,8 @@ our $HELP = {
 		]
 	},
 	'template delete' => {
-		title => 685,
-		body => 640,
+		title => '685',
+		body => '640',
 		related => [
 			{
 				tag => 'templates manage',
@@ -454,8 +454,8 @@ our $HELP = {
 		]
 	},
 	'macros using' => {
-		title => 669,
-		body => 624,
+		title => '669',
+		body => '624',
 		related => [
 			{
 				tag => 'collateral macros',
@@ -480,8 +480,8 @@ our $HELP = {
 		]
 	},
 	'trash manage' => {
-		title => 960,
-		body => 961,
+		title => '960',
+		body => '961',
 		related => [
 			{
 				tag => 'trash empty',
@@ -490,8 +490,8 @@ our $HELP = {
 		]
 	},
 	'clipboard manage' => {
-		title => 957,
-		body => 958,
+		title => '957',
+		body => '958',
 		related => [
 			{
 				tag => 'clipboard empty',
@@ -500,8 +500,8 @@ our $HELP = {
 		]
 	},
 	'karma using' => {
-		title => 697,
-		body => 698,
+		title => '697',
+		body => '698',
 		related => [
 			{
 				tag => 'article add/edit',
@@ -530,8 +530,8 @@ our $HELP = {
 		]
 	},
 	'collateral manage' => {
-		title => 785,
-		body => 786,
+		title => '785',
+		body => '786',
 		related => [
 			{
 				tag => 'collateral macros',
@@ -560,8 +560,8 @@ our $HELP = {
 		]
 	},
 	'template language' => {
-		title => 825,
-		body => 826,
+		title => '825',
+		body => '826',
 		related => [
 			{
 				tag => 'templates manage',
@@ -570,8 +570,8 @@ our $HELP = {
 		]
 	},
 	'wobject template' => {
-		title => 827,
-		body => 828,
+		title => '827',
+		body => '828',
 		related => [
 			{
 				tag => 'article template',
@@ -616,8 +616,8 @@ our $HELP = {
 		]
 	},
 	'page template' => {
-		title => 829,
-		body => 830,
+		title => '829',
+		body => '830',
 		related => [
 			{
 				tag => 'page add/edit',
@@ -630,8 +630,8 @@ our $HELP = {
 		]
 	},
 	'collateral macros' => {
-		title => 831,
-		body => 832,
+		title => '831',
+		body => '832',
 		related => [
 			{
 				tag => 'collateral manage',
@@ -644,8 +644,8 @@ our $HELP = {
 		]
 	},
 	'file add/edit' => {
-		title => 833,
-		body => 834,
+		title => '833',
+		body => '834',
 		related => [
 			{
 				tag => 'collateral manage',
@@ -654,8 +654,8 @@ our $HELP = {
 		]
 	},
 	'snippet add/edit' => {
-		title => 835,
-		body => 836,
+		title => '835',
+		body => '836',
 		related => [
 			{
 				tag => 'collateral manage',
@@ -664,8 +664,8 @@ our $HELP = {
 		]
 	},
 	'folder add/edit' => {
-		title => 837,
-		body => 838,
+		title => '837',
+		body => '838',
 		related => [
 			{
 				tag => 'collateral manage',
@@ -674,8 +674,8 @@ our $HELP = {
 		]
 	},
 	'programmer macros' => {
-		title => 839,
-		body => 840,
+		title => '839',
+		body => '840',
 		related => [
 			{
 				tag => 'macros using',
@@ -684,8 +684,8 @@ our $HELP = {
 		]
 	},
 	'navigation macro' => {
-		title => 841,
-		body => 842,
+		title => '841',
+		body => '842',
 		related => [
 			{
 				tag => 'macros using',
@@ -694,8 +694,8 @@ our $HELP = {
 		]
 	},
 	'user macros' => {
-		title => 843,
-		body => 844,
+		title => '843',
+		body => '844',
 		related => [
 			{
 				tag => 'macros using',
@@ -704,8 +704,8 @@ our $HELP = {
 		]
 	},
 	'style macros' => {
-		title => 845,
-		body => 846,
+		title => '845',
+		body => '846',
 		related => [
 			{
 				tag => 'macros using',
@@ -718,8 +718,8 @@ our $HELP = {
 		]
 	},
 	'clipboard empty' => {
-		title => 968,
-		body => 969,
+		title => '968',
+		body => '969',
 		related => [
 			{
 				tag => 'clipboard manage',
@@ -728,8 +728,8 @@ our $HELP = {
 		]
 	},
 	'themes manage' => {
-		title => 931,
-		body => 932,
+		title => '931',
+		body => '932',
 		related => [
 			{
 				tag => 'collateral manage',
@@ -754,8 +754,8 @@ our $HELP = {
 		]
 	},
 	'theme edit' => {
-		title => 933,
-		body => 934,
+		title => '933',
+		body => '934',
 		related => [
 			{
 				tag => 'themes manage',
@@ -764,8 +764,8 @@ our $HELP = {
 		]
 	},
 	'theme import' => {
-		title => 936,
-		body => 937,
+		title => '936',
+		body => '937',
 		related => [
 			{
 				tag => 'themes manage',
@@ -774,8 +774,8 @@ our $HELP = {
 		]
 	},
 	'theme delete' => {
-		title => 938,
-		body => 939,
+		title => '938',
+		body => '939',
 		related => [
 			{
 				tag => 'themes manage',
@@ -784,8 +784,8 @@ our $HELP = {
 		]
 	},
 	'database links manage' => {
-		title => 997,
-		body => 1000,
+		title => '997',
+		body => '1000',
 		related => [
 			{
 				tag => 'database link add/edit',
@@ -802,8 +802,8 @@ our $HELP = {
 		]
 	},
 	'database link add/edit' => {
-		title => 998,
-		body => 1001,
+		title => '998',
+		body => '1001',
 		related => [
 			{
 				tag => 'database links manage',
@@ -820,8 +820,8 @@ our $HELP = {
 		]
 	},
 	'database link delete' => {
-		title => 999,
-		body => 1002,
+		title => '999',
+		body => '1002',
 		related => [
 			{
 				tag => 'database links manage',
@@ -838,8 +838,8 @@ our $HELP = {
 		]
 	},
 	'forum discussion properties' => {
-		title => 1054,
-		body => 1055,
+		title => '1054',
+		body => '1055',
 		related => [
 			{
 				tag => 'forum notification template',
@@ -868,8 +868,8 @@ our $HELP = {
 		]
 	},
 	'forum template' => {
-		title => 1056,
-		body => 1057,
+		title => '1056',
+		body => '1057',
 		related => [
 			{
 				tag => 'forum discussion properties',
@@ -886,8 +886,8 @@ our $HELP = {
 		]
 	},
 	'forum post template' => {
-		title => 1058,
-		body => 1059,
+		title => '1058',
+		body => '1059',
 		related => [
 			{
 				tag => 'forum discussion properties',
@@ -904,8 +904,8 @@ our $HELP = {
 		]
 	},
 	'forum thread template' => {
-		title => 1060,
-		body => 1061,
+		title => '1060',
+		body => '1061',
 		related => [
 			{
 				tag => 'forum discussion properties',
@@ -926,8 +926,8 @@ our $HELP = {
 		]
 	},
 	'forum notification template' => {
-		title => 1062,
-		body => 1063,
+		title => '1062',
+		body => '1063',
 		related => [
 			{
 				tag => 'forum discussion properties',
@@ -948,8 +948,8 @@ our $HELP = {
 		]
 	},
 	'forum post form template' => {
-		title => 1065,
-		body => 1066,
+		title => '1065',
+		body => '1066',
 		related => [
 			{
 				tag => 'forum discussion properties',
@@ -970,8 +970,8 @@ our $HELP = {
 		]
 	},
 	'forum search template' => {
-		title => 1067,
-		body => 1068,
+		title => '1067',
+		body => '1068',
 		related => [
 			{
 				tag => 'forum discussion properties',
@@ -988,8 +988,8 @@ our $HELP = {
 		]
 	},
 	'pagination template variables' => {
-		title => 1085,
-		body => 1086,
+		title => '1085',
+		body => '1086',
 		related => [
 			{
 				tag => 'wobject template',
@@ -998,8 +998,8 @@ our $HELP = {
 		]
 	},
 	'gradebook report template' => {
-		title => 1087,
-		body => 1088,
+		title => '1087',
+		body => '1088',
 		related => [
 			{
 				tag => 'pagination template variables',
@@ -1016,8 +1016,8 @@ our $HELP = {
 		]
 	},
 	'survey response template' => {
-		title => 1089,
-		body => 1090,
+		title => '1089',
+		body => '1090',
 		related => [
 			{
 				tag => 'survey template common vars',
@@ -1030,8 +1030,8 @@ our $HELP = {
 		]
 	},
 	'statistical overview report template' => {
-		title => 1091,
-		body => 1092,
+		title => '1091',
+		body => '1092',
 		related => [
 			{
 				tag => 'pagination template variables',
@@ -1048,8 +1048,8 @@ our $HELP = {
 		]
 	},
 	'navigation add/edit' => {
-		title => 1098,
-		body => 1093,
+		title => '1098',
+		body => '1093',
 		related => [
 			{
 				tag => 'navigation macro',
@@ -1070,8 +1070,8 @@ our $HELP = {
 		]
 	},
 	'navigation manage' => {
-		title => 1094,
-		body => 1095,
+		title => '1094',
+		body => '1095',
 		related => [
 			{
 				tag => 'navigation macro',
@@ -1088,8 +1088,8 @@ our $HELP = {
 		]
 	},
 	'navigation template' => {
-		title => 1096,
-		body => 1097,
+		title => '1096',
+		body => '1097',
 		related => [
 			{
 				tag => 'navigation macro',

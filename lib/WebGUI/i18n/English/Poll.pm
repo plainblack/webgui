@@ -1,31 +1,68 @@
 package WebGUI::i18n::English::Poll;
 
 our $I18N = {
-	1 => q|Poll|,
+	'1' => {
+		message => q|Poll|,
+		lastUpdated => 1031514049
+	},
 
-	3 => q|Active|,
+	'3' => {
+		message => q|Active|,
+		lastUpdated => 1031514049
+	},
 
-	4 => q|Who can vote?|,
+	'4' => {
+		message => q|Who can vote?|,
+		lastUpdated => 1031514049
+	},
 
-	5 => q|Graph Width|,
+	'5' => {
+		message => q|Graph Width|,
+		lastUpdated => 1031514049
+	},
 
-	6 => q|Question|,
+	'6' => {
+		message => q|Question|,
+		lastUpdated => 1031514049
+	},
 
-	7 => q|Answers|,
+	'7' => {
+		message => q|Answers|,
+		lastUpdated => 1031514049
+	},
 
-	8 => q|(Enter one answer per line. No more than 20.)|,
+	'8' => {
+		message => q|(Enter one answer per line. No more than 20.)|,
+		lastUpdated => 1031514049
+	},
 
-	9 => q|Edit Poll|,
+	'9' => {
+		message => q|Edit Poll|,
+		lastUpdated => 1031514049
+	},
 
-	10 => q|Reset votes.|,
+	'10' => {
+		message => q|Reset votes.|,
+		lastUpdated => 1031514049
+	},
 
-	11 => q|Vote!|,
+	'11' => {
+		message => q|Vote!|,
+		lastUpdated => 1031514049
+	},
 
-	20 => q|Karma Per Vote|,
+	'20' => {
+		message => q|Karma Per Vote|,
+		lastUpdated => 1031514049
+	},
 
-	61 => q|Poll, Add/Edit|,
+	'61' => {
+		message => q|Poll, Add/Edit|,
+		lastUpdated => 1050183732
+	},
 
-	71 => q|Polls can be used to get the impressions of your users on various topics.
+	'71' => {
+		message => q|Polls can be used to get the impressions of your users on various topics.
 <br><br>
 <b>Active</b><br>
 If this box is checked, then users will be able to vote. Otherwise they'll only be able to see the results of the poll.
@@ -59,10 +96,16 @@ In order to be sure that the ordering of the answers in the poll does not bias y
 Reset the votes on this Poll.
 <br><br>
 |,
+		lastUpdated => 1050183732
+	},
 
-	73 => q|Poll Template|,
+	'73' => {
+		message => q|Poll Template|,
+		lastUpdated => 1050183668
+	},
 
-	74 => q|The following variables are available to the poll template:
+	'74' => {
+		message => q|The following variables are available to the poll template:
 
 <b>canVote</b><br>
 A condition indicating whether the user has the right to vote on this poll.
@@ -127,10 +170,18 @@ The total number of votes that have been placed on this poll.
 <p>
 
 |,
+		lastUpdated => 1050183668
+	},
 
-	72 => q|Randomize answers?|,
+	'72' => {
+		message => q|Randomize answers?|,
+		lastUpdated => 1031514049
+	},
 
-	12 => q|Total Votes|,
+	'12' => {
+		message => q|Total Votes|,
+		lastUpdated => 1050182699
+	},
 
 };
 

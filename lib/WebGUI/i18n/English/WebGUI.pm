@@ -1,29 +1,64 @@
 package WebGUI::i18n::English::WebGUI;
 
 our $I18N = {
-	367 => q|Expire Offset|,
+	'367' => {
+		message => q|Expire Offset|,
+		lastUpdated => 1044126611
+	},
 
-	1 => q|Add content...|,
+	'1' => {
+		message => q|Add content...|,
+		lastUpdated => 1031514049
+	},
 
-	2 => q|Page|,
+	'2' => {
+		message => q|Page|,
+		lastUpdated => 1031514049
+	},
 
-	564 => q|Who can post?|,
+	'564' => {
+		message => q|Who can post?|,
+		lastUpdated => 1031514049
+	},
 
-	1023 => q|Unsubscribe from discussion|,
+	'1023' => {
+		message => q|Unsubscribe from discussion|,
+		lastUpdated => 1065875186,
+		context => q|A label for a link that unsubscribes the user from the discussion they are currently viewing.|
+	},
 
-	4 => q|Manage settings.|,
+	'4' => {
+		message => q|Manage settings.|,
+		lastUpdated => 1031514049
+	},
 
-	700 => q|Day(s)|,
+	'700' => {
+		message => q|Day(s)|,
+		lastUpdated => 1031514049
+	},
 
-	816 => q|Status|,
+	'816' => {
+		message => q|Status|,
+		lastUpdated => 1038431169
+	},
 
-	566 => q|Edit Timeout|,
+	'566' => {
+		message => q|Edit Timeout|,
+		lastUpdated => 1031514049
+	},
 
-	5 => q|Manage groups.|,
+	'5' => {
+		message => q|Manage groups.|,
+		lastUpdated => 1031514049
+	},
 
-	701 => q|Week(s)|,
+	'701' => {
+		message => q|Week(s)|,
+		lastUpdated => 1031514049
+	},
 
-	1061 => q|These are the template variables for the thread template.
+	'1061' => {
+		message => q|These are the template variables for the thread template.
 <p>
 
 <b>callback.url</b><br>
@@ -224,504 +259,1254 @@ The description of this forum as passed by the calling object.
 <p>
 
 |,
-
-	1080 => q|Use admin style?|,
-
-	560 => q|Approved|,
-
-	7 => q|Manage users.|,
-
-	561 => q|Denied|,
-
-	8 => q|View page not found.|,
-
-	728 => q|Are you certain you wish to delete this file?|,
-
-	562 => q|Pending|,
-
-	9 => q|View clipboard.|,
-
-	563 => q|Default Status|,
-
-	10 => q|Manage trash.|,
-
-	707 => q|Show debugging?|,
-
-	780 => q|File|,
-
-	772 => q|Edit File|,
-
-	1053 => q|Manage Replacements|,
-
-	1045 => q|Nested|,
-
-	767 => q|Collateral Id|,
-
-	763 => q|Add a snippet.|,
-
-	11 => q|Empy trash.|,
-
-	807 => q|Manage the groups in this group.|,
-
-	12 => q|Turn admin off.|,
-
-	577 => q|Post Reply|,
-
-	13 => q|View help index.|,
-
-	761 => q|Add an image.|,
-
-	516 => q|Turn Admin On!|,
-
-	517 => q|Turn Admin Off!|,
-
-	515 => q|Add edit stamp to posts?|,
-
-	14 => q|View pending submissions.|,
-
-	15 => q|January|,
-
-	16 => q|February|,
-
-	17 => q|March|,
-
-	18 => q|April|,
-
-	1016 => q|Replies|,
-
-	19 => q|May|,
-
-	1017 => q|Last Reply|,
-
-	20 => q|June|,
-
-	21 => q|July|,
-
-	22 => q|August|,
-
-	23 => q|September|,
-
-	572 => q|Approve|,
-
-	24 => q|October|,
-
-	25 => q|November|,
-
-	574 => q|Deny|,
-
-	26 => q|December|,
-
-	27 => q|Sunday|,
-
-	28 => q|Monday|,
-
-	29 => q|Tuesday|,
-
-	30 => q|Wednesday|,
-
-	31 => q|Thursday|,
-
-	32 => q|Friday|,
-
-	33 => q|Saturday|,
-
-	35 => q|Administrative Function|,
-
-	36 => q|You must be an administrator to perform this function. Please contact one of your administrators. |,
-
-	37 => q|Permission Denied!|,
-
-	404 => q|First Page|,
-
-	38 => q|You do not have sufficient privileges to perform this operation. Please ^a(log in with an account); that has sufficient privileges before attempting this operation.|,
-
-	39 => q|You do not have sufficient privileges to access this page.|,
-
-	40 => q|Vital Component|,
-
-	41 => q|You're attempting to remove a vital component of the WebGUI system. If you were allowed to continue WebGUI may cease to function.|,
-
-	42 => q|Please Confirm|,
-
-	43 => q|Are you certain that you wish to delete this content?|,
-
-	44 => q|Yes, I'm sure.|,
-
-	45 => q|No, I made a mistake.|,
-
-	46 => q|My Account|,
-
-	47 => q|Home|,
-
-	48 => q|Hello|,
-
-	49 => q|Click <a href="^\;?op=logout">here</a> to log out.|,
-
-	50 => q|Username|,
-
-	51 => q|Password|,
-
-	52 => q|login|,
-
-	53 => q|Make Page Printable|,
-
-	54 => q|Create Account|,
-
-	56 => q|Email Address|,
-
-	57 => q|This is only necessary if you wish to use features that require Email.|,
-
-	58 => q|I already have an account.|,
-
-	59 => q|I forgot my password.|,
-
-	60 => q|Are you certain you want to deactivate your account. If you proceed your account information will be lost permanently.|,
-
-	61 => q|Update Account Information|,
-
-	62 => q|save|,
-
-	63 => q|Turn admin on.|,
-
-	64 => q|Log out.|,
-
-	65 => q|Please deactivate my account permanently.|,
-
-	66 => q|Log In|,
-
-	67 => q|Create a new account.|,
-
-	68 => q|The account information you supplied is invalid. Either the account does not exist or the username/password combination was incorrect.|,
-
-	69 => q|Please contact your system administrator for assistance.|,
-
-	70 => q|Error|,
-
-	71 => q|Recover password|,
-
-	72 => q|recover|,
-
-	73 => q|Log in.|,
-
-	74 => q|Account Information|,
-
-	75 => q|Your account information has been sent to your email address.|,
-
-	76 => q|That email address is not in our databases.|,
-
-	77 => q|That account name is already in use by another member of this site. Please try a different username. The following are some suggestions:|,
-
-	80 => q|Account created successfully!|,
-
-	81 => q|Account updated successfully!|,
-
-	82 => q|Administrative functions...|,
-
-	84 => q|Group Name|,
-
-	85 => q|Description|,
-
-	86 => q|Are you certain you wish to delete this group? Beware that deleting a group is permanent and will remove all privileges associated with this group.|,
-
-	87 => q|Edit Group|,
-
-	88 => q|Users In Group|,
-
-	89 => q|Groups|,
-
-	90 => q|Add new group.|,
-
-	91 => q|Previous Page|,
-
-	92 => q|Next Page|,
-
-	93 => q|Help|,
-
-	94 => q|See also|,
-
-	95 => q|Help Index|,
-
-	817 => q|Active|,
-
-	99 => q|Title|,
-
-	100 => q|Meta Tags|,
-
-	101 => q|Are you certain that you wish to delete this page, its content, and all items under it?|,
-
-	102 => q|Edit Page|,
-
-	103 => q|Page Properties|,
-
-	104 => q|Page URL|,
-
-	105 => q|Layout|,
-
-	106 => q|Select "Yes" to change all the pages under this page to this style.|,
-
-	107 => q|Privileges|,
-
-	108 => q|Owner|,
-
-	116 => q|Select "Yes" to change the privileges of all pages and wobjects under this page to these privileges.|,
-
-	117 => q|Edit User Settings|,
-
-	118 => q|Anonymous Registration|,
-
-	119 => q|Authentication Method (default)|,
-
-	124 => q|Edit Company Information|,
-
-	125 => q|Company Name|,
-
-	126 => q|Company Email Address|,
-
-	127 => q|Company URL|,
-
-	130 => q|Maximum Attachment Size|,
-
-	133 => q|Edit Messaging Settings|,
-
-	134 => q|Recover Password Message|,
-
-	135 => q|SMTP Server|,
-
-	138 => q|Yes|,
-
-	139 => q|No|,
-
-	140 => q|Edit Miscellaneous Settings|,
-
-	141 => q|Not Found Page|,
-
-	142 => q|Session Timeout|,
-
-	143 => q|Manage Settings|,
-
-	144 => q|View statistics.|,
-
-	145 => q|WebGUI Build Version|,
-
-	146 => q|Active Sessions|,
-
-	147 => q|Pages|,
-
-	148 => q|Wobjects|,
-
-	149 => q|Users|,
-
-	505 => q|Add a new template.|,
-
-	504 => q|Template|,
-
-	503 => q|Template ID|,
-
-	502 => q|Are you certain you wish to delete this template and set all pages using this template to the default template?|,
-
-	160 => q|Date Submitted|,
-
-	161 => q|Submitted By|,
-
-	162 => q|Are you certain that you wish to purge all the pages and wobjects in the trash?|,
-
-	163 => q|Add User|,
-
-	164 => q|Authentication Method|,
-
-	167 => q|Are you certain you want to delete this user? Be warned that all this user's information will be lost permanently if you choose to proceed.|,
-
-	168 => q|Edit User|,
-
-	169 => q|Add a new user.|,
-
-	170 => q|search|,
-
-	171 => q|rich edit|,
-
-	174 => q|Display the title?|,
-
-	175 => q|Process macros?|,
-
-	229 => q|Subject|,
-
-	230 => q|Message|,
-
-	231 => q|Posting New Message...|,
-
-	232 => q|no subject|,
-
-	233 => q|(eom)|,
-
-	240 => q|Message ID:|,
-
-	244 => q|Author|,
-
-	245 => q|Date|,
-
-	304 => q|Language|,
-
-	307 => q|Use default meta tags?|,
-
-	308 => q|Edit Profile Settings|,
-
-	309 => q|Allow real name?|,
-
-	310 => q|Allow extra contact information?|,
-
-	311 => q|Allow home information?|,
-
-	312 => q|Allow business information?|,
-
-	313 => q|Allow miscellaneous information?|,
-
-	314 => q|First Name|,
-
-	315 => q|Middle Name|,
-
-	316 => q|Last Name|,
-
-	317 => q|<a href="http://www.icq.com">ICQ</a> UIN|,
-
-	318 => q|<a href="http://www.aol.com/aim/homenew.adp">AIM</a> Id|,
-
-	319 => q|<a href="http://messenger.msn.com/">MSN Messenger</a> Id|,
-
-	320 => q|<a href="http://messenger.yahoo.com/">Yahoo! Messenger</a> Id|,
-
-	321 => q|Cell Phone|,
-
-	322 => q|Pager|,
-
-	323 => q|Home Address|,
-
-	324 => q|Home City|,
-
-	325 => q|Home State|,
-
-	326 => q|Home Zip Code|,
-
-	327 => q|Home Country|,
-
-	328 => q|Home Phone|,
-
-	329 => q|Work Address|,
-
-	330 => q|Work City|,
-
-	331 => q|Work State|,
-
-	332 => q|Work Zip Code|,
-
-	333 => q|Work Country|,
-
-	334 => q|Work Phone|,
-
-	335 => q|Gender|,
-
-	336 => q|Birth Date|,
-
-	337 => q|Homepage URL|,
-
-	338 => q|Edit Profile|,
-
-	339 => q|Male|,
-
-	340 => q|Female|,
-
-	341 => q|Edit profile.|,
-
-	342 => q|Edit account information.|,
-
-	343 => q|View profile.|,
-
-	351 => q|Message|,
-
-	345 => q|Not A Member|,
-
-	346 => q|This user is no longer a member of our site. We have no further information about this user.|,
-
-	347 => q|View Profile For|,
-
-	348 => q|Name|,
-
-	349 => q|Latest version available|,
-
-	350 => q|Completed|,
-
-	352 => q|Date Of Entry|,
-
-	355 => q|Default|,
-
-	356 => q|Template|,
-
-	357 => q|News|,
-
-	358 => q|Left Column|,
-
-	359 => q|Right Column|,
-
-	360 => q|One Over Three|,
-
-	361 => q|Three Over One|,
-
-	362 => q|SideBySide|,
-
-	363 => q|Page Template Position|,
-
-	364 => q|Search|,
-
-	368 => q|Add a new group to this user.|,
-
-	369 => q|Expire Date|,
-
-	370 => q|Edit Grouping|,
-
-	371 => q|Add Grouping|,
-
-	372 => q|Edit User's Groups|,
-
-	374 => q|Manage packages.|,
-
-	376 => q|Package|,
-
-	378 => q|User ID|,
-
-	379 => q|Group ID|,
-
-	381 => q|WebGUI received a malformed request and was unable to continue. Proprietary characters being passed through a form typically cause this. Please feel free to hit your back button and try again.|,
-
-	766 => q|Back to collateral list.|,
-
-	770 => q|Edit Snippet|,
-
-	384 => q|File|,
-
-	385 => q|Parameters|,
-
-	386 => q|Edit Image|,
-
-	387 => q|Uploaded By|,
-
-	388 => q|Upload Date|,
-
-	391 => q|Delete attached file.|,
-
-	779 => q|Image|,
-
-	394 => q|Manage collateral.|,
-
-	395 => q|Add a new image.|,
-
-	399 => q|Validate this page.|,
-
-	400 => q|Prevent Proxy Caching|,
-
-	401 => q|Are you certain you wish to delete this message and all messages under it in this thread?|,
-
-	565 => q|Who can moderate?|,
-
-	1063 => q|These are the variables availabe in the forum notification template.
+		lastUpdated => 1068919471
+	},
+
+	'1080' => {
+		message => q|Use admin style?|,
+		lastUpdated => 1073161583,
+		context => q|A label asking the user if they want to use a seperate admin style from the main page style.|
+	},
+
+	'560' => {
+		message => q|Approved|,
+		lastUpdated => 1031514049
+	},
+
+	'7' => {
+		message => q|Manage users.|,
+		lastUpdated => 1031514049
+	},
+
+	'561' => {
+		message => q|Denied|,
+		lastUpdated => 1031514049
+	},
+
+	'8' => {
+		message => q|View page not found.|,
+		lastUpdated => 1031514049
+	},
+
+	'728' => {
+		message => q|Are you certain you wish to delete this file?|,
+		lastUpdated => 1031514049
+	},
+
+	'562' => {
+		message => q|Pending|,
+		lastUpdated => 1031514049
+	},
+
+	'9' => {
+		message => q|View clipboard.|,
+		lastUpdated => 1031514049
+	},
+
+	'563' => {
+		message => q|Default Status|,
+		lastUpdated => 1031514049
+	},
+
+	'10' => {
+		message => q|Manage trash.|,
+		lastUpdated => 1031514049
+	},
+
+	'707' => {
+		message => q|Show debugging?|,
+		lastUpdated => 1031514049
+	},
+
+	'780' => {
+		message => q|File|,
+		lastUpdated => 1036912946
+	},
+
+	'772' => {
+		message => q|Edit File|,
+		lastUpdated => 1036893140
+	},
+
+	'1053' => {
+		message => q|Manage Replacements|,
+		lastUpdated => 1066419031,
+		context => q|A heading for the replacement listings page.|
+	},
+
+	'1045' => {
+		message => q|Nested|,
+		lastUpdated => 1066405110,
+		context => q|A label indicating the layout of a forum thread.|
+	},
+
+	'767' => {
+		message => q|Collateral Id|,
+		lastUpdated => 1036892929
+	},
+
+	'763' => {
+		message => q|Add a snippet.|,
+		lastUpdated => 1036892785
+	},
+
+	'11' => {
+		message => q|Empy trash.|,
+		lastUpdated => 1031514049
+	},
+
+	'807' => {
+		message => q|Manage the groups in this group.|,
+		lastUpdated => 1037579473
+	},
+
+	'12' => {
+		message => q|Turn admin off.|,
+		lastUpdated => 1031514049
+	},
+
+	'577' => {
+		message => q|Post Reply|,
+		lastUpdated => 1031514049
+	},
+
+	'13' => {
+		message => q|View help index.|,
+		lastUpdated => 1031514049
+	},
+
+	'761' => {
+		message => q|Add an image.|,
+		lastUpdated => 1036892765
+	},
+
+	'516' => {
+		message => q|Turn Admin On!|,
+		lastUpdated => 1031514049
+	},
+
+	'517' => {
+		message => q|Turn Admin Off!|,
+		lastUpdated => 1031514049
+	},
+
+	'515' => {
+		message => q|Add edit stamp to posts?|,
+		lastUpdated => 1031514049
+	},
+
+	'14' => {
+		message => q|View pending submissions.|,
+		lastUpdated => 1031514049
+	},
+
+	'15' => {
+		message => q|January|,
+		lastUpdated => 1031514049
+	},
+
+	'16' => {
+		message => q|February|,
+		lastUpdated => 1031514049
+	},
+
+	'17' => {
+		message => q|March|,
+		lastUpdated => 1031514049
+	},
+
+	'18' => {
+		message => q|April|,
+		lastUpdated => 1031514049
+	},
+
+	'1016' => {
+		message => q|Replies|,
+		lastUpdated => 1031514049
+	},
+
+	'19' => {
+		message => q|May|,
+		lastUpdated => 1031514049
+	},
+
+	'1017' => {
+		message => q|Last Reply|,
+		lastUpdated => 1031514049
+	},
+
+	'20' => {
+		message => q|June|,
+		lastUpdated => 1031514049
+	},
+
+	'21' => {
+		message => q|July|,
+		lastUpdated => 1031514049
+	},
+
+	'22' => {
+		message => q|August|,
+		lastUpdated => 1031514049
+	},
+
+	'23' => {
+		message => q|September|,
+		lastUpdated => 1031514049
+	},
+
+	'572' => {
+		message => q|Approve|,
+		lastUpdated => 1031514049
+	},
+
+	'24' => {
+		message => q|October|,
+		lastUpdated => 1031514049
+	},
+
+	'25' => {
+		message => q|November|,
+		lastUpdated => 1031514049
+	},
+
+	'574' => {
+		message => q|Deny|,
+		lastUpdated => 1031514049
+	},
+
+	'26' => {
+		message => q|December|,
+		lastUpdated => 1031514049
+	},
+
+	'27' => {
+		message => q|Sunday|,
+		lastUpdated => 1031514049
+	},
+
+	'28' => {
+		message => q|Monday|,
+		lastUpdated => 1031514049
+	},
+
+	'29' => {
+		message => q|Tuesday|,
+		lastUpdated => 1031514049
+	},
+
+	'30' => {
+		message => q|Wednesday|,
+		lastUpdated => 1031514049
+	},
+
+	'31' => {
+		message => q|Thursday|,
+		lastUpdated => 1031514049
+	},
+
+	'32' => {
+		message => q|Friday|,
+		lastUpdated => 1031514049
+	},
+
+	'33' => {
+		message => q|Saturday|,
+		lastUpdated => 1031514049
+	},
+
+	'35' => {
+		message => q|Administrative Function|,
+		lastUpdated => 1031514049
+	},
+
+	'36' => {
+		message => q|You must be an administrator to perform this function. Please contact one of your administrators. |,
+		lastUpdated => 1058092984
+	},
+
+	'37' => {
+		message => q|Permission Denied!|,
+		lastUpdated => 1031514049
+	},
+
+	'404' => {
+		message => q|First Page|,
+		lastUpdated => 1031514049
+	},
+
+	'38' => {
+		message => q|You do not have sufficient privileges to perform this operation. Please ^a(log in with an account); that has sufficient privileges before attempting this operation.|,
+		lastUpdated => 1031514049
+	},
+
+	'39' => {
+		message => q|You do not have sufficient privileges to access this page.|,
+		lastUpdated => 1031514049
+	},
+
+	'40' => {
+		message => q|Vital Component|,
+		lastUpdated => 1031514049
+	},
+
+	'41' => {
+		message => q|You're attempting to remove a vital component of the WebGUI system. If you were allowed to continue WebGUI may cease to function.|,
+		lastUpdated => 1031514049
+	},
+
+	'42' => {
+		message => q|Please Confirm|,
+		lastUpdated => 1031514049
+	},
+
+	'43' => {
+		message => q|Are you certain that you wish to delete this content?|,
+		lastUpdated => 1031514049
+	},
+
+	'44' => {
+		message => q|Yes, I'm sure.|,
+		lastUpdated => 1031514049
+	},
+
+	'45' => {
+		message => q|No, I made a mistake.|,
+		lastUpdated => 1031514049
+	},
+
+	'46' => {
+		message => q|My Account|,
+		lastUpdated => 1031514049
+	},
+
+	'47' => {
+		message => q|Home|,
+		lastUpdated => 1031514049
+	},
+
+	'48' => {
+		message => q|Hello|,
+		lastUpdated => 1031514049
+	},
+
+	'49' => {
+		message => q|Click <a href="^\;?op=logout">here</a> to log out.|,
+		lastUpdated => 1031514049
+	},
+
+	'50' => {
+		message => q|Username|,
+		lastUpdated => 1031514049
+	},
+
+	'51' => {
+		message => q|Password|,
+		lastUpdated => 1031514049
+	},
+
+	'52' => {
+		message => q|login|,
+		lastUpdated => 1031514049
+	},
+
+	'53' => {
+		message => q|Make Page Printable|,
+		lastUpdated => 1031514049
+	},
+
+	'54' => {
+		message => q|Create Account|,
+		lastUpdated => 1031514049
+	},
+
+	'56' => {
+		message => q|Email Address|,
+		lastUpdated => 1031514049
+	},
+
+	'57' => {
+		message => q|This is only necessary if you wish to use features that require Email.|,
+		lastUpdated => 1031514049
+	},
+
+	'58' => {
+		message => q|I already have an account.|,
+		lastUpdated => 1031514049
+	},
+
+	'59' => {
+		message => q|I forgot my password.|,
+		lastUpdated => 1031514049
+	},
+
+	'60' => {
+		message => q|Are you certain you want to deactivate your account. If you proceed your account information will be lost permanently.|,
+		lastUpdated => 1031514049
+	},
+
+	'61' => {
+		message => q|Update Account Information|,
+		lastUpdated => 1031514049
+	},
+
+	'62' => {
+		message => q|save|,
+		lastUpdated => 1031514049
+	},
+
+	'63' => {
+		message => q|Turn admin on.|,
+		lastUpdated => 1031514049
+	},
+
+	'64' => {
+		message => q|Log out.|,
+		lastUpdated => 1031514049
+	},
+
+	'65' => {
+		message => q|Please deactivate my account permanently.|,
+		lastUpdated => 1031514049
+	},
+
+	'66' => {
+		message => q|Log In|,
+		lastUpdated => 1031514049
+	},
+
+	'67' => {
+		message => q|Create a new account.|,
+		lastUpdated => 1031514049
+	},
+
+	'68' => {
+		message => q|The account information you supplied is invalid. Either the account does not exist or the username/password combination was incorrect.|,
+		lastUpdated => 1031514049
+	},
+
+	'69' => {
+		message => q|Please contact your system administrator for assistance.|,
+		lastUpdated => 1031514049
+	},
+
+	'70' => {
+		message => q|Error|,
+		lastUpdated => 1031514049
+	},
+
+	'71' => {
+		message => q|Recover password|,
+		lastUpdated => 1031514049
+	},
+
+	'72' => {
+		message => q|recover|,
+		lastUpdated => 1031514049
+	},
+
+	'73' => {
+		message => q|Log in.|,
+		lastUpdated => 1031514049
+	},
+
+	'74' => {
+		message => q|Account Information|,
+		lastUpdated => 1031514049
+	},
+
+	'75' => {
+		message => q|Your account information has been sent to your email address.|,
+		lastUpdated => 1031514049
+	},
+
+	'76' => {
+		message => q|That email address is not in our databases.|,
+		lastUpdated => 1031514049
+	},
+
+	'77' => {
+		message => q|That account name is already in use by another member of this site. Please try a different username. The following are some suggestions:|,
+		lastUpdated => 1031514049
+	},
+
+	'80' => {
+		message => q|Account created successfully!|,
+		lastUpdated => 1031514049
+	},
+
+	'81' => {
+		message => q|Account updated successfully!|,
+		lastUpdated => 1031514049
+	},
+
+	'82' => {
+		message => q|Administrative functions...|,
+		lastUpdated => 1031514049
+	},
+
+	'84' => {
+		message => q|Group Name|,
+		lastUpdated => 1031514049
+	},
+
+	'85' => {
+		message => q|Description|,
+		lastUpdated => 1031514049
+	},
+
+	'86' => {
+		message => q|Are you certain you wish to delete this group? Beware that deleting a group is permanent and will remove all privileges associated with this group.|,
+		lastUpdated => 1031514049
+	},
+
+	'87' => {
+		message => q|Edit Group|,
+		lastUpdated => 1031514049
+	},
+
+	'88' => {
+		message => q|Users In Group|,
+		lastUpdated => 1031514049
+	},
+
+	'89' => {
+		message => q|Groups|,
+		lastUpdated => 1031514049
+	},
+
+	'90' => {
+		message => q|Add new group.|,
+		lastUpdated => 1031514049
+	},
+
+	'91' => {
+		message => q|Previous Page|,
+		lastUpdated => 1031514049
+	},
+
+	'92' => {
+		message => q|Next Page|,
+		lastUpdated => 1031514049
+	},
+
+	'93' => {
+		message => q|Help|,
+		lastUpdated => 1031514049
+	},
+
+	'94' => {
+		message => q|See also|,
+		lastUpdated => 1031514049
+	},
+
+	'95' => {
+		message => q|Help Index|,
+		lastUpdated => 1031514049
+	},
+
+	'817' => {
+		message => q|Active|,
+		lastUpdated => 1038431287
+	},
+
+	'99' => {
+		message => q|Title|,
+		lastUpdated => 1031514049
+	},
+
+	'100' => {
+		message => q|Meta Tags|,
+		lastUpdated => 1031514049
+	},
+
+	'101' => {
+		message => q|Are you certain that you wish to delete this page, its content, and all items under it?|,
+		lastUpdated => 1031514049
+	},
+
+	'102' => {
+		message => q|Edit Page|,
+		lastUpdated => 1031514049
+	},
+
+	'103' => {
+		message => q|Page Properties|,
+		lastUpdated => 1046638742
+	},
+
+	'104' => {
+		message => q|Page URL|,
+		lastUpdated => 1031514049
+	},
+
+	'105' => {
+		message => q|Layout|,
+		lastUpdated => 1046638916
+	},
+
+	'106' => {
+		message => q|Select "Yes" to change all the pages under this page to this style.|,
+		lastUpdated => 1031514049
+	},
+
+	'107' => {
+		message => q|Privileges|,
+		lastUpdated => 1031514049
+	},
+
+	'108' => {
+		message => q|Owner|,
+		lastUpdated => 1031514049
+	},
+
+	'116' => {
+		message => q|Select "Yes" to change the privileges of all pages and wobjects under this page to these privileges.|,
+		lastUpdated => 1056054674
+	},
+
+	'117' => {
+		message => q|Edit User Settings|,
+		lastUpdated => 1031514049
+	},
+
+	'118' => {
+		message => q|Anonymous Registration|,
+		lastUpdated => 1031514049
+	},
+
+	'119' => {
+		message => q|Authentication Method (default)|,
+		lastUpdated => 1031514049
+	},
+
+	'124' => {
+		message => q|Edit Company Information|,
+		lastUpdated => 1031514049
+	},
+
+	'125' => {
+		message => q|Company Name|,
+		lastUpdated => 1031514049
+	},
+
+	'126' => {
+		message => q|Company Email Address|,
+		lastUpdated => 1031514049
+	},
+
+	'127' => {
+		message => q|Company URL|,
+		lastUpdated => 1031514049
+	},
+
+	'130' => {
+		message => q|Maximum Attachment Size|,
+		lastUpdated => 1031514049
+	},
+
+	'133' => {
+		message => q|Edit Messaging Settings|,
+		lastUpdated => 1044138764
+	},
+
+	'134' => {
+		message => q|Recover Password Message|,
+		lastUpdated => 1031514049
+	},
+
+	'135' => {
+		message => q|SMTP Server|,
+		lastUpdated => 1031514049
+	},
+
+	'138' => {
+		message => q|Yes|,
+		lastUpdated => 1031514049
+	},
+
+	'139' => {
+		message => q|No|,
+		lastUpdated => 1031514049
+	},
+
+	'140' => {
+		message => q|Edit Miscellaneous Settings|,
+		lastUpdated => 1031514049
+	},
+
+	'141' => {
+		message => q|Not Found Page|,
+		lastUpdated => 1031514049
+	},
+
+	'142' => {
+		message => q|Session Timeout|,
+		lastUpdated => 1031514049
+	},
+
+	'143' => {
+		message => q|Manage Settings|,
+		lastUpdated => 1031514049
+	},
+
+	'144' => {
+		message => q|View statistics.|,
+		lastUpdated => 1031514049
+	},
+
+	'145' => {
+		message => q|WebGUI Build Version|,
+		lastUpdated => 1031514049
+	},
+
+	'146' => {
+		message => q|Active Sessions|,
+		lastUpdated => 1031514049
+	},
+
+	'147' => {
+		message => q|Pages|,
+		lastUpdated => 1031514049
+	},
+
+	'148' => {
+		message => q|Wobjects|,
+		lastUpdated => 1045312362
+	},
+
+	'149' => {
+		message => q|Users|,
+		lastUpdated => 1031514049
+	},
+
+	'505' => {
+		message => q|Add a new template.|,
+		lastUpdated => 1031514049
+	},
+
+	'504' => {
+		message => q|Template|,
+		lastUpdated => 1031514049
+	},
+
+	'503' => {
+		message => q|Template ID|,
+		lastUpdated => 1031514049
+	},
+
+	'502' => {
+		message => q|Are you certain you wish to delete this template and set all pages using this template to the default template?|,
+		lastUpdated => 1031514049
+	},
+
+	'160' => {
+		message => q|Date Submitted|,
+		lastUpdated => 1031514049
+	},
+
+	'161' => {
+		message => q|Submitted By|,
+		lastUpdated => 1031514049
+	},
+
+	'162' => {
+		message => q|Are you certain that you wish to purge all the pages and wobjects in the trash?|,
+		lastUpdated => 1031514049
+	},
+
+	'163' => {
+		message => q|Add User|,
+		lastUpdated => 1031514049
+	},
+
+	'164' => {
+		message => q|Authentication Method|,
+		lastUpdated => 1031514049
+	},
+
+	'167' => {
+		message => q|Are you certain you want to delete this user? Be warned that all this user's information will be lost permanently if you choose to proceed.|,
+		lastUpdated => 1031514049
+	},
+
+	'168' => {
+		message => q|Edit User|,
+		lastUpdated => 1031514049
+	},
+
+	'169' => {
+		message => q|Add a new user.|,
+		lastUpdated => 1031514049
+	},
+
+	'170' => {
+		message => q|search|,
+		lastUpdated => 1031514049
+	},
+
+	'171' => {
+		message => q|rich edit|,
+		lastUpdated => 1031514049
+	},
+
+	'174' => {
+		message => q|Display the title?|,
+		lastUpdated => 1031514049
+	},
+
+	'175' => {
+		message => q|Process macros?|,
+		lastUpdated => 1031514049
+	},
+
+	'229' => {
+		message => q|Subject|,
+		lastUpdated => 1031514049
+	},
+
+	'230' => {
+		message => q|Message|,
+		lastUpdated => 1031514049
+	},
+
+	'231' => {
+		message => q|Posting New Message...|,
+		lastUpdated => 1031514049
+	},
+
+	'232' => {
+		message => q|no subject|,
+		lastUpdated => 1031514049
+	},
+
+	'233' => {
+		message => q|(eom)|,
+		lastUpdated => 1031514049
+	},
+
+	'240' => {
+		message => q|Message ID:|,
+		lastUpdated => 1031514049
+	},
+
+	'244' => {
+		message => q|Author|,
+		lastUpdated => 1031514049
+	},
+
+	'245' => {
+		message => q|Date|,
+		lastUpdated => 1031514049
+	},
+
+	'304' => {
+		message => q|Language|,
+		lastUpdated => 1031514049
+	},
+
+	'307' => {
+		message => q|Use default meta tags?|,
+		lastUpdated => 1031514049
+	},
+
+	'308' => {
+		message => q|Edit Profile Settings|,
+		lastUpdated => 1031514049
+	},
+
+	'309' => {
+		message => q|Allow real name?|,
+		lastUpdated => 1031514049
+	},
+
+	'310' => {
+		message => q|Allow extra contact information?|,
+		lastUpdated => 1031514049
+	},
+
+	'311' => {
+		message => q|Allow home information?|,
+		lastUpdated => 1031514049
+	},
+
+	'312' => {
+		message => q|Allow business information?|,
+		lastUpdated => 1031514049
+	},
+
+	'313' => {
+		message => q|Allow miscellaneous information?|,
+		lastUpdated => 1031514049
+	},
+
+	'314' => {
+		message => q|First Name|,
+		lastUpdated => 1031514049
+	},
+
+	'315' => {
+		message => q|Middle Name|,
+		lastUpdated => 1031514049
+	},
+
+	'316' => {
+		message => q|Last Name|,
+		lastUpdated => 1031514049
+	},
+
+	'317' => {
+		message => q|<a href="http://www.icq.com">ICQ</a> UIN|,
+		lastUpdated => 1031514049
+	},
+
+	'318' => {
+		message => q|<a href="http://www.aol.com/aim/homenew.adp">AIM</a> Id|,
+		lastUpdated => 1031514049
+	},
+
+	'319' => {
+		message => q|<a href="http://messenger.msn.com/">MSN Messenger</a> Id|,
+		lastUpdated => 1031514049
+	},
+
+	'320' => {
+		message => q|<a href="http://messenger.yahoo.com/">Yahoo! Messenger</a> Id|,
+		lastUpdated => 1031514049
+	},
+
+	'321' => {
+		message => q|Cell Phone|,
+		lastUpdated => 1031514049
+	},
+
+	'322' => {
+		message => q|Pager|,
+		lastUpdated => 1031514049
+	},
+
+	'323' => {
+		message => q|Home Address|,
+		lastUpdated => 1031514049
+	},
+
+	'324' => {
+		message => q|Home City|,
+		lastUpdated => 1031514049
+	},
+
+	'325' => {
+		message => q|Home State|,
+		lastUpdated => 1031514049
+	},
+
+	'326' => {
+		message => q|Home Zip Code|,
+		lastUpdated => 1031514049
+	},
+
+	'327' => {
+		message => q|Home Country|,
+		lastUpdated => 1031514049
+	},
+
+	'328' => {
+		message => q|Home Phone|,
+		lastUpdated => 1031514049
+	},
+
+	'329' => {
+		message => q|Work Address|,
+		lastUpdated => 1031514049
+	},
+
+	'330' => {
+		message => q|Work City|,
+		lastUpdated => 1031514049
+	},
+
+	'331' => {
+		message => q|Work State|,
+		lastUpdated => 1031514049
+	},
+
+	'332' => {
+		message => q|Work Zip Code|,
+		lastUpdated => 1031514049
+	},
+
+	'333' => {
+		message => q|Work Country|,
+		lastUpdated => 1031514049
+	},
+
+	'334' => {
+		message => q|Work Phone|,
+		lastUpdated => 1031514049
+	},
+
+	'335' => {
+		message => q|Gender|,
+		lastUpdated => 1031514049
+	},
+
+	'336' => {
+		message => q|Birth Date|,
+		lastUpdated => 1031514049
+	},
+
+	'337' => {
+		message => q|Homepage URL|,
+		lastUpdated => 1031514049
+	},
+
+	'338' => {
+		message => q|Edit Profile|,
+		lastUpdated => 1031514049
+	},
+
+	'339' => {
+		message => q|Male|,
+		lastUpdated => 1031514049
+	},
+
+	'340' => {
+		message => q|Female|,
+		lastUpdated => 1031514049
+	},
+
+	'341' => {
+		message => q|Edit profile.|,
+		lastUpdated => 1031514049
+	},
+
+	'342' => {
+		message => q|Edit account information.|,
+		lastUpdated => 1031514049
+	},
+
+	'343' => {
+		message => q|View profile.|,
+		lastUpdated => 1031514049
+	},
+
+	'351' => {
+		message => q|Message|,
+		lastUpdated => 1031514049
+	},
+
+	'345' => {
+		message => q|Not A Member|,
+		lastUpdated => 1031514049
+	},
+
+	'346' => {
+		message => q|This user is no longer a member of our site. We have no further information about this user.|,
+		lastUpdated => 1031514049
+	},
+
+	'347' => {
+		message => q|View Profile For|,
+		lastUpdated => 1031514049
+	},
+
+	'348' => {
+		message => q|Name|,
+		lastUpdated => 1031514049
+	},
+
+	'349' => {
+		message => q|Latest version available|,
+		lastUpdated => 1031514049
+	},
+
+	'350' => {
+		message => q|Completed|,
+		lastUpdated => 1031514049
+	},
+
+	'352' => {
+		message => q|Date Of Entry|,
+		lastUpdated => 1031514049
+	},
+
+	'355' => {
+		message => q|Default|,
+		lastUpdated => 1031514049
+	},
+
+	'356' => {
+		message => q|Template|,
+		lastUpdated => 1031514049
+	},
+
+	'357' => {
+		message => q|News|,
+		lastUpdated => 1031514049
+	},
+
+	'358' => {
+		message => q|Left Column|,
+		lastUpdated => 1031514049
+	},
+
+	'359' => {
+		message => q|Right Column|,
+		lastUpdated => 1031514049
+	},
+
+	'360' => {
+		message => q|One Over Three|,
+		lastUpdated => 1031514049
+	},
+
+	'361' => {
+		message => q|Three Over One|,
+		lastUpdated => 1031514049
+	},
+
+	'362' => {
+		message => q|SideBySide|,
+		lastUpdated => 1031514049
+	},
+
+	'363' => {
+		message => q|Page Template Position|,
+		lastUpdated => 1034736999
+	},
+
+	'364' => {
+		message => q|Search|,
+		lastUpdated => 1031514049
+	},
+
+	'368' => {
+		message => q|Add a new group to this user.|,
+		lastUpdated => 1031514049
+	},
+
+	'369' => {
+		message => q|Expire Date|,
+		lastUpdated => 1031514049
+	},
+
+	'370' => {
+		message => q|Edit Grouping|,
+		lastUpdated => 1031514049
+	},
+
+	'371' => {
+		message => q|Add Grouping|,
+		lastUpdated => 1031514049
+	},
+
+	'372' => {
+		message => q|Edit User's Groups|,
+		lastUpdated => 1031514049
+	},
+
+	'374' => {
+		message => q|Manage packages.|,
+		lastUpdated => 1031514049
+	},
+
+	'376' => {
+		message => q|Package|,
+		lastUpdated => 1031514049
+	},
+
+	'378' => {
+		message => q|User ID|,
+		lastUpdated => 1031514049
+	},
+
+	'379' => {
+		message => q|Group ID|,
+		lastUpdated => 1031514049
+	},
+
+	'381' => {
+		message => q|WebGUI received a malformed request and was unable to continue. Proprietary characters being passed through a form typically cause this. Please feel free to hit your back button and try again.|,
+		lastUpdated => 1031514049
+	},
+
+	'766' => {
+		message => q|Back to collateral list.|,
+		lastUpdated => 1036892898
+	},
+
+	'770' => {
+		message => q|Edit Snippet|,
+		lastUpdated => 1036893050
+	},
+
+	'384' => {
+		message => q|File|,
+		lastUpdated => 1031514049
+	},
+
+	'385' => {
+		message => q|Parameters|,
+		lastUpdated => 1031514049
+	},
+
+	'386' => {
+		message => q|Edit Image|,
+		lastUpdated => 1031514049
+	},
+
+	'387' => {
+		message => q|Uploaded By|,
+		lastUpdated => 1031514049
+	},
+
+	'388' => {
+		message => q|Upload Date|,
+		lastUpdated => 1031514049
+	},
+
+	'391' => {
+		message => q|Delete attached file.|,
+		lastUpdated => 1031514049
+	},
+
+	'779' => {
+		message => q|Image|,
+		lastUpdated => 1036912938
+	},
+
+	'394' => {
+		message => q|Manage collateral.|,
+		lastUpdated => 1036954925
+	},
+
+	'395' => {
+		message => q|Add a new image.|,
+		lastUpdated => 1031514049
+	},
+
+	'399' => {
+		message => q|Validate this page.|,
+		lastUpdated => 1031514049
+	},
+
+	'400' => {
+		message => q|Prevent Proxy Caching|,
+		lastUpdated => 1031514049
+	},
+
+	'401' => {
+		message => q|Are you certain you wish to delete this message and all messages under it in this thread?|,
+		lastUpdated => 1031514049
+	},
+
+	'565' => {
+		message => q|Who can moderate?|,
+		lastUpdated => 1031514049
+	},
+
+	'1063' => {
+		message => q|These are the variables availabe in the forum notification template.
 
 <p>
 <b>notify.subscription.message</b><br>
@@ -731,234 +1516,579 @@ A message stating that the user is receiving the message because they subscribed
 <b>NOTE:</b> The notification template also includes all the variables from the post template.
 <p>
 |,
-
-	403 => q|Prefer not to say.|,
-
-	405 => q|Last Page|,
-
-	406 => q|Thumbnail Size|,
-
-	407 => q|Click here to register.|,
-
-	506 => q|Manage Templates|,
-
-	353 => q|You have no messages in your Inbox at this time.|,
-
-	408 => q|Manage Roots|,
-
-	409 => q|Add a new root.|,
-
-	410 => q|Manage roots.|,
-
-	411 => q|Menu Title|,
-
-	412 => q|Synopsis|,
-
-	894 => q|Allow discussion?|,
-
-	417 => q|<h1>Security Violation</h1>You attempted to access a wobject not associated with this page. This incident has been reported.|,
-
-	418 => q|Filter Content|,
-
-	420 => q|Remove nothing.|,
-
-	421 => q|Remove everything except basic formating.|,
-
-	422 => q|<h1>Login Failed</h1>The information supplied does not match the account.|,
-
-	423 => q|View active sessions.|,
-
-	424 => q|View login history.|,
-
-	425 => q|Active Sessions|,
-
-	426 => q|Login History|,
-
-	427 => q|Styles|,
-
-	428 => q|User (ID)|,
-
-	429 => q|Login Time|,
-
-	430 => q|Last Page View|,
-
-	431 => q|IP Address|,
-
-	432 => q|Expires|,
-
-	433 => q|User Agent|,
-
-	434 => q|Status|,
-
-	435 => q|Session Signature|,
-
-	436 => q|Kill Session|,
-
-	437 => q|Statistics|,
-
-	438 => q|Your Name|,
-
-	1062 => q|Forum Notification Template|,
-
-	774 => q|Are you certain you wish to delete this collateral? It cannot be recovered once deleted.|,
-
-	771 => q|Snippet|,
-
-	762 => q|Add a file.|,
-
-	439 => q|Personal Information|,
-
-	440 => q|Contact Information|,
-
-	441 => q|Email To Pager Gateway|,
-
-	442 => q|Work Information|,
-
-	443 => q|Home Information|,
-
-	444 => q|Demographic Information|,
-
-	445 => q|Preferences|,
-
-	446 => q|Work Web Site|,
-
-	447 => q|Manage page tree.|,
-
-	448 => q|Page Tree|,
-
-	449 => q|Miscellaneous Information|,
-
-	450 => q|Work Name (Company Name)|,
-
-	451 => q|is required.|,
-
-	452 => q|Please wait...|,
-
-	453 => q|Date Created|,
-
-	454 => q|Last Updated|,
-
-	455 => q|Edit User's Profile|,
-
-	456 => q|Back to user list.|,
-
-	457 => q|Edit this user's account.|,
-
-	458 => q|Edit this user's groups.|,
-
-	459 => q|Edit this user's profile.|,
-
-	460 => q|Time Offset|,
-
-	461 => q|Date Format|,
-
-	462 => q|Time Format|,
-
-	463 => q|Text Area Rows|,
-
-	464 => q|Text Area Columns|,
-
-	465 => q|Text Box Size|,
-
-	469 => q|Id|,
-
-	470 => q|Name|,
-
-	472 => q|Label|,
-
-	475 => q|Text|,
-
-	476 => q|Text Area|,
-
-	477 => q|HTML Area|,
-
-	478 => q|URL|,
-
-	479 => q|Date|,
-
-	480 => q|Email Address|,
-
-	481 => q|Telephone Number|,
-
-	482 => q|Number (Integer)|,
-
-	483 => q|Yes or No|,
-
-	484 => q|Select List|,
-
-	485 => q|Boolean (Checkbox)|,
-
-	486 => q|Data Type|,
-
-	487 => q|Possible Values|,
-
-	488 => q|Default Value(s)|,
-
-	492 => q|Profile fields list.|,
-
-	493 => q|Back to site.|,
-
-	495 => q|htmlArea (Internet Explorer 5.5+)|,
-
-	496 => q|Editor To Use|,
-
-	494 => q|RealObjects edit-on Pro 2.x|,
-
-	497 => q|Start Date|,
-
-	498 => q|End Date|,
-
-	499 => q|Wobject ID|,
-
-	500 => q|Page ID|,
-
-	1060 => q|Forum Thread Template|,
-
-	514 => q|Views|,
-
-	1049 => q|Replacement ID|,
-
-	576 => q|Delete|,
-
-	527 => q|Default Home Page|,
-
-	768 => q|Name|,
-
-	773 => q|File|,
-
-	354 => q|View Inbox.|,
-
-	808 => q|Email this group.|,
-
-	782 => q|Any|,
-
-	578 => q|You have a pending message to approve.|,
-
-	159 => q|Inbox|,
-
-	507 => q|Edit Template|,
-
-	508 => q|Manage templates.|,
-
-	1032 => q|Thread Template|,
-
-	509 => q|Discussion Layout|,
-
-	510 => q|Flat|,
-
-	511 => q|Threaded|,
-
-	512 => q|Go to next thread|,
-
-	513 => q|Go to previous thread|,
-
-	777 => q|Folder Id|,
-
-	580 => q|Your message has been denied.|,
-
-	1020 => q|Rating|,
-
-	1066 => q|These are the template variables available to the post form template.
+		lastUpdated => 1066580520
+	},
+
+	'403' => {
+		message => q|Prefer not to say.|,
+		lastUpdated => 1031514049
+	},
+
+	'405' => {
+		message => q|Last Page|,
+		lastUpdated => 1031514049
+	},
+
+	'406' => {
+		message => q|Thumbnail Size|,
+		lastUpdated => 1031514049
+	},
+
+	'407' => {
+		message => q|Click here to register.|,
+		lastUpdated => 1031514049
+	},
+
+	'506' => {
+		message => q|Manage Templates|,
+		lastUpdated => 1031514049
+	},
+
+	'353' => {
+		message => q|You have no messages in your Inbox at this time.|,
+		lastUpdated => 1031514049
+	},
+
+	'408' => {
+		message => q|Manage Roots|,
+		lastUpdated => 1031514049
+	},
+
+	'409' => {
+		message => q|Add a new root.|,
+		lastUpdated => 1031514049
+	},
+
+	'410' => {
+		message => q|Manage roots.|,
+		lastUpdated => 1031514049
+	},
+
+	'411' => {
+		message => q|Menu Title|,
+		lastUpdated => 1031514049
+	},
+
+	'412' => {
+		message => q|Synopsis|,
+		lastUpdated => 1031514049
+	},
+
+	'894' => {
+		message => q|Allow discussion?|,
+		lastUpdated => 1031514049
+	},
+
+	'417' => {
+		message => q|<h1>Security Violation</h1>You attempted to access a wobject not associated with this page. This incident has been reported.|,
+		lastUpdated => 1031514049
+	},
+
+	'418' => {
+		message => q|Filter Content|,
+		lastUpdated => 1046604931
+	},
+
+	'420' => {
+		message => q|Remove nothing.|,
+		lastUpdated => 1046637549
+	},
+
+	'421' => {
+		message => q|Remove everything except basic formating.|,
+		lastUpdated => 1046611728
+	},
+
+	'422' => {
+		message => q|<h1>Login Failed</h1>The information supplied does not match the account.|,
+		lastUpdated => 1031514049
+	},
+
+	'423' => {
+		message => q|View active sessions.|,
+		lastUpdated => 1031514049
+	},
+
+	'424' => {
+		message => q|View login history.|,
+		lastUpdated => 1031514049
+	},
+
+	'425' => {
+		message => q|Active Sessions|,
+		lastUpdated => 1031514049
+	},
+
+	'426' => {
+		message => q|Login History|,
+		lastUpdated => 1031514049
+	},
+
+	'427' => {
+		message => q|Styles|,
+		lastUpdated => 1031514049
+	},
+
+	'428' => {
+		message => q|User (ID)|,
+		lastUpdated => 1031514049
+	},
+
+	'429' => {
+		message => q|Login Time|,
+		lastUpdated => 1031514049
+	},
+
+	'430' => {
+		message => q|Last Page View|,
+		lastUpdated => 1031514049
+	},
+
+	'431' => {
+		message => q|IP Address|,
+		lastUpdated => 1031514049
+	},
+
+	'432' => {
+		message => q|Expires|,
+		lastUpdated => 1031514049
+	},
+
+	'433' => {
+		message => q|User Agent|,
+		lastUpdated => 1031514049
+	},
+
+	'434' => {
+		message => q|Status|,
+		lastUpdated => 1031514049
+	},
+
+	'435' => {
+		message => q|Session Signature|,
+		lastUpdated => 1031514049
+	},
+
+	'436' => {
+		message => q|Kill Session|,
+		lastUpdated => 1031514049
+	},
+
+	'437' => {
+		message => q|Statistics|,
+		lastUpdated => 1031514049
+	},
+
+	'438' => {
+		message => q|Your Name|,
+		lastUpdated => 1031514049
+	},
+
+	'1062' => {
+		message => q|Forum Notification Template|,
+		lastUpdated => 1066580520
+	},
+
+	'774' => {
+		message => q|Are you certain you wish to delete this collateral? It cannot be recovered once deleted.|,
+		lastUpdated => 1036902945
+	},
+
+	'771' => {
+		message => q|Snippet|,
+		lastUpdated => 1036893079
+	},
+
+	'762' => {
+		message => q|Add a file.|,
+		lastUpdated => 1036892774
+	},
+
+	'439' => {
+		message => q|Personal Information|,
+		lastUpdated => 1031514049
+	},
+
+	'440' => {
+		message => q|Contact Information|,
+		lastUpdated => 1031514049
+	},
+
+	'441' => {
+		message => q|Email To Pager Gateway|,
+		lastUpdated => 1031514049
+	},
+
+	'442' => {
+		message => q|Work Information|,
+		lastUpdated => 1031514049
+	},
+
+	'443' => {
+		message => q|Home Information|,
+		lastUpdated => 1031514049
+	},
+
+	'444' => {
+		message => q|Demographic Information|,
+		lastUpdated => 1031514049
+	},
+
+	'445' => {
+		message => q|Preferences|,
+		lastUpdated => 1031514049
+	},
+
+	'446' => {
+		message => q|Work Web Site|,
+		lastUpdated => 1031514049
+	},
+
+	'447' => {
+		message => q|Manage page tree.|,
+		lastUpdated => 1031514049
+	},
+
+	'448' => {
+		message => q|Page Tree|,
+		lastUpdated => 1031514049
+	},
+
+	'449' => {
+		message => q|Miscellaneous Information|,
+		lastUpdated => 1031514049
+	},
+
+	'450' => {
+		message => q|Work Name (Company Name)|,
+		lastUpdated => 1031514049
+	},
+
+	'451' => {
+		message => q|is required.|,
+		lastUpdated => 1031514049
+	},
+
+	'452' => {
+		message => q|Please wait...|,
+		lastUpdated => 1031514049
+	},
+
+	'453' => {
+		message => q|Date Created|,
+		lastUpdated => 1031514049
+	},
+
+	'454' => {
+		message => q|Last Updated|,
+		lastUpdated => 1031514049
+	},
+
+	'455' => {
+		message => q|Edit User's Profile|,
+		lastUpdated => 1031514049
+	},
+
+	'456' => {
+		message => q|Back to user list.|,
+		lastUpdated => 1031514049
+	},
+
+	'457' => {
+		message => q|Edit this user's account.|,
+		lastUpdated => 1031514049
+	},
+
+	'458' => {
+		message => q|Edit this user's groups.|,
+		lastUpdated => 1031514049
+	},
+
+	'459' => {
+		message => q|Edit this user's profile.|,
+		lastUpdated => 1031514049
+	},
+
+	'460' => {
+		message => q|Time Offset|,
+		lastUpdated => 1031514049
+	},
+
+	'461' => {
+		message => q|Date Format|,
+		lastUpdated => 1031514049
+	},
+
+	'462' => {
+		message => q|Time Format|,
+		lastUpdated => 1031514049
+	},
+
+	'463' => {
+		message => q|Text Area Rows|,
+		lastUpdated => 1031514049
+	},
+
+	'464' => {
+		message => q|Text Area Columns|,
+		lastUpdated => 1031514049
+	},
+
+	'465' => {
+		message => q|Text Box Size|,
+		lastUpdated => 1031514049
+	},
+
+	'469' => {
+		message => q|Id|,
+		lastUpdated => 1031514049
+	},
+
+	'470' => {
+		message => q|Name|,
+		lastUpdated => 1031514049
+	},
+
+	'472' => {
+		message => q|Label|,
+		lastUpdated => 1031514049
+	},
+
+	'475' => {
+		message => q|Text|,
+		lastUpdated => 1031514049
+	},
+
+	'476' => {
+		message => q|Text Area|,
+		lastUpdated => 1031514049
+	},
+
+	'477' => {
+		message => q|HTML Area|,
+		lastUpdated => 1031514049
+	},
+
+	'478' => {
+		message => q|URL|,
+		lastUpdated => 1031514049
+	},
+
+	'479' => {
+		message => q|Date|,
+		lastUpdated => 1031514049
+	},
+
+	'480' => {
+		message => q|Email Address|,
+		lastUpdated => 1031514049
+	},
+
+	'481' => {
+		message => q|Telephone Number|,
+		lastUpdated => 1031514049
+	},
+
+	'482' => {
+		message => q|Number (Integer)|,
+		lastUpdated => 1031514049
+	},
+
+	'483' => {
+		message => q|Yes or No|,
+		lastUpdated => 1031514049
+	},
+
+	'484' => {
+		message => q|Select List|,
+		lastUpdated => 1031514049
+	},
+
+	'485' => {
+		message => q|Boolean (Checkbox)|,
+		lastUpdated => 1031514049
+	},
+
+	'486' => {
+		message => q|Data Type|,
+		lastUpdated => 1031514049
+	},
+
+	'487' => {
+		message => q|Possible Values|,
+		lastUpdated => 1031514049
+	},
+
+	'488' => {
+		message => q|Default Value(s)|,
+		lastUpdated => 1031514049
+	},
+
+	'492' => {
+		message => q|Profile fields list.|,
+		lastUpdated => 1031514049
+	},
+
+	'493' => {
+		message => q|Back to site.|,
+		lastUpdated => 1031514049
+	},
+
+	'495' => {
+		message => q|htmlArea (Internet Explorer 5.5+)|,
+		lastUpdated => 1044704928
+	},
+
+	'496' => {
+		message => q|Editor To Use|,
+		lastUpdated => 1031514049
+	},
+
+	'494' => {
+		message => q|RealObjects edit-on Pro 2.x|,
+		lastUpdated => 1044704984
+	},
+
+	'497' => {
+		message => q|Start Date|,
+		lastUpdated => 1031514049
+	},
+
+	'498' => {
+		message => q|End Date|,
+		lastUpdated => 1031514049
+	},
+
+	'499' => {
+		message => q|Wobject ID|,
+		lastUpdated => 1031514049
+	},
+
+	'500' => {
+		message => q|Page ID|,
+		lastUpdated => 1031514049
+	},
+
+	'1060' => {
+		message => q|Forum Thread Template|,
+		lastUpdated => 1066578513
+	},
+
+	'514' => {
+		message => q|Views|,
+		lastUpdated => 1031514049
+	},
+
+	'1049' => {
+		message => q|Replacement ID|,
+		lastUpdated => 1066418840,
+		context => q|Show the admin what the unique identifier for this replacement is.|
+	},
+
+	'576' => {
+		message => q|Delete|,
+		lastUpdated => 1031514049
+	},
+
+	'527' => {
+		message => q|Default Home Page|,
+		lastUpdated => 1031514049
+	},
+
+	'768' => {
+		message => q|Name|,
+		lastUpdated => 1036892946
+	},
+
+	'773' => {
+		message => q|File|,
+		lastUpdated => 1036893165
+	},
+
+	'354' => {
+		message => q|View Inbox.|,
+		lastUpdated => 1031514049
+	},
+
+	'808' => {
+		message => q|Email this group.|,
+		lastUpdated => 1037579487
+	},
+
+	'782' => {
+		message => q|Any|,
+		lastUpdated => 1036913053
+	},
+
+	'578' => {
+		message => q|You have a pending message to approve.|,
+		lastUpdated => 1031514049
+	},
+
+	'159' => {
+		message => q|Inbox|,
+		lastUpdated => 1031514049
+	},
+
+	'507' => {
+		message => q|Edit Template|,
+		lastUpdated => 1031514049
+	},
+
+	'508' => {
+		message => q|Manage templates.|,
+		lastUpdated => 1031514049
+	},
+
+	'1032' => {
+		message => q|Thread Template|,
+		lastUpdated => 1066034586,
+		context => q|Tell the admin to select a template for threads in this forum.|
+	},
+
+	'509' => {
+		message => q|Discussion Layout|,
+		lastUpdated => 1031514049
+	},
+
+	'510' => {
+		message => q|Flat|,
+		lastUpdated => 1031514049
+	},
+
+	'511' => {
+		message => q|Threaded|,
+		lastUpdated => 1031514049
+	},
+
+	'512' => {
+		message => q|Go to next thread|,
+		lastUpdated => 1065280309
+	},
+
+	'513' => {
+		message => q|Go to previous thread|,
+		lastUpdated => 1065280287
+	},
+
+	'777' => {
+		message => q|Folder Id|,
+		lastUpdated => 1036905972
+	},
+
+	'580' => {
+		message => q|Your message has been denied.|,
+		lastUpdated => 1031514049
+	},
+
+	'1020' => {
+		message => q|Rating|,
+		lastUpdated => 1065280882,
+		context => q|How useful/interesting a user thinks another poster's post is.|
+	},
+
+	'1066' => {
+		message => q|These are the template variables available to the post form template.
 <p>
 
 <b>newpost.header</b><br>
@@ -1067,150 +2197,373 @@ The form footer.
 <p>
 
 |,
-
-	1079 => q|Printable Style|,
-
-	812 => q|Your message has been sent.|,
-
-	518 => q|Inbox Notifications|,
-
-	519 => q|I would not like to be notified.|,
-
-	520 => q|I would like to be notified via email.|,
-
-	521 => q|I would like to be notified via email to pager.|,
-
-	522 => q|I would like to be notified via ICQ.|,
-
-	523 => q|Notification|,
-
-	1025 => q|Add edit stamp to posts?|,
-
-	525 => q|Edit Content Settings|,
-
-	528 => q|Template Name|,
-
-	529 => q|results per page|,
-
-	530 => q|with <b>all</b> the words|,
-
-	531 => q|with the <b>exact phrase</b>|,
-
-	532 => q|with <b>at least one</b> of the words|,
-
-	533 => q|<b>without</b> the words|,
-
-	535 => q|Group To Alert On New User|,
-
-	534 => q|Alert on new user?|,
-
-	536 => q|A new user named ^@; has joined the site.|,
-
-	579 => q|Your message has been approved.|,
-
-	575 => q|Edit|,
-
-	1048 => q|Manage replacements.|,
-
-	1046 => q|Archived|,
-
-	537 => q|Karma|,
-
-	538 => q|Karma Threshold|,
-
-	539 => q|Enable Karma?|,
-
-	540 => q|Karma Per Login|,
-
-	541 => q|Karma Per Post|,
-
-	542 => q|Previous..|,
-
-	543 => q|Add a new image group.|,
-
-	551 => q|Notice|,
-
-	552 => q|Pending|,
-
-	553 => q|Status|,
-
-	554 => q|Take Action|,
-
-	555 => q|Edit this user's karma.|,
-
-	556 => q|Amount|,
-
-	557 => q|Description|,
-
-	558 => q|Edit User's Karma|,
-
-	559 => q|Run On Registration|,
-
-	581 => q|Add New Value|,
-
-	582 => q|Leave Blank|,
-
-	583 => q|Max Image Size|,
-
-	818 => q|Deactivated|,
-
-	1021 => q|Rate Message|,
-
-	1081 => q|Admin Style|,
-
-	764 => q|Edit this collateral item.|,
-
-	605 => q|Add Groups|,
-
-	809 => q|Email Group|,
-
-	783 => q|Type|,
-
-	1036 => q|Threads|,
-
-	584 => q|Add a new translation.|,
-
-	585 => q|Manage translations.|,
-
-	586 => q|Manage Translations|,
-
-	587 => q|Are you certain you wish to delete this language and all the help and international messages that go with it?|,
-
-	589 => q|Edit Translation|,
-
-	590 => q|Language ID|,
-
-	591 => q|Language|,
-
-	592 => q|Character Set|,
-
-	595 => q|International Messages|,
-
-	596 => q|MISSING|,
-
-	597 => q|Edit International Message|,
-
-	598 => q|Edit this translation.|,
-
-	601 => q|International ID|,
-
-	784 => q|Thumbnail|,
-
-	811 => q|From|,
-
-	810 => q|send|,
-
-	775 => q|Are you certain you wish to delete this folder and move its contents to it's parent folder?|,
-
-	642 => q|Page, Add/Edit|,
-
-	715 => q|Redirect URL|,
-
-	819 => q|Self-Deactivated|,
-
-	1067 => q|Forum Search Template|,
-
-	1068 => q|The following variables are available in the search template.
+		lastUpdated => 1066581759
+	},
+
+	'1079' => {
+		message => q|Printable Style|,
+		lastUpdated => 1073152790,
+		context => q|A label describing a style that looks good when printing the page.|
+	},
+
+	'812' => {
+		message => q|Your message has been sent.|,
+		lastUpdated => 1037580328
+	},
+
+	'518' => {
+		message => q|Inbox Notifications|,
+		lastUpdated => 1031514049
+	},
+
+	'519' => {
+		message => q|I would not like to be notified.|,
+		lastUpdated => 1031514049
+	},
+
+	'520' => {
+		message => q|I would like to be notified via email.|,
+		lastUpdated => 1031514049
+	},
+
+	'521' => {
+		message => q|I would like to be notified via email to pager.|,
+		lastUpdated => 1031514049
+	},
+
+	'522' => {
+		message => q|I would like to be notified via ICQ.|,
+		lastUpdated => 1031514049
+	},
+
+	'523' => {
+		message => q|Notification|,
+		lastUpdated => 1031514049
+	},
+
+	'1025' => {
+		message => q|Add edit stamp to posts?|,
+		lastUpdated => 1031514049
+	},
+
+	'525' => {
+		message => q|Edit Content Settings|,
+		lastUpdated => 1031514049
+	},
+
+	'528' => {
+		message => q|Template Name|,
+		lastUpdated => 1031514049
+	},
+
+	'529' => {
+		message => q|results per page|,
+		lastUpdated => 1066492301,
+		context => q|A label indicating the number of items per page to return in a list.|
+	},
+
+	'530' => {
+		message => q|with <b>all</b> the words|,
+		lastUpdated => 1031514049
+	},
+
+	'531' => {
+		message => q|with the <b>exact phrase</b>|,
+		lastUpdated => 1031514049
+	},
+
+	'532' => {
+		message => q|with <b>at least one</b> of the words|,
+		lastUpdated => 1031514049
+	},
+
+	'533' => {
+		message => q|<b>without</b> the words|,
+		lastUpdated => 1031514049
+	},
+
+	'535' => {
+		message => q|Group To Alert On New User|,
+		lastUpdated => 1031514049
+	},
+
+	'534' => {
+		message => q|Alert on new user?|,
+		lastUpdated => 1031514049
+	},
+
+	'536' => {
+		message => q|A new user named ^@; has joined the site.|,
+		lastUpdated => 1031514049
+	},
+
+	'579' => {
+		message => q|Your message has been approved.|,
+		lastUpdated => 1031514049
+	},
+
+	'575' => {
+		message => q|Edit|,
+		lastUpdated => 1031514049
+	},
+
+	'1048' => {
+		message => q|Manage replacements.|,
+		lastUpdated => 1066418767,
+		context => q|A label for a link that lists all replacements.|
+	},
+
+	'1046' => {
+		message => q|Archived|,
+		lastUpdated => 1066406723,
+		context => q|A label indicating that the content has a status of archived.|
+	},
+
+	'537' => {
+		message => q|Karma|,
+		lastUpdated => 1031514049
+	},
+
+	'538' => {
+		message => q|Karma Threshold|,
+		lastUpdated => 1031514049
+	},
+
+	'539' => {
+		message => q|Enable Karma?|,
+		lastUpdated => 1031514049
+	},
+
+	'540' => {
+		message => q|Karma Per Login|,
+		lastUpdated => 1031514049
+	},
+
+	'541' => {
+		message => q|Karma Per Post|,
+		lastUpdated => 1031514049
+	},
+
+	'542' => {
+		message => q|Previous..|,
+		lastUpdated => 1031514049
+	},
+
+	'543' => {
+		message => q|Add a new image group.|,
+		lastUpdated => 1031514049
+	},
+
+	'551' => {
+		message => q|Notice|,
+		lastUpdated => 1031514049
+	},
+
+	'552' => {
+		message => q|Pending|,
+		lastUpdated => 1031514049
+	},
+
+	'553' => {
+		message => q|Status|,
+		lastUpdated => 1031514049
+	},
+
+	'554' => {
+		message => q|Take Action|,
+		lastUpdated => 1031514049
+	},
+
+	'555' => {
+		message => q|Edit this user's karma.|,
+		lastUpdated => 1031514049
+	},
+
+	'556' => {
+		message => q|Amount|,
+		lastUpdated => 1031514049
+	},
+
+	'557' => {
+		message => q|Description|,
+		lastUpdated => 1031514049
+	},
+
+	'558' => {
+		message => q|Edit User's Karma|,
+		lastUpdated => 1031514049
+	},
+
+	'559' => {
+		message => q|Run On Registration|,
+		lastUpdated => 1031514049
+	},
+
+	'581' => {
+		message => q|Add New Value|,
+		lastUpdated => 1031514049
+	},
+
+	'582' => {
+		message => q|Leave Blank|,
+		lastUpdated => 1031514049
+	},
+
+	'583' => {
+		message => q|Max Image Size|,
+		lastUpdated => 1031514049
+	},
+
+	'818' => {
+		message => q|Deactivated|,
+		lastUpdated => 1038431300
+	},
+
+	'1021' => {
+		message => q|Rate Message|,
+		lastUpdated => 1065356764,
+		context => q|A label indicating that the following links are to be used for discussion post ratings.|
+	},
+
+	'1081' => {
+		message => q|Admin Style|,
+		lastUpdated => 1073161679,
+		context => q|A label indicating that the user should choose a style for admin pages.|
+	},
+
+	'764' => {
+		message => q|Edit this collateral item.|,
+		lastUpdated => 1036892856
+	},
+
+	'605' => {
+		message => q|Add Groups|,
+		lastUpdated => 1031514049
+	},
+
+	'809' => {
+		message => q|Email Group|,
+		lastUpdated => 1037579611
+	},
+
+	'783' => {
+		message => q|Type|,
+		lastUpdated => 1036954378
+	},
+
+	'1036' => {
+		message => q|Threads|,
+		lastUpdated => 1066038155,
+		context => q|A label indicating how many threads there are in a particular forum.|
+	},
+
+	'584' => {
+		message => q|Add a new translation.|,
+		lastUpdated => 1036971092
+	},
+
+	'585' => {
+		message => q|Manage translations.|,
+		lastUpdated => 1031514049
+	},
+
+	'586' => {
+		message => q|Manage Translations|,
+		lastUpdated => 1036971445
+	},
+
+	'587' => {
+		message => q|Are you certain you wish to delete this language and all the help and international messages that go with it?|,
+		lastUpdated => 1031514049
+	},
+
+	'589' => {
+		message => q|Edit Translation|,
+		lastUpdated => 1036971172
+	},
+
+	'590' => {
+		message => q|Language ID|,
+		lastUpdated => 1031514049
+	},
+
+	'591' => {
+		message => q|Language|,
+		lastUpdated => 1031514049
+	},
+
+	'592' => {
+		message => q|Character Set|,
+		lastUpdated => 1031514049
+	},
+
+	'595' => {
+		message => q|International Messages|,
+		lastUpdated => 1031514049
+	},
+
+	'596' => {
+		message => q|MISSING|,
+		lastUpdated => 1031514049
+	},
+
+	'597' => {
+		message => q|Edit International Message|,
+		lastUpdated => 1031514049
+	},
+
+	'598' => {
+		message => q|Edit this translation.|,
+		lastUpdated => 1036971142
+	},
+
+	'601' => {
+		message => q|International ID|,
+		lastUpdated => 1031514049
+	},
+
+	'784' => {
+		message => q|Thumbnail|,
+		lastUpdated => 1036954393
+	},
+
+	'811' => {
+		message => q|From|,
+		lastUpdated => 1037580145
+	},
+
+	'810' => {
+		message => q|send|,
+		lastUpdated => 1037579743
+	},
+
+	'775' => {
+		message => q|Are you certain you wish to delete this folder and move its contents to it's parent folder?|,
+		lastUpdated => 1036903002
+	},
+
+	'642' => {
+		message => q|Page, Add/Edit|,
+		lastUpdated => 1078569027
+	},
+
+	'715' => {
+		message => q|Redirect URL|,
+		lastUpdated => 1031514049
+	},
+
+	'819' => {
+		message => q|Self-Deactivated|,
+		lastUpdated => 1038431323
+	},
+
+	'1067' => {
+		message => q|Forum Search Template|,
+		lastUpdated => 1066582842
+	},
+
+	'1068' => {
+		message => q|The following variables are available in the search template.
 <p>
 
 <b>callback.url</b><br>
@@ -1372,10 +2725,16 @@ The number of the current page in a multi-page listing.
 <p>
 
 |,
+		lastUpdated => 1066582842
+	},
 
-	1054 => q|Forum (Discussion) Properties|,
+	'1054' => {
+		message => q|Forum (Discussion) Properties|,
+		lastUpdated => 1066583000
+	},
 
-	1055 => q|WebGUI has a very powerful built-in discussion system. It can be attached to anything and is attached to many wobjects.
+	'1055' => {
+		message => q|WebGUI has a very powerful built-in discussion system. It can be attached to anything and is attached to many wobjects.
 <p>
 Forums (aka Discussions) have many settable properties. The following is a comprehensive list:
 <p>
@@ -1450,12 +2809,22 @@ If set to yes then posts will be set to pending by default and will not be displ
 A group that is allowed to moderate messages.
 <p>
 |,
+		lastUpdated => 1068708617
+	},
 
-	839 => q|Programmer Macros|,
+	'839' => {
+		message => q|Programmer Macros|,
+		lastUpdated => 1078570360
+	},
 
-	944 => q|Zip Code|,
+	'944' => {
+		message => q|Zip Code|,
+		lastUpdated => 1051962797,
+		context => q|The American term for "Postal Code". When translating translate as "Postal Code".|
+	},
 
-	625 => q|Upload any images that you'll possibly use in more than one location on your site.
+	'625' => {
+		message => q|Upload any images that you'll possibly use in more than one location on your site.
 <p/>
 
 <b>Name</b><br>
@@ -1482,31 +2851,64 @@ alt="This is an image"<br>
 <b>Thumbnail Size</b><br>
 How big (in pixels) should the thumbnail for this image be?
 <p/>|,
+		lastUpdated => 1038871530
+	},
 
-	800 => q|Unique Visitors|,
+	'800' => {
+		message => q|Unique Visitors|,
+		lastUpdated => 1036978829
+	},
 
-	799 => q|Page Views|,
+	'799' => {
+		message => q|Page Views|,
+		lastUpdated => 1036978804
+	},
 
-	798 => q|Page Title|,
+	'798' => {
+		message => q|Page Title|,
+		lastUpdated => 1036978688
+	},
 
-	797 => q|View traffic statistics.|,
+	'797' => {
+		message => q|View traffic statistics.|,
+		lastUpdated => 1036978191
+	},
 
-	796 => q|View page statistics.|,
+	'796' => {
+		message => q|View page statistics.|,
+		lastUpdated => 1036978043
+	},
 
-	795 => q|Roots|,
+	'795' => {
+		message => q|Roots|,
+		lastUpdated => 1036972103
+	},
 
-	794 => q|Packages|,
+	'794' => {
+		message => q|Packages|,
+		lastUpdated => 1036971944
+	},
 
-	793 => q|Pieces of Collateral|,
+	'793' => {
+		message => q|Pieces of Collateral|,
+		lastUpdated => 1036971785
+	},
 
-	792 => q|Templates|,
+	'792' => {
+		message => q|Templates|,
+		lastUpdated => 1036971696
+	},
 
-	633 => q|Simply put, roots are pages with no parent. The first and most important root in WebGUI is the "Home" page. Many people will never add any additional roots, but a few power users will. Those power users will create new roots for many different reasons. Perhaps they'll create a staging area for content managers. Or maybe a hidden area for Admin tools. Or possibly even a new root just to place their search engine.
+	'633' => {
+		message => q|Simply put, roots are pages with no parent. The first and most important root in WebGUI is the "Home" page. Many people will never add any additional roots, but a few power users will. Those power users will create new roots for many different reasons. Perhaps they'll create a staging area for content managers. Or maybe a hidden area for Admin tools. Or possibly even a new root just to place their search engine.
 <p>
 
 |,
+		lastUpdated => 1031514049
+	},
 
-	636 => q|To create a package follow these simple steps:
+	'636' => {
+		message => q|To create a package follow these simple steps:
 
 <ol>
 <li> From the admin menu select "Manage packages."
@@ -1529,19 +2931,28 @@ If you add content to any of the wobjects, that content will automatically be co
 Privileges and styles assigned to pages in the package will not be copied when the package is deployed. Instead the pages will take the privileges and styles of the area to which they are deployed.
 <p>
 |,
+		lastUpdated => 1038889481
+	},
 
-	635 => q|Packages are groups of pages and wobjects that are predefined to be deployed together. A package manager may see the need to create a package several pages with a message board, an FAQ, and a Poll because that task is performed quite often. Packages are often defined to lessen the burden of repetitive tasks.
+	'635' => {
+		message => q|Packages are groups of pages and wobjects that are predefined to be deployed together. A package manager may see the need to create a package several pages with a message board, an FAQ, and a Poll because that task is performed quite often. Packages are often defined to lessen the burden of repetitive tasks.
 <br><br>
 One package that many people create is a Page/Article package. It is often the case that you want to add a page with an article on it for content. Instead of going through the steps of creating a page, going to the page, and then adding an article to the page, you may wish to simply create a package to do those steps all at once.|,
+		lastUpdated => 1038889471
+	},
 
-	630 => q|WebGUI has a small, but sturdy real-time search engine built-in. If you wish to use the internal search engine, you can use the ^?; macro, or by adding <i>?op=search</i> to the end of any URL, or feel free to build your own form to access it.
+	'630' => {
+		message => q|WebGUI has a small, but sturdy real-time search engine built-in. If you wish to use the internal search engine, you can use the ^?; macro, or by adding <i>?op=search</i> to the end of any URL, or feel free to build your own form to access it.
 <p>
 Many people need a search engine to index their WebGUI site, plus many others. Or they have more advanced needs than what WebGUI's search engine allows. In those cases we recommend <a href="http://www.mnogosearch.org/">MnoGo Search</a> or <a href="http://www.htdig.org/">ht://Dig</a>.
 <p>
 
 |,
+		lastUpdated => 1038888957
+	},
 
-	611 => q|<b>Company Name</b><br>
+	'611' => {
+		message => q|<b>Company Name</b><br>
 The name of your company. It will appear on all emails and anywhere you use the Company Name macro.
 <br><br>
 
@@ -1552,18 +2963,27 @@ A general email address at your company. This is the address that all automated 
 <b>Company URL</b><br>
 The primary URL of your company. This will appear on all automated emails sent from the WebGUI system. It is also available via the WebGUI macro system.
 |,
+		lastUpdated => 1038872019
+	},
 
-	651 => q|If you choose to empty your trash, any items contained in it will be lost forever. If you're unsure about a few items, it might be best to cut them to your clipboard before you empty the trash.
+	'651' => {
+		message => q|If you choose to empty your trash, any items contained in it will be lost forever. If you're unsure about a few items, it might be best to cut them to your clipboard before you empty the trash.
 <p>
 
 |,
+		lastUpdated => 1031514049
+	},
 
-	627 => q|Profiles are used to extend the information of a particular user. In some cases profiles are important to a site, in others they are not. The profiles system is completely extensible. You can add as much information to the users profile as you like.
+	'627' => {
+		message => q|Profiles are used to extend the information of a particular user. In some cases profiles are important to a site, in others they are not. The profiles system is completely extensible. You can add as much information to the users profile as you like.
 <p>
 
 |,
+		lastUpdated => 1031514049
+	},
 
-	629 => q|<b>Use shared clipboard?</b><br>
+	'629' => {
+		message => q|<b>Use shared clipboard?</b><br>
 Enables a single, system-wide clipboard shared by all users.  Default is user separated clipboards.
 <p>
 
@@ -1592,8 +3012,11 @@ WebGUI can track some statistical information for your site. However, this will 
 Select which host to use by default when generating URLs. Config Sitename will use the "sitename" variable from your config file. And Env HTTP Host will use the "HTTP_HOST" environment variable provided by the web server.
 <p>
 |,
+		lastUpdated => 1066641387
+	},
 
-	616 => q|<b>Path to WebGUI Extras</b><br>
+	'616' => {
+		message => q|<b>Path to WebGUI Extras</b><br>
 The web-path to the directory containing WebGUI images and javascript files.
 <br><br>
 
@@ -1614,10 +3037,16 @@ The web-path of the directory where attachments are to be stored.
 <b>Server Attachment Path</b><br>
 The local path of the directory where attachments are to be stored. (Perhaps /var/www/public/uploads) Be sure that the web server has the rights to write to that directory.
 |,
+		lastUpdated => 1031514049
+	},
 
-	885 => q|Allow users to deactivate their account?|,
+	'885' => {
+		message => q|Allow users to deactivate their account?|,
+		lastUpdated => 1044708760
+	},
 
-	626 => q|Wobjects (fomerly known as Widgets) are the true power of WebGUI. Wobjects are tiny pluggable applications built to run under WebGUI. Message boards and polls are examples of wobjects.
+	'626' => {
+		message => q|Wobjects (fomerly known as Widgets) are the true power of WebGUI. Wobjects are tiny pluggable applications built to run under WebGUI. Message boards and polls are examples of wobjects.
 <p>
 
 To add a wobject to a page, first go to that page, then select <i>Add Content...</i> from the upper left corner of your screen. Each wobject has it's own help so be sure to read the help if you're not sure how to use it.
@@ -1634,8 +3063,11 @@ The style-sheet id is the word "wobjectId" plus the Wobject Id for that wobject 
 <p>
 
 |,
+		lastUpdated => 1047858549
+	},
 
-	632 => q|You can add wobjects by selecting from the <I>Add Content</I> pulldown menu. You can edit them by clicking on the "Edit" button that appears directly above an instance of a particular wobject. 
+	'632' => {
+		message => q|You can add wobjects by selecting from the <I>Add Content</I> pulldown menu. You can edit them by clicking on the "Edit" button that appears directly above an instance of a particular wobject. 
 <P>Almost all wobjects share some properties. Those properties are: 
 <P><B>Wobject ID</B><BR>This is the unique identifier WebGUI uses to keep track of this wobject instance. Normal users should never need to be concerned with the Wobject ID, but some advanced users may need to know it for things like SQL Reports. 
 <P><B>Title</B> The title of the wobject. This is typically displayed at the top of each wobject. 
@@ -1650,8 +3082,11 @@ The style-sheet id is the word "wobjectId" plus the Wobject Id for that wobject 
 <P><B>Who can edit?</B><BR>Choose the group that can edit this wobject. The group assigned editing rights can also always view the wobject. </P>
 <P><B>Description</B><BR>A content area in which you can place as much content as you wish. For instance, even before an FAQ there is usually a paragraph describing what is contained in the FAQ. 
 <P></P>|,
+		lastUpdated => 1056055106
+	},
 
-	623 => q|<a href="http://www.w3.org/Style/CSS/">Cascading Style Sheets (CSS)</a> are a great way to manage the look and feel of any web site. They are used extensively in WebGUI.
+	'623' => {
+		message => q|<a href="http://www.w3.org/Style/CSS/">Cascading Style Sheets (CSS)</a> are a great way to manage the look and feel of any web site. They are used extensively in WebGUI.
 <p>
 
 
@@ -1724,8 +3159,11 @@ The headings of columns on things like message boards and user contributions.
 
 
 |,
+		lastUpdated => 1070030223
+	},
 
-	846 => q|These macros are mainly useful in maintaining styles in WebGUI.
+	'846' => {
+		message => q|These macros are mainly useful in maintaining styles in WebGUI.
 <p/>
 
 <b>&#94;AdminBar;</b><br>
@@ -1788,8 +3226,11 @@ Create a spacer in your layout. Great for creating blocks of color with divs and
 <p>
 
 |,
+		lastUpdated => 1078243435
+	},
 
-	607 => q|<b>Anonymous Registration</b><br>
+	'607' => {
+		message => q|<b>Anonymous Registration</b><br>
 Do you wish visitors to your site to be able to register themselves?
 <br><br>
 
@@ -1889,17 +3330,29 @@ Just as the LDAP Identity Name is a label, so is the LDAP Password Name. Use thi
 <p>
 
 |,
+		lastUpdated => 1076700672
+	},
 
-	869 => q|Welcome Message|,
+	'869' => {
+		message => q|Welcome Message|,
+		lastUpdated => 1044138730
+	},
 
-	868 => q|Send welcome message?|,
+	'868' => {
+		message => q|Send welcome message?|,
+		lastUpdated => 1044138691
+	},
 
-	620 => q|As the function suggests you'll be deleting a group and removing all users from the group. Be careful not to orphan users from pages they should have access to by deleting a group that is in use.
+	'620' => {
+		message => q|As the function suggests you'll be deleting a group and removing all users from the group. Be careful not to orphan users from pages they should have access to by deleting a group that is in use.
 <p>
 
 As with any delete operation, you are prompted to be sure you wish to proceed with the delete. If you answer yes, the delete will proceed and there is no recovery possible. If you answer no you'll be returned to the prior screen.|,
+		lastUpdated => 1031514049
+	},
 
-	619 => q|This function permanently deletes the selected wobject from a page. If you are unsure whether you wish to delete this content you may be better served to cut the content to the clipboard until you are certain you wish to delete it.
+	'619' => {
+		message => q|This function permanently deletes the selected wobject from a page. If you are unsure whether you wish to delete this content you may be better served to cut the content to the clipboard until you are certain you wish to delete it.
 <p>
 
 
@@ -1907,8 +3360,11 @@ As with any delete operation, you are prompted to be sure you wish to proceed wi
 <p>
 
 |,
+		lastUpdated => 1031514049
+	},
 
-	617 => q|Settings are items that allow you to adjust WebGUI to your particular needs.
+	'617' => {
+		message => q|Settings are items that allow you to adjust WebGUI to your particular needs.
 <p>
 
 
@@ -1943,8 +3399,11 @@ Settings relating to users (beyond profile information), like authentication inf
 
 
 |,
+		lastUpdated => 1044139325
+	},
 
-	615 => q|Groups are used to subdivide privileges and responsibilities within the WebGUI system. For instance, you may be building a site for a classroom situation. In that case you might set up a different group for each class that you teach. You would then apply those groups to the pages that are designed for each class.
+	'615' => {
+		message => q|Groups are used to subdivide privileges and responsibilities within the WebGUI system. For instance, you may be building a site for a classroom situation. In that case you might set up a different group for each class that you teach. You would then apply those groups to the pages that are designed for each class.
 <p>
 
 There are several groups built into WebGUI. They are as follows:
@@ -1982,8 +3441,11 @@ Users that have privileges to edit templates for this site.
 Visitors are users who are not logged in using an account on the system. Also, if you wish to punish a registered user you could remove him/her from the Registered Users group and insert him/her into the Visitors group.
 <p>
 |,
+		lastUpdated => 1031514049
+	},
 
-	613 => q|Users are the accounts in the system that are given rights to do certain things. There are two default users built into the system: Admin and Visitor.
+	'613' => {
+		message => q|Users are the accounts in the system that are given rights to do certain things. There are two default users built into the system: Admin and Visitor.
 </i></p><p><i>
 
 <b>Admin</b><br>
@@ -2000,8 +3462,11 @@ Click on this to go to the add user screen.
 
 <b>Search</b><br>
 You can search users based on username and email address. You can do partial searches too if you like.|,
+		lastUpdated => 1031514049
+	},
 
-	612 => q|There is no need to ever actually delete a user. If you are concerned with locking out a user, then simply change their password. If you truely wish to delete a user, then please keep in mind that there are consequences. If you delete a user any content that they added to the site via wobjects (like message boards and user contributions) will remain on the site. However, if another user tries to visit the deleted user's profile they will get an error message. Also if the user ever is welcomed back to the site, there is no way to give him/her access to his/her old content items except by re-adding the user to the users table manually.
+	'612' => {
+		message => q|There is no need to ever actually delete a user. If you are concerned with locking out a user, then simply change their password. If you truely wish to delete a user, then please keep in mind that there are consequences. If you delete a user any content that they added to the site via wobjects (like message boards and user contributions) will remain on the site. However, if another user tries to visit the deleted user's profile they will get an error message. Also if the user ever is welcomed back to the site, there is no way to give him/her access to his/her old content items except by re-adding the user to the users table manually.
 <p>
 
 
@@ -2009,8 +3474,11 @@ As with any delete operation, you are prompted to be sure you wish to proceed wi
 <p>
 
 |,
+		lastUpdated => 1031514049
+	},
 
-	637 => q|<b>First Name</b><br>
+	'637' => {
+		message => q|<b>First Name</b><br>
 The given name of this user.
 <p>
 
@@ -2097,8 +3565,11 @@ Should discussions be laid out flat or threaded? Flat puts all replies on one pa
 How should this user be notified when they get a new WebGUI message?
 
 |,
+		lastUpdated => 1031514049
+	},
 
-	610 => q|See <b>Manage Users</b> for additional details.
+	'610' => {
+		message => q|See <b>Manage Users</b> for additional details.
 <p>
 
 <b>Username</b><br>
@@ -2138,15 +3609,21 @@ The Connect DN is the <b>cn</b> (or common name) of a given user in your LDAP da
 
 
 |,
+		lastUpdated => 1076700945
+	},
 
-	608 => q|Deleting a page can create a big mess if you are uncertain about what you are doing. When you delete a page you are also deleting the content it contains, all sub-pages connected to this page, and all the content they contain. Be certain that you have already moved all the content you wish to keep before you delete a page.
+	'608' => {
+		message => q|Deleting a page can create a big mess if you are uncertain about what you are doing. When you delete a page you are also deleting the content it contains, all sub-pages connected to this page, and all the content they contain. Be certain that you have already moved all the content you wish to keep before you delete a page.
 <p>
 
 As with any delete operation, you are prompted to be sure you wish to proceed with the delete. If you answer yes, the delete will proceed and there is no recovery possible. If you answer no you'll be returned to the prior screen.
 <p>
 |,
+		lastUpdated => 1031514049
+	},
 
-	606 => q|Think of pages as containers for content. For instance, if you want to write a letter to the editor of your favorite magazine you'd get out a notepad (or open a word processor) and start filling it with your thoughts. The same is true with WebGUI. Create a page, then add your content to the page.
+	'606' => {
+		message => q|Think of pages as containers for content. For instance, if you want to write a letter to the editor of your favorite magazine you'd get out a notepad (or open a word processor) and start filling it with your thoughts. The same is true with WebGUI. Create a page, then add your content to the page.
 <p>
 
 <b>Title</b><br>
@@ -2249,13 +3726,22 @@ You can optionally recursively give these privileges to all pages under this pag
 <b>What next?</b><br/>
 If you leave this on the default setting you'll be redirected to the new page after creating it.
 <p/>|,
+		lastUpdated => 1078569027
+	},
 
-	875 => q|A new message has been posted to one of your subscriptions.|,
+	'875' => {
+		message => q|A new message has been posted to one of your subscriptions.|,
+		lastUpdated => 1065874019
+	},
 
-	638 => q|Templates are used to affect how content is laid out in WebGUI. There are many templates that come with WebGUI, and using the template management system, you can add your own templates to the system to ensure that your site looks <b>exactly</b> how you want it to look. 
+	'638' => {
+		message => q|Templates are used to affect how content is laid out in WebGUI. There are many templates that come with WebGUI, and using the template management system, you can add your own templates to the system to ensure that your site looks <b>exactly</b> how you want it to look. 
 |,
+		lastUpdated => 1050430164
+	},
 
-	639 => q|<b>Template Name</b><br/>
+	'639' => {
+		message => q|<b>Template Name</b><br/>
 Give this template a descriptive name so that you'll know what it is when you're applying a template to content.
 <p/>
 
@@ -2268,13 +3754,19 @@ Create your template by using template commands and variables, macros, and HTML.
 <p/>
 
 <b>NOTE:</b> You should never edit the default templates that come with WebGUI as they are subject to change with each new release. Instead, copy the template you wish to edit, and edit the copy.|,
+		lastUpdated => 1038890615
+	},
 
-	640 => q|It is not a good idea to delete templates as you never know what kind of adverse affect it may have on your site (some content may still be using the template). 
+	'640' => {
+		message => q|It is not a good idea to delete templates as you never know what kind of adverse affect it may have on your site (some content may still be using the template). 
 <p>
 
 |,
+		lastUpdated => 1038791020
+	},
 
-	624 => q|WebGUI macros are used to create dynamic content within otherwise static content. For instance, you may wish to show which user is logged in on every page, or you may wish to have a dynamically built menu or crumb trail. 
+	'624' => {
+		message => q|WebGUI macros are used to create dynamic content within otherwise static content. For instance, you may wish to show which user is logged in on every page, or you may wish to have a dynamically built menu or crumb trail. 
 <p>
 
 Macros always begin with a carat (&#94;) and follow with at least one other character and ended with a semicolon (;). Some macros can be extended/configured by taking the format of &#94;<i>x</i>("<b>config text</b>");. 
@@ -2284,154 +3776,367 @@ NOTE: The following macros are reserved for system/wobject-specific functions as
 <b>&#94;-;,&#94;0;,&#94;1;,&#94;2;,&#94;3;, etc.</b><br>
 <p>
 |,
+		lastUpdated => 1046656837
+	},
 
-	670 => q|Image, Add/Edit|,
+	'670' => {
+		message => q|Image, Add/Edit|,
+		lastUpdated => 1038871530
+	},
 
-	813 => q|Groups In This Group|,
+	'813' => {
+		message => q|Groups In This Group|,
+		lastUpdated => 1037583186
+	},
 
-	678 => q|Root, Manage|,
+	'678' => {
+		message => q|Root, Manage|,
+		lastUpdated => 1031514049
+	},
 
-	681 => q|Packages, Creating|,
+	'681' => {
+		message => q|Packages, Creating|,
+		lastUpdated => 1038889481
+	},
 
-	680 => q|Package, Add|,
+	'680' => {
+		message => q|Package, Add|,
+		lastUpdated => 1038889471
+	},
 
-	675 => q|Search Engine, Using|,
+	'675' => {
+		message => q|Search Engine, Using|,
+		lastUpdated => 1038888957
+	},
 
-	656 => q|Company Information, Edit|,
+	'656' => {
+		message => q|Company Information, Edit|,
+		lastUpdated => 1038872019
+	},
 
-	696 => q|Trash, Empty|,
+	'696' => {
+		message => q|Trash, Empty|,
+		lastUpdated => 1031514049
+	},
 
-	672 => q|Profile Settings, Edit|,
+	'672' => {
+		message => q|Profile Settings, Edit|,
+		lastUpdated => 1031514049
+	},
 
-	674 => q|Miscellaneous Settings, Edit|,
+	'674' => {
+		message => q|Miscellaneous Settings, Edit|,
+		lastUpdated => 1038889454
+	},
 
-	661 => q|File Settings, Edit|,
+	'661' => {
+		message => q|File Settings, Edit|,
+		lastUpdated => 1031514049
+	},
 
-	663 => q|Messaging Settings, Edit|,
+	'663' => {
+		message => q|Messaging Settings, Edit|,
+		lastUpdated => 1044138790
+	},
 
-	671 => q|Wobjects, Using|,
+	'671' => {
+		message => q|Wobjects, Using|,
+		lastUpdated => 1047858549
+	},
 
-	677 => q|Wobject, Add/Edit|,
+	'677' => {
+		message => q|Wobject, Add/Edit|,
+		lastUpdated => 1047858650
+	},
 
-	668 => q|Style Sheets, Using|,
+	'668' => {
+		message => q|Style Sheets, Using|,
+		lastUpdated => 1046067403
+	},
 
-	667 => q|Group, Add/Edit|,
+	'667' => {
+		message => q|Group, Add/Edit|,
+		lastUpdated => 1031514049
+	},
 
-	652 => q|User Settings, Edit|,
+	'652' => {
+		message => q|User Settings, Edit|,
+		lastUpdated => 1076700672
+	},
 
-	665 => q|Group, Delete|,
+	'665' => {
+		message => q|Group, Delete|,
+		lastUpdated => 1031514049
+	},
 
-	664 => q|Wobject, Delete|,
+	'664' => {
+		message => q|Wobject, Delete|,
+		lastUpdated => 1031514049
+	},
 
-	662 => q|Settings, Manage|,
+	'662' => {
+		message => q|Settings, Manage|,
+		lastUpdated => 1031514049
+	},
 
-	660 => q|Groups, Manage|,
+	'660' => {
+		message => q|Groups, Manage|,
+		lastUpdated => 1031514049
+	},
 
-	658 => q|Users, Manage|,
+	'658' => {
+		message => q|Users, Manage|,
+		lastUpdated => 1031514049
+	},
 
-	657 => q|User, Delete|,
+	'657' => {
+		message => q|User, Delete|,
+		lastUpdated => 1031514049
+	},
 
-	682 => q|User Profile, Edit|,
+	'682' => {
+		message => q|User Profile, Edit|,
+		lastUpdated => 1031514049
+	},
 
-	655 => q|User, Add/Edit|,
+	'655' => {
+		message => q|User, Add/Edit|,
+		lastUpdated => 1076700945
+	},
 
-	653 => q|Page, Delete|,
+	'653' => {
+		message => q|Page, Delete|,
+		lastUpdated => 1031514049
+	},
 
-	679 => q|Content Settings, Edit|,
+	'679' => {
+		message => q|Content Settings, Edit|,
+		lastUpdated => 1038872365
+	},
 
-	683 => q|Templates, Manage|,
+	'683' => {
+		message => q|Templates, Manage|,
+		lastUpdated => 1050430164
+	},
 
-	684 => q|Template, Add/Edit|,
+	'684' => {
+		message => q|Template, Add/Edit|,
+		lastUpdated => 1038890615
+	},
 
-	685 => q|Template, Delete|,
+	'685' => {
+		message => q|Template, Delete|,
+		lastUpdated => 1038791020
+	},
 
-	669 => q|Macros, Using|,
+	'669' => {
+		message => q|Macros, Using|,
+		lastUpdated => 1046656837
+	},
 
-	697 => q|Karma, Using|,
+	'697' => {
+		message => q|Karma, Using|,
+		lastUpdated => 1031514049
+	},
 
-	698 => q|Karma is a method of tracking the activity of your users, and potentially rewarding or punishing them for their level of activity. Once karma has been enabled, you'll notice that the menus of many things in WebGUI change to reflect karma.
+	'698' => {
+		message => q|Karma is a method of tracking the activity of your users, and potentially rewarding or punishing them for their level of activity. Once karma has been enabled, you'll notice that the menus of many things in WebGUI change to reflect karma.
 <p>
 
 You can track whether users are logging in, and how much they contribute to your site. And you can allow them access to additional features by the level of their karma.
 <p>
 
 You can find out more about karma in <a href="http://www.plainblack.com/ruling_webgui">Ruling WebGUI</a>.|,
+		lastUpdated => 1031514049
+	},
 
-	699 => q|First Day Of Week|,
+	'699' => {
+		message => q|First Day Of Week|,
+		lastUpdated => 1031514049
+	},
 
-	702 => q|Month(s)|,
+	'702' => {
+		message => q|Month(s)|,
+		lastUpdated => 1031514049
+	},
 
-	703 => q|Year(s)|,
+	'703' => {
+		message => q|Year(s)|,
+		lastUpdated => 1031514049
+	},
 
-	704 => q|Second(s)|,
+	'704' => {
+		message => q|Second(s)|,
+		lastUpdated => 1031514049
+	},
 
-	705 => q|Minute(s)|,
+	'705' => {
+		message => q|Minute(s)|,
+		lastUpdated => 1031514049
+	},
 
-	706 => q|Hour(s)|,
+	'706' => {
+		message => q|Hour(s)|,
+		lastUpdated => 1031514049
+	},
 
-	716 => q|Login|,
+	'716' => {
+		message => q|Login|,
+		lastUpdated => 1031514049
+	},
 
-	717 => q|Logout|,
+	'717' => {
+		message => q|Logout|,
+		lastUpdated => 1031514049
+	},
 
-	781 => q|Snippet|,
+	'781' => {
+		message => q|Snippet|,
+		lastUpdated => 1036912954
+	},
 
-	953 => q|Previous Location|,
+	'953' => {
+		message => q|Previous Location|,
+		lastUpdated => 1052850265
+	},
 
-	946 => q|Use shared trash?|,
+	'946' => {
+		message => q|Use shared trash?|,
+		lastUpdated => 1052850265
+	},
 
-	1042 => q|Posts Per Page|,
+	'1042' => {
+		message => q|Posts Per Page|,
+		lastUpdated => 1066394411,
+		context => q|A label indicating that the administrator needs to enter an integer that specifies how many posts will be displayed per page on the discussion.|
+	},
 
-	1050 => q|Search For|,
+	'1050' => {
+		message => q|Search For|,
+		lastUpdated => 1066418903,
+		context => q|Prompt the admin to enter a string to search for in the replacement text.|
+	},
 
-	765 => q|Delete this collateral item.|,
+	'765' => {
+		message => q|Delete this collateral item.|,
+		lastUpdated => 1036892866
+	},
 
-	769 => q|Organize in Folder|,
+	'769' => {
+		message => q|Organize in Folder|,
+		lastUpdated => 1036893015
+	},
 
-	776 => q|Edit Folder|,
+	'776' => {
+		message => q|Edit Folder|,
+		lastUpdated => 1036905944
+	},
 
-	786 => q|WebGUI's collateral management system allows you to upload files and text to a central repository for use elsewhere in your content.
+	'786' => {
+		message => q|WebGUI's collateral management system allows you to upload files and text to a central repository for use elsewhere in your content.
 <p/>
 |,
+		lastUpdated => 1050430118
+	},
 
-	747 => q|Usernames must contain only alpha-numeric characters.|,
+	'747' => {
+		message => q|Usernames must contain only alpha-numeric characters.|,
+		lastUpdated => 1036384261
+	},
 
-	954 => q|Manage system clipboard.|,
+	'954' => {
+		message => q|Manage system clipboard.|,
+		lastUpdated => 1052850265
+	},
 
-	947 => q|Use shared clipboard?|,
+	'947' => {
+		message => q|Use shared clipboard?|,
+		lastUpdated => 1052850265
+	},
 
-	588 => q|Are you certain you wish to submit this translation to Plain Black for inclusion in the official distribution of WebGUI? By clicking on the yes link you understand that you're giving Plain Black an unlimited license to use the translation in its software distributions.|,
+	'588' => {
+		message => q|Are you certain you wish to submit this translation to Plain Black for inclusion in the official distribution of WebGUI? By clicking on the yes link you understand that you're giving Plain Black an unlimited license to use the translation in its software distributions.|,
+		lastUpdated => 1031514630
+	},
 
-	593 => q|Submit this translation.|,
+	'593' => {
+		message => q|Submit this translation.|,
+		lastUpdated => 1036970850
+	},
 
-	594 => q|Translate messages.|,
+	'594' => {
+		message => q|Translate messages.|,
+		lastUpdated => 1031514314
+	},
 
-	722 => q|Id|,
+	'722' => {
+		message => q|Id|,
+		lastUpdated => 1031517195
+	},
 
-	721 => q|Namespace|,
+	'721' => {
+		message => q|Namespace|,
+		lastUpdated => 1031515005
+	},
 
-	720 => q|OK|,
+	'720' => {
+		message => q|OK|,
+		lastUpdated => 1031514777
+	},
 
-	719 => q|Out of Date|,
+	'719' => {
+		message => q|Out of Date|,
+		lastUpdated => 1031514679
+	},
 
-	718 => q|Export this translation.|,
+	'718' => {
+		message => q|Export this translation.|,
+		lastUpdated => 1036970877
+	},
 
-	723 => q|Deprecated|,
+	'723' => {
+		message => q|Deprecated|,
+		lastUpdated => 1031800566
+	},
 
-	725 => q|Your username cannot be blank.|,
+	'725' => {
+		message => q|Your username cannot be blank.|,
+		lastUpdated => 1031879612
+	},
 
-	724 => q|Your username cannot begin or end with a space.|,
+	'724' => {
+		message => q|Your username cannot begin or end with a space.|,
+		lastUpdated => 1031879593
+	},
 
-	791 => q|Delete this translation.|,
+	'791' => {
+		message => q|Delete this translation.|,
+		lastUpdated => 1036970806
+	},
 
-	802 => q|WebGUI is not currently tracking page statistics. You can enable this feature in the settings.|,
+	'802' => {
+		message => q|WebGUI is not currently tracking page statistics. You can enable this feature in the settings.|,
+		lastUpdated => 1036979395
+	},
 
-	801 => q|Wobject Interactions|,
+	'801' => {
+		message => q|Wobject Interactions|,
+		lastUpdated => 1036978843
+	},
 
-	1033 => q|Post Template|,
+	'1033' => {
+		message => q|Post Template|,
+		lastUpdated => 1066034603,
+		context => q|Tell the admin to select a template for posts in this forum.|
+	},
 
-	952 => q|Clipboard Date|,
+	'952' => {
+		message => q|Clipboard Date|,
+		lastUpdated => 1052850265
+	},
 
-	1090 => q|The following are the variables available to display the individual response.
+	'1090' => {
+		message => q|The following are the variables available to display the individual response.
 <p>
 
 <b>title</b><br>
@@ -2551,112 +4256,273 @@ The correct answer for this question.
 
 
 </blockquote>|,
+		lastUpdated => 1078515839
+	},
 
-	739 => q|UI Level|,
+	'739' => {
+		message => q|UI Level|,
+		lastUpdated => 1033832377
+	},
 
-	738 => q|9 Guru|,
+	'738' => {
+		message => q|9 Guru|,
+		lastUpdated => 1033836704
+	},
 
-	737 => q|8 Master|,
+	'737' => {
+		message => q|8 Master|,
+		lastUpdated => 1033836698
+	},
 
-	736 => q|7 Expert|,
+	'736' => {
+		message => q|7 Expert|,
+		lastUpdated => 1033836692
+	},
 
-	735 => q|6 Professional|,
+	'735' => {
+		message => q|6 Professional|,
+		lastUpdated => 1033836686
+	},
 
-	734 => q|5 Adept|,
+	'734' => {
+		message => q|5 Adept|,
+		lastUpdated => 1033836678
+	},
 
-	733 => q|4 Skilled|,
+	'733' => {
+		message => q|4 Skilled|,
+		lastUpdated => 1033836668
+	},
 
-	732 => q|3 Rookie|,
+	'732' => {
+		message => q|3 Rookie|,
+		lastUpdated => 1033836660
+	},
 
-	731 => q|2 Trained|,
+	'731' => {
+		message => q|2 Trained|,
+		lastUpdated => 1033836651
+	},
 
-	730 => q|1 Novice|,
+	'730' => {
+		message => q|1 Novice|,
+		lastUpdated => 1033836642
+	},
 
-	729 => q|0 Beginner|,
+	'729' => {
+		message => q|0 Beginner|,
+		lastUpdated => 1033836631
+	},
 
-	886 => q|Hide from navigation?|,
+	'886' => {
+		message => q|Hide from navigation?|,
+		lastUpdated => 1044727952
+	},
 
-	887 => q|Midas (Mozilla 1.3+)|,
+	'887' => {
+		message => q|Midas (Mozilla 1.3+)|,
+		lastUpdated => 1047342950
+	},
 
-	824 => q|Email Footer|,
+	'824' => {
+		message => q|Email Footer|,
+		lastUpdated => 1038708558
+	},
 
-	951 => q|Are you certain that you wish to empty the clipboard to the trash?|,
+	'951' => {
+		message => q|Are you certain that you wish to empty the clipboard to the trash?|,
+		lastUpdated => 1052850265
+	},
 
-	820 => q|Your account is not activated. Therefore you cannot log in until it's activated, which only can be done by the admin.|,
+	'820' => {
+		message => q|Your account is not activated. Therefore you cannot log in until it's activated, which only can be done by the admin.|,
+		lastUpdated => 1038431645
+	},
 
-	749 => q|Track page statistics?|,
+	'749' => {
+		message => q|Track page statistics?|,
+		lastUpdated => 1036736182
+	},
 
-	778 => q|Folder Description|,
+	'778' => {
+		message => q|Folder Description|,
+		lastUpdated => 1036906132
+	},
 
-	806 => q|Delete this group.|,
+	'806' => {
+		message => q|Delete this group.|,
+		lastUpdated => 1037579396
+	},
 
-	785 => q|Collateral, Manage|,
+	'785' => {
+		message => q|Collateral, Manage|,
+		lastUpdated => 1050430118
+	},
 
-	1044 => q|Search Template|,
+	'1044' => {
+		message => q|Search Template|,
+		lastUpdated => 1066394621,
+		context => q|Tell the admin to select a template for search results.|
+	},
 
-	1041 => q|Unlock|,
+	'1041' => {
+		message => q|Unlock|,
+		lastUpdated => 1066073967,
+		context => q|A label for a link that unlocks the current thread.|
+	},
 
-	746 => q|Toolbar Icon Set|,
+	'746' => {
+		message => q|Toolbar Icon Set|,
+		lastUpdated => 1036046598
+	},
 
-	745 => q|Go back to the page.|,
+	'745' => {
+		message => q|Go back to the page.|,
+		lastUpdated => 1035872437
+	},
 
-	744 => q|What next?|,
+	'744' => {
+		message => q|What next?|,
+		lastUpdated => 1035864828
+	},
 
-	743 => q|You must specify a valid email address in order to attempt to recover your password.|,
+	'743' => {
+		message => q|You must specify a valid email address in order to attempt to recover your password.|,
+		lastUpdated => 1035246389
+	},
 
-	748 => q|User Count|,
+	'748' => {
+		message => q|User Count|,
+		lastUpdated => 1036553016
+	},
 
-	760 => q|Delete this folder.|,
+	'760' => {
+		message => q|Delete this folder.|,
+		lastUpdated => 1036892740
+	},
 
-	759 => q|Edit this folder.|,
+	'759' => {
+		message => q|Edit this folder.|,
+		lastUpdated => 1036892731
+	},
 
-	758 => q|Add a folder.|,
+	'758' => {
+		message => q|Add a folder.|,
+		lastUpdated => 1036892705
+	},
 
-	757 => q|Manage Collateral|,
+	'757' => {
+		message => q|Manage Collateral|,
+		lastUpdated => 1036892669
+	},
 
-	756 => q|Back to group list.|,
+	'756' => {
+		message => q|Back to group list.|,
+		lastUpdated => 1036867726
+	},
 
-	754 => q|Manage the users in this group.|,
+	'754' => {
+		message => q|Manage the users in this group.|,
+		lastUpdated => 1036866994
+	},
 
-	753 => q|Edit this group.|,
+	'753' => {
+		message => q|Edit this group.|,
+		lastUpdated => 1036866979
+	},
 
-	752 => q|View this user's profile.|,
+	'752' => {
+		message => q|View this user's profile.|,
+		lastUpdated => 1036864965
+	},
 
-	751 => q|Become this user.|,
+	'751' => {
+		message => q|Become this user.|,
+		lastUpdated => 1036864905
+	},
 
-	750 => q|Delete this user.|,
+	'750' => {
+		message => q|Delete this user.|,
+		lastUpdated => 1036864742
+	},
 
-	815 => q|The file you tried to upload is too large.|,
+	'815' => {
+		message => q|The file you tried to upload is too large.|,
+		lastUpdated => 1038023800
+	},
 
-	821 => q|Any|,
+	'821' => {
+		message => q|Any|,
+		lastUpdated => 1038432387
+	},
 
-	1078 => q|There is already a user of this system with the email address you've entered.  Press "Save" if you still wish to create this user|,
+	'1078' => {
+		message => q|There is already a user of this system with the email address you've entered.  Press "Save" if you still wish to create this user|,
+		lastUpdated => 1067951807
+	},
 
-	1076 => q|WebGUI Database|,
+	'1076' => {
+		message => q|WebGUI Database|,
+		lastUpdated => 1070899134,
+		context => q|A label indicating the the user will be selecting the default WebGUI database.|
+	},
 
-	1022 => q|Subscribe to discussion|,
+	'1022' => {
+		message => q|Subscribe to discussion|,
+		lastUpdated => 1065875027,
+		context => q|A label for a link that subscribes the user to the discussion they are currently viewing.|
+	},
 
-	1047 => q|Add a replacement.|,
+	'1047' => {
+		message => q|Add a replacement.|,
+		lastUpdated => 1066418669,
+		context => q|A label for a link that adds a new replacement (used in message boards).|
+	},
 
-	1083 => q|New Content|,
+	'1083' => {
+		message => q|New Content|,
+		lastUpdated => 1076866510,
+		context => q|A label for adding new wobjects that users can understand.|
+	},
 
-	823 => q|Go to the new page.|,
+	'823' => {
+		message => q|Go to the new page.|,
+		lastUpdated => 1038706332
+	},
 
-	1037 => q|Make sticky|,
+	'1037' => {
+		message => q|Make sticky|,
+		lastUpdated => 1066065402,
+		context => q|A label for a link that makes the current thread sticky.|
+	},
 
-	948 => q|Manage Clipboard|,
+	'948' => {
+		message => q|Manage Clipboard|,
+		lastUpdated => 1052850265
+	},
 
-	961 => q|The trash is a special system location where deleted content is temporarily stored. Items in the trash may be managed individually. You may cut an item to the clipboard or permanently delete it by selecting the approriate icon.  You may also purge/delete all items in the trash by choosing the Empty trash menu option.
+	'961' => {
+		message => q|The trash is a special system location where deleted content is temporarily stored. Items in the trash may be managed individually. You may cut an item to the clipboard or permanently delete it by selecting the approriate icon.  You may also purge/delete all items in the trash by choosing the Empty trash menu option.
 <p><b>Title</b><br>The name of the item in the trash.  You may view the item by selecting the title.
 <p><b>Type</b><br>The type of content.  For instance, a Page, Article, EventsCalendar, etc.
 <p><b>Trash Date</b><br>The date and time the item was added to the trash
 <p><b>Previous Location</b><br>The location where the item was previously found.  You may view the previous location by selecting the location.<p><b>Username</b><br>The username of the individual who placed the item in the trash.  This optional field is only visible in shared trash environments or when an administrator is managing the system trash.|,
+		lastUpdated => 1052850265
+	},
 
-	945 => q|Scratch Filter|,
+	'945' => {
+		message => q|Scratch Filter|,
+		lastUpdated => 1052560369,
+		context => q|There is a type of session variable called a "scratch" variable. So a scratch filter allows you to add someone to a group based upon a scratch variable.|
+	},
 
-	1091 => q|Statistical Overview Report Template|,
+	'1091' => {
+		message => q|Statistical Overview Report Template|,
+		lastUpdated => 1078517114
+	},
 
-	1092 => q|The following are the variables available in this template:
+	'1092' => {
+		message => q|The following are the variables available in this template:
 <p>
 
 <b>title</b><br>
@@ -2747,14 +4613,27 @@ A comment.
 
 
 </blockquote>|,
+		lastUpdated => 1078517114
+	},
 
-	1028 => q|Moderate posts?|,
+	'1028' => {
+		message => q|Moderate posts?|,
+		lastUpdated => 1065966284,
+		context => q|Asking the admin whether they wish to moderate the posts in a discussion or just allow all posts to go out.|
+	},
 
-	845 => q|Style Macros|,
+	'845' => {
+		message => q|Style Macros|,
+		lastUpdated => 1078243435
+	},
 
-	843 => q|User Macros|,
+	'843' => {
+		message => q|User Macros|,
+		lastUpdated => 1046656765
+	},
 
-	844 => q|These macros have to do with users and logins.
+	'844' => {
+		message => q|These macros have to do with users and logins.
 <p/>
 
 <b>&#94;a; or &#94;a(); - My Account Link</b><br>
@@ -2823,12 +4702,21 @@ The user id of the currently logged in user.
 <p>
 
 |,
+		lastUpdated => 1053779917
+	},
 
-	841 => q|Navigation Macro|,
+	'841' => {
+		message => q|Navigation Macro|,
+		lastUpdated => 1078243564
+	},
 
-	837 => q|Folder, Add/Edit|,
+	'837' => {
+		message => q|Folder, Add/Edit|,
+		lastUpdated => 1038871918
+	},
 
-	838 => q|Folders are used to organize collateral, much the same way you'd use folders on your hard drive or in a file cabinet.
+	'838' => {
+		message => q|Folders are used to organize collateral, much the same way you'd use folders on your hard drive or in a file cabinet.
 <p/>
 <b>Organize in Folder</b><br/>
 Folders can be inside of other folders. In which folder would you like to put this folder?
@@ -2841,10 +4729,16 @@ Give this folder a name so you can recognize what's in it.
 <b>Description</b><br/>
 Describe the folder so that you remember why you created it and what it's supposed to contain.
 <p/>|,
+		lastUpdated => 1038871918
+	},
 
-	835 => q|Snippet, Add/Edit|,
+	'835' => {
+		message => q|Snippet, Add/Edit|,
+		lastUpdated => 1038871744
+	},
 
-	836 => q|Snippets are bits of text that may be reused on your site. Thinks like java scripts, style sheets, flash animations, or even slogans are all great snippets. Best of all, if you need to change the text, you can change it in only one location.
+	'836' => {
+		message => q|Snippets are bits of text that may be reused on your site. Thinks like java scripts, style sheets, flash animations, or even slogans are all great snippets. Best of all, if you need to change the text, you can change it in only one location.
 <p/>
 <b>Name</b><br/>
 Give your snippet a unqiue name that you can use later to retrieve it.
@@ -2857,10 +4751,16 @@ Which collateral folder should contain this snippet?
 <b>Snippet</b><br/>
 Start typing! Or better yet, copy the snippet from some other electronic document and paste it here.
 <p/>|,
+		lastUpdated => 1038871744
+	},
 
-	833 => q|File, Add/Edit|,
+	'833' => {
+		message => q|File, Add/Edit|,
+		lastUpdated => 1038871497
+	},
 
-	834 => q|You can upload any kind of file to the repository to be used later.
+	'834' => {
+		message => q|You can upload any kind of file to the repository to be used later.
 <p/>
 
 <b>Name</b><br/>
@@ -2874,12 +4774,21 @@ Which collateral folder should hold this file?
 <b>File</b><br/>
 Select a file from your hard drive to upload.
 <p/>|,
+		lastUpdated => 1038871497
+	},
 
-	831 => q|Collateral Macros|,
+	'831' => {
+		message => q|Collateral Macros|,
+		lastUpdated => 1050441851
+	},
 
-	829 => q|Page Template|,
+	'829' => {
+		message => q|Page Template|,
+		lastUpdated => 1038870260
+	},
 
-	830 => q|Page templates are used to organize wobjects on your page. To do this you create page template positions. You can have any number of positions in your page template, but you must always have position one. The following are the variables available to page templates.
+	'830' => {
+		message => q|Page templates are used to organize wobjects on your page. To do this you create page template positions. You can have any number of positions in your page template, but you must always have position one. The following are the variables available to page templates.
 <p>
 
 <b>position<i>X</i>_loop</b><br>
@@ -2932,10 +4841,16 @@ The toolbar for manipulating the properties of the page.
 
 
 |,
+		lastUpdated => 1070028702
+	},
 
-	825 => q|Template, Language|,
+	'825' => {
+		message => q|Template, Language|,
+		lastUpdated => 1038865669
+	},
 
-	826 => q|WebGUI has a powerful templating language built to give you maximum control over the layout of your content. The following is a list of the template language syntax.
+	'826' => {
+		message => q|WebGUI has a powerful templating language built to give you maximum control over the layout of your content. The following is a list of the template language syntax.
 
 <p/>
 <b>NOTE:</b> Please note that the words <i>foo</i> and <i>bar</i> are used below as placeholders for the actual variable names that you'll use. They are not part of the template language.
@@ -3007,10 +4922,16 @@ Loops come with special condition variables of their own. They are __FIRST__, __
 
 <p/>
 <b>NOTE:</b>Both the template language and template variables are case-insensitive.|,
+		lastUpdated => 1038865669
+	},
 
-	827 => q|Wobject Template|,
+	'827' => {
+		message => q|Wobject Template|,
+		lastUpdated => 1052046436
+	},
 
-	828 => q|Most wobjects have templates that allow you to change the layout of the wobject's user interface. Those wobjects that do have templates all have a common set of template variables that you can use for layout, as well as their own custom variables. The following is a list of the common template variables shared among all wobjects.
+	'828' => {
+		message => q|Most wobjects have templates that allow you to change the layout of the wobject's user interface. Those wobjects that do have templates all have a common set of template variables that you can use for layout, as well as their own custom variables. The following is a list of the common template variables shared among all wobjects.
 <p/>
 <b>title</b><br/>
 The title for this wobject.
@@ -3035,58 +4956,141 @@ A conditional indicating if this wobject is a shortcut to an original wobject.
 <b>originalURL</b><br />
 If this wobject is a shortcut, then this URL will direct you to the original wobject.
 <p />|,
+		lastUpdated => 1053469640
+	},
 
-	1038 => q|Unstick|,
+	'1038' => {
+		message => q|Unstick|,
+		lastUpdated => 1066065454,
+		context => q|A label for a link that makes the current thread not sticky.|
+	},
 
-	847 => q|Go back to the current page.|,
+	'847' => {
+		message => q|Go back to the current page.|,
+		lastUpdated => 1039587250
+	},
 
-	848 => q|There is a syntax error in this template. Please correct.|,
+	'848' => {
+		message => q|There is a syntax error in this template. Please correct.|,
+		lastUpdated => 1039892202
+	},
 
-	972 => q|Date and Time|,
+	'972' => {
+		message => q|Date and Time|,
+		lastUpdated => 1053278234,
+		context => q|A field that holds a calendar date and clock time.|
+	},
 
-	855 => q|List all templates.|,
+	'855' => {
+		message => q|List all templates.|,
+		lastUpdated => 1039926498
+	},
 
-	854 => q|List all templates like this one.|,
+	'854' => {
+		message => q|List all templates like this one.|,
+		lastUpdated => 1039926488
+	},
 
-	853 => q|Delete this template.|,
+	'853' => {
+		message => q|Delete this template.|,
+		lastUpdated => 1039926459
+	},
 
-	852 => q|Copy this template.|,
+	'852' => {
+		message => q|Copy this template.|,
+		lastUpdated => 1039926448
+	},
 
-	851 => q|Edit this template.|,
+	'851' => {
+		message => q|Edit this template.|,
+		lastUpdated => 1039926394
+	},
 
-	856 => q|You have no account properties to edit at this time.|,
+	'856' => {
+		message => q|You have no account properties to edit at this time.|,
+		lastUpdated => 1040340432
+	},
 
-	973 => q|If proxied, use real client IP address?|,
+	'973' => {
+		message => q|If proxied, use real client IP address?|,
+		lastUpdated => 1053459227
+	},
 
-	1040 => q|Lock|,
+	'1040' => {
+		message => q|Lock|,
+		lastUpdated => 1066073923,
+		context => q|A label for a link that locks the current thread.|
+	},
 
-	1035 => q|Notification Template|,
+	'1035' => {
+		message => q|Notification Template|,
+		lastUpdated => 1066034661,
+		context => q|Tell the admin to select a template for the notification messages that come from this forum.|
+	},
 
-	971 => q|Time|,
+	'971' => {
+		message => q|Time|,
+		lastUpdated => 1053278208,
+		context => q|A field that holds clock time.|
+	},
 
-	857 => q|IP Address|,
+	'857' => {
+		message => q|IP Address|,
+		lastUpdated => 1043878310
+	},
 
-	861 => q|Make profile public?|,
+	'861' => {
+		message => q|Make profile public?|,
+		lastUpdated => 1043879954
+	},
 
-	860 => q|Make email address public?|,
+	'860' => {
+		message => q|Make email address public?|,
+		lastUpdated => 1043879942
+	},
 
-	859 => q|Signature|,
+	'859' => {
+		message => q|Signature|,
+		lastUpdated => 1043879866
+	},
 
-	858 => q|Alias|,
+	'858' => {
+		message => q|Alias|,
+		lastUpdated => 1043879848
+	},
 
-	862 => q|This user's profile is not public.|,
+	'862' => {
+		message => q|This user's profile is not public.|,
+		lastUpdated => 1043881275
+	},
 
-	866 => q|Expire Notifcation Message|,
+	'866' => {
+		message => q|Expire Notifcation Message|,
+		lastUpdated => 1044127055
+	},
 
-	865 => q|Notify user about expiration?|,
+	'865' => {
+		message => q|Notify user about expiration?|,
+		lastUpdated => 1044126938
+	},
 
-	864 => q|Expire Notification Offset|,
+	'864' => {
+		message => q|Expire Notification Offset|,
+		lastUpdated => 1044126838
+	},
 
-	863 => q|Delete Offset|,
+	'863' => {
+		message => q|Delete Offset|,
+		lastUpdated => 1044126633
+	},
 
-	867 => q|Loss of Privilege|,
+	'867' => {
+		message => q|Loss of Privilege|,
+		lastUpdated => 1044133143
+	},
 
-	618 => q|<b>SMTP Server</b><br>
+	'618' => {
+		message => q|<b>SMTP Server</b><br>
 This is the address of your local mail server. It is needed for all features that use the Internet email system (such as password recovery).
 <p>
 Optionally, if you are running a sendmail server on the same machine as WebGUI, you can also specify a path to your sendmail executable. On most Linux systems this can be found at "/usr/lib/sendmail".
@@ -3105,36 +5109,81 @@ What group should be alerted when a new user registers?
 <p>
 
 |,
+		lastUpdated => 1044709143
+	},
 
-	870 => q|Welcome|,
+	'870' => {
+		message => q|Welcome|,
+		lastUpdated => 1044139461
+	},
 
-	872 => q|Who can view?|,
+	'872' => {
+		message => q|Who can view?|,
+		lastUpdated => 1044218038
+	},
 
-	871 => q|Who can edit?|,
+	'871' => {
+		message => q|Who can edit?|,
+		lastUpdated => 1044218026
+	},
 
-	874 => q|Unsubscribe from thread|,
+	'874' => {
+		message => q|Unsubscribe from thread|,
+		lastUpdated => 1065876868
+	},
 
-	873 => q|Subscribe to thread|,
+	'873' => {
+		message => q|Subscribe to thread|,
+		lastUpdated => 1065876827
+	},
 
-	884 => q|Pop Up|,
+	'884' => {
+		message => q|Pop Up|,
+		lastUpdated => 1044705337
+	},
 
-	883 => q|Inline (when supported)|,
+	'883' => {
+		message => q|Inline (when supported)|,
+		lastUpdated => 1044705322
+	},
 
-	882 => q|Editor Mode|,
+	'882' => {
+		message => q|Editor Mode|,
+		lastUpdated => 1044705246
+	},
 
-	881 => q|None|,
+	'881' => {
+		message => q|None|,
+		lastUpdated => 1044705162
+	},
 
-	880 => q|Last Resort Editor|,
+	'880' => {
+		message => q|Last Resort Editor|,
+		lastUpdated => 1044705137
+	},
 
-	879 => q|Classic Editor (Internet Explorer 5+)|,
+	'879' => {
+		message => q|Classic Editor (Internet Explorer 5+)|,
+		lastUpdated => 1044705103
+	},
 
-	888 => q|Snippet Preview Length|,
+	'888' => {
+		message => q|Snippet Preview Length|,
+		lastUpdated => 1045312362
+	},
 
-	960 => q|Trash, Manage|,
+	'960' => {
+		message => q|Trash, Manage|,
+		lastUpdated => 1052850265
+	},
 
-	889 => q|Style Sheets, Tabs|,
+	'889' => {
+		message => q|Style Sheets, Tabs|,
+		lastUpdated => 1046067380
+	},
 
-	890 => q|WebGUI has a sub-system that can create tabs. You'll see these in complex forms such as page editing. In order to make the tabs system look good and match your site, you'll need to add a section to your style's style sheet specifically for the tabs. 
+	'890' => {
+		message => q|WebGUI has a sub-system that can create tabs. You'll see these in complex forms such as page editing. In order to make the tabs system look good and match your site, you'll need to add a section to your style's style sheet specifically for the tabs. 
 <p>
 The following style sheet classes are available:
 <p>
@@ -3219,8 +5268,11 @@ div.tabs {
 
 
 |,
+		lastUpdated => 1046067380
+	},
 
-	840 => q|These macros are designed to provide programming-like functionality. They are powerful when used appropriately, and dangerous when used carelessly. Take care when using these macros.
+	'840' => {
+		message => q|These macros are designed to provide programming-like functionality. They are powerful when used appropriately, and dangerous when used carelessly. Take care when using these macros.
 
 <p>
 <b>NOTE:</b> These macros are included in WebGUI in order to provide very powerful display mechanisms. Though they could be used to write simple web applications, this is not their intended use, nor is it supported or condoned by Plain Black. If you find yourself trying to do something like that, just write a macro. =) <b>By default these macros are disabled to protect the security of your site and server, and only your administrator can enable them.</b>
@@ -3319,20 +5371,41 @@ A randomly generated number. This is often used on images (such as banner ads) t
 These macros are reserved for system/wobject-specific functions as in the SQL Report wobject and the Body in the Style Manager.
 <p>
 |,
+		lastUpdated => 1078570360
+	},
 
-	1024 => q|Filter Post|,
+	'1024' => {
+		message => q|Filter Post|,
+		lastUpdated => 1046607477
+	},
 
-	419 => q|Remove everything but the text.|,
+	'419' => {
+		message => q|Remove everything but the text.|,
+		lastUpdated => 1046637533
+	},
 
-	526 => q|Remove JavaScript and negate macros.|,
+	'526' => {
+		message => q|Remove JavaScript and negate macros.|,
+		lastUpdated => 1047838780
+	},
 
-	891 => q|Only negate macros.|,
+	'891' => {
+		message => q|Only negate macros.|,
+		lastUpdated => 1047838859
+	},
 
-	892 => q|Discussion|,
+	'892' => {
+		message => q|Discussion|,
+		lastUpdated => 1046637952
+	},
 
-	893 => q|Wobject Properties|,
+	'893' => {
+		message => q|Wobject Properties|,
+		lastUpdated => 1046638419
+	},
 
-	1088 => q|The following template variables are available in the survey's gradebook report:
+	'1088' => {
+		message => q|The following template variables are available in the survey's gradebook report:
 <p>
 
 <b>title</b><br>
@@ -3381,20 +5454,43 @@ The percentage of correct questions.
 
 
 </blockquote>|,
+		lastUpdated => 1078513217
+	},
 
-	1026 => q|Allow rich edit?|,
+	'1026' => {
+		message => q|Allow rich edit?|,
+		lastUpdated => 1065966219,
+		context => q|Asking the admin whether they wish to allow rich edit in a discussion.|
+	},
 
-	896 => q|Cache Timeout (Visitors)|,
+	'896' => {
+		message => q|Cache Timeout (Visitors)|,
+		lastUpdated => 1056292980
+	},
 
-	895 => q|Cache Timeout|,
+	'895' => {
+		message => q|Cache Timeout|,
+		lastUpdated => 1056292971
+	},
 
-	1030 => q|by|,
+	'1030' => {
+		message => q|by|,
+		lastUpdated => 1047842270
+	},
 
-	1029 => q|Edited at|,
+	'1029' => {
+		message => q|Edited at|,
+		lastUpdated => 1047842180
+	},
 
-	1034 => q|Post Form Template|,
+	'1034' => {
+		message => q|Post Form Template|,
+		lastUpdated => 1066034620,
+		context => q|Tell the admin to select a template for post forms in this forum.|
+	},
 
-	1086 => q|Many wobjects have pagination features. Though some wobjects define their own pagination variables, most use a common set of pagination variables. These are those:
+	'1086' => {
+		message => q|Many wobjects have pagination features. Though some wobjects define their own pagination variables, most use a common set of pagination variables. These are those:
 
 <br /><br />
 
@@ -3449,68 +5545,148 @@ A list of links to the 10 nearest in the paginator relative to the current page.
 <p> 
 
 |,
+		lastUpdated => 1082370668
+	},
 
-	1027 => q|Allow replacements?|,
+	'1027' => {
+		message => q|Allow replacements?|,
+		lastUpdated => 1065966244,
+		context => q|Asking the admin whether they wish to allow text replacements in a discussion.|
+	},
 
-	1065 => q|Forum Post Form Template|,
+	'1065' => {
+		message => q|Forum Post Form Template|,
+		lastUpdated => 1066581759
+	},
 
-	1018 => q|Start a new thread|,
+	'1018' => {
+		message => q|Start a new thread|,
+		lastUpdated => 1065279960,
+		context => q|Add a new line of discussion to a forum.|
+	},
 
-	950 => q|Empty clipboard.|,
+	'950' => {
+		message => q|Empty clipboard.|,
+		lastUpdated => 1052850265
+	},
 
-	970 => q|set time|,
+	'970' => {
+		message => q|set time|,
+		lastUpdated => 1053278089,
+		context => q|Click the button to use the time chooser wizard.|
+	},
 
-	955 => q|Manage System Clipboard|,
+	'955' => {
+		message => q|Manage System Clipboard|,
+		lastUpdated => 1052850265
+	},
 
-	956 => q|Are you certain that you wish to move this item from the clipboard to the trash?|,
+	'956' => {
+		message => q|Are you certain that you wish to move this item from the clipboard to the trash?|,
+		lastUpdated => 1052850265
+	},
 
-	957 => q|Clipboard, Manage|,
+	'957' => {
+		message => q|Clipboard, Manage|,
+		lastUpdated => 1052850265
+	},
 
-	959 => q|Empty system clipboard.|,
+	'959' => {
+		message => q|Empty system clipboard.|,
+		lastUpdated => 1052850265
+	},
 
-	958 => q|The clipboard is a special system location to which content may be temporarily cut or copied.  Items in the clipboard may then be pasted to a new location.
+	'958' => {
+		message => q|The clipboard is a special system location to which content may be temporarily cut or copied.  Items in the clipboard may then be pasted to a new location.
 <p>The clipboard contents may be managed individually. You may delete or paste an item by selecting the approriate icon.  You may also empty the entire contents of the clipboard to the trash by choosing the Empty clipboard menu option.
 <p><b>Title</b><br>The name of the item in the clipboard.  You may view the item by selecting the title.
 <p><b>Type</b><br>The type of content.  For instance, a Page, Article, EventsCalendar, etc.
 <p><b>Clipboard Date</b><br>The date and time the item was added to the clipboard
 <p><b>Previous Location</b><br>The location where the item was previously found.  You may view the previous location by selecting the location.<p><b>Username</b><br>The username of the individual who placed the item in the clipboard.  This optional field is only visible in shared clipboard environments or when an administrator is managing the system clipboard.|,
+		lastUpdated => 1052850265
+	},
 
-	1077 => q|The function you are attempting to call is not available for this authentication module|,
+	'1077' => {
+		message => q|The function you are attempting to call is not available for this authentication module|,
+		lastUpdated => 1067951805
+	},
 
-	1051 => q|Replace With|,
+	'1051' => {
+		message => q|Replace With|,
+		lastUpdated => 1066418940,
+		context => q|Prompt the admin to enter a string to replace the search for string with in the replacement text.|
+	},
 
-	1043 => q|Archive After|,
+	'1043' => {
+		message => q|Archive After|,
+		lastUpdated => 1066394455,
+		context => q|A label indicating that the administrator needs to enter an interval that specifies how long posts will remain viewable before archiving.|
+	},
 
-	949 => q|Manage clipboard.|,
+	'949' => {
+		message => q|Manage clipboard.|,
+		lastUpdated => 1052850265
+	},
 
-	898 => q|Site Icon|,
+	'898' => {
+		message => q|Site Icon|,
+		lastUpdated => 1050172395
+	},
 
-	897 => q|Favicon|,
+	'897' => {
+		message => q|Favicon|,
+		lastUpdated => 1050170767
+	},
 
-	931 => q|Themes, Manage|,
+	'931' => {
+		message => q|Themes, Manage|,
+		lastUpdated => 1050437240
+	},
 
-	932 => q|Themes are a mechanism to quickly install new styles, templates, and collateral into a WebGUI site. They are also great for moving those same items from one site to another.
+	'932' => {
+		message => q|Themes are a mechanism to quickly install new styles, templates, and collateral into a WebGUI site. They are also great for moving those same items from one site to another.
 <p>
 <b>TIP:</b> When building a theme, be sure to name the components (styles, templates collateral) in the theme with some name that is unique to the theme. This is useful so that your users can find the components in your theme, as well as to avoid name conflicts.|,
+		lastUpdated => 1070027889
+	},
 
-	938 => q|Theme, Delete|,
+	'938' => {
+		message => q|Theme, Delete|,
+		lastUpdated => 1050437207
+	},
 
-	939 => q|When you delete a theme you've created all you're actually deleting is the basic properties for the theme. However, when you delete a theme you've imported, you'll also be deleting all of its components (styles, templates, and collateral) as well. Be careful that you are no longer using any of those components before deleting them.|,
+	'939' => {
+		message => q|When you delete a theme you've created all you're actually deleting is the basic properties for the theme. However, when you delete a theme you've imported, you'll also be deleting all of its components (styles, templates, and collateral) as well. Be careful that you are no longer using any of those components before deleting them.|,
+		lastUpdated => 1050437207
+	},
 
-	936 => q|Theme, Import|,
+	'936' => {
+		message => q|Theme, Import|,
+		lastUpdated => 1050436484
+	},
 
-	937 => q|In order to import a theme you need a valid theme file exported from another WebGUI site. Just select the theme from your hard drive and click the "Import" button. You'll then get a confirmation screen asking whether this is the theme you wanted to import. If you agree, click on the "Import" button again and you'll have your new theme. You can then start to apply the theme to your site as you would any normal style, template, or collateral data.
+	'937' => {
+		message => q|In order to import a theme you need a valid theme file exported from another WebGUI site. Just select the theme from your hard drive and click the "Import" button. You'll then get a confirmation screen asking whether this is the theme you wanted to import. If you agree, click on the "Import" button again and you'll have your new theme. You can then start to apply the theme to your site as you would any normal style, template, or collateral data.
 <p>
 You cannot import a theme twice. If you wish to import a new version of a theme, then you must first delete the previous version of the theme. 
 <p>
 You also cannot import a theme from a version of WebGUI that is newer than the one you're using. Therefore if you are using WebGUI 5.2.4 and a theme was created with WebGUI 6.0.0, then you will not be allowed to import the theme until you upgrade.
 |,
+		lastUpdated => 1050436484
+	},
 
-	935 => q|The file you uploaded does not appear to be a valid theme file.|,
+	'935' => {
+		message => q|The file you uploaded does not appear to be a valid theme file.|,
+		lastUpdated => 1050431137
+	},
 
-	933 => q|Theme, Edit|,
+	'933' => {
+		message => q|Theme, Edit|,
+		lastUpdated => 1050430737
+	},
 
-	934 => q|Creating and editing themes is a fairly simple process. First you set up some basic properties for the theme, and then you start adding components to the theme. 
+	'934' => {
+		message => q|Creating and editing themes is a fairly simple process. First you set up some basic properties for the theme, and then you start adding components to the theme. 
 <p>
 The basic properties of a theme cannot be changed by anyone except the site that the theme was created on. The following are the definitions of the basic properties of a theme:
 <p>
@@ -3531,10 +5707,16 @@ The URL of the web site for this theme's designer. If you are in the business of
 <p>
 
 |,
+		lastUpdated => 1050430737
+	},
 
-	940 => q|Open in new window?|,
+	'940' => {
+		message => q|Open in new window?|,
+		lastUpdated => 1050438829
+	},
 
-	832 => q|The collateral management system has several macros for its specific purpose.
+	'832' => {
+		message => q|The collateral management system has several macros for its specific purpose.
 <p/>
 
 <b>&#94;File();</b><br/>
@@ -3612,155 +5794,381 @@ This macro builds a quick image viewer using nothing more than the collateral ma
 <p/>
 
 |,
+		lastUpdated => 1051221379
+	},
 
-	930 => q|View Theme|,
+	'930' => {
+		message => q|View Theme|,
+		lastUpdated => 1050270912
+	},
 
-	929 => q|Import!|,
+	'929' => {
+		message => q|Import!|,
+		lastUpdated => 1050265357
+	},
 
-	928 => q|Do you wish to import this theme?|,
+	'928' => {
+		message => q|Do you wish to import this theme?|,
+		lastUpdated => 1050265284
+	},
 
-	927 => q|Import Theme|,
+	'927' => {
+		message => q|Import Theme|,
+		lastUpdated => 1050265139
+	},
 
-	926 => q|This theme was created with a newer version of WebGUI than is installed on your system. You must upgrade before installing this theme.|,
+	'926' => {
+		message => q|This theme was created with a newer version of WebGUI than is installed on your system. You must upgrade before installing this theme.|,
+		lastUpdated => 1050264990
+	},
 
-	925 => q|You already have another version of this theme installed. You must delete it before installing it again.|,
+	'925' => {
+		message => q|You already have another version of this theme installed. You must delete it before installing it again.|,
+		lastUpdated => 1050264954
+	},
 
-	924 => q|Import a theme.|,
+	'924' => {
+		message => q|Import a theme.|,
+		lastUpdated => 1050262993
+	},
 
-	923 => q|Theme Version|,
+	'923' => {
+		message => q|Theme Version|,
+		lastUpdated => 1050262964
+	},
 
-	922 => q|Created With|,
+	'922' => {
+		message => q|Created With|,
+		lastUpdated => 1050262917
+	},
 
-	921 => q|Theme Package File|,
+	'921' => {
+		message => q|Theme Package File|,
+		lastUpdated => 1050260403
+	},
 
-	920 => q|Export this theme.|,
+	'920' => {
+		message => q|Export this theme.|,
+		lastUpdated => 1050247169
+	},
 
-	919 => q|Edit this theme.|,
+	'919' => {
+		message => q|Edit this theme.|,
+		lastUpdated => 1050247154
+	},
 
-	918 => q|Delete this theme.|,
+	'918' => {
+		message => q|Delete this theme.|,
+		lastUpdated => 1050247144
+	},
 
-	917 => q|Add a theme component.|,
+	'917' => {
+		message => q|Add a theme component.|,
+		lastUpdated => 1050232824
+	},
 
-	916 => q|Snippet|,
+	'916' => {
+		message => q|Snippet|,
+		lastUpdated => 1050232301
+	},
 
-	915 => q|File|,
+	'915' => {
+		message => q|File|,
+		lastUpdated => 1050232294
+	},
 
-	914 => q|Image|,
+	'914' => {
+		message => q|Image|,
+		lastUpdated => 1050232286
+	},
 
-	913 => q|Template|,
+	'913' => {
+		message => q|Template|,
+		lastUpdated => 1050232279
+	},
 
-	911 => q|Component|,
+	'911' => {
+		message => q|Component|,
+		lastUpdated => 1050232236
+	},
 
-	909 => q|Add Theme Component|,
+	'909' => {
+		message => q|Add Theme Component|,
+		lastUpdated => 1050232207
+	},
 
-	908 => q|Are you certain you wish to remove this component from this theme?|,
+	'908' => {
+		message => q|Are you certain you wish to remove this component from this theme?|,
+		lastUpdated => 1050230878
+	},
 
-	907 => q|Are you certain you wish to delete this theme?|,
+	'907' => {
+		message => q|Are you certain you wish to delete this theme?|,
+		lastUpdated => 1050230443
+	},
 
-	906 => q|Designer URL|,
+	'906' => {
+		message => q|Designer URL|,
+		lastUpdated => 1050191766
+	},
 
-	905 => q|Theme Designer|,
+	'905' => {
+		message => q|Theme Designer|,
+		lastUpdated => 1050191749
+	},
 
-	904 => q|Theme Name|,
+	'904' => {
+		message => q|Theme Name|,
+		lastUpdated => 1050190959
+	},
 
-	903 => q|Theme ID|,
+	'903' => {
+		message => q|Theme ID|,
+		lastUpdated => 1050190880
+	},
 
-	902 => q|Edit Theme|,
+	'902' => {
+		message => q|Edit Theme|,
+		lastUpdated => 1050190716
+	},
 
-	901 => q|Add a new theme.|,
+	'901' => {
+		message => q|Add a new theme.|,
+		lastUpdated => 1050190107
+	},
 
-	900 => q|Manage themes.|,
+	'900' => {
+		message => q|Manage themes.|,
+		lastUpdated => 1050189066
+	},
 
-	899 => q|Manage Themes|,
+	'899' => {
+		message => q|Manage Themes|,
+		lastUpdated => 1050189012
+	},
 
-	943 => q|Checkbox|,
+	'943' => {
+		message => q|Checkbox|,
+		lastUpdated => 1051464272,
+		context => q|A form type that allows you to put a check mark in a box.|
+	},
 
-	942 => q|Radio List|,
+	'942' => {
+		message => q|Radio List|,
+		lastUpdated => 1051464141,
+		context => q|A form with a list of checkable boxes where only one box can be checked at a time.|
+	},
 
-	941 => q|Checkbox List|,
+	'941' => {
+		message => q|Checkbox List|,
+		lastUpdated => 1051464113,
+		context => q|A form with a list of checkable boxes.|
+	},
 
-	962 => q|Manage Trash|,
+	'962' => {
+		message => q|Manage Trash|,
+		lastUpdated => 1052850265
+	},
 
-	963 => q|Trash Date|,
+	'963' => {
+		message => q|Trash Date|,
+		lastUpdated => 1052850265
+	},
 
-	964 => q|Manage system trash.|,
+	'964' => {
+		message => q|Manage system trash.|,
+		lastUpdated => 1052850265
+	},
 
-	965 => q|Manage System Trash|,
+	'965' => {
+		message => q|Manage System Trash|,
+		lastUpdated => 1052850265
+	},
 
-	966 => q|Are you certain that you wish to permantently purge/delete this item from the trash?|,
+	'966' => {
+		message => q|Are you certain that you wish to permantently purge/delete this item from the trash?|,
+		lastUpdated => 1052850265
+	},
 
-	967 => q|Empty system trash.|,
+	'967' => {
+		message => q|Empty system trash.|,
+		lastUpdated => 1052850265
+	},
 
-	968 => q|Clipboard, Empty|,
+	'968' => {
+		message => q|Clipboard, Empty|,
+		lastUpdated => 1052850265
+	},
 
-	969 => q|If you choose to empty your clipboard, any items contained in it will be moved to the trash.
+	'969' => {
+		message => q|If you choose to empty your clipboard, any items contained in it will be moved to the trash.
 |,
+		lastUpdated => 1052850265
+	},
 
-	975 => q|Users can remove themselves?|,
+	'975' => {
+		message => q|Users can remove themselves?|,
+		lastUpdated => 1053778962,
+		context => q|Determines whether users can delete themselves from this group.|
+	},
 
-	974 => q|Users can add themselves?|,
+	'974' => {
+		message => q|Users can add themselves?|,
+		lastUpdated => 1053778912,
+		context => q|Determines whether users can add themselves to this group.|
+	},
 
-	976 => q|Add Users|,
+	'976' => {
+		message => q|Add Users|,
+		lastUpdated => 1053800614,
+		context => q|This is the label for a box that shows a list of users to add to a particular group.|
+	},
 
-	977 => q|Is secondary admin?|,
+	'977' => {
+		message => q|Is secondary admin?|,
+		lastUpdated => 1053803387,
+		context => q|A flag indicating whether the users has secondary administrative privileges for this group.|
+	},
 
-	978 => q|User added successfully.|,
+	'978' => {
+		message => q|User added successfully.|,
+		lastUpdated => 1053804577,
+		context => q|A message used after secondary admin adds a user successfully.|
+	},
 
-	1089 => q|Survey Response Template|,
+	'1089' => {
+		message => q|Survey Response Template|,
+		lastUpdated => 1078515839
+	},
 
-	1039 => q|Back|,
+	'1039' => {
+		message => q|Back|,
+		lastUpdated => 1066073289,
+		context => q|A generic term meaning to go to a place in history, or more specifically, a page in the user's history.|
+	},
 
-	1031 => q|Forum Template|,
+	'1031' => {
+		message => q|Forum Template|,
+		lastUpdated => 1066034528,
+		context => q|Tell the admin to select a template for this forum.|
+	},
 
-	1087 => q|Gradebook Report Template|,
+	'1087' => {
+		message => q|Gradebook Report Template|,
+		lastUpdated => 1078513217
+	},
 
-	979 => q|Are you certain you wish to delete all items in this folder? They cannot be recovered once deleted. Items in sub-folders will not be removed.|,
+	'979' => {
+		message => q|Are you certain you wish to delete all items in this folder? They cannot be recovered once deleted. Items in sub-folders will not be removed.|,
+		lastUpdated => 1055908341
+	},
 
-	980 => q|Empty this folder.|,
+	'980' => {
+		message => q|Empty this folder.|,
+		lastUpdated => 1055908341
+	},
 
-	982 => q|Add a database link.|,
+	'982' => {
+		message => q|Add a database link.|,
+		lastUpdated => 1056151382
+	},
 
-	983 => q|Edit this database link.|,
+	'983' => {
+		message => q|Edit this database link.|,
+		lastUpdated => 1056151382
+	},
 
-	984 => q|Copy this database link.|,
+	'984' => {
+		message => q|Copy this database link.|,
+		lastUpdated => 1056151382
+	},
 
-	985 => q|Delete this database link.|,
+	'985' => {
+		message => q|Delete this database link.|,
+		lastUpdated => 1056151382
+	},
 
-	986 => q|Back to database links.|,
+	'986' => {
+		message => q|Back to database links.|,
+		lastUpdated => 1056151382
+	},
 
-	987 => q|Delete Database Link|,
+	'987' => {
+		message => q|Delete Database Link|,
+		lastUpdated => 1056151382
+	},
 
-	988 => q|Are you certain you wish to delete this database link?  The following items are using this link and will no longer work if you delete it:|,
+	'988' => {
+		message => q|Are you certain you wish to delete this database link?  The following items are using this link and will no longer work if you delete it:|,
+		lastUpdated => 1056151382
+	},
 
-	989 => q|on page|,
+	'989' => {
+		message => q|on page|,
+		lastUpdated => 1056151382
+	},
 
-	990 => q|Edit Database Link|,
+	'990' => {
+		message => q|Edit Database Link|,
+		lastUpdated => 1056151382
+	},
 
-	991 => q|Database Link ID|,
+	'991' => {
+		message => q|Database Link ID|,
+		lastUpdated => 1056151382
+	},
 
-	992 => q|Title|,
+	'992' => {
+		message => q|Title|,
+		lastUpdated => 1056151382
+	},
 
-	993 => q|DSN|,
+	'993' => {
+		message => q|DSN|,
+		lastUpdated => 1056151382
+	},
 
-	994 => q|Database User|,
+	'994' => {
+		message => q|Database User|,
+		lastUpdated => 1056151382
+	},
 
-	995 => q|Database Password|,
+	'995' => {
+		message => q|Database Password|,
+		lastUpdated => 1056151382
+	},
 
-	996 => q|Manage Database Links|,
+	'996' => {
+		message => q|Manage Database Links|,
+		lastUpdated => 1056151382
+	},
 
-	997 => q|Database Links, Manage|,
+	'997' => {
+		message => q|Database Links, Manage|,
+		lastUpdated => 1056151382
+	},
 
-	998 => q|Database Link, Add/Edit|,
+	'998' => {
+		message => q|Database Link, Add/Edit|,
+		lastUpdated => 1056151382
+	},
 
-	999 => q|Database Link, Delete|,
+	'999' => {
+		message => q|Database Link, Delete|,
+		lastUpdated => 1056151382
+	},
 
-	1000 => q|<p>
+	'1000' => {
+		message => q|<p>
 Database Links enable a WebGUI administrator to add commonly used databases for use in SQL Reports.  This frees the SQL Report author from having to know or enter a DSN, user, or password.<br>
 <br>
 Be aware that any database links you create here will be available to all content authors.  While they will not be able to see the database connection info, they will be able to execute any select, show, or describe commands on the database.
 <p>|,
+		lastUpdated => 1056151382
+	},
 
-	1001 => q|<p>
+	'1001' => {
+		message => q|<p>
 The following fields make up a Database Link.
 <p>
 
@@ -3805,8 +6213,11 @@ The username you use to connect to the DSN.
 The password you use to connect to the DSN.
 <p>
 |,
+		lastUpdated => 1056151382
+	},
 
-	1002 => q|<p>
+	'1002' => {
+		message => q|<p>
 When you delete a database link, all SQL Reports using that link will stop working.  A list of all affected reports is shown on the confirmation screen.
 <p>
 
@@ -3814,12 +6225,22 @@ When you delete a database link, all SQL Reports using that link will stop worki
 As with any delete operation, you are prompted to be sure you wish to proceed with the delete. If you answer yes, the delete will proceed and there is no recovery possible. If you answer no you'll be returned to the prior screen.
 <p>
 |,
+		lastUpdated => 1056151382
+	},
 
-	1075 => q|Database Link|,
+	'1075' => {
+		message => q|Database Link|,
+		lastUpdated => 1056151382
+	},
 
-	1003 => q|Wobject privileges?|,
+	'1003' => {
+		message => q|Wobject privileges?|,
+		lastUpdated => 1056041703,
+		context => q|Would you like Wobject Privileges to be enabled?|
+	},
 
-	634 => q|<B>Default Home Page</B><BR>Some really small sites don't have a home page, but instead like to use one of their internal pages like "About Us" or "Company Information" as their home page. For that reason, you can set the default page of your site to any page in the site. That page will be the one people go to if they type in just your URL http://www.mywebguisite.com, or if they click on the Home link generated by the ^H; macro. 
+	'634' => {
+		message => q|<B>Default Home Page</B><BR>Some really small sites don't have a home page, but instead like to use one of their internal pages like "About Us" or "Company Information" as their home page. For that reason, you can set the default page of your site to any page in the site. That page will be the one people go to if they type in just your URL http://www.mywebguisite.com, or if they click on the Home link generated by the ^H; macro. 
 
 <P><B>Not Found Page</B><BR>If a page that a user requests is not found in the system, the user can be redirected to the home page or to an error page where they can attempt to find what they were looking for. You decide which is better for your users. 
 
@@ -3847,22 +6268,50 @@ As with any delete operation, you are prompted to be sure you wish to proceed wi
 <P><B>Text Box Size</B><BR>Some sites wish to control the size of the forms that WebGUI generates. With this setting you can specify how characters can be displayed at once in text boxes on the site. 
 
 <BR><BR><B>Wobject Privileges</B><BR>Choose 'Yes' to enable privileges at the Wobject level.&nbsp; By default, Wobjects are set to inherit page level privileges</P>|,
+		lastUpdated => 1070026791
+	},
 
-	1082 => q|Clipboard|,
+	'1082' => {
+		message => q|Clipboard|,
+		lastUpdated => 1076866475,
+		context => q|A label for the clipboard.|
+	},
 
-	1019 => q|Back to thread list|,
+	'1019' => {
+		message => q|Back to thread list|,
+		lastUpdated => 1065280160,
+		context => q|Return to the list of threads in a discussion.|
+	},
 
-	1052 => q|Edit Replacement|,
+	'1052' => {
+		message => q|Edit Replacement|,
+		lastUpdated => 1066418983,
+		context => q|A heading for the edit replacement page. |
+	},
 
-	1085 => q|Pagination Template Variables|,
+	'1085' => {
+		message => q|Pagination Template Variables|,
+		lastUpdated => 1078243385
+	},
 
-	1064 => q|Post a Message|,
+	'1064' => {
+		message => q|Post a Message|,
+		lastUpdated => 1066580782,
+		context => q|A header for the forum post form.|
+	},
 
-	1004 => q|Cache external groups for how long?|,
+	'1004' => {
+		message => q|Cache external groups for how long?|,
+		lastUpdated => 1057208065
+	},
 
-	1005 => q|SQL Query|,
+	'1005' => {
+		message => q|SQL Query|,
+		lastUpdated => 1057208065
+	},
 
-	622 => q|See <i>Manage Group</i> for a description of grouping functions and the default groups.
+	'622' => {
+		message => q|See <i>Manage Group</i> for a description of grouping functions and the default groups.
 <p>
 
 <b>Group Name</b><br>
@@ -3947,26 +6396,63 @@ This group could then be named "Employees in HMO 1", and would allow you to rest
 
 <b>Cache external groups for how long?</b><br>
 Large sites using external group data will be making many calls to the external database.  To help reduce the load, you may select how long you'd like to cache the results of the external database query within the WebGUI database.  More advanced background caching may be included in a future version of WebGUI.|,
+		lastUpdated => 1066651479
+	},
 
-	1006 => q|Encrypt Login?|,
+	'1006' => {
+		message => q|Encrypt Login?|,
+		lastUpdated => 1057208065
+	},
 
-	1010 => q|Text|,
+	'1010' => {
+		message => q|Text|,
+		lastUpdated => 1060433369,
+		context => q|A content type of text.|
+	},
 
-	1011 => q|Code|,
+	'1011' => {
+		message => q|Code|,
+		lastUpdated => 1060433339,
+		context => q|A content type of source code.|
+	},
 
-	1009 => q|HTML|,
+	'1009' => {
+		message => q|HTML|,
+		lastUpdated => 1060433286,
+		context => q|A content type of HTML.|
+	},
 
-	1008 => q|Mixed Text and HTML|,
+	'1008' => {
+		message => q|Mixed Text and HTML|,
+		lastUpdated => 1060433234,
+		context => q|A content type of mixed HTML and text.|
+	},
 
-	1007 => q|Content Type|,
+	'1007' => {
+		message => q|Content Type|,
+		lastUpdated => 1060432032,
+		context => q|The type of content to be posted, like HTML, source code, text, etc.|
+	},
 
-	1013 => q|Make sticky?|,
+	'1013' => {
+		message => q|Make sticky?|,
+		lastUpdated => 1060434033,
+		context => q|A message indicating whether the moderator wants to make this message stay at the top of the discussion.|
+	},
 
-	1012 => q|Lock this thread?|,
+	'1012' => {
+		message => q|Lock this thread?|,
+		lastUpdated => 1060433963,
+		context => q|A message indicating whether the moderator wants to lock the thread as he posts.|
+	},
 
-	1056 => q|Forum Template|,
+	'1056' => {
+		message => q|Forum Template|,
+		lastUpdated => 1066576831
+	},
 
-	1057 => q|The following template variables are available in forum templates.
+	'1057' => {
+		message => q|The following template variables are available in forum templates.
 <p>
 
 <b>callback.url</b><br>
@@ -4232,8 +6718,11 @@ The description of this forum as passed by the calling object.
 
 </blockquote>
 |,
+		lastUpdated => 1068919452
+	},
 
-	1059 => q|The following are the template variables available in the post template.
+	'1059' => {
+		message => q|The following are the template variables available in the post template.
 <p>
 
 <b>callback.url</b><br>
@@ -4426,20 +6915,46 @@ The description of this forum as passed by the calling object.
 
 
 |,
+		lastUpdated => 1068919407
+	},
 
-	1058 => q|Forum Post Template|,
+	'1058' => {
+		message => q|Forum Post Template|,
+		lastUpdated => 1066576785
+	},
 
-	1071 => q|Env HTTP Host|,
+	'1071' => {
+		message => q|Env HTTP Host|,
+		lastUpdated => 1066641511,
+		context => q|A label referring to the HTTP_HOST environment variable provided by the web server.|
+	},
 
-	1070 => q|Config Sitename|,
+	'1070' => {
+		message => q|Config Sitename|,
+		lastUpdated => 1066641473,
+		context => q|A label referring to the sitename property in the config file.|
+	},
 
-	1069 => q|Host To Use|,
+	'1069' => {
+		message => q|Host To Use|,
+		lastUpdated => 1066641432,
+		context => q|Ask the user which HTTP hostname they want to use.|
+	},
 
-	1072 => q|The email address is already in use. Please use a different email address.|,
+	'1072' => {
+		message => q|The email address is already in use. Please use a different email address.|,
+		lastUpdated => 1068703399,
+		context => q|Error message shown when trying to create/update an account with an email address that already exists.|
+	},
 
-	1084 => q|Default|,
+	'1084' => {
+		message => q|Default|,
+		lastUpdated => 1077472740,
+		context => q|A label indicating that the user should use the default setting.|
+	},
 
-	842 => q|<P>These macros are used to create navigation on the site. </P>
+	'842' => {
+		message => q|<P>These macros are used to create navigation on the site. </P>
 <P><B>^H; or ^H(); - Home Link</B><BR>A link to the home page of this site. In addition you can change the link text by creating a macro like this <B>^H("Go Home");</B>. 
 <P><B>NOTES:</B> You can also use the special case ^H(linkonly); to return only the URL to the home page and nothing more. Also, the .homeLink style sheet class is tied to this macro. </P>
 <P><B>^/; - System URL</B><BR>The URL to the gateway script (example: <I>/index.pl/</I>). 
@@ -4470,10 +6985,16 @@ The description of this forum as passed by the calling object.
 <P><B>.selectedMenuItem</B><BR>Use this class to highlight the current page in any of the menu macros. 
 <P><B>.verticalMenu </B><BR>The vertical menu (if you use a vertical menu macro). 
 <P><B>.horizontalMenu </B><BR>The horizontal menu (if you use a horizontal menu macro). </P>|,
+		lastUpdated => 1078477366
+	},
 
-	1073 => q|Style Template|,
+	'1073' => {
+		message => q|Style Template|,
+		lastUpdated => 1070027660
+	},
 
-	1074 => q|Style templates are a special kind of template in WebGUI. They allow you to keep your content seperated from the look and feel of your site. The following are the template variables available in style templates:
+	'1074' => {
+		message => q|Style templates are a special kind of template in WebGUI. They allow you to keep your content seperated from the look and feel of your site. The following are the template variables available in style templates:
 
 <p>
 
@@ -4494,10 +7015,16 @@ In addition to the above tags all of the session variables are made available to
 Following a guide like the above will help you get good ranking on search engines.
 
 |,
+		lastUpdated => 1070027660
+	},
 
-	1098 => q|Navigation, Add/Edit|,
+	'1098' => {
+		message => q|Navigation, Add/Edit|,
+		lastUpdated => 1078208044
+	},
 
-	1093 => q|<P>Edit Navigation lets you add and edit what are essentially 'menu templates' -- they define what pages' Menu Names should be included in a menu based (sometimes) on where that menu appears. </P>
+	'1093' => {
+		message => q|<P>Edit Navigation lets you add and edit what are essentially 'menu templates' -- they define what pages' Menu Names should be included in a menu based (sometimes) on where that menu appears. </P>
 <P><B>Identifier</B><BR>This is the (unique) label you will later use to specify this Navigation definition in a ^Navigation(); macro.</P>
 <P><B>Base Page<BR></B>This identifies the spot in the Page Tree where the macro should commence listing pages. The first three choices will create 'absolute' menus -- ones which will display the same pages no matter which page you use the macro from. </P>
 <P></P>
@@ -4523,20 +7050,32 @@ Following a guide like the above will help you get good ranking on search engine
 <P><B>Template</B><BR>This menu permits you to select a template which is used to style the output created by the macro -- if you need the same collection of pages in multiple formats, you'll need to create multiple Navigation entries with (slightly) different names; the Copy Navigation button is useful for this.</P>
 <P><B>Revert Output<BR></B>When this option is switched on, the menu will be in reverse order.</P>
 <P><STRONG>Preview<BR></STRONG>The Preview button allows you to view a navigation setup without actually saving it.<STRONG><FONT color=#ff0000></P></FONT></STRONG>|,
+		lastUpdated => 1078461049
+	},
 
-	1094 => q|Navigation, Manage|,
+	'1094' => {
+		message => q|Navigation, Manage|,
+		lastUpdated => 1078208044
+	},
 
-	1095 => q|<P>The general idea behind the&nbsp;navigation system is that instead of<BR>hardwiring all the various choices you might make into the code, the<BR>system manages a 'library' of these styles, just the way it does with<BR>Snippets, Images, Templates, Page Styles, and other types of reusable<BR>information.&nbsp; You can create a new 'nav menu style', give it a name,<BR>and then use it anywhere on your site that you like.</P>
+	'1095' => {
+		message => q|<P>The general idea behind the&nbsp;navigation system is that instead of<BR>hardwiring all the various choices you might make into the code, the<BR>system manages a 'library' of these styles, just the way it does with<BR>Snippets, Images, Templates, Page Styles, and other types of reusable<BR>information.&nbsp; You can create a new 'nav menu style', give it a name,<BR>and then use it anywhere on your site that you like.</P>
 <P>The navigation system consists of two parts:</P>
 <OL>
 <LI>The navigation editor</LI>
 <LI>The <STRONG>^Navigation();</STRONG> macro</LI></OL>
 <P>The easiest way to add a completely new menu to your site is to put a <STRONG>^Navigation(myMenu);</STRONG> macro into your style. <BR>A "edit myMenu" link will be displayed if "myMenu" is not defined. </P>
 <P>Note: In this example "myMenu" is used, but you can pick any name, as long as it is unique.</P>|,
+		lastUpdated => 1078462928
+	},
 
-	1096 => q|Navigation Template|,
+	'1096' => {
+		message => q|Navigation Template|,
+		lastUpdated => 1078207966
+	},
 
-	1097 => q|<STRONG>config.button</STRONG>&nbsp;<BR>A "Edit / Manage" button for this navigation item.<BR>
+	'1097' => {
+		message => q|<STRONG>config.button</STRONG>&nbsp;<BR>A "Edit / Manage" button for this navigation item.<BR>
 <P><STRONG>page_loop</STRONG><BR>A loop containing page information.</P>
 <BLOCKQUOTE dir=ltr style="MARGIN-RIGHT: 0px">
 <P dir=ltr><STRONG>page.menuTitle<BR></STRONG>The menu title of this page.</P>
@@ -4571,8 +7110,13 @@ Following a guide like the above will help you get good ranking on search engine
 <P dir=ltr>&lt;tmpl_if page.depthIs1&gt;<BR>&nbsp;&nbsp; &lt;img src="level1.gif"&gt;<BR>&lt;tmpl_else&gt;<BR>&nbsp;&nbsp; &lt;img src="defaultBullet.gif"&gt;<BR>&lt;/tmpl_if&gt;</P>
 <P dir=ltr><STRONG>page.relativeDepthIs1 , page.relativeDepthIs2 , page.relativeDepthIs3 , page.relativeDepthIsN</STRONG><BR>A condition indicating whether the relative depth of this page is N.</P></BLOCKQUOTE>
 <P dir=ltr>&nbsp;</P>|,
+		lastUpdated => 1078207966
+	},
 
-	981 => q|Manage database links.|,
+	'981' => {
+		message => q|Manage database links.|,
+		lastUpdated => 1056151382
+	},
 
 };
 

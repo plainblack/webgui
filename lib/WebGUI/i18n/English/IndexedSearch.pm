@@ -1,9 +1,13 @@
 package WebGUI::i18n::English::IndexedSearch;
 
 our $I18N = {
-	29 => q|Search template|,
+	'29' => {
+		message => q|Search template|,
+		lastUpdated => 1070202588
+	},
 
-	28 => q|
+	'28' => {
+		message => q|
 <P>This is the list of template variables available for 
 search&nbsp;templates:</P>
 <P><STRONG>query<BR></STRONG>Contains the value of the <EM>query</EM> form 
@@ -69,60 +73,146 @@ one page in the paginator.
 the first page. 
 <P><B>isLastPage</B><BR>A conditional indicating whether the visitor is viewing 
 the last page.</P>|,
+		lastUpdated => 1070202325
+	},
 
-	2 => q|No index created. The scheduler must run and create the index first.|,
+	'2' => {
+		message => q|No index created. The scheduler must run and create the index first.|,
+		lastUpdated => 1066252099
+	},
 
-	3 => q|Please refer to the documentation for more info.|,
+	'3' => {
+		message => q|Please refer to the documentation for more info.|,
+		lastUpdated => 1066252166
+	},
 
-	4 => q|This page|,
+	'4' => {
+		message => q|This page|,
+		lastUpdated => 1066252218
+	},
 
-	5 => q|Index to use|,
+	'5' => {
+		message => q|Index to use|,
+		lastUpdated => 1066252241
+	},
 
-	6 => q|Search through|,
+	'6' => {
+		message => q|Search through|,
+		lastUpdated => 1066252264
+	},
 
-	1 => q|Table Search_docInfo can't be opened.|,
+	'1' => {
+		message => q|Table Search_docInfo can't be opened.|,
+		lastUpdated => 1066252055
+	},
 
-	14 => q|Highlight color|,
+	'14' => {
+		message => q|Highlight color|,
+		lastUpdated => 1066252536
+	},
 
-	13 => q|Highlight results ?|,
+	'13' => {
+		message => q|Highlight results ?|,
+		lastUpdated => 1066252498
+	},
 
-	12 => q|Context preview length|,
+	'12' => {
+		message => q|Context preview length|,
+		lastUpdated => 1066252463
+	},
 
-	11 => q|Paginate after|,
+	'11' => {
+		message => q|Paginate after|,
+		lastUpdated => 1066252409
+	},
 
-	10 => q|Only results of type|,
+	'10' => {
+		message => q|Only results of type|,
+		lastUpdated => 1066252387
+	},
 
-	9 => q|Only results in language|,
+	'9' => {
+		message => q|Only results in language|,
+		lastUpdated => 1066252363
+	},
 
-	8 => q|Only results in namespace|,
+	'8' => {
+		message => q|Only results in namespace|,
+		lastUpdated => 1066252344
+	},
 
-	7 => q|Only results created by|,
+	'7' => {
+		message => q|Only results created by|,
+		lastUpdated => 1066252303
+	},
 
-	20 => q|Wobject details|,
+	'20' => {
+		message => q|Wobject details|,
+		lastUpdated => 1066765556
+	},
 
-	18 => q|Any namespace|,
+	'18' => {
+		message => q|Any namespace|,
+		lastUpdated => 1066593420,
+		context => q|first option for "Search in namespace:"|
+	},
 
-	17 => q|Search|,
+	'17' => {
+		message => q|Search|,
+		lastUpdated => 1066593262,
+		context => q|Title of this wobject|
+	},
 
-	16 => q|Search|,
+	'16' => {
+		message => q|Search|,
+		lastUpdated => 1066565087,
+		context => q|Label of the search submit button.|
+	},
 
-	15 => q|All pages|,
+	'15' => {
+		message => q|All pages|,
+		lastUpdated => 1066253116
+	},
 
-	19 => q|Wobject|,
+	'19' => {
+		message => q|Wobject|,
+		lastUpdated => 1066765495
+	},
 
-	22 => q|Profile|,
+	'22' => {
+		message => q|Profile|,
+		lastUpdated => 1066765844
+	},
 
-	25 => q|Any user|,
+	'25' => {
+		message => q|Any user|,
+		lastUpdated => 1066766053
+	},
 
-	24 => q|Any language|,
+	'24' => {
+		message => q|Any language|,
+		lastUpdated => 1066766053
+	},
 
-	23 => q|Any Content Type|,
+	'23' => {
+		message => q|Any Content Type|,
+		lastUpdated => 1066766053,
+		context => q|Any type of content|
+	},
 
-	21 => q|Content|,
+	'21' => {
+		message => q|Content|,
+		lastUpdated => 1066765681,
+		context => q|Collective term for Wobjects, Pages and Wobject details.|
+	},
 
-	26 => q|Search, Add/Edit|,
+	'26' => {
+		message => q|Search, Add/Edit|,
+		lastUpdated => 1067346336
+	},
 
-	27 => q|
+	'27' => {
+		message => q|
 <P>The Search adds advanced search capabilities to your WebGUI site. </P>
 <P><STRONG>Index to use<BR></STRONG>The Search uses an index to retrieve it's 
 results from. Indexes are created with the scheduler. You can create more then one index. Choose here which index to use.</P>
@@ -157,6 +247,8 @@ no preview.</P>
 highlight the search results in the preview you'll want to check this box.</P>
 <P dir=ltr align=left><STRONG>Highlight color n<BR></STRONG>The colors that are 
 used to highlight the corresponding words in the query.&nbsp;</P>|,
+		lastUpdated => 1070195783
+	},
 
 };
 

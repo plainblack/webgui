@@ -2,8 +2,8 @@ package WebGUI::Help::SiteMap;
 
 our $HELP = {
 	'site map add/edit' => {
-		title => 61,
-		body => 71,
+		title => '61',
+		body => '71',
 		related => [
 			{
 				tag => 'site map template',
@@ -16,8 +16,8 @@ our $HELP = {
 		]
 	},
 	'site map template' => {
-		title => 72,
-		body => 73,
+		title => '72',
+		body => '73',
 		related => [
 			{
 				tag => 'site map add/edit',

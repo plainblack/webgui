@@ -2,8 +2,8 @@ package WebGUI::Help::DataForm;
 
 our $HELP = {
 	'data form add/edit' => {
-		title => 61,
-		body => 71,
+		title => '61',
+		body => '71',
 		related => [
 			{
 				tag => 'data form fields add/edit',
@@ -24,8 +24,8 @@ our $HELP = {
 		]
 	},
 	'data form fields add/edit' => {
-		title => 62,
-		body => 72,
+		title => '62',
+		body => '72',
 		related => [
 			{
 				tag => 'data form template',
@@ -38,8 +38,8 @@ our $HELP = {
 		]
 	},
 	'data form template' => {
-		title => 82,
-		body => 83,
+		title => '82',
+		body => '83',
 		related => [
 			{
 				tag => 'data form fields add/edit',
@@ -56,8 +56,8 @@ our $HELP = {
 		]
 	},
 	'data form list template' => {
-		title => 88,
-		body => 89,
+		title => '88',
+		body => '89',
 		related => [
 			{
 				tag => 'data form add/edit',

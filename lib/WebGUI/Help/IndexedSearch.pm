@@ -2,8 +2,8 @@ package WebGUI::Help::IndexedSearch;
 
 our $HELP = {
 	'search add/edit' => {
-		title => 26,
-		body => 27,
+		title => '26',
+		body => '27',
 		related => [
 			{
 				tag => 'wobjects using',
@@ -16,8 +16,8 @@ our $HELP = {
 		]
 	},
 	'search template' => {
-		title => 29,
-		body => 28,
+		title => '29',
+		body => '28',
 		related => [
 			{
 				tag => 'wobjects using',

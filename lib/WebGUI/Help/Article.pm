@@ -2,8 +2,8 @@ package WebGUI::Help::Article;
 
 our $HELP = {
 	'article add/edit' => {
-		title => 61,
-		body => 71,
+		title => '61',
+		body => '71',
 		related => [
 			{
 				tag => 'article template',
@@ -20,8 +20,8 @@ our $HELP = {
 		]
 	},
 	'article template' => {
-		title => 72,
-		body => 73,
+		title => '72',
+		body => '73',
 		related => [
 			{
 				tag => 'article add/edit',

@@ -1,19 +1,38 @@
 package WebGUI::i18n::English::SiteMap;
 
 our $I18N = {
-	2 => q|Site Map|,
+	'2' => {
+		message => q|Site Map|,
+		lastUpdated => 1031514049
+	},
 
-	3 => q|Start With|,
+	'3' => {
+		message => q|Start With|,
+		lastUpdated => 1039908390
+	},
 
-	4 => q|Depth To Traverse|,
+	'4' => {
+		message => q|Depth To Traverse|,
+		lastUpdated => 1031514049
+	},
 
-	5 => q|Edit Site Map|,
+	'5' => {
+		message => q|Edit Site Map|,
+		lastUpdated => 1031514049
+	},
 
-	6 => q|Indent|,
+	'6' => {
+		message => q|Indent|,
+		lastUpdated => 1031514049
+	},
 
-	61 => q|Site Map, Add/Edit|,
+	'61' => {
+		message => q|Site Map, Add/Edit|,
+		lastUpdated => 1038890147
+	},
 
-	71 => q|Site maps are used to provide additional navigation in WebGUI. You could set up a traditional site map that would display a hierarchical view of all the pages in the site. On the other hand, you could use site maps to provide extra navigation at certain levels in your site.
+	'71' => {
+		message => q|Site maps are used to provide additional navigation in WebGUI. You could set up a traditional site map that would display a hierarchical view of all the pages in the site. On the other hand, you could use site maps to provide extra navigation at certain levels in your site.
 <br><br>
 
 <b>Template</b><br/>
@@ -37,10 +56,16 @@ If this setting is true, site map entries are sorted alphabetically.  If this se
 <p>
 
 |,
+		lastUpdated => 1039908464
+	},
 
-	72 => q|Site Map Template|,
+	'72' => {
+		message => q|Site Map Template|,
+		lastUpdated => 1047855100
+	},
 
-	73 => q|This is the list of template variables available for site map templates.
+	'73' => {
+		message => q|This is the list of template variables available for site map templates.
 <p />
 
 <b>page_loop</b><br />
@@ -82,12 +107,23 @@ A condition indicating whether or not this page is at the top of the navigation 
 
 </blockquote>
 <p />|,
+		lastUpdated => 1047855100
+	},
 
-	75 => q|All Roots|,
+	'75' => {
+		message => q|All Roots|,
+		lastUpdated => 1039908572
+	},
 
-	74 => q|This Page|,
+	'74' => {
+		message => q|This Page|,
+		lastUpdated => 1039908565
+	},
 
-	7 => q|Alphabetic?|,
+	'7' => {
+		message => q|Alphabetic?|,
+		lastUpdated => 1057208065
+	},
 
 };
 

@@ -1,31 +1,68 @@
 package WebGUI::i18n::English::SQLReport;
 
 our $I18N = {
-	1 => q|SQL Report|,
+	'1' => {
+		message => q|SQL Report|,
+		lastUpdated => 1031514049
+	},
 
-	4 => q|Query|,
+	'4' => {
+		message => q|Query|,
+		lastUpdated => 1031514049
+	},
 
-	8 => q|Edit SQL Report|,
+	'8' => {
+		message => q|Edit SQL Report|,
+		lastUpdated => 1031514049
+	},
 
-	10 => q|<b>Debug:</b> Error: The SQL specified is of an improper format.|,
+	'10' => {
+		message => q|<b>Debug:</b> Error: The SQL specified is of an improper format.|,
+		lastUpdated => 1031514049
+	},
 
-	11 => q|<b>Debug:</b> Error: There was a problem with the query.|,
+	'11' => {
+		message => q|<b>Debug:</b> Error: There was a problem with the query.|,
+		lastUpdated => 1031514049
+	},
 
-	12 => q|<b>Debug:</b> Error: Could not connect to the database.|,
+	'12' => {
+		message => q|<b>Debug:</b> Error: Could not connect to the database.|,
+		lastUpdated => 1031514049
+	},
 
-	14 => q|Paginate After|,
+	'14' => {
+		message => q|Paginate After|,
+		lastUpdated => 1031514049
+	},
 
-	15 => q|Preprocess macros on query?|,
+	'15' => {
+		message => q|Preprocess macros on query?|,
+		lastUpdated => 1031514049
+	},
 
-	16 => q|Debug?|,
+	'16' => {
+		message => q|Debug?|,
+		lastUpdated => 1031514049
+	},
 
-	17 => q|<b>Debug:</b> Query:|,
+	'17' => {
+		message => q|<b>Debug:</b> Query:|,
+		lastUpdated => 1031514049
+	},
 
-	18 => q|There were no results for this query.|,
+	'18' => {
+		message => q|There were no results for this query.|,
+		lastUpdated => 1031514049
+	},
 
-	61 => q|SQL Report, Add/Edit|,
+	'61' => {
+		message => q|SQL Report, Add/Edit|,
+		lastUpdated => 1082365503
+	},
 
-	71 => q|SQL Reports are perhaps the most powerful wobject in the WebGUI arsenal. They allow a user to query data from any database that they have access to. This is great for getting sales figures from your Accounting database or even summarizing all the message boards on your web site.
+	'71' => {
+		message => q|SQL Reports are perhaps the most powerful wobject in the WebGUI arsenal. They allow a user to query data from any database that they have access to. This is great for getting sales figures from your Accounting database or even summarizing all the message boards on your web site.
 <p>
 
 
@@ -53,8 +90,11 @@ How many rows should be displayed before splitting the results into separate pag
 
 
 |,
+		lastUpdated => 1082365503
+	},
 
-	73 => q|The following variables are made available from SQL Reports:
+	'73' => {
+		message => q|The following variables are made available from SQL Reports:
 <p>
 
 <b>columns_loop</b><br />
@@ -119,8 +159,13 @@ The default label for rows.count.isZero.
 <br /><br />
 
 |,
+		lastUpdated => 1082365471
+	},
 
-	72 => q|SQL Report Template|,
+	'72' => {
+		message => q|SQL Report Template|,
+		lastUpdated => 1082371148
+	},
 
 };
 
