@@ -293,17 +293,52 @@ sub date {
 	$value = epochToSet($_[0]->{value});
         $size = $_[0]->{size} || 10;
 	$value = "" if ($_[0]->{noDate});
-	$output = text({
+        my $output = _javascriptFile('inputCheck.js');
+	$output .= text({
 		name=>$_[0]->{name},
 		value=>$value,
 		size=>$size,
-		maxlength=>10,
-		extras=>$_[0]->{extras}
+		extras=>'onKeyUp="doInputCheck(this.form.'.$_[0]->{name}.',\'0123456789\')" '.$_[0]->{extras},
+		maxlength=>10
 		});
 	$output .= '<input type="button" style="font-size: 8pt;" onClick="window.dateField = this.form.'.
 		$_[0]->{name}.';calendar = window.open(\''.$session{config}{extrasURL}.
 		'/calendar.html\',\'cal\',\'WIDTH=200,HEIGHT=250\');return false" value="'.
 		WebGUI::International::get(34).'">';
+	return $output;
+}
+
+
+
+#-------------------------------------------------------------------
+
+=head2 dateTime ( hashRef )
+
+Returns a date/time field.
+
+=over
+
+=item name
+
+The the base name for this form element. This form element actually returns two values under different names. They are name_date and name_time.
+
+=item value
+
+The date and time. Pass as an epoch value. Defaults to today and now.
+
+=back
+
+=cut
+
+sub dateTime {
+	my $output = date({
+		name=>$_[0]->{name}."_date",
+		value=>$_[0]->{value}
+		});
+	$output .= time({
+		name=>$_[0]->{name}."_time",
+		value=>WebGUI::DateTime::getSecondsFromEpoch($_[0]->{value})
+		});
 	return $output;
 }
 
@@ -400,11 +435,15 @@ sub fieldType {
 	# without adult supervision. =) It was done this way because a huge
 	# if/elsif construct executes much more quickly than a bunch of
 	# unnecessary database hits.
-	my @types = qw(zipcode text textarea HTMLArea url date email phone integer yesNo selectList radioList checkboxList);
+	my @types = qw(dateTime time zipcode text textarea HTMLArea url date email phone integer yesNo selectList radioList checkboxList);
 	$_[0]->{types} = \@types unless ($_[0]->{types});
 	foreach $type (@{$_[0]->{types}}) {
 		if ($type eq "text") {
 			$hash{text} = WebGUI::International::get(475);
+		} elsif ($type eq "time") {
+        		$hash{time} = WebGUI::International::get(971);
+		} elsif ($type eq "dateTime") {
+        		$hash{dateTime} = WebGUI::International::get(972);
 		} elsif ($type eq "textarea") {
         		$hash{textarea} = WebGUI::International::get(476);
 		} elsif ($type eq "HTMLArea") {
@@ -1360,6 +1399,57 @@ sub textarea {
 	$value = _fixMacros($value);
         return '<textarea name="'.$_[0]->{name}.'" cols="'.$columns.'" rows="'.$rows.'" wrap="'.
 		$wrap.'" '.$_[0]->{extras}.'>'.$value.'</textarea>';
+}
+
+#-------------------------------------------------------------------
+
+=head2 time ( hashRef )
+
+Returns a time field, 24 hour format.
+
+=over
+
+=item name
+
+The name field for this form element.
+
+=item value
+
+The default value for this form element. Defaults to the current time (like "15:03:42").
+
+=item maxlength
+
+The maximum number of characters to allow in this form element.  Defaults to 8.
+
+=item extras
+
+If you want to add anything special to this form element like javascript actions, or stylesheet information, you'd add it in here as follows:
+
+ 'onChange="this.form.submit()"'
+
+=item size
+
+The number of characters wide this form element should be. There should be no reason for anyone to specify this. Defaults to 8.
+
+=back
+
+=cut
+
+sub time {
+        my $value = WebGUI::DateTime::secondsToTime($_[0]->{value});
+        my $output = _javascriptFile('inputCheck.js');
+	$output .= text({
+		name=>$_[0]->{name},
+		value=>$value,
+		size=>$_[0]->{size} || 8,
+		extras=>'onKeyUp="doInputCheck(this.form.'.$_[0]->{name}.',\'0123456789:\')" '.$_[0]->{extras},
+		maxlength=>$_[0]->{maxlength} || 8
+		});
+	$output .= '<input type="button" style="font-size: 8pt;" onClick="window.timeField = this.form.'.
+		$_[0]->{name}.';clockSet = window.open(\''.$session{config}{extrasURL}.
+		'/timeChooser.html\',\'timeChooser\',\'WIDTH=220,HEIGHT=100\');return false" value="'.
+		WebGUI::International::get(970).'">';
+	return $output;
 }
 
 #-------------------------------------------------------------------

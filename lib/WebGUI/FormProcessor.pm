@@ -170,9 +170,11 @@ The name of the form variable to retrieve.
 =cut
 
 sub dateTime {
-	return (date($_[0]."_date")+time($_[0]."_time"));
+	my $date = WebGUI::FormProcessor::date($_[0]."_date");
+	my $time = WebGUI::FormProcessor::time($_[0]."_time");
+	my $epoch = $date+$time;
+	return $epoch;
 }
-
 
 #-------------------------------------------------------------------
 
@@ -469,9 +471,8 @@ sub process {
 	my ($name, $type, $default) = @_;
 	my $value;
 	$type = "text" if ($type eq "");
-	if (exists $session{form}{$name}) {
-		$value = &$type($name);
-        } else {
+	$value = &$type($name);
+	unless (defined $value) {
 		$value = $default;
 	}
 	if ($value =~ /^[\s]+$/) {
@@ -627,7 +628,7 @@ The name of the form variable to retrieve.
 =cut
 
 sub time {
-	return WebGUI::DateTime::timeToEpoch($session{form}{$_[0]});
+	return WebGUI::DateTime::timeToSeconds($session{form}{$_[0]});
 }
 
 

@@ -482,6 +482,63 @@ sub date {
 
 #-------------------------------------------------------------------
 
+=head2 dateTime ( name [ label, value, subtext, uiLevel ] )
+
+Adds a date time row to this form.
+
+=over
+
+=item name
+
+The name field for this form element.
+
+=item label
+
+The left column label for this form row.
+
+=item value
+
+The default date and time. Pass as an epoch value. Defaults to today and now.
+
+=item subtext
+
+Extra text to describe this form element or to provide special instructions.
+
+=item uiLevel
+
+The UI level for this field. See the WebGUI developer's site for details. Defaults to "0".
+
+=back
+
+=cut
+
+sub dateTime {
+        my ($output);
+        my ($self, @p) = @_;
+        my ($name, $label, $value, $subtext, $uiLevel) = rearrange([qw(name label value subtext uiLevel)], @p);
+        if (_uiLevelChecksOut($uiLevel)) {
+                $output = WebGUI::Form::dateTime({
+                        "name"=>$name,
+                        "value"=>$value
+                        });
+                $output .= _subtext($subtext);
+                $output = $self->_tableFormRow($label,$output);
+        } else {
+                $output = WebGUI::Form::hidden({
+                        "name"=>$name."_date",
+                        "value"=>epochToSet($value)
+                        });
+                $output .= WebGUI::Form::hidden({
+                        "name"=>$name."_time",
+                        "value"=>epochToHuman($value,"%j:%n:%s")
+                        });
+        }
+        $self->{_data} .= $output;
+}
+
+
+#-------------------------------------------------------------------
+
 =head2 email ( name [ label, value, maxlength, extras, subtext, size, uiLevel ] )
 
 Adds an email address row to this form.
@@ -1918,6 +1975,72 @@ sub textarea {
         }
         $self->{_data} .= $output;
 }
+
+#-------------------------------------------------------------------
+
+=head2 time ( name [ label, value, extras, subtext, size, noDate, uiLevel ] )
+
+Adds a date row to this form.
+
+=over
+
+=item name
+
+The name field for this form element.
+
+=item label
+
+The left column label for this form row.
+
+=item value
+
+The default time. Pass as a number of seconds. Defaults to 0.
+
+=item extras
+
+If you want to add anything special to this form element like javascript actions, or stylesheet information, you'd add it in here as follows:
+
+ 'onChange="this.form.submit()"'
+
+=item subtext
+
+Extra text to describe this form element or to provide special instructions.
+
+=item size
+
+The number of characters wide this form element should be. There should be no reason for anyone to specify this.
+
+=item uiLevel
+
+The UI level for this field. See the WebGUI developer's site for details. Defaults to "0".
+
+=back
+
+=cut
+
+sub time {
+        my ($output);
+        my ($self, @p) = @_;
+        my ($name, $label, $value, $extras, $subtext, $size, $uiLevel) =
+                rearrange([qw(name label value extras subtext size uiLevel)], @p);
+        if (_uiLevelChecksOut($uiLevel)) {
+                $output = WebGUI::Form::time({
+                        "name"=>$name,
+                        "value"=>$value,
+                        "size"=>$size,
+                        "extras"=>$extras
+                        });
+                $output .= _subtext($subtext);
+                $output = $self->_tableFormRow($label,$output);
+        } else {
+                $output = WebGUI::Form::hidden({
+                        "name"=>$name,
+                        "value"=>secondsToTime($value)
+                        });
+        }
+        $self->{_data} .= $output;
+}
+
 
 #-------------------------------------------------------------------
 

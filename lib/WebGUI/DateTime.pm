@@ -42,9 +42,9 @@ This package provides easy to use date math functions, which are normally a comp
  ($startEpoch, $endEpoch) = WebGUI::DateTime::dayStartEnd($epoch);
  $dateString = WebGUI::DateTime::epochToHuman($epoch, $formatString);
  $setString = WebGUI::DateTime::epochToSet($epoch);
- ($setString, $timeString) = WebGUI::DateTime::epochToSetTime($epoch);
  $day = WebGUI::DateTime::getDayName($dayInteger);
  $month = WebGUI::DateTime::getMonthName($monthInteger);
+ $seconds = WebGUI::DateTime::getSecondsFromEpoch($seconds);
  $epoch = WebGUI::DateTime::humanToEpoch($dateString);
  $seconds = WebGUI::DateTime::intervalToSeconds($interval, $units);
  @date = WebGUI::DateTime::localtime($epoch);
@@ -52,7 +52,6 @@ This package provides easy to use date math functions, which are normally a comp
  ($interval, $units) = WebGUI::DateTime::secondsToInterval($seconds);
  $timeString = WebGUI::DateTime::secondsToTime($seconds);
  $epoch = WebGUI::DateTime::setToEpoch($setString);
- $epoch = WebGUI::DateTime::setTimeToEpoch($setTimeString);
  $epoch = WebGUI::DateTime::time();
  $seconds = WebGUI::DateTime::timeToSeconds($timeString);
 
@@ -307,26 +306,6 @@ sub epochToSet {
 
 #-------------------------------------------------------------------
 
-=head2 epochToSetTime ( epoch )
-
-Returns a set date (used by WebGUI::HTMLForm->date) in the format of MM/DD/YYYY and a time string in the format of HH:MM:SS. 
-
-=over
-
-=item epoch
-
-The number of seconds since January 1, 1970.
-
-=back
-
-=cut
-
-sub epochToSetTime {
-	return (epochToHuman($_[0],"%m/%d/%y"), epochToHuman($_[0],"%j:%n:%s"));
-}
-
-#-------------------------------------------------------------------
-
 =head2 getMonthName ( month )
 
 Returns a string containing the calendar month name in the language of the current user.
@@ -403,6 +382,28 @@ sub getDayName {
                 return WebGUI::International::get(33);
         }
 }
+
+#-------------------------------------------------------------------
+
+=head2 getSecondsFromEpoch ( epoch )
+
+Calculates the number of seconds into the day of an epoch date the epoch datestamp is.
+
+=over
+
+=item epoch
+
+The number of seconds since January 1, 1970 00:00:00.
+
+=back
+
+=cut
+
+sub getSecondsFromEpoch {
+	return timeToSeconds(epochToHuman($_[0],"%j:%n:%s"));
+}
+
+
 
 #-------------------------------------------------------------------
 
@@ -598,7 +599,7 @@ Returns a time string of the format HH::MM::SS on a 24 hour clock. See also time
 
 =item seconds
 
-A number of seconds.
+A number of seconds. 
 
 =back
 
@@ -606,11 +607,11 @@ A number of seconds.
 
 sub secondsToTime {
 	my $seconds = $_[0];
-	my $timeString = int($seconds / 3600).":";
+	my $timeString = sprintf("%02d",int($seconds / 3600)).":";
 	$seconds = $seconds % 3600;	
-	$timeString = int($seconds / 60).":";
+	$timeString .= sprintf("%02d",int($seconds / 60)).":";
 	$seconds = $seconds % 60;
-	$timeString .= $seconds;
+	$timeString .= sprintf("%02d",$seconds);
 	return $timeString;
 }
 
@@ -649,33 +650,7 @@ sub setToEpoch {
         } else {
                 $day = $date[2];
         }
-	return Date::Calc::Date_to_Time($year,$month,$day,12,0,0);
-}
-
-#-------------------------------------------------------------------
-
-=head2 setTimeToEpoch ( setString, timeString )
-
-Returns an epoch date.
-
-=over
-
-=item setString
-
-A string in the format of MM/DD/YYYY.
-
-=item timeString
-
-A string in the format of HH:MM:SS.
-
-=back
-
-=cut
-
-sub setTimeToEpoch {
-	my $epoch = setToEpoch($_[0]);
-	$epoch += timeToSeconds($_[1]);
-	return $epoch;
+	return Date::Calc::Date_to_Time($year,$month,$day,0,0,0);
 }
 
 #-------------------------------------------------------------------

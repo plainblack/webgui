@@ -156,7 +156,7 @@ sub www_editProfileCategorySave {
 	if ($session{form}{cid} eq "new") {
 		$session{form}{cid} = getNextId("profileCategoryId");
 		($sequenceNumber) = WebGUI::SQL->quickArray("select max(sequenceNumber) from userProfileCategory");
-		WebGUI::SQL->write("insert into userProfileCategory values ($session{form}{cid}, "
+		WebGUI::SQL->write("insert into userProfileCategory (profileCategoryId,sequenceNumber) values ($session{form}{cid}, "
 			.($sequenceNumber+1).")");
 	}
 	WebGUI::SQL->write("update userProfileCategory set categoryName=".quote($session{form}{categoryName}).", 
