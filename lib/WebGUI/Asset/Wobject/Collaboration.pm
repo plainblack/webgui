@@ -111,7 +111,7 @@ sub appendPostListTemplateVars {
 sub appendTemplateLabels {
 	my $self = shift;
 	my $var = shift;
-	my $i18n = WebGUI::International->new("Collaboration");
+	my $i18n = WebGUI::International->new("Asset_Collaboration");
 	$var->{"add.label"} = $i18n->get("add");
 	$var->{"addlink.label"} = $i18n->get("addlink");
 	$var->{"addquestion.label"} = $i18n->get("addquestion");
@@ -410,63 +410,63 @@ sub getEditForm {
 	my $tabform = $self->SUPER::getEditForm;
    	$tabform->getTab("display")->yesNo(
       		-value=>$self->getValue('displayLastReply'),
-		-label=>WebGUI::International::get('display last reply', 'Collaboration'),
+		-label=>WebGUI::International::get('display last reply', 'Asset_Collaboration'),
 		-name=>"displayLastReply"
    		);
    	$tabform->getTab("display")->template(
       		-value=>$self->getValue('collaborationTemplateId'),
       		-namespace=>"Collaboration",
-		-label=>WebGUI::International::get('system template', 'Collaboration'),
+		-label=>WebGUI::International::get('system template', 'Asset_Collaboration'),
 		-name=>"collaborationTemplateId"
    		);
         $tabform->getTab("display")->template(
                 -name=>"threadTemplateId",
                 -value=>$self->getValue("threadTemplateId"),
                 -namespace=>"Collaboration/Thread",
-		-label=>WebGUI::International::get('thread template', 'Collaboration'),
+		-label=>WebGUI::International::get('thread template', 'Asset_Collaboration'),
                 );
         $tabform->getTab("display")->template(
                 -name=>"postFormTemplateId",
                 -value=>$self->getValue("postFormTemplateId"),
                 -namespace=>"Collaboration/PostForm",
-		-label=>WebGUI::International::get('post template', 'Collaboration'),
+		-label=>WebGUI::International::get('post template', 'Asset_Collaboration'),
                 );
         $tabform->getTab("display")->template(
                 -name=>"searchTemplateId",
                 -value=>$self->getValue("SearchTemplateId"),
                 -namespace=>"Collaboration/Search",
-		-label=>WebGUI::International::get('search template', 'Collaboration'),
+		-label=>WebGUI::International::get('search template', 'Asset_Collaboration'),
                 );
         $tabform->getTab("display")->template(
                 -name=>"notificationTemplateId",
                 -value=>$self->getValue("notificationTemplateId"),
                 -namespace=>"Collaboration/Notification",
-		-label=>WebGUI::International::get('notification template', 'Collaboration'),
+		-label=>WebGUI::International::get('notification template', 'Asset_Collaboration'),
                 );
         $tabform->getTab("security")->group(
 		-name=>"moderateGroupId",
-		-label=>WebGUI::International::get('who moderates', 'Collaboration'),
+		-label=>WebGUI::International::get('who moderates', 'Asset_Collaboration'),
 		-value=>[$self->getValue("moderateGroupId")]
 		);
         $tabform->getTab("security")->group(
 		-name=>"postGroupId",
-		-label=>WebGUI::International::get('who posts', 'Collaboration'),
+		-label=>WebGUI::International::get('who posts', 'Asset_Collaboration'),
 		-value=>[$self->getValue("postGroupId")]
 		);
         $tabform->getTab("display")->integer(
 		-name=>"threadsPerPage",
-		-label=>WebGUI::International::get('threads/page', 'Collaboration'),
+		-label=>WebGUI::International::get('threads/page', 'Asset_Collaboration'),
 		-value=>$self->getValue("threadsPerPage")
 		);
         $tabform->getTab("display")->integer(
 		-name=>"postsPerPage",
-		-label=>WebGUI::International::get('posts/page', 'Collaboration'),
+		-label=>WebGUI::International::get('posts/page', 'Asset_Collaboration'),
 		-value=>$self->getValue("postsPerPage")
 		);
         if ($session{setting}{useKarma}) {
                 $tabform->getTab("properties")->integer(
 			-name=>"karmaPerPost",
-			-label=>WebGUI::International::get('karma/post', 'Collaboration'),
+			-label=>WebGUI::International::get('karma/post', 'Asset_Collaboration'),
 			-value=>$self->getValue("karmaPerPost")
 			);
         } else {
@@ -475,7 +475,7 @@ sub getEditForm {
 	$tabform->getTab("security")->filterContent(
 		-value=>$self->getValue("filterCode"),
 		-name=>"filterCode",
-		-label=>WebGUI::International::get('filter code', 'Collaboration'),
+		-label=>WebGUI::International::get('filter code', 'Asset_Collaboration'),
 		);
 	$tabform->getTab("display")->selectList(
 		-name=>"sortBy",
@@ -491,7 +491,7 @@ sub getEditForm {
 			userDefined5=>"User Defined 5",
 			title=>"Title"
 			},
-		-label=>WebGUI::International::get('sort by', 'Collaboration'),
+		-label=>WebGUI::International::get('sort by', 'Asset_Collaboration'),
 		);
 	$tabform->getTab("display")->selectList(
 		-name=>"sortOrder",
@@ -500,51 +500,51 @@ sub getEditForm {
 			asc=>"Ascending",
 			desc=>"Descending"
 			},
-		-label=>WebGUI::International::get('sort order', 'Collaboration'),
+		-label=>WebGUI::International::get('sort order', 'Asset_Collaboration'),
 		);
         $tabform->getTab("properties")->interval(
 		-name=>"archiveAfter",
-		-label=>WebGUI::International::get('archive after', 'Collaboration'),
+		-label=>WebGUI::International::get('archive after', 'Asset_Collaboration'),
 		-value=>$self->getValue("archiveAfter")
 		);
         $tabform->getTab("properties")->integer(
 		-name=>"attachmentsPerPost",
-		-label=>WebGUI::International::get('attachments/post', 'Collaboration'),
+		-label=>WebGUI::International::get('attachments/post', 'Asset_Collaboration'),
 		-value=>$self->getValue("attachmentsPerPost")
 		);
         $tabform->getTab("security")->interval(
 		-name=>"editTimeout",
-		-label=>WebGUI::International::get('edit timeout', 'Collaboration'),
+		-label=>WebGUI::International::get('edit timeout', 'Asset_Collaboration'),
 		-value=>$self->getValue("editTimeout")
 		);
         $tabform->getTab("security")->yesNo(
 		-name=>"allowReplies",
-		-label=>WebGUI::International::get('allow replies', 'Collaboration'),
+		-label=>WebGUI::International::get('allow replies', 'Asset_Collaboration'),
 		-value=>$self->getValue("allowReplies")
 		);
         $tabform->getTab("security")->yesNo(
 		-name=>"addEditStampToPosts",
-		-label=>WebGUI::International::get('edit stamp', 'Collaboration'),
+		-label=>WebGUI::International::get('edit stamp', 'Asset_Collaboration'),
 		-value=>$self->getValue("addEditStampToPosts")
 		);
         $tabform->getTab("display")->yesNo(
 		-name=>"allowRichEdit",
-		-label=>WebGUI::International::get('rich edit', 'Collaboration'),
+		-label=>WebGUI::International::get('rich edit', 'Asset_Collaboration'),
 		-value=>$self->getValue("allowRichEdit")
 		);
         $tabform->getTab("display")->yesNo(
 		-name=>"useContentFilter",
-		-label=>WebGUI::International::get('content filter', 'Collaboration'),
+		-label=>WebGUI::International::get('content filter', 'Asset_Collaboration'),
 		-value=>$self->getValue("useContentFilter")
 		);
         $tabform->getTab("properties")->yesNo(
 		-name=>"usePreview",
-		-label=>WebGUI::International::get('use preview', 'Collaboration'),
+		-label=>WebGUI::International::get('use preview', 'Asset_Collaboration'),
 		-value=>$self->getValue("usePreview")
 		);
         $tabform->getTab("security")->yesNo(
 		-name=>"moderatePosts",
-		-label=>WebGUI::International::get('moderate', 'Collaboration'),
+		-label=>WebGUI::International::get('moderate', 'Asset_Collaboration'),
 		-value=>$self->getValue("moderatePosts")
 		);
 	return $tabform;

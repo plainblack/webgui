@@ -91,12 +91,12 @@ sub getEditForm {
 	my $tabform = $self->SUPER::getEditForm();
         $tabform->getTab("properties")->codearea(
                 -name=>"snippet",
-                -label=>WebGUI::International::get('snippet', 'Snippet'),
+                -label=>WebGUI::International::get('snippet', 'Asset_Snippet'),
                 -value=>$self->getValue("snippet")
                 );
         $tabform->getTab("properties")->yesNo(
                 -name=>"processAsTemplate",
-                -label=>WebGUI::International::get('process as template', 'Snippet'),
+                -label=>WebGUI::International::get('process as template', 'Asset_Snippet'),
                 -value=>$self->getValue("processAsTemplate")
                 );
 	return $tabform;

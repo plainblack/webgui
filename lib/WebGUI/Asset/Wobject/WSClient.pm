@@ -140,7 +140,7 @@ sub getIcon {
 
 #-------------------------------------------------------------------
 sub getName {
-   return WebGUI::International::get(1, "WSClient");
+   return WebGUI::International::get(1, "Asset_WSClient");
 }
 
 #-------------------------------------------------------------------
@@ -160,88 +160,88 @@ sub getEditForm {
    );
    $tabform->getTab("display")->yesNo (
       -name  => 'preprocessMacros',
-      -label => WebGUI::International::get(8, "WSClient"),
+      -label => WebGUI::International::get(8, "Asset_WSClient"),
       -value => $self->get('preprocessMacros'),
    );
   	$tabform->getTab("display")->integer(
       -name  => 'paginateAfter',
-      -label => WebGUI::International::get(13, "WSClient"),
+      -label => WebGUI::International::get(13, "Asset_WSClient"),
       -value => $self->getValue("paginateAfter")
    );
    $tabform->getTab("display")->text (
       -name  => 'paginateVar',
-      -label => WebGUI::International::get(14, "WSClient"),
+      -label => WebGUI::International::get(14, "Asset_WSClient"),
       -value => $self->get('paginateVar'),
    );
    $tabform->getTab("properties")->text (
       -name  => 'uri',
-      -label => WebGUI::International::get(2, "WSClient"),
+      -label => WebGUI::International::get(2, "Asset_WSClient"),
       -value => $self->get('uri'),
    );
    $tabform->getTab("properties")->text (
       -name  => 'proxy',
-      -label => WebGUI::International::get(3, "WSClient"),
+      -label => WebGUI::International::get(3, "Asset_WSClient"),
       -value => $self->get('proxy'),
    );
    $tabform->getTab("properties")->text (
       -name  => 'callMethod',
-      -label => WebGUI::International::get(4, "WSClient"),
+      -label => WebGUI::International::get(4, "Asset_WSClient"),
       -value => $self->get('callMethod'),
    );
    $tabform->getTab("properties")->textarea ( 
       -name  => 'params',
-      -label => WebGUI::International::get(5, "WSClient"),
+      -label => WebGUI::International::get(5, "Asset_WSClient"),
       -value => $self->get('params'),
    );
    if ($session{'config'}{'soapHttpHeaderOverride'}) {
       $tabform->getTab("properties")->text (
          -name  => 'httpHeader',
-         -label => WebGUI::International::get(16, "WSClient"),
+         -label => WebGUI::International::get(16, "Asset_WSClient"),
          -value => $self->get('httpHeader'),
       );
    } else {
       $tabform->getTab("properties")->hidden (
          -name  => 'httpHeader',
-         -label => WebGUI::International::get(16, "WSClient"),
+         -label => WebGUI::International::get(16, "Asset_WSClient"),
          -value => $self->get('httpHeader'),
       );
    }
    $tabform->getTab("properties")->yesNo (
       -name  => 'execute_by_default',
-      -label => WebGUI::International::get(11, "WSClient"),
+      -label => WebGUI::International::get(11, "Asset_WSClient"),
       -value => $self->get('execute_by_default'),
    );
    $tabform->getTab("properties")->yesNo (
       -name  => 'debugMode',
-      -label => WebGUI::International::get(9, "WSClient"),
+      -label => WebGUI::International::get(9, "Asset_WSClient"),
       -value => $self->get('debugMode'),
    );
    if ($utf8FieldType eq 'yesNo') {
       $tabform->getTab("properties")->yesNo (
          -name  => 'decodeUtf8',
-         -label => WebGUI::International::get(15, "WSClient"),
+         -label => WebGUI::International::get(15, "Asset_WSClient"),
          -value => $self->get('decodeUtf8'),
       );
    } else {
       $tabform->getTab("properties")->hidden (
          -name  => 'decodeUtf8',
-         -label => WebGUI::International::get(15, "WSClient"),
+         -label => WebGUI::International::get(15, "Asset_WSClient"),
          -value => $self->get('decodeUtf8'),
       );
    }
    my $cacheopts = {
-	0 => WebGUI::International::get(29, "WSClient"),
-	1 => WebGUI::International::get(19, "WSClient"),
+	0 => WebGUI::International::get(29, "Asset_WSClient"),
+	1 => WebGUI::International::get(19, "Asset_WSClient"),
    };
    $tabform->getTab("properties")->radioList (
       -name    => 'sharedCache',
       -options => $cacheopts,
-      -label   => WebGUI::International::get(28, "WSClient"),
+      -label   => WebGUI::International::get(28, "Asset_WSClient"),
       -value   => $self->get('sharedCache'),
    );
    $tabform->getTab("properties")->text (
       -name     => 'cacheTTL',
-      -label    => WebGUI::International::get(27, "WSClient"),
+      -label    => WebGUI::International::get(27, "Asset_WSClient"),
       -value    => $self->get('cacheTTL'),
    );
 	return $tabform;
@@ -253,7 +253,7 @@ sub www_edit {
         my $self = shift;
 	return WebGUI::Privilege::insufficient() unless $self->canEdit;
 	$self->getAdminConsole->setHelp("web services client add/edit","WSClient");
-        return $self->getAdminConsole->render($self->getEditForm->print,WebGUI::International::get("20","WSClient"));
+        return $self->getAdminConsole->render($self->getEditForm->print,WebGUI::International::get("20","Asset_WSClient"));
 }
 
 
@@ -339,7 +339,7 @@ sub view {
       $cache_key = _create_cache_key($self, $call, $param_str);
    }
    $cache = WebGUI::Cache->new($cache_key,
-      WebGUI::International::get(4, "WSClient"));
+      WebGUI::International::get(4, "Asset_WSClient"));
 
    # passing a form param WSClient_skipCache lets us ignore even good caches
    if (!$session{'form'}{'WSClient_skipCache'}) {
@@ -354,7 +354,7 @@ sub view {
       # the solution is to normalize all params to another table
       eval "\$arr_ref = [$param_str];";
       eval { @params = @$arr_ref; };
-      WebGUI::ErrorHandler::debug(WebGUI::International::get(22, "WSClient")) if $@ && $self->get('debugMode');
+      WebGUI::ErrorHandler::debug(WebGUI::International::get(22, "Asset_WSClient")) if $@ && $self->get('debugMode');
 
       if ($self->get('execute_by_default') || grep /^$call$/,
          @targetWobjects) {
@@ -368,7 +368,7 @@ sub view {
             $soap = $self->_instantiate_soap;
 
          } else {
-            WebGUI::ErrorHandler::debug(WebGUI::International::get(23, "WSClient")) if $self->get('debugMode');
+            WebGUI::ErrorHandler::debug(WebGUI::International::get(23, "Asset_WSClient")) if $self->get('debugMode');
          }
       }
    }
@@ -390,7 +390,7 @@ sub view {
             # a hash reference, a blessed object or a simple scalar.  Each type
             # requires different handling (woohoo!) before being passed to the
             # template system
-            WebGUI::ErrorHandler::debug(WebGUI::International::get(24, "WSClient") .  (ref $return ? ref $return : 'scalar')) if $self->get('debugMode');
+            WebGUI::ErrorHandler::debug(WebGUI::International::get(24, "Asset_WSClient") .  (ref $return ? ref $return : 'scalar')) if $self->get('debugMode');
 
             # SOAP object
             if ((ref $return) =~ /SOAP/i) {
@@ -425,7 +425,7 @@ sub view {
          if ($@) {
             WebGUI::ErrorHandler::debug($@) if $self->get('debugMode');
             $var{'soapError'} = $@;
-            WebGUI::ErrorHandler::debug(WebGUI::International::get(25, "WSClient") . $var{'soapError'})
+            WebGUI::ErrorHandler::debug(WebGUI::International::get(25, "Asset_WSClient") . $var{'soapError'})
                if $self->get('debugMode');
          }
 
@@ -508,7 +508,7 @@ sub view {
 
 
    } else {
-      WebGUI::ErrorHandler::debug(WebGUI::International::get(26, "WSClient") . $@) if $self->get('debugMode');
+      WebGUI::ErrorHandler::debug(WebGUI::International::get(26, "Asset_WSClient") . $@) if $self->get('debugMode');
    }
 
    # did they request a funky http header?

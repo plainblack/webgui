@@ -64,21 +64,21 @@ sub getEditForm {
    		);
 	$tabform->getTab("properties")->text(
 		-name=>"linkTitle",
-		-label=>WebGUI::International::get(7,"Article"),
+		-label=>WebGUI::International::get(7,"Asset_Article"),
 		-value=>$self->getValue("linkTitle"),
 		-uiLevel=>3
 		);
         $tabform->getTab("properties")->url(
 		-name=>"linkURL",
-		-label=>WebGUI::International::get(8,"Article"),
+		-label=>WebGUI::International::get(8,"Asset_Article"),
 		-value=>$self->getValue("linkURL"),
 		-uiLevel=>3
 		);
 	$tabform->getTab("display")->yesNo(
 		-name=>"convertCarriageReturns",
-		-label=>WebGUI::International::get(10,"Article"),
+		-label=>WebGUI::International::get(10,"Asset_Article"),
 		-value=>$self->getValue("convertCarriageReturns"),
-		-subtext=>' &nbsp; <span style="font-size: 8pt;">'.WebGUI::International::get(11,"Article").'</span>',
+		-subtext=>' &nbsp; <span style="font-size: 8pt;">'.WebGUI::International::get(11,"Asset_Article").'</span>',
 		-uiLevel=>5,
 		-defaultValue=>0
 		);
@@ -128,7 +128,7 @@ sub getIndexerParams {
 
 #-------------------------------------------------------------------
 sub getName {
-	return WebGUI::International::get(1,"Article");
+	return WebGUI::International::get(1,"Asset_Article");
 }
 
 
@@ -192,9 +192,9 @@ sub view {
 		my $forum = WebGUI::Forum->new($self->get("forumId"));
 		$var{"replies.count"} = ($forum->get("replies") + $forum->get("threads"));
 		$var{"replies.URL"} = WebGUI::Forum::UI::formatForumURL($callback,$forum->get("forumId"));
-		$var{"replies.label"} = WebGUI::International::get(28,"Article");
+		$var{"replies.label"} = WebGUI::International::get(28,"Asset_Article");
 		$var{"post.URL"} = WebGUI::Forum::UI::formatNewThreadURL($callback,$forum->get("forumId"));
-        	$var{"post.label"} = WebGUI::International::get(24,"Article");
+        	$var{"post.label"} = WebGUI::International::get(24,"Asset_Article");
 	}
 	my $templateId = $self->get("templateId");
         if ($session{form}{overrideTemplateId} ne "") {
@@ -218,7 +218,7 @@ sub www_edit {
         my $self = shift;
 	return WebGUI::Privilege::insufficient() unless $self->canEdit;
 	$self->getAdminConsole->setHelp("article add/edit","Article");
-        return $self->getAdminConsole->render($self->getEditForm->print,WebGUI::International::get("12","Article"));
+        return $self->getAdminConsole->render($self->getEditForm->print,WebGUI::International::get("12","Asset_Article"));
 }
 
 

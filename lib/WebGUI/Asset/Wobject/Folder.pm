@@ -91,8 +91,8 @@ sub getEditForm {
 	if ($self->get("assetId") eq "new") {
                	$tabform->getTab("properties")->whatNext(
                        	-options=>{
-                               	view=>WebGUI::International::get(823, "Folder"),
-                      	 	""=>WebGUI::International::get(847, "Folder")
+                               	view=>WebGUI::International::get(823, "Asset_Folder"),
+                      	 	""=>WebGUI::International::get(847, "Asset_Folder")
                               	},
 			-value=>"view"
 			);

@@ -95,35 +95,35 @@ sub getEditForm {
 	my $tabform = $self->SUPER::getEditForm();
 	#	$tabform->getTab("properties")->selectList(
 	#		-name=>"type",
-	#		-label=>WebGUI::International::get(501,"EventsCalendar"),
+	#		-label=>WebGUI::International::get(501,"Asset_EventsCalendar"),
 	#		-value=>[$self->getValue("type")],
 	#		-options=>{
-	#			0=>WebGUI::International::get(502,"EventsCalendar"),
-	#			1=>WebGUI::International::get(503,"EventsCalendar"),
-	#			2=>WebGUI::International::get(504,"EventsCalendar"),
-	#			3=>WebGUI::International::get(505,"EventsCalendar"),
-	#			4=>WebGUI::International::get(506,"EventsCalendar")
+	#			0=>WebGUI::International::get(502,"Asset_EventsCalendar"),
+	#			1=>WebGUI::International::get(503,"Asset_EventsCalendar"),
+	#			2=>WebGUI::International::get(504,"Asset_EventsCalendar"),
+	#			3=>WebGUI::International::get(505,"Asset_EventsCalendar"),
+	#			4=>WebGUI::International::get(506,"Asset_EventsCalendar")
 	#		},
 	#	);
 		$tabform->getTab("properties")->selectList(
 			-name=>"scope",
-			-label=>WebGUI::International::get(507,"EventsCalendar"),
+			-label=>WebGUI::International::get(507,"Asset_EventsCalendar"),
 			-value=>[$self->getValue("scope")],
 			-options=>{
-				0=>WebGUI::International::get(508,"EventsCalendar"),
-				1=>WebGUI::International::get(510,"EventsCalendar"),
-				2=>WebGUI::International::get(509,"EventsCalendar"),
+				0=>WebGUI::International::get(508,"Asset_EventsCalendar"),
+				1=>WebGUI::International::get(510,"Asset_EventsCalendar"),
+				2=>WebGUI::International::get(509,"Asset_EventsCalendar"),
 			}
 		);
    	$tabform->getTab("display")->template(
    		-name=>"templateId",
-			-label=>WebGUI::International::get(94,"EventsCalendar"),
+			-label=>WebGUI::International::get(94,"Asset_EventsCalendar"),
 			-value=>$self->getValue('templateId'),
 			-namespace=>"EventsCalendar"
 		);
    	$tabform->getTab("display")->template(
    		-name=>"eventTemplateId",
-			-label=>WebGUI::International::get(80,"EventsCalendar"),
+			-label=>WebGUI::International::get(80,"Asset_EventsCalendar"),
 			-value=>$self->getValue('eventTemplateId'),
 			-namespace=>"EventsCalendar/Event",
 			-afterEdit=>'func=edit&wid='.$self->get("wobjectId")
@@ -131,48 +131,48 @@ sub getEditForm {
 		$tabform->getTab("display")->selectList(
 			-name=>"startMonth",
 			-options=>{
-				"january"=>WebGUI::International::get('january','EventsCalendar'),
-				"now"=>WebGUI::International::get(98,"EventsCalendar"),
-				"current"=>WebGUI::International::get(82,"EventsCalendar"),
-				"first"=>WebGUI::International::get(83,"EventsCalendar")
+				"january"=>WebGUI::International::get('january','Asset_EventsCalendar'),
+				"now"=>WebGUI::International::get(98,"Asset_EventsCalendar"),
+				"current"=>WebGUI::International::get(82,"Asset_EventsCalendar"),
+				"first"=>WebGUI::International::get(83,"Asset_EventsCalendar")
 			},
-			-label=>WebGUI::International::get(81,"EventsCalendar"),
+			-label=>WebGUI::International::get(81,"Asset_EventsCalendar"),
 			-value=>[$self->getValue("startMonth")]
 		);
 		my %options;
 		tie %options, 'Tie::IxHash';
 		%options = (
-			"last"=>WebGUI::International::get(85,"EventsCalendar"),
-			"after12"=>WebGUI::International::get(86,"EventsCalendar"),
-			"after9"=>WebGUI::International::get(87,"EventsCalendar"),
-			"after6"=>WebGUI::International::get(88,"EventsCalendar"),
-			"after3"=>WebGUI::International::get(89,"EventsCalendar"),
-			"current"=>WebGUI::International::get(82,"EventsCalendar")
+			"last"=>WebGUI::International::get(85,"Asset_EventsCalendar"),
+			"after12"=>WebGUI::International::get(86,"Asset_EventsCalendar"),
+			"after9"=>WebGUI::International::get(87,"Asset_EventsCalendar"),
+			"after6"=>WebGUI::International::get(88,"Asset_EventsCalendar"),
+			"after3"=>WebGUI::International::get(89,"Asset_EventsCalendar"),
+			"current"=>WebGUI::International::get(82,"Asset_EventsCalendar")
 		);
 		$tabform->getTab("display")->selectList(
 			-name=>"endMonth",
 			-options=>\%options,
-			-label=>WebGUI::International::get(84,"EventsCalendar"),
+			-label=>WebGUI::International::get(84,"Asset_EventsCalendar"),
 			-value=>[$self->getValue("endMonth")]
 		);
 		$tabform->getTab("display")->selectList(
 			-name=>"defaultMonth",
 			-options=>{
-				"current"=>WebGUI::International::get(82,"EventsCalendar"),
-				"last"=>WebGUI::International::get(85,"EventsCalendar"),
-				"first"=>WebGUI::International::get(83,"EventsCalendar")
+				"current"=>WebGUI::International::get(82,"Asset_EventsCalendar"),
+				"last"=>WebGUI::International::get(85,"Asset_EventsCalendar"),
+				"first"=>WebGUI::International::get(83,"Asset_EventsCalendar")
 			},
-			-label=>WebGUI::International::get(90,"EventsCalendar"),
+			-label=>WebGUI::International::get(90,"Asset_EventsCalendar"),
 			-value=>[$self->getValue("defaultMonth")]
 		);
 		$tabform->getTab("display")->integer(
 			-name=>"paginateAfter",
-			-label=>WebGUI::International::get(19,"EventsCalendar"),
+			-label=>WebGUI::International::get(19,"Asset_EventsCalendar"),
 			-value=>$self->getValue("paginateAfter")
 		);
 	#	$tabform->getTab("security")->group(
 	#		-name=>"groupIdManage",
-	#		-label=>WebGUI::International::get(500,"EventsCalendar"),
+	#		-label=>WebGUI::International::get(500,"Asset_EventsCalendar"),
 	#		-value=>[$self->getValue("groupIdManage")],
 	#		-uiLevel=>6
 	#	);
@@ -189,7 +189,7 @@ sub getIcon {
 
 #-------------------------------------------------------------------
 sub getName {
-        return WebGUI::International::get(2,"EventsCalendar");
+        return WebGUI::International::get(2,"Asset_EventsCalendar");
 }
 
 
@@ -435,7 +435,7 @@ sub view {
 	$var{month_loop} = \@$monthloop;
 #	$var{"canManage"} = $self->canManage;
 	$var{"addevent.url"} = $self->getUrl().'?func=addStyledEvent&class=WebGUI::Asset::Event';
-	$var{"addevent.label"} = WebGUI::International::get(20,"EventsCalendar");
+	$var{"addevent.label"} = WebGUI::International::get(20,"Asset_EventsCalendar");
 	$var{'sunday.label'} = WebGUI::DateTime::getDayName(7);
 	$var{'monday.label'} = WebGUI::DateTime::getDayName(1);
 	$var{'tuesday.label'} = WebGUI::DateTime::getDayName(2);
@@ -458,28 +458,28 @@ sub view {
 	my $nextCalMonthEnd = $calMonthEnd + $monthRangeLength;
 	my $monthLabel;
 	if ($monthRangeLength == 1) {
-		$monthLabel = WebGUI::International::get(560,"EventsCalendar");
+		$monthLabel = WebGUI::International::get(560,"Asset_EventsCalendar");
 	} else {
-		$monthLabel = WebGUI::International::get(561,"EventsCalendar");
+		$monthLabel = WebGUI::International::get(561,"Asset_EventsCalendar");
 	}
 	$var{'pagination.previousPage'} = '<form method="POST" style="inline;" action="'.
 		$self->getUrl.'?calMonthStart='.$calMonthStart.
 		'"><a href="'.$self->getUrl.
 		'?calMonthStart='.$prevCalMonthStart.'&calMonthEnd='.$prevCalMonthEnd.'">'.
-		WebGUI::International::get(558,"EventsCalendar")." ".$monthRangeLength." ".
+		WebGUI::International::get(558,"Asset_EventsCalendar")." ".$monthRangeLength." ".
 		$monthLabel.'</a>';
 	$var{'pagination.nextPage'} = '<a href="'.$self->getUrl.
 		'?calMonthStart='.$nextCalMonthStart.'&calMonthEnd='.$nextCalMonthEnd.'">'.
-		WebGUI::International::get(559,"EventsCalendar")." ".$monthRangeLength." ".
+		WebGUI::International::get(559,"Asset_EventsCalendar")." ".$monthRangeLength." ".
 		$monthLabel.'</a></form>';
 	$var{'pagination.pageList.upTo20'} = '<select size="1" name="calMonthEnd">
-		<option value="'.($calMonthStart).'">1 '.WebGUI::International::get(560,"EventsCalendar").'</option>
-		<option value="'.(1+$calMonthStart).'">2 '.WebGUI::International::get(561,"EventsCalendar").'</option>
-		<option value="'.(2+$calMonthStart).'">3 '.WebGUI::International::get(561,"EventsCalendar").'</option>
-		<option value="'.(3+$calMonthStart).'">4 '.WebGUI::International::get(561,"EventsCalendar").'</option>
-		<option value="'.(5+$calMonthStart).'">6 '.WebGUI::International::get(561,"EventsCalendar").'</option>
-		<option value="'.(8+$calMonthStart).'">9 '.WebGUI::International::get(561,"EventsCalendar").'</option>
-		<option value="'.(11+$calMonthStart).'">12 '.WebGUI::International::get(561,"EventsCalendar").'</option>
+		<option value="'.($calMonthStart).'">1 '.WebGUI::International::get(560,"Asset_EventsCalendar").'</option>
+		<option value="'.(1+$calMonthStart).'">2 '.WebGUI::International::get(561,"Asset_EventsCalendar").'</option>
+		<option value="'.(2+$calMonthStart).'">3 '.WebGUI::International::get(561,"Asset_EventsCalendar").'</option>
+		<option value="'.(3+$calMonthStart).'">4 '.WebGUI::International::get(561,"Asset_EventsCalendar").'</option>
+		<option value="'.(5+$calMonthStart).'">6 '.WebGUI::International::get(561,"Asset_EventsCalendar").'</option>
+		<option value="'.(8+$calMonthStart).'">9 '.WebGUI::International::get(561,"Asset_EventsCalendar").'</option>
+		<option value="'.(11+$calMonthStart).'">12 '.WebGUI::International::get(561,"Asset_EventsCalendar").'</option>
 		<input type="submit" value="Go" name="Go">';
 	
 	
@@ -529,7 +529,7 @@ sub www_edit {
 	my $self = shift;
 	return WebGUI::Privilege::insufficient() unless $self->canEdit;
 	$self->getAdminConsole->setHelp("events calendar add/edit","EventsCalendar");
-	return $self->getAdminConsole->render($self->getEditForm->print,WebGUI::International::get("12","EventsCalendar"));
+	return $self->getAdminConsole->render($self->getEditForm->print,WebGUI::International::get("12","Asset_EventsCalendar"));
 }
 
 

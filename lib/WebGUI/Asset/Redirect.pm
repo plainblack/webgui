@@ -86,7 +86,7 @@ sub getEditForm {
 	my $tabform = $self->SUPER::getEditForm();
         $tabform->getTab("properties")->url(
                 -name=>"redirectUrl",
-                -label=>WebGUI::International::get('redirect url', 'Redirect'),
+                -label=>WebGUI::International::get('redirect url', 'Asset_Redirect'),
                 -value=>$self->getValue("redirectUrl")
                 );
 	return $tabform;

@@ -165,17 +165,17 @@ sub getEditForm {
 		);
 	$tabform->getTab("display")->yesNo(
 		-name=>'showSystemPages',
-		-label=>WebGUI::International::get(30,'Navigation'),
+		-label=>WebGUI::International::get(30,'Asset_Navigation'),
 		-value=>$self->getValue("showSystemPages")
 		);
         $tabform->getTab("display")->yesNo(
                 -name=>'showHiddenPages',
-                -label=>WebGUI::International::get(31,'Navigation'),
+                -label=>WebGUI::International::get(31,'Asset_Navigation'),
                 -value=>$self->getValue("showHiddenPages")
         	);
         $tabform->getTab("display")->yesNo(
                 -name=>'showUnprivilegedPages',
-                -label=>WebGUI::International::get(32,'Navigation'),
+                -label=>WebGUI::International::get(32,'Asset_Navigation'),
                 -value=>$self->getValue("showUnprivilegedPages")
         	);
 	my $start = $self->getValue("startPoint");
@@ -228,7 +228,7 @@ sub getIcon {
 
 #-------------------------------------------------------------------
 sub getName {
-	return WebGUI::International::get("navigation","Navigation");
+	return WebGUI::International::get("navigation","Asset_Navigation");
 }
 
 
@@ -394,7 +394,7 @@ sub www_edit {
         my $self = shift;
 	return WebGUI::Privilege::insufficient() unless $self->canEdit;
 	$self->getAdminConsole->setHelp("navigation add/edit","Navigation");
-        return $self->getAdminConsole->render($self->getEditForm->print,WebGUI::International::get("22","Navigation"));
+        return $self->getAdminConsole->render($self->getEditForm->print,WebGUI::International::get("22","Asset_Navigation"));
 }
 
 

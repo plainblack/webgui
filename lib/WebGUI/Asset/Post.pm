@@ -331,13 +331,13 @@ sub getStatus {
 	my $self = shift;
 	my $status = $self->get("status");
         if ($status eq "approved") {
-                return WebGUI::International::get('approved','Post');
+                return WebGUI::International::get('approved','Asset_Post');
         } elsif ($status eq "denied") {
-                return WebGUI::International::get('denied','Post');
+                return WebGUI::International::get('denied','Asset_Post');
         } elsif ($status eq "pending") {
-                return WebGUI::International::get('pending','Post');
+                return WebGUI::International::get('pending','Asset_Post');
         } elsif ($status eq "archived") {
-                return WebGUI::International::get('archived','Post');
+                return WebGUI::International::get('archived','Asset_Post');
         }
 }
 
@@ -467,7 +467,7 @@ sub getUploadControl {
 	if ($self->get("storageId")) {
 		my $i;
 		foreach my $filename (@{$self->getStorageLocation->getFiles}) {
-			$uploadControl .= deleteIcon("func=deleteFile&filename=".$filename,$self->get("url"),WebGUI::International::get("delete file warning","Collaboration"))	
+			$uploadControl .= deleteIcon("func=deleteFile&filename=".$filename,$self->get("url"),WebGUI::International::get("delete file warning","Asset_Collaboration"))	
 				.' <a href="'.$self->getStorageLocation->getUrl($filename).'">'.$filename.'</a>'
 				.'<br />';
 			$i++;
@@ -610,8 +610,8 @@ sub notifySubscribers {
                         $lang{$u->profileField("language")}{var} = $self->getTemplateVars($lang{$u->profileField("language")}{var});
 			$lang{$u->profileField("language")}{var}{url} = WebGUI::URL::getSiteURL().$self->getUrl;
                         $lang{$u->profileField("language")}{var}{'notify.subscription.message'} =
-                                         WebGUI::International::get(875,"Post",$u->profileField("language"));
-                        $lang{$u->profileField("language")}{subject} = WebGUI::International::get(523,"Post",$u->profileField("language"));
+                                         WebGUI::International::get(875,"Asset_Post",$u->profileField("language"));
+                        $lang{$u->profileField("language")}{subject} = WebGUI::International::get(523,"Asset_Post",$u->profileField("language"));
                         $lang{$u->profileField("language")}{message} = $self->processTemplate($lang{$u->profileField("language")}{var}, $self->getThread->getParent->get("notificationTemplateId"));
                 }
                 WebGUI::MessageLog::addEntry($userId,"",$lang{$u->profileField("language")}{subject},$lang{$u->profileField("language")}{message});
@@ -983,7 +983,7 @@ sub www_edit {
 		extras=>"onclick=\"this.value='".WebGUI::International::get(452)."'; this.form.func.value='editSave'; this.form.submit();\""
 		});
 	$var{'form.preview'} = WebGUI::Form::submit({
-		value=>WebGUI::International::get("preview","Collaboration")
+		value=>WebGUI::International::get("preview","Asset_Collaboration")
 		});
 	$var{'attachment.form'} = $self->getUploadControl;
         $var{'contentType.form'} = WebGUI::Form::contentType({

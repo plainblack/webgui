@@ -87,7 +87,7 @@ sub getEditForm {
 	my $originalTemplate = WebGUI::Asset::Template->new($self->getShortcut->get("templateId"));
 	$tabform->getTab("properties")->HTMLArea(
 		-value=>$self->getValue("description"),
-                -label=>WebGUI::International::get(85, 'Shortcut'),
+                -label=>WebGUI::International::get(85, 'Asset_Shortcut'),
 		-name=>"description"
 		);
 	$tabform->getTab("display")->template(
@@ -102,32 +102,32 @@ sub getEditForm {
 	$tabform->getTab("properties")->yesNo(
 		-name=>"overrideTitle",
 		-value=>$self->getValue("overrideTitle"),
-		-label=>WebGUI::International::get(7,"Shortcut")
+		-label=>WebGUI::International::get(7,"Asset_Shortcut")
 		);
 	$tabform->getTab("display")->yesNo(
 		-name=>"overrideDisplayTitle",
 		-value=>$self->getValue("overrideDisplayTitle"),
-		-label=>WebGUI::International::get(8,"Shortcut")
+		-label=>WebGUI::International::get(8,"Asset_Shortcut")
 		);
 	$tabform->getTab("properties")->yesNo(
 		-name=>"overrideDescription",
 		-value=>$self->getValue("overrideDescription"),
-		-label=>WebGUI::International::get(9,"Shortcut")
+		-label=>WebGUI::International::get(9,"Asset_Shortcut")
 		);
 	$tabform->getTab("display")->yesNo(
 		-name=>"overrideTemplate",
 		-value=>$self->getValue("overrideTemplate"),
-		-label=>WebGUI::International::get(10,"Shortcut")
+		-label=>WebGUI::International::get(10,"Asset_Shortcut")
 		);
 	$tabform->getTab("properties")->readOnly(
-		-label=>WebGUI::International::get(1,"Shortcut"),
+		-label=>WebGUI::International::get(1,"Asset_Shortcut"),
 		-value=>'<a href="'.$self->getShortcut->getUrl.'">'.$self->getShortcut->get('title').'</a> ('.$self->getShortcut->getId.')'
 		);
 	if($session{setting}{metaDataEnabled}) {
 		$tabform->getTab("properties")->yesNo(
 			-name=>"shortcutByCriteria",
 			-value=>$self->getValue("shortcutByCriteria"),
-			-label=>WebGUI::International::get("Shortcut by alternate criteria?","Shortcut"),
+			-label=>WebGUI::International::get("Asset_Shortcut by alternate criteria?","Shortcut"),
 			-extras=>q|Onchange="
 				if (this.form.shortcutByCriteria[0].checked) { 
  					this.form.resolveMultiples.disabled=false;
@@ -143,17 +143,17 @@ sub getEditForm {
 		$tabform->getTab("properties")->selectList(
 			-name=>"resolveMultiples",
 			-value=>[ $self->getValue("resolveMultiples") ],
-			-label=>WebGUI::International::get("Resolve Multiples?","Shortcut"),
+			-label=>WebGUI::International::get("Resolve Multiples?","Asset_Shortcut"),
 			-options=>{
-				mostRecent=>WebGUI::International::get("Most Recent","Shortcut"),
-				random=>WebGUI::International::get("Random","Shortcut"),
+				mostRecent=>WebGUI::International::get("Most Recent","Asset_Shortcut"),
+				random=>WebGUI::International::get("Random","Asset_Shortcut"),
 			},
 			-extras=>$self->{_disabled}
 		);
 
 		 $tabform->getTab("properties")->readOnly(
         		-value=>$self->_drawQueryBuilder(),
-		        -label=>WebGUI::International::get("Criteria","Shortcut"),
+		        -label=>WebGUI::International::get("Criteria","Asset_Shortcut"),
 	        );
 	}
 	return $tabform;
@@ -169,7 +169,7 @@ sub getIcon {
 
 #-------------------------------------------------------------------
 sub getName {
-        return WebGUI::International::get(3,"Shortcut");
+        return WebGUI::International::get(3,"Asset_Shortcut");
 }
 
 
@@ -339,7 +339,7 @@ sub view {
 	my %var = (
 		isShortcut => 1,
 		'shortcut.content' => $content,
-		'shortcut.label' => WebGUI::International::get('3',"Shortcut"),
+		'shortcut.label' => WebGUI::International::get('3',"Asset_Shortcut"),
 		originalURL => $self->getShortcut->getUrl
 		);
 	return $self->processTemplate(\%var,$self->getValue("templateId"));
@@ -351,7 +351,7 @@ sub www_edit {
         my $self = shift;
         return WebGUI::Privilege::insufficient() unless $self->canEdit;
 	$self->getAdminConsole->setHelp("shortcut add/edit","Shortcut");
-        return $self->getAdminConsole->render($self->getEditForm->print,WebGUI::International::get(2,"Shortcut"));
+        return $self->getAdminConsole->render($self->getEditForm->print,WebGUI::International::get(2,"Asset_Shortcut"));
 }
 
 #-------------------------------------------------------------------
@@ -362,15 +362,15 @@ sub _drawQueryBuilder {
 	my %operator;
 	foreach (@textFields) {
 		$operator{$_} = {
-				"=" => WebGUI::International::get("is","Shortcut"),
-				"!=" => WebGUI::International::get("isnt","Shortcut")
+				"=" => WebGUI::International::get("is","Asset_Shortcut"),
+				"!=" => WebGUI::International::get("isnt","Asset_Shortcut")
 			};
 	}
 	$operator{integer} = {
-				"=" => WebGUI::International::get("equal to","Shortcut"),
-                                "!=" => WebGUI::International::get("not equal to","Shortcut"),
-				"<" => WebGUI::International::get("less than","Shortcut"),
-				">" => WebGUI::International::get("greater than","Shortcut")
+				"=" => WebGUI::International::get("equal to","Asset_Shortcut"),
+                                "!=" => WebGUI::International::get("not equal to","Asset_Shortcut"),
+				"<" => WebGUI::International::get("less than","Asset_Shortcut"),
+				">" => WebGUI::International::get("greater than","Asset_Shortcut")
 			};
 
 	# Get the fields and count them	
@@ -392,8 +392,8 @@ sub _drawQueryBuilder {
 	my $conjunctionField = WebGUI::Form::selectList({
 					name=>"conjunction",
 					options=>{
-						"AND" => WebGUI::International::get("AND","Shortcut"),
-						"OR" => WebGUI::International::get("OR","Shortcut")},
+						"AND" => WebGUI::International::get("AND","Asset_Shortcut"),
+						"OR" => WebGUI::International::get("OR","Asset_Shortcut")},
 					value=>["OR"],
 					extras=>'class="qbselect"',
 				});

@@ -68,7 +68,7 @@ sub getIcon {
 
 #-------------------------------------------------------------------
 sub getName {
-        return WebGUI::International::get(2,"SyndicatedContent");
+        return WebGUI::International::get(2,"Asset_SyndicatedContent");
 }
 
 #-------------------------------------------------------------------
@@ -87,12 +87,12 @@ sub getEditForm {
    		);
 	$tabform->getTab("properties")->url(
 		-name=>"rssUrl",
-		-label=>WebGUI::International::get(1,"SyndicatedContent"),
+		-label=>WebGUI::International::get(1,"Asset_SyndicatedContent"),
 		-value=>$self->getValue("rssUrl")
 		);
 	$tabform->getTab("display")->integer(
 		-name=>"maxHeadlines",
-		-label=>WebGUI::International::get(3,"SyndicatedContent"),
+		-label=>WebGUI::International::get(3,"Asset_SyndicatedContent"),
 		-value=>$self->getValue("maxHeadlines")
 		);
 	return $tabform;
@@ -391,7 +391,7 @@ sub www_edit {
         my $self = shift;
 	return WebGUI::Privilege::insufficient() unless $self->canEdit;
         $self->getAdminConsole->setHelp("syndicated content add/edit","SyndicatedContent");
-        return $self->getAdminConsole->render($self->getEditForm->print,WebGUI::International::get("4","SyndicatedContent"));
+        return $self->getAdminConsole->render($self->getEditForm->print,WebGUI::International::get("4","Asset_SyndicatedContent"));
 }
 
 

@@ -117,22 +117,22 @@ sub getEditForm {
 	my $tabform = $self->SUPER::getEditForm();
         $tabform->getTab("properties")->integer(
                	-name=>"thumbnailSize",
-		-label=>WebGUI::International::get('thumbnail size', 'Image'),
+		-label=>WebGUI::International::get('thumbnail size', 'Asset_Image'),
 		-value=>$self->getValue("thumbnailSize")
                	);
 	$tabform->getTab("properties")->textarea(
 		-name=>"parameters",
-		-label=>WebGUI::International::get('parameters', 'Image'),
+		-label=>WebGUI::International::get('parameters', 'Asset_Image'),
 		-value=>$self->getValue("parameters")
 		);
 	if ($self->get("filename") ne "") {
 		$tabform->getTab("properties")->readOnly(
-			-label=>WebGUI::International::get('thumbnail', 'Image'),
+			-label=>WebGUI::International::get('thumbnail', 'Asset_Image'),
 			-value=>'<a href="'.$self->getFileUrl.'"><img src="'.$self->getThumbnailUrl.'?noCache='.time().'" alt="thumbnail" /></a>'
 			);
 		my ($x, $y) = $self->getStorageLocation->getSizeInPixels($self->get("filename"));
         	$tabform->getTab("properties")->readOnly(
-			-label=>WebGUI::International::get('image size', 'Image'),
+			-label=>WebGUI::International::get('image size', 'Asset_Image'),
 			-value=>$x.' x '.$y
 			);
 	}
@@ -224,7 +224,7 @@ sub view {
 sub www_edit {
         my $self = shift;
         return WebGUI::Privilege::insufficient() unless $self->canEdit;
-	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=resize'),WebGUI::International::get("resize image","Image")) if ($self->get("filename"));
+	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=resize'),WebGUI::International::get("resize image","Asset_Image")) if ($self->get("filename"));
 	my $tabform = $self->getEditForm;
 	$tabform->getTab("display")->template(
 		-value=>$self->get("templateId"),
@@ -232,7 +232,7 @@ sub www_edit {
 		-defaultValue=>"PBtmpl0000000000000088"
 		);
         $self->getAdminConsole->setHelp("image add/edit","Image");
-        return $self->getAdminConsole->render($tabform->print,WebGUI::International::get("edit image","Image"));
+        return $self->getAdminConsole->render($tabform->print,WebGUI::International::get("edit image","Asset_Image"));
 }
 
 #-------------------------------------------------------------------
@@ -243,7 +243,7 @@ sub www_resize {
 		$self->getStorageLocation->resize($self->get("filename"),$session{form}{newWidth},$session{form}{newHeight});
 		$self->setSize($self->getStorageLocation->getFileSize($self->get("filename")));
 	}
-	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=edit'),WebGUI::International::get("edit image","Image"));
+	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=edit'),WebGUI::International::get("edit image","Asset_Image"));
 	my $f = WebGUI::HTMLForm->new(-action=>$self->getUrl);
 	$f->hidden(
 		-name=>"func",
@@ -251,20 +251,20 @@ sub www_resize {
 		);
 	my ($x, $y) = $self->getStorageLocation->getSizeInPixels($self->get("filename"));
        	$f->readOnly(
-		-label=>WebGUI::International::get('image size', 'Image'),
+		-label=>WebGUI::International::get('image size', 'Asset_Image'),
 		-value=>$x.' x '.$y
 		);
 	$f->integer(
-		-label=>WebGUI::International::get('new width','Image'),
+		-label=>WebGUI::International::get('new width','Asset_Image'),
 		-name=>"newWidth"
 		);
 	$f->integer(
-		-label=>WebGUI::International::get('new height','Image'),
+		-label=>WebGUI::International::get('new height','Asset_Image'),
 		-name=>"newHeight"
 		);
 	$f->submit;
 	my $image = '<div align="center"><img src="'.$self->getStorageLocation->getUrl($self->get("filename")).'" border="1" alt="'.$self->get("filename").'" /></div>';
-        return $self->getAdminConsole->render($f->print.$image,WebGUI::International::get("resize image","Image"));
+        return $self->getAdminConsole->render($f->print.$image,WebGUI::International::get("resize image","Asset_Image"));
 }
 
 #-------------------------------------------------------------------

@@ -142,7 +142,7 @@ sub getEditForm {
    		);
         $tabform->getTab("properties")->yesNo(
                 -name=>"debugMode",
-                -label=>WebGUI::International::get(16,"SQLReport"),
+                -label=>WebGUI::International::get(16,"Asset_SQLReport"),
                 -value=>$self->getValue("debugMode")
                 );
 
@@ -176,17 +176,17 @@ sub getEditForm {
 		   ); 
 	   $tabform->getTab("properties")->yesNo(
 	  	   -name=>"preprocessMacros".$nr,
-		   -label=>WebGUI::International::get(15,"SQLReport"),
+		   -label=>WebGUI::International::get(15,"Asset_SQLReport"),
 		   -value=>$self->getValue("preprocessMacros".$nr)
 		   );
 	   $tabform->getTab("properties")->textarea(
                    -name=>"placeholderParams".$nr,
-                   -label=>WebGUI::International::get('Placeholder Parameters',"SQLReport"),
+                   -label=>WebGUI::International::get('Placeholder Parameters',"Asset_SQLReport"),
                    -value=>$self->getValue("placeholderParams".$nr)
                    );
 	   $tabform->getTab("properties")->codearea(
 		   -name=>"dbQuery".$nr,
-		   -label=>WebGUI::International::get(4,"SQLReport"),
+		   -label=>WebGUI::International::get(4,"Asset_SQLReport"),
 		   -value=>$self->getValue("dbQuery".$nr)
 		   );
 	   $tabform->getTab("properties")->databaseLink(
@@ -197,7 +197,7 @@ sub getEditForm {
 	   # Add a "Add another query" button
 	   if ($nr < 5	and ($self->get("dbQuery".($nr+1)) eq "" || ($self->get("dbQuery".($nr)) eq "" and $self->get("dbQuery".($nr+1)) ne ""))) {
 	           $tabform->getTab("properties")->button(
-        	           -value=>WebGUI::International::get('Add another query',"SQLReport"),
+        	           -value=>WebGUI::International::get('Add another query',"Asset_SQLReport"),
                 	   -extras=>'onClick="toggleQuery(\''.($nr+1).'\'); this.style.display=\'none\';"',
 	                   -noWait=>1
         	           );
@@ -218,7 +218,7 @@ sub getEditForm {
 
 	$tabform->getTab("display")->integer(
 		-name=>"paginateAfter",
-		-label=>WebGUI::International::get(14,"SQLReport"),
+		-label=>WebGUI::International::get(14,"Asset_SQLReport"),
 		-value=>$self->getValue("paginateAfter")
 		);
 	return $tabform;
@@ -234,7 +234,7 @@ sub getIcon {
 
 #-------------------------------------------------------------------
 sub getName {
-        return WebGUI::International::get(1,"SQLReport");
+        return WebGUI::International::get(1,"Asset_SQLReport");
 }
 
 
@@ -267,7 +267,7 @@ sub www_edit {
         my $self = shift;
 	return WebGUI::Privilege::insufficient() unless $self->canEdit;
 	$self->getAdminConsole->setHelp("sql report add/edit", "SQLReport");
-        return $self->getAdminConsole->render($self->getEditForm->print,WebGUI::International::get("8","SQLReport"));
+        return $self->getAdminConsole->render($self->getEditForm->print,WebGUI::International::get("8","Asset_SQLReport"));
 }
 
 
@@ -326,8 +326,8 @@ sub _processQuery {
                 $query = $self->{_query}{$nr}{dbQuery};
         }
 	
-        push(@{$self->{_debug_loop}},{'debug.output'=>WebGUI::International::get(17,"SQLReport").$query});
-        push(@{$self->{_debug_loop}},{'debug.output'=>WebGUI::International::get('debug placeholder parameters',"SQLReport").join(",",@$placeholderParams)});
+        push(@{$self->{_debug_loop}},{'debug.output'=>WebGUI::International::get(17,"Asset_SQLReport").$query});
+        push(@{$self->{_debug_loop}},{'debug.output'=>WebGUI::International::get('debug placeholder parameters',"Asset_SQLReport").join(",",@$placeholderParams)});
         my $dbLink = WebGUI::DatabaseLink->new($self->{_query}{$nr}{databaseLinkId});
         my $dbh = $dbLink->dbh;
         if (defined $dbh) {
@@ -345,7 +345,7 @@ sub _processQuery {
                         my $error = $p->setDataByQuery($query,$dbh,1,$placeholderParams);
                         if ($error ne "") {
                                 WebGUI::ErrorHandler::warn("There was a problem with the query: ".$error);
-                                push(@{$self->{_debug_loop}},{'debug.output'=>WebGUI::International::get(11,"SQLReport")." ".$error});
+                                push(@{$self->{_debug_loop}},{'debug.output'=>WebGUI::International::get(11,"Asset_SQLReport")." ".$error});
                         } else {
                                 my $first = 1;
                                 my @columns;
@@ -389,16 +389,16 @@ sub _processQuery {
 				$var{$prefix.'columns.count'} = scalar(@columns);
                                 $var{$prefix.'rows.count'} = $p->getRowCount;
                                 $var{$prefix.'rows.count.isZero'} = ($p->getRowCount < 1);
-                                $var{$prefix.'rows.count.isZero.label'} = WebGUI::International::get(18,"SQLReport");
+                                $var{$prefix.'rows.count.isZero.label'} = WebGUI::International::get(18,"Asset_SQLReport");
                                 $p->appendTemplateVars(\%var) if ($nr == 1);
                         }
                 } else {
-                        push(@{$self->{_debug_loop}},{'debug.output'=>WebGUI::International::get(10,"SQLReport")});
+                        push(@{$self->{_debug_loop}},{'debug.output'=>WebGUI::International::get(10,"Asset_SQLReport")});
                         WebGUI::ErrorHandler::warn("SQLReport [".$self->getId."] The SQL query is improperly formatted.");
                 }
                 $dbLink->disconnect;
         } else {
-                push(@{$self->{_debug_loop}},{'debug.output'=>WebGUI::International::get(12,"SQLReport")});
+                push(@{$self->{_debug_loop}},{'debug.output'=>WebGUI::International::get(12,"Asset_SQLReport")});
                 WebGUI::ErrorHandler::warn("SQLReport [".$self->getId."] Could not connect to database.");
         }
 	return \%var;

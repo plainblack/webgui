@@ -181,18 +181,18 @@ sub getEditForm {
         }
 	$tabform->getTab("security")->yesNo(
 		-name=>"active",
-		-label=>WebGUI::International::get(3,"Poll"),
+		-label=>WebGUI::International::get(3,"Asset_Poll"),
 		-value=>$self->getValue("active")
 		);
         $tabform->getTab("security")->group(
 		-name=>"voteGroup",
-		-label=>WebGUI::International::get(4,"Poll"),
+		-label=>WebGUI::International::get(4,"Asset_Poll"),
 		-value=>[$self->getValue("voteGroup")]
 		);
 	if ($session{setting}{useKarma}) {
 		$tabform->getTab("properties")->integer(
 			-name=>"karmaPerVote",
-			-label=>WebGUI::International::get(20,"Poll"),
+			-label=>WebGUI::International::get(20,"Asset_Poll"),
 			-value=>$self->getValue("karmaPerVote")
 			);
 	} else {
@@ -203,28 +203,28 @@ sub getEditForm {
 	}
 	$tabform->getTab("display")->integer(
 		-name=>"graphWidth",
-		-label=>WebGUI::International::get(5,"Poll"),
+		-label=>WebGUI::International::get(5,"Asset_Poll"),
 		-value=>$self->getValue("graphWidth")
 		);
 	$tabform->getTab("properties")->text(
 		-name=>"question",
-		-label=>WebGUI::International::get(6,"Poll"),
+		-label=>WebGUI::International::get(6,"Asset_Poll"),
 		-value=>$self->getValue("question")
 		);
         $tabform->getTab("properties")->textarea(
 		-name=>"answers",
-		-label=>WebGUI::International::get(7,"Poll"),
-		-subtext=>('<span class="formSubtext"><br>'.WebGUI::International::get(8,"Poll").'</span>'),
+		-label=>WebGUI::International::get(7,"Asset_Poll"),
+		-subtext=>('<span class="formSubtext"><br>'.WebGUI::International::get(8,"Asset_Poll").'</span>'),
 		-value=>$answers
 		);
 	$tabform->getTab("display")->yesNo(
 		-name=>"randomizeAnswers",
-		-label=>WebGUI::International::get(72,"Poll"),
+		-label=>WebGUI::International::get(72,"Asset_Poll"),
 		-value=>$self->getValue("randomizeAnswers")
 		);
 	$tabform->getTab("properties")->yesNo(
 		-name=>"resetVotes",
-		-label=>WebGUI::International::get(10,"Poll")
+		-label=>WebGUI::International::get(10,"Asset_Poll")
 		);
 	return $tabform;
 }
@@ -270,7 +270,7 @@ sub getIndexerParams {
 
 #-------------------------------------------------------------------
 sub getName {
-        return WebGUI::International::get(1,"Poll");
+        return WebGUI::International::get(1,"Asset_Poll");
 }
 
 
@@ -323,11 +323,11 @@ sub view {
 	}
 	$var{canVote} = $showPoll;
         my ($totalResponses) = WebGUI::SQL->quickArray("select count(*) from Poll_answer where assetId=".quote($self->getId));
-	$var{"responses.label"} = WebGUI::International::get(12,"Poll");
+	$var{"responses.label"} = WebGUI::International::get(12,"Asset_Poll");
 	$var{"responses.total"} = $totalResponses;
 	$var{"form.start"} = WebGUI::Form::formHeader({action=>$self->getUrl});
         $var{"form.start"} .= WebGUI::Form::hidden({name=>'func',value=>'vote'});
-	$var{"form.submit"} = WebGUI::Form::submit({value=>WebGUI::International::get(11,"Poll")});
+	$var{"form.submit"} = WebGUI::Form::submit({value=>WebGUI::International::get(11,"Asset_Poll")});
 	$var{"form.end"} = WebGUI::Form::formFooter();
 	$totalResponses = 1 if ($totalResponses < 1);
         for (my $i=1; $i<=20; $i++) {
@@ -355,7 +355,7 @@ sub www_edit {
         my $self = shift;
 	return WebGUI::Privilege::insufficient() unless $self->canEdit;
 	$self->getAdminConsole->setHelp("poll add/edit","Poll");
-        return $self->getAdminConsole->render($self->getEditForm->print,WebGUI::International::get("9","Poll"));
+        return $self->getAdminConsole->render($self->getEditForm->print,WebGUI::International::get("9","Asset_Poll"));
 }
 
 #-------------------------------------------------------------------

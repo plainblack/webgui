@@ -78,7 +78,7 @@ sub _execute {
 		return $t->output;
 	} else {
 		WebGUI::ErrorHandler::error("Error in template. ".$@);
-		return WebGUI::International::get('template error', 'Template').$@;
+		return WebGUI::International::get('template error', 'Asset_Template').$@;
 	}
 }
 
@@ -147,12 +147,12 @@ sub getEditForm {
 		$tabform->getTab("properties")->combo(
 			-name=>"namespace",
 			-options=>$namespaces,
-			-label=>WebGUI::International::get('namespace','Template'),
+			-label=>WebGUI::International::get('namespace','Asset_Template'),
 			-value=>[$session{form}{namespace}] 
 			);
 	} else {
 		$tabform->getTab("meta")->readOnly(
-			-label=>WebGUI::International::get('namespace','Template'),
+			-label=>WebGUI::International::get('namespace','Asset_Template'),
 			-value=>$self->getValue("namespace")
 			);	
 		$tabform->getTab("meta")->hidden(
@@ -163,11 +163,11 @@ sub getEditForm {
 	$tabform->getTab("display")->yesNo(
 		-name=>"showInForms",
 		-value=>$self->getValue("showInForms"),
-		-label=>WebGUI::International::get('show in forms', 'Template'),
+		-label=>WebGUI::International::get('show in forms', 'Asset_Template'),
 		);
         $tabform->getTab("properties")->codearea(
 		-name=>"template",
-		-label=>WebGUI::International::get('template', 'Template'),
+		-label=>WebGUI::International::get('template', 'Asset_Template'),
 		-value=>$self->getValue("template")
 		);
 	return $tabform;
@@ -334,7 +334,7 @@ sub www_edit {
         my $self = shift;
         return WebGUI::Privilege::insufficient() unless $self->canEdit;
 	$self->getAdminConsole->setHelp("template add/edit","Template");
-        return $self->getAdminConsole->render($self->getEditForm->print,WebGUI::International::get('edit template', 'Template'));
+        return $self->getAdminConsole->render($self->getEditForm->print,WebGUI::International::get('edit template', 'Asset_Template'));
 }
 
 #-------------------------------------------------------------------

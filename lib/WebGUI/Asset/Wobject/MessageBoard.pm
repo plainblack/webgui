@@ -60,7 +60,7 @@ sub getIcon {
 
 #-------------------------------------------------------------------
 sub getName {
-        return WebGUI::International::get(2,"MessageBoard");
+        return WebGUI::International::get(2,"Asset_MessageBoard");
 }
 
 
@@ -111,13 +111,13 @@ sub view {
 	}
 	$var{'default.listing'} = $first->view if ($count == 1 && defined $first);
 	$var{'forum.add.url'} = $self->getUrl("func=add&class=WebGUI::Asset::Wobject::Collaboration");
-	$var{'forum.add.label'} = WebGUI::International::get(75,"MessageBoard");
-	$var{'title.label'} = WebGUI::International::get('title','MessageBoard');
-	$var{'views.label'} = WebGUI::International::get('views',,'MessageBoard');
-	$var{'rating.label'} = WebGUI::International::get('rating','MessageBoard');
-	$var{'threads.label'} = WebGUI::International::get('threads','MessageBoard');
-	$var{'replies.label'} = WebGUI::International::get('replies','MessageBoard');
-	$var{'lastpost.label'} = WebGUI::International::get('lastpost','MessageBoard');
+	$var{'forum.add.label'} = WebGUI::International::get(75,"Asset_MessageBoard");
+	$var{'title.label'} = WebGUI::International::get('title','Asset_MessageBoard');
+	$var{'views.label'} = WebGUI::International::get('views',,'Asset_MessageBoard');
+	$var{'rating.label'} = WebGUI::International::get('rating','Asset_MessageBoard');
+	$var{'threads.label'} = WebGUI::International::get('threads','Asset_MessageBoard');
+	$var{'replies.label'} = WebGUI::International::get('replies','Asset_MessageBoard');
+	$var{'lastpost.label'} = WebGUI::International::get('lastpost','Asset_MessageBoard');
 	$var{areMultipleForums} = ($count > 1);
 	$var{forum_loop} = \@forum_loop;
        	return $self->processTemplate(\%var,$self->get("templateId"));
@@ -129,7 +129,7 @@ sub www_edit {
         my $self = shift;
 	return WebGUI::Privilege::insufficient() unless $self->canEdit;
 	$self->getAdminConsole->setHelp("message board add/edit","MessageBoard");
-        return $self->getAdminConsole->render($self->getEditForm->print,WebGUI::International::get("6","MessageBoard"));
+        return $self->getAdminConsole->render($self->getEditForm->print,WebGUI::International::get("6","Asset_MessageBoard"));
 }
 
 

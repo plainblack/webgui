@@ -38,15 +38,15 @@ sub _addFileTab {
    if($value eq ""){
       $tabform->getTab("properties")->file(
 	      -name=>$column,
-		  -label=>WebGUI::International::get($internationalId,"Product"),
+		  -label=>WebGUI::International::get($internationalId,"Asset_Product"),
 		);
       return;
    }
    
    my $file = WebGUI::Storage->get($value);
    $tabform->getTab("properties")->readOnly(
-	      -value=>'<a href="'.$self->getUrl('func=deleteFileConfirm&file='.$column).'">'.WebGUI::International::get("deleteImage","Product").'</a>',
-	      -label=>WebGUI::International::get($internationalId,"Product"),
+	      -value=>'<a href="'.$self->getUrl('func=deleteFileConfirm&file='.$column).'">'.WebGUI::International::get("deleteImage","Asset_Product").'</a>',
+	      -label=>WebGUI::International::get($internationalId,"Asset_Product"),
 	    );
 }
 
@@ -207,12 +207,12 @@ sub getEditForm {
    		);
 	$tabform->getTab("properties")->text(
 		-name=>"price",
-		-label=>WebGUI::International::get(10,"Product"),
+		-label=>WebGUI::International::get(10,"Asset_Product"),
 		-value=>$self->getValue("price")
 		);
     $tabform->getTab("properties")->text(
 		-name=>"productNumber",
-		-label=>WebGUI::International::get(11,"Product"),
+		-label=>WebGUI::International::get(11,"Asset_Product"),
 		-value=>$self->getValue("productNumber")
 		);
     $self->_addFileTab($tabform,"image1",7);
@@ -297,7 +297,7 @@ sub getIndexerParams {
 
 #-------------------------------------------------------------------
 sub getName {
-        return WebGUI::International::get(1,"Product");
+        return WebGUI::International::get(1,"Asset_Product");
 }
 
 #-------------------------------------------------------------------
@@ -348,8 +348,8 @@ sub www_addAccessory {
    @usedAccessories = WebGUI::SQL->buildArray("select accessoryAssetId from Product_accessory where assetId=".quote($self->getId));
    push(@usedAccessories,$self->getId);
    $accessory = WebGUI::SQL->buildHashRef("select assetId, title from asset where className='WebGUI::Asset::Wobject::Product' and assetId not in (".quoteAndJoin(\@usedAccessories).")");
-   $f->selectList("accessoryAccessId",$accessory,WebGUI::International::get(17,'Product'));
-   $f->yesNo("proceed",WebGUI::International::get(18,'Product'));
+   $f->selectList("accessoryAccessId",$accessory,WebGUI::International::get(17,'Asset_Product'));
+   $f->yesNo("proceed",WebGUI::International::get(18,'Asset_Product'));
    $f->submit;
    return $self->getAdminConsole->render($f->print, "product accessory add/edit");
 }
@@ -375,8 +375,8 @@ sub www_addRelated {
    @usedRelated = WebGUI::SQL->buildArray("select relatedAssetId from Product_related where assetId=".quote($self->getId));
    push(@usedRelated,$self->getId);
    $related = WebGUI::SQL->buildHashRef("select assetId,title from asset where className='WebGUI::Asset::Wobject::Product' and assetId not in (".quoteAndJoin(\@usedRelated).")");
-   $f->selectList("relatedAssetId",$related,WebGUI::International::get(20,'Product'));
-   $f->yesNo("proceed",WebGUI::International::get(21,'Product'));
+   $f->selectList("relatedAssetId",$related,WebGUI::International::get(20,'Asset_Product'));
+   $f->yesNo("proceed",WebGUI::International::get(21,'Asset_Product'));
    $f->submit;
    return $self->getAdminConsole->render($f->print,"product related add/edit");
 }
@@ -454,7 +454,7 @@ sub www_edit {
    my $self = shift;
    return WebGUI::Privilege::insufficient() unless $self->canEdit;
    $self->getAdminConsole->setHelp("product add/edit","Product");
-   return $self->getAdminConsole->render($self->getEditForm->print,WebGUI::International::get("6","Product"));
+   return $self->getAdminConsole->render($self->getEditForm->print,WebGUI::International::get("6","Asset_Product"));
 }
 
 #-------------------------------------------------------------------
@@ -481,8 +481,8 @@ sub www_editBenefit {
    $f->hidden("bid",$data->{Product_benefitId});
    $f->hidden("func","editBenefitSave");
    $benefits = WebGUI::SQL->buildHashRef("select benefit,benefit from Product_benefit order by benefit");
-   $f->combo("benefit",$benefits,WebGUI::International::get(51,'Product'),[$data->{benefits}]);
-   $f->yesNo("proceed",WebGUI::International::get(52,'Product'));
+   $f->combo("benefit",$benefits,WebGUI::International::get(51,'Asset_Product'),[$data->{benefits}]);
+   $f->yesNo("proceed",WebGUI::International::get(52,'Asset_Product'));
    $f->submit;
    return $self->getAdminConsole->render($f->print, "product benefit add/edit");
 }
@@ -512,8 +512,8 @@ sub www_editFeature {
    $f->hidden("fid",$data->{Product_featureId});
    $f->hidden("func","editFeatureSave");
    $features = WebGUI::SQL->buildHashRef("select feature,feature from Product_feature order by feature");
-   $f->combo("feature",$features,WebGUI::International::get(23,'Product'),[$data->{feature}]);
-   $f->yesNo("proceed",WebGUI::International::get(24,'Product'));
+   $f->combo("feature",$features,WebGUI::International::get(23,'Asset_Product'),[$data->{feature}]);
+   $f->yesNo("proceed",WebGUI::International::get(24,'Asset_Product'));
    $f->submit;
    return $self->getAdminConsole->render($f->print, "product feature add/edit");
 }
@@ -542,11 +542,11 @@ sub www_editSpecification {
    $f->hidden("sid",$data->{Product_specificationId});
    $f->hidden("func","editSpecificationSave");
    $hashRef = WebGUI::SQL->buildHashRef("select name,name from Product_specification order by name");
-   $f->combo("name",$hashRef,WebGUI::International::get(26,'Product'),[$data->{name}]);
-   $f->text("value",WebGUI::International::get(27,'Product'),$data->{value});
+   $f->combo("name",$hashRef,WebGUI::International::get(26,'Asset_Product'),[$data->{name}]);
+   $f->text("value",WebGUI::International::get(27,'Asset_Product'),$data->{value});
    $hashRef = WebGUI::SQL->buildHashRef("select units,units from Product_specification order by units");
-   $f->combo("units",$hashRef,WebGUI::International::get(29,'Product'),[$data->{units}]);
-   $f->yesNo("proceed",WebGUI::International::get(28,'Product'));
+   $f->combo("units",$hashRef,WebGUI::International::get(29,'Asset_Product'),[$data->{units}]);
+   $f->yesNo("proceed",WebGUI::International::get(28,'Asset_Product'));
    $f->submit;
    return $self->getAdminConsole->render($f->print, "product specification add/edit");
 }
@@ -660,21 +660,21 @@ sub view {
    if ($brochure) {
       $file = WebGUI::Storage->get($brochure);
       $var{"brochure.icon"} = $self->getFileIconUrl($file);
-	  $var{"brochure.label"} = WebGUI::International::get(13,"Product");
+	  $var{"brochure.label"} = WebGUI::International::get(13,"Asset_Product");
 	  $var{"brochure.URL"} = $self->getFileUrl($file);
    }
 	#---manual
    if ($manual) {
       $file = WebGUI::Storage->get($manual);
 	  $var{"manual.icon"} = $self->getFileIconUrl($file);
-	  $var{"manual.label"} = WebGUI::International::get(14,"Product");
+	  $var{"manual.label"} = WebGUI::International::get(14,"Asset_Product");
       $var{"manual.URL"} = $self->getFileUrl($file);
    }
    #---warranty
    if ($warranty) {
       $file = WebGUI::Storage->get($warranty);
       $var{"warranty.icon"} = $self->getFileIconUrl($file);
-	  $var{"warranty.label"} = WebGUI::International::get(15,"Product");
+	  $var{"warranty.label"} = WebGUI::International::get(15,"Asset_Product");
 	  $var{"warranty.URL"} = $self->getFileUrl($file);
    }
    #---image1
@@ -698,10 +698,10 @@ sub view {
    
    #---features 
    $var{"addFeature.url"} = $self->getUrl('func=editFeature&fid=new');
-   $var{"addFeature.label"} = WebGUI::International::get(34,'Product');
+   $var{"addFeature.label"} = WebGUI::International::get(34,'Asset_Product');
    $sth = WebGUI::SQL->read("select feature,Product_featureId from Product_feature where assetId=".quote($self->getId)." order by sequenceNumber");
    while (%data = $sth->hash) {
-      $segment = deleteIcon('func=deleteFeatureConfirm&fid='.$data{Product_featureId},$self->get("url"),WebGUI::International::get(3,'Product'))
+      $segment = deleteIcon('func=deleteFeatureConfirm&fid='.$data{Product_featureId},$self->get("url"),WebGUI::International::get(3,'Asset_Product'))
                  .editIcon('func=editFeature&fid='.$data{Product_featureId},$self->get("url"))
                  .moveUpIcon('func=moveFeatureUp&&fid='.$data{Product_featureId},$self->get("url"))
                  .moveDownIcon('func=moveFeatureDown&&fid='.$data{Product_featureId},$self->get("url"));
@@ -715,10 +715,10 @@ sub view {
 
    #---benefits 
    $var{"addBenefit.url"} = $self->getUrl('func=editBenefit&fid=new');
-   $var{"addBenefit.label"} = WebGUI::International::get(55,'Product');
+   $var{"addBenefit.label"} = WebGUI::International::get(55,'Asset_Product');
    $sth = WebGUI::SQL->read("select benefit,Product_benefitId from Product_benefit where assetId=".quote($self->getId)." order by sequenceNumber");
    while (%data = $sth->hash) {
-      $segment = deleteIcon('func=deleteBenefitConfirm&bid='.$data{Product_benefitId},$self->get("url"),WebGUI::International::get(48,'Product'))
+      $segment = deleteIcon('func=deleteBenefitConfirm&bid='.$data{Product_benefitId},$self->get("url"),WebGUI::International::get(48,'Asset_Product'))
                  .editIcon('func=editBenefit&bid='.$data{Product_benefitId},$self->get("url"))
                  .moveUpIcon('func=moveBenefitUp&bid='.$data{Product_benefitId},$self->get("url"))
                  .moveDownIcon('func=moveBenefitDown&bid='.$data{Product_benefitId},$self->get("url"));
@@ -732,10 +732,10 @@ sub view {
 
    #---specifications 
    $var{"addSpecification.url"} = $self->getUrl('func=editSpecification&sid=new');
-   $var{"addSpecification.label"} = WebGUI::International::get(35,'Product');
+   $var{"addSpecification.label"} = WebGUI::International::get(35,'Asset_Product');
    $sth = WebGUI::SQL->read("select name,value,units,Product_specificationId from Product_specification where assetId=".quote($self->getId)." order by sequenceNumber");
    while (%data = $sth->hash) {
-      $segment = deleteIcon('func=deleteSpecificationConfirm&sid='.$data{Product_specificationId},$self->get("url"),WebGUI::International::get(5,'Product'))
+      $segment = deleteIcon('func=deleteSpecificationConfirm&sid='.$data{Product_specificationId},$self->get("url"),WebGUI::International::get(5,'Asset_Product'))
                  .editIcon('func=editSpecification&sid='.$data{Product_specificationId},$self->get("url"))
                  .moveUpIcon('func=moveSpecificationUp&sid='.$data{Product_specificationId},$self->get("url"))
                  .moveDownIcon('func=moveSpecificationDown&sid='.$data{Product_specificationId},$self->get("url"));
@@ -751,14 +751,14 @@ sub view {
 
 	#---accessories 
    $var{"addaccessory.url"} = $self->getUrl('func=addAccessory');
-   $var{"addaccessory.label"} = WebGUI::International::get(36,'Product');
+   $var{"addaccessory.label"} = WebGUI::International::get(36,'Asset_Product');
    $sth = WebGUI::SQL->read("select asset.title, asset.url, Product_accessory.accessoryAssetId 
                              from   Product_accessory,asset 
 		                     where Product_accessory.assetId=".quote($self->getId)." 
 		                     and Product_accessory.accessoryAssetId=asset.assetId 
 		                     order by Product_accessory.sequenceNumber");
    while (%data = $sth->hash) {
-      $segment = deleteIcon('func=deleteAccessoryConfirm&aid='.$data{accessoryAssetId},$self->get("url"),WebGUI::International::get(2,'Product'))
+      $segment = deleteIcon('func=deleteAccessoryConfirm&aid='.$data{accessoryAssetId},$self->get("url"),WebGUI::International::get(2,'Asset_Product'))
                  .moveUpIcon('func=moveAccessoryUp&aid='.$data{accessoryAssetId},$self->get("url"))
                  .moveDownIcon('func=moveAccessoryDown&aid='.$data{accessoryAssetId},$self->get("url"));
 	  push(@accessoryloop,{
@@ -772,14 +772,14 @@ sub view {
 
    #---related
    $var{"addrelatedproduct.url"} = $self->getUrl('func=addRelated');
-   $var{"addrelatedproduct.label"} = WebGUI::International::get(37,'Product');
+   $var{"addrelatedproduct.label"} = WebGUI::International::get(37,'Asset_Product');
    $sth = WebGUI::SQL->read("select asset.title,asset.url,Product_related.relatedAssetId 
 		                     from Product_related,asset 
 		                     where Product_related.assetId=".quote($self->getId)." 
 		                     and Product_related.relatedAssetId=asset.assetId 
 		                     order by Product_related.sequenceNumber");
    while (%data = $sth->hash) {
-      $segment = deleteIcon('func=deleteRelatedConfirm&rid='.$data{relatedAssetId},$self->get("url"),WebGUI::International::get(4,'Product'))
+      $segment = deleteIcon('func=deleteRelatedConfirm&rid='.$data{relatedAssetId},$self->get("url"),WebGUI::International::get(4,'Asset_Product'))
                  .moveUpIcon('func=moveRelatedUp&rid='.$data{relatedAssetId},$self->get("url"))
                  .moveDownIcon('func=moveRelatedDown&rid='.$data{relatedAssetId},$self->get("url"));
       push(@relatedloop,{

@@ -35,7 +35,7 @@ sub addAnswer {
 		Survey_id=>$_[0]->get("Survey_id"),
 		Survey_questionId=>$_[2],
 		Survey_answerId=>"new",
-		answer=>WebGUI::International::get($_[1],'Survey')
+		answer=>WebGUI::International::get($_[1],'Asset_Survey')
 		},1,0,"Survey_id");
 }
 
@@ -184,28 +184,28 @@ sub getEditForm {
 	$tabform->getTab('properties')->hidden("Survey_id",($self->get("Survey_id") || WebGUI::Id::generate()));
 	$tabform->getTab('display')->template(
 		-name		=> 'templateId',
-		-label		=> WebGUI::International::get('view template', 'Survey'),
+		-label		=> WebGUI::International::get('view template', 'Asset_Survey'),
 		-value		=> $self->getValue('templateId'),
 		-namespace	=> 'Survey',
 		-afterEdit	=> 'func=edit'
 		);
 	$tabform->getTab('display')->template(
 		-name		=> 'responseTemplateId',
-		-label		=> WebGUI::International::get('response template', 'Survey'),
+		-label		=> WebGUI::International::get('response template', 'Asset_Survey'),
 		-value		=> $self->getValue('responseTemplateId'),
 		-namespace	=> 'Survey/Response',
 		-afterEdit	=> 'func=edit'
 		);
 	$tabform->getTab('display')->template(
 		-name		=> 'gradebookTemplateId',
-		-label		=> WebGUI::International::get('gradebook template', 'Survey'),
+		-label		=> WebGUI::International::get('gradebook template', 'Asset_Survey'),
 		-value		=> $self->getValue('gradebookTemplateId'),
 		-namespace	=> 'Survey/Gradebook',
 		-afterEdit	=> 'func=edit'
 		);
 	$tabform->getTab('display')->template(
 		-name		=> 'overviewTemplateId',
-		-label		=> WebGUI::International::get('overview template', 'Survey'),
+		-label		=> WebGUI::International::get('overview template', 'Asset_Survey'),
 		-value		=> $self->getValue('overviewTemplateId'),
 		-namespace	=> 'Survey/Overview',
 		-afterEdit	=> 'func=edit'
@@ -214,57 +214,57 @@ sub getEditForm {
 	$tabform->getTab('display')->selectList(
 		-name		=> "questionOrder",
 		-options	=> {
-			sequential => WebGUI::International::get(5,'Survey'),
-                	random => WebGUI::International::get(6,'Survey'),
-                	response => WebGUI::International::get(7,'Survey')
+			sequential => WebGUI::International::get(5,'Asset_Survey'),
+                	random => WebGUI::International::get(6,'Asset_Survey'),
+                	response => WebGUI::International::get(7,'Asset_Survey')
 			},
-		-label		=> WebGUI::International::get(8,'Survey'),
+		-label		=> WebGUI::International::get(8,'Asset_Survey'),
 		-value		=> [$self->getValue("questionOrder")]
 		);
 	$tabform->getTab('display')->integer(
 		-name		=> "questionsPerPage",
 		-value		=> $self->getValue("questionsPerPage"),
-		-label		=> WebGUI::International::get(83,'Survey')
+		-label		=> WebGUI::International::get(83,'Asset_Survey')
 		);
         $tabform->getTab('properties')->selectList(
                 -name	=> "mode",
                 -options	=> {
-			survey => WebGUI::International::get(9,'Survey'),
-                	quiz => WebGUI::International::get(10,'Survey')
+			survey => WebGUI::International::get(9,'Asset_Survey'),
+                	quiz => WebGUI::International::get(10,'Asset_Survey')
 			},
-                -label		=> WebGUI::International::get(11,'Survey'),
+                -label		=> WebGUI::International::get(11,'Asset_Survey'),
                 -value		=> [$self->getValue("mode")]
                 );
 	$tabform->getTab('properties')->yesNo(
 		-name		=> "anonymous",
                	-value		=> $self->getValue("anonymous"),
-               	-label		=> WebGUI::International::get(81,'Survey')
+               	-label		=> WebGUI::International::get(81,'Asset_Survey')
                	);
 	$tabform->getTab('properties')->integer(
 		-name		=> "maxResponsesPerUser",
 		-value		=> $self->getValue("maxResponsesPerUser"),
-		-label		=> WebGUI::International::get(84,'Survey')
+		-label		=> WebGUI::International::get(84,'Asset_Survey')
 		);
 	$tabform->getTab('properties')->integer(
 		-name		=> "questionsPerResponse",
 		-value		=> $self->getValue("questionsPerResponse"),
-		-label		=> WebGUI::International::get(85,'Survey')
+		-label		=> WebGUI::International::get(85,'Asset_Survey')
 		);	
 	$tabform->getTab('security')->group(
 		-name		=> "groupToTakeSurvey",
 		-value		=> [$self->getValue("groupToTakeSurvey")],
-		-label		=> WebGUI::International::get(12,'Survey')
+		-label		=> WebGUI::International::get(12,'Asset_Survey')
 		);
         $tabform->getTab('security')->group(
                 -name		=> "groupToViewReports",
-                -label		=> WebGUI::International::get(13,'Survey'),
+                -label		=> WebGUI::International::get(13,'Asset_Survey'),
                 -value		=> [$self->getValue("groupToViewReports")]
                 );
 	if ($self->get("wobjectId") eq "new") {
 		$tabform->getTab('properties')->whatNext(
 			-options=>{
-				addQuestion=>WebGUI::International::get(28,'Survey'),
-				backToPage=>WebGUI::International::get(745,'Survey')
+				addQuestion=>WebGUI::International::get(28,'Asset_Survey'),
+				backToPage=>WebGUI::International::get(745,'Asset_Survey')
 				},
 			-value=>"addQuestion"
 			);
@@ -329,21 +329,21 @@ sub getMenuVars {
 	my %var;
 	$var{'user.canViewReports'} = (WebGUI::Grouping::isInGroup($self->get("groupToViewReports")));
 	$var{'delete.all.responses.url'} = $self->getUrl('func=deleteAllResponses');
-	$var{'delete.all.responses.label'} = WebGUI::International::get(73,'Survey');
+	$var{'delete.all.responses.label'} = WebGUI::International::get(73,'Asset_Survey');
 	$var{'export.answers.url'} = $self->getUrl('func=exportAnswers');
-	$var{'export.answers.label'} = WebGUI::International::get(62,'Survey');
+	$var{'export.answers.label'} = WebGUI::International::get(62,'Asset_Survey');
 	$var{'export.questions.url'} = $self->getUrl('func=exportQuestions');
-	$var{'export.questions.label'} = WebGUI::International::get(63,'Survey');
+	$var{'export.questions.label'} = WebGUI::International::get(63,'Asset_Survey');
 	$var{'export.responses.url'} = $self->getUrl('func=exportResponses');
-	$var{'export.responses.label'} = WebGUI::International::get(64,'Survey');
+	$var{'export.responses.label'} = WebGUI::International::get(64,'Asset_Survey');
 	$var{'export.composite.url'} = $self->getUrl('func=exportComposite');
-	$var{'export.composite.label'} = WebGUI::International::get(65,'Survey');
+	$var{'export.composite.label'} = WebGUI::International::get(65,'Asset_Survey');
 	$var{'report.gradebook.url'} = $self->getUrl('func=viewGradebook');
-	$var{'report.gradebook.label'} = WebGUI::International::get(61,'Survey');
+	$var{'report.gradebook.label'} = WebGUI::International::get(61,'Asset_Survey');
 	$var{'report.overview.url'} = $self->getUrl('func=viewStatisticalOverview');
-	$var{'report.overview.label'} = WebGUI::International::get(59,'Survey');
+	$var{'report.overview.label'} = WebGUI::International::get(59,'Asset_Survey');
         $var{'survey.url'} = $self->getUrl;
-	$var{'survey.label'} = WebGUI::International::get(60,'Survey');
+	$var{'survey.label'} = WebGUI::International::get(60,'Asset_Survey');
 	return \%var;
 }
 
@@ -398,7 +398,7 @@ sub getQuestionVars {
 	$var{'question.comment.field'} = WebGUI::Form::textarea({
 		name=>'comment_'.$questionId
 		});
-	$var{'question.comment.label'} = WebGUI::International::get(51,'Survey');
+	$var{'question.comment.label'} = WebGUI::International::get(51,'Asset_Survey');
 	if ($question->{answerFieldType} eq "text") {
 		my ($answer) = WebGUI::SQL->quickArray("select Survey_answerId from Survey_answer where Survey_questionId=".quote($question->{Survey_questionId})); 
 		$var{'question.answer.field'} = WebGUI::Form::hidden({
@@ -509,7 +509,7 @@ sub getUserId {
 
 #-------------------------------------------------------------------
 sub getName {
-        return WebGUI::International::get(1,'Survey');
+        return WebGUI::International::get(1,'Asset_Survey');
 }
 
 #-------------------------------------------------------------------
@@ -553,13 +553,13 @@ sub view {
 	$self->logView() if ($session{setting}{passiveProfilingEnabled});
 	my $var = $self->getMenuVars;
 	$var->{'question.add.url'} = $self->getUrl('func=editQuestion&qid=new');
-	$var->{'question.add.label'} = WebGUI::International::get(30,'Survey');
+	$var->{'question.add.label'} = WebGUI::International::get(30,'Asset_Survey');
 	my @edit;
 	my $sth = WebGUI::SQL->read("select Survey_questionId,question from Survey_question where Survey_id=".quote($self->get("Survey_id"))." order by sequenceNumber");
 	while (my %data = $sth->hash) {
 		push(@edit,{
 			'question.edit.controls'=>
-				deleteIcon('func=deleteQuestionConfirm&qid='.$data{Survey_questionId}, $self->get("url"), WebGUI::International::get(44,'Survey')).
+				deleteIcon('func=deleteQuestionConfirm&qid='.$data{Survey_questionId}, $self->get("url"), WebGUI::International::get(44,'Asset_Survey')).
 				editIcon('func=editQuestion&qid='.$data{Survey_questionId}, $self->get("url")).
 				moveUpIcon('func=moveQuestionUp&qid='.$data{Survey_questionId}, $self->get("url")).
 				moveDownIcon('func=moveQuestionDown&qid='.$data{Survey_questionId}, $self->get("url")),
@@ -596,19 +596,19 @@ sub view {
 			});
 	$var->{'form.footer'} = WebGUI::Form::formFooter();
 	$var->{'form.submit'} = WebGUI::Form::submit({
-			value=>WebGUI::International::get(50,'Survey')
+			value=>WebGUI::International::get(50,'Asset_Survey')
 			});
-	$var->{'questions.sofar.label'} = WebGUI::International::get(86,'Survey');
-	$var->{'start.newResponse.label'} = WebGUI::International::get(87,'Survey');
+	$var->{'questions.sofar.label'} = WebGUI::International::get(86,'Asset_Survey');
+	$var->{'start.newResponse.label'} = WebGUI::International::get(87,'Asset_Survey');
 	$var->{'start.newResponse.url'} = $self->getUrl("func=view&startNew=1"); 
-	$var->{'thanks.survey.label'} = WebGUI::International::get(46,'Survey');
-	$var->{'thanks.quiz.label'} = WebGUI::International::get(47,'Survey');
+	$var->{'thanks.survey.label'} = WebGUI::International::get(46,'Asset_Survey');
+	$var->{'thanks.quiz.label'} = WebGUI::International::get(47,'Asset_Survey');
 	$var->{'questions.total'} = $self->getQuestionCount;
-	$var->{'questions.correct.count.label'} = WebGUI::International::get(52,'Survey');
-	$var->{'questions.correct.percent.label'} = WebGUI::International::get(54,'Survey');
+	$var->{'questions.correct.count.label'} = WebGUI::International::get(52,'Asset_Survey');
+	$var->{'questions.correct.percent.label'} = WebGUI::International::get(54,'Asset_Survey');
 	$var->{'mode.isSurvey'} = ($self->get("mode") eq "survey");
-	$var->{'survey.noprivs.label'} = WebGUI::International::get(48,'Survey');
-	$var->{'quiz.noprivs.label'} = WebGUI::International::get(49,'Survey');
+	$var->{'survey.noprivs.label'} = WebGUI::International::get(48,'Asset_Survey');
+	$var->{'quiz.noprivs.label'} = WebGUI::International::get(49,'Asset_Survey');
 	return $self->processTemplate($var, $self->getValue("templateId"));
 }
 
@@ -636,7 +636,7 @@ sub www_deleteQuestionConfirm {
 #-------------------------------------------------------------------
 sub www_deleteResponse {
 	return "" unless (WebGUI::Grouping::isInGroup($_[0]->get("groupToViewReports")));
-        return $_[0]->confirm(WebGUI::International::get(72,'Survey'),
+        return $_[0]->confirm(WebGUI::International::get(72,'Asset_Survey'),
                 $_[0]->getUrl('func=deleteResponseConfirm&responseId='.$session{form}{responseId}));
 }
 
@@ -651,7 +651,7 @@ sub www_deleteResponseConfirm {
 #-------------------------------------------------------------------
 sub www_deleteAllResponses {
 	return "" unless (WebGUI::Grouping::isInGroup($_[0]->get("groupToViewReports")));
-        return $_[0]->confirm(WebGUI::International::get(74,'Survey'),
+        return $_[0]->confirm(WebGUI::International::get(74,'Asset_Survey'),
                 $_[0]->getUrl('func=deleteAllResponsesConfirm'));
 }
 
@@ -668,7 +668,7 @@ sub www_edit {
         my $self = shift;
 	return WebGUI::Privilege::insufficient() unless $self->canEdit;
 	$self->getAdminConsole->setHelp("survey add/edit","Survey");
-	return $self->getAdminConsole->render($self->getEditForm->print,WebGUI::International::get(2,'Survey'));
+	return $self->getAdminConsole->render($self->getEditForm->print,WebGUI::International::get(2,'Asset_Survey'));
 }
 
 #-------------------------------------------------------------------
@@ -698,13 +698,13 @@ sub www_editAnswer {
         $f->text(
                 -name=>"answer",
                 -value=>$answer->{answer},
-                -label=>WebGUI::International::get(19,'Survey')
+                -label=>WebGUI::International::get(19,'Asset_Survey')
                 );
 	if ($self->get("mode") eq "quiz") {
         	$f->yesNo(
                 	-name=>"isCorrect",
                 	-value=>$answer->{isCorrect},
-                	-label=>WebGUI::International::get(20,'Survey')
+                	-label=>WebGUI::International::get(20,'Asset_Survey')
                 	);
 	} else {
 		$f->hidden("isCorrect",0);
@@ -712,22 +712,22 @@ sub www_editAnswer {
 	if ($self->get("questionOrder") eq "response") {
 		$question = WebGUI::SQL->buildHashRef("select Survey_questionId,question 
 			from Survey_question where Survey_id=".quote($self->get("Survey_id"))." order by sequenceNumber");
-		$question = { ('-1' => WebGUI::International::get(82,'Survey'),%$question) };
+		$question = { ('-1' => WebGUI::International::get(82,'Asset_Survey'),%$question) };
 		$f->select(
 			-name=>"gotoQuestion",
 			-options=>$question,
 			-value=>[$answer->{gotoQuestion}],
-			-label=>WebGUI::International::get(21,'Survey')
+			-label=>WebGUI::International::get(21,'Asset_Survey')
 			);
 	}
 	if ($answer->{Survey_answerId} eq "new") {
                 my %options;
                 tie %options, 'Tie::IxHash';
                 %options = (
-                        "addAnswer"=>WebGUI::International::get(24,'Survey'),
-                        "addQuestion"=>WebGUI::International::get(28,'Survey'),
-                        "editQuestion"=>WebGUI::International::get(75,'Survey'),
-                        "backToPage"=>WebGUI::International::get(745,'Survey')
+                        "addAnswer"=>WebGUI::International::get(24,'Asset_Survey'),
+                        "addQuestion"=>WebGUI::International::get(28,'Asset_Survey'),
+                        "editQuestion"=>WebGUI::International::get(75,'Asset_Survey'),
+                        "backToPage"=>WebGUI::International::get(745,'Asset_Survey')
                         );
                 $f->whatNext(
                         -options=>\%options,
@@ -737,7 +737,7 @@ sub www_editAnswer {
         $f->submit;
 
 #	$self->getAdminConsole->setHelp("answer add/edit","Survey");
-	return $self->getAdminConsole->render($f->print, WebGUI::International::get(18,'Survey'));
+	return $self->getAdminConsole->render($f->print, WebGUI::International::get(18,'Asset_Survey'));
 
 }
 
@@ -782,27 +782,27 @@ sub www_editQuestion {
 	$f->HTMLArea(
 		-name	=> "question",
 		-value	=> $question->{question},
-		-label	=> WebGUI::International::get(14,'Survey')
+		-label	=> WebGUI::International::get(14,'Asset_Survey')
 		);
 	$f->yesNo(
 		-name	=> "allowComment",
 		-value	=> $question->{allowComment},
-		-label	=> WebGUI::International::get(15,'Survey')
+		-label	=> WebGUI::International::get(15,'Asset_Survey')
 		);
 	$f->yesNo(
 		-name	=> "randomizeAnswers",
 		-value	=> $question->{randomizeAnswers},
-		-label	=> WebGUI::International::get(16,'Survey')
+		-label	=> WebGUI::International::get(16,'Asset_Survey')
 		);
 	if ($self->get("questionOrder") eq "response") {
 		my $ql = WebGUI::SQL->buildHashRef("select Survey_questionId,question 
 			from Survey_question where Survey_id=".quote($self->get("Survey_id"))." order by sequenceNumber");
-		$ql = { ('-1' => WebGUI::International::get(82,'Survey'),%$ql) };
+		$ql = { ('-1' => WebGUI::International::get(82,'Asset_Survey'),%$ql) };
 		$f->select(
 			-name	=> "gotoQuestion",
 			-options=> $ql,
 			-value	=> [$question->{gotoQuestion}],
-			-label	=> WebGUI::International::get(21,'Survey')
+			-label	=> WebGUI::International::get(21,'Asset_Survey')
 			);
 	}
 	
@@ -810,13 +810,13 @@ sub www_editQuestion {
 		my %options;
 		tie %options, 'Tie::IxHash';
 		%options = (
-			"addMultipleChoiceAnswer"	=> WebGUI::International::get(24,'Survey'),
-                        "addTextAnswer"			=> WebGUI::International::get(29,'Survey'),
-                        "addBooleanAnswer"		=> WebGUI::International::get(25,'Survey'),
-                        "addFrequencyAnswer"		=> WebGUI::International::get(26,'Survey'),
-                        "addOpinionAnswer"		=> WebGUI::International::get(27,'Survey'),
-			#"addQuestion"			=> WebGUI::International::get(28,'Survey'),
-                        "backToPage"			=> WebGUI::International::get(745,'Survey')
+			"addMultipleChoiceAnswer"	=> WebGUI::International::get(24,'Asset_Survey'),
+                        "addTextAnswer"			=> WebGUI::International::get(29,'Asset_Survey'),
+                        "addBooleanAnswer"		=> WebGUI::International::get(25,'Asset_Survey'),
+                        "addFrequencyAnswer"		=> WebGUI::International::get(26,'Asset_Survey'),
+                        "addOpinionAnswer"		=> WebGUI::International::get(27,'Asset_Survey'),
+			#"addQuestion"			=> WebGUI::International::get(28,'Asset_Survey'),
+                        "backToPage"			=> WebGUI::International::get(745,'Asset_Survey')
 			);
         	$f->whatNext(
                 	-options=> \%options,
@@ -827,13 +827,13 @@ sub www_editQuestion {
 	my $output = $f->print;
 	if ($question->{Survey_questionId} ne "new" && $question->{answerFieldType} ne "text") {
 		$output .= '<a href="'.$self->getUrl('func=editAnswer&aid=new&qid='
-			.$question->{Survey_questionId}).'">'.WebGUI::International::get(23,'Survey').'</a><p>';
+			.$question->{Survey_questionId}).'">'.WebGUI::International::get(23,'Asset_Survey').'</a><p>';
 		$sth = WebGUI::SQL->read("select Survey_answerId,answer from Survey_answer 
 			where Survey_questionId=".quote($question->{Survey_questionId})." order by sequenceNumber");
 		while (%data = $sth->hash) {
 			$output .= 
 				deleteIcon('func=deleteAnswerConfirm&qid='.$question->{Survey_questionId}.'&aid='.$data{Survey_answerId}, 
-					$self->getUrl,WebGUI::International::get(45,'Survey')).
+					$self->getUrl,WebGUI::International::get(45,'Asset_Survey')).
                                 editIcon('func=editAnswer&qid='.$question->{Survey_questionId}.'&aid='.$data{Survey_answerId}, $self->getUrl).
                                 moveUpIcon('func=moveAnswerUp'.'&qid='.$question->{Survey_questionId}.'&aid='.$data{Survey_answerId}, $self->getUrl).
                                 moveDownIcon('func=moveAnswerDown&qid='.$question->{Survey_questionId}.'&aid='.$data{Survey_answerId}, $self->getUrl).
@@ -843,7 +843,7 @@ sub www_editQuestion {
 	}
 
 	$self->getAdminConsole->setHelp("question add/edit","Survey");
-	return $self->getAdminConsole->render($f->print, WebGUI::International::get(17,'Survey'));
+	return $self->getAdminConsole->render($f->print, WebGUI::International::get(17,'Asset_Survey'));
 
 }
 
@@ -987,7 +987,7 @@ sub www_viewGradebook {
         return "" unless (WebGUI::Grouping::isInGroup($self->get("groupToViewReports")));
 	$self->logView() if ($session{setting}{passiveProfilingEnabled});
 	my $var = $self->getMenuVars;
-	$var->{title} = WebGUI::International::get(71,'Survey');
+	$var->{title} = WebGUI::International::get(71,'Asset_Survey');
 	my $p = WebGUI::Paginator->new($self->getUrl('func=viewGradebook'));
 	$p->setDataByQuery("select userId,username,ipAddress,Survey_responseId,startDate,endDate from Survey_response 
 		where isComplete=1 and Survey_id=".quote($self->get("Survey_id"))." order by username,ipAddress,startDate");
@@ -996,9 +996,9 @@ sub www_viewGradebook {
 	if ($var->{'question.count'} > $self->get("questionsPerResponse")) {
 		$var->{'question.count'} = $self->get("questionsPerResponse");
 	}
-	$var->{'response.user.label'} = WebGUI::International::get(67,'Survey');
-	$var->{'response.count.label'} = WebGUI::International::get(52,'Survey');
-	$var->{'response.percent.label'} = WebGUI::International::get(54,'Survey');
+	$var->{'response.user.label'} = WebGUI::International::get(67,'Asset_Survey');
+	$var->{'response.count.label'} = WebGUI::International::get(52,'Asset_Survey');
+	$var->{'response.percent.label'} = WebGUI::International::get(54,'Asset_Survey');
 	my @responseloop;
 	foreach my $user (@$users) {
 		my ($correctCount) = WebGUI::SQL->quickArray("select count(*) from Survey_questionResponse a left join
@@ -1024,26 +1024,26 @@ sub www_viewIndividualSurvey {
         return "" unless (WebGUI::Grouping::isInGroup($self->get("groupToViewReports")));
 	$self->logView() if ($session{setting}{passiveProfilingEnabled});
 	my $var = $self->getMenuVars;
-	$var->{'title'} = WebGUI::International::get(70,'Survey');
+	$var->{'title'} = WebGUI::International::get(70,'Asset_Survey');
 	$var->{'delete.url'} = $self->getUrl('func=deleteResponse&responseId='.$session{form}{responseId});
-	$var->{'delete.label'} = WebGUI::International::get(69,'Survey');
+	$var->{'delete.label'} = WebGUI::International::get(69,'Asset_Survey');
 	my $response = WebGUI::SQL->getRow("Survey_response","Survey_responseId",$session{form}{responseId});
-	$var->{'start.date.label'} = WebGUI::International::get(76,'Survey');
+	$var->{'start.date.label'} = WebGUI::International::get(76,'Asset_Survey');
 	$var->{'start.date.epoch'} = $response->{startDate};
 	$var->{'start.date.human'} = epochToHuman($response->{startDate},"%z");
 	$var->{'start.time.human'} = epochToHuman($response->{startDate},"%Z");
-	$var->{'end.date.label'} = WebGUI::International::get(77,'Survey');
+	$var->{'end.date.label'} = WebGUI::International::get(77,'Asset_Survey');
 	$var->{'end.date.epoch'} = $response->{endDate};
 	$var->{'end.date.human'} = epochToHuman($response->{endDate},"%z");
 	$var->{'end.time.human'} = epochToHuman($response->{endDate},"%Z");
-	$var->{'duration.label'} = WebGUI::International::get(78,'Survey');
+	$var->{'duration.label'} = WebGUI::International::get(78,'Asset_Survey');
 	$var->{'duration.minutes'} = int(($response->{end} - $response->{start})/60);
-	$var->{'duration.minutes.label'} = WebGUI::International::get(79,'Survey');
+	$var->{'duration.minutes.label'} = WebGUI::International::get(79,'Asset_Survey');
 	$var->{'duration.seconds'} = (($response->{endDate} - $response->{start})%60);
-	$var->{'duration.seconds.label'} = WebGUI::International::get(80,'Survey');
-	$var->{'answer.label'} = WebGUI::International::get(19,'Survey');
-	$var->{'response.label'} = WebGUI::International::get(66,'Survey');
-	$var->{'comment.label'} = WebGUI::International::get(57,'Survey');
+	$var->{'duration.seconds.label'} = WebGUI::International::get(80,'Asset_Survey');
+	$var->{'answer.label'} = WebGUI::International::get(19,'Asset_Survey');
+	$var->{'response.label'} = WebGUI::International::get(66,'Asset_Survey');
+	$var->{'comment.label'} = WebGUI::International::get(57,'Asset_Survey');
 	my $a = WebGUI::SQL->read("select Survey_questionId,question,answerFieldType from Survey_question 
 		where Survey_id=".quote($self->get("Survey_id"))." order by sequenceNumber");
 	my @questionloop;
@@ -1083,17 +1083,17 @@ sub www_viewStatisticalOverview {
         return "" unless (WebGUI::Grouping::isInGroup($self->get("groupToViewReports")));
 	$self->logView() if ($session{setting}{passiveProfilingEnabled});
 	my $var = $self->getMenuVars;
-	$var->{title} = WebGUI::International::get(58,'Survey');
+	$var->{title} = WebGUI::International::get(58,'Asset_Survey');
 	my $p = WebGUI::Paginator->new($self->getUrl('func=viewStatisticalOverview'));
 	$p->setDataByQuery("select Survey_questionId,question,answerFieldType,allowComment from Survey_question 
 		where Survey_id=".quote($self->get("Survey_id"))." order by sequenceNumber");
 	my $questions = $p->getPageData;
 	my @questionloop;
-	$var->{'answer.label'} = WebGUI::International::get(19,'Survey');
-	$var->{'response.count.label'} = WebGUI::International::get(53,'Survey');
-	$var->{'response.percent.label'} = WebGUI::International::get(54,'Survey');
-	$var->{'show.responses.label'} = WebGUI::International::get(55,'Survey');
-	$var->{'show.comments.label'} = WebGUI::International::get(56,'Survey');
+	$var->{'answer.label'} = WebGUI::International::get(19,'Asset_Survey');
+	$var->{'response.count.label'} = WebGUI::International::get(53,'Asset_Survey');
+	$var->{'response.percent.label'} = WebGUI::International::get(54,'Asset_Survey');
+	$var->{'show.responses.label'} = WebGUI::International::get(55,'Asset_Survey');
+	$var->{'show.comments.label'} = WebGUI::International::get(56,'Asset_Survey');
 	foreach my $question (@$questions) {
 		my @answerloop;
 		my ($totalResponses) = WebGUI::SQL->quickArray("select count(*) from Survey_questionResponse where Survey_questionId=".quote($question->{Survey_questionId}));
