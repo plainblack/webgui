@@ -257,7 +257,7 @@ sub www_editPage {
 		$f->select(
 			-name=>"languageId",
 			-label=>WebGUI::International::get(304),
-			-value=>[$page{internationalId}],
+			-value=>[$page{languageId}],
 			-uiLevel=>1,
 			-options=>WebGUI::International::getLanguages()
 			);
@@ -449,11 +449,12 @@ sub www_editPageSave {
 		where pageId=$session{form}{pageId}");
 	WebGUI::SQL->write("update wobject set templatePosition=1 where pageId=$session{form}{pageId} 
 		and templatePosition>".WebGUI::Page::countTemplatePositions($session{form}{templateId}));
-	_recursivelyChangeStyle($session{page}{pageId}) if ($session{form}{recurseStyle});
-	_recursivelyChangePrivileges($session{page}{pageId}) if ($session{form}{recursePrivs});
-	WebGUI::Session::refreshPageInfo($session{page}{pageId}) if ($session{form}{pageId} == $session{page}{pageId});
+	_recursivelyChangeStyle($session{form}{pageId}) if ($session{form}{recurseStyle});
+	_recursivelyChangePrivileges($session{form}{pageId}) if ($session{form}{recursePrivs});
 	if ($session{form}{proceed} eq "gotoNewPage") {
 		WebGUI::Session::refreshPageInfo($session{form}{pageId});
+	} elsif ($session{form}{pageId} == $session{page}{pageId}) {
+		WebGUI::Session::refreshPageInfo($session{page}{pageId});
 	}
        	return "";
 }
