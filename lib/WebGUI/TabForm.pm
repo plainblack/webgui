@@ -196,6 +196,8 @@ sub new {
 	tie %tabs, 'Tie::IxHash';
 	foreach my $key (keys %{$startingTabs}) {
 		$tabs{$key}{form} = WebGUI::HTMLForm->new;
+		$tabs{$key}{label} = $startingTabs->{$key}->{label};
+		$tabs{$key}{uiLevel} = $startingTabs->{$key}->{uiLevel};
 	}
 	my $cancel = WebGUI::Form::button({
 			value=>WebGUI::International::get('cancel'),
