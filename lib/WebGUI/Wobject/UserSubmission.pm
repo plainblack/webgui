@@ -325,7 +325,7 @@ sub www_deleteMessageConfirm {
 sub www_deleteSubmission {
 	my ($output, $owner);
 	($owner) = WebGUI::SQL->quickArray("select userId from UserSubmission_submission where submissionId=$session{form}{sid}");
-        if ($owner == $session{user}{userId}) {
+        if ($owner == $session{user}{userId} || WebGUI::Privilege::isInGroup($_[0]->get("groupToApprove"))) {
 		$output = '<h1>'.WebGUI::International::get(42).'</h1>';
 		$output .= WebGUI::International::get(17,$namespace).'<p>';
 		$output .= '<div align="center"><a href="'.WebGUI::URL::page('func=deleteSubmissionConfirm&wid='.
@@ -341,7 +341,7 @@ sub www_deleteSubmission {
 sub www_deleteSubmissionConfirm {
         my ($output, $owner, $file);
 	($owner) = WebGUI::SQL->quickArray("select userId from UserSubmission_submission where submissionId=$session{form}{sid}");
-        if ($owner == $session{user}{userId}) {
+        if ($owner == $session{user}{userId} || WebGUI::Privilege::isInGroup($_[0]->get("groupToApprove"))) {
 		WebGUI::SQL->write("delete from UserSubmission_submission where submissionId=$session{form}{sid}");
 		$file = WebGUI::Attachment->new("",$session{form}{wid},$session{form}{sid});
 		$file->deleteNode;
@@ -430,7 +430,7 @@ sub www_editSubmission {
 		$submission{convertCarriageReturns} = 1;
 		$submission{userId} = $session{user}{userId};
 	}
-        if ($submission{userId} == $session{user}{userId}) {
+        if ($submission{userId} == $session{user}{userId} || WebGUI::Privilege::isInGroup($_[0]->get("groupToApprove"))) {
                 $output = '<h1>'.WebGUI::International::get(19,$namespace).'</h1>';
 		$f = WebGUI::HTMLForm->new;
                 $f->hidden("wid",$session{form}{wid});
@@ -465,7 +465,7 @@ sub www_editSubmission {
 sub www_editSubmissionSave {
 	my ($sqlAdd,$owner,$image,$attachment,$title);
 	($owner) = WebGUI::SQL->quickArray("select userId from UserSubmission_submission where submissionId='$session{form}{sid}'");
-        if ($owner == $session{user}{userId} || $session{form}{sid} eq "new") {
+        if ($owner == $session{user}{userId} || $session{form}{sid} eq "new" || WebGUI::Privilege::isInGroup($_[0]->get("groupToApprove"))) {
 		if ($session{form}{sid} eq "new") {
 			$session{form}{sid} = getNextId("submissionId");
 			WebGUI::SQL->write("insert into UserSubmission_submission (wobjectId,submissionId,userId,username) 
@@ -639,7 +639,7 @@ sub www_viewSubmission {
 	$output .= '<b>'.WebGUI::International::get(514).':</b> '.$submission{views}.'<br>';
 	$output .= '</td><td rowspan="2" class="tableMenu" nowrap valign="top">';
   #---menu
-        if ($submission{userId} == $session{user}{userId} && WebGUI::Privilege::isInGroup($_[0]->get("groupToApprove"))) {
+        if ($submission{userId} == $session{user}{userId} || WebGUI::Privilege::isInGroup($_[0]->get("groupToApprove"))) {
                 $output .= '<a href="'.WebGUI::URL::page('func=deleteSubmission&wid='.$session{form}{wid}.'&sid='.
 			$session{form}{sid}).'">'.WebGUI::International::get(37,$namespace).'</a><br>';
                 $output .= '<a href="'.WebGUI::URL::page('func=editSubmission&wid='.$session{form}{wid}.'&sid='.
