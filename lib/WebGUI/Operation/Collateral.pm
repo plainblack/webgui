@@ -76,6 +76,7 @@ sub www_deleteCollateralConfirm {
 	return WebGUI::Privilege::insufficient unless (WebGUI::Privilege::isInGroup(4));
 	my $collateral = WebGUI::Collateral->new($session{form}{cid});
 	$collateral->delete;
+	WebGUI::Session::deleteScratch("collateralPageNumber");
 	return www_listCollateral();
 }
 
