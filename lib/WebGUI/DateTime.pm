@@ -166,7 +166,7 @@ sub epochToHuman {
 	my ($offset, $temp, $hour12, $value, $output, @date, $day, $month);
 	$offset = $session{user}{timeOffset} || 0;
 	$offset = $offset*3600;
-	$temp = $_[0] || time();
+	$temp = int($_[0]) || time();
 	$temp = $temp+$offset;
 	@date = &localtime($temp);
 	$output = $_[1] || "%z %Z";
