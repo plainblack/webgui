@@ -14,6 +14,7 @@
  - fix [ 1165425 ] View Userprofile - Style is missing for non-public profiles
  - fix [ 1165434 ] View Userprofile - Perm. denied page not parsed for macros
  - fix [ 1138654 ] 6.3 CVS - raw form parameter not processed
+ - fix [ 1164202 ] Data Form field types are not sticky when re-edited
  - fix [ 1149529 ] 6.3 CVS: Content positions don't save and  
        [ 1149801 ] page position not maintained (Martin Kamerbeek)
 

@@ -707,12 +707,12 @@ sub www_editField {
 		-name=>"status",
 		-options=>\%fieldStatus,
 		-label=>WebGUI::International::get(22,"DataForm"),
-		-value=>[ $field{status} || "editable" ]
+		-value=>[ $field{status} ] || [ "editable" ]
 		); 
 	$f->fieldType(
 		-name=>"type",
 		-label=>WebGUI::International::get(23,"DataForm"),
-		-value=>[$field{type} || "text"]
+		-value=>$field{type} || "text"
 		);
 	$f->integer(
 		-name=>"width",
