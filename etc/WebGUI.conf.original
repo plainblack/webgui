@@ -21,7 +21,7 @@ macros = a => a_account, \
 	AdminText => AdminText, \
 	AdminToggle => AdminToggle, \
 	@ => At_username, \
-	\ => Backslash_pageUrl, \
+	\\ => Backslash_pageUrl, \
 	c => c_companyName, \
 	C => C_crumbTrail, \
 	D => D_date, \
