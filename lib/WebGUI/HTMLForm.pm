@@ -682,12 +682,8 @@ sub dateTime {
                 $output = $self->_tableFormRow($label,$output);
         } else {
                 $output = WebGUI::Form::hidden({
-                        "name"=>$name."_date",
-                        "value"=>epochToSet($value)
-                        });
-                $output .= WebGUI::Form::hidden({
-                        "name"=>$name."_time",
-                        "value"=>epochToHuman($value,"%j:%n:%s")
+                        "name"=>$name,
+                        "value"=>epochToSet($value,1)
                         });
         }
         $self->{_data} .= $output;

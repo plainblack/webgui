@@ -12,6 +12,10 @@ Andreas Graf).
  - Bugfix [ 912217 ] top level nav macro problems
  - Bugfix [ 912401 ] level 0 nav
  - Bugfix [ 912400 ] db link not working
+ - Bugfix [ 913114 ] Can't change passwords from display account screen.
+   (Thanks to Frank Dillon.)
+ - Bugfix [ 916538 ] Typo in lib/WebGUI/Auth.pm
+ - Bugfix [ 917783 ] 6.0.0 Date Changes
 
 
 6.0.0
