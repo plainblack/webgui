@@ -158,7 +158,7 @@ sub validateProfileData {
 #-------------------------------------------------------------------
 sub www_editProfile {
    my ($output, $f, $a, %data, $method, $values, $category, $label, $default, $previousCategory, $subtext);
-   return WebGUI::Operation::Auth::www_displayLogin() if($session{user}{userId} == 1);
+   return WebGUI::Operation::Auth::www_auth("init") if($session{user}{userId} == 1);
    
    tie %data, 'Tie::CPHash';
    $output .= '<h1>'.WebGUI::International::get(338).'</h1>';
@@ -224,7 +224,7 @@ sub www_editProfile {
 #-------------------------------------------------------------------
 sub www_editProfileSave {
 	my ($profile, $fieldName, $error, $u, $warning);
-    return WebGUI::Operation::Auth::www_displayLogin() if ($session{user}{userId} == 1);
+    return WebGUI::Operation::Auth::www_auth("init") if ($session{user}{userId} == 1);
 	
 	($profile, $error, $warning) = validateProfileData();
 	$error .= $warning;
