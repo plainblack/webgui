@@ -10,6 +10,7 @@
  - Fixed a relative hyperlink bug in htmlArea (Thanks to Andreas Graf.)
  - Ordered the username list in the manageUsersInGroup operation (Thanks to
    Andreas Graf.)
+ - Added support for record deletion in DataForm (Thanks to Hal Roberts.)
 
 
 

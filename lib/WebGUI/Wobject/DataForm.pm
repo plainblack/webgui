@@ -166,6 +166,8 @@ sub getRecordTemplateVars {
 	$var->{"entryList.label"} = WebGUI::International::get(86,$self->get("namespace"));
 	$var->{"export.tab.url"} = WebGUI::URL::page('func=exportTab&wid='.$self->get("wobjectId"));
 	$var->{"export.tab.label"} = WebGUI::International::get(84,$self->get("namespace"));
++	$var->{"delete.url"} = WebGUI::URL::page('func=delete&wid='.$self->get("wobjectId").'&entryId='.$var->{entryId});
++	$var->{"delete.label"} = WebGUI::International::get(90,$self->get("namespace"));
 	$var->{"back.url"} = WebGUI::URL::page();
 	$var->{"back.label"} = WebGUI::International::get(18,$self->get("namespace"));
 	$var->{"addField.url"} = WebGUI::URL::page('func=editField&wid='.$self->get("wobjectId"));
@@ -650,6 +652,18 @@ sub www_view {
 	return $_[0]->processTemplate($_[0]->get("templateId"),$var);
 }
 
+#-------------------------------------------------------------------
+sub www_delete {
+        my $entryId = $session{form}{entryId};
+        if (!WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId"))) {
+                return WebGUI::Privilege::insufficient();
+        }
+        
+    	WebGUI::SQL->write("delete from DataForm_entry where DataForm_entryId=".$entryId);
+        
+        $session{form}{entryId} = 'list';
+        return $_[0]->www_view();
+}
 
 
 1;
