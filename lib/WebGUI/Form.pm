@@ -69,6 +69,13 @@ All of the functions in this package accept the input of a hash reference contai
 =cut
 
 #-------------------------------------------------------------------
+sub _fixMacros {
+	my $value = shift;
+	$value =~ s/\^/\&\#94\;/g;
+	return $value;
+}
+
+#-------------------------------------------------------------------
 sub _fixQuotes {
         my $value = shift;
 	$value =~ s/\"/\&quot\;/g;
@@ -79,6 +86,14 @@ sub _fixQuotes {
 sub _fixSpecialCharacters {
 	my $value = shift;
 	$value =~ s/\&/\&amp\;/g;
+	return $value;
+}
+
+#-------------------------------------------------------------------
+sub _fixTags {
+	my $value = shift;
+	$value =~ s/\</\&lt\;/g;
+        $value =~ s/\>/\&gt\;/g;
 	return $value;
 }
 
@@ -1244,8 +1259,9 @@ The number of characters wide this form element should be. There should be no re
 
 sub text {
         my ($size, $maxLength, $value);
-        $value = _fixSpecialCharacters($value);
-	$value = _fixQuotes($_[0]->{value});
+        $value = _fixSpecialCharacters($_[0]->{value});
+	$value = _fixQuotes($value);
+	$value = _fixMacros($value);
         $maxLength = $_[0]->{maxlength} || 255;
         $size = $_[0]->{size} || $session{setting}{textBoxSize} || 30;
         return '<input type="text" name="'.$_[0]->{name}.'" value="'.$value.'" size="'.
@@ -1296,8 +1312,8 @@ sub textarea {
 	$rows = $_[0]->{rows} || $session{setting}{textAreaRows} || 5;
 	$columns = $_[0]->{columns} || $session{setting}{textAreaCols} || 50;
 	$value = _fixSpecialCharacters($_[0]->{value});
-	$value =~ s/\</\&lt\;/g;
-        $value =~ s/\>/\&gt\;/g;
+	$value = _fixTags($value);
+	$value = _fixMacros($value);
         return '<textarea name="'.$_[0]->{name}.'" cols="'.$columns.'" rows="'.$rows.'" wrap="'.
 		$wrap.'" '.$_[0]->{extras}.'>'.$value.'</textarea>';
 }

@@ -1118,11 +1118,19 @@ sub www_edit {
 
 #-------------------------------------------------------------------
 
-=head2 www_editSave ( )
+=head2 www_editSave ( hashRef )
 
 Saves the default properties of any/all wobjects.
 
 NOTE: This method should be extended by all subclasses.
+
+=over
+
+=item hashRef
+
+A hash reference of extra properties to set.
+
+=back
 
 =cut
 
@@ -1151,7 +1159,7 @@ sub www_editSave {
 		editTimeout=>$session{form}{editTimeout},
 		moderationType=>$session{form}{moderationType},
 		filterPost=>$session{form}{filterPost},
-		addEditStampToPosts=>$session{form}{addEditStampToPosts}
+		addEditStampToPosts=>$session{form}{addEditStampToPosts},
 		%{$_[1]}
 	});
 	return "";
