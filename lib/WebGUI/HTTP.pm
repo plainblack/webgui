@@ -75,14 +75,15 @@ sub getHeader {
 		}
 	}
 	$params{"-cookie"} = $session{http}{cookie};
+	my $status = getStatus();
 	if($session{env}{MOD_PERL}) {
         	my $r = Apache->request;
                 if(defined($r)) {
-                	$r->custom_response($session{http}{status}, '<!-- '.$session{http}{statusDescription}.' -->' );
-                        $r->status($session{http}{status});
+                	$r->custom_response($status, '<!-- '.$session{http}{statusDescription}.' -->' );
+                        $r->status($status);
                 }
         } else {
-		$params{"-status"} = $session{http}{status}.' '.$session{http}{statusDescription};
+		$params{"-status"} = $status.' '.$session{http}{statusDescription};
 	}
 	return $session{cgi}->header(%params);
 }
