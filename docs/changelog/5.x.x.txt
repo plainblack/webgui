@@ -14,7 +14,7 @@
  - Bugfix [ 855632 ] SyndicatedContent crashs when rss contains only one item
    (Thanks to Len Kranendonk)
  - Bugfix [ 855682 ] USS rss feed shows unapproved items
-
+ - Bugfix [ 855684 ] USS: no approvement check
 
 
 5.5.3

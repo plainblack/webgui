@@ -542,7 +542,10 @@ sub www_viewSubmission {
 	return "" unless ($session{form}{sid});
 	my ($file, @data, %var, $replies);
 	my $submission = $_[0]->getCollateral("USS_submission","USS_submissionId",$session{form}{sid});
-	return $_[0]->www_view unless ($submission->{USS_submissionId});
+	return "" unless ($submission->{USS_submissionId});
+	return "" unless ($submission->{status} eq 'Approved' || 
+		($submission->{userId} == $session{user}{userId} && $session{user}{userId} != 1) || 
+		WebGUI::Privilege::isInGroup($_[0]->getValue("groupToApprove")));
 	my $callback = WebGUI::URL::page("func=viewSubmission&amp;wid=".$_[0]->get("wobjectId")."&amp;sid=".$submission->{USS_submissionId});
 	if ($session{form}{forumOp}) {	
 		return WebGUI::Forum::UI::forumOp({
