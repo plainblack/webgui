@@ -365,8 +365,8 @@ sub www_editUserProfile {
                                 # ORs caused problems with the array reference.
                                 if ($session{form}{$data{fieldName}}) {
                         		$default = [$session{form}{$data{fieldName}}];
-                                } elsif ($session{user}{$data{fieldName}}) {
-                                        $default = [$session{user}{$data{fieldName}}];
+                                } elsif ($user{$data{fieldName}}) {
+                                        $default = [$user{$data{fieldName}}];
                                 } else {
                                         $default = eval $data{dataDefault};
                                 }
