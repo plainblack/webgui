@@ -2021,7 +2021,7 @@ You can optionally give the privileges of this page to all pages under this page
 <b>What next?</b><br/>
 If you leave this on the default setting you'll be redirected to the new page after creating it.
 <p/>|,
-		lastUpdated =>  1102031032,
+		lastUpdated =>  1104629236,
 	},
 
 	'60' => {
@@ -2444,22 +2444,32 @@ The password you use to connect to the DSN.
 	},
 
 	'632' => {
-		message => q|You can add wobjects by selecting from the <I>Add Content</I> pulldown menu. You can edit them by clicking on the "Edit" button that appears directly above an instance of a particular wobject while in Admin mode. 
-<P>Almost all wobjects share some properties. Those properties are: 
-<P><B>Wobject ID</B><BR>This is the unique identifier WebGUI uses to keep track of this wobject instance. Normal users should never need to be concerned with the Wobject ID, but some advanced users may need to know it for things like SQL Reports. The Wobject ID is not editable.
-<P><B>Title</B><BR> The title of the wobject. This is typically displayed at the top of each wobject. 
-<P><I>Note:</I> You should always specify a title even if you are going to turn it off (with the next property). This is because the title shows up in the trash and clipboard and you'll want to be able to distinguish which wobject is which. 
-<P><B>Display title?</B><BR>Do you wish to display the title you specified? On some sites, displaying the title is not necessary. 
-<P><B>Metadata</B><BR>Under the Metadata tab you can set the metadata properties for this content. Metadata must be enabled in the Manage Settings menu.
-<P><B>Template Position</B><BR>Template positions range from 0 (zero) to any number. How many are available depends upon the Template associated with this page. The default template has only one template position, others may have more. By selecting a template position, you're specifying where this wobject should be placed within the template. 
-<P><B>Start Date</B><BR>On what date should this wobject become visible? Before this date, the wobject will only be displayed to Content Managers. 
-<P><B>End Date</B><BR>On what date should this wobject become invisible? After this date, the wobject will only be displayed to Content Managers. <BR><BR><B>Owner</B><BR>The owner of a wobject is usually the person who created the wobject. This user has full edit and viewing rights on the wobject unless privileges to edit the page the wobject appears on are taken away. 
-<P><B>NOTE:</B> The owner can only be changed by an administrator. 
-<P><B>Who can view?</B><BR>Choose which group can view this wobject. If you want both visitors and registered users to be able to view the&nbsp;wobject then you should choose the "Everybody" group. 
-<P><B>Who can edit?</B><BR>Choose the group that can edit this wobject. The group assigned editing rights can also always view the wobject. </P>
-<P><B>Description</B><BR>A content area in which you can place as much content as you wish. For instance, even before an FAQ there is usually a paragraph describing what is contained in the FAQ. 
-<P></P>|,
-		lastUpdated => 1104622115,
+		message => q|<p>You can add wobjects by selecting from the <I>Add Content</I> pulldown menu. You can edit them by clicking on the "Edit" button that appears directly above an instance of a particular wobject while in Admin mode.</p>
+<p>Wobjects are one kind of Asset, so they have all of the properties that Assets do.  Additionally, almost all Wobjects share some properties. Those properties are:</p>
+
+<P><B>Display title?</B><BR>
+Do you wish to display the Wobject's title? On some sites, displaying the title is not necessary. 
+
+<P><b>Template</b><br>
+Select a template to layout your Wobject.
+
+<P><b>Style Template</b><br>
+Select a style template to enclose your Wobject if it viewed directly.  If the Wobject
+is displayed as part of a Layout Asset, the Layout Asset's Style Template is used instead.
+
+<p><b>Printable Style</b><br>
+This sets the printable style for this page to be something other than the WebGUI Default Printable Style.  It behaves similarly to the <b>Style Template</b> with respect to when it is used.
+
+<P><B>Description</B><BR>A content area in which you can place as much content as you wish. For instance, even before a FAQ there is usually a paragraph describing what is contained in the FAQ. 
+
+<P><B>Cache Timeout</B><BR>The amount of time this page should remain cached for registered users.  
+
+<P><B>Cache Timeout (Visitors)</B><BR>The amount of time this page should remain cached for visitors.
+
+<P><B>NOTE:</B> Page caching is only available if your administrator has installed the Cache::FileCache Perl module. Using page caching can improve site performance by as much as 1000%.&nbsp;
+
+|,
+		lastUpdated => 1104628942,
 	},
 
 	'991' => {
