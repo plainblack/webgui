@@ -26,7 +26,9 @@ alter table discussion add column userDefined3 varchar(255);
 alter table discussion add column userDefined4 varchar(255);
 alter table discussion add column userDefined5 varchar(255);
 
-
-
-
+--- SMB authentication module ----------------------------------------------
+insert into settings (name,value) values ('smbPDC','your PDC');
+insert into settings (name,value) values ('smbBDC','your BDC');
+insert into settings (name,value) values ('smbDomain','your NT Domain');
+----------------------------------------------------------------------------
 
