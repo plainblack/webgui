@@ -70,7 +70,7 @@ These functions are available from this package:
 
 =head2 checkbox ( name )
 
-Returns an array or a comma-space (", ") separated scalar depending upon whether you're returning the values into an array or a scalar.
+Returns an array or a carriage return ("\n") separated scalar depending upon whether you're returning the values into an array or a scalar.
 
 =over 
 
@@ -91,7 +91,7 @@ sub checkbox {
 
 =head2 checkboxList ( name )
 
-Returns an array or a comma-space (", ") separated scalar depending upon whether you're returning the values into an array or a scalar.
+Returns an array or a carriage return ("\n") separated scalar depending upon whether you're returning the values into an array or a scalar.
 
 =over 
 
@@ -204,7 +204,7 @@ sub email {
 
 =head2 fieldType ( name )
 
-Returns an array or a comma-space (", ") separated scalar depending upon whether you're returning the values into an array or a scalar. Defautls to "text".
+Returns an array or a carriage return ("\n") separated scalar depending upon whether you're returning the values into an array or a scalar. Defautls to "text".
 
 =over 
 
@@ -315,7 +315,7 @@ sub hidden {
 
 =head2 hiddenList ( name )
 
-Returns an array or a comma-space (", ") separated scalar depending upon whether you're returning the values into an array or a scalar.
+Returns an array or a carriage return ("\n") separated scalar depending upon whether you're returning the values into an array or a scalar.
 
 =over 
 
@@ -528,7 +528,7 @@ sub radioList {
 
 =head2 selectList ( name )
 
-Returns an array or a comma-space (", ") separated scalar depending upon whether you're returning the values into an array or a scalar.
+Returns an array or a carriage return ("\n") separated scalar depending upon whether you're returning the values into an array or a scalar.
 
 =over 
 
@@ -542,7 +542,7 @@ The name of the form variable to retrieve.
 
 sub selectList {
 	my @data = $session{cgi}->param($_[0]);
-	return wantarray ? @data : join(", ",@data);
+	return wantarray ? @data : join("\n",@data);
 }
 
 
