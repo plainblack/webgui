@@ -1190,7 +1190,7 @@ sub radio {
         my ($name, $label, $checked, $value, $subtext, $extras, $uiLevel) =
                 rearrange([qw(name label checked value subtext extras uiLevel)], @p);
         if (_uiLevelChecksOut($uiLevel)) {
-                $output = WebGUI::Form::checkbox({
+                $output = WebGUI::Form::radio({
                         "name"=>$name,
                         "value"=>$value,
                         "checked"=>$checked,
