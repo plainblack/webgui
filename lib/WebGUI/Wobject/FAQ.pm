@@ -137,7 +137,7 @@ sub www_editQuestion {
                         	addQuestion=>WebGUI::International::get(75,$namespace),
                                 backToPage=>WebGUI::International::get(745)
                                 },
-                        -value=>"addQuestion"
+                        -value=>"backToPage"
                         );
         }
 	$f->submit;

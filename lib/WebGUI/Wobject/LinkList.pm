@@ -143,7 +143,7 @@ sub www_editLink {
                                 addLink=>WebGUI::International::get(13,$namespace),
                                 backToPage=>WebGUI::International::get(745)
                                 },
-                        -value=>"addLink"
+                        -value=>"backToPage"
                         );
         }
 	$f->submit;

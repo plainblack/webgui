@@ -220,7 +220,7 @@ sub www_editDownload {
                                 addFile=>WebGUI::International::get(74,$namespace),
                                 backToPage=>WebGUI::International::get(745)
                                 },
-                        -value=>"addFile"
+                        -value=>"backToPage"
                         );
         }
 	$f->submit;

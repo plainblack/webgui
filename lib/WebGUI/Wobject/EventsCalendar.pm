@@ -267,7 +267,7 @@ sub www_edit {
 				addEvent=>WebGUI::International::get(91,$namespace),
 				backToPage=>WebGUI::International::get(745)
 				},
-			-value=>"addEvent"
+			-value=>"backToPage"
 			);
 	}
 	$output .= $_[0]->SUPER::www_edit($f->printRowsOnly);
