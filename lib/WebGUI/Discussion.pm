@@ -87,10 +87,11 @@ sub deleteMessageConfirm {
 #-------------------------------------------------------------------
 sub formatHeader {
 	my $output;
-	$output = '<b>'.WebGUI::International::get(237).'</b> '.formatSubject($_[0]).'<br>';
+	$output = '<b>'.WebGUI::International::get(237).'</b> '.formatSubject($_[0]).'<br>' if ($_[0] ne "");
         $output .= '<b>'.WebGUI::International::get(238).'</b> 
-		<a href="'.WebGUI::URL::page('op=viewProfile&uid='.$_[1]).'">'.$_[2].'</a><br>';
-        $output .= "<b>".WebGUI::International::get(239)."</b> ".epochToHuman($_[3],"%z %Z")."<br>";
+		<a href="'.WebGUI::URL::page('op=viewProfile&uid='.$_[1]).'">'.$_[2].'</a><br>' if ($_[1] && $_[2] ne "");
+        $output .= "<b>".WebGUI::International::get(239)."</b> ".epochToHuman($_[3],"%z %Z")."<br>" if ($_[3]);
+	$output .= "<b>".WebGUI::International::get(514).":</b> ".$_[4]."<br>" if ($_[4]);
 	return $output;
 }
 
@@ -129,7 +130,8 @@ sub post {
 	if ($session{form}{replyTo} ne "") { 		# is a reply
 		$header = WebGUI::International::get(234);
 		%message = getMessage($session{form}{replyTo});
-		$footer = formatHeader($message{subject},$message{userId},$message{username},$message{dateOfPost}).'<p>'.formatMessage($message{message});
+		$footer = formatHeader($message{subject},$message{userId},$message{username},$message{dateOfPost},$message{views})
+			.'<p>'.formatMessage($message{message});
 		$message{message} = "";
 		$message{subject} = formatSubject("Re: ".$message{subject});
 		$session{form}{mid} = "new";
@@ -145,7 +147,8 @@ sub post {
 	} else {					# is editing an existing message
 		$header = WebGUI::International::get(228);
 		%message = getMessage($session{form}{mid});
-		$footer = formatHeader($message{subject},$message{userId},$message{username},$message{dateOfPost}).'<p>'.formatMessage($message{message});
+		$footer = formatHeader($message{subject},$message{userId},$message{username},$message{dateOfPost},$message{views})
+			.'<p>'.formatMessage($message{message});
 		$message{subject} = formatSubject($message{subject});
 	}
         $f->hidden("func","postSave");
@@ -208,18 +211,20 @@ sub purge {
 
 #-------------------------------------------------------------------
 sub showMessage {
-        my (@data, $html, %message, $defaultMid, $sqlAdd);
+        my (@data, $html, %message, $sqlAdd);
         tie %message, 'Tie::CPHash';
 	if ($session{form}{sid}) {
 		$sqlAdd = " and subId=$session{form}{sid}";
 	}
-        ($defaultMid) = WebGUI::SQL->quickArray("select min(messageId) from discussion where wobjectId=$session{form}{wid}".$sqlAdd);
-        $session{form}{mid} = $defaultMid if ($session{form}{mid} eq "");
+	if ($session{form}{mid} eq "") {
+        	($session{form}{mid}) = WebGUI::SQL->quickArray("select min(messageId) from discussion where wobjectId=$session{form}{wid}".$sqlAdd);
+	}
+	WebGUI::SQL->write("update discussion set views=views+1 where messageId=$session{form}{mid}");
         %message = getMessage($session{form}{mid});
         if ($message{messageId}) {
                 $html .= '<h1>'.$message{subject}.'</h1>';
                 $html .= '<table width="100%" cellpadding=3 cellspacing=1 border=0><tr><td class="tableHeader">';
-		$html .= formatHeader($message{subject},$message{userId},$message{username},$message{dateOfPost});
+		$html .= formatHeader($message{subject},$message{userId},$message{username},$message{dateOfPost},$message{views});
                 $html .= '</td>';
                 $html .= '<td rowspan=2 valign="top" class="tableMenu" nowrap>';
 		$html .= $_[0];
@@ -284,7 +289,7 @@ sub showThreads {
 	if ($session{user}{discussionLayout} eq "flat") {
 		while (%data = $sth->hash) {
 			$html .= '<tr><td class="tableHeader">';
-			$html .= formatHeader($data{subject},$data{userId},$data{username},$data{dateOfPost});
+			$html .= formatHeader($data{subject},$data{userId},$data{username},$data{dateOfPost},$data{views});
 			$html .= '</td></tr>';
 			$html .= '<tr><td class="tableData">'.formatMessage($data{message}).'</td></tr>';
 		}

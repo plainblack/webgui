@@ -187,7 +187,7 @@ sub www_showMessage {
 
 #-------------------------------------------------------------------
 sub www_view {
-	my ($sth, @data, $html, $i, $pn, $lastId, @last, $replies);
+	my ($sth, %data, $html, $i, $pn, $lastId, @last, $replies);
         if ($session{form}{pn} < 1) {
                 $pn = 0;
         } else {
@@ -204,26 +204,29 @@ sub www_view {
 	$html .= '<tr><td class="tableHeader">'.WebGUI::International::get(229).'</td>
 		<td class="tableHeader">'.WebGUI::International::get(15,$namespace).'</td>
 		<td class="tableHeader">'.WebGUI::International::get(18,$namespace).'</td>
+		<td class="tableHeader">'.WebGUI::International::get(514).'</td>
 		<td class="tableHeader">'.WebGUI::International::get(19,$namespace).'</td>
 		<td class="tableHeader">'.WebGUI::International::get(20,$namespace).'</td></tr>';
-	$sth = WebGUI::SQL->read("select messageId,subject,username,dateOfPost,userId 
+	$sth = WebGUI::SQL->read("select messageId,subject,username,dateOfPost,userId,views 
 		from discussion where wobjectId=".$_[0]->get("wobjectId")." and pid=0 order by messageId desc");
-	while (@data = $sth->array) {
-		$data[1] = WebGUI::HTML::filter($data[1],'all');
+	while (%data = $sth->hash) {
+		$data{subject} = WebGUI::Discussion::formatSubject($data{subject});
 		if ($i >= ($_[0]->get("messagesPerPage")*$pn) && $i < ($_[0]->get("messagesPerPage")*($pn+1))) {
 			@last = WebGUI::SQL->quickArray("select messageId,dateOfPost,username,subject,userId 
-				from discussion where wobjectId=".$_[0]->get("wobjectId")." and rid=$data[0] order by dateOfPost desc");
+				from discussion where wobjectId=".$_[0]->get("wobjectId")." and rid=$data{messageId} order by dateOfPost desc");
 			$last[3] = WebGUI::HTML::filter($last[3],'all');
-			($replies) = WebGUI::SQL->quickArray("select count(*) from discussion where rid=$data[0]");
-			$replies -= 1;
+			($replies) = WebGUI::SQL->quickArray("select count(*) from discussion where rid=$data{messageId}");
+			$replies--;
 			$html .= '<tr><td class="tableData"><a 
-				href="'.WebGUI::URL::page('func=showMessage&mid='.$data[0].'&wid='.$_[0]->get("wobjectId"))
-				.'">'.substr($data[1],0,30).'</a></td>
-				<td class="tableData"><a href="'.WebGUI::URL::page('op=viewProfile&uid='.$data[4]).'">'.$data[2].'</a></td>
-				<td class="tableData">'.epochToHuman($data[3],"%z %Z").'</td>
+				href="'.WebGUI::URL::page('func=showMessage&mid='.$data{messageId}.'&wid='.$_[0]->get("wobjectId"))
+				.'">'.substr($data{subject},0,30).'</a></td>
+				<td class="tableData"><a href="'.WebGUI::URL::page('op=viewProfile&uid='.$data{userId}).'">'.$data{username}.'</a></td>
+				<td class="tableData">'.epochToHuman($data{dateOfPost},"%z %Z").'</td>
+				<td class="tableData">'.$data{views}.'</td>
 				<td class="tableData">'.$replies.'</td>
 				<td class="tableData"><span style="font-size: 8pt;"><a 
-				href="'.WebGUI::URL::page('func=showMessage&mid='.$last[0].'&wid='.$_[0]->get("wobjectId")).'">'.substr($last[3],0,30).'</a> 
+				href="'.WebGUI::URL::page('func=showMessage&mid='.$last[0].'&wid='.$_[0]->get("wobjectId")).'">'
+				.substr($last[3],0,30).'</a> 
 				@ '.epochToHuman($last[1],"%z %Z").' by <a href="'.WebGUI::URL::page('op=viewProfile&uid='.$last[4]).'">'.$last[2].'</a>
 				</span></td></tr>';
 		}

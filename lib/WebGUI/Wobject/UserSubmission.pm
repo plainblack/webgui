@@ -559,6 +559,7 @@ sub www_view {
 sub www_viewSubmission {
 	my ($output, %submission, $file, $replies);
 	tie %submission, 'Tie::CPHash';
+	WebGUI::SQL->write("update UserSubmission_submission set views=views+1 where submissionId=$session{form}{sid}");
 	%submission = WebGUI::SQL->quickHash("select * from UserSubmission_submission where submissionId=$session{form}{sid}");
 	$submission{title} = WebGUI::HTML::filter($submission{title},'all');
 	$submission{content} = WebGUI::HTML::filter($submission{content},$session{setting}{filterContributedHTML});
@@ -570,7 +571,8 @@ sub www_viewSubmission {
 	$output .= '<b>'.WebGUI::International::get(22,$namespace).'</b> <a href="'.
 		WebGUI::URL::page('op=viewProfile&uid='.$submission{userId}).'">'.$submission{username}.'</a><br>';
 	$output .= '<b>'.WebGUI::International::get(23,$namespace).'</b> '.epochToHuman($submission{dateSubmitted},"%z %Z")."<br>";
-	$output .= '<b>'.WebGUI::International::get(14,$namespace).':</b> '.$submissionStatus{$submission{status}};
+	$output .= '<b>'.WebGUI::International::get(14,$namespace).':</b> '.$submissionStatus{$submission{status}}.'<br>';
+	$output .= '<b>'.WebGUI::International::get(514).':</b> '.$submission{views}.'<br>';
 	$output .= '</td><td rowspan="2" class="tableMenu" nowrap valign="top">';
   #---menu
         if ($submission{userId} == $session{user}{userId} && WebGUI::Privilege::isInGroup($_[0]->get("groupToApprove"))) {
