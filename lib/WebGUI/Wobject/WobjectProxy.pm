@@ -27,16 +27,6 @@ our @ISA = qw(WebGUI::Wobject);
 
 
 #-------------------------------------------------------------------
-sub duplicate {
-        my ($w);
-	$w = $_[0]->SUPER::duplicate($_[1]);
-        $w = WebGUI::Wobject::WobjectProxy->new({wobjectId=>$w,namespace=>$_[0]->get("namespace")});
-        $w->set({
-		proxiedWobjectId=>$_[0]->get("proxiedWobjectId")
-		});
-}
-
-#-------------------------------------------------------------------
 sub name {
         return WebGUI::International::get(3,$_[0]->get("namespace"));
 }
@@ -45,9 +35,11 @@ sub name {
 sub new {
         my $class = shift;
         my $property = shift;
-        my $self = WebGUI::Wobject->new(
-                $property,
-                [qw(proxiedWobjectId)]
+	my $self = WebGUI::Wobject->new(
+                -properties=>$property,
+                -extendedProperties=>{
+                        proxiedWobjectId=>{ }
+                        }
                 );
         bless $self, $class;
 }
@@ -61,15 +53,12 @@ sub uiLevel {
 #-------------------------------------------------------------------
 sub www_edit {
 	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
-        my ($output, $f, $startDate, $endDate, $templatePosition,%wobjects, %page, %wobject, $a, $b);
+        my ($output, $f, %wobjects, %page, %wobject, $a, $b);
 	tie %wobject, 'Tie::CPHash';
 	tie %page, 'Tie::CPHash';
 	tie %wobjects, 'Tie::IxHash';
         $output = helpIcon(1,$_[0]->get("namespace"));
 	$output .= '<h1>'.WebGUI::International::get(2,$_[0]->get("namespace")).'</h1>';
-	$templatePosition = $_[0]->get("templatePosition") || 1;
-       	$startDate = $_[0]->get("startDate") || $session{page}{startDate};
-       	$endDate = $_[0]->get("endDate") || $session{page}{endDate};
 	my %tabs;
         tie %tabs, 'Tie::IxHash';
         %tabs = (
@@ -89,19 +78,30 @@ sub www_edit {
        	$f->hidden({name=>"wid",value=>$_[0]->get("wobjectId")});
        	$f->hidden({name=>"namespace",value=>$_[0]->get("namespace")}) if ($_[0]->get("wobjectId") eq "new");
        	$f->hidden({name=>"func",value=>"editSave"});
-       	$f->getTab("properties")->readOnly($_[0]->get("wobjectId"),WebGUI::International::get(499));
+       	$f->getTab("properties")->readOnly(
+		-value=>$_[0]->get("wobjectId"),
+		-label=>WebGUI::International::get(499)
+		);
        	$f->hidden({name=>"title",value=>$_[0]->name});
-       	$f->hidden({name=>"displayTitle",value=>0});
+       	$f->hidden({name=>"displayTitle",value=>$_[0]->getValue("displayTitle")});
 	$f->getTab("layout")->select(
                 -name=>"templatePosition",
                 -label=>WebGUI::International::get(363),
-                -value=>[$templatePosition],
+                -value=>[$_[0]->getValue("templatePosition")],
                 -uiLevel=>5,
                 -options=>WebGUI::Page::getTemplatePositions($session{page}{templateId}),
                 -subtext=>WebGUI::Page::drawTemplate($session{page}{templateId})
                 );
-       	$f->getTab("privileges")->date("startDate",WebGUI::International::get(497),$startDate);
-       	$f->getTab("privileges")->date("endDate",WebGUI::International::get(498),$endDate);
+       	$f->getTab("privileges")->date(
+		-name=>"startDate",
+		-label=>WebGUI::International::get(497),
+		-value=>$_[0]->getValue("startDate")
+		);
+       	$f->getTab("privileges")->date(
+		-name=>"endDate",
+		-label=>WebGUI::International::get(498),
+		-value=>$_[0]->getValue("endDate")
+		);
 	$a = WebGUI::SQL->read("select pageId,menuTitle from page where pageId<2 or pageId>25 order by menuTitle");
 	while (%page = $a->hash) {
 		$b = WebGUI::SQL->read("select wobjectId,title from wobject 
@@ -113,18 +113,14 @@ sub www_edit {
 		$b->finish;
 	}
 	$a->finish;
-	$f->getTab("properties")->select("proxiedWobjectId",\%wobjects,WebGUI::International::get(1,$_[0]->get("namespace")),[$_[0]->get("proxiedWobjectId")]);
+	$f->getTab("properties")->select(
+		-name=>"proxiedWobjectId",
+		-options=>\%wobjects,
+		-label=>WebGUI::International::get(1,$_[0]->get("namespace")),
+		-value=>[$_[0]->getValue("proxiedWobjectId")]
+		);
        	$output .= $f->print;
 	return $output;
-}
-
-#-------------------------------------------------------------------
-sub www_editSave {
-	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
-	$_[0]->SUPER::www_editSave({
-		proxiedWobjectId=>$session{form}{proxiedWobjectId}
-		});
-        return "";
 }
 
 #-------------------------------------------------------------------

@@ -54,6 +54,9 @@ save you many hours of grief.
 	javascript and macros, but you may wish to set these to one
 	of the other options.
 
+ * The discussions on USS and Articles have been turned off. They'll
+	need to be manually turned back on.
+
 
 5.1.0
 --------------------------------------------------------------------

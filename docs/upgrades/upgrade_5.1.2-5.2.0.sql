@@ -3091,5 +3091,13 @@ delete from international where languageId=8 and namespace='WebGUI' and internat
 insert into international (internationalId,languageId,namespace,message,lastUpdated) values (716,8,'WebGUI','Login', 1031514049);
 delete from international where languageId=8 and namespace='WebGUI' and internationalId=717;
 insert into international (internationalId,languageId,namespace,message,lastUpdated) values (717,8,'WebGUI','Logout', 1031514049);
+alter table Article drop column allowDiscussion;
+alter table USS drop column allowDiscussion;
+delete from settings where name='usernameBinding';
+delete from settings where name='addEditStampToPosts';
+
+
+
+
 
 

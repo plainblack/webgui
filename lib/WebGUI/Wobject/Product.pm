@@ -26,21 +26,10 @@ our @ISA = qw(WebGUI::Wobject);
 
 #-------------------------------------------------------------------
 sub duplicate {
-        my ($w, $file, %data, $newId, $sth);
+        my ($w, %data, $file, $row, $sth);
 	tie %data, 'Tie::CPHash';
         $w = $_[0]->SUPER::duplicate($_[1]);
 	$w = WebGUI::Wobject::Product->new({wobjectId=>$w,namespace=>$_[0]->get("namespace")});
-	$w->set({
-		image1=>$_[0]->get("image1"),
-		image2=>$_[0]->get("image2"),
-		image3=>$_[0]->get("image3"),
-		warranty=>$_[0]->get("warranty"),
-		manual=>$_[0]->get("manual"),
-		brochure=>$_[0]->get("brochure"),
-		price=>$_[0]->get("price"),
-		templateId=>$_[0]->get("templateId"),
-		productNumber=>$_[0]->get("productNumber")
-		});
 	$file = WebGUI::Attachment->new($_[0]->get("image1"),$_[0]->get("wobjectId"));
         $file->copy($w->get("wobjectId"));
         $file = WebGUI::Attachment->new($_[0]->get("image2"),$_[0]->get("wobjectId"));
@@ -54,24 +43,21 @@ sub duplicate {
         $file = WebGUI::Attachment->new($_[0]->get("warranty"),$_[0]->get("wobjectId"));
         $file->copy($w->get("wobjectId"));
         $sth = WebGUI::SQL->read("select * from Product_feature where wobjectId=".$_[0]->get("wobjectId"));
-        while (%data = $sth->hash) {
-                $newId = getNextId("Product_featureId");
-                WebGUI::SQL->write("insert into Product_feature values (".$w->get("wobjectId").", $newId, "
-			.quote($data{feature}).", $data{sequenceNumber})");
+        while ($row = $sth->hashRef) {
+		$row->{"Product_featureId"} = "new";
+		$w->setCollateral("Product_feature","Product_featureId",$row);
         }
         $sth->finish;
         $sth = WebGUI::SQL->read("select * from Product_benefit where wobjectId=".$_[0]->get("wobjectId"));
-        while (%data = $sth->hash) {
-                $newId = getNextId("Product_benefitId");
-                WebGUI::SQL->write("insert into Product_benefit values (".$w->get("wobjectId").", $newId, "
-                        .quote($data{benefit}).", $data{sequenceNumber})");
+        while ($row = $sth->hashRef) {
+		$row->{"Product_benefitId"} = "new";
+                $w->setCollateral("Product_benefit","Product_benefitId",$row);
         }
         $sth->finish;
         $sth = WebGUI::SQL->read("select * from Product_specification where wobjectId=".$_[0]->get("wobjectId"));
-        while (%data = $sth->hash) {
-                $newId = getNextId("Product_specificationId");
-                WebGUI::SQL->write("insert into Product_specification values (".$w->get("wobjectId").", $newId, "
-                        .quote($data{name}).", ".quote($data{value}).", ".quote($data{units}).", $data{sequenceNumber})");
+        while ($row = $sth->hashRef) {
+		$row->{"Product_specificationId"} = "new";
+                $w->setCollateral("Product_specifcation","Product_specificationId",$row);
         }
         $sth->finish;
         $sth = WebGUI::SQL->read("select * from Product_accessory where wobjectId=".$_[0]->get("wobjectId"));
@@ -98,8 +84,20 @@ sub new {
         my $class = shift;
         my $property = shift;
         my $self = WebGUI::Wobject->new(
-                $property,
-                [qw(price templateId productNumber image1 image2 image3 manual brochure warranty)]
+                -properties=>$property,
+                -extendedProperties=>{
+			price=>{}, 
+			templateId=>{
+				defaultValue=>1
+				},
+			productNumber=>{}, 
+			image1=>{}, 
+			image2=>{}, 
+			image3=>{}, 
+			manual=>{}, 
+			brochure=>{}, 
+			warranty=>{}
+			}
                 );
         bless $self, $class;
 }
@@ -271,37 +269,37 @@ sub www_deleteSpecificationConfirm {
 
 #-------------------------------------------------------------------
 sub www_edit {
-	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
-	my $output = helpIcon(1,$_[0]->get("namespace"));
-	my $template;
-        $output .= '<h1>'.WebGUI::International::get(6,$_[0]->get("namespace")).'</h1>';
-	if ($_[0]->get("wobjectId") eq "new") {
-		$template = 1;
-	} else {
-		$template = $_[0]->get("templateId");
-	}
 	my $layout = WebGUI::HTMLForm->new;
 	my $properties = WebGUI::HTMLForm->new;
         $layout->template(
                 -name=>"templateId",
-                -value=>$template,
+                -value=>$_[0]->getValue("template"),
                 -namespace=>$_[0]->get("namespace"),
                 -label=>WebGUI::International::get(61,$_[0]->get("namespace")),
 		-afterEdit=>'func=edit&wid='.$_[0]->get("wobjectId")
                 );
-	$properties->text("price",WebGUI::International::get(10,$_[0]->get("namespace")),$_[0]->get("price"));
-	$properties->text("productNumber",WebGUI::International::get(11,$_[0]->get("namespace")),$_[0]->get("productNumber"));
+	$properties->text(
+		-name=>"price",
+		-label=>WebGUI::International::get(10,$_[0]->get("namespace")),
+		-value=>$_[0]->getValue("price")
+		);
+	$properties->text(
+		-name=>"productNumber",
+		-label=>WebGUI::International::get(11,$_[0]->get("namespace")),
+		-value=>$_[0]->getValue("productNumber")
+		);
 	$properties->raw($_[0]->fileProperty("image1",7));
 	$properties->raw($_[0]->fileProperty("image2",8));
 	$properties->raw($_[0]->fileProperty("image3",9));
 	$properties->raw($_[0]->fileProperty("brochure",13));
 	$properties->raw($_[0]->fileProperty("manual",14));
 	$properties->raw($_[0]->fileProperty("warranty",15));
-	$output .= $_[0]->SUPER::www_edit(
+	return $_[0]->SUPER::www_edit(
 		-properties=>$properties->printRowsOnly,
-		-layout=>$layout->printRowsOnly
+		-layout=>$layout->printRowsOnly,
+		-helpId=>1,
+		-headingId=>6
 		);
-        return $output;
 }
 
 #-------------------------------------------------------------------
@@ -327,9 +325,6 @@ sub www_editSave {
         $file = WebGUI::Attachment->new("",$_[0]->get("wobjectId"));
         $file->save("warranty");
         $property{warranty}=$file->getFilename("warranty") if ($file->getFilename("warranty") ne "");
-	$property{templateId}=$session{form}{templateId};
-	$property{price}=$session{form}{price};
-	$property{productNumber}=$session{form}{productNumber};
 	$_[0]->SUPER::www_editSave(\%property);
 	return "";
 }

@@ -37,28 +37,18 @@ sub duplicate {
         my ($sth, $file, %row, $newSubmissionId, $w);
 	tie %row, 'Tie::CPHash';
 	$w = $_[0]->SUPER::duplicate($_[1],1);
-        $w = WebGUI::Wobject::USS->new({wobjectId=>$w,namespace=>$_[0]->get("namespace")});
-        $w->set({
-		groupToContribute=>$_[0]->get("groupToContribute"),
-		submissionsPerPage=>$_[0]->get("submissionsPerPage"),
-		defaultStatus=>$_[0]->get("defaultStatus"),
-		groupToApprove=>$_[0]->get("groupToApprove"),
-		karmaPerSubmission=>$_[0]->get("karmaPerSubmission"),
-		templateId=>$_[0]->get("templateId"),
-		submissionTemplateId=>$_[0]->get("submissionTemplateId")
-		});
         $sth = WebGUI::SQL->read("select * from USS_submission where wobjectId=".$_[0]->get("wobjectId"));
         while (%row = $sth->hash) {
                 $newSubmissionId = getNextId("USS_submissionId");
 		$file = WebGUI::Attachment->new($row{image},$_[0]->get("wobjectId"),$row{USS_submissionId});
-		$file->copy($w->get("wobjectId"),$newSubmissionId);
+		$file->copy($w,$newSubmissionId);
 		$file = WebGUI::Attachment->new($row{attachment},$_[0]->get("wobjectId"),$row{USS_submissionId});
-		$file->copy($w->get("wobjectId"),$newSubmissionId);
-                WebGUI::SQL->write("insert into USS_submission values (".$w->get("wobjectId").", $newSubmissionId, ".
+		$file->copy($w,$newSubmissionId);
+                WebGUI::SQL->write("insert into USS_submission values (".$w.", $newSubmissionId, ".
 			quote($row{title}).", $row{dateSubmitted}, ".quote($row{username}).", '$row{userId}', ".quote($row{content}).", ".
 			quote($row{image}).", ".quote($row{attachment}).", '$row{status}', '$row{convertCarriageReturns}', 
 			'$row{views}')");
-		WebGUI::Discussion::duplicate($_[0]->get("wobjectId"),$w->get("wobjectId"),$row{USS_submissionId},$newSubmissionId);
+		WebGUI::Discussion::duplicate($_[0]->get("wobjectId"),$w,$row{USS_submissionId},$newSubmissionId);
         }
         $sth->finish;
 }
@@ -73,10 +63,37 @@ sub new {
         my $class = shift;
         my $property = shift;
         my $self = WebGUI::Wobject->new(
-                $property,
-                [qw(submissionsPerPage groupToContribute groupToApprove defaultStatus
-			submissionTemplateId templateId karmaPerSubmission allowDiscussion)],
-		1
+                -properties=>$property,
+		-useDiscussion=>1<
+                -extendedProperties=>{
+			submissionsPerPage=>{
+				defaultValue=>50
+				},
+			groupToContribute=>{
+				defaultValue=>2
+				},
+ 			groupToApprove=>{
+				defaultValue=>4
+				},
+ 			defaultStatus=>{
+				defaultValue=>"Approved"
+				},
+			submissionTemplateId=>{
+				defaultValue=>1
+				}, 
+			templateId=>{
+				defaultValue=>1 
+				},
+			karmaPerSubmission=>{
+				defaultValue=>0
+				},
+			allowDiscussion=>{
+				defaultValue=>0
+				},
+			filterContent=>{
+				defaultValue=>"javascript"
+				}
+			}
                 );
         bless $self, $class;
 }
@@ -172,49 +189,67 @@ sub www_denySubmission {
 
 #-------------------------------------------------------------------
 sub www_edit {
-	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
-        my ($output, $defaultStatus, $submissionsPerPage, $groupToApprove);
-	$groupToApprove = $_[0]->get("groupToApprove") || 4;
-	$submissionsPerPage = $_[0]->get("submissionsPerPage") || 50;
-	$defaultStatus = $_[0]->get("defaultStatus") || "Approved";
-        $output = helpIcon(1,$_[0]->get("namespace"));
-	$output .= '<h1>'.WebGUI::International::get(18,$_[0]->get("namespace")).'</h1>';
 	my $layout = WebGUI::HTMLForm->new;
 	my $privileges = WebGUI::HTMLForm->new;
 	my $properties = WebGUI::HTMLForm->new;
 	$layout->template(
                 -name=>"templateId",
-                -value=>$_[0]->get("templateId"),
+                -value=>$_[0]->getValue("templateId"),
                 -namespace=>$_[0]->get("namespace"),
                 -label=>WebGUI::International::get(72,$_[0]->get("namespace")),
                 -afterEdit=>'func=edit&wid='.$_[0]->get("wobjectId")
                 );
         $layout->template(
                 -name=>"submissionTemplateId",
-                -value=>$_[0]->get("submissionTemplateId"),
+                -value=>$_[0]->getValue("submissionTemplateId"),
                 -namespace=>$_[0]->get("namespace")."/Submission",
                 -label=>WebGUI::International::get(73,$_[0]->get("namespace")),
                 -afterEdit=>'func=edit&wid='.$_[0]->get("wobjectId")
                 );
-        $privileges->group("groupToApprove",WebGUI::International::get(1,$_[0]->get("namespace")),[$groupToApprove]);
-        $privileges->group("groupToContribute",WebGUI::International::get(2,$_[0]->get("namespace")),[$_[0]->get("groupToContribute")]);
-        $layout->integer("submissionsPerPage",WebGUI::International::get(6,$_[0]->get("namespace")),$submissionsPerPage);
-        $privileges->select("defaultStatus",{Approved=>status('Approved'),Denied=>status('Denied'),Pending=>status('Pending')}
-		,WebGUI::International::get(563),[$defaultStatus]);
+        $privileges->group(
+		-name=>"groupToApprove",
+		-label=>WebGUI::International::get(1,$_[0]->get("namespace")),
+		-value=>[$_[0]->getValue("groupToApprove")]
+		);
+        $privileges->group(
+		-name=>"groupToContribute",
+		-label=>WebGUI::International::get(2,$_[0]->get("namespace")),
+		-value=>[$_[0]->getValue("groupToContribute")]
+		);
+        $layout->integer(
+		-name=>"submissionsPerPage",
+		-label=>WebGUI::International::get(6,$_[0]->get("namespace")),
+		-value=>$_[0]->getValue("submissionsPerPage")
+		);
+        $privileges->selectList(
+		-name=>"defaultStatus",
+		-options=>{
+			Approved=>status('Approved'),
+			Denied=>status('Denied'),
+			Pending=>status('Pending')
+			},
+		-label=>WebGUI::International::get(563),
+		-value=>[$_[0]->getValue("defaultStatus")]
+		);
         if ($session{setting}{useKarma}) {
-                $properties->integer("karmaPerSubmission",WebGUI::International::get(30,$_[0]->get("namespace")),$_[0]->get("karmaPerSubmission"));
+                $properties->integer(
+			-name=>"karmaPerSubmission",
+			-label=>WebGUI::International::get(30,$_[0]->get("namespace")),
+			-value=>$_[0]->getValue("karmaPerSubmission")
+			);
         } else {
-                $properties->hidden("karmaPerSubmission",$_[0]->get("karmaPerSubmission"));
+                $properties->hidden("karmaPerSubmission",$_[0]->getValue("karmaPerSubmission"));
         }
 	$layout->filterContent(
-		-value=>$_[0]->get("filterContent")
+		-value=>$_[0]->getValue("filterContent")
 		);
-	$output .= $_[0]->SUPER::www_edit(
+	return $_[0]->SUPER::www_edit(
 		-layout=>$layout->printRowsOnly,
 		-privileges=>$privileges->printRowsOnly,
-		-properties=>$properties->printRowsOnly
+		-properties=>$properties->printRowsOnly,
+		-headingId=>18,
+		-helpId=>1
 		);
-        return $output;
 }
 
 #-------------------------------------------------------------------

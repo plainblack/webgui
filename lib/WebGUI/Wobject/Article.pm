@@ -31,19 +31,10 @@ our @ISA = qw(WebGUI::Wobject);
 sub duplicate {
 	my ($file, $w);
 	$w = $_[0]->SUPER::duplicate($_[1]);
-        $w = WebGUI::Wobject::Article->new({wobjectId=>$w,namespace=>$_[0]->get("namespace")});
 	$file = WebGUI::Attachment->new($_[0]->get("image"),$_[0]->get("wobjectId"));
-	$file->copy($w->get("wobjectId"));
+	$file->copy($w);
         $file = WebGUI::Attachment->new($_[0]->get("attachment"),$_[0]->get("wobjectId"));
-        $file->copy($w->get("wobjectId"));
-	$w->set({
-		templateId=>$_[0]->get("templateId"),
-		image=>$_[0]->get("image"),
-		linkTitle=>$_[0]->get("linkTitle"),
-		linkURL=>$_[0]->get("linkURL"),
-		attachment=>$_[0]->get("attachment"),
-		convertCarriageReturns=>$_[0]->get("convertCarriageReturns")
-		});
+        $file->copy($w);
 }
 
 #-------------------------------------------------------------------
@@ -56,31 +47,31 @@ sub new {
         my $class = shift;
         my $property = shift;
         my $self = WebGUI::Wobject->new(
-		$property,
-		[qw(image templateId linkTitle linkURL attachment convertCarriageReturns)],
-		1
+		-properties=>$property,
+		-extendedProperties=>{
+			image=>{ },
+                	templateId=>{
+                        	defaultValue=>1
+                        	},
+                	linkTitle=>{ },
+                	linkURL=>{ },
+                	attachment=>{ },
+                	convertCarriageReturns=>{
+                        	defaultValue=>0
+                        	}
+			},
+		-useDiscussion=>1
 		);
         bless $self, $class;
 }
 
 #-------------------------------------------------------------------
 sub www_edit {
-	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
-        my ($output, $editTimeout, $groupToModerate, $template);
-	if ($_[0]->get("wobjectId") eq "new") {
-                $editTimeout = 1;
-        } else {
-                $editTimeout = $_[0]->get("editTimeout");
-        }
-	$template = $_[0]->get("templateId") || 1;
-	$groupToModerate = $_[0]->get("groupToModerate") || 4;
-        $output = helpIcon(1,$_[0]->get("namespace"));
-	$output .= '<h1>'.WebGUI::International::get(12,$_[0]->get("namespace")).'</h1>';
 	my $properties = WebGUI::HTMLForm->new;
 	my $layout = WebGUI::HTMLForm->new;
 	$layout->template(
                 -name=>"templateId",
-                -value=>$template,
+                -value=>$_[0]->getValue("templateId"),
                 -namespace=>$_[0]->get("namespace"),
                 -label=>WebGUI::International::get(356),
                 -afterEdit=>'func=edit&wid='.$_[0]->get("wobjectId")
@@ -96,32 +87,32 @@ sub www_edit {
 	$properties->text(
 		-name=>"linkTitle",
 		-label=>WebGUI::International::get(7,$_[0]->get("namespace")),
-		-value=>$_[0]->get("linkTitle"),
+		-value=>$_[0]->getValue("linkTitle"),
 		-uiLevel=>3
 		);
         $properties->url(
 		-name=>"linkURL",
 		-label=>WebGUI::International::get(8,$_[0]->get("namespace")),
-		-value=>$_[0]->get("linkURL"),
+		-value=>$_[0]->getValue("linkURL"),
 		-uiLevel=>3
 		);
 	$layout->yesNo(
 		-name=>"convertCarriageReturns",
 		-label=>WebGUI::International::get(10,$_[0]->get("namespace")),
-		-value=>$_[0]->get("convertCarriageReturns"),
+		-value=>$_[0]->getValue("convertCarriageReturns"),
 		-subtext=>' &nbsp; <span style="font-size: 8pt;">'.WebGUI::International::get(11,$_[0]->get("namespace")).'</span>',
 		-uiLevel=>5
 		);
-	$output .= $_[0]->SUPER::www_edit(
+	return $_[0]->SUPER::www_edit(
 		-properties=>$properties->printRowsOnly,
-		-layout=>$layout->printRowsOnly
+		-layout=>$layout->printRowsOnly,
+		-headingId=>12,
+		-helpId=>1
 		);
-        return $output;
 }
 
 #-------------------------------------------------------------------
 sub www_editSave {
-	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
         my ($image, $attachment, %property);
 	$_[0]->SUPER::www_editSave() if ($_[0]->get("wobjectId") eq "new");
         $image = WebGUI::Attachment->new("",$_[0]->get("wobjectId"));
@@ -130,12 +121,7 @@ sub www_editSave {
 	$attachment->save("attachment");
 	$property{image} = $image->getFilename if ($image->getFilename ne "");
 	$property{attachment} = $attachment->getFilename if ($attachment->getFilename ne "");
-	$property{convertCarriageReturns} = $session{form}{convertCarriageReturns};
-	$property{linkTitle} = $session{form}{linkTitle};
-	$property{templateId} = $session{form}{templateId};
-	$property{linkURL} = $session{form}{linkURL};
-	$_[0]->SUPER::www_editSave(\%property);
-       	return "";
+	return $_[0]->SUPER::www_editSave(\%property);
 }
 
 #-------------------------------------------------------------------

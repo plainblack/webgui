@@ -71,11 +71,7 @@ sub duplicate {
         $w = WebGUI::Wobject::Survey->new({wobjectId=>$w,namespace=>$_[0]->get("namespace")});
 	$newSurveyId = getNextId("Survey_id");
 	$w->set({
-		questionOrder=>$_[0]->get("questionOrder"),
-		groupToTakeSurvey=>$_[0]->get("groupToTakeSurvey"),
-		Survey_id=>$newSurveyId,
-		groupToViewReports=>$_[0]->get("groupToViewReports"),
-		mode=>$_[0]->get("mode")
+		Survey_id=>$newSurveyId
 		});
 	$a = WebGUI::SQL->read("select * from Survey_question where Survey_id=".$_[0]->get("Survey_id")
 		." order by sequenceNumber");
@@ -116,8 +112,22 @@ sub new {
         my $class = shift;
         my $property = shift;
         my $self = WebGUI::Wobject->new(
-                $property,
-                [qw(Survey_id questionOrder groupToTakeSurvey groupToViewReports mode)]
+                -properties=>$property,
+                -extendedProperties=>{
+			Survey_id=>{}, 
+			questionOrder=>{
+				defaultValue=>"sequential"
+				}, 
+			groupToTakeSurvey=>{
+				defaultValue=>2
+				}, 
+			groupToViewReports=>{
+				defaultValue=>4
+				},
+			mode=>{
+				defaultValue=>"survey"
+				}
+			}
                 );
         bless $self, $class;
 }
@@ -205,20 +215,12 @@ sub www_deleteAllResponsesConfirm {
 
 #-------------------------------------------------------------------
 sub www_edit {
-	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
-        my ($output, $surveyId, $questionOrder, $mode, $groupToViewReports, $sth, %data, $groupToTakeSurvey);
+        my ($output, $sth, %data);
 	tie %data, 'Tie::CPHash';
-        $mode = $_[0]->get("mode") || "survey";
-        $questionOrder = $_[0]->get("questionOrder") || "sequential";
-	$groupToViewReports = $_[0]->get("groupToViewReports") || 4;
-	$groupToTakeSurvey = $_[0]->get("groupToTakeSurvey") || 2;
-	$surveyId = $_[0]->get("Survey_id") || getNextId("Survey_id");
-        $output = helpIcon(1,$_[0]->get("namespace"));
-	$output .= '<h1>'.WebGUI::International::get(2,$_[0]->get("namespace")).'</h1>';
 	my $properties = WebGUI::HTMLForm->new;
 	my $layout = WebGUI::HTMLForm->new;
 	my $privileges = WebGUI::HTMLForm->new;
-	$properties->hidden("Survey_id",$surveyId);
+	$properties->hidden("Survey_id",($_[0]->get("Survey_id") || getNextId("Survey_id")));
 	$layout->select(
 		-name=>"questionOrder",
 		-options=>{
@@ -227,7 +229,7 @@ sub www_edit {
                 	response => WebGUI::International::get(7,$_[0]->get("namespace"))
 			},
 		-label=>WebGUI::International::get(8,$_[0]->get("namespace")),
-		-value=>[$questionOrder]
+		-value=>[$_[0]->getValue("questionOrder")]
 		);
         $properties->select(
                 -name=>"mode",
@@ -236,17 +238,17 @@ sub www_edit {
                 	quiz => WebGUI::International::get(10,$_[0]->get("namespace"))
 			},
                 -label=>WebGUI::International::get(11,$_[0]->get("namespace")),
-                -value=>[$mode]
+                -value=>[$_[0]->getValue("mode")]
                 );
 	$privileges->group(
 		-name=>"groupToTakeSurvey",
-		-value=>[$groupToTakeSurvey],
+		-value=>[$_[0]->getValue("groupToTakeSurvey")],
 		-label=>WebGUI::International::get(12,$_[0]->get("namespace"))
 		);
         $privileges->group(
                 -name=>"groupToViewReports",
                 -label=>WebGUI::International::get(13,$_[0]->get("namespace")),
-                -value=>[$groupToViewReports]
+                -value=>[$_[0]->getValue("groupToViewReports")]
                 );
 	if ($_[0]->get("wobjectId") eq "new") {
 		$properties->whatNext(
@@ -257,10 +259,12 @@ sub www_edit {
 			-value=>"addQuestion"
 			);
 	}
-	$output .= $_[0]->SUPER::www_edit(
+	$output = $_[0]->SUPER::www_edit(
 		-properties=>$properties->printRowsOnly,
 		-layout=>$layout->printRowsOnly,
-		-privileges=>$privileges->printRowsOnly
+		-privileges=>$privileges->printRowsOnly,
+		-headingId=>2,
+		-helpId=>1
 		);
 	if ($_[0]->get("wobjectId") ne "new") {
 		$output .= '<a href="'.WebGUI::URL::page('wid='.$_[0]->get("wobjectId").'&func=editQuestion&qid=new')
@@ -282,13 +286,7 @@ sub www_edit {
 #-------------------------------------------------------------------
 sub www_editSave {
 	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
-	$_[0]->SUPER::www_editSave({
-		groupToTakeSurvey=>$session{form}{groupToTakeSurvey},
-		groupToViewReports=>$session{form}{groupToViewReports},
-		mode=>$session{form}{mode},
-		Survey_id=>$session{form}{Survey_id},
-		questionOrder=>$session{form}{questionOrder}
-		});
+	$_[0]->SUPER::www_editSave(); 
 	if ($session{form}{proceed} eq "addQuestion") {
 		$session{form}{qid} = "new";
 		return $_[0]->www_editQuestion;

@@ -29,14 +29,10 @@ sub duplicate {
         my ($w, %data, $newQuestionId, $sth);
 	tie %data, 'Tie::CPHash';
         $w = $_[0]->SUPER::duplicate($_[1]);
-	$w = WebGUI::Wobject::FAQ->new({wobjectId=>$w,namespace=>$_[0]->get("namespace")});
-	$w->set({
-		templateId=>$_[0]->get("templateId")
-		});
         $sth = WebGUI::SQL->read("select * from FAQ_question where wobjectId=".$_[0]->get("wobjectId"));
         while (%data = $sth->hash) {
                 $newQuestionId = getNextId("FAQ_questionId");
-                WebGUI::SQL->write("insert into FAQ_question values (".$w->get("wobjectId").", $newQuestionId, "
+                WebGUI::SQL->write("insert into FAQ_question values (".$w.", $newQuestionId, "
 			.quote($data{question}).", ".quote($data{answer}).", $data{sequenceNumber})");
         }
         $sth->finish;
@@ -52,8 +48,12 @@ sub new {
         my $class = shift;
         my $property = shift;
         my $self = WebGUI::Wobject->new(
-                $property,
-                [qw(templateId)]
+                -properties=>$property,
+                -extendedProperties=>{
+			templateId=>{
+				defaultValue=>1
+				}
+			}
                 );
         bless $self, $class;
 }
@@ -81,14 +81,11 @@ sub www_deleteQuestionConfirm {
 
 #-------------------------------------------------------------------
 sub www_edit {
-        return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
-	my $output = helpIcon(1,$_[0]->get("namespace"));
-        $output .= '<h1>'.WebGUI::International::get(8,$_[0]->get("namespace")).'</h1>';
 	my $properties = WebGUI::HTMLForm->new;
 	my $layout = WebGUI::HTMLForm->new;
 	$layout->template(
               	-name=>"templateId",
-               	-value=>$_[0]->get("templateId"),
+               	-value=>$_[0]->getValue("templateId"),
                	-namespace=>$_[0]->get("namespace"),
                	-label=>WebGUI::International::get(74,$_[0]->get("namespace")),
                	-afterEdit=>'func=edit&wid='.$_[0]->get("wobjectId")
@@ -102,24 +99,21 @@ sub www_edit {
                        	-value=>"addQuestion"
                        	);
 	}
-	$output .= $_[0]->SUPER::www_edit(
+	return $_[0]->SUPER::www_edit(
 		-properties=>$properties->printRowsOnly,
 		-layout=>$layout->printRowsOnly
+		-headingId=>8,
+		-helpId=>1
 		);
-        return $output;
 }
 
 #-------------------------------------------------------------------
 sub www_editSave {
-        return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
-	$_[0]->SUPER::www_editSave({
-        	templateId=>$session{form}{templateId}
-		});
+	$_[0]->SUPER::www_editSave();
 	if ($session{form}{proceed} eq "addQuestion") {
 		$session{form}{qid} = "new";
 		return $_[0]->www_editQuestion();
 	}
-	return "";
 }
 
 #-------------------------------------------------------------------

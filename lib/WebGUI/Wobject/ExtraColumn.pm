@@ -28,18 +28,6 @@ our @ISA = qw(WebGUI::Wobject);
 
 
 #-------------------------------------------------------------------
-sub duplicate {
-        my ($w);
-	$w = $_[0]->SUPER::duplicate($_[1]);
-        $w = WebGUI::Wobject::ExtraColumn->new({wobjectId=>$w,namespace=>$_[0]->get("namespace")});
-        $w->set({
-		spacer=>$_[0]->get("spacer"),
-		width=>$_[0]->get("width"),
-		class=>$_[0]->get("class")
-		});
-}
-
-#-------------------------------------------------------------------
 sub name {
         return WebGUI::International::get(1,$_[0]->get("namespace"));
 }
@@ -49,8 +37,18 @@ sub new {
         my $class = shift;
         my $property = shift;
         my $self = WebGUI::Wobject->new(
-                $property,
-                [qw(spacer width class)]
+                -properties=>$property,
+                -extendedProperties=>{
+			spacer=>{
+				defaultValue=>10
+				},
+			width=>{
+				defaultValue=>200
+				}, 
+			class=>{
+				defaultValue=>"content"
+				}
+			}
                 );
         bless $self, $class;
 }
@@ -63,15 +61,9 @@ sub uiLevel {
 #-------------------------------------------------------------------
 sub www_edit {
 	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
-        my ($output, $f, $endDate, $width, $class, $spacer,$startDate, $templatePosition);
+        my ($output, $f);
         $output = helpIcon(1,$_[0]->get("namespace"));
 	$output .= '<h1>'.WebGUI::International::get(6,$_[0]->get("namespace")).'</h1>';
-        $width = $_[0]->get("width") || 200;
-        $spacer = $_[0]->get("spacer") || 10;
-	$templatePosition = $_[0]->get("templatePosition") || 1;
-	$class = $_[0]->get("class") || "content";
-       	$startDate = $_[0]->get("startDate") || $session{page}{startDate};
-       	$endDate = $_[0]->get("endDate") || $session{page}{endDate};
 	my %tabs;
         tie %tabs, 'Tie::IxHash';
         %tabs = (
@@ -91,35 +83,47 @@ sub www_edit {
        	$f->hidden({name=>"wid",value=>$_[0]->get("wobjectId")});
        	$f->hidden({name=>"namespace",value=>$_[0]->get("namespace")}) if ($_[0]->get("wobjectId") eq "new");
        	$f->hidden({name=>"func",value=>"editSave"});
-       	$f->getTab("properties")->readOnly($_[0]->get("wobjectId"),WebGUI::International::get(499));
+       	$f->getTab("properties")->readOnly(
+		-value=>$_[0]->get("wobjectId"),
+		-label=>WebGUI::International::get(499)
+		);
        	$f->hidden({name=>"title",value=>$_[0]->name});
-       	$f->hidden({name=>"displayTitle",value=>0});
+       	$f->hidden({name=>"displayTitle",value=>$_[0]->getValue("displayTitle")});
 	$f->getTab("layout")->select(
                 -name=>"templatePosition",
                 -label=>WebGUI::International::get(363),
-                -value=>[$templatePosition],
+                -value=>[$_[0]->getValue("templatePosition")],
                 -uiLevel=>5,
                 -options=>WebGUI::Page::getTemplatePositions($session{page}{templateId}),
                 -subtext=>WebGUI::Page::drawTemplate($session{page}{templateId})
                 );
-       	$f->getTab("privileges")->date("startDate",WebGUI::International::get(497),$startDate);
-       	$f->getTab("privileges")->date("endDate",WebGUI::International::get(498),$endDate);
-	$f->getTab("properties")->integer("spacer",WebGUI::International::get(3,$_[0]->get("namespace")),$spacer);
-	$f->getTab("properties")->integer("width",WebGUI::International::get(4,$_[0]->get("namespace")),$width);
-	$f->getTab("properties")->text("class",WebGUI::International::get(5,$_[0]->get("namespace")),$class);
+       	$f->getTab("privileges")->date(
+		-name=>"startDate",
+		-label=>WebGUI::International::get(497),
+		-value=>$_[0]->getValue("startDate")
+		);
+       	$f->getTab("privileges")->date(
+		-name=>"endDate",
+		-label=>WebGUI::International::get(498),
+		-value=>$_[0]->getValue("endDate")
+		);
+	$f->getTab("properties")->integer(
+		-name=>"spacer",
+		-label=>WebGUI::International::get(3,$_[0]->get("namespace"))
+		-value=>,$_[0]->getValue("spacer")
+		);
+	$f->getTab("properties")->integer(
+		-name=>"width",
+		-label=>WebGUI::International::get(4,$_[0]->get("namespace")),
+		-value=>$_[0]->getValue("width")
+		);
+	$f->getTab("properties")->text(
+		-name=>"class",
+		-label=>WebGUI::International::get(5,$_[0]->get("namespace")),
+		-value=>$_[0]->get("class")
+		);
        	$output .= $f->print;
 	return $output;
-}
-
-#-------------------------------------------------------------------
-sub www_editSave {
-	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
-	$_[0]->SUPER::www_editSave({
-		spacer=>$session{form}{spacer},
-		width=>$session{form}{width},
-		class=>$session{form}{class}
-		});
-        return "";
 }
 
 #-------------------------------------------------------------------

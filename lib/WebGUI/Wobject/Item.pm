@@ -29,14 +29,8 @@ our @ISA = qw(WebGUI::Wobject);
 sub duplicate {
         my ($w, $f);
         $w = $_[0]->SUPER::duplicate($_[1]);
-	$w = WebGUI::Wobject::Item->new({wobjectId=>$w,namespace=>$_[0]->get("namespace")});
-	$w->set({
-		linkURL=>$_[0]->get("linkURL"),
-		attachment=>$_[0]->get("attachment"),
-		templateId=>$_[0]->get("templateId")
-		});
 	$f = WebGUI::Attachment->new($_[0]->get("attachment"),$_[0]->get("wobjectId"));
-	$f->copy($w->get("wobjectId"));
+	$f->copy($w);
 }
 
 #-------------------------------------------------------------------
@@ -49,34 +43,40 @@ sub new {
         my $class = shift;
         my $property = shift;
         my $self = WebGUI::Wobject->new(
-                $property,
-                [qw(linkURL attachment templateId)]
+                -properties=>$property,
+                -extendedProperties=>{
+			linkURL=>{}, 
+			attachment=>{}, 
+			templateId=>{
+				defaultValue=>1
+				}
+			}
                 );
         bless $self, $class;
 }
 
 #-------------------------------------------------------------------
 sub www_edit {
-	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
-	my $template = $_[0]->get("templateId") || 1;
-	my $output = helpIcon(1,$_[0]->get("namespace"));
-	$output .= '<h1>'.WebGUI::International::get(6,$_[0]->get("namespace")).'</h1>';
 	my $properties = WebGUI::HTMLForm->new;
 	my $layout = WebGUI::HTMLForm->new;
-	$properties->url("linkURL",WebGUI::International::get(1,$_[0]->get("namespace")),$_[0]->get("linkURL"));
+	$properties->url(
+		-name=>"linkURL",
+		-label=>WebGUI::International::get(1,$_[0]->get("namespace")),
+		-value=>$_[0]->getValue("linkURL"));
 	$properties->raw($_[0]->fileProperty("attachment",2));
 	$layout->template(
                 -name=>"templateId",
-                -value=>$template,
+                -value=>$_[0]->getValue("templateId"),
                 -namespace=>$_[0]->get("namespace"),
                 -label=>WebGUI::International::get(72,$_[0]->get("namespace")),
                 -afterEdit=>'func=edit&wid='.$_[0]->get("wobjectId")
                 );
-	$output .= $_[0]->SUPER::www_edit(
+	return $_[0]->SUPER::www_edit(
 		-properties=>$properties->printRowsOnly,
-		-layout=>$layout->printRowsOnly
+		-layout=>$layout->printRowsOnly,
+		-headingId=>6,
+		-helpId=>1
 		);
-        return $output;
 }
 
 #-------------------------------------------------------------------
@@ -86,7 +86,6 @@ sub www_editSave {
 	$_[0]->SUPER::www_editSave() if ($_[0]->get("wobjectId") eq "new");
         $attachment = WebGUI::Attachment->new("",$_[0]->get("wobjectId"));
 	$attachment->save("attachment");
-	$property->{linkURL} = $session{form}{linkURL};
 	$property->{attachment} = $attachment->getFilename if ($attachment->getFilename ne "");
 	$_[0]->SUPER::www_editSave($property);
         return "";

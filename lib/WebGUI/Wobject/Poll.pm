@@ -31,38 +31,9 @@ our @ISA = qw(WebGUI::Wobject);
 sub duplicate {
         my ($w, $f, $sth, @row);
         $w = $_[0]->SUPER::duplicate($_[1]);
-        $w = WebGUI::Wobject::Poll->new({wobjectId=>$w,namespace=>$_[0]->get("namespace")});
-        $w->set({
-                active=>$_[0]->get("active"),
-                randomizeAnswers=>$_[0]->get("randomizeAnswers"),
-                graphWidth=>$_[0]->get("graphWidth"),
-                voteGroup=>$_[0]->get("voteGroup"),
-                question=>$_[0]->get("question"),
-                karmaPerVote=>$_[0]->get("karmaPerVote"),
-                a1=>$_[0]->get("a1"),
-                a2=>$_[0]->get("a2"),
-                a3=>$_[0]->get("a3"),
-                a4=>$_[0]->get("a4"),
-                a5=>$_[0]->get("a5"),
-                a6=>$_[0]->get("a6"),
-                a7=>$_[0]->get("a7"),
-                a8=>$_[0]->get("a8"),
-                a9=>$_[0]->get("a9"),
-                a10=>$_[0]->get("a10"),
-                a11=>$_[0]->get("a11"),
-                a12=>$_[0]->get("a12"),
-                a13=>$_[0]->get("a13"),
-                a14=>$_[0]->get("a14"),
-                a15=>$_[0]->get("a15"),
-                a16=>$_[0]->get("a16"),
-                a17=>$_[0]->get("a17"),
-                a18=>$_[0]->get("a18"),
-                a19=>$_[0]->get("a19"),
-                a20=>$_[0]->get("a20")
-                });
         $sth = WebGUI::SQL->read("select * from Poll_answer where wobjectId=".$_[0]->get("wobjectId"));
         while (@row = $sth->array) {
-        	WebGUI::SQL->write("insert into Poll_answer values (".$w->get("wobjectId").", '$row[1]', $row[2], '$row[3]')");
+        	WebGUI::SQL->write("insert into Poll_answer values (".$w.", '$row[1]', $row[2], '$row[3]')");
         }
         $sth->finish;
 }
@@ -77,8 +48,45 @@ sub new {
         my $class = shift;
         my $property = shift;
         my $self = WebGUI::Wobject->new(
-                $property,
-                [qw(active karmaPerVote graphWidth voteGroup question randomizeAnswers a1 a2 a3 a4 a5 a6 a7 a8 a9 a10 a11 a12 a13 a14 a15 a16 a17 a18 a19 a20)]
+                -properties=>$property,
+                -extendedProperties=>{
+			active=>{
+				defaultValue=>1
+				},
+			karmaPerVote=>{
+				defaultValue=>0
+				}, 
+			graphWidth=>{
+				defaultValue=>150
+				}, 
+			voteGroup=>{
+				defaultValue=>7
+				}, 
+			question=>{}, 
+			randomizeAnswers=>{
+				defaultValue=>1
+				},
+			a1=>{}, 
+			a2=>{}, 
+			a3=>{}, 
+			a4=>{}, 
+			a5=>{}, 
+			a6=>{}, 
+			a7=>{}, 
+			a8=>{}, 
+			a9=>{}, 
+			a10=>{}, 
+			a11=>{}, 
+			a12=>{}, 
+			a13=>{}, 
+			a14=>{}, 
+			a15=>{}, 
+			a16=>{}, 
+			a17=>{}, 
+			a18=>{}, 
+			a19=>{}, 
+			a20=>{}
+			}
                 );
         bless $self, $class;
 }
@@ -91,42 +99,61 @@ sub purge {
 
 #-------------------------------------------------------------------
 sub www_edit {
-	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
-        my ($i, $output, $active, $voteGroup, $graphWidth, $answers, $randomizeAnswers);
-	if ($_[0]->get("wobjectId") eq "new") {
-		$active = 1;
-		$randomizeAnswers = 1;
-	} else {
-		$active = $_[0]->get("active");
-		$randomizeAnswers = $_[0]->get("randomizeAnswers");
-	}
-	$voteGroup = $_[0]->get("voteGroup") || 7;
-	$graphWidth = $_[0]->get("graphWidth") || 150;
+        my ($i, $active, $voteGroup, $graphWidth, $answers, $randomizeAnswers);
 	for ($i=1; $i<=20; $i++) {
                 if ($_[0]->get('a'.$i) =~ /\C/) {
-                        $answers .= $_[0]->get("a".$i)."\n";
+                        $answers .= $_[0]->getValue("a".$i)."\n";
                 }
         }
-        $output = helpIcon(1,$_[0]->get("namespace"));
-	$output .= '<h1>'.WebGUI::International::get(9,$_[0]->get("namespace")).'</h1>';
 	my $privileges = WebGUI::HTMLForm->new;
 	my $layout = WebGUI::HTMLForm->new;
 	my $properties = WebGUI::HTMLForm->new;
-	$privileges->yesNo("active",WebGUI::International::get(3,$_[0]->get("namespace")),$active);
-        $privileges->group("voteGroup",WebGUI::International::get(4,$_[0]->get("namespace")),[$voteGroup]);
+	$privileges->yesNo(
+		-name=>"active",
+		-label=>WebGUI::International::get(3,$_[0]->get("namespace")),
+		-value=>$_[0]->getValue("active")
+		);
+        $privileges->group(
+		-name=>"voteGroup",
+		-label=>WebGUI::International::get(4,$_[0]->get("namespace")),
+		-value=>[$_[0]->getValue("voteGroup")]
+		);
 	if ($session{setting}{useKarma}) {
-		$properties->integer("karmaPerVote",WebGUI::International::get(20,$_[0]->get("namespace")),$_[0]->get("karmaPerVote"));
+		$properties->integer(
+			-name=>"karmaPerVote",
+			-label=>WebGUI::International::get(20,$_[0]->get("namespace")),
+			-value=>$_[0]->getValue("karmaPerVote")
+			);
 	} else {
-		$properties->hidden("karmaPerVote",$_[0]->get("karmaPerVote"));
+		$properties->hidden("karmaPerVote",$_[0]->getValue("karmaPerVote"));
 	}
-	$layout->integer("graphWidth",WebGUI::International::get(5,$_[0]->get("namespace")),$graphWidth);
-	$properties->text("question",WebGUI::International::get(6,$_[0]->get("namespace")),$_[0]->get("question"));
-        $properties->textarea("answers",WebGUI::International::get(7,$_[0]->get("namespace")).'<span class="formSubtext"><br>'.WebGUI::International::get(8,$_[0]->get("namespace")).'</span>',$answers);
-	$layout->yesNo("randomizeAnswers",WebGUI::International::get(72,$_[0]->get("namespace")),$randomizeAnswers);
-	$output .= $_[0]->SUPER::www_edit(
+	$layout->integer(
+		-name=>"graphWidth",
+		-label=>WebGUI::International::get(5,$_[0]->get("namespace")),
+		-value=>$_[0]->getValue("graphWidth")
+		);
+	$properties->text(
+		-name=>"question",
+		-label=>WebGUI::International::get(6,$_[0]->get("namespace")),
+		-value=>$_[0]->getValue("question")
+		);
+        $properties->textarea(
+		-name=>"answers",
+		-value=>WebGUI::International::get(7,$_[0]->get("namespace")).
+		-subtext=>'<span class="formSubtext"><br>'.WebGUI::International::get(8,$_[0]->get("namespace")).'</span>',
+		-value=>$answers
+		);
+	$layout->yesNo(
+		-name=>"randomizeAnswers",
+		-label=>WebGUI::International::get(72,$_[0]->get("namespace")),
+		-value=>$randomizeAnswers
+		);
+	my $output = $_[0]->SUPER::www_edit(
 		-layout=>$layout->printRowsOnly,
 		-properties=>$properties->printRowsOnly,
-		-privileges=>$privileges->printRowsOnly
+		-privileges=>$privileges->printRowsOnly,
+		-headingId=>9,
+		-helpId=>1
 		);
 	if ($_[0]->get("wobjectId") ne "new") {
 		$output .= '<p>';
@@ -138,20 +165,12 @@ sub www_edit {
 
 #-------------------------------------------------------------------
 sub www_editSave {
-	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
 	my (@answer, $i, $property);
 	@answer = split("\n",$session{form}{answers});
         for ($i=1; $i<=20; $i++) {
              	$property->{'a'.$i} = $answer[($i-1)];
         }
-	$property->{randomizeAnswers} = $session{form}{randomizeAnswers};
-	$property->{karmaPerVote} = $session{form}{karmaPerVote};
-	$property->{voteGroup} = $session{form}{voteGroup};
-	$property->{graphWidth} = $session{form}{graphWidth};
-	$property->{active} = $session{form}{active};
-	$property->{question} = $session{form}{question};
-	$_[0]->SUPER::www_editSave($property);
-	return "";
+	return $_[0]->SUPER::www_editSave($property);
 }
 
 #-------------------------------------------------------------------

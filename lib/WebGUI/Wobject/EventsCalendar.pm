@@ -139,15 +139,6 @@ sub _drawSmallCalendar {
 sub duplicate {
         my ($sth, $w, @row, $newEventId, $previousRecurringEventId);
 	$w = $_[0]->SUPER::duplicate($_[1]);
-        $w = WebGUI::Wobject::EventsCalendar->new({wobjectId=>$w,namespace=>$_[0]->get("namespace")});
-        $w->set({
-		templateId=>$_[0]->get("templateId"),
-		eventTemplateId=>$_[0]->get("eventTemplateId"),
-		startMonth=>$_[0]->get("startMonth"),
-		endMonth=>$_[0]->get("endMonth"),
-		defaultMonth=>$_[0]->get("defaultMonth"),
-		paginateAfter=>$_[0]->get("paginateAfter")
-		});
 	$sth = WebGUI::SQL->read("select * from EventsCalendar_event where wobjectId="
 		.$_[0]->get("wobjectId")." order by EventsCalendar_recurringId");
 	while (@row = $sth->array) {
@@ -156,7 +147,7 @@ sub duplicate {
 			$row[6] = getNextId("EventsCalendar_recurringId");
 			$previousRecurringEventId = $row[6];
 		}
-               	WebGUI::SQL->write("insert into EventsCalendar_event values ($newEventId, ".$w->get("wobjectId").", ".
+               	WebGUI::SQL->write("insert into EventsCalendar_event values ($newEventId, ".$w.", ".
 			quote($row[2]).", ".quote($row[3]).", '".$row[4]."', '".$row[5]."', $row[6])");
 	}
 	$sth->finish;
@@ -172,8 +163,27 @@ sub new {
         my $class = shift;
         my $property = shift;
         my $self = WebGUI::Wobject->new(
-                $property,
-                [qw(templateId eventTemplateId startMonth endMonth defaultMonth paginateAfter)]
+                -properties=>$property,
+                -extendedProperties=>{
+			templateId=>{
+                        	defaultValue=>1
+                        	},
+                	eventTemplateId=>{
+                        	defaultValue=>1
+                        	},
+                	startMonth=>{
+                        	defaultValue=>"current"
+                        	},
+                	endMonth=>{
+                        	defaultValue=>"after12"
+                        	},
+                	defaultMonth=>{
+                        	defaultValue=>"current"
+                        	},
+                	paginateAfter=>{
+                        	defaultValue=>50
+                        	}
+			}
                 );
         bless $self, $class;
 }
@@ -214,27 +224,19 @@ sub www_deleteEventConfirm {
 
 #-------------------------------------------------------------------
 sub www_edit {
-	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
-        my ($output, $startMonth, $endMonth, $afterEdit, $defaultMonth, $paginateAfter);
-	$paginateAfter = $_[0]->get("paginateAfter") || 50;
-	$startMonth = $_[0]->get("startMonth") || "current";
-	$endMonth = $_[0]->get("endMonth") || "after12";
-	$defaultMonth = $_[0]->get("defaultMonth") || "current";
-	$afterEdit = 'func=edit&wid='.$_[0]->get("wobjectId") if ($_[0]->get("wobjectId") ne "new");
-        $output = helpIcon(1,$_[0]->get("namespace"));
-	$output .= '<h1>'.WebGUI::International::get(12,$_[0]->get("namespace")).'</h1>';
+	my $afterEdit = 'func=edit&wid='.$_[0]->get("wobjectId") if ($_[0]->get("wobjectId") ne "new");
 	my $layout = WebGUI::HTMLForm->new;
 	my $properties = WebGUI::HTMLForm->new;
         $layout->template(
                 -name=>"templateId",
-                -value=>$_[0]->get("templateId"),
+                -value=>$_[0]->getValue("templateId"),
                 -namespace=>$_[0]->get("namespace"),
                 -label=>WebGUI::International::get(79,$_[0]->get("namespace")),
                 -afterEdit=>$afterEdit
                 );
         $layout->template(
                 -name=>"eventTemplateId",
-                -value=>$_[0]->get("eventTemplateId"),
+                -value=>$_[0]->getValue("eventTemplateId"),
                 -namespace=>$_[0]->get("namespace")."/Event",
                 -label=>WebGUI::International::get(80,$_[0]->get("namespace")),
                 -afterEdit=>$afterEdit
@@ -246,20 +248,23 @@ sub www_edit {
 			"first"=>WebGUI::International::get(83,$_[0]->get("namespace"))
 			},
 		-label=>WebGUI::International::get(81,$_[0]->get("namespace")),
-		-value=>[$startMonth]
+		-value=>[$_[0]->getValue("startMonth")]
+		);
+	my %options;
+	tie %options, 'Tie::IxHash';
+	%options = (
+		"last"=>WebGUI::International::get(85,$_[0]->get("namespace")),
+                "after12"=>WebGUI::International::get(86,$_[0]->get("namespace")),
+                "after9"=>WebGUI::International::get(87,$_[0]->get("namespace")),
+                "after6"=>WebGUI::International::get(88,$_[0]->get("namespace")),
+                "after3"=>WebGUI::International::get(89,$_[0]->get("namespace")),
+                "current"=>WebGUI::International::get(82,$_[0]->get("namespace"))
 		);
         $properties->select(
                 -name=>"endMonth",
-                -options=>{
-                        "last"=>WebGUI::International::get(85,$_[0]->get("namespace")),
-			"after12"=>WebGUI::International::get(86,$_[0]->get("namespace")),
-			"after9"=>WebGUI::International::get(87,$_[0]->get("namespace")),
-			"after6"=>WebGUI::International::get(88,$_[0]->get("namespace")),
-			"after3"=>WebGUI::International::get(89,$_[0]->get("namespace")),
-			"current"=>WebGUI::International::get(82,$_[0]->get("namespace")),
-                        },
+                -options=>\%options,
                 -label=>WebGUI::International::get(84,$_[0]->get("namespace")),
-                -value=>[$endMonth]
+                -value=>[$_[0]->getValue("endMonth")]
                 );
         $properties->select(
                 -name=>"defaultMonth",
@@ -269,9 +274,13 @@ sub www_edit {
                         "first"=>WebGUI::International::get(83,$_[0]->get("namespace"))
                         },
                 -label=>WebGUI::International::get(90,$_[0]->get("namespace")),
-                -value=>[$defaultMonth]
+                -value=>[$_[0]->getValue("defaultMonth")]
                 );
-	$layout->integer("paginateAfter",WebGUI::International::get(19,$_[0]->get("namespace")),$paginateAfter);
+	$layout->integer(
+		-name=>"paginateAfter",
+		-label=>WebGUI::International::get(19,$_[0]->get("namespace")),
+		-value=>$_[0]->getValue("paginateAfter")
+		);
 	if ($_[0]->get("wobjectId") eq "new") {
 		$properties->whatNext(
 			-options=>{
@@ -281,24 +290,17 @@ sub www_edit {
 			-value=>"backToPage"
 			);
 	}
-	$output .= $_[0]->SUPER::www_edit(
+	return $_[0]->SUPER::www_edit(
 		-properties=>$properties->printRowsOnly,
-		-layout=>$layout->printRowsOnly
+		-layout=>$layout->printRowsOnly,
+		-helpId=>1,
+		-headingId=>12
 		);
-        return $output;
 }
 
 #-------------------------------------------------------------------
 sub www_editSave {
-	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
-	$_[0]->SUPER::www_editSave({
-		templateId=>$session{form}{templateId},
-		eventTemplateId=>$session{form}{eventTemplateId},
-		startMonth=>$session{form}{startMonth},
-		endMonth=>$session{form}{endMonth},
-		defaultMonth=>$session{form}{defaultMonth},
-		paginateAfter=>$session{form}{paginateAfter}
-		});
+	$_[0]->SUPER::www_editSave();
 	if ($session{form}{proceed} eq "addEvent") {
 		$session{form}{eid} = "new";
 		return $_[0]->www_editEvent;

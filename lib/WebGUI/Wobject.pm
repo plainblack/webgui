@@ -263,26 +263,15 @@ If specified the wobject will be duplicated to this pageId, otherwise it will be
 =cut
 
 sub duplicate {
-	my ($pageId, $w);
-	$pageId = $_[1] || 2;
-	$w = WebGUI::Wobject->new({
-		wobjectId => "new",
-		namespace => $_[0]->get("namespace")
-		});
-	$w->set({
-		pageId => $pageId,
-		userDefined1 => $_[0]->get("userDefined1"),
-		userDefined2 => $_[0]->get("userDefined2"),
-		userDefined3 => $_[0]->get("userDefined3"),
-		userDefined4 => $_[0]->get("userDefined4"),
-		userDefined5 => $_[0]->get("userDefined5"),
-		title => $_[0]->get("title"),
-		description => $_[0]->get("description"),
-		displayTitle => $_[0]->get("displayTitle"),
-		startDate => $_[0]->get("startDate"),
-		endDate => $_[0]->get("endDate"),
-		templatePosition => $_[0]->get("templatePosition")
-		});
+	my %properties = %{$_[0]->get};
+	$properties{pageId} = $_[1] || 2;
+	delete $properties{wobjectId};
+	my $cmd = "WebGUI::Wobject::".$properties{namespace};
+        my $w = eval{$cmd->new({namespace=>$properties{namespace},wobjectId=>"new"})};
+        if ($@) {
+        	WebGUI::ErrorHandler::warn("Could duplicate wobject ".$properties{namespace}." because: ".$@);
+	}
+	$w->set(\%properties);
 	WebGUI::Discussion::duplicate($_[0]->get("wobjectId"),$w->get("wobjectId")) unless ($_[2]);
         return $w->get("wobjectId");
 }
@@ -382,6 +371,61 @@ sub getCollateral {
 		return WebGUI::SQL->quickHashRef("select * from $tableName where $keyName=".quote($keyValue));
 	}
 }
+
+
+#-------------------------------------------------------------------
+
+=head2 getDefaultValue ( propertyName )
+
+Returns the default value for a wobject property.
+
+=over
+
+=item propertyName
+
+The name of the property to retrieve the default value for.
+
+=back
+
+=cut
+
+sub getDefaultValue {
+	if (exists $_[0]->{_extendedProperties}{$_[1]}{defaultValue}) {
+		return $_[0]->{_extendedProperties}{$_[1]}{defaultValue};
+	} elsif (exists $_[0]->{_wobjectProperties}{$_[1]}{defaultValue}) {
+		return $_[0]->{_wobjectProperties}{$_[1]}{defaultValue};
+	} else {
+		return undef;
+	}
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 getValue ( propertyName )
+
+Returns a value for a wobject property however possible. It first looks in form variables for the property, then looks to the value stored in the wobject instance, and if all else fails it returns the default value for the property.
+
+=over
+
+=item propertyName
+
+The name of the property to retrieve the value for.
+
+=back
+
+=cut
+
+sub getValue {
+	if (exists $session{form}{$_[1]}) {
+		return $session{form}{$_[1]};
+	} elsif (defined $_[0]->get($_[1])) {
+		return $_[0]->get($_[1]);
+	} else {
+		return $_[0]->getDefaultValue($_[1]);
+	}
+}
+
 
 
 #-------------------------------------------------------------------
@@ -521,7 +565,7 @@ sub name {
 
 #-------------------------------------------------------------------
 
-=head2 new ( properties [, extendedProperties, useDiscussion] )
+=head2 new ( -properties, -extendedProperties [, -useDiscussion ] )
 
 Constructor.
 
@@ -529,13 +573,13 @@ NOTE: This method should never need to be overridden or extended.
 
 =over
 
-=item properties
+=item -properties
 
 A hash reference containing at minimum "wobjectId" and "namespace". wobjectId may be set to "new" if you're creating a new instance. This hash reference should be the one created by WebGUI.pm and passed to the wobject subclass.
 
 NOTE: It may seem a little weird that the initial data for the wobject instance is coming from WebGUI.pm, but this was done to lessen database traffic thus increasing the speed of all wobjects.
 
-=item extendedProperties
+=item -extendedProperties
 
 An array reference containing a list of properties that extend the wobject class. This list should match the properties that are added to this wobject's namespace table in the database. So if this wobject has a namespace of "MyWobject" and a table definition that looks like this:
 
@@ -550,7 +594,7 @@ Then the extended property list would be "[something, foo, bar]".
 
 NOTE: This is used to define the wobject and should only be passed in by a wobject subclass.
 
-=item useDiscussion
+=item -useDiscussion
 
  Defaults to "0". If set to "1" this will add a discussion properties tab to this wobject to enable content managers to set the properties of a discussion attached to this wobject.
 
@@ -561,18 +605,63 @@ NOTE: This is used to define the wobject and should only be passed in by a wobje
 =cut
 
 sub new {
-	my $self = shift;
-	my $properties = shift;
-	my $extendedProperties = shift;
-	my $useDiscussion = shift || 0;
-	my $wobjectProperties = [qw(userDefined1 userDefined2 userDefined3 userDefined4 userDefined5 
-		moderationType groupToModerate groupToPost karmaPerPost editTimeout filterPost addEditStampToPosts
-		title displayTitle description pageId templatePosition startDate endDate sequenceNumber)];
+	my ($self, @p) = @_;
+        my ($properties, $extendedProperties, $useDiscussion) = rearrange([qw(properties extendedProperties useDiscussion)], @p);
+	$useDiscussion = 0 unless ($useDiscussion);
+	my $wobjectProperties = {
+		userDefined1=>{},
+		userDefined2=>{}, 
+		userDefined3=>{}, 
+		userDefined4=>{}, 
+		userDefined5=>{}, 
+		allowDiscussion=>{
+			defaultValue=>0
+			},
+		moderationType=>{
+			defaultValue=>"after"
+			},
+		groupToModerate=>{
+			defaultValue=>4
+			}, 
+		groupToPost=>{
+			defaultValue=>2
+			},
+ 		karmaPerPost=>{
+			defaultValue=>0
+			} ,
+		editTimeout=>{
+			defaultValue=>1
+			}, 
+		filterPost=>{
+			defaultValue=>"javascript",
+			}, 
+		addEditStampToPosts=>{
+			defaultValue=>1,
+			},
+		title=>{}, 
+		displayTitle=>{
+			defaultValue=>1
+			}, 
+		description=>{},
+ 		pageId=>{
+			defaultValue=>$session{page}{pageId}
+			}, 
+		templatePosition=>{
+			defaultValue=>1
+			}, 
+		startDate=>{
+			defaultValue=>$session{page}{startDate}
+			},
+		endDate=>{
+			defaultValue=>$session{page}{endDate}
+			},
+		sequenceNumber=>{}
+		};
         bless({
 		_property=>$properties, 
-		_extendedProperties=>$extendedProperties,
 		_useDiscussion=>$useDiscussion,
-		_wobjectProperties=>$wobjectProperties
+		_wobjectProperties=>$wobjectProperties,
+		_extendedProperties=>$extendedProperties
 		}, 
 		$self);
 }
@@ -711,7 +800,19 @@ sub set {
 	my ($key, $sql, @update, $i);
 	my $self = shift;
 	my $properties = shift;
-	my $extendedProperties = shift || $self->{_extendedProperties}; # shift for backward compatibility.
+	my $extendedProperties = shift; # shift for backward compatibility.
+	unless (defined $extendedProperties) {
+		my @temp;
+		foreach (keys %{$self->{_extendedProperties}}) {
+			push(@temp,$_);
+		}
+		$extendedProperties = \@temp;
+	}
+	my @temp;
+        foreach (keys %{$self->{_wobjectProperties}}) {
+        	push(@temp,$_);
+        }
+        my $wobjectProperties = \@temp;
 	if ($self->{_property}{wobjectId} eq "new") {
 		$self->{_property}{wobjectId} = getNextId("wobjectId");
 		$self->{_property}{pageId} = ${$_[1]}{pageId} || $session{page}{pageId};
@@ -735,8 +836,8 @@ sub set {
 	$self->{_property}{editedBy} = $session{user}{userId};
 	$sql = "update wobject set";
 	foreach $key (keys %{$properties}) {
-		$properties->{_property}{$key} = ${$properties}{$key};
-		if (isIn($key, @{$self->{_wobjectProperties}})) {
+		$self->{_property}{$key} = ${$properties}{$key};
+		if (isIn($key, @{$wobjectProperties})) {
         		$sql .= " ".$key."=".quote(${$properties}{$key}).",";
 		}
                 if (isIn($key, @{$extendedProperties})) {
@@ -1037,32 +1138,44 @@ sub www_denyPost {
 
 #-------------------------------------------------------------------
 
-=head2 www_edit ( formRows ) 
+=head2 www_edit ( [ -properties, -layout, -privileges, -helpId, -heading, -headingId ] ) 
 
 Displays the common properties of any/all wobjects. 
 
-NOTE: This method should be extended by all wobjects.
-
 =over
 
-=item formRows
+=item -properties, -layout, -privileges 
 
-The custom form rows from the wobject subclass edit page.
+WebGUI::HTMLForm objects that extend these tabs.
+
+=item -helpId
+
+An id in this namespace in the WebGUI help system for this edit page. If specified a help link will be created on the edit page.
+
+=item -heading
+
+A text string to put in the heading of this page.
+
+=item -headingId
+
+An id this namespace of the WebGUI international system. This message will be retrieved and displayed in the heading of this edit page.
 
 =back
 
 =cut
 
 sub www_edit {
+	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
 	my ($self, @p) = @_;
-        my ($properties, $layout, $privileges) = rearrange([qw(properties layout privileges)], @p);
-        my ($f, $startDate, $displayTitle, $title, $templatePosition, $endDate);
+        my ($properties, $layout, $privileges, $heading, $helpId, $headingId) = 
+		rearrange([qw(properties layout privileges heading helpId headingId)], @p);
+        my ($f, $startDate, $displayTitle, $templatePosition, $endDate);
         if ($_[0]->get("wobjectId") eq "new") {
                	$displayTitle = 1;
         } else {
         	$displayTitle = $_[0]->get("displayTitle");
         }
-	$title = $_[0]->get("title") || $_[0]->name;
+	my $title = $_[0]->get("title") || $_[0]->name;
 	$templatePosition = $_[0]->get("templatePosition") || 1;
 	$startDate = $_[0]->get("startDate") || $session{page}{startDate};
 	$endDate = $_[0]->get("endDate") || $session{page}{endDate};
@@ -1078,7 +1191,7 @@ sub www_edit {
                         },
                 privileges=>{
                         label=>WebGUI::International::get(107),
-                        uiLevel=>9
+                        uiLevel=>6
                         }
 		);
 	if ($_[0]->{_useDiscussion}) {
@@ -1115,13 +1228,13 @@ sub www_edit {
 		-name=>"startDate",
 		-label=>WebGUI::International::get(497),
 		-value=>$startDate,
-		-uiLevel=>9
+		-uiLevel=>6
 		);
 	$f->getTab("privileges")->date(
 		-name=>"endDate",
 		-label=>WebGUI::International::get(498),
 		-value=>$endDate,
-		-uiLevel=>9
+		-uiLevel=>6
 		);
 	$f->getTab("properties")->HTMLArea(
 		-name=>"description",
@@ -1140,16 +1253,20 @@ sub www_edit {
                 	);
 		$f->getTab("discussion")->raw($_[0]->discussionProperties);
 	}
-	return $f->print; 
+	my $output;
+	$output = helpIcon($helpId,$_[0]->get("namespace")) if ($helpId);
+	$heading = WebGUI::International::get($headingId,$_[0]->get("namespace")) if ($headingId);
+        $output .= '<h1>'.$heading.'</h1>' if ($heading);
+	return $output.$f->print; 
 }
 
 #-------------------------------------------------------------------
 
-=head2 www_editSave ( hashRef )
+=head2 www_editSave ( [ hashRef ] )
 
 Saves the default properties of any/all wobjects.
 
-NOTE: This method should be extended by all subclasses.
+NOTE: This method should only need to be extended if you need to do some special validation.
 
 =over
 
@@ -1162,33 +1279,23 @@ A hash reference of extra properties to set.
 =cut
 
 sub www_editSave {
-	my ($title, $templatePosition, $startDate, $endDate);
-	$title = $session{form}{title} || $_[0]->get("namespace");
-        $templatePosition = $session{form}{templatePosition} || 1;
-        $startDate = setToEpoch($session{form}{startDate}) || $session{page}{startDate};
-        $endDate = setToEpoch($session{form}{endDate}) || $session{page}{endDate};
-	$session{form}{description} = WebGUI::HTML::cleanSegment($session{form}{description});
-	$session{form}{karmaPerPost} ||= 0;
-	$session{form}{groupToPost} ||= 2;
-	$session{form}{editTimeout} = WebGUI::DateTime::intervalToSeconds($session{form}{editTimeout_interval},$session{form}{editTimeout_units}) || 0;
-	$session{form}{groupToModerate} ||= 3;
-	$session{form}{moderationType} ||= "after";
-	$_[0]->set({
-		title=>$title,
-		displayTitle=>$session{form}{displayTitle},
-		templatePosition=>$templatePosition,
-		startDate=>$startDate,
-		endDate=>$endDate,
-		description=>$session{form}{description},
-		karmaPerPost=>$session{form}{karmaPerPost},
-		groupToPost=>$session{form}{groupToPost},
-		groupToModerate=>$session{form}{groupToModerate},
-		editTimeout=>$session{form}{editTimeout},
-		moderationType=>$session{form}{moderationType},
-		filterPost=>$session{form}{filterPost},
-		addEditStampToPosts=>$session{form}{addEditStampToPosts},
-		%{$_[1]}
-	});
+	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
+	my %set;
+	foreach (keys %{$_[0]->{_wobjectProperties}}) {
+		if (exists $session{form}{$_}) {
+			$set{$_} = $session{form}{$_} || $_[0]->{_wobjectProperties}{$_}{defaultValue};
+		}
+	}
+	$set{title} = $session{form}{title} || $_[0]->name;
+	$set{description} = WebGUI::HTML::cleanSegment($set{description});
+	$set{editTimeout} = WebGUI::DateTime::intervalToSeconds($session{form}{editTimeout_interval},$session{form}{editTimeout_units}) || 0;
+	foreach (keys %{$_[0]->{_extendedProperties}}) {
+		if (exists $session{form}{$_}) {
+			$set{$_} = $session{form}{$_} || $_[0]->{_extendedProperties}{$_}{defaultValue};
+		}
+	}
+	%set = (%set, %{$_[1]});
+	$_[0]->set(\%set);
 	return "";
 }
 

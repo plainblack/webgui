@@ -55,18 +55,6 @@ sub _traversePageTree {
         return \@pages;
 }
 
-#-------------------------------------------------------------------
-sub duplicate {
-        my ($w, $f);
-        $w = $_[0]->SUPER::duplicate($_[1]);
-        $w = WebGUI::Wobject::SiteMap->new({wobjectId=>$w,namespace=>$_[0]->get("namespace")});
-        $w->set({
-                startAtThisLevel=>$_[0]->get("startAtThisLevel"),
-                templateId=>$_[0]->get("templateId"),
-                indent=>$_[0]->get("indent"),
-                depth=>$_[0]->get("depth")
-                });
-}
 
 #-------------------------------------------------------------------
 sub name {
@@ -78,8 +66,21 @@ sub new {
         my $class = shift;
         my $property = shift;
         my $self = WebGUI::Wobject->new(
-                $property,
-                [qw(startAtThisLevel indent templateId depth)]
+                -properties=>$property,
+                -extendedProperties=>{
+			startAtThisLevel=>{
+				defaultValue=>1
+				},
+ 			indent=>{
+				defaultValue=>5
+				}, 
+			templateId=>{
+				defaultValue=>1
+				},
+			depth=>{
+				defaultValue=>0
+				}
+			}
                 );
         bless $self, $class;
 }
@@ -87,52 +88,42 @@ sub new {
 
 #-------------------------------------------------------------------
 sub www_edit {
-	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
-        my ($output, $indent, $startLevel);
-	if ($_[0]->get("wobjectId") eq "new") {
-		$startLevel = 1;
-	} else {
-		$startLevel = $_[0]->get("startAtThisLevel");
-	}
 	my $options = WebGUI::SQL->buildHashRef("select pageId,title from page where parentId=0 
 		and (pageId=1 or pageId>999) order by title");
-	$indent = $_[0]->get("indent") || 5;
-        $output = helpIcon(1,$_[0]->get("namespace"));
-        $output .= '<h1>'.WebGUI::International::get(5,$_[0]->get("namespace")).'</h1>';
         my $f = WebGUI::HTMLForm->new;
 	$f->template(
                 -name=>"templateId",
-                -value=>$_[0]->get("templateId"),
+                -value=>$_[0]->getValue("templateId"),
                 -namespace=>$_[0]->get("namespace"),
                 -afterEdit=>'func=edit&wid='.$_[0]->get("wobjectId")
                 );
         $f->select(
 		-name=>"startAtThisLevel",
 		-label=>WebGUI::International::get(3,$_[0]->get("namespace")),
-		-value=>[$startLevel],
+		-value=>[$_[0]->getValue("startLevel")],
 		-options=>{
                	 	0=>WebGUI::International::get(75,$_[0]->get("namespace")),
                 	$session{page}{pageId}=>WebGUI::International::get(74,$_[0]->get("namespace")),
                 	%{$options}
                 	}
 		);
-        $f->integer("depth",WebGUI::International::get(4,$_[0]->get("namespace")),$_[0]->get("depth"));
-	$f->integer("indent",WebGUI::International::get(6,$_[0]->get("namespace")),$indent);
-	$output .= $_[0]->SUPER::www_edit(-layout=>$f->printRowsOnly);
-        return $output;
+        $f->integer(
+		-name=>"depth",
+		-label=>WebGUI::International::get(4,$_[0]->get("namespace")),
+		-value=>$_[0]->getValue("depth")
+		);
+	$f->integer(
+		-name=>"indent",
+		-label=>WebGUI::International::get(6,$_[0]->get("namespace")),
+		-value=>$_[0]->getValue("indent")
+		);
+	return $_[0]->SUPER::www_edit(
+		-layout=>$f->printRowsOnly,
+		-headingId=>5,
+		-helpId=>1
+		);
 }
 
-#-------------------------------------------------------------------
-sub www_editSave {
-	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
-	$_[0]->SUPER::www_editSave({
-		indent=>$session{form}{indent},
-		startAtThisLevel=>$session{form}{startAtThisLevel},
-		depth=>$session{form}{depth},
-		templateId=>$session{form}{templateId}
-		});
-        return "";
-}
 
 #-------------------------------------------------------------------
 sub www_view {

@@ -129,7 +129,6 @@ sub _setupUserInfo {
 	if ($user{userId} eq "") {
 		_setupUserInfo("1");
 	} else {
-		$user{alias} = $user{username};
 		%profile = WebGUI::SQL->buildHash("select userProfileField.fieldName, userProfileData.fieldData 
 			from userProfileData, userProfileField where userProfileData.fieldName=userProfileField.fieldName 
 			and userProfileData.userId='$user{userId}'");
@@ -154,6 +153,7 @@ sub _setupUserInfo {
                        		$r->user($session{user}{username});
                		}
        		}
+		$session{user}{alias} = $session{user}{username} unless ($session{user}{alias} =~ /[A..Za..z0..9]/);
 	}
 }
 

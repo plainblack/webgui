@@ -26,23 +26,6 @@ use WebGUI::Wobject;
 
 our @ISA = qw(WebGUI::Wobject);
 
-#-------------------------------------------------------------------
-sub duplicate {
-        my ($w);
-	$w = $_[0]->SUPER::duplicate($_[1]);
-        $w = WebGUI::Wobject::SQLReport->new({wobjectId=>$w,namespace=>$_[0]->get("namespace")});
-        $w->set({
-		template=>$_[0]->get("template"),
-		dbQuery=>$_[0]->get("dbQuery"),
-		DSN=>$_[0]->get("DSN"),
-		username=>$_[0]->get("username"),
-		identifier=>$_[0]->get("identifier"),
-		convertCarriageReturns=>$_[0]->get("convertCarriageReturns"),
-		paginateAfter=>$_[0]->get("paginateAfter"),
-		preprocessMacros=>$_[0]->get("preprocessMacros"),
-		debugMode=>$_[0]->get("debugMode")
-		});
-}
 
 #-------------------------------------------------------------------
 sub name {
@@ -55,8 +38,30 @@ sub new {
         my $class = shift;
         my $property = shift;
         my $self = WebGUI::Wobject->new(
-                $property,
-                [qw(template dbQuery DSN username identifier convertCarriageReturns paginateAfter preprocessMacros debugMode)]
+                -properties=>$property,
+                -extendedProperties=>{
+			template=>{}, 
+			dbQuery=>{}, 
+			DSN=>{
+				defaultValue=>$session{config}{dsn}
+				},
+			username=>{
+				defaultValue=>$session{config}{dbuser}
+				},
+			identifier=>{},
+			convertCarriageReturns=>{
+				defaultValue=>0
+				}, 
+			paginateAfter=>{
+				defaultValue=>50
+				},
+			preprocessMacros=>{
+				defaultValue=>0
+				},
+			debugMode=>{
+				defaultValue=>0
+				}
+			}
                 );
         bless $self, $class;
 }
@@ -68,49 +73,63 @@ sub uiLevel {
 
 #-------------------------------------------------------------------
 sub www_edit {
-	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
-        my ($output, $dsn, $username, $paginateAfter);
-	$dsn = $_[0]->get("DSN") || $session{config}{dsn};
-	$username = $_[0]->get("username") || $session{config}{dbuser};
-	$paginateAfter = $_[0]->get("paginateAfter") || 50;
 	my $privileges = WebGUI::HTMLForm->new;
 	my $layout = WebGUI::HTMLForm->new;
 	my $properties = WebGUI::HTMLForm->new;
-        $output = helpIcon(1,$_[0]->get("namespace"));
-        $output .= '<h1>'.WebGUI::International::get(8,$_[0]->get("namespace")).'</h1>';
-	$properties->yesNo("preprocessMacros",WebGUI::International::get(15,$_[0]->get("namespace")),$_[0]->get("preprocessMacros"));
-        $properties->yesNo("debugMode",WebGUI::International::get(16,$_[0]->get("namespace")),$_[0]->get("debugMode"));
-	$properties->textarea("dbQuery",WebGUI::International::get(4,$_[0]->get("namespace")),$_[0]->get("dbQuery"));
-       	$layout->textarea("template",WebGUI::International::get(3,$_[0]->get("namespace")),$_[0]->get("template"));        
-        $privileges->text("DSN",WebGUI::International::get(5,$_[0]->get("namespace")),$dsn);
-	$privileges->text("username",WebGUI::International::get(6,$_[0]->get("namespace")),$username);
-	$privileges->password("identifier",WebGUI::International::get(7,$_[0]->get("namespace")),$_[0]->get("identifier"));
-	$layout->integer("paginateAfter",WebGUI::International::get(14,$_[0]->get("namespace")),$paginateAfter);
-	$layout->yesNo("convertCarriageReturns",WebGUI::International::get(13,$_[0]->get("namespace")),$_[0]->get("convertCarriageReturns"));
-	$output .= $_[0]->SUPER::www_edit(
+	$properties->yesNo(
+		-name=>"preprocessMacros",
+		-label=>WebGUI::International::get(15,$_[0]->get("namespace")),
+		-value=>$_[0]->getValue("preprocessMacros")
+		);
+        $properties->yesNo(
+		-name=>"debugMode",
+		-label=>WebGUI::International::get(16,$_[0]->get("namespace")),
+		-value=>$_[0]->getValue("debugMode")
+		);
+	$properties->textarea(
+		-name=>"dbQuery",
+		-label=>WebGUI::International::get(4,$_[0]->get("namespace")),
+		-value=>$_[0]->getValue("dbQuery")
+		);
+       	$layout->textarea(
+		-name=>"template",
+		-label=>WebGUI::International::get(3,$_[0]->get("namespace")),
+		-value=>$_[0]->getValue("template")
+		);        
+        $privileges->text(
+		-name=>"DSN",
+		-label=>WebGUI::International::get(5,$_[0]->get("namespace")),
+		-value=>$_[0]->getValue("DSN")
+		);
+	$privileges->text(
+		-name=>"username",
+		-label=>WebGUI::International::get(6,$_[0]->get("namespace")),
+		-value=>$_[0]->getValue("username")
+		);
+	$privileges->password(
+		-name=>"identifier",
+		-label=>WebGUI::International::get(7,$_[0]->get("namespace")),
+		-value=>$_[0]->getValue("identifier")
+		);
+	$layout->integer(
+		-name=>"paginateAfter",
+		-label=>WebGUI::International::get(14,$_[0]->get("namespace")),
+		-value=>$_[0]->getValue("paginateAfter")
+		);
+	$layout->yesNo(
+		-name=>"convertCarriageReturns",
+		-label=>WebGUI::International::get(13,$_[0]->get("namespace")),
+		-value=>$_[0]->getValue("convertCarriageReturns")
+		);
+	return $_[0]->SUPER::www_edit(
 		-layout=>$layout->printRowsOnly,
 		-properties=>$properties->printRowsOnly,
-		-privileges=>$privileges->printRowsOnly
+		-privileges=>$privileges->printRowsOnly,
+		-headingId=>8,
+		-helpId=>1
 		);
-        return $output;
 }
 
-#-------------------------------------------------------------------
-sub www_editSave {
-	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
-	$_[0]->SUPER::www_editSave({
-		template=>$session{form}{template},
-		dbQuery=>$session{form}{dbQuery},
-		convertCarriageReturns=>$session{form}{convertCarriageReturns},
-		DSN=>$session{form}{DSN},
-		username=>$session{form}{username},
-		identifier=>$session{form}{identifier},
-		paginateAfter=>$session{form}{paginateAfter},
-		preprocessMacros=>$session{form}{preprocessMacros},
-		debugMode=>$session{form}{debugMode}
-		});
-        return "";
-}
 
 #-------------------------------------------------------------------
 sub www_view {

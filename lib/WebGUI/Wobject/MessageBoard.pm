@@ -27,16 +27,6 @@ use WebGUI::Wobject;
 
 our @ISA = qw(WebGUI::Wobject);
 
-#-------------------------------------------------------------------
-sub duplicate {
-        my ($w);
-	$w = $_[0]->SUPER::duplicate($_[1]);
-        $w = WebGUI::Wobject::MessageBoard->new({wobjectId=>$w,namespace=>$_[0]->get("namespace")});
-        $w->set({
-		messagesPerPage=>$_[0]->get("messagesPerPage"),
-		templateId=>$_[0]->get("templateId")
-		});
-}
 
 #-------------------------------------------------------------------
 sub name {
@@ -48,15 +38,17 @@ sub new {
         my $class = shift;
         my $property = shift;
         my $self = WebGUI::Wobject->new(
-                $property,
-                [qw(templateId messagesPerPage)]
+                -properties=>$property,
+                -extendedProperties=>{
+			templateId=>{
+				defaultValue=>1
+				},
+			messagesPerPage=>{
+				defaultValue=>50
+				}
+			}
                 );
         bless $self, $class;
-}
-
-#-------------------------------------------------------------------
-sub set {
-        $_[0]->SUPER::set($_[1],[qw(templateId messagesPerPage)]);
 }
 
 #-------------------------------------------------------------------
@@ -72,37 +64,29 @@ sub status {
 
 #-------------------------------------------------------------------
 sub www_edit {
-	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
-	my $messagesPerPage = $_[0]->get("messagesPerPage") || 50;
-        my $output = helpIcon(1,$_[0]->get("namespace"));
-	$output .= '<h1>'.WebGUI::International::get(6,$_[0]->get("namespace")).'</h1>';
 	my $properties = WebGUI::HTMLForm->new;
 	my $layout = WebGUI::HTMLForm->new;
-        $layout->integer("messagesPerPage",WebGUI::International::get(4,$_[0]->get("namespace")),$messagesPerPage);
+        $layout->integer(
+		-name=>"messagesPerPage",
+		-label=>WebGUI::International::get(4,$_[0]->get("namespace")),
+		-value=>$_[0]->getValue("messagesPerPage")
+		);
 	$layout->template(
                 -name=>"templateId",
-                -value=>$_[0]->get("templateId"),
+                -value=>$_[0]->getValue("templateId"),
                 -namespace=>$_[0]->get("namespace"),
                 -label=>WebGUI::International::get(72,$_[0]->get("namespace")),
                 -afterEdit=>'func=edit&wid='.$_[0]->get("wobjectId")
                 );
 	$properties->raw($_[0]->SUPER::discussionProperties);
-	$output .= $_[0]->SUPER::www_edit(
+	return $_[0]->SUPER::www_edit(
 		-layout=>$layout->printRowsOnly,
-		-properties=>$properties->printRowsOnly
+		-properties=>$properties->printRowsOnly,
+		-headingId=>6,
+		-helpId=>1
 		);
-        return $output;
 }
 
-#-------------------------------------------------------------------
-sub www_editSave {
-	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
-	$_[0]->SUPER::www_editSave({
-		messagesPerPage=>$session{form}{messagesPerPage},
-		templateId=>$session{form}{templateId}
-		});
-        return "";
-}
 
 #-------------------------------------------------------------------
 sub www_showMessage {

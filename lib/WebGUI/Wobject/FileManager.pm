@@ -42,21 +42,16 @@ sub duplicate {
         my ($file, $w, %row, $sth, $newDownloadId);
 	tie %row, 'Tie::CPHash';
         $w = $_[0]->SUPER::duplicate($_[1]);
-        $w = WebGUI::Wobject::FileManager->new({wobjectId=>$w,namespace=>$_[0]->get("namespace")});
-        $w->set({
-		paginateAfter=>$_[0]->get("paginateAfter"),
-		templateId=>$_[0]->get("templateId")
-		});
         $sth = WebGUI::SQL->read("select * from FileManager_file where wobjectId=".$_[0]->get("wobjectId"));
         while (%row = $sth->hash) {
                 $newDownloadId = getNextId("FileManager_fileId");
 		$file = WebGUI::Attachment->new($row{downloadFile},$_[0]->get("wobjectId"),$row{FileManager_fileId});
-		$file->copy($w->get("wobjectId"),$newDownloadId);
+		$file->copy($w,$newDownloadId);
                 $file = WebGUI::Attachment->new($row{alternateVersion1},$_[0]->get("wobjectId"),$row{FileManager_fileId});
-                $file->copy($w->get("wobjectId"),$newDownloadId);
+                $file->copy($w,$newDownloadId);
                 $file = WebGUI::Attachment->new($row{alternateVersion2},$_[0]->get("wobjectId"),$row{FileManager_fileId});
-                $file->copy($w->get("wobjectId"),$newDownloadId);
-                WebGUI::SQL->write("insert into FileManager_file values ($newDownloadId, ".$w->get("wobjectId").", ".
+                $file->copy($w,$newDownloadId);
+                WebGUI::SQL->write("insert into FileManager_file values ($newDownloadId, ".$w.", ".
 			quote($row{fileTitle}).", ".quote($row{downloadFile}).", $row{groupToView}, ".
 			quote($row{briefSynopsis}).", $row{dateUploaded}, $row{sequenceNumber}, ".
 			quote($row{alternateVersion1}).", ".quote($row{alternateVersion2}).")");
@@ -74,15 +69,17 @@ sub new {
         my $class = shift;
         my $property = shift;
         my $self = WebGUI::Wobject->new(
-                $property,
-                [qw(paginateAfter templateId)]
+                -properties=>$property,
+                -extendedProperties=>{
+			paginateAfter=>{
+				defaultValue=>50,
+				},
+			templateId=>{
+				defaultValue=>1
+				}
+			}
                 );
         bless $self, $class;
-}
-
-#-------------------------------------------------------------------
-sub set {
-        $_[0]->SUPER::set($_[1],[qw(paginateAfter templateId)]);
 }
 
 #-------------------------------------------------------------------
@@ -144,23 +141,19 @@ sub www_download {
 
 #-------------------------------------------------------------------
 sub www_edit {
-	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
-        my ($output, $paginateAfter, $proceed);
-        if ($_[0]->get("wobjectId") eq "new") {
-                $proceed = 1;
-        }
-        $output .= helpIcon(1,$_[0]->get("namespace"));
-        $output .= '<h1>'.WebGUI::International::get(9,$_[0]->get("namespace")).'</h1>';
-	$paginateAfter = $_[0]->get("paginateAfter") || 50;
 	my $properties = WebGUI::HTMLForm->new;
 	my $layout = WebGUI::HTMLForm->new;
 	$layout->template(
                 -name=>"templateId",
-                -value=>$_[0]->get("templateId"),
+                -value=>$_[0]->getValue("templateId"),
                 -namespace=>$_[0]->get("namespace"),
                 -afterEdit=>'func=edit&wid='.$_[0]->get("wobjectId")
                 );
-	$layout->integer("paginateAfter",WebGUI::International::get(20,$_[0]->get("namespace")),$paginateAfter);
+	$layout->integer(
+		-name=>"paginateAfter",
+		-label=>WebGUI::International::get(20,$_[0]->get("namespace")),
+		-value=>$_[0]->getValue("paginateAfter")
+		);
 	if ($_[0]->get("wobjectId") eq "new") {
                 $properties->whatNext(
                         -options=>{
@@ -170,20 +163,18 @@ sub www_edit {
                         -value=>"addFile"
                         );
         }
-	$output .= $_[0]->SUPER::www_edit(
+	return $_[0]->SUPER::www_edit(
 		-properties=>$properties->printRowsOnly,
 		-layout=>$layout->printRowsOnly
+		-headingId=>9,
+		-helpId=>1
 		);
-        return $output;
 }
 
 #-------------------------------------------------------------------
 sub www_editSave {
 	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
-	$_[0]->SUPER::www_editSave({
-		paginateAfter=>$session{form}{paginateAfter},
-		templateId=>$session{form}{templateId}
-		});
+	$_[0]->SUPER::www_editSave();
         if ($session{form}{proceed} eq "addFile") {
 		$session{form}{did} = "new";
                 return $_[0]->www_editDownload();

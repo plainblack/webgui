@@ -26,30 +26,12 @@ use WebGUI::Wobject;
 
 our @ISA = qw(WebGUI::Wobject);
 
-our @fields = qw(width fromField fromStatus toField toStatus
-	ccField ccStatus bccField bccStatus subjectField subjectStatus acknowledgement storeEntries);
-
 #-------------------------------------------------------------------
 sub duplicate {
 	my ($w, %data, $sth);
 	tie %data, 'Tie::CPHash';
 	$w = $_[0]->SUPER::duplicate($_[1]);
 	$w = WebGUI::Wobject::MailForm->new({wobjectId=>$w,namespace=>$_[0]->get("namespace")});
-	$w->set({
-		width=>$_[0]->get("width"),
-        	fromField=>$_[0]->get("fromField"),
-        	fromStatus=>$_[0]->get("fromStatus"),
-        	toField=>$_[0]->get("toField"),
-        	toStatus=>$_[0]->get("toStatus"),
-        	ccField=>$_[0]->get("ccField"),
-        	ccStatus=>$_[0]->get("ccStatus"),
-        	bccField=>$_[0]->get("bccField"),
-        	bccStatus=>$_[0]->get("bccStatus"),
-        	subjectField=>$_[0]->get("subjectField"),
-        	subjectStatus=>$_[0]->get("subjectStatus"),		
-		acknowledgement=>$_[0]->get("acknowledgement"),
-		storeEntries=>$_[0]->get("storeEntries"),
-		});
 	$sth = WebGUI::SQL->read("select * from MailForm_field where wobjectId=".$_[0]->get("wobjectId"));
     	while (%data = $sth->hash) {
 		$data{MailForm_fieldId} = "new";
@@ -68,8 +50,38 @@ sub new {
         my $class = shift;
         my $property = shift;
         my $self = WebGUI::Wobject->new(
-                $property,
-                \@fields
+                -properties=>$property,
+		-extendedProperties=>{
+			width=>{
+				defaultValue=>45
+				},
+			fromField=>{},
+			fromStatus=>{
+				defaultValue=>3
+				},
+			toField=>{
+				defaultValue=>$session{setting}{companyEmail}
+				},
+			toStatus=>{
+				defaultValue=>1
+				},
+			ccField=>{},
+			ccStatus=>{
+				defaultValue=>1
+				},
+			bccField=>{},
+			bccStatus=>{
+				defaultValue=>1
+				},
+			subjectField=>{},
+			subjectStatus=>{
+				defaultValue=>3
+				},
+			acknowledgement=>{},
+			storeEntries=>{
+				defaultValue=>1
+				}
+			}
                 );
         bless $self, $class;
 }
@@ -104,67 +116,91 @@ sub www_deleteFieldConfirm {
 
 #-------------------------------------------------------------------
 sub www_edit {
-	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
-	my ($output, $f, $proceed);
 	my %fieldStatus = ( 1 => WebGUI::International::get(4, $_[0]->get("namespace")),
 		2 => WebGUI::International::get(5, $_[0]->get("namespace")),
 		3 => WebGUI::International::get(6, $_[0]->get("namespace")) );
-        # field defaults
-        my %data = (
-            width => 45,
-            fromField => '',
-            fromStatus => 3,
-            toField => $session{setting}{companyEmail},
-            toStatus => 1,
-            ccField => '',
-            ccStatus => 1,
-            bccField => '',
-            bccStatus => 1,
-            subjectField => WebGUI::International::get(2, $_[0]->get("namespace")),
-            subjectStatus => 3,
-            acknowledgement => WebGUI::International::get(3, $_[0]->get("namespace")),
-            storeEntries => 1,
-        );
-        # initialize fields from existing data, if any
-        foreach my $field (@fields) {
-            $data{$field} = $_[0]->get($field) if ($_[0]->get($field));
-        }
-        if ($_[0]->get("wobjectId") eq "new") {
-            $proceed = 1;
-        }
-	$output = helpIcon(1,$_[0]->get("namespace"));
-	$output .= '<h1>'.WebGUI::International::get(7, $_[0]->get("namespace")).'</h1>';
-	$f = WebGUI::HTMLForm->new;
-	$f->integer("width",WebGUI::International::get(8, $_[0]->get("namespace")),$_[0]->get("width") || 45);
-        $f->raw( $_[0]->_textSelectRow("fromField",WebGUI::International::get(10, $_[0]->get("namespace")),$data{fromField},128,
-            "fromStatus",\%fieldStatus,$data{fromStatus}) );
-        $f->raw( $_[0]->_textSelectRow("toField",WebGUI::International::get(11, $_[0]->get("namespace")),$data{toField},128,
-            "toStatus",\%fieldStatus,$data{toStatus}) );
-        $f->raw( $_[0]->_textSelectRow("ccField",WebGUI::International::get(12, $_[0]->get("namespace")),$data{ccField},128,
-            "ccStatus",\%fieldStatus,$data{ccStatus}) );
-        $f->raw( $_[0]->_textSelectRow("bccField",WebGUI::International::get(13, $_[0]->get("namespace")),$data{bccField},128,
-            "bccStatus",\%fieldStatus,$data{bccStatus}) );
-        $f->raw( $_[0]->_textSelectRow("subjectField",WebGUI::International::get(14, $_[0]->get("namespace")),$data{subjectField},128,
-            "subjectStatus",\%fieldStatus,$data{subjectStatus}) );		
-	$f->HTMLArea("acknowledgement",WebGUI::International::get(16, $_[0]->get("namespace")),$_[0]->get("acknowledgement") || WebGUI::International::get(3, $_[0]->get("namespace")));
-	$f->yesNo("storeEntries",WebGUI::International::get(26,$_[0]->get("namespace")),[ $data{storeEntries} ]);
-	$f->yesNo("proceed",WebGUI::International::get(15,$_[0]->get("namespace")),$proceed);
-	$output .= $_[0]->SUPER::www_edit($f->printRowsOnly);
-	return $output;
+        my $proceed = 1 if ($_[0]->get("wobjectId") eq "new");
+	my $f = WebGUI::HTMLForm->new;
+	$f->integer(
+		-name=>"width",
+		-label=>WebGUI::International::get(8, $_[0]->get("namespace")),
+		-value=>$_[0]->getValue("width")
+		);
+        $f->raw( $_[0]->_textSelectRow( 
+		"fromField",
+		WebGUI::International::get(10, $_[0]->get("namespace")),
+		$_[0]->getValue("fromField"),
+		128,
+            	"fromStatus",
+		\%fieldStatus,
+		$_[0]->getValue("fromStatus")
+		) );
+        $f->raw( $_[0]->_textSelectRow(
+		"toField",
+		WebGUI::International::get(11, $_[0]->get("namespace")),
+		$_[0]->getValue("toField"),
+		128,
+            	"toStatus",
+		\%fieldStatus,
+		$_[0]->getValue("toStatus")
+		) );
+        $f->raw( $_[0]->_textSelectRow(
+		"ccField",
+		WebGUI::International::get(12, $_[0]->get("namespace")),
+		$_[0]->getValue("ccField"),
+		128,
+            	"ccStatus",
+		\%fieldStatus,
+		$_[0]->getValue("ccStatus")
+		) );
+        $f->raw( $_[0]->_textSelectRow(
+		"bccField",
+		WebGUI::International::get(13, $_[0]->get("namespace")),
+		$_[0]->getValue("bccField"),
+		128,
+            	"bccStatus",
+		\%fieldStatus,
+		$_[0]->getValue("bccStatus")
+		) );
+        $f->raw( $_[0]->_textSelectRow(
+		"subjectField",
+		WebGUI::International::get(14, $_[0]->get("namespace")),
+		($_[0]->get("subjectField") || WebGUI::International::get(2, $_[0]->get("namespace"))),
+		128,
+            	"subjectStatus",
+		\%fieldStatus,
+		$_[0]->getValue("subjectStatus")
+		) );		
+	$f->HTMLArea(
+		-name=>"acknowledgement",
+		-label=>WebGUI::International::get(16, $_[0]->get("namespace")),
+		-value=>($_[0]->get("acknowledgement") || WebGUI::International::get(3, $_[0]->get("namespace")))
+		);
+	$f->yesNo(
+		-name=>"storeEntries",
+		-label=>WebGUI::International::get(26,$_[0]->get("namespace")),
+		-value=>[ $_[0]->getValue("storeEntries") ]
+		);
+	$f->yesNo(
+		-name=>"proceed",
+		-label=>WebGUI::International::get(15,$_[0]->get("namespace")),
+		-label=>$proceed
+		);
+	return $_[0]->SUPER::www_edit(
+		-properties=>$f->printRowsOnly,
+		-helpId=>1,
+		-headingId=>7
+		);
 }
 
 #-------------------------------------------------------------------
 sub www_editSave {
 	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
-	my ($property);
-	foreach my $field (@fields) {
-		$property->{$field} = $session{form}{$field};
-	}
-	$_[0]->SUPER::www_editSave($property);
+	$_[0]->SUPER::www_editSave();
         if ($session{form}{proceed}) {
-            return $_[0]->www_editField();
+            	return $_[0]->www_editField();
         } else {
-            return "";
+            	return "";
         }
 }
 
