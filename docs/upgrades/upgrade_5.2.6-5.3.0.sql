@@ -1480,10 +1480,6 @@ delete from international where languageId=13 and namespace='Survey' and interna
 insert into international (internationalId,languageId,namespace,message,lastUpdated) values (14,13,'Survey','Kysymys', 1037710227);
 delete from international where languageId=13 and namespace='Survey' and internationalId=11;
 insert into international (internationalId,languageId,namespace,message,lastUpdated) values (11,13,'Survey','Tila', 1037710192);
-delete from international where languageId=13 and namespace='PhotoGallery' and internationalId=4;
-insert into international (internationalId,languageId,namespace,message,lastUpdated) values (4,13,'PhotoGallery','Kuvan järjestys', 1037710144);
-delete from international where languageId=13 and namespace='PhotoGallery' and internationalId=12;
-insert into international (internationalId,languageId,namespace,message,lastUpdated) values (12,13,'PhotoGallery','Jatka kuvien lisäämistä.', 1037710098);
 delete from international where languageId=13 and namespace='WebGUI' and internationalId=598;
 insert into international (internationalId,languageId,namespace,message,lastUpdated) values (598,13,'WebGUI','Muokkaa käännöstä.', 1037709738);
 delete from international where languageId=13 and namespace='WebGUI' and internationalId=718;
@@ -1594,42 +1590,6 @@ delete from international where languageId=13 and namespace='Poll' and internati
 insert into international (internationalId,languageId,namespace,message,lastUpdated) values (71,13,'Poll','', 1036527902);
 delete from international where languageId=13 and namespace='WebGUI' and internationalId=719;
 insert into international (internationalId,languageId,namespace,message,lastUpdated) values (719,13,'WebGUI','Vanhentunut', 1036527514);
-delete from international where languageId=13 and namespace='PhotoGallery' and internationalId=23;
-insert into international (internationalId,languageId,namespace,message,lastUpdated) values (23,13,'PhotoGallery','Suosituimmuus', 1036527473);
-delete from international where languageId=13 and namespace='PhotoGallery' and internationalId=21;
-insert into international (internationalId,languageId,namespace,message,lastUpdated) values (21,13,'PhotoGallery','Näytä kuvan tiedot', 1036527452);
-delete from international where languageId=13 and namespace='PhotoGallery' and internationalId=20;
-insert into international (internationalId,languageId,namespace,message,lastUpdated) values (20,13,'PhotoGallery','Kuvien väli', 1036527438);
-delete from international where languageId=13 and namespace='PhotoGallery' and internationalId=2;
-insert into international (internationalId,languageId,namespace,message,lastUpdated) values (2,13,'PhotoGallery','Lisää kuva', 1036527423);
-delete from international where languageId=13 and namespace='PhotoGallery' and internationalId=19;
-insert into international (internationalId,languageId,namespace,message,lastUpdated) values (19,13,'PhotoGallery','Tallenna kuva', 1036527410);
-delete from international where languageId=13 and namespace='PhotoGallery' and internationalId=18;
-insert into international (internationalId,languageId,namespace,message,lastUpdated) values (18,13,'PhotoGallery','Kuvateksti', 1036527398);
-delete from international where languageId=13 and namespace='PhotoGallery' and internationalId=16;
-insert into international (internationalId,languageId,namespace,message,lastUpdated) values (16,13,'PhotoGallery','Pikkukuvan korkeus', 1036527376);
-delete from international where languageId=13 and namespace='PhotoGallery' and internationalId=15;
-insert into international (internationalId,languageId,namespace,message,lastUpdated) values (15,13,'PhotoGallery','Pikkukuvan leveys', 1036527365);
-delete from international where languageId=13 and namespace='PhotoGallery' and internationalId=14;
-insert into international (internationalId,languageId,namespace,message,lastUpdated) values (14,13,'PhotoGallery','Kuvan nimi', 1036527353);
-delete from international where languageId=13 and namespace='PhotoGallery' and internationalId=13;
-insert into international (internationalId,languageId,namespace,message,lastUpdated) values (13,13,'PhotoGallery','Kuva', 1036527342);
-delete from international where languageId=13 and namespace='PhotoGallery' and internationalId=22;
-insert into international (internationalId,languageId,namespace,message,lastUpdated) values (22,13,'PhotoGallery','Järjestys lisätty', 1036497044);
-delete from international where languageId=13 and namespace='PhotoGallery' and internationalId=24;
-insert into international (internationalId,languageId,namespace,message,lastUpdated) values (24,13,'PhotoGallery','Tallennuspäivä', 1036497025);
-delete from international where languageId=13 and namespace='PhotoGallery' and internationalId=25;
-insert into international (internationalId,languageId,namespace,message,lastUpdated) values (25,13,'PhotoGallery','Kuvan nimi', 1036497011);
-delete from international where languageId=13 and namespace='PhotoGallery' and internationalId=3;
-insert into international (internationalId,languageId,namespace,message,lastUpdated) values (3,13,'PhotoGallery','Tallenna kuva', 1036496997);
-delete from international where languageId=13 and namespace='PhotoGallery' and internationalId=5;
-insert into international (internationalId,languageId,namespace,message,lastUpdated) values (5,13,'PhotoGallery','Uusi', 1036496978);
-delete from international where languageId=13 and namespace='PhotoGallery' and internationalId=6;
-insert into international (internationalId,languageId,namespace,message,lastUpdated) values (6,13,'PhotoGallery','Muokkaa', 1036496971);
-delete from international where languageId=13 and namespace='PhotoGallery' and internationalId=7;
-insert into international (internationalId,languageId,namespace,message,lastUpdated) values (7,13,'PhotoGallery','Pikkukuvia rivillä', 1036496963);
-delete from international where languageId=13 and namespace='PhotoGallery' and internationalId=8;
-insert into international (internationalId,languageId,namespace,message,lastUpdated) values (8,13,'PhotoGallery','Ryhmä, jolla tallennusoikeus', 1036496922);
 delete from international where languageId=13 and namespace='WebGUI' and internationalId=720;
 insert into international (internationalId,languageId,namespace,message,lastUpdated) values (720,13,'WebGUI','OK', 1036496844);
 delete from international where languageId=13 and namespace='WebGUI' and internationalId=724;
@@ -1640,8 +1600,6 @@ delete from international where languageId=13 and namespace='Auth/WebGUI' and in
 insert into international (internationalId,languageId,namespace,message,lastUpdated) values (4,13,'Auth/WebGUI','Salasanaa ei voi jättää tyhjäksi.', 1036496729);
 delete from international where languageId=13 and namespace='Auth/WebGUI' and internationalId=5;
 insert into international (internationalId,languageId,namespace,message,lastUpdated) values (5,13,'Auth/WebGUI','Salasana ei voi olla "password".', 1036496691);
-delete from international where languageId=13 and namespace='PhotoGallery' and internationalId=1;
-insert into international (internationalId,languageId,namespace,message,lastUpdated) values (1,13,'PhotoGallery','Kuvagalleria', 1036496620);
 delete from international where languageId=13 and namespace='Poll' and internationalId=12;
 insert into international (internationalId,languageId,namespace,message,lastUpdated) values (12,13,'Poll','Äänia annettu:', 1035450220);
 delete from international where languageId=13 and namespace='MessageBoard' and internationalId=9;
@@ -2872,5 +2830,41 @@ delete from international where languageId=13 and namespace='WebGUI' and interna
 insert into international (internationalId,languageId,namespace,message,lastUpdated) values (87,13,'WebGUI','Muokkaa ryhmää', 1032541166);
 delete from international where languageId=13 and namespace='WebGUI' and internationalId=99;
 insert into international (internationalId,languageId,namespace,message,lastUpdated) values (99,13,'WebGUI','Otsikko', 1032541149);
+delete from international where languageId=13 and namespace='Product' and internationalId=61;
+delete from international where languageId=13 and namespace='USS' and internationalId=72;
+delete from international where languageId=13 and namespace='WebGUI' and internationalId=466;
+delete from international where languageId=13 and namespace='WebGUI' and internationalId=467;
+delete from international where languageId=13 and namespace='WebGUI' and internationalId=468;
+delete from international where languageId=13 and namespace='WebGUI' and internationalId=471;
+delete from international where languageId=13 and namespace='WebGUI' and internationalId=473;
+delete from international where languageId=13 and namespace='WebGUI' and internationalId=474;
+delete from international where languageId=13 and namespace='WebGUI' and internationalId=489;
+delete from international where languageId=13 and namespace='WebGUI' and internationalId=490;
+delete from international where languageId=13 and namespace='WebGUI' and internationalId=491;
+delete from international where languageId=13 and namespace='WebGUI' and internationalId=787;
+delete from international where languageId=13 and namespace='WebGUI' and internationalId=788;
+delete from international where languageId=13 and namespace='WebGUI' and internationalId=789;
+delete from international where languageId=13 and namespace='WebGUI' and internationalId=790;
+delete from international where languageId=13 and namespace='EventsCalendar' and internationalId=79;
+delete from international where languageId=13 and namespace='FAQ' and internationalId=74;
+delete from international where languageId=13 and namespace='Item' and internationalId=72;
+delete from international where namespace='DataForm' and languageId=13;
+update international set namespace='DataForm' where namespace='MailForm';
+delete from international where languageId=8 and namespace='WebGUI' and internationalId=524;
+delete from international where languageId=8 and namespace='Article' and internationalId=18;
+delete from international where languageId=21 and namespace='WebGUI' and internationalId=4200;
+delete from international where languageId=13 and namespace='DataForm' and internationalId=15;
+delete from international where languageId=13 and namespace='DataForm' and internationalId=26;
+delete from international where languageId=13 and namespace='DataForm' and internationalId=29;
+delete from international where languageId=13 and namespace='DataForm' and internationalId=30;
+delete from international where languageId=13 and namespace='DataForm' and internationalId=31;
+delete from international where languageId=13 and namespace='DataForm' and internationalId=32;
+delete from international where languageId=13 and namespace='DataForm' and internationalId=9;
+delete from international where languageId=13 and namespace='MessageBoard' and internationalId=72;
+
+
+
+
+
 
 

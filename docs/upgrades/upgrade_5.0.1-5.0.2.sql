@@ -685,8 +685,6 @@ insert into international (internationalId,languageId,namespace,message,lastUpda
 delete from international where languageId=2 and namespace='Product' and internationalId=39;
 insert into international (internationalId,languageId,namespace,message,lastUpdated) values (39,2,'Product','WebGUI enthält eine Produktverwaltung, mit dem Sie Produkte und Services schnell \r\nund einfach zu Ihrer Seite hinzufügen können. \r\n<P><b>Template</b><BR>Wählen Sie ein Layout für dieses Produkt. \r\n<P><b>Preis</b><BR>Hier können Sie einen Preis für dieses Produkt eingeben. \r\nSie können aber auch einen&nbsp;Text angeben, wie &quot;Rufen Sie uns an, wenn \r\nSie den Preis erfahren möchten&quot; oder lassen Sie dieses Feld einfach leer. \r\n<P><b>Produkt Nummer</b><BR>Die Produkt Nummber, SKU, ISBN oder ähnliches für \r\ndieses Produkt. \r\n<P><b>Produkt Grafik 1</b><BR>Eine Grafik für dieses  Produkt. \r\n<P><b>Produkt Grafik 2</b><BR>Eine weitere Grafik für dieses Produkt. \r\n<P><b>Produkt Grafik 3</b><BR>Eine dritte Grafik für dieses Produkt. \r\n<P><b>Prospekt/Broschüre</b><BR>Ein Prospekt oder eine Broschüre für dieses Produkt. \r\n<P><b>Handbuch</b><BR>Das !
  Produkt-, Benutzer oder Servicehandbuch  für dieses \r\nProdukt. \r\n<P><b>Garantie</b><BR>Die Garantie für dieses Produkt. </P>', 1041612070);
-delete from international where languageId=2 and namespace='PhotoGallery' and internationalId=10;
-insert into international (internationalId,languageId,namespace,message,lastUpdated) values (10,2,'PhotoGallery','Aktivieren Sie dies, um alle hochgeladenen Fotos zur Photo Gallery hinzuzufügen.', 1041611543);
 delete from international where languageId=2 and namespace='WebGUI' and internationalId=699;
 insert into international (internationalId,languageId,namespace,message,lastUpdated) values (699,2,'WebGUI','Erster Tag der Woche', 1041611488);
 delete from international where languageId=2 and namespace='WebGUI' and internationalId=336;
@@ -805,22 +803,6 @@ insert into international (internationalId,languageId,namespace,message,lastUpda
  er Diskussion verfassen kann.<P> <b>Timeout \r\nzum Bearbeiten</b><BR>Wie lange hat der Benutzer die Möglichkeit, seinen verfassten Beitrag zu \r\nbearbeiten, bevor diese Bearbeitungsmöglichkeit gesperrt wird? \r\n<P><I>Beachten Sie:</I> Setzen Sie das Limit nicht zu hoch!. Das schönste an \r\nDiskussionen ist doch, dass diese einen genauen Verlauf darstellen, wer was wann \r\ngesagt hat. Wenn Sie das Bearbeiten zu lange ermöglichen, kann jeder Benutzer \r\nseine Meinung beliebig oft korrigieren oder abändern ...  \r\n</P><P><b>Karma pro Beitrag</b><BR>Wie viel Karma erhält ein Benutzer, wenn er Beiträge zu dieser Diskussion \r\nverfasst?<P><b>Wer kann moderieren?</b><BR>Wählen Sie die Gruppe aus, die die Berechtigung hat, diese Diskussion zu \r\nmoderieren. <P><b>Moderationsart?</b><BR>Sie können hier auswählen, welche Moderationsart \r\nSie bevorzugen. \r\n<UL>\r\n<LI>\'Sofort\'<I> </I>bedeutet, dass der Beitrag sofort veröffentlicht wird, \r\nnachdem der Benutzer ihn ver!
  fasst hat. \r\n<LI>\'Freigeben\' bedeutet, dass der Moderator den Beit
 rag zuerst anschauen und \r\nfreigeben muss, bevor er für alle sichtbar wird.</LI></UL><P>Benachrichtigungen über den Eingang neuer Beiträge/Kommentare erscheinen \r\nsofort im Posteingang des Moderators. </P>\r\n<P><I>Beachten Sie:</I> Bei beiden Moderationsarten hat der Moderator immer das \r\nRecht, die Beiträge Ihrer Besucher/Benutzer zu bearbeiten oder sogar zu \r\nlöschen.</P>', 1041609016);
-delete from international where languageId=2 and namespace='PhotoGallery' and internationalId=23;
-insert into international (internationalId,languageId,namespace,message,lastUpdated) values (23,2,'PhotoGallery','Beliebtheit', 1041608123);
-delete from international where languageId=2 and namespace='PhotoGallery' and internationalId=22;
-insert into international (internationalId,languageId,namespace,message,lastUpdated) values (22,2,'PhotoGallery','Reihenfolge hinzugefügt', 1041608098);
-delete from international where languageId=2 and namespace='PhotoGallery' and internationalId=20;
-insert into international (internationalId,languageId,namespace,message,lastUpdated) values (20,2,'PhotoGallery','Abstand zwischen Grafiken', 1041608080);
-delete from international where languageId=2 and namespace='PhotoGallery' and internationalId=17;
-insert into international (internationalId,languageId,namespace,message,lastUpdated) values (17,2,'PhotoGallery','Trennlinie', 1041608063);
-delete from international where languageId=2 and namespace='PhotoGallery' and internationalId=14;
-insert into international (internationalId,languageId,namespace,message,lastUpdated) values (14,2,'PhotoGallery','Grafikname', 1041608051);
-delete from international where languageId=2 and namespace='PhotoGallery' and internationalId=12;
-insert into international (internationalId,languageId,namespace,message,lastUpdated) values (12,2,'PhotoGallery','Weitere Grafiken hinzufügen', 1041608037);
-delete from international where languageId=2 and namespace='PhotoGallery' and internationalId=26;
-insert into international (internationalId,languageId,namespace,message,lastUpdated) values (26,2,'PhotoGallery','Titel Trennlinie', 1041608013);
-delete from international where languageId=2 and namespace='PhotoGallery' and internationalId=11;
-insert into international (internationalId,languageId,namespace,message,lastUpdated) values (11,2,'PhotoGallery','Trennlinie als Mouse Over Text darstellen', 1041607991);
 delete from international where languageId=2 and namespace='WebGUI' and internationalId=143;
 insert into international (internationalId,languageId,namespace,message,lastUpdated) values (143,2,'WebGUI','Einstellungen verwalten', 1041607865);
 delete from international where languageId=2 and namespace='WebGUI' and internationalId=142;
@@ -871,38 +853,6 @@ delete from international where languageId=2 and namespace='WebGUI' and internat
 insert into international (internationalId,languageId,namespace,message,lastUpdated) values (567,2,'WebGUI','Freigeben', 1041607147);
 delete from international where languageId=2 and namespace='WebGUI' and internationalId=568;
 insert into international (internationalId,languageId,namespace,message,lastUpdated) values (568,2,'WebGUI','Sofort', 1041606979);
-delete from international where languageId=2 and namespace='PhotoGallery' and internationalId=16;
-insert into international (internationalId,languageId,namespace,message,lastUpdated) values (16,2,'PhotoGallery','Höhe der Vorschaubildes (Thumbnail)', 1041605836);
-delete from international where languageId=2 and namespace='PhotoGallery' and internationalId=19;
-insert into international (internationalId,languageId,namespace,message,lastUpdated) values (19,2,'PhotoGallery','Grafik Upload', 1041605781);
-delete from international where languageId=2 and namespace='PhotoGallery' and internationalId=13;
-insert into international (internationalId,languageId,namespace,message,lastUpdated) values (13,2,'PhotoGallery','Grafik', 1041605751);
-delete from international where languageId=2 and namespace='PhotoGallery' and internationalId=15;
-insert into international (internationalId,languageId,namespace,message,lastUpdated) values (15,2,'PhotoGallery','Breite des Vorschaubilds (Thumbnail)', 1041605739);
-delete from international where languageId=2 and namespace='PhotoGallery' and internationalId=21;
-insert into international (internationalId,languageId,namespace,message,lastUpdated) values (21,2,'PhotoGallery','Informationen zur Grafik anzeigen', 1041604849);
-delete from international where languageId=2 and namespace='PhotoGallery' and internationalId=24;
-insert into international (internationalId,languageId,namespace,message,lastUpdated) values (24,2,'PhotoGallery','Upload Datum', 1041604825);
-delete from international where languageId=2 and namespace='PhotoGallery' and internationalId=6;
-insert into international (internationalId,languageId,namespace,message,lastUpdated) values (6,2,'PhotoGallery','Bearbeiten', 1041604797);
-delete from international where languageId=2 and namespace='PhotoGallery' and internationalId=7;
-insert into international (internationalId,languageId,namespace,message,lastUpdated) values (7,2,'PhotoGallery','Vorschaubilder (Thumbnails) pro Reihe', 1041604785);
-delete from international where languageId=2 and namespace='PhotoGallery' and internationalId=8;
-insert into international (internationalId,languageId,namespace,message,lastUpdated) values (8,2,'PhotoGallery','Gruppe mit Berechtigung zum Upload', 1041604721);
-delete from international where languageId=2 and namespace='PhotoGallery' and internationalId=5;
-insert into international (internationalId,languageId,namespace,message,lastUpdated) values (5,2,'PhotoGallery','Neu', 1041604680);
-delete from international where languageId=2 and namespace='PhotoGallery' and internationalId=25;
-insert into international (internationalId,languageId,namespace,message,lastUpdated) values (25,2,'PhotoGallery','Name der Grafik', 1041604668);
-delete from international where languageId=2 and namespace='PhotoGallery' and internationalId=4;
-insert into international (internationalId,languageId,namespace,message,lastUpdated) values (4,2,'PhotoGallery','Anordnung der Grafiken', 1041604651);
-delete from international where languageId=2 and namespace='PhotoGallery' and internationalId=2;
-insert into international (internationalId,languageId,namespace,message,lastUpdated) values (2,2,'PhotoGallery','Grafik hinzufügen', 1041604630);
-delete from international where languageId=2 and namespace='PhotoGallery' and internationalId=18;
-insert into international (internationalId,languageId,namespace,message,lastUpdated) values (18,2,'PhotoGallery','Text, der mit dieser Grafik angezeigt werden soll', 1041604597);
-delete from international where languageId=2 and namespace='PhotoGallery' and internationalId=3;
-insert into international (internationalId,languageId,namespace,message,lastUpdated) values (3,2,'PhotoGallery','Grafik Upload', 1041604577);
-delete from international where languageId=2 and namespace='PhotoGallery' and internationalId=9;
-insert into international (internationalId,languageId,namespace,message,lastUpdated) values (9,2,'PhotoGallery','Grafik oder Upload hinzufügen', 1041604520);
 delete from international where languageId=2 and namespace='MailForm' and internationalId=62;
 insert into international (internationalId,languageId,namespace,message,lastUpdated) values (62,2,'MailForm','Mail Formular Felder hinzufügen oder bearbeiten', 1041604431);
 delete from international where languageId=2 and namespace='MailForm' and internationalId=61;
@@ -935,8 +885,6 @@ delete from international where languageId=2 and namespace='FileManager' and int
 insert into international (internationalId,languageId,namespace,message,lastUpdated) values (71,2,'FileManager','Der Download-/Dateimanager wurde entwickelt um Ihnen eine Möglichkeit zu geben, \r\nDateien und Downloads in Ihrer Seite zu verwalten. Er bietet Ihnen die Möglichkeit \r\nzu definieren, wer Dateien anschauen oder gar downloaden kann. \r\n<P><b>Template</b><BR>Wählen Sie ein Layout für den Downloadmanager (z. B. \'Standard/Default\' \r\noder \'Standard ohne Suchfunktion\'. \r\n<P><b>Einträge pro Seite</b><BR>Wie viele Dateien sollen pro Seite angezeigt \r\nwerden? \r\n<P><b>Als nächstes?</b><BR>Möchten Sie neue Downloads hinzufügen oder zurück \r\nzur Seite gehen?.</P>', 1041598396);
 delete from international where languageId=2 and namespace='FAQ' and internationalId=77;
 insert into international (internationalId,languageId,namespace,message,lastUpdated) values (77,2,'FAQ','Nachfolgend eine Liste aller Variablen für FAQ Templates. \r\n<P><b>addquestion.url</b><BR>Die URL um eine Frage zur FAQ hinzuzufügen. \r\n<P><b>addquestion.label</b><BR>Die übersetzte Bezeichnung für diesen Link. \r\n<P><b>qa_loop</b><BR>Eine Schleife (Loop), die die Variablen für jede einzelne \r\nFrage der FAQ enthält. \r\n<BLOCKQUOTE><b>qa.id</b><BR>Die ID für diese Frage. \r\n<P><b>qa.answer</b><BR>Die Antwort für diese Frage. \r\n<P><b>qa.question</b><BR>Die Frage selbst. \r\n<P><b>qa.controls</b><BR>Die WebGUI Verwaltungscontrols für diese Frage (z. \r\n    B. \'Frage bearbeiten\').</BLOCKQUOTE>', 1041597921);
-delete from international where languageId=2 and namespace='PhotoGallery' and internationalId=1;
-insert into international (internationalId,languageId,namespace,message,lastUpdated) values (1,2,'PhotoGallery','Photo Gallerie', 1041597689);
 delete from international where languageId=2 and namespace='EventsCalendar' and internationalId=97;
 insert into international (internationalId,languageId,namespace,message,lastUpdated) values (97,2,'EventsCalendar','Nachfolgend eine Liste von Template Variablen für Ereignis Templates. \r\n<P><b>title</b><BR>Der Titel des Ereignisses. \r\n<P><b>start.label</b><BR>Die &nbsp;übersetzte Bezeichnung des Startdatums. \r\n<P><b>start.date</b><BR>Das Datum, an dem das Ereignis beginnt. \r\n<P><b>end.date</b><BR>Das Datum, an dem dieses Ereignis endet. \r\n<P><b>end.label</b><BR>Die übersetzte Bezeichung des Ende Datums. \r\n<P><b>canEdit</b><BR>Variable, falls der Benutzer des Ereignis bearbeiten kann. \r\n<P><b>edit.url</b><BR>Die URL zum Bearbeiten dieses Ereignisses. \r\n<P><b>edit.label</b><BR>Die übersetzte Bezeichnung für diese URL (z. B. \'Termin \r\nbearbeiten\'). \r\n<P><b>delete.url</b><BR>Die URL zum Löschen dieses Ereignisses. \r\n<P><b>delete.label</b><BR>Die übersetzte Bezeichnung für diese  URL. \r\n<P><b>previous.url</b><BR>Die URL, um sich das vorherige Ereignis a!
  nzeigen zu \r\nlassen. \r\n<P><b>previous.label</b><BR>Die übersetzte Bezeichnung für diese URL. \r\n<P><b>next.url</b><BR>Die URL, um sich das nächste Ereignis anzeigen zu lassen. \r\n<p><b>next.label</b><BR>Die übersetzte Bezeichnung für diese URL. \r\n</p>\r\n<P><b>description</b><BR>Die Beschreibung für dieses Ereignis.</P>', 1041597266);
