@@ -30,6 +30,6 @@ use WebGUI::Operation::Template;
 use WebGUI::Operation::Theme;
 use WebGUI::Operation::Trash;
 use WebGUI::Operation::User;
-
+use WebGUI::Operation::WebGUI;
 
 1;
