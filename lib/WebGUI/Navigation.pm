@@ -16,12 +16,10 @@ package WebGUI::Navigation;
 
 
 use strict;
-use Tie::CPHash;
-use Tie::IxHash;
+use warnings;
+use WebGUI::Asset;
 use WebGUI::Icon;
 use WebGUI::International;
-use WebGUI::Operation::Navigation;
-use WebGUI::Page;
 use WebGUI::Session;
 use WebGUI::SQL;
 use WebGUI::Template;
@@ -217,6 +215,15 @@ in the class and returns HTML.
 
 sub build {
 	my $self = shift;
+	my $config = $self->getConfig;
+	my $base = WebGUI::Asset->newByDynamicClass($config->{basePage});
+	my (@relatives, %rules);
+	foreach my $relative ("ancestors","self","siblings","descendants") {
+		push(@relatives,$relative) if ($config->{relative});
+	}
+	$rules{returnQuickReadObjects} = 1;
+	$base->getLineage(\@relatives,\%rules);
+
 	my @interestingPageProperties = ('pageId', 'parentId', 'title', 'ownerId', 'urlizedTitle',
 			'synopsis', 'newWindow', 'menuTitle', 'encryptLogin');
 	my $var = {'page_loop' => []};

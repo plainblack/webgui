@@ -1511,8 +1511,8 @@ sub new {
 		"method"=>$method,
 		"enctype"=>$enctype
 		});
-	$header .= "\n<table ".$tableExtras.'>' unless ($noTable);
-	$footer = "</table>\n" unless ($noTable);
+	$header .= "\n<table ".$tableExtras.'><tbody>' unless ($noTable);
+	$footer = "</tbody></table>\n" unless ($noTable);
 	$footer .= WebGUI::Form::formFooter();
         bless {_noTable => $noTable, _header => $header, _footer => $footer, _data => ''}, $self;
 }

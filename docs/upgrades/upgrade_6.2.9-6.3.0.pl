@@ -130,8 +130,80 @@ WebGUI::SQL->write("alter table Article drop column attachment");
 
 
 
-
-
+print "\tUpdating navigation to work with asset tree\n" unless ($quiet);
+WebGUI::SQL->write("alter table Navigation add column assetsToInclude text");
+WebGUI::SQL->write("alter table Navigation add column startType varchar(35)");
+WebGUI::SQL->write("alter table Navigation add column startPoint varchar(35)");
+WebGUI::SQL->write("alter table Navigation add column baseType varchar(35)");
+WebGUI::SQL->write("alter table Navigation add column basePage varchar(255)");
+WebGUI::SQL->write("alter table Navigation add column endType varchar(35)");
+WebGUI::SQL->write("alter table Navigation add column endPoint varchar(35)");
+my $sth = WebGUI::SQL->read("select * from Navigation");
+while (my $data = $sth->hashRef) {
+	my %newNav;
+	$newNav{navigationId} = $data->{navigationId};
+	$newNav{identifier} = $data->{identifier};
+	$newNav{showSystemPages} = $data->{showSystemPages};
+	$newNav{showHiddenPages} = $data->{showHiddenPages};
+	$newNav{showUnprivilegedPages} = $data->{showUnprivilegedPages};
+	$newNav{startType} = "relativeToRoot";
+	$newNav{startPoint} = $data->{stopAtLevel}+1;
+	if ($data->{startAt} eq "root") {
+		$newNav{baseType} = "relativeToRoot";
+		$newNav{basePage} = "0";
+	} elsif ($data->{startAt} eq "WebGUIroot") {
+		$newNav{baseType} = "relativeToRoot";
+		$newNav{basePage} = "1";
+	} elsif ($data->{startAt} eq "top") {
+		$newNav{baseType} = "relativeToRoot";
+		$newNav{basePage} = "2";
+	} elsif ($data->{startAt} eq "grandmother") {
+		$newNav{baseType} = "relativeToCurrentPage";
+		$newNav{basePage} = "-2";
+	} elsif ($data->{startAt} eq "mother") {
+		$newNav{baseType} = "relativeToCurrentPage";
+		$newNav{basePage} = "-1";
+	} elsif ($data->{startAt} eq "current") {
+		$newNav{baseType} = "relativeToCurrentPage";
+		$newNav{basePage} = "0";
+	} elsif ($data->{startAt} eq "daughter") {
+		$newNav{baseType} = "relativeToCurrentPage";
+		$newNav{basePage} = "1";
+	} else {
+		$newNav{baseType} = "specificUrl";
+		$newNav{basePage} = $data->{startAt};
+	}
+	$newNav{endType} = "relativeToBasePage";
+	$newNav{endPoint} = ($data->{depth} == 99)?55:$data->{stopAtLevel});
+	if ($data->{method} eq "daughters") {
+		$newNav{assetsToInclude} = "descendants";
+	} elsif ($data->{method} eq "sisters") {
+		$newNav{assetsToInclude} = "siblings";
+	} elsif ($data->{method} eq "self_and_sisters") {
+		$newNav{assetsToInclude} = "self,siblings";
+	} elsif ($data->{method} eq "descendants") {
+		$newNav{assetsToInclude} = "descendants";
+	} elsif ($data->{method} eq "self_and_descendants") {
+		$newNav{assetsToInclude} = "self,descendants";
+	} elsif ($data->{method} eq "leaves_under") {
+		$newNav{assetsToInclude} = "descendants";
+	} elsif ($data->{method} eq "generation") {
+		$newNav{assetsToInclude} = "self,sisters";
+	} elsif ($data->{method} eq "ancestors") {
+		$newNav{assetsToInclude} = "ancestors";
+	} elsif ($data->{method} eq "self_and_ancestors") {
+		$newNav{assetsToInclude} = "self,ancestors";
+	} elsif ($data->{method} eq "pedigree") {
+		$newNav{assetsToInclude} = "pedigree";
+	}
+	WebGUI::SQL->setRow("Navigation","navigationId",\%newNav);
+}
+$sth->finish;
+WebGUI::SQL->write("alter table Navigation drop column depth");
+WebGUI::SQL->write("alter table Navigation drop column startAt");
+WebGUI::SQL->write("alter table Navigation drop column stopAtLevel");
+WebGUI::SQL->write("alter table Navigation drop column method");
+WebGUI::SQL->write("alter table Navigation drop column reverse");
 
 
 WebGUI::Session::close();

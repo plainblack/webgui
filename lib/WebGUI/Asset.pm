@@ -428,14 +428,18 @@ sub getLineage {
 			$whereDescendants .= " and length(lineage) <= ".($rules->{endingLineageLength}*6);
 		}
 	}
-	my $sql = "select assetId,className from asset where $whereSiblings $whereExact $whereDescendants $whereExclusion order by lineage";
+	my $columns = "assetId, className";
+	$columns = "*" if ($rules->{returnQuickReadObjects});
+	my $sql = "select $columns from asset where $whereSiblings $whereExact $whereDescendants $whereExclusion order by lineage";
 	my @lineage;
 	my $sth = WebGUI::SQL->read($sql);
-	while (my ($assetId,$className) = $sth->array) {
+	while (my $properties = $sth->hashRef) {
 		if ($rules->{returnObjects}) {
-			push(@lineage,WebGUI::Asset->newByDynamicClass($assetId, $className));
+			push(@lineage,WebGUI::Asset->newByDynamicClass($properties->{assetId}, $properties->{className}));
+		} elsif ($rules->{returnQuickReadObjects}) {
+			push(@lineage,WebGUI::Asset->newByPropertyHashRef($properties));
 		} else {
-			push(@lineage,$assetId);
+			push(@lineage,$properties->{assetId});
 		}
 	}
 	$sth->finish;
@@ -556,6 +560,15 @@ sub new {
 	return undef;
 }
 
+sub newByPropertyHashRef {
+	my $class = shift;
+	my $properties = shift;
+	my $className = $properties->{className};
+	my $cmd = "use ".$className;
+        eval ($cmd);
+        WebGUI::ErrorHandler::fatalError("Couldn't compile asset package: ".$className.". Root cause: ".$@) if ($@);
+	bless {_properties => $properties}, $className;
+}
 
 sub newByDynamicClass {
 	my $class = shift;

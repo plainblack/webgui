@@ -83,8 +83,220 @@ sub www_deleteNavigationConfirm {
 	return www_listNavigation();
 }
 
-#-------------------------------------------------------------------
+
 sub www_editNavigation {
+	return WebGUI::Privilege::insufficient() unless (WebGUI::Grouping::isInGroup(3));
+	my $identifier = shift || $session{form}{identifier};
+	my $config = WebGUI::Navigation::getConfig($identifier);
+	if ($config->{identifier}) {
+		# Existing config
+	} else {
+		$config->{navigationId} = 'new';
+		$config->{identifier} = $identifier || 'myIdentifier';
+		$config->{assetsToInclude} = "descendants";
+		$config->{startType} = "relativeToRoot";
+		$config->{startPoint} = 0;
+		$config->{baseType} = "relativeToCurrentPage";
+		$config->{basePage} = "0";
+		$config->{endType} = "relativeToBasePage";
+		$config->{endPoint} = "55";
+		$config->{templateId} = 1;
+		$config->{showSystemPages} = 0;
+		$config->{showHiddenPages} = 0;
+		$config->{showUnprivilegedPages} = 0;
+	}
+	my $tabform = WebGUI::TabForm->new;
+	$tabform->hidden({
+		name=>'op', 
+		value=>'editNavigationSave'
+		});
+	$tabform->hidden({
+		name=>'navigationId', 
+		value=>$config->{navigationId}
+		});
+	$tabform->addTab("properties",WebGUI::International::get(23, 'Navigation'));
+ 	$tabform->getTab("properties")->raw('<input type="hidden" name="op2" value="'.$session{form}{afterEdit}.'" />');
+	$tabform->getTab("properties")->readOnly(
+		-value=>$config->{navigationId},
+                -label=>'navigationId'
+                );
+	$tabform->getTab("properties")->text(
+		-name=>'identifier',
+		-value=>$config->{identifier},
+		-label=>WebGUI::International::get(24, 'Navigation')
+		);
+	my ($ancestorsChecked, $descendantsChecked, $selfChecked, $pedigreeChecked, $siblingsChecked);
+	my @assetsToInclude = split(",",$config->{assetsToInclude});
+	my $afterScript;
+	foreach my $item (@assetsToInclude) {
+		if ($item eq "self") {
+			$selfChecked = 1;
+		} elsif ($item eq "descendants") {
+			$descendantsChecked = 1;
+			$afterScript = "displayNavEndPoint = false;";
+		} elsif ($item eq "ancestors") {
+			$ancestorsChecked = 1;
+			$afterScript = "displayNavStartPoint = false;";
+		} elsif ($item eq "siblings") {
+			$siblingsChecked = 1;
+		} elsif ($item eq "pedigree") {
+			$pedigreeChecked = 1;
+		}
+	}
+	$tabform->getTab("properties")->readOnly(
+		-label=>"Pages to Include",
+		-value=>WebGUI::Form::checkbox({
+				checked=>$ancestorsChecked,
+				name=>"assetsToInclude",
+				value=>"ancestors",
+				extras=>'onChange="toggleStartPoint()"'
+				}).'Ancestors<br />'
+			.WebGUI::Form::checkbox({
+				checked=>$selfChecked,
+				name=>"assetsToInclude",
+				value=>"self"
+				}).'Self<br />'
+			.WebGUI::Form::checkbox({
+				checked=>$siblingsChecked,
+				name=>"assetsToInclude",
+				value=>"siblings"
+				}).'Siblings<br />'
+			.WebGUI::Form::checkbox({
+				checked=>$descendantsChecked,
+				name=>"assetsToInclude",
+				value=>"descendants",
+				extras=>'onChange="toggleEndPoint()"'
+				}).'Descendants<br />'
+			.WebGUI::Form::checkbox({
+				checked=>$pedigreeChecked,
+				name=>"assetsToInclude",
+				value=>"pedigree"
+				}).'Pedigree<br />'
+		);
+	$tabform->getTab("properties")->raw(
+		'</tbody><tbody id="navStart"><tr><td class="formDescription">Start Type</td><td>'
+		.WebGUI::Form::selectList({
+			name=>"startType",
+			value=>[$config->{startType}],
+			extras=>'id="navStartType" onChange="changeStartPoint()"',
+			options=>{
+				relativeToRoot=>"Relative To Root",
+				relativeToCurrentPage=>"Relative To Current Page"
+				}
+			})
+		.'</td></tr><tr><td class="formDescription">Start Point</td><td><div id="navStartPoint"></div></td></tr></tbody><tbody>'
+		);
+	$tabform->getTab("properties")->selectList(
+		-name=>"baseType",
+		-options=>{
+			specificUrl=>'Specific URL',
+			relativeToCurrentPage=>'Relative To Current Page',
+			relativeToRoot=>'Relative To Root'
+			},
+		-value=>[$config->{baseType}],
+		-label=>"Base Type",
+		-extras=>'id="navBaseType" onChange="changeBasePage()"'
+		);
+	$tabform->getTab("properties")->readOnly(
+		-label=>"Base Page",
+		-value=>'<div id="navBasePage"></div>'
+		);
+	my %options;
+	tie %options, 'Tie::IxHash';
+	%options = (
+		'55'=>'Infinity',
+		'1'=>'./a/ (+1)',
+		'2'=>'./a/b/ (+2)',
+		'3'=>'./a/b/c/ (+3)',
+		'4'=>'./a/b/c/d/ (+4)',
+		'5'=>'./a/b/c/d/e/ (+5)'
+		);
+	$tabform->getTab("properties")->raw(
+		'</tbody><tbody id="navEnd"><tr><td class="formDescription">End Type</td><td>'
+		.WebGUI::Form::selectList({
+			name=>"endType",
+			value=>[$config->{endType}],
+			options=>{
+				relativeToStartPage=>"Relative To Start Page",
+				relativeToBasePage=>"Relative To Base Page"
+				}
+			})
+		.'</td></tr><tr><td class="formDescription">End Point</td><td>'
+		.WebGUI::Form::selectList({
+			name=>"endPoint",
+			value=>[$config->{endPoint}],
+			options=>\%options
+			})
+		.'</td></tr></tbody><tbody>'
+		);
+	$tabform->addTab("layout",WebGUI::International::get(105));
+	$tabform->getTab("layout")->template(
+		-name=>'templateId',
+		-label=>WebGUI::International::get(913),
+		-value=>$session{form}{templateId} || $config->{templateId},
+		-namespace=>'Navigation',
+		);
+	$tabform->getTab("layout")->yesNo(
+		-name=>'showSystemPages',
+		-label=>WebGUI::International::get(30,'Navigation'),
+		-value=>$session{form}{showSystemPages} || $config->{showSystemPages}
+		);
+        $tabform->getTab("layout")->yesNo(
+                -name=>'showHiddenPages',
+                -label=>WebGUI::International::get(31,'Navigation'),
+                -value=>$session{form}{showHiddenPages} || $config->{showHiddenPages}
+        	);
+        $tabform->getTab("layout")->yesNo(
+                -name=>'showUnprivilegedPages',
+                -label=>WebGUI::International::get(32,'Navigation'),
+                -value=>$session{form}{showUnprivilegedPages} || $config->{showUnprivilegedPages}
+        	);
+	my $script = "<script type=\"text/javascript\">
+		var displayNavStartPoint = true;
+		function toggleStartPoint () {
+			if (displayNavStartPoint) {
+				document.getElementById('navStart').style.display='none';
+				displayNavStartPoint = false;
+			} else {
+				document.getElementById('navStart').style.display='';
+				displayNavStartPoint = true;
+			}
+		}
+		var displayNavEndPoint = true;
+		function toggleEndPoint () {
+			if (displayNavEndPoint) {
+				document.getElementById('navEnd').style.display='none';
+				displayNavEndPoint = false;
+			} else {
+				document.getElementById('navEnd').style.display='';
+				displayNavEndPoint = true;
+			}
+		}
+		var relativeToRoot ='<select name=\"basePage\"><option value=\"0\"".(($config->{basePage} eq "0")?' selected=\"1\"':'').">/ (0)</option><option value=\"1\"".(($config->{basePage} eq "1")?' selected=\"1\"':'').">/a/ (+1)</option><option value=\"2\"".(($config->{basePage} eq "2")?' selected=\"1\"':'').">/a/b/ (+2)</option><option value=\"3\"".(($config->{basePage} eq "3")?' selected=\"1\"':'').">/a/b/c/ (+3)</option><option value=\"4\"".(($config->{basePage} eq "4")?' selected=\"1\"':'').">/a/b/c/d/ (+4)</option><option value=\"5\"".(($config->{basePage} eq "5")?' selected=\"1\"':'').">/a/b/c/d/e/ (+5)</option><option value=\"6\"".(($config->{basePage} eq "6")?' selected=\"1\"':'').">/a/b/c/d/e/f/ (+6)</option><option value=\"7\"".(($config->{basePage} eq "7")?' selected=\"1\"':'').">/a/b/c/d/e/f/g/h/ (+7)</option><option value=\"8\"".(($config->{basePage} eq "8")?' selected=\"1\"':'').">/a/b/c/d/e/f/g/h/ (+8)</option><option value=\"9\"".(($config->{basePage} eq "9")?' selected=\"1\"':'').">/a/b/c/d/e/f/g/h/i/ (+9)</option></select>';
+		function changeBasePage () {
+			var types = new Array();
+			types['specificUrl']='<input type=\"text\" name=\"basePage\">';
+			types['relativeToRoot']=relativeToRoot;
+			types['relativeToCurrentPage']='<select name=\"basePage\"><option value=\"-3\"".(($config->{basePage} eq "-3")?' selected=\"1\"':'').">../../.././ (-3)</option><option value=\"-2\"".(($config->{basePage} eq "-2")?' selected=\"1\"':'').">../.././ (-2)</option><option value=\"-1\"".(($config->{basePage} eq "-1")?' selected=\"1\"':'').">.././ (-1)</option><option value=\"0\"".(($config->{basePage} eq "0")?' selected=\"1\"':'').">./ (0)</option><option value=\"1\"".(($config->{basePage} eq "1")?' selected=\"1\"':'').">./a/ (+1)</option><option value=\"2\"".(($config->{basePage} eq "2")?' selected=\"1\"':'').">./a/b/ (+2)</option><option value=\"3\"".(($config->{basePage} eq "3")?' selected=\"1\"':'').">./a/b/c/ (+3)</option></select>';
+			document.getElementById('navBasePage').innerHTML=types[document.getElementById('navBaseType').options[document.getElementById('navBaseType').selectedIndex].value];
+		}
+		function changeStartPoint () {
+			var types = new Array();
+			types['relativeToRoot']=relativeToRoot;
+			types['relativeToCurrentPage']='<select name=\"basePage\"><option value=\"-3\"".(($config->{basePage} eq "-3")?' selected=\"1\"':'').">../../.././ (-3)</option><option value=\"-2\"".(($config->{basePage} eq "-2")?' selected=\"1\"':'').">../.././ (-2)</option><option value=\"-1\"".(($config->{basePage} eq "-1")?' selected=\"1\"':'').">.././ (-1)</option></select>';
+			document.getElementById('navStartPoint').innerHTML=types[document.getElementById('navStartType').options[document.getElementById('navStartType').selectedIndex].value];
+		}
+		".$afterScript."
+		changeBasePage();
+		changeStartPoint();
+		toggleStartPoint();
+		toggleEndPoint();
+		</script>";
+	return _submenu($tabform->print.$script,'22',"navigation add/edit");
+}
+
+#-------------------------------------------------------------------
+sub www_editNavigationOld {
 	return WebGUI::Privilege::insufficient() unless (WebGUI::Grouping::isInGroup(3));
 	my $identifier = shift || $session{form}{identifier};
 	my $config = WebGUI::Navigation::getConfig($identifier);
