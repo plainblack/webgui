@@ -13,36 +13,47 @@ package WebGUI::DateTime;
 use Exporter;
 use strict;
 use Time::Local;
+use WebGUI::International;
 
 our @ISA = qw(Exporter);
 our @EXPORT = qw(&epochToHuman &epochToSet &humanToEpoch &setToEpoch);
-our %month = (
-	1=>	"January",
-	2=>	"February",
-	3=>	"March",
-	4=>	"April",
-	5=>	"May",
-	6=>	"June",
-	7=>	"July",
-	8=>	"August",
-	9=>	"September",
-	10=>	"October",
-	11=>	"November",
-	12=>	"December"
+
+#-------------------------------------------------------------------
+sub _getMonth { 
+	my %month = (
+	1=> 	WebGUI::International::get(15),
+	2=>	WebGUI::International::get(16),
+	3=>	WebGUI::International::get(17),
+	4=>	WebGUI::International::get(18),
+	5=>	WebGUI::International::get(19),
+	6=>	WebGUI::International::get(20),
+	7=>	WebGUI::International::get(21),
+	8=>	WebGUI::International::get(22),
+	9=>	WebGUI::International::get(23),
+	10=>	WebGUI::International::get(24),
+	11=>	WebGUI::International::get(25),
+	12=>	WebGUI::International::get(26)	
 	);
-our %weekday = (
-	1=>	"Sunday",
-	2=>	"Monday",
-	3=>	"Tuesday",
-	4=>	"Wednesday",
-	5=>	"Thursday",
-	6=>	"Friday",
-	7=>	"Saturday"
-	);
+	return %month;
+}
+
+#-------------------------------------------------------------------
+sub _getWeekday {
+	my %weekday = (
+		1=>	WebGUI::International::get(27),
+		2=>	WebGUI::International::get(28),
+		3=>	WebGUI::International::get(29),
+		4=>	WebGUI::International::get(30),
+		5=>	WebGUI::International::get(31),
+		6=>	WebGUI::International::get(32),
+		7=> 	WebGUI::International::get(33)
+		);
+	return %weekday;
+}
 
 #-------------------------------------------------------------------
 sub epochToHuman {
-	my ($hour12, $value, $output, @date);
+	my ($hour12, $value, $output, @date, %weekday, %month);
 	@date = localtime($_[0]);
 	$date[4]++; 		# offset the months starting from 0
 	$date[5] += 1900;	# original value is Year-1900
@@ -58,12 +69,18 @@ sub epochToHuman {
 	$value = sprintf("%02d",$date[4]);
 	$output =~ s/\%m/$value/g;
 	$output =~ s/\%M/$date[4]/g;
-	$output =~ s/\%c/$month{$date[4]}/g;
+	if ($output =~ /\%c/) {
+		%month = _getMonth();
+		$output =~ s/\%c/$month{$date[4]}/g;
+	}
   #---day stuff
 	$value = sprintf("%02d",$date[3]);
 	$output =~ s/\%d/$value/g;
 	$output =~ s/\%D/$date[3]/g;
-	$output =~ s/\%w/$weekday{$date[6]}/g;
+	if ($output =~ /\%w/) {
+		%weekday = _getWeekday();
+		$output =~ s/\%w/$weekday{$date[6]}/g;
+	}
   #---hour stuff
 	$hour12 = $date[2]+1;
 	if ($hour12 > 12) {

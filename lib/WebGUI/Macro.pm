@@ -16,9 +16,14 @@ use WebGUI::Session;
 
 #-------------------------------------------------------------------
 sub process {
-        my (@files, $file, $cmd, $output);
+        my (@files, $file, $cmd, $output, $macroDir);
 	$output = $_[0];
-        opendir (DIR,$session{config}{webguiRoot}."/lib/WebGUI/Macro") or WebGUI::ErrorHandler::fatalError("Can't open macro directory!");
+	if ($^O =~ /Win/i) {
+		$macroDir = "\\lib\\WebGUI\\Macro";
+	} else {
+		$macroDir = "/lib/WebGUI/Macro";
+	}
+        opendir (DIR,$session{config}{webguiRoot}.$macroDir) or WebGUI::ErrorHandler::fatalError("Can't open macro directory!");
         @files = readdir(DIR);
         foreach $file (@files) {
                 if ($file ne "." && $file ne ".." && $file =~ /\.pm/) {

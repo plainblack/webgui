@@ -12,6 +12,7 @@ package WebGUI::Widget::FAQ;
 
 use strict;
 use Tie::CPHash;
+use WebGUI::International;
 use WebGUI::Macro;
 use WebGUI::Privilege;
 use WebGUI::Session;
@@ -38,22 +39,24 @@ sub purge {
 
 #-------------------------------------------------------------------
 sub widgetName {
-	return "F.A.Q.";
+	return WebGUI::International::get(205);
 }
 
 #-------------------------------------------------------------------
 sub www_add {
         my ($output);
       	if (WebGUI::Privilege::canEditPage()) {
-                $output = '<h1>Add F.A.Q.</h1><form method="post" enctype="multipart/form-data" action="'.$session{page}{url}.'">';
+		$output = '<a href="'.$session{page}{url}.'?op=viewHelp&hid=40"><img src="'.$session{setting}{lib}.'/help.gif" border="0" align="right"></a>';
+                $output = '<h1>'.WebGUI::International::get(206).'</h1>';
+		$output .= '<form method="post" enctype="multipart/form-data" action="'.$session{page}{url}.'">';
                 $output .= WebGUI::Form::hidden("widget","FAQ");
                 $output .= WebGUI::Form::hidden("func","addSave");
                 $output .= '<table>';
-                $output .= '<tr><td class="formDescription">Title</td><td>'.WebGUI::Form::text("title",20,30,'F.A.Q.').'</td></tr>';
-                $output .= '<tr><td class="formDescription">Display the title?</td><td>'.WebGUI::Form::checkbox("displayTitle",1,1).'</td></tr>';
-                $output .= '<tr><td class="formDescription">Process Macros?</td><td>'.WebGUI::Form::checkbox("processMacros",1,1).'</td></tr>';
-                $output .= '<tr><td class="formDescription">Description</td><td>'.WebGUI::Form::textArea("description").'</td></tr>';
-                $output .= '<tr><td></td><td>'.WebGUI::Form::submit("save").'</td></tr>';
+                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(99).'</td><td>'.WebGUI::Form::text("title",20,30,'F.A.Q.').'</td></tr>';
+                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(174).'</td><td>'.WebGUI::Form::checkbox("displayTitle",1,1).'</td></tr>';
+                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(175).'</td><td>'.WebGUI::Form::checkbox("processMacros",1,1).'</td></tr>';
+                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(85).'</td><td>'.WebGUI::Form::textArea("description").'</td></tr>';
+                $output .= '<tr><td></td><td>'.WebGUI::Form::submit(WebGUI::International::get(62)).'</td></tr>';
                 $output .= '</table></form>';
                 return $output;
         } else {
@@ -77,13 +80,14 @@ sub www_addSave {
 sub www_addQuestion {
         my ($output);
         if (WebGUI::Privilege::canEditPage()) {
-                $output = '<h1>Add Question</h1><form method="post" enctype="multipart/form-data" action="'.$session{page}{url}.'">';
+                $output = '<h1>'.WebGUI::International::get(207).'</h1>';
+		$output .= '<form method="post" enctype="multipart/form-data" action="'.$session{page}{url}.'">';
                 $output .= WebGUI::Form::hidden("wid",$session{form}{wid});
                 $output .= WebGUI::Form::hidden("func","addQuestionSave");
                 $output .= '<table>';
-                $output .= '<tr><td class="formDescription">Question</td><td>'.WebGUI::Form::textArea("question",'',50,3).'</td></tr>';
-                $output .= '<tr><td class="formDescription">Answer</td><td>'.WebGUI::Form::textArea("answer").'</td></tr>';
-                $output .= '<tr><td></td><td>'.WebGUI::Form::submit("save").'</td></tr>';
+                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(208).'</td><td>'.WebGUI::Form::textArea("question",'',50,3).'</td></tr>';
+                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(209).'</td><td>'.WebGUI::Form::textArea("answer").'</td></tr>';
+                $output .= '<tr><td></td><td>'.WebGUI::Form::submit(WebGUI::International::get(62)).'</td></tr>';
                 $output .= '</table></form>';
                 return $output;
         } else {
@@ -109,8 +113,10 @@ sub www_addQuestionSave {
 sub www_deleteQuestion {
 	my ($output);
         if (WebGUI::Privilege::canEditPage()) {
-		$output = '<h1>Please Confirm</h1>';
-		$output .= 'Are you certain that you want to delete this question?<p><div align="center"><a href="'.$session{page}{url}.'?func=deleteQuestionConfirm&wid='.$session{form}{wid}.'&qid='.$session{form}{qid}.'">Yes, I\'m sure.</a> &nbsp; <a href="'.$session{page}{url}.'?func=edit&wid='.$session{form}{wid}.'">No, I made a mistake.</a></div>';
+		$output = '<h1>'.WebGUI::International::get(42).'</h1>';
+		$output .= WebGUI::International::get(210).'<p>';
+		$output .= '<div align="center"><a href="'.$session{page}{url}.'?func=deleteQuestionConfirm&wid='.$session{form}{wid}.'&qid='.$session{form}{qid}.'">'.WebGUI::International::get(44).'</a>';
+		$output .= ' &nbsp; <a href="'.$session{page}{url}.'?func=edit&wid='.$session{form}{wid}.'">'.WebGUI::International::get(45).'</a></div>';
                 return $output;
         } else {
                 return WebGUI::Privilege::insufficient();
@@ -135,17 +141,19 @@ sub www_edit {
 	tie %data, 'Tie::CPHash';
         if (WebGUI::Privilege::canEditPage()) {
 		%data = WebGUI::SQL->quickHash("select * from widget where widget.widgetId=$session{form}{wid}",$session{dbh});
-                $output = '<h1>Edit Link List</h1><form method="post" enctype="multipart/form-data" action="'.$session{page}{url}.'">';
+		$output = '<a href="'.$session{page}{url}.'?op=viewHelp&hid=41"><img src="'.$session{setting}{lib}.'/help.gif" border="0" align="right"></a>';
+                $output = '<h1>'.WebGUI::International::get(211).'</h1>';
+		$output .= '<form method="post" enctype="multipart/form-data" action="'.$session{page}{url}.'">';
                 $output .= WebGUI::Form::hidden("wid",$session{form}{wid});
                 $output .= WebGUI::Form::hidden("func","editSave");
                 $output .= '<table>';
-                $output .= '<tr><td class="formDescription">Title</td><td>'.WebGUI::Form::text("title",20,30,$data{title}).'</td></tr>';
-                $output .= '<tr><td class="formDescription">Display the title?</td><td>'.WebGUI::Form::checkbox("displayTitle","1",$data{displayTitle}).'</td></tr>';
-                $output .= '<tr><td class="formDescription">Process macros?</td><td>'.WebGUI::Form::checkbox("processMacros","1",$data{processMacros}).'</td></tr>';
-                $output .= '<tr><td class="formDescription">Description</td><td>'.WebGUI::Form::textArea("description",$data{description}).'</td></tr>';
-                $output .= '<tr><td></td><td>'.WebGUI::Form::submit("save").'</td></tr>';
+                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(99).'</td><td>'.WebGUI::Form::text("title",20,30,$data{title}).'</td></tr>';
+                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(174).'</td><td>'.WebGUI::Form::checkbox("displayTitle","1",$data{displayTitle}).'</td></tr>';
+                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(175).'</td><td>'.WebGUI::Form::checkbox("processMacros","1",$data{processMacros}).'</td></tr>';
+                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(85).'</td><td>'.WebGUI::Form::textArea("description",$data{description}).'</td></tr>';
+                $output .= '<tr><td></td><td>'.WebGUI::Form::submit(WebGUI::International::get(62)).'</td></tr>';
                 $output .= '</table></form>';
-                $output .= '<p><a href="'.$session{page}{url}.'?func=addQuestion&wid='.$session{form}{wid}.'">Add New Question</a><p>';
+                $output .= '<p><a href="'.$session{page}{url}.'?func=addQuestion&wid='.$session{form}{wid}.'">'.WebGUI::International::get(212).'</a><p>';
                 $output .= '<table border=1 cellpadding=3 cellspacing=0>';
 		$sth = WebGUI::SQL->read("select questionId,question from faqQuestion where widgetId='$session{form}{wid}' order by sequenceNumber",$session{dbh});
 		while (@question = $sth->array) {
@@ -175,14 +183,15 @@ sub www_editQuestion {
 	tie %question, 'Tie::CPHash';
         if (WebGUI::Privilege::canEditPage()) {
                 %question = WebGUI::SQL->quickHash("select * from faqQuestion where questionId='$session{form}{qid}'",$session{dbh});
-                $output = '<h1>Edit Question</h1><form method="post" enctype="multipart/form-data" action="'.$session{page}{url}.'">';
+                $output = '<h1>'.WebGUI::International::get(213).'</h1>';
+		$output .= '<form method="post" enctype="multipart/form-data" action="'.$session{page}{url}.'">';
                 $output .= WebGUI::Form::hidden("wid",$session{form}{wid});
                 $output .= WebGUI::Form::hidden("qid",$session{form}{qid});
                 $output .= WebGUI::Form::hidden("func","editQuestionSave");
                 $output .= '<table>';
-                $output .= '<tr><td class="formDescription">Question</td><td>'.WebGUI::Form::textArea("question",$question{question},50,3).'</td></tr>';
-                $output .= '<tr><td class="formDescription">Answer</td><td>'.WebGUI::Form::textArea("answer",$question{answer}).'</td></tr>';
-                $output .= '<tr><td></td><td>'.WebGUI::Form::submit("save").'</td></tr>';
+                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(208).'</td><td>'.WebGUI::Form::textArea("question",$question{question},50,3).'</td></tr>';
+                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(209).'</td><td>'.WebGUI::Form::textArea("answer",$question{answer}).'</td></tr>';
+                $output .= '<tr><td></td><td>'.WebGUI::Form::submit(WebGUI::International::get(62)).'</td></tr>';
                 $output .= '</table></form>';
                 return $output;
         } else {

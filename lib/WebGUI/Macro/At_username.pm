@@ -1,4 +1,4 @@
-package WebGUI::Macro::e;
+package WebGUI::Macro::At_username;
 
 #-------------------------------------------------------------------
 # WebGUI is Copyright 2001 Plain Black Software.
@@ -17,12 +17,13 @@ use WebGUI::Session;
 sub process {
 	my ($output);
 	$output = $_[0];
-  #---company email---
-        if ($output =~ /\^e/) {
-                $output =~ s/\^e/$session{setting}{companyEmail}/g;
+  #---username---
+        if ($output =~ /\^\@/) {
+                $output =~ s/\^\@/$session{user}{username}/g;
         }
 	return $output;
 }
 
-1;
 
+
+1;

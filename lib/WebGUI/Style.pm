@@ -30,9 +30,9 @@ sub getStyle {
 			<head>
 			<title>'.$session{page}{title}.'</title>
 			'.$style{styleSheet}.'
-			'.$session{page}{metaTags}.'
-			<script language="JavaScript" src="'.$session{setting}{lib}.'/WebGUI.js"></script>
-			</head>
+			'.$session{page}{metaTags}
+		#	.'<script language="JavaScript" src="'.$session{setting}{lib}.'/WebGUI.js"></script>'
+			.'</head>
 			'.$style{header};
 		$footer = $style{footer}.'
 			</html>';

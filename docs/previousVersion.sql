@@ -195,6 +195,7 @@ CREATE TABLE event (
   description text,
   startDate int(11) default NULL,
   endDate int(11) default NULL,
+  recurringEventId int(11) NOT NULL default '0',
   PRIMARY KEY  (eventId)
 ) TYPE=MyISAM;
 
@@ -370,6 +371,7 @@ INSERT INTO incrementer VALUES ('eventId',1);
 INSERT INTO incrementer VALUES ('linkId',1);
 INSERT INTO incrementer VALUES ('questionId',1);
 INSERT INTO incrementer VALUES ('submissionId',1);
+INSERT INTO incrementer VALUES ('recurringEventId',1);
 
 #
 # Table structure for table 'link'
@@ -518,7 +520,7 @@ INSERT INTO settings VALUES ('maxAttachmentSize','300');
 INSERT INTO settings VALUES ('lib','/extras');
 INSERT INTO settings VALUES ('sessionTimeout','28000');
 INSERT INTO settings VALUES ('attachmentDirectoryLocal','/data/WebGUI/uploads');
-INSERT INTO settings VALUES ('smtpServer','smtp.mycompany.com');
+INSERT INTO settings VALUES ('smtpServer','localhost');
 INSERT INTO settings VALUES ('companyEmail','info@mycompany.com');
 INSERT INTO settings VALUES ('ldapURL','ldap://ldap.mycompany.com:389/o=MyCompany');
 INSERT INTO settings VALUES ('companyName','My Company');

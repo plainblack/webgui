@@ -1,4 +1,4 @@
-package WebGUI::Macro::T;
+package WebGUI::International;
 
 #-------------------------------------------------------------------
 # WebGUI is Copyright 2001 Plain Black Software.
@@ -11,26 +11,28 @@ package WebGUI::Macro::T;
 #-------------------------------------------------------------------
 
 use strict;
-use WebGUI::Privilege;
 use WebGUI::Session;
 use WebGUI::SQL;
 
+my %international;
+
 #-------------------------------------------------------------------
-sub process {
-	my ($output, $temp, @data, $sth);
-	$output = $_[0];
-  #---top menu vertical---
-	if ($output =~ /\^T/) {
-		$temp = '<span class="verticalMenu">';
-		$sth = WebGUI::SQL->read("select title,urlizedTitle,pageId from page where parentId=1 order by sequenceNumber",$session{dbh});
-		while (@data = $sth->array) {
-			if (WebGUI::Privilege::canViewPage($data[2])) {
-				$temp .= '<a href="'.$session{env}{SCRIPT_NAME}.'/'.$data[1].'">'.$data[0].'</a><br>';
-			}
+sub get {
+        my ($output, $language);
+	if ($session{user}{language} ne "") {
+		$language = $session{user}{language};
+	} elsif ($_[1] ne "") {
+		$language = $_[1];
+	} else {
+		$language = "English";
+	}
+	if (defined $international{$language}{$_[0]}) { 		# a little caching never hurts =)
+		$output = $international{$language}{$_[0]};
+	} else {
+		($output) = WebGUI::SQL->quickArray("select message from international where internationalId=$_[0] and language='$language'",$session{dbh});
+		if ($output eq "" && $language ne "English") {
+			$output = get($_[0],"English");
 		}
-		$sth->finish;
-		$temp .= '</span>';
-        	$output =~ s/\^T/$temp/g;
 	}
 	return $output;
 }

@@ -12,6 +12,7 @@ package WebGUI::Widget::ExtraColumn;
 
 use strict;
 use Tie::CPHash;
+use WebGUI::International;
 use WebGUI::Privilege;
 use WebGUI::Session;
 use WebGUI::SQL;
@@ -26,22 +27,24 @@ sub purge {
 
 #-------------------------------------------------------------------
 sub widgetName {
-	return "Extra Column";
+	return WebGUI::International::get(199);
 }
 
 #-------------------------------------------------------------------
 sub www_add {
         my ($output);
       	if (WebGUI::Privilege::canEditPage()) {
-                $output = '<a href="'.$session{page}{url}.'?op=viewHelp&hid=25"><img src="'.$session{setting}{lib}.'/help.gif" border="0" align="right"></a><h1>Add Column</h1><form method="post" enctype="multipart/form-data" action="'.$session{page}{url}.'">';
+                $output = '<a href="'.$session{page}{url}.'?op=viewHelp&hid=25"><img src="'.$session{setting}{lib}.'/help.gif" border="0" align="right"></a>';
+		$output .= '<h1>'.WebGUI::International::get(200).'</h1>';
+		$output .= '<form method="post" enctype="multipart/form-data" action="'.$session{page}{url}.'">';
                 $output .= WebGUI::Form::hidden("widget","ExtraColumn");
                 $output .= WebGUI::Form::hidden("func","addSave");
                 $output .= WebGUI::Form::hidden("title","column");
                 $output .= '<table>';
-                $output .= '<tr><td class="formDescription">Spacer</td><td>'.WebGUI::Form::text("spacer",20,3,10).'</td></tr>';
-                $output .= '<tr><td class="formDescription">Width</td><td>'.WebGUI::Form::text("width",20,3,200).'</td></tr>';
-                $output .= '<tr><td class="formDescription">StyleSheet Class</td><td>'.WebGUI::Form::text("class",20,50,"content").'</td></tr>';
-                $output .= '<tr><td></td><td>'.WebGUI::Form::submit("save").'</td></tr>';
+                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(201).'</td><td>'.WebGUI::Form::text("spacer",20,3,10).'</td></tr>';
+                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(202).'</td><td>'.WebGUI::Form::text("width",20,3,200).'</td></tr>';
+                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(203).'</td><td>'.WebGUI::Form::text("class",20,50,"content").'</td></tr>';
+                $output .= '<tr><td></td><td>'.WebGUI::Form::submit(WebGUI::International::get(62)).'</td></tr>';
                 $output .= '</table></form>';
                 return $output;
         } else {
@@ -68,15 +71,17 @@ sub www_edit {
 	tie %data, 'Tie::CPHash';
         if (WebGUI::Privilege::canEditPage()) {
 		%data = WebGUI::SQL->quickHash("select * from ExtraColumn where widgetId=$session{form}{wid}",$session{dbh});
-                $output = '<a href="'.$session{page}{url}.'?op=viewHelp&hid=26"><img src="'.$session{setting}{lib}.'/help.gif" border="0" align="right"></a><h1>Edit Column</h1><form method="post" action="'.$session{page}{url}.'">';
+                $output = '<a href="'.$session{page}{url}.'?op=viewHelp&hid=26"><img src="'.$session{setting}{lib}.'/help.gif" border="0" align="right"></a>';
+		$output .= '<h1>'.WebGUI::International::get(204).'</h1>';
+		$output .= '<form method="post" action="'.$session{page}{url}.'">';
                 $output .= WebGUI::Form::hidden("wid",$session{form}{wid});
                 $output .= WebGUI::Form::hidden("func","editSave");
                 $output .= WebGUI::Form::hidden("title","column");
                 $output .= '<table>';
-                $output .= '<tr><td class="formDescription">Spacer</td><td>'.WebGUI::Form::text("spacer",20,3,$data{spacer}).'</td></tr>';
-                $output .= '<tr><td class="formDescription">Width</td><td>'.WebGUI::Form::text("width",20,3,$data{width}).'</td></tr>';
-                $output .= '<tr><td class="formDescription">StyleSheet Class</td><td>'.WebGUI::Form::text("class",20,30,$data{class}).'</td></tr>';
-                $output .= '<tr><td></td><td>'.WebGUI::Form::submit("save").'</td></tr>';
+                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(201).'</td><td>'.WebGUI::Form::text("spacer",20,3,$data{spacer}).'</td></tr>';
+                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(202).'</td><td>'.WebGUI::Form::text("width",20,3,$data{width}).'</td></tr>';
+                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(203).'</td><td>'.WebGUI::Form::text("class",20,30,$data{class}).'</td></tr>';
+                $output .= '<tr><td></td><td>'.WebGUI::Form::submit(WebGUI::International::get(204)).'</td></tr>';
                 $output .= '</table></form>';
                 return $output;
         } else {

@@ -1,4 +1,4 @@
-package WebGUI::Macro::h;
+package WebGUI::Macro::P_previousMenuVertical;
 
 #-------------------------------------------------------------------
 # WebGUI is Copyright 2001 Plain Black Software.
@@ -12,17 +12,23 @@ package WebGUI::Macro::h;
 
 use strict;
 use WebGUI::Macro::Shared;
+use WebGUI::Session;
 
 #-------------------------------------------------------------------
 sub process {
 	my ($output, $temp);
 	$output = $_[0];
-  #---3 level menu (vertical)---
-        if ($output =~ /\^h/) {
+  #---previous menu vertical---
+        if ($output =~ /\^P(.*)\^\/P/) {
                 $temp = '<span class="verticalMenu">';
-        	$temp .= traversePageTree(1,0,3);
-        	$temp .= '</span>';
-                $output =~ s/\^h/$temp/g;
+                $temp .= traversePageTree($session{page}{parentId},0,$1);
+                $temp .= '</span>';
+                $output =~ s/\^P(.*)\^\/P/$temp/g;
+        } elsif ($output =~ /\^P/) {
+                $temp = '<span class="verticalMenu">';
+                $temp .= traversePageTree($session{page}{parentId},0,1);
+                $temp .= '</span>';
+                $output =~ s/\^P/$temp/g;
         }
 	return $output;
 }

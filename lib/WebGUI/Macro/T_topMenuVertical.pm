@@ -1,4 +1,4 @@
-package WebGUI::Macro::F;
+package WebGUI::Macro::T_topMenuVertical;
 
 #-------------------------------------------------------------------
 # WebGUI is Copyright 2001 Plain Black Software.
@@ -17,12 +17,17 @@ use WebGUI::Macro::Shared;
 sub process {
 	my ($output, $temp);
 	$output = $_[0];
-  #---2 level menu (vertical)---
-        if ($output =~ /\^F/) {
+  #---top menu vertical---
+        if ($output =~ /\^T(.*)\^\/T/) {
                 $temp = '<span class="verticalMenu">';
-        	$temp .= traversePageTree(1,0,2);
-        	$temp .= '</span>';
-                $output =~ s/\^F/$temp/g;
+                $temp .= traversePageTree(1,0,$1);
+                $temp .= '</span>';
+                $output =~ s/\^T(.*)\^\/T/$temp/g;
+        } elsif ($output =~ /\^T/) {
+                $temp = '<span class="verticalMenu">';
+                $temp .= traversePageTree(1,0,1);
+                $temp .= '</span>';
+                $output =~ s/\^T/$temp/g;
         }
 	return $output;
 }

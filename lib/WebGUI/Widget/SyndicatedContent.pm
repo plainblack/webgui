@@ -13,6 +13,7 @@ package WebGUI::Widget::SyndicatedContent;
 use strict;
 use Tie::CPHash;
 use WebGUI::DateTime;
+use WebGUI::International;
 use WebGUI::Macro;
 use WebGUI::Privilege;
 use WebGUI::Session;
@@ -28,22 +29,25 @@ sub purge {
 
 #-------------------------------------------------------------------
 sub widgetName {
-	return "Syndicated Content";
+	return WebGUI::International::get(271);
 }
 
 #-------------------------------------------------------------------
 sub www_add {
         my ($output);
       	if (WebGUI::Privilege::canEditPage()) {
-                $output = '<a href="'.$session{page}{url}.'?op=viewHelp&hid=36"><img src="'.$session{setting}{lib}.'/help.gif" border="0" align="right"></a><h1>Add Syndicated Content</h1><form method="post" enctype="multipart/form-data" action="'.$session{page}{url}.'">';
+                $output = '<a href="'.$session{page}{url}.'?op=viewHelp&hid=36"><img src="'.$session{setting}{lib}.'/help.gif" border="0" align="right"></a>';
+		$output .= '<h1>'.WebGUI::International::get(272).'</h1>';
+		$output .= '<form method="post" enctype="multipart/form-data" action="'.$session{page}{url}.'">';
                 $output .= WebGUI::Form::hidden("widget","SyndicatedContent");
                 $output .= WebGUI::Form::hidden("func","addSave");
                 $output .= '<table>';
-                $output .= '<tr><td class="formDescription">Title</td><td>'.WebGUI::Form::text("title",20,30,'Syndicated Content').'</td></tr>';
-                $output .= '<tr><td class="formDescription">Display the title?</td><td>'.WebGUI::Form::checkbox("displayTitle",1,1).'</td></tr>';
-                $output .= '<tr><td class="formDescription">Description</td><td>'.WebGUI::Form::textArea("description",'','','',1).'</td></tr>';
-                $output .= '<tr><td class="formDescription">URL to RSS File</td><td>'.WebGUI::Form::text("rssUrl",20,2048).'</td></tr>';
-                $output .= '<tr><td></td><td>'.WebGUI::Form::submit("save").'</td></tr>';
+                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(99).'</td><td>'.WebGUI::Form::text("title",20,30,'Syndicated Content').'</td></tr>';
+                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(175).'</td><td>'.WebGUI::Form::checkbox("displayTitle",1).'</td></tr>';
+                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(176).'</td><td>'.WebGUI::Form::checkbox("processMacros",1).'</td></tr>';
+                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(85).'</td><td>'.WebGUI::Form::textArea("description",'','','',1).'</td></tr>';
+                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(273).'</td><td>'.WebGUI::Form::text("rssUrl",20,2048).'</td></tr>';
+                $output .= '<tr><td></td><td>'.WebGUI::Form::submit(WebGUI::International::get(62)).'</td></tr>';
                 $output .= '</table></form>';
                 return $output;
         } else {
@@ -70,18 +74,21 @@ sub www_edit {
 	tie %data, 'Tie::CPHash';
         if (WebGUI::Privilege::canEditPage()) {
 		%data = WebGUI::SQL->quickHash("select * from widget,SyndicatedContent where widget.widgetId=$session{form}{wid}",$session{dbh});
-                $output = '<a href="'.$session{page}{url}.'?op=viewHelp&hid=37"><img src="'.$session{setting}{lib}.'/help.gif" border="0" align="right"></a><h1>Edit Syndicated Content</h1><form method="post" enctype="multipart/form-data" action="'.$session{page}{url}.'">';
+                $output = '<a href="'.$session{page}{url}.'?op=viewHelp&hid=37"><img src="'.$session{setting}{lib}.'/help.gif" border="0" align="right"></a>';
+		$output .= '<h1>'.WebGUI::International::get(274).'</h1>';
+		$output .= '<form method="post" enctype="multipart/form-data" action="'.$session{page}{url}.'">';
                 $output .= WebGUI::Form::hidden("wid",$session{form}{wid});
                 $output .= WebGUI::Form::hidden("func","editSave");
                 $output .= '<table>';
-                $output .= '<tr><td class="formDescription">Title</td><td>'.WebGUI::Form::text("title",20,30,$data{title}).'</td></tr>';
-                $output .= '<tr><td class="formDescription">Display the title?</td><td>'.WebGUI::Form::checkbox("displayTitle","1",$data{displayTitle}).'</td></tr>';
-                $output .= '<tr><td class="formDescription">Description</td><td>'.WebGUI::Form::textArea("description",$data{description},50,10,1).'</td></tr>';
-                $output .= '<tr><td class="formDescription">URL to RSS File</td><td>'.WebGUI::Form::text("rssUrl",20,2048,$data{rssUrl}).'</td></tr>';
+                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(99).'</td><td>'.WebGUI::Form::text("title",20,30,$data{title}).'</td></tr>';
+                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(175).'</td><td>'.WebGUI::Form::checkbox("displayTitle","1",$data{displayTitle}).'</td></tr>';
+                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(176).'</td><td>'.WebGUI::Form::checkbox("processMacros","1",$data{processMacros}).'</td></tr>';
+                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(85).'</td><td>'.WebGUI::Form::textArea("description",$data{description},50,10,1).'</td></tr>';
+                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(273).'</td><td>'.WebGUI::Form::text("rssUrl",20,2048,$data{rssUrl}).'</td></tr>';
                 $output .= '<tr><td></td><td>'.WebGUI::Form::submit("save").'</td></tr>';
 		$output .= '<tr><td><br></td></tr>';
-                $output .= '<tr><td class="formDescription">Last Fetched</td><td>'.WebGUI::DateTime::epochToHuman($data{lastFetched},"%m/%d/%y %h:%n%p").'</td></tr>';
-                $output .= '<tr><td class="formDescription">Current Content</td><td>'.$data{content}.'</td></tr>';
+                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(275).'</td><td>'.WebGUI::DateTime::epochToHuman($data{lastFetched},"%m/%d/%y %h:%n%p").'</td></tr>';
+                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(276).'</td><td>'.$data{content}.'</td></tr>';
                 $output .= '</table></form>';
                 return $output;
         } else {
@@ -114,6 +121,9 @@ sub www_view {
 			$output .= $data{description}.'<p>';
                 }
 		$output .= $data{content};
+	}
+	if ($data{processMacros}) {
+		$output = WebGUI::Macro::process($output);
 	}
 	return $output;
 }

@@ -18,7 +18,8 @@ use WebGUI::ErrorHandler;
 
 # Note: This class is really not necessary, I just decided to wrapper DBI in case
 # 	I wanted to change to some other DB connector in the future. Also, it shorthands
-#	a few tasks.
+#	a few tasks. And to be honest, having it separated has come in handy a few times,
+#	like when I started coding for databases beyond MySQL.
 
 #-------------------------------------------------------------------
 sub array {
@@ -44,7 +45,11 @@ sub buildHash {
 	tie %hash, "Tie::IxHash";
         $sth = WebGUI::SQL->read($_[1],$_[2]);
         while (@data = $sth->array) {
-                $hash{$data[0]} = $data[1];
+		if ($data[1] eq "") {
+			$hash{$data[0]} = $data[0];
+		} else {
+                	$hash{$data[0]} = $data[1];
+		}
         }
         $sth->finish;
 	return %hash;

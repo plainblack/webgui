@@ -1,4 +1,4 @@
-package WebGUI::Macro::c;
+package WebGUI::Macro::H_homeLink;
 
 #-------------------------------------------------------------------
 # WebGUI is Copyright 2001 Plain Black Software.
@@ -11,15 +11,20 @@ package WebGUI::Macro::c;
 #-------------------------------------------------------------------
 
 use strict;
+use WebGUI::International;
 use WebGUI::Session;
 
 #-------------------------------------------------------------------
 sub process {
-	my ($output);
+	my ($output, $temp);
 	$output = $_[0];
-  #---company name---
-	if ($output =~ /\^c/) {
-		$output =~ s/\^c/$session{setting}{companyName}/g;
+  #---home link---
+        if ($output =~ /\^H(.*)\^\/H/) {
+                $temp = '<a href="'.$session{env}{SCRIPT_NAME}.'/home">'.$1.'</a>';
+                $output =~ s/\^H(.*)\^\/H/$temp/g;
+        } elsif ($output =~ /\^H/) {
+        	$temp = '<a href="'.$session{env}{SCRIPT_NAME}.'/home">'.WebGUI::International::get(47).'</a>';
+        	$output =~ s/\^H/$temp/g;
 	}
 	return $output;
 }

@@ -1,4 +1,4 @@
-package WebGUI::Macro::P;
+package WebGUI::Macro::M_currentMenuVertical;
 
 #-------------------------------------------------------------------
 # WebGUI is Copyright 2001 Plain Black Software.
@@ -11,26 +11,24 @@ package WebGUI::Macro::P;
 #-------------------------------------------------------------------
 
 use strict;
-use WebGUI::Privilege;
+use WebGUI::Macro::Shared;
 use WebGUI::Session;
-use WebGUI::SQL;
 
 #-------------------------------------------------------------------
 sub process {
-	my ($output, $temp, @data, $sth);
+	my ($output, $temp);
 	$output = $_[0];
-  #---previous menu vertical---
-        if ($output =~ /\^P/) {
+  #---current menu vertical---
+        if ($output =~ /\^M(.*)\^\/M/) {
                 $temp = '<span class="verticalMenu">';
-                $sth = WebGUI::SQL->read("select title,urlizedTitle,pageId from page where parentId=$session{page}{parentId} order by sequenceNumber",$session{dbh});
-                while (@data = $sth->array) {
-                        if (WebGUI::Privilege::canViewPage($data[2])) {
-                                $temp .= '<a href="'.$session{env}{SCRIPT_NAME}.'/'.$data[1].'">'.$data[0].'</a><br>';
-                        }
-                }
-                $sth->finish;
+                $temp .= traversePageTree($session{page}{pageId},0,$1);
                 $temp .= '</span>';
-                $output =~ s/\^P/$temp/g;
+                $output =~ s/\^M(.*)\^\/M/$temp/g;
+        } elsif ($output =~ /\^M/) {
+                $temp = '<span class="verticalMenu">';
+                $temp .= traversePageTree($session{page}{pageId},0,1);
+                $temp .= '</span>';
+                $output =~ s/\^M/$temp/g;
         }
 	return $output;
 }

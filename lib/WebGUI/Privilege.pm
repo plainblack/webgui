@@ -12,6 +12,7 @@ package WebGUI::Privilege;
 
 use strict;
 use Tie::CPHash;
+use WebGUI::International;
 use WebGUI::Session;
 use WebGUI::SQL;
 use WebGUI::Utility;
@@ -19,7 +20,9 @@ use WebGUI::Utility;
 #-------------------------------------------------------------------
 sub adminOnly {
 	my ($output, $sth, @data);
-        $output = '<h1>Administrative Function</h1>You must be an administrator to perform this function. Please contact one of your administrators. The following is a list of the administrators for this system:<ul>';
+        $output = '<h1>'.WebGUI::International::get(35).'</h1>';
+	$output .= WebGUI::International::get(36);
+	$output .= '<ul>';
 	$sth = WebGUI::SQL->read("select users.username, users.email from users,groupings where users.userId=groupings.userId and groupings.groupId=3 order by users.username",$session{dbh});
 	while (@data = $sth->array) {
 		$output .= '<li>'.$data[0].' (<a href="mailto:'.$data[1].'">'.$data[1].'</a>)';
@@ -68,7 +71,12 @@ sub canViewPage {
 
 #-------------------------------------------------------------------
 sub insufficient {
-	return '<h1>Permission Denied!</h1>You do not have sufficient privileges to perform this operation. Please <a href="'.$session{page}{url}.'?op=displayLogin">log in with an account</a> that has sufficient privileges before attempting this operation.<p>';
+	my ($output);
+	$output = '<h1>'.WebGUI::International::get(37).'</h1>';
+	$output .= WebGUI::International::get(37);
+	$output .= '<p>';
+	$output = WebGUI::Macro::process($output);
+	return $output;
 }
 
 #-------------------------------------------------------------------
@@ -86,8 +94,21 @@ sub isInGroup {
 }
 
 #-------------------------------------------------------------------
+sub noAccess {
+	my ($output);
+        $output = '<h1>'.WebGUI::International::get(37).'</h1>';
+	$output .= WebGUI::International::get(39);
+	$output .= '<p>';
+	return $output;
+}
+
+#-------------------------------------------------------------------
 sub vitalComponent {
-        return '<h1>Vital Component</h1>You\'re attempting to remove a vital component of the WebGUI system. If you were allowed to continue WebGUI may cease to function.<p>';
+	my ($output);
+        $output = '<h1>'.WebGUI::International::get(40).'</h1>';
+	$output .= WebGUI::International::get(41);
+	$output .= '<p>';
+	return $output;
 }
 
 

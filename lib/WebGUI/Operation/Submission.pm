@@ -13,6 +13,7 @@ package WebGUI::Operation::Submission;
 use Exporter;
 use strict;
 use WebGUI::DateTime;
+use WebGUI::International;
 use WebGUI::Privilege;
 use WebGUI::Session;
 use WebGUI::SQL;
@@ -46,7 +47,7 @@ sub www_denySubmission {
 sub www_viewPendingSubmissions {
         my (@submission, $output, $sth, @row, $i, $pn);
 	if (WebGUI::Privilege::isInGroup(4,$session{user}{userId}) || WebGUI::Privilege::isInGroup(3,$session{user}{userId})) {
-		$output = '<h1>Pending Sumissions</h1>';
+		$output = '<h1>'.WebGUI::International::get(159).'</h1>';
         	$sth = WebGUI::SQL->read("select title,submissionId,dateSubmitted,username,userId,widgetId from submission where status='Pending' order by dateSubmitted",$session{dbh});
         	while (@submission = $sth->array) {
                 	$row[$i] = '<tr><td class="tableData"><a href="'.$session{page}{url}.'?wid='.$submission[5].'&func=viewSubmission&sid='.$submission[1].'">'.$submission[0].'</a></td><td class="tableData">'.epochToHuman($submission[2],"%m/%d/%Y").'</td><td class="tableData">'.$submission[3].'</td></tr>';
@@ -54,7 +55,7 @@ sub www_viewPendingSubmissions {
         	}
         	$sth->finish;
         	$output .= '<table width="100%" cellspacing=1 cellpadding=2 border=0>';
-        	$output .= '<tr><td class="tableHeader">Title</td><td class="tableHeader">Date Submitted</td><td class="tableHeader">Submitted By</td></tr>';
+        	$output .= '<tr><td class="tableHeader">'.WebGUI::International::get(99).'</td><td class="tableHeader">'.WebGUI::International::get(160).'</td><td class="tableHeader">'.WebGUI::International::get(161).'</td></tr>';
         	if ($session{form}{pn} < 1) {
                 	$pn = 0;
         	} else {
@@ -66,15 +67,15 @@ sub www_viewPendingSubmissions {
         	$output .= '</table>';
         	$output .= '<div class="pagination">';
         	if ($pn > 0) {
-                	$output .= '<a href="'.$session{page}{url}.'?pn='.($pn-1).'&op=viewPendingSubmissions">&laquo;Previous Page</a>';
+                	$output .= '<a href="'.$session{page}{url}.'?pn='.($pn-1).'&op=viewPendingSubmissions">&laquo;'.WebGUI::International::get(91).'</a>';
         	} else {
-                	$output .= '&laquo;Previous Page';
+                	$output .= '&laquo;'.WebGUI::International::get(91);
         	}
         	$output .= ' &middot; ';
         	if ($pn < round($#row/50)) {
-                	$output .= '<a href="'.$session{page}{url}.'?pn='.($pn+1).'&op=viewPendingSubmissions">Next Page&raquo;</a>';
+                	$output .= '<a href="'.$session{page}{url}.'?pn='.($pn+1).'&op=viewPendingSubmissions">'.WebGUI::International::get(92).'&raquo;</a>';
         	} else {
-                	$output .= 'Next Page&raquo;';
+                	$output .= WebGUI::International::get(92).'&raquo;';
         	}
             	$output .= '</div>';
 	} else {

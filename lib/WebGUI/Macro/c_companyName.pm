@@ -1,4 +1,4 @@
-package WebGUI::Macro::Splat;
+package WebGUI::Macro::c_companyName;
 
 #-------------------------------------------------------------------
 # WebGUI is Copyright 2001 Plain Black Software.
@@ -11,19 +11,18 @@ package WebGUI::Macro::Splat;
 #-------------------------------------------------------------------
 
 use strict;
+use WebGUI::Session;
 
 #-------------------------------------------------------------------
 sub process {
-	my ($output, $temp);
+	my ($output);
 	$output = $_[0];
-  #---random number---
-        if ($output =~ /\^\*/) {
-                $temp = rand()*1000000000;
-                $output =~ s/\^\*/$temp/g;
-        }
+  #---company name---
+	if ($output =~ /\^c/) {
+		$output =~ s/\^c/$session{setting}{companyName}/g;
+	}
 	return $output;
 }
 
-
-
 1;
+

@@ -13,6 +13,7 @@ package WebGUI::Widget::Article;
 use strict;
 use Tie::CPHash;
 use WebGUI::DateTime;
+use WebGUI::International;
 use WebGUI::Macro;
 use WebGUI::Privilege;
 use WebGUI::Session;
@@ -28,7 +29,7 @@ sub purge {
 
 #-------------------------------------------------------------------
 sub widgetName {
-	return "Article";
+	return WebGUI::International::get(172);
 }
 
 #-------------------------------------------------------------------
@@ -36,23 +37,23 @@ sub www_add {
         my ($output);
       	if (WebGUI::Privilege::canEditPage()) {
                 $output = '<a href="'.$session{page}{url}.'?op=viewHelp&hid=23"><img src="'.$session{setting}{lib}.'/help.gif" border="0" align="right"></a>';
-		$output .= '<h1>Add '.widgetName().'</h1>';
+		$output .= '<h1>'.WebGUI::International::get(173).'</h1>';
 		$output .= '<form method="post" enctype="multipart/form-data" action="'.$session{page}{url}.'">';
                 $output .= WebGUI::Form::hidden("widget","Article");
                 $output .= WebGUI::Form::hidden("func","addSave");
                 $output .= '<table>';
-                $output .= '<tr><td class="formDescription">Title</td><td>'.WebGUI::Form::text("title",20,30,'Article').'</td></tr>';
-                $output .= '<tr><td class="formDescription">Display the title?</td><td>'.WebGUI::Form::checkbox("displayTitle",1,1).'</td></tr>';
-                $output .= '<tr><td class="formDescription">Process macros?</td><td>'.WebGUI::Form::checkbox("processMacros",1,1).'</td></tr>';
-                $output .= '<tr><td class="formDescription">Start Date</td><td>'.WebGUI::Form::text("startDate",20,30,epochToSet(time()),1).'</td></tr>';
-                $output .= '<tr><td class="formDescription">End Date</td><td>'.WebGUI::Form::text("endDate",20,30,'01/01/2037',1).'</td></tr>';
-                $output .= '<tr><td class="formDescription">Body</td><td>'.WebGUI::Form::textArea("body",'',50,10,1).'</td></tr>';
-                $output .= '<tr><td class="formDescription">Image</td><td>'.WebGUI::Form::file("image").'</td></tr>';
-                $output .= '<tr><td class="formDescription">Link Title</td><td>'.WebGUI::Form::text("linkTitle",20,30).'</td></tr>';
-                $output .= '<tr><td class="formDescription">Link URL</td><td>'.WebGUI::Form::text("linkURL",20,2048).'</td></tr>';
-                $output .= '<tr><td class="formDescription">Attachment</td><td>'.WebGUI::Form::file("attachment").'</td></tr>';
-		$output .= '<tr><td class="formDescription">Convert Carriage Returns</td><td>'.WebGUI::Form::checkbox("convertCarriageReturns",1).' <span style="font-size: 8pt;">(check if you\'re not adding &lt;br&gt; manually)</span></td></tr>';
-                $output .= '<tr><td></td><td>'.WebGUI::Form::submit("save").'</td></tr>';
+                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(99).'</td><td>'.WebGUI::Form::text("title",20,30,'Article').'</td></tr>';
+                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(174).'</td><td>'.WebGUI::Form::checkbox("displayTitle",1,1).'</td></tr>';
+                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(175).'</td><td>'.WebGUI::Form::checkbox("processMacros",1,1).'</td></tr>';
+                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(176).'</td><td>'.WebGUI::Form::text("startDate",20,30,epochToSet(time()),1).'</td></tr>';
+                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(177).'</td><td>'.WebGUI::Form::text("endDate",20,30,'01/01/2037',1).'</td></tr>';
+                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(178).'</td><td>'.WebGUI::Form::textArea("body",'',50,10,1).'</td></tr>';
+                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(179).'</td><td>'.WebGUI::Form::file("image").'</td></tr>';
+                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(180).'</td><td>'.WebGUI::Form::text("linkTitle",20,30).'</td></tr>';
+                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(181).'</td><td>'.WebGUI::Form::text("linkURL",20,2048).'</td></tr>';
+                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(182).'</td><td>'.WebGUI::Form::file("attachment").'</td></tr>';
+		$output .= '<tr><td class="formDescription">'.WebGUI::International::get(183).'</td><td>'.WebGUI::Form::checkbox("convertCarriageReturns",1).' <span style="font-size: 8pt;">'.WebGUI::International::get(184).'</span></td></tr>';
+                $output .= '<tr><td></td><td>'.WebGUI::Form::submit(WebGUI::International::get(62)).'</td></tr>';
                 $output .= '</table></form>';
                 return $output;
         } else {
@@ -63,7 +64,7 @@ sub www_add {
 
 #-------------------------------------------------------------------
 sub www_addSave {
-	my ($widgetId, $displayTitle, $image, $attachment);
+	my ($widgetId, $image, $attachment);
 	if (WebGUI::Privilege::canEditPage()) {
 		$widgetId = create();
 		$image = saveAttachment("image",$widgetId);
@@ -102,31 +103,31 @@ sub www_edit {
         if (WebGUI::Privilege::canEditPage()) {
 		%article = WebGUI::SQL->quickHash("select * from widget,Article where widget.widgetId=Article.widgetId and widget.widgetId=$session{form}{wid}",$session{dbh});
                 $output = '<a href="'.$session{page}{url}.'?op=viewHelp&hid=24"><img src="'.$session{setting}{lib}.'/help.gif" border="0" align="right"></a>';
-		$output .= '<h1>Edit '.widgetName().'</h1>';
+		$output .= '<h1>'.WebGUI::International::get(185).'</h1>';
 		$output .= '<form method="post" enctype="multipart/form-data" action="'.$session{page}{url}.'">';
                 $output .= WebGUI::Form::hidden("wid",$session{form}{wid});
                 $output .= WebGUI::Form::hidden("func","editSave");
                 $output .= '<table>';
-                $output .= '<tr><td class="formDescription">Title</td><td>'.WebGUI::Form::text("title",20,30,$article{title}).'</td></tr>';
-                $output .= '<tr><td class="formDescription">Display the title?</td><td>'.WebGUI::Form::checkbox("displayTitle","1",$article{displayTitle}).'</td></tr>';
-                $output .= '<tr><td class="formDescription">Process macros?</td><td>'.WebGUI::Form::checkbox("processMacros","1",$article{processMacros}).'</td></tr>';
-                $output .= '<tr><td class="formDescription">Start Date</td><td>'.WebGUI::Form::text("startDate",20,30,epochToSet($article{startDate}),1).'</td></tr>';
-                $output .= '<tr><td class="formDescription">End Date</td><td>'.WebGUI::Form::text("endDate",20,30,epochToSet($article{endDate}),1).'</td></tr>';
-                $output .= '<tr><td class="formDescription">Body</td><td>'.WebGUI::Form::textArea("body",$article{body},50,10,1).'</td></tr>';
+                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(99).'</td><td>'.WebGUI::Form::text("title",20,30,$article{title}).'</td></tr>';
+                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(174).'</td><td>'.WebGUI::Form::checkbox("displayTitle","1",$article{displayTitle}).'</td></tr>';
+                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(175).'</td><td>'.WebGUI::Form::checkbox("processMacros","1",$article{processMacros}).'</td></tr>';
+                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(176).'</td><td>'.WebGUI::Form::text("startDate",20,30,epochToSet($article{startDate}),1).'</td></tr>';
+                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(177).'</td><td>'.WebGUI::Form::text("endDate",20,30,epochToSet($article{endDate}),1).'</td></tr>';
+                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(178).'</td><td>'.WebGUI::Form::textArea("body",$article{body},50,10,1).'</td></tr>';
 		if ($article{image} ne "") {
-                	$output .= '<tr><td class="formDescription">Image</td><td><a href="'.$session{page}{url}.'?func=deleteImage&wid='.$session{form}{wid}.'">Delete Image</a></td></tr>';
+                	$output .= '<tr><td class="formDescription">'.WebGUI::International::get(179).'</td><td><a href="'.$session{page}{url}.'?func=deleteImage&wid='.$session{form}{wid}.'">'.WebGUI::International::get(186).'</a></td></tr>';
 		} else {
-                	$output .= '<tr><td class="formDescription">Image</td><td>'.WebGUI::Form::file("image").'</td></tr>';
+                	$output .= '<tr><td class="formDescription">'.WebGUI::International::get(179).'</td><td>'.WebGUI::Form::file("image").'</td></tr>';
 		}
-                $output .= '<tr><td class="formDescription">Link Title</td><td>'.WebGUI::Form::text("linkTitle",20,30,$article{linkTitle}).'</td></tr>';
-                $output .= '<tr><td class="formDescription">Link URL</td><td>'.WebGUI::Form::text("linkURL",20,2048,$article{linkURL}).'</td></tr>';
+                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(180).'</td><td>'.WebGUI::Form::text("linkTitle",20,30,$article{linkTitle}).'</td></tr>';
+                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(181).'</td><td>'.WebGUI::Form::text("linkURL",20,2048,$article{linkURL}).'</td></tr>';
 		if ($article{attachment} ne "") {
-                	$output .= '<tr><td class="formDescription">Attachment</td><td><a href="'.$session{page}{url}.'?func=deleteAttachment&wid='.$session{form}{wid}.'">Delete Attachment</a></td></tr>';
+                	$output .= '<tr><td class="formDescription">'.WebGUI::International::get(182).'</td><td><a href="'.$session{page}{url}.'?func=deleteAttachment&wid='.$session{form}{wid}.'">'.WebGUI::International::get(186).'</a></td></tr>';
 		} else {
-                	$output .= '<tr><td class="formDescription">Attachment</td><td>'.WebGUI::Form::file("attachment").'</td></tr>';
+                	$output .= '<tr><td class="formDescription">'.WebGUI::International::get(182).'</td><td>'.WebGUI::Form::file("attachment").'</td></tr>';
 		}
-		$output .= '<tr><td class="formDescription">Convert Carriage Returns</td><td>'.WebGUI::Form::checkbox("convertCarriageReturns",1,$article{convertCarriageReturns}).' <span style="font-size: 8pt;">(check if you\'re not adding &lt;br&gt; manually)</span></td></tr>';
-                $output .= '<tr><td></td><td>'.WebGUI::Form::submit("save").'</td></tr>';
+		$output .= '<tr><td class="formDescription">'.WebGUI::International::get(183).'</td><td>'.WebGUI::Form::checkbox("convertCarriageReturns",1,$article{convertCarriageReturns}).' <span style="font-size: 8pt;">'.WebGUI::International::get(184).'</span></td></tr>';
+                $output .= '<tr><td></td><td>'.WebGUI::Form::submit(WebGUI::International::get(62)).'</td></tr>';
                 $output .= '</table></form>';
                 return $output;
         } else {
@@ -136,7 +137,7 @@ sub www_edit {
 
 #-------------------------------------------------------------------
 sub www_editSave {
-        my ($widgetId, $displayTitle, $image, $attachment);
+        my ($image, $attachment);
         if (WebGUI::Privilege::canEditPage()) {
 		update();
                 $image = saveAttachment("image",$session{form}{wid});
@@ -187,7 +188,5 @@ sub www_view {
 
 
 
-
-
-
 1;
+

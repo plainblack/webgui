@@ -12,6 +12,7 @@ package WebGUI::Widget::SiteMap;
 
 use strict;
 use Tie::CPHash;
+use WebGUI::International;
 use WebGUI::Macro;
 use WebGUI::Privilege;
 use WebGUI::Session;

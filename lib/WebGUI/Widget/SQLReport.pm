@@ -12,6 +12,7 @@ package WebGUI::Widget::SQLReport;
 
 use strict;
 use WebGUI::ErrorHandler;
+use WebGUI::International;
 use WebGUI::Macro;
 use WebGUI::Privilege;
 use WebGUI::Session;
@@ -27,7 +28,7 @@ sub purge {
 
 #-------------------------------------------------------------------
 sub widgetName {
-	return "SQL Report";
+	return WebGUI::International::get(259);
 }
 
 #-------------------------------------------------------------------
@@ -35,22 +36,22 @@ sub www_add {
         my ($output);
       	if (WebGUI::Privilege::canEditPage()) {
                 $output = '<a href="'.$session{page}{url}.'?op=viewHelp&hid=20"><img src="'.$session{setting}{lib}.'/help.gif" border="0" align="right"></a>';
-		$output .= '<h1>Add '.widgetName().'</h1>';
+		$output .= '<h1>'.WebGUI::International::get(260).'</h1>';
 		$output .= '<form method="post" enctype="multipart/form-data" action="'.$session{page}{url}.'">';
                 $output .= WebGUI::Form::hidden("widget","SQLReport");
                 $output .= WebGUI::Form::hidden("func","addSave");
                 $output .= '<table>';
-                $output .= '<tr><td class="formDescription">Title</td><td>'.WebGUI::Form::text("title",20,30,'SQL Report').'</td></tr>';
-                $output .= '<tr><td class="formDescription">Display the title?</td><td>'.WebGUI::Form::checkbox("displayTitle",1,1).'</td></tr>';
-                $output .= '<tr><td class="formDescription">Process macros?</td><td>'.WebGUI::Form::checkbox("processMacros",1,1).'</td></tr>';
-                $output .= '<tr><td class="formDescription">Description</td><td>'.WebGUI::Form::textArea("description",'','','',1).'</td></tr>';
-                $output .= '<tr><td class="formDescription">Template</td><td>'.WebGUI::Form::textArea("template",'','','',1).'</td></tr>';
-                $output .= '<tr><td class="formDescription">Query</td><td>'.WebGUI::Form::textArea("dbQuery",'').'</td></tr>';
-                $output .= '<tr><td class="formDescription">DSN</td><td>'.WebGUI::Form::text("DSN",20,255,$session{config}{dsn}).'</td></tr>';
-                $output .= '<tr><td class="formDescription">Database User</td><td>'.WebGUI::Form::text("username",20,255,$session{config}{dbuser}).'</td></tr>';
-                $output .= '<tr><td class="formDescription">Database Password</td><td>'.WebGUI::Form::password("identifier",20,255).'</td></tr>';
-                $output .= '<tr><td class="formDescription">Convert carriage returns?</td><td>'.WebGUI::Form::checkbox("convertCarriageReturns",1).'</td></tr>';
-                $output .= '<tr><td></td><td>'.WebGUI::Form::submit("save").'</td></tr>';
+                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(99).'</td><td>'.WebGUI::Form::text("title",20,30,'SQL Report').'</td></tr>';
+                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(175).'</td><td>'.WebGUI::Form::checkbox("displayTitle",1,1).'</td></tr>';
+                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(176).'</td><td>'.WebGUI::Form::checkbox("processMacros",1,1).'</td></tr>';
+                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(85).'</td><td>'.WebGUI::Form::textArea("description",'','','',1).'</td></tr>';
+                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(261).'</td><td>'.WebGUI::Form::textArea("template",'','','',1).'</td></tr>';
+                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(262).'</td><td>'.WebGUI::Form::textArea("dbQuery",'').'</td></tr>';
+                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(263).'</td><td>'.WebGUI::Form::text("DSN",20,255,$session{config}{dsn}).'</td></tr>';
+                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(264).'</td><td>'.WebGUI::Form::text("username",20,255,$session{config}{dbuser}).'</td></tr>';
+                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(265).'</td><td>'.WebGUI::Form::password("identifier",20,255).'</td></tr>';
+                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(183).'</td><td>'.WebGUI::Form::checkbox("convertCarriageReturns",1).'</td></tr>';
+                $output .= '<tr><td></td><td>'.WebGUI::Form::submit(WebGUI::International::get(62)).'</td></tr>';
                 $output .= '</table></form>';
                 return $output;
         } else {
@@ -78,22 +79,22 @@ sub www_edit {
         if (WebGUI::Privilege::canEditPage()) {
 		%data = WebGUI::SQL->quickHash("select * from widget,SQLReport where widget.widgetId=$session{form}{wid} and widget.widgetId=SQLReport.widgetId",$session{dbh});
                 $output = '<a href="'.$session{page}{url}.'?op=viewHelp&hid=22"><img src="'.$session{setting}{lib}.'/help.gif" border="0" align="right"></a>';
-                $output .= '<h1>Edit '.widgetName().'</h1>';
+                $output .= '<h1>'.WebGUI::International::get(266).'</h1>';
 		$output .= '<form method="post" enctype="multipart/form-data" action="'.$session{page}{url}.'">';
                 $output .= WebGUI::Form::hidden("wid",$session{form}{wid});
                 $output .= WebGUI::Form::hidden("func","editSave");
                 $output .= '<table>';
-                $output .= '<tr><td class="formDescription">Title</td><td>'.WebGUI::Form::text("title",20,30,$data{title}).'</td></tr>';
-                $output .= '<tr><td class="formDescription">Display the title?</td><td>'.WebGUI::Form::checkbox("displayTitle","1",$data{displayTitle}).'</td></tr>';
-                $output .= '<tr><td class="formDescription">Process macros?</td><td>'.WebGUI::Form::checkbox("processMacros","1",$data{processMacros}).'</td></tr>';
-                $output .= '<tr><td class="formDescription">Description</td><td>'.WebGUI::Form::textArea("description",$data{description},50,10,1).'</td></tr>';
-                $output .= '<tr><td class="formDescription">Template</td><td>'.WebGUI::Form::textArea("template",$data{template},50,10,1).'</td></tr>';
+                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(99).'</td><td>'.WebGUI::Form::text("title",20,30,$data{title}).'</td></tr>';
+                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(175).'</td><td>'.WebGUI::Form::checkbox("displayTitle","1",$data{displayTitle}).'</td></tr>';
+                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(176).'</td><td>'.WebGUI::Form::checkbox("processMacros","1",$data{processMacros}).'</td></tr>';
+                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(85).'</td><td>'.WebGUI::Form::textArea("description",$data{description},50,10,1).'</td></tr>';
+                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(261).'</td><td>'.WebGUI::Form::textArea("template",$data{template},50,10,1).'</td></tr>';
                 $output .= '<tr><td class="formDescription">Query</td><td>'.WebGUI::Form::textArea("dbQuery",$data{dbQuery},50,10,1).'</td></tr>';
-                $output .= '<tr><td class="formDescription">DSN</td><td>'.WebGUI::Form::text("DSN",20,255,$data{DSN}).'</td></tr>';
-                $output .= '<tr><td class="formDescription">Database User</td><td>'.WebGUI::Form::text("username",20,255,$data{username}).'</td></tr>';
-                $output .= '<tr><td class="formDescription">Database Password</td><td>'.WebGUI::Form::password("identifier",20,255,$data{identifier}).'</td></tr>';
-                $output .= '<tr><td class="formDescription">Convert carriage returns?</td><td>'.WebGUI::Form::checkbox("convertCarriageReturns",1,$data{convertCarriageReturns}).'</td></tr>';
-                $output .= '<tr><td></td><td>'.WebGUI::Form::submit("save").'</td></tr>';
+                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(262).'</td><td>'.WebGUI::Form::text("DSN",20,255,$data{DSN}).'</td></tr>';
+                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(263).'</td><td>'.WebGUI::Form::text("username",20,255,$data{username}).'</td></tr>';
+                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(264).'</td><td>'.WebGUI::Form::password("identifier",20,255,$data{identifier}).'</td></tr>';
+                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(183).'</td><td>'.WebGUI::Form::checkbox("convertCarriageReturns",1,$data{convertCarriageReturns}).'</td></tr>';
+                $output .= '<tr><td></td><td>'.WebGUI::Form::submit(WebGUI::International::get(62)).'</td></tr>';
                 $output .= '</table></form>';
                 return $output;
         } else {
@@ -131,14 +132,14 @@ sub www_view {
 	        if ($data{DSN} =~ /\DBI\:\w+\:\w+/) {
         	        $dbh = DBI->connect($data{DSN},$data{username},$data{identifier});
        	 	} else {
-                	$output .= '<b>Error</b>: The DSN specified is of an improper format.<p>';
+                	$output .= WebGUI::International::get(267).'<p>';
 			WebGUI::ErrorHandler::warn("SQLReport [$widgetId] The DSN specified is of an improper format.");
         	}
 		if (defined $dbh) {
 			if ($data{dbQuery} =~ /select/i) {
 				$sth = WebGUI::SQL->read($data{dbQuery},$dbh);
 			} else {
-				$output .= '<b>Error</b>: The SQL query is improperly formatted.<p>';
+				$output .= WebGUI::International::get(268).'<p>';
 				WebGUI::ErrorHandler::warn("SQLReport [$widgetId] The SQL query is improperly formatted.");
 			}
 			if (defined $sth) {
@@ -152,12 +153,12 @@ sub www_view {
 				}
 				$sth->finish;
 			} else {
-				$output .= '<b>Error</b>: There was a problem with the query.<p>';
+				$output .= WebGUI::International::get(269).'<p>';
 				WebGUI::ErrorHandler::warn("SQLReport [$widgetId] There was a problem with the query.");
 			}
 			$dbh->disconnect();
 		} else {
-			$output .= '<b>Error</b>: Could not connect to remote database.<p>';
+			$output .= WebGUI::International::get(270).'<p>';
 			WebGUI::ErrorHandler::warn("SQLReport [$widgetId] Could not connect to remote database.");
 		}	
 		$output .= $template[2];

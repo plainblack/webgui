@@ -1,4 +1,4 @@
-package WebGUI::Macro::J;
+package WebGUI::Macro::Carat_carat;
 
 #-------------------------------------------------------------------
 # WebGUI is Copyright 2001 Plain Black Software.
@@ -11,22 +11,17 @@ package WebGUI::Macro::J;
 #-------------------------------------------------------------------
 
 use strict;
-use WebGUI::Macro::Shared;
-use WebGUI::Session;
 
-#-------------------------------------------------------------------
 sub process {
-	my ($output, $temp, @data, $sth, $first);
+	my ($output);
 	$output = $_[0];
-  #---3 level current level menu (vertical)---
-        if ($output =~ /\^J/) {
-                $temp = '<span class="verticalMenu">';
-                $temp .= traversePageTree($session{page}{pageId},0,3);
-                $temp .= '</span>';
-                $output =~ s/\^J/$temp/g;
+  #---carrot ^---
+        if ($output =~ /\^\^/) {
+                $output =~ s/\^\^/\^/g;
         }
 	return $output;
 }
 
-1;
 
+
+1;

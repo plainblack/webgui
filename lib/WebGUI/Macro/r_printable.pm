@@ -1,4 +1,4 @@
-package WebGUI::Macro::r;
+package WebGUI::Macro::r_printable;
 
 #-------------------------------------------------------------------
 # WebGUI is Copyright 2001 Plain Black Software.
@@ -11,6 +11,7 @@ package WebGUI::Macro::r;
 #-------------------------------------------------------------------
 
 use strict;
+use WebGUI::International;
 use WebGUI::Session;
 
 #-------------------------------------------------------------------
@@ -34,7 +35,9 @@ sub process {
 		} else {
 			$temp .= '?makePrintable=1';
 		}
-		$temp = '<a href="'.$temp.'">Make Page Printable</a>';
+		$temp = '<a href="'.$temp.'">';
+		$temp .= WebGUI::International::get(53); 
+		$temp .= '</a>';
                 $output =~ s/\^r/$temp/g;
         }
 	return $output;

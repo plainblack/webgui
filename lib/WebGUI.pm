@@ -1,5 +1,5 @@
 package WebGUI;
-our $VERSION = "2.0.0";
+our $VERSION = "2.1.0";
 
 #-------------------------------------------------------------------
 # WebGUI is Copyright 2001 Plain Black Software.
@@ -15,6 +15,7 @@ use strict qw(vars subs);
 use Tie::CPHash;
 use Tie::IxHash;
 use WebGUI::ErrorHandler;
+use WebGUI::International;
 use WebGUI::Operation;
 use WebGUI::Privilege;
 use WebGUI::Session;
@@ -28,15 +29,16 @@ sub _displayAdminBar {
 	tie %hash2, "Tie::IxHash";
   #--content adder
 	@widgetArray = @_;
-	$hash2{$session{page}{url}} = "Add content...";
-	$hash2{$session{page}{url}.'?op=addPage'} = 'Page';
+	$hash2{$session{page}{url}} = WebGUI::International::get(1);
+	$hash2{$session{page}{url}.'?op=addPage'} = WebGUI::International::get(2);
 	foreach $widget (@widgetArray) {
 		$widgetName = "WebGUI::Widget::".$widget."::widgetName";
 		$hash2{$session{page}{url}.'?func=add&widget='.$widget} = &$widgetName;
 	}
 	$contentSelect = WebGUI::Form::selectList("contentSelect",\%hash2,"","","","goContent()");
   #--clipboard paster
-	%hash2 = ( $session{page}{url}=> "Paste from clipboard..." );
+	%hash2 = ();
+	$hash2{$session{page}{url}} = WebGUI::International::get(3);
 	%hash = WebGUI::SQL->buildHash("select pageId,title from page where parentId=2 order by title",$session{dbh});
 	foreach $key (keys %hash) {
 		$hash2{$session{page}{url}.'?op=pastePage&pageId='.$key} = $hash{$key};
@@ -50,20 +52,20 @@ sub _displayAdminBar {
 	%hash = ();
 	if (WebGUI::Privilege::isInGroup(3,$session{user}{userId})) {
         	%hash = ( 
-			$session{page}{url}.'?op=editSettings'=>'Edit Settings', 
-			$session{page}{url}.'?op=listGroups'=>'Manage Groups', 
-			$session{page}{url}.'?op=listStyles'=>'Manage Styles', 
-			$session{page}{url}.'?op=listUsers'=>'Manage Users',
-			$session{env}{SCRIPT_NAME}.'/page_not_found'=>'View Page Not Found',
-			$session{env}{SCRIPT_NAME}.'/clipboard'=>'View Clipboard',
-			$session{env}{SCRIPT_NAME}.'/trash'=>'View Trash',
-			$session{page}{url}.'?op=purgeTrash'=>'Empty Trash'
+			$session{page}{url}.'?op=listGroups'=>WebGUI::International::get(5), 
+			$session{page}{url}.'?op=manageSettings'=>WebGUI::International::get(4), 
+			$session{page}{url}.'?op=listStyles'=>WebGUI::International::get(6), 
+			$session{page}{url}.'?op=listUsers'=>WebGUI::International::get(7),
+			$session{env}{SCRIPT_NAME}.'/page_not_found'=>WebGUI::International::get(8),
+			$session{env}{SCRIPT_NAME}.'/clipboard'=>WebGUI::International::get(9),
+			$session{env}{SCRIPT_NAME}.'/trash'=>WebGUI::International::get(10),
+			$session{page}{url}.'?op=purgeTrash'=>WebGUI::International::get(11)
 		);
 	}
-        %hash = ( $session{page}{url}=>'Admin...', 
-		$session{page}{url}.'?op=switchOffAdmin'=>'Turn Admin Off',
-		$session{page}{url}.'?op=viewHelpIndex'=>'View Help Index',
-		$session{page}{url}.'?op=viewPendingSubmissions'=>'View Pending Submissions', 
+        %hash = ( $session{page}{url}=>WebGUI::International::get(82), 
+		$session{page}{url}.'?op=switchOffAdmin'=>WebGUI::International::get(12),
+		$session{page}{url}.'?op=viewHelpIndex'=>WebGUI::International::get(13),
+		$session{page}{url}.'?op=viewPendingSubmissions'=>WebGUI::International::get(14), 
 		%hash
 	);
         $adminSelect = WebGUI::Form::selectList("adminSelect",\%hash,"","","","goAdmin()");
@@ -91,8 +93,13 @@ sub _displayAdminBar {
 
 #-------------------------------------------------------------------
 sub _loadWidgets {
-	my (@files, $file, $use, @widget, $i);
-	opendir (DIR,$session{config}{webguiRoot}."/lib/WebGUI/Widget") or WebGUI::ErrorHandler::fatalError("Can't open widget directory!");
+	my ($widgetDir, @files, $file, $use, @widget, $i);
+        if ($^O =~ /Win/i) {
+                $widgetDir = "\\lib\\WebGUI\\Widget";
+        } else {
+                $widgetDir = "/lib/WebGUI/Widget";
+        }
+	opendir (DIR,$session{config}{webguiRoot}.$widgetDir) or WebGUI::ErrorHandler::fatalError("Can't open widget directory!");
 	@files = readdir(DIR);
 	foreach $file (@files) {
         	if ($file ne "." && $file ne ".." && $file =~ /\.pm/) {
@@ -146,7 +153,7 @@ sub page {
 			}
 			$sth->finish;
 		} else {
-			$content = ' <h1>Permission Denied!</h1> You do not have sufficient privileges to access this page. ';
+			$content = WebGUI::Privilege::noAccess();
 		}
 	}
 	if ($session{var}{adminOn}) {

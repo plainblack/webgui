@@ -12,6 +12,7 @@ package WebGUI::Widget::Poll;
 
 use strict;
 use Tie::CPHash;
+use WebGUI::International;
 use WebGUI::Privilege;
 use WebGUI::Session;
 use WebGUI::SQL;
@@ -86,7 +87,7 @@ sub purge {
 
 #-------------------------------------------------------------------
 sub widgetName {
-	return "Poll";
+	return WebGUI::International::get(250);
 }
 
 #-------------------------------------------------------------------
@@ -94,20 +95,23 @@ sub www_add {
         my ($output, %hash);
 	tie %hash, "Tie::IxHash";
       	if (WebGUI::Privilege::canEditPage()) {
-                $output = '<a href="'.$session{page}{url}.'?op=viewHelp&hid=28"><img src="'.$session{setting}{lib}.'/help.gif" border="0" align="right"></a><h1>Add Poll</h1><form method="post" enctype="multipart/form-data" action="'.$session{page}{url}.'">';
+                $output = '<a href="'.$session{page}{url}.'?op=viewHelp&hid=28"><img src="'.$session{setting}{lib}.'/help.gif" border="0" align="right"></a>';
+		$output .= '<h1>'.WebGUI::International::get(251).'</h1>';
+		$output .= '<form method="post" enctype="multipart/form-data" action="'.$session{page}{url}.'">';
                 $output .= WebGUI::Form::hidden("widget","Poll");
                 $output .= WebGUI::Form::hidden("func","addSave");
                 $output .= '<table>';
-                $output .= '<tr><td class="formDescription">Title</td><td>'.WebGUI::Form::text("title",20,30,'Poll').'</td></tr>';
-                $output .= '<tr><td class="formDescription">Display the title?</td><td>'.WebGUI::Form::checkbox("displayTitle",1).'</td></tr>';
-                $output .= '<tr><td class="formDescription">Description</td><td>'.WebGUI::Form::textArea("description",'').'</td></tr>';
-                $output .= '<tr><td class="formDescription">Active</td><td>'.WebGUI::Form::checkbox("active",1,1).'</td></tr>';
+                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(99).'</td><td>'.WebGUI::Form::text("title",20,30,'Poll').'</td></tr>';
+                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(175).'</td><td>'.WebGUI::Form::checkbox("displayTitle",1).'</td></tr>';
+                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(176).'</td><td>'.WebGUI::Form::checkbox("processMacros",1).'</td></tr>';
+                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(85).'</td><td>'.WebGUI::Form::textArea("description",'').'</td></tr>';
+                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(252).'</td><td>'.WebGUI::Form::checkbox("active",1,1).'</td></tr>';
 		%hash = WebGUI::SQL->buildHash("select groupId,groupName from groups where groupName<>'Reserved' order by groupName",$session{dbh});
-                $output .= '<tr><td class="formDescription" valign="top">Who can vote?</td><td>'.WebGUI::Form::selectList("voteGroup",\%hash,).'</td></tr>';
-                $output .= '<tr><td class="formDescription">Graph Width</td><td>'.WebGUI::Form::text("graphWidth",20,3,150).'</td></tr>';
-                $output .= '<tr><td class="formDescription">Question</td><td>'.WebGUI::Form::text("question",50,255).'</td></tr>';
-                $output .= '<tr><td class="formDescription">Answers<span><br>(Enter one answer per line. No more than 20.)</span></td><td>'.WebGUI::Form::textArea("answers",'',50,8,0,'on').'</td></tr>';
-                $output .= '<tr><td></td><td>'.WebGUI::Form::submit("save").'</td></tr>';
+                $output .= '<tr><td class="formDescription" valign="top">'.WebGUI::International::get(253).'</td><td>'.WebGUI::Form::selectList("voteGroup",\%hash,).'</td></tr>';
+                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(254).'</td><td>'.WebGUI::Form::text("graphWidth",20,3,150).'</td></tr>';
+                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(255).'</td><td>'.WebGUI::Form::text("question",50,255).'</td></tr>';
+                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(256).'<span><br>'.WebGUI::International::get(257).'</span></td><td>'.WebGUI::Form::textArea("answers",'',50,8,0,'on').'</td></tr>';
+                $output .= '<tr><td></td><td>'.WebGUI::Form::submit(WebGUI::International::get(62)).'</td></tr>';
                 $output .= '</table></form>';
                 return $output;
         } else {
@@ -136,21 +140,24 @@ sub www_edit {
 	tie %data, 'Tie::CPHash';
         if (WebGUI::Privilege::canEditPage()) {
 		%data = WebGUI::SQL->quickHash("select * from widget,Poll where widget.widgetId=Poll.widgetId and widget.widgetId=$session{form}{wid}",$session{dbh});
-                $output = '<a href="'.$session{page}{url}.'?op=viewHelp&hid=29"><img src="'.$session{setting}{lib}.'/help.gif" border="0" align="right"></a><h1>Edit Poll</h1><form method="post" enctype="multipart/form-data" action="'.$session{page}{url}.'">';
+                $output = '<a href="'.$session{page}{url}.'?op=viewHelp&hid=29"><img src="'.$session{setting}{lib}.'/help.gif" border="0" align="right"></a>';
+		$output .= '<h1>'.WebGUI::International::get(258).'</h1>';
+		$output .= '<form method="post" enctype="multipart/form-data" action="'.$session{page}{url}.'">';
                 $output .= WebGUI::Form::hidden("wid",$session{form}{wid});
                 $output .= WebGUI::Form::hidden("func","editSave");
                 $output .= '<table>';
-                $output .= '<tr><td class="formDescription">Title</td><td>'.WebGUI::Form::text("title",20,30,$data{title}).'</td></tr>';
-                $output .= '<tr><td class="formDescription">Display the title?</td><td>'.WebGUI::Form::checkbox("displayTitle",1,$data{displayTitle}).'</td></tr>';
-                $output .= '<tr><td class="formDescription">Description</td><td>'.WebGUI::Form::textArea("description",$data{description}).'</td></tr>';
-                $output .= '<tr><td class="formDescription">Active</td><td>'.WebGUI::Form::checkbox("active",1,$data{active}).'</td></tr>';
+                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(99).'</td><td>'.WebGUI::Form::text("title",20,30,$data{title}).'</td></tr>';
+                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(175).'</td><td>'.WebGUI::Form::checkbox("displayTitle",1,$data{displayTitle}).'</td></tr>';
+                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(176).'</td><td>'.WebGUI::Form::checkbox("processMacros",1,$data{processMacros}).'</td></tr>';
+                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(85).'</td><td>'.WebGUI::Form::textArea("description",$data{description}).'</td></tr>';
+                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(252).'</td><td>'.WebGUI::Form::checkbox("active",1,$data{active}).'</td></tr>';
 		%hash = WebGUI::SQL->buildHash("select groupId,groupName from groups where groupName<>'Reserved' order by groupName",$session{dbh});
                 $array[0] = $data{voteGroup};
-                $output .= '<tr><td class="formDescription" valign="top">Who can vote?</td><td>'.WebGUI::Form::selectList("voteGroup",\%hash,\@array).'</td></tr>';
-                $output .= '<tr><td class="formDescription">Graph Width</td><td>'.WebGUI::Form::text("graphWidth",20,3,$data{graphWidth}).'</td></tr>';
-                $output .= '<tr><td class="formDescription">Question</td><td>'.WebGUI::Form::text("question",50,255,$data{question}).'</td></tr>';
-                $output .= '<tr><td class="formDescription">Answers<span><br>(Enter one answer per line. No more than 20.)</span></td><td>'.WebGUI::Form::textArea("answers",$data{a1}."\n".$data{a2}."\n".$data{a3}."\n".$data{a4}."\n".$data{a5}."\n".$data{a6}."\n".$data{a7}."\n".$data{a8}."\n".$data{a9}."\n".$data{a10}."\n".$data{a11}."\n".$data{a12}."\n".$data{a13}."\n".$data{a14}."\n".$data{a15}."\n".$data{a16}."\n".$data{a17}."\n".$data{a18}."\n".$data{a19}."\n".$data{a20}."\n",50,8,0,'on').'</td></tr>';
-                $output .= '<tr><td></td><td>'.WebGUI::Form::submit("save").'</td></tr>';
+                $output .= '<tr><td class="formDescription" valign="top">'.WebGUI::International::get(253).'</td><td>'.WebGUI::Form::selectList("voteGroup",\%hash,\@array).'</td></tr>';
+                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(254).'</td><td>'.WebGUI::Form::text("graphWidth",20,3,$data{graphWidth}).'</td></tr>';
+                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(255).'</td><td>'.WebGUI::Form::text("question",50,255,$data{question}).'</td></tr>';
+                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(256).'<span><br>'.WebGUI::International::get(257).'</span></td><td>'.WebGUI::Form::textArea("answers",$data{a1}."\n".$data{a2}."\n".$data{a3}."\n".$data{a4}."\n".$data{a5}."\n".$data{a6}."\n".$data{a7}."\n".$data{a8}."\n".$data{a9}."\n".$data{a10}."\n".$data{a11}."\n".$data{a12}."\n".$data{a13}."\n".$data{a14}."\n".$data{a15}."\n".$data{a16}."\n".$data{a17}."\n".$data{a18}."\n".$data{a19}."\n".$data{a20}."\n",50,8,0,'on').'</td></tr>';
+                $output .= '<tr><td></td><td>'.WebGUI::Form::submit(WebGUI::International::get(62)).'</td></tr>';
                 $output .= '</table></form>';
                 return $output;
         } else {

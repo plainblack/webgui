@@ -53,6 +53,13 @@ if (eval { require Tie::IxHash }) {
         print "Please install.\n";
 }
 
+print "Tie::CPHash module:\t";
+if (eval { require Tie::CPHash }) {
+        print "OK\n";
+} else {
+        print "Please install.\n";
+}
+
 print "XML::RSS module:\t";
 if (eval { require XML::RSS }) {
         print "OK\n";

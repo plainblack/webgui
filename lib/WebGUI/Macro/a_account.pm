@@ -1,4 +1,4 @@
-package WebGUI::Macro::H;
+package WebGUI::Macro::a_account;
 
 #-------------------------------------------------------------------
 # WebGUI is Copyright 2001 Plain Black Software.
@@ -11,19 +11,20 @@ package WebGUI::Macro::H;
 #-------------------------------------------------------------------
 
 use strict;
+use WebGUI::International;
 use WebGUI::Session;
 
 #-------------------------------------------------------------------
 sub process {
 	my ($output, $temp);
 	$output = $_[0];
-  #---home link---
-        if ($output =~ /\^H(.*)\^\/H/) {
-                $temp = '<a href="'.$session{env}{SCRIPT_NAME}.'/home">'.$1.'</a>';
-                $output =~ s/\^H(.*)\^\/H/$temp/g;
-        } elsif ($output =~ /\^H/) {
-        	$temp = '<a href="'.$session{env}{SCRIPT_NAME}.'/home">Home</a>';
-        	$output =~ s/\^H/$temp/g;
+  #---account link---
+	if ($output =~ /\^a(.*)\^\/a/) {
+        	$temp = '<a href="'.$session{page}{url}.'?op=displayAccount">'.$1.'</a>';
+                $output =~ s/\^a(.*)\^\/a/$temp/g;
+	} elsif ($output =~ /\^a/) {
+        	$temp = '<a href="'.$session{page}{url}.'?op=displayAccount">'.WebGUI::International::get(46).'</a>';
+        	$output =~ s/\^a/$temp/g;
 	}
 	return $output;
 }

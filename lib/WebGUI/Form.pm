@@ -11,6 +11,7 @@ package WebGUI::Form;
 #-------------------------------------------------------------------
 
 use strict qw(vars subs);
+use WebGUI::International;
 use WebGUI::Session;
 
 #-------------------------------------------------------------------
@@ -116,19 +117,22 @@ sub submit {
 
 #-------------------------------------------------------------------
 sub text {
-        my ($output, $assistance, $name, $size, $maxLength, $value);
-        ($name, $size, $maxLength, $value, $assistance) = @_;
+        my ($output, $assistance, $name, $size, $maxLength, $value, $events);
+        ($name, $size, $maxLength, $value, $assistance, $events) = @_;
         if ($size eq "") {
                 $size = 15;
         }
 	if ($maxLength ne "") {
 		$maxLength = ' maxlength="'.$maxLength.'"';
 	}
+	if ($events ne "") {
+		$events = ' '.$events;
+	}
 	if ($assistance == 1) {
-		$assistance = '<input type="button" style="font-size: 8pt;" onClick="window.dateField = this.form.'.$name.';calendar = window.open(\''.$session{setting}{lib}.'/calendar.html\',\'cal\',\'WIDTH=200,HEIGHT=250\');return false" value="set date">';
+		$assistance = '<input type="button" style="font-size: 8pt;" onClick="window.dateField = this.form.'.$name.';calendar = window.open(\''.$session{setting}{lib}.'/calendar.html\',\'cal\',\'WIDTH=200,HEIGHT=250\');return false" value="'.WebGUI::International::get(34).'">';
 	}
 	$value = _fixQuotes($value);
-        $output = '<input type="text" name="'.$name.'" value="'.$value.'" size="'.$size.'" '.$maxLength.'>'.$assistance;
+        $output = '<input type="text" name="'.$name.'" value="'.$value.'" size="'.$size.'" '.$maxLength.$events.'>'.$assistance;
         return $output;
 }
 
@@ -143,7 +147,8 @@ sub textArea {
                 $rows = 5;
         }
 	if ($htmlEdit > 0) {
-		$output = '<input type="button" onClick="colorText(this.form.'.$name.')" value="color" style="font-size: 8pt;"><input type="button" onClick="boldText(this.form.'.$name.')" value="bold" style="font-size: 8pt;"><input type="button" onClick="italicText(this.form.'.$name.')" value="italics" style="font-size: 8pt;"><input type="button" onClick="centerText(this.form.'.$name.')" value="center" style="font-size: 8pt;"><input type="button" onClick="list(this.form.'.$name.')" value="list" style="font-size: 8pt;"><input type="button" onClick="url(this.form.'.$name.')" value="link" style="font-size: 8pt;"><input type="button" onClick="email(this.form.'.$name.')" value="email" style="font-size: 8pt;"><input type="button" onClick="imageAdd(this.form.'.$name.')" value="image" style="font-size: 8pt;"><input type="button" onClick="showMe(this.form.'.$name.')" value="show me" style="font-size: 8pt;"><input type="button" onClick="copyright(this.form.'.$name.')" value="(C)" style="font-size: 8pt;"><input type="button" onClick="registered(this.form.'.$name.')" value="(R)" style="font-size: 8pt;"><input type="button" onClick="trademark(this.form.'.$name.')" value="TM" style="font-size: 8pt;"><br>';
+		$output .= '<script language="JavaScript"> var formObj; var extrasDir="'.$session{setting}{lib}.'"; function openEditWindow(obj) { formObj = obj; /* if (navigator.userAgent.substr(navigator.userAgent.indexOf("MSIE")+5,1)>=5)  window.open("'.$session{setting}{lib}.'/ieEdit.html","editWindow","width=500,height=400");  else */ window.open("'.$session{setting}{lib}.'/nonIeEdit.html","editWindow","width=450,height=240"); } function setContent(content) { formObj.value = content; } </script>';
+		$output .= '<input type="button" onClick="openEditWindow(this.form.'.$name.')" value="'.WebGUI::International::get(171).'" style="font-size: 8pt;"><br>';
 	}
         if ($wrap eq "") {
                 $wrap = "virtual";

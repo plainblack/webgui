@@ -1,4 +1,4 @@
-package WebGUI::Macro::L;
+package WebGUI::Macro::L_loginBox;
 
 #-------------------------------------------------------------------
 # WebGUI is Copyright 2001 Plain Black Software.
@@ -12,6 +12,8 @@ package WebGUI::Macro::L;
 
 use strict;
 use WebGUI::Form;
+use WebGUI::International;
+use WebGUI::Macro::Backslash_pageUrl;
 use WebGUI::Session;
 
 #-------------------------------------------------------------------
@@ -22,13 +24,20 @@ sub process {
 	if ($output =~ /\^L/) {
 		$temp = '<div class="loginBox">';
         	if ($session{var}{sessionId}) {
-                	$temp .= 'Hello '.$session{user}{username}.'. Click <a href="'.$session{page}{url}.'?op=logout">here</a> to log out.';
+			$temp .= WebGUI::International::get(48);
+                	$temp .= ' '.$session{user}{username}.'. ';
+			$temp .= WebGUI::International::get(49);
+			$temp = WebGUI::Macro::Backslash::process($temp);
         	} else {
                 	$temp .= '<form method="post" action="'.$session{page}{url}.'"> ';
-                	$temp .= WebGUI::Form::hidden("op","login").'<span class="formSubtext">Username:<br></span>';
-                	$temp .= WebGUI::Form::text("username",12,30).'<span class="formSubtext"><br>Password:<br></span>';
+                	$temp .= WebGUI::Form::hidden("op","login").'<span class="formSubtext">';
+			$temp .= WebGUI::International::get(50); 
+			$temp .= '<br></span>';
+                	$temp .= WebGUI::Form::text("username",12,30).'<span class="formSubtext"><br>';
+			$temp .= WebGUI::International::get(51);
+			$temp .= '<br></span>';
 			$temp .= WebGUI::Form::password("identifier",12,30).'<span class="formSubtext"><br></span>';
-                	$temp .= WebGUI::Form::submit("login");
+                	$temp .= WebGUI::Form::submit(WebGUI::International::get(52));
                 	$temp .= '</form>';
         	}
         	$temp .= '</div>';

@@ -1,4 +1,4 @@
-package WebGUI::Macro::M;
+package WebGUI::Macro::m_currentMenuHorizontal;
 
 #-------------------------------------------------------------------
 # WebGUI is Copyright 2001 Plain Black Software.

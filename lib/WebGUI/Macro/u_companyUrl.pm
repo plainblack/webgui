@@ -1,4 +1,4 @@
-package WebGUI::Macro::At;
+package WebGUI::Macro::u_companyUrl;
 
 #-------------------------------------------------------------------
 # WebGUI is Copyright 2001 Plain Black Software.
@@ -15,15 +15,14 @@ use WebGUI::Session;
 
 #-------------------------------------------------------------------
 sub process {
-	my ($output);
+	my ($output, $temp, @data, $sth, $first);
 	$output = $_[0];
-  #---username---
-        if ($output =~ /\^\@/) {
-                $output =~ s/\^\@/$session{user}{username}/g;
+  #---company URL---
+        if ($output =~ /\^u/) {
+                $output =~ s/\^u/$session{setting}{companyURL}/g;
         }
 	return $output;
 }
 
-
-
 1;
+

@@ -1,4 +1,4 @@
-package WebGUI::Macro::D;
+package WebGUI::Macro::Hash_userId;
 
 #-------------------------------------------------------------------
 # WebGUI is Copyright 2001 Plain Black Software.
@@ -11,22 +11,19 @@ package WebGUI::Macro::D;
 #-------------------------------------------------------------------
 
 use strict;
-use WebGUI::DateTime;
+use WebGUI::Session;
 
 #-------------------------------------------------------------------
 sub process {
-	my ($output, $temp);
+	my ($output);
+  #---uid---
 	$output = $_[0];
-  #---date---
-	if ($output =~ /\^D(.*)\^\/D/) {
-		$temp = epochToHuman(time(),$1);
-		$output =~ s/\^D(.*)\^\/D/$temp/g;
-	} elsif ($output =~ /\^D/) {
-		$temp = localtime(time);
-		$output =~ s/\^D/$temp/g;
-	}
+        if ($output =~ /\^\#/) {
+                $output =~ s/\^\#/$session{user}{userId}/g;
+        }
 	return $output;
 }
 
-1;
 
+
+1;

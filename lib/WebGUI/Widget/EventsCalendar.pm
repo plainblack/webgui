@@ -13,6 +13,7 @@ package WebGUI::Widget::EventsCalendar;
 use strict;
 use Tie::CPHash;
 use WebGUI::DateTime;
+use WebGUI::International;
 use WebGUI::Macro;
 use WebGUI::Privilege;
 use WebGUI::Session;
@@ -28,22 +29,24 @@ sub purge {
 
 #-------------------------------------------------------------------
 sub widgetName {
-	return "Events Calendar";
+	return WebGUI::International::get(187);
 }
 
 #-------------------------------------------------------------------
 sub www_add {
         my ($output);
       	if (WebGUI::Privilege::canEditPage()) {
-                $output = '<a href="'.$session{page}{url}.'?op=viewHelp&hid=38"><img src="'.$session{setting}{lib}.'/help.gif" border="0" align="right"></a><h1>Add Events Calendar</h1><form method="post" enctype="multipart/form-data" action="'.$session{page}{url}.'">';
+                $output = '<a href="'.$session{page}{url}.'?op=viewHelp&hid=38"><img src="'.$session{setting}{lib}.'/help.gif" border="0" align="right"></a>';
+		$output .= '<h1>'.WebGUI::International::get(188).'</h1>';
+		$output .= '<form method="post" enctype="multipart/form-data" action="'.$session{page}{url}.'">';
                 $output .= WebGUI::Form::hidden("widget","EventsCalendar");
                 $output .= WebGUI::Form::hidden("func","addSave");
                 $output .= '<table>';
-                $output .= '<tr><td class="formDescription">Title</td><td>'.WebGUI::Form::text("title",20,30,'Events Calendar').'</td></tr>';
-                $output .= '<tr><td class="formDescription">Display the title?</td><td>'.WebGUI::Form::checkbox("displayTitle",1).'</td></tr>';
-                $output .= '<tr><td class="formDescription">Process macros?</td><td>'.WebGUI::Form::checkbox("processMacros",1).'</td></tr>';
-                $output .= '<tr><td class="formDescription">Description</td><td>'.WebGUI::Form::textArea("description").'</td></tr>';
-                $output .= '<tr><td></td><td>'.WebGUI::Form::submit("save").'</td></tr>';
+                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(99).'</td><td>'.WebGUI::Form::text("title",20,30,'Events Calendar').'</td></tr>';
+                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(174).'</td><td>'.WebGUI::Form::checkbox("displayTitle",1).'</td></tr>';
+                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(175).'</td><td>'.WebGUI::Form::checkbox("processMacros",1).'</td></tr>';
+                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(85).'</td><td>'.WebGUI::Form::textArea("description").'</td></tr>';
+                $output .= '<tr><td></td><td>'.WebGUI::Form::submit(WebGUI::International::get(62)).'</td></tr>';
                 $output .= '</table></form>';
                 return $output;
         } else {
@@ -67,19 +70,23 @@ sub www_addSave {
 sub www_addEvent {
         my ($output, $today, %recursEvery);
 	tie %recursEvery, 'Tie::IxHash';
-	%recursEvery = ('never'=>'Happens Only Once','day'=>'Day','week'=>'Week');
+	%recursEvery = ('never'=>WebGUI::International::get(189),
+		'day'=>WebGUI::International::get(190),
+		'week'=>WebGUI::International::get(191)
+		);
         if (WebGUI::Privilege::canEditPage()) {
 		($today) = epochToSet(time());
-                $output = '<h1>Add Event</h1><form method="post" enctype="multipart/form-data" action="'.$session{page}{url}.'">';
+                $output = '<h1>'.WebGUI::International::get(192).'</h1>';
+		$output .= '<form method="post" enctype="multipart/form-data" action="'.$session{page}{url}.'">';
                 $output .= WebGUI::Form::hidden("wid",$session{form}{wid});
                 $output .= WebGUI::Form::hidden("func","addEventSave");
                 $output .= '<table>';
-                $output .= '<tr><td class="formDescription">Name</td><td>'.WebGUI::Form::text("name",20,30).'</td></tr>';
-                $output .= '<tr><td class="formDescription">Description</td><td>'.WebGUI::Form::textArea("description",'',50,10,1).'</td></tr>';
-                $output .= '<tr><td class="formDescription">Start Date</td><td>'.WebGUI::Form::text("startDate",20,30,$today,1).'</td></tr>';
-                $output .= '<tr><td class="formDescription">End Date</td><td>'.WebGUI::Form::text("endDate",20,30,$today,1).'</td></tr>';
-                $output .= '<tr><td class="formDescription">Recurs every</td><td>'.WebGUI::Form::selectList("recursEvery",\%recursEvery).' until '.WebGUI::Form::text("until",20,30,$today,1).'</td></tr>';
-                $output .= '<tr><td></td><td>'.WebGUI::Form::submit("save").'</td></tr>';
+                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(99).'</td><td>'.WebGUI::Form::text("name",20,30).'</td></tr>';
+                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(85).'</td><td>'.WebGUI::Form::textArea("description",'',50,10,1).'</td></tr>';
+                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(176).'</td><td>'.WebGUI::Form::text("startDate",20,30,$today,1,'onBlur="this.form.endDate.value=this.form.startDate.value;this.form.until.value=this.form.startDate.value;"').'</td></tr>';
+                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(177).'</td><td>'.WebGUI::Form::text("endDate",20,30,$today,1).'</td></tr>';
+                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(193).'</td><td>'.WebGUI::Form::selectList("recursEvery",\%recursEvery).' '.WebGUI::International::get(194).' '.WebGUI::Form::text("until",20,30,$today,1).'</td></tr>';
+                $output .= '<tr><td></td><td>'.WebGUI::Form::submit(WebGUI::International::get(62)).'</td></tr>';
                 $output .= '</table></form>';
                 return $output;
         } else {
@@ -130,12 +137,12 @@ sub www_addEventSave {
 sub www_deleteEvent {
 	my ($output);
         if (WebGUI::Privilege::canEditPage()) {
-		$output = '<h1>Please Confirm</h1>';
-		$output .= 'Are you certain that you want to delete this event';
+		$output = '<h1>'.WebGUI::International::get(42).'</h1>';
+		$output .= WebGUI::International::get(195);
 		if ($session{form}{rid} > 0) {
-			$output .= ' <b>and</b> all of its recurring events';
+			$output .= ' '.WebGUI::International::get(196);
 		}
-		$output .= '?<p><div align="center"><a href="'.$session{page}{url}.'?func=deleteEventConfirm&wid='.$session{form}{wid}.'&eid='.$session{form}{eid}.'&rid='.$session{form}{rid}.'">Yes, I\'m sure.</a> &nbsp; <a href="'.$session{page}{url}.'?func=edit&wid='.$session{form}{wid}.'">No, I made a mistake.</a></div>';
+		$output .= '?<p><div align="center"><a href="'.$session{page}{url}.'?func=deleteEventConfirm&wid='.$session{form}{wid}.'&eid='.$session{form}{eid}.'&rid='.$session{form}{rid}.'">'.WebGUI::International::get(44).'</a> &nbsp; <a href="'.$session{page}{url}.'?func=edit&wid='.$session{form}{wid}.'">'.WebGUI::International::get(45).'</a></div>';
                 return $output;
         } else {
                 return WebGUI::Privilege::insufficient();
@@ -163,15 +170,17 @@ sub www_edit {
 	tie %data, 'Tie::CPHash';
         if (WebGUI::Privilege::canEditPage()) {
 		%data = WebGUI::SQL->quickHash("select * from widget where widget.widgetId=$session{form}{wid}",$session{dbh});
-                $output = '<a href="'.$session{page}{url}.'?op=viewHelp&hid=39"><img src="'.$session{setting}{lib}.'/help.gif" border="0" align="right"></a><h1>Edit Events Calendar</h1><form method="post" enctype="multipart/form-data" action="'.$session{page}{url}.'">';
+                $output = '<a href="'.$session{page}{url}.'?op=viewHelp&hid=39"><img src="'.$session{setting}{lib}.'/help.gif" border="0" align="right"></a>';
+		$output .= '<h1>'.WebGUI::International::get(197).'</h1>';
+		$output .= '<form method="post" enctype="multipart/form-data" action="'.$session{page}{url}.'">';
                 $output .= WebGUI::Form::hidden("wid",$session{form}{wid});
                 $output .= WebGUI::Form::hidden("func","editSave");
                 $output .= '<table>';
-                $output .= '<tr><td class="formDescription">Title</td><td>'.WebGUI::Form::text("title",20,30,$data{title}).'</td></tr>';
-                $output .= '<tr><td class="formDescription">Display the title?</td><td>'.WebGUI::Form::checkbox("displayTitle",1,$data{displayTitle}).'</td></tr>';
-                $output .= '<tr><td class="formDescription">Process macros?</td><td>'.WebGUI::Form::checkbox("processMacros",1,$data{processMacros}).'</td></tr>';
-                $output .= '<tr><td class="formDescription">Description</td><td>'.WebGUI::Form::textArea("description",$data{description}).'</td></tr>';
-                $output .= '<tr><td></td><td>'.WebGUI::Form::submit("save").'</td></tr>';
+                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(99).'</td><td>'.WebGUI::Form::text("title",20,30,$data{title}).'</td></tr>';
+                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(174).'</td><td>'.WebGUI::Form::checkbox("displayTitle",1,$data{displayTitle}).'</td></tr>';
+                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(175).'</td><td>'.WebGUI::Form::checkbox("processMacros",1,$data{processMacros}).'</td></tr>';
+                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(85).'</td><td>'.WebGUI::Form::textArea("description",$data{description}).'</td></tr>';
+                $output .= '<tr><td></td><td>'.WebGUI::Form::submit(WebGUI::International::get(62)).'</td></tr>';
                 $output .= '</table></form>';
                 $output .= '<p><a href="'.$session{page}{url}.'?func=addEvent&wid='.$session{form}{wid}.'">Add New Event</a><p>';
                 $output .= '<table border=1 cellpadding=3 cellspacing=0>';
@@ -203,17 +212,18 @@ sub www_editEvent {
 	tie %event, 'Tie::CPHash';
         if (WebGUI::Privilege::canEditPage()) {
                 %event = WebGUI::SQL->quickHash("select * from event where eventId='$session{form}{eid}'",$session{dbh});
-                $output = '<h1>Edit Event</h1><form method="post" enctype="multipart/form-data" action="'.$session{page}{url}.'">';
+                $output = '<h1>'.WebGUI::International::get(198).'</h1>';
+		$output .= '<form method="post" enctype="multipart/form-data" action="'.$session{page}{url}.'">';
                 $output .= WebGUI::Form::hidden("wid",$session{form}{wid});
                 $output .= WebGUI::Form::hidden("eid",$session{form}{eid});
                 $output .= WebGUI::Form::hidden("func","editEventSave");
                 $output .= '<table>';
-                $output .= '<tr><td class="formDescription">Name</td><td>'.WebGUI::Form::text("name",20,30,$event{name}).'</td></tr>'
+                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(99).'</td><td>'.WebGUI::Form::text("name",20,30,$event{name}).'</td></tr>'
 ;
-                $output .= '<tr><td class="formDescription">Description</td><td>'.WebGUI::Form::textArea("description",$event{description},50,10,1).'</td></tr>';
-                $output .= '<tr><td class="formDescription">Start Date</td><td>'.WebGUI::Form::text("startDate",20,30,epochToSet($event{startDate}),1).'</td></tr>';
-                $output .= '<tr><td class="formDescription">End Date</td><td>'.WebGUI::Form::text("endDate",20,30,epochToSet($event{endDate}),1).'</td></tr>';
-                $output .= '<tr><td></td><td>'.WebGUI::Form::submit("save").'</td></tr>';
+                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(85).'</td><td>'.WebGUI::Form::textArea("description",$event{description},50,10,1).'</td></tr>';
+                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(176).'</td><td>'.WebGUI::Form::text("startDate",20,30,epochToSet($event{startDate}),1).'</td></tr>';
+                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(177).'</td><td>'.WebGUI::Form::text("endDate",20,30,epochToSet($event{endDate}),1).'</td></tr>';
+                $output .= '<tr><td></td><td>'.WebGUI::Form::submit(WebGUI::International::get(62)).'</td></tr>';
                 $output .= '</table></form>';
                 return $output;
         } else {

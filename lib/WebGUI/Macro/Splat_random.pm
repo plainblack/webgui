@@ -1,4 +1,4 @@
-package WebGUI::Macro::u;
+package WebGUI::Macro::Splat_random;
 
 #-------------------------------------------------------------------
 # WebGUI is Copyright 2001 Plain Black Software.
@@ -11,18 +11,23 @@ package WebGUI::Macro::u;
 #-------------------------------------------------------------------
 
 use strict;
-use WebGUI::Session;
+use WebGUI::Utility;
 
 #-------------------------------------------------------------------
 sub process {
-	my ($output, $temp, @data, $sth, $first);
+	my ($output, $temp);
 	$output = $_[0];
-  #---company URL---
-        if ($output =~ /\^u/) {
-                $output =~ s/\^u/$session{setting}{companyURL}/g;
+  #---random number---
+        if ($output =~ /\^\*(.*)\^\/\*/) {
+                $temp = round(rand()*$1);
+                $output =~ s/\^\*(.*)\^\/\*/$temp/g;
+        } elsif ($output =~ /\^\*/) {
+                $temp = round(rand()*1000000000);
+                $output =~ s/\^\*/$temp/g;
         }
 	return $output;
 }
 
-1;
 
+
+1;

@@ -1,4 +1,4 @@
-package WebGUI::Macro::j;
+package WebGUI::Macro::A_anyMenu;
 
 #-------------------------------------------------------------------
 # WebGUI is Copyright 2001 Plain Black Software.
@@ -12,18 +12,28 @@ package WebGUI::Macro::j;
 
 use strict;
 use WebGUI::Macro::Shared;
+use WebGUI::Privilege;
 use WebGUI::Session;
+use WebGUI::SQL;
 
 #-------------------------------------------------------------------
 sub process {
-	my ($output, $temp);
+	my ($output, $temp, $pageTitle, $depth, @data);
 	$output = $_[0];
-  #---2 level current level menu (vertical)---
-        if ($output =~ /\^j/) {
-                $temp = '<span class="verticalMenu">';
-                $temp .= traversePageTree($session{page}{pageId},0,2);
+  #---any page sub menu vertical---
+        if ($output =~ /\^A(.*)\^\/A/) {
+		($pageTitle,$depth) = split(/,/,$1);
+		if ($depth eq "") {
+			$depth = 1;
+		}
+		@data = WebGUI::SQL->quickArray("select pageId,title,urlizedTitle from page where urlizedTitle='$pageTitle'",$session{dbh}); 
+                $temp = $pageTitle.'|'.$depth.'<span class="verticalMenu">';
+		if (defined $data[0] && WebGUI::Privilege::canViewPage($data[0])) {
+			$temp .= '<a href="'.$session{env}{SCRIPT_URL}.'/'.$data[2].'">'.$data[1].'</a><br>';
+                	$temp .= traversePageTree($data[0],1,$depth);
+		}
                 $temp .= '</span>';
-                $output =~ s/\^j/$temp/g;
+                $output =~ s/\^A(.*)\^\/A/$temp/g;
         }
 	return $output;
 }

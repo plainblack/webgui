@@ -1,4 +1,4 @@
-package WebGUI::Macro::C;
+package WebGUI::Macro::C_crumbTrail;
 
 #-------------------------------------------------------------------
 # WebGUI is Copyright 2001 Plain Black Software.

@@ -14,6 +14,7 @@ use CGI::Carp qw(fatalsToBrowser);
 use DBI;
 use Exporter;
 use strict;
+use WebGUI::International;
 use WebGUI::Session;
 use WebGUI::SQL;
 use WebGUI::Utility;
@@ -66,10 +67,16 @@ sub www_cut {
 sub www_delete {
         my ($output);
         if (WebGUI::Privilege::canEditPage()) {
-                $output .= '<a href="'.$session{page}{url}.'?op=viewHelp&hid=14"><img src="'.$session{setting}{lib}.'/help.gif" border="0" align="right"></a><h1>Please Confirm</h1>';
-                $output .= 'Are you certain that you wish to delete this content?<p>';
-                $output .= '<div align="center"><a href="'.$session{page}{url}.'?func=deleteConfirm&wid='.$session{form}{wid}.'">Yes, I\'m sure.</a>';
-                $output .= '&nbsp;&nbsp;&nbsp;&nbsp;<a href="'.$session{page}{url}.'">No, I made a mistake.</a></div>';
+                $output = '<a href="'.$session{page}{url}.'?op=viewHelp&hid=14"><img src="'.$session{setting}{lib}.'/help.gif" border="0" align="right"></a>';
+		$output .= '<h1>'.WebGUI::International::get(42).'</h1>';
+                $output .= WebGUI::International::get(43);
+		$output .= '<p>';
+                $output .= '<div align="center"><a href="'.$session{page}{url}.'?func=deleteConfirm&wid='.$session{form}{wid}.'">';
+		$output .= WebGUI::International::get(44); 
+		$output .= '</a>';
+                $output .= '&nbsp;&nbsp;&nbsp;&nbsp;<a href="'.$session{page}{url}.'">';
+		$output .= WebGUI::International::get(45);
+		$output .= '</a></div>';
                 return $output;
         } else {
                 return WebGUI::Privilege::insufficient();

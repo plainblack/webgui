@@ -47,10 +47,10 @@ sub _recursePageTree {
 sub www_purgeTrash {
         my ($output);
         if (WebGUI::Privilege::isInGroup(3)) {
-                $output = '<a href="'.$session{page}{url}.'?op=viewHelp&hid=46"><img src="'.$session{setting}{lib}.'/help.gif" border="0" align="right"></a><h1>Please Confirm</h1>';
-                $output .= 'Are you certain that you wish to purge all the pages and widgets in the trash?<p>';
-                $output .= '<div align="center"><a href="'.$session{page}{url}.'?op=purgeTrashConfirm">Yes, I\'m sure.</a>';
-                $output .= '&nbsp;&nbsp;&nbsp;&nbsp;<a href="'.$session{page}{url}.'">No, I made a mistake.</a></div>';
+                $output = '<a href="'.$session{page}{url}.'?op=viewHelp&hid=46"><img src="'.$session{setting}{lib}.'/help.gif" border="0" align="right"></a><h1>'.WebGUI::International::get(42).'</h1>';
+                $output .= WebGUI::International::get(162).'<p>';
+                $output .= '<div align="center"><a href="'.$session{page}{url}.'?op=purgeTrashConfirm">'.WebGUI::International::get(44).'</a>';
+                $output .= '&nbsp;&nbsp;&nbsp;&nbsp;<a href="'.$session{page}{url}.'">'.WebGUI::International::get(45).'</a></div>';
                 return $output;
         } else {
                 return WebGUI::Privilege::adminOnly();

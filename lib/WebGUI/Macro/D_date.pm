@@ -1,4 +1,4 @@
-package WebGUI::Macro::a;
+package WebGUI::Macro::D_date;
 
 #-------------------------------------------------------------------
 # WebGUI is Copyright 2001 Plain Black Software.
@@ -11,19 +11,19 @@ package WebGUI::Macro::a;
 #-------------------------------------------------------------------
 
 use strict;
-use WebGUI::Session;
+use WebGUI::DateTime;
 
 #-------------------------------------------------------------------
 sub process {
 	my ($output, $temp);
 	$output = $_[0];
-  #---account link---
-	if ($output =~ /\^a(.*)\^\/a/) {
-        	$temp = '<a href="'.$session{page}{url}.'?op=displayAccount">'.$1.'</a>';
-                $output =~ s/\^a(.*)\^\/a/$temp/g;
-	} elsif ($output =~ /\^a/) {
-        	$temp = '<a href="'.$session{page}{url}.'?op=displayAccount">My Account</a>';
-        	$output =~ s/\^a/$temp/g;
+  #---date---
+	if ($output =~ /\^D(.*)\^\/D/) {
+		$temp = epochToHuman(time(),$1);
+		$output =~ s/\^D(.*)\^\/D/$temp/g;
+	} elsif ($output =~ /\^D/) {
+		$temp = localtime(time);
+		$output =~ s/\^D/$temp/g;
 	}
 	return $output;
 }

@@ -1,4 +1,4 @@
-package WebGUI::Macro::Carat;
+package WebGUI::Macro::e_companyEmail;
 
 #-------------------------------------------------------------------
 # WebGUI is Copyright 2001 Plain Black Software.
@@ -11,17 +11,18 @@ package WebGUI::Macro::Carat;
 #-------------------------------------------------------------------
 
 use strict;
+use WebGUI::Session;
 
+#-------------------------------------------------------------------
 sub process {
 	my ($output);
 	$output = $_[0];
-  #---carrot ^---
-        if ($output =~ /\^\^/) {
-                $output =~ s/\^\^/\^/g;
+  #---company email---
+        if ($output =~ /\^e/) {
+                $output =~ s/\^e/$session{setting}{companyEmail}/g;
         }
 	return $output;
 }
 
-
-
 1;
+
