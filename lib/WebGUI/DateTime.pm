@@ -181,19 +181,19 @@ sub setToEpoch {
 	if (int($year) < 2038 && int($year) > 1900) {
 		$year = int($year);
 	} else {
-		$year = $date[5];
+		$year = $date[0];
 	}
         if (int($month) < 13 && int($month) > 0) {
                 $month = int($month);
         } else {
-                $month = $date[4]++;
+                $month = $date[1]++;
         }
         if (int($day) < 32 && int($day) > 0) {
                 $day = int($day);
         } else {
-                $day = $date[3];
+                $day = $date[2];
         }
-	return Date::Calc::Date_to_Time($year,$month,$day,0,0,0);
+	return Date::Calc::Date_to_Time($year,$month,$day,12,0,0);
 }
 
 #-------------------------------------------------------------------
