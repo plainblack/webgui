@@ -13,12 +13,11 @@ package WebGUI::DateTime;
 use Date::Calc;
 use Exporter;
 use strict;
-use Time::Local;
 use WebGUI::International;
 use WebGUI::Session;
 
 our @ISA = qw(Exporter);
-our @EXPORT = qw(&addToTime &addToDate &epochToHuman &epochToSet &humanToEpoch &setToEpoch &monthStartEnd);
+our @EXPORT = qw(&localtime &time &addToTime &addToDate &epochToHuman &epochToSet &humanToEpoch &setToEpoch &monthStartEnd);
 
 #-------------------------------------------------------------------
 sub _getMonth { 
@@ -74,25 +73,6 @@ sub addToTime {
 #-------------------------------------------------------------------
 sub epochToHuman {
 	my ($offset, $temp, $hour12, $value, $output, @date, %weekday, %month);
-
-      #  0    1    2     3     4    5     6     7     8
-#      $sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) =
-#                                                               localtime(time);
-#
-#               All list elements are numeric, and come straight
-#               out of the C `struct tm'.  $sec, $min, and $hour
-#               are the seconds, minutes, and hours of the
-#               specified time.  $mday is the day of the month,
-#               and $mon is the month itself, in the range `0..11'
-#               with 0 indicating January and 11 indicating
-#               December.  $year is the number of years since
-#               1900.  That is, $year is `123' in year 2023.
-#               $wday is the day of the week, with 0 indicating
-#               Sunday and 3 indicating Wednesday.  $yday is the
-#               day of the year, in the range `1..365' (or
-#               `1..366' in leap years.)  $isdst is true if the
-#               specified time occurs during daylight savings
-#               time, false otherwise.
 	$offset = $session{user}{timeOffset} || 0;
 	$offset = $offset*3600;
 	$temp = $_[0] || time();
@@ -171,16 +151,21 @@ sub humanToEpoch {
 	my (@temp, $dateString, $timeString, $output, @date);
 	($dateString,$timeString) = split(/ /,$_[0]);
 	@temp = split(/-/,$dateString);
-	$date[5] = $temp[0]-1900;
-	$date[4] = $temp[1]-1;
-	$date[3] = $temp[2]+0;
+	$date[0] = int($temp[0]);
+	$date[1] = int($temp[1]);
+	$date[2] = int($temp[2]);
 	@temp = split(/:/,$timeString);
-	$date[2] = $temp[0]+0;
-	$date[1] = $temp[1]+0;
-	$date[0] = $temp[2]+0;
-	$output = timelocal(@date);
+	$date[3] = int($temp[0]);
+	$date[4] = int($temp[1]);
+	$date[5] = int($temp[2]);
+	$output = Date::Calc::Date_to_Time(@date);
 	return $output;
 } 
+
+#-------------------------------------------------------------------
+sub localtime {
+	return Date::Calc::Localtime($_[0]);
+}
 
 #-------------------------------------------------------------------
 sub monthStartEnd {
@@ -199,7 +184,7 @@ sub setToEpoch {
 	if (int($year) < 2038 && int($year) > 1900) {
 		$year = int($year);
 	} else {
-		$year = $date[5]+1900;
+		$year = $date[5];
 	}
         if (int($month) < 13 && int($month) > 0) {
                 $month = int($month);
@@ -211,9 +196,12 @@ sub setToEpoch {
         } else {
                 $day = $date[3];
         }
-	return humanToEpoch($year.'-'.$month.'-'.$day.' 00:00:00');
+	return Date::Calc::Date_to_Time($year,$month,$day,0,0,0);
 }
 
-
+#-------------------------------------------------------------------
+sub time {
+	return Date::Calc::Mktime(Date::Calc::Today_and_Now());
+}
 
 1;

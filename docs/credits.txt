@@ -29,7 +29,7 @@ Contributing Translators.............Andreas Ljunggren
 
 Perl.................................Larry Wall / O'Reilly
 
-RSSLite..............................Jerrad Pierce
+XML::RSSLite.........................Jerrad Pierce
                                      Scott Thomason
 
 IE Rich Edit.........................Brattli
@@ -37,5 +37,8 @@ IE Rich Edit.........................Brattli
 Data::Config.........................Sébastien Aperghis-Tramoni
 
 HTML::TagFilter......................William Ross
+
+HTML::CalendarMonthSimple............Gregor Mosheh
+
 
 
