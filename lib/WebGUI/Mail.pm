@@ -16,13 +16,14 @@ use WebGUI::ErrorHandler;
 use WebGUI::Session;
 
 #-------------------------------------------------------------------
-#eg: send("jt@jt.com","hi, how are you","this is my message","bob@bob.com");
-#eg: send(to,subject,message,cc);
+#eg: send("jt@jt.com","hi, how are you","this is my message","bob@bob.com","you@ther.com");
+#eg: send(to,subject,message,cc,from);
 sub send {
-        my ($smtp, $message);
+        my ($smtp, $message, $from);
+	$from = $_[4] || ($session{setting}{companyName}.' <'.$session{setting}{companyEmail}.'>');
 	#header
-	$message = "To: ".$_[0]."\n";
-        $message .= "From: $session{setting}{companyName} <$session{setting}{companyEmail}>\n";
+	$message = "To: $_[0]\n";
+        $message .= "From: $from\n";
         $message .= "CC: $_[3]\n" if ($_[3]);
         $message .= "Subject: ".$_[1]."\n";
         $message .= "\n";
@@ -37,7 +38,7 @@ sub send {
 	} else {
         	$smtp = Net::SMTP->new($session{setting}{smtpServer}); # connect to an SMTP server
         	if (defined $smtp) {
-        		$smtp->mail($session{setting}{companyEmail});     # use the sender's address here
+        		$smtp->mail($from);     # use the sender's address here
         		$smtp->to($_[0]);             # recipient's address
         		$smtp->data();              # Start the mail
         		$smtp->datasend($message);
