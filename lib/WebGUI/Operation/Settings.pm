@@ -124,6 +124,7 @@ sub www_editMailSettings {
 	$f = WebGUI::HTMLForm->new;
         $f->hidden("op","saveSettings");
         $f->textarea("recoverPasswordEmail",WebGUI::International::get(134),$session{setting}{recoverPasswordEmail});
+        $f->textarea("mailFooter",WebGUI::International::get(824),$session{setting}{mailFooter});
         $f->text("smtpServer",WebGUI::International::get(135),$session{setting}{smtpServer});
 	$f->submit;
 	$output .= $f->print;

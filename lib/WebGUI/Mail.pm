@@ -17,6 +17,7 @@ package WebGUI::Mail;
 use Net::SMTP;
 use strict;
 use WebGUI::ErrorHandler;
+use WebGUI::Macro;
 use WebGUI::Session;
 
 =head1 NAME
@@ -74,7 +75,7 @@ use WebGUI::Session;
 =cut
 
 sub send {
-        my ($smtp, $message, $from);
+        my ($smtp, $message, $from, $footer);
 	$from = $_[4] || ($session{setting}{companyName}.' <'.$session{setting}{companyEmail}.'>');
 	#header
 	$message = "To: $_[0]\n";
@@ -86,7 +87,7 @@ sub send {
         #body
         $message .= $_[2]."\n";
 	#footer
-        $message .= "\n $session{setting}{companyName}\n $session{setting}{companyEmail}\n $session{setting}{companyURL}\n";
+	$message .= "\n".WebGUI::Macro::process($session{setting}{mailFooter});
 	if ($session{setting}{smtpServer} =~ /\/sendmail/) {
 		open(MAIL,'| '.$session{setting}{smtpServer}.' -t -oi') or WebGUI::ErrorHandler::warn("Couldn't connect to mail server: ".$session{setting}{smtpServer});
 		print MAIL $message;
