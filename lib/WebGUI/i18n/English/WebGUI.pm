@@ -6937,7 +6937,9 @@ You can configure the date by using date formatting symbols. For instance, if yo
 
 <table><tbody><tr><td>%%</td><td>%</td></tr><tr><td>%y</td><td>4 digit year</td></tr><tr><td>%Y</td><td>2 digit year</td></tr><tr><td>%m</td><td>2 digit month</td></tr><tr><td>%M</td><td>variable digit month</td></tr><tr><td>%c</td><td>month name</td></tr><tr><td>%d</td><td>2 digit day of month</td></tr><tr><td>%D</td><td>variable digit day of month</td></tr><tr><td>%w</td><td>day of week name</td></tr><tr><td>%h</td><td>2 digit base 12 hour</td></tr><tr><td>%H</td><td>variable digit base 12 hour</td></tr><tr><td>%j</td><td>2 digit base 24 hour</td></tr><tr><td>%J</td><td>variable digit base 24 hour</td></tr><tr><td>%p</td><td>lower case am/pm</td></tr><tr><td>%P</td><td>upper case AM/PM</td></tr><tr><td>%z</td><td>user preference date format</td></tr><tr><td>%Z</td><td>user preference time format</td></tr></tbody></table>
 <p>
+You can also pass in an epoch date into this macro as a secondary parameter. If no date is specified then today's date and time will be used.
 
+<p>
 <b>&#94;Env()</b><br>
 Can be used to display a web server environment variable on a page. The environment variables available on each server are different, but you can find out which ones your web server has by going to: http://www.yourwebguisite.com/env.pl
 <p>
@@ -7020,7 +7022,7 @@ A randomly generated number. This is often used on images (such as banner ads) t
 These macros are reserved for system/wobject-specific functions as in the SQL Report wobject and the Body in the Style Manager.
 <p>
 |,
-		lastUpdated => 1078570360
+		lastUpdated => 1092652208 
 	},
 
 	'146' => {
