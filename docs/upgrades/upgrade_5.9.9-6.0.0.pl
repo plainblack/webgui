@@ -234,7 +234,8 @@ WebGUI::SQL->write("alter table SQLReport drop column username");
 WebGUI::SQL->write("alter table SQLReport drop column identifier");
 use WebGUI::DatabaseLink;
 my $templateId;
-my $a = WebGUI::SQL->read("select a.databaseLinkId, a.dbQuery, a.template, a.wobjectId, b.title 
+use WebGUI::Macro;
+my $a = WebGUI::SQL->read("select a.databaseLinkId, a.dbQuery, a.template, a.wobjectId, b.title, a.preprocessMacros
 	from SQLReport a , wobject b where a.wobjectId=b.wobjectId");
 while (my $data = $a->hashRef) {
 	next if ($data->{dbQuery} eq "");
@@ -246,6 +247,7 @@ while (my $data = $a->hashRef) {
 		} else {
 			$templateId = 1000;
 		}
+		$data->{dbQuery} = WebGUI::Macro::process($data->{dbQuery}) if ($data->{preprocessMacros});
 		my $b = WebGUI::SQL->unconditionalRead($data->{dbQuery},$db->dbh);
 		my @template = split(/\^\-\;/,$data->{template});
 		my $final = '<tmpl_if displayTitle>
@@ -567,29 +569,29 @@ while (my $authHash = $authSth->hashRef){
 
 #--------------------------------------------
 print "\tRemoving unneeded files and directories.\n" unless ($quiet);
-unlink("../../lib/WebGUI/Wobject/Item.pm");
-unlink("../../lib/WebGUI/Wobject/LinkList.pm");
-unlink("../../lib/WebGUI/Wobject/FAQ.pm");
-unlink("../../lib/WebGUI/Wobject/ExtraColumn.pm");
+#unlink("../../lib/WebGUI/Wobject/Item.pm");
+#unlink("../../lib/WebGUI/Wobject/LinkList.pm");
+#unlink("../../lib/WebGUI/Wobject/FAQ.pm");
+#unlink("../../lib/WebGUI/Wobject/ExtraColumn.pm");
 unlink("../../lib/WebGUI/Authentication.pm");
 unlink("../../lib/WebGUI/Operation/Account.pm");
-unlink("../../lib/WebGUI/Macro/m_currentMenuHorizontal.pm");
-unlink("../../lib/WebGUI/Macro/M_currentMenuVertical.pm");
-unlink("../../lib/WebGUI/Macro/s_specificMenuHorizontal.pm");
-unlink("../../lib/WebGUI/Macro/S_specificMenuVertical.pm");
-unlink("../../lib/WebGUI/Macro/t_topMenuHorizontal.pm");
-unlink("../../lib/WebGUI/Macro/T_topMenuVertical.pm");
-unlink("../../lib/WebGUI/Macro/p_previousMenuHorizontal.pm");
-unlink("../../lib/WebGUI/Macro/P_previousMenuVertical.pm");
-unlink("../../lib/WebGUI/Macro/C_crumbTrail.pm");
-unlink("../../lib/WebGUI/Macro/FlexMenu.pm");
-unlink("../../lib/WebGUI/Macro/PreviousDropMenu.pm");
-unlink("../../lib/WebGUI/Macro/Synopsis.pm");
-unlink("../../lib/WebGUI/Macro/rootmenuHorizontal.pm");
-unlink("../../lib/WebGUI/Macro/RootTab.pm");
-unlink("../../lib/WebGUI/Macro/SpecificDropMenu.pm");
-unlink("../../lib/WebGUI/Macro/TopDropMenu.pm");
-unlink("../../lib/WebGUI/Macro/Question_search.pm");
+#unlink("../../lib/WebGUI/Macro/m_currentMenuHorizontal.pm");
+#unlink("../../lib/WebGUI/Macro/M_currentMenuVertical.pm");
+#unlink("../../lib/WebGUI/Macro/s_specificMenuHorizontal.pm");
+#unlink("../../lib/WebGUI/Macro/S_specificMenuVertical.pm");
+#unlink("../../lib/WebGUI/Macro/t_topMenuHorizontal.pm");
+#unlink("../../lib/WebGUI/Macro/T_topMenuVertical.pm");
+#unlink("../../lib/WebGUI/Macro/p_previousMenuHorizontal.pm");
+#unlink("../../lib/WebGUI/Macro/P_previousMenuVertical.pm");
+#unlink("../../lib/WebGUI/Macro/C_crumbTrail.pm");
+#unlink("../../lib/WebGUI/Macro/FlexMenu.pm");
+#unlink("../../lib/WebGUI/Macro/PreviousDropMenu.pm");
+#unlink("../../lib/WebGUI/Macro/Synopsis.pm");
+#unlink("../../lib/WebGUI/Macro/rootmenuHorizontal.pm");
+#unlink("../../lib/WebGUI/Macro/RootTab.pm");
+#unlink("../../lib/WebGUI/Macro/SpecificDropMenu.pm");
+#unlink("../../lib/WebGUI/Macro/TopDropMenu.pm");
+#unlink("../../lib/WebGUI/Macro/Question_search.pm");
 unlink("../../lib/WebGUI/Operation/Search.pm");
 rmtree("../../lib/WebGUI/Authentication");
 rmtree("../../www/extras/toolbar/default");
