@@ -601,11 +601,10 @@ sub notifySubscribers {
         foreach my $userId (keys %subscribers) {
                 my $u = WebGUI::User->new($userId);
                 if ($lang{$u->profileField("language")}{message} eq "") {
-                        $lang{$u->profileField("language")}{var} = {
-                                'notify.subscription.message' => WebGUI::International::get(875,"WebGUI",$u->profileField("language"))
-                                };
                         $lang{$u->profileField("language")}{var} = $self->getTemplateVars($lang{$u->profileField("language")}{var});
 			$lang{$u->profileField("language")}{var}{url} = WebGUI::URL::getSiteURL().$self->getUrl;
+                        $lang{$u->profileField("language")}{var}{'notify.subscription.message'} =
+                                         WebGUI::International::get(875,"WebGUI",$u->profileField("language"));
                         $lang{$u->profileField("language")}{subject} = WebGUI::International::get(523,"WebGUI",$u->profileField("language"));
                         $lang{$u->profileField("language")}{message} = $self->processTemplate($lang{$u->profileField("language")}{var}, $self->getThread->getParent->get("notificationTemplateId"));
                 }
