@@ -12,13 +12,13 @@ our $I18N = {
 
 NOTE: You can create a multi-paged article by placing the separator macro (&#94;-;) at various places through-out your article.  This works unless you are using a Make Page Printable style.
 
-<P><b>^International("913","Template");</b><br>
+<P><b>^International("913","WebGUI");</b><br>
 Select a template from the list to layout your Wobject.  Each Wobject
 may only use templates for their own namespace.  For example, Articles
 can only use templates from the "Article" namespace.  Layouts can only
 use templates from the "page" namespace.
 
-<p><b>^International("1",Article");</b><br>
+<p><b>^International("1","Article");</b><br>
 If you wish to add a link to your article, enter the title of the link in this field. 
 <br><br>
 <i>Example:</i> Google
