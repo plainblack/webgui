@@ -995,6 +995,30 @@ A comment.
 		lastUpdated => 1078517114
 	},
 
+	'overview template' => {
+		message => q|Overview template|,
+		lastUpdated => 0,
+		context => q|Form label indicating the overview template.|
+	},
+
+	'gradebook template' => {
+		message => q|Gradebook template|,
+		lastUpdated => 0,
+		context => q|Form label indicating the gradebook template.|
+	},
+	
+	'response template' => {
+		message => q|Response template|,
+		lastUpdated => 0,
+		context => q|Form label indicating the response template.|
+	},
+
+	'view template' => {
+		message => q|View template|,
+		lastUpdated => 0,
+		context => q|Form label indicating the response template.|
+	},
+
 
 };
 
