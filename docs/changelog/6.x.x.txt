@@ -60,6 +60,6 @@ webgui.
  - Added a "Turn Admin On" group to determine who can enable or disable admin
    mode. 
  - Added the Web Services Client wobject. (Thanks to Alan Ritari and DonorWare.)
-
-
+ - Optional second parameter to the File macro can be a boolean value to
+   turn off file icons.
 
