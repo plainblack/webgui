@@ -2,6 +2,9 @@
  - Fixed a recursive style change bug.
  - Bugfix [ 953593 ] perl -MWebGUI -e "" fails
  - Bugfix [ 955397 ] Make Page Printable Macro Fails
+ - Bugfix [ 959762 ] Mail Form Template problem (fix)
+ - Bugfix [ 952908 ] Manage database option is not available
+
 
 
 6.0.2
