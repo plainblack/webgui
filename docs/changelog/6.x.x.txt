@@ -4,6 +4,7 @@
  - Converted site maps to navigation assets.
  - Converted file managers to layout assets with file and image assets
    attached.
+ - Added AssetProxy macro.
  - Converted page templates to use CSS-based layouts instead of tables.
  - Added a "Position" property to the DataForm Edit Field interface. This makes it easier to move a field to a certain position. (Len Kranendonk).
  - Added the variables "record.edit.icon", "record.delete.url" and "record.delete.icon" to the DataForm DataList template. (Len Kranendonk).
@@ -25,7 +26,7 @@
  - Sped up Navigation.pm
  - bugfix [1041937] List Roots broken
  - Navigation template variable rename, added template variables for
-   basepage.hasDaughter, page.inRoot.
+   currentPage.hasDaughter, page.inBranchRoot.
  - Bugfix [ 1055396 ] Template switching issue (Len Kranendonk)
  - WebGUI Operations are now dynamically loaded (Len Kranendonk) 
  - Added <input type="button"> button to Form.pm / HTMLForm.pm (Len Kranendonk)

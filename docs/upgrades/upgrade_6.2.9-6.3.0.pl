@@ -157,7 +157,7 @@ my $navRootId = WebGUI::SQL->setRow("asset","assetId",{
 	parentId=>"PBasset000000000000001",
 	lineage=>$navRootLineage,
 	lastUpdated=>time(),
-	className=>"WebGUI::Admin::Wobject::Navigation",
+	className=>"WebGUI::Asset::Wobject::Navigation",
 	state=>"published"
 	});
 WebGUI::SQL->setRow("wobject","assetId",{
@@ -171,7 +171,8 @@ WebGUI::SQL->setRow("Navigation","assetId",{
 	startType=>"relativeToCurrentUrl",
 	startPoint=>"0",
 	endPoint=>"55",
-	assetsToInclude=>"descendants"
+	assetsToInclude=>"descendants",
+	showHiddenPages=>1
 	},undef,$navRootId);
 my $sth = WebGUI::SQL->read("select * from tempoldnav");
 my $navRankCounter = 1;
@@ -183,7 +184,8 @@ while (my $data = $sth->hashRef) {
 	$newAsset{isHidden} = 1;
 	$newAsset{title} = $newAsset{menuTitle} = $data->{identifier};
 	$newAsset{ownerUserId} = "3";
-	$newAsset{groupIdView} = $newAsset{groupIdEdit} = "4";
+	$newAsset{groupIdView} = "7";
+	$newAsset{groupIdEdit} = "4";
 	$newAsset{className} = 'WebGUI::Asset::Wobject::Navigation';
 	$newAsset{state} = 'published';
 	$newAsset{lastUpdated} = time();
@@ -192,6 +194,7 @@ while (my $data = $sth->hashRef) {
 	$newWobject{templateId} = $data->{templateId};
 	$newWobject{styleTemplateId}="1";
 	$newWobject{printableStyleTemplateId}="3";
+	$newWobject{displayTitle} = "0";
 	$newNav{showSystemPages} = $data->{showSystemPages};
 	$newNav{showHiddenPages} = $data->{showHiddenPages};
 	$newNav{showUnprivilegedPages} = $data->{showUnprivilegedPages};
@@ -248,9 +251,9 @@ while (my $data = $sth->hashRef) {
 		$newNav{startPoint} = $data->{stopAtLevel}+1;
 		$newNav{assetsToInclude} = "self\ndescendants";
 	} elsif ($data->{method} eq "pedigree") {
-		$newNav{endPoint} += $newNav{startPoint} unless ($newNav{startType} eq "specificUrl");
+		$newNav{endPoint} = 55;
 		$newNav{startType} = "relativeToRoot";
-		$newNav{startPoint} = $data->{stopAtLevel}+1;
+		$newNav{startPoint} = 1;
 		$newNav{assetsToInclude} = "pedigree";
 	}
 	WebGUI::SQL->setRow("asset","assetId",\%newAsset,undef,$newNav{assetId});
@@ -299,7 +302,9 @@ $sth->finish;
 print "\tDeleting files which are no longer used.\n" unless ($quiet);
 #unlink("../../lib/WebGUI/Page.pm");
 #unlink("../../lib/WebGUI/Operation/Page.pm");
+#unlink("../../lib/WebGUI/Operation/Root.pm");
 #unlink("../../lib/WebGUI/Navigation.pm");
+#unlink("../../lib/WebGUI/Macro/Navigation.pm");
 #unlink("../../lib/WebGUI/Operation/Navigation.pm");
 #unlink("../../lib/WebGUI/Attachment.pm");
 #unlink("../../lib/WebGUI/Node.pm");
@@ -309,6 +314,38 @@ print "\tDeleting files which are no longer used.\n" unless ($quiet);
 #unlink("../../lib/WebGUI/Wobject/USS.pm");
 #unlink("../../lib/WebGUI/Wobject/FileManager.pm");
 
+#--------------------------------------------
+print "\tUpdating config file.\n" unless ($quiet);
+my $pathToConfig = '../../etc/'.$configFile;
+my $conf = Parse::PlainConfig->new('DELIM' => '=', 'FILE' => $pathToConfig);
+my $macros = $conf->get("macros");
+delete $macros->{"\\"};
+$macros->{"\\\\"} = "Backslash_pageUrl";
+$macros->{"AssetProxy"} = "AssetProxy";
+$macros->{"Navigation"} = "AssetProxy";
+my %newMacros;
+foreach my $macro (keys %{$macros}) {
+	unless (
+		$macros->{$macro} eq "m_currentMenuHorizontal" 
+		|| $macros->{$macro} eq "M_currentMenuVertical" 
+		) {
+		$newMacros{$macro} = $macros->{$macro};
+	}
+}
+$conf->set("macros"=>\%newMacros);
+$conf->set("assets"=>[
+		'WebGUI::Asset::Wobject::Navigation',
+		'WebGUI::Asset::Wobject::Layout',
+		'WebGUI::Asset::Wobject::Article',
+		'WebGUI::Asset::Wobject::DataForm',
+		'WebGUI::Asset::Wobject::USS',
+		'WebGUI::Asset::Wobject::SyndicatedContent',
+		'WebGUI::Asset::Redirect',
+		'WebGUI::Asset::FilePile',
+		'WebGUI::Asset::File',
+		'WebGUI::Asset::File::Image'
+		]);
+$conf->write;
 
 
 WebGUI::Session::close();

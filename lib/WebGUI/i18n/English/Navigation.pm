@@ -11,19 +11,9 @@ our $I18N = {
 		lastUpdated => 1077080766
 	},
 
-	'25' => {
-		message => q|Base page|,
-		lastUpdated => 1077080583
-	},
-
 	'31' => {
 		message => q|Show hidden pages|,
 		lastUpdated => 1077080799
-	},
-
-	'22' => {
-		message=> q|Edit Navigation|,
-		lastUpdated => 1077078969
 	},
 
 	'preview' => {

@@ -227,6 +227,12 @@ sub getAssetAdderLinks {
 		if ($@) {
 			WebGUI::ErrorHandler::warn("Couldn't compile ".$class." because ".$@);
 		} else {
+			my $uiLevel = eval{$class->getUiLevel()};
+			if ($@) {
+				WebGUI::ErrorHandler::warn("Couldn't get UI level of ".$class." because ".$@);
+			} else {
+				next if ($uiLevel > $session{user}{uiLevel});
+			}
 			my $label = eval{$class->getName()};
 			if ($@) {
 				WebGUI::ErrorHandler::warn("Couldn't get the name of ".$class." because ".$@);
@@ -415,19 +421,10 @@ sub getLineage {
 	my $relatives = shift;
 	my $rules = shift;
 	my $lineage = $self->get("lineage");
-	# deal with exclusions
-	my $whereExclusion = " and state='published'";
-	if (exists $rules->{excludeClasses}) {
-		my @set;
-		foreach my $className (@{$rules->{excludeClasses}}) {
-			push(@set,"className <> ".quote($className));
-		}
-		$whereExclusion .= 'and ('.join(" and ",@set).')';
-	}
+	my @whereModifiers;
 	# let's get those siblings
-	my $whereSiblings;
 	if (isIn("siblings",@{$relatives})) {
-		$whereSiblings = "(parentId=".quote($self->get("parentId"))." and assetId<>".quote($self->getId).")";
+		push(@whereModifiers, " (parentId=".quote($self->get("parentId"))." and assetId<>".quote($self->getId).")");
 	}
 	# ancestors too
 	my @specificFamilyMembers = ();
@@ -441,30 +438,44 @@ sub getLineage {
 	if (isIn("self",@{$relatives})) {
 		push(@specificFamilyMembers,$self->get("lineage"));
 	}
-	my $whereExact;
 	if (scalar(@specificFamilyMembers) > 0) {
-		if ($whereSiblings ne "") {
-			$whereExact = " or ";
-		}
-		$whereExact .= "lineage in (";
-		$whereExact .= quoteAndJoin(\@specificFamilyMembers);
-		$whereExact .= ")";
+		push(@whereModifiers,"(lineage in (".quoteAndJoin(\@specificFamilyMembers)."))");
 	}
 	# we need to include descendants
-	my $whereDescendants;
 	if (isIn("descendants",@{$relatives})) {
-		if ($whereSiblings ne "" || $whereExact ne "") {
-			$whereDescendants = " or ";
-		}
-		$whereDescendants .= "lineage like ".quote($lineage.'%')." and lineage<>".quote($lineage); 
+		my $mod = "(lineage like ".quote($lineage.'%')." and lineage<>".quote($lineage); 
 		if (exists $rules->{endingLineageLength}) {
-			$whereDescendants .= " and length(lineage) <= ".($rules->{endingLineageLength}*6);
+			$mod .= " and length(lineage) <= ".($rules->{endingLineageLength}*6);
 		}
+		$mod .= ")";
+		push(@whereModifiers,$mod);
 	}
+	# now lets add in all of the siblings in every level between ourself and the asset we wish to pedigree
+	if (isIn("pedigree",@{$relatives}) && exists $rules->{assetToPedigree}) {
+		my @mods;
+		my $lineage = $rules->{assetToPedigree}->get("lineage");
+		my $length = $rules->{assetToPedigree}->getLineageLength;
+		for (my $i = $length; $i > 0; $i--) {
+			my $line = substr($lineage,0,$i*6);
+			push(@mods,"( lineage like ".quote($line.'%')." and  length(lineage)=".(($i+1)*6).")");
+			last if ($self->getLineageLength == $i);
+		}
+		push(@whereModifiers, "(".join(" or ",@mods).")");
+	}
+	# formulate a where clause
+	my $where = "state='published'";
+	if (exists $rules->{excludeClasses}) { # deal with exclusions
+		my @set;
+		foreach my $className (@{$rules->{excludeClasses}}) {
+			push(@set,"className <> ".quote($className));
+		}
+		$where .= 'and ('.join(" and ",@set).')';
+	}
+	$where .= " and ".join(" or ",@whereModifiers) if (scalar(@whereModifiers));
 	# based upon all available criteria, let's get some assets
 	my $columns = "assetId, className, parentId";
 	$columns = "*" if ($rules->{returnQuickReadObjects});
-	my $sql = "select $columns from asset where $whereSiblings $whereExact $whereDescendants $whereExclusion order by lineage";
+	my $sql = "select $columns from asset where $where order by lineage";
 	my @lineage;
 	my %relativeCache;
 	my $sth = WebGUI::SQL->read($sql);

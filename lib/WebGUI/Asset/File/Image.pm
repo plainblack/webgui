@@ -17,6 +17,7 @@ package WebGUI::Asset::File::Image;
 use strict;
 use WebGUI::Asset::File;
 use WebGUI::HTTP;
+use WebGUI::Icon;
 use WebGUI::Session;
 use WebGUI::Storage;
 use WebGUI::Utility;

@@ -198,6 +198,13 @@ sub getEditForm {
 	return $tabform;
 }
 
+sub getIcon {
+	my $self = shift;
+	my $small = shift;
+	return $session{config}{extrasURL}.'/assets/small/navigation.gif' if ($small);
+	return $session{config}{extrasURL}.'/assets/navigation.gif';
+}
+
 sub getName {
 	return WebGUI::International::get("navigation","Navigation");
 }
@@ -208,10 +215,9 @@ sub view {
 	# we've got to determine what our start point is based upon user conditions
 	my ($start,$current);
 	if (!exists $session{asset}) {
-		$start = $self;
-		$current = $self;
+		$start = $current = $self;
 	} elsif ($self->get("startType") eq "specificUrl") {
-		$start = WebGUI::Asset->getByUrl($self->get("startPoint"));
+		$start = WebGUI::Asset->newByUrl($self->get("startPoint"));
 	} elsif ($self->get("startType") eq "relativeToRoot") {
 		unless (($self->get("startPoint")+1) >= $self->getLineageLength) {
 			$start = WebGUI::Asset->newByLineage(substr($session{asset}->get("lineage"),0, ($self->get("startPoint") + 1) * 6));
@@ -235,7 +241,8 @@ sub view {
 	my %rules;
 	$rules{returnQuickReadObjects} = 1;
 	$rules{endingLineageLength} = $start->getLineageLength+$self->get("endPoint");
-	my @assets = $start->getLineage(\@includedRelationships,\%rules);	
+	$rules{assetToPedigree} = $current if (isIn("pedigree",@includedRelationships));
+	my $assets = $start->getLineage(\@includedRelationships,\%rules);	
 	my $var = {'page_loop' => []};
 	my @interestingProperties = ('assetId', 'parentId', 'title', 'ownerUserId', 'synopsis', 'newWindow', 'menuTitle');
 	foreach my $property (@interestingProperties) {
@@ -247,7 +254,7 @@ sub view {
 	my $currentLineage = $current->get("lineage");
 	my @linesToSkip;
 	my $absoluteDepthOfLastPage;
-	foreach my $asset (@assets) {
+	foreach my $asset (@{$assets}) {
 		# skip pages we shouldn't see
 		my $skip = 0;
 		my $pageLineage = $asset->get("lineage");
@@ -311,22 +318,22 @@ sub view {
 			push(@{$pageData->{"page.depthDiff_loop"}},{}) for(1..$depthDiff);
 		}
 		$absoluteDepthOfLastPage = $pageData->{"page.absDepth"};
+		$pageData->{"page.hasChild"} = $asset->hasChildren;
 		my $parent = $self->getParent;
 		if (defined $parent) {
 			foreach my $property (@interestingProperties) {
 				$pageData->{"page.parent.".$property} = $parent->get($property);
 			}
 			$pageData->{"page.parent.url"} = $parent->getUrl;	
-		}
-		$pageData->{"page.hasChild"} = $asset->hasChildren;
-		# these next two variables can be very inefficient, consider getting rid of them
-		my $parentsFirstChild = $parent->getFirstChild;
-		if (defined $parentsFirstChild) {
-			$pageData->{"page.isRankedFirst"} = ($asset->getId == $parentsFirstChild->getId);
-		}
-		my $parentsLastChild = $parent->getLastChild;
-		if (defined $parentsLastChild) {
-			$pageData->{"page.isRankedLast"} = ($asset->getId == $parentsLastChild->getId);
+			# these next two variables can be very inefficient, consider getting rid of them
+			my $parentsFirstChild = $parent->getFirstChild;
+			if (defined $parentsFirstChild) {
+				$pageData->{"page.isRankedFirst"} = ($asset->getId == $parentsFirstChild->getId);
+			}
+			my $parentsLastChild = $parent->getLastChild;
+			if (defined $parentsLastChild) {
+				$pageData->{"page.isRankedLast"} = ($asset->getId == $parentsLastChild->getId);
+			}
 		}
 		push(@{$var->{page_loop}}, $pageData);	
 	}

@@ -65,15 +65,6 @@ sub getAdminFunction {
 			op=>"listUsers",
 			group=>"11"
 		},
-		"navigation"=>{
-			title=>{
-				id=>"navigation",
-				namespace=>"Navigation"
-			},
-			icon=>"navigation.gif",
-			op=>"listNavigation",
-			group=>"4"
-		},
 		"clipboard"=>{
 			title=>{
 				id=>"948",
