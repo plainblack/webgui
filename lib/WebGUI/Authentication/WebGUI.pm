@@ -136,17 +136,21 @@ sub userFormSave {
 #-------------------------------------------------------------------
 sub userFormValidate {
         my ($error);
-        if ($session{form}{"authWebGUI.username"} =~ /^\s/ || $session{form}{"authWebGUI.username"} =~ /\s$/) {
-               $error = '<li>'.WebGUI::International::get(724);
-        }
-        if ($session{form}{"authWebGUI.username"} eq "") {
-                $error .= '<li>'.WebGUI::International::get(725);
-        }
-        unless ($session{form}{"authWebGUI.username"} =~ /^[A-Za-z0-9\-\_\.\,\@]+$/) {
-                $error .= '<li>'.WebGUI::International::get(747);
-        }
+	# the grandfather clause
+	my ($curentUsername) = WebGUI::SQL->quickArray("select username from users where userId=".$session{user}{userId});
+	unless ($currentUsername eq $session{form}{"authWebGUI.username"}) {
+        	if ($session{form}{"authWebGUI.username"} =~ /^\s/ || $session{form}{"authWebGUI.username"} =~ /\s$/) {
+               		$error = '<li>'.WebGUI::International::get(724);
+        	}
+        	if ($session{form}{"authWebGUI.username"} eq "") {
+                	$error .= '<li>'.WebGUI::International::get(725);
+        	}
+        	unless ($session{form}{"authWebGUI.username"} =~ /^[A-Za-z0-9\-\_\.\,\@]+$/) {
+                	$error .= '<li>'.WebGUI::International::get(747);
+        	}
+	}
         if ($session{form}{'authWebGUI.identifier'} ne $session{form}{'authWebGUI.identifierConfirm'}) {
-                $error = '<li>'.WebGUI::International::get(3,'Auth/WebGUI');
+               	$error = '<li>'.WebGUI::International::get(3,'Auth/WebGUI');
         }
         if ($session{form}{'authWebGUI.identifier'} eq "") {
                 $error .= '<li>'.WebGUI::International::get(4,'Auth/WebGUI');
