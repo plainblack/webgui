@@ -22,6 +22,8 @@
    Len Kranendonk)
  - passing form param disableWobjects=$call shortcircuits most of
    WebGUI::Wobject::WSClient::www_view()
+ - Added write permission checks to WebGUI::Template.
+
 
 6.1.1
  - bugfix [ 991313 ] Manage Translations doesn't work
