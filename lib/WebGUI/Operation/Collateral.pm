@@ -372,7 +372,7 @@ sub www_editCollateralFolderSave {
 #-------------------------------------------------------------------
 sub www_listCollateral {
 	return WebGUI::Privilege::insufficient unless (WebGUI::Privilege::isInGroup(4));
-	my (%type, %user, $f, $row, $data, $sth, $url, $output, $parent, $p, $thumbnail, $file, $page, $constraints, $folderId, $crCount);
+	my (%type, %user, $f, $row, $data, $sth, $url, $output, $parent, $p, $thumbnail, $file, $page, $constraints, $folderId);
 	tie %type, 'Tie::IxHash';
 	tie %user, 'Tie::IxHash';
 	%type = (
@@ -457,15 +457,19 @@ sub www_listCollateral {
 			$file = WebGUI::Attachment->new($row->{filename},"images",$row->{collateralId});
 			$thumbnail = '<a href="'.$url.'"><img src="'.$file->getIcon.'" border="0" /></a>';
 		} elsif ($row->{collateralType} eq "snippet") {
-			$crCount = $row->{parameters} =~ s/(\n[^\n]\r?|\r[^\r]\n?)/\&crarr;/gs;
-			$row->{parameters} = WebGUI::HTML::filter($row->{parameters},'all');
-			$thumbnail = substr($row->{parameters},0,$session{setting}{snippetsPreviewLength}+$crCount*6);
+			$thumbnail = WebGUI::HTML::filter($row->{parameters},'all');
+			$thumbnail =~ s/(\n[^\n]\r?|\r[^\r]\n?)/\&crarr;/gs;
+			$thumbnail =~ s/\s{2,}//g;
+			$thumbnail =~ s/\s*\&crarr;+\s*/\&crarr;/g;
+			$thumbnail =~ s/^(\&crarr;)+//;
+			my $crCount = $thumbnail =~ m/\&crarr;/g;
+			$thumbnail = substr($thumbnail,0,$session{setting}{snippetsPreviewLength}+$crCount*6);
 			$thumbnail .= '...' if (length($row->{parameters}) > $session{setting}{snippetsPreviewLength});
 		} else {
 			$thumbnail = "";
 		}
 		$output .= '<td class="tableData">'.$thumbnail.'</td>';
-		$output .= '</tr>';
+		$output .= "</tr>\n";
 	}
 	$output .= '</table>';
 	$output .= $p->getBarTraditional;
