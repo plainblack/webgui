@@ -32,25 +32,19 @@ CREATE TABLE wobject (
   PRIMARY KEY  (wobjectId)
 );
 
-insert into wobject 
-  (wobjectId, pageId, title, displayTitle, processMacros, 
-  description, dateAdded, addedBy, namespace, lastEdited, 
-  editedBy, templatePosition, sequenceNumber, startDate, endDate)
-select 
-  widgetId, pageId, title, displayTitle, processMacros, 
-  description, dateAdded, addedBy, namespace, lastEdited, 
-  editedBy, templatePosition, sequenceNumber, dateAdded, 1336444487
-from 
- widget
-where
- namespace='Item';
-
+insert into wobject (wobjectId, pageId, title, displayTitle, processMacros, description, dateAdded, addedBy, namespace, lastEdited, editedBy, templatePosition, sequenceNumber, startDate, endDate) select widgetId, pageId, title, displayTitle, processMacros, description, dateAdded, addedBy, namespace, lastEdited, editedBy, templatePosition, sequenceNumber, dateAdded, 1336444487 from widget where namespace='Item';
+delete from widget where namespace='Item';
 alter table Item drop column description;
 alter table Item change widgetId wobjectId int not null;
 
 
-delete from international where language='Svenska';
+insert into wobject (wobjectId, pageId, title, displayTitle, processMacros, description, dateAdded, addedBy, namespace, lastEdited, editedBy, templatePosition, sequenceNumber, startDate, endDate) select widgetId, pageId, title, displayTitle, processMacros, description, dateAdded, addedBy, namespace, lastEdited, editedBy, templatePosition, sequenceNumber, dateAdded, 1336444487 from widget where namespace='FAQ';
+delete from widget where namespace='FAQ';
+alter table FAQ change widgetId wobjectId int not null;
+alter table FAQ_question change widgetId wobjectId int not null;
 
+
+delete from international where language='Svenska';
 INSERT INTO international VALUES (367,'WebGUI','Svenska','Bäst före'); 
 INSERT INTO international VALUES (1,'Article','Svenska','Artikel'); 
 INSERT INTO international VALUES (1,'EventsCalendar','Svenska','Fortsätt med att lägga till en händelse?'); 
