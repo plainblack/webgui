@@ -33,3 +33,7 @@
  - Wobject privileges are available per page rather than site-wide.
  - Templatized the Rich Editor support. Tnx to Len Kranendonk
  - Fixed a problem in the forum that showed up under Postgres.
+ - Added some processing functions to programatically add meta tags,
+   javascript, and link tags to the head block of a page from anywhere within
+webgui.
+

@@ -103,7 +103,31 @@ sub process {
 		<meta http-equiv="Content-Type" content="text/html; charset='.($session{header}{charset}||$session{language}{characterSet}||"ISO-8859-1").'" />
 		<link rel="icon" href="'.$session{setting}{siteicon}.'" type="image/'.$type.'" />
 		<link rel="SHORTCUT ICON" href="'.$session{setting}{favicon}.'" />
-		';
+		'.$session{page}{head}{raw};
+        # generate additional link tags
+	foreach my $url (keys %{$session{page}{head}{link}}) {
+		$var{'head.tags'} .= '<link href="'.$url.'"';
+		foreach my $name (keys %{$session{page}{head}{link}{$url}}) {
+			$var{'head.tags'} .= ' '.$name.'="'.$session{page}{head}{link}{$url}{$name}.'"';
+		}
+		$var{'head.tags'} .= ' />'."\n";
+	}
+	# generate additional javascript tags
+	foreach my $url (keys %{$session{page}{head}{javascript}}) {
+		$var{'head.tags'} .= '<script src="'.$url.'"';
+		foreach my $name (keys %{$session{page}{head}{javascript}{$url}}) {
+			$var{'head.tags'} .= ' '.$name.'="'.$session{page}{head}{javascript}{$url}{$name}.'"';
+		}
+		$var{'head.tags'} .= '></script>'."\n";
+	}
+	# generate additional meta tags
+	foreach my $tag (@{$session{page}{head}{meta}}) {
+		$var{'head.tags'} .= '<meta';
+		foreach my $name (keys %{$tag}) {
+			$var{'head.tags'} .= ' '.$name.'="'.$tag->{$name}.'"';
+		}
+		$var{'head.tags'} .= ' />'."\n";
+	}
 	$var{'head.tags'} .= $session{page}{metaTags};
 	if ($session{var}{adminOn}) {
                 # This "triple incantation" panders to the delicate tastes of various browsers for reliable cache suppression.
