@@ -47,7 +47,6 @@ insert into help (helpId,namespace,titleId,bodyId,seeAlso) values (28, 'WebGUI',
 insert into help (helpId,namespace,titleId,bodyId,seeAlso) values (31, 'WebGUI', 681, 636, '30,WebGUI;1,WebGUI;3,WebGUI;');
 insert into help (helpId,namespace,titleId,bodyId,seeAlso) values (30, 'WebGUI', 680, 635, '31,WebGUI;');
 insert into help (helpId,namespace,titleId,bodyId,seeAlso) values (25, 'WebGUI', 675, 630, '60,WebGUI;');
-insert into help (helpId,namespace,titleId,bodyId,seeAlso) values (1, 'Item', 61, 71, '2,Item;21,WebGUI;');
 insert into help (helpId,namespace,titleId,bodyId,seeAlso) values (6, 'WebGUI', 656, 611, '12,WebGUI;');
 insert into help (helpId,namespace,titleId,bodyId,seeAlso) values (46, 'WebGUI', 696, 651, '66,WebGUI;');
 insert into help (helpId,namespace,titleId,bodyId,seeAlso) values (22, 'WebGUI', 672, 627, '12,WebGUI;');
@@ -62,7 +61,7 @@ insert into help (helpId,namespace,titleId,bodyId,seeAlso) values (1, 'LinkList'
 insert into help (helpId,namespace,titleId,bodyId,seeAlso) values (21, 'WebGUI', 671, 626, '19,WebGUI;18,WebGUI;27,WebGUI;14,WebGUI;');
 insert into help (helpId,namespace,titleId,bodyId,seeAlso) values (1, 'Article', 61, 71, '2,Article;71,WebGUI;21,WebGUI;');
 insert into help (helpId,namespace,titleId,bodyId,seeAlso) values (1, 'ExtraColumn', 61, 71, '21,WebGUI;');
-insert into help (helpId,namespace,titleId,bodyId,seeAlso) values (27, 'WebGUI', 677, 632, '1,Article;1,EventsCalendar;1,ExtraColumn;1,FAQ;1,FileManager;1,HttpProxy;1,Item;1,LinkList;1,DataForm;1,MessageBoard;1,Poll;1,Product;1,SiteMap;1,SQLReport;1,Survey;1,SyndicatedContent;1,USS;1,WobjectProxy;21,WebGUI;');
+insert into help (helpId,namespace,titleId,bodyId,seeAlso) values (27, 'WebGUI', 677, 632, '1,Article;1,EventsCalendar;1,ExtraColumn;1,FAQ;1,FileManager;1,HttpProxy;1,LinkList;1,DataForm;1,MessageBoard;1,Poll;1,Product;1,SiteMap;1,SQLReport;1,Survey;1,SyndicatedContent;1,USS;1,WobjectProxy;21,WebGUI;');
 insert into help (helpId,namespace,titleId,bodyId,seeAlso) values (1, 'Poll', 61, 71, '2,Poll;21,WebGUI;');
 insert into help (helpId,namespace,titleId,bodyId,seeAlso) values (1, 'SiteMap', 61, 71, '2,SiteMap;21,WebGUI;');
 insert into help (helpId,namespace,titleId,bodyId,seeAlso) values (1, 'SQLReport', 61, 71, '21,WebGUI;');
@@ -104,12 +103,11 @@ insert into help (helpId,namespace,titleId,bodyId,seeAlso) values (1, 'Survey', 
 insert into help (helpId,namespace,titleId,bodyId,seeAlso) values (49, 'WebGUI', 785, 786, '53,WebGUI;54,WebGUI;56,WebGUI;20,WebGUI;61,WebGUI;55,WebGUI;');
 insert into help (helpId,namespace,titleId,bodyId,seeAlso) values (50, 'WebGUI', 825, 826, '33,WebGUI;');
 insert into help (helpId,namespace,titleId,bodyId,seeAlso) values (2, 'Article', 72, 73, '1,Article;51,WebGUI;');
-insert into help (helpId,namespace,titleId,bodyId,seeAlso) values (51, 'WebGUI', 827, 828, '2,Article;3,DataForm;3,EventsCalendar;3,FAQ;3,FileManager;2,Item;3,LinkList;2,MessageBoard;7,Product;2,SiteMap;2,SyndicatedContent;33,WebGUI;2,USS;');
+insert into help (helpId,namespace,titleId,bodyId,seeAlso) values (51, 'WebGUI', 827, 828, '2,Article;3,DataForm;3,EventsCalendar;3,FAQ;3,FileManager;3,LinkList;2,MessageBoard;7,Product;2,SiteMap;2,SyndicatedContent;33,WebGUI;2,USS;');
 insert into help (helpId,namespace,titleId,bodyId,seeAlso) values (3, 'EventsCalendar', 94, 95, '1,EventsCalendar;51,WebGUI;');
 insert into help (helpId,namespace,titleId,bodyId,seeAlso) values (3, 'FAQ', 76, 77, '1,FAQ;51,WebGUI;');
 insert into help (helpId,namespace,titleId,bodyId,seeAlso) values (3, 'FileManager', 75, 76, '1,FileManager;51,WebGUI;');
 insert into help (helpId,namespace,titleId,bodyId,seeAlso) values (4, 'EventsCalendar', 96, 97, '2,EventsCalendar;51,WebGUI;');
-insert into help (helpId,namespace,titleId,bodyId,seeAlso) values (2, 'Item', 73, 74, '1,Item;51,WebGUI;');
 insert into help (helpId,namespace,titleId,bodyId,seeAlso) values (3, 'LinkList', 75, 76, '1,LinkList;51,WebGUI;');
 insert into help (helpId,namespace,titleId,bodyId,seeAlso) values (2, 'MessageBoard', 73, 74, '75,WebGUI;76,WebGUI;73,WebGUI;77,WebGUI;72,WebGUI;74,WebGUI;1,MessageBoard;51,WebGUI;');
 insert into help (helpId,namespace,titleId,bodyId,seeAlso) values (2, 'SiteMap', 72, 73, '1,SiteMap;51,WebGUI;');
@@ -148,5 +146,7 @@ insert into help (helpId,namespace,titleId,bodyId,seeAlso) values (76, 'WebGUI',
 insert into help (helpId,namespace,titleId,bodyId,seeAlso) values (77, 'WebGUI', 1067, 1068, '71,WebGUI;50,WebGUI;33,WebGUI;');
 insert into help (helpId,namespace,titleId,bodyId,seeAlso) values (3, 'MessageBoard', 78, 79, '71,WebGUI;1,MessageBoard;');
 
+
+delete from international where namespace='Item';
 
 

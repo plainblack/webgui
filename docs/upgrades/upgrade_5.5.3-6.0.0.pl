@@ -75,7 +75,10 @@ while (my $template = $sth->hashRef) {
 		<tmpl_if session.var.adminOn>
 		<style>
 			div.wobject:hover {
-				border: 1px outset #cccccc;
+				border: 2px ridge gray;
+			}
+			div.wobject {
+				border: 2px hidden;
 			}
 		</style>
 		</tmpl_if>
@@ -90,18 +93,60 @@ while (my $template = $sth->hashRef) {
 $sth->finish;
 
 #--------------------------------------------
-#print "\tUpdating config file.\n" unless ($quiet);
-#my $pathToConfig = '../../etc/'.$configFile;
-#my $conf = Parse::PlainConfig->new('DELIM' => '=', 'FILE' => $pathToConfig);
-#my $wobjects = $conf->get("wobjects");
-#$conf->set("wobjects"=>$wobjects);
-#$conf->write;
+print "\tConverting items into articles.\n" unless ($quiet);
+my $sth = WebGUI::SQL->read("select * from template where namespace='Item'");
+while (my $template = $sth->hashRef) {
+	$template->{name} =~ s/Default (.*?)/$1/i;
+       	if ($template->{templateId} < 1000) {
+		($template->{templateId}) = WebGUI::SQL->quickArray("select max(templateId) from template where namespace='Article' and templateId<1000");
+		$template->{templateId}++;
+	} else {
+		($template->{templateId}) = WebGUI::SQL->quickArray("select max(templateId) from template where namespace='Article'");
+		if ($template->{templateId} > 999) {
+       			$template->{templateId}++;
+     		} else {
+     			$template->{templateId} = 1000;
+		}
+	}
+	WebGUI::SQL->write("insert into template (templateId,name,template,namespace) values (".$template->{templateId}.",
+		".quote($template->{name}).", ".quote($template->{template}).", 'Article')");
+}
+$sth->finish;
+WebGUI::SQL->write("delete from template where namespace='Item'");
+WebGUI::SQL->write("update wobject set namespace='Article' where namespace='Item'");
+my $sth = WebGUI::SQL->read("select * from Item");
+while (my $data = $sth->hashRef) {
+	WebGUI::SQL->write("insert into Article (wobjectId,linkURL,attachment) values (".$data->{wobjectId}.",
+		".quote($data->{linkURL}).", ".quote($data->{attachment}).")");
+}
+$sth->finish;
+WebGUI::SQL->write("drop table Item");
+
+
+#--------------------------------------------
+print "\tUpdating config file.\n" unless ($quiet);
+my $pathToConfig = '../../etc/'.$configFile;
+my $conf = Parse::PlainConfig->new('DELIM' => '=', 'FILE' => $pathToConfig);
+my $macros = $conf->get("macros");
+delete $macros->{"\\"};
+$macros->{"\\\\"} = "Backslash_pageUrl";
+$conf->set("macros"=>$macros);
+my $wobjects = $conf->get("wobjects");
+my @newWobjects;
+foreach my $wobject (@{$wobjects}) {
+	unless ($wobject eq "Item") {
+		push(@newWobjects,$wobject);
+	}
+}
+$conf->set("wobjects"=>\@newWobjects);
+$conf->write;
 
 
 
 #--------------------------------------------
 print "\tRemoving unneeded files.\n" unless ($quiet);
 unlink("../../lib/WebGUI/Operation/Style.pm");
+unlink("../../lib/WebGUI/Wobject/Item.pm");
 #unlink("../../lib/WebGUI/Wobject/LinkList.pm");
 #unlink("../../lib/WebGUI/Wobject/FAQ.pm");
 

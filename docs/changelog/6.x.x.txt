@@ -4,3 +4,9 @@
    privacy problems. 
  - Removed all the old styles. They now exist as themes in the user
    contributions area of plainblack.com.
+ - Migrated styles to templates and removed the styles system.
+ - Updated page templates to be more powerful.
+ - Converted items to articles and removed the item wobject.
+
+
+

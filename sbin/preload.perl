@@ -109,7 +109,6 @@ use WebGUI::Operation::Search ();
 use WebGUI::Operation::Settings ();
 use WebGUI::Operation::Shared ();
 use WebGUI::Operation::Statistics ();
-use WebGUI::Operation::Style ();
 use WebGUI::Operation::Template ();
 use WebGUI::Operation::Theme ();
 use WebGUI::Operation::Trash ();
