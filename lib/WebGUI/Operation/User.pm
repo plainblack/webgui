@@ -356,7 +356,13 @@ sub www_editUserProfile {
                         }
                  	$f->select($data{fieldName},$values,$label,$default);
                 } elsif ($method) {
-                        $default = $session{form}{$data{fieldName}} || $user{$data{fieldName}} || eval $data{dataDefault};
+			if ($session{form}{$data{fieldName}}) {
+                        	$default = $session{form}{$data{fieldName}};
+                        } elsif (exists $session{user}{$data{fieldName}}) {
+                                $default = $user{$data{fieldName}};
+                        } else {
+                                $default = eval $data{dataDefault};
+                        }
                         $f->$method($data{fieldName},$label,$default);
                 }
                 $previousCategory = $category;

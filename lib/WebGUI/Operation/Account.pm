@@ -320,9 +320,13 @@ sub www_editProfile {
 						-subtext=>$subtext
 						);
                                 } else {
-                                        $default = $session{form}{$data{fieldName}}
-                                                || $session{user}{$data{fieldName}}
-                                                || eval $data{dataDefault};
+					if ($session{form}{$data{fieldName}}) {
+						$default = $session{form}{$data{fieldName}};
+					} elsif (exists $session{user}{$data{fieldName}}) {
+						$default = $session{user}{$data{fieldName}};
+					} else {
+						$default = eval $data{dataDefault};
+					}
                                         $f->$method(
 						-name=>$data{fieldName},
 						-label=>$label,

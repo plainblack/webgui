@@ -9,8 +9,8 @@ insert into international (internationalId,languageId,namespace,message,lastUpda
 insert into international (internationalId,languageId,namespace,message,lastUpdated) values (858,1,'WebGUI','Alias', 1043879848);
 INSERT INTO userProfileField VALUES ('alias','WebGUI::International::get(858)',1,0,'text','','',4,3,0);
 INSERT INTO userProfileField VALUES ('signature','WebGUI::International::get(859)',1,0,'HTMLArea','','',5,3,0);
-INSERT INTO userProfileField VALUES ('publicProfile','WebGUI::International::get(861)',1,0,'yesNo','','[1]',9,4,0);
-INSERT INTO userProfileField VALUES ('publicEmail','WebGUI::International::get(860)',1,0,'yesNo','','[1]',10,4,0);
+INSERT INTO userProfileField VALUES ('publicProfile','WebGUI::International::get(861)',1,0,'yesNo','','1',9,4,0);
+INSERT INTO userProfileField VALUES ('publicEmail','WebGUI::International::get(860)',1,0,'yesNo','','1',10,4,0);
 insert into international (internationalId,languageId,namespace,message,lastUpdated) values (862,1,'WebGUI','This user\'s profile is not public.', 1043881275);
 alter table groups add column dateCreated int not null default 997938000;
 alter table groups add column lastUpdated int not null default 997938000;
