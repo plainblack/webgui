@@ -14,15 +14,12 @@ package WebGUI::Storage::Image;
 
 =cut
 
+use Image::Magick;
 use strict;
+use WebGUI::Id;
 use WebGUI::Session;
 use WebGUI::Storage;
 use WebGUI::Utility;
-
-
-# do a check to see if they've installed Image::Magick
-my  $hasImageMagick = 1;
-eval " use Image::Magick; "; $hasImageMagick=0 if $@;
 
 our @ISA = qw(WebGUI::Storage);
 
@@ -33,7 +30,7 @@ Package WebGUI::Storage::Image
 
 =head1 DESCRIPTION
 
-Extends WebGUI::Storageto add image manipulation operations.
+Extends WebGUI::Storage to add image manipulation operations.
 
 =head1 SYNOPSIS
 
@@ -50,6 +47,29 @@ my $boolean = $self->isImage;
 
 =cut
 
+
+#-------------------------------------------------------------------
+
+=head2 addFileFromCaptcha ( )
+
+Generates a captcha image (105px x 26px) and returns the filename and challenge string (6 random characters). For more information about captcha, consult the Wikipedia here: http://en.wikipedia.org/wiki/Captcha
+
+=cut 
+
+sub addFileFromCaptcha {
+	my $challenge;
+	$challenge.= ('A'..'Z')[26*rand] foreach (1..6);
+	my $filename = "captcha.".WebGUI::Id::generate().".png";
+	my $image = Image::Magick->new;
+	$image->Set(size=>'105x26');
+	$image->ReadImage('xc:white');
+	$image->Annotate(pointsize=>20, skewY=>5, skewX=>11, gravity=>'center', fill=>'black', antialias=>'true', text=>$challenge);
+	$image->Swirl(degrees=>10);
+	$image->AddNoise(noise=>'Multiplicative');
+	$image->Border(fill=>'black', width=>1, height=>1);
+	$image->Write($self->getPath($filename));
+	return ($filename, $challenge);
+}
 
 
 #-------------------------------------------------------------------
@@ -74,10 +94,6 @@ sub generateThumbnail {
 	my $thumbnailSize = shift || $session{setting}{thumbnailSize};
 	unless (defined $filename) {
 		WebGUI::ErrorHandler::warn("Can't generate a thumbnail when you haven't specified a file.");
-		return 0;
-	}
-	unless ($hasImageMagick) {
-		WebGUI::ErrorHandler::warn("Can't generate a thumbnail if you don't have Image Magick.");
 		return 0;
 	}
 	unless ($self->isImage($filename)) {

@@ -7,6 +7,11 @@ upgrading from one version to the next, or even between multiple
 versions. Be sure to heed the warnings contained herein as they will
 save you many hours of grief.
 
+6.4.0
+--------------------------------------------------------------------
+ * Image Magick is no longer optional.
+
+
 6.3.0
 --------------------------------------------------------------------
  * In order to upgrade to 6.3.0 or beyond you need to have already

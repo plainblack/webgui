@@ -33,6 +33,7 @@
  - bugfix [ 1154247 ] Title and menuTitle set to 'untitled' if url is changed
  - bugfix [ 1150982 ] Subscribe to forum thread causes error
  - bugfix [ 1151216 ] The Latest News is blank on demo.plainblack.com
+ - Image Magick is now required to run WebGUI.
 
 
 6.3.0

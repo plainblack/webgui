@@ -11,7 +11,6 @@ $|=1;
 
 use strict;
 print "\nStarting WebGUI ".$WebGUI::VERSION."\n";
-$ENV{GATEWAY_INTERFACE} =~ /^CGI-Perl/ or die "GATEWAY_INTERFACE not Perl!";
 
 #----------------------------------------
 # Enable the mod_perl environment. 
@@ -29,7 +28,7 @@ use CGI (); CGI->compile(':all');
 use CGI::Carp ();
 use CGI::Util ();
 use Digest::MD5 ();
-eval "use Image::Magick ();"; # eval, may not be installed
+use Image::Magick ();
 use File::Copy ();
 use File::Path ();
 use FileHandle ();

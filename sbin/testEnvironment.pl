@@ -239,11 +239,12 @@ if (eval { require Time::HiRes }) {
         }
 }
 
-print "Image::Magick module (optional) .......... ";
+print "Image::Magick module ..................... ";
 if (eval { require Image::Magick }) {
         print "OK\n";
 } else {
-        print "Not installed. Thumbnailing will be disabled.\n";
+        print "Please install.\n";
+	$prereq = 0;
 }
 
 # this is here to insure they installed correctly.
