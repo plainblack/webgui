@@ -37,11 +37,18 @@ sub getStyle {
 		$header .= '</title>'
 			.$style{styleSheet}
 			.$session{page}{metaTags};
+		if ($session{var}{adminOn}) {
+			# This "triple incantation" panders to the delicate tastes of various browsers for reliable cache suppression.
+			$header .= '<META HTTP-EQUIV="Pragma" CONTENT="no-cache">';
+			$header .= '<META HTTP-EQUIV="Cache-Control" CONTENT="no-cache, must-revalidate, max_age=0">';
+			$header .= '<META HTTP-EQUIV="Expires" CONTENT="0">';
+		}
 		if ($session{page}{defaultMetaTags}) {
 			$header .= '<meta http-equiv="Keywords" name="Keywords" content="'.
 				$session{page}{title}.', '.$session{setting}{companyName}.'">';
 			$header .= '<meta http-equiv="Description" name="Description" content="'.
 				$session{page}{synopsis}.'">';
+
 		}
 		$header .= '</head>'.$style{header};
 		$footer = $style{footer}.' </html>';
