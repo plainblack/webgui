@@ -280,8 +280,8 @@ sub getEditForm {
                 -uiLevel=>3
                 );
 	$tabform->getTab("properties")->yesNo(
-                -name=>"hideFromNavigation",
-                -value=>$self->get("hideFromNavigation"),
+                -name=>"isHidden",
+                -value=>$self->get("isHidden"),
                 -label=>WebGUI::International::get(886),
                 -uiLevel=>6
                 );
@@ -775,7 +775,7 @@ sub www_add {
 		groupIdEdit => $self->get("groupIdEdit"),
 		ownerId => $self->get("ownerId"),
 		encryptPage => $self->get("encryptPage"),
-		hideFromNavigation => $self->get("hideFromNavigation"),
+		isHidden => $self->get("isHidden"),
 		startDate => $self->get("startDate"),
 		endDate => $self->get("endDate")
 		);

@@ -182,7 +182,7 @@ sub editSave {
 		$storage->addFileFromFilesystem($tempStorage->getPath($filename));
 		my %data;
 		my $class = 'WebGUI::Asset::File';
-		$class = "WebGUI::Asset::File::Image" if (isIn($storage->getFileExtension($filename),qw(jpg gif png)));
+		$class = "WebGUI::Asset::File::Image" if (isIn($storage->getFileExtension($filename),qw(jpg jpeg gif png)));
 		my $newAsset = $parent->addChild({className=>$class});
 		foreach my $definition (@{$self->definition}) {
 			foreach my $property (keys %{$definition->{properties}}) {
