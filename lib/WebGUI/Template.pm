@@ -103,13 +103,13 @@ sub selectTemplate {
 		$templates{$key} =~ s/\n//g;
 		$templates{$key} =~ s/\r//g;
 		$templates{$key} =~ s/\'/\\\'/g;
-		$templates{$key} =~ s/\<table.*?\>/\<table\ border\=1>/ig;
+		$templates{$key} =~ s/\<table.*?\>/\<table cellspacing=0 cellpadding=3 width=60 height=80 border=1\>/ig;
 		$templates{$key} =~ s/\^(\d+)\;/$1/g;
 		$output .= "	var b".$key." = '".$templates{$key}."';\n";
 	}
 	$output .= '</script>';
 	$output .= $f->printRowsOnly;
-	$output .= '<div id="templatePreview"></div>';
+	$output .= '<div id="templatePreview" style="padding: 5px;"></div>';
 	return $output;
 }
 
