@@ -11,9 +11,11 @@
  - Image Magick is now required to run WebGUI.
  - Added an image resizer to the image asset.
  - Added Captcha verification option to WebGUI anonymous registration.
+ - Authentication templates are now selectable through the settings console.
  - Added email validation option to WebGUI anonymous registration. Thanks to
    Matt Wilson for inspiration.
  - Thumbnails will now be generated a little sharper. Thanks to Nuba.
+ - SSL is now more strictly enforced.
  - Fixed resetting votes on Poll would crash it.
  - Fixed not being able to set display title and other yes no questions to no.
  - Fixed a bug where URLs would become unreachable when using SSL.

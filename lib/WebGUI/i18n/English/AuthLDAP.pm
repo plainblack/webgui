@@ -1,6 +1,21 @@
 package WebGUI::i18n::English::AuthLDAP;
 
 our $I18N = {
+	'account template' => {
+		message => q|Account Template|,
+		lastUpdated => 1078852969
+	},
+
+	'create account template' => {
+		message => q|Create Account Template|,
+		lastUpdated => 1078852969
+	},
+
+	'login template' => {
+		message => q|Login Template|,
+		lastUpdated => 1078852969
+	},
+
 	'account-1' => {
 		message => q|LDAP Authentication Display Account Template|,
 		lastUpdated => 1078852969

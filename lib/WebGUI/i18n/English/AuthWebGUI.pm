@@ -1,6 +1,31 @@
 package WebGUI::i18n::English::AuthWebGUI;
 
 our $I18N = {
+	'account template' => {
+		message => q|Account Template|,
+		lastUpdated => 1078852836
+	},
+
+	'create account template' => {
+		message => q|Create Account Template|,
+		lastUpdated => 1078852836
+	},
+
+	'expired password template' => {
+		message => q|Expired Password Template|,
+		lastUpdated => 1078852836
+	},
+
+	'login template' => {
+		message => q|Login Template|,
+		lastUpdated => 1078852836
+	},
+
+	'password recovery template' => {
+		message => q|Password Recovery Template|,
+		lastUpdated => 1078852836
+	},
+
 	'use captcha' => {
 		message => q|Use captcha image?|,
 		lastUpdated => 1078852836

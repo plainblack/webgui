@@ -383,42 +383,72 @@ sub editUserSettingsForm {
              -label=>WebGUI::International::get(6,'AuthWebGUI')
              );
    $f->textarea("webguiRecoverPasswordEmail",WebGUI::International::get(134),$session{setting}{webguiRecoverPasswordEmail});
-   $f->yesNo(
-	         -name=>"webguiValidateEmail",
-             -value=>$session{setting}{webguiValidateEmail},
-             -label=>WebGUI::International::get('validate email','AuthWebGUI')
-             );
-   $f->yesNo(
-	         -name=>"webguiUseCaptcha",
-             -value=>$session{setting}{webguiUseCaptcha},
-             -label=>WebGUI::International::get('use captcha','AuthWebGUI')
-             );
+   	$f->yesNo(
+		-name=>"webguiValidateEmail",
+             	-value=>$session{setting}{webguiValidateEmail},
+             	-label=>WebGUI::International::get('validate email','AuthWebGUI')
+             	);
+   	$f->yesNo(
+	     	-name=>"webguiUseCaptcha",
+             	-value=>$session{setting}{webguiUseCaptcha},
+             	-label=>WebGUI::International::get('use captcha','AuthWebGUI')
+             	);
+	$f->template(
+		-name=>"webguiAccountTemplate",
+		-value=>$session{setting}{webguiAccountTemplate},
+		-namespace=>"Auth/WebGUI/Account",
+		-label=>WebGUI::International::get("account template","AuthWebGUI")
+		);
+	$f->template(
+		-name=>"webguiCreateAccountTemplate",
+		-value=>$session{setting}{webguiCreateAccountTemplate},
+		-namespace=>"Auth/WebGUI/Create",
+		-label=>WebGUI::International::get("create account template","AuthWebGUI")
+		);
+	$f->template(
+		-name=>"webguiExpiredPasswordTemplate",
+		-value=>$session{setting}{webguiExpiredPasswordTemplate},
+		-namespace=>"Auth/WebGUI/Expired",
+		-label=>WebGUI::International::get("expired password template","AuthWebGUI")
+		);
+	$f->template(
+		-name=>"webguiLoginTemplate",
+		-value=>$session{setting}{webguiLoginTemplate},
+		-namespace=>"Auth/WebGUI/Login",
+		-label=>WebGUI::International::get("login template","AuthWebGUI")
+		);
+	$f->template(
+		-name=>"webguiPasswordRecoveryTemplate",
+		-value=>$session{setting}{webguiPasswordRecoveryTemplate},
+		-namespace=>"Auth/WebGUI/Recovery",
+		-label=>WebGUI::International::get("password recovery template","AuthWebGUI")
+		);
    return $f->printRowsOnly;
 }
 
 #-------------------------------------------------------------------
 sub getAccountTemplateId {
-	return "PBtmpl0000000000000010";
+	return $session{setting}{webguiAccountTemplate} || "PBtmpl0000000000000010";
 }
 
 #-------------------------------------------------------------------
 sub getCreateAccountTemplateId {
-	return "PBtmpl0000000000000011";
+	return $session{setting}{webguiCreateAccountTemplate} || "PBtmpl0000000000000011";
 }
 
 #-------------------------------------------------------------------
 sub getExpiredPasswordTemplateId {
-	return "PBtmpl0000000000000012";
+	return $session{setting}{webguiExpiredPasswordTemplate} || "PBtmpl0000000000000012";
 }
 
 #-------------------------------------------------------------------
 sub getLoginTemplateId {
-	return "PBtmpl0000000000000013";
+	return $session{setting}{webguiLoginTemplate} || "PBtmpl0000000000000013";
 }
 
 #-------------------------------------------------------------------
 sub getPasswordRecoveryTemplateId {
-	return "PBtmpl0000000000000014";
+	return $session{setting}{webguiPasswordRecoveryTemplate} || "PBtmpl0000000000000014";
 }
 
 

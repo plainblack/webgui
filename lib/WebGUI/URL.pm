@@ -208,7 +208,7 @@ sub getSiteURL {
                 $site = $session{env}{HTTP_HOST} || $session{config}{defaultSitename};
         }
         my $proto = "http://";
-        if ($session{env}{SERVER_PORT} == 443) {
+        if ($session{env}{HTTPS} eq "on") {
                 $proto = "https://";
         }
         return $proto.$site;

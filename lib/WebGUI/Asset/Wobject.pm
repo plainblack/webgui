@@ -561,6 +561,10 @@ Renders self->view based upon current style, subject to timeouts. Returns Privil
 sub www_view {
 	my $self = shift;
 	return WebGUI::Privilege::noAccess() unless $self->canView;
+	if ($self->get("encryptPage") && $session{env}{HTTPS} ne "on") {
+                WebGUI::HTTP::setRedirect($self->getUrl);
+                return "";
+        }
 	$self->logView();
 	my $cache;
 	my $output;

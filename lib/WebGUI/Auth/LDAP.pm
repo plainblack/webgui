@@ -325,22 +325,40 @@ sub editUserSettingsForm {
                 -value=>$session{setting}{ldapWelcomeMessage},
                 -label=>WebGUI::International::get(869)
                );
+	$f->template(
+		-name=>"ldapAccountTemplate",
+		-value=>$session{setting}{ldapAccountTemplate},
+		-namespace=>"Auth/LDAP/Account",
+		-label=>WebGUI::International::get("account template","AuthLDAP")
+		);
+	$f->template(
+		-name=>"ldapCreateAccountTemplate",
+		-value=>$session{setting}{ldapCreateAccountTemplate},
+		-namespace=>"Auth/LDAP/Create",
+		-label=>WebGUI::International::get("create account template","AuthLDAP")
+		);
+	$f->template(
+		-name=>"ldapLoginTemplate",
+		-value=>$session{setting}{ldapLoginTemplate},
+		-namespace=>"Auth/LDAP/Login",
+		-label=>WebGUI::International::get("login template","AuthLDAP")
+		);
    return $f->printRowsOnly;
 }
 
 #-------------------------------------------------------------------
 sub getAccountTemplateId {
-	return "PBtmpl0000000000000004";
+	return $session{setting}{ldapAccountTemplate} || "PBtmpl0000000000000004";
 }
 
 #-------------------------------------------------------------------
 sub getCreateAccountTemplateId {
-	return "PBtmpl0000000000000005";
+	return $session{setting}{ldapCreateAccountTemplate} || "PBtmpl0000000000000005";
 }
 
 #-------------------------------------------------------------------
 sub getLoginTemplateId {
-	return "PBtmpl0000000000000006";
+	return $session{setting}{ldapLoginTemplate} || "PBtmpl0000000000000006";
 }
 
 #-------------------------------------------------------------------
