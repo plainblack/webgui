@@ -94,7 +94,7 @@ sub www_addPage {
 
 #-------------------------------------------------------------------
 sub www_addPageSave {
-	my ($urlizedTitle, $test, $nextSeq, $parentId, $menuTitle);
+	my ($urlizedTitle, $nextSeq, $parentId, $menuTitle);
 	if (WebGUI::Privilege::canEditPage()) {
 		($nextSeq) = WebGUI::SQL->quickArray("select max(sequenceNumber)+1 from page where parentId=$session{page}{pageId}");
 		if ($session{form}{title} eq "") {
@@ -110,10 +110,7 @@ sub www_addPageSave {
 		} else {
 			$menuTitle = $session{form}{menuTitle};
 		}
-		$urlizedTitle = WebGUI::URL::urlize($session{form}{title});
-		while (($test) = WebGUI::SQL->quickArray("select urlizedTitle from page where urlizedTitle='$urlizedTitle'")) {
-			$urlizedTitle .= 2;
-		}
+		$urlizedTitle = WebGUI::URL::makeUnique(WebGUI::URL::urlize($session{form}{title}));
 		WebGUI::SQL->write("insert into page values (".getNextId("pageId").", $parentId, ".quote($session{form}{title}).", $session{page}{styleId}, $session{user}{userId}, $session{page}{ownerView}, $session{page}{ownerEdit}, $session{page}{groupId}, $session{page}{groupView}, $session{page}{groupEdit}, $session{page}{worldView}, $session{page}{worldEdit}, '$nextSeq', ".quote($session{form}{metaTags}).", '$urlizedTitle', '$session{form}{defaultMetaTags}', '$session{form}{template}', ".quote($menuTitle).", ".quote($session{form}{synopsis}).")");
 		return "";
 	} else {
@@ -245,10 +242,7 @@ sub www_editPageSave {
                 if ($session{form}{title} eq "") {
                         $session{form}{title} = "no title";
                 }
-                $urlizedTitle = WebGUI::URL::urlize($session{form}{urlizedTitle});
-                while (($test) = WebGUI::SQL->quickArray("select urlizedTitle from page where urlizedTitle='$urlizedTitle' and pageId<>$session{page}{pageId}")) {
-                        $urlizedTitle .= 2;
-                }
+		$urlizedTitle = WebGUI::URL::makeUnique(WebGUI::URL::urlize($session{form}{urlizedTitle}));
                 WebGUI::SQL->write("update page set title=".quote($session{form}{title}).", styleId=$session{form}{styleId}, ownerId=$session{form}{ownerId}, ownerView=$session{form}{ownerView}, ownerEdit=$session{form}{ownerEdit}, groupId='$session{form}{groupId}', groupView=$session{form}{groupView}, groupEdit=$session{form}{groupEdit}, worldView=$session{form}{worldView}, worldEdit=$session{form}{worldEdit}, metaTags=".quote($session{form}{metaTags}).", urlizedTitle='$urlizedTitle', defaultMetaTags='$session{form}{defaultMetaTags}', template='$session{form}{template}', menuTitle=".quote($session{form}{menuTitle}).", synopsis=".quote($session{form}{synopsis})." where pageId=$session{page}{pageId}");
 		if ($session{form}{recurseStyle} eq "yes") {
 			_recursivelyChangeStyle($session{page}{pageId});

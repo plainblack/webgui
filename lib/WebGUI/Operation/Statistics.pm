@@ -76,7 +76,7 @@ sub www_viewLoginHistory {
 	tie %data, 'Tie::CPHash';
         if (WebGUI::Privilege::isInGroup(3)) {
                 $output = '<h1>'.WebGUI::International::get(426).'</h1>';
-		$sth = WebGUI::SQL->read("select * from users,userLoginLog where users.userId=userLoginLog.userId order by userLoginLog.timeStamp");	
+		$sth = WebGUI::SQL->read("select * from users,userLoginLog where users.userId=userLoginLog.userId order by userLoginLog.timeStamp desc");	
 		while (%data = $sth->hash) {
 			$data{username} = 'unknown user' if ($data{userId} == 0);
 			$row[$i] = '<tr class="tableData"><td>'.$data{username}.' ('.$data{userId}.')</td>';
@@ -96,7 +96,7 @@ sub www_viewLoginHistory {
 		$output .= '<td>'.WebGUI::International::get(433).'</td></tr>';
                 $output .= $p->getPage($session{form}{pn});
                 $output .= '</table>';
-                $output .= $p->getBarTraditional($session{form}{pn});
+                $output .= $p->getBar($session{form}{pn});
         } else {
                 $output = WebGUI::Privilege::adminOnly();
 	}

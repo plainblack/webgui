@@ -34,7 +34,7 @@ sub _duplicateWidgets {
 
 #-------------------------------------------------------------------
 sub _recursePageTree {
-        my ($a, %package, %newParent, $newPageId, $test, $urlizedTitle);
+        my ($a, %package, %newParent, $newPageId, $urlizedTitle);
 	tie %newParent, 'Tie::CPHash';
 	tie %package, 'Tie::CPHash';
 	%newParent = WebGUI::SQL->quickHash("select * from page where pageId=$_[1]");
@@ -42,10 +42,7 @@ sub _recursePageTree {
         $a = WebGUI::SQL->read("select * from page where parentId=$_[0]");
         while (%package = $a->hash) {
 		$newPageId = getNextId("pageId");
-		$urlizedTitle = $package{urlizedTitle};
-		while (($test) = WebGUI::SQL->quickArray("select urlizedTitle from page where urlizedTitle='$urlizedTitle'")) {
-                        $urlizedTitle .= 2;
-                }
+		$urlizedTitle = WebGUI::URL::makeUnique($package{urlizedTitle});
                 WebGUI::SQL->write("insert into page values ($newPageId,$_[1],".quote($package{title}).",$newParent{styleId},$session{user}{userId},$newParent{ownerView},$newParent{ownerEdit},$newParent{groupId},$newParent{groupView},$newParent{groupEdit},$newParent{worldView},$newParent{worldEdit},$package{sequenceNumber},".quote($package{metaTags}).",".quote($urlizedTitle).",$package{defaultMetaTags},".quote($package{template}).",".quote($package{menuTitle}).",".quote($package{synopsis}).")");
                 _recursePageTree($package{pageId},$newPageId);
         }

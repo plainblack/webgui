@@ -482,7 +482,7 @@ sub www_viewSubmission {
   #---content
 	if ($submission{image} ne "") {
 		$file = WebGUI::Attachment->new($submission{image},$session{form}{wid},$session{form}{sid});
-		$output .= '<img src="'.$file->getURL.'" hspace=3 align="right">';
+		$output .= '<img src="'.$file->getURL.'"><p>';
 	}
 	if ($submission{convertCarriageReturns}) {
 		$submission{content} =~ s/\n/\<br\>/g;

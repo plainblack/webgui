@@ -13,7 +13,7 @@ use CGI::Carp ();
 use DBI ();
 use DBD::mysql ();
 use URI::Escape ();
-use HTML::Parser ();
+#use HTML::Parser (); # commented because it is causing problems with attachments
 use Data::Config ();
 use Date::Calc ();
 use HTML::CalendarMonthSimple ();
@@ -25,7 +25,7 @@ use Net::SMTP ();
 use File::Copy ();
 use File::Path ();
 use FileHandle ();
-use HTML::TagFilter ();
+#use HTML::TagFilter (); # commented because it is causing problems with attachments
 use POSIX ();
 use WebGUI ();
 

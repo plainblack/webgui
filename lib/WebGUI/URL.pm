@@ -13,6 +13,7 @@ package WebGUI::URL;
 use strict;
 use URI::Escape;
 use WebGUI::Session;
+use WebGUI::SQL;
 use WebGUI::Utility;
 
 #-------------------------------------------------------------------
@@ -43,6 +44,20 @@ sub gateway {
                 $url = append($url,randint(0,1000).';'.time());
         }
         return $url;
+}
+
+#-------------------------------------------------------------------
+sub makeUnique {
+	my ($url, $test);
+	$url = $_[0];
+	while (($test) = WebGUI::SQL->quickArray("select urlizedTitle from page where urlizedTitle='$url'")) {
+		if ($url =~ /(.*)(\d+$)/) {
+			$url = $1.($2+1);
+		} elsif ($test ne "") {
+			$url .= "2";
+		}
+	}
+	return $url;      
 }
 
 #-------------------------------------------------------------------
