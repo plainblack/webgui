@@ -23,7 +23,7 @@ sub process {
 	my @param = WebGUI::Macro::getParams($_[0]);
 	return "" if ($param[0] eq "");
 	return "" if ($param[1] eq "");
-        return "" if ($session{user}{userId} == 1);
+        return "" if ($session{user}{userId} eq '1');
 	my $g = WebGUI::Group->find($param[0]);
 	return "" if ($g->groupId eq "");
 	return "" unless ($g->autoDelete);

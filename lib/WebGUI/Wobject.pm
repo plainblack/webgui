@@ -105,7 +105,7 @@ Returns a boolean (0|1) value signifying that the user has the required privileg
 sub canEdit {
 	my $self = shift;
         return WebGUI::Page::canEdit() if ($session{page}{wobjectPrivileges} != 1 || $self->get("wobjectId") eq "new");
-        if ($session{user}{userId} == $self->get("ownerId")) {
+        if ($session{user}{userId} eq $self->get("ownerId")) {
                 return 1;
         } else {
 		return WebGUI::Grouping::isInGroup($self->get("groupIdEdit"));
@@ -123,7 +123,7 @@ Returns a boolean (0|1) value signifying that the user has the required privileg
 sub canView {
 	my $self = shift;
         return WebGUI::Page::canView() unless ($session{page}{wobjectPrivileges} == 1);
-        if ($session{user}{userId} == $self->get("ownerId")) {
+        if ($session{user}{userId} eq $self->get("ownerId")) {
           	return 1;
         } elsif ($self->get("startDate") < WebGUI::DateTime::time() && $self->get("endDate") > WebGUI::DateTime::time() && WebGUI::Grouping::isInGroup($self->get("groupIdView"))) {
           	return 1;

@@ -51,7 +51,7 @@ sub _purgeUserTrash {
 	$page = WebGUI::Page->getPage(3);
 	foreach ($page->daughters) {
 		$currentPage = WebGUI::Page->new($_);
-		if ($currentPage->get('bufferUserId') == $userId) {
+		if ($currentPage->get('bufferUserId') eq $userId) {
 			foreach $currentWobjectPage ($currentPage->self_and_descendants) {
 				_purgeWobjects($currentWobjectPage->{'pageId'});
 			}

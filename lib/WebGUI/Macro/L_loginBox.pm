@@ -40,14 +40,16 @@ sub process {
         if (index(lc($ENV{HTTP_USER_AGENT}),"msie") < 0) {
         	$boxSize = int($boxSize=$boxSize*2/3);
         }
-	$var{'form.header'} = WebGUI::Form::formHeader()
+	my $action;
+        if ($session{setting}{encryptLogin}) {
+                $action = WebGUI::URL::page(undef,1);
+                $action =~ s/http:/https:/;
+        }
+	$var{'form.header'} = WebGUI::Form::formHeader({action=>$action})
 		.WebGUI::Form::hidden({
 			name=>"op",
 			value=>"login"
 			});
-        if ($session{setting}{encryptLogin}) {
-                $var{'form.header'} =~ s/http:/https:/;
-        }
 	$var{'username.label'} = WebGUI::International::get(50);
 	$var{'username.form'} = WebGUI::Form::text({
 		name=>"username",

@@ -388,7 +388,7 @@ sub getFileSize {
                 $size = round($attributes[7]/1024);
                 $size .= 'kB';
         } else {
-                $size = $attributes[7]."B";
+                $size = $attributes[7].'B';
         }
         return $size;
 }

@@ -275,7 +275,7 @@ sub www_approveSubmission {
 		%submission = WebGUI::SQL->quickHash("select * from USS_submission where USS_submissionId=".quote($session{form}{sid}));
                 WebGUI::SQL->write("update USS_submission set status='Approved' where USS_submissionId=".quote($session{form}{sid}));
 		WebGUI::MessageLog::addInternationalizedEntry($submission{userId},'',WebGUI::URL::page('func=viewSubmission&wid='.
-			$session{form}{wid}.'&sid='.$session{form}{sid}),4,$self->get("namespace"));
+			$session{form}{wid}.'&sid='.$session{form}{sid},1),4,$self->get("namespace"));
 		WebGUI::MessageLog::completeEntry($session{form}{mlog});
 		$self->deleteCachedSubmission($session{form}{sid});
                 return WebGUI::Operation::www_viewMessageLog();
@@ -337,7 +337,7 @@ sub www_denySubmission {
 		%submission = WebGUI::SQL->quickHash("select * from USS_submission where USS_submissionId=".quote($session{form}{sid}));
                 WebGUI::SQL->write("update USS_submission set status='Denied' where USS_submissionId=".quote($session{form}{sid}));
                 WebGUI::MessageLog::addInternationalizedEntry($submission{userId},'',WebGUI::URL::page('func=viewSubmission&wid='.
-			$session{form}{wid}.'&sid='.$session{form}{sid}),5,$self->get("namespace"));
+			$session{form}{wid}.'&sid='.$session{form}{sid},1),5,$self->get("namespace"));
                 WebGUI::MessageLog::completeEntry($session{form}{mlog});
 		$self->deleteCachedSubmission($session{form}{sid});
                 return WebGUI::Operation::www_viewMessageLog();
@@ -454,7 +454,7 @@ sub www_editSubmission {
 	$var{'link.header.label'} = WebGUI::International::get(90,$_[0]->get("namespace"));
 	$var{'question.header.label'} = WebGUI::International::get(84,$_[0]->get("namespace"));
         $var{'submission.header.label'} = WebGUI::International::get(19,$_[0]->get("namespace"));
-	$var{'user.isVisitor'} = ($session{user}{userId} == 1);
+	$var{'user.isVisitor'} = ($session{user}{userId} eq '1');
         $var{'visitorName.label'} = WebGUI::International::get(438);
 	$var{'visitorName.form'} = WebGUI::Form::text({
 		name=>"visitorName"
@@ -689,7 +689,7 @@ sub www_editSubmissionSave {
 				$hash{status} = $_[0]->get("defaultStatus");
 				WebGUI::MessageLog::addInternationalizedEntry('',$_[0]->get("groupToApprove"),
 					WebGUI::URL::page('func=viewSubmission&wid='.$_[0]->get("wobjectId").'&sid='.
-					$session{form}{sid}),3,$_[0]->get("namespace"),'pending');
+					$session{form}{sid},1),3,$_[0]->get("namespace"),'pending');
 			} else {
 				$hash{status} = "Approved";
 			}
@@ -738,7 +738,7 @@ sub www_view {
         $var{"search.label"} = WebGUI::International::get(364);
 	$var{"search.Form"} = WebGUI::Search::form({wid=>$_[0]->get("wobjectId"),func=>'view',search=>1});
 	$var{"search.url"} = WebGUI::Search::toggleURL("wid=".$_[0]->get("wobjectId")."&func=view");
-        $var{"rss.url"} = WebGUI::URL::page('func=viewRSS&wid='.$_[0]->get("wobjectId"));
+        $var{"rss.url"} = WebGUI::URL::page('func=viewRSS&wid='.$_[0]->get("wobjectId"),1);
         $var{canModerate} = WebGUI::Grouping::isInGroup($_[0]->get("groupToApprove"),$session{user}{userId});
 	WebGUI::Style::setLink($var{"rss.url"},{ rel=>'alternate', type=>'application/rss+xml', title=>'RSS' });
 	if ($session{scratch}{search}) {

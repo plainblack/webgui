@@ -44,7 +44,7 @@ sub www_viewPageReport {
 		$sth = WebGUI::SQL->read("select pageTitle,pageId,userId,ipAddress,wobjectId 
 			from pageStatistics order by pageTitle,userId,ipAddress");
 		while ($data = $sth->hashRef) {
-			if ($data->{userId} == 1) {
+			if ($data->{userId} eq '1') {
 				$user = $data->{ipAddress};
 			} else {
 				$user = $data->{userId};

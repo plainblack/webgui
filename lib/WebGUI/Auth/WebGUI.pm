@@ -203,7 +203,7 @@ sub createAccountSave {
 #-------------------------------------------------------------------
 sub deactivateAccount {
    my $self = shift;
-   return $self->displayLogin if($self->userId == 1);
+   return $self->displayLogin if($self->userId eq '1');
    return $self->SUPER::deactivateAccount("deactivateAccountConfirm");
 }
 
@@ -218,7 +218,7 @@ sub deactivateAccountConfirm {
 sub displayAccount {
    my $self = shift;
    my $vars;
-   return $self->displayLogin($_[0]) if ($self->userId == 1);
+   return $self->displayLogin($_[0]) if ($self->userId eq '1');
    my $userData = $self->getParams;
    $vars->{'account.message'} = $_[0] if ($_[0]);
    $vars->{'account.noform'} = 1;
@@ -508,7 +508,7 @@ sub updateAccount {
    my $display = '<li>'.WebGUI::International::get(81).'<p>';
    my $error = "";
    
-   if($self->userId == 1){
+   if($self->userId eq '1'){
       return $self->displayLogin;
    }
    

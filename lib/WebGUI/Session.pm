@@ -102,8 +102,8 @@ sub _setupUserInfo {
 			from userProfileData, userProfileField where userProfileData.fieldName=userProfileField.fieldName 
 			and userProfileData.userId=".quote($user{userId}));
 		%user = (%user, %profile);
-		$user{language} = $session{page}{languageId} if ($user{userId} == 1 || $user{language} eq '');
-		%default = WebGUI::SQL->buildHash("select fieldName, dataDefault from userProfileField where profileCategoryId=4");
+		$user{language} = $session{page}{languageId} if ($user{userId} eq '1' || $user{language} eq '');
+		%default = WebGUI::SQL->buildHash("select fieldName, dataDefault from userProfileField where profileCategoryId='4'");
 		foreach $key (keys %default) {
 			if ($user{$key} eq "") {
 				$value = eval($default{$key});

@@ -237,7 +237,7 @@ The URL to redirect to.
 sub setRedirect {
 	$session{http}{location} = shift;
 	setStatus("302", "Redirect");
-	WebGUI::Style::setMeta({"http-equiv"=>"refresh",content=>"0,".$session{http}{location}});
+	WebGUI::Style::setMeta({"http-equiv"=>"refresh",content=>"0, URL=".$session{http}{location}});
 }
 
 

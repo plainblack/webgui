@@ -416,6 +416,7 @@ The default value for this variable. If the variable is undefined then the defau
 sub process {
 	my ($name, $type, $default) = @_;
 	my $value;
+	return undef unless (exists $session{form}{$name});
 	$type = "text" if ($type eq "");
 	$value = &$type($name);
 	unless (defined $value) {

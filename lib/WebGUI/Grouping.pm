@@ -318,12 +318,11 @@ sub isInGroup {
         $gid = 3 unless (defined $gid);
         $uid = $session{user}{userId} if ($uid eq "");
         ### The following several checks are to increase performance. If this section were removed, everything would continue to work as normal. 
-        return 1 if ($gid == 7);		# everyone is in the everyone group
-        return 1 if ($gid == 1 && $uid == 1); 	# visitors are in the visitors group
-	return 0 if ($gid != 1 && $uid == 1); 	# visitors can't be in any group except the visitors group
-        return 1 if ($gid==2 && $uid != 1); 	# if you're not a visitor, then you're a registered user
+        return 1 if ($gid eq '7');		# everyone is in the everyone group
+        return 1 if ($gid eq '1' && $uid eq '1'); 	# visitors are in the visitors group
+        return 1 if ($gid eq '2' && $uid ne '1'); 	# if you're not a visitor, then you're a registered user
         ### Look to see if we've already looked up this group. 
-        if ($session{isInGroup}{$uid}{$gid} == 1) {
+        if ($session{isInGroup}{$uid}{$gid} eq '1') {
                 return 1;
         } elsif ($session{isInGroup}{$uid}{$gid} eq "0") {
                 return 0;
@@ -334,7 +333,7 @@ sub isInGroup {
 	        foreach (@{$groups}) {
 	                $session{isInGroup}{$uid}{$_} = 1;
         	}
-        	if ($session{isInGroup}{$uid}{$gid} == 1) {
+        	if ($session{isInGroup}{$uid}{$gid} eq '1') {
                 	return 1;
         	}
 	}
@@ -374,7 +373,7 @@ sub isInGroup {
         ### Check karma levels.
         if ($session{setting}{useKarma}) {
                 my $karma;
-                if ($uid == $session{user}{userId}) {
+                if ($uid eq $session{user}{userId}) {
                         $karma = $session{user}{karma};
                 } else {
                         ($karma) = WebGUI::SQL->quickHash("select karma from users where userId=".quote($uid));
@@ -387,7 +386,7 @@ sub isInGroup {
         ### Check external database
         if ($group{dbQuery} ne "" && $group{databaseLinkId}) {
                 # skip if not logged in and query contains a User macro
-                unless ($group{dbQuery} =~ /\^User/i && $uid == 1) {
+                unless ($group{dbQuery} =~ /\^User/i && $uid eq '1') {
                         my $dbLink = WebGUI::DatabaseLink->new($group{databaseLinkId});
                         my $dbh = $dbLink->dbh;
                         if (defined $dbh) {

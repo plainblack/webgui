@@ -287,7 +287,7 @@ Auth method that the form for creating users should call
 sub deactivateAccount {
    my $self = shift;
    my $method = $_[0];
-   return WebGUI::Privilege::vitalComponent() if($self->userId < 26);
+   return WebGUI::Privilege::vitalComponent() if($self->userId eq '1' || $self->userId eq '3');
    return WebGUI::Privilege::adminOnly() if(!$session{setting}{selfDeactivation});
    my %var; 
   	$var{title} = WebGUI::International::get(42);
@@ -309,7 +309,7 @@ Superclass method that performs general functionality for deactivating accounts.
 
 sub deactivateAccountConfirm {
    my $self = shift;
-   return WebGUI::Privilege::vitalComponent() if ($self->userId < 26);
+   return WebGUI::Privilege::vitalComponent() if($self->userId eq '1' || $self->userId eq '3');
    my $u = $self->user;
    $u->status("Selfdestructed");
    WebGUI::Session::end($session{var}{sessionId});
@@ -401,10 +401,12 @@ sub displayLogin {
 	   	WebGUI::Session::setScratch("redirectAfterLogin",$session{env}{REQUEST_URI});
 	}
 	$vars->{title} = WebGUI::International::get(66);
-	$vars->{'login.form.header'} = WebGUI::Form::formHeader();
-	if ($session{setting}{encryptLogin}) {
-       		$vars->{'login.form.header'} =~ s/http:/https:/;
-    	}
+	my $action;
+        if ($session{setting}{encryptLogin}) {
+                $action = WebGUI::URL::page(undef,1);
+                $action =~ s/http:/https:/;
+        }
+	$vars->{'login.form.header'} = WebGUI::Form::formHeader({action=>$action});
     	$vars->{'login.form.hidden'} = WebGUI::Form::hidden({"name"=>"op","value"=>"auth"});
 	$vars->{'login.form.hidden'} .= WebGUI::Form::hidden({"name"=>"method","value"=>$method});
 	$vars->{'login.form.username'} = WebGUI::Form::text({"name"=>"username"});

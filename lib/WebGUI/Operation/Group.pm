@@ -407,7 +407,7 @@ sub www_listGroups {
 	return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
 	my $output = getGroupSearchForm("listGroups");
 	my ($groupCount) = WebGUI::SQL->quickArray("select count(*) from groups");
-        return _submenu($output) unless ($session{form}{doit} || $groupCount<250);
+        return _submenu($output) unless ($session{form}{doit} || $groupCount<250 || $session{form}{pn} > 1);
 	$output .= '<table border=1 cellpadding=5 cellspacing=0 align="center">';
 	$output .= '<tr><td class="tableHeader">'.WebGUI::International::get(84).'</td><td class="tableHeader">'
 		.WebGUI::International::get(85).'</td><td class="tableHeader">'
@@ -533,7 +533,7 @@ sub www_manageUsersInGroup {
 	$output .= '<p><h1>'.WebGUI::International::get(976).'</h1>';
 	$output .= WebGUI::Operation::User::getUserSearchForm("manageUsersInGroup",{gid=>$session{form}{gid}});
 	my ($userCount) = WebGUI::SQL->quickArray("select count(*) from users");
-	return _submenu($output) unless ($session{form}{doit} || $userCount < 250);
+	return _submenu($output) unless ($session{form}{doit} || $userCount < 250 || $session{form}{pn} > 1);
 	my $f = WebGUI::HTMLForm->new;
 	$f->hidden("gid",$session{form}{gid});
 	$f->hidden("op","addUsersToGroupSave");

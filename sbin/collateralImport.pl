@@ -30,7 +30,7 @@ use WebGUI::Utility;
 
 
 my $configFile;
-my $folderId;
+my $folderId = '0';
 my $help;
 my $override;
 my $pathToFiles;

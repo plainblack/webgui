@@ -90,7 +90,7 @@ A valid databaseLinkId
 sub whatIsUsing {
 	# get list of SQLReports
 	my $sql = 'select wobject.wobjectId, wobject.title, page.menuTitle, page.urlizedTitle from wobject, SQLReport, page '.
-		'where SQLReport.databaseLinkId = '.quote($_[0]). 'and SQLReport.wobjectId = wobject.wobjectId '.
+		'where SQLReport.databaseLinkId = '.quote($_[0]).' and SQLReport.wobjectId = wobject.wobjectId '.
 		'and wobject.pageId = page.pageId';
 	my $sth = WebGUI::SQL->read($sql);
 	my @using;

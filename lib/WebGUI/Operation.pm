@@ -153,6 +153,7 @@ sub getOperations {
           'deleteNavigationConfirm' => 'WebGUI::Operation::Navigation',
           'previewNavigation' => 'WebGUI::Operation::Navigation',
           'deployPackage' => 'WebGUI::Operation::Package',
+	  'managePackages' => 'WebGUI::Operation::Package',
           'viewPageTree' => 'WebGUI::Operation::Page',
           'movePageUp' => 'WebGUI::Operation::Page',
           'movePageDown' => 'WebGUI::Operation::Page',

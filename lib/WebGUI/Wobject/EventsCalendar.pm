@@ -155,7 +155,7 @@ sub www_deleteEvent {
 #-------------------------------------------------------------------
 sub www_deleteEventConfirm {
 	return WebGUI::Privilege::insufficient() unless ($_[0]->canEdit);
-	if ($session{form}{rid} > 0) {
+	if ($session{form}{rid} ne "") {
 		$_[0]->deleteCollateral("EventsCalendar_event","EventsCalendar_recurringId",$session{form}{rid});
 	} else {
 		$_[0]->deleteCollateral("EventsCalendar_event","EventsCalendar_eventId",$session{form}{eid});

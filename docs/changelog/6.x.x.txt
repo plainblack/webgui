@@ -1,8 +1,4 @@
 6.3.0
- - bugfix [1066029] IDs with dashes break search
- - bugfix [1059353] index.fpl broken
- - bugfix [1066824] lib/WebGUI/Forum.pm problem, and the fix
- - Fixed the Slash_gatewayUrl macro. 
  - Added a "Position" property to the DataForm Edit Field interface. This makes it easier to move a field to a certain position. (Len Kranendonk).
  - Added the variables "record.edit.icon", "record.delete.url" and "record.delete.icon" to the DataForm DataList template. (Len Kranendonk).
  - Converted all confirmation pages to client-side confirmation dialogs. Saves
@@ -21,11 +17,8 @@
    tnx brother for reporting)
  - Sped up Navigation.pm
  - bugfix [1041937] List Roots broken
- - bugfix [1042680] collateralImport.pl --folderId
- - Fixed typo in Wobjects/IndexedSearch.pm
  - Navigation template variable rename, added template variables for
    basepage.hasDaughter, page.inRoot.
- - bugfix [1059647] Forum search broken, and the fix
  - Bugfix [ 1055396 ] Template switching issue (Len Kranendonk)
  - WebGUI Operations are now dynamically loaded (Len Kranendonk) 
  - Added <input type="button"> button to Form.pm / HTMLForm.pm (Len Kranendonk)
@@ -36,14 +29,50 @@
  - bugfix [ 991070 ] 5.5.4 Editor(s) replacing ^ symbol
  - bugfix [ 1022287 ] WYSIWYG-Editor Add new web link
  - bugfix [ 1055153 ] Turn Admin ON with SSL and IE.
- - Fixed a redirect loop problem.
- - Fixed a user profile vulnerability.
- - Fixed a sequence ordering problem with the USS.
  - Added internationalized URL handling.
  - Moved site icon and fav icon directly into style templates.
  - Removed all the upgrades prior to 5.5.0. If you need to upgrade from an
    older version, you'll need to upgrade to 5.5.x first, and then upgrade
    to 6.x.
+ - Fixed a bug that caused begin/commit/rollback to fail when using the
+   internal WebGUI database. This exhibited no problems prior to this release
+   because no WebGUI functions actually used those methods before.
+
+
+6.2.9
+ - bugfix [ 1058105 ] input tag has to be closed with /
+ - Changed a bunch of comparison operators that could potentially break with
+   GUIDs.
+ - bugfix [ 1058090 ] POST in Form.pm should be post
+ - bugfix [ 1066824 ] lib/WebGUI/Forum.pm problem, and the fix
+ - bugfix [ 1062108 ] Typo in WebGUI::Attachment
+ - bugfix [ 1059647 ] Forum search broken, and the fix
+ - bugfix [ 1059353 ] index.fpl broken (draj)
+ - bugfix [ 1066029 ] IDs with dashes break search
+ - bugfix [ 1066759 ] USER I.D. Multiple Issues (Matt Luebke)
+ - bugfix [ 1060002 ] Unable to delete empty DatabaseLink
+ - bugfix [ 1068344 ] 6.2.8 gamma - Users can't deactivate account
+ - bugfix [ 1068920 ] IpFilter non-functional in 6.2.7
+ - bugfix [ 1067171 ] DeleteCollateral doesn't delete all recurring in
+   EventsCalen
+ - bugfix [ 1069073 ] IDs with dashes break CoolMenus
+ - bugfix [ 1066778 ] www.plainblack.com/news?wid=920&func=viewRSS
+ - bugfix [ 1067740 ] pagination for manage users and groups
+ - bugfix [ 1062543 ] User profile fields don't hide correctly
+ - bugfix [ 1061115 ] 6.2.8 Encrypt login fails
+ - Fixed a bug in collateralImport.pl where imported items would not be
+   displayed if they were imported to the root.
+ - bugfix [ 1058167 ] admin mode: Menu --> undefined/forum
+ - bugfix [ 1057394 ] Bug in Notification email
+ - Fixed a meta refresh problem that resulted from a bug in Internet Explorer.
+ - Fixed the Slash_gatewayUrl macro.
+ - Fixed a redirect loop problem.
+ - Fixed a sequence ordering problem with the USS.
+ - Fixed a user profile vulnerability.
+ - Fixed typo in Wobjects/IndexedSearch.pm
+ - bugfix [ 1040570 ] default values for publicProfile and other preferences
+ - bugfix [ 1069732 ] redirect URL not working
+ - bugfix [ 1060003 ] pagination for Events Calendar not working as described
 
 
 6.2.8

@@ -947,7 +947,7 @@ sub www_viewGradebook {
 		push(@responseloop, {
 			'response.url'=>WebGUI::URL::page('func=viewIndividualSurvey&amp;wid='.$self->get("wobjectId")
 					.'&amp;responseId='.$user->{Survey_responseId}),
-			'response.user.name'=>($user->{userId} == 1) ? $user->{ipAddress} : $user->{username},
+			'response.user.name'=>($user->{userId} eq '1') ? $user->{ipAddress} : $user->{username},
 			'response.count.correct' => $correctCount,
 			'response.percent' => round(($correctCount/$var->{'question.count'})*100)
 			});

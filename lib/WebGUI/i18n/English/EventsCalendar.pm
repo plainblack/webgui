@@ -70,7 +70,7 @@ Choose a layout for the individual events within the calendars.
 
 <p>
 <b>Paginate After</b><br>
-When using a list-style calendar, how many events should be shown per page?
+How many months of data should be shown before paginating?
 
 <p>
 <hr size="1">
@@ -81,7 +81,7 @@ When using a list-style calendar, how many events should be shown per page?
 The title of an individual event.
 
 |,
-		lastUpdated => 1099551537,
+		lastUpdated => 1100902948,
 	},
 
 	'80' => {

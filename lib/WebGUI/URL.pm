@@ -233,7 +233,7 @@ sub makeCompliant {
 
 #-------------------------------------------------------------------
 
-=head2 page ( [ pairs ] )
+=head2 page ( [ pairs, useSiteUrl ] )
 
 Returns the URL of the current page.
 
@@ -243,17 +243,29 @@ Name value pairs to add to the URL in the form of:
 
  name1=value1&name2=value2&name3=value3
 
+=head3 useSiteUrl
+
+If set to "1" we'll use the full site URL rather than the script (gateway) URL.
+
 =cut
 
 sub page {
-	my $url = getScriptURL().$session{page}{urlizedTitle};
-	if ($_[0]) {
-		$url = append($url,$_[0]);
-	}
-	if ($session{setting}{preventProxyCache} == 1) {
-		$url = append($url,"noCache=".randint(0,1000).';'.time());
-	}
-	return $url;
+	my $pairs = shift;
+        my $useFullUrl = shift;
+        my $url;
+        if ($useFullUrl) {
+                $url = getSiteURL();
+        } else {
+                $url = getScriptURL();
+        }
+        $url .= $session{page}{urlizedTitle};
+        if ($pairs) {
+                $url = append($url,$pairs);
+        }
+        if ($session{setting}{preventProxyCache} == 1) {
+                $url = append($url,"noCache=".randint(0,1000).';'.time());
+        }
+        return $url;
 }
 
 #-------------------------------------------------------------------

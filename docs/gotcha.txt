@@ -11,7 +11,12 @@ save you many hours of grief.
 --------------------------------------------------------------------
  * If you're using languages other than English, you'll need to get
 	new versions of those language files before upgrading. The
-	language file format has a new requirement.
+	language file format has a new requirement. Also, the
+	language files are now all converted to UTF-8.
+
+ * If you were using any non-English language files on your site,
+	you may now have to convert your site content to UTF-8
+	format. Check with your language file provider for details.
 
 
 6.2.8

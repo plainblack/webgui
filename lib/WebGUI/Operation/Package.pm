@@ -19,6 +19,11 @@ use WebGUI::Session;
 use WebGUI::SQL;
 use WebGUI::URL;
 
+
+sub www_managePackages {
+	return "Packages have been disabled for this release. Check back in a future release to use packages.\n";
+}
+
 #-------------------------------------------------------------------
 sub _duplicateWobjects {
 	my (%properties);
@@ -76,6 +81,7 @@ sub _recursePageTree {
 
 #-------------------------------------------------------------------
 sub www_deployPackage {
+	return "Packages have been disabled for this release. Check back in a future release to use packages.\n";
 	if (WebGUI::Page::canEdit()) {
 		_recursePageTree($session{form}{pid},$session{page}{pageId});
 		return "";

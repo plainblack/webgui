@@ -237,7 +237,7 @@ sub createAccountSave {
 #-------------------------------------------------------------------
 sub deactivateAccount {
    my $self = shift;
-   return $self->displayLogin if($self->userId == 1);
+   return $self->displayLogin if($self->userId eq '1');
    return $self->SUPER::deactivateAccount("deactivateAccountConfirm");
 }
 
@@ -252,7 +252,7 @@ sub deactivateAccountConfirm {
 sub displayAccount {
    my $self = shift;
    my $vars;
-   return $self->displayLogin($_[0]) if ($self->userId == 1);
+   return $self->displayLogin($_[0]) if ($self->userId eq '1');
    $vars->{displayTitle} = '<h1>'.WebGUI::International::get(61).'</h1>';
    $vars->{'account.message'} = WebGUI::International::get(856);
    if($session{setting}{useKarma}){

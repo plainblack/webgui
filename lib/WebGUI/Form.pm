@@ -136,7 +136,7 @@ sub button {
 	my $params = shift;
         my $value = $params->{value} || $params->{defaultValue} || WebGUI::International::get(62);
         $value = _fixQuotes($value);
-        return '<input type="button" value="'.$value.'" '.$params->{extras}.'>';
+        return '<input type="button" value="'.$value.'" '.$params->{extras}.' />';
 }
 
 #-------------------------------------------------------------------
@@ -173,7 +173,7 @@ sub checkbox {
 	my $params = shift;
         my $checkedText = ' checked="1"' if ($params->{checked});
         my $value = $params->{value} || $params->{defaultValue} || 1;
-        return '<input type="checkbox" name="'.$params->{name}.'" value="'.$value.'"'.$checkedText.' '.$params->{extras}.'>';
+        return '<input type="checkbox" name="'.$params->{name}.'" value="'.$value.'"'.$checkedText.' '.$params->{extras}.' />';
 }
 
 #-------------------------------------------------------------------
@@ -709,7 +709,7 @@ The number of characters wide this form element should be. There should be no re
 sub file {
 	my $params = shift;
         my $size = $params->{size} || $session{setting}{textBoxSize} || 30;
-        return '<input type="file" name="'.$params->{name}.'" size="'.$size.'" '.$params->{extras}.'>';
+        return '<input type="file" name="'.$params->{name}.'" size="'.$size.'" '.$params->{extras}.' />';
 }
 
 
@@ -785,7 +785,7 @@ The form action. Defaults to the current page.
 
 =head3 method
 
-The form method. Defaults to "POST".
+The form method. Defaults to "post".
 
 =head3 enctype
 
@@ -811,7 +811,7 @@ sub formHeader {
 			$hidden .= hidden({name=>$name,value=>$value});
 		}
 	}
-        my $method = $params->{method} || "POST";
+        my $method = $params->{method} || "post";
         my $enctype = $params->{enctype} || "multipart/form-data";
 	return '<form action="'.$action.'" enctype="'.$enctype.'" method="'.$method.'" '.$params->{extras}.'><div class="formContents">'.$hidden;
 }
@@ -1071,7 +1071,7 @@ sub HTMLArea {
 
 	# Other variables
 	$var{"button"} = '<input type="button" onClick="openEditWindow(this.form.'.$params->{name}.')" value="'
-                .WebGUI::International::get(171).'" style="font-size: 8pt;"><br>';
+                .WebGUI::International::get(171).'" style="font-size: 8pt;" /><br />';
 	if ($session{user}{richEditor} eq 'none') {
 		return $var{textarea};
 	} else {
@@ -1224,7 +1224,7 @@ sub password {
         my $maxLength = $params->{maxlength} || 35;
         my $size = $params->{size} || $session{setting}{textBoxSize} || 30;
         return '<input type="password" name="'.$params->{name}.'" value="'.$value.'" size="'.
-		$size.'" maxlength="'.$maxLength.'" '.$params->{extras}.'>';
+		$size.'" maxlength="'.$maxLength.'" '.$params->{extras}.' />';
 }
 
 #-------------------------------------------------------------------
@@ -1309,7 +1309,7 @@ sub radio {
 	my $params = shift;
         my $checkedText = ' checked="1"' if ($params->{checked});
 	my $value = $params->{value}||$params->{defaultValue};
-        return '<input type="radio" name="'.$params->{name}.'" value="'.$value.'"'.$checkedText.' '.$params->{extras}.'>';
+        return '<input type="radio" name="'.$params->{name}.'" value="'.$value.'"'.$checkedText.' '.$params->{extras}.' />';
 }
 
 #-------------------------------------------------------------------
@@ -1468,7 +1468,7 @@ sub submit {
         my $value = $params->{value} || $params->{defaultValue} || WebGUI::International::get(62);
         my $value = _fixQuotes($value);
 	my $wait = WebGUI::International::get(452);
-	return '<input type="submit" value="'.$value.'" onClick="this.value=\''.$wait.'\'" '.$params->{extras}.'>';
+	return '<input type="submit" value="'.$value.'" onClick="this.value=\''.$wait.'\'" '.$params->{extras}.' />';
 
 }
 
@@ -1657,7 +1657,7 @@ sub timeField {
 	$output .= '<input type="button" style="font-size: 8pt;" onClick="window.timeField = this.form.'.
 		$params->{name}.';clockSet = window.open(\''.$session{config}{extrasURL}.
 		'/timeChooser.html\',\'timeChooser\',\'WIDTH=230,HEIGHT=100\');return false" value="'.
-		WebGUI::International::get(970).'">';
+		WebGUI::International::get(970).'" />';
 	return $output;
 }
 

@@ -127,7 +127,7 @@ sub validateProfileData {
 #-------------------------------------------------------------------
 sub www_editProfile {
    my ($a, $data, $method, $values, $category, $label, $default, $previousCategory, $subtext, $vars, @profile, @array);
-   return WebGUI::Operation::Auth::www_auth("init") if($session{user}{userId} == 1);
+   return WebGUI::Operation::Auth::www_auth("init") if($session{user}{userId} eq '1');
    
    $vars->{displayTitle} .= '<h1>'.WebGUI::International::get(338).'</h1>';
    
@@ -198,7 +198,7 @@ sub www_editProfile {
 #-------------------------------------------------------------------
 sub www_editProfileSave {
 	my ($profile, $fieldName, $error, $u, $warning);
-    return WebGUI::Operation::Auth::www_auth("init") if ($session{user}{userId} == 1);
+    return WebGUI::Operation::Auth::www_auth("init") if ($session{user}{userId} eq '1');
 	
 	($profile, $error, $warning) = validateProfileData();
 	$error .= $warning;
@@ -252,7 +252,7 @@ sub www_viewProfile {
     }
 	$vars->{'profile.elements'} = \@array;
     $a->finish;
-	if ($session{user}{userId} == $session{form}{uid}) {
+	if ($session{user}{userId} eq $session{form}{uid}) {
        $vars->{'profile.accountOptions'} = WebGUI::Operation::Shared::accountOptions();
 	}
     return WebGUI::Template::process(1,'Operation/Profile/View', $vars);

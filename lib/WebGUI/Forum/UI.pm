@@ -677,7 +677,9 @@ The unique id for the post.
 =cut
 
 sub formatThreadURL {
-	return WebGUI::URL::append($_[0],"forumOp=viewThread&forumPostId=".$_[1]."#".$_[1]);
+	my $callback = shift;
+        my $postId = shift;
+        return WebGUI::URL::append($callback,"forumOp=viewThread&forumPostId=".$postId."#".$postId);
 }
 
 #-------------------------------------------------------------------
@@ -974,7 +976,7 @@ sub getForumTemplateVars {
 	my (%var, @thread_loop);
 	$var{'callback.url'} = $callback;
 	$var{'callback.label'} = WebGUI::International::get(1039);
-	$var{'user.isVisitor'} = ($session{user}{userId} == 1);
+	$var{'user.isVisitor'} = ($session{user}{userId} eq '1');
 	$var{'thread.new.url'} = formatNewThreadURL($callback,$forum->get("forumId"));
 	$var{'thread.new.label'} = WebGUI::International::get(1018);
 	$var{'forum.description'} = $caller->{description};
@@ -1063,7 +1065,7 @@ sub getForumTemplateVars {
 			'thread.root.user.name'=>$root->get("username"),
 			'thread.root.user.alias'=>WebGUI::User->new($root->get("userId"))->profileField("alias"),
 			'thread.root.user.id'=>$root->get("userId"),
-			'thread.root.user.isVisitor'=>($root->get("userId") == 1),
+			'thread.root.user.isVisitor'=>($root->get("userId") eq '1'),
 			'thread.root.status'=>formatStatus($root->get("status")),
 			'thread.last.subject'=>chopSubject($last->get("subject")),
 			'thread.last.url'=>formatThreadURL($callback,$last->get("forumPostId")),
@@ -1073,7 +1075,7 @@ sub getForumTemplateVars {
 			'thread.last.user.profile'=>formatUserProfileURL($last->get("userId")),
 			'thread.last.user.name'=>$last->get("username"),
 			'thread.last.user.id'=>$last->get("userId"),
-			'thread.last.user.isVisitor'=>($root->get("userId") == 1),
+			'thread.last.user.isVisitor'=>($root->get("userId") eq '1'),
 			'thread.last.status'=>formatStatus($last->get("status"))
 			});
 	}
@@ -1131,13 +1133,13 @@ sub getPostTemplateVars {
 	$var->{'post.isLocked'} = $thread->isLocked;
 	$var->{'post.isModerator'} = $forum->isModerator;
 	$var->{'post.canEdit'} = $post->canEdit($session{user}{userId});
-	$var->{'post.user.isVisitor'} = ($post->get("userId") == 1);
+	$var->{'post.user.isVisitor'} = ($post->get("userId") eq '1');
 	$var->{'post.user.label'} = WebGUI::International::get(244);
 	$var->{'post.user.name'} = $post->get("username");
 	$var->{'post.user.alias'} = WebGUI::User->new($post->get("userId"))->profileField("alias");
 	$var->{'post.user.Id'} = $post->get("userId");
 	$var->{'post.user.Profile'} = formatUserProfileURL($post->get("userId"));
-	$var->{'post.url'} = formatThreadURL($callback,$post->get("forumPostId"));
+	$var->{'post.url'} = WebGUI::URL::getSiteURL().formatThreadURL($callback,$post->get("forumPostId"));
 	$var->{'post.id'} = $post->get("forumPostId");
 	$var->{'post.rate.label'} = WebGUI::International::get(1021);
 	$var->{'post.rate.url.1'} = formatRatePostURL($callback,$post->get("forumPostId"),1);
@@ -1193,7 +1195,7 @@ sub getThreadTemplateVars {
 	$var->{'callback.url'} = $callback;
 	$var->{'callback.label'} = WebGUI::International::get(1039);
         $var->{'user.canPost'} = $forum->canPost;
-        $var->{'user.isVisitor'} = ($session{user}{userId} == 1);
+        $var->{'user.isVisitor'} = ($session{user}{userId} eq '1');
         $var->{'user.isModerator'} = $forum->isModerator;
         $var->{'user.isSubscribed'} = $thread->isSubscribed;
 	$var->{'thread.layout.nested.label'} = WebGUI::International::get(1045);
@@ -1685,7 +1687,7 @@ sub www_post {
 	$var->{'newpost.isReply'} = ($session{form}{parentId} ne "");
 	$var->{'newpost.isEdit'} = ($session{form}{forumPostId} ne "");
 	$var->{'newpost.isNewThread'} = ($session{form}{parentId} eq "" && !$var->{'newpost.isEdit'});
-	$var->{'user.isVisitor'} = ($session{user}{userId} == 1);
+	$var->{'user.isVisitor'} = ($session{user}{userId} eq '1');
 	$var->{'newpost.isNewMessage'} = ($var->{'newpost.isNewThread'} || $var->{'newpost.isReply'});
 	$var->{'form.begin'} = WebGUI::Form::formHeader({
 		action=>$caller->{callback}

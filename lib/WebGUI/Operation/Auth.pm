@@ -33,7 +33,7 @@ Get the instance of this object or create a new instance if none exists
 sub getInstance {   
    	#Get Auth Settings
 	my $authMethod = $session{user}{authMethod} || $session{setting}{authMethod};
-	$authMethod = $session{setting}{authMethod} if($session{user}{userId} == 1);
+	$authMethod = $session{setting}{authMethod} if($session{user}{userId} eq '1');
 	$authMethod = $_[0] if($_[0] && isIn($_[0], @{$session{config}{authMethods}}));
 	my $userId = $_[1];
 	#Create Auth Object

@@ -160,7 +160,7 @@ sub www_becomeUser {
 #-------------------------------------------------------------------
 sub www_deleteGrouping {
 	return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
-	if (($session{user}{userId} == $session{form}{uid} || $session{form}{uid} == 3) && $session{form}{gid} == 3) {
+	if (($session{user}{userId} eq $session{form}{uid} || $session{form}{uid} eq '3') && $session{form}{gid} eq '3') {
 		return _submenu(WebGUI::Privilege::vitalComponent());
         }
         my @users = $session{cgi}->param('uid');
@@ -179,7 +179,7 @@ sub www_deleteGrouping {
 sub www_deleteUser {
         my ($output);
 	return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
-        if ($session{form}{uid} == 1 || $session{form}{uid} == 3) {
+        if ($session{form}{uid} eq '1' || $session{form}{uid} eq '3') {
 		return _submenu(WebGUI::Privilege::vitalComponent());
         } else {
                 $output .= WebGUI::International::get(167).'<p>';
@@ -195,7 +195,7 @@ sub www_deleteUser {
 sub www_deleteUserConfirm {
 	return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
 	my ($u);
-        if ($session{form}{uid} == 1 || $session{form}{uid} == 3) {
+        if ($session{form}{uid} eq '1' || $session{form}{uid} eq '') {
 	   return WebGUI::Privilege::vitalComponent();
     } else {
 	   $u = WebGUI::User->new($session{form}{uid});
@@ -239,7 +239,7 @@ sub www_editUser {
 		Deactivated	=>$i18n->get(818),
 		Selfdestructed	=>$i18n->get(819)
 		);
-	if ($u->userId == $session{user}{userId}) {
+	if ($u->userId eq $session{user}{userId}) {
 		$tabform->getTab("account")->hidden("status",$u->status);
 	} else {
 		$tabform->getTab("account")->select("status",\%status,$i18n->get(816),[$u->status]);
@@ -423,7 +423,7 @@ sub www_listUsers {
 	my %status;
 	my $output = getUserSearchForm("listUsers");
 	my ($userCount) = WebGUI::SQL->quickArray("select count(*) from users");
-	return _submenu($output) unless ($session{form}{doit} || $userCount<250);
+	return _submenu($output) unless ($session{form}{doit} || $userCount<250 || $session{form}{pn} > 1);
 	tie %status, 'Tie::IxHash';
 	%status = (
 		Active		=> WebGUI::International::get(817),

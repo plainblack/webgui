@@ -189,22 +189,6 @@ sub getEditForm {
                 -value=>$self->get("synopsis"),
                 -uiLevel=>3
                 );
-	my @data = WebGUI::DateTime::secondsToInterval($self->get("cacheTimeout"));
-        $tabform->getTab("properties")->interval(
-       	        -name=>"cacheTimeout",
-               	-label=>WebGUI::International::get(895),
-                -intervalValue=>$data[0],
-       	        -unitsValue=>$data[1],
-		-uiLevel=>8
-               	);
-        @data = WebGUI::DateTime::secondsToInterval($self->get("cacheTimeoutVisitor"));
-       	$tabform->getTab("properties")->interval(
-               	-name=>"cacheTimeoutVisitor",
-                -label=>WebGUI::International::get(896),
-       	        -intervalValue=>$data[0],
-               	-unitsValue=>$data[1],
-		-uiLevel=>8
-               	);
 	$tabform->add("privileges",WebGUI::International::get(107),6);
 	$tabform->getTab("privileges")->dateTime(
                 -name=>"startDate",
@@ -260,6 +244,18 @@ sub getEditForm {
 sub getId {
 	my $self = shift;
 	return $self->get("assetId");
+}
+
+#-------------------------------------------------------------------
+                                                                                                                                                       
+=head2 getIndexerParams ( )
+                                                                                                                                                       
+Override this method and return a hash reference that includes the properties necessary to index the content of the wobject.
+                                                                                                                                                       
+=cut
+                                                                                                                                                       
+sub getIndexerParams {
+        return {};
 }
 
 sub getNextChildRank {
@@ -350,6 +346,15 @@ sub getRank {
 sub getUiLevel {
 	my $self = shift;
 	return 0;
+}
+
+sub getValue {
+	my $self = shift;
+	my $key = shift;
+	if (defined $key) {
+		return $session{form}{$key} || $self->get($key);
+	}
+	return undef;
 }
 
 sub new {

@@ -116,6 +116,7 @@ something that uses a macro, wobject, or auth module outside of the usual
 mechanisms that call those plug-ins, then you'll need to write a piece of code
 to load the plug-in at use time.
 
+
 5.5 Privilege API Change
 
 In 6.1 we moved isInGroup from WebGUI::Privilege to WebGUI::Grouping, where it
@@ -124,11 +125,13 @@ to canView and canEdit. And finally, we moved canEditWobject and
 canViewWobject to WebGUI::Wobject and renamed them canView and canEdit and
 converted them from regular functions into methods.
 
+
 5.6 Template API Change
 
 In 6.1 we completely rewrote the underlying template framework to add template
 caching. Any plug-ins that use WebGUI::Template, must be updated to reflect
 the new API.
+
 
 5.7 Internationalization and Help Change
 
@@ -150,12 +153,14 @@ help files using a script we provide. You can find the script here:
 
 http://www.plainblack.com/translations?wid=1552&func=viewSubmission&sid=1213
 
+
 5.8 WebGUI::Session Changes
 
 In 6.1 we changed the session API to remove functions that didn't really
 belong in WebGUI::Session. The main changes of interest are that you no longer
 do HTTP redirects and set cookies via session. Take a look at WebGUI::HTTP for
 details.
+
 
 5.9 Global Unique IDs
 
@@ -165,9 +170,10 @@ update your code and database tables to take advantage of this. Some of the more
 important ID's that have been changed are User Ids, Group Ids, and Wobject Ids.
 See WebGUI::Id for more information.
 
+
 5.10 POD
 
-We've switched to a new Plain Old Documentation (POD) format. See Ruling
+In 6.2 we've switched to a new Plain Old Documentation (POD) format. See Ruling
 WebGUI for details.
 
 
@@ -179,6 +185,33 @@ URLs. So now they can write in their own handlers to deal with WebGUI
 generated URLs. If your language uses a latin character set, you can just copy
 the makeUrlCompliant subroutine from lib/WebGUI/i18n/English.pm into your
 language file.
+
+
+5.12 UTF-8 Required
+
+As of 6.3 we're now requiring that all WebGUI sites use the UTF-8 character
+set. The language packs distributed from the WebGUI Worldwide members will now
+be converted to UTF-8, and you can get instructions on their sites as to how
+to convert your content, if necessary.
+
+
+5.13 Form Changes 
+
+The following form changes were made in 6.3:
+
+The interval subroutine in WebGUI::Form and WebGUI::HTMLForm had an API
+change. See the documentation for WebGUI::Form and WebGUI::HTMLForm for
+details.
+
+The select method in WebGUI::HTMLForm that has been depricated forever has
+been removed.
+
+Most of the subroutines in WebGUI::HTMLForm and WebGUI::Form now have a
+parameter called "defaultValue" which will be used in the event that "value"
+is not specified.
+
+You can now dynamically add tabs to WebGUI::TabForms.
+
 
 
 

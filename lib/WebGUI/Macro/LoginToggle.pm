@@ -23,7 +23,7 @@ sub process {
         my $login = $param[0] || WebGUI::International::get(716);
         my $logout = $param[1] || WebGUI::International::get(717);
 	my %var;
-        if ($session{user}{userId} == 1) {
+        if ($session{user}{userId} eq '1') {
 		return WebGUI::URL::page("op=displayLogin") if ($param[0] eq "linkonly");
         	$var{'toggle.url'} = WebGUI::URL::page('op=displayLogin');
                	$var{'toggle.text'} = $login;

@@ -326,6 +326,7 @@ sub new {
 		$properties->{karmaPerPost} = $master->{karmaPerPost};
 		$properties->{groupToView} = $master->{groupToView};
 		$properties->{groupToPost} = $master->{groupToPost};
+		$properties->{groupToView} = $master->{groupToView};
 		$properties->{groupToModerate} = $master->{groupToModerate};
 		$properties->{moderatePosts} = $master->{moderatePosts};
 		$properties->{attachmentsPerPost} = $master->{attachmentsPerPost};
