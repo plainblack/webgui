@@ -53,7 +53,7 @@ unlink("../../www/extras/numberCheck.js");
 
 print "\tMigrating Mail Form to Data Form.\n" unless ($quiet);
 
-WebGUI::Session::open("../../lib",$configFile);
+WebGUI::Session::open("../..",$configFile);
 
 #renaming namespace
 my @sql = (
