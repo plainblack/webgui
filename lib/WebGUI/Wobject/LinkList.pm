@@ -92,7 +92,7 @@ sub www_edit {
         if ($_[0]->get("wobjectId") eq "new") {
                 $f->whatNext(
                         -options=>{
-                                addLink=>WebGUI::International::get(74,$namespace),
+                                addLink=>WebGUI::International::get(13,$namespace),
                                 backToPage=>WebGUI::International::get(745)
                                 },
                         -value=>"addLink"
@@ -140,7 +140,7 @@ sub www_editLink {
 		$f->hidden("sequenceNumber",-1);
                 $f->whatNext(
                         -options=>{
-                                addLink=>WebGUI::International::get(74,$namespace),
+                                addLink=>WebGUI::International::get(13,$namespace),
                                 backToPage=>WebGUI::International::get(745)
                                 },
                         -value=>"addLink"

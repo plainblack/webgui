@@ -946,7 +946,6 @@ delete from international where namespace='LinkList' and internationalId=1;
 delete from international where namespace='LinkList' and internationalId=2;
 delete from international where namespace='LinkList' and internationalId=4;
 delete from international where namespace='LinkList' and internationalId=5;
-insert into international (internationalId,languageId,namespace,message,lastUpdated) values (74,1,'LinkList','Add a new link.', 1038268049);
 alter table LinkList add column templateId int not null default 1;
 alter table LinkList drop column indent;
 alter table LinkList drop column lineSpacing;
