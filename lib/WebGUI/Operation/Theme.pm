@@ -467,7 +467,6 @@ sub www_viewTheme {
         $theme = WebGUI::SQL->quickHashRef("select * from theme where themeId=$session{form}{themeId}");
         $output .= '<h1>'.WebGUI::International::get(930).'</h1>';
         $f = WebGUI::HTMLForm->new;
-        my $f = WebGUI::HTMLForm->new;
         $f->readOnly(
 		-value=>$session{form}{themeId},
 		-label=>WebGUI::International::get(903)
