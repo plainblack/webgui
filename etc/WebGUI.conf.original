@@ -48,6 +48,7 @@ macros = a => a_account, \
 	p => p_previousMenuHorizontal, \
 	P => P_previousMenuVertical, \
 	? => Question_search, \
+	Quote => Quote, \
 	rootmenu => rootmenuHorizontal, \
 	RootTitle => RootTitle, \
 	r => r_printable, \
