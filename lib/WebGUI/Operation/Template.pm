@@ -46,7 +46,7 @@ sub www_deleteTemplate {
         if ($session{form}{tid} < 1000 && $session{form}{tid} > 1000) {
 		return WebGUI::Privilege::vitalComponent();
         } elsif (WebGUI::Privilege::isInGroup(8)) {
-                $output .= helpIcon(4);
+                $output .= helpIcon(35);
 		$output .= '<h1>'.WebGUI::International::get(42).'</h1>';
                 $output .= WebGUI::International::get(502).'<p>';
                 $output .= '<div align="center"><a href="'.
@@ -83,7 +83,7 @@ sub www_editTemplate {
 		} else {
                 	%template = WebGUI::SQL->quickHash("select * from template where templateId=$session{form}{tid}");
 		}
-                $output .= helpIcon(16);
+                $output .= helpIcon(34);
 		$output .= '<h1>'.WebGUI::International::get(507).'</h1>';
 		$f = WebGUI::HTMLForm->new;
                 $f->hidden("op","editTemplateSave");
@@ -119,7 +119,7 @@ sub www_editTemplateSave {
 sub www_listTemplates {
         my ($output, $sth, @data, @row, $i, $p);
         if (WebGUI::Privilege::isInGroup(8)) {
-                $output = helpIcon(9);
+                $output = helpIcon(33);
 		$output .= '<h1>'.WebGUI::International::get(506).'</h1>';
 		$output .= '<div align="center"><a href="'.WebGUI::URL::page('op=editTemplate&tid=new').
 			'">'.WebGUI::International::get(505).'</a><p/></div>';
