@@ -1148,6 +1148,7 @@ INSERT INTO groupGroupings VALUES (4,12);
 INSERT INTO groupGroupings VALUES (6,12);
 INSERT INTO groupGroupings VALUES (8,12);
 INSERT INTO groupGroupings VALUES (9,12);
+INSERT INTO groupGroupings VALUES (10,12);
 INSERT INTO groupGroupings VALUES (11,12);
 INSERT INTO groupGroupings VALUES (3,2);
 INSERT INTO groupGroupings VALUES (3,4);
@@ -1224,6 +1225,7 @@ INSERT INTO groups VALUES (6,'Package Managers','Users that have privileges to a
 INSERT INTO groups VALUES (7,'Everyone','A group that automatically includes all users including Visitors.',314496000,1000000000,NULL,997938000,997938000,14,-14,NULL,0,NULL,0,0,0,3600,NULL,0,1);
 INSERT INTO groups VALUES (8,'Template Managers','Users that have privileges to edit templates for this site.',314496000,1000000000,NULL,997938000,997938000,14,-14,NULL,0,NULL,0,0,0,3600,NULL,1,1);
 INSERT INTO groups VALUES (9,'Theme Managers','Users in this group can use the theme manager to create new themes and install themes from other systems.',314496000,1000000000,NULL,997938000,997938000,14,-14,NULL,0,NULL,0,0,0,3600,NULL,1,1);
+INSERT INTO groups VALUES (10,'Translation Managers','Users that can edit language translations for WebGUI.',314496000,1000000000,NULL,997938000,997938000,14,-14,NULL,0,NULL,0,0,0,3600,NULL,1,1);
 INSERT INTO groups VALUES (11,'Secondary Admins','Users that have limited administrative privileges.',314496000,1000000000,NULL,997938000,997938000,14,-14,NULL,0,NULL,0,0,0,3600,NULL,1,1);
 INSERT INTO groups VALUES (12,'Turn Admin On','These users can enable admin mode.',314496000,1000000000,NULL,997938000,997938000,14,-14,NULL,0,NULL,0,0,0,3600,NULL,1,0);
 
@@ -1908,7 +1910,7 @@ CREATE TABLE webguiVersion (
 --
 
 
-INSERT INTO webguiVersion VALUES ('6.1.1','initial install',unix_timestamp());
+INSERT INTO webguiVersion VALUES ('6.1.0','initial install',unix_timestamp());
 
 --
 -- Table structure for table `wobject`
