@@ -183,7 +183,7 @@ sub getReplies {
         } else {
                 $query .= "(status='approved'";
         }
-        $query .= " or userId=".quote($session{user}{userId}).")  order by forumPostId";
+        $query .= " or userId=".quote($session{user}{userId}).")  order by dateOfPost";
 	my $sth = WebGUI::SQL->read($query,WebGUI::SQL->getSlave);
 	while (my @data = $sth->array) {
 		push(@replies,WebGUI::Forum::Post->new($data[0]));
