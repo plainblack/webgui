@@ -21,6 +21,7 @@ use WebGUI::SQL;
 use WebGUI::URL;
 use WebGUI::HTML;
 use WebGUI::ErrorHandler;
+use WebGUI::Grouping;
 use DBIx::FullTextSearch::StopList;
 use WebGUI::Utility;
 use WebGUI::Session;
@@ -192,6 +193,9 @@ sub getDetails {
 	my (@searchDetails, %namespace);
 	foreach my $wobject (@{$session{config}{wobjects}}){
 		my $cmd = "WebGUI::Wobject::".$wobject;
+                my $load = 'use '.$cmd;
+                eval($load);
+                WebGUI::ErrorHandler::warn("Wobject failed to compile: $cmd.".$@) if($@);
 		my $w = $cmd->new({namespace=>$wobject, wobjectId=>'new'});
 		$namespace{$wobject} = $w->name;
 	}
@@ -684,7 +688,7 @@ Returns an array reference containing all groupIds of groups the user is in.
 sub _getGroups {
 	my @groups;
 	foreach my $groupId (WebGUI::SQL->buildArray("select groupId from groups")) {
-		push(@groups, $groupId) if (WebGUI::Privilege::isInGroup($groupId));
+		push(@groups, $groupId) if (WebGUI::Grouping::isInGroup($groupId));
 	}
 	return \@groups;
 }

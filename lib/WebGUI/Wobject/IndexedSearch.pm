@@ -447,8 +447,7 @@ sub _buildFilter {
 #-------------------------------------------------------------------
 sub _getLanguages {
 	my ($self, $restricted) = @_;
-	my $international = WebGUI::SQL->buildHashRef("select distinct(IndexedSearch_docInfo.languageId), language.language from IndexedSearch_docInfo, language 
-		where language.languageId = IndexedSearch_docInfo.languageId");
+	my $international = WebGUI::SQL->buildHashRef("select distinct(languageId) from IndexedSearch_docInfo");
 	tie my %languages, 'Tie::IxHash';
 	if ($restricted and $self->get('languages') !~ /any/i) {
 		$languages{any} = WebGUI::International::get(24,$self->get("namespace"));
@@ -467,6 +466,9 @@ sub _getNamespaces {
 	my %international;
 	foreach my $wobject (@{$session{config}{wobjects}}){
 		my $cmd = "WebGUI::Wobject::".$wobject;
+                my $load = 'use '.$cmd;
+                eval($load);
+                WebGUI::ErrorHandler::warn("Wobject failed to compile: $cmd.".$@) if($@);
 		my $w = $cmd->new({namespace=>$wobject, wobjectId=>'new'});
 		$international{$wobject} = $w->name;
 	}
