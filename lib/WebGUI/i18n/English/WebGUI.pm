@@ -4582,20 +4582,48 @@ A condition indicating whether the current user has the privileges necessary to 
 A url that will change the sorting options to be sorted by date.
 <p>
 
+<b>thread.sortedby.date</b><br>
+A condition indicating that the thread is currently sorted by date.
+<p>
+
 <b>thread.sortby.lastreply.url</b><br>
 A url that will change the sorting options to be sorted by the date of the last reply to the thread.
+<p>
+
+<b>thread.sortedby.lastreply</b><br>
+A condition indicating that the thread is currently sorted by lastreply.
 <p>
 
 <b>thread.sortby.views.url</b><br>
 A url that will change the sorting options to be sorted by the number of views each thread has.
 <p>
 
+<b>thread.sortedby.views</b><br>
+A condition indicating that the thread is currently sorted by views.
+<p>
+
 <b>thread.sortby.replies.url</b><br>
 A url that will change the sorting options to be sorted by the number of replies a thread has.
 <p>
 
+<b>thread.sortedby.replies</b><br>
+A condition indicating that the thread is currently sorted by replies.
+<p>
+
 <b>thread.sortby.rating.url</b><br>
 A url that will change the sorting options to be sorted by the average rating of each thread.
+<p>
+
+<b>thread.sortedby.rating</b><br>
+A condition indicating that the thread is currently sorted by rating.
+<p>
+
+<b>thread.sorted.asc</b><br>
+A condition indicating that the thread is currently sorted in an ascending manner.
+<p>
+
+<b>thread.sorted.desc</b><br>
+A condition indicating that the thread is currently sorted in an descending manner.
 <p>
 
 <b>thread.subject.label</b><br>
@@ -6695,6 +6723,14 @@ A template that controls the layout of the search engine interface and search re
 A template that controls the form that users see when posting a new message.
 <p>
 
+<b>Post Preview Template</b><br>
+A template that controls the layout of the preview of a message posting.
+<p>
+
+<b>Use Post Preview</b><br>
+If set to yes a preview of the posted message will be shown before adding it to the forum.
+<p>
+
 <b>Notification Template</b><br>
 A template that controls the layout of subscription notification messages sent to users.
 <p>
@@ -7260,6 +7296,21 @@ config file.</p>
                 lastUpdated =>1092748557,
                 context => q|page property|
         },
+	'Forum, Post Preview Template Title' => {
+		message => q|Forum Post Preview Template|,
+		lastUpdated =>1092930637,
+		context => q|help title forum post preview template|
+	},
+	'Forum, Post Preview Template Body' => {
+		message => q|
+<p>This template uses the same template variable as the Forum Post Template.</p>
+
+
+
+|,
+		lastUpdated =>1092930637,
+		context => q|help body forum post preview template|
+	}
 };
 
 1;

@@ -1151,7 +1151,28 @@ our $HELP = {
                 related => [
                 ],
         },
-
+	'forum post preview template' => {
+		title => 'Forum, Post Preview Template Title',
+		body => 'Forum, Post Preview Template Body',
+		related => [
+			{
+				tag => 'forum post template',
+				namespace => 'WebGUI'
+			},
+			{
+				tag => 'forum discussion properties',
+				namespace => 'WebGUI'
+			},
+			{
+				tag => 'template language',
+				namespace => 'WebGUI'
+			},
+			{
+				tag => 'templates manage',
+				namespace => 'WebGUI'
+			}
+		],
+	}
 };
 
 1;
