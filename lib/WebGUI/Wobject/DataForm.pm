@@ -119,7 +119,7 @@ sub getTemplateVars {
 		.WebGUI::Form::hidden({name=>"func",value=>"process"});
 	my @fields;
 	my $where = "where a.wobjectId=".$self->get("wobjectId");
-	my $select = "select a.name, a.label, a.status, a.isMailField, a.subtext, a.type, a.defaultValue, a.possibleValues, a.width, a.rows";
+	my $select = "select a.name, a.DataForm_fieldId, a.label, a.status, a.isMailField, a.subtext, a.type, a.defaultValue, a.possibleValues, a.width, a.rows";
 	my $join;
 	if ($var->{entryId}) {
 		$var->{"form.start"} .= WebGUI::Form::hidden({name=>"entryId",value=>$var->{entryId}});
