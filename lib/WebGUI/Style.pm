@@ -105,7 +105,16 @@ sub process {
 		<meta http-equiv="Content-Type" content="text/html; charset='.($session{header}{charset}||$session{language}{characterSet}||"ISO-8859-1").'" />
 		<link rel="icon" href="'.$session{setting}{siteicon}.'" type="image/'.$type.'" />
 		<link rel="SHORTCUT ICON" href="'.$session{setting}{favicon}.'" />
-		'.$session{page}{head}{raw};
+		'.$session{page}{head}{raw}.'
+                <script>
+                        function getWebguiProperty (propName) {
+                                var props = new Array();
+                                props["extrasURL"] = "'.$session{config}{extrasURL}.'";
+                                props["pageURL"] = "'.$session{page}{url}.'";
+                                return props[propName];
+                        }
+                </script>
+                ';
         # generate additional link tags
 	foreach my $url (keys %{$session{page}{head}{link}}) {
 		$var{'head.tags'} .= '<link href="'.$url.'"';

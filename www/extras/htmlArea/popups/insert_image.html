@@ -78,17 +78,19 @@ function HandleError(message, url, line) {
 }
 
 function Init() {
+    var dialogArgs = window.dialogArguments;
+    var globalDoc = dialogArgs[0];
+    var pageURL = dialogArgs[1];
     var elmSelectedImage;
     var htmlSelectionControl = "Control";
-    var globalDoc = window.dialogArguments;
     var grngMaster = globalDoc.selection.createRange();
     var dpi = 96;
 
     if(document.all.dpicheck) {
         dpi = document.all.dpicheck.width;
     }
-    document.all.lister.contentWindow.navigate('/?op=htmlArealistCollateral&DPI=' + dpi);
-    document.all.viewer.contentWindow.navigate('/?op=htmlAreaviewCollateral&DPI=' + dpi);
+   document.all.lister.contentWindow.navigate(pageURL + '?op=htmlArealistCollateral&DPI=' + dpi);
+   document.all.viewer.contentWindow.navigate(pageURL + '?op=htmlAreaviewCollateral&DPI=' + dpi);
     document.all.actions.DPI.value = dpi;
     if(dpi != 96) {
         var xfactor = ((dpi < 96) ? (dpi / 95) : (dpi / 97.5));
@@ -144,7 +146,9 @@ function OKClick() {
     var elmImage;
     var intAlignment;
     var htmlSelectionControl = "Control";
-    var globalDoc = window.dialogArguments;
+var dialogArgs = window.dialogArguments;
+    var globalDoc = dialogArgs[0];
+    var pageURL = dialogArgs[1];
     var grngMaster = globalDoc.selection.createRange();
 
     // error checking

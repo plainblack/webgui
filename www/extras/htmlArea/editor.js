@@ -35,7 +35,8 @@ document.write('</SCR' + 'IPT\> \n');
 \* ---------------------------------------------------------------------- */
 
 function editor_defaultConfig(objname) {
-
+this.webguiPageUrl = master.getWebguiProperty("pageURL");
+//this.webguiPageUrl = "/test.pl";
 this.version = "2.02"
 
 this.width =  "auto";
@@ -636,7 +637,10 @@ oTags[i].outerHTML = oTags[i].innerHTML;
 
     // insert image
     else if (cmdID.toLowerCase() == 'insertimage'){
-      showModalDialog(_editor_url + "popups/insert_image.html", editdoc, "resizable: no; help: no; status: no; scroll: no; ");
+	var args = new Array();
+	args[0] = editdoc;
+	args[1] = config.webguiPageUrl;
+      showModalDialog(_editor_url + "popups/insert_image.html", args, "dialogWidth:600px; dialogHeight: 650px;resizable: no; help: no; status: no; scroll: no; ");
     }
 
     // insert table

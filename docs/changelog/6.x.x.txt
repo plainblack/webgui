@@ -23,6 +23,7 @@ Andreas Graf).
    Mountifield.)
  - Added Tony Mountifield to the credits list for all his debugging efforts as
    of late.
+ - Bugfix [ 915498 ] htmlArea - insert image WebGUI 6.0
 
 
 6.0.0
