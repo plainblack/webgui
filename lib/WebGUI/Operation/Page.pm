@@ -193,41 +193,36 @@ The depth the tree should start with. Defaults to zero.
 
 =cut
 sub _traversePageTree {
-        my ($top, $initialDepth, %wobject, $output, $spacer, $page, $currentPage, $options, $currentPageId, $currentUrlizedTitle, $wobjects);
-	($top, $initialDepth) = @_;
+        my (%wobject, $output, $spacer, $page, $currentPage, $options, $currentPageId, $currentUrlizedTitle, $wobjects);
+	my ($parentId, $initialDepth) = @_;
 
 	tie %wobject, 'Tie::CPHash';
         $spacer = '<img src="'.$session{config}{extrasURL}.'/spacer.gif" width=12>';
-	$page = WebGUI::Page->getPage($top);
-
-	$page->traversePreOrder(
-		sub {
-			($currentPage, $options) = @_;
-			$currentPageId = $currentPage->get('pageId');
-			$currentUrlizedTitle = $currentPage->get('urlizedTitle');
-			if ($currentPageId < 2 || $currentPageId > 999) {
-				$output .= $spacer x $options->{_depth}
-					.pageIcon()
-					.deleteIcon('op=deletePage',$currentUrlizedTitle)
-                	                .moveLeftIcon(sprintf('op=moveTreePageLeft&pageId=%s',$currentPageId), $currentUrlizedTitle)
-                        	        .moveUpIcon(sprintf('op=moveTreePageUp&pageId=%s',$currentPageId), $currentUrlizedTitle)
-					.moveDownIcon(sprintf('op=moveTreePageDown&pageId=%s',$currentPageId), $currentUrlizedTitle)
-					.moveRightIcon(sprintf('op=moveTreePageRight&pageId=%s',$currentPageId), $currentUrlizedTitle)
-					.editIcon('op=editPage', $currentUrlizedTitle)
-					.' <a href="'.WebGUI::URL::gateway($currentUrlizedTitle).'">'.$currentPage->get('title').'</a><br>';
-				$wobjects = WebGUI::SQL->read("select * from wobject where pageId=".quote($currentPageId));
-				while (%wobject = $wobjects->hash) {
-					$output .= $spacer x $options->{_depth} . $spacer
-						.wobjectIcon()
-						.deleteIcon('func=delete&wid='.$wobject{wobjectId},$currentUrlizedTitle)
-						.editIcon('func=edit&wid='.$wobject{wobjectId},$currentUrlizedTitle)
-						.' '. $wobject{title}.'<br>';
-				}
-				$wobjects->finish;
+	my $sth = WebGUI::SQL->read("select pageId,isSystem,urlizedTitle,title from page where parentId=".$parentId);
+	while (my ($pageId,$isSystem,$url,$title) = $sth->array) {
+		unless ($isSystem) {
+			$output .= $spacer x $options->{_depth}
+				.pageIcon()
+				.deleteIcon('op=deletePage',$url)
+               	                .moveLeftIcon(sprintf('op=moveTreePageLeft&pageId=%s',$pageId), $url)
+                       	        .moveUpIcon(sprintf('op=moveTreePageUp&pageId=%s',$pageId), $url)
+				.moveDownIcon(sprintf('op=moveTreePageDown&pageId=%s',$pageId), $url)
+				.moveRightIcon(sprintf('op=moveTreePageRight&pageId=%s',$pageId), $url)
+				.editIcon('op=editPage', $url)
+				.' <a href="'.WebGUI::URL::gateway($url).'">'.$title.'</a><br>';
+			$wobjects = WebGUI::SQL->read("select wobjectId,title from wobject where pageId=".quote($pageId));
+			while (%wobject = $wobjects->hash) {
+				$output .= $spacer x $options->{_depth} . $spacer
+					.wobjectIcon()
+					.deleteIcon('func=delete&wid='.$wobject{wobjectId},$url)
+					.editIcon('func=edit&wid='.$wobject{wobjectId},$url)
+					.' '. $wobject{title}.'<br>';
 			}
+			$wobjects->finish;
+			$output .= _traversePageTree($pageId,$initialDepth+1);
 		}
-	);
-                
+	}
+	$sth->finish;
         return $output;
 }
 

@@ -632,6 +632,7 @@ sub www_editSubmissionSave {
                 	delete $pageVars{parentId};
 	                delete $pageVars{sequenceNumber};
         	        $pageVars{hideFromNavigation} = 1;
+			$pageVars{isSystem} = 1;
                 	$pageVars{subroutine} = "viewSubmissionAsPage";
                 	$pageVars{subroutinePackage} = "WebGUI::Wobject::USS";
                 	$pageVars{subroutineParams} = "{wobjectId=>'".$_[0]->wid."',submissionId=>'".$session{form}{sid}."'}";

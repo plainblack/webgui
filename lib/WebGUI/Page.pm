@@ -90,12 +90,12 @@ Some OO style methods
 
  @array = $page->ancestors;
  @array = $page->daughters;
- @array = $page->decendants;
+ @array = $page->descendants;
  @array = $page->generation; 
  @array = $page->leaves_under; 
  @array = $page->pedigree;
  @array = $page->self_and_ancesters;
- @array = $page->self_and_decendants;
+ @array = $page->self_and_descendants;
  @array = $page->self_and_sisters;
  @array = $page->self_and_sisters_splitted;
  @array = $page->sisters;

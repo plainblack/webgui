@@ -258,8 +258,7 @@ sub build {
 				$pageData->{"page.relDepth"} = $pageData->{"page.absDepth"} - $startPageDepth;
 				$pageData->{"page.isCurrent"} = ($page->{'pageId'} == $session{page}{pageId});
 				$pageData->{"page.isHidden"} = $page->{'hideFromNavigation'};
-				$pageData->{"page.isSystem"} = ($page->{'pageId'} =~ /^\d+$/ &&
-								($page->{'pageId'} < 1000 && $page->{'pageId'} >= 0));
+				$pageData->{"page.isSystem"} = $page->{isSystem};
 				
 				# indent
 				my $indent = 0;
@@ -287,7 +286,7 @@ sub build {
 				next if ($pageData->{"page.absDepth"} < $self->{_stopAtLevel});
 
 				# Check showSystemPages
-				next if (! $self->{_showSystemPages} && $pageData->{"page.isSystem"}); 
+			#	next if (! $self->{_showSystemPages} && $pageData->{"page.isSystem"}); 
 	
 				# Deal with hidden pages, don't ever hide pages if admin mode is on
 				next if(($page->{'hideFromNavigation'} && ! $self->{_showHiddenPages}) && (! $session{var}{adminOn}));
@@ -347,7 +346,7 @@ sub build {
 		}
 
 		# We had a cache miss, so let's put the data in cache
-		$cache->set(\@page_loop, 3600*24) unless $session{var}{adminOn};
+	#	$cache->set(\@page_loop, 3600*24) unless $session{var}{adminOn};
 	} else {
 		# We had a cache hit
 		@page_loop = @{$cacheContent};
