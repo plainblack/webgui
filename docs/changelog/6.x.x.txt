@@ -29,3 +29,5 @@
    matching collateral is found.
  - Added style personalization.
  - Added admin style option.
+ - Added per page printable styles.
+ - Wobject privileges are available per page rather than site-wide.

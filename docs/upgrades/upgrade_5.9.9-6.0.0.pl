@@ -457,6 +457,15 @@ unlink("../../lib/WebGUI/Authentication/WebGUI.pm");
 unlink("../../lib/WebGUI/Authentication/LDAP.pm");
 unlink("../../lib/WebGUI/Authentication/SMB.pm");
 rmdir("../../lib/WebGUI/Authentication");
+
+
+#--------------------------------------------
+print "\tMigrating wobject privileges.\n" unless ($quiet);
+WebGUI::SQL->write("alter table page add column wobjectPrivileges int not null default 0");
+WebGUI::SQL->write("update page set wobjectPrivileges=$session{setting}{wobjectPrivileges}");
+WebGUI::SQL->write("delete from settings where name='wobjectPrivileges'");
+
+
 WebGUI::Session::close();
 
 

@@ -82,7 +82,6 @@ sub www_editContentSettings {
         $f->integer("textAreaRows",WebGUI::International::get(463),$session{setting}{textAreaRows});
         $f->integer("textAreaCols",WebGUI::International::get(464),$session{setting}{textAreaCols});
         $f->integer("textBoxSize",WebGUI::International::get(465),$session{setting}{textBoxSize});
-	$f->yesNo("wobjectPrivileges",WebGUI::International::get(1003),$session{setting}{wobjectPrivileges});
         $f->submit;
         $output .= $f->print;
         return _submenu($output);

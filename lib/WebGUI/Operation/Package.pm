@@ -75,7 +75,8 @@ sub _recursePageTree {
 			newWindow,
 			cacheTimeout,
 			cacheTimeoutVisitor,
-			printableStyleId
+			printableStyleId,
+			wobjectPrivileges
 			) values (
 			$newPageId,
 			$_[1],
@@ -103,7 +104,8 @@ sub _recursePageTree {
 			$package{newWindow},
 			$package{cacheTimeout},
 			$package{cacheTimeoutVisitor},
-			$package{printableStyleId}
+			$package{printableStyleId},
+			$package{wobjectPrivileges}
 			)");
 		_recursePageTree($package{pageId},$newPageId);
 	}

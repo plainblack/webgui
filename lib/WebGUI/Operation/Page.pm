@@ -56,7 +56,7 @@ sub _recursivelyChangePrivileges {
         		WebGUI::SQL->write("update page set startDate=".WebGUI::FormProcessor::dateTime("startDate").", 
 				endDate=".WebGUI::FormProcessor::dateTime("endDate").",
 				ownerId=$session{form}{ownerId},  groupIdView=$session{form}{groupIdView}, 
-				groupIdEdit=$session{form}{groupIdEdit} where pageId=$pageId");
+				groupIdEdit=$session{form}{groupIdEdit}, wobjectPrivileges=$session{form}{wobjectPrivileges} where pageId=$pageId");
                 	_recursivelyChangePrivileges($pageId);
 		}
         }
@@ -294,7 +294,11 @@ sub www_editPage {
 			-label=>WebGUI::International::get(500),
 			-uiLevel=>3
 			);
-                $f->getTab("properties")->text("title",WebGUI::International::get(99),$page{title});
+                $f->getTab("properties")->text(
+			-name=>"title",
+			-label=>WebGUI::International::get(99),
+			-value=>$page{title}
+			);
 		$f->getTab("properties")->text(
 			-name=>"menuTitle",
 			-label=>WebGUI::International::get(411),
@@ -448,6 +452,12 @@ sub www_editPage {
 			-excludeGroups=>[1,7],
                         -uiLevel=>6
                         );
+		$f->getTab("privileges")->yesNo(
+			-name=>"wobjectPrivileges",
+			-label=>WebGUI::International::get(1003),
+			-value=>$page{wobjectPrivileges},
+			-uiLevel=>9
+			);
 		if ($childCount) {
                 	$f->getTab("privileges")->yesNo(
 				-name=>"recursePrivs",
@@ -500,6 +510,7 @@ sub www_editPageSave {
 		groupIdView=$session{form}{groupIdView}, 
 		groupIdEdit=$session{form}{groupIdEdit}, 
 		newWindow=$session{form}{newWindow},
+		wobjectPrivileges=$session{form}{wobjectPrivileges},
 		hideFromNavigation=$session{form}{hideFromNavigation},
 		startDate=".WebGUI::FormProcessor::dateTime("startDate").",
 		endDate=".WebGUI::FormProcessor::dateTime("endDate").",

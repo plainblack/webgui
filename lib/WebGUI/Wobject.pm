@@ -1249,7 +1249,7 @@ sub www_edit {
 	} else {
 	   $subtext = "";
     	}
-	if ($session{setting}{wobjectPrivileges}) {
+	if ($session{page}{wobjectPrivileges}) {
 	    	my $clause; 
 		if (WebGUI::Privilege::isInGroup(3)) {
 	   		my $contentManagers = WebGUI::Grouping::getUsersInGroup(4,1);
