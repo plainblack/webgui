@@ -1,5 +1,20 @@
 package WebGUI::Authentication::LDAP;
 
+#-------------------------------------------------------------------
+# This module is made by M. Kamerbeek of Procolix (procolix.com)
+# for WebGUI and released under GNU/GPL. 
+#-------------------------------------------------------------------
+
+#-------------------------------------------------------------------
+# WebGUI is Copyright 2001-2002 Plain Black LLC.
+#-------------------------------------------------------------------
+# Please read the legal notices (docs/legal.txt) and the license
+# (docs/license.txt) that came with this distribution before using
+# this software.
+#-------------------------------------------------------------------
+# http://www.plainblack.com			info@plainblack.com
+#-------------------------------------------------------------------
+
 use strict;
 use WebGUI::SQL;
 use WebGUI::Session; 
@@ -24,88 +39,7 @@ my %ldapStatusCode = ( 0=>'success (0)', 1=>'Operations Error (1)', 2=>'Protocol
         68=>'Entry Already Exists (68)', 69=>'Object Class Mods Prohibited (69)',
         71=>'Affects Multiple DSAs (71)', 80=>'other (80)');
 
-sub formAddUser {
-	my $fo;
-
-	$fo = WebGUI::HTMLForm->new;
-	$fo->readOnly("<b>LDAP Authentication Options</b>");
-	$fo->url("ldapURL",WebGUI::International::get(165),$session{setting}{ldapURL});
-	$fo->text("connectDN",WebGUI::International::get(166),$session{form}{connectDN});
-
-	return $fo->printRowsOnly;
-}
-
-sub saveAddUser {
-	WebGUI::Authentication::saveParams($session{form}{uid},'LDAP',{connectDN => $session{form}{connectDN}, ldapURL => $session{form}{ldapURL}});
-}
-
-sub formEditUserSettings {
-	my $f;
-
-	$f = WebGUI::HTMLForm->new;
-	$f->url("ldapURL",WebGUI::International::get(120),$session{setting}{ldapURL});
-        $f->text("ldapId",WebGUI::International::get(121),$session{setting}{ldapId});
-        $f->text("ldapIdName",WebGUI::International::get(122),$session{setting}{ldapIdName});
-        $f->text("ldapPasswordName",WebGUI::International::get(123),$session{setting}{ldapPasswordName});
-	return $f->printRowsOnly;
-}
-
-#sub saveEditUserSettings {
-#	WebGUI::Operation::Settings::_saveSetting("ldapURL");
-#	WebGUI::Operation::Settings::_saveSetting("ldapId");
-#	WebGUI::Operation::Settings::_saveSetting("ldapIdName");
-#	WebGUI::Operation::Settings::_saveSetting("ldapPasswordName");
-#}
-
-sub formEditUser {
-	my ($f, $userData);
-	$userData = WebGUI::Authentication::getParams($session{form}{uid}, 'LDAP');
-
-	$f = WebGUI::HTMLForm->new;
-	$f->readOnly('<b>LDAP Authentication Options</b>');
-	$f->url("ldapURL",WebGUI::International::get(165),$$userData{ldapURL});
-	$f->text("connectDN",WebGUI::International::get(166),$$userData{connectDN});
-
-	return $f->printRowsOnly;
-}
-
-sub saveEditUser {
-	WebGUI::Authentication::saveParams($session{form}{uid},'LDAP',{connectDN => $session{form}{connectDN}, ldapURL => $session{form}{ldapURL}});
-}
-
-sub formCreateAccount {
-	my $f;
-
-	$f = WebGUI::HTMLForm->new;
-	$f->password("ldapPassword",$session{setting}{ldapPasswordName});
-	
-	return $f->printRowsOnly;
-}
-
-sub saveCreateAccount { 
-	my($uri, $port, %args, $ldap, $auth, $search, $connectDN, $uid);
-
-	my $uid = shift;
-
-	$uri = URI->new($session{setting}{ldapURL});
-	if ($uri->port < 1) {
-		$port = 389;
-	} else {
-		$port = $uri->port;
-	}
-
-	%args = (port => $port);
-	$ldap = Net::LDAP->new($uri->host, %args);
-	$ldap->bind;
-	$search = $ldap->search (base => $uri->dn, filter => $session{setting}{ldapId}."=".$session{form}{loginId});
-	if (defined $search->entry(0)) {
-		$connectDN = "cn=".$search->entry(0)->get_value("cn");
-	}
-	$ldap->unbind;
-
-	WebGUI::Authentication::saveParams($uid,'LDAP',{connectDN => $connectDN, ldapURL => $session{setting}{ldapURL}});
-}
-
+#-------------------------------------------------------------------
 sub hasBadUserData {
 	my($uri, $port, %args, $ldap, $auth, $error, $search, $connectDN);
 	$uri = URI->new($session{setting}{ldapURL});
@@ -140,6 +74,7 @@ sub hasBadUserData {
 	return $error;
 }
 
+#-------------------------------------------------------------------
 sub validateUser {
 	my ($userId, $password, $userData, $uri, $port, %args, $ldap, $auth, $error);
 	($userId, $password) = @_;
@@ -169,5 +104,95 @@ sub validateUser {
                 $ldap->unbind;
 	return $error
 }
+
+#-------------------------------------------------------------------------
+# Below are the subs that create and save the forms used for inputting 
+# config data for this auth module. The 'form' and 'save' subs of each
+# from are so related that I've grouped by function. Apart from the 
+# 'save' and 'form' stuff the subs are still in alphabetical order though.
+#-------------------------------------------------------------------------
+
+#-------------------------------------------------------------------
+sub formAddUser {
+	my $f;
+
+	$f = WebGUI::HTMLForm->new;
+	$f->readOnly("<b>LDAP Authentication Options</b>");
+	$f->url("ldapURL",WebGUI::International::get(165),$session{setting}{ldapURL});
+	$f->text("connectDN",WebGUI::International::get(166),$session{form}{connectDN});
+
+	return $f->printRowsOnly;
+}
+
+#-------------------------------------------------------------------
+sub saveAddUser {
+	WebGUI::Authentication::saveParams($session{form}{uid},'LDAP',{connectDN => $session{form}{connectDN}, ldapURL => $session{form}{ldapURL}});
+}
+
+#-------------------------------------------------------------------
+sub formCreateAccount {
+	my $f;
+
+	$f = WebGUI::HTMLForm->new;
+	$f->password("ldapPassword",$session{setting}{ldapPasswordName});
+	
+	return $f->printRowsOnly;
+}
+
+#-------------------------------------------------------------------
+sub saveCreateAccount { 
+	my($uri, $port, %args, $ldap, $auth, $search, $connectDN, $uid);
+
+	my $uid = shift;
+
+	$uri = URI->new($session{setting}{ldapURL});
+	if ($uri->port < 1) {
+		$port = 389;
+	} else {
+		$port = $uri->port;
+	}
+
+	%args = (port => $port);
+	$ldap = Net::LDAP->new($uri->host, %args);
+	$ldap->bind;
+	$search = $ldap->search (base => $uri->dn, filter => $session{setting}{ldapId}."=".$session{form}{loginId});
+	if (defined $search->entry(0)) {
+		$connectDN = "cn=".$search->entry(0)->get_value("cn");
+	}
+	$ldap->unbind;
+
+	WebGUI::Authentication::saveParams($uid,'LDAP',{connectDN => $connectDN, ldapURL => $session{setting}{ldapURL}});
+}
+
+#-------------------------------------------------------------------
+sub formEditUserSettings {
+	my $f;
+
+	$f = WebGUI::HTMLForm->new;
+	$f->url("ldapURL",WebGUI::International::get(120),$session{setting}{ldapURL});
+        $f->text("ldapId",WebGUI::International::get(121),$session{setting}{ldapId});
+        $f->text("ldapIdName",WebGUI::International::get(122),$session{setting}{ldapIdName});
+        $f->text("ldapPasswordName",WebGUI::International::get(123),$session{setting}{ldapPasswordName});
+	return $f->printRowsOnly;
+}
+
+#-------------------------------------------------------------------
+sub formEditUser {
+	my ($f, $userData);
+	$userData = WebGUI::Authentication::getParams($session{form}{uid}, 'LDAP');
+
+	$f = WebGUI::HTMLForm->new;
+	$f->readOnly('<b>LDAP Authentication Options</b>');
+	$f->url("ldapURL",WebGUI::International::get(165),$$userData{ldapURL});
+	$f->text("connectDN",WebGUI::International::get(166),$$userData{connectDN});
+
+	return $f->printRowsOnly;
+}
+
+#-------------------------------------------------------------------
+sub saveEditUser {
+	WebGUI::Authentication::saveParams($session{form}{uid},'LDAP',{connectDN => $session{form}{connectDN}, ldapURL => $session{form}{ldapURL}});
+}
+
 
 1;
