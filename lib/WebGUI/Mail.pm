@@ -80,6 +80,14 @@ The email address for the BCC line.
 
 sub send {
         my ($smtp, $message, $from, $footer);
+        foreach my $option (\$_[0], \$_[1], \$_[3], \$_[4], \$_[5]) {
+           if(${$option}) {
+                if (${$option} =~ /(?:From|To|Date|X-Mailer|Subject|Received|Message-Id)\s*:/is) {
+                   use WebGUI::ErrorHandler;
+                   return WebGUI::ErrorHandler::security("pass a malicious value to the mail header.");
+                }
+           }
+        }
 	$from = $_[4] || $session{setting}{companyEmail};
 	#header
 	$message = "To: $_[0]\n";

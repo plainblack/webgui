@@ -23,6 +23,7 @@
  - Fixed bug [ 838091 ] Read-Only Forum User Cannot Subscribe
  - Fixed bug [ 839524 ] Editing forum settings defaults all template names
  - Fixed bug [ 841194 ] denied post security problem
+ - Added a check for malicious mail headers
  
 
 5.5.0
