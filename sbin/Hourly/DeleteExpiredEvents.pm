@@ -1,7 +1,5 @@
 package Hourly::DeleteExpiredEvents;
 
-my $offset = 0; # in days, time to wait before deleting
-
 #-------------------------------------------------------------------
 # WebGUI is Copyright 2001-2002 Plain Black LLC.
 #-------------------------------------------------------------------
@@ -19,7 +17,10 @@ use WebGUI::SQL;
 
 #-----------------------------------------
 sub process {
-	WebGUI::SQL->write("delete from EventsCalendar_event where endDate<".(time()-(86400*$offset)));
+	if ($session{config}{DeleteExpiredEvents_offset} ne "") {
+		WebGUI::SQL->write("delete from EventsCalendar_event where endDate < "
+			.(time()-(86400*$session{config}{DeleteExpiredEvents}{offset})));
+	}
 }
 
 1;

@@ -1,7 +1,5 @@
 package Hourly::DeleteExpiredGroupings;
 
-my $offset = 0; # in seconds, time to wait before deleting
-
 #-------------------------------------------------------------------
 # WebGUI is Copyright 2001-2002 Plain Black LLC.
 #-------------------------------------------------------------------
@@ -18,7 +16,10 @@ use WebGUI::SQL;
 
 #-----------------------------------------
 sub process {
-	WebGUI::SQL->write("delete from groupings where expireDate<".(time()-(86400*$offset)));
+	if ($session{config}{DeleteExpiredGroupings_offset} ne "") {
+		WebGUI::SQL->write("delete from groupings where expireDate < "
+			.(time()-(86400*$session{config}{DeleteExpiredGroupings_offset})));
+	}
 }
 
 1;

@@ -1,7 +1,5 @@
 package Hourly::CleanLoginHistory;
 
-my $ageToDelete = 90; # in days, time to wait before deleting from login log
-
 #-------------------------------------------------------------------
 # WebGUI is Copyright 2001-2002 Plain Black LLC.
 #-------------------------------------------------------------------
@@ -19,7 +17,10 @@ use WebGUI::SQL;
 
 #-----------------------------------------
 sub process {
-	WebGUI::SQL->write("delete from userLoginLog where timeStamp<".(time()-(86400*$ageToDelete)));
+	if ($session{config}{CleanLoginHistory_ageToDelete}) {
+		WebGUI::SQL->write("delete from userLoginLog 
+			where timeStamp < ".(time()-(86400*$session{config}{CleanLoginHistory_ageToDelete})));
+	}
 }
 
 1;

@@ -1,8 +1,5 @@
 package Hourly::DecayKarma;
 
-my $minimumKarma = 0; # won't go below this number
-my $decayFactor = 1; # amount to remove per hour
-
 #-------------------------------------------------------------------
 # WebGUI is Copyright 2001-2002 Plain Black LLC.
 #-------------------------------------------------------------------
@@ -20,7 +17,10 @@ use WebGUI::SQL;
 
 #-----------------------------------------
 sub process {
-	WebGUI::SQL->write("update users set karma=karma-$decayFactor where karma>".$minimumKarma);
+	if ($session{config}{DecayKarma_minimumKarma} ne "" && $session{config}{DecayKarma_decayFactor}) {
+		WebGUI::SQL->write("update users set karma=".karma-$session{config}{DecayKarma_decayFactor}
+			." where karma > ".$session{config}{DecayKarma_minimumKarma});
+	}
 }
 
 1;
