@@ -32,6 +32,29 @@ use WebGUI::Wobject;
 
 our @ISA = qw(WebGUI::Wobject);
 
+# format the date according to rfc 822 (for RSS export)
+my @_months = qw(Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec);
+sub _get_rfc822_date {
+        my ($time) = @_;
+        
+        my ($year, $mon, $mday, $hour, $min, $sec) = WebGUI::DateTime::localtime($time);
+        
+        my $month = $_months[$mon - 1];
+        
+        return sprintf("%02d %s %04d %02d:%02d:%02d GMT", 
+                       $mday, $month, $year, $hour, $min, $sec);
+}
+  
+# encode a string to include in xml (for RSS export)
+sub _xml_encode {
+        
+        $_[0] =~ s/&/&amp;/g;
+        $_[0] =~ s/</&lt;/g;
+        $_[0] =~ s/\]\]>/\]\]&gt;/g;
+        
+        return $_[0];
+}
+
 #-------------------------------------------------------------------
 sub duplicate {
         my ($sth, $file, %row, $newSubmissionId, $w);
@@ -350,6 +373,7 @@ sub www_view {
         $var{"search.label"} = WebGUI::International::get(364);
 	$var{"search.Form"} = WebGUI::Search::form({wid=>$_[0]->get("wobjectId"),func=>'view',search=>1});
 	$var{"search.url"} = WebGUI::Search::toggleURL("wid=".$_[0]->get("wobjectId")."&func=view");
+        $var{"rss.url"} = WebGUI::URL::page('func=viewRSS&wid='.$_[0]->get("wobjectId"));
 	if ($session{scratch}{search}) {
                 $numResults = $session{scratch}{numResults};
        		$constraints = WebGUI::Search::buildConstraints([qw(username title content)]);
@@ -408,6 +432,64 @@ sub www_view {
 	$var{previousPage} = $p->getPreviousPageLink;
 	$var{multiplePages} = ($p->getNumberOfPages > 1);
 	return $_[0]->processTemplate($_[0]->get("templateId"),\%var);
+}
+
+#-------------------------------------------------------------------
+# print out RSS 2.0 feed describing the items visible on the first page
+sub www_viewRSS {
+        
+        my $wid = $_[0]->get("wobjectId");
+        my $numResults = $_[0]->get("submissionsPerPage");
+        
+        my $encTitle = _xml_encode($_[0]->get("title"));
+        my $encDescription = _xml_encode($_[0]->get("description"));  
+        my $encUrl = _xml_encode(WebGUI::URL::page("wid=$wid"));
+        
+        my $xml = qq~<?xml version="1.0"?>
+<rss version="2.0">
+<channel>
+<title>$encTitle</title>
+<link>$encUrl</link>
+<description>$encDescription</description>
+~;
+        
+        my $res = WebGUI::SQL->read
+          ("select USS_submissionId, content, title, " .
+           "dateSubmitted, username from USS_submission " .
+           "where wobjectId = " .$session{dbh}->quote($wid) . " " .
+           "order by dateSubmitted desc limit " . $numResults);
+        
+        while (my $row = $res->{_sth}->fetchrow_arrayref()) {
+                my ($sid, $content, $title, $dateSubmitted, $username) = 
+                  @{$row};
+
+                my $encUrl = _xml_encode
+                  (WebGUI::URL::page
+                   ("wid=$wid&func=viewSubmission&sid=$sid"));    
+                my $encTitle = _xml_encode($title);
+                my $encPubDate = _xml_encode
+                  (_get_rfc822_date($dateSubmitted));
+                my $encDescription = _xml_encode($content);
+                
+                $xml .= qq~
+<item>
+<title>$encTitle</title>
+<link>$encUrl</link>
+<description>$encDescription</description>
+<guid isPermaLink="true">$encUrl</guid>
+<pubDate>$encPubDate</pubDate>
+</item>
+~;
+        }
+
+        $xml .=qq~
+</channel>
+</rss>
+~;
+
+        $session{header}{mimetype} = 'text/xml';
+        
+        return $xml;
 }
 
 #-------------------------------------------------------------------
