@@ -117,7 +117,15 @@ The url to the last poster's profile.
 <p>
 
 <b>forum.lastpost.user.isVisitor</b><br>
-A condition indicating where the last poster was a visitor.
+A conditional indicating whether the last poster was a visitor.
+<p>
+
+<b>forum.user.canView</b><br>
+A conditional indicating whether the user can view this forum.
+<p>
+
+<b>forum.user.canPost</b><br>
+A conditional indicating whether the user can post to this forum.
 <p>
 
 
@@ -137,14 +145,14 @@ The title of the default forum.
 <p>
 
 <b>default.controls</b><br>
-The controls for the default forum.
+The editing controls for the default forum.
 <p>
 
 <b>areMultipleForums</b><br>
-A condition indicating whether there is more than one forum.
+A conditional indicating whether there is more than one forum.
 <p>
 |,
-		lastUpdated => 1066584179
+		lastUpdated => 1100231440
 	},
 
 	'6' => {
@@ -158,10 +166,10 @@ A condition indicating whether there is more than one forum.
 	},
 
 	'71' => {
-		message => q|Message boards, also called Forums and/or Discussions, are a great way to add community to any site or intranet. Many companies use message boards internally to collaborate on projects.
+		message => q|Message boards can contain one or more Forums and/or Discussion Boards, are a great way to add community to any site or intranet. Many companies use message boards internally to collaborate on projects.
 <br><br>
 |,
-		lastUpdated => 1066584548
+		lastUpdated => 1100231686
 	},
 
 	'61' => {
@@ -192,8 +200,8 @@ The title of the forum.
 The description of the forum.
 <p>
 
-<b>NOTE:</b> All of the properties of the forum system are also here. See that help page for details.|,
-		lastUpdated => 1066584480
+|,
+		lastUpdated => 1100231810
 	},
 
 	'77' => {
