@@ -43,6 +43,7 @@ Base forms package. Eliminates some of the normal code work that goes along with
  $html = WebGUI::Form::fieldType({name=>"fieldType",types=>\%supportedTypes});
  $html = WebGUI::Form::file({name=>"image"});
  $html = WebGUI::Form::formHeader();
+ $html = WebGUI::Form::filterContent({value=>"javascript"});
  $html = WebGUI::Form::group({name=>"groupToPost"});
  $html = WebGUI::Form::hidden({name=>"wid",value=>"55"});
  $html = WebGUI::Form::hiddenList({name=>"wid",value=>"55",options=>\%options});

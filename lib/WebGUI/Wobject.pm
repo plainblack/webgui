@@ -14,6 +14,7 @@ package WebGUI::Wobject;
 
 =cut
 
+use CGI::Util qw(rearrange);
 use DBI;
 use strict qw(subs vars);
 use Tie::IxHash;
@@ -24,9 +25,10 @@ use WebGUI::Icon;
 use WebGUI::International;
 use WebGUI::Macro;
 use WebGUI::Node;
+use WebGUI::Page;
 use WebGUI::Session;
 use WebGUI::SQL;
-use WebGUI::Page;
+use WebGUI::TabForm;
 use WebGUI::Template;
 use WebGUI::URL;
 use WebGUI::Utility;
@@ -1052,34 +1054,56 @@ The custom form rows from the wobject subclass edit page.
 =cut
 
 sub www_edit {
+	my ($self, @p) = @_;
+        my ($properties, $layout, $privileges) = rearrange([qw(properties layout privileges)], @p);
         my ($f, $startDate, $displayTitle, $title, $templatePosition, $endDate);
         if ($_[0]->get("wobjectId") eq "new") {
                	$displayTitle = 1;
         } else {
         	$displayTitle = $_[0]->get("displayTitle");
         }
-	$title = $_[0]->get("title") || $_[0]->get("namespace");
+	$title = $_[0]->get("title") || $_[0]->name;
 	$templatePosition = $_[0]->get("templatePosition") || 1;
 	$startDate = $_[0]->get("startDate") || $session{page}{startDate};
 	$endDate = $_[0]->get("endDate") || $session{page}{endDate};
-	$f = WebGUI::HTMLForm->new;
-	$f->hidden("wid",$_[0]->get("wobjectId"));
-	$f->hidden("namespace",$_[0]->get("namespace")) if ($_[0]->get("wobjectId") eq "new");
-	$f->hidden("func","editSave");
-	$f->submit if ($_[0]->get("wobjectId") ne "new");
-	$f->readOnly(
+	my %tabs;
+	tie %tabs, 'Tie::IxHash';
+	%tabs = (	
+		properties=>{
+			label=>WebGUI::International::get(893)
+			},
+		layout=>{
+                        label=>WebGUI::International::get(105),
+                        uiLevel=>5
+                        },
+                privileges=>{
+                        label=>WebGUI::International::get(107),
+                        uiLevel=>9
+                        }
+		);
+	if ($_[0]->{_useDiscussion}) {
+		$tabs{discussion} = {
+			label=>WebGUI::International::get(892),
+			uiLevel=>7
+			};
+	}
+	$f = WebGUI::TabForm->new(\%tabs);
+	$f->hidden({name=>"wid",value=>$_[0]->get("wobjectId")});
+	$f->hidden({name=>"namespace",value=>$_[0]->get("namespace")}) if ($_[0]->get("wobjectId") eq "new");
+	$f->hidden({name=>"func",value=>"editSave"});
+	$f->getTab("properties")->readOnly(
 		-value=>$_[0]->get("wobjectId"),
 		-label=>WebGUI::International::get(499),
 		-uiLevel=>3
 		);
-	$f->text("title",WebGUI::International::get(99),$title);
-	$f->yesNo(
+	$f->getTab("properties")->text("title",WebGUI::International::get(99),$title);
+	$f->getTab("layout")->yesNo(
 		-name=>"displayTitle",
 		-label=>WebGUI::International::get(174),
 		-value=>$displayTitle,
 		-uiLevel=>5
 		);
-	$f->select(
+	$f->getTab("layout")->select(
 		-name=>"templatePosition",
 		-label=>WebGUI::International::get(363),
 		-value=>[$templatePosition],
@@ -1087,28 +1111,35 @@ sub www_edit {
 		-options=>WebGUI::Page::getTemplatePositions($session{page}{templateId}),
 		-subtext=>WebGUI::Page::drawTemplate($session{page}{templateId})
 		);
-	$f->date(
+	$f->getTab("privileges")->date(
 		-name=>"startDate",
 		-label=>WebGUI::International::get(497),
 		-value=>$startDate,
 		-uiLevel=>9
 		);
-	$f->date(
+	$f->getTab("privileges")->date(
 		-name=>"endDate",
 		-label=>WebGUI::International::get(498),
 		-value=>$endDate,
 		-uiLevel=>9
 		);
-	$f->HTMLArea(
+	$f->getTab("properties")->HTMLArea(
 		-name=>"description",
 		-label=>WebGUI::International::get(85),
 		-value=>$_[0]->get("description")
 		);
-	$f->raw($_[1]);
+	$f->getTab("properties")->raw($properties);
+	$f->getTab("layout")->raw($layout);
+	$f->getTab("privileges")->raw($privileges);
 	if ($_[0]->{_useDiscussion}) {
-		$f->raw($_[0]->discussionProperties);
+		$f->getTab("discussion")->yesNo(
+                	-name=>"allowDiscussion",
+                	-label=>WebGUI::International::get(894),
+                	-value=>$_[0]->get("allowDiscussion"),
+                	-uiLevel=>5
+                	);
+		$f->getTab("discussion")->raw($_[0]->discussionProperties);
 	}
-	$f->submit;
 	return $f->print; 
 }
 

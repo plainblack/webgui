@@ -99,9 +99,22 @@ delete from international where languageId=1 and namespace='WebGUI' and internat
 insert into international (internationalId,languageId,namespace,message,lastUpdated) values (526,1,'WebGUI','Remove JavaScript and macros.', 1046604649);
 delete from international where languageId=1 and namespace='WebGUI' and internationalId=891;
 insert into international (internationalId,languageId,namespace,message,lastUpdated) values (891,1,'WebGUI','Remove only macros.', 1046604579);
-
-
-
+alter table USS add column filterContent varchar(30) not null default 'javascript';
+delete from international where languageId=1 and namespace='WebGUI' and internationalId=420;
+insert into international (internationalId,languageId,namespace,message,lastUpdated) values (420,1,'WebGUI','Remove nothing.', 1046637549);
+delete from international where languageId=1 and namespace='WebGUI' and internationalId=419;
+insert into international (internationalId,languageId,namespace,message,lastUpdated) values (419,1,'WebGUI','Remove everything but the text.', 1046637533);
+delete from international where languageId=1 and namespace='WebGUI' and internationalId=892;
+insert into international (internationalId,languageId,namespace,message,lastUpdated) values (892,1,'WebGUI','Discussion', 1046637952);
+delete from international where languageId=1 and namespace='WebGUI' and internationalId=893;
+insert into international (internationalId,languageId,namespace,message,lastUpdated) values (893,1,'WebGUI','Wobject Properties', 1046638419);
+delete from international where languageId=1 and namespace='WebGUI' and internationalId=103;
+insert into international (internationalId,languageId,namespace,message,lastUpdated) values (103,1,'WebGUI','Page Properties', 1046638742);
+delete from international where languageId=1 and namespace='WebGUI' and internationalId=105;
+insert into international (internationalId,languageId,namespace,message,lastUpdated) values (105,1,'WebGUI','Layout', 1046638916);
+update international set internationalId=894, namespace='WebGUI' where internationalId=18 and namespace='Article';
+alter table wobject add column allowDiscussion int not null default 0;
+delete from international where namespace='HttpProxy' and internationalId=7;
 
 
 
