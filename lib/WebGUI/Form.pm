@@ -1024,6 +1024,7 @@ sub HTMLArea {
 	# Supported Rich Editors
 	$var{"htmlArea.supported"} = ($browser->ie && $browser->version >= 5.5);
 	$var{"midas.supported"} = (($browser->ie && $browser->version >= 6) || ($browser->gecko && $browser->version >= 1.3));
+	$var{"htmlArea3.supported"} = (($browser->ie && $browser->version >= 5.5) || $var{"midas.supported"});
 	$var{"classic.supported"} = ($browser->ie && $browser->version >= 5);
  
 	# Textarea field
@@ -1035,14 +1036,13 @@ sub HTMLArea {
                 wrap=>$_[0]->{wrap},
                 columns=>$columns,
                 rows=>$rows,
-                extras=>$_[0]->{extras}.' onBlur="fixChars(this.form.'.$_[0]->{name}.')"'
+                extras=>$_[0]->{extras}.' onBlur="fixChars(this.form.'.$_[0]->{name}.')" id="'.$_[0]->{name}.'"'
                 });
 
 	# Other variables
 	$var{"popup"} = ($session{user}{richEditorMode} eq "popup" || $_[0]->{popupToggle});
 	$var{"button"} = '<input type="button" onClick="openEditWindow(this.form.'.$_[0]->{name}.')" value="'
                 .WebGUI::International::get(171).'" style="font-size: 8pt;"><br>';
-
 	if ($session{user}{richEditor} eq 'none') {
 		return $var{textarea};
 	} else {
