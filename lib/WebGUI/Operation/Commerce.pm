@@ -12,6 +12,7 @@ use WebGUI::TabForm;
 use WebGUI::Style;
 use WebGUI::Commerce;
 use WebGUI::Operation;
+use WebGUI::Operation::Shared;
 use WebGUI::URL;
 use WebGUI::International;
 use WebGUI::Asset::Template;
@@ -55,7 +56,7 @@ sub www_cancelTransaction {
 
 	$var{message} = WebGUI::International::get('checkout canceled message', 'Commerce');
 	
-	return WebGUI::Asset::Template->new($session{setting}{commerceCheckoutCanceledTemplateId})->process(\%var);
+	return WebGUI::Operation::Shared::userStyle(WebGUI::Asset::Template->new($session{setting}{commerceCheckoutCanceledTemplateId})->process(\%var));
 }
 
 # This operation is here for easier future extensions to the commerce system.
@@ -74,7 +75,7 @@ sub www_checkoutConfirm {
 	# If the user isn't logged in yet, let him do so or have him create an account
 	if ($session{user}{userId} == 1) {
 		WebGUI::Session::setScratch('redirectAfterLogin', WebGUI::URL::page('op=checkout'));
-		return WebGUI::Operation::execute('displayLogin');
+		return WebGUI::Operation::execute('auth');
 	}
 
 	# If no payment gateway has been selected yet, have the user do so now.
@@ -103,7 +104,7 @@ sub www_checkoutConfirm {
 	$var{form} = $f->print;
 	$var{title} = $i18n->get('checkout confirm title');
 
-	return WebGUI::Asset::Template->new($session{setting}{commerceConfirmCheckoutTemplateId})->process(\%var);
+	return WebGUI::Operation::Shared::userStyle(WebGUI::Asset::Template->new($session{setting}{commerceConfirmCheckoutTemplateId})->process(\%var));
 }
 
 #-------------------------------------------------------------------
@@ -212,7 +213,7 @@ sub www_checkoutSubmit {
 	return WebGUI::Operation::execute('viewPurchaseHistory') unless ($checkoutError);
 
 	# If an error has occurred show the template errorlog
-	return WebGUI::Asset::Template->new($session{setting}{commerceTransactionErrorTemplateId})->process(\%param);
+	return WebGUI::Operation::Shared::userStyle(WebGUI::Asset::Template->new($session{setting}{commerceTransactionErrorTemplateId})->process(\%param));
 }
 
 #-------------------------------------------------------------------
@@ -359,7 +360,7 @@ sub www_editCommerceSettingsSave {
 		}
 	}
 	
-	return WebGUI::Operation::execute('adminConsole');
+	return WebGUI::Operation::execute('editCommerceSettings');
 }
 
 #-------------------------------------------------------------------
@@ -400,13 +401,17 @@ sub www_selectPaymentGateway {
 
 	$i18n = WebGUI::International->new('Commerce');
 	$plugins = WebGUI::Commerce::Payment->getEnabledPlugins;
-
-	foreach (@$plugins) {
-		push(@pluginLoop, {
-			name		=> $_->name,
-			namespace	=> $_->namespace,
-			formElement	=> WebGUI::Form::radio({name=>'paymentGateway', value=>$_->namespace})
-			});
+	if (scalar(@$plugins) > 1) {
+		foreach (@$plugins) {
+			push(@pluginLoop, {
+				name		=> $_->name,
+				namespace	=> $_->namespace,
+				formElement	=> WebGUI::Form::radio({name=>'paymentGateway', value=>$_->namespace})
+				});
+		}
+	} else {
+		$session{form}{paymentGateway} = $plugins->[0]->namespace;
+		return WebGUI::Operation::execute("checkoutConfirm");
 	}
 	
 	$var{pluginLoop} = \@pluginLoop;
@@ -417,7 +422,7 @@ sub www_selectPaymentGateway {
 	$var{formSubmit} = WebGUI::Form::submit({value=>$i18n->get('payment gateway select')});
 	$var{formFooter} = WebGUI::Form::formFooter;		
 	
-	return WebGUI::Asset::Template->new($session{setting}{commerceSelectPaymentGatewayTemplateId})->process(\%var);
+	return WebGUI::Operation::Shared::userStyle(WebGUI::Asset::Template->new($session{setting}{commerceSelectPaymentGatewayTemplateId})->process(\%var));
 }
 
 #-------------------------------------------------------------------

@@ -259,10 +259,10 @@ sub getToolbar {
 sub view {
 	my $self = shift;
 	# we've got to determine what our start point is based upon user conditions
-	my ($start,$current);
-	if (!exists $session{asset}) {
-		$start = $current = $self;
-	} elsif ($self->get("startType") eq "specificUrl") {
+	my $start;
+	$session{asset} = WebGUI::Asset->newByUrl unless (exists $session{asset});
+	my $current = $session{asset};
+	if ($self->get("startType") eq "specificUrl") {
 		$start = WebGUI::Asset->newByUrl($self->get("startPoint"));
 	} elsif ($self->get("startType") eq "relativeToRoot") {
 		unless (($self->get("startPoint")+1) >= $self->getLineageLength) {
@@ -281,8 +281,7 @@ sub view {
 			$start = WebGUI::Asset->newByLineage($lineage);
 		}
 	}
-	$current = $session{asset} unless (defined $current);
-	$start = $session{asset} unless (defined $start); # if none of the above results in a start point, then the current page must be it
+	$start = $current unless (defined $start); # if none of the above results in a start point, then the current page must be it
 	my @includedRelationships = split("\n",$self->get("assetsToInclude"));
 	my %rules;
 	$rules{returnQuickReadObjects} = 1;
@@ -298,26 +297,22 @@ sub view {
 	$var->{'currentPage.url'} = $current->getUrl;
     	$var->{'currentPage.hasChild'} = $current->hasChildren;
 	my $currentLineage = $current->get("lineage");
-	my @linesToSkip;
+	my $lineageToSkip = "noskip";
 	my $absoluteDepthOfLastPage;
 	foreach my $asset (@{$assets}) {
 		# skip pages we shouldn't see
-		my $skip = 0;
 		my $pageLineage = $asset->get("lineage");
-		foreach my $lineage (@linesToSkip) {
-			$skip = 1 if ($pageLineage =~ m/^$lineage/);
-		}
-		next if ($skip);
+		next if ($pageLineage =~ m/^$lineageToSkip/);
 		if ($asset->get("isHidden") && !$self->get("showHiddenPages")) {
-			push (@linesToSkip,$asset->get("lineage")) unless ($asset->get("lineage") eq "000001");
+			$lineageToSkip = $pageLineage unless ($pageLineage eq "000001");
 			next;
 		}
 		if ($asset->get("isSystem") && !$self->get("showSystemPages")) {
-			push (@linesToSkip,$asset->get("lineage")) unless ($asset->get("lineage") eq "000001");
+			$lineageToSkip = $pageLineage unless ($pageLineage eq "000001");
 			next;
 		}
 		unless ($self->get("showUnprivilegedPages") || $asset->canView) {
-			push (@linesToSkip,$asset->get("lineage")) unless ($asset->get("lineage") eq "000001");
+			$lineageToSkip = $pageLineage unless ($pageLineage eq "000001");
 			next;
 		}
 		my $pageData = {};

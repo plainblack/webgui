@@ -18,13 +18,14 @@
 	font-family:arial; 
 	font-size:11px; 
 	cursor:hand; 
-	border-width:2; 
-	border-style:outset; 
-	border-color: #dddddd; 
+	border-width:1; 	 
+	border-color: #ACACAC; 
 	background-color:#dddddd;
+	background-image: url(btn_bg.jpg);
 	position:absolute; 
 	left:0;
 	top: 0;
+	border-style: solid;
 } 
 
 .panelButton A {
@@ -46,12 +47,15 @@
 .slidePanel {
 	position:absolute;
 	background-color: #eeeeee;
+
 }
 
 .panel, .panelLinkHolder {
 	position:absolute; 
 	left:0;
 	background-color: #eeeeee;
+		background-image: url(panel_bg.jpg);
+	background-repeat: repeat-x;
 }
 
 .panelLinkOut {
@@ -60,9 +64,10 @@
 	height: 20px;
 	cursor: hand;
 	left:0; 
-	border: 1px solid #eeeeee; 
+	/*border: 1px solid #eeeeee; */
 	font-size: 11px;
 	font-family: helvetica, arial, sans;
+	padding: 5px;
 }
 .panelLinkIn {
 	position:absolute; 
@@ -70,8 +75,10 @@
 	overflow: hidden;
 	cursor: hand;
 	left:0; 
-	border: 1px solid orange;
+	border: 1px solid #DEDCDC;
 	font-size: 11px;
 	font-family: helvetica, arial, sans;
+	background-color: #F5F5F5;
+	padding: 5px;
 }
 

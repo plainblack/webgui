@@ -28,7 +28,7 @@ sub www_viewPurchaseHistory {
 
 	$var{purchaseHistoryLoop} = \@historyLoop;
 
-	return WebGUI::Asset::Template->new("PBtmpl0000000000000019")->process(\%var);
+	return WebGUI::Operation::Shared::userStyle(WebGUI::Asset::Template->new("PBtmpl0000000000000019")->process(\%var));
 }
 
 #-------------------------------------------------------------------

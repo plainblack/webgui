@@ -5,6 +5,7 @@ use WebGUI::Session;
 use WebGUI::HTMLForm;
 use WebGUI::Commerce::Payment;
 use WebGUI::Commerce::Item;
+use WebGUI::URL;
 use Tie::IxHash;
 use WebGUI::International;
 use LWP::UserAgent;
@@ -208,7 +209,7 @@ sub configurationForm {
 		-value	=> '<br>'
 		);
 	$f->readOnly(
-		-value	=> $i18n->get('extra info').'<br><b>'.$session{setting}{companyURL}.'?op=confirmRecurringTransaction&gateway='.$self->namespace
+		-value	=> $i18n->get('extra info').'<br><b>https://'.$session{config}{defaultSitename}.WebGUI::URL::getScriptURL().'?op=confirmRecurringTransaction&gateway='.$self->namespace
 		);
 		
 	return $self->SUPER::configurationForm($f->printRowsOnly);

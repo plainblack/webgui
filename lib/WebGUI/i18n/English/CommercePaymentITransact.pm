@@ -156,8 +156,35 @@ See the information toward the bottom of this page to set up your merchant accou
 Contact your hosting provider to install your certificate or install it yourself.
 </p>
 
+
 <p>
-<b>Step 5: Optionally Accept eChecks</b><br />
+<b>Step 5: Enable IP Address</b><br />
+For added security the system will not allow just anyone to post requests to the merchant account. We have to tell the merchant account what the IP address of our site (or sites) is. To do this go to your virtual terminal and log in. Go to Account Settings &gt; Fraud Control &gt; and click on the "IP Filter Settings" link. There enter the IP address of your server Set the status to Active and set the module to XML, then hit go. Contact your system administrator for your server IP address. You'll also need to send an email to support@cdgcommerce.com to let them know that you wish to enable the XML API.
+</p>
+
+<p>
+<b>Step 6: Enable The Commerce System</b><br />
+Set the enabled field to "Yes" in your WebGUI commerce settings.
+</p>
+
+<p>
+<b>Step 7: Optionally Accept American Express, Discover, and Diners Club</b><br />
+By default you'll only be able to accept MasterCard and Visa. If you want to accept others you'll need to follow these steps:
+<ol>
+	<li>Call the credit card vendor to apply:
+		<ul>
+		<li>American Express: (800) 528-5200</li>
+		<li>Discover: (800) 347-2000</li>
+		<li>Diners Club: (800) 525-7376</li> 
+		</ul>
+	</li>
+	<li>Send the account numbers that you get from those companies to merchantchanges@cdgcommerce.com to get them registered with your merchant account.</li>
+	<li>Go to your virtual terminal and enable these cards under your Account settings.</li>
+</ol>
+</p>
+
+<p>
+<b>Step 8: Optionally Accept eChecks</b><br />
 <a target="_blank" href="http://cdgcommerce.com/forms/CDGcommerce_ACH_Processing.pdf">After you have your iTransact/CDGCommerce merchant account set up, you can optionally add the ability to accept eChecks by filling out this application.</a>
 </p>
 
@@ -209,7 +236,7 @@ Please note that some of these recipe's are only roughly correct. They don't 'fi
   <li><b>yearly</b> (differs 1 day each leap year)</li>
 </ul><br>
 Also set the 'RECURRING POST-BACK URL' field in the Account Settings part of the virtual terminal to:|,
-		lastUpdated => 0,
+		lastUpdated => 1112200925,
 		context => q|An informational message that's shown in the configuration form of this plugin.|
 	},
 };
