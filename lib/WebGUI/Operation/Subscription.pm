@@ -404,7 +404,7 @@ sub www_redeemSubscriptionCode {
 		-name		=> 'code',
 		-label		=> $i18n->get('code'),
 		-maxLength	=> 64,
-		-size		=> 64
+		-size		=> 30
 		);
 	$f->submit;
 	$var{codeForm} = $f->print;
