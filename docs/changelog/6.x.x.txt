@@ -20,6 +20,8 @@
  - bugfix [ 997916 ] Bug and solution in File.pm
  - Added the page.isMyAncestor condition to the Navigation system. (Thanks to
    Len Kranendonk)
+ - passing form param disableWobjects=$call shortcircuits most of
+   WebGUI::Wobject::WSClient::www_view()
 
 6.1.1
  - bugfix [ 991313 ] Manage Translations doesn't work
