@@ -211,7 +211,8 @@ sub duplicate {
 		$file->copy($w->get("wobjectId"),$newSubmissionId);
                 WebGUI::SQL->write("insert into UserSubmission_submission values (".$w->get("wobjectId").", $newSubmissionId, ".
 			quote($row{title}).", $row{dateSubmitted}, ".quote($row{username}).", '$row{userId}', ".quote($row{content}).", ".
-			quote($row{image}).", ".quote($row{attachment}).", '$row{status}', '$row{convertCarriageReturns}')");
+			quote($row{image}).", ".quote($row{attachment}).", '$row{status}', '$row{convertCarriageReturns}', 
+			'$row{views}')");
 		WebGUI::Discussion::duplicate($_[0]->get("wobjectId"),$w->get("wobjectId"),$row{submissionId},$newSubmissionId);
         }
         $sth->finish;

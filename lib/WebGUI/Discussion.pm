@@ -49,7 +49,7 @@ sub _duplicateReplyTree {
                 $newMessageId = getNextId("messageId");
 		WebGUI::SQL->write("insert into discussion values ($newMessageId, $_[2], $_[3], $_[1], $data{userId}, "
 			.quote($data{username}).", ".quote($data{subject}).", ".quote($data{message}).
-			", $data{dateOfPost}, $_[4])");
+			", $data{dateOfPost}, $_[4], $data{views}, $data{locked}, ".quote($data{status}).")");
                 _duplicateReplyTree($data{messageId},$newMessageId,$_[2],$_[3],$_[4]);
         }
         $sth->finish;
@@ -144,7 +144,8 @@ sub duplicate {
                 $newMessageId = getNextId("messageId");
 		WebGUI::SQL->write("insert into discussion values ($newMessageId, $newMessageId, $_[1], 0, 
 			$data{userId}, ".quote($data{username}).", ".quote($data{subject}).", "
-			.quote($data{message}).", $data{dateOfPost}, $newSubId)");
+			.quote($data{message}).", $data{dateOfPost}, $newSubId, $data{views}, $data{locked},
+			".quote($data{status}).")");
 		_duplicateReplyTree($data{messageId},$newMessageId,$newMessageId,$_[1],$newSubId);
         }
         $sth->finish;
