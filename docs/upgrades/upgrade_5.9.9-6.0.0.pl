@@ -490,6 +490,7 @@ my $conf = Parse::PlainConfig->new('DELIM' => '=', 'FILE' => $pathToConfig);
 my $macros = $conf->get("macros");
 delete $macros->{"\\"};
 $macros->{"\\\\"} = "Backslash_pageUrl";
+$macros->{"Navigation"} = "Navigation";
 $conf->set("macros"=>$macros);
 my $wobjects = $conf->get("wobjects");
 my @newWobjects;
@@ -817,7 +818,7 @@ foreach $table (keys %dbFields){
 					   ! $identifier{cachedTemplate}{$replaceId."_".$repNav->{columns}->{seperator}}) {
   					   WebGUI::SQL->write("insert into template (templateId,namespace,name,template) values
 					  ($repNav->{columns}->{templateId}, ".quote('Navigation').", ".
-					  quote($identifier{$replaceId}).", ".quote($repNav->{template}).")");	
+					  quote("AutoGen ".$searchString).", ".quote($repNav->{template}).")");	
 					}
 					my $replacement = "^Navigation($identifier{cachedConfig}{$replaceId});";
 					 # print "\tReplacing macro $macro with $replacement ";
