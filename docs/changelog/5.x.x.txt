@@ -8,6 +8,7 @@
    (Thanks to Steve Simms.)
  - Bugfix [ 870681 ] Wobject start/end dates change when editing wobject
  - Bugfix [ 877999 ] runHourly.pl crashes server when no db
+ - Fixed a timing bug in the run hourly script
 
 
 5.5.4

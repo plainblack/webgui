@@ -85,10 +85,8 @@ if (opendir (CONFDIR,$confdir)) {
 			my $startTime = time();
 			WebGUI::Session::open($webguiRoot,$file);
 			WebGUI::Session::refreshUserInfo(3,$session{dbh});
-			my $previousTime = time();
-			my $currentTime; 
 			foreach $namespace (keys %plugins) {
-				$currentTime = time();
+				my $taskTime = time();
 				print "\t".$namespace if ($verbose);
 				$exclude = $session{config}{excludeHourly};
 				$exclude =~ s/ //g;
@@ -96,8 +94,7 @@ if (opendir (CONFDIR,$confdir)) {
 					$cmd = $plugins{$namespace};
 					&$cmd();
 				}
-				print " (".($currentTime-$previousTime)." seconds)\n" if ($verbose);
-				$previousTime = $currentTime;
+				print " (".(time()-$taskTime)." seconds)\n" if ($verbose);
 			}
 			WebGUI::Session::end($session{var}{sessionId});
 			WebGUI::Session::close();
