@@ -29,6 +29,25 @@ use POSIX ();
 
 
 #----------------------------------------
+# International Message Caching 
+#----------------------------------------
+#Test to see if IPC::Sharable will load.
+my $hasIPC=1;
+eval " use IPC::Shareable (); "; $hasIPC=0 if $@;
+my (%international);
+if ($hasIPC) {
+	my $glue = 'intl';
+        my %options = (
+        	create    => 'yes',
+                exclusive => 0,
+                mode      => 0666,
+                destroy   => 'yes',
+                );
+        tie %international, 'IPC::Shareable', $glue, { %options };
+}
+
+
+#----------------------------------------
 # Database connectivity.
 #----------------------------------------
 use DBI ();
