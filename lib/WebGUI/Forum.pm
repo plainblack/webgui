@@ -65,5 +65,23 @@ sub set {
         }
 }
 
+sub subscribe {
+        my ($self, $userId) = @_;
+        $userId = $session{user}{userId} unless ($userId);
+        unless ($self->isSubscribed($userId)) {
+                WebGUI::SQL->write("insert into forumSubscription (forumId, userId) values (".$self->get("forumId").",$userId)");
+        }
+}
+                                                                                                                                                             
+sub unsubscribe {
+        my ($self, $userId) = @_;
+        $userId = $session{user}{userId} unless ($userId);
+        if ($self->isSubscribed($userId)) {
+                WebGUI::SQL->write("delete from forumSubscription where forumId=".$self->get("forumId")." and userId=$userId");
+        }
+}
+
+
+
 1;
 

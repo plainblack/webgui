@@ -161,4 +161,13 @@ create table forumPostRating ( forumPostId int not null, userId int not null, ip
 alter table forumPost add column rating int not null default 0;
 insert into international (internationalId,languageId,namespace,message,lastUpdated,context) values (1021,1,'WebGUI','Rate Message', 1065356764,'A label indicating that the following links are to be used for discussion post ratings.');
 alter table forumThread add column rating int not null;
+delete from international where languageId=1 and namespace='WebGUI' and internationalId=875;
+insert into international (internationalId,languageId,namespace,message,lastUpdated,context) values (875,1,'WebGUI','A new message has been posted to one of your subscriptions.', 1065874019,NULL);
+insert into international (internationalId,languageId,namespace,message,lastUpdated,context) values (1023,1,'WebGUI','Unsubscribe from discussion.', 1065875186,'A label for a link that unsubscribes the user from the discussion they are currently viewing.');
+insert into international (internationalId,languageId,namespace,message,lastUpdated,context) values (1022,1,'WebGUI','Subscribe to discussion.', 1065875027,'A label for a link that subscribes the user to the discussion they are currently viewing.');
+delete from international where languageId=1 and namespace='WebGUI' and internationalId=874;
+insert into international (internationalId,languageId,namespace,message,lastUpdated,context) values (874,1,'WebGUI','Unsubscribe from thread.', 1065876868,NULL);
+delete from international where languageId=1 and namespace='WebGUI' and internationalId=873;
+insert into international (internationalId,languageId,namespace,message,lastUpdated,context) values (873,1,'WebGUI','Subscribe to thread.', 1065876827,NULL);
+
 

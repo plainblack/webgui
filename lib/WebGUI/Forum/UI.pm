@@ -32,6 +32,14 @@ sub _formatEditPostURL {
 	return WebGUI::URL::append($_[0],"forumOp=post&amp;forumPostId=".$_[1]);
 }
 
+sub _formatForumSubscribeURL {
+	return WebGUI::URL::append($_[0],"forumOp=forumSubscribe&amp;forumId=".$_[1]);
+}
+
+sub _formatForumUnsubscribeURL {
+	return WebGUI::URL::append($_[0],"forumOp=forumUnsubscribe&amp;forumId=".$_[1]);
+}
+
 sub _formatNextThreadURL {
 	return WebGUI::URL::append($_[0],"forumOp=nextThread&amp;forumThreadId=".$_[1]);
 }
@@ -74,6 +82,14 @@ sub _formatStatus {
         }
 }
 
+sub _formatThreadSubscribeURL {
+	return WebGUI::URL::append($_[0],"forumOp=threadSubscribe&amp;forumPostId=".$_[1]);
+}
+
+sub _formatThreadUnsubscribeURL {
+	return WebGUI::URL::append($_[0],"forumOp=threadUnsubscribe&amp;forumPostId=".$_[1]);
+}
+
 sub _formatThreadURL {
 	return WebGUI::URL::append($_[0],"forumOp=viewThread&amp;forumPostId=".$_[1]."#".$_[1]);
 }
@@ -111,7 +127,7 @@ sub _getPostTemplateVars {
                 }
                 $sth->finish;
         }
-	$var->{canPost} = $forum->canPost;
+	$var->{'user.canPost'} = $forum->canPost;
         $var->{'post.date.value'} = _formatPostDate($post->get("dateOfPost"));
 	$var->{'post.date.label'} = WebGUI::International::get(245);
         $var->{'post.date.epoch'} = $post->get("dateOfPost");
@@ -179,29 +195,42 @@ sub forumOp {
 }
 
 sub notifySubscribers {
-        my ($self, $postId) = @_;
-        my $post = WebGUI::Post->new($postId);
-        my $sth = WebGUI::SQL->read("select userId from forumThreadSubscription where forumThreadId=".$post->get("forumThreadId"));
-                                                                                                                                                             
-    WebGUI::MessageLog::addInternationalizedEntry($userId,"",
-                                WebGUI::URL::page('func=showMessage&wid='.$session{form}{wid}
-                                .'&sid='.$session{form}{sid}.'&mid='.$session{form}{mid}),875);
-        $forum
-        my $message = WebGUI::Template::process(WebGUI::Template::get(1,"Forum/Notification"), $var);
-                                                                                                                                                             
-        while (($userId) = $sth->array) {
-                WebGUI::MessageLog::addEntry($userId,"","Subscription Notification",);
-        }
+        my ($post, $thread, $forum, $callback) = @_;
+	my %subscribers;
+        my $sth = WebGUI::SQL->read("select userId from forumThreadSubscription where forumThreadId=".$thread->get("forumThreadId"));
+	while (my ($userId) = $sth->array) { 
+		$subscribers{$userId} = $userId unless ($userId == $post->get("userId"));	# make sure we don't send unnecessary messages 
+	}
         $sth->finish;
+        my $sth = WebGUI::SQL->read("select userId from forumSubscription where forumId=".$forum->get("forumId"));
+	while (my ($userId) = $sth->array) { 
+		$subscribers{$userId} = $userId unless ($userId == $post->get("userId"));	# make sure we don't send unnecessary messages 
+	}
+        $sth->finish;
+	my $var = {
+		'notify.subscription.message' => WebGUI::International::get(875)
+		};
+	$var = _getPostTemplateVars($post, $thread, $forum, $callback, $var);
+	my $subject = WebGUI::International::get(523);
+       	my $message = WebGUI::Template::process(WebGUI::Template::get(1,"Forum/Notification"), $var);
+	foreach my $userId (keys %subscribers) {
+               	WebGUI::MessageLog::addEntry($userId,"",$subject,$message);
+	}
 }
 
 sub viewForum {
 	my ($callback, $forumId) = @_;
 	my (%var, @thread_loop);
+	my $forum = WebGUI::Forum->new($forumId);
+	$var{'user.isVisitor'} = ($session{user}{userId} == 1);
 	$var{'thread.new.url'} = _formatNewThreadURL($callback,$forumId);
 	$var{'thread.new.label'} = WebGUI::International::get(1018);
-	my $forum = WebGUI::Forum->new($forumId);
-	$var{canPost} = $forum->canPost;
+	$var{'forum.subscribe.label'} = WebGUI::International::get(1022);
+	$var{'forum.subscribe.url'} = _formatForumSubscribeURL($callback,$forumId);
+	$var{'forum.unsubscribe.label'} = WebGUI::International::get(1023);
+	$var{'forum.unsubscribe.url'} = _formatForumUnsubscribeURL($callback,$forumId);
+	$var{'user.isSubscribed'} = $forum->isSubscribed;
+	$var{'user.canPost'} = $forum->canPost;
 	$var{'thread.subject.label'} = WebGUI::International::get(229);
 	$var{'thread.date.label'} = WebGUI::International::get(245);
 	$var{'thread.user.label'} = WebGUI::International::get(244);
@@ -299,6 +328,22 @@ sub www_denyPost {
        	return www_viewThread($callback);
 }
 
+sub www_forumSubscribe {
+	my ($callback) = @_;
+	my $forum = WebGUI::Forum->new($session{form}{forumId});
+	return WebGUI::Privilege::insufficient() unless ($forum->canPost && $session{user}{userId} != 1);
+	$forum->subscribe;
+	return viewForum($callback, $session{form}{forumId});
+}
+
+sub www_forumUnsubscribe {
+	my ($callback) = @_;
+	my $forum = WebGUI::Forum->new($session{form}{forumId});
+	return WebGUI::Privilege::insufficient() unless ($session{user}{userId} != 1);
+	$forum->unsubscribe;
+	return viewForum($callback, $session{form}{forumId});
+}
+
 sub www_nextThread {
 	my ($callback) = @_;
 	my $thread = WebGUI::Forum::Thread->new($session{form}{forumThreadId});
@@ -314,18 +359,18 @@ sub www_post {
 	my ($callback) = @_;
 	my ($subject, $message, $forum);
 	my $var;
-	$var->{header} = 'Post a Message';
-	$var->{isNewThread} = ($session{form}{forumId} ne "");
-	$var->{isReply} = ($session{form}{parentId} ne "");
-	$var->{isEdit} = ($session{form}{forumPostId} ne "");
-	$var->{isVisitor} = ($session{user}{userId} == 1);
-	$var->{isNewMessage} = ($var->{isNewThread} || $var->{isReply});
+	$var->{'newpost.header'} = 'Post a Message';
+	$var->{'newpost.isNewThread'} = ($session{form}{forumId} ne "");
+	$var->{'newpost.isReply'} = ($session{form}{parentId} ne "");
+	$var->{'newpost.isEdit'} = ($session{form}{forumPostId} ne "");
+	$var->{'user.isVisitor'} = ($session{user}{userId} == 1);
+	$var->{'newpost.isNewMessage'} = ($var->{isNewThread} || $var->{isReply});
 	$var->{'form.begin'} = WebGUI::Form::formHeader({
 		action=>$callback
 		});
 	my $defaultSubscribeValue = 0;
 	my $contentType = "mixed";
-	if ($var->{isReply}) {
+	if ($var->{'newpost.isReply'}) {
 		my $reply = WebGUI::Forum::Post->new($session{form}{parentId});
 		return WebGUI::Privilege::insufficient unless ($reply->getThread->getForum->canPost);
 		$var->{'form.begin'} .= WebGUI::Form::hidden({
@@ -338,7 +383,7 @@ sub www_post {
 		$subject = $reply->get("subject");
 		$subject = "Re: ".$subject unless ($subject =~ /^Re:/);
 	}
-	if ($var->{isNewThread}) {
+	if ($var->{'newpost.isNewThread'}) {
 		$var->{'form.begin'} .= WebGUI::Form::hidden({
 			name=>'forumId',
 			value=>$session{form}{forumId}
@@ -354,7 +399,7 @@ sub www_post {
 		}
 		$defaultSubscribeValue = 1 unless ($forum->isSubscribed);
 	}
-	if ($var->{isNewMessage}) {
+	if ($var->{'newpost.isNewMessage'}) {
 		$var->{'subscribe.label'} = WebGUI::International::get(873);
 		if ($forum->isModerator) {
 			$var->{'lock.label'} = WebGUI::International::get(1012);
@@ -368,7 +413,7 @@ sub www_post {
 			value=>$defaultSubscribeValue
 			});
 	}
-	if ($var->{isEdit}) {
+	if ($var->{'newpost.isEdit'}) {
 		my $post = WebGUI::Forum::Post->new($session{form}{forumPostId});
 		return WebGUI::Privilege::insufficient unless ($post->getThread->getForum->canPost);
 		$subject = $post->get("subject");
@@ -385,7 +430,7 @@ sub www_post {
 		name=>'contentType',
 		value=>[$contentType]
 		});
-	$var->{isModerator} = $forum->isModerator;
+	$var->{'user.isModerator'} = $forum->isModerator;
 	$var->{allowReplacements} = $forum->get("allowReplacements");
 	if ($forum->get("allowRichEdit")) {
 		$var->{'message.form'} = WebGUI::Form::HTMLArea({
@@ -399,7 +444,7 @@ sub www_post {
 			});
 	}
 	$var->{'message.label'} = WebGUI::International::get(230);
-	if ($var->{isVisitor}) {
+	if ($var->{'user.isVisitor'}) {
 		$var->{'visitorName.label'} = WebGUI::International::get(438);
 		$var->{'visitorName.form'} = WebGUI::Form::text({
 			name=>'visitorName'
@@ -442,6 +487,7 @@ sub www_postSave {
 		$postData{forumThreadId} = $parentPost->getThread->get("forumThreadId");
 		$postData{parentId} = $session{form}{parentId};
 		my $post = WebGUI::Forum::Post->create(\%postData);
+		notifySubscribers($post,$post->getThread,$post->getThread->getForum,$callback);
 		return www_viewThread($callback,$post->get("forumPostId"));
 	}
 	if ($session{form}{forumPostId} > 0) { # edit
@@ -483,6 +529,22 @@ sub www_ratePost {
 	return www_viewThread($callback,$session{form}{forumPostId});
 }
 
+sub www_threadSubscribe {
+	my ($callback) = @_;
+	my $post = WebGUI::Forum::Post->new($session{form}{forumPostId});
+	return WebGUI::Privilege::insufficient() unless ($session{user}{userId} != 1 && $post->getThread->getForum->canPost);
+	$post->getThread->subscribe;
+	return www_viewThread($callback, $session{form}{forumPostId});
+}
+
+sub www_threadUnsubscribe {
+	my ($callback) = @_;
+	my $post = WebGUI::Forum::Post->new($session{form}{forumPostId});
+	return WebGUI::Privilege::insufficient() unless ($session{user}{userId} != 1);
+	$post->getThread->unsubscribe;
+	return www_viewThread($callback, $session{form}{forumPostId});
+}
+
 sub www_viewThread {
 	my ($callback, $postId) = @_;
 	$postId = $session{form}{forumPostId} unless ($postId);
@@ -492,6 +554,13 @@ sub www_viewThread {
 	my $forum = $thread->getForum;
 	my $var = _getPostTemplateVars($post, $thread, $forum, $callback);
 	my $root = WebGUI::Forum::Post->new($thread->get("rootPostId"));
+	$var->{'user.canPost'} = $forum->canPost;
+	$var->{'user.isSubscribed'} = $thread->isSubscribed;
+	$var->{'user.isVisitor'} = ($session{user}{userId} == 1);
+	$var->{'thread.subscribe.url'} = _formatThreadSubscribeURL($callback,$postId);
+	$var->{'thread.subscribe.label'} = WebGUI::International::get(873);
+	$var->{'thread.unsubscribe.url'} = _formatThreadUnsubscribeURL($callback,$postId);
+	$var->{'thread.unsubscribe.label'} = WebGUI::International::get(874);
 	$var->{post_loop} = _recurseThread($root, $thread, $forum, 0, $callback, $postId);
 	$var->{'thread.layout.isFlat'} = ($session{user}{discussionLayout} eq "flat");
 	$var->{'thread.layout.isNested'} = ($session{user}{discussionLayout} eq "nested");
@@ -507,7 +576,6 @@ sub www_viewThread {
 	$var->{'thread.next.label'} = WebGUI::International::get(512);
 	$var->{'thread.list.url'} = $callback;
 	$var->{'thread.list.label'} = WebGUI::International::get(1019);
-	$var->{canPost} = $forum->canPost;
 	return WebGUI::Template::process(WebGUI::Template::get(1,"Forum/Thread"), $var); 
 }
 
