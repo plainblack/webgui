@@ -90,12 +90,10 @@ sub isInGroup {
 	if ($uid eq "") {
 		$uid = $session{user}{userId};
 	}
-	($result) = WebGUI::SQL->quickArray("select count(*) from groupings where groupId='$gid' and userId='$uid' and expireDate>".time());
-
 	if ($gid == 7) {
 		return 1;		# If the "Everyone" group is specified then return true regardless of the user.
 	}
-
+	($result) = WebGUI::SQL->quickArray("select count(*) from groupings where groupId='$gid' and userId='$uid' and expireDate>".time());
         if ($result < 1 && $gid != 3) {         # admins can
                 $result = isInGroup(3, $uid);   # do anything any 
         }                                       # user can do
