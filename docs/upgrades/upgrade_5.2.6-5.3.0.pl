@@ -39,12 +39,13 @@ $macros->{GroupDelete} = "GroupDelete";
 $macros->{SI} = "SI_scaledImage";
 $conf->set("macros"=>$macros);
 my $wobjects = $conf->get("wobjects");
-foreach my $i ($wobjects) {
-	if ($wobjects->[$i] eq "MailForm") {
-		$wobjects->[$i] = "DataForm";
+my @newWobjects = qw(DataForm);
+foreach (@{$wobjects}) {
+	unless ($_ eq "MailForm") {
+		push(@newWobjects, $_);
 	}
 }
-$conf->set("wobjects"=>$wobjects);
+$conf->set("wobjects"=>\@newWobjects);
 $conf->set("searchAndReplace"=>{ ":)"  => "<img src='/extras/smileys/smile01.gif' align='absMiddle' border='0'>", 
         			 ":-)" => "<img src='/extras/smileys/smile01.gif' align='absMiddle' border='0'>",
 				 ":("  => "<img src='/extras/smileys/smile02.gif' align='absMiddle' border='0'>", 

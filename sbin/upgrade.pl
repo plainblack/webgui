@@ -123,26 +123,33 @@ if (!($^O =~ /^Win/i) && $> != 0 && !$override) {
 	exit;
 }
 
-$|=1;
-my ($upgrade, @files, $file, $dbh, $config, $dir, %upgrade, %config);
+## Globals
 
+$| = 1;
+our $perl = $^X;
+our $slash;
+if ($^O =~ /^Win/i) {
+	$slash = "\\";
+} else {
+	$slash = "/";
+}
+our $upgradesPath = $webguiRoot.$slash."docs".$slash."upgrades".$slash;
+our $configsPath = $webguiRoot.$slash."etc".$slash;
+our (%upgrade, %config);
+
+
+## Find upgrade files.
 
 print "\nLooking for upgrade files...\n" unless ($quiet);
-if ($^O =~ /^Win/i) {
-        $dir = $webguiRoot."\\docs\\upgrades\\";
-} else {
-        $dir = $webguiRoot."/docs/upgrades/";
-}
-opendir(DIR,$dir) or die "Couldn't open $dir\n";
-@files = readdir(DIR);
+opendir(DIR,$upgradesPath) or die "Couldn't open $upgradesPath\n";
+my @files = readdir(DIR);
 closedir(DIR);
-foreach $file (@files) {
+foreach my $file (@files) {
 	if ($file =~ /upgrade_(\d+\.\d+\.\d+)-(\d+\.\d+\.\d+)\.(\w+)/) {
 		if (checkVersion($1)) {
-			$upgrade{$1}{dir} = $dir;
 			if ($3 eq "sql") {
 				print "\tFound upgrade script from $1 to $2.\n" unless ($quiet);
-				$upgrade{$1}{sql} = $dir.$file;
+				$upgrade{$1}{sql} = $file;
 			} elsif ($3 eq "pl") {
 				print "\tFound upgrade executable from $1 to $2.\n" unless ($quiet);
 				$upgrade{$1}{pl} = $file;
@@ -153,23 +160,18 @@ foreach $file (@files) {
 	}
 }
 
-
+## Find site configs.
 
 print "\nGetting site configs...\n" unless ($quiet);
-if ($^O =~ /^Win/i) {
-        $dir = $webguiRoot."\\etc\\";
-} else {
-        $dir = $webguiRoot."/etc/";
-}
-opendir (DIR,$dir) or die "Can't open $dir\n";
-@files=readdir(DIR);
+opendir (DIR,$configsPath) or die "Can't open $configsPath\n";
+my @files=readdir(DIR);
 closedir(DIR);
-foreach $file (@files) {
+foreach my $file (@files) {
 	if ($file =~ /(.*?)\.conf$/ && $file ne "some_other_site.conf") {
 		print "\tFound $file.\n" unless ($quiet);
-		$config{$file}{configFile} = $dir.$file;
+		$config{$file}{configFile} = $file;
 		my $config = Parse::PlainConfig->new('DELIM' => '=',
-                	'FILE' => $config{$file}{configFile},
+                	'FILE' => $configsPath.$config{$file}{configFile},
                 	'PURGE' => 1);
 		$config{$file}{dsn} = $config->get('dsn');
 		$config{$file}{dsn} =~ /^DBI\:(\w+)\:(\w+)(\:(.*)|)$/;
@@ -181,7 +183,7 @@ foreach $file (@files) {
 			$config{$file}{mysqlCLI} = $config->get('mysqlCLI');
 			$config{$file}{mysqlDump} = $config->get('mysqlDump');
 			$config{$file}{backupPath} = $config->get('backupPath');
-			$dbh = DBI->connect($config{$file}{dsn},$config{$file}{dbuser},$config{$file}{dbpass});
+			my $dbh = DBI->connect($config{$file}{dsn},$config{$file}{dbuser},$config{$file}{dbpass});
 			($config{$file}{version}) = WebGUI::SQL->quickArray("select webguiVersion from webguiVersion 
 				order by dateApplied desc, webguiVersion desc limit 1",$dbh);
 			$dbh->disconnect;
@@ -198,20 +200,20 @@ print "\nREADY TO BEGIN UPGRADES\n" unless ($quiet);
 
 my $notRun = 1;
 
-foreach $config (keys %config) {
+foreach my $config (keys %config) {
 	my $clicmd = $config{$config}{mysqlCLI} || $mysql;
 	my $dumpcmd = $config{$config}{mysqlDump} || $mysqldump;
 	my $backupTo = $config{$config}{backupPath} || $backupDir;
 	mkdir($backupTo);
 	while ($upgrade{$config{$config}{version}}{sql} ne "") {
-		$upgrade = $upgrade{$config{$config}{version}}{from};
+		my $upgrade = $upgrade{$config{$config}{version}}{from};
 		unless ($skipBackup) {
 			print "\n".$config{$config}{db}." ".$upgrade{$upgrade}{from}."-".$upgrade{$upgrade}{to}."\n" unless ($quiet);
 			print "\tBacking up $config{$config}{db} ($upgrade{$upgrade}{from})..." unless ($quiet);
 			my $cmd = $dumpcmd." -u".$config{$config}{dbuser}." -p".$config{$config}{dbpass};
 			$cmd .= " --host=".$config{$config}{host} if ($config{$config}{host});
 			$cmd .= " --add-drop-table --databases ".$config{$config}{db}." > "
-				.$backupTo."/".$config{$config}{db}."_".$upgrade{$upgrade}{from}.".sql";
+				.$backupTo.$slash.$config{$config}{db}."_".$upgrade{$upgrade}{from}.".sql";
 			unless (system($cmd)) {
 				print "OK\n" unless ($quiet);
 			} else {
@@ -221,18 +223,20 @@ foreach $config (keys %config) {
 		print "\tUpgrading to ".$upgrade{$upgrade}{to}."..." unless ($quiet);
 		my $cmd = $clicmd." -u".$config{$config}{dbuser}." -p".$config{$config}{dbpass};
 		$cmd .= " --host=".$config{$config}{host} if ($config{$config}{host});
-		$cmd .= " --database=".$config{$config}{db}." < ".$upgrade{$upgrade}{sql};
+		$cmd .= " --database=".$config{$config}{db}." < ".$upgradesPath.$upgrade{$upgrade}{sql};
 		unless (system($cmd)) {
 			print "OK\n" unless ($quiet);
 		} else {
                 	print "Failed!\n" unless ($quiet);
                 }
 		if ($upgrade{$upgrade}{pl} ne "") {
-			my $cmd = "cd ../docs/upgrades;perl ".$upgrade{$upgrade}{pl}." --configFile=".$config;
+			chdir($upgradesPath);
+			my $cmd = $perl." ".$upgrade{$upgrade}{pl}." --configFile=".$config;
 			$cmd .= " --quiet" if ($quiet);
 			if (system($cmd)) {
-				print "\tProcessing upgrade executable failed!\n";
+				print "\tProcessing upgrade executable failed! $!\n";
 			}
+			chdir("..".$slash."sbin");
 		}
 		$config{$config}{version} = $upgrade{$upgrade}{to};
 		$notRun = 0;
