@@ -23,5 +23,7 @@ delete from international where languageId=2 and namespace='WebGUI' and internat
 insert into international (internationalId,languageId,namespace,message,lastUpdated) values (526,2,'WebGUI','JavaScript entfernen und blockiere Makros.', 1049099918);
 alter table MailForm_field change validation validation varchar(255) not null default 'none';
 update MailForm_field set validation='none' where validation='';
+delete from international where languageId=2 and namespace='WobjectProxy' and internationalId=6;
+insert into international (internationalId,languageId,namespace,message,lastUpdated) values (6,2,'WobjectProxy','Mit dem Wobject Proxy können Sie ein bereits vorhandenes Wobject auf einer anderen Seite spiegeln, das heisst, das ein und das selbe Wobject auf mehreren Seiten vorkommen kann.<br><br>\r\n\r\n<b>Wobject To Proxy</b><br>\r\nWählen Sie ein Wobject aus Ihrem System aus, dass Sie als Proxy Element nutzen möchten. Die Auswahlbox hat das Format \"Seiten Titel/Wobject Name (Wobject ID), so dass Sie schnell und direkt das Wobject finden können, dass Sie benötigen.', 1049548414);
 
 
