@@ -428,6 +428,7 @@ sub getTemplateVars {
 				});
 		}
 	}
+	$self->getThread->getParent->appendTemplateLabels(\%var);
 	return \%var;
 }
 
@@ -986,7 +987,6 @@ sub www_edit {
 		name  => 'endDate',
 		value => $endDate
 		});
-	$self->getThread->getParent->appendTemplateLabels(\%var);
 	return $self->getThread->getParent->processStyle($self->processTemplate(\%var,$self->getThread->getParent->get("postFormTemplateId")));
 }
 
