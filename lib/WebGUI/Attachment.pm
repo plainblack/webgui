@@ -295,6 +295,8 @@ sub getIcon {
                 $icon .= "mrproject.gif";
         } elsif ($extension eq "css") {
                 $icon .= "css.gif";
+        } elsif ($extension eq "swf") {
+		$icon .= "swf.gif";
         } elsif ($extension eq "dia") {
                 $icon .= "dia.gif";
 	} else {
@@ -563,11 +565,11 @@ Provide the local path to this file.
 
 =item thumbnailSize
 
-If an image is being grabbed a thumbnail will be generated automatically. By default, WebGUI will create a thumbnail of the size specified in the file settings. You can override that size by specifying one here. Size is measured in pixels of the longest side.
+If an image is being grabbed a thumbnail will be generated automatically. By default, WebGUI will create a thumbnail of the size specified in the content settings. You can override that size by specifying one here. Size is measured in pixels of the longest side.
 
 =item imageSize
 
-If a web image (gif, png, jpg, jpeg) is being grabbed it will be resized if it is larger than this value. By default images are resized to stay within the contraints of the Max Image Size setting in the file settings.
+If a web image (gif, png, jpg, jpeg) is being grabbed it will be resized if it is larger than this value. By default images are resized to stay within the contraints of the Max Image Size setting in the content settings.
 
 =back
 
