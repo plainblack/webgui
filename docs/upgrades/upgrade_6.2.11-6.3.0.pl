@@ -6,6 +6,7 @@ use File::Path;
 use File::Copy;
 use Getopt::Long;
 use strict;
+use WebGUI::Group;
 use WebGUI::HTML;
 use WebGUI::Id;
 use WebGUI::Session;
@@ -46,6 +47,15 @@ foreach my $key (%threadTemplates) {
 	WebGUI::SQL::write("insert into template (templateId, namespace, template, name) values (".quote(WebGUI::Id::generate()).", 'Forum/Thread',
 		".quote($threadTemplates{$key}).", ".quote($key).")");
 }
+WebGUI::SQL->write("update template set templateId='25' where templateId='1' and namespace in ('Forum','Forum/Thread','Forum/PostForm')");
+WebGUI::SQL->write("update forum set forumTemplateId='25' where forumTemplateId='1'");
+WebGUI::SQL->write("update forum set postFormTemplateId='25' where postFormTemplateId='1'");
+WebGUI::SQL->write("update forum set threadTemplateId='25' where threadTemplateId='1'");
+WebGUI::SQL->write("update template set templateId=concat('NNN',templateId) where templateId like '10%' and namespace in ('Forum','Forum/Thread','Forum/PostForm')");
+WebGUI::SQL->write("update forum set forumTemplateId=concat('NNN',forumTemplateId) where forumTemplateId like '10%'");
+WebGUI::SQL->write("update forum set postFormTemplateId=concat('NNN',postFormTemplateId) where postFormTemplateId like '10%'");
+WebGUI::SQL->write("update forum set threadTemplateId=concat('NNN',threadTemplateId) where threadTemplateId like '10%'");
+
 
 
 print "\tFixing navigation template variables.\n" unless ($quiet);
@@ -79,7 +89,7 @@ WebGUI::SQL->write("delete from settings where name in ('siteicon','favicon')");
 
 print "\tMigrating wobject templates to asset templates.\n" unless ($quiet);
 my $sth = WebGUI::SQL->read("select templateId, template, namespace from template where namespace in ('Article', 
-		'USS', 'SyndicatedContent', 'MessageBoard', 'DataForm', 'EventsCalendar', 'HttpProxy', 'Poll', 'Product', 'WobjectProxy',
+		'SyndicatedContent', 'MessageBoard', 'DataForm', 'EventsCalendar', 'HttpProxy', 'Poll', 'Product', 'WobjectProxy',
 		'IndexedSearch', 'SQLReport', 'Survey', 'WSClient')");
 while (my $t = $sth->hashRef) {
 	$t->{template} = '<a name="<tmpl_var assetId>"></a>
@@ -211,17 +221,6 @@ WebGUI::SQL->write("alter table DataForm_entry drop column wobjectId");
 WebGUI::SQL->write("alter table DataForm_entryData drop column wobjectId");
 WebGUI::SQL->write("alter table DataForm_field drop column wobjectId");
 WebGUI::SQL->write("alter table DataForm_tab drop column wobjectId");
-WebGUI::SQL->write("alter table USS_submission drop column forumId");
-WebGUI::SQL->write("alter table USS_submission drop column sequenceNumber");
-WebGUI::SQL->write("alter table USS_submission drop column startDate");
-WebGUI::SQL->write("alter table USS_submission drop column title");
-WebGUI::SQL->write("alter table USS_submission drop column USS_id");
-WebGUI::SQL->write("alter table USS_submission drop column endDate");
-WebGUI::SQL->write("alter table USS_submission drop column USS_submissionId");
-WebGUI::SQL->write("alter table USS_submission drop column pageId");
-WebGUI::SQL->write("alter table USS_submission drop column image");
-WebGUI::SQL->write("alter table USS_submission drop column attachment");
-WebGUI::SQL->write("alter table USS_submission add primary key (assetId)");
 WebGUI::SQL->write("alter table Product_accessory drop column wobjectId");
 WebGUI::SQL->write("alter table Product_benefit drop column wobjectId");
 WebGUI::SQL->write("alter table Product_feature drop column wobjectId");
@@ -238,6 +237,8 @@ WebGUI::SQL->write("drop table forumSubscription");
 WebGUI::SQL->write("drop table forumThread");
 WebGUI::SQL->write("drop table forumThreadSubscription");
 WebGUI::SQL->write("drop table MessageBoard_forums");
+WebGUI::SQL->write("drop table USS");
+WebGUI::SQL->write("drop table USS_submission");
 
 # start migrating non-wobject stuff into assets
 my %migration;
@@ -574,7 +575,7 @@ WebGUI::SQL->write("alter table template drop primary key");
 WebGUI::SQL->write("alter table template drop column templateId");
 WebGUI::SQL->write("alter table template drop column name");
 WebGUI::SQL->write("alter table template add primary key (assetId)");
-my @wobjectTypes = qw(Article Poll Survey USS WSClient DataForm Layout EventsCalendar Navigation HttpProxy IndexedSearch MessageBoard Product SQLReport SyndicatedContent Shortcut);
+my @wobjectTypes = qw(Article Poll Survey WSClient DataForm Layout EventsCalendar Navigation HttpProxy IndexedSearch MessageBoard Product SQLReport SyndicatedContent Shortcut);
 my @allWobjectTypes = (@wobjectTypes,@otherWobjects);
 print "\t\tMigrating wobject templates to new IDs\n" unless ($quiet);
 foreach my $type (@allWobjectTypes) {
@@ -609,13 +610,16 @@ while (my ($assetId, $emailId, $ackId, $listId) = $sth->array) {
 		});
 }
 $sth->finish;
-print "\t\tMigrating USS templates to new IDs\n" unless ($quiet);
-my $sth = WebGUI::SQL->read("select assetId, submissionTemplateId, submissionFormTemplateId from USS");
-while (my ($assetId, $subId, $formId) = $sth->array) {
-	WebGUI::SQL->setRow("USS","assetId",{
+print "\t\tMigrating Collaboration templates to new IDs\n" unless ($quiet);
+my $sth = WebGUI::SQL->read("select assetId, collaborationTemplateId, postFormTemplateId, threadTemplateId, searchTemplateId, notificationTemplateId from Collaboration");
+while (my ($assetId, $collabId, $formId, $threadId, $searchId, $notId) = $sth->array) {
+	WebGUI::SQL->setRow("Collaboration","assetId",{
 		assetId=>$assetId,
-		submissionTemplateId=>$templateCache{"USS/Submission"}{$subId},
-		submissionFormTemplateId=>$templateCache{"USS/SubmissionForm"}{$formId}
+		collaborationTemplateId=>$templateCache{"Collaboration"}{$collabId},
+		searchTemplateId=>$templateCache{"Collaboration/Search"}{$searchId},
+		threadTemplateId=>$templateCache{"Collaboration/Thread"}{$threadId},
+		notificationTemplateId=>$templateCache{"Collaboration/Notification"}{$notId},
+		postFormTemplateId=>$templateCache{"Collaboration/PostForm"}{$formId}
 		});
 }
 print "\t\tMigrating Shortcut templates to new IDs\n" unless ($quiet);
@@ -1130,7 +1134,7 @@ sub walkTree {
 				print "\t\t\tConverting File Manager ".$wobject->{wobjectId}." into File Folder Layout\n" unless ($quiet);
 				WebGUI::SQL->write("update asset set className='WebGUI::Asset::Layout' where assetId=".quote($wobjectId));
 				WebGUI::SQL->write("insert into Layout (assetId,templateId) values (".quote($wobjectId).", '15')");
-				WebGUI::SQL->write("update wobject set namespace='Layout' where wobjectId=".quote($wobjectId));
+				WebGUI::SQL->write("update wobject set namespace='Layout' where wobjectId=".quote($wobject->{wobjectId}));
 				print "\t\t\tMigrating attachments for File Manager ".$wobject->{wobjectId}."\n" unless ($quiet);
 				my $sth = WebGUI::SQL->read("select * from FileManager_file where wobjectId=".quote($wobjectId)." order by sequenceNumber");
 				my $rank = 1;
@@ -1205,17 +1209,50 @@ sub walkTree {
 					WebGUI::SQL->write("update $table set assetId=".quote($wobjectId)." where wobjectId=".quote($wobject->{wobjectId}));
 				}
 			} elsif ($wobject->{namespace} eq "USS") {
+				print "\t\t\tConverting USS to collaboration system ".$wobject->{wobjectId}."\n" unless ($quiet);
+				WebGUI::SQL->write("update asset set className='WebGUI::Asset::Wobject::Collaboration' where assetId=".quote($wobjectId));
+				my $moderate = ($namespace->{defaultStatus} eq 'Approved') ? 0 : 1;
+				my $master = WebGUI::SQL->quickHashRef("select * from forum where forumId=".quote($wobject->{forumId}));
+				my $sg = WebGUI::Group->new("new");
+				$sg->description("The group to store subscriptions for the collaboration system $wobjectId");
+				$sg->name($wobjectId);
+				$sg->showInForms(0);
+				$sg->isEditable(0);
+				$sg->deleteGroups(['3']);
+				WebGUI::SQL->write("insert into Collaboration (assetId,postGroupId,moderateGroupId,moderatePosts,karmaPerPost,
+					collaborationTemplateId, threadTemplateId, postFormTemplateId, searchTemplateId, notificationTemplateId,
+					sortBy, sortOrder, usePreview, addEditStampToPosts, editTimeout, attachmentsPerPost, allowRichEdit, filterCode,
+					useContentFilter, rating, archiveAfter, postsPerPage, threadsPerPage, subscriptionGroupId,
+					allowReplies) values (".quote($wobjectId).", ".quote($namespace->{groupToContribute}).", 
+					".quote($namespace->{groupToApprove}).", $moderate, ".quote($namespace->{karmaPerSubmission}).", 
+					".quote($wobject->{templateId}).", ".quote($namespace->{submissionTemplateId}).", 
+					".quote($namespace->{submissionFormTemplateId}).", ".quote($master->{searchTemplateId}||1).", 
+					".quote($master->{notificationTemplateId}||1)." , ".quote($namespace->{sortBy}).",
+					".quote($namespace->{sortOrder}).", 0, 0, 931536000, 2, 1, ".quote($namespace->{filterContent}).",
+					0, 0, ".quote($master->{archiveAfter}||31536000).", ".quote($master->{postsPerPage}||10).", 
+					".quote($namespace->{submissionsPerPage}).", ".quote($sg->groupId).",
+					".quote($wobject->{allowDiscussion}).")");
+				#count threads, views, replies
+				#find last post
+				WebGUI::SQL->write("update wobject set namespace='Collaboration' where wobjectId=".quote($wobject->{wobjectId}));
 				print "\t\t\tMigrating submissions for USS ".$wobject->{wobjectId}."\n" unless ($quiet);
-				my ($ussId) = WebGUI::SQL->quickArray("select USS_id from USS where wobjectId=".quote($wobject->{wobjectId}));
+				my $ussId = $namespace->{USS_id};
 				my $sth = WebGUI::SQL->read("select * from USS_submission where USS_id=".quote($ussId));
 				my $usssubrank = 1;
+				my $collabReplyCounter;
+				my $collabViewCounter;
+				my $collabThreadCounter;
+				my %oldestForumPost;
 				while (my $submission = $sth->hashRef) {
+					$collabThreadCounter++;
+					$collabViewCounter += $submission->{views};
 					print "\t\t\t\tMigrating submission ".$submission->{USS_submissionId}."\n" unless ($quiet);
 					my $body = $submission->{content};
                 			$body =~ s/\n/\^\-\;/ unless ($body =~ m/\^\-\;/);
                 			my @content = split(/\^\-\;/,$body);
 					$content[0] = WebGUI::HTML::filter($content[0],"none");
 					$body =~ s/\^\-\;/\n/;
+					my $threadLineage = $wobjectLineage.sprintf("%06d",$usssubrank);
 					my $id = WebGUI::SQL->setRow("asset","assetId",{
 						assetId => "new",
 						title => $submission->{title},
@@ -1231,15 +1268,98 @@ sub walkTree {
 						synopsis=>$content[0],
 						assetSize=>length($submission->{content}),
 						parentId=>$wobjectId,
-						lineage=>$wobjectLineage.sprintf("%06d",$usssubrank),
+						lineage=>$threadLineage,
 						isHidden => 1
 						});	
-					WebGUI::SQL->write("update USS_submission set content=".quote($body).", 
-						assetId=".quote($id)." where USS_submissionId=".quote($submission->{USS_submissionId}));	
+					WebGUI::SQL->setRow("Post","assetId",{
+						assetId=>$id,
+						threadId=>$id,
+						dateSubmitted=>$submission->{dateSubmitted},
+						dateUpdated=>$submission->{dateUpdated},
+						username=>$submission->{username},
+						content=>$body,
+						status=>lc($submission->{status}),
+						views=>$submission->{views},
+						contentType=>$submission->{contentType},
+						rating=>0
+						},undef,$id);
+					my $threadSubscriptionGroup = WebGUI::Group->new("new");
+					$threadSubscriptionGroup->description("The group to store subscriptions for the thread $id");
+					$threadSubscriptionGroup->name($id);
+					$threadSubscriptionGroup->showInForms(0);
+					$threadSubscriptionGroup->isEditable(0);
+					$threadSubscriptionGroup->deleteGroups(['3']);
+					WebGUI::SQL->setRow("Thread","assetId",{
+						assetId=>$id,
+						isLocked=>0,
+						isSticky=>0,
+						subscriptionGroupId=>$threadSubscriptionGroup->groupId
+						}, undef, $id);
+					my %oldestThreadPost;
+					my $posts = WebGUI::SQL->read("select forumPost.* from forumPost left join forumThread on forumPost.forumThreadId=forumThread.forumThreadId where forumId=".quote($submission->{forumId}));
+					my $postRank = 1;
+					my $threadReplyCounter;
+					while (my $post = $posts->hashRef) {
+						$collabViewCounter += $post->{views};
+						$threadReplyCounter++;
+						my $postId = WebGUI::SQL->setRow("asset","assetId",{
+							assetId=>"new",
+							parentId=>$id,
+							lineage=>$threadLineage.sprintf("%06d",$postRank),
+							state=>'published',
+							className=>'WebGUI::Asset::Post',
+							title=>$post->{subject},
+							menuTitle=>$post->{subject},
+							url=>fixUrl("noneyet",$wobject->{title}.'/'.$submission->{title}.'/'.$post->{subject}),
+							startDate=>$submission->{startDate},
+							endDate=>$submission->{endDate},
+							ownerUserId=>$post->{userId},
+							groupIdView=>$page->{groupIdView},
+							groupIdEdit=>$page->{groupIdEdit},
+							isHidden=>1,
+							lastUpdated=>$post->{dateOfPost},
+							lastUpdatedBy=>$post->{userId}
+							});
+						if ($oldestThreadPost{date} < $post->{dateOfPost}) {
+							$oldestThreadPost{date} = $post->{dateOfPost};
+							$oldestThreadPost{id} = $postId;
+						}
+						WebGUI::SQL->setRow("Post","assetId",{
+							assetId=>$postId,
+							threadId=>$id,
+							dateSubmitted=>$post->{dateOfPost},
+							dateUpdated=>$post->{dateOfPost},
+							username=>$post->{username},
+							content=>$post->{message},
+							status=>$post->{status},
+							views=>$post->{views},
+							contentType=>$post->{contentType},
+							rating=>$post->{rating}
+							},undef,$postId);
+						$postRank++;
+					}
+					$posts->finish;
+					WebGUI::SQL->setRow("Thread","assetId",{
+						assetId=>$id,
+						lastPostId=>$oldestThreadPost{id},
+						lastPostDate=>$oldestThreadPost{date},
+						replies=>$threadReplyCounter
+						});
 					$usssubrank++;
+					$collabReplyCounter += $threadReplyCounter;
+					if ($oldestForumPost{date} < $oldestThreadPost{date}) {
+						$oldestForumPost{date} = $oldestThreadPost{date};
+						$oldestForumPost{id} = $oldestThreadPost{id};
+					}
 				}
-				# migrate master forum
-				# migrate submission forums
+				WebGUI::SQL->setRow("Collaboration","assetId",{
+					assetId=>$wobjectId,
+					lastPostId=>$oldestForumPost{id},
+					lastPostDate=>$oldestForumPost{date},
+					replies=>$collabReplyCounter,	
+					views=>$collabViewCounter,
+					threads=>$collabThreadCounter
+					});
 				# migrate submission attachments
 				# migrate submission images
 			} elsif ($wobject->{namespace} eq "WobjectProxy") {
@@ -1601,7 +1721,7 @@ sub getNewId {
                       'Operation/MessageLog/View' => {
                                                        '1' => 'PBtmpl0000000000000050'
                                                      },
-                      'Forum/Search' => {
+                      'Collaboration/Search' => {
                                           '1' => 'PBtmpl0000000000000031'
                                         },
                       'Auth/WebGUI/Account' => {
@@ -1613,9 +1733,6 @@ sub getNewId {
                       'Operation/Profile/View' => {
                                                     '1' => 'PBtmpl0000000000000052'
                                                   },
-                      'Forum/PostForm' => {
-                                            '1' => 'PBtmpl0000000000000029'
-                                          },
                       'Operation/RedeemSubscription' => {
                                                           '1' => 'PBtmpl0000000000000053'
                                                         },
@@ -1650,9 +1767,6 @@ sub getNewId {
                       'AttachmentBox' => {
                                            '1' => 'PBtmpl0000000000000003'
                                          },
-                      'Forum' => {
-                                   '1' => 'PBtmpl0000000000000026'
-                                 },
                       'Poll' => {
                                   '1' => 'PBtmpl0000000000000055'
                                 },
@@ -1728,7 +1842,8 @@ sub getNewId {
                       'Macro/H_homeLink' => {
                                               '1' => 'PBtmpl0000000000000042'
                                             },
-                      'USS' => {
+                      'Collaboration' => {
+                                   '25' => 'PBtmpl0000000000000026',
                                  '6' => 'PBtmpl0000000000000133',
                                  '21' => 'PBtmpl0000000000000102',
                                  '3' => 'PBtmpl0000000000000112',
@@ -1740,7 +1855,6 @@ sub getNewId {
                                  '4' => 'PBtmpl0000000000000121',
                                  '1' => 'PBtmpl0000000000000066',
                                  '18' => 'PBtmpl0000000000000082',
-                                 '1000' => 'PBtmpl0000000000000074',
                                  '16' => 'PBtmpl0000000000000080',
                                  '19' => 'PBtmpl0000000000000083',
                                  '5' => 'PBtmpl0000000000000128'
@@ -1807,7 +1921,8 @@ sub getNewId {
                       'Commerce/CheckoutCanceled' => {
                                                        '1' => 'PBtmpl0000000000000015'
                                                      },
-                      'USS/Submission' => {
+                      'Collaboration/Thread' => {
+                                          '25' => 'PBtmpl0000000000000032',
                                             '1' => 'PBtmpl0000000000000067',
                                             '3' => 'PBtmpl0000000000000113',
                                             '2' => 'PBtmpl0000000000000098'
@@ -1824,7 +1939,8 @@ sub getNewId {
                       'SyndicatedContent' => {
                                                '1' => 'PBtmpl0000000000000065'
                                              },
-                      'USS/SubmissionForm' => {
+                      'Collaboration/PostForm' => {
+                                            '25' => 'PBtmpl0000000000000029',
                                                 '4' => 'PBtmpl0000000000000122',
                                                 '1' => 'PBtmpl0000000000000068',
                                                 '3' => 'PBtmpl0000000000000114',
@@ -1836,7 +1952,7 @@ sub getNewId {
                       'Macro/GroupAdd' => {
                                             '1' => 'PBtmpl0000000000000040'
                                           },
-                      'Forum/Notification' => {
+                      'Collaboration/Notification' => {
                                                 '1' => 'PBtmpl0000000000000027'
                                               },
                       'Auth/LDAP/Login' => {
@@ -1854,12 +1970,6 @@ sub getNewId {
                       'richEditor' => {
                                         'tinymce' => 'PBtmpl0000000000000138',
                                         '5' => 'PBtmpl0000000000000126'
-                                      },
-                      'Forum/Thread' => {
-                                          '1' => 'PBtmpl0000000000000032'
-                                        },
-                      'Forum/Post' => {
-                                        '1' => 'PBtmpl0000000000000028'
                                       },
                       'Macro/EditableToggle' => {
                                                   '1' => 'PBtmpl0000000000000038'
