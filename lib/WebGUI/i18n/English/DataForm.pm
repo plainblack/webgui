@@ -329,7 +329,7 @@ WebGUI's administrative controls for this field.
 </blockquote>
 
 <b>field.noloop.<i>fieldName</i>.<i>property</i></b><br>
-Except from within the <b>field_loop</b> it's also possible to access all formfields directly. To accomplish this you should use these variables. Call them with field.noloop.<i>fieldName</i>.<i>property</i>, where fieldName is the name of the field (not the label) and property is anyone of the properties supplied by the <b>field_loop</b>. If you want the form tag of field 'name' you should use <tmpl_var field.noloop.name.form> anywhere in your template. If you want to know if the field is required use field.noloop.name.isRequired.
+From outside the <b>field_loop</b> it's also possible to access all form fields directly. To accomplish this you should use these variables. Call them with <b>field.noloop.<i>fieldName</i>.<i>property</i></b>, where fieldName is the name of the field (not the label) and property is anyone of the properties supplied by the <b>field_loop</b>. If you want the form tag of field 'name' you should use <b>field.noloop.name.form</b> anywhere in your template. If you want to know if the field is required use <b>field.noloop.name.isRequired</b>.
 <p>
 
 <b>form.send</b><br>
@@ -345,7 +345,7 @@ The end of the form.
 <p>
 
 *Only available if the user has already submitted the form.|,
-		lastUpdated => 1090575731
+		lastUpdated => 1098920726
 	},
 
 	'61' => {
