@@ -528,7 +528,7 @@ sub contentType {
 
 #-------------------------------------------------------------------
 
-=head2 date (  [name , value, label, afterEdit, extras, uiLevel ] )
+=head2 databaseLink (  [name , value, label, afterEdit, extras, uiLevel ] )
 
 Adds a database link select list to the form.
 
