@@ -70,8 +70,7 @@ These methods are available from this package:
 #-------------------------------------------------------------------
 sub _getEditButton {
         my $self = shift;
-        return editIcon("op=editNavigation&navigationId=".$self->{_navigationId}."&identifier=".$self->{_identifier})
-              .copyIcon('op=copyNavigation&identifier='.$self->{_identifier}.'&navigationId='.$self->{_navigationId});
+        return editIcon("op=editNavigation&navigationId=".$self->{_navigationId}."&identifier=".$self->{_identifier});
 }
 
 #-------------------------------------------------------------------
