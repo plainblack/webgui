@@ -121,12 +121,12 @@ Name value pairs to add to the URL in the form of:
 
 sub gateway {
         my $url = getScriptURL().$_[0];
-	if ($_[1]) {
-		$url = append($url,$_[1]);
-	}
         if ($session{setting}{preventProxyCache} == 1) {
                 $url = append($url,"noCache=".randint(0,1000).';'.time());
         }
+	if ($_[1]) {
+		$url = append($url,$_[1]);
+	}
         return $url;
 }
 
@@ -258,12 +258,14 @@ sub page {
         } else {
                 $url = getScriptURL();
         }
-        $url .= $session{page}{urlizedTitle};
-        if ($pairs) {
-                $url = append($url,$pairs);
-        }
+       	my $pathinfo = $session{env}{PATH_INFO};
+	$pathinfo =~ s/^\/(.*)/$1/;
+        $url .= $pathinfo;
         if ($session{setting}{preventProxyCache} == 1) {
                 $url = append($url,"noCache=".randint(0,1000).';'.time());
+        }
+        if ($pairs) {
+                $url = append($url,$pairs);
         }
         return $url;
 }

@@ -2075,10 +2075,6 @@ Choose which group can view this page. If you want both visitors and registered 
 Choose the group that can edit this page. The group assigned editing rights can also always view the page.
 <p>
 
-<b>Wobject privileges?</b><br>
-Allows content managers to specify view/edit privileges on a per wobject basis rather than relying on the privileges on the page.
-<p>
-
 <b>Recursively set privileges?</b><br>
 You can optionally give the privileges of this page to all pages under this page.
 <p>
@@ -4016,11 +4012,6 @@ The toolbar for manipulating the properties of the page.
 	'326' => {
 		message => q|Home Zip Code|,
 		lastUpdated => 1031514049
-	},
-
-	'1003' => {
-		message => q|Wobject privileges?|,
-		lastUpdated => 1056041703
 	},
 
 	'555' => {

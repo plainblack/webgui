@@ -32,7 +32,7 @@ sub process {
                 $var{'toggle.url'} = WebGUI::URL::page('op=logout');
                	$var{'toggle.text'} = $logout;
         }
-        return  WebGUI::Template::process(WebGUI::Template::getIdByName($param[3],"Macro/LoginToggle"), "Macro/LoginToggle", \%var);
+        return  WebGUI::Template::process(WebGUI::Template::getIdByName($param[3],"Macro/LoginToggle")||1, "Macro/LoginToggle", \%var);
 }
 
 

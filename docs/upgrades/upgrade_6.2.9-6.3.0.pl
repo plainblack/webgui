@@ -50,10 +50,24 @@ $sth->finish;
 WebGUI::SQL->write("delete from settings where name in ('siteicon','favicon')");
 
 
+print "\tMigrating wobject templates to asset templates.\n" unless ($quiet);
+my $sth = WebGUI::SQL->read("select templateId, template, namespace from template where namespace in ('Article', 
+		'USS', 'SyndicatedContent', 'MessageBoard', 'DataForm', 'EventsCalendar', 'HttpProxy', 'Poll', 'WobjectProxy',
+		'IndexedSearch', 'SQLReport', 'Survey', 'WSClient')");
+while (my $t = $sth->hashRef) {
+	$t->{template} = '<a name="<tmpl_var assetId>"></a>
+<tmpl_if session.var.adminOn>
+	<p><tmpl_var controls></p>
+</tmpl_if>	
+		'.$t->{template};
+	WebGUI::SQL->write("update template set template=".quote($t->{template})." where templateId=".quote($t->{templateId})." and namespace=".quote($t->{namespace}));
+}
+$sth->finish;
+
 
 # <this is here because we don't want to actually migrate stuff yet
-WebGUI::Session::close();
-exit;
+#WebGUI::Session::close();
+#exit;
 # >this is here because we don't want to actually migrate stuff yet
 
 
@@ -64,6 +78,8 @@ print "\t\tMaking first round of table structure changes\n" unless ($quiet);
 WebGUI::SQL->write("alter table wobject add column assetId varchar(22) not null");
 WebGUI::SQL->write("alter table wobject add styleTemplateId varchar(22) not null");
 WebGUI::SQL->write("alter table wobject add printableStyleTemplateId varchar(22) not null");
+WebGUI::SQL->write("alter table wobject add cacheTimeout int not null default 60");
+WebGUI::SQL->write("alter table wobject add cacheTimeoutVisitor int not null default 3600");
 WebGUI::SQL->write("alter table wobject drop primary key");
 my $sth = WebGUI::SQL->read("select distinct(namespace) from wobject");
 while (my ($namespace) = $sth->array) {
@@ -130,24 +146,33 @@ sub walkTree {
 	while (my $page = $a->hashRef) {
 		print "\t\tConverting page ".$page->{pageId}."\n" unless ($quiet);
 		my $pageId = WebGUI::Id::generate();
+		if ($page->{pageId} eq $session{setting}{defaultPage}) {
+			WebGUI::SQL->write("update settings set value=".quote($pageId)." where name='defaultPage'");
+		}
+		if ($page->{pageId} eq $session{setting}{notFoundPage}) {
+			WebGUI::SQL->write("update settings set value=".quote($pageId)." where name='notFoundPage'");
+		}
 		my $pageLineage = $parentLineage.sprintf("%06d",$myRank);
 		my $pageUrl = fixUrl($pageId,$page->{urlizedTitle});
-		my $className = 'WebGUI::Asset::Layout';
+		my $className = 'WebGUI::Asset::Wobject::Layout';
 		if ($page->{redirectURL} ne "") {
 			$className = 'WebGUI::Asset::Redirect';
 		}
 		WebGUI::SQL->write("insert into asset (assetId, parentId, lineage, className, state, title, menuTitle, url, startDate, 
-			endDate, synopsis, newWindow, isHidden, ownerUserId, groupIdView, groupIdEdit, encryptPage ) values (".quote($pageId).",
+			endDate, synopsis, newWindow, isHidden, ownerUserId, groupIdView, groupIdEdit, encryptPage, assetSize ) values (".quote($pageId).",
 			".quote($newParentId).", ".quote($pageLineage).", ".quote($className).",'published',".quote($page->{title}).",
 			".quote($page->{menuTitle}).", ".quote($pageUrl).", ".quote($page->{startDate}).", ".quote($page->{endDate}).",
 			".quote($page->{synopsis}).", ".quote($page->{newWindow}).", ".quote($page->{hideFromNavigation}).", ".quote($page->{ownerId}).",
-			".quote($page->{groupIdView}).", ".quote($page->{groupIdEdit}).", ".quote($page->{encryptPage}).")");
+			".quote($page->{groupIdView}).", ".quote($page->{groupIdEdit}).", ".quote($page->{encryptPage}).",
+			".length($page->{title}.$page->{menuTitle}.$page->{synopsis}.$page->{urlizedTitle}).")");
 		if ($page->{redirectURL} ne "") {
 			WebGUI::SQL->write("insert into redirect (assetId, redirectUrl) values (".quote($pageId).",".quote($page->{redirectURL}).")");
 		} else {
-			WebGUI::SQL->write("insert into wobject (assetId, styleTemplateId, templateId, printableStyleTemplateId) values (
+			WebGUI::SQL->write("insert into wobject (assetId, styleTemplateId, templateId, printableStyleTemplateId, 
+				cacheTimeout, cacheTimeoutVisitor, displayTitle) values (
 				".quote($pageId).", ".quote($page->{styleId}).", ".quote($page->{templateId}).", 
-				".quote($page->{printableStyleId}).")");
+				".quote($page->{printableStyleId}).", ".quote($page->{cacheTimeout}).",".quote($page->{cacheTimeoutVisitor}).",
+				0)");
 			WebGUI::SQL->write("insert into layout (assetId) values (".quote($pageId).")");
 		}
 		my $rank = 1;
@@ -169,12 +194,14 @@ sub walkTree {
 			}
 			$className = 'WebGUI::Asset::Wobject::'.$wobject->{namespace};
 			WebGUI::SQL->write("insert into asset (assetId, parentId, lineage, className, state, title, menuTitle, url, startDate, 
-				endDate, isHidden, ownerUserId, groupIdView, groupIdEdit, encryptPage) values (".quote($wobjectId).",
-				".quote($pageId).", ".quote($wobjectLineage).", ".quote($className).",'published',".quote($page->{title}).",
-				".quote($page->{title}).", ".quote($wobjectUrl).", ".quote($wobject->{startDate}).", ".quote($wobject->{endDate}).",
-				1, ".quote($ownerId).", ".quote($groupIdView).", ".quote($groupIdEdit).", ".quote($page->{encryptPage}).")");
+				endDate, isHidden, ownerUserId, groupIdView, groupIdEdit, encryptPage, assetSize) values (".quote($wobjectId).",
+				".quote($pageId).", ".quote($wobjectLineage).", ".quote($className).",'published',".quote($wobject->{title}).",
+				".quote($wobject->{title}).", ".quote($wobjectUrl).", ".quote($wobject->{startDate}).", ".quote($wobject->{endDate}).",
+				1, ".quote($ownerId).", ".quote($groupIdView).", ".quote($groupIdEdit).", ".quote($page->{encryptPage}).",
+				".length($wobject->{title}.$wobject->{description}).")");
 			WebGUI::SQL->write("update wobject set assetId=".quote($wobjectId).", styleTemplateId=".quote($page->{styleId}).",
-				printableStyleTemplateId=".quote($page->{printableStyleId})." where wobjectId=".quote($wobject->{wobjectId}));
+				printableStyleTemplateId=".quote($page->{printableStyleId}).", cacheTimeout=".quote($page->{cacheTimeout})
+				.", cacheTimeoutVisitor=".quote($page->{cacheTimeoutVisitor})." where wobjectId=".quote($wobject->{wobjectId}));
 			WebGUI::SQL->write("update ".$wobject->{namespace}." set assetId=".quote($wobjectId)." where wobjectId="
 				.quote($wobject->{wobjectId}));
 			if ($wobject->{namespace} eq "Article") {
@@ -244,6 +271,25 @@ sub walkTree {
 			$rank++;
 		}
 		$b->finish;
+		if ($className eq "WebGUI::Asset::Wobject::Layout") { # Let's position some content
+			my $positions;
+			my $last = 1;
+			my @assets;
+			my @positions;
+			my $b = WebGUI::SQL->read("select assetId, templatePosition from wobject where pageId=".quote($page->{pageId})."
+				order by templatePosition, sequenceNumber");
+			while (my ($assetId, $position) = $b->array) {
+				if ($position ne $last) {
+					push(@positions,join(",",@assets));
+					@assets = ();
+				}
+				$last = $position;
+				push(@assets,$assetId);
+			}
+			$b->finish;
+			my $contentPositions = join("\.",@positions);
+			WebGUI::SQL->write("update layout set contentPositions=".quote($contentPositions)." where assetId=".quote($pageId));
+		}
 		walkTree($page->{pageId},$pageId,$pageLineage,$rank);
 		$myRank++;
 	}

@@ -93,6 +93,15 @@ sub getEditForm {
 
 
 #-------------------------------------------------------------------
+sub getIcon {
+	my $self = shift;
+	my $small = shift;
+	return $session{config}{extrasURL}.'/assets/small/redirect.gif' if ($small);
+	return $session{config}{extrasURL}.'/assets/redirect.gif';
+}
+
+
+#-------------------------------------------------------------------
 
 =head2 getUiLevel ()
 

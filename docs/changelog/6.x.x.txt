@@ -1,9 +1,16 @@
 6.3.0
+ - Migrated all wobjects to assets.
+ - Migrated pages to the layout and redirect assets.
+ - Converted site maps to navigation macros.
+ - Converted file managers to layout assets with file and image assets
+   attached.
+ - Converted page templates to use CSS-based layouts instead of tables.
  - Added a "Position" property to the DataForm Edit Field interface. This makes it easier to move a field to a certain position. (Len Kranendonk).
  - Added the variables "record.edit.icon", "record.delete.url" and "record.delete.icon" to the DataForm DataList template. (Len Kranendonk).
  - Converted all confirmation pages to client-side confirmation dialogs. Saves
    a pageload. (Len Kranendonk).
- - Added a new, more user-friendly administrative console.
+ - Added a new, more user-friendly administrative console complete with over
+   40 new icons developed specifically for WebGUI.
  - SQL Report now supports multiple queries. (Thanks to Brunswick New
    Technologies for funding this development.)
  - Removed the old rich editors and replaced them with Tiny MCE.

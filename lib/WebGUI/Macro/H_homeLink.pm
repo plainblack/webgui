@@ -23,7 +23,7 @@ sub process {
 	if ($session{setting}{defaultPage} eq $session{page}{pageId}) {
 		$temp = $session{page}{urlizedTitle};
 	} else {
-		($temp) = WebGUI::SQL->quickArray("select urlizedTitle from page where pageId=".quote($session{setting}{defaultPage}),WebGUI::SQL->getSlave);
+		($temp) = WebGUI::SQL->quickArray("select url from asset where assetId=".quote($session{setting}{defaultPage}),WebGUI::SQL->getSlave);
 	}
 	$temp = WebGUI::URL::gateway($temp);
 	if ($param[0] ne "linkonly") {

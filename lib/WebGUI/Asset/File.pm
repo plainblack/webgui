@@ -109,6 +109,18 @@ sub getEditForm {
 
 
 #-------------------------------------------------------------------
+sub getIcon {
+	my $self = shift;
+	my $small = shift;
+	if ($small) {
+		my $storage = WebGUI::Storage->new($self->get("storageId"));
+		return $storage->getFileIconUrl($self->get("filename"));	
+	}
+	return $session{config}{extrasURL}.'/assets/file.gif';
+}
+
+
+#-------------------------------------------------------------------
 
 =head2 getName 
 
@@ -151,26 +163,26 @@ Gathers data from www_edit and persists it.
 
 sub www_editSave {
 	my $self = shift;
-	$self->SUPER::www_editSave();
+	my $output = $self->SUPER::www_editSave();
 	my $storage = WebGUI::Storage->create;
 	my $filename = $storage->addFileFromFormPost("file");
 	if (defined $filename) {
 		my $oldVersions;
 		if ($self->get($filename)) { # do file versioning
 			my @old = split("\n",$self->get("olderVersions"));
-			push(@old,$self->get{"storageId")."|".$self->get("filename"));
+			push(@old,$self->get("storageId")."|".$self->get("filename"));
 			$oldVersions = join("\n",@old);
 		}
 		$self->update({
 			filename=>$filename,
 			storageId=>$storage->getId,
-			fileSize=>$storage->getFileSize,
 			olderVersions=>$oldVersions
 			});
+		$self->setSize($storage->getFileSize($filename));
 	} else {
 		$storage->delete;
 	}
-	return "";
+	return $output;
 }
 
 

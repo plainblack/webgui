@@ -88,7 +88,7 @@ The error message to add to the object.
 sub _addError {
 	my $self = shift;
 	my $errorMessage = shift;
-	push(@$self->{_errors},$errorMessage);
+	push(@{$self->{_errors}},$errorMessage);
 	WebGUI::ErrorHandler::warn($errorMessage);
 }
 
@@ -375,7 +375,7 @@ sub get {
 	my $class = shift;
 	my $id = shift;
 	my $parts = _getStorageParts($id);
-	bless {_id => $id, _part1 => $part->[0], _part2 => $part->[1]}, $class;
+	bless {_id => $id, _part1 => $parts->[0], _part2 => $parts->[1]}, $class;
 }
 
 #-------------------------------------------------------------------
@@ -473,18 +473,8 @@ Returns the size of this file.
 sub getFileSize {
 	my $self = shift;
 	my $filename = shift;
-        my ($size);
         my (@attributes) = stat($self->getPath($filename));
-        if ($attributes[7] > 1048576) {
-                $size = round($attributes[7]/1048576);
-                $size .= 'MB';
-        } elsif ($attributes[7] > 1024) {
-                $size = round($attributes[7]/1024);
-                $size .= 'kB';
-        } else {
-                $size = $attributes[7].'B';
-        }
-        return $size;
+        return $attributes[7];
 }
 
 

@@ -3,8 +3,14 @@ package WebGUI::Asset;
 #needs documentation
 
 use strict;
+use Tie::IxHash;
+use WebGUI::Clipboard;
 use WebGUI::DateTime;
+use WebGUI::ErrorHandler;
+use WebGUI::Form;
 use WebGUI::Grouping;
+use WebGUI::HTTP;
+use WebGUI::Icon;
 use WebGUI::Id;
 use WebGUI::Privilege;
 use WebGUI::Session;
@@ -22,14 +28,13 @@ sub addChild {
 		values (".quote($id).",".quote($self->getId).", ".quote($lineage).", 
 		'published', ".quote($properties->{className}).", ".quote($id).",
 		997995720, 9223372036854775807)");
-	foreach my $definition (@{$self->{definition}}) {
+	foreach my $definition (@{$self->definition}) {
 		unless ($definition->{tableName} eq "asset") {
 			WebGUI::SQL->write("insert into ".$definition->{tableName}." (assetId) values (".quote($id).")");
 		}
 	}
 	WebGUI::SQL->commit;
-	my $className = $properties->{className};
-	my $newAsset = $className->new($id);
+	my $newAsset = WebGUI::Asset->newByDynamicClass($id, $properties->{className});
 	$newAsset->update($properties);
 	return $newAsset;
 }
@@ -46,9 +51,10 @@ sub canEdit {
 sub canView {
 	my $self = shift;
 	my $userId = shift || $session{user}{userId};
+	return 0 unless ($self->get("state") eq "published");
 	if ($userId eq $self->get("ownerUserId")) {
                 return 1;
-        } elsif ($self->get("startDate") < time() && 
+        } elsif ( $self->get("startDate") < time() && 
 		$self->get("endDate") > time() && 
 		WebGUI::Grouping::isInGroup($self->get("groupIdView"),$userId)) {
                 return 1;
@@ -75,8 +81,9 @@ sub cut {
 
 sub definition {
         my $class = shift;
-        my $definition = shift;
-        push(@{$definition}, {
+        my $definition = shift || [];
+	my @newDef = @{$definition};
+        push(@newDef, {
                 tableName=>'asset',
                 className=>'WebGUI::Asset',
                 properties=>{
@@ -117,18 +124,13 @@ sub definition {
                                         fieldType=>'dateTime',
                                         defaultValue=>undef
                                         },
+				assetSize=>{
+					fieldType=>'hidden',
+					defaultValue=>0
+					}
                         }
                 });
-        return $definition;
-}
-
-sub delete {
-	my $self = shift;
-	WebGUI::SQL->beginTransaction;
-	WebGUI::SQL->write("update asset set state='limbo' where lineage like ".quote($self->get("lineage").'%'));
-	WebGUI::SQL->write("update asset set state='trash' where assetId=".quote($self->getId));
-	WebGUI::SQL->commit;
-	$self->{_properties}{state} = "trash";
+        return \@newDef;
 }
 
 sub demote {
@@ -147,6 +149,7 @@ sub duplicate {
 	my $newAsset = $self->addChild($self->get);
 	return $newAsset;
 }
+
 
 sub fixUrl {
 	my $self = shift;
@@ -197,7 +200,31 @@ sub getAdminConsole {
 	unless (exists $self->{_adminConsole}) {
 		$self->{_adminConsole} = WebGUI::AdminConsole->new("assets");
 	}
+	$self->{_adminConsole}->setIcon($self->getIcon);
 	return $self->{_adminConsole};
+}
+
+sub getAssetAdderLinks {
+	my $self = shift;
+	my @links;
+	foreach my $class (@{$session{config}{assets}}) {
+		my $load = "use ".$class;
+		eval ($load);
+		if ($@) {
+			WebGUI::ErrorHandler::warn("Couldn't compile ".$class." because ".$@);
+		} else {
+			my $label = eval{$class->getName()};
+			if ($@) {
+				WebGUI::ErrorHandler::warn("Couldn't get the name of ".$class." because ".$@);
+			} else {
+				push(@links, {
+					label=>$label,
+					url=>$self->getUrl("func=add&class=".$class)
+					});
+			}
+		}
+	}
+	return \@links;
 }
 
 sub getEditForm {
@@ -213,7 +240,13 @@ sub getEditForm {
 			value=>"1"
 			});
 	}
-	$tabform->add("properties",WebGUI::International::get("properties","Asset"));
+	if ($session{form}{afterEdit}) {
+		$tabform->hidden({
+			name=>"afterEdit",
+			value=>$session{form}{afterEdit}
+			});
+	}
+	$tabform->addTab("properties",WebGUI::International::get("properties","Asset"));
 	$tabform->getTab("properties")->readOnly(
 		-label=>WebGUI::International::get("asset id","Asset"),
 		-value=>$self->get("assetId")
@@ -259,7 +292,7 @@ sub getEditForm {
                 -value=>$self->get("synopsis"),
                 -uiLevel=>3
                 );
-	$tabform->add("privileges",WebGUI::International::get(107),6);
+	$tabform->addTab("privileges",WebGUI::International::get(107),6);
 	$tabform->getTab("privileges")->dateTime(
                 -name=>"startDate",
                 -label=>WebGUI::International::get(497),
@@ -287,7 +320,7 @@ sub getEditForm {
                 $clause = "userId=".quote($self->get("ownerUserId"));
         }
         my $users = WebGUI::SQL->buildHashRef("select userId,username from users where $clause order by username");
-        $tabform->getTab("privileges")->select(
+        $tabform->getTab("privileges")->selectList(
                -name=>"ownerUserId",
                -options=>$users,
                -label=>WebGUI::International::get(108),
@@ -311,6 +344,15 @@ sub getEditForm {
 	return $tabform;
 }
 
+
+sub getIcon {
+	my $self = shift;
+	my $small = shift;
+	return $session{config}{extrasURL}.'/adminConsole/small/assets.gif' if ($small);
+	return $session{config}{extrasURL}.'/adminConsole/assets.gif';
+}
+
+
 sub getId {
 	my $self = shift;
 	return $self->get("assetId");
@@ -329,28 +371,19 @@ sub getIndexerParams {
 }
 
 
-sub getName {
-	return WebGUI::International::get('asset','Asset');
-}
-
-sub getNextChildRank {
-	my $self = shift;
-	my ($lineage) = WebGUI::SQL->quickArray("select max(lineage) from asset where parentId=".quote($self->getId));
-	my $rank;
-	if (defined $lineage) {
-		$rank = $self->getRank($lineage);
-		$rank++;
-	} else {
-		$rank = 1;
-	}
-	return $self->formatRank($rank);
-}
-
 sub getLineage {
 	my $self = shift;
 	my $relatives = shift;
 	my $rules = shift;
 	my $lineage = $self->get("lineage");
+	my $whereExclusion = " and state='published'";
+	if (exists $rules->{excludeClasses}) {
+		my @set;
+		foreach my $className (@{$rules->{excludeClasses}}) {
+			push(@set,"className <> ".quote($className));
+		}
+		$whereExclusion .= 'and ('.join(" and ",@set).')';
+	}
 	my $whereSiblings;
 	if (isIn("siblings",@{$relatives})) {
 		$whereSiblings = "(parentId=".quote($self->get("parentId"))." and assetId<>".quote($self->getId).")";
@@ -379,15 +412,17 @@ sub getLineage {
 		if ($whereSiblings ne "" || $whereExact ne "") {
 			$whereDescendants = " or ";
 		}
-		my $lineageLength = length($lineage);
-		$whereDescendants .= "lineage like ".quote($lineage.'%')." and length(lineage)> ".$lineageLength; 
+		$whereDescendants .= "lineage like ".quote($lineage.'%')." and lineage<>".quote($lineage); 
+		if (exists $rules->{endingLineageLength}) {
+			$whereDescendants .= " and length(lineage) <= ".($rules->{endingLineageLength}*6);
+		}
 	}
-	my $sql = "select assetId from asset where $whereSiblings $whereExact $whereDescendants order by lineage";
+	my $sql = "select assetId,className from asset where $whereSiblings $whereExact $whereDescendants $whereExclusion order by lineage";
 	my @lineage;
 	my $sth = WebGUI::SQL->read($sql);
-	while (my ($assetId) = $sth->array) {
-		if ($rules->{returnOjbects}) {
-			push(@lineage,WebGUI::Asset->new($assetId);
+	while (my ($assetId,$className) = $sth->array) {
+		if ($rules->{returnObjects}) {
+			push(@lineage,WebGUI::Asset->newByDynamicClass($assetId, $className));
 		} else {
 			push(@lineage,$assetId);
 		}
@@ -396,9 +431,31 @@ sub getLineage {
 	return \@lineage;
 }
 
+sub getLineageLength {
+	my $self = shift;
+	return length($self->get("lineage"))/6;
+}
+
+sub getName {
+	return WebGUI::International::get('asset','Asset');
+}
+
+sub getNextChildRank {
+	my $self = shift;
+	my ($lineage) = WebGUI::SQL->quickArray("select max(lineage) from asset where parentId=".quote($self->getId));
+	my $rank;
+	if (defined $lineage) {
+		$rank = $self->getRank($lineage);
+		$rank++;
+	} else {
+		$rank = 1;
+	}
+	return $self->formatRank($rank);
+}
+
 sub getParent {
 	my $self = shift;
-	return WebGUI::Asset->new($self->get("parentId"));	
+	return WebGUI::Asset->newByDynamicClass($self->get("parentId"));	
 }
 
 sub getParentLineage {
@@ -421,6 +478,12 @@ sub getUiLevel {
 	return 0;
 }
 
+sub getUrl {
+	my $self = shift;
+	my $params = shift;
+	return WebGUI::URL::gateway($self->get("url"),$params);
+}
+
 sub getValue {
 	my $self = shift;
 	my $key = shift;
@@ -435,6 +498,12 @@ sub getValue {
 		return $session{form}{$key} || $self->get($key) || $self->{_propertiyDefinitions}{$key}{defaultValue};
 	}
 	return undef;
+}
+
+sub hasChildren {
+	my $self = shift;
+	my ($hasChildren) = WebGUI::SQL->read("select count(*) from asset where parentId=".quote($self->getId));
+	return $hasChildren;
 }
 
 sub new {
@@ -457,23 +526,75 @@ sub new {
 		$sql .= " where asset.assetId=".quote($assetId);
 		$properties = WebGUI::SQL->quickHashRef($sql);
 		return undef unless (exists $properties->{assetId});
-                foreach my $property (keys %{$overrideProperties}) {
-                        unless (isIn($property, qw(assetId className parentId lineage state))) {
-                                $properties->{$property} = $overrideProperties->{$property};
-                        }
-                }
 	}
+	if (defined $overrideProperties) {
+		foreach my $definition (@{$class->definition}) {
+			foreach my $property (keys %{$definition->{properties}}) {
+				if (exists $overrideProperties->{$property}) {
+					$properties->{$property} = $overrideProperties->{$property};
+				}
+			}
+		}
+	}	
 	if (defined $properties) {
-		return bless { _properties=>$properties }, $class;
+		my $object = { _properties => $properties };
+		bless $object, $class;
+		return $object;
 	}	
 	return undef;
 }
 
+
+sub newByDynamicClass {
+	my $class = shift;
+	my $assetId = shift;
+	my $className = shift;
+	unless (defined $className) {
+        	($className) = WebGUI::SQL->quickArray("select className from asset where assetId=".quote($assetId));
+	}
+        if ($className eq "") {
+        	WebGUI::HTTP::setStatus('404',"Page Not Found");
+		WebGUI::ErrorHandler::fatalError("The page not found page doesn't exist.") if ($assetId eq $session{setting}{notFoundPage});
+                return WebGUI::Asset->newByDynamicClass($session{setting}{notFoundPage});
+        }
+	my $cmd = "use ".$className;
+        eval ($cmd);
+        WebGUI::ErrorHandler::fatalError("Couldn't compile asset package: ".$className.". Root cause: ".$@) if ($@);
+        my $assetObject = eval{$className->new($assetId)};
+        WebGUI::ErrorHandler::fatalError("Couldn't create asset instance for ".$assetId.". Root cause: ".$@) if ($@);
+	return $assetObject;
+}
+
+
+sub newByUrl {
+	my $class = shift;
+        my $url = shift || $session{env}{PATH_INFO};
+        $url = lc($url);
+        $url =~ s/\/$//;
+        $url =~ s/^\///;
+        $url =~ s/\'//;
+        $url =~ s/\"//;
+        my $asset;
+        if ($url ne "") {
+                $asset = WebGUI::SQL->quickHashRef("select assetId, className from asset where url=".quote($url));
+		return WebGUI::Asset->newByDynamicClass($asset->{assetId}, $asset->{className});
+        }
+        return $class->newByDynamicClass($session{setting}{defaultPage});
+}
+
+
+sub republish {
+	my $self = shift;
+	WebGUI::SQL->write("update asset set state='published' where lineage like ".quote($self->get("lineage").'%'));
+	$self->{_properties}{state} = "published";
+}
+
 sub paste {
 	my $self = shift;
-	my $newParentId = shift;
-	if ($self->setParent($newParentId)) {
-		WebGUI::SQL->write("update asset set state='published' where lineage like ".quote($self->get("lineage").'%'));
+	my $assetId = shift;
+	my $pastedAsset = WebGUI::Asset->new($assetId);	
+	if ($self->getId eq $pastedAsset->get("parentId") || $pastedAsset->setParent($self->getId)) {
+		$pastedAsset->republish;
 		return 1;
 	}
 	return 0;
@@ -508,6 +629,7 @@ sub setParent {
 	my $self = shift;
 	my $newParentId = shift;
 	return 0 if ($newParentId eq $self->get("parentId")); # don't move it to where it already is
+	return 0 if ($newParentId eq $self->getId); # don't move it to itself
 	my $parent = WebGUI::Asset->new($newParentId);
 	if (defined $parent) {
 		my $oldLineage = $self->get("lineage");
@@ -549,6 +671,16 @@ sub setRank {
 	return 1;
 }
 
+sub setSize {
+	my $self = shift;
+	my $extra = shift;
+	my $sizetest;
+	foreach my $key (keys %{$self->get}) {
+		$sizetest .= $self->get($key);
+	}
+	WebGUI::SQL->write("update asset set assetSize=".(length($sizetest)+$extra)." where assetId=".quote($self->getId));
+}
+
 sub swapRank {
 	my $self = shift;
 	my $second = shift;
@@ -563,17 +695,30 @@ sub swapRank {
 }
 
 
+sub trash {
+	my $self = shift;
+	WebGUI::SQL->beginTransaction;
+	WebGUI::SQL->write("update asset set state='limbo' where lineage like ".quote($self->get("lineage").'%'));
+	WebGUI::SQL->write("update asset set state='trash' where assetId=".quote($self->getId));
+	WebGUI::SQL->commit;
+	$self->{_properties}{state} = "trash";
+}
+
 sub update {
 	my $self = shift;
 	my $properties = shift;
 	WebGUI::SQL->beginTransaction;
 	foreach my $definition (@{$self->definition}) {
 		my @setPairs;
+		if ($definition->{tableName} eq "asset") {
+			push(@setPairs,"lastUpdated=".time());
+		}
 		foreach my $property (keys %{$definition->{properties}}) {
 			my $value = $properties->{$property} || $definition->{properties}{$property}{defaultValue};
 			if (defined $value) {
 				if (exists $definition->{properties}{$property}{filter}) {
-					$value = $self->$definition->{properties}{$property}{filter}($value);
+					my $filter = $definition->{properties}{$property}{filter};
+					$value = $self->$filter($value);
 				}
 				$self->{_properties}{$property} = $value;
 				push(@setPairs, $property."=".quote($value));
@@ -583,6 +728,7 @@ sub update {
 			WebGUI::SQL->write("update ".$definition->{tableName}." set ".join(",",@setPairs)." where assetId=".quote($self->getId));
 		}
 	}
+	$self->setSize;
 	WebGUI::SQL->commit;
 	return 1;
 }
@@ -596,18 +742,57 @@ sub www_copy {
 	return "";
 }
 
+sub www_copyList {
+	my $self = shift;
+	return WebGUI::Privilege::insufficient() unless $self->canEdit;
+	my $newAsset = $self->duplicate;
+	$newAsset->cut;
+	foreach my $assetId ($session{cgi}->param("assetId")) {
+		my $asset = WebGUI::Asset->newByDynamicClass($assetId);
+		if ($asset->canEdit) {
+			my $newAsset = $asset->duplicate;
+			$newAsset->cut;
+		}
+	}
+	return $self->manageAssets();
+}
+
 sub www_cut {
 	my $self = shift;
 	return WebGUI::Privilege::insufficient() unless $self->canEdit;
 	$self->cut;
-	return "";
+	return $self->getParent->www_view;
+}
+
+sub www_cutList {
+	my $self = shift;
+	return WebGUI::Privilege::insufficient() unless $self->canEdit;
+	foreach my $assetId ($session{cgi}->param("assetId")) {
+		my $asset = WebGUI::Asset->newByDynamicClass($assetId);
+		if ($asset->canEdit) {
+			$asset->cut;
+		}
+	}
+	return $self->manageAssets();
 }
 
 sub www_delete {
 	my $self = shift;
 	return WebGUI::Privilege::insufficient() unless $self->canEdit;
-	$self->delete;
-	return "";
+	$self->trash;
+	return $self->getParent->www_view;
+}
+
+sub www_deleteList {
+	my $self = shift;
+	return WebGUI::Privilege::insufficient() unless $self->canEdit;
+	foreach my $assetId ($session{cgi}->param("assetId")) {
+		my $asset = WebGUI::Asset->newByDynamicClass($assetId);
+		if ($asset->canEdit) {
+			$asset->trash;
+		}
+	}
+	return $self->manageAssets();
 }
 
 sub www_demote {
@@ -620,7 +805,7 @@ sub www_demote {
 sub www_edit {
 	my $self = shift;
 	return WebGUI::Privilege::insufficient() unless $self->canEdit;
-	return $self->getAdminConsole->render($self->getEditForm);
+	return $self->getAdminConsole->render($self->getEditForm->print);
 }
 
 sub www_editSave {
@@ -628,7 +813,7 @@ sub www_editSave {
 	my %data;
 	foreach my $definition (@{$self->definition}) {
 		foreach my $property (keys %{$definition->{properties}}) {
-			my $data{$property} = WebGUI::FormProcessor::process(
+			$data{$property} = WebGUI::FormProcessor::process(
 				$property,
 				$definition->{properties}{fieldType},
 				$definition->{properties}{defaultValue}
@@ -636,14 +821,133 @@ sub www_editSave {
 		}
 	}
 	$self->update(\%data);
+	return $self->www_manageAssets if ($session{form}{afterEdit} eq "assetManager");
 	return "";
 }
+
+sub www_editTree {
+	return "not yet implemented";
+}
+
+sub www_editTreeSave {
+	return "not yet implemented";
+}
+
+sub www_manageAssets {
+	my $self = shift;
+	return WebGUI::Privilege::insufficient() unless $self->canEdit;
+	WebGUI::Style::setLink($session{config}{extrasURL}.'/assetManager/ActiveWidgets/runtime/styles/xp/grid.css', {rel=>"stylesheet",type=>"text/css"});
+	WebGUI::Style::setLink($session{config}{extrasURL}.'/assetManager/assetManager.css', {rel=>"stylesheet",type=>"text/css"});
+	WebGUI::Style::setScript($session{config}{extrasURL}.'/assetManager/ActiveWidgets/source/lib/grid.js', {type=>"text/javascript"});
+	WebGUI::Style::setScript($session{config}{extrasURL}.'/assetManager/Tools.js', {type=>"text/javascript"});
+	WebGUI::Style::setScript($session{config}{extrasURL}.'/assetManager/ContextMenu.js', {type=>"text/javascript"});
+	WebGUI::Style::setScript($session{config}{extrasURL}.'/assetManager/Asset.js', {type=>"text/javascript"});
+	WebGUI::Style::setScript($session{config}{extrasURL}.'/assetManager/Display.js', {type=>"text/javascript"});
+	WebGUI::Style::setScript($session{config}{extrasURL}.'/assetManager/EventManager.js', {type=>"text/javascript"});
+	WebGUI::Style::setScript($session{config}{extrasURL}.'/assetManager/AssetManager.js', {type=>"text/javascript"});
+	my $children = $self->getLineage(["descendants"],{returnObjects=>1, endingLineageLength=>$self->getLineageLength+1});
+	my $output;
+	$output = '
+		<div id="contextMenu" class="contextMenu"></div>
+   		<div id="propertiesWindow" class="propertiesWindow"></div>
+   		<div id="crumbtrail"></div>
+   		<div id="workspace" style="height: 200px;">Retrieving Assets...</div>
+   		<div id="dragImage" class="dragIdentifier">hello</div>
+		';
+	$output .= "<script>\n";
+	$output .= "/* assetId, url, title */\nvar crumbtrail = [\n";
+	my $ancestors = $self->getLineage(["self","ancestors"],{returnObjects=>1});
+	foreach my $ancestor (@{$ancestors}) {
+		$output .= '[';
+		$output .= "'".$ancestor->getId."',";
+		$output .= "'".$ancestor->getUrl."',";
+		my $title = $ancestor->get("title");
+		$title =~ s/\'/\\\'/g;
+		$output .= "'".$title."'";
+		$output .= "],\n";
+	}
+	$output .= "];\n";
+	$output .= "var columnHeadings = ['Rank','Title','Type','Last Updated','Size'];\n";
+	$output .= "/*rank, title, type, lastUpdate, size, url, assetId, icon */\nvar assets = [\n";
+	foreach my $child (@{$children}) {
+		$output .= '[';
+		$output .= $child->getRank.",";
+		my $title = $child->get("title");
+		$title =~ s/\'/\\\'/g;
+		$output .= "'".$title."',";
+		$output .= "'".$child->getName."',";
+		$output .= "'".WebGUI::DateTime::epochToHuman($child->get("lastUpdated"))."',";
+		$output .= "'".formatBytes($child->get("assetSize"))."',";
+		#my $hasChildren = "false";
+		$output .= "'".$child->getUrl."',";
+		$output .= "'".$child->getId."',";
+		$output .= "'".$child->getIcon(1)."'";
+		#$hasChildren = "true" if ($child->hasChildren);
+		#$output .= $hasChildren;
+		$output .= "],\n";
+	}
+	$output .= "];\n var labels = new Array();\n";
+	$output .= "labels['edit'] = 'Edit';\n";
+	$output .= "labels['cut'] = 'Cut';\n";
+	$output .= "labels['copy'] = 'Copy';\n";
+	$output .= "labels['move'] = 'Move';\n";
+	$output .= "labels['view'] = 'View';\n";
+	$output .= "labels['delete'] = 'Delete';\n";
+	$output .= "labels['go'] = 'Go';\n";
+	$output .= "labels['properties'] = 'Properties';\n";
+	$output .= "labels['editTree'] = 'Edit Tree';\n";
+	$output .= "var manager = new AssetManager(assets,columnHeadings,labels,crumbtrail);  manager.renderAssets();\n</script>\n";
+	$output .= '<div style="font-size: 18px;">'.WebGUI::International::get(1).'
+    <div class="adminConsoleSpacer">
+            &nbsp;
+        </div>
+		<div style="float: left; padding-right: 30px; font-size: 14px;"><b>'.WebGUI::International::get(1083).'</b><br />';
+	foreach my $link (@{$self->getAssetAdderLinks}) {
+		$output .= '<a href="'.$link->{url}.'">'.$link->{label}.'</a><br />';
+	}
+	$output .= '</div>'; 
+	my $clipboard = WebGUI::Clipboard::getAssetsInClipboard();
+	my %options;
+	tie %options, 'Tie::IxHash';
+	my $hasClips = 0;
+        foreach my $item (@{$clipboard}) {
+              	$options{$item->{assetId}} = $item->{title};
+		$hasClips = 1;
+        }
+	if ($hasClips) {
+		$output .= '<div style="float: left; padding-right: 30px; font-size: 14px;"><b>'.WebGUI::International::get(1082).'</b><br />'
+			.WebGUI::Form::formHeader()
+			.WebGUI::Form::hidden({name=>"func",value=>"pasteList"})
+			.WebGUI::Form::checkList({name=>"assetId",options=>\%options})
+			.'<br />'
+			.WebGUI::Form::submit({value=>"Paste"})
+			.WebGUI::Form::formFooter()
+			.' </div> ';
+	}
+	$output .= '
+    <div class="adminConsoleSpacer">
+            &nbsp;
+        </div>
+		</div>
+		';
+	return $self->getAdminConsole->render($output);
+}
+
 
 sub www_paste {
 	my $self = shift;
 	return WebGUI::Privilege::insufficient() unless $self->canEdit;
-	$self->paste($session{form}{newParentId});
+	$self->paste($session{form}{assetId});
 	return "";
+}
+
+sub www_pasteList {
+	my $self = shift;
+	return WebGUI::Privilege::insufficient() unless $self->canEdit;
+	foreach my $clipId ($session{cgi}->param("assetId")) {
+		$self->paste($clipId);
+	}
+	return $self->manageAssets();
 }
 
 sub www_promote {
@@ -653,10 +957,29 @@ sub www_promote {
 	return "";
 }
 
-sub www_view {
+sub www_setParent {
 	my $self = shift;
 	return WebGUI::Privilege::insufficient() unless $self->canEdit;
-	return "No view has been defined for this asset.";
+	my $newParent = shift;
+	$self->setParent($newParent) if (defined $newParent);
+	return $self->www_manageAssets();
+
 }
 
+sub www_setRank {
+	my $self = shift;
+	return WebGUI::Privilege::insufficient() unless $self->canEdit;
+	my $newRank = $session{form}{rank};
+	$self->setRank($newRank) if (defined $newRank);
+	return $self->www_manageAssets();
+}
+
+sub www_view {
+	my $self = shift;
+	return WebGUI::Privilege::noAccess() unless $self->canView;
+	return "No view has been implemented for this asset.";
+}
+
+
 1;
+

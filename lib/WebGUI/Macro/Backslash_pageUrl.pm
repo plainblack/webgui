@@ -16,7 +16,9 @@ use WebGUI::URL;
 
 #-------------------------------------------------------------------
 sub process {
-        return WebGUI::URL::getScriptURL().$session{page}{urlizedTitle}; 
+	my $pathinfo = $session{env}{PATH_INFO};
+        $pathinfo =~ s/^\/(.*)/$1/;
+        return WebGUI::URL::getScriptURL().$pathinfo;
 }
 
 

@@ -14,6 +14,7 @@ use strict qw(refs vars);
 use Tie::CPHash;
 use Tie::IxHash;
 use WebGUI::AdminConsole;
+use WebGUI::Clipboard;
 use WebGUI::Grouping;
 use WebGUI::International;
 use WebGUI::Macro;
@@ -37,18 +38,18 @@ sub process {
 	$var{'packages.label'} = WebGUI::International::get(376);
 	my @packages;
 	my $i;
-	my $sth = WebGUI::SQL->read("select pageId,title from page where parentId='5'");
-        while (my %data = $sth->hash) {
-		$data{title} =~ s/'//g;
-		push(@packages, {
-        		'package.url'=>WebGUI::URL::page('op=deployPackage&pid='.$data{pageId}),
-               		'package.label'=>$data{title},
-			'package.count'=>$i
-			});
-		$i++;
-        }
-        $sth->finish;
-	$var{package_loop} = \@packages;
+#	my $sth = WebGUI::SQL->read("select pageId,title from page where parentId='5'");
+ #       while (my %data = $sth->hash) {
+#		$data{title} =~ s/'//g;
+#		push(@packages, {
+ #       		'package.url'=>WebGUI::URL::page('op=deployPackage&pid='.$data{pageId}),
+  #             		'package.label'=>$data{title},
+#			'package.count'=>$i
+#			});
+#		$i++;
+ #       }
+  #      $sth->finish;
+#	$var{package_loop} = \@packages;
   #--contenttypes adder
 	$var{'contentTypes.label'} = WebGUI::International::get(1083);
 	foreach my $namespace (@{$session{config}{wobjects}}) {
@@ -81,64 +82,18 @@ sub process {
 	$var{'addpage.label'} = WebGUI::International::get(2);
   #--clipboard paster
 	$var{'clipboard.label'} = WebGUI::International::get(1082);
-	%hash2 = ();
-
-	# get pages and store in array of arrays in order to integrate with wobjects and sort by buffer date
-	if ($session{setting}{sharedClipboard} eq "1") {
-		$query = "select bufferDate,pageId,title from page where parentId='2' order by bufferDate";
-	} else {
-		$query = "select bufferDate,pageId,title from page where parentId='2' "
-			." and bufferUserId=".quote($session{user}{userId})
-			." order by bufferDate";
-	}
-        $r = WebGUI::SQL->read($query);
-        while (%cphash = $r->hash) {
-		$cphash{title} =~ s/'//g;
-		push @item, [	$cphash{bufferDate},
-				WebGUI::URL::page('op=pastePage&pageId='.$cphash{pageId}),
-				$cphash{title} . ' ('. WebGUI::International::get(2) .')' ];
-	}
-        $r->finish;
-
-	# get wobjects and store in array of arrays in order to integrate with pages and sort by buffer date
-	if ($session{setting}{sharedClipboard} eq "1") {
-        	$query = "select bufferDate,wobjectId,title,namespace from wobject where pageId='2' "
-			." order by bufferDate";
-	} else {
-        	$query = "select bufferDate,wobjectId,title,namespace from wobject where pageId='2' "
-			." and bufferUserId=".quote($session{user}{userId})
-			." order by bufferDate";
-	}
-        $r = WebGUI::SQL->read($query);
-        while (%cphash = $r->hash) {
-		$cphash{title} =~ s/'//g;
-		push @item, [	$cphash{bufferDate},
-				WebGUI::URL::page('func=paste&wid='.$cphash{wobjectId}),
-				$cphash{title} . ' ('. $cphash{namespace} .')' ];
-	}
-        $r->finish;
-
-	# Reverse sort by bufferDate and and create hash from list values
-	my @sorted_item = sort {$b->[0] <=> $a->[0]} @item;
-	@item = ();
- 	for $i ( 0 .. $#sorted_item ) {
-		$hash2{ $sorted_item[$i][1] } = $sorted_item[$i][2];
-	}
-	@sorted_item = ();
-	my @clipboard;
-	$i = 0;
-	foreach my $key (keys %hash2) {
-		push(@clipboard,{
-			'clipboard.url'=>$key,
-			'clipboard.label'=>$hash2{$key},
-			'clipboard.count'=>$i
+	my $clipboard = WebGUI::Clipboard::getAssetsInClipboard();
+	foreach my $item (@{$clipboard}) {
+		my $title = $item->{title};
+		$title =~ s/'//g; # stops it from breaking the javascript menus
+		push(@{$var{clipboard_loop}}, {
+			'clipboard.label'=>$title,
+			'clipboard.url'=>WebGUI::URL::page("func=paste&assetId=".$item->{assetId})
 			});
-		$i++;
 	}
-	$var{'clipboard_loop'} = \@clipboard;
    #--admin functions
 	%hash = (
-		'http://validator.w3.org/check?uri='.WebGUI::URL::escape(WebGUI::URL::page())=>WebGUI::International::get(399),
+		'http://validator.w3.org/check?uri=referer'=>WebGUI::International::get(399),
 		);
 	my $acParams = WebGUI::AdminConsole->getAdminConsoleParams;
 	$hash{$acParams->{url}} = $acParams->{title} if ($acParams->{canUse});

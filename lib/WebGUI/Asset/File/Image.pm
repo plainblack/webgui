@@ -98,16 +98,16 @@ sub generateThumbnail {
 	}
 	if ($self->getValue("filename") && $hasImageMagick) {
 		my $storage = WebGUI::Storage->new($self->get("storageId"));
-                $image = Image::Magick->new;
-                $error = $image->Read($storage->getPath($storage->get("filename")));
+                my $image = Image::Magick->new;
+                my $error = $image->Read($storage->getPath($storage->get("filename")));
 		if ($error) {
 			$self->_addError("Couldn't read image for thumnail creation: ".$error);
 			return 0;
 		}
-                ($x, $y) = $image->Get('width','height');
-                $n = $self->get("thumbnailSize");
+                my ($x, $y) = $image->Get('width','height');
+                my $n = $self->get("thumbnailSize");
                 if ($x > $n || $y > $n) {
-                        $r = $x>$y ? $x / $n : $y / $n;
+                        my $r = $x>$y ? $x / $n : $y / $n;
                         $image->Scale(width=>($x/$r),height=>($y/$r));
                 }
                 if (isIn($storage->getFileExtension($self->get("filename")), qw(tif tiff bmp))) {
@@ -149,6 +149,15 @@ sub getEditForm {
 			-value=>'<img src="'.$storage->getUrl($self->get("filename")).'" alt="thumbnail" />'
 			);
 	}
+}
+
+
+#-------------------------------------------------------------------
+sub getIcon {
+	my $self = shift;
+	my $small = shift;
+	return $session{config}{extrasURL}.'/assets/image.gif' unless ($small);
+	$self->SUPER::getIcon(1);
 }
 
 

@@ -22,7 +22,7 @@ use Tie::IxHash;
 
 our @ISA = qw(Exporter);
 our @EXPORT = qw(&isBetween &makeTabSafe &makeArrayTabSafe &randomizeHash &commify &randomizeArray 
-	&sortHashDescending &sortHash &isIn &makeCommaSafe &makeArrayCommaSafe &randint &round);
+	&formatBytes &sortHashDescending &sortHash &isIn &makeCommaSafe &makeArrayCommaSafe &randint &round);
 
 
 =head1 NAME
@@ -37,6 +37,7 @@ This package provides miscellaneous but useful utilities to the WebGUI programme
 
  use WebGUI::Utility;
  $string = commify($integer);
+ $size = formatBytes($integer);
  $boolean = isIn($value, @array);
  makeArrayCommaSafe(\@array); 
  makeArrayTabSafe(\@array); 
@@ -72,6 +73,32 @@ sub commify {
 	$text =~ s/(\d\d\d)(?=\d)(?!\d*\.)/$1,/g;
 	return scalar reverse $text;
 }
+
+
+#-------------------------------------------------------------------
+
+=head2 formatBytes ( integer )
+
+Returns a formatted file size like "3MB" or "44kB".
+
+=head3 integer
+
+An integer representing the number of bytes to format.
+
+=cut
+
+sub formatBytes {
+	my $size = shift;
+        if ($size > 1048576) {
+                return round($size/1048576).'MB';
+        } elsif ($size > 1024) {
+                return round($size/1024).'kB';
+        } else {
+		return $size.'B';
+        }
+}
+
+
 
 #-------------------------------------------------------------------
 

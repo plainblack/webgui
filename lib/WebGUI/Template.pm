@@ -96,17 +96,17 @@ Returns a hash reference containing all of the template parameters.
 
 =head3 templateId
 
-Defaults to "1". Specify the templateId of the template to retrieve.
+Specify the templateId of the template to retrieve.
 
 =head3 namespace
 
-Defaults to "page". Specify the namespace of the template to retrieve.
+Specify the namespace of the template to retrieve.
 
 =cut
 
 sub get {
-	my $templateId = shift || 1;
-	my $namespace = shift || "page";
+	my $templateId = shift;
+	my $namespace = shift;
         return WebGUI::SQL->quickHashRef("select * from template where templateId=".quote($templateId)." and namespace=".quote($namespace),WebGUI::SQL->getSlave);
 }
 
@@ -162,11 +162,11 @@ Evaluate a template replacing template commands for HTML.
 
 =head3 templateId
 
-Defaults to "1". Specify the templateId of the template to retrieve.
+Specify the templateId of the template to retrieve.
 
 =head3 namespace
 
-Defaults to "page". Specify the namespace of the template to retrieve.
+Specify the namespace of the template to retrieve.
 
 =head3 vars
 
@@ -175,8 +175,8 @@ A hash reference containing template variables and loops. Automatically includes
 =cut
 
 sub process {
-	my $templateId = shift || 1;
-	my $namespace = shift || "page";
+	my $templateId = shift;
+	my $namespace = shift;
 	my $vars = shift;
 	my $file = _getTemplateFile($templateId,$namespace);
 	my $fileCacheDir = $session{config}{uploadsPath}.$session{os}{slash}."temp".$session{os}{slash}."templatecache";
@@ -202,7 +202,8 @@ sub process {
 		}
 	}
 	if ($session{config}{templateCacheType} eq "file" && not $error) {
-		$params{file_cache} = 1;
+	# disabled until we can figure out what's wrong with it
+	#	$params{file_cache} = 1;
 	} elsif ($session{config}{templateCacheType} eq "memory") {
 		$params{cache} = 1;
 	} elsif ($session{config}{templateCacheType} eq "ipc") {

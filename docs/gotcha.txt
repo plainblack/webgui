@@ -38,6 +38,12 @@ save you many hours of grief.
 	operates, or else the scheduler plugin ProcessRecurringPayments
 	will fail with a cert error.
 
+ * If you have any custom page templates, they'll need to be updated
+	to work with the new Layout system. The templates have been 
+	changed significantly enough that automatic migration of them is
+	not possible.
+
+
 6.2.8
 --------------------------------------------------------------------
  * Due to a bug in the theme system, if you created any themes in any

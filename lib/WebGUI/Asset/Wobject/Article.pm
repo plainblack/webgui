@@ -22,8 +22,7 @@ use WebGUI::International;
 use WebGUI::Paginator;
 use WebGUI::Privilege;
 use WebGUI::Session;
-use WebGUI::URL;
-use WebGUI::Wobject;
+use WebGUI::Asset::Wobject;
 
 our @ISA = qw(WebGUI::Asset::Wobject);
 
@@ -61,25 +60,34 @@ sub getEditForm {
 	my $tabform = $self->SUPER::getEditForm();
 	$tabform->getTab("properties")->text(
 		-name=>"linkTitle",
-		-label=>WebGUI::International::get(7,$self->get("namespace")),
+		-label=>WebGUI::International::get(7,"Article"),
 		-value=>$self->getValue("linkTitle"),
 		-uiLevel=>3
 		);
         $tabform->getTab("properties")->url(
 		-name=>"linkURL",
-		-label=>WebGUI::International::get(8,$self->get("namespace")),
+		-label=>WebGUI::International::get(8,"Article"),
 		-value=>$self->getValue("linkURL"),
 		-uiLevel=>3
 		);
 	$tabform->getTab("layout")->yesNo(
 		-name=>"convertCarriageReturns",
-		-label=>WebGUI::International::get(10,$_[0]->get("namespace")),
-		-value=>$_[0]->getValue("convertCarriageReturns"),
-		-subtext=>' &nbsp; <span style="font-size: 8pt;">'.WebGUI::International::get(11,$_[0]->get("namespace")).'</span>',
+		-label=>WebGUI::International::get(10,"Article"),
+		-value=>$self->getValue("convertCarriageReturns"),
+		-subtext=>' &nbsp; <span style="font-size: 8pt;">'.WebGUI::International::get(11,"Article").'</span>',
 		-uiLevel=>5,
 		-defaultValue=>0
 		);
 	return $tabform;
+}
+
+
+#-------------------------------------------------------------------
+sub getIcon {
+	my $self = shift;
+	my $small = shift;
+	return $session{config}{extrasURL}.'/assets/small/article.gif' if ($small);
+	return $session{config}{extrasURL}.'/assets/article.gif';
 }
 
 
@@ -90,31 +98,8 @@ sub getName {
 
 
 #-------------------------------------------------------------------
-sub www_edit {
-        my $self = shift;
-        return WebGUI::Privilege::insufficient() unless $self->canEdit;
-	$self->getAdminConsole->setHelp("article add/edit");
-        return $self->getAdminConsole->render($self->getEditForm,WebGUI::International::get("12","Article"));
-}
-
-
-#-------------------------------------------------------------------
-sub www_editSave {
-        my ($image, $attachment, %property);
-	$_[0]->SUPER::www_editSave() if ($_[0]->get("wobjectId") eq "new");
-        $image = WebGUI::Attachment->new("",$_[0]->get("wobjectId"));
-	$image->save("image");
-        $attachment = WebGUI::Attachment->new("",$_[0]->get("wobjectId"));
-	$attachment->save("attachment");
-	$property{image} = $image->getFilename if ($image->getFilename ne "");
-	$property{attachment} = $attachment->getFilename if ($attachment->getFilename ne "");
-	return $_[0]->SUPER::www_editSave(\%property);
-}
-
-#-------------------------------------------------------------------
-sub www_view {
+sub view {
 	my $self = shift;
-	$self->logView() if ($session{setting}{passiveProfilingEnabled});
 	my ($file, %var);
 	if ($self->get("image") ne "") {
 		$file = WebGUI::Attachment->new($self->get("image"),$self->get("wobjectId"));
@@ -125,7 +110,7 @@ sub www_view {
 	if ($self->get("convertCarriageReturns")) {
 		$var{description} =~ s/\n/\<br\>\n/g;
 	}
-	$var{"new.template"} = WebGUI::URL::page("wid=".$self->get("wobjectId")."&func=view")."&overrideTemplateId=";
+	$var{"new.template"} = $self->getUrl("wid=".$self->get("wobjectId")."&func=view")."&overrideTemplateId=";
 	$var{"description.full"} = $var{description};
 	$var{"description.full"} =~ s/\^\-\;//g;
 	$var{"description.first.100words"} = $var{"description.full"};
@@ -150,7 +135,7 @@ sub www_view {
 	$var{"description.first.2sentences"} =~ s/^((.*?\.){2}).*/$1/s;
 	$var{"description.first.sentence"} = $var{"description.first.2sentences"};
 	$var{"description.first.sentence"} =~ s/^(.*?\.).*/$1/s;
-	my $p = WebGUI::Paginator->new(WebGUI::URL::page("wid=".$self->get("wobjectId")."&func=view"),1);
+	my $p = WebGUI::Paginator->new($self->getUrl("wid=".$self->get("wobjectId")."&func=view"),1);
 	if ($session{form}{makePrintable} || $var{description} eq "") {
 		$var{description} =~ s/\^\-\;//g;
 		$p->setDataByArrayRef([$var{description}]);
@@ -167,7 +152,7 @@ sub www_view {
 		$var{"attachment.url"} = $file->getURL;
 		$var{"attachment.name"} = $file->getFilename;
 	}	
-	my $callback = WebGUI::URL::page("func=view&amp;wid=".$self->get("wobjectId"));
+	my $callback = $self->getUrl("func=view&amp;wid=".$self->get("wobjectId"));
 	if ($self->get("allowDiscussion")) {
 		my $forum = WebGUI::Forum->new($self->get("forumId"));
 		$var{"replies.count"} = ($forum->get("replies") + $forum->get("threads"));
@@ -188,9 +173,19 @@ sub www_view {
 			forumId=>$self->get("forumId")
 			});
 	} else {
-		return $self->processTemplate($templateId,\%var);
+		return $self->processTemplate(\%var, "Article", $templateId);
 	}
 }
+
+
+#-------------------------------------------------------------------
+sub www_edit {
+        my $self = shift;
+        return WebGUI::Privilege::insufficient() unless $self->canEdit;
+	$self->getAdminConsole->setHelp("article add/edit");
+        return $self->getAdminConsole->render($self->getEditForm->print,WebGUI::International::get("12","Article"));
+}
+
 
 
 1;

@@ -101,7 +101,7 @@ The URL to any page. Defaults to the current page.
 
 sub copyIcon {
         my ($output, $pageURL);
-        $pageURL = $_[1] || $session{page}{urlizedTitle};
+        $pageURL = $_[1] || $session{env}{PATH_INFO};
         $output = '<a href="'.WebGUI::URL::gateway($pageURL,$_[0]).'">';
         $output .= '<img src="'._getBaseURL().'copy.gif" align="middle" border="0" alt="Copy" title="Copy" /></a>';
         return $output;
@@ -125,7 +125,7 @@ The URL to any page. Defaults to the current page.
 
 sub cutIcon {
         my ($output, $pageURL);
-        $pageURL = $_[1] || $session{page}{urlizedTitle};
+        $pageURL = $_[1] || $session{env}{PATH_INFO};
         $output = '<a href="'.WebGUI::URL::gateway($pageURL,$_[0]).'">';
         $output .= '<img src="'._getBaseURL().'cut.gif" align="middle" border="0" alt="Cut" title="Cut" /></a>';
         return $output;
@@ -158,7 +158,7 @@ sub deleteIcon {
 		$confirmText = qq| onclick="return confirm('$confirmText')" |;
 	}
 	
-        $pageURL = $_[1] || $session{page}{urlizedTitle};
+        $pageURL = $_[1] || $session{env}{PATH_INFO};
 	
         $output = '<a href="'.WebGUI::URL::gateway($pageURL,$_[0]).'" '.$confirmText.'>';
 	$output .= '<img src="'._getBaseURL().'delete.gif" align="middle" border="0" alt="Delete" title="Delete" /></a>';
@@ -195,7 +195,7 @@ The URL to any page. Defaults to the current page.
 
 sub editIcon {
         my ($output, $pageURL);
-        $pageURL = $_[1] || $session{page}{urlizedTitle};
+        $pageURL = $_[1] || $session{env}{PATH_INFO};
         $output = '<a href="'.WebGUI::URL::gateway($pageURL,$_[0]).'">';
         $output .= '<img src="'._getBaseURL().'edit.gif" align="middle" border="0" alt="Edit" title="Edit" /></a>';
         return $output;
@@ -219,7 +219,7 @@ The URL to any page. Defaults to the current page.
 
 sub exportIcon {
         my ($output, $pageURL);
-        $pageURL = $_[1] || $session{page}{urlizedTitle};
+        $pageURL = $_[1] || $session{env}{PATH_INFO};
         $output = '<a href="'.WebGUI::URL::gateway($pageURL,$_[0]).'">';
 	# TODO Change icon to Jeffs export icon
         $output .= '<img src="'._getBaseURL().'export.gif" align="middle" border="0" alt="Export" title="Export" /></a>';
@@ -292,7 +292,7 @@ The URL to any page. Defaults to the current page.
 
 sub manageIcon {
         my ($output, $pageURL);
-        $pageURL = $_[1] || $session{page}{urlizedTitle};
+        $pageURL = $_[1] || $session{env}{PATH_INFO};
         $output = '<a href="'.WebGUI::URL::gateway($pageURL,$_[0]).'">';
         $output .= '<img src="'._getBaseURL().'manage.gif" align="middle" border="0" alt="Manage" title="Manage" /></a>';
         return $output;
@@ -316,7 +316,7 @@ The URL to any page. Defaults to the current page.
 
 sub moveBottomIcon {
         my ($output, $pageURL);
-        $pageURL = $_[1] || $session{page}{urlizedTitle};
+        $pageURL = $_[1] || $session{env}{PATH_INFO};
         $output = '<a href="'.WebGUI::URL::gateway($pageURL,$_[0]).'">';
         $output .= '<img src="'._getBaseURL().'moveBottom.gif" align="middle" border="0" alt="Move To Bottom" title="Move To Bottom" /></a>';
         return $output;
@@ -340,7 +340,7 @@ The URL to any page. Defaults to the current page.
 
 sub moveDownIcon {
         my ($output, $pageURL);
-        $pageURL = $_[1] || $session{page}{urlizedTitle};
+        $pageURL = $_[1] || $session{env}{PATH_INFO};
         $output = '<a href="'.WebGUI::URL::gateway($pageURL,$_[0]).'">';
         $output .= '<img src="'._getBaseURL().'moveDown.gif" align="middle" border="0" alt="Move Down" title="Move Down" /></a>';
         return $output;
@@ -364,7 +364,7 @@ The URL to any page. Defaults to the current page.
 
 sub moveLeftIcon {
         my ($output, $pageURL);
-        $pageURL = $_[1] || $session{page}{urlizedTitle};
+        $pageURL = $_[1] || $session{env}{PATH_INFO};
         $output = '<a href="'.WebGUI::URL::gateway($pageURL,$_[0]).'">';
         $output .= '<img src="'._getBaseURL().'moveLeft.gif" align="middle" border="0" alt="Move Left" title="Move Left" /></a>';
         return $output;
@@ -388,7 +388,7 @@ The URL to any page. Defaults to the current page.
 
 sub moveRightIcon {
         my ($output, $pageURL);
-        $pageURL = $_[1] || $session{page}{urlizedTitle};
+        $pageURL = $_[1] || $session{env}{PATH_INFO};
         $output = '<a href="'.WebGUI::URL::gateway($pageURL,$_[0]).'">';
         $output .= '<img src="'._getBaseURL().'moveRight.gif" align="middle" border="0" alt="Move Right" title="Move Right" /></a>';
         return $output;
@@ -412,7 +412,7 @@ The URL to any page. Defaults to the current page.
 
 sub moveTopIcon {
         my ($output, $pageURL);
-        $pageURL = $_[1] || $session{page}{urlizedTitle};
+        $pageURL = $_[1] || $session{env}{PATH_INFO};
         $output = '<a href="'.WebGUI::URL::gateway($pageURL,$_[0]).'">';
         $output .= '<img src="'._getBaseURL().'moveTop.gif" align="middle" border="0" alt="Move To Top" title="Move To Top" /></a>';
         return $output;
@@ -436,7 +436,7 @@ The URL to any page. Defaults to the current page.
 
 sub moveUpIcon {
         my ($output, $pageURL);
-        $pageURL = $_[1] || $session{page}{urlizedTitle};
+        $pageURL = $_[1] || $session{env}{PATH_INFO};
         $output = '<a href="'.WebGUI::URL::gateway($pageURL,$_[0]).'">';
         $output .= '<img src="'._getBaseURL().'moveUp.gif" align="middle" border="0" alt="Move Up" title="Move Up" /></a>';
         return $output;
@@ -472,7 +472,7 @@ The URL to any page. Defaults to the current page.
 
 sub pasteIcon {
         my ($output, $pageURL);
-        $pageURL = $_[1] || $session{page}{urlizedTitle};
+        $pageURL = $_[1] || $session{env}{PATH_INFO};
         $output = '<a href="'.WebGUI::URL::gateway($pageURL,$_[0]).'">';
         $output .= '<img src="'._getBaseURL().'paste.gif" align="middle" border="0" alt="Paste" title="Paste" /></a>';
         return $output;
@@ -496,7 +496,7 @@ The URL to any page. Defaults to the current page.
 
 sub shortcutIcon {
         my ($output, $pageURL);
-        $pageURL = $_[1] || $session{page}{urlizedTitle};
+        $pageURL = $_[1] || $session{env}{PATH_INFO};
         $output = '<a href="'.WebGUI::URL::gateway($pageURL,$_[0]).'">';
         $output .= '<img src="'._getBaseURL().'shortcut.gif" align="middle" border="0" alt="Shortcut" title="Create Shortcut" /></a>';
         return $output;
@@ -520,7 +520,7 @@ The URL to any page. Defaults to the current page.
 
 sub viewIcon {
         my ($output, $pageURL);
-        $pageURL = $_[1] || $session{page}{urlizedTitle};
+        $pageURL = $_[1] || $session{env}{PATH_INFO};
         $output = '<a href="'.WebGUI::URL::gateway($pageURL,$_[0]).'">';
         $output .= '<img src="'._getBaseURL().'view.gif" align="middle" border="0" alt="View" title="View" /></a>';
         return $output;

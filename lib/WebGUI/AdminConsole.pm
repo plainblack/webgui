@@ -4,16 +4,23 @@ use strict;
 use WebGUI::Grouping;
 use WebGUI::International;
 use WebGUI::Session;
+use WebGUI::Style;
 use WebGUI::Template;
 use WebGUI::URL;
 
 sub _formatFunction {
 	my $self = shift;
 	my $function = shift;
+	my $url;
+	if (exists $function->{func}) {
+		$url = WebGUI::URL::page("func=".$function->{func});
+	} else {
+		$url = WebGUI::URL::page("op=".$function->{op});
+	}
 	return {
 		title=>WebGUI::International::get($function->{title}{id}, $function->{title}{namespace}),
 		icon=>$session{config}{extrasURL}."/adminConsole/".$function->{icon},
-		url=>WebGUI::URL::page("op=".$function->{op}),
+		url=>$url,
 		canUse=>WebGUI::Grouping::isInGroup($function->{group})
 	};
 }
@@ -46,7 +53,7 @@ sub getAdminFunction {
 				namespace=>"Asset"
 			},
 			icon=>"assets.gif",
-			op=>"manageAssets",
+			func=>"manageAssets",
 			group=>"12"
 		},
 		"users"=>{
@@ -267,8 +274,7 @@ sub render {
 	$var{"console.icon"} = $acParams->{icon};
 	$var{"help.url"} = $self->{_helpUrl};
 	$var{"application_loop"} = $self->getAdminFunction;
-	$session{page}{useAdminStyle} = 1;
-	return WebGUI::Template::process($session{setting}{AdminConsoleTemplate}, "AdminConsole", \%var);
+	return WebGUI::Style::process(WebGUI::Template::process($session{setting}{AdminConsoleTemplate}, "AdminConsole", \%var),"adminConsole");
 }
 
 sub setHelp {
@@ -276,6 +282,14 @@ sub setHelp {
 	my $id = shift;
 	my $namespace = shift || "WebGUI";
 	$self->{_helpUrl} = WebGUI::URL::page('op=viewHelp&hid='.$id.'&namespace='.$namespace) if ($id);
+}
+
+sub setIcon {
+	my $self = shift;
+	my $icon = shift;
+	if ($icon) { 
+		$self->{_function}{icon} = $icon;
+	}
 }
 
 1;

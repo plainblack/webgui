@@ -18,6 +18,7 @@ use CGI::Util qw(rearrange);
 use DBI;
 use strict qw(subs vars);
 use Tie::IxHash;
+use WebGUI::Asset;
 use WebGUI::AdminConsole;
 use WebGUI::DateTime;
 use WebGUI::FormProcessor;
@@ -32,6 +33,7 @@ use WebGUI::Node;
 use WebGUI::Page;
 use WebGUI::Privilege;
 use WebGUI::Session;
+use WebGUI::Style;
 use WebGUI::SQL;
 use WebGUI::TabForm;
 use WebGUI::Template;
@@ -40,9 +42,11 @@ use WebGUI::Utility;
 use WebGUI::MetaData;
 use WebGUI::Wobject::WobjectProxy;
 
+our @ISA = qw(WebGUI::Asset);
+
 =head1 NAME
 
-Package WebGUI::Wobject
+Package WebGUI::Asset::Wobject
 
 =head1 DESCRIPTION
 
@@ -83,7 +87,19 @@ sub definition {
                                 cacheTimeoutVisitor=>{
                                         fieldType=>'interval',
                                         defaultValue=>600
-                                        }
+                                        },
+				templateId=>{
+					fieldType=>'template',
+					defaultValue=>undef
+					},
+				styleTemplateId=>{
+					fieldType=>'template',
+					defaultValue=>undef
+					},
+				printableStyleTemplateId=>{
+					fieldType=>'template',
+					defaultValue=>undef
+					}
                         }
                 });
         return $class->SUPER::definition($definition);
@@ -115,7 +131,7 @@ A comparison expression to be used when checking whether the action should be al
 
 sub confirm {
         return WebGUI::Privilege::vitalComponent() if ($_[4]);
-	my $noURL = $_[3] || WebGUI::URL::page();
+	my $noURL = $_[3] || $_[0]->getUrl;
         my $output = '<h1>'.WebGUI::International::get(42).'</h1>';
         $output .= $_[1].'<p>';
         $output .= '<div align="center"><a href="'.$_[2].'">'.WebGUI::International::get(44).'</a>';
@@ -174,24 +190,24 @@ sub getEditForm {
          $tabform->getTab("layout")->template(
 		-name=>"styleTemplateId",
 		-label=>WebGUI::International::get(1073),
-		-value=>($page{styleId} || 2),
+		-value=>$self->getValue("styleTemplateId"),
 		-namespace=>'style',
 		-afterEdit=>'op=editPage&amp;npp='.$session{form}{npp}
 		);
          $tabform->getTab("layout")->template(
 		-name=>"printableStyleTemplateId",
 		-label=>WebGUI::International::get(1079),
-		-value=>($page{printableStyleId} || 3),
+		-value=>$self->getValue("printableStyleTemplateId"),
 		-namespace=>'style',
 		-afterEdit=>'op=editPage&amp;npp='.$session{form}{npp}
 		);
-	if ($childCount) {
+#	if ($childCount) {
                	$tabform->getTab("layout")->yesNo(
 			-name=>"recurseStyle",
 			-subtext=>' &nbsp; '.WebGUI::International::get(106),
 			-uiLevel=>9
 			);
-	}
+#	}
 	$tabform->getTab("properties")->HTMLArea(
                 -name=>"description",
                 -label=>WebGUI::International::get(85),
@@ -209,6 +225,7 @@ sub getEditForm {
                 -value=>$self->getValue("cacheTimeoutVisitor"),
                 -uiLevel=>8
                 );
+	return $tabform;
 }
 
 
@@ -237,7 +254,20 @@ Logs the view of the wobject to the passive profiling mechanism.
 
 sub logView {
 	my $self = shift;
-	WebGUI::PassiveProfiling::add($self->get("assetId"));
+	if ($session{setting}{passiveProfilingEnabled}) {
+		WebGUI::PassiveProfiling::add($self->get("assetId"));
+# not sure what this will do in the new model
+#		WebGUI::PassiveProfiling::addPage();	# add wobjects on asset to passive profile log
+	}
+ # disabled for the time being because it's dangerous
+                #       if ($session{form}{op} eq "" && $session{setting}{trackPageStatistics} && $session{form}{wid} ne "new") {
+                #               WebGUI::SQL->write("insert into pageStatistics (dateStamp, userId, username, ipAddress, userAgent, referer,
+                #                       assetId, assetTitle, wobjectId, wobjectFunction) values (".time().",".quote($session{user}{userId})
+                #                       .",".quote($session{user}{username}).",
+                #                       ".quote($session{env}{REMOTE_ADDR}).", ".quote($session{env}{HTTP_USER_AGENT}).",
+                #                       ".quote($session{env}{HTTP_REFERER}).", ".quote($session{asset}{assetId}).",
+                #                       ".quote($session{asset}{title}).", ".quote($session{form}{wid}).", ".quote($session{form}{func}).")");
+                #       }
 	return;
 }
 
@@ -261,15 +291,9 @@ sub processMacros {
 
 #-------------------------------------------------------------------
 
-=head2 processTemplate ( templateId, vars [ , namespace ] ) 
+=head2 processTemplate ( vars, namespace [ , templateId ] ) 
 
 Returns the content generated from this template.
-
-B<NOTE:> Only for use in wobjects that support templates.
-
-=head3 templateId
-
-An id referring to a particular template in the templates table.
 
 =head3 hashRef
 
@@ -279,27 +303,41 @@ A hash reference containing variables and loops to pass to the template engine.
 
 A namespace to use for the template. Defaults to the wobject's namespace.
 
+=head3 templateId
+
+An id referring to a particular template in the templates table. Defaults to $self->get("templateId").
+
 =cut
 
 sub processTemplate {
 	my $self = shift;
-	my $templateId = shift;
 	my $var = shift;
-	my $namespace = shift || $self->get("namespace");
-	if ($self->{_useMetaData}) {
-                my $meta = WebGUI::MetaData::getMetaDataFields($self->get("wobjectId"));
-                foreach my $field (keys %$meta) {
-			$var->{$meta->{$field}{fieldName}} = $meta->{$field}{value};
-		}
+	my $namespace = shift;
+	my $templateId = shift || $self->get("templateId");
+        my $meta = WebGUI::MetaData::getMetaDataFields($self->get("wobjectId"));
+        foreach my $field (keys %$meta) {
+		$var->{$meta->{$field}{fieldName}} = $meta->{$field}{value};
 	}
+	my $wobjectToolbar = deleteIcon('func=delete',$self->get("url"),WebGUI::International::get(43))
+              	.editIcon('func=edit',$self->get("url"))
+             	.moveUpIcon('func=promote',$self->get("url"))
+             	.moveDownIcon('func=demote',$self->get("url"))
+              #	.moveTopIcon('func=moveTop&wid='.${$wobject}{wobjectId})
+              #	.moveBottomIcon('func=moveBottom&wid='.${$wobject}{wobjectId})
+            	.cutIcon('func=cut',$self->get("url"))
+            	.copyIcon('func=copy',$self->get("url"));
+       # if (${$wobject}{namespace} ne "WobjectProxy" && isIn("WobjectProxy",@{$session{config}{wobjects}})) {
+        #     	$wobjectToolbar .= shortcutIcon('func=createShortcut');
+        #}
+	$var->{'controls'} = $wobjectToolbar;
 	my %vars = (
-		%{$self->{_property}},
+		%{$self->{_properties}},
 		%{$var}
 		);
 	if (defined $self->get("_WobjectProxy")) {
 		$vars{isShortcut} = 1;
-		my ($originalPageURL) = WebGUI::SQL->quickArray("select urlizedTitle from page where pageId=".quote($self->get("pageId")),WebGUI::SQL->getSlave);
-		$vars{originalURL} = WebGUI::URL::gateway($originalPageURL."#".$self->get("wobjectId"));
+		my ($originalPageURL) = WebGUI::SQL->quickArray("select url from asset where assetId=".quote($self->getId),WebGUI::SQL->getSlave);
+		$vars{originalURL} = WebGUI::URL::gateway($originalPageURL."#".$self->getId);
 	}
 	return WebGUI::Template::process($templateId,$namespace, \%vars);
 }
@@ -318,6 +356,14 @@ sub purge {
 	WebGUI::MetaData::metaDataDelete($self->get("wobjectId"));
 }
 
+
+
+#-------------------------------------------------------------------
+
+sub view {
+	my $self = shift;
+	return "No view has been created for this wobject.";
+}
 
 
 #-------------------------------------------------------------------
@@ -360,12 +406,47 @@ B<NOTE:> This method should only need to be extended if you need to do some spec
 
 sub www_editSave {
 	my $self = shift;
-	$self->SUPER::www_editSave();
+	my $output = $self->SUPER::www_editSave();
 	WebGUI::MetaData::metaDataSave($self->getId);
-	return "";
+	return $output;
 }
 
 
+
+
+
+#-------------------------------------------------------------------
+
+sub www_view {
+	my $self = shift;
+	$self->logView();
+	return WebGUI::Privilege::noAccess() unless $self->canView;
+	my $cache;
+	my $output;
+        my $useCache = (
+		$session{form}{op} eq "" && 
+		(
+			( $self->get("cacheTimeout") > 10 && $session{user}{userId} !=1) || 
+			( $self->get("cacheTimeoutVisitor") > 10 && $session{user}{userId} == 1)
+		) && 
+		not $session{var}{adminOn}
+	);
+#	if ($useCache) {
+ #              	$cache = WebGUI::Cache->new("asset_".$self->getId."_".$session{user}{userId});
+  #         	$output = $cache->get;
+#	}
+	unless ($output) {
+		$output = $self->view;
+		my $ttl;
+		if ($session{user}{userId} == 1) {
+			$ttl = $self->get("cacheTimeoutVisitor");
+		} else {
+			$ttl = $self->get("cacheTimeout");
+		}
+#		$cache->set($output, $ttl) if ($useCache && !WebGUI::HTTP::isRedirect());
+	}
+	return WebGUI::Style::process($output,$self->get("styleTemplateId"));
+}
 
 1;
 
