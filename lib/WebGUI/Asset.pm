@@ -847,6 +847,25 @@ sub getAssetsInTrash {
 
 #-------------------------------------------------------------------
 
+=head2 getContainer  ()
+
+Returns a reference to the container asset. If this asset is a container it returns a reference to itself. If this asset is not attached to a container it returns its parent.
+
+=cut
+
+sub getContainer {
+	my $self = shift;
+	if (WebGUI::Utility::isIn(ref $self, @{$session{config}{assetContainers}})) {
+		return $self;
+	} else {
+		$session{asset} = $self->getParent;
+		return $self->getParent;
+	}
+}
+
+
+#-------------------------------------------------------------------
+
 =head2 getEditForm ( )
 
 Creates and returns a tabform to edit parameters of an Asset.
@@ -2065,6 +2084,7 @@ sub www_add {
 		startDate => $self->get("startDate"),
 		endDate => $self->get("endDate")
 		);
+	$properties{isHidden} = 1 unless (WebGUI::Utility::isIn(ref $session{form}{class}, @{$session{config}{assetContainers}}));
 	my $newAsset = WebGUI::Asset->newByDynamicClass("new",$session{form}{class},\%properties);
 	return $newAsset->www_edit();
 }
@@ -2082,7 +2102,7 @@ sub www_copy {
 	return $self->getAdminConsole->render(WebGUI::Privilege::insufficient()) unless $self->canEdit;
 	my $newAsset = $self->duplicate;
 	$newAsset->cut;
-	return "";
+	return $self->getContainer->www_view;
 }
 
 #-------------------------------------------------------------------
@@ -2204,7 +2224,7 @@ sub www_demote {
 	my $self = shift;
 	return $self->getAdminConsole->render(WebGUI::Privilege::insufficient()) unless $self->canEdit;
 	$self->demote;
-	return "";
+	return $self->getContainer->www_view; 
 }
 
 #-------------------------------------------------------------------
@@ -2941,7 +2961,7 @@ sub www_promote {
 	my $self = shift;
 	return $self->getAdminConsole->render(WebGUI::Privilege::insufficient()) unless $self->canEdit;
 	$self->promote;
-	return "";
+	return $self->getContainer->www_view;
 }
 
 

@@ -142,7 +142,7 @@ sub getUiLevel {
 #-------------------------------------------------------------------
 sub view {
 	my $self = shift;
-	my $children = $self->getLineage( ["children"], { returnObjects=>1 });
+	my $children = $self->getLineage( ["children"], { returnObjects=>1, excludeClasses=>["WebGUI::Asset::Wobject::Layout"] });
 	my %vars;
 	# I'm sure there's a more efficient way to do this. We'll figure it out someday.
 	my @positions = split(/\./,$self->get("contentPositions"));
@@ -165,19 +165,11 @@ sub view {
 	}
 	# deal with unplaced children
 	foreach my $child (@{$children}) {
-		if (ref $child eq "WebGUI::Asset::Wobject::Layout") {
-			push(@{$vars{"sublayout_loop"}}, {
-				id => $child->getId,
-				url => $child->getUrl,
-				title => $child->get("title")
+		unless (isIn($child->getId, @found)) {
+			push(@{$vars{"position1_loop"}},{
+				id=>$child->getId,
+				content=>$child->view
 				});
-		} else {
-			unless (isIn($child->getId, @found)) {
-				push(@{$vars{"position1_loop"}},{
-					id=>$child->getId,
-					content=>$child->view
-					});
-			}
 		}
 	}
 	$vars{showAdmin} = ($session{var}{adminOn} && $self->canEdit);
