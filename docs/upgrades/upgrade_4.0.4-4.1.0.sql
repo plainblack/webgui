@@ -14,5 +14,12 @@ INSERT INTO international VALUES (539,'WebGUI','English','Enable Karma?');
 INSERT INTO international VALUES (540,'WebGUI','English','Karma Per Login');
 INSERT INTO settings VALUES ('useKarma','0');
 INSERT INTO settings VALUES ('karmaPerLogin','1');
+alter table Poll add column karmaPerVote int not null default 0;
+INSERT INTO international VALUES (20,'Poll','English','Karma Per Vote');
+INSERT INTO international VALUES (541,'WebGUI','English','Karma Per Post');
+INSERT INTO international VALUES (30,'UserSubmission','English','Karma Per Submission');
+alter table UserSubmission add column karmaPerSubmission int not null default 0;
+alter table UserSubmission add column karmaPerPost int not null default 0;
+alter table MessageBoard add column karmaPerPost int not null default 0;
 
 

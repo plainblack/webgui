@@ -20,6 +20,7 @@ use WebGUI::Privilege;
 use WebGUI::Session;
 use WebGUI::SQL;
 use WebGUI::URL;
+use WebGUI::User;
 use WebGUI::Utility;
 use WebGUI::Wobject;
 
@@ -38,6 +39,7 @@ sub duplicate {
                 graphWidth=>$_[0]->get("graphWidth"),
                 voteGroup=>$_[0]->get("voteGroup"),
                 question=>$_[0]->get("question"),
+                karmaPerVote=>$_[0]->get("karmaPerVote"),
                 a1=>$_[0]->get("a1"),
                 a2=>$_[0]->get("a2"),
                 a3=>$_[0]->get("a3"),
@@ -83,7 +85,7 @@ sub purge {
 
 #-------------------------------------------------------------------
 sub set {
-        $_[0]->SUPER::set($_[1],[qw(active graphWidth voteGroup question a1 a2 a3 a4 a5 a6 a7 a8 a9 a10 a11 a12 a13 a14 a15 a16 a17 a18 a19 a20)]);
+        $_[0]->SUPER::set($_[1],[qw(active karmaPerVote graphWidth voteGroup question a1 a2 a3 a4 a5 a6 a7 a8 a9 a10 a11 a12 a13 a14 a15 a16 a17 a18 a19 a20)]);
 }
 
 #-------------------------------------------------------------------
@@ -117,6 +119,11 @@ sub www_edit {
 		$f = WebGUI::HTMLForm->new;
 		$f->yesNo("active",WebGUI::International::get(3,$namespace),$active);
                 $f->group("voteGroup",WebGUI::International::get(4,$namespace),[$voteGroup]);
+		if ($session{setting}{useKarma}) {
+			$f->integer("karmaPerVote",WebGUI::International::get(20,$namespace),$_[0]->get("karmaPerVote"));
+		} else {
+			$f->hidden("karmaPerVote",$_[0]->get("karmaPerVote"));
+		}
 		$f->integer("graphWidth",WebGUI::International::get(5,$namespace),$graphWidth);
 		$f->text("question",WebGUI::International::get(6,$namespace),$_[0]->get("question"));
                 $f->textarea("answers",WebGUI::International::get(7,$namespace).'<span class="formSubtext"><br>'.WebGUI::International::get(8,$namespace).'</span>',$answers);
@@ -141,6 +148,7 @@ sub www_editSave {
                 for ($i=1; $i<=20; $i++) {
                 	$property->{'a'.$i} = $answer[($i-1)];
                 }
+		$property->{karmaPerVote} = $session{form}{karmaPerVote};
 		$property->{voteGroup} = $session{form}{voteGroup};
 		$property->{graphWidth} = $session{form}{graphWidth};
 		$property->{active} = $session{form}{active};
@@ -214,11 +222,15 @@ sub www_view {
 
 #-------------------------------------------------------------------
 sub www_vote {
-	my ($hasVoted);
+	my ($hasVoted, $u);
 	($hasVoted) = WebGUI::SQL->quickArray("select count(*) from Poll_answer where wobjectId=".$_[0]->get("wobjectId")." and ((userId=$session{user}{userId} and userId<>1) or (userId=1 and ipAddress='$session{env}{REMOTE_ADDR}'))");
         if ($session{form}{answer} ne "" && WebGUI::Privilege::isInGroup($_[0]->get("voteGroup"),$session{user}{userId}) && !($hasVoted)) {
         	WebGUI::SQL->write("insert into Poll_answer values (".$_[0]->get("wobjectId").", 
 			'$session{form}{answer}', $session{user}{userId}, '$session{env}{REMOTE_ADDR}')");
+		if ($session{setting}{useKarma}) {
+			$u = WebGUI::User->new($session{user}{userId});
+			$u->karma($_[0]->get("karmaPerVote"),$namespace." (".$_[0]->get("wobjectId").")","Voted on this poll.");
+		}
 	}
 	return "";
 }
