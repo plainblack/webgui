@@ -317,6 +317,7 @@ sub www_editUserKarmaSave {
 sub www_editUserProfile {
 	return WebGUI::Privilege::adminOnly() unless (WebGUI::Privilege::isInGroup(3));
         my ($output, $f, $a, %user, %data, $method, $values, $category, $label, $default, $previousCategory);
+	tie %data, 'Tie::CPHash';
 	$output = helpIcon(32);
         $output .= '<h1>'.WebGUI::International::get(455).'</h1>';
         $f = WebGUI::HTMLForm->new;
@@ -345,7 +346,7 @@ sub www_editUserProfile {
                                 $default = eval $data{dataDefault};
                         }
                  	$f->select($data{fieldName},$values,$label,$default);
-                } else {
+                } elsif ($method) {
                         $default = $session{form}{$data{fieldName}} || $user{$data{fieldName}} || eval $data{dataDefault};
                         $f->$method($data{fieldName},$label,$default);
                 }
