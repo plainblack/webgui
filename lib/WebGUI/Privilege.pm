@@ -16,10 +16,12 @@ package WebGUI::Privilege;
 
 use strict;
 use Tie::CPHash;
+use WebGUI::DatabaseLink;
 use WebGUI::DateTime;
 use WebGUI::Group;
 use WebGUI::Grouping;
 use WebGUI::International;
+use WebGUI::Macro;
 use WebGUI::Operation::Account ();
 use WebGUI::Session;
 use WebGUI::SQL;
@@ -302,7 +304,7 @@ sub isInGroup {
 	}
         ### Get data for auxillary checks.
 	tie %group, 'Tie::CPHash';
-	%group = WebGUI::SQL->quickHash("select karmaThreshold,ipFilter,scratchFilter from groups where groupId='$gid'");
+	%group = WebGUI::SQL->quickHash("select karmaThreshold,ipFilter,scratchFilter,databaseLinkId,dbQuery,dbCacheTimeout from groups where groupId='$gid'");
 	### Check IP Address
 	if ($group{ipFilter} ne "") {
 		$group{ipFilter} =~ s/\t//g;
@@ -346,6 +348,42 @@ sub isInGroup {
 			return 1;
 		}
 	}
+	
+	### Check external database
+	if ($group{dbQuery} ne "" && $group{databaseLinkId}) {
+		# skip if not logged in and query contains a User macro
+		unless ($group{dbQuery} =~ /\^User/i && $uid == 1) {
+			my $dbLink = WebGUI::DatabaseLink->new($group{databaseLinkId});
+			my $dbh = $dbLink->dbh;
+			if (defined $dbh) {
+				if ($group{dbQuery} =~ /select 1/i) {
+					$group{dbQuery} = WebGUI::Macro::process($group{dbQuery});
+					my $sth = WebGUI::SQL->unconditionalRead($group{dbQuery},$dbh);
+					unless ($sth->errorCode < 1) {
+						WebGUI::ErrorHandler::warn("There was a problem with the database query for group ID $gid.");
+					} else {
+						my ($result) = $sth->array;
+						if ($result == 1) {
+							$session{isInGroup}{$gid}{$uid} = 1;
+							if ($group{dbCacheTimeout} > 0) {
+								WebGUI::Grouping::deleteUsersFromGroups([$uid],[$gid]);
+								WebGUI::Grouping::addUsersToGroups([$uid],[$gid],$group{dbCacheTimeout});
+							}
+						} else {
+							$session{isInGroup}{$gid}{$uid} = 0;
+							WebGUI::Grouping::deleteUsersFromGroups([$uid],[$gid]) if ($group{dbCacheTimeout} > 0);
+						}
+					}
+					$sth->finish;
+				} else {
+					WebGUI::ErrorHandler::warn("Database query for group ID $gid must use 'select 1'");
+				}
+				$dbLink->disconnect;
+				return 1 if ($session{isInGroup}{$gid}{$uid});
+			}
+		}
+	}
+				
 	### Check for groups of groups.
 	$groups = WebGUI::Grouping::getGroupsInGroup($gid,1);
 	foreach (@{$groups}) {

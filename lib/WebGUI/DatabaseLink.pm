@@ -34,6 +34,10 @@ This package contains utility methods for WebGUI's database link system.
  %links = WebGUI::DatabaseLink::getHash();
  %databaseLink = WebGUI::DatabaseLink::get($databaseLinkId);
  %using = WebGUI::Databaselink::whatIsUsing($databaseLinkId);
+ 
+ $dbLink = WebGUI::DatabaseLink->new($databaseLinkId);
+ $dbh = $dbLink->dbh;
+ $dbLink->disconnect;
 
 =head1 METHODS
 
@@ -75,7 +79,8 @@ sub get {
 #-------------------------------------------------------------------
 =head2 whatIsUsing ( databaseLinkId )
 
-Returns an array of hashrefs containing wobjects which use a database link.
+Returns an array of hashrefs containing items which use a database link.  This method will
+need to be updated any time a new item starts using Database Links.
 
 =over
 
@@ -88,6 +93,7 @@ A valid databaseLinkId
 =cut
 
 sub whatIsUsing {
+	# get list of SQLReports
 	my $sql = 'select wobject.wobjectId, wobject.title, page.menuTitle, page.urlizedTitle from wobject, SQLReport, page '.
 		'where SQLReport.databaseLinkId = '.$_[0].' and SQLReport.wobjectId = wobject.wobjectId '.
 		'and wobject.pageId = page.pageId';
@@ -97,7 +103,97 @@ sub whatIsUsing {
 		push @using, $data;
 	}
 	$sth->finish;
+	
+	# get list of groups
+	$sql = 'select groupId, groupName from groups where databaseLinkId = '.$_[0];
+	$sth = WebGUI::SQL->read($sql);
+	while (my $data = $sth->hashRef()) {
+		push @using, $data;
+	}
+	$sth->finish;
+	
 	return @using;
+}
+
+#-------------------------------------------------------------------
+=head2 disconnect ( )
+
+Disconnect cleanly from the current databaseLink.
+
+=cut
+
+sub disconnect {
+	my ($class, $value);
+	$class = shift;
+	$value = shift;
+	if (defined $class->{_dbh}) {
+		$class->{_dbh}->disconnect() unless ($class->{_databaseLink}{DSN} eq $session{config}{dsn});
+	}
+}
+
+#-------------------------------------------------------------------
+=head2 dbh ( )
+
+Return a DBI handle for the current databaseLink, connecting if necessary.
+
+=cut
+
+sub dbh {
+	my ($class, $value);
+	my ($dsn, $username, $identifier);
+	$class = shift;
+	$value = shift;
+	
+	if (defined $class->{_dbh}) {
+		return $class->{_dbh};
+	}
+
+	$dsn = $class->{_databaseLink}{DSN};
+	$username = $class->{_databaseLink}{username};
+	$identifier = $class->{_databaseLink}{identifier};
+	if ($dsn eq $session{config}{dsn}) {
+		$class->{_dbh} = $session{dbh};
+		return $session{dbh};
+	} elsif ($dsn =~ /\DBI\:\w+\:\w+/i) {
+		eval{
+			$class->{_dbh} = DBI->connect($dsn,$username,$identifier);
+		};
+		if ($@) {
+			WebGUI::ErrorHandler::warn("DatabaseLink [".$_[0]."] ".$@);
+		} else {
+			return $class->{_dbh};
+		}
+	} else {
+		WebGUI::ErrorHandler::warn("DatabaseLink [".$_[0]."] The DSN specified is of an improper format.");
+	}
+	return undef;
+}
+
+#-------------------------------------------------------------------
+
+=head2 new ( databaseLinkId )
+
+Constructor.
+
+=over
+
+=item databaseLinkId
+
+The databaseLinkId of the databaseLink you're creating an object reference for. 
+
+=back
+
+=cut
+
+sub new {
+    my ($class, $databaseLinkId, %databaseLink);
+    tie %databaseLink, 'Tie::CPHash';
+    $class = shift;
+	$databaseLinkId = shift;
+	unless ($databaseLinkId eq "") {
+		%databaseLink = WebGUI::SQL->quickHash("select * from databaseLink where databaseLinkId='$databaseLinkId'");
+	}
+	bless {_databaseLinkId => $databaseLinkId, _databaseLink => \%databaseLink }, $class;
 }
 
 1;

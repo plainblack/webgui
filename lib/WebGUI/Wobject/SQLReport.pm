@@ -148,7 +148,7 @@ sub www_edit {
 
 #-------------------------------------------------------------------
 sub www_view {
-	my ($dsn, $username, $identifier, $query, @row, $i, $rownum, $p, $ouch, $output, $sth, $dbh, @result, @template, $temp, $col, $errorMessage, $url);
+	my ($dsn, $username, $identifier, $dbLink, $query, @row, $i, $rownum, $p, $ouch, $output, $sth, $dbh, @result, @template, $temp, $col, $errorMessage, $url);
 	if ($_[0]->get("preprocessMacros")) {
 		$query = WebGUI::Macro::process($_[0]->get("dbQuery"));
 	} else {
@@ -161,29 +161,24 @@ sub www_view {
         $output .= $_[0]->description;
 	$output .= WebGUI::International::get(17,$_[0]->get("namespace"))." ".$query."<p>" if ($_[0]->get("debugMode"));
 	
-	# pull database link info if selected
+	# connect to external database if used
 	if ($_[0]->get("databaseLinkId")) {
-		my %databaseLink = WebGUI::DatabaseLink::get($_[0]->get("databaseLinkId"));
-		# failsafe check in case the link gets deleted
-		if ($databaseLink{DSN}) {
-			$dsn = $databaseLink{DSN};
-			$username = $databaseLink{username};
-			$identifier = $databaseLink{identifier};
+		$dbLink = WebGUI::DatabaseLink->new($_[0]->get("databaseLinkId"));
+		$dbh = $dbLink->dbh;
+	} else {
+		if ($dsn eq $session{config}{dsn}) {
+			$dbh = $session{dbh};
+		} elsif ($dsn =~ /\DBI\:\w+\:\w+/i) {
+			eval{$dbh = DBI->connect($dsn,$username,$identifier)};
+			if ($@) {
+				WebGUI::ErrorHandler::warn("SQL Report [".$_[0]->get("wobjectId")."] ".$@);
+				undef $dbh;
+			}
+		} else {
+			$output .= WebGUI::International::get(9,$_[0]->get("namespace")).'<p>' if ($_[0]->get("debugMode"));
+			WebGUI::ErrorHandler::warn("SQLReport [".$_[0]->get("wobjectId")."] The DSN specified is of an improper format.");
 		}
 	}
-	
-	if ($dsn eq $session{config}{dsn}) {
-		$dbh = $session{dbh};
-	} elsif ($dsn =~ /\DBI\:\w+\:\w+/) {
-                eval{$dbh = DBI->connect($dsn,$username,$identifier)};
-		if ($@) {
-			WebGUI::ErrorHandler::warn("SQL Report [".$_[0]->get("wobjectId")."] ".$@);
-			undef $dbh;
-		}
-       	} else {
-               	$output .= WebGUI::International::get(9,$_[0]->get("namespace")).'<p>' if ($_[0]->get("debugMode"));
-		WebGUI::ErrorHandler::warn("SQLReport [".$_[0]->get("wobjectId")."] The DSN specified is of an improper format.");
-        }
 	if (defined $dbh) {
 		if ($query =~ /^select/i || $query =~ /^show/i || $query =~ /^describe/i) {
 			$sth = WebGUI::SQL->unconditionalRead($query,$dbh);
@@ -242,7 +237,11 @@ sub www_view {
                		$output .= WebGUI::International::get(10,$_[0]->get("namespace")).'<p>' if ($_[0]->get("debugMode"));
                         WebGUI::ErrorHandler::warn("SQLReport [".$_[0]->get("wobjectId")."] The SQL query is improperly formatted.");
                 }
-		$dbh->disconnect() unless ($dsn eq $session{config}{dsn});
+		if ($dbLink) {
+			$dbLink->disconnect;
+		} else {
+			$dbh->disconnect() unless ($dsn eq $session{config}{dsn});
+		}
 	} else {
 		$output .= WebGUI::International::get(12,$_[0]->get("namespace")).'<p>' if ($_[0]->get("debugMode"));
 		WebGUI::ErrorHandler::warn("SQLReport [".$_[0]->get("wobjectId")."] Could not connect to database.");

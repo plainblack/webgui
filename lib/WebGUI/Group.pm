@@ -535,6 +535,7 @@ sub new {
 		$group{expireNotifyOffset} = -14;
 		$group{deleteOffset} = 14;
 		$group{expireNotify} = 0;
+		$group{dbCacheTimeout} = 3600;
 	} else {
         	%group = WebGUI::SQL->quickHash("select * from groups where groupId='$groupId'");
 	}
@@ -567,6 +568,90 @@ sub scratchFilter {
                         lastUpdated=".time()." where groupId=$class->{_groupId}");
         }
         return $class->{_group}{"scratchFilter"};
+}
+
+#-------------------------------------------------------------------
+
+=head2 dbQuery ( [ value ] )
+
+Returns the dbQuery for this group.
+
+=over
+
+=item value
+
+If specified, the dbQuery is set to this value.
+
+=back
+
+=cut
+
+sub dbQuery {
+        my ($class, $value);
+        $class = shift;
+        $value = shift;
+        if (defined $value) {
+                $class->{_group}{"dbQuery"} = $value;
+                WebGUI::SQL->write("update groups set dbQuery=".quote($value).",
+                        lastUpdated=".time()." where groupId=$class->{_groupId}");
+        }
+        return $class->{_group}{"dbQuery"};
+}
+
+#-------------------------------------------------------------------
+
+=head2 databaseLinkId ( [ value ] )
+
+Returns the databaseLinkId for this group.
+
+=over
+
+=item value
+
+If specified, the databaseLinkId is set to this value.
+
+=back
+
+=cut
+
+sub databaseLinkId {
+        my ($class, $value);
+        $class = shift;
+        $value = shift;
+        if (defined $value) {
+                $class->{_group}{"databaseLinkId"} = $value;
+                WebGUI::SQL->write("update groups set databaseLinkId=".quote($value).",
+                        lastUpdated=".time()." where groupId=$class->{_groupId}");
+        }
+        return $class->{_group}{"databaseLinkId"};
+}
+
+#-------------------------------------------------------------------
+
+=head2 dbCacheTimeout ( [ value ] )
+
+Returns the dbCacheTimeout for this group.
+
+=over
+
+=item value
+
+If specified, the dbCacheTimeout is set to this value.
+
+=back
+
+=cut
+
+sub dbCacheTimeout {
+        my ($class, $value);
+        $class = shift;
+        $value = shift;
+        if (defined $value) {
+                $class->{_group}{"dbCacheTimeout"} = $value;
+                WebGUI::SQL->write("update groups set dbCacheTimeout=".quote($value).",
+                        lastUpdated=".time()." where groupId=$class->{_groupId}");
+        }
+        return $class->{_group}{"dbCacheTimeout"};
 }
 
 

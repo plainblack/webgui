@@ -13,6 +13,7 @@ package WebGUI::Operation::Group;
 use Exporter;
 use strict;
 use Tie::CPHash;
+use WebGUI::DatabaseLink;
 use WebGUI::DateTime;
 use WebGUI::Group;
 use WebGUI::Grouping;
@@ -216,6 +217,22 @@ sub www_editGroup {
 		-value=>$g->autoDelete,
 		-label=>WebGUI::International::get(975)
 		);
+	$f->selectList(
+		-name=>"databaseLinkId",
+		-options=>{
+			"0"=>WebGUI::International::get(19,'SQLReport'),
+			WebGUI::DatabaseLink::getHash(),
+		},
+		-label=>WebGUI::International::get(20,'SQLReport'),
+		-value=>[$g->databaseLinkId],
+		-subtext=>(WebGUI::Privilege::isInGroup(3)) ? '<a href="'.WebGUI::URL::page("op=listDatabaseLinks").'">'.WebGUI::International::get(981).'</a>' : ""
+		);
+	$f->textarea(
+		-name=>"dbQuery",
+		-value=>$g->dbQuery,
+		-label=>WebGUI::International::get(1005)
+		);
+	$f->interval("dbCacheTimeout",WebGUI::International::get(1004), WebGUI::DateTime::secondsToInterval($g->dbCacheTimeout));
 	$f->submit;
 	$output .= $f->print;
         return _submenu($output);
@@ -237,6 +254,9 @@ sub www_editGroupSave {
 	$g->deleteOffset($session{form}{deleteOffset});
 	$g->autoAdd(WebGUI::FormProcessor::yesNo("autoAdd"));
 	$g->autoDelete(WebGUI::FormProcessor::yesNo("autoDelete"));
+	$g->databaseLinkId($session{form}{databaseLinkId});
+	$g->dbQuery($session{form}{dbQuery});
+	$g->dbCacheTimeout(WebGUI::FormProcessor::interval("dbCacheTimeout"));
         return www_listGroups();
 }
 

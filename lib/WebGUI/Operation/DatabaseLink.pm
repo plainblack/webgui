@@ -60,8 +60,12 @@ sub www_deleteDatabaseLink {
 	$output .= '<h1>'.WebGUI::International::get(987).'</h1>';
         $output .= WebGUI::International::get(988).'<p>';
         foreach my $using (WebGUI::DatabaseLink::whatIsUsing($session{form}{dlid})) {
-			$output .= '<li>'.WebGUI::International::get(1,'SQL Report').' <a href="'.WebGUI::URL::page('func=edit&wid='.$using->{wobjectId},$using->{urlizedTitle}).'">'
-				.$using->{title}.'</a> '.WebGUI::International::get(989).' <a href="'.WebGUI::URL::gateway($using->{urlizedTitle}).'">'.$using->{menuTitle}.'</a>.</li>';
+        	if ($using->{title}) {
+				$output .= '<li>'.WebGUI::International::get(1,'SQLReport').' <a href="'.WebGUI::URL::page('func=edit&wid='.$using->{wobjectId},$using->{urlizedTitle}).'">'
+					.$using->{title}.'</a> '.WebGUI::International::get(989).' <a href="'.WebGUI::URL::gateway($using->{urlizedTitle}).'">'.$using->{menuTitle}.'</a>.</li>';
+			} else {
+				$output .= '<li>'.'Group'.' <a href="'.WebGUI::URL::page('op=editGroup&gid='.$using->{groupId}).'">'.$using->{groupName}.'</a>.</li>';
+			}
 		}
         $output .= '<p><div align="center"><a href="'.
 		WebGUI::URL::page('op=deleteDatabaseLinkConfirm&dlid='.$session{form}{dlid})

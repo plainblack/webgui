@@ -19,10 +19,15 @@ use WebGUI::SQL;
 sub process {
 	my @date = WebGUI::DateTime::localtime();
         if ($date[4] == 3) { # only occurs at 3am on the day in question.
-        	my $sth = WebGUI::SQL->read("select groupId,deleteOffset from groups");
+        	my $sth = WebGUI::SQL->read("select groupId,deleteOffset,dbCacheTimeout from groups");
         	while (my $data = $sth->hashRef) {
-        		WebGUI::SQL->write("delete from groupings where groupId=$data->{groupId} and expireDate < "
+        		if ($data->{dbCacheTimeout} > 0) {
+					# there is no need to wait deleteOffset days for expired external group cache data
+					WebGUI::SQL->write("delete from groupings where groupId=$data->{groupId} and expireDate < ".time());
+				} else {
+        			WebGUI::SQL->write("delete from groupings where groupId=$data->{groupId} and expireDate < "
                         	.(time()-(86400*$data->{deleteOffset})));
+				}
         	}
 	        $sth->finish;
 	}
