@@ -86,6 +86,8 @@
  - RFE [ 960747 ] Make the attachment box templated. Thanks to Flavio Curti.
  - Snippets can now take up to 9 optional parameters as replacements similar
    to the SQL macro. Thanks to Andreas Ljunggren.
+ - bugfix [ 990710 ] Users can't change own passwords
+
 
 
 6.0.3

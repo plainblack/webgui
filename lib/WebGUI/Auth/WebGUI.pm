@@ -191,6 +191,8 @@ sub createAccountSave {
    }
 
    my $properties;
+   $properties->{changeUsername} = $session{setting}{webguiChangeUsername};
+   $properties->{changePassword} = $session{setting}{webguiChangePassword};   
    $properties->{identifier} = Digest::MD5::md5_base64($password);
    $properties->{passwordLastUpdated} = time();
    $properties->{passwordTimeout} = $session{setting}{webguiPasswordTimeout};
@@ -219,18 +221,18 @@ sub displayAccount {
    return $self->displayLogin($_[0]) if ($self->userId == 1);
    my $userData = $self->getParams;
    $vars->{'account.message'} = $_[0] if ($_[0]);
-   if($userData->{changeUsername}){
+   $vars->{'account.noform'} = 1;
+   if($userData->{changeUsername}  || (!defined $userData->{changeUsername} && $session{setting}{webguiChangeUsername})){
       $vars->{'account.form.username'} = WebGUI::Form::text({"name"=>"authWebGUI.username","value"=>$self->username});
       $vars->{'account.form.username.label'} = WebGUI::International::get(50);
+      $vars->{'account.noform'} = 0;
    }
-   if($userData->{changePassword}){
+   if($userData->{changePassword} || (!defined $userData->{changePassword} && $session{setting}{webguiChangePassword})){
       $vars->{'account.form.password'} = WebGUI::Form::password({"name"=>"authWebGUI.identifier","value"=>"password"});
       $vars->{'account.form.password.label'} = WebGUI::International::get(51);
       $vars->{'account.form.passwordConfirm'} = WebGUI::Form::password({"name"=>"authWebGUI.identifierConfirm","value"=>"password"});
       $vars->{'account.form.passwordConfirm.label'} = WebGUI::International::get(2,'AuthWebGUI');
-   }
-   if(!$userData->{changeUsername} && !$userData->{changePassword}){
-      $vars->{'account.noform'} = "true";
+      $vars->{'account.noform'} = 0;
    }
    $vars->{'account.nofields'} = WebGUI::International::get(22,'AuthWebGUI');
    return $self->SUPER::displayAccount("updateAccount",$vars);

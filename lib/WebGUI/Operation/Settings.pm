@@ -20,6 +20,7 @@ use WebGUI::International;
 use WebGUI::Operation::Shared;
 use WebGUI::Privilege;
 use WebGUI::Session;
+use WebGUI::Style;
 use WebGUI::SQL;
 use WebGUI::URL;
 
@@ -149,7 +150,7 @@ sub www_editUserSettings {
    my ($output, $f, $cmd, $html);
    $output .= helpIcon("user settings edit");
    $output .= '<h1>'.WebGUI::International::get(117).'</h1>';
-   $output .= WebGUI::Form::_javascriptFile("swapLayers.js");
+	WebGUI::Style::setScript($session{config}{extrasURL}."/swapLayers.js",{language=>"Javascript"});
    $output .= '<script language="JavaScript" > var active="'.$session{setting}{authMethod}.'"; </script>';
    $f = WebGUI::HTMLForm->new("","","","","","border='0' cellpadding='0' cellspacing='0' width='800'");
    $f->hidden("op","saveSettings");
