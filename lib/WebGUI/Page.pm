@@ -126,6 +126,67 @@ These functions are available from this package:
 =cut
 
 #-------------------------------------------------------------------
+sub _processWobjectFunctions {
+        my ($wobject, $output, $proxyWobjectId, $cmd, $w);        
+	if (exists $session{form}{func} && exists $session{form}{wid}) {                
+		if ($session{form}{func} =~ /^[A-Za-z]+$/) {                        
+			if ($session{form}{wid} eq "new") {                                
+				$wobject = {wobjectId=>"new",namespace=>$session{form}{namespace},pageId=>$session{page}{pageId}};                        
+			} else {                                
+				$wobject = WebGUI::SQL->quickHashRef("select * from wobject where wobjectId=".quote($session{form}{wid}),WebGUI::SQL->getSlave); 
+				if (${$wobject}{namespace} eq "") {                                        
+					WebGUI::ErrorHandler::warn("Wobject [$session{form}{wid}] appears to be missing or "                                    
+					."corrupt, but was requested " 
+					."by $session{user}{username} [$session{user}{userId}].");                                        
+					$wobject = ();                                
+				}                        
+			}                        
+			if ($wobject) {                                
+				if (${$wobject}{pageId} != $session{page}{pageId}) {                                        
+					($proxyWobjectId) = WebGUI::SQL->quickArray("select wobject.wobjectId from                                                
+						wobject,WobjectProxy                                               
+						where wobject.wobjectId=WobjectProxy.wobjectId                                                
+						and wobject.pageId=".quote($session{page}{pageId})."                                                
+						and WobjectProxy.proxiedWobjectId=".quote(${$wobject}{wobjectId}),WebGUI::SQL->getSlave);
+				  	${$wobject}{_WobjectProxy} = $proxyWobjectId;
+				}
+				unless (${$wobject}{pageId} == $session{page}{pageId}                                                                
+					|| ${$wobject}{pageId} == 2                                                                
+					|| ${$wobject}{pageId} == 3                                                                
+					|| ${$wobject}{_WobjectProxy} ne "") {                                        
+					$output .= WebGUI::International::get(417);                                        
+					WebGUI::ErrorHandler::security("access wobject [".$session{form}{wid}."] on page '"       
+						.$session{page}{title}."' [".$session{page}{pageId}."].");                                
+				} else {                                        
+					if (WebGUI::Page::canView()) {                                                
+						$cmd = "WebGUI::Wobject::".${$wobject}{namespace};                                                
+						my $load = "use ".$cmd; # gotta load the wobject before you can use it        
+						eval($load);                                                
+						WebGUI::ErrorHandler::warn("Wobject failed to compile: $cmd.".$@) if($@);
+						$w = eval{$cmd->new($wobject)};   
+						WebGUI::ErrorHandler::fatalError("Couldn't instanciate wobject: ${$wobject}{namespace}. Root Cause: ".$@) if($@);
+						if ($session{form}{func} =~ /^[A-Za-z]+$/) {                                                        
+							$cmd = "www_".$session{form}{func};                                                        
+							$output = eval{$w->$cmd};        
+							WebGUI::ErrorHandler::fatalError("Wobject runtime error: ${$wobject}{namespace} / $session{form}{func}. Root cause: ".$@) if($@);
+                                               	} else {
+                                                       	WebGUI::ErrorHandler::security("execute an invalid function: ".$session{form}{func});
+                                               	}
+                                       	} else {
+                                               	$output = WebGUI::Privilege::noAccess();
+                                       	}
+                         	}
+                       	}
+               	} else {
+                       	WebGUI::ErrorHandler::security("execute an invalid function on wobject "
+                               	.$session{form}{wid}.": ".$session{form}{func});
+               	}
+	}
+	return $output;
+}
+
+
+#-------------------------------------------------------------------
 
 =head2 add
 
@@ -485,6 +546,8 @@ Generates the content of the page.
 
 sub generate {
         return WebGUI::Privilege::noAccess() unless (canView());
+	my $output = _processWobjectFunctions();
+	return $output if ($output);
 	my %var;
 	if ($session{page}{defaultMetaTags}) {
 		WebGUI::Style::setMeta({'http-equiv'=>"Keywords", name=>"Keywords", content=>join(",",$session{page}{title},$session{page}{menuTitle})});

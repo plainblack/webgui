@@ -258,4 +258,11 @@ alter table page change id id char(22);
 delete from incrementer where incrementerId in ("messageLogId","profileCategoryId","templateId","navigationId","passiveProfileLogId","metaData_fieldId","userId","collateralId","pageId","databaseLinkId", "DataForm_entryId", "DataForm_fieldId", "DataForm_tabId", "EventsCalendar_eventId", "EventsCalendar_recurringId", "FileManager_fileId", "forumId", "forumPostId", "forumThreadId", "groupId", "languageId", "Product_benefitId", "Product_featureId", "Product_specificationId", "replacementId", "Survey_answerId", "Survey_id", "Survey_questionId", "Survey_responseId", "USS_id", "USS_submissionId", "wobjectId");
 alter table forum change postsPerPage threadsPerPage int(11) default 30;
 alter table forum add postsPerPage int(11) default 10 after threadsPerPage;
+update page set title='Nameless Root',menuTitle='Nameless Root',urlizedTitle='nameless_root', redirectUrl='/' where pageId=0;
+create table urls (
+	urlId char(22) not null primary key,
+	url varchar(255) not null unique key,
+	subroutine varchar(255) not null,
+	params text
+);
 
