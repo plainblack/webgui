@@ -8,7 +8,10 @@ our $I18N = {
 
 	'71' => {
 		message => q|Syndicated content is content that is pulled from another site using the RDF/RSS specification. This technology is often used to pull headlines from various news sites like <a href="http://www.cnn.com/">CNN</a> and  <a href="http://slashdot.org/">Slashdot</a>. It can, of course, be used for other things like sports scores, stock market info, etc.
-<br><br>
+<p>
+This Syndicated Content client is a Wobject and an Asset, so it has the properties of both.  It also has
+these unique properties:
+<p>
 
 <b>URL to RSS file</b><br>
 Provide the exact URL (starting with http://) to the syndicated content's RDF or RSS file. The syndicated content will be downloaded from this URL hourly.
@@ -33,7 +36,7 @@ Select a template for this content.
 <p><b>Maximum Headlines</b><br>
 Enter the maximum number of headlines that should be displayed.  For an aggregate feed, the system will display an equal number of headlines from each source, even if doing so requires displaying more than the requested maximum number of headlines.  Set to zero to allow any number of headlines.
 <p>|,
-		lastUpdated => 1101774469
+		lastUpdated => 1110070203,
 	},
 
 	'61' => {
