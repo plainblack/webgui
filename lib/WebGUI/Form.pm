@@ -16,6 +16,7 @@ package WebGUI::Form;
 
 use strict;
 use HTTP::BrowserDetect;
+use Tie::IxHash;
 use WebGUI::DateTime;
 use WebGUI::International;
 use WebGUI::Session;
@@ -1314,6 +1315,10 @@ If you want to add anything special to this form element like javascript actions
 
  'onChange="this.form.submit()"'
 
+=item sortByValue
+
+A boolean value for whether or not the values in the options hash should be sorted.
+
 =back
 
 =cut
@@ -1322,19 +1327,29 @@ sub selectList {
 	my ($output, $key, $item, $size, $multiple);
 	$size = $_[0]->{size} || 1;
 	$multiple = ' multiple="1"' if ($_[0]->{multiple});
-	$output	= '<select name="'.$_[0]->{name}.'" size="'.$size.'" '.$_[0]->{extras}.$multiple.'>'; 
-	foreach $key (keys %{$_[0]->{options}}) {
-		$output .= '<option value="'.$key.'"';
-		foreach $item (@{$_[0]->{value}}) {
-			if ($item eq $key) {
-				$output .= ' selected="1"';
-			}
-		}
-		$output .= '>'.${$_[0]->{options}}{$key}.'</option>';
+       	$output = '<select name="'.$_[0]->{name}.'" size="'.$size.'" '.$_[0]->{extras}.$multiple.'>';
+	my %options;
+       	if ($_[0]->{sortByValue}) {
+               	tie %options, 'Tie::IxHash';
+               	foreach my $optionKey (sort {"\L${$_[0]->{options}}{$a}" cmp "\L${$_[0]->{options}}{$b}" } keys %{$_[0]->{options}}) {
+                         $options{$optionKey} = ${$_[0]->{options}}{$optionKey};
+               	}
+       	} else {
+               	%options = %{$_[0]->{options}};
+       	}
+       	foreach $key (keys %options) {
+           	$output .= '<option value="'.$key.'"';
+          	 foreach $item (@{$_[0]->{value}}) {
+             		if ($item eq $key) {
+             			$output .= ' selected="1"';
+             		}
+           	}
+           	$output .= '>'.${$_[0]->{options}}{$key}.'</option>';
 	}
 	$output	.= '</select>'; 
 	return $output;
 }
+
 
 #-------------------------------------------------------------------
 

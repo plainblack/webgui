@@ -36,6 +36,9 @@ save you many hours of grief.
 	sure you have extrasPath and extrasURL defined in your config
 	file.
 
+ * The ThumbnailLinker macro has been removed. You can now use the
+	Thumbnail macro because it is templated.
+
 
 6.0.2
 --------------------------------------------------------------------

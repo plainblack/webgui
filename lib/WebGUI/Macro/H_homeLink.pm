@@ -27,13 +27,14 @@ sub process {
 	}
 	$temp = WebGUI::URL::gateway($temp);
 	if ($param[0] ne "linkonly") {
-        	$temp = '<a class="homeLink" href="'.$temp.'">';
-        	if ($param[0] ne "") {
-			$temp .= $param[0];
-        	} else {
-        		$temp .= WebGUI::International::get(47);
-        	}
-        	$temp .= '</a>';
+		my %var;
+       		$var{'homelink.url'} = WebGUI::URL::gateway($temp);
+       		if ($param[0] ne "") {
+               		$var{'homeLink.text'} = $param[0];
+       		} else {
+               		$var{'homeLink.text'} = WebGUI::International::get(47);
+       		}
+        	$temp =  WebGUI::Template::process(WebGUI::Template::getIdByName($param[1],"Macro/H_homeLink"), "Macro/H_homeLink", \%var);
 	}
 	return $temp;
 }

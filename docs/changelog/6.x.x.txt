@@ -66,8 +66,8 @@
    the master database. This will have no effect on single database users, but
    can add a tremendous amount of scalability on large WebGUI sites that use
    database replication.
- - Templated the EditableToggle, a, and AdminToggle macros. Thanks to Colin
-   Kuskie.
+ - Templated the EditableToggle, a, GroupAdd, GroupDelete, H, LoginToggle, r, 
+   and AdminToggle macros. Thanks to Colin Kuskie.
  - bugfix [ 933881 ] Forms not compliant (solution). Thanks to Nicklous
    Roberts.
  - bugfix [ 934410 ] non-compliant HTML (solution). Thanks to Nicklous
@@ -82,7 +82,7 @@
    scalability a lot. Thanks to Martin Kamerbeek / Procolix
  - bugfix [ 977201 ] ws client bug
  - bugfix [ 969740 ] Messageboard: Deleting of postings
-
+ - Added an option to sort a select list by its values. Thanks to Roy Johnson.
 
 
 6.0.3

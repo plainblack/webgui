@@ -14,26 +14,25 @@ use strict;
 use WebGUI::International;
 use WebGUI::Macro;
 use WebGUI::Session;
+use WebGUI::Template;
 use WebGUI::URL;
 
 #-------------------------------------------------------------------
 sub process {
-       my (@param, $temp, $login, $logout);
-       @param = WebGUI::Macro::getParams($_[0]);
-       if ($session{user}{userId} == 1) {
-		if ($param[0] eq "linkonly") {
-			return WebGUI::URL::page('op=displayLogin');
-		}
-              	$login = $param[0] || WebGUI::International::get(716);
-               	$temp = '<a class="loginToggleLink" href="'.WebGUI::URL::page('op=displayLogin').'">'.$login.'</a>';
-       } else {
-		if ($param[0] eq "linkonly") {
-			return WebGUI::URL::page('op=logout');
-		}
-               	$logout = $param[1] || WebGUI::International::get(717);
-               	$temp = '<a class="loginToggleLink" href="'.WebGUI::URL::page('op=logout').'">'.$logout.'</a>';
-       }
-       return $temp;
+        my @param = WebGUI::Macro::getParams($_[0]);
+        my $login = $param[0] || WebGUI::International::get(716);
+        my $logout = $param[1] || WebGUI::International::get(717);
+	my %var;
+        if ($session{user}{userId} == 1) {
+		return WebGUI::URL::page("op=displayLogin") if ($param[0] eq "linkonly");
+        	$var{'toggle.url'} = WebGUI::URL::page('op=displayLogin');
+               	$var{'toggle.text'} = $login;
+        } else {
+		return WebGUI::URL::page("op=logout") if ($param[0] eq "linkonly");
+                $var{'toggle.url'} = WebGUI::URL::page('op=logout');
+               	$var{'toggle.text'} = $logout;
+        }
+        return  WebGUI::Template::process(WebGUI::Template::getIdByName($param[3],"Macro/LoginToggle"), "Macro/LoginToggle", \%var);
 }
 
 

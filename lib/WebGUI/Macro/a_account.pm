@@ -21,18 +21,10 @@ use WebGUI::URL;
 sub process {
        my %var;
          my  @param = WebGUI::Macro::getParams($_[0]);
+	return WebGUI::URL::page("op=displayAccount") if ($param[0] eq "linkonly");
        $var{'account.url'} = WebGUI::URL::page('op=displayAccount');
-         my $templateId = 1;  ##Set default template in the namespace
-       $var{'account.text'} = WebGUI::International::get(46);
-       if    (@param == 1) {
-               $var{'account.text'} = $param[0] if $param[0];
-        }
-       elsif (@param == 2) {
-               $var{'account.text'} = $param[0] if $param[0];
-		$templateId = WebGUI::Template::getIdByName($param[1],"Macro/a_account");
-               $templateId = 1 if $templateId == 0;
-       }
-         return WebGUI::Template::process($templateId,"Macro/a_account",\%var);
+       $var{'account.text'} = $param[0] || WebGUI::International::get(46);
+         return WebGUI::Template::process(WebGUI::Template::getIdByName($param[1],"Macro/a_account"),"Macro/a_account",\%var);
 }
 
 

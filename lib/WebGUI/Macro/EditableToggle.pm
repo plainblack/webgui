@@ -24,20 +24,8 @@ sub process {
          if (WebGUI::Page::canEdit() && WebGUI::Grouping::isInGroup(12)) {
         	my %var;
               my @param = WebGUI::Macro::getParams($_[0]);
-              my $templateId = 1;  ##Set default template in the namespace
-              my ($turnOff, $turnOn) = (WebGUI::International::get(517),WebGUI::International::get(516));
-              ##1 param means use my template with default text
-              if (@param == 1) {
-			$templateId = WebGUI::Template::getIdByName($param[0],"Macro/EditableToggle");
-              }
-              ##2 params means use my text with the default template
-              elsif (@param == 2) {
-                      ($turnOff, $turnOn) = @param;
-              }
-              ##3 or more params means use my text and template, other args ignored
-              elsif (@param >= 3) {
-                      ($turnOff, $turnOn) = @param[1,2];
-              }
+              my $turnOn = $param[0] || WebGUI::International::get(516);
+              my $turnOff = $param[1] || WebGUI::International::get(517);
                  if ($session{var}{adminOn}) {
                       $var{'toggle.url'} = WebGUI::URL::page('op=switchOffAdmin');
                       $var{'toggle.text'} = $turnOff;
@@ -45,8 +33,7 @@ sub process {
                       $var{'toggle.url'} = WebGUI::URL::page('op=switchOnAdmin');
                       $var{'toggle.text'} = $turnOn;
                  }
-              $templateId = 1 if $templateId == 0;
-                return WebGUI::Template::process($templateId,"Macro/EditableToggle",\%var);
+                return WebGUI::Template::process(WebGUI::Template::getIdByName($param[2],"Macro/EditableToggle"),"Macro/EditableToggle",\%var);
        }
        return "";
 }

@@ -14,24 +14,18 @@ use strict;
 use WebGUI::Collateral;
 use WebGUI::Macro;
 use WebGUI::Session;
+use WebGUI::Template;
 
 #-------------------------------------------------------------------
 sub process {
         my @param = WebGUI::Macro::getParams($_[0]);
         if (my $collateral = WebGUI::Collateral->find($param[0])) {
-
-                # include default icon unless a second param
-                if ( ! $param[1] ) {
-                        return '<a href="' . $collateral->getURL .
-                                '"><img src="' . $collateral->getIcon .
-                                '" align="middle" border="0" /> ' .
-                                $collateral->get("name") . '</a>';
-
-                # second param was flag, so no accompanying image
-                } else {
-                        return '<a href="' . $collateral->getURL .
-                                '">' . $collateral->get("name") . '</a>';
-                }
+               $var{'file.url'} = $collateral->getURL;
+		$var{'file.icon'} = $collateral->getIcon;
+	        $var{'file.name'} = $param[0];
+                $var{'file.size'} = $collateral->getSize;
+                $var{'file.thumbnail'} = $collateral->getThumbnail;
+		return  WebGUI::Template::process(WebGUI::Template::getIdByName($param[1],"Macro/File"),"Macro/File", \%var);
         } else {
                 return undef;
         }

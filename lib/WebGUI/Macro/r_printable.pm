@@ -15,6 +15,7 @@ use WebGUI::International;
 use WebGUI::Macro;
 use WebGUI::Session;
 use WebGUI::SQL;
+use WebGUI::Template;
 use WebGUI::URL;
 use WebGUI::Utility;
 
@@ -28,19 +29,20 @@ sub process {
 	}
         $temp = WebGUI::URL::append($session{env}{REQUEST_URI},$append);
 	if ($param[1] ne "") {
-		($styleId) = WebGUI::SQL->quickArray("select styleId from style where name=".quote($param[1]),WebGUI::SQL->getSlave);
+		($styleId) = WebGUI::Template::getIdByName($param[1],"style");
 		if ($styleId != 0) {
 			$temp = WebGUI::URL::append($temp,'styleId='.$styleId);
 		}
 	}
 	if ($param[0] ne "linkonly") {
-        	$temp = '<a class="makePrintableLink" href="'.$temp.'">';
-        	if ($param[0] ne "") {
-        		$temp .= $param[0];
-        	} else {
-                	$temp .= WebGUI::International::get(53);
-        	}
-        	$temp .= '</a>';
+		my %var;
+		$var{'printable.url'} = $temp;
+       		if ($param[0] ne "") {
+               		$var{'printable.text'} = $param[0];
+       		} else {
+               		$var{'printable.text'} = WebGUI::International::get(53);
+       		}
+         	$temp =  WebGUI::Template::process(WebGUI::Template::getByName($param[2],"Macro/r_printable"), "Macro/r_printable", \%var);
 	}
 	return $temp;
 }

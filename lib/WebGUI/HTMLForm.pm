@@ -1834,6 +1834,10 @@ Extra text to describe this form element or to provide special instructions.
 
 The UI level for this field. See the WebGUI developer's site for details. Defaults to "0".
 
+=item sortByValue
+
+A boolean value for whether the values in the options hash should be sorted.
+
 =back
 
 =cut
@@ -1841,8 +1845,8 @@ The UI level for this field. See the WebGUI developer's site for details. Defaul
 sub selectList {
         my ($output);
         my ($self, @p) = @_;
-        my ($name, $options, $label, $value, $size, $multiple, $extras, $subtext, $uiLevel) =
-                rearrange([qw(name options label value size multiple extras subtext uiLevel)], @p);
+        my ($name, $options, $label, $value, $size, $multiple, $extras, $subtext, $uiLevel, $sortByValue) =
+                rearrange([qw(name options label value size multiple extras subtext uiLevel sortByValue)], @p);
         if (_uiLevelChecksOut($uiLevel)) {
                 $output = WebGUI::Form::selectList({
                         "name"=>$name,
@@ -1850,7 +1854,8 @@ sub selectList {
                         "value"=>$value,
                         "multiple"=>$multiple,
                         "size"=>$size,
-                        "extras"=>$extras
+                        "extras"=>$extras,
+			"sortByValue"=>$sortByValue
                         });
                 $output .= _subtext($subtext);
                 $output = $self->_tableFormRow($label,$output);

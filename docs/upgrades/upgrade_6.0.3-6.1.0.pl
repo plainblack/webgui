@@ -18,6 +18,29 @@ GetOptions(
 
 WebGUI::Session::open("../..",$configFile);
 
+
+
+#--------------------------------------------
+print "\tUpdating config file.\n" unless ($quiet);
+my $pathToConfig = '../../etc/'.$configFile;
+my $conf = Parse::PlainConfig->new('DELIM' => '=', 'FILE' => $pathToConfig);
+$conf->set("templateCacheType"=>"file");
+my $macros = $conf->get("macros");
+delete $macros->{"\\"};
+$macros->{"\\\\"} = "Backslash_pageUrl";
+$macros->{"Navigation"} = "Navigation";
+my %newMacros;
+foreach my $macro (keys %{$macros}) {
+        unless (
+                $macros->{$macro} eq "ThumbnailLinker"
+                ) {
+                $newMacros{$macro} = $macros->{$macro};
+        }
+}
+$conf->set("macros"=>\%newMacros);
+$conf->write;
+
+
 #--------------------------------------------
 print "\tRemoving unneeded files and directories.\n" unless ($quiet);
 unlink("../../lib/WebGUI/Operation/International.pm");
@@ -25,6 +48,7 @@ unlink("../../lib/WebGUI/Wobject/Item.pm");
 unlink("../../lib/WebGUI/Wobject/LinkList.pm");
 unlink("../../lib/WebGUI/Wobject/FAQ.pm");
 unlink("../../lib/WebGUI/Wobject/ExtraColumn.pm");
+unlink("../../lib/WebGUI/Macro/ThumbnailLinker.pm");
 unlink("../../lib/WebGUI/Macro/m_currentMenuHorizontal.pm");
 unlink("../../lib/WebGUI/Macro/M_currentMenuVertical.pm");
 unlink("../../lib/WebGUI/Macro/s_specificMenuHorizontal.pm");
@@ -44,6 +68,7 @@ unlink("../../lib/WebGUI/Macro/TopDropMenu.pm");
 unlink("../../lib/WebGUI/Macro/Question_search.pm");
 
 
+#--------------------------------------------
 print "\tResetting user languages.\n" unless ($quiet);
 my ($defaultLangId) = WebGUI::SQL->quickArray("select dataDefault from userProfileField where fieldName='language'");
 $defaultLangId =~ s/\[//;
@@ -75,6 +100,7 @@ foreach my $key (keys %{$langs}) {
 	WebGUI::SQL->write("update page set languageId=".quote($langs->{$key})." where languageId=".$key);
 }
 
+#--------------------------------------------
 print "\tConverting page tree to the Nested Set model.\n";
 sub walk_down {
 	my($pageId, $o) = @_[0,1];
