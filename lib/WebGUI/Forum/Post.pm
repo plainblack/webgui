@@ -471,11 +471,9 @@ sub setStatusDeleted {
 	$self->set({status=>'deleted'});
 	$self->getThread->decrementReplies;
 	$self->getThread->setStatusDeleted if ($self->getThread->get("rootPostId") == $self->get("forumPostId"));
-	if ($self->getThread->get("lastPostId") == $self->get("forumPostId")) {
-		my ($id, $date) = WebGUI::SQL->quickArray("select forumPostId,dateOfPost from forumPost where forumThreadId="
-			.$self->get("forumThreadId")." and status='approved'");
-		$self->getThread->setLastPost($date,$id);
-	}
+	my ($id, $date) = WebGUI::SQL->quickArray("select forumPostId,dateOfPost from forumPost where forumThreadId="
+		.$self->get("forumThreadId")." and status='approved'");
+	$self->getThread->setLastPost($date,$id);
 }
 
 #-------------------------------------------------------------------
