@@ -119,7 +119,7 @@ sub www_editCollateral {
 	} else {
 		$collateral = WebGUI::SQL->quickHashRef("select * from collateral where collateralId=".$session{form}{cid});
 	}
-	$canEdit = ($collateral->{userId} == $session{user}{userId} || WebGUI::Privilege::isInGroup($session{user}{userId}));
+	$canEdit = ($collateral->{userId} == $session{user}{userId} || WebGUI::Privilege::isInGroup(3));
 	$folderId = $session{scratch}{collateralFolderId} || 0;
 	$f = WebGUI::HTMLForm->new;
 	$f->hidden("op","editCollateralSave");
