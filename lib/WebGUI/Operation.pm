@@ -81,7 +81,6 @@ sub getOperations {
           'switchOffAdmin' => 'WebGUI::Operation::Admin',
           'switchOnAdmin' => 'WebGUI::Operation::Admin',
           'auth' => 'WebGUI::Operation::Auth',
-          'init' => 'WebGUI::Operation::Auth',
           'copyDatabaseLink' => 'WebGUI::Operation::DatabaseLink',
           'deleteDatabaseLink' => 'WebGUI::Operation::DatabaseLink',
           'deleteDatabaseLinkConfirm' => 'WebGUI::Operation::DatabaseLink',
