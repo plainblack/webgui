@@ -9,6 +9,8 @@
  - bugfix [962224] WebGUI::Operation::Statistics
  - bugfix [966470] WebGUI::User. Session not properly killed when deleting user.
  - bugfix [966466] WebGUI::Session. System crash when user language missing.
+ - bugfix [ 981059 ] WebGUI vs perl 5.8.4
+
 
 
 5.5.6

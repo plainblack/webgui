@@ -45,6 +45,13 @@ These functions are available from this package:
 =cut
 
 
+our $parenthesis = qr /\(                      # Start with '(',
+                     (?:                     # Followed by
+                     (?>[^()]+)              # Non-parenthesis
+                     |(??{ $parenthesis })   # Or a balanced parenthesis block
+                     )*                      # zero or more times
+                     \)/x;                  # Ending with ')'
+
 
 our $nestedMacro = qr /(\^                     # Start with carat
                      ([^\^;()]+)            # And one or more none-macro characters -tagged-
@@ -55,14 +62,6 @@ our $nestedMacro = qr /(\^                     # Start with carat
                      )*)                    # zero or more times -tagged-
                      ;)/x;                   # End with  a semicolon.
 
-
-
-our $parenthesis = qr /\(                      # Start with '(',
-                     (?:                     # Followed by
-                     (?>[^()]+)              # Non-parenthesis
-                     |(??{ $parenthesis })   # Or a balanced parenthesis block
-                     )*                      # zero or more times
-                     \)/x;                  # Ending with ')'
 
 #-------------------------------------------------------------------
 
