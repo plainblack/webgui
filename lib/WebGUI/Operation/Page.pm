@@ -67,7 +67,9 @@ sub www_addPage {
 		$output .= '<h1>'.WebGUI::International::get(98).'</h1>';
 		$output .= formHeader();
 		$output .= WebGUI::Form::hidden("op","addPageSave");
-		$output .= WebGUI::Form::hidden("root","1");
+		if ($session{form}{root}) {
+			$output .= WebGUI::Form::hidden("root","1");
+		}
 		$output .= '<table>';
 		$output .= tableFormRow(WebGUI::International::get(99),WebGUI::Form::text("title",20,128,$session{form}{title}));
 		%hash = sortHash(WebGUI::Template::getList());

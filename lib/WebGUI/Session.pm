@@ -149,9 +149,14 @@ sub open {
 
 #-------------------------------------------------------------------
 sub refreshPageInfo {
-        my (%PAGE);
+        my (%PAGE, $pageId);
 	tie %PAGE, 'Tie::CPHash';
-        %PAGE = _getPageInfo($_[0],$session{dbh},$session{setting}{notFoundPage},$session{config}{scripturl});
+	if ($_[0] == 0) {
+		$pageId = 1;
+	} else {
+		$pageId = $_[0];
+	}
+        %PAGE = _getPageInfo($pageId,$session{dbh},$session{setting}{notFoundPage},$session{config}{scripturl});
         $session{page} = \%PAGE;
 }
 
