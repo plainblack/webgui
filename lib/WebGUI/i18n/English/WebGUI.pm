@@ -2336,6 +2336,11 @@ will be modified to make it unique.|,
 		lastUpdated => 1031514049
 	},
 
+	'groups default title' => {
+		message => q|Groups, Default|,
+		lastUpdated => 1100223171
+	},
+
 	'428' => {
 		message => q|User (ID)|,
 		lastUpdated => 1031514049
@@ -2616,11 +2621,8 @@ The Connect DN is the <b>cn</b> (or common name) of a given user in your LDAP da
 		lastUpdated => 1065280287
 	},
 
-	'615' => {
-		message => q|Groups are used to subdivide privileges and responsibilities within the WebGUI system. For instance, you may be building a site for a classroom situation. In that case you might set up a different group for each class that you teach. You would then apply those groups to the pages that are designed for each class.
-<p>
-
-There are several groups built into WebGUI. They are as follows:
+	'groups default body' => {
+		message => q|There are several groups built into WebGUI:
 <p>
 
 <b>Admins</b><br>
@@ -2635,6 +2637,10 @@ Content managers are users who have privileges to add, edit, and delete content 
 Everyone is a magic group in that no one is ever physically inserted into it, but yet all members of the site are part of it. If you want to open up your site to both visitors and registered users, use this group to do it.
 <p>
 
+<b>Export Managers</b><br>
+Members of this group are allowed to export pages to disk.
+<p>
+
 <b>Package Managers</b><br>
 Users that have privileges to add, edit, and delete packages of wobjects and pages to deploy.
 <p>
@@ -2643,19 +2649,41 @@ Users that have privileges to add, edit, and delete packages of wobjects and pag
 When users are added to the system they are put into the registered users group. A user should only be removed from this group if their account is deleted or if you wish to punish a troublemaker.
 <p>
 
+<b>Secondary Admins</b><br>
+Users in the Secondary Admins group may add new users, but cannot edit users. Also, if 
+you are a Secondary Admin for a group, you may modify the membership of that group.
+<p>
+
 <b>Style Managers</b><br>
-Users that have privileges to edit styles for this site. These privileges do not allow the user to assign privileges to a page, just define them to be used.
+Users that have privileges to edit styles for this site. These privileges do not allow the user to assign styles to a page, just define them to be used.
 <p>
 
 <b>Template Managers</b><br>
 Users that have privileges to edit templates for this site.
 <p>
 
+<b>Theme Managers</b><br>
+Users in this group can use the theme manager to create new themes and install themes from other systems.
+<p>
+
+<b>Turn Admin On</b><br>
+These users are allowed to turn on Admin mode.
+<p>
+
 <b>Visitors</b><br>
 Visitors are users who are not logged in using an account on the system. Also, if you wish to punish a registered user you could remove him/her from the Registered Users group and insert him/her into the Visitors group.
 <p>
 |,
-		lastUpdated => 1031514049
+		lastUpdated => 1100157165
+	},
+
+	'615' => {
+		message => q|Groups are used to subdivide privileges and responsibilities within the WebGUI system. For instance, you may be building a site for a classroom situation. In that case you might set up a different group for each class that you teach. You would then apply those groups to the pages that are designed for each class.
+<p>
+The Groups page displays all groups that you are allowed to edit.  The form on the page allows you to display a subset of those groups.  The search engine uses SQL wildcards like '%' instead of the familiar ones used by internet search engines.
+<p>
+|,
+		lastUpdated => 1100224416
 	},
 
 	'50' => {
@@ -3160,11 +3188,11 @@ If this wobject is a shortcut, then this URL will direct you to the original wob
 	},
 
 	'620' => {
-		message => q|As the function suggests you'll be deleting a group and removing all users from the group. Be careful not to orphan users from pages they should have access to by deleting a group that is in use.
+		message => q|As this function suggests you'll be deleting a group and removing all users from the group. Be careful not to restrict users from pages they should have access to by deleting a group that is in use.
 <p>
 
 As with any delete operation, you are prompted to be sure you wish to proceed with the delete. If you answer yes, the delete will proceed and there is no recovery possible. If you answer no you'll be returned to the prior screen.|,
-		lastUpdated => 1031514049
+		lastUpdated => 1100154599
 	},
 
 	'520' => {
