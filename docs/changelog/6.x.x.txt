@@ -1,7 +1,11 @@
 6.2.4
  - Changed text processor to convert HTML tags into text rather than
    discarding them.
-
+ - Fixed some bugs in the WS Client that were checked in with the new Caching
+   code.
+ - Fixed a bug in the URL checker javascript that wouldn't allow for relative
+   paths.
+ - bugfix [ 991205 ] 6.0.3 Data Form data field sequence problem (Steven Chan)
 
 6.2.3
  - Changed to new POD format.

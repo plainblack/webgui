@@ -261,11 +261,9 @@ sub www_view {
    $url = WebGUI::URL::page("func=view&wid=" . $self->get("wobjectId"));
 
    # snag our SOAP call and preprocess if needed
-   $call        = WebGUI::Macro::process($self->get('call'));
-   $param_str   = WebGUI::Macro::process($self->get('params'));
    if ($self->get('preprocessMacros')) {
-      WebGUI::Macro::process($call);
-      WebGUI::Macro::process($param_str);
+      $call = WebGUI::Macro::process($self->get("call"));
+      $param_str = WebGUI::Macro::process($self->get("params"));
    }
 
    # see if we can shortcircuit this whole process
@@ -289,10 +287,10 @@ sub www_view {
 
    # check to see if this exact query has already been cached, using either
    # a cache specific to this session, or a shared global cache
-   $cache_key = $_[0]->get('sharedCache')
+   $cache_key = $self->get('sharedCache')
       ? Digest::MD5::md5_hex($call, $param_str)
       : Digest::MD5::md5_hex($call, $param_str, $session{'var'}{'sessionId'});
-   WebGUI::ErrorHandler::warn(($_[0]->get('sharedCache')?'shared':'session')
+   WebGUI::ErrorHandler::warn(($self->get('sharedCache')?'shared':'session')
       . " cache_key=$cache_key md5_hex($call, $param_str)");
    $cache = WebGUI::Cache->new($cache_key,
       WebGUI::International::get(4, $self->get('namespace')));

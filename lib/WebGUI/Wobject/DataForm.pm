@@ -107,6 +107,12 @@ sub _tabAdminIcons {
 
 
 #-------------------------------------------------------------------
+sub _tonull { 
+	return $_[1] eq "0" ? (undef, undef) : @_ ;
+}
+
+
+#-------------------------------------------------------------------
 sub _createTabInit {
 	my $wid = $_[0];
 	my @tabCount = WebGUI::SQL->quickArray("select count(DataForm_tabId) from DataForm_tab where wobjectId=".quote($wid));
@@ -642,6 +648,7 @@ sub www_editField {
         	%field = WebGUI::SQL->quickHash("select * from DataForm_field where DataForm_fieldId=".quote($session{form}{fid}));
 	}
 	$tab = WebGUI::SQL->buildHashRef("select DataForm_tabId,label from DataForm_tab where wobjectId=".quote($_[0]->get("wobjectId")));
+	$tab->{0} = $_[0]->i18n("no tab");
         $output = helpIcon("data form fields add/edit",$_[0]->get("namespace"));
         $output .= '<h1>'.WebGUI::International::get(20,$_[0]->get("namespace")).'</h1>';
         $f = WebGUI::HTMLForm->new;
@@ -662,7 +669,7 @@ sub www_editField {
 		-name=>"tid",
 		-options=>$tab,
 		-label=>WebGUI::International::get(104,$_[0]->get("namespace")),
-		-value=>[ $field{DataForm_tabId}]
+		-value=>[ $field{DataForm_tabId}] || [0]
 		); 
         $f->text(
                 -name=>"subtext",
@@ -750,8 +757,8 @@ sub www_editFieldSave {
 		rows=>$session{form}{rows},
 		vertical=>$session{form}{vertical},
 		extras=>$session{form}{extras},
-		}, "1","1", "DataForm_tabId",$session{form}{tid});
-	$_[0]->reorderCollateral("DataForm_field","DataForm_fieldId", "DataForm_tabId",$session{form}{tid}) if ($session{form}{fid} ne "new");
+		}, "1","1", _tonull("DataForm_tabId",$session{form}{tid}));
+	$_[0]->reorderCollateral("DataForm_field","DataForm_fieldId", _tonull("DataForm_tabId",$session{form}{tid})) if ($session{form}{fid} ne "new");
         if ($session{form}{proceed} eq "addField") {
             	$session{form}{fid} = "new";
             	return $_[0]->www_editField();
@@ -846,14 +853,14 @@ sub www_exportTab {
 #-------------------------------------------------------------------
 sub www_moveFieldDown {
 	return WebGUI::Privilege::insufficient() unless ($_[0]->canEdit);
-	$_[0]->moveCollateralDown("DataForm_field","DataForm_fieldId",$session{form}{fid},"DataForm_tabId",$session{form}{tid});
+	$_[0]->moveCollateralDown("DataForm_field","DataForm_fieldId",$session{form}{fid},_tonull("DataForm_tabId",$session{form}{tid}));
 	return "";
 }
 
 #-------------------------------------------------------------------
 sub www_moveFieldUp {
 	return WebGUI::Privilege::insufficient() unless ($_[0]->canEdit);
-	$_[0]->moveCollateralUp("DataForm_field","DataForm_fieldId",$session{form}{fid},"DataForm_tabId",$session{form}{tid});
+	$_[0]->moveCollateralUp("DataForm_field","DataForm_fieldId",$session{form}{fid},_tonull("DataForm_tabId",$session{form}{tid}));
 	return "";
 }
 
