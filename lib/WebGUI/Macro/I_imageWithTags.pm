@@ -22,7 +22,7 @@ sub _replacement {
 	my (@param, $temp, %data, $image);
 	tie %data, 'Tie::CPHash';
         @param = WebGUI::Macro::getParams($_[0]);
-	%data = WebGUI::SQL->quickHash("select * from images where name='$param[0]'");
+	%data = WebGUI::SQL->quickHash("select * from images where name=".quote($param[0]));
 	$image = WebGUI::Attachment->new($data{filename},"images",$data{imageId});
 	$temp = '<img src="'.$image->getURL.'" '.$data{parameters}.'>'; 
 	return $temp;
