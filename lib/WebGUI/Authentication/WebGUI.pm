@@ -37,14 +37,14 @@ sub adminForm {
 	my $f;
 	$f = WebGUI::HTMLForm->new;
 	$f->readOnly('<b>'.optionsLabel().'</b>');
-	$f->password("identifier",WebGUI::International::get(51),"password");
+	$f->password("authWebGUI.identifier",WebGUI::International::get(51),"password");
 	return $f->printRowsOnly;
 }
 
 #-------------------------------------------------------------------
 sub adminFormSave {
-	unless ($session{form}{identifier} eq "password") {
-		WebGUI::Authentication::saveParams($_[0],'WebGUI',{identifier => Digest::MD5::md5_base64($session{form}{identifier})});
+	unless ($session{form}{authWebGUI.identifier} eq "password") {
+		WebGUI::Authentication::saveParams($_[0],'WebGUI',{identifier => Digest::MD5::md5_base64($session{form}{authWebGUI.identifier})});
 	}
 }
 
@@ -62,8 +62,8 @@ sub optionsLabel {
 sub registrationForm {
 	my $f;
 	$f = WebGUI::HTMLForm->new;
-	$f->password("identifier",WebGUI::International::get(51));
-	$f->password("identifierConfirm",WebGUI::International::get(2,'Auth/WebGUI'));
+	$f->password("authWebGUI.identifier",WebGUI::International::get(51));
+	$f->password("authWebGUI.identifierConfirm",WebGUI::International::get(2,'Auth/WebGUI'));
 	return $f->printRowsOnly;
 }
 
@@ -75,13 +75,13 @@ sub registrationFormSave {
 #-------------------------------------------------------------------
 sub registrationFormValidate {
 	my ($error);
-        if ($session{form}{identifier} ne $session{form}{identifierConfirm}) {
+        if ($session{form}{authWebGUI.identifier} ne $session{form}{authWebGUI.identifierConfirm}) {
                 $error = '<li>'.WebGUI::International::get(3,'Auth/WebGUI');
         }
-        if ($session{form}{identifier} eq "password") {
+        if ($session{form}{authWebGUI.identifier} eq "password") {
                 $error .= '<li>'.WebGUI::International::get(5,'Auth/WebGUI');
         }
-        if ($session{form}{identifier} eq "") {
+        if ($session{form}{authWebGUI.identifier} eq "") {
                 $error .= '<li>'.WebGUI::International::get(4,'Auth/WebGUI');
         }
         return $error;
@@ -96,8 +96,8 @@ sub settingsForm {
 sub userForm {
         my $f;
         $f = WebGUI::HTMLForm->new;
-        $f->password("identifier",WebGUI::International::get(51),"password");
-        $f->password("identifierConfirm",WebGUI::International::get(2,'Auth/WebGUI'),"password");
+        $f->password("authWebGUI.identifier",WebGUI::International::get(51),"password");
+        $f->password("authWebGUI.identifierConfirm",WebGUI::International::get(2,'Auth/WebGUI'),"password");
         return $f->printRowsOnly;
 }
 
@@ -109,10 +109,10 @@ sub userFormSave {
 #-------------------------------------------------------------------
 sub userFormValidate {
         my ($error);
-        if ($session{form}{identifier} ne $session{form}{identifierConfirm}) {
+        if ($session{form}{authWebGUI.identifier} ne $session{form}{identifierConfirm}) {
                 $error = '<li>'.WebGUI::International::get(3,'Auth/WebGUI');
         }
-        if ($session{form}{identifier} eq "") {
+        if ($session{form}{authWebGUI.identifier} eq "") {
                 $error .= '<li>'.WebGUI::International::get(4,'Auth/WebGUI');
         }
         return $error;
