@@ -203,6 +203,98 @@ dragable_init("^\;");
 }
 $sth->finish;
 
+
+#--------------------------------------------
+print "\tUpdating SQL Reports.\n" unless ($quiet);
+my %dblink;
+$dblink{$session{config}{dsn}}{id} = 0;
+$dblink{$session{config}{dsn}}{user} = $session{config}{dbuser};
+my $sth = WebGUI::SQL->read("select DSN, databaseLinkId, username, identifier, wobjectId from SQLReport");
+while (my $data = $sth->hashRef) {
+	my $id = undef;
+	next if ($data->{databaseLinkId} > 0);
+	foreach my $dsn (keys %dblink) {
+		if ($dsn eq $data->{DSN} && $dblink{$dsn}{user} eq $data->{username}) {
+			$id = $dblink{$dsn}{id};
+			last;
+		}
+	}
+	unless (defined $id) {
+		$id = getNextId("databaseLinkId");
+		my $title = $data->{username}.'@'.$data->{DSN};
+		WebGUI::SQL->write("insert into databaseLink (databaseLinkId, title, DSN, username, identifier) values ($id, ".quote($title).",
+			".quote($data->{DSN}).", ".quote($data->{username}).", ".quote($data->{identifier}).")");
+		$dblink{$data->{DSN}}{id} = $id;
+		$dblink{$data->{DSN}}{user} = $data->{username};
+	}
+	WebGUI::SQL->write("update SQLReport set databaseLinkId=".$id." where wobjectId=".$data->{wobjectId});
+}
+$sth->finish;
+WebGUI::SQL->write("alter table SQLReport drop column DSN");
+WebGUI::SQL->write("alter table SQLReport drop column username");
+WebGUI::SQL->write("alter table SQLReport drop column identifier");
+use WebGUI::DatabaseLink;
+my $templateId;
+my $a = WebGUI::SQL->read("select a.databaseLinkId, a.dbQuery, a.template, a.wobjectId, b.title 
+	from SQLReport a , wobject b where a.wobjectId=b.wobjectId");
+while (my $data = $a->hashRef) {
+	next if ($data->{dbQuery} eq "");
+	my $db = WebGUI::DatabaseLink->new($data->{databaseLinkId});
+	if ($data->{template} ne "") {
+                ($templateId) = WebGUI::SQL->quickArray("select max(templateId) from template where namespace='SQLReport'");
+		if ($templateId > 999) {
+			$templateId++;
+		} else {
+			$templateId = 1000;
+		}
+		my $b = WebGUI::SQL->unconditionalRead($data->{dbQuery},$db->dbh);
+		my @template = split(/\^\-\;/,$data->{template});
+		my $final = '<tmpl_if displayTitle>
+    			<h1><tmpl_var title></h1>
+			</tmpl_if>
+
+			<tmpl_if description>
+			    <tmpl_var description><p />
+			</tmpl_if>
+
+			<tmpl_if debugMode>
+				<ul>
+				<tmpl_loop debug_loop>
+					<li><tmpl_var debug.output></li>
+				</tmpl_loop>
+				</ul>
+			</tmpl_if>
+			'.$template[0].'
+			<tmpl_loop rows_loop>	';
+		my $i;
+		unless ($b->errorCode) {
+			foreach my $col ($b->getColumnNames) {
+				my $replacement = '<tmpl_var row.field.'.$col.'.value>';
+				$template[1] =~ s/\^$i\;/$replacement/g;
+				$i++;
+			}
+		}
+		$template[1] =~ s/\^rownum\;/\<tmpl_var row\.number\>/g;
+		$final .= $template[1].'
+			</tmpl_loop>
+			'.$template[2].'
+			<tmpl_if multiplePages>
+  			<div class="pagination">
+    				<tmpl_var previousPage>   <tmpl_var pageList>  <tmpl_var nextPage>
+  			</div>
+			</tmpl_if>';
+		WebGUI::SQL->write("insert into template (templateId, name, template, namespace) values ($templateId, 
+			".quote($data->{title}).",".quote($final).",'SQLReport')");
+	} else {
+		$templateId = 1;
+	}
+	WebGUI::SQL->write("update wobject set templateId=$templateId where wobjectId=".$data->{wobjectId});
+}
+$a->finish;
+WebGUI::SQL->write("alter table SQLReport drop column template");
+WebGUI::SQL->write("alter table SQLReport drop column convertCarriageReturns");
+
+
 #--------------------------------------------
 print "\tConverting items into articles.\n" unless ($quiet);
 my $sth = WebGUI::SQL->read("select * from template where namespace='Item'");
@@ -268,8 +360,10 @@ WebGUI::SQL->write("alter table USS_submission add column userDefined5 text");
 
 #--------------------------------------------
 print "\tConverting FAQs into USS Submissions.\n" unless ($quiet);
+my %tempMatch = ();
 my $sth = WebGUI::SQL->read("select * from template where namespace='FAQ'");
 while (my $template = $sth->hashRef) {
+	my $oldTid = $template->{templateId};
 	$template->{name} =~ s/Default (.*?)/$1/i;
        	if ($template->{templateId} < 1000) {
 		($template->{templateId}) = WebGUI::SQL->quickArray("select max(templateId) from template where namespace='USS' and templateId<1000");
@@ -282,6 +376,7 @@ while (my $template = $sth->hashRef) {
      			$template->{templateId} = 1000;
 		}
 	}
+	$tempMatch{$oldTid} = $template->{templateId};
 	$template->{template} =~ s/\<tmpl\_loop\s+qa\_loop\>/\<tmpl\_loop submissions\_loop\>/igs;
 	my $replacement = '
 		<tmpl_if submission.currentUser>
@@ -302,6 +397,9 @@ while (my $template = $sth->hashRef) {
 		".quote($template->{name}).", ".quote($template->{template}).", 'USS')");
 }
 $sth->finish;
+foreach my $oldTid (keys %tempMatch) {
+	WebGUI::SQL->write("update wobject set templateId=".$tempMatch{$oldTid}." where templateId=".$oldTid." and namespace='FAQ'");
+}
 WebGUI::SQL->write("delete from template where namespace='FAQ'");
 my $a = WebGUI::SQL->read("select a.wobjectId,a.groupIdEdit,a.ownerId,a.lastEdited,b.username,a.dateAdded from wobject a left join users b on
 	a.ownerId=b.userId where a.namespace='FAQ'");
@@ -311,7 +409,7 @@ while (my $data = $a->hashRef) {
 	WebGUI::SQL->write("insert into USS (wobjectId,	USS_id, groupToContribute, submissionsPerPage, filterContent, sortBy, sortOrder, 
 		submissionFormTemplateId) values (
 		".$data->{wobjectId}.", $ussId, ".$data->{groupIdEdit}.", 1000, 'none', 'sequenceNumber', 'asc', 2)");
-	my $b = WebGUI::SQL->read("select * from FAQ_question");
+	my $b = WebGUI::SQL->read("select * from FAQ_question where wobjectId=".$data->{wobjectId});
 	while (my $sub = $b->hashRef) {
 		my $subId = getNextId("USS_submissionId");
 		my $forum = WebGUI::Forum->create({});
@@ -331,8 +429,10 @@ WebGUI::SQL->write("delete from incrementer where incrementerId='FAQ_questionId'
 
 #--------------------------------------------
 print "\tMigrating Link Lists to USS Submissions.\n" unless ($quiet);
+my %tempMatch = ();
 my $sth = WebGUI::SQL->read("select * from template where namespace='LinkList'");
 while (my $template = $sth->hashRef) {
+	my $oldTid = $template->{templateId};
 	$template->{name} =~ s/Default (.*?)/$1/i;
        	if ($template->{templateId} < 1000) {
 		($template->{templateId}) = WebGUI::SQL->quickArray("select max(templateId) from template where namespace='USS' and templateId<1000");
@@ -345,6 +445,7 @@ while (my $template = $sth->hashRef) {
      			$template->{templateId} = 1000;
 		}
 	}
+	$tempMatch{$oldTid} = $template->{templateId};
 	$template->{template} =~ s/\<tmpl\_loop\s+link\_loop\>/\<tmpl\_loop submissions\_loop\>/igs;
 	$template->{template} =~ s/\<tmpl\_if\s+session\.var\.adminOn\>//igs;
 	$template->{template} =~ s/\<\/tmpl\_if\>\s*\<\/tmpl\_if\>/\<\/tmpl_if>/igs;
@@ -369,6 +470,9 @@ while (my $template = $sth->hashRef) {
 		".quote($template->{name}).", ".quote($template->{template}).", 'USS')");
 }
 $sth->finish;
+foreach my $oldTid (keys %tempMatch) {
+	WebGUI::SQL->write("update wobject set templateId=".$tempMatch{$oldTid}." where templateId=".$oldTid." and namespace='LinkList'");
+}
 WebGUI::SQL->write("delete from template where namespace='LinkList'");
 my $a = WebGUI::SQL->read("select a.wobjectId,a.groupIdEdit,a.ownerId,a.lastEdited,b.username,a.dateAdded from wobject a left join users b on
 	a.ownerId=b.userId where a.namespace='LinkList'");
@@ -378,7 +482,7 @@ while (my $data = $a->hashRef) {
 	WebGUI::SQL->write("insert into USS (wobjectId,	USS_id, groupToContribute, submissionsPerPage, filterContent, sortBy, sortOrder, 
 		submissionFormTemplateId) values (
 		".$data->{wobjectId}.", $ussId, ".$data->{groupIdEdit}.", 1000, 'none', 'sequenceNumber', 'asc', 3)");
-	my $b = WebGUI::SQL->read("select * from LinkList_link");
+	my $b = WebGUI::SQL->read("select * from LinkList_link where wobjectId=".$data->{wobjectId});
 	while (my $sub = $b->hashRef) {
 		my $subId = getNextId("USS_submissionId");
 		my $forum = WebGUI::Forum->create({});
@@ -394,97 +498,6 @@ WebGUI::SQL->write("update wobject set namespace='USS' where namespace='LinkList
 WebGUI::SQL->write("drop table LinkList");
 WebGUI::SQL->write("drop table LinkList_link");
 WebGUI::SQL->write("delete from incrementer where incrementerId='LinkList_linkId'");
-
-
-
-#--------------------------------------------
-print "\tUpdating SQL Reports.\n" unless ($quiet);
-my %dblink;
-$dblink{$session{config}{dsn}}{id} = 0;
-$dblink{$session{config}{dsn}}{user} = $session{config}{dbuser};
-my $sth = WebGUI::SQL->read("select DSN, databaseLinkId, username, identifier, wobjectId from SQLReport");
-while (my $data = $sth->hashRef) {
-	my $id = undef;
-	next if ($data->{databaseLinkId} > 0);
-	foreach my $dsn (keys %dblink) {
-		if ($dsn eq $data->{DSN} && $dblink{$dsn}{user} eq $data->{username}) {
-			$id = $dblink{$dsn}{id};
-			last;
-		}
-	}
-	unless (defined $id) {
-		$id = getNextId("databaseLinkId");
-		my $title = $data->{username}.'@'.$data->{DSN};
-		WebGUI::SQL->write("insert into databaseLink (databaseLinkId, title, DSN, username, identifier) values ($id, ".quote($title).",
-			".quote($data->{DSN}).", ".quote($data->{username}).", ".quote($data->{identifier}).")");
-		$dblink{$data->{DSN}}{id} = $id;
-		$dblink{$data->{DSN}}{user} = $data->{username};
-	}
-	WebGUI::SQL->write("update SQLReport set databaseLinkId=".$id." where wobjectId=".$data->{wobjectId});
-}
-$sth->finish;
-WebGUI::SQL->write("alter table SQLReport drop column DSN");
-WebGUI::SQL->write("alter table SQLReport drop column username");
-WebGUI::SQL->write("alter table SQLReport drop column identifier");
-use WebGUI::DatabaseLink;
-my $templateId;
-my $a = WebGUI::SQL->read("select a.databaseLinkId, a.dbQuery, a.template, a.wobjectId, b.title from SQLReport a , wobject b where a.wobjectId=b.wobjectId");
-while (my $data = $a->hashRef) {
-	next if ($data->{dbQuery} eq "");
-	my $db = WebGUI::DatabaseLink->new($data->{databaseLinkId});
-	if ($data->{template} ne "") {
-                ($templateId) = WebGUI::SQL->quickArray("select max(templateId) from template where namespace='SQLReport'");
-		if ($templateId > 999) {
-			$templateId++;
-		} else {
-			$templateId = 1000;
-		}
-		my $b = WebGUI::SQL->unconditionalRead($data->{dbQuery},$db->dbh);
-		my @template = split(/\^\-\;/,$data->{template});
-		my $final = '<tmpl_if displayTitle>
-    			<h1><tmpl_var title></h1>
-			</tmpl_if>
-
-			<tmpl_if description>
-			    <tmpl_var description><p />
-			</tmpl_if>
-
-			<tmpl_if debugMode>
-				<ul>
-				<tmpl_loop debug_loop>
-					<li><tmpl_var debug.output></li>
-				</tmpl_loop>
-				</ul>
-			</tmpl_if>
-			'.$template[0].'
-			<tmpl_loop rows_loop>	';
-		my $i;
-		if (defined $b) {
-		foreach my $col ($b->getColumnNames) {
-			my $replacement = '<tmpl_var row.field.'.$col.'.value>';
-			$template[1] =~ s/\^$i\;/$replacement/g;
-			$i++;
-		}
-		}
-		$template[1] =~ s/\^rownum\;/\<tmpl_var row\.number\>/g;
-		$final .= $template[1].'
-			</tmpl_loop>
-			'.$template[2].'
-			<tmpl_if multiplePages>
-  			<div class="pagination">
-    				<tmpl_var previousPage>   <tmpl_var pageList>  <tmpl_var nextPage>
-  			</div>
-			</tmpl_if>';
-		WebGUI::SQL->write("insert into template (templateId, name, template, namespace) values ($templateId, 
-			".quote($data->{title}).",".quote($final).",'SQLReport')");
-	} else {
-		$templateId = 1;
-	}
-	WebGUI::SQL->write("update wobject set templateId=$templateId where wobjectId=".$data->{wobjectId});
-}
-$a->finish;
-WebGUI::SQL->write("alter table SQLReport drop column template");
-WebGUI::SQL->write("alter table SQLReport drop column convertCarriageReturns");
 
 
 
