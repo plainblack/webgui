@@ -587,6 +587,7 @@ sub www_moveTreePageRight {
 
 #-------------------------------------------------------------------
 sub www_pastePage {
+	return "" if ($session{page}{pageId} == $session{form}{pageId}); # don't let it paste to itself
         my ($output, $nextSeq);
 	($nextSeq) = WebGUI::SQL->quickArray("select max(sequenceNumber) from page where parentId=$session{page}{pageId}");
 	$nextSeq += 1;

@@ -15,6 +15,7 @@
    (Thanks to Len Kranendonk)
  - Bugfix [ 855682 ] USS rss feed shows unapproved items
  - Bugfix [ 855684 ] USS: no approvement check
+ - Bugfix [ 826864 ] Endless recursion
 
 
 5.5.3
