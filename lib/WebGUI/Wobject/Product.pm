@@ -503,10 +503,8 @@ sub www_moveSpecificationUp {
 
 #-------------------------------------------------------------------
 sub www_view {
-        my ($output, %data, $sth, $file, $segment, $template, %var, @featureloop, @benefitloop, @specificationloop,
-		@accessoryloop, @relatedloop);
+        my (%data, $sth, $file, $segment, %var, @featureloop, @benefitloop, @specificationloop, @accessoryloop, @relatedloop);
         tie %data, 'Tie::CPHash';
-        $output = $_[0]->displayTitle;
 	#---brochure
         if ($_[0]->get("brochure")) {
                 $file = WebGUI::Attachment->new($_[0]->get("brochure"),$_[0]->get("wobjectId"));
@@ -548,19 +546,15 @@ sub www_view {
         }
 
 	#---features 
-        if ($session{var}{adminOn}) {
-        	$var{addFeature} = '<a href="'.WebGUI::URL::page('func=editFeature&fid=new&wid='
-			.$_[0]->get("wobjectId")).'">'.WebGUI::International::get(34,$namespace).'</a>';
-        }
+        $var{"addFeature.url"} = WebGUI::URL::page('func=editFeature&fid=new&wid='.$_[0]->get("wobjectId"));
+	$var{"addFeature.label"} = WebGUI::International::get(34,$namespace);
         $sth = WebGUI::SQL->read("select feature,Product_featureId from Product_feature where wobjectId="
 		.$_[0]->get("wobjectId")." order by sequenceNumber");
         while (%data = $sth->hash) {
-                if ($session{var}{adminOn}) {
-                        $segment = deleteIcon('func=deleteFeature&wid='.$_[0]->get("wobjectId").'&fid='.$data{Product_featureId})
-                                .editIcon('func=editFeature&wid='.$_[0]->get("wobjectId").'&fid='.$data{Product_featureId})
-                                .moveUpIcon('func=moveFeatureUp&wid='.$_[0]->get("wobjectId").'&fid='.$data{Product_featureId})
-                                .moveDownIcon('func=moveFeatureDown&wid='.$_[0]->get("wobjectId").'&fid='.$data{Product_featureId});
-                }
+                $segment = deleteIcon('func=deleteFeature&wid='.$_[0]->get("wobjectId").'&fid='.$data{Product_featureId})
+                        .editIcon('func=editFeature&wid='.$_[0]->get("wobjectId").'&fid='.$data{Product_featureId})
+                        .moveUpIcon('func=moveFeatureUp&wid='.$_[0]->get("wobjectId").'&fid='.$data{Product_featureId})
+                        .moveDownIcon('func=moveFeatureDown&wid='.$_[0]->get("wobjectId").'&fid='.$data{Product_featureId});
 		push(@featureloop,{
 			"feature.feature"=>$data{feature},
 			"feature.controls"=>$segment
@@ -570,19 +564,15 @@ sub www_view {
 	$var{feature_loop} = \@featureloop;
 
 	#---benefits 
-        if ($session{var}{adminOn}) {
-        	$var{addBenefit} = '<a href="'.WebGUI::URL::page('func=editBenefit&fid=new&wid='
-                	.$_[0]->get("wobjectId")).'">'.WebGUI::International::get(55,$namespace).'</a><p/>';
-        }
+        $var{"addBenefit.url"} = WebGUI::URL::page('func=editBenefit&fid=new&wid='.$_[0]->get("wobjectId"));
+	$var{"addBenefit.label"} = WebGUI::International::get(55,$namespace);
         $sth = WebGUI::SQL->read("select benefit,Product_benefitId from Product_benefit where wobjectId="
 		.$_[0]->get("wobjectId")." order by sequenceNumber");
         while (%data = $sth->hash) {
-                if ($session{var}{adminOn}) {
-                        $segment = deleteIcon('func=deleteBenefit&wid='.$_[0]->get("wobjectId").'&bid='.$data{Product_benefitId})
-                                .editIcon('func=editBenefit&wid='.$_[0]->get("wobjectId").'&bid='.$data{Product_benefitId})
-                                .moveUpIcon('func=moveBenefitUp&wid='.$_[0]->get("wobjectId").'&bid='.$data{Product_benefitId})
-                                .moveDownIcon('func=moveBenefitDown&wid='.$_[0]->get("wobjectId").'&bid='.$data{Product_benefitId});
-                }
+                $segment = deleteIcon('func=deleteBenefit&wid='.$_[0]->get("wobjectId").'&bid='.$data{Product_benefitId})
+                        .editIcon('func=editBenefit&wid='.$_[0]->get("wobjectId").'&bid='.$data{Product_benefitId})
+                        .moveUpIcon('func=moveBenefitUp&wid='.$_[0]->get("wobjectId").'&bid='.$data{Product_benefitId})
+                        .moveDownIcon('func=moveBenefitDown&wid='.$_[0]->get("wobjectId").'&bid='.$data{Product_benefitId});
 		push(@benefitloop,{
 			"benefit.benefit"=>$data{benefit},
 			"benefit.controls"=>$segment
@@ -592,19 +582,15 @@ sub www_view {
 	$var{benefit_loop} = \@benefitloop;
 
 	#---specifications 
-        if ($session{var}{adminOn}) {
-        	$var{addSpecification} = '<a href="'.WebGUI::URL::page('func=editSpecification&sid=new&wid='
-                	.$_[0]->get("wobjectId")).'">'.WebGUI::International::get(35,$namespace).'</a><p/>';
-        }
+        $var{"addSpecification.url"} = WebGUI::URL::page('func=editSpecification&sid=new&wid='.$_[0]->get("wobjectId"));
+	$var{"addSpecification.label"} = WebGUI::International::get(35,$namespace);
         $sth = WebGUI::SQL->read("select name,value,units,Product_specificationId from Product_specification 
 		where wobjectId=".$_[0]->get("wobjectId")." order by sequenceNumber");
         while (%data = $sth->hash) {
-                if ($session{var}{adminOn}) {
-                        $segment = deleteIcon('func=deleteSpecification&wid='.$_[0]->get("wobjectId").'&sid='.$data{Product_specificationId})
-                                .editIcon('func=editSpecification&wid='.$_[0]->get("wobjectId").'&sid='.$data{Product_specificationId})
-                                .moveUpIcon('func=moveSpecificationUp&wid='.$_[0]->get("wobjectId").'&sid='.$data{Product_specificationId})
-                                .moveDownIcon('func=moveSpecificationDown&wid='.$_[0]->get("wobjectId").'&sid='.$data{Product_specificationId});
-                }
+                $segment = deleteIcon('func=deleteSpecification&wid='.$_[0]->get("wobjectId").'&sid='.$data{Product_specificationId})
+                        .editIcon('func=editSpecification&wid='.$_[0]->get("wobjectId").'&sid='.$data{Product_specificationId})
+                        .moveUpIcon('func=moveSpecificationUp&wid='.$_[0]->get("wobjectId").'&sid='.$data{Product_specificationId})
+                        .moveDownIcon('func=moveSpecificationDown&wid='.$_[0]->get("wobjectId").'&sid='.$data{Product_specificationId});
 		push(@specificationloop,{
 			"specification.controls"=>$segment,
 			"specification.specification"=>$data{value},
@@ -616,21 +602,17 @@ sub www_view {
 	$var{specification_loop} = \@specificationloop;
 
 	#---accessories 
-        if ($session{var}{adminOn}) {
-        	$var{addaccessory} = '<a href="'.WebGUI::URL::page('func=addAccessory&wid='
-                	.$_[0]->get("wobjectId")).'">'.WebGUI::International::get(36,$namespace).'</a><p/>';
-        }
+        $var{"addaccessory.url"} = WebGUI::URL::page('func=addAccessory&wid='.$_[0]->get("wobjectId"));
+	$var{"addaccessory.label"} = WebGUI::International::get(36,$namespace);
         $sth = WebGUI::SQL->read("select wobject.title,page.urlizedTitle,Product_accessory.accessoryWobjectId 
 		from Product_accessory,wobject,page 
 		where Product_accessory.wobjectId=".$_[0]->get("wobjectId")." 
 		and Product_accessory.accessoryWobjectId=wobject.wobjectId 
 		and wobject.pageId=page.pageId order by Product_accessory.sequenceNumber");
         while (%data = $sth->hash) {
-                if ($session{var}{adminOn}) {
-                        $segment = deleteIcon('func=deleteAccessory&wid='.$_[0]->get("wobjectId").'&aid='.$data{accessoryWobjectId})
-                                .moveUpIcon('func=moveAccessoryUp&wid='.$_[0]->get("wobjectId").'&aid='.$data{accessoryWobjectId})
-                                .moveDownIcon('func=moveAccessoryDown&wid='.$_[0]->get("wobjectId").'&aid='.$data{accessoryWobjectId});
-                }
+                $segment = deleteIcon('func=deleteAccessory&wid='.$_[0]->get("wobjectId").'&aid='.$data{accessoryWobjectId})
+                        .moveUpIcon('func=moveAccessoryUp&wid='.$_[0]->get("wobjectId").'&aid='.$data{accessoryWobjectId})
+                        .moveDownIcon('func=moveAccessoryDown&wid='.$_[0]->get("wobjectId").'&aid='.$data{accessoryWobjectId});
 		push(@accessoryloop,{
 			"accessory.URL"=>WebGUI::URL::gateway($data{urlizedTitle}),
 			"accessory.title"=>$data{title},
@@ -641,22 +623,17 @@ sub www_view {
 	$var{accessory_loop} = \@accessoryloop;
 
 	#---related
-        if ($session{var}{adminOn}) {
-        	$var{addrelatedproduct} = '<a href="'.WebGUI::URL::page('func=addRelated&wid='
-			.$_[0]->get("wobjectId")).'">'.WebGUI::International::get(37,$namespace).'</a><p/>';
-	}
+        $var{"addrelatedproduct.url"} = WebGUI::URL::page('func=addRelated&wid='.$_[0]->get("wobjectId"));
+	$var{"addrelatedproduct.label"} = WebGUI::International::get(37,$namespace);
 	$sth = WebGUI::SQL->read("select wobject.title,page.urlizedTitle,Product_related.relatedWobjectId 
 		from Product_related,wobject,page 
 		where Product_related.wobjectId=".$_[0]->get("wobjectId")." 
 		and Product_related.relatedWobjectId=wobject.wobjectId 
 		and wobject.pageId=page.pageId order by Product_related.sequenceNumber");
         while (%data = $sth->hash) {
-                if ($session{var}{adminOn}) {
-                        $segment = deleteIcon('func=deleteRelated&wid='.$_[0]->get("wobjectId").'&rid='.$data{relatedWobjectId})
-                                .moveUpIcon('func=moveRelatedUp&wid='.$_[0]->get("wobjectId").'&rid='.$data{relatedWobjectId})
-                                .moveDownIcon('func=moveRelatedDown&wid='.$_[0]->get("wobjectId").'&rid='.$data{relatedWobjectId});
-                }
-                $segment .= '&middot;<a href="'.WebGUI::URL::gateway($data{urlizedTitle}).'">'.$data{title}.'</a><br>';
+                $segment = deleteIcon('func=deleteRelated&wid='.$_[0]->get("wobjectId").'&rid='.$data{relatedWobjectId})
+                        .moveUpIcon('func=moveRelatedUp&wid='.$_[0]->get("wobjectId").'&rid='.$data{relatedWobjectId})
+                        .moveDownIcon('func=moveRelatedDown&wid='.$_[0]->get("wobjectId").'&rid='.$data{relatedWobjectId});
                 push(@relatedloop,{
 			"relatedproduct.URL"=>WebGUI::URL::gateway($data{urlizedTitle}),
 			"relatedproduct.title"=>$data{title},
@@ -665,7 +642,7 @@ sub www_view {
         }
         $sth->finish;
 	$var{relatedproduct_loop} = \@relatedloop;
-        return $_[0]->processMacros($output.$_[0]->processTemplate($_[0]->get("templateId"),\%var));
+        return $_[0]->processMacros($_[0]->processTemplate($_[0]->get("templateId"),\%var));
 }
 
 
