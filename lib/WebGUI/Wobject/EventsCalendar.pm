@@ -542,7 +542,7 @@ sub www_viewEvent {
 	$_[0]->logView() if ($session{setting}{passiveProfilingEnabled});
 	my ($output, %event, %var, $id);
 	tie %event, 'Tie::CPHash';
-	%event = WebGUI::SQL->quickHash("select * from EventsCalendar_event where EventsCalendar_eventId=$session{form}{eid}",WebGUI::SQL->getSlave);
+	%event = WebGUI::SQL->quickHash("select * from EventsCalendar_event where EventsCalendar_eventId=".quote($session{form}{eid}),WebGUI::SQL->getSlave);
 	$var{title} = $event{name};
 	$var{"start.label"} =  WebGUI::International::get(14,$_[0]->get("namespace"));
 	$var{"start.date"} = epochToHuman($event{startDate},"%z");
@@ -556,14 +556,14 @@ sub www_viewEvent {
         $var{"delete.url"} = WebGUI::URL::page('func=deleteEvent&eid='.$session{form}{eid}.'&wid='
 		.$session{form}{wid}.'&rid='.$event{EventsCalendar_recurringId});
 	$var{"delete.label"} = WebGUI::International::get(576);
-	my $query = "select EventsCalendar_eventId from EventsCalendar_event where EventsCalendar_eventId<>$event{EventsCalendar_eventId}";
-	$query .= " and wobjectId=".$_[0]->get("wobjectId") unless ($_[0]->get("isMaster"));
+	my $query = "select EventsCalendar_eventId from EventsCalendar_event where EventsCalendar_eventId<>".quote($event{EventsCalendar_eventId});
+	$query .= " and wobjectId=".quote($_[0]->get("wobjectId")) unless ($_[0]->get("isMaster"));
 	$query .= " and startDate<=$event{startDate} order by startDate desc, endDate desc";
 	($id) = WebGUI::SQL->quickArray($query,WebGUI::SQL->getSlave);
 	$var{"previous.label"} = '&laquo;'.WebGUI::International::get(92,$_[0]->get("namespace"));
 	$var{"previous.url"} = WebGUI::URL::page("func=viewEvent&wid=".$_[0]->get("wobjectId")."&eid=".$id) if ($id);
-	$query = "select EventsCalendar_eventId from EventsCalendar_event where EventsCalendar_eventId<>$event{EventsCalendar_eventId}";
-	$query .= " and wobjectId=".$_[0]->get("wobjectId") unless ($_[0]->get("isMaster"));
+	$query = "select EventsCalendar_eventId from EventsCalendar_event where EventsCalendar_eventId<>".quote($event{EventsCalendar_eventId});
+	$query .= " and wobjectId=".quote($_[0]->get("wobjectId")) unless ($_[0]->get("isMaster"));
 	$query .= " and startDate>=$event{startDate} order by startDate, endDate";
         ($id) = WebGUI::SQL->quickArray($query,WebGUI::SQL->getSlave);
         $var{"next.label"} = WebGUI::International::get(93,$_[0]->get("namespace")).'&raquo;';
