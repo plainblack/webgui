@@ -357,7 +357,7 @@ sub www_editUserSave {
 	return WebGUI::Privilege::adminOnly() unless ($isAdmin || $isSecondary);
 	my ($uid) = WebGUI::SQL->quickArray("select userId from users where username=".quote($session{form}{username}));
 	my $error;
-	if ($uid eq $session{form}{uid} || $uid eq "") {
+	if ($uid eq $session{form}{uid} || $uid eq "" || $session{form}{username} ne "") {
 	   	my $u = WebGUI::User->new($session{form}{uid});
 		$session{form}{uid} = $u->userId unless ($isSecondary);
 	   	$u->username($session{form}{username});

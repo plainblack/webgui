@@ -26,6 +26,7 @@
  - Fixed a bunch of Collaboration System template problems.
  - fix [ 1165829 ] i18n/english/Eventscalendar.pm: double entrys [mwilson]
  - fix [ 1165386 ] Templates page overlap [mwilson]
+ - fix [ 1166071 ] Create New User allows blank username [mwilson]
 
 
 6.5.2
