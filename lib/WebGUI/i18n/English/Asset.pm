@@ -365,6 +365,10 @@ each wobject under the tab &quot;Metadata&quot; in the wobject properties.</p>
                    lastUpdated => 1099050265,
                    message => q|System Trash|
                  },
+        '966' => {
+        	         lastUpdated => 1099050265,
+                   message => q|System Clipboard|
+        	       },
         'Extras URL' => {
                           lastUpdated => 1089039511,
                           context => q|Field label for the Export Page operation|,

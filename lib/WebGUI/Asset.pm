@@ -3066,7 +3066,7 @@ sub www_manageClipboard {
 	my ($header,$limit);
         $ac->setHelp("clipboard manage");
 	if ($session{form}{systemClipboard} && WebGUI::Grouping::isInGroup(3)) {
-		$header = WebGUI::International::get(965,"Asset");
+		$header = WebGUI::International::get(966,"Asset");
 		$ac->addSubmenuItem($self->getUrl('func=manageClipboard'), WebGUI::International::get(949),"Asset");
 		$ac->addSubmenuItem($self->getUrl('func=emptyClipboard&systemClipboard=1'), WebGUI::International::get(959,"Asset"), 
 			'onclick="return window.confirm(\''.WebGUI::International::get(951).'\')"',"Asset");
