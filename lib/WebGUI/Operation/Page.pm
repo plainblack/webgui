@@ -1,7 +1,7 @@
 package WebGUI::Operation::Page;
 
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001 Plain Black Software.
+# WebGUI is Copyright 2001-2002 Plain Black Software.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -87,6 +87,9 @@ sub www_addPageSave {
 	my ($urlizedTitle, $test, $nextSeq);
 	if (WebGUI::Privilege::canEditPage()) {
 		($nextSeq) = WebGUI::SQL->quickArray("select max(sequenceNumber)+1 from page where parentId=$session{page}{pageId}");
+		if ($session{form}{title} eq "") {
+			$session{form}{title} = "no title";
+		}
 		$urlizedTitle = urlize($session{form}{title});
 		while (($test) = WebGUI::SQL->quickArray("select urlizedTitle from page where urlizedTitle='$urlizedTitle'")) {
 			$urlizedTitle .= 2;
@@ -200,6 +203,9 @@ sub www_editPage {
 sub www_editPageSave {
         my (%parent, $urlizedTitle, $test);
         if (WebGUI::Privilege::canEditPage()) {
+                if ($session{form}{title} eq "") {
+                        $session{form}{title} = "no title";
+                }
                 $urlizedTitle = urlize($session{form}{urlizedTitle});
                 while (($test) = WebGUI::SQL->quickArray("select urlizedTitle from page where urlizedTitle='$urlizedTitle' and pageId<>$session{page}{pageId}")) {
                         $urlizedTitle .= 2;

@@ -1,7 +1,7 @@
 package WebGUI::Operation::Package;
 
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001 Plain Black Software.
+# WebGUI is Copyright 2001-2002 Plain Black Software.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -33,7 +33,7 @@ sub _duplicateWidgets {
 
 #-------------------------------------------------------------------
 sub _recursePageTree {
-        my ($a, %package, %newParent, $newPageId);
+        my ($a, %package, %newParent, $newPageId, $test, $urlizedTitle);
 	tie %newParent, 'Tie::CPHash';
 	tie %package, 'Tie::CPHash';
 	%newParent = WebGUI::SQL->quickHash("select * from page where pageId=$_[1]");
@@ -41,7 +41,11 @@ sub _recursePageTree {
         $a = WebGUI::SQL->read("select * from page where parentId=$_[0]");
         while (%package = $a->hash) {
 		$newPageId = getNextId("pageId");
-                WebGUI::SQL->write("insert into page values ($newPageId,$_[1],".quote($package{title}).",$newParent{styleId},$session{user}{userId},$newParent{ownerView},$newParent{ownerEdit},$newParent{groupId},$newParent{groupView},$newParent{groupEdit},$newParent{worldView},$newParent{worldEdit},$package{sequenceNumber},".quote($package{metaTags}).",".quote($package{urlizedTitle}).",$package{defaultMetaTags},".quote($package{template}).")");
+		$urlizedTitle = $package{urlizedTitle};
+		while (($test) = WebGUI::SQL->quickArray("select urlizedTitle from page where urlizedTitle='$urlizedTitle'")) {
+                        $urlizedTitle .= 2;
+                }
+                WebGUI::SQL->write("insert into page values ($newPageId,$_[1],".quote($package{title}).",$newParent{styleId},$session{user}{userId},$newParent{ownerView},$newParent{ownerEdit},$newParent{groupId},$newParent{groupView},$newParent{groupEdit},$newParent{worldView},$newParent{worldEdit},$package{sequenceNumber},".quote($package{metaTags}).",".quote($urlizedTitle).",$package{defaultMetaTags},".quote($package{template}).")");
                 _recursePageTree($package{pageId},$newPageId);
         }
         $a->finish;

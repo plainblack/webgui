@@ -1,7 +1,7 @@
 package WebGUI::Operation::User;
 
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001 Plain Black Software.
+# WebGUI is Copyright 2001-2002 Plain Black Software.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -32,17 +32,20 @@ sub www_addUser {
         if (WebGUI::Privilege::isInGroup(3)) {
                 $output .= helpLink(5);
 		$output .= '<h1>'.WebGUI::International::get(163).'</h1>';
+		if ($session{form}{op} eq "addUserSave") {
+			$output .= '<ul><li>'.WebGUI::International::get(77).' '.$session{form}{username}.'Too or '.$session{form}{username}.'02</ul>';
+		}
 		$output .= formHeader();
                 $output .= WebGUI::Form::hidden("op","addUserSave");
                 $output .= '<table>';
-                $output .= tableFormRow(WebGUI::International::get(50),WebGUI::Form::text("username",20,30));
-               	$output .= tableFormRow(WebGUI::International::get(51),WebGUI::Form::password("identifier",20,30));
+                $output .= tableFormRow(WebGUI::International::get(50),WebGUI::Form::text("username",20,30,$session{form}{username}));
+               	$output .= tableFormRow(WebGUI::International::get(51),WebGUI::Form::password("identifier",20,30,$session{form}{username}));
 		%hash = ('WebGUI'=>'WebGUI', 'LDAP'=>'LDAP');
 		$array[0] = $session{setting}{authMethod};
                	$output .= tableFormRow(WebGUI::International::get(164),WebGUI::Form::selectList("authMethod",\%hash, \@array));
                 $output .= tableFormRow(WebGUI::International::get(165),WebGUI::Form::text("ldapURL",20,2048,$session{setting}{ldapURL}));
-                $output .= tableFormRow(WebGUI::International::get(166),WebGUI::Form::text("connectDN",20,255));
-                $output .= tableFormRow(WebGUI::International::get(56),WebGUI::Form::text("email",20,255));
+                $output .= tableFormRow(WebGUI::International::get(166),WebGUI::Form::text("connectDN",20,255,$session{form}{connectDN}));
+                $output .= tableFormRow(WebGUI::International::get(56),WebGUI::Form::text("email",20,255,$session{form}{email}));
                 %hash = WebGUI::SQL->buildHash("select groupId,groupName from groups where groupName<>'Reserved' order by groupName");
 		$array[0] = 2;
                 $output .= tableFormRow(WebGUI::International::get(89),WebGUI::Form::selectList("groups",\%hash,\@array,5,1));
@@ -62,15 +65,20 @@ sub www_addUser {
 sub www_addUserSave {
         my ($output, @groups, $uid, $gid, $encryptedPassword, $expireAfter);
         if (WebGUI::Privilege::isInGroup(3)) {
-                $encryptedPassword = Digest::MD5::md5_base64($session{form}{identifier});
-		$uid = getNextId("userId");
-                WebGUI::SQL->write("insert into users (userId,username,identifier,email,authMethod,ldapURL,connectDN,language) values ($uid, ".quote($session{form}{username}).", ".quote($encryptedPassword).", ".quote($session{form}{email}).", ".quote($session{form}{authMethod}).", ".quote($session{form}{ldapURL}).", ".quote($session{form}{connectDN}).", ".quote($session{form}{language}).")");
-                @groups = $session{cgi}->param('groups');
-                foreach $gid (@groups) {
-			($expireAfter) = WebGUI::SQL->quickArray("select expireAfter from groups where groupId=$gid");
-                        WebGUI::SQL->write("insert into groupings values ($gid, $uid, ".(time()+$expireAfter).")");
-                }
-                $output = www_listUsers();
+		($uid) = WebGUI::SQL->quickArray("select userId from users where username='$session{form}{username}'");
+		unless ($uid) {
+                	$encryptedPassword = Digest::MD5::md5_base64($session{form}{identifier});
+			$uid = getNextId("userId");
+                	WebGUI::SQL->write("insert into users (userId,username,identifier,email,authMethod,ldapURL,connectDN,language) values ($uid, ".quote($session{form}{username}).", ".quote($encryptedPassword).", ".quote($session{form}{email}).", ".quote($session{form}{authMethod}).", ".quote($session{form}{ldapURL}).", ".quote($session{form}{connectDN}).", ".quote($session{form}{language}).")");
+                	@groups = $session{cgi}->param('groups');
+                	foreach $gid (@groups) {
+				($expireAfter) = WebGUI::SQL->quickArray("select expireAfter from groups where groupId=$gid");
+                        	WebGUI::SQL->write("insert into groupings values ($gid, $uid, ".(time()+$expireAfter).")");
+                	}
+                	$output = www_listUsers();
+		} else {
+			$output = www_addUser();
+		}
         } else {
                 $output = WebGUI::Privilege::adminOnly();
         }
@@ -178,6 +186,9 @@ sub www_editUser {
 		$output .= '<table><tr><td valign="top">';
                 $output .= helpLink(5);
 		$output .= '<h1>'.WebGUI::International::get(168).'</h1>';
+                if ($session{form}{op} eq "editUserSave") {
+                        $output .= '<ul><li>'.WebGUI::International::get(77).' '.$session{form}{username}.'Too or '.$session{form}{username}.'02</ul>';
+                }
 		$output .= formHeader();
                 $output .= WebGUI::Form::hidden("op","editUserSave");
                 $output .= WebGUI::Form::hidden("uid",$session{form}{uid});
@@ -251,15 +262,20 @@ sub www_editUser {
 
 #-------------------------------------------------------------------
 sub www_editUserSave {
-        my ($error, $encryptedPassword, $passwordStatement);
+        my ($error, $uid, $encryptedPassword, $passwordStatement);
         if (WebGUI::Privilege::isInGroup(3)) {
-                if ($session{form}{identifier} ne "password") {
-                        $encryptedPassword = Digest::MD5::md5_base64($session{form}{identifier});
-                        $passwordStatement = ', identifier='.quote($encryptedPassword);
-                }
-                $encryptedPassword = Digest::MD5::md5_base64($session{form}{identifier1});
-                WebGUI::SQL->write("update users set username=".quote($session{form}{username}).$passwordStatement.", authMethod=".quote($session{form}{authMethod}).", ldapURL=".quote($session{form}{ldapURL}).", connectDN=".quote($session{form}{connectDN}).", email=".quote($session{form}{email}).", language=".quote($session{form}{language}).", firstName=".quote($session{form}{firstName}).", middleName=".quote($session{form}{middleName}).", lastName=".quote($session{form}{lastName}).", icq=".quote($session{form}{icq}).", aim=".quote($session{form}{aim}).", msnIM=".quote($session{form}{msnIM}).", yahooIM=".quote($session{form}{yahooIM}).", homeAddress=".quote($session{form}{homeAddress}).", homeCity=".quote($session{form}{homeCity}).", homeState=".quote($session{form}{homeState}).", homeZip=".quote($session{form}{homeZip}).", homeCountry=".quote($session{form}{homeCountry}).", homePhone=".quote($session{form}{homePhone}).", workAddress=".quote($session{form}{workAddress}).", workCity=".quote($session{form}{workCity}).", workState=".quote($session{form}{workState}).", workZip=".quote($session{form}{workZip}).", workCountry=".quote($session{form}{workCountry}).", workPhone=".quote($session{form}{workPhone}).", cellPhone=".quote($session{form}{cellPhone}).", pager=".quote($session{form}{pager}).", gender=".quote($session{form}{gender}).", birthdate=".quote($session{form}{birthdate}).", homepage=".quote($session{form}{homepage})." where userId=".$session{form}{uid});
-		return www_listUsers();
+                ($uid) = WebGUI::SQL->quickArray("select userId from users where username='$session{form}{username}'");
+                unless ($uid) {
+                	if ($session{form}{identifier} ne "password") {
+                        	$encryptedPassword = Digest::MD5::md5_base64($session{form}{identifier});
+                        	$passwordStatement = ', identifier='.quote($encryptedPassword);
+                	}
+                	$encryptedPassword = Digest::MD5::md5_base64($session{form}{identifier1});
+                	WebGUI::SQL->write("update users set username=".quote($session{form}{username}).$passwordStatement.", authMethod=".quote($session{form}{authMethod}).", ldapURL=".quote($session{form}{ldapURL}).", connectDN=".quote($session{form}{connectDN}).", email=".quote($session{form}{email}).", language=".quote($session{form}{language}).", firstName=".quote($session{form}{firstName}).", middleName=".quote($session{form}{middleName}).", lastName=".quote($session{form}{lastName}).", icq=".quote($session{form}{icq}).", aim=".quote($session{form}{aim}).", msnIM=".quote($session{form}{msnIM}).", yahooIM=".quote($session{form}{yahooIM}).", homeAddress=".quote($session{form}{homeAddress}).", homeCity=".quote($session{form}{homeCity}).", homeState=".quote($session{form}{homeState}).", homeZip=".quote($session{form}{homeZip}).", homeCountry=".quote($session{form}{homeCountry}).", homePhone=".quote($session{form}{homePhone}).", workAddress=".quote($session{form}{workAddress}).", workCity=".quote($session{form}{workCity}).", workState=".quote($session{form}{workState}).", workZip=".quote($session{form}{workZip}).", workCountry=".quote($session{form}{workCountry}).", workPhone=".quote($session{form}{workPhone}).", cellPhone=".quote($session{form}{cellPhone}).", pager=".quote($session{form}{pager}).", gender=".quote($session{form}{gender}).", birthdate=".quote($session{form}{birthdate}).", homepage=".quote($session{form}{homepage})." where userId=".$session{form}{uid});
+			return www_listUsers();
+		} else {
+			return www_editUser();
+		}
         } else {
                 return WebGUI::Privilege::adminOnly();
         }
