@@ -363,7 +363,7 @@ sub date {
 		});
 	$output .= '<input type="button" style="font-size: 8pt;" onClick="window.dateField = this.form.'.
 		$_[0]->{name}.';calendar = window.open(\''.$session{config}{extrasURL}.
-		'/calendar.html\',\'cal\',\'WIDTH=200,HEIGHT=250\');return false" value="'.
+		'/calendar.html\',\'cal\',\'WIDTH=220,HEIGHT=250\');return false" value="'.
 		WebGUI::International::get(34).'">';
 	return $output;
 }
@@ -454,6 +454,7 @@ sub email {
 	$output .= text({
 		name=>$_[0]->{name},
 		value=>$_[0]->{value},
+		size=>$_[0]->{size},
 		extras=>' onChange="emailCheck(this.value)" '.$_[0]->{extras}
 		});
 	return $output;
@@ -1517,7 +1518,7 @@ sub timeField {
 		});
 	$output .= '<input type="button" style="font-size: 8pt;" onClick="window.timeField = this.form.'.
 		$_[0]->{name}.';clockSet = window.open(\''.$session{config}{extrasURL}.
-		'/timeChooser.html\',\'timeChooser\',\'WIDTH=220,HEIGHT=100\');return false" value="'.
+		'/timeChooser.html\',\'timeChooser\',\'WIDTH=230,HEIGHT=100\');return false" value="'.
 		WebGUI::International::get(970).'">';
 	return $output;
 }

@@ -129,7 +129,7 @@ sub getListTemplateVars {
 	while (my $record = $a->hashRef) {
 		my @dataLoop;
 		my $b = WebGUI::SQL->read("select b.name, b.label, b.isMailField, a.value from DataForm_entryData a left join DataForm_field b
-			on a.name=b.name where a.DataForm_entryId=".$record->{DataForm_entryId}."
+			on a.DataForm_fieldId=b.DataForm_fieldId where a.DataForm_entryId=".$record->{DataForm_entryId}."
 			order by b.sequenceNumber");
 		while (my $data = $b->hashRef) {
 			push(@dataLoop,{
@@ -189,7 +189,7 @@ sub getRecordTemplateVars {
 		$var->{epoch} = $entry->{submissionDate};
 		$var->{"edit.URL"} = WebGUI::URL::page('func=view&wid='.$self->get("wobjectId").'&entryId='.$var->{entryId});
 		$where .= " and b.DataForm_entryId=".$var->{entryId};
-		$join = "left join DataForm_entryData as b on a.name=b.name";
+		$join = "left join DataForm_entryData as b on a.DataForm_fieldId=b.DataForm_fieldId";
 		$select .= ", b.value";
 	}
 	my %data;
@@ -199,15 +199,19 @@ sub getRecordTemplateVars {
 		my $formValue = $session{form}{$data{name}};
 		if ((not exists $data{value}) && $session{form}{func} ne "editSave" && $session{form}{func} ne "editFieldSave" && defined $formValue) {
                         $data{value} = $formValue;
+		 	$data{value} = WebGUI::DateTime::setToEpoch($data{value}) if ($data{type} eq "date");
                 }
                 if (not exists $data{value}) {
                         $data{value} = WebGUI::Macro::process($data{defaultValue});
                 }
-		my $hidden = (($data{status} eq "hidden" || ($data{isMailField} && !$self->get("mailData"))) && !$session{var}{adminOn});
+		my $hidden = (($data{status} eq "hidden" && !$session{var}{adminOn}) || ($data{isMailField} && !$self->get("mailData")));
+		my $value = $data{value};
+                $value = WebGUI::DateTime::epochToHuman($value,"%z") if ($data{type} eq "date");
+                $value = WebGUI::DateTime::epochToHuman($value) if ($data{type} eq "dateTime");
 		push(@fields,{
 			"field.form" => _createField(\%data),
 			"field.name" => $data{name},
-			"field.value" => $data{value},
+			"field.value" => $value,
 			"field.label" => $data{label},
 			"field.isMailField" => $data{isMailField},
 			"field.isHidden" => $hidden,
@@ -284,14 +288,7 @@ sub sendEmail {
 		}
 	}
 	if ($to =~ /\@/) {
-		WebGUI::Mail::send(
-			$to,
-			$subject,
-			$message,
-			$cc,
-			$from,
-			$bcc
-			);
+		WebGUI::Mail::send($to, $subject, $message, $cc, $from, $bcc);
 	} else {
                 my ($userId) = WebGUI::SQL->quickArray("select userId from users where username=".quote($to));
                 my $groupId;
@@ -303,6 +300,12 @@ sub sendEmail {
                         WebGUI::ErrorHandler::warn($_[0]->get("wobjectId").": Unable to send message, no user or group found.");
                 } else {
                         WebGUI::MessageLog::addEntry($userId, $groupId, $subject, $message);
+			if ($cc) {
+                                WebGUI::Mail::send($cc, $subject, $message, "", $from);
+                        }
+                        if ($bcc) {
+                                WebGUI::Mail::send($bcc, $subject, $message, "", $from);
+                        }
                 }
         }
 }
@@ -555,19 +558,19 @@ sub www_exportTab {
 	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId")));
 	$session{header}{filename} = WebGUI::URL::urlize($_[0]->get("title")).".tab";
 	$session{header}{mimetype} = "text/plain";
-	my @fields = WebGUI::SQL->buildArray("select name from DataForm_field where wobjectId=".$_[0]->get("wobjectId")." order by sequenceNumber");
+	my %fields = WebGUI::SQL->buildHash("select DataForm_fieldId,name from DataForm_field where wobjectId=".$_[0]->get("wobjectId")." order by sequenceNumber");
 	my $select = "select a.DataForm_entryId as entryId, a.ipAddress, a.username, a.userId, a.submissionDate";
 	my $from = " from DataForm_entry a";
 	my $join;
 	my $where = " where a.wobjectId=".$_[0]->get("wobjectId");
 	my $orderBy = " order by a.DataForm_entryId";
 	my $columnCounter = "b";
-	foreach my $field (@fields) {
+	foreach my $fieldId (keys %fields) {
 		my $extension = "";
-		$extension = "mail_" if (isIn($field, qw(to from cc bcc subject)));
-		$select .= ", ".$columnCounter.".value as ".$extension.$field;
+		$extension = "mail_" if (isIn($fields{$fieldId}, qw(to from cc bcc subject)));
+		$select .= ", ".$columnCounter.".value as ".$extension.$fields{$fieldId};
 		$join .= " left join DataForm_entryData ".$columnCounter." on a.DataForm_entryId=".$columnCounter.".DataForm_entryId and "
-			.$columnCounter.".name=".quote($field);
+			.$columnCounter.".DataForm_fieldId=".quote($fieldId);
 		$columnCounter++;
 	}
 	return WebGUI::SQL->quickTab($select.$from.$join.$where.$orderBy);
@@ -618,14 +621,14 @@ sub www_process {
 		}
 		unless ($hadErrors) {
 			my ($exists) = WebGUI::SQL->quickArray("select count(*) from DataForm_entryData where DataForm_entryId=$entryId
-				and name=".quote($row{name}));
+				and DataForm_fieldId=".quote($row{DataForm_fieldId}));
 			if ($exists) {
 				WebGUI::SQL->write("update DataForm_entryData set value=".quote($value)."
-					where DataForm_entryId=$entryId and name=".quote($row{name}));
+					where DataForm_entryId=$entryId and DataForm_fieldId=".quote($row{DataForm_fieldId}));
 				$updating = 1;
 			} else {
 				WebGUI::SQL->write("insert into DataForm_entryData (DataForm_entryId,wobjectId,name,value) values
-					($entryId, ".$_[0]->get("wobjectId").", ".quote($row{name}).", ".quote($value).")");
+					($entryId, $row{DataForm_fieldId}, ".$_[0]->get("wobjectId").", ".quote($value).")");
 			}
 		}
 	}
