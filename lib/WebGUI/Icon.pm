@@ -23,7 +23,7 @@ use WebGUI::URL;
 our @ISA = qw(Exporter);
 our @EXPORT = qw(&helpIcon &becomeIcon &cutIcon &copyIcon &deleteIcon &editIcon &manageIcon
 	&moveBottomIcon &moveDownIcon &moveLeftIcon &moveRightIcon &moveTopIcon &moveUpIcon
-	&pageIcon &dragIcon &shortcutIcon &pasteIcon &wobjectIcon &viewIcon);
+	&pageIcon &dragIcon &shortcutIcon &pasteIcon &wobjectIcon &viewIcon &exportIcon);
 
 =head1 NAME
 
@@ -204,6 +204,35 @@ sub editIcon {
         $pageURL = $_[1] || $session{page}{urlizedTitle};
         $output = '<a href="'.WebGUI::URL::gateway($pageURL,$_[0]).'">';
         $output .= '<img src="'._getBaseURL().'edit.gif" align="middle" border="0" alt="Edit" title="Edit" /></a>';
+        return $output;
+}
+
+#-------------------------------------------------------------------
+
+=head2 exportIcon ( urlParameters [, pageURL ] )
+
+Generates an export button.
+
+=over
+
+=item urlParameters
+
+Any URL parameters that need to be tacked on to the current URL to accomplish whatever function this button represents.
+
+=item pageURL
+
+The URL to any page. Defaults to the current page.
+
+=back
+
+=cut
+
+sub exportIcon {
+        my ($output, $pageURL);
+        $pageURL = $_[1] || $session{page}{urlizedTitle};
+        $output = '<a href="'.WebGUI::URL::gateway($pageURL,$_[0]).'">';
+	# TODO Change icon to Jeffs export icon
+        $output .= '<img src="'._getBaseURL().'export.gif" align="middle" border="0" alt="Export" title="Export" /></a>';
         return $output;
 }
 

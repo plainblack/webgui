@@ -7128,10 +7128,75 @@ each wobject under the tab &quot;Metadata&quot; in the wobject properties.</p>
                 lastUpdated => 1089039511,
                 context => q|Metadata help|
         },
-
-
-
-
+        'Export Page' => {
+                message => q|Export Page|,
+                lastUpdated => 1089039511,
+                context => q|Title for the Export Page operation|
+        },
+        'Page to export' => {
+                message => q|Page to export|,
+                lastUpdated => 1089039511,
+                context => q|Field label for the Export Page operation|
+        },
+        'Export as user' => {
+                message => q|Export as user|,
+                lastUpdated => 1089039511,
+                context => q|Field label for the Export Page operation|
+        },
+	'Alternate style' => {
+		message => q|Alternate style|,
+                lastUpdated => 1089039511,
+                context => q|Field label for the Export Page operation|
+        },
+	'Page Export Status' => {
+                message => q|Page Export Status|,
+                lastUpdated => 1089039511,
+                context => q|Title for the Page Export Status operation|
+        },
+        'Depth' => {
+                message => q|Depth|,
+                lastUpdated => 1089039511,
+                context => q|Field label for the Export Page operation|
+        },
+	'Extras URL' => {
+		message => q|Extras URL|,
+                lastUpdated => 1089039511,
+                context => q|Field label for the Export Page operation|
+        },
+	'Uploads URL' => {
+                message => q|Uploads URL|,
+                lastUpdated => 1089039511,
+                context => q|Field label for the Export Page operation|
+        },
+	'Page, Export' => {
+                message => q|Page, Export|,
+                lastUpdated => 1089039511,
+                context => q|Help title for Page Export operation|
+        },
+	'Page, Export body' => {
+                message => q|
+<p>The Export Page function allows you to export WebGUI pages to static HTML
+files on disk. <br>
+The &quot;exportPath&quot; variable in the WebGUI config file must be enabled
+for this function to work properly.</p>
+<p><b>Depth<br>
+</b>Sets the depth of the page tree to export. Use a depth of 0 to export only
+the current page. </p>
+<p><b>Export as user<br>
+</b>Run the export as this user. Defaults to Visitor.</p>
+<p><b>&nbsp;Alternate style<br>
+</b>Sets an alternate style for the export. If this option is set, all pages
+will be exported using the selected style. </p>
+<p><b>Extras URL<br>
+</b>Sets the Extras URL. Defaults to the configured extrasURL in the WebGUI
+config file.</p>
+<p><b>Uploads URL<br>
+</b>Sets the Uploads URL. Defaults to the configured uploadsURL in the WebGUI
+config file.</p>
+				|,
+                lastUpdated => 1089039511,
+                context => q|Help body for Page Export operation|
+        },
 
 };
 

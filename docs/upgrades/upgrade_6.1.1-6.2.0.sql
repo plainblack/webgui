@@ -56,3 +56,7 @@ alter table WobjectProxy add proxyCriteria text default NULL;
 alter table IndexedSearch add column (forceSearchRoots smallint(1) default 1);
 alter table DataForm_field add column (vertical smallint(1) default 1);
 alter table DataForm_field add column (extras varchar(128));
+
+INSERT INTO groups VALUES (13,'Export Managers','Users in this group can export pages to disk.',314496000,1000000000,NULL,997938000,997938000,14,-14,NULL,0,NULL,0,0,0,3600,NULL,1,1);
+
+INSERT INTO groupGroupings VALUES (3,13);

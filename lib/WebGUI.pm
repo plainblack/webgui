@@ -177,8 +177,16 @@ sub page {
 		$cache->set($output, $ttl) if ($useCache);
 	}
 	my $httpHeader = WebGUI::HTTP::getHeader();
+
+	# This allows an operation or wobject to write directly to the browser.
+        if ($session{page}{empty}) {
+		$httpHeader = $output = undef;
+        }
+	
 	WebGUI::Session::close() unless ($useExistingSession);
+
 	return $httpHeader.$output;
+
 }
 
 

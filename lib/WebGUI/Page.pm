@@ -462,6 +462,7 @@ sub generate {
 		.moveUpIcon('op=movePageUp')
 		.moveDownIcon('op=movePageDown')
 		.cutIcon('op=cutPage');
+	$var{'page.controls'} .= exportIcon('op=exportPage') if defined ($session{config}{exportPath});
 	my $sth = WebGUI::SQL->read("select * from wobject where pageId=".$session{page}{pageId}." order by sequenceNumber, wobjectId",WebGUI::SQL->getSlave);
         while (my $wobject = $sth->hashRef) {
 		my $wobjectToolbar = wobjectIcon()
@@ -1368,8 +1369,10 @@ Returns an array of hashrefs containing the page properties of this node and it'
 sub self_and_descendants {
 	my ($self);
 	$self = shift;
+	my @options = @_;
 	return @{$self->get_self_and_children_flat(
-		id	=> $self->get('pageId')
+		id	=> $self->get('pageId'),
+		@options
 		)};
 }
 

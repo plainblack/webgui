@@ -12,10 +12,12 @@ package WebGUI::Operation::Page;
 
 use Exporter;
 use strict;
+use File::Path;
 use WebGUI::DateTime;
 use WebGUI::FormProcessor;
 use WebGUI::Grouping;
 use WebGUI::HTMLForm;
+use WebGUI::HTTP;
 use WebGUI::Icon;
 use WebGUI::International;
 use WebGUI::Page;
@@ -25,12 +27,14 @@ use WebGUI::SQL;
 use WebGUI::TabForm;
 use WebGUI::URL;
 use WebGUI::Utility;
+use WebGUI::Export;
 
 our @ISA = qw(Exporter);
 our @EXPORT = qw(&www_viewPageTree &www_movePageUp &www_movePageDown 
         &www_cutPage &www_deletePage &www_deletePageConfirm &www_editPage 
-        &www_editPageSave &www_pastePage &www_moveTreePageUp &www_rearrangeWobjects
-        &www_moveTreePageDown &www_moveTreePageLeft &www_moveTreePageRight);
+        &www_editPageSave &www_exportPage &www_exportPageStatus www_exportPageGenerate
+	&www_pastePage &www_moveTreePageUp &www_rearrangeWobjects &www_moveTreePageDown 
+	&www_moveTreePageLeft &www_moveTreePageRight);
 
 #-------------------------------------------------------------------
 =head2 _changeWobjectPrivileges ( page )
@@ -299,7 +303,6 @@ sub www_deletePageConfirm {
         }
 }
 
-use WebGUI::TabForm;
 #-------------------------------------------------------------------
 =head2 www_editPage
 
@@ -606,7 +609,189 @@ sub www_editPageSave {
 }
 
 #-------------------------------------------------------------------
-=head2 www_moqvePageDown
+
+=head2 www_exportPage
+
+Displays the export page administrative interface
+
+=back
+
+=cut
+
+sub www_exportPage {
+        return WebGUI::Privilege::insufficient unless (WebGUI::Grouping::isInGroup(13));
+
+	my $output;
+        $output .= helpIcon("page export");
+        $output .= '<h1>'.WebGUI::International::get('Export Page').'</h1>';
+	$output .= _checkExportPath();
+
+        my $f = WebGUI::HTMLForm->new;
+        $f->hidden("op","exportPageStatus");
+	$f->integer(
+			-label=>WebGUI::International::get('Depth'),
+			-name=>"depth",
+			-value=>99,
+		);
+	$f->selectList(
+			-label=>WebGUI::International::get('Export as user'),
+			-name=>"userId",
+			-options=>WebGUI::SQL->buildHashRef("select userId, username from users"),
+			-value=>[1],
+		);
+	tie my %templates, 'Tie::IxHash';
+	%templates = ("", WebGUI::International::get(139), %{WebGUI::Template::getList('style')});
+	$f->selectList(
+			-label=>WebGUI::International::get('Alternate style'),
+			-name=>"styleId",
+			-options=>\%templates,
+		);
+	$f->text(
+			-label=>WebGUI::International::get('Extras URL'),
+			-name=>"extrasURL",
+			-value=>$session{config}{extrasURL}
+		);
+	$f->text(
+                        -label=>WebGUI::International::get('Uploads URL'),
+                        -name=>"uploadsURL",
+                        -value=>$session{config}{uploadsURL}
+                );
+        $f->submit;
+        $output .= $f->print;
+	return $output;
+}
+
+#-------------------------------------------------------------------
+
+=head2 www_exportPageStatus
+
+Displays the export status page
+
+=back
+
+=cut
+
+
+sub www_exportPageStatus {
+        return WebGUI::Privilege::insufficient unless (WebGUI::Grouping::isInGroup(13));
+
+	my $iframeUrl = WebGUI::URL::page('op=exportPageGenerate');
+	$iframeUrl = WebGUI::URL::append($iframeUrl, 'depth='.$session{form}{depth});
+	$iframeUrl = WebGUI::URL::append($iframeUrl, 'styleId='.$session{form}{styleId});
+	$iframeUrl = WebGUI::URL::append($iframeUrl, 'userId='.$session{form}{userId});
+	$iframeUrl = WebGUI::URL::append($iframeUrl, 'pageId='.$session{page}{pageId});
+	$iframeUrl = WebGUI::URL::append($iframeUrl, 'extrasURL='.$session{form}{extrasURL});
+	$iframeUrl = WebGUI::URL::append($iframeUrl, 'uploadsURL='.$session{form}{uploadsURL});
+	
+
+	my $output;
+        $output .= '<h1>'.WebGUI::International::get('Page Export Status').'</h1>';
+	$output .= '<IFRAME SRC="'.$iframeUrl.'" 
+			TITLE="'.WebGUI::International::get('Page Export Status').'" 
+			WIDTH="410" HEIGHT="200"></IFRAME>';
+
+	return $output;
+}
+
+#-------------------------------------------------------------------
+
+=head2 www_exportPageGenerate
+
+Executes the export process and displays real time status. This operation is displayed
+by exportPageStatus in an IFRAME.
+
+=back
+
+=cut
+
+
+sub www_exportPageGenerate {
+	return WebGUI::Privilege::insufficient unless (WebGUI::Grouping::isInGroup(13));
+		
+	# This routine is called in an IFRAME and prints status output directly to the browser.
+	$|++;				# Unbuffered data output
+        $session{page}{empty} = 1;      # Write directly to the browser
+
+	print WebGUI::HTTP::getHeader();
+
+	my $startTime = time();	
+	my $error = _checkExportPath();
+	if ($error) {
+		print $error;
+		return;
+	}
+	my $userId = $session{form}{userId};
+	my $styleId = $session{form}{styleId};
+	my $extrasURL = $session{form}{extrasURL};
+	my $uploadsURL = $session{form}{uploadsURL};
+
+	# Get the pages
+	my $p = WebGUI::Page->getPage($session{form}{page});
+	my @pages = $p->self_and_descendants(depth=>$session{form}{depth});
+	unless (@pages) {
+		print "There are no pages to export";
+		return;
+	}
+	foreach my $page (@pages) {
+		my ($path, $file);
+		print "Exporting page ".$page->{urlizedTitle}."......";
+
+		# Create path
+		$page->{urlizedTitle} =~ /^(.*)\/(.*)$/;
+		$path = $1;
+		if($path) {
+			$path = $session{config}{exportPath} . $session{os}{slash} . $path;
+			eval { mkpath($path) };
+			if($@) {
+				print "Couldn't create $path: $@";
+				return;
+			}
+		} 
+		# initiate export object
+		my $e = WebGUI::Export->new(
+						pageId => $page->{pageId},
+						userId => $userId || 1,
+						styleId => $styleId,
+						relativeUrls => 1,
+						extrasURL => $extrasURL,
+						uploadsURL => $uploadsURL
+					);
+		# Open file
+                $file = $session{config}{exportPath} . $session{os}{slash} . $page->{urlizedTitle};
+                open(FILE, "> $file") || die "Can't open $file: $!";
+		print FILE $e->generate;
+		close(FILE);
+
+		print "DONE<br/>";
+	}
+	print "<p>Exported ".scalar(@pages)." pages in ".(time()-$startTime)." seconds.</p>";
+	print '<a target="_parent" href="'.WebGUI::URL::page().'">'.WebGUI::International::get(493).'</a>';
+
+	return;
+
+}
+
+#-------------------------------------------------------------------
+sub _checkExportPath {
+	my $error;
+	if(defined $session{config}{exportPath}) {
+		if(-d $session{config}{exportPath}) {
+			unless (-w $session{config}{exportPath}) {
+				$error .= 'Error: The export path '.$session{config}{exportPath}.' is not writable.<br>
+						Make sure that the webserver has permissions to write to that directory';
+			}
+		} else {
+			$error .= 'Error: The export path '.$session{config}{exportPath}.' does not exists.';
+		}
+	} else {
+		$error.= 'Error: The export path is not configured. Please set the exportPath variable in the WebGUI config file';
+	}
+	$error = '<p><b>'.$error.'</b></p>' if $error;
+	return $error;
+}
+
+#-------------------------------------------------------------------
+=head2 www_movePageDown
 
 Moves page down in the context of it's sisters.
 

@@ -23,12 +23,11 @@ use Getopt::Long;
 use strict qw(subs vars);
 use WebGUI;
 use WebGUI::Session;
-use WebGUI::HTML;
-use WebGUI::Utility;
+use WebGUI::Export;
 
 $|=1;
 
-my ($configFile, $pageId, $userId, $styleId, $toFile, $stripHTML, $help);
+my ($configFile, $pageId, $userId, $styleId, $toFile, $stripHTML, $help, $relativeUrls);
 
 $userId = 1;
 
@@ -39,7 +38,8 @@ GetOptions(
 	'styleId:i'=>\$styleId,
 	'toFile:s'=>\$toFile,
 	'stripHTML'=>\$stripHTML,
-	'help'=>\$help
+	'help'=>\$help,
+	'relativeUrls'=>\$relativeUrls,
 );
 
 if ($help || $configFile eq '' ) {
@@ -70,44 +70,32 @@ Options:
 			output only text. NOTE: The resulting
 			text may have formatting problems as a
 			result.
-		
+
+	--relativeUrls	If set, all navigation URL's will be relative
+			instead of absolute. Defaults to "0" (absolute
+			URLs)
+
 STOP
 	exit;
 }
 
-# Open output file if necessary
-if ($toFile) {
-	open (TOFILE, ">$toFile") or die "Can't open file $toFile for writing. $!";
-}
-
 # Open WebGUI session
 WebGUI::Session::open($webguiRoot,$configFile);
-WebGUI::Session::refreshUserInfo($userId,$session{dbh});
-WebGUI::Session::refreshPageInfo($pageId);
+WebGUI::Session::refreshUserInfo(3,$session{dbh});
 
-# No HTTP header as we're browserless
-$session{page}{noHttpHeader} = 1;
+my $e = WebGUI::Export->new(
+				pageId => $pageId,
+				userId => $userId,
+				styleId => $styleId,
+				stripHTML => $stripHTML,
+				relativeUrls => $relativeUrls
+			);
 
-# Alternate style
-if (defined $styleId) {
-	$session{form}{makePrintable}++; 	# prevent caching
-	$session{page}{styleId} = $styleId;
-}
-
-# Retrieve content
-my $content = WebGUI::page(undef, undef, 1);
-
-# stripHTML
-if ($stripHTML) {
-	$content = WebGUI::HTML::html2text($content);
-} else {
-	# Make links absolute
-	$content = WebGUI::HTML::makeAbsolute($content);
-}
-
-# Print result
+my $content = $e->generate;
 if ($toFile) {
+        open (TOFILE, ">$toFile") or die "Can't open file $toFile for writing. $!";
 	print TOFILE $content;
+	close (TOFILE);
 } else {
 	print $content;
 }
@@ -115,8 +103,5 @@ if ($toFile) {
 # Clean-up WebGUI Session
 WebGUI::Session::end($session{var}{sessionId});
 WebGUI::Session::close();
-
-# Close output file if necessary
-close(TOFILE) if ($toFile);
 
 exit;

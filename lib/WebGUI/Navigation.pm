@@ -228,8 +228,7 @@ sub build {
 
 	my (@page_loop, $lastPage, %unfolded);
 	tie %unfolded, "Tie::IxHash";
-	
-	unless (defined $cacheContent) {
+	unless (defined $cacheContent && ! $session{var}{altSiteURL}) {
 		# The loop was not cached
 		my @pages = eval $method;
 		if ($@) {

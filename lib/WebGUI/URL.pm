@@ -174,7 +174,8 @@ Returns a constructed site url from protocol to gateway.
 
 =cut
 
-sub getSiteURL {
+sub getSiteURL { 
+	return $session{var}{altSiteURL} if (defined $session{var}{altSiteURL});
         my $site;
         my @sitenames;
         if (ref $session{config}{sitename} eq "ARRAY") {
