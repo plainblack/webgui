@@ -318,7 +318,7 @@ sub view {
 			push(@{$pageData->{"page.depthDiff_loop"}},{}) for(1..$depthDiff);
 		}
 		$absoluteDepthOfLastPage = $pageData->{"page.absDepth"};
-		$pageData->{"page.isMother"} = $asset->hasChildren;
+		$pageData->{"page.hasChild"} = $asset->hasChildren;
 		my $parent = $self->getParent;
 		if (defined $parent) {
 			foreach my $property (@interestingProperties) {
