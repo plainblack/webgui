@@ -295,7 +295,7 @@ Returns an HTML formatted list of the session variables for display during debug
 sub showSessionVars {
 	my $data = getSessionVars();
 	$data =~ s/\n/\<br\>/g;
-	return '<div bgcolor="#ffffff" style="color: #000000; font-size: 10pt; font-family: helvetica;">'.$data.'</div>';
+	return '<div style="background-color: #ffffff; color: #000000; font-size: 10pt; font-family: helvetica;">'.$data.'</div>';
 }
 
 
