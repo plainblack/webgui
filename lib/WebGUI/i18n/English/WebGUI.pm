@@ -3679,7 +3679,7 @@ The description of this forum as passed by the calling object.
 	},
 
 	'622' => {
-		message => q|See <i>Manage Group</i> for a description of grouping functions and the default groups.
+		message => q|
 <p>
 
 <b>Group Name</b><br>
@@ -3715,7 +3715,7 @@ The difference in the number of days from the expiration to the grouping being d
 <b>Scratch Filter</b><br>
 A user can be dynamically bound to a group by a scratch variable in their session. Scratch variables can be set programatically, or via the web. To set a scratch variable via the web, tack the following on to the end of any URL:
 <p>
-<i>?op=setScratch&scratchName=somename&scratchValue=somevalue</i>
+<i>?op=setScratch&amp;scratchName=somename&amp;scratchValue=somevalue</i>
 <p>
 Having done that, when a user clicks on that link they will have a scratch variable added to their session with a name of "www_somename" and a value of "somevalue". The "www_" is prepended to prevent web requests from overwriting scratch variables that were set programatically.
 <p>
@@ -3734,7 +3734,6 @@ Specify an IP address or an IP mask to match. If the user's IP address matches, 
 If you've enabled Karma, then you'll be able to set this value. Karma Threshold is the amount of karma a user must have to be considered part of this group.
 <p>
 
-
 <b>Users can add themselves?</b><br>
 Do you wish to let users add themselves to this group? See the GroupAdd macro for more info.
 <p>
@@ -3751,10 +3750,10 @@ If you'd like to have this group validate users using an external database, choo
 <p>
 
 <b>SQL Query</b><br>
-Many organizations have external databases that map users to groups; for example an HR database might map Employee ID to Health Care Plan.  To validate users against an external database, you need to construct a SQL statement that will return 1 if a user is in the group.  Make sure to begin your statement with "select 1".  You may use macros in this query to access data in a user's profile, such as Employee ID.  Here is an example that checks a user against a fictional HR database.  This assumes you have created an additional profile field called employeeId.<br>
+Many organizations have external databases that map users to groups; for example an HR database might map Employee ID to Health Care Plan.  To validate users against an external database, you need to construct a SQL statement that will return 1 if a user is in the group.  Make sure to begin your statement with "select 1".  You may use macros in this query to access data in a user's profile, such as Employee ID.  Here is an example that checks a user against a fictional HR database.  This assumes you have created an additional WebGUI profile field called employeeId.<br>
 <br>
 select 1 from employees, health_plans, empl_plan_map<br>
-where employees.employee_id = ^User("employeeId");<br>
+where employees.employee_id = &#94;User("employeeId");<br>
 and health_plans.plan_name = 'HMO 1'<br>
 and employees.employee_id = empl_plan_map.employee_id<br>
 and health_plans.health_plan_id = empl_plan_mp.health_plan_id<br>
@@ -3764,7 +3763,7 @@ This group could then be named "Employees in HMO 1", and would allow you to rest
 
 <b>Cache external groups for how long?</b><br>
 Large sites using external group data will be making many calls to the external database.  To help reduce the load, you may select how long you'd like to cache the results of the external database query within the WebGUI database.  More advanced background caching may be included in a future version of WebGUI.|,
-		lastUpdated => 1066651479
+		lastUpdated => 1100153797
 	},
 
 	'361' => {
