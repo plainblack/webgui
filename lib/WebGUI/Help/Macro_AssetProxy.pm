@@ -12,7 +12,7 @@ our $HELP = {
 			},
 			{
 				tag => 'shortcut add/edit',
-				namespace => 'Shortcut'
+				namespace => 'Asset_Shortcut'
 			},
 		]
 	},

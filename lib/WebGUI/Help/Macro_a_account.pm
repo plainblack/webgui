@@ -12,7 +12,7 @@ our $HELP = {
 			},
 			{
 				tag => 'template language',
-				namespace => 'Template',
+				namespace => 'Asset_Template',
 			},
 		]
 	},

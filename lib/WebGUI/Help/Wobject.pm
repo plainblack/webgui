@@ -56,48 +56,16 @@ our $HELP = {
 		body => '828',
 		related => [
 			{
-				tag => 'article template',
-				namespace => 'Article'
-			},
-			{
-				tag => 'data form template',
-				namespace => 'DataForm'
-			},
-			{
-				tag => 'events calendar template',
-				namespace => 'EventsCalendar'
-			},
-			{
-				tag => 'message board template',
-				namespace => 'MessageBoard'
-			},
-			{
 				tag => 'pagination template variables',
 				namespace => 'WebGUI'
 			},
 			{
-				tag => 'poll template',
-				namespace => 'Poll'
-			},
-			{
-				tag => 'product template',
-				namespace => 'Product'
-			},
-			{
-				tag => 'survey template',
-				namespace => 'Survey'
-			},
-			{
-				tag => 'syndicated content template',
-				namespace => 'SyndicatedContent'
-			},
-			{
 				tag => 'template language',
-				namespace => 'Template'
+				namespace => 'Asset_Template'
 			},
 			{
 				tag => 'templates manage',
-				namespace => 'Template'
+				namespace => 'Asset_Template'
 			},
 		]
 	},

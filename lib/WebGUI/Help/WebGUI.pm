@@ -54,11 +54,11 @@ our $HELP = {
 			},
 			{
 				tag => 'template language',
-				namespace => 'Template'
+				namespace => 'Asset_Template'
 			},
 			{
 				tag => 'templates manage',
-				namespace => 'Template'
+				namespace => 'Asset_Template'
 			}
 		]
 	},
@@ -243,7 +243,7 @@ our $HELP = {
 		related => [
 			{
 				tag => 'article add/edit',
-				namespace => 'Article'
+				namespace => 'Asset_Article'
 			},
 			{
 				tag => 'group add/edit',
@@ -251,11 +251,11 @@ our $HELP = {
 			},
 			{
 				tag => 'message board add/edit',
-				namespace => 'MessageBoard'
+				namespace => 'Asset_MessageBoard'
 			},
 			{
 				tag => 'poll add/edit',
-				namespace => 'Poll'
+				namespace => 'Asset_Poll'
 			},
 			{
 				tag => 'settings',
@@ -279,7 +279,7 @@ our $HELP = {
 		related => [
 			{
 				tag => 'templates manage',
-				namespace => 'Template'
+				namespace => 'Asset_Template'
 			},
 			{
 				tag => 'theme delete',
@@ -339,7 +339,7 @@ our $HELP = {
 			},
 			{
 				tag => 'sql report add/edit',
-				namespace => 'SQLReport'
+				namespace => 'Asset_SQLReport'
 			}
 		]
 	},
@@ -357,7 +357,7 @@ our $HELP = {
 			},
 			{
 				tag => 'sql report add/edit',
-				namespace => 'SQLReport'
+				namespace => 'Asset_SQLReport'
 			}
 		]
 	},
@@ -375,7 +375,7 @@ our $HELP = {
 			},
 			{
 				tag => 'sql report add/edit',
-				namespace => 'SQLReport'
+				namespace => 'Asset_SQLReport'
 			}
 		]
 	},

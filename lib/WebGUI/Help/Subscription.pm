@@ -78,11 +78,11 @@ our $HELP = {
 		related => [
 			{
 				tag => 'template language',
-				namespace => 'Template'
+				namespace => 'Asset_Template'
 			},
 			{
 				tag => 'templates manage',
-				namespace => 'Template'
+				namespace => 'Asset_Template'
 			},
 		]
 	},

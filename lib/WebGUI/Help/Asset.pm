@@ -65,6 +65,7 @@ our $HELP = {
 				 $tag =~ s/([a-z])([A-Z])/$1 $2/g;  #Separate studly caps
 				 $tag =~ s/([A-Z]+(?![a-z]))/$1 /g; #Separate acronyms
 				 $tag = lc $tag;
+				 $namespace = join '', 'Asset_', $namespace;
 				 { tag => "$tag add/edit",
 				   namespace => $namespace }
 			     }
