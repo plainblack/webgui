@@ -855,6 +855,12 @@ sub processTemplate {
 	my $templateId = shift;
 	my $var = shift;
 	my $namespace = shift || $self->get("namespace");
+	if ($self->{_useMetaData}) {
+                my $meta = WebGUI::MetaData::getMetaDataFields($self->get("wobjectId"));
+                foreach my $field (keys %$meta) {
+			$var->{$meta->{$field}{fieldName}} = $meta->{$field}{value};
+		}
+	}
 	my %vars = (
 		%{$self->{_property}},
 		%{$var}
