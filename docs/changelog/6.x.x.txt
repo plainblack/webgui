@@ -47,4 +47,6 @@ webgui.
  - Added a limit option to the page list in the paginator.
  - Fixed a bug in AdminBar's clipboard code where a standard hash was
    used instead of a CPHash for database access.  (Thanks to Steve Simms.)
-
+ - Added caching of complex data structures to WebGUI::Cache (Martin Kamerbeek / Procolix)
+ - Implemented an object oriented interface to the page tree and converted
+   WebGUI::Operation::Page to use it. (Martin Kamerbeek / Procolix)
