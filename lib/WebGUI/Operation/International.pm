@@ -36,7 +36,6 @@ sub _submenu {
 	$output .= '<td valign="top" class="tableMenu">';
 	$output .= '<li><a href="'.WebGUI::URL::page('op=editLanguage&lid='.$session{form}{lid}).'">'.WebGUI::International::get(598).'</a>';
 	$output .= '<li><a href="'.WebGUI::URL::page('op=listInternationalMessages&lid='.$session{form}{lid}).'">'.WebGUI::International::get(594).'</a>';
-	$output .= '<li><a href="'.WebGUI::URL::page('op=listHelpMessages&lid='.$session{form}{lid}).'">'.WebGUI::International::get(599).'</a>';
 	$output .= '<li><a href="'.WebGUI::URL::page('op=submitTranslation&lid='.$session{form}{lid}).'">'.WebGUI::International::get(593).'</a>';
 	$output .= '<li><a href="'.WebGUI::URL::page('op=listLanguages').'">'.WebGUI::International::get(585).'</a>';
 	$output .= '<li><a href="'.WebGUI::URL::page().'">'.WebGUI::International::get(493).'</a>';
@@ -73,59 +72,6 @@ sub www_deleteLanguageConfirm {
                 WebGUI::SQL->write("delete from help where languageId=".$session{form}{lid});
                 WebGUI::SQL->write("delete from userProfileData where fieldName='language' and fieldData=".$session{form}{lid});
                 return www_listLanguages();
-        } else {
-                return WebGUI::Privilege::adminOnly();
-        }
-}
-
-#-------------------------------------------------------------------
-sub www_editHelpMessage {
-        my ($output, %data, $f, $language, $action, $object);
-	tie %data, 'Tie::CPHash';
-        if (WebGUI::Privilege::isInGroup(3)) {
-                ($language) = WebGUI::SQL->quickArray("select language from language where languageId=".$session{form}{lid});
-		$action = WebGUI::International::get(603);
-		$object = WebGUI::International::get(604);
-                $output = '<h1>'.WebGUI::International::get(602).'</h1>';
-                $f = WebGUI::HTMLForm->new;
-                $f->readOnly($session{form}{hid},WebGUI::International::get(600));
-                $f->hidden("lid",$session{form}{lid});
-                $f->hidden("hid",$session{form}{hid});
-		$f->hidden("missing",$session{form}{missing});
-                $f->hidden("pn",$session{form}{pn});
-                $f->hidden("namespace",$session{form}{namespace});
-                $f->hidden("op","editHelpMessageSave");
-                %data = WebGUI::SQL->quickHash("select action,object,body from help where helpId=".$session{form}{hid}."  
-                        and namespace='".$session{form}{namespace}."' and languageId=".$session{form}{lid});
-                $f->text("action",$action,$data{action});
-                $f->text("object",$object,$data{object});
-                $f->HTMLArea("body",$language,$data{body});
-                $f->submit;
-                %data = WebGUI::SQL->quickHash("select action,object,body from help where helpId=".$session{form}{hid}." 
-			and namespace='".$session{form}{namespace}."' and languageId=1");
-                $f->readOnly($data{action},$action);
-                $f->readOnly($data{object},$object);
-                $f->readOnly($data{body},"English");
-                $output .= $f->print;
-                return _submenu($output);
-        } else {
-                return WebGUI::Privilege::adminOnly();
-        }
-}
-
-#-------------------------------------------------------------------
-sub www_editHelpMessageSave {
-        if (WebGUI::Privilege::isInGroup(3)) {
-		if ($session{form}{missing}) {
-                	WebGUI::SQL->write("insert into help (body,action,object,namespace,languageId,helpId) values (".quote($session{form}{body}).", "
-				.quote($session{form}{action}).", ".quote($session{form}{object}).",".quote($session{form}{namespace}).","
-				.$session{form}{lid}.",".$session{form}{hid}.")");
-		} else {
-			WebGUI::SQL->write("update help set body=".quote($session{form}{body}).", action=".quote($session{form}{action}).", 
-                                object=".quote($session{form}{action})." where namespace=".quote($session{form}{namespace})." 
-                                and languageId=".$session{form}{lid}." and helpId=".$session{form}{hid});
-		}
-                return www_listHelpMessages();
         } else {
                 return WebGUI::Privilege::adminOnly();
         }
@@ -197,7 +143,6 @@ sub www_editLanguage {
 		if ($session{form}{lid} ne "new") {
 			$output .= '<ul>';
 			$output .= '<li><a href="'.WebGUI::URL::page('op=listInternationalMessages&lid='.$session{form}{lid}).'">'.WebGUI::International::get(594).'</a>';
-			$output .= '<li><a href="'.WebGUI::URL::page('op=listHelpMessages&lid='.$session{form}{lid}).'">'.WebGUI::International::get(599).'</a>';
 			$output .= '<li><a href="'.WebGUI::URL::page('op=submitLanguage&lid='.$session{form}{lid}).'">'.WebGUI::International::get(593).'</a>';
 			$output .= '</ul>';
 		}
@@ -353,23 +298,22 @@ sub www_submitTranslation {
 
 #-------------------------------------------------------------------
 sub www_submitTranslationConfirm {
-	my ($sth, @data, $submission);
+	my ($sth, %data, $submission);
+	tie %data, 'Tie::CPHash';
 	$submission = "#language\n\n";
+	$submission .= "delete from language where languageId=".$session{form}{lid}.";\n";
 	$sth = WebGUI::SQL->read("select * from language where languageId=".$session{form}{lid});
-	while (@data = $sth->array) {
-		$submission .= join("\t",@data)."\n"; 
+	while (%data = $sth->hash) {
+		$submission .= "insert into language (languageId,language,characterSet) values ("
+			.$data{languageId}.", ".quote($data{language}).", ".quote($data{characterSet}).");\n";
 	}
 	$sth->finish;
         $submission .= "\n#international\n\n";
+	$submission .= "delete from international where languageId=".$session{form}{lid}.";\n";
         $sth = WebGUI::SQL->read("select * from international where languageId=".$session{form}{lid});
-        while (@data = $sth->array) {
-                $submission .= join("\t",@data)."\n"; 
-        }
-        $sth->finish;
-        $submission .= "\n#help\n\n";
-        $sth = WebGUI::SQL->read("select * from help where languageId=".$session{form}{lid});
-        while (@data = $sth->array) {
-                $submission .= join("\t",@data)."\n"; 
+        while (%data = $sth->hash) {
+                $submission .= "insert into international (internationalId,languageId,namespace,message) values ("
+			.$data{internationalId}.",".$data{languageId}.",".quote($data{namespace}).",".quote($data{message}).");\n"; 
         }
         $sth->finish;
 	WebGUI::Mail::send("info\@plainblack.com","International Message Submission",$submission);

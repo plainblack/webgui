@@ -314,7 +314,7 @@ sub www_editImageGroup {
 			%data = WebGUI::SQL->quickHash("select * from imageGroup where imageGroupId=$session{form}{gid}");
 		}
                 %parent_data = WebGUI::SQL->quickHash("select name from imageGroup where imageGroupId=$session{form}{pid}");
-                $output = helpIcon(20);
+                $output = helpIcon(36);
                 $output .= '<h1>'.WebGUI::International::get(545).'</h1>';
 		$f = WebGUI::HTMLForm->new;
                 $f->hidden("op","editImageGroupSave");

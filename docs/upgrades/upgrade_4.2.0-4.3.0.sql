@@ -660,6 +660,32 @@ update international set message='Attachment' where internationalId=33 and langu
 alter table page add column startDate int not null default 946710000;
 alter table page add column endDate int not null default 2082783600;
 update page set styleId=-6 where styleId=-3;
+update international set message='Edit Image Group' where internationalId=545 and languageId=1;
+alter table help change seeAlso seeAlso text;
+alter table international change message message mediumtext;
+drop table helpSeeAlso;
+insert into international select (60+helpId),namespace,1,concat(object,", ",action) from help where languageId=1 and namespace<>'WebGUI';
+insert into international select (70+helpId),namespace,1,body from help where languageId=1 and namespace<>'WebGUI';
+insert into international select (605+helpId),namespace,1,body from help where languageId=1 and namespace='WebGUI';
+insert into international select (650+helpId),namespace,1,concat(object,", ",action) from help where languageId=1 and namespace='WebGUI';
+alter table help add column titleId int after languageId;
+alter table help add column bodyId int after titleId;
+update help set titleId=60+helpId, bodyId=70+helpId where namespace<>'WebGUI';
+update help set titleId=650+helpId, bodyId=605+helpId where namespace='WebGUI';
+alter table help drop column languageId;
+alter table help drop column action;
+alter table help drop column object;
+alter table help drop column body;
+delete from international where internationalId=96;
+delete from international where internationalId=97;
+insert into international values (642,'WebGUI',1,'Page, Add/Edit');
+update help set titleId=642 where helpId=1 and namespace='WebGUI';
+
+
+
+
+
+
 
 
 
