@@ -67,9 +67,9 @@ my $langs = {
 	16 => "Polish",
 	21 => "Russian"
 	};
-WebGUI::SQL->write("update userProfileField set dataDefault='[\'".$langs->{$defaultLangId}."\']' where fieldName='language'");
-WebGUI::SQL->write("update userProfileData set language='".$langs->{$defaultLangId}."' where fieldName='language' and fieldData<>1");
-WebGUI::SQL->write("update userProfileData set language='English' where fieldName='language' and fieldData=1");
+WebGUI::SQL->write("update userProfileField set dataDefault=".quote("['".$langs->{$defaultLangId}."']")." where fieldName='language'");
+WebGUI::SQL->write("update userProfileData set fieldData='".$langs->{$defaultLangId}."' where fieldName='language' and fieldData<>1");
+WebGUI::SQL->write("update userProfileData set fieldData='English' where fieldName='language' and fieldData=1");
 
 
 WebGUI::Session::close();

@@ -431,11 +431,6 @@ sub open {
 	###----------------------------
 	### current user's account and profile information (from users and userProfileData tables)
 	_setupUserInfo($session{var}{userId});
-	###----------------------------
-	### language settings
-	$session{language} = WebGUI::SQL->quickHashRef("select * from language where languageId=".quote($session{user}{language}));
-	###----------------------------
-	### loading plugins
 }
 
 #-------------------------------------------------------------------
