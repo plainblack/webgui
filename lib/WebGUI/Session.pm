@@ -302,7 +302,6 @@ The URL to redirect to.
 =cut
 
 sub httpRedirect {
-
 	return $session{cgi}->redirect($_[0]);
 }
 

@@ -66,7 +66,7 @@ sub process {
 		});
    #--admin functions
 	%hash = ();
-	if (WebGUI::Privilege::isInGroup(3,$session{user}{userId})) {
+	if (WebGUI::Privilege::isInGroup(3)) {
         	%hash = ( 
 			WebGUI::URL::page('op=listGroups')=>WebGUI::International::get(5), 
 			WebGUI::URL::page('op=manageSettings')=>WebGUI::International::get(4), 
@@ -77,7 +77,7 @@ sub process {
 			WebGUI::URL::page('op=viewStatistics')=>WebGUI::International::get(144)
 		);
 	}
-	if (WebGUI::Privilege::isInGroup(4,$session{user}{userId})) {
+	if (WebGUI::Privilege::isInGroup(4)) {
         	%hash = ( 
 			'http://validator.w3.org/check?uri=http%3A%2F%2F'.$session{env}{SERVER_NAME}.
 				WebGUI::URL::page()=>WebGUI::International::get(399),
@@ -86,21 +86,27 @@ sub process {
 			%hash
 		);
 	}
-        if (WebGUI::Privilege::isInGroup(5,$session{user}{userId})) {
+        if (WebGUI::Privilege::isInGroup(5)) {
                 %hash = (
 			WebGUI::URL::page('op=listStyles')=>WebGUI::International::get(6), 
 			%hash
                 );
         }
-        if (WebGUI::Privilege::isInGroup(6,$session{user}{userId})) {
+        if (WebGUI::Privilege::isInGroup(6)) {
                 %hash = (
 			WebGUI::URL::gateway('packages')=>WebGUI::International::get(374),
                         %hash
                 );
         }
-        if (WebGUI::Privilege::isInGroup(8,$session{user}{userId})) {
+        if (WebGUI::Privilege::isInGroup(8)) {
                 %hash = (
                         WebGUI::URL::page('op=listTemplates')=>WebGUI::International::get(508),
+                        %hash
+                );
+        }
+        if (WebGUI::Privilege::isInGroup(9)) {
+                %hash = (
+                        WebGUI::URL::page('op=listThemes')=>WebGUI::International::get(900),
                         %hash
                 );
         }
