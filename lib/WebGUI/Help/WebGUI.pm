@@ -105,7 +105,7 @@ our $HELP = {
 		body => '618',
 		related => [
 			{
-				tag => 'settings manage',
+				tag => 'settings',
 				namespace => 'WebGUI'
 			}
 		]
@@ -454,7 +454,7 @@ our $HELP = {
 				namespace => 'Poll'
 			},
 			{
-				tag => 'user settings edit',
+				tag => 'settings',
 				namespace => 'WebGUI'
 			},
 			{
