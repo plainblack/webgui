@@ -19,7 +19,9 @@ use WebGUI::Session;
 sub process {
         my @param = WebGUI::Macro::getParams($_[0]);
 	my $collateral = WebGUI::Collateral->find($param[0]);
-	my $output = '<a href="'.$collateral->getURL.'"><img src="'.$collateral->getThumbnail.
+	my $output = '<a href="'.$collateral->getURL.'"';
+	$output .= ' target="_blank"' if ($param[1]);
+	$output .= '><img src="'.$collateral->getThumbnail.
 		'" border="0"></a><br><b>'.$param[0].'</b><p>';
 	return $output;
 }
