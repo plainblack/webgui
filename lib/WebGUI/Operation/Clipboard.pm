@@ -39,7 +39,7 @@ sub _submenu {
 	if ($session{form}{systemClipboard} ne "1") {
 		$menu{WebGUI::URL::page('op=emptyClipboard')} = WebGUI::International::get(950);
 	}
-	if ( ($session{setting}{sharedClipboard} ne "1") && (WebGUI::Privilege::isInGroup(3)) ) {
+	if ( ($session{setting}{sharedClipboard} ne "1") && (WebGUI::Grouping::isInGroup(3)) ) {
 		$menu{WebGUI::URL::page('op=manageClipboard&systemClipboard=1')} = WebGUI::International::get(954);
 		if ($session{form}{systemClipboard} eq "1") {
 			$menu{WebGUI::URL::page('op=emptyClipboard&systemClipboard=1')} = WebGUI::International::get(959);
@@ -51,7 +51,7 @@ sub _submenu {
 
 #-------------------------------------------------------------------
 sub www_deleteClipboardItem {
-	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::isInGroup(4));
+	return WebGUI::Privilege::insufficient() unless (WebGUI::Grouping::isInGroup(4));
         my ($output);
 	if ($session{form}{wid} ne "") {
         	$output .= helpIcon(14);
@@ -74,9 +74,9 @@ sub www_deleteClipboardItem {
 
 #-------------------------------------------------------------------
 sub www_deleteClipboardItemConfirm {
-	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::isInGroup(4));
+	return WebGUI::Privilege::insufficient() unless (WebGUI::Grouping::isInGroup(4));
 	if ($session{form}{wid} ne "") {
-		if ( ($session{setting}{sharedClipboard} eq "1") || (WebGUI::Privilege::isInGroup(3)) ) {
+		if ( ($session{setting}{sharedClipboard} eq "1") || (WebGUI::Grouping::isInGroup(3)) ) {
 			WebGUI::SQL->write("update wobject set pageId=3, "
                 		."bufferDate=".time().", "
                 		."bufferUserId=".$session{user}{userId} .", "
@@ -96,7 +96,7 @@ sub www_deleteClipboardItemConfirm {
 		}
 		WebGUI::ErrorHandler::audit("moved wobject ". $session{form}{wid} ." from clipboard to trash");
 	} elsif ($session{form}{pageId} ne "") {
-		if ( ($session{setting}{sharedClipboard} eq "1") || (WebGUI::Privilege::isInGroup(3)) ) {
+		if ( ($session{setting}{sharedClipboard} eq "1") || (WebGUI::Grouping::isInGroup(3)) ) {
         		WebGUI::SQL->write("update page set parentId=3, "
                 		."bufferDate=".time().", "
                 		."bufferUserId=".$session{user}{userId} .", "
@@ -122,12 +122,12 @@ sub www_deleteClipboardItemConfirm {
 
 #-------------------------------------------------------------------
 sub www_emptyClipboard {
-	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::isInGroup(4));
+	return WebGUI::Privilege::insufficient() unless (WebGUI::Grouping::isInGroup(4));
         my ($output);
 	$output = helpIcon(67);
         $output .= '<h1>'.WebGUI::International::get(42).'</h1>';
         $output .= WebGUI::International::get(951).'<p>';
-	if ( ($session{setting}{sharedClipboard} ne "1") && (WebGUI::Privilege::isInGroup(3)) ) {
+	if ( ($session{setting}{sharedClipboard} ne "1") && (WebGUI::Grouping::isInGroup(3)) ) {
         	$output .= '<div align="center"><a href="'.WebGUI::URL::page('op=emptyClipboardConfirm&systemClipboard=1')
                 	.'">'.WebGUI::International::get(44).'</a>';
 	} else {
@@ -141,12 +141,12 @@ sub www_emptyClipboard {
 
 #-------------------------------------------------------------------
 sub www_emptyClipboardConfirm {
-	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::isInGroup(4));
+	return WebGUI::Privilege::insufficient() unless (WebGUI::Grouping::isInGroup(4));
 	my ($allUsers);
 	if ($session{setting}{sharedClipboard} eq "1") {
 		$allUsers = 1;
 	} elsif ($session{form}{systemClipboard} eq "1") {
-		return WebGUI::Privilege::adminOnly() unless (WebGUI::Privilege::isInGroup(3));
+		return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
 		$allUsers = 1;
 	} else {
 		$allUsers = 0;
@@ -184,7 +184,7 @@ sub www_emptyClipboardConfirm {
 
 #-------------------------------------------------------------------
 sub www_manageClipboard {
-	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::isInGroup(4));
+	return WebGUI::Privilege::insufficient() unless (WebGUI::Grouping::isInGroup(4));
 
 	my ($sth, @data, @row, @sorted_row, $i, $p, $allUsers);
 	my $output = helpIcon(65);
@@ -194,7 +194,7 @@ sub www_manageClipboard {
 		$allUsers = 1;
         	$output .= '<h1>'. WebGUI::International::get(948) .'</h1>';
 	} elsif ($session{form}{systemClipboard} eq "1") {
-		return WebGUI::Privilege::adminOnly() unless (WebGUI::Privilege::isInGroup(3));
+		return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
 		$allUsers = 1;
         	$output .= '<h1>'. WebGUI::International::get(955) .'</h1>';
 	} else {

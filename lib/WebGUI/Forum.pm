@@ -16,7 +16,7 @@ package WebGUI::Forum;
                                                                                                                                                              
 use strict;
 use WebGUI::Forum::Thread;
-use WebGUI::Privilege;
+use WebGUI::Grouping;
 use WebGUI::Session;
 use WebGUI::SQL;
 use WebGUI::Utility;
@@ -81,7 +81,7 @@ Defaults to $session{user}{userId}. Specify a user ID to check privileges for.
 sub canPost {
         my ($self, $userId) = @_;
         $userId = $session{user}{userId} unless ($userId);
-        return (WebGUI::Privilege::isInGroup($self->get("groupToPost"),$userId) || $self->isModerator);
+        return (WebGUI::Grouping::isInGroup($self->get("groupToPost"),$userId) || $self->isModerator);
 }
 
 #-------------------------------------------------------------------
@@ -103,7 +103,7 @@ Defaults to $session{user}{userId}. Specify a user ID to check privileges for.
 sub canView {
         my ($self, $userId) = @_;
         $userId = $session{user}{userId} unless ($userId);
-        return (WebGUI::Privilege::isInGroup($self->get("groupToView"),$userId) || $self->canPost);
+        return (WebGUI::Grouping::isInGroup($self->get("groupToView"),$userId) || $self->canPost);
 }
 
 #-------------------------------------------------------------------
@@ -242,7 +242,7 @@ Defaults to $session{user}{userId}. A user id to test for moderator privileges.
 sub isModerator {
 	my ($self, $userId) = @_;
 	$userId = $session{user}{userId} unless ($userId);
-	return WebGUI::Privilege::isInGroup($self->get("groupToModerate"), $userId);
+	return WebGUI::Grouping::isInGroup($self->get("groupToModerate"), $userId);
 }
 
 #-------------------------------------------------------------------

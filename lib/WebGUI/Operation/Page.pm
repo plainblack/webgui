@@ -40,13 +40,21 @@ This private function changes the privileges of all wobjects on page.
 =cut
 sub _changeWobjectPrivileges {
    my($wobject,$sth);
-   $sth = WebGUI::SQL->read("select wobjectId from wobject where pageId=".quote($_[0]));
+   $sth = WebGUI::SQL->read("select wobjectId,namespace from wobject where pageId=".quote($_[0]));
    while ($wobject = $sth->hashRef) {
-      if (WebGUI::Privilege::canEditWobject($wobject->{wobjectId})) {
-         WebGUI::SQL->write("update wobject set startDate=".WebGUI::FormProcessor::dateTime("startDate").", 
-		                     endDate=".WebGUI::FormProcessor::dateTime("endDate").", 
-							 ownerId=$session{form}{ownerId}, groupIdView=$session{form}{groupIdView}, 
-							 groupIdEdit=$session{form}{groupIdEdit} where wobjectId=".quote($wobject->{wobjectId}));
+	my $cmd = "WebGUI::Wobject::".$wobject->{namespace};
+	my $load = "use ".$cmd;
+	eval($load);
+	WebGUI::ErrorHandler::warn("Wobject failed to compile: $cmd.".$@) if($@);
+	my $w = $cmd->new($wobject);
+      if ($w->canEdit) {
+		$w->set({
+			startDate=>WebGUI::FormProcessor::dateTime("startDate"),
+			endDate=>WebGUI::FormProcessor::dateTime("endDate"),
+			ownerId=>$session{form}{ownerId},
+			groupIdView=>$session{form}{ownerId},
+			groupIdEdit=>$session{form}{groupIdEdit}
+			});
 	  }
     }
 }			
@@ -76,7 +84,7 @@ sub _recursivelyChangeProperties {
 	$page->walk_down({
 		callback => sub {
 			$currentPage = shift;
-			if (WebGUI::Privilege::canEditPage($currentPage->get('pageId'))) {
+			if (WebGUI::Page::canEdit($currentPage->get('pageId'))) {
 				$currentPage->setWithoutRecache({
 					startDate		=> WebGUI::FormProcessor::dateTime("startDate"),
 					endDate			=> WebGUI::FormProcessor::dateTime("endDate"),
@@ -234,7 +242,7 @@ sub www_cutPage {
         if ($session{page}{pageId} < 26 && $session{page}{pageId} >= 0) {
                 return WebGUI::Privilege::vitalComponent();
 		
-        } elsif (WebGUI::Privilege::canEditPage()) {
+        } elsif (WebGUI::Page::canEdit()) {
 		$page = WebGUI::Page->getPage($session{page}{pageId});
 		$page->cut;
                 return "";
@@ -255,7 +263,7 @@ sub www_deletePage {
 	my ($output);
 	if ($session{page}{pageId} < 1000 && $session{page}{pageId} > 0) {
 		return WebGUI::Privilege::vitalComponent();
-	} elsif (WebGUI::Privilege::canEditPage()) {
+	} elsif (WebGUI::Page::canEdit()) {
 		$output .= helpIcon(3);
 		$output .= '<h1>'.WebGUI::International::get(42).'</h1>';
 		$output .= WebGUI::International::get(101).'<p>';
@@ -280,7 +288,7 @@ Actually transfers the page to the trash.
 sub www_deletePageConfirm {
 	if ($session{page}{pageId} < 1000 && $session{page}{pageId} > 0) {
 		return WebGUI::Privilege::vitalComponent();
-        } elsif (WebGUI::Privilege::canEditPage()) {
+        } elsif (WebGUI::Page::canEdit()) {
 		my $page = WebGUI::Page->getPage($session{page}{pageId});
 		$page->delete;
 		WebGUI::Session::refreshPageInfo($session{page}{parentId});
@@ -304,7 +312,7 @@ sub www_editPage {
 	$session{page}{useAdminStyle} = 1;
 	tie %hash, "Tie::IxHash";
 	tie %page, "Tie::CPHash";
-        if (WebGUI::Privilege::canEditPage($session{form}{npp})) {
+        if (WebGUI::Page::canEdit($session{form}{npp})) {
 	        my %tabs;
         	tie %tabs, 'Tie::IxHash';
 	        %tabs = (
@@ -466,13 +474,13 @@ sub www_editPage {
 			-value=>$page{endDate},
 			-uiLevel=>6
 			);
-		if (WebGUI::Privilege::isInGroup(3)) {
+		if (WebGUI::Grouping::isInGroup(3)) {
 			$subtext = manageIcon('op=listUsers');
 		} else {
 			$subtext = "";
 		}
 		my $clause; 
-		if (WebGUI::Privilege::isInGroup(3)) {
+		if (WebGUI::Grouping::isInGroup(3)) {
 			my $contentManagers = WebGUI::Grouping::getUsersInGroup(4,1);
 			push (@$contentManagers, $session{user}{userId});
 			$clause = "userId in (".join(",",@$contentManagers).")";
@@ -549,7 +557,7 @@ sub www_editPageSave {
 		$pageId = $session{form}{pageId};
 	}
 	
-	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage($pageId));
+	return WebGUI::Privilege::insufficient() unless (WebGUI::Page::canEdit($pageId));
 
 	if ($session{form}{pageId} eq "new") {
 		$currentPage = WebGUI::Page->getPage($pageId);
@@ -605,7 +613,7 @@ Moves page down in the context of it's sisters.
 
 =cut
 sub www_movePageDown {
-  if (WebGUI::Privilege::canEditPage($session{page}{pageId})) {
+  if (WebGUI::Page::canEdit($session{page}{pageId})) {
     WebGUI::Page->moveDown($session{page}{pageId});
     return "";
   } else {
@@ -622,7 +630,7 @@ Moves page up in the context of it's sisters.
 
 =cut
 sub www_movePageUp {
-  if (WebGUI::Privilege::canEditPage($session{page}{pageId})) {
+  if (WebGUI::Page::canEdit($session{page}{pageId})) {
     WebGUI::Page->moveUp($session{page}{pageId});
     return "";
   } else {
@@ -639,7 +647,7 @@ Same as www_movePageUp wit this difference that this module returns the www_view
 
 =cut
 sub www_moveTreePageUp {
-  if (WebGUI::Privilege::canEditPage($session{page}{pageId})) {
+  if (WebGUI::Page::canEdit($session{page}{pageId})) {
     WebGUI::Page->moveUp($session{page}{pageId});
     return www_viewPageTree();
   } else {
@@ -656,7 +664,7 @@ Same as www_movePageDown with this difference that this module returns the www_v
 
 =cut
 sub www_moveTreePageDown {
-  if (WebGUI::Privilege::canEditPage($session{page}{pageId})) {
+  if (WebGUI::Page::canEdit($session{page}{pageId})) {
     WebGUI::Page->moveDown($session{page}{pageId});
     return www_viewPageTree();
   } else {
@@ -674,7 +682,7 @@ Another way to look at is that the mother of the current page becomes the elder 
 
 =cut
 sub www_moveTreePageLeft {
-  if (WebGUI::Privilege::canEditPage($session{page}{pageId})) {
+  if (WebGUI::Page::canEdit($session{page}{pageId})) {
     WebGUI::Page->moveLeft($session{page}{pageId});
     return www_viewPageTree();
   } else {
@@ -684,7 +692,7 @@ sub www_moveTreePageLeft {
 
 #-------------------------------------------------------------------
 sub www_moveTreePageRight {
-  if (WebGUI::Privilege::canEditPage($session{page}{pageId})) {
+  if (WebGUI::Page::canEdit($session{page}{pageId})) {
     WebGUI::Page->moveRight($session{page}{pageId});
     return www_viewPageTree();
   } else {
@@ -695,7 +703,7 @@ sub www_moveTreePageRight {
 #-------------------------------------------------------------------
 sub www_pastePage {
 	my ($currentPage, $pageToPaste);
-        if (WebGUI::Privilege::canEditPage()) {
+        if (WebGUI::Page::canEdit()) {
 		$currentPage = WebGUI::Page->getPage($session{page}{pageId});
 		$pageToPaste = WebGUI::Page->getPage($session{form}{pageId});
 		$pageToPaste->paste($currentPage);
@@ -707,7 +715,7 @@ sub www_pastePage {
 
 #-------------------------------------------------------------------
 sub www_rearrangeWobjects {
-	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage($session{page}{pageId}));
+	return WebGUI::Privilege::insufficient() unless (WebGUI::Page::canEdit($session{page}{pageId}));
 	$session{page}{styleId} = 2;
 	my @contentAreas = split(/\./,$session{form}{map});
 	my $templatePosition = 1;

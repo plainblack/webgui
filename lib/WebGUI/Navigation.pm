@@ -18,16 +18,15 @@ package WebGUI::Navigation;
 use strict;
 use Tie::CPHash;
 use Tie::IxHash;
-use WebGUI::Session;
-use WebGUI::SQL;
-use WebGUI::URL;
-use WebGUI::Operation::Navigation;
-use WebGUI::Page;
-use WebGUI::Utility;
-use WebGUI::Privilege;
-use WebGUI::Template;
 use WebGUI::Icon;
 use WebGUI::International;
+use WebGUI::Operation::Navigation;
+use WebGUI::Page;
+use WebGUI::Session;
+use WebGUI::SQL;
+use WebGUI::Template;
+use WebGUI::URL;
+use WebGUI::Utility;
 
 =head1 NAME
 
@@ -269,7 +268,7 @@ sub build {
 			$pageData->{"page.isHidden"} = $page->get('hideFromNavigation');
 			$pageData->{"page.isSystem"} = (($page->get('pageId') < 1000 && $page->get('pageId') > 1) || 
 							$page->get('pageId') == 0);
-			$pageData->{"page.isViewable"} = WebGUI::Privilege::canViewPage($page->get('pageId'));
+			$pageData->{"page.isViewable"} = WebGUI::Page::canView($page->get('pageId'));
 
 			# indent
 			my $indent = 0;

@@ -13,6 +13,7 @@ package WebGUI::Wobject::Survey;
 use strict;
 use Tie::CPHash;
 use WebGUI::DateTime;
+use WebGUI::Grouping;
 use WebGUI::HTMLForm;
 use WebGUI::Icon;
 use WebGUI::International;
@@ -158,7 +159,7 @@ sub getIp {
 sub getMenuVars {
 	my $self = shift;
 	my %var;
-	$var{'user.canViewReports'} = (WebGUI::Privilege::isInGroup($self->get("groupToViewReports")));
+	$var{'user.canViewReports'} = (WebGUI::Grouping::isInGroup($self->get("groupToViewReports")));
 	$var{'delete.all.responses.url'} = WebGUI::URL::page('func=deleteAllResponses&wid='.$self->get("wobjectId"));
 	$var{'delete.all.responses.label'} = WebGUI::International::get(73,$self->get("namespace"));
 	$var{'export.answers.url'} = WebGUI::URL::page('func=exportAnswers&wid='.$self->get("wobjectId"));
@@ -427,7 +428,7 @@ sub uiLevel {
 
 #-------------------------------------------------------------------
 sub www_deleteAnswer {
-        return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId")));
+        return WebGUI::Privilege::insufficient() unless ($_[0]->canEdit);
         return $_[0]->confirm(WebGUI::International::get(45,$_[0]->get("namespace")),
                 WebGUI::URL::page('func=deleteAnswerConfirm&wid='.$_[0]->get("wobjectId").'&aid='
 		.$session{form}{aid}.'&qid='.$session{form}{qid}));
@@ -435,7 +436,7 @@ sub www_deleteAnswer {
 
 #-------------------------------------------------------------------
 sub www_deleteAnswerConfirm {
-        return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId")));
+        return WebGUI::Privilege::insufficient() unless ($_[0]->canEdit);
         WebGUI::SQL->write("delete from Survey_questionResponse where Survey_answerId=".quote($session{form}{aid}));
         $_[0]->deleteCollateral("Survey_answer","Survey_answerId",$session{form}{aid});
         $_[0]->reorderCollateral("Survey_answer","Survey_answerId","Survey_id");
@@ -444,14 +445,14 @@ sub www_deleteAnswerConfirm {
 
 #-------------------------------------------------------------------
 sub www_deleteQuestion {
-        return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId")));
+        return WebGUI::Privilege::insufficient() unless ($_[0]->canEdit);
         return $_[0]->confirm(WebGUI::International::get(44,$_[0]->get("namespace")),
         	WebGUI::URL::page('func=deleteQuestionConfirm&wid='.$_[0]->get("wobjectId").'&qid='.$session{form}{qid}));
 }
 
 #-------------------------------------------------------------------
 sub www_deleteQuestionConfirm {
-        return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId")));
+        return WebGUI::Privilege::insufficient() unless ($_[0]->canEdit);
 	WebGUI::SQL->write("delete from Survey_answer where Survey_questionId=".quote($session{form}{qid}));
 	WebGUI::SQL->write("delete from Survey_questionResponse where Survey_questionId=".quote($session{form}{qid}));
         $_[0]->deleteCollateral("Survey_question","Survey_questionId",$session{form}{qid});
@@ -461,14 +462,14 @@ sub www_deleteQuestionConfirm {
 
 #-------------------------------------------------------------------
 sub www_deleteResponse {
-	return "" unless (WebGUI::Privilege::isInGroup($_[0]->get("groupToViewReports")));
+	return "" unless (WebGUI::Grouping::isInGroup($_[0]->get("groupToViewReports")));
         return $_[0]->confirm(WebGUI::International::get(72,$_[0]->get("namespace")),
                 WebGUI::URL::page('func=deleteResponseConfirm&amp;wid='.$_[0]->get("wobjectId").'&responseId='.$session{form}{responseId}));
 }
 
 #-------------------------------------------------------------------
 sub www_deleteResponseConfirm {
-	return "" unless (WebGUI::Privilege::isInGroup($_[0]->get("groupToViewReports")));
+	return "" unless (WebGUI::Grouping::isInGroup($_[0]->get("groupToViewReports")));
         WebGUI::SQL->write("delete from Survey_response where Survey_responseId=".quote($session{form}{responseId}));
         WebGUI::SQL->write("delete from Survey_questionResponse where Survey_responseId=".quote($session{form}{responseId}));
         return $_[0]->www_viewGradebook;
@@ -476,14 +477,14 @@ sub www_deleteResponseConfirm {
 
 #-------------------------------------------------------------------
 sub www_deleteAllResponses {
-	return "" unless (WebGUI::Privilege::isInGroup($_[0]->get("groupToViewReports")));
+	return "" unless (WebGUI::Grouping::isInGroup($_[0]->get("groupToViewReports")));
         return $_[0]->confirm(WebGUI::International::get(74,$_[0]->get("namespace")),
                 WebGUI::URL::page('func=deleteAllResponsesConfirm&wid='.$_[0]->get("wobjectId")));
 }
 
 #-------------------------------------------------------------------
 sub www_deleteAllResponsesConfirm {
-	return "" unless (WebGUI::Privilege::isInGroup($_[0]->get("groupToViewReports")));
+	return "" unless (WebGUI::Grouping::isInGroup($_[0]->get("groupToViewReports")));
         WebGUI::SQL->write("delete from Survey_response where Survey_id=".$_[0]->get("Survey_id")); 
         WebGUI::SQL->write("delete from Survey_questionResponse where Survey_id=".$_[0]->get("Survey_id")); 
         return "";
@@ -567,7 +568,7 @@ sub www_edit {
 
 #-------------------------------------------------------------------
 sub www_editSave {
-	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId")));
+	return WebGUI::Privilege::insufficient() unless ($_[0]->canEdit);
 	$_[0]->SUPER::www_editSave(); 
 	if ($session{form}{proceed} eq "addQuestion") {
 		$session{form}{qid} = "new";
@@ -578,7 +579,7 @@ sub www_editSave {
 
 #-------------------------------------------------------------------
 sub www_editAnswer {
-        return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId")));
+        return WebGUI::Privilege::insufficient() unless ($_[0]->canEdit);
         $session{page}{useAdminStyle} = 1;
         my ($question, $output, $f, $answer);
         $answer = $_[0]->getCollateral("Survey_answer","Survey_answerId",$session{form}{aid});
@@ -634,7 +635,7 @@ sub www_editAnswer {
 
 #-------------------------------------------------------------------
 sub www_editAnswerSave {
-        return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId")));
+        return WebGUI::Privilege::insufficient() unless ($_[0]->canEdit);
         $_[0]->setCollateral("Survey_answer", "Survey_answerId", {
                 Survey_answerId => $session{form}{aid},
                 Survey_questionId => $session{form}{qid},
@@ -656,7 +657,7 @@ sub www_editAnswerSave {
 
 #-------------------------------------------------------------------
 sub www_editQuestion {
-	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId")));
+	return WebGUI::Privilege::insufficient() unless ($_[0]->canEdit);
         $session{page}{useAdminStyle} = 1;
 	my ($output, $f, $question, $answerFieldType, $sth, %data);
 	tie %data, 'Tie::CPHash';
@@ -736,7 +737,7 @@ sub www_editQuestion {
 
 #-------------------------------------------------------------------
 sub www_editQuestionSave {
-	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId")));
+	return WebGUI::Privilege::insufficient() unless ($_[0]->canEdit);
 	$session{form}{qid} = $_[0]->setCollateral("Survey_question", "Survey_questionId", {
                 question=>$session{form}{question},
         	Survey_questionId=>$session{form}{qid},
@@ -778,7 +779,7 @@ sub www_editQuestionSave {
 
 #-------------------------------------------------------------------
 sub www_exportAnswers {
-        return "" unless (WebGUI::Privilege::isInGroup($_[0]->get("groupToViewReports")));
+        return "" unless (WebGUI::Grouping::isInGroup($_[0]->get("groupToViewReports")));
         $session{header}{filename} = WebGUI::URL::escape($_[0]->get("title")."_answers.tab");
         $session{header}{mimetype} = "text/tab";
         return WebGUI::SQL->quickTab("select * from Survey_answer where Survey_id=".$_[0]->get("Survey_id"));
@@ -786,7 +787,7 @@ sub www_exportAnswers {
 
 #-------------------------------------------------------------------
 sub www_exportComposite {
-	return "" unless (WebGUI::Privilege::isInGroup($_[0]->get("groupToViewReports")));
+	return "" unless (WebGUI::Grouping::isInGroup($_[0]->get("groupToViewReports")));
 	$session{header}{filename} = WebGUI::URL::escape($_[0]->get("title")."_composite.tab");
 	$session{header}{mimetype} = "text/tab";
 	return WebGUI::SQL->quickTab("select b.question, c.response, a.userId, a.username, a.ipAddress, c.comment, c.dateOfResponse from Survey_response a 
@@ -797,7 +798,7 @@ sub www_exportComposite {
 
 #-------------------------------------------------------------------
 sub www_exportQuestions {
-        return "" unless (WebGUI::Privilege::isInGroup($_[0]->get("groupToViewReports")));
+        return "" unless (WebGUI::Grouping::isInGroup($_[0]->get("groupToViewReports")));
         $session{header}{filename} = WebGUI::URL::escape($_[0]->get("title")."_questions.tab");
         $session{header}{mimetype} = "text/tab";
         return WebGUI::SQL->quickTab("select * from Survey_question where Survey_id=".$_[0]->get("Survey_id"));
@@ -805,7 +806,7 @@ sub www_exportQuestions {
 
 #-------------------------------------------------------------------
 sub www_exportResponses {
-        return "" unless (WebGUI::Privilege::isInGroup($_[0]->get("groupToViewReports")));
+        return "" unless (WebGUI::Grouping::isInGroup($_[0]->get("groupToViewReports")));
         $session{header}{filename} = WebGUI::URL::escape($_[0]->get("title")."_responses.tab");
         $session{header}{mimetype} = "text/tab";
         return WebGUI::SQL->quickTab("select * from Survey_response where Survey_id=".$_[0]->get("Survey_id"));
@@ -813,28 +814,28 @@ sub www_exportResponses {
 
 #-------------------------------------------------------------------
 sub www_moveAnswerDown {
-        return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId")));
+        return WebGUI::Privilege::insufficient() unless ($_[0]->canEdit);
         $_[0]->moveCollateralDown("Survey_answer","Survey_answerId",$session{form}{aid},"Survey_id");
         return $_[0]->www_editQuestion;
 }
 
 #-------------------------------------------------------------------
 sub www_moveAnswerUp {
-        return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId")));
+        return WebGUI::Privilege::insufficient() unless ($_[0]->canEdit);
         $_[0]->moveCollateralUp("Survey_answer","Survey_answerId",$session{form}{aid},"Survey_id");
         return $_[0]->www_editQuestion;
 }
 
 #-------------------------------------------------------------------
 sub www_moveQuestionDown {
-        return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId")));
+        return WebGUI::Privilege::insufficient() unless ($_[0]->canEdit);
         $_[0]->moveCollateralDown("Survey_question","Survey_questionId",$session{form}{qid},"Survey_id");
         return $_[0]->www_edit;
 }
 
 #-------------------------------------------------------------------
 sub www_moveQuestionUp {
-        return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId")));
+        return WebGUI::Privilege::insufficient() unless ($_[0]->canEdit);
         $_[0]->moveCollateralUp("Survey_question","Survey_questionId",$session{form}{qid},"Survey_id");
         return $_[0]->www_edit;
 }
@@ -842,7 +843,7 @@ sub www_moveQuestionUp {
 #-------------------------------------------------------------------
 sub www_respond {
 	my $self = shift;
-	return "" unless (WebGUI::Privilege::isInGroup($self->get("groupToTakeSurvey")));
+	return "" unless (WebGUI::Grouping::isInGroup($self->get("groupToTakeSurvey")));
 	my $varname = $self->getResponseIdString;
 	return "" unless ($session{scratch}{$varname});
 	my $userId = ($self->get("anonymous")) ? substr(md5_hex($session{user}{userId}),0,8) : $session{user}{userId};
@@ -890,7 +891,7 @@ sub www_view {
 		$var->{'question.edit_loop'} = \@edit;
 	}
 	$sth->finish;
-	$var->{'user.canTakeSurvey'} = WebGUI::Privilege::isInGroup($self->get("groupToTakeSurvey"));
+	$var->{'user.canTakeSurvey'} = WebGUI::Grouping::isInGroup($self->get("groupToTakeSurvey"));
 	if ($var->{'user.canTakeSurvey'}) {
 		$var->{'response.Id'} = $self->getResponseId();
 		$var->{'response.Count'} = $self->getResponseCount;
@@ -940,7 +941,7 @@ sub www_view {
 #-------------------------------------------------------------------
 sub www_viewGradebook {
 	my $self = shift;
-        return "" unless (WebGUI::Privilege::isInGroup($self->get("groupToViewReports")));
+        return "" unless (WebGUI::Grouping::isInGroup($self->get("groupToViewReports")));
 	my $var = $self->getMenuVars;
 	$var->{title} = WebGUI::International::get(71,$self->get("namespace"));
 	my $p = WebGUI::Paginator->new(WebGUI::URL::page('func=viewGradebook&wid='.$self->get("wobjectId")));
@@ -976,7 +977,7 @@ sub www_viewGradebook {
 #-------------------------------------------------------------------
 sub www_viewIndividualSurvey {
 	my $self = shift;
-        return "" unless (WebGUI::Privilege::isInGroup($self->get("groupToViewReports")));
+        return "" unless (WebGUI::Grouping::isInGroup($self->get("groupToViewReports")));
 	my $var = $self->getMenuVars;
 	$var->{'title'} = WebGUI::International::get(70,$self->get("namespace"));
 	$var->{'delete.url'} = WebGUI::URL::page('func=deleteResponse&amp;wid='.$self->get("wobjectId").'&amp;responseId='.$session{form}{responseId});
@@ -1033,7 +1034,7 @@ sub www_viewIndividualSurvey {
 #-------------------------------------------------------------------
 sub www_viewStatisticalOverview {
 	my $self = shift;
-        return "" unless (WebGUI::Privilege::isInGroup($self->get("groupToViewReports")));
+        return "" unless (WebGUI::Grouping::isInGroup($self->get("groupToViewReports")));
 	my $var = $self->getMenuVars;
 	$var->{title} = WebGUI::International::get(58,$self->get("namespace"));
 	my $p = WebGUI::Paginator->new(WebGUI::URL::page('func=viewStatisticalOverview&wid='.$self->get("wobjectId")));

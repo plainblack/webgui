@@ -14,6 +14,7 @@ use Exporter;
 use strict;
 use Tie::CPHash;
 use Tie::IxHash;
+use WebGUI::Grouping;
 use WebGUI::HTMLForm;
 use WebGUI::Icon;
 use WebGUI::International;
@@ -68,7 +69,7 @@ sub _submenu {
 
 #-------------------------------------------------------------------
 sub www_deleteProfileCategory {
-        return WebGUI::Privilege::adminOnly() unless (WebGUI::Privilege::isInGroup(3));
+        return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
         my ($output);
         return WebGUI::Privilege::vitalComponent() if ($session{form}{cid} < 1000);
         $output = '<h1>'.WebGUI::International::get(42).'</h1>';
@@ -82,7 +83,7 @@ sub www_deleteProfileCategory {
 
 #-------------------------------------------------------------------
 sub www_deleteProfileCategoryConfirm {
-        return WebGUI::Privilege::adminOnly() unless (WebGUI::Privilege::isInGroup(3));
+        return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
         return WebGUI::Privilege::vitalComponent() if ($session{form}{cid} < 1000);
 	WebGUI::SQL->write("delete from userProfileCategory where profileCategoryId=$session{form}{cid}");
 	WebGUI::SQL->write("update userProfileField set profileCategoryId=1 where profileCategoryId=$session{form}{cid}");
@@ -91,7 +92,7 @@ sub www_deleteProfileCategoryConfirm {
 
 #-------------------------------------------------------------------
 sub www_deleteProfileField {
-        return WebGUI::Privilege::adminOnly() unless (WebGUI::Privilege::isInGroup(3));
+        return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
         my ($output,$protected);
 	($protected) = WebGUI::SQL->quickArray("select protected from userProfileField where fieldname=".quote($session{form}{fid}));
         return WebGUI::Privilege::vitalComponent() if ($protected);
@@ -106,7 +107,7 @@ sub www_deleteProfileField {
 
 #-------------------------------------------------------------------
 sub www_deleteProfileFieldConfirm {
-        return WebGUI::Privilege::adminOnly() unless (WebGUI::Privilege::isInGroup(3));
+        return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
 	my ($protected);
 	($protected) = WebGUI::SQL->quickArray("select protected from userProfileField where fieldname=".quote($session{form}{fid}));
         return WebGUI::Privilege::vitalComponent() if ($protected);
@@ -117,7 +118,7 @@ sub www_deleteProfileFieldConfirm {
 
 #-------------------------------------------------------------------
 sub www_editProfileCategory {
-        return WebGUI::Privilege::adminOnly() unless (WebGUI::Privilege::isInGroup(3));
+        return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
 	my ($output, $f, %data);
 	tie %data, 'Tie::CPHash';
 	$output = '<h1>'.WebGUI::International::get(468,"WebGUI/Profile").'</h1>';
@@ -148,7 +149,7 @@ sub www_editProfileCategory {
 
 #-------------------------------------------------------------------
 sub www_editProfileCategorySave {
-        return WebGUI::Privilege::adminOnly() unless (WebGUI::Privilege::isInGroup(3));
+        return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
 	my ($sequenceNumber, $test);
 	$session{form}{categoryName} = 'Unamed' if ($session{form}{categoryName} eq "" || $session{form}{categoryName} eq "''");
 	$test = eval($session{form}{categoryName});
@@ -167,7 +168,7 @@ sub www_editProfileCategorySave {
 
 #-------------------------------------------------------------------
 sub www_editProfileField {
-        return WebGUI::Privilege::adminOnly() unless (WebGUI::Privilege::isInGroup(3));
+        return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
 	my ($output, $f, %data, %hash, $key);
 	tie %data, 'Tie::CPHash';
         $output = '<h1>'.WebGUI::International::get(471,"WebGUI/Profile").'</h1>';
@@ -222,7 +223,7 @@ sub www_editProfileField {
 
 #-------------------------------------------------------------------
 sub www_editProfileFieldSave {
-        return WebGUI::Privilege::adminOnly() unless (WebGUI::Privilege::isInGroup(3));
+        return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
 	my ($sequenceNumber, $fieldName, $test);
         $session{form}{fieldLabel} = 'Unamed' if ($session{form}{fieldLabel} eq "" || $session{form}{fieldLabel} eq "''");
         $test = eval($session{form}{fieldLabel});
@@ -261,7 +262,7 @@ sub www_editProfileFieldSave {
 
 #-------------------------------------------------------------------
 sub www_editProfileSettings {
-        return WebGUI::Privilege::adminOnly() unless (WebGUI::Privilege::isInGroup(3));
+        return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
 	my ($output, $a, %category, %field, $b);
 	tie %category, 'Tie::CPHash';
 	tie %field, 'Tie::CPHash';
@@ -296,7 +297,7 @@ sub www_editProfileSettings {
 
 #-------------------------------------------------------------------
 sub www_moveProfileCategoryDown {
-        return WebGUI::Privilege::adminOnly() unless (WebGUI::Privilege::isInGroup(3));
+        return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
         my ($id, $thisSeq);
         ($thisSeq) = WebGUI::SQL->quickArray("select sequenceNumber from userProfileCategory where profileCategoryId=$session{form}{cid}");
         ($id) = WebGUI::SQL->quickArray("select profileCategoryId from userProfileCategory where sequenceNumber=$thisSeq+1");
@@ -310,7 +311,7 @@ sub www_moveProfileCategoryDown {
 
 #-------------------------------------------------------------------
 sub www_moveProfileCategoryUp {
-        return WebGUI::Privilege::adminOnly() unless (WebGUI::Privilege::isInGroup(3));
+        return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
         my ($id, $thisSeq);
         ($thisSeq) = WebGUI::SQL->quickArray("select sequenceNumber from userProfileCategory where profileCategoryId=$session{form}{cid}");
         ($id) = WebGUI::SQL->quickArray("select profileCategoryId from userProfileCategory where sequenceNumber=$thisSeq-1");
@@ -324,7 +325,7 @@ sub www_moveProfileCategoryUp {
 
 #-------------------------------------------------------------------
 sub www_moveProfileFieldDown {
-        return WebGUI::Privilege::adminOnly() unless (WebGUI::Privilege::isInGroup(3));
+        return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
         my ($id, $thisSeq, $profileCategoryId);
         ($thisSeq,$profileCategoryId) = WebGUI::SQL->quickArray("select sequenceNumber,profileCategoryId from userProfileField where fieldName=".quote($session{form}{fid}));
         ($id) = WebGUI::SQL->quickArray("select fieldName from userProfileField where profileCategoryId=$profileCategoryId and sequenceNumber=$thisSeq+1");
@@ -338,7 +339,7 @@ sub www_moveProfileFieldDown {
 
 #-------------------------------------------------------------------
 sub www_moveProfileFieldUp {
-        return WebGUI::Privilege::adminOnly() unless (WebGUI::Privilege::isInGroup(3));
+        return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
         my ($id, $thisSeq, $profileCategoryId);
         ($thisSeq,$profileCategoryId) = WebGUI::SQL->quickArray("select sequenceNumber,profileCategoryId from userProfileField where fieldName=".quote($session{form}{fid}));
         ($id) = WebGUI::SQL->quickArray("select fieldName from userProfileField where profileCategoryId=$profileCategoryId and sequenceNumber=$thisSeq-1");

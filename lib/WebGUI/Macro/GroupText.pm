@@ -11,17 +11,17 @@ package WebGUI::Macro::GroupText;
 #-------------------------------------------------------------------
 
 use strict;
+use WebGUI::Grouping;
 use WebGUI::Macro;
 use WebGUI::SQL;
 use WebGUI::Session;
-use WebGUI::Privilege;
 
 #-------------------------------------------------------------------
 sub process {
 	my @param = WebGUI::Macro::getParams($_[0]);
 	my ($groupId) = WebGUI::SQL->quickArray("select groupId from groups where groupName=".quote($param[0]));
 	$groupId = 3 if ($groupId eq "");
-	if (WebGUI::Privilege::isInGroup($groupId)) { 
+	if (WebGUI::Grouping::isInGroup($groupId)) { 
 		return $param[1];
 	} else {
 		return $param[2];

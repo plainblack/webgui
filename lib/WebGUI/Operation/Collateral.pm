@@ -22,6 +22,7 @@ use strict;
 use WebGUI::Collateral;
 use WebGUI::CollateralFolder;
 use WebGUI::DateTime;
+use WebGUI::Grouping;
 use WebGUI::HTMLForm;
 use WebGUI::Icon;
 use WebGUI::International;
@@ -55,7 +56,7 @@ sub _submenu {
 		$menu{WebGUI::URL::page('op=deleteCollateral&cid='.$session{form}{cid})} = WebGUI::International::get(765);
 	}
 	$menu{WebGUI::URL::page('op=editCollateralFolder')} = WebGUI::International::get(759);
-	if (WebGUI::Privilege::isInGroup(3)) {
+	if (WebGUI::Grouping::isInGroup(3)) {
 		$menu{WebGUI::URL::page('op=emptyCollateralFolder')} = WebGUI::International::get(980);
 		$menu{WebGUI::URL::page('op=deleteCollateralFolder')} = WebGUI::International::get(760);
 	}
@@ -66,7 +67,7 @@ sub _submenu {
 #-------------------------------------------------------------------
 sub www_deleteCollateral {
 	my $collateral = WebGUI::Collateral->new($session{form}{cid});
-        return WebGUI::Privilege::insufficient unless ($collateral->get("userId") == $session{user}{userId} || WebGUI::Privilege::isInGroup(3));
+        return WebGUI::Privilege::insufficient unless ($collateral->get("userId") == $session{user}{userId} || WebGUI::Grouping::isInGroup(3));
 	my $output = '<h1>'.WebGUI::International::get(42).'</h1>';
 	$output .= WebGUI::International::get(774).'<p/><div align="center">';
 	$output .= '<a href="'.WebGUI::URL::page('op=deleteCollateralConfirm&cid='.$session{form}{cid}).'">'
@@ -80,7 +81,7 @@ sub www_deleteCollateral {
 #-------------------------------------------------------------------
 sub www_deleteCollateralConfirm {
 	my $collateral = WebGUI::Collateral->new($session{form}{cid});
-        return WebGUI::Privilege::insufficient unless ($collateral->get("userId") == $session{user}{userId} || WebGUI::Privilege::isInGroup(3));
+        return WebGUI::Privilege::insufficient unless ($collateral->get("userId") == $session{user}{userId} || WebGUI::Grouping::isInGroup(3));
 	$collateral->delete;
 	WebGUI::Session::deleteScratch("collateralPageNumber");
 	return www_listCollateral();
@@ -89,14 +90,14 @@ sub www_deleteCollateralConfirm {
 #-------------------------------------------------------------------
 sub www_deleteCollateralFile {
 	my $collateral = WebGUI::Collateral->new($session{form}{cid});
-        return WebGUI::Privilege::insufficient unless ($collateral->get("userId") == $session{user}{userId} || WebGUI::Privilege::isInGroup(3));
+        return WebGUI::Privilege::insufficient unless ($collateral->get("userId") == $session{user}{userId} || WebGUI::Grouping::isInGroup(3));
 	$collateral->deleteFile;
 	return www_editCollateral($collateral);
 }
 
 #-------------------------------------------------------------------
 sub www_deleteCollateralFolder {
-        return WebGUI::Privilege::insufficient unless (WebGUI::Privilege::isInGroup(3));
+        return WebGUI::Privilege::insufficient unless (WebGUI::Grouping::isInGroup(3));
 	return WebGUI::Privilege::vitalComponent() unless ($session{scratch}{collateralFolderId} > 999);
         my $output = '<h1>'.WebGUI::International::get(42).'</h1>';
 	$output .= WebGUI::International::get(775).'<p/><div align="center">';
@@ -110,7 +111,7 @@ sub www_deleteCollateralFolder {
 
 #-------------------------------------------------------------------
 sub www_deleteCollateralFolderConfirm {
-        return WebGUI::Privilege::insufficient unless (WebGUI::Privilege::isInGroup(3));
+        return WebGUI::Privilege::insufficient unless (WebGUI::Grouping::isInGroup(3));
 	return WebGUI::Privilege::vitalComponent() unless ($session{scratch}{collateralFolderId} > 999);
         my $folders = WebGUI::CollateralFolder->getTree({-minimumFields => 1});
         if (my $deadFolder = $folders->{$session{scratch}{collateralFolderId}}) {
@@ -123,7 +124,7 @@ sub www_deleteCollateralFolderConfirm {
 
 #-------------------------------------------------------------------
 sub www_emptyCollateralFolder {
-        return WebGUI::Privilege::insufficient unless (WebGUI::Privilege::isInGroup(3));
+        return WebGUI::Privilege::insufficient unless (WebGUI::Grouping::isInGroup(3));
 	return WebGUI::Privilege::vitalComponent() unless ($session{scratch}{collateralFolderId} > 999);
         my $output = '<h1>'.WebGUI::International::get(42).'</h1>';
 	$output .= WebGUI::International::get(979).'<p/><div align="center">';
@@ -137,7 +138,7 @@ sub www_emptyCollateralFolder {
 
 #-------------------------------------------------------------------
 sub www_emptyCollateralFolderConfirm {
-        return WebGUI::Privilege::insufficient unless (WebGUI::Privilege::isInGroup(3));
+        return WebGUI::Privilege::insufficient unless (WebGUI::Grouping::isInGroup(3));
 	return WebGUI::Privilege::vitalComponent() unless ($session{scratch}{collateralFolderId} > 999);
 	my @collateralIds = WebGUI::SQL->buildArray("select collateralId from collateral where collateralFolderId=".$session{scratch}{collateralFolderId});
 	WebGUI::Collateral->multiDelete(@collateralIds);
@@ -146,7 +147,7 @@ sub www_emptyCollateralFolderConfirm {
 
 #-------------------------------------------------------------------
 sub www_editCollateral {
-	return WebGUI::Privilege::insufficient unless (WebGUI::Privilege::isInGroup(4));
+	return WebGUI::Privilege::insufficient unless (WebGUI::Grouping::isInGroup(4));
 	my ($canEdit, $file, $folderId, $output, $f, $collateral, $image, $error, $x, $y);
 	if ($session{form}{cid} eq "new") {
 		$collateral->{collateralType} = $session{form}{type};
@@ -159,7 +160,7 @@ sub www_editCollateral {
 		my $c = $_[1] || WebGUI::Collateral->new($session{form}{cid});
 		$collateral = $c->get;
 	}
-	$canEdit = ($collateral->{userId} == $session{user}{userId} || WebGUI::Privilege::isInGroup(3));
+	$canEdit = ($collateral->{userId} == $session{user}{userId} || WebGUI::Grouping::isInGroup(3));
 	$folderId = $session{scratch}{collateralFolderId} || 0;
 	$f = WebGUI::HTMLForm->new;
 	$f->hidden("op","editCollateralSave");
@@ -295,7 +296,7 @@ sub www_editCollateral {
 
 #-------------------------------------------------------------------
 sub www_editCollateralSave {
-	return WebGUI::Privilege::insufficient unless (WebGUI::Privilege::isInGroup(4));
+	return WebGUI::Privilege::insufficient unless (WebGUI::Grouping::isInGroup(4));
 	WebGUI::Session::setScratch("collateralFolderId",$session{form}{collateralFolderId});
 	my ($test, $file, $addFile);
 	my $collateral = WebGUI::Collateral->new($session{form}{cid});
@@ -322,7 +323,7 @@ sub www_editCollateralSave {
 
 #-------------------------------------------------------------------
 sub www_editCollateralFolder {
-	return WebGUI::Privilege::insufficient unless (WebGUI::Privilege::isInGroup(4));
+	return WebGUI::Privilege::insufficient unless (WebGUI::Grouping::isInGroup(4));
 	my ($output, $f, $folder, $folderId, $constraint);
 	$output .= '<h1>'.WebGUI::International::get(776).'</h1>';
 	if ($session{form}{fid} eq "new") {
@@ -368,7 +369,7 @@ sub www_editCollateralFolder {
 
 #-------------------------------------------------------------------
 sub www_editCollateralFolderSave {
-	return WebGUI::Privilege::insufficient unless (WebGUI::Privilege::isInGroup(4));
+	return WebGUI::Privilege::insufficient unless (WebGUI::Grouping::isInGroup(4));
 	if ($session{form}{fid} eq "new") {
 		$session{form}{fid} = getNextId("collateralFolderId");
 		WebGUI::Session::setScratch("collateralFolderId",$session{form}{fid});
@@ -392,7 +393,7 @@ sub www_editCollateralFolderSave {
 
 #-------------------------------------------------------------------
 sub www_listCollateral {
-	return WebGUI::Privilege::insufficient unless (WebGUI::Privilege::isInGroup(4));
+	return WebGUI::Privilege::insufficient unless (WebGUI::Grouping::isInGroup(4));
 	my (%type, %user, $f, $row, $data, $sth, $url, $output, $parent, $p, $thumbnail, $file, $page, $constraints, $folderId);
 	tie %type, 'Tie::IxHash';
 	tie %user, 'Tie::IxHash';
@@ -519,7 +520,7 @@ sub _htmlAreaCreateTree {
 sub www_htmlArealistCollateral {
 	my (@parents, $sth, $data, $indent);
         $session{page}{makePrintable}=1; $session{page}{printableStyleId}=10;
-	return "<b>Only Content Managers are allowed to use WebGUI Collateral</b>" unless (WebGUI::Privilege::isInGroup(4));
+	return "<b>Only Content Managers are allowed to use WebGUI Collateral</b>" unless (WebGUI::Grouping::isInGroup(4));
 
 	my $output = '<table border="0" cellspacing="0" cellpadding="0" width="100%">';
 	my $folderId = $session{form}{fid} || 0;
@@ -574,7 +575,7 @@ sub www_htmlAreaviewCollateral {
 	my($output, $collateral, $file, $x, $y, $image, $error);
         $session{page}{makePrintable}=1; $session{page}{printableStyleId}=10;
         $output .= '<table align="center" border="0" cellspacing="0" cellpadding="2" width="100%" height="100%">';
-	if($session{form}{cid} == 0 || ! WebGUI::Privilege::isInGroup(4)) {
+	if($session{form}{cid} == 0 || ! WebGUI::Grouping::isInGroup(4)) {
 		$output .= '<tr><td align="center" valign="middle" width="100%" height="100%">';
 		$output .= '<p align="center"><br><img src="'.$session{config}{extrasURL}.'/htmlArea/images/icon.gif" 
 			    border="0"></p>';
@@ -610,7 +611,7 @@ sub www_htmlAreaviewCollateral {
 #-------------------------------------------------------------------
 sub www_htmlAreaUpload {
         $session{page}{makePrintable}=1; $session{page}{printableStyleId}=10;
-	return "<b>Only Content Managers are allowed to use WebGUI Collateral</b>" unless (WebGUI::Privilege::isInGroup(4));
+	return "<b>Only Content Managers are allowed to use WebGUI Collateral</b>" unless (WebGUI::Grouping::isInGroup(4));
 	return www_htmlArealistCollateral() if ($session{form}{image} eq "");
 	my($test, $file);
 	$session{form}{fid} = $session{form}{collateralFolderId} = $session{form}{path};
@@ -635,7 +636,7 @@ sub www_htmlAreaUpload {
 #-------------------------------------------------------------------
 sub www_htmlAreaDelete {
         $session{page}{makePrintable}=1; $session{page}{printableStyleId}=10;
-	return "<b>Only Content Managers are allowed to use WebGUI Collateral</b>" unless (WebGUI::Privilege::isInGroup(4));
+	return "<b>Only Content Managers are allowed to use WebGUI Collateral</b>" unless (WebGUI::Grouping::isInGroup(4));
 	if($session{form}{cid}) { # Delete Image
 	        my $collateral = WebGUI::Collateral->new($session{form}{cid});
         	$collateral->delete;
@@ -652,7 +653,7 @@ sub www_htmlAreaDelete {
 #-------------------------------------------------------------------
 sub www_htmlAreaCreateFolder {
         $session{page}{makePrintable}=1; $session{page}{printableStyleId}=10;
-	return "<b>Only Content Managers are allowed to use WebGUI Collateral</b>" unless (WebGUI::Privilege::isInGroup(4));
+	return "<b>Only Content Managers are allowed to use WebGUI Collateral</b>" unless (WebGUI::Grouping::isInGroup(4));
         $session{form}{fid} = getNextId("collateralFolderId");
         WebGUI::Session::setScratch("collateralFolderId",$session{form}{fid});
         WebGUI::SQL->write("insert into collateralFolder (collateralFolderId) values ($session{form}{fid})");

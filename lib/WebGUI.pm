@@ -16,6 +16,7 @@ use Tie::CPHash;
 use WebGUI::Affiliate;
 use WebGUI::Cache;
 use WebGUI::ErrorHandler;
+use WebGUI::Grouping;
 use WebGUI::International;
 use WebGUI::Macro;
 use WebGUI::Operation;
@@ -39,7 +40,7 @@ sub _generatePage {
 			".quote($session{page}{title}).", ".quote($session{form}{wid}).", ".quote($session{form}{func}).")");
 	}
 	my $output = WebGUI::Macro::process(WebGUI::Style::process($content));
-        if ($session{setting}{showDebug} || ($session{form}{debug}==1 && WebGUI::Privilege::isInGroup(3))) {
+        if ($session{setting}{showDebug} || ($session{form}{debug}==1 && WebGUI::Grouping::isInGroup(3))) {
 		$output .= WebGUI::ErrorHandler::showDebug();
         }
 	return $output;
@@ -92,7 +93,7 @@ sub _processFunctions {
                                         WebGUI::ErrorHandler::security("access wobject [".$session{form}{wid}."] on page '"
                                                 .$session{page}{title}."' [".$session{page}{pageId}."].");
                                 } else {
-                                        if (WebGUI::Privilege::canViewPage()) {
+                                        if (WebGUI::Page::canView()) {
                                                 $cmd = "WebGUI::Wobject::".${$wobject}{namespace};
 						my $load = "use ".$cmd; # gotta load the wobject before you can use it
 						eval($load);

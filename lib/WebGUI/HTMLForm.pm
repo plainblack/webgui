@@ -20,7 +20,7 @@ use WebGUI::DateTime;
 use WebGUI::Form;
 use WebGUI::Icon;
 use WebGUI::International;
-use WebGUI::Privilege;
+use WebGUI::Grouping;
 use WebGUI::Session;
 use WebGUI::SQL;
 
@@ -535,7 +535,7 @@ sub databaseLink {
 		rearrange([qw(name value label afterEdit extras uiLevel)], @p);
         if (_uiLevelChecksOut($uiLevel)) {
 		$label = $label || WebGUI::International::get(1075);
-		if (WebGUI::Privilege::isInGroup(3)) {
+		if (WebGUI::Grouping::isInGroup(3)) {
 			if ($afterEdit) {
                                 $subtext = editIcon("op=editDatabaseLink&amp;lid=".$value."&amp;afterEdit=".WebGUI::URL::escape($afterEdit));
                         }
@@ -1079,7 +1079,7 @@ sub group {
         my ($name, $label, $value, $size, $multiple, $extras, $subtext, $uiLevel, $excludeGroups) =
                 rearrange([qw(name label value size multiple extras subtext uiLevel excludeGroups)], @p);
         if (_uiLevelChecksOut($uiLevel)) {
-		if (WebGUI::Privilege::isInGroup(3)) {
+		if (WebGUI::Grouping::isInGroup(3)) {
 			$subtext = manageIcon("op=listGroups").$subtext;
 		}
                 $output = WebGUI::Form::group({
@@ -1956,7 +1956,7 @@ sub template {
 		rearrange([qw(name value label namespace afterEdit extras uiLevel)], @p);
         if (_uiLevelChecksOut($uiLevel)) {
 		$label = $label || WebGUI::International::get(356);
-		if (WebGUI::Privilege::isInGroup(8)) {
+		if (WebGUI::Grouping::isInGroup(8)) {
         		if ($afterEdit) {
                 		$subtext = editIcon("op=editTemplate&tid=".$value."&namespace=".$namespace."&afterEdit=".WebGUI::URL::escape($afterEdit));
         		}

@@ -13,9 +13,9 @@ package WebGUI::Macro::AdminBar;
 use strict qw(refs vars);
 use Tie::CPHash;
 use Tie::IxHash;
+use WebGUI::Grouping;
 use WebGUI::International;
 use WebGUI::Macro;
-use WebGUI::Privilege;
 use WebGUI::Session;
 use WebGUI::SQL;
 use WebGUI::URL;
@@ -137,7 +137,7 @@ sub process {
 	$var{'clipboard_loop'} = \@clipboard;
    #--admin functions
 	%hash = ();
-	if (WebGUI::Privilege::isInGroup(3)) {
+	if (WebGUI::Grouping::isInGroup(3)) {
         	%hash = ( 
 			WebGUI::URL::page('op=listGroups')=>WebGUI::International::get(5), 
 			WebGUI::URL::page('op=manageSettings')=>WebGUI::International::get(4), 
@@ -146,14 +146,14 @@ sub process {
 			WebGUI::URL::page('op=listDatabaseLinks')=>WebGUI::International::get(981),
 			WebGUI::URL::page('op=listNavigation')=>'Manage navigation.'
 		);
-	} elsif (WebGUI::Privilege::isInGroup(11)) {
+	} elsif (WebGUI::Grouping::isInGroup(11)) {
                 %hash = (
 			WebGUI::URL::page('op=listGroupsSecondary')=>WebGUI::International::get(5), 
 			WebGUI::URL::page('op=addUserSecondary')=>WebGUI::International::get(169),
                         %hash
                 );
         }
-	if (WebGUI::Privilege::isInGroup(4)) {
+	if (WebGUI::Grouping::isInGroup(4)) {
         	%hash = ( 
 			WebGUI::URL::page('op=listRoots')=>WebGUI::International::get(410),
 			'http://validator.w3.org/check?uri='.WebGUI::URL::escape(WebGUI::URL::page())=>WebGUI::International::get(399),
@@ -164,25 +164,25 @@ sub process {
 			%hash
 		);
 	}
-        if (WebGUI::Privilege::isInGroup(6)) {
+        if (WebGUI::Grouping::isInGroup(6)) {
                 %hash = (
 			WebGUI::URL::gateway('packages')=>WebGUI::International::get(374),
                         %hash
                 );
         }
-        if (WebGUI::Privilege::isInGroup(8)) {
+        if (WebGUI::Grouping::isInGroup(8)) {
                 %hash = (
                         WebGUI::URL::page('op=listTemplates')=>WebGUI::International::get(508),
                         %hash
                 );
         }
-        if (WebGUI::Privilege::isInGroup(9)) {
+        if (WebGUI::Grouping::isInGroup(9)) {
                 %hash = (
                         WebGUI::URL::page('op=listThemes')=>WebGUI::International::get(900),
                         %hash
                 );
         }
-        if (WebGUI::Privilege::isInGroup(10)) {
+        if (WebGUI::Grouping::isInGroup(10)) {
                 %hash = (
 			WebGUI::URL::page('op=listLanguages')=>WebGUI::International::get(585),
                         %hash

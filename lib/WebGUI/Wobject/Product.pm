@@ -163,7 +163,7 @@ sub purge {
 
 #-------------------------------------------------------------------
 sub www_addAccessory {
-	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId")));
+	return WebGUI::Privilege::insufficient() unless ($_[0]->canEdit);
         $session{page}{useAdminStyle} = 1;
         my ($output, $f, $accessory, @usedAccessories);
 	$output = helpIcon(4,$_[0]->get("namespace"));
@@ -185,7 +185,7 @@ sub www_addAccessory {
 
 #-------------------------------------------------------------------
 sub www_addAccessorySave {
-	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId")));
+	return WebGUI::Privilege::insufficient() unless ($_[0]->canEdit);
         $session{page}{useAdminStyle} = 1;
         my ($seq);
         ($seq) = WebGUI::SQL->quickArray("select max(sequenceNumber) from Product_accessory
@@ -201,7 +201,7 @@ sub www_addAccessorySave {
 
 #-------------------------------------------------------------------
 sub www_addRelated {
-	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId")));
+	return WebGUI::Privilege::insufficient() unless ($_[0]->canEdit);
         my ($output, $f, $related, @usedRelated);
 	$output = helpIcon(5,$_[0]->get("namespace"));
         $output .= '<h1>'.WebGUI::International::get(19,$_[0]->get("namespace")).'</h1>';
@@ -222,7 +222,7 @@ sub www_addRelated {
 
 #-------------------------------------------------------------------
 sub www_addRelatedSave {
-	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId")));
+	return WebGUI::Privilege::insufficient() unless ($_[0]->canEdit);
         my ($seq);
         ($seq) = WebGUI::SQL->quickArray("select max(sequenceNumber) from Product_related
      		where wobjectId=".$_[0]->get("wobjectId"));
@@ -237,7 +237,7 @@ sub www_addRelatedSave {
 
 #-------------------------------------------------------------------
 sub www_deleteAccessory {
-	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId")));
+	return WebGUI::Privilege::insufficient() unless ($_[0]->canEdit);
         return $_[0]->confirm(
                 WebGUI::International::get(2,$_[0]->get("namespace")),
 		WebGUI::URL::page('func=deleteAccessoryConfirm&wid='.$_[0]->get("wobjectId").'&aid='.$session{form}{aid})
@@ -246,7 +246,7 @@ sub www_deleteAccessory {
 
 #-------------------------------------------------------------------
 sub www_deleteAccessoryConfirm {
-	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId")));
+	return WebGUI::Privilege::insufficient() unless ($_[0]->canEdit);
 	WebGUI::SQL->write("delete from Product_accessory where wobjectId=".$_[0]->get("wobjectId")." and accessoryWobjectId=".quote($session{form}{aid}));
 	$_[0]->reorderCollateral("Product_accessory","accessoryWobjectId");
         return "";
@@ -254,7 +254,7 @@ sub www_deleteAccessoryConfirm {
 
 #-------------------------------------------------------------------
 sub www_deleteBenefit {
-	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId")));
+	return WebGUI::Privilege::insufficient() unless ($_[0]->canEdit);
         return $_[0]->confirm(
                 WebGUI::International::get(48,$_[0]->get("namespace")),
 		WebGUI::URL::page('func=deleteBenefitConfirm&wid='.$_[0]->get("wobjectId").'&bid='.$session{form}{bid})
@@ -263,7 +263,7 @@ sub www_deleteBenefit {
 
 #-------------------------------------------------------------------
 sub www_deleteBenefitConfirm {
-	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId")));
+	return WebGUI::Privilege::insufficient() unless ($_[0]->canEdit);
 	$_[0]->deleteCollateral("Product_benefit","Product_benefitId",$session{form}{bid});
 	$_[0]->reorderCollateral("Product_benefit","Product_benefitId");
         return "";
@@ -271,7 +271,7 @@ sub www_deleteBenefitConfirm {
 
 #-------------------------------------------------------------------
 sub www_deleteFeature {
-	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId")));
+	return WebGUI::Privilege::insufficient() unless ($_[0]->canEdit);
 	return $_[0]->confirm(
 		WebGUI::International::get(3,$_[0]->get("namespace")),
 		WebGUI::URL::page('func=deleteFeatureConfirm&wid='.$_[0]->get("wobjectId").'&fid='.$session{form}{fid})
@@ -280,7 +280,7 @@ sub www_deleteFeature {
 
 #-------------------------------------------------------------------
 sub www_deleteFeatureConfirm {
-	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId")));
+	return WebGUI::Privilege::insufficient() unless ($_[0]->canEdit);
 	$_[0]->deleteCollateral("Product_feature","Product_featureId",$session{form}{fid});
 	$_[0]->reorderCollateral("Product_feature","Product_featureId");
         return "";
@@ -288,7 +288,7 @@ sub www_deleteFeatureConfirm {
 
 #-------------------------------------------------------------------
 sub www_deleteRelated {
-	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId")));
+	return WebGUI::Privilege::insufficient() unless ($_[0]->canEdit);
         return $_[0]->confirm(
                 WebGUI::International::get(4,$_[0]->get("namespace")),
 		WebGUI::URL::page('func=deleteRelatedConfirm&wid='.$_[0]->get("wobjectId").'&rid='.$session{form}{rid})
@@ -297,7 +297,7 @@ sub www_deleteRelated {
 
 #-------------------------------------------------------------------
 sub www_deleteRelatedConfirm {
-	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId")));
+	return WebGUI::Privilege::insufficient() unless ($_[0]->canEdit);
         WebGUI::SQL->write("delete from Product_related where wobjectId=".$_[0]->get("wobjectId")." and relatedWobjectId=".quote($session{form}{rid}));
 	$_[0]->reorderCollateral("Product_related","relatedWobjectId");
         return "";
@@ -305,7 +305,7 @@ sub www_deleteRelatedConfirm {
 
 #-------------------------------------------------------------------
 sub www_deleteSpecification {
-	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId")));
+	return WebGUI::Privilege::insufficient() unless ($_[0]->canEdit);
         return $_[0]->confirm(
                 WebGUI::International::get(5,$_[0]->get("namespace")),
 		WebGUI::URL::page('func=deleteSpecificationConfirm&wid='.$_[0]->get("wobjectId").'&sid='.$session{form}{sid})
@@ -314,7 +314,7 @@ sub www_deleteSpecification {
 
 #-------------------------------------------------------------------
 sub www_deleteSpecificationConfirm {
-	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId")));
+	return WebGUI::Privilege::insufficient() unless ($_[0]->canEdit);
 	$_[0]->deleteCollateral("Product_specification","Product_specificationId",$session{form}{sid});
 	$_[0]->reorderCollateral("Product_specification","Product_specificationId");
         return "";
@@ -348,7 +348,7 @@ sub www_edit {
 
 #-------------------------------------------------------------------
 sub www_editSave {
-	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId")));
+	return WebGUI::Privilege::insufficient() unless ($_[0]->canEdit);
 	my ($file, %property);
 	$_[0]->SUPER::www_editSave() if ($_[0]->get("wobjectId") eq "new");
 	$file = WebGUI::Attachment->new("",$_[0]->get("wobjectId"));
@@ -375,7 +375,7 @@ sub www_editSave {
 
 #-------------------------------------------------------------------
 sub www_editBenefit {
-	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId")));
+	return WebGUI::Privilege::insufficient() unless ($_[0]->canEdit);
         $session{page}{useAdminStyle} = 1;
         my ($output, $data, $f, $benefits);
 	$data = $_[0]->getCollateral("Product_benefit","Product_benefitId",$session{form}{bid});
@@ -395,7 +395,7 @@ sub www_editBenefit {
 
 #-------------------------------------------------------------------
 sub www_editBenefitSave {
-	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId")));
+	return WebGUI::Privilege::insufficient() unless ($_[0]->canEdit);
         $session{form}{benefit} = $session{form}{benefit_new} if ($session{form}{benefit_new} ne "");
 	$_[0]->setCollateral("Product_benefit", "Product_benefitId", {
 		Product_benefitId => $session{form}{bid},
@@ -411,7 +411,7 @@ sub www_editBenefitSave {
 
 #-------------------------------------------------------------------
 sub www_editFeature {
-	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId")));
+	return WebGUI::Privilege::insufficient() unless ($_[0]->canEdit);
         $session{page}{useAdminStyle} = 1;
         my ($output, $data, $f, $features);
 	$data = $_[0]->getCollateral("Product_feature","Product_featureId",$session{form}{fid});
@@ -431,7 +431,7 @@ sub www_editFeature {
 
 #-------------------------------------------------------------------
 sub www_editFeatureSave {
-	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId")));
+	return WebGUI::Privilege::insufficient() unless ($_[0]->canEdit);
 	$session{form}{feature} = $session{form}{feature_new} if ($session{form}{feature_new} ne "");
         $_[0]->setCollateral("Product_feature", "Product_featureId", {
                 Product_featureId => $session{form}{fid},
@@ -447,7 +447,7 @@ sub www_editFeatureSave {
 
 #-------------------------------------------------------------------
 sub www_editSpecification {
-	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId")));
+	return WebGUI::Privilege::insufficient() unless ($_[0]->canEdit);
         $session{page}{useAdminStyle} = 1;
         my ($output, $data, $f, $hashRef);
 	$data = $_[0]->getCollateral("Product_specification","Product_specificationId",$session{form}{sid});
@@ -470,7 +470,7 @@ sub www_editSpecification {
 
 #-------------------------------------------------------------------
 sub www_editSpecificationSave {
-	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId")));
+	return WebGUI::Privilege::insufficient() unless ($_[0]->canEdit);
         $session{form}{name} = $session{form}{name_new} if ($session{form}{name_new} ne "");
         $session{form}{units} = $session{form}{units_new} if ($session{form}{units_new} ne "");
         $_[0]->setCollateral("Product_specification", "Product_specificationId", {
@@ -489,70 +489,70 @@ sub www_editSpecificationSave {
 
 #-------------------------------------------------------------------
 sub www_moveAccessoryDown {
-	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId")));
+	return WebGUI::Privilege::insufficient() unless ($_[0]->canEdit);
         $_[0]->moveCollateralDown("Product_related","accessoryWobjectId",$session{form}{aid});
 	return "";
 }
 
 #-------------------------------------------------------------------
 sub www_moveAccessoryUp {
-	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId")));
+	return WebGUI::Privilege::insufficient() unless ($_[0]->canEdit);
         $_[0]->moveCollateralUp("Product_accessory","accessoryWobjectId",$session{form}{aid});
 	return "";
 }
 
 #-------------------------------------------------------------------
 sub www_moveBenefitDown {
-	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId")));
+	return WebGUI::Privilege::insufficient() unless ($_[0]->canEdit);
         $_[0]->moveCollateralDown("Product_benefit","Product_benefitId",$session{form}{bid});
 	return "";
 }
 
 #-------------------------------------------------------------------
 sub www_moveBenefitUp {
-	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId")));
+	return WebGUI::Privilege::insufficient() unless ($_[0]->canEdit);
         $_[0]->moveCollateralUp("Product_benefit","Product_benefitId",$session{form}{bid});
 	return "";
 }
 
 #-------------------------------------------------------------------
 sub www_moveFeatureDown {
-	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId")));
+	return WebGUI::Privilege::insufficient() unless ($_[0]->canEdit);
         $_[0]->moveCollateralDown("Product_feature","Product_featureId",$session{form}{fid});
 	return "";
 }
 
 #-------------------------------------------------------------------
 sub www_moveFeatureUp {
-	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId")));
+	return WebGUI::Privilege::insufficient() unless ($_[0]->canEdit);
 	$_[0]->moveCollateralUp("Product_feature","Product_featureId",$session{form}{fid});
 	return "";
 }
 
 #-------------------------------------------------------------------
 sub www_moveRelatedDown {
-	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId")));
+	return WebGUI::Privilege::insufficient() unless ($_[0]->canEdit);
         $_[0]->moveCollateralDown("Product_related","relatedWobjectId",$session{form}{rid});
 	return "";
 }
 
 #-------------------------------------------------------------------
 sub www_moveRelatedUp {
-	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId")));
+	return WebGUI::Privilege::insufficient() unless ($_[0]->canEdit);
         $_[0]->moveCollateralUp("Product_related","relatedWobjectId",$session{form}{rid});
 	return "";
 }
 
 #-------------------------------------------------------------------
 sub www_moveSpecificationDown {
-	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId")));
+	return WebGUI::Privilege::insufficient() unless ($_[0]->canEdit);
         $_[0]->moveCollateralDown("Product_specification","Product_specificationId",$session{form}{sid});
 	return "";
 }
 
 #-------------------------------------------------------------------
 sub www_moveSpecificationUp {
-	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId")));
+	return WebGUI::Privilege::insufficient() unless ($_[0]->canEdit);
         $_[0]->moveCollateralUp("Product_specification","Product_specificationId",$session{form}{sid});
 	return "";
 }

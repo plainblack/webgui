@@ -240,7 +240,7 @@ sub getRecordTemplateVars {
 	my $self = shift;
 	my $var = shift;
 	$var->{error_loop} = [] unless (exists $var->{error_loop});
-	$var->{canEdit} = (WebGUI::Privilege::canEditWobject($self->get("wobjectId")));
+	$var->{canEdit} = ($self->canEdit);
 	$var->{"entryList.url"} = WebGUI::URL::page('func=view&entryId=list&wid='.$self->get("wobjectId"));
 	$var->{"entryList.label"} = WebGUI::International::get(86,$self->get("namespace"));
 	$var->{"export.tab.url"} = WebGUI::URL::page('func=exportTab&wid='.$self->get("wobjectId"));
@@ -450,7 +450,7 @@ sub uiLevel {
 
 #-------------------------------------------------------------------
 sub www_deleteEntry {
-        return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId")));
+        return WebGUI::Privilege::insufficient() unless ($_[0]->canEdit);
         my $entryId = $session{form}{entryId};
     	WebGUI::SQL->write("delete from DataForm_entry where DataForm_entryId=".quote($entryId));
         $session{form}{entryId} = 'list';
@@ -459,14 +459,14 @@ sub www_deleteEntry {
 
 #-------------------------------------------------------------------
 sub www_deleteField {
-	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId")));
+	return WebGUI::Privilege::insufficient() unless ($_[0]->canEdit);
 	return $_[0]->confirm(WebGUI::International::get(19,$_[0]->get("namespace")),
        		WebGUI::URL::page('func=deleteFieldConfirm&wid='.$_[0]->get("wobjectId").'&fid='.$session{form}{fid}));
 }
 
 #-------------------------------------------------------------------
 sub www_deleteFieldConfirm {
-	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId")));
+	return WebGUI::Privilege::insufficient() unless ($_[0]->canEdit);
 	$_[0]->deleteCollateral("DataForm_field","DataForm_fieldId",$session{form}{fid});
 	$_[0]->reorderCollateral("DataForm_field","DataForm_fieldId");
        	return "";
@@ -474,14 +474,14 @@ sub www_deleteFieldConfirm {
 
 #-------------------------------------------------------------------
 sub www_deleteTab {
-	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId")));
+	return WebGUI::Privilege::insufficient() unless ($_[0]->canEdit);
 	return $_[0]->confirm(WebGUI::International::get(100,$_[0]->get("namespace")),
        		WebGUI::URL::page('func=deleteTabConfirm&wid='.$_[0]->get("wobjectId").'&tid='.$session{form}{tid}));
 }
 
 #-------------------------------------------------------------------
 sub www_deleteTabConfirm {
-	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId")));
+	return WebGUI::Privilege::insufficient() unless ($_[0]->canEdit);
 	$_[0]->deleteCollateral("DataForm_tab","DataForm_tabId",$session{form}{tid});
 	$_[0]->deleteCollateral("DataForm_field","DataForm_tabId",$session{form}{tid});
 	$_[0]->reorderCollateral("DataForm_tab","DataForm_tabId");
@@ -542,7 +542,7 @@ sub www_edit {
 
 #-------------------------------------------------------------------
 sub www_editSave {
-	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId")));
+	return WebGUI::Privilege::insufficient() unless ($_[0]->canEdit);
 	$_[0]->SUPER::www_editSave();
 	if ($session{form}{wid} eq "new") {
 		$_[0]->setCollateral("DataForm_field","DataForm_fieldId",{
@@ -601,7 +601,7 @@ sub www_editSave {
 
 #-------------------------------------------------------------------
 sub www_editField {
-	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId")));
+	return WebGUI::Privilege::insufficient() unless ($_[0]->canEdit);
         $session{page}{useAdminStyle} = 1;
     	my ($output, %field, $f, %fieldStatus,$tab);
     	tie %field, 'Tie::CPHash';
@@ -695,7 +695,7 @@ sub www_editField {
 
 #-------------------------------------------------------------------
 sub www_editFieldSave {
-	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId")));
+	return WebGUI::Privilege::insufficient() unless ($_[0]->canEdit);
 	$session{form}{name} = $session{form}{label} if ($session{form}{name} eq "");
 	$session{form}{tid} = "0" if ($session{form}{tid} eq "");
 	$session{form}{name} = WebGUI::URL::urlize($session{form}{name});
@@ -724,7 +724,7 @@ sub www_editFieldSave {
 
 #-------------------------------------------------------------------
 sub www_editTab {
-	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId")));
+	return WebGUI::Privilege::insufficient() unless ($_[0]->canEdit);
         $session{page}{useAdminStyle} = 1;
     	my ($output, %tab, $f);
     	tie %tab, 'Tie::CPHash';
@@ -767,7 +767,7 @@ sub www_editTab {
 
 #-------------------------------------------------------------------
 sub www_editTabSave {
-	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId")));
+	return WebGUI::Privilege::insufficient() unless ($_[0]->canEdit);
 	$session{form}{name} = $session{form}{label} if ($session{form}{name} eq "");
 	$session{form}{name} = WebGUI::URL::urlize($session{form}{name});
         $session{form}{name} =~ s/\-//g;
@@ -786,7 +786,7 @@ sub www_editTabSave {
 
 #-------------------------------------------------------------------
 sub www_exportTab {
-	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId")));
+	return WebGUI::Privilege::insufficient() unless ($_[0]->canEdit);
 	$session{header}{filename} = WebGUI::URL::urlize($_[0]->get("title")).".tab";
 	$session{header}{mimetype} = "text/plain";
 	my %fields = WebGUI::SQL->buildHash("select DataForm_fieldId,name from DataForm_field where wobjectId=".$_[0]->get("wobjectId")." order by sequenceNumber");
@@ -809,28 +809,28 @@ sub www_exportTab {
 
 #-------------------------------------------------------------------
 sub www_moveFieldDown {
-	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId")));
+	return WebGUI::Privilege::insufficient() unless ($_[0]->canEdit);
 	$_[0]->moveCollateralDown("DataForm_field","DataForm_fieldId",$session{form}{fid},"DataForm_tabId",$session{form}{tid});
 	return "";
 }
 
 #-------------------------------------------------------------------
 sub www_moveFieldUp {
-	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId")));
+	return WebGUI::Privilege::insufficient() unless ($_[0]->canEdit);
 	$_[0]->moveCollateralUp("DataForm_field","DataForm_fieldId",$session{form}{fid},"DataForm_tabId",$session{form}{tid});
 	return "";
 }
 
 #-------------------------------------------------------------------
 sub www_moveTabRight {
-	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId")));
+	return WebGUI::Privilege::insufficient() unless ($_[0]->canEdit);
 	$_[0]->moveCollateralDown("DataForm_tab","DataForm_tabId",$session{form}{tid});
 	return "";
 }
 
 #-------------------------------------------------------------------
 sub www_moveTabLeft {
-	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId")));
+	return WebGUI::Privilege::insufficient() unless ($_[0]->canEdit);
 	$_[0]->moveCollateralUp("DataForm_tab","DataForm_tabId",$session{form}{tid});
 	return "";
 }
@@ -892,8 +892,8 @@ sub www_process {
 #-------------------------------------------------------------------
 sub www_view {
 	my $var;
-	$var->{entryId} = $session{form}{entryId} if (WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId")));
-	if ($var->{entryId} eq "list" && WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId"))) {
+	$var->{entryId} = $session{form}{entryId} if ($_[0]->canEdit);
+	if ($var->{entryId} eq "list" && $_[0]->canEdit) {
 		return $_[0]->processTemplate($_[0]->get("listTemplateId"),$_[0]->getListTemplateVars,"DataForm/List");
 	}
 	# add Tab StyleSheet and JavaScript

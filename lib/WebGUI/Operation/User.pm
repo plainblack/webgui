@@ -38,7 +38,7 @@ our @EXPORT = qw(&www_editUserKarma &www_editUserKarmaSave &www_editUserGroup &w
 sub _submenu {
 	my ($output, %menu);
 	tie %menu, 'Tie::IxHash';
-	if (WebGUI::Privilege::isInGroup(3)) {
+	if (WebGUI::Grouping::isInGroup(3)) {
 		$menu{WebGUI::URL::page("op=addUser")} = WebGUI::International::get(169);
 		unless ($session{form}{op} eq "listUsers" 
 			|| $session{form}{op} eq "addUser" 
@@ -63,7 +63,7 @@ sub _submenu {
 #-------------------------------------------------------------------
 sub www_addUser {
     my ($output, $f, $cmd, $html, %status);
-    return WebGUI::Privilege::adminOnly() unless (WebGUI::Privilege::isInGroup(3) || WebGUI::Privilege::isInGroup(11));
+    return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3) || WebGUI::Grouping::isInGroup(11));
     $output .= helpIcon(5);
 	$output .= '<h1>'.WebGUI::International::get(163).'</h1>';
 	$output .= WebGUI::Form::_javascriptFile("swapLayers.js");
@@ -79,7 +79,7 @@ sub www_addUser {
     $f->text("username",WebGUI::International::get(50),$session{form}{username});
     $f->email("email",WebGUI::International::get(56));
     
-	if(WebGUI::Privilege::isInGroup(3)){    
+	if(WebGUI::Grouping::isInGroup(3)){    
 	   tie %status, 'Tie::IxHash';
 	   %status = (
 		   Active		=>WebGUI::International::get(817),
@@ -123,7 +123,7 @@ sub www_addUser {
 #-------------------------------------------------------------------
 sub www_addUserSave {
     my (@groups, $uid, $u);
-	return WebGUI::Privilege::adminOnly() unless (WebGUI::Privilege::isInGroup(3) || WebGUI::Privilege::isInGroup(11));
+	return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3) || WebGUI::Grouping::isInGroup(11));
 	($uid) = WebGUI::SQL->quickArray("select userId from users where username=".quote($session{form}{username}));
 	return www_addUser if ($uid);
 	
@@ -139,13 +139,13 @@ sub www_addUserSave {
     @groups = $session{cgi}->param('groups');
 	$u->addToGroups(\@groups);
 	$u->profileField("email",$session{form}{email});
-    return _submenu(WebGUI::International::get(978)) if(!WebGUI::Privilege::isInGroup(3));
+    return _submenu(WebGUI::International::get(978)) if(!WebGUI::Grouping::isInGroup(3));
 	return www_editUser();
 }
 
 #-------------------------------------------------------------------
 sub www_addUserToGroupSave {
-	return WebGUI::Privilege::adminOnly() unless (WebGUI::Privilege::isInGroup(3));
+	return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
         my (@groups, $u);
         @groups = $session{cgi}->param('groups');
 	$u = WebGUI::User->new($session{form}{uid});
@@ -155,7 +155,7 @@ sub www_addUserToGroupSave {
 
 #-------------------------------------------------------------------
 sub www_becomeUser {
-	return WebGUI::Privilege::adminOnly() unless (WebGUI::Privilege::isInGroup(3));
+	return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
         WebGUI::Session::end($session{var}{sessionId});
 	WebGUI::Session::start($session{form}{uid});
 	return "";
@@ -163,7 +163,7 @@ sub www_becomeUser {
 
 #-------------------------------------------------------------------
 sub www_deleteGrouping {
-	return WebGUI::Privilege::adminOnly() unless (WebGUI::Privilege::isInGroup(3));
+	return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
 	if (($session{user}{userId} == $session{form}{uid} || $session{form}{uid} == 3) && $session{form}{gid} == 3) {
 		return WebGUI::Privilege::vitalComponent();
         }
@@ -178,7 +178,7 @@ sub www_deleteGrouping {
 #-------------------------------------------------------------------
 sub www_deleteUser {
         my ($output);
-	return WebGUI::Privilege::adminOnly() unless (WebGUI::Privilege::isInGroup(3));
+	return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
         if ($session{form}{uid} < 26) {
 		return WebGUI::Privilege::vitalComponent();
         } else {
@@ -195,7 +195,7 @@ sub www_deleteUser {
 
 #-------------------------------------------------------------------
 sub www_deleteUserConfirm {
-	return WebGUI::Privilege::adminOnly() unless (WebGUI::Privilege::isInGroup(3));
+	return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
 	my ($u);
     if ($session{form}{uid} < 26) {
 	   return WebGUI::Privilege::vitalComponent();
@@ -208,7 +208,7 @@ sub www_deleteUserConfirm {
 
 #-------------------------------------------------------------------
 sub www_editGrouping {
-	return WebGUI::Privilege::adminOnly() unless (WebGUI::Privilege::isInGroup(3));
+	return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
         my $output .= '<h1>'.WebGUI::International::get(370).'</h1>';
 	my $f = WebGUI::HTMLForm->new;
         $f->hidden("op","editGroupingSave");
@@ -231,7 +231,7 @@ sub www_editGrouping {
 
 #-------------------------------------------------------------------
 sub www_editGroupingSave {
-	return WebGUI::Privilege::adminOnly() unless (WebGUI::Privilege::isInGroup(3));
+	return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
         WebGUI::Grouping::userGroupExpireDate($session{form}{uid},$session{form}{gid},setToEpoch($session{form}{expireDate}));
         WebGUI::Grouping::userGroupAdmin($session{form}{uid},$session{form}{gid},$session{form}{groupAdmin});
         return www_editUserGroup();
@@ -239,7 +239,7 @@ sub www_editGroupingSave {
 
 #-------------------------------------------------------------------
 sub www_editUser {
-	return WebGUI::Privilege::adminOnly() unless (WebGUI::Privilege::isInGroup(3));
+	return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
 	my ($output, $f, $u, $cmd, $html, %status);
 	$u = WebGUI::User->new($session{form}{uid});
 	$output .= WebGUI::Form::_javascriptFile("swapLayers.js");
@@ -293,7 +293,7 @@ sub www_editUser {
 
 #-------------------------------------------------------------------
 sub www_editUserSave {
-	return WebGUI::Privilege::adminOnly() unless (WebGUI::Privilege::isInGroup(3));
+	return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
     my ($error, $uid, $u);
 	($uid) = WebGUI::SQL->quickArray("select userId from users where username=".quote($session{form}{username}));
     
@@ -314,7 +314,7 @@ sub www_editUserSave {
 
 #-------------------------------------------------------------------
 sub www_editUserGroup {
-	return WebGUI::Privilege::adminOnly() unless (WebGUI::Privilege::isInGroup(3));
+	return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
 	my ($output, $f, $groups, $sth, %hash);
 	tie %hash, 'Tie::CPHash';
         $output .= '<h1>'.WebGUI::International::get(372).'</h1>';
@@ -355,7 +355,7 @@ sub www_editUserGroup {
 
 #-------------------------------------------------------------------
 sub www_editUserKarma {
-	return WebGUI::Privilege::adminOnly() unless (WebGUI::Privilege::isInGroup(3));
+	return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
         my ($output, $f, $a, %user, %data, $method, $values, $category, $label, $default, $previousCategory);
         $output = helpIcon(36);
         $output .= '<h1>'.WebGUI::International::get(558).'</h1>';
@@ -371,7 +371,7 @@ sub www_editUserKarma {
 
 #-------------------------------------------------------------------
 sub www_editUserKarmaSave {
-	return WebGUI::Privilege::adminOnly() unless (WebGUI::Privilege::isInGroup(3));
+	return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
         my ($u);
         $u = WebGUI::User->new($session{form}{uid});
         $u->karma($session{form}{amount},$session{user}{username}." (".$session{user}{userId}.")",$session{form}{description});
@@ -380,7 +380,7 @@ sub www_editUserKarmaSave {
 
 #-------------------------------------------------------------------
 sub www_editUserProfile {
-	return WebGUI::Privilege::adminOnly() unless (WebGUI::Privilege::isInGroup(3));
+	return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
         my ($output, $f, $a, %user, %data, $method, $values, $category, $label, $default, $previousCategory);
 	tie %data, 'Tie::CPHash';
 	$output = helpIcon(32);
@@ -448,7 +448,7 @@ sub www_editUserProfile {
 
 #-------------------------------------------------------------------
 sub www_editUserProfileSave {
-	return WebGUI::Privilege::adminOnly() unless (WebGUI::Privilege::isInGroup(3));
+	return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
         my ($a, %field, $u);
       	tie %field, 'Tie::CPHash';
         $u = WebGUI::User->new($session{form}{uid});
@@ -465,7 +465,7 @@ sub www_editUserProfileSave {
 
 #-------------------------------------------------------------------
 sub www_listUsers {
-	return WebGUI::Privilege::adminOnly() unless (WebGUI::Privilege::isInGroup(3));
+	return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
 	WebGUI::Session::setScratch("userSearchKeyword",$session{form}{keyword});
 	WebGUI::Session::setScratch("userSearchStatus",$session{form}{status});
 	my ($output, $data, $f, $rows, $p, $search, %status, $selectedStatus);

@@ -16,6 +16,7 @@ use WebGUI::Attachment;
 use WebGUI::DateTime;
 use WebGUI::Forum;
 use WebGUI::Forum::UI;
+use WebGUI::Grouping;
 use WebGUI::HTML;
 use WebGUI::HTMLForm;
 use WebGUI::Icon;
@@ -236,7 +237,7 @@ sub status {
 sub www_approveSubmission {
 	my (%submission);
 	tie %submission, 'Tie::CPHash';
-        if (WebGUI::Privilege::isInGroup(4,$session{user}{userId}) || WebGUI::Privilege::isInGroup(3,$session{user}{userId})) {
+        if (WebGUI::Grouping::isInGroup(4,$session{user}{userId}) || WebGUI::Grouping::isInGroup(3,$session{user}{userId})) {
 		%submission = WebGUI::SQL->quickHash("select * from USS_submission where USS_submissionId=$session{form}{sid}");
                 WebGUI::SQL->write("update USS_submission set status='Approved' where USS_submissionId=".quote($session{form}{sid}));
 		WebGUI::MessageLog::addInternationalizedEntry($submission{userId},'',WebGUI::URL::page('func=viewSubmission&wid='.
@@ -251,7 +252,7 @@ sub www_approveSubmission {
 #-------------------------------------------------------------------
 sub www_deleteFile {
 	my ($owner) = WebGUI::SQL->quickArray("select userId from USS_submission where USS_submissionId=$session{form}{sid}");
-        if ($owner == $session{user}{userId} || WebGUI::Privilege::isInGroup($_[0]->get("groupToApprove"))) {
+        if ($owner == $session{user}{userId} || WebGUI::Grouping::isInGroup($_[0]->get("groupToApprove"))) {
 		$_[0]->setCollateral("USS_submission","USS_submissionId",{
 			$session{form}{file}=>'',
 		 	USS_submissionId=>$session{form}{sid}
@@ -265,7 +266,7 @@ sub www_deleteFile {
 #-------------------------------------------------------------------
 sub www_deleteSubmission {
 	my ($owner) = WebGUI::SQL->quickArray("select userId from USS_submission where USS_submissionId=$session{form}{sid}");
-        if ($owner == $session{user}{userId} || WebGUI::Privilege::isInGroup($_[0]->get("groupToApprove"))) {
+        if ($owner == $session{user}{userId} || WebGUI::Grouping::isInGroup($_[0]->get("groupToApprove"))) {
 		return $_[0]->confirm(WebGUI::International::get(17,$_[0]->get("namespace")),
 			WebGUI::URL::page('func=deleteSubmissionConfirm&wid='.$session{form}{wid}.'&sid='.$session{form}{sid}));
         } else {
@@ -276,7 +277,7 @@ sub www_deleteSubmission {
 #-------------------------------------------------------------------
 sub www_deleteSubmissionConfirm {
 	my ($owner, $forumId) = WebGUI::SQL->quickArray("select userId,forumId from USS_submission where USS_submissionId=$session{form}{sid}");
-        if ($owner == $session{user}{userId} || WebGUI::Privilege::isInGroup($_[0]->get("groupToApprove"))) {
+        if ($owner == $session{user}{userId} || WebGUI::Grouping::isInGroup($_[0]->get("groupToApprove"))) {
 		my ($inUseElsewhere) = WebGUI::SQL->quickArray("select count(*) from USS_submission where forumId=".$forumId);
                 unless ($inUseElsewhere > 1) {
 			my $forum = WebGUI::Forum->new($forumId);
@@ -295,7 +296,7 @@ sub www_deleteSubmissionConfirm {
 sub www_denySubmission {
 	my (%submission);
 	tie %submission, 'Tie::CPHash';
-        if (WebGUI::Privilege::isInGroup(4,$session{user}{userId}) || WebGUI::Privilege::isInGroup(3,$session{user}{userId})) {
+        if (WebGUI::Grouping::isInGroup(4,$session{user}{userId}) || WebGUI::Grouping::isInGroup(3,$session{user}{userId})) {
 		%submission = WebGUI::SQL->quickHash("select * from USS_submission where USS_submissionId=$session{form}{sid}");
                 WebGUI::SQL->write("update USS_submission set status='Denied' where USS_submissionId=".quote($session{form}{sid}));
                 WebGUI::MessageLog::addInternationalizedEntry($submission{userId},'',WebGUI::URL::page('func=viewSubmission&wid='.
@@ -403,9 +404,9 @@ sub www_editSubmission {
 		$submission->{contentType} = "mixed";
 		$var{'submission.isNew'} = 1;
 	}
-        return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::isInGroup($_[0]->get("groupToContribute")) 
+        return WebGUI::Privilege::insufficient() unless (WebGUI::Grouping::isInGroup($_[0]->get("groupToContribute")) 
 		|| $submission->{userId} == $session{user}{userId} 
-		|| WebGUI::Privilege::isInGroup($_[0]->get("groupToApprove")));
+		|| WebGUI::Grouping::isInGroup($_[0]->get("groupToApprove")));
 	$var{'link.header.label'} = WebGUI::International::get(90,$_[0]->get("namespace"));
 	$var{'question.header.label'} = WebGUI::International::get(84,$_[0]->get("namespace"));
         $var{'submission.header.label'} = WebGUI::International::get(19,$_[0]->get("namespace"));
@@ -571,8 +572,8 @@ sub www_editSubmissionSave {
 	$submission = $_[0]->getCollateral("USS_submission","USS_submissionId",$session{form}{sid});
         if ($submission->{userId} == $session{user}{userId} 
 		|| ($submission->{USS_submissionId} eq "new" 
-		&& WebGUI::Privilege::isInGroup($_[0]->get("groupToContribute"))) 
-		|| WebGUI::Privilege::isInGroup($_[0]->get("groupToApprove"))) {
+		&& WebGUI::Grouping::isInGroup($_[0]->get("groupToContribute"))) 
+		|| WebGUI::Grouping::isInGroup($_[0]->get("groupToApprove"))) {
                 if ($session{form}{sid} eq "new") {
 			my $forum = WebGUI::Forum->create({
 				masterForumId=>$_[0]->get("forumId"),
@@ -609,7 +610,7 @@ sub www_editSubmissionSave {
 		$file->save("attachment");
 		$hash{attachment} = $file->getFilename if ($file->getFilename ne "");
 		unless ($_[0]->get("defaultStatus") eq "Approved") {
-			unless (WebGUI::Privilege::isInGroup($_[0]->get("groupToApprove")) ) {
+			unless (WebGUI::Grouping::isInGroup($_[0]->get("groupToApprove")) ) {
 				$hash{status} = $_[0]->get("defaultStatus");
 				WebGUI::MessageLog::addInternationalizedEntry('',$_[0]->get("groupToApprove"),
 					WebGUI::URL::page('func=viewSubmission&wid='.$_[0]->get("wobjectId").'&sid='.
@@ -627,14 +628,14 @@ sub www_editSubmissionSave {
 
 #-------------------------------------------------------------------
 sub www_moveSubmissionDown {
-        return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId")));
+        return WebGUI::Privilege::insufficient() unless ($_[0]->canEdit);
         $_[0]->moveCollateralDown("USS_submission","USS_submissionId",$session{form}{sid}, "USS_id", $_[0]->get("USS_id"));
         return "";
 }
                                                                                                                                                              
 #-------------------------------------------------------------------
 sub www_moveSubmissionUp {
-        return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId")));
+        return WebGUI::Privilege::insufficient() unless ($_[0]->canEdit);
         $_[0]->moveCollateralUp("USS_submission","USS_submissionId",$session{form}{sid}, "USS_id", $_[0]->get("USS_id"));
         return "";
 }
@@ -646,7 +647,7 @@ sub www_view {
 	$numResults = $_[0]->get("submissionsPerPage");
 	$var{"readmore.label"} = WebGUI::International::get(46,$_[0]->get("namespace"));
 	$var{"responses.label"} = WebGUI::International::get(57,$_[0]->get("namespace"));
-	$var{canPost} = WebGUI::Privilege::isInGroup($_[0]->get("groupToContribute"));
+	$var{canPost} = WebGUI::Grouping::isInGroup($_[0]->get("groupToContribute"));
         $var{"post.url"} = WebGUI::URL::page('func=editSubmission&sid=new&wid='.$_[0]->get("wobjectId"));
 	$var{"post.label"} = WebGUI::International::get(20,$_[0]->get("namespace"));
 	$var{"addquestion.label"} = WebGUI::International::get(83,$_[0]->get("namespace"));
@@ -664,7 +665,7 @@ sub www_view {
 	} else {
 		$constraints = "(status='Approved' or (userId=$session{user}{userId} and userId<>1))";
 	}
-        $var{canModerate} = WebGUI::Privilege::isInGroup($_[0]->get("groupToApprove"),$session{user}{userId});
+        $var{canModerate} = WebGUI::Grouping::isInGroup($_[0]->get("groupToApprove"),$session{user}{userId});
 	$var{"title.label"} = WebGUI::International::get(99);
 	$var{"thumbnail.label"} = WebGUI::International::get(52,$_[0]->get("namespace"));
 	$var{"date.label"} = WebGUI::International::get(13,$_[0]->get("namespace"));
@@ -806,7 +807,7 @@ sub www_viewSubmission {
 	return "" unless ($submission->{USS_submissionId});
         return "" unless ($submission->{status} eq 'Approved' ||
                 ($submission->{userId} == $session{user}{userId} && $session{user}{userId} != 1) ||
-                WebGUI::Privilege::isInGroup($_[0]->getValue("groupToApprove")));
+                WebGUI::Grouping::isInGroup($_[0]->getValue("groupToApprove")));
 	my $callback = WebGUI::URL::page("func=viewSubmission&amp;wid=".$_[0]->get("wobjectId")."&amp;sid=".$submission->{USS_submissionId});
 	if ($session{form}{forumOp} ne "" && $session{form}{forumOp} ne "viewForum") {	
 		return WebGUI::Forum::UI::forumOp({
@@ -834,7 +835,7 @@ sub www_viewSubmission {
 	$var{"status.status"} = status($submission->{status});
 	$var{"views.label"} = WebGUI::International::get(514);
 	$var{"views.count"} = $submission->{views};
-        $var{canPost} = WebGUI::Privilege::isInGroup($_[0]->get("groupToContribute"));
+        $var{canPost} = WebGUI::Grouping::isInGroup($_[0]->get("groupToContribute"));
         $var{"post.url"} = WebGUI::URL::page('func=editSubmission&sid=new&wid='.$_[0]->get("wobjectId"));
         $var{"post.label"} = WebGUI::International::get(20,$_[0]->get("namespace"));
 	@data = WebGUI::SQL->quickArray("select max(USS_submissionId) from USS_submission 
@@ -849,12 +850,12 @@ sub www_viewSubmission {
         $var{"next.more"} = ($data[0] ne "");
         $var{"next.url"} = WebGUI::URL::page('func=viewSubmission&sid='.$data[0].'&wid='.$session{form}{wid});
 	$var{"next.label"} = WebGUI::International::get(59,$_[0]->get("namespace"));
-        $var{canEdit} = (($submission->{userId} == $session{user}{userId} || WebGUI::Privilege::isInGroup($_[0]->get("groupToApprove"))) && $session{user}{userId} != 1);
+        $var{canEdit} = (($submission->{userId} == $session{user}{userId} || WebGUI::Grouping::isInGroup($_[0]->get("groupToApprove"))) && $session{user}{userId} != 1);
         $var{"delete.url"} = WebGUI::URL::page('func=deleteSubmission&wid='.$session{form}{wid}.'&sid='.$session{form}{sid});
 	$var{"delete.label"} = WebGUI::International::get(37,$_[0]->get("namespace"));
         $var{"edit.url"} = WebGUI::URL::page('func=editSubmission&wid='.$session{form}{wid}.'&sid='.$session{form}{sid});
 	$var{"edit.label"} = WebGUI::International::get(27,$_[0]->get("namespace"));
-        $var{canChangeStatus} = WebGUI::Privilege::isInGroup($_[0]->get("groupToApprove"),$session{user}{userId});
+        $var{canChangeStatus} = WebGUI::Grouping::isInGroup($_[0]->get("groupToApprove"),$session{user}{userId});
         $var{"approve.url"} = WebGUI::URL::page('func=approveSubmission&wid='.$session{form}{wid}.'&sid='.$session{form}{sid}.'&mlog='.$session{form}{mlog});
 	$var{"approve.label"} = WebGUI::International::get(572);
         $var{"leave.url"} = WebGUI::URL::page('op=viewMessageLog');

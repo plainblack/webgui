@@ -14,6 +14,7 @@ use Exporter;
 use strict;
 use WebGUI::Cache;
 use WebGUI::DateTime;
+use WebGUI::Grouping;
 use WebGUI::Icon;
 use WebGUI::International;
 use WebGUI::Operation::Shared;
@@ -40,14 +41,14 @@ sub _submenu {
 
 #-------------------------------------------------------------------
 sub www_killSession {
-        return WebGUI::Privilege::adminOnly() unless (WebGUI::Privilege::isInGroup(3));
+        return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
 	WebGUI::Session::end($session{form}{sid});
 	return www_viewActiveSessions();
 }
 
 #-------------------------------------------------------------------
 sub www_viewActiveSessions {
-        return WebGUI::Privilege::adminOnly() unless (WebGUI::Privilege::isInGroup(3));
+        return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
 	my ($output, $p, @row, $i, $sth, %data);
 	tie %data, 'Tie::CPHash';
         $output = '<h1>'.WebGUI::International::get(425).'</h1>';
@@ -81,7 +82,7 @@ sub www_viewActiveSessions {
 
 #-------------------------------------------------------------------
 sub www_viewLoginHistory {
-        return WebGUI::Privilege::adminOnly() unless (WebGUI::Privilege::isInGroup(3));
+        return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
 	my ($output, $p, @row, $i, $sth, %data);
 	tie %data, 'Tie::CPHash';
         $output = '<h1>'.WebGUI::International::get(426).'</h1>';
@@ -112,7 +113,7 @@ sub www_viewLoginHistory {
 
 #-------------------------------------------------------------------
 sub www_viewPageReport {
-        return WebGUI::Privilege::adminOnly() unless (WebGUI::Privilege::isInGroup(3));
+        return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
 	my ($output, $count, $user, $data, $sth, %page, $pageId);
 	tie %page, "Tie::IxHash";
 	$output = '<h1>Page Statistics</h1>';
@@ -155,7 +156,7 @@ sub www_viewPageReport {
 
 #-------------------------------------------------------------------
 sub www_viewStatistics {
-        return WebGUI::Privilege::adminOnly() unless (WebGUI::Privilege::isInGroup(3));
+        return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
         my ($output, $data);
 	my $url = "http://www.plainblack.com/downloads/latest-version.txt";
 	my $cache = WebGUI::Cache->new($url,"URL");
@@ -200,7 +201,7 @@ sub www_viewStatistics {
 
 #-------------------------------------------------------------------
 sub www_viewTrafficReport {
-        return WebGUI::Privilege::adminOnly() unless (WebGUI::Privilege::isInGroup(3));
+        return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
 	my ($output, $data);
 	$output = '<h1>Pages</h1>';
 	($data) = WebGUI::SQL->quickArray("select count(*) from pageStatistics where dateStamp>=".(time()-2592000));

@@ -14,6 +14,7 @@ package WebGUI::Wobject::Poll;
 use strict;
 use Tie::CPHash;
 use WebGUI::Form;
+use WebGUI::Grouping;
 use WebGUI::HTMLForm;
 use WebGUI::Icon;
 use WebGUI::International;
@@ -223,7 +224,7 @@ sub www_editSave {
 
 #-------------------------------------------------------------------
 sub www_resetVotes {
-	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId")));
+	return WebGUI::Privilege::insufficient() unless ($_[0]->canEdit);
 	$_[0]->deleteCollateral("Poll_answer","wobjectId",$_[0]->get("wobjectId"));
 	return "";
 }
@@ -234,7 +235,7 @@ sub www_view {
         $var{question} = $_[0]->get("question");
 	if ($_[0]->get("active") eq "0") {
 		$showPoll = 0;
-	} elsif (WebGUI::Privilege::isInGroup($_[0]->get("voteGroup"),$session{user}{userId})) {
+	} elsif (WebGUI::Grouping::isInGroup($_[0]->get("voteGroup"),$session{user}{userId})) {
 		if ($_[0]->_hasVoted()) {
 			$showPoll = 0;
 		} else {
@@ -277,7 +278,7 @@ sub www_view {
 #-------------------------------------------------------------------
 sub www_vote {
 	my $u;
-        if ($session{form}{answer} ne "" && WebGUI::Privilege::isInGroup($_[0]->get("voteGroup"),$session{user}{userId}) && !($_[0]->_hasVoted())) {
+        if ($session{form}{answer} ne "" && WebGUI::Grouping::isInGroup($_[0]->get("voteGroup"),$session{user}{userId}) && !($_[0]->_hasVoted())) {
         	WebGUI::SQL->write("insert into Poll_answer values (".$_[0]->get("wobjectId").", 
 			".quote($session{form}{answer}).", $session{user}{userId}, '$session{env}{REMOTE_ADDR}')");
 		if ($session{setting}{useKarma}) {

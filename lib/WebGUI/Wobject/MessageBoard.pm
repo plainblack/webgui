@@ -137,14 +137,14 @@ sub purge {
 
 #-------------------------------------------------------------------
 sub www_deleteForum {
- 	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId")));
+ 	return WebGUI::Privilege::insufficient() unless ($_[0]->canEdit);
         return $_[0]->confirm(WebGUI::International::get(76,$_[0]->get("namespace")),
                 WebGUI::URL::page('func=deleteForumConfirm&wid='.$_[0]->get("wobjectId").'&forumId='.$session{form}{forumId}));
 }
 
 #-------------------------------------------------------------------
 sub www_deleteForumConfirm {
- 	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId")));
+ 	return WebGUI::Privilege::insufficient() unless ($_[0]->canEdit);
 	my ($inUseElsewhere) = WebGUI::SQL->quickArray("select count(*) from MessageBoard_forums where forumId=".$session{form}{forumId});
         unless ($inUseElsewhere > 1) {
 		my $forum = WebGUI::Forum->new($session{form}{forumId});
@@ -166,7 +166,7 @@ sub www_edit {
 
 #-------------------------------------------------------------------
 sub www_editForum {
- 	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId")));
+ 	return WebGUI::Privilege::insufficient() unless ($_[0]->canEdit);
         $session{page}{useAdminStyle} = 1;
 	my $forumMeta;
 	if ($session{form}{forumId} ne "new") {
@@ -199,7 +199,7 @@ sub www_editForum {
 
 #-------------------------------------------------------------------
 sub www_editForumSave {
- 	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId")));
+ 	return WebGUI::Privilege::insufficient() unless ($_[0]->canEdit);
 	my $forumId = WebGUI::Forum::UI::forumPropertiesSave();
 	if ($session{form}{forumId} eq "new") {
 		my ($seq) = WebGUI::SQL->quickArray("select max(sequenceNumber) from MessageBoard_forums where wobjectId=".$_[0]->get("wobjectId"));
@@ -216,14 +216,14 @@ sub www_editForumSave {
 
 #-------------------------------------------------------------------
 sub www_moveForumDown {
-        return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId")));
+        return WebGUI::Privilege::insufficient() unless ($_[0]->canEdit);
         $_[0]->moveCollateralDown("MessageBoard_forums","forumId",$session{form}{forumId});
         return "";
 }
                                                                                                                                                              
 #-------------------------------------------------------------------
 sub www_moveForumUp {
-        return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId")));
+        return WebGUI::Privilege::insufficient() unless ($_[0]->canEdit);
         $_[0]->moveCollateralUp("MessageBoard_forums","forumId",$session{form}{forumId});
         return "";
 }

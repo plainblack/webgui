@@ -13,6 +13,7 @@ package WebGUI::Operation::Root;
 use Exporter;
 use strict;
 use Tie::CPHash;
+use WebGUI::Grouping;
 use WebGUI::Icon;
 use WebGUI::International;
 use WebGUI::Operation::Shared;
@@ -35,7 +36,7 @@ sub _submenu {
 
 #-------------------------------------------------------------------
 sub www_listRoots {
-        return WebGUI::Privilege::adminOnly() unless(WebGUI::Privilege::isInGroup(3));
+        return WebGUI::Privilege::adminOnly() unless(WebGUI::Grouping::isInGroup(3));
         my ($output, $p, $sth, %data, @row, $i);
         $output = helpIcon(28);
 	$output .= '<h1>'.WebGUI::International::get(408).'</h1>';

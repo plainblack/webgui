@@ -111,5 +111,13 @@ something that uses a macro, wobject, or auth module outside of the usual
 mechanisms that call those plug-ins, then you'll need to write a piece of code
 to load the plug-in at use time.
 
+5.5 Privilege API Change
+
+In 6.1 we move isInGroup from WebGUI::Privilege to WebGUI::Grouping, where it
+belongs. We also moved canViewPage and canEditPage to WebGUI::Page and renamed them 
+to canView and canEdit. And finally, we moved canEditWobject and
+canViewWobject to WebGUI::Wobject and renamed them canView and canEdit and
+converted them from regular functions into methods.
+
 
 

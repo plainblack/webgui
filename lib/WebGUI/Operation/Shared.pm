@@ -13,6 +13,7 @@ package WebGUI::Operation::Shared;
 
 use Exporter;
 use strict;
+use WebGUI::Grouping;
 use WebGUI::International;
 use WebGUI::Session;
 use WebGUI::SQL;
@@ -23,7 +24,7 @@ our @EXPORT = qw(&menuWrapper);
 #-------------------------------------------------------------------
  sub accountOptions {
 	my @array;
-	if (WebGUI::Privilege::isInGroup(12)) {
+	if (WebGUI::Grouping::isInGroup(12)) {
 		my %hash;
 		if ($session{var}{adminOn}) {
 			$hash{'options.display'} .= '<a href="'.WebGUI::URL::page('op=switchOffAdmin').'">'.WebGUI::International::get(12).'</a>';
@@ -55,7 +56,7 @@ our @EXPORT = qw(&menuWrapper);
 	my %logout;
 	$logout{'options.display'} = '<a href="'.WebGUI::URL::page('op=logout').'">'.WebGUI::International::get(64).'</a>'; 
 	push(@array,\%logout);
-	if ($session{setting}{selfDeactivation} && !WebGUI::Privilege::isInGroup(3)){
+	if ($session{setting}{selfDeactivation} && !WebGUI::Grouping::isInGroup(3)){
 	   my %hash;
 	   $hash{'options.display'} = '<a href="'.WebGUI::URL::page('op=deactivateAccount').'">'.WebGUI::International::get(65).'</a>';
 	   push(@array,\%hash);

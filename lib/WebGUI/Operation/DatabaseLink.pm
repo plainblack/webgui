@@ -14,6 +14,7 @@ use Exporter;
 use strict;
 use Tie::CPHash;
 use WebGUI::DatabaseLink;
+use WebGUI::Grouping;
 use WebGUI::Icon;
 use WebGUI::International;
 use WebGUI::Operation::Shared;
@@ -43,7 +44,7 @@ sub _submenu {
 
 #-------------------------------------------------------------------
 sub www_copyDatabaseLink {
-        return WebGUI::Privilege::insufficient unless (WebGUI::Privilege::isInGroup(3));
+        return WebGUI::Privilege::insufficient unless (WebGUI::Grouping::isInGroup(3));
 	my (%db);
 	tie %db, 'Tie::CPHash';
 	%db = WebGUI::SQL->quickHash("select * from databaseLink where databaseLinkId=$session{form}{dlid}");
@@ -54,7 +55,7 @@ sub www_copyDatabaseLink {
 
 #-------------------------------------------------------------------
 sub www_deleteDatabaseLink {
-        return WebGUI::Privilege::insufficient unless (WebGUI::Privilege::isInGroup(3));
+        return WebGUI::Privilege::insufficient unless (WebGUI::Grouping::isInGroup(3));
         my ($output);
         $output .= helpIcon(70);
 	$output .= '<h1>'.WebGUI::International::get(987).'</h1>';
@@ -77,14 +78,14 @@ sub www_deleteDatabaseLink {
 
 #-------------------------------------------------------------------
 sub www_deleteDatabaseLinkConfirm {
-        return WebGUI::Privilege::insufficient unless (WebGUI::Privilege::isInGroup(3));
+        return WebGUI::Privilege::insufficient unless (WebGUI::Grouping::isInGroup(3));
         WebGUI::SQL->write("delete from databaseLink where databaseLinkId=".$session{form}{dlid});
         return www_listDatabaseLinks();
 }
 
 #-------------------------------------------------------------------
 sub www_editDatabaseLink {
-        return WebGUI::Privilege::insufficient unless (WebGUI::Privilege::isInGroup(3));
+        return WebGUI::Privilege::insufficient unless (WebGUI::Grouping::isInGroup(3));
         my ($output, %db, $f);
 	tie %db, 'Tie::CPHash';
 	if ($session{form}{dlid} eq "new") {
@@ -109,7 +110,7 @@ sub www_editDatabaseLink {
 
 #-------------------------------------------------------------------
 sub www_editDatabaseLinkSave {
-        return WebGUI::Privilege::insufficient unless (WebGUI::Privilege::isInGroup(3));
+        return WebGUI::Privilege::insufficient unless (WebGUI::Grouping::isInGroup(3));
 	if ($session{form}{dlid} eq "new") {
 		$session{form}{dlid} = getNextId("databaseLinkId");
 		WebGUI::SQL->write("insert into databaseLink (databaseLinkId) values ($session{form}{dlid})");
@@ -121,7 +122,7 @@ sub www_editDatabaseLinkSave {
 
 #-------------------------------------------------------------------
 sub www_listDatabaseLinks {
-        return WebGUI::Privilege::adminOnly() unless(WebGUI::Privilege::isInGroup(3));
+        return WebGUI::Privilege::adminOnly() unless(WebGUI::Grouping::isInGroup(3));
         my ($output, $p, $sth, %data, @row, $i);
         $output = helpIcon(68);
 	$output .= '<h1>'.WebGUI::International::get(996).'</h1>';

@@ -40,7 +40,8 @@ This package provides an interface for managing WebGUI user and group groupings.
  $arrayRef = WebGUI::Grouping::getGroupsForUser($userId);
  $arrayRef = WebGUI::Grouping::getGroupsInGroup($groupId);
  $arrayRef = WebGUI::Grouping::getUsersInGroup($groupId);
- $yesNo = WebGUI::Grouping::userGroupAdmin($userId,$groupId);
+ $boolean = WebGUI::Grouping::isInGroup($groupId, $userId);
+ $boolean = WebGUI::Grouping::userGroupAdmin($userId,$groupId);
  $epoch = WebGUI::Grouping::userGroupExpireDate($userId,$groupId);
 
 =head1 METHODS
@@ -227,11 +228,13 @@ If set to "1" then the listing will not include expired groupings. Defaults to "
 =cut
 
 sub getGroupsForUser {
-	my $clause = "and expireDate>".time() if ($_[1]);
-	if ($_[0] eq "") {
+	my $userId = shift;
+	my $withoutExpired = shift;
+	my $clause = "and expireDate>".time() if ($withoutExpired);
+	if ($userId eq "") {
                 return [];
         } else {
-                return  WebGUI::SQL->buildArrayRef("select groupId from groupings where userId=$_[0] $clause");
+                return WebGUI::SQL->buildArrayRef("select groupId from groupings where userId=$userId $clause");
         }
 }
 
@@ -309,6 +312,146 @@ sub getUsersInGroup {
 	}
        	return WebGUI::SQL->buildArrayRef("select userId from groupings where $clause");
 }
+
+
+#-------------------------------------------------------------------
+
+=head2 isInGroup ( [ groupId , userId ] )
+
+Returns a boolean (0|1) value signifying that the user has the required privileges. Always returns true for Admins.
+
+=over
+
+=item groupId
+
+The group that you wish to verify against the user. Defaults to group with Id 3 (the Admin group).
+
+=item userId
+
+The user that you wish to verify against the group. Defaults to the currently logged in user.
+
+=back
+
+=cut
+
+sub isInGroup {
+        my ($gid, $uid, @data, %group, $groupId);
+        ($gid, $uid) = @_;
+        $gid = 3 unless (defined $gid);
+        $uid = $session{user}{userId} if ($uid eq "");
+        ### The following several checks are to increase performance. If this section were removed, everything would continue to work as normal. 
+        return 1 if ($gid == 7);		# everyone is in the everyone group
+        return 1 if ($gid == 1 && $uid == 1); 	# visitors are in the visitors group
+	return 0 if ($gid != 1 && $uid == 1); 	# visitors can't be in any group execpt the visitors group
+        return 1 if ($gid==2 && $uid != 1); 	# if you're not a visitor, then you're a registered user
+        ### Look to see if we've already looked up this group. 
+        if ($session{isInGroup}{$gid}{$uid} == 1) {
+                return 1;
+        } elsif ($session{isInGroup}{$gid}{$uid} eq "0") {
+                return 0;
+        }
+        ### Lookup the actual groupings.
+        my $groups = WebGUI::Grouping::getGroupsForUser($uid,1);
+        foreach (@{$groups}) {
+                $session{isInGroup}{$_}{$uid} = 1;
+        }
+        if ($session{isInGroup}{$gid}{$uid} == 1) {
+                return 1;
+        }
+        ### Get data for auxillary checks.
+        tie %group, 'Tie::CPHash';
+        %group = WebGUI::SQL->quickHash("select karmaThreshold,ipFilter,scratchFilter,databaseLinkId,dbQuery,dbCacheTimeout from groups where groupId='$gid'");
+        ### Check IP Address
+        if ($group{ipFilter} ne "") {
+                $group{ipFilter} =~ s/\t//g;
+                $group{ipFilter} =~ s/\r//g;
+                $group{ipFilter} =~ s/\n//g;
+                $group{ipFilter} =~ s/\s//g;
+                $group{ipFilter} =~ s/\./\\\./g;
+                my @ips = split(";",$group{ipFilter});
+                foreach my $ip (@ips) {
+                        if ($session{env}{REMOTE_ADDR} =~ /^$ip/) {
+                                $session{isInGroup}{$gid}{$uid} = 1;
+                                return 1;
+                        }
+                }
+        }
+        ### Check Scratch Variables 
+        if ($group{scratchFilter} ne "") {
+                $group{scratchFilter} =~ s/\t//g;
+                $group{scratchFilter} =~ s/\r//g;
+                $group{scratchFilter} =~ s/\n//g;
+                $group{scratchFilter} =~ s/\s//g;
+                my @vars = split(";",$group{scratchFilter});
+                foreach my $var (@vars) {
+                        my ($name, $value) = split(/\=/,$var);
+                        if ($session{scratch}{$name} eq $value) {
+                                $session{isInGroup}{$gid}{$uid} = 1;
+                                return 1;
+                        }
+                }
+        }
+        ### Check karma levels.
+        if ($session{setting}{useKarma}) {
+                my $karma;
+                if ($uid == $session{user}{userId}) {
+                        $karma = $session{user}{karma};
+                } else {
+                        ($karma) = WebGUI::SQL->quickHash("select karma from users where userId='$uid'");
+                }
+                if ($karma >= $group{karmaThreshold}) {
+                        $session{isInGroup}{$gid}{$uid} = 1;
+                        return 1;
+                }
+        }
+        ### Check external database
+        if ($group{dbQuery} ne "" && $group{databaseLinkId}) {
+                # skip if not logged in and query contains a User macro
+                unless ($group{dbQuery} =~ /\^User/i && $uid == 1) {
+                        my $dbLink = WebGUI::DatabaseLink->new($group{databaseLinkId});
+                        my $dbh = $dbLink->dbh;
+                        if (defined $dbh) {
+                                if ($group{dbQuery} =~ /select 1/i) {
+                                        $group{dbQuery} = WebGUI::Macro::process($group{dbQuery});
+                                        my $sth = WebGUI::SQL->unconditionalRead($group{dbQuery},$dbh);
+                                        unless ($sth->errorCode < 1) {
+                                                WebGUI::ErrorHandler::warn("There was a problem with the database query for group ID $gid.");
+                                        } else {
+                                                my ($result) = $sth->array;
+                                                if ($result == 1) {
+                                                        $session{isInGroup}{$gid}{$uid} = 1;
+                                                        if ($group{dbCacheTimeout} > 0) {
+                                                                WebGUI::Grouping::deleteUsersFromGroups([$uid],[$gid]);
+                                                                WebGUI::Grouping::addUsersToGroups([$uid],[$gid],$group{dbCacheTimeout});
+                                                        }
+                                                } else {
+                                                        $session{isInGroup}{$gid}{$uid} = 0;
+                                                        WebGUI::Grouping::deleteUsersFromGroups([$uid],[$gid]) if ($group{dbCacheTimeout} > 0);
+                                                }
+                                        }
+                                        $sth->finish;
+                                } else {
+                                        WebGUI::ErrorHandler::warn("Database query for group ID $gid must use 'select 1'");
+                                }
+                                $dbLink->disconnect;
+                                return 1 if ($session{isInGroup}{$gid}{$uid});
+                        }
+                }
+        }
+        ### Check for groups of groups.
+        $groups = WebGUI::Grouping::getGroupsInGroup($gid,1);
+        foreach (@{$groups}) {
+                $session{isInGroup}{$_}{$uid} = isInGroup($_, $uid);
+                if ($session{isInGroup}{$_}{$uid}) {
+                        $session{isInGroup}{$gid}{$uid} = 1; # cache current group also so we don't have to do the group in group check again
+                        return 1;
+                }
+        }
+        $session{isInGroup}{$gid}{$uid} = 0;
+        return 0;
+}
+
+
 
 
 

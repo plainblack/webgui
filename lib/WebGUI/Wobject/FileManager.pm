@@ -13,6 +13,7 @@ package WebGUI::Wobject::FileManager;
 use strict;
 use Tie::CPHash;
 use WebGUI::DateTime;
+use WebGUI::Grouping;
 use WebGUI::HTMLForm;
 use WebGUI::Icon;
 use WebGUI::International;
@@ -131,7 +132,7 @@ sub uiLevel {
 
 #-------------------------------------------------------------------
 sub www_deleteFile {
-	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId")));
+	return WebGUI::Privilege::insufficient() unless ($_[0]->canEdit);
 	$_[0]->setCollateral("FileManager_file","FileManager_fileId",
 		{$session{form}{file}=>'',FileManager_fileId=>$session{form}{did}},0,0);
        	return $_[0]->www_editDownload();
@@ -139,14 +140,14 @@ sub www_deleteFile {
 
 #-------------------------------------------------------------------
 sub www_deleteDownload {
-	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId")));
+	return WebGUI::Privilege::insufficient() unless ($_[0]->canEdit);
 	return $_[0]->confirm(WebGUI::International::get(12,$_[0]->get("namespace")),
 		WebGUI::URL::page('func=deleteDownloadConfirm&wid='.$session{form}{wid}.'&did='.$session{form}{did}));
 }
 
 #-------------------------------------------------------------------
 sub www_deleteDownloadConfirm {
-	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId")));
+	return WebGUI::Privilege::insufficient() unless ($_[0]->canEdit);
         my ($output, $file);
         $file = WebGUI::Attachment->new("",$session{form}{wid},$session{form}{did});
         $file->deleteNode;
@@ -160,7 +161,7 @@ sub www_download {
 	my (%download, $file);
 	tie %download,'Tie::CPHash';
 	%download = WebGUI::SQL->quickHash("select * from FileManager_file where FileManager_fileId=$session{form}{did}");
-	if (WebGUI::Privilege::isInGroup($download{groupToView})) {
+	if (WebGUI::Grouping::isInGroup($download{groupToView})) {
 		if ($session{form}{alternateVersion} == 1) {
                         $file = WebGUI::Attachment->new($download{alternateVersion1},
                                 $session{form}{wid},
@@ -209,7 +210,7 @@ sub www_edit {
 
 #-------------------------------------------------------------------
 sub www_editSave {
-	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId")));
+	return WebGUI::Privilege::insufficient() unless ($_[0]->canEdit);
 	$_[0]->SUPER::www_editSave();
         if ($session{form}{proceed} eq "addFile") {
 		$session{form}{did} = "new";
@@ -221,7 +222,7 @@ sub www_editSave {
 
 #-------------------------------------------------------------------
 sub www_editDownload {
-	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId")));
+	return WebGUI::Privilege::insufficient() unless ($_[0]->canEdit);
 	$session{page}{useAdminStyle} = 1;
         my ($output, $file, $f);
 	$file = $_[0]->getCollateral("FileManager_file","FileManager_fileId",$session{form}{did});
@@ -271,7 +272,7 @@ sub www_editDownload {
 
 #-------------------------------------------------------------------
 sub www_editDownloadSave {
-	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId")));
+	return WebGUI::Privilege::insufficient() unless ($_[0]->canEdit);
         my ($file, %files);
 	$files{FileManager_fileId} = $_[0]->setCollateral("FileManager_file", "FileManager_fileId", {
         	FileManager_fileId => $session{form}{did},
@@ -308,7 +309,7 @@ sub www_editDownloadSave {
 
 #-------------------------------------------------------------------
 sub www_moveDownloadDown {
-	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId")));
+	return WebGUI::Privilege::insufficient() unless ($_[0]->canEdit);
         WebGUI::Session::setScratch($_[0]->get("namespace").".".$_[0]->get("wobjectId").".sortDirection","-delete-");
         WebGUI::Session::setScratch($_[0]->get("namespace").".".$_[0]->get("wobjectId").".sort","-delete-");
 	$_[0]->moveCollateralUp("FileManager_file","FileManager_fileId",$session{form}{did});
@@ -317,7 +318,7 @@ sub www_moveDownloadDown {
 
 #-------------------------------------------------------------------
 sub www_moveDownloadUp {
-	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId")));
+	return WebGUI::Privilege::insufficient() unless ($_[0]->canEdit);
         WebGUI::Session::setScratch($_[0]->get("namespace").".".$_[0]->get("wobjectId").".sortDirection","-delete-");
         WebGUI::Session::setScratch($_[0]->get("namespace").".".$_[0]->get("wobjectId").".sort","-delete-");
 	$_[0]->moveCollateralDown("FileManager_file","FileManager_fileId",$session{form}{did});
@@ -357,13 +358,13 @@ sub www_view {
 	$p = WebGUI::Paginator->new($url,$numResults);
 	$p->setDataByQuery($sql);
 	$files = $p->getPageData;
-	my $canEditWobject = (WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId")) || WebGUI::Privilege::canEditPage());
+	my $canEditWobject = ($_[0]->canEdit);
 	foreach $file (@$files) {
 		$file1 = WebGUI::Attachment->new($file->{downloadFile},$_[0]->get("wobjectId"),$file->{FileManager_fileId});
 		$file2 = WebGUI::Attachment->new($file->{alternateVersion1},$_[0]->get("wobjectId"),$file->{FileManager_fileId});
 		$file3 = WebGUI::Attachment->new($file->{alternateVersion2},$_[0]->get("wobjectId"),$file->{FileManager_fileId});
 		push (@fileloop,{
-			"file.canView"=>(WebGUI::Privilege::isInGroup($file->{groupToView}) || $canEditWobject),
+			"file.canView"=>(WebGUI::Grouping::isInGroup($file->{groupToView}) || $canEditWobject),
 			"file.controls"=>deleteIcon('func=deleteDownload&wid='.$_[0]->get("wobjectId")
 				.'&did='.$file->{FileManager_fileId}).editIcon('func=editDownload&wid='.$_[0]->get("wobjectId")
 				.'&did='.$file->{FileManager_fileId}).moveUpIcon('func=moveDownloadUp&wid='

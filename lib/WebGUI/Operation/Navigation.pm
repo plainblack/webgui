@@ -15,19 +15,20 @@ use strict;
 use Tie::IxHash;
 use Tie::CPHash;
 use WebGUI::DateTime;
+use WebGUI::ErrorHandler;
+use WebGUI::Grouping;
 use WebGUI::HTMLForm;
 use WebGUI::Icon;
 use WebGUI::International;
 use WebGUI::Macro;
+use WebGUI::Navigation;
 use WebGUI::Operation::Shared;
+use WebGUI::Privilege;
 use WebGUI::Session;
 use WebGUI::SQL;
 use WebGUI::URL;
 use WebGUI::Utility;
-use WebGUI::Navigation;
 use WebGUI::TabForm;
-use WebGUI::ErrorHandler;
-use WebGUI::Privilege;
 
 our @ISA = qw(Exporter);
 our @EXPORT = qw(&www_listNavigation &www_editNavigation &www_editNavigationSave &www_copyNavigation
@@ -52,7 +53,7 @@ sub _submenu {
 
 #-------------------------------------------------------------------
 sub www_copyNavigation {
-	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::isInGroup(3));
+	return WebGUI::Privilege::insufficient() unless (WebGUI::Grouping::isInGroup(3));
 	my %navigation = WebGUI::SQL->quickHash("select * from Navigation where identifier = ".
 							quote($session{form}{identifier}));
 	WebGUI::SQL->write("insert into Navigation (navigationId, identifier, depth, method, startAt, stopAtLevel,
@@ -68,7 +69,7 @@ sub www_copyNavigation {
 
 #-------------------------------------------------------------------
 sub www_deleteNavigation {
-	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::isInGroup(3));
+	return WebGUI::Privilege::insufficient() unless (WebGUI::Grouping::isInGroup(3));
 	if ($session{form}{navigationId} < 1000 && $session{form}{navigationId} > 0) {
 		return WebGUI::Privilege::vitalComponent();
 	}
@@ -84,7 +85,7 @@ sub www_deleteNavigation {
 
 #-------------------------------------------------------------------
 sub www_deleteNavigationConfirm {
-        return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::isInGroup(3));
+        return WebGUI::Privilege::insufficient() unless (WebGUI::Grouping::isInGroup(3));
         if ($session{form}{navigationId} < 1000 && $session{form}{navigationId} > 0) {
                 return WebGUI::Privilege::vitalComponent();
         }
@@ -94,7 +95,7 @@ sub www_deleteNavigationConfirm {
 
 #-------------------------------------------------------------------
 sub www_editNavigation {
-	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::isInGroup(3));
+	return WebGUI::Privilege::insufficient() unless (WebGUI::Grouping::isInGroup(3));
 
 	my $identifier = shift || $session{form}{identifier};
 	#return  WebGUI::ErrorHandler::warn("editNavigation called without identifier") unless $identifier;	
@@ -241,7 +242,7 @@ sub www_editNavigation {
 
 #-------------------------------------------------------------------
 sub www_editNavigationSave {
-	return WebGUI::Privilege::insufficient()  unless (WebGUI::Privilege::isInGroup(3)); 
+	return WebGUI::Privilege::insufficient()  unless (WebGUI::Grouping::isInGroup(3)); 
 
         # Check on duplicate identifier
 	my ($existingNavigationId, $existingIdentifier) = WebGUI::SQL->quickArray("select navigationId,
@@ -274,7 +275,7 @@ sub www_editNavigationSave {
 
 #-------------------------------------------------------------------
 sub www_listNavigation {
-	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::isInGroup(3));
+	return WebGUI::Privilege::insufficient() unless (WebGUI::Grouping::isInGroup(3));
 	my $output .= helpIcon(84).'<h1>'.WebGUI::International::get(34,'Navigation').'</h1>';
 	my $sth = WebGUI::SQL->read("select navigationId, identifier from Navigation order by identifier");
 	my $i = 0;
@@ -303,7 +304,7 @@ sub www_previewNavigation {
 	#$session{page}{useEmptyStyle} = 1;
 	$session{page}{useAdminStyle} = 1;
 	$session{var}{adminOn} = 0;
-	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::isInGroup(3));
+	return WebGUI::Privilege::insufficient() unless (WebGUI::Grouping::isInGroup(3));
 	my $nav = WebGUI::Navigation->new(	depth=>$session{form}{depth},
 						method=>$session{form}{method},
 						startAt=>$session{form}{startAt},

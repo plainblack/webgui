@@ -6,6 +6,7 @@
  - All plugins are now dynamically loaded. This provides a performance gain of
    over 100% in CGI mode, 10% in mod_perl mode, and less memory usage in
    mod_perl mode.
+ - Changed the privileges API significantly. See docs/migration.txt for details.
 
 
 

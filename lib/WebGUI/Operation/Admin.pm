@@ -12,7 +12,7 @@ package WebGUI::Operation::Admin;
 
 use Exporter;
 use strict;
-use WebGUI::Privilege;
+use WebGUI::Grouping;
 use WebGUI::Session;
 use WebGUI::SQL;
 
@@ -21,7 +21,7 @@ our @EXPORT = qw(&www_switchOffAdmin &www_switchOnAdmin);
 
 #-------------------------------------------------------------------
 sub www_switchOffAdmin {
-	return "" unless (WebGUI::Privilege::isInGroup(12));
+	return "" unless (WebGUI::Grouping::isInGroup(12));
 	WebGUI::SQL->write("update userSession set adminOn=0 where sessionId='$session{var}{sessionId}'");
 	WebGUI::Session::refreshSessionVars($session{var}{sessionId});
 	return "";
@@ -29,7 +29,7 @@ sub www_switchOffAdmin {
 
 #-------------------------------------------------------------------
 sub www_switchOnAdmin {
-	return "" unless (WebGUI::Privilege::isInGroup(12));
+	return "" unless (WebGUI::Grouping::isInGroup(12));
         WebGUI::SQL->write("update userSession set adminOn=1 where sessionId='$session{var}{sessionId}'");
         WebGUI::Session::refreshSessionVars($session{var}{sessionId});
 	return "";

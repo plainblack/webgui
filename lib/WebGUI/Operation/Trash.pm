@@ -14,6 +14,7 @@ use Exporter;
 use strict qw(vars subs);
 use Tie::CPHash;
 use WebGUI::DateTime;
+use WebGUI::Grouping;
 use WebGUI::Icon;
 use WebGUI::Operation::Shared;
 use WebGUI::Paginator;
@@ -121,7 +122,7 @@ sub _submenu {
 	if ($session{form}{systemTrash} ne "1") {
 		$menu{WebGUI::URL::page('op=emptyTrash')} = WebGUI::International::get(11);
 	}
-	if ( ($session{setting}{sharedTrash} ne "1") && (WebGUI::Privilege::isInGroup(3)) ) {
+	if ( ($session{setting}{sharedTrash} ne "1") && (WebGUI::Grouping::isInGroup(3)) ) {
 		$menu{WebGUI::URL::page('op=manageTrash&systemTrash=1')} = WebGUI::International::get(964);
 		if ($session{form}{systemTrash} eq "1") {
 			$menu{WebGUI::URL::page('op=emptyTrash&systemTrash=1')} = WebGUI::International::get(967);
@@ -133,9 +134,9 @@ sub _submenu {
 
 #-------------------------------------------------------------------
 sub www_cutTrashItem {
-	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::isInGroup(4));
+	return WebGUI::Privilege::insufficient() unless (WebGUI::Grouping::isInGroup(4));
 	if ($session{form}{wid} ne "") {
-		if ( ($session{setting}{sharedTrash} ne "1") && (!(WebGUI::Privilege::isInGroup(3)) ) ) {
+		if ( ($session{setting}{sharedTrash} ne "1") && (!(WebGUI::Grouping::isInGroup(3)) ) ) {
 			my ($bufferUserId) = WebGUI::SQL->quickArray("select bufferUserId from wobject "
 								."where wobjectId=" .$session{form}{wid});
 			return WebGUI::Privilege::insufficient() unless ($bufferUserId eq $session{user}{userId});
@@ -149,7 +150,7 @@ sub www_cutTrashItem {
 	} elsif ($session{form}{pageId} ne "") {
 		my $page = WebGUI::Page->getPage($session{form}{pageId});
 
-		if ( ($session{setting}{sharedTrash} ne "1") && (!(WebGUI::Privilege::isInGroup(3)) ) ) {
+		if ( ($session{setting}{sharedTrash} ne "1") && (!(WebGUI::Grouping::isInGroup(3)) ) ) {
 			my ($bufferUserId) = $page->get("bufferUserId");
 			return WebGUI::Privilege::insufficient() unless ($bufferUserId eq $session{user}{userId});
 		}
@@ -165,7 +166,7 @@ sub www_cutTrashItem {
 
 #-------------------------------------------------------------------
 sub www_deleteTrashItem {
-	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::isInGroup(4));
+	return WebGUI::Privilege::insufficient() unless (WebGUI::Grouping::isInGroup(4));
         my ($output);
 	if ($session{form}{wid} ne "") {
         	$output .= helpIcon(14);
@@ -188,9 +189,9 @@ sub www_deleteTrashItem {
 
 #-------------------------------------------------------------------
 sub www_deleteTrashItemConfirm {
-	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::isInGroup(4));
+	return WebGUI::Privilege::insufficient() unless (WebGUI::Grouping::isInGroup(4));
 	if ($session{form}{wid} ne "") {
-		if ( ($session{setting}{sharedTrash} eq "1") || (WebGUI::Privilege::isInGroup(3)) ) {
+		if ( ($session{setting}{sharedTrash} eq "1") || (WebGUI::Grouping::isInGroup(3)) ) {
 			_purgeWobject($session{form}{wid});
 		} else {
 			my ($bufferUserId) = WebGUI::SQL->quickArray("select bufferUserId from wobject "
@@ -202,7 +203,7 @@ sub www_deleteTrashItemConfirm {
 	} elsif ($session{form}{pageId} ne "") {
 		my $page = WebGUI::Page->getPage($session{form}{pageId});
 		
-		unless ( ($session{setting}{sharedTrash} eq "1") || (WebGUI::Privilege::isInGroup(3)) ) {
+		unless ( ($session{setting}{sharedTrash} eq "1") || (WebGUI::Grouping::isInGroup(3)) ) {
 			my ($bufferUserId) = $page->get("bufferUserId");
 			return WebGUI::Privilege::insufficient() unless ($bufferUserId eq $session{user}{userId});
 		}
@@ -221,7 +222,7 @@ sub www_deleteTrashItemConfirm {
 
 #-------------------------------------------------------------------
 sub www_emptyTrash {
-	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::isInGroup(4));
+	return WebGUI::Privilege::insufficient() unless (WebGUI::Grouping::isInGroup(4));
         my ($output);
 	$output = helpIcon(46);
         $output .= '<h1>'.WebGUI::International::get(42).'</h1>';
@@ -241,12 +242,12 @@ sub www_emptyTrash {
 
 #-------------------------------------------------------------------
 sub www_emptyTrashConfirm {
-	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::isInGroup(4));
+	return WebGUI::Privilege::insufficient() unless (WebGUI::Grouping::isInGroup(4));
 	my ($allUsers, $page, $currentPage, $currentWobjectPage);
 	if ($session{setting}{sharedTrash} eq "1") {
 		$allUsers = 1;
 	} elsif ($session{form}{systemTrash} eq "1") {
-		return WebGUI::Privilege::adminOnly() unless (WebGUI::Privilege::isInGroup(3));
+		return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
 		$allUsers = 1;
 	} else {
 		$allUsers = 0;
@@ -271,7 +272,7 @@ sub www_emptyTrashConfirm {
 
 #-------------------------------------------------------------------
 sub www_manageTrash {
-	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::isInGroup(4));
+	return WebGUI::Privilege::insufficient() unless (WebGUI::Grouping::isInGroup(4));
 
 	my ($sth, @data, @row, @sorted_row, $i, $p, $allUsers);
 	my $output = helpIcon(66);
@@ -281,7 +282,7 @@ sub www_manageTrash {
 		$allUsers = 1;
         	$output .= '<h1>'. WebGUI::International::get(962) .'</h1>';
 	} elsif ($session{form}{systemTrash} eq "1") {
-		return WebGUI::Privilege::adminOnly() unless (WebGUI::Privilege::isInGroup(3));
+		return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
 		$allUsers = 1;
         	$output .= '<h1>'. WebGUI::International::get(965) .'</h1>';
 	} else {

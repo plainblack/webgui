@@ -16,6 +16,7 @@ use Tie::IxHash;
 use Tie::CPHash;
 use WebGUI::Attachment;
 use WebGUI::Collateral;
+use WebGUI::Grouping;
 use WebGUI::HTMLForm;
 use WebGUI::Icon;
 use WebGUI::International;
@@ -62,7 +63,7 @@ sub _submenu {
 
 #-------------------------------------------------------------------
 sub www_addThemeComponent {
-        return WebGUI::Privilege::insufficient unless (WebGUI::Privilege::isInGroup(9));
+        return WebGUI::Privilege::insufficient unless (WebGUI::Grouping::isInGroup(9));
         my (@q, $output, $defaultList, $component, $f);
 	my $types = _getComponentTypes();
         push(@q,{query=>"select collateralType,collateralId,name from collateral where collateralType='file' order by name",type=>"file"});
@@ -103,7 +104,7 @@ sub www_addThemeComponent {
 
 #-------------------------------------------------------------------
 sub www_addThemeComponentSave {
-        return WebGUI::Privilege::insufficient unless (WebGUI::Privilege::isInGroup(9));
+        return WebGUI::Privilege::insufficient unless (WebGUI::Grouping::isInGroup(9));
 	my @ids = WebGUI::FormProcessor::selectList("id");
 	foreach my $id (@ids) {
 		$id =~ /^(.*?)\_(.*)/;
@@ -118,7 +119,7 @@ sub www_addThemeComponentSave {
 
 #-------------------------------------------------------------------
 sub www_deleteTheme {
-        return WebGUI::Privilege::insufficient unless (WebGUI::Privilege::isInGroup(9));
+        return WebGUI::Privilege::insufficient unless (WebGUI::Grouping::isInGroup(9));
 	return WebGUI::Privilege::vitalComponent() if ($session{form}{themeId} < 1000 && $session{form}{themeId} > 0);
         my $output = helpIcon(64);
 	$output .= '<h1>'.WebGUI::International::get(42).'</h1>';
@@ -133,7 +134,7 @@ sub www_deleteTheme {
 
 #-------------------------------------------------------------------
 sub www_deleteThemeConfirm {
-        return WebGUI::Privilege::insufficient unless (WebGUI::Privilege::isInGroup(9));
+        return WebGUI::Privilege::insufficient unless (WebGUI::Grouping::isInGroup(9));
 	return WebGUI::Privilege::vitalComponent() if ($session{form}{themeId} < 1000 && $session{form}{themeId} > 0);
 	my $theme = WebGUI::SQL->quickHashRef("select * from theme where themeId=".$session{form}{themeId});
 	unless ($theme->{original}) {
@@ -158,7 +159,7 @@ sub www_deleteThemeConfirm {
 
 #-------------------------------------------------------------------
 sub www_deleteThemeComponent {
-        return WebGUI::Privilege::insufficient unless (WebGUI::Privilege::isInGroup(9));
+        return WebGUI::Privilege::insufficient unless (WebGUI::Grouping::isInGroup(9));
         return WebGUI::Privilege::vitalComponent() if ($session{form}{themeId} < 1000 && $session{form}{themeId} > 0);
         my $output = helpIcon(4);
         $output .= '<h1>'.WebGUI::International::get(42).'</h1>';
@@ -173,7 +174,7 @@ sub www_deleteThemeComponent {
 
 #-------------------------------------------------------------------
 sub www_deleteThemeComponentConfirm {
-        return WebGUI::Privilege::insufficient unless (WebGUI::Privilege::isInGroup(9));
+        return WebGUI::Privilege::insufficient unless (WebGUI::Grouping::isInGroup(9));
         return WebGUI::Privilege::vitalComponent() if ($session{form}{themeId} < 1000 && $session{form}{themeId} > 0);
         WebGUI::SQL->write("delete from themeComponent where themeComponentId=".$session{form}{themeComponentId});
         return www_editTheme();
@@ -181,7 +182,7 @@ sub www_deleteThemeComponentConfirm {
 
 #-------------------------------------------------------------------
 sub www_editTheme {
-        return WebGUI::Privilege::insufficient unless (WebGUI::Privilege::isInGroup(9));
+        return WebGUI::Privilege::insufficient unless (WebGUI::Grouping::isInGroup(9));
         my ($output, $theme, $f);
 	unless($session{form}{themeId} eq "new") {
                	$theme = WebGUI::SQL->quickHashRef("select * from theme where themeId=$session{form}{themeId}");
@@ -242,7 +243,7 @@ sub www_editTheme {
 
 #-------------------------------------------------------------------
 sub www_editThemeSave {
-        return WebGUI::Privilege::insufficient unless (WebGUI::Privilege::isInGroup(9));
+        return WebGUI::Privilege::insufficient unless (WebGUI::Grouping::isInGroup(9));
 	if ($session{form}{themeId} eq "new") {
 		$session{form}{themeId} = getNextId("themeId");
 		WebGUI::SQL->write("insert into theme (themeId,webguiVersion,original,versionNumber) 
@@ -260,7 +261,7 @@ sub www_editThemeSave {
 
 #-------------------------------------------------------------------
 sub www_exportTheme {
-        return WebGUI::Privilege::insufficient unless (WebGUI::Privilege::isInGroup(9));
+        return WebGUI::Privilege::insufficient unless (WebGUI::Grouping::isInGroup(9));
 	my $tempId = "theme".$session{form}{themeId};
 	my $propertyFile = WebGUI::Attachment->new("_theme.properties","temp",$tempId);
 	WebGUI::SQL->write("update theme set versionNumber=versionNumber+1, webguiVersion=".quote($WebGUI::VERSION)
@@ -307,7 +308,7 @@ sub www_exportTheme {
 
 #-------------------------------------------------------------------
 sub www_importTheme {
-        return WebGUI::Privilege::insufficient unless (WebGUI::Privilege::isInGroup(9));
+        return WebGUI::Privilege::insufficient unless (WebGUI::Grouping::isInGroup(9));
 	my $output = helpIcon(63);
 	$output .= '<h1>'.WebGUI::International::get(927).'</h1>';
 	my $f = WebGUI::HTMLForm->new;
@@ -326,7 +327,7 @@ sub www_importTheme {
 
 #-------------------------------------------------------------------
 sub www_importThemeValidate {
-        return WebGUI::Privilege::insufficient unless (WebGUI::Privilege::isInGroup(9));
+        return WebGUI::Privilege::insufficient unless (WebGUI::Grouping::isInGroup(9));
 	my $output = helpIcon(63);
 	$output .= '<h1>'.WebGUI::International::get(927).'</h1>';
 	my $a = WebGUI::Attachment->new("","temp");
@@ -381,7 +382,7 @@ sub www_importThemeValidate {
 
 #-------------------------------------------------------------------
 sub www_importThemeSave {
-        return WebGUI::Privilege::insufficient unless (WebGUI::Privilege::isInGroup(9));
+        return WebGUI::Privilege::insufficient unless (WebGUI::Grouping::isInGroup(9));
 	my $propertiesFile = WebGUI::Attachment->new("_theme.properties","temp",$session{form}{extractionPoint});
 	my $theme = $propertiesFile->getHashref;
 	my $themeId = getNextId("themeId");
@@ -421,7 +422,7 @@ sub www_importThemeSave {
 
 #-------------------------------------------------------------------
 sub www_listThemes {
-        return WebGUI::Privilege::insufficient unless (WebGUI::Privilege::isInGroup(9));
+        return WebGUI::Privilege::insufficient unless (WebGUI::Grouping::isInGroup(9));
         my (@data, @row, $i, $p);
         my $output = helpIcon(61);
 	$output .= '<h1>'.WebGUI::International::get(899).'</h1>';
@@ -449,7 +450,7 @@ sub www_listThemes {
 
 #-------------------------------------------------------------------
 sub www_viewTheme {
-        return WebGUI::Privilege::insufficient unless (WebGUI::Privilege::isInGroup(9));
+        return WebGUI::Privilege::insufficient unless (WebGUI::Grouping::isInGroup(9));
         my ($output, $theme, $f);
         $theme = WebGUI::SQL->quickHashRef("select * from theme where themeId=$session{form}{themeId}");
         $output .= '<h1>'.WebGUI::International::get(930).'</h1>';

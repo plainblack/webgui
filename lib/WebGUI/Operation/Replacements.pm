@@ -12,10 +12,12 @@ package WebGUI::Operation::Replacements;
 
 use Exporter;
 use strict;
+use WebGUI::Grouping;
 use WebGUI::Icon;
 use WebGUI::HTMLForm;
 use WebGUI::International;
 use WebGUI::Operation::Shared;
+use WebGUI::Privilege;
 use WebGUI::Session;
 use WebGUI::SQL;
 
@@ -35,14 +37,14 @@ sub _submenu {
 
 #-------------------------------------------------------------------
 sub www_deleteReplacement {
-	return WebGUI::Privilege::adminOnly() unless (WebGUI::Privilege::isInGroup(3));
+	return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
 	WebGUI::SQL->write("delete from replacements where replacementId=$session{form}{replacementId}");
 	return www_listReplacements();
 }
 
 #-------------------------------------------------------------------
 sub www_editReplacement {
-	return WebGUI::Privilege::adminOnly() unless (WebGUI::Privilege::isInGroup(3));
+	return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
 	my $data = WebGUI::SQL->getRow("replacements","replacementId",$session{form}{replacementId});
 	my $f = WebGUI::HTMLForm->new;
 	$f->hidden(
@@ -73,7 +75,7 @@ sub www_editReplacement {
 
 #-------------------------------------------------------------------
 sub www_editReplacementSave {
-	return WebGUI::Privilege::adminOnly() unless (WebGUI::Privilege::isInGroup(3));
+	return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
 	WebGUI::SQL->setRow("replacements","replacementId",{
 		replacementId=>$session{form}{replacementId},
 		searchFor=>$session{form}{searchFor},
@@ -84,7 +86,7 @@ sub www_editReplacementSave {
 
 #-------------------------------------------------------------------
 sub www_listReplacements {
-	return WebGUI::Privilege::adminOnly() unless (WebGUI::Privilege::isInGroup(3));
+	return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
 	my $output = "<h1>".WebGUI::International::get(1053)."</h1>";
 	$output .= '<table>';
 	my $sth = WebGUI::SQL->read("select replacementId,searchFor from replacements order by searchFor");

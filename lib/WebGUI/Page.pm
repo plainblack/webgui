@@ -19,6 +19,7 @@ use HTML::Template;
 use strict;
 use Tie::IxHash;
 use WebGUI::ErrorHandler;
+use WebGUI::Grouping;
 use WebGUI::HTMLForm;
 use WebGUI::Icon;
 use WebGUI::Persistent::Tree;
@@ -47,6 +48,8 @@ The methods that do affect this hiearchy should be called in a object oriented c
  Non OO functions
  
  use WebGUI::Page;
+ $boolean = WebGUI::Page::canEdit();
+ $boolean = WebGUI::Page::canView();
  $integer = WebGUI::Page::countTemplatePositions($templateId);
  $html = WebGUI::Page::drawTemplate($templateId);
  $html = WebGUI::Page::generate();
@@ -161,6 +164,74 @@ sub add {
 	
 	return $page;
 }
+
+#-------------------------------------------------------------------
+        
+=head2 canEdit ( [ pageId ] )
+        
+Returns a boolean (0|1) value signifying that the user has the required privileges.
+        
+=over           
+        
+=item pageId
+
+The unique identifier for the page that you wish to check the privileges on. Defaults to the current page id.
+
+=back
+
+=cut
+
+sub canEdit {
+	my $pageId = shift || $session{page}{pageId};
+        my (%page);
+        tie %page, 'Tie::CPHash';
+        if ($pageId ne $session{page}{pageId}) {
+                %page = WebGUI::SQL->quickHash("select ownerId,groupIdEdit from page where pageId=$pageId");
+        } else {
+                %page = %{$session{page}};
+        }
+        if ($session{user}{userId} == $page{ownerId}) {
+                return 1;
+        } else {
+		return WebGUI::Grouping::isInGroup($page{groupIdEdit});
+        }
+}       
+
+
+#-------------------------------------------------------------------
+
+=head2 canView ( [ pageId ] )
+
+Returns a boolean (0|1) value signifying that the user has the required privileges. Always returns users that have the rights to edit this page.
+
+=over
+
+=item pageId
+
+The unique identifier for the page that you wish to check the privileges on. Defaults to the current page id.
+
+=back
+
+=cut
+
+sub canView {
+	my $pageId = shift || $session{page}{pageId};
+        my %page;
+        tie %page, 'Tie::CPHash';
+        if ($pageId eq $session{page}{pageId}) {
+                %page = %{$session{page}};
+        } else {
+                %page = WebGUI::SQL->quickHash("select ownerId,groupIdView,startDate,endDate from page where pageId=$pageId");
+        }
+        if ($session{user}{userId} == $page{ownerId}) {
+                return 1;
+        } elsif ($page{startDate} < WebGUI::DateTime::time() && $page{endDate} > WebGUI::DateTime::time() && WebGUI::Grouping::isInGroup($page{groupIdView})) {
+                return 1;
+        } else {
+		return canEditPage($pageId);
+        }
+}
+
 
 #-------------------------------------------------------------------
 
@@ -314,9 +385,9 @@ Generates the content of the page.
 =cut
 
 sub generate {
-        return WebGUI::Privilege::noAccess() unless (WebGUI::Privilege::canViewPage());
+        return WebGUI::Privilege::noAccess() unless (canView());
 	my %var;
-	$var{'page.canEdit'} = WebGUI::Privilege::canEditPage();
+	$var{'page.canEdit'} = canEdit();
         $var{'page.controls'} = pageIcon()
        		.deleteIcon('op=deletePage')
 		.editIcon('op=editPage')
@@ -369,8 +440,8 @@ sub generate {
                 my $w = eval{$cmd->new($wobject)};
                 WebGUI::ErrorHandler::fatalError("Couldn't instanciate wobject: ${$wobject}{namespace}. Root cause: ".$@) if($@);
 		push(@{$var{'position'.$wobject->{templatePosition}.'_loop'}},{
-                        'wobject.canView'=>WebGUI::Privilege::canViewWobject($wobject->{wobjectId}),
-        		'wobject.canEdit'=>WebGUI::Privilege::canEditWobject($wobject->{wobjectId}),
+                        'wobject.canView'=>$w->canView,
+        		'wobject.canEdit'=>$w->canEdit,
 			'wobject.controls'=>$wobjectToolbar,
 			'wobject.controls.drag'=>dragIcon(),
 			'wobject.namespace'=>$wobject->{namespace},

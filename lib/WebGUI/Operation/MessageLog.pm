@@ -14,6 +14,7 @@ use Exporter;
 use strict qw(vars subs);
 use URI;
 use WebGUI::DateTime;
+use WebGUI::Grouping;
 use WebGUI::International;
 use WebGUI::Paginator;
 use WebGUI::Privilege;
@@ -36,7 +37,7 @@ sub _status {
 #-------------------------------------------------------------------
 sub www_viewMessageLog {
    my (@msg, $vars);
-   WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::isInGroup(2,$session{user}{userId}));
+   WebGUI::Privilege::insufficient() unless (WebGUI::Grouping::isInGroup(2,$session{user}{userId}));
    $vars->{displayTitle} = '<h1>'.WebGUI::International::get(159).'</h1>';
    my $p = WebGUI::Paginator->new(WebGUI::URL::page('op=viewMessageLog'));
    my $query = "select messageLogId,subject,url,dateOfEntry,status from messageLog where userId=$session{user}{userId} order by dateOfEntry desc";
@@ -73,7 +74,7 @@ sub www_viewMessageLog {
 #-------------------------------------------------------------------
 sub www_viewMessageLogMessage {
    my ($data, $vars);
-   return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::isInGroup(2,$session{user}{userId}));
+   return WebGUI::Privilege::insufficient() unless (WebGUI::Grouping::isInGroup(2,$session{user}{userId}));
    $vars->{displayTitle} = '<h1>'.WebGUI::International::get(159).'</h1>';
    
    $data = WebGUI::SQL->quickHashRef("select * from messageLog where messageLogId=$session{form}{mlog} and userId=$session{user}{userId}");

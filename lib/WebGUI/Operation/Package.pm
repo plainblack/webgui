@@ -117,7 +117,7 @@ sub _recursePageTree {
 
 #-------------------------------------------------------------------
 sub www_deployPackage {
-	if (WebGUI::Privilege::canEditPage()) {
+	if (WebGUI::Page::canEdit()) {
 		_recursePageTree($session{form}{pid},$session{page}{pageId});
 		return "";
 	} else {

@@ -126,7 +126,7 @@ sub purge {
 
 #-------------------------------------------------------------------
 sub www_deleteEvent {
-	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId")));
+	return WebGUI::Privilege::insufficient() unless ($_[0]->canEdit);
 	my ($output);
 	$output = '<h1>'.WebGUI::International::get(42).'</h1>';
 	$output .= WebGUI::International::get(75,$_[0]->get("namespace")).'<p><blockquote>';
@@ -143,7 +143,7 @@ sub www_deleteEvent {
 
 #-------------------------------------------------------------------
 sub www_deleteEventConfirm {
-	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId")));
+	return WebGUI::Privilege::insufficient() unless ($_[0]->canEdit);
 	if ($session{form}{rid} > 0) {
 		$_[0]->deleteCollateral("EventsCalendar_event","EventsCalendar_recurringId",$session{form}{rid});
 	} else {
@@ -241,7 +241,7 @@ sub www_editSave {
 
 #-------------------------------------------------------------------
 sub www_editEvent {
-	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId")));
+	return WebGUI::Privilege::insufficient() unless ($_[0]->canEdit);
         $session{page}{useAdminStyle} = 1;
         my (%recursEvery, $special, $output, $f, %event);
 	tie %event, 'Tie::CPHash';
@@ -306,7 +306,7 @@ sub www_editEvent {
 
 #-------------------------------------------------------------------
 sub www_editEventSave {
-	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId")));
+	return WebGUI::Privilege::insufficient() unless ($_[0]->canEdit);
 	my (@startDate, @endDate, $until, @eventId, $i, $recurringEventId);
         $startDate[0] = WebGUI::FormProcessor::dateTime("startDate");
 	$startDate[0] = time() unless ($startDate[0] > 0);
@@ -547,7 +547,7 @@ sub www_viewEvent {
 	$var{"end.label"} = WebGUI::International::get(15,$_[0]->get("namespace"));
 	$var{"end.date"} = epochToHuman($event{endDate},"%z");
 	$var{"end.time"} = epochToHuman($event{endDate},"%Z");
-	$var{canEdit} = WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId"));
+	$var{canEdit} = $_[0]->canEdit;
         $var{"edit.url"} = WebGUI::URL::page('func=editEvent&eid='.$session{form}{eid}.'&wid='.$session{form}{wid});
 	$var{"edit.label"} = WebGUI::International::get(575);
         $var{"delete.url"} = WebGUI::URL::page('func=deleteEvent&eid='.$session{form}{eid}.'&wid='

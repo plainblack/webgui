@@ -12,7 +12,9 @@ package WebGUI::Operation::Style;
 
 use Exporter;
 use strict;
+use WebGUI::Grouping;
 use WebGUI::Paginator;
+use WebGUI::Privilege;
 use WebGUI::Session;
 use WebGUI::URL;
 
@@ -42,7 +44,7 @@ sub www_unsetPersonalStyle {
 
 #-------------------------------------------------------------------
 sub www_listRoots {
-        return WebGUI::Privilege::adminOnly() unless(WebGUI::Privilege::isInGroup(3));
+        return WebGUI::Privilege::adminOnly() unless(WebGUI::Grouping::isInGroup(3));
         my ($output, $p, $sth, %data, @row, $i);
         $output = helpIcon(28);
 	$output .= '<h1>'.WebGUI::International::get(408).'</h1>';
