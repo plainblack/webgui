@@ -19,6 +19,9 @@
  - Bugfix [ 855968 ] search shows deleted messages
  - Fixed a bug that wouldn't allow urls like ldap://some.server and
    https://some.server to work in a url field
+ - Bugfix [ 852024 ] Can't copy a USS wobject (Thanks to Len Kranendonk)
+ - Bugfix [ 849438 ] Adding Wobject Fails for Content Managers
+
 
 5.5.3
  - Lowercase file extension in importCollateral.pl while determinating file
