@@ -430,34 +430,14 @@ sub uiLevel {
 }
 
 #-------------------------------------------------------------------
-sub www_deleteAnswer {
-	my $self = shift;
-        return WebGUI::Privilege::insufficient() unless ($self->canEdit);
-	my ($answerCount) = WebGUI::SQL->quickArray("select count(*) from Survey_answer where Survey_questionId=".quote($session{form}{qid}));
-	if ($answerCount > 1) {
-        	return $self->confirm(
-			$self->i18n(45),
-                	WebGUI::URL::page('func=deleteAnswerConfirm&wid='.$self->wid.'&aid='.$session{form}{aid}.'&qid='.$session{form}{qid})
-			);
-	} else {
-		return $self->i18n("cannot delete the last answer");
-	}
-}
-
-#-------------------------------------------------------------------
 sub www_deleteAnswerConfirm {
         return WebGUI::Privilege::insufficient() unless ($_[0]->canEdit);
+        my ($answerCount) = WebGUI::SQL->quickArray("select count(*) from Survey_answer where Survey_questionId=".quote($session{form}{qid}));
+	return $_[0]->i18n("cannot delete the last answer") unless($answerCount);
         WebGUI::SQL->write("delete from Survey_questionResponse where Survey_answerId=".quote($session{form}{aid}));
         $_[0]->deleteCollateral("Survey_answer","Survey_answerId",$session{form}{aid});
         $_[0]->reorderCollateral("Survey_answer","Survey_answerId","Survey_id");
         return $_[0]->www_editQuestion;
-}
-
-#-------------------------------------------------------------------
-sub www_deleteQuestion {
-        return WebGUI::Privilege::insufficient() unless ($_[0]->canEdit);
-        return $_[0]->confirm(WebGUI::International::get(44,$_[0]->get("namespace")),
-        	WebGUI::URL::page('func=deleteQuestionConfirm&wid='.$_[0]->get("wobjectId").'&qid='.$session{form}{qid}));
 }
 
 #-------------------------------------------------------------------
@@ -725,8 +705,8 @@ sub www_editQuestion {
 		$sth = WebGUI::SQL->read("select Survey_answerId,answer from Survey_answer 
 			where Survey_questionId=".quote($question->{Survey_questionId})." order by sequenceNumber");
 		while (%data = $sth->hash) {
-			$output .= deleteIcon('func=deleteAnswer&wid='.$_[0]->get("wobjectId")
-					.'&qid='.$question->{Survey_questionId}.'&aid='.$data{Survey_answerId})
+			$output .= deleteIcon('func=deleteAnswerConfirm&wid='.$_[0]->get("wobjectId")
+					.'&qid='.$question->{Survey_questionId}.'&aid='.$data{Survey_answerId},'',$_[0]->i18n(45))
                                 .editIcon('func=editAnswer&wid='.$_[0]->get("wobjectId").'&qid='.$question->{Survey_questionId}
 					.'&aid='.$data{Survey_answerId})
                                 .moveUpIcon('func=moveAnswerUp&wid='.$_[0]->get("wobjectId")
@@ -884,7 +864,7 @@ sub www_view {
 	my $sth = WebGUI::SQL->read("select Survey_questionId,question from Survey_question where Survey_id=".quote($self->get("Survey_id"))." order by sequenceNumber");
 	while (my %data = $sth->hash) {
 		push(@edit,{
-			'question.edit.controls'=>deleteIcon('func=deleteQuestion&wid='.$self->get("wobjectId").'&qid='.$data{Survey_questionId})
+			'question.edit.controls'=>deleteIcon('func=deleteQuestionConfirm&wid='.$self->get("wobjectId").'&qid='.$data{Survey_questionId},'',WebGUI::International::get(44,$self->get("namespace")))
 				.editIcon('func=editQuestion&wid='.$self->get("wobjectId").'&qid='.$data{Survey_questionId})	
 				.moveUpIcon('func=moveQuestionUp&wid='.$self->get("wobjectId").'&qid='.$data{Survey_questionId})	
 				.moveDownIcon('func=moveQuestionDown&wid='.$self->get("wobjectId").'&qid='.$data{Survey_questionId}),
