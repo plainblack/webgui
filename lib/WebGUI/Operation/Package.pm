@@ -13,6 +13,7 @@ package WebGUI::Operation::Package;
 use Exporter;
 use strict qw(vars subs);
 use WebGUI::Icon;
+use WebGUI::Page;
 use WebGUI::Privilege;
 use WebGUI::Session;
 use WebGUI::SQL;
@@ -49,7 +50,7 @@ sub _recursePageTree {
 	while (%package = $a->hash) {
 		$newPageId = getNextId("pageId");
 		$sequenceNumber++;
-		$urlizedTitle = WebGUI::URL::makeUnique($package{urlizedTitle});
+		$urlizedTitle = WebGUI::Page::makeUnique($package{urlizedTitle});
                 WebGUI::SQL->write("insert into page (
 			pageId,
 			parentId,

@@ -1,19 +1,59 @@
 package WebGUI::ErrorHandler;
 
-#-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2002 Plain Black LLC.
-#-------------------------------------------------------------------
-# Please read the legal notices (docs/legal.txt) and the license
-# (docs/license.txt) that came with this distribution before using
-# this software.
-#-------------------------------------------------------------------
-# http://www.plainblack.com                     info@plainblack.com
-#-------------------------------------------------------------------
+=head1 LEGAL
+
+ -------------------------------------------------------------------
+  WebGUI is Copyright 2001-2002 Plain Black LLC.
+ -------------------------------------------------------------------
+  Please read the legal notices (docs/legal.txt) and the license
+  (docs/license.txt) that came with this distribution before using
+  this software.
+ -------------------------------------------------------------------
+  http://www.plainblack.com                     info@plainblack.com
+ -------------------------------------------------------------------
+
+=cut
 
 use FileHandle;
 use WebGUI::Session;
 
+
+=head1 NAME
+
+ Package WebGUI::ErrorHandler
+
+=head1 SYNOPSIS
+
+ use WebGUI::ErrorHandler;
+ WebGUI::ErrorHandler::audit(message);
+ WebGUI::ErrorHandler::fatalError();
+ WebGUI::ErrorHandler::security(message);
+ WebGUI::ErrorHandler::warn(message);
+
+=head1 DESCRIPTION
+
+ This package provides simple but effective error handling and logging for WebGUI.
+
+=head1 METHODS
+
+ These functions are available from this package:
+
+=cut
+
+
+
 #-------------------------------------------------------------------
+
+=head2 audit ( message )
+
+ Inserts an AUDIT type message into the WebGUI log.
+
+=item message
+
+ Whatever message you wish to insert into the log.
+
+=cut
+
 sub audit {
         my ($log, $data);
         $log = FileHandle->new(">>".$session{config}{logfile}) or fatalError("Can't open log file for audit.");
@@ -24,6 +64,16 @@ sub audit {
 }
 
 #-------------------------------------------------------------------
+
+=head2 fatalError ( )
+
+ Outputs an error message to the user and logs an error. Should only
+ be called if the system cannot recover from an error, or if it would
+ be unsafe to attempt to recover from an error (like compile errors
+ or database errors).
+
+=cut
+
 sub fatalError {
         my ($key, $log, $cgi, $logfile, $config);
 	if (exists $session{cgi}) {
@@ -101,10 +151,22 @@ sub fatalError {
         	}
         	print '</table>';
 	}
+	WebGUI::Session::close();
         exit;
 }
 
 #-------------------------------------------------------------------
+
+=head2 security ( message )
+
+ Adds a SECURITY type message to the log.
+
+=item message
+
+ The message you wish to add to the log.
+
+=cut
+
 sub security {
         my ($log, $data);
         $log = FileHandle->new(">>".$session{config}{logfile}) or fatalError("Can't open log file for audit.");
@@ -116,6 +178,17 @@ sub security {
 }
 
 #-------------------------------------------------------------------
+
+=head2 warn ( message )
+
+ Adds a WARNING type message to the log.
+
+=item message
+
+ The message you wish to add to the log.
+
+=cut
+
 sub warn {
         my ($log);
         $log = FileHandle->new(">>".$session{config}{logfile}) or fatalError("Can't open log file for warning.");

@@ -1,14 +1,20 @@
 package WebGUI::Template;
 
-#-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2002 Plain Black LLC.
-#-------------------------------------------------------------------
-# Please read the legal notices (docs/legal.txt) and the license
-# (docs/license.txt) that came with this distribution before using
-# this software.
-#-------------------------------------------------------------------
-# http://www.plainblack.com                     info@plainblack.com
-#-------------------------------------------------------------------
+=head1 LEGAL
+
+ -------------------------------------------------------------------
+  WebGUI is Copyright 2001-2002 Plain Black LLC.
+ -------------------------------------------------------------------
+  Please read the legal notices (docs/legal.txt) and the license
+  (docs/license.txt) that came with this distribution before using
+  this software.
+ -------------------------------------------------------------------
+  http://www.plainblack.com                     info@plainblack.com
+ -------------------------------------------------------------------
+
+=cut
+
+
 
 use HTML::Template;
 use strict;
@@ -18,7 +24,45 @@ use WebGUI::Session;
 use WebGUI::SQL;
 
 
+=head1 NAME
+
+ Package WebGUI::Template
+
+=head1 SYNOPSIS
+
+ use WebGUI::Template;
+ $template = WebGUI::Template::get($templateId, $namespace);
+ $hashRef = WebGUI::Template::getList($namespace);
+ $html = WebGUI::Template::process($template);
+
+
+=head1 DESCRIPTION
+
+ This package contains utility methods for WebGUI's template system.
+
+=head1 METHODS
+
+ These subroutines are available from this package:
+
+=cut
+
+
 #-------------------------------------------------------------------
+
+=head get ( [ templateId, namespace ] )
+
+ Returns a template.
+
+=item templateId
+
+ Defaults to "1". Specify the templateId of the template to retrieve.
+
+=item namespace
+
+ Defaults to "Page". Specify the namespace of the template to retrieve.
+
+=cut
+
 sub get {
 	my $templateId = $_[0] || 1;
 	my $namespace = $_[1] || "Page";
@@ -27,13 +71,43 @@ sub get {
         return $template;
 }
 
+
 #-------------------------------------------------------------------
+
+=head2 getList ( [ namespace ] )
+
+ Returns a hash reference containing template ids and template names
+ of all the templates in the specified namespace.
+
+=item namespace
+
+ Defaults to "Page". Specify the namespace to build the list for.
+
+=cut
+
 sub getList {
 	my $namespace = $_[0] || "Page";
 	return WebGUI::SQL->buildHashRef("select templateId,name from template where namespace=".quote($namespace)." order by name");
 }
 
+
 #-------------------------------------------------------------------
+
+=head2 process ( template [ , vars ] )
+
+ Evaluate a template replacing template commands for HTML.
+
+=item template
+
+ The template to process.
+
+=item vars
+
+ A hash reference containing template variables and loops. Automatically
+ includes the entire WebGUI session.
+
+=cut
+
 sub process {
 	my ($t, $test, $html);
 	$html = $_[0];

@@ -446,7 +446,7 @@ sub www_editPageSave {
         $session{form}{title} = "no title" if ($session{form}{title} eq "");
         $session{form}{menuTitle} = $session{form}{title} if ($session{form}{menuTitle} eq "");
         $session{form}{urlizedTitle} = $session{form}{menuTitle} if ($session{form}{urlizedTitle} eq "");
-	$session{form}{urlizedTitle} = WebGUI::URL::makeUnique(WebGUI::URL::urlize($session{form}{urlizedTitle}),$session{form}{pageId});
+	$session{form}{urlizedTitle} = WebGUI::Page::makeUnique(WebGUI::URL::urlize($session{form}{urlizedTitle}),$session{form}{pageId});
 	$session{form}{startDate} = setToEpoch($session{form}{startDate}) || setToEpoch(time());
        	$session{form}{endDate} = setToEpoch($session{form}{endDate}) || setToEpoch(addToDate(time(),10));
         WebGUI::SQL->write("update page set 

@@ -1,14 +1,19 @@
 package WebGUI::Style;
 
-#-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2002 Plain Black LLC.
-#-------------------------------------------------------------------
-# Please read the legal notices (docs/legal.txt) and the license
-# (docs/license.txt) that came with this distribution before using
-# this software.
-#-------------------------------------------------------------------
-# http://www.plainblack.com                     info@plainblack.com
-#-------------------------------------------------------------------
+=head1 LEGAL
+
+ -------------------------------------------------------------------
+  WebGUI is Copyright 2001-2002 Plain Black LLC.
+ -------------------------------------------------------------------
+  Please read the legal notices (docs/legal.txt) and the license
+  (docs/license.txt) that came with this distribution before using
+  this software.
+ -------------------------------------------------------------------
+  http://www.plainblack.com                     info@plainblack.com
+ -------------------------------------------------------------------
+
+=cut
+
 
 use strict;
 use Tie::CPHash;
@@ -17,7 +22,35 @@ use WebGUI::Session;
 use WebGUI::SQL;
 use WebGUI::Template;
 
+
+=head1 NAME
+
+ Package WebGUI::Style
+
+=head1 SYNOPSIS
+
+ use WebGUI::Style;
+ $style = WebGUI::Style::get();
+
+=head1 DESCRIPTION
+
+ This package contains utility methods for WebGUI's style system.
+
+=head1 METHODS
+
+ These subroutines are available from this package:
+
+=cut
+
+
 #-------------------------------------------------------------------
+
+=head2 get ( )
+
+ Returns a style based upon the current WebGUI session information.
+
+=cut
+
 sub get {
         my ($header, $footer, %style, $styleId, @body);
         tie %style, 'Tie::CPHash';
@@ -54,3 +87,4 @@ sub get {
 
 
 1;
+

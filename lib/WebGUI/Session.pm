@@ -1,14 +1,19 @@
 package WebGUI::Session;
 
-#-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2002 Plain Black LLC.
-#-------------------------------------------------------------------
-# Please read the legal notices (docs/legal.txt) and the license
-# (docs/license.txt) that came with this distribution before using
-# this software.
-#-------------------------------------------------------------------
-# http://www.plainblack.com			info@plainblack.com
-#-------------------------------------------------------------------
+=head1 LEGAL
+
+ -------------------------------------------------------------------
+  WebGUI is Copyright 2001-2002 Plain Black LLC.
+ -------------------------------------------------------------------
+  Please read the legal notices (docs/legal.txt) and the license
+  (docs/license.txt) that came with this distribution before using
+  this software.
+ -------------------------------------------------------------------
+  http://www.plainblack.com                     info@plainblack.com
+ -------------------------------------------------------------------
+
+=cut
+
 
 use CGI;
 use Data::Config;
@@ -24,6 +29,51 @@ our @ISA = qw(Exporter);
 our @EXPORT = qw(%session);
 our %session = ();
 tie %session, 'Tie::CPHash';
+
+
+=head1 NAME
+
+ Package WebGUI::Session
+
+=head1 SYNOPSIS
+
+ use WebGUI::Session;
+ WebGUI::Session::close();
+ WebGUI::Session::convertVisitorToUser($sessionId,$userId);
+ WebGUI::Session::end($sessionId);
+ $header = WebGUI::Session::httpHeader();
+ $header = WebGUI::Session::httpRedirect($url);
+ WebGUI::Session::open($webguiRoot,$configFilename);
+ WebGUI::Session::refreshPageInfo($pageId);
+ WebGUI::Session::refreshSessionVars($sessionId);
+ WebGUI::Session::refreshUserInfo($userId);
+ WebGUI::Session::setCookie($name,$value);
+ WebGUI::Session::setScratch($name,$value);
+ WebGUI::Session::start($userId);
+
+=head1 DESCRIPTION
+
+ This package is the heart and lifeblood of WebGUI. Without it WebGUI
+ could not exist. By using this package a package gains access to
+ WebGUI's $session variable which contains everything WebGUI needs to
+ know to operate.
+
+ NOTE: It is important to distinguish the difference between a WebGUI
+ session and a user session. A user session is attached to a WebGUI
+ session. A WebGUI session is all of the basic data the WebGUI needs
+ to operate.
+
+ TIP: The $session variable is a case-insensitive hash. The contents
+ of the has vary, but can be seen by adding debug=1 to the end of any
+ WebGUI URL while logged in as an admin user.
+
+=head1 METHODS
+
+ These subroutines are available from this package:
+
+=cut
+
+
 
 #-------------------------------------------------------------------
 sub _generateSessionId {
@@ -202,6 +252,14 @@ sub _loadWobjects {
 }
 
 #-------------------------------------------------------------------
+
+=head2 close
+
+ Cleans up a WebGUI session information from memory and disconnects from
+ any resources opened by the session.
+
+=cut
+
 sub close {
 	$session{'dbh'}->disconnect();
 	undef %session;
@@ -209,6 +267,21 @@ sub close {
 }
 
 #-------------------------------------------------------------------
+
+=head2 convertVisitorToUser ( sessionId, userId )
+
+ Converts a visitor session to a user session.
+
+=item sessionId
+
+ The session to convert.
+
+=item userId
+
+ The user for the session to become.
+
+=cut
+
 sub convertVisitorToUser {
 	WebGUI::SQL->write("update userSession set userId=$_[1] where sessionId=".quote($_[0]));
 	$session{var}{userId} = $_[1];
@@ -216,6 +289,17 @@ sub convertVisitorToUser {
 }
 
 #-------------------------------------------------------------------
+
+=head2 end ( sessionId ) 
+
+ Removes the specified user session from memory and database.
+
+=item sessionId
+
+ The session to end.
+
+=cut
+
 sub end {
 	WebGUI::SQL->write("delete from userSession where sessionId='$_[0]'",$session{dbh});
 	WebGUI::SQL->write("delete from userSessionScratch where sessionId='$_[0]'",$session{dbh});
@@ -225,6 +309,13 @@ sub end {
 }
 
 #-------------------------------------------------------------------
+
+=head2 httpHeader ( ) 
+
+ Generates an HTTP header.
+
+=cut
+
 sub httpHeader {
 	unless ($session{header}{charset}) {
 		$session{header}{charset} = $session{language}{characterSet} || "ISO-8859-1";
@@ -241,11 +332,38 @@ sub httpHeader {
 }
 
 #-------------------------------------------------------------------
+
+=head2 httpRedirect ( url )
+
+ Generates an HTTP header for redirect.
+
+=item url
+
+ The URL to redirect to.
+
+=cut
+
 sub httpRedirect {
+
 	return $session{cgi}->redirect($_[0]);
 }
 
 #-------------------------------------------------------------------
+
+=head2 open ( webguiRoot [ , configFile ] )
+
+ Opens a closed ( or new ) WebGUI session.
+
+=item webguiRoot
+
+ The path to the WebGUI files.
+
+=item configFile
+
+ The filename of the config file that WebGUI should operate from.
+
+=cut
+
 sub open {
 	my ($key, $config);
 	###----------------------------
@@ -347,6 +465,18 @@ sub open {
 }
 
 #-------------------------------------------------------------------
+
+=head2 refreshPageInfo ( [ pageId ] ) 
+
+ Updates the WebGUI session to reflect new page information.
+
+=item pageId
+
+ Defaults to page id "1". Specify the page id to change this WebGUI
+ session to use.
+
+=cut
+
 sub refreshPageInfo {
 	my ($pageId);
 	if ($_[0] == 0) {
@@ -358,18 +488,64 @@ sub refreshPageInfo {
 }
 
 #-------------------------------------------------------------------
+
+=head2 refreshSessionVars ( sessionId )
+
+ Updates the user session variables from the database.
+
+ NOTE: This also updates the user information.
+
+=item sessionId
+
+ The session id to update.
+
+=cut
+
 sub refreshSessionVars {
 	_setupSessionVars($_[0],$session{setting}{sessionTimeout});
 	refreshUserInfo($session{var}{userId});
 }
 
 #-------------------------------------------------------------------
+
+=head2 refreshUserInfo ( userId ) 
+
+ Refreshes the user's information from the database into this user
+ session.
+
+=item userId
+
+ The user id to refresh into this session.
+
+=cut
+
 sub refreshUserInfo {
 	_setupUserInfo($_[0]);
 	$session{isInGroup} = ();
 }
 
 #-------------------------------------------------------------------
+
+=head2 setCookie ( name, value [ , timeToLive ] ) 
+
+ Sends a cookie to the browser.
+
+=item name
+
+ The name of the cookie to set. Must be unique from all other cookies
+ from this domain or it will overwrite that cookie.
+
+=item value
+
+ The value to set.
+
+=item timeToLive
+
+ The time that the cookie should remain in the browser. Defaults to
+ "+10y" (10 years from now).
+
+=cut
+
 sub setCookie {
         my $ttl = $_[2] || '+10y';
         #my $domain = $session{env}{SERVER_NAME} if ($session{env}{HTTP_USER_AGENT} =~ m/MSIE/i);
@@ -387,7 +563,19 @@ sub setCookie {
 
 =head2 setScratch ( name, value )
 
- Sets a scratch variable for this user session.
+ Sets a scratch variable for this user session. Scratch variables are
+ just arbitrary bits of data that a programmer may wish to store in
+ a user session from page to page.
+
+=item name
+
+ The name of the scratch variable.
+
+=item value
+
+ The value of the scratch variable. If the value is blank but defined
+ or if it is set to "-delete-" then the scratch variable will be
+ removed from the user session.
 
 =cut
 
@@ -409,6 +597,17 @@ sub setScratch {
 }
 
 #-------------------------------------------------------------------
+
+=head2 start ( userId )
+
+ Start a new user session.
+
+=item
+
+ The user id of the user to create a session for.
+
+=cut
+
 sub start {
 	my ($sessionId);
 	if ($session{cookie}{wgSession} ne "") {  #fix for internet exploder cookie bug

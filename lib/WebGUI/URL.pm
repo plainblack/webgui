@@ -1,22 +1,74 @@
 package WebGUI::URL;
 
-#-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2002 Plain Black LLC.
-#-------------------------------------------------------------------
-# Please read the legal notices (docs/legal.txt) and the license
-# (docs/license.txt) that came with this distribution before using
-# this software.
-#-------------------------------------------------------------------
-# http://www.plainblack.com                     info@plainblack.com
-#-------------------------------------------------------------------
+=head1 LEGAL
+
+ -------------------------------------------------------------------
+  WebGUI is Copyright 2001-2002 Plain Black LLC.
+ -------------------------------------------------------------------
+  Please read the legal notices (docs/legal.txt) and the license
+  (docs/license.txt) that came with this distribution before using
+  this software.
+ -------------------------------------------------------------------
+  http://www.plainblack.com                     info@plainblack.com
+ -------------------------------------------------------------------
+
+=cut
+
 
 use strict;
 use URI::Escape;
 use WebGUI::Session;
-use WebGUI::SQL;
 use WebGUI::Utility;
 
+
+=head1 NAME
+
+ Package WebGUI::URL
+
+=head1 SYNOPSIS
+
+ use WebGUI::URL;
+ $url = WebGUI::URL::append($url,$pairs);
+ $string = WebGUI::URL::escape($string);
+ $url = WebGUI::URL::gateway($url,$pairs);
+ $url = WebGUI::URL::makeCompliant($string);
+ $url = WebGUI::URL::page($url,$pairs);
+ $string = WebGUI::URL::unescape($string);
+ $url = WebGUI::URL::urlize($string);
+
+=head1 DESCRIPTION
+
+ This package provides URL writing functionality. It is important that
+ all WebGUI URLs be written using these methods so that they can contain
+ any extra information that WebGUI needs to add to the URLs in order
+ to function properly.
+
+=head1 METHODS
+
+ These subroutines are available from this package:
+
+=cut
+
+
+
 #-------------------------------------------------------------------
+
+=head2 append ( url, pairs ) 
+
+ Returns a URL after adding some information to the end of it.
+
+=item url
+
+ The URL to append information to.
+
+=item pairs
+
+ Name value pairs to add to the URL in the form of:
+
+ name1=value1&name2=value2&name3=value3
+
+=cut
+
 sub append {
 	my ($url);
 	$url = $_[0];
@@ -29,11 +81,42 @@ sub append {
 }
 
 #-------------------------------------------------------------------
+
+=head2 escape ( string )
+
+ Encodes a string to make it safe to pass in a URL.
+
+ NOTE: See WebGUI::URL::unescape()
+
+=item string
+
+ The string to escape.
+
+=cut
+
 sub escape {
 	return uri_escape($_[0]);
 }
 
+
 #-------------------------------------------------------------------
+
+=head2 gateway ( pageURL [ , pairs ] )
+
+ Generate a URL based on WebGUI's gateway script.
+
+=item pageURL
+
+ The urlized title of a page that you wish to create a URL for.
+
+=item pairs
+
+ Name value pairs to add to the URL in the form of:
+
+ name1=value1&name2=value2&name3=value3
+
+=cut
+
 sub gateway {
         my ($url);
         $url = $session{config}{scripturl}.'/'.$_[0];
@@ -47,6 +130,18 @@ sub gateway {
 }
 
 #-------------------------------------------------------------------
+
+=head2 makeCompliant ( string )
+
+ Returns a string that has made into a WebGUI compliant URL.
+
+=item string
+
+ The string to make compliant. This is usually a page title or a
+ filename.
+
+=cut 
+
 sub makeCompliant {
         my ($value);
 	$value = $_[0];
@@ -60,21 +155,19 @@ sub makeCompliant {
 }
 
 #-------------------------------------------------------------------
-sub makeUnique {
-        my ($url, $test, $pageId);
-        $url = $_[0];
-        $pageId = $_[1] || "new";
-        while (($test) = WebGUI::SQL->quickArray("select urlizedTitle from page where urlizedTitle='$url' and pageId<>'$pageId'")) {
-                if ($url =~ /(.*)(\d+$)/) {
-                        $url = $1.($2+1);
-                } elsif ($test ne "") {
-                        $url .= "2";
-                }
-        }
-        return $url;
-}
 
-#-------------------------------------------------------------------
+=head2 page ( [ pairs ] )
+
+ Returns the URL of the current page.
+
+=item pairs
+
+ Name value pairs to add to the URL in the form of:
+
+ name1=value1&name2=value2&name3=value3
+
+=cut
+
 sub page {
 	my ($url);
 	$url = $session{page}{url};
@@ -88,11 +181,36 @@ sub page {
 }
 
 #-------------------------------------------------------------------
+
+=head2 unescape
+
+ Decodes a string that was URL encoded.
+
+ NOTE: See WebGUI::URL::escape()
+
+=item string
+
+ The string to unescape.
+
+=cut
+
 sub unescape {
 	return uri_unescape($_[0]);
 }
 
 #-------------------------------------------------------------------
+
+=head2 urlize ( string )
+
+ Same as makeCompliant except that it also lower-cases the string.
+ This is mainly meant for WebGUI page URLs.
+
+=item string
+
+ The string to urlize.
+
+=cut
+
 sub urlize {
 	my ($value);
         $value = lc($_[0]);		#lower cases whole string

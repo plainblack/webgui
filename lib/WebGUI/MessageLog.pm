@@ -1,14 +1,19 @@
 package WebGUI::MessageLog;
 
-#-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2002 Plain Black LLC.
-#-------------------------------------------------------------------
-# Please read the legal notices (docs/legal.txt) and the license
-# (docs/license.txt) that came with this distribution before using
-# this software.
-#-------------------------------------------------------------------
-# http://www.plainblack.com                     info@plainblack.com
-#-------------------------------------------------------------------
+=head1 LEGAL
+
+ -------------------------------------------------------------------
+  WebGUI is Copyright 2001-2002 Plain Black LLC.
+ -------------------------------------------------------------------
+  Please read the legal notices (docs/legal.txt) and the license
+  (docs/license.txt) that came with this distribution before using
+  this software.
+ -------------------------------------------------------------------
+  http://www.plainblack.com                     info@plainblack.com
+ -------------------------------------------------------------------
+
+=cut
+
 
 use strict;
 use Tie::CPHash;
@@ -20,6 +25,29 @@ use WebGUI::SQL;
 use WebGUI::URL;
 use WebGUI::User;
 use WebGUI::Utility;
+
+
+=head1 NAME
+
+ Package WebGUI::MessageLog
+
+=head1 SYNOPSIS
+
+ use WebGUI::MessageLog;
+ WebGUI::MessageLog::addEntry($userId, $groupId,$subject,$message);
+ WebGUI::MessageLog::addInternationalizedEntry($userId,$groupId,$url,$internationalId);
+ WebGUI::MessageLog::completeEntry($messageLogId);
+
+=head1 DESCRIPTION
+
+ This package is WebGUI's notification system.
+
+=head1 METHODS
+
+ These functions are available from this package:
+
+=cut
+
 
 #-------------------------------------------------------------------
 sub _notify {
@@ -43,6 +71,42 @@ sub _notify {
 }
 
 #-------------------------------------------------------------------
+
+=head2 addEntry ( userId, groupId, subject, message [ , url, status ] )
+
+ Adds an entry to the message log and sends out notification to users.
+
+=item userId
+
+ The id of the user that should receive this notification.
+
+ NOTE: This can be left blank if you're specifying a groupId.
+
+=item groupId
+
+ The id of the group that should receive this notification.
+
+ NOTE: This can be left blank if you're specifying a userId.
+
+=item subject
+
+ The subject of the notification.
+
+=item message
+
+ The content of the notification.
+
+=item url
+
+ The URL of any action that should be taken based upon this
+ notification (if any).
+
+=item status
+
+ Defaults to 'notice'. Can be 'pending', 'notice', or 'completed'.
+
+=cut
+
 sub addEntry {
         my ($u, @users, $messageLogId, $sth, $userId, $groupId, $subject, $message, $url, $status, $user);
 	$messageLogId = getNextId("messageLogId");
@@ -70,6 +134,43 @@ sub addEntry {
 }
 
 #-------------------------------------------------------------------
+
+=head2 addInternationalizedEntry ( userId, groupId, url, internationalId [ , namespace, status ] )
+
+ Adds an entry to the message log using a translated message from
+ the internationalization system and sends out notifications to users.
+
+=item userId
+
+ The id of the user that should receive this notification.
+
+ NOTE: This can be left blank if you're specifying a groupId.
+
+=item groupId
+
+ The id of the group that should receive this notification.
+
+ NOTE: This can be left blank if you're specifying a userId.
+
+=item url
+
+ The URL of any action that should be taken based upon this
+ notification (if any).
+
+=item internationalId
+
+ The unique identifier from the internationalization system of the message to send.
+
+=item namespace
+
+ The namespace from the internationalization system of the message to send. Defaults to "WebGUI";
+
+=item status
+
+ Defaults to 'notice'. Can be 'pending', 'notice', or 'completed'.
+
+=cut
+
 sub addInternationalizedEntry {
         my ($u, $userId, $url, $groupId, $internationalId, @users, $messageLogId,$sth, $user, %message, %subject, $message, $subject, $namespace, $status);
         $messageLogId = getNextId("messageLogId");
@@ -103,6 +204,17 @@ sub addInternationalizedEntry {
 }
 
 #-------------------------------------------------------------------
+
+=head2 completeEntry ( messageLogId )
+
+ Set a message log entry to complete.
+
+=item messageLogId
+
+ The id of the message to complete.
+
+=cut
+
 sub completeEntry {
 	WebGUI::SQL->write("update messageLog set status='completed', dateOfEntry=".time()." where messageLogId='$_[0]'");
 }

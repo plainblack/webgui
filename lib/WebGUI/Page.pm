@@ -1,14 +1,19 @@
 package WebGUI::Page;
 
-#-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2002 Plain Black LLC.
-#-------------------------------------------------------------------
-# Please read the legal notices (docs/legal.txt) and the license
-# (docs/license.txt) that came with this distribution before using
-# this software.
-#-------------------------------------------------------------------
-# http://www.plainblack.com                     info@plainblack.com
-#-------------------------------------------------------------------
+=head1 LEGAL
+
+ -------------------------------------------------------------------
+  WebGUI is Copyright 2001-2002 Plain Black LLC.
+ -------------------------------------------------------------------
+  Please read the legal notices (docs/legal.txt) and the license
+  (docs/license.txt) that came with this distribution before using
+  this software.
+ -------------------------------------------------------------------
+  http://www.plainblack.com                     info@plainblack.com
+ -------------------------------------------------------------------
+
+=cut
+
 
 use HTML::Template;
 use strict;
@@ -20,12 +25,49 @@ use WebGUI::SQL;
 use WebGUI::Template;
 
 
+
+=head1 NAME
+
+ Package WebGUI::Page
+
+=head1 SYNOPSIS
+
+ use WebGUI::Page;
+ $integer = WebGUI::Page::countTemplatePositions($templateId);
+ $html = WebGUI::Page::drawTemplate($templateId);
+ $hashRef = WebGUI::Page::getTemplateList();
+ $template = WebGUI::Page::getTemplate($templateId);
+ $hashRef = WebGUI::Page::getTemplatePositions($templateId);
+ $url = WebGUI::Page::makeUnique($url,$pageId);
+
+=head1 DESCRIPTION
+
+ This package provides utility functions for WebGUI's page system.
+
+=head1 METHODS
+
+ These functions are available from this package:
+
+=cut
+
+
 #-------------------------------------------------------------------
 sub _newPositionFormat {
 	return "<tmpl_var page.position".($_[0]+1).">";
 }
 
 #-------------------------------------------------------------------
+
+=head2 countTemplatePositions ( templateId ) 
+
+ Returns the number of template positions in the specified page template.
+
+=item templateId
+
+ The id of the page template you wish to count.
+
+=cut
+
 sub countTemplatePositions {
         my ($template, $i);
         $template = getTemplate($_[0]);
@@ -37,6 +79,17 @@ sub countTemplatePositions {
 }
 
 #-------------------------------------------------------------------
+
+=head2 drawTemplate ( templateId )
+
+ Returns an HTML string containing a small representation of the page template.
+
+=item templateId
+
+ The id of the page template you wish to draw.
+
+=cut
+
 sub drawTemplate {
 	my $template = getTemplate($_[0]);
 	$template =~ s/\n//g;
@@ -48,11 +101,30 @@ sub drawTemplate {
 }
 
 #-------------------------------------------------------------------
+
+=head2 getTemplateList
+
+ Returns a hash reference containing template ids and template titles
+ for all the page templates available in the system. 
+
+=cut
+
 sub getTemplateList {
 	return WebGUI::Template::getList("Page");
 }
 
 #-------------------------------------------------------------------
+
+=head2 getTemplate ( templateId )
+
+ Returns an HTML template.
+
+=item templateId
+
+ The id of the page template you wish to retrieve.
+
+=cut
+
 sub getTemplate {
 	my $template = WebGUI::Template::get($_[0],"Page");
 	$template =~ s/\^(\d+)\;/_newPositionFormat($1)/eg; #compatibility with old-style templates
@@ -60,6 +132,18 @@ sub getTemplate {
 }
 
 #-------------------------------------------------------------------
+
+=head2 getTemplatePositions ( templateId ) 
+
+ Returns a hash reference containing the positions available in
+ the specified page template.
+
+=item templateId
+
+ The id of the page template you wish to retrieve the positions from.
+
+=cut
+
 sub getTemplatePositions {
 	my (%hash, $template, $i);
 	tie %hash, "Tie::IxHash";
@@ -67,6 +151,36 @@ sub getTemplatePositions {
 		$hash{$i} = $i;
 	}
 	return \%hash;
+}
+
+#-------------------------------------------------------------------
+
+=head2 makeUnique ( pageURL, pageId )
+
+ Returns a unique page URL.
+
+=item url
+
+ The URL you're hoping for.
+
+=item pageId
+
+ The page id of the page you're creating a URL for.
+
+=cut
+
+sub makeUnique {
+        my ($url, $test, $pageId);
+        $url = $_[0];
+        $pageId = $_[1] || "new";
+        while (($test) = WebGUI::SQL->quickArray("select urlizedTitle from page where urlizedTitle='$url' and pageId<>'$pageId'")) {
+                if ($url =~ /(.*)(\d+$)/) {
+                        $url = $1.($2+1);
+                } elsif ($test ne "") {
+                        $url .= "2";
+                }
+        }
+        return $url;
 }
 
 
