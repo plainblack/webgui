@@ -35,7 +35,9 @@ sub duplicate {
 		$data{description},$data{processMacros},$data{templatePosition});
 	WebGUI::SQL->write("insert into SQLReport values($newWidgetId, ".quote($data{template}).", ".
 		quote($data{dbQuery}).", ".quote($data{DSN}).", ".quote($data{username}).", ".
-		quote($data{identifier}).", '$data{convertCarriageReturns}', '$data{paginateAfter}')");
+		quote($data{identifier}).", ".quote($data{convertCarriageReturns}).", ".
+		quote($data{paginateAfter}).", ".quote($data{preprocessMacros}).", ".
+		quote($data{debugMode}).")");
 }
 
 #-------------------------------------------------------------------
@@ -70,10 +72,14 @@ sub www_add {
 			WebGUI::Form::selectList("templatePosition",\%hash));
                 $output .= tableFormRow(WebGUI::International::get(85),
 			WebGUI::Form::textArea("description",'','','',1));
+                $output .= tableFormRow(WebGUI::International::get(15,$namespace),
+                        WebGUI::Form::checkbox("preprocessMacros",1));
+                $output .= tableFormRow(WebGUI::International::get(16,$namespace),
+                        WebGUI::Form::checkbox("debugMode",1));
+                $output .= tableFormRow(WebGUI::International::get(4,$namespace),
+                        WebGUI::Form::textArea("dbQuery",''));
                 $output .= tableFormRow(WebGUI::International::get(3,$namespace),
 			WebGUI::Form::textArea("template",'','','',1));
-                $output .= tableFormRow(WebGUI::International::get(4,$namespace),
-			WebGUI::Form::textArea("dbQuery",''));
                 $output .= tableFormRow(WebGUI::International::get(5,$namespace),
 			WebGUI::Form::text("DSN",20,255,$session{config}{dsn}));
                 $output .= tableFormRow(WebGUI::International::get(6,$namespace),
@@ -102,10 +108,16 @@ sub www_addSave {
 			$session{form}{description},$session{form}{processMacros},
 			$session{form}{templatePosition});
 		WebGUI::SQL->write("insert into SQLReport values($widgetId, ".
-			quote($session{form}{template}).", ".quote($session{form}{dbQuery}).", ".
-			quote($session{form}{DSN}).", ".quote($session{form}{username}).", ".
-			quote($session{form}{identifier}).
-			", '$session{form}{convertCarriageReturns}', '$session{form}{paginateAfter}')");
+			quote($session{form}{template}).", ".
+			quote($session{form}{dbQuery}).", ".
+			quote($session{form}{DSN}).", ".
+			quote($session{form}{username}).", ".
+			quote($session{form}{identifier}).", ".
+			quote($session{form}{convertCarriageReturns}).", ".
+			quote($session{form}{paginateAfter}).", ".
+			quote($session{form}{preprocessMacros}).", ".
+			quote($session{form}{debugMode}).
+			")");
 		return "";
 	} else {
 		return WebGUI::Privilege::insufficient();
@@ -147,10 +159,14 @@ sub www_edit {
 			WebGUI::Form::selectList("templatePosition",\%hash,\@array));
                 $output .= tableFormRow(WebGUI::International::get(85),
 			WebGUI::Form::textArea("description",$data{description},50,10,1));
+                $output .= tableFormRow(WebGUI::International::get(15,$namespace),
+                        WebGUI::Form::checkbox("preprocessMacros",1,$data{preprocessMacros}));
+                $output .= tableFormRow(WebGUI::International::get(16,$namespace),
+                        WebGUI::Form::checkbox("debugMode",1,$data{debugMode}));
+                $output .= tableFormRow(WebGUI::International::get(4,$namespace),
+                        WebGUI::Form::textArea("dbQuery",$data{dbQuery},50,10));
                 $output .= tableFormRow(WebGUI::International::get(3,$namespace),
 			WebGUI::Form::textArea("template",$data{template},50,10,1));
-                $output .= tableFormRow(WebGUI::International::get(4,$namespace),
-			WebGUI::Form::textArea("dbQuery",$data{dbQuery},50,10));
                 $output .= tableFormRow(WebGUI::International::get(5,$namespace),
 			WebGUI::Form::text("DSN",20,255,$data{DSN}));
                 $output .= tableFormRow(WebGUI::International::get(6,$namespace),
@@ -176,10 +192,14 @@ sub www_editSave {
 		update();
                 WebGUI::SQL->write("update SQLReport set template=".quote($session{form}{template}).
 			", dbQuery=".quote($session{form}{dbQuery}).
-			", convertCarriageReturns='$session{form}{convertCarriageReturns}', DSN=".
-			quote($session{form}{DSN}).", username=".quote($session{form}{username}).
+			", convertCarriageReturns=".quote($session{form}{convertCarriageReturns}).
+			", DSN=".quote($session{form}{DSN}).
+			", username=".quote($session{form}{username}).
 			", identifier=".quote($session{form}{identifier}).
-			", paginateAfter='$session{form}{paginateAfter}' where widgetId=$session{form}{wid}");
+			", paginateAfter=".quote($session{form}{paginateAfter}).
+			", preprocessMacros=".quote($session{form}{preprocessMacros}).
+			", debugMode=".quote($session{form}{debugMode}).
+			" where widgetId=$session{form}{wid}");
                 return "";
         } else {
                 return WebGUI::Privilege::insufficient();
@@ -192,27 +212,34 @@ sub www_view {
 		@template, $temp, $col);
 	tie %data, 'Tie::CPHash';
 	%data = getProperties($namespace,$_[0]);
-	if (defined %data) {
+	if (%data) {
+		if ($data{preprocessMacros}) {
+			$data{dbQuery} = WebGUI::Macro::process($data{dbQuery});
+		}
 		if ($data{displayTitle} == 1) {
 			$output = "<h1>".$data{title}."</h1>";
 		}
+		$output .= WebGUI::International::get(17,$namespace)." ".$data{dbQuery}."<p>" if ($data{debugMode});
 		if ($data{description} ne "") {
 			$output .= $data{description}.'<p>';
                 }
 	        if ($data{DSN} =~ /\DBI\:\w+\:\w+/) {
         	        $dbh = DBI->connect($data{DSN},$data{username},$data{identifier});
        	 	} else {
-                	$output .= WebGUI::International::get(9,$namespace).'<p>';
+                	$output .= WebGUI::International::get(9,$namespace).'<p>' if ($data{debugMode});
 			WebGUI::ErrorHandler::warn("SQLReport [$_[0]] The DSN specified is of an improper format.");
         	}
 		if (defined $dbh) {
 			if ($data{dbQuery} =~ /select/i) {
 				$sth = WebGUI::SQL->unconditionalRead($data{dbQuery},$dbh);
 			} else {
-				$output .= WebGUI::International::get(10,$namespace).'<p>';
+				$output .= WebGUI::International::get(10,$namespace).'<p>' if ($data{debugMode});
 				WebGUI::ErrorHandler::warn("SQLReport [$_[0]] The SQL query is improperly formatted.");
 			}
-			if ($sth->rows > 0) {
+			unless ($sth->array) {
+                                $output .= WebGUI::International::get(11,$namespace).'<p>' if ($data{debugMode});
+                                WebGUI::ErrorHandler::warn("There was a problem with the query.");
+			} else {
 				if ($data{template} ne "") {
 					@template = split(/\^\-\;/,$data{template});
 				} else {
@@ -239,18 +266,20 @@ sub www_view {
 					$row[$i] = $temp;	
 					$i++;
 				}
+                        	if ($sth->rows < 1) {
+	                		$output .= $template[2];
+        	                       	$output .= WebGUI::International::get(18,$namespace).'<p>';
+                	        } else {
+                			$p = WebGUI::Paginator->new(WebGUI::URL::page(),\@row,$data{paginateAfter});
+                			$output .= $p->getPage($session{form}{pn});
+    	        	    		$output .= $template[2];
+        	        		$output .= $p->getBar($session{form}{pn});
+				}
 				$sth->finish;
-                		$p = WebGUI::Paginator->new(WebGUI::URL::page(),\@row,$data{paginateAfter});
-                		$output .= $p->getPage($session{form}{pn});
-                		$output .= $template[2];
-                		$output .= $p->getBar($session{form}{pn});
-			} else {
-				$output .= WebGUI::International::get(11,$namespace).'<p>';
-				WebGUI::ErrorHandler::warn("SQLReport [$_[0]] There was a problem with the query.");
 			}
 			$dbh->disconnect();
 		} else {
-			$output .= WebGUI::International::get(12,$namespace).'<p>';
+			$output .= WebGUI::International::get(12,$namespace).'<p>' if ($data{debugMode});
 			WebGUI::ErrorHandler::warn("SQLReport [$_[0]] Could not connect to remote database.");
 		}	
 	}

@@ -1,4 +1,4 @@
-package WebGUI::Operation;
+package WebGUI::Macro::FormParam;
 
 #-------------------------------------------------------------------
 # WebGUI is Copyright 2001-2002 Plain Black Software.
@@ -11,20 +11,23 @@ package WebGUI::Operation;
 #-------------------------------------------------------------------
 
 use strict;
-use WebGUI::Operation::Account;
-use WebGUI::Operation::Admin;
-use WebGUI::Operation::Group;
-use WebGUI::Operation::Help;
-use WebGUI::Operation::Image;
-use WebGUI::Operation::Package;
-use WebGUI::Operation::Page;
-use WebGUI::Operation::Root;
-use WebGUI::Operation::Search;
-use WebGUI::Operation::Settings;
-use WebGUI::Operation::Statistics;
-use WebGUI::Operation::Style;
-use WebGUI::Operation::Trash;
-use WebGUI::Operation::User;
+use WebGUI::Macro;
+use WebGUI::Session;
 
+#-------------------------------------------------------------------
+sub _replacement {
+        my (@param);
+        @param = WebGUI::Macro::getParams($1);
+	return $session{form}{$param[0]};
+}
+
+#-------------------------------------------------------------------
+sub process {
+        my ($output, $temp, @param);
+        $output = $_[0];
+        $output =~ s/\^FormParam\((.*?)\)\;/_replacement($1)/ge;
+	return $output;
+}
 
 1;
+

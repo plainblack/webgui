@@ -154,18 +154,6 @@ if (eval { require Net::SMTP }) {
         }
 }
 
-print "XML::RSS module..........................";
-if (eval { require XML::RSS }) {
-        print "OK\n";
-} else {
-        if ($ARGV[0] eq "--install-modules") {
-                print "Installing...\n";
-                CPAN::Shell->install("XML::RSS");
-        } else {
-                print "Please install.\n";
-        }
-}
-
 print "Net::LDAP module.........................";
 if (eval { require Net::LDAP }) {
         print "OK\n";

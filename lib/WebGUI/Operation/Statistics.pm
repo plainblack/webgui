@@ -43,7 +43,7 @@ sub www_viewStatistics {
                 $output .= '<h1>'.WebGUI::International::get(144).'</h1>';
 		$output .= '<table>';
 		$output .= '<tr><td class="tableHeader">'.WebGUI::International::get(145).'</td><td class="tableData">'.$WebGUI::VERSION.' ('.WebGUI::International::get(349).': '.$version.')</td></tr>';
-		($data) = WebGUI::SQL->quickArray("select count(*) from session");
+		($data) = WebGUI::SQL->quickArray("select count(*) from userSession");
 		$output .= '<tr><td class="tableHeader">'.WebGUI::International::get(146).'</td><td class="tableData">'.$data.'</td></tr>';
 		($data) = WebGUI::SQL->quickArray("select count(*)+1 from page where parentId>25");
 		$output .= '<tr><td class="tableHeader">'.WebGUI::International::get(147).'</td><td class="tableData">'.$data.'</td></tr>';

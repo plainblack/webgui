@@ -17,8 +17,7 @@ QnD INSTALL INSTRUCTIONS:
    LWP
    Tie::IxHash
    DBI
-   XML::RSS
-   Mysql
+   Mysql (or some other DB driver)
    Digest::MD5
    Net::LDAP
    Tie::CPHash

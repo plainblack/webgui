@@ -41,8 +41,8 @@ sub www_addUser {
 		$output .= formHeader();
                 $output .= WebGUI::Form::hidden("op","addUserSave");
                 $output .= '<table>';
-                $output .= tableFormRow(WebGUI::International::get(50),WebGUI::Form::text("username",20,30,$session{form}{username}));
-               	$output .= tableFormRow(WebGUI::International::get(51),WebGUI::Form::password("identifier",20,30,$session{form}{username}));
+                $output .= tableFormRow(WebGUI::International::get(50),WebGUI::Form::text("username",20,35,$session{form}{username}));
+               	$output .= tableFormRow(WebGUI::International::get(51),WebGUI::Form::password("identifier",20,35,$session{form}{username}));
 		%hash = ('WebGUI'=>'WebGUI', 'LDAP'=>'LDAP');
 		$array[0] = $session{setting}{authMethod};
                	$output .= tableFormRow(WebGUI::International::get(164),WebGUI::Form::selectList("authMethod",\%hash, \@array));
@@ -203,8 +203,8 @@ sub www_editUser {
                 $output .= WebGUI::Form::hidden("uid",$session{form}{uid});
                 $output .= '<table>';
                 $output .= tableFormRow(WebGUI::International::get(378),$session{form}{uid});
-                $output .= tableFormRow(WebGUI::International::get(50),WebGUI::Form::text("username",20,30,$user{username}));
-                $output .= tableFormRow(WebGUI::International::get(51),WebGUI::Form::password("identifier",20,30,"password"));
+                $output .= tableFormRow(WebGUI::International::get(50),WebGUI::Form::text("username",20,35,$user{username}));
+                $output .= tableFormRow(WebGUI::International::get(51),WebGUI::Form::password("identifier",20,35,"password"));
 		%data = ('WebGUI'=>'WebGUI', 'LDAP'=>'LDAP');
 		$array[0] = $user{authMethod};
                 $output .= tableFormRow(WebGUI::International::get(164),WebGUI::Form::selectList("authMethod",\%data,\@array));

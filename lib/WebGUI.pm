@@ -1,5 +1,5 @@
 package WebGUI;
-our $VERSION = "3.3.0";
+our $VERSION = "3.4.0";
 
 #-------------------------------------------------------------------
 # WebGUI is Copyright 2001-2002 Plain Black Software.
@@ -63,18 +63,16 @@ sub _displayAdminBar {
 			WebGUI::URL::page('op=listGroups')=>WebGUI::International::get(5), 
 			WebGUI::URL::page('op=manageSettings')=>WebGUI::International::get(4), 
 			WebGUI::URL::page('op=listUsers')=>WebGUI::International::get(7),
-			WebGUI::URL::gateway('page_not_found')=>WebGUI::International::get(8),
 			WebGUI::URL::gateway('trash')=>WebGUI::International::get(10),
-			WebGUI::URL::page('op=purgeTrash')=>WebGUI::International::get(11),
+			WebGUI::URL::page('op=listRoots')=>WebGUI::International::get(410),
 			WebGUI::URL::page('op=viewStatistics')=>WebGUI::International::get(144)
 		);
 	}
 	if (WebGUI::Privilege::isInGroup(4,$session{user}{userId})) {
         	%hash = ( 
 			'http://validator.w3.org/check?uri=http%3A%2F%2F'.$session{env}{SERVER_NAME}.
-				$session{page}{url}=>WebGUI::International::get(399),
+				WebGUI::URL::page()=>WebGUI::International::get(399),
 			WebGUI::URL::page('op=listImages')=>WebGUI::International::get(394),
-			WebGUI::URL::gateway('clipboard')=>WebGUI::International::get(9),
 			%hash
 		);
 	}
@@ -187,7 +185,8 @@ sub page {
                        			$contentHash{$widgetList[2]} .= '<hr><a href="'.WebGUI::URL::page('func=edit&wid='.$widgetList[0]).'"><img src="'.$session{setting}{lib}.'/edit.gif" border=0 alt="Edit"></a><a href="'.WebGUI::URL::page('func=cut&wid='.$widgetList[0]).'"><img src="'.$session{setting}{lib}.'/cut.gif" border=0 alt="Cut"></a><a href="'.WebGUI::URL::page('func=copy&wid='.$widgetList[0]).'"><img src="'.$session{setting}{lib}.'/copy.gif" border=0 alt="Copy"></a><a href="'.WebGUI::URL::page('wid='.$widgetList[0].'&func=delete').'"><img src="'.$session{setting}{lib}.'/delete.gif" border=0 alt="Delete"></a><a href="'.WebGUI::URL::page('func=moveUp&wid='.$widgetList[0]).'"><img src="'.$session{setting}{lib}.'/upArrow.gif" border=0 alt="Move Up"></a><a href="'.WebGUI::URL::page('func=moveDown&wid='.$widgetList[0]).'"><img src="'.$session{setting}{lib}.'/downArrow.gif" border=0 alt="Move Down"></a><a href="'.WebGUI::URL::page('func=jumpUp&wid='.$widgetList[0]).'"><img src="'.$session{setting}{lib}.'/jumpUp.gif" border=0 alt="Move to Top"></a><a href="'.WebGUI::URL::page('func=jumpDown&wid='.$widgetList[0]).'"><img src="'.$session{setting}{lib}.'/jumpDown.gif" border=0 alt="Move to Bottom"></a><br>';
 				}
 				$cmd = "WebGUI::Widget::".$widgetList[1]."::www_view";
-				$contentHash{$widgetList[2]} .= &$cmd($widgetList[0])."<p>\n\n";
+				$contentHash{$widgetList[2]} .= '<a name="'.$widgetList[0].'"></a>'.
+					&$cmd($widgetList[0])."<p>\n\n";
 			}
 			$sth->finish;
 			$cmd = "use WebGUI::Template::".$session{page}{template};

@@ -67,6 +67,7 @@ sub www_addPage {
 		$output .= '<h1>'.WebGUI::International::get(98).'</h1>';
 		$output .= formHeader();
 		$output .= WebGUI::Form::hidden("op","addPageSave");
+		$output .= WebGUI::Form::hidden("root","1");
 		$output .= '<table>';
 		$output .= tableFormRow(WebGUI::International::get(99),WebGUI::Form::text("title",20,128,$session{form}{title}));
 		%hash = sortHash(WebGUI::Template::getList());
@@ -85,17 +86,22 @@ sub www_addPage {
 
 #-------------------------------------------------------------------
 sub www_addPageSave {
-	my ($urlizedTitle, $test, $nextSeq);
+	my ($urlizedTitle, $test, $nextSeq, $parentId);
 	if (WebGUI::Privilege::canEditPage()) {
 		($nextSeq) = WebGUI::SQL->quickArray("select max(sequenceNumber)+1 from page where parentId=$session{page}{pageId}");
 		if ($session{form}{title} eq "") {
 			$session{form}{title} = "no title";
 		}
+		if ($session{form}{root}) {
+			$parentId = 0;
+		} else {
+			$parentId = $session{page}{pageId};
+		}
 		$urlizedTitle = WebGUI::URL::urlize($session{form}{title});
 		while (($test) = WebGUI::SQL->quickArray("select urlizedTitle from page where urlizedTitle='$urlizedTitle'")) {
 			$urlizedTitle .= 2;
 		}
-		WebGUI::SQL->write("insert into page values (".getNextId("pageId").", $session{page}{pageId}, ".quote($session{form}{title}).", $session{page}{styleId}, $session{user}{userId}, $session{page}{ownerView}, $session{page}{ownerEdit}, $session{page}{groupId}, $session{page}{groupView}, $session{page}{groupEdit}, $session{page}{worldView}, $session{page}{worldEdit}, '$nextSeq', ".quote($session{form}{metaTags}).", '$urlizedTitle', '$session{form}{defaultMetaTags}', '$session{form}{template}')");
+		WebGUI::SQL->write("insert into page values (".getNextId("pageId").", $parentId, ".quote($session{form}{title}).", $session{page}{styleId}, $session{user}{userId}, $session{page}{ownerView}, $session{page}{ownerEdit}, $session{page}{groupId}, $session{page}{groupView}, $session{page}{groupEdit}, $session{page}{worldView}, $session{page}{worldEdit}, '$nextSeq', ".quote($session{form}{metaTags}).", '$urlizedTitle', '$session{form}{defaultMetaTags}', '$session{form}{template}')");
 		return "";
 	} else {
 		return WebGUI::Privilege::insufficient();

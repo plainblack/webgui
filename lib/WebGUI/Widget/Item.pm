@@ -82,7 +82,7 @@ sub www_addSave {
 		$widgetId = create($session{page}{pageId},$session{form}{widget},$session{form}{title},$session{form}{displayTitle},$session{form}{description},$session{form}{processMacros},$session{form}{templatePosition});
 		$attachment = WebGUI::Attachment->new("",$widgetId);
 		$attachment->save("attachment");
-		WebGUI::SQL->write("insert into Item values ($widgetId, ".quote($session{form}{description}).", ".quote($session{form}{linkURL}).", ".quote($attachment).")");
+		WebGUI::SQL->write("insert into Item values ($widgetId, ".quote($session{form}{description}).", ".quote($session{form}{linkURL}).", ".quote($attachment->getFilename).")");
 		return "";
 	} else {
 		return WebGUI::Privilege::insufficient();

@@ -34,7 +34,7 @@ sub isIn {
         }
         foreach $e (@a, @b) { $union{$e}++ && $isect{$e}++ }
         @isect = keys %isect;
-        if (defined @isect) {
+        if (@isect) {
 		undef @isect;
                 return 1;
         } else {

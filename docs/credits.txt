@@ -15,5 +15,5 @@ Dutch Translation....................Joeri de Bruin
 mod_rewrite Support..................Peter Beardsley / Appropriate Solutions, Inc.
 Oracle testing.......................Richard Caelius
 Image Manager concept................Frank Dillon
-
+RSSLite..............................Scott Thomason
 

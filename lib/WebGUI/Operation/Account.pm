@@ -103,22 +103,28 @@ sub www_createAccount {
 		$output .= WebGUI::Form::hidden("op","createAccountSave");
 		$output .= '<table>';
 		unless ($session{setting}{authMethod} eq "LDAP" && $session{setting}{usernameBinding} eq "yes") {
-			$output .= '<tr><td class="formDescription">'.WebGUI::International::get(50).'</td><td>'.WebGUI::Form::text("username",20,30).'</td></tr>';
+			$output .= tableFormRow(WebGUI::International::get(50),WebGUI::Form::text("username",20,35));
 		}
 		if ($session{setting}{authMethod} eq "LDAP") {
 			$output .= WebGUI::Form::hidden("identifier1","ldap-password");
 			$output .= WebGUI::Form::hidden("identifier2","ldap-password");
-			$output .= '<tr><td class="formDescription">'.$session{setting}{ldapIdName}.'</td><td>'.WebGUI::Form::text("ldapId",20,100).'</td></tr>';
-			$output .= '<tr><td class="formDescription">'.$session{setting}{ldapPasswordName}.'</td><td>'.WebGUI::Form::password("ldapPassword",20,100).'</td></tr>';
+			$output .= tableFormRow($session{setting}{ldapIdName},WebGUI::Form::text("ldapId",20,100));
+			$output .= tableFormRow($session{setting}{ldapPasswordName},
+				WebGUI::Form::password("ldapPassword",20,100));
 		} else {
-			$output .= '<tr><td class="formDescription">'.WebGUI::International::get(51).'</td><td>'.WebGUI::Form::password("identifier1",20,30).'</td></tr>';
-			$output .= '<tr><td class="formDescription">'.WebGUI::International::get(55).'</td><td>'.WebGUI::Form::password("identifier2",20,30).'</td></tr>';
+			$output .= tableFormRow(WebGUI::International::get(51),
+				WebGUI::Form::password("identifier1",20,35));
+			$output .= tableFormRow(WebGUI::International::get(55),
+				WebGUI::Form::password("identifier2",20,35));
 		}
-		$output .= '<tr><td class="formDescription" valign="top">'.WebGUI::International::get(56).'</td><td>'.WebGUI::Form::text("email",20,255).'<span class="formSubtext"><br>'.WebGUI::International::get(57).'</span></td></tr>';
+		$output .= tableFormRow(WebGUI::International::get(56),
+			WebGUI::Form::text("email",20,255).'<span class="formSubtext"><br>'.
+			WebGUI::International::get(57).'</span>');
 		%language = WebGUI::SQL->buildHash("select distinct(language) from international");
 		$array[0] = "English";
-		$output .= '<tr><td class="formDescription" valign="top">'.WebGUI::International::get(304).'</td><td>'.WebGUI::Form::selectList("language",\%language,\@array).'</td></tr>';
-		$output .= '<tr><td></td><td>'.WebGUI::Form::submit(WebGUI::International::get(62)).'</td></tr>';
+		$output .= tableFormRow(WebGUI::International::get(304),
+			WebGUI::Form::selectList("language",\%language,\@array));
+		$output .= formSave();
 		$output .= '</table>';
 		$output .= '</form> ';
 		$output .= '<div class="accountOptions"><ul>';
@@ -231,22 +237,28 @@ sub www_displayAccount {
         	$output .= '<table>';
 		if ($session{user}{authMethod} eq "LDAP" && $session{setting}{usernameBinding} eq "yes") {
 			$output .= WebGUI::Form::hidden("username",$session{user}{username});
-        		$output .= '<tr><td class="formDescription">'.WebGUI::International::get(50).'</td><td>'.$session{user}{username}.'</td></tr>';
+        		$output .= tableFormRow(WebGUI::International::get(50),$session{user}{username});
 		} else {
-        		$output .= '<tr><td class="formDescription">'.WebGUI::International::get(50).'</td><td>'.WebGUI::Form::text("username",20,30,$session{user}{username}).'</td></tr>';
+        		$output .= tableFormRow(WebGUI::International::get(50),
+				WebGUI::Form::text("username",20,35,$session{user}{username}));
 		}
 		if ($session{user}{authMethod} eq "LDAP") {
         		$output .= WebGUI::Form::hidden("identifier1","password");
         		$output .= WebGUI::Form::hidden("identifier2","password");
 		} else {
-        		$output .= '<tr><td class="formDescription">'.WebGUI::International::get(51).'</td><td>'.WebGUI::Form::password("identifier1",20,30,"password").'</td></tr>';
-        		$output .= '<tr><td class="formDescription">'.WebGUI::International::get(55).'</td><td>'.WebGUI::Form::password("identifier2",20,30,"password").'</td></tr>';
+        		$output .= tableFormRow(WebGUI::International::get(51),
+				WebGUI::Form::password("identifier1",20,35,"password"));
+        		$output .= tableFormRow(WebGUI::International::get(55),
+				WebGUI::Form::password("identifier2",20,35,"password"));
 		}
-        	$output .= '<tr><td class="formDescription" valign="top">'.WebGUI::International::get(56).'</td><td>'.WebGUI::Form::text("email",20,255,$session{user}{email}).'<span class="formSubtext"><br>'.WebGUI::International::get(57).'</span></td></tr>';
+        	$output .= tableFormRow(WebGUI::International::get(56),
+			WebGUI::Form::text("email",20,255,$session{user}{email}).
+			'<span class="formSubtext"><br>'.WebGUI::International::get(57).'</span>');
 		%hash = WebGUI::SQL->buildHash("select distinct(language) from international");
 		$array[0] = $session{user}{language};
-        	$output .= '<tr><td class="formDescription" valign="top">'.WebGUI::International::get(304).'</td><td>'.WebGUI::Form::selectList("language",\%hash,\@array).'</td></tr>';
-		$output .= '<tr><td></td><td>'.WebGUI::Form::submit(WebGUI::International::get(62)).'</td></tr>';
+        	$output .= tableFormRow(WebGUI::International::get(304),
+			WebGUI::Form::selectList("language",\%hash,\@array));
+		$output .= formSave();
         	$output .= '</table>';
         	$output .= '</form> ';
 		$output .= _accountOptions();
@@ -266,8 +278,10 @@ sub www_displayLogin {
 		$output .= formHeader();
 		$output .= WebGUI::Form::hidden("op","login");
 		$output .= '<table>';
-        	$output .= '<tr><td class="formDescription">'.WebGUI::International::get(50).'</td><td>'.WebGUI::Form::text("username",20,30).'</td></tr>';
-        	$output .= '<tr><td class="formDescription">'.WebGUI::International::get(51).'</td><td>'.WebGUI::Form::password("identifier",20,30).'</td></tr>';
+        	$output .= tableFormRow(WebGUI::International::get(50),
+			WebGUI::Form::text("username",20,35));
+        	$output .= tableFormRow(WebGUI::International::get(51),
+			WebGUI::Form::password("identifier",20,35));
 		$output .= '<tr><td></td><td>'.WebGUI::Form::submit(WebGUI::International::get(52)).'</td></tr>';
 		$output .= '</table>';
 		$output .= '</form>';
@@ -296,41 +310,65 @@ sub www_editProfile {
                 $output .= WebGUI::Form::hidden("uid",$session{user}{userId});
                 $output .= '<table>';
 		if ($session{setting}{profileName}) {
-			$output .= '<tr><td class="formDescription" valign="top">'.WebGUI::International::get(314).'</td><td>'.WebGUI::Form::text("firstName",20,50,$session{user}{firstName}).'</td></tr>';
-                	$output .= '<tr><td class="formDescription" valign="top">'.WebGUI::International::get(315).'</td><td>'.WebGUI::Form::text("middleName",20,50,$session{user}{middleName}).'</td></tr>';
-                	$output .= '<tr><td class="formDescription" valign="top">'.WebGUI::International::get(316).'</td><td>'.WebGUI::Form::text("lastName",20,50,$session{user}{lastName}).'</td></tr>';
+			$output .= tableFormRow(WebGUI::International::get(314),
+				WebGUI::Form::text("firstName",20,50,$session{user}{firstName}));
+                	$output .= tableFormRow(WebGUI::International::get(315),
+				WebGUI::Form::text("middleName",20,50,$session{user}{middleName}));
+                	$output .= tableFormRow(WebGUI::International::get(316),
+				WebGUI::Form::text("lastName",20,50,$session{user}{lastName}));
 		}
 		if ($session{setting}{profileExtraContact}) {
-                	$output .= '<tr><td class="formDescription" valign="top">'.WebGUI::International::get(317).'</td><td>'.WebGUI::Form::text("icq",20,30,$session{user}{icq}).'</td></tr>';
-                	$output .= '<tr><td class="formDescription" valign="top">'.WebGUI::International::get(318).'</td><td>'.WebGUI::Form::text("aim",20,30,$session{user}{aim}).'</td></tr>';
-                	$output .= '<tr><td class="formDescription" valign="top">'.WebGUI::International::get(319).'</td><td>'.WebGUI::Form::text("msnIM",20,30,$session{user}{msnIM}).'</td></tr>';
-                	$output .= '<tr><td class="formDescription" valign="top">'.WebGUI::International::get(320).'</td><td>'.WebGUI::Form::text("yahooIM",20,30,$session{user}{yahooIM}).'</td></tr>';
-                	$output .= '<tr><td class="formDescription" valign="top">'.WebGUI::International::get(321).'</td><td>'.WebGUI::Form::text("cellPhone",20,30,$session{user}{cellPhone}).'</td></tr>';
-                	$output .= '<tr><td class="formDescription" valign="top">'.WebGUI::International::get(322).'</td><td>'.WebGUI::Form::text("pager",20,30,$session{user}{pager}).'</td></tr>';
+                	$output .= tableFormRow(WebGUI::International::get(317),
+				WebGUI::Form::text("icq",20,30,$session{user}{icq}));
+                	$output .= tableFormRow(WebGUI::International::get(318),
+				WebGUI::Form::text("aim",20,30,$session{user}{aim}));
+                	$output .= tableFormRow(WebGUI::International::get(319),
+				WebGUI::Form::text("msnIM",20,30,$session{user}{msnIM}));
+                	$output .= tableFormRow(WebGUI::International::get(320),
+				WebGUI::Form::text("yahooIM",20,30,$session{user}{yahooIM}));
+                	$output .= tableFormRow(WebGUI::International::get(321),
+				WebGUI::Form::text("cellPhone",20,30,$session{user}{cellPhone}));
+                	$output .= tableFormRow(WebGUI::International::get(322),
+				WebGUI::Form::text("pager",20,30,$session{user}{pager}));
 		}
 		if ($session{setting}{profileHome}) {
-                	$output .= '<tr><td class="formDescription" valign="top">'.WebGUI::International::get(323).'</td><td>'.WebGUI::Form::text("homeAddress",20,128,$session{user}{homeAddress}).'</td></tr>';
-                	$output .= '<tr><td class="formDescription" valign="top">'.WebGUI::International::get(324).'</td><td>'.WebGUI::Form::text("homeCity",20,30,$session{user}{homeCity}).'</td></tr>';
-                	$output .= '<tr><td class="formDescription" valign="top">'.WebGUI::International::get(325).'</td><td>'.WebGUI::Form::text("homeState",20,30,$session{user}{homeState}).'</td></tr>';
-                	$output .= '<tr><td class="formDescription" valign="top">'.WebGUI::International::get(326).'</td><td>'.WebGUI::Form::text("homeZip",20,15,$session{user}{homeZip}).'</td></tr>';
-                	$output .= '<tr><td class="formDescription" valign="top">'.WebGUI::International::get(327).'</td><td>'.WebGUI::Form::text("homeCountry",20,30,$session{user}{homeCountry}).'</td></tr>';
-                	$output .= '<tr><td class="formDescription" valign="top">'.WebGUI::International::get(328).'</td><td>'.WebGUI::Form::text("homePhone",20,30,$session{user}{homePhone}).'</td></tr>';
+                	$output .= tableFormRow(WebGUI::International::get(323),
+				WebGUI::Form::text("homeAddress",20,128,$session{user}{homeAddress}));
+                	$output .= tableFormRow(WebGUI::International::get(324),
+				WebGUI::Form::text("homeCity",20,30,$session{user}{homeCity}));
+                	$output .= tableFormRow(WebGUI::International::get(325),
+				WebGUI::Form::text("homeState",20,30,$session{user}{homeState}));
+                	$output .= tableFormRow(WebGUI::International::get(326),
+				WebGUI::Form::text("homeZip",20,15,$session{user}{homeZip}));
+                	$output .= tableFormRow(WebGUI::International::get(327),
+				WebGUI::Form::text("homeCountry",20,30,$session{user}{homeCountry}));
+                	$output .= tableFormRow(WebGUI::International::get(328),
+				WebGUI::Form::text("homePhone",20,30,$session{user}{homePhone}));
 		}
 		if ($session{setting}{profileWork}) {
-                	$output .= '<tr><td class="formDescription" valign="top">'.WebGUI::International::get(329).'</td><td>'.WebGUI::Form::text("workAddress",20,128,$session{user}{workAddress}).'</td></tr>';
-                	$output .= '<tr><td class="formDescription" valign="top">'.WebGUI::International::get(330).'</td><td>'.WebGUI::Form::text("workCity",20,30,$session{user}{workCity}).'</td></tr>';
-                	$output .= '<tr><td class="formDescription" valign="top">'.WebGUI::International::get(331).'</td><td>'.WebGUI::Form::text("workState",20,30,$session{user}{workState}).'</td></tr>';
-                	$output .= '<tr><td class="formDescription" valign="top">'.WebGUI::International::get(332).'</td><td>'.WebGUI::Form::text("workZip",20,15,$session{user}{workZip}).'</td></tr>';
-			$output .= '<tr><td class="formDescription" valign="top">'.WebGUI::International::get(333).'</td><td>'.WebGUI::Form::text("workCountry",20,30,$session{user}{workCountry}).'</td></tr>';
-                	$output .= '<tr><td class="formDescription" valign="top">'.WebGUI::International::get(334).'</td><td>'.WebGUI::Form::text("workPhone",20,30,$session{user}{workPhone}).'</td></tr>';
+                	$output .= tableFormRow(WebGUI::International::get(329),
+				WebGUI::Form::text("workAddress",20,128,$session{user}{workAddress}));
+                	$output .= tableFormRow(WebGUI::International::get(330),
+				WebGUI::Form::text("workCity",20,30,$session{user}{workCity}));
+                	$output .= tableFormRow(WebGUI::International::get(331),
+				WebGUI::Form::text("workState",20,30,$session{user}{workState}));
+                	$output .= tableFormRow(WebGUI::International::get(332),
+				WebGUI::Form::text("workZip",20,15,$session{user}{workZip}));
+			$output .= tableFormRow(WebGUI::International::get(333),
+				WebGUI::Form::text("workCountry",20,30,$session{user}{workCountry}));
+                	$output .= tableFormRow(WebGUI::International::get(334),
+				WebGUI::Form::text("workPhone",20,30,$session{user}{workPhone}));
 		}
 		if ($session{setting}{profileMisc}) {
 			$array[0] = $session{user}{gender};
-                	$output .= '<tr><td class="formDescription" valign="top">'.WebGUI::International::get(335).'</td><td>'.WebGUI::Form::selectList("gender",\%gender,\@array).'</td></tr>';
-                	$output .= '<tr><td class="formDescription" valign="top">'.WebGUI::International::get(336).'</td><td>'.WebGUI::Form::text("birthdate",20,30,$session{user}{birthdate}).'</td></tr>';
-                	$output .= '<tr><td class="formDescription" valign="top">'.WebGUI::International::get(337).'</td><td>'.WebGUI::Form::text("homepage",20,2048,$session{user}{homepage}).'</td></tr>';
+                	$output .= tableFormRow(WebGUI::International::get(335),
+				WebGUI::Form::selectList("gender",\%gender,\@array));
+                	$output .= tableFormRow(WebGUI::International::get(336),
+				WebGUI::Form::text("birthdate",20,30,$session{user}{birthdate}));
+                	$output .= tableFormRow(WebGUI::International::get(337),
+				WebGUI::Form::text("homepage",20,2048,$session{user}{homepage}));
 		}
-                $output .= '<tr><td></td><td>'.WebGUI::Form::submit(WebGUI::International::get(62)).'</td></tr>';
+                $output .= formSave();
                 $output .= '</table>';
                 $output .= '</form>';
                 $output .= _accountOptions();
@@ -407,8 +445,7 @@ sub www_recoverPassword {
 		$output .= formHeader();
                 $output .= WebGUI::Form::hidden("op","recoverPasswordFinish");
                 $output .= '<table>';
-                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(56).
-			'</td><td>'.WebGUI::Form::text("email",20,255).'</td></tr>';
+                $output .= tableFormRow(WebGUI::International::get(56),WebGUI::Form::text("email",20,255));
                 $output .= '<tr><td></td><td>'.WebGUI::Form::submit(WebGUI::International::get(72)).'</td></tr>';
                 $output .= '</table>';
                 $output .= '</form>';

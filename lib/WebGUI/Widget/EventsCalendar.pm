@@ -398,7 +398,7 @@ sub www_view {
 				$row[$i] = _calendarLayout($_[0],$nextDate);
 				($first,$last) = WebGUI::DateTime::monthStartEnd($nextDate);
 				if ($session{form}{pn} eq "" && $first <= time() && $last >= time()) {
-					$session{form}{pn} = $i;
+					$session{form}{pn} = $i+1;
 				}
 				$i++;
 				$nextDate = addToDate($nextDate,0,1,0);

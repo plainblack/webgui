@@ -14,7 +14,7 @@ package WebGUI::Attachment;
 
 =cut
 
-use File::Copy cp;
+use File::Copy qw(cp);
 use File::Path;
 use FileHandle;
 use Image::Magick;
@@ -284,7 +284,7 @@ sub getURL {
 
 sub new {
 	my ($class, $filename, $node, $nodeSub) = @_;
-	my $node = WebGUI::Node->new($node, $nodeSub);
+	$node = WebGUI::Node->new($node, $nodeSub);
 	bless {_node => $node, _filename => $filename}, $class;
 }
 
