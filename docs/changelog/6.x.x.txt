@@ -1,3 +1,7 @@
+6.5.0
+ - Fixed a bug in the Collaboration post where the post end date was set to
+   the start date.
+
 6.4.0
  - You can now see the groups of groups hierarchy in the group manager.
  - Added an initial configuration wizard which prompts the site owner to

@@ -937,7 +937,7 @@ sub www_edit {
 		});
 	$var{'endDate.form'} = WebGUI::Form::dateTime({
 		name  => 'endDate',
-		value => $self->getValue("startDate")
+		value => $self->getValue("endDate")
 		});
 	$self->getThread->getParent->appendTemplateLabels(\%var);
 	return $self->getThread->getParent->processStyle($self->processTemplate(\%var,$self->getThread->getParent->get("postFormTemplateId")));
