@@ -24,6 +24,7 @@
  - Fixed a bunch of POD errors.
  - Fixed some errors in the search engine indexer related to the new GUID
    system.
+ - Added extra debug to SQL errors on fatality.
 
 
 6.2.1

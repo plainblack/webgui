@@ -306,7 +306,8 @@ A list of values to be used in the placeholders defined in the prepared statemen
 
 sub execute {
 	my $self = shift;
-	$self->{_sth}->execute(@_) or WebGUI::ErrorHandler::fatalError("Couldn't execute prepared statement: ". DBI->errstr);
+	my $sql = shift;
+	$self->{_sth}->execute or WebGUI::ErrorHandler::fatalError("Couldn't execute prepared statement: $sql   Root cause: ". DBI->errstr);
 }
 
 
@@ -734,7 +735,7 @@ sub read {
 	my $sql = shift;
 	my $dbh = shift;
 	my $sth = WebGUI::SQL->prepare($sql, $dbh);
-	$sth->execute;
+	$sth->execute($sql);
 	return $sth;
 }
 
