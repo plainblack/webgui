@@ -33,7 +33,7 @@ sub _generateSessionId {
 }
 
 #-------------------------------------------------------------------
-sub _getPageInfo {
+sub _setupPageInfo {
 	my (%page, $pageId, $pageName);
 	tie %page, 'Tie::CPHash';
 	($pageId) = $_[0];
@@ -44,9 +44,9 @@ sub _getPageInfo {
 		$pageName =~ s/\'//;
 		$pageName =~ s/\"//;
 		if ($pageName ne "") {
-			($pageId) = WebGUI::SQL->quickArray("select pageId from page where urlizedTitle='".$pageName."'",$_[1]);
+			($pageId) = WebGUI::SQL->quickArray("select pageId from page where urlizedTitle='".$pageName."'");
 			if ($pageId eq "") {
-				$pageId = $_[2];
+				$pageId = $_[1];
 				if($ENV{"MOD_PERL"}) {
 					my $r = Apache->request;
 					if(defined($r)) {
@@ -61,49 +61,62 @@ sub _getPageInfo {
 			$pageId = $session{setting}{defaultPage};
 		}
 	}
-	%page = WebGUI::SQL->quickHash("select * from page where pageId='".$pageId."'",$_[1]);
-	$page{url} = $_[3]."/".$page{urlizedTitle};
-	return \%page;
+	%page = WebGUI::SQL->quickHash("select * from page where pageId='".$pageId."'");
+	$page{url} = $_[2]."/".$page{urlizedTitle};
+	$session{page} = \%page;
 }
 
 #-------------------------------------------------------------------
-sub _getSessionVars {
+sub _setupSessionVars {
 	my (%vars, $uid, $encryptedPassword);
 	tie %vars, 'Tie::CPHash';
 	if ($_[0] ne "") {
-		%vars = WebGUI::SQL->quickHash("select * from userSession where sessionId='$_[0]'", $_[1]);
+		%vars = WebGUI::SQL->quickHash("select * from userSession where sessionId='$_[0]'");
 		if ($vars{sessionId} ne "") {
-			WebGUI::SQL->write("update userSession set lastPageView=".time().", lastIP='$ENV{REMOTE_ADDR}', expires=".(time()+$_[2])." where sessionId='$_[0]'",$_[1]);
-		}
+			$session{scratch} = WebGUI::SQL->buildHashRef("select name,value from userSessionScratch
+                		where sessionId=".quote($_[0]));
+			WebGUI::SQL->write("update userSession set lastPageView=".time().", lastIP='$ENV{REMOTE_ADDR}', 
+				expires=".(time()+$_[1])." where sessionId='$_[0]'");
+		} else {
+                        setCookie("wgSession",$session{cookie}{wgSession},"-10y");
+                }
 	}
-	return \%vars;
+	$session{var} = \%vars;
 }
 
 #-------------------------------------------------------------------
-sub _getUserInfo {
+sub _setupUserInfo {
 	my (%default, $key, %user, $uid, %profile, $value);
 	tie %user, 'Tie::CPHash';
 	$uid = $_[0] || 1;
-	%user = WebGUI::SQL->quickHash("select * from users where userId='$uid'", $_[1]);
+	%user = WebGUI::SQL->quickHash("select * from users where userId='$uid'");
 	if ($user{userId} eq "") {
-		%user = {_getUserInfo("1",$_[1])};
-	}
-	%profile = WebGUI::SQL->buildHash("select userProfileField.fieldName, userProfileData.fieldData 
-		from userProfileData, userProfileField where userProfileData.fieldName=userProfileField.fieldName 
-		and userProfileData.userId='$user{userId}'", $_[1]);
-	%user = (%user, %profile);
-	%default = WebGUI::SQL->buildHash("select fieldName, dataDefault from userProfileField where profileCategoryId=4", $_[1]);
-	foreach $key (keys %default) {
-		if ($user{$key} eq "") {
-			$value = eval($default{$key});
-			if (ref $value eq "ARRAY") {
-				$user{$key} = $$value[0];
-			} else {
-				$user{$key} = $value;
+		_setupUserInfo("1");
+	} else {
+		%profile = WebGUI::SQL->buildHash("select userProfileField.fieldName, userProfileData.fieldData 
+			from userProfileData, userProfileField where userProfileData.fieldName=userProfileField.fieldName 
+			and userProfileData.userId='$user{userId}'");
+		%user = (%user, %profile);
+		%default = WebGUI::SQL->buildHash("select fieldName, dataDefault from userProfileField 
+			where profileCategoryId=4");
+		foreach $key (keys %default) {
+			if ($user{$key} eq "") {
+				$value = eval($default{$key});
+				if (ref $value eq "ARRAY") {
+					$user{$key} = $$value[0];
+				} else {
+					$user{$key} = $value;
+				}
 			}
 		}
+		$session{user} = \%user;
+		if ($session{env}{MOD_PERL}) {
+               		my $r = Apache->request;
+               		if(defined($r)) {
+                       		$r->user($session{user}{username});
+               		}
+       		}
 	}
-	return \%user;
 }
 
 #-------------------------------------------------------------------
@@ -298,24 +311,14 @@ sub open {
 		$session{cookie}{$_} = $session{cgi}->cookie($_);
 	}
 	###----------------------------
-	### session variables (from userSession table)
-	$session{var} = _getSessionVars($session{cookie}{wgSession},$session{dbh},$session{setting}{sessionTimeout});
-	###----------------------------
-	### session scratch variables (from userSessionScratch table)
-	$session{scratch} = WebGUI::SQL->buildHashRef("select name,value from userSessionScratch 
-		where sessionId=".quote($session{var}{sessionId}));
+	### session variables 
+	_setupSessionVars($session{cookie}{wgSession},$session{setting}{sessionTimeout});
 	###----------------------------
 	### current user's account and profile information (from users and userProfileData tables)
-	$session{user} = _getUserInfo($session{var}{userId},$session{dbh});
-	if ($session{env}{MOD_PERL}) {
-                my $r = Apache->request;
-                if(defined($r)) {
-			$r->user($session{user}{username}); 
-		}
-	}
+	_setupUserInfo($session{var}{userId});
 	###----------------------------
 	### current page's properties (from page table)
-	$session{page} = _getPageInfo("",$session{dbh},$session{setting}{notFoundPage},$session{config}{scripturl});
+	_setupPageInfo("",$session{setting}{notFoundPage},$session{config}{scripturl});
 	###----------------------------
 	### language settings
 	$session{language} = WebGUI::SQL->quickHashRef("select * from language where languageId=$session{user}{language}");
@@ -334,24 +337,32 @@ sub refreshPageInfo {
 	} else {
 		$pageId = $_[0];
 	}
-	$session{page} = _getPageInfo($pageId,$session{dbh},$session{setting}{notFoundPage},$session{config}{scripturl});
+	_setupPageInfo($pageId,$session{setting}{notFoundPage},$session{config}{scripturl});
 }
 
 #-------------------------------------------------------------------
 sub refreshSessionVars {
-	$session{var} = _getSessionVars($_[0],$session{dbh},$session{setting}{sessionTimeout});
+	_setupSessionVars($_[0],$session{setting}{sessionTimeout});
 	refreshUserInfo($session{var}{userId});
 }
 
 #-------------------------------------------------------------------
 sub refreshUserInfo {
-	$session{user} = _getUserInfo($_[0],$session{dbh});
+	_setupUserInfo($_[0]);
 	$session{isInGroup} = ();
 }
 
 #-------------------------------------------------------------------
 sub setCookie {
-	push @{$session{header}{cookie}}, $session{cgi}->cookie(-name=>$_[0], -value=>$_[1], -expires=>'+10y', -path=>'/');
+        my $ttl = $_[2] || '+10y';
+        my $domain = $session{env}{SERVER_NAME} if ($session{env}{HTTP_USER_AGENT} =~ m/MSIE/i);
+        push @{$session{header}{cookie}}, $session{cgi}->cookie(
+                -name=>$_[0],
+                -value=>$_[1],
+                -expires=>$ttl,
+                -path=>'/',
+                -domain=>$domain
+                );
 }
 
 #-------------------------------------------------------------------
