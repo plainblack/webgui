@@ -29,13 +29,14 @@ sub _alias {
 
 #-------------------------------------------------------------------
 sub process {
-	my (@date, $userId, $u, $uri, $port, %args, $fieldName, $ldap, $search, $a, $b);
+	my (@date, $userId, $u, $userData, $uri, $port, %args, $fieldName, $ldap, $search, $a, $b);
 	@date = WebGUI::DateTime::localtime(WebGUI::DateTime::time());
 	if ($date[3] == $session{config}{SyncProfilesToLDAP_hour}) { 
 		$a = WebGUI::SQL->read("select userId from users where authMethod='LDAP'");
 		while (($userId) = $a->array) {
 			$u = WebGUI::User->new($userId);
-			$uri = URI->new($u->ldapURL);
+			$userData = WebGUI::Authentication::getParams($userId, 'LDAP');
+			$uri = URI->new($userData->{ldapUrl});
 			if ($uri->port < 1) {
 				$port = 389;
 			} else {
@@ -45,7 +46,7 @@ sub process {
 			$ldap = Net::LDAP->new($uri->host, %args);
 			if ($ldap) {
 				$ldap->bind;
-				$search = $ldap->search (base => $uri->dn, filter => $u->connectDN);
+				$search = $ldap->search (base => $uri->dn, filter => $userData->{connectDN});
 				if (defined $search->entry(0)) {
 					$b = WebGUI::SQL->read("select fieldName from userProfileField where profileCategoryId<>4");
 					while (($fieldName) = $b->array) {
