@@ -172,9 +172,10 @@ foreach $file (@files) {
                 	'FILE' => $config{$file}{configFile},
                 	'PURGE' => 1);
 		$config{$file}{dsn} = $config->get('dsn');
-		$config{$file}{dsn} =~ /DBI\:(\w+)\:(\w+).*/;
+		$config{$file}{dsn} =~ /^DBI\:(\w+)\:(\w+)(\:(.*)|)$/;
 		if ($1 eq "mysql") {
 			$config{$file}{db} = $2;
+			$config{$file}{host} = $4;
 			$config{$file}{dbuser} = $config->get('dbuser');
 			$config{$file}{dbpass} = $config->get('dbpass');
 			$config{$file}{mysqlCLI} = $config->get('mysqlCLI');
@@ -207,8 +208,9 @@ foreach $config (keys %config) {
 		unless ($skipBackup) {
 			print "\n".$config{$config}{db}." ".$upgrade{$upgrade}{from}."-".$upgrade{$upgrade}{to}."\n" unless ($quiet);
 			print "\tBacking up $config{$config}{db} ($upgrade{$upgrade}{from})..." unless ($quiet);
-			my $cmd = $dumpcmd." -u".$config{$config}{dbuser}." -p".$config{$config}{dbpass}
-				." --add-drop-table --databases ".$config{$config}{db}." > "
+			my $cmd = $dumpcmd." -u".$config{$config}{dbuser}." -p".$config{$config}{dbpass};
+			$cmd .= " --host=".$config{$config}{host} if ($config{$config}{host});
+			$cmd .= " --add-drop-table --databases ".$config{$config}{db}." > "
 				.$backupTo."/".$config{$config}{db}."_".$upgrade{$upgrade}{from}.".sql";
 			unless (system($cmd)) {
 				print "OK\n" unless ($quiet);
@@ -217,8 +219,9 @@ foreach $config (keys %config) {
 			}
 		}
 		print "\tUpgrading to ".$upgrade{$upgrade}{to}."..." unless ($quiet);
-		my $cmd = $clicmd." -u".$config{$config}{dbuser}." -p".$config{$config}{dbpass}
-			." --database=".$config{$config}{db}." < ".$upgrade{$upgrade}{sql};
+		my $cmd = $clicmd." -u".$config{$config}{dbuser}." -p".$config{$config}{dbpass};
+		$cmd .= " --host=".$config{$config}{host} if ($config{$config}{host});
+		$cmd .= " --database=".$config{$config}{db}." < ".$upgrade{$upgrade}{sql};
 		unless (system($cmd)) {
 			print "OK\n" unless ($quiet);
 		} else {
