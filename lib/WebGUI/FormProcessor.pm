@@ -32,6 +32,7 @@ This package helps in the processing of the form variables that are returned fro
  use WebGUI::FormProcessor;
  $value = WebGUI::FormProcessor::process("favoriteColor","selectList","black");
 
+ $value = WebGUI::FormProcessor::asset("assetId");
  $value = WebGUI::FormProcessor::checkbox("whichOne");
  $value = WebGUI::FormProcessor::checkList("dayOfWeek");
  $value = WebGUI::FormProcessor::codearea("snippet");
@@ -70,6 +71,22 @@ These functions are available from this package:
 
 sub _checkEmailAddy {
         return ($_[0] =~ /^([A-Z0-9]+[._+-]?){1,}([A-Z0-9]+[_+-]?)+\@(([A-Z0-9]+[._-]?){1,}[A-Z0-9]+\.){1,}[A-Z]{2,4}$/i);
+}
+
+#-------------------------------------------------------------------
+
+=head2 asset ( name )
+
+Returns an asset id.
+
+=head3 name
+
+The name of the form variable to retrieve.
+
+=cut
+
+sub asset {
+	return $session{form}{$_[0]};
 }
 
 #-------------------------------------------------------------------
@@ -386,7 +403,8 @@ The name of the form variable to retrieve.
 =cut
 
 sub interval {
-	return (WebGUI::DateTime::intervalToSeconds($session{form}{$_[0]."_interval"},$session{form}{$_[0]."_units"}) || 0);
+	my $val = WebGUI::DateTime::intervalToSeconds($session{form}{$_[0]."_interval"},$session{form}{$_[0]."_units"}) || 0;
+	return $val;
 }
 
 
@@ -450,7 +468,6 @@ The default value for this variable. If the variable is undefined then the defau
 sub process {
 	my ($name, $type, $default) = @_;
 	my $value;
-	return undef unless (exists $session{form}{$name});
 	$type = "text" if ($type eq "");
 	$value = &$type($name);
 	unless (defined $value) {

@@ -1,4 +1,4 @@
-package WebGUI::Operation::RichEdit;
+package WebGUI::Operation::FormHelpers;
 
 #-------------------------------------------------------------------
 # WebGUI is Copyright 2001-2004 Plain Black Corporation.
@@ -15,6 +15,34 @@ use WebGUI::Asset;
 use WebGUI::HTMLForm;
 use WebGUI::Session;
 use WebGUI::Style;
+
+#-------------------------------------------------------------------
+sub www_formAssetTree {
+	my $base = WebGUI::Asset->newByUrl || WebGUI::Asset->getRoot;
+	my @crumb;
+	my $ancestors = $base->getLineage(["self","ancestors"],{returnQuickReadObjects=>1});
+	foreach my $ancestor (@{$ancestors}) {
+		push(@crumb,'<a href="'.$ancestor->getUrl("op=formAssetTree&classLimiter=".$session{form}{classLimiter}."&formId="
+                        .$session{form}{formId}).'">'.$ancestor->get("menuTitle").'</a>');
+	}	
+	my $output = '<p>'.join(" &gt; ", @crumb)."</p>\n";
+	my $children = $base->getLineage(["children"],{returnQuickReadObjects=>1});
+	foreach my $child (@{$children}) {
+		next unless $child->canView;
+		if ($child->get("className") =~ /^$session{form}{classLimiter}/) {
+			$output .= '<a href="#" onclick="window.opener.document.getElementById(\''.$session{form}{formId}
+				.'\').value=\''.$child->getId.'\';window.opener.document.getElementById(\''.
+				$session{form}{formId}.'_display\').value=\''.$child->get("title").'\';window.close();">(&bull;)</a> ';
+		} else {
+			$output .= "(&bull;) ";
+		}
+		$output .= '<a href="'.$child->getUrl("op=formAssetTree&classLimiter=".$session{form}{classLimiter}."&formId="
+			.$session{form}{formId}).'">'.$child->get("menuTitle").'</a>'."<br />\n";	
+	}
+	$session{page}{useEmptyStyle} = 1;
+	return $output;
+}
+
 
 #-------------------------------------------------------------------
 

@@ -60,24 +60,21 @@ sub www_editSettings {
 		-value=>$session{setting}{companyURL}
 		);
 # content settings
-	my $pages = WebGUI::SQL->buildHashRef("select pageId,menuTitle from page order by menuTitle");
         my %htmlFilter = (
 		'none'=>$i18n->get(420), 
 		'most'=>$i18n->get(421), 
 		'javascript'=>$i18n->get(526), 
 		'all'=>$i18n->get(419)
 		);
-        $tabform->getTab("content")->selectList(
+        $tabform->getTab("content")->asset(
 		-name=>"defaultPage",
-		-options=>$pages,
 		-label=>$i18n->get(527),
-		-value=>[$session{setting}{defaultPage}]
+		-value=>$session{setting}{defaultPage}
 		);
-        $tabform->getTab("content")->selectList(
+        $tabform->getTab("content")->asset(
 		-name=>"notFoundPage",
-		-options=>$pages,
 		-label=>$i18n->get(141),
-		-value=>[$session{setting}{notFoundPage}]
+		-value=>$session{setting}{notFoundPage}
 		);
 	$tabform->getTab("content")->text(
 		-name=>"urlExtension",
@@ -101,7 +98,7 @@ sub www_editSettings {
 		);
 	 $tabform->getTab("content")->yesNo(
                 -name=>"metaDataEnabled",
-                -label=>$i18n->get("Enable Metadata ?", 'MetaData'),
+                -label=>$i18n->get("Enable Metadata ?", 'Asset'),
                 -value=>$session{setting}{metaDataEnabled}
         	);
 # user interface settings
@@ -202,12 +199,10 @@ sub www_editSettings {
 		-label=>$i18n->get(540),
 		-value=>$session{setting}{karmaPerLogin}
 		);
-	my ($interval, $units) = WebGUI::DateTime::secondsToInterval($session{setting}{sessionTimeout});
    	$tabform->getTab("user")->interval(
 		-name=>"sessionTimeout",
 		-label=>$i18n->get(142),
-		-intervalValue=>$interval,
-		-unitsValue=>$units
+		-value=>$session{setting}{sessionTimeout}
 		);
    	$tabform->getTab("user")->yesNo(
 		-name=>"selfDeactivation",
@@ -221,9 +216,9 @@ sub www_editSettings {
 		);
         $tabform->getTab("user")->yesNo(
                 -name=>"passiveProfilingEnabled",
-                -label=>$i18n->get("Enable passive profiling ?", 'MetaData'),
+                -label=>$i18n->get("Enable passive profiling ?", 'Asset'),
                 -value=>$session{setting}{passiveProfilingEnabled},
-                -extras=>' onChange="alert(\''.$i18n->get("Illegal Warning","MetaData").'\')" '
+                -extras=>' onChange="alert(\''.$i18n->get("Illegal Warning","Asset").'\')" '
         );
 # auth settings 
 	WebGUI::Style::setScript($session{config}{extrasURL}."/swapLayers.js",{language=>"Javascript"});

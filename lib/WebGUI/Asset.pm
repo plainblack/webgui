@@ -2232,6 +2232,7 @@ Moves self to trash, returns www_view() method of Parent if canEdit. Otherwise r
 sub www_delete {
 	my $self = shift;
 	return $self->getAdminConsole->render(WebGUI::Privilege::insufficient()) unless $self->canEdit;
+	return $self->getAdminConsole->render(WebGUI::Privilege::vitalComponent()) if (isIn($self->getId, $session{setting}{defaultPage}, $session{setting}{notFoundPage}));
 	$self->trash;
 	return $self->getParent->www_view;
 }

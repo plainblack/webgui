@@ -61,6 +61,9 @@
    files and images.
  - Added a privilege access handler to the uploads file system.
  - Added CDG Commerce iTransact payment plugin.
+ - Added an asset picker form control.
+ - Shortcuts can now proxy every type of asset, not just wobjects.
+ - Added a codearea form control.
 
 
 6.2.11

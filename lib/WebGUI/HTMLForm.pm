@@ -38,6 +38,10 @@ Package that makes HTML forms typed data and significantly reduces the code need
  use WebGUI::HTMLForm;
  $f = WebGUI::HTMLForm->new;
 
+ $f-asset(
+	-value=>$assetId,
+	-label=>"Pick an Asset"
+	);
  $f->button(
 	-value=>"Click me!",
 	-extras=>qq|onClick="alert('Aaaaaaaggggghh!!!!')"|
@@ -51,6 +55,10 @@ Package that makes HTML forms typed data and significantly reduces the code need
 	-name=>"dayOfWeek",
 	-options=>\%days,
 	-label=>"Which day?"
+	);
+ $f->codearea(
+	-name=>"stylesheet",
+	-label=>"Stylesheet"
 	);
  $f->combo(
 	-name=>"fruit",
@@ -219,6 +227,71 @@ sub _uiLevelChecksOut {
 		return 0;
 	}
 }
+
+#-------------------------------------------------------------------
+
+=head2 asset ( name, label, value, class, extras, subtext, defaultValue, uiLevel )
+
+Returns an asset picker control.
+
+=head3 name
+
+The name of this field. Defaults to "asset".
+
+=head3 label
+
+A label to display next to this field.
+
+=head3 value
+
+The asset ID to assign to this control.
+
+=head3 class
+
+Limit the assets picked to a specific class such as "WebGUI::Asset::File"
+
+=head3 extras
+
+Add extra attributes to the form element like javascript event handlers.
+
+=head3 subtext
+
+A small message to appear under the form element with additional instructions.
+
+=head3 defaultValue
+
+If value is not specified we'll use this instead.
+
+=head3 uiLevel
+
+What UI level is required to see this control.
+
+=cut
+
+sub asset {
+        my ($self, @p) = @_;
+        my ($name, $label, $value, $class, $extras, $subtext, $defaultValue, $uiLevel) = rearrange([qw(name label value class extras subtext defaultValue uiLevel)], @p);
+	my $output;
+	if (_uiLevelChecksOut($uiLevel)) {
+		$output = WebGUI::Form::asset({
+			"name"=>$name,
+			"value"=>$value,
+			"class"=>$class,
+			"extras"=>$extras,
+			"defaultValue"=>$defaultValue
+			});
+		$output .= _subtext($subtext);
+        	$output = $self->_tableFormRow($label,$output);
+	} else {
+		$output = WebGUI::Form::hidden({
+			"name"=>$name,
+			"value"=>$value,
+			"defaultValue"=>$defaultValue
+			});
+	}
+        $self->{_data} .= $output;
+}
+
 
 #-------------------------------------------------------------------
 

@@ -17,12 +17,13 @@ package WebGUI::Form;
 use strict;
 use HTTP::BrowserDetect;
 use Tie::IxHash;
+use WebGUI::Asset;
+use WebGUI::Asset::Template;
 use WebGUI::DateTime;
 use WebGUI::International;
 use WebGUI::Session;
 use WebGUI::SQL;
 use WebGUI::Style;
-use WebGUI::Asset::Template;
 use WebGUI::URL;
 use WebGUI::Utility;
 
@@ -38,9 +39,11 @@ Base forms package. Eliminates some of the normal code work that goes along with
 
  use WebGUI::Form;
 
+ $html = WebGUI::Form::asset({value=>$assetId});
  $html = WebGUI::Form::button({value=>"Click me!", extras=>qq|onclick="alert('Aaaaggggghhh!!!')"|});
  $html = WebGUI::Form::checkbox({name=>"whichOne", value=>"red"});
  $html = WebGUI::Form::checkList({name=>"dayOfWeek", options=>\%days});
+ $html = WebGUI::Form::codearea({name=>"stylesheet"});
  $html = WebGUI::Form::combo({name=>"fruit",options=>\%fruit});
  $html = WebGUI::Form::contentType({name=>"contentType");
  $html = WebGUI::Form::databaseLink();
@@ -107,6 +110,58 @@ sub _fixTags {
 	$value =~ s/\</\&lt\;/g;
         $value =~ s/\>/\&gt\;/g;
 	return $value;
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 asset ( hashref )
+
+Returns an asset picker control. 
+
+=head3 value
+
+The asset ID assigned to this control. 
+
+=head3 name
+
+The name of this field. Defaults to "asset".
+
+=head3 defaultValue
+
+If no value is specified, use this value.
+
+=head3 class
+
+Limit options to a specific class type such as "WebGUI::Asset::Wobject::Article"
+
+=head3 extras
+
+Assign extra things like javascript events to this form element.
+
+=cut
+
+
+sub asset {
+	my $params = shift;
+	my $value = $params->{value} || $params->{defaultValue};
+	my $name = $params->{name} || "asset";
+	my $asset = WebGUI::Asset->newByDynamicClass($value) || WebGUI::Asset->getRoot;
+	return hidden({
+			name=>$name,
+			extras=>'id="'.$name.'" '.$params->{extras},
+			value=>$asset->getId
+			})
+		.text({
+			name=>$name."_display",
+			extras=>'id="'.$name."_display".'" readonly="1"',
+			value=>$asset->get("title")
+			})
+		.button({
+			value=>"...",
+			extras=>'onclick="window.open(\''.$asset->getUrl("op=formAssetTree&classLimiter=".$params->{class}."&formId=".$name).'\',\'assetPicker\',\'toolbar=no, location=no, status=no, directories=no, width=400, height=400\');"'
+			});
+
 }
 
 
@@ -994,11 +1049,15 @@ The default value for this form element.
 
 This will be used if no value is specified.
 
+=head3 extras
+
+Add extra things like ids and javascript event handlers.
+
 =cut
 
 sub hidden {
 	my $params = shift;
-        return '<input type="hidden" name="'.$params->{name}.'" value="'._fixQuotes(_fixMacros(_fixSpecialCharacters($params->{value}))).'" />'."\n";
+        return '<input type="hidden" name="'.$params->{name}.'" value="'._fixQuotes(_fixMacros(_fixSpecialCharacters($params->{value}))).'" '.$params->{extras}.' />'."\n";
 }
 
 
