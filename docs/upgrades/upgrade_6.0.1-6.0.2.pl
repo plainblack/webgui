@@ -34,7 +34,7 @@ while (my $data = $sth->hashRef) {
 	$data->{template} =~ s/pageNumber/pagination.pageNumber/ig;
 	WebGUI::SQL->write("update template set template=".quote($data->{template})." where namespace=".quote($data->{namespace})." and templateId=".quote($data->{templateId}));
 }
-$sth->close;
+$sth->finish;
 
 WebGUI::Session::close();
 
