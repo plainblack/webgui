@@ -55,6 +55,7 @@ A lineage is a concatenated series of sequence numbers, each six digits long, th
  cascadeLineage
  cut
  definition
+ deleteMetaDataField
  demote
  DESTROY
  duplicate
@@ -74,11 +75,13 @@ A lineage is a concatenated series of sequence numbers, each six digits long, th
  getLastChild
  getLineage
  getLineageLength
+ getMetaDataFields
  getName
  getNextChildRank
  getParent
  getParentLineage
  getRank
+ getRoot
  getToolbar
  getUiLevel
  getUrl
@@ -110,8 +113,12 @@ A lineage is a concatenated series of sequence numbers, each six digits long, th
  www_cutList
  www_delete
  www_deleteList
+ www_deleteMetaDataField
  www_demote
+ www_deployPackage
  www_edit
+ www_editMetaDataField
+ www_editMetaDataFieldSave
  www_editSave
  www_editTree (NYI)
  www_editTreeSave (NYI)
@@ -119,6 +126,7 @@ A lineage is a concatenated series of sequence numbers, each six digits long, th
  www_emptyTrash
  www_manageAssets
  www_manageClipboard
+ www_manageMetaData
  www_manageTrash
  www_paste
  www_pasteList
@@ -398,13 +406,13 @@ sub DESTROY {
 
 #-------------------------------------------------------------------
 
-=head2 duplicate ( asset )
+=head2 duplicate ( [assetToDuplicate] )
 
 Duplicates an asset. Calls addChild with self as an arguement. Returns a new Asset object.
 
-=head3 asset
+=head3 assetToDuplicate
 
-The asset to duplicate. Defaults to self.
+If not supplied, defaults to self.
 
 =cut
 
@@ -423,11 +431,11 @@ sub duplicate {
 
 #-------------------------------------------------------------------
 
-=head2 duplicateTree ( asset )
+=head2 duplicateTree ( [assetToDuplicate] )
 
-Duplicates an asset and all it's descendants. Calls addChild with asset as an argument. Returns a new Asset object.
+Duplicates an asset and all its descendants. Calls addChild with assetToDuplicate as an argument. Returns a new Asset object.
 
-=head3 asset
+=head3 assetToDuplicate
 
 The asset to duplicate. Defaults to self.
 
@@ -539,7 +547,7 @@ Returns an array that contains a label (name of the class of Asset) and url (url
 
 =head3 addToUrl
 
-Any text to append to the getAssetAdderLinks URL. Usually another variable to pass in the url. If addToURL is specified, the character & and the text in addToUrl is appended to the returned url.
+Any text to append to the getAssetAdderLinks URL. Usually name/variable pairs to pass in the url. If addToURL is specified, the character "&" and the text in addToUrl is appended to the returned url.
 
 =cut
 
@@ -577,7 +585,7 @@ sub getAssetAdderLinks {
 
 #-------------------------------------------------------------------
 
-=head2 getAssetManagerControl ( children )
+=head2 getAssetManagerControl ( children [,controlType] )
 
 Returns a text string of HTML code for the Asset Manager Control Page. English only.
 
@@ -1920,7 +1928,7 @@ sub view {
 
 =head2 www_add ( )
 
-
+Adds a new Asset based upon the class of the current form. Returns the Asset calling method www_edit();
 
 =cut
 
@@ -1943,7 +1951,7 @@ sub www_add {
 
 =head2 www_copy ( )
 
-
+Duplicates self, cuts duplicate, returns "" if canEdit. Otherwise returns an AdminConsole rendered as insufficient privilege.
 
 =cut
 
@@ -1959,7 +1967,7 @@ sub www_copy {
 
 =head2 www_copyList ( )
 
-
+Duplicates self, cuts (moves to clipboard) the duplicate newAsset, repeats for other assets in a list, then returns self calling method www_manageAssets(), if canEdit. Otherwise returns AdminConsole rendered insufficient privilege.
 
 =cut
 
@@ -1982,7 +1990,7 @@ sub www_copyList {
 
 =head2 www_cut ( )
 
-
+Cuts (removes to clipboard) self, returns the www_view of the Parent if canEdit. Otherwise returns AdminConsole rendered insufficient privilege.
 
 =cut
 
@@ -1997,7 +2005,7 @@ sub www_cut {
 
 =head2 www_cutList ( )
 
-
+Cuts assets in a list (removes to clipboard), then returns self calling method www_manageAssets(), if canEdit. Otherwise returns AdminConsole rendered insufficient privilege.
 
 =cut
 
@@ -2017,7 +2025,7 @@ sub www_cutList {
 
 =head2 www_delete
 
-
+Moves self to trash, returns www_view() method of Parent if canEdit. Otherwise returns AdminConsole rendered insufficient privilege.
 
 =cut
 
@@ -2032,7 +2040,7 @@ sub www_delete {
 
 =head2 www_deleteList
 
-
+Moves list of assets to trash, returns www_manageAssets() method of self if canEdit. Otherwise returns AdminConsole rendered insufficient privilege.
 
 =cut
 
@@ -2049,6 +2057,13 @@ sub www_deleteList {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_deleteMetaDataField ( )
+
+Deletes a MetaDataField and returns www_manageMetaData on self, if user isInGroup(4), if not, renders a "content profiling" AdminConsole as insufficient privilege. 
+
+=cut
+
 sub www_deleteMetaDataField {
 	my $self = shift;
 	my $ac = WebGUI::AdminConsole->new("content profiling");
@@ -2061,7 +2076,7 @@ sub www_deleteMetaDataField {
 
 =head2 www_demote ( )
 
-
+Demotes self and returns "" if canEdit, otherwise renders an AdminConsole as insufficient privilege.
 
 =cut
 
@@ -2075,6 +2090,8 @@ sub www_demote {
 #-------------------------------------------------------------------
 
 =head2 www_deployPackage ( ) 
+
+
 
 =cut
 
@@ -2098,7 +2115,7 @@ sub www_deployPackage {
 
 =head2 www_edit ( )
 
-
+Renders an AdminConsole EditForm, unless insufficient privileges.
 
 =cut
 
@@ -2112,7 +2129,7 @@ sub www_edit {
 
 =head2 www_editSave ( )
 
-
+Saves and updates history. If canEdit, returns www_manageAssets() if a new Asset is created, otherwise returns www_view().
 
 =cut
 
@@ -2137,6 +2154,13 @@ sub www_editSave {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_editMetaDataField ( )
+
+Returns a rendered page to edit MetaData
+
+=cut
+
 sub www_editMetaDataField {
 	my $self = shift;
 	my $ac = WebGUI::AdminConsole->new("content profiling");
@@ -2168,6 +2192,13 @@ sub www_editMetaDataField {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_editMetaDataFieldSave ( )
+
+
+
+=cut
+
 sub www_editMetaDataFieldSave {
 	my $self = shift;
 	my $ac = WebGUI::AdminConsole->new("content profiling");
@@ -2547,6 +2578,13 @@ sub www_manageClipboard {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_manageMetaData ( )
+
+
+
+=cut
+
 sub www_manageMetaData {
 	my $self = shift;
 	my $ac = WebGUI::AdminConsole->new("content profiling");
