@@ -1018,7 +1018,7 @@ sub makeUnique {
 	unless ($pageId eq "new") {
 		$where .= " and pageId<>".$pageId;
 	}
-        my ($test) = WebGUI::SQL->quickArray("select urlizedTitle from page ".$where);
+        my ($test) = WebGUI::SQL->quickArray("select urlizedTitle from page where urlizedTitle=".quote($url).$where);
 	if ($test) {
 		my @parts = split(/\./,$url);
        	 	if ($parts[0] =~ /(.*)(\d+$)/) {
@@ -1104,7 +1104,9 @@ sub move{
 		      		rgt
 		      end
 		where 
-			rgt between $updateRange";
+			rgt between $updateRange or
+			lft between $updateRange";
+			
 	WebGUI::SQL->write($sql);
 
 	# Set the parentId to the right node.
@@ -1195,8 +1197,13 @@ sub moveUp {
 	$self = shift;
 
 	$mother = $self->getMother;
-	return 0 unless (defined $mother);
+	
+	# Don't move to an nonexistent node;
+	return 0 if (!defined $mother);
 
+	# Don't allow to move up if node is already a webguiroot;
+	return 0 if ($mother->get('pageId') == 0);
+	
 	# Update depth, we do this before the move because now we know the rgt range of nodes 
 	# that change in depth.
 	WebGUI::SQL->write("update page set depth=depth-1 where rgt between ".$self->get('lft')." and ".$self->get('rgt'));
@@ -1229,7 +1236,9 @@ sub moveUp {
 				parentId
 			end
 		where 
-			rgt between ". $self->get('lft') ." and ". $mother->get('rgt');
+			rgt between ". $self->get('lft') ." and ". $mother->get('rgt')."
+			lft between ". $self->get('lft') ." and ". $mother->get('rgt');
+			
 	WebGUI::SQL->write($sql);
 
 	WebGUI::Page->recacheNavigation;
