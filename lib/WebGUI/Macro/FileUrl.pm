@@ -1,4 +1,4 @@
-package WebGUI::Macro::I_imageWithTags;
+package WebGUI::Macro::FileUrl;
 
 #-------------------------------------------------------------------
 # WebGUI is Copyright 2001-2004 Plain Black Corporation.
@@ -11,22 +11,20 @@ package WebGUI::Macro::I_imageWithTags;
 #-------------------------------------------------------------------
 
 use strict;
-use WebGUI::Collateral;
+use WebGUI::Asset;
 use WebGUI::Macro;
 use WebGUI::Session;
+use WebGUI::Storage;
 
 #-------------------------------------------------------------------
 sub process {
-        my @param = WebGUI::Macro::getParams($_[0]);
-	if (my $collateral = WebGUI::Collateral->find($param[0])) {
-		my $tag = '<img src="'.$collateral->getURL.'" '.$collateral->get("parameters");
-		unless ($tag =~ /alt\=/i) {
-			$tag .= ' alt="'.$collateral->get("name").'"';
-		}
-		$tag .= ' />'; 
-		return $tag;
+        my ($url) = WebGUI::Macro::getParams(shift);
+	my $asset = WebGUI::Asset->newByUrl($url);
+	if (defined $asset) {
+		my $storage = WebGUI::Storage->get($asset->get("storageId"));
+		return $storage->getUrl($asset->get("filename"));
 	} else {
-		return "";
+		return "Invalid Asset URL";
 	}
 }
 

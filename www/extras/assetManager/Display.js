@@ -5,6 +5,12 @@
 
 function Display() {
     this.dom=document.getElementById&&!document.all;
+    this.documentElement = document.documentElement;
+    
+    if (document.compatMode == "BackCompat") {
+    	this.documentElement = document.body;
+    }
+    
     this.focusObjects = new Array();
     this.overObjects = new Array();
     this.topLevelElement=this.dom? "HTML" : "BODY"
@@ -55,8 +61,8 @@ function Display_dragStart(firedobj,xCoordinate,yCoordinate) {
 
     this.dragEnabled=true;
 
-    this.pageHeight = document.documentElement.scrollHeight;
-    this.pageWidth = document.documentElement.scrollWidth;
+    this.pageHeight = this.documentElement.scrollHeight;
+    this.pageWidth = this.documentElement.scrollWidth;
 
     this.focusObjects[0]=firedobj.asset;
                 
@@ -138,10 +144,10 @@ function Display_move(e){
     if (this.dragEnabled){        		
         this.adjustScrollBars(e);
 
-		var topScroll = document.documentElement.scrollTop;
-		var leftScroll =document.documentElement.scrollLeft; 
+		var topScroll = this.documentElement.scrollTop;
+		var leftScroll =this.documentElement.scrollLeft; 
 
-	    var act = this.spy(this.dom? e.pageX: (e.clientX + document.documentElement.scrollLeft),this.dom? e.pageY: (e.clientY + document.documentElement.scrollTop));
+	    var act = this.spy(this.dom? e.pageX: (e.clientX + this.documentElement.scrollLeft),this.dom? e.pageY: (e.clientY + this.documentElement.scrollTop));
    		       		    
    		if (act && act.asset) {
 	   		this.selectAsset(act.asset);
@@ -213,11 +219,13 @@ function Display_keyUp(e) {
 function Display_adjustScrollBars(e) {
         var scrY=0;
         var scrX=0;
+		
+		if (!this.documentElement) return;
 
-		var topScroll = document.documentElement.scrollTop;
-		var leftScroll = document.documentElement.scrollLeft;
-		var innerHeight = document.documentElement.clientHeight;
-		var innerWidth = document.documentElement.clientWidth;
+		var topScroll = this.documentElement.scrollTop;
+		var leftScroll = this.documentElement.scrollLeft;
+		var innerHeight = this.documentElement.clientHeight;
+		var innerWidth = this.documentElement.clientWidth;
 		
         if (e.clientY > innerHeight-this.scrollJump) {
             if (e.clientY + topScroll < this.pageHeight - (this.scrollJump + 40)) {

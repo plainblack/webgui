@@ -1,4 +1,4 @@
-package WebGUI::Macro::Snippet;
+package WebGUI::Macro::PageUrl;
 
 #-------------------------------------------------------------------
 # WebGUI is Copyright 2001-2004 Plain Black Corporation.
@@ -11,26 +11,16 @@ package WebGUI::Macro::Snippet;
 #-------------------------------------------------------------------
 
 use strict;
-use Tie::CPHash;
-use WebGUI::Collateral;
-use WebGUI::Macro;
 use WebGUI::Session;
+use WebGUI::URL;
 
 #-------------------------------------------------------------------
 sub process {
-        my @param = WebGUI::Macro::getParams($_[0]);
-	if (my $collateral = WebGUI::Collateral->find($param[0])) {
-		my $temp = $collateral->get("parameters");
-               	for my $i ( 1 .. $#param ) {
-                 	$temp =~ s/\^$i\;/$param[$i]/g;
-                }
-        	return $temp;
-        } else {
-                return undef;
-        }
+	my $pathinfo = $session{env}{PATH_INFO};
+        $pathinfo =~ s/^\/(.*)/$1/;
+        return WebGUI::URL::getScriptURL().$pathinfo;
 }
 
 
 1;
-
 

@@ -2511,6 +2511,7 @@ CREATE TABLE page (
 
 
 INSERT INTO page VALUES ('1','0','Home','1001','3',0,'','home',1,'Home',NULL,'1',946710000,2082783600,NULL,NULL,NULL,NULL,NULL,NULL,'English','7','3',0,0,NULL,NULL,NULL,60,600,'3',0,1,22,0,'generate','WebGUI::Page',NULL,0,0);
+INSERT INTO page VALUES ('5','0','Packages','2','3',24,'','packages',0,'Packages',NULL,'1',946710000,2082783600,NULL,NULL,NULL,NULL,NULL,NULL,'English','6','6',1,0,NULL,NULL,NULL,60,600,'3',0,29,30,0,'generate','WebGUI::Page',NULL,0,1);
 INSERT INTO page VALUES ('1000','1','Getting Started','1001','3',1,'','getting_started',1,'Getting Started','','1',946710000,2082783600,'',NULL,NULL,NULL,NULL,NULL,'English','7','3',0,0,NULL,NULL,NULL,60,600,'3',0,2,3,1,'generate','WebGUI::Page',NULL,0,0);
 INSERT INTO page VALUES ('1001','1','What should you do next?','1001','3',2,'','your_next_step',1,'Your Next Step','','1',946710000,2082783600,'',NULL,NULL,NULL,NULL,NULL,'English','7','3',0,0,NULL,NULL,NULL,60,600,'3',0,4,15,1,'generate','WebGUI::Page',NULL,0,0);
 INSERT INTO page VALUES ('1002','1','The Latest News','1001','3',3,'','the_latest_news',1,'The Latest News','','1',946710000,2082783600,'',NULL,NULL,NULL,NULL,NULL,'English','7','3',0,0,NULL,NULL,NULL,60,600,'3',0,16,17,1,'generate','WebGUI::Page',NULL,0,0);

@@ -1,4 +1,4 @@
-package WebGUI::Macro::File;
+package WebGUI::Macro::RandomAssetProxy;
 
 #-------------------------------------------------------------------
 # WebGUI is Copyright 2001-2004 Plain Black Corporation.
@@ -11,26 +11,29 @@ package WebGUI::Macro::File;
 #-------------------------------------------------------------------
 
 use strict;
-use WebGUI::Collateral;
+use WebGUI::Asset;
 use WebGUI::Macro;
 use WebGUI::Session;
-use WebGUI::Template;
 
 #-------------------------------------------------------------------
 sub process {
-        my @param = WebGUI::Macro::getParams($_[0]);
-	my %var;
-        if (my $collateral = WebGUI::Collateral->find($param[0])) {
-               $var{'file.url'} = $collateral->getURL;
-		$var{'file.icon'} = $collateral->getIcon;
-	        $var{'file.name'} = $param[0];
-                $var{'file.size'} = $collateral->getSize;
-                $var{'file.thumbnail'} = $collateral->getThumbnail;
-		return  WebGUI::Template::process(WebGUI::Template::getIdByName($param[1],"Macro/File"),"Macro/File", \%var);
-        } else {
-                return undef;
-        }
+        my ($url) = WebGUI::Macro::getParams(shift);
+	my $asset = WebGUI::Asset->newByUrl($url);
+	if (defined $asset) {
+		my $children = $asset->getLineage(["descendants"],{endingLineageLength=>$asset->getLineageLength+1});
+		randomize;
+		my $randomAssetId = $children->[rand(scalar(@{$children})];	
+		my $randomAsset = WebGUI::Asset->newByDynamicClass($randomAssetId);
+		if (defined $randomAsset) {
+			return $randomAsset->canView ? $randomAsset->view : "";
+		} else {
+			return "Asset has no children.";
+		}
+	} else {
+		return "Invalid asset URL.";
+	}
 }
+
 
 1;
 

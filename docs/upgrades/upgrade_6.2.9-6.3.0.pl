@@ -143,7 +143,7 @@ WebGUI::SQL->write("alter table Article drop column attachment");
 my %migration;
 
 print "\tConverting navigation system to asset tree\n" unless ($quiet);
-my ($navRootLineage) = WebGUI::SQL->quickArray("select assetId,title,lineage from asset where length(lineage)=12 order by lineage desc limit 1");
+my ($navRootLineage) = WebGUI::SQL->quickArray("select lineage from asset where length(lineage)=12 order by lineage desc limit 1");
 $navRootLineage = sprintf("%012d",($navRootLineage+1));
 my $navRootId = WebGUI::SQL->setRow("asset","assetId",{
 	assetId=>"new",
@@ -174,13 +174,15 @@ WebGUI::SQL->setRow("Navigation","assetId",{
 	assetsToInclude=>"descendants",
 	showHiddenPages=>1
 	},undef,$navRootId);
-my $sth = WebGUI::SQL->read("select * from tempoldnav");
+my %macroCache;
 my $navRankCounter = 1;
+my $sth = WebGUI::SQL->read("select * from tempoldnav");
 while (my $data = $sth->hashRef) {
 	print "\t\tConverting ".$data->{identifier}."\n" unless ($quiet);
 	my (%newNav,%newAsset,%newWobject);
 	$newNav{assetId} = $newWobject{assetId} = $newAsset{assetId} = getNewId("nav",$data->{navigationId}); 
 	$newAsset{url} = fixUrl($newAsset{assetId},$data->{identifier});
+	$macroCache{$data->{identifier}} = $newAsset{url};
 	$newAsset{isHidden} = 1;
 	$newAsset{title} = $newAsset{menuTitle} = $data->{identifier};
 	$newAsset{ownerUserId} = "3";
@@ -265,112 +267,6 @@ $sth->finish;
 WebGUI::SQL->write("update Navigation set startPoint='root' where startPoint='nameless_root'");
 WebGUI::SQL->write("drop table tempoldnav");
 
-print "\tConverting collateral manager items into assets\n" unless ($quiet);
-my ($collateralRootLineage) = WebGUI::SQL->quickArray("select assetId,title,lineage from asset where length(lineage)=12 order by lineage desc limit 1");
-$collateralRootLineage = sprintf("%012d",($collateralRootLineage+1));
-my $collateralRootId = WebGUI::SQL->setRow("asset","assetId",{
-	assetId=>"new",
-	isHidden=>1,
-	title=>"Navigation Configurations",
-	menuTitle=>"Navigation Configurations",
-	url=>fixUrl('doesntexistyet',"Navigation Configurations"),
-	ownerUserId=>"3",
-	groupIdView=>"4",
-	groupIdEdit=>"4",
-	parentId=>"PBasset000000000000001",
-	lineage=>$collateralRootLineage,
-	lastUpdated=>time(),
-	className=>"WebGUI::Asset::Wobject::Navigation",
-	state=>"published"
-	});
-WebGUI::SQL->setRow("wobject","assetId",{
-	assetId=>$collateralRootId,
-	templateId=>"1",
-	styleTemplateId=>"1",
-	printableStyleTemplateId=>"3"
-	},undef,$collateralRootId);
-WebGUI::SQL->setRow("Navigation","assetId",{
-	assetId=>$collateralRootId,
-	startType=>"relativeToCurrentUrl",
-	startPoint=>"0",
-	endPoint=>"55",
-	assetsToInclude=>"descendants",
-	showHiddenPages=>1
-	},undef,$collateralRootId);
-my %folderCache = ('0'=>$collateralRootId);
-my $collateralRankCounter = 1;
-my $sth = WebGUI::SQL->read("select * from collateralFolder");
-while (my $data = $sth->hashRef) {
-	my $folderId = WebGUI::SQL->setRow("asset","assetId",{
-		assetId=>"new",
-		className=>'WebGUI::Asset::Layout',
-		lineage=>$collateralRootLineage.sprintf("%06d",$collateralRankCounter),
-		parentId=>$collateralRootId,
-		ownerUserId=>'3',
-		groupIdView=>'4',
-		groupIdEdit=>'4',
-		lastUpdate=>time(),
-		title=>quote($data->{name}),
-		menuTitle=>quote($data->{name}),
-		url=>quote(fixUrl('doesntexist',$data->{name})),
-		state=>'published'
-		});
-	WebGUI::SQL->setRow("wobject","assetId",{
-		assetId=>quote($folderId),
-		templateId=>'15',
-		styleTemplateId=>"1",
-		printableStyleTemplateId=>"3",
-		namespace=>'Layout',
-		description=>quote($data->{description})
-		},undef,$folderId);
-	WebGUI::SQL->setRow("layout","assetId",{
-		assetId=>quote($folderId)
-		},undef,$folderId);
-	$folderCache{$data->{collateralFolderId}} = $folderId;
-	$collateralRankCounter++;
-}
-$sth->finish;
-my %collateralCache;
-my $lastCollateralFolderId = 'nolastid';
-my ($parentId, $baseLineage, $rank);
-my $sth = WebGUI::SQL->read("select * from collateral order by collateralFolderId");
-while (my $data = $sth->hashRef) {
-	unless ($lastCollateralFolderId eq $data->{collateralFolderId}) {
-		$rank = 1;
-		$baseLineage = "";
-		$parentId = "";
-	}
-	my $class;
-	my $collateralId = WebGUI::Id::generate();
-	if ($data->{filename} ne "") {
-		my $storageId = copyFile($data->{filename},'images/'.$data->{collateralId});
-		if (isIn(getFileExtension($data->{filename}), qw(jpg jpeg gif png))) {
-			copyFile('thumb-'.$data->{filename},'images/'.$data->{collateralId},$storageId);
-			WebGUI::SQL->write("insert into ImageAsset (assetId, thumbnailSize) values (".quote($newId).",
-				".quote($session{setting}{thumbnailSize}).")");
-			$class = 'WebGUI::Asset::File::Image';
-		} else {
-			$class = 'WebGUI::Asset::File';
-		}
-		WebGUI::SQL->write("insert into FileAsset (assetId, filename, storageId, fileSize) values (
-			".quote($newId).", ".quote($data->{$field}).", ".quote($storageId).",
-			".quote(getFileSize($storageId,$data->{$field})).")");
-	} else {
-
-	}
-	WebGUI::SQL->write("insert into asset (assetId, parentId, lineage, className, state, title, menuTitle, 
-		url, startDate, endDate, isHidden, ownerUserId, groupIdView, groupIdEdit, synopsis) values (".
-		quote($collateralId).", ".quote($parentId).", ".quote($baseLineage.sprintf("%06d",$rank)).", 
-		'".$class."','published',".quote($data->{fileTitle}).", ".
-		quote($data->{fileTitle}).", ".quote(fixUrl($newId,$wobjectUrl.'/'.$data->{$field})).", 
-		".quote($wobject->{startDate}).", ".quote($wobject->{endDate}).", 1, ".quote($ownerId).", 
-		".quote($data->{groupToView}).", ".quote($groupIdEdit).", ".quote($data->{briefSynopsis}).")");
-	$collateralCache{$data->{collateralId}} = $collateralId;
-	$rank++;
-}
-
-WebGUI::SQL->write("drop table collateralFolder");
-WebGUI::SQL->write("drop table collateral");
 
 
 print "\tConverting navigation templates\n" unless ($quiet);
@@ -406,13 +302,164 @@ $sth->finish;
 
 
 
+
+print "\tConverting collateral manager items into assets\n" unless ($quiet);
+my ($collateralRootLineage) = WebGUI::SQL->quickArray("select lineage from asset where length(lineage)=12 order by lineage desc limit 1");
+$collateralRootLineage = sprintf("%012d",($collateralRootLineage+1));
+my $collateralRootId = WebGUI::SQL->setRow("asset","assetId",{
+	assetId=>"new",
+	isHidden=>1,
+	title=>"Files, Snippets, and Images",
+	menuTitle=>"Files, Snippets, and Images",
+	url=>fixUrl('doesntexistyet',"Collateral"),
+	ownerUserId=>"3",
+	groupIdView=>"4",
+	groupIdEdit=>"4",
+	parentId=>"PBasset000000000000001",
+	lineage=>$collateralRootLineage,
+	lastUpdated=>time(),
+	className=>"WebGUI::Asset::Wobject::Navigation",
+	state=>"published"
+	});
+WebGUI::SQL->setRow("wobject","assetId",{
+	assetId=>$collateralRootId,
+	templateId=>"1",
+	styleTemplateId=>"1",
+	printableStyleTemplateId=>"3"
+	},undef,$collateralRootId);
+WebGUI::SQL->setRow("Navigation","assetId",{
+	assetId=>$collateralRootId,
+	startType=>"relativeToCurrentUrl",
+	startPoint=>"0",
+	endPoint=>"55",
+	assetsToInclude=>"descendants",
+	showHiddenPages=>1
+	},undef,$collateralRootId);
+my %folderCache = ('0'=>$collateralRootId);
+my %folderNameCache;
+my $collateralRankCounter = 1;
+my $sth = WebGUI::SQL->read("select * from collateralFolder where collateralFolderId <> '0'");
+while (my $data = $sth->hashRef) {
+	my $url = fixUrl('doesntexist',$data->{name});
+	$folderNameCache{$data->{name}} = $url;
+	my $folderId = WebGUI::SQL->setRow("asset","assetId",{
+		assetId=>"new",
+		className=>'WebGUI::Asset::Layout',
+		lineage=>$collateralRootLineage.sprintf("%06d",$collateralRankCounter),
+		parentId=>$collateralRootId,
+		ownerUserId=>'3',
+		groupIdView=>'4',
+		groupIdEdit=>'4',
+		lastUpdated=>time(),
+		title=>$data->{name},
+		menuTitle=>$data->{name},
+		url=>$url,
+		state=>'published'
+		});
+	WebGUI::SQL->setRow("wobject","assetId",{
+		assetId=>quote($folderId),
+		templateId=>'15',
+		styleTemplateId=>"1",
+		printableStyleTemplateId=>"3",
+		description=>$data->{description}
+		},undef,$folderId);
+	WebGUI::SQL->setRow("layout","assetId",{
+		assetId=>$folderId
+		},undef,$folderId);
+	$folderCache{$data->{collateralFolderId}} = {
+		id=>$folderId,
+		lineage=>$collateralRootLineage.sprintf("%06d",$collateralRankCounter)
+		};
+	$collateralRankCounter++;
+}
+$sth->finish;
+my $lastCollateralFolderId = 'nolastid';
+my ($parentId, $baseLineage, $rank);
+my $sth = WebGUI::SQL->read("select * from collateral order by collateralFolderId");
+while (my $data = $sth->hashRef) {
+	unless ($lastCollateralFolderId eq $data->{collateralFolderId}) {
+		$rank = 1;
+		my $id = $data->{collateralFolderId};
+		$id = "0" unless (defined $id);
+		$baseLineage = $folderCache{$id}{lineage};
+		$parentId = $folderCache{$id}{id};
+	}
+	my $class;
+	my $collateralId = WebGUI::Id::generate();
+	my $fileSize;
+	if ($data->{collateralType} eq "file" || $data->{collateralType} eq "image") {
+		my $storageId = copyFile($data->{filename},'images/'.$data->{collateralId});
+		if (isIn(getFileExtension($data->{filename}), qw(jpg jpeg gif png))) {
+			copyFile('thumb-'.$data->{filename},'images/'.$data->{collateralId},$storageId);
+			WebGUI::SQL->write("insert into ImageAsset (assetId, parameters, thumbnailSize) values (".quote($collateralId).",
+				".quote($data->{parameters}).", ".quote($data->{thumbnailSize}).")");
+			$class = 'WebGUI::Asset::File::Image';
+		} else {
+			$class = 'WebGUI::Asset::File';
+		}
+		WebGUI::SQL->write("insert into FileAsset (assetId, filename, storageId) values (
+			".quote($collateralId).", ".quote($data->{filename}).", ".quote($storageId).")");
+		$fileSize = getFileSize($storageId,$data->{filename});
+	} else {
+		WebGUI::SQL->setRow("snippet","assetId",{
+			assetId=>$collateralId,
+			snippet=>$data->{parameters}
+			},undef,$collateralId);
+		$fileSize = length($data->{parameters});
+	}
+	my $url = fixUrl($collateralId,$data->{name});
+	$macroCache{$data->{name}} = $macroCache{$data->{collateralId}} = $url;
+	WebGUI::SQL->write("insert into asset (assetId, parentId, lineage, className, state, title, menuTitle, 
+		url, ownerUserId, groupIdView, groupIdEdit, fileSize, lastUpdated) values (".
+		quote($collateralId).", ".quote($parentId).", ".quote($baseLineage.sprintf("%06d",$rank)).", 
+		'".$class."','published',".quote($data->{name}).", ".
+		quote($data->{name}).", ".quote($url).", ".quote($data->{userId}).", 
+		'7', '4', ".quote($fileSize).",".quote($data->{dateUploaded}).")");
+	$rank++;
+}
+WebGUI::SQL->write("drop table collateralFolder");
+WebGUI::SQL->write("drop table collateral");
+
+
+
+
+print "\tReplacing some old macros with new ones\n" unless ($quiet);
+my $sth = WebGUI::SQL->read("select templateId, namespace, template from template");
+while (my ($id, $namespace, $template) = $sth->array) {
+	WebGUI::SQL->write("update template set template=".quote(replaceMacros($template))." where 
+		templateId=".quote($id)." and namespace=".quote($namespace));
+}
+$sth->finish;
+my $sth = WebGUI::SQL->read("select assetId, description from wobject");
+while (my ($id, $desc) = $sth->array) {
+	WebGUI::SQL->write("update wobject set description=".quote(replaceMacros($desc))." where assetId=".quote($id));
+}
+$sth->finish;
+
+my $sth = WebGUI::SQL->read("select assetId, snippet from snippet");
+while (my ($id, $snip) = $sth->array) {
+	WebGUI::SQL->write("update snippet set snippet=".quote(replaceMacros($snip))." where assetId=".quote($id));
+}
+$sth->finish;
+
+
+
+
+
 print "\tDeleting files which are no longer used.\n" unless ($quiet);
 #unlink("../../lib/WebGUI/Page.pm");
 #unlink("../../lib/WebGUI/Operation/Page.pm");
 #unlink("../../lib/WebGUI/Operation/Root.pm");
 #unlink("../../lib/WebGUI/Navigation.pm");
-#unlink("../../lib/WebGUI/Macro/Navigation.pm");
 #unlink("../../lib/WebGUI/Operation/Navigation.pm");
+#unlink("../../lib/WebGUI/Macro/Navigation.pm");
+#unlink("../../lib/WebGUI/Macro/File.pm");
+#unlink("../../lib/WebGUI/Macro/I_imageWithTags.pm");
+#unlink("../../lib/WebGUI/Macro/i_imageNoTags.pm");
+#unlink("../../lib/WebGUI/Macro/Snippet.pm");
+#unlink("../../lib/WebGUI/Macro/Backslash_pageUrl.pm");
+#unlink("../../lib/WebGUI/Macro/RandomSnippet.pm");
+#unlink("../../lib/WebGUI/Macro/RandomImage.pm");
 #unlink("../../lib/WebGUI/Attachment.pm");
 #unlink("../../lib/WebGUI/Node.pm");
 #unlink("../../lib/WebGUI/Wobject/Article.pm");
@@ -421,25 +468,28 @@ print "\tDeleting files which are no longer used.\n" unless ($quiet);
 #unlink("../../lib/WebGUI/Wobject/USS.pm");
 #unlink("../../lib/WebGUI/Wobject/FileManager.pm");
 
+
+
+
 #--------------------------------------------
 print "\tUpdating config file.\n" unless ($quiet);
 my $pathToConfig = '../../etc/'.$configFile;
 my $conf = Parse::PlainConfig->new('DELIM' => '=', 'FILE' => $pathToConfig);
 my $macros = $conf->get("macros");
 delete $macros->{"\\"};
-$macros->{"\\\\"} = "Backslash_pageUrl";
+delete $macros->{"Backslash_pageUrl"};
+delete $macros->{"I_imageWithTags"};
+delete $macros->{"Snippet"};
+delete $macros->{"Navigation"};
+delete $macros->{"File"};
+delete $macros->{"RandomSnippet"};
+delete $macros->{"RandomImage"};
+delete $macros->{"i_imageNoTags"};
 $macros->{"AssetProxy"} = "AssetProxy";
-$macros->{"Navigation"} = "AssetProxy";
-my %newMacros;
-foreach my $macro (keys %{$macros}) {
-	unless (
-		$macros->{$macro} eq "m_currentMenuHorizontal" 
-		|| $macros->{$macro} eq "M_currentMenuVertical" 
-		) {
-		$newMacros{$macro} = $macros->{$macro};
-	}
-}
-$conf->set("macros"=>\%newMacros);
+$macros->{"RandomAssetProxy"} = "RandomAssetProxy";
+$macros->{"FileUrl"} = "FileUrl";
+$macros->{"PageUrl"} = "PageUrl";
+$conf->set("macros"=>$macros);
 $conf->set("assets"=>[
 		'WebGUI::Asset::Wobject::Navigation',
 		'WebGUI::Asset::Wobject::Layout',
@@ -456,7 +506,77 @@ $conf->set("assets"=>[
 $conf->write;
 
 
+
+
+print "\tMiscellaneous other changes.\n" unless ($quiet);
+WebGUI::SQL->write("delete from settings where name='snippetPreviewLength'");
+WebGUI::SQL->write("delete from incrementer where incrementerId in ('collateralFolderId','themeId','themeComponentId')");
+
+
+
+
+
 WebGUI::Session::close();
+
+
+
+
+
+
+
+
+sub replaceMacros {
+   	my $content = shift;
+my $parenthesis;
+$parenthesis = qr /\(                      # Start with '(',
+                     (?:                     # Followed by
+                     (?>[^()]+)              # Non-parenthesis
+                     |(??{ $parenthesis })   # Or a balanced parenthesis block
+                     )*                      # zero or more times
+                     \)/x;                  # Ending with ')'
+my $nestedMacro;
+$nestedMacro = qr /(\^                     # Start with carat
+                     ([^\^;()]+)            # And one or more none-macro characters -tagged-
+                     ((?:                   # Followed by
+                     (??{ $parenthesis })   # a balanced parenthesis block
+                     |(?>[^\^;])            # Or not a carat or semicolon
+#                    |(??{ $nestedMacro }) # Or a balanced carat-semicolon block
+                     )*)                    # zero or more times -tagged-
+                     ;)/x;                   # End with  a semicolon.
+   	while ($content =~ /$nestedMacro/gs) {
+      		my ($macro, $searchString, $params) = ($1, $2, $3);
+      		next if ($searchString =~ /^\d+$/); # don't process ^0; ^1; ^2; etc.
+      		next if ($searchString =~ /^\-$/); # don't process ^-;
+		if ($params ne "") {
+      			$params =~ s/(^\(|\)$)//g; # remove parenthesis
+		}
+		my @parsed;
+        	push(@parsed, $+) while $params =~ m {
+                	"([^\"\\]*(?:\\.[^\"\\]*)*)",?
+                	|       ([^,]+),?
+                	|       ,
+        		}gx;
+        	push(@parsed, undef) if substr($params,-1,1) eq ',';
+		my $result;
+		if (isIn($searchString, qw(Navigation I Snippet File))) {
+			my $url = (exists $macroCache{$parsed[0]}) ? $macroCache{$parsed[0]} : $parsed[0];
+			$result = '^AssetProxy("'.$url.'");';
+		} elsif (isIn($searchString, qw(RandomSnippet RandomImage))) {
+			my $url = (exists $macroCache{$parsed[0]}) ? $folderCache{$parsed[0]} : $parsed[0];
+			$result = '^RandomAssetProxy("'.$url.'");';
+		} elsif (isIn($searchString, qw(i))) {
+			my $url = (exists $macroCache{$parsed[0]}) ? $macroCache{$parsed[0]} : $parsed[0];
+			$result = '^FileUrl("'.$url.'");';
+		} elsif (isIn($searchString, qw(\\))) {
+			$result = '^PageUrl;';
+		} else {
+			next;
+		}
+		$content =~ s/\Q$macro/$result/ges;
+   	}
+   	return $content;
+}
+
 
 
 sub walkTree {
@@ -594,22 +714,24 @@ sub walkTree {
 						my $class;
 						if (isIn(getFileExtension($data->{$field}), qw(jpg jpeg gif png))) {
 							copyFile('thumb-'.$data->{$field},$wobject->{wobjectId}.'/'.$data->{FileManager_fileId},$storageId);
-							WebGUI::SQL->write("insert into ImageAsset (assetId, thumbnailSize) values (".quote($newId).",
-								".quote($session{setting}{thumbnailSize}).")");
+							WebGUI::SQL->write("insert into ImageAsset (assetId, thumbnailSize, parameters) values 
+								(".quote($newId).",
+								".quote($session{setting}{thumbnailSize}).", ".quote('alt="'.$wobject->{title}.'"').")");
 							$class = 'WebGUI::Asset::File::Image';
 						} else {
 							$class = 'WebGUI::Asset::File';
 						}
 						WebGUI::SQL->write("insert into FileAsset (assetId, filename, storageId, fileSize) values (
-							".quote($newId).", ".quote($data->{$field}).", ".quote($storageId).",
-							".quote(getFileSize($storageId,$data->{$field})).")");
+							".quote($newId).", ".quote($data->{$field}).", ".quote($storageId).")");
 						WebGUI::SQL->write("insert into asset (assetId, parentId, lineage, className, state, title, menuTitle, 
-							url, startDate, endDate, isHidden, ownerUserId, groupIdView, groupIdEdit, synopsis) values (".
+							url, startDate, endDate, isHidden, ownerUserId, groupIdView, groupIdEdit, synopsis, fileSize
+							) values (".
 							quote($newId).", ".quote($wobjectId).", ".quote($wobjectLineage.sprintf("%06d",1)).", 
 							'".$class."','published',".quote($data->{fileTitle}).", ".
 							quote($data->{fileTitle}).", ".quote(fixUrl($newId,$wobjectUrl.'/'.$data->{$field})).", 
 							".quote($wobject->{startDate}).", ".quote($wobject->{endDate}).", 1, ".quote($ownerId).", 
-							".quote($data->{groupToView}).", ".quote($groupIdEdit).", ".quote($data->{briefSynopsis}).")");
+							".quote($data->{groupToView}).", ".quote($groupIdEdit).", ".quote($data->{briefSynopsis}).",
+							".quote(getFileSize($storageId,$data->{$field})).")");
 						$rank++;
 					}
 				}
@@ -661,6 +783,7 @@ sub walkTree {
 sub fixUrl {
 	my $id = shift;
         my $url = shift;
+	$url = WebGUI::Id::generate() unless (defined $url);
         $url = WebGUI::URL::urlize($url);
         my ($test) = WebGUI::SQL->quickArray("select url from asset where assetId<>".quote($id)." and url=".quote($url));
         if ($test) {
@@ -671,7 +794,7 @@ sub fixUrl {
                         $parts[0] .= "2";
                 }
                 $url = join(".",@parts);
-                $url = fixUrl($url);
+                $url = fixUrl($id,$url);
         }
         return $url;
 }

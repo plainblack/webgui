@@ -10,6 +10,7 @@ var dragableList=new Array();
 
 //browser check
 var dom=document.getElementById&&!document.all
+var docElement = document.documentElement;
 var pageURL = "";
 var dragging=false;
 var z,x,y
@@ -74,36 +75,36 @@ function dragable_adjustScrollBars(e) {
         scrY=0;
         scrX=0;
 
-        if (e.clientY > document.body.clientHeight-scrollJump) {
-            if (e.clientY + document.body.scrollTop < pageHeight - (scrollJump + 60)) {
+        if (e.clientY > docElement.clientHeight-scrollJump) {
+            if (e.clientY + docElement.scrollTop < pageHeight - (scrollJump + 60)) {
                 scrY=scrollJump;
-                window.scroll(document.body.scrollLeft,document.body.scrollTop + scrY);
+                window.scroll(docElement.scrollLeft,docElement.scrollTop + scrY);
                 y-=scrY;
             }
         }else if (e.clientY < scrollJump) {
-            if (document.body.scrollTop < scrollJump) {
-                scrY = document.body.scrollTop;
+            if (docElement.scrollTop < scrollJump) {
+                scrY = docElement.scrollTop;
             }else {
                 scrY=scrollJump;
             }
-            window.scroll(document.body.scrollLeft,document.body.scrollTop - scrY);
+            window.scroll(docElement.scrollLeft,docElement.scrollTop - scrY);
             y+=scrY;
         }
 
 
-        if (e.clientX > document.body.clientWidth-scrollJump) {
-            if (e.clientX + document.body.scrollLeft < pageWidth - (scrollJump + 60)) {
+        if (e.clientX > docElement.clientWidth-scrollJump) {
+            if (e.clientX + docElement.scrollLeft < pageWidth - (scrollJump + 60)) {
                 scrX=scrollJump;
-                window.scroll(document.body.scrollLeft + scrX,document.body.scrollTop);
+                window.scroll(docElement.scrollLeft + scrX,docElement.scrollTop);
                 x-=scrX;
             }
         }else if (e.clientX < scrollJump) {
-            if (document.body.scrollLeft < scrollJump) {
-                scrX = document.body.scrollLeft;
+            if (docElement.scrollLeft < scrollJump) {
+                scrX = docElement.scrollLeft;
             }else {
                 scrX=scrollJump;
             }
-            window.scroll(document.body.scrollLeft - scrX,document.body.scrollTop);
+            window.scroll(docElement.scrollLeft - scrX,docElement.scrollTop);
             x+=scrX;
         }
 }
@@ -111,6 +112,13 @@ function dragable_adjustScrollBars(e) {
 
 //initialization routine, must be called on load.  Sets up event handlers
 function dragable_init(url) {
+
+	docElement = document.documentElement;
+
+	if (document.compatMode == "BackCompat") {
+		docElement = document.body;
+	}
+
         pageURL = url;
     //window.scroll(10,500);
     //set up event handlers
@@ -149,7 +157,7 @@ function dragable_move(e){
 
     if (dragging){        
         if (accuracyCount==accuracy) {                                    
-            tmp = dragable_spy(dom? e.pageX: (e.clientX + document.body.scrollLeft),dom? e.pageY: (e.clientY + document.body.scrollTop));            
+            tmp = dragable_spy(dom? e.pageX: (e.clientX + docElement.scrollLeft),dom? e.pageY: (e.clientY + docElement.scrollTop));            
             if (tmp.length != 0) {
                 dragable_dragOver(tmp[0],tmp[1]);
             }else {
@@ -178,7 +186,7 @@ function dragable_move(e){
         return false
     }else {
                 
-        tmp = dragable_spy(dom? e.pageX: (e.clientX + document.body.scrollLeft),dom? e.pageY: (e.clientY + document.body.scrollTop));
+        tmp = dragable_spy(dom? e.pageX: (e.clientX + docElement.scrollLeft),dom? e.pageY: (e.clientY + docElement.scrollTop));
         
         if (tmp.length == 0) {
             currentDiv = null;
@@ -207,8 +215,8 @@ function dragable_dragStart(e){
     fObj.className="dragging";        
 
     //set the page height and width in a var since IE changes them when scrolling
-    pageHeight = window.document.body.scrollHeight;
-    pageWidth = window.document.body.scrollWidth;
+    pageHeight = docElement.scrollHeight;
+    pageWidth = docElement.scrollWidth;
 
     dragging=true
     z=fObj;
