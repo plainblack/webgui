@@ -335,6 +335,16 @@ sub www_edit {
 }
 
 #-------------------------------------------------------------------
+sub www_manage {
+	my $self = shift;
+	#takes the user to the folder containing this template.
+	return $self->getParent->www_manageAssets;
+}
+
+
+
+
+#-------------------------------------------------------------------
 sub www_view {
 	my $self = shift;
 	return $self->getContainer->www_view;

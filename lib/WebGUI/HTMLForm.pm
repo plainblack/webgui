@@ -2175,7 +2175,7 @@ sub template {
                 		$buttons = editIcon("func=edit",$template->get("url"));
 				#"&namespace=".$namespace."&afterEdit=".WebGUI::URL::escape($afterEdit));
         	#	}
-        		#$buttons .= manageIcon("op=listTemplates&namespace=$namespace");
+        		$buttons .= manageIcon("func=manage",$template->get("url"));
 		}
         	$output = WebGUI::Form::template({
                 	"name"=>$name,

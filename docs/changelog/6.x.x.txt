@@ -1,4 +1,6 @@
 6.5.3
+ - Sorted templates into folders named after their respective namespaces
+ - & re-enabled the manage button next to the template dropdown [mwilson]
  - fix [ 1161457 ] Data fomr - list all entries: Logfile Error
  - fix [ 1161461 ] Data form - Add field - wrong destination
  - fix [ 1164382 ] User Profiling WebGUI::International::get(304,"WebGUI");
