@@ -50,7 +50,7 @@ update wobject set templatePosition=3 where templatePosition='D';
 alter table UserSubmission add column allowDiscussion int not null default 0;
 alter table UserSubmission add column editTimeout int not null default 1;
 alter table UserSubmission add column groupToPost int not null default 2;
-alter table UserSubmission add column groupToApprove int not null default 4;
+alter table UserSubmission add column groupToModerate int not null default 4;
 INSERT INTO international VALUES (39,'UserSubmission','English','Post a Reply');
 INSERT INTO international VALUES (40,'UserSubmission','English','Posted by');
 INSERT INTO international VALUES (41,'UserSubmission','English','Date');
