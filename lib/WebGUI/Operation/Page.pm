@@ -221,6 +221,7 @@ sub www_editPage {
 			$page{pageId} = "new";
 			$page{title} = $page{menuTitle} = $page{urlizedTitle} = $page{synopsis} = '';
 			$page{parentId} = $session{form}{npp};
+			$page{ownerId} = $session{user}{userId};
 			$page{ownerEdit} = 1;
 			$page{ownerView} = 1;
 		} else {

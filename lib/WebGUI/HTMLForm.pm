@@ -659,7 +659,7 @@ sub group {
                 $output .= _subtext($subtext);
                 $output = $self->_tableFormRow($label,$output);
         } else {
-		my $hashRef = WebGUI::SQL->quickHashRef("select groupId,groupName from groups");
+		my $hashRef = WebGUI::SQL->buildHashRef("select groupId,groupName from groups");
                 $output = WebGUI::Form::hiddenList({
 			"name"=>$name,
                         "options"=>$hashRef,
