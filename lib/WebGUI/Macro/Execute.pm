@@ -20,7 +20,7 @@ sub _replacement {
 	if ($param[0] =~ /passwd/ || $param[0] =~ /shadow/ || $param[0] =~ /WebGUI.conf/) {
 		$temp = "SECURITY VIOLATION";
 	} else {
-       		$temp = "<pre>".`$param[0]`."</pre>";
+       		$temp = `$param[0]`;
 	}
 	return $temp;
 }
