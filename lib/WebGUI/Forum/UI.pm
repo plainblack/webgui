@@ -36,75 +36,481 @@ User interface package for forums.
                                                                                                                                                              
  use WebGUI::Forum::UI;
 
+ $scalar = WebGUI::Forum::UI::chopSubject($subject);
+ $url = WebGUI::Forum::UI::formatApprovePostURL($callback, $postId);
+ $url = WebGUI::Forum::UI::formatDeletePostURL($callback, $postId);
+ $url = WebGUI::Forum::UI::formatDenyPostURL($callback, $postId);
+ $url = WebGUI::Forum::UI::formatEditPostURL($callback, $postId);
+ $url = WebGUI::Forum::UI::formatForumSearchURL($callback, $forumId);
+ $url = WebGUI::Forum::UI::formatForumSortByURL($callback, $forumIId);
+ $url = WebGUI::Forum::UI::formatForumSubscribeURL($callback, $forumId);
+ $url = WebGUI::Forum::UI::formatForumUnsubscribeURL($callback, $forumId);
+ $url = WebGUI::Forum::UI::formatForumURL($callback, $forumId);
+ $url = WebGUI::Forum::UI::formatNextThreadURL($callback, $postId);
+ $url = WebGUI::Forum::UI::formatNewThreadURL($callback, $forumId);
+ $scalar = WebGUI::Forum::UI::formatPostDate($epoch);
+ $scalar = WebGUI::Forum::UI::formatPostTime($epoch);
+ $url = WebGUI::Forum::UI::formatPreviousThreadURL($callback, $postId);
+ $url = WebGUI::Forum::UI::formatRatePostURL($callback, $postId, $rating);
+ $url = WebGUI::Forum::UI::formatReplyPostURL($callback, $postId);
+ $scalar = WebGUI::Forum::UI::formatStatus($status);
+ $scalar = WebGUI::Forum::UI::formatSubject($subject);
+ $url = WebGUI::Forum::UI::formatThreadLayoutURL($callback, $postId, $layout);
+ $url = WebGUI::Forum::UI::formatThreadLockURL($callback, $postId);
+ $url = WebGUI::Forum::UI::formatThreadStickURL($callback, $postId);
+ $url = WebGUI::Forum::UI::formatThreadSubscribeURL($callback, $postId);
+ $url = WebGUI::Forum::UI::formatThreadUnlockURL($callback, $postId);
+ $url = WebGUI::Forum::UI::formatThreadUnstickURL($callback, $postId);
+ $url = WebGUI::Forum::UI::formatThreadUnsubscribeURL($callback, $postId);
+ $url = WebGUI::Forum::UI::formatThreadURL($callback, $postId);
+ $url = WebGUI::Forum::UI::formatUserProfileURL($userId);
+
+ $html = WebGUI::Forum::UI::forumProperties($forumId);
+ WebGUI::Forum::UI::forumPropertiesSave();
+
+ $hashRef = WebGUI::Forum::UI::getForumTemplateVars($callack, $forum);
+ $hashRef = WebGUI::Forum::UI::getPostTemplateVars($post, $thread, $forum, $callack);
+ $hashRef = WebGUI::Forum::UI::getThreadTemplateVars($callack, $post);
+ $arrayRef = WebGUI::Forum::UI::recurseThread($post, $thread, $forum, $depth, $callback, $postId);
+
+ WebGUI::Forum::UI::notifySubscribers($post, $thread, $forum, $callback);
+ WebGUI::Forum::UI::setPostApproved($callback, $post);
+ WebGUI::Forum::UI::setPostDeleted($callback, $post);
+ WebGUI::Forum::UI::setPostDenied($callback, $post);
+ WebGUI::Forum::UI::setPostPending($callback, $post);
+ WebGUI::Forum::UI::setPostStatus($callback, $post);
+ 
+ $html = WebGUI::Forum::UI::forumOp($callback);
+ $html = WebGUI::Forum::UI::www_approvePost($callback);
+ $html = WebGUI::Forum::UI::www_deletePost($callback);
+ $html = WebGUI::Forum::UI::www_deletePostConfirm($callback);
+ $html = WebGUI::Forum::UI::www_denyPost($callback);
+ $html = WebGUI::Forum::UI::www_forumSubscribe($callback);
+ $html = WebGUI::Forum::UI::www_forumUnsubscribe($callback);
+ $html = WebGUI::Forum::UI::www_nextThread($callback);
+ $html = WebGUI::Forum::UI::www_post($callback);
+ $html = WebGUI::Forum::UI::www_postSave($callback);
+ $html = WebGUI::Forum::UI::www_previousThread($callback);
+ $html = WebGUI::Forum::UI::www_ratePost($callback);
+ $html = WebGUI::Forum::UI::www_search($callback);
+ $html = WebGUI::Forum::UI::www_threadLock($callback);
+ $html = WebGUI::Forum::UI::www_threadStick($callback);
+ $html = WebGUI::Forum::UI::www_threadSubscribe($callback);
+ $html = WebGUI::Forum::UI::www_threadUnlock($callback);
+ $html = WebGUI::Forum::UI::www_threadUnstick($callback);
+ $html = WebGUI::Forum::UI::www_threadUnsubscribe($callback);
+ $html = WebGUI::Forum::UI::www_viewForum($callback);
+ $html = WebGUI::Forum::UI::www_viewThread($callback);
+
 =head1 FUNCTIONS
                                                                                                                                                              
 These functions are available from this package:
                                                                                                                                                              
 =cut
 
+#-------------------------------------------------------------------
+
+=head2 chopSubject ( subject )
+
+Cuts a subject string off at 30 characters.
+
+=over
+
+=item subject
+
+The string to format.
+
+=back
+
+=cut
+
 sub chopSubject {
 	return substr(formatSubject($_[0]),0,30);
 }
+
+#-------------------------------------------------------------------
+
+=head2 formatApprovePostURL ( callback, postId )
+
+Formats the URL to approve a post.
+
+=over
+
+=item callback
+
+The url to get back to the calling object.
+
+=item postId
+
+The unique id for the post.
+
+=back
+
+=cut
 
 sub formatApprovePostURL {
 	return WebGUI::URL::append($_[0],"forumOp=approvePost&amp;forumPostId=".$_[1]."&amp;mlog=".$session{form}{mlog});
 }
 
+#-------------------------------------------------------------------
+
+=head2 formatDeletePostURL ( callback, postId )
+
+Formats the url to delete a post.
+
+=over
+
+=item callback
+
+The url to get back tot he calling object.
+
+=item postId
+
+The unique id for the post.
+
+=back
+
+=cut
+
 sub formatDeletePostURL {
 	return WebGUI::URL::append($_[0],"forumOp=deletePost&amp;forumPostId=".$_[1]);
 }
+
+#-------------------------------------------------------------------
+
+=head2 formatDenyPostURL ( callback, postId )
+
+Formats the url to deny a post.
+
+=over
+
+=item callback
+
+The url to get back tot he calling object.
+
+=item postId
+
+The unique id for the post.
+
+=back
+
+=cut
 
 sub formatDenyPostURL {
 	return WebGUI::URL::append($_[0],"forumOp=denyPost&amp;forumPostId=".$_[1]."&amp;mlog=".$session{form}{mlog});
 }
 
+#-------------------------------------------------------------------
+
+=head2 formatEditPostURL ( callback, postId )
+
+Formats the url to edit a post.
+
+=over
+
+=item callback
+
+The url to get back tot he calling object.
+
+=item postId
+
+The unique id for the post.
+
+=back
+
+=cut
+
 sub formatEditPostURL {
 	return WebGUI::URL::append($_[0],"forumOp=post&amp;forumPostId=".$_[1]);
 }
+
+#-------------------------------------------------------------------
+
+=head2 formatForumSearchURL ( callback, forumId )
+
+Formats the url to the forum search engine.
+
+=over
+
+=item callback
+
+The url to get back tot he calling object.
+
+=item forumId
+
+The unique id for the forum.
+
+=back
+
+=cut
 
 sub formatForumSearchURL {
 	return WebGUI::URL::append($_[0],"forumOp=search&amp;forumId=".$_[1]);
 }
 
+#-------------------------------------------------------------------
+
+=head2 formatForumSortByURL ( callback, forumId, sortBy )
+
+Formats the url to change the default sort.
+
+=over
+
+=item callback
+
+The url to get back tot he calling object.
+
+=item forumId
+
+The unique id for the forum.
+
+=item sortBy 
+
+The sort by string. Can be views, rating, date replies, or lastreply.
+
+=back
+
+=cut
+
 sub formatForumSortByURL {
 	return WebGUI::URL::append($_[0],"forumOp=viewForum&amp;forumId=".$_[1]."&amp;sortBy=".$_[2]);
 }
+
+#-------------------------------------------------------------------
+
+=head2 formatForumSubscribeURL ( callback, forumId )
+
+Formats the url to subscribe to the forum.
+
+=over
+
+=item callback
+
+The url to get back tot he calling object.
+
+=item forumId
+
+The unique id for the forum.
+
+=back
+
+=cut
 
 sub formatForumSubscribeURL {
 	return WebGUI::URL::append($_[0],"forumOp=forumSubscribe&amp;forumId=".$_[1]);
 }
 
+#-------------------------------------------------------------------
+
+=head2 formatForumUnsubscribeURL ( callback, forumId )
+
+Formats the url to unsubscribe from the forum.
+
+=over
+
+=item callback
+
+The url to get back tot he calling object.
+
+=item forumId
+
+The unique id for the forum.
+
+=back
+
+=cut
+
 sub formatForumUnsubscribeURL {
 	return WebGUI::URL::append($_[0],"forumOp=forumUnsubscribe&amp;forumId=".$_[1]);
 }
+
+#-------------------------------------------------------------------
+
+=head2 formatForumURL ( callback, forumId )
+
+Formats the url to view the forum.
+
+=over
+
+=item callback
+
+The url to get back tot he calling object.
+
+=item forumId
+
+The unique id for the forum.
+
+=back
+
+=cut
 
 sub formatForumURL {
 	return WebGUI::URL::append($_[0],"forumOp=viewForum&amp;forumId=".$_[1]);
 }
 
+#-------------------------------------------------------------------
+
+=head2 formatNextThreadURL ( callback, postId )
+
+Formats the url to view the next thread. 
+
+=over
+
+=item callback
+
+The url to get back tot he calling object.
+
+=item postId
+
+The unique id for the post.
+
+=back
+
+=cut
+
 sub formatNextThreadURL {
 	return WebGUI::URL::append($_[0],"forumOp=nextThread&amp;forumThreadId=".$_[1]);
 }
+
+#-------------------------------------------------------------------
+
+=head2 formatNewThreadURL ( callback, forumId )
+
+Formats the url to start a new thread. 
+
+=over
+
+=item callback
+
+The url to get back tot he calling object.
+
+=item forumId
+
+The unique id for the forum.
+
+=back
+
+=cut
 
 sub formatNewThreadURL {
 	return WebGUI::URL::append($_[0],"forumOp=post&amp;forumId=".$_[1]);
 }
 
+#-------------------------------------------------------------------
+
+=head2 formatPostDate ( epoch )
+
+Formats the date as human readable according to the user's profile. 
+
+=over
+
+=item epoch
+
+The date represented as the number of seconds since January 1, 1970.
+
+=back
+
+=cut
+
 sub formatPostDate {
 	return WebGUI::DateTime::epochToHuman($_[0],"%z");
 }
+
+#-------------------------------------------------------------------
+
+=head2 formatPostTime ( epoch )
+
+Formats the time as human readable according to the user's profile. 
+
+=over
+
+=item epoch
+
+The date represented as the number of seconds since January 1, 1970.
+
+=back
+
+=cut
 
 sub formatPostTime {
 	return WebGUI::DateTime::epochToHuman($_[0],"%Z");
 }
 
+#-------------------------------------------------------------------
+
+=head2 formatPreviousThreadURL ( callback, postId )
+
+Formats the url to view the previous thread. 
+
+=over
+
+=item callback
+
+The url to get back tot he calling object.
+
+=item postId
+
+The unique id for the post.
+
+=back
+
+=cut
+
 sub formatPreviousThreadURL {
 	return WebGUI::URL::append($_[0],"forumOp=previousThread&amp;forumThreadId=".$_[1]);
 }
 
+#-------------------------------------------------------------------
+
+=head2 formatRatePostURL ( callback, postId, rating )
+
+Formats the url to rate a post. 
+
+=over
+
+=item callback
+
+The url to get back tot he calling object.
+
+=item postId
+
+The unique id for the post.
+
+=item rating
+
+An integer between 1 and 5 (5 = best).
+
+=back
+
+=cut
+
 sub formatRatePostURL {
 	return WebGUI::URL::append($_[0],"forumOp=ratePost&amp;forumPostId=".$_[1]."&amp;rating=".$_[2]."#".$_[1]);
 }
+
+#-------------------------------------------------------------------
+
+=head2 formatReplyPostURL ( callback, postId [ , withQuote ] )
+
+Formats the url to reply to a post.
+
+=over
+
+=item callback
+
+The url to get back tot he calling object.
+
+=item postId
+
+The unique id for the post.
+
+=item withQuote 
+
+If specified the reply with automatically quote the parent post.
+
+=back
+
+=cut
 
 sub formatReplyPostURL {
 	my $url = WebGUI::URL::append($_[0],"forumOp=post&amp;parentId=".$_[1]);
@@ -112,9 +518,21 @@ sub formatReplyPostURL {
 	return $url;
 }
 
-sub formatSubject {
-	return WebGUI::HTML::filter($_[0],"all");
-}
+#-------------------------------------------------------------------
+
+=head2 formatStatus ( status )
+
+Returns an internationalized string for the status based upon the key.
+
+=over
+
+=item status
+
+A string key. Can be approved, archived, deleted, denied, or pending.
+
+=back
+
+=cut
 
 sub formatStatus {
         if ($_[0] eq "approved") {
@@ -128,41 +546,257 @@ sub formatStatus {
         }
 }
 
+#-------------------------------------------------------------------
+
+=head2 formatSubject ( subject )
+
+Formats the subject string (removing bad stuff like HTML).
+
+=over
+
+=item subject 
+
+The string to format.
+
+=back
+
+=cut
+
+sub formatSubject {
+	return WebGUI::HTML::filter($_[0],"all");
+}
+
+#-------------------------------------------------------------------
+
+=head2 formatThreadLayoutURL ( callback, postId, layout )
+
+Formats the url to change the layout of a thread.
+
+=over
+
+=item callback
+
+The url to get back tot he calling object.
+
+=item postId
+
+The unique id for the post.
+
+=item layout
+
+A string indicating the type of layout to use. Can be flat, nested, or threaded.
+
+=back
+
+=cut
+
 sub formatThreadLayoutURL {
 	return WebGUI::URL::append($_[0],"forumOp=viewThread&amp;forumPostId=".$_[1]."&amp;layout=".$_[2]);
 }
+
+#-------------------------------------------------------------------
+
+=head2 formatThreadLockURL ( callback, postId )
+
+Formats the url to lock a thread.
+
+=over
+
+=item callback
+
+The url to get back tot he calling object.
+
+=item postId
+
+The unique id for the post.
+
+=back
+
+=cut
 
 sub formatThreadLockURL {
 	return WebGUI::URL::append($_[0],"forumOp=threadLock&amp;forumPostId=".$_[1]."#".$_[1]);
 }
 
-sub formatThreadUnlockURL {
-	return WebGUI::URL::append($_[0],"forumOp=threadUnlock&amp;forumPostId=".$_[1]."#".$_[1]);
-}
+#-------------------------------------------------------------------
+
+=head2 formatThreadStickURL ( callback, postId )
+
+Formats the url to make a thread sticky.
+
+=over
+
+=item callback
+
+The url to get back tot he calling object.
+
+=item postId
+
+The unique id for the post.
+
+=back
+
+=cut
 
 sub formatThreadStickURL {
 	return WebGUI::URL::append($_[0],"forumOp=threadStick&amp;forumPostId=".$_[1]."#".$_[1]);
 }
 
+#-------------------------------------------------------------------
+
+=head2 formatThreadSubscribeURL ( callback, postId )
+
+Formats the url to subscribe to a thread. 
+
+=over
+
+=item callback
+
+The url to get back tot he calling object.
+
+=item postId
+
+The unique id for the post.
+
+=back
+
+=cut
+
 sub formatThreadSubscribeURL {
 	return WebGUI::URL::append($_[0],"forumOp=threadSubscribe&amp;forumPostId=".$_[1]."#".$_[1]);
 }
+
+#-------------------------------------------------------------------
+
+=head2 formatThreadUnlockURL ( callback, postId )
+
+Formats the url to unlock a thread.
+
+=over
+
+=item callback
+
+The url to get back tot he calling object.
+
+=item postId
+
+The unique id for the post.
+
+=back
+
+=cut
+
+sub formatThreadUnlockURL {
+	return WebGUI::URL::append($_[0],"forumOp=threadUnlock&amp;forumPostId=".$_[1]."#".$_[1]);
+}
+
+#-------------------------------------------------------------------
+
+=head2 formatThreadUnstickURL ( callback, postId )
+
+Formats the url to make a sticky thread no longer sticky. 
+
+=over
+
+=item callback
+
+The url to get back tot he calling object.
+
+=item postId
+
+The unique id for the post.
+
+=back
+
+=cut
 
 sub formatThreadUnstickURL {
 	return WebGUI::URL::append($_[0],"forumOp=threadUnstick&amp;forumPostId=".$_[1]."#".$_[1]);
 }
 
+#-------------------------------------------------------------------
+
+=head2 formatThreadUnsubscribeURL ( callback, postId )
+
+Formats the url to unsubscribe from a thread.
+
+=over
+
+=item callback
+
+The url to get back tot he calling object.
+
+=item postId
+
+The unique id for the post.
+
+=back
+
+=cut
+
 sub formatThreadUnsubscribeURL {
 	return WebGUI::URL::append($_[0],"forumOp=threadUnsubscribe&amp;forumPostId=".$_[1]."#".$_[1]);
 }
+
+#-------------------------------------------------------------------
+
+=head2 formatThreadURL ( callback, postId )
+
+Formats the url to view a thread.
+
+=over
+
+=item callback
+
+The url to get back tot he calling object.
+
+=item postId
+
+The unique id for the post.
+
+=back
+
+=cut
 
 sub formatThreadURL {
 	return WebGUI::URL::append($_[0],"forumOp=viewThread&amp;forumPostId=".$_[1]."#".$_[1]);
 }
 
+#-------------------------------------------------------------------
+
+=head2 formatUserProfileURL ( userId )
+
+Formats the url to view a users profile.
+
+=over
+
+=item userId
+
+The unique id for the user.
+
+=back
+
+=cut
+
 sub formatUserProfileURL {
 	return WebGUI::URL::page("op=viewProfile&amp;uid=".$_[0]);
 }
+
+#-------------------------------------------------------------------
+
+=head2 forumProperties ( forumId )
+
+Returns a forum containing the editable properties of a forum.
+
+=over
+
+=item forumId
+
+The unique id of the forum.
+
+=back
+
+=cut
 
 sub forumProperties {
 	my ($forumId) = @_;
@@ -289,6 +923,14 @@ sub forumProperties {
         return $f->printRowsOnly;
 }
 
+#-------------------------------------------------------------------
+
+=head2 forumPropertiesSave ( )
+
+Saves all of the forum properties in $session{form}.
+
+=cut
+
 sub forumPropertiesSave {
 	my %data = (
 		forumTemplateId=>$session{form}{forumTemplateId},
@@ -319,6 +961,22 @@ sub forumPropertiesSave {
 	return $forum->get("forumId");
 }
 
+#-------------------------------------------------------------------
+
+=head2 forumOp ( callback )
+
+Returns the output of the various www_ subroutines.
+
+=over
+
+=item callback
+
+The URL to get back to the calling object.
+
+=back
+
+=cut
+
 sub forumOp {
         my ($callback) = @_;
 	if ($session{form}{forumOp} =~ /^[A-Za-z]+$/) {
@@ -328,6 +986,26 @@ sub forumOp {
 		WebGUI::ErrorHandler::security("execute an invalid forum operation: ".$session{form}{forumOp});
 	}
 }
+
+#-------------------------------------------------------------------
+
+=head2 getForumTemplateVars ( callback, forum )
+
+Returns a hash reference compatible with WebGUI's templating system.
+
+=over
+
+=item callback
+
+The url to get back to the calling object.
+
+=item forum
+
+The unique id for the forum.
+
+=back
+
+=cut
 
 sub getForumTemplateVars {
 	my ($callback, $forum) = @_;
@@ -432,6 +1110,38 @@ sub getForumTemplateVars {
 	return \%var; 
 }	
 
+#-------------------------------------------------------------------
+
+=head2 getPostTemplateVars ( post, thread, forum, callback [, var ] )
+
+Returns a hash reference compatible with WebGUI's templating system containing the template variables for a post.
+
+=over
+
+=item post
+
+A post object.
+
+=item thread
+
+A thread object.
+
+=item forum
+
+A forum object.
+
+=item callback
+
+The url to get back to the calling object.
+
+=item var
+
+A hash reference to be prepended to the hashref being returned.
+
+=back
+
+=cut
+
 sub getPostTemplateVars {
         my ($post, $thread, $forum, $callback, $var) = @_;
 	$var->{'callback.url'} = $callback;
@@ -506,6 +1216,26 @@ sub getPostTemplateVars {
 	return $var;
 }
 
+#-------------------------------------------------------------------
+
+=head2 getThreadTemplateVars ( callback, post )
+
+Returns a hash reference compatible with WebGUI's template system containing the template variables for the thread.
+
+=over
+
+=item callback
+
+The URL to get back to the calling object.
+
+=item post
+
+A post object.
+
+=back
+
+=cut
+
 sub getThreadTemplateVars {
         my ($callback, $post) = @_;
         $post->markRead($session{user}{userId});
@@ -558,6 +1288,33 @@ sub getThreadTemplateVars {
         return $var;
 }
                                                                                                                                                              
+#-------------------------------------------------------------------
+
+=head2 notifySubscribers ( post, thread, forum, callback )
+
+Send notifications to the thread and forum subscribers that a new post has been made.
+
+=over
+
+=item post
+
+A post object.
+
+=item thread
+
+A thread object.
+
+=item forum
+
+A forum object.
+
+=item callback
+
+The url to get back to the calling object.
+
+=back
+
+=cut
 
 sub notifySubscribers {
         my ($post, $thread, $forum, $callback) = @_;
@@ -583,6 +1340,42 @@ sub notifySubscribers {
 	}
 }
 
+#-------------------------------------------------------------------
+
+=head2 recurseThread ( post, thread, forum, depth, callback, currentPost ) 
+
+Returns an array reference with the template variables from all the posts in a thread.
+
+=over
+
+=item post
+
+A post object.
+
+=item thread
+
+A thread object.
+
+=item forum
+
+A forum object.
+
+=item depth
+
+An integer representing the depth of the current recurrsion. Starts at 0.
+
+=item callback
+
+The url to get back to the calling object.
+
+=item currentPost
+
+The unique id of the post that was selected by the user in this thread.
+
+=back
+
+=cut
+
 sub recurseThread {
         my ($post, $thread, $forum, $depth, $callback, $currentPost) = @_;
         my @depth_loop;
@@ -602,6 +1395,26 @@ sub recurseThread {
         return \@post_loop;
 }
                                                                                                                                                              
+#-------------------------------------------------------------------
+
+=head2 setPostApproved ( callback, post )
+
+Sets the post to approved and sends any necessary notifications.
+
+=over
+
+=item callback
+
+The url to get back to the calling object.
+
+=item post
+
+A post object.
+
+=back
+
+=cut
+
 sub setPostApproved {
 	my ($callback, $post) = @_;
 	$post->setStatusApproved;
@@ -611,11 +1424,76 @@ sub setPostApproved {
 	notifySubscribers($post,$post->getThread,$post->getThread->getForum,$callback);
 }
 
+#-------------------------------------------------------------------
+
+=head2 setPostDeleted ( callback, post )
+
+Sets the post to deleted and sends any necessary notifications.
+
+=over
+
+=item callback
+
+The url to get back to the calling object.
+
+=item post
+
+A post object.
+
+=back
+
+=cut
+
+sub setPostDeleted {
+	my ($callback, $post) = @_;
+	$post->setStatusDeleted;
+}
+
+#-------------------------------------------------------------------
+
+=head2 setPostDenied ( callback, post )
+
+Sets the post to denied and sends any necessary notifications.
+
+=over
+
+=item callback
+
+The url to get back to the calling object.
+
+=item post
+
+A post object.
+
+=back
+
+=cut
+
 sub setPostDenied {
 	my ($callback, $post) = @_;
 	$post->setStatusDenied;
 	WebGUI::MessageLog::addInternationalizedEntry($post->get("userId"),'',formatThreadURL($callback,$post->get("forumPostId")),580);
 }
+
+#-------------------------------------------------------------------
+
+=head2 setPostPending ( callback, post )
+
+Sets the post to pending and sends any necessary notifications.
+
+=over
+
+=item callback
+
+The url to get back to the calling object.
+
+=item post
+
+A post object.
+
+=back
+
+=cut
 
 sub setPostPending {
 	my ($callback, $post) = @_;
@@ -623,6 +1501,26 @@ sub setPostPending {
 	WebGUI::MessageLog::addInternationalizedEntry('',$post->getThread->getForum->get("groupToModerate"),
 		formatThreadURL($callback,$post->get("forumPostId")),578,'WebGUI','pending');
 }
+
+#-------------------------------------------------------------------
+
+=head2 setPostStatus ( callback, post ) 
+
+Sets a new post's status based upon forum settings.
+
+=over
+
+=item callback
+
+The url to get back to the calling object.
+
+=item post
+
+A post object.
+
+=back
+
+=cut
 
 sub setPostStatus {
 	my ($callback, $post) = @_;
@@ -633,6 +1531,22 @@ sub setPostStatus {
 	}
 }
 
+#-------------------------------------------------------------------
+
+=head2 www_approvePost ( callback )
+
+The web method to approve a post.
+
+=over
+
+=item callback
+
+The url to get back to the calling object.
+
+=back
+
+=cut
+
 sub www_approvePost {
 	my ($callback) = @_;
 	my $post = WebGUI::Forum::Post->new($session{form}{forumPostId});
@@ -640,6 +1554,22 @@ sub www_approvePost {
 	setPostApproved($callback,$post);
        	return www_viewThread($callback);
 }
+
+#-------------------------------------------------------------------
+
+=head2 www_deletePost ( callback )
+
+The web method to prompt a user as to whether they actually want to delete a post.
+
+=over
+
+=item callback
+
+The url to get back to the calling object.
+
+=back
+
+=cut
 
 sub www_deletePost {
 	my ($callback) = @_;
@@ -653,6 +1583,22 @@ sub www_deletePost {
        	return $output;
 }
 
+#-------------------------------------------------------------------
+
+=head2 www_deletePostConfirm ( callback )
+
+The web method to delete a post.
+
+=over
+
+=item callback
+
+The url to get back to the calling object.
+
+=back
+
+=cut
+
 sub www_deletePostConfirm {
 	my ($callback) = @_;
 	my $post = WebGUI::Forum::Post->new($session{form}{forumPostId});
@@ -660,6 +1606,22 @@ sub www_deletePostConfirm {
 	$post->setStatusDeleted;
        	return www_viewForum($callback,$post->getThread->get("forumId"));
 }
+
+#-------------------------------------------------------------------
+
+=head2 www_denyPost ( callback )
+
+The web method to deny a post.
+
+=over
+
+=item callback
+
+The url to get back to the calling object.
+
+=back
+
+=cut
 
 sub www_denyPost {
 	my ($callback) = @_;
@@ -669,6 +1631,22 @@ sub www_denyPost {
        	return www_viewThread($callback);
 }
 
+#-------------------------------------------------------------------
+
+=head2 www_forumSubscribe ( callback )
+
+The web method to subscribe to a forum.
+
+=over
+
+=item callback
+
+The url to get back to the calling object.
+
+=back
+
+=cut
+
 sub www_forumSubscribe {
 	my ($callback) = @_;
 	my $forum = WebGUI::Forum->new($session{form}{forumId});
@@ -677,6 +1655,22 @@ sub www_forumSubscribe {
 	return www_viewForum($callback, $session{form}{forumId});
 }
 
+#-------------------------------------------------------------------
+
+=head2 www_forumUnsubscribe ( callback )
+
+The web method to unsubscribe from a forum.
+
+=over
+
+=item callback
+
+The url to get back to the calling object.
+
+=back
+
+=cut
+
 sub www_forumUnsubscribe {
 	my ($callback) = @_;
 	my $forum = WebGUI::Forum->new($session{form}{forumId});
@@ -684,6 +1678,22 @@ sub www_forumUnsubscribe {
 	$forum->unsubscribe;
 	return www_viewForum($callback, $session{form}{forumId});
 }
+
+#-------------------------------------------------------------------
+
+=head2 www_nextThread ( callback )
+
+The web method to display the next thread in the forum.
+
+=over
+
+=item callback
+
+The url to get back to the calling object.
+
+=back
+
+=cut
 
 sub www_nextThread {
 	my ($callback) = @_;
@@ -695,6 +1705,22 @@ sub www_nextThread {
 		return www_viewForum($callback,$thread->get("forumId"));
 	}
 }
+
+#-------------------------------------------------------------------
+
+=head2 www_post ( callback )
+
+The web method to display the post form.
+
+=over
+
+=item callback
+
+The url to get back to the calling object.
+
+=back
+
+=cut
 
 sub www_post {
 	my ($callback) = @_;
@@ -806,6 +1832,22 @@ sub www_post {
 	return WebGUI::Template::process(WebGUI::Template::get($forum->get("postformTemplateId"),"Forum/PostForm"), $var); 
 }
 
+#-------------------------------------------------------------------
+
+=head2 www_postSave ( callback )
+
+The web method to save the data from the post form.
+
+=over
+
+=item callback
+
+The url to get back to the calling object.
+
+=back
+
+=cut
+
 sub www_postSave {
 	my ($callback) = @_;
 	my $forumId = $session{form}{forumId};
@@ -860,6 +1902,22 @@ sub www_postSave {
 	}
 }
 
+#-------------------------------------------------------------------
+
+=head2 www_previousThread ( callback )
+
+The web method to view the previous thread in this forum.
+
+=over
+
+=item callback
+
+The url to get back to the calling object.
+
+=back
+
+=cut
+
 sub www_previousThread {
 	my ($callback) = @_;
 	my $thread = WebGUI::Forum::Thread->new($session{form}{forumThreadId});
@@ -871,6 +1929,22 @@ sub www_previousThread {
 	}
 }
 
+#-------------------------------------------------------------------
+
+=head2 www_ratePost ( callback )
+
+The web method to rate a post.
+
+=over
+
+=item callback
+
+The url to get back to the calling object.
+
+=back
+
+=cut
+
 sub www_ratePost {
 	my ($callback) = @_;
 	my $post = WebGUI::Forum::Post->new($session{form}{forumPostId});
@@ -878,6 +1952,22 @@ sub www_ratePost {
 	$post->rate($session{form}{rating}) unless ($post->hasRated);
 	return www_viewThread($callback,$session{form}{forumPostId});
 }
+
+#-------------------------------------------------------------------
+
+=head2 www_search ( callback )
+
+The web method to display and use the forum search interface.
+
+=over
+
+=item callback
+
+The url to get back to the calling object.
+
+=back
+
+=cut
 
 sub www_search {
 	my ($callback) = @_;
@@ -968,6 +2058,22 @@ sub www_search {
 	return WebGUI::Template::process(WebGUI::Template::get($forum->get("searchTemplateId"),"Forum/Search"), \%var);
 }
 
+#-------------------------------------------------------------------
+
+=head2 www_threadLock ( callback )
+
+The web method to lock a thread.
+
+=over
+
+=item callback
+
+The url to get back to the calling object.
+
+=back
+
+=cut
+
 sub www_threadLock {
 	my ($callback) = @_;
 	my $post = WebGUI::Forum::Post->new($session{form}{forumPostId});
@@ -976,13 +2082,21 @@ sub www_threadLock {
 	return www_viewThread($callback, $session{form}{forumPostId});
 }
 
-sub www_threadUnlock {
-	my ($callback) = @_;
-	my $post = WebGUI::Forum::Post->new($session{form}{forumPostId});
-	return WebGUI::Privilege::insufficient() unless ($post->getThread->getForum->isModerator);
-	$post->getThread->unlock;
-	return www_viewThread($callback, $session{form}{forumPostId});
-}
+#-------------------------------------------------------------------
+
+=head2 www_threadStick ( callback )
+
+The web method to make a thread sticky.
+
+=over
+
+=item callback
+
+The url to get back to the calling object.
+
+=back
+
+=cut
 
 sub www_threadStick {
 	my ($callback) = @_;
@@ -992,6 +2106,22 @@ sub www_threadStick {
 	return www_viewThread($callback, $session{form}{forumPostId});
 }
 
+#-------------------------------------------------------------------
+
+=head2 www_threadSubscribe ( callback )
+
+The web method to subscribe to a thread.
+
+=over
+
+=item callback
+
+The url to get back to the calling object.
+
+=back
+
+=cut
+
 sub www_threadSubscribe {
 	my ($callback) = @_;
 	my $post = WebGUI::Forum::Post->new($session{form}{forumPostId});
@@ -999,6 +2129,46 @@ sub www_threadSubscribe {
 	$post->getThread->subscribe;
 	return www_viewThread($callback, $session{form}{forumPostId});
 }
+
+#-------------------------------------------------------------------
+
+=head2 www_threadUnlock ( callback )
+
+The web method to unlock a thread.
+
+=over
+
+=item callback
+
+The url to get back to the calling object.
+
+=back
+
+=cut
+
+sub www_threadUnlock {
+	my ($callback) = @_;
+	my $post = WebGUI::Forum::Post->new($session{form}{forumPostId});
+	return WebGUI::Privilege::insufficient() unless ($post->getThread->getForum->isModerator);
+	$post->getThread->unlock;
+	return www_viewThread($callback, $session{form}{forumPostId});
+}
+
+#-------------------------------------------------------------------
+
+=head2 www_threadUnstick ( callback )
+
+The web method to make a sticky thread normal again. 
+
+=over
+
+=item callback
+
+The url to get back to the calling object.
+
+=back
+
+=cut
 
 sub www_threadUnstick {
 	my ($callback) = @_;
@@ -1008,6 +2178,22 @@ sub www_threadUnstick {
 	return www_viewThread($callback, $session{form}{forumPostId});
 }
 
+#-------------------------------------------------------------------
+
+=head2 www_threadUnsubscribe ( callback )
+
+The web method to unsubscribe from a thread.
+
+=over
+
+=item callback
+
+The url to get back to the calling object.
+
+=back
+
+=cut
+
 sub www_threadUnsubscribe {
 	my ($callback) = @_;
 	my $post = WebGUI::Forum::Post->new($session{form}{forumPostId});
@@ -1015,6 +2201,26 @@ sub www_threadUnsubscribe {
 	$post->getThread->unsubscribe;
 	return www_viewThread($callback, $session{form}{forumPostId});
 }
+
+#-------------------------------------------------------------------
+
+=head2 www_viewForum ( callback [ , forumId ] )
+
+The web method to display a forum. 
+
+=over
+
+=item callback
+
+The url to get back to the calling object.
+
+=item forumId 
+
+Specify a forumId and call this method directly, rather than over the web.
+
+=back
+
+=cut
 
 sub www_viewForum {
 	my ($callback, $forumId) = @_;
@@ -1024,6 +2230,26 @@ sub www_viewForum {
 	my $var = getForumTemplateVars($callback, $forum);
 	return WebGUI::Template::process(WebGUI::Template::get($forum->get("forumTemplateId"),"Forum"), $var); 
 }	
+
+#-------------------------------------------------------------------
+
+=head2 www_viewThread ( callback [ , postId ] )
+
+The web method to display a thread. 
+
+=over
+
+=item callback
+
+The url to get back to the calling object.
+
+=item postId 
+
+Specify a postId and call this method directly, rather than over the web.
+
+=back
+
+=cut
 
 sub www_viewThread {
 	my ($callback, $postId) = @_;
