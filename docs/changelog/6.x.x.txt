@@ -89,6 +89,9 @@ webgui.
    contest.
  - Removed the old realtime search subsystem in favor of the new search
    wobject.
+ - Removed the upgrades older than 4.x in order to help reduce the size of
+   the distribution. If you need those old upgrades you can still get them 
+   from previous distributions or th 5.5 branch in CVS.
 
 
 
