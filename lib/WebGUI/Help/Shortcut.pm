@@ -9,10 +9,26 @@ our $HELP = {
 				tag => 'wobjects using',
 				namespace => 'WebGUI'
 			},
-            {
-                    tag => 'metadata manage',
-                    namespace => 'MetaData'
-            },
+                        {
+                                tag => 'metadata manage',
+                                namespace => 'Asset'
+                        },
+
+		]
+	},
+
+	'shortcut template' => {
+		title => 'shortcut template title',
+		body => 'shortcut template body',
+		related => [
+			{
+				tag => 'wobjects using',
+				namespace => 'WebGUI'
+			},
+                        {
+                                tag => 'template language',
+                                namespace => 'Template'
+                        },
 
 		]
 	},

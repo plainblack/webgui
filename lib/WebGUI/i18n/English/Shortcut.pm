@@ -60,7 +60,7 @@ our $I18N = {
 <p>
 
 <b>Asset to Mirror</b><br>
-Provides a link to the original wobject being proxied.
+Provides a link to the original wobject being mirrored.
 <p>
 
 <b>Override title?</b><br>
@@ -92,10 +92,10 @@ Most Recent will select the most recent asset that match the shortcut criteria.
 A statement to determinate what to mirror, in the form of "color = blue and weight != heavy". Multiple expressions may be joined with "and" and "or". <br>
 A property or value must be quoted if it contains spaces. Feel free to use the criteria builder to build your statements.
 <p>
-<b>NOTE:</b> Shortcut will automatically add a template variable to the asset it's mirroring called 'original.page.url'. You can use that to link to the original content that's being proxied.
+<b>NOTE:</b> Shortcut will automatically add a template variable to the asset it's mirroring called 'originalURL'. You can use that to link to the original content that's being mirrored.
 <p>
 |,
-		lastUpdated => 1101795461,
+		lastUpdated => 1109524349,
 	},
 
 	'greater than' => {
@@ -161,6 +161,25 @@ A property or value must be quoted if it contains spaces. Feel free to use the c
 	'5' => {
 		message => q|Shortcut, Add/Edit|,
 		lastUpdated => 1031514049
+	},
+
+	'shortcut template title' => {
+		message => q|Shortcut Template|,
+		lastUpdated => 1109525763,
+	},
+
+	'shortcut template body' => {
+		message => q|<p>These variables are available in Shortcut Templates:</p>
+<p><b>shortcut.content</b><br>
+The content from the mirrored Asset.  If any overrides were enabled in the Shortcut then the override content will be used instead of the content from the mirrored Asset.</p>
+<p><b>originalURL</b><br>
+The URL to the Asset being mirrored by this Shortcut.</p>
+<p><b>isShortcut</b><br>
+A boolean indicating that this Asset is a Shortcut.  This can be used in conjuction with another boolean for Admin mode to quickly show Content Managers that this is a Shortcut Asset.</p>
+<p><b>shortcut.label</b><br>
+The word "Shortcut".</p>
+                |,
+		lastUpdated => 1109525761,
 	},
 
 };
