@@ -25,7 +25,7 @@ our @EXPORT = qw(&www_viewPendingSubmissions &www_approveSubmission &www_denySub
 #-------------------------------------------------------------------
 sub www_approveSubmission {
 	if (WebGUI::Privilege::isInGroup(4,$session{user}{userId}) || WebGUI::Privilege::isInGroup(3,$session{user}{userId})) {
-		WebGUI::SQL->write("update submission set status='Approved' where submissionId=$session{form}{sid}",$session{dbh});
+		WebGUI::SQL->write("update UserSubmission_submission set status='Approved' where submissionId=$session{form}{sid}",$session{dbh});
 		return www_viewPendingSubmissions();
 	} else {
 		return WebGUI::Privilege::insufficient();
@@ -35,7 +35,7 @@ sub www_approveSubmission {
 #-------------------------------------------------------------------
 sub www_denySubmission {
         if (WebGUI::Privilege::isInGroup(4,$session{user}{userId}) || WebGUI::Privilege::isInGroup(3,$session{user}{userId})) {
-                WebGUI::SQL->write("update submission set status='Denied' where submissionId=$session{form}{sid}",$session{dbh}
+                WebGUI::SQL->write("update UserSubmission_submission set status='Denied' where submissionId=$session{form}{sid}",$session{dbh}
 );
                 return www_viewPendingSubmissions();
         } else {
@@ -48,7 +48,7 @@ sub www_viewPendingSubmissions {
         my (@submission, $output, $sth, @row, $i, $pn);
 	if (WebGUI::Privilege::isInGroup(4,$session{user}{userId}) || WebGUI::Privilege::isInGroup(3,$session{user}{userId})) {
 		$output = '<h1>'.WebGUI::International::get(159).'</h1>';
-        	$sth = WebGUI::SQL->read("select title,submissionId,dateSubmitted,username,userId,widgetId from submission where status='Pending' order by dateSubmitted",$session{dbh});
+        	$sth = WebGUI::SQL->read("select title,submissionId,dateSubmitted,username,userId,widgetId from UserSubmission_submission where status='Pending' order by dateSubmitted",$session{dbh});
         	while (@submission = $sth->array) {
                 	$row[$i] = '<tr><td class="tableData"><a href="'.$session{page}{url}.'?wid='.$submission[5].'&func=viewSubmission&sid='.$submission[1].'">'.$submission[0].'</a></td><td class="tableData">'.epochToHuman($submission[2],"%m/%d/%Y").'</td><td class="tableData">'.$submission[3].'</td></tr>';
                 	$i++;

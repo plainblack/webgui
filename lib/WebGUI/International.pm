@@ -19,10 +19,10 @@ my %international;
 #-------------------------------------------------------------------
 sub get {
         my ($output, $language, $namespace);
-	if ($session{user}{language} ne "") {
-		$language = $session{user}{language};
-	} elsif ($_[2] ne "") {
+	if ($_[2] ne "") {
 		$language = $_[2];
+	} elsif ($session{user}{language} ne "") {
+		$language = $session{user}{language};
 	} else {
 		$language = "English";
 	}

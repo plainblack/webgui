@@ -8,14 +8,46 @@
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
+# Yeah if you're looking at this code you're probably thinking to
+# yourself, "What a #$@*ing mess!" That's what we think too. But
+# if you know Perl well enough to know that this sux, then you
+# probably don't need to use this script cuz you know how to
+# install Perl modules and such.
+
+
 BEGIN {
         unshift (@INC, "./lib");
 }
 
 use strict;
+use CPAN;
+
+if ($ARGV[0] eq "--help" || $ARGV[0] eq "/?" || $ARGV[0] eq "/help" || $ARGV[0] eq "-?" || $ARGV[0] eq "-help" || $ARGV[0] eq "help") {
+	print "Usage: ".$0." [option]\n";
+	print "\t--help\t\t\tPrint this menu.\n";
+	print "\t--install-modules\tInstall any missing Perl modules.\n";
+	print "\n";
+	exit;
+}
 
 print "\nWebGUI is checking your system environment...\n\n";
 
+our $os;
+if ($^O =~ /Win/i) {
+	$os = "Microsoftish";
+} else {
+	$os = "Linuxish";
+}
+
+print "Operating System:\t".$os."\n";
+
+if ($ARGV[0] eq "--install-modules" && $< != 0 && $os eq "Linuxish") {
+	print "You cannot install Perl modules unless you are the root user.\n";
+	exit;
+} elsif ($ARGV[0] eq "--install-modules" && $os eq "Windowsish") {
+	print $0." cannot currently install Perl modules under ".$os." operating systems.\n";
+	exit;
+}
 
 ###################################
 # Checking Perl
@@ -26,66 +58,110 @@ if ($] >= 5.006) {
 	print "OK\n";
 } else {
 	print "Please upgrade to 5.6 or later!\n";
+	if ($ARGV[0] ne "") {
+		print "Test environment exiting, cannot continue without Perl 5.6.\n";
+		exit;
+	}
 }
-
-print "DBI module:\t\t";
-if (eval { require DBI }) {
-	print "OK\n";
-} else {
-	print "Please install.\n";
-}
-
-print "Database drivers:\t";
-print join(", ",DBI->available_drivers);
-print "\n";
 
 print "LWP module:\t\t";
 if (eval { require LWP }) {
         print "OK\n";
 } else {
-        print "Please install.\n";
-}
-
-print "Tie::IxHash module:\t";
-if (eval { require Tie::IxHash }) {
-        print "OK\n";
-} else {
-        print "Please install.\n";
-}
-
-print "Tie::CPHash module:\t";
-if (eval { require Tie::CPHash }) {
-        print "OK\n";
-} else {
-        print "Please install.\n";
-}
-
-print "Net::SMTP module:\t";
-if (eval { require Net::SMTP }) {
-        print "OK\n";
-} else {
-        print "Please install.\n";
-}
-
-print "XML::RSS module:\t";
-if (eval { require XML::RSS }) {
-        print "OK\n";
-} else {
-        print "Please install.\n";
+	if ($ARGV[0] eq "--install-modules") {
+        	print "Installing...\n";
+		CPAN::Shell->install("LWP");
+	} else {
+        	print "Please install.\n";
+	}
 }
 
 print "Digest::MD5 module:\t";
 if (eval { require Digest::MD5 }) {
         print "OK\n";
 } else {
-        print "Please install.\n";
+        if ($ARGV[0] eq "--install-modules") {
+        	print "Installing...\n";
+                CPAN::Shell->install("Digest::MD5");
+        } else {
+                print "Please install.\n";
+        }
+}
+
+print "DBI module:\t\t";
+if (eval { require DBI }) {
+	print "OK\n";
+} else {
+        if ($ARGV[0] eq "--install-modules") {
+        	print "Installing...\n";
+                CPAN::Shell->install("DBI");
+        } else {
+                print "Please install.\n";
+        }
+}
+
+print "Database drivers:\t";
+print join(", ",DBI->available_drivers);
+print "\n";
+
+print "Tie::IxHash module:\t";
+if (eval { require Tie::IxHash }) {
+        print "OK\n";
+} else {
+        if ($ARGV[0] eq "--install-modules") {
+        	print "Installing...\n";
+                CPAN::Shell->install("Tie::IxHash");
+        } else {
+                print "Please install.\n";
+        }
+}
+
+print "Tie::CPHash module:\t";
+if (eval { require Tie::CPHash }) {
+        print "OK\n";
+} else {
+        if ($ARGV[0] eq "--install-modules") {
+        	print "Installing...\n";
+                CPAN::Shell->install("Tie::CPHash");
+        } else {
+                print "Please install.\n";
+        }
+}
+
+print "Net::SMTP module:\t";
+if (eval { require Net::SMTP }) {
+        print "OK\n";
+} else {
+        if ($ARGV[0] eq "--install-modules") {
+                print "Installing...\n";
+                CPAN::Shell->install("Net::SMTP");
+        } else {
+                print "Please install.\n";
+        }
+}
+
+print "XML::RSS module:\t";
+if (eval { require XML::RSS }) {
+        print "OK\n";
+} else {
+        if ($ARGV[0] eq "--install-modules") {
+                print "Installing...\n";
+                CPAN::Shell->install("XML::RSS");
+        } else {
+                print "Please install.\n";
+        }
 }
 
 print "Net::LDAP module:\t";
 if (eval { require Net::LDAP }) {
         print "OK\n";
 } else {
-        print "Please install.\n";
+        if ($ARGV[0] eq "--install-modules") {
+                print "Installing...\n";
+                CPAN::Shell->install("Net::LDAP");
+        } else {
+                print "Please install.\n";
+        }
 }
 
 # this is here to insure they installed correctly.
@@ -155,11 +231,10 @@ use HTTP::Request;
 use HTTP::Headers;
 my ($header, $userAgent, $request, $response, $version, $referer);
 $userAgent = new LWP::UserAgent;
-$userAgent->agent("WebGUI-Check/1.0");
+$userAgent->agent("WebGUI-Check/2.0");
 $header = new HTTP::Headers;
-$referer = "http://".`hostname`;
+$referer = "http://webgui.cli.getversion/".`hostname`;
 chomp $referer;
-$referer .= "/getversion/";
 $header->referer($referer);
 $request = new HTTP::Request (GET => "http://www.plainblack.com/downloads/latest-version.txt", $header);
 $response = $userAgent->request($request);
@@ -170,9 +245,11 @@ if ($response->is_error) {
 } elsif ($version eq $WebGUI::VERSION) {
 	print "OK\n";
 } else {
-	print "There is a newer version of WebGUI available.\n";
+	print "You are using ".$WebGUI::VERSION." and ".$version." is available.\n";
 }
 
 
 print "\nTesting complete!\n";
+
+
 

@@ -1197,6 +1197,7 @@ INSERT INTO international VALUES (343,'WebGUI','Deutsch','Profil anschauen.');
 INSERT INTO international VALUES (345,'WebGUI','Deutsch','Kein Mitglied');
 INSERT INTO international VALUES (346,'WebGUI','Deutsch','Dieser Benutzer ist kein Mitglied. Wir haben keine weiteren Informationen über ihn.');
 INSERT INTO international VALUES (347,'WebGUI','Deutsch','Profil anschauen von');
+INSERT INTO international VALUES (349,'WebGUI','English','Latest version available');
 
 #
 # Table structure for table 'message'
@@ -1329,7 +1330,7 @@ INSERT INTO settings VALUES ('profileExtraContact','1');
 INSERT INTO settings VALUES ('profileMisc','1');
 INSERT INTO settings VALUES ('profileHome','0');
 INSERT INTO settings VALUES ('profileWork','0');
-INSERT INTO settings VALUES ('VERSION','2.3.2');
+INSERT INTO settings VALUES ('VERSION','2.3.3');
 
 #
 # Table structure for table 'style'
