@@ -307,12 +307,12 @@ sub build {
 					(($page->{'nestedSetLeft'} > $currentPage->get('nestedSetLeft')) && ($page->{'nestedSetRight'} < $currentPage->get('nestedSetRight'))) ||
 					(($page->{'nestedSetLeft'} < $currentPage->get('nestedSetLeft')) && ($page->{'nestedSetRight'} > $currentPage->get('nestedSetRight')));
 
-                                # Anchestor info
+				# Anchestor info
                                 foreach my $ancestor ($currentPage->ancestors) {
                                         $pageData->{"page.isMyAncestor"} += ($ancestor->{'pageId'} == $page->{'pageId'});
                                 }
-				# Some information about my mother
 				
+				# Some information about my mother
 				my $mother = WebGUI::Page->getPage($page->{parentId});
 				if ($page->{parentId} > 0) {
 					foreach (qw(title urlizedTitle parentId pageId)) {
@@ -370,7 +370,11 @@ sub build {
 	
 	# Configure button
 	$var->{'config.button'} = $self->_getEditButton();
-	
+
+	# Some properties of the page the user's viewing.
+	$var->{"page.current.hasDaughter"} = ($currentPage->get('nestedSetRight') - $currentPage->get('nestedSetLeft') > 1);
+	$var->{"page.current.isHome"} = ($currentPage->get('pageId') == 1);
+
 	if ($self->{_template}) {
 		return WebGUI::Template::processRaw($self->{_template}, $var);
 	} else {

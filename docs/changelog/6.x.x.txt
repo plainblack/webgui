@@ -43,7 +43,7 @@
    they were in the past.
  - BugFix: [ 999799 ] Fixed Package deletion/copy bug in 6.1.1
  - BugFix: [ 997885 ] Root move left bug. 
- - Changed 'lft' and 'rgt' database field names to 'nestedSetLeft' and 'nestedSetRight'. (Martin Kamerbeek)
+ - Changed 'lft' and 'rgt' database field names to 'nestedSetLeft' and 'nestedSetRight'. (Martin Kamerbeek / Procolix)
  - Added WebGUI::Session::getScratch().
  - bugfix [ 996169 ] message log && uss not working
  - bugfix [ 1000944 ] WebGUI::MessageLog::addInternationalizedEntry error
@@ -57,6 +57,7 @@
    Kranendonk)
  - RFE [ 806332 ] Force SSL, a new page property "Encrypt page" is added. (Len
    Kranendonk)
+ - RFE [ 1004098 ] Additional navigation Template Parameters added. (Martin Kamerbeek / Procolix, code thanks to Opentech)
 
 6.1.1
  - bugfix [ 991313 ] Manage Translations doesn't work
