@@ -119,186 +119,169 @@ sub set {
 
 #-------------------------------------------------------------------
 sub www_deleteEvent {
+	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
 	my ($output);
-        if (WebGUI::Privilege::canEditPage()) {
-		$output = '<h1>'.WebGUI::International::get(42).'</h1>';
-		$output .= WebGUI::International::get(75,$namespace).'<p><blockquote>';
-		$output .= '<a href="'.WebGUI::URL::page('func=deleteEventConfirm&wid='.$session{form}{wid}.'&eid='
-			.$session{form}{eid}).'">'.WebGUI::International::get(76,$namespace).'</a><p>';
-		$output .= '<a href="'.WebGUI::URL::page('func=deleteEventConfirm&wid='.$session{form}{wid}.'&eid='
-			.$session{form}{eid}.'&rid='.$session{form}{rid}).'">'
-			.WebGUI::International::get(77,$namespace).'</a><p>'; 
-		$output .= '<a href="'.WebGUI::URL::page('func=edit&wid='.$session{form}{wid}).'">'
-			.WebGUI::International::get(78,$namespace).'</a>';
-		$output .= '</blockquote>';
-                return $output;
-        } else {
-                return WebGUI::Privilege::insufficient();
-        }
+	$output = '<h1>'.WebGUI::International::get(42).'</h1>';
+	$output .= WebGUI::International::get(75,$namespace).'<p><blockquote>';
+	$output .= '<a href="'.WebGUI::URL::page('func=deleteEventConfirm&wid='.$session{form}{wid}.'&eid='
+		.$session{form}{eid}).'">'.WebGUI::International::get(76,$namespace).'</a><p>';
+	$output .= '<a href="'.WebGUI::URL::page('func=deleteEventConfirm&wid='.$session{form}{wid}.'&eid='
+		.$session{form}{eid}.'&rid='.$session{form}{rid}).'">'
+		.WebGUI::International::get(77,$namespace).'</a><p>'; 
+	$output .= '<a href="'.WebGUI::URL::page('func=edit&wid='.$session{form}{wid}).'">'
+		.WebGUI::International::get(78,$namespace).'</a>';
+	$output .= '</blockquote>';
+        return $output;
 }
 
 #-------------------------------------------------------------------
 sub www_deleteEventConfirm {
-        if (WebGUI::Privilege::canEditPage()) {
-		if ($session{form}{rid} > 0) {
-			$_[0]->deleteCollateral("EventsCalendar_event","recurringEventId",$session{form}{rid});
-		} else {
-			$_[0]->deleteCollateral("EventsCalendar_event","eventId",$session{form}{eid});
-		}
-                return "";
-        } else {
-                return WebGUI::Privilege::insufficient();
-        }
+	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
+	if ($session{form}{rid} > 0) {
+		$_[0]->deleteCollateral("EventsCalendar_event","recurringEventId",$session{form}{rid});
+	} else {
+		$_[0]->deleteCollateral("EventsCalendar_event","eventId",$session{form}{eid});
+	}
+        return "";
 }
 
 #-------------------------------------------------------------------
 sub www_edit {
+	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
         my ($output, %hash, $f, $paginateAfter, $proceed);
 	tie %hash, 'Tie::IxHash';
-        if (WebGUI::Privilege::canEditPage()) {
-		if ($_[0]->get("wobjectId") eq "new") {
-			$proceed = 1;
-		}
-		$paginateAfter = $_[0]->get("paginateAfter") || 50;
-                $output = helpIcon(1,$namespace);
-		$output .= '<h1>'.WebGUI::International::get(12,$namespace).'</h1>';
-		$f = WebGUI::HTMLForm->new;
-                %hash = (list => WebGUI::International::get(17,$namespace),
-                        calendarMonth => WebGUI::International::get(18,$namespace));
-		#	calendarMonthSmall => WebGUI::International::get(74,$namespace));
-		$f->select("calendarLayout",\%hash,WebGUI::International::get(16,$namespace),[$_[0]->get("calendarLayout")]);
-		$f->integer("paginateAfter",WebGUI::International::get(19,$namespace),$paginateAfter);
-		$f->yesNo("proceed",WebGUI::International::get(21,$namespace),$proceed);
-		$output .= $_[0]->SUPER::www_edit($f->printRowsOnly);
-                return $output;
-        } else {
-                return WebGUI::Privilege::insufficient();
-        }
+	if ($_[0]->get("wobjectId") eq "new") {
+		$proceed = 1;
+	}
+	$paginateAfter = $_[0]->get("paginateAfter") || 50;
+        $output = helpIcon(1,$namespace);
+	$output .= '<h1>'.WebGUI::International::get(12,$namespace).'</h1>';
+	$f = WebGUI::HTMLForm->new;
+        %hash = (list => WebGUI::International::get(17,$namespace),
+                calendarMonth => WebGUI::International::get(18,$namespace));
+	#	calendarMonthSmall => WebGUI::International::get(74,$namespace));
+	$f->select("calendarLayout",\%hash,WebGUI::International::get(16,$namespace),[$_[0]->get("calendarLayout")]);
+	$f->integer("paginateAfter",WebGUI::International::get(19,$namespace),$paginateAfter);
+	$f->yesNo("proceed",WebGUI::International::get(21,$namespace),$proceed);
+	$output .= $_[0]->SUPER::www_edit($f->printRowsOnly);
+        return $output;
 }
 
 #-------------------------------------------------------------------
 sub www_editSave {
-        if (WebGUI::Privilege::canEditPage()) {
-		$_[0]->SUPER::www_editSave();
-                $_[0]->set({
-			calendarLayout=>$session{form}{calendarLayout},
-			paginateAfter=>$session{form}{paginateAfter}
-			});
-		if ($session{form}{proceed}) {
-			$session{form}{eid} = "new";
-			return $_[0]->www_editEvent;
-		} else {
-                	return "";
-		}
-        } else {
-                return WebGUI::Privilege::insufficient();
-        }
+	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
+	$_[0]->SUPER::www_editSave();
+        $_[0]->set({
+		calendarLayout=>$session{form}{calendarLayout},
+		paginateAfter=>$session{form}{paginateAfter}
+		});
+	if ($session{form}{proceed}) {
+		$session{form}{eid} = "new";
+		return $_[0]->www_editEvent;
+	} else {
+               	return "";
+	}
 }
 
 #-------------------------------------------------------------------
 sub www_editEvent {
+	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
         my (%recursEvery, $special, $output, $f, %event);
 	tie %event, 'Tie::CPHash';
 	tie %recursEvery, 'Tie::IxHash';
-        if (WebGUI::Privilege::canEditPage()) {
-		if ($session{form}{eid} eq "new") {
-        		%recursEvery = ('never'=>WebGUI::International::get(4,$namespace),
-                		'day'=>WebGUI::International::get(700),
-                		'week'=>WebGUI::International::get(701),
-                		'month'=>WebGUI::International::get(702),
-                		'year'=>WebGUI::International::get(703)
-                		);
-			$event{endDate} = $event{endDate};
-			$f = WebGUI::HTMLForm->new(1);
-			$f->raw('<tr><td class="formdescription" valign="top">'.WebGUI::International::get(8,$namespace).'</td><td class="tableData">');
-			$f->integer("interval","",1,"","","",3);
-			$f->select("recursEvery",\%recursEvery);
-			$f->raw(' '.WebGUI::International::get(9,$namespace).' ');
-			$f->date("until");
-			$f->raw("</td><tr>");
-			$special = $f->printRowsOnly;
-		} else {
-                	%event = WebGUI::SQL->quickHash("select * from EventsCalendar_event where eventId='$session{form}{eid}'");
-			$f = WebGUI::HTMLForm->new;
-			$f->hidden("until");
-			$special = $f->printRowsOnly;
-		}
-		$output = helpIcon(2,$namespace);
-                $output .= '<h1>'.WebGUI::International::get(13,$namespace).'</h1>';
+	if ($session{form}{eid} eq "new") {
+        	%recursEvery = ('never'=>WebGUI::International::get(4,$namespace),
+               		'day'=>WebGUI::International::get(700),
+               		'week'=>WebGUI::International::get(701),
+               		'month'=>WebGUI::International::get(702),
+               		'year'=>WebGUI::International::get(703)
+               		);
+		$event{endDate} = $event{endDate};
+		$f = WebGUI::HTMLForm->new(1);
+		$f->raw('<tr><td class="formdescription" valign="top">'.WebGUI::International::get(8,$namespace).'</td><td class="tableData">');
+		$f->integer("interval","",1,"","","",3);
+		$f->select("recursEvery",\%recursEvery);
+		$f->raw(' '.WebGUI::International::get(9,$namespace).' ');
+		$f->date("until");
+		$f->raw("</td><tr>");
+		$special = $f->printRowsOnly;
+	} else {
+               	%event = WebGUI::SQL->quickHash("select * from EventsCalendar_event where eventId='$session{form}{eid}'");
 		$f = WebGUI::HTMLForm->new;
-                $f->hidden("wid",$_[0]->get("wobjectId"));
-                $f->hidden("eid",$session{form}{eid});
-                $f->hidden("func","editEventSave");
-                $f->text("name",WebGUI::International::get(99),$event{name});
-                $f->HTMLArea("description",WebGUI::International::get(85),$event{description});
-                $f->date("startDate",WebGUI::International::get(14,$namespace),$event{startDate},
-			'onBlur="this.form.endDate.value=this.form.startDate.value;this.form.until.value=this.form.startDate.value;"');
-                $f->date("endDate",WebGUI::International::get(15,$namespace),$event{endDate});
-		$f->raw($special);
-		$f->yesNo("proceed",WebGUI::International::get(21,$namespace));
-		$f->submit;
-		$output .= $f->print;
-                return $output;
-        } else {
-                return WebGUI::Privilege::insufficient();
-        }
+		$f->hidden("until");
+		$special = $f->printRowsOnly;
+	}
+	$output = helpIcon(2,$namespace);
+        $output .= '<h1>'.WebGUI::International::get(13,$namespace).'</h1>';
+	$f = WebGUI::HTMLForm->new;
+        $f->hidden("wid",$_[0]->get("wobjectId"));
+        $f->hidden("eid",$session{form}{eid});
+        $f->hidden("func","editEventSave");
+        $f->text("name",WebGUI::International::get(99),$event{name});
+        $f->HTMLArea("description",WebGUI::International::get(85),$event{description});
+        $f->date("startDate",WebGUI::International::get(14,$namespace),$event{startDate},
+		'onBlur="this.form.endDate.value=this.form.startDate.value;this.form.until.value=this.form.startDate.value;"');
+        $f->date("endDate",WebGUI::International::get(15,$namespace),$event{endDate});
+	$f->raw($special);
+	$f->yesNo("proceed",WebGUI::International::get(21,$namespace));
+	$f->submit;
+	$output .= $f->print;
         return $output;
 }
 
 #-------------------------------------------------------------------
 sub www_editEventSave {
+	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
 	my (@startDate, @endDate, $until, @eventId, $i, $recurringEventId);
-        if (WebGUI::Privilege::canEditPage()) {
-		if ($session{form}{eid} eq "new") {
-			$session{form}{eid} = getNextId("eventId");
-               		$startDate[0] = setToEpoch($session{form}{startDate});
-                	$endDate[0] = setToEpoch($session{form}{endDate});
-                	$until = setToEpoch($session{form}{until});
-                	$eventId[0] = getNextId("eventId");
-			$session{form}{interval} = 1 if ($session{form}{interval} < 1);
-                	if ($session{form}{recursEvery} eq "never") {
-                        	$recurringEventId = 0;
-                	} else {
-                        	$recurringEventId = getNextId("recurringEventId");
-                        	while ($startDate[$i] < $until) {
-                                	$i++;
-                                	$eventId[$i] = getNextId("eventId");
-					if ($session{form}{recursEvery} eq "day") {
-                                		$startDate[$i] = addToDate($startDate[0],0,0,($i*$session{form}{interval}));
-                                		$endDate[$i] = addToDate($endDate[0],0,0,($i*$session{form}{interval}));
-					} elsif ($session{form}{recursEvery} eq "week") {
-                                		$startDate[$i] = addToDate($startDate[0],0,0,(7*$i*$session{form}{interval}));
-                                		$endDate[$i] = addToDate($endDate[0],0,0,(7*$i*$session{form}{interval}));
-                                        } elsif ($session{form}{recursEvery} eq "month") {
-                                                $startDate[$i] = addToDate($startDate[0],0,($i*$session{form}{interval}),0);
-                                                $endDate[$i] = addToDate($endDate[0],0,($i*$session{form}{interval}),0);
-                                        } elsif ($session{form}{recursEvery} eq "year") {
-                                                $startDate[$i] = addToDate($startDate[0],($i*$session{form}{interval}),0,0);
-                                                $endDate[$i] = addToDate($endDate[0],($i*$session{form}{interval}),0,0);
-					}
-                        	}
-                	}
-                	$i = 0;
-                	while ($eventId[$i] > 0) {
-                        	WebGUI::SQL->write("insert into EventsCalendar_event values ($eventId[$i], 
-				".$_[0]->get("wobjectId").", ".quote($session{form}{name}).", ".quote($session{form}{description}).", 
+	if ($session{form}{eid} eq "new") {
+		$session{form}{eid} = getNextId("eventId");
+       		$startDate[0] = setToEpoch($session{form}{startDate});
+               	$endDate[0] = setToEpoch($session{form}{endDate});
+               	$until = setToEpoch($session{form}{until});
+               	$eventId[0] = getNextId("eventId");
+		$session{form}{interval} = 1 if ($session{form}{interval} < 1);
+               	if ($session{form}{recursEvery} eq "never") {
+                       	$recurringEventId = 0;
+               	} else {
+                       	$recurringEventId = getNextId("recurringEventId");
+                       	while ($startDate[$i] < $until) {
+                               	$i++;
+                               	$eventId[$i] = getNextId("eventId");
+				if ($session{form}{recursEvery} eq "day") {
+                               		$startDate[$i] = addToDate($startDate[0],0,0,($i*$session{form}{interval}));
+                               		$endDate[$i] = addToDate($endDate[0],0,0,($i*$session{form}{interval}));
+				} elsif ($session{form}{recursEvery} eq "week") {
+                               		$startDate[$i] = addToDate($startDate[0],0,0,(7*$i*$session{form}{interval}));
+                               		$endDate[$i] = addToDate($endDate[0],0,0,(7*$i*$session{form}{interval}));
+                                } elsif ($session{form}{recursEvery} eq "month") {
+                                        $startDate[$i] = addToDate($startDate[0],0,($i*$session{form}{interval}),0);
+                                        $endDate[$i] = addToDate($endDate[0],0,($i*$session{form}{interval}),0);
+                                } elsif ($session{form}{recursEvery} eq "year") {
+                                        $startDate[$i] = addToDate($startDate[0],($i*$session{form}{interval}),0,0);
+                                        $endDate[$i] = addToDate($endDate[0],($i*$session{form}{interval}),0,0);
+				}
+                       	}
+               	}
+               	$i = 0;
+               	while ($eventId[$i] > 0) {
+                       	WebGUI::SQL->write("insert into EventsCalendar_event values ($eventId[$i], 
+				".$_[0]->get("wobjectId").", 
+				".quote($session{form}{name}).", 
+				".quote($session{form}{description}).", 
 				$startDate[$i], $endDate[$i], $recurringEventId)");
-                        	$i++;
-                	}
-		} else {
-                	WebGUI::SQL->write("update EventsCalendar_event set name=".quote($session{form}{name}).", 
-				description=".quote($session{form}{description}).", startDate='".setToEpoch($session{form}{startDate})."', 
-				endDate='".setToEpoch($session{form}{endDate})."' where eventId=$session{form}{eid}");
-		}
-		if ($session{form}{proceed}) {
-			$session{form}{eid} = "new";
-			return $_[0]->www_editEvent;
-		} else {
-                	return "";
-		}
-        } else {
-                return WebGUI::Privilege::insufficient();
-        }
+                       	$i++;
+               	}
+	} else {
+               	WebGUI::SQL->write("update EventsCalendar_event set name=".quote($session{form}{name}).", 
+			description=".quote($session{form}{description}).", startDate='".setToEpoch($session{form}{startDate})."', 
+			endDate='".setToEpoch($session{form}{endDate})."' where eventId=$session{form}{eid}");
+	}
+	if ($session{form}{proceed}) {
+		$session{form}{eid} = "new";
+		return $_[0]->www_editEvent;
+	} else {
+               	return "";
+	}
 }
 
 #-------------------------------------------------------------------

@@ -45,55 +45,49 @@ sub set {
 
 #-------------------------------------------------------------------
 sub www_edit {
+	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
         my ($output, $f, $endDate, $width, $class, $spacer,$startDate);
-        if (WebGUI::Privilege::canEditPage()) {
-                $output = helpIcon(1,$namespace);
-		$output .= '<h1>'.WebGUI::International::get(6,$namespace).'</h1>';
-        	if ($_[0]->get("wobjectId") eq "new") {
-                	$width = 200;
-                	$spacer = 10;
-        	} else {
-                	$width = $_[0]->get("width");
-                	$spacer = $_[0]->get("spacer");
-        	}
-		$class = $_[0]->get("class") || "content";
-        	$startDate = $_[0]->get("startDate") || $session{page}{startDate};
-        	$endDate = $_[0]->get("endDate") || $session{page}{endDate};
-        	$f = WebGUI::HTMLForm->new;
-        	$f->hidden("wid",$_[0]->get("wobjectId"));
-        	$f->hidden("namespace",$_[0]->get("namespace")) if ($_[0]->get("wobjectId") eq "new");
-        	$f->hidden("func","editSave");
-        	$f->readOnly($_[0]->get("wobjectId"),WebGUI::International::get(499));
-        	$f->hidden("title",$namespace);
-        	$f->hidden("displayTitle",0);
-        	$f->hidden("processMacros",0);
-        	$f->hidden("templatePosition",0);
-        	$f->date("startDate",WebGUI::International::get(497),$startDate);
-        	$f->date("endDate",WebGUI::International::get(498),$endDate);
-		$f->integer("spacer",WebGUI::International::get(3,$namespace),$spacer);
-		$f->integer("width",WebGUI::International::get(4,$namespace),$width);
-		$f->text("class",WebGUI::International::get(5,$namespace),$class);
-        	$f->submit;
-        	$output .= $f->print;
-		return $output;
-        } else {
-                return WebGUI::Privilege::insufficient();
-        }
+        $output = helpIcon(1,$namespace);
+	$output .= '<h1>'.WebGUI::International::get(6,$namespace).'</h1>';
+       	if ($_[0]->get("wobjectId") eq "new") {
+               	$width = 200;
+               	$spacer = 10;
+       	} else {
+               	$width = $_[0]->get("width");
+               	$spacer = $_[0]->get("spacer");
+       	}
+	$class = $_[0]->get("class") || "content";
+       	$startDate = $_[0]->get("startDate") || $session{page}{startDate};
+       	$endDate = $_[0]->get("endDate") || $session{page}{endDate};
+       	$f = WebGUI::HTMLForm->new;
+       	$f->hidden("wid",$_[0]->get("wobjectId"));
+       	$f->hidden("namespace",$_[0]->get("namespace")) if ($_[0]->get("wobjectId") eq "new");
+       	$f->hidden("func","editSave");
+       	$f->readOnly($_[0]->get("wobjectId"),WebGUI::International::get(499));
+       	$f->hidden("title",$namespace);
+       	$f->hidden("displayTitle",0);
+       	$f->hidden("processMacros",0);
+       	$f->hidden("templatePosition",0);
+       	$f->date("startDate",WebGUI::International::get(497),$startDate);
+       	$f->date("endDate",WebGUI::International::get(498),$endDate);
+	$f->integer("spacer",WebGUI::International::get(3,$namespace),$spacer);
+	$f->integer("width",WebGUI::International::get(4,$namespace),$width);
+	$f->text("class",WebGUI::International::get(5,$namespace),$class);
+       	$f->submit;
+       	$output .= $f->print;
+	return $output;
 }
 
 #-------------------------------------------------------------------
 sub www_editSave {
-        if (WebGUI::Privilege::canEditPage()) {
-		$_[0]->SUPER::www_editSave();
-                $_[0]->set({
-			spacer=>$session{form}{spacer},
-			width=>$session{form}{width},
-			class=>$session{form}{class}
-			});
-                return "";
-        } else {
-                return WebGUI::Privilege::insufficient();
-        }
+	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
+	$_[0]->SUPER::www_editSave();
+        $_[0]->set({
+		spacer=>$session{form}{spacer},
+		width=>$session{form}{width},
+		class=>$session{form}{class}
+		});
+        return "";
 }
 
 #-------------------------------------------------------------------

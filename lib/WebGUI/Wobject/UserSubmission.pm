@@ -314,6 +314,7 @@ sub www_denySubmission {
 
 #-------------------------------------------------------------------
 sub www_edit {
+	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
         my (%layout, $layout, $output, $f, $defaultStatus, $submissionsPerPage, $groupToApprove);
 	%layout = (traditional=>WebGUI::International::get(55,$namespace),
 		weblog=>WebGUI::International::get(54,$namespace),
@@ -322,48 +323,41 @@ sub www_edit {
 	$groupToApprove = $_[0]->get("groupToApprove") || 4;
 	$submissionsPerPage = $_[0]->get("submissionsPerPage") || 50;
 	$defaultStatus = $_[0]->get("defaultStatus") || "Approved";
-        if (WebGUI::Privilege::canEditPage()) {
-                $output = helpIcon(1,$namespace);
-		$output .= '<h1>'.WebGUI::International::get(18,$namespace).'</h1>';
-		$f = WebGUI::HTMLForm->new;
-                $f->select("layout",\%layout,WebGUI::International::get(53,$namespace),[$layout]);
-                $f->group("groupToApprove",WebGUI::International::get(1,$namespace),[$groupToApprove]);
-                $f->group("groupToContribute",WebGUI::International::get(2,$namespace),[$_[0]->get("groupToContribute")]);
-                $f->integer("submissionsPerPage",WebGUI::International::get(6,$namespace),$submissionsPerPage);
-                $f->select("defaultStatus",\%submissionStatus,WebGUI::International::get(563),[$defaultStatus]);
-                if ($session{setting}{useKarma}) {
-                        $f->integer("karmaPerSubmission",WebGUI::International::get(30,$namespace),$_[0]->get("karmaPerSubmission"));
-                } else {
-                        $f->hidden("karmaPerSubmission",$_[0]->get("karmaPerSubmission"));
-                }
-		$f->yesNo("displayThumbnails",WebGUI::International::get(51,$namespace),$_[0]->get("displayThumbnails"));
-		$f->yesNo("allowDiscussion",WebGUI::International::get(48,$namespace),$_[0]->get("allowDiscussion"));
-		$f->raw($_[0]->SUPER::discussionProperties);
-		$output .= $_[0]->SUPER::www_edit($f->printRowsOnly);
-                return $output;
+        $output = helpIcon(1,$namespace);
+	$output .= '<h1>'.WebGUI::International::get(18,$namespace).'</h1>';
+	$f = WebGUI::HTMLForm->new;
+        $f->select("layout",\%layout,WebGUI::International::get(53,$namespace),[$layout]);
+        $f->group("groupToApprove",WebGUI::International::get(1,$namespace),[$groupToApprove]);
+        $f->group("groupToContribute",WebGUI::International::get(2,$namespace),[$_[0]->get("groupToContribute")]);
+        $f->integer("submissionsPerPage",WebGUI::International::get(6,$namespace),$submissionsPerPage);
+        $f->select("defaultStatus",\%submissionStatus,WebGUI::International::get(563),[$defaultStatus]);
+        if ($session{setting}{useKarma}) {
+                $f->integer("karmaPerSubmission",WebGUI::International::get(30,$namespace),$_[0]->get("karmaPerSubmission"));
         } else {
-                return WebGUI::Privilege::insufficient();
+                $f->hidden("karmaPerSubmission",$_[0]->get("karmaPerSubmission"));
         }
+	$f->yesNo("displayThumbnails",WebGUI::International::get(51,$namespace),$_[0]->get("displayThumbnails"));
+	$f->yesNo("allowDiscussion",WebGUI::International::get(48,$namespace),$_[0]->get("allowDiscussion"));
+	$f->raw($_[0]->SUPER::discussionProperties);
+	$output .= $_[0]->SUPER::www_edit($f->printRowsOnly);
+        return $output;
 }
 
 #-------------------------------------------------------------------
 sub www_editSave {
-        if (WebGUI::Privilege::canEditPage()) {
-		$_[0]->SUPER::www_editSave();
-                $_[0]->set({
-			submissionsPerPage=>$session{form}{submissionsPerPage},
-			groupToContribute=>$session{form}{groupToContribute},
-			groupToApprove=>$session{form}{groupToApprove},
-			defaultStatus=>$session{form}{defaultStatus},
-			karmaPerSubmission=>$session{form}{karmaPerSubmission},
-			allowDiscussion=>$session{form}{allowDiscussion},
-			layout=>$session{form}{layout},
-			displayThumbnails=>$session{form}{displayThumbnails}
-			});
-                return "";
-        } else {
-                return WebGUI::Privilege::insufficient();
-        }
+	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
+	$_[0]->SUPER::www_editSave();
+        $_[0]->set({
+		submissionsPerPage=>$session{form}{submissionsPerPage},
+		groupToContribute=>$session{form}{groupToContribute},
+		groupToApprove=>$session{form}{groupToApprove},
+		defaultStatus=>$session{form}{defaultStatus},
+		karmaPerSubmission=>$session{form}{karmaPerSubmission},
+		allowDiscussion=>$session{form}{allowDiscussion},
+		layout=>$session{form}{layout},
+		displayThumbnails=>$session{form}{displayThumbnails}
+		});
+        return "";
 }
 
 #-------------------------------------------------------------------

@@ -82,75 +82,68 @@ sub set {
 
 #-------------------------------------------------------------------
 sub www_edit {
+	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
         my ($f, $i, $output, $active, $voteGroup, $graphWidth, $answers, $randomizeAnswers);
-        if (WebGUI::Privilege::canEditPage()) {
-		if ($_[0]->get("wobjectId") eq "new") {
-			$active = 1;
-			$randomizeAnswers = 1;
-		} else {
-			$active = $_[0]->get("active");
-			$randomizeAnswers = $_[0]->get("randomizeAnswers");
-		}
-		$voteGroup = $_[0]->get("voteGroup") || 7;
-		$graphWidth = $_[0]->get("graphWidth") || 150;
-		for ($i=1; $i<=20; $i++) {
-                        if ($_[0]->get('a'.$i) =~ /\C/) {
-                                $answers .= $_[0]->get("a".$i)."\n";
-                        }
+	if ($_[0]->get("wobjectId") eq "new") {
+		$active = 1;
+		$randomizeAnswers = 1;
+	} else {
+		$active = $_[0]->get("active");
+		$randomizeAnswers = $_[0]->get("randomizeAnswers");
+	}
+	$voteGroup = $_[0]->get("voteGroup") || 7;
+	$graphWidth = $_[0]->get("graphWidth") || 150;
+	for ($i=1; $i<=20; $i++) {
+                if ($_[0]->get('a'.$i) =~ /\C/) {
+                        $answers .= $_[0]->get("a".$i)."\n";
                 }
-                $output = helpIcon(1,$namespace);
-		$output .= '<h1>'.WebGUI::International::get(9,$namespace).'</h1>';
-		$f = WebGUI::HTMLForm->new;
-		$f->yesNo("active",WebGUI::International::get(3,$namespace),$active);
-                $f->group("voteGroup",WebGUI::International::get(4,$namespace),[$voteGroup]);
-		if ($session{setting}{useKarma}) {
-			$f->integer("karmaPerVote",WebGUI::International::get(20,$namespace),$_[0]->get("karmaPerVote"));
-		} else {
-			$f->hidden("karmaPerVote",$_[0]->get("karmaPerVote"));
-		}
-		$f->integer("graphWidth",WebGUI::International::get(5,$namespace),$graphWidth);
-		$f->text("question",WebGUI::International::get(6,$namespace),$_[0]->get("question"));
-                $f->textarea("answers",WebGUI::International::get(7,$namespace).'<span class="formSubtext"><br>'.WebGUI::International::get(8,$namespace).'</span>',$answers);
-		$f->yesNo("randomizeAnswers",WebGUI::International::get(72,$namespace),$randomizeAnswers);
-		$output .= $_[0]->SUPER::www_edit($f->printRowsOnly);
-		if ($_[0]->get("wobjectId") ne "new") {
-			$output .= '<p>';
-			$output .= '<a href="'.WebGUI::URL::page('func=resetVotes&wid='.$_[0]->get("wobjectId")).'">'
-				.WebGUI::International::get(10,$namespace).'</a>';
-		}
-                return $output;
-        } else {
-                return WebGUI::Privilege::insufficient();
         }
+        $output = helpIcon(1,$namespace);
+	$output .= '<h1>'.WebGUI::International::get(9,$namespace).'</h1>';
+	$f = WebGUI::HTMLForm->new;
+	$f->yesNo("active",WebGUI::International::get(3,$namespace),$active);
+        $f->group("voteGroup",WebGUI::International::get(4,$namespace),[$voteGroup]);
+	if ($session{setting}{useKarma}) {
+		$f->integer("karmaPerVote",WebGUI::International::get(20,$namespace),$_[0]->get("karmaPerVote"));
+	} else {
+		$f->hidden("karmaPerVote",$_[0]->get("karmaPerVote"));
+	}
+	$f->integer("graphWidth",WebGUI::International::get(5,$namespace),$graphWidth);
+	$f->text("question",WebGUI::International::get(6,$namespace),$_[0]->get("question"));
+        $f->textarea("answers",WebGUI::International::get(7,$namespace).'<span class="formSubtext"><br>'.WebGUI::International::get(8,$namespace).'</span>',$answers);
+	$f->yesNo("randomizeAnswers",WebGUI::International::get(72,$namespace),$randomizeAnswers);
+	$output .= $_[0]->SUPER::www_edit($f->printRowsOnly);
+	if ($_[0]->get("wobjectId") ne "new") {
+		$output .= '<p>';
+		$output .= '<a href="'.WebGUI::URL::page('func=resetVotes&wid='.$_[0]->get("wobjectId")).'">'
+			.WebGUI::International::get(10,$namespace).'</a>';
+	}
+        return $output;
 }
 
 #-------------------------------------------------------------------
 sub www_editSave {
+	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
 	my (@answer, $i, $property);
-        if (WebGUI::Privilege::canEditPage()) {
-		$_[0]->SUPER::www_editSave();
-		@answer = split("\n",$session{form}{answers});
-                for ($i=1; $i<=20; $i++) {
-                	$property->{'a'.$i} = $answer[($i-1)];
-                }
-		$property->{randomizeAnswers} = $session{form}{randomizeAnswers};
-		$property->{karmaPerVote} = $session{form}{karmaPerVote};
-		$property->{voteGroup} = $session{form}{voteGroup};
-		$property->{graphWidth} = $session{form}{graphWidth};
-		$property->{active} = $session{form}{active};
-		$property->{question} = $session{form}{question};
-		$_[0]->set($property);
-		return "";
-        } else {
-                return WebGUI::Privilege::insufficient();
+	$_[0]->SUPER::www_editSave();
+	@answer = split("\n",$session{form}{answers});
+        for ($i=1; $i<=20; $i++) {
+             	$property->{'a'.$i} = $answer[($i-1)];
         }
+	$property->{randomizeAnswers} = $session{form}{randomizeAnswers};
+	$property->{karmaPerVote} = $session{form}{karmaPerVote};
+	$property->{voteGroup} = $session{form}{voteGroup};
+	$property->{graphWidth} = $session{form}{graphWidth};
+	$property->{active} = $session{form}{active};
+	$property->{question} = $session{form}{question};
+	$_[0]->set($property);
+	return "";
 }
 
 #-------------------------------------------------------------------
 sub www_resetVotes {
-	if (WebGUI::Privilege::canEditPage()) {
-		$_[0]->deleteCollateral("Poll_answer","wobjectId",$_[0]->get("wobjectId"));
-	}
+	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
+	$_[0]->deleteCollateral("Poll_answer","wobjectId",$_[0]->get("wobjectId"));
 	return "";
 }
 

@@ -47,34 +47,28 @@ sub set {
 
 #-------------------------------------------------------------------
 sub www_edit {
+	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
         my ($output, $f);
-        if (WebGUI::Privilege::canEditPage()) {
-		$output = helpIcon(1,$_[0]->get("namespace"));
-		$output .= '<h1>'.WebGUI::International::get(6,$namespace).'</h1>';
-		$f = WebGUI::HTMLForm->new;
-		$f->url("linkURL",WebGUI::International::get(1,$_[0]->get("namespace")),$_[0]->get("linkURL"));
-		$f->raw($_[0]->fileProperty("attachment",2));
-		$output .= $_[0]->SUPER::www_edit($f->printRowsOnly);
-                return $output;
-        } else {
-                return WebGUI::Privilege::insufficient();
-        }
+	$output = helpIcon(1,$_[0]->get("namespace"));
+	$output .= '<h1>'.WebGUI::International::get(6,$namespace).'</h1>';
+	$f = WebGUI::HTMLForm->new;
+	$f->url("linkURL",WebGUI::International::get(1,$_[0]->get("namespace")),$_[0]->get("linkURL"));
+	$f->raw($_[0]->fileProperty("attachment",2));
+	$output .= $_[0]->SUPER::www_edit($f->printRowsOnly);
+        return $output;
 }
 
 #-------------------------------------------------------------------
 sub www_editSave {
+	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
         my ($attachment, $property);
-        if (WebGUI::Privilege::canEditPage()) {
-		$_[0]->SUPER::www_editSave();
-                $attachment = WebGUI::Attachment->new("",$_[0]->get("wobjectId"));
-		$attachment->save("attachment");
-		$property->{linkURL} = $session{form}{linkURL};
-		$property->{attachment} = $attachment->getFilename if ($attachment->getFilename ne "");
-		$_[0]->set($property);
-                return "";
-        } else {
-                return WebGUI::Privilege::insufficient();
-        }
+	$_[0]->SUPER::www_editSave();
+        $attachment = WebGUI::Attachment->new("",$_[0]->get("wobjectId"));
+	$attachment->save("attachment");
+	$property->{linkURL} = $session{form}{linkURL};
+	$property->{attachment} = $attachment->getFilename if ($attachment->getFilename ne "");
+	$_[0]->set($property);
+        return "";
 }
 
 #-------------------------------------------------------------------

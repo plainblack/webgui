@@ -56,60 +56,54 @@ sub set {
 
 #-------------------------------------------------------------------
 sub www_edit {
+	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
         my ($output, $editTimeout, $groupToModerate, %hash, $f);
 	tie %hash, 'Tie::IxHash';
-        if (WebGUI::Privilege::canEditPage()) {
-		if ($_[0]->get("wobjectId") eq "new") {
-                        $editTimeout = 1;
-                } else {
-                        $editTimeout = $_[0]->get("editTimeout");
-                }
-		$groupToModerate = $_[0]->get("groupToModerate") || 4;
-                $output = helpIcon(1,$namespace);
-		$output .= '<h1>'.WebGUI::International::get(12,$namespace).'</h1>';
-		$f = WebGUI::HTMLForm->new;
-		$f->raw($_[0]->fileProperty("image",6));
-                %hash = (
-                        right => WebGUI::International::get(15,$namespace),
-                        left => WebGUI::International::get(16,$namespace),
-                        center => WebGUI::International::get(17,$namespace)
-                        );
-		$f->select("alignImage",\%hash,WebGUI::International::get(14,$namespace),[$_[0]->get("alignImage")]);
-		$f->raw($_[0]->fileProperty("attachment",9));
-		$f->text("linkTitle",WebGUI::International::get(7,$namespace),$_[0]->get("linkTitle"));
-                $f->url("linkURL",WebGUI::International::get(8,$namespace),$_[0]->get("linkURL"));
-		$f->yesNo("convertCarriageReturns",WebGUI::International::get(10,$namespace),$_[0]->get("convertCarriageReturns")
-			,'',' &nbsp; <span style="font-size: 8pt;">'.WebGUI::International::get(11,$namespace).'</span>');
-		$f->yesNo("allowDiscussion",WebGUI::International::get(18,$namespace),$_[0]->get("allowDiscussion"));
-		$f->raw($_[0]->SUPER::discussionProperties);
-		$output .= $_[0]->SUPER::www_edit($f->printRowsOnly);
-                return $output;
+	if ($_[0]->get("wobjectId") eq "new") {
+                $editTimeout = 1;
         } else {
-                return WebGUI::Privilege::insufficient();
+                $editTimeout = $_[0]->get("editTimeout");
         }
+	$groupToModerate = $_[0]->get("groupToModerate") || 4;
+        $output = helpIcon(1,$namespace);
+	$output .= '<h1>'.WebGUI::International::get(12,$namespace).'</h1>';
+	$f = WebGUI::HTMLForm->new;
+	$f->raw($_[0]->fileProperty("image",6));
+        %hash = (
+                right => WebGUI::International::get(15,$namespace),
+                left => WebGUI::International::get(16,$namespace),
+                center => WebGUI::International::get(17,$namespace)
+                );
+	$f->select("alignImage",\%hash,WebGUI::International::get(14,$namespace),[$_[0]->get("alignImage")]);
+	$f->raw($_[0]->fileProperty("attachment",9));
+	$f->text("linkTitle",WebGUI::International::get(7,$namespace),$_[0]->get("linkTitle"));
+        $f->url("linkURL",WebGUI::International::get(8,$namespace),$_[0]->get("linkURL"));
+	$f->yesNo("convertCarriageReturns",WebGUI::International::get(10,$namespace),$_[0]->get("convertCarriageReturns")
+		,'',' &nbsp; <span style="font-size: 8pt;">'.WebGUI::International::get(11,$namespace).'</span>');
+	$f->yesNo("allowDiscussion",WebGUI::International::get(18,$namespace),$_[0]->get("allowDiscussion"));
+	$f->raw($_[0]->SUPER::discussionProperties);
+	$output .= $_[0]->SUPER::www_edit($f->printRowsOnly);
+        return $output;
 }
 
 #-------------------------------------------------------------------
 sub www_editSave {
+	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
         my ($image, $attachment, %property);
-        if (WebGUI::Privilege::canEditPage()) {
-		$_[0]->SUPER::www_editSave();
-                $image = WebGUI::Attachment->new("",$_[0]->get("wobjectId"));
-		$image->save("image");
-                $attachment = WebGUI::Attachment->new("",$_[0]->get("wobjectId"));
-		$attachment->save("attachment");
-		$property{image} = $image->getFilename if ($image->getFilename ne "");
-		$property{attachment} = $attachment->getFilename if ($attachment->getFilename ne "");
-		$property{alignImage} = $session{form}{alignImage};
-		$property{convertCarriageReturns} = $session{form}{convertCarriageReturns};
-		$property{linkTitle} = $session{form}{linkTitle};
-		$property{linkURL} = $session{form}{linkURL};
-		$property{allowDiscussion} = $session{form}{allowDiscussion};
-		$_[0]->set(\%property);
-                return "";
-        } else {
-                return WebGUI::Privilege::insufficient();
-        }
+	$_[0]->SUPER::www_editSave();
+        $image = WebGUI::Attachment->new("",$_[0]->get("wobjectId"));
+	$image->save("image");
+        $attachment = WebGUI::Attachment->new("",$_[0]->get("wobjectId"));
+	$attachment->save("attachment");
+	$property{image} = $image->getFilename if ($image->getFilename ne "");
+	$property{attachment} = $attachment->getFilename if ($attachment->getFilename ne "");
+	$property{alignImage} = $session{form}{alignImage};
+	$property{convertCarriageReturns} = $session{form}{convertCarriageReturns};
+	$property{linkTitle} = $session{form}{linkTitle};
+	$property{linkURL} = $session{form}{linkURL};
+	$property{allowDiscussion} = $session{form}{allowDiscussion};
+	$_[0]->set(\%property);
+        return "";
 }
 
 #-------------------------------------------------------------------

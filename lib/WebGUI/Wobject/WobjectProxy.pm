@@ -43,56 +43,50 @@ sub set {
 
 #-------------------------------------------------------------------
 sub www_edit {
+	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
         my ($output, $f, $startDate, $endDate, $templatePosition,%wobjects, %page, %wobject, $a, $b);
 	tie %wobject, 'Tie::CPHash';
 	tie %page, 'Tie::CPHash';
 	tie %wobjects, 'Tie::IxHash';
-        if (WebGUI::Privilege::canEditPage()) {
-                $output = helpIcon(1,$namespace);
-		$output .= '<h1>'.WebGUI::International::get(2,$namespace).'</h1>';
-		$templatePosition = $_[0]->get("templatePosition") || '0';
-        	$startDate = $_[0]->get("startDate") || $session{page}{startDate};
-        	$endDate = $_[0]->get("endDate") || $session{page}{endDate};
-        	$f = WebGUI::HTMLForm->new;
-        	$f->hidden("wid",$_[0]->get("wobjectId"));
-        	$f->hidden("namespace",$_[0]->get("namespace")) if ($_[0]->get("wobjectId") eq "new");
-        	$f->hidden("func","editSave");
-        	$f->readOnly($_[0]->get("wobjectId"),WebGUI::International::get(499));
-        	$f->hidden("title",$namespace);
-        	$f->hidden("displayTitle",0);
-        	$f->hidden("processMacros",0);
-        	$f->select("templatePosition",WebGUI::Template::getPositions($session{page}{templateId}),WebGUI::International::get(363),[$templatePosition]);
-        	$f->date("startDate",WebGUI::International::get(497),$startDate);
-        	$f->date("endDate",WebGUI::International::get(498),$endDate);
-		$a = WebGUI::SQL->read("select pageId,menuTitle from page where pageId<2 or pageId>25 order by title");
-		while (%page = $a->hash) {
-			$b = WebGUI::SQL->read("select wobjectId,title from wobject where pageId=".$page{pageId}." and namespace<>'WobjectProxy' order by sequenceNumber");
-			while (%wobject = $b->hash) {
-				$wobjects{$wobject{wobjectId}} = $page{menuTitle}." / ".$wobject{title}." (".$wobject{wobjectId}.")";
-			}
-			$b->finish;
+        $output = helpIcon(1,$namespace);
+	$output .= '<h1>'.WebGUI::International::get(2,$namespace).'</h1>';
+	$templatePosition = $_[0]->get("templatePosition") || '0';
+       	$startDate = $_[0]->get("startDate") || $session{page}{startDate};
+       	$endDate = $_[0]->get("endDate") || $session{page}{endDate};
+       	$f = WebGUI::HTMLForm->new;
+       	$f->hidden("wid",$_[0]->get("wobjectId"));
+       	$f->hidden("namespace",$_[0]->get("namespace")) if ($_[0]->get("wobjectId") eq "new");
+       	$f->hidden("func","editSave");
+       	$f->readOnly($_[0]->get("wobjectId"),WebGUI::International::get(499));
+       	$f->hidden("title",$namespace);
+       	$f->hidden("displayTitle",0);
+       	$f->hidden("processMacros",0);
+       	$f->select("templatePosition",WebGUI::Template::getPositions($session{page}{templateId}),WebGUI::International::get(363),[$templatePosition]);
+       	$f->date("startDate",WebGUI::International::get(497),$startDate);
+       	$f->date("endDate",WebGUI::International::get(498),$endDate);
+	$a = WebGUI::SQL->read("select pageId,menuTitle from page where pageId<2 or pageId>25 order by title");
+	while (%page = $a->hash) {
+		$b = WebGUI::SQL->read("select wobjectId,title from wobject where pageId=".$page{pageId}." and namespace<>'WobjectProxy' order by sequenceNumber");
+		while (%wobject = $b->hash) {
+			$wobjects{$wobject{wobjectId}} = $page{menuTitle}." / ".$wobject{title}." (".$wobject{wobjectId}.")";
 		}
-		$a->finish;
-		$f->select("proxiedWobjectId",\%wobjects,WebGUI::International::get(1,$namespace),[$_[0]->get("proxiedWobjectId")]);
-        	$f->submit;
-        	$output .= $f->print;
-		return $output;
-        } else {
-                return WebGUI::Privilege::insufficient();
-        }
+		$b->finish;
+	}
+	$a->finish;
+	$f->select("proxiedWobjectId",\%wobjects,WebGUI::International::get(1,$namespace),[$_[0]->get("proxiedWobjectId")]);
+       	$f->submit;
+       	$output .= $f->print;
+	return $output;
 }
 
 #-------------------------------------------------------------------
 sub www_editSave {
-        if (WebGUI::Privilege::canEditPage()) {
-		$_[0]->SUPER::www_editSave();
-                $_[0]->set({
-			proxiedWobjectId=>$session{form}{proxiedWobjectId}
-			});
-                return "";
-        } else {
-                return WebGUI::Privilege::insufficient();
-        }
+	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
+	$_[0]->SUPER::www_editSave();
+        $_[0]->set({
+		proxiedWobjectId=>$session{form}{proxiedWobjectId}
+		});
+        return "";
 }
 
 #-------------------------------------------------------------------

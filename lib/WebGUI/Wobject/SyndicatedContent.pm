@@ -45,39 +45,33 @@ sub set {
 
 #-------------------------------------------------------------------
 sub www_edit {
+        return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
         my ($output, $f);
-        if (WebGUI::Privilege::canEditPage()) {
-                $output = helpIcon(1,$namespace);
-		$output .= '<h1>'.WebGUI::International::get(4,$namespace).'</h1>';
-		$f = WebGUI::HTMLForm->new;
-		$f->url("rssUrl",WebGUI::International::get(1,$namespace),$_[0]->get("rssUrl"));
-		if ($_[0]->get("wobjectId") ne "new") {
-                	$f->readOnly(WebGUI::DateTime::epochToHuman($_[0]->get("lastFetched"),"%z %Z"),WebGUI::International::get(5,$namespace));
-                	$f->readOnly($_[0]->get("content"),WebGUI::International::get(6,$namespace));
-		} else {
-			$f->hidden("content","Not yet fetched!");
-			$f->hidden("lastFetched",time());
-		}
-		$output .= $_[0]->SUPER::www_edit($f->printRowsOnly);
-                return $output;
-        } else {
-                return WebGUI::Privilege::insufficient();
-        }
+        $output = helpIcon(1,$namespace);
+	$output .= '<h1>'.WebGUI::International::get(4,$namespace).'</h1>';
+	$f = WebGUI::HTMLForm->new;
+	$f->url("rssUrl",WebGUI::International::get(1,$namespace),$_[0]->get("rssUrl"));
+	if ($_[0]->get("wobjectId") ne "new") {
+               	$f->readOnly(WebGUI::DateTime::epochToHuman($_[0]->get("lastFetched"),"%z %Z"),WebGUI::International::get(5,$namespace));
+               	$f->readOnly($_[0]->get("content"),WebGUI::International::get(6,$namespace));
+	} else {
+		$f->hidden("content","Not yet fetched!");
+		$f->hidden("lastFetched",time());
+	}
+	$output .= $_[0]->SUPER::www_edit($f->printRowsOnly);
+        return $output;
 }
 
 #-------------------------------------------------------------------
 sub www_editSave {
+        return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
 	my ($property);
-        if (WebGUI::Privilege::canEditPage()) {
-		$_[0]->SUPER::www_editSave();
-		$property->{rssUrl} = $session{form}{rssUrl};
-		$property->{content} = $session{form}{content} if ($session{form}{content} ne "");
-		$property->{lastFetched} = $session{form}{lastFetched} if ($session{form}{lastFetched} ne "");
-		$_[0]->set($property);
-                return "";
-        } else {
-                return WebGUI::Privilege::insufficient();
-        }
+	$_[0]->SUPER::www_editSave();
+	$property->{rssUrl} = $session{form}{rssUrl};
+	$property->{content} = $session{form}{content} if ($session{form}{content} ne "");
+	$property->{lastFetched} = $session{form}{lastFetched} if ($session{form}{lastFetched} ne "");
+	$_[0]->set($property);
+        return "";
 }
 
 #-------------------------------------------------------------------

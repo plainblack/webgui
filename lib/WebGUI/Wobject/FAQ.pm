@@ -166,12 +166,16 @@ sub www_editQuestionSave {
 
 #-------------------------------------------------------------------
 sub www_moveQuestionDown {
+	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
 	$_[0]->moveCollateralDown("FAQ_question","questionId",$session{form}{qid});
+	return "";
 }
 
 #-------------------------------------------------------------------
 sub www_moveQuestionUp {
+	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
 	$_[0]->moveCollateralUp("FAQ_question","questionId",$session{form}{qid});
+	return "";
 }
 
 #-------------------------------------------------------------------

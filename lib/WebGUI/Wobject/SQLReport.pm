@@ -53,50 +53,44 @@ sub set {
 
 #-------------------------------------------------------------------
 sub www_edit {
+	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
         my ($output, $f, $dsn, $username, $paginateAfter);
-        if (WebGUI::Privilege::canEditPage()) {
-		$dsn = $_[0]->get("DSN") || $session{config}{dsn};
-		$username = $_[0]->get("username") || $session{config}{dbuser};
-		$paginateAfter = $_[0]->get("paginateAfter") || 50;
-		$f = WebGUI::HTMLForm->new;
-                $output = helpIcon(1,$namespace);
-                $output .= '<h1>'.WebGUI::International::get(8,$namespace).'</h1>';
-		$f->yesNo("preprocessMacros",WebGUI::International::get(15,$namespace),$_[0]->get("preprocessMacros"));
-                $f->yesNo("debugMode",WebGUI::International::get(16,$namespace),$_[0]->get("debugMode"));
-		$f->textarea("dbQuery",WebGUI::International::get(4,$namespace),$_[0]->get("dbQuery"));
-        	$f->HTMLArea("template",WebGUI::International::get(3,$namespace),$_[0]->get("template"));        
-                $f->text("DSN",WebGUI::International::get(5,$namespace),$dsn);
-		$f->text("username",WebGUI::International::get(6,$namespace),$username);
-		$f->password("identifier",WebGUI::International::get(7,$namespace),$_[0]->get("identifier"));
-		$f->integer("paginateAfter",WebGUI::International::get(14,$namespace),$paginateAfter);
-		$f->yesNo("convertCarriageReturns",WebGUI::International::get(13,$namespace),$_[0]->get("convertCarriageReturns"));
-		$output .= $_[0]->SUPER::www_edit($f->printRowsOnly);
-                return $output;
-        } else {
-                return WebGUI::Privilege::insufficient();
-        }
+	$dsn = $_[0]->get("DSN") || $session{config}{dsn};
+	$username = $_[0]->get("username") || $session{config}{dbuser};
+	$paginateAfter = $_[0]->get("paginateAfter") || 50;
+	$f = WebGUI::HTMLForm->new;
+        $output = helpIcon(1,$namespace);
+        $output .= '<h1>'.WebGUI::International::get(8,$namespace).'</h1>';
+	$f->yesNo("preprocessMacros",WebGUI::International::get(15,$namespace),$_[0]->get("preprocessMacros"));
+        $f->yesNo("debugMode",WebGUI::International::get(16,$namespace),$_[0]->get("debugMode"));
+	$f->textarea("dbQuery",WebGUI::International::get(4,$namespace),$_[0]->get("dbQuery"));
+       	$f->HTMLArea("template",WebGUI::International::get(3,$namespace),$_[0]->get("template"));        
+        $f->text("DSN",WebGUI::International::get(5,$namespace),$dsn);
+	$f->text("username",WebGUI::International::get(6,$namespace),$username);
+	$f->password("identifier",WebGUI::International::get(7,$namespace),$_[0]->get("identifier"));
+	$f->integer("paginateAfter",WebGUI::International::get(14,$namespace),$paginateAfter);
+	$f->yesNo("convertCarriageReturns",WebGUI::International::get(13,$namespace),$_[0]->get("convertCarriageReturns"));
+	$output .= $_[0]->SUPER::www_edit($f->printRowsOnly);
+        return $output;
 }
 
 #-------------------------------------------------------------------
 sub www_editSave {
+	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
         my ($wobjectId, $displayTitle, $image, $attachment);
-        if (WebGUI::Privilege::canEditPage()) {
-		$_[0]->SUPER::www_editSave();
-                $_[0]->set({
-			template=>$session{form}{template},
-			dbQuery=>$session{form}{dbQuery},
-			convertCarriageReturns=>$session{form}{convertCarriageReturns},
-			DSN=>$session{form}{DSN},
-			username=>$session{form}{username},
-			identifier=>$session{form}{identifier},
-			paginateAfter=>$session{form}{paginateAfter},
-			preprocessMacros=>$session{form}{preprocessMacros},
-			debugMode=>$session{form}{debugMode}
-			});
-                return "";
-        } else {
-                return WebGUI::Privilege::insufficient();
-        }
+	$_[0]->SUPER::www_editSave();
+        $_[0]->set({
+		template=>$session{form}{template},
+		dbQuery=>$session{form}{dbQuery},
+		convertCarriageReturns=>$session{form}{convertCarriageReturns},
+		DSN=>$session{form}{DSN},
+		username=>$session{form}{username},
+		identifier=>$session{form}{identifier},
+		paginateAfter=>$session{form}{paginateAfter},
+		preprocessMacros=>$session{form}{preprocessMacros},
+		debugMode=>$session{form}{debugMode}
+		});
+        return "";
 }
 
 #-------------------------------------------------------------------

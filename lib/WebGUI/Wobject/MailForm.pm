@@ -79,36 +79,26 @@ sub set {
 
 #-------------------------------------------------------------------
 sub www_deleteField {
-    	my ($output);
-    	if (WebGUI::Privilege::canEditPage()) {
-		return $_[0]->confirm(WebGUI::International::get(19,$namespace),
-            		WebGUI::URL::page('func=deleteFieldConfirm&wid='.$_[0]->get("wobjectId").'&fid='.$session{form}{fid}));
-    	} else {
-        	return WebGUI::Privilege::insufficient();
-    	}
+	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
+	return $_[0]->confirm(WebGUI::International::get(19,$namespace),
+       		WebGUI::URL::page('func=deleteFieldConfirm&wid='.$_[0]->get("wobjectId").'&fid='.$session{form}{fid}));
 }
 
 #-------------------------------------------------------------------
 sub www_deleteFieldConfirm {
-    	my ($output);
-    	if (WebGUI::Privilege::canEditPage()) {
-		$_[0]->deleteCollateral("MailForm_field","mailFieldId",$session{form}{fid});
-		$_[0]->reorderCollateral("MailForm_field","mailFieldId");
-        	return "";
-    	} else {
-        	return WebGUI::Privilege::insufficient();
-    	}
+	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
+	$_[0]->deleteCollateral("MailForm_field","mailFieldId",$session{form}{fid});
+	$_[0]->reorderCollateral("MailForm_field","mailFieldId");
+       	return "";
 }
 
 #-------------------------------------------------------------------
 sub www_edit {
+	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
 	my ($output, $f, $proceed);
-	if (WebGUI::Privilege::canEditPage()) {
-
-		my %fieldStatus = ( 1 => WebGUI::International::get(4, $namespace),
-			2 => WebGUI::International::get(5, $namespace),
-			3 => WebGUI::International::get(6, $namespace) );
-		
+	my %fieldStatus = ( 1 => WebGUI::International::get(4, $namespace),
+		2 => WebGUI::International::get(5, $namespace),
+		3 => WebGUI::International::get(6, $namespace) );
         # field defaults
         my %data = (
             width => 45,
@@ -133,10 +123,10 @@ sub www_edit {
         if ($_[0]->get("wobjectId") eq "new") {
             $proceed = 1;
         }
-		$output = helpIcon(1,$_[0]->get("namespace"));
-		$output .= '<h1>'.WebGUI::International::get(7, $namespace).'</h1>';
-		$f = WebGUI::HTMLForm->new;
-		$f->integer("width",WebGUI::International::get(8, $namespace),$_[0]->get("width") || 45);
+	$output = helpIcon(1,$_[0]->get("namespace"));
+	$output .= '<h1>'.WebGUI::International::get(7, $namespace).'</h1>';
+	$f = WebGUI::HTMLForm->new;
+	$f->integer("width",WebGUI::International::get(8, $namespace),$_[0]->get("width") || 45);
         $f->raw( $_[0]->_textSelectRow("fromField",WebGUI::International::get(10, $namespace),$data{fromField},128,
             "fromStatus",\%fieldStatus,$data{fromStatus}) );
         $f->raw( $_[0]->_textSelectRow("toField",WebGUI::International::get(11, $namespace),$data{toField},128,
@@ -147,44 +137,34 @@ sub www_edit {
             "bccStatus",\%fieldStatus,$data{bccStatus}) );
         $f->raw( $_[0]->_textSelectRow("subjectField",WebGUI::International::get(14, $namespace),$data{subjectField},128,
             "subjectStatus",\%fieldStatus,$data{subjectStatus}) );		
-		$f->HTMLArea("acknowledgement",WebGUI::International::get(16, $namespace),$_[0]->get("acknowledgement") || WebGUI::International::get(3, $namespace));
-		my %storeEntriesOptions = (
-			1 => "Yes",
-			0 => "No"
-		);
-		$f->select("storeEntries",\%storeEntriesOptions,WebGUI::International::get(26,$namespace),[ $data{storeEntries} ]);
-		$f->yesNo("proceed",WebGUI::International::get(15,$namespace),$proceed);
-		$output .= $_[0]->SUPER::www_edit($f->printRowsOnly);
-		return $output;
-	} else {
-		return WebGUI::Privilege::insufficient();
-	}
+	$f->HTMLArea("acknowledgement",WebGUI::International::get(16, $namespace),$_[0]->get("acknowledgement") || WebGUI::International::get(3, $namespace));
+	$f->yesNo("storeEntries",WebGUI::International::get(26,$namespace),[ $data{storeEntries} ]);
+	$f->yesNo("proceed",WebGUI::International::get(15,$namespace),$proceed);
+	$output .= $_[0]->SUPER::www_edit($f->printRowsOnly);
+	return $output;
 }
 
 #-------------------------------------------------------------------
 sub www_editSave {
+	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
 	my ($property);
-	if (WebGUI::Privilege::canEditPage()) {
-		$_[0]->SUPER::www_editSave();
-		foreach my $field (@fields) {
-			$property->{$field} = $session{form}{$field};
-		}
-		$_[0]->set($property);
+	$_[0]->SUPER::www_editSave();
+	foreach my $field (@fields) {
+		$property->{$field} = $session{form}{$field};
+	}
+	$_[0]->set($property);
         if ($session{form}{proceed}) {
-            $_[0]->www_editField();
+            return $_[0]->www_editField();
         } else {
             return "";
         }
-	} else {
-		return WebGUI::Privilege::insufficient();
-	}
 }
 
 #-------------------------------------------------------------------
 sub www_editField {
+	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
     my ($output, %field, $f);
     tie %field, 'Tie::CPHash';
-    
 	my %fieldStatus = ( 1 => WebGUI::International::get(4, $namespace),
 		2 => WebGUI::International::get(5, $namespace),
 		3 => WebGUI::International::get(6, $namespace) );
@@ -198,7 +178,6 @@ sub www_editField {
 		yesNo => "Yes/No",
 		select => "Drop-Down Box" );
     
-    if (WebGUI::Privilege::canEditPage()) {
         %field = WebGUI::SQL->quickHash("select * from MailForm_field where mailFieldId='$session{form}{fid}'");
         $output = helpIcon(2,$_[0]->get("namespace"));
         $output .= '<h1>'.WebGUI::International::get(20,$namespace).'</h1>';
@@ -218,16 +197,12 @@ sub www_editField {
         $f->submit;
         $output .= $f->print;
         return $output;
-    } else {
-        return WebGUI::Privilege::insufficient();
-    }
-    return $output;
 }
 
 #-------------------------------------------------------------------
 sub www_editFieldSave {
+	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
     my ($seq);
-    if (WebGUI::Privilege::canEditPage()) {
         if ($session{form}{fid} eq "new") {
             ($seq) = WebGUI::SQL->quickArray("select max(sequenceNumber) from MailForm_field where wobjectId=".$_[0]->get("wobjectId"));
             $session{form}{fid} = getNextId("mailFieldId");
@@ -246,19 +221,20 @@ sub www_editFieldSave {
         } else {
             return "";
         }
-    } else {
-        return WebGUI::Privilege::insufficient();
-    }
 }
 
 #-------------------------------------------------------------------
 sub www_moveFieldDown {
+	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
 	$_[0]->moveCollateralDown("MailForm_field","mailFieldId",$session{form}{fid});
+	return "";
 }
 
 #-------------------------------------------------------------------
 sub www_moveFieldUp {
+	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
 	$_[0]->moveCollateralUp("MailForm_field","mailFieldId",$session{form}{fid});
+	return "";
 }
 
 #-------------------------------------------------------------------

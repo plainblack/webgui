@@ -379,18 +379,13 @@ sub inDateRange {
 
 sub moveCollateralDown {
         my ($id, $seq);
-        if (WebGUI::Privilege::canEditPage()) {
-                ($seq) = WebGUI::SQL->quickArray("select sequenceNumber from $_[1] where $_[2]=$_[3] and wobjectId=".$_[0]->get("wobjectId"));
-                ($id) = WebGUI::SQL->quickArray("select $_[2] from $_[1] where wobjectId=".$_[0]->get("wobjectId")
-			." and sequenceNumber=$seq+1 group by wobjectId");
-                if ($id ne "") {
-                        WebGUI::SQL->write("update $_[1] set sequenceNumber=sequenceNumber+1 where $_[2]=$_[3] and wobjectId=".$_[0]->get("wobjectId"));
-                        WebGUI::SQL->write("update $_[1] set sequenceNumber=sequenceNumber-1 where $_[2]=$id and wobjectId=".$_[0]->get("wobjectId"));
-                }
-                return "";
-        } else {
-                return WebGUI::Privilege::insufficient();
-        }
+        ($seq) = WebGUI::SQL->quickArray("select sequenceNumber from $_[1] where $_[2]=$_[3] and wobjectId=".$_[0]->get("wobjectId"));
+        ($id) = WebGUI::SQL->quickArray("select $_[2] from $_[1] where wobjectId=".$_[0]->get("wobjectId")
+		." and sequenceNumber=$seq+1 group by wobjectId");
+        if ($id ne "") {
+                WebGUI::SQL->write("update $_[1] set sequenceNumber=sequenceNumber+1 where $_[2]=$_[3] and wobjectId=".$_[0]->get("wobjectId"));
+                WebGUI::SQL->write("update $_[1] set sequenceNumber=sequenceNumber-1 where $_[2]=$id and wobjectId=".$_[0]->get("wobjectId"));
+         }
 }
 
 #-------------------------------------------------------------------
@@ -422,17 +417,12 @@ sub moveCollateralDown {
 
 sub moveCollateralUp {
         my ($id, $seq);
-        if (WebGUI::Privilege::canEditPage()) {
-                ($seq) = WebGUI::SQL->quickArray("select sequenceNumber from $_[1] where $_[2]=$_[3] and wobjectId=".$_[0]->get("wobjectId"));
-                ($id) = WebGUI::SQL->quickArray("select $_[2] from $_[1] where wobjectId=".$_[0]->get("wobjectId")
-			." and sequenceNumber=$seq-1 group by wobjectId");
-                if ($id ne "") {
-                        WebGUI::SQL->write("update $_[1] set sequenceNumber=sequenceNumber-1 where $_[2]=$_[3] and wobjectId=".$_[0]->get("wobjectId"));
-                        WebGUI::SQL->write("update $_[1] set sequenceNumber=sequenceNumber+1 where $_[2]=$id and wobjectId=".$_[0]->get("wobjectId"));
-                }
-                return "";
-        } else {
-                return WebGUI::Privilege::insufficient();
+        ($seq) = WebGUI::SQL->quickArray("select sequenceNumber from $_[1] where $_[2]=$_[3] and wobjectId=".$_[0]->get("wobjectId"));
+        ($id) = WebGUI::SQL->quickArray("select $_[2] from $_[1] where wobjectId=".$_[0]->get("wobjectId")
+		." and sequenceNumber=$seq-1 group by wobjectId");
+        if ($id ne "") {
+                WebGUI::SQL->write("update $_[1] set sequenceNumber=sequenceNumber-1 where $_[2]=$_[3] and wobjectId=".$_[0]->get("wobjectId"));
+                WebGUI::SQL->write("update $_[1] set sequenceNumber=sequenceNumber+1 where $_[2]=$id and wobjectId=".$_[0]->get("wobjectId"));
         }
 }
 

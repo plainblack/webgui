@@ -91,44 +91,35 @@ sub set {
 
 #-------------------------------------------------------------------
 sub www_deleteFile {
+	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
 	my ($delete);
-        if (WebGUI::Privilege::canEditPage()) {
-		if ($session{form}{alt} == 1) {
-			$delete = "alternateVersion1";
-		} elsif ($session{form}{alt} == 2) {
-			$delete = "alternateVersion2";
-		} else {
-			$delete = "downloadFile";
-		}
-                WebGUI::SQL->write("update DownloadManager_file set $delete='' where downloadId=$session{form}{did}");
-                return $_[0]->www_editDownload();
-        } else {
-                return WebGUI::Privilege::insufficient();
-        }
+	if ($session{form}{alt} == 1) {
+		$delete = "alternateVersion1";
+	} elsif ($session{form}{alt} == 2) {
+		$delete = "alternateVersion2";
+	} else {
+		$delete = "downloadFile";
+	}
+        WebGUI::SQL->write("update DownloadManager_file set $delete='' where downloadId=$session{form}{did}");
+       return $_[0]->www_editDownload();
 }
 
 #-------------------------------------------------------------------
 sub www_deleteDownload {
-        if (WebGUI::Privilege::canEditPage()) {
-		return $_[0]->confirm(WebGUI::International::get(12,$namespace),
-			WebGUI::URL::page('func=deleteDownloadConfirm&wid='.$session{form}{wid}.'&did='.$session{form}{did}));
-        } else {
-                return WebGUI::Privilege::insufficient();
-        }
+	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
+	return $_[0]->confirm(WebGUI::International::get(12,$namespace),
+		WebGUI::URL::page('func=deleteDownloadConfirm&wid='.$session{form}{wid}.'&did='.$session{form}{did}));
 }
 
 #-------------------------------------------------------------------
 sub www_deleteDownloadConfirm {
+	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
         my ($output, $file);
-        if (WebGUI::Privilege::canEditPage()) {
-                $file = WebGUI::Attachment->new("",$session{form}{wid},$session{form}{did});
-                $file->deleteNode;
-		$_[0]->deleteCollateral("DownloadManager_file","downloadId",$session{form}{did});
-                $_[0]->reorderCollateral("DownloadManager_file","downloadId");
-                return "";
-        } else {
-                return WebGUI::Privilege::insufficient();
-        }
+        $file = WebGUI::Attachment->new("",$session{form}{wid},$session{form}{did});
+        $file->deleteNode;
+	$_[0]->deleteCollateral("DownloadManager_file","downloadId",$session{form}{did});
+        $_[0]->reorderCollateral("DownloadManager_file","downloadId");
+        return "";
 }
 
 #-------------------------------------------------------------------
@@ -159,134 +150,126 @@ sub www_download {
 
 #-------------------------------------------------------------------
 sub www_edit {
+	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
         my ($output, $f, $paginateAfter, $proceed);
-        if (WebGUI::Privilege::canEditPage()) {
-                if ($_[0]->get("wobjectId") eq "new") {
-                        $proceed = 1;
-                }
-                $output .= helpIcon(1,$namespace);
-                $output .= '<h1>'.WebGUI::International::get(9,$namespace).'</h1>';
-		$paginateAfter = $_[0]->get("paginateAfter") || 50;
-		$f = WebGUI::HTMLForm->new;
-		$f->integer("paginateAfter",WebGUI::International::get(20,$namespace),$paginateAfter);
-                $f->yesNo("displayThumbnails",WebGUI::International::get(21,$namespace),$_[0]->get("displayThumbnails"));
-                $f->yesNo("proceed",WebGUI::International::get(22,$namespace),$proceed);
-		$output .= $_[0]->SUPER::www_edit($f->printRowsOnly);
-                return $output;
-        } else {
-                return WebGUI::Privilege::insufficient();
+        if ($_[0]->get("wobjectId") eq "new") {
+                $proceed = 1;
         }
+        $output .= helpIcon(1,$namespace);
+        $output .= '<h1>'.WebGUI::International::get(9,$namespace).'</h1>';
+	$paginateAfter = $_[0]->get("paginateAfter") || 50;
+	$f = WebGUI::HTMLForm->new;
+	$f->integer("paginateAfter",WebGUI::International::get(20,$namespace),$paginateAfter);
+        $f->yesNo("displayThumbnails",WebGUI::International::get(21,$namespace),$_[0]->get("displayThumbnails"));
+        $f->yesNo("proceed",WebGUI::International::get(22,$namespace),$proceed);
+	$output .= $_[0]->SUPER::www_edit($f->printRowsOnly);
+        return $output;
 }
 
 #-------------------------------------------------------------------
 sub www_editSave {
-        if (WebGUI::Privilege::canEditPage()) {
-		$_[0]->SUPER::www_editSave();
-                $_[0]->set({
-			paginateAfter=>$session{form}{paginateAfter},
-			displayThumbnails=>$session{form}{displayThumbnails}
-			});
-                if ($session{form}{proceed}) {
-                        $_[0]->www_editDownload();
-                } else {
-                        return "";
-                }
+	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
+	$_[0]->SUPER::www_editSave();
+        $_[0]->set({
+		paginateAfter=>$session{form}{paginateAfter},
+		displayThumbnails=>$session{form}{displayThumbnails}
+		});
+        if ($session{form}{proceed}) {
+                return $_[0]->www_editDownload();
         } else {
-                return WebGUI::Privilege::insufficient();
+                return "";
         }
 }
 
 #-------------------------------------------------------------------
 sub www_editDownload {
+	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
         my ($output, %download, $f);
         tie %download,'Tie::CPHash';
-        if (WebGUI::Privilege::canEditPage()) {
-		if ($session{form}{did} eq "") {
-			$session{form}{did} = "new";
-		} else {
-			%download = WebGUI::SQL->quickHash("select * from DownloadManager_file where downloadId='$session{form}{did}'");
-		}
-                $output .= helpIcon(2,$namespace);
-                $output .= '<h1>'.WebGUI::International::get(10,$namespace).'</h1>';
-		$f = WebGUI::HTMLForm->new;
-                $f->hidden("wid",$_[0]->get("wobjectId"));
-                $f->hidden("did",$session{form}{did});
-                $f->hidden("func","editDownloadSave");
-		$f->text("fileTitle",WebGUI::International::get(5,$namespace),$download{fileTitle});
-		if ($download{downloadFile} ne "") {
-			$f->readOnly('<a href="'.WebGUI::URL::page('func=deleteFile&wid='.
-				$session{form}{wid}.'&did='.$session{form}{did}).'">'.WebGUI::International::get(391).
-				'</a>',WebGUI::International::get(6,$namespace));
-                } else {
-			$f->file("downloadFile",WebGUI::International::get(6,$namespace));
-                }
-                if ($download{alternateVersion1} ne "") {
-			$f->readOnly('<a href="'.WebGUI::URL::page('func=deleteFile&alt=1&wid='.
-				$session{form}{wid}.'&did='.$session{form}{did}).'">'.
-				WebGUI::International::get(391).'</a>',WebGUI::International::get(17,$namespace));
-                } else {
-			$f->file("alternateVersion1",WebGUI::International::get(17,$namespace));
-                }
-                if ($download{alternateVersion2} ne "") {
-			$f->readOnly('<a href="'.WebGUI::URL::page('func=deleteFile&alt=2&wid='.
-				$session{form}{wid}.'&did='.$session{form}{did}).'">'.
-				WebGUI::International::get(391).'</a>',WebGUI::International::get(18,$namespace));
-                } else {
-			$f->file("alternateVersion2",WebGUI::International::get(18,$namespace));
-                }
-                $f->text("briefSynopsis",WebGUI::International::get(8,$namespace),$download{briefSynopsis});
-                $f->group("groupToView",WebGUI::International::get(7,$namespace),[$download{groupToView}]);
-                $f->yesNo("proceed",WebGUI::International::get(22,$namespace));
-		$f->submit;
-		$output .= $f->print;
-                return $output;
+	if ($session{form}{did} eq "") {
+		$session{form}{did} = "new";
+	} else {
+		%download = WebGUI::SQL->quickHash("select * from DownloadManager_file where downloadId='$session{form}{did}'");
+	}
+        $output .= helpIcon(2,$namespace);
+        $output .= '<h1>'.WebGUI::International::get(10,$namespace).'</h1>';
+	$f = WebGUI::HTMLForm->new;
+        $f->hidden("wid",$_[0]->get("wobjectId"));
+        $f->hidden("did",$session{form}{did});
+        $f->hidden("func","editDownloadSave");
+	$f->text("fileTitle",WebGUI::International::get(5,$namespace),$download{fileTitle});
+	if ($download{downloadFile} ne "") {
+		$f->readOnly('<a href="'.WebGUI::URL::page('func=deleteFile&wid='.
+			$session{form}{wid}.'&did='.$session{form}{did}).'">'.WebGUI::International::get(391).
+			'</a>',WebGUI::International::get(6,$namespace));
         } else {
-                return WebGUI::Privilege::insufficient();
+		$f->file("downloadFile",WebGUI::International::get(6,$namespace));
         }
+        if ($download{alternateVersion1} ne "") {
+		$f->readOnly('<a href="'.WebGUI::URL::page('func=deleteFile&alt=1&wid='.
+			$session{form}{wid}.'&did='.$session{form}{did}).'">'.
+			WebGUI::International::get(391).'</a>',WebGUI::International::get(17,$namespace));
+        } else {
+		$f->file("alternateVersion1",WebGUI::International::get(17,$namespace));
+        }
+        if ($download{alternateVersion2} ne "") {
+		$f->readOnly('<a href="'.WebGUI::URL::page('func=deleteFile&alt=2&wid='.
+		$session{form}{wid}.'&did='.$session{form}{did}).'">'.
+			WebGUI::International::get(391).'</a>',WebGUI::International::get(18,$namespace));
+        } else {
+		$f->file("alternateVersion2",WebGUI::International::get(18,$namespace));
+        }
+        $f->text("briefSynopsis",WebGUI::International::get(8,$namespace),$download{briefSynopsis});
+        $f->group("groupToView",WebGUI::International::get(7,$namespace),[$download{groupToView}]);
+        $f->yesNo("proceed",WebGUI::International::get(22,$namespace));
+	$f->submit;
+	$output .= $f->print;
+        return $output;
 }
 
 #-------------------------------------------------------------------
 sub www_editDownloadSave {
+	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
         my ($file, %files);
-        if (WebGUI::Privilege::canEditPage()) {
-		$files{downloadId} = $_[0]->setCollateral("DownloadManager_file", "downloadId", {
-                        downloadId => $session{form}{did},
-                        fileTitle => $session{form}{fileTitle},
-                        briefSynopsis => $session{form}{briefSynopsis},
-                        dateUploaded => time(),
-                        groupToView => $session{form}{groupToView}
-                        });
-		$_[0]->reorderCollateral("DownloadManager_file","downloadId");
-                $file = WebGUI::Attachment->new("",$session{form}{wid},$session{form}{did});
-		$file->save("downloadFile");
-		$files{downloadFile} = $file->getFilename;
-		$files{fileTitle} = $files{downloadFile} if ($session{form}{fileTitle} eq "");
-                $file = WebGUI::Attachment->new("",$session{form}{wid},$session{form}{did});
-		$file->save("alternateVersion1");
-		$files{alternateVersion1} = $file->getFilename;
-                $file = WebGUI::Attachment->new("",$session{form}{wid},$session{form}{did});
-		$file->save("alternateVersion2");
-		$files{alternateVersion2} = $file->getFilename;
-		$_[0]->setCollateral("DownloadManager_file", "downloadId", \%files);
-                if ($session{form}{proceed}) {
-                        $session{form}{did} = "new";
-                        $_[0]->www_editDownload();
-                } else {
-                        return "";
-                }
+	$files{downloadId} = $_[0]->setCollateral("DownloadManager_file", "downloadId", {
+        	downloadId => $session{form}{did},
+                fileTitle => $session{form}{fileTitle},
+                briefSynopsis => $session{form}{briefSynopsis},
+                dateUploaded => time(),
+                groupToView => $session{form}{groupToView}
+                });
+	$_[0]->reorderCollateral("DownloadManager_file","downloadId");
+        $file = WebGUI::Attachment->new("",$session{form}{wid},$session{form}{did});
+	$file->save("downloadFile");
+	$files{downloadFile} = $file->getFilename;
+	$files{fileTitle} = $files{downloadFile} if ($session{form}{fileTitle} eq "");
+        $file = WebGUI::Attachment->new("",$session{form}{wid},$session{form}{did});
+	$file->save("alternateVersion1");
+	$files{alternateVersion1} = $file->getFilename;
+        $file = WebGUI::Attachment->new("",$session{form}{wid},$session{form}{did});
+	$file->save("alternateVersion2");
+	$files{alternateVersion2} = $file->getFilename;
+	$_[0]->setCollateral("DownloadManager_file", "downloadId", \%files);
+        if ($session{form}{proceed}) {
+        	$session{form}{did} = "new";
+        	return $_[0]->www_editDownload();
         } else {
-                return WebGUI::Privilege::insufficient();
+                return "";
         }
 }
 
 #-------------------------------------------------------------------
 sub www_moveDownloadDown {
+	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
 	$_[0]->moveCollateralDown("DownloadManager_file","downloadId",$session{form}{did});
+	return "";
 }
 
 #-------------------------------------------------------------------
 sub www_moveDownloadUp {
+	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
 	$_[0]->moveCollateralUp("DownloadManager_file","downloadId",$session{form}{did});
+	return "";
 }
 
 #-------------------------------------------------------------------

@@ -110,107 +110,90 @@ sub set {
 
 #-------------------------------------------------------------------
 sub www_addAccessory {
+	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
         my ($output, $f, $accessory, @usedAccessories);
-        if (WebGUI::Privilege::canEditPage()) {
-		$output = helpIcon(4,$namespace);
-                $output .= '<h1>'.WebGUI::International::get(16,$namespace).'</h1>';
-                $f = WebGUI::HTMLForm->new;
-                $f->hidden("wid",$_[0]->get("wobjectId"));
-                $f->hidden("func","addAccessorySave");
-                @usedAccessories = WebGUI::SQL->quickArray("select accessoryWobjectId from Product_accessory
-                        where wobjectId=".$session{form}{wid});
-                push(@usedAccessories,$session{form}{wid});
-                $accessory = WebGUI::SQL->buildHashRef("select wobjectId,title from wobject where namespace='Product'
-                        and wobjectId not in (".join(",",@usedAccessories).")");
-                $f->select("accessoryWobjectId",$accessory,WebGUI::International::get(17,$namespace));
-                $f->yesNo("proceed",WebGUI::International::get(18,$namespace));
-                $f->submit;
-                $output .= $f->print;
-                return $output;
-        } else {
-                return WebGUI::Privilege::insufficient();
-        }
+	$output = helpIcon(4,$namespace);
+        $output .= '<h1>'.WebGUI::International::get(16,$namespace).'</h1>';
+        $f = WebGUI::HTMLForm->new;
+        $f->hidden("wid",$_[0]->get("wobjectId"));
+        $f->hidden("func","addAccessorySave");
+        @usedAccessories = WebGUI::SQL->quickArray("select accessoryWobjectId from Product_accessory
+                where wobjectId=".$session{form}{wid});
+        push(@usedAccessories,$session{form}{wid});
+        $accessory = WebGUI::SQL->buildHashRef("select wobjectId,title from wobject where namespace='Product'
+                and wobjectId not in (".join(",",@usedAccessories).")");
+        $f->select("accessoryWobjectId",$accessory,WebGUI::International::get(17,$namespace));
+        $f->yesNo("proceed",WebGUI::International::get(18,$namespace));
+        $f->submit;
+        $output .= $f->print;
         return $output;
 }
 
 #-------------------------------------------------------------------
 sub www_addAccessorySave {
+	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
         my ($seq);
-        if (WebGUI::Privilege::canEditPage()) {
-                ($seq) = WebGUI::SQL->quickArray("select max(sequenceNumber) from Product_accessory
-                        where wobjectId=".$_[0]->get("wobjectId"));
-                WebGUI::SQL->write("insert into Product_accessory (wobjectId,accessoryWobjectId,sequenceNumber) values
-                                (".$_[0]->get("wobjectId").",$session{form}{accessoryWobjectId},".($seq+1).")");
-                if ($session{form}{proceed}) {
-                        return $_[0]->www_addAccessory();
-                } else {
-                        return "";
-                }
+        ($seq) = WebGUI::SQL->quickArray("select max(sequenceNumber) from Product_accessory
+                where wobjectId=".$_[0]->get("wobjectId"));
+        WebGUI::SQL->write("insert into Product_accessory (wobjectId,accessoryWobjectId,sequenceNumber) values
+                (".$_[0]->get("wobjectId").",$session{form}{accessoryWobjectId},".($seq+1).")");
+        if ($session{form}{proceed}) {
+                return $_[0]->www_addAccessory();
         } else {
-                return WebGUI::Privilege::insufficient();
+                return "";
         }
 }
 
 #-------------------------------------------------------------------
 sub www_addRelated {
+	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
         my ($output, $f, $related, @usedRelated);
-        if (WebGUI::Privilege::canEditPage()) {
-		$output = helpIcon(5,$namespace);
-                $output .= '<h1>'.WebGUI::International::get(19,$namespace).'</h1>';
-                $f = WebGUI::HTMLForm->new;
-                $f->hidden("wid",$_[0]->get("wobjectId"));
-                $f->hidden("func","addRelatedSave");
-                @usedRelated = WebGUI::SQL->quickArray("select relatedWobjectId from Product_related
-                        where wobjectId=".$session{form}{wid});
-                push(@usedRelated,$session{form}{wid});
-                $related = WebGUI::SQL->buildHashRef("select wobjectId,title from wobject where namespace='Product'
-                        and wobjectId not in (".join(",",@usedRelated).")");
-                $f->select("relatedWobjectId",$related,WebGUI::International::get(20,$namespace));
-                $f->yesNo("proceed",WebGUI::International::get(21,$namespace));
-                $f->submit;
-                $output .= $f->print;
-                return $output;
-        } else {
-                return WebGUI::Privilege::insufficient();
-        }
+	$output = helpIcon(5,$namespace);
+        $output .= '<h1>'.WebGUI::International::get(19,$namespace).'</h1>';
+        $f = WebGUI::HTMLForm->new;
+        $f->hidden("wid",$_[0]->get("wobjectId"));
+        $f->hidden("func","addRelatedSave");
+        @usedRelated = WebGUI::SQL->quickArray("select relatedWobjectId from Product_related
+                where wobjectId=".$session{form}{wid});
+        push(@usedRelated,$session{form}{wid});
+        $related = WebGUI::SQL->buildHashRef("select wobjectId,title from wobject where namespace='Product'
+                and wobjectId not in (".join(",",@usedRelated).")");
+        $f->select("relatedWobjectId",$related,WebGUI::International::get(20,$namespace));
+        $f->yesNo("proceed",WebGUI::International::get(21,$namespace));
+        $f->submit;
+        $output .= $f->print;
         return $output;
 }
 
 #-------------------------------------------------------------------
 sub www_addRelatedSave {
+	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
         my ($seq);
-        if (WebGUI::Privilege::canEditPage()) {
-                ($seq) = WebGUI::SQL->quickArray("select max(sequenceNumber) from Product_related
-                        where wobjectId=".$_[0]->get("wobjectId"));
-                WebGUI::SQL->write("insert into Product_related (wobjectId,relatedWobjectId,sequenceNumber) values
-                                (".$_[0]->get("wobjectId").",$session{form}{relatedWobjectId},".($seq+1).")");
-                if ($session{form}{proceed}) {
-                        return $_[0]->www_addRelated();
-                } else {
-                        return "";
-                }
+        ($seq) = WebGUI::SQL->quickArray("select max(sequenceNumber) from Product_related
+     		where wobjectId=".$_[0]->get("wobjectId"));
+        WebGUI::SQL->write("insert into Product_related (wobjectId,relatedWobjectId,sequenceNumber) values
+                (".$_[0]->get("wobjectId").",$session{form}{relatedWobjectId},".($seq+1).")");
+        if ($session{form}{proceed}) {
+                return $_[0]->www_addRelated();
         } else {
-                return WebGUI::Privilege::insufficient();
+                return "";
         }
 }
 
 #-------------------------------------------------------------------
 sub www_copyTemplate {
+	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
 	my (%data);
 	tie %data, 'Tie::CPHash';
-        if (WebGUI::Privilege::canEditPage()) {
-		%data = WebGUI::SQL->quickHash("select * from Product_template where productTemplateId=".$session{form}{tid});
-		WebGUI::SQL->write("insert into Product_template values (".getNextId("productTemplateId").","
-			.quote("Copy of ".$data{name}).",".quote($data{template}).")");
-                return $_[0]->www_edit();
-        } else {
-                return WebGUI::Privilege::insufficient();
-        }
+	%data = WebGUI::SQL->quickHash("select * from Product_template where productTemplateId=".$session{form}{tid});
+	WebGUI::SQL->write("insert into Product_template values (".getNextId("productTemplateId").","
+		.quote("Copy of ".$data{name}).",".quote($data{template}).")");
+        return $_[0]->www_edit();
 }
 
 #-------------------------------------------------------------------
 sub www_deleteAccessory {
-        $_[0]->confirm(
+        return $_[0]->confirm(
                 WebGUI::International::get(2,$namespace),
 		WebGUI::URL::page('func=deleteAccessoryConfirm&wid='.$_[0]->get("wobjectId").'&aid='.$session{form}{aid})
                 );
@@ -218,19 +201,15 @@ sub www_deleteAccessory {
 
 #-------------------------------------------------------------------
 sub www_deleteAccessoryConfirm {
-        if (WebGUI::Privilege::canEditPage()) {
-		WebGUI::SQL->write("delete from Product_accessory where wobjectId=$session{form}{wid} 
-			and accessoryWobjectId=$session{form}{aid}");
-		$_[0]->reorderCollateral("Product_accessory","accessoryWobjectId");
-                return "";
-        } else {
-                return WebGUI::Privilege::insufficient();
-        }
+	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
+	WebGUI::SQL->write("delete from Product_accessory where wobjectId=$session{form}{wid} and accessoryWobjectId=$session{form}{aid}");
+	$_[0]->reorderCollateral("Product_accessory","accessoryWobjectId");
+        return "";
 }
 
 #-------------------------------------------------------------------
 sub www_deleteBenefit {
-        $_[0]->confirm(
+        return $_[0]->confirm(
                 WebGUI::International::get(48,$namespace),
 		WebGUI::URL::page('func=deleteBenefitConfirm&wid='.$_[0]->get("wobjectId").'&bid='.$session{form}{bid})
                 );
@@ -238,18 +217,15 @@ sub www_deleteBenefit {
 
 #-------------------------------------------------------------------
 sub www_deleteBenefitConfirm {
-        if (WebGUI::Privilege::canEditPage()) {
-		$_[0]->deleteCollateral("Product_benefit","productBenefitId",$session{form}{bid});
-		$_[0]->reorderCollateral("Product_benefit","productBenefitId");
-                return "";
-        } else {
-                return WebGUI::Privilege::insufficient();
-        }
+	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
+	$_[0]->deleteCollateral("Product_benefit","productBenefitId",$session{form}{bid});
+	$_[0]->reorderCollateral("Product_benefit","productBenefitId");
+        return "";
 }
 
 #-------------------------------------------------------------------
 sub www_deleteFeature {
-	$_[0]->confirm(
+	return $_[0]->confirm(
 		WebGUI::International::get(3,$namespace),
 		WebGUI::URL::page('func=deleteFeatureConfirm&wid='.$_[0]->get("wobjectId").'&fid='.$session{form}{fid})
 		);
@@ -257,18 +233,15 @@ sub www_deleteFeature {
 
 #-------------------------------------------------------------------
 sub www_deleteFeatureConfirm {
-        if (WebGUI::Privilege::canEditPage()) {
-		$_[0]->deleteCollateral("Product_feature","productFeatureId",$session{form}{fid});
-		$_[0]->reorderCollateral("Product_feature","productFeatureId");
-                return "";
-        } else {
-                return WebGUI::Privilege::insufficient();
-        }
+	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
+	$_[0]->deleteCollateral("Product_feature","productFeatureId",$session{form}{fid});
+	$_[0]->reorderCollateral("Product_feature","productFeatureId");
+        return "";
 }
 
 #-------------------------------------------------------------------
 sub www_deleteRelated {
-        $_[0]->confirm(
+        return $_[0]->confirm(
                 WebGUI::International::get(4,$namespace),
 		WebGUI::URL::page('func=deleteRelatedConfirm&wid='.$_[0]->get("wobjectId").'&rid='.$session{form}{rid})
                 );
@@ -276,19 +249,15 @@ sub www_deleteRelated {
 
 #-------------------------------------------------------------------
 sub www_deleteRelatedConfirm {
-        if (WebGUI::Privilege::canEditPage()) {
-                WebGUI::SQL->write("delete from Product_related where wobjectId=$session{form}{wid}
-                        and relatedWobjectId=$session{form}{rid}");
-		$_[0]->reorderCollateral("Product_related","relatedWobjectId");
-                return "";
-        } else {
-                return WebGUI::Privilege::insufficient();
-        }
+	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
+        WebGUI::SQL->write("delete from Product_related where wobjectId=$session{form}{wid} and relatedWobjectId=$session{form}{rid}");
+	$_[0]->reorderCollateral("Product_related","relatedWobjectId");
+        return "";
 }
 
 #-------------------------------------------------------------------
 sub www_deleteSpecification {
-        $_[0]->confirm(
+        return $_[0]->confirm(
                 WebGUI::International::get(5,$namespace),
 		WebGUI::URL::page('func=deleteSpecificationConfirm&wid='.$_[0]->get("wobjectId").'&sid='.$session{form}{sid})
                 );
@@ -296,18 +265,15 @@ sub www_deleteSpecification {
 
 #-------------------------------------------------------------------
 sub www_deleteSpecificationConfirm {
-        if (WebGUI::Privilege::canEditPage()) {
-		$_[0]->deleteCollateral("Product_specification","productSpecificationId",$session{form}{sid});
-		$_[0]->reorderCollateral("Product_specification","productSpecificationId");
-                return "";
-        } else {
-                return WebGUI::Privilege::insufficient();
-        }
+	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
+	$_[0]->deleteCollateral("Product_specification","productSpecificationId",$session{form}{sid});
+	$_[0]->reorderCollateral("Product_specification","productSpecificationId");
+        return "";
 }
 
 #-------------------------------------------------------------------
 sub www_deleteTemplate {
-        $_[0]->confirm(
+        return $_[0]->confirm(
                 WebGUI::International::get(57,$namespace),
 		WebGUI::URL::page('func=deleteTemplateConfirm&wid='.$_[0]->get("wobjectId").'&tid='.$session{form}{tid}),
 		'',
@@ -317,307 +283,290 @@ sub www_deleteTemplate {
 
 #-------------------------------------------------------------------
 sub www_deleteTemplateConfirm {
-        if (WebGUI::Privilege::canEditPage()) {
-		$_[0]->deleteCollateral("Product_template","productTemplateId",$session{form}{tid});
-                WebGUI::SQL->write("update Product set productTemplateId=1 where productTemplateId=$session{form}{tid}");
-                return $_[0]->www_edit();
-        } else {
-                return WebGUI::Privilege::insufficient();
-        }
+	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
+	$_[0]->deleteCollateral("Product_template","productTemplateId",$session{form}{tid});
+        WebGUI::SQL->write("update Product set productTemplateId=1 where productTemplateId=$session{form}{tid}");
+        return $_[0]->www_edit();
 }
 
 #-------------------------------------------------------------------
 sub www_edit {
+	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
         my ($f, $output, $proceed, %data, $sth, $templates, $template);
-        if (WebGUI::Privilege::canEditPage()) {
-		$output = helpIcon(1,$namespace);
-                $output .= '<h1>'.WebGUI::International::get(6,$namespace).'</h1>';
-		if ($_[0]->get("wobjectId") eq "new") {
-			$template = 1;
-		} else {
-			$template = $_[0]->get("productTemplateId");
+	$output = helpIcon(1,$namespace);
+        $output .= '<h1>'.WebGUI::International::get(6,$namespace).'</h1>';
+	if ($_[0]->get("wobjectId") eq "new") {
+		$template = 1;
+	} else {
+		$template = $_[0]->get("productTemplateId");
+	}
+	$f = WebGUI::HTMLForm->new;
+	$f->text("price",WebGUI::International::get(10,$namespace),$_[0]->get("price"));
+	$f->text("productNumber",WebGUI::International::get(11,$namespace),$_[0]->get("productNumber"));
+	$f->raw($_[0]->fileProperty("image1",7));
+	$f->raw($_[0]->fileProperty("image2",8));
+	$f->raw($_[0]->fileProperty("image3",9));
+	$f->raw($_[0]->fileProperty("brochure",13));
+	$f->raw($_[0]->fileProperty("manual",14));
+	$f->raw($_[0]->fileProperty("warranty",15));
+	$templates = WebGUI::SQL->buildHashRef("select productTemplateId,name from Product_template order by name");
+	$f->select("productTemplateId",$templates,WebGUI::International::get(61,$namespace),[$template]);
+	$output .= $_[0]->SUPER::www_edit($f->printRowsOnly);
+	unless ($_[0]->get("wobjectId") eq "new") {
+		$output .= '<hr size="1" /><p>';
+		$output .= '<a href="'.WebGUI::URL::page('func=editTemplate&tid=new&wid='.$_[0]->get("wobjectId")).'">'
+			.WebGUI::International::get(56,$namespace).'</a><p>';
+		tie %data, 'Tie::CPHash';
+		$sth = WebGUI::SQL->read("select productTemplateId,name from Product_template order by name");
+		while (%data = $sth->hash) {
+			$output .= deleteIcon('func=deleteTemplate&wid='.$_[0]->get("wobjectId").'&tid='.$data{productTemplateId})
+				.editIcon('func=editTemplate&wid='.$_[0]->get("wobjectId").'&tid='.$data{productTemplateId})
+				.copyIcon('func=copyTemplate&wid='.$_[0]->get("wobjectId").'&tid='.$data{productTemplateId})
+				.' '.$data{name}.'<br>';
 		}
-		$f = WebGUI::HTMLForm->new;
-		$f->text("price",WebGUI::International::get(10,$namespace),$_[0]->get("price"));
-		$f->text("productNumber",WebGUI::International::get(11,$namespace),$_[0]->get("productNumber"));
-		$f->raw($_[0]->fileProperty("image1",7));
-		$f->raw($_[0]->fileProperty("image2",8));
-		$f->raw($_[0]->fileProperty("image3",9));
-		$f->raw($_[0]->fileProperty("brochure",13));
-		$f->raw($_[0]->fileProperty("manual",14));
-		$f->raw($_[0]->fileProperty("warranty",15));
-		$templates = WebGUI::SQL->buildHashRef("select productTemplateId,name from Product_template order by name");
-		$f->select("productTemplateId",$templates,WebGUI::International::get(61,$namespace),[$template]);
-		$output .= $_[0]->SUPER::www_edit($f->printRowsOnly);
-		unless ($_[0]->get("wobjectId") eq "new") {
-			$output .= '<hr size="1" /><p>';
-			$output .= '<a href="'.WebGUI::URL::page('func=editTemplate&tid=new&wid='.$_[0]->get("wobjectId")).'">'
-				.WebGUI::International::get(56,$namespace).'</a><p>';
-			tie %data, 'Tie::CPHash';
-			$sth = WebGUI::SQL->read("select productTemplateId,name from Product_template order by name");
-			while (%data = $sth->hash) {
-				$output .= deleteIcon('func=deleteTemplate&wid='.$_[0]->get("wobjectId").'&tid='.$data{productTemplateId})
-					.editIcon('func=editTemplate&wid='.$_[0]->get("wobjectId").'&tid='.$data{productTemplateId})
-					.copyIcon('func=copyTemplate&wid='.$_[0]->get("wobjectId").'&tid='.$data{productTemplateId})
-					.' '.$data{name}.'<br>';
-			}
-			$sth->finish;
-		}
-                return $output;
-        } else {
-                return WebGUI::Privilege::insufficient();
-        }
+		$sth->finish;
+	}
+        return $output;
 }
 
 #-------------------------------------------------------------------
 sub www_editSave {
+	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
 	my ($file, %property);
-        if (WebGUI::Privilege::canEditPage()) {
-		$_[0]->SUPER::www_editSave();
-		$file = WebGUI::Attachment->new("",$_[0]->get("wobjectId"));
-                $file->save("image1");
-		$property{image1}=$file->getFilename("image1") if ($file->getFilename("image1") ne "");
-                $file = WebGUI::Attachment->new("",$_[0]->get("wobjectId"));
-                $file->save("image2");
-                $property{image2}=$file->getFilename("image2") if ($file->getFilename("image2") ne "");
-                $file = WebGUI::Attachment->new("",$_[0]->get("wobjectId"));
-                $file->save("image3");
-                $property{image3}=$file->getFilename("image3") if ($file->getFilename("image3") ne "");
-                $file = WebGUI::Attachment->new("",$_[0]->get("wobjectId"));
-                $file->save("manual");
-                $property{manual}=$file->getFilename("manual") if ($file->getFilename("manual") ne "");
-                $file = WebGUI::Attachment->new("",$_[0]->get("wobjectId"));
-                $file->save("brochure");
-                $property{brochure}=$file->getFilename("brochure") if ($file->getFilename("brochure") ne "");
-                $file = WebGUI::Attachment->new("",$_[0]->get("wobjectId"));
-                $file->save("warranty");
-                $property{warranty}=$file->getFilename("warranty") if ($file->getFilename("warranty") ne "");
-		$property{productTemplateId}=$session{form}{productTemplateId};
-		$property{price}=$session{form}{price};
-		$property{productNumber}=$session{form}{productNumber};
-		$_[0]->set(\%property);
-		return "";
-        } else {
-                return WebGUI::Privilege::insufficient();
-        }
+	$_[0]->SUPER::www_editSave();
+	$file = WebGUI::Attachment->new("",$_[0]->get("wobjectId"));
+        $file->save("image1");
+	$property{image1}=$file->getFilename("image1") if ($file->getFilename("image1") ne "");
+        $file = WebGUI::Attachment->new("",$_[0]->get("wobjectId"));
+        $file->save("image2");
+        $property{image2}=$file->getFilename("image2") if ($file->getFilename("image2") ne "");
+        $file = WebGUI::Attachment->new("",$_[0]->get("wobjectId"));
+        $file->save("image3");
+        $property{image3}=$file->getFilename("image3") if ($file->getFilename("image3") ne "");
+        $file = WebGUI::Attachment->new("",$_[0]->get("wobjectId"));
+        $file->save("manual");
+        $property{manual}=$file->getFilename("manual") if ($file->getFilename("manual") ne "");
+        $file = WebGUI::Attachment->new("",$_[0]->get("wobjectId"));
+        $file->save("brochure");
+        $property{brochure}=$file->getFilename("brochure") if ($file->getFilename("brochure") ne "");
+        $file = WebGUI::Attachment->new("",$_[0]->get("wobjectId"));
+        $file->save("warranty");
+        $property{warranty}=$file->getFilename("warranty") if ($file->getFilename("warranty") ne "");
+	$property{productTemplateId}=$session{form}{productTemplateId};
+	$property{price}=$session{form}{price};
+	$property{productNumber}=$session{form}{productNumber};
+	$_[0]->set(\%property);
+	return "";
 }
 
 #-------------------------------------------------------------------
 sub www_editBenefit {
+	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
         my ($output, $data, $f, $benefits);
-        if (WebGUI::Privilege::canEditPage()) {
-		$data = $_[0]->getCollateral("Product_benefit","productBenefitId",$session{form}{bid});
-                $output = helpIcon(6,$namespace);
-                $output .= '<h1>'.WebGUI::International::get(53,$namespace).'</h1>';
-                $f = WebGUI::HTMLForm->new;
-                $f->hidden("wid",$_[0]->get("wobjectId"));
-                $f->hidden("bid",$data->{productBenefitId});
-                $f->hidden("func","editBenefitSave");
-                $benefits = WebGUI::SQL->buildHashRef("select benefit,benefit from Product_benefit order by benefit");
-                $f->combo("benefit",$benefits,WebGUI::International::get(51,$namespace),[$data->{benefits}]);
-                $f->yesNo("proceed",WebGUI::International::get(52,$namespace));
-                $f->submit;
-                $output .= $f->print;
-                return $output;
-        } else {
-                return WebGUI::Privilege::insufficient();
-        }
+	$data = $_[0]->getCollateral("Product_benefit","productBenefitId",$session{form}{bid});
+        $output = helpIcon(6,$namespace);
+        $output .= '<h1>'.WebGUI::International::get(53,$namespace).'</h1>';
+        $f = WebGUI::HTMLForm->new;
+        $f->hidden("wid",$_[0]->get("wobjectId"));
+        $f->hidden("bid",$data->{productBenefitId});
+        $f->hidden("func","editBenefitSave");
+        $benefits = WebGUI::SQL->buildHashRef("select benefit,benefit from Product_benefit order by benefit");
+        $f->combo("benefit",$benefits,WebGUI::International::get(51,$namespace),[$data->{benefits}]);
+        $f->yesNo("proceed",WebGUI::International::get(52,$namespace));
+        $f->submit;
+        $output .= $f->print;
         return $output;
 }
 
 #-------------------------------------------------------------------
 sub www_editBenefitSave {
-        if (WebGUI::Privilege::canEditPage()) {
-                $session{form}{benefit} = $session{form}{benefit_new} if ($session{form}{benefit_new} ne "");
-		$_[0]->setCollateral("Product_benefit", "productBenefitId", {
-			productBenefitId => $session{form}{bid},
-			benefit => $session{form}{benefit}
-			});
-                if ($session{form}{proceed}) {
-                        $session{form}{bid} = "new";
-                        return $_[0]->www_editBenefit();
-                } else {
-                        return "";
-                }
+	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
+        $session{form}{benefit} = $session{form}{benefit_new} if ($session{form}{benefit_new} ne "");
+	$_[0]->setCollateral("Product_benefit", "productBenefitId", {
+		productBenefitId => $session{form}{bid},
+		benefit => $session{form}{benefit}
+		});
+        if ($session{form}{proceed}) {
+                $session{form}{bid} = "new";
+                return $_[0]->www_editBenefit();
         } else {
-                return WebGUI::Privilege::insufficient();
+                return "";
         }
 }
 
 #-------------------------------------------------------------------
 sub www_editFeature {
+	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
         my ($output, $data, $f, $features);
-        if (WebGUI::Privilege::canEditPage()) {
-		$data = $_[0]->getCollateral("Product_feature","productFeatureId",$session{form}{fid});
-		$output = helpIcon(2,$namespace);
-                $output .= '<h1>'.WebGUI::International::get(22,$namespace).'</h1>';
-                $f = WebGUI::HTMLForm->new;
-                $f->hidden("wid",$_[0]->get("wobjectId"));
-                $f->hidden("fid",$data->{productFeatureId});
-                $f->hidden("func","editFeatureSave");
-		$features = WebGUI::SQL->buildHashRef("select feature,feature from Product_feature order by feature");
-                $f->combo("feature",$features,WebGUI::International::get(23,$namespace),[$data->{feature}]);
-                $f->yesNo("proceed",WebGUI::International::get(24,$namespace));
-                $f->submit;
-                $output .= $f->print;
-                return $output;
-        } else {
-                return WebGUI::Privilege::insufficient();
-        }
+	$data = $_[0]->getCollateral("Product_feature","productFeatureId",$session{form}{fid});
+	$output = helpIcon(2,$namespace);
+        $output .= '<h1>'.WebGUI::International::get(22,$namespace).'</h1>';
+        $f = WebGUI::HTMLForm->new;
+        $f->hidden("wid",$_[0]->get("wobjectId"));
+        $f->hidden("fid",$data->{productFeatureId});
+        $f->hidden("func","editFeatureSave");
+	$features = WebGUI::SQL->buildHashRef("select feature,feature from Product_feature order by feature");
+        $f->combo("feature",$features,WebGUI::International::get(23,$namespace),[$data->{feature}]);
+        $f->yesNo("proceed",WebGUI::International::get(24,$namespace));
+        $f->submit;
+        $output .= $f->print;
         return $output;
 }
 
 #-------------------------------------------------------------------
 sub www_editFeatureSave {
-        if (WebGUI::Privilege::canEditPage()) {
-		$session{form}{feature} = $session{form}{feature_new} if ($session{form}{feature_new} ne "");
-                $_[0]->setCollateral("Product_feature", "productFeatureId", {
-                        productFeatureId => $session{form}{fid},
-                        feature => $session{form}{feature}
-                        });
-                if ($session{form}{proceed}) {
-                        $session{form}{fid} = "new";
-                        return $_[0]->www_editFeature();
-                } else {
-                        return "";
-                }
+	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
+	$session{form}{feature} = $session{form}{feature_new} if ($session{form}{feature_new} ne "");
+        $_[0]->setCollateral("Product_feature", "productFeatureId", {
+                productFeatureId => $session{form}{fid},
+                feature => $session{form}{feature}
+                });
+        if ($session{form}{proceed}) {
+                $session{form}{fid} = "new";
+                return $_[0]->www_editFeature();
         } else {
-                return WebGUI::Privilege::insufficient();
+                return "";
         }
 }
 
 #-------------------------------------------------------------------
 sub www_editSpecification {
+	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
         my ($output, $data, $f, $hashRef);
-        if (WebGUI::Privilege::canEditPage()) {
-		$data = $_[0]->getCollateral("Product_specification","productSpecificationId",$session{form}{sid});
-		$output = helpIcon(3,$namespace);
-                $output .= '<h1>'.WebGUI::International::get(25,$namespace).'</h1>';
-                $f = WebGUI::HTMLForm->new;
-                $f->hidden("wid",$_[0]->get("wobjectId"));
-                $f->hidden("sid",$data->{productSpecificationId});
-                $f->hidden("func","editSpecificationSave");
-                $hashRef = WebGUI::SQL->buildHashRef("select name,name from Product_specification order by name");
-                $f->combo("name",$hashRef,WebGUI::International::get(26,$namespace),[$data->{name}]);
-                $f->text("value",WebGUI::International::get(27,$namespace),$data->{value});
-                $hashRef = WebGUI::SQL->buildHashRef("select units,units from Product_specification order by units");
-                $f->combo("units",$hashRef,WebGUI::International::get(29,$namespace),[$data->{units}]);
-                $f->yesNo("proceed",WebGUI::International::get(28,$namespace));
-                $f->submit;
-                $output .= $f->print;
-                return $output;
-        } else {
-                return WebGUI::Privilege::insufficient();
-        }
+	$data = $_[0]->getCollateral("Product_specification","productSpecificationId",$session{form}{sid});
+	$output = helpIcon(3,$namespace);
+        $output .= '<h1>'.WebGUI::International::get(25,$namespace).'</h1>';
+        $f = WebGUI::HTMLForm->new;
+        $f->hidden("wid",$_[0]->get("wobjectId"));
+        $f->hidden("sid",$data->{productSpecificationId});
+        $f->hidden("func","editSpecificationSave");
+        $hashRef = WebGUI::SQL->buildHashRef("select name,name from Product_specification order by name");
+        $f->combo("name",$hashRef,WebGUI::International::get(26,$namespace),[$data->{name}]);
+        $f->text("value",WebGUI::International::get(27,$namespace),$data->{value});
+        $hashRef = WebGUI::SQL->buildHashRef("select units,units from Product_specification order by units");
+        $f->combo("units",$hashRef,WebGUI::International::get(29,$namespace),[$data->{units}]);
+        $f->yesNo("proceed",WebGUI::International::get(28,$namespace));
+        $f->submit;
+        $output .= $f->print;
         return $output;
 }
 
 #-------------------------------------------------------------------
 sub www_editSpecificationSave {
-        if (WebGUI::Privilege::canEditPage()) {
-                $session{form}{name} = $session{form}{name_new} if ($session{form}{name_new} ne "");
-                $session{form}{units} = $session{form}{units_new} if ($session{form}{units_new} ne "");
-                $_[0]->setCollateral("Product_specification", "productSpecificationId", {
-                        productSpecificationId => $session{form}{sid},
-                        name => $session{form}{name},
-                        value => $session{form}{value},
-                        units => $session{form}{units}
-                        });
-                if ($session{form}{proceed}) {
-                        $session{form}{sid} = "new";
-                        return $_[0]->www_editSpecification();
-                } else {
-                        return "";
-                }
+	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
+        $session{form}{name} = $session{form}{name_new} if ($session{form}{name_new} ne "");
+        $session{form}{units} = $session{form}{units_new} if ($session{form}{units_new} ne "");
+        $_[0]->setCollateral("Product_specification", "productSpecificationId", {
+                productSpecificationId => $session{form}{sid},
+                name => $session{form}{name},
+                value => $session{form}{value},
+                units => $session{form}{units}
+                });
+        if ($session{form}{proceed}) {
+                $session{form}{sid} = "new";
+                return $_[0]->www_editSpecification();
         } else {
-                return WebGUI::Privilege::insufficient();
+                return "";
         }
 }
 
 #-------------------------------------------------------------------
 sub www_editTemplate {
+	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
         my ($output, $data, $f);
-        if (WebGUI::Privilege::canEditPage()) {
-		$data = $_[0]->getCollateral("Product_template","productTemplateId",$session{form}{tid});
-                $output = helpIcon(7,$namespace);
-                $output .= '<h1>'.WebGUI::International::get(58,$namespace).'</h1>';
-                $f = WebGUI::HTMLForm->new;
-                $f->hidden("wid",$_[0]->get("wobjectId"));
-                $f->hidden("tid",$data->{productTemplateId});
-                $f->hidden("func","editTemplateSave");
-		$f->text("name",WebGUI::International::get(59,$namespace),$data->{name});
-		$f->HTMLArea("template",WebGUI::International::get(60,$namespace),$data->{template},'','','',($session{setting}{textAreaRows}+10));
-                $f->submit;
-                $output .= $f->print;
-                return $output;
-        } else {
-                return WebGUI::Privilege::insufficient();
-        }
+	$data = $_[0]->getCollateral("Product_template","productTemplateId",$session{form}{tid});
+        $output = helpIcon(7,$namespace);
+        $output .= '<h1>'.WebGUI::International::get(58,$namespace).'</h1>';
+        $f = WebGUI::HTMLForm->new;
+        $f->hidden("wid",$_[0]->get("wobjectId"));
+        $f->hidden("tid",$data->{productTemplateId});
+        $f->hidden("func","editTemplateSave");
+	$f->text("name",WebGUI::International::get(59,$namespace),$data->{name});
+	$f->HTMLArea("template",WebGUI::International::get(60,$namespace),$data->{template},'','','',($session{setting}{textAreaRows}+10));
+        $f->submit;
+        $output .= $f->print;
         return $output;
 }
 
 #-------------------------------------------------------------------
 sub www_editTemplateSave {
-        if (WebGUI::Privilege::canEditPage()) {
-                $_[0]->setCollateral("Product_template", "productTemplateId", {
-                        productTemplateId => $session{form}{tid},
-                        name => $session{form}{name},
-                        template => $session{form}{template}
-                        }, 0, 0);
-                return $_[0]->www_edit();
-        } else {
-                return WebGUI::Privilege::insufficient();
-        }
+	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
+        $_[0]->setCollateral("Product_template", "productTemplateId", {
+                productTemplateId => $session{form}{tid},
+                name => $session{form}{name},
+                template => $session{form}{template}
+                }, 0, 0);
+        return $_[0]->www_edit();
 }
 
 #-------------------------------------------------------------------
 sub www_moveAccessoryDown {
+	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
         $_[0]->moveCollateralDown("Product_related","accessoryWobjectId",$session{form}{aid});
+	return "";
 }
 
 #-------------------------------------------------------------------
 sub www_moveAccessoryUp {
+	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
         $_[0]->moveCollateralUp("Product_accessory","accessoryWobjectId",$session{form}{aid});
+	return "";
 }
 
 #-------------------------------------------------------------------
 sub www_moveBenefitDown {
+	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
         $_[0]->moveCollateralDown("Product_benefit","productBenefitId",$session{form}{bid});
+	return "";
 }
 
 #-------------------------------------------------------------------
 sub www_moveBenefitUp {
+	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
         $_[0]->moveCollateralUp("Product_benefit","productBenefitId",$session{form}{bid});
+	return "";
 }
 
 #-------------------------------------------------------------------
 sub www_moveFeatureDown {
+	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
         $_[0]->moveCollateralDown("Product_feature","productFeatureId",$session{form}{fid});
+	return "";
 }
 
 #-------------------------------------------------------------------
 sub www_moveFeatureUp {
+	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
 	$_[0]->moveCollateralUp("Product_feature","productFeatureId",$session{form}{fid});
+	return "";
 }
 
 #-------------------------------------------------------------------
 sub www_moveRelatedDown {
+	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
         $_[0]->moveCollateralDown("Product_related","relatedWobjectId",$session{form}{rid});
+	return "";
 }
 
 #-------------------------------------------------------------------
 sub www_moveRelatedUp {
+	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
         $_[0]->moveCollateralUp("Product_related","relatedWobjectId",$session{form}{rid});
+	return "";
 }
 
 #-------------------------------------------------------------------
 sub www_moveSpecificationDown {
+	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
         $_[0]->moveCollateralDown("Product_specification","productSpecificationId",$session{form}{sid});
+	return "";
 }
 
 #-------------------------------------------------------------------
 sub www_moveSpecificationUp {
+	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
         $_[0]->moveCollateralUp("Product_specification","productSpecificationId",$session{form}{sid});
+	return "";
 }
 
 #-------------------------------------------------------------------
