@@ -432,6 +432,8 @@ sub save {
 			close($file);
 			_createThumbnail($_[0],$_[2]);
 		} else {
+			WebGUI::ErrorHandler::warn("Couldn't open file ".$_[0]->getPath." for writing.");
+			$_[0]->{_filename} = "";
 			return "";
 		}
 		return $_[0]->getFilename;
