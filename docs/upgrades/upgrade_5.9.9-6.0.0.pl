@@ -799,6 +799,13 @@ $replace{'T'} = {
 		},
 	'parameter'=>[ "depth" ]
 	};
+$replace{'Synopsis'} = {
+        'columns'=>{
+                identifier=>'Synopsis', depth=>99, method=>'self_and_descendants', startAt=>'current', stopAtLevel=>'-1',
+                templateId=>'8', showSystemPages=>0, showHiddenPages=>0, showUnprivilegedPages=>0, reverse=>0, seperator=>''
+                },
+        'parameter'=>[ "depth" ]
+        };
 $replace{'t'} = {
 	'columns'=>{
 		identifier=>'TopLevelMenuHorizontal', depth=>0, method=>'self_and_sisters', startAt=>'top', stopAtLevel=>'-1',
