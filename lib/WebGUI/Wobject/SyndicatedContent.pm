@@ -12,6 +12,7 @@ package WebGUI::Wobject::SyndicatedContent;
 
 use strict;
 use Tie::CPHash;
+use WebGUI::Cache;
 use WebGUI::DateTime;
 use WebGUI::HTMLForm;
 use WebGUI::Icon;
@@ -20,6 +21,7 @@ use WebGUI::Privilege;
 use WebGUI::Session;
 use WebGUI::SQL;
 use WebGUI::Wobject;
+use XML::RSSLite;
 
 our @ISA = qw(WebGUI::Wobject);
 
@@ -37,12 +39,9 @@ sub new {
                 -properties=>$property,
                 -extendedProperties=>{
 			rssUrl=>{},
-			content=>{
-				defaultValue=>'Not yet fetched!'
-				},
-			lastFetched=>{
-				defaultValue=>time()
-				}
+			templateId=>{
+                                defaultValue=>1
+                                }
 			}
                 );
         bless $self, $class;
@@ -56,27 +55,22 @@ sub uiLevel {
 
 #-------------------------------------------------------------------
 sub www_edit {
-	my $f = WebGUI::HTMLForm->new;
-	$f->url(
+	my $properties = WebGUI::HTMLForm->new;
+	my $layout = WebGUI::HTMLForm->new;
+	$properties->url(
 		-name=>"rssUrl",
 		-label=>WebGUI::International::get(1,$_[0]->get("namespace")),
 		-value=>$_[0]->getValue("rssUrl")
 		);
-	if ($_[0]->get("wobjectId") ne "new") {
-               	$f->readOnly(
-			-value=>WebGUI::DateTime::epochToHuman($_[0]->getValue("lastFetched"),"%z %Z"),
-			-label=>WebGUI::International::get(5,$_[0]->get("namespace"))
-			);
-               	$f->readOnly(
-			-value=>$_[0]->getValue("content"),
-			-label=>WebGUI::International::get(6,$_[0]->get("namespace"))
-			);
-	} else {
-		$f->hidden("content",$_[0]->getValue("content"));
-		$f->hidden("lastFetched",$_[0]->getValue("lastFetched"));
-	}
+	$layout->template(
+                -name=>"templateId",
+                -value=>$_[0]->getValue("templateId"),
+                -namespace=>$_[0]->get("namespace"),
+                -afterEdit=>'func=edit&wid='.$_[0]->get("wobjectId")
+                );
 	return $_[0]->SUPER::www_edit(
-		-properties=>$f->printRowsOnly,
+		-properties=>$properties->printRowsOnly,
+		-layout=>$layout->printRowsOnly,
 		-headingId=>4,
 		-helpId=>1
 		);
@@ -85,11 +79,30 @@ sub www_edit {
 
 #-------------------------------------------------------------------
 sub www_view {
-	my ($output);
-	$output = $_[0]->displayTitle;
-	$output .= $_[0]->description;
-	$output .= $_[0]->get("content");
-	return $output;
+	my %rss;
+	my $cache = WebGUI::Cache->new($_[0]->get("rssUrl"),"URL");
+	my $rssFile = $cache->get;
+	unless (defined $rssFile) {
+		$rssFile = $cache->setByHTTP($_[0]->get("rssUrl"),3600);
+	}
+	eval{parseXML(\%rss, \$rssFile)};
+	if ($@) {
+		WebGUI::ErrorHandler::warn($_[0]->get("rssUrl")." ".$@);
+	}
+	my %var;
+	$var{"channel.title"} = $rss{title};
+	$var{"channel.link"} = $rss{link};
+	$var{"channel.description"} = $rss{description};
+	my @items;
+        foreach my $item (@{$rss{items}}) {
+		push (@items,{
+			link=>$item->{link},
+			title=>$item->{title},
+			description=>$item->{description}
+			});
+	}
+	$var{item_loop} = \@items;
+	return $_[0]->processTemplate($_[0]->get("templateId"),\%var);
 }
 
 
