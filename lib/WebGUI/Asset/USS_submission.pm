@@ -39,6 +39,29 @@ use WebGUI::Asset::Wobject::USS;
 our @ISA = qw(WebGUI::Asset);
 
 
+
+#-------------------------------------------------------------------
+sub canContribute {
+	my $self = shift;
+	return WebGUI::Grouping::isInGroup($self->getParent->get("groupToContribute"));
+}
+
+
+#-------------------------------------------------------------------
+sub canEdit {
+	my $self = shift;
+	return 	( ($session{form}{func} eq "add" && $self->canContribute) || $self->canModerate || $self->canEdit);
+
+}
+
+
+#-------------------------------------------------------------------
+sub canModerate {
+	my $self = shift;
+        return WebGUI::Grouping::isInGroup($self->getParent->get("groupToApprove"));
+}
+
+#-------------------------------------------------------------------
 sub definition {
 	my $class = shift;
         my $definition = shift;
@@ -94,83 +117,6 @@ sub definition {
         return $class->SUPER::definition($definition);
 }
 
-#-------------------------------------------------------------------
-sub getEditForm {
-	my $self = shift;
-	my $tabform = $self->getEditForm;
-        $tabform->getTab("display")->template(
-                -name=>"submissionTemplateId",
-                -value=>$self->getValue("submissionTemplateId"),
-                -namespace=>$self->get("namespace")."/Submission",
-                -label=>WebGUI::International::get(73,$self->get("namespace")),
-                -afterEdit=>'func=edit&wid='.$self->get("wobjectId")
-                );
-        $tabform->getTab("display")->template(
-                -name=>"submissionFormTemplateId",
-                -value=>$self->getValue("submissionFormTemplateId"),
-                -namespace=>$self->get("namespace")."/SubmissionForm",
-                -label=>WebGUI::International::get(87,$self->get("namespace")),
-                -afterEdit=>'func=edit&wid='.$self->get("wobjectId")
-                );
-        $tabform->getTab("security")->group(
-		-name=>"groupToApprove",
-		-label=>WebGUI::International::get(1,$self->get("namespace")),
-		-value=>[$self->getValue("groupToApprove")]
-		);
-        $tabform->getTab("security")->group(
-		-name=>"groupToContribute",
-		-label=>WebGUI::International::get(2,$self->get("namespace")),
-		-value=>[$self->getValue("groupToContribute")]
-		);
-        $tabform->getTab("display")->integer(
-		-name=>"submissionsPerPage",
-		-label=>WebGUI::International::get(6,$self->get("namespace")),
-		-value=>$self->getValue("submissionsPerPage")
-		);
-        $tabform->getTab("security")->selectList(
-		-name=>"defaultStatus",
-		-options=>{
-			Approved=>status('Approved'),
-			Denied=>status('Denied'),
-			Pending=>status('Pending')
-			},
-		-label=>WebGUI::International::get(563),
-		-value=>[$self->getValue("defaultStatus")]
-		);
-        if ($session{setting}{useKarma}) {
-                $tabform->getTab("properties")->integer(
-			-name=>"karmaPerSubmission",
-			-label=>WebGUI::International::get(30,$self->get("namespace")),
-			-value=>$self->getValue("karmaPerSubmission")
-			);
-        } else {
-                $tabform->getTab("properties")->hidden("karmaPerSubmission",$self->getValue("karmaPerSubmission"));
-        }
-	$tabform->getTab("display")->filterContent(
-		-value=>$self->getValue("filterContent")
-		);
-	$tabform->getTab("display")->selectList(
-		-name=>"sortBy",
-		-value=>[$self->getValue("sortBy")],
-		-options=>{
-			sequenceNumber=>WebGUI::International::get(88,$self->get("namespace")),
-			dateUpdated=>WebGUI::International::get(78,$self->get("namespace")),
-			dateSubmitted=>WebGUI::International::get(13,$self->get("namespace")),
-			title=>WebGUI::International::get(35,$self->get("namespace"))
-			},
-		-label=>WebGUI::International::get(79,$self->get("namespace"))
-		);
-	$tabform->getTab("display")->selectList(
-		-name=>"sortOrder",
-		-value=>[$self->getValue("sortOrder")],
-		-options=>{
-			asc=>WebGUI::International::get(81,$self->get("namespace")),
-			desc=>WebGUI::International::get(82,$self->get("namespace"))
-			},
-		-label=>WebGUI::International::get(80,$self->get("namespace"))
-		);
-	return $tabform;
-}
 
 #-------------------------------------------------------------------
 sub getIcon {
@@ -314,57 +260,43 @@ sub view {
 #-------------------------------------------------------------------
 sub www_approve {
 	my $self = shift;
-	my (%submission);
-	tie %submission, 'Tie::CPHash';
-        if (WebGUI::Grouping::isInGroup(4,$session{user}{userId}) || WebGUI::Grouping::isInGroup(3,$session{user}{userId})) {
-		%submission = WebGUI::SQL->quickHash("select * from USS_submission where USS_submissionId=".quote($session{form}{sid}));
-                WebGUI::SQL->write("update USS_submission set status='Approved' where USS_submissionId=".quote($session{form}{sid}));
-		WebGUI::MessageLog::addInternationalizedEntry($submission{userId},'',WebGUI::URL::page('func=viewSubmission&wid='.
-			$session{form}{wid}.'&sid='.$session{form}{sid},1),4,$self->get("namespace"));
+        return WebGUI::Privilege::insufficient() unless ($self->canModerate);
+	$self->set({"status"=>'Approved'});
+	WebGUI::MessageLog::addInternationalizedEntry($self->get("ownerUserId"),'',$self->getUrl,4,"USS");
+	if ($session{form}{mlog}) {
 		WebGUI::MessageLog::completeEntry($session{form}{mlog});
-		$self->deleteCachedSubmission($session{form}{sid});
-                return WebGUI::Operation::www_viewMessageLog();
-        } else {
-                return WebGUI::Privilege::insufficient();
-        }
+        	return WebGUI::Operation::www_viewMessageLog();
+	}
+	return $self->www_view;
 }
 
 
 #-------------------------------------------------------------------
 sub www_deny {
 	my $self = shift;
-	my (%submission);
-	tie %submission, 'Tie::CPHash';
-        if (WebGUI::Grouping::isInGroup(4,$session{user}{userId}) || WebGUI::Grouping::isInGroup(3,$session{user}{userId})) {
-		%submission = WebGUI::SQL->quickHash("select * from USS_submission where USS_submissionId=".quote($session{form}{sid}));
-                WebGUI::SQL->write("update USS_submission set status='Denied' where USS_submissionId=".quote($session{form}{sid}));
-                WebGUI::MessageLog::addInternationalizedEntry($submission{userId},'',WebGUI::URL::page('func=viewSubmission&wid='.
-			$session{form}{wid}.'&sid='.$session{form}{sid},1),5,$self->get("namespace"));
-                WebGUI::MessageLog::completeEntry($session{form}{mlog});
-		$self->deleteCachedSubmission($session{form}{sid});
-                return WebGUI::Operation::www_viewMessageLog();
-        } else {
-                return WebGUI::Privilege::insufficient();
-        }
+        return WebGUI::Privilege::insufficient() unless ($self->canModerate);
+	$self->set({status=>'Denied'});
+	WebGUI::MessageLog::addInternationalizedEntry($self->get("ownerUserId"),'',$self->getUrl,5,"USS");
+	if ($session{form}{mlog}) {
+		WebGUI::MessageLog::completeEntry($session{form}{mlog});
+        	return WebGUI::Operation::www_viewMessageLog();
+	}
+	return $self->www_view;
 }
 
 
 #-------------------------------------------------------------------
 sub www_edit {
-        my ($output, $submission, $f, @submission, $sth);
-        $submission = $_[0]->getCollateral("USS_submission","USS_submissionId",$session{form}{sid});
+	my $self = shift;
+	return WebGUI::Privilege::insufficient() unless ($self->canEdit);
 	my %var;
 	if ($submission->{USS_submissionId} eq "new") {
-		$submission->{userId} = $session{user}{userId};
 		$submission->{contentType} = "mixed";
 		$var{'submission.isNew'} = 1;
 	}
-        return WebGUI::Privilege::insufficient() unless (WebGUI::Grouping::isInGroup($_[0]->get("groupToContribute")) 
-		|| $submission->{userId} eq $session{user}{userId} 
-		|| WebGUI::Grouping::isInGroup($_[0]->get("groupToApprove")));
-	$var{'link.header.label'} = WebGUI::International::get(90,$_[0]->get("namespace"));
-	$var{'question.header.label'} = WebGUI::International::get(84,$_[0]->get("namespace"));
-        $var{'submission.header.label'} = WebGUI::International::get(19,$_[0]->get("namespace"));
+	$var{'link.header.label'} = WebGUI::International::get(90,"USS");
+	$var{'question.header.label'} = WebGUI::International::get(84,"USS");
+        $var{'submission.header.label'} = WebGUI::International::get(19,"USS");
 	$var{'user.isVisitor'} = ($session{user}{userId} eq '1');
         $var{'visitorName.label'} = WebGUI::International::get(438);
 	$var{'visitorName.form'} = WebGUI::Form::text({
@@ -372,163 +304,98 @@ sub www_edit {
 		});
         $var{'form.header'} = WebGUI::Form::formHeader()
 		.WebGUI::Form::hidden({
-			name=>"wid",
-			value=>$session{form}{wid}
-			})
-                .WebGUI::Form::hidden({
-			name=>"sid",
-			value=>$submission->{USS_submissionId}
-			})
-		.WebGUI::Form::hidden({
                 	name=>"func",
-			value=>"editSubmissionSave"
+			value=>"editSave"
 			});
-        $var{'url.label'} = WebGUI::International::get(91,$_[0]->get("namespace"));
-        $var{'newWindow.label'} = WebGUI::International::get(92,$_[0]->get("namespace"));
-	$var{'userDefined1.form'} = WebGUI::Form::text({
-		name=>"userDefined1",
-		value=>$submission->{userDefined1}
-		});
-	$var{'userDefined1.form.yesNo'} = WebGUI::Form::yesNo({
-		name=>"userDefined1",
-		value=>$submission->{userDefined1}
-		});
-	$var{'userDefined1.form.textarea'} = WebGUI::Form::textarea({
-		name=>"userDefined1",
-		value=>$submission->{userDefined1}
-		});
-	$var{'userDefined2.form'} = WebGUI::Form::text({
-		name=>"userDefined2",
-		value=>$submission->{userDefined2}
-		});
-	$var{'userDefined2.form.yesNo'} = WebGUI::Form::yesNo({
-		name=>"userDefined2",
-		value=>$submission->{userDefined2}
-		});
-	$var{'userDefined2.form.textarea'} = WebGUI::Form::textarea({
-		name=>"userDefined2",
-		value=>$submission->{userDefined2}
-		});
-	$var{'userDefined3.form'} = WebGUI::Form::text({
-		name=>"userDefined3",
-		value=>$submission->{userDefined3}
-		});
-	$var{'userDefined3.form.yesNo'} = WebGUI::Form::yesNo({
-		name=>"userDefined3",
-		value=>$submission->{userDefined3}
-		});
-	$var{'userDefined3.form.textarea'} = WebGUI::Form::textarea({
-		name=>"userDefined3",
-		value=>$submission->{userDefined3}
-		});
-	$var{'userDefined4.form'} = WebGUI::Form::text({
-		name=>"userDefined4",
-		value=>$submission->{userDefined4}
-		});
-	$var{'userDefined4.form.yesNo'} = WebGUI::Form::yesNo({
-		name=>"userDefined4",
-		value=>$submission->{userDefined4}
-		});
-	$var{'userDefined4.form.textarea'} = WebGUI::Form::textarea({
-		name=>"userDefined4",
-		value=>$submission->{userDefined4}
-		});
-	$var{'userDefined5.form'} = WebGUI::Form::text({
-		name=>"userDefined5",
-		value=>$submission->{userDefined5}
-		});
-	$var{'userDefined5.form.yesNo'} = WebGUI::Form::yesNo({
-		name=>"userDefined5",
-		value=>$submission->{userDefined5}
-		});
-	$var{'userDefined5.form.textarea'} = WebGUI::Form::textarea({
-		name=>"userDefined5",
-		value=>$submission->{userDefined5}
-		});
-	$var{'userDefined1.form.htmlarea'} = WebGUI::Form::HTMLArea({
-		name=>"userDefined1",
-		value=>$submission->{userDefined1}
-		});
-	$var{'userDefined2.form.htmlarea'} = WebGUI::Form::HTMLArea({
-		name=>"userDefined2",
-		value=>$submission->{userDefined2}
-		});
-	$var{'userDefined3.form.htmlarea'} = WebGUI::Form::HTMLArea({
-		name=>"userDefined3",
-		value=>$submission->{userDefined3}
-		});
-	$var{'userDefined4.form.htmlarea'} = WebGUI::Form::HTMLArea({
-		name=>"userDefined4",
-		value=>$submission->{userDefined4}
-		});
-	$var{'userDefined5.form.htmlarea'} = WebGUI::Form::HTMLArea({
-		name=>"userDefined5",
-		value=>$submission->{userDefined5}
-		});
-	$var{'userDefined1.value'} = $submission->{userDefined1};
-	$var{'userDefined2.value'} = $submission->{userDefined2};
-	$var{'userDefined3.value'} = $submission->{userDefined3};
-	$var{'userDefined4.value'} = $submission->{userDefined4};
-	$var{'userDefined5.value'} = $submission->{userDefined5};
-	$var{'question.label'} = WebGUI::International::get(85,$_[0]->get("namespace"));
-	$var{'title.label'} = WebGUI::International::get(35,$_[0]->get("namespace"));
+	if ($self->getId eq "new") {
+		$var{'form.header'} = WebGUI::Form::hidden({
+			name=>"assetId",
+			value=>"new"
+			}).WebGUI::Form::hidden({
+			name=>"class",
+			value=>$session{form}{class}
+			});
+	}
+        $var{'url.label'} = WebGUI::International::get(91,"USS");
+        $var{'newWindow.label'} = WebGUI::International::get(92,"USS");
+	for my $x (1..5) {
+		$var{'userDefined'.$x.'.form'} = WebGUI::Form::text({
+			name=>"userDefined".$x,
+			value=>$self->get("userDefined".$x)
+			});
+		$var{'userDefined'.$x.'.form.yesNo'} = WebGUI::Form::yesNo({
+			name=>"userDefined".$x,
+			value=>$self->get("userDefined".$x)
+			});
+		$var{'userDefined'.$x.'.form.textarea'} = WebGUI::Form::textarea({
+			name=>"userDefined".$x,
+			value=>$self->get("userDefined".$x)
+			});
+		$var{'userDefined'.$x.'.form.textarea'} = WebGUI::Form::HTMLArea({
+			name=>"userDefined".$x,
+			value=>$self->get("userDefined".$x)
+			});
+		$var{'userDefined'.$x.'.value'} = $self->get('userDefined'.$x);
+	}
+	$var{'question.label'} = WebGUI::International::get(85,"USS");
+	$var{'title.label'} = WebGUI::International::get(35,"USS");
 	$var{'title.form'} = WebGUI::Form::text({
 		name=>"title",
-		value=>$submission->{title}
+		value=>$self->get("title")
 		});
 	$var{'title.form.textarea'} = WebGUI::Form::textarea({
 		name=>"title",
-		value=>$submission->{title}
+		value=>$self->get("title")
 		});
-	$var{'title.value'} = $submission->{title};
-        $var{'body.label'} = WebGUI::International::get(31,$_[0]->get("namespace"));
-	$var{'answer.label'} = WebGUI::International::get(86,$_[0]->get("namespace"));
+	$var{'title.value'} = $self->get("title"); 
+        $var{'body.label'} = WebGUI::International::get(31,"USS");
+	$var{'answer.label'} = WebGUI::International::get(86,"USS");
         $var{'description.label'} = WebGUI::International::get(85);
-	$var{'body.value'} = $submission->{content};
+	$var{'body.value'} = $self->get("description"); 
 	$var{'body.form'} = WebGUI::Form::HTMLArea({
 		name=>"body",
-		value=>$submission->{content}
+		value=>$self->get("description")
 		});
 	$var{'body.form.textarea'} = WebGUI::Form::textarea({
 		name=>"body",
-		value=>$submission->{content}
+		value=>$self->get("description")
 		});
-	$var{'image.label'} = WebGUI::International::get(32,$_[0]->get("namespace"));
-        if ($submission->{image} ne "") {
-		$var{'image.form'} = '<a href="'.WebGUI::URL::page('func=deleteFile&amp;file=image&amp;wid='.$session{form}{wid}
-			.'&amp;sid='.$submission->{USS_submissionId}).'">'.WebGUI::International::get(391).'</a>';
-        } else {
-		$var{'image.form'} = WebGUI::Form::file({
-			name=>"image"
-			});
-        }
-	$var{'attachment.label'} = WebGUI::International::get(33,$_[0]->get("namespace"));
-        if ($submission->{attachment} ne "") {
-		$var{'attachment.form'} = '<a href="'.WebGUI::URL::page('func=deleteFile&amp;file=attachment&amp;wid='
-			.$session{form}{wid}.'&amp;sid='.$submission->{USS_submissionId}).'">'.WebGUI::International::get(391).'</a>';
-        } else {
-		$var{'attachment.form'} = WebGUI::Form::file({
-			name=>"attachment"
-			});
-        }
+#	$var{'image.label'} = WebGUI::International::get(32,"USS");
+ #       if ($submission->{image} ne "") {
+#		$var{'image.form'} = '<a href="'.WebGUI::URL::page('func=deleteFile&amp;file=image&amp;wid='.$session{form}{wid}
+#			.'&amp;sid='.$submission->{USS_submissionId}).'">'.WebGUI::International::get(391).'</a>';
+ #       } else {
+#		$var{'image.form'} = WebGUI::Form::file({
+#			name=>"image"
+#			});
+ #       }
+#	$var{'attachment.label'} = WebGUI::International::get(33,"USS");
+ #       if ($submission->{attachment} ne "") {
+#		$var{'attachment.form'} = '<a href="'.WebGUI::URL::page('func=deleteFile&amp;file=attachment&amp;wid='
+#			.$session{form}{wid}.'&amp;sid='.$submission->{USS_submissionId}).'">'.WebGUI::International::get(391).'</a>';
+ #       } else {
+#		$var{'attachment.form'} = WebGUI::Form::file({
+#			name=>"attachment"
+#			});
+ #       }
 	$var{'contentType.label'} = WebGUI::International::get(1007);
         $var{'contentType.form'} = WebGUI::Form::contentType({
                 name=>'contentType',
-                value=>[$submission->{contentType}]
+                value=>[$self->get("contentType")] || ["mixed"]
                 });
 	$var{'startDate.label'} = WebGUI::International::get(497);
 	$var{'endDate.label'} = WebGUI::International::get(498);
 	$var{'startDate.form'} = WebGUI::Form::dateTime({
 		name  => 'startDate',
-		value => ($submission->{startDate} || $_[0]->get("startDate"))
+		value => $self->get("startDate")
 		});
 	$var{'endDate.form'} = WebGUI::Form::dateTime({
 		name  => 'endDate',
-		value => ($submission->{endDate} || $_[0]->get("endDate"))
+		value => $self->get("startDate")
 		});
 	$var{'form.submit'} = WebGUI::Form::submit();
 	$var{'form.footer'} = WebGUI::Form::formFooter();
-	return $_[0]->processTemplate($_[0]->get("submissionFormTemplateId"),\%var,"USS/SubmissionForm");
+	return $self->getParent->processStyle($self->processTemplate(\%var,"USS/SubmissionForm",$self->getParent->get("submissionFormTemplate")));
 }
 
 #-------------------------------------------------------------------
