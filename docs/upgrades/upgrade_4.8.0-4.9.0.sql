@@ -31,3 +31,12 @@ insert into settings (name,value) values ('smbPDC','your PDC');
 insert into settings (name,value) values ('smbBDC','your BDC');
 insert into settings (name,value) values ('smbDomain','your NT Domain');
 insert into settings (name,value) values ('selfDeactivation',1);
+delete from groups where groupId=9;
+delete from groupings where groupId=9;
+delete from groupGroupings where groupId=9;
+delete from groupGroupings where inGroup=9;
+
+
+
+
+
