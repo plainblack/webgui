@@ -320,9 +320,15 @@ sub processPropertiesFromFormPost {
 #-------------------------------------------------------------------
 sub view {
 	my $self = shift;
+	my $content;
+	if ($self->get("shortcutToAssetId") eq $self->get("parentId")) {
+		$content = "Displaying this shortcut would cause a feedback loop.";
+	} else {
+		$content = $self->getShortcut->view;
+	}
 	my %var = (
 		isShortcut => 1,
-		'shortcut.content' => $self->getShortcut->view,
+		'shortcut.content' => $content,
 		'shortcut.label' => 'Shortcut',
 		originalURL => $self->getShortcut->getUrl
 		);
@@ -335,7 +341,7 @@ sub www_edit {
         my $self = shift;
         return WebGUI::Privilege::insufficient() unless $self->canEdit;
 	$self->getAdminConsole->setHelp("shortcut add/edit","Shortcut");
-        return $self->getAdminConsole->render($self->getEditForm->print,WebGUI::International::get(2));
+        return $self->getAdminConsole->render($self->getEditForm->print,WebGUI::International::get(2,"Shortcut"));
 }
 
 #-------------------------------------------------------------------

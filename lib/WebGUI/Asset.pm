@@ -2172,6 +2172,13 @@ sub www_createShortcut () {
 		shortcutToAssetId=>$self->getId,
 		title=>$self->get("title"),
 		menuTitle=>$self->get("menuTitle"),
+		isHidden=>$self->get("isHidden"),
+		newWindow=>$self->get("newWindow"),
+		startDate=>$self->get("startDate"),
+		endDate=>$self->get("endDate"),
+		ownerUserId=>$self->get("ownerUserId"),
+		groupIdEdit=>$self->get("groupIdEdit"),
+		groupIdView=>$self->get("groupIdView"),
 		url=>$self->get("title"),
 		templateId=>'PBtmpl0000000000000140'
 		});

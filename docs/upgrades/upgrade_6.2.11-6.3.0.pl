@@ -119,8 +119,7 @@ walkTree('0','PBasset000000000000001','000001','2');
 mapProductCollateral();
 
 print "\t\tMaking second round of table structure changes\n" unless ($quiet);
-my $sth = WebGUI::SQL->read("select distinct(namespace) from wobject where namespace is not null");
-while (my ($namespace) = $sth->array) {
+foreach my $namespace (@allWobjects) {
 	if (isIn($namespace, @wobjects)) {
 		WebGUI::SQL->write("alter table ".$namespace." drop column wobjectId");
 		WebGUI::SQL->write("alter table ".$namespace." add primary key (assetId)");
@@ -131,7 +130,6 @@ while (my ($namespace) = $sth->array) {
 		WebGUI::SQL->write("alter table ".$namespace." add primary key (assetId)");
 	}
 }
-$sth->finish;
 WebGUI::SQL->write("alter table WobjectProxy add column shortcutToAssetId varchar(22) not null");
 my $sth = WebGUI::SQL->read("select proxiedWobjectId from WobjectProxy");
 while (my ($wobjectId) = $sth->array) {
