@@ -34,33 +34,6 @@ our @ISA = qw(Exporter);
 our @EXPORT = qw(&www_editProfile &www_editProfileSave &www_viewProfile);
 
 #-------------------------------------------------------------------
- sub accountOptions {
-	my ($output);
-	$output = '<div class="accountOptions"><ul>';
-	if (WebGUI::Privilege::isInGroup(4) || WebGUI::Privilege::isInGroup(5) || WebGUI::Privilege::isInGroup(6) || WebGUI::Privilege::isInGroup(8) || WebGUI::Privilege::isInGroup(9) || WebGUI::Privilege::isInGroup(10) || WebGUI::Privilege::isInGroup(11)) {
-		if ($session{var}{adminOn}) {
-			$output .= '<li><a href="'.WebGUI::URL::page('op=switchOffAdmin').'">'.
-				WebGUI::International::get(12).'</a>';
-		} else {
-			$output .= '<li><a href="'.WebGUI::URL::page('op=switchOnAdmin').'">'.WebGUI::International::get(63).'</a>';
-		}
-	}
-	$output .= '<li><a href="'.WebGUI::URL::page('op=displayAccount').'">'.WebGUI::International::get(342).'</a>' 
-		unless ($session{form}{op} eq "displayAccount");
-	$output .= '<li><a href="'.WebGUI::URL::page('op=editProfile').'">'.WebGUI::International::get(341).'</a>'
-		unless ($session{form}{op} eq "editProfile");
-	$output .= '<li><a href="'.WebGUI::URL::page('op=viewProfile&uid='.$session{user}{userId}).'">'.WebGUI::International::get(343).'</a>'
-		unless ($session{form}{op} eq "viewProfile");
-	$output .= '<li><a href="'.WebGUI::URL::page('op=viewMessageLog').'">'.WebGUI::International::get(354).'</a>'
-		unless ($session{form}{op} eq "viewMessageLog");
-	$output .= '<li><a href="'.WebGUI::URL::page('op=logout').'">'.WebGUI::International::get(64).'</a>'; 
-
-	$output .= '<li><a href="'.WebGUI::URL::page('op=deactivateAccount').'">'.WebGUI::International::get(65).'</a>' if ($session{setting}{selfDeactivation} && !WebGUI::Privilege::isInGroup(3));
-	$output .= '</ul></div>';
-	return $output;
-}
-
-#-------------------------------------------------------------------
 # Builds Extra form requirements for anonymous registration. 
 sub getRequiredProfileFields {
    my ($f,$a,$method,$label,$default,$values,$data,@array);
