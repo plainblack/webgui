@@ -254,7 +254,7 @@ STOP
 # in order to be upgraded by this utility.
 #-----------------------------------------
 sub checkVersion {
-	$_[0] =~ /(\d+)\.(\d+).(\d+)/;
+	$_[0] =~ /(\d+)\.(\d+)\.(\d+)/; 
         if ($1 > 3) {
         	return 1;
         } elsif ($1 == 3) {
