@@ -50,6 +50,14 @@ $sth->finish;
 WebGUI::SQL->write("delete from settings where name in ('siteicon','favicon')");
 
 
+
+# <this is here because we don't want to actually migrate stuff yet
+WebGUI::Session::close();
+exit;
+# >this is here because we don't want to actually migrate stuff yet
+
+
+
 print "\tConverting Pages, Wobjects, and Forums to Assets\n" unless ($quiet);
 print "\t\tHold on cuz this is going to take a long time...\n" unless ($quiet);
 print "\t\tMaking first round of table structure changes\n" unless ($quiet);
