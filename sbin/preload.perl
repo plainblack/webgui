@@ -9,7 +9,8 @@ $ENV{GATEWAY_INTERFACE} =~ /^CGI-Perl/ or die "GATEWAY_INTERFACE not Perl!";
 #----------------------------------------
 # System controlled Perl modules.
 #----------------------------------------
-use Apache::Registry (); 
+use Apache::Registry (); # Uncomment this for use with mod_perl 1.0
+#use ModPerl::Registry (); # Uncomment this for use with mod_perl 2.0
 use CGI (); CGI->compile(':all');
 use CGI::Carp ();
 use URI::Escape ();
