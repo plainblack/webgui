@@ -165,6 +165,11 @@ sub www_viewStatistics {
         $output .= '<h1>'.WebGUI::International::get(437).'</h1>';
 	$output .= '<table>';
 	$output .= '<tr><td align="right" class="tableHeader">'.WebGUI::International::get(145).':</td><td class="tableData">'.$WebGUI::VERSION.'</td></tr>';
+	if ($version ne $WebGUI::VERSION) {
+		my @rev = split(/\./,$version);
+		
+		$version = '<a href="http://files.plainblack.com/downloads/'.$rev[0].'.x.x/webgui-'.$version.'.tar.gz">'.$version.'</a>';
+	}
 	$output .= '<tr><td align="right" class="tableHeader">'.WebGUI::International::get(349).':</td><td class="tableData">'.$version.'</td></tr>';
 	($data) = WebGUI::SQL->quickArray("select count(*) from page where parentId>1000 and parentId<>3");
 	$output .= '<tr><td align="right" class="tableHeader">'.WebGUI::International::get(147).':</td><td class="tableData">'.$data.'</td></tr>';
