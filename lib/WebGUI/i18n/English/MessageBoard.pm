@@ -191,6 +191,37 @@ A conditional indicating whether there is more than one forum.
 		message => q|Are you certain you wish to delete this forum and all the posts it contains?|,
 		lastUpdated => 1066055963
 	}
+
+	'title' => {
+		message => q|Title|,
+		lastUpdated => 1109806115,
+	}
+
+	'views' => {
+		message => q|Views|,
+		lastUpdated => 1109806115,
+	}
+
+	'rating' => {
+		message => q|Rating|,
+		lastUpdated => 1109806115,
+	}
+
+	'threads' => {
+		message => q|Threads|,
+		lastUpdated => 1109806115,
+	}
+
+	'replies' => {
+		message => q|Replies|,
+		lastUpdated => 1109806115,
+	}
+
+	'lastpost' => {
+		message => q|Last Post|,
+		lastUpdated => 1109806115,
+	}
+
 };
 
 1;

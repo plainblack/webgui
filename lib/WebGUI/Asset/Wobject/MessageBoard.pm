@@ -104,12 +104,12 @@ sub view {
 	$var{'default.listing'} = $first->view if ($count == 1 && defined $first);
 	$var{'forum.add.url'} = $self->getUrl("func=add&class=WebGUI::Asset::Wobject::Collaboration");
 	$var{'forum.add.label'} = WebGUI::International::get(75,"MessageBoard");
-	$var{'title.label'} = WebGUI::International::get(99);
-	$var{'views.label'} = WebGUI::International::get(514);
-	$var{'rating.label'} = WebGUI::International::get(1020);
-	$var{'threads.label'} = WebGUI::International::get(1036);
-	$var{'replies.label'} = WebGUI::International::get(1016);
-	$var{'lastpost.label'} = WebGUI::International::get(1017);
+	$var{'title.label'} = WebGUI::International::get('title','MessageBoard');
+	$var{'views.label'} = WebGUI::International::get('views',,'MessageBoard');
+	$var{'rating.label'} = WebGUI::International::get('rating','MessageBoard');
+	$var{'threads.label'} = WebGUI::International::get('threads','MessageBoard');
+	$var{'replies.label'} = WebGUI::International::get('replies','MessageBoard');
+	$var{'lastpost.label'} = WebGUI::International::get('lastpost','MessageBoard');
 	$var{areMultipleForums} = ($count > 1);
 	$var{forum_loop} = \@forum_loop;
        	return $self->processTemplate(\%var,$self->get("templateId"));
