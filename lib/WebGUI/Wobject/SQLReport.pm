@@ -108,7 +108,9 @@ sub www_view {
 	$output = $_[0]->displayTitle;
         $output .= $_[0]->description;
 	$output .= WebGUI::International::get(17,$namespace)." ".$query."<p>" if ($_[0]->get("debugMode"));
-	if ($dsn =~ /\DBI\:\w+\:\w+/) {
+	if ($dsn eq $session{config}{dsn}) {
+		$dbh = $session{dbh};
+	} elsif ($dsn =~ /\DBI\:\w+\:\w+/) {
                 eval{$dbh = DBI->connect($dsn,$_[0]->get("username"),$_[0]->get("identifier"))};
 		if ($@) {
 			WebGUI::ErrorHandler::warn("SQL Report [".$_[0]->get("wobjectId")."] ".$@);
