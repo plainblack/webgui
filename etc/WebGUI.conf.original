@@ -51,6 +51,9 @@ paymentPlugins = ITransact
 
 authMethods = LDAP, WebGUI
 
+# Enable Web Service Clients to override the default MIME types of SOAP/WDSL content
+# soapHttpHeaderOverride=1
+
 macros=# => Hash_userId, \
         / => Slash_gatewayUrl, \
         @ => At_username, \
