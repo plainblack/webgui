@@ -184,22 +184,21 @@ sub www_listImages {
 
 #-------------------------------------------------------------------
 sub www_viewImage {
-        my ($output, %data, $image);
+        my ($output, %data, $image,$f);
         tie %data, 'Tie::CPHash';
         if (WebGUI::Privilege::isInGroup(4)) {
                 %data = WebGUI::SQL->quickHash("select * from images where imageId=$session{form}{iid}");
 		$image = WebGUI::Attachment->new($data{filename},"images",$data{imageId});
                 $output .= '<h1>'.WebGUI::International::get(396).'</h1>';
 		$output .= '<a href="'.WebGUI::URL::page('op=listImages').'">'.WebGUI::International::get(397).'</a>';
-                $output .= '<table>';
-                $output .= tableFormRow(WebGUI::International::get(389),$data{imageId});
-                $output .= tableFormRow(WebGUI::International::get(383),$data{name});
-                $output .= tableFormRow(WebGUI::International::get(384),$data{filename});
-                $output .= tableFormRow(WebGUI::International::get(385),$data{parameters});
-                $output .= tableFormRow(WebGUI::International::get(387),$data{username});
-                $output .= tableFormRow(WebGUI::International::get(388),
-			WebGUI::DateTime::epochToHuman($data{dateUploaded},"%M/%D/%y"));
-                $output .= '</table>';
+		$f = WebGUI::HTMLForm->new;
+		$f->readOnly($data{imageId},WebGUI::International::get(389));
+		$f->readOnly($data{name},WebGUI::International::get(383));
+		$f->readOnly($data{filename},WebGUI::International::get(384));
+		$f->readOnly($data{parameters},WebGUI::International::get(385));
+		$f->readOnly($data{username},WebGUI::International::get(387));
+		$f->readOnly(WebGUI::DateTime::epochToHuman($data{dateUploaded},"%z %z"),WebGUI::International::get(388));
+		$output .= $f->print;
                 $output .= '<p><img src="'.$image->getURL.'">';
                 return $output;
         } else {
