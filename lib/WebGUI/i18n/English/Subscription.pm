@@ -369,6 +369,16 @@ The form in which the user can enter his subscription code.<br>|,
 		lastUpdated => 1101754848,
 		context => q|The title of the help page of the code redemption template.|
 	},
+	'code length' => {
+		message => q|Subscription code length|,
+		lastUpdated => 0,
+		context => q|The label of the formfield in which the length of a subscription code is entered.|
+	},
+	'code length error' => {
+		message => q|You must enter a subscription code length between 10 and 64 (border values included).|,
+		lastUpdated => 0,
+		context => q|The error message that shows up when a wrong code length is specified.|
+	},
 
 };
 

@@ -17,6 +17,19 @@ use WebGUI::Form;
 use WebGUI::International;
 
 #-------------------------------------------------------------------
+sub _generateCode {
+	my ($codeLength, @codeElements, $code, $i);
+	$codeLength = shift || 64;
+	@codeElements = ('A'..'Z', 'a'..'z', 0..9, '-');
+	
+	for ($i=0; $i < $codeLength; $i++) {
+		$code .= $codeElements[rand(63)];
+	}
+
+	return $code;
+}
+
+#-------------------------------------------------------------------
 sub _submenu {
 	my $i18n = WebGUI::International->new("Subscription");
 
@@ -56,6 +69,11 @@ sub www_createSubscriptionCodeBatch {
 		-label	=> $i18n->get('noc'),
 		-value	=> $session{form}{noc} || 1
 		);
+	$f->integer(
+		-name	=> 'codeLength',
+		-label	=> $i18n->get('code length'),
+		-value	=> $session{form}{codeLength} || 64
+		);
 	$f->interval(
 		-name	=> 'expires',
 		-label	=> $i18n->get('codes expire'),
@@ -94,19 +112,18 @@ sub www_createSubscriptionCodeBatchSave {
 
 	push(@error, $i18n->get('no description error')) unless ($description);
 	push(@error, $i18n->get('no association error')) unless ($session{form}{subscriptionId});
+	push(@error, $i18n->get('code length error')) unless ($session{form}{codeLength} >= 10 && $session{form}{codeLength} <= 64 && $session{form}{codeLength} =~ m/^\d\d$/);
+
 	return www_createSubscriptionCodeBatch(\@error) if (@error);
 
 	$creationEpoch = time();
 	
 	WebGUI::SQL->write("insert into subscriptionCodeBatch (batchId, description) values (".
 		quote($batchId).", ".quote($description).")");
-	@codeElements = ('A'..'Z', 'a'..'z', 0..9, '-');
 
 	for ($currentCode=0; $currentCode < $numberOfCodes; $currentCode++) {
-		$code = "";
-		for ($i=0; $i < 64; $i++) {
-			$code .= $codeElements[rand(63)];
-		}
+		$code = _generateCode($session{form}{codeLength});
+		$code = _generateCode($session{form}{codeLength}) while (WebGUI::SQL->quickArray("select code from subscriptionCode where code=".quote($code)));
 		
 		WebGUI::SQL->write("insert into subscriptionCode (batchId, code, status, dateCreated, dateUsed, expires, usedBy)".
 			" values (".quote($batchId).",".quote($code).", 'Unused', ".quote($creationEpoch).", 0, ".quote($expires).", 0)");
