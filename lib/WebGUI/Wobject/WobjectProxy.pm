@@ -166,6 +166,14 @@ sub www_edit {
 }
 
 #-------------------------------------------------------------------
+sub www_editSave {
+        $_[0]->SUPER::www_editSave();	# This will do the priv check as well.
+	my $scratchId = "WobjectProxy_" . $_[0]->get("wobjectId");
+	WebGUI::Session::deleteAllScratch($scratchId);
+        return "";
+}
+
+#-------------------------------------------------------------------
 sub _drawQueryBuilder {
 	# Initialize operators
 	my @textFields = qw|text yesNo selectList radioList|;
