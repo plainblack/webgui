@@ -99,7 +99,7 @@ if (!($^O =~ /^Win/i) && $> != 0 && !$override) {
 
 
 print "Starting..." unless ($quiet);
-WebGUI::Session::open($webguiRoot,$ARGV[1]);
+WebGUI::Session::open($webguiRoot,$configFile);
 WebGUI::Session::refreshUserInfo(3);
 print "OK\n" unless ($quiet);
 
