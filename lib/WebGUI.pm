@@ -137,7 +137,7 @@ sub page {
 				$w = eval{$cmd->new($wobject)};
 				WebGUI::ErrorHandler::fatalError("Couldn't instanciate wojbect: ${$wobject}{namespace}.") if($@);
 				if ($w->inDateRange) {
-					$contentHash{${$wobject}{templatePosition}} .= '<div class="wobject'.${$wobject}{namespace}.'" id=wobjectId'.${$wobject}{wobjectId}.'>';
+					$contentHash{${$wobject}{templatePosition}} .= '<div class="wobject'.${$wobject}{namespace}.'" id="wobjectId'.${$wobject}{wobjectId}.'">';
 					$contentHash{${$wobject}{templatePosition}} .= '<a name="'.${$wobject}{wobjectId}.'"></a>';
 					$contentHash{${$wobject}{templatePosition}} .= eval{$w->www_view};
 					WebGUI::ErrorHandler::fatalError("No view method in wojbect: ${$wobject}{namespace}.") if($@);

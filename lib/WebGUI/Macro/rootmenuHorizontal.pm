@@ -55,6 +55,7 @@ sub _replacement {
 sub process {
 	my ($output);
 	$output = $_[0];
+        $output =~ s/\^rootmenu\;/_replacement()/ge;
         $output =~ s/\^rootmenu\((.*?)\)\;/_replacement($1)/ge;
 	return $output;
 }

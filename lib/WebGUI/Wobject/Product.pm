@@ -322,7 +322,8 @@ sub set {
 sub www_addAccessory {
         my ($output, $f, $accessory, @usedAccessories);
         if (WebGUI::Privilege::canEditPage()) {
-                $output = '<h1>'.WebGUI::International::get(16,$namespace).'</h1>';
+		$output = helpIcon(4,$namespace);
+                $output .= '<h1>'.WebGUI::International::get(16,$namespace).'</h1>';
                 $f = WebGUI::HTMLForm->new;
                 $f->hidden("wid",$_[0]->get("wobjectId"));
                 $f->hidden("func","addAccessorySave");
@@ -364,7 +365,8 @@ sub www_addAccessorySave {
 sub www_addRelated {
         my ($output, $f, $related, @usedRelated);
         if (WebGUI::Privilege::canEditPage()) {
-                $output = '<h1>'.WebGUI::International::get(19,$namespace).'</h1>';
+		$output = helpIcon(5,$namespace);
+                $output .= '<h1>'.WebGUI::International::get(19,$namespace).'</h1>';
                 $f = WebGUI::HTMLForm->new;
                 $f->hidden("wid",$_[0]->get("wobjectId"));
                 $f->hidden("func","addRelatedSave");
@@ -609,7 +611,8 @@ sub www_editFeature {
         if (WebGUI::Privilege::canEditPage()) {
                 %data = WebGUI::SQL->quickHash("select * from Product_feature where 
                         productFeatureId='$session{form}{fid}'");
-                $output = '<h1>'.WebGUI::International::get(22,$namespace).'</h1>';
+		$output = helpIcon(2,$namespace);
+                $output .= '<h1>'.WebGUI::International::get(22,$namespace).'</h1>';
                 $f = WebGUI::HTMLForm->new;
                 $f->hidden("wid",$_[0]->get("wobjectId"));
                 $session{form}{fid} = "new" if ($session{form}{fid} eq "");
@@ -659,7 +662,8 @@ sub www_editSpecification {
         if (WebGUI::Privilege::canEditPage()) {
                 %data = WebGUI::SQL->quickHash("select * from Product_specification where 
                         productSpecificationId='$session{form}{sid}'");
-                $output = '<h1>'.WebGUI::International::get(25,$namespace).'</h1>';
+		$output = helpIcon(3,$namespace);
+                $output .= '<h1>'.WebGUI::International::get(25,$namespace).'</h1>';
                 $f = WebGUI::HTMLForm->new;
                 $f->hidden("wid",$_[0]->get("wobjectId"));
                 $session{form}{sid} = "new" if ($session{form}{sid} eq "");

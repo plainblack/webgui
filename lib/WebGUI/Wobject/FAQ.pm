@@ -161,7 +161,8 @@ sub www_editQuestion {
 	tie %question, 'Tie::CPHash';
         if (WebGUI::Privilege::canEditPage()) {
                 %question = WebGUI::SQL->quickHash("select * from FAQ_question where questionId='$session{form}{qid}'");
-                $output = '<h1>'.WebGUI::International::get(10,$namespace).'</h1>';
+		$output = helpIcon(2,$namespace);
+                $output .= '<h1>'.WebGUI::International::get(10,$namespace).'</h1>';
 		$f = WebGUI::HTMLForm->new;
 		$f->hidden("wid",$_[0]->get("wobjectId"));
 		$session{form}{qid} = "new" if ($session{form}{qid} eq "");
@@ -263,11 +264,11 @@ sub www_view {
 		}
 		$qNa .= '<a name="'.$question{questionId}.'"><span class="faqQuestion">';
 		if ($_[0]->get("qaOn")) {
-			$qNa .= $q.' ';
+			$qNa .= $q.': ';
 		}
 		$qNa .= $question{question}.'</span></a><br>';
                 if ($_[0]->get("qaOn")) {
-                        $qNa .= $a.' ';
+                        $qNa .= $a.': ';
                 }
 		$qNa .= $question{answer};
 		if ($_[0]->get("topOn")) {

@@ -222,6 +222,7 @@ sub www_editDownload {
 			$session{form}{did} = "new";
 		}
 		%download = WebGUI::SQL->quickHash("select * from DownloadManager_file where downloadId='$session{form}{did}'");
+                $output .= helpIcon(2,$namespace);
                 $output .= '<h1>'.WebGUI::International::get(10,$namespace).'</h1>';
 		$f = WebGUI::HTMLForm->new;
                 $f->hidden("wid",$_[0]->get("wobjectId"));

@@ -14,6 +14,8 @@ use Exporter;
 use strict;
 use Tie::IxHash;
 use Tie::CPHash;
+use WebGUI::HTMLForm;
+use WebGUI::Icon;
 use WebGUI::International;
 use WebGUI::Session;
 use WebGUI::SQL;
@@ -21,7 +23,8 @@ use WebGUI::URL;
 use WebGUI::Utility;
 
 our @ISA = qw(Exporter);
-our @EXPORT = qw(&www_viewHelp &www_viewHelpIndex);
+our @EXPORT = qw(&www_viewHelp &www_viewHelpIndex &www_manageHelp &www_editHelp &www_editHelpSave 
+	&www_exportHelp &www_deleteHelp &www_deleteHelpConfirm);
 
 #-------------------------------------------------------------------
 sub _helpLink {
@@ -43,6 +46,191 @@ sub _seeAlso {
 		$output .= '<li>'._helpLink($helpId,$namespace,WebGUI::International::get($titleId,$namespace));
 	}
 	return $output;
+}
+
+#-------------------------------------------------------------------
+sub www_deleteHelp {
+	if ($session{user}{userId} != 3) {
+                return "";
+        } else {
+		my $output = '<h1>Confirm</h1>Are you sure? Deleting help is never a good idea. <a href="'
+			.WebGUI::URL::page("op=deleteHelpConfirm&hid=".$session{form}{hid}."&namespace=".$session{form}{namespace})
+			.'">Yes</a> / <a href="'.WebGUI::URL::page("op=manageHelp").'">No</a><p>';
+		return $output;
+	}
+}
+
+#-------------------------------------------------------------------
+sub www_deleteHelpConfirm {
+	if ($session{user}{userId} != 3) {
+                return "";
+        } else {
+		my ($titleId, $bodyId) = WebGUI::SQL->quickArray("select titleId,bodyId from help where helpId=".$session{form}{hid}."
+			and namespace=".quote($session{form}{namespace}));
+		WebGUI::SQL->write("delete from international where internationalId=$titleId
+			and namespace=".quote($session{form}{namespace}));
+		WebGUI::SQL->write("delete from international where internationalId=$bodyId
+			and namespace=".quote($session{form}{namespace}));
+		WebGUI::SQL->write("delete from help where helpId=".$session{form}{hid}." 
+			and namespace=".quote($session{form}{namespace}));
+		return www_manageHelp();
+	}
+}
+
+#-------------------------------------------------------------------
+sub www_editHelp {
+	if ($session{user}{userId} != 3) {
+                return "";
+        } else {
+		my ($output, $f, %data, %help, @seeAlso);
+		tie %data, 'Tie::IxHash';
+		tie %help, 'Tie::CPHash';
+		if ($session{form}{hid} ne "new") {
+			%help = WebGUI::SQL->quickHash("select * from help where 
+				helpId=$session{form}{hid} and namespace=".quote($session{form}{namespace}));
+			$help{title} = WebGUI::International::get($help{titleId},$help{namespace});
+			$help{body} = WebGUI::International::get($help{bodyId},$help{namespace});
+			$help{seeAlso} =~ s/\n//g;
+			$help{seeAlso} =~ s/\r//g;
+			$help{seeAlso} =~ s/ //g;
+			@seeAlso = split(/;/,$help{seeAlso});
+		} else {
+			$help{titleId} = "new";
+			$help{bodyId} = "new";
+			$help{namespace} = "WebGUI";
+		}
+		$output = '<h1>Edit Help</h1>';
+		$f = WebGUI::HTMLForm->new();
+		$f->hidden("op","editHelpSave");
+		$f->hidden("hid",$session{form}{hid});
+		$f->readOnly($session{form}{hid},"Help ID");
+		if ($session{form}{hid} eq "new") {
+			%data = WebGUI::SQL->buildHash("select namespace,namespace from help order by namespace");
+			$f->combo("namespace",\%data,"Namespace",[$help{namespace}]);
+		} else {
+			$f->hidden("namespace",$session{form}{namespace});
+			$f->readOnly($session{form}{namespace},"Namespace");
+		}
+		$f->hidden("titleId",$help{titleId});
+		$f->readOnly($help{titleId},"Title ID");
+		$f->text("title","Title",$help{title});
+		$f->hidden("bodyId",$help{bodyId});
+		$f->readOnly($help{bodyId},"Body ID");
+		$f->HTMLArea("body","Body",$help{body},'','','',20,60);
+		%data = WebGUI::SQL->buildHash("select concat(help.helpId,',',help.namespace),
+			concat(international.message,' (',help.helpId,'/',help.namespace,')')
+			from help,international where help.titleId=international.internationalId 
+			and help.namespace=international.namespace and international.languageId=1 order by international.message");
+		$f->select("seeAlso",\%data,"See Also",\@seeAlso,8,1);
+		$f->submit;
+		$output .= $f->print;
+		return $output;
+	}
+}
+
+#-------------------------------------------------------------------
+sub www_editHelpSave {
+	if ($session{user}{userId} != 3) {
+                return "";
+        } else {
+		my (@seeAlso);
+		if ($session{form}{hid} eq "new") {
+			if ($session{form}{namespace_new} ne "") {
+				$session{form}{namespace} = $session{form}{namespace_new};
+			}
+			($session{form}{titleId}) = WebGUI::SQL->quickArray("select max(internationalId) from international
+				where namespace=".quote($session{form}{namespace}));
+			$session{form}{titleId}++;
+			$session{form}{bodyId} = $session{form}{titleId}+1;
+			($session{form}{hid}) = WebGUI::SQL->quickArray("select max(helpId) from help 
+				where namespace=".quote($session{form}{namespace}));
+			$session{form}{hid}++;
+			WebGUI::SQL->write("insert into international (internationalId,languageId,namespace) values 
+				($session{form}{titleId},1,".quote($session{form}{namespace}).")");
+			WebGUI::SQL->write("insert into international (internationalId,languageId,namespace) values 
+				($session{form}{bodyId},1,".quote($session{form}{namespace}).")");
+			WebGUI::SQL->write("insert into help (helpId,namespace,titleId,bodyId) values 
+				($session{form}{hid},".quote($session{form}{namespace}).",$session{form}{titleId},
+				$session{form}{bodyId})");
+		}
+		@seeAlso = $session{cgi}->param('seeAlso');
+		if ($seeAlso[0] ne "") {
+			$session{form}{seeAlso} = join(";",@seeAlso);
+			$session{form}{seeAlso} .= ';';
+		}
+		WebGUI::SQL->write("update international set message=".quote($session{form}{title})." 
+			where internationalId=$session{form}{titleId} and languageId=1 and namespace=".quote($session{form}{namespace}));
+		WebGUI::SQL->write("update international set message=".quote($session{form}{body})." 
+			where internationalId=$session{form}{bodyId} and languageId=1 and namespace=".quote($session{form}{namespace}));
+		WebGUI::SQL->write("update help set seeAlso=".quote($session{form}{seeAlso})." 
+			where helpId=$session{form}{hid} and namespace=".quote($session{form}{namespace}));
+		return www_manageHelp();
+	}
+}
+
+#-------------------------------------------------------------------
+sub www_exportHelp {
+	if ($session{user}{userId} != 3) {
+                return "";
+        } else {
+		my ($export, $output, %help, %data, $sth);
+		$output = '<h1>Export Help</h1>';
+		$export = "#export of WebGUI ".$WebGUI::VERSION." help system.\n\n";
+		$sth = WebGUI::SQL->read("select * from help");
+		while (%help = $sth->hash) {
+			%data = WebGUI::SQL->quickHash("select * from international where internationalId=$help{titleId}"
+				." and languageId=1 and namespace=".quote($help{namespace}));
+			$export .= "delete from international where internationalId=$data{internationalId}" 
+				." and namespace=".quote($data{namespace})." and languageId=1;\n";
+			$export .= "insert into international (internationalId,namespace,languageId,message) values ("
+				."$data{internationalId}, ".quote($data{namespace}).",1,".quote($data{message}).");\n";
+			%data = WebGUI::SQL->quickHash("select * from international where internationalId=$help{bodyId}" 
+				." and languageId=1 and namespace=".quote($help{namespace}));
+			$export .= "delete from international where internationalId=$data{internationalId}"
+				." and namespace=".quote($data{namespace})." and languageId=1;\n";
+                        $export .= "insert into international (internationalId,namespace,languageId,message) values ("
+                                ."$data{internationalId}, ".quote($data{namespace}).",1,".quote($data{message}).");\n";
+			$export .= "delete from help where helpId=$help{helpId} and namespace=".quote($help{namespace}).";\n";
+			$export .= "insert into help (helpId,namespace,titleId,bodyId,seeAlso) values ($help{helpId}, "
+				.quote($help{namespace}).", $help{titleId}, $help{bodyId}, ".quote($help{seeAlso}).");\n";
+		}
+		$sth->finish;
+		#$output .= '<form><textarea cols=80 rows=20>'.$export.'</textarea></form>';
+		$output .= "<p><pre>\n\n\n\n".$export."\n\n\n\n</pre><p>";
+		return $output;
+	}
+}
+
+#-------------------------------------------------------------------
+sub www_manageHelp {
+        my ($sth, @help, $output);
+	if ($session{user}{userId} != 3) {	
+		return "";
+	} else {
+        	$output = '<h1>Manage Help</h1>';
+		$output .= 'This interface is for WebGUI developers only. If you\'re not a developer, leave this alone. Also, 
+			this interface works <b>ONLY</b> under MySQL and is not supported by Plain Black under any
+			circumstances.<p>';
+		$output .= '<a href="'.WebGUI::URL::page('op=editHelp&hid=new').'">Add new help.</a>';
+		$output .= ' &middot; ';
+		$output .= '<a href="'.WebGUI::URL::page('op=exportHelp').'">Export help.</a>';
+		$output .= '<p><table class="tableData">';
+        	$sth = WebGUI::SQL->read("select help.helpId,help.namespace,international.message from help,international 
+			where help.titleId=international.internationalId and help.namespace=international.namespace 
+			and international.languageId=1 order by international.message");
+        	while (@help = $sth->array) {
+			$output .= '<tr><td>'
+				.deleteIcon("op=deleteHelp&hid=".$help[0]."&namespace=".$help[1])
+				.editIcon("op=editHelp&hid=".$help[0]."&namespace=".$help[1])
+				.'</td>'
+				.'<td>'._helpLink($help[0],$help[1],$help[2]).'</td>'
+				.'<td>'.$help[0].'/'.$help[1].'</td>'
+				.'</tr>';	
+		}
+        	$sth->finish;
+        	$output .= '</table>';
+        	return $output;
+	}
 }
 
 #-------------------------------------------------------------------

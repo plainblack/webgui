@@ -171,7 +171,8 @@ sub www_editLink {
 	        } else {
         	        $newWindow = $link{newWindow};
         	}
-                $output = '<h1>'.WebGUI::International::get(12,$namespace).'</h1>';
+		$output = helpIcon(2,$namespace);
+                $output .= '<h1>'.WebGUI::International::get(12,$namespace).'</h1>';
 		$f = WebGUI::HTMLForm->new;
 		$f->hidden("wid",$_[0]->get("wobjectId"));
                 $f->hidden("lid",$linkId);

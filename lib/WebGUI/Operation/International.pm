@@ -300,7 +300,8 @@ sub www_submitTranslation {
 sub www_submitTranslationConfirm {
 	my ($sth, %data, $submission);
 	tie %data, 'Tie::CPHash';
-	$submission = "#language\n\n";
+	$submission = "#Translation export for WebGUI ".$WebGUI::Version.".\n\n";
+	$submission .= "#language\n\n";
 	$submission .= "delete from language where languageId=".$session{form}{lid}.";\n";
 	$sth = WebGUI::SQL->read("select * from language where languageId=".$session{form}{lid});
 	while (%data = $sth->hash) {
