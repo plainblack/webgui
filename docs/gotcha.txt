@@ -7,15 +7,6 @@ upgrading from one version to the next, or even between multiple
 versions. Be sure to heed the warnings contained herein as they will
 save you many hours of grief.
 
-6.0.0
---------------------------------------------------------------------
- * You MUST clear your filesystem cache or WebGUI will crash. It is
-	typically in /tmp/FileCache. A command like the following
-	run as the super user will do the job nicely:
-
-	rm -Rf /tmp/FileCache
-
-
 5.5.0
 --------------------------------------------------------------------
  * If you have any custom Message Board templates they will be
