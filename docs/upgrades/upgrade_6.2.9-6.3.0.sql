@@ -177,3 +177,10 @@ CREATE TABLE commerceSettings (
   type varchar(10) NOT NULL default ''
 ) TYPE=MyISAM;
 INSERT INTO template VALUES ('1','Default payment gateway selection template','<tmpl_if pluginsAvailable>\r\n   <tmpl_var message><br>\r\n    <tmpl_var formHeader>\r\n       <table border=\"0\" cellspacing=\"0\" cellpadding=\"5\">\r\n    <tmpl_loop pluginLoop>\r\n            <tr>\r\n                        <td><tmpl_var formElement></td>\r\n                     <td align=\"left\"><tmpl_var name></td>\r\n           </tr>\r\n       </tmpl_loop>\r\n        </table>\r\n    <tmpl_var formSubmit>\r\n    <tmpl_var formFooter>\r\n<tmpl_else>\r\n <tmpl_var noPluginsMessage>\r\n</tmpl_if>','Commerce/SelectPaymentGateway',1,1);
+
+
+create table ImageAsset (
+	assetId varchar(22) not null primary key,
+	thumbnailSize int not null default 50
+);
+
