@@ -120,6 +120,7 @@ sub page {
 			while ($wobject = $sth->hashRef) {
 				if ($session{var}{adminOn} && $canEdit) {
 					$contentHash{"template.position".${$wobject}{templatePosition}} .= "\n<hr>"
+						.wobjectIcon()
 						.deleteIcon('func=delete&wid='.${$wobject}{wobjectId})
 						.editIcon('func=edit&wid='.${$wobject}{wobjectId})
 						.moveUpIcon('func=moveUp&wid='.${$wobject}{wobjectId})
