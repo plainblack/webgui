@@ -70,7 +70,6 @@ sub process {
         	%hash = ( 
 			WebGUI::URL::page('op=listGroups')=>WebGUI::International::get(5), 
 			WebGUI::URL::page('op=manageSettings')=>WebGUI::International::get(4), 
-			WebGUI::URL::page('op=listLanguages')=>WebGUI::International::get(585),
 			WebGUI::URL::page('op=listUsers')=>WebGUI::International::get(7),
 			WebGUI::URL::gateway('trash')=>WebGUI::International::get(10),
 			WebGUI::URL::page('op=listRoots')=>WebGUI::International::get(410),
@@ -107,6 +106,12 @@ sub process {
         if (WebGUI::Privilege::isInGroup(9)) {
                 %hash = (
                         WebGUI::URL::page('op=listThemes')=>WebGUI::International::get(900),
+                        %hash
+                );
+        }
+        if (WebGUI::Privilege::isInGroup(10)) {
+                %hash = (
+			WebGUI::URL::page('op=listLanguages')=>WebGUI::International::get(585),
                         %hash
                 );
         }

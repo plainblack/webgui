@@ -85,7 +85,7 @@ sub _submenu {
 #-------------------------------------------------------------------
 sub www_addInternationalMessage {
 	my ($output,$f);
-	return WebGUI::Privilege::adminOnly() unless (WebGUI::Privilege::isInGroup(3));
+	return WebGUI::Privilege::adminOnly() unless (WebGUI::Privilege::isInGroup(10));
 	$output = '<h1>Add English Message</h1>';
 	$f = WebGUI::HTMLForm->new();
 	$f->hidden("lid",1);
@@ -118,7 +118,7 @@ sub www_addInternationalMessageSave {
 sub www_deleteLanguage {
         my ($output);
         return WebGUI::Privilege::vitalComponent() if ($session{form}{lid} < 1000 && $session{form}{lid} > 0);
-        return WebGUI::Privilege::adminOnly() unless (WebGUI::Privilege::isInGroup(3));
+        return WebGUI::Privilege::adminOnly() unless (WebGUI::Privilege::isInGroup(10));
         $output .= '<h1>'.WebGUI::International::get(42).'</h1>';
         $output .= WebGUI::International::get(587).'<p>';
         $output .= '<div align="center"><a href="'.
@@ -131,7 +131,7 @@ sub www_deleteLanguage {
 
 #-------------------------------------------------------------------
 sub www_deleteLanguageConfirm {
-	return WebGUI::Privilege::adminOnly() unless (WebGUI::Privilege::isInGroup(3));
+	return WebGUI::Privilege::adminOnly() unless (WebGUI::Privilege::isInGroup(10));
         return WebGUI::Privilege::vitalComponent() if ($session{form}{lid} < 1000 && $session{form}{lid} > 0);
         WebGUI::SQL->write("delete from language where languageId=".$session{form}{lid});
         WebGUI::SQL->write("delete from international where languageId=".$session{form}{lid});
@@ -143,7 +143,7 @@ sub www_deleteLanguageConfirm {
 #-------------------------------------------------------------------
 sub www_editInternationalMessage {
         my ($output, $message, $context, $f, $language);
-        return WebGUI::Privilege::adminOnly() unless (WebGUI::Privilege::isInGroup(3));
+        return WebGUI::Privilege::adminOnly() unless (WebGUI::Privilege::isInGroup(10));
 	($language) = WebGUI::SQL->quickArray("select language from language where languageId=".$session{form}{lid});
         $output = '<h1>'.WebGUI::International::get(597).'</h1>';
         $f = WebGUI::HTMLForm->new;
@@ -171,7 +171,7 @@ sub www_editInternationalMessage {
 
 #-------------------------------------------------------------------
 sub www_editInternationalMessageSave {
-        return WebGUI::Privilege::adminOnly() unless (WebGUI::Privilege::isInGroup(3));
+        return WebGUI::Privilege::adminOnly() unless (WebGUI::Privilege::isInGroup(10));
 	if ($session{form}{status} eq "missing") {
                	WebGUI::SQL->write("insert into international (message,namespace,languageId,internationalId,lastUpdated) 
 			values (".quote($session{form}{message}).",".quote($session{form}{namespace})
@@ -187,7 +187,7 @@ sub www_editInternationalMessageSave {
 #-------------------------------------------------------------------
 sub www_editLanguage {
 	my ($output, $dir, @files, $file, %data, $f, %options);
-	return WebGUI::Privilege::adminOnly() unless (WebGUI::Privilege::isInGroup(3));
+	return WebGUI::Privilege::adminOnly() unless (WebGUI::Privilege::isInGroup(10));
 	tie %data, 'Tie::CPHash';
         $dir = $session{config}{extrasPath}.$session{os}{slash}."toolbar";
         opendir (DIR,$dir) or WebGUI::ErrorHandler::warn("Can't open toolbar directory!");
@@ -219,7 +219,7 @@ sub www_editLanguage {
 
 #-------------------------------------------------------------------
 sub www_editLanguageSave {
-        return WebGUI::Privilege::adminOnly() unless (WebGUI::Privilege::isInGroup(3));
+        return WebGUI::Privilege::adminOnly() unless (WebGUI::Privilege::isInGroup(10));
         if ($session{form}{lid} eq "new") {
 		$session{form}{lid} = getNextId("languageId");
 		WebGUI::SQL->write("insert into language (languageId) values ($session{form}{lid})");
@@ -238,7 +238,7 @@ sub www_exportTranslation {
 
 #-------------------------------------------------------------------
 sub www_listInternationalMessages {
-        return WebGUI::Privilege::adminOnly() unless (WebGUI::Privilege::isInGroup(3));
+        return WebGUI::Privilege::adminOnly() unless (WebGUI::Privilege::isInGroup(10));
         my ($output, $sth, $key, $p, $status,%data, %list, $deprecated, $i, $missing, @row, $f, $outOfDate, $ok);
         tie %data, 'Tie::CPHash';
         %data = WebGUI::SQL->quickHash("select language from language where languageId=".$session{form}{lid});
@@ -369,7 +369,7 @@ sub www_listInternationalMessages {
 sub www_listLanguages {
         my ($output, $sth, %data);
 	tie %data, 'Tie::CPHash';
-	return WebGUI::Privilege::adminOnly() unless (WebGUI::Privilege::isInGroup(3));
+	return WebGUI::Privilege::adminOnly() unless (WebGUI::Privilege::isInGroup(10));
 	$output = '<h1>'.WebGUI::International::get(586).'</h1>';
 	$sth = WebGUI::SQL->read("select languageId,language from language where languageId<>1 order by language");
 	while (%data = $sth->hash) {

@@ -274,6 +274,6 @@ insert into international (internationalId,languageId,namespace,message,lastUpda
 delete from international where languageId=1 and namespace='WebGUI' and internationalId=831;
 insert into international (internationalId,languageId,namespace,message,lastUpdated) values (831,1,'WebGUI','Collateral Macros', 1050441851);
 alter table international add column context text;
-
+insert into groups (groupId,groupName,description) values (10,"Translation Managers","Users that can edit language translations for WebGUI.");
 
 
