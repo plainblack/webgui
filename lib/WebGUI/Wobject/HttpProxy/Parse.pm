@@ -141,6 +141,7 @@ sub start {
   	if ($self->{FormAction} ne "") {
     		$self->output('<input type="hidden" name="FormAction" value="'.$self->{FormAction}.'">');
     		$self->output('<input type="hidden" name="wid" value="'.$self->{wid}.'">');
+    		$self->output('<input type="hidden" name="func" value="view">');
     		$self->{FormAction} = '';
     		$self->{FormActionIsDefined}=0;
   	}
