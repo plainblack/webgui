@@ -187,6 +187,11 @@ WebGUI::SQL->write("alter table USS_submission add column contentType varchar(35
 WebGUI::SQL->write("update USS_submission set contentType='html' where convertCarriageReturns=0");
 WebGUI::SQL->write("alter table USS_submission drop column convertCarriageReturns");
 WebGUI::SQL->write("insert into incrementer (incrementerId,nextValue) values ('USS_id',$ussId)");
+WebGUI::SQL->write("alter table USS_submission add column userDefined1 text");
+WebGUI::SQL->write("alter table USS_submission add column userDefined2 text");
+WebGUI::SQL->write("alter table USS_submission add column userDefined3 text");
+WebGUI::SQL->write("alter table USS_submission add column userDefined4 text");
+WebGUI::SQL->write("alter table USS_submission add column userDefined5 text");
 
 
 #--------------------------------------------
@@ -251,6 +256,70 @@ WebGUI::SQL->write("drop table FAQ_question");
 WebGUI::SQL->write("delete from incrementer where incrementerId='FAQ_questionId'");
 
 
+#--------------------------------------------
+print "\tMigrating Link Lists to USS Submissions.\n" unless ($quiet);
+my $sth = WebGUI::SQL->read("select * from template where namespace='LinkList'");
+while (my $template = $sth->hashRef) {
+	$template->{name} =~ s/Default (.*?)/$1/i;
+       	if ($template->{templateId} < 1000) {
+		($template->{templateId}) = WebGUI::SQL->quickArray("select max(templateId) from template where namespace='USS' and templateId<1000");
+		$template->{templateId}++;
+	} else {
+		($template->{templateId}) = WebGUI::SQL->quickArray("select max(templateId) from template where namespace='USS'");
+		if ($template->{templateId} > 999) {
+       			$template->{templateId}++;
+     		} else {
+     			$template->{templateId} = 1000;
+		}
+	}
+	$template->{template} =~ s/\<tmpl\_loop\s+link\_loop\>/\<tmpl\_loop submissions\_loop\>/igs;
+	$template->{template} =~ s/\<tmpl\_if\s+session\.var\.adminOn\>//igs;
+	$template->{template} =~ s/\<\/tmpl\_if\>\s*\<\/tmpl\_if\>/\<\/tmpl_if>/igs;
+	my $replacement = '
+		<tmpl_if submission.currentUser>
+			[<a href="<tmpl_var submission.edit.url>"><tmpl_var submission.edit.label></a>]
+		</tmpl_if>
+		<tmpl_if canModerate>
+			<tmpl_var submission.controls>
+		';
+	$template->{template} =~ s/\<tmpl\_if\s+canEdit\>\s*\<tmpl\_var\s+link\.controls\>\s*/$replacement/igs;
+	$replacement = ' <tmpl_if canPost>
+			<a href="<tmpl_var post.url>"> ';
+	$template->{template} =~ s/\<tmpl\_if\s+canEdit\>\s*\<a\s+href="\<tmpl\_var\s+addlink\.url\>"\>/$replacement/igs;
+	$template->{template} =~ s/\<tmpl\_if\s+link\.newWindow\>/\<tmpl\_if submission\.userDefined2\>/igs;
+	$template->{template} =~ s/\<tmpl\_var\s+link\.url\>/\<tmpl\_var submission\.userDefined1\>/igs;
+	$template->{template} =~ s/\<tmpl\_var\s+link\.id\>/\<tmpl\_var submission\.id\>/igs;
+	$template->{template} =~ s/\<tmpl\_var\s+link\.name\>/\<tmpl\_var submission\.title\>/igs;
+	$template->{template} =~ s/\<tmpl\_var\s+link\.description\>/\<tmpl\_var submission\.content\.full\>/igs;
+	$template->{template} =~ s/\<tmpl\_if\s+link\.description\>/\<tmpl\_if submission\.content\.full\>/igs;
+	WebGUI::SQL->write("insert into template (templateId,name,template,namespace) values (".$template->{templateId}.",
+		".quote($template->{name}).", ".quote($template->{template}).", 'USS')");
+}
+$sth->finish;
+WebGUI::SQL->write("delete from template where namespace='LinkList'");
+my $a = WebGUI::SQL->read("select a.wobjectId,a.groupIdEdit,a.ownerId,a.lastEdited,b.username,a.dateAdded from wobject a left join users b on
+	a.ownerId=b.userId where a.namespace='LinkList'");
+while (my $data = $a->hashRef) {
+	$ussId = getNextId("USS_id");
+	WebGUI::SQL->write("insert into USS (wobjectId,	USS_id, groupToContribute, submissionsPerPage, filterContent, sortBy, sortOrder, 
+		submissionFormTemplateId) values (
+		".$data->{wobjectId}.", $ussId, ".$data->{groupIdEdit}.", 1000, 'none', 'sequenceNumber', 'asc', 3)");
+	my $b = WebGUI::SQL->read("select * from LinkList_link");
+	while (my $sub = $b->hashRef) {
+		my $subId = getNextId("USS_submissionId");
+		my $forum = WebGUI::Forum->create({});
+		WebGUI::SQL->write("insert into USS_submission (USS_submissionId, USS_id, title, username, userId, content, 
+			dateUpdated, dateSubmited, forumId,contentType,userDefined1, userDefined2) values ( $subId, $ussId, ".quote($sub->{name}).", 
+			".quote($data->{username}).", ".$data->{ownerId}.", ".quote($sub->{description}).", ".$data->{lastEdited}.", 
+			".$data->{dateAdded}.", ".$forum->get("forumId").", 'html', ".quote($sub->{url}).", ".quote($sub->{newWindow}).")");
+	}
+	$b->finish;
+}
+$a->finish;
+WebGUI::SQL->write("update wobject set namespace='USS' where namespace='LinkList'");
+WebGUI::SQL->write("drop table LinkList");
+WebGUI::SQL->write("drop table LinkList_link");
+WebGUI::SQL->write("delete from incrementer where incrementerId='LinkList_linkId'");
 
 
 
@@ -265,7 +334,7 @@ $conf->set("macros"=>$macros);
 my $wobjects = $conf->get("wobjects");
 my @newWobjects;
 foreach my $wobject (@{$wobjects}) {
-	unless ($wobject eq "Item" || $wobject eq "FAQ" || $wobject eq "ExtraColumn") {
+	unless ($wobject eq "Item" || $wobject eq "FAQ" || $wobject eq "ExtraColumn" || $wobject eq "LinkList") {
 		push(@newWobjects,$wobject);
 	}
 }
@@ -278,7 +347,7 @@ $conf->write;
 print "\tRemoving unneeded files.\n" unless ($quiet);
 unlink("../../lib/WebGUI/Operation/Style.pm");
 unlink("../../lib/WebGUI/Wobject/Item.pm");
-#unlink("../../lib/WebGUI/Wobject/LinkList.pm");
+unlink("../../lib/WebGUI/Wobject/LinkList.pm");
 unlink("../../lib/WebGUI/Wobject/FAQ.pm");
 unlink("../../lib/WebGUI/Wobject/ExtraColumn.pm");
 

@@ -14,7 +14,7 @@ uploadsPath = /data/WebGUI/www/uploads
 
 authMethods = LDAP, WebGUI
 
-wobjects = Article, EventsCalendar, ExtraColumn, FileManager, HttpProxy, \
+wobjects = Article, EventsCalendar, FileManager, HttpProxy, \
 	DataForm, MessageBoard, Poll, Product, SiteMap, \
 	SQLReport, Survey, SyndicatedContent, USS, WobjectProxy
 

@@ -335,9 +335,8 @@ sub www_editSubmission {
         return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::isInGroup($_[0]->get("groupToContribute")) 
 		|| $submission->{userId} == $session{user}{userId} 
 		|| WebGUI::Privilege::isInGroup($_[0]->get("groupToApprove")));
+	$var{'link.header.label'} = WebGUI::International::get(90,$_[0]->get("namespace"));
 	$var{'question.header.label'} = WebGUI::International::get(84,$_[0]->get("namespace"));
-	$var{'question.label'} = WebGUI::International::get(85,$_[0]->get("namespace"));
-	$var{'answer.label'} = WebGUI::International::get(86,$_[0]->get("namespace"));
         $var{'submission.header.label'} = WebGUI::International::get(19,$_[0]->get("namespace"));
 	$var{'user.isVisitor'} = ($session{user}{userId} == 1);
         $var{'visitorName.label'} = WebGUI::International::get(438);
@@ -357,6 +356,74 @@ sub www_editSubmission {
                 	name=>"func",
 			value=>"editSubmissionSave"
 			});
+        $var{'url.label'} = WebGUI::International::get(91,$_[0]->get("namespace"));
+        $var{'newWindow.label'} = WebGUI::International::get(92,$_[0]->get("namespace"));
+	$var{'userDefined1.form'} = WebGUI::Form::text({
+		name=>"userDefined1",
+		value=>$submission->{userDefined1}
+		});
+	$var{'userDefined1.form.yesNo'} = WebGUI::Form::yesNo({
+		name=>"userDefined1",
+		value=>$submission->{userDefined1}
+		});
+	$var{'userDefined1.form.textarea'} = WebGUI::Form::textarea({
+		name=>"userDefined1",
+		value=>$submission->{userDefined1}
+		});
+	$var{'userDefined2.form'} = WebGUI::Form::text({
+		name=>"userDefined2",
+		value=>$submission->{userDefined2}
+		});
+	$var{'userDefined2.form.yesNo'} = WebGUI::Form::yesNo({
+		name=>"userDefined2",
+		value=>$submission->{userDefined2}
+		});
+	$var{'userDefined2.form.textarea'} = WebGUI::Form::textarea({
+		name=>"userDefined2",
+		value=>$submission->{userDefined2}
+		});
+	$var{'userDefined3.form'} = WebGUI::Form::text({
+		name=>"userDefined3",
+		value=>$submission->{userDefined3}
+		});
+	$var{'userDefined3.form.yesNo'} = WebGUI::Form::yesNo({
+		name=>"userDefined3",
+		value=>$submission->{userDefined3}
+		});
+	$var{'userDefined3.form.textarea'} = WebGUI::Form::textarea({
+		name=>"userDefined3",
+		value=>$submission->{userDefined3}
+		});
+	$var{'userDefined4.form'} = WebGUI::Form::text({
+		name=>"userDefined4",
+		value=>$submission->{userDefined4}
+		});
+	$var{'userDefined4.form.yesNo'} = WebGUI::Form::yesNo({
+		name=>"userDefined4",
+		value=>$submission->{userDefined4}
+		});
+	$var{'userDefined4.form.textarea'} = WebGUI::Form::textarea({
+		name=>"userDefined4",
+		value=>$submission->{userDefined4}
+		});
+	$var{'userDefined5.form'} = WebGUI::Form::text({
+		name=>"userDefined5",
+		value=>$submission->{userDefined5}
+		});
+	$var{'userDefined5.form.yesNo'} = WebGUI::Form::yesNo({
+		name=>"userDefined5",
+		value=>$submission->{userDefined5}
+		});
+	$var{'userDefined5.form.textarea'} = WebGUI::Form::textarea({
+		name=>"userDefined5",
+		value=>$submission->{userDefined5}
+		});
+	$var{'userDefined1.value'} = $submission->{userDefined1};
+	$var{'userDefined2.value'} = $submission->{userDefined2};
+	$var{'userDefined3.value'} = $submission->{userDefined3};
+	$var{'userDefined4.value'} = $submission->{userDefined4};
+	$var{'userDefined5.value'} = $submission->{userDefined5};
+	$var{'question.label'} = WebGUI::International::get(85,$_[0]->get("namespace"));
 	$var{'title.label'} = WebGUI::International::get(35,$_[0]->get("namespace"));
 	$var{'title.form'} = WebGUI::Form::text({
 		name=>"title",
@@ -368,8 +435,14 @@ sub www_editSubmission {
 		});
 	$var{'title.value'} = $submission->{title};
         $var{'body.label'} = WebGUI::International::get(31,$_[0]->get("namespace"));
+	$var{'answer.label'} = WebGUI::International::get(86,$_[0]->get("namespace"));
+        $var{'description.label'} = WebGUI::International::get(85);
 	$var{'body.value'} = $submission->{content};
 	$var{'body.form'} = WebGUI::Form::HTMLArea({
+		name=>"body",
+		value=>$submission->{content}
+		});
+	$var{'body.form.textarea'} = WebGUI::Form::textarea({
 		name=>"body",
 		value=>$submission->{content}
 		});
@@ -432,6 +505,11 @@ sub www_editSubmissionSave {
 		$hash{USS_submissionId} = $session{form}{sid};
 		$hash{dateUpdated} = WebGUI::DateTime::time();
 		$hash{content} = $session{form}{body};
+		$hash{userDefined1} = $session{form}{userDefined1};
+		$hash{userDefined2} = $session{form}{userDefined2};
+		$hash{userDefined3} = $session{form}{userDefined3};
+		$hash{userDefined4} = $session{form}{userDefined4};
+		$hash{userDefined5} = $session{form}{userDefined5};
 		$hash{contentType} = $session{form}{contentType};
                 $file = WebGUI::Attachment->new("",$session{form}{wid},$session{form}{sid});
 		$file->save("image");
@@ -477,11 +555,11 @@ sub www_view {
 	$numResults = $_[0]->get("submissionsPerPage");
 	$var{"readmore.label"} = WebGUI::International::get(46,$_[0]->get("namespace"));
 	$var{"responses.label"} = WebGUI::International::get(57,$_[0]->get("namespace"));
-	$var{title} = $_[0]->get("title");
-        $var{description} = $_[0]->get("description");
 	$var{canPost} = WebGUI::Privilege::isInGroup($_[0]->get("groupToContribute"));
         $var{"post.url"} = WebGUI::URL::page('func=editSubmission&sid=new&wid='.$_[0]->get("wobjectId"));
 	$var{"post.label"} = WebGUI::International::get(20,$_[0]->get("namespace"));
+	$var{"addquestion.label"} = WebGUI::International::get(83,$_[0]->get("namespace"));
+	$var{"addlink.label"} = WebGUI::International::get(89,$_[0]->get("namespace"));
         $var{"search.label"} = WebGUI::International::get(364);
 	$var{"search.Form"} = WebGUI::Search::form({wid=>$_[0]->get("wobjectId"),func=>'view',search=>1});
 	$var{"search.url"} = WebGUI::Search::toggleURL("wid=".$_[0]->get("wobjectId")."&func=view");
@@ -495,7 +573,6 @@ sub www_view {
 	} else {
 		$constraints = "(status='Approved' or (userId=$session{user}{userId} and userId<>1))";
 	}
-	$var{"addquestion.label"} = WebGUI::International::get(83,$_[0]->get("namespace"));
         $var{canModerate} = WebGUI::Privilege::isInGroup($_[0]->get("groupToApprove"),$session{user}{userId});
 	$var{"title.label"} = WebGUI::International::get(99);
 	$var{"thumbnail.label"} = WebGUI::International::get(52,$_[0]->get("namespace"));
@@ -505,7 +582,7 @@ sub www_view {
 	$var{"submission.edit.label"} = WebGUI::International::get(27,$_[0]->get("namespace"));
 	$p = WebGUI::Paginator->new(WebGUI::URL::page('func=view&wid='.$_[0]->get("wobjectId")),[],$numResults);
 	$p->setDataByQuery("select USS_submissionId, content, title, userId, status, image, dateSubmitted, dateUpdated, 
-		username, contentType, forumId from USS_submission 
+		username, contentType, forumId, userDefined1, userDefined2, userDefined3, userDefined4, userDefined5 from USS_submission 
 		where USS_id=".$_[0]->get("USS_Id")." and $constraints order by ".$_[0]->getValue("sortBy")." ".$_[0]->getValue("sortOrder"));
 	$page = $p->getPageData;
 	$i = 0;
@@ -544,14 +621,19 @@ sub www_view {
 			"submission.content.full"=>join("\n",@content),
 			"submission.responses"=>$responses,
                         "submission.title"=>$page->[$i]->{title},
+                        "submission.userDefined1"=>$page->[$i]->{userDefined1},
+                        "submission.userDefined2"=>$page->[$i]->{userDefined2},
+                        "submission.userDefined3"=>$page->[$i]->{userDefined3},
+                        "submission.userDefined4"=>$page->[$i]->{userDefined4},
+                        "submission.userDefined5"=>$page->[$i]->{userDefined5},
                         "submission.userId"=>$page->[$i]->{userId},
+                        "submission.username"=>$page->[$i]->{username},
                         "submission.status"=>$page->[$i]->{status},
                         "submission.thumbnail"=>$thumbnail,
                         "submission.image"=>$imageURL,
                         "submission.date"=>epochToHuman($page->[$i]->{dateSubmitted}),
                         "submission.date.updated"=>epochToHuman($page->[$i]->{dateUpdated}),
                         "submission.currentUser"=>($session{user}{userId} == $page->[$i]->{userId}),
-                        "submission.username"=>$page->[$i]->{username},
                         "submission.userProfile"=>WebGUI::URL::page('op=viewProfile&uid='.$page->[$i]->{userId}),
         		"submission.edit.url"=>WebGUI::URL::page($quickurl.'editSubmission'),
                         "submission.secondColumn"=>(($i+1)%2==0),
@@ -697,6 +779,11 @@ sub www_viewSubmission {
 	$var{"search.label"} = WebGUI::International::get(364);
         $var{"back.url"} = WebGUI::URL::page();
 	$var{"back.label"} = WebGUI::International::get(28,$_[0]->get("namespace"));
+	$var{'userDefined1.value'} = $submission->{userDefined1};
+	$var{'userDefined2.value'} = $submission->{userDefined2};
+	$var{'userDefined3.value'} = $submission->{userDefined3};
+	$var{'userDefined4.value'} = $submission->{userDefined4};
+	$var{'userDefined5.value'} = $submission->{userDefined5};
 	if ($submission->{image} ne "") {
 		$file = WebGUI::Attachment->new($submission->{image},$session{form}{wid},$session{form}{sid});
 		$var{"image.url"} = $file->getURL;
