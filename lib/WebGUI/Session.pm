@@ -226,7 +226,7 @@ sub convertVisitorToUser {
 
 =head2 deleteAllScratch ( name )
 
-Deletes a scratch variable for all users. This function should be used with care.
+Deletes a scratch variable for all users. This function must be used with care.
 
 =over
 
