@@ -12,6 +12,7 @@ package WebGUI::Operation::Settings;
 
 use Exporter;
 use strict;
+use WebGUI::DateTime;
 use WebGUI::HTMLForm;
 use WebGUI::Icon;
 use WebGUI::International;
@@ -45,7 +46,7 @@ sub www_editUserSettings {
 		$f->group("onNewUserAlertGroup",WebGUI::International::get(535),[$session{setting}{onNewUserAlertGroup}]);
                 $f->yesNo("useKarma",WebGUI::International::get(539),$session{setting}{useKarma});
                 $f->integer("karmaPerLogin",WebGUI::International::get(540),$session{setting}{karmaPerLogin});
-                $f->integer("sessionTimeout",WebGUI::International::get(142),$session{setting}{sessionTimeout});
+                $f->interval("sessionTimeout",WebGUI::International::get(142),WebGUI::DateTime::secondsToInterval($session{setting}{sessionTimeout}));
                 $f->select("authMethod",\%authMethod,WebGUI::International::get(119),[$session{setting}{authMethod}]);
                 $f->yesNo("usernameBinding",WebGUI::International::get(306),$session{setting}{usernameBinding});
                 $f->url("ldapURL",WebGUI::International::get(120),$session{setting}{ldapURL});
@@ -63,6 +64,8 @@ sub www_editUserSettings {
 #-------------------------------------------------------------------
 sub www_editUserSettingsSave {
         if (WebGUI::Privilege::isInGroup(3)) {
+		$session{form}{sessionTimeout} = WebGUI::DateTime::intervalToSeconds($session{form}{sessionTimeout_interval},
+			$session{form}{sessionTimeout_units});
 		_saveSetting("sessionTimeout");
 		_saveSetting("onNewUserAlertGroup");
 		_saveSetting("alertOnNewUser");

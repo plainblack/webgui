@@ -99,7 +99,7 @@ sub discussionProperties {
         %moderationType = (before=>WebGUI::International::get(567),after=>WebGUI::International::get(568));
         $f = WebGUI::HTMLForm->new;
         if ($_[0]->get("wobjectId") eq "new") {
-                $editTimeout = 1;
+                $editTimeout = 3600;
                 $moderationType = 'after';
         } else {
                 $editTimeout = $_[0]->get("editTimeout");
@@ -107,7 +107,7 @@ sub discussionProperties {
         }
         $groupToModerate = $_[0]->get("groupToModerate") || 4;
         $f->group("groupToPost",WebGUI::International::get(564),[$_[0]->get("groupToPost")]);
-        $f->integer("editTimeout",WebGUI::International::get(566),$editTimeout);
+        $f->interval("editTimeout",WebGUI::International::get(566),WebGUI::DateTime::secondsToInterval($editTimeout));
         if ($session{setting}{useKarma}) {
                 $f->integer("karmaPerPost",WebGUI::International::get(541),$_[0]->get("karmaPerPost"));
         } else {
@@ -478,7 +478,7 @@ sub www_editSave {
 		karmaPerPost=>$session{form}{karmaPerPost},
 		groupToPost=>$session{form}{groupToPost},
 		groupToModerate=>$session{form}{groupToModerate},
-		editTimeout=>$session{form}{editTimeout},
+		editTimeout=>WebGUI::DateTime::intervalToSeconds($session{form}{editTimeout_interval},$session{form}{editTimeout_units}),
 		moderationType=>$session{form}{moderationType}
 	});
 	return "";

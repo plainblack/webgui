@@ -51,9 +51,11 @@ sub _calendarLayout {
 	$calendar->monthname(WebGUI::DateTime::getMonthName($calendar->month));
 	$calendar->header('<h2 align="center">'.$calendar->monthname.' '.$calendar->year.'</h2>');
         ($start,$end) = monthStartEnd($_[1]);
-        $sth = WebGUI::SQL->read("select * from EventsCalendar_event where wobjectId=".$_[0]->get("wobjectId")." order by startDate,endDate");
+        $sth = WebGUI::SQL->read("select * from EventsCalendar_event where wobjectId="
+		.$_[0]->get("wobjectId")." order by startDate,endDate");
         while (%event = $sth->hash) {
-        	if (epochToHuman($event{startDate},"%M %y") eq $thisMonth || epochToHuman($event{endDate},"%M %y") eq $thisMonth) {
+        	if (epochToHuman($event{startDate},"%M %y") eq $thisMonth 
+			|| epochToHuman($event{endDate},"%M %y") eq $thisMonth) {
 			$message = "";
                         if ($session{var}{adminOn}) {
                                 $message = deleteIcon('func=deleteEvent&wid='.$_[0]->get("wobjectId").'&eid='.$event{eventId}
@@ -93,7 +95,8 @@ sub duplicate {
 		calendarLayout=>$_[0]->get("calendarLayout"),
 		paginateAfter=>$_[0]->get("paginateAfter")
 		});
-	$sth = WebGUI::SQL->read("select * from EventsCalendar_event where wobjectId=".$_[0]->get("wobjectId")." order by recurringEventId");
+	$sth = WebGUI::SQL->read("select * from EventsCalendar_event where wobjectId="
+		.$_[0]->get("wobjectId")." order by recurringEventId");
 	while (@row = $sth->array) {
 		$newEventId = getNextId("eventId");
 		if ($row[6] > 0 && $row[6] != $previousRecurringEventId) {
@@ -397,6 +400,14 @@ sub www_view {
 	return $_[0]->processMacros($output);
 }
 
+#-------------------------------------------------------------------
+sub www_viewEvent {
+	my ($output, %event);
+	tie %event, 'Tie::CPHash';
+	%event = WebGUI::SQL->quickHash("select * from EventsCalendar_event where eventId=$session{form}{eid}");
+
+	return $output;
+}
 
 1;
 

@@ -666,6 +666,94 @@ sub integer {
 
 #-------------------------------------------------------------------
 
+=head2 interval ( name [ label, intervalValue, unitsValue, extras, subtext ] )
+
+ Adds a time interval row to this form.
+
+=item name
+
+ The the base name for this form element. This form element actually
+ returns two values under different names. They are name_interval and
+ name_units.
+
+=item label
+
+ The left column label for this form row.
+
+=item intervalValue
+
+ The default value for interval portion of this form element. Defaults
+ to '1'.
+
+=item unitsValue
+
+ The default value for units portion of this form element. Defaults
+ to 'seconds'. Possible values are 'seconds', 'minutes', 'hours',
+ 'days', 'weeks', 'months', and 'years'.
+
+=item extras
+
+ If you want to add anything special to this form element like
+ javascript actions, or stylesheet information, you'd add it in
+ here as follows:
+
+   'onChange="this.form.submit()"'
+
+=item subtext
+
+ Extra text to describe this form element or to provide special
+ instructions.
+
+=cut
+
+sub interval {
+        my ($subtext, %units, $item, $key, $class, $output, $name, $label, $extras, $intervalValue, $unitsValue);
+        $class = shift;
+        $name = shift;
+        $label = shift;
+        $intervalValue = shift || 1;
+        $unitsValue = shift || "seconds";
+        $extras = shift;
+        $subtext = shift;
+        tie %units, 'Tie::IxHash';
+	%units = ('seconds'=>WebGUI::International::get(704),
+		'minutes'=>WebGUI::International::get(705),
+		'hours'=>WebGUI::International::get(706),
+		'days'=>WebGUI::International::get(700),
+                'weeks'=>WebGUI::International::get(701),
+                'months'=>WebGUI::International::get(702),
+                'years'=>WebGUI::International::get(703));
+        $output = '<script language="JavaScript">function doNumCheck(field) {
+                var valid = "0123456789"
+                var ok = "yes";
+                var temp;
+                for (var i=0; i<field.value.length; i++) {
+                        temp = "" + field.value.substring(i, i+1);
+                        if (valid.indexOf(temp) == "-1") ok = "no";
+                }
+                if (ok == "no") {
+                        field.value = field.value.substring(0, (field.value.length) - 1);
+                }
+                } </script>';
+        $output .= '<input type="text" name="'.$name.'_interval" value="'.$intervalValue.'"
+                size="3" maxlength="11" onKeyUp="doNumCheck(this.form.'.$name.')" '.$extras.'>';
+        $output .= '<select name="'.$name.'_units">';
+        foreach $key (keys %units) {
+                $output .= '<option value="'.$key.'"';
+                if ($unitsValue eq $key) {
+                	$output .= " selected";
+                }
+                $output .= '>'.$units{$key};
+        }
+        $output .= '</select>';
+        $output .= _subtext($subtext);
+        $output = _tableFormRow($label,$output) unless ($class->{_noTable});
+        $class->{_data} .= $output;
+}
+
+
+#-------------------------------------------------------------------
+
 =head2 new ( [ noTable, action, extras, method, enctype ] )
 
  Constructor.

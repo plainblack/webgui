@@ -99,7 +99,7 @@ sub canEditMessage {
         %message = getMessage($_[1]);
         if (    # is the message owner
 		(
-			(time()-$message{dateOfPost}) < 3600*$_[0]->get("editTimeout") 
+			(time()-$message{dateOfPost}) < $_[0]->get("editTimeout") 
 			&& $message{userId} eq $session{user}{userId}
 			&& !($message{locked})
 		)

@@ -19,13 +19,14 @@ update international set message='Month(s)' where internationalId=702 and langua
 update international set message='Year(s)' where internationalId=703 and languageId=1;
 insert into international values (704,'WebGUI',1,'Second(s)');
 insert into international values (705,'WebGUI',1,'Minute(s)');
-insert into international values (706,'WebGUI',1,'Hours(s)');
+insert into international values (706,'WebGUI',1,'Hour(s)');
 delete from international where namespace='EventsCalendar' and internationalId=10;
 delete from international where namespace='EventsCalendar' and internationalId=11;
 insert into international values (75,'EventsCalendar',1,'Which do you wish to do?');
 insert into international values (76,'EventsCalendar',1,'Delete only this event.');
 insert into international values (77,'EventsCalendar',1,'Delete this event <b>and</b> all of its recurrences.');
 insert into international values (78,'EventsCalendar',1,'Don\'t delete anything, I made a mistake.');
+update wobject set editTimeout=editTimeout*3600;
 
 
 

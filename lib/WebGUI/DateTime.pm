@@ -15,6 +15,7 @@ use Exporter;
 use strict;
 use WebGUI::International;
 use WebGUI::Session;
+use WebGUI::Utility;
 
 our @ISA = qw(Exporter);
 our @EXPORT = qw(&localtime &time &addToTime &addToDate &epochToHuman &epochToSet &humanToEpoch &setToEpoch &monthStartEnd);
@@ -39,7 +40,7 @@ sub addToTime {
 
 #-------------------------------------------------------------------
 sub epochToHuman {
-	my ($offset, $temp, $hour12, $value, $output, @date, %weekday, %month);
+	my ($offset, $temp, $hour12, $value, $output, @date, $day, $month);
 	$offset = $session{user}{timeOffset} || 0;
 	$offset = $offset*3600;
 	$temp = $_[0] || time();
@@ -63,16 +64,16 @@ sub epochToHuman {
 	$output =~ s/\%m/$value/g;
 	$output =~ s/\%M/$date[1]/g;
 	if ($output =~ /\%c/) {
-		%month = getMonthName();
-		$output =~ s/\%c/$month{$date[1]}/g;
+		$month = getMonthName($date[1]);
+		$output =~ s/\%c/$month/g;
 	}
   #---day stuff
 	$value = sprintf("%02d",$date[2]);
 	$output =~ s/\%d/$value/g;
 	$output =~ s/\%D/$date[2]/g;
 	if ($output =~ /\%w/) {
-		%weekday = getDayName();
-		$output =~ s/\%w/$weekday{$date[6]}/g;
+		$day = getDayName($date[6]);
+		$output =~ s/\%w/$day/g;
 	}
   #---hour stuff
 	$hour12 = $date[3];
@@ -175,6 +176,25 @@ sub humanToEpoch {
 } 
 
 #-------------------------------------------------------------------
+sub intervalToSeconds {
+	if ($_[1] eq "years") {
+		return ($_[0]*31536000);
+	} elsif ($_[1] eq "months") {
+		return ($_[0]*2592000);
+        } elsif ($_[1] eq "weeks") {
+                return ($_[0]*604800);
+        } elsif ($_[1] eq "days") {
+                return ($_[0]*86400);
+        } elsif ($_[1] eq "hours") {
+                return ($_[0]*3600);
+        } elsif ($_[1] eq "minutes") {
+                return ($_[0]*60);
+        } else {
+                return $_[0];
+	} 
+}
+
+#-------------------------------------------------------------------
 sub localtime {
 	return Date::Calc::Localtime($_[0]);
 }
@@ -187,6 +207,34 @@ sub monthStartEnd {
 	($year,$month,$day, $hour,$min,$sec) = Date::Calc::Time_to_Date(addToDate($_[0],0,1,0));
 	$end = Date::Calc::Date_to_Time($year,$month,1,0,0,0)-1;
 	return ($start, $end);
+}
+
+#-------------------------------------------------------------------
+sub secondsToInterval {
+	my ($interval, $units);
+	if ($_[0] >= 31536000) {
+		$interval = round($_[0]/31536000);
+		$units = "years";
+	} elsif ($_[0] >= 2592000) {
+                $interval = round($_[0]/2592000);
+                $units = "months";
+	} elsif ($_[0] >= 604800) {
+                $interval = round($_[0]/604800);
+                $units = "weeks";
+	} elsif ($_[0] >= 86400) {
+                $interval = round($_[0]/86400);
+                $units = "days";
+        } elsif ($_[0] >= 3600) {
+                $interval = round($_[0]/3600);
+                $units = "hours";
+        } elsif ($_[0] >= 60) {
+                $interval = round($_[0]/60);
+                $units = "minutes";
+        } else {
+                $interval = $_[0];
+                $units = "seconds";
+	}
+	return ($interval, $units);
 }
 
 #-------------------------------------------------------------------

@@ -80,7 +80,8 @@ sub www_editGroup {
 		$f->readOnly($session{form}{gid},WebGUI::International::get(379));
                 $f->text("groupName",WebGUI::International::get(84),$group{groupName});
                 $f->textarea("description",WebGUI::International::get(85),$group{description});
-                $f->integer("expireAfter",WebGUI::International::get(367),$group{expireAfter});
+                $f->interval("expireAfter",WebGUI::International::get(367), 
+			WebGUI::DateTime::secondsToInterval($group{expireAfter}));
 		if ($session{setting}{useKarma}) {
                 	$f->integer("karmaThreshold",WebGUI::International::get(538),$group{karmaThreshold});
 		} else {
@@ -122,7 +123,9 @@ sub www_editGroupSave {
 			WebGUI::SQL->write("insert into groups (groupId) values ($session{form}{gid})");
 		}
                 WebGUI::SQL->write("update groups set groupName=".quote($session{form}{groupName}).", 
-			description=".quote($session{form}{description}).", expireAfter='$session{form}{expireAfter}',
+			description=".quote($session{form}{description}).", 
+			expireAfter='".WebGUI::DateTime::intervalToSeconds($session{form}{expireAfter_interval},
+			$session{form}{expireAfter_units})."',
 			karmaThreshold='$session{form}{karmaThreshold}'
 			where groupId=".$session{form}{gid});
                 return www_listGroups();
