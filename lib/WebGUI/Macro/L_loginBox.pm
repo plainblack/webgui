@@ -28,7 +28,7 @@ sub process {
         my @param = WebGUI::Macro::getParams($_[0]);
 	my $templateId = $param[2] || 1;
 	my %var;	
-        $var{'user.isVisitor'} = ($session{user}{userId} == 1);
+        $var{'user.isVisitor'} = ($session{user}{userId} eq "1");
 	$var{'customText'} = $param[1];
 	$var{'customText'} =~ s/%(.*?)%/_createURL($1)/ge;
 	$var{'hello.label'} = WebGUI::International::get(48);

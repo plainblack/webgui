@@ -7,6 +7,13 @@ upgrading from one version to the next, or even between multiple
 versions. Be sure to heed the warnings contained herein as they will
 save you many hours of grief.
 
+6.2.8
+--------------------------------------------------------------------
+ * Due to a bug in the theme system, if you created any themes in any
+	6.2.x version prior to 6.2.8 they will need to be deleted and
+	recreated. Otherwise they will export a corrupt theme file.
+
+
 6.2.2
 --------------------------------------------------------------------
  * If you used 6.1.1 for a while, and feel like there's something

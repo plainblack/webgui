@@ -13,6 +13,67 @@
  - WebGUI Operations are now dynamically loaded (Len Kranendonk) 
  - Added <input type="button"> button to Form.pm / HTMLForm.pm (Len Kranendonk)
  - Added a "Cancel" button to each tab form (Len Kranendonk)
+ - bugfix [ 1040341 ] Opera balks on HTMLArea TypeError
+ - bugfix [ 1037364 ] HTMLArea3 breaks ^i macro
+ - bugfix [ 889424 ] htmlArea td background image in expanded mode
+ - bugfix [ 991070 ] 5.5.4 Editor(s) replacing ^ symbol
+ - bugfix [ 1022287 ] WYSIWYG-Editor Add new web link
+ - bugfix [ 1055153 ] Turn Admin ON with SSL and IE.
+
+
+6.2.8
+ - bugfix [ 1056335 ] Cool Menus navigation template seems broken
+ - bugfix [ 1041937 ] List Roots broken
+ - bugfix [ 1053187 ] eq/ne suggestions 6.2.7
+ - bugfix [ 1053003 ] theWg e-egg has a bug
+ - bugfix [ 1044316 ] 6.2.7 (and earlier?) Navigation change-suggestion
+ - bugfix [ 1052133 ] Databaselinks are not recognized (dapperdodo)
+ - bugfix [ 1046683 ] SQLReport doesn't query selected Data Source
+ - bugfix [ 1050133 ] broken link in 6.2.7 create.sql
+ - bugfix [ 1048421 ] TestEnvironment.pl - OS check
+ - bugfix [ 1044174 ] Site map wobject (Vadim Platonov)
+ - bugfix [ 1042680 ] collateralImport.pl --folderId
+ - bugfix [ 1050472 ] A CAUSE OF MANY BUGS (numeric comparisons against Ids)
+ - bugfix [ 1047947 ] collateralimport.pl
+ - bugfix [ 1040025 ] More HashId crashes (Paul Malabad)
+ - bugfix [ 1050282 ] no documentation for "wobject privileges" under add/edit
+   page
+ - bugfix [ 1055396 ] Template switching issue
+ - bugfix [ 1056122 ] 'bthis' is undefined
+ - bugfix [ 1044151 ] Adding new layout template causes JS error
+ - bugfix [ 1039765 ] Edit Page > Layout > Page Template
+ - bugfix [ 1053736 ] USS FAQ questions not updating
+ - bugfix [ 1043679 ] USS summary not updated on edit
+ - bugfix [ 1048484 ] USS ignores "URL Extension" content setting
+ - bugfix [ 1054364 ] Deleted event still visible
+ - bugfix [ 1052863 ] Empty Trash
+ - bugfix [ 1042682 ] op=emptyCollateralFolder
+ - bugfix [ 1056118 ] 2 File Managers on a page produces confusing results.
+ - Added missing POD in WebGUI::HTTP synopsis.
+ - The page URLs are back to being generated as relative (from the document
+   root) URLs once again. This means that you no longer have to specify all
+   your potential site URLs in your WebGUI config file.
+ - bugfix [ 1052613 ] sitename only first works
+ - bugfix [ 1041068 ] Wrong side menu after deleting a template
+ - bugfix [ 1043283 ] Prevent Proxy Caching breaks query string in URLs
+   (6.2.7)
+ - bugfix [ 1048167 ] grouping expiration notifications may not be working
+ - Fixed a bug in the search properties where pages that weren't roots were
+   showing up as roots to be searched.
+ - bugfix [ 1055589 ] "Default search" results show "Nameless root" in bread
+   crumb
+ - bugfix [ 1047157 ] Search wobject returns Profile content excerpts to
+   Visitor
+ - bugfix [ 1048166 ] privileged forums displayed in search
+ - bugfix [ 1040350 ] Calendar with Start and End Month = Current doesn't show
+   cal (Gerald Young)
+ - bugfix [ 1048955 ] all events in calendar moved ahead 1 day
+ - bugfix [ 1043234 ] EventCalendar Current Day Incorrect 6.2.7
+ - Added error handling to USS purge to deal with submissions without pages.
+ - bugfix [ 1037138 ] empty trash not working, Trash.pm
+ - bugfix [ 1053498 ] 6.2.7 gamma
+ - The forum post archive function is now 2700% faster.
+
 
 6.2.7
  - Expanded upon the help for URL extensions.
@@ -44,8 +105,8 @@
  - Added a performance cache to the USS. Our testing indicates most USS' will see
    more than 900% increase in performance.
  - Added a performance cache to the Events Calendar. Our testing indicates
-   that most Events Calendars will see more than 33000% increase in
-   performance. No that's not a typo.
+   that most Events Calendars will see more than 3300% increase in
+   performance. 
  - bugfix [ 1035901 ] Comparision logic based on int ids
  - bugfix [ 1035891 ] DBMS reserved keyword in webgui wsclient table
  - bugfix [ 1035055 ] Forum Karma

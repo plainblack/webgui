@@ -169,9 +169,9 @@ sub getIndexerParams {
 					b.fieldData as publicProfile,
 					'profile' as namespace,
 					1 as pageId,
-					7 as page_groupIdView,
-					7 as wobject_groupIdView,
-					7 as wobject_special_groupIdView
+					2 as page_groupIdView,
+					2 as wobject_groupIdView,
+					2 as wobject_special_groupIdView
 					from userProfileData
 					LEFT join userProfileData b
 						on userProfileData.userId=b.userId 

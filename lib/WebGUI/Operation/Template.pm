@@ -32,7 +32,7 @@ sub _submenu {
         tie %menu, 'Tie::IxHash';
         $menu{WebGUI::URL::page('op=editTemplate&tid=new&namespace='.$session{form}{namespace})} = 
 		WebGUI::International::get(505);
-        if (($session{form}{op} eq "editTemplate" && $session{form}{tid} ne "new") || $session{form}{op} eq "deleteTemplateConfirm") {
+        if ($session{form}{op} eq "editTemplate" && ($session{form}{tid} ne "new" || $session{form}{op} ne "deleteTemplateConfirm")) {
                 $menu{WebGUI::URL::page('op=editTemplate&tid='.$session{form}{tid}.'&namespace='.$session{form}{namespace})} = 
 			WebGUI::International::get(851);
                 $menu{WebGUI::URL::page('op=copyTemplate&tid='.$session{form}{tid}.'&namespace='.$session{form}{namespace})} = 

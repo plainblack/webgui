@@ -259,7 +259,7 @@ A typical hashRef for this function will look like:
 
 Most of the time this will be a:
 
-WebGUI::SQL->quickHashRef("select * from WobjectProxy where wobjectId=$proxiedId");
+WebGUI::SQL->quickHashRef("select * from WobjectProxy where wobjectId=".quote($proxiedId));
 
 =cut
 

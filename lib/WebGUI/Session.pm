@@ -291,7 +291,7 @@ sub open {
 	###----------------------------
 	### operating system specific things
 	$session{os}{name} = $^O;
-	if ($session{os}{name} =~ /^Win/i) {
+	if ($session{os}{name} =~ /Win/) {
 		$session{os}{type} = "Windowsish";
 		$session{os}{slash} = "\\";
 	} else {

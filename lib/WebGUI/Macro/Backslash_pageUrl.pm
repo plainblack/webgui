@@ -16,7 +16,7 @@ use WebGUI::URL;
 
 #-------------------------------------------------------------------
 sub process {
-        return WebGUI::URL::page();
+        return WebGUI::URL::getScriptURL().$session{page}{urlizedTitle}; 
 }
 
 

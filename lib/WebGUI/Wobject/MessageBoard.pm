@@ -85,10 +85,11 @@ sub getIndexerParams {
                                         page.pageId as pageId,
                                         page.groupIdView as page_groupIdView,
                                         wobject.groupIdView as wobject_groupIdView,
-                                        7 as wobject_special_groupIdView
-                                from forumPost, forumThread, MessageBoard_forums, wobject, page
+                                        forum.groupToView as wobject_special_groupIdView
+                                from forum, forumPost, forumThread, MessageBoard_forums, wobject, page
                                 where forumPost.forumThreadId = forumThread.forumThreadId
                                         and forumThread.forumId = MessageBoard_forums.forumId
+					and forumThread.forumId = forum.forumId
                                         and MessageBoard_forums.wobjectId = wobject.wobjectId
                                         and wobject.pageId = page.pageId
                                         and wobject.startDate < $now 

@@ -131,6 +131,7 @@ sub _processWobjectFunctions {
         my ($wobject, $output, $proxyWobjectId, $cmd, $w);        
 	if (exists $session{form}{func} && exists $session{form}{wid}) {                
 		if ($session{form}{func} =~ /^[A-Za-z]+$/) {                        
+			if ($session{form}{wid} =~ /^[A-Za-z0-9\_\-]+$/) { #valid wobject id
 			if ($session{form}{wid} eq "new") {                                
 				$wobject = {wobjectId=>"new",namespace=>$session{form}{namespace},pageId=>$session{page}{pageId}};                        
 			} else {                                
@@ -178,6 +179,9 @@ sub _processWobjectFunctions {
                                        	}
                          	}
                        	}
+			} else {
+				WebGUI::ErrorHandler::security("instanciate a wobject with an invalid wobjectId [".$session{form}{wid}."]");
+			}
                	} else {
                        	WebGUI::ErrorHandler::security("execute an invalid function on wobject "
                                	.$session{form}{wid}.": ".$session{form}{func});
@@ -235,7 +239,7 @@ sub ancestors {
 
 #-------------------------------------------------------------------
 
-=head2 canEdit ( [ pageId ] )
+=head2 canEdit ( [ pageId || pageProperties ] )
         
 Returns a boolean (0|1) value signifying that the user has the required privileges.
         
@@ -243,21 +247,24 @@ Returns a boolean (0|1) value signifying that the user has the required privileg
 
 The unique identifier for the page that you wish to check the privileges on. Defaults to the current page id.
 
+You can alternatively pass a hash reference containing the page's properties. This will save a hit to the database.
+
 =cut
 
 sub canEdit {
 	my $pageId = shift || $session{page}{pageId};
-        my (%page);
-        tie %page, 'Tie::CPHash';
-        if ($pageId ne $session{page}{pageId}) {
-                %page = WebGUI::SQL->quickHash("select ownerId,groupIdEdit from page where pageId=".quote($pageId));
+	my $page;
+	if (ref $pageId eq 'HASH') {
+		$page = $pageId;
+        } elsif ($pageId ne $session{page}{pageId}) {
+                $page = WebGUI::SQL->quickHashRef("select ownerId,groupIdEdit from page where pageId=".quote($pageId));
         } else {
-                %page = %{$session{page}};
+                $page = $session{page};
         }
-        if ($session{user}{userId} eq $page{ownerId}) {
+        if ($session{user}{userId} eq $page->{ownerId}) {
                 return 1;
         } else {
-		return WebGUI::Grouping::isInGroup($page{groupIdEdit});
+		return WebGUI::Grouping::isInGroup($page->{groupIdEdit});
         }
 }       
 
@@ -325,7 +332,7 @@ sub canMoveUp {
 
 #-------------------------------------------------------------------
 
-=head2 canView ( [ pageId ] )
+=head2 canView ( [ pageId || $pageProperties ] )
 
 Returns a boolean (0|1) value signifying that the user has the required privileges. Always returns users that have the rights to edit this page.
 
@@ -333,23 +340,26 @@ Returns a boolean (0|1) value signifying that the user has the required privileg
 
 The unique identifier for the page that you wish to check the privileges on. Defaults to the current page id.
 
+You can alternatively pass a hash reference of page properties. This will eliminate a hit to the database.
+
 =cut
 
 sub canView {
 	my $pageId = shift || $session{page}{pageId};
-        my %page;
-        tie %page, 'Tie::CPHash';
-        if ($pageId eq $session{page}{pageId}) {
-                %page = %{$session{page}};
+	my $page;
+	if (ref $pageId eq 'HASH') {
+		$page = $pageId;
+	} elsif ($pageId eq $session{page}{pageId}) {
+                $page = $session{page};
         } else {
-                %page = WebGUI::SQL->quickHash("select ownerId,groupIdView,startDate,endDate from page where pageId=".quote($pageId),WebGUI::SQL->getSlave);
+                $page = WebGUI::SQL->quickHashRef("select ownerId,groupIdEdit,groupIdView,startDate,endDate from page where pageId=".quote($pageId),WebGUI::SQL->getSlave);
         }
-        if ($session{user}{userId} eq $page{ownerId}) {
+        if ($session{user}{userId} eq $page->{ownerId}) {
                 return 1;
-        } elsif ($page{startDate} < WebGUI::DateTime::time() && $page{endDate} > WebGUI::DateTime::time() && WebGUI::Grouping::isInGroup($page{groupIdView})) {
+        } elsif ($page->{startDate} < WebGUI::DateTime::time() && $page->{endDate} > WebGUI::DateTime::time() && WebGUI::Grouping::isInGroup($page->{groupIdView})) {
                 return 1;
         } else {
-		return canEdit($pageId);
+		return canEdit($page);
         }
 }
 
@@ -1562,13 +1572,11 @@ sub traversePreOrder {
 	
 	@pages = $self->self_and_descendants;
 	# The 'ueber'-root contains no data so we do not want to return i!
-	shift @pages if ($pages[0]->{'pageId'} eq 0);
-	
+	shift @pages if ($pages[0]->{'pageId'} eq '0');
 	foreach (@pages) {
 		$page = WebGUI::Page->new($_->{'pageId'});
 		&$mappingFunction($page, {_depth=>$page->get('depth')});
 	}
-
 	return @pages;
 }
 

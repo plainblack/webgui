@@ -287,7 +287,7 @@ sub www_view {
       $var{content} = "<b>Getting <a href='$proxiedUrl'>$proxiedUrl</a> failed</b>".
    	      "<p><i>GET status line: ".$response->status_line."</i>";
    }
-   if ($session{user}{userId} == 1) {
+   if ($session{user}{userId} eq '1') {
       $ttl = $session{page}{cacheTimeoutVisitor};
       } else {
           $ttl = $session{page}{cacheTimeout};

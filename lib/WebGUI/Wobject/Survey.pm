@@ -1050,7 +1050,7 @@ sub www_viewStatisticalOverview {
 	$var->{title} = WebGUI::International::get(58,$self->get("namespace"));
 	my $p = WebGUI::Paginator->new(WebGUI::URL::page('func=viewStatisticalOverview&wid='.$self->get("wobjectId")));
 	$p->setDataByQuery("select Survey_questionId,question,answerFieldType,allowComment from Survey_question 
-		where Survey_id=".$self->get("Survey_id")." order by sequenceNumber");
+		where Survey_id=".quote($self->get("Survey_id"))." order by sequenceNumber");
 	my $questions = $p->getPageData;
 	my @questionloop;
 	$var->{'answer.label'} = WebGUI::International::get(19,$self->get("namespace"));

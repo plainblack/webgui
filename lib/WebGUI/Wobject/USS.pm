@@ -227,7 +227,12 @@ sub purge {
 			$forum->purge;
 		}
 		my $page  = WebGUI::Page->new($pageId);
-		$page->purge;
+		if (defined $page) {
+                        $page->purge;
+                } else {
+                        WebGUI::ErrorHandler::warn("Submission ".$submissionId."
+ of USS ".$_[0]->get("USS_id")." didn't have real page attached to it. This could be a minor problem caused by a bug of old, or it could indicate major data corruption issues.");
+                }
 	}
 	$sth->finish;
         WebGUI::SQL->write("delete from USS_submission where USS_id=".quote($_[0]->get("USS_id")));
@@ -266,7 +271,7 @@ sub www_approveSubmission {
 		WebGUI::MessageLog::addInternationalizedEntry($submission{userId},'',WebGUI::URL::page('func=viewSubmission&wid='.
 			$session{form}{wid}.'&sid='.$session{form}{sid}),4,$self->get("namespace"));
 		WebGUI::MessageLog::completeEntry($session{form}{mlog});
-		$self->deleteCachedSubmission;
+		$self->deleteCachedSubmission($session{form}{sid});
                 return WebGUI::Operation::www_viewMessageLog();
         } else {
                 return WebGUI::Privilege::insufficient();
@@ -288,7 +293,7 @@ sub www_deleteFile {
 			$session{form}{file}=>'',
 		 	USS_submissionId=>$session{form}{sid}
 			},0,0);
-		$self->deleteCachedSubmission;
+		$self->deleteCachedSubmission($session{form}{sid});
                 return $self->www_editSubmission();
         } else {
                 return WebGUI::Privilege::insufficient();
@@ -319,7 +324,7 @@ sub www_deleteSubmissionConfirm {
 		}
 		my $page = WebGUI::Page->new($pageId);
 		$page->purge;
-		$self->deleteCachedSubmission;
+		$self->deleteCachedSubmission($session{form}{sid});
 		$self->deleteCollateral("USS_submission","USS_submissionId",$session{form}{sid});
 		my $file = WebGUI::Attachment->new("",$session{form}{wid},$session{form}{sid});
 		$file->deleteNode;
@@ -340,7 +345,7 @@ sub www_denySubmission {
                 WebGUI::MessageLog::addInternationalizedEntry($submission{userId},'',WebGUI::URL::page('func=viewSubmission&wid='.
 			$session{form}{wid}.'&sid='.$session{form}{sid}),5,$self->get("namespace"));
                 WebGUI::MessageLog::completeEntry($session{form}{mlog});
-		$self->deleteCachedSubmission;
+		$self->deleteCachedSubmission($session{form}{sid});
                 return WebGUI::Operation::www_viewMessageLog();
         } else {
                 return WebGUI::Privilege::insufficient();
@@ -656,6 +661,7 @@ sub www_editSubmissionSave {
                 	$pageVars{subroutinePackage} = "WebGUI::Wobject::USS";
                 	$pageVars{subroutineParams} = "{wobjectId=>'".$_[0]->wid."',submissionId=>'".$session{form}{sid}."'}";
                 	$pageVars{urlizedTitle} .= "/".$_[0]->get("title")."/".$session{form}{title};
+ 			$pageVars{urlizedTitle} .= ".".$session{setting}{urlExtension} unless ($pageVars{urlizedTitle} =~ /\./ && $session{setting}{urlExtension} ne "");
                 	$pageVars{urlizedTitle} = WebGUI::Page::makeUnique(WebGUI::URL::urlize($pageVars{urlizedTitle},-999));
                 	$newPage->set(\%pageVars);
 			%hash = ();
@@ -693,7 +699,7 @@ sub www_editSubmissionSave {
 		my $page = WebGUI::Page->new($submission->{pageId});
                	$page->set(\%pageVars);
 		$_[0]->setCollateral("USS_submission", "USS_submissionId", \%hash, 1, 0, "USS_id", $_[0]->get("USS_id"));
-		$_[0]->deleteCachedSubmission;
+		$_[0]->deleteCachedSubmission($hash{USS_submissionId});
                 return $_[0]->www_viewSubmission();
         } else {
                 return WebGUI::Privilege::insufficient();

@@ -131,7 +131,7 @@ sub new {
 
 #-------------------------------------------------------------------
 sub purge {
-        WebGUI::SQL->write("delete from EventsCalendar_event where wobjectId=".$_[0]->get("wobjectId"));
+        WebGUI::SQL->write("delete from EventsCalendar_event where wobjectId=".quote($_[0]->get("wobjectId")));
 	$_[0]->SUPER::purge();
 }
 
@@ -160,6 +160,7 @@ sub www_deleteEventConfirm {
 	} else {
 		$_[0]->deleteCollateral("EventsCalendar_event","EventsCalendar_eventId",$session{form}{eid});
 	}
+	$_[0]->deleteCache;
         return "";
 }
 
@@ -318,7 +319,6 @@ sub www_editEvent {
 #-------------------------------------------------------------------
 sub www_editEventSave {
 	return WebGUI::Privilege::insufficient() unless ($_[0]->canEdit);
-	$_[0]->deleteCache;
 	my (@startDate, @endDate, $until, @eventId, $i, $recurringEventId);
         $startDate[0] = WebGUI::FormProcessor::dateTime("startDate");
 	$startDate[0] = time() unless ($startDate[0] > 0);
@@ -367,6 +367,7 @@ sub www_editEventSave {
 			description=".quote($session{form}{description}).", startDate=".$startDate[0].", 
 			endDate=".$endDate[0]." where EventsCalendar_eventId=".quote($session{form}{eid}));
 	}
+	$_[0]->deleteCache;
 	if ($session{form}{proceed} eq "addEvent") {
 		$session{form}{eid} = "new";
 		return $_[0]->www_editEvent;
@@ -408,6 +409,8 @@ sub www_view {
 		$maxDate = WebGUI::DateTime::addToDate($minDate,0,6,0); 
 	} elsif ($_[0]->get("endMonth") eq "after3") {
 		$maxDate = WebGUI::DateTime::addToDate($minDate,0,3,0); 
+	} elsif ($_[0]->get("endMonth") eq "current") { # a hack that we need to get the default month to be end month. probably a better way to do it
+                $maxDate = WebGUI::DateTime::addToDate($minDate,0,1,0);
 	}
 
 	$maxDate = $maxDate || WebGUI::DateTime::time();
@@ -423,6 +426,7 @@ sub www_view {
 			$session{form}{calPn} = 1;
 		}
 	}
+	my @now = WebGUI::DateTime::epochToArray(WebGUI::DateTime::time());
 	for (my $i=1;$i<$monthCount;$i++) {
 			my $thisMonth = WebGUI::DateTime::addToDate($minDate,0,($i-1),0);
 			my ($monthStart, $monthEnd) = WebGUI::DateTime::monthStartEnd($thisMonth);
@@ -494,9 +498,7 @@ sub www_view {
 					day=>$dayCounter,
 					isStartOfWeek=>($dayOfWeekCounter==1),
 					isEndOfWeek=>($dayOfWeekCounter==7),
-					isToday=>(WebGUI::DateTime::getDaysInInterval(
-						WebGUI::DateTime::setToEpoch($date[0]."-".$date[1]."-".$dayCounter),
-						WebGUI::DateTime::time()) == 0),
+					isToday=>($date[0]."-".$date[1]."-".$dayCounter eq $now[0]."-".$now[1]."-".$now[2]),
 					event_loop=>\@{$events{$dayCounter}},
 					url=>$events{$dayCounter}->[0]->{url}
 					});

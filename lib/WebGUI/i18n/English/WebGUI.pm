@@ -469,11 +469,6 @@ The URL of the web site for this theme's designer. If you are in the business of
 		lastUpdated => 1050264990
 	},
 
-	'495' => {
-		message => q|htmlArea (Internet Explorer 5.5+)|,
-		lastUpdated => 1044704928
-	},
-
 	'859' => {
 		message => q|Signature|,
 		lastUpdated => 1043879866
@@ -555,7 +550,7 @@ The URL of the web site for this theme's designer. If you are in the business of
 	},
 
 	'49' => {
-		message => q|Click <a href="^\;?op=logout">here</a> to log out.|,
+		message => q|Click here to log out.|,
 		lastUpdated => 1031514049
 	},
 
@@ -2132,7 +2127,7 @@ Displays a small text message to the user if they belong to the specified group.
 <i>Example:</i> &#94;GroupText("Visitors","You need an account to do anything cool on this site!","We value our registered users!");
 <p>
 <b>&#94;L; or &#94;L(); - Login Box</b><br>
-A small login form. This macro takes up to three parameters.  The first is used to set the width of the login box: &#94;L(20);. The second sets the message displayed after the user is logged in: &#94;L(20,"Hi &#94;a(&#94;@;);. Click %here% if you wanna log out!");.  Text between percent signs (%) is replaced by a link to the logout operation.  The third parameter is the name of a template in the Macro/L_loginBox namespace to replace the default template.  The variables below are
+A small login form. This macro takes up to three parameters.  The first is used to set the width of the login box: &#94;L(20);. The second sets the message displayed after the user is logged in: &#94;L(20,"Hi &#94;a(&#94;@;);. Click %here% if you wanna log out!");.  Text between percent signs (%) is replaced by a link to the logout operation.  The third parameter is the ID of a template in the Macro/L_loginBox namespace to replace the default template.  The variables below are
 available in the template.  Not all of them are required, but variables that will cause the macro to output code that doesn't function properly (like not actually log someone in) are marked with an asterisk '*'
 <p/>
 <b>user.isVisitor</b><br/>
@@ -2474,13 +2469,17 @@ Choose which group can view this page. If you want both visitors and registered 
 Choose the group that can edit this page. The group assigned editing rights can also always view the page.
 <p>
 
+<b>Wobject privileges?</b><br>
+Allows content managers to specify view/edit privileges on a per wobject basis rather than relying on the privileges on the page.
+<p>
+
 You can optionally recursively give these privileges to all pages under this page.
 <p>
 
 <b>What next?</b><br/>
 If you leave this on the default setting you'll be redirected to the new page after creating it.
 <p/>|,
-		lastUpdated => 1096433872
+		lastUpdated =>  1099004008
 	},
 
 	'60' => {
@@ -2827,11 +2826,6 @@ Select which host to use by default when generating URLs. Config Sitename will u
 	'7' => {
 		message => q|Manage users.|,
 		lastUpdated => 1031514049
-	},
-
-	'887' => {
-		message => q|Midas (Mozilla 1.3+)|,
-		lastUpdated => 1047342950
 	},
 
 	'26' => {
@@ -6533,11 +6527,6 @@ Create your template by using template commands and variables, macros, and HTML.
 		lastUpdated => 1031514049
 	},
 
-	'494' => {
-		message => q|RealObjects edit-on Pro 2.x|,
-		lastUpdated => 1044704984
-	},
-
 	'873' => {
 		message => q|Subscribe to thread|,
 		lastUpdated => 1065876827
@@ -7442,8 +7431,8 @@ config file.</p>
 		lastUpdated =>1092748557,
 		context => q|Label for Forum Settings|
 	},
-	'HTMLArea 3' => {
-                message => q|HTMLArea 3 (IE, mozilla)|,
+	'tinymce' => {
+                message => q|TinyMCE (IE, mozilla)|,
                 lastUpdated =>1092748557,
                 context => q|option for Rich Editor in profile|
         },

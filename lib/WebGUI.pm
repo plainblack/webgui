@@ -151,7 +151,11 @@ sub page {
 		}
 	}
 	WebGUI::Affiliate::grabReferral();	# process affilliate tracking request
-       	$output = WebGUI::HTTP::getHeader().$output;
+	if (WebGUI::HTTP::isRedirect() && !$useExistingSession) {
+                $output = WebGUI::HTTP::getHeader();
+        } else {
+                $output = WebGUI::HTTP::getHeader().$output;
+        }
 	# This allows an operation or wobject to write directly to the browser.
 	$output = undef if ($session{page}{empty});
 	WebGUI::Session::close() unless ($useExistingSession);

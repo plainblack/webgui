@@ -30,16 +30,19 @@ This package allows the manipulation of HTTP protocol information.
 
 =head1 SYNOPSIS
 
-use WebGUI::HTTP;
- $header = WebGUI::HTTP::getHeader();
- WebGUI::HTTP::setRedirect($url);
- WebGUI::HTTP::setCookie($name,$value);
- WebGUI::HTTP::setNoHeader($bool);
+ use WebGUI::HTTP;
 
+ $header = WebGUI::HTTP::getHeader();
  $mimetype = WebGUI::HTTP::getMimeType();
  $code = WebGUI::HTTP::getStatus();
  $boolean = WebGUI::HTTP::isRedirect();
  
+ WebGUI::HTTP::setCookie($name,$value);
+ WebGUI::HTTP::setFilename($filename,$mimetype);
+ WebGUI::HTTP::setMimeType($mimetype);
+ WebGUI::HTTP::setNoHeader($bool);
+ WebGUI::HTTP::setRedirect($url);
+
 =head1 METHODS
 
 These subroutines are available from this package:

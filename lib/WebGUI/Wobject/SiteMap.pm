@@ -49,8 +49,8 @@ sub _traversePageTree {
 					"page.title" => $data->{title},
 					"page.menuTitle" => $data->{menuTitle},
 					"page.synopsis" => $data->{synopsis},
-					"page.isRoot" => ($parent eq '0'),
-					"page.isTop" => ($currentDepth == 0 || ($currentDepth == 1 && $parent eq '0'))
+					"page.isRoot" => ($parent eq "0"),
+					"page.isTop" => ($currentDepth == 0 || ($currentDepth == 1 && $parent eq "0"))
 					});
                                 push(@pages,@{_traversePageTree($data->{pageId},($currentDepth+1),$depth,$indent,$alphabetic)});
                         }

@@ -122,7 +122,7 @@ sub disconnect {
 	$class = shift;
 	$value = shift;
 	if (defined $class->{_dbh}) {
-		$class->{_dbh}->disconnect() unless ($class->{_databaseLink}{databaseLinkId} == 0);
+		$class->{_dbh}->disconnect() unless ($class->{_databaseLink}{databaseLinkId} eq "0");
 	}
 }
 
@@ -146,7 +146,7 @@ sub dbh {
 	$dsn = $class->{_databaseLink}{DSN};
 	$username = $class->{_databaseLink}{username};
 	$identifier = $class->{_databaseLink}{identifier};
-	if ($class->{_databaseLinkId} == 0) {
+	if ($class->{_databaseLinkId} eq "0") {
 		$class->{_dbh} = $session{dbh};
 		return $session{dbh};
 	} elsif ($dsn =~ /\DBI\:\w+\:\w+/i) {
@@ -182,9 +182,9 @@ sub new {
     $class = shift;
 	$databaseLinkId = shift;
 	unless ($databaseLinkId eq "") {
-		if ($databaseLinkId == 0) {
+		if ($databaseLinkId eq "0") {
 			%databaseLink = (
-				databaseLinkId=>0,
+				databaseLinkId=>"0",
 				DSN=>$session{config}{dsn},
 				username=>$session{config}{dbuser},
 				identifier=>$session{config}{dpass},

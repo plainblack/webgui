@@ -29,7 +29,7 @@ print "\nWebGUI is checking your system environment:\n\n";
 my ($os, $prereq, $dbi, $dbDrivers);
 $prereq = 1;
 
-if ($^O =~ /^Win/i) {
+if ($^O =~ /Win/) {
 	$os = "Windowsish";
 } else {
 	$os = "Linuxish";

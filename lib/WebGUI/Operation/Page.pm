@@ -107,8 +107,14 @@ sub _selectPositions {
 		-afterEdit=>'op=editPage&amp;npp='.$session{form}{npp},
                 -extras=>'onChange="changeTemplatePreview(this.form.templateId.value)"'
                 );
-        $output = '
-        <script language="JavaScript">
+	my $headtags =  '
+        	<script language="JavaScript">
+		var b_templates = new Array();
+		';
+        foreach $key (keys %{$templates}) {
+                $headtags .= "    b_templates['".$key."'] = '".WebGUI::Page::drawTemplate($key)."';\n";
+        }	
+	$headtags .= '
         function checkBrowserVersion(){
                 this.ver=navigator.appVersion;
                 this.dom=document.getElementById?1:0;
@@ -140,22 +146,20 @@ sub _selectPositions {
                         this.writeref.innerHTML=text;
                 }
         }
-        function init(){
+        function inittemplatechanger(){
                 if(pbw.bw){
                         oMessage=new makeChangeTextObj("templatePreview");
                         oMessage.css.visibility="visible";
                         changeTemplatePreview(\''.$_[0].'\');
                 }
         }
-        onload=init
         function changeTemplatePreview(value) {
-                oMessage.writeIt(eval("b"+value));
+                oMessage.writeIt(b_templates[value]);
         }
+        onload=inittemplatechanger
         ';
-        foreach $key (keys %{$templates}) {
-                $output .= "    var b".$key." = '".WebGUI::Page::drawTemplate($key)."';\n";
-        }
-        $output .= '</script>';
+        $headtags .= '</script>';
+	WebGUI::Style::setRawHeadTags($headtags);
         $output .= $f->printRowsOnly;
         $output .= '<div id="templatePreview" style="padding: 5px;"></div>';
         return $output;
@@ -308,7 +312,7 @@ sub www_editPage {
 		$f = WebGUI::TabForm->new(\%tabs);
 		if ($session{form}{npp} ne "") {
 			my $buildFromPage = $session{form}{npp};
-			if ($buildFromPage == 0) {
+			if ($buildFromPage eq "0") {
 				$buildFromPage = $session{setting}{defaultPage};
 			}
 			%page = WebGUI::SQL->quickHash("select * from page where pageId=".quote($buildFromPage));
@@ -874,6 +878,38 @@ sub www_pastePage {
 }
 
 #-------------------------------------------------------------------
+sub www_richEditPageTree {
+	my (%var,@bad);
+	my $namelessroot = WebGUI::Page->new('0');
+	foreach my $page ($namelessroot->descendants) {
+		my $skipBadPage = 0;
+		foreach my $badPage (@bad) {
+			if ($page->{nestedSetLeft} > $badPage->{nestedSetLeft} && $page->{nestedSetRight} < $badPage->{nestedSetRight}) {
+				$skipBadPage = 1;
+			}	
+		}
+		next if ($skipBadPage); # descendant of a page we threw out
+		if ($page->{isSystem}) {
+			push(@bad,$page);
+			next; # throw out system pages
+		}
+		unless (WebGUI::Page::canView($page)) {
+			push(@bad,$page); 
+			next; # throw out pages we can't view
+		}
+		push(@{$var{page_loop}},{
+			id=>$page->{pageId},
+			url=>$page->{urlizedTitle},
+			indent=>"&nbsp;&nbsp;&nbsp;" x $page->{depth},
+			title=>$page->{title}
+			});
+	}
+	$session{page}{useEmptyStyle} = 1;
+	return WebGUI::Template::process(1,"richEditor/pagetree",\%var);
+}
+
+
+#-------------------------------------------------------------------
 sub www_rearrangeWobjects {
 	return WebGUI::Privilege::insufficient() unless (WebGUI::Page::canEdit($session{page}{pageId}));
 	$session{page}{styleId} = 2;
@@ -904,6 +940,7 @@ Returns a HTML formatted indented pagetree complete with edit/delete/cut/move bu
 
 =cut
 sub www_viewPageTree {
+	return WebGUI::Privilege::insufficient() unless (WebGUI::Grouping::isInGroup(4));
 	my ($output);
 	$session{page}{useAdminStyle} = 1;
 	$output = '<h1>'.WebGUI::International::get(448).'</h1>';

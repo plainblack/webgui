@@ -83,7 +83,7 @@ sub www_viewLoginHistory {
         $output = '<h1>'.WebGUI::International::get(426).'</h1>';
 	$sth = WebGUI::SQL->read("select * from users,userLoginLog where users.userId=userLoginLog.userId order by userLoginLog.timeStamp desc");	
 	while (%data = $sth->hash) {
-		$data{username} = 'unknown user' if ($data{userId} == 0);
+		$data{username} = 'unknown user' if ($data{userId} eq "0");
 		$row[$i] = '<tr class="tableData"><td>'.$data{username}.' ('.$data{userId}.')</td>';
 		$row[$i] .= '<td>'.$data{status}.'</td>';
 		$row[$i] .= '<td>'.epochToHuman($data{timeStamp},"%H:%n%p %M/%D/%y").'</td>';

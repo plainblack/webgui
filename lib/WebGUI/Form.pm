@@ -982,7 +982,7 @@ sub HTMLArea {
 	$var{"classic.supported"} = ($browser->ie && $browser->version >= 5);
  
 	# Textarea field
-        $rows = $_[0]->{rows} || ($session{setting}{textAreaRows}+7);
+        $rows = $_[0]->{rows} || ($session{setting}{textAreaRows}+15);
         $columns = $_[0]->{columns} || ($session{setting}{textAreaCols}+5);
         $var{textarea} = textarea({
                 name=>$_[0]->{name},

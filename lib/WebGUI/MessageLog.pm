@@ -121,6 +121,9 @@ sub addEntry {
 	$subject = $_[2];
 	$message = $_[3];
 	$url = $_[4];
+	unless ($url =~ /^http/) {
+		$url = WebGUI::URL::getSiteURL().$url;
+	}
 	$status = $_[5];
 	$from = $_[6];
 	if ($groupId ne "") {
@@ -183,6 +186,9 @@ sub addInternationalizedEntry {
 	$userId = $_[0];
 	$groupId = $_[1];
 	$url = $_[2];
+	unless ($url =~ /^http/) {
+		$url = WebGUI::URL::getSiteURL().$url;
+	}
 	$internationalId = $_[3];
         $namespace = $_[4] || "WebGUI";
 	$status = $_[5] || 'notice';

@@ -119,7 +119,7 @@ Name value pairs to add to the URL in the form of:
 =cut
 
 sub gateway {
-        my $url = getSiteURL().$_[0];
+        my $url = getScriptURL().$_[0];
 	if ($_[1]) {
 		$url = append($url,$_[1]);
 	}
@@ -165,9 +165,28 @@ sub setSiteURL {
 
 #-------------------------------------------------------------------
 
+=head2 getScriptURL {
+
+Returns the URL for the gateway script.
+
+=cut
+
+sub getScriptURL {
+	my $scripturl;
+	if (exists $session{config}{scripturl}) {
+        	$scripturl = $session{config}{scripturl};
+	} else {
+		$scripturl = $session{env}{SCRIPT_NAME};
+	}
+	$scripturl .= '/';
+	return $scripturl;
+}
+
+#-------------------------------------------------------------------
+
 =head2 getSiteURL ( )
 
-Returns a constructed site url from protocol to gateway. The returned
+Returns a constructed site url. The returned
 value can be overridden using the setSiteURL function.
 
 =cut
@@ -190,14 +209,7 @@ sub getSiteURL {
         if ($session{env}{SERVER_PORT} == 443) {
                 $proto = "https://";
         }
-	my $scripturl;
-	if (exists $session{config}{scripturl}) {
-        	$scripturl .= $session{config}{scripturl};
-	} else {
-		$scripturl .= $session{env}{SCRIPT_NAME};
-	}
-	$scripturl .= '/';
-        return $proto.$site.$scripturl;
+        return $proto.$site;
 }
 
 
@@ -242,7 +254,7 @@ Name value pairs to add to the URL in the form of:
 =cut
 
 sub page {
-	my $url = getSiteURL().$session{page}{urlizedTitle};
+	my $url = getScriptURL().$session{page}{urlizedTitle};
 	if ($_[0]) {
 		$url = append($url,$_[0]);
 	}

@@ -131,6 +131,7 @@ sub www_editNavigation {
 	my $f = WebGUI::TabForm->new(\%tabs);
 	$f->hidden({name=>'op', value=>'editNavigationSave'});
 	$f->hidden({name=>'navigationId', value=>$config->{navigationId}});
+ 	$f->getTab("properties")->raw('<input type="hidden" name="op2" value="'.$session{form}{afterEdit}.'" />');
 	$f->getTab("properties")->readOnly(
 		-value=>$config->{navigationId},
                 -label=>'navigationId'
@@ -274,7 +275,7 @@ sub www_editNavigationSave {
 	# Delete from cache
 	
 	WebGUI::Page->recacheNavigation;
-	return www_listNavigation();  
+	return "";  
 }
 
 #-------------------------------------------------------------------
@@ -287,7 +288,7 @@ sub www_listNavigation {
 	while (my %data = $sth->hash) {
 		$row[$i].= '<tr><td valign="top" class="tableData">'
 			.deleteIcon('op=deleteNavigation&identifier='.$data{identifier}.'&navigationId='.$data{navigationId})
-			.editIcon('op=editNavigation&identifier='.$data{identifier}.'&navigationId='.$data{navigationId})
+			.editIcon('op=editNavigation&identifier='.$data{identifier}.'&navigationId='.$data{navigationId}."&afterEdit=".WebGUI::URL::escape("op=listNavigation"))
 			.copyIcon('op=copyNavigation&identifier='.$data{identifier}.'&navigationId='.$data{navigationId})
 			.'</td>';
 		$row[$i].= '<td valign="top" class="tableData">'.$data{identifier}.'</td>';

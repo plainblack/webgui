@@ -346,7 +346,7 @@ sub www_view {
         $var{"dateColumn.url"} = $_[0]->_sortByColumn("dateUploaded",$url);
 	$session{form}{sort} = "sequenceNumber" if ($session{form}{sort} eq "");
 	$var{"search.form"} = WebGUI::Search::form({wid=>$_[0]->get("wobjectId"),func=>"view"});
-	$var{"search.url"} = WebGUI::Search::toggleURL();
+	$var{"search.url"} = WebGUI::Search::toggleURL("wid=".$_[0]->get("wobjectId")."&func=view");
 	$var{"search.label"} = WebGUI::International::get(364);
         $var{"addfile.url"} = WebGUI::URL::page('func=editDownload&did=new&wid='.$_[0]->get("wobjectId"));
         $var{"addfile.label"} = WebGUI::International::get(11,$_[0]->get("namespace"));
