@@ -70,6 +70,9 @@ sub registrationForm {
 
 #-------------------------------------------------------------------
 sub registrationFormSave {
+	my $authInfo = "\n\n".WebGUI::International::get(50).": ".$session{form}{"authWebGUI.username"}."\n"
+        	.WebGUI::International::get(51).": ".$session{form}{'authWebGUI.identifier'}."\n\n";
+        WebGUI::MessageLog::addEntry($_[0],"",WebGUI::International::get(870),$session{setting}{welcomeMessage}.$authInfo);
 	adminFormSave($_[0]);
 }
 
@@ -99,7 +102,20 @@ sub registrationFormValidate {
 
 #-------------------------------------------------------------------
 sub settingsForm {
-	return "";
+	my $f = WebGUI::HTMLForm->new;
+	$f->readOnly('<b>'.optionsLabel().'</b>');
+	$f->yesNo(
+                -name=>"sendWelcomeMessage",
+                -value=>$session{setting}{sendWelcomeMessage},
+                -label=>WebGUI::International::get(868)
+                );
+        $f->textarea(
+                -name=>"welcomeMessage",
+                -value=>$session{setting}{welcomeMessage},
+                -label=>WebGUI::International::get(869)
+                );
+        $f->textarea("recoverPasswordEmail",WebGUI::International::get(134),$session{setting}{recoverPasswordEmail});
+	return $f->printRowsOnly;
 }
 
 #-------------------------------------------------------------------

@@ -185,7 +185,6 @@ sub www_createAccountSave {
 		}
                 WebGUI::Session::start($u->userId);
 		_logLogin($u->userId,"success");
-		WebGUI::MessageLog::addEntry($u->userId,"",WebGUI::International::get(870),$session{setting}{welcomeMessage});
 		system(WebGUI::Macro::process($session{setting}{runOnRegistration})) if ($session{setting}{runOnRegistration} ne "");
 		WebGUI::MessageLog::addInternationalizedEntry('',$session{setting}{onNewUserAlertGroup},'',536) if ($session{setting}{alertOnNewUser});
         } else {

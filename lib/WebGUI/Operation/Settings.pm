@@ -49,9 +49,9 @@ sub www_editUserSettings {
         $f->yesNo("useKarma",WebGUI::International::get(539),$session{setting}{useKarma});
         $f->integer("karmaPerLogin",WebGUI::International::get(540),$session{setting}{karmaPerLogin});
         $f->interval("sessionTimeout",WebGUI::International::get(142),WebGUI::DateTime::secondsToInterval($session{setting}{sessionTimeout}));
-        $f->select("authMethod",$session{authentication},WebGUI::International::get(119),[$session{setting}{authMethod}]);
         #$f->yesNo("usernameBinding",WebGUI::International::get(306),$session{setting}{usernameBinding});
 	$f->yesNo("selfDeactivation","Allow users to deactivate their account",$session{setting}{selfDeactivation});
+        $f->select("authMethod",$session{authentication},WebGUI::International::get(119),[$session{setting}{authMethod}]);
 	foreach (keys %{$session{authentication}}) {
 		$f->raw(WebGUI::Authentication::settingsForm($_));
  	}
@@ -115,17 +115,6 @@ sub www_editMessagingSettings {
 	$f = WebGUI::HTMLForm->new;
         $f->hidden("op","saveSettings");
         $f->text("smtpServer",WebGUI::International::get(135),$session{setting}{smtpServer});
-	$f->yesNo(
-		-name=>"sendWelcomeMessage",
-		-value=>$session{setting}{sendWelcomeMessage},
-		-label=>WebGUI::International::get(868)
-		);
-	$f->textarea(
-		-name=>"welcomeMessage",
-		-value=>$session{setting}{welcomeMessage},
-		-label=>WebGUI::International::get(869)
-		);
-        $f->textarea("recoverPasswordEmail",WebGUI::International::get(134),$session{setting}{recoverPasswordEmail});
         $f->textarea("mailFooter",WebGUI::International::get(824),$session{setting}{mailFooter});
         $f->yesNo("alertOnNewUser",WebGUI::International::get(534),$session{setting}{alertOnNewUser});
         $f->group("onNewUserAlertGroup",WebGUI::International::get(535),[$session{setting}{onNewUserAlertGroup}]);
