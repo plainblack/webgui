@@ -39,7 +39,8 @@ sub _getPageInfo {
 	($pageId) = $_[0];
 	if ($pageId eq "") {
 		$pageName = lc($ENV{PATH_INFO});
-		$pageName =~ s/\///g;
+		#$pageName =~ s/\///g;
+		$pageName =~ s/\///;
 		$pageName =~ s/\'//;
 		$pageName =~ s/\"//;
 		if ($pageName ne "") {
