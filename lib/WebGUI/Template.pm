@@ -80,6 +80,7 @@ sub process {
 	$html = $_[0];
 	$t = HTML::Template->new(
    		scalarref=>\$html,
+		global_vars=>1,
    		loop_context_vars=>1,
 		die_on_bad_params=>0,
 		strict=>0
