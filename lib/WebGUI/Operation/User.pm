@@ -151,7 +151,7 @@ sub getUserSearchForm {
 
 #-------------------------------------------------------------------
 sub www_becomeUser {
-	return WebGUI::AdminConsole->new("users")->render(WebGUI::Privilege::adminOnly()) unless (WebGUI::Grouping::isInGroup(3));
+	return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
         WebGUI::Session::end($session{var}{sessionId});
 	WebGUI::Session::start($session{form}{uid});
 	return "";
@@ -159,7 +159,7 @@ sub www_becomeUser {
 
 #-------------------------------------------------------------------
 sub www_deleteGrouping {
-	return WebGUI::AdminConsole->new("users")->render(WebGUI::Privilege::adminOnly()) unless (WebGUI::Grouping::isInGroup(3));
+	return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
 	if (($session{user}{userId} eq $session{form}{uid} || $session{form}{uid} eq '3') && $session{form}{gid} eq '3') {
 		return _submenu(WebGUI::Privilege::vitalComponent());
         }
@@ -178,7 +178,7 @@ sub www_deleteGrouping {
 #-------------------------------------------------------------------
 sub www_deleteUser {
         my ($output);
-	return WebGUI::AdminConsole->new("users")->render(WebGUI::Privilege::adminOnly()) unless (WebGUI::Grouping::isInGroup(3));
+	return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
         if ($session{form}{uid} eq '1' || $session{form}{uid} eq '3') {
 		return _submenu(WebGUI::Privilege::vitalComponent());
         } else {
@@ -193,7 +193,7 @@ sub www_deleteUser {
 
 #-------------------------------------------------------------------
 sub www_deleteUserConfirm {
-	return WebGUI::AdminConsole->new("users")->render(WebGUI::Privilege::adminOnly()) unless (WebGUI::Grouping::isInGroup(3));
+	return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
 	my ($u);
         if ($session{form}{uid} eq '1' || $session{form}{uid} eq '') {
 	   return WebGUI::AdminConsole->new("users")->render(WebGUI::Privilege::vitalComponent());
@@ -206,7 +206,7 @@ sub www_deleteUserConfirm {
 
 #-------------------------------------------------------------------
 sub www_editUser {
-	return WebGUI::AdminConsole->new("users")->render(WebGUI::Privilege::adminOnly()) unless (WebGUI::Grouping::isInGroup(11));
+	return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(11));
 	my $error = shift;
 	my $i18n = WebGUI::International->new("WebGUI");
 	my %tabs;
@@ -354,7 +354,7 @@ sub www_editUserSave {
 	unless ($isAdmin) {
 		$isSecondary = (WebGUI::Grouping::isInGroup(11) && $session{form}{uid} eq "new");
 	}
-	return WebGUI::AdminConsole->new("users")->render(WebGUI::Privilege::adminOnly()) unless ($isAdmin || $isSecondary);
+	return WebGUI::Privilege::adminOnly() unless ($isAdmin || $isSecondary);
 	my ($uid) = WebGUI::SQL->quickArray("select userId from users where username=".quote($session{form}{username}));
 	my $error;
 	if ($uid eq $session{form}{uid} || $uid eq "") {
@@ -390,7 +390,7 @@ sub www_editUserSave {
 
 #-------------------------------------------------------------------
 sub www_editUserKarma {
-	return WebGUI::AdminConsole->new("users")->render(WebGUI::Privilege::adminOnly()) unless (WebGUI::Grouping::isInGroup(3));
+	return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
         my ($output, $f, $a, %user, %data, $method, $values, $category, $label, $default, $previousCategory);
         $f = WebGUI::HTMLForm->new;
         $f->hidden("op","editUserKarmaSave");
@@ -404,7 +404,7 @@ sub www_editUserKarma {
 
 #-------------------------------------------------------------------
 sub www_editUserKarmaSave {
-	return WebGUI::AdminConsole->new("users")->render(WebGUI::Privilege::adminOnly()) unless (WebGUI::Grouping::isInGroup(3));
+	return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
         my ($u);
         $u = WebGUI::User->new($session{form}{uid});
         $u->karma($session{form}{amount},$session{user}{username}." (".$session{user}{userId}.")",$session{form}{description});
@@ -418,7 +418,7 @@ sub www_listUsers {
 			$session{form}{uid} = "new";
 			return www_editUser();
 		}
-		return WebGUI::AdminConsole->new("users")->render(WebGUI::Privilege::adminOnly());
+		return WebGUI::Privilege::adminOnly();
 	}
 	my %status;
 	my $output = getUserSearchForm("listUsers");

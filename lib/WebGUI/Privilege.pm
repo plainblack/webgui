@@ -17,6 +17,7 @@ package WebGUI::Privilege;
 use strict;
 use WebGUI::HTTP;
 use WebGUI::International;
+use WebGUI::Operation::Shared;
 use WebGUI::Session;
 
 =head1 NAME
@@ -55,7 +56,7 @@ sub adminOnly {
 	my ($output, $sth, @data);
         $output = '<h1>'.WebGUI::International::get(35).'</h1>';
 	$output .= WebGUI::International::get(36);
-	return $output;
+	return WebGUI::Operation::Shared::userStyle($output);
 }
 
 
@@ -73,7 +74,7 @@ sub insufficient {
 	$output = '<h1>'.WebGUI::International::get(37).'</h1>';
 	$output .= WebGUI::International::get(38);
 	$output .= '<p>';
-	return $output;
+	return WebGUI::Operation::Shared::userStyle($output);
 }
 
 
@@ -87,15 +88,14 @@ Returns a message stating that the user does not have the privileges necessary t
 
 sub noAccess {
 	WebGUI::HTTP::setStatus("401", "No Access");
-   	my ($output);
    	if ($session{user}{userId} eq '1') {
-      		$output = WebGUI::Operation::Auth::www_auth("init");
+      		return WebGUI::Operation::Auth::www_auth("init");
    	} else {
-      		$output = '<h1>'.WebGUI::International::get(37).'</h1>';
+      		my $output = '<h1>'.WebGUI::International::get(37).'</h1>';
       		$output .= WebGUI::International::get(39);
       		$output .= '<p>';
+		return WebGUI::Operation::Shared::userStyle($output);
    	}
-   	return $output;
 }
 
 #-------------------------------------------------------------------
@@ -112,7 +112,7 @@ sub notMember {
 	$output = '<h1>'.WebGUI::International::get(345).'</h1>';
 	$output .= WebGUI::International::get(346);
 	$output .= '<p>';
-	return $output;
+	return WebGUI::Operation::Shared::userStyle($output);
 }
 
 #-------------------------------------------------------------------
@@ -129,7 +129,7 @@ sub vitalComponent {
         $output = '<h1>'.WebGUI::International::get(40).'</h1>';
 	$output .= WebGUI::International::get(41);
 	$output .= '<p>';
-	return $output;
+	return WebGUI::Operation::Shared::userStyle($output);
 }
 
 

@@ -801,14 +801,14 @@ sub www_deny {
 sub www_edit {
 	my $self = shift;
 	my %var = %{$self->getTemplateVars};
-        $var{'form.header'} = WebGUI::Form::formHeader({action=>$self->getParent->getUrl})
-		.WebGUI::Form::hidden({
-                	name=>"func",
-			value=>"add"
-			});
 	my $content;
 	my $title;
 	if ($session{form}{func} eq "add") { # new post
+        	$var{'form.header'} = WebGUI::Form::formHeader({action=>$self->getParent->getUrl})
+			.WebGUI::Form::hidden({
+                		name=>"func",
+				value=>"add"
+				});
         	$var{'isNewPost'} = 1;
 		$var{'form.header'} .= WebGUI::Form::hidden({
 			name=>"assetId",
@@ -819,7 +819,7 @@ sub www_edit {
 			});
 		if ($session{form}{class} eq "WebGUI::Asset::Post") { # new reply
 			$self->{_thread} = $self->getParent->getThread;
-			return $self->getThread->getParent->processStyle(WebGUI::Privilege::insufficient()) unless ($self->getThread->canReply);
+			return WebGUI::Privilege::insufficient() unless ($self->getThread->canReply);
 			$var{isReply} = 1;
 			if ($session{form}{content} || $session{form}{title}) {
 				$content = $session{form}{content};
@@ -834,7 +834,7 @@ sub www_edit {
 				value=>$session{form}{subscribe}
 				});
 		} elsif ($session{form}{class} eq "WebGUI::Asset::Post::Thread") { # new thread
-			return $self->getThread->getParent->processStyle(WebGUI::Privilege::insufficient()) unless ($self->getThread->getParent->canPost);
+			return WebGUI::Privilege::insufficient() unless ($self->getThread->getParent->canPost);
 			$var{isNewThread} = 1;
                 	if ($self->getThread->getParent->canModerate) {
                         	$var{'sticky.form'} = WebGUI::Form::yesNo({
@@ -853,7 +853,12 @@ sub www_edit {
                 }
                 $content .= "\n\n".$session{user}{signature} if ($session{user}{signature});
 	} else { # edit
-		return $self->getThread->getParent->processStyle(WebGUI::Privilege::insufficient()) unless ($self->canEdit);
+		return WebGUI::Privilege::insufficient() unless ($self->canEdit);
+        	$var{'form.header'} = WebGUI::Form::formHeader({action=>$self->getUrl})
+			.WebGUI::Form::hidden({
+                		name=>"func",
+				value=>"edit"
+				});
 		$var{isEdit} = 1;
 		$content = $self->getValue("content");
 		$title = $self->getValue("title");

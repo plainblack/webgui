@@ -560,8 +560,8 @@ Renders self->view based upon current style, subject to timeouts. Returns Privil
 =cut
 sub www_view {
 	my $self = shift;
+	return WebGUI::Privilege::noAccess() unless $self->canView;
 	$self->logView();
-	return $self->processStyle(WebGUI::Privilege::noAccess()) unless $self->canView;
 	my $cache;
 	my $output;
         my $useCache = (

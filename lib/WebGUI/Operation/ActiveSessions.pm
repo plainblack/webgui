@@ -23,14 +23,14 @@ use WebGUI::SQL;
 
 #-------------------------------------------------------------------
 sub www_killSession {
-        return WebGUI::AdminConsole->new("activeSessions")->render(WebGUI::Privilege::adminOnly()) unless (WebGUI::Grouping::isInGroup(3));
+        return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
 	WebGUI::Session::end($session{form}{sid});
 	return www_viewActiveSessions();
 }
 
 #-------------------------------------------------------------------
 sub www_viewActiveSessions {
-        return WebGUI::AdminConsole->new("activeSessions")->render(WebGUI::Privilege::adminOnly()) unless (WebGUI::Grouping::isInGroup(3));
+        return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
 	my ($output, $p, @row, $i, $sth, %data);
 	tie %data, 'Tie::CPHash';
 	$sth = WebGUI::SQL->read("select users.username,users.userId,userSession.sessionId,userSession.expires,

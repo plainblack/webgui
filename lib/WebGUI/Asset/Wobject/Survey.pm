@@ -666,7 +666,7 @@ sub www_deleteAllResponsesConfirm {
 #-------------------------------------------------------------------
 sub www_edit {
         my $self = shift;
-	return $self->getAdminConsole->render(WebGUI::Privilege::insufficient()) unless $self->canEdit;
+	return WebGUI::Privilege::insufficient() unless $self->canEdit;
 	$self->getAdminConsole->setHelp("survey add/edit");
 	return $self->getAdminConsole->render($self->getEditForm->print,WebGUI::International::get(2,'Survey'));
 }
@@ -687,7 +687,7 @@ sub www_editAnswer {
         my ($question, $f, $answer, $self);
 	$self = shift;
 	
-        return $self->getAdminConsole->render(WebGUI::Privilege::insufficient()) unless ($self->canEdit);
+        return WebGUI::Privilege::insufficient() unless ($self->canEdit);
         
 	$answer = $self->getCollateral("Survey_answer","Survey_answerId",$session{form}{aid});
         $f = WebGUI::HTMLForm->new(-action=>$self->getUrl);
@@ -768,7 +768,7 @@ sub www_editQuestion {
 	my ($f, $question, $answerFieldType, $sth, %data, $self);
 	$self = shift;
 
-	return $self->getAdminConsole->render(WebGUI::Privilege::insufficient()) unless ($self->canEdit);
+	return WebGUI::Privilege::insufficient() unless ($self->canEdit);
 
 	tie %data, 'Tie::CPHash';
 	$question = $self->getCollateral("Survey_question","Survey_questionId",$session{form}{qid});

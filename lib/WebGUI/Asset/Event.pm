@@ -431,7 +431,7 @@ sub www_editSave {
 	
 	if ($session{form}{assetId} eq "new") {
 		$self = $self->getParent() if ($self->getValue("className") eq "WebGUI::Asset::Event");
-		return $self->getAdminConsole->render(WebGUI::Privilege::insufficient()) unless ($self->canEdit);
+		return WebGUI::Privilege::insufficient() unless ($self->canEdit);
 		my (@startDate, @endDate, @regStartDate, @regEndDate, @reminderStartDate, 
 		@reminderEndDate, $until, @eventId, $i, $recurringEventId);
 		$startDate[0] = WebGUI::DateTime::setToEpoch($session{form}{eventStartDate});

@@ -86,13 +86,6 @@ sub definition {
 
 
 #-------------------------------------------------------------------
-sub DESTROY {
-	my $self = shift;
-	$self->{_storageLocation}->DESTROY if (exists $self->{_storageLocation});
-	$self->SUPER::DESTROY;
-}
-
-#-------------------------------------------------------------------
 
 sub duplicate {
 	my $self = shift;

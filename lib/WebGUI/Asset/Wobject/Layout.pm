@@ -198,13 +198,13 @@ sub view {
 
 sub www_edit {
         my $self = shift;
-	return $self->getAdminConsole->render(WebGUI::Privilege::insufficient()) unless $self->canEdit;
+	return WebGUI::Privilege::insufficient() unless $self->canEdit;
         return $self->getAdminConsole->render($self->getEditForm->print,"Edit Layout");
 }
 
 sub www_setContentPositions {
 	my $self = shift;
-	return WebGUI::Style::process(WebGUI::Privilege::insufficient(),$self->get("styleTemplateId")) unless ($self->canEdit);
+	return WebGUI::Privilege::insufficient() unless ($self->canEdit);
 	$self->update({
 		contentPositions=>$session{form}{map}
 		});

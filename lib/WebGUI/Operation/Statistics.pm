@@ -34,7 +34,7 @@ sub _submenu {
 
 #-------------------------------------------------------------------
 sub www_viewStatistics {
-        return WebGUI::AdminConsole->new("statistics")->render(WebGUI::Privilege::adminOnly()) unless (WebGUI::Grouping::isInGroup(3));
+        return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
         my ($output, $data);
 	my $url = "http://www.plainblack.com/downloads/latest-version.txt";
 	my $cache = WebGUI::Cache->new($url,"URL");

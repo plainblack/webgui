@@ -702,7 +702,7 @@ sub www_unsubscribe {
 #-------------------------------------------------------------------
 sub www_view {
 	my $self = shift;
-	return $self->getParent->processStyle(WebGUI::Privilege::noAccess()) unless $self->canView;
+	return WebGUI::Privilege::noAccess() unless $self->canView;
 	return $self->getParent->processStyle($self->view);
 }
 

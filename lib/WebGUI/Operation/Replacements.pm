@@ -38,14 +38,14 @@ sub _submenu {
 
 #-------------------------------------------------------------------
 sub www_deleteReplacement {
-	return WebGUI::AdminConsole->new("contentFilters")->render(WebGUI::Privilege::adminOnly()) unless (WebGUI::Grouping::isInGroup(3));
+	return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
 	WebGUI::SQL->write("delete from replacements where replacementId=".quote($session{form}{replacementId}));
 	return www_listReplacements();
 }
 
 #-------------------------------------------------------------------
 sub www_editReplacement {
-	return WebGUI::AdminConsole->new("contentFilters")->render(WebGUI::Privilege::adminOnly()) unless (WebGUI::Grouping::isInGroup(3));
+	return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
 	my $data = WebGUI::SQL->getRow("replacements","replacementId",$session{form}{replacementId});
 	my $f = WebGUI::HTMLForm->new;
 	$f->hidden(
@@ -76,7 +76,7 @@ sub www_editReplacement {
 
 #-------------------------------------------------------------------
 sub www_editReplacementSave {
-	return WebGUI::AdminConsole->new("contentFilters")->render(WebGUI::Privilege::adminOnly()) unless (WebGUI::Grouping::isInGroup(3));
+	return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
 	WebGUI::SQL->setRow("replacements","replacementId",{
 		replacementId=>$session{form}{replacementId},
 		searchFor=>$session{form}{searchFor},
@@ -87,7 +87,7 @@ sub www_editReplacementSave {
 
 #-------------------------------------------------------------------
 sub www_listReplacements {
-	return WebGUI::AdminConsole->new("contentFilters")->render(WebGUI::Privilege::adminOnly()) unless (WebGUI::Grouping::isInGroup(3));
+	return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
 	my $output = '<table>';
 	my $sth = WebGUI::SQL->read("select replacementId,searchFor from replacements order by searchFor");
 	while (my $data = $sth->hashRef) {

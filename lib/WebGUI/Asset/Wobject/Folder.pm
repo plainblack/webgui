@@ -175,7 +175,7 @@ sub view {
 
 sub www_edit {
         my $self = shift;
-	return $self->getAdminConsole->render(WebGUI::Privilege::insufficient()) unless $self->canEdit;
+	return WebGUI::Privilege::insufficient() unless $self->canEdit;
         return $self->getAdminConsole->render($self->getEditForm->print,"Edit Folder");
 }
 

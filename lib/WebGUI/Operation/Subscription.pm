@@ -52,7 +52,7 @@ sub _submenu {
 #-------------------------------------------------------------------
 sub www_createSubscriptionCodeBatch {
 	my (%subscriptions, $f, $error, $errorMessage);
-	return WebGUI::AdminConsole->new("subscriptions")->render(WebGUI::Privilege::adminOnly()) unless (WebGUI::Grouping::isInGroup(3));
+	return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
 	
 	$error = shift;
 	my $i18n = WebGUI::International->new("Subscription");
@@ -101,7 +101,7 @@ sub www_createSubscriptionCodeBatch {
 sub www_createSubscriptionCodeBatchSave {
 	my ($numberOfCodes, $description, $expires, $batchId, @codeElements, $currentCode, $code, $i, @subscriptions, 
 		@error, $creationEpoch);
-	return WebGUI::AdminConsole->new("subscriptions")->render(WebGUI::Privilege::adminOnly()) unless (WebGUI::Grouping::isInGroup(3));
+	return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
 	
 	my $i18n = WebGUI::International->new("Subscription");	
 	
@@ -139,7 +139,7 @@ sub www_createSubscriptionCodeBatchSave {
 
 #-------------------------------------------------------------------
 sub www_deleteSubscription {
-	return WebGUI::AdminConsole->new("subscriptions")->render(WebGUI::Privilege::adminOnly()) unless (WebGUI::Grouping::isInGroup(3));
+	return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
 	
 	WebGUI::Subscription->new($session{form}{sid})->delete;
 	return www_listSubscriptions();
@@ -147,7 +147,7 @@ sub www_deleteSubscription {
 
 #-------------------------------------------------------------------
 sub www_deleteSubscriptionCodeBatch {
-	return WebGUI::AdminConsole->new("subscriptions")->render(WebGUI::Privilege::adminOnly()) unless (WebGUI::Grouping::isInGroup(3));
+	return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
 	
 	WebGUI::SQL->write("delete from subscriptionCodeBatch where batchId=".quote($session{form}{bid}));
 	WebGUI::SQL->write("delete from subscriptionCode where batchId=".quote($session{form}{bid}));
@@ -157,7 +157,7 @@ sub www_deleteSubscriptionCodeBatch {
 
 #-------------------------------------------------------------------
 sub www_deleteSubscriptionCodes {
-	return WebGUI::AdminConsole->new("subscriptions")->render(WebGUI::Privilege::adminOnly()) unless (WebGUI::Grouping::isInGroup(3));
+	return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
 	
 	if ($session{form}{selection} eq 'dc') {
 		WebGUI::SQL->write("delete from subscriptionCode where dateCreated >= ".quote($session{form}{dcStart}).
@@ -173,7 +173,7 @@ sub www_deleteSubscriptionCodes {
 #-------------------------------------------------------------------
 sub www_editSubscription {
 	my ($properties, $subscriptionId, $durationInterval, $durationUnits, $f);
-	return WebGUI::AdminConsole->new("subscriptions")->render(WebGUI::Privilege::adminOnly()) unless (WebGUI::Grouping::isInGroup(3));
+	return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
 	
 	my $i18n = WebGUI::International->new("Subscription");
 	
@@ -236,7 +236,7 @@ sub www_editSubscription {
 #-------------------------------------------------------------------
 sub www_editSubscriptionSave {
 	my (@relevantFields);
-	return WebGUI::AdminConsole->new("subscriptions")->render(WebGUI::Privilege::adminOnly()) unless (WebGUI::Grouping::isInGroup(3));
+	return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
 	
 	@relevantFields = qw(subscriptionId name price description subscriptionGroup duration executeOnSubscription karma);
 	WebGUI::Subscription->new($session{form}{sid})->set({map {$_ => $session{form}{$_}} @relevantFields});
@@ -247,7 +247,7 @@ sub www_editSubscriptionSave {
 #-------------------------------------------------------------------
 sub www_listSubscriptionCodeBatches {
 	my ($p, $batches, $output);
-	return WebGUI::AdminConsole->new("subscriptions")->render(WebGUI::Privilege::adminOnly()) unless (WebGUI::Grouping::isInGroup(3));
+	return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
 	
 	my $i18n = WebGUI::International->new("Subscription");
 	
@@ -274,7 +274,7 @@ sub www_listSubscriptionCodeBatches {
 #-------------------------------------------------------------------
 sub www_listSubscriptionCodes {
 	my ($p, $codes, $output, $where, $ops, $delete);
-	return WebGUI::AdminConsole->new("subscriptions")->render(WebGUI::Privilege::adminOnly()) unless (WebGUI::Grouping::isInGroup(3));
+	return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
 
 	my $i18n = WebGUI::International->new("Subscription");
 	
@@ -355,7 +355,7 @@ sub www_listSubscriptionCodes {
 #-------------------------------------------------------------------
 sub www_listSubscriptions {
 	my ($p, $subscriptions, $output);
-	return WebGUI::AdminConsole->new("subscriptions")->render(WebGUI::Privilege::adminOnly()) unless (WebGUI::Grouping::isInGroup(3));
+	return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
 	
 	my $i18n = WebGUI::International->new("Subscription");
 	

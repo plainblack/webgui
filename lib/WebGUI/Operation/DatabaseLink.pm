@@ -120,7 +120,7 @@ sub www_editDatabaseLinkSave {
 
 #-------------------------------------------------------------------
 sub www_listDatabaseLinks {
-        return WebGUI::AdminConsole->new("databases")->render(WebGUI::Privilege::adminOnly()) unless(WebGUI::Grouping::isInGroup(3));
+        return WebGUI::Privilege::adminOnly() unless(WebGUI::Grouping::isInGroup(3));
         my ($output, $p, $sth, %data, @row, $i);
         $sth = WebGUI::SQL->read("select * from databaseLink order by title");
 	$row[$i] = '<tr><td valign="top" class="tableData"></td><td valign="top" class="tableData">'.WebGUI::International::get(1076).'</td></tr>';

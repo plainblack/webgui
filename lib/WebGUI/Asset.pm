@@ -2170,7 +2170,7 @@ Duplicates self, cuts duplicate, returns self->getContainer->www_view if canEdit
 
 sub www_copy {
 	my $self = shift;
-	return $self->getAdminConsole->render(WebGUI::Privilege::insufficient()) unless $self->canEdit;
+	return WebGUI::Privilege::insufficient() unless $self->canEdit;
 	my $newAsset = $self->duplicate;
 	$newAsset->cut;
 	return $self->getContainer->www_view;
@@ -2186,7 +2186,7 @@ Copies to clipboard assets in a list, then returns self calling method www_manag
 
 sub www_copyList {
 	my $self = shift;
-	return $self->getAdminConsole->render(WebGUI::Privilege::insufficient()) unless $self->canEdit;
+	return WebGUI::Privilege::insufficient() unless $self->canEdit;
 	foreach my $assetId ($session{cgi}->param("assetId")) {
 		my $asset = WebGUI::Asset->newByDynamicClass($assetId);
 		if ($asset->canEdit) {
@@ -2234,7 +2234,7 @@ Cuts (removes to clipboard) self, returns the www_view of the Parent if canEdit.
 
 sub www_cut {
 	my $self = shift;
-	return $self->getAdminConsole->render(WebGUI::Privilege::insufficient()) unless $self->canEdit;
+	return WebGUI::Privilege::insufficient() unless $self->canEdit;
 	$self->cut;
 	$session{asset} = $self->getParent;
 	return $self->getParent->www_view;
@@ -2250,7 +2250,7 @@ Cuts assets in a list (removes to clipboard), then returns self calling method w
 
 sub www_cutList {
 	my $self = shift;
-	return $self->getAdminConsole->render(WebGUI::Privilege::insufficient()) unless $self->canEdit;
+	return WebGUI::Privilege::insufficient() unless $self->canEdit;
 	foreach my $assetId ($session{cgi}->param("assetId")) {
 		my $asset = WebGUI::Asset->newByDynamicClass($assetId);
 		if ($asset->canEdit) {
@@ -2270,8 +2270,8 @@ Moves self to trash, returns www_view() method of Parent if canEdit. Otherwise r
 
 sub www_delete {
 	my $self = shift;
-	return $self->getAdminConsole->render(WebGUI::Privilege::insufficient()) unless $self->canEdit;
-	return $self->getAdminConsole->render(WebGUI::Privilege::vitalComponent()) if (isIn($self->getId, $session{setting}{defaultPage}, $session{setting}{notFoundPage}));
+	return WebGUI::Privilege::insufficient() unless $self->canEdit;
+	return WebGUI::Privilege::vitalComponent() if (isIn($self->getId, $session{setting}{defaultPage}, $session{setting}{notFoundPage}));
 	$self->trash;
 	$session{asset} = $self->getParent;
 	return $self->getParent->www_view;
@@ -2287,7 +2287,7 @@ Moves list of assets to trash, returns www_manageAssets() method of self if canE
 
 sub www_deleteList {
 	my $self = shift;
-	return $self->getAdminConsole->render(WebGUI::Privilege::insufficient()) unless $self->canEdit;
+	return WebGUI::Privilege::insufficient() unless $self->canEdit;
 	foreach my $assetId ($session{cgi}->param("assetId")) {
 		my $asset = WebGUI::Asset->newByDynamicClass($assetId);
 		if ($asset->canEdit) {
@@ -2308,7 +2308,7 @@ Deletes a MetaDataField and returns www_manageMetaData on self, if user isInGrou
 sub www_deleteMetaDataField {
 	my $self = shift;
 	my $ac = WebGUI::AdminConsole->new("content profiling");
-	return $ac->render(WebGUI::Privilege::insufficient()) unless (WebGUI::Grouping::isInGroup(4));
+	return WebGUI::Privilege::insufficient() unless (WebGUI::Grouping::isInGroup(4));
 	$self->deleteMetaDataField($session{form}{fid});
 	return $self->www_manageMetaData;
 }
@@ -2323,7 +2323,7 @@ Demotes self and returns www_view method of getContainer of self if canEdit, oth
 
 sub www_demote {
 	my $self = shift;
-	return $self->getAdminConsole->render(WebGUI::Privilege::insufficient()) unless $self->canEdit;
+	return WebGUI::Privilege::insufficient() unless $self->canEdit;
 	$self->demote;
 	return $self->getContainer->www_view; 
 }
@@ -2338,7 +2338,7 @@ Returns "". Deploys a Package. If canEdit is Fales, renders an insufficient Priv
 
 sub www_deployPackage {
 	my $self = shift;
-	return $self->getAdminConsole->render(WebGUI::Privilege::insufficient()) unless $self->canEdit;
+	return WebGUI::Privilege::insufficient() unless $self->canEdit;
 	my $packageMasterAssetId = $session{form}{assetId};
 	if (defined $packageMasterAssetId) {
 		my $packageMasterAsset = WebGUI::Asset->newByDynamicClass($packageMasterAssetId);
@@ -2362,7 +2362,7 @@ Renders an AdminConsole EditForm, unless canEdit returns False.
 
 sub www_edit {
 	my $self = shift;
-	return $self->getAdminConsole->render(WebGUI::Privilege::insufficient()) unless $self->canEdit;
+	return WebGUI::Privilege::insufficient() unless $self->canEdit;
 	return $self->getAdminConsole->render($self->getEditForm->print);
 }
 
@@ -2376,7 +2376,7 @@ Saves and updates history. If canEdit, returns www_manageAssets() if a new Asset
 
 sub www_editSave {
 	my $self = shift;
-	return $self->getAdminConsole->render(WebGUI::Privilege::insufficient()) unless $self->canEdit;
+	return WebGUI::Privilege::insufficient() unless $self->canEdit;
 	my $object;
 	if ($session{form}{assetId} eq "new") {
 		$object = $self->addChild({className=>$session{form}{class}});	
@@ -2406,7 +2406,7 @@ Returns a rendered page to edit MetaData.  Will return an insufficient Privilege
 sub www_editMetaDataField {
 	my $self = shift;
 	my $ac = WebGUI::AdminConsole->new("content profiling");
-	return $ac->render(WebGUI::Privilege::insufficient()) unless (WebGUI::Grouping::isInGroup(4));
+	return WebGUI::Privilege::insufficient() unless (WebGUI::Grouping::isInGroup(4));
         my $fieldInfo;
 	if($session{form}{fid} && $session{form}{fid} ne "new") {
 		$fieldInfo = WebGUI::MetaData::getField($session{form}{fid});
@@ -2444,7 +2444,7 @@ Verifies that MetaData fields aren't duplicated or blank, assigns default values
 sub www_editMetaDataFieldSave {
 	my $self = shift;
 	my $ac = WebGUI::AdminConsole->new("content profiling");
-	return $ac->render(WebGUI::Privilege::insufficient()) unless (WebGUI::Grouping::isInGroup(4));
+	return WebGUI::Privilege::insufficient() unless (WebGUI::Grouping::isInGroup(4));
 	$ac->setHelp("metadata edit property","Asset");
 	# Check for duplicate field names
 	my $sql = "select count(*) from metaData_properties where fieldName = ".
@@ -2495,7 +2495,7 @@ Creates a tabform to edit the Asset Tree. If canEdit returns False, returns insu
 sub www_editTree {
 	my $self = shift;
 	my $ac = WebGUI::AdminConsole->new("assets");
-	return $ac->render(WebGUI::Privilege::insufficient()) unless ($self->canEdit);
+	return WebGUI::Privilege::insufficient() unless ($self->canEdit);
 	my $tabform = WebGUI::TabForm->new;
 	$tabform->hidden({name=>"func",value=>"editTreeSave"});
 	$tabform->addTab("properties",WebGUI::International::get("properties","Asset"),9);
@@ -2655,7 +2655,7 @@ Verifies proper inputs in the Asset Tree and saves them. Returns ManageAssets me
 
 sub www_editTreeSave {
 	my $self = shift;
-	return $self->getAdminConsole->render(WebGUI::Privilege::insufficient()) unless ($self->canEdit);
+	return WebGUI::Privilege::insufficient() unless ($self->canEdit);
 	my %data;
 	$data{isHidden} = WebGUI::FormProcessor::yesNo("isHidden") if (WebGUI::FormProcessor::yesNo("change_isHidden"));
 	$data{newWindow} = WebGUI::FormProcessor::yesNo("newWindow") if (WebGUI::FormProcessor::yesNo("change_newWindow"));
@@ -2715,7 +2715,7 @@ Moves assets in clipboard to trash. Returns www_manageClipboard() when finished.
 sub www_emptyClipboard {
 	my $self = shift;
 	my $ac = WebGUI::AdminConsole->new("clipboard");
-	return $ac->render(WebGUI::Privilege::insufficient()) unless (WebGUI::Grouping::isInGroup(4));
+	return WebGUI::Privilege::insufficient() unless (WebGUI::Grouping::isInGroup(4));
 	foreach my $assetData (@{$self->getAssetsInClipboard($session{form}{systemClipboard} && WebGUI::Grouping::isInGroup(3))}) {
 		my $asset = WebGUI::Asset->newByDynamicClass($assetData->{assetId},$assetData->{className});
 		$asset->trash;
@@ -2734,7 +2734,7 @@ Calls the purgeTree() method to delete all items in Trash. Returns the www_manag
 sub www_emptyTrash {
 	my $self = shift;
 	my $ac = WebGUI::AdminConsole->new("trash");
-	return $ac->render(WebGUI::Privilege::insufficient()) unless (WebGUI::Grouping::isInGroup(4));
+	return WebGUI::Privilege::insufficient() unless (WebGUI::Grouping::isInGroup(4));
 	foreach my $assetData (@{$self->getAssetsInTrash($session{form}{systemTrash} && WebGUI::Grouping::isInGroup(3))}) {
 		my $asset = WebGUI::Asset->newByDynamicClass($assetData->{assetId},$assetData->{className});
 		$asset->purgeTree;
@@ -2752,7 +2752,7 @@ Displays the export page administrative interface
 
 sub www_export {
 	my $self = shift;
-	return $self->getAdminConsole->render(WebGUI::Privilege::insufficient()) unless (WebGUI::Grouping::isInGroup(13));
+	return WebGUI::Privilege::insufficient() unless (WebGUI::Grouping::isInGroup(13));
         $self->getAdminConsole->setHelp("page export");
         my $f = WebGUI::HTMLForm->new(-action=>$self->getUrl);
         $f->hidden("func","exportStatus");
@@ -2797,7 +2797,7 @@ Displays the export status page
 
 sub www_exportStatus {
 	my $self = shift;
-	return $self->getAdminConsole->render(WebGUI::Privilege::insufficient()) unless (WebGUI::Grouping::isInGroup(13));
+	return WebGUI::Privilege::insufficient() unless (WebGUI::Grouping::isInGroup(13));
 	my $iframeUrl = $self->getUrl('func=exportGenerate');
 	$iframeUrl = WebGUI::URL::append($iframeUrl, 'index='.$session{form}{index});
 	$iframeUrl = WebGUI::URL::append($iframeUrl, 'depth='.$session{form}{depth});
@@ -2818,7 +2818,7 @@ Executes the export process and displays real time status. This operation is dis
 
 sub www_exportGenerate {
 	my $self = shift;
-	return $self->getAdminConsole->render(WebGUI::Privilege::insufficient()) unless (WebGUI::Grouping::isInGroup(13));
+	return WebGUI::Privilege::insufficient() unless (WebGUI::Grouping::isInGroup(13));
 	# This routine is called in an IFRAME and prints status output directly to the browser.
 	$|++;				# Unbuffered data output
         $session{page}{empty} = 1;      # Write directly to the browser
@@ -2891,7 +2891,7 @@ Main page to manage assets. Renders an AdminConsole with a list of assets. If ca
 
 sub www_manageAssets {
 	my $self = shift;
-	return $self->getAdminConsole->render(WebGUI::Privilege::insufficient()) unless $self->canEdit;
+	return WebGUI::Privilege::insufficient() unless $self->canEdit;
 	my $children = $self->getLineage(["children"],{returnObjects=>1});
 	my $output = $self->getAssetManagerControl($children);
 	$output .= ' <div class="adminConsoleSpacer">
@@ -2942,7 +2942,7 @@ Returns an AdminConsole to deal with assets in the Clipboard. If isInGroup(12) i
 sub www_manageClipboard {
 	my $self = shift;
 	my $ac = WebGUI::AdminConsole->new("clipboard");
-	return $ac->render(WebGUI::Privilege::insufficient()) unless (WebGUI::Grouping::isInGroup(12));
+	return WebGUI::Privilege::insufficient() unless (WebGUI::Grouping::isInGroup(12));
 	my @assets;
 	my ($header,$limit);
         $ac->setHelp("clipboard manage");
@@ -2974,7 +2974,7 @@ Returns an AdminConsole to deal with MetaDataFields. If isInGroup(4) is False, r
 sub www_manageMetaData {
 	my $self = shift;
 	my $ac = WebGUI::AdminConsole->new("content profiling");
-	return $ac->render(WebGUI::Privilege::insufficient()) unless (WebGUI::Grouping::isInGroup(4));
+	return WebGUI::Privilege::insufficient() unless (WebGUI::Grouping::isInGroup(4));
 	my $output;
 	my $fields = $self->getMetaDataFields();
 	foreach my $fieldId (keys %{$fields}) {
@@ -2997,7 +2997,7 @@ Returns an AdminConsole to deal with assets in the Trash. If isInGroup(4) is Fal
 sub www_manageTrash {
 	my $self = shift;
 	my $ac = WebGUI::AdminConsole->new("trash");
-	return $ac->render(WebGUI::Privilege::insufficient()) unless (WebGUI::Grouping::isInGroup(4));
+	return WebGUI::Privilege::insufficient() unless (WebGUI::Grouping::isInGroup(4));
 	my @assets;
 	my ($header, $limit);
         $ac->setHelp("trash manage");
@@ -3029,7 +3029,7 @@ Returns "". Pastes an asset. If canEdit is False, returns an insufficient privil
 
 sub www_paste {
 	my $self = shift;
-	return $self->getAdminConsole->render(WebGUI::Privilege::insufficient()) unless $self->canEdit;
+	return WebGUI::Privilege::insufficient() unless $self->canEdit;
 	$self->paste($session{form}{assetId});
 	return "";
 }
@@ -3044,7 +3044,7 @@ Returns a www_manageAssets() method. Pastes a selection of assets. If canEdit is
 
 sub www_pasteList {
 	my $self = shift;
-	return $self->getAdminConsole->render(WebGUI::Privilege::insufficient()) unless $self->canEdit;
+	return WebGUI::Privilege::insufficient() unless $self->canEdit;
 	foreach my $clipId ($session{cgi}->param("assetId")) {
 		$self->paste($clipId);
 	}
@@ -3061,7 +3061,7 @@ Returns www_view method of getContainer of self. Promotes self. If canEdit is Fa
 
 sub www_promote {
 	my $self = shift;
-	return $self->getAdminConsole->render(WebGUI::Privilege::insufficient()) unless $self->canEdit;
+	return WebGUI::Privilege::insufficient() unless $self->canEdit;
 	$self->promote;
 	return $self->getContainer->www_view;
 }
@@ -3077,7 +3077,7 @@ Returns a www_manageAssets() method. Sets a new parent via the results of a form
 
 sub www_setParent {
 	my $self = shift;
-	return $self->getAdminConsole->render(WebGUI::Privilege::insufficient()) unless $self->canEdit;
+	return WebGUI::Privilege::insufficient() unless $self->canEdit;
 	my $newParent = $session{form}{assetId};
 	$self->setParent($newParent) if (defined $newParent);
 	return $self->www_manageAssets();
@@ -3094,7 +3094,7 @@ Returns a www_manageAssets() method. Sets a new rank via the results of a form. 
 
 sub www_setRank {
 	my $self = shift;
-	return $self->getAdminConsole->render(WebGUI::Privilege::insufficient()) unless $self->canEdit;
+	return WebGUI::Privilege::insufficient() unless $self->canEdit;
 	my $newRank = $session{form}{rank};
 	$self->setRank($newRank) if (defined $newRank);
 	$session{asset} = $self->getParent;

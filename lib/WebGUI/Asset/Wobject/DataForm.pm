@@ -617,7 +617,7 @@ sub view {
 #-------------------------------------------------------------------
 sub www_deleteEntry {
 	my $self = shift;
-	return $self->getAdminConsole->render(WebGUI::Privilege::insufficient()) unless $self->canEdit;
+	return WebGUI::Privilege::insufficient() unless $self->canEdit;
         my $entryId = $session{form}{entryId};
 	$self->deleteCollateral("DataForm_entry","DataForm_entryId",$entryId);
         $session{form}{entryId} = 'list';
@@ -627,7 +627,7 @@ sub www_deleteEntry {
 #-------------------------------------------------------------------
 sub www_deleteFieldConfirm {
 	my $self = shift;
-	return $self->getAdminConsole->render(WebGUI::Privilege::insufficient()) unless $self->canEdit;
+	return WebGUI::Privilege::insufficient() unless $self->canEdit;
 	$self->deleteCollateral("DataForm_field","DataForm_fieldId",$session{form}{fid});
 	$self->reorderCollateral("DataForm_field","DataForm_fieldId");
        	return "";
@@ -636,7 +636,7 @@ sub www_deleteFieldConfirm {
 #-------------------------------------------------------------------
 sub www_deleteTabConfirm {
 	my $self = shift;
-	return $self->getAdminConsole->render(WebGUI::Privilege::insufficient()) unless $self->canEdit;
+	return WebGUI::Privilege::insufficient() unless $self->canEdit;
 	$self->deleteCollateral("DataForm_tab","DataForm_tabId",$session{form}{tid});
 	$self->deleteCollateral("DataForm_field","DataForm_tabId",$session{form}{tid});
 	$self->reorderCollateral("DataForm_tab","DataForm_tabId");
@@ -646,7 +646,7 @@ sub www_deleteTabConfirm {
 #-------------------------------------------------------------------
 sub www_edit {
         my $self = shift;
-	return $self->getAdminConsole->render(WebGUI::Privilege::insufficient()) unless $self->canEdit;
+	return WebGUI::Privilege::insufficient() unless $self->canEdit;
 	$self->getAdminConsole->setHelp("data form add/edit");
         return $self->getAdminConsole->render($self->getEditForm->print,WebGUI::International::get("7","DataForm"));
 }
@@ -654,7 +654,7 @@ sub www_edit {
 #-------------------------------------------------------------------
 sub www_editField {
 	my $self = shift;
-	return $self->getAdminConsole->render(WebGUI::Privilege::insufficient()) unless $self->canEdit;
+	return WebGUI::Privilege::insufficient() unless $self->canEdit;
     	my (%field, $f, %fieldStatus,$tab);
     	tie %field, 'Tie::CPHash';
     	tie %fieldStatus, 'Tie::IxHash';
@@ -764,7 +764,7 @@ sub www_editField {
 #-------------------------------------------------------------------
 sub www_editFieldSave {
 	my $self = shift;
-	return $self->getAdminConsole->render(WebGUI::Privilege::insufficient()) unless $self->canEdit;
+	return WebGUI::Privilege::insufficient() unless $self->canEdit;
 	$session{form}{name} = $session{form}{label} if ($session{form}{name} eq "");
 	$session{form}{tid} = "0" if ($session{form}{tid} eq "");
 	$session{form}{name} = WebGUI::URL::urlize($session{form}{name});
@@ -800,7 +800,7 @@ sub www_editFieldSave {
 #-------------------------------------------------------------------
 sub www_editTab {
 	my $self = shift;
-	return $self->getAdminConsole->render(WebGUI::Privilege::insufficient()) unless $self->canEdit;
+	return WebGUI::Privilege::insufficient() unless $self->canEdit;
     	my (%tab, $f);
     	tie %tab, 'Tie::CPHash';
         $session{form}{tid} = "new" if ($session{form}{tid} eq "");
@@ -840,7 +840,7 @@ sub www_editTab {
 #-------------------------------------------------------------------
 sub www_editTabSave {
 	my $self = shift;
-	return $self->getAdminConsole->render(WebGUI::Privilege::insufficient()) unless $self->canEdit;
+	return WebGUI::Privilege::insufficient() unless $self->canEdit;
 	$session{form}{name} = $session{form}{label} if ($session{form}{name} eq "");
 	$session{form}{name} = WebGUI::URL::urlize($session{form}{name});
         $session{form}{name} =~ s/\-//g;
@@ -860,7 +860,7 @@ sub www_editTabSave {
 #-------------------------------------------------------------------
 sub www_exportTab {
 	my $self = shift;
-	return $self->getAdminConsole->render(WebGUI::Privilege::insufficient()) unless $self->canEdit;
+	return WebGUI::Privilege::insufficient() unless $self->canEdit;
 	WebGUI::HTTP::setFilename($self->get("url").".tab","text/plain");
 	my %fields = WebGUI::SQL->buildHash("select DataForm_fieldId,name from DataForm_field where assetId=".quote($self->getId)." order by sequenceNumber");
 	my $select = "select a.DataForm_entryId as entryId, a.ipAddress, a.username, a.userId, a.submissionDate";
@@ -883,7 +883,7 @@ sub www_exportTab {
 #-------------------------------------------------------------------
 sub www_moveFieldDown {
 	my $self = shift;
-	return $self->getAdminConsole->render(WebGUI::Privilege::insufficient()) unless $self->canEdit;
+	return WebGUI::Privilege::insufficient() unless $self->canEdit;
 	$self->moveCollateralDown("DataForm_field","DataForm_fieldId",$session{form}{fid},_tonull("DataForm_tabId",$session{form}{tid}));
 	return "";
 }
@@ -891,7 +891,7 @@ sub www_moveFieldDown {
 #-------------------------------------------------------------------
 sub www_moveFieldUp {
 	my $self = shift;
-	return $self->getAdminConsole->render(WebGUI::Privilege::insufficient()) unless $self->canEdit;
+	return WebGUI::Privilege::insufficient() unless $self->canEdit;
 	$self->moveCollateralUp("DataForm_field","DataForm_fieldId",$session{form}{fid},_tonull("DataForm_tabId",$session{form}{tid}));
 	return "";
 }
@@ -899,7 +899,7 @@ sub www_moveFieldUp {
 #-------------------------------------------------------------------
 sub www_moveTabRight {
 	my $self = shift;
-	return $self->getAdminConsole->render(WebGUI::Privilege::insufficient()) unless $self->canEdit;
+	return WebGUI::Privilege::insufficient() unless $self->canEdit;
 	$self->moveCollateralDown("DataForm_tab","DataForm_tabId",$session{form}{tid});
 	return "";
 }
@@ -907,7 +907,7 @@ sub www_moveTabRight {
 #-------------------------------------------------------------------
 sub www_moveTabLeft {
 	my $self = shift;
-	return $self->getAdminConsole->render(WebGUI::Privilege::insufficient()) unless $self->canEdit;
+	return WebGUI::Privilege::insufficient() unless $self->canEdit;
 	$self->moveCollateralUp("DataForm_tab","DataForm_tabId",$session{form}{tid});
 	return "";
 }

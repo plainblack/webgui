@@ -390,7 +390,7 @@ sub view {
 #-------------------------------------------------------------------
 sub www_edit {
         my $self = shift;
-        return $self->getAdminConsole->render(WebGUI::Privilege::insufficient()) unless $self->canEdit;
+        return WebGUI::Privilege::insufficient() unless $self->canEdit;
         $self->getAdminConsole->setHelp("search add/edit");
         return $self->getAdminConsole->render($self->getEditForm->print,WebGUI::International::get("26","Article"));
 }

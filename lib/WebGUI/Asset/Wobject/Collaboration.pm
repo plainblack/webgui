@@ -817,7 +817,7 @@ sub view {
 #-------------------------------------------------------------------
 sub www_edit {
         my $self = shift;
-	return $self->getAdminConsole->render(WebGUI::Privilege::insufficient()) unless $self->canEdit;
+	return WebGUI::Privilege::insufficient() unless $self->canEdit;
 #	$self->getAdminConsole->setHelp("user submission system add/edit");
         return $self->getAdminConsole->render($self->getEditForm->print,"Edit Collaboration System");
 }
@@ -873,6 +873,7 @@ sub www_search {
         $var{'form.search'} = WebGUI::Form::submit({value=>WebGUI::International::get(170)});
         $var{'form.end'} = WebGUI::Form::formFooter();
         $var{'back.url'} = $self->getUrl;
+	$self->appendTemplateLabels(\%var);
         $var{doit} = $session{form}{doit};
         if ($session{form}{doit}) {
                 my @fieldsToSearch = qw(asset.title asset.synopsis Post.content Post.username Post.userDefined1 Post.userDefined2 Post.userDefined3 Post.userDefined4 Post.userDefined5);
