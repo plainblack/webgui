@@ -15,6 +15,8 @@
  - bugfix [ 938266 ] Fix: 5.5.4 Synopsis ignores hideFromNav (Thanks to 
    Nicklous Roberts.)
  - bugfix [ 961056 ] pages erroneously owned by visitor
+ - bugfix [ 913847 ] Minutes on times can not be updated.
+
 
 
 5.5.6
