@@ -203,8 +203,8 @@ sub www_editPageSave {
 	}
         if (WebGUI::Privilege::canEditPage($pageId)) {
 		if ($session{form}{pageId} eq "new") {
-			($nextSeq) = WebGUI::SQL->quickArray("select max(sequenceNumber) from page where pageId=$session{page}{parentId}");
-                	$nextSeq += 1;
+			($nextSeq) = WebGUI::SQL->quickArray("select max(sequenceNumber) from page where parentId=$session{form}{parentId}");
+                	$nextSeq++;
 			$session{form}{pageId} = getNextId("pageId");
 			WebGUI::SQL->write("insert into page (pageId,sequenceNumber,parentId) 
 				values ($session{form}{pageId},$nextSeq,$session{form}{parentId})");
