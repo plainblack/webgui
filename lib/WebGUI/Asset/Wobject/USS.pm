@@ -27,6 +27,7 @@ use WebGUI::Style;
 use WebGUI::URL;
 use WebGUI::Utility;
 use WebGUI::Asset::Wobject;
+use WebGUI::Asset::USS_submission;
 
 our @ISA = qw(WebGUI::Asset::Wobject);
 
@@ -50,6 +51,7 @@ sub _xml_encode {
         return $_[0];
 }
 
+#-------------------------------------------------------------------
 sub definition {
 	my $class = shift;
         my $definition = shift;
@@ -315,7 +317,7 @@ sub view {
 	my $constraints;
 	if ($session{scratch}{search}) {
                 $numResults = $session{scratch}{numResults};
-       		$constraints = WebGUI::Search::buildConstraints([qw(USS_submission.username asset.title wobject.description USS_submission.userDefined1 USS_submission.userDefined2 USS_submission.userDefined3 USS_submission.userDefined4 USS_submission.userDefined5)]);
+       		$constraints = WebGUI::Search::buildConstraints([qw(USS_submission.username asset.synopsis asset.title USS_submission.content USS_submission.userDefined1 USS_submission.userDefined2 USS_submission.userDefined3 USS_submission.userDefined4 USS_submission.userDefined5)]);
 	}
 	if ($constraints ne "") {
         	$constraints = "USS_submission.status='Approved' and ".$constraints;
@@ -326,16 +328,18 @@ sub view {
 		}
 		$constraints .= ")";
 	}
-	my $p = WebGUI::Paginator->new(WebGUI::URL::page('func=view'),$numResults);
-	$p->setDataByQuery("select * from USS_submission left join asset on USS_submission.assetId=asset.assetId 
-		where asset.parentId=".quote($self->getId)." and asset.className='WebGUI:Asset::Wobject::USS_submission' and $constraints 
-		order by ".$self->getValue("sortBy")." ".$self->getValue("sortOrder"));
+	my $p = WebGUI::Paginator->new($self->getUrl,$numResults);
+	my $sql = "select * from USS_submission left join asset on USS_submission.assetId=asset.assetId 
+		where asset.parentId=".quote($self->getId)." and asset.className='WebGUI::Asset::USS_submission' and $constraints 
+		order by ".$self->getValue("sortBy")." ".$self->getValue("sortOrder");
+WebGUI::ErrorHandler::warn($sql);
+	$p->setDataByQuery($sql);
 	my $page = $p->getPageData;
 	my $i = 0;
 	my $imageURL = "";
 	foreach my $row (@$page) {
-		my $submission = WebGUI::Asset::Wobject::USS_submission->newByPropertyHashRef($row);
-		my $body = WebGUI::HTML::filter($submission->get("description"),$self->get("filterContent"));
+		my $submission = WebGUI::Asset::USS_submission->newByPropertyHashRef($row);
+		my $body = WebGUI::HTML::filter($submission->get("content"),$self->get("filterContent"));
 		$body = WebGUI::HTML::format($body,$submission->get("contentType"));
 		my $controls = deleteIcon('func=delete',$submission->getUrl,WebGUI::International::get(17,"USS")).editIcon('func=edit',$submission->getUrl);
 		if ($self->get("sortBy") eq "lineage") {
@@ -354,8 +358,8 @@ sub view {
                 push(@{$var{submissions_loop}}, {
                         "submission.id"=>$submission->getId,
                         "submission.url"=>$submission->getUrl,
-                        "submission.content"=>$submission->{synopsis},
-			"submission.content.full"=>$submission->{description},
+                        "submission.content"=>$submission->get("synopsis"),
+			"submission.content.full"=>$submission->get("content"),
 			"submission.responses"=>$submission->getResponseCount,
                         "submission.title"=>$submission->get("title"),
                         "submission.userDefined1"=>$submission->get("userDefined1"),

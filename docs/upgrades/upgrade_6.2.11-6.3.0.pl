@@ -6,6 +6,7 @@ use File::Path;
 use File::Copy;
 use Getopt::Long;
 use strict;
+use WebGUI::HTML;
 use WebGUI::Id;
 use WebGUI::Session;
 use WebGUI::SQL;
@@ -193,9 +194,9 @@ WebGUI::SQL->write("alter table USS_submission drop column USS_id");
 WebGUI::SQL->write("alter table USS_submission drop column endDate");
 WebGUI::SQL->write("alter table USS_submission drop column USS_submissionId");
 WebGUI::SQL->write("alter table USS_submission drop column pageId");
-WebGUI::SQL->write("alter table USS_submission drop column content");
 WebGUI::SQL->write("alter table USS_submission drop column image");
 WebGUI::SQL->write("alter table USS_submission drop column attachment");
+WebGUI::SQL->write("alter table USS_submission add primary key (assetId)");
 WebGUI::SQL->write("alter table Product_accessory drop column wobjectId");
 WebGUI::SQL->write("alter table Product_benefit drop column wobjectId");
 WebGUI::SQL->write("alter table Product_feature drop column wobjectId");
@@ -1000,6 +1001,7 @@ sub walkTree {
 				$sth->finish;
 				rmtree($session{config}{uploadsPath}.'/'.$wobject->{wobjectId});
 			} elsif ($wobject->{namespace} eq "Product") {
+				print "\t\t\tMigrating information for Product ".$wobject->{wobjectId}."\n" unless ($quiet);
 			    my ($newProductStoreId);
 				# do a check to see if they've installed Image::Magick
                 my  $hasImageMagick = 1;
@@ -1039,6 +1041,7 @@ sub walkTree {
 					WebGUI::SQL->write("update $table set assetId=".quote($wobjectId)." where wobjectId=".quote($wobject->{wobjectId}));
 				}
 			} elsif ($wobject->{namespace} eq "USS") {
+				print "\t\t\tMigrating submissions for USS ".$wobject->{wobjectId}."\n" unless ($quiet);
 #| dateSubmitted    | int(11)      | YES  |     | NULL       |       |
 #| username         | varchar(30)  | YES  |     | NULL       |       |
 #| userId           | varchar(22)  | YES  |     | NULL       |       |
@@ -1062,29 +1065,37 @@ sub walkTree {
 #| content          | text         | YES  |     | NULL       |       |
 #| image            | varchar(255) | YES  |     | NULL       |       |
 #| attachment       | varchar(255) | YES  |     | NULL       |       |
-				my $sth = WebGUI::SQL->read("select * from USS_submission where USS_id=".quote($wobject->{USS_id}));
+				my ($ussId) = WebGUI::SQL->quickArray("select USS_id from USS where wobjectId=".quote($wobject->{wobjectId}));
+				my $sth = WebGUI::SQL->read("select * from USS_submission where USS_id=".quote($ussId));
+				my $usssubrank = 1;
 				while (my $submission = $sth->hashRef) {
+					print "\t\t\t\tMigrating submission ".$submission->{USS_submissionId}."\n" unless ($quiet);
+					my $body = $submission->{content};
+                			$body =~ s/\n/\^\-\;/ unless ($body =~ m/\^\-\;/);
+                			my @content = split(/\^\-\;/,$body);
+					$content[0] = WebGUI::HTML::filter($content[0],"none");
+					$body =~ s/\^\-\;/\n/;
 					my $id = WebGUI::SQL->setRow("asset","assetId",{
+						assetId => "new",
 						title => $submission->{title},
 						menuTitle => $submission->{title},
 						startDate => $submission->{startDate},
 						endDate => $submission->{endDate},
-						url => fixUrl($wobjectId,$submission->{title}),
-						className=>'WebGUI::Asset::Wobject::USS_submission',
+						url => fixUrl('notknownyet',$submission->{title}),
+						className=>'WebGUI::Asset::USS_submission',
 						state=>'published',
 						ownerUserId=>$submission->{userId},
-						groupIdView=>,
-						groupIdEdit=>,
-						synopsis=>,
-						fileSize=>length($submission->{content}),
+						groupIdView=>$page->{groupIdView},
+						groupIdEdit=>$page->{groupIdEdit},
+						synopsis=>$content[0],
+						assetSize=>length($submission->{content}),
 						parentId=>$wobjectId,
-						lineage=>$wobjectLineage.sprintf("%06d",1),
+						lineage=>$wobjectLineage.sprintf("%06d",$usssubrank),
 						isHidden => 1
 						});	
-					WebGUI::SQL->setRow("wobject","assetId",{
-						description => $submission->{content}
-						}, undef, $id);	
-					WebGUI::SQL->write("update USS_submission set assetId=".quote($id)." where USS_id=".quote($wobject->{USS_id}));	
+					WebGUI::SQL->write("update USS_submission set content=".quote($body).", 
+						assetId=".quote($id)." where USS_submissionId=".quote($submission->{USS_submissionId}));	
+					$usssubrank++;
 				}
 				# migrate master forum
 				# migrate submissions

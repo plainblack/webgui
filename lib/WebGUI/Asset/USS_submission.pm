@@ -12,9 +12,12 @@ package WebGUI::Asset::USS_submission;
 
 use strict;
 use Tie::CPHash;
+use WebGUI::Asset;
+use WebGUI::Asset::Template;
+use WebGUI::Asset::Wobject::USS;
 use WebGUI::DateTime;
-use WebGUI::Forum;
-use WebGUI::Forum::UI;
+#use WebGUI::Forum;
+#use WebGUI::Forum::UI;
 use WebGUI::Grouping;
 use WebGUI::HTML;
 use WebGUI::HTMLForm;
@@ -29,12 +32,9 @@ use WebGUI::Privilege;
 use WebGUI::Session;
 use WebGUI::SQL;
 use WebGUI::Style;
-use WebGUI::Template;
 use WebGUI::URL;
 use WebGUI::User;
 use WebGUI::Utility;
-use WebGUI::Asset;
-use WebGUI::Asset::Wobject::USS;
 
 our @ISA = qw(WebGUI::Asset);
 
@@ -112,7 +112,8 @@ sub definition {
 			userDefined5 => {
 				fieldType=>"text",
 				defaultValue=>undef
-				},
+				}
+			}
 		});
         return $class->SUPER::definition($definition);
 }
@@ -127,8 +128,28 @@ sub getIcon {
 }
 
 #-------------------------------------------------------------------
+sub getImageUrl {
+	return '/image.jpg';
+}
+
+#-------------------------------------------------------------------
 sub getName {
         return "USS Submission";
+}
+
+#-------------------------------------------------------------------
+sub getResponseCount {
+	return 0;
+}
+
+#-------------------------------------------------------------------
+sub getStatus {
+	return 'Approved';
+}
+
+#-------------------------------------------------------------------
+sub getThumbnailUrl {
+	return '/thumbnail.jpg';
 }
 
 #-------------------------------------------------------------------
@@ -143,13 +164,13 @@ sub processPropertiesFromFormPost {
 	$data{startDate} = $self->getParent->get("startDate") unless ($session{form}{startDate});
 	$data{endDate} = $self->getParent->get("endDate") unless ($session{form}{endDate});
 	unless ($session{form}{synopsis}) {
-		my $body = $session{form}{description};
+		my $body = $session{form}{content};
                 $body =~ s/\n/\^\-\;/ unless ($body =~ m/\^\-\;/);
                 my @content = split(/\^\-\;/,$body);
 		$content[0] = WebGUI::HTML::filter($content[0],"none");
 		$data{synopsis} = $content[0];
 		$body =~ s/\^\-\;/\n/;
-		$data{description} = $body;
+		$data{content} = $body;
 	}
 	$self->update(\%data);
 }
@@ -270,7 +291,7 @@ sub view {
 			{callback=>$callback,title=>$submission->{title},forumId=>$submission->{forumId}},
 			$submission->{forumId});
 	}
-	return $self->processTemplate(\%var,"USS/Submission",$self->get("submissionTemplateId"));
+	return $self->processTemplate(\%var,$self->get("submissionTemplateId"));
 }
 
 #-------------------------------------------------------------------
@@ -306,8 +327,8 @@ sub www_edit {
 	my $self = shift;
 	return WebGUI::Privilege::insufficient() unless ($self->canEdit);
 	my %var;
-	if ($submission->{USS_submissionId} eq "new") {
-		$submission->{contentType} = "mixed";
+	if ($session{form}{func} eq "add") {
+		$self->{_properties}{contentType} = "mixed";
 		$var{'submission.isNew'} = 1;
 	}
 	$var{'link.header.label'} = WebGUI::International::get(90,"USS");
@@ -367,14 +388,14 @@ sub www_edit {
         $var{'body.label'} = WebGUI::International::get(31,"USS");
 	$var{'answer.label'} = WebGUI::International::get(86,"USS");
         $var{'description.label'} = WebGUI::International::get(85);
-	$var{'body.value'} = $self->get("description"); 
+	$var{'body.value'} = $self->get("content"); 
 	$var{'body.form'} = WebGUI::Form::HTMLArea({
 		name=>"body",
-		value=>$self->get("description")
+		value=>$self->get("content")
 		});
 	$var{'body.form.textarea'} = WebGUI::Form::textarea({
 		name=>"body",
-		value=>$self->get("description")
+		value=>$self->get("content")
 		});
 #	$var{'image.label'} = WebGUI::International::get(32,"USS");
  #       if ($submission->{image} ne "") {
@@ -411,11 +432,11 @@ sub www_edit {
 		});
 	$var{'form.submit'} = WebGUI::Form::submit();
 	$var{'form.footer'} = WebGUI::Form::formFooter();
-	return $self->getParent->processStyle($self->processTemplate(\%var,"USS/SubmissionForm",$self->getParent->get("submissionFormTemplate")));
+	return $self->getParent->processStyle($self->processTemplate(\%var,$self->getParent->get("submissionFormTemplate")));
 }
 
 #-------------------------------------------------------------------
-sub www_editSave {
+sub www_editSave2 {
 	my ($submission, %hash, $file, $u);
 	$submission = $_[0]->getCollateral("USS_submission","USS_submissionId",$session{form}{sid});
         if ($submission->{userId} eq $session{user}{userId} 
