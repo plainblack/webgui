@@ -377,14 +377,14 @@ INSERT INTO Navigation VALUES (8,'rootmenu',1,'daughters','root',-1,3,0,0,0,0);
 INSERT INTO Navigation VALUES (9,'SpecificDropMenu',3,'descendants','home',-1,4,0,0,0,0);
 INSERT INTO Navigation VALUES (10,'SpecificSubMenuVertical',3,'descendants','home',-1,1,0,0,0,0);
 INSERT INTO Navigation VALUES (11,'SpecificSubMenuHorizontal',1,'descendants','home',-1,3,0,0,0,0);
-INSERT INTO Navigation VALUES (12,'TopLevelMenuVertical',99,'descendants','WebGUIroot',-1,1,0,0,0,0);
-INSERT INTO Navigation VALUES (13,'TopLevelMenuHorizontal',99,'descendants','WebGUIroot',-1,3,0,0,0,0);
+INSERT INTO Navigation VALUES (12,'TopLevelMenuVertical',1,'descendants','WebGUIroot',-1,1,0,0,0,0);
+INSERT INTO Navigation VALUES (13,'TopLevelMenuHorizontal',1,'descendants','WebGUIroot',-1,3,0,0,0,0);
 INSERT INTO Navigation VALUES (14,'RootTab',99,'daughters','root',-1,5,0,0,0,0);
-INSERT INTO Navigation VALUES (15,'TopDropMenu',99,'decendants','WebGUIroot',-1,4,0,0,0,0);
+INSERT INTO Navigation VALUES (15,'TopDropMenu',1,'decendants','WebGUIroot',-1,4,0,0,0,0);
 INSERT INTO Navigation VALUES (16,'dtree',99,'self_and_descendants','WebGUIroot',-1,6,0,0,0,0);
 INSERT INTO Navigation VALUES (17,'coolmenu',99,'descendants','WebGUIroot',-1,7,0,0,0,0);
 INSERT INTO Navigation VALUES (18,'Synopsis',99,'self_and_descendants','current',-1,8,0,0,0,0);
-INSERT INTO Navigation VALUES (1000,'TopLevelMenuHorizontal_1000',99,'WebGUIroot','WebGUIroot',-1,1000,0,0,0,0);
+INSERT INTO Navigation VALUES (1000,'TopLevelMenuHorizontal_1000',1,'WebGUIroot','WebGUIroot',-1,1000,0,0,0,0);
 INSERT INTO Navigation VALUES (1001,'currentMenuHorizontal_1001',1,'descendants','current',-1,1001,0,0,0,0);
 INSERT INTO Navigation VALUES (1002,'FlexMenu_1002',99,'pedigree','current',2,1,0,0,0,0);
 
