@@ -492,6 +492,19 @@ oTags[i].outerHTML = oTags[i].innerHTML;
                         var tar_attribute = '';
                         var linkText = '';
 
+		  
+			// a few tests.
+      var elmSelectedImage;
+      var htmlSelectionControl = "Control";
+      var grngMaster = editdoc.selection.createRange();
+	    if (editdoc.selection.type == htmlSelectionControl) {   
+	       // alright! here we have an image.
+         elmSelectedImage = grngMaster.item(0);	
+	 			 highlightedText = elmSelectedImage.outerHTML; 				 
+		  }
+		  
+			else { // else NOT an image
+			
                   if (editdoc.selection.createRange().parentElement().outerHTML.search(/^\<[A|a]/) != -1) {
 
                           var fullElement = editdoc.selection.createRange().parentElement().outerHTML;
@@ -518,6 +531,7 @@ oTags[i].outerHTML = oTags[i].innerHTML;
                                 linkText = lt[0];
 
                         }
+      }
 
                         var myValues = new Object();
                         myValues.highlightedText = highlightedText;
@@ -534,10 +548,16 @@ oTags[i].outerHTML = oTags[i].innerHTML;
                                 }
                         }
                         else {
-                          if (myText) { editor_insertHTML(objname, unescape(myText) ); } // this function ALWAYS puts in an absolute link
+			  if (myText) { 
+   			  if (editdoc.selection.type == htmlSelectionControl) {
+	          grngMaster.execCommand('Delete');
+					}
+ 				  editor_insertHTML(objname, unescape(myText) ); // this function ALWAYS puts in an absolute link 
+				} 
                         }
 
           }
+
 
     // insert image
     else if (cmdID.toLowerCase() == 'insertimage'){
@@ -862,6 +882,7 @@ function editor_filterOutput(objname) {
     var matchTag = /<\/?(\w+)((?:[^'">]*|'[^']*'|"[^"]*")*)>/g;   // this will match tags, but still doesn't handle container tags (textarea, comments, etc)
 
   contents = contents.replace(matchTag, filterTag);
+  contents = contents.replace(/http:\/\/www\.___relativelink___\.com\//g, ""); 
 
   // remove nextlines from output (if requested)
   if (config.replaceNextlines) { 
