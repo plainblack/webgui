@@ -21,24 +21,18 @@ our @EXPORT = qw(&www_switchOffAdmin &www_switchOnAdmin);
 
 #-------------------------------------------------------------------
 sub www_switchOffAdmin {
-	if ($session{var}{sessionId}) {
-		WebGUI::SQL->write("update userSession set adminOn=0 where sessionId='$session{var}{sessionId}'");
-		WebGUI::Session::refreshSessionVars($session{var}{sessionId});
-		return "";
-	} else {
-		return WebGUI::Privilege::insufficient();
-	}
+	return "" unless (WebGUI::Privilege::isInGroup(5));
+	WebGUI::SQL->write("update userSession set adminOn=0 where sessionId='$session{var}{sessionId}'");
+	WebGUI::Session::refreshSessionVars($session{var}{sessionId});
+	return "";
 }
 
 #-------------------------------------------------------------------
 sub www_switchOnAdmin {
-        if ($session{var}{sessionId}) {
-                WebGUI::SQL->write("update userSession set adminOn=1 where sessionId='$session{var}{sessionId}'");
-                WebGUI::Session::refreshSessionVars($session{var}{sessionId});
-                return "";
-        } else {
-                return WebGUI::Privilege::insufficient();
-        }
+	return "" unless (WebGUI::Privilege::isInGroup(5));
+        WebGUI::SQL->write("update userSession set adminOn=1 where sessionId='$session{var}{sessionId}'");
+        WebGUI::Session::refreshSessionVars($session{var}{sessionId});
+	return "";
 }
 
 

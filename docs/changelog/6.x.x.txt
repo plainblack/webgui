@@ -57,5 +57,8 @@ webgui.
  - The everyone and registered users group are no longer magic in that there
    are physical linkages between them and users. The magic was getting too
    hard to maintain and users were confused by it.
- 
+ - Added a "Turn Admin On" group to determine who can enable or disable admin
+   mode. 
+
+
 

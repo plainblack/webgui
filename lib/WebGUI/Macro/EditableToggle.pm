@@ -20,7 +20,7 @@ use WebGUI::URL;
 #-------------------------------------------------------------------
 sub process {
        my ($temp, @param, $turnOn, $turnOff);
-       if (WebGUI::Privilege::canEditPage()) {
+       if (WebGUI::Privilege::canEditPage() && WebGUI::Privilege::isInGroup(5)) {
                @param = WebGUI::Macro::getParams($_[0]);
                if ($session{var}{adminOn}) {
                        $turnOff = $param[1] || WebGUI::International::get(517);

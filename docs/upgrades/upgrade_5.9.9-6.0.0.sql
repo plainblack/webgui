@@ -350,6 +350,14 @@ alter table groups add column showInForms int not null default 1;
 update groups set isEditable=0 where groupId in (1,2,7);
 insert into groupings (groupId,userId) select userId, 7 from users;
 insert into groupings (groupId,userId) select userId, 2 from users where userId<>1;
+insert into groups (groupId,groupName,description,showInForms) values (5,'Turn Admin On','These users can enable admin mode.',0);
+insert into groupGroupings (groupId, inGroup) values (3,5);
+insert into groupGroupings (groupId, inGroup) values (4,5);
+insert into groupGroupings (groupId, inGroup) values (6,5);
+insert into groupGroupings (groupId, inGroup) values (8,5);
+insert into groupGroupings (groupId, inGroup) values (9,5);
+insert into groupGroupings (groupId, inGroup) values (10,5);
+insert into groupGroupings (groupId, inGroup) values (11,5);
 
 
 
