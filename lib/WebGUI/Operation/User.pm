@@ -425,7 +425,7 @@ sub www_editUserGroup {
 		'</td><td class="tableHeader">'.WebGUI::International::get(369).'</td></tr>';
 	my $p = WebGUI::Paginator->new("op=editUserGroups&uid=".$session{form}{uid});
 	$p->setDataByQuery("select groups.groupId,groups.groupName,groupings.expireDate 
-		from groupings,groups where groupings.groupId=groups.groupId and groupings.userId=$session{form}{uid} order by groups.groupName");
+		from groupings,groups where groupings.groupId=groups.groupId and groupings.userId=$session{form}{uid} and groups.isEditable > 0 order by groups.groupName");
 	foreach my $row (@{$p->getPageData}) {
                 $output .= '<tr><td>'
 			.WebGUI::Form::checkbox({

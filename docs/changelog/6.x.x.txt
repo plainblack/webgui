@@ -29,7 +29,7 @@
  - Bugfix: [ 1003594 ] Fixed Navigation Cacheing bug
  - Bugfix: [ 1000299 ] laodAllConfigs should be loadAllConfigs?
  - Bugfix: [ 995088 ] Error in printable macro 6.1.1
-
+ - Bugfix: [ 1003511 ] Users cannot be added to Registered Users if removed
 
 6.1.1
  - bugfix [ 991313 ] Manage Translations doesn't work
