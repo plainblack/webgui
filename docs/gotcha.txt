@@ -35,6 +35,14 @@ save you many hours of grief.
    		background-color: #dddddd; 
 	}
 
+ * If you have downloaded and installed the HttpProxy wobject from
+	the contributions then you will need to delete it prior to
+	upgrading or the database upgrade will fail. To remove it
+	from the database just run the following commands from your
+	MySQL prompt:
+
+	drop table HttpProxy;
+	delete from Wobject where namespace='HttpProxy';
 
 
 5.1.0
