@@ -492,10 +492,11 @@ sub www_editPageSave {
         $session{form}{menuTitle} = $session{form}{title} if ($session{form}{menuTitle} eq "");
         $session{form}{urlizedTitle} = $session{form}{menuTitle} if ($session{form}{urlizedTitle} eq "");
 	$session{form}{urlizedTitle} = WebGUI::Page::makeUnique(WebGUI::URL::urlize($session{form}{urlizedTitle}),$session{form}{pageId});
+	$session{form}{ownerId} ||= 3;
         WebGUI::SQL->write("update page set 
 		title=".quote($session{form}{title}).", 
-		styleId=$session{form}{styleId}, 
-		ownerId=($session{form}{ownerId} || 3), 
+		styleId=$session{form}{styleId},
+		ownerId=$session{form}{ownerId},
 		groupIdView=$session{form}{groupIdView}, 
 		groupIdEdit=$session{form}{groupIdEdit}, 
 		newWindow=$session{form}{newWindow},
