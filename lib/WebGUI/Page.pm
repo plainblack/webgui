@@ -31,6 +31,7 @@ use WebGUI::Style;
 use WebGUI::Template;
 use WebGUI::Utility;
 use DBIx::Tree::NestedSet;
+use WebGUI::MetaData;
 
 our @ISA = qw(DBIx::Tree::NestedSet);
 
@@ -478,7 +479,10 @@ sub generate {
        		if (${$wobject}{namespace} eq "WobjectProxy") {
           		my $originalWobject = $wobject;
       			my ($wobjectProxy) = WebGUI::SQL->quickHashRef("select * from WobjectProxy where wobjectId=".${$wobject}{wobjectId},WebGUI::SQL->getSlave);
-        		$wobject = WebGUI::SQL->quickHashRef("select * from wobject where wobject.wobjectId=".$wobjectProxy->{proxiedWobjectId},WebGUI::SQL->getSlave);
+			if($wobjectProxy->{proxyByCriteria}) {
+				$wobjectProxy->{proxiedWobjectId} = WebGUI::MetaData::getWobjectByCriteria($wobjectProxy) || $wobjectProxy->{proxiedWobjectId};
+			}
+	        	$wobject = WebGUI::SQL->quickHashRef("select * from wobject where wobject.wobjectId=".$wobjectProxy->{proxiedWobjectId},WebGUI::SQL->getSlave);
            		if (${$wobject}{namespace} eq "") {
              			$wobject = $originalWobject;
          		} else {

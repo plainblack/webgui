@@ -22,6 +22,7 @@ use WebGUI::Page;
 use WebGUI::TabForm;
 use WebGUI::Template;
 use WebGUI::Wobject;
+use WebGUI::MetaData;
 
 our @ISA = qw(WebGUI::Wobject);
 
@@ -64,7 +65,19 @@ sub new {
 			proxiedTemplateId=>{
 				fieldType=>"template",
 				defaultValue=>1
-				}
+				},
+			proxyByCriteria=>{
+				fieldType=>"yesNo",
+				defaultValue=>0,
+				},
+			resolveMultiples=>{
+				fieldType=>"selectList",
+				defaultValue=>"mostRecent",
+				},
+			proxyCriteria=>{
+				fieldType=>"textarea",
+				defaultValue=>"",
+				},
                         }
                 );
         bless $self, $class;
@@ -111,13 +124,171 @@ sub www_edit {
 		-label=>WebGUI::International::get(1,$_[0]->get("namespace")),
 		-value=>'<a href="'.WebGUI::URL::gateway($data[0]).'">'.$data[1].'</a> ('.$_[0]->get("proxiedWobjectId").')'
 		);
+	$properties->yesNo(
+		-name=>"proxyByCriteria",
+		-value=>$_[0]->getValue("proxyByCriteria"),
+		-label=>WebGUI::International::get("Proxy by alternate criteria?",$_[0]->get("namespace")),
+		-extras=>q|Onchange="
+				if (this.form.proxyByCriteria[0].checked) { 
+ 					this.form.resolveMultiples.disabled=false;
+					this.form.proxyCriteria.disabled=false;
+				} else {
+ 					this.form.resolveMultiples.disabled=true;
+					this.form.proxyCriteria.disabled=true;
+				}"|
+                );
+	my $extras;
+	if ($_[0]->getValue("proxyByCriteria") == 0) {
+		$extras = 'disabled=true';
+	}
+	$properties->selectList(
+		-name=>"resolveMultiples",
+		-value=>[ $_[0]->getValue("resolveMultiples") ],
+		-label=>WebGUI::International::get("Resolve Multiples?",$_[0]->get("namespace")),
+		-options=>{
+				mostRecent=>WebGUI::International::get("Most Recent",$_[0]->get("namespace")),
+				random=>WebGUI::International::get("Random",$_[0]->get("namespace")),
+			},
+		-extras=>$extras
+		);
+
+	 $properties->readOnly(
+        -value=>$_[0]->_drawQueryBuilder(),
+        -label=>WebGUI::International::get("Criteria",$_[0]->get("namespace")),
+	
+        );
 	return $_[0]->SUPER::www_edit(
                 -properties=>$properties->printRowsOnly,
                 -layout=>$layout->printRowsOnly,
                 -headingId=>2,
                 -helpId=>"wobject proxy add/edit"
                 );
+}
 
+#-------------------------------------------------------------------
+sub _drawQueryBuilder {
+	# Initialize operators
+	my @textFields = qw|text yesNo selectList radioList|;
+	my %operator;
+	foreach (@textFields) {
+		$operator{$_} = {
+				"=" => WebGUI::International::get("is",$_[0]->get("namespace")),
+				"!=" => WebGUI::International::get("isnt",$_[0]->get("namespace"))
+			};
+	}
+	$operator{integer} = {
+				"=" => WebGUI::International::get("equal to",$_[0]->get("namespace")),
+                                "!=" => WebGUI::International::get("not equal to",$_[0]->get("namespace")),
+				"<" => WebGUI::International::get("less than",$_[0]->get("namespace")),
+				">" => WebGUI::International::get("greater than",$_[0]->get("namespace"))
+			};
+
+	# Get the fields and count them	
+	my $fields = WebGUI::MetaData::getMetaDataFields();
+	my $fieldCount = scalar(keys %$fields);
+	
+	unless ($fieldCount) {	# No fields found....
+		return 'No metadata defined yet.
+			<a href="'.WebGUI::URL::page('op=manageMetaData').
+			'">Click here</a> to define metadata attributes.';
+	}
+
+	# Static form fields
+	my $proxyCriteriaField = WebGUI::Form::textarea({
+	                	        name=>"proxyCriteria",
+        	                	value=>$_[0]->getValue("proxyCriteria"),
+                	        });
+	my $conjunctionField = WebGUI::Form::selectList({
+					name=>"conjunction",
+					options=>{
+						"AND" => WebGUI::International::get("AND",$_[0]->get("namespace")),
+						"OR" => WebGUI::International::get("OR",$_[0]->get("namespace"))},
+					value=>["OR"],
+					extras=>'class="qbselect"',
+				});
+	
+	# html
+	my $output;
+	$output .= '<script type="text/javascript" language="javascript" src="'.
+		$session{config}{extrasURL}.'/wobject/WobjectProxy/querybuilder.js"></script>';
+	$output .= '<link href="'.$session{config}{extrasURL}.
+			'/wobject/WobjectProxy/querybuilder.css" type="text/css" rel="stylesheet">';
+
+	$output .= qq|<table cellspacing="0" cellpadding=0 border=0 >
+			  <tr>
+			    <td colspan="5">$proxyCriteriaField</td>
+			  </tr>
+			  <tr>
+			    <td></td>
+			    <td></td>
+			    <td></td>
+			    <td></td>
+			    <td class="qbtdright">
+			    </td>
+			  </tr>
+			  <tr>
+			    <td></td>
+			    <td></td>
+			    <td></td>
+			    <td></td>
+			    <td class="qbtdright">
+				$conjunctionField
+			    </td>
+			  </tr>
+	|;
+
+	# Here starts the field loop
+	foreach my $field (keys %$fields) {
+		my $fieldLabel = $fields->{$field}{fieldName};
+		my $fieldType = $fields->{$field}{fieldType} || "text";
+
+		# The operator select field
+		my $opFieldName = "op_field".$fields->{$field}{fieldId};
+		my $opField = WebGUI::Form::selectList({
+						name=>$opFieldName,
+						uiLevel=>5,
+						options=>$operator{$fieldType},
+						extras=>'class="qbselect"'
+					});	
+		# The value select field
+		my $valFieldName = "val_field".$fields->{$field}{fieldId};
+		my $valueField = WebGUI::Form::dynamicField($fieldType, {
+                                                name=>$valFieldName,
+                                                uiLevel=>5,
+                                                extras=>qq/title="$fields->{$field}{description}" class="qbselect"/,
+                                                possibleValues=>$fields->{$field}{possibleValues},
+					});
+		# An empty row
+		$output .= qq|
+                          <tr>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td class="qbtdright"></td>
+                          </tr>
+			|;
+		
+		# Table row with field info
+		$output .= qq|
+			  <tr>
+			    <td class="qbtdleft"><p class="qbfieldLabel">$fieldLabel</p></td>
+			    <td class="qbtd">
+				$opField
+			    </td>
+			    <td class="qbtd">
+				<span class="qbText">$valueField</span>
+			    </td>
+			    <td class="qbtd"></td>
+			    <td class="qbtdright">
+				<input class="qbselect" type=button value=Add onclick="addCriteria('$fieldLabel', this.form.$opFieldName, this.form.$valFieldName)"></td>
+			  </tr>
+			|;
+	}
+	# Close the table
+	$output .= "</table>";
+
+	return $output;
 }
 
 #-------------------------------------------------------------------

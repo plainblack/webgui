@@ -24,6 +24,7 @@ use WebGUI::SQL;
 use WebGUI::Style;
 use WebGUI::Template;
 use WebGUI::URL;
+use WebGUI::Utility;
 
 =head1 NAME
 
@@ -459,7 +460,59 @@ sub dateTime {
                         </script>';
 }
 
+#-------------------------------------------------------------------
 
+=head2 dynamicField ( fieldType , hashRef )
+                                                                                                                         
+Returns a dynamic configurable field.
+                                                                                                                         
+=over
+                                                                                                                         
+=item fieldType
+
+The field type to use. The field name is the name of the method from this forms package.
+
+=item options
+
+The field options. See the documentation for the desired field for more information.
+                                                                                                                         
+=back
+                                                                                                                         
+=cut
+
+sub dynamicField {
+	my $fieldType = shift;
+	my $param = shift;
+
+        # Set options for fields that use a list.
+        if (isIn($fieldType,qw(selectList checkList radioList))) {
+                delete $param->{size};
+                my %options;
+                tie %options, 'Tie::IxHash';
+                foreach (split(/\n/, $param->{possibleValues})) {
+                        s/\s+$//; # remove trailing spaces
+                        $options{$_} = $_;
+                }
+		if (exists $param->{options} && ref($param->{options}) eq "HASH") {
+			%options = (%{$param->{options}} , %options);
+		}
+                $param->{options} = \%options;
+        }
+        # Convert value to list for selectList / checkList
+        if (isIn($fieldType,qw(selectList checkList)) && ref $param->{value} ne "ARRAY") {
+                my @defaultValues;
+                foreach (split(/\n/, $param->{value})) {
+                                s/\s+$//; # remove trailing spaces
+                                push(@defaultValues, $_);
+                }
+                $param->{value} = \@defaultValues;
+        }
+
+	# Return the appropriate field.
+	no strict 'refs';
+	return &$fieldType($param);
+
+}
 
 #-------------------------------------------------------------------
 

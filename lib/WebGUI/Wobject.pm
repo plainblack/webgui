@@ -1476,7 +1476,8 @@ sub www_edit {
 						-uiLevel=>5,
 						-value=>$meta->{$field}{value},
 						-extras=>qq/title="$meta->{$field}{description}"/,
-						-possibleValues=>$meta->{$field}{possibleValues}
+						-possibleValues=>$meta->{$field}{possibleValues},
+						-options=>{"", WebGUI::International::get("Select...","MetaData")}
 				);
         	}
 	}

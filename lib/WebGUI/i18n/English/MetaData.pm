@@ -50,8 +50,10 @@ our $I18N = {
 		message => q|Enable passive profiling ?|,
                 lastUpdated=> 1089039511,
         },
-
-
+	'Select...' => {
+		message => q|Select...|,
+		lastUpdated=> 1089039511,
+        },
 };
 
 1;

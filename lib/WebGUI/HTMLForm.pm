@@ -726,33 +726,9 @@ sub dynamicField {
 		$param{$1} = $param{$key};
 		delete $param{$key};
 	}
-	# Set options for fields that use a list.
-        if (isIn($fieldType,qw(selectList checkList radioList))) {
-                delete $param{size};
-                my %options;
-                tie %options, 'Tie::IxHash';
-                foreach (split(/\n/, $param{possibleValues})) {
-                        s/\s+$//; # remove trailing spaces
-                        $options{$_} = $_;
-                }
-                $param{options} = \%options;
-        }
-	# Convert value to list for selectList / checkList
-	if (isIn($fieldType,qw(selectList checkList)) && ref $param{value} ne "ARRAY") {
-                my @defaultValues;
-                foreach (split(/\n/, $param{value})) {
-                                s/\s+$//; # remove trailing spaces
-                                push(@defaultValues, $_);
-                }
-                $param{value} = \@defaultValues;
-        }
-
-
-        my $cmd = "WebGUI::Form::".$fieldType;
 	my $output;
         if (_uiLevelChecksOut($param{uiLevel})) {
-		no strict "refs";
-		$output = &$cmd(\%param);
+		$output = WebGUI::Form::dynamicField($fieldType, \%param);
                 $output .= _subtext($param{subtext});
                 $output = $self->_tableFormRow($param{label},$output);
         } else {

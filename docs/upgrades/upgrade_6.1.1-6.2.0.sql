@@ -49,3 +49,7 @@ INSERT INTO settings (name, value) values ("metaDataEnabled", 0);
 DELETE FROM settings WHERE name = "passiveProfilingEnabled";
 INSERT INTO settings (name, value) values ("passiveProfilingEnabled", 0);
 
+alter table WobjectProxy add proxyByCriteria int default 0;
+alter table WobjectProxy add resolveMultiples varchar(30) default "mostRecent";
+alter table WobjectProxy add proxyCriteria text default NULL;
+

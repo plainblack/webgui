@@ -18,6 +18,7 @@ package WebGUI::MetaData;
 use strict;
 use WebGUI::Session;
 use WebGUI::SQL;
+use WebGUI::Macro;
 use Tie::IxHash;
 
 =head1 NAME
@@ -42,8 +43,9 @@ These functions/methods are available from this package:
 
 
 #-------------------------------------------------------------------
+
                                                                                                                              
-=head2 getFieldTypes ( )
+=head2 getFieldTypes ()
                                                                                                                              
 Returns an array ref with supported metadata field types.
 
@@ -164,6 +166,8 @@ sub getMetaDataFields {
 
 Saves posted metadata for requested wobjectId
 
+=over
+
 =item wobjectId
 
 The Id from the wobject you want to save metadata for.
@@ -203,6 +207,8 @@ sub metaDataSave {
 
 Deletes the metadata for requested wobjectId
 
+=over
+
 =item wobjectId
 
 The Id from the wobject you want to delete metadata for.
@@ -221,6 +227,8 @@ sub metaDataDelete {
 =head2 MetaDataDuplicate ( fromWobjectId , toWobjectId )
 
 Duplicates Metadata
+
+=over
 
 =item fromWobjectId
 
@@ -244,6 +252,129 @@ sub MetaDataDuplicate {
         }
         $sth->finish;
 
+}
+
+#-------------------------------------------------------------------
+
+=head2 getWobjectByCriteria ( hashRef )
+
+This function will search for a wobject that match a metadata criteria set.
+If no wobject is found, undef will be returned.
+
+=over
+
+=item hashRef
+
+A typical hashRef for this function will look like:
+
+{
+	proxiedNamespace => "Article",
+	resolveMultiples => "random",
+	proxyCriteria => "State = Wisconsin AND Country != Sauk"
+}
+
+Most of the time this will be a:
+
+WebGUI::SQL->quickHashRef("select * from WobjectProxy where wobjectId=$proxiedId");
+
+=back
+
+=cut
+
+sub getWobjectByCriteria {
+	my $wobjectProxy = shift;
+	my $criteria = $wobjectProxy->{proxyCriteria};
+	my $order = $wobjectProxy->{resolveMultiples};
+	my $namespace = $wobjectProxy->{proxiedNamespace};
+	my $wobjectId = $wobjectProxy->{wobjectId};
+	
+	# Once a wobject is found, we will stick to that wobject, 
+	# to prevent the proxying of multiple- depth wobjects like Surveys and USS.
+	my $scratchId;
+	if ($wobjectId) {
+		$scratchId = "WobjectProxy_" . $wobjectId;
+		if($session{scratch}{$scratchId}) {
+			return $session{scratch}{$scratchId};
+		}
+	}
+
+	# $criteria = "State = Wisconsin AND Country != Sauk";
+	#
+	# State          =             Wisconsin AND Country != Sauk
+	# |              |             |
+	# |- $field      |_ $operator  |- $value
+	# |_ $attribute                |_ $attribute
+	my $operator = qr/<>|!=|=|>=|<=|>|<|like/i;
+	my $attribute = qr/['"][^()|=><!]+['"]|[^()|=><!\s]+/i; 
+                                                                                                      
+	my $constraint = $criteria;
+	
+	# Get each expression from $criteria
+	foreach my $expression ($criteria =~ /($attribute\s*$operator\s*$attribute)/gi) {
+		# $expression will match "State = Wisconsin"
+
+        	my $replacement = $expression;	# We don't want to modify $expression.
+						# We need it later.
+
+		# Get the field (State) and the value (Wisconsin) from the $expression.
+	        $expression =~ /($attribute)\s*$operator\s*($attribute)/gi;
+	        my $field = $1;
+	        my $value = $2;
+
+		# quote the field / value variables.
+		my $quotedField = $field;
+		unless ($field =~ /^\s*['"].*['"]\s*/) {
+			$quotedField = quote($field);
+		}
+		my $quotedValue = WebGUI::Macro::process($value);
+                unless ($value =~ /^\s*['"].*['"]\s*/) {
+                        $quotedValue = quote($value);
+                }
+		
+		# transform replacement from "State = Wisconsin" to 
+		# "(fieldname=State and value = Wisconsin)"
+	        $replacement =~ s/\Q$field/(fieldname=$quotedField and value /;
+	        $replacement =~ s/\Q$value/$quotedValue )/i;
+
+		# replace $expression with the new $replacement in $constraint.
+	        $constraint =~ s/\Q$expression/$replacement/;
+	}
+	my $sql =  "	select w.wobjectId 
+			from metaData_data d, metaData_fields f, wobject w 
+			where f.fieldId = d.fieldId
+				and w.wobjectId = d.wobjectId
+				and w.namespace = ".quote($namespace); 			
+
+	
+	# Add constraint only if it has been modified.
+	$sql .= " and ".$constraint if (($constraint ne $criteria) && $constraint ne "");
+	$sql .= " order by w.lastEdited desc";
+
+	# Execute the query with an unconditional read
+	my @wids;
+        my $sth = WebGUI::SQL->unconditionalRead($sql);
+        while (my ($data) = $sth->array) {
+		push (@wids, $data);
+        }
+        $sth->finish;
+
+	# No matching wobjects found.
+        if (scalar(@wids) == 0) {
+                return undef;
+	}
+	my $wid;
+	# Grab a wid from the results
+	if ($order = 'random') {
+		$wid = $wids[ rand @wids ];
+	} else { 
+				 #default order is mostRecent
+		$wid = $wids[0]; # 1st element in list is most recent.
+	}
+
+	# Store the matching wobjectId in user scratch. 
+	WebGUI::Session::setScratch($scratchId,$wid) if ($scratchId);
+
+	return $wid;		
 }
 
 1;

@@ -79,6 +79,71 @@ Set to "yes" to use the template of the wobject proxy instead of the original te
 		lastUpdated => 1053183804,
 		context => q|Asking the user if s/he would like to use the description specified in the wobject proxy or the original description of the original wobject.|
 	},
+	'Proxy by alternate criteria?' => {
+		message => q|Proxy by alternate criteria?|,
+		lastUpdated => 1053183804,
+		context => q|Asking the user if s/he would like to use alternate criteria to find a  matching a wobject to proxy.|
+        },
+	'Resolve Multiples?' => {
+                message => q|Resolve Multiples?|,
+                lastUpdated => 1053183804,
+                context => q|Asking the user what sort order (random / most recent) to use if multiple hits are found.|
+        },
+	'Most Recent' => {
+                message => q|Most Recent|,
+                lastUpdated => 1053183804,
+                context => q|Selectlist item for "Resolve Multiples?"|
+        },
+	'Random'  => {
+                message => q|Random|,
+                lastUpdated => 1053183804,
+                context => q|Selectlist item for "Resolve Multiples?"|
+        },
+	'Criteria' => {
+                message => q|Criteria|,
+                lastUpdated => 1053183804,
+                context => q|Label for the criteria textarea|
+        },
+	'AND' => {
+		message => q|AND|,
+		lastUpdated => 1053183804,
+                context => q|Part of the WobjectProxy Query Builder|
+        },
+        'OR' => {
+                message => q|OR|,
+                lastUpdated => 1053183804,
+                context => q|Part of the WobjectProxy Query Builder|
+        },
+        'is' => {
+                message => q|is|,
+                lastUpdated => 1053183804,
+                context => q|Part of the WobjectProxy Query Builder|
+        },
+        'isnt' => {
+                message => q|isn't|,
+                lastUpdated => 1053183804,
+                context => q|Part of the WobjectProxy Query Builder|
+        },
+	"less than" => {
+		message => q|less than|,
+                lastUpdated => 1053183804,
+                context => q|Part of the WobjectProxy Query Builder|
+        },
+        "equal to" => {
+                message => q|equal to|,
+                lastUpdated => 1053183804,
+                context => q|Part of the WobjectProxy Query Builder|
+        },
+        "greater than" => {
+                message => q|greater than|,
+                lastUpdated => 1053183804,
+                context => q|Part of the WobjectProxy Query Builder|
+        },
+        "not equal to" => {
+                message => q|not equal to|,
+                lastUpdated => 1053183804,
+                context => q|Part of the WobjectProxy Query Builder|
+        },
 
 };
 
