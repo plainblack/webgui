@@ -1393,8 +1393,11 @@ The unique id of the post that was selected by the user in this thread.
 
 sub getFlatThread {
 	my ($post, $thread, $forum, $caller, $currentPost) = @_;
-	my (@post_loop, @posts);
-	@posts = WebGUI::SQL->buildArray("SELECT forumPostId FROM forumPost WHERE forumThreadId=".quote($thread->get("forumThreadId"))." ORDER BY dateOfPost");
+	 my (@post_loop, @posts, $OR);
+        unless ($post->getThread->getForum->isModerator) {
+                $OR = "OR status='denied' OR status='pending'";
+        }
+        @posts = WebGUI::SQL->buildArray("SELECT forumPostId FROM forumPost WHERE forumThreadId=".quote($thread->get("forumThreadId"))." AND NOT (status='deleted' $OR) ORDER BY dateOfPost");
 	foreach my $postId (@posts){
 		my $post = WebGUI::Forum::Post->new($postId);
 		push (@post_loop, getPostTemplateVars($post,$thread, $forum, $caller, {
@@ -1829,7 +1832,7 @@ sub www_postPreview {
 	$newPost->{_properties}->{userId} = $session{user}{userId};
 	$newPost->{_properties}->{username} = ($session{form}{visitorName} || $session{user}{alias});
 	$newPost->{_properties}->{dateOfPost} = WebGUI::DateTime::time();
-
+	my $forum = WebGUI::Forum->new($forumId);
 
 	my $var = getPostTemplateVars($newPost, WebGUI::Forum::Thread->new($threadId), WebGUI::Forum->new($forumId), $caller);
 	$var->{'newpost.header'} = WebGUI::International::get('Forum, Preview Heading');
@@ -1851,7 +1854,7 @@ sub www_postPreview {
 	$var->{'form.begin'} .= WebGUI::Form::hidden({name=>'forumOp', value=>"postSave"});
 	$var->{'form.submit'} = WebGUI::Form::submit();
 	$var->{'form.end'} = WebGUI::Form::formFooter();
-	return WebGUI::Template::process(1,"Forum/PostPreview", $var);
+	return WebGUI::Template::process($forum->get("postPreviewTemplateId"),"Forum/PostPreview", $var);
 }
 
 

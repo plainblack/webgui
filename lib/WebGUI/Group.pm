@@ -349,7 +349,8 @@ The name of the group you wish to instanciate.
 =cut
 
 sub find {
-	my ($groupId) = WebGUI::SQL->quickArray("select groupId from groups where groupName=".quote($_[1]));
+	my $name = shift;
+	my ($groupId) = WebGUI::SQL->quickArray("select groupId from groups where groupName=".quote($name));
 	return WebGUI::Group->new($groupId);
 }
 

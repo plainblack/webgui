@@ -318,7 +318,7 @@ sub view {
 	if ($constraints ne "") {
         	$constraints = "USS_submission.status='Approved' and ".$constraints;
 	} else {
-		$constraints = "(USS_submission.status='Approved' or (USS_submission.userId=".quote($session{user}{userId})." and USS_submission.userId<>1)";
+		$constraints = "(USS_submission.status='Approved' or (USS_submission.userId=".quote($session{user}{userId})." and USS_submission.userId<>'1')";
 		if ($var{canModerate}) {
 			$constraints .= " or USS_submission.status='Pending'"; 
 		}

@@ -14,7 +14,7 @@ use strict;
 use WebGUI::International;
 use WebGUI::Macro;
 use WebGUI::Session;
-use WebGUI::Asset::Template;
+use WebGUI::Template;
 use WebGUI::URL;
 use WebGUI::Utility;
 
@@ -28,7 +28,10 @@ sub process {
 	}
         $temp = WebGUI::URL::append($session{env}{REQUEST_URI},$append);
 	if ($param[1] ne "") {
-		$temp = WebGUI::URL::append($temp,'styleId='.$param[1]);
+		($styleId) = WebGUI::Template::getIdByName($param[1],"style");
+		if ($styleId != 0) {
+			$temp = WebGUI::URL::append($temp,'styleId='.$styleId);
+		}
 	}
 	if ($param[0] ne "linkonly") {
 		my %var;
@@ -38,11 +41,7 @@ sub process {
        		} else {
                		$var{'printable.text'} = WebGUI::International::get(53);
        		}
-		if ($param[2]) {
-         		$temp =  WebGUI::Asset::Template->newByUrl($param[2])->process(\%var);
-		} else {
-         		$temp =  WebGUI::Asset::Template->new("PBtmpl0000000000000109")->process(\%var);
-		}
+         	$temp =  WebGUI::Template::process(WebGUI::Template::getIdByName($param[2],"Macro/r_printable"), "Macro/r_printable", \%var);
 	}
 	return $temp;
 }

@@ -442,7 +442,7 @@ sub getResponseCount {
 	my $ipAddress = $self->getIp;
 	my $userId = $self->getUserId;
 	my ($count) = WebGUI::SQL->quickArray("select count(*) from Survey_response where Survey_id=".quote($self->get("Survey_id"))." and 
-		((userId<>1 and userId=".quote($userId).") or ( userId=1 and ipAddress=".quote($ipAddress)."))");
+		((userId<>'1' and userId=".quote($userId).") or ( userId='1' and ipAddress=".quote($ipAddress)."))");
 	return $count;
 }
 

@@ -124,6 +124,9 @@ sub addEntry {
 	unless ($url =~ /^http/ || !defined $url) {
 		$url = WebGUI::URL::getSiteURL().$url;
 	}
+	unless ($url =~ /op=/ || !defined $url) {
+                $url = WebGUI::URL::append($url, "op=viewMessageLogMessage");
+        }
 	$status = $_[5];
 	$from = $_[6];
 	if ($groupId ne "") {
@@ -189,6 +192,9 @@ sub addInternationalizedEntry {
 	unless ($url =~ /^http/ || !defined $url) {
 		$url = WebGUI::URL::getSiteURL().$url;
 	}
+	unless ($url =~ /op=/ || !defined $url) {
+                $url = WebGUI::URL::append($url, "op=viewMessageLogMessage");
+        }
 	$internationalId = $_[3];
         $namespace = $_[4] || "WebGUI";
 	$status = $_[5] || 'notice';

@@ -19,6 +19,7 @@ use File::Copy qw(cp);
 use FileHandle;
 use File::Path;
 use POSIX;
+use Storable qw(nstore retrieve);
 use strict;
 use warnings;
 use WebGUI::ErrorHandler;
@@ -241,7 +242,8 @@ sub addFileFromHashref {
 	my $self = shift;
 	my $filename = WebGUI::URL::makeCompliant(shift);
 	my $hashref = shift;
-        store $hashref, $self->getPath($filename) or $self->_addError("Couldn't create file ".$self->getPath($filename)." because ".$!);
+	bless $hashref;
+        nstore $hashref, $self->getPath($filename) or $self->_addError("Couldn't create file ".$self->getPath($filename)." because ".$!);
 	return $filename;
 }
 

@@ -84,10 +84,10 @@ if ( grep /^style$/i, @tables ){
 		my ($newStyleId) = WebGUI::SQL->quickArray("select max(templateId) from template where namespace='style'");
 	       	if ($style->{styleId} > 0 && $style->{styleId} < 25) {
 			$newStyleId = $style->{styleId};
-		} elsif ($newStyleId > 999) {
+		} elsif ($newStyleId > 9999) {
 	       		$newStyleId++;
 	     	} else {
-	     		$newStyleId = 1000;
+	     		$newStyleId = 10000;
 		}
 		my $newStyle = $session{setting}{docTypeDec}.'
 			<html>
@@ -103,7 +103,7 @@ if ( grep /^style$/i, @tables ){
 			';
 		WebGUI::SQL->write("insert into template (templateId, name, template, namespace) values (".$newStyleId.",
 			".quote($style->{name}).", ".quote($newStyle).", 'style')");
-		WebGUI::SQL->write("update page set styleId=".$newStyleId." where styleId=".$style->{styleId});
+		WebGUI::SQL->write("update page set styleId=".quote($newStyleId)." where styleId=".quote($style->{styleId}));
 		WebGUI::SQL->write("update themeComponent set id=".$newStyleId.", type='template' where id=".$style->{styleId}." and type='style'");
 	}
 	$sth->finish;
@@ -886,7 +886,8 @@ $replace{'t'} = {
 
 my ($sth, $data, $code, $table, $column, %identifier);
 foreach $table (keys %dbFields){
-	unless ($sth = WebGUI::SQL->read("SELECT * FROM $table")) {die "Cannot read from table $table ";}
+	$sth = WebGUI::SQL->read("SELECT * FROM $table");
+	#unless ($sth = WebGUI::SQL->read("SELECT * FROM $table")) {die "Cannot read from table $table ";}
 	while ($data = $sth->hashRef){
 		foreach $column (@{$dbFields{$table}{fields}}){
 			$code = $data->{$column};

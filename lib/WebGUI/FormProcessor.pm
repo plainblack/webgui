@@ -454,7 +454,7 @@ sub process {
 	$type = "text" if ($type eq "");
 	$value = &$type($name);
 	unless (defined $value) {
-		$value = $default;
+		return $default;
 	}
 	if ($value =~ /^[\s]+$/) {
 		return undef;

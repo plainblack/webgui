@@ -42,7 +42,7 @@ sub process {
         my ($collateralIdent,$width,$height,$parameters) = WebGUI::Macro::getParams($_[0]);
         my ($collateral,$url);
        
-        if ($collateralIdent =~ /^\d+$/) {
+	if ($collateralIdent =~ /[\w|\-]{22}/) {
           $collateral = WebGUI::Collateral->new($collateralIdent);
         }
         else {

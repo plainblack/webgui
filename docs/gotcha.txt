@@ -41,12 +41,6 @@ save you many hours of grief.
 	changed significantly enough that automatic migration of them is
 	not possible.
 
- * The recommended default location for the WebGUI log is now
-	/var/log/webgui.log instead of /data/webgui.log
-
- * The default path for WebGUI backups is now /tmp/backups rather than
-	/data/backups
-
  * You may add optional protection for your uploaded WebGUI files. This
 	will check the privileges of the files from the WebGUI database
 	before sending them to the browser. To enable this you must use
@@ -64,6 +58,15 @@ save you many hours of grief.
 
  * If you have any custom code, please check out docs/migration.txt as
 	there have been many changes to the API in this release.
+
+
+6.2.10
+--------------------------------------------------------------------
+ * The recommended default location for the WebGUI log is now
+	/var/log/webgui.log instead of /data/webgui.log
+
+ * The default path for WebGUI backups is now /tmp/backups rather than
+	/data/backups
 
 
 6.2.8

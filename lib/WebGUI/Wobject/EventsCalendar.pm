@@ -408,9 +408,9 @@ sub www_view {
 	} elsif ($_[0]->get("endMonth") eq "after6") {
 		$maxDate = WebGUI::DateTime::addToDate($minDate,0,6,0); 
 	} elsif ($_[0]->get("endMonth") eq "after3") {
-		$maxDate = WebGUI::DateTime::addToDate($minDate,0,3,0); 
+		$maxDate = WebGUI::DateTime::addToDate($minDate,0,3,0);
 	} elsif ($_[0]->get("endMonth") eq "current") { # a hack that we need to get the default month to be end month. probably a better way to do it
-                $maxDate = WebGUI::DateTime::addToDate($minDate,0,1,0);
+		$maxDate = WebGUI::DateTime::addToDate($minDate,0,1,0);
 	}
 
 	$maxDate = $maxDate || WebGUI::DateTime::time();
@@ -434,32 +434,28 @@ sub www_view {
 			# get event information
 			my $query = "select * from EventsCalendar_event where ";
 			$query .= " wobjectId=".quote($_[0]->get("wobjectId"))." and " unless ($_[0]->get("isMaster"));
-			$query .= " (endDate>=$monthStart and endDate<=$monthEnd) and (startDate>=$monthStart and startDate<=$monthEnd) order by startDate,endDate";
+			$query .= " ((endDate>=$monthStart and endDate<=$monthEnd) or (startDate>=$monthStart and startDate<=$monthEnd)) order by startDate,endDate";
 			my %events;
 			my %previous;
 			my $sth = WebGUI::SQL->read($query,WebGUI::SQL->getSlave);
 			while (my $event = $sth->hashRef) {
 				my $eventLength = WebGUI::DateTime::getDaysInInterval($event->{startDate},$event->{endDate});
-				my $startYear = epochToHuman($event->{startDate},"%y");
-				my $startMonth = epochToHuman($event->{startDate},"%c");
-				my $startDay = epochToHuman($event->{startDate},"%D");
-				my $endYear = epochToHuman($event->{endDate},"%y");
-				my $endMonth = epochToHuman($event->{endDate},"%c");
-				my $endDay = epochToHuman($event->{endDate},"%D");
+				my ($startYear, $startMonth, $startDay, $startDate, $startTime) = split " ", WebGUI::DateTime::epochToHuman($event->{startDate}, "%y %c %D %z %Z");
+				my ($endYear, $endMonth, $endDay, $endDate, $endTime) = split " ", WebGUI::DateTime::epochToHuman($event->{endDate}, "%y %c %D %z %Z");
 				for (my $i=0; $i<=$eventLength; $i++) {	
 					my @date = WebGUI::DateTime::epochToArray(WebGUI::DateTime::addToDate($event->{startDate},0,0,$i));
 					if ($date[1] == $thisMonthDate[1]) {
 						push(@{$events{$date[2]}}, {
 							description=>$event->{description},
 							name=>$event->{name},
-							'start.date.human'=>WebGUI::DateTime::epochToHuman($event->{startDate},"%z"),
-							'start.time.human'=>WebGUI::DateTime::epochToHuman($event->{startDate},"%Z"),
+							'start.date.human'=>$startDate,
+							'start.time.human'=>$startTime,
 							'start.date.epoch'=>$event->{startDate},
 							'start.year'=>$startYear,
 							'start.month'=>$startMonth,
 							'start.day'=>$startDay,
-							'end.date.human'=>WebGUI::DateTime::epochToHuman($event->{endDate},"%z"),
-							'end.time.human'=>WebGUI::DateTime::epochToHuman($event->{endDate},"%Z"),
+							'end.date.human'=>$endDate,
+							'end.time.human'=>$endTime,
 							'end.date.epoch'=>$event->{endDate},
 							'end.year'=>$endYear,
 							'end.month'=>$endMonth,

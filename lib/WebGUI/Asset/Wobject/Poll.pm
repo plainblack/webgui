@@ -29,7 +29,7 @@ sub _hasVoted {
 	my $self = shift;
 	my ($hasVoted) = WebGUI::SQL->quickArray("select count(*) from Poll_answer 
 		where assetId=".quote($self->getId)." and ((userId=".quote($session{user}{userId})." 
-		and userId<>1) or (userId=1 and ipAddress='$session{env}{REMOTE_ADDR}'))");
+		and userId<>'1') or (userId='1' and ipAddress='$session{env}{REMOTE_ADDR}'))");
 	return $hasVoted;
 }
 

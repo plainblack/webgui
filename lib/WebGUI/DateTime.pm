@@ -241,7 +241,7 @@ A string representing the output format for the date. Defaults to '%z %Z'. You c
  %m = A two digit month.
  %M = A variable digit month.
  %n = A two digit minute.
- %o = Offset from GMT represented as an integer.
+ %o = Offset from local time represented as an integer.
  %O = Offset from GMT represented in four digit form with a sign. Example: -0600
  %p = A lower-case am/pm.
  %P = An upper-case AM/PM.
@@ -265,9 +265,11 @@ sub epochToHuman {
 	my ($year,$month,$day,$hour,$min,$sec) = epochToArray($temp);
 	$output = $_[1] || "%z %Z";
   #---GMT Offsets
-	$temp = $session{user}{timeOffset}*100;
-	$temp = sprintf('%+05d',$temp);
-	$output =~ s/\%O/$temp/g;
+	if ($output =~ /\%O/) {
+		$temp = $session{user}{timeOffset}*100;
+		$temp = sprintf("%+05d",Date::Manip::UnixDate("now","%z")+$temp);
+		$output =~ s/\%O/$temp/g;
+	}
 	$temp = $session{user}{timeOffset}+0;
 	$output =~ s/\%o/$temp/g;
   #---dealing with percent symbol

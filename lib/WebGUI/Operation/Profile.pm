@@ -114,7 +114,7 @@ sub validateProfileData {
    $a = WebGUI::SQL->read("select * from userProfileField,userProfileCategory where userProfileField.profileCategoryId=userProfileCategory.profileCategoryId
                            and userProfileCategory.editable=1 and userProfileField.editable=1 order by userProfileCategory.sequenceNumber,userProfileField.sequenceNumber");
    while (%field = $a->hash) {
-      $data{$field{fieldName}} = WebGUI::Macro::negate(WebGUI::FormProcessor::process($field{fieldName},$field{dataType}));
+      $data{$field{fieldName}} = WebGUI::Macro::negate(WebGUI::FormProcessor::process($field{fieldName},$field{dataType},""));
 	  if ($field{required} && $data{$field{fieldName}} eq "") {
 	     $error .= '<li>'.(eval $field{fieldLabel}).' '.WebGUI::International::get(451);
 	  }elsif($field{fieldName} eq "email" && isDuplicateEmail($data{$field{fieldName}})){
@@ -150,8 +150,13 @@ sub www_editProfile {
        $label = eval $data->{fieldLabel};
 	   $default = eval $data->{dataDefault};
 	   
-	   if ($method eq "selectList") {
-          $values = eval $data->{dataValues};
+                if ($method eq "selectList" || $method eq "checkList" || $method eq "radioList") {
+          		$values = eval $data->{dataValues};
+                        my $orderedValues = {};
+                        tie %{$orderedValues}, 'Tie::IxHash';
+                        foreach my $ov (sort keys %{$values}) {
+                        	$orderedValues->{$ov} = $values->{$ov};
+                        }
 		  # note: this big if statement doesn't look elegant, but doing regular ORs caused problems with the array reference.
           if ($session{form}{$data->{fieldName}}) {
              $default = [$session{form}{$data->{fieldName}}];

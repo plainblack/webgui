@@ -214,7 +214,7 @@ sub hasRated {
 	return 1 if ($userId != 1 && $userId eq $self->get("userId")); # is poster
 	$ipAddress = $session{env}{REMOTE_ADDR} unless ($ipAddress);
 	my ($flag) = WebGUI::SQL->quickArray("select count(*) from forumPostRating where forumPostId="
-		.quote($self->get("forumPostId"))." and ((userId=".quote($userId)." and userId<>1) or (userId=1 and 
+		.quote($self->get("forumPostId"))." and ((userId=".quote($userId)." and userId<>1) or (userId='1' and 
 		ipAddress=".quote($ipAddress)."))");
 	return $flag;
 }

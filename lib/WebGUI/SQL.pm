@@ -173,7 +173,7 @@ Builds a hash of data from a series of rows.
 
 =head3 sql
 
-An SQL query. The query must select at least two columns of data, the first being the key for the hash, the second being the value. If the query selects more than two columns, then the last column will be the value and the remaining columns will be joined together by an underscore "_" to form a complex key.
+An SQL query. The query must select at least two columns of data, the first being the key for the hash, the second being the value. If the query selects more than two columns, then the last column will be the value and the remaining columns will be joined together by a colon ":" to form a complex key.
 
 =head3 dbh
 
@@ -187,7 +187,7 @@ sub buildHash {
         $sth = WebGUI::SQL->read($_[1],$_[2]);
         while (@data = $sth->array) {
 		my $value = pop @data;
-		my $key = join("_",@data);	
+		my $key = join(":",@data);	
                	$hash{$key} = $value;
         }
         $sth->finish;

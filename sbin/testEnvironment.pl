@@ -377,10 +377,10 @@ $version = $response->content;
 chomp $version;
 if ($response->is_error) {
 	print "Couldn't connect to Plain Black Software. Check your connection and try again.\n";
-} elsif ($version eq $WebGUI::VERSION) {
+} elsif ($version eq $WebGUI::VERSION."-".$WebGUI::STATUS) {
 	print $version." OK\n";
 } else {
-	print "You are using ".$WebGUI::VERSION." and ".$version." is available.\n";
+	print "You are using ".$WebGUI::VERSION."-".$WebGUI::STATUS." and ".$version." is available.\n";
 }
 
 

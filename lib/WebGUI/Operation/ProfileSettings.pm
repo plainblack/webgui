@@ -74,7 +74,7 @@ sub www_deleteProfileCategoryConfirm {
         return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
         return WebGUI::Privilege::vitalComponent() if ($session{form}{cid} < 1000 && $session{form}{cid} > 0);
 	WebGUI::SQL->write("delete from userProfileCategory where profileCategoryId=".quote($session{form}{cid}));
-	WebGUI::SQL->write("update userProfileField set profileCategoryId=1 where profileCategoryId=".quote($session{form}{cid}));
+	WebGUI::SQL->write("update userProfileField set profileCategoryId='1' where profileCategoryId=".quote($session{form}{cid}));
         return www_editProfileSettings();
 }
 

@@ -62,6 +62,52 @@
  - Added CDG Commerce iTransact payment plugin.
 
 
+6.2.11
+ - Fixed a navigation problem where home page was not showing up.
+ - fix [ 1111452 ] 6.2.10 showDebug=1 in create.sql 
+ - Removed fix 1079821 as it caused an ugly post bug defined as [ 1111591 ] Message Preview problems. (Duplicate message)
+ - fix [ 1111490 ] Calendar events in 6.2.10 (Matt Wilson)
+
+
+6.2.10
+ - A lot of help updates (Colin Kuskie)
+ - A bunch of GUID fixes (Eric Kennedy)
+ - fix [ 1102676 ] Re-visit 920583 Theme imports fail (Gerald Young)
+ - fix [ 1085795 ] Wrong parameter count to WebGUI/Group.pm (Dri)
+ - fix [ 1085485 ] parentId in page table not an int
+ - fix [ 1080299 ] Home page can be deleted
+ - fix [ 1071435 ] AdminBar macro incorrectly selects packages
+ - fix [ 1080326 ] DeleteExpiredTrash doesn't work
+ - Fixed the version compare bug in testEnvironment.pl and statistics due to
+   the missing status.
+ - fix [ 1072107 ] Calling ^SI(); by id doesn't work. (Dri)
+ - fix [ 1055088 ] SI macro will not do by ID look-up
+ - fix [ 1074036 ] Eventscalendar : very slow (Milo vd Zee)
+ - fix [ 1069991 ] Deleted msg - problems in nested, threaded views (mdj2000)
+ - fix [ 1108905 ] WebGUI::Mail charset inconsistency (fix) (Dri)
+ - fix [ 1108539 ] Profile issues
+ - fix [ 1096397 ] Data Form mail acknowledgement
+ - fix [ 1095532 ] Deploying package with sub-pages fails
+ - fix [ 1089383 ] message log URL missing operation name
+ - fix [ 1088470 ] missing '>' in template (create.sql) - minor. (Matt Wilson)
+ - fix [ 1080783 ] Profile field issue
+ - fix [ 1079821 ] Make printable macro ignores POST variables (rainer)
+ - fix [ 1078370 ] CPU Spike- UNKNOWN CAUSE
+ - fix [ 1078488 ] bad slashes in thumbnail
+ - fix [ 1077905 ] Post Preview template won't load. templateId 1 hardcoded!! (mdj2000)
+ - fix [ 1071941 ] Time Zone
+ - fix [ 1076678 ] Infinite loop with snippet
+ - fix [ 1075290 ] forum template subscription problem
+ - fix [ 1072838 ] FIX -- LDAP Auth: Sign up with existing WG username crashes
+   (Roy Johnson)
+ - fix [ 1066778 ] www.plainblack.com/news?wid=920&func=viewRSS (Dri)
+ - fix [ 1070169 ] 6.2.9 - Template create problem
+ - fix [ 1110644 ] Eventscalender month crossing bug (Milo van der Zee)
+ - fixed a template switching problem in the 6.0.0 upgrade script.
+ - fix [ 1071229 ] unauthorized user can view submissions!
+
+
+
 6.2.9
  - bugfix [ 1058105 ] input tag has to be closed with /
  - Changed a bunch of comparison operators that could potentially break with

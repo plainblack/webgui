@@ -161,6 +161,9 @@ sub process {
 			if ($@) {
 				WebGUI::ErrorHandler::warn("Processing failed on macro: $macro: ".$@);
 			} else {
+				if ($result =~ /\Q$macro/) {
+                                        $result = "Endless macro loop detected. Stopping recursion.";
+                                }
 				$content =~ s/\Q$macro/$result/ges;
 			}
 		}
