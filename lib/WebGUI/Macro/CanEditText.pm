@@ -12,13 +12,12 @@ package WebGUI::Macro::CanEditText;
 
 use strict;
 use WebGUI::Macro;
-use WebGUI::Page;
 use WebGUI::Session;
 
 #-------------------------------------------------------------------
 sub process {
 	my @param = WebGUI::Macro::getParams($_[0]);
-	if (WebGUI::Page::canEdit()) { 
+	if (exists $session{asset} && $session{asset}->canEdit) { 
 		return $param[0];
 	} else {
 		return "";

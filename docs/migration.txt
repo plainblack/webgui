@@ -213,5 +213,19 @@ is not specified.
 You can now dynamically add tabs to WebGUI::TabForms.
 
 
+5.14 Persistent API Removed
+
+The never understood and not really used Persistent API has been removed. If
+you want to store something in a tree, it probably belongs in the asset tree
+anyway.
+
+
+5.15 Node/Attachment System Replaced
+
+The file system storage mechanism of lib/WebGUI/Node.pm and
+lib/WebGUI/Attachment.pm have been replaced in favor of lib/WebGUI/Storage.pm.
+If you had anything using the old system we highly recommend migrating it into
+the new system as it is much more flexible. Alternatively you can copy the old 
+system back into place (it should still work, but no guarantees).
 
 

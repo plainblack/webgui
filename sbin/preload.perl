@@ -58,7 +58,6 @@ use Parse::PlainConfig ();
 use Date::Manip ();
 use Tie::CPHash ();
 use Tie::IxHash ();
-use Tree::DAG_Node ();
 
 #----------------------------------------
 # WebGUI modules.
@@ -67,11 +66,10 @@ use Tree::DAG_Node ();
 # core
 use WebGUI ();
 use WebGUI::Affiliate ();
-use WebGUI::Attachment ();
+use WebGUI::Asset ();
+use WebGUI::Asset::Wobject ();
 use WebGUI::Auth ();
 use WebGUI::Cache ();
-use WebGUI::Collateral ();
-use WebGUI::CollateralFolder ();
 use WebGUI::Config ();
 use WebGUI::DatabaseLink ();
 use WebGUI::DateTime ();
@@ -91,29 +89,19 @@ use WebGUI::International ();
 use WebGUI::Macro ();
 use WebGUI::Mail ();
 use WebGUI::MessageLog ();
-#use WebGUI::Navigation ();
-use WebGUI::Node ();
 use WebGUI::Operation ();
-use WebGUI::Persistent ();
-use WebGUI::Persistent::Query ();
-use WebGUI::Persistent::Tree ();
-use WebGUI::Persistent::Query::Delete ();
-use WebGUI::Persistent::Query::Insert ();
-use WebGUI::Persistent::Query::Select ();
-use WebGUI::Persistent::Query::Update ();
-use WebGUI::Page ();
 use WebGUI::Paginator ();
 use WebGUI::Privilege ();
 use WebGUI::Search ();
 use WebGUI::Session ();
 use WebGUI::SQL ();
+use WebGUI::Storage ();
 use WebGUI::Style ();
 use WebGUI::TabForm ();
 use WebGUI::Template ();
 use WebGUI::URL ();
 use WebGUI::User ();
 use WebGUI::Utility ();
-use WebGUI::Wobject ();
 
 # help
 use WebGUI::Help::Article ();
@@ -122,13 +110,11 @@ use WebGUI::Help::AuthSMB ();
 use WebGUI::Help::AuthWebGUI ();
 use WebGUI::Help::DataForm ();
 use WebGUI::Help::EventsCalendar ();
-use WebGUI::Help::FileManager ();
 use WebGUI::Help::HttpProxy ();
 use WebGUI::Help::IndexedSearch ();
 use WebGUI::Help::MessageBoard ();
 use WebGUI::Help::Poll ();
 use WebGUI::Help::Product ();
-use WebGUI::Help::SiteMap ();
 use WebGUI::Help::SQLReport ();
 use WebGUI::Help::Survey ();
 use WebGUI::Help::SyndicatedContent ();
@@ -140,19 +126,17 @@ use WebGUI::Help::WSClient ();
 # i18n
 use WebGUI::i18n::English ();
 use WebGUI::i18n::English::Article ();
-use WebGUI::i18n::English::AuthLDAP ();
-use WebGUI::i18n::English::AuthSMB ();
+#use WebGUI::i18n::English::AuthLDAP ();
+#use WebGUI::i18n::English::AuthSMB ();
 use WebGUI::i18n::English::AuthWebGUI ();
 use WebGUI::i18n::English::DataForm ();
 use WebGUI::i18n::English::EventsCalendar ();
-use WebGUI::i18n::English::FileManager ();
 use WebGUI::i18n::English::HttpProxy ();
 use WebGUI::i18n::English::IndexedSearch ();
 use WebGUI::i18n::English::MessageBoard ();
 use WebGUI::i18n::English::Navigation ();
 use WebGUI::i18n::English::Poll ();
 use WebGUI::i18n::English::Product ();
-use WebGUI::i18n::English::SiteMap ();
 use WebGUI::i18n::English::SQLReport ();
 use WebGUI::i18n::English::Survey ();
 use WebGUI::i18n::English::SyndicatedContent ();
@@ -164,22 +148,27 @@ use WebGUI::i18n::English::WSClient ();
 
 # you can significantly reduce your memory usage by preloading the plugins used on your sites, only the most commonly used ones are preloaded by default
 
-# wobjects
-use WebGUI::Wobject::Article ();
-use WebGUI::Wobject::USS ();
+# assets 
+use WebGUI::Asset::File ();
+use WebGUI::Asset::File::Image ();
+use WebGUI::Asset::Snippet ();
+use WebGUI::Asset::Wobject::Article ();
+use WebGUI::Asset::Wobject::Layout ();
+use WebGUI::Asset::Wobject::Navigation ();
+use WebGUI::Asset::Wobject::USS ();
 
 # auth methods
 use WebGUI::Auth::WebGUI ();
 
-#use WebGUI::Auth::LDAP ();
 #use Net::LDAP ();  # used by ldap authentication
+use WebGUI::Auth::LDAP ();
 
-#use WebGUI::Auth::SMB ();
 #use Authen::Smb (); #uncomment when using this type of authentication.
+#use WebGUI::Auth::SMB ();
 
 # macros
 use WebGUI::Macro::AdminBar ();
-#use WebGUI::Macro::Navigation ();
+use WebGUI::Macro::AssetProxy ();
 
 
 

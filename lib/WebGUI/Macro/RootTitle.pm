@@ -11,14 +11,20 @@ package WebGUI::Macro::RootTitle;
 #-------------------------------------------------------------------
 
 use strict;
-use Tie::CPHash;
-use WebGUI::Page;
+use WebGUI::Asset;
 use WebGUI::Session;
 
 #-------------------------------------------------------------------
 sub process {
-	my $root = WebGUI::Page->getWebGUIRoot;
-	return $root->get("title");	
+	if (exists $session{asset}) {
+		my $lineage = $session{asset}->get("lineage");
+		$lineage = substr($lineage,0,6);
+		my $root = WebGUI::Asset->newByLineage($lineage);
+		if (defined $root) {
+			return $root->get("title");	
+		}
+	}
+	return "";
 }
 
 

@@ -1,16 +1,6 @@
 package WebGUI::Help::WebGUI;
 
 our $HELP = {
-	'image add/edit' => {
-		title => '670',
-		body => '625',
-		related => [
-			{
-				tag => 'collateral manage',
-				namespace => 'WebGUI'
-			}
-		]
-	},
 	'packages creating' => {
 		title => '681',
 		body => '636',
@@ -396,10 +386,6 @@ our $HELP = {
 		body => '624',
 		related => [
 			{
-				tag => 'collateral macros',
-				namespace => 'WebGUI'
-			},
-			{
 				tag => 'navigation macros',
 				namespace => 'WebGUI'
 			},
@@ -464,36 +450,6 @@ our $HELP = {
 			{
 				tag => 'user submission system add/edit',
 				namespace => 'USS'
-			}
-		]
-	},
-	'collateral manage' => {
-		title => '785',
-		body => '786',
-		related => [
-			{
-				tag => 'collateral macros',
-				namespace => 'WebGUI'
-			},
-			{
-				tag => 'file add/edit',
-				namespace => 'WebGUI'
-			},
-			{
-				tag => 'folder add/edit',
-				namespace => 'WebGUI'
-			},
-			{
-				tag => 'image add/edit',
-				namespace => 'WebGUI'
-			},
-			{
-				tag => 'themes manage',
-				namespace => 'WebGUI'
-			},
-			{
-				tag => 'snippet add/edit',
-				namespace => 'WebGUI'
 			}
 		]
 	},
@@ -583,50 +539,6 @@ our $HELP = {
 			}
 		]
 	},
-	'collateral macros' => {
-		title => '831',
-		body => '832',
-		related => [
-			{
-				tag => 'collateral manage',
-				namespace => 'WebGUI'
-			},
-			{
-				tag => 'macros using',
-				namespace => 'WebGUI'
-			}
-		]
-	},
-	'file add/edit' => {
-		title => '833',
-		body => '834',
-		related => [
-			{
-				tag => 'collateral manage',
-				namespace => 'WebGUI'
-			}
-		]
-	},
-	'snippet add/edit' => {
-		title => '835',
-		body => '836',
-		related => [
-			{
-				tag => 'collateral manage',
-				namespace => 'WebGUI'
-			}
-		]
-	},
-	'folder add/edit' => {
-		title => '837',
-		body => '838',
-		related => [
-			{
-				tag => 'collateral manage',
-				namespace => 'WebGUI'
-			}
-		]
-	},
 	'programmer macros' => {
 		title => '839',
 		body => '840',
@@ -689,10 +601,6 @@ our $HELP = {
 		title => '931',
 		body => '932',
 		related => [
-			{
-				tag => 'collateral manage',
-				namespace => 'WebGUI'
-			},
 			{
 				tag => 'templates manage',
 				namespace => 'WebGUI'

@@ -27,8 +27,6 @@ use WebGUI::HTTP;
 use WebGUI::Icon;
 use WebGUI::International;
 use WebGUI::Macro;
-use WebGUI::Node;
-use WebGUI::Page;
 use WebGUI::Session;
 use WebGUI::SQL;
 use WebGUI::TabForm;

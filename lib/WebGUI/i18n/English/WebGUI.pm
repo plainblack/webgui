@@ -81,11 +81,6 @@ our $I18N = {
 		lastUpdated => 1031514049
 	},
 
-	'767' => {
-		message => q|Collateral Id|,
-		lastUpdated => 1036892929
-	},
-
 	'798' => {
 		message => q|Page Title|,
 		lastUpdated => 1036978688
@@ -485,11 +480,6 @@ The URL of the web site for this theme's designer. If you are in the business of
 		lastUpdated => 1056151382
 	},
 
-	'833' => {
-		message => q|File, Add/Edit|,
-		lastUpdated => 1038871497
-	},
-
 	'139' => {
 		message => q|No|,
 		lastUpdated => 1031514049
@@ -545,11 +535,6 @@ The URL of the web site for this theme's designer. If you are in the business of
 		lastUpdated => 1050430737
 	},
 
-	'758' => {
-		message => q|Add a folder.|,
-		lastUpdated => 1036892705
-	},
-
 	'783' => {
 		message => q|Type|,
 		lastUpdated => 1036954378
@@ -590,29 +575,6 @@ The URL of the web site for this theme's designer. If you are in the business of
 		lastUpdated => 1031514049
 	},
 
-	'834' => {
-		message => q|You can upload any kind of file to the repository to be used later.
-<p/>
-
-<b>Name</b><br/>
-Give this file a unique name that you can use to retrieve it later.
-<p/>
-
-<b>Organize in Folder</b><br/>
-Which collateral folder should hold this file?
-<p/>
-
-<b>File</b><br/>
-Select a file from your hard drive to upload.
-<p/>|,
-		lastUpdated => 1038871497
-	},
-
-	'772' => {
-		message => q|Edit File|,
-		lastUpdated => 1036893140
-	},
-
 	'993' => {
 		message => q|DSN|,
 		lastUpdated => 1056151382
@@ -633,11 +595,6 @@ Select a file from your hard drive to upload.
 
 	'23' => {
 		message => q|September|,
-		lastUpdated => 1031514049
-	},
-
-	'388' => {
-		message => q|Upload Date|,
 		lastUpdated => 1031514049
 	},
 
@@ -1105,11 +1062,6 @@ The description of this forum as passed by the calling object.
 		lastUpdated => 1035246389
 	},
 
-	'778' => {
-		message => q|Folder Description|,
-		lastUpdated => 1036906132
-	},
-
 	'685' => {
 		message => q|Template, Delete|,
 		lastUpdated => 1038791020
@@ -1276,11 +1228,6 @@ How should this user be notified when they get a new WebGUI message?
 		lastUpdated => 1060433963
 	},
 
-	'835' => {
-		message => q|Snippet, Add/Edit|,
-		lastUpdated => 1038871744
-	},
-
 	'430' => {
 		message => q|Last Page View|,
 		lastUpdated => 1031514049
@@ -1426,16 +1373,6 @@ How should this user be notified when they get a new WebGUI message?
 		lastUpdated => 1044705162
 	},
 
-	'765' => {
-		message => q|Delete this collateral item.|,
-		lastUpdated => 1036892866
-	},
-
-	'784' => {
-		message => q|Thumbnail|,
-		lastUpdated => 1036954393
-	},
-
 	'312' => {
 		message => q|Allow business information?|,
 		lastUpdated => 1031514049
@@ -1481,11 +1418,6 @@ As with any delete operation, you are prompted to be sure you wish to proceed wi
 	'309' => {
 		message => q|Allow real name?|,
 		lastUpdated => 1031514049
-	},
-
-	'762' => {
-		message => q|Add a file.|,
-		lastUpdated => 1036892774
 	},
 
 	'638' => {
@@ -1579,11 +1511,6 @@ As with any delete operation, you are prompted to be sure you wish to proceed wi
 		lastUpdated => 1031514049
 	},
 
-	'773' => {
-		message => q|File|,
-		lastUpdated => 1036893165
-	},
-
 	'813' => {
 		message => q|Groups In This Group|,
 		lastUpdated => 1037583186
@@ -1597,11 +1524,6 @@ As with any delete operation, you are prompted to be sure you wish to proceed wi
 	'42' => {
 		message => q|Please Confirm|,
 		lastUpdated => 1031514049
-	},
-
-	'759' => {
-		message => q|Edit this folder.|,
-		lastUpdated => 1036892731
 	},
 
 	'851' => {
@@ -1672,16 +1594,6 @@ As with any delete operation, you are prompted to be sure you wish to proceed wi
 	'1033' => {
 		message => q|Post Template|,
 		lastUpdated => 1066034603
-	},
-
-	'916' => {
-		message => q|Snippet|,
-		lastUpdated => 1050232301
-	},
-
-	'386' => {
-		message => q|Edit Image|,
-		lastUpdated => 1031514049
 	},
 
 	'796' => {
@@ -1898,11 +1810,6 @@ The user id of the currently logged in user.
 		lastUpdated => 1031514049
 	},
 
-	'775' => {
-		message => q|Are you certain you wish to delete this folder and move its contents to it's parent folder?|,
-		lastUpdated => 1036903002
-	},
-
 	'582' => {
 		message => q|Leave Blank|,
 		lastUpdated => 1031514049
@@ -1936,11 +1843,6 @@ The user id of the currently logged in user.
 	'20' => {
 		message => q|June|,
 		lastUpdated => 1031514049
-	},
-
-	'888' => {
-		message => q|Snippet Preview Length|,
-		lastUpdated => 1045312362
 	},
 
 	'1011' => {
@@ -1984,9 +1886,9 @@ The user id of the currently logged in user.
 	},
 
 	'932' => {
-		message => q|Themes are a mechanism to quickly install new styles, templates, and collateral into a WebGUI site. They are also great for moving those same items from one site to another.
+		message => q|Themes are a mechanism to quickly install new styles, templates, and assets into a WebGUI site. They are also great for moving those same items from one site to another.
 <p>
-<b>TIP:</b> When building a theme, be sure to name the components (styles, templates collateral) in the theme with some name that is unique to the theme. This is useful so that your users can find the components in your theme, as well as to avoid name conflicts.|,
+<b>TIP:</b> When building a theme, be sure to name the components (styles, templates, assets) in the theme with some name that is unique to the theme. This is useful so that your users can find the components in your theme, as well as to avoid name conflicts.|,
 		lastUpdated => 1070027889
 	},
 
@@ -1995,19 +1897,9 @@ The user id of the currently logged in user.
 		lastUpdated => 1031514049
 	},
 
-	'764' => {
-		message => q|Edit this collateral item.|,
-		lastUpdated => 1036892856
-	},
-
 	'349' => {
 		message => q|Latest version available|,
 		lastUpdated => 1031514049
-	},
-
-	'769' => {
-		message => q|Organize in Folder|,
-		lastUpdated => 1036893015
 	},
 
 	'983' => {
@@ -2315,11 +2207,6 @@ A message stating that the user is receiving the message because they subscribed
 		message => q|Login History|,
 		lastUpdated => 1031514049,
                 context => q|Title of the login history viewer for the admin console.|
-	},
-
-	'542' => {
-		message => q|Previous..|,
-		lastUpdated => 1031514049
 	},
 
 	'369' => {
@@ -2788,11 +2675,6 @@ The Groups page displays all groups that you are allowed to edit.  The form on t
 		lastUpdated => 1031514049
 	},
 
-	'766' => {
-		message => q|Back to collateral list.|,
-		lastUpdated => 1036892898
-	},
-
 	'1077' => {
 		message => q|The function you are attempting to call is not available for this authentication module|,
 		lastUpdated => 1067951805
@@ -2860,11 +2742,6 @@ One package that many people create is a Page/Article package. It is often the c
 		lastUpdated => 1052850265
 	},
 
-	'979' => {
-		message => q|Are you certain you wish to delete all items in this folder? They cannot be recovered once deleted. Items in sub-folders will not be removed.|,
-		lastUpdated => 1055908341
-	},
-
 	'1005' => {
 		message => q|SQL Query|,
 		lastUpdated => 1057208065
@@ -2912,11 +2789,6 @@ One package that many people create is a Page/Article package. It is often the c
 
 	'53' => {
 		message => q|Make Page Printable|,
-		lastUpdated => 1031514049
-	},
-
-	'387' => {
-		message => q|Uploaded By|,
 		lastUpdated => 1031514049
 	},
 
@@ -3067,19 +2939,9 @@ Loops come with special condition variables of their own. They are __FIRST__, __
 		lastUpdated => 1066580782
 	},
 
-	'757' => {
-		message => q|Manage Collateral|,
-		lastUpdated => 1036892669
-	},
-
 	'951' => {
 		message => q|Are you certain that you wish to empty the clipboard to the trash?|,
 		lastUpdated => 1052850265
-	},
-
-	'782' => {
-		message => q|Any|,
-		lastUpdated => 1036913053
 	},
 
 	'85' => {
@@ -3113,105 +2975,6 @@ Loops come with special condition variables of their own. They are __FIRST__, __
 		lastUpdated => 1035872437
 	},
 
-	'832' => {
-		message => q|The collateral management system has several macros for its specific purpose.
-<p/>
-
-<b>&#94;File();</b><br/>
-&#94;File(<i>collateralFileName</i>);<BR>
-&#94;File(<i>collateralFileName</i>,<i>templateName</i>);<BR>
-This macro builds a quick link to a file in the Collateral Manager. It creates an icon for the file and outputs the files' name. Then it links them both to the file for downloading.  The following variables are available for use in the template:
-<p/>
-<b>file.url</b><br/>
-The URL to the file.
-<p/>
-<b>file.icon</b><br/>
-The file's icon.
-<p/>
-<b>file.name</b><br/>
-The name of the file.
-<p/>
-<b>file.size</b><br/>
-The size of the file.
-<p/>
-<b>file.thumbnail</b><br/>
-The file's thumbnail.
-<p/>
-
-An optional second parameter, a template name, allows a custom template
-from the Macro/File template namespace to be used instead of the default.
-If a template with that name is not found, then the default is used.<br>
-<p/>
-
-<b>&#94;I();</b><br/>
-This macro retrieves an image from the collateral management system along with an HTML image tag so that you can quickly display an image from the repository in your content.
-<p/>
-<i>Example:</i> &#94;I("logo");
-<p/>
-
-<b>&#94;i();</b><br/>
-This macro retrieves the URL for any file in the collateral management system.
-<p/>
-<i>Example:</i> &#94;i("status report");
-<p/>
-
-
-<b>&#94;RandomImage();</b><br/>
-This macro takes the name of a collateral folder as a parameter. If the folder name is omitted, then the root folder will be used. The macro then randomly chooses an image in the folder and returns it in much the same way the &#94;I(); macro works.
-<p />
-<i>Example:</i> &#94;RandomImage("site headers");
-<p />
-
-<b>&#94;RandomSnippet();</b><br/>
-This macro takes the name of a collateral folder as a parameter. If the folder name is omitted, then the root folder will be used. The macro then randomly chooses a snippet from the folder and returns it in much the same way the &#94;Snippet(); macro works.
-<p />
-<i>Example:</i> &#94;RandomSnippet("quips");
-<p />
-
-
-<b>&#94;SI();</b><br/>
-The Scaled Image macro allows images to be found in the collateral and scaled (on the server-side), either maintaining the original aspect ratio or an entirely new ratio of your design. 
-<p>
-It takes four parameters. The first is the image name or optionally the collateral id. The second is the width. Set the width to "0" to maintain aspect ratio by height. The third is height. Set the height to "0" to maintain aspect ratio by width. The fourth parameter allows you to specify additional parameters to the image.
-<p />
-<i>Examples:</i><br>
-Retrieving an image by name (no scaling)<br>
-^SI(myimage);
-<p>
-Retrieving an image by collateralId (no scaling)<br>
-^SI(8ucfhA1Joswj59UFIubr1Q);
-<p>
-Scaling by width, maintaining aspect ratio<br>
-^SI(8ucfhA1Joswj59UFIubr1Q,25);
-<p>
-Scaling by height, maintaining aspect ratio<br>
-^SI(8ucfhA1Joswj59UFIubr1Q,0,25);
-<p>
-Playing with the aspect ratio<br>
-^SI(8ucfhA1Joswj59UFIubr1Q,148,25);
-<p>
-Using parameters<br>
-^SI(8ucfhA1Joswj59UFIubr1Q,0,0,'border="0"');
-<p />
-
-
-<b>&#94;Snippet();</b><br/>
-&#94;Snippet(<i>snippet name</i>);<br/>
-This macro retrieves the contents of a snippet in the collateral management system and inserts it into the page. You can optionally specify up to 9 additional parameters that will be replace these special characters in the snippet: ^1; ^2; ^3; ^4; ^5; ^6; ^7; ^8; ^9;
-<p />
-<i>Example:</i> &#94;Snippet("flash code");
-<p />
-
-<b>&#94;Thumbnail();</b><br/>
-&#94;Thumbnail(<i>image name</i>);<br/>
-This macro retrieves the URL for the thumbnail of any image in the collateral management system.
-<p/>
-<i>Example:</i> &#94;Thumbnail("logo");
-<p/>
-|,
-		lastUpdated => 1101886126,
-	},
-
 	'736' => {
 		message => q|7 Expert|,
 		lastUpdated => 1033836692
@@ -3220,11 +2983,6 @@ This macro retrieves the URL for the thumbnail of any image in the collateral ma
 	'539' => {
 		message => q|Enable Karma?|,
 		lastUpdated => 1031514049
-	},
-
-	'781' => {
-		message => q|Snippet|,
-		lastUpdated => 1036912954
 	},
 
 	'828' => {
@@ -3509,11 +3267,6 @@ The translated label for the link to the home page or the text that you supply t
 
 	'73' => {
 		message => q|Log in.|,
-		lastUpdated => 1031514049
-	},
-
-	'409' => {
-		message => q|Add a new root.|,
 		lastUpdated => 1031514049
 	},
 
@@ -3898,11 +3651,6 @@ Large sites using external group data will be making many calls to the external 
 		lastUpdated => 1053278089
 	},
 
-	'776' => {
-		message => q|Edit Folder|,
-		lastUpdated => 1036905944
-	},
-
 	'894' => {
 		message => q|Allow discussion?|,
 		lastUpdated => 1031514049
@@ -3932,11 +3680,6 @@ Large sites using external group data will be making many calls to the external 
 	'954' => {
 		message => q|Manage system clipboard.|,
 		lastUpdated => 1052850265
-	},
-
-	'385' => {
-		message => q|Parameters|,
-		lastUpdated => 1031514049
 	},
 
 	'502' => {
@@ -4472,11 +4215,6 @@ The description of this forum as passed by the calling object.
 		lastUpdated => 1038889471
 	},
 
-	'831' => {
-		message => q|Collateral Macros|,
-		lastUpdated => 1050441851
-	},
-
 	'552' => {
 		message => q|Pending|,
 		lastUpdated => 1031514049
@@ -4495,11 +4233,6 @@ The description of this forum as passed by the calling object.
 	'880' => {
 		message => q|Last Resort Editor|,
 		lastUpdated => 1044705137
-	},
-
-	'780' => {
-		message => q|File|,
-		lastUpdated => 1036912946
 	},
 
 	'433' => {
@@ -4614,15 +4347,6 @@ div.tabs {
 
 |,
 		lastUpdated => 1046067380
-	},
-
-	'786' => {
-		message => q|WebGUI's collateral management system allows you to upload files and text to a central repository for use elsewhere in your site.
-<p/>
-You can organize collateral into different folders, but names must be unique, even if they are in different folders or of different types.  If you attempt to use a name that is already in use, WebGUI will rename the file for you by appending and/or incrementing a number to the end of the name.
-<p/>
-|,
-		lastUpdated => 1099512407
 	},
 
 	'440' => {
@@ -4846,11 +4570,6 @@ A list of links to the 10 nearest in the paginator relative to the current page.
 		lastUpdated => 1031514049
 	},
 
-	'774' => {
-		message => q|Are you certain you wish to delete this collateral? It cannot be recovered once deleted.|,
-		lastUpdated => 1036902945
-	},
-
 	'229' => {
 		message => q|Subject|,
 		lastUpdated => 1031514049
@@ -4871,11 +4590,6 @@ A list of links to the 10 nearest in the paginator relative to the current page.
 		lastUpdated => 1031514049
 	},
 
-	'770' => {
-		message => q|Edit Snippet|,
-		lastUpdated => 1036893050
-	},
-
 	'68' => {
 		message => q|The account information you supplied is invalid. Either the account does not exist or the username/password combination was incorrect.|,
 		lastUpdated => 1031514049
@@ -4894,28 +4608,6 @@ A list of links to the 10 nearest in the paginator relative to the current page.
 	'338' => {
 		message => q|Edit Profile|,
 		lastUpdated => 1031514049
-	},
-
-	'838' => {
-		message => q|Folders are used to organize collateral, much the same way you'd use folders on your hard drive or in a file cabinet.  Unlike files on your hard drive, collateral names must be unique, even if they are in different folders.
-<p/>
-<b>Organize in Folder</b><br/>
-Folders can be inside of other folders. In which folder would you like to put this folder?
-<p/>
-
-<b>Name</b><br/>
-Give this folder a name so you can recognize what's in it.
-<p/>
-
-<b>Description</b><br/>
-Describe the folder so that you remember why you created it and what it's supposed to contain.
-<p/>|,
-		lastUpdated => 1094406796
-	},
-
-	'761' => {
-		message => q|Add an image.|,
-		lastUpdated => 1036892765
 	},
 
 	'576' => {
@@ -5083,11 +4775,6 @@ The headings of columns on things like message boards and user contributions.
 		lastUpdated => 1078243385
 	},
 
-	'777' => {
-		message => q|Folder Id|,
-		lastUpdated => 1036905972
-	},
-
 	'464' => {
 		message => q|Text Area Columns|,
 		lastUpdated => 1031514049
@@ -5208,28 +4895,6 @@ As with any delete operation, you are prompted to be sure you wish to proceed wi
 		lastUpdated => 1046637952
 	},
 
-	'384' => {
-		message => q|File|,
-		lastUpdated => 1031514049
-	},
-
-	'836' => {
-		message => q|Snippets are bits of text that may be reused on your site. Thinks like java scripts, style sheets, flash animations, or even slogans are all great snippets. Best of all, if you need to change the text, you can change it in only one location.
-<p/>
-<b>Name</b><br/>
-Give your snippet a unique name that you can use later to retrieve it.
-<p/>
-
-<b>Organize in Folder</b><br/>
-Which collateral folder should contain this snippet?
-<p/>
-
-<b>Snippet</b><br/>
-Start typing! Or better yet, copy the snippet from some other electronic document and paste it here.
-<p/>|,
-		lastUpdated => 1101775475,
-	},
-
 	'942' => {
 		message => q|Radio List|,
 		lastUpdated => 1051464141
@@ -5258,11 +4923,6 @@ Start typing! Or better yet, copy the snippet from some other electronic documen
 	'376' => {
 		message => q|Package|,
 		lastUpdated => 1031514049
-	},
-
-	'785' => {
-		message => q|Collateral, Manage|,
-		lastUpdated => 1050430118
 	},
 
 	'125' => {
@@ -5318,11 +4978,6 @@ Start typing! Or better yet, copy the snippet from some other electronic documen
 	'231' => {
 		message => q|Posting New Message...|,
 		lastUpdated => 1031514049
-	},
-
-	'779' => {
-		message => q|Image|,
-		lastUpdated => 1036912938
 	},
 
 	'551' => {
@@ -5477,11 +5132,6 @@ Macros always begin with a caret (&#94;) and follow with at least one other char
 		lastUpdated => 1031514049
 	},
 
-	'771' => {
-		message => q|Snippet|,
-		lastUpdated => 1036893079
-	},
-
 	'435' => {
 		message => q|Session Signature|,
 		lastUpdated => 1031514049
@@ -5530,11 +5180,6 @@ Macros always begin with a caret (&#94;) and follow with at least one other char
 	'339' => {
 		message => q|Male|,
 		lastUpdated => 1031514049
-	},
-
-	'760' => {
-		message => q|Delete this folder.|,
-		lastUpdated => 1036892740
 	},
 
 	'1046' => {
@@ -5929,11 +5574,6 @@ Privileges and styles assigned to pages in the package will not be copied when t
 		lastUpdated => 1031514049
 	},
 
-	'670' => {
-		message => q|Image, Add/Edit|,
-		lastUpdated => 1038871530
-	},
-
 	'929' => {
 		message => q|Import!|,
 		lastUpdated => 1050265357
@@ -5968,37 +5608,6 @@ Privileges and styles assigned to pages in the package will not be copied when t
 		message => q|Users|,
 		lastUpdated => 1031514049,
                 context => q|Title of the user manager for the admin console.|
-	},
-
-	'625' => {
-		message => q|Upload any images that you'll possibly use in more than one location on your site.  Image collateral differ from regular file collateral in that thumbnails can be displayed instead of icons and additional parameters can be added to the HTML tag when they are displayed.
-<p/>
-
-<b>Name</b><br>
-The label that this image will be referenced by to include it into pages.
-<p>
-
-<b>Organize In Folder</b><br/>
-Which collateral folder should this image be placed in.
-<p/>
-
-<b>File</b><br>
-Select a file from your local drive to upload to the server.
-<p>
-
-<b>Parameters</b><br>
-Add any HTML &lt;img&gt; parameters that you wish to act as the defaults for this image.
-<p>
-
-<i>Example:</i><br>
-align="right"<br>
-alt="This is an image"<br>
-<p/>
-
-<b>Thumbnail Size</b><br>
-How big (in pixels) should the thumbnail for this image be?
-<p/>|,
-		lastUpdated => 1096524176
 	},
 
 	'304' => {
@@ -6054,11 +5663,6 @@ How big (in pixels) should the thumbnail for this image be?
 	'1030' => {
 		message => q|by|,
 		lastUpdated => 1047842270
-	},
-
-	'763' => {
-		message => q|Add a snippet.|,
-		lastUpdated => 1036892785
 	},
 
 	'70' => {
@@ -6182,11 +5786,6 @@ You can move an existing forum to another Message Board. If set to 'No Change' t
 <p>
 |,
 		lastUpdated => 1101775516,
-	},
-
-	'793' => {
-		message => q|Pieces of Collateral|,
-		lastUpdated => 1036971785
 	},
 
 	'88' => {
@@ -6471,11 +6070,6 @@ A randomly generated number. This is often used on images (such as banner ads) t
 
 	'38' => {
 		message => q|You do not have sufficient privileges to perform this operation. Please ^a(log in with an account); that has sufficient privileges before attempting this operation.|,
-		lastUpdated => 1031514049
-	},
-
-	'408' => {
-		message => q|Manage Roots|,
 		lastUpdated => 1031514049
 	},
 
@@ -6776,8 +6370,6 @@ The primary URL of your company. This will appear on all automated emails sent f
 <P><B>Max Image Size</B><BR>If images are uploaded to your system that are bigger than the max image size, then they will be resized to the max image size. The max image size is measured in pixels and will use the size of the longest side of the image to determine if the limit has been reached. 
 
 <P><B>Thumbnail Size</B><BR>When images are uploaded to your system, they will automatically have thumbnails generated at the size specified here (unless overridden on a case-by-case basis). Thumbnail size is measured in pixels. 
-
-<P><B>Snippet Preview Length</B><BR>How many characters of a snippet should be displayed in the collateral management system main listing. 
 
 <B>Text Area Rows</B>, <B>Text Area Columns</B> and <B>Text Box Size</B> allow the size of
 forms that WebGUI generates to be customized on a site-by-site basis.

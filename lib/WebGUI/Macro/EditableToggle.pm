@@ -14,14 +14,13 @@ use strict;
 use WebGUI::Grouping;
 use WebGUI::International;
 use WebGUI::Macro;
-use WebGUI::Page;
 use WebGUI::Session;
 use WebGUI::Template;
 use WebGUI::URL;
 
 #-------------------------------------------------------------------
 sub process {
-         if (WebGUI::Page::canEdit() && WebGUI::Grouping::isInGroup(12)) {
+         if (exists $session{asset} && $session{asset}->canEdit && WebGUI::Grouping::isInGroup(12)) {
         	my %var;
               my @param = WebGUI::Macro::getParams($_[0]);
               my $turnOn = $param[0] || WebGUI::International::get(516);

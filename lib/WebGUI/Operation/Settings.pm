@@ -116,11 +116,6 @@ sub www_editSettings {
 		-value=>$session{setting}{sharedTrash}
 		);
         $tabform->getTab("ui")->integer(
-		-name=>"snippetsPreviewLength",
-		-label=>$i18n->get(888),
-		-value=>$session{setting}{snippetsPreviewLength}
-		);
-        $tabform->getTab("ui")->integer(
 		-name=>"textAreaRows",
 		-label=>$i18n->get(463),
 		-value=>$session{setting}{textAreaRows}

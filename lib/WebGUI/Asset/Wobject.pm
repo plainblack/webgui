@@ -29,7 +29,6 @@ use WebGUI::Id;
 use WebGUI::International;
 use WebGUI::Macro;
 use WebGUI::Node;
-use WebGUI::Page;
 use WebGUI::Privilege;
 use WebGUI::Session;
 use WebGUI::Style;
@@ -39,7 +38,7 @@ use WebGUI::Template;
 use WebGUI::URL;
 use WebGUI::Utility;
 use WebGUI::MetaData;
-use WebGUI::Wobject::WobjectProxy;
+#use WebGUI::Asset::Wobject::WobjectProxy;
 
 our @ISA = qw(WebGUI::Asset);
 

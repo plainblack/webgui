@@ -467,7 +467,13 @@ print "\tDeleting files which are no longer used.\n" unless ($quiet);
 #unlink("../../lib/WebGUI/Wobject/DataForm.pm");
 #unlink("../../lib/WebGUI/Wobject/USS.pm");
 #unlink("../../lib/WebGUI/Wobject/FileManager.pm");
-
+#unlink("../../lib/WebGUI/Operation/Collateral.pm");
+#unlink("../../lib/WebGUI/Collateral.pm");
+#unlink("../../lib/WebGUI/CollateralFolder.pm");
+#unlink("../../lib/WebGUI/Persistent.pm");
+#rmtree("../../lib/WebGUI/Persistent");
+#rmtree("../../lib/Tree");
+#rmtree("../../lib/DBIx/Tree");
 
 
 
