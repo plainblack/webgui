@@ -458,8 +458,12 @@ sub www_view {
 	tie %data, 'Tie::CPHash';
 	%data = getProperties($namespace,$_[0]);
 	if ($data{startDate}<time() && $data{endDate}>time()) {
+		$output = "";
+		if ($data{image} ne "") { # Images collide on successive articles if there is little text - prevent this.
+			$output .= '<table width="100%" border="0" cellpadding="0" cellspacing="0"><tr><td>';
+		}
 		if ($data{displayTitle} == 1) {
-			$output = "<h1>".$data{title}."</h1>";
+			$output .= "<h1>".$data{title}."</h1>";
 		}
 		if ($data{image} ne "") {
 			$image = WebGUI::Attachment->new($data{image},$_[0]);
@@ -484,6 +488,9 @@ sub www_view {
 		if ($data{attachment} ne "") {
 			$output .= attachmentBox($data{attachment},$_[0]);
 		}
+		if ($data{image} ne "") {
+			$output .= "</td></tr></table>";
+		}
 	}
 	if ($data{processMacros}) {
 		$output = WebGUI::Macro::process($output);
@@ -501,9 +508,6 @@ sub www_view {
 	}
 	return $output;
 }
-
-
-
 
 1;
 
