@@ -237,7 +237,7 @@ children from the pagetree and place it on the clipboard.
 =cut
 sub www_cutPage {
 	my ($page);
-        if ($session{page}{pageId} < 26 && $session{page}{pageId} >= 0) {
+        if ($session{page}{isSystem}) {
                 return WebGUI::Privilege::vitalComponent();
 		
         } elsif (WebGUI::Page::canEdit()) {
@@ -261,7 +261,7 @@ This function returns an 'Are you sure' page for moving the page to the trash.
 =cut
 sub www_deletePage {
 	my ($output);
-	if ($session{page}{pageId} < 1000 && $session{page}{pageId} > 0) {
+        if ($session{page}{isSystem}) {
 		return WebGUI::Privilege::vitalComponent();
 	} elsif (WebGUI::Page::canEdit()) {
 		$output .= helpIcon("page delete");
@@ -286,7 +286,7 @@ Actually transfers the page to the trash.
 
 =cut
 sub www_deletePageConfirm {
-	if ($session{page}{pageId} < 1000 && $session{page}{pageId} > 0) {
+        if ($session{page}{isSystem}) {
 		return WebGUI::Privilege::vitalComponent();
         } elsif (WebGUI::Page::canEdit()) {
 		my $page = WebGUI::Page->getPage($session{page}{pageId});
