@@ -11,7 +11,7 @@ package WebGUI::Operation::Settings;
 #-------------------------------------------------------------------
 
 use Exporter;
-use strict;
+use strict qw(Vars Subs);
 use WebGUI::DateTime;
 use WebGUI::HTMLForm;
 use WebGUI::Icon;
@@ -38,8 +38,10 @@ sub _submenu {
 #-------------------------------------------------------------------
 sub www_editUserSettings {
 	WebGUI::Privilege::adminOnly() unless (WebGUI::Privilege::isInGroup(3));
-        my ($output, %authMethod, $f);
-        %authMethod = ('WebGUI'=>'WebGUI', 'LDAP'=>'LDAP');
+        my ($output, %authMethod, $f, $cmd, $html);
+
+	%authMethod = map {$_ => $_} @{$session{authentication}{available}};
+
         $output .= helpIcon(2);
         $output .= '<h1>'.WebGUI::International::get(117).'</h1>';
 	$f = WebGUI::HTMLForm->new;
@@ -53,10 +55,14 @@ sub www_editUserSettings {
         $f->interval("sessionTimeout",WebGUI::International::get(142),WebGUI::DateTime::secondsToInterval($session{setting}{sessionTimeout}));
         $f->select("authMethod",\%authMethod,WebGUI::International::get(119),[$session{setting}{authMethod}]);
         $f->yesNo("usernameBinding",WebGUI::International::get(306),$session{setting}{usernameBinding});
-        $f->url("ldapURL",WebGUI::International::get(120),$session{setting}{ldapURL});
-        $f->text("ldapId",WebGUI::International::get(121),$session{setting}{ldapId});
-        $f->text("ldapIdName",WebGUI::International::get(122),$session{setting}{ldapIdName});
-        $f->text("ldapPasswordName",WebGUI::International::get(123),$session{setting}{ldapPasswordName});
+
+	foreach (@{$session{authentication}{available}}) {
+               	$cmd = "WebGUI::Authentication::".$_."::formEditUserSettings";
+               	$html = eval{&$cmd};
+               	WebGUI::ErrorHandler::fatalError("Unable to load method formEditUserSettings on Authentication module: $_. ".$@) if($@);
+		$f->raw($html);
+ 	}
+
 	$f->submit;
 	$output .= $f->print;
         return _submenu($output);

@@ -107,6 +107,35 @@ sub _getUserInfo {
 }
 
 #-------------------------------------------------------------------
+sub _loadAuthentication {
+	my ($dir, @files, $slash, $file, $cmd, $namespace, $exclude, @availableModules);
+	$slash = ($^O =~ /Win/i) ? "\\" : "/";
+	$dir = $slash."lib".$slash."WebGUI".$slash."Authentication";
+	opendir (DIR,$session{config}{webguiRoot}.$dir) or WebGUI::ErrorHandler::fatalError("Can't open Authentication module directory!");
+	@files = readdir(DIR);
+	foreach $file (@files) {
+		if ($file =~ /(.*?)\.pm$/) {
+			$namespace = $1;
+			$cmd = "use WebGUI::Authentication::".$namespace;
+			eval($cmd);
+			unless ($@) {
+				$exclude = $session{config}{excludeAuthentication};
+                        	$exclude =~ s/ //g;
+				unless (isIn($namespace, split(/,/,$exclude))) {
+					$session{authentication}{$namespace} = 'WebGUI::Authentication::' . $namespace;
+					push(@availableModules, $namespace);
+				}
+			} else {
+				WebGUI::ErrorHandler::warn("Authentication module failed to compile: $namespace. ".$@);
+				$session{authentication}{failed} .= "[".$namespace."] ";
+			}
+		}
+	}
+	$session{authentication}{available} = \@availableModules;
+	closedir(DIR);
+}
+
+#-------------------------------------------------------------------
 sub _loadMacros {
 	my ($slash, $namespace, $cmd, @files, $file, $dir, $exclude);
 	$slash = ($^O =~ /Win/i) ? "\\" : "/";
@@ -274,6 +303,7 @@ sub open {
 	### loading plugins
 	_loadWobjects();
 	_loadMacros();
+	_loadAuthentication();  
 }
 
 #-------------------------------------------------------------------

@@ -20,6 +20,7 @@ use WebGUI::International;
 use WebGUI::Session;
 use WebGUI::SQL;
 use WebGUI::URL;
+use WebGUI::Authentication;
 
 =head1 NAME
 
@@ -31,12 +32,10 @@ use WebGUI::URL;
  $u = WebGUI::User->new(3); or  $f = WebGUI::User->new("new");
 
  $authMethod =		$u->authMethod("WebGUI");
- $connectDN = 		$u->authMethod("cn=Jon Doe");
  $dateCreated = 	$u->dateCreated;
  $identifier = 		$u->identifier("somepassword");
  $karma = 		$u->karma;
  $lastUpdated = 	$u->lastUpdated;
- $ldapURL = 		$u->ldapURL("ldap://ldap.mycompany.com:389/o=MyCompany");
  $languagePreference = 	$u->profileField("language",1);
  $username = 		$u->username("jonboy");
 
@@ -114,30 +113,6 @@ sub authMethod {
 
 #-------------------------------------------------------------------
 
-=head2 connectDN ( [ value ] )
-
- Returns the connection distinguished name for this user.
-
-=item value
-
- If specified, the connectDN is set to this value.
-
-=cut
-
-sub connectDN {
-        my ($class, $value);
-        $class = shift;
-        $value = shift;
-        if (defined $value) {
-                $class->{_user}{"connectDN"} = $value;
-                WebGUI::SQL->write("update users set connectDN=".quote($value).",
-                        lastUpdated=".time()." where userId=$class->{_userId}");
-        }
-        return $class->{_user}{"connectDN"};
-}
-
-#-------------------------------------------------------------------
-
 =head2 dateCreated ( )
 
  Returns the epoch for when this user was created.
@@ -164,6 +139,7 @@ sub delete {
 	WebGUI::SQL->write("delete from groupings where userId=".$class->{_userId});
 	WebGUI::SQL->write("delete from messageLog where userId=".$class->{_userId});
 	WebGUI::SQL->write("delete from userSession where userId=".$class->{_userId});
+	WebGUI::Authentication::deleteParams($class->{_userId});
 }
 
 #-------------------------------------------------------------------
@@ -254,29 +230,6 @@ sub karma {
 
 sub lastUpdated {
         return $_[0]->{_user}{lastUpdated};
-}
-
-#-------------------------------------------------------------------
-
-=head2 ldapURL ( [ value ] )
-
- Returns the LDAP URL for this user.
-
-=item value
-
- If specified, the ldapURL is set to this value.
-
-=cut
-
-sub ldapURL {
-        my ($class, $value);
-        $class = shift;
-        $value = shift;
-        if (defined $value) {
-                $class->{_user}{"ldapURL"} = $value;
-                WebGUI::SQL->write("update users set ldapURL=".quote($value).", lastUpdated=".time()." where userId=$class->{_userId}");
-        }
-        return $class->{_user}{"ldapURL"};
 }
 
 #-------------------------------------------------------------------

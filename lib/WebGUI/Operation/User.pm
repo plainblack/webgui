@@ -12,7 +12,7 @@ package WebGUI::Operation::User;
 
 use Digest::MD5 qw(md5_base64);
 use Exporter;
-use strict;
+use strict qw(vars subs);
 use Tie::CPHash;
 use WebGUI::DateTime;
 use WebGUI::HTMLForm;
@@ -55,7 +55,7 @@ sub _submenu {
 
 #-------------------------------------------------------------------
 sub www_addUser {
-        my (@array, $output, $groups, %hash, $f);
+        my (@array, $output, $groups, %hash, $f, $cmd, $html);
 	tie %hash, 'Tie::IxHash';
         return WebGUI::Privilege::adminOnly() unless (WebGUI::Privilege::isInGroup(3));
         $output .= helpIcon(5);
@@ -68,10 +68,17 @@ sub www_addUser {
         $f->text("username",WebGUI::International::get(50),$session{form}{username});
         $f->password("identifier",WebGUI::International::get(51));
         $f->email("email",WebGUI::International::get(56));
-	%hash = ('WebGUI'=>'WebGUI', 'LDAP'=>'LDAP');
-        $f->select("authMethod",\%hash,WebGUI::International::get(164),[$session{setting}{authMethod}]);
-        $f->url("ldapURL",WebGUI::International::get(165),$session{setting}{ldapURL});
-        $f->text("connectDN",WebGUI::International::get(166),$session{form}{connectDN});
+
+	%hash = map {$_ => $_} @{$session{authentication}{available}};
+	$f->select("authMethod",\%hash,WebGUI::International::get(164),[$session{setting}{authMethod}]);
+
+	foreach (@{$session{authentication}{available}}) {
+              	$cmd = "WebGUI::Authentication::".$_."::formAddUser";
+              	$html = eval{&$cmd};
+               	WebGUI::ErrorHandler::fatalError("Unable to load method formAddUser on Authentication module: $_. ".$@) if($@);
+		$f->raw($html);
+	}
+
         push(@array,1); #visitors
         push(@array,2); #registered users
         push(@array,7); #everyone
@@ -84,16 +91,20 @@ sub www_addUser {
 
 #-------------------------------------------------------------------
 sub www_addUserSave {
-        my (@groups, $uid, $u, $gid, $encryptedPassword, $expireAfter);
+        my (@groups, $uid, $u, $gid, $encryptedPassword, $expireAfter, $cmd);
 	return WebGUI::Privilege::adminOnly() unless (WebGUI::Privilege::isInGroup(3));
 	($uid) = WebGUI::SQL->quickArray("select userId from users where username=".quote($session{form}{username}));
 	unless ($uid) {
                	$encryptedPassword = Digest::MD5::md5_base64($session{form}{identifier});
 		$u = WebGUI::User->new("new");
 		$u->username($session{form}{username});
-		$u->identifier($encryptedPassword);
-		$u->connectDN($session{form}{connectDN});
-		$u->ldapURL($session{form}{ldapURL});
+
+		foreach (@{$session{authentication}{available}}) {
+        	       	$cmd = "WebGUI::Authentication::".$_."::saveAddUser";
+                	eval{&$cmd};
+                	WebGUI::ErrorHandler::fatalError("Unable to load method saveAddUser on Authentication module: $_. ".$@) if($@);
+	 	}
+
 		$u->authMethod($session{form}{authMethod});
                	@groups = $session{cgi}->param('groups');
 		$u->addToGroups(\@groups);
@@ -198,7 +209,7 @@ sub www_editGroupingSave {
 #-------------------------------------------------------------------
 sub www_editUser {
 	return WebGUI::Privilege::adminOnly() unless (WebGUI::Privilege::isInGroup(3));
-        my ($output, $f, $u);
+        my ($output, $f, $u, $cmd, $html, %hash);
 	$u = WebGUI::User->new($session{form}{uid});
         $output .= helpIcon(5);
 	$output .= '<h1>'.WebGUI::International::get(168).'</h1>';
@@ -210,18 +221,17 @@ sub www_editUser {
         $f->readOnly(epochToHuman($u->dateCreated,"%z"),WebGUI::International::get(453));
         $f->readOnly(epochToHuman($u->lastUpdated,"%z"),WebGUI::International::get(454));
         $f->text("username",WebGUI::International::get(50),$u->username);
-        $f->password("identifier",WebGUI::International::get(51),"password");
-        $f->select(
-		-name=>"authMethod",
-		-options=>{
-			'WebGUI'=>'WebGUI', 
-			'LDAP'=>'LDAP'
-			},
-		-label=>WebGUI::International::get(164),
-		-value=>[$u->authMethod]
-		);
-        $f->url("ldapURL",WebGUI::International::get(165),$u->ldapURL);
-        $f->text("connectDN",WebGUI::International::get(166),$u->connectDN);
+
+	%hash = map {$_ => $_} @{$session{authentication}{available}};	
+       	$f->select("authMethod",\%hash,WebGUI::International::get(164),[$session{setting}{authMethod}]);
+
+	foreach (@{$session{authentication}{available}}) {
+               	$cmd = "WebGUI::Authentication::".$_."::formEditUser";
+               	$html = eval{&$cmd};
+               	WebGUI::ErrorHandler::fatalError("Unable to load method formEditUser on Authentication module: $_. ".$@) if($@);
+		$f->raw($html);
+ 	}
+
         $f->submit;
 	$output .= $f->print;
 	return _submenu($output);
@@ -230,18 +240,17 @@ sub www_editUser {
 #-------------------------------------------------------------------
 sub www_editUserSave {
 	return WebGUI::Privilege::adminOnly() unless (WebGUI::Privilege::isInGroup(3));
-        my ($error, $uid, $u, $encryptedPassword, $passwordStatement);
+        my ($error, $uid, $u, $encryptedPassword, $passwordStatement, $cmd);
         ($uid) = WebGUI::SQL->quickArray("select userId from users where username=".quote($session{form}{username}));
         if ($uid == $session{form}{uid} || $uid < 1) {
 		$u = WebGUI::User->new($session{form}{uid});
-               	if ($session{form}{identifier} ne "password") {
-                       	$encryptedPassword = Digest::MD5::md5_base64($session{form}{identifier});
-			$u->identifier($encryptedPassword);
-               	}
 		$u->username($session{form}{username});
 		$u->authMethod($session{form}{authMethod});
-		$u->connectDN($session{form}{connectDN});
-		$u->ldapURL($session{form}{ldapURL});
+		foreach (@{$session{authentication}{available}}) {
+                	$cmd = "WebGUI::Authentication::".$_."::saveEditUser";
+               		eval{&$cmd};
+               		WebGUI::ErrorHandler::fatalError("Unable to load method saveEditUser on Authentication module: $_. ".$@) if($@);
+	 	}
 	} else {
                 $error = '<ul><li>'.WebGUI::International::get(77).' '.$session{form}{username}.'Too or '.$session{form}{username}.'02</ul>';
 	}

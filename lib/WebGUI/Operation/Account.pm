@@ -13,7 +13,9 @@ package WebGUI::Operation::Account;
 use Digest::MD5 qw(md5_base64);
 use Exporter;
 use Net::LDAP;
-use strict;
+use strict qw(vars subs);
+#use warnings;
+#use strict;
 use URI;
 use WebGUI::DateTime;
 use WebGUI::ErrorHandler;
@@ -29,24 +31,10 @@ use WebGUI::SQL;
 use WebGUI::URL;
 use WebGUI::User;
 use WebGUI::Utility;
+use WebGUI::Authentication;
 
 our @ISA = qw(Exporter);
 our @EXPORT = qw(&www_viewMessageLogMessage &www_viewMessageLog &www_viewProfile &www_editProfile &www_editProfileSave &www_createAccount &www_deactivateAccount &www_deactivateAccountConfirm &www_displayAccount &www_displayLogin &www_login &www_logout &www_recoverPassword &www_recoverPasswordFinish &www_createAccountSave &www_updateAccount);
-our %ldapStatusCode = ( 0=>'success (0)', 1=>'Operations Error (1)', 2=>'Protocol Error (2)',
-        3=>'Time Limit Exceeded (3)', 4=>'Size Limit Exceeded (4)', 5=>'Compare False (5)',
-        6=>'Compare True (6)', 7=>'Auth Method Not Supported (7)', 8=>'Strong Auth Required (8)',
-        9=>'Referral (10)', 11=>'Admin Limit Exceeded (11)', 12=>'Unavailable Critical Extension (12)',
-        13=>'Confidentiality Required (13)', 14=>'Sasl Bind In Progress (14)',
-        15=>'No Such Attribute (16)', 17=>'Undefined Attribute Type (17)',
-        18=>'Inappropriate Matching (18)', 19=>'Constraint Violation (19)',
-        20=>'Attribute Or Value Exists (20)', 21=>'Invalid Attribute Syntax (21)', 32=>'No Such Object (32)',
-        33=>'Alias Problem (33)', 34=>'Invalid DN Syntax (34)', 36=>'Alias Dereferencing Problem (36)',
-        48=>'Inappropriate Authentication (48)', 49=>'Invalid Credentials (49)',
-        50=>'Insufficient Access Rights (50)', 51=>'Busy (51)', 52=>'Unavailable (52)',
-        53=>'Unwilling To Perform (53)', 54=>'Loop Detect (54)', 64=>'Naming Violation (64)',
-        65=>'Object Class Violation (65)', 66=>'Not Allowed On Non Leaf (66)', 67=>'Not Allowed On RDN (67)',
-        68=>'Entry Already Exists (68)', 69=>'Object Class Mods Prohibited (69)',
-        71=>'Affects Multiple DSAs (71)', 80=>'other (80)');
 
 #-------------------------------------------------------------------
 sub _accountOptions {
@@ -135,7 +123,7 @@ sub _validateProfileData {
 
 #-------------------------------------------------------------------
 sub www_createAccount {
-	my ($output, %language, @array, 
+	my ($output, %language, @array, $cmd, $return,
         	$previousCategory, $category, $f, $a, %data, $default, $label, $values, $method);
         tie %data, 'Tie::CPHash';
 	if ($session{user}{userId} != 1) {
@@ -144,20 +132,21 @@ sub www_createAccount {
 		$output .= www_displayLogin();
         } else {
 		$output .= '<h1>'.WebGUI::International::get(54).'</h1>';
+
         	$f = WebGUI::HTMLForm->new();
 		$f->hidden("op","createAccountSave");
-		unless ($session{setting}{authMethod} eq "LDAP" && $session{setting}{usernameBinding}) {
+		unless ($session{setting}{authMethod} ne "WebGUI" && $session{setting}{usernameBinding}) {
 			$f->text("username",WebGUI::International::get(50),$session{form}{username});
 		}
-		if ($session{setting}{authMethod} eq "LDAP") {
-			$f->hidden("identifier1","ldap-password");
-			$f->hidden("identifier2","ldap-password");
-			$f->text("ldapId",$session{setting}{ldapIdName});
-			$f->password("ldapPassword",$session{setting}{ldapPasswordName});
-		} else {
-			$f->password("identifier1",WebGUI::International::get(51));
-			$f->password("identifier2",WebGUI::International::get(55));
+		unless ($session{setting}{authMethod} eq 'WebGUI') {
+			$f->text("loginId", 'loginName');
 		}
+ 
+		$cmd = $session{authentication}{$session{setting}{authMethod}} . "::formCreateAccount";
+		$return = eval {&$cmd};
+               	WebGUI::ErrorHandler::fatalError("Unable to load method formCreateAccount on Authentication module: $session{setting}{authMethod}. ".$@) if($@);
+		$f->raw($return);
+
         	$a = WebGUI::SQL->read("select * from userProfileField,userProfileCategory 
 			where userProfileField.profileCategoryId=userProfileCategory.profileCategoryId 
 			order by userProfileCategory.sequenceNumber,userProfileField.sequenceNumber");
@@ -196,10 +185,12 @@ sub www_createAccount {
 		$output .= '<div class="accountOptions"><ul>';
 		$output .= '<li><a href="'.WebGUI::URL::page('op=displayLogin').'">'.
 			WebGUI::International::get(58).'</a>';
+
 		if ($session{setting}{authMethod} eq "WebGUI") {
 			$output .= '<li><a href="'.WebGUI::URL::page('op=recoverPassword').'">'.
 				WebGUI::International::get(59).'</a>';
 		}
+
 		$output .= '</ul></div>';
 	}
         return $output;
@@ -207,54 +198,30 @@ sub www_createAccount {
 
 #-------------------------------------------------------------------
 sub www_createAccountSave {
-        my ($profile, $u, $username, $uri, $temp, $ldap, $port, %args, $search, 
+        my ($profile, $u, $username, $uri, $temp, $ldap, $port, %args, $search, $cmd, 
 		$connectDN, $auth, $output, $error, $uid,  $encryptedPassword, $fieldName);
-        if ($session{setting}{authMethod} eq "LDAP" && $session{setting}{usernameBinding}) {
-                $username = $session{form}{ldapId};
+        if ($session{setting}{authMethod} ne "WebGUI" && $session{setting}{usernameBinding}) {
+		$username = $session{form}{loginId};
         } else {
                 $username = $session{form}{username};
         }
 	$error = _hasBadUsername($username);
-	$error .= _hasBadPassword($session{form}{identifier1},$session{form}{identifier2});
-        if ($session{setting}{authMethod} eq "LDAP") {
-                $uri = URI->new($session{setting}{ldapURL});
-                if ($uri->port < 1) {
-                        $port = 389;
-                } else {
-                        $port = $uri->port;
-                }
-                %args = (port => $port);
-                $ldap = Net::LDAP->new($uri->host, %args) or $error .= WebGUI::International::get(79);
-                $ldap->bind;
-                $search = $ldap->search (base => $uri->dn, filter => $session{setting}{ldapId}."=".$session{form}{ldapId});
-                if (defined $search->entry(0)) {
-                        $connectDN = "cn=".$search->entry(0)->get_value("cn");
-                        $ldap->unbind;
-                        $ldap = Net::LDAP->new($uri->host, %args) or $error .= WebGUI::International::get(79);
-                        $auth = $ldap->bind(dn=>$connectDN, password=>$session{form}{ldapPassword});
-                        if ($auth->code == 48 || $auth->code == 49) {
-                                $error .= '<li>'.WebGUI::International::get(68);
-                                WebGUI::ErrorHandler::warn("Invalid LDAP information for registration of LDAP ID: ".$session{form}{ldapId});
-                        } elsif ($auth->code > 0) {
-                                $error .= '<li>LDAP error "'.$ldapStatusCode{$auth->code}.'" occured. '.WebGUI::International::get(69);
-                                WebGUI::ErrorHandler::warn("LDAP error: ".$ldapStatusCode{$auth->code});
-                        }
-                        $ldap->unbind;
-                } else {
-                        $error .= '<li>'.WebGUI::International::get(68);
-                        WebGUI::ErrorHandler::warn("Invalid LDAP information for registration of LDAP ID: ".$session{form}{ldapId});
-                }
-        }
+
+	$cmd = $session{authentication}{$session{setting}{authMethod}} . '::hasBadUserData';
+	$error .= eval {&$cmd};
+	WebGUI::ErrorHandler::fatalError("Unable to load method hasBadUserData on Authentication module: $session{setting}{authMethod}. ".$@) if($@);
+
 	($profile, $temp) = _validateProfileData();
 	$error .= $temp;
         if ($error eq "") {
-                $encryptedPassword = Digest::MD5::md5_base64($session{form}{identifier1});
 		$u = WebGUI::User->new("new");
 		$u->username($username);
-		$u->identifier($encryptedPassword);
 		$u->authMethod($session{setting}{authMethod});
-		$u->ldapURL($session{setting}{ldapURL});
-		$u->connectDN($connectDN);
+
+		$cmd = $session{authentication}{$session{setting}{authMethod}} . '::saveCreateAccount';
+		eval {&$cmd($u->userId)};
+               	WebGUI::ErrorHandler::fatalError("Unable to load method saveCreateAccount on Authentication module: $session{setting}{authMethod}. ".$@) if($@);
+
 		$u->karma($session{setting}{karmaPerLogin},"Login","Just for logging in.") if ($session{setting}{useKarma});
 		foreach $fieldName (keys %{$profile}) {
 			$u->profileField($fieldName,${$profile}{$fieldName});
@@ -307,13 +274,15 @@ sub www_displayAccount {
 		$f = WebGUI::HTMLForm->new;
         	$f->hidden("op","updateAccount");
 		$f->readOnly($session{user}{karma},WebGUI::International::get(537)) if ($session{setting}{useKarma});
-		if ($session{user}{authMethod} eq "LDAP" && $session{setting}{usernameBinding}) {
+
+		if ($session{user}{authMethod} ne "WebGUI" && $session{setting}{usernameBinding}) {
 			$f->hidden("username",$session{user}{username});
         		$f->readOnly($session{user}{username},WebGUI::International::get(50));
 		} else {
         		$f->text("username",WebGUI::International::get(50),$session{user}{username});
 		}
-		if ($session{user}{authMethod} eq "LDAP") {
+
+		if ($session{user}{authMethod} ne "WebGUI") {
         		$f->hidden("identifier1","password");
         		$f->hidden("identifier2","password");
 		} else {
@@ -432,48 +401,23 @@ sub www_editProfileSave {
 
 #-------------------------------------------------------------------
 sub www_login {
-	my ($uri, $port, $ldap, %args, $auth, $error, $uid, $success, $u);
+	my ($cmd, $uid, $success, $u);
+
 	($uid) = WebGUI::SQL->quickArray("select userId from users where username=".quote($session{form}{username}));
 	$u = WebGUI::User->new($uid);
-	if ($u->authMethod eq "LDAP") {
-                $uri = URI->new($u->ldapURL);
-                if ($uri->port < 1) {
-                        $port = 389;
-                } else {
-                        $port = $uri->port;
-                }
-                %args = (port => $port);
-                $ldap = Net::LDAP->new($uri->host, %args) or $error = WebGUI::International::get(79);
-                $auth = $ldap->bind(dn=>$u->connectDN, password=>$session{form}{identifier});
-                if ($auth->code == 48 || $auth->code == 49) {
-			$error = WebGUI::International::get(68);
-			WebGUI::ErrorHandler::security("login to account ".$session{form}{username}." with invalid information.");
-                	_logLogin($uid,"invalid username/password");
-		} elsif ($auth->code > 0) {
-			$error .= 'LDAP error "'.$ldapStatusCode{$auth->code}.'" occured.';
-			$error .= WebGUI::International::get(69);
-			WebGUI::ErrorHandler::warn("LDAP error: ".$ldapStatusCode{$auth->code});
-                	_logLogin($uid,"LDAP error: ".$ldapStatusCode{$auth->code});
-		} else {
-			$success = 1;
-		}
-                $ldap->unbind;
-	} else {
-		if (Digest::MD5::md5_base64($session{form}{identifier}) eq $u->identifier && $session{form}{identifier} ne "") {
-			$success = 1;
-		} else {
-			$error = WebGUI::International::get(68);
-			WebGUI::ErrorHandler::security("login to account ".$session{form}{username}." with invalid information.");
-			_logLogin($uid,"invalid username/password");
-		}
-	}
-	if ($success) {
+
+	$cmd = $session{authentication}{$u->authMethod}."::validateUser";
+	$success = eval{&$cmd($uid, $session{form}{identifier})};
+	WebGUI::ErrorHandler::fatalError("Unable to load method validateUser on Authentication module: $_. ".$@) if($@);
+
+	if ($success == 1) {
 		WebGUI::Session::start($uid);
 		$u->karma($session{setting}{karmaPerLogin},"Login","Just for logging in.") if ($session{setting}{useKarma});
                 _logLogin($uid,"success");
 		return "";
 	} else {
-		return "<h1>".WebGUI::International::get(70)."</h1>".$error.www_displayLogin();
+		_logLogin($uid, $success);
+		return "<h1>".WebGUI::International::get(70)."</h1>".$success.www_displayLogin();
 	}
 }
 
