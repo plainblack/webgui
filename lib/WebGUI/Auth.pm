@@ -34,7 +34,6 @@ use WebGUI::TabForm;
 use WebGUI::Template;
 use WebGUI::URL;
 use WebGUI::Utility;
-use WebGUI::Operation::Profile;
 use WebGUI::Operation::Shared;
 
 
@@ -135,7 +134,7 @@ sub _logLogin {
 
 =head2 addUserForm ( userId )
 
-  Creates user form elements specific to this Auth Method.
+  Creates elements for the add user form specific to this Authentication Method.
 
 =cut
 
@@ -189,6 +188,14 @@ sub authenticate {
 
   Gets or sets the authMethod in the Auth Object
 
+=over
+
+=item authMethod
+
+   A string which sets the auth method for an instance of this class
+
+=back
+
 =cut
 
 sub authMethod {
@@ -198,6 +205,28 @@ sub authMethod {
 }
 
 #-------------------------------------------------------------------
+=head2 createAccount ( method [,vars,template] )
+
+  Superclass method that performs general functionality for creating new accounts.
+
+=over
+
+=item method
+
+   Auth method that the form for creating users should call
+   
+=item vars
+   
+   Array ref of template vars from subclass
+   
+=item template
+
+   Template that this class should use for display purposes
+
+=back
+  
+=cut
+
 sub createAccount {
     my $self = shift;
 	my $method = $_[0];
@@ -224,6 +253,32 @@ sub createAccount {
 }
 
 #-------------------------------------------------------------------
+=head2 createAccountSave ( username,properties [,password,profile] )
+
+  Superclass method that performs general functionality for saving new accounts.
+
+=over
+
+=item username
+
+   Username for the account being created
+   
+=item properties
+   
+   Properties from the subclass that should be saved as authentication parameters
+   
+=item password
+
+   Password entered by the user.  This is only used in for sending the user a notification by email of his/her username/password
+
+=item profile
+   
+   Hashref of profile values returned by the function WebGUI::Operation::Profile::validateProfileData()
+   
+=back
+  
+=cut
+
 sub createAccountSave {
    my $self = shift;
    my $username = $_[0];
@@ -256,6 +311,20 @@ sub createAccountSave {
 }
 
 #-------------------------------------------------------------------
+=head2 deactivateAccount ( method )
+
+  Superclass method that displays a confirm message for deactivating a user's account.
+
+=over
+
+=item method
+
+   Auth method that the form for creating users should call
+   
+=back
+  
+=cut
+
 sub deactivateAccount {
    my $self = shift;
    my $method = $_[0];
@@ -270,17 +339,22 @@ sub deactivateAccount {
 }
 
 #-------------------------------------------------------------------
+=head2 deactivateAccount ( method )
+
+  Superclass method that performs general functionality for deactivating accounts.
+  
+=cut
+
 sub deactivateAccountConfirm {
    my $self = shift;
    return WebGUI::Privilege::vitalComponent() if ($self->userId < 26);
-   my $u = $self->user;   #WebGUI::User->new($session{user}{userId});
+   my $u = $self->user;
    $u->status("Selfdestructed");
    WebGUI::Session::end($session{var}{sessionId});
    WebGUI::Session::start(1);   
 }
 
 #-------------------------------------------------------------------
-
 =head2 deleteParams (  )
 
 Removes the user's authentication parameters from the database for all authentication methods. This is primarily useful when deleting the user's account.
@@ -293,11 +367,26 @@ sub deleteParams {
 }
 
 #-------------------------------------------------------------------
+=head2 displayAccount ( method [,vars,template] )
 
-=head2 displayAccount ( )
+  Superclass method that performs general functionality for viewing editable fields related to a user's account.
 
-  Superclass method that has a basic displayAccount template.
+=over
 
+=item method
+
+   Auth method that the form for updating a user's account should call
+   
+=item vars
+   
+   Array ref of template vars from subclass
+   
+=item template
+
+   Template that this class should use for display purposes
+
+=back
+  
 =cut
 
 sub displayAccount {
@@ -323,12 +412,26 @@ sub displayAccount {
 }
 
 #-------------------------------------------------------------------
+=head2 displayLogin ( [method,vars,template] )
 
-=head2 displayLogin ( )
+  Superclass method that performs general functionality for creating new accounts.
 
-  Superclass method that has a basic displayLogin template.  
-  This method should be called unless login methods are completely different than WebGUI's standard
+=over
 
+=item method
+
+   Auth method that the form for performing the login routine should call
+   
+=item vars
+   
+   Array ref of template vars from subclass
+   
+=item template
+
+   Template that this class should use for display purposes
+
+=back
+  
 =cut
 
 sub displayLogin {
@@ -443,6 +546,13 @@ sub getSetting {
 }
 
 #-------------------------------------------------------------------
+=head2 init ( )
+
+  Initialization function for these auth routines.  Default is a superclass function called displayLogin.
+  Override this method in your subclass to change the initialization for custom authentication methods
+
+=cut
+
 sub init {
    my $self = shift;
    return $self->displayLogin;
@@ -466,7 +576,8 @@ sub isCallable {
 
 =head2 login ( )
 
-  Superclass method that performs standard login routines.  This is what should happen after a user has been authenticated
+  Superclass method that performs standard login routines.  This is what should happen after a user has been authenticated.
+  Authentication should always happen in the subclass routine.
 
 =cut
 
@@ -503,9 +614,25 @@ sub logout {
 
 #-------------------------------------------------------------------
 
-=head2 new ( )
+=head2 new ( authMethod [,userId,callable] )
 
 Constructor.
+
+=over
+
+=item authMethod
+  
+  This object's authentication method
+  
+=item userId
+
+  userId for the user requesting authentication.  This defaults to $session{user}{userId}
+  
+=item callable
+
+  Array reference of methods allowed to be called externally;  
+
+=back
 
 =cut
 
@@ -543,6 +670,28 @@ sub profile {
 
 
 #-------------------------------------------------------------------
+=head2 recoverPassword ( method [,vars,template] )
+
+  Superclass method that performs general functionality for creating new accounts.
+
+=over
+
+=item method
+
+   Auth method that the form for recovering passwords should call
+   
+=item vars
+   
+   Array ref of template vars from subclass
+   
+=item template
+
+   Template that this class should use for display purposes
+
+=back
+  
+=cut
+
 sub recoverPassword {
    my $self = shift;
    my $method = $_[0];
@@ -567,6 +716,21 @@ sub recoverPassword {
 }
 
 #-------------------------------------------------------------------
+=head2 setCallable ( callableMethods )
+
+  adds elements to the callable routines list.  This list determines whether or not a method in this instance is 
+  allowed to be called externally
+
+=over
+
+=item callableMethods
+
+  Array reference containing a list of methods for this authentication instance that can be called externally
+
+=back
+
+=cut
+
 sub setCallable {
    my $self = shift;
    my @callable = @{$self->{callable}};
@@ -652,7 +816,7 @@ sub username {
 
 =head2 validUsernameAndPassword ( username,password,passwordConfirm )
 
-  Validates the account form.
+  Validates the a username and password.
 
 =cut
 
