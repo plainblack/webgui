@@ -40,6 +40,7 @@ sub authenticate {
 	$userId = $_[0]->[0];
         my $identifier = $_[0]->[1];
 	$userData = WebGUI::Authentication::getParams($userId, 'LDAP');
+	return "No connect DN specified." if ($$userData{connectDN} eq "");
 	if ($uri = URI->new($userData->{ldapUrl})) {
         	$ldap = Net::LDAP->new($uri->host, (port=>$uri->port)) or $result = WebGUI::International::get(2,'Auth/LDAP');
 		return $result if $result;
