@@ -24,8 +24,7 @@ sub _submenu {
 	my $workarea = shift;
 	my $title = shift;
 	$title = WebGUI::International::get($title) if ($title);
-	my $ac = WebGUI::AdminConsole->new;
-	$ac->setAdminFunction("statistics");
+	my $ac = WebGUI::AdminConsole->new("statistics");
 	if ($session{setting}{trackPageStatistics}) {
 		$ac->addSubmenuItem( WebGUI::URL::page("op=viewPageReport"), WebGUI::International::get(796));
 #		$ac->addSubmenuItem( WebGUI::URL::page("op=viewTrafficReport"), WebGUI::International::get(797));

@@ -47,15 +47,14 @@ sub _seeAlso {
 #-------------------------------------------------------------------
 sub www_viewHelp {
 	return WebGUI::Privilege::insufficient() unless (WebGUI::Grouping::isInGroup(12));
-	my $ac = WebGUI::AdminConsole->new;
-	$ac->setAdminFunction("help");
+	my $ac = WebGUI::AdminConsole->new("help");
 	my $namespace = $session{form}{namespace} || "WebGUI";
 	my $help = _get($session{form}{hid},$namespace);
-    	$ac->addSubmenuItem(WebGUI::URL::page('op=viewHelpIndex'),WebGUI::International::get(95));
 	foreach my $row (@{$help->{related}}) {
 		my $relatedHelp = _get($row->{tag},$row->{namespace});
 		$ac->addSubmenuItem(_link($row->{tag},$row->{namespace}),WebGUI::International::get($relatedHelp->{title},$row->{namespace}));
 	}
+    	$ac->addSubmenuItem(WebGUI::URL::page('op=viewHelpIndex'),WebGUI::International::get(95));
     	return $ac->render(
 		WebGUI::Macro::negate(WebGUI::International::get($help->{body},$namespace)), 
 		WebGUI::International::get(93).': '.WebGUI::International::get($help->{title},$namespace)
@@ -104,9 +103,7 @@ sub www_viewHelpIndex {
 		}	
 	}
 	$output .= '</td></tr></table>';
-	my $ac = WebGUI::AdminConsole->new;
-	$ac->setAdminFunction("help");
-	return $ac->render($output);
+	return WebGUI::AdminConsole->new("help")->render($output);
 }
 
 1;

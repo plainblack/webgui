@@ -170,7 +170,6 @@ sub www_edit {
 #-------------------------------------------------------------------
 sub www_editForum {
  	return WebGUI::Privilege::insufficient() unless ($_[0]->canEdit);
-        $session{page}{useAdminStyle} = 1;
 	my $forumMeta;
 	if ($session{form}{forumId} ne "new") {
 		$forumMeta = WebGUI::SQL->quickHashRef("select title,description from MessageBoard_forums where forumId=".quote($session{form}{forumId}));
@@ -214,7 +213,7 @@ sub www_editForum {
 	}
 
 	$f->submit;
-	return helpIcon("forum add/edit",$_[0]->get("namespace")).'<h1>'.WebGUI::International::get(77,$_[0]->get("namespace")).'</h1>'.$f->print;
+	return $_[0]->adminConsole($f->print,'77','forum add/edit');
 }
 
 #-------------------------------------------------------------------

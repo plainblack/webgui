@@ -32,11 +32,10 @@ sub _submenu {
         my $title = shift;
         $title = WebGUI::International::get($title) if ($title);
         my $help = shift;
-        my $ac = WebGUI::AdminConsole->new;
+        my $ac = WebGUI::AdminConsole->new("templates");
         if ($help) {
                 $ac->setHelp($help);
         }
-        $ac->setAdminFunction("templates");
         $ac->addSubmenuItem(WebGUI::URL::page('op=editTemplate&tid=new&namespace='.$session{form}{namespace}), WebGUI::International::get(505));
         if ($session{form}{op} eq "editTemplate" && ($session{form}{tid} ne "new" || $session{form}{op} ne "deleteTemplateConfirm")) {
                 $ac->addSubmenuItem(

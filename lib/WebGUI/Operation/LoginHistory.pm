@@ -48,9 +48,7 @@ sub www_viewLoginHistory {
         $output .= $p->getPage($session{form}{pn});
         $output .= '</table>';
         $output .= $p->getBar($session{form}{pn});
-	my $ac = WebGUI::AdminConsole->new;
-	$ac->setAdminFunction("loginHistory");
-	return $ac->render($output);
+	return WebGUI::AdminConsole->new("loginHistory")->render($output);
 }
 
 1;

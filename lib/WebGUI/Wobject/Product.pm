@@ -165,10 +165,7 @@ sub purge {
 #-------------------------------------------------------------------
 sub www_addAccessory {
 	return WebGUI::Privilege::insufficient() unless ($_[0]->canEdit);
-        $session{page}{useAdminStyle} = 1;
-        my ($output, $f, $accessory, @usedAccessories);
-	$output = helpIcon("product accessory add/edit",$_[0]->get("namespace"));
-        $output .= '<h1>'.WebGUI::International::get(16,$_[0]->get("namespace")).'</h1>';
+        my ($f, $accessory, @usedAccessories);
         $f = WebGUI::HTMLForm->new;
         $f->hidden("wid",$_[0]->get("wobjectId"));
         $f->hidden("func","addAccessorySave");
@@ -180,15 +177,13 @@ sub www_addAccessory {
         $f->select("accessoryWobjectId",$accessory,WebGUI::International::get(17,$_[0]->get("namespace")));
         $f->yesNo("proceed",WebGUI::International::get(18,$_[0]->get("namespace")));
         $f->submit;
-        $output .= $f->print;
-        return $output;
+        return $_[0]->adminConsole($f->print, '16', "product accessory add/edit");
 }
 
 #-------------------------------------------------------------------
 sub www_addAccessorySave {
 	return WebGUI::Privilege::insufficient() unless ($_[0]->canEdit);
 	return "" unless ($session{form}{accessoryWobjectId});
-        $session{page}{useAdminStyle} = 1;
         my ($seq);
         ($seq) = WebGUI::SQL->quickArray("select max(sequenceNumber) from Product_accessory
                 where wobjectId=".quote($_[0]->get("wobjectId")));
@@ -204,9 +199,7 @@ sub www_addAccessorySave {
 #-------------------------------------------------------------------
 sub www_addRelated {
 	return WebGUI::Privilege::insufficient() unless ($_[0]->canEdit);
-        my ($output, $f, $related, @usedRelated);
-	$output = helpIcon("product related add/edit",$_[0]->get("namespace"));
-        $output .= '<h1>'.WebGUI::International::get(19,$_[0]->get("namespace")).'</h1>';
+        my ($f, $related, @usedRelated);
         $f = WebGUI::HTMLForm->new;
         $f->hidden("wid",$_[0]->get("wobjectId"));
         $f->hidden("func","addRelatedSave");
@@ -218,8 +211,7 @@ sub www_addRelated {
         $f->select("relatedWobjectId",$related,WebGUI::International::get(20,$_[0]->get("namespace")));
         $f->yesNo("proceed",WebGUI::International::get(21,$_[0]->get("namespace")));
         $f->submit;
-        $output .= $f->print;
-        return $output;
+        return $_[0]->adminConsole( $f->print, '19',"product related add/edit");
 }
 
 #-------------------------------------------------------------------
@@ -379,11 +371,8 @@ sub www_editSave {
 #-------------------------------------------------------------------
 sub www_editBenefit {
 	return WebGUI::Privilege::insufficient() unless ($_[0]->canEdit);
-        $session{page}{useAdminStyle} = 1;
-        my ($output, $data, $f, $benefits);
+        my ($data, $f, $benefits);
 	$data = $_[0]->getCollateral("Product_benefit","Product_benefitId",$session{form}{bid});
-        $output = helpIcon("product benefit add/edit",$_[0]->get("namespace"));
-        $output .= '<h1>'.WebGUI::International::get(53,$_[0]->get("namespace")).'</h1>';
         $f = WebGUI::HTMLForm->new;
         $f->hidden("wid",$_[0]->get("wobjectId"));
         $f->hidden("bid",$data->{Product_benefitId});
@@ -392,8 +381,7 @@ sub www_editBenefit {
         $f->combo("benefit",$benefits,WebGUI::International::get(51,$_[0]->get("namespace")),[$data->{benefits}]);
         $f->yesNo("proceed",WebGUI::International::get(52,$_[0]->get("namespace")));
         $f->submit;
-        $output .= $f->print;
-        return $output;
+        return $_[0]->adminConsole($f->print,'53',"product benefit add/edit");
 }
 
 #-------------------------------------------------------------------
@@ -415,11 +403,8 @@ sub www_editBenefitSave {
 #-------------------------------------------------------------------
 sub www_editFeature {
 	return WebGUI::Privilege::insufficient() unless ($_[0]->canEdit);
-        $session{page}{useAdminStyle} = 1;
-        my ($output, $data, $f, $features);
+        my ($data, $f, $features);
 	$data = $_[0]->getCollateral("Product_feature","Product_featureId",$session{form}{fid});
-	$output = helpIcon("product feature add/edit",$_[0]->get("namespace"));
-        $output .= '<h1>'.WebGUI::International::get(22,$_[0]->get("namespace")).'</h1>';
         $f = WebGUI::HTMLForm->new;
         $f->hidden("wid",$_[0]->get("wobjectId"));
         $f->hidden("fid",$data->{Product_featureId});
@@ -428,8 +413,7 @@ sub www_editFeature {
         $f->combo("feature",$features,WebGUI::International::get(23,$_[0]->get("namespace")),[$data->{feature}]);
         $f->yesNo("proceed",WebGUI::International::get(24,$_[0]->get("namespace")));
         $f->submit;
-        $output .= $f->print;
-        return $output;
+        return $_[0]->adminConsole($f->print,'22',"product feature add/edit");
 }
 
 #-------------------------------------------------------------------
@@ -451,11 +435,8 @@ sub www_editFeatureSave {
 #-------------------------------------------------------------------
 sub www_editSpecification {
 	return WebGUI::Privilege::insufficient() unless ($_[0]->canEdit);
-        $session{page}{useAdminStyle} = 1;
-        my ($output, $data, $f, $hashRef);
+        my ($data, $f, $hashRef);
 	$data = $_[0]->getCollateral("Product_specification","Product_specificationId",$session{form}{sid});
-	$output = helpIcon("product specification add/edit",$_[0]->get("namespace"));
-        $output .= '<h1>'.WebGUI::International::get(25,$_[0]->get("namespace")).'</h1>';
         $f = WebGUI::HTMLForm->new;
         $f->hidden("wid",$_[0]->get("wobjectId"));
         $f->hidden("sid",$data->{Product_specificationId});
@@ -467,8 +448,7 @@ sub www_editSpecification {
         $f->combo("units",$hashRef,WebGUI::International::get(29,$_[0]->get("namespace")),[$data->{units}]);
         $f->yesNo("proceed",WebGUI::International::get(28,$_[0]->get("namespace")));
         $f->submit;
-        $output .= $f->print;
-        return $output;
+        return $_[0]->adminConsole($f->print,'25',"product specification add/edit");
 }
 
 #-------------------------------------------------------------------

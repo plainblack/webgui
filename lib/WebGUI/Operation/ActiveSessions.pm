@@ -58,9 +58,7 @@ sub www_viewActiveSessions {
         $output .= $p->getPage($session{form}{pn});
         $output .= '</table>';
         $output .= $p->getBarTraditional($session{form}{pn});
-	my $ac = WebGUI::AdminConsole->new;
-	$ac->setAdminFunction("activeSessions");
-	return $ac->render($output);
+	return WebGUI::AdminConsole->new("activeSessions")->render($output);
 }
 
 1;

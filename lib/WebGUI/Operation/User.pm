@@ -38,11 +38,10 @@ sub _submenu {
         my $title = shift;
         $title = WebGUI::International::get($title) if ($title);
         my $help = shift;
-        my $ac = WebGUI::AdminConsole->new;
+        my $ac = WebGUI::AdminConsole->new("users");
         if ($help) {
                 $ac->setHelp($help);
         }
-        $ac->setAdminFunction("users");
 	if (WebGUI::Grouping::isInGroup(3)) {
 		$ac->addSubmenuItem(WebGUI::URL::page("op=addUser"), WebGUI::International::get(169));
 		unless ($session{form}{op} eq "listUsers" 

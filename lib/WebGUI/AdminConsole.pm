@@ -208,7 +208,10 @@ sub getAdminFunction {
 
 sub new {
 	my $class = shift;
-	bless {}, $class;
+	my $id = shift;
+	my %self;
+	$self{_function} = $class->getAdminFunction($id);
+	bless \%self, $class;
 }
 
 sub render {
@@ -235,17 +238,11 @@ sub render {
 	return WebGUI::Template::process($session{setting}{AdminConsoleTemplate}, "AdminConsole", \%var);
 }
 
-sub setAdminFunction {
-	my $self = shift;
-	my $id = shift;
-	$self->{_function} = $self->getAdminFunction($id);
-}
-
 sub setHelp {
 	my $self = shift;
 	my $id = shift;
 	my $namespace = shift || "WebGUI";
-	$self->{_helpUrl} = WebGUI::URL::page('op=viewHelp&hid='.$id.'&namespace='.$namespace)
+	$self->{_helpUrl} = WebGUI::URL::page('op=viewHelp&hid='.$id.'&namespace='.$namespace) if ($id);
 }
 
 1;

@@ -26,11 +26,10 @@ sub _submenu {
         my $title = shift;
         $title = WebGUI::International::get($title) if ($title);
         my $help = shift;
-        my $ac = WebGUI::AdminConsole->new;
+        my $ac = WebGUI::AdminConsole->new("contentFilters");
         if ($help) {
                 $ac->setHelp($help);
         }
-        $ac->setAdminFunction("contentFilters");
         $ac->addSubmenuItem(WebGUI::URL::page("op=editReplacement&amp;replacementId=new"), WebGUI::International::get(1047));
         $ac->addSubmenuItem(WebGUI::URL::page("op=listReplacements"), WebGUI::International::get("content filters"));
         return $ac->render($workarea, $title);

@@ -18,6 +18,7 @@ use CGI::Util qw(rearrange);
 use DBI;
 use strict qw(subs vars);
 use Tie::IxHash;
+use WebGUI::AdminConsole;
 use WebGUI::DateTime;
 use WebGUI::FormProcessor;
 use WebGUI::Grouping;
@@ -77,6 +78,20 @@ sub _getNextSequenceNumber {
 	my ($sequenceNumber);
 	($sequenceNumber) = WebGUI::SQL->quickArray("select max(sequenceNumber) from wobject where pageId=".quote($_[0]));
 	return ($sequenceNumber+1);
+}
+
+#-------------------------------------------------------------------
+
+sub adminConsole {
+	my $self = shift;
+	my $content = shift;
+	my $title = shift;
+	my $helpId = shift;
+	my $namespace = shift || $self->namespace;
+	$title = WebGUI::International::get($title,$namespace) if ($title);
+	my $ac = WebGUI::AdminConsole->new("assets");
+	$ac->setHelp($helpId,$namespace);
+	$ac->render($content,$title);
 }
 
 #-------------------------------------------------------------------
@@ -1158,23 +1173,16 @@ Prompts a user to confirm whether they wish to delete this instance.
 
 sub www_delete {
 	my $self = shift;
-        my ($output);
-        if ($self->canEdit) {
-                $output = helpIcon("wobject delete");
-		$output .= '<h1>'.WebGUI::International::get(42).'</h1>';
-                $output .= WebGUI::International::get(43);
-		$output .= '<p>';
-                $output .= '<div align="center"><a href="'.WebGUI::URL::page('func=deleteConfirm&wid='.
-			$self->get("wobjectId")).'">';
-		$output .= WebGUI::International::get(44); 
-		$output .= '</a>';
-                $output .= '&nbsp;&nbsp;&nbsp;&nbsp;<a href="'.WebGUI::URL::page().'">';
-		$output .= WebGUI::International::get(45);
-		$output .= '</a></div>';
-                return $output;
-        } else {
-                return WebGUI::Privilege::insufficient();
-        }
+        return WebGUI::Privilege::insufficient() unless ($self->canEdit);
+        my $output = WebGUI::International::get(43);
+	$output .= '<p>';
+        $output .= '<div align="center"><a href="'.WebGUI::URL::page('func=deleteConfirm&wid='. $self->get("wobjectId")).'">';
+	$output .= WebGUI::International::get(44); 
+	$output .= '</a>';
+        $output .= '&nbsp;&nbsp;&nbsp;&nbsp;<a href="'.WebGUI::URL::page().'">';
+	$output .= WebGUI::International::get(45);
+	$output .= '</a></div>';
+        return $self->adminConsole($output,'42',"wobject delete","WebGUI");
 }
 
 #-------------------------------------------------------------------
@@ -1259,7 +1267,6 @@ An id this namespace of the WebGUI international system. This message will be re
 sub www_edit {
 	my $self = shift;
 	return WebGUI::Privilege::insufficient() unless ($self->canEdit);
-	$session{page}{useAdminStyle} = 1;
 	my (@p) = @_;
         my ($properties, $layout, $privileges, $heading, $helpId, $headingId) = 
 		rearrange([qw(properties layout privileges heading helpId headingId)], @p);
@@ -1436,11 +1443,7 @@ sub www_edit {
      					                '</a></p>'
 		);
 	}
-	my $output;
-	$output = helpIcon($helpId,$self->get("namespace")) if ($helpId);
-	$heading = WebGUI::International::get($headingId,$self->get("namespace")) if ($headingId);
-        $output .= '<h1>'.$heading.'</h1>' if ($heading);
-	return $output.$f->print; 
+	return $self->adminConsole($f->print,$headingId,$helpId);
 }
 
 #-------------------------------------------------------------------

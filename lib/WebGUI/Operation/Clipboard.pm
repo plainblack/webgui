@@ -33,11 +33,10 @@ sub _submenu {
         my $title = shift;
         $title = WebGUI::International::get($title) if ($title);
 	my $help = shift;
-        my $ac = WebGUI::AdminConsole->new;
+        my $ac = WebGUI::AdminConsole->new("clipboard");
 	if ($help) {
 		$ac->setHelp($help);
 	}
-        $ac->setAdminFunction("clipboard");
 	$ac->addSubmenuItem(WebGUI::URL::page('op=manageClipboard'), WebGUI::International::get(949));
 	if ($session{form}{systemClipboard} ne "1") {
 		$ac->addSubmenuItem(WebGUI::URL::page('op=emptyClipboard'), WebGUI::International::get(950));

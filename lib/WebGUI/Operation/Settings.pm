@@ -263,10 +263,9 @@ sub www_editSettings {
 	$jscript .= "</script>";	
 	$tabform->getTab("auth")->raw($jscript);
 	$tabform->submit();
-	my $ac = WebGUI::AdminConsole->new;
-	$ac->setAdminFunction("settings");
+	my $ac = WebGUI::AdminConsole->new("settings");
 	$ac->setHelp("settings");
-    	return $ac->render($tabform->print);
+	return $ac->render($tabform->print);
 }
 
 #-------------------------------------------------------------------

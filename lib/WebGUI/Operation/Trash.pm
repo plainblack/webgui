@@ -116,11 +116,10 @@ sub _submenu {
         my $title = shift;
         $title = WebGUI::International::get($title) if ($title);
         my $help = shift;
-        my $ac = WebGUI::AdminConsole->new;
+        my $ac = WebGUI::AdminConsole->new("trash");
         if ($help) {
                 $ac->setHelp($help);
         }
-        $ac->setAdminFunction("trash");
 	$ac->addSubmenuItem(WebGUI::URL::page('op=manageTrash'), WebGUI::International::get(10));
 	if ($session{form}{systemTrash} ne "1") {
 		$ac->addSubmenuItem(WebGUI::URL::page('op=emptyTrash'), WebGUI::International::get(11));

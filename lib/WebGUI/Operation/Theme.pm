@@ -50,11 +50,10 @@ sub _submenu {
         my $title = shift;
         $title = WebGUI::International::get($title) if ($title);
         my $help = shift;
-        my $ac = WebGUI::AdminConsole->new;
+        my $ac = WebGUI::AdminConsole->new("themes");
         if ($help) {
                 $ac->setHelp($help);
         }
-        $ac->setAdminFunction("themes");
 	$ac->addSubmenuItem(WebGUI::URL::page('op=editTheme&themeId=new'), WebGUI::International::get(901));
 	$ac->addSubmenuItem(WebGUI::URL::page('op=importTheme'), WebGUI::International::get(924));
 	unless (isIn($session{form}{op}, qw(deleteThemeConfirm viewTheme listThemes)) || $session{form}{themeId} eq "new") {

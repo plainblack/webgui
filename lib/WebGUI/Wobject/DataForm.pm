@@ -632,8 +632,7 @@ sub www_editSave {
 #-------------------------------------------------------------------
 sub www_editField {
 	return WebGUI::Privilege::insufficient() unless ($_[0]->canEdit);
-        $session{page}{useAdminStyle} = 1;
-    	my ($output, %field, $f, %fieldStatus,$tab);
+    	my (%field, $f, %fieldStatus,$tab);
     	tie %field, 'Tie::CPHash';
     	tie %fieldStatus, 'Tie::IxHash';
 
@@ -649,8 +648,6 @@ sub www_editField {
 	}
 	$tab = WebGUI::SQL->buildHashRef("select DataForm_tabId,label from DataForm_tab where wobjectId=".quote($_[0]->get("wobjectId")));
 	$tab->{0} = $_[0]->i18n("no tab");
-        $output = helpIcon("data form fields add/edit",$_[0]->get("namespace"));
-        $output .= '<h1>'.WebGUI::International::get(20,$_[0]->get("namespace")).'</h1>';
         $f = WebGUI::HTMLForm->new;
         $f->hidden("wid",$_[0]->get("wobjectId"));
         $f->hidden("fid",$session{form}{fid});
@@ -731,8 +728,7 @@ sub www_editField {
 			);
 	}
         $f->submit;
-        $output .= $f->print;
-        return $output;
+        return $_[0]->adminConsole($f->print,'20',"data form fields add/edit");
 }
 
 #-------------------------------------------------------------------
@@ -769,16 +765,13 @@ sub www_editFieldSave {
 #-------------------------------------------------------------------
 sub www_editTab {
 	return WebGUI::Privilege::insufficient() unless ($_[0]->canEdit);
-        $session{page}{useAdminStyle} = 1;
-    	my ($output, %tab, $f);
+    	my (%tab, $f);
     	tie %tab, 'Tie::CPHash';
 
         $session{form}{tid} = "new" if ($session{form}{tid} eq "");
 	unless ($session{form}{tid} eq "new") {	
         	%tab = WebGUI::SQL->quickHash("select * from DataForm_tab where DataForm_tabId=".quote($session{form}{tid}));
 	}
-        $output = helpIcon("data form fields add/edit",$_[0]->get("namespace"));
-        $output .= '<h1>'.WebGUI::International::get(20,$_[0]->get("namespace")).'</h1>';
         $f = WebGUI::HTMLForm->new;
         $f->hidden("wid",$_[0]->get("wobjectId"));
         $f->hidden("tid",$session{form}{tid});
@@ -805,8 +798,7 @@ sub www_editTab {
 			);
 	}
         $f->submit;
-        $output .= $f->print;
-        return $output;
+        return $_[0]->adminConsole($f->print,'20',"data form fields add/edit");
 }
 
 #-------------------------------------------------------------------

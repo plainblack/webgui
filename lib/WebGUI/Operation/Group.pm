@@ -44,11 +44,10 @@ sub _submenu {
         my $title = shift;
         $title = WebGUI::International::get($title) if ($title);
         my $help = shift;
-        my $ac = WebGUI::AdminConsole->new;
+        my $ac = WebGUI::AdminConsole->new("groups");
         if ($help) {
                 $ac->setHelp($help);
         }
-        $ac->setAdminFunction("groups");
 	if (WebGUI::Grouping::isInGroup(3)) {
 	        $ac->addSubmenuItem(WebGUI::URL::page('op=editGroup&gid=new'), WebGUI::International::get(90));
         	unless ($session{form}{op} eq "listGroups" 

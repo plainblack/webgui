@@ -39,11 +39,10 @@ sub _submenu {
 	my $i18n = WebGUI::International->new("Navigation");
         $title = $i18n->get($title) if ($title);
         my $help = shift;
-        my $ac = WebGUI::AdminConsole->new;
+        my $ac = WebGUI::AdminConsole->new("navigation");
         if ($help) {
                 $ac->setHelp($help);
         }
-        $ac->setAdminFunction("navigation");
 	$ac->addSubmenuItem(WebGUI::URL::page('op=editNavigation'),$i18n->get("add new"));
 	if (($session{form}{op} eq "editNavigation" && $session{form}{navigationId} ne "new") || $session{form}{op} eq "deleteNavigationConfirm") {
                 $ac->addSubmenuItem(WebGUI::URL::page('op=editNavigation&identifier='.$session{form}{identifier}), $i18n->get("18"));

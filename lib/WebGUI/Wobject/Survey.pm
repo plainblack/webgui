@@ -590,10 +590,8 @@ sub www_editSave {
 #-------------------------------------------------------------------
 sub www_editAnswer {
         return WebGUI::Privilege::insufficient() unless ($_[0]->canEdit);
-        $session{page}{useAdminStyle} = 1;
-        my ($question, $output, $f, $answer);
+        my ($question, $f, $answer);
         $answer = $_[0]->getCollateral("Survey_answer","Survey_answerId",$session{form}{aid});
-        $output = '<h1>'.WebGUI::International::get(18,$_[0]->get("namespace")).'</h1>';
         $f = WebGUI::HTMLForm->new;
         $f->hidden("wid",$session{form}{wid});
         $f->hidden("func","editAnswerSave");
@@ -639,8 +637,7 @@ sub www_editAnswer {
                         );
         }
         $f->submit;
-        $output .= $f->print;
-        return $output;
+	return $_[0]->adminConsole($f->print,'18');
 }
 
 #-------------------------------------------------------------------
@@ -668,11 +665,9 @@ sub www_editAnswerSave {
 #-------------------------------------------------------------------
 sub www_editQuestion {
 	return WebGUI::Privilege::insufficient() unless ($_[0]->canEdit);
-        $session{page}{useAdminStyle} = 1;
-	my ($output, $f, $question, $answerFieldType, $sth, %data);
+	my ($f, $question, $answerFieldType, $sth, %data);
 	tie %data, 'Tie::CPHash';
 	$question = $_[0]->getCollateral("Survey_question","Survey_questionId",$session{form}{qid});
-	$output = '<h1>'.WebGUI::International::get(17,$_[0]->get("namespace")).'</h1>';
 	$answerFieldType = $question->{answerFieldType} || "radioList";
 	$f = WebGUI::HTMLForm->new;
 	$f->hidden("wid",$_[0]->get("wobjectId"));
@@ -723,7 +718,7 @@ sub www_editQuestion {
                 	);
 	}
 	$f->submit;
-	$output .= $f->print;
+	my $output = $f->print;
 	if ($question->{Survey_questionId} ne "new" && $question->{answerFieldType} ne "text") {
 		$output .= '<a href="'.WebGUI::URL::page('wid='.$_[0]->get("wobjectId").'&func=editAnswer&aid=new&qid='
 			.$question->{Survey_questionId}).'">'.WebGUI::International::get(23,$_[0]->get("namespace")).'</a><p>';
@@ -742,7 +737,7 @@ sub www_editQuestion {
 		}
 		$sth->finish;
 	}
-	return $output;
+	return $_[0]->adminConsole($output,'17');
 }
 
 #-------------------------------------------------------------------

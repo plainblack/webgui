@@ -51,11 +51,10 @@ sub _submenu {
         my $help = shift;
 	my $namespace = shift;
         $title = WebGUI::International::get($title,$namespace) if ($title);
-        my $ac = WebGUI::AdminConsole->new;
+        my $ac = WebGUI::AdminConsole->new("userProfiling");
         if ($help) {
                 $ac->setHelp($help);
         }
-        $ac->setAdminFunction("userProfiling");
 	$ac->addSubmenuItem(WebGUI::URL::page("op=editProfileCategory&cid=new"), WebGUI::International::get(490,"WebGUIProfile"));
 	$ac->addSubmenuItem(WebGUI::URL::page("op=editProfileField&fid=new"), WebGUI::International::get(491,"WebGUIProfile"));
         if ((($session{form}{op} eq "editProfileField" && $session{form}{fid} ne "new") || $session{form}{op} eq "deleteProfileField") && $session{form}{cid} eq "") {

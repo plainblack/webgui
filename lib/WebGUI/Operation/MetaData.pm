@@ -29,11 +29,10 @@ sub _submenu {
         my $title = shift;
         $title = WebGUI::International::get($title,"MetaData") if ($title);
         my $help = shift;
-        my $ac = WebGUI::AdminConsole->new;
+        my $ac = WebGUI::AdminConsole->new("contentProfiling");
         if ($help) {
                 $ac->setHelp($help,"MetaData");
         }
-        $ac->setAdminFunction("contentProfiling");
 	if($session{form}{op} ne "manageMetaData") {
 		$ac->addSubmenuItem(WebGUI::URL::page('op=manageMetaData'), WebGUI::International::get('content profiling','MetaData'));
 	}

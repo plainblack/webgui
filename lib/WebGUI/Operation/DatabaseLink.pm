@@ -30,11 +30,10 @@ sub _submenu {
         my $title = shift;
         $title = WebGUI::International::get($title) if ($title);
         my $help = shift;
-        my $ac = WebGUI::AdminConsole->new;
+        my $ac = WebGUI::AdminConsole->new("databases");
         if ($help) {
                 $ac->setHelp($help);
         }
-        $ac->setAdminFunction("databases");
 	$ac->addSubmenuItem(WebGUI::URL::page('op=editDatabaseLink&dlid=new'), WebGUI::International::get(982));
 	if (($session{form}{op} eq "editDatabaseLink" && $session{form}{dlid} ne "new") || $session{form}{op} eq "deleteDatabaseLink") {
                 $ac->addSubmenuItem(WebGUI::URL::page('op=editDatabaseLink&dlid='.$session{form}{dlid}), WebGUI::International::get(983));
