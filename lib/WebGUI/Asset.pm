@@ -1974,8 +1974,6 @@ Duplicates self, cuts (moves to clipboard) the duplicate newAsset, repeats for o
 sub www_copyList {
 	my $self = shift;
 	return $self->getAdminConsole->render(WebGUI::Privilege::insufficient()) unless $self->canEdit;
-	my $newAsset = $self->duplicate;
-	$newAsset->cut;
 	foreach my $assetId ($session{cgi}->param("assetId")) {
 		my $asset = WebGUI::Asset->newByDynamicClass($assetId);
 		if ($asset->canEdit) {
