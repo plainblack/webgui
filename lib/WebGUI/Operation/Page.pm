@@ -184,7 +184,8 @@ sub www_editPage {
         	$f->date("startDate",WebGUI::International::get(497),$page{startDate});
         	$f->date("endDate",WebGUI::International::get(498),$page{endDate});
 		%hash = WebGUI::SQL->buildHash("select users.userId,users.username from users,groupings 
-			where groupings.groupId=4 and groupings.userId=users.userId order by users.username");
+			where (groupings.groupId=4 or groupings.groupId=3) and groupings.userId=users.userId 
+			order by users.username");
 		$f->select("ownerId",\%hash,WebGUI::International::get(108),[$page{ownerId}],'','','',
 			' &nbsp; <a href="'.WebGUI::URL::page('op=listUsers').'">'.WebGUI::International::get(7).'</a>');
 		$f->yesNo("ownerView",WebGUI::International::get(109),$page{ownerView});
