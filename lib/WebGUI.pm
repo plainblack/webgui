@@ -258,7 +258,7 @@ sub page {
                 $httpHeader = WebGUI::Session::httpRedirect(WebGUI::Macro::process($session{page}{redirectURL}));
                 WebGUI::Session::close();
                 return $httpHeader;
-        } elsif ($session{header}{redirect} ne "") {
+        } elsif (exists $session{header}{redirect}) {
                 $httpHeader = $session{header}{redirect};
                 WebGUI::Session::close();
                 return $httpHeader;

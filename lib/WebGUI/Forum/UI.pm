@@ -2318,6 +2318,12 @@ sub www_viewThread {
 	my ($caller, $postId) = @_;
 	WebGUI::Session::setScratch("forumThreadLayout",$session{form}{layout});
 	$postId = $session{form}{forumPostId} unless ($postId);
+	 # If POST, cause redirect, so new post is displayed using GET instead of POST
+	if ($session{env}{REQUEST_METHOD} =~ /POST/i) { 
+		my $url= formatThreadURL($caller-> {callback}, $postId); 
+		$session{header}{redirect} = WebGUI::Session::httpRedirect($url);
+		return "";
+	}
         my $post = WebGUI::Forum::Post->new($postId);
 	my $var = getThreadTemplateVars($caller, $post);
 	if ($post->get("forumPostId") == $post->getThread->get("rootPostId") && !$post->canView) {

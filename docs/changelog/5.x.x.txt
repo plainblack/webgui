@@ -16,6 +16,8 @@
  - Bugfix [ 881586 ] Forum overview
  - bugfix [ 881599 ] edit Posts
  - Bugfix [ 883909 ] font family for contentType code in forum
+ - bugfix [ 884372 ] $session{header}{redirect} bug under mod_perl
+ - Bugfix [ 884375 ] Fix for multiple forum posts caused by browser Refresh
 
 
 5.5.4
