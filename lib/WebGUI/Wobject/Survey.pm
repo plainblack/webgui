@@ -331,6 +331,7 @@ sub www_editAnswer {
 	if ($_[0]->get("questionOrder") eq "response") {
 		$question = WebGUI::SQL->buildHashRef("select Survey_questionId,question 
 			from Survey_question where Survey_id=".$_[0]->get("Survey_id")." order by sequenceNumber");
+		$question = { ('-1' => WebGUI::International::get(82,$_[0]->get("namespace")),%$question) };
 		$f->select(
 			-name=>"gotoQuestion",
 			-options=>$question,
@@ -621,6 +622,7 @@ sub www_view {
 				} else {
 					$questionOrder = "sequential";
 				}
+				undef $question if ($responseDriver < 0);	# Terminate Survey
 			} 
 			if ($questionOrder eq "sequential" && $previousResponse->{Survey_questionId}) {
 				my $previousQuestion = $_[0]->getCollateral("Survey_question","Survey_questionId",
