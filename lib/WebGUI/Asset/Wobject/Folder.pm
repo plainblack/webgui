@@ -91,8 +91,8 @@ sub getEditForm {
 	if ($self->get("assetId") eq "new") {
                	$tabform->getTab("properties")->whatNext(
                        	-options=>{
-                               	view=>WebGUI::International::get(823),
-                      	 	""=>WebGUI::International::get(847)
+                               	view=>WebGUI::International::get(823, "Folder"),
+                      	 	""=>WebGUI::International::get(847, "Folder")
                               	},
 			-value=>"view"
 			);
@@ -163,7 +163,7 @@ sub view {
 				type=>$child->getName,
 				url=>$child->getUrl,
 				isImage=>$isImage,
-				isImage=>$isFile,
+				isFile=>$isFile,
 				"thumbnail.url"=>$thumbnail,
 				"file.url"=>$file
 				});
