@@ -576,9 +576,13 @@ sub get_self_and_children_flat{
 	my $id_SQL;
     if (defined $params{$id_name}) {
 	my ($left_value,$right_value,$depth_value)=$dbh->selectrow_array("select $left,$right,depth from $table where $id_name=?",undef,($params{$id_name}));
-	$id_SQL="where $left between " . $dbh->quote($left_value)." and ".$dbh->quote($right_value)." having level <=".($params{depth} + $depth_value+2);
+	$id_SQL="where $left between " . $dbh->quote($left_value)." and ".$dbh->quote($right_value);
+	if (defined $params{depth}) {
+		$id_SQL .= " having level <=".($params{depth} + $depth_value+2);
+	}
     }
-    my $tree_structure=$dbh->selectall_arrayref("select depth+2 as level,$table.* from $table $id_SQL order by $left",{Columns=>{}});
+    my $sql ="select depth+2 as level,$table.* from $table $id_SQL order by $left";
+    my $tree_structure=$dbh->selectall_arrayref($sql,{Columns=>{}});
 	return $tree_structure;
 }
 ########################################
