@@ -3838,8 +3838,8 @@ The primary URL of your company. This will appear on all automated emails sent f
 	},
 
 	'11' => {
-		message => q|Empy trash.|,
-		lastUpdated => 1031514049
+		message => q|Empty trash.|,
+		lastUpdated => 1051514049
 	},
 
 	'492' => {

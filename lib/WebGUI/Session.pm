@@ -128,7 +128,7 @@ sub _setupUserInfo {
 
 #-------------------------------------------------------------------
 sub _time {
-	return &UnixDate(&ParseDate("now")),"%s");
+	return &UnixDate(&ParseDate("now"),"%s");
 }
 
 

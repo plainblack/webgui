@@ -81,6 +81,9 @@
  - Replaced Date::Calc with Date::Manip to allow for dates before 1970 and
    after 2035. (Emiliano Bruni)
  - Added Date::Manip to the WebGUI distribution.
+ - bugfix [ 1013370 ] tag </body> appears twice (Vladimir Kondratiev).
+ - bugfix [ 1016258 ] Empty Trash Typo (Tavis Parker).
+ - bugfix [ 1017727 ] Redirect URL (on edit page) not redirecting
  - RFE [ 718739 ]. USS Submission Start/End Dates (Thanks to Roy Johnson).
 
 
