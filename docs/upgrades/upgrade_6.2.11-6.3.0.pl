@@ -3,6 +3,7 @@
 use lib "../../lib";
 use FileHandle;
 use File::Path;
+use File::Copy;
 use Getopt::Long;
 use strict;
 use WebGUI::Id;
@@ -52,7 +53,7 @@ WebGUI::SQL->write("delete from settings where name in ('siteicon','favicon')");
 
 print "\tMigrating wobject templates to asset templates.\n" unless ($quiet);
 my $sth = WebGUI::SQL->read("select templateId, template, namespace from template where namespace in ('Article', 
-		'USS', 'SyndicatedContent', 'MessageBoard', 'DataForm', 'EventsCalendar', 'HttpProxy', 'Poll', 'WobjectProxy',
+		'USS', 'SyndicatedContent', 'MessageBoard', 'DataForm', 'EventsCalendar', 'HttpProxy', 'Poll', 'Product', 'WobjectProxy',
 		'IndexedSearch', 'SQLReport', 'Survey', 'WSClient')");
 while (my $t = $sth->hashRef) {
 	$t->{template} = '<a name="<tmpl_var assetId>"></a>
@@ -84,6 +85,23 @@ WebGUI::SQL->write("alter table DataForm_entryData add column assetId varchar(22
 WebGUI::SQL->write("alter table DataForm_field add column assetId varchar(22)");
 WebGUI::SQL->write("alter table DataForm_tab add column assetId varchar(22)");
 WebGUI::SQL->write("alter table USS_submission add column assetId varchar(22) not null");
+
+# Frank Dillon 20050201 --
+# Converting Product Wobjects to Assets. --
+WebGUI::SQL->write("alter table Product_feature add assetId varchar(22)");
+WebGUI::SQL->write("alter table Product_benefit add assetId varchar(22)");
+WebGUI::SQL->write("alter table Product_specification add assetId varchar(22)");
+WebGUI::SQL->write("alter table Product_accessory drop primary key");
+WebGUI::SQL->write("alter table Product_accessory add assetId varchar(22)");
+WebGUI::SQL->write("alter table Product_accessory add accessoryAssetId varchar(22)");
+WebGUI::SQL->write("alter table Product_accessory add primary key (assetId,accessoryAssetId)");
+WebGUI::SQL->write("alter table Product_related drop primary key");
+WebGUI::SQL->write("alter table Product_related add assetId varchar(22)");
+WebGUI::SQL->write("alter table Product_related add relatedAssetId varchar(22)");
+WebGUI::SQL->write("alter table Product_related add primary key (assetId,relatedAssetId)");
+
+
+
 # next 2 lines are for sitemap to nav migration
 WebGUI::SQL->write("alter table Navigation rename tempoldnav");
 WebGUI::SQL->write("create table Navigation (assetId varchar(22) not null primary key, assetsToInclude text, startType varchar(35), startPoint varchar(255), endPoint varchar(35), showSystemPages int not null default 0, showHiddenPages int not null default 0, showUnprivilegedPages int not null default 0, templateId varchar(22) not null)");
@@ -99,7 +117,10 @@ foreach my $namespace (@allWobjects) {
 	}
 	$sth->finish;
 }
+
 walkTree('0','PBasset000000000000001','000001','2');
+mapProductCollateral();
+
 print "\t\tMaking second round of table structure changes\n" unless ($quiet);
 my $sth = WebGUI::SQL->read("select distinct(namespace) from wobject where namespace is not null");
 while (my ($namespace) = $sth->array) {
@@ -166,6 +187,16 @@ WebGUI::SQL->write("alter table USS_submission drop column pageId");
 WebGUI::SQL->write("alter table USS_submission drop column content");
 WebGUI::SQL->write("alter table USS_submission drop column image");
 WebGUI::SQL->write("alter table USS_submission drop column attachment");
+
+# Frank Dillon 20050201 --
+# Converting Product Wobjects to Assets. --
+WebGUI::SQL->write("alter table Product_accessory drop column wobjectId");
+WebGUI::SQL->write("alter table Product_benefit drop column wobjectId");
+WebGUI::SQL->write("alter table Product_feature drop column wobjectId");
+WebGUI::SQL->write("alter table Product_related drop column wobjectId");
+WebGUI::SQL->write("alter table Product_specification drop column wobjectId");
+WebGUI::SQL->write("alter table Product_related drop column RelatedWobjectId");
+WebGUI::SQL->write("alter table Product_accessory drop column AccessoryWobjectId");
 
 
 # start migrating non-wobject stuff into assets
@@ -921,8 +952,44 @@ sub walkTree {
 				$sth->finish;
 				rmtree($session{config}{uploadsPath}.'/'.$wobject->{wobjectId});
 			} elsif ($wobject->{namespace} eq "Product") {
-				# migrate attachments to file assets
-				# migrate images to image assets
+			    my ($newProductStoreId);
+				# do a check to see if they've installed Image::Magick
+                my  $hasImageMagick = 1;
+                eval " use Image::Magick; "; $hasImageMagick=0 if $@;
+			    # migrate attachments to file storage
+				if($namespace->{image1}){
+				   $newProductStoreId = copyFile($namespace->{image1},$wobject->{wobjectId});
+				   copyFile("thumb-$namespace->{image1}",$wobject->{wobjectId},$newProductStoreId);
+				   WebGUI::SQL->write("update Product set image1=".quote($newProductStoreId)." where wobjectId=".quote($wobject->{wobjectId}));
+				}
+				if($namespace->{image2}){
+				   $newProductStoreId = copyFile($namespace->{image2},$wobject->{wobjectId});
+				   copyFile("thumb-$namespace->{image2}",$wobject->{wobjectId},$newProductStoreId);
+				   WebGUI::SQL->write("update Product set image2=".quote($newProductStoreId)." where wobjectId=".quote($wobject->{wobjectId}));
+				}
+				if($namespace->{image3}){
+				   $newProductStoreId = copyFile($namespace->{image3},$wobject->{wobjectId});
+				   copyFile("thumb-$namespace->{image3}",$wobject->{wobjectId},$newProductStoreId);
+				   WebGUI::SQL->write("update Product set image3=".quote($newProductStoreId)." where wobjectId=".quote($wobject->{wobjectId}));
+				}
+				if($namespace->{manual}){
+				   $newProductStoreId = copyFile($namespace->{manual},$wobject->{wobjectId});
+				   WebGUI::SQL->write("update Product set manual=".quote($newProductStoreId)." where wobjectId=".quote($wobject->{wobjectId}));
+				}
+				if($namespace->{brochure}){
+				   $newProductStoreId = copyFile($namespace->{brochure},$wobject->{wobjectId});
+				   WebGUI::SQL->write("update Product set brochure=".quote($newProductStoreId)." where wobjectId=".quote($wobject->{wobjectId}));
+				}
+				if($namespace->{warranty}){
+				   $newProductStoreId = copyFile($namespace->{warranty},$wobject->{wobjectId});
+				   WebGUI::SQL->write("update Product set warranty=".quote($newProductStoreId)." where wobjectId=".quote($wobject->{wobjectId}));
+				}
+				
+				# migrate collateral
+				print "\t\t\tMigrating product collateral data\n" unless ($quiet);
+				foreach my $table (qw(Product_accessory Product_benefit Product_feature Product_related Product_specification)) {
+					WebGUI::SQL->write("update $table set assetId=".quote($wobjectId)." where wobjectId=".quote($wobject->{wobjectId}));
+				}
 			} elsif ($wobject->{namespace} eq "USS") {
 #| dateSubmitted    | int(11)      | YES  |     | NULL       |       |
 #| username         | varchar(30)  | YES  |     | NULL       |       |
@@ -1048,11 +1115,12 @@ sub copyFile {
 	mkdir($node);
 	$node .= $session{os}{slash}.$id;
 	mkdir($node);
-	my $a = FileHandle->new($session{config}{uploadPath}.$session{os}{slash}.$oldPath.$session{os}{slash}.$filename,"r");
-        binmode($a);
+	print "Moving File".$session{config}{uploadsPath}.$session{os}{slash}.$oldPath.$session{os}{slash}.$filename."\n";
+	my $a = FileHandle->new($session{config}{uploadsPath}.$session{os}{slash}.$oldPath.$session{os}{slash}.$filename,"r");
+   	    binmode($a);
         my $b = FileHandle->new(">".$node.$session{os}{slash}.$filename);
         binmode($b);
-        cp($a,$b);
+        copy($a,$b);
 	return $id;
 }
 
@@ -1395,4 +1463,22 @@ sub getNewId {
 	}
 	$newId = WebGUI::Id::generate() unless ($newId);
 	return $newId;
+}
+
+# Frank Dillon 20050201 --
+# Converting Product Wobjects to Assets. --
+sub mapProductCollateral {
+   my $sth = WebGUI::SQL->read("select * from Product_accessory");
+   while (my $hash = $sth->hashRef){
+      my ($newAssetId) = WebGUI::SQL->quickArray("select assetId from Product where wobjectId=".quote($hash->{AccessoryWobjectId}));
+      WebGUI::SQL->write("update Product_accessory set accessoryAssetId=".quote($newAssetId)." where wobjectId=".quote($hash->{wobjectId})." and AccessoryWobjectId=".quote($hash->{AccessoryWobjectId}));
+   }
+   $sth->finish;
+   
+   $sth = WebGUI::SQL->read("select * from Product_related");
+   while (my $hash = $sth->hashRef){
+      my ($newAssetId) = WebGUI::SQL->quickArray("select assetId from Product where wobjectId=".quote($hash->{RelatedWobjectId}));
+      WebGUI::SQL->write("update Product_related set relatedAssetId=".quote($newAssetId)." where wobjectId=".quote($hash->{wobjectId})." and RelatedWobjectId=".quote($hash->{RelatedWobjectId}));
+   }
+   $sth->finish;
 }
