@@ -124,4 +124,5 @@ print "\tRemoving unneeded files.\n" unless ($quiet);
 
 unlink("../../sbin/Hourly/SyndicatedContent.pm");
 unlink("../../sbin/imageCollateralImport.pl");
+unlink("../../lib/WebGUI/ProxyParse.pm");
 

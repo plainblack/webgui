@@ -22,7 +22,7 @@ use WebGUI::International;
 use WebGUI::Privilege;
 use WebGUI::Session;
 use WebGUI::Wobject;
-use WebGUI::ProxyParse;
+use WebGUI::Wobject::HttpProxy::Parse;
 
 our @ISA = qw(WebGUI::Wobject);
 
@@ -231,7 +231,7 @@ sub www_view {
       if($response->content_type eq "text/html" || 
         ($response->content_type eq "" && $content=~/<html/gis)) {
   
-         my $p = WebGUI::ProxyParse->new($proxiedUrl, $content, $_[0]->get("wobjectId"));
+         my $p = WebGUI::Wobject::HttpProxy::Parse->new($proxiedUrl, $content, $_[0]->get("wobjectId"));
          $content = $p->filter; # Rewrite content. (let forms/links return to us).
          $p->DESTROY; 
    
