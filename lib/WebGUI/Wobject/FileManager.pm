@@ -242,14 +242,20 @@ sub www_editDownloadSave {
 	$_[0]->reorderCollateral("FileManager_file","FileManager_fileId");
         $file = WebGUI::Attachment->new("",$_[0]->get("wobjectId"),$files{FileManager_fileId});
 	$file->save("downloadFile");
-	$files{downloadFile} = $file->getFilename;
-	$files{fileTitle} = $files{downloadFile} if ($session{form}{fileTitle} eq "");
+	if ($file->getFilename ne "") {
+		$files{downloadFile} = $file->getFilename;
+		$files{fileTitle} = $files{downloadFile} if ($session{form}{fileTitle} eq "");
+	}
         $file = WebGUI::Attachment->new("",$_[0]->get("wobjectId"),$files{FileManager_fileId});
 	$file->save("alternateVersion1");
+	if ($file->getFilename ne "") {
 		$files{alternateVersion1} = $file->getFilename;
-		$file = WebGUI::Attachment->new("",$_[0]->get("wobjectId"),$files{FileManager_fileId});
+	}
+	$file = WebGUI::Attachment->new("",$_[0]->get("wobjectId"),$files{FileManager_fileId});
 	$file->save("alternateVersion2");
-	$files{alternateVersion2} = $file->getFilename;
+	if ($file->getFilename ne "") {
+		$files{alternateVersion2} = $file->getFilename;
+	}
 	$_[0]->setCollateral("FileManager_file", "FileManager_fileId", \%files);
         if ($session{form}{proceed} eq "addFile") {
         	$session{form}{did} = "new";
