@@ -465,8 +465,7 @@ sub _instantiate_soap {
    # a wsdl file was specified
    # we don't use fault handling with wsdls becuase they seem to behave 
    # differently.  Not sure if that is by design.
-   if ($self->get("uri") =~ m/\.wsdl\s*$/i) {
-
+     if ( ($self->get("uri") =~ m/\.wsdl\s*$/i) || ($self->get("uri") =~ m/\.\w*\?wsdl\s*$/i) ) {
       WebGUI::ErrorHandler::warn('wsdl=' . $self->get('uri'))
          if $self->get('debugMode');
 

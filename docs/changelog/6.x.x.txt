@@ -25,6 +25,8 @@
    old procedural interface still works as well.
  - Added on the wire compression to HTTP transport for WSClient wobject.  This
    will have no effect on clients/servers that can't support compression.
+ - A small patch from Roy Johnson to deal with different types of WSDLs in th
+   WS Client.
 
 
 6.0.3
