@@ -228,6 +228,7 @@ sub lockThread {
 #-------------------------------------------------------------------
 sub post {
 	my ($html, $header, $footer, $f, %message);
+	my $signature = "\n\n\n".$session{user}{signature} if ($session{user}{signature} ne "");
 	tie %message, 'Tie::CPHash';
 	$f = WebGUI::HTMLForm->new;
 	if ($session{form}{replyTo} ne "") { 		# is a reply
@@ -236,7 +237,7 @@ sub post {
 		$footer = formatHeader($message{subject},$message{userId},$message{username},$message{dateOfPost},$message{views},
 			'',$message{status})
 			.'<p>'.formatMessage($message{message});
-		$message{message} = "";
+		$message{message} = $signature;
 		$message{subject} = "Re: ".$message{subject} unless ($message{subject} =~ /^Re:/);
 		$session{form}{mid} = "new";
 		$f->hidden("replyTo",$session{form}{replyTo});
@@ -248,6 +249,7 @@ sub post {
         	if ($session{user}{userId} == 1) {
        	        	$f->text("visitorName",WebGUI::International::get(438));
        		}
+		$message{message} = $signature;
 	} else {					# is editing an existing message
 		$header = WebGUI::International::get(228);
 		%message = getMessage($session{form}{mid});
@@ -287,7 +289,7 @@ sub postSave {
                 	        $username = $session{form}{visitorName};
                		}
 	       	} else {
-                	$username = $session{user}{username};
+                	$username = $session{user}{alias};
         	}
 		if ($session{form}{sid} eq "") {
 			$session{form}{sid} = 0;

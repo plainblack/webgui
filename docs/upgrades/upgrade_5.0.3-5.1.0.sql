@@ -17,5 +17,16 @@ delete from international where languageId=2 and namespace='WebGUI' and internat
 insert into international (internationalId,languageId,namespace,message,lastUpdated) values (836,2,'WebGUI','Schnipsel sind Text-Elemente, die mehrfach auf Ihrer Seite genutzt werden k?nnen. Dinge wie Java-Scripts, Style Sheets, Flash Animationen oder einfach nur Slogans sind Beispiele hierf?r. Das beste daran ist, dass Sie ?nderungen, die zum Beispiel in einem Slogan oder Werbespruch durchgef?hrt werden m?ssen, an zentraler Stelle ?ndern k?nnen.<br><br>\r\n<b>Name</b><br>Vergeben Sie einen eindeutigen Namen, damit Sie das Schnipsel sp?ter schnell wiederfinden k?nnen.<br><br>\r\n<b>In welches Verzeichnis</b><br>In welchen Ordner m?chten Sie das Schnipsel speichern<br><br>\r\n<b>Schnipsel</b><br>Geben Sie hier den Text ein oder noch einfacher: kopieren Sie den ben?tigten Text oder auch JavaScript-Code ?ber die Zwischenablage ein.', 1043421646);
 alter table groups add column ipFilter varchar(255);
 insert into international (internationalId,languageId,namespace,message,lastUpdated) values (857,1,'WebGUI','IP Address', 1043878310);
+insert into international (internationalId,languageId,namespace,message,lastUpdated) values (861,1,'WebGUI','Make profile public?', 1043879954);
+insert into international (internationalId,languageId,namespace,message,lastUpdated) values (860,1,'WebGUI','Make email address public?', 1043879942);
+insert into international (internationalId,languageId,namespace,message,lastUpdated) values (859,1,'WebGUI','Signature', 1043879866);
+insert into international (internationalId,languageId,namespace,message,lastUpdated) values (858,1,'WebGUI','Alias', 1043879848);
+INSERT INTO userProfileField VALUES ('alias','WebGUI::International::get(858)',1,0,'text','','',4,3,0);
+INSERT INTO userProfileField VALUES ('signature','WebGUI::International::get(859)',1,0,'HTMLArea','','',5,3,0);
+INSERT INTO userProfileField VALUES ('publicProfile','WebGUI::International::get(861)',1,0,'yesNo','','[1]',9,4,0);
+INSERT INTO userProfileField VALUES ('publicEmail','WebGUI::International::get(860)',1,0,'yesNo','','[1]',10,4,0);
+insert into international (internationalId,languageId,namespace,message,lastUpdated) values (862,1,'WebGUI','This user\'s profile is not public.', 1043881275);
+
+
 
 

@@ -552,10 +552,13 @@ sub www_viewProfile {
         my ($a, %data, $category, $label, $value, $previousCategory, $output, $u, %gender);
 	%gender = ('neuter'=>WebGUI::International::get(403),'male'=>WebGUI::International::get(339),'female'=>WebGUI::International::get(340));
 	$u = WebGUI::User->new($session{form}{uid});
+        my $header = '<h1>'.WebGUI::International::get(347).' '.$u->username.'</h1>';
 	if ($u->username eq "") {
-		WebGUI::Privilege::notMember();
+		return WebGUI::Privilege::notMember();
+	} elsif ($u->profileField("publicProfile") < 1) {
+		return $header.WebGUI::International::get(862);
         } elsif ($session{user}{userId} != 1) {
-                $output .= '<h1>'.WebGUI::International::get(347).' '.$u->username.'</h1>';
+                $output = $header;
                 $output .= '<table>';
                 $a = WebGUI::SQL->read("select * from userProfileField,userProfileCategory
                         where userProfileField.profileCategoryId=userProfileCategory.profileCategoryId
@@ -574,7 +577,9 @@ sub www_viewProfile {
 			} else {
 				$value = $u->profileField($data{fieldName});
 			}
-			$output .= '<tr><td class="tableHeader">'.$label.'</td><td class="tableData">'.$value.'</td></tr>';
+			unless ($data{fieldName} eq "email" and $u->profileField("publicEmail") < 1) {
+				$output .= '<tr><td class="tableHeader">'.$label.'</td><td class="tableData">'.$value.'</td></tr>';
+			}
                         $previousCategory = $category;
                 }
                 $a->finish;
@@ -582,10 +587,10 @@ sub www_viewProfile {
 		if ($session{user}{userId} == $session{form}{uid}) {
                 	$output .= _accountOptions();
 		}
+		return $output;
         } else {
-                	$output .= WebGUI::Privilege::insufficient();
+               return WebGUI::Privilege::insufficient();
         }
-        return $output;
 }
 
 1;
