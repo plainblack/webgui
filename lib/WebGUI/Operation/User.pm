@@ -42,7 +42,7 @@ sub _submenu {
         if ($help) {
                 $ac->setHelp($help);
         }
-        $ac->setAdminFunction("trash");
+        $ac->setAdminFunction("users");
 	if (WebGUI::Grouping::isInGroup(3)) {
 		$ac->addSubmenuItem(WebGUI::URL::page("op=addUser"), WebGUI::International::get(169));
 		unless ($session{form}{op} eq "listUsers" 

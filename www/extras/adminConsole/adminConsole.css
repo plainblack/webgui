@@ -18,15 +18,22 @@
 
 .adminConsoleWorkArea {
  	border: 1px solid #ddd;
-	margin: 90px 220px 50px 10px;
+	margin: 65px 200px 50px 10px;
 	padding: 5px;
 	-moz-border-radius: 10px;
 }
+/* Hides from non-ie: the holly hack \*/
+* html .adminConsoleWorkArea {
+	zoom: 1.00;
+	display: inline;
+	}
+/* End hide from non-ie */
+
 
 .adminConsoleMenu {
 	position: absolute;
-	top: 85px;
-	right: 20px;
+	top: 65px;
+	right: 10px;
 	width: 180px;
 /* 	border: 1px solid #ddd; 
 	padding: 5px; */
@@ -62,7 +69,6 @@
 
 .adminConsoleApplication {
 	float: left;
-	padding: 10px;
 	text-align: center;
 	width: 100px;
 	font-size: 14px;
@@ -85,6 +91,7 @@
 
 .adminConsoleHelpIcon {
 	position: absolute;
-	top: 85px;
-	right: 220px;
+	top: 60px;
+	right: 200px;
+	z-index: 100;
 }
