@@ -967,7 +967,7 @@ sub walkTree {
 						menuTitle => $submission->{title},
 						startDate => $submission->{startDate},
 						endDate => $submission->{endDate},
-						url = fixUrl($wobjectId,$submission->{title}),
+						url => fixUrl($wobjectId,$submission->{title}),
 						className=>'WebGUI::Asset::Wobject::USS_submission',
 						state=>'published',
 						ownerUserId=>$submission->{userId},
