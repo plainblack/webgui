@@ -26,7 +26,7 @@ use WebGUI::MetaData;
 
 our @ISA = qw(Exporter);
 our @EXPORT = qw(&www_editMetaDataField &www_manageMetaData &www_editMetaDataFieldSave &www_deleteMetaDataField
-		 &www_deleteMetaDataFieldConfirm &www_saveSettings);
+		 &www_deleteMetaDataFieldConfirm &www_saveMetaDataSettings);
 
 #-------------------------------------------------------------------
 sub _submenu {
@@ -41,7 +41,7 @@ sub _submenu {
 }
 
 #-------------------------------------------------------------------
-sub www_saveSettings {
+sub www_saveMetaDataSettings {
 	return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
 	WebGUI::SQL->write("update settings set value=".quote($session{form}{metaDataEnabled})." where name='metaDataEnabled'");
 	WebGUI::SQL->write("update settings set value=".quote($session{form}{passiveProfilingEnabled})." where name='passiveProfilingEnabled'");
@@ -161,11 +161,10 @@ sub www_deleteMetaDataFieldConfirm {
 sub www_manageMetaData {
         return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
 	my $output;
-        # TODO: add help
         $output = helpIcon('metadata manage');
         $output .= '<h1>'.WebGUI::International::get('Manage Metadata','MetaData').'</h1>';
 	my $f = new WebGUI::HTMLForm;
-	$f->hidden("op","saveSettings");
+	$f->hidden("op","saveMetaDataSettings");
 	$f->yesNo(
         	-name=>"metaDataEnabled",
 	        -label=>WebGUI::International::get("Enable Metadata ?", 'MetaData'),
