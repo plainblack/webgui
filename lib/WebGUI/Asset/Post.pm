@@ -14,6 +14,7 @@ use strict;
 use Tie::CPHash;
 use WebGUI::Asset;
 use WebGUI::Asset::Template;
+use WebGUI::Asset::Post::Thread;
 use WebGUI::DateTime;
 use WebGUI::Grouping;
 use WebGUI::HTML;
@@ -333,9 +334,9 @@ sub getTemplateVars {
 	$var{"dateSubmitted.human"} = epochToHuman($self->get("dateSubmitted"));
 	$var{"dateUpdated.human"} = epochToHuman($self->get("dateUpdated"));
 
-	$var{content} = $self->formatContent;
+	$var{content} = $self->formatContent if ($self->getThread);
 
-        $var{canEdit} = $self->canEdit;
+        $var{canEdit} = $self->canEdit if ($self->getThread);
         $var{"delete.url"} = $self->getDeleteUrl;
         $var{"edit.url"} = $self->getEditUrl;
 
@@ -374,7 +375,7 @@ sub getTemplateVars {
 sub getThread {
 	my $self = shift;
 	unless (exists $self->{_thread}) {
-		$self->{_thread} = WebGUI::Asset::Thread->new($self->get("threadId"));
+		$self->{_thread} = WebGUI::Asset::Post::Thread->new($self->get("threadId"));
 	}
 	return $self->{_thread};	
 }
@@ -505,27 +506,37 @@ sub notifySubscribers {
 #-------------------------------------------------------------------
 sub processPropertiesFromFormPost {
 	my $self = shift;
-	$self->SUPER::processPropertiesFromFormPost;
-	if ($session{form}{assetId} eq "new" && $session{setting}{enableKarma} && $self->getThread->getParent->get("karmaPerPost")) {
-		my $u = WebGUI::User->new($session{user}{userId});
-		$u->addKarma($self->getThread->getParent->get("karmaPerPost"), $self->getId, "Collaboration post");
+	$self->SUPER::processPropertiesFromFormPost;	
+	my %data;
+	if ($session{form}{assetId} eq "new") {
+		if ($self->getParent->get("className") eq "WebGUI::Asset::Wobject::Collaboration") {
+			$self->update({threadId=>$self->getId});
+		} else {
+			$self->update({threadId=>$self->getParent->get("threadId")});
+		}
+		if ($session{setting}{enableKarma} && $self->getThread->getParent->get("karmaPerPost")) {
+			my $u = WebGUI::User->new($session{user}{userId});
+			$u->addKarma($self->getThread->getParent->get("karmaPerPost"), $self->getId, "Collaboration post");
+		}
+		%data = (
+			ownerUserId => $session{user}{userId},
+			groupIdView => $self->getThread->getParent->get("groupIdView"),
+			groupIdEdit => $self->getThread->getParent->get("groupIdEdit"),
+			isHidden => 1
+			);
+		if ($self->getThread->getParent->canModerate) {
+        		$self->getThread->lock if ($session{form}{'lock'});
+        		$self->getThread->stick if ($session{form}{stick});
+		}
 	}
-	my %data = (
-		ownerUserId => $session{user}{userId},
-		groupIdView => $self->getThread->get("groupIdView"),
-		groupIdEdit => $self->getThread->get("groupIdEdit")
-		);
 	$data{startDate} = $self->getThread->getParent->get("startDate") unless ($session{form}{startDate});
 	$data{endDate} = $self->getThread->getParent->get("endDate") unless ($session{form}{endDate});
 	($data{synopsis}, $data{content}) = $self->getSynopsisAndContentFromFormPost;
         if ($self->getThread->getParent->get("addEditStampToPosts")) {
         	$data{content} .= "<p>\n\n --- (Edited on ".WebGUI::DateTime::epochToHuman()." by ".$session{user}{alias}.") --- \n</p>";
         }
-	$data{isHidden} = 1;
 	$self->update(\%data);
         $self->getThread->subscribe if ($session{form}{subscribe});
-        $self->getThread->lock if ($session{form}{'lock'});
-        $self->getThread->stick if ($session{form}{stick});
         if ($self->getThread->getParent->get("moderatePosts")) {
                 $self->setStatusPending;
         } else {
@@ -700,21 +711,16 @@ sub www_edit {
 			name=>"class",
 			value=>$session{form}{class}
 			});
-                if ($self->getThread->getParent->canModerate) {
-                        $var{'lock.form'} = WebGUI::Form::yesNo({
-                                name=>'lock',
-                                value=>$session{form}{'lock'}
-                                });
-                }
 		if ($session{form}{class} eq "WebGUI::Asset::Post") { # new reply
-			return $self->getThread->getParent->processStyle(WebGUI::Privilege::insufficient()) unless ($self->canReply);
+			$self->{_thread} = $self->getParent->getThread;
+			return $self->getThread->getParent->processStyle(WebGUI::Privilege::insufficient()) unless ($self->getThread->canReply);
 			$var{isReply} = 1;
 			if ($session{form}{content} || $session{form}{title}) {
 				$content = $session{form}{content};
 				$title = $session{form}{title};
 			} else {
                 		$content = "[quote]".$self->getParent->get("content")."[/quote]" if ($session{form}{withQuote});
-                		$title = $self->getParent->get("subject");
+                		$title = $self->getParent->get("title");
                 		$title = "Re: ".$title unless ($title =~ /^Re:/);
 			}
 			$var{'subscribe.form'} = WebGUI::Form::yesNo({
@@ -728,6 +734,10 @@ sub www_edit {
                         	$var{'sticky.form'} = WebGUI::Form::yesNo({
                                 	name=>'stick',
                                 	value=>$session{form}{stick}
+                                	});
+                        	$var{'lock.form'} = WebGUI::Form::yesNo({
+                       	         	name=>'lock',
+                                	value=>$session{form}{'lock'}
                                 	});
 			}
 			$var{'subscribe.form'} = WebGUI::Form::yesNo({
@@ -825,7 +835,7 @@ sub www_edit {
 		value => $self->getValue("startDate")
 		});
 	$self->getThread->getParent->appendTemplateLabels(\%var);
-	return $self->getParent->processStyle($self->processTemplate(\%var,$self->getThread->getParent->get("postFormTemplateId")));
+	return $self->getThread->getParent->processStyle($self->processTemplate(\%var,$self->getThread->getParent->get("postFormTemplateId")));
 }
 
 

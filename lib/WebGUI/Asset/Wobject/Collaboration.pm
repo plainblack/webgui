@@ -117,6 +117,7 @@ sub appendTemplateLabels {
 	$var->{"layout.flat.label"} = "Flat";
 	$var->{'image.label'} = "Image";
 	$var->{'link.header.label'} = "Edit Link";
+	$var->{"lastReply.label"} = "Last Reply";
 	$var->{"lock.label"} = "Lock";
 	$var->{"layout.label"} = "Layout";
         $var->{'message.header.label'} = "Edit Message";
@@ -131,6 +132,7 @@ sub appendTemplateLabels {
 	$var->{"rating.label"} = "Rating";
 	$var->{"rate.label"} = "Rate";
 	$var->{"reply.label"} = "Reply";
+	$var->{"replies.label"} = "Replies";
 	$var->{"readmore.label"} = "Read More";
 	$var->{"responses.label"} = "Responses";
         $var->{'results.label'} = "Results";
@@ -230,6 +232,10 @@ sub definition {
                 tableName=>'Collaboration',
                 className=>'WebGUI::Asset::Wobject::Collaboration',
                 properties=>{
+			allowReplies =>{
+				fieldType=>"yesNo",
+				defaultValue=>1
+				},
 			threadsPerPage =>{
 				fieldType=>"integer",
 				defaultValue=>30
@@ -461,6 +467,11 @@ sub getEditForm {
 		-value=>$self->getValue("editTimeout")
 		);
         $tabform->getTab("security")->yesNo(
+		-name=>"allowReplies",
+		-label=>"Allow replies?",
+		-value=>$self->getValue("allowReplies")
+		);
+        $tabform->getTab("security")->yesNo(
 		-name=>"addEditStampToPosts",
 		-label=>"Add edit stamp to posts?",
 		-value=>$self->getValue("addEditStampToPosts")
@@ -475,7 +486,7 @@ sub getEditForm {
 		-label=>"Use content filter?",
 		-value=>$self->getValue("useContentFilter")
 		);
-        $tabform->getTab("display")->yesNo(
+        $tabform->getTab("properties")->yesNo(
 		-name=>"usePreview",
 		-label=>"Use preview?",
 		-value=>$self->getValue("usePreview")

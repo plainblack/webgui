@@ -610,7 +610,7 @@ sub view {
 				)
 		order by ";
 	if ($layout eq "flat") {
-		$sql .= "post.dateSubmitted";
+		$sql .= "Post.dateSubmitted";
 	} else {
 		$sql .= "asset.lineage";
 	}
@@ -625,7 +625,7 @@ sub view {
         	for (my $i=0; $i<$replyVars->{depth}; $i++) {
                 	push(@{$replyVars->{indent_loop}},{depth=>$i});
         	}
-		push (@{$var->{reply_loop}}, $replyVars);
+		push (@{$var->{post_loop}}, $replyVars);
 	}		
 	$p->appendTemplateVars($var);
         $var->{'add.url'} = $self->getParent->getNewThreadUrl;
@@ -636,7 +636,7 @@ sub view {
 	$var->{"next.url"} = $next->getUrl if (defined $next);
 
 	$var->{"search.url"} = $self->getParent->getSearchUrl;
-        $var->{"back.url"} = $self->getThread->getParent->getUrl;
+        $var->{"collaboration.url"} = $self->getThread->getParent->getUrl;
 	return $self->processTemplate($var,$self->getParent->get("threadTemplateId"));
 }
 

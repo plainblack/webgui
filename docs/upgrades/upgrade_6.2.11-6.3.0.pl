@@ -748,7 +748,9 @@ while (my ($id, $template, $namespace) = $sth->array) {
 	$template =~ s/numberOfPages/pagination.pageCount/ixsg;
 	$template =~ s/pageNumber/pagination.pageNumber/ixsg;
 	$template =~ s/thread_loop/post_loop/ixsg;
+	$template =~ s/depth_loop/indent_loop/ixsg;
 	$template =~ s/back\.url/collaboration.url/ixsg;
+	$template =~ s/list\.label/back.label/ixsg;
 	$template =~ s/-=:\s+:=-//ixsg;
 	WebGUI::SQL->write("update template set template=".quote($template).", namespace=".quote($namespace)." where assetId=".quote($id)); 
 }
