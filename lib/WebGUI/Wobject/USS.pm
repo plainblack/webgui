@@ -545,7 +545,7 @@ sub www_viewSubmission {
 	return $_[0]->www_view unless ($submission->{USS_submissionId});
 	my $callback = WebGUI::URL::page("func=viewSubmission&amp;wid=".$_[0]->get("wobjectId")."&amp;sid=".$submission->{USS_submissionId});
 	if ($session{form}{forumOp}) {	
-		return WebGUI::Forum::UI::forumOp($callback);
+		return WebGUI::Forum::UI::forumOp($callback,$submission->{title});
 	}
 	WebGUI::SQL->write("update USS_submission set views=views+1 where USS_submissionId=$session{form}{sid}");
 	$var{title} = $submission->{title};

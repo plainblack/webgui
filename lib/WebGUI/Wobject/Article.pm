@@ -193,7 +193,7 @@ sub www_view {
                 $templateId = $_[0]->get("templateId");
         }
 	if ($session{form}{forumOp}) {
-		return WebGUI::Forum::UI::forumOp($callback);
+		return WebGUI::Forum::UI::forumOp($callback,$_[0]->get("title"),$_[0]->get("description"));
 	} else {
 		return $_[0]->processTemplate($templateId,\%var);
 	}
