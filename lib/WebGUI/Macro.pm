@@ -33,7 +33,8 @@ sub process {
 	$output = $_[0];
         foreach $macro (keys %{$session{macro}}) {
 		$cmd = "WebGUI::Macro::".$macro."::process";
-		$output = &$cmd($output);
+		$output = eval{&$cmd($output)};
+		WebGUI::ErrorHandler::fatalError("Processing failed on macro: $macro.") if($@);
         }
 	return $output;
 }

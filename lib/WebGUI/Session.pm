@@ -16,6 +16,7 @@ use DBI;
 use Exporter;
 use strict;
 use Tie::CPHash;
+use WebGUI::ErrorHandler;
 use WebGUI::SQL;
 
 our @ISA = qw(Exporter);
@@ -118,6 +119,7 @@ sub _loadMacros {
 			$namespace = $1;
                         $cmd = "use WebGUI::Macro::".$1;
                         eval($cmd);
+                	WebGUI::ErrorHandler::fatalError("Macro failed to compile: $namespace.") if($@);
 			$session{macro}{$namespace} = $namespace;
                 }
         }
@@ -139,8 +141,10 @@ sub _loadWobjects {
                         $namespace = $1;
                         $cmd = "use WebGUI::Wobject::".$namespace;
                         eval($cmd);
+                	WebGUI::ErrorHandler::fatalError("Wobject failed to compile: $namespace.") if($@);
 			$cmd = "\$WebGUI::Wobject::".$namespace."::name";
 			$session{wobject}{$namespace} = eval($cmd);
+                	WebGUI::ErrorHandler::fatalError("No name method in wobject: $namespace.") if($@);
                 }
         }
         closedir(DIR);

@@ -45,7 +45,8 @@ sub page {
 	}
 	if (exists $session{form}{op}) {
 		$cmd = "WebGUI::Operation::www_".$session{form}{op};
-		$operationOutput = &$cmd();
+		$operationOutput = eval($cmd);
+               	WebGUI::ErrorHandler::warn("Non-existent operation called: $session{form}{op}.") if($@);
 	}
 	if (exists $session{form}{func} && exists $session{form}{wid}) {
 		if ($session{form}{wid} eq "new") {
@@ -70,9 +71,11 @@ sub page {
                         		.$session{form}{wid}."] on page '".$session{page}{title}."' [".$session{page}{pageId}."].");
                 	} else {
                         	$cmd = "WebGUI::Wobject::".${$wobject}{namespace};
-                        	$w = $cmd->new($wobject);
+                        	$w = eval{$cmd->new($wobject)};
+                		WebGUI::ErrorHandler::fatalError("Couldn't instanciate wojbect: ${$wobject}{namespace}.") if($@);
                         	$cmd = "www_".$session{form}{func};
-                        	$wobjectOutput = $w->$cmd;
+                        	$wobjectOutput = eval{$w->$cmd};
+                		WebGUI::ErrorHandler::fatalError("Web method doesn't exist in wojbect: ${$wobject}{namespace} / $session{form}{func}.") if($@);
                 	}
                 	# $wobjectOutput = WebGUI::International::get(381); # bad error
 		}
@@ -114,10 +117,13 @@ sub page {
 				%hash = (%{$wobject},%{$extra});
 				$wobject = \%hash;
 				$cmd = "WebGUI::Wobject::".${$wobject}{namespace};
-				$w = $cmd->new($wobject);
+				$w = eval{$cmd->new($wobject)};
+				WebGUI::ErrorHandler::fatalError("Couldn't instanciate wojbect: ${$wobject}{namespace}.") if($@);
 				if ($w->inDateRange) {
-					$contentHash{${$wobject}{templatePosition}} .= '<a name="'.${$wobject}{wobjectId}.'"></a>'
-						.$w->www_view."<p>\n\n";
+					$contentHash{${$wobject}{templatePosition}} .= '<a name="'.${$wobject}{wobjectId}.'"></a>';
+					$contentHash{${$wobject}{templatePosition}} .= eval{$w->www_view};
+					WebGUI::ErrorHandler::fatalError("No view method in wojbect: ${$wobject}{namespace}.") if($@);
+					$contentHash{${$wobject}{templatePosition}} .= "<p>\n\n";
 				}
 			}
 			$sth->finish;
