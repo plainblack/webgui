@@ -308,7 +308,7 @@ sub profileField {
 
 =head2 referringAffiliate ( [ value ] )
 
-Returns the unique identifier of the affiliate the referred this user to the site. 
+Returns the unique identifier of the affiliate that referred this user to the site. 
 
 =over
 
