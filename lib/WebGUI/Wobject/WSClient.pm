@@ -265,6 +265,17 @@ sub www_view {
       WebGUI::Macro::process($param_str);
    }
 
+   # see if we can shortcircuit this whole process
+   if ((ref $session{'form'}{'disableWobjects'} && grep /^$call$/,
+         @{$session{'form'}{'disableWobjects'}}) ||
+        ($session{'form'}{'disableWobjects'} && grep /^$call$/,
+         $session{'form'}{'disableWobjects'})) {
+                                                                                
+      WebGUI::ErrorHandler::warn("disabling soap call $call");
+      $var{'disableWobject'} = 1;
+      return $self[0]->processTemplate($self[0]->get("templateId"),\%var);
+   }
+
    # advanced use, if you want to pass SOAP results to a single, particular
    # wobject on a page
    if (ref $session{'form'}{'targetWobjects'}) {
