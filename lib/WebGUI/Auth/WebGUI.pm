@@ -220,7 +220,7 @@ sub createAccountSave {
    $properties->{identifier} = Digest::MD5::md5_base64($password);
    $properties->{passwordLastUpdated} = time();
    $properties->{passwordTimeout} = $session{setting}{webguiPasswordTimeout};
-   $properties->{status} = 'Deactiviated' if ($session{setting}{webguiValidateEmail});
+   $properties->{status} = 'Deactivated' if ($session{setting}{webguiValidateEmail});
    $self->SUPER::createAccountSave($username,$properties,$password,$profile);
    	if ($session{setting}{webguiValidateEmail}) {
 		my $key = WebGUI::Id::generate();
@@ -230,7 +230,11 @@ sub createAccountSave {
 			WebGUI::International::get('email address validation email subject','AuthWebGUI'),
 			WebGUI::International::get('email address validation email body','AuthWebGUI')."\n\n".WebGUI::URL::getSiteURL().WebGUI::URL::page("op=auth&method=validateEmail&key=".$key),
 			);
-		$self->SUPER::deactivateAccount("deactivateAccountConfirm");
+		$self->user->status("Deactivated");
+		WebGUI::Session::end($session{var}{sessionId});
+		WebGUI::Session::start(1);
+		my $u = WebGUI::User->new(1);
+		$self->{user} = $u;
 		$self->logout;
 		return $self->displayLogin(WebGUI::International::get('check email for validation','AuthWebGUI'));
 	}
