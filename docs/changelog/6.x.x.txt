@@ -1,4 +1,6 @@
 6.3.0
+ - Converted all confirmation pages to client-side confirmation dialogs. Saves
+   a pageload. (Len Kranendonk).
  - Added a new, more user-friendly administrative console.
  - SQL Report now supports multiple queries. (Thanks to Brunswick New
    Technologies for funding this development.)
