@@ -111,6 +111,10 @@ sub new {
             fieldType     => 'integer',
             defaultValue  => 60,
          },
+         sharedCache      => {
+            fieldType     => 'integer',
+            defaultValue  => '0',
+         },
       },
    );
    bless $self, $class;
@@ -206,6 +210,17 @@ sub www_edit {
       );
    }
 
+   my $cacheopts = {
+	0 => WebGUI::International::get(29, $_[0]->get('namespace')),
+	1 => WebGUI::International::get(19, $_[0]->get('namespace')),
+   };
+   $properties->radioList (
+      -name    => 'sharedCache',
+      -options => $cacheopts,
+      -label   => WebGUI::International::get(28, $_[0]->get('namespace')),
+      -value   => $_[0]->get('sharedCache'),
+   );
+
    $properties->text (
       -name     => 'cacheTTL',
       -label    => WebGUI::International::get(27, $_[0]->get('namespace')),
@@ -257,9 +272,13 @@ sub www_view {
       push @targetWobjects, $session{'form'}{'targetWobjects'};
    }
 
-   # check to see if this exact query has already been cached
-   $cache_key = $session{'form'}{'cache'} ||
-      Digest::MD5::md5_hex($call, $param_str);
+   # check to see if this exact query has already been cached, using either
+   # a cache specific to this session, or a shared global cache
+   $cache_key = $_[0]->get('sharedCache')
+      ? Digest::MD5::md5_hex($call, $param_str)
+      : Digest::MD5::md5_hex($call, $param_str, $session{'var'}{'sessionId'});
+   WebGUI::ErrorHandler::warn(($_[0]->get('sharedCache')?'shared':'session')
+      . " cache_key=$cache_key md5_hex($call, $param_str)");
    $cache = WebGUI::Cache->new($cache_key,
       WebGUI::International::get(4, $self->get('namespace')));
    @result = Storable::thaw($cache->get);
