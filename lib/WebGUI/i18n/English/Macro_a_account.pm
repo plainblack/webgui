@@ -34,6 +34,11 @@ The translated label for the account link, or the text that you supply to the ma
 |,
 		lastUpdated => 1112560585,
 	},
+
+	'46' => {
+		message => q|My Account|,
+		lastUpdated => 1031514049
+	},
 };
 
 1;

@@ -22,6 +22,17 @@ The Internationalized label for logging in or logging out (depending on the stat
 |,
 		lastUpdated => 1112466919,
 	},
+
+	'716' => {
+		message => q|Login|,
+		lastUpdated => 1031514049
+	},
+
+	'717' => {
+		message => q|Logout|,
+		lastUpdated => 1031514049
+	},
+
 };
 
 1;

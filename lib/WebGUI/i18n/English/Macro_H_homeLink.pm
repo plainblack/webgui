@@ -22,6 +22,11 @@ The translated label for the link to the home page or the text that you supply t
 |,
 		lastUpdated => 1112466919,
 	},
+
+	'47' => {
+		message => q|Home|,
+		lastUpdated => 1031514049
+	},
 };
 
 1;

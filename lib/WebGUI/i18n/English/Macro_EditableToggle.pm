@@ -25,6 +25,16 @@ The Internationalized label for turning on or off Admin (depending on the state 
 |,
 		lastUpdated => 1112466919,
 	},
+
+	'516' => {
+		message => q|Turn Admin On!|,
+		lastUpdated => 1031514049
+	},
+
+	'517' => {
+		message => q|Turn Admin Off!|,
+		lastUpdated => 1031514049
+	},
 };
 
 1;

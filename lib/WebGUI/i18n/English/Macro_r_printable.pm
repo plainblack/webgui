@@ -43,6 +43,11 @@ The translated label for the printable link, or the text that you supply to the 
 |,
 		lastUpdated => 1112504006,
 	},
+
+	'53' => {
+		message => q|Make Page Printable|,
+		lastUpdated => 1031514049
+	},
 };
 
 1;

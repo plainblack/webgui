@@ -92,11 +92,6 @@ our $I18N = {
 		lastUpdated => 1031514049
 	},
 
-	'517' => {
-		message => q|Turn Admin Off!|,
-		lastUpdated => 1031514049
-	},
-
 	'451' => {
 		message => q|is required.|,
 		lastUpdated => 1031514049
@@ -282,11 +277,6 @@ The URL of the web site for this theme's designer. If you are in the business of
 		lastUpdated => 1043879866
 	},
 
-	'1083' => {
-		message => q|New Content|,
-		lastUpdated => 1076866510
-	},
-
 	'739' => {
 		message => q|UI Level|,
 		lastUpdated => 1033832377
@@ -334,11 +324,6 @@ The URL of the web site for this theme's designer. If you are in the business of
 
 	'145' => {
 		message => q|WebGUI Build Version|,
-		lastUpdated => 1031514049
-	},
-
-	'49' => {
-		message => q|Click here to log out.|,
 		lastUpdated => 1031514049
 	},
 
@@ -403,11 +388,6 @@ The URL of the web site for this theme's designer. If you are in the business of
 	'367' => {
 		message => q|Expire Offset|,
 		lastUpdated => 1044126611
-	},
-
-	'716' => {
-		message => q|Login|,
-		lastUpdated => 1031514049
 	},
 
 	'1000' => {
@@ -839,11 +819,6 @@ As with any delete operation, you are prompted to be sure you wish to proceed wi
 		lastUpdated => 1050265139
 	},
 
-	'399' => {
-		message => q|Validate this page.|,
-		lastUpdated => 1031514049
-	},
-
 	'1073' => {
 		message => q|Style Template|,
 		lastUpdated => 1070027660
@@ -1193,11 +1168,6 @@ That particular example will help you get good ranking on search engines.
 		lastUpdated => 1050230443
 	},
 
-	'82' => {
-		message => q|Administrative functions...|,
-		lastUpdated => 1031514049
-	},
-
 	'333' => {
 		message => q|Work Country|,
 		lastUpdated => 1031514049
@@ -1448,11 +1418,6 @@ The password you use to connect to the DSN.
 		lastUpdated => 1031514049
 	},
 
-	'717' => {
-		message => q|Logout|,
-		lastUpdated => 1031514049
-	},
-
 	'462' => {
 		message => q|Time Format|,
 		lastUpdated => 1031514049
@@ -1490,11 +1455,6 @@ The password you use to connect to the DSN.
 
 	'167' => {
 		message => q|Are you certain you want to delete this user? Be warned that all this user's information will be lost permanently if you choose to proceed.|,
-		lastUpdated => 1031514049
-	},
-
-	'48' => {
-		message => q|Hello|,
 		lastUpdated => 1031514049
 	},
 
@@ -1757,11 +1717,6 @@ One package that many people create is a Page/Article package. It is often the c
 
 	'130' => {
 		message => q|Maximum Attachment Size|,
-		lastUpdated => 1031514049
-	},
-
-	'53' => {
-		message => q|Make Page Printable|,
 		lastUpdated => 1031514049
 	},
 
@@ -2331,11 +2286,6 @@ Large sites using external group data will be making many calls to the external 
 
 	'555' => {
 		message => q|Edit this user's karma.|,
-		lastUpdated => 1031514049
-	},
-
-	'47' => {
-		message => q|Home|,
 		lastUpdated => 1031514049
 	},
 
@@ -2928,11 +2878,6 @@ The headings of columns on things like message boards and user contributions.
 		lastUpdated => 1034736999
 	},
 
-	'46' => {
-		message => q|My Account|,
-		lastUpdated => 1031514049
-	},
-
 	'1051' => {
 		message => q|Replace With|,
 		lastUpdated => 1066418940
@@ -3045,11 +2990,6 @@ As with any delete operation, you are prompted to be sure you wish to proceed wi
 
 	'18' => {
 		message => q|April|,
-		lastUpdated => 1031514049
-	},
-
-	'376' => {
-		message => q|Package|,
 		lastUpdated => 1031514049
 	},
 
@@ -3303,11 +3243,6 @@ As with any delete operation, you are prompted to be sure you wish to proceed wi
 		lastUpdated => 1031514049
 	},
 
-	'516' => {
-		message => q|Turn Admin On!|,
-		lastUpdated => 1031514049
-	},
-
 	'613' => {
 		message => q|<p>Users are the accounts in the system that are given rights to do certain things. There are two default users built into the system: Admin and Visitor.
 </p>
@@ -3332,11 +3267,6 @@ You can search users based on username and email address. You can do partial sea
 	'1043' => {
 		message => q|Archive After|,
 		lastUpdated => 1066394455
-	},
-
-	'1082' => {
-		message => q|Clipboard|,
-		lastUpdated => 1076866475
 	},
 
 	'974' => {

@@ -66,6 +66,16 @@ Form footer.
 |,
 		lastUpdated => 1112466919,
 	},
+
+	'48' => {
+		message => q|Hello|,
+		lastUpdated => 1031514049,
+	},
+
+	'49' => {
+		message => q|Click here to log out.|,
+		lastUpdated => 1031514049,
+	},
 };
 
 1;

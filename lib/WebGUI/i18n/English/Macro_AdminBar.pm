@@ -96,6 +96,36 @@ The URL for executing this admin function.
 |,
 		lastUpdated => 1112583521,
 	},
+
+	'376' => {
+		message => q|Package|,
+		lastUpdated => 1031514049
+	},
+
+	'1083' => {
+		message => q|New Content|,
+		lastUpdated => 1076866510
+	},
+
+	'1082' => {
+		message => q|Clipboard|,
+		lastUpdated => 1076866475
+	},
+
+	'399' => {
+		message => q|Validate this page.|,
+		lastUpdated => 1031514049
+	},
+
+	'12' => {
+		message => q|Turn admin off.|,
+		lastUpdated => 1031514049
+	},
+
+	'82' => {
+		message => q|Administrative functions...|,
+		lastUpdated => 1031514049
+	},
 };
 
 1;
