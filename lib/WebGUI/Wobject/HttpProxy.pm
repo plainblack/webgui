@@ -149,6 +149,8 @@ sub www_view {
 
    $redirect=0; 
 
+	return $output unless ($proxiedUrl ne "");
+
    until($redirect == 5) { # We follow max 5 redirects to prevent bouncing/flapping
       $userAgent = new LWP::UserAgent;
       $userAgent->agent($session{env}{HTTP_USER_AGENT});
@@ -168,9 +170,8 @@ sub www_view {
       $header = new HTTP::Headers;
 	$header->referer($_[0]->get("proxiedUrl")); # To get around referrer blocking
 
-      if($session{env}{REQUEST_METHOD}=~/GET/i 
-         || $redirect != 0) {  # request_method is also GET after a redirection. Just to make sure we're
-                               # not posting the same data over and over again.
+      if($session{env}{REQUEST_METHOD}=~/GET/i || $redirect != 0) {  # request_method is also GET after a redirection. Just to make sure we're
+                               						# not posting the same data over and over again.
          if($redirect == 0 && $session{form}{wid} == $_[0]->get("wobjectId")) {
             foreach my $input_name (keys %{$session{form}}) {
                next if ($input_name !~ /^HttpProxy_/); # Skip non proxied form var's

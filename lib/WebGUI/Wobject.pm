@@ -258,7 +258,9 @@ If specified the wobject will be duplicated to this pageId, otherwise it will be
 =cut
 
 sub duplicate {
-	my %properties = %{$_[0]->get};
+	my %properties;
+	tie %properties, 'Tie::CPHash';
+	%properties = %{$_[0]->get};
 	$properties{pageId} = $_[1] || 2;
 	if ($properties{pageId} == 2)  {
 		$properties{bufferUserId} = $session{user}{userId};

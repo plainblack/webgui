@@ -32,6 +32,7 @@ $macros->{SpecificDropMenu} = "SpecificDropMenu";
 $macros->{LastModified} = "LastModified";
 $macros->{PreviousDropMenu} = "PreviousDropMenu";
 $macros->{TopDropMenu} = "TopDropMenu";
+$macros->{EditableToggle} = "EditableToggle";
 $macros->{SI} = "SI_scaledImage";
 $conf->set("macros"=>$macros);
 my $wobjects = $conf->get("wobjects");
