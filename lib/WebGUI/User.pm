@@ -148,7 +148,7 @@ sub delete {
 	$authMethod->deleteParams($class->{_userId});
     my $sth = WebGUI::SQL->read("select sessionId from userSession where userId=$class->{_userId}");
     while (my ($sid) = $sth->array) {
-       WebGUI::Sesssion::end($sid);
+       WebGUI::Session::end($sid);
     }
     $sth->finish;
 }

@@ -2,6 +2,7 @@
  - Changed the output of upgrade.pl for better understanding.
  - Added a --history option to upgrade.pl that displays the upgrade history
    for each site.
+ - Fixed a typo in User.pm
 
 
 6.0.3
