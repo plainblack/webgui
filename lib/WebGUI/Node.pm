@@ -237,6 +237,7 @@ sub untar {
         chdir $self->getPath;
 	my $temp = WebGUI::Node->new($node1,$node2);
 	Archive::Tar->extract_archive($temp->getPath.$session{os}{slash}.$filename,1);
+	WebGUI::ErrorHandler::warn(Archive::Tar->error) if (Archive::Tar->error);
 }
 
 

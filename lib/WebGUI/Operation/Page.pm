@@ -92,7 +92,13 @@ sub _selectPositions {
         my ($templates, $output, $f, $key);
         $f = WebGUI::HTMLForm->new(1);
         $templates = WebGUI::Page::getTemplateList();
-        $f->select("templateId",$templates,'',[$_[0]],'','','onChange="changeTemplatePreview(this.form.templateId.value)"');
+	$f->selectList(
+                -name=>"templateId",
+                -options=>$templates,
+                -value=>[$_[0]],
+                -extras=>'onChange="changeTemplatePreview(this.form.templateId.value)"',
+                -subtext=>' &nbsp; <a href="'.WebGUI::URL::page("op=listTemplates&namespace=Page").'">'.WebGUI::International::get(742).'</a>'
+                );
         $output = '
         <script language="JavaScript">
         function checkBrowser(){

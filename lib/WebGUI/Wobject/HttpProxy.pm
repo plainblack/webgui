@@ -182,6 +182,7 @@ sub www_view {
 
       #if ($_[0]->get("followExternal")==0 && $proxiedUrl !~ /\Q$allowed_url/i) {
       if ($_[0]->get("followExternal")==0 && 
+	$var{header} = "text/html";
           (URI->new($_[0]->get('proxiedUrl'))->host) ne (URI->new($proxiedUrl)->host) ) {
          return "<h1>You are not allowed to leave ".$_[0]->get("proxiedUrl")."</h1>";
       }
@@ -271,6 +272,7 @@ sub www_view {
          $p->DESTROY; 
    
          if ($var{content} =~ /<frame/gis) {
+		$var{header} = "text/html";
             $var{content} = "<h1>HttpProxy: Can't display frames</h1>
                         Try fetching it directly <a href='$proxiedUrl'>here.</a>";
          } else {
@@ -280,6 +282,7 @@ sub www_view {
          }
       }
    } else { # Fetching page failed...
+	$var{header} = "text/html";
       $var{content} = "<b>Getting <a href='$proxiedUrl'>$proxiedUrl</a> failed</b>".
    	      "<p><i>GET status line: ".$response->status_line."</i>";
    }

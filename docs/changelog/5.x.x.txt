@@ -34,6 +34,17 @@
    macro that did not exist.
  - Email address didn't validate when it contained a dash (-). (Thanks to
    Fekke.)
+ - Fixed a bug in the node mechanism where no error would be logged if
+   decompression failed.
+ - Fixed a bug that allowed users to import the same theme multiple times.
+ - Fixed a bug in the page template draw method where javascript caused
+   problems. (Thanks to Leendert Bottelberghs.)
+ - Messages in the message log now have carriage returns converted to HTML
+   breaks when necessary.
+ - Fixed a bug in SMB authentication where the user was let in if there was no
+   SMB Username specified for a user.
+ - Fixed a preceeding space problem in the M macro.
+ - Added a manage templates link to the page properties.
  - The calendar wizard was too narrow and wrapping on some browsers.
  - The size attribute was missing from the email method in the Form package.
    (Thanks to Andreas Graf.)
@@ -51,6 +62,8 @@
    displayed.
  - Data Form: CC and BCC would not be sent if the TO was specified as a
    username or group name instead of an email address.
+ - Survey: Couldn't go beyond page 1 in gradebook report.
+ - HTTP Proxy: Improper headers were set on errors.
 
 
 5.4.3

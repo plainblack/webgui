@@ -25,21 +25,19 @@ my %smbError = (
 
 #-------------------------------------------------------------------
 sub authenticate {
-	my ($userId, $password, $userData, $smb, $result);
-	$userId = $_[0]->[0];
+        my ($userId, $password, $userData, $smb, $result);
+        $userId = $_[0]->[0];
         $password = $_[0]->[1];
-	$userData = WebGUI::Authentication::getParams($userId, 'SMB');
-
-	$smb = Authen::Smb::authen($userData->{smbLogin}, $password, $userData->{smbPDC}, $userData->{smbBDC}, $userData->{smbDomain});
-	if ($smb > 0) {
-		$result = '<li>'. $smbError{$smb};
-	} else {
-		$result = 1;
-	}
-
-	return $result;
+        $userData = WebGUI::Authentication::getParams($userId, 'SMB');
+        return "<li>No SMB username specfified." unless ($userData->{smbLogin});
+        $smb = Authen::Smb::authen($userData->{smbLogin}, $password, $userData->{smbPDC}, $userData->{smbBDC}, $userData->{smbDomain});
+        if ($smb > 0) {
+                return '<li>'. $smbError{$smb};
+        } else {
+                return 1;
+        }
 }
-
+                                                                                                                                                             
 #-------------------------------------------------------------------
 sub adminForm {
 	my $userData = WebGUI::Authentication::getParams($_[0], 'SMB');

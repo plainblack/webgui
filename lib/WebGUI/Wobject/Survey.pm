@@ -724,7 +724,7 @@ sub www_viewGradebook {
         return "" unless (WebGUI::Privilege::isInGroup($_[0]->get("groupToViewReports")));
 	my ($output, $p, $users, $user);
 	$output = '<h1>'.WebGUI::International::get(71,$_[0]->get("namespace")).'</h1>';
-	$p = WebGUI::Paginator->new('func=viewGradebook&wid='.$_[0]->get("wobjectId"));
+	$p = WebGUI::Paginator->new(WebGUI::URL::page('func=viewGradebook&wid='.$_[0]->get("wobjectId")));
 	$p->setDataByQuery("select userId,username,ipAddress from Survey_response 
 		group by userId,username,ipAddress order by username,ipAddress");
 	$users = $p->getPageData;

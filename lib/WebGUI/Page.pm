@@ -161,6 +161,7 @@ sub drawTemplate {
 	$template =~ s/\n//g;
 	$template =~ s/\r//g;
 	$template =~ s/\'/\\\'/g;
+	$template =~ s/\<script.*?\>.*?\<\/script\>//gi;
 	$template =~ s/\<table.*?\>/\<table cellspacing=0 cellpadding=3 width=100 height=80 border=1\>/ig;
 	$template =~ s/\<tmpl_var\s+page\.position(\d+)\>/$1/ig;
 	return $template;

@@ -557,6 +557,9 @@ sub www_viewMessageLogMessage {
 		if ($data{url} ne "") {
 			$output .= '</a>';
 		}
+		unless ($data{message} =~ /\<div\>/ig || $data{message} =~ /\<br\>/ig || $data{message} =~ /\<p\>/ig) {
+                        $data{message} =~ s/\n/\<br\>/g;
+                }
 		$output .= '<br>'.$data{message}.'<p>';
 		if ($data{url} ne "" && $data{status} eq 'pending') {
                         $output .= '<a href="'.$data{url}.'">'.WebGUI::International::get(554).'</a> &middot; ';

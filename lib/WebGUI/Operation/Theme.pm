@@ -353,6 +353,7 @@ sub www_importThemeValidate {
 	$extracted->untar($filename);
 	my $propertiesFile = WebGUI::Attachment->new("_theme.properties","temp",$subnode);
 	my $theme = $propertiesFile->getHashref;
+	my @themes = WebGUI::SQL->buildArray("select name from theme");
 	my $f = WebGUI::HTMLForm->new;
 	$f->hidden(
 		-name=>"op",
@@ -384,7 +385,7 @@ sub www_importThemeValidate {
 		);
 	if ($theme->{webguiVersion} > $WebGUI::VERSION) {
 		$output .= WebGUI::International::get(926);
-	} elsif (0) {
+	} elsif (isIn($theme->{name},@themes)) {
 		$output .= WebGUI::International::get(925);
 	} else {
 		$output .= WebGUI::International::get(928);

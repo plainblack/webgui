@@ -19,14 +19,14 @@ use WebGUI::Session;
 sub process {
         my ($tree, $temp, @param);
         @param = WebGUI::Macro::getParams($_[0]);
-        $temp = '<span class="verticalMenu">';
+        $temp = '<div class="verticalMenu">';
         if ($param[0] ne "") {
         	$tree = WebGUI::Navigation::tree($session{page}{pageId},$param[0]);
         } else {
         	$tree = WebGUI::Navigation::tree($session{page}{pageId},1);
         }
 	$temp .= WebGUI::Navigation::drawVertical($tree);
-        $temp .= '</span>';
+        $temp .= '</div>';
 	return $temp;
 }
 
