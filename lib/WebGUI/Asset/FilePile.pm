@@ -21,6 +21,7 @@ use WebGUI::Icon;
 use WebGUI::Session;
 use WebGUI::SQL;
 use WebGUI::Storage;
+use WebGUI::TabForm;
 use WebGUI::Template;
 use WebGUI::Utility;
 
@@ -80,7 +81,7 @@ sub edit {
                	-label=>WebGUI::International::get(940),
                 -uiLevel=>6
        	        );
-	$tabform->addTab("privileges",WebGUI::International::get(107),6);
+	$tabform->addTab("security",WebGUI::International::get(107),6);
 	$tabform->getTab("security")->dateTime(
                	-name=>"startDate",
                 -label=>WebGUI::International::get(497),
@@ -129,45 +130,27 @@ sub edit {
        		-excludeGroups=>[1,7],
        		-uiLevel=>6
        		);
-	$tabform->getTab("properties")->file(
-		-name=>"file",
-		-label=>"Upload File"
-		);
-	$tabform->getTab("properties")->file(
-		-name=>"file",
-		-label=>"Upload File"
-		);
-	$tabform->getTab("properties")->file(
-		-name=>"file",
-		-label=>"Upload File"
-		);
-	$tabform->getTab("properties")->file(
-		-name=>"file",
-		-label=>"Upload File"
-		);
-	$tabform->getTab("properties")->file(
-		-name=>"file",
-		-label=>"Upload File"
-		);
-	$tabform->getTab("properties")->file(
-		-name=>"file",
-		-label=>"Upload File"
-		);
-	$tabform->getTab("properties")->file(
-		-name=>"file",
-		-label=>"Upload File"
-		);
-	$tabform->getTab("properties")->file(
-		-name=>"file",
-		-label=>"Upload File"
-		);
-	$tabform->getTab("properties")->file(
-		-name=>"file",
-		-label=>"Upload File"
-		);
-	$tabform->getTab("properties")->file(
-		-name=>"file",
-		-label=>"Upload File"
+	WebGUI::Style::setScript($session{config}{extrasURL}.'/FileUploadControl.js',{type=>"text/javascript"});
+	my $uploadControl = '<div id="fileUploadControl"> </div>
+		<script>
+		var images = new Array();
+		';
+	opendir(DIR,$session{config}{extrasPath}.'/fileIcons');
+	my @files = readdir(DIR);
+	closedir(DIR);
+	foreach my $file (@files) {
+		unless ($file eq "." || $file eq "..") {
+			my $ext = $file;
+			$ext =~ s/(.*?)\.gif/$1/;
+			$uploadControl .= 'images["'.$ext.'"] = "'.$session{config}{extrasURL}.'/fileIcons/'.$file.'";'."\n";
+		}
+	}
+	$uploadControl .= 'var uploader = new FileUploadControl("fileUploadControl", images);
+	uploader.addRow();
+	</script>';
+	$tabform->getTab("properties")->readOnly(
+		-label=>"Upload Files",
+		-value=>$uploadControl
 		);
 	return $self->getAdminConsole->render($tabform->print,"Add a Pile of Files");
 }

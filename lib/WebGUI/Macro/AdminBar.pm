@@ -104,8 +104,8 @@ foreach my $link (@{$session{asset}->getAssetAdderLinks}) {
 #	$hash{$acParams->{url}} = $acParams->{title} if ($acParams->{canUse});
 #	$acParams = WebGUI::AdminConsole->getAdminFunction("groups");
 #	$hash{$acParams->{url}} = $acParams->{title} if ($acParams->{canUse});
-#	$acParams = WebGUI::AdminConsole->getAdminFunction("assets");
-#	$hash{$acParams->{url}} = $acParams->{title} if ($acParams->{canView});
+	$acParams = WebGUI::AdminConsole->getAdminFunction("assets");
+	$hash{$acParams->{url}} = $acParams->{title} if ($acParams->{canUse});
 
 	%hash = sortHash(%hash);
         %hash = ( 

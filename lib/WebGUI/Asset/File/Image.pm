@@ -198,7 +198,7 @@ sub view {
 	my $self = shift;
 	my $storage = WebGUI::Storage->get($self->get("storageId"));
 	my %var = %{$self->get};
-	$var{controls} = $toolbar;
+	$var{controls} = $self->getToolbar;
 	$var{fileUrl} = $storage->getUrl($self->get("filename"));
 	$var{fileIcon} = $storage->getFileIconUrl($self->get("filename"));
 	$var{thumbnail} = $storage->getUrl("thumb-".$self->get("filename"));

@@ -144,7 +144,7 @@ my %migration;
 
 print "\tConverting navigation system to asset tree\n" unless ($quiet);
 my ($navRootLineage) = WebGUI::SQL->quickArray("select assetId,title,lineage from asset where length(lineage)=12 order by lineage desc limit 1");
-$navRootLineage = sprintf("%012d",("000001000005"+1));
+$navRootLineage = sprintf("%012d",($navRootLineage+1));
 my $navRootId = WebGUI::SQL->setRow("asset","assetId",{
 	assetId=>"new",
 	isHidden=>1,
@@ -264,6 +264,113 @@ while (my $data = $sth->hashRef) {
 $sth->finish;
 WebGUI::SQL->write("update Navigation set startPoint='root' where startPoint='nameless_root'");
 WebGUI::SQL->write("drop table tempoldnav");
+
+print "\tConverting collateral manager items into assets\n" unless ($quiet);
+my ($collateralRootLineage) = WebGUI::SQL->quickArray("select assetId,title,lineage from asset where length(lineage)=12 order by lineage desc limit 1");
+$collateralRootLineage = sprintf("%012d",($collateralRootLineage+1));
+my $collateralRootId = WebGUI::SQL->setRow("asset","assetId",{
+	assetId=>"new",
+	isHidden=>1,
+	title=>"Navigation Configurations",
+	menuTitle=>"Navigation Configurations",
+	url=>fixUrl('doesntexistyet',"Navigation Configurations"),
+	ownerUserId=>"3",
+	groupIdView=>"4",
+	groupIdEdit=>"4",
+	parentId=>"PBasset000000000000001",
+	lineage=>$collateralRootLineage,
+	lastUpdated=>time(),
+	className=>"WebGUI::Asset::Wobject::Navigation",
+	state=>"published"
+	});
+WebGUI::SQL->setRow("wobject","assetId",{
+	assetId=>$collateralRootId,
+	templateId=>"1",
+	styleTemplateId=>"1",
+	printableStyleTemplateId=>"3"
+	},undef,$collateralRootId);
+WebGUI::SQL->setRow("Navigation","assetId",{
+	assetId=>$collateralRootId,
+	startType=>"relativeToCurrentUrl",
+	startPoint=>"0",
+	endPoint=>"55",
+	assetsToInclude=>"descendants",
+	showHiddenPages=>1
+	},undef,$collateralRootId);
+my %folderCache = ('0'=>$collateralRootId);
+my $collateralRankCounter = 1;
+my $sth = WebGUI::SQL->read("select * from collateralFolder");
+while (my $data = $sth->hashRef) {
+	my $folderId = WebGUI::SQL->setRow("asset","assetId",{
+		assetId=>"new",
+		className=>'WebGUI::Asset::Layout',
+		lineage=>$collateralRootLineage.sprintf("%06d",$collateralRankCounter),
+		parentId=>$collateralRootId,
+		ownerUserId=>'3',
+		groupIdView=>'4',
+		groupIdEdit=>'4',
+		lastUpdate=>time(),
+		title=>quote($data->{name}),
+		menuTitle=>quote($data->{name}),
+		url=>quote(fixUrl('doesntexist',$data->{name})),
+		state=>'published'
+		});
+	WebGUI::SQL->setRow("wobject","assetId",{
+		assetId=>quote($folderId),
+		templateId=>'15',
+		styleTemplateId=>"1",
+		printableStyleTemplateId=>"3",
+		namespace=>'Layout',
+		description=>quote($data->{description})
+		},undef,$folderId);
+	WebGUI::SQL->setRow("layout","assetId",{
+		assetId=>quote($folderId)
+		},undef,$folderId);
+	$folderCache{$data->{collateralFolderId}} = $folderId;
+	$collateralRankCounter++;
+}
+$sth->finish;
+my %collateralCache;
+my $lastCollateralFolderId = 'nolastid';
+my ($parentId, $baseLineage, $rank);
+my $sth = WebGUI::SQL->read("select * from collateral order by collateralFolderId");
+while (my $data = $sth->hashRef) {
+	unless ($lastCollateralFolderId eq $data->{collateralFolderId}) {
+		$rank = 1;
+		$baseLineage = "";
+		$parentId = "";
+	}
+	my $class;
+	my $collateralId = WebGUI::Id::generate();
+	if ($data->{filename} ne "") {
+		my $storageId = copyFile($data->{filename},'images/'.$data->{collateralId});
+		if (isIn(getFileExtension($data->{filename}), qw(jpg jpeg gif png))) {
+			copyFile('thumb-'.$data->{filename},'images/'.$data->{collateralId},$storageId);
+			WebGUI::SQL->write("insert into ImageAsset (assetId, thumbnailSize) values (".quote($newId).",
+				".quote($session{setting}{thumbnailSize}).")");
+			$class = 'WebGUI::Asset::File::Image';
+		} else {
+			$class = 'WebGUI::Asset::File';
+		}
+		WebGUI::SQL->write("insert into FileAsset (assetId, filename, storageId, fileSize) values (
+			".quote($newId).", ".quote($data->{$field}).", ".quote($storageId).",
+			".quote(getFileSize($storageId,$data->{$field})).")");
+	} else {
+
+	}
+	WebGUI::SQL->write("insert into asset (assetId, parentId, lineage, className, state, title, menuTitle, 
+		url, startDate, endDate, isHidden, ownerUserId, groupIdView, groupIdEdit, synopsis) values (".
+		quote($collateralId).", ".quote($parentId).", ".quote($baseLineage.sprintf("%06d",$rank)).", 
+		'".$class."','published',".quote($data->{fileTitle}).", ".
+		quote($data->{fileTitle}).", ".quote(fixUrl($newId,$wobjectUrl.'/'.$data->{$field})).", 
+		".quote($wobject->{startDate}).", ".quote($wobject->{endDate}).", 1, ".quote($ownerId).", 
+		".quote($data->{groupToView}).", ".quote($groupIdEdit).", ".quote($data->{briefSynopsis}).")");
+	$collateralCache{$data->{collateralId}) = $collateralId;
+	$rank++;
+}
+
+WebGUI::SQL->write("drop table collateralFolder");
+WebGUI::SQL->write("drop table collateral");
 
 
 print "\tConverting navigation templates\n" unless ($quiet);
