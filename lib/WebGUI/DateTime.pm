@@ -216,7 +216,7 @@ sub epochToHuman {
 	$output =~ s/\%d/$value/g;
 	$output =~ s/\%D/$day/g;
 	if ($output =~ /\%w/) {
-		my $dayName = getDayName(Day_of_Week($year,$month,$day));
+		my $dayName = getDayName(Date::Calc::Day_of_Week($year,$month,$day));
 		$output =~ s/\%w/$dayName/g;
 	}
   #---hour stuff
