@@ -606,7 +606,7 @@ sub view {
 	my $var;
 	$var->{entryId} = $session{form}{entryId} if ($self->canEdit);
 	if ($var->{entryId} eq "list" && $self->canEdit) {
-		return $self->processTemplate($self->getListTemplateVars,"DataForm/List",$self->get("listTemplateId"));
+		return $self->processTemplate($self->getListTemplateVars,$self->get("listTemplateId"));
 	}
 	# add Tab StyleSheet and JavaScript
 	WebGUI::Style::setLink($session{config}{extrasURL}.'/tabs/tabs.css', {"type"=>"text/css"});
@@ -792,6 +792,10 @@ sub www_editFieldSave {
 					" where DataForm_fieldId=".quote($session{form}{fid}));
 	}
 	$self->reorderCollateral("DataForm_field","DataForm_fieldId", _tonull("DataForm_tabId",$session{form}{tid})) if ($session{form}{fid} ne "new");
+        if ($session{form}{proceed} eq "editField") {
+            $session{form}{fid} = "new";
+            return $self->www_editField;
+        }
         return "";
 }
 
@@ -848,6 +852,10 @@ sub www_editTabSave {
 		label=>$session{form}{label},
 		subtext=>$session{form}{subtext}
 		});
+        if ($session{form}{proceed} eq "editTab") {
+            $session{form}{tid} = "new";
+            return $self->www_editTab;
+        }
         return "";
 }
 
@@ -960,7 +968,7 @@ sub www_process {
 		$self->www_view($var);
 	} else {
 		$self->sendEmail($var) if ($self->get("mailData") && !$updating);
-		return WebGUI::Style::process($self->processTemplate($var,"DataForm",$self->get("acknowlegementTemplateId")),$self->get("styleTemplateId"));
+		return WebGUI::Style::process($self->processTemplate($var,$self->get("acknowlegementTemplateId")),$self->get("styleTemplateId"));
 	}
 }
 

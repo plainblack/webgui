@@ -19,7 +19,8 @@
  - fix [ 1150140 ] Manage users in group only views first page
  - fix [ 1163470 ] [6.5.1CVS] Dataform, wrong template, bad edit URL
  - fix [ 1159992 ] Integer value zero not returned in form fields
-
+ - fix [ 1161457 ] Data fomr - list all entries: Logfile Error
+ - fix [ 1161461 ] Data form - Add field - wrong destination
 
 6.5.1
  - Fixed a bug in the lineage tree that caused funky ranks to be created when
