@@ -118,7 +118,8 @@ sub www_editImageSave {
 		if ($file->getFilename) {
 			$sqlAdd = ", filename=".quote($file->getFilename);
 		}
-	        while (($test) = WebGUI::SQL->quickArray("select name from images where name='$session{form}{name}'")) {
+	        while (($test) = WebGUI::SQL->quickArray("select name from images 
+			where name=".quote($session{form}{name})." and imageId<>$session{form}{iid}")) {
         	        if ($session{form}{name} =~ /(.*)(\d+$)/) {
                 	        $session{form}{name} = $1.($2+1);
 	                } elsif ($test ne "") {
