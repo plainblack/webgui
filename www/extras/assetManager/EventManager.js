@@ -106,10 +106,14 @@ function EventManager_documentMouseUp(e) {
     //obj = manager.tools.getActivity(obj);
    
     var asset = manager.getAsset(obj);
-        
-        
+                        
     if (manager.display.contextMenu.owner && (!asset || asset.assetId != manager.display.contextMenu.owner.assetId)) {
         manager.display.contextMenu.hide();
+    }else {
+    	if (!asset) {
+	    	manager.display.clearSelectedAssets();
+    	}
+    
     }
     manager.display.dragStop();
     //if (obj) manager.display.selectActivity(obj);

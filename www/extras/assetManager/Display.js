@@ -39,6 +39,7 @@ function Display() {
     this.keyUp = Display_keyUp;
     this.selectAsset = Display_selectAsset;
     this.isSelected = Display_isSelected;
+    this.clearSelectedAssets = Display_clearSelectedAssets;
 }
 
 //---------Method Implementations -------------
@@ -60,7 +61,7 @@ function Display_hidePropertiesWindow() {
 }
 
 function Display_displayPropertiesWindow(html) {    
-    temp = "<table border='1' cellspacing='0'><tr><td><table border='0'><tr bgcolor='#000000'><td width='325' class='dragable'><font color='#FFFFFF'>PROPERTIES</font></td><td align='right'><a href='javascript:manager.display.hidePropertiesWindow()'>X</a></td></tr><tr><td colspan='2'>" + html + "</td></tr></table></td></tr></table>";    
+    temp = "<table border='1' cellspacing='0'><tr><td><table border='0'><tr bgcolor='#000000'><td width='325' class='dragable'><font color='#FFFFFF'>" + manager.labels['properties'] + "</font></td><td align='right'><a href='javascript:manager.display.hidePropertiesWindow()'>X</a></td></tr><tr><td colspan='2'>" + html + "</td></tr></table></td></tr></table>";    
     
     propWindow = document.getElementById("propertiesWindow");        
     propWindow.innerHTML=temp;
@@ -78,12 +79,12 @@ function Display_dragStart(firedobj,xCoordinate,yCoordinate) {
     
 	
         
-    while (firedobj.tagName!=this.topLevelElement && firedobj.className.indexOf("am-grid-row") == -1 && firedobj.className != "dragable") {
+    while (firedobj.tagName!=this.topLevelElement && !firedobj.asset && firedobj.className != "dragable") {
         firedobj=manager.display.dom? firedobj.parentNode : firedobj.parentElement    
     }
 
     
-    if (firedobj.className.indexOf("am-grid-row") == -1 && firedobj.className != "dragable") {
+    if ((!firedobj.asset || firedobj.asset.isParent) && firedobj.className != "dragable") {
         return;
     }
 
@@ -97,7 +98,12 @@ function Display_dragStart(firedobj,xCoordinate,yCoordinate) {
                 this.pageHeight = window.document.body.scrollHeight;
                 this.pageWidth = window.document.body.scrollWidth;
 
-                this.focusObjects[0]=firedobj
+                if (firedobj.asset) {
+	                this.focusObjects[0]=firedobj.asset;
+	            }else {
+	            	this.focusObjects[0] = firedobj;
+	            }
+                
                 //this.bringToFront(this.focusObject);
                 
                 //hack to get the transparency - need to make generic
@@ -130,7 +136,12 @@ function Display_dragStop() {
 
         //if (this.focusObjects.dragDescriptor.clazzName == "activityMenuItem") {
             if (this.overObjects[0] && this.overObjects[0].assetId && this.overObjects[0] != this.focusObjects[0]) {
-		            this.focusObjects[0].setRank(this.overObjects[0].rank);                
+		            
+		            if (this.overObjects[0].isParent) {
+			            this.focusObjects[0].setParent(this.overObjects[0]);			            
+    				}else {
+    					this.focusObjects[0].setRank(this.overObjects[0].rank);    				
+    				}    				    				
             }        
             //this.focusObject.style.top=0;
             //this.focusObject.style.left=0;
@@ -169,6 +180,14 @@ function Display_selectAsset(asset) {
 		}
 }
 
+function Display_clearSelectedAssets() {	
+    		for (i=0;i<this.overObjects.length;i++) {
+    			this.overObjects[i].div.style.backgroundColor="white";
+    		}
+   			this.overObjects=new Array();
+}
+
+
 function Display_move(e){
     
     if (this.dragEnabled){        
@@ -180,9 +199,11 @@ function Display_move(e){
     	    this.focusObjects[0].style.top=this.dom? this.temp2+e.clientY-this.y : this.temp2+event.clientY-this.y       
         }else {
 	        var act = this.spy(this.dom? e.pageX: (e.clientX + document.body.scrollLeft),this.dom? e.pageY: (e.clientY + document.body.scrollTop));
-   		    
+   		       		    
    		    if (act && act.asset) {
 	   		    this.selectAsset(act.asset);
+			}else {
+				this.clearSelectedAssets();
 			}			
 					
 			if (this.overObjects[0] != this.focusObjects[0]) {

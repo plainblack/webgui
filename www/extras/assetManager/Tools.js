@@ -28,15 +28,12 @@ function Tools() {
 }
 
 function Tools_getHostName(url) {
-	debug(url);
 	var serverParts = url.split("/");
 	return serverParts[2];
 }
 
 //returns a ? or & based on contents of url
-function Tools_addParamDelimiter(url) {
-		
-		
+function Tools_addParamDelimiter(url) {		
 	if (url.indexOf("?") == -1) {
 		return url + "?";
 	}else {
@@ -44,19 +41,6 @@ function Tools_addParamDelimiter(url) {
     }
 }
 
-
-//returns a ? or & based on contents of url
-function Tools_addParamDelimiter(url) {
-		
-	var serverParts = location.href.split("/");
-	var server = serverParts[0] + "//" +serverParts[2];
-		
-	if (url.indexOf("?") == -1) {
-		return server + url + "?";
-	}else {
-		return server + url + "&";
-    }
-}
 
 //---------Method Implementations -------------
 

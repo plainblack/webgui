@@ -1,6 +1,6 @@
 //--------Constructor--------------------
 
-function AssetManager(assetArrayData,headerArrayData,lables,crumbtrail) {	
+function AssetManager(assetArrayData,headerArrayData,labels,crumbtrail) {	
 	this.tools = new Tools();
 	this.contextMenu = new ContextMenu();
 	this.display = new Display();
@@ -16,7 +16,7 @@ function AssetManager(assetArrayData,headerArrayData,lables,crumbtrail) {
 
 	this.parentURL = "";
 			
-	this.lables = lables;
+	this.labels = labels;
 	this.crumbtrail = crumbtrail;		
 	this.parentURL = "d";		
 	this.renderAssets = AssetManager_renderAssets;
@@ -27,8 +27,6 @@ function AssetManager(assetArrayData,headerArrayData,lables,crumbtrail) {
 	this.buildCrumbTrail = AssetManager_buildCrumbTrail;
 	this.displayContextMenu = AssetManager_displayContextMenu;
 	this.editTree=AssetManager_editTree;
-	this.setParent=AssetManager_setParent;
-	this.setRank=AssetManager_setRank;
 	this.remove = AssetManager_remove;
 	this.cut = AssetManager_cut;
 	this.copy = AssetManager_copy;
@@ -86,7 +84,12 @@ function AssetManager_renderAssets() {
 						
 		for (k=0;k<this.columnHeadings.length;k++) {
 			id = 'am_grid.row' + '.' + i + '.col.' + k;
-			gridStr+= '<td id="' + id  + '" class="am-grid-col-' + k +'">' + this.assetArrayData[i][k] + '</td>';	
+			gridStr+= '<td id="' + id  + '" class="am-grid-col-' + k +'">';
+			
+			if (k == 1) {
+				gridStr +='<img src="' + asset.icon + '" border="0"/>';				
+			}
+			gridStr+=this.assetArrayData[i][k] + '</td>';	
 //			eventStr += 'document.getElementById("' + id + '").asset = AssetManager_getManager().assets[' + i + '];';
 		}
 	}
@@ -106,35 +109,46 @@ function AssetManager_buildCrumbTrail() {
 	var crumbtrail = document.getElementById("crumbtrail");
 	var contents = "<table><tr>";
 	
+	var parentAssets = new Array();
+	
 	for (i=0;i<this.crumbtrail.length;i++) {
-		contents += '<td id="' + this.crumbtrail[i][0] + '" class="crumbtrail">' + this.crumbtrail[i][1] + '</td>';		
+		contents += '<td id="' + this.crumbtrail[i][0] + '" class="crumbtrail">' + this.crumbtrail[i][2] + '</td>';		
 		if (i != this.crumbtrail.length -1) {
 			contents += "<td>&nbsp;->&nbsp;</td>";
 		}	
 	}
 	
-	this.parentURL = "http://" + this.tools.getHostName("http://www.yahoo.com") + this.crumbtrail[this.crumbtrail.length -1][1];
+	this.parentURL = "http://" + this.tools.getHostName(location.href) + this.crumbtrail[this.crumbtrail.length -1][1];
 	
 	contents += '</tr></table>';	
 	
 	crumbtrail.innerHTML = contents;
 			
-//	for (i=0;i<this.crumbtrail.length;i++) {
+	//build assets attach the div properties
+	for (i=0; i< this.crumbtrail.length; i++ ) {
+		var asset = new Asset();		
+		asset.title = this.crumbtrail[i][2];
+		asset.url = this.crumbtrail[i][1];
+		asset.assetId = this.crumbtrail[i][0];
+
+
+		asset.div = document.getElementById(this.crumbtrail[i][0]);
+
+		asset.div.ondblclick=AssetManager_getManager().eventManager.assetDoubleClick;	
+		asset.div.onmousedown=AssetManager_getManager().eventManager.assetMouseDown;	
+		asset.div.oncontextmenu=AssetManager_getManager().eventManager.assetRightClick;	
+
+		asset.isParent = true;
+		document.getElementById(this.crumbtrail[i][0]).asset = asset;
+		this.assets[this.assets.length] = asset;
 		
-//		var obj = document.getElementById(this.crumbtrail[i][0]);
-//		this.crumbtrail
-		
-//		contents += '<td id="' + this.crumbtrail[i][0] + '" class="crumbtrail">' + this.crumbtrail[i][1] + '</td>';		
-//		if (i != this.crumbtrail.lenght) {
-//			contents += "<td>&nbsp;->&nbsp;</td>";
-//		}
-	
-	//}
+	}		
+			
 }
 		
 function AssetManager_getAsset(obj) {   	
    
-    while (obj.tagName!=this.display.topLevelElement && obj.className != "am-grid-row") {
+    while (obj.tagName!=this.display.topLevelElement && !obj.asset) {
         obj=this.display.dom? obj.parentNode : obj.parentElement    
     }
    
@@ -146,19 +160,19 @@ function AssetManager_displayContextMenu(x,y) {
     var arr = new Array();
     
     if (this.display.overObjects.length == 1) {
-	    arr[arr.length] = new ContextMenuItem("View","javascript:manager.display.contextMenu.owner.view()");
-    	arr[arr.length] = new ContextMenuItem("Edit","javascript:manager.display.contextMenu.owner.edit()");
+	    arr[arr.length] = new ContextMenuItem(this.labels["view"],"javascript:manager.display.contextMenu.owner.view()");
+    	arr[arr.length] = new ContextMenuItem(this.labels["edit"],"javascript:manager.display.contextMenu.owner.edit()");
     }
     
-    arr[arr.length] = new ContextMenuItem("Delete","javascript:manager.remove()");        
-    arr[arr.length] = new ContextMenuItem("<img src='/Extras/assetManager/breakerLine.gif'>","");
-    arr[arr.length] = new ContextMenuItem("Cut","javascript:AssetManager_getManager().cut()");        
-    arr[arr.length] = new ContextMenuItem("Copy","javascript:manager.copy()");
+    arr[arr.length] = new ContextMenuItem(this.labels["delete"],"javascript:manager.remove()");        
+    arr[arr.length] = new ContextMenuItem("<img src='/extras/assetManager/breakerLine.gif'>","");
+    arr[arr.length] = new ContextMenuItem(this.labels["cut"],"javascript:AssetManager_getManager().cut()");        
+    arr[arr.length] = new ContextMenuItem(this.labels["copy"],"javascript:manager.copy()");
     
     if (this.display.overObjects.length ==1) {
-	    arr[arr.length] = new ContextMenuItem("<img src='/Extras/assetManager/breakerLine.gif'>","");
-	    arr[arr.length] = new ContextMenuItem("Edit Tree","javascript:manager.editTree()");        
-	    arr[arr.length] = new ContextMenuItem("Properties","javascript:manager.display.contextMenu.owner.displayProperties()");
+	    arr[arr.length] = new ContextMenuItem("<img src='/extras/assetManager/breakerLine.gif'>","");
+	    arr[arr.length] = new ContextMenuItem(this.labels["editTree"],"javascript:manager.editTree()");        
+	    arr[arr.length] = new ContextMenuItem(this.labels["properties"],"javascript:manager.display.contextMenu.owner.displayProperties()");
 	}    
 //    alert("x = " + x + " y= " + y);
     
@@ -168,21 +182,8 @@ function AssetManager_displayContextMenu(x,y) {
 
 //url + ?||& + func=editTree 				
 function AssetManager_editTree() {	
+	//parentURL
 	location.href = this.tools.addParamDelimiter(this.parentURL) + "func=editTree";		
-}
-
-//Moving to a new parent (move)
-//----------------------
-//url + ?||& + func=setParent&assetId= + assetId 		
-function AssetManager_setParent(parentId) {
-	location.href = this.tools.addParamDelimiter(this.parentURL) + "func=setParent&assetId="+ parentId;		
-}
-
-//Set the rank of an asset amongst its siblings (move)
-//---------------------------------------------
-//url + ?||& + func=setRank&rank= + newRank
-function AssetManager_setRank(rank) {
-	location.href = this.tools.addParamDelimiter(this.parentURL) + "func=setRank&rank="+ rank;		
 }
 
 
@@ -211,6 +212,7 @@ function AssetManager_remove() {
 
 function AssetManager_getSelectedAssetIds() {
 	var assetIds = "";
+	alert(this.display.overObjects.length);
 	for (i=0;i<this.display.overObjects.length;i++) {
 		assetIds += "&assetId=" + this.display.overObjects[i].assetId;
 	}

@@ -12,30 +12,48 @@ function Asset() {
         this.lastUpdate = "";
         this.icon = "";
         this.div = null;
+        this.isParent=false;
 		
 		//methods
         this.edit = Asset_edit;        
 		this.view = Asset_view;
+		this.setRank = Asset_setRank;
 		this.displayProperties = Asset_displayProperties;
+		this.setParent = Asset_setParent;
 }		
 
 //---------Method Implementations -------------
 
-		
+//Moving to a new parent (move)
+//----------------------
+//url + ?||& + func=setParent&assetId= + assetId 		
+function Asset_setParent(asset) {
+	//parentURL
+	location.href = "http://" + manager.tools.getHostName(location.href) + manager.tools.addParamDelimiter(this.url) + "func=setParent&assetId="+ asset.assetId;		
+}
+	
+			
+//Set the rank of an asset amongst its siblings (move)
+//---------------------------------------------
+//url + ?||& + func=setRank&rank= + newRank
+function Asset_setRank(rank) {
+	//to child
+	location.href = "http://" + manager.tools.getHostName(location.href) + manager.tools.addParamDelimiter(this.url) + "func=setRank&rank="+ rank;		
+}
 
 
 //Edit the properties of an asset (edit)
 //-------------------------------
 //url + ?||& + func=edit
 function Asset_edit() {
-	location.href = manager.tools.addParamDelimiter(this.url) + "func=edit";		
+	location.href = "http://" + manager.tools.getHostName(location.href) + manager.tools.addParamDelimiter(this.url) + "func=edit&afterEdit=assetManager";		
 }
 
 //View an asset (view)
 //-------------
 //url + ?||& + func=view
 function Asset_view() {
-	location.href = manager.tools.addParamDelimiter(this.url) + "func=view";		
+	location.href = "http://" + manager.tools.getHostName(location.href) + this.url;		
 }
 
 function Asset_displayProperties() {
