@@ -75,5 +75,6 @@ webgui.
  - Added options for developers for an empty style
    $session{page}{useEmptyStyle} and added settings to the template table to
    to allow templates to be hidden from forms and/or management.
-
+ - Added dTree menu to the navigation system 
+   (Thanks to Geir Landro, http://www.destroydrop.com)
 
