@@ -28,6 +28,15 @@ save you many hours of grief.
 	check your site after the upgrade for all site maps to make
 	sure that they look the way you want them to look.
 
+* If you want to use the e-commerce system, you'll have to enable the
+	PayFlowPro plugin in the config file. To do this correctly 
+	you'll also have to download the Payflow Pro SDK from Verisign.
+	Be sure to export the cert path into the PFPRO_CERT_PATH 
+	environment variable, and to start your server the hard way 
+	(apachectl stop; apachectl start, restart won't do). Also be sure
+	that this variable is set in the environment in which cron 
+	operates, or else the scheduler plugin ProcessRecurringPayments
+	will fail with a cert error.
 
 6.2.8
 --------------------------------------------------------------------
