@@ -20,6 +20,9 @@ var topelement=dom? "HTML" : "BODY"
 var currentDiv = null;
 var clipboard = null;
 var contra = "";
+var pageHeight=0;
+var pageWidth=0;
+var scrollJump=50;
 
 //checks the key Events for copy and paste operations
 //ctrlC ctrlV shiftP shiftY
@@ -65,9 +68,50 @@ function dragable_getObjectByClass(target,clazz) {
     
 }
 
+//checks to see if the scroll bars need to be adjusted
+function dragable_adjustScrollBars(e) {
+
+        scrY=0;
+        scrX=0;
+
+        if (e.clientY > document.body.clientHeight-scrollJump) {
+            if (e.clientY + document.body.scrollTop < pageHeight - (scrollJump + 60)) {
+                scrY=scrollJump;
+                window.scroll(document.body.scrollLeft,document.body.scrollTop + scrY);
+                y-=scrY;
+            }
+        }else if (e.clientY < scrollJump) {
+            if (document.body.scrollTop < scrollJump) {
+                scrY = document.body.scrollTop;
+            }else {
+                scrY=scrollJump;
+            }
+            window.scroll(document.body.scrollLeft,document.body.scrollTop - scrY);
+            y+=scrY;
+        }
+
+
+        if (e.clientX > document.body.clientWidth-scrollJump) {
+            if (e.clientX + document.body.scrollLeft < pageWidth - (scrollJump + 60)) {
+                scrX=scrollJump;
+                window.scroll(document.body.scrollLeft + scrX,document.body.scrollTop);
+                x-=scrX;
+            }
+        }else if (e.clientX < scrollJump) {
+            if (document.body.scrollLeft < scrollJump) {
+                scrX = document.body.scrollLeft;
+            }else {
+                scrX=scrollJump;
+            }
+            window.scroll(document.body.scrollLeft - scrX,document.body.scrollTop);
+            x+=scrX;
+        }
+}
+
+
 //initialization routine, must be called on load.  Sets up event handlers
 function dragable_init(url) {
-	pageURL = url;
+        pageURL = url;
     //window.scroll(10,500);
     //set up event handlers
     document.onmouseup=dragable_dragStop;
@@ -127,6 +171,8 @@ function dragable_move(e){
             accuracyCount++;
         }
       
+        dragable_adjustScrollBars(e);
+
         z.style.left=temp1+e.clientX-x;
         z.style.top=temp2+e.clientY-y;
         return false
@@ -160,9 +206,12 @@ function dragable_dragStart(e){
 
     fObj.className="dragging";        
 
+    //set the page height and width in a var since IE changes them when scrolling
+    pageHeight = window.document.body.scrollHeight;
+    pageWidth = window.document.body.scrollWidth;
+
     dragging=true
     z=fObj;
-    //z.style.zIndex=0;
     temp1=parseInt(z.style.left+0) 
     temp2=parseInt(z.style.top+0)
     x=e.clientX;
@@ -352,8 +401,7 @@ function dragable_moveContent(from, to,position) {
             if (i == children.length - 1) {
                 toParent.appendChild(from);                
             }else {
-                tmp = children[i+1];
-                toParent.insertBefore(children[i+1]);
+                toParent.insertBefore(from,children[i+1]);
             }
         }
     }
