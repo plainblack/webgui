@@ -358,7 +358,7 @@ sub www_view {
 	$var{"post.label"} = WebGUI::International::get(20,$_[0]->get("namespace"));
         $var{"search.label"} = WebGUI::International::get(364);
 	$var{"search.Form"} = WebGUI::Search::form({wid=>$_[0]->get("wobjectId"),func=>'view',search=>1});
-	$var{"search.url"} = WebGUI::Search::toggleURL();
+	$var{"search.url"} = WebGUI::Search::toggleURL("wid=".$_[0]->get("wobjectId")."&func=view");
 	if ($session{scratch}{search}) {
                 $numResults = $session{scratch}{numResults};
        		$constraints = WebGUI::Search::buildConstraints([qw(username title content)]);
