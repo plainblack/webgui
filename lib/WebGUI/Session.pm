@@ -323,7 +323,7 @@ sub httpHeader {
                 $session{header}{expires} = "-1d";
         }
 	return $session{cgi}->header( 
-		-type => $session{header}{mimetype}
+		-type => $session{header}{mimetype},
 		-charset => $session{header}{charset},
 		-cookie => $session{header}{cookie}, 
 		-status => $session{header}{status},
