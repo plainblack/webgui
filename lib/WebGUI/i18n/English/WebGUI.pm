@@ -5786,13 +5786,6 @@ This macro retrieves the URL for the thumbnail of any image in the collateral ma
 <p/>
 <i>Example:</i> &#94;Thumbnail("logo");
 <p/>
-
-<b>&#94;ThumbnailLinker();</b><br/>
-This macro builds a quick image viewer using nothing more than the collateral management system. It creates a thumbnail image with the name of the image under it and then links them both to the full sized image. You can also specify a "1" as a second parameter to have the linker create a new window to display the linked image.
-<p/>
-<i>Example:</i> &#94;ThumbnailLinker("logo");
-<p/>
-
 |,
 		lastUpdated => 1089730066
 	},
