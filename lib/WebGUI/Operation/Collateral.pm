@@ -173,7 +173,8 @@ sub www_editCollateral {
 			$f->HTMLArea(
 				-name=>"parameters",
 				-value=>$collateral->{parameters},
-				-label=>WebGUI::International::get(771)
+				-label=>WebGUI::International::get(771),
+				-popupToggle=>1
 				);
 		} else {
 			$f->readOnly(
