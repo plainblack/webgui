@@ -53,7 +53,7 @@ sub duplicate {
 		$data{processMacros},
 		$data{templatePosition}
 		);
-        WebGUI::SQL->write("insert into DownloadManager values ($newWidgetId, $data{paginateAfter})");
+        WebGUI::SQL->write("insert into DownloadManager values ($newWidgetId, $data{paginateAfter}, $data{displayThumbnails})");
         $sth = WebGUI::SQL->read("select * from DownloadManager_file where widgetId=$_[0]");
         while (%row = $sth->hash) {
                 $newDownloadId = getNextId("downloadId");
@@ -66,8 +66,7 @@ sub duplicate {
                 WebGUI::SQL->write("insert into DownloadManager_file values ($newDownloadId, $newWidgetId, ".
 			quote($row{fileTitle}).", ".quote($row{downloadFile}).", $row{groupToView}, ".
 			quote($row{briefSynopsis}).", $row{dateUploaded}, $row{sequenceNumber}, ".
-			quote($row{alternateVersion1}).", ".quote($row{alternateVersion2}).
-			", $row{displayThumbnails})");
+			quote($row{alternateVersion1}).", ".quote($row{alternateVersion2}).")");
         }
 	$sth->finish;
 }
@@ -214,7 +213,7 @@ sub www_addDownloadSave {
 		$alt2 = WebGUI::Attachment->new("",$session{form}{wid},$downloadId);
 		$alt2->save("alternateVersion2");
 		($sequenceNumber) = WebGUI::SQL->quickArray("select count(*) from DownloadManager_file where widgetId=$session{form}{wid}");
-		$sequenceNumber += 1;
+		$sequenceNumber++;
                 WebGUI::SQL->write("insert into DownloadManager_file values (".
 			$downloadId.
 			", ".$session{form}{wid}. 

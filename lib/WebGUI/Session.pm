@@ -44,6 +44,7 @@ sub _getPageInfo {
                 	($pageId) = WebGUI::SQL->quickArray("select pageId from page where urlizedTitle='".$pageName."'",$_[1]);
                 	if ($pageId eq "") {
                         	$pageId = $_[2];
+				$session{header}{status} = '404';
                 	}
         	} else {
                 	$pageId = 1;
@@ -69,13 +70,15 @@ sub _getSessionVars {
 
 #-------------------------------------------------------------------
 sub _getUserInfo {
-	my (%user, $uid);
+	my (%user, $uid, %profile);
 	tie %user, 'Tie::CPHash';
 	$uid = $_[0] || 1;
 	%user = WebGUI::SQL->quickHash("select * from users where userId='$uid'", $_[1]);
 	if ($user{userId} eq "") {
 		%user = _getUserInfo("1",$_[1]);
 	}
+	%profile = WebGUI::SQL->buildHash("select userProfileField.fieldName, userProfileData.fieldData from userProfileData, userProfileField where userProfileData.fieldName=userProfileField.fieldName and userProfileData.userId=$user{userId}", $_[1]);
+	%user = (%user, %profile);
 	return %user;
 }
 
@@ -95,7 +98,10 @@ sub end {
 
 #-------------------------------------------------------------------
 sub httpHeader {
-        return $session{cgi}->header( -cookie => $session{header}{cookie});
+        return $session{cgi}->header( 
+		-cookie => $session{header}{cookie}, 
+		-status => $session{header}{status} 
+		);
 }
 
 #-------------------------------------------------------------------
@@ -149,8 +155,8 @@ sub open {
                 setting => \%SETTINGS,				# variables set by the administrator
                 cgi => $query,					# interface to the CGI environment
                 page => \%PAGE,					# variables related to the current page 
-                header => {},					# settings to be passed back through the http header
                 dbh => $dbh,					# interface to the default WebGUI database
+		header => $session{header}			# HTTP header modifiers
         );
 }
 

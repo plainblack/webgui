@@ -370,7 +370,8 @@ sub www_view {
 		if ($i >= ($itemsPerPage*$pn) && $i < ($itemsPerPage*($pn+1))) {
 			@last = WebGUI::SQL->quickArray("select messageId,dateOfPost,username,subject,userId from discussion where widgetId=$_[0] and rid=$data[0] order by dateOfPost desc");
 			$last[3] = WebGUI::HTML::filter($last[3],'all');
-			($replies) = WebGUI::SQL->quickArray("select count(*)-1 from discussion where rid=$data[0]");
+			($replies) = WebGUI::SQL->quickArray("select count(*) from discussion where rid=$data[0]");
+			$replies -= 1;
 			$html .= '<tr><td class="tableData"><a href="'.WebGUI::URL::page('func=showMessage&mid='.
 				$data[0].'&wid='.$_[0]).'">'.substr($data[1],0,30).
 				'</a></td><td class="tableData"><a href="'.

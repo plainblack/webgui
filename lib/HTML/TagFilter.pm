@@ -4,7 +4,7 @@ use warnings;
 use base qw(HTML::Parser);
 use vars qw($VERSION);
 
-$VERSION = '0.07';  # $Date: 2001/10/25 $
+$VERSION = '0.07';  # $Date$
 
 =head1 NAME
 

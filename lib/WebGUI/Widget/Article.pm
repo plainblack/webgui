@@ -68,7 +68,7 @@ sub duplicate {
 	WebGUI::SQL->write("insert into Article values ($newWidgetId, $data{startDate}, $data{endDate}, ".
 		quote($data{body}).", ".quote($data{image}).", ".quote($data{linkTitle}).", ".
 		quote($data{linkURL}).", ".quote($data{attachment}).", '$data{convertCarriageReturns}', ".
-		quote($data{alignImage}).", $data{allowDiscussion}, $data{groupToPost}, $data{groupToModerate}, $data{editTimeout})");
+		quote($data{alignImage}).", '$data{allowDiscussion}', $data{groupToPost}, $data{groupToModerate}, $data{editTimeout})");
 	WebGUI::Discussion::duplicate($_[0],$newWidgetId);
 }
 

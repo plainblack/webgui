@@ -18,6 +18,7 @@ use WebGUI::Operation::Help;
 use WebGUI::Operation::Image;
 use WebGUI::Operation::Package;
 use WebGUI::Operation::Page;
+use WebGUI::Operation::ProfileSettings;
 use WebGUI::Operation::Root;
 use WebGUI::Operation::Search;
 use WebGUI::Operation::Settings;

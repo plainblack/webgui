@@ -176,6 +176,10 @@ sub getIcon {
                 $icon .= "exe.gif";
         } elsif (isIn($extension, qw(sit hqx))) {
                 $icon .= "sit.gif";
+        } elsif (isIn($extension, qw(dwg dwf))) {
+                $icon .= "dwg.gif";
+        } elsif (isIn($extension, qw(indd p65))) {
+                $icon .= "indd.gif";
         } elsif (isIn($extension, qw(tgz gz tar Z))) {
                 $icon .= "gz.gif";
         } elsif ($extension eq "rar") {

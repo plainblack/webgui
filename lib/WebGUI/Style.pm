@@ -44,8 +44,7 @@ sub getStyle {
 				$session{page}{synopsis}.'">';
 		}
 		$header .= '</head>'.$style{header};
-		$footer = $style{footer}.'
-			</html>';
+		$footer = $style{footer}.' </html>';
 	}
 	$header = WebGUI::Macro::process($header);
 	$footer = WebGUI::Macro::process($footer);

@@ -42,5 +42,17 @@ sub get {
 	return $output;
 }
 
+#-------------------------------------------------------------------
+sub getLanguages {
+        my ($sth, %hash, @data);
+        tie %hash, "Tie::IxHash";
+        $sth = WebGUI::SQL->read("select distinct(language) from international");
+        while (@data = $sth->array) {
+                $hash{$data[0]} = $data[0];
+        }
+        $sth->finish;
+        return \%hash;
+}
+
 1;
 

@@ -15,6 +15,7 @@ use Exporter;
 use strict;
 use Time::Local;
 use WebGUI::International;
+use WebGUI::Session;
 
 our @ISA = qw(Exporter);
 our @EXPORT = qw(&addToTime &addToDate &epochToHuman &epochToSet &humanToEpoch &setToEpoch &monthStartEnd);
@@ -72,7 +73,7 @@ sub addToTime {
 
 #-------------------------------------------------------------------
 sub epochToHuman {
-	my ($hour12, $value, $output, @date, %weekday, %month);
+	my ($offset, $temp, $hour12, $value, $output, @date, %weekday, %month);
 
       #  0    1    2     3     4    5     6     7     8
 #      $sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) =
@@ -92,14 +93,23 @@ sub epochToHuman {
 #               `1..366' in leap years.)  $isdst is true if the
 #               specified time occurs during daylight savings
 #               time, false otherwise.
-
-	@date = localtime($_[0]);
+	$offset = $session{user}{timeOffset} || 0;
+	$offset = $offset*3600;
+	$temp = $_[0] || time();
+	$temp = $temp+$offset;
+	@date = localtime($temp);
 	$date[4]++; 		# offset the months starting from 0
 	$date[5] += 1900;	# original value is Year-1900
 	$date[6]++;		# offset for weekdays starting from 0
 	$output = $_[1];
   #---dealing with percent symbol
 	$output =~ s/\%\%/\%/g;
+  #---date format preference
+	$temp = $session{user}{dateFormat} || '%M/%D/%y';
+	$output =~ s/\%z/$temp/g;
+  #---time format preference
+	$temp = $session{user}{timeFormat} || '%H:%n %p';
+	$output =~ s/\%Z/$temp/g;
   #---year stuff
 	$output =~ s/\%y/$date[5]/g;
 	$value = substr($date[5],2,2);
@@ -124,6 +134,9 @@ sub epochToHuman {
 	$hour12 = $date[2];
 	if ($hour12 > 12) {
 		$hour12 = $hour12 - 12;
+		if ($hour12 == 0) {
+			$hour12 = 12;
+		}
 	}	
 	$value = sprintf("%02d",$hour12);
 	$output =~ s/\%h/$value/g;

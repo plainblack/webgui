@@ -48,17 +48,17 @@ sub gateway {
 
 #-------------------------------------------------------------------
 sub makeUnique {
-	my ($url, $test, $pageId);
-	$url = $_[0];
-	$pageId = $_[1] || "new";
-	while (($test) = WebGUI::SQL->quickArray("select urlizedTitle from page where urlizedTitle='$url' and pageId<>'$pageId'")) {
-		if ($url =~ /(.*)(\d+$)/) {
-			$url = $1.($2+1);
-		} elsif ($test ne "") {
-			$url .= "2";
-		}
-	}
-	return $url;      
+        my ($url, $test, $pageId);
+        $url = $_[0];
+        $pageId = $_[1] || "new";
+        while (($test) = WebGUI::SQL->quickArray("select urlizedTitle from page where urlizedTitle='$url' and pageId<>'$pageId'")) {
+                if ($url =~ /(.*)(\d+$)/) {
+                        $url = $1.($2+1);
+                } elsif ($test ne "") {
+                        $url .= "2";
+                }
+        }
+        return $url;
 }
 
 #-------------------------------------------------------------------

@@ -35,15 +35,16 @@ our @EXPORT = qw(&quote &getNextId);
  $sth = WebGUI::SQL->new($sql);
  $sth = WebGUI::SQL->read($sql);
  $sth = WebGUI::SQL->unconditionalRead($sql);
- $sth->array;
- $sth->getColumnNames;
- $sth->hash;
- $sth->hashRef;
- $sth->rows;
+ @arr = $sth->array;
+ @arr = $sth->getColumnNames;
+ %hash = $sth->hash;
+ $hashRef = $sth->hashRef;
+ $num = $sth->rows;
  $sth->finish;
 
  @arr = WebGUI::SQL->buildArray($sql);
  %hash = WebGUI::SQL->buildHash($sql);
+ $hashRef = WebGUI::SQL->buildHashRef($sql);
  @arr = WebGUI::SQL->quickArray($sql);
  %hash = WebGUI::SQL->quickHash($sql);
 
@@ -131,14 +132,36 @@ sub buildHash {
 	tie %hash, "Tie::IxHash";
         $sth = WebGUI::SQL->read($_[1],$_[2]);
         while (@data = $sth->array) {
-		if ($data[1] eq "") {
-			$hash{$data[0]} = $data[0];
-		} else {
-                	$hash{$data[0]} = $data[1];
-		}
+               	$hash{$data[0]} = $data[1];
         }
         $sth->finish;
 	return %hash;
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 buildHashRef ( sql [, dbh ] )
+
+ Builds a hash reference of data from a series of rows.
+
+=item sql
+
+ An SQL query. The query must select only two columns of data, the
+ first being the key for the hash, the second being the value.
+
+=item dbh
+
+ By default this method uses the WebGUI database handler. However,
+ you may choose to pass in your own if you wish.
+
+=cut
+
+sub buildHashRef {
+        my ($sth, %hash);
+        tie %hash, "Tie::IxHash";
+	%hash = $_[0]->buildHash($_[1],$_[2]);
+        return \%hash;
 }
 
 

@@ -32,7 +32,9 @@ if ($ARGV[0] eq "--help" || $ARGV[0] eq "/?" || $ARGV[0] eq "/help" || $ARGV[0] 
 
 print "\nWebGUI is checking your system environment:\n\n";
 
-my $os;
+my ($os, $prereq, $dbi);
+$prereq = 1;
+
 if ($^O =~ /Win/i) {
 	$os = "Microsoftish";
 } else {
@@ -73,6 +75,7 @@ if (eval { require LWP }) {
 		CPAN::Shell->install("LWP");
 	} else {
         	print "Please install.\n";
+		$prereq = 0;
 	}
 }
 
@@ -81,6 +84,7 @@ if (eval { require HTTP::Request }) {
         print "OK\n";
 } else {
         print "Please install LWP.\n";
+	$prereq = 0;
 }
 
 print "HTTP::Headers module.....................";
@@ -88,6 +92,7 @@ if (eval { require HTTP::Headers }) {
         print "OK\n";
 } else {
         print "Please install LWP.\n";
+	$prereq = 0;
 }
 
 print "Digest::MD5 module.......................";
@@ -99,10 +104,10 @@ if (eval { require Digest::MD5 }) {
                 CPAN::Shell->install("Digest::MD5");
         } else {
                 print "Please install.\n";
+		$prereq = 0;
         }
 }
 
-my $dbi;
 print "DBI module...............................";
 if (eval { require DBI }) {
 	print "OK\n";
@@ -113,6 +118,7 @@ if (eval { require DBI }) {
                 CPAN::Shell->install("DBI");
 		eval {require DBI};
 		$dbi = 1;
+		$prereq = 0;
         } else {
                 print "Please install.\n";
         }
@@ -123,6 +129,7 @@ if ($dbi) {
 	print join(", ",DBI->available_drivers);
 } else {
 	print "None";
+	$prereq = 0;
 }
 print "\n";
 
@@ -135,6 +142,7 @@ if (eval { require HTML::Parser }) {
                 CPAN::Shell->install("HTML::Parser");
         } else {
                 print "Please install.\n";
+		$prereq = 0;
         }
 }
 
@@ -147,6 +155,7 @@ if (eval { require Tie::IxHash }) {
                 CPAN::Shell->install("Tie::IxHash");
         } else {
                 print "Please install.\n";
+		$prereq = 0;
         }
 }
 
@@ -159,6 +168,7 @@ if (eval { require Tie::CPHash }) {
                 CPAN::Shell->install("Tie::CPHash");
         } else {
                 print "Please install.\n";
+		$prereq = 0;
         }
 }
 
@@ -171,6 +181,7 @@ if (eval { require Net::SMTP }) {
                 CPAN::Shell->install("Net::SMTP");
         } else {
                 print "Please install.\n";
+		$prereq = 0;
         }
 }
 
@@ -183,6 +194,7 @@ if (eval { require Net::LDAP }) {
                 CPAN::Shell->install("Net::LDAP");
         } else {
                 print "Please install.\n";
+		$prereq = 0;
         }
 }
 
@@ -195,6 +207,7 @@ if (eval { require Date::Calc }) {
                 CPAN::Shell->install("Date::Calc");
         } else {
                 print "Please install.\n";
+		$prereq = 0;
         }
 }
 
@@ -207,6 +220,7 @@ if (eval { require HTML::CalendarMonthSimple }) {
                 CPAN::Shell->install("HTML::CalendarMonthSimple");
         } else {
                 print "Please install.\n";
+		$prereq = 0;
         }
 }
 
@@ -219,29 +233,36 @@ if (eval { require Image::Magick }) {
                 CPAN::Shell->install("Image::Magick");
         } else {
                 print "Please install.\n";
+		$prereq = 0;
         }
 }
 
 # this is here to insure they installed correctly.
-print "WebGUI modules...........................";
-if (eval { require WebGUI } && eval { require WebGUI::SQL }) {
-        print "OK\n";
-} else {
-        print "Please install.\n";
-}
 
-print "Data::Config module......................";
-if (eval { require Data::Config }) {
-        print "OK\n";
-} else {
-        print "Please install.\n";
-}
+if ($prereq) {
+	print "WebGUI modules...........................";
+	if (eval { require WebGUI } && eval { require WebGUI::SQL }) {
+	        print "OK\n";
+	} else {
+	        print "Please install WebGUI.\n";
+	}
 
-print "HTML::TagFilter module...................";
-if (eval { require HTML::TagFilter }) {
-        print "OK\n";
+	print "Data::Config module......................";
+	if (eval { require Data::Config }) {
+	        print "OK\n";
+	} else {
+	        print "Please install WebGUI.\n";
+	}
+
+	print "HTML::TagFilter module...................";
+	if (eval { require HTML::TagFilter }) {
+	        print "OK\n";
+	} else {
+	        print "Please install WebGUI.\n";
+	}
 } else {
-        print "Please install.\n";
+	print "Cannot continue without prerequisites.\n";
+	exit;
 }
 
 ###################################

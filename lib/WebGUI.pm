@@ -1,5 +1,5 @@
 package WebGUI;
-our $VERSION = "3.6.5";
+our $VERSION = "3.7.0";
 
 #-------------------------------------------------------------------
 # WebGUI is Copyright 2001-2002 Plain Black Software.
@@ -73,6 +73,7 @@ sub _displayAdminBar {
 			'http://validator.w3.org/check?uri=http%3A%2F%2F'.$session{env}{SERVER_NAME}.
 				WebGUI::URL::page()=>WebGUI::International::get(399),
 			WebGUI::URL::page('op=listImages')=>WebGUI::International::get(394),
+			WebGUI::URL::page('op=viewPageTree')=>WebGUI::International::get(447),
 			%hash
 		);
 	}
@@ -145,12 +146,27 @@ sub _loadWidgets {
 
 #-------------------------------------------------------------------
 sub page {
-	my (%contentHash, $cmd, $pageEdit, $widgetPage, $widgetType, $functionOutput, @availableWidgets, @widgetList, $sth, $httpHeader, $header, $footer, $content, $operationOutput, $adminBar);
+	my ($debug, %contentHash, $cmd, $pageEdit, $widgetPage, $widgetType, $functionOutput, @availableWidgets, @widgetList, $sth, $httpHeader, $header, $footer, $content, $operationOutput, $adminBar);
 	WebGUI::Session::open($_[0],$_[1]);
 	# For some reason we have to pre-cache the templates when running under mod_perl
 	# so that's what we're doing with this next command.
 	WebGUI::Template::loadTemplates();
 	@availableWidgets = _loadWidgets();
+	if ($session{form}{debug}==1 && WebGUI::Privilege::isInGroup(3)) {
+		$debug = '<table bgcolor="#ffffff" style="color: #000000; font-size: 10pt; font-family: helvetica;">';
+		while (my ($section, $hash) = each %session) {
+			while (my ($key, $value) = each %$hash) {
+				if (ref $value eq 'ARRAY') {
+					$value = '['.join(', ',@$value).']';
+				} elsif (ref $value eq 'HASH') {
+					$value = '{'.join(', ',map {"$_ => $value->{$_}"} keys %$value).'}';
+				}
+				$debug .= '<tr><td align="right"><b>'.$section.'.'.$key.':</b></td><td>'.$value.'</td>';
+			}
+			$debug .= '<tr height=10><td>&nbsp;</td><td>&nbsp</td></tr>';
+		}
+		$debug .='</table>';
+	}
 	if (exists $session{form}{op}) {
 		$cmd = "WebGUI::Operation::www_".$session{form}{op};
 		$operationOutput = &$cmd();
@@ -213,7 +229,7 @@ sub page {
 		$httpHeader = WebGUI::Session::httpHeader();
 		($header, $footer) = WebGUI::Style::getStyle();
 		WebGUI::Session::close();
-		return $httpHeader.$adminBar.$header.$pageEdit.$content.$footer;
+		return $httpHeader.$adminBar.$header.$pageEdit.$content.$footer.$debug;
 	}
 }
 

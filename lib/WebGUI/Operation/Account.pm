@@ -17,7 +17,6 @@ use strict;
 use URI;
 use WebGUI::DateTime;
 use WebGUI::ErrorHandler;
-use WebGUI::Form;
 use WebGUI::International;
 use WebGUI::Mail;
 use WebGUI::Paginator;
@@ -26,11 +25,26 @@ use WebGUI::Session;
 use WebGUI::Shortcut;
 use WebGUI::SQL;
 use WebGUI::URL;
+use WebGUI::User;
 use WebGUI::Utility;
 
 our @ISA = qw(Exporter);
 our @EXPORT = qw(&www_viewMessageLog &www_viewProfile &www_editProfile &www_editProfileSave &www_createAccount &www_deactivateAccount &www_deactivateAccountConfirm &www_displayAccount &www_displayLogin &www_login &www_logout &www_recoverPassword &www_recoverPasswordFinish &www_createAccountSave &www_updateAccount);
-our %ldapStatusCode = ( 0=>'success (0)', 1=>'Operations Error (1)', 2=>'Protocol Error (2)', 3=>'Time Limit Exceeded (3)', 4=>'Size Limit Exceeded (4)', 5=>'Compare False (5)', 6=>'Compare True (6)', 7=>'Auth Method Not Supported (7)', 8=>'Strong Auth Required (8)', 9=>'Referral (10)', 11=>'Admin Limit Exceeded (11)', 12=>'Unavailable Critical Extension (12)', 13=>'Confidentiality Required (13)', 14=>'Sasl Bind In Progress (14)', 15=>'No Such Attribute (16)', 17=>'Undefined Attribute Type (17)', 18=>'Inappropriate Matching (18)', 19=>'Constraint Violation (19)', 20=>'Attribute Or Value Exists (20)', 21=>'Invalid Attribute Syntax (21)', 32=>'No Such Object (32)', 33=>'Alias Problem (33)', 34=>'Invalid DN Syntax (34)', 36=>'Alias Dereferencing Problem (36)', 48=>'Inappropriate Authentication (48)', 49=>'Invalid Credentials (49)', 50=>'Insufficient Access Rights (50)', 51=>'Busy (51)', 52=>'Unavailable (52)', 53=>'Unwilling To Perform (53)', 54=>'Loop Detect (54)', 64=>'Naming Violation (64)', 65=>'Object Class Violation (65)', 66=>'Not Allowed On Non Leaf (66)', 67=>'Not Allowed On RDN (67)', 68=>'Entry Already Exists (68)', 69=>'Object Class Mods Prohibited (69)', 71=>'Affects Multiple DSAs (71)', 80=>'other (80)');
+our %ldapStatusCode = ( 0=>'success (0)', 1=>'Operations Error (1)', 2=>'Protocol Error (2)',
+        3=>'Time Limit Exceeded (3)', 4=>'Size Limit Exceeded (4)', 5=>'Compare False (5)',
+        6=>'Compare True (6)', 7=>'Auth Method Not Supported (7)', 8=>'Strong Auth Required (8)',
+        9=>'Referral (10)', 11=>'Admin Limit Exceeded (11)', 12=>'Unavailable Critical Extension (12)',
+        13=>'Confidentiality Required (13)', 14=>'Sasl Bind In Progress (14)',
+        15=>'No Such Attribute (16)', 17=>'Undefined Attribute Type (17)',
+        18=>'Inappropriate Matching (18)', 19=>'Constraint Violation (19)',
+        20=>'Attribute Or Value Exists (20)', 21=>'Invalid Attribute Syntax (21)', 32=>'No Such Object (32)',
+        33=>'Alias Problem (33)', 34=>'Invalid DN Syntax (34)', 36=>'Alias Dereferencing Problem (36)',
+        48=>'Inappropriate Authentication (48)', 49=>'Invalid Credentials (49)',
+        50=>'Insufficient Access Rights (50)', 51=>'Busy (51)', 52=>'Unavailable (52)',
+        53=>'Unwilling To Perform (53)', 54=>'Loop Detect (54)', 64=>'Naming Violation (64)',
+        65=>'Object Class Violation (65)', 66=>'Not Allowed On Non Leaf (66)', 67=>'Not Allowed On RDN (67)',
+        68=>'Entry Already Exists (68)', 69=>'Object Class Mods Prohibited (69)',
+        71=>'Affects Multiple DSAs (71)', 80=>'other (80)');
 
 #-------------------------------------------------------------------
 sub _accountOptions {
@@ -83,42 +97,85 @@ sub _logLogin {
 }
 
 #-------------------------------------------------------------------
+sub _validateProfileData {
+	my (%data, $error, $a, %field);
+	tie %field, 'Tie::CPHash';
+        $a = WebGUI::SQL->read("select * from userProfileField");
+        while (%field = $a->hash) {
+		if ($field{fieldType} eq "date") {
+			$session{form}{$field{fieldName}} = setToEpoch($session{form}{$field{fieldName}});
+		}
+		$data{$field{fieldName}} = $session{form}{$field{fieldName}} if (exists $session{form}{$field{fieldName}});
+		if ($field{required} && $session{form}{$field{fieldName}} eq "") {
+			$error .= '<li>';
+			$error .= eval $field{fieldLabel};
+			$error .= ' '.WebGUI::International::get(451);
+		}
+        }
+        $a->finish;
+	return (\%data, $error);
+}
+
+#-------------------------------------------------------------------
 sub www_createAccount {
-	my ($output, %language, @array);
+	my ($output, %language, @array, 
+        	$previousCategory, $category, $f, $a, %data, $default, $label, $values, $method);
+        tie %data, 'Tie::CPHash';
 	if ($session{user}{userId} != 1) {
                 $output .= www_displayAccount();
-	} elsif ($session{setting}{anonymousRegistration} eq "no") {
+	} elsif (!$session{setting}{anonymousRegistration}) {
 		$output .= www_displayLogin();
         } else {
 		$output .= '<h1>'.WebGUI::International::get(54).'</h1>';
-		$output .= formHeader();
-		$output .= WebGUI::Form::hidden("op","createAccountSave");
-		$output .= '<table>';
-		unless ($session{setting}{authMethod} eq "LDAP" && $session{setting}{usernameBinding} eq "yes") {
-			$output .= tableFormRow(WebGUI::International::get(50),WebGUI::Form::text("username",20,35));
+        	$f = WebGUI::HTMLForm->new();
+		$f->hidden("op","createAccountSave");
+		unless ($session{setting}{authMethod} eq "LDAP" && $session{setting}{usernameBinding}) {
+			$f->text("username",WebGUI::International::get(50),$session{form}{username});
 		}
 		if ($session{setting}{authMethod} eq "LDAP") {
-			$output .= WebGUI::Form::hidden("identifier1","ldap-password");
-			$output .= WebGUI::Form::hidden("identifier2","ldap-password");
-			$output .= tableFormRow($session{setting}{ldapIdName},WebGUI::Form::text("ldapId",20,100));
-			$output .= tableFormRow($session{setting}{ldapPasswordName},
-				WebGUI::Form::password("ldapPassword",20,100));
+			$f->hidden("identifier1","ldap-password");
+			$f->hidden("identifier2","ldap-password");
+			$f->text("ldapId",$session{setting}{ldapIdName});
+			$f->password("ldapPassword",$session{setting}{ldapPasswordName});
 		} else {
-			$output .= tableFormRow(WebGUI::International::get(51),
-				WebGUI::Form::password("identifier1",20,35));
-			$output .= tableFormRow(WebGUI::International::get(55),
-				WebGUI::Form::password("identifier2",20,35));
+			$f->password("identifier1",WebGUI::International::get(51));
+			$f->password("identifier2",WebGUI::International::get(55));
 		}
-		$output .= tableFormRow(WebGUI::International::get(56),
-			WebGUI::Form::text("email",20,255).'<span class="formSubtext"><br>'.
-			WebGUI::International::get(57).'</span>');
-		%language = WebGUI::SQL->buildHash("select distinct(language) from international");
-		$array[0] = "English";
-		$output .= tableFormRow(WebGUI::International::get(304),
-			WebGUI::Form::selectList("language",\%language,\@array));
-		$output .= formSave();
-		$output .= '</table>';
-		$output .= '</form> ';
+        	$a = WebGUI::SQL->read("select * from userProfileField,userProfileCategory 
+			where userProfileField.profileCategoryId=userProfileCategory.profileCategoryId 
+			order by userProfileCategory.sequenceNumber,userProfileField.sequenceNumber");
+        	while(%data = $a->hash) {
+                	if ($data{required}) {
+                        	$category = eval $data{categoryName};
+                        	if ($category ne $previousCategory) {
+                                	#$f->raw('<tr><td colspan="2" class="tableHeader">'.$category.'</td></tr>');
+                        	}
+                        	$values = eval $data{dataValues};
+                        	$method = $data{dataType};
+                        	$label = eval $data{fieldLabel};
+                        	if ($method eq "select") {
+                                        # note: this big if statement doesn't look elegant, but doing regular
+                                        # ORs caused problems with the array reference.
+                                        if ($session{form}{$data{fieldName}}) {
+                                                $default = [$session{form}{$data{fieldName}}];
+                                        } elsif ($session{user}{$data{fieldName}}) {
+                                                $default = [$session{user}{$data{fieldName}}];
+                                        } else {
+                                                $default = eval $data{dataDefault};
+                                        }
+                                	$f->select($data{fieldName},$values,$label,$default);
+                        	} else {
+                                	$default = $session{form}{$data{fieldName}} 
+						|| $session{user}{$data{fieldName}} 
+						|| eval $data{dataDefault};
+                                	$f->$method($data{fieldName},$label,$default);
+                        	}
+                        	$previousCategory = $category;
+                	}
+       		}
+        	$a->finish;
+		$f->submit;
+		$output .= $f->print;
 		$output .= '<div class="accountOptions"><ul>';
 		$output .= '<li><a href="'.WebGUI::URL::page('op=displayLogin').'">'.
 			WebGUI::International::get(58).'</a>';
@@ -133,21 +190,22 @@ sub www_createAccount {
 
 #-------------------------------------------------------------------
 sub www_createAccountSave {
-        my ($username, $uri, $ldap, $port, %args, $search, $connectDN, $auth, $output, $error, $uid, $registeredUserExpire, $encryptedPassword);
-        if ($session{setting}{authMethod} eq "LDAP" && $session{setting}{usernameBinding} eq "yes") {
+        my ($profile, $u, $username, $uri, $temp, $ldap, $port, %args, $search, 
+		$connectDN, $auth, $output, $error, $uid,  
+		$encryptedPassword, $fieldName);
+        if ($session{setting}{authMethod} eq "LDAP" && $session{setting}{usernameBinding}) {
                 $username = $session{form}{ldapId};
         } else {
                 $username = $session{form}{username};
         }
         if (_hasBadUsername($username)) {
-                $error = WebGUI::International::get(77);
+                $error = '<li>'.WebGUI::International::get(77);
                 $error .= ' "'.$username.'too", ';
                 $error .= '"'.$username.'2", ';
                 $error .= '"'.$username.'_'.WebGUI::DateTime::epochToHuman(time(),"%y").'"';
-                $error .= '<p>';
         }
         if (_hasBadPassword($session{form}{identifier1},$session{form}{identifier2})) {
-                $error .= WebGUI::International::get(78);
+                $error .= '<li>'.WebGUI::International::get(78);
         }
         if ($session{setting}{authMethod} eq "LDAP") {
                 $uri = URI->new($session{setting}{ldapURL});
@@ -166,26 +224,34 @@ sub www_createAccountSave {
                         $ldap = Net::LDAP->new($uri->host, %args) or $error .= WebGUI::International::get(79);
                         $auth = $ldap->bind(dn=>$connectDN, password=>$session{form}{ldapPassword});
                         if ($auth->code == 48 || $auth->code == 49) {
-                                $error .= WebGUI::International::get(68);
+                                $error .= '<li>'.WebGUI::International::get(68);
                                 WebGUI::ErrorHandler::warn("Invalid LDAP information for registration of LDAP ID: ".$session{form}{ldapId});
                         } elsif ($auth->code > 0) {
-                                $error .= 'LDAP error "'.$ldapStatusCode{$auth->code}.'" occured. '.WebGUI::International::get(69);
+                                $error .= '<li>LDAP error "'.$ldapStatusCode{$auth->code}.'" occured. '.WebGUI::International::get(69);
                                 WebGUI::ErrorHandler::warn("LDAP error: ".$ldapStatusCode{$auth->code});
                         }
                         $ldap->unbind;
                 } else {
-                        $error .= WebGUI::International::get(68);
+                        $error .= '<li>'.WebGUI::International::get(68);
                         WebGUI::ErrorHandler::warn("Invalid LDAP information for registration of LDAP ID: ".$session{form}{ldapId});
                 }
         }
+	($profile, $temp) = _validateProfileData();
+	$error .= $temp;
         if ($error eq "") {
                 $encryptedPassword = Digest::MD5::md5_base64($session{form}{identifier1});
-                $uid = getNextId("userId");
-                WebGUI::SQL->write("insert into users (userId,username,identifier,email,authMethod,ldapURL,connectDN,language) values ($uid, ".quote($username).", ".quote($encryptedPassword).", ".quote($session{form}{email}).", ".quote($session{setting}{authMethod}).", ".quote($session{setting}{ldapURL}).", ".quote($connectDN).", ".quote($session{form}{language}).")");
-		($registeredUserExpire) = WebGUI::SQL->quickArray("select expireAfter from groups where groupId=2");
-                WebGUI::SQL->write("insert into groupings values (2,$uid,".(time()+$registeredUserExpire).")");
-                WebGUI::Session::start($uid);
-		_logLogin($uid,"success");
+		$u = WebGUI::User->new("new");
+		$u->username($username);
+		$u->identifier($encryptedPassword);
+		$u->authMethod($session{setting}{authMethod});
+		$u->ldapURL($session{setting}{ldapURL});
+		$u->connectDN($connectDN);
+		foreach $fieldName (keys %{$profile}) {
+			$u->profileField($fieldName,${$profile}{$fieldName});
+		}
+		$u->addToGroups([2]);
+                WebGUI::Session::start($u->userId);
+		_logLogin($u->userId,"success");
         } else {
                 $output = "<h1>".WebGUI::International::get(70)."</h1>".$error.www_createAccount();
         }
@@ -209,9 +275,10 @@ sub www_deactivateAccount {
 
 #-------------------------------------------------------------------
 sub www_deactivateAccountConfirm {
+	my ($u);
         if ($session{user}{userId} != 1) {
-                WebGUI::SQL->write("delete from users where userId=$session{user}{userId}");
-                WebGUI::SQL->write("delete from groupings where userId=$session{user}{userId}");
+		$u = WebGUI::User->new($session{user}{userId});
+		$u->delete;
 	        WebGUI::Session::end($session{var}{sessionId});
         }
         return www_displayLogin();
@@ -219,38 +286,26 @@ sub www_deactivateAccountConfirm {
 
 #-------------------------------------------------------------------
 sub www_displayAccount {
-        my ($output, %hash, @array);
+        my ($output, %hash, @array, $f);
 	if ($session{user}{userId} != 1) {
         	$output .= '<h1>'.WebGUI::International::get(61).'</h1>';
-		$output .= formHeader();
-        	$output .= WebGUI::Form::hidden("op","updateAccount");
-        	$output .= '<table>';
-		if ($session{user}{authMethod} eq "LDAP" && $session{setting}{usernameBinding} eq "yes") {
-			$output .= WebGUI::Form::hidden("username",$session{user}{username});
-        		$output .= tableFormRow(WebGUI::International::get(50),$session{user}{username});
+		$f = WebGUI::HTMLForm->new;
+        	$f->hidden("op","updateAccount");
+		if ($session{user}{authMethod} eq "LDAP" && $session{setting}{usernameBinding}) {
+			$f->hidden("username",$session{user}{username});
+        		$f->readOnly($session{user}{username},WebGUI::International::get(50));
 		} else {
-        		$output .= tableFormRow(WebGUI::International::get(50),
-				WebGUI::Form::text("username",20,35,$session{user}{username}));
+        		$f->text("username",WebGUI::International::get(50),$session{user}{username});
 		}
 		if ($session{user}{authMethod} eq "LDAP") {
-        		$output .= WebGUI::Form::hidden("identifier1","password");
-        		$output .= WebGUI::Form::hidden("identifier2","password");
+        		$f->hidden("identifier1","password");
+        		$f->hidden("identifier2","password");
 		} else {
-        		$output .= tableFormRow(WebGUI::International::get(51),
-				WebGUI::Form::password("identifier1",20,35,"password"));
-        		$output .= tableFormRow(WebGUI::International::get(55),
-				WebGUI::Form::password("identifier2",20,35,"password"));
+        		$f->password("identifier1",WebGUI::International::get(51),"password");
+        		$f->password("identifier2",WebGUI::International::get(55),"password");
 		}
-        	$output .= tableFormRow(WebGUI::International::get(56),
-			WebGUI::Form::text("email",20,255,$session{user}{email}).
-			'<span class="formSubtext"><br>'.WebGUI::International::get(57).'</span>');
-		%hash = WebGUI::SQL->buildHash("select distinct(language) from international");
-		$array[0] = $session{user}{language};
-        	$output .= tableFormRow(WebGUI::International::get(304),
-			WebGUI::Form::selectList("language",\%hash,\@array));
-		$output .= formSave();
-        	$output .= '</table>';
-        	$output .= '</form> ';
+		$f->submit;
+		$output .= $f->print;
 		$output .= _accountOptions();
         } else {
                 $output .= www_displayLogin();
@@ -260,23 +315,19 @@ sub www_displayAccount {
 
 #-------------------------------------------------------------------
 sub www_displayLogin {
-	my ($output);
+	my ($output, $f);
 	if ($session{var}{sessionId}) {
 		$output .= www_displayAccount();
 	} else {
         	$output .= '<h1>'.WebGUI::International::get(66).'</h1>';
-		$output .= formHeader();
-		$output .= WebGUI::Form::hidden("op","login");
-		$output .= '<table>';
-        	$output .= tableFormRow(WebGUI::International::get(50),
-			WebGUI::Form::text("username",20,35));
-        	$output .= tableFormRow(WebGUI::International::get(51),
-			WebGUI::Form::password("identifier",20,35));
-		$output .= '<tr><td></td><td>'.WebGUI::Form::submit(WebGUI::International::get(52)).'</td></tr>';
-		$output .= '</table>';
-		$output .= '</form>';
+		$f = WebGUI::HTMLForm->new;
+		$f->hidden("op","login");
+        	$f->text("username",WebGUI::International::get(50));
+        	$f->password("identifier",WebGUI::International::get(51));
+		$f->submit(WebGUI::International::get(52));
+		$output .= $f->print;
 		$output .= '<div class="accountOptions"><ul>';
-		if ($session{setting}{anonymousRegistration} eq "yes") {
+		if ($session{setting}{anonymousRegistration}) {
 			$output .= '<li><a href="'.WebGUI::URL::page('op=createAccount').'">'.
 				WebGUI::International::get(67).'</a>';
 		}
@@ -291,76 +342,52 @@ sub www_displayLogin {
 
 #-------------------------------------------------------------------
 sub www_editProfile {
-	my ($output, %gender, @array);
-	%gender = ('neuter'=>WebGUI::International::get(403),'male'=>WebGUI::International::get(339),'female'=>WebGUI::International::get(340));
+	my ($output, $f, $a, %data, $method, $values, $category, $label, $default, $previousCategory, $subtext);
         if ($session{user}{userId} != 1) {
                	$output .= '<h1>'.WebGUI::International::get(338).'</h1>';
-                $output .= formHeader();
-                $output .= WebGUI::Form::hidden("op","editProfileSave");
-                $output .= WebGUI::Form::hidden("uid",$session{user}{userId});
-                $output .= '<table>';
-		if ($session{setting}{profileName}) {
-			$output .= tableFormRow(WebGUI::International::get(314),
-				WebGUI::Form::text("firstName",20,50,$session{user}{firstName}));
-                	$output .= tableFormRow(WebGUI::International::get(315),
-				WebGUI::Form::text("middleName",20,50,$session{user}{middleName}));
-                	$output .= tableFormRow(WebGUI::International::get(316),
-				WebGUI::Form::text("lastName",20,50,$session{user}{lastName}));
-		}
-		if ($session{setting}{profileExtraContact}) {
-                	$output .= tableFormRow(WebGUI::International::get(317),
-				WebGUI::Form::text("icq",20,30,$session{user}{icq}));
-                	$output .= tableFormRow(WebGUI::International::get(318),
-				WebGUI::Form::text("aim",20,30,$session{user}{aim}));
-                	$output .= tableFormRow(WebGUI::International::get(319),
-				WebGUI::Form::text("msnIM",20,30,$session{user}{msnIM}));
-                	$output .= tableFormRow(WebGUI::International::get(320),
-				WebGUI::Form::text("yahooIM",20,30,$session{user}{yahooIM}));
-                	$output .= tableFormRow(WebGUI::International::get(321),
-				WebGUI::Form::text("cellPhone",20,30,$session{user}{cellPhone}));
-                	$output .= tableFormRow(WebGUI::International::get(322),
-				WebGUI::Form::text("pager",20,30,$session{user}{pager}));
-		}
-		if ($session{setting}{profileHome}) {
-                	$output .= tableFormRow(WebGUI::International::get(323),
-				WebGUI::Form::text("homeAddress",20,128,$session{user}{homeAddress}));
-                	$output .= tableFormRow(WebGUI::International::get(324),
-				WebGUI::Form::text("homeCity",20,30,$session{user}{homeCity}));
-                	$output .= tableFormRow(WebGUI::International::get(325),
-				WebGUI::Form::text("homeState",20,30,$session{user}{homeState}));
-                	$output .= tableFormRow(WebGUI::International::get(326),
-				WebGUI::Form::text("homeZip",20,15,$session{user}{homeZip}));
-                	$output .= tableFormRow(WebGUI::International::get(327),
-				WebGUI::Form::text("homeCountry",20,30,$session{user}{homeCountry}));
-                	$output .= tableFormRow(WebGUI::International::get(328),
-				WebGUI::Form::text("homePhone",20,30,$session{user}{homePhone}));
-		}
-		if ($session{setting}{profileWork}) {
-                	$output .= tableFormRow(WebGUI::International::get(329),
-				WebGUI::Form::text("workAddress",20,128,$session{user}{workAddress}));
-                	$output .= tableFormRow(WebGUI::International::get(330),
-				WebGUI::Form::text("workCity",20,30,$session{user}{workCity}));
-                	$output .= tableFormRow(WebGUI::International::get(331),
-				WebGUI::Form::text("workState",20,30,$session{user}{workState}));
-                	$output .= tableFormRow(WebGUI::International::get(332),
-				WebGUI::Form::text("workZip",20,15,$session{user}{workZip}));
-			$output .= tableFormRow(WebGUI::International::get(333),
-				WebGUI::Form::text("workCountry",20,30,$session{user}{workCountry}));
-                	$output .= tableFormRow(WebGUI::International::get(334),
-				WebGUI::Form::text("workPhone",20,30,$session{user}{workPhone}));
-		}
-		if ($session{setting}{profileMisc}) {
-			$array[0] = $session{user}{gender};
-                	$output .= tableFormRow(WebGUI::International::get(335),
-				WebGUI::Form::selectList("gender",\%gender,\@array));
-                	$output .= tableFormRow(WebGUI::International::get(336),
-				WebGUI::Form::text("birthdate",20,30,$session{user}{birthdate}));
-                	$output .= tableFormRow(WebGUI::International::get(337),
-				WebGUI::Form::text("homepage",20,2048,$session{user}{homepage}));
-		}
-                $output .= formSave();
-                $output .= '</table>';
-                $output .= '</form>';
+		$f = WebGUI::HTMLForm->new;
+                $f->hidden("op","editProfileSave");
+                $f->hidden("uid",$session{user}{userId});
+                $a = WebGUI::SQL->read("select * from userProfileField,userProfileCategory
+                        where userProfileField.profileCategoryId=userProfileCategory.profileCategoryId
+                        order by userProfileCategory.sequenceNumber,userProfileField.sequenceNumber");
+                while(%data = $a->hash) {
+                        if ($data{visible}) {
+                                $category = eval $data{categoryName};
+                                if ($category ne $previousCategory) {
+                                        $f->raw('<tr><td colspan="2" class="tableHeader">'.$category.'</td></tr>');
+                                }
+                                $values = eval $data{dataValues};
+                                $method = $data{dataType};
+                                $label = eval $data{fieldLabel};
+				if ($data{required}) {
+					$subtext = "*";
+				} else {
+					$subtext = "";
+				}
+                                if ($method eq "select") {
+                                        # note: this big if statement doesn't look elegant, but doing regular
+					# ORs caused problems with the array reference.
+					if ($session{form}{$data{fieldName}}) {
+						$default = [$session{form}{$data{fieldName}}];
+					} elsif ($session{user}{$data{fieldName}}) {
+						$default = [$session{user}{$data{fieldName}}];
+					} else {
+						$default = eval $data{dataDefault};
+					}
+                                        $f->select($data{fieldName},$values,$label,$default,'','','',$subtext);
+                                } else {
+                                        $default = $session{form}{$data{fieldName}}
+                                                || $session{user}{$data{fieldName}}
+                                                || eval $data{dataDefault};
+                                        $f->$method($data{fieldName},$label,$default,'','',$subtext);
+                                }
+                                $previousCategory = $category;
+                        }
+                }
+                $a->finish;
+		$f->submit;
+		$output .= $f->print;
                 $output .= _accountOptions();
         } else {
                 $output .= www_displayLogin();
@@ -370,9 +397,18 @@ sub www_editProfile {
 
 #-------------------------------------------------------------------
 sub www_editProfileSave {
+	my ($profile, $fieldName, $error, $u);
         if ($session{user}{userId} != 1) {
-		WebGUI::SQL->write("update users set firstName=".quote($session{form}{firstName}).", middleName=".quote($session{form}{middleName}).", lastName=".quote($session{form}{lastName}).", icq=".quote($session{form}{icq}).", aim=".quote($session{form}{aim}).", msnIM=".quote($session{form}{msnIM}).", yahooIM=".quote($session{form}{yahooIM}).", homeAddress=".quote($session{form}{homeAddress}).", homeCity=".quote($session{form}{homeCity}).", homeState=".quote($session{form}{homeState}).", homeZip=".quote($session{form}{homeZip}).", homeCountry=".quote($session{form}{homeCountry}).", homePhone=".quote($session{form}{homePhone}).", workAddress=".quote($session{form}{workAddress}).", workCity=".quote($session{form}{workCity}).", workState=".quote($session{form}{workState}).", workZip=".quote($session{form}{workZip}).", workCountry=".quote($session{form}{workCountry}).", workPhone=".quote($session{form}{workPhone}).", cellPhone=".quote($session{form}{cellPhone}).", pager=".quote($session{form}{pager}).", gender=".quote($session{form}{gender}).", birthdate=".quote($session{form}{birthdate}).", homepage=".quote($session{form}{homepage})." where userId=".$session{form}{uid});
-		return www_displayAccount();
+		($profile, $error) = _validateProfileData();
+        	if ($error eq "") {
+			$u = WebGUI::User->new($session{user}{userId});
+                	foreach $fieldName (keys %{$profile}) {
+                        	$u->profileField($fieldName,${$profile}{$fieldName});
+			}
+			return www_displayAccount();
+                } else {
+			return '<ul>'.$error.'</ul>'.www_editProfile();	
+		}
 	} else {
 		return www_displayLogin();
 	}
@@ -380,10 +416,11 @@ sub www_editProfileSave {
 
 #-------------------------------------------------------------------
 sub www_login {
-	my ($uri, $port, $ldap, %args, $auth, $error, $uid,$pass,$authMethod, $ldapURL, $connectDN, $success);
-	($uid,$pass,$authMethod, $ldapURL, $connectDN) = WebGUI::SQL->quickArray("select userId,identifier,authMethod,ldapURL,connectDN from users where username=".quote($session{form}{username}));
-	if ($authMethod eq "LDAP") {
-                $uri = URI->new($ldapURL);
+	my ($uri, $port, $ldap, %args, $auth, $error, $uid, $success, $u);
+	($uid) = WebGUI::SQL->quickArray("select userId from users where username=".quote($session{form}{username}));
+	$u = WebGUI::User->new($uid);
+	if ($u->authMethod eq "LDAP") {
+                $uri = URI->new($u->ldapURL);
                 if ($uri->port < 1) {
                         $port = 389;
                 } else {
@@ -391,7 +428,7 @@ sub www_login {
                 }
                 %args = (port => $port);
                 $ldap = Net::LDAP->new($uri->host, %args) or $error = WebGUI::International::get(79);
-                $auth = $ldap->bind(dn=>$connectDN, password=>$session{form}{identifier});
+                $auth = $ldap->bind(dn=>$u->connectDN, password=>$session{form}{identifier});
                 if ($auth->code == 48 || $auth->code == 49) {
 			$error = WebGUI::International::get(68);
 			WebGUI::ErrorHandler::warn("Invalid login for user account: ".$session{form}{username});
@@ -406,7 +443,7 @@ sub www_login {
 		}
                 $ldap->unbind;
 	} else {
-		if (Digest::MD5::md5_base64($session{form}{identifier}) eq $pass && $session{form}{identifier} ne "") {
+		if (Digest::MD5::md5_base64($session{form}{identifier}) eq $u->identifier && $session{form}{identifier} ne "") {
 			$success = 1;
 		} else {
 			$error = WebGUI::International::get(68);
@@ -431,20 +468,18 @@ sub www_logout {
 
 #-------------------------------------------------------------------
 sub www_recoverPassword {
-	my ($output);
+	my ($output, $f);
         if ($session{var}{sessionId}) {
                 $output .= www_displayAccount();
         } else {
                 $output .= '<h1>'.WebGUI::International::get(71).'</h1>';
-		$output .= formHeader();
-                $output .= WebGUI::Form::hidden("op","recoverPasswordFinish");
-                $output .= '<table>';
-                $output .= tableFormRow(WebGUI::International::get(56),WebGUI::Form::text("email",20,255));
-                $output .= '<tr><td></td><td>'.WebGUI::Form::submit(WebGUI::International::get(72)).'</td></tr>';
-                $output .= '</table>';
-                $output .= '</form>';
+		$f = WebGUI::HTMLForm->new;
+                $f->hidden("op","recoverPasswordFinish");
+                $f->email("email",WebGUI::International::get(56));
+                $f->submit(WebGUI::International::get(72));
+		$output .= $f->print;
                 $output .= '<div class="accountOptions"><ul>';
-		if ($session{setting}{anonymousRegistration} eq "yes") {
+		if ($session{setting}{anonymousRegistration}) {
 			$output .= '<li><a href="'.WebGUI::URL::page('op=createAccount').'">'.
 				WebGUI::International::get(67).'</a>';
 		}
@@ -458,7 +493,9 @@ sub www_recoverPassword {
 #-------------------------------------------------------------------
 sub www_recoverPasswordFinish {
 	my ($sth, $username, $encryptedPassword, $userId, $password, $flag, $message, $output);
-	$sth = WebGUI::SQL->read("select username, userId from users where email=".quote($session{form}{email}));
+	$sth = WebGUI::SQL->read("select users.username, users.userId from users, userProfileData 
+		where users.userId=userProfileData.userId and userProfileData.fieldName='email' 
+		and fieldData=".quote($session{form}{email}));
 	while (($username,$userId) = $sth->array) {
 	        foreach (0,1,2,3,4,5) {
         	        $password .= chr(ord('A') + randint(32));
@@ -484,7 +521,7 @@ sub www_recoverPasswordFinish {
 
 #-------------------------------------------------------------------
 sub www_updateAccount {
-        my ($output, $error, $encryptedPassword, $passwordStatement);
+        my ($output, $error, $encryptedPassword, $passwordStatement, $u);
         if ($session{var}{sessionId}) {
         	if (_hasBadUsername($session{form}{username})) {
                 	$error = WebGUI::International::get(77);
@@ -502,14 +539,15 @@ sub www_updateAccount {
 			}
 		}
         	if ($error eq "") {
+			$u = WebGUI::User->new($session{user}{userId});
                 	$encryptedPassword = Digest::MD5::md5_base64($session{form}{identifier1});
-                	WebGUI::SQL->write("update users set username=".quote($session{form}{username}).$passwordStatement.", email=".quote($session{form}{email}).", language=".quote($session{form}{language})." where userId=".$session{user}{userId});
+			$u->identifier($encryptedPassword);
+			$u->username($session{form}{username});
                 	$output .= WebGUI::International::get(81).'<p>';
-                	$output .= www_displayAccount();
         	} else {
                 	$output = $error;
-                	$output .= www_createAccount();
         	}
+                $output .= www_displayAccount();
 	} else {
 		$output .= www_displayLogin();
 	}
@@ -555,69 +593,35 @@ sub www_viewMessageLog {
 
 #-------------------------------------------------------------------
 sub www_viewProfile {
-        my ($output, %user, %gender);
+        my ($a, %data, $category, $label, $value, $previousCategory, $output, $u, %gender);
 	%gender = ('neuter'=>WebGUI::International::get(403),'male'=>WebGUI::International::get(339),'female'=>WebGUI::International::get(340));
-	%user = WebGUI::SQL->quickHash("select * from users where userId='$session{form}{uid}'");
-	if ($user{username} eq "") {
+	$u = WebGUI::User->new($session{form}{uid});
+	if ($u->username eq "") {
 		WebGUI::Privilege::notMember();
         } elsif ($session{user}{userId} != 1) {
-                $output .= '<h1>'.WebGUI::International::get(347).' '.$user{username}.'</h1>';
+                $output .= '<h1>'.WebGUI::International::get(347).' '.$u->username.'</h1>';
                 $output .= '<table>';
-		if ($user{email} ne "") {
-                	$output .= '<tr><td class="tableHeader" valign="top">'.WebGUI::International::get(56).'</td><td class="tableData"><a href="mailto:'.$user{email}.'">'.$user{email}.'</a></td></tr>';
-		}
-                if ($session{setting}{profileName}) {
-			if ($user{firstName} ne "") {
-                        	$output .= '<tr><td class="tableHeader" valign="top">'.WebGUI::International::get(348).'</td><td class="tableData">'.$user{firstName}.' '.$user{middleName}.' '.$user{lastName}.'</td></tr>';
+                $a = WebGUI::SQL->read("select * from userProfileField,userProfileCategory
+                        where userProfileField.profileCategoryId=userProfileCategory.profileCategoryId
+			and userProfileCategory.profileCategoryId<>4
+			and userProfileField.visible=1
+                        order by userProfileCategory.sequenceNumber,userProfileField.sequenceNumber");
+                while (%data = $a->hash) {
+                	$category = eval $data{categoryName};
+                        if ($category ne $previousCategory) {
+                        	$output .= '<tr><td colspan="2" class="tableHeader">'.$category.'</td></tr>';
+                        }
+                        $label = eval $data{fieldLabel};
+			if ($data{dataValues}) {
+				$value = eval $data{dataValues};
+				$value = ${$value}{$u->profileField($data{fieldName})};
+			} else {
+				$value = $u->profileField($data{fieldName});
 			}
+			$output .= '<tr><td class="tableHeader">'.$label.'</td><td class="tableData">'.$value.'</td></tr>';
+                        $previousCategory = $category;
                 }
-                if ($session{setting}{profileExtraContact}) {
-			if ($user{icq} ne "") {
-                        	$output .= '<tr><td class="tableHeader" valign="top">'.WebGUI::International::get(317).'</td><td class="tableData">'.$user{icq}.'</td></tr>';
-			}
-			if ($user{aim} ne "") {
-                        	$output .= '<tr><td class="tableHeader" valign="top">'.WebGUI::International::get(318).'</td><td class="tableData">'.$user{aim}.'</td></tr>';
-			}
-			if ($user{msnIM} ne "") {
-                        	$output .= '<tr><td class="tableHeader" valign="top">'.WebGUI::International::get(319).'</td><td class="tableData">'.$user{msnIM}.'</td></tr>';
-			}
-			if ($user{yahooIM} ne "") {
-                        	$output .= '<tr><td class="tableHeader" valign="top">'.WebGUI::International::get(320).'</td><td class="tableData">'.$user{yahooIM}.'</td></tr>';
-			}
-			if ($user{cellPhone} ne "") {
-                        	$output .= '<tr><td class="tableHeader" valign="top">'.WebGUI::International::get(321).'</td><td class="tableData">'.$user{cellPhone}.'</td></tr>';
-			}
-			if ($user{pager} ne "") {
-                        	$output .= '<tr><td class="tableHeader" valign="top">'.WebGUI::International::get(322).'</td><td class="tableData">'.$user{pager}.'</td></tr>';
-			}
-                }
-                if ($session{setting}{profileHome}) {
-			if ($user{homeAddress} ne "") {
-                        	$output .= '<tr><td class="tableHeader" valign="top">'.WebGUI::International::get(323).'</td><td class="tableData">'.$user{homeAddress}.'<br>'.$user{homeCity}.', '.$user{homeState}.' '.$user{homeZip}.' '.$user{homeCountry}.'</td></tr>';
-			}
-			if ($user{homePhone} ne "") {
-                        	$output .= '<tr><td class="tableHeader" valign="top">'.WebGUI::International::get(328).'</td><td class="tableData">'.$user{homePhone}.'</td></tr>';
-			}
-                }
-                if ($session{setting}{profileWork}) {
-			if ($user{workAddress} ne "") {
-                        	$output .= '<tr><td class="tableHeader" valign="top">'.WebGUI::International::get(329).'</td><td class="tableData">'.$user{workAddress}.'<br>'.$user{workCity}.', '.$user{workState}.' '.$user{workZip}.' '.$user{workCountry}.'</td></tr>';
-			}
-			if ($user{workPhone} ne "") {
-                        	$output .= '<tr><td class="tableHeader" valign="top">'.WebGUI::International::get(334).'</td><td class="tableData">'.$user{workPhone}.'</td></tr>';
-			}
-                }
-                if ($session{setting}{profileMisc}) {
-			if ($user{gender} ne "") {
-                        	$output .= '<tr><td class="tableHeader" valign="top">'.WebGUI::International::get(335).'</td><td class="tableData">'.$gender{$user{gender}}.'</td></tr>';
-			}
-			if ($user{birthdate} ne "") {
-                        	$output .= '<tr><td class="tableHeader" valign="top">'.WebGUI::International::get(336).'</td><td class="tableData">'.$user{birthdate}.'</td></tr>';
-			}
-			if ($user{homepage} ne "") {
-				$output .= '<tr><td class="tableHeader" valign="top">'.WebGUI::International::get(337).'</td><td class="tableData"><a href="'.$user{homepage}.'">'.$user{homepage}.'</a></td></tr>';
-			}
-                }
+                $a->finish;
                 $output .= '</table>';
 		if ($session{user}{userId} == $session{form}{uid}) {
                 	$output .= _accountOptions();

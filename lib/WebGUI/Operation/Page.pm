@@ -23,7 +23,7 @@ use WebGUI::URL;
 use WebGUI::Utility;
 
 our @ISA = qw(Exporter);
-our @EXPORT = qw(&www_movePageUp &www_movePageDown &www_addPage &www_addPageSave &www_cutPage &www_deletePage &www_deletePageConfirm &www_editPage &www_editPageSave &www_pastePage);
+our @EXPORT = qw(&www_viewPageTree &www_movePageUp &www_movePageDown &www_addPage &www_addPageSave &www_cutPage &www_deletePage &www_deletePageConfirm &www_editPage &www_editPageSave &www_pastePage);
 
 #-------------------------------------------------------------------
 sub _recursivelyChangePrivileges {
@@ -52,10 +52,36 @@ sub _reorderPages {
         my ($sth, $i, $pid);
         $sth = WebGUI::SQL->read("select pageId from page where parentId=$_[0] order by sequenceNumber");
         while (($pid) = $sth->array) {
-                WebGUI::SQL->write("update page set sequenceNumber='$i' where pageId=$pid");
                 $i++;
+                WebGUI::SQL->write("update page set sequenceNumber='$i' where pageId=$pid");
         }
         $sth->finish;
+}
+
+#-------------------------------------------------------------------
+sub _traversePageTree {
+        my ($a, $b, %page, %widget, $output, $depth, $i, $spacer);
+	tie %page, 'Tie::CPHash';
+	tie %widget, 'Tie::CPHash';
+        $spacer = '<img src="'.$session{setting}{lib}.'/spacer.gif" width=12>';
+        for ($i=1;$i<=$_[1];$i++) {
+                $depth .= $spacer;
+        }
+        $a = WebGUI::SQL->read("select * from page where (pageId<2 or pageId>25) and parentId='$_[0]' order by sequenceNumber");
+        while (%page = $a->hash) {
+                $output .= $depth.'<img src="'.$session{setting}{lib}.'/page.gif" align="middle">'.
+			' <a href="'.WebGUI::URL::gateway($page{urlizedTitle}).'">'.$page{title}.'</a><br>';
+		$b = WebGUI::SQL->read("select * from widget where pageId=$page{pageId}");
+		while (%widget = $b->hash) {
+                	$output .= $depth.$spacer.
+				'<img src="'.$session{setting}{lib}.'/widget.gif"> '.
+				$widget{title}.'<br>';
+		}
+		$b->finish;
+                $output .= _traversePageTree($page{pageId},$_[1]+1);
+        }
+        $a->finish;
+        return $output;
 }
 
 #-------------------------------------------------------------------
@@ -111,7 +137,7 @@ sub www_addPageSave {
 		} else {
 			$menuTitle = $session{form}{menuTitle};
 		}
-		$urlizedTitle = WebGUI::URL::makeUnique(WebGUI::URL::urlize($session{form}{title}));
+		$urlizedTitle = WebGUI::URL::makeUnique(WebGUI::URL::urlize($menuTitle));
 		WebGUI::SQL->write("insert into page values (".getNextId("pageId").", $parentId, ".quote($session{form}{title}).", $session{page}{styleId}, $session{user}{userId}, $session{page}{ownerView}, $session{page}{ownerEdit}, $session{page}{groupId}, $session{page}{groupView}, $session{page}{groupEdit}, $session{page}{worldView}, $session{page}{worldEdit}, '$nextSeq', ".quote($session{form}{metaTags}).", '$urlizedTitle', '$session{form}{defaultMetaTags}', '$session{form}{template}', ".quote($menuTitle).", ".quote($session{form}{synopsis}).")");
 		return "";
 	} else {
@@ -244,9 +270,9 @@ sub www_editPageSave {
                         $session{form}{title} = "no title";
                 }
 		$urlizedTitle = WebGUI::URL::makeUnique(
-			WebGUI::URL::urlize($session{form}{urlizedTitle}),
-			$session{page}{pageId}
-			);
+                        WebGUI::URL::urlize($session{form}{urlizedTitle}),
+                        $session{page}{pageId}
+                        );
                 WebGUI::SQL->write("update page set title=".quote($session{form}{title}).", styleId=$session{form}{styleId}, ownerId=$session{form}{ownerId}, ownerView=$session{form}{ownerView}, ownerEdit=$session{form}{ownerEdit}, groupId='$session{form}{groupId}', groupView=$session{form}{groupView}, groupEdit=$session{form}{groupEdit}, worldView=$session{form}{worldView}, worldEdit=$session{form}{worldEdit}, metaTags=".quote($session{form}{metaTags}).", urlizedTitle='$urlizedTitle', defaultMetaTags='$session{form}{defaultMetaTags}', template='$session{form}{template}', menuTitle=".quote($session{form}{menuTitle}).", synopsis=".quote($session{form}{synopsis})." where pageId=$session{page}{pageId}");
 		if ($session{form}{recurseStyle} eq "yes") {
 			_recursivelyChangeStyle($session{page}{pageId});
@@ -296,8 +322,8 @@ sub www_movePageUp {
 #-------------------------------------------------------------------
 sub www_pastePage {
         my ($output, $nextSeq);
-		($nextSeq) = WebGUI::SQL->quickArray("select max(sequenceNumber) from page where parentId=$session{page}{pageId}");
-		$nextSeq += 1;
+	($nextSeq) = WebGUI::SQL->quickArray("select max(sequenceNumber) from page where parentId=$session{page}{pageId}");
+	$nextSeq += 1;
         if (WebGUI::Privilege::canEditPage()) {
                 WebGUI::SQL->write("update page set parentId=$session{page}{pageId}, sequenceNumber='$nextSeq' where pageId=$session{form}{pageId}");
 		_reorderPages($session{page}{pageId});
@@ -307,6 +333,13 @@ sub www_pastePage {
         }
 }
 
+#-------------------------------------------------------------------
+sub www_viewPageTree {
+	my ($output);
+	$output = '<h1>'.WebGUI::International::get(448).'</h1>';
+	$output .= _traversePageTree(0,0);
+	return $output;
+}
 
 1;
 

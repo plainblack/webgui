@@ -19,6 +19,7 @@ use WebGUI::SQL;
 
 #-------------------------------------------------------------------
 sub adminOnly {
+	$session{header}{status} = 403;
 	my ($output, $sth, @data);
         $output = '<h1>'.WebGUI::International::get(35).'</h1>';
 	$output .= WebGUI::International::get(36);
@@ -73,6 +74,7 @@ sub canViewPage {
 
 #-------------------------------------------------------------------
 sub insufficient {
+	$session{header}{status} = 403;
 	my ($output);
 	$output = '<h1>'.WebGUI::International::get(37).'</h1>';
 	$output .= WebGUI::International::get(38);
@@ -100,6 +102,7 @@ sub isInGroup {
 
 #-------------------------------------------------------------------
 sub noAccess {
+	$session{header}{status} = 403;
 	my ($output);
         if ($session{user}{userId} <= 1) {
                 $output = WebGUI::Operation::Account::www_displayAccount();
@@ -113,6 +116,7 @@ sub noAccess {
 
 #-------------------------------------------------------------------
 sub notMember {
+	$session{header}{status} = 403;
 	my ($output);
 	$output = '<h1>'.WebGUI::International::get(345).'</h1>';
 	$output .= WebGUI::International::get(346);
