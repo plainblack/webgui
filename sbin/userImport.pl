@@ -207,7 +207,11 @@ while(<FILE>) {
 		if ($user{username} eq "" && $user{firstName} ne "" && $user{lastName} ne "") {
 			$user{username} = $user{firstName}.".".$user{lastName};
 		}
-		$user{identifier} = $defaultIdentifier if ($user{password} eq "");
+                if ($user{password} eq "") {
+                        $user{identifier} = $defaultIdentifier;
+                } else {
+                        $user{identifier} = $user{password};
+                }
 		$user{identifier} = Digest::MD5::md5_base64($user{identifier});
 		$user{ldapUrl} = $ldapUrl if ($user{ldapUrl} eq "");
 		$user{authMethod} = $authMethod if ($user{authMethod} eq "");
