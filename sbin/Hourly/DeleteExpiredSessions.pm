@@ -1,4 +1,4 @@
-package Hourly::ExpireSessions;
+package Hourly::DeleteExpiredSessions;
 
 #-------------------------------------------------------------------
 # WebGUI is Copyright 2001-2002 Plain Black Software.
