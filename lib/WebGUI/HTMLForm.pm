@@ -1302,7 +1302,7 @@ sub radioList {
         my ($name, $options, $label, $value, $vertical, $extras, $subtext, $uiLevel) =
                 rearrange([qw(name options label value vertical extras subtext uiLevel)], @p);
         if (_uiLevelChecksOut($uiLevel)) {
-                $output = WebGUI::Form::checkList({
+                $output = WebGUI::Form::radioList({
                         "name"=>$name,
                         "options"=>$options,
                         "value"=>$value,

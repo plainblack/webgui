@@ -376,7 +376,7 @@ sub inDateRange {
 
 #-------------------------------------------------------------------
 
-=head2 moveCollateralDown ( tableName, idName, id )
+=head2 moveCollateralDown ( tableName, idName, id [ , setName, setValue ] )
 
  Moves a collateral data item down one position. This assumes that the
  collateral data table has a column called "wobjectId" that identifies
@@ -396,25 +396,41 @@ sub inDateRange {
 
  An integer that uniquely identifies this collateral data item.
 
+=item setName
+
+ By default this method assumes that the collateral will have a
+ wobject id in the table. However, since there is not always a wobject
+ id to separate one data set from another, you may specify another
+ field to do that.
+
+=item setValue
+
+ The value of the column defined by "setName" to select a data set
+ from.
+
 =cut
 
 ### NOTE: There is a redundant use of wobjectId in some of these statements on purpose to support
 ### two different types of collateral data.
 
 sub moveCollateralDown {
-        my ($id, $seq);
-        ($seq) = WebGUI::SQL->quickArray("select sequenceNumber from $_[1] where $_[2]=$_[3] and wobjectId=".$_[0]->get("wobjectId"));
-        ($id) = WebGUI::SQL->quickArray("select $_[2] from $_[1] where wobjectId=".$_[0]->get("wobjectId")
-		." and sequenceNumber=$seq+1 group by wobjectId");
+        my ($id, $seq, $setName, $setValue);
+	$setName = $_[4] || "wobjectId";
+	$setValue = $_[5] || $_[0]->get($setName);
+        ($seq) = WebGUI::SQL->quickArray("select sequenceNumber from $_[1] where $_[2]=$_[3] and $setName=".quote($setValue));
+        ($id) = WebGUI::SQL->quickArray("select $_[2] from $_[1] where $setName=".quote($setValue)
+		." and sequenceNumber=$seq+1 group by $setName");
         if ($id ne "") {
-                WebGUI::SQL->write("update $_[1] set sequenceNumber=sequenceNumber+1 where $_[2]=$_[3] and wobjectId=".$_[0]->get("wobjectId"));
-                WebGUI::SQL->write("update $_[1] set sequenceNumber=sequenceNumber-1 where $_[2]=$id and wobjectId=".$_[0]->get("wobjectId"));
+                WebGUI::SQL->write("update $_[1] set sequenceNumber=sequenceNumber+1 where $_[2]=$_[3] and $setName="
+			.quote($setValue));
+                WebGUI::SQL->write("update $_[1] set sequenceNumber=sequenceNumber-1 where $_[2]=$id and $setName="
+			.quote($setValue));
          }
 }
 
 #-------------------------------------------------------------------
 
-=head2 moveCollateralUp ( tableName, idName, id )
+=head2 moveCollateralUp ( tableName, idName, id [ , setName, setValue ] )
 
  Moves a collateral data item up one position. This assumes that the
  collateral data table has a column called "wobjectId" that identifies
@@ -434,19 +450,35 @@ sub moveCollateralDown {
 
  An integer that uniquely identifies this collateral data item.
 
+=item setName
+
+ By default this method assumes that the collateral will have a
+ wobject id in the table. However, since there is not always a wobject
+ id to separate one data set from another, you may specify another
+ field to do that.
+
+=item setValue
+
+ The value of the column defined by "setName" to select a data set
+ from.
+
 =cut
 
 ### NOTE: There is a redundant use of wobjectId in some of these statements on purpose to support
 ### two different types of collateral data.
 
 sub moveCollateralUp {
-        my ($id, $seq);
-        ($seq) = WebGUI::SQL->quickArray("select sequenceNumber from $_[1] where $_[2]=$_[3] and wobjectId=".$_[0]->get("wobjectId"));
-        ($id) = WebGUI::SQL->quickArray("select $_[2] from $_[1] where wobjectId=".$_[0]->get("wobjectId")
-		." and sequenceNumber=$seq-1 group by wobjectId");
+        my ($id, $seq, $setValue, $setName);
+        $setName = $_[4] || "wobjectId";
+        $setValue = $_[5] || $_[0]->get($setName);
+        ($seq) = WebGUI::SQL->quickArray("select sequenceNumber from $_[1] where $_[2]=$_[3] and $setName=".quote($setValue));
+        ($id) = WebGUI::SQL->quickArray("select $_[2] from $_[1] where $setName=".quote($setValue)
+		." and sequenceNumber=$seq-1 group by $setValue");
         if ($id ne "") {
-                WebGUI::SQL->write("update $_[1] set sequenceNumber=sequenceNumber-1 where $_[2]=$_[3] and wobjectId=".$_[0]->get("wobjectId"));
-                WebGUI::SQL->write("update $_[1] set sequenceNumber=sequenceNumber+1 where $_[2]=$id and wobjectId=".$_[0]->get("wobjectId"));
+                WebGUI::SQL->write("update $_[1] set sequenceNumber=sequenceNumber-1 where $_[2]=$_[3] and $setName="
+			.quote($setValue));
+                WebGUI::SQL->write("update $_[1] set sequenceNumber=sequenceNumber+1 where $_[2]=$id and $setName="
+			.quote($setValue));
         }
 }
 
@@ -547,7 +579,7 @@ sub purge {
 
 #-------------------------------------------------------------------
 
-=head2 reorderCollateral ( tableName, keyName )
+=head2 reorderCollateral ( tableName, keyName [ , setName, setValue ] )
 
  Resequences collateral data. Typically useful after deleting a
  collateral item to remove the gap created by the deletion.
@@ -560,14 +592,27 @@ sub purge {
 
  The key column name used to determine which data needs sorting within the table.
 
+=item setName
+
+ Defaults to "wobjectId". This is used to define which data set to
+ reorder.
+
+=item setValue
+
+ Used to define which data set to reorder. Defaults to the wobjectId
+ for this instance. Defaults to the value of "setName" in the wobject
+ properties.
+
 =cut
 
 sub reorderCollateral {
-        my ($sth, $i, $id);
+        my ($sth, $i, $id, $setName, $setValue);
 	$i = 0;
-        $sth = WebGUI::SQL->read("select $_[2] from $_[1] where wobjectId=".$_[0]->get("wobjectId")." order by sequenceNumber");
+	$setName = $_[3] || "wobjectId";
+	$setValue = $_[4] || $_[0]->get($setName);
+        $sth = WebGUI::SQL->read("select $_[2] from $_[1] where $setName=".quote($setValue)." order by sequenceNumber");
         while (($id) = $sth->array) {
-                WebGUI::SQL->write("update $_[1] set sequenceNumber=$i where wobjectId=".$_[0]->get("wobjectId")." and $_[2]=$id");
+                WebGUI::SQL->write("update $_[1] set sequenceNumber=$i where $setName=".quote($setValue)." and $_[2]=$id");
                 $i++;
         }
         $sth->finish;
@@ -647,7 +692,7 @@ sub set {
 
 #-----------------------------------------------------------------
 
-=head2 setCollateral ( tableName, keyName, properties [ , useSequenceNumber, useWobjectId ] )
+=head2 setCollateral ( tableName, keyName, properties [ , useSequenceNumber, useWobjectId, setName, setValue ] )
 
  Performs and insert/update of collateral data for any wobject's
  collateral data. Returns the primary key value for that row of
@@ -682,20 +727,37 @@ sub set {
  upon creation of a new row. Note that this means the table better
  have a wobjectId column. Defaults to "1".
 
+=item setName
+
+ If this collateral data set is not grouped by wobjectId, but by another
+ column then specify that column here. The useSequenceNumber parameter
+ will then use this column name instead of wobjectId to generate
+ the sequenceNumber.
+
+=item setValue
+
+ If you've specified a setName you may also set a value for that set.
+ Defaults to the value for this id from the wobject properties.
+
+=item 
+
 =cut
 
 sub setCollateral {
 	my ($key, $sql, $seq, $dbkeys, $dbvalues, $counter);
-	my ($class, $table, $keyName, $properties, $useSequence, $useWobjectId) = @_;
+	my ($class, $table, $keyName, $properties, $useSequence, $useWobjectId, $setName, $setValue) = @_;
 	$counter = 0;
+	$setName = $setName || "wobjectId";
+	$setValue = $setValue || $_[0]->get($setName);
 	if ($properties->{$keyName} eq "new" || $properties->{$keyName} eq "") {
 		$properties->{$keyName} = getNextId($keyName);
 		$sql = "insert into $table (";
 		$dbkeys = "";
      		$dbvalues = "";
 		unless ($useSequence eq "0") {
+			
 			($seq) = WebGUI::SQL->quickArray("select max(sequenceNumber) from $table 
-                               	where wobjectId=".$_[0]->get("wobjectId"));
+                               	where $setName=".quote($setValue));
 			$properties->{sequenceNumber} = $seq+1;
 		} 
 		unless ($useWobjectId eq "0") {

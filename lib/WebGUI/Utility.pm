@@ -15,7 +15,8 @@ use strict;
 use Tie::IxHash;
 
 our @ISA = qw(Exporter);
-our @EXPORT = qw(&commify &randomizeArray &sortHashDescending &sortHash &isIn &randint &round);
+our @EXPORT = qw(&makeTabSafe &makeArrayTabSafe &randomizeHash &commify &randomizeArray 
+	&sortHashDescending &sortHash &isIn &makeCommaSafe &makeArrayCommaSafe &randint &round);
 
 #-------------------------------------------------------------------
 sub commify {
@@ -46,6 +47,42 @@ sub isIn {
 }
 
 #-------------------------------------------------------------------
+sub makeArrayCommaSafe {
+        my ($array) = $_[0];
+        my ($i);
+        for ($i = @$array; --$i;) {
+                $$array[$i] = makeCommaSafe($$array[$i]);
+        }
+}
+
+#-------------------------------------------------------------------
+sub makeArrayTabSafe {
+        my ($array) = $_[0];
+        my ($i);
+        for ($i = @$array; --$i;) {
+                $$array[$i] = makeTabSafe($$array[$i]);
+        }
+}
+
+#-------------------------------------------------------------------
+sub makeCommaSafe {
+        my ($text) = $_[0];
+        $text =~ s/\n/ /g;
+        $text =~ s/\r/ /g;
+        $text =~ s/,/;/g;
+        return $text;
+}
+
+#-------------------------------------------------------------------
+sub makeTabSafe {
+        my ($text) = $_[0];
+        $text =~ s/\n/ /g;
+        $text =~ s/\r/ /g;
+        $text =~ s/\t/    /g;
+        return $text;
+}
+
+#-------------------------------------------------------------------
 sub randint {
 	my ($low, $high) = @_;
 	$low = 0 unless defined $low;
@@ -65,6 +102,21 @@ sub randomizeArray {
 			@$array[$i,$j] = @$array[$j,$i];
 		}
 	}
+}
+
+#-------------------------------------------------------------------
+sub randomizeHash {
+	my ($hash, $key, @keys, %temp);
+	$hash = $_[0];
+	foreach $key (keys %{$_[0]}) {
+		push(@keys,$key);
+	}
+	randomizeArray(\@keys);
+	tie %temp, 'Tie::IxHash';
+	foreach $key (@keys) {
+		$temp{$key} = $hash->{$key};
+	}
+	return \%temp;
 }
 
 #-------------------------------------------------------------------

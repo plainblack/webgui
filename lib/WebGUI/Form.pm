@@ -160,8 +160,12 @@ sub checkList {
 			extras=>$_[0]->{extras},
 			checked=>$checked
 			});
-                $output .= ${$_[0]->{options}}{$key}.' &nbsp; &nbsp;';
-                $output .= '<br>' if ($_[0]->{vertical});
+                $output .= ${$_[0]->{options}}{$key};
+		if ($_[0]->{vertical}) {
+			$output .= "<br />\n";
+		} else {
+			$output .= " &nbsp; &nbsp;\n";
+		}
         }
 	return $output;
 }
@@ -946,12 +950,6 @@ sub radio {
 sub radioList {
         my ($output, $key, $checked);
         foreach $key (keys %{$_[0]->{options}}) {
-                $output .= '<input type="radio" name="'.$_[0]->{name}.'" value="'.$key.'"';
-                if ($_[0]->{value} eq $key) {
-                        $checked = 1;
-                } else {
-			$checked = 0;
-		}
 		$output .= radio({
 			name=>$_[0]->{name},
 			value=>$key,
@@ -959,8 +957,11 @@ sub radioList {
 			extras=>$_[0]->{extras}
 			});
 		$output .= ' '.$_[0]->{options}->{$key};
-                $output .= ' &nbsp; &nbsp;';
-		$output .= '<br>' if ($_[0]->{vertical});
+                if ($_[0]->{vertical}) {
+                        $output .= "<br />\n";
+                } else {
+                        $output .= " &nbsp; &nbsp;\n";
+                }
         }
 	return $output;
 }

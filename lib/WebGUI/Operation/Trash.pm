@@ -12,6 +12,7 @@ package WebGUI::Operation::Trash;
 
 use Exporter;
 use strict qw(vars subs);
+use Tie::CPHash;
 use WebGUI::Icon;
 use WebGUI::Privilege;
 use WebGUI::Session;
@@ -23,11 +24,15 @@ our @EXPORT = qw(&www_purgeTrash &www_purgeTrashConfirm);
 
 #-------------------------------------------------------------------
 sub _purgeWobjects {
-	my ($b, $wobjectId, $namespace, $w, $cmd);
-	$b = WebGUI::SQL->read("select wobjectId, namespace from wobject where pageId=$_[0]");
-        while (($wobjectId,$namespace) = $b->array) {
-        	$cmd = "WebGUI::Wobject::".$namespace;
-                $w = $cmd->new({wobjectId=>$wobjectId,namespace=>$namespace});
+	my (%properties, $base, $extended, $b, $wobjectId, $namespace, $w, $cmd);
+	tie %properties, 'Tie::CPHash';
+	$b = WebGUI::SQL->read("select * from wobject where pageId=$_[0]");
+        while ($base = $b->hashRef) {
+		$extended = WebGUI::SQL->quickHashRef("select * from ".$base->{namespace}." 
+			where wobjectId=".$base->{wobjectId});
+		%properties = (%{$base}, %{$extended});
+        	$cmd = "WebGUI::Wobject::".$properties{namespace};
+                $w = $cmd->new(\%properties);
 		$w->purge;
         }
         $b->finish;

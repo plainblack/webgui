@@ -54,6 +54,10 @@ sub _submenu {
         my (%menu);
         tie %menu, 'Tie::IxHash';
 	%menu = %{$_[1]};
+	if ($session{form}{op} ne "viewHelp" && $session{form}{op} ne "viewHelpIndex") {
+		$menu{WebGUI::URL::page('op=editHelp&hid=new')} = "Add new help.";
+        	$menu{WebGUI::URL::page('op=exportHelp')} = "Export help.";
+	}
 	if (($session{form}{op} eq "editHelp" && $session{form}{hid} ne "new") || $session{form}{op} eq "deleteHelp") {
 		$menu{WebGUI::URL::page('op=editHelpIndex&hid='.$session{form}{hid})} = "Edit this help.";
 		$menu{WebGUI::URL::page('op=deleteHelpIndex&hid='.$session{form}{hid})} = "Delete this help.";
@@ -68,7 +72,7 @@ sub www_deleteHelp {
 	my $output = '<h1>Confirm</h1>Are you sure? Deleting help is never a good idea. <a href="'
 		.WebGUI::URL::page("op=deleteHelpConfirm&hid=".$session{form}{hid}."&namespace=".$session{form}{namespace})
 		.'">Yes</a> / <a href="'.WebGUI::URL::page("op=manageHelp").'">No</a><p>';
-	return _submen($output);
+	return _submenu($output,{});
 }
 
 #-------------------------------------------------------------------
@@ -130,7 +134,7 @@ sub www_editHelp {
 	$f->select("seeAlso",\%data,"See Also",\@seeAlso,8,1);
 	$f->submit;
 	$output .= $f->print;
-	return _submenu($output);
+	return _submenu($output,{});
 }
 
 #-------------------------------------------------------------------
@@ -194,10 +198,7 @@ sub www_manageHelp {
 	$output .= 'This interface is for WebGUI developers only. If you\'re not a developer, leave this alone. Also, 
 		this interface works <b>ONLY</b> under MySQL and is not supported by Plain Black under any
 		circumstances.<p>';
-	$output .= '<a href="'.WebGUI::URL::page('op=editHelp&hid=new').'">Add new help.</a>';
-	$output .= ' &middot; ';
-	$output .= '<a href="'.WebGUI::URL::page('op=exportHelp').'">Export help.</a>';
-	$output .= '<p><table class="tableData">';
+	$output .= '<table class="tableData">';
        	$sth = WebGUI::SQL->read("select help.helpId,help.namespace,international.message from help,international 
 		where help.titleId=international.internationalId and help.namespace=international.namespace 
 		and international.languageId=1 order by international.message");
@@ -212,7 +213,7 @@ sub www_manageHelp {
 	}
        	$sth->finish;
        	$output .= '</table>';
-       	return _submenu($output);
+       	return _submenu($output,{});
 }
 
 #-------------------------------------------------------------------

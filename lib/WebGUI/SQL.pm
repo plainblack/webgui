@@ -20,6 +20,7 @@ use strict;
 use Tie::IxHash;
 use WebGUI::ErrorHandler;
 use WebGUI::Session;
+use WebGUI::Utility;
 
 our @ISA = qw(Exporter);
 our @EXPORT = qw(&quote &getNextId);
@@ -45,8 +46,10 @@ our @EXPORT = qw(&quote &getNextId);
  %hash = WebGUI::SQL->buildHash($sql);
  $hashRef = WebGUI::SQL->buildHashRef($sql);
  @arr = WebGUI::SQL->quickArray($sql);
+ $text = WebGUI::SQL->quickCSV($sql);
  %hash = WebGUI::SQL->quickHash($sql);
  $hashRef = WebGUI::SQL->quickHashRef($sql);
+ $text = WebGUI::SQL->quickTab($sql);
 
  WebGUI::SQL->write($sql);
 
@@ -338,6 +341,37 @@ sub quickArray {
 
 #-------------------------------------------------------------------
 
+=head2 quickCSV ( sql [, dbh ] )
+
+ Executes a query and returns a comma delimited text blob with column
+ headers.
+
+=item sql
+
+ An SQL query.
+
+=item dbh
+
+ By default this method uses the WebGUI database handler. However,
+ you may choose to pass in your own if you wish.
+
+=cut
+
+sub quickTab {
+        my ($sth, $output, @data);
+        $sth = WebGUI::SQL->new($_[1],$_[2]);
+        $output = join(",",$sth->getColumnNames)."\n";
+        while (@data = $sth->array) {
+                makeArrayCommaSafe(\@data);
+                $output .= join(",",@data)."\n";
+        }
+        $sth->finish;
+        return $output;
+}
+
+
+#-------------------------------------------------------------------
+
 =head2 quickHash ( sql [, dbh ] )
 
  Executes a query and returns a single row of data as a hash.
@@ -389,6 +423,36 @@ sub quickHashRef {
         if (defined $data) {
                 return $data;
         }
+}
+
+#-------------------------------------------------------------------
+
+=head2 quickTab ( sql [, dbh ] )
+
+ Executes a query and returns a tab delimited text blob with column
+ headers.
+
+=item sql
+
+ An SQL query.
+
+=item dbh
+
+ By default this method uses the WebGUI database handler. However,
+ you may choose to pass in your own if you wish.
+
+=cut
+
+sub quickTab {
+        my ($sth, $output, @data);
+        $sth = WebGUI::SQL->new($_[1],$_[2]);
+	$output = join("\t",$sth->getColumnNames)."\n";
+	while (@data = $sth->array) {
+                makeArrayTabSafe(\@data);
+                $output .= join("\t",@data)."\n";
+        }
+        $sth->finish;
+	return $output;
 }
 
 #-------------------------------------------------------------------
