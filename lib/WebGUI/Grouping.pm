@@ -72,6 +72,7 @@ An array reference containing the list of group ids to add the first list to.
 sub addGroupsToGroups {
 	delete $session{isInGroup};
 	foreach my $gid (@{$_[0]}) {
+		next if ($gid eq '1');
 		foreach my $toGid (@{$_[1]}) {
 			my ($isIn) = WebGUI::SQL->quickArray("select count(*) from groupGroupings 
 				where groupId=".quote($gid)." and inGroup=".quote($toGid));
