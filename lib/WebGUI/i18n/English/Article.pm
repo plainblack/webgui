@@ -12,54 +12,31 @@ our $I18N = {
 
 NOTE: You can create a multi-paged article by placing the separator macro (^-;) at various places through-out your article.  This works unless you are using a Make Page Printable style.
 
-<p />
-<b>Template</b><br/>
-Select a template to layout your article.
-<p />
+<P><b>Template</b><br>
+Select a template from the list to layout your Wobject.  Each Wobject
+may only use templates for their own namespace.  For example, Articles
+can only use templates from the "Article" namespace.  Layouts can only
+use templates from the "page" namespace.
 
-<b>Image</b><br>
-Choose an image (.jpg, .gif, .png) file from your hard drive. This file will be uploaded to the server and displayed in your article.
-<br><br>
-
-
-<b>Attachment</b><br>
-If you wish to attach a word processor file, a zip file, or any other file for download by your users, then choose it from your hard drive.
-<br><br>
-
-<b>Link Title</b><br>
+<p><b>Link Title</b><br>
 If you wish to add a link to your article, enter the title of the link in this field. 
 <br><br>
 <i>Example:</i> Google
-<br><br>
 
-<b>Link URL</b><br>
+<p><b>Link URL</b><br>
 If you added a link title, now add the URL (uniform resource locater) here. 
 <br><br>
 <i>Example:</i> http://www.google.com
 
-<br><br>
-
-<b>Convert carriage returns?</b><br>
+<p><b>Convert carriage returns?</b><br>
 If you're publishing HTML there's generally no need to check this option, but if you aren't using HTML and you want a carriage return every place you hit your "Enter" key, then check this option.
-<p>
-
-<b>Allow discussion?</b><br>
-Checking this box will enable responses to your article much like Articles on Slashdot.org by
-adding a discussion board to the page.
-<p>
-
 
 |,
-		lastUpdated => 1101771446
+		lastUpdated => 1106767668
 	},
 
 	'7' => {
 		message => q|Link Title|,
-		lastUpdated => 1031514049
-	},
-
-	'22' => {
-		message => q|Author|,
 		lastUpdated => 1031514049
 	},
 
@@ -73,39 +50,14 @@ adding a discussion board to the page.
 		lastUpdated => 1038794871
 	},
 
-	'23' => {
-		message => q|Date|,
-		lastUpdated => 1031514049
-	},
-
-	'13' => {
-		message => q|Delete|,
-		lastUpdated => 1031514049
-	},
-
-	'6' => {
-		message => q|Image|,
-		lastUpdated => 1031514049
-	},
-
 	'28' => {
 		message => q|View Responses|,
-		lastUpdated => 1031514049
-	},
-
-	'3' => {
-		message => q|Start Date|,
 		lastUpdated => 1031514049
 	},
 
 	'61' => {
 		message => q|Article, Add/Edit|,
 		lastUpdated => 1066583066
-	},
-
-	'9' => {
-		message => q|Attachment|,
-		lastUpdated => 1031514049
 	},
 
 	'12' => {
@@ -115,11 +67,6 @@ adding a discussion board to the page.
 
 	'8' => {
 		message => q|Link URL|,
-		lastUpdated => 1031514049
-	},
-
-	'4' => {
-		message => q|End Date|,
 		lastUpdated => 1031514049
 	},
 
