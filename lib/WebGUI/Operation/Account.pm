@@ -247,6 +247,7 @@ sub www_createAccountSave {
 		$u->authMethod($session{setting}{authMethod});
 		$u->ldapURL($session{setting}{ldapURL});
 		$u->connectDN($connectDN);
+		$u->karma($session{setting}{karmaPerLogin},"Login","Just for logging in.") if ($session{setting}{useKarma});
 		foreach $fieldName (keys %{$profile}) {
 			$u->profileField($fieldName,${$profile}{$fieldName});
 		}
@@ -458,6 +459,7 @@ sub www_login {
 	}
 	if ($success) {
 		WebGUI::Session::start($uid);
+		$u->karma($session{setting}{karmaPerLogin},"Login","Just for logging in.") if ($session{setting}{useKarma});
                 _logLogin($uid,"success");
 		return "";
 	} else {
