@@ -379,6 +379,7 @@ sub www_view {
 
 #-------------------------------------------------------------------
 sub www_viewSubmission {
+	return "" unless ($session{form}{sid});
 	my ($output, $submission, $file, @data, %var, $replies);
 	WebGUI::SQL->write("update USS_submission set views=views+1 where USS_submissionId=$session{form}{sid}");
 	$submission = $_[0]->getCollateral("USS_submission","USS_submissionId",$session{form}{sid});
