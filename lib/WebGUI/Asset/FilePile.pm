@@ -30,7 +30,7 @@ our @ISA = qw(WebGUI::Asset);
 
 =head1 NAME
 
-Package WebGUI::Asset::File
+Package WebGUI::Asset::FilePile
 
 =head1 DESCRIPTION
 
@@ -38,7 +38,7 @@ Provides a mechanism to upload files to WebGUI.
 
 =head1 SYNOPSIS
 
-use WebGUI::Asset::File;
+use WebGUI::Asset::FilePile;
 
 
 =head1 METHODS
