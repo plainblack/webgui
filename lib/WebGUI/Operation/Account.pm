@@ -288,55 +288,54 @@ sub www_editProfile {
                 $f->hidden("uid",$session{user}{userId});
                 $a = WebGUI::SQL->read("select * from userProfileField,userProfileCategory
                         where userProfileField.profileCategoryId=userProfileCategory.profileCategoryId
+			and userProfileCategory.editable=1 and userProfileField.editable=1
                         order by userProfileCategory.sequenceNumber,userProfileField.sequenceNumber");
                 while(%data = $a->hash) {
-                        if ($data{visible}) {
-                                $category = eval $data{categoryName};
-                                if ($category ne $previousCategory) {
-                                        $f->raw('<tr><td colspan="2" class="tableHeader">'.$category.'</td></tr>');
-                                }
-                                $values = eval $data{dataValues};
-                                $method = $data{dataType};
-                                $label = eval $data{fieldLabel};
-				if ($data{required}) {
-					$subtext = "*";
-				} else {
-					$subtext = "";
-				}
-                                if ($method eq "select") {
-                                        # note: this big if statement doesn't look elegant, but doing regular
-					# ORs caused problems with the array reference.
-					if ($session{form}{$data{fieldName}}) {
-						$default = [$session{form}{$data{fieldName}}];
-					} elsif ($session{user}{$data{fieldName}}) {
-						$default = [$session{user}{$data{fieldName}}];
-					} else {
-						$default = eval $data{dataDefault};
-					}
-                                        $f->select(
-						-name=>$data{fieldName},
-						-options=>$values,
-						-label=>$label,
-						-value=>$default,
-						-subtext=>$subtext
-						);
-                                } else {
-					if ($session{form}{$data{fieldName}}) {
-						$default = $session{form}{$data{fieldName}};
-					} elsif (exists $session{user}{$data{fieldName}}) {
-						$default = $session{user}{$data{fieldName}};
-					} else {
-						$default = eval $data{dataDefault};
-					}
-                                        $f->$method(
-						-name=>$data{fieldName},
-						-label=>$label,
-						-value=>$default,
-						-subtext=>$subtext
-						);
-                                }
-                                $previousCategory = $category;
+                	$category = eval $data{categoryName};
+                        if ($category ne $previousCategory) {
+                                $f->raw('<tr><td colspan="2" class="tableHeader">'.$category.'</td></tr>');
                         }
+                        $values = eval $data{dataValues};
+                        $method = $data{dataType};
+                        $label = eval $data{fieldLabel};
+			if ($data{required}) {
+				$subtext = "*";
+			} else {
+				$subtext = "";
+			}
+                        if ($method eq "select") {
+                        	# note: this big if statement doesn't look elegant, but doing regular
+				# ORs caused problems with the array reference.
+				if ($session{form}{$data{fieldName}}) {
+					$default = [$session{form}{$data{fieldName}}];
+				} elsif ($session{user}{$data{fieldName}}) {
+					$default = [$session{user}{$data{fieldName}}];
+				} else {
+					$default = eval $data{dataDefault};
+				}
+                                $f->select(
+					-name=>$data{fieldName},
+					-options=>$values,
+					-label=>$label,
+					-value=>$default,
+					-subtext=>$subtext
+					);
+                        } else {
+				if ($session{form}{$data{fieldName}}) {
+					$default = $session{form}{$data{fieldName}};
+				} elsif (exists $session{user}{$data{fieldName}}) {
+					$default = $session{user}{$data{fieldName}};
+				} else {
+					$default = eval $data{dataDefault};
+				}
+                                $f->$method(
+					-name=>$data{fieldName},
+					-label=>$label,
+					-value=>$default,
+					-subtext=>$subtext
+					);
+                        }
+                        $previousCategory = $category;
                 }
                 $a->finish;
 		$f->submit;
@@ -569,8 +568,7 @@ sub www_viewProfile {
                 $output .= '<table>';
                 $a = WebGUI::SQL->read("select * from userProfileField,userProfileCategory
                         where userProfileField.profileCategoryId=userProfileCategory.profileCategoryId
-			and userProfileCategory.profileCategoryId<>4
-			and userProfileField.visible=1
+			and userProfileCategory.visible=1 and userProfileField.visible=1
                         order by userProfileCategory.sequenceNumber,userProfileField.sequenceNumber");
                 while (%data = $a->hash) {
                 	$category = eval $data{categoryName};

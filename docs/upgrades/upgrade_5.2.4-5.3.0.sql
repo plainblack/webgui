@@ -17,7 +17,26 @@ INSERT INTO template VALUES (4,'Descriptive','<tmpl_if displayTitle>\r\n    <h1>
 INSERT INTO template VALUES (3,'Ordered List','<tmpl_if displayTitle>\r\n    <h1><tmpl_var title></h1>\r\n</tmpl_if>\r\n\r\n<tmpl_if description>\r\n    <tmpl_var description><p />\r\n</tmpl_if>\r\n\r\n<tmpl_if session.var.adminOn><tmpl_if canEdit>\r\n  <a href=\"<tmpl_var addlink.url>\"><tmpl_var addlink.label></a><p />\r\n</tmpl_if></tmpl_if>\r\n\r\n<ol>\r\n<tmpl_loop link_loop>\r\n  <li>\r\n   <tmpl_if session.var.adminOn><tmpl_if canEdit>\r\n         <tmpl_var link.controls>\r\n   </tmpl_if>  </tmpl_if>\r\n\r\n   <a href=\"<tmpl_var link.url>\"\r\n   <tmpl_if link.newwindow>\r\n          target=\"_blank\"\r\n    </tmpl_if>\r\n    ><span class=\"linkTitle\"><tmpl_var link.name></span></a>\r\n\r\n    <tmpl_if link.description>\r\n              - <tmpl_var link.description>\r\n   </tmpl_if>\r\n  </li>\r\n</tmpl_loop>\r\n</ol>','LinkList');
 INSERT INTO template VALUES (1,'Default Link List','<tmpl_if displayTitle>\r\n    <h1><tmpl_var title></h1>\r\n</tmpl_if>\r\n\r\n<tmpl_if description>\r\n    <tmpl_var description><p />\r\n</tmpl_if>\r\n\r\n<tmpl_if session.var.adminOn>\r\n<tmpl_if canEdit>\r\n  <a href=\"<tmpl_var addlink.url>\"><tmpl_var addlink.label></a><p />\r\n</tmpl_if>\r\n</tmpl_if>\r\n\r\n<tmpl_loop link_loop>\r\n   <tmpl_if session.var.adminOn>\r\n    <tmpl_if canEdit>\r\n         <tmpl_var link.controls>\r\n    </tmpl_if>\r\n   </tmpl_if>\r\n   &middot;\r\n   <a href=\"<tmpl_var link.url>\"\r\n   <tmpl_if link.newwindow>\r\n          target=\"_blank\"\r\n    </tmpl_if>\r\n    ><span class=\"linkTitle\"><tmpl_var link.name></span></a>\r\n\r\n    <tmpl_if link.description>\r\n              - <tmpl_var link.description>\r\n   </tmpl_if>\r\n   <br/>\r\n</tmpl_loop>\r\n','LinkList');
 INSERT INTO template VALUES (2,'Unordered List','<tmpl_if displayTitle>\r\n    <h1><tmpl_var title></h1>\r\n</tmpl_if>\r\n\r\n<tmpl_if description>\r\n    <tmpl_var description><p />\r\n</tmpl_if>\r\n\r\n<tmpl_if session.var.adminOn><tmpl_if canEdit>\r\n  <a href=\"<tmpl_var addlink.url>\"><tmpl_var addlink.label></a><p />\r\n</tmpl_if></tmpl_if>\r\n\r\n<ul>\r\n<tmpl_loop link_loop>\r\n<li>\r\n   <tmpl_if session.var.adminOn><tmpl_if canEdit>\r\n         <tmpl_var link.controls>\r\n   </tmpl_if></tmpl_if>\r\n   \r\n   <a href=\"<tmpl_var link.url>\"\r\n   <tmpl_if link.newwindow>\r\n          target=\"_blank\"\r\n    </tmpl_if>\r\n    ><span class=\"linkTitle\"><tmpl_var link.name></span></a>\r\n\r\n    <tmpl_if link.description>\r\n              - <tmpl_var link.description>\r\n   </tmpl_if>\r\n </li>\r\n</tmpl_loop>\r\n</u>','LinkList');
-
+alter table userProfileCategory add column visible int not null default 1;
+alter table userProfileCategory add column editable int not null default 1;
+update userProfileCategory set visible=0 where profileCategoryId=4;
+alter table userProfileField add column editable int not null default 1;
+update userProfileField set editable=visible;
+update international set namespace='WebGUI/Profile' where namespace='WebGUI' and internationalId=473;
+delete from international where languageId=1 and namespace='WebGUI/Profile' and internationalId=897;
+insert into international (internationalId,languageId,namespace,message,lastUpdated) values (897,1,'WebGUI/Profile','Editable?', 1050167573);
+update international set namespace='WebGUI/Profile' where namespace='WebGUI' and internationalId=471;
+update international set namespace='WebGUI/Profile' where namespace='WebGUI' and internationalId=468;
+update international set namespace='WebGUI/Profile' where namespace='WebGUI' and internationalId=474;
+update international set namespace='WebGUI/Profile' where namespace='WebGUI' and internationalId=489;
+update international set namespace='WebGUI/Profile' where namespace='WebGUI' and internationalId=491;
+update international set namespace='WebGUI/Profile' where namespace='WebGUI' and internationalId=490;
+update international set namespace='WebGUI/Profile' where namespace='WebGUI' and internationalId=787;
+update international set namespace='WebGUI/Profile' where namespace='WebGUI' and internationalId=788;
+update international set namespace='WebGUI/Profile' where namespace='WebGUI' and internationalId=789;
+update international set namespace='WebGUI/Profile' where namespace='WebGUI' and internationalId=790;
+update international set namespace='WebGUI/Profile' where namespace='WebGUI' and internationalId=466;
+update international set namespace='WebGUI/Profile' where namespace='WebGUI' and internationalId=467;
 
 
 
