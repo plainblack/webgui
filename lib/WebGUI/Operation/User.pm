@@ -62,7 +62,7 @@ sub www_addUserSave {
         if (WebGUI::Privilege::isInGroup(3)) {
                 $encryptedPassword = Digest::MD5::md5_base64($session{form}{identifier});
 		$uid = getNextId("userId");
-                WebGUI::SQL->write("insert into users values ($uid, ".quote($session{form}{username}).", ".quote($encryptedPassword).", ".quote($session{form}{email}).", ".quote($session{form}{authMethod}).", ".quote($session{form}{ldapURL}).", ".quote($session{form}{connectDN}).", ".quote($session{form}{language}).", '')",$session{dbh});
+                WebGUI::SQL->write("insert into users (userId,username,identifier,email,authMethod,ldapURL,connectDN,language) values ($uid, ".quote($session{form}{username}).", ".quote($encryptedPassword).", ".quote($session{form}{email}).", ".quote($session{form}{authMethod}).", ".quote($session{form}{ldapURL}).", ".quote($session{form}{connectDN}).", ".quote($session{form}{language}).")",$session{dbh});
                 @groups = $session{cgi}->param('groups');
                 foreach $gid (@groups) {
                         WebGUI::SQL->write("insert into groupings values ($gid, $uid)",$session{dbh});

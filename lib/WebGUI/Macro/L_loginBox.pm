@@ -25,7 +25,7 @@ sub process {
 		$temp = '<div class="loginBox">';
         	if ($session{var}{sessionId}) {
 			$temp .= WebGUI::International::get(48);
-                	$temp .= ' '.$session{user}{username}.'. ';
+                	$temp .= ' <a href="'.$session{page}{url}.'?op=displayAccount">'.$session{user}{username}.'</a>. ';
 			$temp .= WebGUI::International::get(49);
 			$temp = WebGUI::Macro::Backslash_pageUrl::process($temp);
         	} else {
@@ -39,6 +39,7 @@ sub process {
 			$temp .= WebGUI::Form::password("identifier",12,30).'<span class="formSubtext"><br></span>';
                 	$temp .= WebGUI::Form::submit(WebGUI::International::get(52));
                 	$temp .= '</form>';
+			$temp .= '<a href="'.$session{page}{url}.'?op=createAccount">Click here to register.</a>';
         	}
         	$temp .= '</div>';
         	$output =~ s/\^L/$temp/g;

@@ -482,7 +482,7 @@ sub www_viewProfile {
 		}
                 if ($session{setting}{profileName}) {
 			if ($user{firstName} ne "") {
-                        	$output .= '<tr><td class="tableHeader" valign="top">'.WebGUI::International::get(314).'</td><td class="tableData">'.$user{firstName}.' '.$user{middleName}.' '.$user{lastName}.'</td></tr>';
+                        	$output .= '<tr><td class="tableHeader" valign="top">'.WebGUI::International::get(348).'</td><td class="tableData">'.$user{firstName}.' '.$user{middleName}.' '.$user{lastName}.'</td></tr>';
 			}
                 }
                 if ($session{setting}{profileExtraContact}) {
