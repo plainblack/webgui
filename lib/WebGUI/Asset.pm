@@ -1197,9 +1197,7 @@ sub getLineage {
 		my $cmd = "use ".$className;
 		eval ($cmd);
 		WebGUI::ErrorHandler::fatalError("Couldn't compile asset package: ".$className.". Root cause: ".$@) if ($@);
-		my $assetObject = eval{$className->new("new")};
-		WebGUI::ErrorHandler::fatalError("Couldn't create new asset for ".$className.". Root cause: ".$@) if ($@);
-		foreach my $definition (@{$assetObject->definition}) {
+		foreach my $definition (@{$className->definition}) {
 			unless ($definition->{tableName} eq "asset") {
 				my $tableName = $definition->{tableName};
 				$tables .= ", $tableName ";
@@ -1480,7 +1478,8 @@ Name value pairs to add to the URL in the form of:
 sub getUrl {
 	my $self = shift;
 	my $params = shift;
-	my $url = WebGUI::URL::gateway($self->get("url"),$params);
+	my $url = $self->get("url");
+	$url = WebGUI::URL::gateway($url,$params);
 	if ($self->get("encryptPage")) {
 		$url = WebGUI::URL::getSiteURL().$url;
 		$url =~ s/http:/https:/;

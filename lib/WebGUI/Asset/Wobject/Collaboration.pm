@@ -929,8 +929,8 @@ sub www_search {
 		# this is for trained professionals only and should not be attempted at home
 		my $sql = "select *
 			from asset
-			left join Post on Post.assetId=asset.assetId
 			left join Thread on Thread.assetId=asset.assetId
+			left join Post on Post.assetId=asset.assetId
 			where (asset.className='WebGUI::Asset::Post' or asset.className='WebGUI::Asset::Post::Thread')
 				and asset.lineage  like ".quote($self->get("lineage").'%')."
 				and asset.assetId<>".quote($self->getId)."

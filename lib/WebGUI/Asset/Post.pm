@@ -68,13 +68,13 @@ sub canView {
 
 #-------------------------------------------------------------------
 
-=head2 chopSubject ( )
+=head2 chopTitle ( )
 
-Cuts a subject string off at 30 characters.
+Cuts a title string off at 30 characters.
 
 =cut
 
-sub chopSubject {
+sub chopTitle {
 	my $self = shift;
         return substr($self->get("title"),0,30);
 }
@@ -363,16 +363,17 @@ sub getSynopsisAndContentFromFormPost {
 #-------------------------------------------------------------------
 sub getTemplateVars {
 	my $self = shift;
-	my %var = (%{$self->get});
+	my %var = %{$self->get};
 	$var{"userId"} = $self->get("ownerUserId");
 	$var{"user.isPoster"} = $self->isPoster;
 
 	$var{"dateSubmitted.human"} = epochToHuman($self->get("dateSubmitted"));
 	$var{"dateUpdated.human"} = epochToHuman($self->get("dateUpdated"));
 
+	$var{'title.short'} = $self->chopTitle;
 	$var{content} = $self->formatContent if ($self->getThread);
 
-        $var{canEdit} = $self->canEdit if ($self->getThread);
+        $var{'user.canEdit'} = $self->canEdit if ($self->getThread);
         $var{"delete.url"} = $self->getDeleteUrl;
         $var{"edit.url"} = $self->getEditUrl;
 
@@ -383,7 +384,7 @@ sub getTemplateVars {
 	$var{"reply.url"} = $self->getReplyUrl;
         $var{'reply.withquote.url'} = $self->getReplyUrl(1);
 
-        $var{'url'} = WebGUI::URL::getSiteURL().$self->getUrl;
+        $var{'url'} = $self->getUrl.'#'.$self->getId;
 
         $var{'rating.value'} = $self->get("rating")+0;
         $var{'rate.url.1'} = $self->getRateUrl(1);
@@ -593,6 +594,7 @@ sub notifySubscribers {
                                 'notify.subscription.message' => WebGUI::International::get(875,"WebGUI",$u->profileField("language"))
                                 };
                         $lang{$u->profileField("language")}{var} = $self->getTemplateVars($lang{$u->profileField("language")}{var});
+			$lang{$u->profileField("language")}{var}{url} = WebGUI::URL::getSiteURL().$self->getUrl;
                         $lang{$u->profileField("language")}{subject} = WebGUI::International::get(523,"WebGUI",$u->profileField("language"));
                         $lang{$u->profileField("language")}{message} = $self->processTemplate($lang{$u->profileField("language")}{var}, $self->getThread->getParent->get("notificationTemplateId"));
                 }
@@ -670,10 +672,10 @@ sub rate {
         	WebGUI::SQL->write("insert into Post_rating (assetId,userId,ipAddress,dateOfRating,rating) values ("
                 	.quote($self->getId).", ".quote($session{user}{userId}).", ".quote($session{env}{REMOTE_ADDR}).", 
 			".WebGUI::DateTime::time().", $rating)");
-        	my ($count) = WebGUI::SQL->quickArray("select count(*) from Post_rating where postId=".quote($self->getId));
+        	my ($count) = WebGUI::SQL->quickArray("select count(*) from Post_rating where assetId=".quote($self->getId));
         	$count = $count || 1;
-        	my ($sum) = WebGUI::SQL->quickArray("select sum(rating) from Post_rating where postId=".quote($self->getId));
-        	my $average = round($sum/$count);
+        	my ($sum) = WebGUI::SQL->quickArray("select sum(rating) from Post_rating where assetId=".quote($self->getId));
+        	my $average = WebGUI::Utility::round($sum/$count);
         	$self->update({rating=>$average});
 		$self->getThread->rate;
 	}
@@ -954,7 +956,7 @@ This is here to stop people from duplicating posts by hitting refresh in their b
 
 sub www_redirectToParent {
 	my $self = shift;
-	WebGUI::HTTP::setRedirect($self->getThread->getParent->getUrl);
+	WebGUI::HTTP::setRedirect($self->getParent->getUrl);
 }
 
 

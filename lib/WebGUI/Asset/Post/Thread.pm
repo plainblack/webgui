@@ -21,6 +21,7 @@ use WebGUI::Paginator;
 use WebGUI::Privilege;
 use WebGUI::Session;
 use WebGUI::SQL;
+use WebGUI::Utility;
 
 our @ISA = qw(WebGUI::Asset::Post);
 
@@ -127,7 +128,7 @@ sub getName {
 
 #-------------------------------------------------------------------
 
-=head2 getLayoutUrl ( layout [, postId] )
+=head2 getLayoutUrl ( layout )
 
 Formats the url to change the layout of a thread.
 
@@ -135,35 +136,26 @@ Formats the url to change the layout of a thread.
 
 A string indicating the type of layout to use. Can be flat, nested, or threaded.
 
-=head3 postId
-
-The asset id of the post to position on. Defaults to the root post of the thread.
-
 =cut
 
 sub getLayoutUrl {
 	my $self = shift;
 	my $layout = shift;
-	my $postId = shift || $self->get("rootPostId");
-	return $self->getUrl("layout=".$layout."#".$postId);
+	return $session{asset}->getUrl("layout=".$layout.'#'.$session{asset}->getId) if (exists $session{asset});
+	return $self->getUrl("layout=".$layout);
 }
 
 #-------------------------------------------------------------------
 
-=head2 getLockUrl ( [ postId ] )
+=head2 getLockUrl ( )
 
 Formats the url to lock a thread.
-
-=head3 postId
-
-The asset id of the post to position on. Defaults to the root post of the thread.
 
 =cut
 
 sub getLockUrl {
 	my $self = shift;
-	my $postId = shift || $self->get("rootPostId");
-	$self->getUrl("fucn=lock#">$postId);
+	$self->getUrl("func=lock");
 }
 
 #-------------------------------------------------------------------
@@ -233,38 +225,28 @@ sub getPreviousThread {
 
 #-------------------------------------------------------------------
 
-=head2 getStickUrl ( [ postId ] )
+=head2 getStickUrl ( )
 
 Formats the url to make a thread sticky.
-
-=head3 postId
-
-The asset id of the post to position on. Defaults to the root post of the thread.
 
 =cut
 
 sub getStickUrl {
 	my $self = shift;
-	my $postId = shift || $self->get("rootPostId");
-	return $self->getUrl("func=stick#".$postId);
+	return $self->getUrl("func=stick");
 }
 
 #-------------------------------------------------------------------
 
-=head2 getSubscribeUrl ( [ postId ] )
+=head2 getSubscribeUrl (  )
 
 Formats the url to subscribe to the thread
-
-=head3 postId
-
-The asset id of the post to position on. Defaults to the root post of the thread.
 
 =cut
 
 sub getSubscribeUrl {
 	my $self = shift;
-	my $postId = shift || $self->get("rootPostId");
-	return $self->getUrl("func=subscribe#".$postId);
+	return $self->getUrl("func=subscribe");
 }
 
 
@@ -275,57 +257,42 @@ sub getThread {
 
 #-------------------------------------------------------------------
 
-=head2 getUnlockUrl ( [ postId ] )
+=head2 getUnlockUrl ( )
 
 Formats the url to unlock the thread
-
-=head3 postId
-
-The asset id of the post to position on. Defaults to the root post of the thread.
 
 =cut
 
 sub getUnlockUrl {
 	my $self = shift;
-	my $postId = shift || $self->get("rootPostId");
-	return $self->getUrl("func=unlock#".$postId);
+	return $self->getUrl("func=unlock");
 }
 
 
 #-------------------------------------------------------------------
 
-=head2 getUnstickUrl ( [ postId ] )
+=head2 getUnstickUrl ( )
 
 Formats the url to unstick the thread
-
-=head3 postId
-
-The asset id of the post to position on. Defaults to the root post of the thread.
 
 =cut
 
 sub getUnstickUrl {
 	my $self = shift;
-	my $postId = shift || $self->get("rootPostId");
-	return $self->getUrl("func=unstick#".$postId);
+	return $self->getUrl("func=unstick");
 }
 
 #-------------------------------------------------------------------
 
-=head2 getUnsubscribeUrl ( [ postId ] )
+=head2 getUnsubscribeUrl ( )
 
 Formats the url to unsubscribe from the thread
-
-=head3 postId
-
-The asset id of the post to position on. Defaults to the root post of the thread.
 
 =cut
 
 sub getUnsubscribeUrl {
 	my $self = shift;
-	my $postId = shift || $self->get("rootPostId");
-	return $self->getUrl("func=unsubscribe#".$postId);
+	return $self->getUrl("func=unsubscribe");
 }
 
 
@@ -583,7 +550,7 @@ sub view {
         my $layout = $session{scratch}{discussionLayout} || $session{user}{discussionLayout};
         $var->{'layout.isFlat'} = ($layout eq "flat");
         $var->{'layout.isNested'} = ($layout eq "nested");
-        $var->{'layout.isThreaded'} = ($layout eq "threaded" || !($var->{'thread.layout.isNested'} || $var->{'thread.layout.isFlat'}));
+        $var->{'layout.isThreaded'} = ($layout eq "threaded" || !($var->{'layout.isNested'} || $var->{'layout.isFlat'}));
 
         $var->{'user.isSubscribed'} = $self->isSubscribed;
         $var->{'subscribe.url'} = $self->getSubscribeUrl;
@@ -599,11 +566,10 @@ sub view {
 
         my $p = WebGUI::Paginator->new($self->getUrl,$self->getParent->get("postsPerPage"));
 	my $sql = "select * from asset 
-		left join Post on Post.assetId=asset.assetId
 		left join Thread on Thread.assetId=asset.assetId
-		where asset.lineage like ".quote($self->get("lineage").'%')."
-			and asset.assetId<>".quote($self->getId)."
-			and (
+		left join Post on Post.assetId=asset.assetId
+		where asset.lineage like ".quote($self->get("lineage").'%')
+		."	and (
 				Post.status in ('approved','archived')";
 	$sql .= "		or Post.status='pending'" if ($self->getParent->canModerate);
 	$sql .= "		or (asset.ownerUserId=".quote($session{user}{userId})." and asset.ownerUserId<>'1')
@@ -618,14 +584,17 @@ sub view {
 	foreach my $dataSet (@{$p->getPageData()}) {
 		my $reply = WebGUI::Asset::Post->newByPropertyHashRef($dataSet);
 		$reply->{_thread} = $self; # caching thread for better performance
-		my $replyVars = $reply->getTemplateVars;
-		$replyVars->{isCurrent} = $session{asset}->getId eq $reply->getId;
-		$replyVars->{depth} = $reply->getLineageLength - $self->getLineageLength - 1;
+		my %replyVars = %{$reply->getTemplateVars};
+		$replyVars{isCurrent} = ('/'.$reply->get("url") eq $session{env}{PATH_INFO});
+		$replyVars{isThreadRoot} = $self->getId eq $reply->getId;
+		$replyVars{depth} = $reply->getLineageLength - $self->getLineageLength;
+		$replyVars{depthX10} = $replyVars{depth}*10;
         	my @depth_loop;
-        	for (my $i=0; $i<$replyVars->{depth}; $i++) {
-                	push(@{$replyVars->{indent_loop}},{depth=>$i});
+		#@{$replyVars{indent_loop}} = {};
+        	for (my $i=0; $i<$replyVars{depth}; $i++) {
+                	push(@{$replyVars{indent_loop}},{depth=>$i});
         	}
-		push (@{$var->{post_loop}}, $replyVars);
+		push (@{$var->{post_loop}}, \%replyVars);
 	}		
 	$p->appendTemplateVars($var);
         $var->{'add.url'} = $self->getParent->getNewThreadUrl;
@@ -637,6 +606,9 @@ sub view {
 
 	$var->{"search.url"} = $self->getParent->getSearchUrl;
         $var->{"collaboration.url"} = $self->getThread->getParent->getUrl;
+        $var->{'collaboration.title'} = $self->getParent->get("title");
+        $var->{'collaboration.description'} = $self->getParent->get("description");
+
 	return $self->processTemplate($var,$self->getParent->get("threadTemplateId"));
 }
 
