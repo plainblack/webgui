@@ -63,7 +63,7 @@ sub filter {
   	my $self=shift;
   	$self->parse($self->{Content}); # Make paths absolute and let them return to us
   	$self->eof;
-	return "<p>Error: Can't proxy a HttpProxy object inside a HttpProxy object.</p>" if ($self->{recurseCheck});
+	return "<p>Error: HttpProxy can't recursively proxy its own content.</p>" if ($self->{recurseCheck});
   	return $self->{Filtered};
 }
 
@@ -97,11 +97,14 @@ sub end {
 sub start {
   	my $self = shift;
   	my ($tag, $attr, $attrseq, $origtext) = @_;
+	# Check on the div class and div id attributes to see if we're proxying ourself.
+	if($tag eq "div" && $attr->{'class'} eq 'wobjectHttpProxy' && $attr->{'id'} eq ('wobjectId'.$self->{wid})) { 
+		$self->{recurseCheck} = 1;
+	}
   	$self->output("<$tag");
   	for (keys %$attr) {
     		$self->output(" $_=\"");
     		my $val = $attr->{$_};
-		$self->{recurseCheck} = 1 if($val =~ /proxiedUrl=/i); # We're proxying ourself.
     		if ((lc($tag) eq "input" || lc($tag) eq "textarea" || lc($tag) eq "select") 
        			&& (lc($_) eq "name" || lc($_) eq "submit")) {  # Rewrite input type names
       			$val = 'HttpProxy_' . $val;
