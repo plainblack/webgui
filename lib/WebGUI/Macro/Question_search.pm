@@ -22,7 +22,7 @@ sub process {
 	$output = $_[0];
 	$f = WebGUI::HTMLForm->new(1);
         $f->hidden("op","search");
-        $f->text("keywords",'',$session{form}{keywords});
+        $f->text("atLeastOne",'',$session{form}{atLeastOne});
         $f->submit(WebGUI::International::get(364));
 	$temp = $f->print;
         $output =~ s/\^\?\;/$temp/g;
