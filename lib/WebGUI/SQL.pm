@@ -148,7 +148,7 @@ Builds a hash of data from a series of rows.
 
 =item sql
 
-An SQL query. The query must select only two columns of data, the first being the key for the hash, the second being the value.
+An SQL query. The query must select at least two columns of data, the first being the key for the hash, the second being the value. If the query selects more than two columns, then the last column will be the value and the remaining columns will be joined together by an underscore "_" to form a complex key.
 
 =item dbh
 
@@ -163,7 +163,9 @@ sub buildHash {
 	tie %hash, "Tie::IxHash";
         $sth = WebGUI::SQL->read($_[1],$_[2]);
         while (@data = $sth->array) {
-               	$hash{$data[0]} = $data[1];
+		my $value = pop @data;
+		my $key = join("_",@data);	
+               	$hash{$key} = $value;
         }
         $sth->finish;
 	return %hash;
@@ -180,7 +182,7 @@ Builds a hash reference of data from a series of rows.
 
 =item sql
 
-An SQL query. The query must select only two columns of data, the first being the key for the hash, the second being the value.  
+An SQL query. The query must select at least two columns of data, the first being the key for the hash, the second being the value. If the query selects more than two columns, then the last column will be the value and the remaining columns will be joined together by an underscore "_" to form a complex key.
 
 =item dbh
 
