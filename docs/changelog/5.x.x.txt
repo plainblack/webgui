@@ -2,6 +2,7 @@
  - Rewrote the discussion system and added many new features in the process.
  - Fixed a bug in the collateralImport.pl script.
  - Added external database group privileges. (Thanks to Andy Grundman.)
+ - Added support for encryptLogin user setting. (Thanks to Hal Roberts.)
  - Added anonymous response option to Survey. (Thanks to Andy Grundman.)
 
 
