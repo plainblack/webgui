@@ -335,14 +335,14 @@ sub www_listUsers {
 			$row[$i] .= '<a href="'.WebGUI::URL::page('op=becomeUser&uid='.$data[0]).
 				'"><img src="'.$session{setting}{lib}.'/become.gif" border=0></a>';
 			$row[$i] .= '</td>';
-			$row[$i] .= '<td><a href="'.WebGUI::URL::page('?op=viewProfile&uid='.$data[0])
+			$row[$i] .= '<td><a href="'.WebGUI::URL::page('op=viewProfile&uid='.$data[0])
 				.'">'.$data[1].'</a></td>';
 			#$row[$i] .= '<td>'.$data[1].'</td>';
 			$row[$i] .= '<td><a href="mailto:'.$data[2].'">'.$data[2].'</a></td></tr>';
 			$i++;
 		}
 		$sth->finish;
-                ($dataRows, $prevNextBar) = paginate(50,WebGUI::URL::page('?op=listUsers'),\@row);
+                ($dataRows, $prevNextBar) = paginate(50,WebGUI::URL::page('op=listUsers'),\@row);
                 $output .= '<table border=1 cellpadding=5 cellspacing=0 align="center">';
                 $output .= $dataRows;
                 $output .= '</table>';

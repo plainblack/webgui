@@ -72,14 +72,10 @@ sub canViewPage {
 #-------------------------------------------------------------------
 sub insufficient {
 	my ($output);
-	if ($session{user}{userId} eq "") {
-		$output = WebGUI::Operation::Account::displayAccount();
-	} else {
-		$output = '<h1>'.WebGUI::International::get(37).'</h1>';
-		$output .= WebGUI::International::get(38);
-		$output .= '<p>';
-		$output = WebGUI::Macro::process($output);
-	}
+	$output = '<h1>'.WebGUI::International::get(37).'</h1>';
+	$output .= WebGUI::International::get(38);
+	$output .= '<p>';
+	$output = WebGUI::Macro::process($output);
 	return $output;
 }
 
@@ -103,10 +99,14 @@ sub isInGroup {
 #-------------------------------------------------------------------
 sub noAccess {
 	my ($output);
-        $output = '<h1>'.WebGUI::International::get(37).'</h1>';
-	$output .= WebGUI::International::get(39);
-	$output .= '<p>';
-	return $output;
+        if ($session{user}{userId} <= 1) {
+                $output = WebGUI::Operation::Account::www_displayAccount();
+        } else {
+                $output = '<h1>'.WebGUI::International::get(37).'</h1>';
+                $output .= WebGUI::International::get(39);
+                $output .= '<p>';
+        }
+        return $output;
 }
 
 #-------------------------------------------------------------------

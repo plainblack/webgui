@@ -153,9 +153,9 @@ sub www_editImageSave {
 		if ($file ne "") {
 			$file = ", filename=".quote($file);
 		}
-                WebGUI::SQL->write("update images set imageId=$session{form}{iid}, name=".quote($session{form}{name}).
+		WebGUI::SQL->write("update images set name=".quote($session{form}{name}).
                         $file.", parameters=".quote($session{form}{parameters}).", userId=$session{user}{userId}, ".
-                        " username=".quote($session{user}{username}).", dateUploaded=".time());
+                        " username=".quote($session{user}{username}).", dateUploaded=".time()." where imageId=$session{form}{iid}");
                 return www_listImages();
         } else {
                 return WebGUI::Privilege::insufficient();
@@ -164,7 +164,7 @@ sub www_editImageSave {
 
 #-------------------------------------------------------------------
 sub www_listImages {
-        my ($output, $sth, %data, @row, $dataRows, $prevNextBar, $i, $search);
+        my ($output, $sth, %data, @row, $dataRows, $prevNextBar, $i, $search, $isAdmin);
 	tie %data, 'Tie::CPHash';
         if (WebGUI::Privilege::isInGroup(4)) {
                 $output = helpLink(26);
@@ -180,10 +180,11 @@ sub www_listImages {
                         $search = " where (name like '%".$session{form}{keyword}.
 				"%' or filename like '%".$session{form}{keyword}."%') ";
                 }
+		$isAdmin = WebGUI::Privilege::isInGroup(3);
                 $sth = WebGUI::SQL->read("select * from images $search order by name");
                 while (%data = $sth->hash) {
                         $row[$i] = '<tr class="tableData"><td>';
-			if ($session{user}{userId} == $data{userId}) {
+			if ($session{user}{userId} == $data{userId} || $isAdmin) {
 	                        $row[$i] .= '<a href="'.WebGUI::URL::page('op=deleteImage&iid='.$data{imageId}).
         	                        '"><img src="'.$session{setting}{lib}.'/delete.gif" border=0></a>';
                                 $row[$i] .= '<a href="'.WebGUI::URL::page('op=editImage&iid='.$data{imageId}).
