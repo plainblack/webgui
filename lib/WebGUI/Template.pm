@@ -103,7 +103,7 @@ sub selectTemplate {
 		$templates{$key} =~ s/\n//g;
 		$templates{$key} =~ s/\r//g;
 		$templates{$key} =~ s/\'/\\\'/g;
-		$templates{$key} =~ s/\<table.*?\>/\<table cellspacing=0 cellpadding=3 width=60 height=80 border=1\>/ig;
+		$templates{$key} =~ s/\<table.*?\>/\<table cellspacing=0 cellpadding=3 width=100 height=80 border=1\>/ig;
 		$templates{$key} =~ s/\^(\d+)\;/$1/g;
 		$output .= "	var b".$key." = '".$templates{$key}."';\n";
 	}
