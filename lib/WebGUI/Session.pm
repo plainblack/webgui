@@ -172,6 +172,7 @@ sub close {
 #-------------------------------------------------------------------
 sub end {
 	WebGUI::SQL->write("delete from userSession where sessionId='$_[0]'",$session{dbh});
+	WebGUI::SQL->write("delete from userSessionScratch where sessionId='$_[0]'",$session{dbh});
 	if ($_[0] eq $session{var}{sessionId}) {
 		refreshSessionVars();
 	}
