@@ -170,7 +170,7 @@ sub www_view {
 			where wobjectId=".$_[0]->get("wobjectId")." order by sequenceNumber");
 	}
 	my ($forumId, $title, $description) = WebGUI::SQL->quickArray("select forumId, title, description from MessageBoard_forums 
-		where wobjectId=".$_[0]->get("wobjectId")." and forumId=".$session{form}{forumId});
+		where wobjectId=".$_[0]->get("wobjectId")." and forumId=".quote($session{form}{forumId}));
 	my $forumParam = "forumId=".$forumId;
 	$callback = WebGUI::URL::append($callback,$forumParam);
 	my $caller = {
