@@ -135,7 +135,8 @@ sub www_listGroups {
 		$output .= '<h1>'.WebGUI::International::get(89).'</h1>';
 		$output .= '<div align="center"><a href="'.WebGUI::URL::page('op=editGroup&gid=new').'">'.WebGUI::International::get(90).'</a></div>';
                 $output .= '<table border=1 cellpadding=5 cellspacing=0 align="center">';
-                $sth = WebGUI::SQL->read("select groupId,groupName,description from groups where groupName<>'Reserved' order by groupName");
+                $sth = WebGUI::SQL->read("select groupId,groupName,description from groups 
+			where groupId<>1 and groupId<>2 and groupId<>7 order by groupName");
                 while (@data = $sth->array) {
                         $row[$i] = '<tr><td valign="top" class="tableData"><a href="'.
 				WebGUI::URL::page('op=deleteGroup&gid='.$data[0]).
