@@ -4662,6 +4662,30 @@ Just as the LDAP Identity Name is a label, so is the LDAP Password Name. Use thi
 		context => q|Tab label for the user's profile in the user manager.|
 	},
 
+	'glossary title' => {
+		message => q|Glossary|,
+		lastUpdated => 1111729014,
+	},
+
+	'glossary body' => {
+		message => q|
+
+<b>Assets</b><br>
+Everything inside of WebGUI is an Asset: files, images, forums, threads in forums, posts in threads, templates, Wobjects (like Articles, DataForms, EventsCalendars) and more.
+<p>
+
+<b>sticky</b><br>
+If Posts and Threads are set to being "sticky", they will appear at the top of the Forum listing.
+<p>
+
+<b>locked</b><br>
+If Posts and Threads are "locked", no new posts can be added and no existing posts can be edited.
+<p>
+
+|,
+		lastUpdated => 1111729014,
+	},
+
 };
 
 1;

@@ -483,7 +483,13 @@ our $HELP = {
                 body => 'Page, Export body',
                 related => [
                 ],
-	}
+	},
+	'glossary' => {
+                title => 'glossary title',
+                body => 'glossary body',
+                related => [
+                ],
+	},
 };
 
 1;
