@@ -12,5 +12,6 @@
  - Migrated extra columns to page templates and removed the Extra Column
    wobject.
  - Migrated Link Lists to USS submissions and removed the Link List wobject.
+ - Re-enabled the Date macro by default.
 
 
