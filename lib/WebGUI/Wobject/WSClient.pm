@@ -344,7 +344,7 @@ sub www_view {
             }
 
             $cache->set(Storable::freeze(@result),
-               $wobject[0]->get('cacheTTL'));
+               $self->get('cacheTTL'));
          };
 
          # did the soap call fault?
