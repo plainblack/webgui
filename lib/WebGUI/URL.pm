@@ -16,6 +16,7 @@ package WebGUI::URL;
 
 
 use strict;
+use URI;
 use URI::Escape;
 use WebGUI::Session;
 use WebGUI::Utility;
@@ -36,6 +37,7 @@ This package provides URL writing functionality. It is important that all WebGUI
  $string = WebGUI::URL::escape($string);
  $url = WebGUI::URL::gateway($url,$pairs);
  $url = WebGUI::URL::makeCompliant($string);
+ $url = WebGUI::URL::makeAbsolute($url);
  $url = WebGUI::URL::page($url,$pairs);
  $string = WebGUI::URL::unescape($string);
  $url = WebGUI::URL::urlize($string);
@@ -156,6 +158,32 @@ sub gateway {
                 $url = append($url,"noCache=".randint(0,1000).';'.time());
         }
         return $url;
+}
+
+#-------------------------------------------------------------------
+                                                                                                                             
+=head2 makeAbsolute ( url , [ baseURL ] )
+                                                                                                                             
+Returns an absolute url.
+                                                                                                                             
+=over
+                                                                                                                             
+=item url
+                                                                                                                             
+The url to make absolute.
+                                                                                                                            
+=item baseURL
+
+The base URL to use. This defaults to current page url.
+ 
+=back
+                                                                                                                             
+=cut
+                                                                                                                             
+sub makeAbsolute {
+	my $url = shift;
+	my $baseURL = shift || page();
+	return URI->new_abs($url,$baseURL);
 }
 
 #-------------------------------------------------------------------
