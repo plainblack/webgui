@@ -17,7 +17,7 @@ use URI::Escape ();
 use Data::Config ();
 use Date::Calc ();
 use HTML::CalendarMonthSimple ();
-use Image::Magick ();
+eval "use Image::Magick ();"; # eval, may not be installed
 use Tie::CPHash ();
 use Tie::IxHash ();
 use Net::LDAP ();

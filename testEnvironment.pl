@@ -232,7 +232,7 @@ if (eval { require Image::Magick }) {
                 print "Installing...\n";
                 CPAN::Shell->install("Image::Magick");
         } else {
-                print "Please install.\n";
+                print "Please install. (or Thumbnailing will be disabled)\n";
 		$prereq = 0;
         }
 }

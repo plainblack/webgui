@@ -14,10 +14,16 @@ package WebGUI::Attachment;
 
 =cut
 
+my $hasImageMagick=1;
+
 use File::Copy qw(cp);
 use File::Path;
 use FileHandle;
-use Image::Magick;
+
+# test for ImageMagick. if it's not installed set $hasImageMagick to 0,
+# if it is installed it will be set to 1
+eval " use Image::Magick; "; $hasImageMagick=0 if $@;
+
 use POSIX;
 use strict;
 use WebGUI::ErrorHandler;
@@ -59,7 +65,7 @@ use WebGUI::Utility;
 #-------------------------------------------------------------------
 sub _createThumbnail {
 	my ($image, $error, $x, $y, $r, $n);
-        if (isIn($_[0]->getType, qw(jpg jpeg gif png tif tiff bmp))) {
+        if ($hasImageMagick && isIn($_[0]->getType, qw(jpg jpeg gif png tif tiff bmp))) {
 		$image = Image::Magick->new;
 		$error = $image->Read($_[0]->getPath);
 		WebGUI::ErrorHandler::warn($error) if $error;
@@ -223,15 +229,16 @@ sub getPath {
 =head2 getThumbnail ( )
 
  Returns a full URL to the thumbnail for this attachment. Thumbnails
- are only created for jpg, gif, png, tif, and bmp so getThumbnail 
- only returns a thumbnail if the file is one of those types.
+ are only created for jpg, gif, png, tif, and bmp with Image::Magick
+ installed so getThumbnail only returns a thumbnail if the file is 
+ one of those types and Image::Magick is installed.
 
 =cut
 
 sub getThumbnail {
-	if (isIn($_[0]->getType, qw(jpg jpeg gif png))) {
+	if ($hasImageMagick && isIn($_[0]->getType, qw(jpg jpeg gif png))) {
         	return $_[0]->{_node}->getURL.'/thumb-'.$_[0]->getFilename;
-	} elsif (isIn($_[0]->getType, qw(tif tiff bmp))) {
+	} elsif ($hasImageMagick && isIn($_[0]->getType, qw(tif tiff bmp))) {
         	return $_[0]->{_node}->getURL.'/thumb-'.$_[0]->getFilename.'.png';
 	} else {
 		return "";
