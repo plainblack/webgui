@@ -228,11 +228,13 @@ sub build {
 	my (@page_loop, $lastPage, %unfolded);
 	tie %unfolded, "Tie::IxHash";
 
-        # Store current page properties in template var
-        my $currentPage = WebGUI::Page->getPage();
-        foreach my $property (@interestingPageProperties) {
-        	$var->{'page.current.'.$property} = $currentPage->get($property);
-        }
+    # Store current page properties in template var
+    my $currentPage = WebGUI::Page->getPage();
+    my $currentRoot = $currentPage->getWebGUIRoot();
+    foreach my $property (@interestingPageProperties) {
+        $var->{'basepage.'.$property} = $currentPage->get($property);
+    }
+    $var->{'basepage.hasDaughters'} = $currentPage->hasDaughter();
 	unless (defined $cacheContent &&
 		! $session{url}{siteURL}) {	# Never use cache if an alternate site url is specified.
 		# The loop was not cached
@@ -268,7 +270,7 @@ sub build {
 					$pageData->{"page.url"} =~ s/http:/https:/;
 				}
 				$pageData->{"page.relDepth"} = $pageData->{"page.absDepth"} - $startPageDepth;
-				$pageData->{"page.isCurrent"} = ($page->{'pageId'} eq $session{page}{pageId});
+				$pageData->{"page.isBasepage"} = ($page->{'pageId'} eq $session{page}{pageId});
 				$pageData->{"page.isHidden"} = $page->{'hideFromNavigation'};
 				
 				# indent
@@ -297,15 +299,19 @@ sub build {
 				$pageData->{"page.isRoot"} = (! $page->{'parentId'});
 				$pageData->{"page.isTop"} = ($pageData->{"page.absDepth"} == 2);
 				$pageData->{"page.hasDaughter"} = ($page->{'nestedSetRight'} - $page->{'nestedSetLeft'} > 1);
-				$pageData->{"page.isMyDaughter"} = ($page->{'parentId'} eq $currentPage->get('pageId'));
-				$pageData->{"page.isMyMother"} = ($page->{'pageId'} eq $currentPage->get('parentId'));
+				$pageData->{"page.isDaughter"} = ($page->{'parentId'} eq $currentPage->get('pageId'));
+				$pageData->{"page.isMother"} = ($page->{'pageId'} eq $currentPage->get('parentId'));
 
-                $pageData->{"page.isMyAncestor"}
+                $pageData->{"page.isAncestor"}
 				    =  (($page->{'nestedSetLeft'} < $currentPage->get('nestedSetLeft'))
                     && ($page->{'nestedSetRight'} > $currentPage->get('nestedSetRight')));
-                $pageData->{"page.isMyDescendent"}
+                $pageData->{"page.isDescendent"}
                     =  (($page->{'nestedSetLeft'} > $currentPage->get('nestedSetLeft'))
                     && ($page->{'nestedSetRight'} < $currentPage->get('nestedSetRight')));
+
+                $pageData->{"page.inRoot"}
+                    =  (($page->{'nestedSetLeft'} > $currentRoot->get('nestedSetLeft'))
+                    && ($page->{'nestedSetRight'} < $currentRoot->get('nestedSetRight')));
 
 				# Some information about my mother
 				my $mother = WebGUI::Page->getPage($page->{parentId});
@@ -313,16 +319,16 @@ sub build {
 					foreach (qw(title urlizedTitle parentId pageId)) {
 						$pageData->{"page.mother.$_"} = $mother->get($_);
 					}
-                    $pageData->{"page.isMySister"}
+                    $pageData->{"page.isSister"}
                         = (($mother->get("pageId") eq $currentPage->get("parentId"))
-                        && !$pageData->{"page.isCurrent"});
+                        && !$pageData->{"page.isBasepage"});
 				}
 
-				$pageData->{"page.inCurrentRoot"}
-                    =  ($pageData->{"page.isMyAncestor"}
-                    || $pageData->{"page.isMyDescendent"}
-                    || $pageData->{"page.isMySister"}
-                    || $pageData->{"page.isCurrent"});
+				$pageData->{"page.inBranch"}
+                    = ($pageData->{"page.isAncestor"}
+                    || $pageData->{"page.isDescendent"}
+                    || $pageData->{"page.isSister"}
+                    || $pageData->{"page.isBasepage"});
 				
 				$pageData->{"page.isLeftMost"} = (($page->{'nestedSetLeft'} - 1) == $mother->get('nestedSetLeft'));
 				$pageData->{"page.isRightMost"} = (($page->{'nestedSetRight'} + 1) == $mother->get('nestedSetRight'));
@@ -344,7 +350,6 @@ sub build {
 				if ($self->{_reverse}) {
 					unshift(@page_loop, $pageData);
 				} else {
-				
 					push(@page_loop, $pageData);
 				}
 			}

@@ -5,6 +5,8 @@
  - bugfix [1041937] List Roots broken
  - bugfix [1042680] collateralImport.pl --folderId
  - Fixed typo in Wobjects/IndexedSearch.pm
+ - Navigation template variable rename, added template variables for
+   basepage.hasDaughter, page.inRoot.
 
 
 6.2.7

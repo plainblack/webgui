@@ -1042,11 +1042,11 @@ A condition indicating whether the thread layout is threaded.
 <p>
 
 <b>thread.layout.isNested</b><br>
-A condition indicationg whether the thread layout is nested.
+A condition indicating whether the thread layout is nested.
 <p>
 
 <b>thread.layout.isFlat</b><br>
-A condition indicationg whether the thread layout is flat.
+A condition indicating whether the thread layout is flat.
 <p>
 
 <b>thread.subscribe.url</b><br>
@@ -1187,7 +1187,7 @@ The description of this forum as passed by the calling object.
 <p>
 
 |,
-		lastUpdated => 1068919471
+		lastUpdated => 1097356661
 	},
 
 	'485' => {
@@ -5491,15 +5491,16 @@ A comment.
 
 	'1097' => {
 		message => q|<STRONG>config.button</STRONG>&nbsp;<BR>A "Edit / Manage" button for this navigation item.<BR>
-<P><STRONG>page.current.menuTitle</STRONG><BR>The pageId of the current page.</P>
-<P><STRONG>page.current.title</STRONG><BR>The title of the current page.</P>
-<P><STRONG>page.current.urlizedTitle</STRONG><BR>The URL of the current page.</P>
-<P><STRONG>page.current.pageId</STRONG><BR>The pageId of the current page.</P>
-<P><STRONG>page.current.parentId</STRONG><BR>The parentId of the current page.</P>
-<P><STRONG>page.current.ownerId</STRONG><BR>The ownerId of the current page.</P>
-<P><STRONG>page.current.synopsis</STRONG><BR>The synopsis of the current page.</P>
-<P><STRONG>page.current.newWindow</STRONG><BR>A conditional indicating whether the current page should be opened in a new window.</P>
-<P><STRONG>page.current.encryptLogin</STRONG><BR>A conditional indicating whether the current page should be served over SSL.</P>
+<P><STRONG>basepage.menuTitle</STRONG><BR>The pageId of the base page.</P>
+<P><STRONG>basepage.title</STRONG><BR>The title of the base page.</P>
+<P><STRONG>basepage.urlizedTitle</STRONG><BR>The URL of the base page.</P>
+<P><STRONG>basepage.pageId</STRONG><BR>The pageId of the base page.</P>
+<P><STRONG>basepage.parentId</STRONG><BR>The parentId of the base page.</P>
+<P><STRONG>basepage.ownerId</STRONG><BR>The ownerId of the base page.</P>
+<P><STRONG>basepage.synopsis</STRONG><BR>The synopsis of the base page.</P>
+<P><STRONG>basepage.newWindow</STRONG><BR>A conditional indicating whether the base page should be opened in a new window.</P>
+<P><STRONG>basepage.encryptLogin</STRONG><BR>A conditional indicating whether the base page should be served over SSL.</P>
+<P><STRONG>basepage.hasDaughters</STRONG><BR>A conditional indicating whether the base page has daughters.</P>
 <P><STRONG>page_loop</STRONG><BR>A loop containing page information in nested, hierarchial order.</P>
 <P><STRONG>unfolded_page_loop</STRONG><BR>This loop contains the same data as <STRONG>page_loop</STRONG> but the order is different.  <STRONG>unfolded_page_loop</STRONG> returns it's pages in an unfolded manner; grouped by parent id. You'll probably need <STRONG>page_loop</STRONG>, but there are (CSS) menus that need <STRONG>unfolded_page_loop</STRONG> to work properly.</P>
 <p>Both <STRONG>page_loop</STRONG> and <STRONG>unfolded_page_loop</STRONG> have the following
@@ -5520,19 +5521,21 @@ loop variables:</p>
 <P><STRONG>page.isHidden</STRONG><BR>A conditional indicating whether this page is a hidden page.<BR><EM>(Note: This variable is only visible if "Show hidden pages" is switched on.)</EM></P>
 <P><STRONG>page.isSystem</STRONG><BR>A conditional indicating whether this page is a system page (Trash, Clipboard, etc).<BR><EM>(Note: This variable is only visible if "Show system pages" is switched on.)</EM></P>
 <P><STRONG>page.isViewable</STRONG><BR>A conditional indicating whether the user has permission to view it.<BR><EM>(Note: This variable is only visible if "Show unprivileged pages" is switched on.)</EM></P>
-<P><STRONG>page.indent</STRONG><BR>A variable containing the indent for current page. The default indent is three spaces. Use the <STRONG>page.indent_loop</STRONG> if you need a more flexible indent.</P>
+<P><STRONG>page.indent</STRONG><BR>A variable containing the indent for the current page. The default indent is three spaces. Use the <STRONG>page.indent_loop</STRONG> if you need a more flexible indent.</P>
 <P><STRONG>page.indent_loop</STRONG><BR>A loop that runs <STRONG>page.relDepth</STRONG> times.</P>
 <BLOCKQUOTE dir=ltr style="MARGIN-RIGHT: 0px">
 <P><STRONG>indent</STRONG><BR>A number representing the loop count. </P></BLOCKQUOTE>
-<P dir=ltr><STRONG>page.isRoot</STRONG><BR>A conditional indication whether this page is a root page.</P>
-<P dir=ltr><STRONG>page.isTop</STRONG><BR>A conditional indication whether this page is a top page (daughter of root).</P>
-<P dir=ltr><STRONG>page.inCurrentRoot</STRONG><BR>This conditional is true if this page is a descendant of the root page of the current page</P>
-<P dir=ltr><STRONG>page.hasDaughter</STRONG><BR>A conditional indication whether this page has a daughter. In other words: It evaluates to true if this page is a mother.</P>
-<P dir=ltr><STRONG>page.isCurrent</STRONG><BR>A conditional indicating whether this page is the current page.</P>
-<P dir=ltr><STRONG>page.isMyAncestor</STRONG><BR>A conditional indication whether this page is an ancestor of current page.</P>
-<P dir=ltr><STRONG>page.isMyDaughter</STRONG><BR>A conditional indication whether this page is a daughter of current page.</P>
-<P dir=ltr><STRONG>page.isMyMother</STRONG><BR>A conditional indication whether this page is the mother of current page.</P>
-<P dir=ltr><STRONG>page.isMySister</STRONG><BR>A conditional indication whether this page is the sister of current page.</P>
+<P dir=ltr><STRONG>page.isRoot</STRONG><BR>A conditional indicating whether this page is a root page.</P>
+<P dir=ltr><STRONG>page.isTop</STRONG><BR>A conditional indicating whether this page is a top page (daughter of root).</P>
+<P dir=ltr><STRONG>page.inRoot</STRONG><BR>This conditional is true if this page is a descendant of the root page of the base page.</P>
+<P dir=ltr><STRONG>page.hasDaughter</STRONG><BR>A conditional indicating whether this page has a daughter. In other words: It evaluates to true if this page is a mother.</P>
+<P dir=ltr><STRONG>page.isBasepage</STRONG><BR>A conditional indicating whether this page is the base page.</P>
+<P dir=ltr><STRONG>page.isAncestor</STRONG><BR>A conditional indicating whether this page is an ancestor of the base page.</P>
+<P dir=ltr><STRONG>page.isDescendent</STRONG><BR>A conditional indicating whether this page is a descendent of the base page.</P>
+<P dir=ltr><STRONG>page.isDaughter</STRONG><BR>A conditional indicating whether this page is a daughter of the base page.</P>
+<P dir=ltr><STRONG>page.isMother</STRONG><BR>A conditional indicating whether this page is the mother of the base page.</P>
+<P dir=ltr><STRONG>page.isSister</STRONG><BR>A conditional indicating whether this page is the sister of the base page.</P>
+<P dir=ltr><STRONG>page.inBranch</STRONG><BR>A conditional that is the logical OR of <STRONG>isAncestor</STRONG>, <STRONG>isisSister</STRONG>, <STRONG>isBasepage</STRONG> and <STRONG>isDescendent</STRONG>.</P>
 <P dir=ltr><STRONG>page.mother.*</STRONG><BR>These variables will be undefined if the page is a root.</P>
 <P dir=ltr><STRONG>page.mother.title</STRONG><BR>The title of the mother of this page.</P>
 <P dir=ltr><STRONG>page.mother.urlizedTitle</STRONG><BR>The urlized title of the mother of this page.</P>
@@ -5547,7 +5550,7 @@ loop variables:</p>
 <P dir=ltr><STRONG>page.depthDiffIs1, page.depthDiffIs2, page.depthDiffIs3, page.depthDiffIsN</STRONG><BR>True if the <STRONG>page.depthDiff</STRONG> variable is N.</P>
 <P dir=ltr><STRONG>page.depthDiff_loop</STRONG><BR>A loop that runs <STRONG>page.depthDiff</STRONG> times. This loop contains no loop variables.</P></BLOCKQUOTE>
 <P dir=ltr>&nbsp;</P>|,
-		lastUpdated => 1097208584
+		lastUpdated => 1097642669
 	},
 
 	'893' => {
