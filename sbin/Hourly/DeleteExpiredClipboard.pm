@@ -1,4 +1,4 @@
-package Hourly::EmptyTrash;
+package Hourly::DeleteExpiredClipboard;
 
 #-------------------------------------------------------------------
 # WebGUI is Copyright 2001-2003 Plain Black LLC.
@@ -10,20 +10,24 @@ package Hourly::EmptyTrash;
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
+
 use strict;
 use WebGUI::DateTime;
-use WebGUI::Operation::Trash;
 use WebGUI::Session;
 use WebGUI::SQL;
 
 #-----------------------------------------
 sub process {
-        my @date = WebGUI::DateTime::localtime();
-	if ($date[1] == $session{config}{EmptyTrash_day} && $date[4] == 1) { # only occurs at 1am on the day in question.
-		WebGUI::ErrorHandler::audit("emptying system trash");
-		WebGUI::Operation::Trash::_recursePageTree(3);
-		WebGUI::Operation::Trash::_purgeWobjects(3);
+	if ($session{config}{DeleteExpiredClipboard_offset} ne "") {
+		my $expireDate = (time()-(86400*$session{config}{DeleteExpiredClipboard_offset}));
 
+		WebGUI::ErrorHandler::audit("moving expired clipboard items to trash");
+
+		WebGUI::SQL->write("update page set parentId=3, bufferPrevId=2, bufferDate=" .time()
+				." where parentId=2 and bufferDate < ". $expireDate );
+
+		WebGUI::SQL->write("update wobject set pageId=3, bufferPrevId=2, bufferDate=" .time()
+				." where pageId=2 and bufferDate < ". $expireDate );
 	}
 }
 
