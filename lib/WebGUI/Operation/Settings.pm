@@ -23,8 +23,10 @@ our @EXPORT = qw(&www_editSettings &www_editSettingsSave);
 
 #-------------------------------------------------------------------
 sub www_editSettings {
-        my ($output, %authMethod, @array);
+        my ($output, %authMethod, @array, %yesNo, %notFoundPage);
 	%authMethod = ('WebGUI'=>'WebGUI', 'LDAP'=>'LDAP');
+	%yesNo = ('yes'=>'Yes', 'no'=>'No');
+	%notFoundPage = (1=>'Home Page', 4=>'Page Not Found Page');
         if (WebGUI::Privilege::isInGroup(3)) {
                 $output .= '<a href="'.$session{page}{url}.'?op=viewHelp&hid=12"><img src="'.$session{setting}{lib}.'/help.gif" border="0" align="right"></a><h1>Edit Settings</h1> <form method="post" action="'.$session{page}{url}.'"> ';
                 $output .= WebGUI::Form::hidden("op","editSettingsSave");
@@ -39,6 +41,8 @@ sub www_editSettings {
                 $output .= '<tr><td class="formDescription" valign="top">Company Email Address</td><td>'.WebGUI::Form::text("companyEmail",30,255,$session{setting}{companyEmail}).'</td></tr>';
                 $output .= '<tr><td class="formDescription" valign="top">Company URL</td><td>'.WebGUI::Form::text("companyURL",30,2048,$session{setting}{companyURL}).'</td></tr>';
 		$output .= '<tr><td colspan=2><hr size=1><b>Authentication</b></td></tr>';
+		$array[0] = $session{setting}{anonymousRegistration};
+                $output .= '<tr><td class="formDescription" valign="top">Anonymous Registration</td><td>'.WebGUI::Form::selectList("anonymousRegistration",\%yesNo, \@array).'</td></tr>';
 		$array[0] = $session{setting}{authMethod};
                 $output .= '<tr><td class="formDescription" valign="top">Authentication Method (default)</td><td>'.WebGUI::Form::selectList("authMethod",\%authMethod, \@array).'</td></tr>';
                 $output .= '<tr><td class="formDescription" valign="top">LDAP URL (default)</td><td>'.WebGUI::Form::text("ldapURL",30,2048,$session{setting}{ldapURL}).'</td></tr>';
@@ -46,6 +50,8 @@ sub www_editSettings {
                 $output .= '<tr><td class="formDescription" valign="top">LDAP Identity Name</td><td>'.WebGUI::Form::text("ldapIdName",30,100,$session{setting}{ldapIdName}).'</td></tr>';
                 $output .= '<tr><td class="formDescription" valign="top">LDAP Password Name</td><td>'.WebGUI::Form::text("ldapPasswordName",30,100,$session{setting}{ldapPasswordName}).'</td></tr>';
 		$output .= '<tr><td colspan=2><hr size=1><b>Miscellaneous</b></td></tr>';
+		$array[0] = $session{setting}{notFoundPage};
+                $output .= '<tr><td class="formDescription" valign="top">Not Found Page</td><td>'.WebGUI::Form::selectList("notFoundPage",\%notFoundPage,\@array).'</td></tr>';
                 $output .= '<tr><td class="formDescription" valign="top">Session Timeout</td><td>'.WebGUI::Form::text("sessionTimeout",30,11,$session{setting}{sessionTimeout}).'</td></tr>';
                 $output .= '<tr><td class="formDescription" valign="top">SMTP Server</td><td>'.WebGUI::Form::text("smtpServer",30,255,$session{setting}{smtpServer}).'</td></tr>';
                 $output .= '<tr><td></td><td>'.WebGUI::Form::submit("save").'</td></tr>';
@@ -53,7 +59,7 @@ sub www_editSettings {
                 $output .= '</form> ';
 		$output .= '<hr size=1>Build Version: '.$WebGUI::VERSION;
         } else {
-                $output = WebGUI::Privilege::insufficient();
+                $output = WebGUI::Privilege::adminOnly();
         }
         return $output;
 }
@@ -75,9 +81,11 @@ sub www_editSettingsSave {
                 WebGUI::SQL->write("update settings set value=".quote($session{form}{ldapId})." where name='ldapId'",$session{dbh});
                 WebGUI::SQL->write("update settings set value=".quote($session{form}{ldapIdName})." where name='ldapIdName'",$session{dbh});
                 WebGUI::SQL->write("update settings set value=".quote($session{form}{ldapPasswordName})." where name='ldapPasswordName'",$session{dbh});
+                WebGUI::SQL->write("update settings set value=".quote($session{form}{anonymousRegistration})." where name='anonymousRegistration'",$session{dbh});
+                WebGUI::SQL->write("update settings set value=".quote($session{form}{notFoundPage})." where name='notFoundPage'",$session{dbh});
                 return "";
         } else {
-                return WebGUI::Privilege::insufficient();
+                return WebGUI::Privilege::adminOnly();
 	}
 }
 

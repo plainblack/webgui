@@ -12,6 +12,7 @@ package WebGUI::Widget::SearchMnoGo;
 
 use DBI;
 use strict;
+use Tie::CPHash;
 use WebGUI::Privilege;
 use WebGUI::Session;
 use WebGUI::SQL;
@@ -21,6 +22,7 @@ use WebGUI::Widget;
 #-------------------------------------------------------------------
 sub _mnogoSearch {
 	my ($i, %match, $key, $sth, $dbh, $urlId, %data, $output, @keyword, $word, %result);
+	tie %match, 'Tie::CPHash';
 	%data = @_;
 	@keyword = split(/ /,$session{form}{query});
 	if ($data{DSN} =~ /\DBI\:\w+\:\w+/) {
@@ -106,6 +108,7 @@ sub www_addSave {
 #-------------------------------------------------------------------
 sub www_edit {
         my ($output, %data);
+	tie %data, 'Tie::CPHash';
         if (WebGUI::Privilege::canEditPage()) {
 		%data = WebGUI::SQL->quickHash("select * from widget,SearchMnoGo where widget.widgetId=SearchMnoGo.widgetId and widget.widgetId=$session{form}{wid}",$session{dbh});
                 $output = '<a href="'.$session{page}{url}.'?op=viewHelp&hid=43"><img src="'.$session{setting}{lib}.'/help.gif" border="0" align="right"></a><h1>Edit Search (MnoGo)</h1><form method="post" enctype="multipart/form-data" action="'.$session{page}{url}.'">';
@@ -140,6 +143,7 @@ sub www_editSave {
 #-------------------------------------------------------------------
 sub www_view {
 	my (%data, @test, $output, $widgetId);
+	tie %data, 'Tie::CPHash';
 	$widgetId = shift;
 	%data = WebGUI::SQL->quickHash("select * from widget,SearchMnoGo where widget.widgetId='$widgetId' and widget.WidgetId=SearchMnoGo.widgetId",$session{dbh});
 	if (%data) {

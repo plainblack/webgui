@@ -11,9 +11,23 @@ package WebGUI::Privilege;
 #-------------------------------------------------------------------
 
 use strict;
+use Tie::CPHash;
 use WebGUI::Session;
 use WebGUI::SQL;
 use WebGUI::Utility;
+
+#-------------------------------------------------------------------
+sub adminOnly {
+	my ($output, $sth, @data);
+        $output = '<h1>Administrative Function</h1>You must be an administrator to perform this function. Please contact one of your administrators. The following is a list of the administrators for this system:<ul>';
+	$sth = WebGUI::SQL->read("select users.username, users.email from users,groupings where users.userId=groupings.userId and groupings.groupId=3 order by users.username",$session{dbh});
+	while (@data = $sth->array) {
+		$output .= '<li>'.$data[0].' (<a href="mailto:'.$data[1].'">'.$data[1].'</a>)';
+	}
+	$sth->finish;
+	$output .= '</ul><p>';
+	return $output;
+}
 
 #-------------------------------------------------------------------
 sub canEditPage {
@@ -33,17 +47,18 @@ sub canEditPage {
 #-------------------------------------------------------------------
 sub canViewPage {
 	my (%page);
+	tie %page, 'Tie::CPHash';
 	if ($_[0] eq "") {
 		%page = %{$session{page}};
 	} else {
 		%page = WebGUI::SQL->quickHash("select * from page where pageId=$_[0]",$session{dbh});
 	}
-        if ($page{worldView}) {
+	if ($page{worldView}) {
                 return 1;
         } elsif ($session{user}{userId} eq $page{ownerId} && $page{ownerView}) {
                 return 1;
-        } elsif (isInGroup(3)) {
-                return 1;
+        } elsif (isInGroup(3)) { # admin check
+	        return 1;
         } elsif (isInGroup($page{groupId}) && $page{groupView}) {
                 return 1;
         } else {
@@ -68,6 +83,11 @@ sub isInGroup {
 		$result = isInGroup(2, $uid); 	# do anything visitors
 	}					# can do
 	return $result;
+}
+
+#-------------------------------------------------------------------
+sub vitalComponent {
+        return '<h1>Vital Component</h1>You\'re attempting to remove a vital component of the WebGUI system. If you were allowed to continue WebGUI may cease to function.<p>';
 }
 
 

@@ -11,6 +11,7 @@ package WebGUI::Style;
 #-------------------------------------------------------------------
 
 use strict;
+use Tie::CPHash;
 use WebGUI::Macro;
 use WebGUI::Session;
 use WebGUI::SQL;
@@ -22,6 +23,7 @@ sub getStyle {
 		$header = '<html><!-- WebGUI '.$session{wg}{version}.' --><title>'.$session{page}{title}.'</title><body>';
 		$footer = '</body></html>'; 
 	} else {
+		tie %style, 'Tie::CPHash';
 		%style = WebGUI::SQL->quickHash("select header,footer,styleSheet from style where styleId=$session{page}{styleId}",$session{dbh});
 		$header = '<!-- WebGUI '.$WebGUI::VERSION.' -->
 			<html>

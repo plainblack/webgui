@@ -72,6 +72,7 @@ sub www_addSave {
 #-------------------------------------------------------------------
 sub www_edit {
         my ($output, %data);
+	tie %data, 'Tie::CPHash';
         if (WebGUI::Privilege::canEditPage()) {
 		%data = WebGUI::SQL->quickHash("select * from widget,SQLReport where widget.widgetId=$session{form}{wid} and widget.widgetId=SQLReport.widgetId",$session{dbh});
                 $output = '<h1>Edit SQL Report</h1><form method="post" enctype="multipart/form-data" action="'.$session{page}{url}.'">';
@@ -111,6 +112,7 @@ sub www_editSave {
 #-------------------------------------------------------------------
 sub www_view {
 	my (%data, $output, $widgetId, $sth, $dbh, @result, @template, $temp);
+	tie %data, 'Tie::CPHash';
 	$widgetId = shift;
 	%data = WebGUI::SQL->quickHash("select * from widget,SQLReport where widget.widgetId=$widgetId and widget.widgetId=SQLReport.widgetId",$session{dbh});
 	if (defined %data) {

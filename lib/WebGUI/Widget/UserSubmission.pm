@@ -11,6 +11,7 @@ package WebGUI::Widget::UserSubmission;
 #-------------------------------------------------------------------
 
 use strict;
+use Tie::CPHash;
 use WebGUI::DateTime;
 use WebGUI::Privilege;
 use WebGUI::Session;
@@ -170,6 +171,7 @@ sub www_deleteSubmissionConfirm {
 #-------------------------------------------------------------------
 sub www_edit {
         my ($output, %data, @array, $sth, %hash);
+	tie %data, 'Tie::CPHash';
         if (WebGUI::Privilege::canEditPage()) {
 		%data = WebGUI::SQL->quickHash("select * from widget,UserSubmission where widget.widgetId=$session{form}{wid} and widget.widgetId=UserSubmission.widgetId",$session{dbh});
                 $output = '<a href="'.$session{page}{url}.'?op=viewHelp&hid=45"><img src="'.$session{setting}{lib}.'/help.gif" border="0" align="right"></a><h1>Edit User Submission System</h1><form method="post" enctype="multipart/form-data" action="'.$session{page}{url}.'">';
@@ -208,6 +210,7 @@ sub www_editSave {
 #-------------------------------------------------------------------
 sub www_editSubmission {
         my ($output, %submission, $owner);
+	tie %submission, 'Tie::CPHash';
 	($owner) = WebGUI::SQL->quickArray("select userId from submission where submissionId=$session{form}{sid}",$session{dbh});
         if ($owner == $session{user}{userId}) {
                 %submission = WebGUI::SQL->quickHash("select * from submission where submissionId='$session{form}{sid}'",$session{dbh});
@@ -267,6 +270,7 @@ sub www_editSubmissionSave {
 #-------------------------------------------------------------------
 sub www_view {
 	my (%data, @submission, $output, $widgetId, $sth, @row, $i, $pn);
+	tie %data, 'Tie::CPHash';
 	$widgetId = shift;
 	%data = WebGUI::SQL->quickHash("select * from widget,UserSubmission where widget.widgetId=$widgetId and widget.widgetId=UserSubmission.widgetId",$session{dbh});
 	if (%data) {
@@ -314,6 +318,7 @@ sub www_view {
 #-------------------------------------------------------------------
 sub www_viewSubmission {
 	my ($output, %submission);
+	tie %submission, 'Tie::CPHash';
 	%submission = WebGUI::SQL->quickHash("select * from submission where submissionId=$session{form}{sid}",$session{dbh});
        	$output = "<h1>".$submission{title}."</h1>";
 	$output .= '<b>Submitted By:</b> '.$submission{username}.'<br>';

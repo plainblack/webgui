@@ -12,6 +12,7 @@ package WebGUI::Operation::Help;
 
 use Exporter;
 use strict;
+use Tie::CPHash;
 use WebGUI::Session;
 use WebGUI::SQL;
 use WebGUI::Utility;
@@ -22,6 +23,7 @@ our @EXPORT = qw(&www_viewHelp &www_viewHelpIndex);
 #-------------------------------------------------------------------
 sub www_viewHelp {
         my ($output, %help, @data, $sth);
+	tie %help, 'Tie::CPHash';
 	%help = WebGUI::SQL->quickHash("select * from help where helpId=$session{form}{hid}",$session{dbh});
         $output = '<h1>Help: '.$help{action}.' '.$help{object}.'</h1>';
 	$help{body} =~ s/\n/\<br\>/g;

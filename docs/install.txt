@@ -22,6 +22,7 @@ QnD INSTALL INSTRUCTIONS:
    Mysql
    Digest::MD5
    Net::LDAP
+   Tie::CPHash
 
 3. Install Apache (with or without mod_perl) and set up your config.
 

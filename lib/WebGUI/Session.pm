@@ -11,19 +11,22 @@ package WebGUI::Session;
 #-------------------------------------------------------------------
 
 use CGI;
+use Data::Config;
 use DBI;
 use Exporter;
 use strict;
-use Data::Config;
+use Tie::CPHash;
 use WebGUI::SQL;
 
 our @ISA = qw(Exporter);
 our @EXPORT = qw(%session);
 our %session = ();
+tie %session, 'Tie::CPHash';
 
 #-------------------------------------------------------------------
 sub _getPageInfo {
         my (%page, $pageId, $pageName);
+	tie %page, 'Tie::CPHash';
 	($pageId) = $_[0];
 	if ($pageId eq "") {
         	$pageName = lc($ENV{PATH_INFO});
@@ -31,7 +34,7 @@ sub _getPageInfo {
         	if ($pageName ne "") {
                 	($pageId) = WebGUI::SQL->quickArray("select pageId from page where urlizedTitle='".$pageName."'",$_[1]);
                 	if ($pageId eq "") {
-                        	$pageId = 1;
+                        	$pageId = $_[2];
                 	}
         	} else {
                 	$pageId = 1;
@@ -45,6 +48,7 @@ sub _getPageInfo {
 #-------------------------------------------------------------------
 sub _getSessionVars {
         my (%vars, $uid, $encryptedPassword);
+	tie %vars, 'Tie::CPHash';
         if ($_[0] ne "") {
         	%vars = WebGUI::SQL->quickHash("select * from session where sessionId='$_[0]'", $_[1]);
 		if ($vars{sessionId} ne "") {
@@ -57,6 +61,7 @@ sub _getSessionVars {
 #-------------------------------------------------------------------
 sub _getUserInfo {
 	my (%user, $uid, $encryptedPassword);
+	tie %user, 'Tie::CPHash';
 	if ($_[0] ne "") {
 		($uid, $encryptedPassword) = split(/\|/,$_[0]);
 	} else {
@@ -94,11 +99,14 @@ sub httpRedirect {
 #-------------------------------------------------------------------
 sub open {
         my ($key, %CONFIG, %VARS, %PAGE, %FORM, $query, %COOKIES, $config, %USER, %SETTINGS, $dbh);
+	tie %USER, 'Tie::CPHash';
+	tie %VARS, 'Tie::CPHash';
+	tie %PAGE, 'Tie::CPHash';
         $config = new Data::Config '../etc/WebGUI.conf';
         foreach ($config->param) {
                 $CONFIG{$_} = $config->param($_);
         }
-        $dbh = DBI->connect($CONFIG{dsn}, $CONFIG{dbuser}, $CONFIG{dbpass}, { RaiseError => 1, AutoCommit => 1 });
+        $dbh = DBI->connect($CONFIG{dsn}, $CONFIG{dbuser}, $CONFIG{dbpass}, { RaiseError => 0, AutoCommit => 1 });
         $query = CGI->new();
         foreach ($query->param) {
                 $FORM{$_} = $query->param($_);
@@ -110,7 +118,7 @@ sub open {
 	%VARS = _getSessionVars($COOKIES{wgSession},$dbh,$SETTINGS{sessionTimeout});
         %USER = _getUserInfo($VARS{sessionId},$dbh);
 	$CGI::POST_MAX=1024 * $SETTINGS{maxAttachmentSize};
-	%PAGE = _getPageInfo("",$dbh);
+	%PAGE = _getPageInfo("",$dbh,$SETTINGS{notFoundPage});
         %session = (
                 env => \%ENV,					# environment variables from the web server
                 config=> \%CONFIG,				# variables loaded from the config file
@@ -129,13 +137,15 @@ sub open {
 #-------------------------------------------------------------------
 sub refreshPageInfo {
         my (%PAGE);
-        %PAGE = _getPageInfo($_[0],$session{dbh});
+	tie %PAGE, 'Tie::CPHash';
+        %PAGE = _getPageInfo($_[0],$session{dbh},$session{setting}{notFoundPage});
         $session{page} = \%PAGE;
 }
 
 #-------------------------------------------------------------------
 sub refreshSessionVars {
         my (%VARS);
+	tie %VARS, 'Tie::CPHash';
         %VARS = _getSessionVars($_[0],$session{dbh},$session{setting}{sessionTimeout});
         $session{var} = \%VARS;
 	refreshUserInfo($session{var}{sessionId});
@@ -144,6 +154,7 @@ sub refreshSessionVars {
 #-------------------------------------------------------------------
 sub refreshUserInfo {
 	my (%USER);
+	tie %USER, 'Tie::CPHash';
 	%USER = _getUserInfo($_[0],$session{dbh});
 	$session{user} = \%USER;
 }
@@ -157,9 +168,10 @@ sub setCookie {
 sub start {
 	my (%user, $uid, $encryptedPassword);
         ($uid, $encryptedPassword) = split(/\|/,$_[0]);
+	tie %user, 'Tie::CPHash';
 	%user = WebGUI::SQL->quickHash("select * from users where userId='$uid'", $session{dbh});
         if (crypt($user{identifier},"yJ") eq $encryptedPassword) {
-		WebGUI::SQL->write("insert into session values ('$_[0]', ".(time()+$session{setting}{sessionTimeout}).", ".time().", 0, '$ENV{REMOTE_ADDR}')",$session{dbh});
+		WebGUI::SQL->write("insert into session values ('$_[0]', ".(time()+$session{setting}{sessionTimeout}).", ".time().", 0, '$ENV{REMOTE_ADDR}', $uid)",$session{dbh});
 		refreshSessionVars($_[0]);
 		return 1;
         } else {

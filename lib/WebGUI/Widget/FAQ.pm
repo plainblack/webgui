@@ -11,6 +11,7 @@ package WebGUI::Widget::FAQ;
 #-------------------------------------------------------------------
 
 use strict;
+use Tie::CPHash;
 use WebGUI::Macro;
 use WebGUI::Privilege;
 use WebGUI::Session;
@@ -131,6 +132,7 @@ sub www_deleteQuestionConfirm {
 #-------------------------------------------------------------------
 sub www_edit {
         my ($output, %data, @question, $sth);
+	tie %data, 'Tie::CPHash';
         if (WebGUI::Privilege::canEditPage()) {
 		%data = WebGUI::SQL->quickHash("select * from widget where widget.widgetId=$session{form}{wid}",$session{dbh});
                 $output = '<h1>Edit Link List</h1><form method="post" enctype="multipart/form-data" action="'.$session{page}{url}.'">';
@@ -170,6 +172,7 @@ sub www_editSave {
 #-------------------------------------------------------------------
 sub www_editQuestion {
         my ($output, %question);
+	tie %question, 'Tie::CPHash';
         if (WebGUI::Privilege::canEditPage()) {
                 %question = WebGUI::SQL->quickHash("select * from faqQuestion where questionId='$session{form}{qid}'",$session{dbh});
                 $output = '<h1>Edit Question</h1><form method="post" enctype="multipart/form-data" action="'.$session{page}{url}.'">';
@@ -233,6 +236,7 @@ sub www_moveQuestionUp {
 #-------------------------------------------------------------------
 sub www_view {
 	my (%data, @question, $output, $widgetId, $sth, $qNa);
+	tie %data, 'Tie::CPHash';
 	$widgetId = shift;
 	%data = WebGUI::SQL->quickHash("select * from widget where widget.widgetId='$widgetId'",$session{dbh});
 	if (defined %data) {

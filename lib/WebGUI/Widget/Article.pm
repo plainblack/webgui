@@ -11,6 +11,7 @@ package WebGUI::Widget::Article;
 #-------------------------------------------------------------------
 
 use strict;
+use Tie::CPHash;
 use WebGUI::DateTime;
 use WebGUI::Macro;
 use WebGUI::Privilege;
@@ -95,6 +96,7 @@ sub www_deleteImage {
 #-------------------------------------------------------------------
 sub www_edit {
         my ($output, %article);
+	tie %article, 'Tie::CPHash';
         if (WebGUI::Privilege::canEditPage()) {
 		%article = WebGUI::SQL->quickHash("select * from widget,Article where widget.widgetId=Article.widgetId and widget.widgetId=$session{form}{wid}",$session{dbh});
                 $output = '<a href="'.$session{page}{url}.'?op=viewHelp&hid=24"><img src="'.$session{setting}{lib}.'/help.gif" border="0" align="right"></a><h1>Edit Article</h1><form method="post" enctype="multipart/form-data" action="'.$session{page}{url}.'">';
@@ -151,6 +153,7 @@ sub www_editSave {
 #-------------------------------------------------------------------
 sub www_view {
 	my (%data, @test, $output, $widgetId);
+	tie %data, 'Tie::CPHash';
 	$widgetId = shift;
 	%data = WebGUI::SQL->quickHash("select widget.title, widget.displayTitle, widget.processMacros, Article.body, Article.image, Article.linkTitle, Article.linkURL, Article.attachment, Article.convertCarriageReturns from widget,Article where widget.widgetId='$widgetId' and widget.WidgetId=Article.widgetId and Article.startDate<".time()." and Article.endDate>".time()."",$session{dbh});
 	if (defined %data) {

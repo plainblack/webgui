@@ -1,5 +1,5 @@
 package WebGUI;
-our $VERSION = "1.2.1";
+our $VERSION = "1.3.0";
 
 #-------------------------------------------------------------------
 # WebGUI is Copyright 2001 Plain Black Software.
@@ -12,7 +12,9 @@ our $VERSION = "1.2.1";
 #-------------------------------------------------------------------
 
 use strict qw(vars subs);
+use Tie::CPHash;
 use Tie::IxHash;
+use WebGUI::ErrorHandler;
 use WebGUI::Operation;
 use WebGUI::Privilege;
 use WebGUI::Session;
@@ -52,6 +54,7 @@ sub _displayAdminBar {
 			$session{page}{url}.'?op=listGroups'=>'Manage Groups', 
 			$session{page}{url}.'?op=listStyles'=>'Manage Styles', 
 			$session{page}{url}.'?op=listUsers'=>'Manage Users',
+			$session{env}{SCRIPT_NAME}.'/page_not_found'=>'View Page Not Found',
 			$session{env}{SCRIPT_NAME}.'/clipboard'=>'View Clipboard',
 			$session{env}{SCRIPT_NAME}.'/trash'=>'View Trash',
 			$session{page}{url}.'?op=purgeTrash'=>'Empty Trash'
@@ -89,10 +92,10 @@ sub _displayAdminBar {
 #-------------------------------------------------------------------
 sub _loadWidgets {
 	my (@files, $file, $use, @widget, $i);
-	opendir (DIR,"../lib/WebGUI/Widget") or die "Can't get widget directory!\n";
+	opendir (DIR,"../lib/WebGUI/Widget") or WebGUI::ErrorHandler::fatalError("Can't open widget directory!");
 	@files = readdir(DIR);
 	foreach $file (@files) {
-        	unless ($file eq "." || $file eq "..") {
+        	if ($file ne "." && $file ne ".." && $file =~ /\.pm/) {
         		$file =~ s/\.pm//;
 			$widget[$i] = $file;
                         $use = "use WebGUI::Widget::".$widget[$i];

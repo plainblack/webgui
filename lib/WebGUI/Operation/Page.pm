@@ -89,7 +89,9 @@ sub www_addPageSave {
 
 #-------------------------------------------------------------------
 sub www_cutPage {
-        if (WebGUI::Privilege::canEditPage() && $session{page}{pageId}!=1) {
+        if ($session{page}{pageId} < 26) {
+                return WebGUI::Privilege::vitalComponent();
+        } elsif (WebGUI::Privilege::canEditPage()) {
                 WebGUI::SQL->write("update page set parentId=2 where pageId=".$session{page}{pageId},$session{dbh});
 		_reorderPages($session{page}{parentId});
                 WebGUI::Session::refreshPageInfo($session{page}{parentId});
@@ -102,7 +104,9 @@ sub www_cutPage {
 #-------------------------------------------------------------------
 sub www_deletePage {
 	my ($output);
-	if (WebGUI::Privilege::canEditPage() && $session{page}{pageId}!=1) {
+	if ($session{page}{pageId} < 26) {
+		return WebGUI::Privilege::vitalComponent();
+	} elsif (WebGUI::Privilege::canEditPage()) {
 		$output .= '<a href="'.$session{page}{url}.'?op=viewHelp&hid=3"><img src="'.$session{setting}{lib}.'/help.gif" border="0" align="right"></a><h1>Please Confirm</h1>';
 		$output .= 'Are you certain that you wish to delete this page, its content, and all items under it?<p>';
 		$output .= '<div align="center"><a href="'.$session{page}{url}.'?op=deletePageConfirm">Yes, I\'m sure.</a>';
@@ -115,7 +119,9 @@ sub www_deletePage {
 
 #-------------------------------------------------------------------
 sub www_deletePageConfirm {
-        if (WebGUI::Privilege::canEditPage() && $session{page}{pageId}!=1) {
+        if ($session{page}{pageId} < 25) {
+		return WebGUI::Privilege::vitalComponent();
+        } elsif (WebGUI::Privilege::canEditPage()) {
 		WebGUI::SQL->write("update page set parentId=3 where pageId=".$session{page}{pageId},$session{dbh});
 		_reorderPages($session{page}{parentId});
 		WebGUI::Session::refreshPageInfo($session{page}{parentId});
@@ -134,22 +140,26 @@ sub www_editPage {
                 $output = '<a href="'.$session{page}{url}.'?op=viewHelp&hid=2"><img src="'.$session{setting}{lib}.'/help.gif" border="0" align="right"></a><h1>Edit Page</h1><form method="post" action="'.$session{page}{url}.'">';
                 $output .= WebGUI::Form::hidden("op","editPageSave");
                 $output .= '<table>';
+		$output .= '<tr><td colspan=2><b>Page Specifics</b></td></tr>';
                 $output .= '<tr><td class="formDescription">Title</td><td>'.WebGUI::Form::text("title",20,30,$session{page}{title}).'</td></tr>';
+                $output .= '<tr><td class="formDescription">Page URL</td><td>'.WebGUI::Form::text("urlizedTitle",20,30,$session{page}{urlizedTitle}).'</td></tr>';
                 $output .= '<tr><td class="formDescription">Meta Tags</td><td>'.WebGUI::Form::textArea("metaTags",$session{page}{metaTags}).'</td></tr>';
+		$output .= '<tr><td colspan=2><hr size=1><b>Style</b></td></tr>';
 		%hash = WebGUI::SQL->buildHash("select styleId,name from style where name<>'Reserved' order by name",$session{dbh});
 		$array[0] = $session{page}{styleId};
-                $output .= '<tr><td class="formDescription">Style</td><td>'.WebGUI::Form::selectList("styleId",\%hash,\@array).' '.WebGUI::Form::checkbox("recurseStyle","yes").' <span class="formSubtext">Check to give this style to all sub-pages.</span></td></tr>';
-                $output .= '<tr><td class="formDescription">Page URL</td><td>'.WebGUI::Form::text("urlizedTitle",20,30,$session{page}{urlizedTitle}).'</td></tr>';
+                $output .= '<tr><td class="formDescription">Style</td><td>'.WebGUI::Form::selectList("styleId",\%hash,\@array).' <span class="formSubtext"><a href="'.$session{page}{url}.'?op=listStyles">Manage Styles</a></span></td></tr>';
+                $output .= '<tr><td class="formDescription"></td><td>'.WebGUI::Form::checkbox("recurseStyle","yes").' <span class="formSubtext">Check to give this style to all sub-pages.</span></td></tr>';
+		$output .= '<tr><td colspan=2><hr size=1><b>Privileges</b></td></tr>';
 		%hash = WebGUI::SQL->buildHash("select users.userId,users.username from users,groupings where groupings.groupId=4 and groupings.userId=users.userId order by users.username",$session{dbh});
 		$array[0] = $session{page}{ownerId};
-                $output .= '<tr><td class="formDescription">Owner</td><td>'.WebGUI::Form::selectList("ownerId",\%hash,\@array).' '.WebGUI::Form::checkbox("recursePrivs","yes").' <span class="formSubtext">Check to give these privileges to all sub-pages.</span></td></tr>';
+                $output .= '<tr><td class="formDescription">Owner</td><td>'.WebGUI::Form::selectList("ownerId",\%hash,\@array).' <span class="formSubtext"><a href="'.$session{page}{url}.'?op=listUsers">Manage Users</a></span></td></tr>';
 		$array[0] = $session{page}{ownerView};
                 $output .= '<tr><td class="formDescription">Owner can view?</td><td>'.WebGUI::Form::selectList("ownerView",\%yesNo,\@array).'</td></tr>';
 		$array[0] = $session{page}{ownerEdit};
                 $output .= '<tr><td class="formDescription">Owner can edit?</td><td>'.WebGUI::Form::selectList("ownerEdit",\%yesNo,\@array).'</td></tr>';
 		%hash = WebGUI::SQL->buildHash("select groupId,groupName from groups where groupName<>'Reserved' order by groupName",$session{dbh});
 		$array[0] = $session{page}{groupId};
-                $output .= '<tr><td class="formDescription">Group</td><td>'.WebGUI::Form::selectList("groupId",\%hash,\@array).'</td></tr>';
+                $output .= '<tr><td class="formDescription">Group</td><td>'.WebGUI::Form::selectList("groupId",\%hash,\@array).' <span class="formSubtext"><a href="'.$session{page}{url}.'?op=listGroups">Manage Groups</a></span></td></tr>';
 		$array[0] = $session{page}{groupView};
                 $output .= '<tr><td class="formDescription">Group can view?</td><td>'.WebGUI::Form::selectList("groupView",\%yesNo,\@array).'</td></tr>';
 		$array[0] = $session{page}{groupEdit};
@@ -158,6 +168,7 @@ sub www_editPage {
                 $output .= '<tr><td class="formDescription">Anybody can view?</td><td>'.WebGUI::Form::selectList("worldView",\%yesNo,\@array).'</td></tr>';
 		$array[0] = $session{page}{worldEdit};
                 $output .= '<tr><td class="formDescription">Anybody can Edit?</td><td>'.WebGUI::Form::selectList("worldEdit",\%yesNo,\@array).'</td></tr>';
+                $output .= '<tr><td class="formDescription"></td><td>'.WebGUI::Form::checkbox("recursePrivs","yes").' <span class="formSubtext">Check to give these privileges to all sub-pages.</span></td></tr>';
                 $output .= '<tr><td></td><td>'.WebGUI::Form::submit("save").'</td></tr>';
                 $output .= '</table></form>';
                 return $output;

@@ -11,6 +11,7 @@ package WebGUI::Widget::ExtraColumn;
 #-------------------------------------------------------------------
 
 use strict;
+use Tie::CPHash;
 use WebGUI::Privilege;
 use WebGUI::Session;
 use WebGUI::SQL;
@@ -64,6 +65,7 @@ sub www_addSave {
 #-------------------------------------------------------------------
 sub www_edit {
         my ($output, %data);
+	tie %data, 'Tie::CPHash';
         if (WebGUI::Privilege::canEditPage()) {
 		%data = WebGUI::SQL->quickHash("select * from ExtraColumn where widgetId=$session{form}{wid}",$session{dbh});
                 $output = '<a href="'.$session{page}{url}.'?op=viewHelp&hid=26"><img src="'.$session{setting}{lib}.'/help.gif" border="0" align="right"></a><h1>Edit Column</h1><form method="post" action="'.$session{page}{url}.'">';
@@ -96,6 +98,7 @@ sub www_editSave {
 #-------------------------------------------------------------------
 sub www_view {
 	my (%data, @test, $output, $widgetId);
+	tie %data, 'Tie::CPHash';
 	$widgetId = shift;
 	%data = WebGUI::SQL->quickHash("select * from ExtraColumn where widgetId='$widgetId'",$session{dbh});
 	if (defined %data) {

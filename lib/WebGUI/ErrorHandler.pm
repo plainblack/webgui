@@ -42,6 +42,8 @@ sub fatalError {
 	print $log "\t".join(",",caller(2))."\n";
         print "</td><td valign=top>"."<b>Level 3</b><br>".join("<br>",caller(3));
 	print $log "\t".join(",",caller(3))."\n";
+        print "</td><td valign=top>"."<b>Level 4</b><br>".join("<br>",caller(4));
+	print $log "\t".join(",",caller(4))."\n";
         print "</td></tr></table>";
 	print "<h3>Form Variables</h3>";
 	print $log "\t";

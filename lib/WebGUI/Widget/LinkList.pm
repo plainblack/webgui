@@ -11,6 +11,7 @@ package WebGUI::Widget::LinkList;
 #-------------------------------------------------------------------
 
 use strict;
+use Tie::CPHash;
 use WebGUI::Macro;
 use WebGUI::Privilege;
 use WebGUI::Session;
@@ -132,6 +133,7 @@ sub www_deleteLinkConfirm {
 #-------------------------------------------------------------------
 sub www_edit {
         my ($output, %data, @link, $sth);
+	tie %data, 'Tie::CPHash';
         if (WebGUI::Privilege::canEditPage()) {
 		%data = WebGUI::SQL->quickHash("select * from widget where widget.widgetId=$session{form}{wid}",$session{dbh});
                 $output = '<a href="'.$session{page}{url}.'?op=viewHelp&hid=35"><img src="'.$session{setting}{lib}.'/help.gif" border="0" align="right"></a><h1>Edit Link List</h1><form method="post" enctype="multipart/form-data" action="'.$session{page}{url}.'">';
@@ -171,6 +173,7 @@ sub www_editSave {
 #-------------------------------------------------------------------
 sub www_editLink {
         my ($output, %link);
+	tie %link, 'Tie::CPHash';
         if (WebGUI::Privilege::canEditPage()) {
                 %link = WebGUI::SQL->quickHash("select name, url, description from link where linkId='$session{form}{lid}'",$session{dbh});
                 $output = '<h1>Edit Link</h1><form method="post" enctype="multipart/form-data" action="'.$session{page}{url}.'">';
@@ -235,6 +238,7 @@ sub www_moveLinkUp {
 #-------------------------------------------------------------------
 sub www_view {
 	my (%data, @link, $output, $widgetId, $sth);
+	tie %data, 'Tie::CPHash';
 	$widgetId = shift;
 	%data = WebGUI::SQL->quickHash("select * from widget where widget.widgetId='$widgetId'",$session{dbh});
 	if (defined %data) {

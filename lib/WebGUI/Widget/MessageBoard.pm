@@ -11,6 +11,7 @@ package WebGUI::Widget::MessageBoard;
 #-------------------------------------------------------------------
 
 use strict;
+use Tie::CPHash;
 use WebGUI::DateTime;
 use WebGUI::Privilege;
 use WebGUI::Session;
@@ -21,6 +22,7 @@ use WebGUI::Widget;
 #-------------------------------------------------------------------
 sub _getBoardProperties {
         my (%board);
+	tie %board, 'Tie::CPHash';
 	%board = WebGUI::SQL->quickHash("select widget.title, widget.displayTitle, widget.description, MessageBoard.groupToPost, MessageBoard.messagesPerPage, MessageBoard.editTimeout from widget, MessageBoard where widget.widgetId=MessageBoard.widgetId and widget.widgetId=$_[0]",$session{dbh});
         return %board;
 }
@@ -70,7 +72,7 @@ sub www_add {
 		$output .= '<tr><td class="formDescription">Description</td><td>'.WebGUI::Form::textArea("description",'').'</td></tr>';
                 %hash = WebGUI::SQL->buildHash("select groupId,groupName from groups where groupName<>'Reserved' order by groupName",$session{dbh});
                 $output .= '<tr><td class="formDescription" valign="top">Who can post?</td><td>'.WebGUI::Form::selectList("groupToPost",\%hash,'',1).'</td></tr>';
-                $output .= '<tr><td class="formDescription">Messages Per Page</td><td>'.WebGUI::Form::text("messagesPerPage",20,2,50).'</td></tr>';
+                $output .= '<tr><td class="formDescription">Messages Per Page</td><td>'.WebGUI::Form::text("messagesPerPage",20,2,30).'</td></tr>';
                 $output .= '<tr><td class="formDescription">Edit Timeout</td><td>'.WebGUI::Form::text("editTimeout",20,3,1).'</td></tr>';
                 $output .= '<tr><td></td><td>'.WebGUI::Form::submit("save").'</td></tr>';
                 $output .= '</table></form>';
@@ -98,6 +100,7 @@ sub www_edit {
         my ($output, %board, %hash, @array);
 	tie %hash, "Tie::IxHash";
         if (WebGUI::Privilege::canEditPage()) {
+		tie %board, 'Tie::CPHash';
 		%board = _getBoardProperties($session{form}{wid});
                 $output = '<a href="'.$session{page}{url}.'?op=viewHelp&hid=33"><img src="'.$session{setting}{lib}.'/help.gif" border="0" align="right"></a><h1>Edit Message Board</h1><form method="post" enctype="multipart/form-data" action="'.$session{page}{url}.'">';
                 $output .= WebGUI::Form::hidden("wid",$session{form}{wid});
@@ -134,6 +137,8 @@ sub www_editSave {
 #-------------------------------------------------------------------
 sub www_editMessage {
         my ($html, %board, %message);
+	tie %message, 'Tie::CPHash';
+	tie %board, 'Tie::CPHash';
         %board = _getBoardProperties($session{form}{wid});
         if (WebGUI::Privilege::isInGroup($board{groupToPost},$session{user}{userId})) {
         	%message = WebGUI::SQL->quickHash("select * from message where messageId=$session{form}{mid}",$session{dbh});
@@ -160,6 +165,7 @@ sub www_editMessage {
 #-------------------------------------------------------------------
 sub www_editMessageSave {
         my (%board);
+	tie %board, 'Tie::CPHash';
         %board = _getBoardProperties($session{form}{wid});
         if (WebGUI::Privilege::isInGroup($board{groupToPost},$session{user}{userId})) {
                 if ($session{form}{subject} eq "") {
@@ -178,6 +184,7 @@ sub www_editMessageSave {
 #-------------------------------------------------------------------
 sub www_postNewMessage {
 	my ($html, %board);
+	tie %board, 'Tie::CPHash';
 	%board = _getBoardProperties($session{form}{wid});
 	if (WebGUI::Privilege::isInGroup($board{groupToPost},$session{user}{userId})) {
 	        $html .= '<table width="100%"><tr><td class="boardTitle">';
@@ -201,6 +208,7 @@ sub www_postNewMessage {
 #-------------------------------------------------------------------
 sub www_postNewMessageSave {
 	my ($mid, %board);
+	tie %board, 'Tie::CPHash';
 	%board = _getBoardProperties($session{form}{wid});
 	if (WebGUI::Privilege::isInGroup($board{groupToPost},$session{user}{userId})) {
                 if ($session{form}{subject} eq "") {
@@ -220,6 +228,7 @@ sub www_postNewMessageSave {
 #-------------------------------------------------------------------
 sub www_postReply {
 	my ($html, %board, $subject);
+	tie %board, 'Tie::CPHash';
 	%board = _getBoardProperties($session{form}{wid});
 	if (WebGUI::Privilege::isInGroup($board{groupToPost},$session{user}{userId})) {
 		($subject) = WebGUI::SQL->quickArray("select subject from message where messageId=$session{form}{mid}", $session{dbh});
@@ -247,6 +256,7 @@ sub www_postReply {
 #-------------------------------------------------------------------
 sub www_postReplySave {
 	my ($rid, %board, $mid);
+	tie %board, 'Tie::CPHash';
 	%board = _getBoardProperties($session{form}{wid});
 	if (WebGUI::Privilege::isInGroup($board{groupToPost},$session{user}{userId})) {
                 if ($session{form}{subject} eq "") {
@@ -267,6 +277,8 @@ sub www_postReplySave {
 #-------------------------------------------------------------------
 sub www_showMessage {
 	my (@data, $html, %board, %message);
+	tie %message, 'Tie::CPHash';
+	tie %board, 'Tie::CPHash';
 	%message = WebGUI::SQL->quickHash("select * from message where messageId=$session{form}{mid}",$session{dbh});
 	%board = _getBoardProperties($session{form}{wid});
 	$html .= '<table width="100%"><tr><td class="boardTitle">';
@@ -316,11 +328,17 @@ sub www_showMessage {
 
 #-------------------------------------------------------------------
 sub www_view {
-	my ($sth, @data, $html, %board, $itemsPerPage, $i, @row, $pn);
+	my ($sth, @data, $html, %board, $itemsPerPage, $i, $pn, $lastId, @last, $replies);
+	tie %board, 'Tie::CPHash';
 	%board = _getBoardProperties($_[0]);
         $itemsPerPage = $board{messagesPerPage};
+        if ($session{form}{pn} < 1) {
+                $pn = 0;
+        } else {
+                $pn = $session{form}{pn};
+        }
 	if ($board{description} ne "") {
-		$html .= $board{description}.'<p>';
+		$html = $board{description}.'<p>';
 	}
 	$html .= '<table width="100%"><tr><td class="boardTitle">';
 	if ($board{displayTitle}) {
@@ -329,18 +347,15 @@ sub www_view {
 	$html .= '</td><td align="right" valign="bottom" class="boardMenu"><a href="'.$session{page}{url}.'?func=postNewMessage&wid='.$_[0].'">Post New Message</a></td></tr></table>';
 	$html .= '<table border=0 cellpadding=2 cellspacing=1 width="100%">';
 	$html .= '<tr><td class="tableHeader">Subject</td><td class="tableHeader">Author</td><td class="tableHeader">Thread Started</td><td class="tableHeader">Replies</td><td class="tableHeader">Last Reply</td></tr>';
-	$sth = WebGUI::SQL->read("select messageId,subject,count(messageId)-1,username,dateOfPost,max(dateOfPost),max(messageId) from message where widgetId=$_[0] group by rid order by messageId desc", $session{dbh});
+	#$sth = WebGUI::SQL->read("select messageId,subject,count(*)-1,username,dateOfPost,max(dateOfPost),max(messageId) from message where widgetId=$_[0] group by rid order by messageId desc", $session{dbh});
+	$sth = WebGUI::SQL->read("select messageId,subject,username,dateOfPost from message where widgetId=$_[0] and pid=0 order by messageId desc", $session{dbh});
 	while (@data = $sth->array) {
-		$row[$i] = '<tr><td class="tableData"><a href="'.$session{page}{url}.'?func=showMessage&mid='.$data[0].'&wid='.$_[0].'">'.substr($data[1],0,30).'</a></td><td class="tableData">'.$data[3].'</td><td class="tableData">'.epochToHuman($data[4],"%M/%D %H:%n%p").'</td><td class="tableData">'.$data[2].'</td><td class="tableData"><a href="'.$session{page}{url}.'?func=showMessage&mid='.$data[6].'&wid='.$_[0].'">'.epochToHuman($data[5],"%M/%D %H:%n%p").'</a></td></tr>';
+		if ($i >= ($itemsPerPage*$pn) && $i < ($itemsPerPage*($pn+1))) {
+			@last = WebGUI::SQL->quickArray("select messageId,dateOfPost,username,subject from message where widgetId=$_[0] and rid=$data[0] order by dateOfPost desc",$session{dbh});
+			($replies) = WebGUI::SQL->quickArray("select count(*)-1 from message where rid=$data[0]",$session{dbh});
+			$html .= '<tr><td class="tableData"><a href="'.$session{page}{url}.'?func=showMessage&mid='.$data[0].'&wid='.$_[0].'">'.substr($data[1],0,30).'</a></td><td class="tableData">'.$data[2].'</td><td class="tableData">'.epochToHuman($data[3],"%M/%D %H:%n%p").'</td><td class="tableData">'.$replies.'</td><td class="tableData"><a href="'.$session{page}{url}.'?func=showMessage&mid='.$last[0].'&wid='.$_[0].'">'.substr($last[3],0,30).'</a><span style="font-size: 8pt;"> @ '.epochToHuman($last[1],"%M/%D %H:%n%p").' by '.$last[2].'</span></td></tr>';
+		}
        		$i++;
-        }
-        if ($session{form}{pn} < 1) {
-        	$pn = 0;
-        } else {
-                $pn = $session{form}{pn};
-        }
-        for ($i=($itemsPerPage*$pn); $i<($itemsPerPage*($pn+1));$i++) {
-                $html .= $row[$i];
         }
         $html .= '</table>';
         $html .= '<div class="pagination">';
@@ -350,7 +365,7 @@ sub www_view {
                 $html .= '&laquo;Previous Page';
         }
         $html .= ' &middot; ';
-        if ($pn < round($#row/$itemsPerPage)) {
+        if (($pn+1) < round(($i/$itemsPerPage))) {
         	$html .= '<a href="'.$session{page}{url}.'?pn='.($pn+1).'">Next Page&raquo;</a>';
         } else {
         	$html .= 'Next Page&raquo;';

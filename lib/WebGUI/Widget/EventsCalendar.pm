@@ -11,6 +11,7 @@ package WebGUI::Widget::EventsCalendar;
 #-------------------------------------------------------------------
 
 use strict;
+use Tie::CPHash;
 use WebGUI::DateTime;
 use WebGUI::Macro;
 use WebGUI::Privilege;
@@ -122,6 +123,7 @@ sub www_deleteEventConfirm {
 #-------------------------------------------------------------------
 sub www_edit {
         my ($output, %data, @event, $sth);
+	tie %data, 'Tie::CPHash';
         if (WebGUI::Privilege::canEditPage()) {
 		%data = WebGUI::SQL->quickHash("select * from widget where widget.widgetId=$session{form}{wid}",$session{dbh});
                 $output = '<a href="'.$session{page}{url}.'?op=viewHelp&hid=39"><img src="'.$session{setting}{lib}.'/help.gif" border="0" align="right"></a><h1>Edit Events Calendar</h1><form method="post" enctype="multipart/form-data" action="'.$session{page}{url}.'">';
@@ -161,6 +163,7 @@ sub www_editSave {
 #-------------------------------------------------------------------
 sub www_editEvent {
         my ($output, %event);
+	tie %event, 'Tie::CPHash';
         if (WebGUI::Privilege::canEditPage()) {
                 %event = WebGUI::SQL->quickHash("select * from event where eventId='$session{form}{eid}'",$session{dbh});
                 $output = '<h1>Edit Event</h1><form method="post" enctype="multipart/form-data" action="'.$session{page}{url}.'">';
@@ -196,6 +199,7 @@ sub www_editEventSave {
 #-------------------------------------------------------------------
 sub www_view {
 	my (%data, @event, $output, $widgetId, $sth);
+	tie %data, 'Tie::CPHash';
 	$widgetId = shift;
 	%data = WebGUI::SQL->quickHash("select * from widget where widget.widgetId='$widgetId'",$session{dbh});
 	if (defined %data) {

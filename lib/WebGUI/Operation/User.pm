@@ -13,6 +13,7 @@ package WebGUI::Operation::User;
 use Digest::MD5 qw(md5_base64);
 use Exporter;
 use strict;
+use Tie::CPHash;
 use WebGUI::Form;
 use WebGUI::Operation::Help;
 use WebGUI::Operation::Page;
@@ -46,7 +47,7 @@ sub www_addUser {
                 $output .= '</table>';
                 $output .= '</form> ';
         } else {
-                $output = WebGUI::Privilege::insufficient();
+                $output = WebGUI::Privilege::adminOnly();
         }
         return $output;
 }
@@ -64,7 +65,7 @@ sub www_addUserSave {
                 }
                 $output = www_listUsers();
         } else {
-                $output = WebGUI::Privilege::insufficient();
+                $output = WebGUI::Privilege::adminOnly();
         }
         return $output;
 }
@@ -72,31 +73,36 @@ sub www_addUserSave {
 #-------------------------------------------------------------------
 sub www_deleteUser {
         my ($output);
-        if (WebGUI::Privilege::isInGroup(3) && $session{form}{uid} > 25) {
+        if ($session{form}{uid} < 26) {
+		return WebGUI::Privilege::vitalComponent();
+        } elsif (WebGUI::Privilege::isInGroup(3)) {
                 $output .= '<a href="'.$session{page}{url}.'?op=viewHelp&hid=7"><img src="'.$session{setting}{lib}.'/help.gif" border="0" align="right"></a><h1>Please Confirm</h1>';
                 $output .= 'Are you certain you want to delete this user? Be warned that all this user\'s information will be lost permanently if you choose to proceed.<p>';
                 $output .= '<div align="center"><a href="'.$session{page}{url}.'?op=deleteUserConfirm&uid='.$session{form}{uid}.'">Yes, I\'m sure.</a>';
                 $output .= '&nbsp;&nbsp;&nbsp;&nbsp;<a href="'.$session{page}{url}.'?op=listUsers">No, I made a mistake.</a></div>'; 
 		return $output;
         } else {
-                return WebGUI::Privilege::insufficient();
+                return WebGUI::Privilege::adminOnly();
         }
 }
 
 #-------------------------------------------------------------------
 sub www_deleteUserConfirm {
-        if (WebGUI::Privilege::isInGroup(3) && $session{form}{uid} > 25) {
+        if ($session{form}{uid} < 26) {
+		return WebGUI::Privilege::vitalComponent();
+        } elsif (WebGUI::Privilege::isInGroup(3)) {
                 WebGUI::SQL->write("delete from users where userId=$session{form}{uid}",$session{dbh});
                 WebGUI::SQL->write("delete from groupings where userId=$session{form}{uid}",$session{dbh});
                 return www_listUsers();
         } else {
-                return WebGUI::Privilege::insufficient();
+                return WebGUI::Privilege::adminOnly();
         }
 }
 
 #-------------------------------------------------------------------
 sub www_editUser {
         my ($output, %user, %hash, @array);
+	tie %hash, 'Tie::CPHash';
         if (WebGUI::Privilege::isInGroup(3)) {
 		%user = WebGUI::SQL->quickHash("select * from users where userId=$session{form}{uid}",$session{dbh});
                 $output .= '<a href="'.$session{page}{url}.'?op=viewHelp&hid=6"><img src="'.$session{setting}{lib}.'/help.gif" border="0" align="right"></a><h1>Edit User</h1> <form method="post" action="'.$session{page}{url}.'"> ';
@@ -119,7 +125,7 @@ sub www_editUser {
                 $output .= '</table>';
                 $output .= '</form> ';
         } else {
-		$output = WebGUI::Privilege::insufficient();
+		$output = WebGUI::Privilege::adminOnly();
         }
         return $output;
 }
@@ -141,7 +147,7 @@ sub www_editUserSave {
 		}
 		return www_listUsers();
         } else {
-                return WebGUI::Privilege::insufficient();
+                return WebGUI::Privilege::adminOnly();
         }
 }
 
@@ -185,7 +191,7 @@ sub www_listUsers {
                 $output .= '</div>';
 		return $output;
         } else {
-                return WebGUI::Privilege::insufficient();
+                return WebGUI::Privilege::adminOnly();
         }
 }
 

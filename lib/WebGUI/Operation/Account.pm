@@ -63,6 +63,8 @@ sub www_createAccount {
 	my ($output);
 	if ($session{user}{userId} != 1) {
                 $output .= www_displayAccount();
+	} elsif ($session{setting}{anonymousRegistration} eq "no") {
+		$output .= www_displayLogin();
         } else {
 		$output .= ' <h1>Create Account</h1> <form method="post" action="'.$session{page}{url}.'"> ';
 		$output .= WebGUI::Form::hidden("op","saveAccount");
@@ -161,7 +163,12 @@ sub www_displayLogin {
 		$output .= '<tr><td></td><td>'.WebGUI::Form::submit("login").'</td></tr>';
 		$output .= '</table>';
 		$output .= '</form>';
-		$output .= '<div class="accountOptions"><ul><li><a href="'.$session{page}{url}.'?op=createAccount">Create a new account.</a><li><a href="'.$session{page}{url}.'?op=recoverPassword">I forgot my password.</a></ul></div>';
+		$output .= '<div class="accountOptions"><ul>';
+		if ($session{setting}{anonymousRegistration} eq "yes") {
+			$output .= '<li><a href="'.$session{page}{url}.'?op=createAccount">Create a new account.</a>';
+		}
+		$output .= '<li><a href="'.$session{page}{url}.'?op=recoverPassword">I forgot my password.</a>';
+		$output .= '</ul></div>';
 	}
 	return $output;
 }
@@ -224,7 +231,12 @@ sub www_recoverPassword {
                 $output .= '<tr><td></td><td>'.WebGUI::Form::submit("recover").'</td></tr>';
                 $output .= '</table>';
                 $output .= '</form>';
-                $output .= '<div class="accountOptions"><ul><li><a href="'.$session{page}{url}.'?op=createAccount">Create a new account.</a><li><a href="'.$session{page}{url}.'?op=displayLogin">Login.</a></ul></div>';
+                $output .= '<div class="accountOptions"><ul>';
+		if ($session{setting}{anonymousRegistration} eq "yes") {
+			$output .= '<li><a href="'.$session{page}{url}.'?op=createAccount">Create a new account.</a>';
+		}
+		$output .= '<li><a href="'.$session{page}{url}.'?op=displayLogin">Login.</a>';
+		$output .= '</ul></div>';
         }
         return $output;
 }

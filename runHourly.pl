@@ -1,5 +1,3 @@
-#!/usr/bin/perl
-
 #-------------------------------------------------------------------
 # WebGUI is Copyright 2001 Plain Black Software.
 #-------------------------------------------------------------------
@@ -10,6 +8,10 @@
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
+BEGIN {
+        unshift (@INC, "./lib");
+}
+
 use DBI;
 use HTTP::Request;
 use LWP::UserAgent;
@@ -18,7 +20,7 @@ use Data::Config;
 use WebGUI::SQL;
 use XML::RSS;
 
-my $config = new Data::Config '../etc/WebGUI.conf';
+my $config = new Data::Config './etc/WebGUI.conf';
 our $dbh = DBI->connect($config->param('dsn'), $config->param('dbuser'), $config->param('dbpass'));
 
 deleteExpiredSessions();
@@ -59,7 +61,7 @@ sub generateHTML {
       		$image = '<a target="_NEWSITEM" href="'.$link.'">'.$image.'</a>' if ($link);
 	}
   #-- items
-    	$html = ($image) ? '<div align="center">$image</div>' : "";
+    	$html = ($image) ? '<div align="center">'.$image.'</div>' : "";
     	foreach $item (@{$rss->{'items'}}) {
         	next unless defined($item->{'title'}) && defined($item->{'link'});
         	$title = $item->{'title'} if (defined ($item->{'title'}));

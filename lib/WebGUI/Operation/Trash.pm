@@ -53,7 +53,7 @@ sub www_purgeTrash {
                 $output .= '&nbsp;&nbsp;&nbsp;&nbsp;<a href="'.$session{page}{url}.'">No, I made a mistake.</a></div>';
                 return $output;
         } else {
-                return WebGUI::Privilege::insufficient();
+                return WebGUI::Privilege::adminOnly();
         }
 }
 
@@ -64,7 +64,7 @@ sub www_purgeTrashConfirm {
 		_purgeWidgets(3);
 		return "";
 	} else {
-		return WebGUI::Privilege::insufficient();
+		return WebGUI::Privilege::adminOnly();
 	}
 }
 

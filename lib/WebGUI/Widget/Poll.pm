@@ -11,6 +11,7 @@ package WebGUI::Widget::Poll;
 #-------------------------------------------------------------------
 
 use strict;
+use Tie::CPHash;
 use WebGUI::Privilege;
 use WebGUI::Session;
 use WebGUI::SQL;
@@ -20,6 +21,7 @@ use WebGUI::Widget;
 #-------------------------------------------------------------------
 sub _viewPoll {
         my (%poll, $i, $output, $widgetId);
+	tie %poll, 'Tie::CPHash';
         $widgetId = shift;
         %poll = WebGUI::SQL->quickHash("select * from widget,Poll where widget.widgetId=Poll.widgetId and widget.widgetId='$widgetId'",$session{dbh});
         if (defined %poll) {
@@ -48,6 +50,7 @@ sub _viewPoll {
 #-------------------------------------------------------------------
 sub _viewResults {
         my (%poll, @data, $i, $output, $widgetId, $totalResponses);
+	tie %poll, 'Tie::CPHash';
         $widgetId = shift;
         %poll = WebGUI::SQL->quickHash("select * from widget,Poll where widget.widgetId=Poll.widgetId and widget.widgetId='$widgetId'",$session{dbh});
         if (defined %poll) {
@@ -130,6 +133,7 @@ sub www_addSave {
 sub www_edit {
         my ($output, %data, %hash, @array);
 	tie %hash, "Tie::IxHash";
+	tie %data, 'Tie::CPHash';
         if (WebGUI::Privilege::canEditPage()) {
 		%data = WebGUI::SQL->quickHash("select * from widget,Poll where widget.widgetId=Poll.widgetId and widget.widgetId=$session{form}{wid}",$session{dbh});
                 $output = '<a href="'.$session{page}{url}.'?op=viewHelp&hid=29"><img src="'.$session{setting}{lib}.'/help.gif" border="0" align="right"></a><h1>Edit Poll</h1><form method="post" enctype="multipart/form-data" action="'.$session{page}{url}.'">';
@@ -170,6 +174,7 @@ sub www_editSave {
 #-------------------------------------------------------------------
 sub www_view {
 	my ($hasVoted, %data, $output);
+	tie %data, 'Tie::CPHash';
 	%data = WebGUI::SQL->quickHash("select * from widget,Poll where widget.widgetId=Poll.widgetId and widget.widgetId='$_[0]'",$session{dbh});
 	if ($data{active} eq "0") {
 		$output = _viewResults($_[0]);

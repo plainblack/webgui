@@ -31,7 +31,8 @@ sub getNextId {
 #-------------------------------------------------------------------
 # This is here simply to make typing shorter, cuz I'm lazy.
 sub quote {
-	return $session{dbh}->quote($_[0]);
+	my $value = $_[0]; #had to add this here cuz Tie::CPHash variables cause problems otherwise.
+	return $session{dbh}->quote($value);
 }
 
 #-------------------------------------------------------------------

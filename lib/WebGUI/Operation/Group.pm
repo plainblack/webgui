@@ -12,6 +12,7 @@ package WebGUI::Operation::Group;
 
 use Exporter;
 use strict;
+use Tie::CPHash;
 use WebGUI::Form;
 use WebGUI::Privilege;
 use WebGUI::Session;
@@ -34,7 +35,7 @@ sub www_addGroup {
                 $output .= '</table>';
                 $output .= '</form> ';
         } else {
-                $output = WebGUI::Privilege::insufficient();
+                $output = WebGUI::Privilege::adminOnly();
         }
         return $output;
 }
@@ -46,7 +47,7 @@ sub www_addGroupSave {
                 WebGUI::SQL->write("insert into groups values (".getNextId("groupId").", ".quote($session{form}{groupName}).", ".quote($session{form}{description}).")",$session{dbh});
                 $output = www_listGroups();
         } else {
-                $output = WebGUI::Privilege::insufficient();
+                $output = WebGUI::Privilege::adminOnly();
         }
         return $output;
 }
@@ -54,31 +55,36 @@ sub www_addGroupSave {
 #-------------------------------------------------------------------
 sub www_deleteGroup {
         my ($output);
-        if (WebGUI::Privilege::isInGroup(3) && $session{form}{gid} > 25) {
+        if ($session{form}{gid} < 26) {
+                return WebGUI::Privilege::vitalComponent();
+        } elsif (WebGUI::Privilege::isInGroup(3)) {
                 $output .= '<a href="'.$session{page}{url}.'?op=viewHelp&hid=15"><img src="'.$session{setting}{lib}.'/help.gif" border="0" align="right"></a><h1>Please Confirm</h1>';
                 $output .= 'Are you certain you wish to delete this group? Beware that deleting a group is permanent and will remove all privileges associated with this group.<p>';
                 $output .= '<div align="center"><a href="'.$session{page}{url}.'?op=deleteGroupConfirm&gid='.$session{form}{gid}.'">Yes, I\'m sure.</a>';
                 $output .= '&nbsp;&nbsp;&nbsp;&nbsp;<a href="'.$session{page}{url}.'?op=listGroups">No, I made a mistake. </a></div>';
                 return $output;
         } else {
-                return WebGUI::Privilege::insufficient();
+                return WebGUI::Privilege::adminOnly();
         }
 }
 
 #-------------------------------------------------------------------
 sub www_deleteGroupConfirm {
-        if (WebGUI::Privilege::isInGroup(3) && $session{form}{gid} > 25) {
+        if ($session{form}{gid} < 26) {
+                return WebGUI::Privilege::vitalComponent();
+        } elsif (WebGUI::Privilege::isInGroup(3)) {
                 WebGUI::SQL->write("delete from groups where groupId=$session{form}{gid}",$session{dbh});
                 WebGUI::SQL->write("delete from groupings where groupId=$session{form}{gid}",$session{dbh});
                 return www_listGroups();
         } else {
-                return WebGUI::Privilege::insufficient();
+                return WebGUI::Privilege::adminOnly();
         }
 }
 
 #-------------------------------------------------------------------
 sub www_editGroup {
         my ($output, $sth, %group, $user);
+	tie %group, 'Tie::CPHash';
         if (WebGUI::Privilege::isInGroup(3)) {
                 %group = WebGUI::SQL->quickHash("select * from groups where groupId=$session{form}{gid}",$session{dbh});
                 $output .= '<a href="'.$session{page}{url}.'?op=viewHelp&hid=13"><img src="'.$session{setting}{lib}.'/help.gif" border="0" align="right"></a><h1>Edit Group</h1> <form method="post" action="'.$session{page}{url}.'"> ';
@@ -98,7 +104,7 @@ sub www_editGroup {
                 $output .= '</table>';
                 $output .= '</form> ';
         } else {
-                $output = WebGUI::Privilege::insufficient();
+                $output = WebGUI::Privilege::adminOnly();
         }
         return $output;
 }
@@ -109,7 +115,7 @@ sub www_editGroupSave {
                 WebGUI::SQL->write("update groups set groupName=".quote($session{form}{groupName}).", description=".quote($session{form}{description})." where groupId=".$session{form}{gid},$session{dbh});
                 return www_listGroups();
         } else {
-                return WebGUI::Privilege::insufficient();
+                return WebGUI::Privilege::adminOnly();
         }
 }
 
@@ -152,7 +158,7 @@ sub www_listGroups {
                 $output .= '</div>';
                 return $output;
         } else {
-                return WebGUI::Privilege::insufficient();
+                return WebGUI::Privilege::adminOnly();
         }
 }
 

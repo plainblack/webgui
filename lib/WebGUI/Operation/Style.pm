@@ -12,6 +12,7 @@ package WebGUI::Operation::Style;
 
 use Exporter;
 use strict;
+use Tie::CPHash;
 use WebGUI::Form;
 use WebGUI::Privilege;
 use WebGUI::Session;
@@ -36,7 +37,7 @@ sub www_addStyle {
                 $output .= '</table>';
                 $output .= '</form> ';
         } else {
-                $output = WebGUI::Privilege::insufficient();
+                $output = WebGUI::Privilege::adminOnly();
         }
         return $output;
 }
@@ -48,7 +49,7 @@ sub www_addStyleSave {
                 WebGUI::SQL->write("insert into style values (".getNextId("styleId").", ".quote($session{form}{name}).", ".quote($session{form}{header}).", ".quote($session{form}{footer}).", ".quote($session{form}{styleSheet}).")",$session{dbh});
                 $output = www_listStyles();
         } else {
-                $output = WebGUI::Privilege::insufficient();
+                $output = WebGUI::Privilege::adminOnly();
         }
         return $output;
 }
@@ -56,31 +57,36 @@ sub www_addStyleSave {
 #-------------------------------------------------------------------
 sub www_deleteStyle {
         my ($output);
-        if (WebGUI::Privilege::isInGroup(3) && $session{form}{sid} > 25) {
+        if ($session{form}{sid} < 26) {
+		return WebGUI::Privilege::vitalComponent();
+        } elsif (WebGUI::Privilege::isInGroup(3)) {
                 $output .= '<a href="'.$session{page}{url}.'?op=viewHelp&hid=4"><img src="'.$session{setting}{lib}.'/help.gif" border="0" align="right"></a><h1>Please Confirm</h1>';
                 $output .= 'Are you certain you wish to delete this style and migrate all pages using this style to the "Fail Safe" style?<p>';
                 $output .= '<div align="center"><a href="'.$session{page}{url}.'?op=deleteStyleConfirm&sid='.$session{form}{sid}.'">Yes, I\'m sure.</a>';
                 $output .= '&nbsp;&nbsp;&nbsp;&nbsp;<a href="'.$session{page}{url}.'?op=listStyles">No, I made a mistake.</a></div>';
                 return $output;
         } else {
-                return WebGUI::Privilege::insufficient();
+                return WebGUI::Privilege::adminOnly();
         }
 }
 
 #-------------------------------------------------------------------
 sub www_deleteStyleConfirm {
-        if (WebGUI::Privilege::isInGroup(3) && $session{form}{sid} > 25) {
+        if ($session{form}{sid} < 26) {
+		return WebGUI::Privilege::vitalComponent();
+        } elsif (WebGUI::Privilege::isInGroup(3)) {
                 WebGUI::SQL->write("delete from style where styleId=".$session{form}{sid},$session{dbh});
                 WebGUI::SQL->write("update page set styleId=2 where styleId=".$session{form}{sid},$session{dbh});
                 return www_listStyles();
         } else {
-                return WebGUI::Privilege::insufficient();
+                return WebGUI::Privilege::adminOnly();
         }
 }
 
 #-------------------------------------------------------------------
 sub www_editStyle {
         my ($output, %style);
+	tie %style, 'Tie::CPHash';
         if (WebGUI::Privilege::isInGroup(3)) {
                 %style = WebGUI::SQL->quickHash("select * from style where styleId=$session{form}{sid}",$session{dbh});
                 $output .= '<a href="'.$session{page}{url}.'?op=viewHelp&hid=11"><img src="'.$session{setting}{lib}.'/help.gif" border="0" align="right"></a><h1>Edit Style</h1> <form method="post" action="'.$session{page}{url}.'"> ';
@@ -95,7 +101,7 @@ sub www_editStyle {
                 $output .= '</table>';
                 $output .= '</form> ';
         } else {
-                $output = WebGUI::Privilege::insufficient();
+                $output = WebGUI::Privilege::adminOnly();
         }
         return $output;
 }
@@ -106,7 +112,7 @@ sub www_editStyleSave {
                 WebGUI::SQL->write("update style set name=".quote($session{form}{name}).", header=".quote($session{form}{header}).", footer=".quote($session{form}{footer}).", styleSheet=".quote($session{form}{styleSheet})." where styleId=".$session{form}{sid},$session{dbh});
                 return www_listStyles();
         } else {
-                return WebGUI::Privilege::insufficient();
+                return WebGUI::Privilege::adminOnly();
         }
 }
 
@@ -148,7 +154,7 @@ sub www_listStyles {
                 $output .= '</div>';
                 return $output;
         } else {
-                return WebGUI::Privilege::insufficient();
+                return WebGUI::Privilege::adminOnly();
         }
 }
 
