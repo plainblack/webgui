@@ -10,4 +10,9 @@ create table karmaLog (
 INSERT INTO international VALUES (537,'WebGUI','English','Karma');
 INSERT INTO international VALUES (538,'WebGUI','English','Karma Threshold');
 delete from groupings where groupId=1 or groupId=2 or groupId=7;
+INSERT INTO international VALUES (539,'WebGUI','English','Enable Karma?');
+INSERT INTO international VALUES (540,'WebGUI','English','Karma Per Login');
+INSERT INTO settings VALUES ('useKarma','0');
+INSERT INTO settings VALUES ('karmaPerLogin','1');
+
 

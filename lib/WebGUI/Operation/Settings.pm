@@ -21,7 +21,7 @@ use WebGUI::SQL;
 use WebGUI::URL;
 
 our @ISA = qw(Exporter);
-our @EXPORT = qw(&www_editAuthenticationSettings &www_editAuthenticationSettingsSave &www_editCompanyInformation &www_editCompanyInformationSave 
+our @EXPORT = qw(&www_editUserSettings &www_editUserSettingsSave &www_editCompanyInformation &www_editCompanyInformationSave 
 	&www_editFileSettings &www_editFileSettingsSave &www_editMailSettings &www_editMailSettingsSave &www_editMiscSettings 
 	&www_editContentSettings &www_editContentSettingsSave &www_editMiscSettingsSave &www_manageSettings);
 
@@ -31,18 +31,20 @@ sub _saveSetting {
 }
 
 #-------------------------------------------------------------------
-sub www_editAuthenticationSettings {
+sub www_editUserSettings {
         my ($output, %authMethod, $f);
         %authMethod = ('WebGUI'=>'WebGUI', 'LDAP'=>'LDAP');
         if (WebGUI::Privilege::isInGroup(3)) {
                 $output .= helpIcon(2);
                 $output .= '<h1>'.WebGUI::International::get(117).'</h1>';
 		$f = WebGUI::HTMLForm->new;
-                $f->hidden("op","editAuthenticationSettingsSave");
+                $f->hidden("op","editUserSettingsSave");
                 $f->integer("sessionTimeout",WebGUI::International::get(142),$session{setting}{sessionTimeout});
                 $f->yesNo("anonymousRegistration",WebGUI::International::get(118),$session{setting}{anonymousRegistration});
                 $f->yesNo("alertOnNewUser",WebGUI::International::get(534),$session{setting}{alertOnNewUser});
 		$f->group("onNewUserAlertGroup",WebGUI::International::get(535),[$session{setting}{onNewUserAlertGroup}]);
+                $f->yesNo("useKarma",WebGUI::International::get(539),$session{setting}{useKarma});
+                $f->integer("karmaPerLogin",WebGUI::International::get(540),$session{setting}{karmaPerLogin});
                 $f->select("authMethod",\%authMethod,WebGUI::International::get(119),[$session{setting}{authMethod}]);
                 $f->yesNo("usernameBinding",WebGUI::International::get(306),$session{setting}{usernameBinding});
                 $f->url("ldapURL",WebGUI::International::get(120),$session{setting}{ldapURL});
@@ -58,12 +60,14 @@ sub www_editAuthenticationSettings {
 }
 
 #-------------------------------------------------------------------
-sub www_editAuthenticationSettingsSave {
+sub www_editUserSettingsSave {
         if (WebGUI::Privilege::isInGroup(3)) {
 		_saveSetting("sessionTimeout");
 		_saveSetting("onNewUserAlertGroup");
 		_saveSetting("alertOnNewUser");
 		_saveSetting("authMethod");
+		_saveSetting("useKarma");
+		_saveSetting("karmaPerLogin");
 		_saveSetting("ldapURL");
 		_saveSetting("ldapId");
 		_saveSetting("ldapIdName");
@@ -261,7 +265,7 @@ sub www_manageSettings {
                 $output .= '<li><a href="'.WebGUI::URL::page('op=editMailSettings').'">'.WebGUI::International::get(133).'</a>';
                 $output .= '<li><a href="'.WebGUI::URL::page('op=editMiscSettings').'">'.WebGUI::International::get(140).'</a>';
                 $output .= '<li><a href="'.WebGUI::URL::page('op=editProfileSettings').'">'.WebGUI::International::get(308).'</a>';
-                $output .= '<li><a href="'.WebGUI::URL::page('op=editAuthenticationSettings').'">'.WebGUI::International::get(117).'</a>';
+                $output .= '<li><a href="'.WebGUI::URL::page('op=editUserSettings').'">'.WebGUI::International::get(117).'</a>';
                 $output .= '</ul>';
         } else {
                 $output = WebGUI::Privilege::adminOnly();
