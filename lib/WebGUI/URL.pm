@@ -47,6 +47,18 @@ sub gateway {
 }
 
 #-------------------------------------------------------------------
+sub makeCompliant {
+        my ($value);
+	$value = $_[0];
+        $value =~ s/\s+$//g;            #removes trailing whitespace
+        $value =~ s/^\s+//g;            #removes leading whitespace
+        $value =~ s/ /_/g;              #replaces whitespace with underscores
+        $value =~ s/\.$//g;             #removes trailing period
+        $value =~ s/[^A-Za-z0-9\-\.\_]//g; #removes all funky characters
+        return $value;
+}
+
+#-------------------------------------------------------------------
 sub makeUnique {
         my ($url, $test, $pageId);
         $url = $_[0];
@@ -83,11 +95,7 @@ sub unescape {
 sub urlize {
 	my ($value);
         $value = lc($_[0]);		#lower cases whole string
-	$value =~ s/\W+$//g;		#removes trailing whitespace
-	$value =~ s/^\W+//g;		#removes leading whitespace
-        $value =~ s/ /_/g;		#replaces whitespace with underscores
-	$value =~ s/\.$//g;		#removes trailing period
-        $value =~ s/[^a-z0-9\-\.\_]//g;	#removes all funky characters
+	$value = makeCompliant($value);
         return $value;
 }
 

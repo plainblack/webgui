@@ -428,7 +428,7 @@ sub save {
 			$_[0]->{_filename} =~ s/\./\_/g;
 			$_[0]->{_filename} .= ".txt";
 		}
-		$_[0]->{_filename} = WebGUI::URL::urlize($_[0]->getFilename);
+		$_[0]->{_filename} = WebGUI::URL::makeCompliant($_[0]->getFilename);
 		$_[0]->{_node}->create();
 		$file = FileHandle->new(">".$_[0]->getPath);
 		if (defined $file) {
