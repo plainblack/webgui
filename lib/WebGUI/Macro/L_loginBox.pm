@@ -56,7 +56,9 @@ sub _replacement {
 		$f->raw('<span class="formSubtext"><br></span>');
 		$f->submit(WebGUI::International::get(52));
 		$temp .= $f->print;
-                $temp .= '<a href="'.WebGUI::URL::page('op=createAccount').'">'.WebGUI::International::get(407).'</a>';
+		if ($session{setting}{anonymousRegistration}) {
+                	$temp .= '<a href="'.WebGUI::URL::page('op=createAccount').'">'.WebGUI::International::get(407).'</a>';
+		}
         }
         $temp .= '</div>';
 	return $temp;
