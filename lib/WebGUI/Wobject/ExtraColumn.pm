@@ -109,7 +109,7 @@ sub www_edit {
 		);
 	$f->getTab("properties")->integer(
 		-name=>"spacer",
-		-label=>WebGUI::International::get(3,$_[0]->get("namespace"))
+		-label=>WebGUI::International::get(3,$_[0]->get("namespace")),
 		-value=>,$_[0]->getValue("spacer")
 		);
 	$f->getTab("properties")->integer(
