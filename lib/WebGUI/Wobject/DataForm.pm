@@ -299,7 +299,7 @@ sub sendEmail {
                 unless ($userId || $groupId) {
                         WebGUI::ErrorHandler::warn($_[0]->get("wobjectId").": Unable to send message, no user or group found.");
                 } else {
-                        WebGUI::MessageLog::addEntry($userId, $groupId, $subject, $message);
+                        WebGUI::MessageLog::addEntry($userId, $groupId, $subject, $message, "", "", $from);
 			if ($cc) {
                                 WebGUI::Mail::send($cc, $subject, $message, "", $from);
                         }

@@ -52,28 +52,29 @@ These functions are available from this package:
 
 #-------------------------------------------------------------------
 sub _notify {
-	my ($u, $message, $subject);
+	my ($u, $message, $subject, $from);
 	$u = $_[0];
 	$subject = $_[1];
 	$message = $_[2];
+	$from = $_[3];
         if ($u->profileField("INBOXNotifications") eq "email") {
         	if ($u->profileField("email") ne "") {
-                	WebGUI::Mail::send($u->profileField("email"),$subject,$message);
+                	WebGUI::Mail::send($u->profileField("email"),$subject,$message, "", $from);
                 }
         } elsif ($u->profileField("INBOXNotifications") eq "emailToPager") {
                 if ($u->profileField("emailToPagerGateway") ne "") {
-                        WebGUI::Mail::send($u->profileField("emailToPagerGateway"),$subject,$message);
+                        WebGUI::Mail::send($u->profileField("emailToPagerGateway"),$subject,$message, "", $from);
                 }
         } elsif ($u->profileField("INBOXNotifications") eq "icq") {
                 if ($u->profileField("icq")) {
-                        WebGUI::Mail::send($u->profileField("icq").'@pager.icq.com',$subject,$message);
+                        WebGUI::Mail::send($u->profileField("icq").'@pager.icq.com',$subject,$message, "", $from);
                 }
         }
 }
 
 #-------------------------------------------------------------------
 
-=head2 addEntry ( userId, groupId, subject, message [ , url, status ] )
+=head2 addEntry ( userId, groupId, subject, message [ , url, status, from ] )
 
 Adds an entry to the message log and sends out notification to users.
 
@@ -107,12 +108,16 @@ The URL of any action that should be taken based upon this notification (if any)
 
 Defaults to 'notice'. Can be 'pending', 'notice', or 'completed'.
 
+=item from
+
+The addressee email address. Defaults to company email.
+
 =back
 
 =cut
 
 sub addEntry {
-        my ($u, @users, $messageLogId, $sth, $userId, $groupId, $subject, $message, $url, $status, $user);
+        my ($u, @users, $messageLogId, $sth, $userId, $groupId, $subject, $message, $url, $status, $user, $from);
 	$messageLogId = getNextId("messageLogId");
 	$userId = $_[0];
 	$groupId = $_[1];
@@ -120,6 +125,7 @@ sub addEntry {
 	$message = $_[3];
 	$url = $_[4];
 	$status = $_[5];
+	$from = $_[6];
 	if ($groupId ne "") {
 		@users = WebGUI::SQL->buildArray("select userId from groupings where groupId=$groupId");
 	}
@@ -133,7 +139,7 @@ sub addEntry {
 			if ($url ne "") {
 				$message .= "\n".WebGUI::URL::append($url,'mlog='.$messageLogId);
 			}
-			_notify($u,$subject,$message);
+			_notify($u,$subject,$message,$from);
 		}
 	}
 }
