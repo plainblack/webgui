@@ -22,6 +22,21 @@ use WebGUI::Utility;
 
 our @ISA = qw(WebGUI::Auth);
 
+
+#-------------------------------------------------------------------
+
+=head2 addUserForm ( )
+
+  Creates user form elements specific to this Auth Method.
+
+=cut
+
+sub _logSecurityMessage {
+   if($session{config}{passwordChangeLoggingEnabled}) {
+      WebGUI::ErrorHandler::security("change password.  Password changed successfully");
+   }
+}
+
 #-------------------------------------------------------------------
 
 =head2 addUserForm ( )
@@ -36,6 +51,24 @@ sub addUserForm {
    my $f = WebGUI::HTMLForm->new;
    $f->password("authWebGUI.identifier",WebGUI::International::get(51),"password");
    $f->interval("authWebGUI.passwordTimeout",WebGUI::International::get(16,'Auth/WebGUI'),WebGUI::DateTime::secondsToInterval(($userData->{passwordTimeout} || $session{setting}{webguiPasswordTimeout})));
+   my $userChange = $session{setting}{webguiChangeUsername};
+   if($userChange || $userChange eq "0"){
+      $userChange = $userData->{changeUsername};
+   }
+   $f->yesNo(
+                -name=>"authWebGUI.changeUsername",
+                -value=>$userChange,
+                -label=>WebGUI::International::get(21,'Auth/WebGUI')
+             );
+   my $passwordChange = $session{setting}{webguiChangePassword};
+   if($passwordChange || $passwordChange eq "0"){
+      $passwordChange = $userData->{changePassword};
+   }
+   $f->yesNo(
+                -name=>"authWebGUI.changePassword",
+                -value=>$passwordChange,
+                -label=>WebGUI::International::get(20,'Auth/WebGUI')
+             );
    return $f->printRowsOnly;
 }
 
@@ -53,7 +86,8 @@ sub addUserFormSave {
    unless ($session{form}{'authWebGUI.identifier'} eq "password") {
       $properties->{identifier} = Digest::MD5::md5_base64($session{form}{'authWebGUI.identifier'});
    }
-   
+   $properties->{changeUsername} = $session{form}{'authWebGUI.changeUsername'};
+   $properties->{changePassword} = $session{form}{'authWebGUI.changePassword'};
    $properties->{passwordTimeout} =  WebGUI::DateTime::intervalToSeconds($session{form}{'authWebGUI.passwordTimeout_interval'},$session{form}{'authWebGUI.passwordTimeout_units'});
    $properties->{passwordLastUpdated} = time();
    if($session{setting}{webguiExpirePasswordOnCreation}){
@@ -149,13 +183,22 @@ sub displayAccount {
    my $self = shift;
    my $vars;
    return $self->displayLogin($_[0]) if ($self->userId == 1);
+   my $userData = $self->getParams;
    $vars->{'account.message'} = $_[0] if ($_[0]);
-   $vars->{'account.form.username'} = WebGUI::Form::text({"name"=>"authWebGUI.username","value"=>$self->username});
-   $vars->{'account.form.username.label'} = WebGUI::International::get(50);
-   $vars->{'account.form.password'} = WebGUI::Form::password({"name"=>"authWebGUI.identifier","value"=>"password"});
-   $vars->{'account.form.password.label'} = WebGUI::International::get(51);
-   $vars->{'account.form.passwordConfirm'} = WebGUI::Form::password({"name"=>"authWebGUI.identifierConfirm","value"=>"password"});
-   $vars->{'account.form.passwordConfirm.label'} = WebGUI::International::get(2,'Auth/WebGUI');
+   if($userData->{changeUsername}){
+      $vars->{'account.form.username'} = WebGUI::Form::text({"name"=>"authWebGUI.username","value"=>$self->username});
+      $vars->{'account.form.username.label'} = WebGUI::International::get(50);
+   }
+   if($userData->{changePassword}){
+      $vars->{'account.form.password'} = WebGUI::Form::password({"name"=>"authWebGUI.identifier","value"=>"password"});
+      $vars->{'account.form.password.label'} = WebGUI::International::get(51);
+      $vars->{'account.form.passwordConfirm'} = WebGUI::Form::password({"name"=>"authWebGUI.identifierConfirm","value"=>"password"});
+      $vars->{'account.form.passwordConfirm.label'} = WebGUI::International::get(2,'Auth/WebGUI');
+   }
+   if(!$userData->{changeUsername} && !$userData->{changePassword}){
+      $vars->{'account.noform'} = "true";
+   }
+   $vars->{'account.nofields'} = WebGUI::International::get(22,'Auth/WebGUI');
    return $self->SUPER::displayAccount("updateAccount",$vars);
 }
 
@@ -207,6 +250,9 @@ sub editUserFormSave {
       }
    }
    $properties->{passwordTimeout} = WebGUI::DateTime::intervalToSeconds($session{form}{'authWebGUI.passwordTimeout_interval'},$session{form}{'authWebGUI.passwordTimeout_units'});
+   $properties->{changeUsername} = $session{form}{'authWebGUI.changeUsername'};
+   $properties->{changePassword} = $session{form}{'authWebGUI.changePassword'};
+   
    $self->SUPER::editUserFormSave($properties);
 }
 
@@ -244,6 +290,16 @@ sub editUserSettingsForm {
                 -value=>$session{setting}{webguiWelcomeMessage},
                 -label=>WebGUI::International::get(869)
                );
+   $f->yesNo(
+                -name=>"webguiChangeUsername",
+                -value=>$session{setting}{webguiChangeUsername},
+                -label=>WebGUI::International::get(19,'Auth/WebGUI')
+             );
+   $f->yesNo(
+                -name=>"webguiChangePassword",
+                -value=>$session{setting}{webguiChangePassword},
+                -label=>WebGUI::International::get(18,'Auth/WebGUI')
+             );
    $f->yesNo(
 	         -name=>"webguiPasswordRecovery",
              -value=>$session{setting}{webguiPasswordRecovery},
@@ -315,6 +371,10 @@ sub recoverPasswordFinish {
    	   }
    	   $encryptedPassword = Digest::MD5::md5_base64($password);
 	   $self->saveParams($userId,"WebGUI",{identifier=>$encryptedPassword});
+	   _logSecurityMessage();
+	   if($session{config}{emailRecoveryLoggingEnabled}) {
+	      WebGUI::ErrorHandler::security("recover a password.  Password emailed to: ".$session{form}{email});
+	   }
 	   $message = $session{setting}{webguiRecoverPasswordEmail};
 	   $message .= "\n".WebGUI::International::get(50).": ".$username."\n";
 	   $message .= WebGUI::International::get(51).": ".$password."\n";
@@ -370,6 +430,7 @@ sub resetExpiredPasswordSave {
    $properties->{passwordLastUpdated} = time();
    
    $self->saveParams($u->userId,$self->authMethod,$properties);
+   _logSecurityMessage();
    
    $msg = $self->login;
    if($msg eq ""){
@@ -393,28 +454,54 @@ sub updateAccount {
    my $password = $session{form}{'authWebGUI.identifier'};
    my $passConfirm = $session{form}{'authWebGUI.identifierConfirm'};
    my $display = '<li>'.WebGUI::International::get(81).'<p>';
+   my $error = "";
    
    if($self->userId == 1){
       return $self->displayLogin;
    }
    
-   if(!$self->validUsernameAndPassword($username,$password,$passConfirm)){
-      $display = $self->error; #overwrite display
+   if($username){
+      if($self->_isDuplicateUsername($username)){
+         $error .= $self->error;
+      }
+   
+      if(!$self->_isValidUsername($username)){
+         $error .= $self->error;
+      }	  
    }
+    
+   if($password){
+      if(!$self->_isValidPassword($password,$passConfirm)){
+         $error .= $self->error;
+	  }
+   }
+   
+   if($error){
+      $display = $error;
+   }
+   
+   #if(!$self->validUsernameAndPassword($username,$password,$passConfirm)){
+   #   $display = $self->error; #overwrite display
+   #}
    
    my $properties;
    my $u = $self->user;
-   $u->username($username);
-   my $userData = $self->getParams;
-   
-   unless ($password eq "password") {
-      $properties->{identifier} = Digest::MD5::md5_base64($password);
-	   if($userData->{identifier} ne $properties->{identifier}){
-	     $properties->{passwordLastUpdated} = time();
+   if(!$error){
+      if($username){
+	     $u->username($username);
+         $session{form}{uid} = $u->userId;
+	  }
+	  if($password){
+	     my $userData = $self->getParams;
+         unless ($password eq "password") {
+            $properties->{identifier} = Digest::MD5::md5_base64($password);
+			_logSecurityMessage();
+	        if($userData->{identifier} ne $properties->{identifier}){
+	           $properties->{passwordLastUpdated} = time();
+            }
+         }
       }
    }
-   
-   $session{form}{uid} = $u->userId;
    $self->saveParams($u->userId,$self->authMethod,$properties);
    WebGUI::Session::refreshUserInfo($u->userId);
    

@@ -413,3 +413,16 @@ names set for them by the SOAP server (i.e. perhaps "localTime" for a time query
 INSERT INTO template VALUES (1,'Xmethods: getTemp','<h1><tmpl_var title></h1>\n\n<tmpl_if description>\n  <tmpl_var description><br /><br />\n</tmpl_if>\n\n\r\n<tmpl_if results>\r\n  <tmpl_loop results>\r\n    The current temp is: <tmpl_var result>\r\n  </tmpl_loop>\r\n<tmpl_else>\r\n  Failed to retrieve temp.\r\n</tmpl_if>','WSClient');
 INSERT INTO template VALUES (2,'Google: doGoogleSearch','<style>\n.googleDetail {\n  font-size: 9px;\n}\n</style>\n\n<h1><tmpl_var title></h1>\n\n<tmpl_if description>\n  <tmpl_var description><br /><br />\n</tmpl_if>\n\n<form method=\"post\">\n <input type=\"hidden\" name=\"func\" value=\"view\">\n <input type=\"hidden\" name=\"wid\" value=\"<tmpl_var wobjectId>\">\n <input type=\"hidden\" name=\"targetWobjects\" value=\"doGoogleSearch\">\n <input type=\"text\" name=\"q\"><input type=\"submit\" value=\"Search\">\n</form>\n\n<tmpl_if results>\n  <tmpl_loop results>\n   <tmpl_if resultElements>\n      <p> You searched for <b><tmpl_var searchQuery></b>. We found around <tmpl_var estimatedTotalResultsCount> matching records.</p>\n   </tmpl_if>\n\n   <tmpl_loop resultElements>\n     <a href=\"<tmpl_var URL>\">\n	<tmpl_if title>\n		    <tmpl_var title>\n	<tmpl_else>\n                    <tmpl_var url>\n        </tmpl_if>\n     </a><br />\n        <tmpl_if snippet>\n            <tmpl_var snippet><br />\n        </tmpl_if>\n        <div class=\"googleDetail\">\n        <tmpl_if summary>\n            <b>Description:</b> <tmpl_var summary><br />\n        </tmpl_if>\n        <a href=\"<tmpl_var URL>\"><tmpl_var URL></a>\n     <tmpl_if cachedSize>\n           - <tmpl_var cachedSize>\n     </tmpl_if>\n     </div><br />\n    </tmpl_loop>\n  </tmpl_loop>\n<tmpl_else>\n   Could not retrieve results from Google.\n</tmpl_if>','WSClient');
 
+insert into settings (name,value) values ('webguiChangePassword',1);
+insert into settings (name,value) values ('webguiChangeUsername',1);
+
+delete from international where languageId=1 and namespace='Auth/WebGUI' and internationalId=22;
+insert into international (internationalId,languageId,namespace,message,lastUpdated,context) values (22,1,'Auth/WebGUI','There are no fields to update.', 1076361800,'');
+delete from international where languageId=1 and namespace='Auth/WebGUI' and internationalId=21;
+insert into international (internationalId,languageId,namespace,message,lastUpdated,context) values (21,1,'Auth/WebGUI','Allow User to Change Username?', 1076358688,'');
+delete from international where languageId=1 and namespace='Auth/WebGUI' and internationalId=20;
+insert into international (internationalId,languageId,namespace,message,lastUpdated,context) values (20,1,'Auth/WebGUI','Allow User to Change Password?', 1076358606,'');
+delete from international where languageId=1 and namespace='Auth/WebGUI' and internationalId=19;
+insert into international (internationalId,languageId,namespace,message,lastUpdated,context) values (19,1,'Auth/WebGUI','Allow Users to Change Username?', 1076358029,'');
+delete from international where languageId=1 and namespace='Auth/WebGUI' and internationalId=18;
+insert into international (internationalId,languageId,namespace,message,lastUpdated,context) values (18,1,'Auth/WebGUI','Allow Users to Change Passwords?', 1076357595,'');

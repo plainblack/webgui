@@ -433,6 +433,8 @@ foreach my $wobject (@{$wobjects}) {
 }
 push(@newWobjects,"WSClient");
 $conf->set("wobjects"=>\@newWobjects);
+$conf->set("emailRecoveryLoggingEnabled"=>1);
+$conf->set("passwordChangeLoggingEnabled"=>1);
 $conf->write;
 
 
@@ -440,10 +442,15 @@ $conf->write;
 print "\tUpdating Authentication.\n" unless ($quiet);
 WebGUI::SQL->write("delete from authentication where authMethod='WebGUI' and fieldName='passwordLastUpdated'");
 WebGUI::SQL->write("delete from authentication where authMethod='WebGUI' and fieldName='passwordTimeout'");
+WebGUI::SQL->write("delete from authentication where authMethod='WebGUI' and fieldName='changeUsername'");
+WebGUI::SQL->write("delete from authentication where authMethod='WebGUI' and fieldName='changePassword'");
+
 my $authSth = WebGUI::SQL->read("select userId from users where authMethod='WebGUI'");
 while (my $authHash = $authSth->hashRef){
    WebGUI::SQL->write("insert into authentication (userId,authMethod,fieldName,fieldData) values ('".$authHash->{userId}."','WebGUI','passwordLastUpdated','".time()."')");
    WebGUI::SQL->write("insert into authentication (userId,authMethod,fieldName,fieldData) values ('".$authHash->{userId}."','WebGUI','passwordTimeout','3122064000')");
+   WebGUI::SQL->write("insert into authentication (userId,authMethod,fieldName,fieldData) values ('".$authHash->{userId}."','WebGUI','changeUsername','1')");
+   WebGUI::SQL->write("insert into authentication (userId,authMethod,fieldName,fieldData) values ('".$authHash->{userId}."','WebGUI','changePassword','1')");   
 }
 
 
