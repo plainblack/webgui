@@ -941,7 +941,8 @@ sub www_edit {
 		-label=>WebGUI::International::get(363),
 		-value=>[$templatePosition],
 		-uiLevel=>5,
-		-options=>WebGUI::Template::getPositions($session{page}{templateId})
+		-options=>WebGUI::Template::getPositions($session{page}{templateId}),
+		-subtext=>WebGUI::Template::draw($session{page}{templateId})
 		);
 	$f->date(
 		-name=>"startDate",

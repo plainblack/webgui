@@ -68,7 +68,7 @@ sub www_deleteTemplateConfirm {
         } elsif (WebGUI::Privilege::isInGroup($session{setting}{templateManagersGroup})) {
 		$a = WebGUI::SQL->read("select * from page where templateId=".$session{form}{tid});
 		while (($pageId) = $a->array) {
-			WebGUI::SQL->write("update wobject set templatePosition=0 where pageId=$pageId");
+			WebGUI::SQL->write("update wobject set templatePosition=1 where pageId=$pageId");
 		}
 		$a->finish;
                 WebGUI::SQL->write("delete from template where templateId=".$session{form}{tid});
@@ -85,7 +85,7 @@ sub www_editTemplate {
 	tie %template, 'Tie::CPHash';
         if (WebGUI::Privilege::isInGroup($session{setting}{templateManagersGroup})) {
 		if ($session{form}{tid} eq "new") {
-			$template{template} = "<table>\n <tr>\n  <td>\n\n^0;\n\n  </td>\n </tr>\n</table>\n";
+			$template{template} = "<table>\n <tr>\n  <td>\n\n<tmpl_var template.position1>\n\n  </td>\n </tr>\n</table>\n";
 		} else {
                 	%template = WebGUI::SQL->quickHash("select * from template where templateId=$session{form}{tid}");
 		}

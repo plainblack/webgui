@@ -74,7 +74,7 @@ alter table Product change productTemplateId Product_templateId int not null def
 alter table Product_benefit change productBenefitId Product_benefitId int not null;
 alter table Product_feature change productFeatureId Product_featureId int not null;
 alter table Product_specification change productSpecificationId Product_specificationId int not null;
-
+update wobject set templatePosition=templatePosition+1;
 
 
 

@@ -10,6 +10,7 @@ package WebGUI::Template;
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
+use HTML::Template;
 use strict;
 use Tie::IxHash;
 use WebGUI::ErrorHandler;
@@ -17,24 +18,39 @@ use WebGUI::HTMLForm;
 use WebGUI::Session;
 use WebGUI::SQL;
 
+
+#-------------------------------------------------------------------
+sub _newPositionFormat {
+	return "<tmpl_var template.position".($_[0]+1).">";
+}
+
 #-------------------------------------------------------------------
 sub countPositions {
         my ($template, $i);
         ($template) = WebGUI::SQL->quickArray("select template from template where templateId=".$_[0]);
-        $i = 0;
-        while ($template =~ m/\^$i\;/) {
+        $i = 1;
+        while ($template =~ m/template\.position$i/) {
                 $i++;
         }
-        return $i;
+        return $i-1;
 }
 
 #-------------------------------------------------------------------
-sub generate {
-        my ($output, $content, $template);
-	$template = WebGUI::SQL->quickHashRef("select * from template where templateId=".$_[1]);
-	$content = $template->{template};
-	$content =~ s/\^(\d+)\;/${$_[0]}{$1}/g;
-	return $content;
+sub draw {
+	my $template = get($_[0]);
+	$template =~ s/\n//g;
+	$template =~ s/\r//g;
+	$template =~ s/\'/\\\'/g;
+	$template =~ s/\<table.*?\>/\<table cellspacing=0 cellpadding=3 width=100 height=80 border=1\>/ig;
+	$template =~ s/\<tmpl_var\s+template\.position(\d+)\>/$1/ig;
+	return $template;
+}
+
+#-------------------------------------------------------------------
+sub get {
+        my ($template) = WebGUI::SQL->quickArray("select template from template where templateId=".$_[0]);
+	$template =~ s/\^(\d+)\;/_newPositionFormat($1)/eg; #compatibility with old-style templates
+        return $template;
 }
 
 #-------------------------------------------------------------------
@@ -42,30 +58,54 @@ sub getList {
         my (%list);
 	tie %list, 'Tie::IxHash';
 	%list = WebGUI::SQL->buildHash("select templateId,name from template order by name");
-        return %list;
+        return \%list;
 }
 
 #-------------------------------------------------------------------
 sub getPositions {
 	my (%hash, $template, $i);
 	tie %hash, "Tie::IxHash";
-	($template) = WebGUI::SQL->quickArray("select template from template where templateId=".$_[0]);
-	$i = 0;
-	while ($template =~ m/\^$i\;/) {
+	for ($i=1; $i<=countPositions($_[0]); $i++) {
 		$hash{$i} = $i;
-		$i++;	
 	}
 	return \%hash;
 }
 
 #-------------------------------------------------------------------
-sub selectTemplate {
-	my ($output, $f, %templates, $key);
-	tie %templates,'Tie::IxHash';
+sub process {
+	my ($t, $html);
+	$html = $_[0];
+	$t = HTML::Template->new(
+   		scalarref=>\$html,
+   		loop_context_vars=>1,
+		die_on_bad_params=>0,
+		strict=>0
+		);
+        while (my ($section, $hash) = each %session) {
+        	while (my ($key, $value) = each %$hash) {
+                	if (ref $value eq 'ARRAY') {
+				next;
+                        	#$value = '['.join(', ',@$value).']';
+			} elsif (ref $value eq 'HASH') {
+				next;
+				#$value = '{'.join(', ',map {"$_ => $value->{$_}"} keys %$value).'}';
+                      	}
+                        unless (lc($key) eq "password" || lc($key) eq "identifier") {
+                        	$t->param($section.".".$key=>$value);
+                        }
+                }
+        } 
+	$t->param(%{$_[1]});
+	$t->param("webgui.version"=>$WebGUI::VERSION);
+	return $t->output;
+}
+
+#-------------------------------------------------------------------
+sub select {
+	my ($templates, $output, $f, $key);
 	$f = WebGUI::HTMLForm->new(1);
-	%templates = WebGUI::SQL->buildHash("select templateId,name from template order by name");
-	$f->select("templateId",\%templates,'',[$_[0]],'','','onChange="changeTemplatePreview(this.form.templateId.value)"');
-	%templates = WebGUI::SQL->buildHash("select templateId,template from template");
+	$templates = getList();
+	$f->select("templateId",$templates,'',[$_[0]],'','','onChange="changeTemplatePreview(this.form.templateId.value)"');
 	$output = '
 	<script language="JavaScript">
 	function checkBrowser(){
@@ -110,13 +150,8 @@ sub selectTemplate {
 		oMessage.writeIt(eval("b"+value));
 	}
 	';
-	foreach $key (keys %templates) {
-		$templates{$key} =~ s/\n//g;
-		$templates{$key} =~ s/\r//g;
-		$templates{$key} =~ s/\'/\\\'/g;
-		$templates{$key} =~ s/\<table.*?\>/\<table cellspacing=0 cellpadding=3 width=100 height=80 border=1\>/ig;
-		$templates{$key} =~ s/\^(\d+)\;/$1/g;
-		$output .= "	var b".$key." = '".$templates{$key}."';\n";
+	foreach $key (keys %{$templates}) {
+		$output .= "	var b".$key." = '".draw($key)."';\n";
 	}
 	$output .= '</script>';
 	$output .= $f->printRowsOnly;

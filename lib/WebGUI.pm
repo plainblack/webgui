@@ -28,8 +28,9 @@ use WebGUI::Utility;
 #-------------------------------------------------------------------
 sub page {
 	my ($debug, %contentHash, $w, $cmd, $pageEdit, $wobject, $wobjectOutput, $extra, $originalWobject, $proxyWobjectId,
-		$sth, $httpHeader, $header, $footer, $content, $operationOutput, $adminBar, %hash, $canEdit);
+		$sth, $httpHeader, $content, $operationOutput, $adminBar, $template, %hash, $canEdit);
 	WebGUI::Session::open($_[0],$_[1]);
+	$template = 1;
 	if (exists $session{form}{op}) {
 		if ($session{form}{op} =~ /^[A-Za-z]+$/) {
 			$cmd = "WebGUI::Operation::www_".$session{form}{op};
@@ -95,11 +96,9 @@ sub page {
 		WebGUI::Session::close();
 		return $httpHeader.$operationOutput.$wobjectOutput;
 	} elsif ($operationOutput ne "") {
-		$contentHash{0} = $operationOutput;
-		$content = WebGUI::Template::generate(\%contentHash,1);
+		$contentHash{"template.position".1} = $operationOutput;
 	} elsif ($wobjectOutput ne "") {
-		$contentHash{0} = $wobjectOutput;
-		$content = WebGUI::Template::generate(\%contentHash,1);
+		$contentHash{"template.position".1} = $wobjectOutput;
 	} elsif ($session{page}{redirectURL}) {
 		$session{header}{redirect} = WebGUI::Session::httpRedirect($session{page}{redirectURL})
 	} else {
@@ -120,7 +119,7 @@ sub page {
 			$sth = WebGUI::SQL->read("select * from wobject where pageId=$session{page}{pageId} order by sequenceNumber, wobjectId");
 			while ($wobject = $sth->hashRef) {
 				if ($session{var}{adminOn} && $canEdit) {
-					$contentHash{${$wobject}{templatePosition}} .= "\n<hr>"
+					$contentHash{"template.position".${$wobject}{templatePosition}} .= "\n<hr>"
 						.deleteIcon('func=delete&wid='.${$wobject}{wobjectId})
 						.editIcon('func=edit&wid='.${$wobject}{wobjectId})
 						.moveUpIcon('func=moveUp&wid='.${$wobject}{wobjectId})
@@ -151,18 +150,17 @@ sub page {
 				$w = eval{$cmd->new($wobject)};
 				WebGUI::ErrorHandler::fatalError("Couldn't instanciate wobject: ${$wobject}{namespace}. Root cause: ".$@) if($@);
 				if ($w->inDateRange) {
-					$contentHash{${$wobject}{templatePosition}} .= '<div class="wobject'.${$wobject}{namespace}.'" id="wobjectId'.${$wobject}{wobjectId}.'">';
-					$contentHash{${$wobject}{templatePosition}} .= '<a name="'.${$wobject}{wobjectId}.'"></a>';
-					$contentHash{${$wobject}{templatePosition}} .= eval{$w->www_view};
+					$contentHash{"template.position".${$wobject}{templatePosition}} .= '<div class="wobject'.${$wobject}{namespace}.'" id="wobjectId'.${$wobject}{wobjectId}.'">';
+					$contentHash{"template.position".${$wobject}{templatePosition}} .= '<a name="'.${$wobject}{wobjectId}.'"></a>';
+					$contentHash{"template.position".${$wobject}{templatePosition}} .= eval{$w->www_view};
 					WebGUI::ErrorHandler::fatalError("Wobject runtime error: ${$wobject}{namespace}. Root cause: ".$@) if($@);
-					$contentHash{${$wobject}{templatePosition}} .= "</div>\n\n";
+					$contentHash{"template.position".${$wobject}{templatePosition}} .= "</div>\n\n";
 				}
 			}
 			$sth->finish;
-			$content = WebGUI::Template::generate(\%contentHash,$session{page}{templateId});
+			$template = $session{page}{templateId};
 		} else {
-			$contentHash{0} = WebGUI::Privilege::noAccess();
-			$content = WebGUI::Template::generate(\%contentHash,1);
+			$contentHash{"template.position".1} = WebGUI::Privilege::noAccess();
 		}
 	}
         if ($session{setting}{showDebug} || ($session{form}{debug}==1 && WebGUI::Privilege::isInGroup(3))) {
@@ -191,9 +189,17 @@ sub page {
 		return $httpHeader;
 	} else {
 		$httpHeader = WebGUI::Session::httpHeader();
-		($header, $footer) = WebGUI::Style::getStyle();
+		$content = WebGUI::Template::process(
+			WebGUI::Macro::process(
+				WebGUI::Style::get(
+					$pageEdit
+					.WebGUI::Template::get($template)
+				)
+			),
+			\%contentHash
+		);
 		WebGUI::Session::close();
-		return $httpHeader.$adminBar.$header.$pageEdit.$content.$footer.$debug;
+		return $httpHeader.$adminBar.$content.$debug;
 	}
 }
 

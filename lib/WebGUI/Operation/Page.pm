@@ -197,7 +197,7 @@ sub www_editPage {
 			-uiLevel=>8
 			);
 		$f->readOnly(
-			-value=>WebGUI::Template::selectTemplate($page{templateId}),
+			-value=>WebGUI::Template::select($page{templateId}),
 			-label=>WebGUI::International::get(356),
 			-uiLevel=>5
 			);
@@ -362,8 +362,8 @@ sub www_editPageSave {
 			menuTitle=".quote($session{form}{menuTitle}).", 
 			synopsis=".quote($session{form}{synopsis})." 
 			where pageId=$session{form}{pageId}");
-		WebGUI::SQL->write("update wobject set templatePosition=0 where pageId=$session{form}{pageId} 
-			and templatePosition>".(WebGUI::Template::countPositions($session{form}{templateId})-1));
+		WebGUI::SQL->write("update wobject set templatePosition=1 where pageId=$session{form}{pageId} 
+			and templatePosition>".WebGUI::Template::countPositions($session{form}{templateId}));
 		_recursivelyChangeStyle($session{page}{pageId}) if ($session{form}{recurseStyle});
 		_recursivelyChangePrivileges($session{page}{pageId}) if ($session{form}{recursePrivs});
 		WebGUI::Session::refreshPageInfo($session{page}{pageId}) if ($session{form}{pageId} == $session{page}{pageId});
