@@ -72,6 +72,16 @@ INSERT INTO international VALUES (54,'UserSubmission','English','Web Log');
 INSERT INTO international VALUES (55,'UserSubmission','English','Traditional');
 INSERT INTO international VALUES (56,'UserSubmission','English','Photo Gallery');
 INSERT INTO international VALUES (57,'UserSubmission','English','Responses');
+alter table FAQ add column tocOn int not null default 1;
+alter table FAQ add column topOn int not null default 0;
+alter table FAQ add column qaOn int not null default 0;
+INSERT INTO international VALUES (11,'FAQ','English','Turn TOC on?');
+INSERT INTO international VALUES (12,'FAQ','English','Turn Q/A on?');
+INSERT INTO international VALUES (13,'FAQ','English','Turn [top] link on?');
+INSERT INTO international VALUES (14,'FAQ','English','Q');
+INSERT INTO international VALUES (15,'FAQ','English','A');
+INSERT INTO international VALUES (16,'FAQ','English','[top]');
+
 
 
 

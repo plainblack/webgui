@@ -42,6 +42,11 @@ sub duplicate {
         my ($w, %data, $newQuestionId, $sth);
 	tie %data, 'Tie::CPHash';
         $w = $_[0]->SUPER::duplicate($_[1]);
+	$w->set({
+		topOn=>$_[0]->get("topOn"),
+		tocOn=>$_[0]->get("tocOn"),
+		qaOn=>$_[0]->get("qaOn")
+		});
         $sth = WebGUI::SQL->read("select * from FAQ_question where wobjectId=".$_[0]->get("wobjectId"));
         while (%data = $sth->hash) {
                 $newQuestionId = getNextId("questionId");
@@ -64,6 +69,11 @@ sub new {
 sub purge {
         WebGUI::SQL->write("delete from FAQ_question where wobjectId=".$_[0]->get("wobjectId"));
 	$_[0]->SUPER::purge();
+}
+
+#-------------------------------------------------------------------
+sub set {
+        $_[0]->SUPER::set($_[1],[qw(topOn tocOn qaOn)]);
 }
 
 #-------------------------------------------------------------------
@@ -115,6 +125,9 @@ sub www_edit {
 		$output = helpIcon(1,$namespace);
                 $output = '<h1>'.WebGUI::International::get(8,$namespace).'</h1>';
 		$f = WebGUI::HTMLForm->new;
+		$f->yesNo("tocOn",WebGUI::International::get(11,$namespace),$_[0]->get("tocOn"));
+		$f->yesNo("qaOn",WebGUI::International::get(12,$namespace),$_[0]->get("qaOn"));
+		$f->yesNo("topOn",WebGUI::International::get(13,$namespace),$_[0]->get("topOn"));
 		$f->yesNo("proceed",WebGUI::International::get(1,$namespace),$proceed);
 		$output = $_[0]->SUPER::www_edit($f->printRowsOnly);
                 return $output;
@@ -127,6 +140,11 @@ sub www_edit {
 sub www_editSave {
         if (WebGUI::Privilege::canEditPage()) {
 		$_[0]->SUPER::www_editSave();
+		$_[0]->set({
+			tocOn=>$session{form}{tocOn},
+			topOn=>$session{form}{topOn},
+			qaOn=>$session{form}{qaOn}
+			});
 		if ($session{form}{proceed}) {
 			$_[0]->www_editQuestion();
 		} else {
@@ -218,10 +236,14 @@ sub www_moveQuestionUp {
 
 #-------------------------------------------------------------------
 sub www_view {
-	my (%question, $output, $sth, $qNa);
+	my (%question, $top, $q, $a, $output, $sth, $qNa);
 	tie %question,'Tie::CPHash';
 	$output = $_[0]->displayTitle;
+	$output .= '<a name="top"></a>';
 	$output .= $_[0]->description;
+	$top = WebGUI::International::get(16,$namespace);
+	$q = WebGUI::International::get(14,$namespace);
+	$a = WebGUI::International::get(15,$namespace);
 	if ($session{var}{adminOn}) {
 		$output .= '<a href="'.WebGUI::URL::page('func=editQuestion&wid='.$_[0]->get("wobjectId")).'">'
 			.WebGUI::International::get(9,$namespace).'</a>';
@@ -229,7 +251,9 @@ sub www_view {
 	$output .= '<ul>';
 	$sth = WebGUI::SQL->read("select * from FAQ_question where wobjectId=".$_[0]->get("wobjectId")." order by sequenceNumber");
 	while (%question = $sth->hash) {
-		$output .= '<li><a href="#'.$question{questionId}.'"><span class="faqQuestion">'.$question{question}.'</span></a>';
+		if ($_[0]->get("tocOn")) {
+			$output .= '<li><a href="#'.$question{questionId}.'"><span class="faqQuestion">'.$question{question}.'</span></a>';
+		}
 		if ($session{var}{adminOn}) {
 			$qNa .= deleteIcon('func=deleteQuestion&wid='.$_[0]->get("wobjectId").'&qid='.$question{questionId})
 				.editIcon('func=editQuestion&wid='.$_[0]->get("wobjectId").'&qid='.$question{questionId})
@@ -237,7 +261,19 @@ sub www_view {
 				.moveDownIcon('func=moveQuestionDown&wid='.$_[0]->get("wobjectId").'&qid='.$question{questionId})
 				.' ';
 		}
-		$qNa .= '<a name="'.$question{questionId}.'"><span class="faqQuestion">'.$question{question}.'</span></a><br>'.$question{answer}.'<p>';
+		$qNa .= '<a name="'.$question{questionId}.'"><span class="faqQuestion">';
+		if ($_[0]->get("qaOn")) {
+			$qNa .= $q.' ';
+		}
+		$qNa .= $question{question}.'</span></a><br>';
+                if ($_[0]->get("qaOn")) {
+                        $qNa .= $a.' ';
+                }
+		$qNa .= $question{answer};
+		if ($_[0]->get("topOn")) {
+			$qNa .= '<p/><a href="#top">'.$top.'</a>';
+		}
+		$qNa .= '<p>';
 	}
 	$sth->finish;
 	$output .= '</ul>'.$qNa;
