@@ -237,6 +237,29 @@ sub convertVisitorToUser {
 
 #-------------------------------------------------------------------
 
+=head2 deleteScratch ( name )
+
+Deletes a scratch variable.
+
+=over
+
+=item name
+
+The name of the scratch variable.
+
+=back
+
+=cut
+
+sub deleteScratch {
+	my ($name) = @_;
+	return "" unless ($session{var}{sessionId} ne "" && $name ne "");
+	WebGUI::SQL->write("delete from userSessionScratch where sessionId=".quote($session{var}{sessionId})." and name=".quote($name));
+	$session{scratch}{$name} = "";
+}
+
+#-------------------------------------------------------------------
+
 =head2 end ( sessionId ) 
 
 Removes the specified user session from memory and database.
@@ -550,8 +573,7 @@ sub setScratch {
 	my ($name, $value) = @_;
 	return "" unless ($session{var}{sessionId} ne "" && $name ne "" && defined $value);
 	if ($value eq "-delete-" || (defined $value && $value eq "")) {
-		WebGUI::SQL->write("delete from userSessionScratch where sessionId=".quote($session{var}{sessionId})
-			." and name=".quote($name));
+		deleteScratch($name);
 		$value = "";
 	} elsif ($session{scratch}{$name} ne "") {
 		WebGUI::SQL->write("update userSessionScratch set value=".quote($value)."
