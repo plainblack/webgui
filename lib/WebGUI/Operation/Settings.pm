@@ -21,7 +21,9 @@ use WebGUI::SQL;
 use WebGUI::URL;
 
 our @ISA = qw(Exporter);
-our @EXPORT = qw(&www_editAuthenticationSettings &www_editAuthenticationSettingsSave &www_editCompanyInformation &www_editCompanyInformationSave &www_editFileSettings &www_editFileSettingsSave &www_editMailSettings &www_editMailSettingsSave &www_editMiscSettings &www_editMiscSettingsSave &www_manageSettings);
+our @EXPORT = qw(&www_editAuthenticationSettings &www_editAuthenticationSettingsSave &www_editCompanyInformation &www_editCompanyInformationSave 
+	&www_editFileSettings &www_editFileSettingsSave &www_editMailSettings &www_editMailSettingsSave &www_editMiscSettings 
+	&www_editContentSettings &www_editContentSettingsSave &www_editMiscSettingsSave &www_manageSettings);
 
 #-------------------------------------------------------------------
 sub _saveSetting {
@@ -100,6 +102,51 @@ sub www_editCompanyInformationSave {
 }
 
 #-------------------------------------------------------------------
+sub www_editContentSettings {
+        my ($output, %notFoundPage, %htmlFilter, %editor, $f);
+        %htmlFilter = ('none'=>WebGUI::International::get(420), 'most'=>WebGUI::International::get(421), 
+		'javascript'=>WebGUI::International::get(526), 'all'=>WebGUI::International::get(419));
+        %notFoundPage = (1=>WebGUI::International::get(136), 4=>WebGUI::International::get(137));
+        %editor = ('built-in'=>WebGUI::International::get(495), 'edit-on-pro'=>WebGUI::International::get(494));
+        if (WebGUI::Privilege::isInGroup(3)) {
+                $output .= helpIcon(29);
+                $output .= '<h1>'.WebGUI::International::get(525).'</h1>';
+                $f = WebGUI::HTMLForm->new;
+                $f->hidden("op","editContentSettingsSave");
+                $f->select("notFoundPage",\%notFoundPage,WebGUI::International::get(141),[$session{setting}{notFoundPage}]);
+                $f->text("docTypeDec",WebGUI::International::get(398),$session{setting}{docTypeDec});
+                $f->yesNo("addEditStampToPosts",WebGUI::International::get(524),$session{setting}{addEditStampToPosts});
+                $f->select("filterContributedHTML",\%htmlFilter,WebGUI::International::get(418),[$session{setting}{filterContributedHTML}]);
+                $f->integer("textAreaRows",WebGUI::International::get(463),$session{setting}{textAreaRows});
+                $f->integer("textAreaCols",WebGUI::International::get(464),$session{setting}{textAreaCols});
+                $f->integer("textBoxSize",WebGUI::International::get(465),$session{setting}{textBoxSize});
+                $f->select("richEditor",\%editor,WebGUI::International::get(496),[$session{setting}{richEditor}]);
+                $f->submit;
+                $output .= $f->print;
+        } else {
+                $output = WebGUI::Privilege::adminOnly();
+        }
+        return $output;
+}
+
+#-------------------------------------------------------------------
+sub www_editContentSettingsSave {
+        if (WebGUI::Privilege::isInGroup(3)) {
+                _saveSetting("addEditStampToPosts");
+                _saveSetting("notFoundPage");
+                _saveSetting("docTypeDec");
+                _saveSetting("filterContributedHTML");
+                _saveSetting("textAreaRows");
+                _saveSetting("textAreaCols");
+                _saveSetting("textBoxSize");
+                _saveSetting("richEditor");
+                return www_manageSettings();
+        } else {
+                return WebGUI::Privilege::adminOnly();
+        }
+}
+
+#-------------------------------------------------------------------
 sub www_editFileSettings {
         my ($output, $f);
         if (WebGUI::Privilege::isInGroup(3)) {
@@ -165,26 +212,16 @@ sub www_editMailSettingsSave {
 
 #-------------------------------------------------------------------
 sub www_editMiscSettings {
-        my ($output, %notFoundPage, %criticalError, %htmlFilter, %editor, $f);
-	%htmlFilter = ('none'=>WebGUI::International::get(420), 'most'=>WebGUI::International::get(421), 'all'=>WebGUI::International::get(419));
+        my ($output, %criticalError, $f);
 	%criticalError = ('debug'=>WebGUI::International::get(414), 'friendly'=>WebGUI::International::get(415));
-        %notFoundPage = (1=>WebGUI::International::get(136), 4=>WebGUI::International::get(137));
- 	%editor = ('built-in'=>WebGUI::International::get(495), 'edit-on-pro'=>WebGUI::International::get(494));
         if (WebGUI::Privilege::isInGroup(3)) {
                 $output .= helpIcon(24);
                 $output .= '<h1>'.WebGUI::International::get(140).'</h1>';
 		$f = WebGUI::HTMLForm->new;
                 $f->hidden("op","editMiscSettingsSave");
-                $f->select("notFoundPage",\%notFoundPage,WebGUI::International::get(141),[$session{setting}{notFoundPage}]);
                 $f->integer("sessionTimeout",WebGUI::International::get(142),$session{setting}{sessionTimeout});
-		$f->text("docTypeDec",WebGUI::International::get(398),$session{setting}{docTypeDec});
 		$f->yesNo("preventProxyCache",WebGUI::International::get(400),$session{setting}{preventProxyCache});
 		$f->select("onCriticalError",\%criticalError,WebGUI::International::get(413),[$session{setting}{onCriticalError}]);
-                $f->select("filterContributedHTML",\%htmlFilter,WebGUI::International::get(418),[$session{setting}{filterContributedHTML}]);
-                $f->integer("textAreaRows",WebGUI::International::get(463),$session{setting}{textAreaRows});
-                $f->integer("textAreaCols",WebGUI::International::get(464),$session{setting}{textAreaCols});
-                $f->integer("textBoxSize",WebGUI::International::get(465),$session{setting}{textBoxSize});
-                $f->select("richEditor",\%editor,WebGUI::International::get(496),[$session{setting}{richEditor}]);
 		$f->submit;
 		$output .= $f->print;
         } else {
@@ -197,15 +234,8 @@ sub www_editMiscSettings {
 sub www_editMiscSettingsSave {
         if (WebGUI::Privilege::isInGroup(3)) {
 		_saveSetting("sessionTimeout");
-		_saveSetting("notFoundPage");
-		_saveSetting("docTypeDec");
 		_saveSetting("preventProxyCache");
 		_saveSetting("onCriticalError");
-		_saveSetting("filterContributedHTML");
-		_saveSetting("textAreaRows");
-		_saveSetting("textAreaCols");
-		_saveSetting("textBoxSize");
-		_saveSetting("richEditor");
                 return www_manageSettings(); 
         } else {
                 return WebGUI::Privilege::adminOnly();
@@ -219,18 +249,13 @@ sub www_manageSettings {
                 $output .= helpIcon(12);
                 $output .= '<h1>'.WebGUI::International::get(143).'</h1>';
                 $output .= '<ul>';
-                $output .= '<li><a href="'.WebGUI::URL::page('op=editAuthenticationSettings').
-			'">'.WebGUI::International::get(117).'</a>';
-                $output .= '<li><a href="'.WebGUI::URL::page('op=editCompanyInformation').
-			'">'.WebGUI::International::get(124).'</a>';
-                $output .= '<li><a href="'.WebGUI::URL::page('op=editFileSettings').
-			'">'.WebGUI::International::get(128).'</a>';
-                $output .= '<li><a href="'.WebGUI::URL::page('op=editMailSettings').
-			'">'.WebGUI::International::get(133).'</a>';
-                $output .= '<li><a href="'.WebGUI::URL::page('op=editMiscSettings').
-			'">'.WebGUI::International::get(140).'</a>';
-                $output .= '<li><a href="'.WebGUI::URL::page('op=editProfileSettings').
-			'">'.WebGUI::International::get(308).'</a>';
+                $output .= '<li><a href="'.WebGUI::URL::page('op=editAuthenticationSettings').'">'.WebGUI::International::get(117).'</a>';
+                $output .= '<li><a href="'.WebGUI::URL::page('op=editCompanyInformation').'">'.WebGUI::International::get(124).'</a>';
+                $output .= '<li><a href="'.WebGUI::URL::page('op=editContentSettings').'">'.WebGUI::International::get(525).'</a>';
+                $output .= '<li><a href="'.WebGUI::URL::page('op=editFileSettings').'">'.WebGUI::International::get(128).'</a>';
+                $output .= '<li><a href="'.WebGUI::URL::page('op=editMailSettings').'">'.WebGUI::International::get(133).'</a>';
+                $output .= '<li><a href="'.WebGUI::URL::page('op=editMiscSettings').'">'.WebGUI::International::get(140).'</a>';
+                $output .= '<li><a href="'.WebGUI::URL::page('op=editProfileSettings').'">'.WebGUI::International::get(308).'</a>';
                 $output .= '</ul>';
         } else {
                 $output = WebGUI::Privilege::adminOnly();

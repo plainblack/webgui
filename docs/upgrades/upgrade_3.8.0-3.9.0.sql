@@ -689,6 +689,9 @@ INSERT INTO international VALUES (521,'WebGUI','English','I would like to be not
 INSERT INTO international VALUES (522,'WebGUI','English','I would like to be notified via ICQ.');
 INSERT INTO userProfileField VALUES ('INBOXNotifications','WebGUI::International::get(518)',1,0,'select','{ \r\n  none=>WebGUI::International::get(519),\r\n email=>WebGUI::International::get(520),\r\n  emailToPager=>WebGUI::International::get(521),\r\n  icq=>WebGUI::International::get(522)\r\n}','[\'email\']', 6,4,0);
 INSERT INTO international VALUES (523,'WebGUI','English','Notification');
+INSERT INTO international VALUES (524,'WebGUI','English','Add edit stamp to posts?');
+INSERT INTO international VALUES (525,'WebGUI','English','Edit Content Settings');
+INSERT INTO international VALUES (526,'WebGUI','English','Remove only JavaScript.');
 
 
 

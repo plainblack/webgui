@@ -78,8 +78,9 @@ sub cleanSegment {
 
 =item filter
 
- Choose from all, none, or most. Defaults to most. All removes all 
- HTML tags; none removes no HTML tags; and most removes all but 
+ Choose from all, none, javascript, or most. Defaults to most. 
+ All removes all HTML tags; none removes no HTML tags; javascript
+ removes all references to javacript; and most removes all but 
  simple formatting tags like bold and italics.
 
 =cut
@@ -90,6 +91,23 @@ sub filter {
 	if ($type eq "all") {
 		$filter = HTML::TagFilter->new(allow=>{'none'},strip_comments=>1);
 		$html = $filter->filter($_[0]);
+	} elsif ($type eq "javascript") {
+		$html = $_[0];
+		$html =~ s/\<script.*?\/script\>//ixsg;
+		$html =~ s/(href="??)javascript\:.*?\)/$1removed/ixsg;
+		$html =~ s/onClick/removed/ixsg;
+		$html =~ s/onDblClick/removed/ixsg;
+		$html =~ s/onLoad/removed/ixsg;
+		$html =~ s/onMouseOver/removed/ixsg;
+		$html =~ s/onMouseOut/removed/ixsg;
+		$html =~ s/onMouseMove/removed/ixsg;
+		$html =~ s/onMouseUp/removed/ixsg;
+		$html =~ s/onMouseDown/removed/ixsg;
+		$html =~ s/onKeyPress/removed/ixsg;
+		$html =~ s/onKeyUp/removed/ixsg;
+		$html =~ s/onKeyDown/removed/ixsg;
+		$html =~ s/onSubmit/removed/ixsg;
+		$html =~ s/onReset/removed/ixsg;
 	} elsif ($type eq "none") {
 		$html = $_[0];
 	} else {
