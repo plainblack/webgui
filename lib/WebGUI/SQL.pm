@@ -111,7 +111,7 @@ A database handler. Defaults to the WebGUI default database handler.
 
 sub beginTransaction {
 	my $class = shift;
-	my $dbh = shift;
+	my $dbh = shift || _getDefaultDb();
 	$dbh->begin_work;
 }
 
@@ -233,7 +233,7 @@ A database handler. Defaults to the WebGUI default database handler.
 
 sub commit {
 	my $class = shift;
-	my $dbh = shift;
+	my $dbh = shift || _getDefaultDb();
 	$dbh->commit;
 }
 
@@ -688,7 +688,7 @@ A database handler. Defaults to the WebGUI default database handler.
 
 sub rollback {
 	my $class = shift;
-	my $dbh = shift;
+	my $dbh = shift || _getDefaultDb();
 	$dbh->rollback;
 }
 

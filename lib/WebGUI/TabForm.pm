@@ -73,6 +73,36 @@ These methods are available from this class:
 
 #-------------------------------------------------------------------
 
+=head2 addTab ( name, label, uiLevel ) 
+
+Adds a new tab to the tab form.
+
+=head3 name
+
+A key to reference the tab by.
+
+=head3 label
+
+The name that will appear on the tab itself.
+
+=head3 uiLevel
+
+The UI Level the user must have to view the tab. Defaults to '0'.
+
+=cut
+
+sub addTab {
+	my $self = shift;
+	my $name = shift;
+	my $label = shift;
+	my $uiLevel = shift || 0;
+	$self->{_tab}{$name}{form} = WebGUI::HTMLForm->new;
+	$self->{_tab}{$name}{label} = $label;
+	$self->{_tab}{$name}{uiLevel} = $uiLevel;
+}
+
+#-------------------------------------------------------------------
+
 =head2 formHeader ( hashRef )
 
 Replaces the default form header with a new definition.
@@ -82,7 +112,9 @@ B<NOTE:> This uses the same syntax of the WebGUI::Form::formHeader() method.
 =cut
 
 sub formHeader {
-        $_[0]->{_form} = WebGUI::Form::formHeader($_[1]);
+	my $self = shift;
+	my $form = shift;
+        $self->{_form} = WebGUI::Form::formHeader($form);
 }
 
 
@@ -99,7 +131,9 @@ The name of the tab to return the form object for.
 =cut
 
 sub getTab {
-	return $_[0]->{_tab}{$_[1]}{form};
+	my $self = shift;
+	my $key = shift;
+	return $self->{_tab}{$key}{form};
 }
 
 
@@ -114,7 +148,9 @@ B<NOTE:> This uses the same syntax of the WebGUI::Form::hidden() method.
 =cut
 
 sub hidden {
-	$_[0]->{_hidden} .= WebGUI::Form::hidden($_[1]);
+	my $self = shift;
+	my $params = shift;
+	$self->{_hidden} .= WebGUI::Form::hidden($params);
 }
 
 
@@ -152,9 +188,9 @@ A string containing the link to the tab-CascadingStyleSheet
 
 sub new {
 	my ($cancel, $class, $tabs, $css);
-	$class = $_[0];
-	$tabs = $_[1];
-	$css = $_[2] || $session{config}{extrasURL}.'/tabs/tabs.css';
+	$class = shift;
+	$tabs = shift;
+	$css = shift || $session{config}{extrasURL}.'/tabs/tabs.css';
 	foreach my $key (keys %{$tabs}) {
 		$tabs->{$key}{form} = WebGUI::HTMLForm->new;
 	}
@@ -175,27 +211,28 @@ Returns an HTML string with all the necessary components to draw the tab form.
 =cut
 
 sub print {
+	my $self = shift;
 	my $output = '
 		<script src="'.$session{config}{extrasURL}.'/tabs/tabs.js" type="text/javascript"></script>
-		<link href="'.$_[0]->{_css}.'" rel="stylesheet" rev="stylesheet" type="text/css">
+		<link href="'.$self->{_css}.'" rel="stylesheet" rev="stylesheet" type="text/css">
 	';
-	$output .= $_[0]->{_form};
-	$output .= $_[0]->{_hidden};
+	$output .= $self->{_form};
+	$output .= $self->{_hidden};
 	my $i = 1;
 	my $tabs;
 	my $form;	
-	foreach my $key (keys %{$_[0]->{_tab}}) {
+	foreach my $key (keys %{$self->{_tab}}) {
 		$tabs .= '<span onclick="toggleTab('.$i.')" id="tab'.$i.'" class="tab"';
-                if ($_[0]->{_tab}->{$key}{uiLevel} > $session{user}{uiLevel}) {
+                if ($self->{_tab}->{$key}{uiLevel} > $session{user}{uiLevel}) {
                         $tabs .= 'style="display: none;"';
                 }
-                $tabs .= '>'.$_[0]->{_tab}{$key}{label}.'</span> ';
+                $tabs .= '>'.$self->{_tab}{$key}{label}.'</span> ';
 		$form .= '<div id="tabcontent'.$i.'" class="tabBody"><table>';
-		$form .= $_[0]->{_tab}{$key}{form}->printRowsOnly;
+		$form .= $self->{_tab}{$key}{form}->printRowsOnly;
 		$form .= '</table></div>';
 		$i++;
 	}
-	$output .= '<div class="tabs">'.$tabs.$_[0]->{_submit}."&nbsp;&nbsp;".$_[0]->{_cancel}.'</div>';
+	$output .= '<div class="tabs">'.$tabs.$self->{_submit}."&nbsp;&nbsp;".$self->{_cancel}.'</div>';
 	$output .= $form;
 	$output .= WebGUI::Form::formFooter();
 	$output .= '<script>var numberOfTabs = '.($i-1).'; initTabs();</script>';
@@ -214,7 +251,9 @@ B<NOTE:> This uses the same syntax of the WebGUI::Form::submit() method.
 =cut
 
 sub submit {
-	$_[0]->{_submit} = WebGUI::Form::submit($_[1]);
+	my $self = shift;
+	my $submit = shift;
+	$self->{_submit} = WebGUI::Form::submit($submit);
 }
 
 
