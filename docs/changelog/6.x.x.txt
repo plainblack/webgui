@@ -23,5 +23,5 @@
  - Updated the Form subsystem to use the new calendar for date and time
    fields.
  - Bugfix 859816 : DataForm - security issues. Tnx Gabor for reporting.
-
+ - ^t; now starts in current root rather then in site root.
 
