@@ -320,7 +320,7 @@ sub set {
 
 sub www_cut {
         if (WebGUI::Privilege::canEditPage()) {
-		$_[0]->set({pageId=>2});
+		$_[0]->set({pageId=>2, templatePosition=>0});
 		_reorderWobjects($session{page}{pageId});
                 return "";
         } else {
@@ -366,7 +366,7 @@ sub www_delete {
 
 sub www_deleteConfirm {
         if (WebGUI::Privilege::canEditPage()) {
-		$_[0]->set({pageId=>3});
+		$_[0]->set({pageId=>3, templatePosition=>0});
 		_reorderWobjects($_[0]->get("pageId"));
                 return "";
         } else {
@@ -544,7 +544,7 @@ sub www_paste {
         if (WebGUI::Privilege::canEditPage()) {
 		($nextSeq) = WebGUI::SQL->quickArray("select max(sequenceNumber) from wobject where pageId=$session{page}{pageId}");
 		$nextSeq += 1;
-		$_[0]->set({sequenceNumber=>$nextSeq, pageId=>$session{page}{pageId}});
+		$_[0]->set({sequenceNumber=>$nextSeq, pageId=>$session{page}{pageId}, templatePosition=>0});
                 return "";
         } else {
                 return WebGUI::Privilege::insufficient();
