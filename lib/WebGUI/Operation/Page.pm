@@ -318,6 +318,19 @@ sub www_editPage {
 			-subtext=>' &nbsp; '.WebGUI::International::get(116),
 			-uiLevel=>9
 			);
+		$f->raw(
+                        -value=>'<tr><td colspan=2><hr size=1/></td></tr>',
+                        -uiLevel=>5
+                        );
+		if ($page{pageId} eq "new") {
+                	$f->whatNext(
+                        	-options=>{
+                                	gotoNewPage=>WebGUI::International::get(823),
+                               	 	backToPage=>WebGUI::International::get(745)
+                                	},
+                        	-value=>"gotoNewPage"
+                        	);
+        	}
 		$f->submit;
 		$output .= $f->print;
                 return $output;
@@ -334,51 +347,51 @@ sub www_editPageSave {
 	} else {
 		$pageId = $session{form}{pageId};
 	}
-        if (WebGUI::Privilege::canEditPage($pageId)) {
-		if ($session{form}{pageId} eq "new") {
-			($nextSeq) = WebGUI::SQL->quickArray("select max(sequenceNumber) from page where parentId=$session{form}{parentId}");
-                	$nextSeq++;
-			$session{form}{pageId} = getNextId("pageId");
-			WebGUI::SQL->write("insert into page (pageId,sequenceNumber,parentId) 
-				values ($session{form}{pageId},$nextSeq,$session{form}{parentId})");
-		}
-                $session{form}{title} = "no title" if ($session{form}{title} eq "");
-                $session{form}{menuTitle} = $session{form}{title} if ($session{form}{menuTitle} eq "");
-                $session{form}{urlizedTitle} = $session{form}{menuTitle} if ($session{form}{urlizedTitle} eq "");
-		$session{form}{urlizedTitle} = WebGUI::URL::makeUnique(WebGUI::URL::urlize($session{form}{urlizedTitle}),$session{form}{pageId});
-		$session{form}{startDate} = setToEpoch($session{form}{startDate}) || setToEpoch(time());
-        	$session{form}{endDate} = setToEpoch($session{form}{endDate}) || setToEpoch(addToDate(time(),10));
-                WebGUI::SQL->write("update page set 
-			title=".quote($session{form}{title}).", 
-			styleId=$session{form}{styleId}, 
-			ownerId=$session{form}{ownerId}, 
-			ownerView=$session{form}{ownerView}, 
-			ownerEdit=$session{form}{ownerEdit}, 
-			groupId='$session{form}{groupId}', 
-			groupView=$session{form}{groupView}, 
-			groupEdit=$session{form}{groupEdit}, 
-			worldView=$session{form}{worldView}, 
-			worldEdit=$session{form}{worldEdit},
-			startDate=$session{form}{startDate},
-			endDate=$session{form}{endDate},
-			metaTags=".quote($session{form}{metaTags}).", 
-			urlizedTitle='$session{form}{urlizedTitle}', 
-			redirectURL='$session{form}{redirectURL}', 
-			languageId='$session{form}{languageId}', 
-			defaultMetaTags='$session{form}{defaultMetaTags}', 
-			templateId='$session{form}{templateId}', 
-			menuTitle=".quote($session{form}{menuTitle}).", 
-			synopsis=".quote($session{form}{synopsis})." 
-			where pageId=$session{form}{pageId}");
-		WebGUI::SQL->write("update wobject set templatePosition=1 where pageId=$session{form}{pageId} 
-			and templatePosition>".WebGUI::Template::countPositions($session{form}{templateId}));
-		_recursivelyChangeStyle($session{page}{pageId}) if ($session{form}{recurseStyle});
-		_recursivelyChangePrivileges($session{page}{pageId}) if ($session{form}{recursePrivs});
-		WebGUI::Session::refreshPageInfo($session{page}{pageId}) if ($session{form}{pageId} == $session{page}{pageId});
-                return "";
-        } else {
-                return WebGUI::Privilege::insufficient();
-        }
+        return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage($pageId));
+	if ($session{form}{pageId} eq "new") {
+		($nextSeq) = WebGUI::SQL->quickArray("select max(sequenceNumber) from page where parentId=$session{form}{parentId}");
+               	$nextSeq++;
+		$session{form}{pageId} = getNextId("pageId");
+		WebGUI::SQL->write("insert into page (pageId,sequenceNumber,parentId) 
+			values ($session{form}{pageId},$nextSeq,$session{form}{parentId})");
+	}
+        $session{form}{title} = "no title" if ($session{form}{title} eq "");
+        $session{form}{menuTitle} = $session{form}{title} if ($session{form}{menuTitle} eq "");
+        $session{form}{urlizedTitle} = $session{form}{menuTitle} if ($session{form}{urlizedTitle} eq "");
+	$session{form}{urlizedTitle} = WebGUI::URL::makeUnique(WebGUI::URL::urlize($session{form}{urlizedTitle}),$session{form}{pageId});
+	$session{form}{startDate} = setToEpoch($session{form}{startDate}) || setToEpoch(time());
+       	$session{form}{endDate} = setToEpoch($session{form}{endDate}) || setToEpoch(addToDate(time(),10));
+        WebGUI::SQL->write("update page set 
+		title=".quote($session{form}{title}).", 
+		styleId=$session{form}{styleId}, 
+		ownerId=$session{form}{ownerId}, 
+		ownerView=$session{form}{ownerView}, 
+		ownerEdit=$session{form}{ownerEdit}, 
+		groupId='$session{form}{groupId}', 
+		groupView=$session{form}{groupView}, 
+		groupEdit=$session{form}{groupEdit}, 
+		worldView=$session{form}{worldView}, 
+		worldEdit=$session{form}{worldEdit},
+		startDate=$session{form}{startDate},
+		endDate=$session{form}{endDate},
+		metaTags=".quote($session{form}{metaTags}).", 
+		urlizedTitle='$session{form}{urlizedTitle}', 
+		redirectURL='$session{form}{redirectURL}', 
+		languageId='$session{form}{languageId}', 
+		defaultMetaTags='$session{form}{defaultMetaTags}', 
+		templateId='$session{form}{templateId}', 
+		menuTitle=".quote($session{form}{menuTitle}).", 
+		synopsis=".quote($session{form}{synopsis})." 
+		where pageId=$session{form}{pageId}");
+	WebGUI::SQL->write("update wobject set templatePosition=1 where pageId=$session{form}{pageId} 
+		and templatePosition>".WebGUI::Template::countPositions($session{form}{templateId}));
+	_recursivelyChangeStyle($session{page}{pageId}) if ($session{form}{recurseStyle});
+	_recursivelyChangePrivileges($session{page}{pageId}) if ($session{form}{recursePrivs});
+	WebGUI::Session::refreshPageInfo($session{page}{pageId}) if ($session{form}{pageId} == $session{page}{pageId});
+	if ($session{form}{proceed} eq "gotoNewPage") {
+		WebGUI::Session::refreshPageInfo($session{form}{pageId});
+	}
+       	return "";
 }
 
 #-------------------------------------------------------------------

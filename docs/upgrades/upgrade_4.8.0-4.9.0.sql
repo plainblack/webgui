@@ -976,6 +976,7 @@ alter table SiteMap drop column lineSpacing;
 INSERT INTO template VALUES (1,'Default Site Map','<tmpl_if displayTitle>\r\n    <h1><tmpl_var title></h1>\r\n</tmpl_if>\r\n\r\n<tmpl_if description>\r\n    <tmpl_var description><p/>\r\n</tmpl_if>\r\n\r\n<tmpl_loop page_loop>\r\n  <tmpl_var page.indent>&middot;<a href=\"<tmpl_var page.url>\"><tmpl_var page.title></a><br/>\r\n</tmpl_loop>','SiteMap');
 INSERT INTO template VALUES (2,'Descriptive Site Map','<tmpl_if displayTitle>\r\n    <h1><tmpl_var title></h1>\r\n</tmpl_if>\r\n\r\n<tmpl_if description>\r\n    <tmpl_var description><p/>\r\n</tmpl_if>\r\n\r\n<tmpl_loop page_loop>\r\n  <tmpl_var page.indent><a href=\"<tmpl_var page.url>\"><tmpl_var page.title></a> \r\n   <tmpl_if page.synopsis>\r\n       - <tmpl_var page.synopsis>\r\n   </tmpl_if>\r\n <p/>\r\n</tmpl_loop>','SiteMap');
 alter table page add column languageId int not null default 1;
+insert into international (internationalId,languageId,namespace,message,lastUpdated) values (823,1,'WebGUI','Go to the new page.', 1038706332);
 
 
 

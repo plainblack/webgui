@@ -46,7 +46,7 @@ sub _setupPageInfo {
 		if ($pageName ne "") {
 			($pageId) = WebGUI::SQL->quickArray("select pageId from page where urlizedTitle='".$pageName."'");
 			if ($pageId eq "") {
-				$pageId = $_[1];
+				$pageId = $session{setting}{notFoundPage};
 				if($ENV{"MOD_PERL"}) {
 					my $r = Apache->request;
 					if(defined($r)) {
@@ -62,7 +62,7 @@ sub _setupPageInfo {
 		}
 	}
 	%page = WebGUI::SQL->quickHash("select * from page where pageId='".$pageId."'");
-	$page{url} = $_[2]."/".$page{urlizedTitle};
+	$page{url} = $session{config}{scripturl}."/".$page{urlizedTitle};
 	$session{page} = \%page;
 }
 
@@ -334,7 +334,7 @@ sub open {
 	}
         ###----------------------------
         ### current page's properties (from page table)
-        _setupPageInfo("",$session{setting}{notFoundPage},$session{config}{scripturl});
+        _setupPageInfo("");
 	###----------------------------
 	### current user's account and profile information (from users and userProfileData tables)
 	_setupUserInfo($session{var}{userId});
@@ -356,7 +356,7 @@ sub refreshPageInfo {
 	} else {
 		$pageId = $_[0];
 	}
-	_setupPageInfo($pageId,$session{setting}{notFoundPage},$session{config}{scripturl});
+	_setupPageInfo($pageId);
 }
 
 #-------------------------------------------------------------------
