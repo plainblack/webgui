@@ -60,7 +60,7 @@ sub _submenu {
 	}
 	if (($session{form}{op} eq "editHelp" && $session{form}{hid} ne "new") || $session{form}{op} eq "deleteHelp") {
 		$menu{WebGUI::URL::page('op=editHelpIndex&hid='.$session{form}{hid})} = "Edit this help.";
-		$menu{WebGUI::URL::page('op=deleteHelpIndex&hid='.$session{form}{hid})} = "Delete this help.";
+		$menu{WebGUI::URL::page('op=deleteHelp&hid='.$session{form}{hid}.'&namespace='.$session{form}{namespace})} = "Delete this help.";
 	}
 	$menu{WebGUI::URL::page('op=viewHelpIndex')} = WebGUI::International::get(13);
         return menuWrapper($_[0],\%menu);
@@ -98,8 +98,8 @@ sub www_editHelp {
 	if ($session{form}{hid} ne "new") {
 		%help = WebGUI::SQL->quickHash("select * from help where 
 			helpId=$session{form}{hid} and namespace=".quote($session{form}{namespace}));
-		$help{title} = WebGUI::International::get($help{titleId},$help{namespace});
-		$help{body} = WebGUI::International::get($help{bodyId},$help{namespace});
+		($help{title}) = WebGUI::SQL->quickArray("select message from international where internationalId=$help{titleId} and namespace=".quote($help{namespace})." and languageId=$session{user}{language}");
+		($help{body}) = WebGUI::SQL->quickArray("select message from international where internationalId=$help{bodyId} and namespace=".quote($help{namespace})." and languageId=$session{user}{language}");
 		$help{seeAlso} =~ s/\n//g;
 		$help{seeAlso} =~ s/\r//g;
 		$help{seeAlso} =~ s/ //g;
