@@ -85,15 +85,42 @@ The path to the WebGUI installation.
 
 sub loadAllConfigs {
 	my $webguiPath = shift;
+	my $configs = readAllConfigs($webguiPath);
+	foreach my $filename (keys %{$configs}) {
+		unless ($filename =~ /^demo\d/) {
+			print "\tLoading ".$filename."\n";	
+			$config{$filename} = $configs->{$filename};
+		}
+	}
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 readAllConfigs ( webguiRoot )
+
+Reads all the config file data for all defined sites and returns a hash reference containing the resulting data by config file name.
+
+Example: $configs->{$filename};
+
+=head3 webguiRoot
+
+The path to the WebGUI installation.
+
+=cut
+
+sub readAllConfigs {
+	my $webguiPath = shift;
 	opendir(DIR,$webguiPath."/etc");
 	my @files = readdir(DIR);
 	closedir(DIR);
+	my %configs;
 	foreach my $file (@files) {
-		if ($file =~ /\.conf$/ && !($file =~ /^demo\d/)) {
-			print "\tLoading ".$file."\n";	
-			$config{$file} = readConfig($webguiPath,$file);
+		if ($file =~ /\.conf$/ && !($file =~ /^logs.conf$/)) {
+			$configs{$file} = readConfig($webguiPath,$file);
 		}
 	}
+	return \%configs;
 }
 
 

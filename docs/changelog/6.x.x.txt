@@ -1,7 +1,10 @@
 6.6.0
  - Added a new admin panel for inline content editing.
  - Tweaked the preloader so WebGUI uses a little less memory per process.
+ - upgrade.pl and testEnvironment.pl now use the same config file reader as
+   the rest of WebGUI
  - fix [ 1173101 ] Template in ^LoginToggle();
+
 
 6.5.5
  - fix [ 1171569 ] add/edit sql report help link has wrong namespace

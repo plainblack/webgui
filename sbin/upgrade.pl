@@ -20,8 +20,8 @@ BEGIN {
 use DBI;
 use File::Path;
 use Getopt::Long;
-use Parse::PlainConfig;
 use strict;
+use WebGUI::Config;
 use WebGUI::SQL;
 
 my $help;
@@ -140,47 +140,39 @@ if ($^O =~ /^Win/i) {
 	$slash = "/";
 }
 our $upgradesPath = $webguiRoot.$slash."docs".$slash."upgrades".$slash;
-our $configsPath = $webguiRoot.$slash."etc".$slash;
 our (%upgrade, %config);
 
 
 ## Find site configs.
 
 print "\nGetting site configs...\n" unless ($quiet);
-opendir (DIR,$configsPath) or die "Can't open $configsPath\n";
-my @files=readdir(DIR);
-closedir(DIR);
-foreach my $file (@files) {
-	if ($file =~ /(.*?)\.conf$/ && $file ne "some_other_site.conf") {
-		print "\tFound $file.\n" unless ($quiet);
-		$config{$file}{configFile} = $file;
-		my $config = Parse::PlainConfig->new('DELIM' => '=',
-                	'FILE' => $configsPath.$config{$file}{configFile},
-                	'PURGE' => 1);
-		$config{$file}{dsn} = $config->get('dsn');
-		my $temp = _parseDSN($config{$file}{dsn}, ['database', 'host', 'port']);
-		if ($temp->{'driver'} eq "mysql") {
-			$config{$file}{db} = $temp->{'database'};
-			$config{$file}{host} = $temp->{'host'};
-			$config{$file}{port} = $temp->{'port'};
-			$config{$file}{dbuser} = $config->get('dbuser');
-			$config{$file}{dbpass} = $config->get('dbpass');
-			$config{$file}{mysqlCLI} = $config->get('mysqlCLI');
-			$config{$file}{mysqlDump} = $config->get('mysqlDump');
-			$config{$file}{backupPath} = $config->get('backupPath');
-			my $dbh = DBI->connect($config{$file}{dsn},$config{$file}{dbuser},$config{$file}{dbpass});
-			($config{$file}{version}) = WebGUI::SQL->quickArray("select webguiVersion from webguiVersion 
-				order by dateApplied desc, webguiVersion desc limit 1",$dbh);
-			unless ($history) {
-				print "\tPreparing site for upgrade.\n" unless ($quiet);
-				$dbh->do("replace into settings (name,value) values ('specialState','upgrading')") unless ($history);
-				rmtree($config->get("uploadsPath").$slash."temp");
-			}
-			$dbh->disconnect;
-		} else {
-			delete $config{$file};
-			print "\tSkipping non-MySQL database.\n" unless ($quiet);
+my $configs = WebGUI::Config::readAllConfigs($webguiRoot);
+foreach my $filename (keys %{$configs}) {
+	print "\tProcessing $filename.\n" unless ($quiet);
+	$config{$filename}{configFile} = $filename;
+	$config{$filename}{dsn} = $configs->{$filename}{dsn};
+	my $temp = _parseDSN($config{$filename}{dsn}, ['database', 'host', 'port']);
+	if ($temp->{'driver'} eq "mysql") {
+		$config{$filename}{db} = $temp->{'database'};
+		$config{$filename}{host} = $temp->{'host'};
+		$config{$filename}{port} = $temp->{'port'};
+		$config{$filename}{dbuser} = $configs->{$filename}{dbuser};
+		$config{$filename}{dbpass} = $configs->{$filename}{dbpass};
+		$config{$filename}{mysqlCLI} = $configs->{$filename}{mysqlCLI};
+		$config{$filename}{mysqlDump} = $configs->{$filename}{mysqlDump};
+		$config{$filename}{backupPath} = $configs->{$filename}{backupPath};
+		my $dbh = DBI->connect($config{$filename}{dsn},$config{$filename}{dbuser},$config{$filename}{dbpass});
+		($config{$filename}{version}) = WebGUI::SQL->quickArray("select webguiVersion from webguiVersion 
+			order by dateApplied desc, webguiVersion desc limit 1",$dbh);
+		unless ($history) {
+			print "\tPreparing site for upgrade.\n" unless ($quiet);
+			$dbh->do("replace into settings (name,value) values ('specialState','upgrading')") unless ($history);
+			rmtree($configs->{$filename}{uploadsPath}.$slash."temp");
 		}
+		$dbh->disconnect;
+	} else {
+		delete $config{$filename};
+		print "\tSkipping non-MySQL database.\n" unless ($quiet);
 	}
 }
 

@@ -74,80 +74,11 @@ checkModule("DBIx::FullTextSearch",0.73);
 ###################################
 
 printTest("WebGUI modules");
-if (eval { require WebGUI } && eval { require WebGUI::SQL }) {
+if (eval { require WebGUI } && eval { require WebGUI::SQL } && eval { require WebGUI::Config }) {
         printResult("OK");
 } else {
         failAndExit("Not Found. Perhaps you're running this script from the wrong place.");
 }
-
-printTest("Locating WebGUI configs");
-my (@files, $file, $dir, $error);
-if ($os eq "Windowsish") {
-	$dir = $webguiRoot."\\etc\\";
-} else {
-	$dir = $webguiRoot."/etc/";
-}
-opendir (DIR,$dir) or $error = "Can't open etc (".$dir.") directory!";
-if (opendir(DIR,$dir)) {
-	printResult("OK");
-        @files = readdir(DIR);
-        foreach $file (@files) {
-                if ($file =~ /(.*?)\.conf$/) {
-			my $prereq = 1;
-			###################################
-			# Checking Config File
-			###################################
-			printTest("Found config file");
-			printResult($file);
-			printTest("Verifying file");
-			my ($config);
-			$config = Parse::PlainConfig->new('DELIM' => '=',
-                		'FILE' => $dir.$file,
-                		'PURGE' => 1);
-			unless (defined $config) {
-				printResult("Couldn't open the config file.");
-				$prereq = 0;
-			} elsif ($config->get('dsn') !~ /\DBI\:\w+\:\w+/) {
-				printResult("DSN is improperly formatted.");
-				$prereq = 0;
-			} else {
-				printResult("OK");
-			}
-
-			if ($prereq) {
-				###################################
-				# Checking uploads folder
-				###################################
-
-				printTest("Uploads folder");
-                        	if (opendir(DIR,$config->get('uploadsPath'))) {
-					printResult("OK");
-					closedir(DIR);
-				} else {
-					printResult("Appears to be missing!");
-				}
-
-				###################################
-				# Checking database
-				###################################
-
-				printTest("Database connection");
-				my ($dbh, $test);
-				unless (eval {$dbh = DBI->connect($config->get('dsn'),$config->get('dbuser'),$config->get('dbpass'))}) {
-					printResult("Can't connect with info provided!");
-				} else {
-					printResult("OK");
-					$dbh->disconnect();
-				}
-			}
-			print "\n";	
-                }
-        }
-        closedir(DIR);
-} else {
-	failAndExit($error);
-}
-
 
 ###################################
 # Checking Version
@@ -159,6 +90,52 @@ if ($version eq $WebGUI::VERSION."-".$WebGUI::STATUS) {
 } else {
 	printResult("You are using ".$WebGUI::VERSION."-".$WebGUI::STATUS." and ".$version." is available.");
 }
+
+printTest("Locating WebGUI configs");
+my $configs = WebGUI::Config::readAllConfigs($webguiRoot);
+printResult("OK");
+foreach my $filename (keys %{$configs}) {
+	print "\n";	
+	###################################
+	# Checking Config File
+	###################################
+	printTest("Checking config file");
+	printResult($filename);
+
+	###################################
+	# Checking uploads folder
+	###################################
+	printTest("Verifying uploads folder");
+        if (opendir(DIR,$configs->{$filename}{uploadsPath})) {
+		printResult("OK");
+		closedir(DIR);
+	} else {
+		printResult("Appears to be missing!");
+	}
+	printTest("Verifying DSN");
+	my $dsnok = 0;
+	if ($configs->{$filename}{dsn} !~ /\DBI\:\w+\:\w+/) {
+		printResult("DSN is improperly formatted.");
+	} else {
+		printResult("OK");
+		$dsnok = 1;
+	}
+
+	###################################
+	# Checking database
+	###################################
+	if ($dsnok) {
+		printTest("Verifying database connection");
+		my ($dbh, $test);
+		unless (eval {$dbh = DBI->connect($configs->{$filename}{dsn},$configs->{$filename}{dbuser},$configs->{$filename}{dbpass})}) {
+			printResult("Can't connect with info provided!");
+		} else {
+			printResult("OK");
+			$dbh->disconnect();
+		}
+	}
+}
+
 
 
 print "\nTesting complete!\n\n";
