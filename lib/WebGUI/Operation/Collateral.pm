@@ -38,7 +38,8 @@ our @ISA = qw(Exporter);
 our @EXPORT = qw(&www_editCollateral &www_editCollateralSave &www_deleteCollateral 
 	&www_deleteCollateralConfirm &www_listCollateral 
 	&www_deleteCollateralFile &www_editCollateralFolder &www_editCollateralFolderSave &www_deleteCollateralFolder 
-	&www_deleteCollateralFolderConfirm);
+	&www_deleteCollateralFolderConfirm &www_htmlArealistCollateral &www_htmlAreaviewCollateral &www_htmlAreaUpload
+	&www_htmlAreaDelete &www_htmlAreaCreateFolder);
 
 #-------------------------------------------------------------------
 sub _submenu {
@@ -465,5 +466,182 @@ sub www_listCollateral {
 	return _submenu($output);
 }
 
-1;
+#-------------------------------------------------------------------
+sub _htmlAreaCreateTree {
+	my ($output);
+	my ($name, $description, $url, $image, $indent, $target, $delete) = @_;
+	if($delete) {
+		$delete  = qq/<a href="javascript:deleteCollateral('$delete')" title="delete $name">/;
+		$delete .= '<img align="bottom" border="0" src="'.$session{config}{extrasURL}.
+			   '/toolbar/default/delete.gif" width="16" heigth="17"></a>';
+	}
+	$target = ' target="'.$target.'" ' if ($target);
+	$output .= '<tr><td align="left" valign="bottom" width="100%">';
+	$output .= ('<img src="'.$session{config}{extrasURL}.'/htmlArea/images/indent.gif" width="17" heigth="17">') x$indent;
+	$output .= '<img src="'.$session{config}{extrasURL}.'/htmlArea/images/'.$image.'" align="bottom" alt="'.$name.'">';
+	$output .= '<a title="'.$description.'" href="'.$url.'" '.$target.'><b>'.$name.'</b></a></td>';
+	$output .= '<td class="delete" align="right" valign="bottom">'.$delete.'</td></tr>';
+	return $output;
+}
 
+#-------------------------------------------------------------------
+sub www_htmlArealistCollateral {
+	my (@parents, $output, $sth, $data, $folderId, $parent, $indent);
+	$session{form}{makePrintable}=1; $session{form}{style}=-10;	# Special style for this output
+	return "<b>Only Content Managers are allowed to use WebGUI Collateral</b>" unless (WebGUI::Privilege::isInGroup(4));
+
+	$output .= '<table border="0" cellspacing="0" cellpadding="0" width="100%">';
+	$folderId = $session{form}{fid} || 0;
+	my $parent = $folderId;
+	# push parent folders in array so it can be reversed
+	unshift(@parents, $parent);
+	until($parent == 0) {
+		($parent) = WebGUI::SQL->quickArray("select parentId from collateralFolder where collateralFolderId=$parent");
+		unshift(@parents, $parent);
+	}
+	# Build tree for opened parent folders
+	foreach $parent (@parents) { 
+		my ($name, $description) = WebGUI::SQL->quickArray("select name, description from 
+							collateralFolder where collateralFolderId=$parent");
+		my ($itemsInFolder) = WebGUI::SQL->quickArray("select count(*) from collateral where collateralFolderId = $parent");
+		my ($foldersInFolder)=WebGUI::SQL->quickArray("select count(*) from collateralFolder where parentId=$parent");
+		my $delete = "fid=$parent" unless ($itemsInFolder + $foldersInFolder);
+		$output .= _htmlAreaCreateTree($name, $description, 
+				WebGUI::URL::page('op=htmlArealistCollateral&fid='.$parent), "opened.gif", 
+				$indent++,"" ,$delete);
+	}
+	# Extend tree with closed folders in current folder
+	$sth = WebGUI::SQL->read("select collateralFolderId, name, description from collateralFolder
+		                  where parentId=$folderId and collateralFolderId<>0 order by name");
+        while ($data = $sth->hashRef) { 
+		my ($itemsInFolder) = WebGUI::SQL->quickArray("select count(*) from collateral where 
+							collateralFolderId = ".$data->{collateralFolderId});
+		my $delete = 'fid='.$data->{collateralFolderId} unless $itemsInFolder;
+		$output .= _htmlAreaCreateTree($data->{name}, $data->{description}, 
+					WebGUI::URL::page('op=htmlArealistCollateral&fid='.$data->{collateralFolderId}), 
+					"closed.gif", $indent, "", $delete);
+        }
+	# Extend tree with images in current folder
+	$sth = WebGUI::SQL->read('select collateralId, name, filename from collateral where collateralType = "image" '.
+                                 "and collateralFolderId = $folderId");
+	while ($data = $sth->hashRef) {
+		$data->{filename} =~ /\.([^\.]+)$/; # Get extension
+		my $fileType = $1.'.gif';
+		$output .= _htmlAreaCreateTree($data->{filename}, $data->{name},
+					WebGUI::URL::page('op=htmlAreaviewCollateral&cid='.$data->{collateralId}),
+					$fileType, $indent, "viewer", 'cid='.$data->{collateralId}.'&fid='.$folderId);
+	}
+	$output .= '</table>';
+	$output .= '<script language="javascript">'."\n".'actionComplete("","'.$folderId.'","","");';
+	$output .= "\n</script>\n";
+	$sth->finish;
+	return $output;
+}
+
+#-------------------------------------------------------------------
+sub www_htmlAreaviewCollateral {
+	my($output, $collateral, $file, $x, $y, $image, $error);
+	$session{form}{makePrintable}=1; $session{form}{style}=-10;     # Special style for this output
+        $output .= '<table align="center" border="0" cellspacing="0" cellpadding="2" width="100%" height="100%">';
+	if($session{form}{cid} == 0 || ! WebGUI::Privilege::isInGroup(4)) {
+		$output .= '<tr><td align="center" valign="middle" width="100%" height="100%">';
+		$output .= '<p align="center"><br><img src="'.$session{config}{extrasURL}.'/styles/webgui/icon.gif" 
+			    border="0"></p>';
+		$output .= '<P align=center><STRONG>WebGUI Image Manager<BR>for htmlArea</STRONG></P>';
+		$output .= '</td></tr></table>';
+	} else {
+		my $c = WebGUI::Collateral->new($session{form}{cid});
+		$collateral = $c->get;
+		$file = WebGUI::Attachment->new($collateral->{filename},"images",$collateral->{collateralId});
+		$output .= '<tr><td class="label" align="center" valign="middle" width="100%">';
+		$output .= '<b>'.$file->getFilename.'</b><br>';
+		if ($hasImageMagick) {
+			$image = Image::Magick->new;
+			$error = $image->Read($file->getPath);
+			($x, $y) = $image->Get('width','height');
+			$output .= $error ? "Error reading image: $error" : "<i>($x &#215; $y)</i>";
+		}
+		$output .= '</td></tr><tr><td align="center" valign="middle" width="100%" height="100%">';
+		$output .= '<img src="'.$file->getThumbnail.'" border="0">';
+		$output .= '</td></tr></table>';
+		$output .= '<script language="javascript">';
+		$output .= "\nvar src = '".$file->getURL."';\n";
+		$output .= "if(src.length > 0) {
+   				var manager = findAncestor(window.frameElement, 'manager', 'TABLE');
+   				if(manager)
+		      		manager.all.txtFileName.value = src;
+		    		}
+		    	    </script>\n";
+	}
+	return $output;
+}
+
+#-------------------------------------------------------------------
+sub www_htmlAreaUpload {
+	$session{form}{makePrintable}=1; $session{form}{style}=-10;     # Special style for this output
+	return "<b>Only Content Managers are allowed to use WebGUI Collateral</b>" unless (WebGUI::Privilege::isInGroup(4));
+	return www_htmlArealistCollateral() if ($session{form}{image} eq "");
+	my($test, $file);
+	$session{form}{fid} = $session{form}{collateralFolderId} = $session{form}{path};
+        my $collateral = WebGUI::Collateral->new("new");
+        $session{form}{thumbnailSize} ||= $session{setting}{thumbnailSize};
+        $session{form}{cid} = $collateral->get("collateralId");
+        $collateral->save("image", $session{form}{thumbnailSize});
+        $session{form}{name} = "untitled" if ($session{form}{name} eq "");
+        while (($test) = WebGUI::SQL->quickArray("select name from collateral
+                where name=".quote($session{form}{name})." and collateralId<>".$collateral->get("collateralId"))) {
+                if ($session{form}{name} =~ /(.*)(\d+$)/) {
+                        $session{form}{name} = $1.($2+1);
+                } elsif ($test ne "") {
+                        $session{form}{name} .= "2";
+                }
+        }
+        $collateral->set($session{form});
+        $session{form}{collateralType} = "";
+        return www_htmlArealistCollateral();
+}
+
+#-------------------------------------------------------------------
+sub www_htmlAreaDelete {
+	$session{form}{makePrintable}=1; $session{form}{style}=-10;     # Special style for this output
+	return "<b>Only Content Managers are allowed to use WebGUI Collateral</b>" unless (WebGUI::Privilege::isInGroup(4));
+	if($session{form}{cid}) { # Delete Image
+	        my $collateral = WebGUI::Collateral->new($session{form}{cid});
+        	$collateral->delete;
+	} elsif($session{form}{fid} and not($session{form}{cid})) {
+		return WebGUI::Privilege::vitalComponent() unless ($session{form}{fid} > 999);
+	        my ($parent) = WebGUI::SQL->quickArray("select parentId from collateralFolder
+        	        where collateralFolderId=".$session{form}{fid});
+	        WebGUI::SQL->write("delete from collateralFolder where collateralFolderId=".$session{form}{fid});
+		$session{form}{fid}=$parent;	
+	}	
+        return www_htmlArealistCollateral();
+}
+
+#-------------------------------------------------------------------
+sub www_htmlAreaCreateFolder {
+	$session{form}{makePrintable}=1; $session{form}{style}=-10;     # Special style for this output
+	return "<b>Only Content Managers are allowed to use WebGUI Collateral</b>" unless (WebGUI::Privilege::isInGroup(4));
+        $session{form}{fid} = getNextId("collateralFolderId");
+        WebGUI::Session::setScratch("collateralFolderId",$session{form}{fid});
+        WebGUI::SQL->write("insert into collateralFolder (collateralFolderId) values ($session{form}{fid})");
+        my $folderId = $session{scratch}{collateralFolderId} || 0;
+	$session{form}{name} = $session{form}{folder};
+        $session{form}{name} = "untitled" if ($session{form}{name} eq "");
+        while (my ($test) = WebGUI::SQL->quickArray("select name from collateralFolder
+                where name=".quote($session{form}{name})." and collateralFolderId<>$folderId")) {
+                if ($session{form}{name} =~ /(.*)(\d+$)/) {
+                        $session{form}{name} = $1.($2+1);
+                } elsif ($test ne "") {
+                        $session{form}{name} .= "2";
+                }
+        }
+        WebGUI::SQL->write("update collateralFolder set parentId=$session{form}{path}, name=".quote($session{form}{name})
+                .", description=".quote($session{form}{description})
+                ." where collateralFolderId=$folderId");
+	$session{form}{fid} = $session{form}{path};
+        return www_htmlArealistCollateral();
+}
+
+
+1;
