@@ -92,14 +92,22 @@ while(<FILE>) {
 		} else {
     			print "Adding user $user{username}\n";
     			$user{userId} = getUserId($dbh);
-    			WebGUI::SQL->write("insert into users (userId,username,identifier,authMethod,ldapURL,connectDN,dateCreated,lastUpdated) values 
-				($user{userId},".$dbh->quote($user{username}).", ".$dbh->quote($user{identifier}).",".$dbh->quote($user{authMethod}).",
-				".$dbh->quote($user{ldapURL}).", ".$dbh->quote($user{connectDN}).",".time().",".time().")",$dbh);
+    			WebGUI::SQL->write("insert into users (userId,username,authMethod,dateCreated,lastUpdated) values 
+				($user{userId},".$dbh->quote($user{username}).", ".$dbh->quote($user{authMethod}).",
+				".time().",".time().")",$dbh);
 			foreach (keys %user) {
 				if (isIn($_, qw(discussionLayout INBOXNotifications gender birthdate timeOffset dateFormat timeFormat email language firstName middleName lastName icq aim msnIM yahooIM cellPhone pager emailToPager homeAddress homeCity homeState homeZip homeCountry homePhone homeURL workName workAddress workCity workState workZip workCountry workPhone workURL))) {
 					WebGUI::SQL->write("insert into userProfileData (userId, fieldName, fieldData) values
 						($user{userId}, '$_', ".$dbh->quote($user{$_}).")",$dbh);
 				}
+				if ($_ eq "identifier") {
+					WebGUI::SQL->write("insert into authentication (userId,authMethod,fieldName,fieldData)
+						values ($user{userId},'WebGUI','$_',".$dbh->quote($user{$_}).")");
+				}
+                                if (isIn($_, qw(ldapURL connectDN)) {
+                                        WebGUI::SQL->write("insert into authentication (userId,authMethod,fieldName,fieldData)
+                                                values ($user{userId},'LDAP','$_',".$dbh->quote($user{$_}).")");
+                                }
 			}
 			($expireAfter) = WebGUI::SQL->quickArray("select expireAfter from groups where groupId=2",$dbh);
 			$user{groups} =~ s/ //g;
