@@ -12,26 +12,57 @@
 our $webguiRoot;
 
 BEGIN {
-        $webguiRoot = $ARGV[0] || "..";
+        $webguiRoot = "..";
         unshift (@INC, $webguiRoot."/lib");
 }
 
 use DBI;
+use Getopt::Long;
 use strict qw(subs vars);
 use WebGUI::Session;
 use WebGUI::Utility;
 
+$|=1;
+
+my $verbose;
+my $help;
+
+GetOptions(
+        'help'=>\$help,
+        'verbose'=>\$verbose
+);
+
+if ($help) {
+	print <<STOP;
+
+
+Usage: perl $0
+
+Options:
+
+        --help		Displays this message.
+
+	--verbose	Displays output describing the scheduler's
+			activities.
+
+STOP
+	exit;
+}
+
+print "\nStarting.\n\n" if ($verbose);
 
 my (@files, $cmd, $namespace, $file, $slash, $confdir, %plugins, $plugdir, $exclude);
 $slash = ($^O =~ /^Win/i) ? "\\" : "/";
 $confdir = $webguiRoot.$slash."etc".$slash;
 $plugdir = $webguiRoot.$slash."sbin".$slash."Hourly".$slash;
 
+print "Locating plug-ins:\n" if ($verbose);
 if (opendir (PLUGDIR,$plugdir)) {
 	@files = readdir(PLUGDIR);
         foreach $file (@files) {
                 if ($file =~ /(.*?)\.pm$/) {
                         $namespace = $1;
+			print "\tFound ".$namespace."\n" if ($verbose);
                         $cmd = "use Hourly::".$namespace;
                         eval($cmd);
 			$plugins{$namespace} = "Hourly::".$namespace."::process";
@@ -43,22 +74,32 @@ if (opendir (PLUGDIR,$plugdir)) {
 	exit;
 }
 
+
 if (opendir (CONFDIR,$confdir)) {
         @files = readdir(CONFDIR);
         foreach $file (@files) {
                 if ($file =~ /(.*?)\.conf$/ && $file ne "some_other_site.conf") {
+			print "\nProcessing ".$file.":\n" if ($verbose);
+			my $startTime = time();
 			WebGUI::Session::open($webguiRoot,$file);
 			WebGUI::Session::refreshUserInfo(3,$session{dbh});
+			my $previousTime = time();
+			my $currentTime; 
 			foreach $namespace (keys %plugins) {
+				$currentTime = time();
+				print "\t".$namespace if ($verbose);
 				$exclude = $session{config}{excludeHourly};
 				$exclude =~ s/ //g;
 				unless (isIn($namespace, split(/,/,$exclude))) {
 					$cmd = $plugins{$namespace};
 					&$cmd();
 				}
+				print " (".($currentTime-$previousTime)." seconds)\n" if ($verbose);
+				$previousTime = $currentTime;
 			}
 			WebGUI::Session::end($session{var}{sessionId});
 			WebGUI::Session::close();
+			print "\tTOTAL TIME: ".(time()-$startTime)." seconds\n" if ($verbose);
 		}
 	}
 	closedir(CONFDIR);
@@ -67,5 +108,6 @@ if (opendir (CONFDIR,$confdir)) {
 	exit;
 }
 
+print "\nFinished.\n" if ($verbose);
 
 
