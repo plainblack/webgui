@@ -309,18 +309,21 @@ STOP
 #-----------------------------------------
 # checkVersion($versionNumber)
 #-----------------------------------------
-# Version number must be 5.5.0 or greater
+# Version number must be 6.2.0 or greater
 # in order to be upgraded by this utility.
 #-----------------------------------------
 sub checkVersion {
 	$_[0] =~ /(\d+)\.(\d+)\.(\d+)/; 
-        if ($1 > 5) {
+	my $goal = 6;
+	my $feature = 2;
+	my $fix = 0;
+        if ($1 > $goal) {
         	return 1;
-        } elsif ($1 == 5) {
-        	if ($2 > 5) {
+        } elsif ($1 == $goal) {
+        	if ($2 > $feature) {
                 	return 1;
-                } elsif ($2 == 5) {
-                	if ($3 >= 0) {
+                } elsif ($2 == $feature) {
+                	if ($3 >= $fix) {
                         	return 1;
                         } else {
 				return 0;

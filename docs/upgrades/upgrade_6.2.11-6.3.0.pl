@@ -1558,6 +1558,7 @@ unlink("../../lib/WebGUI/Macro/Navigation.pm");
 unlink("../../lib/WebGUI/Macro/File.pm");
 unlink("../../lib/WebGUI/Macro/I_imageWithTags.pm");
 unlink("../../lib/WebGUI/Macro/i_imageNoTags.pm");
+unlink("../../lib/WebGUI/Macro/SI_scaledImage.pm");
 unlink("../../lib/WebGUI/Macro/Snippet.pm");
 unlink("../../lib/WebGUI/Macro/Backslash_pageUrl.pm");
 unlink("../../lib/WebGUI/Macro/RandomSnippet.pm");

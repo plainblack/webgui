@@ -45,52 +45,51 @@ passiveProfileInterval = 86400	# in seconds
 emailRecoveryLoggingEnabled = 1
 passwordChangeLoggingEnabled = 1
 
-# Commerce part
-# The PayFlowPro plugin is commented out because it depends on proprietary code from VeriSign
-# The ITransact plugin depends on XML::Simple. LWP::UserAgent and HTTP::Cookies.
-# paymentPlugins = PayFlowPro, ITransact
+paymentPlugins = ITransact
 
 authMethods = LDAP, WebGUI
 
-macros = a => a_account, \
-	AdminBar => AdminBar, \
-	AdminText => AdminText, \
-	AdminToggle => AdminToggle, \
-	AOIHits => AOIHits, \
-	AOIRank => AOIRank, \
-	@ => At_username, \
-	\\ => Backslash_pageUrl, \
-	c => c_companyName, \
-	CanEditText => CanEditText, \
-	D => D_date, \
-	e => e_companyEmail, \
-	EditableToggle => EditableToggle, \
-	Extras => Extras, \
-	File => File, \
-	GroupAdd => GroupAdd, \
-	GroupDelete => GroupDelete, \
-	GroupText => GroupText, \
-	# => Hash_userId, \
-	H => H_homeLink, \
-	i => i_imageNoTags, \
-	I => I_imageWithTags, \
-	JavaScript => JavaScript, \
-	L => L_loginBox, \
-	LastModified => LastModified, \
-	LoginToggle => LoginToggle, \
-	Navigation => Navigation, \
-	PageTitle => PageTitle, \
-	RandomImage => RandomImage, \
-	RandomSnippet => RandomSnippet, \
-	RawHeadTags => RawHeadTags, \
-	RootTitle => RootTitle, \
-	r => r_printable, \
-	/ => Slash_gatewayUrl, \
-	Snippet => Snippet, \
-	Spacer => Spacer, \
-	SI => SI_scaledImage, \
-	StyleSheet => StyleSheet, \
-	ThumbnailLinker => ThumbnailLinker, \
-	Thumbnail => Thumbnail, \
-	u => u_companyUrl
+macros=# => Hash_userId, \
+        / => Slash_gatewayUrl, \
+        @ => At_username, \
+        AOIHits => AOIHits, \
+        AOIRank => AOIRank, \
+        AdminBar => AdminBar, \
+        AdminText => AdminText, \
+        AdminToggle => AdminToggle, \
+        AssetProxy => AssetProxy, \
+        CanEditText => CanEditText, \
+        D => D_date, \
+        EditableToggle => EditableToggle, \
+        Extras => Extras, \
+        FileUrl => FileUrl, \
+        GroupAdd => GroupAdd, \
+        GroupDelete => GroupDelete, \
+        GroupText => GroupText, \
+        H => H_homeLink, \
+        I => I_imageWithTags, \
+        JavaScript => JavaScript, \
+        L => L_loginBox, \
+        LastModified => LastModified, \
+        LoginToggle => LoginToggle, \
+        Page => Page, \
+        PageTitle => PageTitle, \
+        PageUrl => PageUrl, \
+        RandomAssetProxy => RandomAssetProxy, \
+        RawHeadTags => RawHeadTags, \
+        RootTitle => RootTitle, \
+        Spacer => Spacer, \
+        StyleSheet => StyleSheet, \
+        SubscriptionItem => SubscriptionItem, \
+        SubscriptionItemPurchaseUrl => SubscriptionItemPurchaseUrl, \
+        Thumbnail => Thumbnail, \
+        ThumbnailLinker => ThumbnailLinker, \
+        User => User, \
+        a => a_account, \
+        c => c_companyName, \
+        e => e_companyEmail, \
+        i => i_imageNoTags, \
+        r => r_printable, \
+        u => u_companyUrl
+ 
 

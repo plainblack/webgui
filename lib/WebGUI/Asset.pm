@@ -1229,7 +1229,7 @@ sub getLineage {
 			push(@mods,"( asset.lineage like ".quote($line.'%')." and  length(asset.lineage)=".(($i+1)*6).")");
 			last if ($self->getLineageLength == $i);
 		}
-		push(@whereModifiers, "(".join(" or ",@mods).")");
+		push(@whereModifiers, "(".join(" or ",@mods).")") if (scalar(@mods));
 	}
 	# formulate a where clause
 	my $where = "state='published'";
@@ -1619,7 +1619,8 @@ sub new {
 	my $class = shift;
 	my $assetId = shift;
 	my $overrideProperties = shift;
-	my $properties = WebGUI::Cache->new("asset_".$assetId)->get;
+	my $properties;
+	$properties = WebGUI::Cache->new("asset_".$assetId)->get unless($session{var}{adminOn});
 	if ($assetId eq "new") {
 		$properties = $overrideProperties;
 		$properties->{assetId} = "new";
@@ -2139,7 +2140,7 @@ Hash reference of properties and values to set.
 sub update {
         my $self = shift;
         my $properties = shift;
-	WebGUI::Cache->new($self->getId)->delete;
+	WebGUI::Cache->new("asset_".$self->getId)->delete;
         WebGUI::SQL->beginTransaction;
         foreach my $definition (@{$self->definition}) {
                 my @setPairs;
