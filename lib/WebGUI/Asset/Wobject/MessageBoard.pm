@@ -76,7 +76,7 @@ sub view {
 			%lastPostVars = (
 				'forum.lastPost.url' => $lastPost->getUrl,
 				'forum.lastPost.date' => WebGUI::DateTime::epochToHuman($lastPost->get("dateSubmitted"),"%z"),
-				'forum.lastPost.time' => WebGUI::DateTime::epochToHuman($lastPost->get("dateSubmitted"),"%z"),
+				'forum.lastPost.time' => WebGUI::DateTime::epochToHuman($lastPost->get("dateSubmitted"),"%Z"),
 				'forum.lastPost.epoch' => $lastPost->get("dateSubmitted"),
 				'forum.lastPost.subject' => $lastPost->get("title"),
 				'forum.lastPost.user.id' => $lastPost->get("ownerUserId"),
