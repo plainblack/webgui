@@ -27,9 +27,10 @@ my %linkElements =            # from HTML::Element.pm
    a      => 'href',
    img    => [qw(src lowsrc usemap)], # lowsrc is a Netscape invention
    form   => 'action',
-#   input  => 'src',
+   input  => 'src',
    'link'  => 'href',         # need quoting since link is a perl builtin
    frame  => 'src',
+   iframe => 'src',
    applet => 'codebase',
    area   => 'href',
    script   => 'src',
@@ -121,14 +122,14 @@ sub start {
         			$val = URI::URL::url($val)->abs($self->{Url},1); # make absolute
       			}
       			if ($val->scheme eq "http") {
-        			if (lc($tag) ne "img" && lc($tag) ne "script" && lc($tag) ne "iframe" && $self->{rewriteUrls}) { # no rewrite for some 
+        			if ($self->{rewriteUrls} && lc($tag) ne "iframe") { 
           				if (lc($tag) eq "form" && lc($_) eq "action") {  # Found FORM ACTION
 	    					$self->{FormActionIsDefined}=1;
             					$self->{FormAction} = $val;  # set FormAction to include hidden field later
             					$val = WebGUI::URL::page;    # Form Action returns to us
           				} else {
             					$val = WebGUI::URL::page('proxiedUrl='.WebGUI::URL::escape($val).
-                                     			'&wid='.$self->{wid}); # return to us
+                                     			'&wid='.$self->{wid}.'&func=view'); # return to us
           				}
         			}
       			}

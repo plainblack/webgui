@@ -23,6 +23,7 @@ use WebGUI::Privilege;
 use WebGUI::Session;
 use WebGUI::Wobject;
 use WebGUI::Wobject::HttpProxy::Parse;
+use WebGUI::Cache;
 
 our @ISA = qw(WebGUI::Wobject);
 
@@ -126,7 +127,7 @@ sub www_edit {
 #-------------------------------------------------------------------
 sub www_view {
    my (%formdata, @formUpload, $redirect, $response, $header, 
-       $userAgent, $proxiedUrl, $request, $content);
+       $userAgent, $proxiedUrl, $request, $content, $ttl);
 
    	my $output = $_[0]->displayTitle;
    	$output .= $_[0]->description;
@@ -148,9 +149,15 @@ sub www_view {
 
    $redirect=0; 
 
-	return $output unless ($proxiedUrl ne "");
-
-   until($redirect == 5) { # We follow max 5 redirects to prevent bouncing/flapping
+   return $output unless ($proxiedUrl ne "");
+   
+   my $cachedContent = WebGUI::Cache->new($proxiedUrl,"URL");
+   my $cachedHeader = WebGUI::Cache->new($proxiedUrl,"HEADER");
+   $header = $cachedHeader->get;
+   $content = $cachedContent->get;
+   unless ($content && $session{env}{REQUEST_METHOD}=~/GET/i) {
+      $redirect=0; 
+      until($redirect == 5) { # We follow max 5 redirects to prevent bouncing/flapping
       $userAgent = new LWP::UserAgent;
       $userAgent->agent($session{env}{HTTP_USER_AGENT});
       $userAgent->timeout($_[0]->get("timeout"));
@@ -230,7 +237,7 @@ sub www_view {
    
    if($response->is_success) {
       $content = $response->content;
-   
+      $header = $response->content_type; 
       if($response->content_type eq "text/html" || 
         ($response->content_type eq "" && $content=~/<html/gis)) {
   
@@ -246,21 +253,26 @@ sub www_view {
             $content = WebGUI::HTML::cleanSegment($content);
             $content = WebGUI::HTML::filter($content, $_[0]->get("filterHtml"));
          }
-      } elsif ($response->content_type eq "text/plain") {
-         $content = '<PRE>'.HTML::Entities::encode($response->content).'</PRE>';
-      } elsif ($response->content_type =~ /image\//i) {
-         $content = '<p align="center"><img src='.$proxiedUrl.' border=0></p>';
-      } elsif ($response->content_type ne "") { # content_type we don't know about
-         $content = "<h1>Can't proxy \"".($response->content_type)."\" content.</h1>
-      	          Try Fetching it directly <a href='$proxiedUrl'>here</a>.";
-      } else {
-         $content = "<H1>The request didn't return any data.</H1>
-   		  Try Fetching it directly <a href='$proxiedUrl'>here</a>.";
-      } 
+      }
    } else { # Fetching page failed...
       $content = "<b>Getting <a href='$proxiedUrl'>$proxiedUrl</a> failed</b>".
    	      "<p><i>GET status line: ".$response->status_line."</i>";
    }
-   return $output.$content;
+   if ($session{user}{userId} == 1) {
+      $ttl = $session{page}{cacheTimeoutVisitor};
+      } else {
+          $ttl = $session{page}{cacheTimeout};
+      }
+
+   $cachedContent->set($content,$ttl);
+   $cachedHeader->set($header,$ttl);
+   }
+
+   if($header ne "text/html") {
+	$session{header}{mimetype} = $header; 
+	return $content;
+   } else {
+   	return $output.$content;
+   }
 }
 1;
