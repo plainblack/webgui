@@ -12,6 +12,7 @@ package WebGUI::Operation::Page;
 
 use Exporter;
 use strict;
+use WebGUI::DateTime;
 use WebGUI::HTMLForm;
 use WebGUI::Icon;
 use WebGUI::International;
@@ -31,7 +32,8 @@ sub _recursivelyChangePrivileges {
         my ($sth, $pageId);
         $sth = WebGUI::SQL->read("select pageId from page where parentId=$_[0]");
         while (($pageId) = $sth->array) {
-        	WebGUI::SQL->write("update page set ownerId=$session{form}{ownerId}, ownerView=$session{form}{ownerView}, 
+        	WebGUI::SQL->write("update page set startDate=$session{form}{startDate}, endDate=$session{form}{endDate},
+			ownerId=$session{form}{ownerId}, ownerView=$session{form}{ownerView}, 
 			ownerEdit=$session{form}{ownerEdit}, groupId='$session{form}{groupId}', groupView=$session{form}{groupView}, 
 			groupEdit=$session{form}{groupEdit}, worldView=$session{form}{worldView}, worldEdit=$session{form}{worldEdit} 
 			where pageId=$pageId");
@@ -73,13 +75,18 @@ sub _traversePageTree {
         }
         $a = WebGUI::SQL->read("select * from page where (pageId<2 or pageId>25) and parentId='$_[0]' order by sequenceNumber");
         while (%page = $a->hash) {
-                $output .= $depth.'<img src="'.$session{config}{extras}.'/page.gif" align="middle">'.
-			' <a href="'.WebGUI::URL::gateway($page{urlizedTitle}).'">'.$page{title}.'</a><br>';
+                $output .= $depth
+			.pageIcon()
+			.deleteIcon('op=deletePage',$page{urlizedTitle})
+			.editIcon('op=editPage',$page{urlizedTitle})
+			.' <a href="'.WebGUI::URL::gateway($page{urlizedTitle}).'">'.$page{title}.'</a><br>';
 		$b = WebGUI::SQL->read("select * from wobject where pageId=$page{pageId}");
 		while (%wobject = $b->hash) {
-                	$output .= $depth.$spacer.
-				'<img src="'.$session{config}{extras}.'/wobject.gif"> '.
-				$wobject{title}.'<br>';
+                	$output .= $depth.$spacer
+				.wobjectIcon()
+				.deleteIcon('func=delete&wid='.$wobject{wobjectId},$page{urlizedTitle})
+				.editIcon('func=edit&wid='.$wobject{wobjectId},$page{urlizedTitle})
+				.' '. $wobject{title}.'<br>';
 		}
 		$b->finish;
                 $output .= _traversePageTree($page{pageId},$_[1]+1);
@@ -137,7 +144,7 @@ sub www_deletePageConfirm {
 
 #-------------------------------------------------------------------
 sub www_editPage {
-        my ($f, $output, %hash, %page);
+        my ($f, $endDate, $output, %hash, %page);
 	tie %hash, "Tie::IxHash";
         if (WebGUI::Privilege::canEditPage($session{form}{npp})) {
 		$f = WebGUI::HTMLForm->new;
@@ -152,11 +159,13 @@ sub www_editPage {
 		} else {
 			%page = %{$session{page}};
 		}
+		$page{endDate} = (time()+315360000) if ($page{endDate} < 0);
                 $output = helpIcon(1);
 		$output .= '<h1>'.WebGUI::International::get(102).'</h1>';
 		$f->hidden("pageId",$page{pageId});
 		$f->hidden("parentId",$page{parentId});
 		$f->hidden("op","editPageSave");
+		$f->submit if ($page{pageId} ne "new");
 		$f->raw('<tr><td colspan=2><b>'.WebGUI::International::get(103).'</b></td></tr>');
 		$f->readOnly($page{pageId},WebGUI::International::get(500));
                 $f->text("title",WebGUI::International::get(99),$page{title});
@@ -172,6 +181,8 @@ sub www_editPage {
 			' &nbsp; <a href="'.WebGUI::URL::page('op=listStyles').'">'.WebGUI::International::get(6).'</a>');
                 $f->yesNo("recurseStyle",'','','',' &nbsp; '.WebGUI::International::get(106));
 		$f->raw('<tr><td colspan=2><hr size=1><b>'.WebGUI::International::get(107).'</b></td></tr>');
+        	$f->date("startDate",WebGUI::International::get(497),$page{startDate});
+        	$f->date("endDate",WebGUI::International::get(498),$page{endDate});
 		%hash = WebGUI::SQL->buildHash("select users.userId,users.username from users,groupings 
 			where groupings.groupId=4 and groupings.userId=users.userId order by users.username");
 		$f->select("ownerId",\%hash,WebGUI::International::get(108),[$page{ownerId}],'','','',
@@ -213,6 +224,8 @@ sub www_editPageSave {
                 $session{form}{menuTitle} = $session{form}{title} if ($session{form}{menuTitle} eq "");
                 $session{form}{urlizedTitle} = $session{form}{menuTitle} if ($session{form}{urlizedTitle} eq "");
 		$session{form}{urlizedTitle} = WebGUI::URL::makeUnique(WebGUI::URL::urlize($session{form}{urlizedTitle}),$session{form}{pageId});
+		$session{form}{startDate} = setToEpoch($session{form}{startDate}) || setToEpoch(time());
+        	$session{form}{endDate} = setToEpoch($session{form}{endDate}) || setToEpoch(time()+315360000);
                 WebGUI::SQL->write("update page set 
 			title=".quote($session{form}{title}).", 
 			styleId=$session{form}{styleId}, 
@@ -224,6 +237,8 @@ sub www_editPageSave {
 			groupEdit=$session{form}{groupEdit}, 
 			worldView=$session{form}{worldView}, 
 			worldEdit=$session{form}{worldEdit},
+			startDate=$session{form}{startDate},
+			endDate=$session{form}{endDate},
 			metaTags=".quote($session{form}{metaTags}).", 
 			urlizedTitle='$session{form}{urlizedTitle}', 
 			defaultMetaTags='$session{form}{defaultMetaTags}', 

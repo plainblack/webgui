@@ -656,8 +656,10 @@ delete from international where namespace='WebGUI' and internationalId=128;
 delete from settings where name='attachmentDirectoryLocal';
 delete from settings where name='attachmentDirectoryWeb';
 delete from settings where name='lib';
-
-
+update international set message='Attachment' where internationalId=33 and languageId=1 and namespace='UserSubmission';
+alter table page add column startDate int not null default 946710000;
+alter table page add column endDate int not null default 2082783600;
+update page set styleId=-6 where styleId=-3;
 
 
 

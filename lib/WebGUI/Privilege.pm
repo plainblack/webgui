@@ -47,7 +47,7 @@ sub canEditPage {
 	my ($isContentManager,%page);
 	tie %page, 'Tie::CPHash';
 	if ($_[0] ne "") {
-		%page = WebGUI::SQL->quickHash("select * from page where pageId=$_[0]");
+		%page = WebGUI::SQL->quickHash("select ownerId,ownerEdit,worldEdit,groupId,groupEdit from page where pageId=$_[0]");
 	} else {
 		%page = %{$session{page}};
 	}
@@ -56,9 +56,9 @@ sub canEditPage {
 		return 1;
 	} elsif ($session{user}{userId} eq $page{ownerId} && $page{ownerEdit} && $isContentManager) {
 		return 1;
-	} elsif (isInGroup(3)) {
-		return 1;
 	} elsif (isInGroup($page{groupId}) && $page{groupEdit} && $isContentManager) {
+		return 1;
+	} elsif (isInGroup(3)) { # admin check
 		return 1;
 	} else {
 		return 0;
@@ -67,21 +67,27 @@ sub canEditPage {
 
 #-------------------------------------------------------------------
 sub canViewPage {
-	my (%page);
+	my (%page, $inDateRange);
 	tie %page, 'Tie::CPHash';
 	if ($_[0] eq "") {
 		%page = %{$session{page}};
 	} else {
-		%page = WebGUI::SQL->quickHash("select * from page where pageId=$_[0]");
+		%page = WebGUI::SQL->quickHash("select ownerId,ownerView,groupId,groupView,worldView,startDate,endDate 
+			from page where pageId=$_[0]");
 	}
-	if ($page{worldView}) {
+	if ($page{startDate} < time() && $page{endDate} > time()) {
+		$inDateRange = 1;
+	}
+	if ($page{worldView} && $inDateRange) {
                 return 1;
-        } elsif ($session{user}{userId} eq $page{ownerId} && $page{ownerView}) {
+        } elsif ($session{user}{userId} eq $page{ownerId} && $page{ownerView} && $inDateRange) {
+                return 1;
+        } elsif (isInGroup($page{groupId}) && $page{groupView} && $inDateRange) {
                 return 1;
         } elsif (isInGroup(3)) { # admin check
 	        return 1;
-        } elsif (isInGroup($page{groupId}) && $page{groupView}) {
-                return 1;
+        } elsif (canEditPage($_[0])) { 
+		return 1;
         } else {
                 return 0;
         }

@@ -21,7 +21,7 @@ use WebGUI::URL;
 
 our @ISA = qw(Exporter);
 our @EXPORT = qw(&helpIcon &becomeIcon &cutIcon &copyIcon &deleteIcon &editIcon &moveUpIcon &moveDownIcon
-	&pageIcon &moveTopIcon &moveBottomIcon &viewIcon);
+	&wobjectIcon &pageIcon &moveTopIcon &moveBottomIcon &viewIcon);
 
 =head1 NAME
 
@@ -42,6 +42,7 @@ our @EXPORT = qw(&helpIcon &becomeIcon &cutIcon &copyIcon &deleteIcon &editIcon 
  $html = moveUpIcon('op=something');
  $html = pageIcon();
  $html = viewIcon('op=something');
+ $html = wobjectIcon();
 
 =head1 DESCRIPTION
 
@@ -58,7 +59,7 @@ our @EXPORT = qw(&helpIcon &becomeIcon &cutIcon &copyIcon &deleteIcon &editIcon 
 
 #-------------------------------------------------------------------
 
-=head2 becomeIcon ( urlParameters )
+=head2 becomeIcon ( urlParameters [, pageURL ] )
 
  Generates a button with the word "Become" printed on it.
 
@@ -67,18 +68,23 @@ our @EXPORT = qw(&helpIcon &becomeIcon &cutIcon &copyIcon &deleteIcon &editIcon 
  Any URL parameters that need to be tacked on to the current URL
  to accomplish whatever function this button represents.
 
+=item pageURL
+
+ The URL to any page. Defaults to the current page.
+
 =cut
 
 sub becomeIcon {
-        my ($output);
-        $output = '<a href="'.WebGUI::URL::page($_[0]).'">';
+        my ($output, $pageURL);
+	$pageURL = $_[1] || $session{page}{urlizedTitle};
+        $output = '<a href="'.WebGUI::URL::gateway($pageURL,$_[0]).'">';
         $output .= '<img src="'.$session{config}{extras}.'/become.gif" align="middle" border="0" alt="Become"></a>';
         return $output;
 }
 
 #-------------------------------------------------------------------
 
-=head2 copyIcon ( urlParameters )
+=head2 copyIcon ( urlParameters [, pageURL ] )
 
  Generates a button with the word "Copy" printed on it.
 
@@ -87,18 +93,23 @@ sub becomeIcon {
  Any URL parameters that need to be tacked on to the current URL
  to accomplish whatever function this button represents.
 
+=item pageURL
+
+ The URL to any page. Defaults to the current page.
+
 =cut
 
 sub copyIcon {
-        my ($output);
-        $output = '<a href="'.WebGUI::URL::page($_[0]).'">';
+        my ($output, $pageURL);
+        $pageURL = $_[1] || $session{page}{urlizedTitle};
+        $output = '<a href="'.WebGUI::URL::gateway($pageURL,$_[0]).'">';
         $output .= '<img src="'.$session{config}{extras}.'/copy.gif" align="middle" border="0" alt="Copy"></a>';
         return $output;
 }
 
 #-------------------------------------------------------------------
 
-=head2 cutIcon ( urlParameters )
+=head2 cutIcon ( urlParameters [, pageURL ] )
 
  Generates a button with the word "Cut" printed on it.
 
@@ -107,18 +118,23 @@ sub copyIcon {
  Any URL parameters that need to be tacked on to the current URL
  to accomplish whatever function this button represents.
 
+=item pageURL
+
+ The URL to any page. Defaults to the current page.
+
 =cut
 
 sub cutIcon {
-        my ($output);
-        $output = '<a href="'.WebGUI::URL::page($_[0]).'">';
+        my ($output, $pageURL);
+        $pageURL = $_[1] || $session{page}{urlizedTitle};
+        $output = '<a href="'.WebGUI::URL::gateway($pageURL,$_[0]).'">';
         $output .= '<img src="'.$session{config}{extras}.'/cut.gif" align="middle" border="0" alt="Cut"></a>';
         return $output;
 }
 
 #-------------------------------------------------------------------
 
-=head2 deleteIcon ( urlParameters )
+=head2 deleteIcon ( urlParameters [, pageURL ] )
 
  Generates a button with an "X" printed on it.
 
@@ -127,18 +143,23 @@ sub cutIcon {
  Any URL parameters that need to be tacked on to the current URL
  to accomplish whatever function this button represents.
 
+=item pageURL
+
+ The URL to any page. Defaults to the current page.
+
 =cut
 
 sub deleteIcon {
-	my ($output);
-	$output = '<a href="'.WebGUI::URL::page($_[0]).'">';
+        my ($output, $pageURL);
+        $pageURL = $_[1] || $session{page}{urlizedTitle};
+        $output = '<a href="'.WebGUI::URL::gateway($pageURL,$_[0]).'">';
 	$output .= '<img src="'.$session{config}{extras}.'/delete.gif" align="middle" border="0" alt="Delete"></a>';
 	return $output;
 }
 
 #-------------------------------------------------------------------
 
-=head2 editIcon ( urlParameters )
+=head2 editIcon ( urlParameters [, pageURL ] )
 
  Generates a button with the word "Edit" printed on it.
 
@@ -147,18 +168,23 @@ sub deleteIcon {
  Any URL parameters that need to be tacked on to the current URL
  to accomplish whatever function this button represents.
 
+=item pageURL
+
+ The URL to any page. Defaults to the current page.
+
 =cut
 
 sub editIcon {
-        my ($output);
-        $output = '<a href="'.WebGUI::URL::page($_[0]).'">';
+        my ($output, $pageURL);
+        $pageURL = $_[1] || $session{page}{urlizedTitle};
+        $output = '<a href="'.WebGUI::URL::gateway($pageURL,$_[0]).'">';
         $output .= '<img src="'.$session{config}{extras}.'/edit.gif" align="middle" border="0" alt="Edit"></a>';
         return $output;
 }
 
 #-------------------------------------------------------------------
 
-=head2 becomeIcon ( helpId [, namespace ] )
+=head2 helpIcon ( helpId [, namespace ] )
 
  Generates a button with the word "Help" printed on it.
 
@@ -184,7 +210,7 @@ sub helpIcon {
 
 #-------------------------------------------------------------------
 
-=head2 moveBottomIcon ( urlParameters )
+=head2 moveBottomIcon ( urlParameters [, pageURL ] )
 
  Generates a button with a double down arrow printed on it.
 
@@ -193,18 +219,23 @@ sub helpIcon {
  Any URL parameters that need to be tacked on to the current URL
  to accomplish whatever function this button represents.
 
+=item pageURL
+
+ The URL to any page. Defaults to the current page.
+
 =cut
 
 sub moveBottomIcon {
-        my ($output);
-        $output = '<a href="'.WebGUI::URL::page($_[0]).'">';
+        my ($output, $pageURL);
+        $pageURL = $_[1] || $session{page}{urlizedTitle};
+        $output = '<a href="'.WebGUI::URL::gateway($pageURL,$_[0]).'">';
         $output .= '<img src="'.$session{config}{extras}.'/jumpDown.gif" align="middle" border="0" alt="Move To Bottom"></a>';
         return $output;
 }
 
 #-------------------------------------------------------------------
 
-=head2 moveDownIcon ( urlParameters )
+=head2 moveDownIcon ( urlParameters [, pageURL ] )
 
  Generates a button with a down arrow printed on it.
 
@@ -213,18 +244,23 @@ sub moveBottomIcon {
  Any URL parameters that need to be tacked on to the current URL
  to accomplish whatever function this button represents.
 
+=item pageURL
+
+ The URL to any page. Defaults to the current page.
+
 =cut
 
 sub moveDownIcon {
-        my ($output);
-        $output = '<a href="'.WebGUI::URL::page($_[0]).'">';
+        my ($output, $pageURL);
+        $pageURL = $_[1] || $session{page}{urlizedTitle};
+        $output = '<a href="'.WebGUI::URL::gateway($pageURL,$_[0]).'">';
         $output .= '<img src="'.$session{config}{extras}.'/downArrow.gif" align="middle" border="0" alt="Move Down"></a>';
         return $output;
 }
 
 #-------------------------------------------------------------------
 
-=head2 moveTopIcon ( urlParameters )
+=head2 moveTopIcon ( urlParameters [, pageURL ] )
 
  Generates a button with a double up arrow printed on it.
 
@@ -233,18 +269,23 @@ sub moveDownIcon {
  Any URL parameters that need to be tacked on to the current URL
  to accomplish whatever function this button represents.
 
+=item pageURL
+
+ The URL to any page. Defaults to the current page.
+
 =cut
 
 sub moveTopIcon {
-        my ($output);
-        $output = '<a href="'.WebGUI::URL::page($_[0]).'">';
+        my ($output, $pageURL);
+        $pageURL = $_[1] || $session{page}{urlizedTitle};
+        $output = '<a href="'.WebGUI::URL::gateway($pageURL,$_[0]).'">';
         $output .= '<img src="'.$session{config}{extras}.'/jumpUp.gif" align="middle" border="0" alt="Move To Top"></a>';
         return $output;
 }
 
 #-------------------------------------------------------------------
 
-=head2 moveUpIcon ( urlParameters )
+=head2 moveUpIcon ( urlParameters [, pageURL ] )
 
  Generates a button with an up arrow printed on it.
 
@@ -253,11 +294,16 @@ sub moveTopIcon {
  Any URL parameters that need to be tacked on to the current URL
  to accomplish whatever function this button represents.
 
+=item pageURL
+
+ The URL to any page. Defaults to the current page.
+
 =cut
 
 sub moveUpIcon {
-        my ($output);
-        $output = '<a href="'.WebGUI::URL::page($_[0]).'">';
+        my ($output, $pageURL);
+        $pageURL = $_[1] || $session{page}{urlizedTitle};
+        $output = '<a href="'.WebGUI::URL::gateway($pageURL,$_[0]).'">';
         $output .= '<img src="'.$session{config}{extras}.'/upArrow.gif" align="middle" border="0" alt="Move Up"></a>';
         return $output;
 }
@@ -278,7 +324,7 @@ sub pageIcon {
 
 #-------------------------------------------------------------------
 
-=head2 viewIcon ( urlParameters )
+=head2 viewIcon ( urlParameters [, pageURL ] )
 
  Generates a button with the word "View" printed on it.
 
@@ -287,13 +333,32 @@ sub pageIcon {
  Any URL parameters that need to be tacked on to the current URL
  to accomplish whatever function this button represents.
 
+=item pageURL
+
+ The URL to any page. Defaults to the current page.
+
 =cut
 
 sub viewIcon {
-        my ($output);
-        $output = '<a href="'.WebGUI::URL::page($_[0]).'">';
+        my ($output, $pageURL);
+        $pageURL = $_[1] || $session{page}{urlizedTitle};
+        $output = '<a href="'.WebGUI::URL::gateway($pageURL,$_[0]).'">';
         $output .= '<img src="'.$session{config}{extras}.'/view.gif" align="middle" border="0" alt="View"></a>';
         return $output;
+}
+
+#-------------------------------------------------------------------
+
+=head2 wobjectIcon ( )
+
+ Generates an icon that looks like a wobject. It's purpose is to
+ represent whether you're looking at page properties or Wobject
+ properties.
+
+=cut
+
+sub wobjectIcon {
+        return '<img src="'.$session{config}{extras}.'/wobject.gif" align="middle" border="0" alt="Wobject Settings">';
 }
 
 
