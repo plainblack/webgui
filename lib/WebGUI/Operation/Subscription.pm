@@ -301,7 +301,7 @@ sub www_listSubscriptionCodes {
 	} elsif ($session{form}{selection} eq 'b') {
 		$where = " and t1.batchId=".quote($session{form}{bid});
 		$ops = '&bid='.$session{form}{bid}.'&selection=b';
-		$delete = '<a href="'.WebGUI::URL::page('op=deleteSubscriptionBatch'.$ops).'">'.$i18n->get('delete codes').'</a>';
+		$delete = '<a href="'.WebGUI::URL::page('op=deleteSubscriptionCodeBatch'.$ops).'">'.$i18n->get('delete codes').'</a>';
 	}
 	
 	$p = WebGUI::Paginator->new('op=listSubscriptionCodes'.$ops);
