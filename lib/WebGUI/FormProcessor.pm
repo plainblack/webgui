@@ -67,6 +67,10 @@ These functions are available from this package:
 
 =cut
 
+sub _checkEmailAddy {
+        return ($_[0] =~ /^([A-Z0-9]+[._-]?){1,}([A-Z0-9]+[_-]?)+\@(([A-Z0-9]+[._-]?){1,}[A-Z0-9]+\.){1,}[A-Z]{2,4}$/i);
+}
+
 #-------------------------------------------------------------------
 
 =head2 checkbox ( name )
@@ -211,7 +215,7 @@ The name of the form variable to retrieve.
 =cut
 
 sub email {
-	if ($session{form}{$_[0]} =~ /^([A-Z0-9]+[._-]?){1,}[A-Z0-9]+\@(([A-Z0-9]+[._-]?){1,}[A-Z0-9]+\.){1,}[A-Z]{2,4}$/i) {
+	if (_checkEmailAddy($session{form}{$_[0]})) {
 		return $session{form}{$_[0]};
 	}
 	return undef;
@@ -671,7 +675,7 @@ The name of the form variable to retrieve.
 sub url {
 	if ($session{form}{$_[0]} =~ /mailto:/) {
 		return $session{form}{$_[0]};
-	} elsif ($session{form}{$_[0]} =~ /^([A-Z0-9]+[._]?){1,}[A-Z0-9]+\@(([A-Z0-9]+[-]?){1,}[A-Z0-9]+\.){1,}[A-Z]{2,4}$/i) {
+	} elsif (_checkEmailAddy($session{form}{$_[0]})) {
 		return "mailto:".$session{form}{$_[0]};
 	} elsif ($session{form}{$_[0]} =~ /:\/\//) {
 		return $session{form}{$_[0]};

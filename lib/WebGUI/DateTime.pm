@@ -262,7 +262,7 @@ sub epochToHuman {
 	my ($offset, $temp, $hour12, $value, $output);
 	$offset = $session{user}{timeOffset} || 0;
 	$offset = $offset*3600;
-	$temp = int($_[0]) || time();
+	$temp = int($_[0]) || WebGUI::DateTime::time();
 	$temp = $temp+$offset;
 	my ($year,$month,$day,$hour,$min,$sec) = epochToArray($temp);
 	$output = $_[1] || "%z %Z";
@@ -785,7 +785,7 @@ A string in the format of YYYY-MM-DD or YYYY-MM-DD HH:MM:SS.
 =cut
 
 sub setToEpoch {
-	my @now = epochToArray(time());
+	my @now = epochToArray(WebGUI::DateTime::time());
 	my ($date,$time) = split(/ /,$_[0]);
  	my ($year, $month, $day) = split(/\-/,$date);
 	my ($hour, $minute, $second) = split(/\:/,$time);

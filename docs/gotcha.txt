@@ -8,6 +8,12 @@ versions. Be sure to heed the warnings contained herein as they will
 save you many hours of grief.
 
 
+6.0.2
+--------------------------------------------------------------------
+ * You need to add all of your site aliases to the sitename variable
+        in your WebGUI config file.
+
+
 6.0.1
 --------------------------------------------------------------------
  * Apache 2.0 is now the recommended web server for WebGUI. As such

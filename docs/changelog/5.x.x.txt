@@ -1,3 +1,22 @@
+5.5.6
+ - bugfix [ 895067 ] Forum ID Missing In USS
+ - bugfix [ 909688 ] USS forum post edit function not work
+ - bugfix [ 910514 ] Article Discussion - Not reporting correctly
+ - Bugfix [ 917535 ] 5.5.5 HTMLEdit - Insert Image Not Functional
+ - bugfix [ 912404 ] Visitors can turn admin on
+ - bugfix [ 917913, 915019, 913999, 912765, 912206 ] OwnerId was not set correctly
+   when saving page.
+ - Bugfix [ 884375 ] Fix for multiple forum posts applied also to
+   www_viewForum to handle postings that start a new thread.
+ - Bugfix [ 909579 ] possible package problem 5.5.4
+ - Bugfix [ 918136 ] upgrade to 5.5.5 sql inserts wrong version number
+ - Bugfix [ 917338 ] Typo in 5.5.5 Email Data Form
+ - Bugfix [ 932243 ] Security bug: Env Host can be spoofed
+ - Bugfix [ 913525 ] Beg. / End Dates of WObjects
+ - Bugfix [ 927530 ] bugfix FormProcessor email checking change
+
+
+
 5.5.5
  - Fixed a bug in AdminBar's clipboard code where a standard hash was
    used instead of a CPHash for database access.  (Thanks to Steve Simms.)

@@ -295,7 +295,7 @@ sub getRecordTemplateVars {
 			my $hidden = (($data{status} eq "hidden" && !$session{var}{adminOn}) || ($data{isMailField} && !$self->get("mailData")));
 			my $value = $data{value};
 			$value = WebGUI::DateTime::epochToHuman($value,"%z") if ($data{type} eq "date");
-			$value = WebGUI::DateTime::epochToHuman($value) if ($data{type} eq "dateTime");
+			$value = WebGUI::DateTime::epochToHuman($value,"%z %Z") if ($data{type} eq "dateTime");
 			push(@fields,{
 				"tab.field.form" => _createField(\%data),
 				"tab.field.name" => $data{name},

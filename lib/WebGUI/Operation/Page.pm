@@ -331,6 +331,9 @@ sub www_editPage {
 			$page{title} = $page{menuTitle} = $page{urlizedTitle} = $page{synopsis} = '';
 			$page{parentId} = $session{form}{npp};
 			$page{ownerId} = $session{user}{userId};
+			$page{hideFromNavigation} = 0;
+                        $page{newWindow} = 0;
+                        $page{redirectURL} = "";
 		} else {
 			%page = %{$session{page}};
 			($childCount) = WebGUI::SQL->quickArray("select count(*) from page where parentId=$page{pageId}");
