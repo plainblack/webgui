@@ -39,7 +39,8 @@
    internal WebGUI database. This exhibited no problems prior to this release
    because no WebGUI functions actually used those methods before.
  - bugfix [1073753]. bug in WebGUI::Search (Leendert Bottelberghs).
- - Added an e-commerce system. (Martin Kamerbeek)
+ - Added an e-commerce system. Thanks to Atomic Learning for funding this
+   feature. 
 
 6.2.9
  - bugfix [ 1058105 ] input tag has to be closed with /

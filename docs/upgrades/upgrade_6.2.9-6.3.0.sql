@@ -62,6 +62,7 @@ create table asset (
 	newWindow int not null default 0,
 	isHidden int not null default 0,
 	isSystem int not null default 0,
+	encryptPage int not null default 0,
 	unique index (lineage asc),
 	unique index (url),
 	index (parentId)

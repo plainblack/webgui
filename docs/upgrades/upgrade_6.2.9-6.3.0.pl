@@ -76,11 +76,11 @@ sub walkTree {
 			$className = 'WebGUI::Asset::Redirect';
 		}
 		WebGUI::SQL->write("insert into asset (assetId, parentId, lineage, className, state, title, menuTitle, url, startDate, 
-			endDate, synopsis, newWindow, isHidden, ownerUserId, groupIdView, groupIdEdit ) values (".quote($pageId).",
+			endDate, synopsis, newWindow, isHidden, ownerUserId, groupIdView, groupIdEdit, encryptPage ) values (".quote($pageId).",
 			".quote($newParentId).", ".quote($pageLineage).", ".quote($className).",'published',".quote($page->{title}).",
 			".quote($page->{menuTitle}).", ".quote($pageUrl).", ".quote($page->startDate).", ".quote($page->{endDate}).",
 			".quote($page->{synopsis}).", ".quote($page->{newWindow}).", ".quote($page->{hideFromNavigation}).", ".quote($page->{ownerId}).",
-			".quote($page->{groupIdView}).", ".quote($page->{groupIdEdit}).")");
+			".quote($page->{groupIdView}).", ".quote($page->{groupIdEdit}).", ".quote($page->{encryptPage}).")");
 		if ($page->{redirectURL} ne "") {
 			WebGUI::SQL->write("insert into redirect (assetId, redirectUrl) values (".quote($pageId).",".quote($page->{redirectURL}).")");
 		} else {
@@ -106,10 +106,10 @@ sub walkTree {
 			}
 			$className = 'WebGUI::Asset::Wobject::'.$wobject->{namespace};
 			WebGUI::SQL->write("insert into asset (assetId, parentId, lineage, className, state, title, menuTitle, url, startDate, 
-				endDate, isHidden, ownerUserId, groupIdView, groupIdEdit) values (".quote($wobjectId).",
+				endDate, isHidden, ownerUserId, groupIdView, groupIdEdit, encryptPage) values (".quote($wobjectId).",
 				".quote($pageId).", ".quote($wobjectLineage).", ".quote($className).",'published',".quote($page->{title}).",
 				".quote($page->{title}).", ".quote($wobjectUrl).", ".quote($wobject->startDate).", ".quote($wobject->{endDate}).",
-				1, ".quote($ownerId).", ".quote($groupIdView).", ".quote($groupIdEdit).")");
+				1, ".quote($ownerId).", ".quote($groupIdView).", ".quote($groupIdEdit).", ".quote($page->{encryptPage}).")");
 			WebGUI::SQL->write("update wobject set assetId=".quote($wobjectId));
 			WebGUI::SQL->write("update ".$wobject->{namespace}." set assetId=".quote($wobjectId));
 			if ($namespace eq "Article") {

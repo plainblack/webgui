@@ -14,7 +14,12 @@ package WebGUI::Asset::Redirect;
 
 =cut
 
+use strict;
+use WebGUI::Asset;
+use WebGUI::HTTP;
 use WebGUI::Session;
+
+our @ISA = qw(WebGUI::Asset);
 
 
 =head1 NAME
@@ -124,9 +129,9 @@ sub www_view {
 	my $self = shift;
 	if ($session{var}{adminOn}) {
 		return $self->www_edit;
-	} else {
-
 	}
+	WebGUI::HTTP::setRedirect($self->get("redirectUrl"));
+	return "";
 }
 
 
