@@ -7,7 +7,15 @@ our $I18N = {
 	},
 
 	'71' => {
-		message => q|The File Manager is designed to help you manage file distribution on your site. It allows you to specify who may view/download files from your site.
+		message => q|The File Manager is designed to help you manage file distribution on your site. It allows you to specify who may view/download files from your site.  Viewing
+        access is set by privileges on the page.  Download privileges are set on
+        a per file basis.
+<p>
+
+<b>What next?</b><br>
+This field is available only when you create a File Manager.  After hitting the
+Save button, you may either start loading files into the manager or go back to
+the page with the File Manager on it.
 <p>
 
 <b>Template</b><br/>
@@ -18,12 +26,8 @@ Choose a layout for the file manager.
 How many files should be displayed before splitting the results into separate pages? In other words, how many files should be displayed per page?
 <p>
 
-<b>Proceed to add download?</b><br>
-If you wish to start adding files to download right away, leave this checked.
-<p>
-
 |,
-		lastUpdated => 1038887335
+		lastUpdated => 1099611680
 	},
 
 	'7' => {
@@ -136,23 +140,23 @@ A short description of this file. Be sure to include keywords that users may try
 Choose the group that may download this file.
 <p>
 
-<b>What's next?</b><br>
-If you'd like to add another file after this one, then select "add a new file" otherwise select "go back to the page".
+<b>What next?</b><br>
+If you'd like to add another file after this one, then select "Add a new file" otherwise select "Go back to the page".
 <p>
 |,
-		lastUpdated => 1038883174
+		lastUpdated => 1099611855
 	},
 
 	'76' => {
 		message => q|This is the list of template variables available in File Manager templates.
 <p/>
 
-<b>titleColumn.url</b><br/>
-The URL to sort by the title.
-<p/>
-
 <b>titleColumn.label</b><br/>
 The translated label for the title.
+<p/>
+
+<b>titleColumn.url</b><br/>
+The URL to sort the displayed files by their titles.
 <p/>
 
 <b>descriptionColumn.label</b><br/>
@@ -160,7 +164,7 @@ The translated label for the description.
 <p/>
 
 <b>descriptionColumn.url</b><br/>
-The URL to sort by the description.
+The URL to sort the displayed files by their descriptions.
 <p/>
 
 <b>dateColumn.label</b><br/>
@@ -168,11 +172,7 @@ The translated label for the upload date.
 <p/>
 
 <b>dateColumn.url</b><br/>
-The URL to sort by the date uploaded.
-<p/>
-
-<b>search.form</b><br/>
-WebGUI's power search form.
+The URL to sort the displayed files by their date uploaded.
 <p/>
 
 <b>search.url</b><br/>
@@ -191,6 +191,10 @@ The URL to add a file to the file manager.
 The translated label for the add file link.
 <p/>
 
+<b>search.form</b><br/>
+WebGUI's power search form.
+<p/>
+
 <b>file_loop</b><br/>
 A loop containing the information about each file uploaded to this file manager.
 <blockquote>
@@ -202,6 +206,16 @@ The WebGUI management controls for this file.
 <p/>
 <b>file.title</b><br/>
 The title for this file.
+<p/>
+<b>file.description</b><br/>
+The description of this file.
+<p/>
+<b>file.date</b><br/>
+The last date that any version of this file was uploaded.
+<p/>
+<b>file.time</b><br/>
+The time that this file was uploaded.
+<p/>
 <p/>
 <b>file.version1.name</b><br/>
 The filename for the first version of this file.
@@ -265,16 +279,6 @@ The URL to the thumbnail for the third version of this file.
 <p/>
 <b>file.version3.isImage</b><br/>
 A conditional indicating whether the third version of this file is an image or not.
-<p/>
-<b>file.description</b><br/>
-The description of this file.
-<p/>
-<b>file.date</b><br/>
-The date that this file was uploaded.
-<p/>
-<b>file.time</b><br/>
-The time that this file was uploaded.
-<p/>
 </blockquote>
 <p/>
 <b>noresults.message</b><br/>
@@ -285,7 +289,7 @@ A conditional indicating whether there are any files for this user to view.
 <p/>
 
 |,
-		lastUpdated => 1082371148
+		lastUpdated => 1099611278
 	},
 
 	'10' => {
