@@ -141,6 +141,74 @@ sub checkbox {
 
 #-------------------------------------------------------------------
 
+=head2 checkList ( name, options [ label, value, vertical, extras, subtext ] )
+
+ Adds a checkbox list row to this form.
+
+=item name
+
+ The name field for this form element.
+
+=item options
+ The list of options for this list. Should be passed as a
+ hash reference.
+
+=item label
+
+ The left column label for this form row.
+
+=item value
+
+ The default value(s) for this form element. This should be passed
+ as an array reference.
+
+=item vertical
+
+ If set to "1" the radio button elements will be laid out
+ horizontally. Defaults to "0".
+
+=item extras
+
+ If you want to add anything special to this form element like
+ javascript actions, or stylesheet information, you'd add it in
+ here as follows:
+
+   'onChange="this.form.submit()"'
+
+=item subtext
+
+ Extra text to describe this form element or to provide special
+ instructions.
+
+=cut
+
+sub checkList {
+        my ($label, $subtext, $class, $output, $vertical, $value, $key, $item, $name, $options, $extras);
+        $class = shift;
+        $name = shift;
+        $options = shift;
+        $label = shift;
+        $value = shift;
+        $vertical = shift;
+        $extras = shift;
+        $subtext = shift;
+        foreach $key (keys %{$options}) {
+                $output .= '<input type="checkbox" name="'.$name.'" value="'.$key.'"';
+                foreach $item (@$value) {
+                        if ($item eq $key) {
+                                $output .= ' checked="1"';
+                        }
+                }
+                $output .= ' '.$extras.'>'.${$options}{$key}.' &nbsp; &nbsp;';
+                $output .= '<br>' if ($vertical);
+        }
+        $output .= _subtext($subtext);
+        $output = _tableFormRow($label,$output) unless ($class->{_noTable});
+        $class->{_data} .= $output;
+}
+
+#-------------------------------------------------------------------
+
 =head2 combo ( name, options [ label, value, size, multiple, extras, subtext ] )
 
  Adds a combination select list / text box row to this form. If the
@@ -952,6 +1020,127 @@ sub printRowsOnly {
         my ($class);
         $class = shift;
         return $class->{_data};
+}
+
+#-------------------------------------------------------------------
+
+=head2 radio ( name [ label, checked, subtext, value, extras ] )
+
+ Adds a radio button row to this form.
+
+=item name
+
+ The name field for this form element.
+
+=item label
+
+ The left column label for this form row.
+
+=item checked
+
+ If you'd like this radio button to be defaultly checked, set this to "1".
+
+=item subtext
+
+ Extra text to describe this form element or to provide special
+ instructions.
+
+=item value
+
+ The default value for this form element. Defaults to "1".
+
+=item extras
+
+ If you want to add anything special to this form element like
+ javascript actions, or stylesheet information, you'd add it in
+ here as follows:
+
+   'onChange="this.form.submit()"'
+
+=cut
+
+sub radio {
+        my ($subtext, $class, $output, $name, $label, $extras, $checked, $value);
+        $class = shift;
+        $name = shift;
+        $label = shift;
+        $checked = shift;
+        $checked = ' checked="1"' if ($checked);
+        $subtext = shift;
+        $value = shift || 1;
+        $extras = shift;
+        $output = '<input type="radio" name="'.$name.'" value="'.$value.'"'.$checked.' '.$extras.'>';
+        $output .= _subtext($subtext);
+        $output = _tableFormRow($label,$output) unless ($class->{_noTable});
+        $class->{_data} .= $output;
+}
+
+#-------------------------------------------------------------------
+
+=head2 radioList ( name, options [ label, value, vertical, extras, subtext ] )
+
+ Adds a radio button list row to this form.
+
+=item name
+
+ The name field for this form element.
+
+=item options
+ The list of options for this list. Should be passed as a
+ hash reference.
+
+=item label
+
+ The left column label for this form row.
+
+=item value
+
+ The default value(s) for this form element. This should be passed
+ as an array reference.
+
+=item vertical
+
+ If set to "1" the radio button elements will be laid out 
+ horizontally. Defaults to "0".
+
+=item extras
+
+ If you want to add anything special to this form element like
+ javascript actions, or stylesheet information, you'd add it in
+ here as follows:
+
+   'onChange="this.form.submit()"'
+
+=item subtext
+
+ Extra text to describe this form element or to provide special
+ instructions.
+
+=cut
+
+sub radioList {
+        my ($label, $subtext, $class, $output, $vertical, $value, $key, $item, $name, $options, $extras);
+        $class = shift;
+        $name = shift;
+        $options = shift;
+        $label = shift;
+        $value = shift;
+	$vertical = shift;
+        $extras = shift;
+        $subtext = shift;
+        foreach $key (keys %{$options}) {
+                $output .= '<input type="radio" name="'.$name.'" value="'.$key.'"';
+                foreach $item (@$value) {
+                        if ($item eq $key) {
+                                $output .= ' checked="1"';
+                        }
+                }
+                $output .= ' '.$extras.'>'.${$options}{$key}.' &nbsp; &nbsp;';
+		$output .= '<br>' if ($vertical);
+        }
+        $output .= _subtext($subtext);
+        $output = _tableFormRow($label,$output) unless ($class->{_noTable});
+        $class->{_data} .= $output;
 }
 
 #-------------------------------------------------------------------

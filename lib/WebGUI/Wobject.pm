@@ -644,7 +644,6 @@ sub www_delete {
                 $output .= '&nbsp;&nbsp;&nbsp;&nbsp;<a href="'.WebGUI::URL::page().'">';
 		$output .= WebGUI::International::get(45);
 		$output .= '</a></div>';
-		WebGUI::ErrorHandler::audit("moved Wobject ".$_[0]->{_property}{wobjectId}." to the trash.");
                 return $output;
         } else {
                 return WebGUI::Privilege::insufficient();
@@ -662,6 +661,7 @@ sub www_delete {
 sub www_deleteConfirm {
         if (WebGUI::Privilege::canEditPage()) {
 		$_[0]->set({pageId=>3, templatePosition=>0});
+		WebGUI::ErrorHandler::audit("moved Wobject ".$_[0]->{_property}{wobjectId}." to the trash.");
 		_reorderWobjects($_[0]->get("pageId"));
                 return "";
         } else {
