@@ -7,6 +7,15 @@ upgrading from one version to the next, or even between multiple
 versions. Be sure to heed the warnings contained herein as they will
 save you many hours of grief.
 
+3.0.2
+--------------------------------------------------------------------
+ * 3.0.2 was accidentally released with an internal version number
+	of 3.0.1. If you're having problems figuring out what
+	version you actually have, look at the definition of your
+	widget table. If you see a field with the name
+	"widgetType", then you're on 3.0.1. If you have a field
+	named "namespace", then you're on 3.0.2.
+
 3.0.1
 --------------------------------------------------------------------
  * The macro syntax of old has officially been removed. If you're

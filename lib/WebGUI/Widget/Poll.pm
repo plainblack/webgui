@@ -233,9 +233,10 @@ sub www_view {
 
 #-------------------------------------------------------------------
 sub www_vote {
-	my ($voteGroup);
+	my ($voteGroup,$hasVoted);
 	($voteGroup) = WebGUI::SQL->quickArray("select voteGroup from Poll where widgetId='$session{form}{wid}'");
-        if (WebGUI::Privilege::isInGroup($voteGroup,$session{user}{userId})) {
+	($hasVoted) = WebGUI::SQL->quickArray("select count(*) from Poll_answer where widgetId=$session{form}{wid} and ((userId=$session{user}{userId} and userId<>1) or (userId=1 and ipAddress='$session{env}{REMOTE_ADDR}'))");
+        if (WebGUI::Privilege::isInGroup($voteGroup,$session{user}{userId}) && !($hasVoted)) {
         	WebGUI::SQL->write("insert into Poll_answer values ($session{form}{wid}, '$session{form}{answer}', $session{user}{userId}, '$session{env}{REMOTE_ADDR}')");
 	}
 	return "";

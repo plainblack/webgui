@@ -9,7 +9,7 @@
 #
 
 CREATE TABLE Article (
-  widgetId int(11) default NULL,
+  widgetId int(11) NOT NULL default '0',
   startDate int(11) default NULL,
   endDate int(11) default NULL,
   body mediumtext,
@@ -17,7 +17,8 @@ CREATE TABLE Article (
   linkTitle varchar(255) default NULL,
   linkURL text,
   attachment varchar(255) default NULL,
-  convertCarriageReturns int(11) NOT NULL default '0'
+  convertCarriageReturns int(11) NOT NULL default '0',
+  PRIMARY KEY  (widgetId)
 ) TYPE=MyISAM;
 
 #
@@ -113,10 +114,11 @@ CREATE TABLE FAQ_question (
 #
 
 CREATE TABLE Item (
-  widgetId int(11) default NULL,
+  widgetId int(11) NOT NULL default '0',
   description text,
   linkURL text,
-  attachment varchar(255) default NULL
+  attachment varchar(255) default NULL,
+  PRIMARY KEY  (widgetId)
 ) TYPE=MyISAM;
 
 #
@@ -166,10 +168,11 @@ CREATE TABLE LinkList_link (
 #
 
 CREATE TABLE MessageBoard (
-  widgetId int(11) default NULL,
+  widgetId int(11) NOT NULL default '0',
   groupToPost int(11) default NULL,
   messagesPerPage int(11) NOT NULL default '50',
-  editTimeout int(11) default NULL
+  editTimeout int(11) default NULL,
+  PRIMARY KEY  (widgetId)
 ) TYPE=MyISAM;
 
 #
@@ -2375,6 +2378,7 @@ INSERT INTO international VALUES (36,'UserSubmission','English','Delete file.');
 INSERT INTO international VALUES (378,'WebGUI','English','User ID');
 INSERT INTO international VALUES (379,'WebGUI','English','Group ID');
 INSERT INTO international VALUES (380,'WebGUI','English','Style ID');
+INSERT INTO international VALUES (381,'WebGUI','English','WebGUI received a malformed request and was unable to continue. Proprietary characters being passed through a form typically cause this. Please feel free to hit your back button and try again.');
 
 #
 # Table structure for table 'messageLog'
@@ -2631,7 +2635,7 @@ INSERT INTO users VALUES (25,'Reserved','No Login',NULL,'WebGUI',NULL,NULL,'Engl
 CREATE TABLE widget (
   widgetId int(11) NOT NULL default '0',
   pageId int(11) default NULL,
-  widgetType varchar(35) default NULL,
+  namespace varchar(35) default NULL,
   sequenceNumber int(11) NOT NULL default '1',
   title varchar(255) default NULL,
   displayTitle int(11) NOT NULL default '1',

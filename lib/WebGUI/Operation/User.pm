@@ -266,7 +266,7 @@ sub www_editUserSave {
         my ($error, $uid, $encryptedPassword, $passwordStatement);
         if (WebGUI::Privilege::isInGroup(3)) {
                 ($uid) = WebGUI::SQL->quickArray("select userId from users where username='$session{form}{username}'");
-                unless ($uid) {
+                if ($uid == $session{form}{uid} || $uid < 1) {
                 	if ($session{form}{identifier} ne "password") {
                         	$encryptedPassword = Digest::MD5::md5_base64($session{form}{identifier});
                         	$passwordStatement = ', identifier='.quote($encryptedPassword);

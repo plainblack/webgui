@@ -91,7 +91,7 @@ sub www_add {
                 $output .= tableFormRow(WebGUI::International::get(4,$namespace),WebGUI::Form::text("depth",20,2,0));
                 $output .= tableFormRow(WebGUI::International::get(6,$namespace),WebGUI::Form::text("indent",20,2,5));
                 $output .= tableFormRow(WebGUI::International::get(7,$namespace),WebGUI::Form::text("bullet",20,30,'&middot;'));
-                $output .= tableFormRow(WebGUI::International::get(8,$namespace),WebGUI::Form::text("bullet",20,1,1));
+                $output .= tableFormRow(WebGUI::International::get(8,$namespace),WebGUI::Form::text("lineSpacing",20,1,1));
                 $output .= formSave();
                 $output .= '</table></form>';
                 return $output;
