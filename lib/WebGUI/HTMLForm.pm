@@ -1522,7 +1522,7 @@ sub submit {
 
 #-------------------------------------------------------------------
 
-=head2 template ( name [, value, label, namespace, return, extras, uiLevel ] )
+=head2 template ( name [, value, label, namespace, afterEdit, extras, uiLevel ] )
 
 =cut
 
@@ -1532,13 +1532,15 @@ sub template {
         my ($name, $value, $label, $namespace, $afterEdit, $extras, $uiLevel) = 
 		rearrange([qw(name value label namespace afterEdit extras uiLevel)], @p);
         if (_uiLevelChecksOut($uiLevel)) {
-        	if ($afterEdit) {
-                	$subtext = '<a href="'.WebGUI::URL::page("op=editTemplate&tid=".$value."&namespace=".$namespace
-				."&afterEdit="
-                        	.WebGUI::URL::escape($afterEdit)).'">'.WebGUI::International::get(741).'</a> / ';
-        	}
-        	$subtext .= '<a href="'.WebGUI::URL::page("op=listTemplates&namespace=$namespace").'">'
-			.WebGUI::International::get(742).'</a>';
+		if (WebGUI::Privilege::isInGroup($session{setting}{templateManagersGroup})) {
+        		if ($afterEdit) {
+                		$subtext = '<a href="'.WebGUI::URL::page("op=editTemplate&tid=".$value."&namespace=".$namespace
+					."&afterEdit="
+                        		.WebGUI::URL::escape($afterEdit)).'">'.WebGUI::International::get(741).'</a> / ';
+        		}
+        		$subtext .= '<a href="'.WebGUI::URL::page("op=listTemplates&namespace=$namespace").'">'
+				.WebGUI::International::get(742).'</a>';
+		}
         	$output = WebGUI::Form::template({
                 	"name"=>$name,
                 	"value"=>$value,
