@@ -229,7 +229,13 @@ sub www_editNavigation {
                                 this.form.op.value='previewNavigation';
                                 this.form.target = 'navPreview';
                                 this.form.submit()">};
-	$f->{_submit} = $previewButton." ".$f->{_submit};
+	my $saveButton = ' <input type="button" value="'.WebGUI::International::get(62).'" onClick="
+		this.value=\''.WebGUI::International::get(452).'\';
+		this.form.op.value=\'editNavigationSave\';
+		this.form.target=\'_self\';
+		this.form.submit();
+		" >';
+	$f->{_submit} = $previewButton." ".$saveButton;
 	$output .= $f->print;
 	return _submenu($output);	
 }
