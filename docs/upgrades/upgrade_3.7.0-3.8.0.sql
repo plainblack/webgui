@@ -3,6 +3,8 @@ INSERT INTO settings VALUES ('richEditor','built-in');
 INSERT INTO international VALUES (495,'WebGUI','English','Built-In Editor');
 INSERT INTO international VALUES (496,'WebGUI','English','Editor To Use');
 INSERT INTO international VALUES (494,'WebGUI','English','Real Objects Edit-On Pro');
+INSERT INTO international VALUES (497,'WebGUI','English','Start Date');
+INSERT INTO international VALUES (498,'WebGUI','English','End Date');
 
 INSERT INTO groups VALUES (7,'Everyone','A group that automatically includes all users including Visitors.',314496000);
 
@@ -27,6 +29,20 @@ CREATE TABLE wobject (
   endDate int,
   PRIMARY KEY  (wobjectId)
 );
+
+insert into wobject 
+  (wobjectId, pageId, title, displayTitle, processMacros, 
+  description, dateAdded, addedBy, namespace, lastEdited, 
+  editedBy, templatePosition, sequenceNumber, startDate, endDate)
+select 
+  widgetId, pageId, title, displayTitle, processMacros, 
+  description, dateAdded, addedBy, namespace, lastEdited, 
+  editedBy, templatePosition, sequenceNumber, dateAdded, 1336444487
+from 
+ widget
+where
+ namespace='Item';
+
 
 delete from international where language='Svenska';
 
