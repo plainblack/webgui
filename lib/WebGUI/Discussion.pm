@@ -327,14 +327,16 @@ sub showReplyTree {
         		$sql .= " order by messageId";
         		$sth = WebGUI::SQL->read($sql);
                 	while (%data = $sth->hash) {
-                        	$html .= '<tr><td class="tableHeader">';
-                        	$html .= formatHeader($data{subject},$data{userId},$data{username},$data{dateOfPost},$data{views}, 
-					WebGUI::URL::page('func=showMessage&mid='.$data{messageId}.'&wid='.$session{form}{wid}));
-                        	$html .= '</td></tr><tr class="tableData"><td ';
-				if ($data{messageId} == $message{messageId}) {
-					$html .= 'class="highlight"';
+				unless ($data{messageId} == $session{form}{mid} && $data{messageId} == $data{rid}) { # don't show first message.
+                        		$html .= '<tr><td class="tableHeader">';
+                        		$html .= formatHeader($data{subject},$data{userId},$data{username},$data{dateOfPost},$data{views}, 
+						WebGUI::URL::page('func=showMessage&mid='.$data{messageId}.'&wid='.$session{form}{wid}));
+                        		$html .= '</td></tr><tr class="tableData"><td ';
+					if ($data{messageId} == $message{messageId}) {
+						$html .= 'class="highlight"';
+					}
+					$html .= '>'.formatMessage($data{message}).'<br/><br/></td></tr>';
 				}
-				$html .= '>'.formatMessage($data{message}).'<br/><br/></td></tr>';
                 	}
 			$sth->finish;
 		}
