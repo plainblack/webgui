@@ -1329,8 +1329,8 @@ sub selectList {
 	$multiple = ' multiple="1"' if ($_[0]->{multiple});
        	$output = '<select name="'.$_[0]->{name}.'" size="'.$size.'" '.$_[0]->{extras}.$multiple.'>';
 	my %options;
+        tie %options, 'Tie::IxHash';
        	if ($_[0]->{sortByValue}) {
-               	tie %options, 'Tie::IxHash';
                	foreach my $optionKey (sort {"\L${$_[0]->{options}}{$a}" cmp "\L${$_[0]->{options}}{$b}" } keys %{$_[0]->{options}}) {
                          $options{$optionKey} = ${$_[0]->{options}}{$optionKey};
                	}
