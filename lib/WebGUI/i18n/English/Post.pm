@@ -145,6 +145,97 @@ A form that will set when the post stops being available.
 		lastUpdated => 1111388442,
 	},
 
+	'post template variables title' => {
+		message => q|Post Template Variables|,
+                lastUpdated => 1111253044,
+        },
+
+	'post template variables body' => {
+		message => q|The following variables are available in all Post templates:
+<p>
+
+<b>userId</b><br>
+The User ID of the owner of the Post.
+<p>
+
+<b>user.isPoster</b><br>
+A conditional that is true if the current user is the owner of this Post.
+<p>
+
+<b>userProfile.url</b><br>
+A URL to the profile of the owner of the Post.
+<p>
+
+<b>dateSubmitted.human</b><br>
+The date that the post was sumbitted, in a readable format.
+<p>
+
+<b>dateUpdated.human</b><br>
+The date that the post was last updated, in a readable format.
+<p>
+
+<b>title.short</b><br>
+The title of the Post, limited to 30 characters. 
+<p>
+
+<b>content</b><br>
+The content of the post, if a thread containing the Post exists.
+<p>
+
+<b>user.canEdit</b><br>
+A conditional that is true if the user is adding a new Post, as opposed to
+editing an existing Post, and a thread containing the Post exists.
+<p>
+
+<b>delete.url</b><br>
+A URL to delete this Post.
+<p>
+
+<b>edit.url</b><br>
+A URL to edit this Post.
+<p>
+
+<b>status</b><br>
+The status of this Post, typically "Approved", "Denied", or "Pending".
+<p>
+
+<b>approve.url</b><br>
+The URL to approve this Post, if it's moderated.
+<p>
+
+<b>deny.url</b><br>
+The URL to deny this Post, if it's moderated.
+<p>
+
+<b>reply.url</b><br>
+The URL to reply to this Post and quote it in your reply.
+<p>
+
+<b>reply.withoutQuote.url</b><br>
+The URL to reply to this Post without quoting it.
+<p>
+
+<b>url</b><br>
+The URL for this Post.
+<p>
+
+<b>rating.value</b><br>
+The current rating for this Post.
+<p>
+
+<b>rate.url.<i>N</i></b><br>
+URLs that are used to rate this post.  N goes from 1 to 5.
+<p>
+
+<b>hasRated</b><br>
+A conditional that is true if the user has already rated this Post.
+<p>
+
+|,
+		lastUpdated => 1111446222,
+	},
+
+
 };
 
 1;

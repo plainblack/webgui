@@ -9,6 +9,20 @@ our $HELP = {
 				tag => 'template language',
 				namespace => 'Template'
 			},
+			{
+				tag => 'post template variables',
+				namespace => 'Post'
+			},
+		]
+	},
+	'post template variables' => {
+		title => 'post template variables title',
+		body => 'post template variables body',
+		related => [
+			{
+				tag => 'template language',
+				namespace => 'Template'
+			},
 		]
 	},
 };
