@@ -208,7 +208,7 @@ sub getIcon {
 	$icon = $session{setting}{lib}."/fileIcons/";
 	if (isIn($extension, qw(doc dot wri))) {
                 $icon .= "doc.gif";
-        } elsif (isIn($extension, qw(txt log config conf))) {
+        } elsif (isIn($extension, qw(txt log config conf pm cnf readme))) {
                 $icon .= "txt.gif";
 	} elsif (isIn($extension, qw(xlt csv xls))) {
                 $icon .= "xls.gif";
@@ -218,9 +218,11 @@ sub getIcon {
                 $icon .= "html.gif";
         } elsif (isIn($extension, qw(exe com bat pif))) {
                 $icon .= "exe.gif";
+        } elsif (isIn($extension, qw(vsd vdx))) {
+                $icon .= "vsd.gif";
         } elsif (isIn($extension, qw(sit hqx))) {
                 $icon .= "sit.gif";
-        } elsif (isIn($extension, qw(dwg dwf))) {
+        } elsif (isIn($extension, qw(dwg dwf dxf))) {
                 $icon .= "dwg.gif";
         } elsif (isIn($extension, qw(indd p65))) {
                 $icon .= "indd.gif";
@@ -323,7 +325,7 @@ sub getThumbnail {
 
 sub getType {
 	my ($extension);
-	$extension = $_[0]->getFilename;
+	$extension = lc($_[0]->getFilename);
 	$extension =~ s/.*\.(.*?)$/$1/;
 	return $extension;
 }
