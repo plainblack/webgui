@@ -35,10 +35,14 @@ sub _submenu {
         my (%menu);
         tie %menu, 'Tie::IxHash';
 	$menu{WebGUI::URL::page('op=manageClipboard')} = WebGUI::International::get(949);
-	$menu{WebGUI::URL::page('op=emptyClipboard')} = WebGUI::International::get(950);
+	if ($session{form}{systemClipboard} ne "1") {
+		$menu{WebGUI::URL::page('op=emptyClipboard')} = WebGUI::International::get(950);
+	}
 	if ( ($session{setting}{sharedClipboard} ne "1") && (WebGUI::Privilege::isInGroup(3)) ) {
 		$menu{WebGUI::URL::page('op=manageClipboard&systemClipboard=1')} = WebGUI::International::get(954);
-		$menu{WebGUI::URL::page('op=emptyClipboard&systemClipboard=1')} = WebGUI::International::get(959);
+		if ($session{form}{systemClipboard} eq "1") {
+			$menu{WebGUI::URL::page('op=emptyClipboard&systemClipboard=1')} = WebGUI::International::get(959);
+		}
 	}
         return menuWrapper($_[0],\%menu);
 }

@@ -109,10 +109,14 @@ sub _submenu {
         my (%menu);
         tie %menu, 'Tie::IxHash';
 	$menu{WebGUI::URL::page('op=manageTrash')} = WebGUI::International::get(10);
-	$menu{WebGUI::URL::page('op=emptyTrash')} = WebGUI::International::get(11);
+	if ($session{form}{systemTrash} ne "1") {
+		$menu{WebGUI::URL::page('op=emptyTrash')} = WebGUI::International::get(11);
+	}
 	if ( ($session{setting}{sharedTrash} ne "1") && (WebGUI::Privilege::isInGroup(3)) ) {
 		$menu{WebGUI::URL::page('op=manageTrash&systemTrash=1')} = WebGUI::International::get(964);
-		$menu{WebGUI::URL::page('op=emptyTrash&systemTrash=1')} = WebGUI::International::get(967);
+		if ($session{form}{systemTrash} eq "1") {
+			$menu{WebGUI::URL::page('op=emptyTrash&systemTrash=1')} = WebGUI::International::get(967);
+		}
 	}
         return menuWrapper($_[0],\%menu);
 }
