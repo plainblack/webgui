@@ -1408,8 +1408,8 @@ Optional specified lineage.
 sub getRank {
 	my $self = shift;
 	my $lineage = shift || $self->get("lineage");
-	my $rank = $lineage =~ m/(.{6})$/;
-	$rank = $rank - 0; # gets rid of preceeding 0s.
+	$lineage =~ m/(.{6})$/;
+	my $rank = $1 - 0; # gets rid of preceeding 0s.
 	return $rank;
 }
 
