@@ -130,7 +130,10 @@ our $I18N = {
 		message => q|Reminders Recur Every|,
 		lastUpdated => 1108397891
 	},
-
+#--------------------------------------------------------------
+# Ignore 525-555 (for now). Features will be added in upcoming releases.  
+# (except 530).  530 needs to be translated.
+#--------------------------------------------------------------
 	'525' => {
 		message => q|Add event item to Shopping Cart upon Registration?|,
 		lastUpdated => 1108397891
@@ -285,7 +288,9 @@ our $I18N = {
 		message => q|Registration Confirmation (Accept/Cancel) Template|,
 		lastUpdated => 1108397891
 	},
-	
+#--------------------------------------------------------------
+# Ignore 525-555 (for now). Features will be added in upcoming releases.  
+#--------------------------------------------------------------
 	'556' => {
 		message => q|View Event Template|,
 		lastUpdated => 1108397891

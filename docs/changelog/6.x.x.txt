@@ -24,6 +24,7 @@
  - fix [ 1165635 ] IndexedSearch - double toolbar in AdminMode [mwilson]
  - fix [ 1165598 ] Auth module numeric comparisons against Ids
  - Fixed a bunch of Collaboration System template problems.
+ - fix [ 1165829 ] i18n/english/Eventscalendar.pm: double entrys [mwilson]
 
 
 6.5.2
