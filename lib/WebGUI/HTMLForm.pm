@@ -587,13 +587,9 @@ Extra text to describe this form element or to provide special instructions.
 
 The UI level for this field. See the WebGUI developer's site for details. Defaults to "0".
 
-=item dateExtras 
+=item extras 
 
-Extra parameters such as javascript or style sheet information that you wish to add to the date form element.
-
-=item timeExtras 
-
-Extra parameters such as javascript or style sheet information that you wish to add to the time form element.
+Extra parameters such as javascript or style sheet information that you wish to add to the form element.
 
 =back
 
@@ -602,14 +598,13 @@ Extra parameters such as javascript or style sheet information that you wish to 
 sub dateTime {
         my ($output);
         my ($self, @p) = @_;
-        my ($name, $label, $value, $subtext, $uiLevel, $dateExtras, $timeExtras) = 
-		rearrange([qw(name label value subtext uiLevel dateExtras timeExtras)], @p);
+        my ($name, $label, $value, $subtext, $uiLevel, $extras) = 
+		rearrange([qw(name label value subtext uiLevel extras)], @p);
         if (_uiLevelChecksOut($uiLevel)) {
                 $output = WebGUI::Form::dateTime({
                         "name"=>$name,
                         "value"=>$value,
-			"dateExtras"=>$dateExtras,
-			"timeExtras"=>$timeExtras
+			"extras"=>$extras
                         });
                 $output .= _subtext($subtext);
                 $output = $self->_tableFormRow($label,$output);

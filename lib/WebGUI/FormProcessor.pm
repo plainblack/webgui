@@ -191,10 +191,7 @@ The name of the form variable to retrieve.
 =cut
 
 sub dateTime {
-	my $date = date($_[0]."_date");
-	my $time = timeField($_[0]."_time");
-	my $epoch = $date+$time;
-	return $epoch;
+	return WebGUI::DateTime::setToEpoch($session{form}{$_[0]});
 }
 
 #-------------------------------------------------------------------

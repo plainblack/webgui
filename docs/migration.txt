@@ -53,8 +53,18 @@ There have currently been no changes to the scheduler API.
 5. System Changes Affecting Migration
 -------------------------------------
 
-5.1 Nothing Yet
+5.1 Set Date Format Changes
 
-There have currently been no changes to the system that would affect any normal
-use of the API's by plugins.
+In 6.0 the "set date" format used by WebGUI::Form::date() and other methods
+was changed from "MM/DD/YYYY" to "YYYY-MM-DD" and optionally "YYYY-MM-DD
+HH:MM:SS". If you are using WebGUI::FormProcessor to handle processing of your
+dates then you will notice no side effects from the format change. If you are
+not, then you should convert your plugin to use WebGUI::FormProcessor.
+
+In addition to the format change above, we also made one related API change.
+WebGUI::Form::dateTime() and WebGUI::HTMLForm->dateTime() no longer have
+"dateExtras" and "timeExtras", but rather just "extras" properties. This is
+because there is only one field to represent both the date and the time,
+unlike before.
+
 

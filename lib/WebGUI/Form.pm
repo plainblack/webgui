@@ -354,9 +354,8 @@ By default a date is placed in the "value" field. Set this to "1" to turn off th
 =cut
 
 sub date {
-        my ($subtext, $noDate, $class, $name, $label, $extras, $size, $value);
-	$value = epochToSet($_[0]->{value}) unless ($_[0]->{noDate} && $_[0]->{value} eq '');
-        $size = $_[0]->{size} || 10;
+	my $value = epochToSet($_[0]->{value}) unless ($_[0]->{noDate} && $_[0]->{value} eq '');
+        my $size = $_[0]->{size} || 10;
         my $output = _cssFile("calendar/calendar-win2k-1.css")
 		._javascriptFile('calendar/calendar.js')
         	._javascriptFile('calendar/lang/calendar-en.js')
@@ -377,10 +376,6 @@ sub date {
 				mondayFirst : false
 				}); 
 			</script>';
-#	$output .= '<input type="button" style="font-size: 8pt;" onClick="window.dateField = this.form.'.
-#		$_[0]->{name}.';calendar = window.open(\''.$session{config}{extrasURL}.
-#		'/calendar.html\',\'cal\',\'WIDTH=220,HEIGHT=250\');return false" value="'.
-#		WebGUI::International::get(34).'">';
 	return $output;
 }
 
@@ -402,29 +397,36 @@ The the base name for this form element. This form element actually returns two 
 
 The date and time. Pass as an epoch value. Defaults to today and now.
 
-=item dateExtras 
+=item extras 
 
-Extra parameters to add to the date form element such as javascript or stylesheet information.
-
-=item timeExtras 
-
-Extra parameters to add to the time form element such as javascript or stylesheet information.
+Extra parameters to add to the date/time form element such as javascript or stylesheet information.
 
 =back
 
 =cut
 
 sub dateTime {
-	my $output = date({
-		name=>$_[0]->{name}."_date",
-		value=>$_[0]->{value},
-		extras=>$_[0]->{dateExtras}
-		});
-	$output .= timeField({
-		name=>$_[0]->{name}."_time",
-		value=>WebGUI::DateTime::getSecondsFromEpoch($_[0]->{value}),
-		extras=>$_[0]->{timeExtras}
-		});
+	my $value = epochToSet($_[0]->{value},1);
+        my $output = _cssFile("calendar/calendar-win2k-1.css")
+                ._javascriptFile('calendar/calendar.js')
+                ._javascriptFile('calendar/lang/calendar-en.js')
+                ._javascriptFile('calendar/calendar-setup.js');
+        $output .= text({
+                name=>$_[0]->{name},
+                value=>$value,
+                size=>19,
+                extras=>'id="'.$_[0]->{name}.'Id" '.$_[0]->{extras},
+                maxlength=>19
+                });
+        $output .= '<script type="text/javascript">
+                        Calendar.setup({
+                                inputField : "'.$_[0]->{name}.'Id",
+                                ifFormat : "%Y-%m-%d %H:%M:%S",
+                                showsTime : true,
+                                timeFormat : "12",
+                                mondayFirst : false
+                                });
+                        </script>';
 	return $output;
 }
 

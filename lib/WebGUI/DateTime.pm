@@ -286,9 +286,9 @@ sub epochToHuman {
 
 #-------------------------------------------------------------------
 
-=head2 epochToSet ( epoch )
+=head2 epochToSet ( epoch, withTime )
 
-Returns a set date (used by WebGUI::HTMLForm->date) in the format of MM/DD/YYYY. 
+Returns a set date (used by WebGUI::HTMLForm->date) in the format of YYYY-MM-DD. 
 
 =over
 
@@ -296,12 +296,19 @@ Returns a set date (used by WebGUI::HTMLForm->date) in the format of MM/DD/YYYY.
 
 The number of seconds since January 1, 1970.
 
+=item withTime
+
+A boolean indicating that the time should be added to the output, thust turning the format into YYYY-MM-DD HH:MM:SS.
+
 =back
 
 =cut
 
 sub epochToSet {
-	return epochToHuman($_[0],"%m/%d/%y");
+	if ($_[1]) {
+		return epochToHuman($_[0],"%y-%m-%d %j:%n:%s");
+	}
+	return epochToHuman($_[0],"%y-%m-%d");
 }
 
 #-------------------------------------------------------------------
@@ -626,31 +633,33 @@ Returns an epoch date.
 
 =item set
 
-A string in the format of MM/DD/YYYY.
+A string in the format of YYYY-MM-DD or YYYY-MM-DD HH:MM:SS.
 
 =back
 
 =cut
 
 sub setToEpoch {
-	my @date = Date::Calc::Time_to_Date(time());
- 	my ($month, $day, $year) = split(/\//,$_[0]);
+	my @now = Date::Calc::Time_to_Date(time());
+	my ($date,$time) = split(/ /,$_[0]);
+ 	my ($year, $month, $day) = split(/\-/,$date);
+	my ($hour, $minute, $second) = split(/\:/,$time);
 	if (int($year) < 2038 && int($year) > 1969) {
 		$year = int($year);
 	} else {
-		$year = $date[0];
+		$year = $now[0];
 	}
         if (int($month) < 13 && int($month) > 0) {
                 $month = int($month);
         } else {
-                $month = $date[1]++;
+                $month = $now[1]++;
         }
         if (int($day) < 32 && int($day) > 0) {
                 $day = int($day);
         } else {
-                $day = $date[2];
+                $day = $now[2];
         }
-	return Date::Calc::Date_to_Time($year,$month,$day,0,0,0);
+	return Date::Calc::Date_to_Time($year,$month,$day,$hour,$minute,$second);
 }
 
 #-------------------------------------------------------------------
