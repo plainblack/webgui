@@ -54,7 +54,7 @@ sub _replacement {
 
 #-------------------------------------------------------------------
 sub process {
-	my ($output,@data, $pageTitle, $parentId, $sth, $first, $temp);
+	my ($output);
 	$output = $_[0];
         $output =~ s/\^s\((.*?)\)\;/_replacement($1)/ge;
 	return $output;
