@@ -517,7 +517,7 @@ INSERT INTO international VALUES (33,'Navigation',1,'Error: This identifier is a
 INSERT INTO international VALUES (20,'Navigation',1,'Delete this Navigation.',1077080098,'');
 INSERT INTO international VALUES (31,'Navigation',1,'Show hidden pages',1077080799,'');
 INSERT INTO template VALUES (6,'dtree','<link rel=\"StyleSheet\" href=\"/extras/Navigation/dtree/dtree.css\" type=\"text/css\" />\r\n<script type=\"text/javascript\" src=\"/extras/Navigation/dtree/dtree.js\"></script>\r\n\r\n<tmpl_if session.var.adminOn>\r\n<tmpl_var config.button>\r\n</tmpl_if>\r\n\r\n<script>\r\n// Path to dtree directory\r\n_dtree_url = \"<tmpl_var session.config.extrasURL>/Navigation/dtree/\";\r\n</script>\r\n\r\n<div class=\"dtree\">\r\n<script type=\"text/javascript\">\r\n<!--\r\n	d = new dTree(\'d\');\r\n	<tmpl_loop page_loop>\r\n	d.add(\r\n		<tmpl_var page.pageId>,\r\n		<tmpl_if __first__>-99<tmpl_else><tmpl_var page.parentId></tmpl_if>,\r\n		\'<tmpl_var page.menuTitle>\',\r\n		\'<tmpl_var page.url>\',\r\n		\'<tmpl_var page.synopsis>\'\r\n		<tmpl_if page.newWindow>,\'_blank\'</tmpl_if>\r\n	);\r\n	</tmpl_loop>\r\n	document.write(d);\r\n//-->\r\n</script>\r\n\r\n</div>','Navigation');
-INSERT INTO Navigation VALUES (16,'dtree',99,'self_and_descendants','WebGUIroot',-1,1000,0,0,0,0);
+INSERT INTO Navigation VALUES (16,'dtree',99,'self_and_descendants','WebGUIroot',-1,6,0,0,0,0);
 
 delete from template where namespace='EventsCalendar' and templateId<1000;
 
