@@ -450,7 +450,7 @@ sub www_view {
 		}
 		$row[$i] = "page";
 	}
-	$p = WebGUI::Paginator->new("func=view&wid=".$_[0]->get("wobjectId"),\@row,1);
+	$p = WebGUI::Paginator->new(WebGUI::URL::page("func=view&wid=".$_[0]->get("wobjectId")),\@row,1);
         $var{"calendar.firstPage"} = $p->getFirstPageLink;
         $var{"calendar.lastPage"} = $p->getLastPageLink;
         $var{"calendar.nextPage"} = $p->getNextPageLink;
@@ -461,7 +461,7 @@ sub www_view {
 		$flag = 0;
 		$session{form}{pn} = "";
 	}
-	$p = WebGUI::Paginator->new("func=view&wid=".$_[0]->get("wobjectId"),[],$_[0]->get("paginateAfter"));
+	$p = WebGUI::Paginator->new(WebGUI::URL::page("func=view&wid=".$_[0]->get("wobjectId")),[],$_[0]->get("paginateAfter"));
 	$p->setDataByQuery("select * from EventsCalendar_event where wobjectId=".$_[0]->get("wobjectId")
 		." and endDate>=$minDate and startDate<=$maxDate order by startDate,endDate");
 	my $events = $p->getPageData;

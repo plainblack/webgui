@@ -102,7 +102,7 @@ sub www_view {
 	$var{"views.label"} = WebGUI::International::get(514);
 	$var{"replies.label"} = WebGUI::International::get(19,$namespace);
 	$var{"last.label"} = WebGUI::International::get(20,$namespace);
-	$p = WebGUI::Paginator->new('wid='.$_[0]->get("wobjectId").'&func=view');
+	$p = WebGUI::Paginator->new(WebGUI::URL::page('wid='.$_[0]->get("wobjectId").'&func=view'),[],$_[0]->get("messagesPerPage"));
 	$p->setDataByQuery("select messageId,subject,username,dateOfPost,userId,views,status
 		from discussion where wobjectId=".$_[0]->get("wobjectId")." and pid=0 
 		and (status='Approved' or userId=$session{user}{userId}) order by dateOfPost desc");
