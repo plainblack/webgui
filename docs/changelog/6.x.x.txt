@@ -1,7 +1,7 @@
 6.5.3
  - fix [ 1161457 ] Data fomr - list all entries: Logfile Error
  - fix [ 1161461 ] Data form - Add field - wrong destination
-
+ - fix [ 1149585 ] visitor as admin
 
 
 6.5.2

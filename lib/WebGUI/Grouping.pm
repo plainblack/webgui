@@ -334,6 +334,8 @@ sub isInGroup {
         ### The following several checks are to increase performance. If this section were removed, everything would continue to work as normal. 
         return 1 if ($gid eq '7');		# everyone is in the everyone group
         return 1 if ($gid eq '1' && $uid eq '1'); 	# visitors are in the visitors group
+        return 0 if ($uid eq '1');  #Visitor is in no other groups
+        return 1 if ($uid eq '3');  #Admin is in every group
         return 1 if ($gid eq '2' && $uid ne '1'); 	# if you're not a visitor, then you're a registered user
         ### Look to see if we've already looked up this group. 
         if ($session{isInGroup}{$uid}{$gid} eq '1') {
