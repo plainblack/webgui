@@ -39,8 +39,7 @@ sub duplicate {
 		." order by sequenceNumber");
         while ($row = $sth->hashRef) {
 		$row->{LinkList_linkId} = "new";
-		$row->{wobjectId} = $w->get("wobjectId");
-		$_[0]->setCollateral("LinkList_link","LinkList_linkId",$row);
+		$w->setCollateral("LinkList_link","LinkList_linkId",$row);
         }
         $sth->finish;
 }
