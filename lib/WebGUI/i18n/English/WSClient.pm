@@ -38,7 +38,7 @@ The SOAP method is the name of the function to be invoked by the SOAP server. In
 If your SOAP call requires any additional parameters, include them here as a valid perl hash, array or scalar.  For example: <code>'userid' => '12', companyid => '^FormParam("companyid");  Whether you need to use scalar, hash or array is entirely dependent on what your SOAP service expects as input.  Likewise, what you get back is entirely dependent on what the service deems to return.'</code>.<p></p>
 
 <b>Execute by default?</b><br>
-Leave this set to yes unless your page is calling itself with additional parameters.  You will probably know if/when you need to turn off default execution.  To force execution when it has been disabled by default, pass a form variable "targetWobjects" specifying the name of the SOAP call to force execution.<p></p>
+Leave this set to yes unless your page is calling itself with additional parameters.  You will probably know if/when you need to turn off default execution.  To force execution when it has been disabled by default, pass a form variable "targetWobjects" specifying the name of the SOAP call to force execution.  If current cached results already exist for this wobject they will be returned regardless.  If you don't want <i>any</i> results returned no matter what, see the Tricks section below.<p></p>
 
 <b>Template</b><br>
 Choose a layout for this SOAP client.<p></p>
@@ -56,12 +56,19 @@ Because a SOAP call can return complex data structures, you'll need to specify w
 If you want to display debugging and error messages on the page, check this box.<p></p>
 
 <b>Decode utf8?</b><br />
-This option will only display if you have Data::Structure::Util installed.  SOAP calls return utf8 strings even if they may not have utf8 characters within them.  This converts utf8 characters to that there aren't collisions with any character sets specified in the page header.  Deocing is turned off by default, but try turning it on if you see goofy gibberish, especially with the display of copyright symbols and the like.<p></p>
+This option will only display if you have Data::Structure::Util installed.  SOAP calls return utf8 strings even if they may not have utf8 characters within them.  This converts utf8 characters to that there aren't collisions with any character sets specified in the page header.  Decoding is turned off by default, but try turning it on if you see goofy gibberish, especially with the display of copyright symbols and the like.<p></p>
 
 <b>Cache</b><br />
 By default, SOAP calls are cached uniquely for each user session.  By selecting "Global" call returns can be shared between users.<p></p>
 
-<b>Cache expires</b>Number of seconds a SOAP return will be cached.  Set to 1 to essentially skip caching.|,
+<b>Cache expires</b><br />
+Number of seconds a SOAP return will be cached.  Set to 1 to essentially skip caching.<p></p>
+
+A few other tricks...
+<ul>
+<li>If you want to process a SOAP call (for example, one that sets or updates a value on the remote SOAP server) but then redirect to a completely different page, add a form input parameter <code>redirectURL</code>.  The value of redirectURL can be any valid URI understood by a web browser.</li>
+<li>To trigger a SOAP wobject that has "Execute by default?" turned off, pass a form input param of targetWobjects=<i>call</i> where call is the SOAP method.</li>
+<li>To completely ignore a SOAP wobject, including any possible cached returns, pass a form input param of disableWobjects=<i>call</i> where call is the SOAP method.</li></ul>|,
 		lastUpdated => 1088972047
 	},
 
