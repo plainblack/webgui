@@ -20,7 +20,8 @@ This message will be displayed to the user after they submit their data..
 <p>
 
 <b>Mail entries?</b></br>
-If set to yes, some additional fields will be added to your form for dealing with email. These fields will then be used to email any date entered into the form to a person of your choice.
+If set to yes, some additional fields will be added to your form for dealing with email. These fields will then be used to email any data entered into the form to a person of your choice.  By default the new fields are "Hidden" so that
+they can't be edited by the user.
 <p>
 <b>NOTE:</b> The "To" field that is added as a result of setting this to yes can accept a standard email address, or a WebGUI username or a WebGUI group name.
 <p>
@@ -40,7 +41,7 @@ Choose a template that will be used to display the acknowlegement.
 <b>List Template</b><br>
 Choose a template that will be used to display the list of stored records in this Data Form.
 <p>|,
-		lastUpdated => 1053885941
+		lastUpdated => 1099535835,
 	},
 
 	'editField-vertical-label' => {
@@ -111,12 +112,13 @@ The name of this field.  It must be unique among all of the other fields on your
 <p>
 
 <b>Status</b><br>
-Hidden fields will not be visible to the user, but will be sent in the email.Displayed fields can be seen by the user but not modified. Modifiable fields can be filled in by the user. Required fields must be filled in by the user.
+Hidden fields will not be visible to the user, but will be sent in the email. Displayed fields can be seen by the user but not modified. Modifiable fields can be filled in by the user. Required fields must be filled in by the user.
 If you choose Hidden or Displayed, be sure to fill in a Default Value.
 <p>
 
 <b>Type</b><br>
-Choose the type of form element for this field.  
+Choose the type of form element for this field.   This is also used
+to validate any input that the user may supply.
 <p>
 
 <b>Width</b><br>
@@ -124,11 +126,11 @@ Set the number of characters wide this form field will be.
 <p>
 
 <b>Height</b><br>
-Set the number of characters tall this form field will be. Only used on textarea and HTMLArea.
+Set the number of characters tall this form field will be. Only used on textareas and HTMLAreas.
 <p>
 
 <b>Align vertical</b><br>
-This property controls wheter radio buttons and checklists are laid horizontally or vertically.
+This property controls wheter radio buttons and checklists are laid out horizontally or vertically.
 <p>
 
 <b>Extras</b><br>
@@ -144,12 +146,12 @@ Enter the default value (if any) for the field.  For Yes/No fields, enter "yes" 
 <p>
 
 |,
-		lastUpdated => 1098856520
+		lastUpdated => 1099532598,
 	},
 
 	'16' => {
 		message => q|Acknowledgement|,
-		lastUpdated => 1031514049
+		lastUpdated => 1031514049,
 	},
 
 	'100' => {
