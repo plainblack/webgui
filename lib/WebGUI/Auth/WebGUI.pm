@@ -417,7 +417,6 @@ sub recoverPasswordFinish {
    $flag = 0;
    while (($username,$userId) = $sth->array) {
 	   my $len = $session{setting}{webguiPasswordLength} || 6;
-	   my $len = 6;
 	   $password = "";
 	   for(my $i = 0; $i < $len; $i++) {
           $password .= chr(ord('A') + randint(32));

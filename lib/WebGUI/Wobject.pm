@@ -831,7 +831,7 @@ sub processTemplate {
 	my $self = shift;
 	my $templateId = shift;
 	my $var = shift;
-	my $namespace = shift;
+	my $namespace = shift || $self->get("namespace");
 	my %vars = (
 		%{$self->{_property}},
 		%{$var}
@@ -841,7 +841,6 @@ sub processTemplate {
 		my ($originalPageURL) = WebGUI::SQL->quickArray("select urlizedTitle from page where pageId=".$self->get("pageId"),WebGUI::SQL->getSlave);
 		$vars{originalURL} = WebGUI::URL::gateway($originalPageURL."#".$self->get("wobjectId"));
 	}
-	my $namespace = $namespace || $self->get("namespace");
 	return WebGUI::Template::process($templateId,$namespace, \%vars);
 }
 

@@ -162,35 +162,6 @@ sub getIndexerParams {
 			headerShortcut => 'select subject from forumPost where forumPostId = $data{forumPostId}',
 			bodyShortcut => 'select message from forumPost where forumPostId = $data{forumPostId}',
 	},
-	help => {
-			sql => "select distinct(page.languageId) as languageId,
-					title.message as title, 
-					body.message as body, 
-					help.helpId as hid,
-					help.titleId as titleId,
-					help.bodyId as bodyId,
-					help.namespace as namespace,
-					1 as pageId,
-					7 as page_groupIdView,
-					7 as wobject_groupIdView,
-					7 as wobject_special_groupIdView
-					from help, page 
-					left join international body on bodyId = body.internationalId 
-						and help.namespace = body.namespace 
-						and page.languageId = body.languageId
-					left join international title on titleId = title.internationalId 
-						and help.namespace = title.namespace
-						and page.languageId = title.languageId
-					where body.languageId = title.languageId",
-			fieldsToIndex => ["title", "body"],
-			contentType => 'help',
-			url => '"?op=viewHelp&hid=$data{hid}&namespace=$data{namespace}"',
-			headerShortcut => q/select message from international where languageId=$data{languageId}
-					   and namespace='$data{namespace}' and internationalId=$data{titleId}/,
-			bodyShortcut => q/select message from international where languageId=$data{languageId}
-					   and namespace='$data{namespace}' and internationalId=$data{bodyId}/,
-
-		},
 	userProfileData => {
 			sql => "select distinct(userProfileData.userId),
 					userProfileData.userId as ownerId,
@@ -224,6 +195,9 @@ sub getIndexerParams {
 	);
 	foreach my $wobject (@{$session{config}{wobjects}}) {
 		my $cmd = "WebGUI::Wobject::".$wobject;
+                my $load = 'use '.$cmd;
+                eval($load);
+                WebGUI::ErrorHandler::warn("Wobject failed to compile: $cmd.".$@) if($@);
 		my $w =  $cmd->new({wobjectId=>"new",namespace=>$wobject});
 		%params = (%params, %{$w->getIndexerParams($now)});
 	}

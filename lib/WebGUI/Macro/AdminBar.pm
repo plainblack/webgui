@@ -66,7 +66,7 @@ sub process {
 	%hash = sortHash(%hash);
 	$var{'addcontent.label'} = WebGUI::International::get(1);
 	my @addcontent;
-	my $i = 0;
+	$i = 0;
 	foreach my $key (keys %hash) {
 		push(@addcontent,{
 			'contenttype.url'=>$key,

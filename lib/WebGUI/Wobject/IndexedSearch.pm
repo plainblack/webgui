@@ -494,7 +494,6 @@ sub _getContentTypes {
 					'content' => WebGUI::International::get(21,$self->get("namespace")),
 					'discussion' => WebGUI::International::get(892),
 					'profile' => WebGUI::International::get(22,$self->get("namespace")),
-					#'help' => WebGUI::International::get(93),
 					'any' => WebGUI::International::get(23,$self->get("namespace")),
 				);
 	tie my %contentTypes, 'Tie::IxHash';

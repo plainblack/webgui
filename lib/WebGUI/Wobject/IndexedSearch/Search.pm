@@ -459,7 +459,7 @@ sub indexDocument {
 							quote($self->getIndexName).", ".
 							($document->{pageId} || 0).", ". 
 							($document->{wobjectId} || 0).", ". 
-							($document->{languageId} || quote('')).", ".
+							quote($document->{languageId}).", ".
 							quote($document->{namespace} || 'WebGUI')." , ".
 							quote($document->{location}).", ".
 							($document->{page_groupIdView} || 7).", ". 
