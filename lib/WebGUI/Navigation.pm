@@ -79,9 +79,13 @@ sub drawHorizontal {
 		} else {
 			$output .= ' '.$seperator.' ';
 		}
-                $output .= '<a class="'.$class.'" href="'.$tree->{$pageId}{url}
-                        .'"><span class="selectedMenuItem">'
-                        .$tree->{$pageId}{title}.'</span></a>';
+                $output .= '<a class="'.$class.'" href="'.$tree->{$pageId}{url}.'">';
+		if ($pageId == $session{page}{pageId}) {
+                       $output .= '<span class="selectedMenuItem">'.$tree->{$pageId}{title}.'</span>';
+		} else {
+                       $output .= $tree->{$pageId}{title};
+               	}
+                $output .= '</a>';
         }
         return $output;
 }
@@ -128,9 +132,13 @@ sub drawVertical {
                 $leading .= "<br>";
         }
 	foreach $pageId (keys %{$tree}) {
-		$output .= $padding.$bullet.'<a class="'.$class.'" href="'.$tree->{$pageId}{url}
-			.'"><span class="selectedMenuItem">'
-			.$tree->{$pageId}{title}.'</span></a>'.$leading;
+		$output .= $padding.$bullet.'<a class="'.$class.'" href="'.$tree->{$pageId}{url}.'">';
+                if ($pageId == $session{page}{pageId}) {
+                       $output .= '<span class="selectedMenuItem">'.$tree->{$pageId}{title}.'</span>';
+                } else {
+                       $output .= $tree->{$pageId}{title};
+                }
+		$output .= '</a>'.$leading;
 		$output .= drawVertical($tree->{$pageId}{sub}, $bullet, $class, $spacing, ($indent+1));
 	}
         return $output;
