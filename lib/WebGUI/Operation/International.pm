@@ -130,7 +130,6 @@ sub www_deleteLanguageConfirm {
 
 #-------------------------------------------------------------------
 sub www_editInternationalMessage {
-	my ( $output, $message, $f, $language );
 	return WebGUI::Privilege::adminOnly() unless WebGUI::Privilege::isInGroup( 3 );
 	my ( $language ) = WebGUI::SQL->quickArray( 'select language from language where languageId=' . $session{ form }{ lid } );
 	my $output = '<h1>' . WebGUI::International::get( 597 ) . '</h1>';
@@ -251,33 +250,19 @@ sub www_listInternationalMessages {
 	$sth = WebGUI::SQL->read( 'select * from international where languageId=1' );
 	while ( %data = $sth->hash ) {
 		my $key = $data{ namespace } . '-' . $data{ internationalId };
-		if ( $session{ form }{ search } ne '' ) {
-			if ( $list{ 'z-' . $key } ) {
-				if ( $list{ 'z-' . $key }{ lastUpdated } < $data{ lastUpdated } ) {
-					$list{ 'o-' . $key } = delete $list{ 'z-' . $key };
-					$list{ 'o-' . $key }{ status } = 'updated';
-				}
-				else {
-					$list{ 'q-' . $key } = delete $list{ 'z-' . $key };
-					$list{ 'q-' . $key }{ status } = 'ok';
-				}
-			}
-		}
-		else {
-			unless ( $list{ 'z-' . $key } ) {
-				@{ $list{ 'a-' . $key } }{ qw[namespace id status] }
-					= ( @data{ qw[namespace internationalId] }, 'missing' );
+		if ( $list{ 'z-' . $key } ) {
+			if ( $list{ 'z-' . $key }{ lastUpdated } < $data{ lastUpdated } ) {
+				$list{ 'o-' . $key } = delete $list{ 'z-' . $key };
+				$list{ 'o-' . $key }{ status } = 'updated';
 			}
 			else {
-				if ( $list{ 'z-' . $key }{ lastUpdated } < $data{ lastUpdated } ) {
-					$list{ 'o-' . $key } = delete $list{ 'z-' . $key };
-					$list{ 'o-' . $key }{ status } = 'updated';
-				}
-				else {
-					$list{ 'q-' . $key } = delete $list{ 'z-' . $key };
-					$list{ 'q-' . $key }{ status } = 'ok';
-				}
+				$list{ 'q-' . $key } = delete $list{ 'z-' . $key };
+				$list{ 'q-' . $key }{ status } = 'ok';
 			}
+		}
+		elsif ( $session{ form }{ search } eq '' ) {
+			@{ $list{ 'a-' . $key } }{ qw[namespace id status] }
+				= ( @data{ qw[namespace internationalId] }, 'missing' );
 		}
 	}
 	$sth->finish;
