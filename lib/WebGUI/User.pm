@@ -297,7 +297,7 @@ sub profileField {
 	$class = shift;
         $fieldName = shift;
         $value = shift;
-	$value = WebGUI::Macro::negate($value);	# Len Kranendonk - 20030701: fixed security hole
+	$value = WebGUI::Macro::negate($value);	
 	if (defined $value) {
 		$class->{_profile}{$fieldName} = $value;
 		WebGUI::SQL->write("delete from userProfileData where userId=".quote($class->{_userId})." and fieldName=".quote($fieldName));

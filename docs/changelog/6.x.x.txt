@@ -9,6 +9,8 @@
  - bugfix [ 1024643 ] Unknown column error. (Leendert Bottelberghs)
  - bugfix [ 1025120 ] Pagination in forum thread doesn't work. New default thread template. (Leendert Bottelberghs)
  - Fixed a bug where you couldn't delete templates.
+ - bugfix [ 1025755 ] UILevel can't be set to beginner (0)
+
 
 
 6.2.1

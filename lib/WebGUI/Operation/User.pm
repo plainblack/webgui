@@ -15,6 +15,7 @@ use strict qw(vars subs);
 use Tie::CPHash;
 use Tie::IxHash;
 use WebGUI::DateTime;
+use WebGUI::FormProcessor;
 use WebGUI::Group;
 use WebGUI::Grouping;
 use WebGUI::HTMLForm;
@@ -517,19 +518,14 @@ sub www_editUserProfile {
                 $method = $data{dataType};
                 $label = eval $data{fieldLabel};
                 if ($method eq "selectList" || $method eq "checkList" || $method eq "radioList") {
-                	# note: this big if statement doesn't look elegant, but doing regular
-                        # ORs caused problems with the array reference.
-                        
-						# make sure the values are ordered         
                         my $orderedValues = {};
                         tie %{$orderedValues}, 'Tie::IxHash';
                         foreach my $ov (sort keys %{$values}) {
                         	$orderedValues->{$ov} = $values->{$ov};
                         }
-                        
                         if ($session{form}{$data{fieldName}}) {
                       		$default = [$session{form}{$data{fieldName}}];
-                        } elsif ($user{$data{fieldName}} && (defined($values->{$user{$data{fieldName}}}))) {
+                        } elsif (exists $user{$data{fieldName}} && (defined($values->{$user{$data{fieldName}}}))) {
                                 $default = [$user{$data{fieldName}}];
                         } else {
                                 $default = eval $data{dataDefault};
@@ -568,12 +564,9 @@ sub www_editUserProfileSave {
         my ($a, %field, $u);
       	tie %field, 'Tie::CPHash';
         $u = WebGUI::User->new($session{form}{uid});
-      	$a = WebGUI::SQL->read("select * from userProfileField");
+      	$a = WebGUI::SQL->read("select fieldName,dataType from userProfileField");
       	while (%field = $a->hash) {
-               	if ($field{dataType} eq "date") {
-                       	$session{form}{$field{fieldName}} = setToEpoch($session{form}{$field{fieldName}});
-               	}
-               	$u->profileField($field{fieldName},$session{form}{$field{fieldName}}) if (exists $session{form}{$field{fieldName}});
+               	$u->profileField($field{fieldName},WebGUI::FormProcessor::process($field{fieldName},$field{dataType}));
        	}
        	$a->finish;
         return www_editUserProfile();
