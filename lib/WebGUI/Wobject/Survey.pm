@@ -197,7 +197,7 @@ sub getQuestionsLoop {
 	} else {
 		@ids = $self->getRandomQuestionIds($responseId);
 	}
-	my $length = $#ids+1;
+	my $length = scalar(@ids);
 	my $i = 1;
 	my @loop;
 	my $questionResponseCount = $self->getQuestionResponseCount($responseId);
@@ -286,18 +286,18 @@ sub getResponseDrivenQuestionIds {
 		where Survey_responseId=$responseId order by dateOfResponse desc");
 	my $questionId;
 	my @questions;
-	if (defined $previousResponse) {
+	if ($previousResponse->{Survey_answerId}) {
 	        ($questionId) = WebGUI::SQL->quickArray("select gotoQuestion from Survey_answer where 
 			Survey_answerId=".$previousResponse->{Survey_answerId});
 	        unless ($questionId > 0) { 
 			($questionId) = WebGUI::SQL->quickArray("select gotoQuestion from Survey_question where 
 				Survey_questionId=".$previousResponse->{Survey_questionId});
 		}
-		unless ($questionId > 0) {
-			$questionId = undef;
+		unless ($questionId > 0) { # terminate survey
+			return ();
 		}
 	} else {
-		($questionId) = WebGUI::SQL->quickArray("select Survey_questionId from Survey_question where Survey_responseId=$responseId
+		($questionId) = WebGUI::SQL->quickArray("select Survey_questionId from Survey_question where Survey_id=".$self->getValue("Survey_id")."
 			order by sequenceNumber");
 	}
 	push(@questions,$questionId);
@@ -682,6 +682,17 @@ sub www_editQuestion {
 		-value=>$question->{randomizeAnswers},
 		-label=>WebGUI::International::get(16,$_[0]->get("namespace"))
 		);
+	if ($_[0]->get("questionOrder") eq "response") {
+		my $ql = WebGUI::SQL->buildHashRef("select Survey_questionId,question 
+			from Survey_question where Survey_id=".$_[0]->get("Survey_id")." order by sequenceNumber");
+		$ql = { ('-1' => WebGUI::International::get(82,$_[0]->get("namespace")),%$ql) };
+		$f->select(
+			-name=>"gotoQuestion",
+			-options=>$ql,
+			-value=>[$question->{gotoQuestion}],
+			-label=>WebGUI::International::get(21,$_[0]->get("namespace"))
+			);
+	}
 	if ($question->{Survey_questionId} eq "new") {
 		my %options;
 		tie %options, 'Tie::IxHash';
@@ -730,6 +741,7 @@ sub www_editQuestionSave {
         	Survey_questionId=>$session{form}{qid},
 		Survey_id=>$_[0]->get("Survey_id"),
                 allowComment=>$session{form}{allowComment},
+		gotoQuestion=>$session{form}{gotoQuestion},
 		answerFieldType=>$session{form}{answerFieldType},
                 randomizeAnswers=>$session{form}{randomizeAnswers}
                 },1,0,"Survey_id");

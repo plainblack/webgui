@@ -635,6 +635,7 @@ WebGUI::SQL->write("alter table Survey add column reportcardTemplateId int not n
 WebGUI::SQL->write("alter table Survey add column overviewTemplateId int not null default 1");
 WebGUI::SQL->write("alter table Survey add column maxResponsesPerUser int not null default 1");
 WebGUI::SQL->write("alter table Survey add column questionsPerResponse int not null default 9999999");
+WebGUI::SQL->write("alter table Survey_question add column gotoQuestion int");
 
 #--------------------------------------------
 print "\tMigrating Navigation Macro's.\n" unless ($quiet);
