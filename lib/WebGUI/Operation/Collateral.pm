@@ -354,9 +354,10 @@ sub www_editCollateralFolderSave {
 		WebGUI::Session::setScratch("collateralFolderId",$session{form}{fid});
 		WebGUI::SQL->write("insert into collateralFolder (collateralFolderId) values ($session{form}{fid})");
 	}
+	my $folderId = $session{scratch}{collateralFolderId} || 0;
 	$session{form}{name} = "untitled" if ($session{form}{name} eq "");
 	while (my ($test) = WebGUI::SQL->quickArray("select name from collateralFolder
-                where name=".quote($session{form}{name})." and collateralFolderId<>$session{scratch}{collateralFolderId}")) {
+                where name=".quote($session{form}{name})." and collateralFolderId<>$folderId")) {
                 if ($session{form}{name} =~ /(.*)(\d+$)/) {
                         $session{form}{name} = $1.($2+1);
                 } elsif ($test ne "") {
@@ -365,7 +366,7 @@ sub www_editCollateralFolderSave {
         }
 	WebGUI::SQL->write("update collateralFolder set parentId=$session{form}{parentId}, name=".quote($session{form}{name})
 		.", description=".quote($session{form}{description})
-		." where collateralFolderId=$session{scratch}{collateralFolderId}");
+		." where collateralFolderId=$folderId");
 	return www_listCollateral();
 }
 
