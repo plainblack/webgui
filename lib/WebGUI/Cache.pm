@@ -22,6 +22,7 @@ eval " use Cache::FileCache; "; $hasCache=0 if $@;
 use HTTP::Headers;
 use HTTP::Request;
 use LWP::UserAgent;
+use WebGUI::ErrorHandler;
 use WebGUI::Session;
 
 
@@ -203,7 +204,11 @@ sub setByHTTP {
         $header->referer($referer);
         my $request = new HTTP::Request (GET => $_[1], $header);
         my $response = $userAgent->request($request);
-	$_[0]->set($response->content,$_[2]);
+	if ($response->is_error) {
+		WebGUI::ErrorHandler::warn($_[1]." could not be retrieved.");
+	} else {
+		$_[0]->set($response->content,$_[2]);
+	}
 	return $response->content;
 }
 
