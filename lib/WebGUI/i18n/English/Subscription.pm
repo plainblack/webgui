@@ -357,11 +357,11 @@ Description of the batch.<br>|,
 The description of the batch tied to the subscription code.<br>
 <br>
 <b>message</b><br>
-The message that gives the result of your action. Depending on what you've done is sais that you can enter a code, you've enterd the worong coe, or that you've successfully redeemed your code.<br>
+The message that gives the result of your action. Depending on what you've done it says that you can enter a code, you've entered the wrong code, or you've successfully redeemed your code.<br>
 <br>
 <b>codeForm</b>
 The form in which the user can enter his subscription code.<br>|,
-		lastUpdated => 0,
+		lastUpdated => 1101752050,
 		context => q|The body of the help page of the code redemption template.|
 	},
 	'help redeem code template title' => {
