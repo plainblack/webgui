@@ -201,7 +201,7 @@ sub _processOperations {
                 if ($session{form}{op} =~ /^[A-Za-z]+$/) {
                         $cmd = "WebGUI::Operation::www_".$session{form}{op};
                         $output = eval($cmd);
-                        WebGUI::ErrorHandler::security("call a non-existent operation: $session{form}{op}.") if($@);
+                        WebGUI::ErrorHandler::security("call a non-existent operation: $session{form}{op}. Root cause: ".$@) if($@);
                 } else {
                         WebGUI::ErrorHandler::security("execute an invalid operation: ".$session{form}{op});
                 }

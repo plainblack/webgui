@@ -101,6 +101,38 @@ delete from international where namespace='WebGUI' and internationalId=631;
 delete from help where namespace='WebGUI' and helpId=26;
 delete from help where namespace='WebGUI' and helpId=23;
 delete from help where namespace='WebGUI' and helpId=36;
+insert into international (internationalId,languageId,namespace,message,lastUpdated) values (790,1,'WebGUI','Delete this profile category.', 1036964807);
+insert into international (internationalId,languageId,namespace,message,lastUpdated) values (789,1,'WebGUI','Edit this profile category.', 1036964795);
+insert into international (internationalId,languageId,namespace,message,lastUpdated) values (788,1,'WebGUI','Delete this profile field.', 1036964681);
+insert into international (internationalId,languageId,namespace,message,lastUpdated) values (787,1,'WebGUI','Edit this profile field.', 1036964659);
+delete from settings where name='imageManagersGroup';
+delete from international where languageId=1 and namespace='WebGUI' and internationalId=586;
+insert into international (internationalId,languageId,namespace,message,lastUpdated) values (586,1,'WebGUI','Manage Translations', 1036971445);
+delete from international where languageId=1 and namespace='WebGUI' and internationalId=589;
+insert into international (internationalId,languageId,namespace,message,lastUpdated) values (589,1,'WebGUI','Edit Translation', 1036971172);
+delete from international where languageId=1 and namespace='WebGUI' and internationalId=598;
+insert into international (internationalId,languageId,namespace,message,lastUpdated) values (598,1,'WebGUI','Edit this translation.', 1036971142);
+delete from international where languageId=1 and namespace='WebGUI' and internationalId=584;
+insert into international (internationalId,languageId,namespace,message,lastUpdated) values (584,1,'WebGUI','Add a new translation.', 1036971092);
+delete from international where languageId=1 and namespace='WebGUI' and internationalId=718;
+insert into international (internationalId,languageId,namespace,message,lastUpdated) values (718,1,'WebGUI','Export this translation.', 1036970877);
+delete from international where languageId=1 and namespace='WebGUI' and internationalId=593;
+insert into international (internationalId,languageId,namespace,message,lastUpdated) values (593,1,'WebGUI','Submit this translation.', 1036970850);
+delete from international where languageId=1 and namespace='WebGUI' and internationalId=791;
+insert into international (internationalId,languageId,namespace,message,lastUpdated) values (791,1,'WebGUI','Delete this translation.', 1036970806);
+insert into international (internationalId,languageId,namespace,message,lastUpdated) values (802,1,'WebGUI','WebGUI is not currently tracking page statistics. You can enable this feature in the settings.', 1036979395);
+insert into international (internationalId,languageId,namespace,message,lastUpdated) values (801,1,'WebGUI','Wobject Interactions', 1036978843);
+insert into international (internationalId,languageId,namespace,message,lastUpdated) values (800,1,'WebGUI','Unique Visitors', 1036978829);
+insert into international (internationalId,languageId,namespace,message,lastUpdated) values (799,1,'WebGUI','Page Views', 1036978804);
+insert into international (internationalId,languageId,namespace,message,lastUpdated) values (798,1,'WebGUI','Page Title', 1036978688);
+insert into international (internationalId,languageId,namespace,message,lastUpdated) values (797,1,'WebGUI','View traffic statistics.', 1036978191);
+insert into international (internationalId,languageId,namespace,message,lastUpdated) values (796,1,'WebGUI','View page statistics.', 1036978043);
+insert into international (internationalId,languageId,namespace,message,lastUpdated) values (795,1,'WebGUI','Roots', 1036972103);
+insert into international (internationalId,languageId,namespace,message,lastUpdated) values (794,1,'WebGUI','Packages', 1036971944);
+insert into international (internationalId,languageId,namespace,message,lastUpdated) values (793,1,'WebGUI','Pieces of Collateral', 1036971785);
+insert into international (internationalId,languageId,namespace,message,lastUpdated) values (792,1,'WebGUI','Templates', 1036971696);
+
+
 
 
 

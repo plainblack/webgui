@@ -58,15 +58,17 @@ sub _export {
 sub _submenu {
         my (%menu);
         tie %menu, 'Tie::IxHash';
+	$menu{WebGUI::URL::page('op=editLanguage&lid=new')} = WebGUI::International::get(584);
 	if ($session{form}{lid} == 1) {
-		$menu{WebGUI::URL::page('op=addInternationalMessage&lid=1')} = "Add new message.";
+		$menu{WebGUI::URL::page('op=addInternationalMessage&lid=1')} = "Add a new message.";
 	}
-        if ($session{form}{lid} ne "") {
+        if ($session{form}{lid} ne "new" && $session{form}{lid} ne "") {
 		$menu{WebGUI::URL::page('op=listInternationalMessages&lid='.$session{form}{lid})} = 
 			WebGUI::International::get(594);
-		$menu{WebGUI::URL::page('op=editLanguage&lid='.$session{form}{lid})} = WebGUI::International::get(598);
 		$menu{WebGUI::URL::page('op=exportTranslation&lid='.$session{form}{lid})} = WebGUI::International::get(718);
 		$menu{WebGUI::URL::page('op=submitTranslation&lid='.$session{form}{lid})} = WebGUI::International::get(593);
+		$menu{WebGUI::URL::page('op=editLanguage&lid='.$session{form}{lid})} = WebGUI::International::get(598);
+		$menu{WebGUI::URL::page("op=deleteLanguage&lid=".$session{form}{lid})} = WebGUI::International::get(791);
         }
 	$menu{WebGUI::URL::page('op=listLanguages')} = WebGUI::International::get(585);
         return menuWrapper($_[0],\%menu);
@@ -103,20 +105,16 @@ sub www_addInternationalMessageSave {
 #-------------------------------------------------------------------
 sub www_deleteLanguage {
         my ($output);
-        if ($session{form}{lid} < 1000 && $session{form}{lid} > 0) {
-                return WebGUI::Privilege::vitalComponent();
-        } elsif (WebGUI::Privilege::isInGroup(3)) {
-                $output .= '<h1>'.WebGUI::International::get(42).'</h1>';
-                $output .= WebGUI::International::get(587).'<p>';
-                $output .= '<div align="center"><a href="'.
-                        WebGUI::URL::page('op=deleteLanguageConfirm&lid='.$session{form}{lid})
-                        .'">'.WebGUI::International::get(44).'</a>';
-                $output .= '&nbsp;&nbsp;&nbsp;&nbsp;<a href="'.WebGUI::URL::page('op=listLanguages').
-                        '">'.WebGUI::International::get(45).'</a></div>';
-                return $output;
-        } else {
-                return WebGUI::Privilege::adminOnly();
-        }
+        return WebGUI::Privilege::vitalComponent() if ($session{form}{lid} < 1000 && $session{form}{lid} > 0);
+        return WebGUI::Privilege::adminOnly() unless (WebGUI::Privilege::isInGroup(3));
+        $output .= '<h1>'.WebGUI::International::get(42).'</h1>';
+        $output .= WebGUI::International::get(587).'<p>';
+        $output .= '<div align="center"><a href="'.
+                WebGUI::URL::page('op=deleteLanguageConfirm&lid='.$session{form}{lid})
+                .'">'.WebGUI::International::get(44).'</a>';
+        $output .= '&nbsp;&nbsp;&nbsp;&nbsp;<a href="'.WebGUI::URL::page('op=listLanguages').
+                '">'.WebGUI::International::get(45).'</a></div>';
+        return _submenu($output);
 }
 
 #-------------------------------------------------------------------
@@ -125,8 +123,8 @@ sub www_deleteLanguageConfirm {
         return WebGUI::Privilege::vitalComponent() if ($session{form}{lid} < 1000 && $session{form}{lid} > 0);
         WebGUI::SQL->write("delete from language where languageId=".$session{form}{lid});
         WebGUI::SQL->write("delete from international where languageId=".$session{form}{lid});
-        WebGUI::SQL->write("delete from help where languageId=".$session{form}{lid});
         WebGUI::SQL->write("delete from userProfileData where fieldName='language' and fieldData=".$session{form}{lid});
+	$session{form}{lid} = "";
         return www_listLanguages();
 }
 
@@ -308,13 +306,9 @@ sub www_listLanguages {
 	tie %data, 'Tie::CPHash';
 	return WebGUI::Privilege::adminOnly() unless (WebGUI::Privilege::isInGroup(3));
 	$output = '<h1>'.WebGUI::International::get(586).'</h1>';
-	$output .= '<a href="'.WebGUI::URL::page('op=editLanguage&lid=new').'">'.WebGUI::International::get(584).'</a>';
-	$output .= '<p>';
 	$sth = WebGUI::SQL->read("select languageId,language from language where languageId<>1 order by language");
 	while (%data = $sth->hash) {
-		$output .= deleteIcon("op=deleteLanguage&lid=".$data{languageId})
-			.editIcon("op=editLanguage&lid=".$data{languageId})
-			.' '.$data{language}.'<br>';
+		$output .= '<a href="'.WebGUI::URL::page("op=editLanguage&lid=".$data{languageId}).'">'.$data{language}.'<br>';
 	}
 	$sth->finish;
        	return _submenu($output);
