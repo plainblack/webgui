@@ -253,8 +253,8 @@ sub www_editCommerceSettings {
 	
 	tie %tabs, 'Tie::IxHash';
  	%tabs = (
-       		general=>{label=>$i18n->get('general tab')},
         	payment=>{label=>$i18n->get('payment tab')},
+       		general=>{label=>$i18n->get('general tab')},
         );
 
 	$paymentPlugin = $session{config}{paymentPlugins}->[0];
