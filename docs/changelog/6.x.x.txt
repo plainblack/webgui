@@ -19,6 +19,7 @@
  - Bugfix [ 956219 ] can't delete survey question
  - Fixed a bug whhere after posting to a USS you were redirected to the forum
    for your new submission.
+ - Bugfix [ 952949 ] Survey Export Composite Fails
 
 
 

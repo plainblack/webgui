@@ -789,8 +789,9 @@ sub www_exportComposite {
 	return "" unless (WebGUI::Privilege::isInGroup($_[0]->get("groupToViewReports")));
 	$session{header}{filename} = WebGUI::URL::escape($_[0]->get("title")."_composite.tab");
 	$session{header}{mimetype} = "text/tab";
-	return WebGUI::SQL->quickTab("select b.question, a.response, a.userId, a.username, a.ipAddress, a.comment, 
-		a.dateOfResponse from Survey_response a left join Survey_question b on a.Survey_questionId=b.Survey_questionId 
+	return WebGUI::SQL->quickTab("select b.question, c.response, a.userId, a.username, a.ipAddress, c.comment, c.dateOfResponse from Survey_response a 
+		left join Survey_questionResponse c on a.Survey_responseId=c.Survey_responseId 
+		left join Survey_question b on c.Survey_questionId=b.Survey_questionId 
 		where a.Survey_id=".$_[0]->get("Survey_id")." order by a.userId, a.ipAddress, b.sequenceNumber");
 }
 
