@@ -177,13 +177,13 @@ Returns an array reference containing a list of post objects that are direct dec
 sub getReplies {
 	my ($self) = @_;
 	my @replies = ();
- 	my $query = "select forumPostId from forumPost where parentId=".$self->get("forumPostId")." and ";
+ 	my $query = "select forumPostId from forumPost where parentId=".quote($self->get("forumPostId"))." and ";
         if ($self->getThread->getForum->isModerator) {
                 $query .= "(status='approved' or status='pending' or status='denied'";
         } else {
                 $query .= "(status='approved'";
         }
-        $query .= " or userId=$session{user}{userId})  order by forumPostId";
+        $query .= " or userId=".quote($session{user}{userId}).")  order by forumPostId";
 	my $sth = WebGUI::SQL->read($query,WebGUI::SQL->getSlave);
 	while (my @data = $sth->array) {
 		push(@replies,WebGUI::Forum::Post->new($data[0]));
@@ -234,8 +234,8 @@ sub hasRated {
 	return 1 if ($userId != 1 && $userId == $self->get("userId")); # is poster
 	$ipAddress = $session{env}{REMOTE_ADDR} unless ($ipAddress);
 	my ($flag) = WebGUI::SQL->quickArray("select count(*) from forumPostRating where forumPostId="
-		.$self->get("forumPostId")." and ((userId=$userId and userId<>1) or (userId=1 and 
-		ipAddress='$ipAddress'))");
+		.quote($self->get("forumPostId"))." and ((userId=".quote($userId)." and userId<>1) or (userId=1 and 
+		ipAddress=".quote($ipAddress)."))");
 	return $flag;
 }
 
@@ -249,7 +249,7 @@ Increments the views counter for this post.
 
 sub incrementViews {
 	my ($self) = @_;
-	WebGUI::SQL->write("update forumPost set views=views+1 where forumPostId=".$self->get("forumPostId"));
+	WebGUI::SQL->write("update forumPost set views=views+1 where forumPostId=".quote($self->get("forumPostId")));
 	$self->getThread->incrementViews;
 }
 
@@ -272,7 +272,7 @@ A unique id for a user that you want to check. Defaults to the current user.
 sub isMarkedRead {
 	my ($self, $userId) = @_;
 	$userId = $session{user}{userId} unless ($userId);
-	my ($isRead) = WebGUI::SQL->quickArray("select count(*) from forumRead where userId=$userId and forumPostId=".$self->get("forumPostId"));
+	my ($isRead) = WebGUI::SQL->quickArray("select count(*) from forumRead where userId=".quote($userId)." and forumPostId=".quote($self->get("forumPostId")));
 	return $isRead;
 }
 
@@ -313,8 +313,8 @@ sub markRead {
 	my ($self, $userId) = @_;
 	$userId = $session{user}{userId} unless ($userId);
 	unless ($self->isMarkedRead($userId)) {
-		WebGUI::SQL->write("insert into forumRead (userId, forumPostId, forumThreadId, lastRead) values ($userId,
-			".$self->get("forumPostId").", ".$self->get("forumThreadId").", ".WebGUI::DateTime::time().")");
+		WebGUI::SQL->write("insert into forumRead (userId, forumPostId, forumThreadId, lastRead) values (".quote($userId).",
+			".quote($self->get("forumPostId")).", ".quote($self->get("forumThreadId")).", ".WebGUI::DateTime::time().")");
 	}
 	$self->incrementViews;
 }
@@ -374,7 +374,7 @@ sub rate {
 	$userId = $session{user}{userId} unless ($userId);
 	$ipAddress = $session{env}{REMOTE_ADDR} unless ($ipAddress);
 	WebGUI::SQL->write("insert into forumPostRating (forumPostId,userId,ipAddress,dateOfRating,rating) values ("
-		.$self->get("forumPostId").", $userId, ".quote($ipAddress).", ".WebGUI::DateTime::time().", $rating)");
+		.quote($self->get("forumPostId")).", ".quote($userId).", ".quote($ipAddress).", ".WebGUI::DateTime::time().", $rating)");
 	$self->recalculateRating;
 }
 
@@ -388,9 +388,9 @@ Recalculates the average rating of the post from all the ratings and stores the 
 
 sub recalculateRating {
 	my ($self) = @_;
-	my ($count) = WebGUI::SQL->quickArray("select count(*) from forumPostRating where forumPostId=".$self->get("forumPostId"));
+	my ($count) = WebGUI::SQL->quickArray("select count(*) from forumPostRating where forumPostId=".quote($self->get("forumPostId")));
         $count = $count || 1;
-        my ($sum) = WebGUI::SQL->quickArray("select sum(rating) from forumPostRating where forumPostId=".$self->get("forumPostId"));
+        my ($sum) = WebGUI::SQL->quickArray("select sum(rating) from forumPostRating where forumPostId=".quote($self->get("forumPostId")));
         my $average = round($sum/$count);
         $self->set({rating=>$average});
 	$self->getThread->recalculateRating;
@@ -472,7 +472,7 @@ sub setStatusDeleted {
 	$self->getThread->decrementReplies;
 	$self->getThread->setStatusDeleted if ($self->getThread->get("rootPostId") == $self->get("forumPostId"));
 	my ($id, $date) = WebGUI::SQL->quickArray("select forumPostId,dateOfPost from forumPost where forumThreadId="
-		.$self->get("forumThreadId")." and status='approved'");
+		.quote($self->get("forumThreadId"))." and status='approved'");
 	$self->getThread->setLastPost($date,$id);
 }
 
@@ -524,7 +524,7 @@ The unique id of the user marking unread. Defaults to the current user.
 sub unmarkRead {
 	my ($self, $userId) = @_;
 	$userId = $session{user}{userId} unless ($userId);
-	WebGUI::SQL->write("delete from forumRead where userId=$userId and forumPostId=".$self->get("forumPostId"));
+	WebGUI::SQL->write("delete from forumRead where userId=".quote($userId)." and forumPostId=".quote($self->get("forumPostId")));
 }
 
 1;

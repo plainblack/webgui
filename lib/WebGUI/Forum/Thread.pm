@@ -116,7 +116,7 @@ Decrements the replies counter for this thread.
 
 sub decrementReplies {
         my ($self) = @_;
-        WebGUI::SQL->write("update forumThread set replies=replies-1 where forumThreadId=".$self->get("forumThreadId"));
+        WebGUI::SQL->write("update forumThread set replies=replies-1 where forumThreadId=".quote($self->get("forumThreadId")));
 	$self->getForum->decrementReplies;
 }
 
@@ -171,8 +171,8 @@ Returns a thread object for the next (newer) thread in the same forum.
 sub getNextThread {
 	my ($self) = @_;
 	unless (exists $self->{_next}) {
-		my ($nextId) = WebGUI::SQL->quickArray("select min(forumThreadId) from forumThread where forumId=".$self->get("forumId")." 
-			and forumThreadId>".$self->get("forumThreadId"),WebGUI::SQL->getSlave);
+		my ($nextId) = WebGUI::SQL->quickArray("select min(lastPostDate) from forumThread where forumId=".quote($self->get("forumId"))." 
+			and lastPostDate>".quote($self->get("lastPostDate")),WebGUI::SQL->getSlave);
 		$self->{_next} = WebGUI::Forum::Thread->new($nextId);
 	}
 	return $self->{_next};
@@ -213,8 +213,8 @@ Returns a thread object for the previous (older) thread in the same forum.
 sub getPreviousThread {
 	my ($self) = @_;
 	unless (exists $self->{_previous}) {
-		my ($nextId) = WebGUI::SQL->quickArray("select max(forumThreadId) from forumThread where forumId=".$self->get("forumId")." 
-			and forumThreadId<".$self->get("forumThreadId"),WebGUI::SQL->getSlave);
+		my ($nextId) = WebGUI::SQL->quickArray("select max(lastPostDate) from forumThread where forumId=".quote($self->get("forumId"))." 
+			and lastPostDate<".quote($self->get("lastPostDate")),WebGUI::SQL->getSlave);
 		$self->{_previous} = WebGUI::Forum::Thread->new($nextId);
 	}
 	return $self->{_previous};
@@ -255,8 +255,8 @@ The id of the reply that caused the replies counter to be incremented.
 
 sub incrementReplies {
         my ($self, $dateOfReply, $replyId) = @_;
-        WebGUI::SQL->write("update forumThread set replies=replies+1, lastPostId=$replyId, lastPostDate=$dateOfReply 
-		where forumThreadId=".$self->get("forumThreadId"));
+        WebGUI::SQL->write("update forumThread set replies=replies+1, lastPostId=".quote($replyId).", lastPostDate=$dateOfReply 
+		where forumThreadId=".quote($self->get("forumThreadId")));
 	$self->getForum->incrementReplies($dateOfReply,$replyId);
 }
 
@@ -270,7 +270,7 @@ Increments the views counter for this thread.
 
 sub incrementViews {
         my ($self) = @_;
-        WebGUI::SQL->write("update forumThread set views=views+1 where forumThreadId=".$self->get("forumThreadId"));
+        WebGUI::SQL->write("update forumThread set views=views+1 where forumThreadId=".quote($self->get("forumThreadId")));
 	$self->getForum->incrementViews;
 }
                                                                                                                                                              
@@ -306,8 +306,8 @@ The unique id of the user to check. Defaults to the current user.
 sub isSubscribed {
 	my ($self, $userId) = @_;
 	$userId = $session{user}{userId} unless ($userId);
-	my ($isSubscribed) = WebGUI::SQL->quickArray("select count(*) from forumThreadSubscription where forumThreadId=".$self->get("forumThreadId")
-		." and userId=$userId");
+	my ($isSubscribed) = WebGUI::SQL->quickArray("select count(*) from forumThreadSubscription where forumThreadId=".quote($self->get("forumThreadId"))
+		." and userId=".quote($userId));
 	return $isSubscribed;
 }
 
@@ -360,9 +360,9 @@ Recalculates the average rating of this thread based upon all of the posts in th
 
 sub recalculateRating {
 	my ($self) = @_;
-        my ($count) = WebGUI::SQL->quickArray("select count(*) from forumPost where forumThreadId=".$self->get("forumThreadId")." and rating>0");
+        my ($count) = WebGUI::SQL->quickArray("select count(*) from forumPost where forumThreadId=".quote($self->get("forumThreadId"))." and rating>0");
         $count = $count || 1;
-        my ($sum) = WebGUI::SQL->quickArray("select sum(rating) from forumPost where forumThreadId=".$self->get("forumThreadId")." and rating>0");
+        my ($sum) = WebGUI::SQL->quickArray("select sum(rating) from forumPost where forumThreadId=".quote($self->get("forumThreadId"))." and rating>0");
         my $average = round($sum/$count);
         $self->set({rating=>$average});
 	$self->getForum->recalculateRating;
@@ -521,7 +521,7 @@ sub subscribe {
 	my ($self, $userId) = @_;
 	$userId = $session{user}{userId} unless ($userId);
 	unless ($self->isSubscribed($userId)) {
-		WebGUI::SQL->write("insert into forumThreadSubscription (forumThreadId, userId) values (".$self->get("forumThreadId").",$userId)");
+		WebGUI::SQL->write("insert into forumThreadSubscription (forumThreadId, userId) values (".quote($self->get("forumThreadId")).",".quote($userId).")");
 	}
 }
 
@@ -571,7 +571,7 @@ sub unsubscribe {
 	my ($self, $userId) = @_;
 	$userId = $session{user}{userId} unless ($userId);
 	if ($self->isSubscribed($userId)) {
-		WebGUI::SQL->write("delete from forumThreadSubscription where forumThreadId=".$self->get("forumThreadId")." and userId=$userId");
+		WebGUI::SQL->write("delete from forumThreadSubscription where forumThreadId=".quote($self->get("forumThreadId"))." and userId=".quote($userId));
 	}
 }
 

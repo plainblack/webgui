@@ -25,6 +25,7 @@ use WebGUI::DateTime;
 use WebGUI::Grouping;
 use WebGUI::HTMLForm;
 use WebGUI::Icon;
+use WebGUI::Id;
 use WebGUI::International;
 use WebGUI::Operation::Shared;
 use WebGUI::Paginator;
@@ -140,7 +141,7 @@ sub www_emptyCollateralFolder {
 sub www_emptyCollateralFolderConfirm {
         return WebGUI::Privilege::insufficient unless (WebGUI::Grouping::isInGroup(3));
 	return WebGUI::Privilege::vitalComponent() unless ($session{scratch}{collateralFolderId} > 999);
-	my @collateralIds = WebGUI::SQL->buildArray("select collateralId from collateral where collateralFolderId=".$session{scratch}{collateralFolderId});
+	my @collateralIds = WebGUI::SQL->buildArray("select collateralId from collateral where collateralFolderId=".quote($session{scratch}{collateralFolderId}));
 	WebGUI::Collateral->multiDelete(@collateralIds);
         return www_listCollateral();
 }
@@ -309,7 +310,7 @@ sub www_editCollateralSave {
        	$collateral->save("filename", $session{form}{thumbnailSize});
 	$session{form}{name} = "untitled" if ($session{form}{name} eq "");
         while (($test) = WebGUI::SQL->quickArray("select name from collateral 
-		where name=".quote($session{form}{name})." and collateralId<>".$collateral->get("collateralId"))) {
+		where name=".quote($session{form}{name})." and collateralId<>".quote($collateral->get("collateralId")))) {
         	if ($session{form}{name} =~ /(.*)(\d+$)/) {
                 	$session{form}{name} = $1.($2+1);
         	} elsif ($test ne "") {
@@ -331,8 +332,8 @@ sub www_editCollateralFolder {
 		$folder->{parentId} = $session{scratch}{collateralFolderId} || 0;
 	} else {
 		$folderId = $session{scratch}{collateralFolderId} || 0;
-		$folder = WebGUI::SQL->quickHashRef("select * from collateralFolder where collateralFolderId=$folderId");
-		$constraint = "where collateralFolderId<>".$folder->{collateralFolderId};
+		$folder = WebGUI::SQL->quickHashRef("select * from collateralFolder where collateralFolderId=".quote($folderId));
+		$constraint = "where collateralFolderId<>".quote($folder->{collateralFolderId});
 	}
 	$f = WebGUI::HTMLForm->new;
 	$f->hidden("op","editCollateralFolderSave");
@@ -371,23 +372,23 @@ sub www_editCollateralFolder {
 sub www_editCollateralFolderSave {
 	return WebGUI::Privilege::insufficient unless (WebGUI::Grouping::isInGroup(4));
 	if ($session{form}{fid} eq "new") {
-		$session{form}{fid} = getNextId("collateralFolderId");
+		$session{form}{fid} = WebGUI::Id::generate();
 		WebGUI::Session::setScratch("collateralFolderId",$session{form}{fid});
-		WebGUI::SQL->write("insert into collateralFolder (collateralFolderId) values ($session{form}{fid})");
+		WebGUI::SQL->write("insert into collateralFolder (collateralFolderId) values (".quote($session{form}{fid}).")");
 	}
 	my $folderId = $session{scratch}{collateralFolderId} || 0;
 	$session{form}{name} = "untitled" if ($session{form}{name} eq "");
 	while (my ($test) = WebGUI::SQL->quickArray("select name from collateralFolder
-                where name=".quote($session{form}{name})." and collateralFolderId<>$folderId")) {
+                where name=".quote($session{form}{name})." and collateralFolderId<>".quote($folderId))) {
                 if ($session{form}{name} =~ /(.*)(\d+$)/) {
                         $session{form}{name} = $1.($2+1);
                 } elsif ($test ne "") {
                         $session{form}{name} .= "2";
                 }
         }
-	WebGUI::SQL->write("update collateralFolder set parentId=$session{form}{parentId}, name=".quote($session{form}{name})
+	WebGUI::SQL->write("update collateralFolder set parentId=".quote($session{form}{parentId}).", name=".quote($session{form}{name})
 		.", description=".quote($session{form}{description})
-		." where collateralFolderId=$folderId");
+		." where collateralFolderId=".quote($folderId));
 	return www_listCollateral();
 }
 
@@ -449,15 +450,14 @@ sub www_listCollateral {
 		.'</td><td class="tableHeader">'.WebGUI::International::get(388).'</td><td class="tableHeader">'
 		.WebGUI::International::get(784).'</td></tr>';
 	if ($folderId) {
-		($parent) = WebGUI::SQL->quickArray("select parentId from collateralFolder 
-			where collateralFolderId=$folderId");
+		($parent) = WebGUI::SQL->quickArray("select parentId from collateralFolder where collateralFolderId=".quote($folderId));
 		$output .= '<tr><td colspan="5" class="tableData"><a href="'.WebGUI::URL::page('op=listCollateral&fid='
 			.$parent.'&pn=1')
                         .'"><img src="'.$session{config}{extrasURL}.'/smallAttachment.gif" border="0">'
                         .'&nbsp;'.WebGUI::International::get(542).'</a></td></tr>';
 	}
 	$sth = WebGUI::SQL->read("select collateralFolderId, name, description from collateralFolder 
-		where parentId=$folderId and collateralFolderId<>0 order by name");
+		where parentId=".quote($folderId)." and collateralFolderId<>0 order by name");
 	while ($data = $sth->hashRef) {
 		$output .= '<tr><td class="tableData"><a href="'.WebGUI::URL::page('op=listCollateral&fid='
 			.$data->{collateralFolderId}.'&pn=1')
@@ -528,15 +528,15 @@ sub www_htmlArealistCollateral {
 	# push parent folders in array so it can be reversed
 	unshift(@parents, $parent);
 	until($parent == 0) {
-		($parent) = WebGUI::SQL->quickArray("select parentId from collateralFolder where collateralFolderId=$parent");
+		($parent) = WebGUI::SQL->quickArray("select parentId from collateralFolder where collateralFolderId=".quote($parent));
 		unshift(@parents, $parent);
 	}
 	# Build tree for opened parent folders
 	foreach $parent (@parents) { 
 		my ($name, $description) = WebGUI::SQL->quickArray("select name, description from 
-							collateralFolder where collateralFolderId=$parent");
-		my ($itemsInFolder) = WebGUI::SQL->quickArray("select count(*) from collateral where collateralFolderId = $parent");
-		my ($foldersInFolder)=WebGUI::SQL->quickArray("select count(*) from collateralFolder where parentId=$parent");
+							collateralFolder where collateralFolderId=".quote($parent));
+		my ($itemsInFolder) = WebGUI::SQL->quickArray("select count(*) from collateral where collateralFolderId = ".quote($parent));
+		my ($foldersInFolder)=WebGUI::SQL->quickArray("select count(*) from collateralFolder where parentId=".quote($parent));
 		my $delete = "fid=$parent" unless ($itemsInFolder + $foldersInFolder);
 		$output .= _htmlAreaCreateTree($name, $description, 
 				WebGUI::URL::page('op=htmlArealistCollateral&fid='.$parent), "opened.gif", 
@@ -544,10 +544,10 @@ sub www_htmlArealistCollateral {
 	}
 	# Extend tree with closed folders in current folder
 	$sth = WebGUI::SQL->read("select collateralFolderId, name, description from collateralFolder
-		                  where parentId=$folderId and collateralFolderId<>0 order by name");
+		                  where parentId=".quote($folderId)." and collateralFolderId<>0 order by name");
         while ($data = $sth->hashRef) { 
 		my ($itemsInFolder) = WebGUI::SQL->quickArray("select count(*) from collateral where 
-							collateralFolderId = ".$data->{collateralFolderId});
+							collateralFolderId = ".quote($data->{collateralFolderId}));
 		my $delete = 'fid='.$data->{collateralFolderId} unless $itemsInFolder;
 		$output .= _htmlAreaCreateTree($data->{name}, $data->{description}, 
 					WebGUI::URL::page('op=htmlArealistCollateral&fid='.$data->{collateralFolderId}), 
@@ -555,7 +555,7 @@ sub www_htmlArealistCollateral {
         }
 	# Extend tree with images in current folder
 	$sth = WebGUI::SQL->read("select collateralId, name, filename from collateral where collateralType = 'image' ".
-                                 "and collateralFolderId = $folderId");
+                                 "and collateralFolderId = ".quote($folderId));
 	while ($data = $sth->hashRef) {
 		$data->{filename} =~ /\.([^\.]+)$/; # Get extension
 		my $fileType = $1.'.gif';
@@ -621,7 +621,7 @@ sub www_htmlAreaUpload {
         $collateral->save("image", $session{form}{thumbnailSize});
         $session{form}{name} = "untitled" if ($session{form}{name} eq "");
         while (($test) = WebGUI::SQL->quickArray("select name from collateral
-                where name=".quote($session{form}{name})." and collateralId<>".$collateral->get("collateralId"))) {
+                where name=".quote($session{form}{name})." and collateralId<>".quote($collateral->get("collateralId")))) {
                 if ($session{form}{name} =~ /(.*)(\d+$)/) {
                         $session{form}{name} = $1.($2+1);
                 } elsif ($test ne "") {
@@ -642,9 +642,8 @@ sub www_htmlAreaDelete {
         	$collateral->delete;
 	} elsif($session{form}{fid} and not($session{form}{cid})) {
 		return WebGUI::Privilege::vitalComponent() unless ($session{form}{fid} > 999);
-	        my ($parent) = WebGUI::SQL->quickArray("select parentId from collateralFolder
-        	        where collateralFolderId=".$session{form}{fid});
-	        WebGUI::SQL->write("delete from collateralFolder where collateralFolderId=".$session{form}{fid});
+	        my ($parent) = WebGUI::SQL->quickArray("select parentId from collateralFolder where collateralFolderId=".quote($session{form}{fid}));
+	        WebGUI::SQL->write("delete from collateralFolder where collateralFolderId=".quote($session{form}{fid}));
 		$session{form}{fid}=$parent;	
 	}	
         return www_htmlArealistCollateral();
@@ -654,23 +653,22 @@ sub www_htmlAreaDelete {
 sub www_htmlAreaCreateFolder {
         $session{page}{makePrintable}=1; $session{page}{printableStyleId}=10;
 	return "<b>Only Content Managers are allowed to use WebGUI Collateral</b>" unless (WebGUI::Grouping::isInGroup(4));
-        $session{form}{fid} = getNextId("collateralFolderId");
+        $session{form}{fid} = WebGUI::Id::generate();
         WebGUI::Session::setScratch("collateralFolderId",$session{form}{fid});
-        WebGUI::SQL->write("insert into collateralFolder (collateralFolderId) values ($session{form}{fid})");
+        WebGUI::SQL->write("insert into collateralFolder (collateralFolderId) values (".quote($session{form}{fid}).")");
         my $folderId = $session{scratch}{collateralFolderId} || 0;
 	$session{form}{name} = $session{form}{folder};
         $session{form}{name} = "untitled" if ($session{form}{name} eq "");
         while (my ($test) = WebGUI::SQL->quickArray("select name from collateralFolder
-                where name=".quote($session{form}{name})." and collateralFolderId<>$folderId")) {
+                where name=".quote($session{form}{name})." and collateralFolderId<>".quote($folderId))) {
                 if ($session{form}{name} =~ /(.*)(\d+$)/) {
                         $session{form}{name} = $1.($2+1);
                 } elsif ($test ne "") {
                         $session{form}{name} .= "2";
                 }
         }
-        WebGUI::SQL->write("update collateralFolder set parentId=$session{form}{path}, name=".quote($session{form}{name})
-                .", description=".quote($session{form}{description})
-                ." where collateralFolderId=$folderId");
+        WebGUI::SQL->write("update collateralFolder set parentId=".quote($session{form}{path}).", name=".quote($session{form}{name})
+                .", description=".quote($session{form}{description})." where collateralFolderId=".quote($folderId));
 	$session{form}{fid} = $session{form}{path};
         return www_htmlArealistCollateral();
 }

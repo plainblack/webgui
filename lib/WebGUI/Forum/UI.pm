@@ -26,6 +26,7 @@ use WebGUI::HTTP;
 use WebGUI::MessageLog;
 use WebGUI::Search;
 use WebGUI::Session;
+use WebGUI::SQL;
 use WebGUI::Template;
 use WebGUI::User;
 
@@ -1363,12 +1364,12 @@ A hash reference containing information passed from the calling object.
 sub notifySubscribers {
         my ($post, $thread, $forum, $caller) = @_;
 	my %subscribers;
-        my $sth = WebGUI::SQL->read("select userId from forumThreadSubscription where forumThreadId=".$thread->get("forumThreadId"));
+        my $sth = WebGUI::SQL->read("select userId from forumThreadSubscription where forumThreadId=".quote($thread->get("forumThreadId")));
 	while (my ($userId) = $sth->array) { 
 		$subscribers{$userId} = $userId unless ($userId == $post->get("userId"));	# make sure we don't send unnecessary messages 
 	}
         $sth->finish;
-        $sth = WebGUI::SQL->read("select userId from forumSubscription where forumId=".$forum->get("forumId"));
+        $sth = WebGUI::SQL->read("select userId from forumSubscription where forumId=".quote($forum->get("forumId")));
 	while (my ($userId) = $sth->array) { 
 		$subscribers{$userId} = $userId unless ($userId == $post->get("userId"));	# make sure we don't send unnecessary messages 
 	}

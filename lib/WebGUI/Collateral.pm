@@ -16,6 +16,7 @@ package WebGUI::Collateral;
 
 use WebGUI::Attachment;
 use WebGUI::DateTime;
+use WebGUI::Id;
 use WebGUI::Session;
 use WebGUI::SQL;
 use WebGUI::Utility;
@@ -72,9 +73,9 @@ Delete's this collateral item.
 =cut
 
 sub delete {
-	if ($_[0]->{_properties}->{collateralId} > 0) { # blocks deletion of all collateral in the event that no valid collateral id exists
+	if ($_[0]->{_properties}->{collateralId}) { # blocks deletion of all collateral in the event that no valid collateral id exists
         	$_[0]->deleteNode;
-		WebGUI::SQL->write("delete from collateral where collateralId=".$_[0]->get("collateralId"));
+		WebGUI::SQL->write("delete from collateral where collateralId=".quote($_[0]->get("collateralId")));
 	}
 }
 
@@ -89,7 +90,7 @@ Deletes the file attached to this collateral item.
 
 sub deleteFile {
         $_[0]->SUPER::delete;
-	WebGUI::SQL->write("update collateral set filename='' where collateralId=".$_[0]->get("collateralId"));
+	WebGUI::SQL->write("update collateral set filename='' where collateralId=".quote($_[0]->get("collateralId")));
 	$_[0]->{_properties}{filename}='';
 }
 
@@ -161,7 +162,7 @@ sub new {
 	my $properties;
 	if ($collateralId eq "new") {
 		$properties = {
-			collateralId=>getNextId("collateralId"),
+			collateralId=>WebGUI::Id::generate(),
 			collateralFolderId=>0,
 			collateralType=>"image",
 			userId=>$session{user}{userId},
@@ -171,12 +172,12 @@ sub new {
 			username=>$session{user}{username}
 			};
 		WebGUI::SQL->write("insert into collateral (collateralId, collateralFolderId, collateraltype, userId,
-			dateUploaded, thumbnailSize, name, username) values ( ".$properties->{collateralId}.",
-			".$properties->{collateralFolderId}.", ".quote($properties->{collateralType}).", 
-			".$properties->{userId}.", ".$properties->{dateUploaded}.", ".$properties->{thumbnailSize}.",
+			dateUploaded, thumbnailSize, name, username) values ( ".quote($properties->{collateralId}).",
+			".quote($properties->{collateralFolderId}).", ".quote($properties->{collateralType}).", 
+			".quote($properties->{userId}).", ".$properties->{dateUploaded}.", ".$properties->{thumbnailSize}.",
 			".quote($properties->{name}).", ".quote($properties->{username}).")");
-	} elsif ($collateralId > 0) {
-		$properties = WebGUI::SQL->quickHashRef("select * from collateral where collateralId=".$collateralId);
+	} else {
+		$properties = WebGUI::SQL->quickHashRef("select * from collateral where collateralId=".quote($collateralId));
 	}
         return $class->_new($properties);
 }
@@ -209,7 +210,7 @@ sub multiDelete {
           $obj->deleteNode();
      }
 
-     my $clause = "collateralId in (".join(',',@ids).")";
+     my $clause = "collateralId in (".quoteAndJoin(\@ids).")";
      WebGUI::SQL->write("delete from collateral where $clause");
 }
 
@@ -227,7 +228,7 @@ sub multiNew {
 
      my (@objs);
 
-     my $clause = "collateralId in (".join(',',@collateralIds).")";
+     my $clause = "collateralId in (".quoteAndJoin(\@collateralIds).")";
      my $sth = WebGUI::SQL->read("select * from collateral where $clause");
 
      while (my $hash = $sth->hashRef()) {
@@ -271,7 +272,7 @@ sub set {
                 }
         }
         $sql .= " dateUploaded=".$self->{_properties}{dateUploaded}."
-                where collateralid=".$self->get("collateralId");
+                where collateralid=".quote($self->get("collateralId"));
         WebGUI::SQL->write($sql);
 }
 
@@ -282,7 +283,7 @@ sub save {
 	my $filename = $_[0]->SUPER::save($_[1],$_[2],$_[3]);
 	if ($filename) {
 		WebGUI::SQL->write("update collateral set filename=".quote($filename)
-			." where collateralId=".$_[0]->get("collateralId"));
+			." where collateralId=".quote($_[0]->get("collateralId")));
 		$_[0]->{_properties}{filename} = $filename;
 	}
 	return $filename;
@@ -294,7 +295,7 @@ sub saveFromFilesystem {
         my $filename = $_[0]->SUPER::saveFromFilesystem($_[1],$_[2],$_[3]);
         if ($filename) {
                 WebGUI::SQL->write("update collateral set filename=".quote($filename)
-                        ." where collateralId=".$_[0]->get("collateralId"));
+                        ." where collateralId=".quote($_[0]->get("collateralId")));
 		$_[0]->{_properties}{filename} = $filename;
         }
         return $filename;
