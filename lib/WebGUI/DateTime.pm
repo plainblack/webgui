@@ -302,20 +302,19 @@ sub getMonthName {
 
 sub getDayName {
 	my $day = $_[0];
-	$day++;
-        if ($day == 1) {
+        if ($day == 7) {
                 return WebGUI::International::get(27);
-        } elsif ($day == 2) {
+        } elsif ($day == 1) {
                 return WebGUI::International::get(28);
-        } elsif ($day == 3) {
+        } elsif ($day == 2) {
                 return WebGUI::International::get(29);
-        } elsif ($day == 4) {
+        } elsif ($day == 3) {
                 return WebGUI::International::get(30);
-        } elsif ($day == 5) {
+        } elsif ($day == 4) {
                 return WebGUI::International::get(31);
-        } elsif ($day == 6) {
+        } elsif ($day == 5) {
                 return WebGUI::International::get(32);
-        } elsif ($day == 7) {
+        } elsif ($day == 6) {
                 return WebGUI::International::get(33);
         }
 }
