@@ -23,7 +23,7 @@ our @EXPORT = qw(&menuWrapper);
 #-------------------------------------------------------------------
  sub accountOptions {
 	my @array;
-	if (WebGUI::Privilege::isInGroup(5)) {
+	if (WebGUI::Privilege::isInGroup(12)) {
 		my %hash;
 		if ($session{var}{adminOn}) {
 			$hash{'options.display'} .= '<a href="'.WebGUI::URL::page('op=switchOffAdmin').'">'.WebGUI::International::get(12).'</a>';
