@@ -1164,7 +1164,7 @@ sub getLineage {
 	}
 	# we need to include children
 	if (isIn("children",@{$relatives})) {
-		push(@whereModifiers,"(parentId=".quote($self->getId).")");
+		push(@whereModifiers,"(asset.parentId=".quote($self->getId).")");
 	}
 	# now lets add in all of the siblings in every level between ourself and the asset we wish to pedigree
 	if (isIn("pedigree",@{$relatives}) && exists $rules->{assetToPedigree}) {
