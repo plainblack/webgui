@@ -203,7 +203,7 @@ sub formatHeader {
 		<a href="'.WebGUI::URL::page('op=viewProfile&uid='.$_[1]).'">'.$_[2].'</a><br>' if ($_[1] && $_[2] ne "");
         $output .= "<b>".WebGUI::International::get(239)."</b> ".epochToHuman($_[3],"%z %Z")."<br>" if ($_[3]);
 	$output .= "<b>".WebGUI::International::get(514).":</b> ".$_[4]."<br>" if ($_[4]);
-	$output .= "<b>".WebGUI::International::get(553).":</b> ".$_[6]."<br>" if ($_[6]);
+	$output .= "<b>".WebGUI::International::get(553).":</b> ".status($_[6])."<br>" if ($_[6]);
 	return $output;
 }
 
@@ -347,8 +347,9 @@ sub postSave {
          	       subscribeToThread($session{user}{userId},$rid);
         	}
 	} elsif ($_[0]->get("addEditStampToPosts")) {
-		$session{form}{message} = "\n --- (Edited at ".epochToHuman(time())." by $session{user}{username}) --- \n\n"
-			.$session{form}{message};
+		$session{form}{message} = "\n --- (".WebGUI::International::get(525,"Discussion")." "
+			.epochToHuman(time())." ".WebGUI::International::get(526,"Discussion")
+			." $session{user}{username}) --- \n\n".$session{form}{message};
 	}
 	WebGUI::SQL->write("update discussion set subject=".quote($session{form}{subject}).", 
 		message=".quote($session{form}{message}).", dateOfPost=".time()." where messageId=$session{form}{mid}");
