@@ -356,7 +356,7 @@ sub www_view {
 	if ($board{processMacros}) {
 		$html = WebGUI::Macro::process($html);
 	}
-	$html .= '<table width="100%" cellpadding=3 cellspacing=0 border=0><tr>'.
+	$html .= '<table width="100%" cellpadding=2 cellspacing=1 border=0><tr>'.
 		'<td align="right" valign="bottom" class="tableMenu"><a href="'.
 		WebGUI::URL::page('func=postNewMessage&wid='.$_[0]).'">'.
 		WebGUI::International::get(17,$namespace).'</a></td></tr></table>';
@@ -386,14 +386,14 @@ sub www_view {
 	if ($i > $itemsPerPage) {
         	$html .= '<div class="pagination">';
         	if ($pn > 0) {
-                	$html .= '<a href="'.WebGUI::URL::page('?pn='.($pn-1)).'">&laquo;'.
+                	$html .= '<a href="'.WebGUI::URL::page('pn='.($pn-1)).'">&laquo;'.
 				WebGUI::International::get(91).'</a>';
         	} else {
                 	$html .= '&laquo;'.WebGUI::International::get(91);
         	}
         	$html .= ' &middot; ';
         	if (($pn+1) < round(($i/$itemsPerPage))) {
-        		$html .= '<a href="'.WebGUI::URL::page('?pn='.($pn+1)).'">'.
+        		$html .= '<a href="'.WebGUI::URL::page('pn='.($pn+1)).'">'.
 				WebGUI::International::get(92).'&raquo;</a>';
         	} else {
         		$html .= WebGUI::International::get(92).'&raquo;';

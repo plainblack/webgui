@@ -280,14 +280,19 @@ sub www_deleteDownloadConfirm {
 
 #-------------------------------------------------------------------
 sub www_download {
-	my (%download);
+	my (%download, $url);
 	tie %download,'Tie::CPHash';
 	%download = WebGUI::SQL->quickHash("select * from DownloadManager_file where downloadId=$session{form}{did}");
 	if (WebGUI::Privilege::isInGroup($download{groupToView})) {
-		$session{header}{redirect} = WebGUI::Session::httpRedirect(
-			$session{setting}{attachmentDirectoryWeb}."/".
-			$session{form}{wid}."/".$session{form}{did}."/".$download{downloadFile}
-			);
+		$url = $session{setting}{attachmentDirectoryWeb}."/".$session{form}{wid}."/".$session{form}{did}."/";
+		if ($session{form}{alternateVersion} == 1) {
+			$url .= $download{alternateVersion1};
+		} elsif ($session{form}{alternateVersion} == 2) {
+			$url .= $download{alternateVersion2};
+		} else {
+			$url .= $download{downloadFile};
+		}
+		$session{header}{redirect} = WebGUI::Session::httpRedirect($url);
 		return "";
 	} else {
 		return WebGUI::Privilege::insufficient();
@@ -566,14 +571,16 @@ sub www_view {
 				if ($download{alternateVersion1}) {
 					%fileType = WebGUI::Attachment::getType($download{alternateVersion1});
                                 	$row[$i] .= ' &middot; <a href="'.WebGUI::URL::page('func=download&wid='.
-						$_[0].'&did='.$download{downloadId}).'"><img src="'.$fileType{icon}.
+						$_[0].'&did='.$download{downloadId}.'&alternateVersion=1')
+						.'"><img src="'.$fileType{icon}.
                                         	'" border=0 width=16 height=16 align="middle">('.
                                         	$fileType{extension}.')</a>';
 				}
 				if ($download{alternateVersion2}) {
 					%fileType = WebGUI::Attachment::getType($download{alternateVersion2});
                                 	$row[$i] .= ' &middot; <a href="'.WebGUI::URL::page('func=download&wid='.
-						$_[0].'&did='.$download{downloadId}).'"><img src="'.$fileType{icon}.
+						$_[0].'&did='.$download{downloadId}.'&alternateVersion=2')
+						.'"><img src="'.$fileType{icon}.
                                         	'" border=0 width=16 height=16 align="middle">('.
                                         	$fileType{extension}.')</a>';
 				}

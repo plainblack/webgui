@@ -9,11 +9,11 @@ save you many hours of grief.
 
 3.2.1
 --------------------------------------------------------------------
- * We released a faulty upgrade script with 3.2.0. If happened to be 
-	one of the unlucky people who upgraded to 3.2.0, apply 3.2.1
-	immediately. If you didn't upgrade to 3.2.0 then all your
-	upgrades will appear normal. If you installed 3.2.0 from
-	scratch then DO NOT EVER apply the 3.2.1 upgrade!
+ * We released a faulty upgrade script with 3.2.0. If you happened 
+	to be one of the unlucky people who upgraded to 3.2.0, apply 
+	3.2.1 immediately. If you didn't upgrade to 3.2.0 then all 
+	your upgrades will appear normal. If you installed 3.2.0 
+	from scratch then DO NOT EVER apply the 3.2.1 upgrade!
 
 3.2.0
 --------------------------------------------------------------------

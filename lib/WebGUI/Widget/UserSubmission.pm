@@ -401,7 +401,7 @@ sub www_view {
 			$i++;
 		}
 		$sth->finish;
-		$output .= '<table width="100%" cellpadding=3 cellspacing=0 border=0><tr>'.
+		$output .= '<table width="100%" cellpadding=2 cellspacing=1 border=0><tr>'.
 			'<td align="right" class="tableMenu"><a href="'.WebGUI::URL::page('func=addSubmission&wid='.
 			$_[0]).'">'.WebGUI::International::get(20,$namespace).'</a></td></tr></table>';
                 ($dataRows, $prevNextBar) = paginate($data{submissionsPerPage},WebGUI::URL::page(),\@row);

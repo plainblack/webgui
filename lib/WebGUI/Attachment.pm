@@ -71,7 +71,8 @@ sub getType {
                 $icon = $session{setting}{lib}."/fileIcons/html.gif";
         } elsif ($extension eq "html" || $extension eq "htm" || $extension eq "xml") {
                 $icon = $session{setting}{lib}."/fileIcons/html.gif";
-        } elsif ($extension eq "rar" || $extension eq "tar" || $extension eq "gz" || $extension eq "Z") {
+        } elsif ($extension eq "rar" || $extension eq "tgz" || $extension eq "tar.gz" || 
+		$extension eq "tar" || $extension eq "gz" || $extension eq "Z") {
                 $icon = $session{setting}{lib}."/fileIcons/rar.gif";
         } elsif ($extension eq "mdb") {
                 $icon = $session{setting}{lib}."/fileIcons/mdb.gif";

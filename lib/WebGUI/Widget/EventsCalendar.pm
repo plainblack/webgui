@@ -28,7 +28,7 @@ use WebGUI::Widget;
 
 #-------------------------------------------------------------------
 sub _calendarLayout {
-	my ($thisMonth, $calendar, $start, $end, $sth, %event, $nextDate); 
+	my ($thisMonth, $calendar, $message, $start, $end, $sth, %event, $nextDate); 
         $thisMonth = epochToHuman($_[1],"%M %y");
         $calendar = new HTML::CalendarMonthSimple('year'=>epochToHuman($_[1],"%y"),'month'=>epochToHuman($_[1],"%M"));
         $calendar->width("100%");
@@ -41,18 +41,19 @@ sub _calendarLayout {
         while (%event = $sth->hash) {
         	if (epochToHuman($event{startDate},"%M %y") eq $thisMonth ||
                 	epochToHuman($event{endDate},"%M %y") eq $thisMonth) {
+			$message = $event{name};
+			if ($event{description}) {
+				$message = '<a href=\'javascript:popUp("'.$event{description}.'");\'>'.
+					$message.'</a>';
+			}
+			$message .= '<br>';
                         if ($event{startDate} == $event{endDate}) {
-                        	$calendar->addcontent(epochToHuman($event{startDate},"%D"),
-                        		'<a href=\'javascript:popUp("'.$event{description}.'");\'>'.
-                                        $event{name}.'</a><br>');
+                        	$calendar->addcontent(epochToHuman($event{startDate},"%D"),$message);
                         } else {
                                 $nextDate = $event{startDate};
                                 while($nextDate < $event{endDate}) {
                                 	if (epochToHuman($nextDate,"%M %y") eq $thisMonth) {
-                                        	$calendar->addcontent(epochToHuman($nextDate,"%D"),
-                                                	'<a href=\'javascript:popUp("'.
-                                                        $event{description}
-                                                        .'");\'>'.$event{name}.'</a><br>');
+                                        	$calendar->addcontent(epochToHuman($nextDate,"%D"),$message);
                                         }
                                         $nextDate = addToDate($nextDate,0,0,1);
 				}
@@ -372,8 +373,8 @@ sub www_editEventSave {
 
 #-------------------------------------------------------------------
 sub www_view {
-	my (%data, %event, $dataRows, $prevNextBar, $output, $sth, $flag, %previous, 
-		@row, $i, $maxDate, $minDate, $nextDate, $defaultPn);
+	my (%data, %event, $dataRows, $prevNextBar, $output, $sth, $flag, %previous, $junk,
+		@row, $i, $maxDate, $minDate, $nextDate, $first, $last);
 	tie %data, 'Tie::CPHash';
 	tie %event, 'Tie::CPHash';
 	tie %previous, 'Tie::CPHash';
@@ -387,21 +388,22 @@ sub www_view {
 		}
 		($minDate) = WebGUI::SQL->quickArray("select min(startDate) from EventsCalendar_event where widgetId=$_[0]");
 		($maxDate) = WebGUI::SQL->quickArray("select max(endDate) from EventsCalendar_event where widgetId=$_[0]");	
+		($junk, $maxDate) = WebGUI::DateTime::monthStartEnd($maxDate);
+		
 		if ($data{calendarLayout} eq "calendar") {
 			$nextDate = $minDate;
-			while ($nextDate < $maxDate) {
+			while ($nextDate <= $maxDate) {
 				$row[$i] = _calendarLayout($_[0],$nextDate);
-				if ($session{form}{pn} eq "" && $nextDate <= time()) {
-					$defaultPn = $i;
+				($first,$last) = WebGUI::DateTime::monthStartEnd($nextDate);
+				if ($session{form}{pn} eq "" && $first <= time() && $last >= time()) {
+					$session{form}{pn} = $i;
 				}
 				$i++;
 				$nextDate = addToDate($nextDate,0,1,0);
 			}
-			if ($session{form}{pn} eq "") {
-				$session{form}{pn} = $defaultPn;
-			}
 			($dataRows, $prevNextBar) = paginate(1,WebGUI::URL::page(),\@row);
                 	$output .= $prevNextBar.$dataRows.$prevNextBar;
+			$session{form}{pn} = "";
 		} else {
 			$sth = WebGUI::SQL->read("select name, description, startDate, endDate from EventsCalendar_event where widgetId='$_[0]' and endDate>".(time()-86400)." order by startDate,endDate");
 			while (%event = $sth->hash) {

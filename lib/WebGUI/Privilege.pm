@@ -72,8 +72,8 @@ sub canViewPage {
 #-------------------------------------------------------------------
 sub insufficient {
 	my ($output);
-	if ($session{user}{userId} == 1) {
-		$output = WebGUI::Operation::Account();
+	if ($session{user}{userId} eq "") {
+		$output = WebGUI::Operation::Account::displayAccount();
 	} else {
 		$output = '<h1>'.WebGUI::International::get(37).'</h1>';
 		$output .= WebGUI::International::get(38);
