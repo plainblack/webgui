@@ -256,23 +256,26 @@ A boolean value to determine whether the method should return the groups directl
 
 =cut
 
+
 sub getGroupsInGroup {
-	return undef unless $_[0];
-       	my $groups = WebGUI::SQL->buildArrayRef("select groupId from groupGroupings where inGroup=$_[0]");
-	if ($_[1]) {
-		my $loopCount = $_[2]++ || 1;
-		if ($loopCount > 99) {
-			WebGUI::ErrorHandler::fatalError("Endless recursive loop detected while determinating".
-				" groups in group.\nRequested groupId: ".$_[0]."\nGroups in that group: ".join(",",@$groups));
-		}	
-		my @groupsOfGroups = @$groups;
-		foreach my $group (@$groups) {
-			my $gog = getGroupsInGroup($group,1,$loopCount);
-			push(@groupsOfGroups, @$gog);
-		}
-		return \@groupsOfGroups;
-	}
-	return $groups;
+        my $groupId = shift;
+        my $isRecursive = shift;
+        my $loopCount = shift;
+        my $groups = WebGUI::SQL->buildArrayRef("select groupId from groupGroupings where inGroup=$groupId");
+        if ($isRecursive) {
+                $loopCount++;
+                if ($loopCount > 99) {
+                        WebGUI::ErrorHandler::fatalError("Endless recursive loop detected while determining".
+                                " groups in group.\nRequested groupId: ".$groupId."\nGroups in that group: ".join(",",@$groups));
+                }
+                my @groupsOfGroups = @$groups;
+                foreach my $group (@$groups) {
+                        my $gog = getGroupsInGroup($group,1,$loopCount);
+                        push(@groupsOfGroups, @$gog);
+                }
+                return \@groupsOfGroups;
+        }
+        return $groups;
 }
 
 
