@@ -182,29 +182,36 @@ sub www_editInternationalMessageSave {
 
 #-------------------------------------------------------------------
 sub www_editLanguage {
-	my ($output, %data, $f);
+	my ($output, $slash, $dir, @files, $file, %data, $f, %options);
+	return WebGUI::Privilege::adminOnly() unless (WebGUI::Privilege::isInGroup(3));
 	tie %data, 'Tie::CPHash';
-	if (WebGUI::Privilege::isInGroup(3)) {
-		if ($session{form}{lid} eq "new") {
-			$data{characterSet} = "ISO-8859-1";
-			$data{toolbar} = "default";
-		} else {
-			%data = WebGUI::SQL->quickHash("select * from language where languageId=".$session{form}{lid});
-		}
-		$output = '<h1>'.WebGUI::International::get(589).'</h1>';
-		$f = WebGUI::HTMLForm->new;
-		$f->readOnly($session{form}{lid},WebGUI::International::get(590));
-		$f->hidden("lid",$session{form}{lid});
-		$f->hidden("op","editLanguageSave");
-		$f->text("language",WebGUI::International::get(591),$data{language});
-		$f->text("characterSet",WebGUI::International::get(592),$data{characterSet});
-		$f->text("toolbar",WebGUI::International::get(746),$data{toolbar});
-		$f->submit;
-		$output .= $f->print;
-		return _submenu($output);	
+        $slash = ($^O =~ /Win/i) ? "\\" : "/";
+        $dir = $session{config}{webguiRoot}.$slash."www".$slash."extras".$slash."toolbar";
+        opendir (DIR,$dir) or WebGUI::ErrorHandler::warn("Can't open toolbar directory!");
+        @files = readdir(DIR);
+        foreach $file (@files) {
+                if ($file ne ".." && $file ne ".") {
+			$options{$file} = $file;
+                }
+        }
+        closedir(DIR);
+	if ($session{form}{lid} eq "new") {
+		$data{characterSet} = "ISO-8859-1";
+		$data{toolbar} = "default";
 	} else {
-		return WebGUI::Privilege::adminOnly();
+		%data = WebGUI::SQL->quickHash("select * from language where languageId=".$session{form}{lid});
 	}
+	$output = '<h1>'.WebGUI::International::get(589).'</h1>';
+	$f = WebGUI::HTMLForm->new;
+	$f->readOnly($session{form}{lid},WebGUI::International::get(590));
+	$f->hidden("lid",$session{form}{lid});
+	$f->hidden("op","editLanguageSave");
+	$f->text("language",WebGUI::International::get(591),$data{language});
+	$f->text("characterSet",WebGUI::International::get(592),$data{characterSet});
+	$f->select("toolbar",\%options,WebGUI::International::get(746),[$data{toolbar}]);
+	$f->submit;
+	$output .= $f->print;
+	return _submenu($output);	
 }
 
 #-------------------------------------------------------------------
@@ -214,7 +221,8 @@ sub www_editLanguageSave {
 			$session{form}{lid} = getNextId("languageId");
 			WebGUI::SQL->write("insert into language (languageId) values ($session{form}{lid})");
                 }
-		WebGUI::SQL->write("update language set language=".quote($session{form}{language}).", characterSet=".quote($session{form}{characterSet})." 
+		WebGUI::SQL->write("update language set language=".quote($session{form}{language}).", 
+			characterSet=".quote($session{form}{characterSet}).", toolbar=".quote($session{form}{toolbar})."
 			where languageId=".$session{form}{lid});
                 return www_editLanguage();
         } else {
