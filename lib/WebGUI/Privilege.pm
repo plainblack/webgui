@@ -1,14 +1,18 @@
 package WebGUI::Privilege;
 
-#-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2002 Plain Black LLC.
-#-------------------------------------------------------------------
-# Please read the legal notices (docs/legal.txt) and the license
-# (docs/license.txt) that came with this distribution before using
-# this software.
-#-------------------------------------------------------------------
-# http://www.plainblack.com                     info@plainblack.com
-#-------------------------------------------------------------------
+=head1 LEGAL
+
+ -------------------------------------------------------------------
+  WebGUI is Copyright 2001-2002 Plain Black LLC.
+ -------------------------------------------------------------------
+  Please read the legal notices (docs/legal.txt) and the license
+  (docs/license.txt) that came with this distribution before using
+  this software.
+ -------------------------------------------------------------------
+  http://www.plainblack.com                     info@plainblack.com
+ -------------------------------------------------------------------
+
+=cut
 
 use strict;
 use Tie::CPHash;
@@ -18,16 +22,53 @@ use WebGUI::Session;
 use WebGUI::SQL;
 use WebGUI::URL;
 
+=head1 NAME
+
+ Package WebGUI::Privilege
+
+=head1 SYNOPSIS
+
+ use WebGUI::Privilege;
+ $html =	WebGUI::Privilege::adminOnly();
+ $boolean =	WebGUI::Privilege::canEditPage();
+ $boolean =	WebGUI::Privilege::canViewPage();
+ $html =	WebGUI::Privilege::insufficient();
+ $boolean =	WebGUI::Privilege::isInGroup($groupId);
+ $html =	WebGUI::Privilege::noAccess();
+ $html =	WebGUI::Privilege::notMember();
+ $html =	WebGUI::Privilege::vitalComponent();
+
+
+=head1 DESCRIPTION
+
+ This package provides access to the WebGUI security system
+ and security messages. 
+
+=head1 FUNCTIONS 
+
+ These functions are available from this package:
+
+=cut
+
 #-------------------------------------------------------------------
+
+=head2 adminOnly ( )
+
+ Returns a message stating that this functionality can only be used
+ by administrators. This method also sets the HTTP header status to 
+ 401.
+
+=cut
+
 sub adminOnly {
 	if($session{env}{MOD_PERL}) {
         	my $r = Apache->request;
                 if(defined($r)) {
-                	$r->custom_response(403, '<!--Admin Only-->' );
-                        $r->status(403);
+                	$r->custom_response(401, '<!--Admin Only-->' );
+                        $r->status(401);
                 }
         } else {
-		$session{header}{status} = 403;
+		$session{header}{status} = 401;
 	}
 	my ($output, $sth, @data);
         $output = '<h1>'.WebGUI::International::get(35).'</h1>';
@@ -43,6 +84,19 @@ sub adminOnly {
 }
 
 #-------------------------------------------------------------------
+
+=head2 canEditPage ( [ pageId ] )
+
+ Returns a boolean (0|1) value signifying that the user has the
+ required privileges.
+
+=item pageId
+
+ The unique identifier for the page that you wish to check the
+ privileges on. Defaults to the current page id.
+
+=cut
+
 sub canEditPage {
 	my ($isContentManager,%page);
 	tie %page, 'Tie::CPHash';
@@ -66,6 +120,20 @@ sub canEditPage {
 }
 
 #-------------------------------------------------------------------
+
+=head2 canViewPage ( [ pageId ] )
+
+ Returns a boolean (0|1) value signifying that the user has the
+ required privileges. Always returns true for Admins and users that
+ have the rights to edit this page.
+
+=item pageId
+
+ The unique identifier for the page that you wish to check the
+ privileges on. Defaults to the current page id.
+
+=cut
+
 sub canViewPage {
 	my (%page, $inDateRange);
 	tie %page, 'Tie::CPHash';
@@ -94,15 +162,24 @@ sub canViewPage {
 }
 
 #-------------------------------------------------------------------
+
+=head2 insufficient ( )
+
+ Returns a message stating that the user does not have the required
+ privileges to perform the operation they requested. This method 
+ also sets the HTTP header status to 401. 
+
+=cut
+
 sub insufficient {
 	if($session{env}{MOD_PERL}) {
                 my $r = Apache->request;
                 if(defined($r)) {
-                        $r->custom_response(403, '<!--Insufficient Privileges-->' );
-                        $r->status(403);
+                        $r->custom_response(401, '<!--Insufficient Privileges-->' );
+                        $r->status(401);
                 }
         } else {
-		$session{header}{status} = 403;
+		$session{header}{status} = 401;
 	}
 	my ($output);
 	$output = '<h1>'.WebGUI::International::get(37).'</h1>';
@@ -113,6 +190,23 @@ sub insufficient {
 }
 
 #-------------------------------------------------------------------
+
+=head2 isInGroup ( groupId [ , userId ] )
+
+ Returns a boolean (0|1) value signifying that the user has the
+ required privileges. Always returns true for Admins.
+
+=item groupId
+
+ The group that you wish to verify against the user.
+
+=item userId
+
+ The user that you wish to verify against the group. Defaults to the
+ currently logged in user.
+
+=cut
+
 sub isInGroup {
 	my ($gid, $uid, @data, %group, %user);
 	($gid, $uid) = @_;
@@ -159,15 +253,24 @@ sub isInGroup {
 }
 
 #-------------------------------------------------------------------
+
+=head2 noAccess ( )
+
+ Returns a message stating that the user does not have the privileges
+ necessary to access this page. This method also sets the HTTP header 
+ status to 401.
+
+=cut
+
 sub noAccess {
 	if($session{env}{MOD_PERL}) {
                 my $r = Apache->request;
                 if(defined($r)) {
-                        $r->custom_response(403, '<!--No Access-->' );
-                        $r->status(403);
+                        $r->custom_response(401, '<!--No Access-->' );
+                        $r->status(401);
                 }
         } else {
-		$session{header}{status} = 403;
+		$session{header}{status} = 401;
 	}
 	my ($output);
         if ($session{user}{userId} <= 1) {
@@ -181,15 +284,24 @@ sub noAccess {
 }
 
 #-------------------------------------------------------------------
+
+=head2 notMember ( )
+
+ Returns a message stating that the user they requested information
+ about is no longer active on this server. This method also sets the 
+ HTTP header status to 400.
+
+=cut
+
 sub notMember {
 	if($session{env}{MOD_PERL}) {
                 my $r = Apache->request;
                 if(defined($r)) {
-                        $r->custom_response(403, '<!--Not A Member-->' );
-                        $r->status(403);
+                        $r->custom_response(400, '<!--Not A Member-->' );
+                        $r->status(400);
                 }
         } else {
-		$session{header}{status} = 403;
+		$session{header}{status} = 400;
 	}
 	my ($output);
 	$output = '<h1>'.WebGUI::International::get(345).'</h1>';
@@ -199,7 +311,25 @@ sub notMember {
 }
 
 #-------------------------------------------------------------------
+
+=head2 vitalComponent ( )
+
+ Returns a message stating that the user made a request to delete
+ something that should never delete. This method also sets the HTTP
+ header status to 403. 
+
+=cut
+
 sub vitalComponent {
+        if($session{env}{MOD_PERL}) {
+                my $r = Apache->request;
+                if(defined($r)) {
+                        $r->custom_response(403, '<!--Vital Component-->' );
+                        $r->status(403);
+                }
+        } else {
+                $session{header}{status} = 403;
+        }
 	my ($output);
         $output = '<h1>'.WebGUI::International::get(40).'</h1>';
 	$output .= WebGUI::International::get(41);
