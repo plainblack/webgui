@@ -808,7 +808,7 @@ sub www_viewSubmission {
                 ($submission->{userId} == $session{user}{userId} && $session{user}{userId} != 1) ||
                 WebGUI::Privilege::isInGroup($_[0]->getValue("groupToApprove")));
 	my $callback = WebGUI::URL::page("func=viewSubmission&amp;wid=".$_[0]->get("wobjectId")."&amp;sid=".$submission->{USS_submissionId});
-	if ($session{form}{forumOp}) {	
+	if ($session{form}{forumOp} ne "" && $session{form}{forumOp} ne "viewForum") {	
 		return WebGUI::Forum::UI::forumOp({
 			callback=>$callback,
 			title=>$submission->{title},
