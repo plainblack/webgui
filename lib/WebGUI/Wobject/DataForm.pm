@@ -161,7 +161,7 @@ sub getRecordTemplateVars {
 	my $self = shift;
 	my $var = shift;
 	$var->{error_loop} = [] unless (exists $var->{error_loop});
-	$var->{canEdit} = (WebGUI::Privilege::canEditPage());
+	$var->{canEdit} = (WebGUI::Privilege::canEditWobject($self->get("wobjectId")));
 	$var->{"entryList.url"} = WebGUI::URL::page('func=view&entryId=list&wid='.$self->get("wobjectId"));
 	$var->{"entryList.label"} = WebGUI::International::get(86,$self->get("namespace"));
 	$var->{"export.tab.url"} = WebGUI::URL::page('func=exportTab&wid='.$self->get("wobjectId"));
@@ -311,14 +311,14 @@ sub uiLevel {
 
 #-------------------------------------------------------------------
 sub www_deleteField {
-	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
+	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId")));
 	return $_[0]->confirm(WebGUI::International::get(19,$_[0]->get("namespace")),
        		WebGUI::URL::page('func=deleteFieldConfirm&wid='.$_[0]->get("wobjectId").'&fid='.$session{form}{fid}));
 }
 
 #-------------------------------------------------------------------
 sub www_deleteFieldConfirm {
-	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
+	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId")));
 	$_[0]->deleteCollateral("DataForm_field","DataForm_fieldId",$session{form}{fid});
 	$_[0]->reorderCollateral("DataForm_field","DataForm_fieldId");
        	return "";
@@ -378,7 +378,7 @@ sub www_edit {
 
 #-------------------------------------------------------------------
 sub www_editSave {
-	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
+	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId")));
 	$_[0]->SUPER::www_editSave();
 	if ($session{form}{wid} eq "new") {
 		$_[0]->setCollateral("DataForm_field","DataForm_fieldId",{
@@ -437,7 +437,7 @@ sub www_editSave {
 
 #-------------------------------------------------------------------
 sub www_editField {
-	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
+	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId")));
     	my ($output, %field, $f, %fieldStatus);
     	tie %field, 'Tie::CPHash';
     	tie %fieldStatus, 'Tie::IxHash';
@@ -523,7 +523,7 @@ sub www_editField {
 
 #-------------------------------------------------------------------
 sub www_editFieldSave {
-	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
+	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId")));
 	$session{form}{name} = $session{form}{label} if ($session{form}{name} eq "");
 	$_[0]->setCollateral("DataForm_field","DataForm_fieldId",{
 		DataForm_fieldId=>$session{form}{fid},
@@ -546,7 +546,7 @@ sub www_editFieldSave {
 
 #-------------------------------------------------------------------
 sub www_exportTab {
-	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
+	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId")));
 	$session{header}{filename} = WebGUI::URL::urlize($_[0]->get("title")).".tab";
 	$session{header}{mimetype} = "text/plain";
 	my @fields = WebGUI::SQL->buildArray("select name from DataForm_field where wobjectId=".$_[0]->get("wobjectId")." order by sequenceNumber");
@@ -569,14 +569,14 @@ sub www_exportTab {
 
 #-------------------------------------------------------------------
 sub www_moveFieldDown {
-	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
+	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId")));
 	$_[0]->moveCollateralDown("DataForm_field","DataForm_fieldId",$session{form}{fid});
 	return "";
 }
 
 #-------------------------------------------------------------------
 sub www_moveFieldUp {
-	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
+	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId")));
 	$_[0]->moveCollateralUp("DataForm_field","DataForm_fieldId",$session{form}{fid});
 	return "";
 }
@@ -640,7 +640,7 @@ sub www_process {
 sub www_view {
 	my $var;
 	$var->{entryId} = $session{form}{entryId};
-	if ($var->{entryId} eq "list" && WebGUI::Privilege::canEditPage()) {
+	if ($var->{entryId} eq "list" && WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId"))) {
 		return $_[0]->processTemplate($_[0]->get("listTemplateId"),$_[0]->getListTemplateVars,"DataForm/List");
 	}
 	$var = $_[1] || $_[0]->getRecordTemplateVars($var);

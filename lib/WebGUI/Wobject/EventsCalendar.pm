@@ -51,7 +51,7 @@ sub _drawBigCalendar {
 	$calendar->monthname(WebGUI::DateTime::getMonthName($calendar->month));
 	$calendar->header('<h2 align="center">'.$calendar->monthname.' '.$calendar->year.'</h2>');
         ($start,$end) = monthStartEnd($_[1]);
-	my $canEdit = ($session{var}{adminOn} && WebGUI::Privilege::canEditPage());
+	my $canEdit = ($session{var}{adminOn} && WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId")));
         $sth = WebGUI::SQL->read("select * from EventsCalendar_event where wobjectId="
 		.$_[0]->get("wobjectId")." order by startDate,endDate");
         while (%event = $sth->hash) {
@@ -195,7 +195,7 @@ sub purge {
 
 #-------------------------------------------------------------------
 sub www_deleteEvent {
-	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
+	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId")));
 	my ($output);
 	$output = '<h1>'.WebGUI::International::get(42).'</h1>';
 	$output .= WebGUI::International::get(75,$_[0]->get("namespace")).'<p><blockquote>';
@@ -212,7 +212,7 @@ sub www_deleteEvent {
 
 #-------------------------------------------------------------------
 sub www_deleteEventConfirm {
-	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
+	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId")));
 	if ($session{form}{rid} > 0) {
 		$_[0]->deleteCollateral("EventsCalendar_event","EventsCalendar_recurringId",$session{form}{rid});
 	} else {
@@ -305,7 +305,7 @@ sub www_editSave {
 
 #-------------------------------------------------------------------
 sub www_editEvent {
-	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
+	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId")));
         my (%recursEvery, $special, $output, $f, %event);
 	tie %event, 'Tie::CPHash';
 	tie %recursEvery, 'Tie::IxHash';
@@ -369,7 +369,7 @@ sub www_editEvent {
 
 #-------------------------------------------------------------------
 sub www_editEventSave {
-	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
+	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId")));
 	my (@startDate, @endDate, $until, @eventId, $i, $recurringEventId);
         $startDate[0] = WebGUI::FormProcessor::dateTime("startDate");
 	$startDate[0] = time() unless ($startDate[0] > 0);
@@ -542,7 +542,7 @@ sub www_viewEvent {
 	$var{"start.date"} = epochToHuman($event{startDate},"%z");
 	$var{"end.label"} = WebGUI::International::get(15,$_[0]->get("namespace"));
 	$var{"end.date"} = epochToHuman($event{endDate},"%z");
-	$var{canEdit} = WebGUI::Privilege::canEditPage();
+	$var{canEdit} = WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId"));
         $var{"edit.url"} = WebGUI::URL::page('func=editEvent&eid='.$session{form}{eid}.'&wid='.$session{form}{wid});
 	$var{"edit.label"} = WebGUI::International::get(575);
         $var{"delete.url"} = WebGUI::URL::page('func=deleteEvent&eid='.$session{form}{eid}.'&wid='

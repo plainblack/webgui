@@ -737,6 +737,18 @@ sub new {
 			defaultValue=>$session{page}{endDate},
 			fieldType=>"dateTime"
 			},
+		ownerId=>{
+		    defaultValue=>$session{page}{ownerId},
+			fieldType=>"group" 
+		    }, 
+		groupIdView=>{
+		    defaultValue=>$session{page}{groupIdView},
+			fieldType=>"group" 
+		    }, 
+		groupIdEdit=>{
+		    defaultValue=>$session{page}{groupIdEdit},
+			fieldType=>"group" 
+		    }, 
 		sequenceNumber=>{
 			fieldType=>"hidden"
 			}
@@ -1371,6 +1383,53 @@ sub www_edit {
 		-value=>$endDate,
 		-uiLevel=>6
 		);
+	#Added By Frank Dillon - Wobject Privilege
+	my $subtext;
+	if (WebGUI::Privilege::isInGroup(3)) {
+		$subtext = ' &nbsp; <a href="'.WebGUI::URL::page('op=listUsers').'">'.WebGUI::International::get(7).'</a>';
+	} else {
+	   $subtext = "";
+    }
+	
+    my $clause; 
+	if (WebGUI::Privilege::isInGroup(3)) {
+	   my $contentManagers = WebGUI::Grouping::getUsersInGroup(4,1);
+	   push (@$contentManagers, $session{user}{userId});
+	   $clause = "userId in (".join(",",@$contentManagers).")";
+    } else {
+	   $clause = "userId=".$_[0]->get("ownerId");
+    }
+	my $users = WebGUI::SQL->buildHashRef("select userId,username from users where $clause order by username");
+	$f->getTab("privileges")->select(
+	   -name=>"ownerId",
+	   -options=>$users,
+	   -label=>WebGUI::International::get(108),
+	   -value=>[$_[0]->getValue("ownerId")],
+	   -subtext=>$subtext,
+	   -uiLevel=>6
+	);
+	if (WebGUI::Privilege::isInGroup(3)) {
+	   $subtext = ' &nbsp; <a href="'.WebGUI::URL::page('op=listGroups').'">'.WebGUI::International::get(5).'</a>';
+	} else {
+	   $subtext = "";
+	}
+	$f->getTab("privileges")->group(
+		-name=>"groupIdView",
+		-label=>WebGUI::International::get(872),
+		-value=>[$_[0]->getValue("groupIdView")],
+		-subtext=>$subtext,
+		-uiLevel=>6
+	);
+    $f->getTab("privileges")->group(
+        -name=>"groupIdEdit",
+        -label=>WebGUI::International::get(871),
+        -value=>[$_[0]->getValue("groupIdEdit")],
+        -subtext=>$subtext,
+	    -excludeGroups=>[1,7],
+        -uiLevel=>6
+   );
+   #End Frank Dillon Changes					   
+   
 	$f->getTab("properties")->HTMLArea(
 		-name=>"description",
 		-label=>WebGUI::International::get(85),

@@ -32,10 +32,25 @@ our @EXPORT = qw(&www_viewPageTree &www_movePageUp &www_movePageDown
         &www_editPageSave &www_pastePage &www_moveTreePageUp 
         &www_moveTreePageDown &www_moveTreePageLeft &www_moveTreePageRight);
 
+#Method Added By Frank Dillon - Changes Wobject Privileges on a page
+#-------------------------------------------------------------------
+sub _changeWobjectPrivileges {
+   my($wobject,$sth);
+   $sth = WebGUI::SQL->read("select wobjectId from wobject where pageId=".quote($_[0]));
+   while ($wobject = $sth->hashRef) {
+      if (WebGUI::Privilege::canEditWobject($wobject->{wobjectId})) {
+         WebGUI::SQL->write("update wobject set startDate=$session{form}{startDate}, endDate=$session{form}{endDate}, ownerId=$session{form}{ownerId}, groupIdView=$session{form}{groupIdView}, groupIdEdit=$session{form}{groupIdEdit} where wobjectId=".quote($wobject->{wobjectId}));
+	  }
+    }
+}			
+		
 #-------------------------------------------------------------------
 sub _recursivelyChangePrivileges {
         my ($sth, $pageId);
         $sth = WebGUI::SQL->read("select pageId from page where parentId=$_[0]");
+		#--Added By Frank Dillon - Change the Wobject Privileges on the current page
+		_changeWobjectPrivileges($_[0]);
+		#--End Changes
         while (($pageId) = $sth->array) {
 		if (WebGUI::Privilege::canEditPage($pageId)) {
         		WebGUI::SQL->write("update page set startDate=$session{form}{startDate}, 

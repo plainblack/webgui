@@ -64,14 +64,14 @@ sub purge {
 
 #-------------------------------------------------------------------
 sub www_deleteLink {
-	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
+	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId")));
 	return $_[0]->confirm(WebGUI::International::get(9,$_[0]->get("namespace")),
 		WebGUI::URL::page('func=deleteLinkConfirm&wid='.$session{form}{wid}.'&lid='.$session{form}{lid}));
 }
 
 #-------------------------------------------------------------------
 sub www_deleteLinkConfirm {
-	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
+	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId")));
 	$_[0]->deleteCollateral("LinkList_link","LinkList_linkId",$session{form}{lid});
 	$_[0]->reorderCollateral("LinkList_link","LinkList_linkId");
         return "";
@@ -98,7 +98,7 @@ sub www_edit {
 
 #-------------------------------------------------------------------
 sub www_editSave {
-	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
+	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId")));
         $_[0]->SUPER::www_editSave();
         if ($session{form}{proceed} eq "addLink") {
 		$session{form}{lid} = "new";
@@ -110,7 +110,7 @@ sub www_editSave {
 
 #-------------------------------------------------------------------
 sub www_editLink {
-	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
+	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId")));
         my ($output, $link, $f, $linkId, $newWindow);
         $link = $_[0]->getCollateral("LinkList_link", "LinkList_linkId",$session{form}{lid});
         if ($link->{LinkList_linkId} eq "new") {
@@ -145,7 +145,7 @@ sub www_editLink {
 
 #-------------------------------------------------------------------
 sub www_editLinkSave {
-	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
+	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId")));
 	$_[0]->setCollateral("LinkList_link", "LinkList_linkId", {
                 LinkList_linkId => $session{form}{lid},
                 description => $session{form}{description},
@@ -164,14 +164,14 @@ sub www_editLinkSave {
 
 #-------------------------------------------------------------------
 sub www_moveLinkDown {
-	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
+	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId")));
         $_[0]->moveCollateralDown("LinkList_link","LinkList_linkId",$session{form}{lid});
 	return "";
 }
 
 #-------------------------------------------------------------------
 sub www_moveLinkUp {
-	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
+	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId")));
         $_[0]->moveCollateralUp("LinkList_link","LinkList_linkId",$session{form}{lid});
 	return "";
 }
@@ -181,7 +181,7 @@ sub www_view {
 	my (%var, @linkloop, $controls, $link, $sth);
 	$var{"addlink.url"} = WebGUI::URL::page('func=editLink&lid=new&wid='.$_[0]->get("wobjectId"));
 	$var{"addlink.label"} = WebGUI::International::get(13,$_[0]->get("namespace"));
-	$var{canEdit} = WebGUI::Privilege::canEditPage();
+	$var{canEdit} = WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId"));
 	$sth = WebGUI::SQL->read("select * from LinkList_link where wobjectId=".$_[0]->get("wobjectId")." 
 		order by sequenceNumber");
 	while ($link = $sth->hashRef) {

@@ -70,7 +70,7 @@ sub www_edit {
 
 #-------------------------------------------------------------------
 sub www_editSave {
-	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
+	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId")));
         my ($attachment, $property);
 	$_[0]->SUPER::www_editSave() if ($_[0]->get("wobjectId") eq "new");
         $attachment = WebGUI::Attachment->new("",$_[0]->get("wobjectId"));

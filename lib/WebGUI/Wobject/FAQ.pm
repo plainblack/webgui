@@ -63,14 +63,14 @@ sub purge {
 
 #-------------------------------------------------------------------
 sub www_deleteQuestion {
-        return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
+        return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId")));
 	return $_[0]->confirm(WebGUI::International::get(7,$_[0]->get("namespace")),
 		WebGUI::URL::page('func=deleteQuestionConfirm&wid='.$_[0]->get("wobjectId").'&qid='.$session{form}{qid}));
 }
 
 #-------------------------------------------------------------------
 sub www_deleteQuestionConfirm {
-        return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
+        return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId")));
 	$_[0]->deleteCollateral("FAQ_question","FAQ_questionId",$session{form}{qid});
 	$_[0]->reorderCollateral("FAQ_question","FAQ_questionId");
         return "";
@@ -107,7 +107,7 @@ sub www_editSave {
 #-------------------------------------------------------------------
 sub www_editQuestion {
         my ($output, $question, $f);
-        return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
+        return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId")));
         $question = $_[0]->getCollateral("FAQ_question","FAQ_questionId",$session{form}{qid});
 	$output = helpIcon(2,$_[0]->get("namespace"));
         $output .= '<h1>'.WebGUI::International::get(10,$_[0]->get("namespace")).'</h1>';
@@ -141,7 +141,7 @@ sub www_editQuestion {
 
 #-------------------------------------------------------------------
 sub www_editQuestionSave {
-        return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
+        return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId")));
 	$_[0]->setCollateral("FAQ_question", "FAQ_questionId", {
         	FAQ_questionId => $session{form}{qid},
                 question => $session{form}{question},
@@ -156,14 +156,14 @@ sub www_editQuestionSave {
 
 #-------------------------------------------------------------------
 sub www_moveQuestionDown {
-	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
+	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId")));
 	$_[0]->moveCollateralDown("FAQ_question","FAQ_questionId",$session{form}{qid});
 	return "";
 }
 
 #-------------------------------------------------------------------
 sub www_moveQuestionUp {
-	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
+	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId")));
 	$_[0]->moveCollateralUp("FAQ_question","FAQ_questionId",$session{form}{qid});
 	return "";
 }

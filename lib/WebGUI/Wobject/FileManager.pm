@@ -93,7 +93,7 @@ sub uiLevel {
 
 #-------------------------------------------------------------------
 sub www_deleteFile {
-	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
+	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId")));
 	$_[0]->setCollateral("FileManager_file","FileManager_fileId",
 		{$session{form}{file}=>'',FileManager_fileId=>$session{form}{did}},0,0);
        	return $_[0]->www_editDownload();
@@ -101,14 +101,14 @@ sub www_deleteFile {
 
 #-------------------------------------------------------------------
 sub www_deleteDownload {
-	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
+	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId")));
 	return $_[0]->confirm(WebGUI::International::get(12,$_[0]->get("namespace")),
 		WebGUI::URL::page('func=deleteDownloadConfirm&wid='.$session{form}{wid}.'&did='.$session{form}{did}));
 }
 
 #-------------------------------------------------------------------
 sub www_deleteDownloadConfirm {
-	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
+	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId")));
         my ($output, $file);
         $file = WebGUI::Attachment->new("",$session{form}{wid},$session{form}{did});
         $file->deleteNode;
@@ -171,7 +171,7 @@ sub www_edit {
 
 #-------------------------------------------------------------------
 sub www_editSave {
-	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
+	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId")));
 	$_[0]->SUPER::www_editSave();
         if ($session{form}{proceed} eq "addFile") {
 		$session{form}{did} = "new";
@@ -183,7 +183,7 @@ sub www_editSave {
 
 #-------------------------------------------------------------------
 sub www_editDownload {
-	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
+	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId")));
         my ($output, $file, $f);
 	$file = $_[0]->getCollateral("FileManager_file","FileManager_fileId",$session{form}{did});
         $output .= helpIcon(2,$_[0]->get("namespace"));
@@ -232,7 +232,7 @@ sub www_editDownload {
 
 #-------------------------------------------------------------------
 sub www_editDownloadSave {
-	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
+	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId")));
         my ($file, %files);
 	$files{FileManager_fileId} = $_[0]->setCollateral("FileManager_file", "FileManager_fileId", {
         	FileManager_fileId => $session{form}{did},
@@ -269,7 +269,7 @@ sub www_editDownloadSave {
 
 #-------------------------------------------------------------------
 sub www_moveDownloadDown {
-	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
+	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId")));
         WebGUI::Session::setScratch($_[0]->get("namespace").".".$_[0]->get("wobjectId").".sortDirection","-delete-");
         WebGUI::Session::setScratch($_[0]->get("namespace").".".$_[0]->get("wobjectId").".sort","-delete-");
 	$_[0]->moveCollateralUp("FileManager_file","FileManager_fileId",$session{form}{did});
@@ -278,7 +278,7 @@ sub www_moveDownloadDown {
 
 #-------------------------------------------------------------------
 sub www_moveDownloadUp {
-	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
+	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId")));
         WebGUI::Session::setScratch($_[0]->get("namespace").".".$_[0]->get("wobjectId").".sortDirection","-delete-");
         WebGUI::Session::setScratch($_[0]->get("namespace").".".$_[0]->get("wobjectId").".sort","-delete-");
 	$_[0]->moveCollateralDown("FileManager_file","FileManager_fileId",$session{form}{did});

@@ -115,6 +115,37 @@ sub canEditPage {
 	}
 }
 
+#Added by Frank Dillon.  Wobject API not used due to possible performance issues
+#-------------------------------------------------------------------
+
+=head2 canEditWobject ( wobjectId )
+
+Returns a boolean (0|1) value signifying that the user has the required privileges.
+
+=over
+
+=item wobjectId
+
+The unique identifier for the wobject that you wish to check the privileges on.
+
+=back
+
+=cut
+
+sub canEditWobject {
+	my (%wobject);
+	tie %wobject, 'Tie::CPHash';
+	return canEditPage() unless ($session{setting}{wobjectPrivileges} == 1);
+	%wobject = WebGUI::SQL->quickHash("select ownerId,groupIdEdit from wobject where wobjectId=".quote($_[0]));
+	if ($session{user}{userId} == $wobject{ownerId}) {
+		return 1;
+	} elsif (isInGroup($wobject{groupIdEdit})) {
+		return 1;
+	} else {
+		return 0;
+	}
+}
+
 #-------------------------------------------------------------------
 
 =head2 canViewPage ( [ pageId ] )
@@ -151,6 +182,43 @@ sub canViewPage {
         } else {
                 return 0;
         }
+}
+
+#Added by Frank Dillon.  Wobject API not used due to possible performance issues
+#-------------------------------------------------------------------
+
+=head2 canViewWobject ( wobjectId  )
+
+Returns a boolean (0|1) value signifying that the user has the required privileges. Always returns true for Admins and users that have the rights to edit this wobject.
+
+=over
+
+=item wobjectId
+
+The unique identifier for the wobject that you wish to check the privileges on.
+
+=back
+
+=cut
+
+sub canViewWobject {
+	my (%wobject);
+	tie %wobject, 'Tie::CPHash';
+	return canViewPage() unless ($session{setting}{wobjectPrivileges} == 1);
+	%wobject = WebGUI::SQL->quickHash("select ownerId,groupIdView,startDate,endDate from wobject where wobjectId=".quote($_[0]));
+	if ($wobject{startDate} < time() && $wobject{endDate} > time()) {
+	   if ($session{user}{userId} == $wobject{ownerId}) {
+          return 1;
+       } elsif (isInGroup($wobject{groupIdView})) {
+          return 1;
+       } elsif (canEditWobject($_[0])) { 
+	      return 1;
+       } else {
+          return 0;
+       }
+	}else{
+	   return 0;
+	}
 }
 
 #-------------------------------------------------------------------

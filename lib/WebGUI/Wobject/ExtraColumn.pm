@@ -60,7 +60,7 @@ sub uiLevel {
 
 #-------------------------------------------------------------------
 sub www_edit {
-	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
+	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId")));
         my ($output, $f);
         $output = helpIcon(1,$_[0]->get("namespace"));
 	$output .= '<h1>'.WebGUI::International::get(6,$_[0]->get("namespace")).'</h1>';

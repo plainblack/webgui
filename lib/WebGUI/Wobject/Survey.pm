@@ -151,7 +151,7 @@ sub uiLevel {
 
 #-------------------------------------------------------------------
 sub www_deleteAnswer {
-        return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
+        return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId")));
         return $_[0]->confirm(WebGUI::International::get(45,$_[0]->get("namespace")),
                 WebGUI::URL::page('func=deleteAnswerConfirm&wid='.$_[0]->get("wobjectId").'&aid='
 		.$session{form}{aid}.'&qid='.$session{form}{qid}));
@@ -159,7 +159,7 @@ sub www_deleteAnswer {
 
 #-------------------------------------------------------------------
 sub www_deleteAnswerConfirm {
-        return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
+        return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId")));
         WebGUI::SQL->write("delete from Survey_response where Survey_answerId=$session{form}{aid}");
         $_[0]->deleteCollateral("Survey_answer","Survey_answerId",$session{form}{aid});
         $_[0]->reorderCollateral("Survey_answer","Survey_answerId","Survey_id");
@@ -168,14 +168,14 @@ sub www_deleteAnswerConfirm {
 
 #-------------------------------------------------------------------
 sub www_deleteQuestion {
-        return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
+        return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId")));
         return $_[0]->confirm(WebGUI::International::get(44,$_[0]->get("namespace")),
         	WebGUI::URL::page('func=deleteQuestionConfirm&wid='.$_[0]->get("wobjectId").'&qid='.$session{form}{qid}));
 }
 
 #-------------------------------------------------------------------
 sub www_deleteQuestionConfirm {
-        return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
+        return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId")));
 	WebGUI::SQL->write("delete from Survey_answer where Survey_questionId=$session{form}{qid}");
 	WebGUI::SQL->write("delete from Survey_response where Survey_questionId=$session{form}{qid}");
         $_[0]->deleteCollateral("Survey_question","Survey_questionId",$session{form}{qid});
@@ -285,7 +285,7 @@ sub www_edit {
 
 #-------------------------------------------------------------------
 sub www_editSave {
-	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
+	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId")));
 	$_[0]->SUPER::www_editSave(); 
 	if ($session{form}{proceed} eq "addQuestion") {
 		$session{form}{qid} = "new";
@@ -296,7 +296,7 @@ sub www_editSave {
 
 #-------------------------------------------------------------------
 sub www_editAnswer {
-        return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
+        return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId")));
         my ($question, $output, $f, $answer);
         $answer = $_[0]->getCollateral("Survey_answer","Survey_answerId",$session{form}{aid});
         $output = '<h1>'.WebGUI::International::get(18,$_[0]->get("namespace")).'</h1>';
@@ -350,7 +350,7 @@ sub www_editAnswer {
 
 #-------------------------------------------------------------------
 sub www_editAnswerSave {
-        return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
+        return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId")));
         $_[0]->setCollateral("Survey_answer", "Survey_answerId", {
                 Survey_answerId => $session{form}{aid},
                 Survey_questionId => $session{form}{qid},
@@ -372,7 +372,7 @@ sub www_editAnswerSave {
 
 #-------------------------------------------------------------------
 sub www_editQuestion {
-	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
+	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId")));
 	my ($output, $f, $question, $answerFieldType, $sth, %data);
 	tie %data, 'Tie::CPHash';
 	$question = $_[0]->getCollateral("Survey_question","Survey_questionId",$session{form}{qid});
@@ -440,7 +440,7 @@ sub www_editQuestion {
 
 #-------------------------------------------------------------------
 sub www_editQuestionSave {
-	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
+	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId")));
 	$session{form}{qid} = $_[0]->setCollateral("Survey_question", "Survey_questionId", {
                 question=>$session{form}{question},
         	Survey_questionId=>$session{form}{qid},
@@ -520,28 +520,28 @@ sub www_exportResponses {
 
 #-------------------------------------------------------------------
 sub www_moveAnswerDown {
-        return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
+        return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId")));
         $_[0]->moveCollateralDown("Survey_answer","Survey_answerId",$session{form}{aid},"Survey_id");
         return $_[0]->www_editQuestion;
 }
 
 #-------------------------------------------------------------------
 sub www_moveAnswerUp {
-        return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
+        return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId")));
         $_[0]->moveCollateralUp("Survey_answer","Survey_answerId",$session{form}{aid},"Survey_id");
         return $_[0]->www_editQuestion;
 }
 
 #-------------------------------------------------------------------
 sub www_moveQuestionDown {
-        return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
+        return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId")));
         $_[0]->moveCollateralDown("Survey_question","Survey_questionId",$session{form}{qid},"Survey_id");
         return $_[0]->www_edit;
 }
 
 #-------------------------------------------------------------------
 sub www_moveQuestionUp {
-        return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
+        return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId")));
         $_[0]->moveCollateralUp("Survey_question","Survey_questionId",$session{form}{qid},"Survey_id");
         return $_[0]->www_edit;
 }

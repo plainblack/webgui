@@ -123,6 +123,7 @@ sub www_editContentSettings {
                 -intervalValue=>$data[0],
                 -unitsValue=>$data[1]
                 );
+		$f->yesNo("wobjectPrivileges",WebGUI::International::get(979),$session{setting}{wobjectPrivileges});
         $f->submit;
         $output .= $f->print;
         return _submenu($output);

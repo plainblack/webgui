@@ -185,7 +185,7 @@ sub www_editSave {
 
 #-------------------------------------------------------------------
 sub www_resetVotes {
-	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
+	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId")));
 	$_[0]->deleteCollateral("Poll_answer","wobjectId",$_[0]->get("wobjectId"));
 	return "";
 }
