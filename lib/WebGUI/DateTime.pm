@@ -42,6 +42,7 @@ This package provides easy to use date math functions, which are normally a comp
  ($startEpoch, $endEpoch) = WebGUI::DateTime::dayStartEnd($epoch);
  $dateString = WebGUI::DateTime::epochToHuman($epoch, $formatString);
  $setString = WebGUI::DateTime::epochToSet($epoch);
+ ($setString, $timeString) = WebGUI::DateTime::epochToSetTime($epoch);
  $day = WebGUI::DateTime::getDayName($dayInteger);
  $month = WebGUI::DateTime::getMonthName($monthInteger);
  $epoch = WebGUI::DateTime::humanToEpoch($dateString);
@@ -49,8 +50,11 @@ This package provides easy to use date math functions, which are normally a comp
  @date = WebGUI::DateTime::localtime($epoch);
  ($startEpoch, $endEpoch) = WebGUI::DateTime::monthStartEnd($epoch);
  ($interval, $units) = WebGUI::DateTime::secondsToInterval($seconds);
+ $timeString = WebGUI::DateTime::secondsToTime($seconds);
  $epoch = WebGUI::DateTime::setToEpoch($setString);
+ $epoch = WebGUI::DateTime::setTimeToEpoch($setTimeString);
  $epoch = WebGUI::DateTime::time();
+ $seconds = WebGUI::DateTime::timeToSeconds($timeString);
 
 =head1 METHODS
 
@@ -299,6 +303,26 @@ The number of seconds since January 1, 1970.
 
 sub epochToSet {
 	return epochToHuman($_[0],"%m/%d/%y");
+}
+
+#-------------------------------------------------------------------
+
+=head2 epochToSetTime ( epoch )
+
+Returns a set date (used by WebGUI::HTMLForm->date) in the format of MM/DD/YYYY and a time string in the format of HH:MM:SS. 
+
+=over
+
+=item epoch
+
+The number of seconds since January 1, 1970.
+
+=back
+
+=cut
+
+sub epochToSetTime {
+	return (epochToHuman($_[0],"%m/%d/%y"), epochToHuman($_[0],"%j:%n:%s"));
 }
 
 #-------------------------------------------------------------------
@@ -566,6 +590,33 @@ sub secondsToInterval {
 
 #-------------------------------------------------------------------
 
+=head2 secondsToTime ( seconds )
+
+Returns a time string of the format HH::MM::SS on a 24 hour clock. See also timeToSeconds().
+
+=over
+
+=item seconds
+
+A number of seconds.
+
+=back
+
+=cut
+
+sub secondsToTime {
+	my $seconds = $_[0];
+	my $timeString = int($seconds / 3600).":";
+	$seconds = $seconds % 3600;	
+	$timeString = int($seconds / 60).":";
+	$seconds = $seconds % 60;
+	$timeString .= $seconds;
+	return $timeString;
+}
+
+
+#-------------------------------------------------------------------
+
 =head2 setToEpoch ( set )
 
 Returns an epoch date.
@@ -603,6 +654,32 @@ sub setToEpoch {
 
 #-------------------------------------------------------------------
 
+=head2 setTimeToEpoch ( setString, timeString )
+
+Returns an epoch date.
+
+=over
+
+=item setString
+
+A string in the format of MM/DD/YYYY.
+
+=item timeString
+
+A string in the format of HH:MM:SS.
+
+=back
+
+=cut
+
+sub setTimeToEpoch {
+	my $epoch = setToEpoch($_[0]);
+	$epoch += timeToSeconds($_[1]);
+	return $epoch;
+}
+
+#-------------------------------------------------------------------
+
 =head2 time ( )
 
 Returns an epoch date for now.
@@ -612,5 +689,27 @@ Returns an epoch date for now.
 sub time {
 	return Date::Calc::Date_to_Time(Date::Calc::Today_and_Now());
 }
+
+#-------------------------------------------------------------------
+
+=head2 timeToSeconds ( timeString )
+
+Returns the seconds since 00:00:00 on a 24 hour clock.
+
+=over
+
+=item timeString
+
+A string that looks similar to this: 15:05:32
+
+=back
+
+=cut
+
+sub timeToSeconds {
+	my ($hour,$min,$sec) = split(/:/,$_[0]);
+	return ($hour*3600+$min*60+$sec);
+}
+
 
 1;
