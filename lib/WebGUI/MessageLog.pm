@@ -54,7 +54,7 @@ sub addEntry {
 	if ($groupId ne "") {
 		@users = WebGUI::SQL->buildArray("select userId from groupings where groupId=$groupId");
 	}
-	@users = ($userId,@users);
+	@users = ($userId,@users) if ($userId ne "");
 	foreach $user (@users) {
 		$u = WebGUI::User->new($user);
 		if ($u->userId ne "") {
@@ -83,7 +83,7 @@ sub addInternationalizedEntry {
         if ($groupId ne "") {
                 @users = WebGUI::SQL->buildArray("select userId from groupings where groupId=$groupId");
         }
-	@users = ($userId,@users);
+	@users = ($userId,@users) if ($userId ne "");
         foreach $user (@users) {
                 $u = WebGUI::User->new($user);
                 if ($u->userId ne "") {
