@@ -145,7 +145,7 @@ sub www_deleteEvent {
 		.$session{form}{eid}).'">'.WebGUI::International::get(76,$_[0]->get("namespace")).'</a><p>';
 	$output .= '<a href="'.WebGUI::URL::page('func=deleteEventConfirm&wid='.$session{form}{wid}.'&eid='
 		.$session{form}{eid}.'&rid='.$session{form}{rid}).'">'
-		.WebGUI::International::get(77,$_[0]->get("namespace")).'</a><p>'; 
+		.WebGUI::International::get(77,$_[0]->get("namespace")).'</a><p>' unless ($session{form}{rid} eq "0"); 
 	$output .= '<a href="'.WebGUI::URL::page('func=edit&wid='.$session{form}{wid}).'">'
 		.WebGUI::International::get(78,$_[0]->get("namespace")).'</a>';
 	$output .= '</blockquote>';
