@@ -89,7 +89,7 @@ WebGUI::SQL->write("delete from settings where name in ('siteicon','favicon')");
 
 print "\tMigrating wobject templates to asset templates.\n" unless ($quiet);
 my $sth = WebGUI::SQL->read("select templateId, template, namespace from template where namespace in ('Article', 
-		'SyndicatedContent', 'MessageBoard', 'DataForm', 'EventsCalendar', 'HttpProxy', 'Poll', 'Product', 'WobjectProxy',
+		'SyndicatedContent', 'MessageBoard', 'DataForm', 'HttpProxy', 'Poll', 'Product', 'WobjectProxy',
 		'IndexedSearch', 'SQLReport', 'Survey', 'WSClient')");
 while (my $t = $sth->hashRef) {
 	$t->{template} = '<a name="<tmpl_var assetId>"></a>
@@ -543,7 +543,7 @@ while (my $data = $sth->hashRef) {
 }
 WebGUI::SQL->write("drop table collateralFolder");
 WebGUI::SQL->write("drop table collateral");
-
+$sth->finish;
 
 
 
@@ -1017,6 +1017,17 @@ while (my ($id, $template, $namespace) = $sth->array) {
 }
 $sth->finish;
 
+print "\tMigrating EventsCalendar templates\n" unless ($quiet);
+my $sth = WebGUI::SQL->read("select templateId,template from template where namespace = 'EventsCalendar'");
+while (my ($id, $template) = $sth->array) {
+
+	$template =~ s/<tmpl_var\s+start.month>\s+<tmpl_var\s+start.day>/<tmpl_var start.day.dayOfWeek> <tmpl_var start.month> <tmpl_var start.day>/ixsg;
+	$template =~ s/<tmpl_var\s+end.month>\s+<tmpl_var\s+end.day>/<tmpl_var end.day.dayOfWeek> <tmpl_var end.month> <tmpl_var end.day>/ixsg;
+
+	$template = '<a name="<tmpl_var assetId>"></a> <tmpl_if session.var.adminOn> <p><tmpl_var controls></p> </tmpl_if>'.$template;
+	WebGUI::SQL->write("update template set template=".quote($template)." where templateId=".quote($id)." and namespace='EventsCalendar'"); 
+}
+$sth->finish;
 
 
 print "\tConverting template system to asset tree\n" unless ($quiet);
@@ -1800,6 +1811,7 @@ sub walkTree {
 					#increment the rank.
 					$eventRank++;
 				}
+				$sth->finish;
 			}
 			$rank++;
 		}
