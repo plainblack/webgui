@@ -30,7 +30,7 @@ my $forums = WebGUI::SQL->read("select forumId, threadTemplateId, postTemplateId
 while (my ($forumId, $threadTemplateId, $postTemplateId) = $forums->array) {
 	my $key = "Thread ".$threadTemplateId." | ".$postTemplateId;
 	unless (exists $threadTemplates{$key}) {
-		my ($threadTemplate) = WebGUI::SQL->quickArray("select template from template where namepsace='Forum/Thread' and templateId=".quote($threadTemplateId));
+		my ($threadTemplate) = WebGUI::SQL->quickArray("select template from template where namespace='Forum/Thread' and templateId=".quote($threadTemplateId));
 		my ($postTemplate) = WebGUI::SQL->quickArray("select template from template where namespace='Forum/Post' and templateId=".quote($postTemplateId));
 		$threadTemplate =~ s/\<tmpl_var\s+post\.full\s*\>/$postTemplate/ixsg;
 		$threadTemplates{$key} = $threadTemplate;
