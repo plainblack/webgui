@@ -24,6 +24,7 @@ Andreas Graf).
  - Added Tony Mountifield to the credits list for all his debugging efforts as
    of late.
  - Bugfix [ 915498 ] htmlArea - insert image WebGUI 6.0
+ - Updated the dutch translation. (Thanks to Procolix)
 
 
 6.0.0
