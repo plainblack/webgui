@@ -87,8 +87,24 @@ sub formatStatus {
         }
 }
 
+sub formatThreadLockURL {
+	return WebGUI::URL::append($_[0],"forumOp=threadLock&amp;forumPostId=".$_[1]);
+}
+
+sub formatThreadUnlockURL {
+	return WebGUI::URL::append($_[0],"forumOp=threadUnlock&amp;forumPostId=".$_[1]);
+}
+
+sub formatThreadStickURL {
+	return WebGUI::URL::append($_[0],"forumOp=threadStick&amp;forumPostId=".$_[1]);
+}
+
 sub formatThreadSubscribeURL {
 	return WebGUI::URL::append($_[0],"forumOp=threadSubscribe&amp;forumPostId=".$_[1]);
+}
+
+sub formatThreadUnstickURL {
+	return WebGUI::URL::append($_[0],"forumOp=threadUnstick&amp;forumPostId=".$_[1]);
 }
 
 sub formatThreadUnsubscribeURL {
@@ -243,6 +259,8 @@ sub forumOp {
 sub getForumTemplateVars {
 	my ($callback, $forum) = @_;
 	my (%var, @thread_loop);
+	$var{'callback.url'} = $callback;
+	$var{'callback.label'} = WebGUI::International::get(1039);
 	$var{'user.isVisitor'} = ($session{user}{userId} == 1);
 	$var{'thread.new.url'} = formatNewThreadURL($callback,$forum->get("forumId"));
 	$var{'thread.new.label'} = WebGUI::International::get(1018);
@@ -315,6 +333,8 @@ sub getForumTemplateVars {
 
 sub getPostTemplateVars {
         my ($post, $thread, $forum, $callback, $var) = @_;
+	$var->{'callback.url'} = $callback;
+	$var->{'callback.label'} = WebGUI::International::get(1039);
 	$var->{'post.subject.label'} = WebGUI::International::get(229);
         $var->{'post.subject'} = WebGUI::HTML::filter($post->get("subject"),"none");
         $var->{'post.message'} = WebGUI::HTML::filter($post->get("message"),$forum->get("filterPosts"));
@@ -391,13 +411,26 @@ sub getThreadTemplateVars {
         my $forum = $thread->getForum;
         my $var = getPostTemplateVars($post, $thread, $forum, $callback);
         my $root = WebGUI::Forum::Post->new($thread->get("rootPostId"));
+	$var->{'callback.url'} = $callback;
+	$var->{'callback.label'} = WebGUI::International::get(1039);
         $var->{'user.canPost'} = $forum->canPost;
-        $var->{'user.isSubscribed'} = $thread->isSubscribed;
         $var->{'user.isVisitor'} = ($session{user}{userId} == 1);
+        $var->{'user.isModerator'} = $forum->isModerator;
+        $var->{'user.isSubscribed'} = $thread->isSubscribed;
         $var->{'thread.subscribe.url'} = formatThreadSubscribeURL($callback,$post->get("forumPostId"));
         $var->{'thread.subscribe.label'} = WebGUI::International::get(873);
         $var->{'thread.unsubscribe.url'} = formatThreadUnsubscribeURL($callback,$post->get("forumPostId"));
         $var->{'thread.unsubscribe.label'} = WebGUI::International::get(874);
+        $var->{'thread.isSticky'} = $thread->isSticky;
+        $var->{'thread.stick.url'} = formatThreadStickURL($callback,$post->get("forumPostId"));
+        $var->{'thread.stick.label'} = WebGUI::International::get(1037);
+        $var->{'thread.unstick.url'} = formatThreadUnstickURL($callback,$post->get("forumPostId"));
+        $var->{'thread.unstick.label'} = WebGUI::International::get(1038);
+        $var->{'thread.isLocked'} = $thread->isLocked;
+        $var->{'thread.lock.url'} = formatThreadLockURL($callback,$post->get("forumPostId"));
+        $var->{'thread.lock.label'} = WebGUI::International::get(1040);
+        $var->{'thread.unlock.url'} = formatThreadUnlockURL($callback,$post->get("forumPostId"));
+        $var->{'thread.unlock.label'} = WebGUI::International::get(1041);
         $var->{post_loop} = recurseThread($root, $thread, $forum, 0, $callback, $post->get("forumPostId"));
         $var->{'thread.layout.isFlat'} = ($session{user}{discussionLayout} eq "flat");
         $var->{'thread.layout.isNested'} = ($session{user}{discussionLayout} eq "nested");
@@ -532,7 +565,7 @@ sub www_post {
 	$var->{'newpost.isReply'} = ($session{form}{parentId} ne "");
 	$var->{'newpost.isEdit'} = ($session{form}{forumPostId} ne "");
 	$var->{'user.isVisitor'} = ($session{user}{userId} == 1);
-	$var->{'newpost.isNewMessage'} = ($var->{isNewThread} || $var->{isReply});
+	$var->{'newpost.isNewMessage'} = ($var->{'newpost.isNewThread'} || $var->{'newpost.isReply'});
 	$var->{'form.begin'} = WebGUI::Form::formHeader({
 		action=>$callback
 		});
@@ -702,11 +735,43 @@ sub www_ratePost {
 	return www_viewThread($callback,$session{form}{forumPostId});
 }
 
+sub www_threadLock {
+	my ($callback) = @_;
+	my $post = WebGUI::Forum::Post->new($session{form}{forumPostId});
+	return WebGUI::Privilege::insufficient() unless ($post->getThread->getForum->isModerator);
+	$post->getThread->lock;
+	return www_viewThread($callback, $session{form}{forumPostId});
+}
+
+sub www_threadUnlock {
+	my ($callback) = @_;
+	my $post = WebGUI::Forum::Post->new($session{form}{forumPostId});
+	return WebGUI::Privilege::insufficient() unless ($post->getThread->getForum->isModerator);
+	$post->getThread->unlock;
+	return www_viewThread($callback, $session{form}{forumPostId});
+}
+
+sub www_threadStick {
+	my ($callback) = @_;
+	my $post = WebGUI::Forum::Post->new($session{form}{forumPostId});
+	return WebGUI::Privilege::insufficient() unless ($post->getThread->getForum->isModerator);
+	$post->getThread->stick;
+	return www_viewThread($callback, $session{form}{forumPostId});
+}
+
 sub www_threadSubscribe {
 	my ($callback) = @_;
 	my $post = WebGUI::Forum::Post->new($session{form}{forumPostId});
 	return WebGUI::Privilege::insufficient() unless ($session{user}{userId} != 1 && $post->getThread->getForum->canPost);
 	$post->getThread->subscribe;
+	return www_viewThread($callback, $session{form}{forumPostId});
+}
+
+sub www_threadUnstick {
+	my ($callback) = @_;
+	my $post = WebGUI::Forum::Post->new($session{form}{forumPostId});
+	return WebGUI::Privilege::insufficient() unless ($post->getThread->getForum->isModerator);
+	$post->getThread->unstick;
 	return www_viewThread($callback, $session{form}{forumPostId});
 }
 

@@ -206,6 +206,14 @@ insert into international (internationalId,languageId,namespace,message,lastUpda
 insert into international (internationalId,languageId,namespace,message,lastUpdated,context) values (1036,1,'WebGUI','Threads', 1066038155,'A label indicating how many threads there are in a particular forum.');
 delete from template where namespace='MessageBoard';
 alter table MessageBoard_forums add column sequenceNumber int not null default 1;
+insert into international (internationalId,languageId,namespace,message,lastUpdated,context) values (77,1,'MessageBoard','Edit Forum', 1066061199,'A title for the forum editing page.');
+insert into international (internationalId,languageId,namespace,message,lastUpdated,context) values (76,1,'MessageBoard','Are you certain you wish to delete this forum and all the posts it contains?', 1066055963,'A question prompting the admin whether they truely want to delete a forum from a message board.');
+insert into international (internationalId,languageId,namespace,message,lastUpdated,context) values (1038,1,'WebGUI','Unstick.', 1066065454,'A label for a link that makes the current thread not sticky.');
+insert into international (internationalId,languageId,namespace,message,lastUpdated,context) values (1037,1,'WebGUI','Make sticky.', 1066065402,'A label for a link that makes the current thread sticky.');
+insert into international (internationalId,languageId,namespace,message,lastUpdated,context) values (1039,1,'WebGUI','Back', 1066073289,'A generic term meaning to go to a place in history, or more specifically, a page in the user\'s history.');
+insert into international (internationalId,languageId,namespace,message,lastUpdated,context) values (1041,1,'WebGUI','Unlock.', 1066073967,'A label for a link that unlocks the current thread.');
+insert into international (internationalId,languageId,namespace,message,lastUpdated,context) values (1040,1,'WebGUI','Lock.', 1066073923,'A label for a link that locks the current thread.');
+
 
 
 
