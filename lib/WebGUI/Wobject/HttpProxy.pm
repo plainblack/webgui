@@ -182,8 +182,8 @@ sub www_view {
 
       #if ($_[0]->get("followExternal")==0 && $proxiedUrl !~ /\Q$allowed_url/i) {
       if ($_[0]->get("followExternal")==0 && 
-	$var{header} = "text/html";
           (URI->new($_[0]->get('proxiedUrl'))->host) ne (URI->new($proxiedUrl)->host) ) {
+	$var{header} = "text/html";
          return "<h1>You are not allowed to leave ".$_[0]->get("proxiedUrl")."</h1>";
       }
 

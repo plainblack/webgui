@@ -24,7 +24,7 @@ use WebGUI::User;
 sub grabReferral {
 	if ($session{user}{userId} != 1 && $session{user}{referringAffiliate} > 0) {
 		return "";
-	} elsif ($session{user}{userId} != 1 && $session{user}{referringAffiliate} == 0) {
+	} elsif ($session{user}{userId} != 1 && $session{user}{referringAffiliate} == 0 && $session{scratch}{referringAffiliate} > 0) {
 		my $u = WebGUI::User->new($session{user}{userId});
 		$u->referringAffiliate($session{scratch}{referringAffiliate});
 		WebGUI::Session::deleteScratch("referringAffiliate");
