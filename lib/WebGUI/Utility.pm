@@ -98,23 +98,9 @@ An array to look for the value in.
 =cut
 
 sub isIn {
-        my ($i, @a, @b, @isect, %union, %isect, $e);
-        foreach $e (@_) {
-                if ($a[0] eq "") {
-                        $a[0] = $e;
-                } else {
-                        $b[$i] = $e;
-                        $i++;
-                }
-        }
-        foreach $e (@a, @b) { $union{$e}++ && $isect{$e}++ }
-        @isect = keys %isect;
-        if (@isect) {
-		undef @isect;
-                return 1;
-        } else {
-                return 0;
-        }
+	my $key = shift;
+  	$_ eq $key and return 1 for @_;
+ 	return 0;
 }
 
 #-------------------------------------------------------------------
