@@ -409,10 +409,7 @@ while (my $data = $sth->hashRef) {
 	my $id = undef;
 	next if ($data->{databaseLinkId} > 0);
 	foreach my $dsn (keys %dblink) {
-print $dsn."\n";
-print $dblink{$dsn}{user}."\n";
-		if ($dsn eq $data->{DSN} ){ #&& $dblink{$dsn}{user} eq $data->{username}) {
-print "got here";
+		if ($dsn eq $data->{DSN} && $dblink{$dsn}{user} eq $data->{username}) {
 			$id = $dblink{$dsn}{id};
 			last;
 		}
