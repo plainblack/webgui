@@ -9,4 +9,5 @@ insert into international (internationalId,languageId,namespace,message,lastUpda
 insert into international (internationalId,languageId,namespace,message,lastUpdated) values (31,1,'MailForm','is not filled in correctly.', 1045210016);
 insert into international (internationalId,languageId,namespace,message,lastUpdated) values (32,1,'MailForm','is not a valid email address.', 1045210016);
 update international set message="Possible Values" where namespace = "MailForm" and internationalId = 24 and languageId=1;
+alter table groups change ipFilter ipFilter text;
 

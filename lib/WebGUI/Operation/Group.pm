@@ -132,7 +132,7 @@ sub www_editGroup {
 	if ($session{setting}{useKarma}) {
                	$f->integer("karmaThreshold",WebGUI::International::get(538),$g->karmaThreshold);
 	}
-	$f->text(
+	$f->textarea(
 		-name=>"ipFilter",
 		-value=>$g->ipFilter,
 		-label=>WebGUI::International::get(857)

@@ -236,6 +236,10 @@ sub isInGroup {
 	%group = WebGUI::SQL->quickHash("select karmaThreshold,ipFilter from groups where groupId='$gid'");
 	### Check IP Address
 	if ($group{ipFilter} ne "") {
+		$group{ipFilter} =~ s/\t//g;
+		$group{ipFilter} =~ s/\r//g;
+		$group{ipFilter} =~ s/\n//g;
+		$group{ipFilter} =~ s/\s//g;
 		my @ips = split(";",$group{ipFilter});
 		foreach my $ip (@ips) {
 			if ($session{env}{REMOTE_ADDR} =~ /^$ip/) {
