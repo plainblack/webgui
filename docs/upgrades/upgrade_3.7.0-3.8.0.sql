@@ -99,8 +99,14 @@ insert into wobject (wobjectId, pageId, title, displayTitle, processMacros, desc
 delete from widget where namespace='SQLReport';
 alter table SQLReport change widgetId wobjectId int not null;
 
+insert into wobject (wobjectId, pageId, title, displayTitle, processMacros, description, dateAdded, addedBy, namespace, lastEdited, editedBy, templatePosition, sequenceNumber, startDate, endDate) select widgetId, pageId, title, displayTitle, processMacros, description, dateAdded, addedBy, namespace, lastEdited, editedBy, templatePosition, sequenceNumber, dateAdded, 1336444487 from widget where namespace='EventsCalendar';
+delete from widget where namespace='EventsCalendar';
+alter table EventsCalendar change widgetId wobjectId int not null;
+alter table EventsCalendar_event change widgetId wobjectId int not null;
 
-INSERT INTO international VALUES (38,'UserSubmission','English','(Select \"No\" if you\'re writing a HTML/Rich Edit submission.)');
+INSERT INTO international VALUES (21,'EventsCalendar','English','Proceed to add event?');
+INSERT INTO international VALUES (20,'EventsCalendar','English','Add an event.');
+INSERT INTO international VALUES (38,'UserSubmission','English','(Select \"No\" if you\'re writing an HTML/Rich Edit submission.)');
 update international set message='Select \"Yes\" to change all the pages under this page to this style.' where internationalId='106' and namespace='WebGUI' and language='English';
 update international set message='Select \"Yes\" to change the privileges of all pages under this page to these privileges.' where internationalId='116' and namespace='WebGUI' and language='English';
 INSERT INTO international VALUES (500,'WebGUI','English','Page ID');
