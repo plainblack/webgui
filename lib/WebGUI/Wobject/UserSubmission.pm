@@ -190,7 +190,7 @@ sub _weblogView {
         $p = WebGUI::Paginator->new(WebGUI::URL::page(),\@row,$_[0]->get("submissionsPerPage"));
         $output .= $p->getPage($session{form}{pn});
         $output .= '</table>';
-        $output .= $p->getBarTraditional($session{form}{pn});
+        $output .= $p->getBarSimple($session{form}{pn});
         return $output;
 }
 

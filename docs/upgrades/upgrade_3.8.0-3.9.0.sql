@@ -84,7 +84,7 @@ INSERT INTO international VALUES (16,'FAQ','English','[top]');
 INSERT INTO international VALUES (509,'WebGUI','English','Discussion Layout');
 INSERT INTO international VALUES (510,'WebGUI','English','Flat');
 INSERT INTO international VALUES (511,'WebGUI','English','Threaded');
-INSERT INTO userProfileField VALUES ('discussionLayout','WebGUI::International::get(509)',1,0,'select','{\r\n  threaded=>WebGUI::International::get(511),\r\n  flat=>WebGUI::International::get(510)\r\n}','[threaded]',5,4,0);
+INSERT INTO userProfileField VALUES ('discussionLayout','WebGUI::International::get(509)',1,0,'select','{\r\n  threaded=>WebGUI::International::get(511),\r\n  flat=>WebGUI::International::get(510)\r\n}','[\'threaded\']',5,4,0);
 INSERT INTO international VALUES (512,'WebGUI','English','Next Thread');
 INSERT INTO international VALUES (513,'WebGUI','English','Previous Thread');
 delete from international where internationalId=10 and namespace='MessageBoard';
@@ -682,6 +682,13 @@ INSERT INTO international VALUES (496,'WebGUI','Dansk','Hvilken editor bruges');
 INSERT INTO international VALUES (497,'WebGUI','Dansk','Start dato');
 INSERT INTO international VALUES (498,'WebGUI','Dansk','Slut dato');
 INSERT INTO international VALUES (499,'WebGUI','Dansk','Wobject ID');
+INSERT INTO international VALUES (518,'WebGUI','English','INBOX Notifications');
+INSERT INTO international VALUES (519,'WebGUI','English','I would not like to be notified.');
+INSERT INTO international VALUES (520,'WebGUI','English','I would like to be notified via email.');
+INSERT INTO international VALUES (521,'WebGUI','English','I would like to be notified via email to pager.');
+INSERT INTO international VALUES (522,'WebGUI','English','I would like to be notified via ICQ.');
+INSERT INTO userProfileField VALUES ('INBOXNotifications','WebGUI::International::get(518)',1,0,'select','{ \r\n  none=>WebGUI::International::get(519),\r\n email=>WebGUI::International::get(520),\r\n  emailToPager=>WebGUI::International::get(521),\r\n  icq=>WebGUI::International::get(522)\r\n}','[\'email\']', 6,4,0);
+INSERT INTO international VALUES (523,'WebGUI','English','Notification');
 
 
 
