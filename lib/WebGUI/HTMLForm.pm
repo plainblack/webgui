@@ -2169,11 +2169,13 @@ sub template {
 		rearrange([qw(name value label namespace afterEdit extras uiLevel defaultValue subtext)], @p);
         if (_uiLevelChecksOut($uiLevel)) {
 		$label = $label || WebGUI::International::get(356);
-		if (WebGUI::Grouping::isInGroup(8)) {
-        		if ($afterEdit) {
-                		$buttons = editIcon("op=editTemplate&tid=".$value."&namespace=".$namespace."&afterEdit=".WebGUI::URL::escape($afterEdit));
-        		}
-        		$buttons .= manageIcon("op=listTemplates&namespace=$namespace");
+		my $template = WebGUI::Asset->newByDynamicClass($value);
+		if (defined $template && $template->canEdit) {
+        	#	if ($afterEdit) {
+                		$buttons = editIcon("func=edit",$template->get("url"));
+				#"&namespace=".$namespace."&afterEdit=".WebGUI::URL::escape($afterEdit));
+        	#	}
+        		#$buttons .= manageIcon("op=listTemplates&namespace=$namespace");
 		}
         	$output = WebGUI::Form::template({
                 	"name"=>$name,
