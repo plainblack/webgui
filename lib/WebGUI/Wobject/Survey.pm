@@ -197,6 +197,7 @@ sub www_deleteAllResponsesConfirm {
 sub www_edit {
 	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
         my ($f, $output, $surveyId, $questionOrder, $mode, $groupToViewReports, $sth, %data, $groupToTakeSurvey);
+	tie %data, 'Tie::CPHash';
         $mode = $_[0]->get("mode") || "survey";
         $questionOrder = $_[0]->get("questionOrder") || "sequential";
 	$groupToViewReports = $_[0]->get("groupToViewReports") || 4;
@@ -359,6 +360,7 @@ sub www_editAnswerSave {
 sub www_editQuestion {
 	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
 	my ($output, $f, $question, $answerFieldType, $sth, %data);
+	tie %data, 'Tie::CPHash';
 	$question = $_[0]->getCollateral("Survey_question","Survey_questionId",$session{form}{qid});
 	$output = '<h1>'.WebGUI::International::get(17,$namespace).'</h1>';
 	$answerFieldType = $question->{answerFieldType} || "radioList";
