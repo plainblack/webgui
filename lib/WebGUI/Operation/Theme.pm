@@ -20,6 +20,7 @@ use WebGUI::Grouping;
 use WebGUI::HTMLForm;
 use WebGUI::HTTP;
 use WebGUI::Icon;
+use WebGUI::Id;
 use WebGUI::International;
 use WebGUI::Node;
 use WebGUI::Operation::Shared;
@@ -111,7 +112,7 @@ sub www_addThemeComponentSave {
 		$id =~ /^(.*?)\_(.*)/;
 		my $type = $1;
 		$id = $2;	
-	        my $componentId = getNextId("themeComponentId");
+	        my $componentId = WebGUI::Id::generate();
         	WebGUI::SQL->write("insert into themeComponent (themeId,themeComponentId,type,id)
                 	        values ($session{form}{themeId}, $componentId, ".quote($type).", ".quote($id).")");
 	}
@@ -245,7 +246,7 @@ sub www_editTheme {
 sub www_editThemeSave {
         return WebGUI::Privilege::insufficient unless (WebGUI::Grouping::isInGroup(9));
 	if ($session{form}{themeId} eq "new") {
-		$session{form}{themeId} = getNextId("themeId");
+		$session{form}{themeId} = WebGUI::Id::generate();
 		WebGUI::SQL->write("insert into theme (themeId,webguiVersion,original,versionNumber) 
 			values ($session{form}{themeId},".quote($WebGUI::VERSION).",1,0)");
 	}
@@ -385,17 +386,17 @@ sub www_importThemeSave {
         return WebGUI::Privilege::insufficient unless (WebGUI::Grouping::isInGroup(9));
 	my $propertiesFile = WebGUI::Attachment->new("_theme.properties","temp",$session{form}{extractionPoint});
 	my $theme = $propertiesFile->getHashref;
-	my $themeId = getNextId("themeId");
+	my $themeId = WebGUI::Id::generate();
 	WebGUI::SQL->write("insert into theme (themeId,name,designer,designerURL,webguiVersion,versionNumber,original) values
 		($themeId, ".quote($theme->{name}).", ".quote($theme->{designer}).", ".quote($theme->{designerURL})
 		.", ".quote($theme->{webguiVersion}).", $theme->{versionNumber}, 0)");
-	my $collateralFolderId = getNextId("collateralFolderId");
+	my $collateralFolderId = WebGUI::Id::generate();
 	WebGUI::SQL->write("insert into collateralFolder (collateralFolderId,name,parentId) values ($collateralFolderId,
 		".quote($theme->{name}).", 0)");
 	foreach my $key (keys %{$theme->{components}}) {
 		my $type = $theme->{components}{$key}{type};
 		if ($type eq "template") {
-			$theme->{components}{$key}{properties}{$type."Id"} = getNextId($type."Id");
+			$theme->{components}{$key}{properties}{$type."Id"} = WebGUI::Id::generate();
 			my (@fields, @values);
 			foreach my $property (keys %{$theme->{components}{$key}{properties}}) {
 				push(@fields,$property);
@@ -405,7 +406,7 @@ sub www_importThemeSave {
 			my $id = $theme->{components}{$key}{properties}{$type."Id"};
 			$id .= "_".$theme->{components}{$key}{properties}{namespace} if ($type eq "template");
 			WebGUI::SQL->write("insert into themeComponent (themeId,themeComponentId,type,id) 
-				values ($themeId, ".getNextId("themeComponentId").", ".quote($type).", ".quote($id).")");
+				values ($themeId, ".WebGUI::Id::generate().", ".quote($type).", ".quote($id).")");
 		} elsif (isIn($type, qw(image file snippet))) {
 			$theme->{components}{$key}{properties}{collateralFolderId} = $collateralFolderId;
 			my $c = WebGUI::Collateral->new("new");
@@ -413,7 +414,7 @@ sub www_importThemeSave {
 			$c->saveFromFilesystem($propertiesFile->getNode->getPath.$session{os}{slash}
 				.$theme->{components}{$key}{properties}{filename});
 			WebGUI::SQL->write("insert into themeComponent (themeId,themeComponentId,type,id) 
-				values ($themeId, ".getNextId("themeComponentId").", ".quote($type).", "
+				values ($themeId, ".WebGUI::Id::generate().", ".quote($type).", "
 				.quote($c->get("collateralId")).")");
 		}
 	}

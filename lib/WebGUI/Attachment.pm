@@ -145,7 +145,7 @@ sub copy {
                 	$b = FileHandle->new(">".$newNode->getPath.$session{os}{slash}.'thumb-'.$_[0]->getFilename);
                 	if (defined $b) {
                         	binmode($b);
-                        	cp($a,$b);
+                        	cp($a,$b) or WebGUI::ErrorHandler::warn("Couldn't copy thumbnail: ".)$newNode->getPath.$session{os}{slash}.'thumb-'.$_[0]->getFilename." :".$!);
                         	$b->close;
                 	}
                 	$a->close;
@@ -613,25 +613,29 @@ sub saveFromFilesystem {
                 }
                 $_[0]->{_filename} = WebGUI::URL::makeCompliant($_[0]->getFilename);
                 $_[0]->getNode->create();
-		$a = FileHandle->new($_[1],"r");
-                if (defined $a) {
-                       	binmode($a);
-                	$b = FileHandle->new(">".$_[0]->getPath);
-			if (defined $b) {
-                        	binmode($b);
-                        	cp($a,$b);
-                        	$b->close;
-                        	$_[0]->createThumbnail($_[2]);
-                        	$_[0]->resizeImage($_[3]);
-                	} else {
-                        	WebGUI::ErrorHandler::warn("Couldn't open file ".$_[0]->getPath." for writing due to error: ".$!);
-                        	$_[0]->{_filename} = "";
-			}
-                       	$a->close;
+		if (-d $_[1]) {
+			WebGUI::ErrorHandler::warn($_[1]." is a directory, not a file.");
 		} else {
-                       	WebGUI::ErrorHandler::warn("Couldn't open file ".$_[1]." for reading due to error: ".$!);
-                       	$_[0]->{_filename} = "";
-                }
+			$a = FileHandle->new($_[1],"r");
+        	        if (defined $a) {
+                	       	binmode($a);
+                		$b = FileHandle->new(">".$_[0]->getPath);
+				if (defined $b) {
+        	                	binmode($b);
+                	        	cp($a,$b) or WebGUI::ErrorHandler::warn("Couldn't copy $_[1] to ".$_[0]->getPath.": $!");;
+                        		$b->close;
+                        		$_[0]->createThumbnail($_[2]);
+	                        	$_[0]->resizeImage($_[3]);
+        	        	} else {
+                	        	WebGUI::ErrorHandler::warn("Couldn't open file ".$_[0]->getPath." for writing due to error: ".$!);
+                        		$_[0]->{_filename} = "";
+				}
+                       		$a->close;
+			} else {
+        	               	WebGUI::ErrorHandler::warn("Couldn't open file ".$_[1]." for reading due to error: ".$!);
+                	       	$_[0]->{_filename} = "";
+                	}
+		}
         } else {
                 $_[0]->{_filename} = "";
         }

@@ -376,6 +376,7 @@ The message you wish to write to the log.
 sub writeLog {
         if (my $log = FileHandle->new(">>".$WebGUI::Session::session{config}{logfile})) {
 		print $log $_[0];
+		printf $log '%s:%d (sub %s) ',(caller(2))[1,2,3];
 		$log->close;
 	} else {
 		use CGI;

@@ -6,13 +6,18 @@
  - bugfix [ 1028561 ] Manage Users - Next Page Link Broken
  - bugfix [ 1028494 ] Folder not shown in Manage Collateral
  - bugfix [ 1028446 ] Can't copy Navigation
+ - bugfix [ 1027705 ] %row in sub self_and_sisters should be case-insensitive
+   (Yary Hluchan).
+ - bugfix [ 1027834 ] Theme Importer fails due to getNextId
+ - bugfix [ 1027698 ] Attatchment::saveFromFilesystem fails when 1st arg is a
+   dir (Yary Hluchan)
+ - bugfix [ 1027684 ] cp silent failure in Attatchment.pm (Yary Hluchan)
+ - bugfix [ 1027681 ] Some warnings hard to track down (Yary Hluchan)
 
 
 6.2.2
  - Made a dramatic performance enhancement to the page tree system by
    restructuring an overused, and inefficent method.
- - Added a gotcha warning about setting the TZ environment variable on Windows
-   systems.
  - bugfix [1024275]. Drag and drop not working (Leendert Bottelberghs).
  - bugfix [ 1025671 ] Crash on manage page tree. (Leendert Bottelberghs)
  - bugfix [ 1025271 ] Cut page not working. (Leendert Bottelberghs)

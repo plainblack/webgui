@@ -17,6 +17,7 @@ package WebGUI::Page;
 use HTML::Template;
 use strict;
 use Tie::IxHash;
+use Tie::CPHash;
 use WebGUI::Cache;
 use WebGUI::DateTime;
 use WebGUI::ErrorHandler;
@@ -1417,6 +1418,7 @@ Returns an array of hashrefs containing the page properties of this node and it'
 sub self_and_sisters {
 	my ($self, $sth, %row, @result);
 	$self = shift;
+	tie %row,'Tie::CPHash';
 	$sth = WebGUI::SQL->read(
 		"select a.* 
 		from page as a, 
