@@ -148,7 +148,7 @@ Name value pairs to add to the URL in the form of:
 =cut
 
 sub gateway {
-        my $url = _getSiteURL().$session{config}{scripturl}.'/'.$_[0];
+        my $url = _getSiteURL().($session{config}{scripturl} || $session{env}{SCRIPT_NAME}).'/'.$_[0];
 	if ($_[1]) {
 		$url = append($url,$_[1]);
 	}

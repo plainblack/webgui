@@ -19,9 +19,9 @@ use CGI;
 use Date::Calc;
 use DBI;
 use Exporter;
-use Parse::PlainConfig;
 use strict;
 use Tie::CPHash;
+use WebGUI::Config;
 use WebGUI::ErrorHandler;
 use WebGUI::SQL;
 use WebGUI::Utility;
@@ -96,7 +96,7 @@ sub _setupPageInfo {
 		}
 	}
 	%page = WebGUI::SQL->quickHash("select * from page where pageId='".$pageId."'");
-	$page{url} = $session{config}{scripturl}."/".$page{urlizedTitle};
+	$page{url} = ($session{config}{scripturl} || $session{env}{SCRIPT_NAME})."/".$page{urlizedTitle};
 	$session{page} = \%page;
 }
 
@@ -291,7 +291,9 @@ The filename of the config file that WebGUI should operate from.
 =cut
 
 sub open {
-	my ($key, $config);
+	my $webguiRoot = shift;
+	my $configFile = shift;
+	my ($key);
 	###----------------------------
 	### operating system specific things
 	$session{os}{name} = $^O;
@@ -304,32 +306,7 @@ sub open {
 	}
 	###----------------------------
 	### config variables
-	$session{config}{webguiRoot} = $_[0];
-	$session{config}{configFile} = $_[1] || "WebGUI.conf";
-	$config = Parse::PlainConfig->new('DELIM' => '=', 
-		'FILE' => $session{config}{webguiRoot}.'/etc/'.$session{config}{configFile}, 
-		'PURGE' => 1);
-        foreach ($config->directives) {
-                $session{config}{$_} = $config->get($_);
-        }
-	if (ref $session{config}{authMethods} ne "ARRAY") {
-		$session{config}{authMethods} = [$session{config}{authMethods}];
-	}
-	if( defined( $session{config}{scripturl} ) ) {
-		# get rid of leading "/" if present.
-		$session{config}{scripturl} =~ s/^\///;
-	} else {
-		# default to the "real" path to script.
-		$session{config}{scripturl} = $ENV{SCRIPT_NAME};
-	}
-	$session{config}{extrasURL} = $session{config}{extrasURL} || $session{config}{extras} || "/extras";
-	$session{config}{extras} = $session{config}{extras} || $session{config}{extrasURL}; # for backward compatibility
-	$session{config}{extrasPath} = $session{config}{extrasPath} || "/data/WebGUI/www/extras";
-	if (ref $session{config}{sitename} eq "ARRAY") {
-                $session{config}{defaultSitename} = $session{config}{sitename}[0];
-        } else {
-                $session{config}{defaultSitename} = $session{config}{sitename};
-        }
+	$session{config} = WebGUI::Config::getConfig($webguiRoot,$configFile);
 	###----------------------------
 	### default database handler object
 	$session{dbh} = DBI->connect($session{config}{dsn},$session{config}{dbuser},$session{config}{dbpass},{ RaiseError=>0,AutoCommit=>1 });

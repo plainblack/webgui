@@ -29,6 +29,13 @@ save you many hours of grief.
  * Each user's language has been reset to the default language for
 	the site as specified in the profile settings.
 
+ * We removed a bunch of the cryptic-hack code that was allowing
+	backward compatibility all the way back to some 2.x, 3.x, and
+	4.x stuff. To be sure that your site will still work, copy
+	the gateway script (index.pl) over your old one. Also make
+	sure you have extrasPath and extrasURL defined in your config
+	file.
+
 
 6.0.2
 --------------------------------------------------------------------

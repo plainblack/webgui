@@ -15,7 +15,7 @@ use WebGUI::Session;
 
 #-------------------------------------------------------------------
 sub process {
-	return $session{config}{scripturl}.'/';
+	return ($session{config}{scripturl} || $session{env}{SCRIPT_NAME})."/";
 }
 
 

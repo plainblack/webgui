@@ -1,10 +1,16 @@
 #!/usr/bin/perl
 use strict;
 
-use lib "/data/WebGUI/lib";  # Edit to match your WebGUI installation directory.
+my $webguiRoot;
 
+BEGIN {
+        $webguiRoot = "/data/WebGUI"; # Edit to match your WebGUI installation directory.
+        unshift (@INC, $webguiRoot."/lib");
+}
 
-print "Starting WebGUI ".$WebGUI::VERSION."\t\t";
+$|=1;
+
+print "\nStarting WebGUI ".$WebGUI::VERSION."\n";
 $ENV{GATEWAY_INTERFACE} =~ /^CGI-Perl/ or die "GATEWAY_INTERFACE not Perl!";
 
 #----------------------------------------
@@ -12,6 +18,7 @@ $ENV{GATEWAY_INTERFACE} =~ /^CGI-Perl/ or die "GATEWAY_INTERFACE not Perl!";
 #----------------------------------------
 #use Apache::Registry (); # Uncomment this for use with mod_perl 1.0
 use ModPerl::Registry (); # Uncomment this for use with mod_perl 2.0
+
 
 
 #----------------------------------------
@@ -63,6 +70,7 @@ use WebGUI::Auth ();
 use WebGUI::Cache ();
 use WebGUI::Collateral ();
 use WebGUI::CollateralFolder ();
+use WebGUI::Config ();
 use WebGUI::DatabaseLink ();
 use WebGUI::DateTime ();
 use WebGUI::ErrorHandler ();
@@ -198,7 +206,16 @@ use WebGUI::Auth::WebGUI ();
 use WebGUI::Macro::AdminBar ();
 use WebGUI::Macro::Navigation ();
 
-print "[  OK  ]\n";
+
+
+#----------------------------------------
+# Preload all site configs.
+#----------------------------------------
+WebGUI::Config::laodAllConfigs($webguiRoot);
+
+
+
+print "WebGUI Started!\n";
 
 
 1;

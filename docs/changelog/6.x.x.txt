@@ -57,6 +57,11 @@
    performance gain while in admin mode.
  - Changed the group and user management interfaces to work and scale better 
    with thousands of users and groups.
+ - Changed the config loader to preload the WebGUI config files into memory at
+   a cost of ~70k (mem) per site for a 2000% performance gain. It is a huge
+   gain, but it was already really fast, so relatively users aren't likely to
+   notice the difference. However, this change helps in the overall
+   scalability of WebGUI under load.
 
 
 6.0.3
