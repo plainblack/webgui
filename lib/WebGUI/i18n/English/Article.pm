@@ -7,8 +7,8 @@ our $I18N = {
 	},
 
 	'71' => {
-		message => q|Articles are the Swiss Army knife of WebGUI. Most pieces of static content can be added via the Article.
-<br><br>
+		message => q|<P>Articles are the Swiss Army knife of WebGUI. Most pieces of static content can be added via the Article.  Dataforms are Wobjects, so they inherit the properties of both Wobjects and Assets.
+<P>
 
 NOTE: You can create a multi-paged article by placing the separator macro (^-;) at various places through-out your article.  This works unless you are using a Make Page Printable style.
 
@@ -30,9 +30,8 @@ If you added a link title, now add the URL (uniform resource locater) here.
 
 <p><b>Convert carriage returns?</b><br>
 If you're publishing HTML there's generally no need to check this option, but if you aren't using HTML and you want a carriage return every place you hit your "Enter" key, then check this option.
-
 |,
-		lastUpdated => 1106767668
+		lastUpdated => 1106779583,
 	},
 
 	'7' => {
@@ -131,7 +130,6 @@ The first four sentences in the description. A sentence is determined by countin
 <p>
 
 
-
 <b>attachment.box</b><br/>
 Outputs a standard WebGUI attachment box including icon, filename, and attachment indicator.
 <p/>
@@ -164,28 +162,8 @@ The title of the link added to the article.
 The URL for the link added to the article.
 <p/>
 
-<b>post.label</b><br/>
-The translated label to add a comment to this article.
-<p/>
-
-<b>post.URL</b><br/>
-The URL to add a comment to this article.
-<p/>
-
-<b>replies.count</b><br/>
-The number of comments attached to this article.
-<p/>
-
-<b>replies.label</b><br/>
-The translated text indicating that you can view the replies.
-<p/>
-
-<b>replies.url</b><br/>
-The URL to view the replies to this article.
-<p/>
-
 |,
-		lastUpdated => 1096219144
+		lastUpdated => 1106777549
 	},
 
 	'24' => {
