@@ -104,7 +104,7 @@ while(<FILE>) {
 					WebGUI::SQL->write("insert into authentication (userId,authMethod,fieldName,fieldData)
 						values ($user{userId},'WebGUI','$_',".$dbh->quote($user{$_}).")");
 				}
-                                if (isIn($_, qw(ldapURL connectDN)) {
+                                if (isIn($_, qw(ldapURL connectDN))) {
                                         WebGUI::SQL->write("insert into authentication (userId,authMethod,fieldName,fieldData)
                                                 values ($user{userId},'LDAP','$_',".$dbh->quote($user{$_}).")");
                                 }
