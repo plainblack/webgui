@@ -143,12 +143,13 @@ $sth->finish;
 	"alter table DataForm_entryData drop column sequenceNumber",
 	"alter table DataForm add column emailTemplateId int not null default 2",
 	"alter table DataForm add column acknowlegementTemplateId int not null default 3",
-	"alter table DataForm_field drop column validation"
+	"alter table DataForm_field drop column validation",
+	"alter table DataForm add column listTemplateId int not null default 1"
         );
 foreach my $query (@sql) {
         WebGUI::SQL->write($query);
 }
-my $sth = WebGUI::SQL->read("select DataForm_fieldId,name,wobjectId from DataForm_fieldId");
+my $sth = WebGUI::SQL->read("select DataForm_fieldId,name,wobjectId from DataForm_field");
 while (my @data = $sth->array) {
 	my $newname = WebGUI::URL::urlize($data[1]);
 	WebGUI::SQL->write("update DataForm_field set name=".quote($newname)." where DataForm_fieldId=".$data[0]);
