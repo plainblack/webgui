@@ -262,9 +262,11 @@ sub www_createAccountSave {
 sub www_deactivateAccount {
         my ($output);
         if ($session{user}{userId} == 1) {
-                $output .= www_displayLogin();
+                $output = www_displayLogin();
+        } elsif ($session{user}{userId} < 26) {
+		$output = WebGUI::Privilege::vitalComponent();
         } else {
-                $output .= '<h1>'.WebGUI::International::get(42).'</h1>';
+                $output = '<h1>'.WebGUI::International::get(42).'</h1>';
                 $output .= WebGUI::International::get(60).'<p>';
                 $output .= '<div align="center"><a href="'.WebGUI::URL::page('op=deactivateAccountConfirm').'">'.
 			WebGUI::International::get(44).'</a>';
@@ -276,7 +278,9 @@ sub www_deactivateAccount {
 #-------------------------------------------------------------------
 sub www_deactivateAccountConfirm {
 	my ($u);
-        if ($session{user}{userId} != 1) {
+        if ($session{user}{userId} < 26) {
+                return WebGUI::Privilege::vitalComponent();
+        } elsif ($session{user}{userId} != 1) {
 		$u = WebGUI::User->new($session{user}{userId});
 		$u->delete;
 	        WebGUI::Session::end($session{var}{sessionId});
