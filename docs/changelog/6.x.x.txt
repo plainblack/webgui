@@ -6,6 +6,7 @@
  - Fixed a bug where URLs would become unreachable when using SSL.
  - Added an initial configuration wizard which prompts the site owner to
    configure a custom admin username and password for better security.
+ - Fixed a password timeout bug caused by the change in the interval method.
 
 
 6.3.0

@@ -15,6 +15,7 @@ use strict;
 use WebGUI::Asset::Template;
 use WebGUI::Auth;
 use WebGUI::DateTime;
+use WebGUI::FormProcessor;
 use WebGUI::HTMLForm;
 use WebGUI::Macro;
 use WebGUI::Mail;
@@ -81,7 +82,12 @@ sub addUserForm {
    my $userData = $self->getParams;
    my $f = WebGUI::HTMLForm->new;
    $f->password("authWebGUI.identifier",WebGUI::International::get(51),"password");
-   $f->interval("authWebGUI.passwordTimeout",WebGUI::International::get(16,'AuthWebGUI'),WebGUI::DateTime::secondsToInterval(($userData->{passwordTimeout} || $session{setting}{webguiPasswordTimeout})));
+   $f->interval(
+	-name=>"authWebGUI.passwordTimeout",
+	-label=>WebGUI::International::get(16,'AuthWebGUI'),
+	-value=>$userData->{passwordTimeout},
+	-defaultValue=>$session{setting}{webguiPasswordTimeout}
+	);
    my $userChange = $session{setting}{webguiChangeUsername};
    if($userChange || $userChange eq "0"){
       $userChange = $userData->{changeUsername};
@@ -119,7 +125,7 @@ sub addUserFormSave {
    }
    $properties->{changeUsername} = $session{form}{'authWebGUI.changeUsername'};
    $properties->{changePassword} = $session{form}{'authWebGUI.changePassword'};
-   $properties->{passwordTimeout} =  WebGUI::DateTime::intervalToSeconds($session{form}{'authWebGUI.passwordTimeout_interval'},$session{form}{'authWebGUI.passwordTimeout_units'});
+   $properties->{passwordTimeout} =  WebGUI::FormProcessor::interval('authWebGUI.passwordTimeout');
    $properties->{passwordLastUpdated} = time();
    if($session{setting}{webguiExpirePasswordOnCreation}){
       $properties->{passwordLastUpdated} = time() - $properties->{passwordTimeout};   
@@ -289,7 +295,7 @@ sub editUserFormSave {
 	     $properties->{passwordLastUpdated} = time();
       }
    }
-   $properties->{passwordTimeout} = WebGUI::DateTime::intervalToSeconds($session{form}{'authWebGUI.passwordTimeout_interval'},$session{form}{'authWebGUI.passwordTimeout_units'});
+   $properties->{passwordTimeout} = WebGUI::FormProcessor::interval('authWebGUI.passwordTimeout');
    $properties->{changeUsername} = $session{form}{'authWebGUI.changeUsername'};
    $properties->{changePassword} = $session{form}{'authWebGUI.changePassword'};
    
@@ -314,7 +320,11 @@ sub editUserSettingsForm {
 			 -size=>5,
 			 -maxLength=>5,
 			);
-   $f->interval("webguiPasswordTimeout",WebGUI::International::get(16,'AuthWebGUI'),WebGUI::DateTime::secondsToInterval($session{setting}{webguiPasswordTimeout}));
+   $f->interval(
+	-name=>"webguiPasswordTimeout",
+	-label=>WebGUI::International::get(16,'AuthWebGUI'),
+	-value=>$session{setting}{webguiPasswordTimeout}
+	);
    $f->yesNo(
              -name=>"webguiExpirePasswordOnCreation",
              -value=>$session{setting}{webguiExpirePasswordOnCreation},
