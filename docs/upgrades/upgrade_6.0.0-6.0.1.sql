@@ -1,3 +1,4 @@
+insert into webguiVersion values ('6.0.1','upgrade',unix_timestamp());
 delete from help where helpId=1 and namespace='Auth/WebGUI/Account';
 insert into help (helpId,namespace,titleId,bodyId,seeAlso) values (1, 'Auth/WebGUI/Account', 1, 2, '51,WebGUI;');
 delete from help where helpId=1 and namespace='Auth/LDAP/Account';
