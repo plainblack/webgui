@@ -73,7 +73,7 @@ sub _isDuplicateUsername {
 
 =head2 _isValidUsername ( username )
 
-  Validates the username passed in.
+Validates the username passed in.
 
 =cut
 
@@ -107,7 +107,7 @@ sub _logLogin {
 
 =head2 addUserForm ( userId )
 
-  Creates elements for the add user form specific to this Authentication Method.
+Creates elements for the add user form specific to this Authentication Method.
 
 =cut
 
@@ -119,7 +119,7 @@ sub addUserForm {
 
 =head2 addUserFormSave ( properties [,userId] )
 
-  Saves user elements unique to this authentication method
+Saves user elements unique to this authentication method
 
 =cut
 
@@ -132,7 +132,7 @@ sub addUserFormSave {
 
 =head2 authenticate ( )
 
-  Superclass method that performs standard login routines.  This method should return true or false.
+Superclass method that performs standard login routines.  This method should return true or false.
 
 =cut
 
@@ -157,9 +157,10 @@ sub authenticate {
 }
 
 #-------------------------------------------------------------------
+
 =head2 authMethod ( [authMethod] )
 
-  Gets or sets the authMethod in the Auth Object
+Gets or sets the authMethod in the Auth Object
 
 =over
 
@@ -178,23 +179,24 @@ sub authMethod {
 }
 
 #-------------------------------------------------------------------
+
 =head2 createAccount ( method [,vars,template] )
 
-  Superclass method that performs general functionality for creating new accounts.
+Superclass method that performs general functionality for creating new accounts.
 
 =over
 
 =item method
 
-   Auth method that the form for creating users should call
+Auth method that the form for creating users should call
    
 =item vars
    
-   Array ref of template vars from subclass
+Array ref of template vars from subclass
    
 =item template
 
-   Template that this class should use for display purposes
+Template that this class should use for display purposes
 
 =back
   
@@ -224,27 +226,28 @@ sub createAccount {
 }
 
 #-------------------------------------------------------------------
+
 =head2 createAccountSave ( username,properties [,password,profile] )
 
-  Superclass method that performs general functionality for saving new accounts.
+Superclass method that performs general functionality for saving new accounts.
 
 =over
 
 =item username
 
-   Username for the account being created
+Username for the account being created
    
 =item properties
    
-   Properties from the subclass that should be saved as authentication parameters
+Properties from the subclass that should be saved as authentication parameters
    
 =item password
 
-   Password entered by the user.  This is only used in for sending the user a notification by email of his/her username/password
+Password entered by the user.  This is only used in for sending the user a notification by email of his/her username/password
 
 =item profile
    
-   Hashref of profile values returned by the function WebGUI::Operation::Profile::validateProfileData()
+Hashref of profile values returned by the function WebGUI::Operation::Profile::validateProfileData()
    
 =back
   
@@ -282,15 +285,16 @@ sub createAccountSave {
 }
 
 #-------------------------------------------------------------------
+
 =head2 deactivateAccount ( method )
 
-  Superclass method that displays a confirm message for deactivating a user's account.
+Superclass method that displays a confirm message for deactivating a user's account.
 
 =over
 
 =item method
 
-   Auth method that the form for creating users should call
+Auth method that the form for creating users should call
    
 =back
   
@@ -312,9 +316,10 @@ sub deactivateAccount {
 }
 
 #-------------------------------------------------------------------
+
 =head2 deactivateAccount ( method )
 
-  Superclass method that performs general functionality for deactivating accounts.
+Superclass method that performs general functionality for deactivating accounts.
   
 =cut
 
@@ -328,6 +333,7 @@ sub deactivateAccountConfirm {
 }
 
 #-------------------------------------------------------------------
+
 =head2 deleteParams (  )
 
 Removes the user's authentication parameters from the database for all authentication methods. This is primarily useful when deleting the user's account.
@@ -340,23 +346,24 @@ sub deleteParams {
 }
 
 #-------------------------------------------------------------------
+
 =head2 displayAccount ( method [,vars,template] )
 
-  Superclass method that performs general functionality for viewing editable fields related to a user's account.
+Superclass method that performs general functionality for viewing editable fields related to a user's account.
 
 =over
 
 =item method
 
-   Auth method that the form for updating a user's account should call
+Auth method that the form for updating a user's account should call
    
 =item vars
    
-   Array ref of template vars from subclass
+Array ref of template vars from subclass
    
 =item template
 
-   Template that this class should use for display purposes
+Template that this class should use for display purposes
 
 =back
   
@@ -385,23 +392,24 @@ sub displayAccount {
 }
 
 #-------------------------------------------------------------------
+
 =head2 displayLogin ( [method,vars,template] )
 
-  Superclass method that performs general functionality for creating new accounts.
+Superclass method that performs general functionality for creating new accounts.
 
 =over
 
 =item method
 
-   Auth method that the form for performing the login routine should call
+Auth method that the form for performing the login routine should call
    
 =item vars
    
-   Array ref of template vars from subclass
+Array ref of template vars from subclass
    
 =item template
 
-   Template that this class should use for display purposes
+Template that this class should use for display purposes
 
 =back
   
@@ -439,7 +447,7 @@ sub displayLogin {
 
 =head2 editUserForm (  )
 
-  Creates user form elements specific to this Auth Method.
+Creates user form elements specific to this Auth Method.
 
 =cut
 
@@ -451,7 +459,7 @@ sub editUserForm {
 
 =head2 editUserFormSave ( properties )
 
-  Saves user elements unique to this authentication method
+Saves user elements unique to this authentication method
 
 =cut
 
@@ -464,7 +472,7 @@ sub editUserFormSave {
 
 =head2 error ( [errorMsg] )
 
-  Sets or returns the error currently stored in the object
+Sets or returns the error currently stored in the object
 
 =cut
 
@@ -478,7 +486,7 @@ sub error {
 
 =head2 getParams ()
 
-   Returns a hash reference with the user's authentication information.  This method uses data stored in the instance of the object.
+Returns a hash reference with the user's authentication information.  This method uses data stored in the instance of the object.
 
 =cut
 
@@ -493,13 +501,13 @@ sub getParams {
 
 =head2 getSetting (  setting  )
 
- Returns a setting for this authMethod instance.  If none is specified, returns the system authMethod setting
+Returns a setting for this authMethod instance.  If none is specified, returns the system authMethod setting
 
 =over
 
 =item setting
 
-   Specify a setting to retrieve
+Specify a setting to retrieve
 
 =back
 
@@ -515,8 +523,8 @@ sub getSetting {
 #-------------------------------------------------------------------
 =head2 init ( )
 
-  Initialization function for these auth routines.  Default is a superclass function called displayLogin.
-  Override this method in your subclass to change the initialization for custom authentication methods
+Initialization function for these auth routines.  Default is a superclass function called displayLogin.
+Override this method in your subclass to change the initialization for custom authentication methods
 
 =cut
 
@@ -529,7 +537,7 @@ sub init {
 
 =head2 isCallable ( method )
 
-  Returns whether or not a method is callable
+Returns whether or not a method is callable
 
 =cut
 
@@ -543,8 +551,8 @@ sub isCallable {
 
 =head2 login ( )
 
-  Superclass method that performs standard login routines.  This is what should happen after a user has been authenticated.
-  Authentication should always happen in the subclass routine.
+Superclass method that performs standard login routines.  This is what should happen after a user has been authenticated.
+Authentication should always happen in the subclass routine.
 
 =cut
 
@@ -569,7 +577,7 @@ sub login {
 #-------------------------------------------------------------------
 =head2 logout ( )
 
-  Superclass method that performs standard logout routines.
+Superclass method that performs standard logout routines.
 
 =cut
 
@@ -589,15 +597,15 @@ Constructor.
 
 =item authMethod
   
-  This object's authentication method
+This object's authentication method
   
 =item userId
 
-  userId for the user requesting authentication.  This defaults to $session{user}{userId}
+userId for the user requesting authentication.  This defaults to $session{user}{userId}
   
 =item callable
 
-  Array reference of methods allowed to be called externally;  
+Array reference of methods allowed to be called externally;  
 
 =back
 
@@ -625,7 +633,7 @@ sub new {
 
 =head2 profile ()
 
-   Sets or returns the Profile hash for a user.
+Sets or returns the Profile hash for a user.
 
 =cut
 
@@ -638,16 +646,17 @@ sub profile {
 
 
 #-------------------------------------------------------------------
+
 =head2 setCallable ( callableMethods )
 
-  adds elements to the callable routines list.  This list determines whether or not a method in this instance is 
-  allowed to be called externally
+adds elements to the callable routines list.  This list determines whether or not a method in this instance is 
+allowed to be called externally
 
 =over
 
 =item callableMethods
 
-  Array reference containing a list of methods for this authentication instance that can be called externally
+Array reference containing a list of methods for this authentication instance that can be called externally
 
 =back
 
@@ -696,7 +705,7 @@ sub saveParams {
 
 =head2 user ( [user] )
 
-  Sets or Returns the user object stored in the wobject
+Sets or Returns the user object stored in the wobject
 
 =cut
 
@@ -710,7 +719,7 @@ sub user {
 
 =head2 userId ( )
 
-  Returns the userId currently stored in the object
+Returns the userId currently stored in the object
 
 =cut
 
@@ -724,7 +733,7 @@ sub userId {
 
 =head2 username ( )
 
-  Returns the username currently stored in the object
+Returns the username currently stored in the object
 
 =cut
 
@@ -738,7 +747,7 @@ sub username {
 
 =head2 validUsername ( username )
 
-  Validates the a username.
+Validates the a username.
 
 =cut
 
@@ -763,7 +772,7 @@ sub validUsername {
 
 =head2 warning ( [warningMsg] )
 
-  Sets or Returns a warning in the object
+Sets or Returns a warning in the object
 
 =cut
 

@@ -21,7 +21,7 @@
  - bugfix [ 1027333 ] 6.2.1 Page Tree
  - bugfix [ 1027129 ] view message causes error
  - bugfix [ 1024079 ] "Software error" message
-
+ - Fixed a bunch of POD errors.
 
 
 6.2.1
