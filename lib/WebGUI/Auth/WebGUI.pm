@@ -294,8 +294,7 @@ sub recoverPassword {
    $vars->{'recover.message'} = $_[0] if ($_[0]);
    $vars->{'recover.form.email'} = WebGUI::Form::text({"name"=>"email"});
    $vars->{'recover.form.email.label'} = WebGUI::International::get(56);
-   $self->SUPER::recoverPassword("recoverPasswordFinish",$vars);
-   return WebGUI::Template::process(WebGUI::Template::get(1,'Auth/WebGUI/Recovery'), $vars);
+   return $self->SUPER::recoverPassword("recoverPasswordFinish",$vars);
 }
 
 #-------------------------------------------------------------------

@@ -22,7 +22,6 @@ use WebGUI::Group;
 use WebGUI::Grouping;
 use WebGUI::International;
 use WebGUI::Macro;
-use WebGUI::Operation::Account ();
 use WebGUI::Session;
 use WebGUI::SQL;
 use WebGUI::URL;
@@ -397,24 +396,24 @@ Returns a message stating that the user does not have the privileges necessary t
 =cut
 
 sub noAccess {
-	if($session{env}{MOD_PERL}) {
-                my $r = Apache->request;
-                if(defined($r)) {
-                        $r->custom_response(401, '<!--No Access-->' );
-                        $r->status(401);
-                }
-        } else {
-		$session{header}{status} = 401;
-	}
-	my ($output);
-        if ($session{user}{userId} <= 1) {
-                $output = WebGUI::Operation::Account::www_displayLogin();
-        } else {
-                $output = '<h1>'.WebGUI::International::get(37).'</h1>';
-                $output .= WebGUI::International::get(39);
-                $output .= '<p>';
-        }
-        return $output;
+   if($session{env}{MOD_PERL}) {
+      my $r = Apache->request;
+      if(defined($r)) {
+         $r->custom_response(401, '<!--No Access-->' );
+         $r->status(401);
+      }
+   } else {
+      $session{header}{status} = 401;
+   }
+   my ($output);
+   if ($session{user}{userId} <= 1) {
+      $output = WebGUI::Operation::Auth::www_auth("init");
+   } else {
+      $output = '<h1>'.WebGUI::International::get(37).'</h1>';
+      $output .= WebGUI::International::get(39);
+      $output .= '<p>';
+   }
+   return $output;
 }
 
 #-------------------------------------------------------------------

@@ -19,6 +19,7 @@ use DBI;
 use strict qw(subs vars);
 use Tie::IxHash;
 use WebGUI::DateTime;
+use WebGUI::ErrorHandler;
 use WebGUI::FormProcessor;
 use WebGUI::HTML;
 use WebGUI::HTMLForm;
@@ -442,6 +443,13 @@ sub getSetting {
 }
 
 #-------------------------------------------------------------------
+sub init {
+   my $self = shift;
+   WebGUI::ErrorHandler::warn("In init");
+   return $self->displayLogin;
+}
+
+#-------------------------------------------------------------------
 
 =head2 isCallable ( method )
 
@@ -540,6 +548,7 @@ sub recoverPassword {
    my $self = shift;
    my $method = $_[0];
    my $vars = $_[1];
+   my $template = $_[2] || 'Auth/'.$self->authMethod.'/Recovery';
       
    $vars->{displayTitle} = '<h1>'.WebGUI::International::get(71).'</h1>';
    
@@ -554,7 +563,8 @@ sub recoverPassword {
    $vars->{'recover.options.accountExists'} = '<a href="'.WebGUI::URL::page('op=displayLogin').'">'.WebGUI::International::get(73).'</a>';
    if ($session{setting}{anonymousRegistration}) {
 	   $vars->{'recover.options.anonymousRegistration'} = '<a href="'.WebGUI::URL::page('op=createAccount').'">'.WebGUI::International::get(67).'</a>';
-    }
+   }
+   return WebGUI::Template::process(WebGUI::Template::get(1,$template), $vars);
 }
 
 #-------------------------------------------------------------------
