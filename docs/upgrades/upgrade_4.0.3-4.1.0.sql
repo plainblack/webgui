@@ -9,4 +9,5 @@ create table karmaLog (
 );
 INSERT INTO international VALUES (537,'WebGUI','English','Karma');
 INSERT INTO international VALUES (538,'WebGUI','English','Karma Threshold');
+delete from groupings where groupId=1 or groupId=2 or groupId=7;
 
