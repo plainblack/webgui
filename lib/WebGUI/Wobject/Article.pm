@@ -18,6 +18,7 @@ use WebGUI::HTML;
 use WebGUI::HTMLForm;
 use WebGUI::Icon;
 use WebGUI::International;
+use WebGUI::Paginator;
 use WebGUI::Privilege;
 use WebGUI::Session;
 use WebGUI::SQL;
@@ -140,6 +141,23 @@ sub www_view {
         $var{description} = $_[0]->description;
 	if ($_[0]->get("convertCarriageReturns")) {
 		$var{description} =~ s/\n/\<br\>/g;
+	}
+	if ($session{form}{makePrintable}) {
+		$var{description} =~ s/\^\-\;//g;
+		$var{isFirstPage} = 1;
+		$var{isLastPage} = 1;
+	} else {
+		my @pages = split(/\^\-\;/,$var{description});
+		my $p = WebGUI::Paginator->new(WebGUI::URL::page("wid=".$_[0]->get("wobjectId")."&func=view"),\@pages,1);
+		$var{description} = $p->getPage;
+		$var{firstPage} = $p->getFirstPageLink;
+        	$var{lastPage} = $p->getLastPageLink;
+        	$var{nextPage} = $p->getNextPageLink;
+        	$var{pageList} = $p->getPageLinks;
+        	$var{previousPage} = $p->getPreviousPageLink;
+        	$var{multiplePages} = ($p->getNumberOfPages > 1);
+		$var{isLastPage} = ($p->getNumberOfPages == $p->getPageNumber);
+		$var{isFirstPage} = (1 == $p->getPageNumber);
 	}
 	if ($_[0]->get("attachment") ne "") {
 		$file = WebGUI::Attachment->new($_[0]->get("attachment"),$_[0]->get("wobjectId"));
