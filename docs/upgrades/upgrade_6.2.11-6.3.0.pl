@@ -603,6 +603,7 @@ my $newTemplate = $import->addChild({
 		namespace=>'Shortcut',
 		title=>'Default Shortcut',
 		menuTitle=>'Default Shortcut',
+		isHidden=>1,
 		template=>'
 <a name="<tmpl_var assetId>"></a>
 <tmpl_if session.var.adminOn>
