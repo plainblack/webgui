@@ -18,6 +18,10 @@ save you many hours of grief.
 	you may now have to convert your site content to UTF-8
 	format. Check with your language file provider for details.
 
+ * If you're upgrading from a release earlier than 5.5.0 then you'll
+	need to download and upgrade to 5.5.x before you can upgrade
+	to 6.3 or higher.
+
 
 6.2.8
 --------------------------------------------------------------------
