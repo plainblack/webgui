@@ -36,44 +36,127 @@ Package that makes HTML forms typed data and significantly reduces the code need
  use WebGUI::HTMLForm;
  $f = WebGUI::HTMLForm->new;
 
- $f->checkbox("whichOne","Is red your favorite?","red");
- $f->checkList("dayOfWeek",\%days,"Which day?");
- $f->combo("fruit",\%fruit,"Choose a fruit or enter your own.");
- $f->date("endDate","End Date",$endDate);
- $f->email("emailAddress","Email Address");
- $f->fieldType("dataType",\%supportedTypes,"Type of Field");
- $f->file("image","Image to Upload");
- $f->filterContent("filterThisContent","Filter This Content");
- $f->float("distance","5.1");
- $f->group("groupToPost","Who can post?");
- $f->hidden("wid","55");
- $f->HTMLArea("description","Description");
- $f->integer("size","Size");
- $f->interval("timeToLive","How long should this last?",12,"hours");
- $f->password("identifier","Password");
- $f->phone("cellPhone","Cell Phone");
- $f->radio("whichOne","Is red your favorite?","red");
- $f->radioList("dayOfWeek",\%days,"Which day?");
- $f->raw("text");
- $f->readOnly("34","Page ID");
- $f->selectList("dayOfWeek",\%days,"Which day?");
- $f->submit;
- $f->template("templateId","Page Template");
- $f->text("firstName", "First Name");
- $f->textarea("emailMessage","Email Message");
- $f->url("homepage","Home Page");
- $f->whatNext(\%options);
- $f->yesNo("happy","Are you happy?");
- $f->zipcode("workZip","Office Zip Code");
-
-Alternatively each of these methods can also be called with the tag element syntax like this:
-
  $f->checkbox(
-	-"name"=>"whichOne", 
-	-"value"=>"red", 
-	-label=>"Is red your favorite?"
+	-name=>"whichOne",
+	-label=>"Is red your favorite?",
+	-value=>"red"
 	);
-
+ $f->checkList(
+	-name=>"dayOfWeek",
+	-options=>\%days,
+	-label=>"Which day?"
+	);
+ $f->combo(
+	-name=>"fruit",
+	-options=>\%fruit,
+	-label=>"Choose a fruit or enter your own."
+	);
+ $f->date(
+	-name=>"endDate",
+	-label=>"End Date",
+	-value=>$endDate
+	);
+ $f->email(
+	-name=>"emailAddress",
+	-label=>"Email Address"
+	);
+ $f->fieldType(
+	-name=>"dataType",
+	-options=>\%supportedTypes,
+	-label=>"Type of Field"
+	);
+ $f->file(
+	-name=>"image",
+	-label=>"Image to Upload"
+	);
+ $f->filterContent(
+	-name=>"filterThisContent",
+	-label=>"Filter This Content"
+	);
+ $f->float(
+	-name=>"distance",
+	-label=>"5.1"
+	);
+ $f->group(
+	-name=>"groupToPost",
+	-label=>"Who can post?"
+	);
+ $f->hidden(
+	-name=>"wid",
+	-value=>"55"
+	);
+ $f->HTMLArea(
+	-name=>"description",
+	-label=>"Description"
+	);
+ $f->integer(
+	-name=>"size",
+	-label=>"Size"
+	);
+ $f->interval(
+	-name=>"timeToLive",
+	-label=>"How long should this last?",
+	-intervalValue=>12,
+	-unitsValue=>"hours"
+	);
+ $f->password(
+	-name=>"identifier",
+	-label=>"Password"
+	);
+ $f->phone(
+	-name=>"cellPhone",
+	-label=>"Cell Phone"
+	);
+ $f->radio(
+	-name=>"whichOne",
+	-label=>"Is red your favorite?",
+	-value=>"red"
+	);
+ $f->radioList(
+	-name=>"dayOfWeek",
+	-options=>\%days,
+	-label=>"Which day?"
+	);
+ $f->raw(
+	-value=>"text"
+	);
+ $f->readOnly(
+	-value=>"34",
+	-label=>"Page ID"
+	);
+ $f->selectList(
+	-name=>"dayOfWeek",
+	-options=>\%days,
+	-label=>"Which day?"
+	);
+ $f->submit;
+ $f->template(
+	-name=>"templateId",
+	-label=>"Page Template"
+	);
+ $f->text(
+	-name=>"firstName", 
+	-label=>"First Name"
+	);
+ $f->textarea(
+	-name=>"emailMessage",
+	-label=>"Email Message"
+	);
+ $f->url(
+	-name=>"homepage",
+	-label=>"Home Page"
+	);
+ $f->whatNext(
+	-options=>\%options
+	);
+ $f->yesNo(
+	-name=>"happy",
+	-label=>"Are you happy?"
+	);
+ $f->zipcode(
+	-name=>"workZip",
+	-label=>"Office Zip Code"
+	);
 
  $f->print;
  $f->printRowsOnly;
