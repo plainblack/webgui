@@ -37,6 +37,7 @@ This package provides URL writing functionality. It is important that all WebGUI
  $string = WebGUI::URL::escape($string);
  $url = WebGUI::URL::gateway($url,$pairs);
  $url = WebGUI::URL::getSiteURL();
+ WebGUI::URL::setSiteURL($url);
  $url = WebGUI::URL::makeCompliant($string);
  $url = WebGUI::URL::makeAbsolute($url);
  $url = WebGUI::URL::page($url,$pairs);
@@ -168,14 +169,27 @@ sub makeAbsolute {
 
 #-------------------------------------------------------------------
 
+=head2 setSiteURL ( )
+
+Sets an alternate site url. 
+
+=cut
+
+sub setSiteURL {
+	$session{url}{siteURL} = shift;
+}
+
+#-------------------------------------------------------------------
+
 =head2 getSiteURL ( )
 
-Returns a constructed site url from protocol to gateway.
+Returns a constructed site url from protocol to gateway. The returned
+value can be overridden using the setSiteURL function.
 
 =cut
 
 sub getSiteURL { 
-	return $session{var}{altSiteURL} if (defined $session{var}{altSiteURL});
+	return $session{url}{siteURL} if (defined $session{url}{siteURL});
         my $site;
         my @sitenames;
         if (ref $session{config}{sitename} eq "ARRAY") {

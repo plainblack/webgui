@@ -234,7 +234,8 @@ sub build {
         foreach my $property (@interestingPageProperties) {
         	$var->{'page.current.'.$property} = $currentPage->get($property);
         }
-	unless (defined $cacheContent && ! $session{var}{altSiteURL}) {
+	unless (defined $cacheContent && 
+			! $session{url}{siteURL}) {	# Never use cache if an alternate site url is specified.
 		# The loop was not cached
 		my @pages = eval $method;
 		if ($@) {

@@ -18,6 +18,8 @@ package WebGUI::Export;
 use strict;
 use WebGUI::Session;
 use WebGUI::HTML;
+use WebGUI::HTTP;
+use WebGUI::URL;
 
 =head1 NAME
 
@@ -109,12 +111,12 @@ sub generate {
 
 	# Set alternate Site URL
 	if($self->get('altSiteURL')) {
-		$session{var}{altSiteURL} = $self->get('altSiteURL');
+		WebGUI::URL::setSiteURL($self->get('altSiteURL'));
 	} elsif ($self->get('relativeUrls')) {
-		$session{var}{altSiteURL} = "./";
+		WebGUI::URL::setSiteURL("./");
 		my $url = $session{page}{urlizedTitle};
 		while ($url =~ /\//g) {
-			$session{var}{altSiteURL} .= "../";
+			WebGUI::URL::setSiteURL(WebGUI::URL::getSiteURL()."../");
 		}
 	}
 	# !!! At this point we make URLs absolute only if altSiteURL is not set.
@@ -127,14 +129,14 @@ sub generate {
 
 	if($self->get('stripHTML')) {
 		$content = WebGUI::HTML::html2text($content);
-	} elsif (not $session{var}{altSiteURL}) {	# Implies absolute links
+	} elsif (not $session{url}{siteURL}) {	# Implies absolute links
 		$content = WebGUI::HTML::makeAbsolute($content);
 	}
 
 	# Restore session
 	%session = %oldSession;
 	delete $session{page}{noHttpHeader};
-	delete $session{var}{altSiteURL};
+	delete $session{url}{siteURL};
 	return $content;
 		
 }
