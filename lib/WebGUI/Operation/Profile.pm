@@ -28,6 +28,7 @@ use WebGUI::SQL;
 use WebGUI::URL;
 use WebGUI::User;
 use WebGUI::Utility;
+use WebGUI::Operation::Shared;
 
 #-------------------------------------------------------------------
 # Builds Extra form requirements for anonymous registration. 
