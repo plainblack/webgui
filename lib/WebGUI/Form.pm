@@ -1475,7 +1475,7 @@ This will be used if no value is specified. Defaults to "save".
 sub submit {
 	my $params = shift;
         my $value = $params->{value} || $params->{defaultValue} || WebGUI::International::get(62);
-        my $value = _fixQuotes($value);
+        $value = _fixQuotes($value);
 	my $wait = WebGUI::International::get(452);
 	return '<input type="submit" value="'.$value.'" onClick="this.value=\''.$wait.'\'" '.$params->{extras}.' />';
 
@@ -1789,14 +1789,14 @@ This will be used if no value is specified. Defaults to 1.
 
 sub yesNo {
 	my $params = shift;
-        my ($subtext, $checkYes, $checkNo, $class, $output, $name, $label, $extras, $value);
+        my ($checkYes, $checkNo);
 	my $value = $params->{value}||$params->{defaultValue};
 	if ($value) {
 		$checkYes = 1;
 	} else {
 		$checkNo = 1;
 	}
-	$output = radio({
+	my $output = radio({
 		checked=>$checkYes,
 		name=>$params->{name},
 		value=>1,
