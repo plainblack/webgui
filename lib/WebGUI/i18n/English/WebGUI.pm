@@ -184,14 +184,32 @@ Displays the title of the current page.
 <p>
 
 <b>&#94;r; or &#94;r(); - Make Page Printable</b><br>
-Creates a link to remove the style from a page to make it printable.  In addition, you can change the link text by creating a macro like this <b>&#94;r("Print Me!");</b>.
+Creates a link to alter the style from a page to make it printable.
+
 <p>
 
-By default, when this link is clicked, the current page's style is replaced with the "Make Page Printable" style in the Style Manager. However, that can be overridden by specifying the name of another style as the second parameter, like this: &#94;r("Print!","WebGUI");
+The macro takes up to three arguments.  The first argument allows you to replace the default internationalized link text like this <b>&#94;r("Print Me!");</b>.  If this argument is the string "linkonly", then only the URL to make the page printable will be returned and nothing more.  If you wish to use the internationalized label but need to use multiple arguments to change the printable style or template, then use the empty string.
+
 <p>
 
-<b>NOTES:</b> You can also use the special case &#94;r(linkonly); to return only the URL to the make printable page and nothing more. Also, the .makePrintableLink style sheet class is tied to this macro.
+Normally, the default style to make the page printable is the "Make Page Printable" style.  The second argument specifies that a different style than the default be used to make the page printable: <b>&#94;r("Print!","WebGUI");</b>.
+
 <p>
+
+The third argument allows a different template be used to generate the HTML code for presenting the link and text.  The following variables are available in the template:
+
+<p/>
+<b>printable.url</b><br/>
+The URL to make the page printable.
+<p/>
+<b>printable.text</b><br/>
+The translated label for the printable link, or the text that you supply to the macro.
+
+<p>
+
+<b>NOTES:</b>The .makePrintableLink style sheet class is tied to this macro.
+<p>
+
 
 <b>&#94;RootTitle;</b><br>
 Returns the title of the root of the current page. For instance, the main root in WebGUI is the "Home" page. Many advanced sites have many roots and thus need a way to display to the user which root they are in.
@@ -2003,6 +2021,14 @@ Just as the LDAP Identity Name is a label, so is the LDAP Password Name. Use thi
 <b>&#94;a; or &#94;a(); - My Account Link</b><br>
 A link to your account information. In addition you can change the link text by creating a macro like this <b>&#94;a("Account Info");</b>.  If you specify "linkonly" in the first parameter then only the URL will be returned. Also, you can specify the name of a template in the Macro/a_account namespace as the second parameter to override the default template.
 <p>
+The following is a list of variables available in the template:
+<p/>
+<b>account.url</b><br/>
+The URL to the account page.
+<p/>
+<b>account.text</b><br/>
+The translated label for the account link, or the text that you supply to the macro.
+<p/>
 
 <b>NOTES:</b> You can also use the special case &#94;a(linkonly); to return only the URL to the account page and nothing more. Also, the .myAccountLink style sheet class is tied to this macro.
 <p>
@@ -2015,6 +2041,15 @@ Displays a small text message to a user who is in admin mode. Example: &#94;Admi
 <b>&#94;AdminToggle; or &#94;AdminToggle();</b><br>
 Places a link on the page which is only visible to content managers and adminstrators. The link toggles on/off admin mode. You can optionally specify other messages to display like this: &#94;AdminToggle("Edit On","Edit Off"); This macro optionally takes a third parameter that allows you to specify an alternate template name in the Macro/AdminToggle namespace.
 <p>
+The following variables are available in the template:
+<p/>
+<b>toggle.url</b><br/>
+The URL to activate or deactivate Admin mode.
+<p/>
+<b>toggle.text</b><br/>
+The Internationalized label for turning on or off Admin (depending on the state of the macro), or the text that you supply to the macro.
+<p/>
+
 
 <b>&#94;AOIHits();</b><br>
 Displays the number of views for a metadata property/value pair. Example: &#94;AOIHits(contenttype,sport); would display 99 if this user has looked at content that was tagged "contenttype = sport" 99 times.
@@ -2033,16 +2068,42 @@ Display a message to a user that can edit the current page.
 <b>&#94;EditableToggle; or &#94;EditableToggle();</b><br>
 Exactly the same as AdminToggle, except that the toggle is only displayed if the user has the rights to edit the current page. This macro takes up to three parameters. The first is a labe for "Turn Admin On", the second is a label for "Turn Admin Off", and the third is the name of a template in the Macro/EditableToggle namespace to replace the default template.
 <p>
+The following variables are available in the template:
+<p/>
+<b>toggle.url</b><br/>
+The URL to activate or deactivate Admin mode.
+<p/>
+<b>toggle.text</b><br/>
+The Internationalized label for turning on or off Admin (depending on the state of the macro), or the text that you supply to the macro.
+<p/>
+
+<p>
+
 
 <b>&#94;GroupAdd();</b><br>
-Using this macro you can allow users to add themselves to a group. The first parameter is the name of the group this user should be added to. The second parameter is a text string for the user to click on to add themselves to this group. The third parameter allows you to specify the name of a template in the Macro/GroupAdd namespace to replace the default template.
+Using this macro you can allow users to add themselves to a group. The first parameter is the name of the group this user should be added to. The second parameter is a text string for the user to click on to add themselves to this group. The third parameter allows you to specify the name of a template in the Macro/GroupAdd namespace to replace the default template.  These variables are available in the template:
+<p/>
+<b>group.url</b><br/>
+The URL with the action to add the user to the group.
+<p/>
+<b>group.text</b><br/>
+The supplied text string for the user to click on.
+
 <p>
 <b>NOTE:</b> If the user is not logged in, or or already belongs to the group, or the group is not set to allow auto adds, then no link will be displayed.
 <p>
 
 
 <b>&#94;GroupDelete();</b><br>
-Using this macro you can allow users to delete themselves from a group. The first parameter is the name of the group this user should be deleted from. The second parameter is a text string for the user to click on to delete themselves from this group. The third parameter allows you to specify the name of a template in the Macro/GroupDelete namespace to replace the default template.
+Using this macro you can allow users to delete themselves from a group. The first parameter is the name of the group this user should be deleted from. The second parameter is a text string for the user to click on to delete themselves from this group. The third parameter allows you to specify the name of a template in the Macro/GroupDelete namespace to replace the default template.  These variables are available in the template:
+<p/>
+<b>group.url</b><br/>
+The URL with the action to add the user to the group.
+<p/>
+<b>group.text</b><br/>
+The supplied text string for the user to click on.
+
+
 <p>
 <b>NOTE:</b> If the user is not logged in or the user does not belong to the group, or the group is not set to allow auto deletes, then no link will be displayed.
 <p>
@@ -2052,50 +2113,67 @@ Displays a small text message to the user if they belong to the specified group.
 <p>
 <i>Example:</i> &#94;GroupText("Visitors","You need an account to do anything cool on this site!","We value our registered users!");
 <p>
-
 <b>&#94;L; or &#94;L(); - Login Box</b><br>
-A small login form. You can also configure this macro. You can set the width of the login box like this &#94;L(20);. You can also set the message displayed after the user is logged in like this &#94;L(20,Hi &#94;a(&#94;@;);. Click %here% if you wanna log out!)
-<p>
+A small login form. This macro takes up to three parameters.  The first is used to set the width of the login box: &#94;L(20);. The second sets the message displayed after the user is logged in: &#94;L(20,"Hi &#94;a(&#94;@;);. Click %here% if you wanna log out!");.  Text between percent signs (%) is replaced by a link to the logout operation.  The third parameter is the name of a template in the Macro/L_loginBox namespace to replace the default template.  The variables below are
+available in the template.  Not all of them are required, but variables that will cause the macro to output code that doesn't function properly (like not actually log someone in) are marked with an asterisk '*'
+<p/>
+<b>user.isVisitor</b><br/>
+True if the user is a visitor.
+<p/>
+<b>customText</b><br/>
+The user defined text to display if the user is logged in.
+<p/>
+<b>hello.label</b><br/>
+Internationalized welcome message.
+<p/>
+<b>customText</b><br/>
+The text supplied to the macro to display if the user is logged in.
+<p/>
+<b>account.display.url</b><br/>
+URL to display the account.
+<p/>
+<b>logout.label</b><br/>
+Internationalized logout message.
+<p/>
+<b>* form.header</b><br/>
+Form header.
+<p/>
+<b>username.label</b><br/>
+Internationalized label for "username".
+<p/>
+<b>* username.form</b><br/>
+Form element for the username.
+<p/>
+<b>password.label</b><br/>
+Internationalized label for "password".
+<p/>
+<b>* password.form</b><br/>
+Form element for the password.
+<p/>
+<b>* form.login</b><br/>
+Action to perform when logging in.
+<p/>
+<b>account.create.url</b><br/>
+URL to create an account.
+<p/>
+<b>account.create.label</b><br/>
+Internationalized label for "create an account"
+<p/>
+<b>* form.footer</b><br/>
+Form footer.
+<p/>
 
 <b>NOTE:</b> The .loginBox style sheet class is tied to this macro.
 <p>
 
-The following are the template variables available tot he L macro.<p>
-
-user.IsVisitor
-
-customText
-
-hello.label
-
-logout.url
-
-account.display.url
-
-logout.label
-
-form.header
-
-username.label
-
-username.form
-
-password.label
-
-password.form
-
-form.login
-
-account.create.url
-
-account.create.label
-
-form.footer
-
-<p>
-
 <b>&#94;LoginToggle; or &#94;LoginToggle();</b><br>
 Displays a "Login" or "Logout" message depending upon whether the user is logged in or not. You can optionally specify other labels like this: &#94;LoginToggle("Click here to log in.","Click here to log out.");. You can also use the special case &#94;LoginToggle(linkonly); to return only the URL with no label.
+<p>
+<b>toggle.url</b><br/>
+The URL to login or logout.
+<p/>
+<b>toggle.text</b><br/>
+The Internationalized label for logging in or loggin out (depending on the state of the macro), or the text that you supply to the macro.
 <p>
 
 <b>&#94;@; - Username</b><br>
@@ -2449,7 +2527,7 @@ Following a guide like the above will help you get good ranking on search engine
 	},
 
 	'1063' => {
-		message => q|These are the variables availabe in the forum notification template.
+		message => q|These are the variables available in the forum notification template.
 
 <p>
 <b>notify.subscription.message</b><br>
@@ -3459,7 +3537,26 @@ Loops come with special condition variables of their own. They are __FIRST__, __
 <p/>
 
 <b>&#94;File();</b><br/>
-This macro builds a quick file link. It creates an icon for the file and outputs the files name. Then it links them both to the file for downloading.
+This macro builds a quick file link. It creates an icon for the file and outputs the files name. Then it links them both to the file for downloading.  An optional second parameter allows a custom template to be used instead of the default.  The following variables are available for use in the template:
+<p/>
+<b>file.url</b><br/>
+The URL to the file.
+<p/>
+<b>file.text</b><br/>
+The file's icon.
+<p/>
+<b>file.name</b><br/>
+The name of the file.
+<p/>
+<b>file.size</b><br/>
+The size of the file.
+<p/>
+<b>file.text</b><br/>
+The file's icon.
+<p/>
+<b>file.thumbnail</b><br/>
+The file's thumbnail.
+
 <p/>
 
 <b>&#94;I();</b><br/>
@@ -3754,7 +3851,14 @@ The primary URL of your company. This will appear on all automated emails sent f
 	'842' => {
 		message => q|<P>These macros are used to create navigation on the site. </P>
 <P><B>^H; or ^H(); - Home Link</B><BR>A link to the home page of this site. In addition you can change the link text by creating a macro like this <B>^H("Go Home");</B>. 
-<P><B>NOTES:</B> You can also use the special case ^H(linkonly); to return only the URL to the home page and nothing more. Also, the .homeLink style sheet class is tied to this macro. And you can specify a second parameter that with the name of a template in the Macro/H_homeLink namespace that will override the default template. </P>
+<P><B>NOTES:</B> You can also use the special case ^H(linkonly); to return only the URL to the home page and nothing more. Also, the .homeLink style sheet class is tied to this macro. And you can specify a second parameter that with the name of a template in the Macro/H_homeLink namespace that will override the default template. The following variables are avaiable for use in the template:</P>
+<p/>
+<b>homeLink.url</b><br/>
+The URL to the home page.
+<p/>
+<b>homeLink.text</b><br/>
+The translated label for the link to the home page or the text that you supply to the macro.
+<p/>
 <P><B>^/; - System URL</B><BR>The URL to the gateway script (example: <I>/index.pl/</I>). 
 <P><B>^\; - Page URL</B><BR>The URL to the current page (example: <I>/index.pl/pagename</I>). 
 <P><STRONG>^Navigation(crumbTrail);<BR></STRONG>A dynamically generated crumb trail to the current page.

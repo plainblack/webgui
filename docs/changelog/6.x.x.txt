@@ -69,7 +69,9 @@
  - bugfix [ 1014236 ] Crash if only 1 wobject defined in webgui config (Leendert Bottelberghs).
  - bugfix [ 1015267 ] Wobject drag & drop not working due to GUIDs (Leendert Bottelberghs).
  - bugfix [ 1015319 ] Crash on non-existent URI request (Leendert Bottelberghs).
+ - Updated some out of date and missing help information. (Colin Kuskie)
  - RFE [ 855761 ]. Move forum to another Message Board (Leendert Bottelberghs).
+
 
 6.1.1
  - bugfix [ 991313 ] Manage Translations doesn't work
