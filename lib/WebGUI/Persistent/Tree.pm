@@ -250,7 +250,7 @@ sub getTree {
      }
      $nodes->{$self->get($class->keyColumn())} ||= $self;
 
-     return $nodes if (defined($maxDepth) && ($maxDepth-- > 0));
+     return $nodes if (defined($maxDepth) && --$maxDepth < 0);
 
      my @objs = $class->multiNew(
           parentId => $self->get($class->keyColumn()),%$p
@@ -321,6 +321,7 @@ sub new {
      my $class = shift;
      my $self = $class->SUPER::new(@_);
      $self->{daughters} ||= [] if $self;
+     $self->attributes({});
      return $self;
 }
 
