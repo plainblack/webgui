@@ -301,7 +301,7 @@ sub www_view {
 	my (@submission, $output, $sth, @row, $i, $p);
 	$output = $_[0]->displayTitle;
         $output .= $_[0]->description;
-	$output .= $_[0]->processMacros($output);
+	$output = $_[0]->processMacros($output);
 	$sth = WebGUI::SQL->read("select title,submissionId,dateSubmitted,username,userId from UserSubmission_submission 
 		where wobjectId=".$_[0]->get("wobjectId")." and status='Approved' order by dateSubmitted desc");
 	while (@submission = $sth->array) {
