@@ -236,7 +236,7 @@ sub www_manageClipboard {
 		$htmlData = '<tr>';
 		$htmlData .= '<td valign="top" class="tableData">'
 				.pageIcon()
-				.deleteIcon('op=deleteClipboardItem&pageId='.$pageId)
+				.deleteIcon('op=deleteClipboardItemConfirm&pageId='.$pageId,'',WebGUI::International::get(956))
 				.pasteIcon('op=pastePage&pageId='.$pageId);
 		$htmlData .= '</td>';
 		$htmlData .= '<td valign="top" class="tableData">'. $title .'</td>';
@@ -290,7 +290,7 @@ sub www_manageClipboard {
 		$htmlData = '<tr>';
 		$htmlData .= '<td valign="top" class="tableData">'
 				.wobjectIcon()
-				.deleteIcon('op=deleteClipboardItem&wid='.$wobjectId)
+				.deleteIcon('op=deleteClipboardItemConfirm&wid='.$wobjectId,'',WebGUI::International::get(956))
 				.pasteIcon('func=paste&wid='.$wobjectId);
 		$htmlData .= '</td>';
 		$htmlData .= '<td valign="top" class="tableData">'. $title .'</td>';
