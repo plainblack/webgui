@@ -430,8 +430,27 @@ sub new {
         bless {_url => $currentURL, _rpp => $rowsPerPage, _rowRef => $rowRef, _pn => $formVar}, $class;
 }
 
-
-
+#-------------------------------------------------------------------
+sub setDataByQuery {
+	my ($sth, $pageCount, $rowCount, $dbh, $sql, $self, @row, $data);
+	($self, $sql, $dbh) = @_;
+	$dbh |= $session{dbh};
+	$sth = WebGUI::SQL->read($sql);
+	$pageCount = 1;
+	while ($data = $sth->hashRef) {
+		$rowCount++;
+		if ($rowCount/$self->{_rpp} > $pageCount) {	
+			$pageCount++;
+		}
+		if ($pageCount == $self->getPageNumber) {
+			push(@row,$data);	
+		} else {
+			push(@row,{});
+		}
+	}
+	$sth->finish;
+	$self->{_rowRef} = \@row;
+}
 
 1;
 
