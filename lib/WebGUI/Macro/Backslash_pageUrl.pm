@@ -18,10 +18,10 @@ use WebGUI::URL;
 sub process {
 	my ($output);
 	$output = $_[0];
-        $output =~ s/\^\\\;/WebGUI::URL::page()/ge;
+        $output =~ s/\^\\\;/$session{page}{url}/g;
 	return $output;
 }
 
 
-
 1;
+

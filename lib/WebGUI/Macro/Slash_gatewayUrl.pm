@@ -16,9 +16,10 @@ use WebGUI::URL;
 
 #-------------------------------------------------------------------
 sub process {
-	my ($output);
+	my ($output, $temp);
 	$output = $_[0];
-        $output =~ s/\^\/\;/WebGUI::URL::gateway()/ge;
+	$temp = $session{config}{scripturl}.'/';
+        $output =~ s/\^\/\;/$temp/g;
 	return $output;
 }
 
