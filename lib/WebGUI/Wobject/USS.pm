@@ -361,7 +361,7 @@ sub www_view {
                         "submission.userId"=>$page->[$i]->{userId},
                         "submission.status"=>$page->[$i]->{status},
                         "submission.thumbnail"=>$thumbnail,
-                        "submission.date"=>epochToHuman($row->{$page->[$i]->{dateSubmitted}}),
+                        "submission.date"=>epochToHuman($page->[$i]->{dateSubmitted}),
                         "submission.currentUser"=>($session{user}{userId} == $page->[$i]->{userId}),
                         "submission.username"=>$page->[$i]->{username},
                         "submission.userProfile"=>WebGUI::URL::page('op=viewProfile&uid='.$page->[$i]->{userId}),
