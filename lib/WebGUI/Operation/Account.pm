@@ -278,6 +278,7 @@ sub www_displayLogin {
 sub www_editProfile {
 	my ($output, $f, $a, %data, $method, $values, $category, $label, $default, $previousCategory, $subtext);
         if ($session{user}{userId} != 1) {
+		tie %data, 'Tie::CPHash';
                	$output .= '<h1>'.WebGUI::International::get(338).'</h1>';
 		$f = WebGUI::HTMLForm->new;
                 $f->hidden("op","editProfileSave");
