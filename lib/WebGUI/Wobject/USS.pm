@@ -307,18 +307,6 @@ sub www_deleteFile {
 }
 
 #-------------------------------------------------------------------
-sub www_deleteSubmission {
-	my $self = shift;
-	my ($owner) = WebGUI::SQL->quickArray("select userId from USS_submission where USS_submissionId=".quote($session{form}{sid}));
-        if ($owner eq $session{user}{userId} || WebGUI::Grouping::isInGroup($self->get("groupToApprove"))) {
-		return $self->confirm(WebGUI::International::get(17,$self->get("namespace")),
-			WebGUI::URL::page('func=deleteSubmissionConfirm&wid='.$session{form}{wid}.'&sid='.$session{form}{sid}));
-        } else {
-                return WebGUI::Privilege::insufficient();
-        }
-}
-
-#-------------------------------------------------------------------
 sub www_deleteSubmissionConfirm {
 	my $self = shift;
 	my ($owner, $forumId, $pageId) = WebGUI::SQL->quickArray("select userId,forumId,pageId from USS_submission where USS_submissionId=".quote($session{form}{sid}));
@@ -804,7 +792,7 @@ sub www_view {
 		($responses) = WebGUI::SQL->quickArray("select count(*) from forumPost left join forumThread on
 			forumThread.forumThreadId=forumPost.forumThreadId where forumThread.forumId=".quote($row->{forumId}),WebGUI::SQL->getSlave);
 		my $quickurl = 'wid='.$_[0]->get("wobjectId").'&amp;sid='.$page->[$i]->{USS_submissionId}.'&amp;func=';
-		my $controls = deleteIcon($quickurl.'deleteSubmission')
+		my $controls = deleteIcon($quickurl.'deleteSubmissionConfirm','',WebGUI::International::get(17,$_[0]->get("namespace")))
 			.editIcon($quickurl.'editSubmission');
 		if ($_[0]->get("sortBy") eq "sequenceNumber") {
 			if ($_[0]->get("sortOrder") eq "desc") {
@@ -981,7 +969,7 @@ sub www_viewSubmission {
 	}
 	$var{"next.label"} = WebGUI::International::get(59,$self->get("namespace"));
         $var{canEdit} = (($submission->{userId} eq $session{user}{userId} || WebGUI::Grouping::isInGroup($self->get("groupToApprove"))) && $session{user}{userId} != 1);
-        $var{"delete.url"} = WebGUI::URL::gateway($parentsPage->get("urlizedTitle"),'func=deleteSubmission&wid='.$self->wid.'&sid='.$submissionId);
+        $var{"delete.url"} = WebGUI::URL::gateway($parentsPage->get("urlizedTitle"),'func=deleteSubmissionConfirm&wid='.$self->wid.'&sid='.$submissionId);
 	$var{"delete.label"} = WebGUI::International::get(37,$self->get("namespace"));
         $var{"edit.url"} = WebGUI::URL::gateway($parentsPage->get("urlizedTitle"),'func=editSubmission&wid='.$self->wid.'&sid='.$submissionId);
 	$var{"edit.label"} = WebGUI::International::get(27,$self->get("namespace"));
