@@ -16,5 +16,11 @@
  - Templatized the Login Box macro.
  - Added the new WebGUI 6 design.
  - Templatized the Admin Bar macro.
+ - Added CoolMenus to the distribution for easy making of DHTML driven menus.
+   (Thanks to Thomas Brattli.)
+ - Added JS Calendar to the distribution to replace the old calendar system.
+   (Thanks to Mihai Bazon.)
+ - Updated the Form subsystem to use the new calendar for date and time
+   fields.
 
 

@@ -1,0 +1,253 @@
+<html>
+<head>
+	<title>Coolmenus example - CoolMenus4 DHTML script made by Thomas Brattli from DHTMLCentral.com. Visit for more great scripts.</title>
+<style>
+  /* DEFAULT STYLES ---- NEEEDED START */
+  .clCMEvent{position:absolute; width:99%; height:99%; clip:rect(0,100%,100%,0); left:0; top:0; visibility:visible}
+  .clCMAbs{position:absolute; visibility:hidden; left:0; top:0}
+  /* DEFAULT STYLES ---- NEEEDED END */
+  .clT,.clTover,.clS,.clSover,.clS2,.clS2over{position:absolute; width:120; font-family:arial,helvetica; cursor:pointer; cursor:hand; ;}
+  .clT,.clTover{padding:4px; font-size:12px; font-weight:bold}
+  .clS,.clSover{padding:2px; font-size:11px; font-weight:bold}
+  .clS2,.clS2over{padding:2px; font-size:11px;}
+  .clT,.clS,.clS2{color:#006699; background-color:#CDDBEB; layer-background-color:#CDDBEB;}
+  .clTover{color:#FCCE55; background-color:#336699; layer-background-color:#336699;}
+  .clSover{color:white; background-color:#339966; layer-background-color:#339966}
+  .clS2{background-color:silver; width:230; layer-background-color:silver;}
+  .clS2over{background-color:#00cccc; width:230; layer-background-color:#00cccc; color:black}
+  .clStest{position:absolute; font-family:verdana; font-size:10px; color:red; layer-background-color:silver; background-color:silver;cursor:pointer; cursor:hand; }
+  .clStestover{position:absolute; color:#ffff33; font-weight:bold; font-family:courier; layer-background-color:#00ccff; background-color:#00ccff;  cursor:pointer; cursor:hand; }
+  .clB1{position:absolute; layer-background-color:#ff9933; background-color:#ff9933; visibility:hidden}
+  .clB2{position:absolute; layer-background-color:#996600; background-color:#996600; visibility:hidden}
+  .clB3{position:absolute; layer-background-color:red; background-color:red; visibility:hidden}
+  .clB{position:absolute; background-color:#336699; layer-background-color:#336699; visibility:hidden}
+  .clBar{position:absolute; width:10; height:10; visibility:hidden; layer-background-color:#336699; background-color:#336699;}
+  .clNoLink{position:absolute; font-family:arial,helvetica;}
+  .clNoLink2{position:absolute; padding:2px; font-size:11px; color:#006699; layer-background-color:silver; background-color:silver; font-family:arial,helvetica;}
+  .clNoLink3{position:absolute; background-color:#CDDBEB; layer-background-color:#CDDBEB; font-family:arial,helvetica;}
+</style>
+<script language="JavaScript1.2" src="coolmenus4.js">
+/*****************************************************************************
+Copyright (c) 2001 Thomas Brattli (webmaster@dhtmlcentral.com)
+
+DHTML coolMenus - Get it at coolmenus.dhtmlcentral.com
+Version 4.0_beta
+This script can be used freely as long as all copyright messages are
+intact.
+
+Extra info - Coolmenus reference/help - Extra links to help files **** 
+CSS help: http://192.168.1.31/projects/coolmenus/reference.asp?m=37
+General: http://coolmenus.dhtmlcentral.com/reference.asp?m=35
+Menu properties: http://coolmenus.dhtmlcentral.com/properties.asp?m=47
+Level properties: http://coolmenus.dhtmlcentral.com/properties.asp?m=48
+Background bar properties: http://coolmenus.dhtmlcentral.com/properties.asp?m=49
+Item properties: http://coolmenus.dhtmlcentral.com/properties.asp?m=50
+******************************************************************************/
+</script>
+<script language="JavaScript1.2" src="cm_addins.js">
+/*****************************************************************************
+Copyright (c) 2001 Thomas Brattli (webmaster@dhtmlcentral.com)
+Coolmenus add-in file for more advanced featuers..
+******************************************************************************/
+</script>
+</head>
+<body topmargin=0 marginheight=0>
+
+<script>
+/*** 
+This is the menu creation code - place it right after you body tag
+Feel free to add this to a stand-alone js file and link it to your page.
+**/
+
+var oM=new makeCM("oM")
+oM.pxBetween =0
+oM.fromTop=280
+oM.fromLeft=10
+oM.menuPlacement="center"
+oM.wait=600
+oM.fillImg="cm_fill.gif"
+oM.zIndex=100 
+oM.resizeCheck=1
+oM.zIndex=100  
+
+oM.onlineRoot=""
+oM.offlineRoot="file:///C|/myfiles/"
+
+oM.rows=1
+
+//Background bar properties
+oM.useBar=0
+oM.barWidth="100%" 
+oM.barHeight="menu"
+oM.barX=0
+oM.barY="menu"
+oM.barClass="clBar" 
+oM.barBorderX=0
+oM.barBorderY=2
+oM.barBorderClass="clB3"
+
+
+//Level properties
+//Syntax for fast creation (advanced users only)
+//oM.level[1]=new cm_makeLevel(width,height,regClass,overClass,borderX,borderY,borderClass,rows,align,offsetX,offsetY,arrow,arrowWidth,arrowHeight)
+
+oM.level[0]=new cm_makeLevel()
+oM.level[0].width=120
+oM.level[0].height=20
+oM.level[0].regClass="clT" 
+oM.level[0].overClass="clTover"  
+oM.level[0].borderX=1
+oM.level[0].borderY=5
+oM.level[0].borderClass="clB2" 
+oM.level[0].rows=0
+oM.level[0].align="bottom"
+oM.level[0].offsetX=0
+oM.level[0].offsetY=0
+oM.level[0].arrow=0
+oM.level[0].arrowWidth=0
+oM.level[0].arrowHeight=0
+
+
+oM.level[1]=new cm_makeLevel()
+oM.level[1].width=120
+oM.level[1].height=null
+oM.level[1].regClass="clS" 
+oM.level[1].overClass="clSover" 
+oM.level[1].borderX=1
+oM.level[1].borderY=10
+oM.level[1].borderClass="clB1"
+oM.level[1].align="bottomright"
+oM.level[1].rows=1
+oM.level[1].arrow="menu_arrow.gif"
+oM.level[1].arrowWidth=10
+oM.level[1].arrowHeight=10
+
+oM.level[2]=new cm_makeLevel()
+oM.level[2].width=60
+oM.level[2].height=22
+oM.level[2].borderClass="clB3"
+oM.level[2].regClass="clS2" 
+oM.level[2].borderX=3
+oM.level[2].borderY=1
+oM.level[2].rows=0
+oM.level[2].borderX=5
+oM.level[2].borderY=2
+oM.level[2].offsetX=0
+oM.level[2].offsetY=0
+oM.level[2].overClass="clS2over" 
+oM.level[2].align="bottom"
+
+//oM.level[1]=new cm_makeLevel(width,height,regClass,overClass,borderX,borderY,borderClass,rows,align,offsetX,offsetY,arrow,arrowWidth,arrowHeight)
+oM.level[3]=new cm_makeLevel(0,0,"","",3,3,"clB",0,"left")
+oM.level[3].filter="progid:DXImageTransform.Microsoft.Fade(duration=0.5)" 
+
+oM.level[4]=new cm_makeLevel(0,0,"","",3,3,"clB2",0,"left")
+oM.level[4].filter=""
+oM.level[4].slidepx=10
+
+
+oM.level[5]=new cm_makeLevel(0,0,"","",3,3,"clB2",0,"left")
+oM.level[5].slidepx=0
+oM.level[5].clippx=10
+
+oM.level[6]=new cm_makeLevel(0,0,"","",3,3,"clB2",1,"right")
+oM.level[6].clippx=10
+oM.level[6].regClass="clS" 
+oM.level[6].overClass="clSover" 
+oM.level[6].border=null
+oM.level[6].borderClass="clB1"
+
+oM.level[7]=new cm_makeLevel(0,0,"","",3,3,"clB2",1,"right")
+oM.level[7].clippx=10
+
+/******************************************
+Menu item creation:
+myCoolMenu.makeMenu(name, parent_name, text, link, target, width, height, regImage, overImage, regClass, overClass , align, rows, nolink, onclick, onmouseover, onmouseout) 
+*************************************/
+oM.makeMenu('top0','','Align left','','',100,'','','','','',"left")
+	oM.makeMenu('0sub10','top0','New scripts','script/index.asp?new=1','',110,20)
+	oM.makeMenu('0sub11','top0','All scripts','script/index.asp','',110,30)
+	oM.makeMenu('0sub13','top0','Sub columns<br>aligned bottom','','',110,80,'','','',0,'right')
+    oM.makeMenu('','0sub13','Item') 
+    oM.makeMenu('','0sub13','Item') 
+	oM.makeMenu('0sub12','top0','Sub columns<br>aligned bottom','','',110,80,'','','',0,'right')
+    oM.makeMenu('','0sub12','Item') 
+    oM.makeMenu('','0sub12','Item') 
+    oM.makeMenu('aa','0sub12','With subs aligned bottom','','',150) 
+      oM.makeMenu('','aa','Item') 
+    oM.makeMenu('tt','0sub12','Item') 
+      oM.makeMenu('','tt','Item') 
+    oM.makeMenu('kk','0sub12','Item') 
+      oM.makeMenu('','kk','Item') 
+
+oM.makeMenu('top1','','','','',100,0,'img1.gif','img1_on.gif','','',"bottom")
+	oM.makeMenu('1sub10','top1','Different class','script/index.asp?new=1','',150,30,'','','clStest',"clStestover","right")
+	oM.makeMenu('1sub11','top1','Different class','script/index.asp','',150,20,'','','clStest',"clStestover")
+	oM.makeMenu('1sub12','top1','Regular','','',150,30)
+	oM.makeMenu('1sub13','top1','Different class','script/index.asp','',150,30,'','','clStest',"clStestover")
+
+
+oM.makeMenu('top2','','Align top','','',100,0,'','','','',"top",0)
+	oM.makeMenu('2sub12','top2','Columns<br>aligned<br>topleft','','',94,70,'','','','','topleft')
+    oM.makeMenu('','2sub12','Item') 
+    oM.makeMenu('','2sub12','Item') 
+    oM.makeMenu('','2sub12','Item') 
+    oM.makeMenu('','2sub12','Item') 
+    oM.makeMenu('','2sub12','Item') 
+    oM.makeMenu('','2sub12','Item') 
+	oM.makeMenu('2sub10','top2','','','',94,20,'img_sub.gif','img_sub_on.gif')
+	oM.makeMenu('2sub11','top2','All scripts','script/index.asp','',94,20)
+
+oM.makeMenu('top3','','Align right','','',100,0,'','','','',"right")
+	oM.makeMenu('3sub10','top3','No link item','','',150,30,'','','','','','',1)
+	oM.makeMenu('3sub11','top3','Columns aligned bottom left','','',150,30,'','','','','bottomleft')
+    oM.makeMenu('cc','3sub11','Align bottom','','',150,0,'','','','','bottom') 
+      oM.makeMenu('','cc','Item','','',150) 
+      oM.makeMenu('ff','cc','Align left with filter (ie only)<br>Go down for more add-in<br>effects','','',150,50,'','','','','left') 
+        oM.makeMenu('','ff','Item','','',130) 
+        oM.makeMenu('','ff','Item','','',130) 
+        oM.makeMenu('','ff','Item','','',130) 
+        oM.makeMenu('','ff','Item','','',130) 
+        oM.makeMenu('ee','ff','Align righttop with slide','','',130,0,'','','','','righttop') 
+          oM.makeMenu('','ee','Item','') 
+          oM.makeMenu('','ee','Nolink','','',0,0,'','','clNoLink2','','','',1)  
+          oM.makeMenu('','ee','Item','')  
+        oM.makeMenu('dd','ff','Align lefttop with slide','','',130,0,'','','','','lefttop') 
+          oM.makeMenu('','dd','Item','','',150) 
+          oM.makeMenu('','dd','Item','','',150) 
+          oM.makeMenu('gg','dd','Align bottom with clip','','',150,0,'','','','','bottom')
+            oM.makeMenu('','gg','Item','','',150) 
+            oM.makeMenu('','gg','Item','','',150) 
+            oM.makeMenu('hh','gg','columns with clip','','',150,0)
+              oM.makeMenu('','hh','Item','','',50) 
+              oM.makeMenu('','hh','Nolink','','',50,0,'','','clNoLink3','','','',1) 
+              oM.makeMenu('','hh','Item','','',50) 
+              oM.makeMenu('','hh','Item','','',50) 
+    oM.makeMenu('','3sub11','Item') 
+    oM.makeMenu('','3sub11','Item') 
+    oM.makeMenu('','3sub11','Item') 
+    oM.makeMenu('','3sub11','Item') 
+
+oM.construct()
+
+
+</script>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+Change alignment of the first menu:<br>
+<a href="#" onclick="oM.m['top0'].subx=0; oM.m['top0'].align=cm_checkalign('bottom'); return false">bottom</a>
+<a href="#" onclick="oM.m['top0'].subx=0; oM.m['top0'].align=cm_checkalign('top'); return false">top</a>
+<br>
+<br>
+Change the rows of the second item:<br>
+<a href="#" onclick="oM.m['top1'].subx=0; oM.m['top1'].rows=1; return false">On</a>
+<a href="#" onclick="oM.m['top1'].subx=0; oM.m['top1'].rows=0; return false">Off</a>
+
+<!-- We have to set the subx to zero because if now it try and use the last created coords -->
+</body>
+</html>

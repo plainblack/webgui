@@ -74,6 +74,11 @@ All of the functions in this package accept the input of a hash reference contai
 =cut
 
 #-------------------------------------------------------------------
+sub _cssFile {
+        return '<link rel="stylesheet" type="text/css" media="all" href="'.$session{config}{extrasURL}.'/'.$_[0].'" />'."\n";
+}
+
+#-------------------------------------------------------------------
 sub _fixMacros {
 	my $value = shift;
 	$value =~ s/\^/\&\#94\;/g;
@@ -352,18 +357,30 @@ sub date {
         my ($subtext, $noDate, $class, $name, $label, $extras, $size, $value);
 	$value = epochToSet($_[0]->{value}) unless ($_[0]->{noDate} && $_[0]->{value} eq '');
         $size = $_[0]->{size} || 10;
-        my $output = _javascriptFile('inputCheck.js');
+        my $output = _cssFile("calendar/calendar-win2k-1.css")
+		._javascriptFile('calendar/calendar.js')
+        	._javascriptFile('calendar/lang/calendar-en.js')
+        	._javascriptFile('calendar/calendar-setup.js');
 	$output .= text({
 		name=>$_[0]->{name},
 		value=>$value,
 		size=>$size,
-		extras=>'onKeyUp="doInputCheck(this.form.'.$_[0]->{name}.',\'0123456789/\')" '.$_[0]->{extras},
+		extras=>'id="'.$_[0]->{name}.'Id" '.$_[0]->{extras},
 		maxlength=>10
 		});
-	$output .= '<input type="button" style="font-size: 8pt;" onClick="window.dateField = this.form.'.
-		$_[0]->{name}.';calendar = window.open(\''.$session{config}{extrasURL}.
-		'/calendar.html\',\'cal\',\'WIDTH=220,HEIGHT=250\');return false" value="'.
-		WebGUI::International::get(34).'">';
+	$output .= '<script type="text/javascript"> 
+			Calendar.setup({ 
+				inputField : "'.$_[0]->{name}.'Id", 
+				ifFormat : "%Y-%m-%d", 
+				showsTime : false, 
+				timeFormat : "12",
+				mondayFirst : false
+				}); 
+			</script>';
+#	$output .= '<input type="button" style="font-size: 8pt;" onClick="window.dateField = this.form.'.
+#		$_[0]->{name}.';calendar = window.open(\''.$session{config}{extrasURL}.
+#		'/calendar.html\',\'cal\',\'WIDTH=220,HEIGHT=250\');return false" value="'.
+#		WebGUI::International::get(34).'">';
 	return $output;
 }
 

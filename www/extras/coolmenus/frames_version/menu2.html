@@ -1,0 +1,184 @@
+<html>
+<head>
+	<title>Coolmenus example - CoolMenus4 DHTML script made by Thomas Brattli from DHTMLCentral.com. Visit for more great scripts.</title>
+
+<script language="JavaScript1.2" src="../coolmenus4.js">
+/*****************************************************************************
+Copyright (c) 2001 Thomas Brattli (webmaster@dhtmlcentral.com)
+
+DHTML coolMenus - Get it at coolmenus.dhtmlcentral.com
+Version 4.0_beta
+This script can be used freely as long as all copyright messages are
+intact.
+
+Extra info - Coolmenus reference/help - Extra links to help files **** 
+CSS help: http://192.168.1.31/projects/coolmenus/reference.asp?m=37
+General: http://coolmenus.dhtmlcentral.com/reference.asp?m=35
+Menu properties: http://coolmenus.dhtmlcentral.com/properties.asp?m=47
+Level properties: http://coolmenus.dhtmlcentral.com/properties.asp?m=48
+Background bar properties: http://coolmenus.dhtmlcentral.com/properties.asp?m=49
+Item properties: http://coolmenus.dhtmlcentral.com/properties.asp?m=50
+******************************************************************************/
+</script>
+<link rel="STYLESHEET" type="text/css" href="coolmenus.css">
+</head>
+<body marginwidth="0" marginheight="0">
+<script>
+/*Browsercheck object - we have to move this into the page to prevent an error in NS4*/
+function cm_bwcheck(){
+function cm_bwcheck(){
+	//In theory we should use object detection, but this script needs work-arounds for almost every browser...
+	this.ver=navigator.appVersion
+	this.agent=navigator.userAgent.toLowerCase()
+	this.dom=document.getElementById?1:0
+	this.ns4=(!this.dom && document.layers)?1:0;
+	this.op=window.opera 
+	this.moz=(this.agent.indexOf("gecko")>-1 || window.sidebar)
+	this.ie=this.agent.indexOf("msie")>-1 && !this.op
+	if(this.op){
+		this.op5=(this.agent.indexOf("opera 5")>-1 || this.agent.indexOf("opera/5")>-1)
+		this.op6=(this.agent.indexOf("opera 6")>-1 || this.agent.indexOf("opera/6")>-1)
+		this.op7=this.dom&&!this.op5&&!this.op6 //So all higher opera versions will use it
+	}else if(this.moz) this.ns6 = 1
+	else if(this.ie){
+		this.ie4 = !this.dom && document.all
+  	this.ie5 = (this.agent.indexOf("msie 5")>-1)
+  	this.ie55 = (this.ie5 && this.agent.indexOf("msie 5.5")>-1)
+  	this.ie6 = this.dom && !this.ie4 && !this.ie5 && ! this.ie55
+	}
+	this.mac=(this.agent.indexOf("mac")>-1)
+	this.bw=(this.ie6 || this.ie5 || this.ie4 || this.ns4 || this.ns6 || this.op5 || this.op6 || this.op7)
+  this.usedom= this.ns6||this.op7//Use dom creation
+  this.reuse = this.ie||this.op7||this.usedom //Reuse layers
+  this.px=this.dom&&!this.op5?"px":""
+	return this
+}
+var bw=new cm_bwcheck()
+/*** 
+This is the menu creation code - place it right after you body tag
+Feel free to add this to a stand-alone js file and link it to your page.
+**/
+
+//Menu object creation
+oCMenu=new makeCM("oCMenu") //Making the menu object. Argument: menuname
+
+//Netscape 4 - bug fix - 
+//maybe -stupid NS4 - objects are not handled correctly when
+//the object creator is in a linked file
+if(bw.ns4) if(!oCMenu["makeMenu"] || !bw["ns4"]) self.location.reload()
+
+//Frame properties
+oCMenu.frames = 1
+
+//Menu properties   
+oCMenu.pxBetween=30
+oCMenu.fromLeft=0
+oCMenu.fromTop=20  
+oCMenu.rows=0 
+oCMenu.menuPlacement="center"
+                                                             
+oCMenu.offlineRoot="file:///d|/thomas/coolmenus/frames_version/" 
+oCMenu.onlineRoot="/coolmenus/frames_version/" 
+oCMenu.resizeCheck=1 
+oCMenu.wait=1000 
+oCMenu.fillImg="cm_fill.gif"
+oCMenu.zIndex=0
+
+//Background bar properties
+oCMenu.useBar=1
+oCMenu.barWidth="menu"
+oCMenu.barHeight="menu" 
+oCMenu.barClass="clBar"
+oCMenu.barX="menu"
+oCMenu.barY="menu"
+oCMenu.barBorderX=0
+oCMenu.barBorderY=0
+oCMenu.barBorderClass=""
+
+//Level properties - ALL properties have to be spesified in level 0
+oCMenu.level[0]=new cm_makeLevel() //Add this for each new level
+oCMenu.level[0].width=110
+oCMenu.level[0].height=25 
+oCMenu.level[0].regClass="clLevel0"
+oCMenu.level[0].overClass="clLevel0over"
+oCMenu.level[0].borderX=1
+oCMenu.level[0].borderY=1
+oCMenu.level[0].borderClass="clLevel0border"
+oCMenu.level[0].offsetX=0
+oCMenu.level[0].offsetY=0
+oCMenu.level[0].rows=0
+oCMenu.level[0].arrow=0
+oCMenu.level[0].arrowWidth=0
+oCMenu.level[0].arrowHeight=0
+oCMenu.level[0].align="right"
+
+
+//EXAMPLE SUB LEVEL[1] PROPERTIES - You have to specify the properties you want different from LEVEL[0] - If you want all items to look the same just remove this
+oCMenu.level[1]=new cm_makeLevel() //Add this for each new level (adding one to the number)
+oCMenu.level[1].width=oCMenu.level[0].width-2
+oCMenu.level[1].height=22
+oCMenu.level[1].regClass="clLevel1"
+oCMenu.level[1].overClass="clLevel1over"
+oCMenu.level[1].borderX=1
+oCMenu.level[1].borderY=1
+oCMenu.level[1].align="right" 
+oCMenu.level[1].offsetX=-(oCMenu.level[0].width-2)/2+20
+oCMenu.level[1].offsetY=0
+oCMenu.level[1].borderClass="clLevel1border"
+
+
+//EXAMPLE SUB LEVEL[2] PROPERTIES - You have to spesify the properties you want different from LEVEL[1] OR LEVEL[0] - If you want all items to look the same just remove this
+oCMenu.level[2]=new cm_makeLevel() //Add this for each new level (adding one to the number)
+oCMenu.level[2].width=150
+oCMenu.level[2].height=20
+oCMenu.level[2].offsetX=0
+oCMenu.level[2].offsetY=0
+oCMenu.level[2].regClass="clLevel2"
+oCMenu.level[2].overClass="clLevel2over"
+oCMenu.level[2].borderClass="clLevel2border"
+
+
+/******************************************
+Menu item creation:
+myCoolMenu.makeMenu(name, parent_name, text, link, target, width, height, regImage, overImage, regClass, overClass , align, rows, nolink, onclick, onmouseover, onmouseout) 
+*************************************/
+oCMenu.makeMenu('top0','','&nbsp;News','test1.html','')
+  oCMenu.makeMenu('sub00','top0','Newest news','test2.html')
+    oCMenu.makeMenu('sub001','sub00','- New DHTML API released','test3.html','',160,0)
+		oCMenu.makeMenu('sub002','sub00','- Explorer 7 is out','test1.html','',160,0)
+		oCMenu.makeMenu('sub003','sub00','- Opera 6 supports innerHTML','test1.html','',160,0)
+	oCMenu.makeMenu('sub01','top0','News archive','test2.html')
+	
+oCMenu.makeMenu('top1','','&nbsp;Scripts','test3.html')
+	oCMenu.makeMenu('sub10','top1','New scripts','test2.html')
+	oCMenu.makeMenu('sub11','top1','All scripts','test1.html')
+	oCMenu.makeMenu('sub12','top1','Popular scripts','test2.html')
+	
+oCMenu.makeMenu('top2','','&nbsp;Articles','test1.html')
+	oCMenu.makeMenu('sub21','top2','Tutorials','test2.html')
+		oCMenu.makeMenu('sub210','sub21','New tutorials','test3.html')
+		oCMenu.makeMenu('sub211','sub21','Tutorials archive','test1.html')
+	oCMenu.makeMenu('sub22','top2','Other articles','test3.html')
+		oCMenu.makeMenu('sub220','sub22','New articles','test2.html')
+		oCMenu.makeMenu('sub221','sub22','Article archive','test2.html')
+
+//Leave this line - it constructs the menu
+oCMenu.construct()		
+/*OPTIONAL LINE:
+Because some browsers (especially our old friend NS4)
+have problems with this initial frame load you might
+want to add a line similar to this (replace MyFrameName
+with the name of you frame):
+
+top.frmMain.location.reload()
+
+This will ensure that the menu is loaded when 
+the first page is loaded in the main frame.
+
+This also helps the resize problems in Opera and NS4
+*/
+top.frmMain.location.reload() 
+</script>
+
+</body>
+</html>

@@ -1,0 +1,219 @@
+<html>
+<head>
+	<title>Coolmenus example - CoolMenus4 DHTML script made by Thomas Brattli from DHTMLCentral.com. Visit for more great scripts.</title>
+<style>
+/* CoolMenus 4 - default styles - do not edit */
+.clCMEvent{position:absolute; width:99%; height:99%; clip:rect(0,100%,100%,0); left:0; top:0; visibility:visible}
+.clCMAbs{position:absolute; visibility:hidden; left:0; top:0}
+/* CoolMenus 4 - default styles - end */
+  
+/*Style for the background-bar*/
+.clBar{position:absolute; width:10; height:10; background-color:Navy; layer-background-color:Navy; visibility:hidden}
+
+/*Styles for level 0*/
+.clLevel0,.clLevel0over{position:absolute; padding:2px; font-family:tahoma,arial,helvetica; font-size:12px; font-weight:bold}
+.clLevel0{background-color:Navy; layer-background-color:Navy; color:white;}
+.clLevel0over{background-color:#336699; layer-background-color:#336699; color:Yellow; cursor:pointer; cursor:hand; }
+.clLevel0border{position:absolute; visibility:hidden; background-color:#006699; layer-background-color:#006699}
+
+/*Styles for level 1*/
+.clLevel1, .clLevel1over{position:absolute; padding:2px; font-family:tahoma, arial,helvetica; font-size:11px; font-weight:bold}
+.clLevel1{background-color:Navy; layer-background-color:Navy; color:white;}
+.clLevel1over{background-color:#336699; layer-background-color:#336699; color:Yellow; cursor:pointer; cursor:hand; }
+.clLevel1border{position:absolute; z-index:500; visibility:hidden; background-color:#006699; layer-background-color:#006699}
+
+/*Styles for level 2*/
+.clLevel2, .clLevel2over{position:absolute; padding:2px; font-family:tahoma,arial,helvetica; font-size:10px; font-weight:bold}
+.clLevel2{background-color:Navy; layer-background-color:Navy; color:white;}
+.clLevel2over{background-color:#0099cc; layer-background-color:#0099cc; color:Yellow; cursor:pointer; cursor:hand; }
+.clLevel2border{position:absolute; visibility:hidden; background-color:#006699; layer-background-color:#006699}
+</style>
+<script language="JavaScript1.2" src="coolmenus4.js">
+/*****************************************************************************
+Copyright (c) 2001 Thomas Brattli (webmaster@dhtmlcentral.com)
+
+DHTML coolMenus - Get it at coolmenus.dhtmlcentral.com
+Version 4.0_beta
+This script can be used freely as long as all copyright messages are
+intact.
+
+Extra info - Coolmenus reference/help - Extra links to help files **** 
+CSS help: http://192.168.1.31/projects/coolmenus/reference.asp?m=37
+General: http://coolmenus.dhtmlcentral.com/reference.asp?m=35
+Menu properties: http://coolmenus.dhtmlcentral.com/properties.asp?m=47
+Level properties: http://coolmenus.dhtmlcentral.com/properties.asp?m=48
+Background bar properties: http://coolmenus.dhtmlcentral.com/properties.asp?m=49
+Item properties: http://coolmenus.dhtmlcentral.com/properties.asp?m=50
+******************************************************************************/
+</script>
+</head>
+<body>
+<script>
+/*** 
+This is the menu creation code - place it right after you body tag
+Feel free to add this to a stand-alone js file and link it to your page.
+**/
+
+//Menu object creation
+oCMenu=new makeCM("oCMenu") //Making the menu object. Argument: menuname
+
+//Menu properties   
+oCMenu.pxBetween=50
+//Using the cm_page object to place the menu ----
+  //There are some differences between the browsers that I try to fix here.
+oCMenu.fromLeft=!bw.ns4?cmpage.x2 - 160:cmpage.x2 - 176
+//We also need to "replace" the menu on resize. So:
+oCMenu.onresize="oCMenu.fromLeft=cmpage.x2 - 160"
+
+
+oCMenu.fromTop=150   
+oCMenu.rows=0
+oCMenu.menuPlacement=0
+                                                             
+oCMenu.offlineRoot="file:///C|/Inetpub/wwwroot/dhtmlcentral/projects/coolmenus/examples/" 
+oCMenu.onlineRoot="/coolmenus/" 
+oCMenu.resizeCheck=1 
+oCMenu.wait=1000 
+oCMenu.fillImg="cm_fill.gif"
+oCMenu.zIndex=0
+
+//Background bar properties
+oCMenu.useBar=1
+oCMenu.barWidth="menu"
+oCMenu.barHeight="menu" 
+oCMenu.barClass="clBar"
+oCMenu.barX="menu"
+oCMenu.barY="menu"
+oCMenu.barBorderX=0
+oCMenu.barBorderY=0
+oCMenu.barBorderClass=""
+
+//Level properties - ALL properties have to be spesified in level 0
+oCMenu.level[0]=new cm_makeLevel() //Add this for each new level
+oCMenu.level[0].width=135
+oCMenu.level[0].height=25 
+oCMenu.level[0].regClass="clLevel0"
+oCMenu.level[0].overClass="clLevel0over"
+oCMenu.level[0].borderX=1
+oCMenu.level[0].borderY=1
+oCMenu.level[0].borderClass="clLevel0border"
+oCMenu.level[0].offsetX=0
+oCMenu.level[0].offsetY=0
+oCMenu.level[0].rows=0
+oCMenu.level[0].arrow=0
+oCMenu.level[0].arrowWidth=0
+oCMenu.level[0].arrowHeight=0
+oCMenu.level[0].align="left"
+
+
+//EXAMPLE SUB LEVEL[1] PROPERTIES - You have to specify the properties you want different from LEVEL[0] - If you want all items to look the same just remove this
+oCMenu.level[1]=new cm_makeLevel() //Add this for each new level (adding one to the number)
+oCMenu.level[1].width=oCMenu.level[0].width-2
+oCMenu.level[1].height=22
+oCMenu.level[1].regClass="clLevel1"
+oCMenu.level[1].overClass="clLevel1over"
+oCMenu.level[1].borderX=1
+oCMenu.level[1].borderY=1
+oCMenu.level[1].align="right" 
+oCMenu.level[1].offsetX=-(oCMenu.level[0].width-2)/2+20
+oCMenu.level[1].offsetY=0
+oCMenu.level[1].borderClass="clLevel1border"
+
+
+//EXAMPLE SUB LEVEL[2] PROPERTIES - You have to spesify the properties you want different from LEVEL[1] OR LEVEL[0] - If you want all items to look the same just remove this
+oCMenu.level[2]=new cm_makeLevel() //Add this for each new level (adding one to the number)
+oCMenu.level[2].width=150
+oCMenu.level[2].height=20
+oCMenu.level[2].offsetX=0
+oCMenu.level[2].offsetY=0
+oCMenu.level[2].regClass="clLevel2"
+oCMenu.level[2].overClass="clLevel2over"
+oCMenu.level[2].borderClass="clLevel2border"
+
+
+/******************************************
+Menu item creation:
+myCoolMenu.makeMenu(name, parent_name, text, link, target, width, height, regImage, overImage, regClass, overClass , align, rows, nolink, onclick, onmouseover, onmouseout) 
+*************************************/
+oCMenu.makeMenu('top0','','&nbsp;News','example2.html','')
+  oCMenu.makeMenu('sub00','top0','Newest news','/news/index.asp')
+    oCMenu.makeMenu('sub001','sub00','- New DHTML API released','','',160,0)
+		oCMenu.makeMenu('sub002','sub00','- Explorer 7 is out','','',160,0)
+		oCMenu.makeMenu('sub003','sub00','- Opera 6 supports innerHTML','','',160,0)
+	oCMenu.makeMenu('sub01','top0','News archive','/news/archive.asp')
+	
+oCMenu.makeMenu('top1','','&nbsp;Scripts','/scripts/index.asp')
+	oCMenu.makeMenu('sub10','top1','New scripts','/scripts/index.asp?show=new')
+	oCMenu.makeMenu('sub11','top1','All scripts','/scripts/index.asp?show=all')
+	oCMenu.makeMenu('sub12','top1','Popular scripts','/scripts/index.asp?show=pop')
+	
+oCMenu.makeMenu('top2','','&nbsp;Articles','/articles/index.asp')
+	oCMenu.makeMenu('sub21','top2','Tutorials','/tutorials/index.asp')
+		oCMenu.makeMenu('sub210','sub21','New tutorials','/tutorials/index.asp')
+		oCMenu.makeMenu('sub211','sub21','Tutorials archive','/tutorials/archive.asp')
+	oCMenu.makeMenu('sub22','top2','Other articles','/articles/index.asp')
+		oCMenu.makeMenu('sub220','sub22','New articles','/articles/index.asp?show=new')
+		oCMenu.makeMenu('sub221','sub22','Article archive','/articles/archive.asp')
+
+oCMenu.makeMenu('top3','','&nbsp;Forums','/forums/')
+	oCMenu.makeMenu('sub30','top3','General','/forums/forum.asp?FORUM_ID=6&CAT_ID=1&Forum_Title=General+DHTML+issues')
+	oCMenu.makeMenu('sub31','top3','Scripts','/forums/forum.asp?FORUM_ID=4&CAT_ID=1&Forum_Title=DHTML+Scripts')
+	oCMenu.makeMenu('sub32','top3','Crossbrowser','/forums/forum.asp?FORUM_ID=3&CAT_ID=1&Forum_Title=Crossbrowser+DHTML')
+	oCMenu.makeMenu('sub33','top3','CoolMenus','/forums/forum.asp?FORUM_ID=2&CAT_ID=1&Forum_Title=CoolMenus')
+	oCMenu.makeMenu('sub34','top3','dhtmlcentral.com','/forums/forum.asp?FORUM_ID=5&CAT_ID=1&Forum_Title=dhtmlcentral%2Ecom')
+	oCMenu.makeMenu('sub35','top3','Cool sites','/forums/forum.asp?FORUM_ID=1&CAT_ID=1&Forum_Title=Cool+sites')
+
+oCMenu.makeMenu('top5','','&nbsp;CoolMenus','/coolmenus/index.asp')
+	oCMenu.makeMenu('sub50','top5','Examples','/coolmenus/examples.asp')
+		oCMenu.makeMenu('sub500','sub50','With frames','/coolmenus/examples.asp?show=with')
+		oCMenu.makeMenu('sub501','sub50','Without frames','/coolmenus/examples.asp?show=without')
+	oCMenu.makeMenu('sub51','top5','Download','/coolmenus/download.asp')
+		oCMenu.makeMenu('sub510','sub51','Download the source code to this menu','/coolmenus/download.asp','',150,40)
+	oCMenu.makeMenu('sub52','top5','Tutorial','/coolmenus/tutorial.asp')
+		oCMenu.makeMenu('sub520','sub52','Learn how to set up the menu','/coolmenus/tutorial.asp','',150,40)
+	oCMenu.makeMenu('sub53','top5','MenuMaker','','',0,0,'','','','','','','','window.open("/coolmenus/maker/","","width=800,height=600")')
+		oCMenu.makeMenu('sub530','sub53','Use the menuMaker to make the menu code for you','','',150,40,'','','','','','','','window.open("/coolmenus/maker/","","width=800,height=600")')
+	oCMenu.makeMenu('sub54','top5','FAQ','/coolmenus/faq.asp')
+		oCMenu.makeMenu('sub540','sub54','Frequently asked questions','coolmenus/faq.asp','',150,40)
+	oCMenu.makeMenu('sub55','top5','Help forum','/forums/forum.asp?FORUM_ID=2&CAT_ID=1&Forum_Title=CoolMenus')
+		oCMenu.makeMenu('sub550','sub55','Go to this forum and post you problems or suggestions regarding the CoolMenus','/forum/forum.asp?forum_id=2','',150,40)
+
+//Leave this line - it constructs the menu
+oCMenu.construct()		
+</script>
+<table width="100%" border="1" cellspacing="10" cellpadding="10">
+<tr>
+  <td colspan="2"><h3>Page heading</h3><br></td>
+</tr>
+<td valign="top">
+  This is an exmaple where I try to simulate placing the menu inside a table.
+  For the menu to work properly the menu items have to be positioned absolute (if not
+  it will not work in NS4), therefore we CANNOT place the menu inside a table for real, but
+  we can make place it where it would have been if it was inside the table with a little extra
+  code. 
+  <br>
+  We use a fill image inside the TD to force the size of the TD to the size of the menu. We
+  know that the table is 100% so we can try to find out where to place the menu using the
+  <code>cmpage</code> object (it's an object that holds the size of the page, see the documentsize
+  tutorial at dhtmlcentral.com for more information). 
+  <br>
+  <br>
+  In this case the only position that changes is the left position, so we use cmpage.x2 which is 
+  the total width of the page to figure out where the menu should be placed.
+  <br>
+  If you look at this in different browsers, you'll see that it's not perfect, so in the code
+  of this example I made a little check that checks for NS4 and does some small changes.
+  <br>
+  If the top position of the menu is supposed to change as well, depening on the content
+  or something we can do a little different approuch: <a href="table_placement2.html"></a>
+  <br>
+
+</td>
+<td>
+  Menu:<br>
+  <img src="cm_fill.gif" width="120" height="332" alt="" border="0">
+</td>
+</tr>
+</table>
+</body>
+</html>

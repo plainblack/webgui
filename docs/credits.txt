@@ -102,7 +102,12 @@ Midas................................The Mozilla Development Team
                                      Mike Kaply
 
 HTML Area............................interactivetools.com
+                                     Mihai "Mishoo" Bazon
                                      The Open Source Community
 
 Classic Rich Edit....................Bratta
+
+JS Calendar..........................Mihai "Mishoo" Bazon
+
+Cool Menus...........................Thomas Brattli
 
