@@ -110,6 +110,12 @@ sub new {
 				},
 			filterContent=>{
 				defaultValue=>"javascript"
+				},
+			sortBy=>{
+				defaultValue=>"dateUpdated"
+				},
+			sortOrder=>{
+				defaultValue=>"desc"
 				}
 			},
 		-useTemplate=>1
@@ -267,6 +273,25 @@ sub www_edit {
 	$layout->filterContent(
 		-value=>$_[0]->getValue("filterContent")
 		);
+	$layout->selectList(
+		-name=>"sortBy",
+		-value=>[$_[0]->getValue("sortBy")],
+		-options=>{
+			dateUpdated=>WebGUI::International::get(78,$_[0]->get("namespace")),
+			dateSubmitted=>WebGUI::International::get(13,$_[0]->get("namespace")),
+			title=>WebGUI::International::get(35,$_[0]->get("namespace"))
+			},
+		-label=>WebGUI::International::get(79,$_[0]->get("namespace"))
+		);
+	$layout->selectList(
+		-name=>"sortOrder",
+		-value=>[$_[0]->getValue("sortOrder")],
+		-options=>{
+			asc=>WebGUI::International::get(81,$_[0]->get("namespace")),
+			desc=>WebGUI::International::get(82,$_[0]->get("namespace"))
+			},
+		-label=>WebGUI::International::get(80,$_[0]->get("namespace"))
+		);
 	return $_[0]->SUPER::www_edit(
 		-layout=>$layout->printRowsOnly,
 		-privileges=>$privileges->printRowsOnly,
@@ -335,6 +360,7 @@ sub www_editSubmissionSave {
 			$hash{forumId} = $forum->get("forumId");
 			$hash{username} = $session{form}{visitorName} || $session{user}{alias};
 			$hash{userId} = $session{user}{userId};
+			$hash{dateSubmitted} = WebGUI::DateTime::time();
 			$hash{USS_submissionId} = "new";
 			if ($session{setting}{useKarma}) {
                         	$u = WebGUI::User->new($session{user}{userId});
@@ -346,7 +372,7 @@ sub www_editSubmissionSave {
                 }
                 $hash{title} = WebGUI::HTML::filter($session{form}{title},'all') || WebGUI::International::get(16,$_[0]->get("namespace"));
 		$hash{USS_submissionId} = $session{form}{sid};
-		$hash{dateSubmitted} = time();
+		$hash{dateUpdated} = WebGUI::DateTime::time();
 		$hash{content} = $session{form}{body};
 		$hash{convertCarriageReturns} = $session{form}{convertCarriageReturns};
                 $file = WebGUI::Attachment->new("",$session{form}{wid},$session{form}{sid});
@@ -399,10 +425,11 @@ sub www_view {
 	$var{"title.label"} = WebGUI::International::get(99);
 	$var{"thumbnail.label"} = WebGUI::International::get(52,$_[0]->get("namespace"));
 	$var{"date.label"} = WebGUI::International::get(13,$_[0]->get("namespace"));
+	$var{"date.updated.label"} = WebGUI::International::get(78,$_[0]->get("namespace"));
 	$var{"by.label"} = WebGUI::International::get(21,$_[0]->get("namespace"));
 	$p = WebGUI::Paginator->new(WebGUI::URL::page('func=view&wid='.$_[0]->get("wobjectId")),[],$numResults);
-	$p->setDataByQuery("select USS_submissionId, content, title, userId, status, image, dateSubmitted, username, forumId
-		from USS_submission where wobjectId=".$_[0]->get("wobjectId")." and $constraints order by dateSubmitted desc");
+	$p->setDataByQuery("select USS_submissionId, content, title, userId, status, image, dateSubmitted, username, forumId from USS_submission 
+		where wobjectId=".$_[0]->get("wobjectId")." and $constraints order by ".$_[0]->getValue("sortBy")." ".$_[0]->getValue("sortOrder"));
 	$page = $p->getPageData;
 	$i = 0;
 	my $imageURL;
@@ -431,6 +458,7 @@ sub www_view {
                         "submission.thumbnail"=>$thumbnail,
                         "submission.image"=>$imageURL,
                         "submission.date"=>epochToHuman($page->[$i]->{dateSubmitted}),
+                        "submission.date.updated"=>epochToHuman($page->[$i]->{dateUpdated}),
                         "submission.currentUser"=>($session{user}{userId} == $page->[$i]->{userId}),
                         "submission.username"=>$page->[$i]->{username},
                         "submission.userProfile"=>WebGUI::URL::page('op=viewProfile&uid='.$page->[$i]->{userId}),
@@ -474,7 +502,7 @@ sub www_viewRSS {
           ("select USS_submissionId, content, title, " .
            "dateSubmitted, username from USS_submission " .
            "where wobjectId = " .$session{dbh}->quote($wid) . " " .
-           "order by dateSubmitted desc limit " . $numResults);
+           "order by ".$_[0]->getValue("sortBy")." ".$_[0]->getValue("sortOrder")." limit " . $numResults);
         
         while (my $row = $res->{_sth}->fetchrow_arrayref()) {
                 my ($sid, $content, $title, $dateSubmitted, $username) = 
@@ -531,6 +559,9 @@ sub www_viewSubmission {
 	$var{"date.label"} = WebGUI::International::get(13,$_[0]->get("namespace"));
 	$var{"date.epoch"} = $submission->{dateSubmitted};
 	$var{"date.human"} = epochToHuman($submission->{dateSubmitted});
+	$var{"date.updated.label"} = WebGUI::International::get(78,$_[0]->get("namespace"));
+	$var{"date.updated.human"} = epochToHuman($submission->{dateUpdated});
+	$var{"date.updated.epoch"} = $submission->{dateUpdated};
 	$var{"status.label"} = WebGUI::International::get(14,$_[0]->get("namespace"));
 	$var{"status.status"} = status($submission->{status});
 	$var{"views.label"} = WebGUI::International::get(514);

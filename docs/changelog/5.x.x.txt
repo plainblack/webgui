@@ -1,30 +1,31 @@
 5.5.0
  - Rewrote the discussion system and added many new features in the process.
- - Made the username field in the database unique;
- - Fixed a display bug in the Data Form. (Thanks to Christian Kocourek.)
+ - Made the username field in the database unique.
+ - Added sorting options to USS.
  - Added external database group privileges. (Thanks to Andy Grundman.)
  - Added support for encryptLogin user setting. (Thanks to Hal Roberts.)
  - Added anonymous response option to Survey. (Thanks to Andy Grundman.)
  - Added the alphabetic? option to the SiteMap wobject. (Thanks to Hal Roberts.)
  - Changed the page hideFromNavigation option to hide the given page from site maps as well as from navigation menus. (Thanks to Hal Roberts.)
  - Revamped SyndicatedContent to support aggregate feeds. (Thanks to Hal Roberts.)
- - Fixed a relative hyperlink bug in htmlArea (Thanks to Andreas Graf.)
  - Ordered the username list in the manageUsersInGroup operation (Thanks to
    Andreas Graf.)
  - Added support for record deletion in DataForm (Thanks to Hal Roberts.)
  - Templatized the HttpProxy wobject. (Thanks to Len Kranendonk.)
  - Added a "Search for" and "Stop at" option to HttpProxy. (Thanks to Len Kranendonk.)
  - Enhanced HTMLArea editor to include table editing. (Thanks to Irving Carrion.)
- - Fixed a bug where reinvoking www_createAccountSave could produce duplicate
-   usernames in the database. (Thanks to Martin Kamerbeek.)
- - Fixed a bug in the 5.4.3-5.4.4 upgrade script that some users experienced
-   with null values in their DataForm.
  - If the Cache Timeout on a given page is set to 10 seconds or less, that
    page will not be cached.
  - Added master events calendar switch.
  - Updated the Dutch translation. (Thanks to ProcoliX.)
  - Updated the Spanish translation. (Thanks to GIT Consultors.) 
  - Updated the German translation. (Thanks to Andreas Graf.)
+ - Updated the Norwegian translation. (Thanks to Nils-Magne Kvammen.)
+ - Fixed a bug in the 5.4.3-5.4.4 upgrade script that some users experienced
+   with null values in their DataForm.
+ - Fixed a relative hyperlink bug in htmlArea (Thanks to Andreas Graf.)
+ - Fixed a bug where reinvoking www_createAccountSave could produce duplicate
+   usernames in the database. (Thanks to Martin Kamerbeek.)
  - Fixed a bug in SQL macro where it required a leading space in queries.
  - Fixed a case-sensitivity bug in email verfication. (Thanks to Steve Simms.)
  - Fixed a bug where the user was returned to the wrong page after deleting an
@@ -33,6 +34,7 @@
    regardless of the sendWelcomeMessage setting. (Thanks to Steve Simms.)
  - Fixed a bug where templates would not render properly in the mini view on
    the page if they contained macros.
+ - Fixed a display bug in the Data Form. (Thanks to Christian Kocourek.)
  - Fixed a bug in the date method of the forms package where the noDate option
    did the opposite of what was expected. (Thanks to Ed Van Duinen.)
  - Fixed a bug that could hang the macro parser while processing incorrect
