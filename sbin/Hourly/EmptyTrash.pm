@@ -1,17 +1,14 @@
 package Hourly::EmptyTrash;
 
-#-----------------------------------------
-# Copyright 2002 Plain Black LLC
-#-----------------------------------------
-# Before using this software be sure you
-# agree to the terms of its license, which
-# can be found in docs/ihpkit.pdf of this
-# distribution.
-#-----------------------------------------
-# http://www.plainblack.com
-# info@plainblack.com
-#-----------------------------------------
-
+#-------------------------------------------------------------------
+# WebGUI is Copyright 2001-2003 Plain Black LLC.
+#-------------------------------------------------------------------
+# Please read the legal notices (docs/legal.txt) and the license
+# (docs/license.txt) that came with this distribution before using
+# this software.
+#-------------------------------------------------------------------
+# http://www.plainblack.com                     info@plainblack.com
+#-------------------------------------------------------------------
 
 use strict;
 use WebGUI::DateTime;
