@@ -434,18 +434,30 @@ $conf->set("wobjects"=>\@newWobjects);
 $conf->write;
 
 
+#--------------------------------------------
+print "\tUpdating Authentication.\n" unless ($quiet);
+WebGUI::SQL->write("delete from authentication where authMethod='WebGUI' and fieldName='passwordLastUpdated'");
+WebGUI::SQL->write("delete from authentication where authMethod='WebGUI' and fieldName='passwordTimeout'");
+my $authSth = WebGUI::SQL->read("select userId from users where authMethod='WebGUI'");
+while (my $authHash = $authSth->hashRef){
+   WebGUI::SQL->write("insert into authentication (userId,authMethod,fieldName,fieldData) values ('".$authHash->userId."','WebGUI','passwordLastUpdated','".time()."');
+   WebGUI::SQL->write("insert into authentication (userId,authMethod,fieldName,fieldData) values ('".$authHash->userId."','WebGUI','passwordTimeout','3122064000');
+}
+
 
 #--------------------------------------------
-print "\tRemoving unneeded files.\n" unless ($quiet);
+print "\tRemoving unneeded files and directories.\n" unless ($quiet);
 unlink("../../lib/WebGUI/Operation/Style.pm");
 unlink("../../lib/WebGUI/Wobject/Item.pm");
 unlink("../../lib/WebGUI/Wobject/LinkList.pm");
 unlink("../../lib/WebGUI/Wobject/FAQ.pm");
 unlink("../../lib/WebGUI/Wobject/ExtraColumn.pm");
-
-
-
-
+unlink("../../lib/WebGUI/Authentication.pm");
+unlink("../../lib/WebGUI/Operation/Account.pm");
+unlink("../../lib/WebGUI/Authentication/WebGUI.pm");
+unlink("../../lib/WebGUI/Authentication/LDAP.pm");
+unlink("../../lib/WebGUI/Authentication/SMB.pm");
+rmdir("../../lib/WebGUI/Authentication")
 WebGUI::Session::close();
 
 
