@@ -9,6 +9,7 @@ use WebGUI::Forum::Post;
 use WebGUI::Forum::Thread;
 use WebGUI::HTML;
 use WebGUI::MessageLog;
+use WebGUI::Search;
 use WebGUI::Session;
 use WebGUI::Template;
 
@@ -33,8 +34,12 @@ sub formatEditPostURL {
 	return WebGUI::URL::append($_[0],"forumOp=post&amp;forumPostId=".$_[1]);
 }
 
-sub formatForumURL {
-	return WebGUI::URL::append($_[0],"forumOp=viewForum&amp;forumId=".$_[1]);
+sub formatForumSearchURL {
+	return WebGUI::URL::append($_[0],"forumOp=search&amp;forumId=".$_[1]);
+}
+
+sub formatForumSortByURL {
+	return WebGUI::URL::append($_[0],"forumOp=viewForum&amp;forumId=".$_[1]."&amp;sortBy=".$_[2]);
 }
 
 sub formatForumSubscribeURL {
@@ -43,6 +48,10 @@ sub formatForumSubscribeURL {
 
 sub formatForumUnsubscribeURL {
 	return WebGUI::URL::append($_[0],"forumOp=forumUnsubscribe&amp;forumId=".$_[1]);
+}
+
+sub formatForumURL {
+	return WebGUI::URL::append($_[0],"forumOp=viewForum&amp;forumId=".$_[1]);
 }
 
 sub formatNextThreadURL {
@@ -70,7 +79,9 @@ sub formatRatePostURL {
 }
 
 sub formatReplyPostURL {
-	return WebGUI::URL::append($_[0],"forumOp=post&amp;parentId=".$_[1]);
+	my $url = WebGUI::URL::append($_[0],"forumOp=post&amp;parentId=".$_[1]);
+	$url = WebGUI::URL::append($url,"withQuote=1") if ($_[2]);
+	return $url;
 }
 
 sub formatSubject {
@@ -84,7 +95,13 @@ sub formatStatus {
                 return WebGUI::International::get(561);
         } elsif ($_[0] eq "pending") {
                 return WebGUI::International::get(562);
+        } elsif ($_[0] eq "archived") {
+                return WebGUI::International::get(1046);
         }
+}
+
+sub formatThreadLayoutURL {
+	return WebGUI::URL::append($_[0],"forumOp=viewThread&amp;forumPostId=".$_[1]."&amp;layout=".$_[2]);
 }
 
 sub formatThreadLockURL {
@@ -146,6 +163,12 @@ sub forumProperties {
 		-uiLevel=>5
 		);
 	$f->template(
+		-name=>"searchTemplateId",
+		-label=>WebGUI::International::get(1044),
+		-namespace=>"Forum/Search",
+		-uiLevel=>5
+		);
+	$f->template(
 		-name=>"postFormTemplateId",
 		-label=>WebGUI::International::get(1034),
 		-namespace=>"Forum/PostForm",
@@ -157,6 +180,14 @@ sub forumProperties {
 		-namespace=>"Forum/Notification",
 		-uiLevel=>5
 		);
+        my ($interval, $units) = WebGUI::DateTime::secondsToInterval(($forum->get("archiveAfter") || 31536000));
+        $f->interval(
+                -name=>"archiveAfter",
+                -label=>WebGUI::International::get(1043),
+                -intervalValue=>$interval,
+                -unitsValue=>$units,
+                -uiLevel=>9
+                );
         my ($interval, $units) = WebGUI::DateTime::secondsToInterval(($forum->get("editTimeout") || 3600));
         $f->interval(
                 -name=>"editTimeout",
@@ -189,6 +220,12 @@ sub forumProperties {
                 -label=>WebGUI::International::get(1024),
                 -uiLevel=>7
                 );
+        $f->integer(
+		-name=>"postsPerPage",
+		-label=>WebGUI::International::get(1042),
+		-value=>$forum->get("postsPerPage")||30,
+		-uiLevel=>7
+		);
         if ($session{setting}{useKarma}) {
                 $f->integer(
 			-name=>"karmaPerPost",
@@ -226,11 +263,19 @@ sub forumProperties {
 
 sub forumPropertiesSave {
 	my %data = (
+		forumTemplateId=>$session{form}{forumTemplateId},
+		threadTemplateId=>$session{form}{threadTemplateId},
+		postTemplateId=>$session{form}{postTemplateId},
+		searchTemplateId=>$session{form}{searchTemplateId},
+		notificationTemplateId=>$session{form}{notificationTemplateId},
+		postFormTemplateId=>$session{form}{postFormTemplateId},
 		editTimeout=>WebGUI::FormProcessor::interval("editTimeout"),
+		archiveAfter=>WebGUI::FormProcessor::interval("archiveAfter"),
 		addEditStampToPosts=>$session{form}{addEditStampToPosts},
 		allowRichEdit=>$session{form}{allowRichEdit},
 		allowReplacements=>$session{form}{allowReplacements},
 		filterPosts=>$session{form}{filterPosts},
+		postsPerPage=>$session{form}{postsPerPage},
 		karmaPerPost=>$session{form}{karmaPerPost},
 		groupToPost=>$session{form}{groupToPost},
 		moderatePosts=>$session{form}{moderatePosts},
@@ -264,12 +309,19 @@ sub getForumTemplateVars {
 	$var{'user.isVisitor'} = ($session{user}{userId} == 1);
 	$var{'thread.new.url'} = formatNewThreadURL($callback,$forum->get("forumId"));
 	$var{'thread.new.label'} = WebGUI::International::get(1018);
+	$var{'forum.search.label'} = WebGUI::International::get(364);
+	$var{'forum.search.url'} = formatForumSearchURL($callback,$forum->get("forumId"));
 	$var{'forum.subscribe.label'} = WebGUI::International::get(1022);
 	$var{'forum.subscribe.url'} = formatForumSubscribeURL($callback,$forum->get("forumId"));
 	$var{'forum.unsubscribe.label'} = WebGUI::International::get(1023);
 	$var{'forum.unsubscribe.url'} = formatForumUnsubscribeURL($callback,$forum->get("forumId"));
 	$var{'user.isSubscribed'} = $forum->isSubscribed;
 	$var{'user.canPost'} = $forum->canPost;
+	$var{'thread.sortby.date.url'} = formatForumSortByURL($callback,$forum->get("forumId"),"date");
+	$var{'thread.sortby.lastreply.url'} = formatForumSortByURL($callback,$forum->get("forumId"),"lastreply");
+	$var{'thread.sortby.views.url'} = formatForumSortByURL($callback,$forum->get("forumId"),"views");
+	$var{'thread.sortby.replies.url'} = formatForumSortByURL($callback,$forum->get("forumId"),"replies");
+	$var{'thread.sortby.rating.url'} = formatForumSortByURL($callback,$forum->get("forumId"),"rating");
 	$var{'thread.subject.label'} = WebGUI::International::get(229);
 	$var{'thread.date.label'} = WebGUI::International::get(245);
 	$var{'thread.user.label'} = WebGUI::International::get(244);
@@ -277,14 +329,28 @@ sub getForumTemplateVars {
         $var{"thread.replies.label"} = WebGUI::International::get(1016);
 	$var{'thread.rating.label'} = WebGUI::International::get(1020);
         $var{"thread.last.label"} = WebGUI::International::get(1017);
-	my $p = WebGUI::Paginator->new($callback);
-	$p->setDataByQuery("select * from forumThread where forumId=".$forum->get("forumId")." order by isSticky desc, lastPostDate desc");
+	my $query = "select * from forumThread where forumId=".$forum->get("forumId")." order by isSticky desc, ";
+	if ($session{scratch}{forumSortBy} eq "date") {
+		$query .= "rootPostId desc";
+	} elsif ($session{scratch}{forumSortBy} eq "views") {
+		$query .= "views desc";
+	} elsif ($session{scratch}{forumSortBy} eq "replies") {
+		$query .= "replies desc";
+	} elsif ($session{scratch}{forumSortBy} eq "rating") {
+		$query .= "rating desc";
+	} else {
+		$query .= "lastPostDate desc";
+	}
+	my $p = WebGUI::Paginator->new($callback,"",$forum->get("postsPerPage"));
+	$p->setDataByQuery($query);
 	$var{firstPage} = $p->getFirstPageLink;
         $var{lastPage} = $p->getLastPageLink;
         $var{nextPage} = $p->getNextPageLink;
         $var{pageList} = $p->getPageLinks;
         $var{previousPage} = $p->getPreviousPageLink;
         $var{multiplePages} = ($p->getNumberOfPages > 1);
+        $var{numberOfPages} = $p->getNumberOfPages;
+        $var{pageNumber} = $p->getPageNumber;
 	my $threads = $p->getPageData;
 	foreach my $thread (@$threads) {
 		my $root = WebGUI::Forum::Post->new($thread->{rootPostId});
@@ -392,6 +458,7 @@ sub getPostTemplateVars {
 	$var->{'post.hasRated'} = $post->hasRated;
 	$var->{'post.reply.label'} = WebGUI::International::get(577);
 	$var->{'post.reply.url'} = formatReplyPostURL($callback,$post->get("forumPostId"));
+	$var->{'post.reply.withquote.url'} = formatReplyPostURL($callback,$post->get("forumPostId"),1);
 	$var->{'post.edit.label'} = WebGUI::International::get(575);
 	$var->{'post.edit.url'} = formatEditPostURL($callback,$post->get("forumPostId"));
 	$var->{'post.delete.label'} = WebGUI::International::get(576);
@@ -417,6 +484,16 @@ sub getThreadTemplateVars {
         $var->{'user.isVisitor'} = ($session{user}{userId} == 1);
         $var->{'user.isModerator'} = $forum->isModerator;
         $var->{'user.isSubscribed'} = $thread->isSubscribed;
+	$var->{'thread.layout.nested.label'} = WebGUI::International::get(1045);
+	$var->{'thread.layout.nested.url'} = formatThreadLayoutURL($callback,$post->get("forumPostId"),"nested");
+	$var->{'thread.layout.flat.label'} = WebGUI::International::get(510);
+	$var->{'thread.layout.flat.url'} = formatThreadLayoutURL($callback,$post->get("forumPostId"),"flat");
+	$var->{'thread.layout.threaded.label'} = WebGUI::International::get(511);
+	$var->{'thread.layout.threaded.url'} = formatThreadLayoutURL($callback,$post->get("forumPostId"),"threaded");
+	my $layout = $session{scratch}{forumThreadLayout} || $session{user}{discussionLayout};
+        $var->{'thread.layout.isFlat'} = ($layout eq "flat");
+        $var->{'thread.layout.isNested'} = ($layout eq "nested");
+        $var->{'thread.layout.isThreaded'} = ($layout eq "threaded" || !($var->{'thread.layout.isNested'} || $var->{'thread.layout.isFlat'}));
         $var->{'thread.subscribe.url'} = formatThreadSubscribeURL($callback,$post->get("forumPostId"));
         $var->{'thread.subscribe.label'} = WebGUI::International::get(873);
         $var->{'thread.unsubscribe.url'} = formatThreadUnsubscribeURL($callback,$post->get("forumPostId"));
@@ -432,9 +509,6 @@ sub getThreadTemplateVars {
         $var->{'thread.unlock.url'} = formatThreadUnlockURL($callback,$post->get("forumPostId"));
         $var->{'thread.unlock.label'} = WebGUI::International::get(1041);
         $var->{post_loop} = recurseThread($root, $thread, $forum, 0, $callback, $post->get("forumPostId"));
-        $var->{'thread.layout.isFlat'} = ($session{user}{discussionLayout} eq "flat");
-        $var->{'thread.layout.isNested'} = ($session{user}{discussionLayout} eq "nested");
-        $var->{'thread.layout.isThreaded'} = ($session{user}{discussionLayout} eq "threaded" || !($var->{'thread.layout.isNested'} || $var->{'thread.layout.isFlat'}));
         $var->{'thread.subject.label'} = WebGUI::International::get(229);
         $var->{'thread.date.label'} = WebGUI::International::get(245);
         $var->{'thread.user.label'} = WebGUI::International::get(244);
@@ -578,6 +652,7 @@ sub www_post {
 			name=>'parentId',
 			value=>$reply->get("forumPostId")
 			});
+		$message = "[quote]".$reply->get("message")."[/quote]" if ($session{form}{withQuote});
 		$forum = $reply->getThread->getForum;
 		$var = getPostTemplateVars($reply, $reply->getThread, $forum, $callback, $var);
 
@@ -735,6 +810,95 @@ sub www_ratePost {
 	return www_viewThread($callback,$session{form}{forumPostId});
 }
 
+sub www_search {
+	my ($callback) = @_;
+	my $forum = WebGUI::Forum->new($session{form}{forumId});
+        WebGUI::Session::setScratch("all",$session{form}{all});
+        WebGUI::Session::setScratch("atLeastOne",$session{form}{atLeastOne});
+        WebGUI::Session::setScratch("exactPhrase",$session{form}{exactPhrase});
+        WebGUI::Session::setScratch("without",$session{form}{without});
+        WebGUI::Session::setScratch("numResults",$session{form}{numResults});
+	my %var;
+	$var{'callback.url'} = $callback;
+        $var{'callback.label'} = WebGUI::International::get(1039);
+	$var{'form.begin'} = WebGUI::Form::formHeader({action=>$callback});
+	$var{'form.begin'} .= WebGUI::Form::hidden({ name=>"forumOp", value=>"search" });
+	$var{'form.begin'} .= WebGUI::Form::hidden({ name=>"doit", value=>1 });
+	$var{'form.begin'} .= WebGUI::Form::hidden({ name=>"forumId", value=>$session{form}{forumId} });
+        $var{'search.label'} = WebGUI::International::get(364);
+        $var{'all.label'} = WebGUI::International::get(530);
+	$var{'all.form'} = WebGUI::Form::text({
+		name=>'all',
+		value=>$session{scratch}{all},
+		size=>($session{setting}{textBoxSize}-5)
+		});
+        $var{'exactphrase.label'} = WebGUI::International::get(531);
+        $var{'exactphrase.form'} = WebGUI::Form::text({
+		name=>'exactPhrase',
+		value=>$session{scratch}{exactPhrase},
+		size=>($session{setting}{textBoxSize}-5)
+		});
+        $var{'atleastone.label'} = WebGUI::International::get(532);
+        $var{'atleastone.form'} = WebGUI::Form::text({
+		name=>'atLeastOne',
+		value=>$session{scratch}{atLeastOne},
+		size=>($session{setting}{textBoxSize}-5)
+		});
+        $var{'without.label'} = WebGUI::International::get(533);
+        $var{'without.form'} = WebGUI::Form::text({
+		name=>'without',
+		value=>$session{scratch}{without},
+		size=>($session{setting}{textBoxSize}-5)
+		});
+	$var{'results.label'} = WebGUI::International::get(529);
+        my %results;
+        tie %results, 'Tie::IxHash';
+        %results = (10=>'10', 25=>'25', 50=>'50', 100=>'100');
+        my $numResults = $session{scratch}{numResults} || 25;
+        $var{'results.form'} = WebGUI::Form::selectList({
+		name=>"numResults",
+		options=>\%results,
+		value=>[$numResults]
+		});
+	$var{'form.search'} = WebGUI::Form::submit({value=>WebGUI::International::get(170)});
+	$var{'form.end'} = '</form>';
+	$var{'thread.list.url'} = formatForumURL($callback,$forum->get("forumId"));
+        $var{'thread.list.label'} = WebGUI::International::get(1019);
+	$var{doit} = $session{form}{doit};
+	if ($session{form}{doit}) {
+		$var{'post.subject.label'} = WebGUI::International::get(229);
+      	  	$var{'post.date.label'} = WebGUI::International::get(245);
+        	$var{'post.user.label'} = WebGUI::International::get(244);
+		my $query = "select forumPostId,subject,userId,username,dateOfPost from forumPost where (status='approved' or status='archived') and ";
+		$query .= WebGUI::Search::buildConstraints([qw(subject username message)]);
+		my $p = WebGUI::Paginator->new($callback,"", $numResults);
+		$p->setDataByQuery($query);
+		my @post_loop;
+		foreach my $row (@{$p->getPageData}) {
+			push(@post_loop,{
+				'post.subject'=>formatSubject($row->{subject}),
+				'post.url'=>formatThreadURL($callback,$row->{forumPostId}),
+				'post.user.name'=>$row->{username},
+				'post.user.id'=>$row->{userId},
+				'post.user.profile'=>formatUserProfileURL($row->{userId}),
+				'post.epoch'=>$row->{dateOfPost},
+				'post.date'=>formatPostDate($row->{dateOfPost}),
+				'post.time'=>formatPostTime($row->{dateOfPost})
+				});
+		}
+		$var{post_loop} = \@post_loop;
+		$var{firstPage} = $p->getFirstPageLink;
+	        $var{lastPage} = $p->getLastPageLink;
+        	$var{nextPage} = $p->getNextPageLink;
+        	$var{pageList} = $p->getPageLinks;
+        	$var{previousPage} = $p->getPreviousPageLink;
+        	$var{multiplePages} = ($p->getNumberOfPages > 1);
+        	$var{numberOfPages} = $p->getNumberOfPages;
+        	$var{pageNumber} = $p->getPageNumber;
+	}
+	return WebGUI::Template::process(WebGUI::Template::get($forum->get("searchTemplateId"),"Forum/Search"), \%var);
+}
+
 sub www_threadLock {
 	my ($callback) = @_;
 	my $post = WebGUI::Forum::Post->new($session{form}{forumPostId});
@@ -785,6 +949,7 @@ sub www_threadUnsubscribe {
 
 sub www_viewForum {
 	my ($callback, $forumId) = @_;
+	WebGUI::Session::setScratch("forumSortBy",$session{form}{sortBy});
 	$forumId = $session{form}{forumId} unless ($forumId);
 	my $forum = WebGUI::Forum->new($forumId);
 	my $var = getForumTemplateVars($callback, $forum);
@@ -793,6 +958,7 @@ sub www_viewForum {
 
 sub www_viewThread {
 	my ($callback, $postId) = @_;
+	WebGUI::Session::setScratch("forumThreadLayout",$session{form}{layout});
 	$postId = $session{form}{forumPostId} unless ($postId);
         my $post = WebGUI::Forum::Post->new($postId);
 	my $var = getThreadTemplateVars($callback, $post);
