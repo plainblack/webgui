@@ -28,6 +28,7 @@ macros = a => a_account, \
 	c => c_companyName, \
 	C => C_crumbTrail, \
 	CanEditText => CanEditText, \
+	D => D_date, \
 	e => e_companyEmail, \
 	EditableToggle => EditableToggle, \
 	Extras => Extras, \
