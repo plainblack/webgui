@@ -75,7 +75,6 @@ sub incrementReplies {
         my ($self, $dateOfReply, $replyId) = @_;
         WebGUI::SQL->write("update forumThread set replies=replies+1, lastPostId=$replyId, lastPostDate=$dateOfReply 
 		where forumThreadId=".$self->get("forumThreadId"));
-	#add method to notify users for subscriptions
 }
 
 sub incrementViews {

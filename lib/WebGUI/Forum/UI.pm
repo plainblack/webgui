@@ -1,4 +1,4 @@
-package WebGUI::Forum::Web;
+package WebGUI::Forum::UI;
 
 use strict qw(vars subs);
 use WebGUI::DateTime;
@@ -7,6 +7,7 @@ use WebGUI::Forum;
 use WebGUI::Forum::Post;
 use WebGUI::Forum::Thread;
 use WebGUI::HTML;
+use WebGUI::MessageLog;
 use WebGUI::Session;
 use WebGUI::Template;
 
@@ -175,6 +176,23 @@ sub forumOp {
 	my ($callback) = @_;
 	my $cmd = "www_".$session{form}{forumOp};
         return &$cmd($callback);
+}
+
+sub notifySubscribers {
+        my ($self, $postId) = @_;
+        my $post = WebGUI::Post->new($postId);
+        my $sth = WebGUI::SQL->read("select userId from forumThreadSubscription where forumThreadId=".$post->get("forumThreadId"));
+                                                                                                                                                             
+    WebGUI::MessageLog::addInternationalizedEntry($userId,"",
+                                WebGUI::URL::page('func=showMessage&wid='.$session{form}{wid}
+                                .'&sid='.$session{form}{sid}.'&mid='.$session{form}{mid}),875);
+        $forum
+        my $message = WebGUI::Template::process(WebGUI::Template::get(1,"Forum/Notification"), $var);
+                                                                                                                                                             
+        while (($userId) = $sth->array) {
+                WebGUI::MessageLog::addEntry($userId,"","Subscription Notification",);
+        }
+        $sth->finish;
 }
 
 sub viewForum {

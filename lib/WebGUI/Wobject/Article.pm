@@ -14,7 +14,7 @@ use strict;
 use Tie::CPHash;
 use WebGUI::Attachment;
 use WebGUI::DateTime;
-use WebGUI::Forum::Web;
+use WebGUI::Forum::UI;
 use WebGUI::HTML;
 use WebGUI::HTMLForm;
 use WebGUI::Icon;
@@ -196,9 +196,9 @@ sub www_view {
                 $templateId = $_[0]->get("templateId");
         }
 	if ($session{form}{forumOp}) {
-		return WebGUI::Forum::Web::forumOp(WebGUI::URL::page("func=view&amp;wid=".$_[0]->get("wobjectId")));
+		return WebGUI::Forum::UI::forumOp(WebGUI::URL::page("func=view&amp;wid=".$_[0]->get("wobjectId")));
 	} else {
-		return $_[0]->processTemplate($templateId,\%var).WebGUI::Forum::Web::viewForum(WebGUI::URL::page("func=view&amp;wid=".$_[0]->get("wobjectId")),1);
+		return $_[0]->processTemplate($templateId,\%var).WebGUI::Forum::UI::viewForum(WebGUI::URL::page("func=view&amp;wid=".$_[0]->get("wobjectId")),1);
 	}
 }
 
