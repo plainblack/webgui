@@ -473,7 +473,7 @@ Defaults to page id "1". Specify the page id to change this WebGUI session to us
 sub refreshPageInfo {
 	my ($pageId);
 	if ($_[0] == 0) {
-		$pageId = 1;
+		$pageId = $session{page}{pageId};
 	} else {
 		$pageId = $_[0];
 	}

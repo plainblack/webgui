@@ -174,10 +174,23 @@ foreach my $file (@files) {
                 	'FILE' => $configsPath.$config{$file}{configFile},
                 	'PURGE' => 1);
 		$config{$file}{dsn} = $config->get('dsn');
-		$config{$file}{dsn} =~ /^DBI\:(\w+)\:(\w+)(\:(.*)|)$/;
+		my $temp = $config{$file}{dsn};
+		$temp =~ s/^DBI\:(.*)$/$1/;
+		$temp =~ s/(\w+)\:(.*)/$2/;
+		#$config{$file}{dsn} =~ /^DBI\:(\w+)\:(\w+)(\:(.*)|)$/;
 		if ($1 eq "mysql") {
-			$config{$file}{db} = $2;
-			$config{$file}{host} = $4;
+			if ($temp =~ /(\w+)\;host=(.*)/) {
+				$config{$file}{db} = $1;
+				$config{$file}{host} = $2;
+			} elsif ($temp =~ /(\w+)\;(.*)/) {
+				$config{$file}{db} = $1;
+				$config{$file}{host} = $2;
+			} elsif ($temp =~ /(\w+)\:(.*)/) {
+				$config{$file}{db} = $1;
+				$config{$file}{host} = $2;
+			} else {
+				$config{$file}{db} = $temp;
+			}
 			$config{$file}{dbuser} = $config->get('dbuser');
 			$config{$file}{dbpass} = $config->get('dbpass');
 			$config{$file}{mysqlCLI} = $config->get('mysqlCLI');

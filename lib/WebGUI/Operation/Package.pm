@@ -76,7 +76,9 @@ sub _recursePageTree {
 			userDefined4,
 			userDefined5,
 			hideFromNavigation,
-			newWindow
+			newWindow,
+			cacheTimeout,
+			cacheTimeoutVisitor
 			) values (
 			$newPageId,
 			$_[1],
@@ -101,7 +103,9 @@ sub _recursePageTree {
 			".quote($newParent{userDefined4}).",
 			".quote($newParent{userDefined5}).",
 			$package{hideFromNavigation},
-			$package{newWindow}
+			$package{newWindow},
+			$package{cacheTimeout},
+			$package{cacheTimeoutVisitor}
 			)");
 		_recursePageTree($package{pageId},$newPageId);
 	}

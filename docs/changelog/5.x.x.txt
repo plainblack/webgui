@@ -15,6 +15,7 @@
  - Added support for record deletion in DataForm (Thanks to Hal Roberts.)
  - Templatized the HttpProxy wobject. (Thanks to Len Kranendonk.)
  - Added a "Search for" and "Stop at" option to HttpProxy. (Thanks to Len Kranendonk.)
+ - Added additional DSN formats for upgrades of remote databases.
  - Enhanced HTMLArea editor to include table editing. (Thanks to Irving Carrion.)
  - If the Cache Timeout on a given page is set to 10 seconds or less, that
    page will not be cached.
@@ -23,6 +24,7 @@
  - Updated the Spanish translation. (Thanks to GIT Consultors.) 
  - Updated the German translation. (Thanks to Andreas Graf.)
  - Updated the Norwegian translation. (Thanks to Nils-Magne Kvammen.)
+ - Added the missing group scratch filter documentation to the help.
  - Fixed a bug in the 5.4.3-5.4.4 upgrade script that some users experienced
    with null values in their DataForm.
  - Fixed a relative hyperlink bug in htmlArea (Thanks to Andreas Graf.)
