@@ -20,7 +20,8 @@ sub process {
         my ($url) = WebGUI::Macro::getParams(shift);
 	my $asset = WebGUI::Asset->newByUrl($url);
 	if (defined $asset) {
-		return $asset->canView ? $asset->view : "";
+		$asset->toggleToolbar if ($asset->get("className") =~ /WebGUI::Asset::File/ || $asset->get("className") =~ /WebGUI::Asset::Snippet/ );
+		return $asset->canView ? $asset->view : undef;
 	} else {
 		return "Invalid Asset URL";
 	}

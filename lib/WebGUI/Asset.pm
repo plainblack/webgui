@@ -1436,6 +1436,7 @@ Returns a toolbar with a set of icons that hyperlink to functions that delete, e
 
 sub getToolbar {
 	my $self = shift;
+	return undef if ($self->{_toolbarOff});
 	my $toolbar = deleteIcon('func=delete',$self->get("url"),WebGUI::International::get(43))
               	.editIcon('func=edit',$self->get("url"))
              	.moveUpIcon('func=promote',$self->get("url"))
@@ -2028,6 +2029,23 @@ sub trash {
 	WebGUI::SQL->commit;
 	$self->{_properties}{state} = "trash";
 	$self->updateHistory("trashed");
+}
+
+#-------------------------------------------------------------------
+
+=head2 toggleToolbar ( ) 
+
+Toggles whether to render a toolbar in an asset. This is mostly useful for macros that wish to proxy an asset but not display the toolbar.
+
+=cut
+
+sub toggleToolbar {
+	my $self = shift;
+	if ($self->{_toolbarOff}) {
+		$self->{_toolbarOff} = 0;
+	} else {
+		$self->{_toolbarOff} = 1;
+	}
 }
 
 #-------------------------------------------------------------------

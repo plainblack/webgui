@@ -21,11 +21,12 @@ sub process {
 	my $asset = WebGUI::Asset->newByUrl($url);
 	if (defined $asset) {
 		my $children = $asset->getLineage(["children"]);
-		randomize;
-		my $randomAssetId = $children->[rand(scalar(@{$children})];	
+		#randomize;
+		my $randomAssetId = $children->[rand(scalar(@{$children}))];	
 		my $randomAsset = WebGUI::Asset->newByDynamicClass($randomAssetId);
 		if (defined $randomAsset) {
-			return $randomAsset->canView ? $randomAsset->view : "";
+			$randomAsset->toggleToolbar;
+			return $randomAsset->canView ? $randomAsset->view : undef;
 		} else {
 			return "Asset has no children.";
 		}

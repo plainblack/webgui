@@ -182,7 +182,7 @@ WebGUI::SQL->write("alter table WobjectProxy add column shortcutToAssetId varcha
 my $sth = WebGUI::SQL->read("select proxiedWobjectId from WobjectProxy");
 while (my ($wobjectId) = $sth->array) {
 	my ($assetId) = WebGUI::SQL->quickArray("select assetId from wobject where wobjectId=".quote($wobjectId));
-	WebGUI::SQL->write("update WobjectProxy set shortcutToAssetId=".quote($assetId)." where wobjectId=".quote($wobjectId));
+	WebGUI::SQL->write("update WobjectProxy set shortcutToAssetId=".quote($assetId)." where proxiedWobjectId=".quote($wobjectId));
 }
 $sth->finish;
 foreach my $namespace (@allWobjects) {
@@ -456,7 +456,7 @@ WebGUI::SQL->setRow("wobject","assetId",{
 	styleTemplateId=>"1",
 	printableStyleTemplateId=>"3"
 	},undef,$collateralRootId);
-WebGUI::SQL->setRow("Navigation","assetId",{
+WebGUI::SQL->setRow("Folder","assetId",{
 	assetId=>$collateralRootId,
 	templateId=>"PBtmpl0000000000000078"
 	},undef,$collateralRootId);
@@ -470,7 +470,7 @@ while (my $data = $sth->hashRef) {
 	$folderNameCache{$data->{name}} = $url;
 	my $folderId = WebGUI::SQL->setRow("asset","assetId",{
 		assetId=>"new",
-		className=>'WebGUI::Asset::Layout',
+		className=>'WebGUI::Asset::Wobject::Folder',
 		lineage=>$collateralRootLineage.sprintf("%06d",$collateralRankCounter),
 		parentId=>$collateralRootId,
 		ownerUserId=>'3',
@@ -488,8 +488,8 @@ while (my $data = $sth->hashRef) {
 		printableStyleTemplateId=>"3",
 		description=>$data->{description}
 		},undef,$folderId);
-	WebGUI::SQL->setRow("Layout","assetId",{
-		templateId=>'15',
+	WebGUI::SQL->setRow("Folder","assetId",{
+		templateId=>'PBtmpl0000000000000078',
 		assetId=>$folderId
 		},undef,$folderId);
 	$folderCache{$data->{collateralFolderId}} = {
@@ -533,6 +533,7 @@ while (my $data = $sth->hashRef) {
 			snippet=>$data->{parameters}
 			},undef,$collateralId);
 		$fileSize = length($data->{parameters});
+		$class = 'WebGUI::Asset::Snippet';
 	}
 	my $url = fixUrl($collateralId,$data->{name});
 	$macroCache{$data->{name}} = $macroCache{$data->{collateralId}} = $url;
@@ -1512,7 +1513,7 @@ sub walkTree {
 				WebGUI::SQL->write("update asset set className='WebGUI::Asset::Wobject::Navigation' where assetId=".quote($wobjectId));
 				WebGUI::SQL->write("update wobject set namespace='Navigation'  where assetId=".quote($wobjectId));
 			} elsif ($wobject->{namespace} eq "FileManager") {
-				print "\t\t\tConverting File Manager ".$wobject->{wobjectId}." into File Folder Layout\n" unless ($quiet);
+				print "\t\t\tConverting File Manager ".$wobject->{wobjectId}." into File Folder\n" unless ($quiet);
 				WebGUI::SQL->write("update asset set className='WebGUI::Asset::Folder' where assetId=".quote($wobjectId));
 				WebGUI::SQL->write("insert into Folder (assetId,templateId) values (".quote($wobjectId).", '15')");
 				WebGUI::SQL->write("update wobject set namespace='Folder' where wobjectId=".quote($wobject->{wobjectId}));
