@@ -57,7 +57,7 @@ sub duplicate {
         $sth = WebGUI::SQL->read("select * from Product_specification where wobjectId=".$_[0]->get("wobjectId"));
         while ($row = $sth->hashRef) {
 		$row->{"Product_specificationId"} = "new";
-                $w->setCollateral("Product_specifcation","Product_specificationId",$row);
+                $w->setCollateral("Product_specification","Product_specificationId",$row);
         }
         $sth->finish;
         $sth = WebGUI::SQL->read("select * from Product_accessory where wobjectId=".$_[0]->get("wobjectId"));
