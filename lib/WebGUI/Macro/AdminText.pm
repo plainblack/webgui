@@ -15,23 +15,12 @@ use WebGUI::Macro;
 use WebGUI::Session;
 
 #-------------------------------------------------------------------
-sub _replacement {
-        my ($temp,@param);
-        @param = WebGUI::Macro::getParams(shift);
-        if ($session{var}{adminOn}) {
-                $temp = $param[0];
-        } else {
-                $temp = "";
-        }
-        return $temp;
+sub process {
+        my @param = WebGUI::Macro::getParams(shift);
+        return "" unless ($session{var}{adminOn});
+        return $param[0];
 }
 
-#-------------------------------------------------------------------
-sub process {
-        my ($output) = @_;
-	$output =~ s/\^AdminText\((.*?)\)\;/_replacement($1)/ge;
-        return $output;
-}
 
 1;
 

@@ -15,18 +15,9 @@ use WebGUI::Macro;
 use WebGUI::Session;
 
 #-------------------------------------------------------------------
-sub _replacement {
-	my (@param);
-        @param = WebGUI::Macro::getParams($_[0]);
-	return $session{env}{$param[0]};
-}
-
-#-------------------------------------------------------------------
 sub process {
-	my ($output);
-	$output = $_[0];
-        $output =~ s/\^Env\((.*?)\)\;/_replacement($1)/ge;
-	return $output;
+        my @param = WebGUI::Macro::getParams($_[0]);
+	return $session{env}{$param[0]};
 }
 
 1;

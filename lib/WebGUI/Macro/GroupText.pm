@@ -17,25 +17,17 @@ use WebGUI::Session;
 use WebGUI::Privilege;
 
 #-------------------------------------------------------------------
-sub _replacement {
-        my ($temp,@param,$groupId);
-	@param = WebGUI::Macro::getParams($_[0]);
-	($groupId) = WebGUI::SQL->quickArray("select groupId from groups where groupName=".quote($param[0]));
+sub process {
+	my @param = WebGUI::Macro::getParams($_[0]);
+	my ($groupId) = WebGUI::SQL->quickArray("select groupId from groups where groupName=".quote($param[0]));
 	$groupId = 3 if ($groupId eq "");
 	if (WebGUI::Privilege::isInGroup($groupId)) { 
-		$temp = $param[1];
+		return $param[1];
 	} else {
-		$temp = "";
+		return "";
 	}
-	return $temp;
 }
 
-#-------------------------------------------------------------------
-sub process {
-        my ($output) = @_;
-	$output =~ s/\^GroupText\((.*?)\)\;/_replacement($1)/ge;
-        return $output;
-}
 
 1;
 

@@ -17,7 +17,7 @@ use WebGUI::Session;
 use WebGUI::URL;
 
 #-------------------------------------------------------------------
-sub _replacement {
+sub process {
 	my ($f);
 	$f = WebGUI::HTMLForm->new(1);
         $f->hidden("op","search");
@@ -26,12 +26,5 @@ sub _replacement {
 	return $f->print;
 }
 
-#-------------------------------------------------------------------
-sub process {
-        my ($output);
-        $output = $_[0];
-        $output =~ s/\^\?\;/_replacement()/ge;
-        return $output;
-}
 
 1;

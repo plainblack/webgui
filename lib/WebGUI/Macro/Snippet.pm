@@ -17,20 +17,13 @@ use WebGUI::Session;
 use WebGUI::SQL;
 
 #-------------------------------------------------------------------
-sub _replacement {
+sub process {
 	my (@param, $temp);
         @param = WebGUI::Macro::getParams($_[0]);
 	($temp) = WebGUI::SQL->quickArray("select parameters from collateral where name=".quote($param[0]));
 	return WebGUI::Macro::process($temp);
 }
 
-#-------------------------------------------------------------------
-sub process {
-	my ($output, $temp);
-	$output = $_[0];
-	$output =~ s/\^Snippet\((.*?)\)\;/_replacement($1)/ge;
-	return $output;
-}
 
 1;
 

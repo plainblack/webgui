@@ -18,7 +18,7 @@ use WebGUI::Session;
 use WebGUI::SQL;
 
 #-------------------------------------------------------------------
-sub _replacement {
+sub process {
 	my (@param, $temp, %data, $file);
 	tie %data, 'Tie::CPHash';
         @param = WebGUI::Macro::getParams($_[0]);
@@ -26,14 +26,6 @@ sub _replacement {
 	$file = WebGUI::Attachment->new($data{filename},"images",$data{collateralId});
 	$temp = '<a href="'.$file->getURL.'"><img src="'.$file->getIcon.'" align="middle" border="0" /> '.$data{name}.'</a>'; 
 	return $temp;
-}
-
-#-------------------------------------------------------------------
-sub process {
-	my ($output, $temp);
-	$output = $_[0];
-	$output =~ s/\^File\((.*?)\)\;/_replacement($1)/ge;
-	return $output;
 }
 
 1;

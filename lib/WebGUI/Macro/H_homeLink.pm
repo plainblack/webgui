@@ -17,9 +17,9 @@ use WebGUI::Session;
 use WebGUI::SQL;
 
 #-------------------------------------------------------------------
-sub _replacement {
+sub process {
         my (@param, $temp);
-        @param = WebGUI::Macro::getParams($1);
+        @param = WebGUI::Macro::getParams($_[0]);
 	if ($session{setting}{defaultPage} == $session{page}{pageId}) {
 		$temp = $session{page}{urlizedTitle};
 	} else {
@@ -38,14 +38,6 @@ sub _replacement {
 	return $temp;
 }
 
-#-------------------------------------------------------------------
-sub process {
-        my ($output);
-        $output = $_[0];
-        $output =~ s/\^H\((.*?)\)\;/_replacement($1)/ge;
-        $output =~ s/\^H\;/_replacement()/ge;
-	return $output;
-}
 
 1;
 

@@ -15,10 +15,7 @@ use WebGUI::Session;
 
 #-------------------------------------------------------------------
 sub process {
-	my ($output);
-	$output = $_[0];
-        $output =~ s/\^\@\;/$session{user}{username}/g;
-	return $output;
+	return $session{user}{username};
 }
 
 

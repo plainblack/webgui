@@ -15,7 +15,8 @@ use WebGUI::Macro;
 use WebGUI::Session;
 use WebGUI::SQL;
 
-sub _replacement {
+#-------------------------------------------------------------------
+sub process {
 	my ($output, @data, $rownum, $temp);
 	my ($statement, $format) = WebGUI::Macro::getParams(shift);
 	$format = '^0;' if ($format eq "");
@@ -37,11 +38,6 @@ sub _replacement {
 	}
 }
 
-sub process {
-	my $output = shift;
-	$output =~ s/\^SQL\((.*?)\)\;/_replacement($1)/ges;
-	return $output;
-}
 
 1;
 

@@ -33,7 +33,7 @@ sub _recurseCrumbTrail {
 }
 
 #-------------------------------------------------------------------
-sub _replacement {
+sub process {
         my (@param, $temp, $delimeter);
         @param = WebGUI::Macro::getParams($_[0]);
         if ($param[0] eq "") {
@@ -46,14 +46,6 @@ sub _replacement {
 	return $temp;
 }
 
-#-------------------------------------------------------------------
-sub process {
-	my ($output, $temp);
-	$output = $_[0];
-	$output =~ s/\^C\((.*?)\)\;/_replacement($1)/ge;
-        $output =~ s/\^C\;/_replacement()/ge;
-	return $output;
-}
 
 1;
 

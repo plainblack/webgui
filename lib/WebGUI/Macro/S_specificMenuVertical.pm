@@ -17,7 +17,7 @@ use WebGUI::Session;
 use WebGUI::SQL;
 
 #-------------------------------------------------------------------
-sub _replacement {
+sub process {
         my ($temp, @param, $pageId, $tree);
         @param = WebGUI::Macro::getParams($_[0]);
         ($pageId) = WebGUI::SQL->quickArray("select pageId from page where urlizedTitle='$param[0]'");
@@ -34,14 +34,6 @@ sub _replacement {
 	return $temp;
 }
 
-#-------------------------------------------------------------------
-sub process {
-	my ($output,$temp, @param, @data);
-        $output = $_[0];
-        $output =~ s/\^S\((.*?)\)\;/_replacement($1)/ge;
-        $output =~ s/\^S\;/_replacement()/ge;
-	return $output;
-}
 
 1;
 

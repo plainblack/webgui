@@ -12,14 +12,10 @@ package WebGUI::Macro::Backslash_pageUrl;
 
 use strict;
 use WebGUI::Session;
-use WebGUI::URL;
 
 #-------------------------------------------------------------------
 sub process {
-	my ($output);
-	$output = $_[0];
-        $output =~ s/\^\\\;/$session{page}{url}/g;
-	return $output;
+        return $session{page}{url};
 }
 
 

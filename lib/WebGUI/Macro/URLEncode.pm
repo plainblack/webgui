@@ -16,19 +16,11 @@ use WebGUI::Session;
 use WebGUI::URL;
 
 #-------------------------------------------------------------------
-sub _replacement {
-        my (@param);
-        @param = WebGUI::Macro::getParams($1);
+sub process {
+        my @param = WebGUI::Macro::getParams($1);
 	return WebGUI::URL::escape($param[0]);
 }
 
-#-------------------------------------------------------------------
-sub process {
-        my ($output, $temp, @param);
-        $output = $_[0];
-        $output =~ s/\^URLEncode\((.*?)\)\;/_replacement($1)/ge;
-	return $output;
-}
 
 1;
 

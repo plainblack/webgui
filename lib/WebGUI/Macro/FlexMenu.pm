@@ -17,7 +17,7 @@ use WebGUI::Session;
 use WebGUI::URL;
 
 #-------------------------------------------------------------------
-sub _replacement {
+sub process {
         my ($temp, @param);
         @param = WebGUI::Macro::getParams($_[0]);
         $temp = '<span class="verticalMenu">';
@@ -52,14 +52,6 @@ sub _reversePageTree {
         return $output;
 }
 
-#-------------------------------------------------------------------
-sub process {
-        my ($output,$temp);
-        $output = $_[0];
-        #$output =~ s/\^FlexMenu\((.*?)\)\;/_replacement($1)/ge;
-        $output =~ s/\^FlexMenu\;/_replacement()/ge;
-	return $output;
-}
 
 1;
 

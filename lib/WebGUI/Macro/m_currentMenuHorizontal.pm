@@ -16,7 +16,7 @@ use WebGUI::Navigation;
 use WebGUI::Session;
 
 #-------------------------------------------------------------------
-sub _replacement {
+sub process {
         my ($temp, @param, $tree);
         @param = WebGUI::Macro::getParams($_[0]);
 	$tree = WebGUI::Navigation::tree($session{page}{pageId},1);
@@ -26,14 +26,6 @@ sub _replacement {
 	return $temp;
 }
 
-#-------------------------------------------------------------------
-sub process {
-	my ($output, $temp, @data, $sth, $first);
-	$output = $_[0];
-	$output =~ s/\^m\((.*?)\)\;/_replacement($1)/ge;
-        $output =~ s/\^m\;/_replacement()/ge;
-	return $output;
-}
 
 1;
 

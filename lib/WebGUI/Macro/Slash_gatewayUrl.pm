@@ -12,15 +12,10 @@ package WebGUI::Macro::Slash_gatewayUrl;
 
 use strict;
 use WebGUI::Session;
-use WebGUI::URL;
 
 #-------------------------------------------------------------------
 sub process {
-	my ($output, $temp);
-	$output = $_[0];
-	$temp = $session{config}{scripturl}.'/';
-        $output =~ s/\^\/\;/$temp/g;
-	return $output;
+	return $session{config}{scripturl}.'/';
 }
 
 

@@ -15,19 +15,11 @@ use WebGUI::Macro;
 use WebGUI::Session;
 
 #-------------------------------------------------------------------
-sub _replacement {
-        my (@param);
-        @param = WebGUI::Macro::getParams($1);
+sub process {
+        my @param = WebGUI::Macro::getParams($1);
 	return $session{form}{$param[0]};
 }
 
-#-------------------------------------------------------------------
-sub process {
-        my ($output, $temp, @param);
-        $output = $_[0];
-        $output =~ s/\^FormParam\((.*?)\)\;/_replacement($1)/ge;
-	return $output;
-}
 
 1;
 

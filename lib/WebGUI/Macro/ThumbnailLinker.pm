@@ -18,7 +18,7 @@ use WebGUI::Session;
 use WebGUI::SQL;
 
 #-------------------------------------------------------------------
-sub _replacement {
+sub process {
 	my (@param, %data, $image, $output);
 	tie %data, 'Tie::CPHash';
         @param = WebGUI::Macro::getParams($_[0]);
@@ -29,13 +29,6 @@ sub _replacement {
 	return $output;
 }
 
-#-------------------------------------------------------------------
-sub process {
-	my ($output, $temp);
-	$output = $_[0];
-        $output =~ s/\^ThumbnailLinker\((.*?)\)\;/_replacement($1)/ge;
-	return $output;
-}
 
 1;
 

@@ -17,7 +17,7 @@ use WebGUI::Session;
 use WebGUI::SQL;
 
 #-------------------------------------------------------------------
-sub _replacement {
+sub process {
         my ($temp, $tree, @param);
         @param = WebGUI::Macro::getParams($_[0]);
 	$tree = WebGUI::Navigation::tree($session{page}{parentId},1);
@@ -27,14 +27,6 @@ sub _replacement {
 	return $temp;
 }
 
-#-------------------------------------------------------------------
-sub process {
-	my ($output, $temp, @data, $sth, $first);
-	$output = $_[0];
-	$output =~ s/\^p\((.*?)\)\;/_replacement($1)/ge;
-        $output =~ s/\^p\;/_replacement()/ge;
-	return $output;
-}
 
 1;
 

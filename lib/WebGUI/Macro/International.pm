@@ -16,19 +16,11 @@ use WebGUI::Macro;
 use WebGUI::Session;
 
 #-------------------------------------------------------------------
-sub _replacement {
-	my (@param);
-        @param = WebGUI::Macro::getParams($_[0]);
+sub process {
+        my @param = WebGUI::Macro::getParams($_[0]);
 	return WebGUI::International::get($param[0],$param[1]);
 }
 
-#-------------------------------------------------------------------
-sub process {
-	my ($output);
-	$output = $_[0];
-        $output =~ s/\^International\((.*?)\)\;/_replacement($1)/ge;
-	return $output;
-}
 
 1;
 

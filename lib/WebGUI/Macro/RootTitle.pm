@@ -18,7 +18,7 @@ use WebGUI::SQL;
 use WebGUI::URL;
 
 #-------------------------------------------------------------------
-sub _recurse {
+sub process {
         my ($sth, %data, $output);
         tie %data, 'Tie::CPHash';
         %data = WebGUI::SQL->quickHash("select pageId,parentId,title,urlizedTitle from page where pageId=$_[0]");
@@ -30,13 +30,6 @@ sub _recurse {
 	return $output;
 }
 
-#-------------------------------------------------------------------
-sub process {
-	my ($output);
-	$output = $_[0];
-        $output =~ s/\^RootTitle\;/_recurse($session{page}{parentId})/ge;
-	return $output;
-}
 
 1;
 

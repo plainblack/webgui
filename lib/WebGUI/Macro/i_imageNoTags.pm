@@ -18,7 +18,7 @@ use WebGUI::Session;
 use WebGUI::SQL;
 
 #-------------------------------------------------------------------
-sub _replacement {
+sub process {
 	my (@param, $image, %data);
 	tie %data, 'Tie::CPHash';
         @param = WebGUI::Macro::getParams($_[0]);
@@ -27,13 +27,6 @@ sub _replacement {
 	return $image->getURL;
 }
 
-#-------------------------------------------------------------------
-sub process {
-	my ($output, $temp);
-	$output = $_[0];
-        $output =~ s/\^i\((.*?)\)\;/_replacement($1)/ge;
-	return $output;
-}
 
 1;
 

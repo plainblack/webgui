@@ -44,6 +44,11 @@ save you many hours of grief.
 	drop table HttpProxy;
 	delete from Wobject where namespace='HttpProxy';
 
+ * If you're using any custom macros you'll need to get them updated
+	before using this release as the macro system has changed
+	significantly. Macros written for versions prior to 5.2.0
+	are not compatible with this version or after.
+
 
 5.1.0
 --------------------------------------------------------------------

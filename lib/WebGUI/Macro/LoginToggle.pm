@@ -17,7 +17,7 @@ use WebGUI::Session;
 use WebGUI::URL;
 
 #-------------------------------------------------------------------
-sub _replacement {
+sub process {
        my (@param, $temp, $login, $logout);
        @param = WebGUI::Macro::getParams($_[0]);
        if ($session{user}{userId} == 1) {
@@ -30,14 +30,6 @@ sub _replacement {
        return $temp;
 }
 
-#-------------------------------------------------------------------
-sub process {
-       my ($output, $temp);
-       $output = $_[0];
-       $output =~ s/\^LoginToggle\((.*?)\)\;/_replacement($1)/ge;
-       $output =~ s/\^LoginToggle\;/_replacement()/ge;
-       return $output;
-}
 
 1;
 

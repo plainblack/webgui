@@ -15,7 +15,7 @@ use WebGUI::DateTime;
 use WebGUI::Macro;
 
 #-------------------------------------------------------------------
-sub _replacement {
+sub process {
         my (@param, $temp, $time);
         @param = WebGUI::Macro::getParams($_[0]);
 	$time = $param[1] || time();
@@ -23,14 +23,6 @@ sub _replacement {
 	return $temp;
 }
 
-#-------------------------------------------------------------------
-sub process {
-        my ($output);
-        $output = $_[0];
-        $output =~ s/\^D\((.*?)\)\;/_replacement($1)/ge;
-        $output =~ s/\^D\;/_replacement()/ge;
-	return $output;
-}
 
 1;
 

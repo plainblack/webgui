@@ -16,7 +16,7 @@ use WebGUI::Navigation;
 use WebGUI::Session;
 
 #-------------------------------------------------------------------
-sub _replacement {
+sub process {
         my ($temp, $tree, $parentId, @param);
 	@param = WebGUI::Macro::getParams($_[0]);
         $temp = '<span class="horizontalMenu">';
@@ -27,13 +27,6 @@ sub _replacement {
 	return $temp;
 }
 
-#-------------------------------------------------------------------
-sub process {
-	my ($output);
-	$output = $_[0];
-        $output =~ s/\^s\((.*?)\)\;/_replacement($1)/ge;
-	return $output;
-}
 
 1;
 

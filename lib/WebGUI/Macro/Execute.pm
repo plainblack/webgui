@@ -14,23 +14,13 @@ use strict;
 use WebGUI::Macro;
 
 #-------------------------------------------------------------------
-sub _replacement {
-	my (@param, $temp);
-        @param = WebGUI::Macro::getParams($_[0]);
-	if ($param[0] =~ /passwd/ || $param[0] =~ /shadow/ || $param[0] =~ /WebGUI.conf/) {
-		$temp = "SECURITY VIOLATION";
-	} else {
-       		$temp = `$param[0]`;
-	}
-	return $temp;
-}
-
-#-------------------------------------------------------------------
 sub process {
-	my ($output, $temp);
-	$output = $_[0];
-        $output =~ s/\^Execute\((.*?)\)\;/_replacement($1)/ge;
-	return $output;
+        my @param = WebGUI::Macro::getParams($_[0]);
+	if ($param[0] =~ /passwd/ || $param[0] =~ /shadow/ || $param[0] =~ /\.conf/) {
+		return "SECURITY VIOLATION";
+	} else {
+       		return `$param[0]`;
+	}
 }
 
 1;

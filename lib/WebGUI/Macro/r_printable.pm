@@ -19,7 +19,7 @@ use WebGUI::URL;
 use WebGUI::Utility;
 
 #-------------------------------------------------------------------
-sub _replacement {
+sub process {
         my ($temp, @param, $styleId);
         @param = WebGUI::Macro::getParams($_[0]);
         $temp = WebGUI::URL::append($session{env}{REQUEST_URI},'makePrintable=1');
@@ -41,14 +41,6 @@ sub _replacement {
 	return $temp;
 }
 
-#-------------------------------------------------------------------
-sub process {
-        my ($output, $temp);
-        $output = $_[0];
-        $output =~ s/\^r\((.*?)\)\;/_replacement($1)/ge;
-        $output =~ s/\^r\;/_replacement()/ge;
-	return $output;
-}
 
 1;
 

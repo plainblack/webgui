@@ -21,7 +21,8 @@ use WebGUI::URL;
 use WebGUI::Utility;
 
 #-------------------------------------------------------------------
-sub _replacement {
+sub process {
+	return "" unless ($session{var}{adminOn});
 	my (%hash2, $miscSelect, $adminSelect, $clipboardSelect, %hash, $output, $contentSelect, $key);
 	tie %hash, "Tie::IxHash";
 	tie %hash2, "Tie::IxHash";
@@ -137,17 +138,6 @@ sub _replacement {
 	return $output;
 }
 
-#-------------------------------------------------------------------
-sub process {
-        my ($output,$temp);
-        $output = $_[0];
-	if ($session{var}{adminOn}) {
-        	$output =~ s/\^AdminBar\;/_replacement()/ge;
-	} else {
-		$output =~ s/\^AdminBar\;//g;
-	}
-        return $output;
-}
 
 
 

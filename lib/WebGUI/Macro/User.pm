@@ -15,20 +15,11 @@ use WebGUI::Macro;
 use WebGUI::Session;
 
 #-------------------------------------------------------------------
-sub _replacement {
-	my (@param, $temp);
-        @param = WebGUI::Macro::getParams($_[0]);
-	$temp = $session{user}{$param[0]};
-	return $temp;
+sub process {
+        my @param = WebGUI::Macro::getParams($_[0]);
+	return  $session{user}{$param[0]};
 }
 
-#-------------------------------------------------------------------
-sub process {
-	my ($output, $temp);
-	$output = $_[0];
-        $output =~ s/\^User\((.*?)\)\;/_replacement($1)/ge;
-	return $output;
-}
 
 1;
 

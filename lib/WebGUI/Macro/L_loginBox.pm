@@ -13,7 +13,7 @@ package WebGUI::Macro::L_loginBox;
 use strict;
 use WebGUI::HTMLForm;
 use WebGUI::International;
-use WebGUI::Macro::Backslash_pageUrl;
+use WebGUI::Macro;
 use WebGUI::Session;
 use WebGUI::URL;
 
@@ -23,7 +23,7 @@ sub _createURL {
 }
 
 #-------------------------------------------------------------------
-sub _replacement {
+sub process {
 	my ($temp,$boxSize,@param,$text,$f);
 	@param = WebGUI::Macro::getParams($_[0]);
         $temp = '<div class="loginBox">';
@@ -34,11 +34,10 @@ sub _replacement {
                 	$temp .= ' <a href="'.WebGUI::URL::page('op=displayAccount').
 				'">'.$session{user}{username}.'</a>. ';
                 	$temp .= WebGUI::International::get(49);
-                	$temp = WebGUI::Macro::Backslash_pageUrl::process($temp);
 		} else {
 			$text =~ s/%(.*?)%/_createURL($1)/ge;
-	  		$temp .= WebGUI::Macro::Backslash_pageUrl::process($text);
 		}
+		$temp = WebGUI::Macro::process($temp);
         } else {
 		$boxSize = $param[0];
 		if (not defined $boxSize) {
@@ -62,15 +61,6 @@ sub _replacement {
         }
         $temp .= '</div>';
 	return $temp;
-}
-
-#-------------------------------------------------------------------
-sub process {
-	my ($output, $temp);
-	$output = $_[0];
-	$output =~ s/\^L\((.*?)\)\;/_replacement($1)/ge;
-        $output =~ s/\^L\;/_replacement()/ge;
-	return $output;
 }
 
 1;

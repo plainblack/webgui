@@ -45,6 +45,31 @@ These functions are available from this package:
 
 
 #-------------------------------------------------------------------
+sub _nestedMacro {
+   # This sub returns the regular expression for matching nested macro's.
+   # Regular expression for matching balanced parenthesis
+   my $parenthesis = qr /\(                      # Start with '(',
+                      (?:                     # Followed by
+                      (?>[^()]+)              # Non-parenthesis
+                      |(??{ $parenthesis })   # Or a balanced parenthesis block
+                      )*                      # zero or more times
+                      \)/x;                  # Ending with ')'
+
+   # Regular expression for matching balanced macros
+   my $nestedMacro = qr /\^                     # Start with carat
+                       ([^\^;()]+)            # And one or more none-macro characters -tagged-
+                       ((?:                   # Followed by
+                       (??{ $parenthesis })   # a balanced parenthesis block
+                       |(?>[^\^;])            # Or not a carat or semicolon
+                       |(??{ $nestedMacro }) # Or a balanced carat-semicolon block
+                       )*)                    # zero or more times -tagged-
+                       ;/x;                   # End with  a semicolon.
+   return $nestedMacro;
+}
+
+
+
+#-------------------------------------------------------------------
 
 =head2 getParams ( parameterString )
 
@@ -89,19 +114,33 @@ A string of HTML to be processed.
 =cut
 
 sub process {
-        my ($macro, $cmd, $output, $temp);
-	$output = $_[0];
-        foreach $macro (keys %{$session{config}{macros}}) {
-		$cmd = "WebGUI::Macro::".$session{config}{macros}{$macro}."::process";
-		$temp = eval{&$cmd($output)};
-		if ($@) {
-			WebGUI::ErrorHandler::warn("Processing failed on macro: $macro: ".$@);
-		} else {
-			$output = $temp;
+   	my $content = shift;
+   	my $nestedMacro = &_nestedMacro;
+   	while ($content =~ /($nestedMacro)/gs) {
+      		my ($macro, $searchString, $params) = ($1, $2, $3);
+      		next if ($searchString =~ /^\d+$/); # don't process ^0; ^1; ^2; etc.
+      		next if ($searchString =~ /^\-$/); # don't process ^-;
+		if ($params ne "") {
+      			#$params =~ s/^\(|\)$//; # remove opening / trailing parenthesis (doesn't seem to work)
+      			$params =~ s/^\(//; # remove opening parenthesis
+      			$params =~ s/\)$//; # remove trailing parenthesis
+      			$params = &process($params); # recursive process params
 		}
-        }
-	return $output;
+		if ($session{config}{macros}{$searchString} ne "") {
+      			my $cmd = "WebGUI::Macro::".$session{config}{macros}{$searchString}."::process";
+			my $result = eval{&$cmd($params)};
+			if ($@) {
+				WebGUI::ErrorHandler::warn("Processing failed on macro: $macro: ".$@);
+			} else {
+				$macro =~ s/\^/\\\^/;
+				$content =~ s/$macro/$result/ges;
+			}
+		}
+   	}
+   	return $content;
 }
+
+
 
 1;
 

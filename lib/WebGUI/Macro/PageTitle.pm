@@ -15,7 +15,7 @@ use WebGUI::Session;
 use WebGUI::URL;
 
 #-------------------------------------------------------------------
-sub _replacement {
+sub process {
 	if ($session{env}{QUERY_STRING} =~ /op/ || $session{env}{QUERY_STRING} =~ /func/) {
         	return '<a href="'.WebGUI::URL::page().'">'.$session{page}{title}.'</a>';
 	} else {
@@ -23,13 +23,6 @@ sub _replacement {
 	}
 }
 
-#-------------------------------------------------------------------
-sub process {
-	my ($output);
-	$output = $_[0];
-        $output =~ s/\^PageTitle\;/_replacement()/ge;
-	return $output;
-}
 
 1;
 

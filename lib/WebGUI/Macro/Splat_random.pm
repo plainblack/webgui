@@ -15,7 +15,7 @@ use WebGUI::Macro;
 use WebGUI::Utility;
 
 #-------------------------------------------------------------------
-sub _replacement {
+sub process {
         my ($temp, @param);
         @param = WebGUI::Macro::getParams($_[0]);
         if ($param[0] ne "") {
@@ -26,14 +26,6 @@ sub _replacement {
 	return $temp;
 }
 
-#-------------------------------------------------------------------
-sub process {
-        my ($output,$temp);
-        $output = $_[0];
-        $output =~ s/\^\*\((.*?)\)\;/_replacement($1)/ge;
-        $output =~ s/\^\*\;/_replacement()/ge;
-	return $output;
-}
 
 
 

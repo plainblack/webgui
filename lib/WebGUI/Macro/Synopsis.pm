@@ -11,8 +11,10 @@ package WebGUI::Macro::Synopsis;
 #-------------------------------------------------------------------
 
 use strict;
+use WebGUI::Privilege;
 use WebGUI::Session;
-
+use WebGUI::SQL;
+use WebGUI::URL;
 
 #-------------------------------------------------------------------
 sub traversePageTreeSynopsis {
@@ -50,15 +52,11 @@ sub traversePageTreeSynopsis {
 
 #-------------------------------------------------------------------
 sub process {
-	my ($output) = @_;
-	# Singleton
-	if ($output =~ /\^Synopsis\;/) {
-	        $output =~ s/\^Synopsis;/$session{page}{synopsis}/g;
-		return $output;
+	if ($_[0]) {
+		return traversePageTreeSynopsis($session{page}{pageId},0,$_[0]);
+	} else {
+		return $session{page}{synopsis};
 	}
-	# Tree
-	$output =~ s/\^Synopsis\((\d+)\)\;/traversePageTreeSynopsis($session{page}{pageId},0,$1)/eg;
-	return $output;
 }
 
 1;
