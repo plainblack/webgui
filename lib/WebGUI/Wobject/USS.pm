@@ -284,19 +284,23 @@ sub www_editSubmissionSave {
 		$hash{dateSubmitted} = time();
 		$hash{content} = $session{form}{body};
 		$hash{convertCarriageReturns} = $session{form}{convertCarriageReturns};
-		$hash{status} = $_[0]->get("defaultStatus");
                 $file = WebGUI::Attachment->new("",$session{form}{wid},$session{form}{sid});
 		$file->save("image");
 		$hash{image} = $file->getFilename if ($file->getFilename ne "");
                 $file = WebGUI::Attachment->new("",$session{form}{wid},$session{form}{sid});
 		$file->save("attachment");
 		$hash{attachment} = $file->getFilename if ($file->getFilename ne "");
-		$_[0]->setCollateral("USS_submission", "USS_submissionId", \%hash, 0);
-		if ($_[0]->get("defaultStatus") ne "Approved") {
-			WebGUI::MessageLog::addInternationalizedEntry('',$_[0]->get("groupToApprove"),
-				WebGUI::URL::page('func=viewSubmission&wid='.$_[0]->get("wobjectId").'&sid='.
-				$session{form}{sid}),3,$namespace,'pending');
+		unless ($_[0]->get("defaultStatus") eq "Approved") {
+			unless (WebGUI::Privilege::isInGroup($_[0]->get("groupToApprove")) ) {
+				$hash{status} = $_[0]->get("defaultStatus");
+				WebGUI::MessageLog::addInternationalizedEntry('',$_[0]->get("groupToApprove"),
+					WebGUI::URL::page('func=viewSubmission&wid='.$_[0]->get("wobjectId").'&sid='.
+					$session{form}{sid}),3,$namespace,'pending');
+			} else {
+				$hash{status} = "Approved";
+			}
 		}
+		$_[0]->setCollateral("USS_submission", "USS_submissionId", \%hash, 0);
                 return $_[0]->www_viewSubmission();
         } else {
                 return WebGUI::Privilege::insufficient();
@@ -426,7 +430,7 @@ sub www_viewSubmission {
 	$var{"delete.label"} = WebGUI::International::get(37,$namespace);
         $var{"edit.url"} = WebGUI::URL::page('func=editSubmission&wid='.$session{form}{wid}.'&sid='.$session{form}{sid});
 	$var{"edit.label"} = WebGUI::International::get(27,$namespace);
-        $var{canChangeStatus} = ($submission->{status} ne "Approved" && WebGUI::Privilege::isInGroup($_[0]->get("groupToApprove"),$session{user}{userId}));
+        $var{canChangeStatus} = WebGUI::Privilege::isInGroup($_[0]->get("groupToApprove"),$session{user}{userId});
         $var{"approve.url"} = WebGUI::URL::page('func=approveSubmission&wid='.$session{form}{wid}.'&sid='.$session{form}{sid}.'&mlog='.$session{form}{mlog});
 	$var{"approve.label"} = WebGUI::International::get(572);
         $var{"leave.url"} = WebGUI::URL::page('op=viewMessageLog');
