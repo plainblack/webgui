@@ -176,10 +176,17 @@ sub www_manageSettings {
 #-------------------------------------------------------------------
 sub www_saveSettings {
 	WebGUI::Privilege::adminOnly() unless (WebGUI::Privilege::isInGroup(3));
-	my ($key);
+	my ($key, $value);
 	foreach $key (keys %{$session{form}}) {
+		$value = $session{form}{$key};
+		if ($key =~ m/(.*)_interval/) {
+			$value = WebGUI::DateTime::intervalToSeconds($session{form}{$key},$session{form}{$1."_units"});
+			$key = $1;
+		} elsif ($key =~ m/_units/) {
+			next;
+		} 
 		unless ($key eq "op") {
-			WebGUI::SQL->write("update settings set value=".quote($session{form}{$key})." where name='$key'");
+			WebGUI::SQL->write("update settings set value=".quote($value)." where name='$key'");
 		}
 	}
 	return www_manageSettings();
