@@ -221,7 +221,7 @@ sub www_editPage {
         	        properties=>{
                 	        label=>WebGUI::International::get(103)
 	                        },
-        	        style=>{
+        	        layout=>{
                 	        label=>WebGUI::International::get(105),
 	                        uiLevel=>5
         	                },
@@ -314,7 +314,7 @@ sub www_editPage {
 		} else {
 			$subtext = "";
 		}
-                $f->getTab("style")->select(
+                $f->getTab("layout")->select(
 			-name=>"styleId",
 			-options=>\%hash,
 			-label=>WebGUI::International::get(105),
@@ -323,13 +323,13 @@ sub www_editPage {
 			-uiLevel=>5
 			);
 		if ($childCount) {
-                	$f->getTab("style")->yesNo(
+                	$f->getTab("layout")->yesNo(
 				-name=>"recurseStyle",
 				-subtext=>' &nbsp; '.WebGUI::International::get(106),
 				-uiLevel=>9
 				);
 		}
-                $f->getTab("style")->readOnly(
+                $f->getTab("layout")->readOnly(
                         -value=>_selectPositions($page{templateId}),
                         -label=>WebGUI::International::get(356),
                         -uiLevel=>5
