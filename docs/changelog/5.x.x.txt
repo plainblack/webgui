@@ -3,6 +3,7 @@
  - Added Apache 2 instructions to install.txt. (Thanks to Andy Grundman.)
  - Fixed bug [ 831628 ] Subscription notifications sent in wrong language.
  - Fixed bug [ 828071 ] USS doubles the number of replies
+ - Fixed bug [ 831784 ] Pagination in Messeboard with multiple boards
 
 5.5.0
  - Rewrote the discussion system and added many new features in the process.

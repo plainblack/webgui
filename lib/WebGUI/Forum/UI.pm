@@ -1054,7 +1054,7 @@ sub getForumTemplateVars {
 	} else {
 		$query .= "lastPostDate desc";
 	}
-	my $p = WebGUI::Paginator->new($callback,"",$forum->get("postsPerPage"));
+	my $p = WebGUI::Paginator->new(WebGUI::URL::append($callback,"forumOp=viewForum&amp;forumId=".$forum->get("forumId")),"",$forum->get("postsPerPage"));
 	$p->setDataByQuery($query);
 	$var{firstPage} = $p->getFirstPageLink;
         $var{lastPage} = $p->getLastPageLink;
