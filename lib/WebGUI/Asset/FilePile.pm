@@ -46,6 +46,7 @@ These methods are available from this class:
 
 =cut
 
+#-------------------------------------------------------------------
 sub edit {
 	my $self = shift;
 	my $tabform = WebGUI::TabForm->new();
@@ -129,33 +130,16 @@ sub edit {
        		-excludeGroups=>[1,7],
        		-uiLevel=>6
        		);
-	WebGUI::Style::setScript($session{config}{extrasURL}.'/FileUploadControl.js',{type=>"text/javascript"});
-	my $uploadControl = '<div id="fileUploadControl"> </div>
-		<script>
-		var images = new Array();
-		';
-	opendir(DIR,$session{config}{extrasPath}.'/fileIcons');
-	my @files = readdir(DIR);
-	closedir(DIR);
-	foreach my $file (@files) {
-		unless ($file eq "." || $file eq "..") {
-			my $ext = $file;
-			$ext =~ s/(.*?)\.gif/$1/;
-			$uploadControl .= 'images["'.$ext.'"] = "'.$session{config}{extrasURL}.'/fileIcons/'.$file.'";'."\n";
-		}
-	}
-	$uploadControl .= 'var uploader = new FileUploadControl("fileUploadControl", images);
-	uploader.addRow();
-	</script>';
 	$tabform->getTab("properties")->readOnly(
 		-label=>"Upload Files",
-		-value=>$uploadControl
+		-value=>$self->getUploadControl
 		);
 	return $self->getAdminConsole->render($tabform->print,"Add a Pile of Files");
 }
 
+#-------------------------------------------------------------------
 sub editSave {
-	my $self = shift;
+	my $class = shift;
 	my $parent = WebGUI::Asset->newByUrl;
 	my $tempStorage = WebGUI::Storage->create;
 	$tempStorage->addFileFromFormPost("file");
@@ -165,7 +149,7 @@ sub editSave {
 		my %data;
 		my $class = 'WebGUI::Asset::File';
 		$class = "WebGUI::Asset::File::Image" if (isIn($storage->getFileExtension($filename),qw(jpg jpeg gif png)));
-		foreach my $definition (@{$self->definition}) {
+		foreach my $definition (@{$class->definition}) {
 			foreach my $property (keys %{$definition->{properties}}) {
 				$data{$property} = WebGUI::FormProcessor::process(
 					$property,
@@ -210,6 +194,32 @@ sub getName {
 	return "File Pile";
 } 
 
+#-------------------------------------------------------------------
+sub getUploadControl {
+	my $self = shift;
+	WebGUI::Style::setScript($session{config}{extrasURL}.'/FileUploadControl.js',{type=>"text/javascript"});
+	my $uploadControl = '<div id="fileUploadControl"> </div>
+		<script>
+		var images = new Array();
+		';
+	opendir(DIR,$session{config}{extrasPath}.'/fileIcons');
+	my @files = readdir(DIR);
+	closedir(DIR);
+	foreach my $file (@files) {
+		unless ($file eq "." || $file eq "..") {
+			my $ext = $file;
+			$ext =~ s/(.*?)\.gif/$1/;
+			$uploadControl .= 'images["'.$ext.'"] = "'.$session{config}{extrasURL}.'/fileIcons/'.$file.'";'."\n";
+		}
+	}
+	$uploadControl .= 'var uploader = new FileUploadControl("fileUploadControl", images);
+	uploader.addRow();
+	</script>';
+	return $uploadControl;
+}
+
+
+#-------------------------------------------------------------------
 sub www_edit {
 	my $self = shift;
 	unless ($session{form}{doit}) {

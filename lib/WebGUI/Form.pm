@@ -724,6 +724,41 @@ sub file {
 
 #-------------------------------------------------------------------
 
+=head2 files ( hashRef )
+
+Returns a multiple file upload control.
+
+=head3 name
+
+The name field for this form element.
+
+=cut
+
+sub files {
+	WebGUI::Style::setScript($session{config}{extrasURL}.'/FileUploadControl.js',{type=>"text/javascript"});
+	my $uploadControl = '<div id="fileUploadControl"> </div>
+		<script>
+		var images = new Array();
+		';
+	opendir(DIR,$session{config}{extrasPath}.'/fileIcons');
+	my @files = readdir(DIR);
+	closedir(DIR);
+	foreach my $file (@files) {
+		unless ($file eq "." || $file eq "..") {
+			my $ext = $file;
+			$ext =~ s/(.*?)\.gif/$1/;
+			$uploadControl .= 'images["'.$ext.'"] = "'.$session{config}{extrasURL}.'/fileIcons/'.$file.'";'."\n";
+		}
+	}
+	$uploadControl .= 'var uploader = new FileUploadControl("fileUploadControl", images);
+	uploader.addRow();
+	</script>';
+	return $uploadControl;
+}
+
+
+#-------------------------------------------------------------------
+
 =head2 filterContent ( hashRef )
 
 Returns a select list containing the content filter options. This is for use with WebGUI::HTML::filter().

@@ -1176,12 +1176,16 @@ sub getLineage {
 	$where .= " and ".join(" or ",@whereModifiers) if (scalar(@whereModifiers));
 	# based upon all available criteria, let's get some assets
 	my $columns = "assetId, className, parentId";
-	$columns = "*" if ($rules->{returnQuickReadObjects});
+	my $slavedb;
+	if ($rules->{returnQuickReadObjects}) {
+		$columns = "*";
+		$slavedb = WebGUI::SQL->getSlave;
+	}
 	my $sortOrder = ($rules->{invertTree}) ? "desc" : "asc"; 
 	my $sql = "select $columns from asset where $where order by lineage $sortOrder";
 	my @lineage;
 	my %relativeCache;
-	my $sth = WebGUI::SQL->read($sql);
+	my $sth = WebGUI::SQL->read($sql, $slavedb);
 	while (my $properties = $sth->hashRef) {
 		# create whatever type of object was requested
 		my $asset;
@@ -1439,7 +1443,12 @@ Name value pairs to add to the URL in the form of:
 sub getUrl {
 	my $self = shift;
 	my $params = shift;
-	return WebGUI::URL::gateway($self->get("url"),$params);
+	my $url = WebGUI::URL::gateway($self->get("url"),$params);
+	if ($self->get("encryptPage")) {
+		$url = WebGUI::URL::getSiteURL().$url;
+		$url =~ s/http:/https:/;
+	}
+	return $url;
 }
 
 #-------------------------------------------------------------------
