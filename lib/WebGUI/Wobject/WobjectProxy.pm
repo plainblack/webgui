@@ -71,7 +71,7 @@ sub www_edit {
        	$f->date("endDate",WebGUI::International::get(498),$endDate);
 	$a = WebGUI::SQL->read("select pageId,menuTitle from page where pageId<2 or pageId>25 order by title");
 	while (%page = $a->hash) {
-		$b = WebGUI::SQL->read("select wobjectId,title from wobject where pageId=".$page{pageId}." and namespace<>'WobjectProxy' order by sequenceNumber");
+		$b = WebGUI::SQL->read("select wobjectId,title from wobject where pageId=".$page{pageId}." and namespace<>'WobjectProxy' and namespace<>'ExtraColumn' and endDate=>".time()." and pageId<>3 order by sequenceNumber");
 		while (%wobject = $b->hash) {
 			$wobjects{$wobject{wobjectId}} = $page{menuTitle}." / ".$wobject{title}." (".$wobject{wobjectId}.")";
 		}
