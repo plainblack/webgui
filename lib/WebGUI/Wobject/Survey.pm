@@ -436,7 +436,7 @@ sub www_deleteAnswer {
 #-------------------------------------------------------------------
 sub www_deleteAnswerConfirm {
         return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId")));
-        WebGUI::SQL->write("delete from Survey_response where Survey_answerId=".quote($session{form}{aid}));
+        WebGUI::SQL->write("delete from Survey_questionResponse where Survey_answerId=".quote($session{form}{aid}));
         $_[0]->deleteCollateral("Survey_answer","Survey_answerId",$session{form}{aid});
         $_[0]->reorderCollateral("Survey_answer","Survey_answerId","Survey_id");
         return $_[0]->www_editQuestion;

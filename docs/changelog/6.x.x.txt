@@ -25,6 +25,8 @@
  - Bugfix [ 943298 ] Events Calendar recurrence error in WG6.0 (thanks to
    Frank Dillon). 
  - Bugfix [ 942865 ] urlizedTitle problem. (Thanks to tr0nd).
+ - Bugfix [ 940008 ] error deleting parts of a survey in 6.0.1 (Thanks to
+   Andreas Sexauer.)
 
 
 6.0.1
