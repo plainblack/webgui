@@ -278,7 +278,7 @@ foreach my $config (keys %config) {
 	my $cmd = $clicmd." -u".$config{$config}{dbuser}." -p".$config{$config}{dbpass};
 	$cmd .= " --host=".$config{$config}{host} if ($config{$config}{host});
 	$cmd .= " --port=".$config{$config}{port} if ($config{$config}{port});
-	$cmd .= " --database=".$config{$config}{db}." -e \"delete from settings where name='upgrading'\"";
+	$cmd .= " --database=".$config{$config}{db}." -e \"delete from settings where name='specialState'\"";
 	unless (system($cmd)) {
 		print "OK\n" unless ($quiet);
 	} else {
