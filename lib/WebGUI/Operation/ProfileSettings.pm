@@ -52,15 +52,15 @@ sub _reorderFields {
 sub _submenu {
         my (%menu);
         tie %menu, 'Tie::IxHash';
-	$menu{WebGUI::URL::page("op=editProfileCategory")} = WebGUI::International::get(490,"WebGUI-Profile");
-	$menu{WebGUI::URL::page("op=editProfileField")} = WebGUI::International::get(491,"WebGUI-Profile");
+	$menu{WebGUI::URL::page("op=editProfileCategory")} = WebGUI::International::get(490,"WebGUIProfile");
+	$menu{WebGUI::URL::page("op=editProfileField")} = WebGUI::International::get(491,"WebGUIProfile");
         if (($session{form}{op} eq "editProfileField" && $session{form}{fid} ne "new") || $session{form}{op} eq "deleteProfileField") {
-		$menu{WebGUI::URL::page('op=editProfileField&fid='.$session{form}{fid})} = WebGUI::International::get(787,"WebGUI-Profile");
-		$menu{WebGUI::URL::page('op=deleteProfileField&fid='.$session{form}{fid})} = WebGUI::International::get(788,"WebGUI-Profile");
+		$menu{WebGUI::URL::page('op=editProfileField&fid='.$session{form}{fid})} = WebGUI::International::get(787,"WebGUIProfile");
+		$menu{WebGUI::URL::page('op=deleteProfileField&fid='.$session{form}{fid})} = WebGUI::International::get(788,"WebGUIProfile");
 	}
         if (($session{form}{op} eq "editProfileCategory" && $session{form}{cid} ne "new") || $session{form}{op} eq "deleteProfileCategory") {
-		$menu{WebGUI::URL::page('op=editProfileCategory&cid='.$session{form}{cid})} = WebGUI::International::get(789,"WebGUI-Profile");
-		$menu{WebGUI::URL::page('op=deleteProfileCategory&cid='.$session{form}{cid})} = WebGUI::International::get(790,"WebGUI-Profile");
+		$menu{WebGUI::URL::page('op=editProfileCategory&cid='.$session{form}{cid})} = WebGUI::International::get(789,"WebGUIProfile");
+		$menu{WebGUI::URL::page('op=deleteProfileCategory&cid='.$session{form}{cid})} = WebGUI::International::get(790,"WebGUIProfile");
         }
 	$menu{WebGUI::URL::page("op=editProfileSettings")} = WebGUI::International::get(492);
 	$menu{WebGUI::URL::page('op=manageSettings')} = WebGUI::International::get(4);
@@ -73,7 +73,7 @@ sub www_deleteProfileCategory {
         my ($output);
         return WebGUI::Privilege::vitalComponent() if ($session{form}{cid} < 1000);
         $output = '<h1>'.WebGUI::International::get(42).'</h1>';
-        $output .= WebGUI::International::get(466,"WebGUI-Profile").'<p>';
+        $output .= WebGUI::International::get(466,"WebGUIProfile").'<p>';
         $output .= '<div align="center"><a href="'.WebGUI::URL::page('op=deleteProfileCategoryConfirm&cid='.$session{form}{cid}).
                 '">'.WebGUI::International::get(44).'</a>';
         $output .= '&nbsp;&nbsp;&nbsp;&nbsp;<a href="'.WebGUI::URL::page('op=editProfileSettings').'">'.
@@ -97,7 +97,7 @@ sub www_deleteProfileField {
 	($protected) = WebGUI::SQL->quickArray("select protected from userProfileField where fieldname=".quote($session{form}{fid}));
         return WebGUI::Privilege::vitalComponent() if ($protected);
         $output = '<h1>'.WebGUI::International::get(42).'</h1>';
-        $output .= WebGUI::International::get(467,"WebGUI-Profile").'<p>';
+        $output .= WebGUI::International::get(467,"WebGUIProfile").'<p>';
         $output .= '<div align="center"><a href="'.WebGUI::URL::page('op=deleteProfileFieldConfirm&fid='.$session{form}{fid}).
                 '">'.WebGUI::International::get(44).'</a>';
         $output .= '&nbsp;&nbsp;&nbsp;&nbsp;<a href="'.WebGUI::URL::page('op=editProfileSettings').'">'.
@@ -121,7 +121,7 @@ sub www_editProfileCategory {
         return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
 	my ($output, $f, %data);
 	tie %data, 'Tie::CPHash';
-	$output = '<h1>'.WebGUI::International::get(468,"WebGUI-Profile").'</h1>';
+	$output = '<h1>'.WebGUI::International::get(468,"WebGUIProfile").'</h1>';
 	$f = WebGUI::HTMLForm->new;
 	$f->hidden("op","editProfileCategorySave");
 	if ($session{form}{cid}) {
@@ -134,13 +134,13 @@ sub www_editProfileCategory {
 	$f->text("categoryName",WebGUI::International::get(470),$data{categoryName});
 	$f->yesNo(
                 -name=>"visible",
-                -label=>WebGUI::International::get(473,"WebGUI-Profile"),
+                -label=>WebGUI::International::get(473,"WebGUIProfile"),
                 -value=>$data{visible}
                 );
 	$f->yesNo(
 		-name=>"editable",
 		-value=>$data{editable},
-		-label=>WebGUI::International::get(897,"WebGUI-Profile")
+		-label=>WebGUI::International::get(897,"WebGUIProfile")
 		);
 	$f->submit;
 	$output .= $f->print;
@@ -171,7 +171,7 @@ sub www_editProfileField {
         return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
 	my ($output, $f, %data, %hash, $key);
 	tie %data, 'Tie::CPHash';
-        $output = '<h1>'.WebGUI::International::get(471,"WebGUI-Profile").'</h1>';
+        $output = '<h1>'.WebGUI::International::get(471,"WebGUIProfile").'</h1>';
         $f = WebGUI::HTMLForm->new;
         $f->hidden("op","editProfileFieldSave");
 	if ($session{form}{fid}) {
@@ -185,17 +185,17 @@ sub www_editProfileField {
 	$f->text("fieldLabel",WebGUI::International::get(472),$data{fieldLabel});
 	$f->yesNo(
 		-name=>"visible",
-		-label=>WebGUI::International::get(473,"WebGUI-Profile"),
+		-label=>WebGUI::International::get(473,"WebGUIProfile"),
 		-value=>$data{visible}
 		);
 	$f->yesNo(
                 -name=>"editable",
                 -value=>$data{editable},
-                -label=>WebGUI::International::get(897,"WebGUI-Profile")
+                -label=>WebGUI::International::get(897,"WebGUIProfile")
                 );
 	$f->yesNo(
 		-name=>"required",
-		-label=>WebGUI::International::get(474,"WebGUI-Profile"),
+		-label=>WebGUI::International::get(474,"WebGUIProfile"),
 		-value=>$data{required}
 		);
 	$f->fieldType(
@@ -213,7 +213,7 @@ sub www_editProfileField {
 	$f->select(
 		-name=>"profileCategoryId",
 		-options=>\%hash,
-		-label=>WebGUI::International::get(489,"WebGUI-Profile"),
+		-label=>WebGUI::International::get(489,"WebGUIProfile"),
 		-value=>[$data{profileCategoryId}]
 		);
         $f->submit;

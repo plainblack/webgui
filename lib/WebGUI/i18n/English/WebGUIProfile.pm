@@ -1,4 +1,4 @@
-package WebGUI::i18n::English::WebGUI-Profile;
+package WebGUI::i18n::English::WebGUIProfile;
 
 our $I18N = {
 	471 => q|Edit User Profile Field|,
