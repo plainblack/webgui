@@ -560,7 +560,7 @@ sub www_editPageSave {
 		title			=> $session{form}{title}, 
 		styleId			=> $session{form}{styleId}, 
 		printableStyleId	=> $session{form}{printableStyleId}, 
-		ownerId			=> $session{form}{ownerId}, 
+		ownerId			=> ($session{form}{ownerId} || 3), 
 		groupIdView		=> $session{form}{groupIdView}, 
 		groupIdEdit		=> $session{form}{groupIdEdit}, 
 		newWindow		=> $session{form}{newWindow},

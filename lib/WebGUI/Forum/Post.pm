@@ -82,7 +82,7 @@ sub canEdit {
         my ($self, $userId) = @_;
 	$userId = $session{user}{userId} unless ($userId);
         return ($self->getThread->getForum->isModerator || ($self->get("userId") == $userId && $userId != 1 
-		&& $self->getThread->getForum->get("editTimeout") < (WebGUI::DateTime::time() - $self->get("dateOfPost"))));
+		&& $self->getThread->getForum->get("editTimeout") > (WebGUI::DateTime::time() - $self->get("dateOfPost"))));
 }
 
 #-------------------------------------------------------------------

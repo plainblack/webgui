@@ -189,7 +189,11 @@ sub print {
 	my $tabs;
 	my $form;	
 	foreach my $key (keys %{$_[0]->{_tab}}) {
-		$tabs .= '<span onclick="toggleTab('.$i.')" id="tab'.$i.'" class="tab">'.$_[0]->{_tab}{$key}{label}.'</span> ';
+		$tabs .= '<span onclick="toggleTab('.$i.')" id="tab'.$i.'" class="tab"';
+                if ($_[0]->{_tab}->{$key}{uiLevel} > $session{user}{uiLevel}) {
+                        $tabs .= 'style="display: none;"';
+                }
+                $tabs .= '>'.$_[0]->{_tab}{$key}{label}.'</span> ';
 		$form .= '<div id="tabcontent'.$i.'" class="tabBody"><table>';
 		$form .= $_[0]->{_tab}{$key}{form}->printRowsOnly;
 		$form .= '</table></div>';

@@ -1645,7 +1645,7 @@ A hash reference containing information passed from the calling object.
 sub www_deletePostConfirm {
 	my ($caller) = @_;
 	my $post = WebGUI::Forum::Post->new($session{form}{forumPostId});
-	return WebGUI::Privilege::insufficient() unless ($post->getThread->getForum->isModerator);
+	return WebGUI::Privilege::insufficient() unless ($post->canEdit);
 	$post->setStatusDeleted;
        	return www_viewForum($caller,$post->getThread->get("forumId"));
 }
@@ -1827,7 +1827,7 @@ sub www_post {
 			name=>'subscribe',
 			value=>$defaultSubscribeValue
 			});
-		$message .= "\n\n".$session{user}{signature};
+		$message .= "\n\n".$session{user}{signature} if ($session{user}{signature});
 	}
 	if ($var->{'newpost.isEdit'}) {
 		my $post = WebGUI::Forum::Post->new($session{form}{forumPostId});
@@ -2306,6 +2306,12 @@ sub www_viewThread {
 	my ($caller, $postId) = @_;
 	WebGUI::Session::setScratch("forumThreadLayout",$session{form}{layout});
 	$postId = $session{form}{forumPostId} unless ($postId);
+	# If POST, cause redirect, so new post is displayed using GET instead of POST
+        if ($session{env}{REQUEST_METHOD} =~ /POST/i) { 
+                my $url= formatThreadURL($caller-> {callback}, $postId); 
+                $session{header}{redirect} = WebGUI::Session::httpRedirect($url);
+                return "";
+        }
         my $post = WebGUI::Forum::Post->new($postId);
 	return WebGUI::Privilege::insufficient() unless ($post->getThread->getForum->canView);
 	my $var = getThreadTemplateVars($caller, $post);

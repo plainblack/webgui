@@ -1,3 +1,33 @@
+5.5.5
+ - Fixed a bug in AdminBar's clipboard code where a standard hash was
+   used instead of a CPHash for database access.  (Thanks to Steve Simms.)
+ - When copying a Wobject to a clipboard, the previous location was
+   not stored correctly.  (Thanks to Steve Smms.)
+ - Fixed a problem in the forum that showed up under Postgres.
+ - Bugfix [ 822805 ] Emptying trash can cause fatal error
+   (Thanks to Steve Simms.)
+ - Bugfix [ 870681 ] Wobject start/end dates change when editing wobject
+ - Bugfix [ 877999 ] runHourly.pl crashes server when no db
+ - Fixed a timing bug in the run hourly script
+ - Bugfix [ 903064 ] article won't display after edit
+ - Bugfix [ 903063 ] weird url cause page to break
+ - Bugfix [ 889761 ] Editing Page/Wobject Settings Crashes Netscape 4
+ - Bugfix [ 878601 ] ui level and page owner bug
+ - Bugfix [ 881586 ] Forum overview
+ - bugfix [ 881599 ] edit Posts
+ - Bugfix [ 883909 ] font family for contentType code in forum
+ - bugfix [ 884372 ] $session{header}{redirect} bug under mod_perl
+ - Bugfix [ 884375 ] Fix for multiple forum posts caused by browser Refresh
+ - Bugfix [ 886432 ] endless loop in group of groups
+ - bugfix [ 887447 ] editing messages
+ - Bugfix [ 893203 ] IO::Zlib not getting installed
+ - Bugfix [ 893556 ] TabForm bug: uiLevels not working
+ - Bugfix [ 894855 ] users cannot delete from message board
+ - Added the Polish translation. (Thanks to Indigo-Profit-Hosting.)
+ - Added an expires flag to HTTP header when prevent proxy cache is turned on.
+
+
+
 5.5.4
  - Bugfix [ 849210 ] Login Redirect should filter out the "logout" operation
  - Bugfix 859816 : DataForm - security issues. Tnx Gabor for reporting.

@@ -366,7 +366,7 @@ sub www_manageGroupsInGroup {
         $f = WebGUI::HTMLForm->new;
         $f->hidden("op","addGroupsToGroupSave");
         $f->hidden("gid",$session{form}{gid});
-	$groups = WebGUI::Grouping::getGroupsInGroup($session{form}{gid});
+	$groups = WebGUI::Grouping::getGroupsInGroup($session{form}{gid},1);
 	push(@$groups,$session{form}{gid});
         $f->group(
 		-name=>"groups",

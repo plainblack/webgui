@@ -43,6 +43,7 @@ Contributing Translators.............AGOFER Ltda.
                                      Natalia Almazova
                                      Paco Avila
                                      BNC Distribution
+                                     Indigo-Profit-Hosting
                                      Joeri de Bruin / ProcoliX
                                      Jose Caneira
                                      Junying Du / WDI

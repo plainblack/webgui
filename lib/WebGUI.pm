@@ -159,7 +159,7 @@ sub page {
 		$output = WebGUI::Session::httpHeader()._generatePage($operationOutput);
         } elsif ($session{page}{redirectURL} && !$session{var}{adminOn}) {
               	$output = WebGUI::Session::httpRedirect(WebGUI::Macro::process($session{page}{redirectURL}));
-        } elsif ($session{header}{redirect} ne "") {
+        } elsif (exists $session{header}{redirect}) {
                 $output = $session{header}{redirect};
 	} elsif ($wobjectOutput ne "") {
 		$output = WebGUI::Session::httpHeader()._generatePage($wobjectOutput);

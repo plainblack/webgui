@@ -51,6 +51,7 @@ Data management class for forums.
  $forum->purge;
  $forum->recalculateRating;
  $forum->set(\%data);
+ $forum->setLastPost($epoch, $postId);
  $forum->subscribe;
  $forum->unsubscribe;
 
@@ -440,6 +441,34 @@ sub set {
 	foreach my $key (keys %{$data}) {
                 $self->{_properties}{$key} = $data->{$key};
         }
+}
+
+#-------------------------------------------------------------------
+
+=head2 setLastPost ( lastPostDate, lastPostId ) 
+
+Sets the pertinent details for the last post. Can also be done directly using the set method.
+
+=over
+
+=item lastPostDate
+
+The epoch date of the post.
+
+=item lastPostId
+
+The unique id of the post.
+
+=back
+
+=cut
+
+sub setLastPost {
+        my ($self, $postDate, $postId) = @_;
+        $self->set({
+                lastPostId=>$postId,
+                lastPostDate=>$postDate
+                });
 }
 
 #-------------------------------------------------------------------

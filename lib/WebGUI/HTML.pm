@@ -167,7 +167,7 @@ sub format {
                 $content =~ s/\n/\<br \/\>/g;
                 $content =~ s/\t/&nbsp;&nbsp;&nbsp;&nbsp;/g;
                 $content =~ s/ /&nbsp;/g;
-                $content = '<div style="font-family: fixed;">'.$content.'</div>';
+                $content = '<div style="font-family: monospace;">'.$content.'</div>';
         }
 	return $content;
 }

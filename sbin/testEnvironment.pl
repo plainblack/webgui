@@ -148,6 +148,19 @@ if (eval { require Archive::Tar }) {
         }
 }
 
+print "IO::Zlib module .......................... ";
+if (eval { require IO::Zlib }) {
+        print "OK\n";
+} else {
+	if ($< == 0 && $os eq "Linuxish") {
+                print "Attempting to install...\n";
+                CPAN::Shell->install("IO::Zlib");
+        } else {
+                print "Please install.\n";
+		$prereq = 0;
+        }
+}
+
 print "Compress::Zlib module .................... ";
 if (eval { require Compress::Zlib }) {
         print "OK\n";
