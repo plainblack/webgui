@@ -138,8 +138,7 @@ Deletes this user.
 =cut
 
 sub delete {
-        my ($class,$authMethod);
-        $class = shift;
+        my $class = shift;
         WebGUI::SQL->write("delete from users where userId=".$class->{_userId});
         WebGUI::SQL->write("delete from userProfileData where userId=".$class->{_userId});
 	WebGUI::Grouping::deleteUsersFromGroups([$class->{_userId}],WebGUI::Grouping::getGroupsForUser($class->{_userId}));

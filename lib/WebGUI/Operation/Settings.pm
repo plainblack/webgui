@@ -146,7 +146,7 @@ sub www_editMiscSettings {
 #-------------------------------------------------------------------
 sub www_editUserSettings {
    return WebGUI::Privilege::adminOnly() unless (WebGUI::Privilege::isInGroup(3));
-   my ($output, $f, $cmd, $html, $options);
+   my ($output, $f, $cmd, $html);
    $output .= helpIcon(2);
    $output .= '<h1>'.WebGUI::International::get(117).'</h1>';
    $output .= WebGUI::Form::_javascriptFile("swapLayers.js");

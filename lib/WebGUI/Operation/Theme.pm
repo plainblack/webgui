@@ -225,7 +225,7 @@ sub www_editTheme {
 				.' '.$component->{name}.' ('.$componentTypes->{$component->{componentType}}.')<br>';
 		}
 		$sth->finish;
-		my $sth = WebGUI::SQL->read("select themeComponentId,id from themeComponent 
+		$sth = WebGUI::SQL->read("select themeComponentId,id from themeComponent 
 			where type='template' and themeId=".$session{form}{themeId});
 		while (my $data = $sth->hashRef) {
 			my ($templateId,$namespace) = split("_",$data->{id});
@@ -489,7 +489,7 @@ sub www_viewTheme {
                       $output .= $component->{name}.' ('.$componentTypes->{$component->{componentType}}.')<br>';
                }
              $sth->finish;
-            my $sth = WebGUI::SQL->read("select themeComponentId,id from themeComponent
+            $sth = WebGUI::SQL->read("select themeComponentId,id from themeComponent
                         where type='template' and themeId=".$session{form}{themeId});
                 while (my $data = $sth->hashRef) {
                         my ($templateId,$namespace) = split("_",$data->{id});

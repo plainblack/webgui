@@ -449,7 +449,6 @@ Specify the form variable the paginator should use in it's links.  Defaults to "
 =cut
 
 sub new {
-        my ($class, $currentURL, $rowsPerPage, $rowRef, $formVar, $pageRef, $pn);
 	my $class = shift;
 	my $currentURL = shift;
 	my $rowsPerPage = shift || 25;
