@@ -194,6 +194,22 @@ sub www_editForum {
 		-label=>WebGUI::International::get(85)
 		);
 	$f->raw(WebGUI::Forum::UI::forumProperties($forum->get("forumId")));
+	if($session{form}{forumId} ne "new"){
+		my ($sth, $data, %MBoards);
+		tie %MBoards, "Tie::IxHash";
+		$MBoards{0} = "--- Move Forum ---";
+		$sth = WebGUI::SQL->read("SELECT wobject.wobjectId, wobject.title as wobjectTitle, page.title as pageTitle FROM wobject LEFT JOIN page using(pageId) WHERE wobject.namespace='MessageBoard' and page.pageId NOT IN (2,3,4,5) AND wobject.wobjectId!=".quote($_[0]->get("wobjectId"))." order by page.title ASC");
+		while ($data = $sth->hashRef){
+			$MBoards{$data->{wobjectId}} = $data->{pageTitle}." - ".$data->{wobjectTitle};
+		}
+		$f->selectList(
+			-name=>"toMBoardId",
+			-label=>"Move Forum to Message Board",
+			-options=>\%MBoards,
+			-value=>[$session{form}{toMBoardId}]
+			);
+	}
+
 	$f->submit;
 	return helpIcon("forum add/edit",$_[0]->get("namespace")).'<h1>'.WebGUI::International::get(77,$_[0]->get("namespace")).'</h1>'.$f->print;
 }
@@ -208,7 +224,12 @@ sub www_editForumSave {
 		WebGUI::SQL->write("insert into MessageBoard_forums (wobjectId, forumId, title, description, sequenceNumber) values ("
 			.quote($_[0]->get("wobjectId")).", ".quote($forumId).", ".quote($session{form}{title}).", ".quote($session{form}{description})
 			.", ".$seq.")");
-	} else {
+	}elsif($session{form}{toMBoardId} ne 0){
+		# WebGUI::SQL->write("update MessageBoard_forums set wobjectId=".quote($session{form}{toMBoardId})." where forumId=".quote($forumId)." and wobjectId=".quote($_[0]->get("wobjectId")));
+		WebGUI::SQL->write("update MessageBoard_forums set wobjectId=".quote($session{form}{toMBoardId}).", title=".quote($session{form}{title}).", description="
+			.quote($session{form}{description})." where forumId=".quote($forumId)." and wobjectId=".quote($_[0]->get("wobjectId")));
+
+	}else{
 		WebGUI::SQL->write("update MessageBoard_forums set title=".quote($session{form}{title}).", description="
 			.quote($session{form}{description})." where forumId=".quote($forumId)." and wobjectId=".quote($_[0]->get("wobjectId")));
 	}
