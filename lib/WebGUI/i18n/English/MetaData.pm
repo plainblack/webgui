@@ -74,7 +74,7 @@ our $I18N = {
 
 	'metadata edit property body' => {
 		message => q|
-You may add as many Metadata properties as you like.<br>
+You may add as many Metadata properties to a Wobject as you like.<br>
 <br>
 <b>Field Name</b><br>
 The name of this metadata property.It must be unique. <br>
@@ -87,10 +87,10 @@ as mouseover text in the wobject properties tab.</p>
 </b>Choose the type of form element for this field.<b><br>
 <br>
 Possible Values<br>
-</b>This field is used for the list types (Radio List and Select List). Enter
+</b>This field is used only for the Radio List and Select List data types. Enter
 the values you wish to appear, one per line.</p>
 |,
-		lastUpdated => 1089039511
+		lastUpdated => 1100232327
 	},
 
         'metadata manage body' => {
