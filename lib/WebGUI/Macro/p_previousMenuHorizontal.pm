@@ -21,7 +21,7 @@ sub _replacement {
         my ($temp, @data, $sth, $first);
         $temp = '<span class="horizontalMenu">';
         $first = 1;
-        $sth = WebGUI::SQL->read("select title,urlizedTitle,pageId from page where parentId=$session{page}{parentId} order by sequenceNumber",$session{dbh});
+        $sth = WebGUI::SQL->read("select title,urlizedTitle,pageId from page where parentId=$session{page}{parentId} order by sequenceNumber");
         while (@data = $sth->array) {
         	if (WebGUI::Privilege::canViewPage($data[2])) {
                 	if ($first) {
@@ -46,7 +46,7 @@ sub process {
         if ($output =~ /\^p/) {
                 $temp = '<span class="horizontalMenu">';
                 $first = 1;
-                $sth = WebGUI::SQL->read("select title,urlizedTitle,pageId from page where parentId=$session{page}{parentId} order by sequenceNumber",$session{dbh});
+                $sth = WebGUI::SQL->read("select title,urlizedTitle,pageId from page where parentId=$session{page}{parentId} order by sequenceNumber");
                 while (@data = $sth->array) {
                         if (WebGUI::Privilege::canViewPage($data[2])) {
                                 if ($first) {

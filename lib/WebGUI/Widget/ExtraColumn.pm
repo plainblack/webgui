@@ -17,19 +17,28 @@ use Tie::CPHash;
 use WebGUI::International;
 use WebGUI::Privilege;
 use WebGUI::Session;
+use WebGUI::Shortcut;
 use WebGUI::SQL;
-use WebGUI::Utility;
 use WebGUI::Widget;
 
 #-------------------------------------------------------------------
+sub duplicate {
+        my (%data, $newWidgetId, $pageId);
+        tie %data, 'Tie::CPHash';
+        %data = getProperties($namespace,$_[0]);
+	$pageId = $_[1] || $data{pageId};
+        $newWidgetId = create($pageId,$namespace,$data{title},$data{displayTitle},$data{description},$data{processMacros},$data{position});
+	WebGUI::SQL->write("insert into ExtraColumn values ($newWidgetId, '$data{spacer}', '$data{width}', ".quote($data{class}).")");
+}
+
+#-------------------------------------------------------------------
 sub purge {
-        WebGUI::SQL->write("delete from ExtraColumn where widgetId=$_[0]",$_[1]);
-        purgeWidget($_[0],$_[1]);
+        purgeWidget($_[0],$_[1],$namespace);
 }
 
 #-------------------------------------------------------------------
 sub widgetName {
-	return WebGUI::International::get(199);
+	return WebGUI::International::get(1,$namespace);
 }
 
 #-------------------------------------------------------------------
@@ -37,19 +46,19 @@ sub www_add {
         my ($output, %hash);
 	tie %hash, 'Tie::IxHash';
       	if (WebGUI::Privilege::canEditPage()) {
-                $output = '<a href="'.$session{page}{url}.'?op=viewHelp&hid=1&namespace='.$namespace.'"><img src="'.$session{setting}{lib}.'/help.gif" border="0" align="right"></a>';
-		$output .= '<h1>'.WebGUI::International::get(200).'</h1>';
-		$output .= '<form method="post" enctype="multipart/form-data" action="'.$session{page}{url}.'">';
+                $output = helpLink(1,$namespace);
+		$output .= '<h1>'.WebGUI::International::get(2,$namespace).'</h1>';
+		$output .= formHeader();
                 $output .= WebGUI::Form::hidden("widget",$namespace);
                 $output .= WebGUI::Form::hidden("func","addSave");
                 $output .= WebGUI::Form::hidden("title","column");
                 $output .= '<table>';
 		%hash = WebGUI::Widget::getPositions();
-                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(363).'</td><td>'.WebGUI::Form::selectList("position",\%hash).'</td></tr>';
-                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(201).'</td><td>'.WebGUI::Form::text("spacer",20,3,10).'</td></tr>';
-                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(202).'</td><td>'.WebGUI::Form::text("width",20,3,200).'</td></tr>';
-                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(203).'</td><td>'.WebGUI::Form::text("class",20,50,"content").'</td></tr>';
-                $output .= '<tr><td></td><td>'.WebGUI::Form::submit(WebGUI::International::get(62)).'</td></tr>';
+                $output .= tableFormRow(WebGUI::International::get(363),WebGUI::Form::selectList("position",\%hash));
+                $output .= tableFormRow(WebGUI::International::get(3,$namespace),WebGUI::Form::text("spacer",20,3,10));
+                $output .= tableFormRow(WebGUI::International::get(4,$namespace),WebGUI::Form::text("width",20,3,200));
+                $output .= tableFormRow(WebGUI::International::get(5,$namespace),WebGUI::Form::text("class",20,50,"content"));
+                $output .= formSave();
                 $output .= '</table></form>';
                 return $output;
         } else {
@@ -62,12 +71,22 @@ sub www_add {
 sub www_addSave {
 	my ($widgetId, $displayTitle, $image, $attachment);
 	if (WebGUI::Privilege::canEditPage()) {
-		$widgetId = create();
-		WebGUI::SQL->write("insert into ExtraColumn values ($widgetId, '$session{form}{spacer}', '$session{form}{width}', ".quote($session{form}{class}).")",$session{dbh});
+		$widgetId = create($session{page}{pageId},$session{form}{widget},$session{form}{title},$session{form}{displayTitle},$session{form}{description},$session{form}{processMacros},$session{form}{position});
+		WebGUI::SQL->write("insert into ExtraColumn values ($widgetId, '$session{form}{spacer}', '$session{form}{width}', ".quote($session{form}{class}).")");
 		return "";
 	} else {
 		return WebGUI::Privilege::insufficient();
 	}
+}
+
+#-------------------------------------------------------------------
+sub www_copy {
+        if (WebGUI::Privilege::canEditPage()) {
+                duplicate($session{form}{wid});
+                return "";
+        } else {
+                return WebGUI::Privilege::insufficient();
+        }
 }
 
 #-------------------------------------------------------------------
@@ -76,21 +95,21 @@ sub www_edit {
 	tie %hash, 'Tie::IxHash';
 	tie %data, 'Tie::CPHash';
         if (WebGUI::Privilege::canEditPage()) {
-		%data = WebGUI::SQL->quickHash("select * from widget,ExtraColumn where widget.widgetId=$session{form}{wid} and widget.widgetId=ExtraColumn.widgetId",$session{dbh});
-                $output = '<a href="'.$session{page}{url}.'?op=viewHelp&hid=1&namespace='.$namespace.'"><img src="'.$session{setting}{lib}.'/help.gif" border="0" align="right"></a>';
-		$output .= '<h1>'.WebGUI::International::get(204).'</h1>';
-		$output .= '<form method="post" action="'.$session{page}{url}.'">';
+		%data = getProperties($namespace,$session{form}{wid});
+                $output = helpLink(1,$namespace);
+		$output .= '<h1>'.WebGUI::International::get(6,$namespace).'</h1>';
+		$output .= formHeader();
                 $output .= WebGUI::Form::hidden("wid",$session{form}{wid});
                 $output .= WebGUI::Form::hidden("func","editSave");
                 $output .= WebGUI::Form::hidden("title","column");
                 $output .= '<table>';
 		%hash = WebGUI::Widget::getPositions();
                 $array[0] = $data{position};
-                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(363).'</td><td>'.WebGUI::Form::selectList("position",\%hash,\@array).'</td></tr>';
-                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(201).'</td><td>'.WebGUI::Form::text("spacer",20,3,$data{spacer}).'</td></tr>';
-                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(202).'</td><td>'.WebGUI::Form::text("width",20,3,$data{width}).'</td></tr>';
-                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(203).'</td><td>'.WebGUI::Form::text("class",20,50,$data{class}).'</td></tr>';
-                $output .= '<tr><td></td><td>'.WebGUI::Form::submit(WebGUI::International::get(62)).'</td></tr>';
+                $output .= tableFormRow(WebGUI::International::get(363),WebGUI::Form::selectList("position",\%hash,\@array));
+                $output .= tableFormRow(WebGUI::International::get(3,$namespace),WebGUI::Form::text("spacer",20,3,$data{spacer}));
+                $output .= tableFormRow(WebGUI::International::get(4,$namespace),WebGUI::Form::text("width",20,3,$data{width}));
+                $output .= tableFormRow(WebGUI::International::get(5,$namespace),WebGUI::Form::text("class",20,50,$data{class}));
+                $output .= formSave();
                 $output .= '</table></form>';
                 return $output;
         } else {
@@ -102,7 +121,7 @@ sub www_edit {
 sub www_editSave {
         my ($widgetId, $displayTitle);
         if (WebGUI::Privilege::canEditPage()) {
-                WebGUI::SQL->write("update ExtraColumn set spacer='$session{form}{spacer}', width='$session{form}{width}', class=".quote($session{form}{class})." where widgetId=$session{form}{wid}",$session{dbh});
+                WebGUI::SQL->write("update ExtraColumn set spacer='$session{form}{spacer}', width='$session{form}{width}', class=".quote($session{form}{class})." where widgetId=$session{form}{wid}");
                 return "";
         } else {
                 return WebGUI::Privilege::insufficient();
@@ -111,10 +130,9 @@ sub www_editSave {
 
 #-------------------------------------------------------------------
 sub www_view {
-	my (%data, @test, $output, $widgetId);
+	my (%data, @test, $output);
 	tie %data, 'Tie::CPHash';
-	$widgetId = shift;
-	%data = WebGUI::SQL->quickHash("select * from ExtraColumn where widgetId='$widgetId'",$session{dbh});
+	%data = getProperties($namespace,$_[0]);
 	if (defined %data) {
 		$output = '</td><td width="'.$data{spacer}.'"></td><td width="'.$data{width}.'" class="'.$data{class}.'" valign="top">';
 	}

@@ -27,9 +27,8 @@ sub loadTemplates {
         opendir (DIR,$session{config}{webguiRoot}.$templateDir) or WebGUI::ErrorHandler::fatalError("Can't open template directory!");
         @files = readdir(DIR);
         foreach $file (@files) {
-                if ($file ne "." && $file ne ".." && $file =~ /\.pm/) {
-                        $file =~ s/\.pm//;
-                        $template[$i] = $file;
+                if ($file =~ /(.*?)\.pm$/) {
+                        $template[$i] = $1;
                         $use = "require WebGUI::Template::".$template[$i];
                         eval($use);
 			if ($@) {

@@ -24,7 +24,7 @@ sub _replacement {
         if ($param[1] eq "") {
         	$param[1] = 0;
         }
-        @data = WebGUI::SQL->quickArray("select pageId,title,urlizedTitle from page where urlizedTitle='$param[0]'",$session{dbh});
+        @data = WebGUI::SQL->quickArray("select pageId,title,urlizedTitle from page where urlizedTitle='$param[0]'");
         $temp = '<span class="verticalMenu">';
         if (defined $data[0] && WebGUI::Privilege::canViewPage($data[0])) {
         	$temp .= traversePageTree($data[0],1,$param[1]);
@@ -46,7 +46,7 @@ sub process {
 		if ($depth eq "") {
 			$depth = 0;
 		}
-		@data = WebGUI::SQL->quickArray("select pageId,title,urlizedTitle from page where urlizedTitle='$pageTitle'",$session{dbh}); 
+		@data = WebGUI::SQL->quickArray("select pageId,title,urlizedTitle from page where urlizedTitle='$pageTitle'"); 
                 $temp = '<span class="verticalMenu">';
 		if (defined $data[0] && WebGUI::Privilege::canViewPage($data[0])) {
                 	$temp .= traversePageTree($data[0],1,$depth);

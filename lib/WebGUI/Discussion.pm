@@ -16,25 +16,31 @@ use WebGUI::DateTime;
 use WebGUI::International;
 use WebGUI::Session;
 use WebGUI::SQL;
-use WebGUI::Utility;
 
 #-------------------------------------------------------------------
-sub traverseReplyTree {
-	my ($sth, @data, $html, $depth, $i);
-	for ($i=0;$i<=$_[1];$i++) {
-		$depth .= "&nbsp;&nbsp;";
-	}
-	$sth = WebGUI::SQL->read("select messageId,subject,username,dateOfPost,userId from discussion where pid=$_[0] order by messageId", $session{dbh});
-	while (@data = $sth->array) {
-		$html .= '<tr';
-		if ($session{form}{mid} eq $data[0]) {
-			$html .= ' class="highlight"';
-		}
-		$html .= '><td class="tableData">'.$depth.'<a href="'.$session{page}{url}.'?func=showMessage&mid='.$data[0].'&wid='.$session{form}{wid}.'&sid='.$session{form}{sid}.'">'.substr($data[1],0,30).'</a></td><td class="tableData"><a href="'.$session{page}{url}.'?op=viewProfile&uid='.$data[4].'">'.$data[2].'</a></td><td class="tableData">'.epochToHuman($data[3],"%M/%D %H:%n%p").'</td></tr>';
-		$html .= traverseReplyTree($data[0],$_[1]+1);
-	}
-	$sth->finish;
-	return $html;
+sub _duplicateReplyTree {
+        my (@row, $sth, %data, $newMessageId);
+        $sth = WebGUI::SQL->read("select * from discussion where pid=$_[0] order by messageId");
+        while (%data = $sth->hash) {
+                $newMessageId = getNextId("messageId");
+		WebGUI::SQL->write("insert into discussion values ($newMessageId, $_[2], $_[3], $_[1], $data{userId}, ".quote($data{username}).", ".quote($data{subject}).", ".quote($data{message}).", $data{dateOfPost}, $_[4])");
+                _duplicateReplyTree($data{messageId},$newMessageId,$_[2],$_[3],$_[4]);
+        }
+        $sth->finish;
+}
+
+#-------------------------------------------------------------------
+sub duplicate {
+        my ($sth, %data, $newMessageId, $oldSubId, $newSubId);
+	$oldSubId = $_[2] || 0;
+	$newSubId = $_[3] || 0;
+        $sth = WebGUI::SQL->read("select * from discussion where widgetId=$_[0] and pid=0 and subId=$oldSubId order by messageId");
+        while (%data = $sth->hash) {
+                $newMessageId = getNextId("messageId");
+		WebGUI::SQL->write("insert into discussion values ($newMessageId, $newMessageId, $_[1], 0, $data{userId}, ".quote($data{username}).", ".quote($data{subject}).", ".quote($data{message}).", $data{dateOfPost}, $newSubId)");
+		_duplicateReplyTree($data{messageId},$newMessageId,$newMessageId,$_[1],$newSubId);
+        }
+        $sth->finish;
 }
 
 #-------------------------------------------------------------------
@@ -64,7 +70,7 @@ sub editMessageSave {
         if ($session{form}{message} eq "") {
                 $session{form}{subject} .= ' '.WebGUI::International::get(233);
         }
-        WebGUI::SQL->write("update discussion set subject=".quote($session{form}{subject}).", message=".quote("\n --- (Edited at ".localtime(time)." by $session{user}{username}) --- \n\n".$session{form}{message}).", subId='$session{form}{sid}' where messageId=$session{form}{mid}",$session{dbh});
+        WebGUI::SQL->write("update discussion set subject=".quote($session{form}{subject}).", message=".quote("\n --- (Edited at ".localtime(time)." by $session{user}{username}) --- \n\n".$session{form}{message}).", subId='$session{form}{sid}' where messageId=$session{form}{mid}");
         return showMessage();
 }
 
@@ -72,7 +78,7 @@ sub editMessageSave {
 sub getMessage {
 	my (%message);
         tie %message, 'Tie::CPHash';
-        %message = WebGUI::SQL->quickHash("select * from discussion where messageId=$_[0]",$session{dbh});
+        %message = WebGUI::SQL->quickHash("select * from discussion where messageId=$_[0]");
 	$message{message} =~ s/\n/\<br\>/g;
 	return %message;
 }
@@ -102,14 +108,14 @@ sub postNewMessageSave {
         	$session{form}{subject} .= ' '.WebGUI::International::get(233);
         }
 	$mid = getNextId("messageId");
-	WebGUI::SQL->write("insert into discussion values ($mid, $mid, $session{form}{wid}, 0, $session{user}{userId}, ".quote($session{user}{username}).", ".quote($session{form}{subject}).", ".quote($session{form}{message}).", ".time().", '$session{form}{sid}')",$session{dbh});
+	WebGUI::SQL->write("insert into discussion values ($mid, $mid, $session{form}{wid}, 0, $session{user}{userId}, ".quote($session{user}{username}).", ".quote($session{form}{subject}).", ".quote($session{form}{message}).", ".time().", '$session{form}{sid}')");
 	return "";
 }
 
 #-------------------------------------------------------------------
 sub postReply {
 	my ($html, $subject);
-	($subject) = WebGUI::SQL->quickArray("select subject from discussion where messageId=$session{form}{mid}", $session{dbh});
+	($subject) = WebGUI::SQL->quickArray("select subject from discussion where messageId=$session{form}{mid}");
 	$subject = "Re: ".$subject;
         $html = '<h1>'.WebGUI::International::get(234).'</h1>';
         $html .= '<form action="'.$session{page}{url}.'" method="post"><table>';
@@ -135,9 +141,14 @@ sub postReplySave {
                	$session{form}{subject} .= ' '.WebGUI::International::get(233);
         }
 	$mid = getNextId("messageId");
-	($rid) = WebGUI::SQL->quickArray("select rid from discussion where messageId=$session{form}{mid}",$session{dbh});
-	WebGUI::SQL->write("insert into discussion values ($mid, $rid, $session{form}{wid}, $session{form}{mid}, $session{user}{userId}, ".quote($session{user}{username}).", ".quote($session{form}{subject}).", ".quote($session{form}{message}).", ".time().", '$session{form}{sid}')", $session{dbh});
+	($rid) = WebGUI::SQL->quickArray("select rid from discussion where messageId=$session{form}{mid}");
+	WebGUI::SQL->write("insert into discussion values ($mid, $rid, $session{form}{wid}, $session{form}{mid}, $session{user}{userId}, ".quote($session{user}{username}).", ".quote($session{form}{subject}).", ".quote($session{form}{message}).", ".time().", '$session{form}{sid}')");
 	return "";
+}
+
+#-------------------------------------------------------------------
+sub purgeWidget {
+	WebGUI::SQL->write("delete from discussion where widgetId=$_[0]",$_[1]);
 }
 
 #-------------------------------------------------------------------
@@ -166,6 +177,25 @@ sub showReplyTree {
 	$html .= traverseReplyTree($message{rid},0);
 	$html .= "</table>";
 	return $html;
+}
+
+#-------------------------------------------------------------------
+sub traverseReplyTree {
+        my ($sth, @data, $html, $depth, $i);
+        for ($i=0;$i<=$_[1];$i++) {
+                $depth .= "&nbsp;&nbsp;";
+        }
+        $sth = WebGUI::SQL->read("select messageId,subject,username,dateOfPost,userId from discussion where pid=$_[0] order by messageId");
+        while (@data = $sth->array) {
+                $html .= '<tr';
+                if ($session{form}{mid} eq $data[0]) {
+                        $html .= ' class="highlight"';
+                }
+                $html .= '><td class="tableData">'.$depth.'<a href="'.$session{page}{url}.'?func=showMessage&mid='.$data[0].'&wid='.$session{form}{wid}.'&sid='.$session{form}{sid}.'">'.substr($data[1],0,30).'</a></td><td class="tableData"><a href="'.$session{page}{url}.'?op=viewProfile&uid='.$data[4].'">'.$data[2].'</a></td><td class="tableData">'.epochToHuman($data[3],"%M/%D %H:%n%p").'</td></tr>';
+                $html .= traverseReplyTree($data[0],$_[1]+1);
+        }
+        $sth->finish;
+        return $html;
 }
 
 

@@ -15,7 +15,6 @@ use Tie::CPHash;
 use WebGUI::International;
 use WebGUI::Session;
 use WebGUI::SQL;
-use WebGUI::Utility;
 
 #-------------------------------------------------------------------
 sub adminOnly {
@@ -23,7 +22,7 @@ sub adminOnly {
         $output = '<h1>'.WebGUI::International::get(35).'</h1>';
 	$output .= WebGUI::International::get(36);
 	$output .= '<ul>';
-	$sth = WebGUI::SQL->read("select users.username, users.email from users,groupings where users.userId=groupings.userId and groupings.groupId=3 order by users.username",$session{dbh});
+	$sth = WebGUI::SQL->read("select users.username, users.email from users,groupings where users.userId=groupings.userId and groupings.groupId=3 order by users.username");
 	while (@data = $sth->array) {
 		$output .= '<li>'.$data[0].' (<a href="mailto:'.$data[1].'">'.$data[1].'</a>)';
 	}
@@ -54,7 +53,7 @@ sub canViewPage {
 	if ($_[0] eq "") {
 		%page = %{$session{page}};
 	} else {
-		%page = WebGUI::SQL->quickHash("select * from page where pageId=$_[0]",$session{dbh});
+		%page = WebGUI::SQL->quickHash("select * from page where pageId=$_[0]");
 	}
 	if ($page{worldView}) {
                 return 1;
@@ -86,10 +85,13 @@ sub isInGroup {
 	if ($uid eq "") {
 		$uid = $session{user}{userId};
 	}
-	($result) = WebGUI::SQL->quickArray("select count(*) from groupings where groupId='$gid' and userId='$uid'",$session{dbh});
+	($result) = WebGUI::SQL->quickArray("select count(*) from groupings where groupId='$gid' and userId='$uid' and expireDate>".time());
 	if ($result < 1 && $gid == 1) { 	# registered users can 
 		$result = isInGroup(2, $uid); 	# do anything visitors
 	}					# can do
+        if ($result < 1 && $gid != 3) {         # admins can
+                $result = isInGroup(3, $uid);   # do anything any 
+        }                                       # user can do
 	return $result;
 }
 

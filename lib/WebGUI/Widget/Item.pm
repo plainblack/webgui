@@ -14,23 +14,34 @@ our $namespace = "Item";
 
 use strict;
 use Tie::CPHash;
+use WebGUI::Attachment;
 use WebGUI::Form;
 use WebGUI::International;
 use WebGUI::Privilege;
 use WebGUI::Session;
+use WebGUI::Shortcut;
 use WebGUI::SQL;
-use WebGUI::Utility;
 use WebGUI::Widget;
 
 #-------------------------------------------------------------------
+sub duplicate {
+        my (%data, $newWidgetId, $pageId);
+        tie %data, 'Tie::CPHash';
+        %data = getProperties($namespace,$_[0]);
+	$pageId = $_[1] || $data{pageId};
+        $newWidgetId = create($pageId,$namespace,$data{title},$data{displayTitle},$data{description},$data{processMacros},$data{position});
+        WebGUI::Attachment::copy($data{attachment},$_[0],$newWidgetId);
+	WebGUI::SQL->write("insert into Item values ($newWidgetId, ".quote($data{description}).", ".quote($data{linkURL}).", ".quote($data{attachment}).")");
+}
+
+#-------------------------------------------------------------------
 sub purge {
-	WebGUI::SQL->write("delete from Item where widgetId=$_[0]",$_[1]);
-	purgeWidget($_[0],$_[1]);
+	purgeWidget($_[0],$_[1],$namespace);
 }
 
 #-------------------------------------------------------------------
 sub widgetName {
-	return "Item";
+	return WebGUI::International::get(4,$namespace);
 }
 
 #-------------------------------------------------------------------
@@ -38,20 +49,20 @@ sub www_add {
         my ($output, %hash);
 	tie %hash,'Tie::IxHash';
       	if (WebGUI::Privilege::canEditPage()) {
-		$output = '<a href="'.$session{page}{url}.'?op=viewHelp&hid=1&namespace='.$namespace.'"><img src="'.$session{setting}{lib}.'/help.gif" border="0" align="right"></a>';
-		$output .= '<h1>Add '.widgetName().'</h1>';
-		$output .= '<form method="post" enctype="multipart/form-data" action="'.$session{page}{url}.'">';
-                $output .= WebGUI::Form::hidden("widget","Item");
+		$output = helpLink(1,$namespace);
+		$output .= '<h1>'.WebGUI::International::get(4,$namespace).'</h1>';
+		$output .= formHeader();
+                $output .= WebGUI::Form::hidden("widget",$namespace);
                 $output .= WebGUI::Form::hidden("func","addSave");
                 $output .= '<table>';
-                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(99).'</td><td>'.WebGUI::Form::text("title",20,30,widgetName()).'</td></tr>';
-		$output .= '<tr><td class="formDescription">'.WebGUI::International::get(175).'</td><td>'.WebGUI::Form::checkbox("processMacros",1,1).'</td></tr>';
+                $output .= tableFormRow(WebGUI::International::get(99),WebGUI::Form::text("title",20,30,widgetName()));
+		$output .= tableFormRow(WebGUI::International::get(175),WebGUI::Form::checkbox("processMacros",1,1));
 		%hash = WebGUI::Widget::getPositions();
-                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(363).'</td><td>'.WebGUI::Form::selectList("position",\%hash).'</td></tr>';
-                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(85).'</td><td>'.WebGUI::Form::textArea("description",'').'</td></tr>';
-                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(1,$namespace).'</td><td>'.WebGUI::Form::text("linkURL",20,2048).'</td></tr>';
-                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(2,$namespace).'</td><td>'.WebGUI::Form::file("attachment").'</td></tr>';
-                $output .= '<tr><td></td><td>'.WebGUI::Form::submit(WebGUI::International::get(62)).'</td></tr>';
+                $output .= tableFormRow(WebGUI::International::get(363),WebGUI::Form::selectList("position",\%hash));
+                $output .= tableFormRow(WebGUI::International::get(85),WebGUI::Form::textArea("description",''));
+                $output .= tableFormRow(WebGUI::International::get(1,$namespace),WebGUI::Form::text("linkURL",20,2048));
+                $output .= tableFormRow(WebGUI::International::get(2,$namespace),WebGUI::Form::file("attachment"));
+                $output .= formSave();
                 $output .= '</table></form>';
                 return $output;
         } else {
@@ -64,9 +75,9 @@ sub www_add {
 sub www_addSave {
 	my ($widgetId, $attachment);
 	if (WebGUI::Privilege::canEditPage()) {
-		$widgetId = create();
-		$attachment = saveAttachment("attachment",$widgetId);
-		WebGUI::SQL->write("insert into Item values ($widgetId, ".quote($session{form}{description}).", ".quote($session{form}{linkURL}).", ".quote($attachment).")",$session{dbh});
+		$widgetId = create($session{page}{pageId},$session{form}{widget},$session{form}{title},$session{form}{displayTitle},$session{form}{description},$session{form}{processMacros},$session{form}{position});
+		$attachment = WebGUI::Attachment::save("attachment",$widgetId);
+		WebGUI::SQL->write("insert into Item values ($widgetId, ".quote($session{form}{description}).", ".quote($session{form}{linkURL}).", ".quote($attachment).")");
 		return "";
 	} else {
 		return WebGUI::Privilege::insufficient();
@@ -74,9 +85,19 @@ sub www_addSave {
 }
 
 #-------------------------------------------------------------------
+sub www_copy {
+        if (WebGUI::Privilege::canEditPage()) {
+                duplicate($session{form}{wid});
+                return "";
+        } else {
+                return WebGUI::Privilege::insufficient();
+        }
+}
+
+#-------------------------------------------------------------------
 sub www_deleteAttachment {
         if (WebGUI::Privilege::canEditPage()) {
-		WebGUI::SQL->write("update Item set attachment='' where widgetId=$session{form}{wid}",$session{dbh});
+		WebGUI::SQL->write("update Item set attachment='' where widgetId=$session{form}{wid}");
 		return www_edit();
         } else {
                 return WebGUI::Privilege::insufficient();
@@ -89,25 +110,26 @@ sub www_edit {
 	tie %data, 'Tie::CPHash';
 	tie %hash, 'Tie::IxHash';
         if (WebGUI::Privilege::canEditPage()) {
-		%data = WebGUI::SQL->quickHash("select * from widget,Item where widget.widgetId=Item.widgetId and widget.widgetId=$session{form}{wid}",$session{dbh});
-		$output .= '<h1>Edit '.widgetName().'</h1>';
-		$output .= '<form method="post" enctype="multipart/form-data" action="'.$session{page}{url}.'">';
+		%data = getProperties($namespace,$session{form}{wid});
+		$output .= helpLink(1,$namespace);
+		$output .= '<h1>'.WebGUI::International::get(4,$namespace).'</h1>';
+		$output .= formHeader();
                 $output .= WebGUI::Form::hidden("wid",$session{form}{wid});
                 $output .= WebGUI::Form::hidden("func","editSave");
                 $output .= '<table>';
-                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(99).'</td><td>'.WebGUI::Form::text("title",20,30,$data{title}).'</td></tr>';
-		$output .= '<tr><td class="formDescription">'.WebGUI::International::get(175).'</td><td>'.WebGUI::Form::checkbox("processMacros","1",$data{processMacros}).'</td></tr>';
+                $output .= tableFormRow(WebGUI::International::get(99),WebGUI::Form::text("title",20,30,$data{title}));
+		$output .= tableFormRow(WebGUI::International::get(175),WebGUI::Form::checkbox("processMacros","1",$data{processMacros}));
 		%hash = WebGUI::Widget::getPositions();
                 $array[0] = $data{position};
-                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(363).'</td><td>'.WebGUI::Form::selectList("position",\%hash,\@array).'</td></tr>';
-                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(85).'</td><td>'.WebGUI::Form::textArea("description",$data{description}).'</td></tr>';
-                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(1,$namespace).'</td><td>'.WebGUI::Form::text("linkURL",20,2048,$data{linkURL}).'</td></tr>';
+                $output .= tableFormRow(WebGUI::International::get(363),WebGUI::Form::selectList("position",\%hash,\@array));
+                $output .= tableFormRow(WebGUI::International::get(85),WebGUI::Form::textArea("description",$data{description}));
+                $output .= tableFormRow(WebGUI::International::get(1,$namespace),WebGUI::Form::text("linkURL",20,2048,$data{linkURL}));
 		if ($data{attachment} ne "") {
-                	$output .= '<tr><td class="formDescription">'.WebGUI::International::get(2,$namespace).'</td><td><a href="'.$session{page}{url}.'?func=deleteAttachment&wid='.$session{form}{wid}.'">'.WebGUI::International::get(3,$namespace).'</a></td></tr>';
+                	$output .= tableFormRow(WebGUI::International::get(2,$namespace),'<a href="'.$session{page}{url}.'?func=deleteAttachment&wid='.$session{form}{wid}.'">'.WebGUI::International::get(3,$namespace).'</a>');
 		} else {
-                	$output .= '<tr><td class="formDescription">'.WebGUI::International::get(2,$namespace).'</td><td>'.WebGUI::Form::file("attachment").'</td></tr>';
+                	$output .= tableFormRow(WebGUI::International::get(2,$namespace),WebGUI::Form::file("attachment"));
 		}
-                $output .= '<tr><td></td><td>'.WebGUI::Form::submit("save").'</td></tr>';
+                $output .= formSave();
                 $output .= '</table></form>';
                 return $output;
         } else {
@@ -120,11 +142,11 @@ sub www_editSave {
         my ($attachment);
         if (WebGUI::Privilege::canEditPage()) {
 		update();
-                $attachment = saveAttachment("attachment",$session{form}{wid});
+                $attachment = WebGUI::Attachment::save("attachment",$session{form}{wid});
 		if ($attachment ne "") {
                         $attachment = ', attachment='.quote($attachment);
                 }
-                WebGUI::SQL->write("update Item set description=".quote($session{form}{description}).", linkURL=".quote($session{form}{linkURL}).$attachment." where widgetId=$session{form}{wid}",$session{dbh});
+                WebGUI::SQL->write("update Item set description=".quote($session{form}{description}).", linkURL=".quote($session{form}{linkURL}).$attachment." where widgetId=$session{form}{wid}");
                 return "";
         } else {
                 return WebGUI::Privilege::insufficient();
@@ -133,10 +155,9 @@ sub www_editSave {
 
 #-------------------------------------------------------------------
 sub www_view {
-	my (%data, @test, $output, $widgetId);
+	my (%data, @test, $output);
 	tie %data, 'Tie::CPHash';
-	$widgetId = shift;
-	%data = WebGUI::SQL->quickHash("select * from widget,Item where widget.widgetId='$widgetId' and widget.WidgetId=Item.widgetId",$session{dbh});
+	%data = getProperties($namespace,$_[0]);
 	if (defined %data) {
                 if ($data{linkURL} ne "") {
                         $output .= '<a href="'.$data{linkURL}.'"><span class="itemTitle">'.$data{title}.'</span></a>';
@@ -144,7 +165,7 @@ sub www_view {
 			$output .= '<span class="itemTitle">'.$data{title}.'</span>';
 		}
 		if ($data{attachment} ne "") {
-			$output .= ' - <a href="'.$session{setting}{attachmentDirectoryWeb}.'/'.$widgetId.'/'.$data{attachment}.'"><img src="'.$session{setting}{lib}.'/smallAttachment.gif" border=0 alt="Download Attachment"></a>';
+			$output .= ' - <a href="'.$session{setting}{attachmentDirectoryWeb}.'/'.$_[0].'/'.$data{attachment}.'"><img src="'.$session{setting}{lib}.'/smallAttachment.gif" border=0 alt="'.WebGUI::International::get(5,$namespace).'"></a>';
 		}
 		if ($data{description} ne "") {
 			$output .= ' - '.$data{description};

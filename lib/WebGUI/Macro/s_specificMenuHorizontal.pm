@@ -22,8 +22,8 @@ sub _replacement {
         $pageTitle = $1;
         $temp = '<span class="horizontalMenu">';
         $first = 1;
-        ($parentId) = WebGUI::SQL->quickArray("select pageId from page where urlizedTitle='$pageTitle'",$session{dbh});
-        $sth = WebGUI::SQL->read("select title,urlizedTitle,pageId from page where parentId='$parentId' order by sequenceNumber",$session{dbh});
+        ($parentId) = WebGUI::SQL->quickArray("select pageId from page where urlizedTitle='$pageTitle'");
+        $sth = WebGUI::SQL->read("select title,urlizedTitle,pageId from page where parentId='$parentId' order by sequenceNumber");
         while (@data = $sth->array) {
         	if (WebGUI::Privilege::canViewPage($data[2])) {
                 	if ($first) {
@@ -50,8 +50,8 @@ sub process {
 		$pageTitle = $1;
                 $temp = '<span class="horizontalMenu">';
                 $first = 1;
-		($parentId) = WebGUI::SQL->quickArray("select pageId from page where urlizedTitle='$pageTitle'",$session{dbh}); 
-                $sth = WebGUI::SQL->read("select title,urlizedTitle,pageId from page where parentId='$parentId' order by sequenceNumber",$session{dbh});
+		($parentId) = WebGUI::SQL->quickArray("select pageId from page where urlizedTitle='$pageTitle'"); 
+                $sth = WebGUI::SQL->read("select title,urlizedTitle,pageId from page where parentId='$parentId' order by sequenceNumber");
                 while (@data = $sth->array) {
                         if (WebGUI::Privilege::canViewPage($data[2])) {
                                 if ($first) {

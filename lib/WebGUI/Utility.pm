@@ -10,9 +10,7 @@ package WebGUI::Utility;
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
-use CGI;
 use Exporter;
-use FileHandle;
 use strict;
 use Tie::IxHash;
 use WebGUI::International;
@@ -20,7 +18,7 @@ use WebGUI::Session;
 use WebGUI::SQL;
 
 our @ISA = qw(Exporter);
-our @EXPORT = qw(&sortHashDescending &sortHash &paginate &appendToUrl &randint &getNextId &saveAttachment &round &urlize &quote);
+our @EXPORT = qw(&sortHashDescending &sortHash &paginate &appendToUrl &randint &round &urlize);
 
 #-------------------------------------------------------------------
 sub appendToUrl {
@@ -32,14 +30,6 @@ sub appendToUrl {
 		$url .= '?'.$_[1];
 	}
 	return $url;
-}
-
-#-------------------------------------------------------------------
-sub getNextId {
-	my ($id);
-	($id) = WebGUI::SQL->quickArray("select nextValue from incrementer where incrementerId='$_[0]'",$session{dbh});
-	WebGUI::SQL->write("update incrementer set nextValue=nextValue+1 where incrementerId='$_[0]'",$session{dbh});
-        return $id;
 }
 
 #-------------------------------------------------------------------
@@ -73,13 +63,6 @@ sub paginate {
 }
 
 #-------------------------------------------------------------------
-# This is here simply to make typing shorter, cuz I'm lazy.
-sub quote {
-	my $value = $_[0]; #had to add this here cuz Tie::CPHash variables cause problems otherwise.
-	return $session{dbh}->quote($value);
-}
-
-#-------------------------------------------------------------------
 sub randint {
 	my ($low, $high) = @_;
 	$low = 0 unless defined $low;
@@ -91,40 +74,6 @@ sub randint {
 #-------------------------------------------------------------------
 sub round {
         return sprintf("%.0f", $_[0]);
-}
-
-#-------------------------------------------------------------------
-# eg: saveAttachment(formVarName,widgetId,optionallySubmissionId);
-sub saveAttachment {
-	my ($file, $filename, $bytesread, $buffer, $urlizedFilename, $path);
-	$filename = $session{cgi}->upload($_[0]);
-	if (defined $filename) {
-		if ($filename =~ /([^\/\\]+)$/) {
-     			$urlizedFilename = $1;
-   		} else {
-     			$urlizedFilename = $filename;
-   		}
-		$urlizedFilename = urlize($urlizedFilename);
-		$path = $session{setting}{attachmentDirectoryLocal}."/".$_[1]."/";
-		mkdir ($path,0755);
-		if ($_[2] ne "") {
-			$path = $path.$_[2].'/';
-			mkdir ($path,0755);
-		}
-		$file = FileHandle->new(">".$path.$urlizedFilename);
-		if (defined $file) {
-			binmode $file;
-			while ($bytesread=read($filename,$buffer,1024)) {
-        			print $file $buffer;
-			}
-			close($file);
-		} else {
-			return "";
-		}
-		return $urlizedFilename;
-	} else {
-		return "";
-	}
 }
 
 #-------------------------------------------------------------------

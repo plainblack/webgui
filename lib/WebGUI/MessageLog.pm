@@ -12,21 +12,21 @@ package WebGUI::MessageLog;
 
 use strict;
 use WebGUI::Session;
-use WebGUI::Utility;
+use WebGUI::SQL;
 
 #-------------------------------------------------------------------
 sub addEntry {
         my ($user, %userLanguage, $messageLogId, %message);
 	$messageLogId = getNextId("messageLogId");
 	if ($_[0] ne "") {
-		($userLanguage{$_[0]}) = WebGUI::SQL->quickArray("select language from users where userId=$_[0]",$session{dbh});
+		($userLanguage{$_[0]}) = WebGUI::SQL->quickArray("select language from users where userId=$_[0]");
 	}
 	if ($_[1] ne "") {
-		%userLanguage = (WebGUI::SQL->buildHash("select users.userId,users.language from groupings,users where groupings.groupId=$_[1] and groupings.userId=users.userId",$session{dbh}),%userLanguage);
+		%userLanguage = (WebGUI::SQL->buildHash("select users.userId,users.language from groupings,users where groupings.groupId=$_[1] and groupings.userId=users.userId"),%userLanguage);
 	}
-	%message = WebGUI::SQL->buildHash("select language,message from international where internationalId=$_[3] and namespace='$_[4]'",$session{dbh});
+	%message = WebGUI::SQL->buildHash("select language,message from international where internationalId=$_[3] and namespace='$_[4]'");
 	foreach $user (keys %userLanguage) {
-		WebGUI::SQL->write("insert into messageLog values ($messageLogId,$user,".quote($message{$userLanguage{$user}}).",".quote($_[2]).",".time().")",$session{dbh});
+		WebGUI::SQL->write("insert into messageLog values ($messageLogId,$user,".quote($message{$userLanguage{$user}}).",".quote($_[2]).",".time().")");
 		# here is where we'll trigger communication with external systems like email
 	}
 }
@@ -37,9 +37,9 @@ sub completeEntry {
 	$completeMessage = WebGUI::International::get(350);
 	# unfortunately had to loop through reading and writing because I couldn't
         # find a concatination function that worked the same in all DB servers
-	$sth = WebGUI::SQL->read("select message,userId from messageLog where messageLogId=$_[0]",$session{dbh});
+	$sth = WebGUI::SQL->read("select message,userId from messageLog where messageLogId=$_[0]");
 	while (@data = $sth->array) {
-		WebGUI::SQL->write("update messageLog set message=".quote($completeMessage.": ".$data[0]).", dateOfEntry=".time()." where messageLogId='$_[0]' and userId=$data[1]",$session{dbh});
+		WebGUI::SQL->write("update messageLog set message=".quote($completeMessage.": ".$data[0]).", dateOfEntry=".time()." where messageLogId='$_[0]' and userId=$data[1]");
 	}
 	$sth->finish;
 }

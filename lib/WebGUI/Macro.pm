@@ -39,11 +39,10 @@ sub process {
         opendir (DIR,$session{config}{webguiRoot}.$macroDir) or WebGUI::ErrorHandler::fatalError("Can't open macro directory!");
         @files = readdir(DIR);
         foreach $file (@files) {
-                if ($file ne "." && $file ne ".." && $file =~ /\.pm/) {
-                        $file =~ s/\.pm//;
-                        $cmd = "use WebGUI::Macro::".$file;
+                if ($file =~ /(.*?)\.pm$/) {
+                        $cmd = "use WebGUI::Macro::".$1;
                         eval($cmd);
-                        $cmd = "WebGUI::Macro::".$file."::process";
+                        $cmd = "WebGUI::Macro::".$1."::process";
 			$output = &$cmd($output);
                 }
         }

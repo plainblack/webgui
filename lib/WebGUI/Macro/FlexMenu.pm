@@ -28,8 +28,8 @@ sub _replacement {
 #-------------------------------------------------------------------
 sub _reversePageTree {
         my ($sth, @data, $output, $parentId);
-	($parentId) = WebGUI::SQL->quickArray("select parentId from page where pageId='$_[0]'",$session{dbh});
-        $sth = WebGUI::SQL->read("select pageId,parentId,title,urlizedTitle from page where parentId=$_[0] order by sequenceNumber",$session{dbh});
+	($parentId) = WebGUI::SQL->quickArray("select parentId from page where pageId='$_[0]'");
+        $sth = WebGUI::SQL->read("select pageId,parentId,title,urlizedTitle from page where parentId=$_[0] order by sequenceNumber");
         while (@data = $sth->array) {
 		if (WebGUI::Privilege::canViewPage($data[0])) {
 			if ($_[1] == $data[0]) {

@@ -11,6 +11,6 @@ Data::Config.........................Sébastien Aperghis-Tramoni
 IE Rich Edit.........................Brattli
 Spanish Translation..................Ricardo Markiewicz
 Portuguese Translation...............Jose Caneira
-
+Dutch Translation....................Joeri de Bruin
 
 

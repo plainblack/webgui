@@ -18,8 +18,8 @@ use WebGUI::International;
 use WebGUI::Macro;
 use WebGUI::Privilege;
 use WebGUI::Session;
+use WebGUI::Shortcut;
 use WebGUI::SQL;
-use WebGUI::Utility;
 use WebGUI::Widget;
 
 #-------------------------------------------------------------------
@@ -37,7 +37,7 @@ sub _traversePageTree {
 		$lineSpacing .= "<br>";
 	}
         if ($_[1] < $toLevel) {
-                $sth = WebGUI::SQL->read("select urlizedTitle, title, pageId from page where parentId='$_[0]' order by sequenceNumber",$session{dbh});
+                $sth = WebGUI::SQL->read("select urlizedTitle, title, pageId from page where parentId='$_[0]' order by sequenceNumber");
                 while (@data = $sth->array) {
                         if (WebGUI::Privilege::canViewPage($data[2])) {
                                 $output .= $depth.$_[4].' <a href="'.$session{env}{SCRIPT_NAME}.'/'.$data[0].'">'.$data[1].'</a>';
@@ -51,9 +51,18 @@ sub _traversePageTree {
 }
 
 #-------------------------------------------------------------------
+sub duplicate {
+        my (%data, $newWidgetId, $pageId);
+        tie %data, 'Tie::CPHash';
+        %data = getProperties($namespace,$_[0]);
+	$pageId = $_[1] || $data{pageId};
+        $newWidgetId = create($pageId,$namespace,$data{title},$data{displayTitle},$data{description},$data{processMacros},$data{position});
+	WebGUI::SQL->write("insert into SiteMap values ($newWidgetId, '$data{startAtThisLevel}', '$data{depth}', '$data{indent}', ".quote($data{bullet}).", '$data{lineSpacing}')");
+}
+
+#-------------------------------------------------------------------
 sub purge {
-        WebGUI::SQL->write("delete from SiteMap where widgetId=$_[0]",$_[1]);
-        purgeWidget($_[0],$_[1]);
+        purgeWidget($_[0],$_[1],$namespace);
 }
 
 #-------------------------------------------------------------------
@@ -66,24 +75,24 @@ sub www_add {
         my ($output, %hash);
 	tie %hash, 'Tie::IxHash';
       	if (WebGUI::Privilege::canEditPage()) {
-                $output = '<a href="'.$session{page}{url}.'?op=viewHelp&hid=1&namespace='.$namespace.'"><img src="'.$session{setting}{lib}.'/help.gif" border="0" align="right"></a>';
+                $output = helpLink(1,$namespace);
 		$output .= '<h1>'.WebGUI::International::get(1,$namespace).'</h1>';
-		$output .= '<form method="post" enctype="multipart/form-data" action="'.$session{page}{url}.'">';
+		$output .= formHeader();
                 $output .= WebGUI::Form::hidden("widget",$namespace);
                 $output .= WebGUI::Form::hidden("func","addSave");
                 $output .= '<table>';
-                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(99).'</td><td>'.WebGUI::Form::text("title",20,128,'Site Map').'</td></tr>';
-                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(174).'</td><td>'.WebGUI::Form::checkbox("displayTitle",1,1).'</td></tr>';
-                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(175).'</td><td>'.WebGUI::Form::checkbox("processMacros",1).'</td></tr>';
+                $output .= tableFormRow(WebGUI::International::get(99),WebGUI::Form::text("title",20,128,'Site Map'));
+                $output .= tableFormRow(WebGUI::International::get(174),WebGUI::Form::checkbox("displayTitle",1,1));
+                $output .= tableFormRow(WebGUI::International::get(175),WebGUI::Form::checkbox("processMacros",1));
 		%hash = WebGUI::Widget::getPositions();
-                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(363).'</td><td>'.WebGUI::Form::selectList("position",\%hash).'</td></tr>';
-                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(85).'</td><td>'.WebGUI::Form::textArea("description",'',50,5,1).'</td></tr>';
-                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(3,$namespace).'</td><td>'.WebGUI::Form::checkbox("startAtThisLevel",1,1).'</td></tr>';
-                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(4,$namespace).'</td><td>'.WebGUI::Form::text("depth",20,2,0).'</td></tr>';
-                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(6,$namespace).'</td><td>'.WebGUI::Form::text("indent",20,2,5).'</td></tr>';
-                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(7,$namespace).'</td><td>'.WebGUI::Form::text("bullet",20,30,'&middot;').'</td></tr>';
-                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(8,$namespace).'</td><td>'.WebGUI::Form::text("bullet",20,1,1).'</td></tr>';
-                $output .= '<tr><td></td><td>'.WebGUI::Form::submit(WebGUI::International::get(62)).'</td></tr>';
+                $output .= tableFormRow(WebGUI::International::get(363),WebGUI::Form::selectList("position",\%hash));
+                $output .= tableFormRow(WebGUI::International::get(85),WebGUI::Form::textArea("description",'',50,5,1));
+                $output .= tableFormRow(WebGUI::International::get(3,$namespace),WebGUI::Form::checkbox("startAtThisLevel",1,1));
+                $output .= tableFormRow(WebGUI::International::get(4,$namespace),WebGUI::Form::text("depth",20,2,0));
+                $output .= tableFormRow(WebGUI::International::get(6,$namespace),WebGUI::Form::text("indent",20,2,5));
+                $output .= tableFormRow(WebGUI::International::get(7,$namespace),WebGUI::Form::text("bullet",20,30,'&middot;'));
+                $output .= tableFormRow(WebGUI::International::get(8,$namespace),WebGUI::Form::text("bullet",20,1,1));
+                $output .= formSave();
                 $output .= '</table></form>';
                 return $output;
         } else {
@@ -96,12 +105,22 @@ sub www_add {
 sub www_addSave {
 	my ($widgetId, $displayTitle, $image, $attachment);
 	if (WebGUI::Privilege::canEditPage()) {
-		$widgetId = create();
-		WebGUI::SQL->write("insert into SiteMap values ($widgetId, '$session{form}{startAtThisLevel}', '$session{form}{depth}', '$session{form}{indent}', ".quote($session{form}{bullet}).", '$session{form}{lineSpacing}')",$session{dbh});
+		$widgetId = create($session{page}{pageId},$session{form}{widget},$session{form}{title},$session{form}{displayTitle},$session{form}{description},$session{form}{processMacros},$session{form}{position});
+		WebGUI::SQL->write("insert into SiteMap values ($widgetId, '$session{form}{startAtThisLevel}', '$session{form}{depth}', '$session{form}{indent}', ".quote($session{form}{bullet}).", '$session{form}{lineSpacing}')");
 		return "";
 	} else {
 		return WebGUI::Privilege::insufficient();
 	}
+}
+
+#-------------------------------------------------------------------
+sub www_copy {
+        if (WebGUI::Privilege::canEditPage()) {
+                duplicate($session{form}{wid});
+                return "";
+        } else {
+                return WebGUI::Privilege::insufficient();
+        }
 }
 
 #-------------------------------------------------------------------
@@ -110,26 +129,26 @@ sub www_edit {
 	tie %data, 'Tie::CPHash';
 	tie %hash, 'Tie::IxHash';
         if (WebGUI::Privilege::canEditPage()) {
-		%data = WebGUI::SQL->quickHash("select * from widget,SiteMap where widget.widgetId=SiteMap.widgetId and widget.widgetId=$session{form}{wid}",$session{dbh});
-                $output = '<a href="'.$session{page}{url}.'?op=viewHelp&hid=1&namespace='.$namespace.'"><img src="'.$session{setting}{lib}.'/help.gif" border="0" align="right"></a>';
+		%data = getProperties($namespace,$session{form}{wid});
+                $output = helpLink(1,$namespace);
 		$output .= '<h1>'.WebGUI::International::get(5,$namespace).'</h1>';
-		$output .= '<form method="post" action="'.$session{page}{url}.'">';
+		$output .= formHeader();
                 $output .= WebGUI::Form::hidden("wid",$session{form}{wid});
                 $output .= WebGUI::Form::hidden("func","editSave");
                 $output .= '<table>';
-                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(99).'</td><td>'.WebGUI::Form::text("title",20,128,$data{title}).'</td></tr>';
-                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(174).'</td><td>'.WebGUI::Form::checkbox("displayTitle",1,$data{displayTitle}).'</td></tr>';
-                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(175).'</td><td>'.WebGUI::Form::checkbox("processMacros",1,$data{processMacros}).'</td></tr>';
+                $output .= tableFormRow(WebGUI::International::get(99),WebGUI::Form::text("title",20,128,$data{title}));
+                $output .= tableFormRow(WebGUI::International::get(174),WebGUI::Form::checkbox("displayTitle",1,$data{displayTitle}));
+                $output .= tableFormRow(WebGUI::International::get(175),WebGUI::Form::checkbox("processMacros",1,$data{processMacros}));
 		%hash = WebGUI::Widget::getPositions();
                 $array[0] = $data{position};
-                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(363).'</td><td>'.WebGUI::Form::selectList("position",\%hash,\@array).'</td></tr>';
-                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(85).'</td><td>'.WebGUI::Form::textArea("description",$data{description},50,5,1).'</td></tr>';
-                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(3,$namespace).'</td><td>'.WebGUI::Form::checkbox("startAtThisLevel",1,$data{startAtThisLevel}).'</td></tr>';
-                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(4,$namespace).'</td><td>'.WebGUI::Form::text("depth",20,2,$data{depth}).'</td></tr>';
-                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(6,$namespace).'</td><td>'.WebGUI::Form::text("indent",20,2,$data{indent}).'</td></tr>';
-                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(7,$namespace).'</td><td>'.WebGUI::Form::text("bullet",20,30,$data{bullet}).'</td></tr>';
-                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(8,$namespace).'</td><td>'.WebGUI::Form::text("lineSpacing",20,1,$data{lineSpacing}).'</td></tr>';
-		$output .= '<tr><td></td><td>'.WebGUI::Form::submit(WebGUI::International::get(62)).'</td></tr>';
+                $output .= tableFormRow(WebGUI::International::get(363),WebGUI::Form::selectList("position",\%hash,\@array));
+                $output .= tableFormRow(WebGUI::International::get(85),WebGUI::Form::textArea("description",$data{description},50,5,1));
+                $output .= tableFormRow(WebGUI::International::get(3,$namespace),WebGUI::Form::checkbox("startAtThisLevel",1,$data{startAtThisLevel}));
+                $output .= tableFormRow(WebGUI::International::get(4,$namespace),WebGUI::Form::text("depth",20,2,$data{depth}));
+                $output .= tableFormRow(WebGUI::International::get(6,$namespace),WebGUI::Form::text("indent",20,2,$data{indent}));
+                $output .= tableFormRow(WebGUI::International::get(7,$namespace),WebGUI::Form::text("bullet",20,30,$data{bullet}));
+                $output .= tableFormRow(WebGUI::International::get(8,$namespace),WebGUI::Form::text("lineSpacing",20,1,$data{lineSpacing}));
+		$output .= formSave();
                 $output .= '</table></form>';
                 return $output;
         } else {
@@ -141,7 +160,7 @@ sub www_edit {
 sub www_editSave {
         if (WebGUI::Privilege::canEditPage()) {
 		update();
-		WebGUI::SQL->write("update SiteMap set startAtThisLevel='$session{form}{startAtThisLevel}', depth='$session{form}{depth}', indent='$session{form}{indent}', bullet=".quote($session{form}{bullet}).", lineSpacing='$session{form}{lineSpacing}' where widgetId=$session{form}{wid}",$session{dbh});
+		WebGUI::SQL->write("update SiteMap set startAtThisLevel='$session{form}{startAtThisLevel}', depth='$session{form}{depth}', indent='$session{form}{indent}', bullet=".quote($session{form}{bullet}).", lineSpacing='$session{form}{lineSpacing}' where widgetId=$session{form}{wid}");
                 return "";
         } else {
                 return WebGUI::Privilege::insufficient();
@@ -152,7 +171,7 @@ sub www_editSave {
 sub www_view {
 	my (%data, $output, $parent);
 	tie %data, 'Tie::CPHash';
-	%data = WebGUI::SQL->quickHash("select * from widget,SiteMap where widget.widgetId=SiteMap.widgetId and widget.widgetId='$_[0]'",$session{dbh});
+	%data = getProperties($namespace,$_[0]);
 	if (defined %data) {
 		if ($data{displayTitle} eq 1) {
 			$output = '<h1>'.$data{title}.'</h1>';

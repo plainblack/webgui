@@ -34,7 +34,7 @@ sub get {
 	if (defined $international{$language}{$_[0]}) { 		# a little caching never hurts =)
 		$output = $international{$language}{$_[0]};
 	} else {
-		($output) = WebGUI::SQL->quickArray("select message from international where internationalId=$_[0] and namespace='$namespace' and language='$language'",$session{dbh});
+		($output) = WebGUI::SQL->quickArray("select message from international where internationalId=$_[0] and namespace='$namespace' and language='$language'");
 		if ($output eq "" && $language ne "English") {
 			$output = get($_[0],$namespace,"English");
 		}

@@ -15,6 +15,7 @@ use WebGUI::Operation::Account;
 use WebGUI::Operation::Admin;
 use WebGUI::Operation::Group;
 use WebGUI::Operation::Help;
+use WebGUI::Operation::Package;
 use WebGUI::Operation::Page;
 use WebGUI::Operation::Search;
 use WebGUI::Operation::Settings;

@@ -12,18 +12,18 @@ package WebGUI::SQL;
 
 use CGI::Carp qw(fatalsToBrowser);
 use DBI;
+use Exporter;
 use strict;
 use Tie::IxHash;
 use WebGUI::ErrorHandler;
+use WebGUI::Session;
 
-# Note: This class is really not necessary, I just decided to wrapper DBI in case
-# 	I wanted to change to some other DB connector in the future. Also, it shorthands
-#	a few tasks. And to be honest, having it separated has come in handy a few times,
-#	like when I started coding for databases beyond MySQL.
+our @ISA = qw(Exporter);
+our @EXPORT = qw(&quote &getNextId);
 
 #-------------------------------------------------------------------
 sub array {
-        return $_[0]->{_sth}->fetchrow_array() or WebGUI::ErrorHandler::fatalError(DBI->errstr);
+        return $_[0]->{_sth}->fetchrow_array() or WebGUI::ErrorHandler::fatalError("Couldn't fetch array. ".$_[0]->{_sth}->errstr);
 }
 
 #-------------------------------------------------------------------
@@ -61,8 +61,27 @@ sub finish {
 }
 
 #-------------------------------------------------------------------
+sub getNextId {
+        my ($id);
+        ($id) = WebGUI::SQL->quickArray("select nextValue from incrementer where incrementerId='$_[0]'");
+        WebGUI::SQL->write("update incrementer set nextValue=nextValue+1 where incrementerId='$_[0]'");
+        return $id;
+}
+
+#-------------------------------------------------------------------
 sub hash {
-        return $_[0]->{_sth}->fetchrow_hashref() or WebGUI::ErrorHandler::fatalError(DBI->errstr);
+	my ($hashRef);
+        $hashRef = $_[0]->{_sth}->fetchrow_hashref();
+	if (defined $hashRef) {
+        	return %{$hashRef};
+	} else {
+		return ();
+	}
+}
+
+#-------------------------------------------------------------------
+sub hashRef {
+        return $_[0]->{_sth}->fetchrow_hashref() or WebGUI::ErrorHandler::fatalError("Couldn't fetch hashref. ".$_[0]->{_sth}->errstr);
 }
 
 #-------------------------------------------------------------------
@@ -70,7 +89,7 @@ sub new {
 	my ($class, $sql, $dbh, $sth);
         $class = shift;
         $sql = shift;
-        $dbh = shift;
+        $dbh = shift || $WebGUI::Session::session{dbh};
         $sth = $dbh->prepare($sql) or WebGUI::ErrorHandler::fatalError("Couldn't prepare statement: ".$sql." : ". DBI->errstr);
         $sth->execute or WebGUI::ErrorHandler::fatalError("Couldn't execute statement: ".$sql." : ". DBI->errstr);
 	bless ({_sth => $sth}, $class);
@@ -89,11 +108,17 @@ sub quickArray {
 sub quickHash {
         my ($sth, $data);
         $sth = WebGUI::SQL->new($_[1],$_[2]);
-        $data = $sth->hash;
+        $data = $sth->hashRef;
         $sth->finish;
 	if (defined $data) {
         	return %{$data};
 	}
+}
+
+#-------------------------------------------------------------------
+sub quote {
+        my $value = $_[0]; #had to add this here cuz Tie::CPHash variables cause problems otherwise.
+        return $WebGUI::Session::session{dbh}->quote($value);
 }
 
 #-------------------------------------------------------------------
@@ -116,7 +141,9 @@ sub unconditionalRead {
 
 #-------------------------------------------------------------------
 sub write {
-     	$_[2]->do($_[1]) or WebGUI::ErrorHandler::fatalError("Couldn't prepare statement: ".$_[1]." : ". DBI->errstr);
+	my ($dbh);
+	$dbh = $_[2] || $WebGUI::Session::session{dbh};
+     	$dbh->do($_[1]) or WebGUI::ErrorHandler::fatalError("Couldn't prepare statement: ".$_[1]." : ". DBI->errstr);
 }
 
 

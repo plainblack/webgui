@@ -19,19 +19,28 @@ use WebGUI::International;
 use WebGUI::Macro;
 use WebGUI::Privilege;
 use WebGUI::Session;
+use WebGUI::Shortcut;
 use WebGUI::SQL;
-use WebGUI::Utility;
 use WebGUI::Widget;
 
 #-------------------------------------------------------------------
+sub duplicate {
+        my (%data, $newWidgetId, $pageId);
+        tie %data, 'Tie::CPHash';
+        %data = getProperties($namespace,$_[0]);
+	$pageId = $_[1] || $data{pageId};
+        $newWidgetId = create($pageId,$namespace,$data{title},$data{displayTitle},$data{description},$data{processMacros},$data{position});
+	WebGUI::SQL->write("insert into SyndicatedContent values ($newWidgetId, ".quote($data{rssUrl}).", ".quote($data{content}).", ".quote($data{lastFetched}).")");
+}
+
+#-------------------------------------------------------------------
 sub purge {
-        WebGUI::SQL->write("delete from SyndicatedContent where widgetId=$_[0]",$_[1]);
-        purgeWidget($_[0],$_[1]);
+        purgeWidget($_[0],$_[1],$namespace);
 }
 
 #-------------------------------------------------------------------
 sub widgetName {
-	return WebGUI::International::get(271);
+	return WebGUI::International::get(2,$namespace);
 }
 
 #-------------------------------------------------------------------
@@ -39,20 +48,20 @@ sub www_add {
         my ($output, %hash);
 	tie %hash, 'Tie::IxHash';
       	if (WebGUI::Privilege::canEditPage()) {
-                $output = '<a href="'.$session{page}{url}.'?op=viewHelp&hid=1&namespace='.$namespace.'"><img src="'.$session{setting}{lib}.'/help.gif" border="0" align="right"></a>';
-		$output .= '<h1>'.WebGUI::International::get(272).'</h1>';
-		$output .= '<form method="post" enctype="multipart/form-data" action="'.$session{page}{url}.'">';
+                $output = helpLink(1,$namespace);
+		$output .= '<h1>'.WebGUI::International::get(3,$namespace).'</h1>';
+		$output .= formHeader();
                 $output .= WebGUI::Form::hidden("widget",$namespace);
                 $output .= WebGUI::Form::hidden("func","addSave");
                 $output .= '<table>';
-                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(99).'</td><td>'.WebGUI::Form::text("title",20,128,'Syndicated Content').'</td></tr>';
-                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(174).'</td><td>'.WebGUI::Form::checkbox("displayTitle",1).'</td></tr>';
-                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(175).'</td><td>'.WebGUI::Form::checkbox("processMacros",1).'</td></tr>';
+                $output .= tableFormRow(WebGUI::International::get(99),WebGUI::Form::text("title",20,128,'Syndicated Content'));
+                $output .= tableFormRow(WebGUI::International::get(174),WebGUI::Form::checkbox("displayTitle",1));
+                $output .= tableFormRow(WebGUI::International::get(175),WebGUI::Form::checkbox("processMacros",1));
 		%hash = WebGUI::Widget::getPositions();
-                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(363).'</td><td>'.WebGUI::Form::selectList("position",\%hash).'</td></tr>';
-                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(85).'</td><td>'.WebGUI::Form::textArea("description",'','','',1).'</td></tr>';
-                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(273).'</td><td>'.WebGUI::Form::text("rssUrl",20,2048).'</td></tr>';
-                $output .= '<tr><td></td><td>'.WebGUI::Form::submit(WebGUI::International::get(62)).'</td></tr>';
+                $output .= tableFormRow(WebGUI::International::get(363),WebGUI::Form::selectList("position",\%hash));
+                $output .= tableFormRow(WebGUI::International::get(85),WebGUI::Form::textArea("description",'','','',1));
+                $output .= tableFormRow(WebGUI::International::get(1,$namespace),WebGUI::Form::text("rssUrl",20,2048));
+                $output .= formSave(); 
                 $output .= '</table></form>';
                 return $output;
         } else {
@@ -65,12 +74,22 @@ sub www_add {
 sub www_addSave {
 	my ($widgetId);
 	if (WebGUI::Privilege::canEditPage()) {
-		$widgetId = create();
-		WebGUI::SQL->write("insert into SyndicatedContent values ($widgetId, ".quote($session{form}{rssUrl}).", 'Not yet fetched.', '".time()."')",$session{dbh});
+		$widgetId = create($session{page}{pageId},$session{form}{widget},$session{form}{title},$session{form}{displayTitle},$session{form}{description},$session{form}{processMacros},$session{form}{position});
+		WebGUI::SQL->write("insert into SyndicatedContent values ($widgetId, ".quote($session{form}{rssUrl}).", 'Not yet fetched.', '".time()."')");
 		return "";
 	} else {
 		return WebGUI::Privilege::insufficient();
 	}
+}
+
+#-------------------------------------------------------------------
+sub www_copy {
+        if (WebGUI::Privilege::canEditPage()) {
+                duplicate($session{form}{wid});
+                return "";
+        } else {
+                return WebGUI::Privilege::insufficient();
+        }
 }
 
 #-------------------------------------------------------------------
@@ -79,25 +98,25 @@ sub www_edit {
 	tie %data, 'Tie::CPHash';
 	tie %hash, 'Tie::IxHash';
         if (WebGUI::Privilege::canEditPage()) {
-		%data = WebGUI::SQL->quickHash("select * from widget,SyndicatedContent where widget.widgetId=$session{form}{wid}",$session{dbh});
-                $output = '<a href="'.$session{page}{url}.'?op=viewHelp&hid=1&namespace='.$namespace.'"><img src="'.$session{setting}{lib}.'/help.gif" border="0" align="right"></a>';
-		$output .= '<h1>'.WebGUI::International::get(274).'</h1>';
-		$output .= '<form method="post" enctype="multipart/form-data" action="'.$session{page}{url}.'">';
+		%data = getProperties($namespace,$session{form}{wid});
+                $output = helpLink(1,$namespace);
+		$output .= '<h1>'.WebGUI::International::get(4,$namespace).'</h1>';
+		$output .= formHeader();
                 $output .= WebGUI::Form::hidden("wid",$session{form}{wid});
                 $output .= WebGUI::Form::hidden("func","editSave");
                 $output .= '<table>';
-                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(99).'</td><td>'.WebGUI::Form::text("title",20,128,$data{title}).'</td></tr>';
-                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(174).'</td><td>'.WebGUI::Form::checkbox("displayTitle","1",$data{displayTitle}).'</td></tr>';
-                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(175).'</td><td>'.WebGUI::Form::checkbox("processMacros","1",$data{processMacros}).'</td></tr>';
+                $output .= tableFormRow(WebGUI::International::get(99),WebGUI::Form::text("title",20,128,$data{title}));
+                $output .= tableFormRow(WebGUI::International::get(174),WebGUI::Form::checkbox("displayTitle","1",$data{displayTitle}));
+                $output .= tableFormRow(WebGUI::International::get(175),WebGUI::Form::checkbox("processMacros","1",$data{processMacros}));
 		%hash = WebGUI::Widget::getPositions();
                 $array[0] = $data{position};
-                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(363).'</td><td>'.WebGUI::Form::selectList("position",\%hash,\@array).'</td></tr>';
-                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(85).'</td><td>'.WebGUI::Form::textArea("description",$data{description},50,10,1).'</td></tr>';
-                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(273).'</td><td>'.WebGUI::Form::text("rssUrl",20,2048,$data{rssUrl}).'</td></tr>';
-                $output .= '<tr><td></td><td>'.WebGUI::Form::submit("save").'</td></tr>';
+                $output .= tableFormRow(WebGUI::International::get(363),WebGUI::Form::selectList("position",\%hash,\@array));
+                $output .= tableFormRow(WebGUI::International::get(85),WebGUI::Form::textArea("description",$data{description},50,10,1));
+                $output .= tableFormRow(WebGUI::International::get(1,$namespace),WebGUI::Form::text("rssUrl",20,2048,$data{rssUrl}));
+                $output .= formSave();
 		$output .= '<tr><td><br></td></tr>';
-                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(275).'</td><td>'.WebGUI::DateTime::epochToHuman($data{lastFetched},"%m/%d/%y %h:%n%p").'</td></tr>';
-                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(276).'</td><td>'.$data{content}.'</td></tr>';
+                $output .= tableFormRow(WebGUI::International::get(5,$namespace),WebGUI::DateTime::epochToHuman($data{lastFetched},"%m/%d/%y %h:%n%p"));
+                $output .= tableFormRow(WebGUI::International::get(6,$namespace),$data{content});
                 $output .= '</table></form>';
                 return $output;
         } else {
@@ -109,7 +128,7 @@ sub www_edit {
 sub www_editSave {
         if (WebGUI::Privilege::canEditPage()) {
 		update();
-                WebGUI::SQL->write("update SyndicatedContent set rssUrl=".quote($session{form}{rssUrl})." where widgetId=$session{form}{wid}",$session{dbh});
+                WebGUI::SQL->write("update SyndicatedContent set rssUrl=".quote($session{form}{rssUrl})." where widgetId=$session{form}{wid}");
                 return "";
         } else {
                 return WebGUI::Privilege::insufficient();
@@ -118,10 +137,9 @@ sub www_editSave {
 
 #-------------------------------------------------------------------
 sub www_view {
-	my (%data, $output, $widgetId);
+	my (%data, $output);
 	tie %data, 'Tie::CPHash';
-	$widgetId = shift;
-	%data = WebGUI::SQL->quickHash("select * from widget,SyndicatedContent where widget.widgetId=SyndicatedContent.widgetId and widget.widgetId=$widgetId",$session{dbh});
+	%data = getProperties($namespace,$_[0]);
 	if (defined %data) {
 		if ($data{displayTitle} == 1) {
 			$output = "<h1>".$data{title}."</h1>";

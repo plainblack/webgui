@@ -19,14 +19,12 @@ use WebGUI::SQL;
 sub _recurseCrumbTrail {
         my ($sth, %data, $output);
         tie %data, 'Tie::CPHash';
-        %data = WebGUI::SQL->quickHash("select pageId,parentId,title,urlizedTitle from page where pageId=$_[0]",$session
-{dbh});
+        %data = WebGUI::SQL->quickHash("select pageId,parentId,title,urlizedTitle from page where pageId=$_[0]");
         if ($data{pageId} > 1) {
                 $output .= _recurseCrumbTrail($data{parentId});
         }
         if ($data{title} ne "") {
-                $output .= '<a class="crumbTrail" href="'.$session{env}{SCRIPT_NAME}.'/'.$data{urlizedTitle}.'">'.$data{title}.'</a> &gt; '
-;
+                $output .= '<a class="crumbTrail" href="'.$session{env}{SCRIPT_NAME}.'/'.$data{urlizedTitle}.'">'.$data{title}.'</a> &gt; ';
         }
         return $output;
 }

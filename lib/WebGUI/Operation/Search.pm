@@ -16,6 +16,7 @@ use Tie::IxHash;
 use WebGUI::International;
 use WebGUI::Privilege;
 use WebGUI::Session;
+use WebGUI::Shortcut;
 use WebGUI::SQL;
 use WebGUI::Utility;
 
@@ -26,7 +27,7 @@ our @EXPORT = qw(&www_search);
 sub www_search {
         my ($dataRows, $prevNextBar, $output, %page, @keyword, $pageId, $term, %result, $sth, @data, @row, $i);
 	tie %result,'Tie::IxHash';
-	$output = '<form method="post" action="'.$session{page}{url}.'">';
+	$output = formHeader();
 	$output .= WebGUI::Form::hidden("op","search");
 	$output .= WebGUI::Form::text("keywords",40,100,$session{form}{keywords});
 	$output .= WebGUI::Form::submit(WebGUI::International::get(364));
@@ -34,34 +35,34 @@ sub www_search {
 	if ($session{form}{keywords} ne "") {
 		@keyword = split(" ",$session{form}{keywords});
 		foreach $term (@keyword) {
-			$sth = WebGUI::SQL->read("select pageId from page where title like '%".$term."%' and pageId > 25",$session{dbh});
+			$sth = WebGUI::SQL->read("select pageId from page where title like '%".$term."%' and pageId > 25");
 			while (@data = $sth->array) {
 				$result{$data[0]} += 5;
 			}
 			$sth->finish;
-                        $sth = WebGUI::SQL->read("select pageId from page where metaTags like '%".$term."%' and pageId > 25",$session{dbh});
+                        $sth = WebGUI::SQL->read("select pageId from page where metaTags like '%".$term."%' and pageId > 25");
                         while (@data = $sth->array) {
                                 $result{$data[0]} += 1;
                         }
                         $sth->finish;
-                        $sth = WebGUI::SQL->read("select pageId from widget where title like '%".$term."%' and pageId > 25",$session{dbh});
+                        $sth = WebGUI::SQL->read("select pageId from widget where title like '%".$term."%' and pageId > 25");
                         while (@data = $sth->array) {
                                 $result{$data[0]} += 5;
                         }
                         $sth->finish;
-                        $sth = WebGUI::SQL->read("select pageId from widget where description like '%".$term."%' and pageId > 25",$session{dbh});
+                        $sth = WebGUI::SQL->read("select pageId from widget where description like '%".$term."%' and pageId > 25");
                         while (@data = $sth->array) {
                                 $result{$data[0]} += 2;
                         }
                         $sth->finish;
-                        $sth = WebGUI::SQL->read("select widget.pageId from Article,widget where Article.widgetId=widget.widgetId and Article.body like '%".$term."%'",$session{dbh});
+                        $sth = WebGUI::SQL->read("select widget.pageId from Article,widget where Article.widgetId=widget.widgetId and Article.body like '%".$term."%'");
                         while (@data = $sth->array) {
                                 $result{$data[0]} += 2;
                         }
                         $sth->finish;
 			%result = sortHashDescending(%result);
 			foreach $pageId (keys %result) {
-				%page = WebGUI::SQL->quickHash("select pageId, title, urlizedTitle from page where pageId=$pageId",$session{dbh});
+				%page = WebGUI::SQL->quickHash("select pageId, title, urlizedTitle from page where pageId=$pageId");
 				$row[$i] = '<li><a href="'.$session{ENV}{SCRIPT_NAME}.'/'.$page{urlizedTitle}.'">'.$page{title}.'</a>';
 				$i++;
 			}

@@ -20,11 +20,14 @@ use WebGUI::SQL;
 sub getStyle {
 	my ($header, $footer, @style, %style);
 	if ($session{form}{makePrintable}) {
-		$header = '<html><!-- WebGUI '.$session{wg}{version}.' --><title>'.$session{page}{title}.'</title><body>';
-		$footer = '</body></html>'; 
+		%style = WebGUI::SQL->quickHash("select header,footer,styleSheet from style where styleId=3");
+		$header = '<html><!-- WebGUI '.$session{wg}{version}.' -->'."\n";
+		$header .= '<head><title>'.$session{page}{title}.'</title>';
+		$header .= $style{styleSheet}.'</head>'.$style{header};
+		$footer = $style{footer}.'</html>'; 
 	} else {
 		tie %style, 'Tie::CPHash';
-		%style = WebGUI::SQL->quickHash("select header,footer,styleSheet from style where styleId=$session{page}{styleId}",$session{dbh});
+		%style = WebGUI::SQL->quickHash("select header,footer,styleSheet from style where styleId=$session{page}{styleId}");
 		$header = '<!-- WebGUI '.$WebGUI::VERSION.' -->
 			<html>
 			<head>
@@ -37,9 +40,9 @@ sub getStyle {
 		$header .= '</head>'.$style{header};
 		$footer = $style{footer}.'
 			</html>';
-		$header = WebGUI::Macro::process($header);
-		$footer = WebGUI::Macro::process($footer);
 	}
+	$header = WebGUI::Macro::process($header);
+	$footer = WebGUI::Macro::process($footer);
 	return ($header, $footer);
 }
 
