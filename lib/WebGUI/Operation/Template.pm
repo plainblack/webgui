@@ -130,9 +130,13 @@ sub www_editTemplate {
 sub www_editTemplateSave {
         if (WebGUI::Privilege::isInGroup($session{setting}{templateManagersGroup})) {
 		if ($session{form}{tid} eq "new") {
-			($session{form}{tid}) = WebGUI::SQL->quickArray("select max(internationalId) 
-				from international where namespace=".quote($session{form}{namespace}));
-			$session{form}{tid}++;
+			($session{form}{tid}) = WebGUI::SQL->quickArray("select max(templateId) 
+				from template where namespace=".quote($session{form}{namespace}));
+			if ($session{form}{tid} > 999) {
+				$session{form}{tid}++;
+			} else {
+				$session{form}{tid} = 1000;
+			}
 			WebGUI::SQL->write("insert into template (templateId,namespace) values 
 				($session{form}{tid}, ".quote($session{form}{namespace}).")");
 		}
