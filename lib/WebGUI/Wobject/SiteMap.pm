@@ -65,7 +65,8 @@ sub duplicate {
                 startAtThisLevel=>$_[0]->get("startAtThisLevel"),
                 indent=>$_[0]->get("indent"),
                 bullet=>$_[0]->get("bullet"),
-                lineSpacing=>$_[0]->get("displaySynopsis"),
+                lineSpacing=>$_[0]->get("lineSpacing"),
+                displaySynopsis=>$_[0]->get("displaySynopsis"),
                 depth=>$_[0]->get("depth")
                 });
 }
@@ -81,7 +82,7 @@ sub new {
 
 #-------------------------------------------------------------------
 sub set {
-        $_[0]->SUPER::set($_[1],[qw(startAtThisLevel indent bullet lineSpacing depth)]);
+        $_[0]->SUPER::set($_[1],[qw(startAtThisLevel displaySynopsis indent bullet lineSpacing depth)]);
 }
 
 #-------------------------------------------------------------------
