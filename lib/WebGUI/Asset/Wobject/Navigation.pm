@@ -15,6 +15,7 @@ use Tie::IxHash;
 use WebGUI::Asset::Wobject;
 use WebGUI::ErrorHandler;
 use WebGUI::Form;
+use WebGUI::Icon;
 use WebGUI::International;
 use WebGUI::Privilege;
 use WebGUI::Session;
@@ -27,6 +28,7 @@ our @ISA = qw(WebGUI::Asset::Wobject);
 
 
 
+#-------------------------------------------------------------------
 sub definition {
 	my $class = shift;
 	my $definition = shift;
@@ -71,6 +73,7 @@ sub definition {
         return $class->SUPER::definition($definition);
 }
 
+#-------------------------------------------------------------------
 sub getEditForm {
 	my $self = shift;
 	my $tabform = $self->SUPER::getEditForm;
@@ -211,6 +214,7 @@ sub getEditForm {
 	return $tabform;
 }
 
+#-------------------------------------------------------------------
 sub getIcon {
 	my $self = shift;
 	my $small = shift;
@@ -218,11 +222,32 @@ sub getIcon {
 	return $session{config}{extrasURL}.'/assets/navigation.gif';
 }
 
+#-------------------------------------------------------------------
 sub getName {
 	return WebGUI::International::get("navigation","Navigation");
 }
 
 
+#-------------------------------------------------------------------
+
+=head2 getToolbar ( )
+
+Returns a toolbar with a set of icons that hyperlink to functions that delete, edit, promote, demote, cut, and copy.
+
+=cut
+
+sub getToolbar {
+	my $self = shift;
+	if ($self->getToolbarState) {
+		my $toolbar = editIcon('func=edit',$self->get("url"));
+		return '<img src="'.$self->getIcon(1).'" border="0" title="'.$self->getName.'" alt="'.$self->getName.'" align="absmiddle">'.$toolbar;
+	}
+	return $self->SUPER::getToolbar();
+}
+
+
+
+#-------------------------------------------------------------------
 sub view {
 	my $self = shift;
 	# we've got to determine what our start point is based upon user conditions
@@ -354,6 +379,7 @@ sub view {
 }
 
 
+#-------------------------------------------------------------------
 sub www_edit {
         my $self = shift;
 	return WebGUI::Privilege::insufficient() unless $self->canEdit;

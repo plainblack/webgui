@@ -225,7 +225,7 @@ sub www_viewProfile {
 	$u = WebGUI::User->new($session{form}{uid});
     $vars->{displayTitle} = '<h1>'.WebGUI::International::get(347).' '.$u->username.'</h1>';
 	return WebGUI::Privilege::notMember() if($u->username eq "");
-	return $vars->{displayTitle}.WebGUI::International::get(862) if($u->profileField("publicProfile") < 1 && ($session{user}{userId} ne $session{form}{uid} || WebGUI::Grouping::isInGroup(3)));
+	return WebGUI::Operation::Shared::userStyle($vars->{displayTitle}.WebGUI::International::get(862)) if($u->profileField("publicProfile") < 1 && ($session{user}{userId} ne $session{form}{uid} || WebGUI::Grouping::isInGroup(3)));
 	return WebGUI::Privilege::insufficient() if(!WebGUI::Grouping::isInGroup(2));
     $a = WebGUI::SQL->read("select * from userProfileField,userProfileCategory where userProfileField.profileCategoryId=userProfileCategory.profileCategoryId
 		and userProfileCategory.visible=1 and userProfileField.visible=1 order by userProfileCategory.sequenceNumber,

@@ -88,13 +88,6 @@ sub definition {
 
 
 
-#-------------------------------------------------------------------
-sub duplicate {
-	my $self = shift;
-	return $self->getParent->duplicateTree($self);
-}
-
-
 
 #-------------------------------------------------------------------
 sub getEditForm {
@@ -308,8 +301,8 @@ sub view {
 
 		foreach my $event (@{$children}) {
 			if (ref $event eq "WebGUI::Asset::Event") {
-				my $eventStartDate = $event->getValue("eventStartDate");
-				my $eventEndDate = $event->getValue("eventEndDate");
+				my $eventStartDate = $event->get("eventStartDate");
+				my $eventEndDate = $event->get("eventEndDate");
 				if ($eventStartDate > $eventEndDate) {
 					#Fix bad data.  Everything that has a beginning must have an end [no earlier than its beginning].
 					$event->update({ "eventEndDate"=>$eventStartDate });
@@ -348,8 +341,8 @@ sub view {
 					#Now also test to see if we're at the maxDate yet and after the minDate.
 					if (($date[1] == $thisMonthDate[1])  && (WebGUI::DateTime::addToDate($eventStartDate,0,0,$i) <= ($maxDate + 2678400))){
 						push(@{$events{$date[2]}}, {
-							description=>$event->getValue("description"),
-							name=>$event->getValue("title"),
+							description=>$event->get("description"),
+							name=>$event->get("title"),
 							'start.date.human'=>$startDate,
 							'start.time.human'=>$startTime." ".$startAmPm,
 							'start.date.epoch'=>$eventStartDate,

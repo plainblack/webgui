@@ -7,6 +7,13 @@
  - fix [ 1160034 ] 6.5.0 - newly added posts do not appear
  - fix [ 1027992 ] pagination in forum doesn't take you to correct page
  - fix [ 1149585 ] visitor as admin
+ - Fixed a bug where the wrong toolbar was displayed for AssetProxied
+   Navigation assets.
+ - fix [ 1165010 ] Navigation Display title gets reset
+ - fix [ 1159992 ] Integer value zero not returned in form fields
+ - fix [ 1165425 ] View Userprofile - Style is missing for non-public profiles
+ - fix [ 1165434 ] View Userprofile - Perm. denied page not parsed for macros
+ - fix [ 1138654 ] 6.3 CVS - raw form parameter not processed
 
 
 6.5.2

@@ -13,6 +13,7 @@ package WebGUI::Asset::Event;
 use strict;
 use Tie::CPHash;
 use WebGUI::DateTime;
+use WebGUI::Form;
 use WebGUI::Grouping;
 use WebGUI::HTML;
 use WebGUI::HTMLForm;
@@ -160,7 +161,6 @@ sub definition {
 #-------------------------------------------------------------------
 sub getEditForm {
 	my $self = shift;
-	
 	my $tabform = $self->SUPER::getEditForm();
 	#return $tabform;
 	$tabform->getTab("properties")->HTMLArea(
@@ -253,14 +253,21 @@ sub getEditForm {
 			'month'=>WebGUI::International::get(702,"EventsCalendar"),
 			'year'=>WebGUI::International::get(703,"EventsCalendar"),
 		);
-		$tabform->getTab("properties")->raw(
-			'<tr><td class="formdescription" valign="top">'.WebGUI::International::get(8,"EventsCalendar").'</td><td class="tableData">'
-		);
-		$tabform->getTab("properties")->integer("interval","",1,"","","",3);
-		$tabform->getTab("properties")->selectList("recursEvery",\%recursEvery);
-		$tabform->getTab("properties")->raw('<tr><td class="formdescription" valign="top">'.WebGUI::International::get(9,"EventsCalendar").'</td><td class="tableData">');
-		$tabform->getTab("properties")->date("until");
-		$tabform->getTab("properties")->raw("</td><tr>");
+		$tabform->getTab("properties")->readOnly(
+			-label=>WebGUI::International::get(8,"EventsCalendar"),
+			-value=>WebGUI::Form::integer({
+				name=>"interval",
+				defaultValue=>1
+				})
+				.WebGUI::Form::selectList({
+					name=>"recursEvery",
+					options=>\%recursEvery
+					})
+				.' '.WebGUI::International::get(9,"EventsCalendar").' '
+				.WebGUI::Form::date({
+					name=>"until"
+					})
+			);
 	}
 #	$tabform->getTab("display")->template(
 #    -name=>"confirmationTemplateId",
@@ -319,6 +326,47 @@ sub getIcon {
 #-------------------------------------------------------------------
 sub getName {
         return WebGUI::International::get(511,"EventsCalendar");
+}
+
+
+#-------------------------------------------------------------------
+sub processPropertiesFromFormPost {
+	my $self = shift;
+	$self->SUPER::processPropertiesFromFormPost;
+	if ($session{form}{assetId} eq "new") {
+		$self->update({eventEndDate=>$self->get("eventStartDate")}) unless ($self->get("eventEndDate") >= $self->get("eventStartDate"));
+		if ($session{form}{recursEvery} ne "never") {
+			my $until = WebGUI::DateTime::setToEpoch($session{form}{until});
+			$until = $self->get("eventEndDate") unless ($until >= $self->get("eventEndDate"));
+			my $interval = ($session{form}{interval} < 1) ? 1 : $session{form}{interval};
+			my $recurringEventId = WebGUI::Id::generate();
+			$self->update({EventsCalendar_recurringId=>$recurringEventId});
+			my $start = $self->get("eventStartDate");
+			my $end = $self->get("eventEndDate");
+			my $i = 0;
+			while ($start < $until) {
+				$i++;
+				if ($session{form}{recursEvery} eq "day") {
+					$start = WebGUI::DateTime::addToDate($self->get("eventStartDate"),0,0,($i*$interval));
+					$end = WebGUI::DateTime::addToDate($self->get("eventEndDate"),0,0,($i*$interval));
+				} elsif ($session{form}{recursEvery} eq "week") {
+					$start = WebGUI::DateTime::addToDate($self->get("eventStartDate"),0,0,(7*$i*$interval));
+					$end = WebGUI::DateTime::addToDate($self->get("eventEndDate"),0,0,(7*$i*$interval));
+				} elsif ($session{form}{recursEvery} eq "month") {
+					$start = WebGUI::DateTime::addToDate($self->get("eventStartDate"),0,($i*$interval),0);
+					$end = WebGUI::DateTime::addToDate($self->get("eventEndDate"),0,($i*$interval),0);
+				} elsif ($session{form}{recursEvery} eq "year") {
+					$start = WebGUI::DateTime::addToDate($self->get("eventStartDate"),($i*$interval),0,0);
+					$end = WebGUI::DateTime::addToDate($self->get("eventEndDate"),($i*$interval),0,0);
+				}
+				my $newEvent = $self->getParent->duplicate($self);
+				$newEvent->update({
+					eventStartDate=>$start,
+					eventEndDate=>$end
+					});
+			}
+		}
+	}
 }
 
 
@@ -413,108 +461,6 @@ sub www_edit {
 	return $self->getAdminConsole->render($self->getEditForm->print,WebGUI::International::get('13', 'EventsCalendar'));
 }
 
-
-#-------------------------------------------------------------------
-
-=head2 www_editSave ( )
-
-Saves the event or a new (series of) event(s).
-
-=cut
-
-sub www_editSave {
-	my $self = shift;
-	my $object = $self;
-	# Somebody please help me debug this... it was adding recurring events just fine; then 
-	# I changed something and it stopped working... :(  I suspect it has something to do 
-	# with processPropertiesFromFormPost.  It's as if $session{form}{recursEvery} always equals never.	
-	
-	if ($session{form}{assetId} eq "new") {
-		$self = $self->getParent() if ($self->getValue("className") eq "WebGUI::Asset::Event");
-		return WebGUI::Privilege::insufficient() unless ($self->canEdit);
-		my (@startDate, @endDate, @regStartDate, @regEndDate, @reminderStartDate, 
-		@reminderEndDate, $until, @eventId, $i, $recurringEventId);
-		$startDate[0] = WebGUI::DateTime::setToEpoch($session{form}{eventStartDate});
-		$startDate[0] = time() unless ($startDate[0] > 0);
-		$endDate[0] = WebGUI::DateTime::setToEpoch($session{form}{eventEndDate});
-		$endDate[0] = $startDate[0] unless ($endDate[0] >= $startDate[0]);
-#		$regStartDate[0] = WebGUI::DateTime::setToEpoch($session{form}{regStartDate});
-#		$regEndDate[0] = WebGUI::DateTime::setToEpoch($session{form}{regStartDate});
-#		$regEndDate[0] = $regStartDate[0] unless ($regEndDate[0] >= $regStartDate[0]);
-#		$reminderStartDate[0] = WebGUI::DateTime::setToEpoch($session{form}{reminderStartDate});
-#		$reminderEndDate[0] = WebGUI::DateTime::setToEpoch($session{form}{reminderStartDate});
-#		$reminderEndDate[0] = $reminderStartDate[0] unless ($reminderEndDate[0] >= $reminderStartDate[0]);
-		$session{form}{title} = $session{form}{title} || WebGUI::International::get(557,"EventsCalendar");
-		$until = WebGUI::DateTime::setToEpoch($session{form}{until});
-		$until = $endDate[0] unless ($until >= $endDate[0]);
-		$eventId[0] = WebGUI::Id::generate();
-		$session{form}{interval} = 1 if ($session{form}{interval} < 1);
-		if ($session{form}{recursEvery} eq "never") {
-			$recurringEventId = 0;
-			my $newEvent = $self->addChild({
-				className=>"WebGUI::Asset::Event",
-				title=>$session{form}{title},
-				description=>$session{form}{description},
-				EventsCalendar_recurringId=>$recurringEventId
-			});
-			$newEvent->processPropertiesFromFormPost;
-			$newEvent->updateHistory("edited");
-			$newEvent->{_parent} = $self;
-		} else {
-			$recurringEventId = WebGUI::Id::generate();
-			my $firstEvent = $self->addChild({
-				className=>"WebGUI::Asset::Event",
-				title=>$session{form}{title},
-				eventStartDate=>$startDate[0],
-				eventEndDate=>$endDate[0],
-				description=>$session{form}{description},
-				EventsCalendar_recurringId=>$recurringEventId,
-				eventLocation=>$session{form}{description},
-				templateId=>$self->getValue("eventTemplateId")
-			});
-			$firstEvent->processPropertiesFromFormPost;
-			$firstEvent->updateHistory("edited");
-			$firstEvent->{_parent} = $self;
-			while ($startDate[$i] < $until) {
-				$i++;
-				$eventId[$i] = WebGUI::Id::generate();
-				if ($session{form}{recursEvery} eq "day") {
-					$startDate[$i] = addToDate($startDate[0],0,0,($i*$session{form}{interval}));
-					$endDate[$i] = addToDate($endDate[0],0,0,($i*$session{form}{interval}));
-				} elsif ($session{form}{recursEvery} eq "week") {
-					$startDate[$i] = addToDate($startDate[0],0,0,(7*$i*$session{form}{interval}));
-					$endDate[$i] = addToDate($endDate[0],0,0,(7*$i*$session{form}{interval}));
-				} elsif ($session{form}{recursEvery} eq "month") {
-					$startDate[$i] = addToDate($startDate[0],0,($i*$session{form}{interval}),0);
-					$endDate[$i] = addToDate($endDate[0],0,($i*$session{form}{interval}),0);
-				} elsif ($session{form}{recursEvery} eq "year") {
-					$startDate[$i] = addToDate($startDate[0],($i*$session{form}{interval}),0,0);
-					$endDate[$i] = addToDate($endDate[0],($i*$session{form}{interval}),0,0);
-				}
-				my $newEvent = $self->duplicate($firstEvent);
-				$newEvent->update({
-					eventStartDate=>$startDate[$i],
-					eventEndDate=>$endDate[$i]
-				});
-				print "\n$i\n";
-				$newEvent->fixUrl;
-				$newEvent->updateHistory("edited");
-				$newEvent->{_parent} = $self;
-			}
-		}
-	} else {
-		return $self->getAdminConsole->render(WebGUI::Privilege::insufficient()) unless ($self->canEdit);
-		$self->processPropertiesFromFormPost;
-		$self->updateHistory("edited");
-	}
-	return $self->www_manageAssets if ($session{form}{proceed} eq "manageAssets" && $session{form}{assetId} eq "new");
-	if ($session{form}{proceed} ne "") {
-		my $method = "www_".$session{form}{proceed};
-		$session{asset} = $object;
-		return $object->$method();
-	}
-	return (($self->getParent)->getContainer)->www_view;
-}
 
 
 

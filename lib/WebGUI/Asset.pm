@@ -480,7 +480,7 @@ sub duplicate {
 	my $self = shift;
 	my $assetToDuplicate = shift || $self;
 	my $newAsset = $self->addChild($assetToDuplicate->get);
-        my $sth = WebGUI::SQL->read("select * from metaData_values where assetId = ".quote($self->getId));
+        my $sth = WebGUI::SQL->read("select * from metaData_values where assetId = ".quote($assetToDuplicate->getId));
         while( my $h = $sth->hashRef) {
 		WebGUI::SQL->write("insert into metaData_values (fieldId, assetId, value) values (".
 					quote($h->{fieldId}).",".quote($newAsset->getId).",".quote($h->{value}).")");
@@ -1527,7 +1527,6 @@ Returns a toolbar with a set of icons that hyperlink to functions that delete, e
 
 sub getToolbar {
 	my $self = shift;
-	return undef if ($self->{_toolbarOff});
 	my $toolbar = deleteIcon('func=delete',$self->get("url"),WebGUI::International::get(43,"Asset"))
               	.editIcon('func=edit',$self->get("url"))
              	.moveUpIcon('func=promote',$self->get("url"))
@@ -1539,6 +1538,20 @@ sub getToolbar {
         $toolbar .= shortcutIcon('func=createShortcut',$self->get("url")) unless ($self->get("className") =~ /Shortcut/);
 	return '<img src="'.$self->getIcon(1).'" border="0" title="'.$self->getName.'" alt="'.$self->getName.'" align="absmiddle">'.$toolbar;
 }
+
+#-------------------------------------------------------------------
+
+=head2 getToolbarState ( )
+
+Returns 0 if the state is normal, and 1 if the toolbar state has been toggled. See toggleToolbar() for details.
+
+=cut
+
+sub getToolbarState {
+	my $self = shift;
+	return $self->{_toolbarState};
+}
+
 
 #-------------------------------------------------------------------
 
@@ -1602,7 +1615,10 @@ sub getValue {
 			}
 			$self->{_propertyDefinitions} = \%properties;
 		}
-		return $session{form}{$key} || $self->get($key) || $self->{_propertyDefinitions}{$key}{defaultValue};
+		return $session{form}{$key} if (exists $session{form}{$key});
+		my $storedValue = $self->get($key);
+		return $storedValue if (defined $storedValue);
+		return $self->{_propertyDefinitions}{$key}{defaultValue};
 	}
 	return undef;
 }
@@ -2152,16 +2168,16 @@ sub trash {
 
 =head2 toggleToolbar ( ) 
 
-Toggles whether to render a toolbar in an asset. This is mostly useful for macros that wish to proxy an asset but not display the toolbar.
+Toggles a toolbar to a special state so that custom toolbars can be rendered under special circumstances. This is mostly useful for macros that wish to proxy an asset but not display the toolbar.
 
 =cut
 
 sub toggleToolbar {
 	my $self = shift;
-	if ($self->{_toolbarOff}) {
-		$self->{_toolbarOff} = 0;
+	if ($self->{_toolbarState}) {
+		$self->{_toolbarState} = 0;
 	} else {
-		$self->{_toolbarOff} = 1;
+		$self->{_toolbarState} = 1;
 	}
 }
 

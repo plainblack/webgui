@@ -4288,7 +4288,7 @@ A randomly generated number. This is often used on images (such as banner ads) t
 	},
 
 	'38' => {
-		message => q|You do not have sufficient privileges to perform this operation. Please &#94;a(log in with an account); that has sufficient privileges before attempting this operation.|,
+		message => q|You do not have sufficient privileges to perform this operation. Please ^a(log in with an account); that has sufficient privileges before attempting this operation.|,
 		lastUpdated => 1031514049
 	},
 
