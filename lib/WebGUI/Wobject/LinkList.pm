@@ -110,7 +110,7 @@ sub www_deleteLinkConfirm {
         if (WebGUI::Privilege::canEditPage()) {
 		WebGUI::SQL->write("delete from LinkList_link where linkId=$session{form}{lid}");
 		_reorderLinks($session{form}{wid});
-                return $_[0]->www_edit();
+                return "";
         } else {
                 return WebGUI::Privilege::insufficient();
         }
@@ -118,7 +118,7 @@ sub www_deleteLinkConfirm {
 
 #-------------------------------------------------------------------
 sub www_edit {
-        my ($proceed, $f, $output, @link, $sth, $indent, $lineSpacing, $bullet);
+        my ($proceed, $f, $output, $indent, $lineSpacing, $bullet);
         if (WebGUI::Privilege::canEditPage()) {
                 if ($_[0]->get("wobjectId") eq "new") {
                         $proceed = 1;
@@ -134,20 +134,6 @@ sub www_edit {
                 $f->text("bullet",WebGUI::International::get(4,$namespace),$bullet);
 		$f->yesNo("proceed",WebGUI::International::get(5,$namespace),$proceed);
 		$output .= $_[0]->SUPER::www_edit($f->printRowsOnly);
-		unless ($_[0]->get("wobjectId") eq "new") {
-                	$output .= '<p><a href="'.WebGUI::URL::page('func=editLink&lid=new&wid='.$_[0]->get("wobjectId"))
-				.'">'.WebGUI::International::get(13,$namespace).'</a><p>';
-			$sth = WebGUI::SQL->read("select linkId, name from LinkList_link where wobjectId='$session{form}{wid}' order by sequenceNumber");
-			while (@link = $sth->array) {
-                		$output .= '<p>'
-					.deleteIcon('func=deleteLink&wid='.$session{form}{wid}.'&lid='.$link[0])
-					.editIcon('func=editLink&wid='.$session{form}{wid}.'&lid='.$link[0])
-					.moveUpIcon('func=moveLinkUp&wid='.$session{form}{wid}.'&lid='.$link[0])
-					.moveDownIcon('func=moveLinkDown&wid='.$session{form}{wid}.'&lid='.$link[0])
-					.' '.$link[1].'<br>';
-			}
-			$sth->finish;
-		}
                 return $output;
         } else {
                 return WebGUI::Privilege::insufficient();
@@ -221,7 +207,7 @@ sub www_editLinkSave {
 			$session{form}{lid} = "new";
                         $_[0]->www_editLink();
                 } else {
-                        return $_[0]->www_edit();
+                        return "";
                 }
         } else {
                 return WebGUI::Privilege::insufficient();
@@ -238,7 +224,7 @@ sub www_moveLinkDown {
                         WebGUI::SQL->write("update LinkList_link set sequenceNumber=sequenceNumber+1 where linkId=$session{form}{lid}");
                         WebGUI::SQL->write("update LinkList_link set sequenceNumber=sequenceNumber-1 where linkId=$data[0]");
                 }
-                return $_[0]->www_edit();
+                return "";
         } else {
                 return WebGUI::Privilege::insufficient();
         }
@@ -254,7 +240,7 @@ sub www_moveLinkUp {
                         WebGUI::SQL->write("update LinkList_link set sequenceNumber=sequenceNumber-1 where linkId=$session{form}{lid}");
                         WebGUI::SQL->write("update LinkList_link set sequenceNumber=sequenceNumber+1 where linkId=$data[0]");
                 }
-                return $_[0]->www_edit();
+                return "";
         } else {
                 return WebGUI::Privilege::insufficient();
         }
@@ -262,32 +248,44 @@ sub www_moveLinkUp {
 
 #-------------------------------------------------------------------
 sub www_view {
-	my ($i, $indent, $lineSpacing, @link, $output, $sth);
+	my ($i, $indent, $lineSpacing, %link, $output, $sth);
+	tie %link,'Tie::CPHash';
         $output = $_[0]->displayTitle;
         $output .= $_[0]->description;
+	if ($session{var}{adminOn}) {
+		$output .= '<p><a href="'.WebGUI::URL::page('func=editLink&lid=new&wid='.$_[0]->get("wobjectId"))
+			.'">'.WebGUI::International::get(13,$namespace).'</a><p>';
+	}
 	for ($i=0;$i<$_[0]->get("indent");$i++) {
 		$indent .= "&nbsp;";
 	}
         for ($i=0;$i<$_[0]->get("lineSpacing");$i++) {
                 $lineSpacing .= "<br>";
         }
-	$sth = WebGUI::SQL->read("select name, url, description, newWindow from LinkList_link where wobjectId=".$_[0]->get("wobjectId")." order by sequenceNumber");
-	while (@link = $sth->array) {
-		$output .= $indent.$_[0]->get("bullet").'<a href="'.$link[1].'"';
-		if ($link[3]) {
+	$sth = WebGUI::SQL->read("select * from LinkList_link where wobjectId=".$_[0]->get("wobjectId")." order by sequenceNumber");
+	while (%link = $sth->hash) {
+		if ($session{var}{adminOn}) {
+			$output .= deleteIcon('func=deleteLink&wid='.$_[0]->get("wobjectId").'&lid='.$link{linkId})
+			.editIcon('func=editLink&wid='.$_[0]->get("wobjectId").'&lid='.$link{linkId})
+			.moveUpIcon('func=moveLinkUp&wid='.$_[0]->get("wobjectId").'&lid='.$link{linkId})
+			.moveDownIcon('func=moveLinkDown&wid='.$_[0]->get("wobjectId").'&lid='.$link{linkId})
+			.' ';
+		} else {
+			$output .= $indent.$_[0]->get("bullet");
+		}
+		$output .= '<a href="'.$link{url}.'"';
+		if ($link{newWindow}) {
 			$output .= ' target="_blank"';
 		}
-		$output .= '><span class="linkTitle">'.$link[0].'</span></a>';
-		if ($link[2] ne "") {
-			$output .= ' - '.$link[2];
+		$output .= '><span class="linkTitle">'.$link{name}.'</span></a>';
+		if ($link{description} ne "") {
+			$output .= ' - '.$link{description};
 		}
 		$output .= $lineSpacing;
 	}
 	$sth->finish;
 	return $_[0]->processMacros($output);
 }
-
-
 
 
 1;
