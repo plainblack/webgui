@@ -62,9 +62,15 @@ sub www_deleteTemplate {
 
 #-------------------------------------------------------------------
 sub www_deleteTemplateConfirm {
+	my ($a, $pageId);
         if ($session{form}{tid} < 1000 && $session{form}{tid} > 1000) {
 		return WebGUI::Privilege::vitalComponent();
         } elsif (WebGUI::Privilege::isInGroup(8)) {
+		$a = WebGUI::SQL->read("select * from page where templateId=".$session{form}{tid});
+		while (($pageId) = $a->array) {
+			WebGUI::SQL->write("update wobject set templatePosition=0 where pageId=$pageId");
+		}
+		$a->finish;
                 WebGUI::SQL->write("delete from template where templateId=".$session{form}{tid});
                 WebGUI::SQL->write("update page set templateId=2 where templateId=".$session{form}{tid});
                 return www_listTemplates();
@@ -89,7 +95,7 @@ sub www_editTemplate {
                 $f->hidden("op","editTemplateSave");
                 $f->hidden("tid",$session{form}{tid});
 		$f->readOnly($session{form}{tid},WebGUI::International::get(503));
-                $f->text("name",WebGUI::International::get(151),$template{name});
+                $f->text("name",WebGUI::International::get(528),$template{name});
                 $f->HTMLArea("template",WebGUI::International::get(504),$template{template},'','','',(5+$session{setting}{textAreaRows}));
                 $f->submit;
 		$output .= $f->print;
