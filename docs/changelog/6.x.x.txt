@@ -1,5 +1,6 @@
 6.0.3
  - Fixed a recursive style change bug.
+ - Bugfix [ 953593 ] perl -MWebGUI -e "" fails
 
 
 6.0.2

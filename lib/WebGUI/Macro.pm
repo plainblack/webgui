@@ -45,7 +45,7 @@ These functions are available from this package:
 =cut
 
 
-
+our $parenthesis;
 our $nestedMacro = qr /(\^                     # Start with carat
                      ([^\^;()]+)            # And one or more none-macro characters -tagged-
                      ((?:                   # Followed by
@@ -57,7 +57,7 @@ our $nestedMacro = qr /(\^                     # Start with carat
 
 
 
-our $parenthesis = qr /\(                      # Start with '(',
+$parenthesis = qr /\(                      # Start with '(',
                      (?:                     # Followed by
                      (?>[^()]+)              # Non-parenthesis
                      |(??{ $parenthesis })   # Or a balanced parenthesis block
