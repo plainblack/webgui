@@ -2138,10 +2138,6 @@ The left column label for this form row.
 
 The namespace (or type) of templates to show in this list. 
 
-=head3 afterEdit
-
-A URL that will be acted upon after editing a template. Typically there is a link next to the select list that reads "Edit this template" and this is the URL to go to after editing is complete.
-
 =head3 extras
 
 If you want to add anything special to this form element like javascript actions, or stylesheet information, you'd add it in here as follows:
@@ -2171,11 +2167,12 @@ sub template {
 		$label = $label || WebGUI::International::get(356);
 		my $template = WebGUI::Asset->newByDynamicClass($value);
 		if (defined $template && $template->canEdit) {
-        	#	if ($afterEdit) {
-                		$buttons = editIcon("func=edit",$template->get("url"));
-				#"&namespace=".$namespace."&afterEdit=".WebGUI::URL::escape($afterEdit));
-        	#	}
-        		$buttons .= manageIcon("func=manage",$template->get("url"));
+			my $returnUrl;
+			if (exists $session{asset}) {
+				$returnUrl = "&proceed=goBackToPage&returnUrl=".WebGUI::URL::escape($session{asset}->getUrl);
+			}
+                	$buttons = editIcon("func=edit".$returnUrl,$template->get("url"));
+        		$buttons .= manageIcon("",$template->getParent->get("url"));
 		}
         	$output = WebGUI::Form::template({
                 	"name"=>$name,

@@ -757,31 +757,6 @@ sub recalculateRating {
 
 #-------------------------------------------------------------------
 
-=head2 setLastPost ( lastPostDate, lastPostId )
-
-Sets the pertinent details for the last post. Can also be done directly using the set method.
-
-=head3 lastPostDate
-
-The epoch date of the post.
-
-=head3 lastPostId
-
-The asset id of the post.
-
-=cut
-
-sub setLastPost {
-        my ($self, $postDate, $postId) = @_;
-        $self->update({
-                lastPostId=>$postId,
-                lastPostDate=>$postDate
-                });
-}
-
-
-#-------------------------------------------------------------------
-
 =head2 subscribe ( )
 
 Subscribes a user to this collaboration system.

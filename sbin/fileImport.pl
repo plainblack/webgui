@@ -46,6 +46,7 @@ my $override;
 my $quiet;
 my $webUser = 'apache';
 my $assetId;
+my $parentAssetId;
 
 GetOptions(
 	'configFile=s'=>\$configFile,
@@ -57,7 +58,7 @@ GetOptions(
 	'pathToFiles=s'=>\$pathToFiles,
         'quiet'=>\$quiet,
 	'webUser=s'=>\$webUser,
-	'parentAssetId=s'=>\$parrentAssetId
+	'parentAssetId=s'=>\$parentAssetId
 );
 
 
@@ -138,7 +139,11 @@ sub addFiles {
 		foreach my $file (@{$filelist}) {
         		print "\tAdding ".$file->{filename}." to the database.\n" unless ($quiet);
 			my $class = 'WebGUI::Asset::File';
-			$class = 'WebGUI::Asset::File::Image' if (isIn($file->{ext},@nailable));
+			my $templateId = 'PBtmpl0000000000000024';
+			if (isIn($file->{ext},@nailable)) {
+				$class = 'WebGUI::Asset::File::Image';
+				$templateId = 'PBtmpl0000000000000088'
+			}
 			my $url = $parent->getUrl.'/'.$file->{filename};
 			my $storage = WebGUI::Storage->create;
 			my $filename = $storage->addFileFromFilesystem($pathToFiles.$session{os}{slash}.$file->{filename});
@@ -148,9 +153,12 @@ sub addFiles {
 				menuTitle=>$filename,
 				filename=>$filename,
 				storageId=>$storage->getId,
+				isHidden=>1,
 				url=>$url,
 				groupIdView=>$groupToView,
 				groupIdEdit=>$groupToEdit,
+				templateId=>$templateId,
+				endDate=>32472169200,
 				ownerUserId=>$owner
 				});
 			$newAsset->generateThumbnail if ($class eq 'WebGUI::Asset::File::Image');
@@ -192,7 +200,6 @@ sub buildFileList {
                                 $filename = $1;
                                 $ext = $2;
 				push(@filelist,{ext=>$ext, filename=>$file});
-                                $filelist{$filename}{$ext} = $file;
                                 print "Found file $file.\n" unless ($quiet);
                         }
                 }

@@ -13,6 +13,12 @@
  - fix [ 1167937 ] Asset Manager and No-Cache Imcompatible
  - fix [ 1167917 ] Link to Page Tree and No-Cache Imcompatible
  - fix [ 1168084 ] file uploads don't work.
+ - fix [ 1169239 ] Manage subscription codes -> Delete Selected -> Empty page
+ - fix [ 1169246 ] Manage subscription codes -> Cannot select single day
+ - fix [ 1169271 ] Last Post incorrect
+ - The items listed under new content are now in alphabetical order as they
+   should be.
+ - Fixed some template problems with the folder asset and the failsafe style.
  - fix [ 1167720 ] Folder::view() subfolder_loop - missing.. [mwilson]
  - fix [ 1169379 ] eventscalendar wobjects have wrong scope after upgrade
  - fix [ 1168812 ] navigation sometimes fails to use correct... [mwilson]

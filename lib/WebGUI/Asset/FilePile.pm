@@ -163,6 +163,8 @@ sub editSave {
 		$data{className} = $className;
 		$data{storageId} = $storage->getId;
 		$data{filename} = $data{title} = $data{menuTitle} = $filename;
+		$data{templateId} = 'PBtmpl0000000000000024';
+              	$data{templateId} = 'PBtmpl0000000000000088' if ($className eq  "WebGUI::Asset::File::Image");
 		$data{url} = $class->getParent->getUrl.'/'.$filename;
 		my $newAsset = $class->getParent->addChild(\%data);
 		$newAsset->setSize($storage->getFileSize($filename));

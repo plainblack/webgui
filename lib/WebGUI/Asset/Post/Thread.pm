@@ -469,27 +469,16 @@ sub rate {
 
 #-------------------------------------------------------------------
 
-=head2 setLastPost ( lastPostDate, lastPostId )
+=head2 setStatusApproved ( )
 
-Sets the pertinent details for the last post. Can also be done directly using the set method.
-
-=head3 lastPostDate
-
-The epoch date of the post.
-
-=head3 lastPostId
-
-The unique id of the post.
+Sets the post to approved and sends any necessary notifications.
 
 =cut
 
-sub setLastPost {
-        my ($self, $postDate, $postId) = @_;
-        $self->update({
-                lastPostId=>$postId,
-                lastPostDate=>$postDate
-                });
-        $self->getParent->setLastPost($postDate, $postId);
+sub setStatusApproved {
+	my $self = shift;
+	$self->SUPER::setStatusApproved;
+        $self->getParent->incrementThreads($self->get("dateUpdated"),$self->getId) unless ($self->isReply);
 }
 
 

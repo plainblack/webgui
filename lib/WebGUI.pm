@@ -1,6 +1,6 @@
 package WebGUI;
 our $VERSION = "6.5.4";
-our $STATUS = "beta";
+our $STATUS = "gamma";
 
 #-------------------------------------------------------------------
 # WebGUI is Copyright 2001-2005 Plain Black Corporation.

@@ -1,6 +1,12 @@
 package WebGUI::i18n::English::Subscription;
 
 our $I18N = {
+	'no subscription code batches' => {
+		message => q|No subscription code batches have been created yet. Use the submenu on the right to generate a batch.|,
+		lastUpdated => 1101228391,
+		context => q|Displayed if no subscription code batches have been created|
+	},
+
 	'listSubscriptionCodes title' => {
 		message => q|Manage Subscription Codes|,
 		lastUpdated => 1101228391,

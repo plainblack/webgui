@@ -81,6 +81,10 @@ sub getEditForm {
       		-value=>$self->getValue('templateId'),
       		-namespace=>"Navigation"
    		);
+	$tabform->hidden({
+		name=>"returnUrl",
+		value=>$session{form}{returnUrl}
+		});
 	my ($descendantsChecked, $selfChecked, $pedigreeChecked, $siblingsChecked);
 	my @assetsToInclude = split("\n",$self->getValue("assetsToInclude"));
 	my $afterScript;
@@ -239,7 +243,11 @@ Returns a toolbar with a set of icons that hyperlink to functions that delete, e
 sub getToolbar {
 	my $self = shift;
 	if ($self->getToolbarState) {
-		my $toolbar = editIcon('func=edit',$self->get("url"));
+		my $returnUrl;
+		if (exists $session{asset}) {
+			$returnUrl = "&proceed=goBackToPage&returnUrl=".WebGUI::URL::escape($session{asset}->getUrl);	
+		}
+		my $toolbar = editIcon('func=edit'.$returnUrl,$self->get("url"));
 		return '<img src="'.$self->getIcon(1).'" border="0" title="'.$self->getName.'" alt="'.$self->getName.'" align="absmiddle">'.$toolbar;
 	}
 	return $self->SUPER::getToolbar();
@@ -385,6 +393,14 @@ sub www_edit {
 	return WebGUI::Privilege::insufficient() unless $self->canEdit;
 	$self->getAdminConsole->setHelp("navigation add/edit");
         return $self->getAdminConsole->render($self->getEditForm->print,WebGUI::International::get("22","Navigation"));
+}
+
+
+#-------------------------------------------------------------------
+sub www_goBackToPage {
+	my $self = shift;
+	WebGUI::HTTP::setRedirect($session{form}{returnUrl}) if ($session{form}{returnUrl});
+	return "";
 }
 
 

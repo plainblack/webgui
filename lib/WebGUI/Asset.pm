@@ -369,11 +369,11 @@ sub definition {
                                         },
                                 startDate=>{
                                         fieldType=>'dateTime',
-                                        defaultValue=>undef
+                                        defaultValue=>997995720
                                         },
                                 endDate=>{
                                         fieldType=>'dateTime',
-                                        defaultValue=>undef
+                                        defaultValue=>32472169200
                                         },
 				assetSize=>{
 					noFormPost=>1,
@@ -684,7 +684,7 @@ sub getAssetAdderLinks {
 	my $getContainerLinks = shift;
 	my $type = "assets";
 	$type = "assetContainers" if ($getContainerLinks);
-	my @links;
+	my %links;
 	foreach my $class (@{$session{config}{$type}}) {
 		my $load = "use ".$class;
 		eval ($load);
@@ -703,10 +703,7 @@ sub getAssetAdderLinks {
 			} else {
 				my $url = $self->getUrl("func=add&class=".$class);
 				$url = WebGUI::URL::append($url,$addToUrl) if ($addToUrl);
-				push(@links, {
-					label=>$label,
-					url=>$url
-					});
+				$links{$label} = $url;
 			}
 		}
 	}
@@ -721,12 +718,16 @@ sub getAssetAdderLinks {
 		my $asset = WebGUI::Asset->newByDynamicClass($id,$class);
 		my $url = $self->getUrl("func=add&class=".$class."&prototype=".$id);
 		$url = WebGUI::URL::append($url,$addToUrl) if ($addToUrl);
-		push(@links,{
-			label=>$asset->get("title"),
-			url=>$url
-			});
+		$links{$asset->get("title")} = $url;
 	}
-	return \@links;
+	my @sortedLinks;
+	foreach my $label (sort keys %links) {
+		push(@sortedLinks,{
+			label=>$label,
+			url=>$links{$label}
+			});	
+	}
+	return \@sortedLinks;
 }
 
 #-------------------------------------------------------------------

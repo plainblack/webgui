@@ -137,7 +137,10 @@ Returns the TabForm object that will be used in generating the edit page for thi
 sub getEditForm {
 	my $self = shift;
 	my $tabform = $self->SUPER::getEditForm();
-       # $tabform->getTab("properties")->raw('<input type="hidden" name="op2" value="'.$session{form}{afterEdit}.'" />');
+	$tabform->hidden({
+		name=>"returnUrl",
+		value=>$session{form}{returnUrl}
+		});
 	if ($self->getValue("namespace") eq "") {
 		my $namespaces = WebGUI::SQL->buildHashRef("select distinct(namespace),namespace 
 			from template order by namespace");
@@ -333,6 +336,14 @@ sub www_edit {
 	$self->getAdminConsole->setHelp("template add/edit");
         return $self->getAdminConsole->render($self->getEditForm->print,WebGUI::International::get('edit template', 'Template'));
 }
+
+#-------------------------------------------------------------------
+sub www_goBackToPage {
+	my $self = shift;
+	WebGUI::HTTP::setRedirect($session{form}{returnUrl}) if ($session{form}{returnUrl});
+	return "";
+}
+
 
 #-------------------------------------------------------------------
 sub www_manage {

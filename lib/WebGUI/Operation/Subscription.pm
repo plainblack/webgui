@@ -1,6 +1,7 @@
 package WebGUI::Operation::Subscription;
 
 use strict;
+use WebGUI::DateTime;
 use WebGUI::Session;
 use WebGUI::SQL;
 use WebGUI::HTMLForm;
@@ -268,6 +269,8 @@ sub www_listSubscriptionCodeBatches {
 	$output .= '</table>';
 	$output .= $p->getBarTraditional($session{form}{pn});
 	
+	$output = $i18n->get('no subscription code batches') unless (@{$batches});
+
 	return _submenu($output, 'Manage subscription code batches', 'manage batch');
 }
 
@@ -279,9 +282,9 @@ sub www_listSubscriptionCodes {
 	my $i18n = WebGUI::International->new("Subscription");
 	
 	my $dcStart = WebGUI::FormProcessor::date('dcStart');
-	my $dcStop  = WebGUI::FormProcessor::date('dcStop');
+	my $dcStop  = WebGUI::DateTime::addToTime(WebGUI::FormProcessor::date('dcStop'),23,59);
 	my $duStart = WebGUI::FormProcessor::date('duStart');
-	my $duStop  = WebGUI::FormProcessor::date('duStop');
+	my $duStop  = WebGUI::DateTime::addToTime(WebGUI::FormProcessor::date('duStop'),23,59);
 	my $batches = WebGUI::SQL->buildHashRef("select batchId, description from subscriptionCodeBatch");	
 
 	$output .= $i18n->get('selection message');

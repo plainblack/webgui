@@ -165,6 +165,8 @@ sub view {
 				type=>$child->getName,
 				url=>$child->getUrl,
 				isImage=>$isImage,
+				canEdit=>$child->canEdit,
+				controls=>$child->getToolbar,
 				isFile=>$isFile,
 				"thumbnail.url"=>$thumbnail,
 				"file.url"=>$file
