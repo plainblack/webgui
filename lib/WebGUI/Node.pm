@@ -64,7 +64,7 @@ sub create {
 		WebGUI::ErrorHandler::warn("Couldn't create node: $node : $!");
 	}
         if ($_[0]->{_node2} ne "") {
-		$node = $session{config}{uploadsPath}.$slash.$_[0]->{_node1}.$session{os}{slash}.$_[0]->{_node2};
+		$node = $session{config}{uploadsPath}.$session{os}{slash}.$_[0]->{_node1}.$session{os}{slash}.$_[0]->{_node2};
 		mkdir($node);
 		unless ($! eq "File exists" || $! eq "") {
                 	WebGUI::ErrorHandler::warn("Couldn't create node: $node : $!");
