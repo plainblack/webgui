@@ -39,8 +39,9 @@ sub _export {
         $export = "#".$data{language}." translation export for WebGUI ".$WebGUI::VERSION.".\n\n";
         $export .= "#language\n\n";
         $export .= "delete from language where languageId=".$_[0].";\n";
-        $export .= "insert into language (languageId,language,characterSet) values ("
-        	.$data{languageId}.", ".quote($data{language}).", ".quote($data{characterSet}).");\n";
+        $export .= "insert into language (languageId,language,characterSet,toolbar) values ("
+        	.$data{languageId}.", ".quote($data{language}).", ".quote($data{characterSet}).", "
+		.quote($data{toolbar}).");\n";
         $export .= "\n#international\n\n";
         $sth = WebGUI::SQL->read("select * from international where languageId=".$_[0]." order by lastUpdated desc");
         while (%data = $sth->hash) {
