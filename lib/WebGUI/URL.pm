@@ -178,6 +178,7 @@ sub makeCompliant {
         $value =~ s/\.$//;             		#removes trailing period
         $value =~ s/[^A-Za-z0-9\-\.\_\/]//g; 	#removes all funky characters
 	$value =~ s/^\///;			#removes a preceeding /
+	$value =~ s/\/\//\//g;                  #removes double /
         return $value;
 }
 
