@@ -52,8 +52,10 @@ sub _drawBigCalendar {
 	$calendar->header('<h2 align="center">'.$calendar->monthname.' '.$calendar->year.'</h2>');
         ($start,$end) = monthStartEnd($_[1]);
 	my $canEdit = ($session{var}{adminOn} && WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId")));
-        $sth = WebGUI::SQL->read("select * from EventsCalendar_event where wobjectId="
-		.$_[0]->get("wobjectId")." order by startDate,endDate");
+	my $query = "select * from EventsCalendar_event";
+	$query .= " where wobjectId=".$_[0]->get("wobjectId") unless ($_[0]->get("isMaster"));
+	$query .= " order by startDate,endDate";
+        $sth = WebGUI::SQL->read($query);
         while (%event = $sth->hash) {
         	if (epochToHuman($event{startDate},"%M %y") eq $thisMonth 
 			|| epochToHuman($event{endDate},"%M %y") eq $thisMonth) {
@@ -109,8 +111,10 @@ sub _drawSmallCalendar {
         $calendar->monthname(WebGUI::DateTime::getMonthName($calendar->month));
         $calendar->header('<b>'.$calendar->monthname.' '.$calendar->year.'</b>');
         ($start,$end) = monthStartEnd($_[1]);
-        $sth = WebGUI::SQL->read("select * from EventsCalendar_event where wobjectId="
-                .$_[0]->get("wobjectId")." order by startDate,endDate");
+	my $query = "select * from EventsCalendar_event";
+	$query .= " where wobjectId=".$_[0]->get("wobjectId") unless ($_[0]->get("isMaster"));
+	$query .= " order by startDate,endDate";
+        $sth = WebGUI::SQL->read($query);
         while (%event = $sth->hash) {
                 if (epochToHuman($event{startDate},"%M %y") eq $thisMonth || epochToHuman($event{endDate},"%M %y") eq $thisMonth) {
                         if ($event{startDate} == $event{endDate}) {
@@ -180,7 +184,10 @@ sub new {
                         	},
                 	paginateAfter=>{
                         	defaultValue=>50
-                        	}
+                        	},
+			isMaster=>{
+				defaultValue=>0,
+				}
 			},
 		-useTemplate=>1
                 );
@@ -233,7 +240,7 @@ sub www_edit {
                 -label=>WebGUI::International::get(80,$_[0]->get("namespace")),
                 -afterEdit=>$afterEdit
                 );
-	$properties->select(
+	$properties->selectList(
 		-name=>"startMonth",
 		-options=>{
 			"january"=>WebGUI::International::get(15),
@@ -254,13 +261,13 @@ sub www_edit {
                 "after3"=>WebGUI::International::get(89,$_[0]->get("namespace")),
                 "current"=>WebGUI::International::get(82,$_[0]->get("namespace"))
 		);
-        $properties->select(
+        $properties->selectList(
                 -name=>"endMonth",
                 -options=>\%options,
                 -label=>WebGUI::International::get(84,$_[0]->get("namespace")),
                 -value=>[$_[0]->getValue("endMonth")]
                 );
-        $properties->select(
+        $properties->selectList(
                 -name=>"defaultMonth",
                 -options=>{
                         "current"=>WebGUI::International::get(82,$_[0]->get("namespace")),
@@ -270,6 +277,11 @@ sub www_edit {
                 -label=>WebGUI::International::get(90,$_[0]->get("namespace")),
                 -value=>[$_[0]->getValue("defaultMonth")]
                 );
+	$properties->yesNo(
+		-name=>"isMaster",
+		-value=>$_[0]->getValue("isMaster"),
+		-label=>WebGUI::International::get(99,$_[0]->get("namespace"))
+		);
 	$layout->integer(
 		-name=>"paginateAfter",
 		-label=>WebGUI::International::get(19,$_[0]->get("namespace")),
@@ -433,8 +445,9 @@ sub www_view {
 	$var{"addevent.url"} = WebGUI::URL::page('func=editEvent&eid=new&wid='.$_[0]->get("wobjectId"));
 	$var{"addevent.label"} = WebGUI::International::get(20,$_[0]->get("namespace"));
 	if ($_[0]->get("startMonth") eq "first") {
-		($minDate) = WebGUI::SQL->quickArray("select min(startDate) from EventsCalendar_event 
-			where wobjectId=".$_[0]->get("wobjectId"));
+		my $query = "select min(startDate) from EventsCalendar_event";
+		$query .= " where wobjectId=".$_[0]->get("wobjectId") unless ($_[0]->get("isMaster"));
+		($minDate) = WebGUI::SQL->quickArray($query);
 	} elsif ($_[0]->get("startMonth") eq "january") {
 		$minDate = WebGUI::DateTime::humanToEpoch(WebGUI::DateTime::epochToHuman("","%y")."-01-01 00:00:00");
 	} else {
@@ -444,8 +457,9 @@ sub www_view {
 		($minDate,$junk) = WebGUI::DateTime::monthStartEnd($minDate);
 	}
 	if ($_[0]->get("endMonth") eq "last") {
-		($maxDate) = WebGUI::SQL->quickArray("select max(endDate) from EventsCalendar_event where 
-			wobjectId=".$_[0]->get("wobjectId"));	
+		my $query = "select max(endDate) from EventsCalendar_event";
+		$query .= " where wobjectId=".$_[0]->get("wobjectId") unless ($_[0]->get("isMaster"));
+		($maxDate) = WebGUI::SQL->quickArray($query);	
 	} elsif ($_[0]->get("endMonth") eq "after12") {
 		$maxDate = WebGUI::DateTime::addToDate($minDate,0,11,0); 
 	} elsif ($_[0]->get("endMonth") eq "after9") {
@@ -488,8 +502,10 @@ sub www_view {
 		$session{form}{pn} = "";
 	}
 	$p = WebGUI::Paginator->new(WebGUI::URL::page("func=view&wid=".$_[0]->get("wobjectId")),[],$_[0]->get("paginateAfter"));
-	$p->setDataByQuery("select * from EventsCalendar_event where wobjectId=".$_[0]->get("wobjectId")
-		." and endDate>=$minDate and startDate<=$maxDate order by startDate,endDate");
+	my $query = "select * from EventsCalendar_event where ";
+	$query .= " wobjectId=".$_[0]->get("wobjectId")." and " unless ($_[0]->get("isMaster"));
+	$query .= " endDate>=$minDate and startDate<=$maxDate order by startDate,endDate";
+	$p->setDataByQuery($query);
 	my $events = $p->getPageData;
 	foreach my $event (@$events) {
 		if ($event->{startDate} == $previous{startDate} && $event->{endDate} == $previous{endDate}) {
@@ -550,14 +566,16 @@ sub www_viewEvent {
         $var{"delete.url"} = WebGUI::URL::page('func=deleteEvent&eid='.$session{form}{eid}.'&wid='
 		.$session{form}{wid}.'&rid='.$event{EventsCalendar_recurringId});
 	$var{"delete.label"} = WebGUI::International::get(576);
-	($id) = WebGUI::SQL->quickArray("select EventsCalendar_eventId from EventsCalendar_event 
-		where EventsCalendar_eventId<>$event{EventsCalendar_eventId} and wobjectId=".$_[0]->get("wobjectId")." and
-		startDate<=$event{startDate} order by startDate desc, endDate desc");
+	my $query = "select EventsCalendar_eventId from EventsCalendar_event where EventsCalendar_eventId<>$event{EventsCalendar_eventId}";
+	$query .= " and wobjectId=".$_[0]->get("wobjectId") unless ($_[0]->get("isMaster"));
+	$query .= " and startDate<=$event{startDate} order by startDate desc, endDate desc";
+	($id) = WebGUI::SQL->quickArray($query);
 	$var{"previous.label"} = '&laquo;'.WebGUI::International::get(92,$_[0]->get("namespace"));
 	$var{"previous.url"} = WebGUI::URL::page("func=viewEvent&wid=".$_[0]->get("wobjectId")."&eid=".$id) if ($id);
-        ($id) = WebGUI::SQL->quickArray("select EventsCalendar_eventId from EventsCalendar_event
-                where EventsCalendar_eventId<>$event{EventsCalendar_eventId} and wobjectId=".$_[0]->get("wobjectId")." and 
-		startDate>=$event{startDate} order by startDate, endDate");
+	$query = "select EventsCalendar_eventId from EventsCalendar_event where EventsCalendar_eventId<>$event{EventsCalendar_eventId}";
+	$query .= " and wobjectId=".$_[0]->get("wobjectId") unless ($_[0]->get("isMaster"));
+	$query .= " and startDate>=$event{startDate} order by startDate, endDate";
+        ($id) = WebGUI::SQL->quickArray($query);
         $var{"next.label"} = WebGUI::International::get(93,$_[0]->get("namespace")).'&raquo;';
         $var{"next.url"} = WebGUI::URL::page("func=viewEvent&wid=".$_[0]->get("wobjectId")."&eid=".$id) if ($id);
 	$var{description} = $event{description};

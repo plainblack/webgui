@@ -252,7 +252,6 @@ delete from international where namespace='MessageBoard' and internationalId=4;
 delete from international where namespace='MessageBoard' and internationalId=22;
 delete from international where namespace='MessageBoard' and internationalId=18;
 delete from international where namespace='MessageBoard' and internationalId=16;
-delete from international where namespace='MessageBoard' and internationalId=2;
 delete from international where namespace='MessageBoard' and internationalId=15;
 delete from international where namespace='MessageBoard' and internationalId=12;
 delete from international where namespace='WebGUI' and internationalId=234;
@@ -262,5 +261,6 @@ delete from international where namespace='WebGUI' and internationalId=571;
 delete from international where namespace='WebGUI' and internationalId=402;
 delete from international where languageId=1 and namespace='WebGUI' and internationalId=529;
 insert into international (internationalId,languageId,namespace,message,lastUpdated,context) values (529,1,'WebGUI','results per page', 1066492301,'A label indicating the number of items per page to return in a list.');
-
+insert into international (internationalId,languageId,namespace,message,lastUpdated,context) values (99,1,'EventsCalendar','Is master?', 1066511974,'Ask the user if this calendar should act as a master calendar.');
+alter table EventsCalendar add column isMaster int not null default 0;
 

@@ -21,6 +21,7 @@
    with null values in their DataForm.
  - If the Cache Timeout on a given page is set to 10 seconds or less, that
    page will not be cached.
+ - Added master events calendar switch.
 
 
 5.4.4
