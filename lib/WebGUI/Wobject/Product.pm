@@ -231,29 +231,11 @@ sub www_addRelatedSave {
 }
 
 #-------------------------------------------------------------------
-sub www_deleteAccessory {
-	return WebGUI::Privilege::insufficient() unless ($_[0]->canEdit);
-        return $_[0]->confirm(
-                WebGUI::International::get(2,$_[0]->get("namespace")),
-		WebGUI::URL::page('func=deleteAccessoryConfirm&wid='.$_[0]->get("wobjectId").'&aid='.$session{form}{aid})
-                );
-}
-
-#-------------------------------------------------------------------
 sub www_deleteAccessoryConfirm {
 	return WebGUI::Privilege::insufficient() unless ($_[0]->canEdit);
 	WebGUI::SQL->write("delete from Product_accessory where wobjectId=".quote($_[0]->get("wobjectId"))." and accessoryWobjectId=".quote($session{form}{aid}));
 	$_[0]->reorderCollateral("Product_accessory","accessoryWobjectId");
         return "";
-}
-
-#-------------------------------------------------------------------
-sub www_deleteBenefit {
-	return WebGUI::Privilege::insufficient() unless ($_[0]->canEdit);
-        return $_[0]->confirm(
-                WebGUI::International::get(48,$_[0]->get("namespace")),
-		WebGUI::URL::page('func=deleteBenefitConfirm&wid='.$_[0]->get("wobjectId").'&bid='.$session{form}{bid})
-                );
 }
 
 #-------------------------------------------------------------------
@@ -265,15 +247,6 @@ sub www_deleteBenefitConfirm {
 }
 
 #-------------------------------------------------------------------
-sub www_deleteFeature {
-	return WebGUI::Privilege::insufficient() unless ($_[0]->canEdit);
-	return $_[0]->confirm(
-		WebGUI::International::get(3,$_[0]->get("namespace")),
-		WebGUI::URL::page('func=deleteFeatureConfirm&wid='.$_[0]->get("wobjectId").'&fid='.$session{form}{fid})
-		);
-}
-
-#-------------------------------------------------------------------
 sub www_deleteFeatureConfirm {
 	return WebGUI::Privilege::insufficient() unless ($_[0]->canEdit);
 	$_[0]->deleteCollateral("Product_feature","Product_featureId",$session{form}{fid});
@@ -282,29 +255,11 @@ sub www_deleteFeatureConfirm {
 }
 
 #-------------------------------------------------------------------
-sub www_deleteRelated {
-	return WebGUI::Privilege::insufficient() unless ($_[0]->canEdit);
-        return $_[0]->confirm(
-                WebGUI::International::get(4,$_[0]->get("namespace")),
-		WebGUI::URL::page('func=deleteRelatedConfirm&wid='.$_[0]->get("wobjectId").'&rid='.$session{form}{rid})
-                );
-}
-
-#-------------------------------------------------------------------
 sub www_deleteRelatedConfirm {
 	return WebGUI::Privilege::insufficient() unless ($_[0]->canEdit);
         WebGUI::SQL->write("delete from Product_related where wobjectId=".quote($_[0]->get("wobjectId"))." and relatedWobjectId=".quote($session{form}{rid}));
 	$_[0]->reorderCollateral("Product_related","relatedWobjectId");
         return "";
-}
-
-#-------------------------------------------------------------------
-sub www_deleteSpecification {
-	return WebGUI::Privilege::insufficient() unless ($_[0]->canEdit);
-        return $_[0]->confirm(
-                WebGUI::International::get(5,$_[0]->get("namespace")),
-		WebGUI::URL::page('func=deleteSpecificationConfirm&wid='.$_[0]->get("wobjectId").'&sid='.$session{form}{sid})
-                );
 }
 
 #-------------------------------------------------------------------
@@ -591,7 +546,7 @@ sub www_view {
         $sth = WebGUI::SQL->read("select feature,Product_featureId from Product_feature where wobjectId="
 		.quote($_[0]->get("wobjectId"))." order by sequenceNumber");
         while (%data = $sth->hash) {
-                $segment = deleteIcon('func=deleteFeature&wid='.$_[0]->get("wobjectId").'&fid='.$data{Product_featureId})
+                $segment = deleteIcon('func=deleteFeatureConfirm&wid='.$_[0]->get("wobjectId").'&fid='.$data{Product_featureId},'',WebGUI::International::get(3,$_[0]->get("namespace")))
                         .editIcon('func=editFeature&wid='.$_[0]->get("wobjectId").'&fid='.$data{Product_featureId})
                         .moveUpIcon('func=moveFeatureUp&wid='.$_[0]->get("wobjectId").'&fid='.$data{Product_featureId})
                         .moveDownIcon('func=moveFeatureDown&wid='.$_[0]->get("wobjectId").'&fid='.$data{Product_featureId});
@@ -609,7 +564,7 @@ sub www_view {
         $sth = WebGUI::SQL->read("select benefit,Product_benefitId from Product_benefit where wobjectId="
 		.quote($_[0]->get("wobjectId"))." order by sequenceNumber");
         while (%data = $sth->hash) {
-                $segment = deleteIcon('func=deleteBenefit&wid='.$_[0]->get("wobjectId").'&bid='.$data{Product_benefitId})
+                $segment = deleteIcon('func=deleteBenefitConfirm&wid='.$_[0]->get("wobjectId").'&bid='.$data{Product_benefitId},'',WebGUI::International::get(48,$_[0]->get("namespace")))
                         .editIcon('func=editBenefit&wid='.$_[0]->get("wobjectId").'&bid='.$data{Product_benefitId})
                         .moveUpIcon('func=moveBenefitUp&wid='.$_[0]->get("wobjectId").'&bid='.$data{Product_benefitId})
                         .moveDownIcon('func=moveBenefitDown&wid='.$_[0]->get("wobjectId").'&bid='.$data{Product_benefitId});
@@ -627,7 +582,7 @@ sub www_view {
         $sth = WebGUI::SQL->read("select name,value,units,Product_specificationId from Product_specification 
 		where wobjectId=".quote($_[0]->get("wobjectId"))." order by sequenceNumber");
         while (%data = $sth->hash) {
-                $segment = deleteIcon('func=deleteSpecification&wid='.$_[0]->get("wobjectId").'&sid='.$data{Product_specificationId})
+                $segment = deleteIcon('func=deleteSpecificationConfirm&wid='.$_[0]->get("wobjectId").'&sid='.$data{Product_specificationId},'',WebGUI::International::get(5,$_[0]->get("namespace")))
                         .editIcon('func=editSpecification&wid='.$_[0]->get("wobjectId").'&sid='.$data{Product_specificationId})
                         .moveUpIcon('func=moveSpecificationUp&wid='.$_[0]->get("wobjectId").'&sid='.$data{Product_specificationId})
                         .moveDownIcon('func=moveSpecificationDown&wid='.$_[0]->get("wobjectId").'&sid='.$data{Product_specificationId});
@@ -650,7 +605,7 @@ sub www_view {
 		and Product_accessory.accessoryWobjectId=wobject.wobjectId 
 		and wobject.pageId=page.pageId order by Product_accessory.sequenceNumber");
         while (%data = $sth->hash) {
-                $segment = deleteIcon('func=deleteAccessory&wid='.$_[0]->get("wobjectId").'&aid='.$data{accessoryWobjectId})
+                $segment = deleteIcon('func=deleteAccessoryConfirm&wid='.$_[0]->get("wobjectId").'&aid='.$data{accessoryWobjectId},WebGUI::International::get(2,$_[0]->get("namespace")))
                         .moveUpIcon('func=moveAccessoryUp&wid='.$_[0]->get("wobjectId").'&aid='.$data{accessoryWobjectId})
                         .moveDownIcon('func=moveAccessoryDown&wid='.$_[0]->get("wobjectId").'&aid='.$data{accessoryWobjectId});
 		push(@accessoryloop,{
@@ -671,7 +626,7 @@ sub www_view {
 		and Product_related.relatedWobjectId=wobject.wobjectId 
 		and wobject.pageId=page.pageId order by Product_related.sequenceNumber");
         while (%data = $sth->hash) {
-                $segment = deleteIcon('func=deleteRelated&wid='.$_[0]->get("wobjectId").'&rid='.$data{relatedWobjectId})
+                $segment = deleteIcon('func=deleteRelatedConfirm&wid='.$_[0]->get("wobjectId").'&rid='.$data{relatedWobjectId},'',WebGUI::International::get(4,$_[0]->get("namespace")))
                         .moveUpIcon('func=moveRelatedUp&wid='.$_[0]->get("wobjectId").'&rid='.$data{relatedWobjectId})
                         .moveDownIcon('func=moveRelatedDown&wid='.$_[0]->get("wobjectId").'&rid='.$data{relatedWobjectId});
                 push(@relatedloop,{
