@@ -35,7 +35,7 @@ sub widgetName {
 
 #-------------------------------------------------------------------
 sub www_add {
-        my ($output, %hash);
+        my ($output, %hash, @array);
 	tie %hash, "Tie::IxHash";
       	if (WebGUI::Privilege::canEditPage()) {
                 $output = '<a href="'.$session{page}{url}.'?op=viewHelp&hid=44"><img src="'.$session{setting}{lib}.'/help.gif" border="0" align="right"></a>';
@@ -45,11 +45,12 @@ sub www_add {
                 $output .= WebGUI::Form::hidden("func","addSave");
                 $output .= '<table>';
                 $output .= '<tr><td class="formDescription">'.WebGUI::International::get(99).'</td><td>'.WebGUI::Form::text("title",20,30,'User Submission System').'</td></tr>';
-                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(175).'</td><td>'.WebGUI::Form::checkbox("displayTitle",1,1).'</td></tr>';
-                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(176).'</td><td>'.WebGUI::Form::checkbox("processMacros",1).'</td></tr>';
+                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(174).'</td><td>'.WebGUI::Form::checkbox("displayTitle",1,1).'</td></tr>';
+                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(175).'</td><td>'.WebGUI::Form::checkbox("processMacros",1).'</td></tr>';
                 $output .= '<tr><td class="formDescription">'.WebGUI::International::get(85).'</td><td>'.WebGUI::Form::textArea("description",'',50,5,1).'</td></tr>';
                 %hash = WebGUI::SQL->buildHash("select groupId,groupName from groups where groupName<>'Reserved' order by groupName",$session{dbh});
-                $output .= '<tr><td class="formDescription" valign="top">'.WebGUI::International::get(279).'</td><td>'.WebGUI::Form::selectList("groupToContribute",\%hash,'',1).'</td></tr>';
+		$array[0] = 2;
+                $output .= '<tr><td class="formDescription" valign="top">'.WebGUI::International::get(279).'</td><td>'.WebGUI::Form::selectList("groupToContribute",\%hash,\@array).'</td></tr>';
                 $output .= '<tr><td class="formDescription">'.WebGUI::International::get(280).'</td><td>'.WebGUI::Form::text("submissionsPerPage",20,2,50).'</td></tr>';
                 %hash = ("Approved"=>WebGUI::International::get(281),"Denied"=>WebGUI::International::get(282),"Pending"=>WebGUI::International::get(283));
                 $output .= '<tr><td class="formDescription" valign="top">'.WebGUI::International::get(284).'</td><td>'.WebGUI::Form::selectList("defaultStatus",\%hash,'',1).'</td></tr>';
@@ -182,15 +183,15 @@ sub www_edit {
 	tie %data, 'Tie::CPHash';
         if (WebGUI::Privilege::canEditPage()) {
 		%data = WebGUI::SQL->quickHash("select * from widget,UserSubmission where widget.widgetId=$session{form}{wid} and widget.widgetId=UserSubmission.widgetId",$session{dbh});
-                $output = '<a href="'.$session{page}{url}.'?op=viewHelp&hid=45"><img src="'.$session{setting}{lib}.'/help.gif" border="0" align="right"></a>';
+                $output = '<a href="'.$session{page}{url}.'?op=viewHelp&hid=44"><img src="'.$session{setting}{lib}.'/help.gif" border="0" align="right"></a>';
 		$output .= '<h1>'.WebGUI::International::get(292).'</h1>';
 		$output .= '<form method="post" enctype="multipart/form-data" action="'.$session{page}{url}.'">';
                 $output .= WebGUI::Form::hidden("wid",$session{form}{wid});
                 $output .= WebGUI::Form::hidden("func","editSave");
                 $output .= '<table>';
                 $output .= '<tr><td class="formDescription">'.WebGUI::International::get(99).'</td><td>'.WebGUI::Form::text("title",20,30,$data{title}).'</td></tr>';
-                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(175).'</td><td>'.WebGUI::Form::checkbox("displayTitle","1",$data{displayTitle}).'</td></tr>';
-                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(176).'</td><td>'.WebGUI::Form::checkbox("processMacros","1",$data{processMacros}).'</td></tr>';
+                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(174).'</td><td>'.WebGUI::Form::checkbox("displayTitle","1",$data{displayTitle}).'</td></tr>';
+                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(175).'</td><td>'.WebGUI::Form::checkbox("processMacros","1",$data{processMacros}).'</td></tr>';
                 $output .= '<tr><td class="formDescription">'.WebGUI::International::get(85).'</td><td>'.WebGUI::Form::textArea("description",$data{description}).'</td></tr>';
 		$array[0] = $data{groupToContribute};
 		%hash = WebGUI::SQL->buildHash("select groupId,groupName from groups where groupName<>'Reserved' order by groupName",$session{dbh});

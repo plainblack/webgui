@@ -12,7 +12,7 @@ CREATE TABLE Article (
   widgetId int(11) default NULL,
   startDate int(11) default NULL,
   endDate int(11) default NULL,
-  body text,
+  body mediumtext,
   image varchar(255) default NULL,
   linkTitle varchar(255) default NULL,
   linkURL text,
@@ -113,23 +113,6 @@ CREATE TABLE SQLReport (
 
 #
 # Dumping data for table 'SQLReport'
-#
-
-
-#
-# Table structure for table 'SearchMnoGo'
-#
-
-CREATE TABLE SearchMnoGo (
-  widgetId int(11) NOT NULL default '0',
-  DSN varchar(255) default NULL,
-  username varchar(255) default NULL,
-  identifier varchar(255) default NULL,
-  PRIMARY KEY  (widgetId)
-) TYPE=MyISAM;
-
-#
-# Dumping data for table 'SearchMnoGo'
 #
 
 
@@ -319,7 +302,7 @@ INSERT INTO help VALUES (16,'US English','Add','Style','Styles are WebGUI macro 
 INSERT INTO help VALUES (17,'US English','Add','Group','See <i>Manage Group</i> for a description of grouping functions and the default groups.\r\n\r\n<b>Group Name</b>\r\nA name for the group. It is best if the name is descriptive so you know what it is at a glance.\r\n\r\n<b>Description</b>\r\nA longer description of the group so that other admins and content managers (or you if you forget) will know what the purpose of this group is.','0');
 INSERT INTO help VALUES (22,'US English','Edit','SQL Report','<b>Title</b>\r\nSee <i>Add SQL Report</i> for details.\r\n\r\n<b>Display Title?</b>\r\nSee <i>Add SQL Report</i> for details.\r\n\r\n<b>Process Macros</b>\r\nSee <i>Add SQL Report</i> for details.\r\n\r\n<b>Description</b>\r\nSee <i>Add SQL Report</i> for details.\r\n\r\n<b>Template</b>\r\nSee <i>Add SQL Report</i> for details.\r\n\r\n<b>Query</b>\r\nSee <i>Add SQL Report</i> for details.\r\n\r\n<b>DSN</b>\r\nSee <i>Add SQL Report</i> for details.\r\n\r\n<b>Database User</b>\r\nSee <i>Add SQL Report</i> for details.\r\n\r\n<b>Database Password</b>\r\nSee <i>Add SQL Report</i> for details.\r\n\r\n<b>Convert carriage returns?</b>\r\nSee <i>Add SQL Report</i> for details.\r\n\r\n','19,14,21');
 INSERT INTO help VALUES (18,'US English','Using','Style Sheets','<a href=\"http://www.w3.org/Style/CSS/\">Cascading Style Sheets (CSS)</a> are a great way to manage the look and feel of any web site. They are used extensively in WebGUI.\r\n\r\nIf you are unfamiliar with how to use CSS, <a href=\"http://www.plainblack.com\">Plain Black Software</a> provides training classes on XHTML and CSS. Alternatively, Bradsoft makes an excellent CSS editor called <a href=\"http://www.bradsoft.com/topstyle/index.asp\">Top Style</a>.\r\n\r\nThe following is a list of classes used to control the look of WebGUI:\r\n\r\n<b>A</b>\r\nThe links throughout the style.\r\n\r\n<b>BODY</b>\r\nThe default setup of all pages within a style.\r\n\r\n<b>H1</b>\r\nThe headers on every page.\r\n\r\n<b>.accountOptions</b>\r\nThe links that appear under the login and account update forms.\r\n\r\n<b>.adminBar </b>\r\nThe bar that appears at the top of the page when you\'re in admin mode.\r\n\r\n<b>.boardMenu </b>\r\nThe menu on the message boards.\r\n\r\n<b>.boardMessage </b>\r\nThe full message text.\r\n\r\n<b>.boardTitle </b>\r\nThe title of the message board.\r\n\r\n<b>.content</b>\r\nThe main content area on all pages of the style.\r\n\r\n<b>.crumbTrail </b>\r\nThe crumb trail (if you\'re using that macro).\r\n\r\n<b>.eventTitle </b>\r\nThe title of an individual event.\r\n\r\n<b>.faqQuestion</b>\r\nAn F.A.Q. question. To distinguish it from an answer.\r\n\r\n<b>.formDescription </b>\r\nThe tags on all forms next to the form elements. \r\n\r\n<b>.formSubtext </b>\r\nThe tags below some form elements.\r\n\r\n<b>.highlight </b>\r\nDenotes a highlighted item, such as which message you are viewing within a list.\r\n\r\n<b>.horizontalMenu </b>\r\nThe horizontal menu (if you use a horizontal menu macro).\r\n\r\n<b>.loginBox</b>\r\nThe login box macro.\r\n\r\n<b>.pagination </b>\r\nThe Previous and Next links on pages with pagination.\r\n\r\n<b>.pollAnswer </b>\r\nAn answer on a poll.\r\n\r\n<b>.pollColor </b>\r\nThe color of the percentage bar on a poll.\r\n\r\n<b>.pollQuestion </b>\r\nThe question on a poll.\r\n\r\n<b>.tableData </b>\r\nThe data rows on things like message boards and user contributions.\r\n\r\n<b>.tableHeader </b>\r\nThe headings of columns on things like message boards and user contributions.\r\n\r\n<b>.verticalMenu </b>\r\nThe vertical menu (if you use a verticall menu macro).\r\n\r\n','11,16');
-INSERT INTO help VALUES (19,'US English','Using','Macros','WebGUI macros are used to create dynamic content within otherwise static content. For instance, you may wish to show which user is logged in on every page, or you may wish to have a dynamically built menu or crumb trail. \r\n\r\nMacros always begin with a carat (^) and follow with one other character. Some macros can be extended/configured by taking the format of ^<i>x</i><b>config text</b>^/<i>x</i>. The following is a description of all the macros in the WebGUI system.\r\n\r\n<b>^a or ^a^/a - My Account Link</b>\r\nA link to your account information. In addition you can change the link text by creating a macro like this <b>^aAccount Info^/a</b>.\r\n\r\n<b>^C - Crumb Trail</b>\r\nA dynamically generated crumb trail to the current page.\r\n\r\n<b>^D or ^D^/D - Date</b>\r\nThe current date and time.\r\n\r\nYou can configure the date by using date formatting symbols. For instance if you created a macro like this <b>^D%c %D, %y^/D</b> it would output <b>September 26, 2001</b>. The following are the available date formatting symbols:\r\n<span style=\"font-family: courier;\">\r\n    %% = %\r\n    %y = 4 digit year\r\n    %Y = 2 digit year\r\n    %m = 2 digit month\r\n    %M = variable digit month\r\n    %c = month name\r\n    %d = 2 digit day of month\r\n    %D = variable digit day of month\r\n    %w = day of week name\r\n    %h = 2 digit base 12 hour\r\n    %H = variable digit base 12 hour\r\n    %j = 2 digit base 24 hour\r\n    %J = variable digit base 24 hour\r\n    %p = lower case am/pm\r\n    %P = upper case AM/PM\r\n</span>\r\n<b>^f - Full Menu (Vertical)</b>\r\nDisplays a complete menu listing for all pages on the site, sort of like a site map.\r\n\r\n<b>^F - 2 Level Menu (Vertical)</b>\r\nDisplays the first two levels of the menuing hierarchy at all times.\r\n\r\n<b>^h - 3 Level Menu (Vertical)</b>\r\nDisplays the first three levels of the menuing hierarchy at all times.\r\n\r\n<b>^H or ^H^/H - Home Link</b>\r\nA link to the home page of this site.  In addition you can change the link text by creating a macro like this <b>^HGo Home^/H</b>.\r\n\r\n<b>^j - 2 Level, Current Level Menu (Vertical)</b>\r\nDisplays the next two levels of the menuing hierarchy.\r\n\r\n<b>^J - 3 Level, Current Level Menu (Vertical)</b>\r\nDisplays the next three levels of the menuing hierarchy.\r\n\r\n<b>^L - Login</b>\r\nA small login form.\r\n\r\n<b>^M - Current Menu (Vertical)</b>\r\nA vertical menu containing the sub-pages at the current level.\r\n\r\n<b>^m - Current Menu (Horizontal)</b>\r\nA horizontal menu containing the sub-pages at the current level.\r\n\r\n<b>^P - Previous Menu (Vertical)</b>\r\nA vertical menu containing the sub-pages at the previous level.\r\n\r\n<b>^p - Previous Menu (Horizontal)</b>\r\nA horizontal menu containing the sub-pages at the previous level.\r\n\r\n<b>^r or ^r^/r - Make Page Printable</b>\r\nCreates a link to remove the style from a page to make it printable.  In addition you can change the link text by creating a macro like this <b>^rPRINT!^/r</b>.\r\n\r\n<b>^T - Top Level Menu (Vertical)</b>\r\nA vertical menu containing the main pages of the site (aka the sub-pages from the home page).\r\n\r\n<b>^t - Top Level Menu (Horizontal)</b>\r\nA vertical menu containing the main pages of the site (aka the sub-pages from the home page).\r\n\r\n<b>^^ - Carat</b>\r\nSince the carat symbol is used to start all macros, this macro is in place just in case you really wanted to use a carat somewhere.\r\n\r\n<b>^/ - System URL</b>\r\nThe URL to the gateway script (including the domain for this site). This is often used within pages so that if your development server is on a domain different than your production server that your URLs will still worked when moved.\r\n\r\n<b>^\\ - Page URL</b>\r\nThe URL to the current page (including the domain for this site). This is often used within pages so that if your development server is on a domain different than your production server that your URLs will still worked when moved.\r\n\r\n<b>^@ - Username</b>\r\nThe username of the currently logged in user.\r\n\r\n<b>^# - User ID</b>\r\nThe user id of the currently logged in user.\r\n\r\n<b>^* - Random Number</b>\r\nA randomly generated number. This is often used on images (such as banner ads) that you want to ensure do not cache.\r\n\r\n','11,16,12');
+INSERT INTO help VALUES (19,'US English','Using','Macros','WebGUI macros are used to create dynamic content within otherwise static content. For instance, you may wish to show which user is logged in on every page, or you may wish to have a dynamically built menu or crumb trail. \r\n\r\nMacros always begin with a carat (^) and follow with one other character. Some macros can be extended/configured by taking the format of ^<i>x</i><b>config text</b>^/<i>x</i>. The following is a description of all the macros in the WebGUI system.\r\n\r\n<b>^A^/A - Any SubMenu</b>\r\nThis macro allows you to get the submenu of any page, starting with the page you specified. For instance, you could get the home page submenu by creating a macro that looks like this <b>^Ahome,0</b>. The first value is the urlized title of the page and the second value is the depth you\'d like the menu to go. By default it will show only the first level. To go three levels deep create a macro like this <b>^A3^/A</b>. If you set the macro to \"0\" it will track the entire site tree.\r\n\r\n<b>^a or ^a^/a - My Account Link</b>\r\nA link to your account information. In addition you can change the link text by creating a macro like this <b>^aAccount Info^/a</b>.\r\n\r\n<b>^C - Crumb Trail</b>\r\nA dynamically generated crumb trail to the current page.\r\n\r\n<b>^c - Company Name</b>\r\nThe name of your company specified in the settings by your Administrator.\r\n\r\n<b>^D or ^D^/D - Date</b>\r\nThe current date and time.\r\n\r\nYou can configure the date by using date formatting symbols. For instance, if you created a macro like this <b>^D%c %D, %y^/D</b> it would output <b>September 26, 2001</b>. The following are the available date formatting symbols:\r\n<span style=\"font-family: courier;\">\r\n    %% = %\r\n    %y = 4 digit year\r\n    %Y = 2 digit year\r\n    %m = 2 digit month\r\n    %M = variable digit month\r\n    %c = month name\r\n    %d = 2 digit day of month\r\n    %D = variable digit day of month\r\n    %w = day of week name\r\n    %h = 2 digit base 12 hour\r\n    %H = variable digit base 12 hour\r\n    %j = 2 digit base 24 hour\r\n    %J = variable digit base 24 hour\r\n    %p = lower case am/pm\r\n    %P = upper case AM/PM\r\n</span>\r\n<b>^e - Company Email Address</b>\r\nThe email address for your company specified in the settings by your Administrator.\r\n\r\n<b>^H or ^H^/H - Home Link</b>\r\nA link to the home page of this site.  In addition you can change the link text by creating a macro like this <b>^HGo Home^/H</b>.\r\n\r\n<b>^L - Login</b>\r\nA small login form.\r\n\r\n<b>^M or ^M^/M - Current Menu (Vertical)</b>\r\nA vertical menu containing the sub-pages at the current level. In addition, you may configure this macro by specifying how many levels deep the menu should go. By default it will show only the first level. To go three levels deep create a macro like this <b>^M3^/M</b>. If you set the macro to \"0\" it will track the entire site tree.\r\n\r\n<b>^m - Current Menu (Horizontal)</b>\r\nA horizontal menu containing the sub-pages at the current level.\r\n\r\n<b>^P or ^P^/P - Previous Menu (Vertical)</b>\r\nA vertical menu containing the sub-pages at the previous level. In addition, you may configure this macro by specifying how many levels deep the menu should go. By default it will show only the first level. To go three levels deep create a macro like this <b>^TP^/P</b>. If you set the macro to \"0\" it will track the entire site tree.\r\n\r\n<b>^p - Previous Menu (Horizontal)</b>\r\nA horizontal menu containing the sub-pages at the previous level.\r\n\r\n<b>^r or ^r^/r - Make Page Printable</b>\r\nCreates a link to remove the style from a page to make it printable.  In addition, you can change the link text by creating a macro like this <b>^rPRINT!^/r</b>.\r\n\r\n<b>^T or ^T^/T - Top Level Menu (Vertical)</b>\r\nA vertical menu containing the main pages of the site (aka the sub-pages from the home page). In addition, you may configure this macro by specifying how many levels deep the menu should go. By default it will show only the first level. To go three levels deep create a macro like this <b>^T3^/T</b>. If you set the macro to \"0\" it will track the entire site tree.\r\n\r\n<b>^t - Top Level Menu (Horizontal)</b>\r\nA vertical menu containing the main pages of the site (aka the sub-pages from the home page).\r\n\r\n<b>^u - Company URL</b>\r\nThe URL for your company specified in the settings by your Administrator.\r\n\r\n<b>^^ - Carat</b>\r\nSince the carat symbol is used to start all macros, this macro is in place just in case you really wanted to use a carat somewhere.\r\n\r\n<b>^/ - System URL</b>\r\nThe URL to the gateway script (including the domain for this site). This is often used within pages so that if your development server is on a domain different than your production server that your URLs will still worked when moved.\r\n\r\n<b>^\\ - Page URL</b>\r\nThe URL to the current page (including the domain for this site). This is often used within pages so that if your development server is on a domain different than your production server that your URLs will still worked when moved.\r\n\r\n<b>^@ - Username</b>\r\nThe username of the currently logged in user.\r\n\r\n<b>^# - User ID</b>\r\nThe user id of the currently logged in user.\r\n\r\n<b>^* or ^*^/* - Random Number</b>\r\nA randomly generated number. This is often used on images (such as banner ads) that you want to ensure do not cache. In addition, you may configure this macro like this <b>^*100^/*</b> to create a random number between 0 and 100.\r\n\r\n<b>^0,^1,^2,^3,^4,^5,^6,^7,^8,^9, ^-</b>\r\nThese macros are reserved for widget-specific functions as in the SQL Report widget.\r\n','11,16,12');
 INSERT INTO help VALUES (20,'US English','Add','SQL Report','SQL Reports are perhaps the most powerful widget in the WebGUI arsenal. They allow a user to query data from any database that they have access to. This is great for getting sales figures from your Accounting database or even summarizing all the message boards on your web site.\r\n\r\n<b>Title</b>\r\nThe title of this report.\r\n\r\n<b>Display Title?</b>\r\nDo you wish to display the title of the report? If so, check the box.\r\n\r\n<b>Process Macros</b>\r\nDo you wish to process WebGUI Macros on this report? If so, check the box.\r\n\r\n<b>Description</b>\r\nDescribe the content of this report so your users will better understand what the report is all about.\r\n\r\n<b>Template</b>\r\nLayout a template of how this report should look. Usually you\'ll use HTML tables to generate a report. An example is included below.\r\n\r\nThere are 11 special macro characters used in generating SQL Reports. They are ^-, ^0, ^1, ^2, ^3, ^4, ^5, ^6, ^7, ^8, and ^9. These macros will be processed regardless of whether you checked the process macros box above. The ^- macro represents split points in the document where the report will begin and end looping. The numeric macros represent the data fields that will be returned from your query. Note that you may only have 10 fields returned per row in your query.\r\n\r\n<i>Sample Template:</i>\r\n&lt;table&gt;\r\n&lt;tr&gt;&lt;th&gt;Employee Name&lt;/th&gt;&lt;th&gt;Employee #&lt;/th&gt;&lt;th&gt;Vacation Days Remaining&lt;/th&gt;&lt;th&gt;Monthly Salary&lt;/th&gt;&lt;/tr&gt;\r\n^-\r\n&lt;tr&gt;&lt;td&gt;^0&lt;/td&gt;&lt;td&gt;^1&lt;/td&gt;&lt;td&gt;^2&lt;/td&gt;&lt;td&gt;^3&lt;/td&gt;&lt;/tr&gt;\r\n^-\r\n&lt;/table&gt;\r\n\r\n<b>Query</b>\r\nThis is a standard SQL query. If you are unfamiliar with SQL, <a href=\"http://www.plainblack.com\">Plain Black Software</a> provides training courses in SQL and database management.\r\n\r\n<b>DSN</b>\r\n<b>D</b>ata <b>S</b>ource <b>N</b>ame is the unique identifier that Perl uses to describe the location of your database. It takes the format of DBI:[driver]:[database name]:[host]. \r\n\r\n<i>Example:</i> DBI:mysql:WebGUI:localhost\r\n\r\n<b>Database User</b>\r\nThe username you use to connect to the DSN.\r\n\r\n<b>Database Password</b>\r\nThe password you use to connect to the DSN.\r\n\r\n<b>Convert carriage returns?</b>\r\nDo you wish to convert the carriage returns in the resultant data to HTML breaks (&lt;br&gt;).\r\n','19,14,21');
 INSERT INTO help VALUES (21,'US English','Using','Widget','Widgets are the true power of WebGUI. Widgets are tiny pluggable applications built to run under WebGUI. Message boards and polls are examples of widgets.\r\n\r\nTo add a widget to a page, first go to that page, then select <i>Add Content...</i> from the upper left corner of your screen. Each widget has it\'s own help so be sure to read the help if you\'re not sure how to use a widget.\r\n','0');
 INSERT INTO help VALUES (23,'US English','Add','Article','Articles are the Swiss Army knife of WebGUI. Most pieces of static content can be added via the Article widget.\r\n\r\n<b>Title</b>\r\nWhat\'s the title for this content? Even if you don\'t wish the title to appear, it\'s a good idea to title your content so that if it is ever copied to the clipboard it will have a name.\r\n\r\n<b>Display the title?</b>\r\nDo you wish to display the title listed above?\r\n\r\n<b>Process macros?</b>\r\nDo you wish to process WebGUI macros on this article? Unchecking this box will not process macros and will speed up page execution.\r\n\r\n<b>Start Date</b>\r\nWhat date do you want this article to appear on the site? Dates are in the format of MM/DD/YYYY. You can use the JavaScript wizard to choose your date from a calendar by clicking on the <i>set date</i> button. By default the date is set to 01/01/2000.\r\n\r\n<b>End Date</b>\r\nWhat date do you want this article to be removed from the site? By default the date is set to 100 years in the future, 01/01/2100.\r\n\r\n<b>Body</b>\r\nThe body of the article is where all the content goes. You may feel free to add HTML tags as necessary to format your content. Be sure to put a &lt;p&gt; between paragraphs to add white space to your content.\r\n\r\n<b>Image</b>\r\nChoose an image (.jpg, .gif, .png) file from your hard drive. This file will be uploaded to the server and displayed in the upper-right corner of your article.\r\n\r\n<b>Link Title</b>\r\nIf you wish to add a link to your article, enter the title of the link in this field. \r\n\r\n<i>Example:</i> Google\r\n\r\n<b>Link URL</b>\r\nIf you added a link title, now add the URL (uniform resource locator) here. \r\n\r\n<i>Example:</i> http://www.google.com\r\n\r\n<b>Attachment</b>\r\nIf you wish to attach a word processor file, a zip file, or any other file for download by your users, then choose it from your hard drive.\r\n','14,21');
@@ -372,6 +355,326 @@ INSERT INTO incrementer VALUES ('linkId',1);
 INSERT INTO incrementer VALUES ('questionId',1);
 INSERT INTO incrementer VALUES ('submissionId',1);
 INSERT INTO incrementer VALUES ('recurringEventId',1);
+
+#
+# Table structure for table 'international'
+#
+
+CREATE TABLE international (
+  internationalId int(11) NOT NULL default '0',
+  language varchar(30) NOT NULL default 'English',
+  message text,
+  PRIMARY KEY  (internationalId,language)
+) TYPE=MyISAM;
+
+#
+# Dumping data for table 'international'
+#
+
+INSERT INTO international VALUES (1,'English','Add content...');
+INSERT INTO international VALUES (2,'English','Page');
+INSERT INTO international VALUES (3,'English','Paste from clipboard...');
+INSERT INTO international VALUES (4,'English','Manage settings.');
+INSERT INTO international VALUES (5,'English','Manage groups.');
+INSERT INTO international VALUES (6,'English','Manage styles.');
+INSERT INTO international VALUES (7,'English','Manage users.');
+INSERT INTO international VALUES (8,'English','View page not found.');
+INSERT INTO international VALUES (9,'English','View clipboard.');
+INSERT INTO international VALUES (10,'English','View trash.');
+INSERT INTO international VALUES (11,'English','Empy trash.');
+INSERT INTO international VALUES (12,'English','Turn admin off.');
+INSERT INTO international VALUES (13,'English','View help index.');
+INSERT INTO international VALUES (14,'English','View pending submissions.');
+INSERT INTO international VALUES (15,'English','January');
+INSERT INTO international VALUES (16,'English','February');
+INSERT INTO international VALUES (17,'English','March');
+INSERT INTO international VALUES (18,'English','April');
+INSERT INTO international VALUES (19,'English','May');
+INSERT INTO international VALUES (20,'English','June');
+INSERT INTO international VALUES (21,'English','July');
+INSERT INTO international VALUES (22,'English','August');
+INSERT INTO international VALUES (23,'English','September');
+INSERT INTO international VALUES (24,'English','October');
+INSERT INTO international VALUES (25,'English','November');
+INSERT INTO international VALUES (26,'English','December');
+INSERT INTO international VALUES (27,'English','Sunday');
+INSERT INTO international VALUES (28,'English','Monday');
+INSERT INTO international VALUES (29,'English','Tuesday');
+INSERT INTO international VALUES (30,'English','Wednesday');
+INSERT INTO international VALUES (31,'English','Thursday');
+INSERT INTO international VALUES (32,'English','Friday');
+INSERT INTO international VALUES (33,'English','Saturday');
+INSERT INTO international VALUES (34,'English','set date');
+INSERT INTO international VALUES (35,'English','Administrative Function');
+INSERT INTO international VALUES (36,'English','You must be an administrator to perform this function. Please contact one of your administrators. The following is a list of the administrators for this system:');
+INSERT INTO international VALUES (37,'English','Permission Denied!');
+INSERT INTO international VALUES (38,'English','You do not have sufficient privileges to perform this operation. Please <a href=\"^\\?op=displayLogin\">log in with an account</a> that has sufficient privileges before attempting this operation.');
+INSERT INTO international VALUES (39,'English','You do not have sufficient privileges to access this page.');
+INSERT INTO international VALUES (41,'English','You\'re attempting to remove a vital component of the WebGUI system. If you were allowed to continue WebGUI may cease to function.');
+INSERT INTO international VALUES (40,'English','Vital Component');
+INSERT INTO international VALUES (42,'English','Please Confirm');
+INSERT INTO international VALUES (43,'English','Are you certain that you wish to delete this content?');
+INSERT INTO international VALUES (44,'English','Yes, I\'m sure.');
+INSERT INTO international VALUES (45,'English','No, I made a mistake.');
+INSERT INTO international VALUES (46,'English','My Account');
+INSERT INTO international VALUES (47,'English','Home');
+INSERT INTO international VALUES (48,'English','Hello');
+INSERT INTO international VALUES (49,'English','Click <a href=\"^\\?op=logout\">here</a> to log out.');
+INSERT INTO international VALUES (50,'English','Username');
+INSERT INTO international VALUES (51,'English','Password');
+INSERT INTO international VALUES (52,'English','login');
+INSERT INTO international VALUES (53,'English','Make Page Printable');
+INSERT INTO international VALUES (54,'English','Create Account');
+INSERT INTO international VALUES (55,'English','Password (confirm)');
+INSERT INTO international VALUES (56,'English','Email Address');
+INSERT INTO international VALUES (57,'English','This is only necessary if you wish to use features that require Email.');
+INSERT INTO international VALUES (58,'English','I already have an account.');
+INSERT INTO international VALUES (59,'English','I forgot my password.');
+INSERT INTO international VALUES (60,'English','Are you certain you want to deactivate your account. If you proceed your account information will be lost permanently.');
+INSERT INTO international VALUES (61,'English','Update Account Information');
+INSERT INTO international VALUES (62,'English','save');
+INSERT INTO international VALUES (63,'English','Turn admin on.');
+INSERT INTO international VALUES (64,'English','Log out.');
+INSERT INTO international VALUES (65,'English','Please deactivate my account permanently.');
+INSERT INTO international VALUES (66,'English','Log In');
+INSERT INTO international VALUES (67,'English','Create a new account.');
+INSERT INTO international VALUES (68,'English','The account information you supplied is invalid. Either the account does not exist or the username/password combination was incorrect.');
+INSERT INTO international VALUES (69,'English','Please contact your system administrator for assistance.');
+INSERT INTO international VALUES (70,'English','Error');
+INSERT INTO international VALUES (71,'English','Recover password');
+INSERT INTO international VALUES (72,'English','recover');
+INSERT INTO international VALUES (73,'English','Log in.');
+INSERT INTO international VALUES (74,'English','Account Information');
+INSERT INTO international VALUES (75,'English','Your account information has been sent to your email address.');
+INSERT INTO international VALUES (76,'English','That email address is not in our databases.');
+INSERT INTO international VALUES (77,'English','That account name is already in use by another member of this site. Please try a different username. The following are some suggestions:');
+INSERT INTO international VALUES (78,'English','Your passwords did not match. Please try again.');
+INSERT INTO international VALUES (79,'English','Cannot connect to LDAP server.');
+INSERT INTO international VALUES (80,'English','Account created successfully!');
+INSERT INTO international VALUES (81,'English','Account updated successfully!');
+INSERT INTO international VALUES (82,'English','Administrative functions...');
+INSERT INTO international VALUES (83,'English','Add Group');
+INSERT INTO international VALUES (84,'English','Group Name');
+INSERT INTO international VALUES (85,'English','Description');
+INSERT INTO international VALUES (86,'English','Are you certain you wish to delete this group? Beware that deleting a group is permanent and will remove all privileges associated with this group.');
+INSERT INTO international VALUES (87,'English','Edit Group');
+INSERT INTO international VALUES (88,'English','Users In Group');
+INSERT INTO international VALUES (89,'English','Groups');
+INSERT INTO international VALUES (90,'English','Add new group.');
+INSERT INTO international VALUES (91,'English','Previous Page');
+INSERT INTO international VALUES (92,'English','Next Page');
+INSERT INTO international VALUES (93,'English','Help');
+INSERT INTO international VALUES (94,'English','See also');
+INSERT INTO international VALUES (95,'English','Help Index');
+INSERT INTO international VALUES (96,'English','Sorted By Action');
+INSERT INTO international VALUES (97,'English','Sorted by Object');
+INSERT INTO international VALUES (98,'English','Add Page');
+INSERT INTO international VALUES (99,'English','Title');
+INSERT INTO international VALUES (100,'English','Meta Tags');
+INSERT INTO international VALUES (101,'English','Are you certain that you wish to delete this page, its content, and all items under it?');
+INSERT INTO international VALUES (102,'English','Edit Page');
+INSERT INTO international VALUES (103,'English','Page Specifics');
+INSERT INTO international VALUES (104,'English','Page URL');
+INSERT INTO international VALUES (105,'English','Style');
+INSERT INTO international VALUES (106,'English','Check to give this style to all sub-pages.');
+INSERT INTO international VALUES (107,'English','Privileges');
+INSERT INTO international VALUES (108,'English','Owner');
+INSERT INTO international VALUES (109,'English','Owner can view?');
+INSERT INTO international VALUES (110,'English','Owner can edit?');
+INSERT INTO international VALUES (111,'English','Group');
+INSERT INTO international VALUES (112,'English','Group can view?');
+INSERT INTO international VALUES (113,'English','Group can edit?');
+INSERT INTO international VALUES (114,'English','Anybody can view?');
+INSERT INTO international VALUES (115,'English','Anybody can edit?');
+INSERT INTO international VALUES (116,'English','Check to give these privileges to all sub-pages.');
+INSERT INTO international VALUES (117,'English','Edit Authentication Settings');
+INSERT INTO international VALUES (118,'English','Anonymous Registration');
+INSERT INTO international VALUES (119,'English','Authentication Method (default)');
+INSERT INTO international VALUES (120,'English','LDAP URL (default)');
+INSERT INTO international VALUES (121,'English','LDAP Identity (default)');
+INSERT INTO international VALUES (122,'English','LDAP Identity Name');
+INSERT INTO international VALUES (123,'English','LDAP Password Name');
+INSERT INTO international VALUES (124,'English','Edit Company Information');
+INSERT INTO international VALUES (125,'English','Company Name');
+INSERT INTO international VALUES (126,'English','Company Email Address');
+INSERT INTO international VALUES (127,'English','Company URL');
+INSERT INTO international VALUES (128,'English','Edit File Settings');
+INSERT INTO international VALUES (129,'English','Path to WebGUI Extras');
+INSERT INTO international VALUES (130,'English','Maximum Attachment Size');
+INSERT INTO international VALUES (131,'English','Web Attachment Path');
+INSERT INTO international VALUES (132,'English','Server Attachment Path');
+INSERT INTO international VALUES (133,'English','Edit Mail Settings');
+INSERT INTO international VALUES (134,'English','Recover Password Message');
+INSERT INTO international VALUES (135,'English','SMTP Server');
+INSERT INTO international VALUES (136,'English','Home Page');
+INSERT INTO international VALUES (137,'English','Page Not Found Page');
+INSERT INTO international VALUES (138,'English','Yes');
+INSERT INTO international VALUES (139,'English','No');
+INSERT INTO international VALUES (140,'English','Edit Miscellaneous Settings');
+INSERT INTO international VALUES (141,'English','Not Found Page');
+INSERT INTO international VALUES (142,'English','Session Timeout');
+INSERT INTO international VALUES (143,'English','Manage Settings');
+INSERT INTO international VALUES (144,'English','View Statistics');
+INSERT INTO international VALUES (145,'English','WebGUI Build Version');
+INSERT INTO international VALUES (146,'English','Active Sessions');
+INSERT INTO international VALUES (147,'English','Viewable Pages');
+INSERT INTO international VALUES (148,'English','Viewable Widgets');
+INSERT INTO international VALUES (149,'English','Users');
+INSERT INTO international VALUES (150,'English','Add Style');
+INSERT INTO international VALUES (151,'English','Style Name');
+INSERT INTO international VALUES (152,'English','Header');
+INSERT INTO international VALUES (153,'English','Footer');
+INSERT INTO international VALUES (154,'English','Style Sheet');
+INSERT INTO international VALUES (155,'English','Are you certain you wish to delete this style and migrate all pages using this style to the \"Fail Safe\" style?');
+INSERT INTO international VALUES (156,'English','Edit Style');
+INSERT INTO international VALUES (157,'English','Styles');
+INSERT INTO international VALUES (158,'English','Add a new style.');
+INSERT INTO international VALUES (159,'English','Pending Submissions');
+INSERT INTO international VALUES (160,'English','Date Submitted');
+INSERT INTO international VALUES (161,'English','Submitted By');
+INSERT INTO international VALUES (162,'English','Are you certain that you wish to purge all the pages and widgets in the trash?');
+INSERT INTO international VALUES (163,'English','Add User');
+INSERT INTO international VALUES (164,'English','Authentication Method');
+INSERT INTO international VALUES (165,'English','LDAP URL');
+INSERT INTO international VALUES (166,'English','Connect DN');
+INSERT INTO international VALUES (167,'English','Are you certain you want to delete this user? Be warned that all this user\'s information will be lost permanently if you choose to proceed.');
+INSERT INTO international VALUES (168,'English','Edit User');
+INSERT INTO international VALUES (169,'English','Add a new user.');
+INSERT INTO international VALUES (170,'English','search');
+INSERT INTO international VALUES (171,'English','rich edit');
+INSERT INTO international VALUES (172,'English','Article');
+INSERT INTO international VALUES (173,'English','Add Article');
+INSERT INTO international VALUES (174,'English','Display the title?');
+INSERT INTO international VALUES (175,'English','Process macros?');
+INSERT INTO international VALUES (176,'English','Start Date');
+INSERT INTO international VALUES (177,'English','End Date');
+INSERT INTO international VALUES (178,'English','Body');
+INSERT INTO international VALUES (179,'English','Image');
+INSERT INTO international VALUES (180,'English','Link Title');
+INSERT INTO international VALUES (181,'English','Link URL');
+INSERT INTO international VALUES (182,'English','Attachment');
+INSERT INTO international VALUES (183,'English','Convert carriage returns?');
+INSERT INTO international VALUES (184,'English','(Check if you aren\'t adding &lt;br&gt; manually.)');
+INSERT INTO international VALUES (185,'English','Edit Article');
+INSERT INTO international VALUES (186,'English','Delete');
+INSERT INTO international VALUES (187,'English','Events Calendar');
+INSERT INTO international VALUES (188,'English','Add Events Calendar');
+INSERT INTO international VALUES (189,'English','Happens only once.');
+INSERT INTO international VALUES (190,'English','Day');
+INSERT INTO international VALUES (191,'English','Week');
+INSERT INTO international VALUES (192,'English','Add Event');
+INSERT INTO international VALUES (193,'English','Recurs every');
+INSERT INTO international VALUES (194,'English','until');
+INSERT INTO international VALUES (195,'English','Are you certain that you want to delete this event');
+INSERT INTO international VALUES (197,'English','Edit Events Calendar');
+INSERT INTO international VALUES (196,'English','<b>and</b> all of its recurring events');
+INSERT INTO international VALUES (198,'English','Edit Event');
+INSERT INTO international VALUES (199,'English','Extra Column');
+INSERT INTO international VALUES (200,'English','Add Extra Column');
+INSERT INTO international VALUES (201,'English','Spacer');
+INSERT INTO international VALUES (202,'English','Width');
+INSERT INTO international VALUES (203,'English','StyleSheet Class');
+INSERT INTO international VALUES (204,'English','Edit Extra Column');
+INSERT INTO international VALUES (205,'English','F.A.Q.');
+INSERT INTO international VALUES (206,'English','Add F.A.Q.');
+INSERT INTO international VALUES (207,'English','Add Question');
+INSERT INTO international VALUES (208,'English','Question');
+INSERT INTO international VALUES (209,'English','Answer');
+INSERT INTO international VALUES (211,'English','Edit F.A.Q.');
+INSERT INTO international VALUES (210,'English','Are you certain that you want to delete this question?');
+INSERT INTO international VALUES (212,'English','Add a new question.');
+INSERT INTO international VALUES (213,'English','Edit Question');
+INSERT INTO international VALUES (214,'English','Link List');
+INSERT INTO international VALUES (215,'English','Add Link');
+INSERT INTO international VALUES (216,'English','URL');
+INSERT INTO international VALUES (217,'English','Are you certain that you want to delete this link?');
+INSERT INTO international VALUES (218,'English','Edit Link List');
+INSERT INTO international VALUES (219,'English','Add Link List');
+INSERT INTO international VALUES (220,'English','Edit Link');
+INSERT INTO international VALUES (221,'English','Add a new link.');
+INSERT INTO international VALUES (222,'English','Add Message Board');
+INSERT INTO international VALUES (223,'English','Message Board');
+INSERT INTO international VALUES (224,'English','Who can post?');
+INSERT INTO international VALUES (225,'English','Messages Per Page');
+INSERT INTO international VALUES (226,'English','Edit Timeout');
+INSERT INTO international VALUES (227,'English','Edit Message Board');
+INSERT INTO international VALUES (228,'English','Editing Message...');
+INSERT INTO international VALUES (229,'English','Subject');
+INSERT INTO international VALUES (230,'English','Message');
+INSERT INTO international VALUES (231,'English','Posting New Message...');
+INSERT INTO international VALUES (232,'English','no subject');
+INSERT INTO international VALUES (233,'English','(eom)');
+INSERT INTO international VALUES (234,'English','Posting Reply...');
+INSERT INTO international VALUES (235,'English','Edit Message');
+INSERT INTO international VALUES (236,'English','Post Reply');
+INSERT INTO international VALUES (237,'English','Subject:');
+INSERT INTO international VALUES (238,'English','Author:');
+INSERT INTO international VALUES (239,'English','Date:');
+INSERT INTO international VALUES (240,'English','Message ID:');
+INSERT INTO international VALUES (241,'English','Previous Thread');
+INSERT INTO international VALUES (242,'English','Back To Message List');
+INSERT INTO international VALUES (243,'English','Next Thread');
+INSERT INTO international VALUES (244,'English','Author');
+INSERT INTO international VALUES (245,'English','Date');
+INSERT INTO international VALUES (246,'English','Post New Message');
+INSERT INTO international VALUES (247,'English','Thread Started');
+INSERT INTO international VALUES (248,'English','Replies');
+INSERT INTO international VALUES (249,'English','Last Reply');
+INSERT INTO international VALUES (250,'English','Poll');
+INSERT INTO international VALUES (251,'English','Add Poll');
+INSERT INTO international VALUES (252,'English','Active');
+INSERT INTO international VALUES (253,'English','Who can vote?');
+INSERT INTO international VALUES (254,'English','Graph Width');
+INSERT INTO international VALUES (255,'English','Question');
+INSERT INTO international VALUES (256,'English','Answers');
+INSERT INTO international VALUES (257,'English','(Enter one answer per line. No more than 20.)');
+INSERT INTO international VALUES (258,'English','Edit Poll');
+INSERT INTO international VALUES (259,'English','SQL Report');
+INSERT INTO international VALUES (260,'English','Add SQL Report');
+INSERT INTO international VALUES (261,'English','Template');
+INSERT INTO international VALUES (262,'English','Query');
+INSERT INTO international VALUES (263,'English','DSN');
+INSERT INTO international VALUES (264,'English','Database User');
+INSERT INTO international VALUES (265,'English','Database Password');
+INSERT INTO international VALUES (266,'English','Edit SQL Report');
+INSERT INTO international VALUES (267,'English','Error: The DSN specified is of an improper format.');
+INSERT INTO international VALUES (268,'English','Error: The SQL specified is of an improper format.');
+INSERT INTO international VALUES (269,'English','Error: There was a problem with the query.');
+INSERT INTO international VALUES (270,'English','Error: Could not connect to the database.');
+INSERT INTO international VALUES (271,'English','Syndicated Content');
+INSERT INTO international VALUES (272,'English','Add Syndicated Content');
+INSERT INTO international VALUES (273,'English','URL to RSS File');
+INSERT INTO international VALUES (274,'English','Edit Syndicated Content');
+INSERT INTO international VALUES (275,'English','Last Fetched');
+INSERT INTO international VALUES (276,'English','Current Content');
+INSERT INTO international VALUES (277,'English','User Submission System');
+INSERT INTO international VALUES (278,'English','Add User Submission System');
+INSERT INTO international VALUES (279,'English','Who can contribute?');
+INSERT INTO international VALUES (280,'English','Submissions Per Page');
+INSERT INTO international VALUES (281,'English','Approved');
+INSERT INTO international VALUES (282,'English','Denied');
+INSERT INTO international VALUES (283,'English','Pending');
+INSERT INTO international VALUES (284,'English','Default Status');
+INSERT INTO international VALUES (285,'English','Add Submission');
+INSERT INTO international VALUES (286,'English','(Uncheck if you\'re writing an HTML submission.)');
+INSERT INTO international VALUES (287,'English','Date Submitted');
+INSERT INTO international VALUES (288,'English','Status');
+INSERT INTO international VALUES (289,'English','Edit/Delete');
+INSERT INTO international VALUES (290,'English','Untitiled');
+INSERT INTO international VALUES (291,'English','Are you certain you wish to delete this submission?');
+INSERT INTO international VALUES (292,'English','Edit User Submission System');
+INSERT INTO international VALUES (293,'English','Edit Submission');
+INSERT INTO international VALUES (294,'English','Post New Submission');
+INSERT INTO international VALUES (295,'English','Date Submitted');
+INSERT INTO international VALUES (296,'English','Submitted By');
+INSERT INTO international VALUES (297,'English','Submitted By:');
+INSERT INTO international VALUES (298,'English','Date Submitted:');
+INSERT INTO international VALUES (299,'English','Approve');
+INSERT INTO international VALUES (300,'English','Leave Pending');
+INSERT INTO international VALUES (301,'English','Deny');
+INSERT INTO international VALUES (302,'English','Edit');
+INSERT INTO international VALUES (303,'English','Return To Submissions List');
+INSERT INTO international VALUES (304,'English','Language');
 
 #
 # Table structure for table 'link'
@@ -531,6 +834,7 @@ INSERT INTO settings VALUES ('ldapPasswordName','LDAP Password');
 INSERT INTO settings VALUES ('authMethod','WebGUI');
 INSERT INTO settings VALUES ('anonymousRegistration','yes');
 INSERT INTO settings VALUES ('notFoundPage','1');
+INSERT INTO settings VALUES ('recoverPasswordEmail','Someone (probably you) requested your account information be sent. Your password has been reset. The following represents your new account information:');
 
 #
 # Table structure for table 'style'
@@ -608,10 +912,11 @@ CREATE TABLE users (
   username varchar(35) default NULL,
   identifier varchar(35) default NULL,
   email varchar(255) default NULL,
-  icq varchar(30) default NULL,
   authMethod varchar(30) NOT NULL default 'WebGUI',
   ldapURL text,
   connectDN varchar(255) default NULL,
+  language varchar(30) NOT NULL default 'English',
+  icq varchar(30) default NULL,
   PRIMARY KEY  (userId)
 ) TYPE=MyISAM;
 
@@ -619,31 +924,31 @@ CREATE TABLE users (
 # Dumping data for table 'users'
 #
 
-INSERT INTO users VALUES (1,'Visitor','No Login','','','WebGUI',NULL,NULL);
-INSERT INTO users VALUES (2,'Reserved','No Login',NULL,NULL,'WebGUI',NULL,NULL);
-INSERT INTO users VALUES (3,'Admin','RvlMjeFPs2aAhQdo/xt/Kg','','','WebGUI',NULL,NULL);
-INSERT INTO users VALUES (4,'Reserved','No Login',NULL,NULL,'WebGUI',NULL,NULL);
-INSERT INTO users VALUES (5,'Reserved','No Login',NULL,NULL,'WebGUI',NULL,NULL);
-INSERT INTO users VALUES (6,'Reserved','No Login',NULL,NULL,'WebGUI',NULL,NULL);
-INSERT INTO users VALUES (7,'Reserved','No Login',NULL,NULL,'WebGUI',NULL,NULL);
-INSERT INTO users VALUES (8,'Reserved','No Login',NULL,NULL,'WebGUI',NULL,NULL);
-INSERT INTO users VALUES (9,'Reserved','No Login',NULL,NULL,'WebGUI',NULL,NULL);
-INSERT INTO users VALUES (10,'Reserved','No Login',NULL,NULL,'WebGUI',NULL,NULL);
-INSERT INTO users VALUES (11,'Reserved','No Login',NULL,NULL,'WebGUI',NULL,NULL);
-INSERT INTO users VALUES (12,'Reserved','No Login',NULL,NULL,'WebGUI',NULL,NULL);
-INSERT INTO users VALUES (13,'Reserved','No Login',NULL,NULL,'WebGUI',NULL,NULL);
-INSERT INTO users VALUES (14,'Reserved','No Login',NULL,NULL,'WebGUI',NULL,NULL);
-INSERT INTO users VALUES (15,'Reserved','No Login',NULL,NULL,'WebGUI',NULL,NULL);
-INSERT INTO users VALUES (16,'Reserved','No Login',NULL,NULL,'WebGUI',NULL,NULL);
-INSERT INTO users VALUES (17,'Reserved','No Login',NULL,NULL,'WebGUI',NULL,NULL);
-INSERT INTO users VALUES (18,'Reserved','No Login',NULL,NULL,'WebGUI',NULL,NULL);
-INSERT INTO users VALUES (19,'Reserved','No Login',NULL,NULL,'WebGUI',NULL,NULL);
-INSERT INTO users VALUES (20,'Reserved','No Login',NULL,NULL,'WebGUI',NULL,NULL);
-INSERT INTO users VALUES (21,'Reserved','No Login',NULL,NULL,'WebGUI',NULL,NULL);
-INSERT INTO users VALUES (22,'Reserved','No Login',NULL,NULL,'WebGUI',NULL,NULL);
-INSERT INTO users VALUES (23,'Reserved','No Login',NULL,NULL,'WebGUI',NULL,NULL);
-INSERT INTO users VALUES (24,'Reserved','No Login',NULL,NULL,'WebGUI',NULL,NULL);
-INSERT INTO users VALUES (25,'Reserved','No Login',NULL,NULL,'WebGUI',NULL,NULL);
+INSERT INTO users VALUES (1,'Visitor','No Login','','WebGUI',NULL,NULL,'English','');
+INSERT INTO users VALUES (2,'Reserved','No Login',NULL,'WebGUI',NULL,NULL,'English',NULL);
+INSERT INTO users VALUES (3,'Admin','RvlMjeFPs2aAhQdo/xt/Kg','','WebGUI',NULL,NULL,'English','');
+INSERT INTO users VALUES (4,'Reserved','No Login',NULL,'WebGUI',NULL,NULL,'English',NULL);
+INSERT INTO users VALUES (5,'Reserved','No Login',NULL,'WebGUI',NULL,NULL,'English',NULL);
+INSERT INTO users VALUES (6,'Reserved','No Login',NULL,'WebGUI',NULL,NULL,'English',NULL);
+INSERT INTO users VALUES (7,'Reserved','No Login',NULL,'WebGUI',NULL,NULL,'English',NULL);
+INSERT INTO users VALUES (8,'Reserved','No Login',NULL,'WebGUI',NULL,NULL,'English',NULL);
+INSERT INTO users VALUES (9,'Reserved','No Login',NULL,'WebGUI',NULL,NULL,'English',NULL);
+INSERT INTO users VALUES (10,'Reserved','No Login',NULL,'WebGUI',NULL,NULL,'English',NULL);
+INSERT INTO users VALUES (11,'Reserved','No Login',NULL,'WebGUI',NULL,NULL,'English',NULL);
+INSERT INTO users VALUES (12,'Reserved','No Login',NULL,'WebGUI',NULL,NULL,'English',NULL);
+INSERT INTO users VALUES (13,'Reserved','No Login',NULL,'WebGUI',NULL,NULL,'English',NULL);
+INSERT INTO users VALUES (14,'Reserved','No Login',NULL,'WebGUI',NULL,NULL,'English',NULL);
+INSERT INTO users VALUES (15,'Reserved','No Login',NULL,'WebGUI',NULL,NULL,'English',NULL);
+INSERT INTO users VALUES (16,'Reserved','No Login',NULL,'WebGUI',NULL,NULL,'English',NULL);
+INSERT INTO users VALUES (17,'Reserved','No Login',NULL,'WebGUI',NULL,NULL,'English',NULL);
+INSERT INTO users VALUES (18,'Reserved','No Login',NULL,'WebGUI',NULL,NULL,'English',NULL);
+INSERT INTO users VALUES (19,'Reserved','No Login',NULL,'WebGUI',NULL,NULL,'English',NULL);
+INSERT INTO users VALUES (20,'Reserved','No Login',NULL,'WebGUI',NULL,NULL,'English',NULL);
+INSERT INTO users VALUES (21,'Reserved','No Login',NULL,'WebGUI',NULL,NULL,'English',NULL);
+INSERT INTO users VALUES (22,'Reserved','No Login',NULL,'WebGUI',NULL,NULL,'English',NULL);
+INSERT INTO users VALUES (23,'Reserved','No Login',NULL,'WebGUI',NULL,NULL,'English',NULL);
+INSERT INTO users VALUES (24,'Reserved','No Login',NULL,'WebGUI',NULL,NULL,'English',NULL);
+INSERT INTO users VALUES (25,'Reserved','No Login',NULL,'WebGUI',NULL,NULL,'English',NULL);
 
 #
 # Table structure for table 'widget'

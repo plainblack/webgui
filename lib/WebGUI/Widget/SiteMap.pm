@@ -89,7 +89,7 @@ sub www_edit {
 	tie %data, 'Tie::CPHash';
         if (WebGUI::Privilege::canEditPage()) {
 		%data = WebGUI::SQL->quickHash("select * from widget,SiteMap where widget.widgetId=SiteMap.widgetId and widget.widgetId=$session{form}{wid}",$session{dbh});
-                $output = '<a href="'.$session{page}{url}.'?op=viewHelp&hid=31"><img src="'.$session{setting}{lib}.'/help.gif" border="0" align="right"></a><h1>Edit Site Map</h1><form method="post" action="'.$session{page}{url}.'">';
+                $output = '<a href="'.$session{page}{url}.'?op=viewHelp&hid=30"><img src="'.$session{setting}{lib}.'/help.gif" border="0" align="right"></a><h1>Edit Site Map</h1><form method="post" action="'.$session{page}{url}.'">';
                 $output .= WebGUI::Form::hidden("wid",$session{form}{wid});
                 $output .= WebGUI::Form::hidden("func","editSave");
                 $output .= '<table>';

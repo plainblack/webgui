@@ -28,12 +28,11 @@ sub getStyle {
 		$header = '<!-- WebGUI '.$WebGUI::VERSION.' -->
 			<html>
 			<head>
-			<title>'.$session{page}{title}.'</title>
-			'.$style{styleSheet}.'
-			'.$session{page}{metaTags}
-		#	.'<script language="JavaScript" src="'.$session{setting}{lib}.'/WebGUI.js"></script>'
-			.'</head>
-			'.$style{header};
+			<title>'.$session{page}{title}.'</title>'
+			.$style{styleSheet}
+			.$session{page}{metaTags}
+			.'</head>'
+			.$style{header};
 		$footer = $style{footer}.'
 			</html>';
 		$header = WebGUI::Macro::process($header);
@@ -41,7 +40,6 @@ sub getStyle {
 	}
 	return ($header, $footer);
 }
-
 
 
 

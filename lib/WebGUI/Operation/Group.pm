@@ -91,7 +91,7 @@ sub www_editGroup {
 	tie %group, 'Tie::CPHash';
         if (WebGUI::Privilege::isInGroup(3)) {
                 %group = WebGUI::SQL->quickHash("select * from groups where groupId=$session{form}{gid}",$session{dbh});
-                $output .= '<a href="'.$session{page}{url}.'?op=viewHelp&hid=13"><img src="'.$session{setting}{lib}.'/help.gif" border="0" align="right"></a>';
+                $output .= '<a href="'.$session{page}{url}.'?op=viewHelp&hid=17"><img src="'.$session{setting}{lib}.'/help.gif" border="0" align="right"></a>';
 		$output .= '<h1>'.WebGUI::International::get(87).'</h1>';
 		$output .= ' <form method="post" action="'.$session{page}{url}.'"> ';
                 $output .= WebGUI::Form::hidden("op","editGroupSave");

@@ -20,7 +20,7 @@ use WebGUI::SQL;
 use WebGUI::Utility;
 
 our @ISA = qw(Exporter);
-our @EXPORT = qw(&www_editAuthenticationSettings &www_editAuthenticationSettingsSave &www_editCompanyInformation &www_editCompanyInformationSave &www_editFileSettings &www_editFileSettingsSave &www_editMailSettings &www_editMailSettingsSave &www_editMiscSettings &www_editMiscSettingsSave &www_manageSettings &www_viewStatistics);
+our @EXPORT = qw(&www_editAuthenticationSettings &www_editAuthenticationSettingsSave &www_editCompanyInformation &www_editCompanyInformationSave &www_editFileSettings &www_editFileSettingsSave &www_editMailSettings &www_editMailSettingsSave &www_editMiscSettings &www_editMiscSettingsSave &www_manageSettings);
 
 #-------------------------------------------------------------------
 sub www_editAuthenticationSettings {
@@ -209,33 +209,7 @@ sub www_manageSettings {
                 $output .= '<li><a href="'.$session{page}{url}.'?op=editFileSettings">'.WebGUI::International::get(128).'</a>';
                 $output .= '<li><a href="'.$session{page}{url}.'?op=editMailSettings">'.WebGUI::International::get(133).'</a>';
                 $output .= '<li><a href="'.$session{page}{url}.'?op=editMiscSettings">'.WebGUI::International::get(140).'</a>';
-                $output .= '<li><a href="'.$session{page}{url}.'?op=viewStatistics">'.WebGUI::International::get(144).'</a>';
                 $output .= '</ul>';
-        } else {
-                $output = WebGUI::Privilege::adminOnly();
-        }
-        return $output;
-}
-
-#-------------------------------------------------------------------
-sub www_viewStatistics {
-        my ($output, $data);
-        if (WebGUI::Privilege::isInGroup(3)) {
-                $output .= '<a href="'.$session{page}{url}.'?op=viewHelp&hid=12"><img src="'.$session{setting}{lib}.'/help.gif" border="0" align="right"></a>';
-                $output .= '<h1>'.WebGUI::International::get(144).'</h1>';
-		$output .= '<table>';
-		$output .= '<tr><td class="tableHeader">'.WebGUI::International::get(145).'</td><td class="tableData">'.$WebGUI::VERSION.'</td></tr>';
-		($data) = WebGUI::SQL->quickArray("select count(*) from session",$session{dbh});
-		$output .= '<tr><td class="tableHeader">'.WebGUI::International::get(146).'</td><td class="tableData">'.$data.'</td></tr>';
-		($data) = WebGUI::SQL->quickArray("select count(*)+1 from page where parentId>25",$session{dbh});
-		$output .= '<tr><td class="tableHeader">'.WebGUI::International::get(147).'</td><td class="tableData">'.$data.'</td></tr>';
-		($data) = WebGUI::SQL->quickArray("select count(*) from page where pageId>25 or pageId=0",$session{dbh});
-		$output .= '<tr><td class="tableHeader">'.WebGUI::International::get(148).'</td><td class="tableData">'.$data.'</td></tr>';
-		($data) = WebGUI::SQL->quickArray("select count(*) from users where userId>25",$session{dbh});
-		$output .= '<tr><td class="tableHeader">'.WebGUI::International::get(149).'</td><td class="tableData">'.$data.'</td></tr>';
-		($data) = WebGUI::SQL->quickArray("select count(*) from groups where groupId>25",$session{dbh});
-		$output .= '<tr><td class="tableHeader">'.WebGUI::International::get(89).'</td><td class="tableData">'.$data.'</td></tr>';
-		$output .= '</table>';
         } else {
                 $output = WebGUI::Privilege::adminOnly();
         }

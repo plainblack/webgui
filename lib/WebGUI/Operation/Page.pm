@@ -141,7 +141,7 @@ sub www_editPage {
 	tie %hash, "Tie::IxHash";
         if (WebGUI::Privilege::canEditPage()) {
 		%yesNo = ("0"=>"No", "1"=>"Yes");
-                $output = '<a href="'.$session{page}{url}.'?op=viewHelp&hid=2"><img src="'.$session{setting}{lib}.'/help.gif" border="0" align="right"></a>';
+                $output = '<a href="'.$session{page}{url}.'?op=viewHelp&hid=1"><img src="'.$session{setting}{lib}.'/help.gif" border="0" align="right"></a>';
 		$output .= '<h1>'.WebGUI::International::get(102).'</h1>';
 		$output .= '<form method="post" action="'.$session{page}{url}.'">';
                 $output .= WebGUI::Form::hidden("op","editPageSave");
