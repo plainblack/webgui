@@ -1,5 +1,5 @@
 package WebGUI;
-our $VERSION = "4.6.0";
+our $VERSION = "4.6.1";
 
 #-------------------------------------------------------------------
 # WebGUI is Copyright 2001-2002 Plain Black LLC.
@@ -128,7 +128,8 @@ sub page {
 						${$wobject}{_WobjectProxy} = ${$originalWobject}{wobjectId};
 					}
                                 }
-				$extra = WebGUI::SQL->quickHashRef("select * from ${$wobject}{namespace} where wobjectId=${$wobject}{wobjectId}");
+				my $sql = "select * from ".$wobject->{namespace}." where wobjectId=".$wobject->{wobjectId};
+				$extra = WebGUI::SQL->quickHashRef("select * from ".$wobject->{namespace}." where wobjectId=".$wobject->{wobjectId});
 				tie %hash, 'Tie::CPHash';
 				%hash = (%{$wobject},%{$extra});
 				$wobject = \%hash;
