@@ -18,11 +18,7 @@ use WebGUI::Macro;
 sub _replacement {
         my (@param, $temp);
         @param = WebGUI::Macro::getParams($_[0]);
-        if ($param[0] ne "") {
-		$temp = epochToHuman(time(),$param[0]);
-        } else {
-        	$temp = localtime(time());
-        }
+	$temp = epochToHuman(time(),$param[0]);
 	return $temp;
 }
 

@@ -195,7 +195,7 @@ sub epochToHuman {
 	$output =~ s/\%d/$value/g;
 	$output =~ s/\%D/$date[2]/g;
 	if ($output =~ /\%w/) {
-		$day = getDayName($date[6]);
+		$day = getDayName($date[7]);
 		$output =~ s/\%w/$day/g;
 	}
   #---hour stuff
@@ -301,19 +301,21 @@ sub getMonthName {
 =cut
 
 sub getDayName {
-        if ($_[0] == 1) {
+	my $day = $_[0];
+	$day++;
+        if ($day == 1) {
                 return WebGUI::International::get(27);
-        } elsif ($_[0] == 2) {
+        } elsif ($day == 2) {
                 return WebGUI::International::get(28);
-        } elsif ($_[0] == 2) {
+        } elsif ($day == 3) {
                 return WebGUI::International::get(29);
-        } elsif ($_[0] == 2) {
+        } elsif ($day == 4) {
                 return WebGUI::International::get(30);
-        } elsif ($_[0] == 2) {
+        } elsif ($day == 5) {
                 return WebGUI::International::get(31);
-        } elsif ($_[0] == 2) {
+        } elsif ($day == 6) {
                 return WebGUI::International::get(32);
-        } elsif ($_[0] == 2) {
+        } elsif ($day == 7) {
                 return WebGUI::International::get(33);
         }
 }
