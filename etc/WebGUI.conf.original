@@ -27,15 +27,11 @@ macros = a => a_account, \
 	c => c_companyName, \
 	C => C_crumbTrail, \
 	CanEditText => CanEditText, \
-	D => D_date, \
 	e => e_companyEmail, \
 	EditableToggle => EditableToggle, \
-	Env => Env, \
-	Execute => Execute, \
 	Extras => Extras, \
 	File => File, \
 	FlexMenu => FlexMenu, \
-	FormParam => FormParam, \
 	GroupAdd => GroupAdd, \
 	GroupDelete => GroupDelete, \
 	GroupText => GroupText, \
@@ -43,21 +39,16 @@ macros = a => a_account, \
 	H => H_homeLink, \
 	i => i_imageNoTags, \
 	I => I_imageWithTags, \
-	If => If, \
-	Include => Include, \
-	International => International, \
 	L => L_loginBox, \
 	LastModified => LastModified, \
 	LoginToggle => LoginToggle, \
 	m => m_currentMenuHorizontal, \
 	M => M_currentMenuVertical, \
-	Page => Page, \
 	PageTitle => PageTitle, \
 	PreviousDropMenu => PreviousDropMenu, \
 	p => p_previousMenuHorizontal, \
 	P => P_previousMenuVertical, \
 	? => Question_search, \
-	Quote => Quote, \
 	rootmenu => rootmenuHorizontal, \
 	RandomImage => RandomImage, \
 	RandomSnippet => RandomSnippet, \
@@ -66,8 +57,6 @@ macros = a => a_account, \
 	r => r_printable, \
 	/ => Slash_gatewayUrl, \
 	Snippet => Snippet, \
-	* => Splat_random, \
-	SQL => SQL, \
 	s => s_specificMenuHorizontal, \
 	S => S_specificMenuVertical, \
 	Spacer => Spacer, \
@@ -79,9 +68,7 @@ macros = a => a_account, \
 	TopDropMenu => TopDropMenu, \
 	t => t_topMenuHorizontal, \
 	T => T_topMenuVertical, \
-	u => u_companyUrl, \
-	URLEncode => URLEncode, \
-	User => User
+	u => u_companyUrl
 
 searchAndReplace = \
         :)  => "<img src='/extras/smileys/smile01.gif' align='absMiddle' border='0'>", \
