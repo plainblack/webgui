@@ -62,6 +62,7 @@ sub www_add {
                 $output .= '<tr><td class="formDescription">'.WebGUI::International::get(1,$namespace).'</td><td>'.WebGUI::Form::text("indent",20,2,0).'</td></tr>';
                 $output .= '<tr><td class="formDescription">'.WebGUI::International::get(2,$namespace).'</td><td>'.WebGUI::Form::text("lineSpacing",20,1,1).'</td></tr>';
                 $output .= '<tr><td class="formDescription">'.WebGUI::International::get(4,$namespace).'</td><td>'.WebGUI::Form::text("bullet",20,255,'&middot;').'</td></tr>';
+                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(5,$namespace).'</td><td>'.WebGUI::Form::checkbox("proceed",1,1).'</td></tr>';
                 $output .= '<tr><td></td><td>'.WebGUI::Form::submit(WebGUI::International::get(62)).'</td></tr>';
                 $output .= '</table></form>';
                 return $output;
@@ -77,7 +78,12 @@ sub www_addSave {
 	if (WebGUI::Privilege::canEditPage()) {
 		$widgetId = create();
 		WebGUI::SQL->write("insert into LinkList values ($widgetId, '$session{form}{indent}', '$session{form}{lineSpacing}', ".quote($session{form}{bullet}).")",$session{dbh});
-		return "";
+                if ($session{form}{proceed} == 1) {
+                        $session{form}{wid} = $widgetId;
+                        return www_addLink();
+                } else {
+                        return "";
+                }
 	} else {
 		return WebGUI::Privilege::insufficient();
 	}

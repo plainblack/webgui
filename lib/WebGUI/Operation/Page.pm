@@ -80,7 +80,7 @@ sub www_addPageSave {
 	my ($urlizedTitle, $test, $nextSeq);
 	if (WebGUI::Privilege::canEditPage()) {
 		($nextSeq) = WebGUI::SQL->quickArray("select max(sequenceNumber)+1 from page where parentId=$session{page}{pageId}",$session{dbh});
-		$urlizedTitle = urlizeTitle($session{form}{title});
+		$urlizedTitle = urlize($session{form}{title});
 		while (($test) = WebGUI::SQL->quickArray("select urlizedTitle from page where urlizedTitle='$urlizedTitle'",$session{dbh})) {
 			$urlizedTitle .= 2;
 		}
@@ -189,7 +189,7 @@ sub www_editPage {
 sub www_editPageSave {
         my (%parent, $urlizedTitle, $test);
         if (WebGUI::Privilege::canEditPage()) {
-                $urlizedTitle = urlizeTitle($session{form}{urlizedTitle});
+                $urlizedTitle = urlize($session{form}{urlizedTitle});
                 while (($test) = WebGUI::SQL->quickArray("select urlizedTitle from page where urlizedTitle='$urlizedTitle' and pageId<>$session{page}{pageId}",$session{dbh})) {
                         $urlizedTitle .= 2;
                 }

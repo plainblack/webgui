@@ -46,9 +46,10 @@ sub www_add {
                 $output .= WebGUI::Form::hidden("func","addSave");
                 $output .= '<table>';
                 $output .= '<tr><td class="formDescription">'.WebGUI::International::get(99).'</td><td>'.WebGUI::Form::text("title",20,128,'Events Calendar').'</td></tr>';
-                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(174).'</td><td>'.WebGUI::Form::checkbox("displayTitle",1).'</td></tr>';
+                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(174).'</td><td>'.WebGUI::Form::checkbox("displayTitle",1,1).'</td></tr>';
                 $output .= '<tr><td class="formDescription">'.WebGUI::International::get(175).'</td><td>'.WebGUI::Form::checkbox("processMacros",1).'</td></tr>';
                 $output .= '<tr><td class="formDescription">'.WebGUI::International::get(85).'</td><td>'.WebGUI::Form::textArea("description").'</td></tr>';
+                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(1,$namespace).'</td><td>'.WebGUI::Form::checkbox("proceed",1,1).'</td></tr>';
                 $output .= '<tr><td></td><td>'.WebGUI::Form::submit(WebGUI::International::get(62)).'</td></tr>';
                 $output .= '</table></form>';
                 return $output;
@@ -64,7 +65,12 @@ sub www_addSave {
 	if (WebGUI::Privilege::canEditPage()) {
 		$widgetId = create();	
                 WebGUI::SQL->write("insert into FAQ values ($widgetId)",$session{dbh});
-		return "";
+                if ($session{form}{proceed} == 1) {
+                        $session{form}{wid} = $widgetId;
+                        return www_addEvent();
+                } else {
+                        return "";
+                }
 	} else {
 		return WebGUI::Privilege::insufficient();
 	}

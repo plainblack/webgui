@@ -18,7 +18,7 @@ use WebGUI::Session;
 use WebGUI::SQL;
 
 our @ISA = qw(Exporter);
-our @EXPORT = qw(&randint &getNextId &saveAttachment &round &urlizeTitle &quote);
+our @EXPORT = qw(&randint &getNextId &saveAttachment &round &urlize &quote);
 
 #-------------------------------------------------------------------
 sub getNextId {
@@ -54,10 +54,13 @@ sub round {
 sub saveAttachment {
 	my ($file, $filename, $bytesread, $buffer, $urlizedFilename, $path);
 	$filename = $session{cgi}->upload($_[0]);
-	#$filename = $session{form}{$_[0]};
-	#$filename = $session{cgi}->param($_[0]);
 	if (defined $filename) {
-		$urlizedFilename = urlizeTitle($filename);
+		if ($filename =~ /([^\/\\]+)$/) {
+     			$urlizedFilename = $1;
+   		} else {
+     			$urlizedFilename = $filename;
+   		}
+		$urlizedFilename = urlize($urlizedFilename);
 		$path = $session{setting}{attachmentDirectoryLocal}."/".$_[1]."/";
 		mkdir ($path,0755);
 		if ($_[2] ne "") {
@@ -65,6 +68,7 @@ sub saveAttachment {
 			mkdir ($path,0755);
 		}
 		$file = FileHandle->new(">".$path.$urlizedFilename);
+		binmode $file;
 		if (defined $file) {
 			while ($bytesread=read($filename,$buffer,1024)) {
         			print $file $buffer;
@@ -80,7 +84,7 @@ sub saveAttachment {
 }
 
 #-------------------------------------------------------------------
-sub urlizeTitle {
+sub urlize {
 	my ($title);
         $title = lc($_[0]);
         $title =~ s/ /_/g;

@@ -444,11 +444,13 @@ sub www_updateAccount {
                 	$error .= '"'.$session{form}{username}.'_'.WebGUI::DateTime::epochToHuman(time(),"%y").'"';
 			$error .= '<p>';
         	}
-        	if ($session{form}{identifier1} ne "password" && _hasBadPassword($session{form}{identifier1},$session{form}{identifier2})) {
-                	$error .= WebGUI::International::get(78).'<p>';
-        	} else {
-                	$encryptedPassword = Digest::MD5::md5_base64($session{form}{identifier1});
-			$passwordStatement = ', identifier='.quote($encryptedPassword);
+        	if ($session{form}{identifier1} ne "password") {
+			if (_hasBadPassword($session{form}{identifier1},$session{form}{identifier2})) {
+                		$error .= WebGUI::International::get(78).'<p>';
+        		} else {
+                		$encryptedPassword = Digest::MD5::md5_base64($session{form}{identifier1});
+				$passwordStatement = ', identifier='.quote($encryptedPassword);
+			}
 		}
         	if ($error eq "") {
                 	$encryptedPassword = Digest::MD5::md5_base64($session{form}{identifier1});
