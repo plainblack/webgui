@@ -272,6 +272,16 @@ the last page.</P>|,
 		lastUpdated => 1066252241
 	},
 
+	'page' => {
+		message => q|Page|,
+		lastUpdated => 1109789907,
+	},
+
+	'discussion' => {
+		message => q|Discussion|,
+		lastUpdated => 1109789911,
+	},
+
 };
 
 1;

@@ -392,7 +392,7 @@ sub www_edit {
         my $self = shift;
         return WebGUI::Privilege::insufficient() unless $self->canEdit;
         $self->getAdminConsole->setHelp("search add/edit");
-        return $self->getAdminConsole->render($self->getEditForm->print,WebGUI::International::get("26","Article"));
+        return $self->getAdminConsole->render($self->getEditForm->print,WebGUI::International::get("26","IndexedSearch"));
 }
 
 #-------------------------------------------------------------------
@@ -506,11 +506,11 @@ sub _getNamespaces {
 #-------------------------------------------------------------------
 sub _getContentTypes {
 	my ($self, $restricted) = @_;
-	my %international = (	'page' => WebGUI::International::get(2),
+	my %international = (	'page' => WebGUI::International::get('page',"IndexedSearch"),
 					'wobject' => WebGUI::International::get(19,"IndexedSearch"),
 					'wobjectDetail' => WebGUI::International::get(20,"IndexedSearch"),
 					'content' => WebGUI::International::get(21,"IndexedSearch"),
-					'discussion' => WebGUI::International::get(892),
+					'discussion' => WebGUI::International::get('discussion',"IndexedSearch"),
 					'profile' => WebGUI::International::get(22,"IndexedSearch"),
 					'any' => WebGUI::International::get(23,"IndexedSearch"),
 				);
