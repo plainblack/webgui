@@ -45,38 +45,36 @@ sub _changeWobjectPrivileges {
 	  }
     }
 }			
-		
-#-------------------------------------------------------------------
-sub _recursivelyChangePrivileges {
-        my ($sth, $pageId);
-        $sth = WebGUI::SQL->read("select pageId from page where parentId=$_[0]");
-	    _changeWobjectPrivileges($_[0]) unless $session{form}{wobjectPrivileges};
-        while (($pageId) = $sth->array) {
-		if (WebGUI::Privilege::canEditPage($pageId)) {
-        		WebGUI::SQL->write("update page set startDate=".WebGUI::FormProcessor::dateTime("startDate").", 
-				endDate=".WebGUI::FormProcessor::dateTime("endDate").",
-				ownerId=$session{form}{ownerId},  groupIdView=$session{form}{groupIdView}, 
-				groupIdEdit=$session{form}{groupIdEdit}, wobjectPrivileges=$session{form}{wobjectPrivileges} where pageId=$pageId");
-                	_recursivelyChangePrivileges($pageId);
-		}
-        }
-	$sth->finish;
-}
 
 #-------------------------------------------------------------------
-sub _recursivelyChangeStyle {
-	my ($sth, $pageId);
-	$sth = WebGUI::SQL->read("select pageId from page where parentId=$_[0]");	
-	while (($pageId) = $sth->array) {
-		if (WebGUI::Privilege::canEditPage($pageId)) {
-			WebGUI::SQL->write("update page set styleId=$session{form}{styleId}, printableStyleId=$session{form}{printableStyleId} where pageId=$pageId");
-			_recursivelyChangeStyle($pageId);
+# This combines _recusivelyChangePrivileges and _recusivelyChangeStyle, since there's no use in walking down a tree twice.
+sub _recursivelyChangeProperties {
+	my $page = shift;
+
+	_changeWobjectPrivileges($page->get("pageId")) unless $session{form}{wobjectPrivileges};
+
+	$page->walk_down({
+		callback => sub {
+			if (WebGUI::Privilege::canEditPage($_[0]->get('pageId'))) {
+				$_[0]->setWithoutRecache({
+					startDate		=> WebGUI::FormProcessor::dateTime("startDate"),
+					endDate			=> WebGUI::FormProcessor::dateTime("endDate"),
+					ownerId			=> $session{form}{ownerId},
+					groupIdView		=> $session{form}{groupIdView},
+					groupIdEdit		=> $session{form}{groupIdEdit}
+				}) if ($session{form}{recursePrivs});
+				$_[0]->setWithoutRecache({
+					styleId => $session{form}{styleId}
+				}) if ($session{form}{recurseStyle});
+			}
+			return 1;
 		}
-	}
-	$sth->finish;
+	});
+	
+	WebGUI::Page->recachePageTree;
 }
 
-#-------------------------------------------------------------------
+-------------------------------------------------------------------
 sub _reorderPages {
         my ($sth, $i, $pid);
         $sth = WebGUI::SQL->read("select pageId from page where parentId=$_[0] order by sequenceNumber");
@@ -192,16 +190,13 @@ sub _traversePageTree {
 
 #-------------------------------------------------------------------
 sub www_cutPage {
+	my ($page);
         if ($session{page}{pageId} < 26 && $session{page}{pageId} >= 0) {
                 return WebGUI::Privilege::vitalComponent();
+		
         } elsif (WebGUI::Privilege::canEditPage()) {
-                WebGUI::SQL->write("update page set parentId=2, "
-                        ."bufferUserId=".$session{user}{userId}.", "
-                        ."bufferDate=".time().", "
-                        ."bufferPrevId=".$session{page}{parentId}." "
-                        ."where pageId=".$session{page}{pageId});
-		_reorderPages($session{page}{parentId});
-                WebGUI::Session::refreshPageInfo($session{page}{parentId});
+		$page = WebGUI::Page->getPage($session{page}{pageId});
+		$page->cut;
                 return "";
         } else {
                 return WebGUI::Privilege::insufficient();
@@ -484,51 +479,54 @@ sub www_editPage {
 
 #-------------------------------------------------------------------
 sub www_editPageSave {
-        my ($nextSeq, $pageId);
+        my ($pageId, $currentPage, $page);
+	
 	if ($session{form}{pageId} eq "new") {
 		$pageId = $session{form}{parentId};
 	} else {
+		$page = WebGUI::Page->getPage($session{form}{pageId});
 		$pageId = $session{form}{pageId};
 	}
-        return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage($pageId));
+	
+	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage($pageId));
+
 	if ($session{form}{pageId} eq "new") {
-		($nextSeq) = WebGUI::SQL->quickArray("select max(sequenceNumber) from page where parentId=$session{form}{parentId}");
-               	$nextSeq++;
-		$session{form}{pageId} = getNextId("pageId");
-		WebGUI::SQL->write("insert into page (pageId,sequenceNumber,parentId) 
-			values ($session{form}{pageId},$nextSeq,$session{form}{parentId})");
+		$currentPage = WebGUI::Page->getPage($session{page}{pageId});
+		$page = $currentPage->add;
 	}
+
         $session{form}{title} = "no title" if ($session{form}{title} eq "");
         $session{form}{menuTitle} = $session{form}{title} if ($session{form}{menuTitle} eq "");
         $session{form}{urlizedTitle} = $session{form}{menuTitle} if ($session{form}{urlizedTitle} eq "");
 	$session{form}{urlizedTitle} = WebGUI::Page::makeUnique(WebGUI::URL::urlize($session{form}{urlizedTitle}),$session{form}{pageId});
-        WebGUI::SQL->write("update page set 
-		title=".quote($session{form}{title}).", 
-		styleId=$session{form}{styleId}, 
-		printableStyleId=$session{form}{printableStyleId}, 
-		ownerId=$session{form}{ownerId}, 
-		groupIdView=$session{form}{groupIdView}, 
-		groupIdEdit=$session{form}{groupIdEdit}, 
-		newWindow=$session{form}{newWindow},
-		wobjectPrivileges=$session{form}{wobjectPrivileges},
-		hideFromNavigation=$session{form}{hideFromNavigation},
-		startDate=".WebGUI::FormProcessor::dateTime("startDate").",
-		endDate=".WebGUI::FormProcessor::dateTime("endDate").",
-		cacheTimeout=".WebGUI::FormProcessor::interval("cacheTimeout").",
-		cacheTimeoutVisitor=".WebGUI::FormProcessor::interval("cacheTimeoutVisitor").",
-		metaTags=".quote($session{form}{metaTags}).", 
-		urlizedTitle='$session{form}{urlizedTitle}', 
-		redirectURL='$session{form}{redirectURL}', 
-		languageId='$session{form}{languageId}', 
-		defaultMetaTags='$session{form}{defaultMetaTags}', 
-		templateId='$session{form}{templateId}', 
-		menuTitle=".quote($session{form}{menuTitle}).", 
-		synopsis=".quote($session{form}{synopsis})." 
-		where pageId=$session{form}{pageId}");
-	WebGUI::SQL->write("update wobject set templatePosition=1 where pageId=$session{form}{pageId} 
-		and templatePosition>".WebGUI::Page::countTemplatePositions($session{form}{templateId}));
-	_recursivelyChangeStyle($session{form}{pageId}) if ($session{form}{recurseStyle});
-	_recursivelyChangePrivileges($session{form}{pageId}) if ($session{form}{recursePrivs});
+        $page->set({
+		title			=> $session{form}{title}, 
+		styleId			=> $session{form}{styleId}, 
+		printableStyleId	=> $session{form}{printableStyleId}, 
+		ownerId			=> $session{form}{ownerId}, 
+		groupIdView		=> $session{form}{groupIdView}, 
+		groupIdEdit		=> $session{form}{groupIdEdit}, 
+		newWindow		=> $session{form}{newWindow},
+		wobjectPrivileges	=> $session{form}{wobjectPrivileges},
+		hideFromNavigation	=> $session{form}{hideFromNavigation},
+		startDate		=> WebGUI::FormProcessor::dateTime("startDate"),
+		endDate			=> WebGUI::FormProcessor::dateTime("endDate"),
+		cacheTimeout		=> WebGUI::FormProcessor::interval("cacheTimeout"),
+		cacheTimeoutVisitor	=> WebGUI::FormProcessor::interval("cacheTimeoutVisitor"),
+		metaTags		=> $session{form}{metaTags},
+		urlizedTitle		=> $session{form}{urlizedTitle}, 
+		redirectURL		=> $session{form}{redirectURL}, 
+		languageId		=> $session{form}{languageId}, 
+		defaultMetaTags		=> $session{form}{defaultMetaTags}, 
+		templateId		=> $session{form}{templateId}, 
+		menuTitle		=> $session{form}{menuTitle}, 
+		synopsis		=> $session{form}{synopsis}
+		});
+	unless ($session{form}{pageId} == 'new') {
+		WebGUI::SQL->write("update wobject set templatePosition=1 where pageId=$session{form}{pageId} 
+			and templatePosition>".WebGUI::Page::countTemplatePositions($session{form}{templateId}));
+	}
+	_recursivelyChangeProperties($page) if ($session{form}{recursePrivs} || $session{form}{recurseStyle});
 	if ($session{form}{proceed} eq "gotoNewPage") {
 		WebGUI::Session::refreshPageInfo($session{form}{pageId});
 	} elsif ($session{form}{pageId} == $session{page}{pageId}) {
@@ -599,15 +597,11 @@ sub www_moveTreePageRight {
 
 #-------------------------------------------------------------------
 sub www_pastePage {
-	return "" if ($session{page}{pageId} == $session{form}{pageId}); # don't let it paste to itself
-        my ($output, $nextSeq);
-	($nextSeq) = WebGUI::SQL->quickArray("select max(sequenceNumber) from page where parentId=$session{page}{pageId}");
-	$nextSeq += 1;
+	my ($currentPage, $pageToPaste);
         if (WebGUI::Privilege::canEditPage()) {
-		WebGUI::SQL->write("update page set parentId=$session{page}{pageId}, sequenceNumber='$nextSeq', "
-				  ."bufferUserId=NULL, bufferDate=NULL, bufferPrevId=NULL "
-				  ."where pageId=$session{form}{pageId}");
-		_reorderPages($session{page}{pageId});
+		$currentPage = WebGUI::Page->getPage($session{page}{pageId});
+		$pageToPaste = WebGUI::Page->getPage($session{form}{pageId});
+		$pageToPaste->paste($currentPage);
                 return "";
         } else {
                 return WebGUI::Privilege::insufficient();
@@ -624,4 +618,3 @@ sub www_viewPageTree {
 }
 
 1;
-
