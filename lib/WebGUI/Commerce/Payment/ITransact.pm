@@ -203,11 +203,6 @@ sub configurationForm {
 		$f->readOnly(
 			-value => '<a target="_blank" href="https://secure.paymentclearing.com/support/login.html">'.$i18n->get('show terminal').'</a>'
 			);
-	} else {
-		$f->readOnly(
-			-value => '<a target="_blank" href="https://secure.cdgcommerce.com/onlineapp/onlineapp.php?agentid=309&appcode=PROMO2005">'.
-				$i18n->get('set up account').'</a>'
-			);
 	}
 	$f->readOnly(
 		-value	=> '<br>'

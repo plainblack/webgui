@@ -74,9 +74,9 @@ our $I18N = {
 	},
 
 	'module name' => {
-		message => q|CDG Commerce|,
+		message => q|iTransact (CDG Commerce)|,
 		lastUpdated => 0,
-		context => q|The displayed name of the Payflo Pro payment module.|
+		context => q|The displayed name of the payment module.|
 	},
 
 	'invalid firstName' => {
@@ -134,13 +134,36 @@ our $I18N = {
 		lastUpdated => 0,
 		context => q|The label of the link that points to the virtual terminal login.|
 	},
-	'set up account' => {
-		message => q|Register for a merchant account now to get started processing online transactions.|,
-		lastUpdated => 0,
-		context => q|The label of the link that points to the account creation page of CDG.|
-	},
 	'extra info' => {
-		message => q|This plugin expects that you set up the following recipe's in your CDG account. Be very careful to enter the recipe names exactly as given below.<br>
+		message => q|Setting up your ecommerce site is as easy as these few steps:
+<p>
+<b>Step 1: Get A Merchant Account</b><br />
+<a target="_blank" href="https://secure.cdgcommerce.com/onlineapp/onlineapp.php?agentid=309&appcode=PROMO2005">Register for a merchant account now to get started processing online transactions.</a>
+</p>
+
+<p>
+<b>Step 2: Set Up Your Merchant Account Info</b><br />
+See the information toward the bottom of this page to set up your merchant account info.
+</p>
+
+<p>
+<b>Step 3: Get An SSL Certificate</b><br />
+<a target="_blank" href=""></a>
+</p>
+
+<p>
+<b>Step 4: Install The Certificate</b><br />
+Contact your hosting provider to install your certificate or install it yourself.
+</p>
+
+<p>
+<b>Step 5: Optionally Accept eChecks</b><br />
+<a target="_blank" href="http://cdgcommerce.com/forms/CDGcommerce_ACH_Processing.pdf">After you have your iTransact/CDGCommerce merchant account set up, you can optionally add the ability to accept eChecks by filling out this application.</a>
+</p>
+
+<hr />
+
+This plugin expects that you set up the following recipe's in your CDG account. Be very careful to enter the recipe names exactly as given below.<br>
 <table border="0" cellpadding="3" cellspacing="0">
   <tr>
     <td align="right"><b>weekly</b></td>
