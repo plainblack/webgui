@@ -584,14 +584,14 @@ sub www_editPageSave {
 		menuTitle		=> $session{form}{menuTitle}, 
 		synopsis		=> $session{form}{synopsis}
 		});
-	unless ($session{form}{pageId} == 'new') {
+	unless ($session{form}{pageId} eq 'new') {
 		WebGUI::SQL->write("update wobject set templatePosition=1 where pageId=".quote($session{form}{pageId})." 
 			and templatePosition>".WebGUI::Page::countTemplatePositions($session{form}{templateId}));
 	}
 	_recursivelyChangeProperties($page) if ($session{form}{recursePrivs} || $session{form}{recurseStyle});
 	if ($session{form}{proceed} eq "gotoNewPage") {
 		WebGUI::Session::refreshPageInfo($page->get('pageId'));
-	} elsif ($session{form}{pageId} == $session{page}{pageId}) {
+	} elsif ($session{form}{pageId} eq $session{page}{pageId}) {
 		WebGUI::Session::refreshPageInfo($session{page}{pageId});
 	}
        	return "";
