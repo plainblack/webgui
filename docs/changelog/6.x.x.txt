@@ -40,6 +40,11 @@
  - bugfix [ 1150982 ] Subscribe to forum thread causes error
  - bugfix [ 1151216 ] The Latest News is blank on demo.plainblack.com
  - bugfix [ 1149458 ] CVS 6.3 -> ENV variables have changed for mod_perl 2.0
+ - bugfix [ 1150729 ] Submission approval URL not working from email
+ - bugfix [ 1150078 ] userProfile.url not set in Thread::view()
+ - bugfix [ 1153919 ] Asset::fixUrl doesn't limit URL length
+ - bugfix [ 1152834 ] can not to add IndexedSearch
+ - bugfix [ 1150200 ] Add New DataForm crashes
 
 
 6.3.0

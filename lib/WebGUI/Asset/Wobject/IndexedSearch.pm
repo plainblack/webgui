@@ -29,14 +29,6 @@ sub definition {
 				fieldType=>"template",
 				defaultValue=>"PBtmpl0000000000000034"
 				},
-			linkURL=>{
-				fieldType=>'url',
-				defaultValue=>undef
-				},
-			linkTitle=>{
-				fieldType=>'text',
-				defaultValue=>undef
-				},
                         indexName=>{
 				fieldType=>'text',
                                 defaultValue=>'default'

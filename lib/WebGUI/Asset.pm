@@ -579,6 +579,9 @@ Any text string. Most likely will have been the Asset's name or title.
 sub fixUrl {
 	my $self = shift;
 	my $url = WebGUI::URL::urlize(shift);
+	if (length($url) > 250) {
+		$url = substr($url,220);
+	}
 	$url .= ".".$session{setting}{urlExtension} if ($url =~ /\./ && $session{setting}{urlExtension} ne "");
 	my ($test) = WebGUI::SQL->quickArray("select url from asset where assetId<>".quote($self->getId)." and url=".quote($url));
         if ($test) {

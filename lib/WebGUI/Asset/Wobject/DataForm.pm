@@ -229,10 +229,10 @@ sub getEditForm {
 		-value=>$self->getValue("mailData")
 		);
 	if ($self->getId eq "new" && $session{form}{proceed} ne "manageAssets") {
-        	$self->getTab("properties")->whatNext(
+        	$tabform->getTab("properties")->whatNext(
 			-options=>{
-				addField=>WebGUI::International::get(76,"DataForm"),
-				backToPage=>WebGUI::International::get(745,"DataForm")
+				editField=>WebGUI::International::get(76,"DataForm"),
+				""=>WebGUI::International::get(745,"DataForm")
 				},
 			-value=>"editField"
 			);
@@ -749,10 +749,10 @@ sub www_editField {
 	if ($session{form}{fid} eq "new" && $session{form}{proceed} ne "manageAssets") {
         	$f->whatNext(
 			-options=>{
-				addField=>WebGUI::International::get(76,"DataForm"),
-				backToPage=>WebGUI::International::get(745,"DataForm")
+				editField=>WebGUI::International::get(76,"DataForm"),
+				""=>WebGUI::International::get(745,"DataForm")
 				},
-			-value=>"addField"
+			-value=>"editField"
 			);
 	}
         $f->submit;
@@ -790,10 +790,6 @@ sub www_editFieldSave {
 					" where DataForm_fieldId=".quote($session{form}{fid}));
 	}
 	$self->reorderCollateral("DataForm_field","DataForm_fieldId", _tonull("DataForm_tabId",$session{form}{tid})) if ($session{form}{fid} ne "new");
-        if ($session{form}{proceed} eq "addField") {
-            	$session{form}{fid} = "new";
-            	return $self->www_editField();
-        }
         return "";
 }
 
@@ -824,11 +820,11 @@ sub www_editTab {
 	if ($session{form}{tid} eq "new") {
         	$f->whatNext(
 			-options=>{
-				addTab=>WebGUI::International::get(103,"DataForm"),
+				editTab=>WebGUI::International::get(103,"DataForm"),
 
-				backToPage=>WebGUI::International::get(745,"DataForm")
+				""=>WebGUI::International::get(745,"DataForm")
 				},
-			-value=>"addTab"
+			-value=>"editTab"
 			);
 	}
         $f->submit;
@@ -850,10 +846,6 @@ sub www_editTabSave {
 		label=>$session{form}{label},
 		subtext=>$session{form}{subtext}
 		});
-        if ($session{form}{proceed} eq "addTab") {
-            	$session{form}{tid} = "new";
-            	return $self->www_editTab();
-        }
         return "";
 }
 

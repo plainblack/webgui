@@ -81,7 +81,7 @@ sub www_viewMessageLogMessage {
    my $status = _status->{$data->{status}}; 
    if ($data->{url} ne "" && $data->{status} eq 'pending'){
       $status = '<a href="'.WebGUI::URL::append($data->{url},'mlog='.$data->{messageLogId}).'">'.$status.'</a>';
-      $vars->{'message.takeAction'} = '<a href="'.WebGUI::URL::apppend($data->{url},'mlog='.$data->{messageLogId}).'">'.WebGUI::International::get(554).'</a>'
+      $vars->{'message.takeAction'} = '<a href="'.WebGUI::URL::append($data->{url},'mlog='.$data->{messageLogId}).'">'.WebGUI::International::get(554).'</a>'
    }
    $vars->{'message.status'} = $status;
    

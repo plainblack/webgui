@@ -108,7 +108,6 @@ sub definition {
 				defaultValue=>time()
 				},
 			username => {
-				noFormPost=>1,
 				fieldType=>"hidden",
 				defaultValue=>$session{user}{alias} || $session{user}{username}
 				},
@@ -373,6 +372,7 @@ sub getTemplateVars {
 	my %var = %{$self->get};
 	$var{"userId"} = $self->get("ownerUserId");
 	$var{"user.isPoster"} = $self->isPoster;
+	$var{"userProfile.url"} = $self->getUrl("op=viewProfile&uid=".$self->get("ownerUserId"));
 
 	$var{"dateSubmitted.human"} = epochToHuman($self->get("dateSubmitted"));
 	$var{"dateUpdated.human"} = epochToHuman($self->get("dateUpdated"));
@@ -751,7 +751,7 @@ sub setStatusPending {
         my ($self) = @_;
         $self->update({status=>'pending'});
         WebGUI::MessageLog::addInternationalizedEntry('',$self->getThread->getParent->get("moderateGroupId"),
-                $self->getUrl,578,'WebGUI','pending');
+                $self->getUrl("func=view"),578,'WebGUI','pending');
 }
 
 
