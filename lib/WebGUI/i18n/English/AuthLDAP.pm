@@ -76,7 +76,7 @@ Any message returned by the system.  Usually displays after the form is submitte
 
 <P>
 <B>anonymousRegistration.isAllowed</B><BR>
-Flag indicating whether or not anoymous registrations are allowed.
+Flag indicating whether or not anonymous registrations are allowed.
 
 <P>
 <B>createAccount.url</B><BR>
@@ -86,7 +86,7 @@ URL for the anonymous registration page.
 <B>createAccount.label</B><BR>
 Default label for the anonymous registration link.
 <P>|,
-		lastUpdated => 1100226993
+		lastUpdated => 1101771743
 	},
 
 	'13' => {
