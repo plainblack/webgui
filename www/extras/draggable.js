@@ -422,7 +422,7 @@ function dragable_getContentMap() {
     contentCount=1;
     var contentArea = document.getElementById("position1");
     while (contentArea) {
-        if (contentMap != "") {
+        if ((contentMap != "") || (contentArea.id == 'position2')) {
             contentMap+=".";
         }
 
