@@ -11,6 +11,7 @@ assets = WebGUI::Asset::File::Image, \
 	WebGUI::Asset::Wobject::WSClient, \
 	WebGUI::Asset::Wobject::Article, \
 	WebGUI::Asset::Wobject::Navigation, \
+	WebGUI::Asset::Wobject::Survey, \
 	WebGUI::Asset::FilePile
 
 sitename = www.example.com, example.com

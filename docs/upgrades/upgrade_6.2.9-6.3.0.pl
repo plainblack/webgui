@@ -666,6 +666,7 @@ $conf->set("assets"=>[
 		'WebGUI::Asset::Wobject::WSClient',
 		'WebGUI::Asset::Wobject::HttpProxy',
 		'WebGUI::Asset::Wobject::SQLReport',
+		'WebGUI::Asset::Wobject::Survey',
 		'WebGUI::Asset::Redirect',
 		'WebGUI::Asset::Template',
 		'WebGUI::Asset::FilePile',

@@ -220,4 +220,6 @@ INSERT INTO template VALUES ('15','File Folder','<a href=\"<tmpl_var assetId>\">
 
 alter table HttpProxy add column cookieJarStorageId varchar(22);
 
+alter table Survey drop column reportcardTemplateId;
+alter table Survey add column gradebookTemplateId varchar(22) default 'PBtmpl0000000000000062';
 
