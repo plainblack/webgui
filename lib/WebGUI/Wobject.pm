@@ -730,11 +730,11 @@ sub new {
 			}, 
 		startDate=>{
 			defaultValue=>$session{page}{startDate},
-			fieldType=>"date"
+			fieldType=>"dateTime"
 			},
 		endDate=>{
 			defaultValue=>$session{page}{endDate},
-			fieldType=>"date"
+			fieldType=>"dateTime"
 			},
 		sequenceNumber=>{
 			fieldType=>"hidden"
@@ -1357,13 +1357,13 @@ sub www_edit {
 		-options=>WebGUI::Page::getTemplatePositions($session{page}{templateId}),
 		-subtext=>WebGUI::Page::drawTemplate($session{page}{templateId})
 		);
-	$f->getTab("privileges")->date(
+	$f->getTab("privileges")->dateTime(
 		-name=>"startDate",
 		-label=>WebGUI::International::get(497),
 		-value=>$startDate,
 		-uiLevel=>6
 		);
-	$f->getTab("privileges")->date(
+	$f->getTab("privileges")->dateTime(
 		-name=>"endDate",
 		-label=>WebGUI::International::get(498),
 		-value=>$endDate,

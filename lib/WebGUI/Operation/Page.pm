@@ -13,6 +13,7 @@ package WebGUI::Operation::Page;
 use Exporter;
 use strict;
 use WebGUI::DateTime;
+use WebGUI::FormProcessor;
 use WebGUI::Grouping;
 use WebGUI::HTMLForm;
 use WebGUI::Icon;
@@ -356,13 +357,13 @@ sub www_editPage {
                         -label=>WebGUI::International::get(356),
                         -uiLevel=>5
                         );
-        	$f->getTab("privileges")->date(
+        	$f->getTab("privileges")->dateTime(
 			-name=>"startDate",
 			-label=>WebGUI::International::get(497),
 			-value=>$page{startDate},
 			-uiLevel=>6
 			);
-        	$f->getTab("privileges")->date(
+        	$f->getTab("privileges")->dateTime(
 			-name=>"endDate",
 			-label=>WebGUI::International::get(498),
 			-value=>$page{endDate},
@@ -456,8 +457,8 @@ sub www_editPageSave {
         $session{form}{menuTitle} = $session{form}{title} if ($session{form}{menuTitle} eq "");
         $session{form}{urlizedTitle} = $session{form}{menuTitle} if ($session{form}{urlizedTitle} eq "");
 	$session{form}{urlizedTitle} = WebGUI::Page::makeUnique(WebGUI::URL::urlize($session{form}{urlizedTitle}),$session{form}{pageId});
-	$session{form}{startDate} = setToEpoch($session{form}{startDate}) || setToEpoch(time());
-       	$session{form}{endDate} = setToEpoch($session{form}{endDate}) || setToEpoch(addToDate(time(),10));
+	$session{form}{startDate} = WebGUI::FormProcessor::dateTime("startDate");
+	$session{form}{endDate} = WebGUI::FormProcessor::dateTime("endDate");
         WebGUI::SQL->write("update page set 
 		title=".quote($session{form}{title}).", 
 		styleId=$session{form}{styleId}, 

@@ -76,12 +76,13 @@ sub _generatePage {
                         }
                         if (${$wobject}{namespace} eq "WobjectProxy") {
                                 $originalWobject = $wobject;
-                                my ($wobjectProxy) = WebGUI::SQL->quickHashRef("select * from WobjectProxy 
-					where wobjectId=".${$wobject}{wobjectId});
+                                my ($wobjectProxy) = WebGUI::SQL->quickHashRef("select * from WobjectProxy where wobjectId=".${$wobject}{wobjectId});
                                 $wobject = WebGUI::SQL->quickHashRef("select * from wobject where wobject.wobjectId=".$wobjectProxy->{proxiedWobjectId});
                                 if (${$wobject}{namespace} eq "") {
                                         $wobject = $originalWobject;
                                 } else {
+                                        ${$wobject}{startDate} = ${$originalWobject}{startDate};
+                                        ${$wobject}{endDate} = ${$originalWobject}{endDate};
                                         ${$wobject}{templatePosition} = ${$originalWobject}{templatePosition};
                                         ${$wobject}{_WobjectProxy} = ${$originalWobject}{wobjectId};
 					if ($wobjectProxy->{overrideTitle}) {

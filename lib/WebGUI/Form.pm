@@ -298,7 +298,7 @@ sub date {
 		name=>$_[0]->{name},
 		value=>$value,
 		size=>$size,
-		extras=>'onKeyUp="doInputCheck(this.form.'.$_[0]->{name}.',\'0123456789\')" '.$_[0]->{extras},
+		extras=>'onKeyUp="doInputCheck(this.form.'.$_[0]->{name}.',\'0123456789/\')" '.$_[0]->{extras},
 		maxlength=>10
 		});
 	$output .= '<input type="button" style="font-size: 8pt;" onClick="window.dateField = this.form.'.
