@@ -54,6 +54,51 @@ sub _canEditMessage {
 }
 
 #-------------------------------------------------------------------
+sub _photogalleryView {
+        my (@row, $i, $y, $image, $output, $p, $sth, %submission, $responses);
+        tie %submission, 'Tie::CPHash';
+        $sth = WebGUI::SQL->read("select * from UserSubmission_submission
+                where wobjectId=".$_[0]->get("wobjectId")." and (status='Approved' or userId=$session{user}{userId}) order by dateSubmitted desc");
+        while (%submission = $sth->hash) {
+                $submission{title} = WebGUI::HTML::filter($submission{title},'all');
+                ($responses) = WebGUI::SQL->quickArray("select count(*) from discussion
+                        where wobjectId=".$_[0]->get("wobjectId")." and subId=$submission{submissionId}");
+		if ($y == 0) {
+			$row[$i] .= '<td>';
+		}
+                $row[$i] .= '<td align="center" class="tableData">';
+                if ($_[0]->get("displayThumbnails")) {
+                        $image = WebGUI::Attachment->new($submission{image},$_[0]->get("wobjectId"),$submission{submissionId});
+                        $row[$i] .= '<a href="'.WebGUI::URL::page('wid='.$_[0]->get("wobjectId").'&func=viewSubmission&sid='
+                        	.$submission{submissionId}).'"><img src="'.$image->getThumbnail.'" border="0"/></a><br/>';
+                }
+		$row[$i] .= '<a href="'.WebGUI::URL::page('wid='.$_[0]->get("wobjectId").'&func=viewSubmission&sid='
+                                .$submission{submissionId}).'">'.$submission{title}.'</a>';
+                if ($submission{userId} == $session{user}{userId}) {
+                        $row[$i] .= ' ('.$submissionStatus{$submission{status}}.')';
+                }
+                $row[$i] .= '</td>';
+                if ($y == 2) {
+                        $row[$i] .= '</tr>';
+			$y = -1;
+                }
+                $i++;
+		$y++;
+        }
+        $sth->finish;
+        if (WebGUI::Privilege::isInGroup($_[0]->get("groupToContribute"))) {
+                $output .= '<a href="'.WebGUI::URL::page('func=editSubmission&sid=new&wid='.$_[0]->get("wobjectId")).'">'
+                        .WebGUI::International::get(20,$namespace).'</a><p/>';
+        }
+        $output .= '<table width="100%" cellpadding=2 cellspacing=1 border=0>';
+        $p = WebGUI::Paginator->new(WebGUI::URL::page(),\@row,$_[0]->get("submissionsPerPage"));
+        $output .= $p->getPage($session{form}{pn});
+        $output .= '</table>';
+        $output .= $p->getBarTraditional($session{form}{pn});
+        return $output;
+}
+
+#-------------------------------------------------------------------
 sub _traditionalView {
 	my (@row, $i, $image, $output, $p, $sth, %submission);
 	tie %submission, 'Tie::CPHash';
@@ -133,7 +178,7 @@ sub _weblogView {
         $sth->finish;
 	if (WebGUI::Privilege::isInGroup($_[0]->get("groupToContribute"))) {
         	$output .= '<a href="'.WebGUI::URL::page('func=editSubmission&sid=new&wid='.$_[0]->get("wobjectId")).'">'
-			.WebGUI::International::get(20,$namespace).'</a>';
+			.WebGUI::International::get(20,$namespace).'</a><p/>';
 	}
         $output .= '<table width="100%" cellpadding=2 cellspacing=1 border=0>';
         $p = WebGUI::Paginator->new(WebGUI::URL::page(),\@row,$_[0]->get("submissionsPerPage"));
@@ -145,7 +190,8 @@ sub _weblogView {
 
 #-------------------------------------------------------------------
 sub duplicate {
-        my ($sth, $file, @row, $newSubmissionId, $w);
+        my ($sth, $file, %row, $newSubmissionId, $w);
+	tie %row, 'Tie::CPHash';
 	$w = $_[0]->SUPER::duplicate($_[1]);
         $w = WebGUI::Wobject::UserSubmission->new({wobjectId=>$w,namespace=>$namespace});
         $w->set({
@@ -161,14 +207,16 @@ sub duplicate {
 		groupToModerate=>$_[0]->get("groupToModerate")
 		});
         $sth = WebGUI::SQL->read("select * from UserSubmission_submission where wobjectId=".$_[0]->get("wobjectId"));
-        while (@row = $sth->array) {
+        while (%row = $sth->hash) {
                 $newSubmissionId = getNextId("submissionId");
-		$file = WebGUI::Attachment->new($row[8],$_[0]->get("wobjectId"),$row[1]);
+		$file = WebGUI::Attachment->new($row{image},$_[0]->get("wobjectId"),$row{submissionId});
+		$file->copy($w->get("wobjectId"),$newSubmissionId);
+		$file = WebGUI::Attachment->new($row{attachment},$_[0]->get("wobjectId"),$row{submissionId});
 		$file->copy($w->get("wobjectId"),$newSubmissionId);
                 WebGUI::SQL->write("insert into UserSubmission_submission values (".$w->get("wobjectId").", $newSubmissionId, ".
-			quote($row[2]).", $row[3], ".quote($row[4]).", '$row[5]', ".quote($row[6]).", ".
-			quote($row[7]).", ".quote($row[8]).", '$row[9]', '$row[10]')");
-		WebGUI::Discussion::duplicate($_[0]->get("wobjectId"),$w->get("wobjectId"),$row[0],$newSubmissionId);
+			quote($row{title}).", $row{dateSubmitted}, ".quote($row{username}).", '$row{userId}', ".quote($row{content}).", ".
+			quote($row{image}).", ".quote($row{attachment}).", '$row{status}', '$row{convertCarriageReturns}')");
+		WebGUI::Discussion::duplicate($_[0]->get("wobjectId"),$w->get("wobjectId"),$row{submissionId},$newSubmissionId);
         }
         $sth->finish;
 }
@@ -534,8 +582,8 @@ sub www_showMessage {
                 $html .= '<a href="'.WebGUI::URL::page().'">'.WebGUI::International::get(28,$namespace).'</a><br>';
                 $html .= '</tr><tr><td class="tableData">';
                 $html .= $message{message}.'<p>';
-                $html .= WebGUI::Discussion::showThreads();
                 $html .= '</td></tr></table>';
+                $html .= WebGUI::Discussion::showThreads();
         } else {
                 $html = WebGUI::International::get(402);
         }
@@ -550,6 +598,8 @@ sub www_view {
 	$output = $_[0]->processMacros($output);
 	if ($_[0]->get("layout") eq "weblog") {
 		$output .= $_[0]->_weblogView;
+	} elsif ($_[0]->get("layout") eq "photogallery") {
+		$output .= $_[0]->_photogalleryView;
 	} else {
 		$output .= $_[0]->_traditionalView;
 	}
@@ -608,10 +658,10 @@ sub www_viewSubmission {
 		$file = WebGUI::Attachment->new($submission{attachment},$session{form}{wid},$session{form}{sid});
 		$output .= $file->box;
         }		
+	$output .= '</td></tr></table>';
         if ($_[0]->get("allowDiscussion")) {
 		$output .= WebGUI::Discussion::showThreads();
         }
-	$output .= '</td></tr></table>';
 	return $output;
 }
 

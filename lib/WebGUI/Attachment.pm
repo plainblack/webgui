@@ -138,6 +138,20 @@ sub copy {
 		}
 		$a->close;
 	}
+	if (isIn($_[0]->getType,qw(jpg jpeg gif png tif tiff bmp))) {
+        	$a = FileHandle->new($_[0]->{_node}->getPath.'/thumb-'.$_[0]->getFilename,"r");
+        	$b = FileHandle->new(">".$newNode->getPath.'/thumb-'.$_[0]->getFilename);
+        	if (defined $a) {
+                	binmode($a);
+                	$b = FileHandle->new(">".$newNode->getPath.'/thumb-'.$_[0]->getFilename);
+                	if (defined $b) {
+                        	binmode($b);
+                        	cp($a,$b);
+                        	$b->close;
+                	}
+                	$a->close;
+        	}
+	}
 }
 
 
