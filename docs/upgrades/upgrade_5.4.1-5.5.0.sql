@@ -59,6 +59,7 @@ create table forumThread (
 create table forumRead (
   userId int not null,
   forumPostId int not null,
+  forumThreadId int not null,
   lastRead int not null,
   primary key (userId, postId)
 );

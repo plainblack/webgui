@@ -35,6 +35,7 @@ sub new {
 
 sub set {
 	my ($self, $data) = @_;
+	$data->{forumId} = $self->get("forumId") unless ($data->{forumId});
 	WebGUI::SQL->setRow("forum","forumId",$data);
 	$self->{_properties} = $data;
 }

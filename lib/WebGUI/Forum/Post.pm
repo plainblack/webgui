@@ -1,6 +1,7 @@
 package WebGUI::Forum::Post;
 
-use WebGUI::Discuss::Thread;
+use WebGUI::DateTime;
+use WebGUI::Forum::Thread;
 use WebGUI::Session;
 use WebGUI::SQL;
 
@@ -30,18 +31,6 @@ sub get {
 	return $self->{_properties}->{$key};
 }
 
-sub getTemplateVars {
-	my ($self) = @_;
-	my $properties = $self->get;
-	my %var = %{$properties};
-	$var->{subject} = WebGUI::HTML::filter($var->{subject},"none");
-	$var->{message} = WebGUI::HTML::filter($var->{subject},$self->getThread->getForum->get("filterPosts"));
-	if ($self->getThread->getForum->get("allowReplacements")) {
-		# do the replacement thing
-	}
-	$var->{dateOfPost} = WebGUI::DateTime::epochToHuman($var->{dateOfPost});
-}
-
 sub getThread {
 	my ($self) = @_;
 	unless (exists $self->{_thread}) {
@@ -50,13 +39,19 @@ sub getThread {
 	return $self->{_thread};
 }
 
+sub isMarkedRead {
+	my ($self, $userId) = @_;
+	$userId = $session{user}{userId} unless ($userId);
+	my ($isRead) = WebGUI::SQL->quickArray("select count(*) from forumRead where userId=$userId and forumPostId=".$self->get("forumPostId"));
+	return $isRead;
+}
+
 sub markRead {
 	my ($self, $userId) = @_;
 	$userId = $session{user}{userId} unless ($userId);
-	my ($alreadyMarked) = WebGUI::SQL->quickArray("select count(*) from forumRead userId,forumPostId");
-	unless ($alreadyMarked) {
-		WebGUI::SQL->write("insert into forumRead (userId, forumPostId, lastRead) values ($userId,
-			".$self->get("forumPostId").", ".WebGUI::DateTime::time().")");
+	unless (isMarkedRead($userId)) {
+		WebGUI::SQL->write("insert into forumRead (userId, forumPostId, forumThreadId, lastRead) values ($userId,
+			".$self->get("forumPostId").", ".$self->get("forumThreadId").", ".WebGUI::DateTime::time().")");
 	}
 }
 
@@ -68,8 +63,30 @@ sub new {
 
 sub set {
 	my ($self, $data) = @_;
+	$data->{forumPostId} = $self->get("forumPostId") unless ($data->{forumId});
 	WebGUI::SQL->setRow("forumPost","forumPostId",$data);
 	$self->{_properties} = $data;
+}
+
+sub setStatusApproved {
+	my ($self) = @_;
+	$self->set({status=>'approved'});
+}
+
+sub setStatusDenied {
+	my ($self) = @_;
+	$self->set({status=>'denied'});
+}
+
+sub setStatusPending {
+	my ($self) = @_;
+	$self->set({status=>'pending'});
+}
+
+sub unmarkRead {
+	my ($self, $userId) = @_;
+	$userId = $session{user}{userId} unless ($userId);
+	WebGUI::SQL->write("delete from forumRead where userId=$userId and forumPostId=".$self->get("forumPostId"));
 }
 
 1;

@@ -93,6 +93,7 @@ sub new {
 
 sub set {
 	my ($self, $data) = @_;
+	$data->{forumThreadId} = $self->get("forumThreadId") unless ($data->{forumThreadId});
 	WebGUI::SQL->setRow("forumThread","forumThreadId",$data);
 	$self->{_properties} = $data;
 }

@@ -32,7 +32,6 @@ A package for manipulating and massaging HTML.
  use WebGUI::HTML;
  $html = WebGUI::HTML::cleanSegment($html);
  $html = WebGUI::HTML::filter($html);
- $html = WebGUI::HTML::searchAndReplace($html);
 
 =head1 METHODS
 
@@ -127,32 +126,6 @@ sub filter {
 		return WebGUI::Macro::filter($html);
 	}
 }
-
-#-------------------------------------------------------------------
-
-=head2 searchAndReplace ( html )
-
-Replaces all occurrences of strings specified in the config file.
-
-=over
-
-=item html
-
-The HTML segment you want to have search and replaced.
-
-=back
-
-=cut
-
-sub searchAndReplace {
-	my $content = shift;
-	foreach my $search (keys %{$session{config}{searchAndReplace}}) {
-		my $replace = $session{config}{searchAndReplace}{$search};
-		$content =~ s/\Q$search/$replace/g;
-	}
-	return $content;
-}
-
 
 
 1;
