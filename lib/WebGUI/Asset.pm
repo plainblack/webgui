@@ -943,51 +943,51 @@ sub getEditForm {
 		-value=>$self->get("assetId")
 		);
 	$tabform->getTab("properties")->text(
-		-label=>WebGUI::International::get(99),
+		-label=>WebGUI::International::get(99,"Asset"),
 		-name=>"title",
 		-value=>$self->get("title")
 		);
 	$tabform->getTab("properties")->text(
-		-label=>WebGUI::International::get(411),
+		-label=>WebGUI::International::get(411,"Asset"),
 		-name=>"menuTitle",
 		-value=>$self->get("menuTitle"),
 		-uiLevel=>1
 		);
         $tabform->getTab("properties")->text(
                 -name=>"url",
-                -label=>WebGUI::International::get(104),
+                -label=>WebGUI::International::get(104,"Asset"),
                 -value=>$self->get("url"),
                 -uiLevel=>3
                 );
-	$tabform->addTab("display",WebGUI::International::get(105),5);
+	$tabform->addTab("display",WebGUI::International::get(105,"Asset"),5);
 	$tabform->getTab("display")->yesNo(
                 -name=>"isHidden",
                 -value=>$self->get("isHidden"),
-                -label=>WebGUI::International::get(886),
+                -label=>WebGUI::International::get(886,"Asset"),
                 -uiLevel=>6
                 );
         $tabform->getTab("display")->yesNo(
                 -name=>"newWindow",
                 -value=>$self->get("newWindow"),
-                -label=>WebGUI::International::get(940),
+                -label=>WebGUI::International::get(940,"Asset"),
                 -uiLevel=>6
                 );
-	$tabform->addTab("security",WebGUI::International::get(107),6);
+	$tabform->addTab("security",WebGUI::International::get(107,"Asset"),6);
         $tabform->getTab("security")->yesNo(
                 -name=>"encryptPage",
                 -value=>$self->get("encryptPage"),
-                -label=>WebGUI::International::get('encrypt page'),
+                -label=>WebGUI::International::get('encrypt page',"Asset"),
                 -uiLevel=>6
                 );
 	$tabform->getTab("security")->dateTime(
                 -name=>"startDate",
-                -label=>WebGUI::International::get(497),
+                -label=>WebGUI::International::get(497,"Asset"),
                 -value=>$self->get("startDate"),
                 -uiLevel=>6
                 );
         $tabform->getTab("security")->dateTime(
                 -name=>"endDate",
-                -label=>WebGUI::International::get(498),
+                -label=>WebGUI::International::get(498,"Asset"),
                 -value=>$self->get("endDate"),
                 -uiLevel=>6
                 );
@@ -1009,20 +1009,20 @@ sub getEditForm {
         $tabform->getTab("security")->selectList(
                -name=>"ownerUserId",
                -options=>$users,
-               -label=>WebGUI::International::get(108),
+               -label=>WebGUI::International::get(108,"Asset"),
                -value=>[$self->get("ownerUserId")],
                -subtext=>$subtext,
                -uiLevel=>6
                );
         $tabform->getTab("security")->group(
                -name=>"groupIdView",
-               -label=>WebGUI::International::get(872),
+               -label=>WebGUI::International::get(872,"Asset"),
                -value=>[$self->get("groupIdView")],
                -uiLevel=>6
                );
         $tabform->getTab("security")->group(
                -name=>"groupIdEdit",
-               -label=>WebGUI::International::get(871),
+               -label=>WebGUI::International::get(871,"Asset"),
                -value=>[$self->get("groupIdEdit")],
                -excludeGroups=>[1,7],
                -uiLevel=>6
@@ -1030,7 +1030,7 @@ sub getEditForm {
 	$tabform->addTab("meta","Meta",3);
         $tabform->getTab("meta")->textarea(
                 -name=>"synopsis",
-                -label=>WebGUI::International::get(412),
+                -label=>WebGUI::International::get(412,"Asset"),
                 -value=>$self->get("synopsis"),
                 -uiLevel=>3
                 );
@@ -1521,7 +1521,7 @@ Returns a toolbar with a set of icons that hyperlink to functions that delete, e
 sub getToolbar {
 	my $self = shift;
 	return undef if ($self->{_toolbarOff});
-	my $toolbar = deleteIcon('func=delete',$self->get("url"),WebGUI::International::get(43))
+	my $toolbar = deleteIcon('func=delete',$self->get("url"),WebGUI::International::get(43,"Asset"))
               	.editIcon('func=edit',$self->get("url"))
              	.moveUpIcon('func=promote',$self->get("url"))
              	.moveDownIcon('func=demote',$self->get("url"))
@@ -2539,14 +2539,14 @@ sub www_editMetaDataField {
                 -label=>WebGUI::International::get('Field Id','Asset'),
                 );
         $f->text("fieldName", WebGUI::International::get('Field name','Asset'), $fieldInfo->{fieldName});
-	$f->textarea("description", WebGUI::International::get(85), $fieldInfo->{description});
+	$f->textarea("description", WebGUI::International::get(85,"Asset"), $fieldInfo->{description});
         $f->fieldType(
                 -name=>"fieldType",
-                -label=>WebGUI::International::get(486),
+                -label=>WebGUI::International::get(486,"Asset"),
                 -value=>[$fieldInfo->{fieldType} || "text"],
 		-types=> [ qw /text integer yesNo selectList radioList/ ]
                 );
-	$f->textarea("possibleValues",WebGUI::International::get(487),$fieldInfo->{possibleValues});
+	$f->textarea("possibleValues",WebGUI::International::get(487,"Asset"),$fieldInfo->{possibleValues});
         $f->submit();
 	$ac->setHelp("metadata edit property","Asset");
 	return $ac->render($f->print, WebGUI::International::get('Edit Metadata',"Asset"));
@@ -2619,7 +2619,7 @@ sub www_editTree {
 	$tabform->hidden({name=>"func",value=>"editTreeSave"});
 	$tabform->addTab("properties",WebGUI::International::get("properties","Asset"),9);
         $tabform->getTab("properties")->readOnly(
-                -label=>WebGUI::International::get(104),
+                -label=>WebGUI::International::get(104,"Asset"),
                 -uiLevel=>9,
 		-subtext=>'<br />'.WebGUI::International::get("change","Asset").' '.WebGUI::Form::yesNo({name=>"change_url"}),
 		-value=>WebGUI::Form::selectList({
@@ -2633,8 +2633,8 @@ sub www_editTree {
 			}).'<span id="baseUrl"></span> / '.WebGUI::Form::selectList({
 				name=>"endOfUrl",
 				options=>{
-					menuTitle=>WebGUI::International::get(411),
-					title=>WebGUI::International::get(99),
+					menuTitle=>WebGUI::International::get(411,"Asset"),
+					title=>WebGUI::International::get(99,"Asset"),
 					currentUrl=>"Current URL"
 					}
 				})."<script type=\"text/javascript\">
@@ -2648,31 +2648,31 @@ sub www_editTree {
 			toggleSpecificBaseUrl();
 				</script>"
                 );
-	$tabform->addTab("display",WebGUI::International::get(105),5);
+	$tabform->addTab("display",WebGUI::International::get(105,"Asset"),5);
 	$tabform->getTab("display")->yesNo(
                 -name=>"isHidden",
                 -value=>$self->get("isHidden"),
-                -label=>WebGUI::International::get(886),
+                -label=>WebGUI::International::get(886,"Asset"),
                 -uiLevel=>6,
 		-subtext=>'<br />'.WebGUI::International::get("change","Asset").' '.WebGUI::Form::yesNo({name=>"change_isHidden"})
                 );
         $tabform->getTab("display")->yesNo(
                 -name=>"newWindow",
                 -value=>$self->get("newWindow"),
-                -label=>WebGUI::International::get(940),
+                -label=>WebGUI::International::get(940,"Asset"),
                 -uiLevel=>6,
 		-subtext=>'<br />'.WebGUI::International::get("change","Asset").' '.WebGUI::Form::yesNo({name=>"change_newWindow"})
                 );
 	$tabform->getTab("display")->yesNo(
                 -name=>"displayTitle",
-                -label=>WebGUI::International::get(174),
+                -label=>WebGUI::International::get(174,"Asset"),
                 -value=>$self->getValue("displayTitle"),
                 -uiLevel=>5,
 		-subtext=>'<br />'.WebGUI::International::get("change","Asset").' '.WebGUI::Form::yesNo({name=>"change_displayTitle"})
                 );
          $tabform->getTab("display")->template(
 		-name=>"styleTemplateId",
-		-label=>WebGUI::International::get(1073),
+		-label=>WebGUI::International::get(1073,"Asset"),
 		-value=>$self->getValue("styleTemplateId"),
 		-namespace=>'style',
 		-afterEdit=>'op=editPage&amp;npp='.$session{form}{npp},
@@ -2680,7 +2680,7 @@ sub www_editTree {
 		);
          $tabform->getTab("display")->template(
 		-name=>"printableStyleTemplateId",
-		-label=>WebGUI::International::get(1079),
+		-label=>WebGUI::International::get(1079,"Asset"),
 		-value=>$self->getValue("printableStyleTemplateId"),
 		-namespace=>'style',
 		-afterEdit=>'op=editPage&amp;npp='.$session{form}{npp},
@@ -2688,36 +2688,36 @@ sub www_editTree {
 		);
         $tabform->getTab("display")->interval(
                 -name=>"cacheTimeout",
-                -label=>WebGUI::International::get(895),
+                -label=>WebGUI::International::get(895,"Asset"),
                 -value=>$self->getValue("cacheTimeout"),
                 -uiLevel=>8,
 		-subtext=>'<br />'.WebGUI::International::get("change","Asset").' '.WebGUI::Form::yesNo({name=>"change_cacheTimeout"})
                 );
         $tabform->getTab("display")->interval(
                 -name=>"cacheTimeoutVisitor",
-                -label=>WebGUI::International::get(896),
+                -label=>WebGUI::International::get(896,"Asset"),
                 -value=>$self->getValue("cacheTimeoutVisitor"),
                 -uiLevel=>8,
 		-subtext=>'<br />'.WebGUI::International::get("change","Asset").' '.WebGUI::Form::yesNo({name=>"change_cacheTimeoutVisitor"})
                 );
-	$tabform->addTab("security",WebGUI::International::get(107),6);
+	$tabform->addTab("security",WebGUI::International::get(107,"Asset"),6);
         $tabform->getTab("security")->yesNo(
                 -name=>"encryptPage",
                 -value=>$self->get("encryptPage"),
-                -label=>WebGUI::International::get('encrypt page'),
+                -label=>WebGUI::International::get('encrypt page',"Asset"),
                 -uiLevel=>6,
 		-subtext=>'<br />'.WebGUI::International::get("change","Asset").' '.WebGUI::Form::yesNo({name=>"change_encryptPage"})
                 );
 	$tabform->getTab("security")->dateTime(
                 -name=>"startDate",
-                -label=>WebGUI::International::get(497),
+                -label=>WebGUI::International::get(497,"Asset"),
                 -value=>$self->get("startDate"),
                 -uiLevel=>6,
 		-subtext=>'<br />'.WebGUI::International::get("change","Asset").' '.WebGUI::Form::yesNo({name=>"change_startDate"})
                 );
         $tabform->getTab("security")->dateTime(
                 -name=>"endDate",
-                -label=>WebGUI::International::get(498),
+                -label=>WebGUI::International::get(498,"Asset"),
                 -value=>$self->get("endDate"),
                 -uiLevel=>6,
 		-subtext=>'<br />'.WebGUI::International::get("change","Asset").' '.WebGUI::Form::yesNo({name=>"change_endDate"})
@@ -2740,7 +2740,7 @@ sub www_editTree {
         $tabform->getTab("security")->selectList(
                -name=>"ownerUserId",
                -options=>$users,
-               -label=>WebGUI::International::get(108),
+               -label=>WebGUI::International::get(108,"Asset"),
                -value=>[$self->get("ownerUserId")],
                -subtext=>$subtext,
                -uiLevel=>6,
@@ -2748,14 +2748,14 @@ sub www_editTree {
                );
         $tabform->getTab("security")->group(
                -name=>"groupIdView",
-               -label=>WebGUI::International::get(872),
+               -label=>WebGUI::International::get(872,"Asset"),
                -value=>[$self->get("groupIdView")],
                -uiLevel=>6,
 		-subtext=>'<br />'.WebGUI::International::get("change","Asset").' '.WebGUI::Form::yesNo({name=>"change_groupIdView"})
                );
         $tabform->getTab("security")->group(
                -name=>"groupIdEdit",
-               -label=>WebGUI::International::get(871),
+               -label=>WebGUI::International::get(871,"Asset"),
                -value=>[$self->get("groupIdEdit")],
                -excludeGroups=>[1,7],
                -uiLevel=>6,
@@ -2876,12 +2876,12 @@ sub www_export {
         my $f = WebGUI::HTMLForm->new(-action=>$self->getUrl);
         $f->hidden("func","exportStatus");
 	$f->integer(
-			-label=>WebGUI::International::get('Depth'),
+			-label=>WebGUI::International::get('Depth',"Asset"),
 			-name=>"depth",
 			-value=>99,
 		);
 	$f->selectList(
-			-label=>WebGUI::International::get('Export as user'),
+			-label=>WebGUI::International::get('Export as user',"Asset"),
 			-name=>"userId",
 			-options=>WebGUI::SQL->buildHashRef("select userId, username from users"),
 			-value=>[1],
@@ -2892,17 +2892,17 @@ sub www_export {
 			-value=>"index.html"
 		);
 	$f->text(
-			-label=>WebGUI::International::get('Extras URL'),
+			-label=>WebGUI::International::get('Extras URL',"Asset"),
 			-name=>"extrasURL",
 			-value=>$session{config}{extrasURL}
 		);
 	$f->text(
-                        -label=>WebGUI::International::get('Uploads URL'),
+                        -label=>WebGUI::International::get('Uploads URL',"Asset"),
                         -name=>"uploadsURL",
                         -value=>$session{config}{uploadsURL}
                 );
         $f->submit;
-        $self->getAdminConsole->render($self->checkExportPath.$f->print,WebGUI::International::get('Export Page'));
+        $self->getAdminConsole->render($self->checkExportPath.$f->print,WebGUI::International::get('Export Page'),"Asset");
 }
 
 
@@ -2923,8 +2923,8 @@ sub www_exportStatus {
 	$iframeUrl = WebGUI::URL::append($iframeUrl, 'userId='.$session{form}{userId});
 	$iframeUrl = WebGUI::URL::append($iframeUrl, 'extrasURL='.$session{form}{extrasURL});
 	$iframeUrl = WebGUI::URL::append($iframeUrl, 'uploadsURL='.$session{form}{uploadsURL});
-	my $output = '<IFRAME SRC="'.$iframeUrl.'" TITLE="'.WebGUI::International::get('Page Export Status').'" WIDTH="410" HEIGHT="200"></IFRAME>';
-        $self->getAdminConsole->render($output,WebGUI::International::get('Page Export Status'));
+	my $output = '<IFRAME SRC="'.$iframeUrl.'" TITLE="'.WebGUI::International::get('Page Export Status',"Asset").'" WIDTH="410" HEIGHT="200"></IFRAME>';
+        $self->getAdminConsole->render($output,WebGUI::International::get('Page Export Status'),"Asset");
 }
 
 #-------------------------------------------------------------------
@@ -2995,7 +2995,7 @@ sub www_exportGenerate {
 		print "DONE<br />";
 	}
 	print "<p>Exported ".scalar(@{$assets})." pages in ".(time()-$startTime)." seconds.</p>";
-	print '<a target="_parent" href="'.$self->getUrl.'">'.WebGUI::International::get(493).'</a>';
+	print '<a target="_parent" href="'.$self->getUrl.'">'.WebGUI::International::get(493,"Asset").'</a>';
 	return;
 }
 
@@ -3016,7 +3016,7 @@ sub www_manageAssets {
 	$output .= ' <div class="adminConsoleSpacer">
             &nbsp;
         </div>
-		<div style="float: left; padding-right: 30px; font-size: 14px;"><fieldset><legend>'.WebGUI::International::get(1083).'</legend>';
+		<div style="float: left; padding-right: 30px; font-size: 14px;"><fieldset><legend>'.WebGUI::International::get(1083,"Asset").'</legend>';
 	foreach my $link (@{$self->getAssetAdderLinks("proceed=manageAssets",1)}) {
 		$output .= '<a href="'.$link->{url}.'">'.$link->{label}.'</a><br />';
 	}
@@ -3033,7 +3033,7 @@ sub www_manageAssets {
 		$hasClips = 1;
         }
 	if ($hasClips) {
-		$output .= '<div style="float: left; padding-right: 30px; font-size: 14px;"><fieldset><legend>'.WebGUI::International::get(1082).'</legend>'
+		$output .= '<div style="float: left; padding-right: 30px; font-size: 14px;"><fieldset><legend>'.WebGUI::International::get(1082,"Asset").'</legend>'
 			.WebGUI::Form::formHeader()
 			.WebGUI::Form::hidden({name=>"func",value=>"pasteList"})
 			.WebGUI::Form::checkList({name=>"assetId",vertical=>1,options=>\%options})
@@ -3066,14 +3066,14 @@ sub www_manageClipboard {
 	my ($header,$limit);
         $ac->setHelp("clipboard manage");
 	if ($session{form}{systemClipboard} && WebGUI::Grouping::isInGroup(3)) {
-		$header = WebGUI::International::get(965);
-		$ac->addSubmenuItem($self->getUrl('func=manageClipboard'), WebGUI::International::get(949));
-		$ac->addSubmenuItem($self->getUrl('func=emptyClipboard&systemClipboard=1'), WebGUI::International::get(959), 
-			'onclick="return window.confirm(\''.WebGUI::International::get(951).'\')"');
+		$header = WebGUI::International::get(965,"Asset");
+		$ac->addSubmenuItem($self->getUrl('func=manageClipboard'), WebGUI::International::get(949),"Asset");
+		$ac->addSubmenuItem($self->getUrl('func=emptyClipboard&systemClipboard=1'), WebGUI::International::get(959,"Asset"), 
+			'onclick="return window.confirm(\''.WebGUI::International::get(951).'\')"',"Asset");
 	} else {
-		$ac->addSubmenuItem($self->getUrl('func=manageClipboard&systemClipboard=1'), WebGUI::International::get(954));
-		$ac->addSubmenuItem($self->getUrl('func=emptyClipboard'), WebGUI::International::get(950),
-			'onclick="return window.confirm(\''.WebGUI::International::get(951).'\')"');
+		$ac->addSubmenuItem($self->getUrl('func=manageClipboard&systemClipboard=1'), WebGUI::International::get(954),"Asset");
+		$ac->addSubmenuItem($self->getUrl('func=emptyClipboard'), WebGUI::International::get(950,"Asset"),
+			'onclick="return window.confirm(\''.WebGUI::International::get(951).'\')"',"Asset");
 		$limit = 1;
 	}
 	foreach my $assetData (@{$self->getAssetsInClipboard($limit)}) {
@@ -3121,14 +3121,14 @@ sub www_manageTrash {
 	my ($header, $limit);
         $ac->setHelp("trash manage");
 	if ($session{form}{systemTrash} && WebGUI::Grouping::isInGroup(3)) {
-		$header = WebGUI::International::get(965);
-		$ac->addSubmenuItem($self->getUrl('func=manageTrash'), WebGUI::International::get(10));
-		$ac->addSubmenuItem($self->getUrl('func=emptyTrash&systemTrash=1'), WebGUI::International::get(967), 
-			'onclick="return window.confirm(\''.WebGUI::International::get(651).'\')"');
+		$header = WebGUI::International::get(965,"Asset");
+		$ac->addSubmenuItem($self->getUrl('func=manageTrash'), WebGUI::International::get(10),"Asset");
+		$ac->addSubmenuItem($self->getUrl('func=emptyTrash&systemTrash=1'), WebGUI::International::get(967,"Asset"), 
+			'onclick="return window.confirm(\''.WebGUI::International::get(651).'\')"',"Asset");
 	} else {
-		$ac->addSubmenuItem($self->getUrl('func=manageTrash&systemTrash=1'), WebGUI::International::get(964));
-		$ac->addSubmenuItem($self->getUrl('func=emptyTrash'), WebGUI::International::get(11),
-			'onclick="return window.confirm(\''.WebGUI::International::get(651).'\')"');
+		$ac->addSubmenuItem($self->getUrl('func=manageTrash&systemTrash=1'), WebGUI::International::get(964),"Asset");
+		$ac->addSubmenuItem($self->getUrl('func=emptyTrash'), WebGUI::International::get(11,"Asset"),
+			'onclick="return window.confirm(\''.WebGUI::International::get(651).'\')"',"Asset");
 		$limit = 1;
 	}
 	foreach my $assetData (@{$self->getAssetsInTrash($limit)}) {

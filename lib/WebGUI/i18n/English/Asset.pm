@@ -37,7 +37,7 @@ our $I18N = {
 
         'asset fields body' => {
                 message => q|
-<P><B>Asset ID</B><BR>This is the unique identifier WebGUI uses to keep track of this Asset instance. Normal users should never need to be concerned with the Asset ID, but some advanced users may need to know it for things like SQL Reports. The Asset ID is not editable.</P>
+<P><B>^International("asset id","Asset");</B><BR>This is the unique identifier WebGUI uses to keep track of this Asset instance. Normal users should never need to be concerned with the Asset ID, but some advanced users may need to know it for things like SQL Reports. The Asset ID is not editable.</P>
 
 <p>
 <b>Title</b><br>
@@ -331,6 +331,177 @@ each wobject under the tab &quot;Metadata&quot; in the wobject properties.</p>
 		lastUpdated => 1089039511
 	},
 
+        '1079' => {
+                    lastUpdated => 1073152790,
+                    message => q|Printable Style|
+                  },
+        '967' => {
+                   lastUpdated => 1052850265,
+                   message => q|Empty system trash.|
+                 },
+        '959' => {
+                   lastUpdated => 1052850265,
+                   message => q|Empty system clipboard.|
+                 },
+        'Uploads URL' => {
+                           lastUpdated => 1089039511,
+                           context => q|Field label for the Export Page operation|,
+                           message => q|Uploads URL|
+                         },
+        '99' => {
+                  lastUpdated => 1031514049,
+                  message => q|Title|
+                },
+        'Page Export Status' => {
+                                  lastUpdated => 1089039511,
+                                  context => q|Title for the Page Export Status operation|,
+                                  message => q|Page Export Status|
+                                },
+        '1083' => {
+                    lastUpdated => 1076866510,
+                    message => q|New Content|
+                  },
+        '965' => {
+                   lastUpdated => 1099050265,
+                   message => q|System Trash|
+                 },
+        'Extras URL' => {
+                          lastUpdated => 1089039511,
+                          context => q|Field label for the Export Page operation|,
+                          message => q|Extras URL|
+                        },
+        '895' => {
+                   lastUpdated => 1056292971,
+                   message => q|Cache Timeout|
+                 },
+        '108' => {
+                   lastUpdated => 1031514049,
+                   message => q|Owner|
+                 },
+        '872' => {
+                   lastUpdated => 1044218038,
+                   message => q|Who can view?|
+                 },
+        '896' => {
+                   lastUpdated => 1056292980,
+                   message => q|Cache Timeout (Visitors)|
+                 },
+        'Export as user' => {
+                              lastUpdated => 1089039511,
+                              context => q|Field label for the Export Page operation|,
+                              message => q|Export as user|
+                            },
+        '871' => {
+                   lastUpdated => 1044218026,
+                   message => q|Who can edit?|
+                 },
+        '104' => {
+                   lastUpdated => 1031514049,
+                   context => q|asset property|,
+                   message => q|URL|
+                 },
+        '11' => {
+                  lastUpdated => 1051514049,
+                  message => q|Empty trash.|
+                },
+        '412' => {
+                   lastUpdated => 1031514049,
+                   message => q|Synopsis|
+                 },
+        '954' => {
+                   lastUpdated => 1052850265,
+                   message => q|Manage system clipboard.|
+                 },
+        '1082' => {
+                    lastUpdated => 1076866475,
+                    message => q|Clipboard|
+                  },
+        '107' => {
+                   lastUpdated => 1031514049,
+                   message => q|Security|
+                 },
+        '174' => {
+                   lastUpdated => 1031514049,
+                   message => q|Display the title?|
+                 },
+        '487' => {
+                   lastUpdated => 1031514049,
+                   message => q|Possible Values|
+                 },
+        'Depth' => {
+                     lastUpdated => 1089039511,
+                     context => q|Field label for the Export Page operation|,
+                     message => q|Depth|
+                   },
+        '964' => {
+                   lastUpdated => 1052850265,
+                   message => q|Manage system trash.|
+                 },
+        '105' => {
+                   lastUpdated => 1046638916,
+                   message => q|Display|
+                 },
+        '1073' => {
+                    lastUpdated => 1070027660,
+                    message => q|Style Template|
+                  },
+        'Export Page' => {
+                           lastUpdated => 1089039511,
+                           context => q|Title for the Export Page operation|,
+                           message => q|Export Page|
+                         },
+        '951' => {
+                   lastUpdated => 1052850265,
+                   message => q|Are you certain that you wish to empty the clipboard to the trash?|
+                 },
+        '950' => {
+                   lastUpdated => 1052850265,
+                   message => q|Empty clipboard.|
+                 },
+        '85' => {
+                  lastUpdated => 1031514049,
+                  message => q|Description|
+                },
+        '486' => {
+                   lastUpdated => 1031514049,
+                   message => q|Data Type|
+                 },
+        '497' => {
+                   lastUpdated => 1031514049,
+                   message => q|Start Date|
+                 },
+        '651' => {
+                   lastUpdated => 1101514049,
+                   message => q|Emptying your trash will remove these assets from your site forever. Are you sure you want to continue?|
+                 },
+        '498' => {
+                   lastUpdated => 1031514049,
+                   message => q|End Date|
+                 },
+        '949' => {
+                   lastUpdated => 1052850265,
+                   message => q|Manage clipboard.|
+                 },
+        '411' => {
+                   lastUpdated => 1031514049,
+                   message => q|Menu Title|
+                 },
+        '886' => {
+                   lastUpdated => 1044727952,
+                   message => q|Hide from navigation?|
+                 },
+        '43' => {
+                  lastUpdated => 1031514049,
+                  message => q|Are you certain that you wish to delete this content?|
+                },
+        '940' => {
+                   lastUpdated => 1050438829,
+                   message => q|Open in new window?|
+                 },
+        '493' => {
+                   lastUpdated => 1031514049,
+                   message => q|Back to site.|
+                 }
 };
 
 1;
