@@ -17,11 +17,19 @@ sub addChild {
 	my $properties = shift;
 	my $id = WebGUI::Id::generate();
 	my $lineage = $self->get("lineage").$self->getNextChildRank;
-	WebGUI::SQL->write("insert into asset (assetId, parentId, lineage, state, namespace, url, startDate, endDate) 
+	WebGUI::SQL->beginTransaction;
+	WebGUI::SQL->write("insert into asset (assetId, parentId, lineage, state, className, url, startDate, endDate) 
 		values (".quote($id).",".quote($self->getId).", ".quote($lineage).", 
-		'published', ".quote($properties->{namespace}).", ".quote($id).",
+		'published', ".quote($properties->{className}).", ".quote($id).",
 		997995720, 9223372036854775807)");
-	my $newAsset = WebGUI::Asset->new($id);
+	foreach my $definition (@{$self->{definition}}) {
+		unless ($definition->{tableName} eq "asset") {
+			WebGUI::SQL->write("insert into ".$definition->{tableName}." (assetId) values (".quote($id).")");
+		}
+	}
+	WebGUI::SQL->commit;
+	my $className = $properties->{className};
+	my $newAsset = $className->new($id);
 	$newAsset->set($properties);
 	return $newAsset;
 }
@@ -29,7 +37,7 @@ sub addChild {
 sub canEdit {
 	my $self = shift;
 	my $userId = shift || $session{user}{userId};
- 	if ($userId eq $self->get("ownerId")) {
+ 	if ($userId eq $self->get("ownerUserId")) {
                 return 1;
 	}
         return WebGUI::Grouping::isInGroup($self->get("groupIdEdit"),$userId);
@@ -38,7 +46,7 @@ sub canEdit {
 sub canView {
 	my $self = shift;
 	my $userId = shift || $session{user}{userId};
-	if ($userId eq $self->get("ownerId")) {
+	if ($userId eq $self->get("ownerUserId")) {
                 return 1;
         } elsif ($self->get("startDate") < time() && 
 		$self->get("endDate") > time() && 
@@ -63,6 +71,55 @@ sub cut {
 	WebGUI::SQL->write("update asset set state='clipboard' where assetId=".quote($self->getId));
 	WebGUI::SQL->commit;
 	$self->{_properties}{state} = "clipboard";
+}
+
+sub definition {
+        my $class = shift;
+        my $definition = shift;
+        push(@{$definition}, {
+                tableName=>'asset',
+                className=>'WebGUI::Asset',
+                properties=>{
+                                title=>{
+                                        fieldType=>'text',
+                                        defaultValue=>$definition->[0]->{className}
+                                        },
+                                menuTitle=>{
+                                        fieldType=>'text',
+                                        defaultValue=>undef
+                                        },
+                                synopsis=>{
+                                        fieldType=>'textarea',
+                                        defaultValue=>undef
+                                        },
+                                url=>{
+                                        fieldType=>'text',
+                                        defaultValue=>undef,
+					filter=>'fixUrl',
+                                        },
+                                groupIdEdit=>{
+                                        fieldType=>'group',
+                                        defaultValue=>'4'
+                                        },
+                                groupIdView=>{
+                                        fieldType=>'group',
+                                        defaultValue=>'7'
+                                        },
+                                ownerUserId=>{
+                                        fieldType=>'selectList',
+                                        defaultValue=>'3'
+                                        },
+                                startDate=>{
+                                        fieldType=>'dateTime',
+                                        defaultValue=>undef
+                                        },
+                                endDate=>{
+                                        fieldType=>'dateTime',
+                                        defaultValue=>undef
+                                        },
+                        }
+                });
+        return $definition;
 }
 
 sub delete {
@@ -124,10 +181,23 @@ sub get {
 	return $self->{_properties};
 }
 
+
+
+
+#-------------------------------------------------------------------
+
+=head2 getAdminConsole ()
+
+Returns a reference to a WebGUI::AdminConsole object.
+
+=cut
+
 sub getAdminConsole {
 	my $self = shift;
-	my $ac = WebGUI::AdminConsole->set("assets");
-	return $ac;
+	unless (exists $self->{_adminConsole}) {
+		$self->{_adminConsole} = WebGUI::AdminConsole->new("assets");
+	}
+	return $self->{_adminConsole};
 }
 
 sub getEditForm {
@@ -214,14 +284,14 @@ sub getEditForm {
                 push (@$contentManagers, $session{user}{userId});
                 $clause = "userId in (".quoteAndJoin($contentManagers).")";
         } else {
-                $clause = "userId=".quote($self->get("ownerId"));
+                $clause = "userId=".quote($self->get("ownerUserId"));
         }
         my $users = WebGUI::SQL->buildHashRef("select userId,username from users where $clause order by username");
         $tabform->getTab("privileges")->select(
-               -name=>"ownerId",
+               -name=>"ownerUserId",
                -options=>$users,
                -label=>WebGUI::International::get(108),
-               -value=>[$self->get("ownerId")],
+               -value=>[$self->get("ownerUserId")],
                -subtext=>$subtext,
                -uiLevel=>6
                );
@@ -307,16 +377,14 @@ sub getLineage {
 		my $lineageLength = length($lineage);
 		$whereDescendants .= "lineage like ".quote($lineage.'%')." and length(lineage)> ".$lineageLength; 
 	}
-	my $select = "*";
-	$select = "assetId" if ($rules->{returnIds});
-	my $sql = "select $select from asset where $whereSiblings $whereExact $whereDescendants order by lineage";
+	my $sql = "select assetId from asset where $whereSiblings $whereExact $whereDescendants order by lineage";
 	my @lineage;
 	my $sth = WebGUI::SQL->read($sql);
-	while (my $asset = $sth->hashRef) {
-		if ($rules->{returnIds}) {
-			push(@lineage,$asset->{assetId});
+	while (my ($assetId) = $sth->array) {
+		if ($rules->{returnOjbects}) {
+			push(@lineage,WebGUI::Asset->new($assetId);
 		} else {
-			push(@lineage,WebGUI::Asset->new($asset->{assetId},$asset));
+			push(@lineage,$assetId);
 		}
 	}
 	$sth->finish;
@@ -352,7 +420,14 @@ sub getValue {
 	my $self = shift;
 	my $key = shift;
 	if (defined $key) {
-		return $session{form}{$key} || $self->get($key);
+		unless (exists $self->{_propertyDefinitions}) { # check to see if the defintions have been merged and cached
+			my %properties;
+			foreach my $definition (@{$self->definition}) {
+				%properties = (%properties, %{$definition->{properties}});
+			}
+			$self->{_propertyDefinitions} = \%properties;
+		}
+		return $session{form}{$key} || $self->get($key) || $self->{_propertiyDefinitions}{$key}{defaultValue};
 	}
 	return undef;
 }
@@ -360,17 +435,33 @@ sub getValue {
 sub new {
 	my $class = shift;
 	my $assetId = shift;
-	my $properties = shift;
+	my $overrideProperties = shift;
+	my $properties;
+	if ($assetId eq "new") {
+		$properties = $overrideProperties;
+		$properties->{assetId} = "new";
+		$properties->{className} = $class;
+	} else {
+		my $definitions = $class->definition;
+		my @definitionsReversed = reverse(@{$definitions});
+		shift(@definitionsReversed);
+		my $sql = "select * from asset";
+		foreach my $definition (@definitionsReversed) {
+			$sql .= " left join ".$definition->{tableName}." on asset.assetId=".$definition->{tableName}.".assetId";
+		}
+		$sql .= " where asset.assetId=".quote($assetId);
+		$properties = WebGUI::SQL->quickHashRef($sql);
+		return undef unless (exists $properties->{assetId});
+                foreach my $property (keys %{$overrideProperties}) {
+                        unless (isIn($property, qw(assetId className parentId lineage state))) {
+                                $properties->{$property} = $overrideProperties->{$property};
+                        }
+                }
+	}
 	if (defined $properties) {
 		return bless { _properties=>$properties }, $class;
-	} else {
-		$properties = WebGUI::SQL->quickHashRef("select * from asset where assetId=".quote($assetId));
-		if (exists $properties->{assetId}) {
-			return bless { _properties=>$properties}, $class;
-		} else {	
-			return undef;
-		}
 	}	
+	return undef;
 }
 
 sub paste {
@@ -396,21 +487,38 @@ sub promote {
 	return 0;
 }
 
+sub purge {
+	my $self = shift;
+	# NOTE to self, still need to delete all children too
+	WebGUI::SQL->beginTransaction;
+	foreach my $definition (@{$self->definition}) {
+		WebGUI::SQL->write("delete from ".$definition->{tableName}." where assetId=".quote($self->getId));
+	}
+	WebGUI::SQL->commit;
+	$self = undef;
+}
+
 sub set {
 	my $self = shift;
 	my $properties = shift;
-	my %props = %{$properties}; # make a copy so we don't disturb the original as we make changes
-	my @setPairs;
-	foreach my $property (keys %props) {
-		if (isIn($property, qw(groupIdEdit groupIdView ownerId startDate endDate url title menuTitle synopsis))) {
-			if ($property eq "url") {
-				$props{url} = $self->fixUrl($props{url});
+	WebGUI::SQL->beginTransaction;
+	foreach my $definition (@{$self->definition}) {
+		my @setPairs;
+		foreach my $property (keys %{$definition->{properties}}) {
+			my $value = $properties->{$property} || $definition->{properties}{$property}{defaultValue};
+			if (defined $value) {
+				if (exists $definition->{properties}{$property}{filter}) {
+					$value = $self->$definition->{properties}{$property}{filter}($value);
+				}
+				$self->{_properties}{$property} = $value;
+				push(@setPairs, $property."=".quote($value));
 			}
-			$self->{_properties}{$property} = $props{$property};
-			push(@setPairs ,$property."=".quote($props{$property}));
+		}
+		if (scalar(@setPairs) > 0) {
+			WebGUI::SQL->write("update ".$definition->{tableName}." set ".join(",",@setPairs)." where assetId=".quote($self->getId));
 		}
 	}
-	WebGUI::SQL->write("update asset set ".join(",",@setPairs)." where assetId=".quote($self->getId));
+	WebGUI::SQL->commit;
 	return 1;
 }
 
@@ -439,7 +547,7 @@ sub setRank {
 	my $currentRank = $self->getRank;
 	return 1 if ($newRank == $currentRank); # do nothing if we're moving to ourself
 	my $parentLineage = $self->getParentLineage;
-	my $siblings = $self->getLineage(["siblings"]);
+	my $siblings = $self->getLineage(["siblings"],{returnObjects=>1});
 	my $temp = substr(WebGUI::Id::generate(),0,6);
 	if ($newRank < $currentRank) { # have to do the ordering in reverse when the new rank is above the old rank
 		@{$siblings} = reverse @{$siblings};
@@ -478,42 +586,64 @@ sub www_copy {
 	return WebGUI::Privilege::insufficient() unless $self->canEdit;
 	my $newAsset = $self->duplicate;
 	$newAsset->cut;
+	return "";
 }
 
 sub www_cut {
 	my $self = shift;
 	return WebGUI::Privilege::insufficient() unless $self->canEdit;
 	$self->cut;
+	return "";
 }
 
 sub www_delete {
 	my $self = shift;
 	return WebGUI::Privilege::insufficient() unless $self->canEdit;
 	$self->delete;
+	return "";
 }
 
 sub www_demote {
 	my $self = shift;
 	return WebGUI::Privilege::insufficient() unless $self->canEdit;
 	$self->demote;
+	return "";
 }
 
 sub www_edit {
 	my $self = shift;
 	return WebGUI::Privilege::insufficient() unless $self->canEdit;
-	return "No editor has been defined for this asset.";
+	return $self->getAdminConsole->render($self->getEditForm);
+}
+
+sub www_editSave {
+	my $self = shift;
+	my %data;
+	foreach my $definition (@{$self->definition}) {
+		foreach my $property (keys %{$definition->{properties}}) {
+			my $data{$property} = WebGUI::FormProcessor::process(
+				$property,
+				$definition->{properties}{fieldType},
+				$definition->{properties}{defaultValue}
+				);
+		}
+	}
+	$self->set(\%data);
+	return "";
 }
 
 sub www_paste {
 	my $self = shift;
 	return WebGUI::Privilege::insufficient() unless $self->canEdit;
 	$self->paste($session{form}{newParentId});
+	return "";
 }
 
 sub www_promote {
 	my $self = shift;
 	return WebGUI::Privilege::insufficient() unless $self->canEdit;
 	$self->promote;
+	return "";
 }
 
 sub www_view {

@@ -48,14 +48,18 @@ create table asset (
 	parentId varchar(22) not null,
 	lineage varchar(255) not null,
 	state varchar(35) not null,
-	namespace varchar(255) not null,
+	className varchar(255) not null,
 	boundToId varchar(22),
 	title varchar(255),
 	menuTitle varchar(255),
 	url varchar(255) not null,
 	startDate bigint not null,
 	endDate bigint not null,
+	ownerUserId varchar(22) not null,
+	groupIdView varchar(22) not null,
+	groupIdEdit varchar(22) not null,
 	synopsis text,
+	newWindow int not null default 0,
 	isHidden int not null default 0,
 	isSystem int not null default 0,
 	unique index (lineage asc),
@@ -63,5 +67,5 @@ create table asset (
 	index (parentId)
 );
 
-insert into asset (assetId, parentId, lineage, state, namespace, title, menuTitle, url, startDate, endDate, isSystem) values ('theroot', 'infinity', '000001','published','Asset','Root','Root','root',997995720,9223372036854775807,1);
+insert into asset (assetId, parentId, lineage, state, className, title, menuTitle, url, startDate, endDate, isSystem, ownerUserId, groupIdView, groupIdEdit) values ('theroot', 'infinity', '000001','published','WebGUI::Asset','Root','Root','root',997995720,9223372036854775807,1,'3','3','3');
 
