@@ -30,9 +30,9 @@ sub _replacement {
 sub _reversePageTree {
         my ($sth, @data, $output, $parentId);
 	($parentId) = WebGUI::SQL->quickArray("select parentId from page where pageId='$_[0]'");
-        $sth = WebGUI::SQL->read("select pageId,parentId,menuTitle,urlizedTitle from page where parentId=$_[0] order by sequenceNumber");
+        $sth = WebGUI::SQL->read("select pageId,parentId,menuTitle,urlizedTitle,hideFromNavigation from page where parentId=$_[0] order by sequenceNumber");
         while (@data = $sth->array) {
-		if (WebGUI::Privilege::canViewPage($data[0])) {
+		if (!($data[4]) && WebGUI::Privilege::canViewPage($data[0])) {
                 	$output .= '<a class="verticalMenu" href="'.WebGUI::URL::gateway($data[3]).'">';
 			if ($session{page}{pageId} == $data[0]) {
 				$output .= '<span class="selectedMenuItem">'.$data[2].'</span>';

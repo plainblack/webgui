@@ -132,7 +132,7 @@ sub _traversePageTree {
         for ($i=1;$i<=$_[1];$i++) {
                 $depth .= $spacer;
         }
-        $a = WebGUI::SQL->read("select * from page where (pageId=1 or pageId>999) and parentId='$_[0]' order by sequenceNumber");
+        $a = WebGUI::SQL->read("select pageId,urlizedTitle,title from page where (pageId<2 or pageId>999) and parentId='$_[0]' order by sequenceNumber");
         while (%page = $a->hash) {
 		if (WebGUI::Privilege::canEditPage($page{pageId})) {
                 	$output .= $depth
@@ -247,6 +247,12 @@ sub www_editPage {
 			-label=>WebGUI::International::get(411),
 			-value=>$page{menuTitle},
 			-uiLevel=>1
+			);
+		$f->yesNo(
+			-name=>"hideFromNavigation",
+			-value=>$page{hideFromNavigation},
+			-label=>WebGUI::International::get(886),
+			-uiLevel=>6
 			);
                 $f->text(
 			-name=>"urlizedTitle",
@@ -432,6 +438,7 @@ sub www_editPageSave {
 		ownerId=$session{form}{ownerId}, 
 		groupIdView=$session{form}{groupIdView}, 
 		groupIdEdit=$session{form}{groupIdEdit}, 
+		hideFromNavigation=$session{form}{hideFromNavigation},
 		startDate=$session{form}{startDate},
 		endDate=$session{form}{endDate},
 		metaTags=".quote($session{form}{metaTags}).", 

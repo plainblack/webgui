@@ -707,7 +707,11 @@ delete from international where languageId=11 and namespace='UserSubmission' and
 delete from international where languageId=11 and namespace='UserSubmission' and internationalId=59;
 delete from international where languageId=11 and namespace='UserSubmission' and internationalId=6;
 delete from international where languageId=11 and namespace='UserSubmission' and internationalId=61;
-
+alter table page add column hideFromNavigation int not null default 0;
+update page set hideFromNavigation=1 where pageId=4;
+update page set hideFromNavigation=1 where pageId=3;
+update page set hideFromNavigation=1 where pageId=2;
+update page set hideFromNavigation=1 where pageId=5;
 
 
 

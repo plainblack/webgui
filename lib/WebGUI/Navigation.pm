@@ -189,10 +189,10 @@ sub tree {
 	tie %tree, 'Tie::IxHash';
 	tie %data, 'Tie::CPHash';
        	if ($depth < $toLevel) {
-               	$sth = WebGUI::SQL->read("select urlizedTitle, menuTitle, pageId, synopsis from page 
+               	$sth = WebGUI::SQL->read("select urlizedTitle, menuTitle, pageId, synopsis, hideFromNavigation from page 
 			where parentId='$parentId' order by sequenceNumber");
                	while (%data = $sth->hash) {
-                       	if (WebGUI::Privilege::canViewPage($data{pageId})) {
+                       	if (!($data{hideFromNavigation}) && WebGUI::Privilege::canViewPage($data{pageId})) {
 				$tree{$data{pageId}}{url} = WebGUI::URL::gateway($data{urlizedTitle}); 
 				$tree{$data{pageId}}{title} = $data{menuTitle}; 
 				$tree{$data{pageId}}{synopsis} = $data{synopsis}; 
