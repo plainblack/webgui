@@ -594,7 +594,7 @@ sub _positionFormat5x {
 sub _positionFormat6x {
 	my $newPositionCode = '	
 <tmpl_if session.var.adminOn> <tmpl_if page.canEdit>
-<table border=0 id="position'.$_[0].'">
+<table border=0 id="position'.$_[0].'" class="content">
             <tbody>
 </tmpl_if> </tmpl_if>
 		<tmpl_loop position'.$_[0].'_loop>

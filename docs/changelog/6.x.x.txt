@@ -65,5 +65,6 @@ webgui.
  - Optional second parameter to the File macro can be a boolean value to
    turn off file icons.
  - Added drag and drop content arranging.
+ - Added new toolbar icons. 
 
 

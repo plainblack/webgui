@@ -90,7 +90,7 @@ function dragable_init(url) {
                 dragableList[dragableList.length]=document.getElementById(children[i].id + "_div");
             }
         }
-        obj = document.getElementById("positionArea" + contentCount);
+        obj = document.getElementById("position" + contentCount);
         contentCount++;
     }
 
