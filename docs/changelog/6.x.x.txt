@@ -27,6 +27,7 @@
    will have no effect on clients/servers that can't support compression.
  - A small patch from Roy Johnson to deal with different types of WSDLs in th
    WS Client.
+ - Added the ability to select session v. global caches to WSClient.
 
 
 6.0.3
