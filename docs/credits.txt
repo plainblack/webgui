@@ -24,9 +24,14 @@ Translation..........................Andreas Ljunggren
                                      Michael Ugilt
 
 Perl.................................Larry Wall / O'Reilly
-RSSLite..............................Scott Thomason
+
+RSSLite..............................Jerrad Pierce
+                                     Scott Thomason
+
 IE Rich Edit.........................Brattli
+
 Data::Config.........................Sébastien Aperghis-Tramoni
+
 HTML::TagFilter......................William Ross
 
 

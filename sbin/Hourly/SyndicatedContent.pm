@@ -14,7 +14,7 @@ use HTTP::Request;
 use LWP::UserAgent;
 use strict;
 use WebGUI::SQL;
-use RSSLite;
+use XML::RSSLite;
 
 #-------------------------------------------------------------------
 sub getRSS {
