@@ -247,7 +247,7 @@ sub www_editDownload {
 				$session{form}{wid}.'&did='.$session{form}{did}).'">'.
 				WebGUI::International::get(391).'</a>',WebGUI::International::get(18,$namespace));
                 } else {
-			$f->file("alernateVersion2",WebGUI::International::get(18,$namespace));
+			$f->file("alternateVersion2",WebGUI::International::get(18,$namespace));
                 }
                 $f->text("briefSynopsis",WebGUI::International::get(8,$namespace),$download{briefSynopsis});
                 $f->group("groupToView",WebGUI::International::get(7,$namespace),[$download{groupToView}]);
