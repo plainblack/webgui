@@ -36,6 +36,15 @@
  - Added some processing functions to programatically add meta tags,
    javascript, and link tags to the head block of a page from anywhere within
 webgui.
+ - Templatized the Survey.
+ - Survey now allows for a configurable number of responses from a single user.
+ - Survey now allows for a configurable number of questions per page.
+ - Survey now shows progress indicator.
+ - Survey can now draw from a pool of questions, but does not have to use all
+   of them.
+ - Removed depricated functionality from Paginator (see docs/migration.txt).
+ - Added template variable mechanism to paginator.
+ - Added a limit option to the page list in the paginator.
  - Fixed a bug in AdminBar's clipboard code where a standard hash was
    used instead of a CPHash for database access.  (Thanks to Steve Simms.)
 

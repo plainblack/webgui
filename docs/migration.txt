@@ -81,8 +81,19 @@ WebGUI::Form::dateTime() and WebGUI::HTMLForm->dateTime() no longer have
 because there is only one field to represent both the date and the time,
 unlike before.
 
+
 5.2 Database Links
 
 The database links API was changed in 6.0. The getHash function was removed and
 replaced with a getList function that returns a hash reference.
+
+
+5.3 Paginator
+
+In 6.0 almost all of the paginator methods were modified in an incompatible
+way, including the constructor. We removed depricated parameters from the methods, 
+which will cause pagination not to function in items that have not been updated. 
+
+
+
 

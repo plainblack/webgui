@@ -28,7 +28,7 @@ our @ISA = qw(WebGUI::Wobject);
 
 
 #-------------------------------------------------------------------
-sub _addAnswer {
+sub addAnswer {
 	$_[0]->setCollateral("Survey_answer","Survey_answerId",{
 		Survey_id=>$_[0]->get("Survey_id"),
 		Survey_questionId=>$_[2],
@@ -38,32 +38,16 @@ sub _addAnswer {
 }
 
 #-------------------------------------------------------------------
-sub _setAnswerType {
-	$_[0]->setCollateral("Survey_question","Survey_questionId",{
-		Survey_questionId=>$_[2],
-		Survey_id=>$_[0]->get("Survey_id"),
-		answerFieldType=>$_[1]
-		},1,0,"Survey_id");
+sub completeResponse {
+	my $self = shift;
+	my $responseId = shift;
+	WebGUI::SQL->setRow("Survey_response","Survey_responseId",{
+		'Survey_responseId'=>$responseId,
+		isComplete=>1
+		});
+	WebGUI::Session::deleteScratch($self->getResponseIdString);
 }
 
-#-------------------------------------------------------------------
-sub _submenu {
-        my ($output, $key);
-	return $_[1] if ($session{form}{makePrintable});
-        $output = '<table width="100%" border="0" cellpadding="5" cellspacing="0">
-                <tr><td width="70%" class="tableData" valign="top">';
-        $output .= $_[1];
-        $output .= '</td><td width="30%" class="tableMenu" valign="top">';
-	$output .= '<li><a href="'.WebGUI::URL::page('func=exportAnswers&wid='.$_[0]->get("wobjectId")).'">'.WebGUI::International::get(62,$_[0]->get("namespace")).'</a>';
-	$output .= '<li><a href="'.WebGUI::URL::page('func=exportQuestions&wid='.$_[0]->get("wobjectId")).'">'.WebGUI::International::get(63,$_[0]->get("namespace")).'</a>';
-	$output .= '<li><a href="'.WebGUI::URL::page('func=exportResponses&wid='.$_[0]->get("wobjectId")).'">'.WebGUI::International::get(64,$_[0]->get("namespace")).'</a>';
-	$output .= '<li><a href="'.WebGUI::URL::page('func=exportComposite&wid='.$_[0]->get("wobjectId")).'">'.WebGUI::International::get(65,$_[0]->get("namespace")).'</a>';
-	$output .= '<li><a href="'.WebGUI::URL::page('func=viewGradebook&wid='.$_[0]->get("wobjectId")).'">'.WebGUI::International::get(61,$_[0]->get("namespace")).'</a>';
-	$output .= '<li><a href="'.WebGUI::URL::page('func=viewStatisticalOverview&wid='.$_[0]->get("wobjectId")).'">'.WebGUI::International::get(59,$_[0]->get("namespace")).'</a>';
-        $output .= '<li><a href="'.WebGUI::URL::page().'">'.WebGUI::International::get(60,$_[0]->get("namespace")).'</a>';
-        $output .= '</td></tr></table>';
-        return $output;
-}
 
 #-------------------------------------------------------------------
 sub duplicate {
@@ -104,6 +88,219 @@ sub duplicate {
 }
 
 #-------------------------------------------------------------------
+sub generateResponseId {
+	my $self = shift;
+	my $varname = $self->getResponseIdString;
+	if ($session{scratch}{$varname}) {
+		$self->completeResponse;
+	}
+	my $ipAddress = $self->getIp; 
+	my $userId = $self->getUserId; 
+	my $responseId = WebGUI::SQL->setRow("Survey_response","Survey_responseId",{
+		'Survey_responseId'=>"new",
+		userId=>$userId,
+		ipAddress=>$ipAddress,
+		username=>$session{user}{username},
+		startDate=>WebGUI::DateTime::time(),
+		'Survey_id'=>$self->get("Survey_id")
+		});
+	WebGUI::Session::setScratch($varname,$responseId);
+	return $session{scratch}{$varname};
+}
+
+#-------------------------------------------------------------------
+sub getIp {
+	my $self = shift;
+	my $ip = ($self->get("anonymous")) ? substr(md5_hex($session{env}{REMOTE_ADDR}),0,8) : $session{env}{REMOTE_ADDR};
+	return $ip;
+}
+
+
+
+#-------------------------------------------------------------------
+sub getMenuVars {
+	my $self = shift;
+	my %var;
+	$var{'user.canViewReports'} = (WebGUI::Privilege::isInGroup($self->get("groupToViewReports")));
+	$var{'delete.all.responses.url'} = WebGUI::URL::page('func=deleteAllResponses&wid='.$self->get("wobjectId"));
+	$var{'delete.all.responses.label'} = WebGUI::International::get(73,$self->get("namespace"));
+	$var{'export.answers.url'} = WebGUI::URL::page('func=exportAnswers&wid='.$self->get("wobjectId"));
+	$var{'export.answers.label'} = WebGUI::International::get(62,$self->get("namespace"));
+	$var{'export.questions.url'} = WebGUI::URL::page('func=exportQuestions&wid='.$self->get("wobjectId"));
+	$var{'export.questions.label'} = WebGUI::International::get(63,$self->get("namespace"));
+	$var{'export.responses.url'} = WebGUI::URL::page('func=exportResponses&wid='.$self->get("wobjectId"));
+	$var{'export.responses.label'} = WebGUI::International::get(64,$self->get("namespace"));
+	$var{'export.composite.url'} = WebGUI::URL::page('func=exportComposite&wid='.$self->get("wobjectId"));
+	$var{'export.composite.label'} = WebGUI::International::get(65,$self->get("namespace"));
+	$var{'report.gradebook.url'} = WebGUI::URL::page('func=viewGradebook&wid='.$self->get("wobjectId"));
+	$var{'report.gradebook.label'} = WebGUI::International::get(61,$self->get("namespace"));
+	$var{'report.overview.url'} = WebGUI::URL::page('func=viewStatisticalOverview&wid='.$self->get("wobjectId"));
+	$var{'report.overview.label'} = WebGUI::International::get(59,$self->get("namespace"));
+        $var{'survey.url'} = WebGUI::URL::page();
+	$var{'survey.label'} = WebGUI::International::get(60,$self->get("namespace"));
+	return \%var;
+}
+
+#-------------------------------------------------------------------
+sub getQuestionCount {
+	my $self = shift;
+	my ($count) = WebGUI::SQL->quickArray("select count(*) from Survey_question where Survey_id=".$self->get("Survey_id"));
+	return ($count < $self->getValue("questionsPerResponse")) ? $count : $self->getValue("questionsPerResponse");
+}
+
+#-------------------------------------------------------------------
+sub getQuestionsLoop {
+	my $self = shift;
+	my $responseId = shift;
+	my @ids;
+	if ($self->get("questionOrder") eq "sequential") {
+		@ids = $self->getSequentialQuestionIds($responseId);
+	} elsif ($self->get("questionOrder") eq "response") {
+		@ids = $self->getResponseDrivenQuestionIds($responseId);
+	} else {
+		@ids = $self->getRandomQuestionIds($responseId);
+	}
+	my $length = $#ids+1;
+	my $i = 1;
+	my @loop;
+	my $questionResponseCount = $self->getQuestionResponseCount($responseId);
+	while ($i <= $length && $i<= $self->get("questionsPerPage") && ($questionResponseCount + $i) <= $self->getValue("questionsPerResponse")) {
+		push(@loop,$self->getQuestionVars($ids[($i-1)]));
+		$i++;
+	}
+	return \@loop;
+}
+
+
+#-------------------------------------------------------------------
+sub getQuestionResponseCount {
+	my $self = shift;
+	my $responseId = shift;
+	my ($count) = WebGUI::SQL->quickArray("select count(*) from Survey_questionResponse where Survey_responseId=".$responseId);
+	return $count;
+}
+
+#-------------------------------------------------------------------
+sub getQuestionVars {
+	my $self = shift;
+	my $questionId = shift;
+	my %var;
+	my $question = WebGUI::SQL->getRow("Survey_question","Survey_questionId",$questionId);
+	$var{'question.question'} = $question->{question};
+	$var{'question.allowComment'} = $question->{allowComment};
+	$var{'question.id'} = $question->{Survey_questionId};
+	$var{'question.comment.field'} = WebGUI::Form::textarea({
+		name=>'comment_'.$questionId
+		});
+	$var{'question.comment.label'} = WebGUI::International::get(51,$self->get("namespace"));
+	if ($question->{answerFieldType} eq "text") {
+		my ($answer) = WebGUI::SQL->quickArray("select Survey_answerId from Survey_answer where Survey_questionId=".$question->{Survey_questionId}); 
+		$var{'question.answer.field'} = WebGUI::Form::hidden({
+			name=>'answerId_'.$questionId,
+			value=>$answer
+			});
+		$var{'question.answer.field'} .= WebGUI::Form::text({
+			name=>'textResponse_'.$questionId
+			});
+	} else {
+		my $answer = WebGUI::SQL->buildHashRef("select Survey_answerId,answer from Survey_answer where Survey_questionId=".$question->{Survey_questionId}." order by sequenceNumber");
+		if ($question->{randomizeAnswers}) {
+			$answer = randomizeHash($answer);
+		}
+		$var{'question.answer.field'} = WebGUI::Form::radioList({
+			options=>$answer,
+			name=>"answerId_".$questionId,
+			vertical=>1
+			});
+	}
+	return \%var;
+}
+
+#-------------------------------------------------------------------
+sub getRandomQuestionIds {
+	my $self = shift;
+	my $responseId = shift;
+	my @usedQuestionIds = WebGUI::SQL->buildArray("select Survey_questionId from Survey_questionResponse where Survey_responseId=".$responseId);
+	my $where = " where Survey_id=".$self->get("Survey_id");
+	if ($#usedQuestionIds+1 > 0) {
+		$where .= " and Survey_questionId not in (".join(",",@usedQuestionIds).")";
+	}
+	my @questions = WebGUI::SQL->buildArray("select Survey_questionId from Survey_question".$where);
+	randomizeArray(\@questions);
+	return @questions;
+}
+
+#-------------------------------------------------------------------
+sub getResponseCount {
+	my $self = shift;
+	my $ipAddress = $self->getIp;
+	my $userId = $self->getUserId;
+	my ($count) = WebGUI::SQL->quickArray("select count(*) from Survey_response where Survey_id=".$self->get("Survey_id")." and 
+		((userId<>1 and userId=".quote($userId).") or ( userId=1 and ipAddress=".quote($ipAddress)."))");
+	return $count;
+}
+
+
+#-------------------------------------------------------------------
+sub getResponseDrivenQuestionIds {
+	my $self = shift;
+	my $responseId = shift;
+        my $previousResponse = WebGUI::SQL->quickHashRef("select Survey_questionId, Survey_answerId from Survey_questionResponse 
+		where Survey_responseId=$responseId order by dateOfResponse desc");
+	my $questionId;
+	my @questions;
+	if (defined $previousResponse) {
+	        ($questionId) = WebGUI::SQL->quickArray("select gotoQuestion from Survey_answer where 
+			Survey_answerId=".$previousResponse->{Survey_answerId});
+	        unless ($questionId > 0) { 
+			($questionId) = WebGUI::SQL->quickArray("select gotoQuestion from Survey_question where 
+				Survey_questionId=".$previousResponse->{Survey_questionId});
+		}
+		unless ($questionId > 0) {
+			$questionId = undef;
+		}
+	} else {
+		($questionId) = WebGUI::SQL->quickArray("select Survey_questionId from Survey_question where Survey_responseId=$responseId
+			order by sequenceNumber");
+	}
+	push(@questions,$questionId);
+	return @questions;
+}
+
+#-------------------------------------------------------------------
+sub getResponseId {
+	my $self = shift;
+	return $session{scratch}{$self->getResponseIdString};
+}
+
+#-------------------------------------------------------------------
+sub getResponseIdString {
+	my $self = shift;
+	return "Survey-".$self->get("Survey_id")."-ResponseId";
+}
+
+
+#-------------------------------------------------------------------
+sub getSequentialQuestionIds {
+	my $self = shift;
+	my $responseId = shift;
+	my @usedQuestionIds = WebGUI::SQL->buildArray("select Survey_questionId from Survey_questionResponse where Survey_responseId=".$responseId);
+	my $where = " where Survey_id=".$self->get("Survey_id");
+	if ($#usedQuestionIds+1 > 0) {
+		$where = " and Survey_questionId not in (".join(",",@usedQuestionIds).")";
+	}
+	my @questions = WebGUI::SQL->buildArray("select Survey_questionId from Survey_question $where order by sequenceNumber");
+	return @questions;
+}
+
+#-------------------------------------------------------------------
+sub getUserId {
+	my $self = shift;
+	my $userId = ($self->get("anonymous") && $session{user}{userId} != 1) ? substr(md5_hex($session{user}{userId}),0,8) : $session{user}{userId};
+	return $userId;
+}
+
+#-------------------------------------------------------------------
 sub name {
         return WebGUI::International::get(1,$_[0]->get("namespace"));
 }
@@ -131,7 +328,26 @@ sub new {
 			anonymous=>{
 				defaultValue=>0
 				},
-			}
+			maxResponsesPerUser=>{
+				defaultValue=>1,
+				fieldType=>"integer"
+				},
+			questionsPerResponse=>{
+				defaultValue=>99999,
+				fieldType=>"integer"
+				},
+			questionsPerPage=>{
+				defaultValue=>1,
+				fieldType=>"integer"
+				},
+			reportcardTemplateId=>{
+				defaultValue=>1
+				},
+			overviewTemplateId=>{
+				defaultValue=>1
+				}
+			},
+		-useTemplate=>1
                 );
         bless $self, $class;
 }
@@ -147,6 +363,24 @@ sub purge {
         $_[0]->SUPER::purge();
 }
 
+
+#-------------------------------------------------------------------
+sub responseIsComplete {
+	my $self = shift;
+	my $responseId = shift;
+	my $response = WebGUI::SQL->getRow("Survey_response","Survey_responseId",$responseId);
+	return $response->{isComplete};
+}
+
+
+#-------------------------------------------------------------------
+sub setAnswerType {
+	$_[0]->setCollateral("Survey_question","Survey_questionId",{
+		Survey_questionId=>$_[2],
+		Survey_id=>$_[0]->get("Survey_id"),
+		answerFieldType=>$_[1]
+		},1,0,"Survey_id");
+}
 
 #-------------------------------------------------------------------
 sub uiLevel {
@@ -188,32 +422,32 @@ sub www_deleteQuestionConfirm {
 }
 
 #-------------------------------------------------------------------
-sub www_deleteResponses {
+sub www_deleteResponse {
 	return "" unless (WebGUI::Privilege::isInGroup($_[0]->get("groupToViewReports")));
-        return $_[0]->_submenu($_[0]->confirm(WebGUI::International::get(72,$_[0]->get("namespace")),
-                WebGUI::URL::page('func=deleteResponsesConfirm&wid='.$_[0]->get("wobjectId").'&uid='
-                .$session{form}{uid}.'&ip='.$session{form}{ip})));
+        return $_[0]->confirm(WebGUI::International::get(72,$_[0]->get("namespace")),
+                WebGUI::URL::page('func=deleteResponseConfirm&amp;wid='.$_[0]->get("wobjectId").'&responseId='.$session{form}{responseId}));
 }
 
 #-------------------------------------------------------------------
-sub www_deleteResponsesConfirm {
+sub www_deleteResponseConfirm {
 	return "" unless (WebGUI::Privilege::isInGroup($_[0]->get("groupToViewReports")));
-        WebGUI::SQL->write("delete from Survey_response where ((userId='$session{form}{uid}'
-        	and userId<>1) or (userId=1 and ipAddress='$session{form}{ip}')) and Survey_id=".$_[0]->get("Survey_id"));
+        WebGUI::SQL->write("delete from Survey_response where Survey_responseId=".$session{form}{responseId});
+        WebGUI::SQL->write("delete from Survey_questionResponse where Survey_responseId=".$session{form}{responseId});
         return $_[0]->www_viewGradebook;
 }
 
 #-------------------------------------------------------------------
 sub www_deleteAllResponses {
 	return "" unless (WebGUI::Privilege::isInGroup($_[0]->get("groupToViewReports")));
-        return $_[0]->_submenu($_[0]->confirm(WebGUI::International::get(74,$_[0]->get("namespace")),
-                WebGUI::URL::page('func=deleteAllResponsesConfirm&wid='.$_[0]->get("wobjectId"))));
+        return $_[0]->confirm(WebGUI::International::get(74,$_[0]->get("namespace")),
+                WebGUI::URL::page('func=deleteAllResponsesConfirm&wid='.$_[0]->get("wobjectId")));
 }
 
 #-------------------------------------------------------------------
 sub www_deleteAllResponsesConfirm {
 	return "" unless (WebGUI::Privilege::isInGroup($_[0]->get("groupToViewReports")));
         WebGUI::SQL->write("delete from Survey_response where Survey_id=".$_[0]->get("Survey_id")); 
+        WebGUI::SQL->write("delete from Survey_questionResponse where Survey_id=".$_[0]->get("Survey_id")); 
         return "";
 }
 
@@ -225,7 +459,7 @@ sub www_edit {
 	my $layout = WebGUI::HTMLForm->new;
 	my $privileges = WebGUI::HTMLForm->new;
 	$properties->hidden("Survey_id",($_[0]->get("Survey_id") || getNextId("Survey_id")));
-	$layout->select(
+	$layout->selectList(
 		-name=>"questionOrder",
 		-options=>{
 			sequential => WebGUI::International::get(5,$_[0]->get("namespace")),
@@ -235,7 +469,12 @@ sub www_edit {
 		-label=>WebGUI::International::get(8,$_[0]->get("namespace")),
 		-value=>[$_[0]->getValue("questionOrder")]
 		);
-        $properties->select(
+	$layout->integer(
+		-name=>"questionsPerPage",
+		-value=>$_[0]->getValue("questionsPerPage"),
+		-label=>WebGUI::International::get(83,$_[0]->get("namespace"))
+		);
+        $properties->selectList(
                 -name=>"mode",
                 -options=>{
 			survey => WebGUI::International::get(9,$_[0]->get("namespace")),
@@ -244,11 +483,21 @@ sub www_edit {
                 -label=>WebGUI::International::get(11,$_[0]->get("namespace")),
                 -value=>[$_[0]->getValue("mode")]
                 );
-		$properties->yesNo(
-					-name=>"anonymous",
-                	-value=>$_[0]->getValue("anonymous"),
-                	-label=>WebGUI::International::get(81,$_[0]->get("namespace"))
-                	);
+	$properties->yesNo(
+		-name=>"anonymous",
+               	-value=>$_[0]->getValue("anonymous"),
+               	-label=>WebGUI::International::get(81,$_[0]->get("namespace"))
+               	);
+	$properties->integer(
+		-name=>"maxResponsesPerUser",
+		-value=>$_[0]->getValue("maxResponsesPerUser"),
+		-label=>WebGUI::International::get(84,$_[0]->get("namespace"))
+		);
+	$properties->integer(
+		-name=>"questionsPerResponse",
+		-value=>$_[0]->getValue("questionsPerResponse"),
+		-label=>WebGUI::International::get(85,$_[0]->get("namespace"))
+		);
 	$privileges->group(
 		-name=>"groupToTakeSurvey",
 		-value=>[$_[0]->getValue("groupToTakeSurvey")],
@@ -275,20 +524,6 @@ sub www_edit {
 		-headingId=>2,
 		-helpId=>1
 		);
-	if ($_[0]->get("wobjectId") ne "new") {
-		$output .= '<a href="'.WebGUI::URL::page('wid='.$_[0]->get("wobjectId").'&func=editQuestion&qid=new')
-                        .'">'.WebGUI::International::get(30,$_[0]->get("namespace")).'</a><p>';
-		$sth = WebGUI::SQL->read("select Survey_questionId,question from Survey_question where Survey_id="
-			.$_[0]->get("Survey_id")." order by sequenceNumber");
-		while (%data = $sth->hash) {
-			$output .= deleteIcon('func=deleteQuestion&wid='.$_[0]->get("wobjectId").'&qid='.$data{Survey_questionId})
-				.editIcon('func=editQuestion&wid='.$_[0]->get("wobjectId").'&qid='.$data{Survey_questionId})	
-				.moveUpIcon('func=moveQuestionUp&wid='.$_[0]->get("wobjectId").'&qid='.$data{Survey_questionId})	
-				.moveDownIcon('func=moveQuestionDown&wid='.$_[0]->get("wobjectId").'&qid='.$data{Survey_questionId})	
-				.' '.$data{question}.'<br>';
-		}
-		$sth->finish;
-	}
         return $output;
 }
 
@@ -465,35 +700,33 @@ sub www_editQuestionSave {
         	$session{form}{aid} = "new";
                 return $_[0]->www_editAnswer();
 	} elsif ($session{form}{proceed} eq "addTextAnswer") {
-                $_[0]->_setAnswerType("text",$session{form}{qid});
-        	$_[0]->_addAnswer(0,$session{form}{qid});
+                $_[0]->setAnswerType("text",$session{form}{qid});
+        	$_[0]->addAnswer(0,$session{form}{qid});
 	} elsif ($session{form}{proceed} eq "addBooleanAnswer") {
-        	$_[0]->_addAnswer(31,$session{form}{qid});
-        	$_[0]->_addAnswer(32,$session{form}{qid});
+        	$_[0]->addAnswer(31,$session{form}{qid});
+        	$_[0]->addAnswer(32,$session{form}{qid});
                 return $_[0]->www_editQuestion();
 	} elsif ($session{form}{proceed} eq "addOpinionAnswer") {
-                $_[0]->_addAnswer(33,$session{form}{qid});
-                $_[0]->_addAnswer(34,$session{form}{qid});
-                $_[0]->_addAnswer(35,$session{form}{qid});
-                $_[0]->_addAnswer(36,$session{form}{qid});
-                $_[0]->_addAnswer(37,$session{form}{qid});
-                $_[0]->_addAnswer(38,$session{form}{qid});
-                $_[0]->_addAnswer(39,$session{form}{qid});
+                $_[0]->addAnswer(33,$session{form}{qid});
+                $_[0]->addAnswer(34,$session{form}{qid});
+                $_[0]->addAnswer(35,$session{form}{qid});
+                $_[0]->addAnswer(36,$session{form}{qid});
+                $_[0]->addAnswer(37,$session{form}{qid});
+                $_[0]->addAnswer(38,$session{form}{qid});
+                $_[0]->addAnswer(39,$session{form}{qid});
                 return $_[0]->www_editQuestion();
 	} elsif ($session{form}{proceed} eq "addFrequencyAnswer") {
-                $_[0]->_addAnswer(40,$session{form}{qid});
-                $_[0]->_addAnswer(41,$session{form}{qid});
-                $_[0]->_addAnswer(42,$session{form}{qid});
-                $_[0]->_addAnswer(43,$session{form}{qid});
-                $_[0]->_addAnswer(39,$session{form}{qid});
+                $_[0]->addAnswer(40,$session{form}{qid});
+                $_[0]->addAnswer(41,$session{form}{qid});
+                $_[0]->addAnswer(42,$session{form}{qid});
+                $_[0]->addAnswer(43,$session{form}{qid});
+                $_[0]->addAnswer(39,$session{form}{qid});
                 return $_[0]->www_editQuestion();
 	} elsif ($session{form}{proceed} eq "addQuestion") {
 		$session{form}{qid} eq "new";
                 return $_[0]->www_editQuestion();
-	} elsif ($session{form}{proceed} eq "backToPage") {
-		return ""	
 	}
-        return $_[0]->www_edit;
+        return "";
 }
 
 #-------------------------------------------------------------------
@@ -560,332 +793,261 @@ sub www_moveQuestionUp {
 
 #-------------------------------------------------------------------
 sub www_respond {
-	return "" unless (WebGUI::Privilege::isInGroup($_[0]->get("groupToTakeSurvey")));
-	return "" unless ($session{form}{Survey_answerId} ne "");
-	my $userId = ($_[0]->get("anonymous")) ? substr(md5_hex($session{user}{userId}),0,8) : $session{user}{userId};
-	my ($previousResponse) = WebGUI::SQL->quickArray("select count(*) from Survey_response
-		where Survey_answerId=$session{form}{Survey_answerId} and ((userId='".$userId."' and userId<>1)
-                        or (userId=1 and ipAddress='".$session{form}{ip}."'))");
-	return "" if ($previousResponse);
-	my $answer = $_[0]->getCollateral("Survey_answer","Survey_answerId",$session{form}{Survey_answerId});
-	my $response = $session{form}{response} || $answer->{answer};
-	$_[0]->setCollateral("Survey_response","Survey_responseId",{
-		Survey_responseId=>"new",
-		Survey_answerId=>$session{form}{Survey_answerId},
-		Survey_questionId=>$answer->{Survey_questionId},
-		Survey_id=>$answer->{Survey_id},
-		comment=>$session{form}{comment},
-		response=>$response,
-		userId=>($_[0]->get("anonymous")) ? substr(md5_hex($session{user}{userId}),0,8) : $session{user}{userId},
-		username=>($_[0]->get("anonymous")) ? substr(md5_hex($session{user}{username}),0,8) : $session{user}{username},
-		dateOfResponse=>time(),
-		ipAddress=>($_[0]->get("anonymous")) ? substr(md5_hex($session{env}{REMOTE_ADDR}),0,8) : $session{env}{REMOTE_ADDR}
-		},0,0);
+	my $self = shift;
+	return "" unless (WebGUI::Privilege::isInGroup($self->get("groupToTakeSurvey")));
+	my $varname = $self->getResponseIdString;
+	return "" unless ($session{scratch}{$varname});
+	my $userId = ($self->get("anonymous")) ? substr(md5_hex($session{user}{userId}),0,8) : $session{user}{userId};
+	foreach my $key (keys %{$session{form}}) {
+		if ($key =~ /answerId_(\d+)/) {
+			my $id = $1;
+			my ($previousResponse) = WebGUI::SQL->quickArray("select count(*) from Survey_questionResponse
+				where Survey_answerId=".$session{form}{"answerId_".$id}." and Survey_responseId=".$session{scratch}{$varname});
+			next if ($previousResponse);
+			my $answer = $self->getCollateral("Survey_answer","Survey_answerId",$session{form}{"answerId_".$id});
+			my $response = $session{form}{"textResponse_".$id} || $answer->{answer};
+			WebGUI::SQL->write("insert into Survey_questionResponse (Survey_answerId,Survey_questionId,Survey_responseId,Survey_id,comment,response,dateOfResponse) values (
+				".$answer->{Survey_answerId}.", ".$answer->{Survey_questionId}.", ".$session{scratch}{$varname}.", ".$answer->{Survey_id}.",
+				".quote($session{form}{"comment_".$id}).", ".quote($response).", ".WebGUI::DateTime::time().")");
+		}
+	}
+	my $responseCount = $self->getQuestionResponseCount($session{scratch}{$varname}); 
+	if ($responseCount >= $self->getValue("questionsPerResponse") || $responseCount >= $self->getQuestionCount) {
+		WebGUI::SQL->setRow("Survey_response","Survey_responseId",{
+			isComplete=>1,
+			endDate=>WebGUI::DateTime::time(),
+			Survey_responseId=>$session{scratch}{$varname}
+			});
+	}
 	return "";
 }
 
 #-------------------------------------------------------------------
 sub www_view {
-	my ($output, $f, $previous, $questionOrder, $previousResponse, $question, $ipAddress, $userId);
-	$ipAddress = ($_[0]->get("anonymous")) ? substr(md5_hex($session{env}{REMOTE_ADDR}),0,8) : $session{env}{REMOTE_ADDR};
-	$userId = ($_[0]->get("anonymous")) ? substr(md5_hex($session{user}{userId}),0,8) : $session{user}{userId};
-	$output = $_[0]->displayTitle;
-	$output .= $_[0]->description;
-        if (WebGUI::Privilege::isInGroup($_[0]->get("groupToViewReports"))) {
-                $output .= '<a href="'.WebGUI::URL::page('func=viewStatisticalOverview&wid='.$_[0]->get("wobjectId")).'">'
-                        .WebGUI::International::get(68,$_[0]->get("namespace")).'</a><p/>';
-        }
-	if (WebGUI::Privilege::isInGroup($_[0]->get("groupToTakeSurvey"))) {
-        	$previousResponse = WebGUI::SQL->quickHashRef("select Survey_questionId, Survey_answerId from Survey_response 
-			where Survey_id=".$_[0]->get("Survey_id")
-			." and ((userId='$userId' and userId<>1) or (userId=1 and 
-			ipAddress='$ipAddress')) order by dateOfResponse desc");
-		$questionOrder = $_[0]->get("questionOrder");
-		if ($previousResponse->{Survey_questionId}) {
-			if ($questionOrder eq "random") {
-				my @questions = WebGUI::SQL->buildArray("select Survey_questionId from Survey_response
-					where Survey_id=".$_[0]->get("Survey_id")." and ((userId='$userId' 
-					and userId<>1) or (userId=1 and ipAddress='$ipAddress'))");
-				if ($#questions >= 0) {
-					@questions = WebGUI::SQL->buildArray("select Survey_questionId from Survey_question 
-						where Survey_id=".$_[0]->get("Survey_id")
-						." and Survey_questionId not in (".join(",",@questions).")");
-				}
-				if ($#questions >= 0) {
-					$question = $_[0]->getCollateral("Survey_question","Survey_questionId",
-						$questions[rand($#questions+1)]);
-				}
-			}
-			if ($questionOrder eq "response" && $previousResponse->{Survey_answerId}) {
-				my ($responseDriver) = WebGUI::SQL->quickArray("select gotoQuestion from Survey_answer where
-					Survey_answerId=".$previousResponse->{Survey_answerId});
-				if ($responseDriver) {
-					$question = $_[0]->getCollateral("Survey_question","Survey_questionId",$responseDriver);
-				} else {
-					$questionOrder = "sequential";
-				}
-				undef $question if ($responseDriver < 0);	# Terminate Survey
-			} 
-			if ($questionOrder eq "sequential" && $previousResponse->{Survey_questionId}) {
-				my $previousQuestion = $_[0]->getCollateral("Survey_question","Survey_questionId",
-					$previousResponse->{Survey_questionId});
-				$previousQuestion->{sequenceNumber} = 0 unless($previousQuestion->{sequenceNumber});
-				$question = WebGUI::SQL->quickHashRef("select * from Survey_question where Survey_id="
-					.$_[0]->get("Survey_id")." and sequenceNumber>".$previousQuestion->{sequenceNumber}
-					." order by sequenceNumber");
-			}
-		} else {
-                        if ($questionOrder eq "random") {
-                                my @questions = WebGUI::SQL->buildArray("select Survey_questionId from Survey_question
-                                        where Survey_id=".$_[0]->get("Survey_id"));
-                                $question = $_[0]->getCollateral("Survey_question","Survey_questionId",
-                                        $questions[rand($#questions+1)]);
-				if ($question->{Survey_questionId} eq "new") {
-					delete $question->{Survey_questionId};
-				}
-                        } else {
-                                $question = WebGUI::SQL->quickHashRef("select * from Survey_question
-                                        where Survey_id=".$_[0]->get("Survey_id")." order by sequenceNumber");
-                        }
-		}
-		if ($question->{Survey_questionId}) {
-			$output .= $question->{question};
-			$f = WebGUI::HTMLForm->new;
-			$f->hidden("func","respond");
-			$f->hidden("wid",$_[0]->get("wobjectId"));
-			if ($question->{answerFieldType} eq "text") {
-				my ($answer) = WebGUI::SQL->quickArray("select Survey_answerId from Survey_answer where
-					Survey_questionId=".$question->{Survey_questionId});
-				$f->hidden("Survey_answerId",$answer);
-				$f->text(
-					-name=>"response"
-					);
-			} else {
-				my $answer = WebGUI::SQL->buildHashRef("select Survey_answerId,answer from Survey_answer
-					where Survey_questionId=".$question->{Survey_questionId}." order by sequenceNumber");
-				if ($question->{randomizeAnswers}) {
-					$answer = randomizeHash($answer);
-				}
-				$f->radioList(
-					-options=>$answer,
-					-name=>"Survey_answerId",
-					-vertical=>1
-					);
-			}
-			if ($question->{allowComment}) {
-				$f->textarea(
-					-name=>"comment",
-					-label=>WebGUI::International::get(51,$_[0]->get("namespace"))
-					);
-			}
-			$f->submit(WebGUI::International::get(50,$_[0]->get("namespace")));
-			$output .= $f->print;
-		} else {
-			if ($_[0]->get("mode") eq "survey") {
-				$output .= WebGUI::International::get(46,$_[0]->get("namespace"));
-			} else {
-				$output .= WebGUI::International::get(47,$_[0]->get("namespace"));
-				my ($questionCount) = WebGUI::SQL->quickArray("select count(*) from Survey_question
-					where Survey_id=".$_[0]->get("Survey_id"));
-				my ($correctCount) = WebGUI::SQL->quickArray("select count(*) from Survey_response a,
-					Survey_answer b where a.Survey_id=".$_[0]->get("Survey_id")." 
-					and ((userId='$userId' and userId<>1) or 
-					(userId=1 and ipAddress='$ipAddress'))
-					and a.Survey_answerId=b.Survey_answerId and b.isCorrect=1");
-				if ($questionCount > 0) {
-					$output .= "<h1>".WebGUI::International::get(52,$_[0]->get("namespace")).": "
-						.$correctCount."/".$questionCount
-						."<br/>".WebGUI::International::get(54,$_[0]->get("namespace")).": "
-						.round(($correctCount/$questionCount)*100)."%</h1>";
-				}
-			}
-		}
-	} else {
-		if ($_[0]->get("mode") eq "survey") {
-                        $output .= WebGUI::International::get(48,$_[0]->get("namespace"));
-                } else {
-                        $output .= WebGUI::International::get(49,$_[0]->get("namespace"));
-                }
-	}
-	return $output;
-}
-
-#-------------------------------------------------------------------
-sub www_viewComments {
-        return "" unless (WebGUI::Privilege::isInGroup($_[0]->get("groupToViewReports")));
-	my ($output, $sth, $comment);
-	$output = '<h1>'.WebGUI::International::get(57,$_[0]->get("namespace")).'</h1>';
-	$sth = WebGUI::SQL->read("select comment from Survey_response where Survey_questionId=".$session{form}{qid});
-	while (($comment) = $sth->array) {
-		$output .= $comment."<p/>\n";
+	my $self = shift;
+	my $var = $self->getMenuVars;
+	$var->{'question.add.url'} = WebGUI::URL::page('wid='.$self->get("wobjectId").'&func=editQuestion&qid=new');
+	$var->{'question.add.label'} = WebGUI::International::get(30,$self->get("namespace"));
+	my @edit;
+	my $sth = WebGUI::SQL->read("select Survey_questionId,question from Survey_question where Survey_id=".$self->get("Survey_id")." order by sequenceNumber");
+	while (my %data = $sth->hash) {
+		push(@edit,{
+			'question.edit.controls'=>deleteIcon('func=deleteQuestion&wid='.$self->get("wobjectId").'&qid='.$data{Survey_questionId})
+				.editIcon('func=editQuestion&wid='.$self->get("wobjectId").'&qid='.$data{Survey_questionId})	
+				.moveUpIcon('func=moveQuestionUp&wid='.$self->get("wobjectId").'&qid='.$data{Survey_questionId})	
+				.moveDownIcon('func=moveQuestionDown&wid='.$self->get("wobjectId").'&qid='.$data{Survey_questionId}),
+			'question.edit.question'=>$data{question},
+			'question.edit.id'=>$data{Survey_questionId}
+			});
+		$var->{'question.edit_loop'} = \@edit;
 	}
 	$sth->finish;
-	return $_[0]->_submenu($output);
+	$var->{'user.canTakeSurvey'} = WebGUI::Privilege::isInGroup($self->get("groupToTakeSurvey"));
+	if ($var->{'user.canTakeSurvey'}) {
+		$var->{'response.Id'} = $self->getResponseId();
+		$var->{'response.Count'} = $self->getResponseCount;
+		$var->{'user.isFirstResponse'} = ($var->{'response.Count'} == 0 && !(exists $var->{'response.id'}));
+		$var->{'user.canRespondAgain'} = ($var->{'response.Count'} < $self->get("maxResponsesPerUser"));
+		if (($var->{'user.isFirstResponse'}) || ($session{form}{startNew} && $var->{'user.canRespondAgain'})) {
+			$var->{'response.id'} = $self->generateResponseId;
+		}
+		if ($var->{'response.Id'}) {
+			$var->{'questions.soFar.count'} = $self->getQuestionResponseCount($var->{'response.Id'});
+			($var->{'questions.correct.Count'}) = WebGUI::SQL->quickArray("select count(*) from Survey_questionResponse a, Survey_answer b where a.Survey_responseId="
+				.$var->{'response.Id'}." and a.Survey_answerId=b.Survey_answerId and b.isCorrect=1");
+			if ($var->{'questions.soFar.count'} > 0) {
+				$var->{'questions.correct.percent'} = round(($var->{'questions.correct.count'}/$var->{'questions.soFar.count'})*100)
+			}
+			$var->{'response.isComplete'} = $self->responseIsComplete($var->{'response.Id'});
+			$var->{question_loop} = $self->getQuestionsLoop($var->{'response.Id'});
+		}
+	}
+	$var->{'form.header'} = WebGUI::Form::formHeader()
+		.WebGUI::Form::hidden({
+			name=>'wid',
+			value=>$self->get("wobjectId"),
+			})
+		.WebGUI::Form::hidden({
+			name=>'func',
+			value=>'respond'
+			});
+	$var->{'form.footer'} = '</form>';
+	$var->{'form.submit'} = WebGUI::Form::submit({
+			value=>WebGUI::International::get(50,$self->get("namespace"))
+			});
+	$var->{'questions.sofar.label'} = WebGUI::International::get(86,$self->get("namespace"));
+	$var->{'start.newResponse.label'} = WebGUI::International::get(87,$self->get("namespace"));
+	$var->{'start.newResponse.url'} = WebGUI::URL::page("wid=".$self->get("wobjectId")."&amp;func=view&amp;startNew=1"); 
+	$var->{'thanks.survey.label'} = WebGUI::International::get(46,$self->get("namespace"));
+	$var->{'thanks.quiz.label'} = WebGUI::International::get(47,$self->get("namespace"));
+	$var->{'questions.total'} = $self->getQuestionCount;
+	$var->{'questions.correct.count.label'} = WebGUI::International::get(52,$self->get("namespace"));
+	$var->{'questions.correct.percent.label'} = WebGUI::International::get(54,$self->get("namespace"));
+	$var->{'mode.isSurvey'} = ($self->get("mode") eq "survey");
+	$var->{'survey.noprivs.label'} = WebGUI::International::get(48,$self->get("namespace"));
+	$var->{'quiz.noprivs.label'} = WebGUI::International::get(49,$self->get("namespace"));
+	return $self->processTemplate($self->getValue("templateId"),$var);
 }
 
 #-------------------------------------------------------------------
 sub www_viewGradebook {
-        return "" unless (WebGUI::Privilege::isInGroup($_[0]->get("groupToViewReports")));
-	my ($output, $p, $users, $user);
-	$output = '<h1>'.WebGUI::International::get(71,$_[0]->get("namespace")).'</h1>';
-	$p = WebGUI::Paginator->new(WebGUI::URL::page('func=viewGradebook&wid='.$_[0]->get("wobjectId")));
-	$p->setDataByQuery("select userId,username,ipAddress from Survey_response 
-		group by userId,username,ipAddress order by username,ipAddress");
-	$users = $p->getPageData;
-	my ($questionCount) = WebGUI::SQL->quickArray("select count(*) from Survey_question
-        	where Survey_id=".$_[0]->get("Survey_id"));
-	$output .= '<table class="tableData">';
-	$output .= '<tr class="tableHeader"><td width="60%">'.WebGUI::International::get(67,$_[0]->get("namespace")).'</td>
-		<td width="20%">'.WebGUI::International::get(52,$_[0]->get("namespace")).'</td>
-		<td width="20%">'.WebGUI::International::get(54,$_[0]->get("namespace")).'</td></tr>';
-	foreach $user (@$users) {
-		$output .= '<tr>';
-		$output .= '<td><a href="'.WebGUI::URL::page('func=viewIndividualSurvey&wid='.$_[0]->get("wobjectId")
-			.'&uid='.$user->{userId}.'&ip='.$user->{ipAddress}).'">';
-		if ($user->{userId} == 1) {
-			$output .= $user->{ipAddress};
-		} else {
-			$output .= $user->{username};
-		}
-		$output .= '</a></td>';
-		my ($correctCount) = WebGUI::SQL->quickArray("select count(*) from Survey_response a,
-                	Survey_answer b where a.Survey_id=".$_[0]->get("Survey_id")."
-                        and ((userId='".$user->{userId}."' and userId<>1) or
-                        (userId=1 and ipAddress='".$user->{ipAddress}."'))
-                        and a.Survey_answerId=b.Survey_answerId and b.isCorrect=1");
-		$output .= '<td>'.$correctCount.'/'.$questionCount.'</td>';
-		$output .= '<td>'.round(($correctCount/$questionCount)*100).'</td>';
-		$output .= '</tr>';
+	my $self = shift;
+        return "" unless (WebGUI::Privilege::isInGroup($self->get("groupToViewReports")));
+	my $var = $self->getMenuVars;
+	$var->{title} = WebGUI::International::get(71,$self->get("namespace"));
+	my $p = WebGUI::Paginator->new(WebGUI::URL::page('func=viewGradebook&wid='.$self->get("wobjectId")));
+	$p->setDataByQuery("select userId,username,ipAddress,Survey_responseId,startDate,endDate from Survey_response 
+		where isComplete=1 and Survey_id=".$self->get("Survey_id")." order by username,ipAddress,startDate");
+	my $users = $p->getPageData;
+	($var->{'question.Count'}) = WebGUI::SQL->quickArray("select count(*) from Survey_question where Survey_id=".$self->get("Survey_id"));
+	$var->{'response.user.label'} = WebGUI::International::get(67,$self->get("namespace"));
+	$var->{'response.count.label'} = WebGUI::International::get(52,$self->get("namespace"));
+	$var->{'response.percent.label'} = WebGUI::International::get(54,$self->get("namespace"));
+	my @responseloop;
+	foreach my $user (@$users) {
+		my ($correctCount) = WebGUI::SQL->quickArray("select count(*) from Survey_questionResponse a left join
+                	Survey_answer b on a.Survey_answerId=b.Survey_answerId where a.Survey_responseId=".$user->{Survey_responseId}
+			." and b.isCorrect=1");
+		push(@responseloop, {
+			'response.url'=>WebGUI::URL::page('func=viewIndividualSurvey&amp;wid='.$self->get("wobjectId")
+					.'&amp;responseId='.$user->{Survey_responseId}),
+			'response.user.name'=>($user->{userId} == 1) ? $user->{ipAddress} : $user->{username},
+			'response.count.correct' => $correctCount,
+			'response.percent' => round(($correctCount/$var->{'question.Count'})*100)
+			});
 	}
-	$output .= '</table>';
-	$output .= $p->getBarTraditional;
-	return $_[0]->_submenu($output);
+	$var->{response_loop} = \@responseloop;
+	$p->appendTemplateVars($var);
+	return $self->processTemplate($self->getValue("gradebookTemplateId"),$var,"Survey/Gradebook");
 }
 
 
 #-------------------------------------------------------------------
 sub www_viewIndividualSurvey {
-        return "" unless (WebGUI::Privilege::isInGroup($_[0]->get("groupToViewReports")));
-	my ($output, $questions, $sth, $qdata, $rdata, $adata, $p);
-	$output = '<h1>'.WebGUI::International::get(70,$_[0]->get("namespace")).'</h1>';
-	$output .= '<a href="'.WebGUI::URL::page('func=deleteResponses&wid='.$_[0]->get("wobjectId")
-                .'&uid='.$session{form}{uid}.'&ip='.$session{form}{ip}).'">'.WebGUI::International::get(69,$_[0]->get("namespace")).'</a><p/>';
-	my ($start) = WebGUI::SQL->quickArray("select min(dateOfResponse) from Survey_response 
-		where Survey_id=".$_[0]->get("Survey_id")." and ((userId='".$session{form}{uid}."' and userId<>1)
-                or (userId=1 and ipAddress='".$session{form}{ip}."'))");
-        my ($end) = WebGUI::SQL->quickArray("select max(dateOfResponse) from Survey_response
-                where Survey_id=".$_[0]->get("Survey_id")." and ((userId='".$session{form}{uid}."' and userId<>1)
-                or (userId=1 and ipAddress='".$session{form}{ip}."'))");
-	$output .= '<b>'.WebGUI::International::get(76,$_[0]->get("namespace")).':</b> '.epochToHuman($start).'<br/>';
-	$output .= '<b>'.WebGUI::International::get(77,$_[0]->get("namespace")).':</b> '.epochToHuman($end).'<br/>';
-	$output .= '<b>'.WebGUI::International::get(78,$_[0]->get("namespace")).':</b> '.int(($end-$start)/60).' '
-		.WebGUI::International::get(79,$_[0]->get("namespace")).', '.(($end-$start)%60).' '
-		.WebGUI::International::get(80,$_[0]->get("namespace")).'<p/>';
-	$p = WebGUI::Paginator->new(WebGUI::URL::page('func=viewIndividualSurvey&wid='.$_[0]->get("wobjectId")
-		.'&uid='.$session{form}{uid}.'&ip='.$session{form}{ip}));
-	$p->setDataByQuery("select Survey_questionId,question,answerFieldType from Survey_question 
-		where Survey_id=".$_[0]->get("Survey_id")." order by sequenceNumber");
-	$questions = $p->getPageData;
-	foreach $qdata (@$questions) {
-		$output .= '<b>'.$qdata->{question}.'</b><br/>'
-			.'<table class="tableData" width="100%">';
+	my $self = shift;
+        return "" unless (WebGUI::Privilege::isInGroup($self->get("groupToViewReports")));
+	my $var = $self->getMenuVars;
+	$var->{'title'} = WebGUI::International::get(70,$self->get("namespace"));
+	$var->{'delete.url'} = WebGUI::URL::page('func=deleteResponse&amp;wid='.$self->get("wobjectId").'&amp;responseId='.$session{form}{responseId});
+	$var->{'delete.label'} = WebGUI::International::get(69,$self->get("namespace"));
+	my $response = WebGUI::SQL->getRow("Survey_response","Survey_responseId",$session{form}{responseId});
+	$var->{'start.date.label'} = WebGUI::International::get(76,$self->get("namespace"));
+	$var->{'start.date.epoch'} = $response->{startDate};
+	$var->{'start.date.human'} = epochToHuman($response->{startDate},"%z");
+	$var->{'start.time.human'} = epochToHuman($response->{startDate},"%Z");
+	$var->{'end.date.label'} = WebGUI::International::get(77,$self->get("namespace"));
+	$var->{'end.date.epoch'} = $response->{endDate};
+	$var->{'end.date.human'} = epochToHuman($response->{endDate},"%z");
+	$var->{'end.time.human'} = epochToHuman($response->{endDate},"%Z");
+	$var->{'duration.label'} = WebGUI::International::get(78,$self->get("namespace"));
+	$var->{'duration.minutes'} = int(($response->{end} - $response->{start})/60);
+	$var->{'duration.minutes.label'} = WebGUI::International::get(79,$self->get("namespace"));
+	$var->{'duration.seconds'} = (($response->{endDate} - $response->{start})%60);
+	$var->{'duration.seconds.label'} = WebGUI::International::get(80,$self->get("namespace"));
+	$var->{'answer.label'} = WebGUI::International::get(19,$self->get("namespace"));
+	$var->{'response.label'} = WebGUI::International::get(66,$self->get("namespace"));
+	$var->{'comment.label'} = WebGUI::International::get(57,$self->get("namespace"));
+	my $a = WebGUI::SQL->read("select Survey_questionId,question,answerFieldType from Survey_question 
+		where Survey_id=".$self->get("Survey_id")." order by sequenceNumber");
+	my @questionloop;
+	while (my $qdata = $a->hashRef) {
+		my @aid;
+		my @answer;
 		if ($qdata->{answerFieldType} eq "radioList") {
-			$output .= '<tr><td valign="top" class="tableHeader" width="25%">'
-				.WebGUI::International::get(19,$_[0]->get("namespace")).'</td><td width="75%">';
-			$sth = WebGUI::SQL->read("select Survey_answerId,answer from Survey_answer 
+			my $sth = WebGUI::SQL->read("select Survey_answerId,answer from Survey_answer 
 				where Survey_questionId=".$qdata->{Survey_questionId}." and isCorrect=1 order by sequenceNumber");
-			while ($adata = $sth->hashRef) {
-				$output .= $adata->{answer}.'<br/>';
+			while (my $adata = $sth->hashRef) {
+				push(@aid,$adata->{Survey_answerId});
+				push(@answer,$adata->{answer});
 			}
 			$sth->finish;
-			$output .= '</td></tr>';
 		}
-		$output .= '<tr><td width="25%" valign="top" class="tableHeader">'
-			.WebGUI::International::get(66,$_[0]->get("namespace")).'</td>';
-		$rdata = WebGUI::SQL->quickHashRef("select Survey_answerId,response,comment from Survey_response 
-			where Survey_questionId=".$qdata->{Survey_questionId}." 
-			and ((userId='".$session{form}{uid}."' and userId<>1) 
-			or (userId=1 and ipAddress='".$session{form}{ip}."'))");
-		$output .= '<td width="75%">'.$rdata->{response}.'</td></tr>';
-		if ($rdata->{comment} ne "") {
-			$output .= '<tr><td valign="top" class="tableHeader">'
-				.WebGUI::International::get(57,$_[0]->get("namespace")).'</td>'
-				.'<td>'.$rdata->{comment}.'</td></tr>';
-		}
-		$output .= "</table><p/>\n";
+		my $rdata = WebGUI::SQL->quickHashRef("select Survey_answerId,response,comment from Survey_questionResponse 
+			where Survey_questionId=".$qdata->{Survey_questionId}." and Survey_responseId=".$session{form}{responseId});
+		push(@questionloop,{
+			question => $qdata->{question},
+			'question.id'=>$qdata->{Survey_questionId},
+			'question.isRadioList' => ($qdata->{answerFieldType} eq "radioList"),
+			'question.response' => $rdata->{response},
+			'question.comment' => $rdata->{comment},
+			'question.isCorrect' => isIn($rdata->{Survey_answerId}, @aid),
+			'question.answer' => join(", ",@answer),
+			});
 	}
-	return $_[0]->_submenu($output);
-}
-
-#-------------------------------------------------------------------
-sub www_viewResponses {
-        return "" unless (WebGUI::Privilege::isInGroup($_[0]->get("groupToViewReports")));
-        my ($output, $sth, $response);
-        $output = '<h1>'.WebGUI::International::get(66,$_[0]->get("namespace")).'</h1>';
-        $sth = WebGUI::SQL->read("select response from Survey_response where Survey_questionId=".$session{form}{qid});
-        while (($response) = $sth->array) {
-                $output .= $response."<p/>\n";
-        }
-        $sth->finish;
-        return $_[0]->_submenu($output);
+	$a->finish;
+	$var->{question_loop} = \@questionloop;
+	return $self->processTemplate($self->getValue("responseTemplateId"),$var,"Survey/Response");
 }
 
 #-------------------------------------------------------------------
 sub www_viewStatisticalOverview {
-        return "" unless (WebGUI::Privilege::isInGroup($_[0]->get("groupToViewReports")));
-	my ($output, $p, $questions, $question, $sth, $answer, $totalResponses, $data);
-	$output = '<h1>'.WebGUI::International::get(58,$_[0]->get("namespace")).'</h1>';
-	$output .= '<a href="'.WebGUI::URL::page('func=deleteAllResponses&wid='.$_[0]->get("wobjectId"))
-                .'">'.WebGUI::International::get(73,$_[0]->get("namespace")).'</a><p/>';
-	$p = WebGUI::Paginator->new(WebGUI::URL::page('func=viewStatisticalOverview&wid='.$_[0]->get("wobjectId")));
+	my $self = shift;
+        return "" unless (WebGUI::Privilege::isInGroup($self->get("groupToViewReports")));
+	my $var = $self->getMenuVars;
+	$var->{title} = WebGUI::International::get(58,$self->get("namespace"));
+	my $p = WebGUI::Paginator->new(WebGUI::URL::page('func=viewStatisticalOverview&wid='.$self->get("wobjectId")));
 	$p->setDataByQuery("select Survey_questionId,question,answerFieldType,allowComment from Survey_question 
-		where Survey_id=".$_[0]->get("Survey_id")." order by sequenceNumber");
-	$questions = $p->getPageData;
-	foreach $question (@$questions) {
-		$output .= '<b>'.$question->{question}.'</b>';
+		where Survey_id=".$self->get("Survey_id")." order by sequenceNumber");
+	my $questions = $p->getPageData;
+	my @questionloop;
+	$var->{'answer.label'} = WebGUI::International::get(19,$self->get("namespace"));
+	$var->{'response.count.label'} = WebGUI::International::get(53,$self->get("namespace"));
+	$var->{'response.percent.label'} = WebGUI::International::get(54,$self->get("namespace"));
+	$var->{'show.responses.label'} = WebGUI::International::get(55,$self->get("namespace"));
+	$var->{'show.comments.label'} = WebGUI::International::get(56,$self->get("namespace"));
+	foreach my $question (@$questions) {
+		my @answerloop;
+		my ($totalResponses) = WebGUI::SQL->quickArray("select count(*) from Survey_questionResponse where Survey_questionId=".$question->{Survey_questionId});
 		if ($question->{answerFieldType} eq "radioList") {
-			$output .= '<table class="tableData">';
-			$output .= '<tr class="tableHeader"><td width="60%">'.WebGUI::International::get(19,$_[0]->get("namespace")).'</td>
-				<td width="20%">'.WebGUI::International::get(53,$_[0]->get("namespace")).'</td>
-				<td width="20%">'.WebGUI::International::get(54,$_[0]->get("namespace")).'</td></tr>';
-			($totalResponses) = WebGUI::SQL->quickArray("select count(*) from Survey_response
-				where Survey_questionId=".$question->{Survey_questionId});
-			$sth = WebGUI::SQL->read("select Survey_answerId,answer,isCorrect from Survey_answer where
+			my $sth = WebGUI::SQL->read("select Survey_answerId,answer,isCorrect from Survey_answer where
 				Survey_questionId=".$question->{Survey_questionId}." order by sequenceNumber");
-			while ($answer = $sth->hashRef) {
-				if ($answer->{isCorrect}) {
-					$output .= '<tr class="highlight">';
-				} else {
-					$output .= '<tr>';
-				}
-				$output .= '<td>'.$answer->{answer}.'</td>';
-				($data) = WebGUI::SQL->quickArray("select count(*) from Survey_response
-                                        where Survey_answerId=".$answer->{Survey_answerId});
-				$output .= '<td>'.$data.'</td>';
-				$output .= '<td>';
+			while (my $answer = $sth->hashRef) {
+				my ($numResponses) = WebGUI::SQL->quickArray("select count(*) from Survey_questionResponse where Survey_answerId=".$answer->{Survey_answerId});
+				my $responsePercent;
 				if ($totalResponses) {
-					$output .= round(($data/$totalResponses)*100);
+					$responsePercent = round(($numResponses/$totalResponses)*100);
 				} else {
-					$output .= '0';
+					$responsePercent = 0;
 				}
-				$output .= '</td>';
-				$output .= '</tr>';
+				my @commentloop;
+				my $sth2 = WebGUI::SQL->read("select comment from Survey_questionResponse where Survey_answerId=".$answer->{Survey_answerId});
+				while (my ($comment) = $sth2->array) {
+					push(@commentloop,{
+						'answer.comment'=>$comment
+						});
+				}
+				$sth2->finish;
+				push(@answerloop,{
+					'answer.isCorrect'=>$answer->{isCorrect},
+					'answer' => $answer->{answer},
+					'answer.response.count' =>$numResponses,
+					'answer.response.percent' =>$responsePercent,
+					'comment_loop'=>\@commentloop
+					});
 			}
 			$sth->finish;
-			$output .= "</table>";
 		} else {
-			$output .= '<br/><a href="'.WebGUI::URL::page('func=viewResponses&wid='.$_[0]->get("wobjectId")
-				.'&qid='.$question->{Survey_questionId}).'">'.WebGUI::International::get(55,$_[0]->get("namespace"))
-				.'</a><br/>';
+			my $sth = WebGUI::SQL->read("select response,comment from Survey_questionResponse where Survey_questionId=".$question->{Survey_questionId});
+			while (my $response = $sth->hashRef) {
+				push(@answerloop,{
+					'answer.response'=>$response->{response},
+					'answer.comment'=>$response->{comment}
+					});
+			}
+			$sth->finish;
 		}
-		if ($question->{allowComment}) {
-			$output .= '<a href="'.WebGUI::URL::page('func=viewComments&wid='.$_[0]->get("wobjectId")
-				.'&qid='.$question->{Survey_questionId}).'">'.WebGUI::International::get(56,$_[0]->get("namespace")).'</a>';
-		}
-		$output .= '<br/><br/><br/>';
+		push(@questionloop,{
+			question=>$question->{question},
+			'question.id'=>$question->{Survey_questionId},
+			'question.isRadioList' => ($question->{answerFieldType} eq "radioList"),
+			'question.response.total' => $totalResponses,
+			'answer_loop'=>\@answerloop,
+			'question.allowComment'=>$question->{allowComment}
+			});
 	}
-	$output .= $p->getBarTraditional;
-	return $_[0]->_submenu($output);
+	$var->{question_loop} = \@questionloop;
+	$p->appendTemplateVars($var);
+	return $self->processTemplate($self->getValue("overviewTemplateId"),$var,"Survey/Overview");
 }
 
 1;

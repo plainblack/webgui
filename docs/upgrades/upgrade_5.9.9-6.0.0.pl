@@ -412,6 +412,7 @@ while (my $data = $a->hashRef) {
 }
 $a->finish;
 WebGUI::SQL->write("alter table SQLReport drop column template");
+WebGUI::SQL->write("alter table SQLReport drop column convertCarriageReturns");
 
 
 
@@ -464,6 +465,54 @@ print "\tMigrating wobject privileges.\n" unless ($quiet);
 WebGUI::SQL->write("alter table page add column wobjectPrivileges int not null default 0");
 WebGUI::SQL->write("update page set wobjectPrivileges=$session{setting}{wobjectPrivileges}");
 WebGUI::SQL->write("delete from settings where name='wobjectPrivileges'");
+
+
+#--------------------------------------------
+print "\tMigrating surveys.\n" unless ($quiet);
+WebGUI::SQL->write("alter table Survey_response rename Survey_questionResponse");
+WebGUI::SQL->write("update Survey_questionResponse set userId='1' where userId='c4ca4238'");
+WebGUI::SQL->write("alter table Survey_questionResponse drop primary key");
+WebGUI::SQL->write("alter table Survey_questionResponse add primary key (Survey_questionId, Survey_answerId, Survey_responseId)");
+WebGUI::SQL->write("create table Survey_response (Survey_id int, Survey_responseId int not null primary key, userId varchar(11), 
+	username varchar(255), ipAddress varchar(15), startDate int, endDate int, isComplete int not null default 0)");
+my $a = WebGUI::SQL->read("select Survey_id from Survey");
+while (my ($surveyId) = $a->array) {
+	my $b = WebGUI::SQL->read("select distinct userId from Survey_questionResponse where Survey_id=$surveyId");
+	while (my ($userId) = $b->array) {
+		my ($username,$ipAddress) = WebGUI::SQL->quickArray("select username,ipAddress from Survey_questionResponse where Survey_id=$surveyId and 
+			userId=".quote($userId));
+		WebGUI::SQL->write("insert into (Survey_id, Survey_responseId, userId, username, isComplete, ipAddress) values ($surveyId,
+			".getNextId("Survey_responseId")." ,".quote($userId).", ".quote($username).", 1, ".quote($ipAddress).")");
+	}
+	$b->finish;
+	$b = WebGUI::SQL->read("select distinct ipAddress from Survey_questionResponse where Survey_id=$surveyId and userId='1'");
+	while (my ($ipAddress) = $b->array) {
+		WebGUI::SQL->write("insert into (Survey_id, Survey_responseId, userId, username, isComplete, ipAddress) values (
+			$surveyId, ".getNextId("Survey_responseId")." ,'1', 'Visitor', 1, ".quote($ipAddress).")");
+	}
+	$b->finish;
+}
+$a->finish;
+$a = WebGUI::SQL->read("select Survey_id, Survey_responseId, userId, ipAddress from Survey_response");
+while (my $data = $a->hashRef) {
+	my ($end) = WebGUI::SQL->quickArray("select max(dateOfResponse) from Survey_questionResponse where Survey_id=".$data->{Survey_id}."
+		and ((userId=".quote($data->{userId})." and userId<>1) or (userId=1 and ipAddress=".quote($data->{ipAddress})."))");
+	my ($start) = WebGUI::SQL->quickArray("select min(dateOfResponse) from Survey_questionResponse where Survey_id=".$data->{Survey_id}."
+		and ((userId=".quote($data->{userId})." and userId<>1) or (userId=1 and ipAddress=".quote($data->{ipAddress})."))");
+	WebGUI::SQL->write("update Survey_response set startDate=$start, endDate=$end where Survey_responseId=".$data->{Survey_responseId});
+	WebGUI::SQL->quickArray("update Survey_questionResponse set Survey_responseId=".$data->{Survey_responseId}." where Survey_id=".$data->{Survey_id}."
+		and ((userId=".quote($data->{userId})." and userId<>1) or (userId=1 and ipAddress=".quote($data->{ipAddress})."))");
+}
+$a->finish;
+WebGUI::SQL->write("alter table Survey_questionResponse drop column userId");
+WebGUI::SQL->write("alter table Survey_questionResponse drop column username");
+WebGUI::SQL->write("alter table Survey_questionResponse drop column ipAddress");
+WebGUI::SQL->write("alter table Survey add column questionsPerPage int not null default 1");
+WebGUI::SQL->write("alter table Survey add column responseTemplateId int not null default 1");
+WebGUI::SQL->write("alter table Survey add column reportcardTemplateId int not null default 1");
+WebGUI::SQL->write("alter table Survey add column overviewTemplateId int not null default 1");
+WebGUI::SQL->write("alter table Survey add column maxResponsesPerUser int not null default 1");
+WebGUI::SQL->write("alter table Survey add column questionsPerResponse int not null default 9999999");
 
 
 WebGUI::Session::close();

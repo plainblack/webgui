@@ -18,6 +18,7 @@ use strict;
 use WebGUI::International;
 use WebGUI::Session;
 use WebGUI::URL;
+use WebGUI::Utility;
 
 =head1 NAME
 
@@ -30,9 +31,11 @@ Package that paginates rows of arbitrary data for display on the web.
 =head1 SYNOPSIS
 
  use WebGUI::Paginator;
- $p = WebGUI::Paginator->new("/index.pl/page_name?this=that",\@row);
+ $p = WebGUI::Paginator->new("/index.pl/page_name?this=that");
+ $p->setDataByArrayRef(\@array);
  $p->setDataByQuery($sql);
 
+ $p->appendTemplateVars($hashRef);
  $html = $p->getBar;
  $html = $p->getBarAdvanced;
  $html = $p->getBarSimple;
@@ -57,17 +60,41 @@ These methods are available from this class:
 
 #-------------------------------------------------------------------
 
-=head2 getBar ( [ pageNumber ] )
+=head2 appendTemplateVars ( hashRef )
 
-Returns the pagination bar including First, Previous, Next, and last links. If there's only one page, nothing is returned.
+Adds paginator template vars to a hash reference.
 
 =over
 
-=item pageNumber
+=item hashRef
 
-Defaults to the page you're currently viewing. This is mostly here as an override and probably has no real use.
+The hash reference to append the variables to.
 
 =back
+
+=cut
+
+sub appendTemplateVars {
+	my $self = shift;
+	my $var = shift;
+	$var->{'pagination.firstpage'} = $self->getFirstPageLink;
+	$var->{'pagination.lastpage'} = $self->getLastPageLink;
+	$var->{'pagination.nextpage'} = $self->getNextPageLink;
+	$var->{'pagination.previouspage'} = $self->getPreviousPageLink;
+	$var->{'pagination.pageNumber'} = $self->getPageNumber;
+	$var->{'pagination.pageCount'} = $self->getNumberOfPages;
+	$var->{'pagination.pageCount.isMultiple'} = ($self->getNumberOfPages > 1);
+	$var->{'pagination.pageList'} = $self->getPageLinks;
+	$var->{'pagination.pageList.upTo10'} = $self->getPageLinks(10);
+	$var->{'pagination.pageList.upTo20'} = $self->getPageLinks(20);
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 getBar ( )
+
+Returns the pagination bar including First, Previous, Next, and last links. If there's only one page, nothing is returned.
 
 =cut
 
@@ -75,13 +102,13 @@ sub getBar {
         my ($output);
         if ($_[0]->getNumberOfPages > 1) {
                 $output = '<div class="pagination">';
-                $output .= $_[0]->getFirstPageLink($_[1]);
+                $output .= $_[0]->getFirstPageLink;
                 $output .= ' &middot; ';
-                $output .= $_[0]->getPreviousPageLink($_[1]);
+                $output .= $_[0]->getPreviousPageLink;
                 $output .= ' &middot; ';
-                $output .= $_[0]->getNextPageLink($_[1]);
+                $output .= $_[0]->getNextPageLink;
                 $output .= ' &middot; ';
-                $output .= $_[0]->getLastPageLink($_[1]);
+                $output .= $_[0]->getLastPageLink;
                 $output .= '</div>';
                 return $output;
         } else {
@@ -92,17 +119,9 @@ sub getBar {
 
 #-------------------------------------------------------------------
 
-=head2 getBarAdvanced ( [ pageNumber ] )
+=head2 getBarAdvanced ( )
 
 Returns the pagination bar including First, Previous, Page Numbers, Next, and Last links. If there's only one page, nothing is returned.
-
-=over
-
-=item pageNumber
-
-Defaults to the page you're currently viewing. This is mostly here as an override and probably has no real use.
-
-=back
 
 =cut
 
@@ -110,15 +129,15 @@ sub getBarAdvanced {
         my ($output);
         if ($_[0]->getNumberOfPages > 1) {
                 $output = '<div class="pagination">';
-                $output .= $_[0]->getFirstPageLink($_[1]);
+                $output .= $_[0]->getFirstPageLink;
                 $output .= ' &middot; ';
-                $output .= $_[0]->getPreviousPageLink($_[1]);
+                $output .= $_[0]->getPreviousPageLink;
                 $output .= ' &middot; ';
-                $output .= $_[0]->getPageLinks($_[1]);
+                $output .= $_[0]->getPageLinks;
                 $output .= ' &middot; ';
-                $output .= $_[0]->getNextPageLink($_[1]);
+                $output .= $_[0]->getNextPageLink;
                 $output .= ' &middot; ';
-                $output .= $_[0]->getLastPageLink($_[1]);
+                $output .= $_[0]->getLastPageLink;
                 $output .= '</div>';
                 return $output;
         } else {
@@ -129,17 +148,9 @@ sub getBarAdvanced {
 
 #-------------------------------------------------------------------
 
-=head2 getBarSimple ( [ pageNumber ] )
+=head2 getBarSimple ( )
 
 Returns the pagination bar including only Previous and Next links. If there's only one page, nothing is returned.
-
-=over
-
-=item pageNumber
-
-Defaults to the page you're currently viewing. This is mostly here as an override and probably has no real use.
-
-=back
 
 =cut 
 
@@ -147,9 +158,9 @@ sub getBarSimple {
 	my ($output);
 	if ($_[0]->getNumberOfPages > 1) {
 		$output = '<div class="pagination">';
-		$output .= $_[0]->getPreviousPageLink($_[1]);
+		$output .= $_[0]->getPreviousPageLink;
 		$output .= ' &middot; ';
-		$output .= $_[0]->getNextPageLink($_[1]);
+		$output .= $_[0]->getNextPageLink;
 		$output .= '</div>';
 		return $output;
 	} else {
@@ -160,17 +171,9 @@ sub getBarSimple {
 
 #-------------------------------------------------------------------
 
-=head2 getBarTraditional ( [ pageNumber ] )
+=head2 getBarTraditional ( )
 
 Returns the pagination bar including Previous, Page Numbers, and Next links. If there's only one page, nothing is returned.
-
-=over
-
-=item pageNumber
-
-Defaults to the page you're currently viewing. This is mostly here as an override and probably has no real use.
-
-=back
 
 =cut
 
@@ -178,11 +181,11 @@ sub getBarTraditional {
         my ($output);
         if ($_[0]->getNumberOfPages > 1) {
                 $output = '<div class="pagination">';
-                $output .= $_[0]->getPreviousPageLink($_[1]);
+                $output .= $_[0]->getPreviousPageLink;
                 $output .= ' &middot; ';
-                $output .= $_[0]->getPageLinks($_[1]);
+                $output .= $_[0]->getPageLinks;
                 $output .= ' &middot; ';
-                $output .= $_[0]->getNextPageLink($_[1]);
+                $output .= $_[0]->getNextPageLink;
                 $output .= '</div>';
                 return $output;
         } else {
@@ -193,23 +196,15 @@ sub getBarTraditional {
 
 #-------------------------------------------------------------------
 
-=head2 getFirstPageLink ( [ pageNumber ] )
+=head2 getFirstPageLink ( )
 
 Returns a link to the first page's data.
-
-=over
-
-=item pageNumber
-
-Defaults to the page you're currently viewing. This is mostly here as an override and probably has no real use.
-
-=back
 
 =cut
 
 sub getFirstPageLink {
         my ($text, $pn);
-	$pn = $_[1] || $_[0]->getPageNumber;
+	$pn = $_[0]->getPageNumber;
         $text = '|&lt;'.WebGUI::International::get(404);
         if ($pn > 1) {
                 return '<a href="'.
@@ -223,23 +218,15 @@ sub getFirstPageLink {
 
 #-------------------------------------------------------------------
 
-=head2 getLastPageLink ( [ pageNumber ] )
+=head2 getLastPageLink (  )
 
 Returns a link to the last page's data.
-
-=over
-
-=item pageNumber
-
-Defaults to the page you're currently viewing. This is mostly here as an override and probably has no real use.
-
-=back
 
 =cut
 
 sub getLastPageLink {
         my ($text, $pn);
-	$pn = $_[1] || $_[0]->getPageNumber;
+	$pn = $_[0]->getPageNumber;
         $text = WebGUI::International::get(405).'&gt;|';
         if ($pn != $_[0]->getNumberOfPages) {
                 return '<a href="'.
@@ -253,23 +240,15 @@ sub getLastPageLink {
 
 #-------------------------------------------------------------------
 
-=head2 getNextPageLink ( [ pageNumber ] )
+=head2 getNextPageLink (  )
 
 Returns a link to the next page's data.
-
-=over
-
-=item pageNumber
-
-Defaults to the page you're currently viewing. This is mostly here as an override and probably has no real use.
-
-=back
 
 =cut
 
 sub getNextPageLink {
         my ($text, $pn);
-	$pn = $_[1] || $_[0]->getPageNumber;
+	$pn = $_[0]->getPageNumber;
         $text = WebGUI::International::get(92).'&raquo;';
         if ($pn < $_[0]->getNumberOfPages) {
                 return '<a href="'.WebGUI::URL::append($_[0]->{_url},($_[0]->{_formVar}.'='.($pn+1))).'">'.$text.'</a>';
@@ -362,55 +341,63 @@ sub getPageNumber {
 
 #-------------------------------------------------------------------
 
-=head2 getPageLinks ( [ pageNumber ] )
+=head2 getPageLinks ( [ limit ] )
 
 Returns links to all pages in this paginator.
 
 =over
 
-=item pageNumber
+=iten limit
 
-Defaults to the page you're currently viewing. This is mostly here as an override and probably has no real use.
+An integer representing the maximum number of page links to return. Defaultly all page links will be returned.
 
 =back
 
 =cut
 
 sub getPageLinks {
-        my ($i, $output, $pn);
-	$pn = $_[1] || $_[0]->getPageNumber;
-	for ($i=0; $i<$_[0]->getNumberOfPages; $i++) {
+	my $self = shift;
+	my $limit = shift;
+	my $pn = $self->getPageNumber;
+	my @pages;
+	for (my $i=0; $i<$self->getNumberOfPages; $i++) {
 		if ($i+1 == $pn) {
-			$output .= ' '.($i+1).' ';
+			push(@pages,($i+1));
 		} else {
-			$output .= ' <a href="'.
-				WebGUI::URL::append($_[0]->{_url},($_[0]->{_formVar}.'='.($i+1)))
-				.'">'.($i+1).'</a> ';
+			push(@pages,'<a href="'.WebGUI::URL::append($self->{_url},($self->{_formVar}.'='.($i+1))).'">'.($i+1).'</a>');
 		}
 	}
-	return $output;
+	if ($limit) {
+		my $output;
+		my $i = 1;
+		my $minPage = $self->getPageNumber - round($limit/2);
+		my $maxPage = $minPage + $limit;
+		my $start = ($minPage > 0) ? $minPage : 1;
+		my $end = ($maxPage < $self->getPageNumber) ? $maxPage : $self->getPageNumber;
+		foreach my $page (@pages) {
+			if ($i <= $end && $i >= $start) {
+				$output .= $page.' ';
+			}
+			$i++;
+		}
+		return $output;
+	} else {
+		return join(" ",@pages);
+	}
 }
 
 
 #-------------------------------------------------------------------
 
-=head2 getPreviousPageLink ( [ pageNumber ] )
+=head2 getPreviousPageLink ( )
 
 Returns a link to the previous page's data. 
-
-=over
-
-=item pageNumber
-
-Defaults to the page you're currently viewing. This is mostly here as an override and probably has no real use.
-
-=back
 
 =cut
 
 sub getPreviousPageLink {
 	my ($text, $pn);
-	$pn = $_[1] || $_[0]->getPageNumber;
+	$pn = $_[0]->getPageNumber;
 	$text = '&laquo;'.WebGUI::International::get(91);
 	if ($pn > 1) {
 		return '<a href="'.WebGUI::URL::append($_[0]->{_url},($_[0]->{_formVar}.'='.($pn-1))).'">'.$text.'</a>';
@@ -435,7 +422,7 @@ sub getRowCount {
 
 #-------------------------------------------------------------------
 
-=head2 new ( currentURL, rowArrayRef [, paginateAfter, pageNumber, formVar ] )
+=head2 new ( currentURL [, paginateAfter, pageNumber, formVar ] )
 
 Constructor.
 
@@ -445,17 +432,13 @@ Constructor.
 
 The URL of the current page including attributes. The page number will be appended to this in all links generated by the paginator.
 
-=item rowArrayRef
-
-An array reference to all the rows of data for this page.
-
 =item paginateAfter
 
 The number of rows to display per page. If left blank it defaults to 50.
 
 =item pageNumber 
 
-By default the paginator uses a form variable of "pn" to determine the page number. If you wish it to use some other variable, then specify the page number here.
+By default the page number will be determined by looking at $session{form}{pn}. If that is empty the page number will be defaulted to "1". If you'd like to override the page number specify it here.
 
 =item formVar
 
@@ -467,15 +450,37 @@ Specify the form variable the paginator should use in it's links.  Defaults to "
 
 sub new {
         my ($class, $currentURL, $rowsPerPage, $rowRef, $formVar, $pageRef, $pn);
-	$class = $_[0];
-	$currentURL = $_[1];
-	$rowRef = $_[2];
-	$rowsPerPage = $_[3] || 25;
-	$formVar = $_[5] || "pn";
-	$pn = $_[4] || $session{form}{$formVar} || 1;
-	my $totalRows = $#{$rowRef};
-        bless {_url => $currentURL, _rpp => $rowsPerPage, _totalRows=>$totalRows , _rowRef => $rowRef, _formVar => $formVar, _pn => $pn}, $class;
+	my $class = shift;
+	my $currentURL = shift;
+	my $rowsPerPage = shift || 25;
+	my $formVar = shift || "pn";
+	my $pn = shift || $session{form}{$formVar} || 1;
+        bless {_url => $currentURL, _rpp => $rowsPerPage, _formVar => $formVar, _pn => $pn}, $class;
 }
+
+#-------------------------------------------------------------------
+
+=head2 setDataByArrayRef ( arrayRef )
+
+Provide the paginator with data by giving it an array reference.
+
+=over
+
+=item arrayRef
+
+The array reference that contains the data to be paginated.
+
+=back
+
+=cut
+
+sub setDataByArrayRef {
+	my $self = shift;
+	my $rowRef = shift;
+	$self->{_rowRef} = $rowRef;
+	$self->{_totalRows} = $#{$rowRef};
+}
+
 
 #-------------------------------------------------------------------
 
