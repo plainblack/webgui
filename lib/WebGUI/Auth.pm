@@ -369,7 +369,7 @@ sub displayAccount {
    $vars->{title} = WebGUI::International::get(61);
    
    $vars->{'account.form.header'} = WebGUI::Form::formHeader({});
-   $vars->{'account.form.header'} = WebGUI::Form::hidden({"name"=>"op","value"=>"auth"});
+   $vars->{'account.form.header'} .= WebGUI::Form::hidden({"name"=>"op","value"=>"auth"});
    $vars->{'account.form.header'} .= WebGUI::Form::hidden({"name"=>"method","value"=>$method});
    if($session{setting}{useKarma}){
       $vars->{'account.form.karma'} = $session{user}{karma};
