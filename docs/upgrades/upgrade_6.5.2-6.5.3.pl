@@ -40,7 +40,8 @@ while (my $namespace = $sth->hashRef) {
 		styleTemplateId=>'PBtmpl0000000000000060',
 		printableStyleTemplateId=>'PBtmpl0000000000000111',
 		groupIdView=>'4',
-		groupIdEdit=>'3'
+		groupIdEdit=>'3',
+		description=>''
 	});
 	my $templatesquery = "select * from asset, template where asset.parentId='".$templateFolder."' and asset.assetId=template.assetId and asset.className='WebGUI::Asset::Template' and template.namespace='".$namespace->{namespace}."' order by title asc";
 	my $newParentId = $folder->getId;
@@ -58,6 +59,10 @@ while (my $namespace = $sth->hashRef) {
 }
 $sth->finish;
 
+#Lock down permissions on viewing templates.  There's no reason "everyone"
+#should be allowed to view them if the www_view method returns the parent 
+#container anyway...!
+WebGUI::SQL->write("update asset set groupIdView='4' where className='WebGUI::Asset::Template'");
 
 WebGUI::Session::close();
 

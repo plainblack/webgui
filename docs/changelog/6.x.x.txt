@@ -21,6 +21,7 @@
        [ 1149801 ] page position not maintained (Martin Kamerbeek)
  - fix [ 1165373 ] sort templates into folders by namespace under ImportNode
  - fix [ 1118789 ] 6.2.11 - L_loginBox display with empty 1st param [colink]
+ - fix [ 1165635 ] IndexedSearch - double toolbar in AdminMode [mwilson]
 
 
 6.5.2

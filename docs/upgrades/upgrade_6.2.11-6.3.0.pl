@@ -90,7 +90,7 @@ WebGUI::SQL->write("delete from settings where name in ('siteicon','favicon')");
 print "\tMigrating wobject templates to asset templates.\n" unless ($quiet);
 my $sth = WebGUI::SQL->read("select templateId, template, namespace from template where namespace in ('Article', 
 		'SyndicatedContent', 'MessageBoard', 'DataForm', 'HttpProxy', 'Poll', 'Product', 'WobjectProxy',
-		'IndexedSearch', 'SQLReport', 'Survey', 'WSClient')");
+		'SQLReport', 'Survey', 'WSClient')");
 while (my $t = $sth->hashRef) {
 	$t->{template} = '<a name="<tmpl_var assetId>"></a>
 <tmpl_if session.var.adminOn>
