@@ -19,8 +19,14 @@ document.write('.cMenuDivInner { margin: 0 4 0 4; border-width: 1; border-style:
 document.write('</style>\n');
 
 document.write('<SCR' + 'IPT LANGUAGE=VBScript\> \n');
+document.write('Function spellEnabled() \n');
 document.write('on error resume next \n');
-document.write('spellEnabled = (IsObject(CreateObject("Word.Application"))) \n');
+document.write('Dim objWord \n');
+document.write('Set objWord = CreateObject("Word.Application") \n');
+document.write('spellEnabled = (IsObject(objWord)) \n');
+document.write('objWord.Quit \n');
+document.write('Set objWord = Nothing \n');
+document.write('End Function \n');
 document.write('</SCR' + 'IPT\> \n');
 
 /* ---------------------------------------------------------------------- *\
@@ -365,7 +371,7 @@ function editor_action(button_id) {
     editor_insertHTML(objname, "It's easy to add buttons that insert text!");
   }
   else if (cmdID == 'spell') {
-	if(typeof(spellEnabled) == 'undefined') alert('Unable to start MS Word for spell checking.\nActive X is not enabled for this site or MS Word is not available.');
+	if(! spellEnabled()) alert('Unable to start MS Word for spell checking.\nActive X is not enabled for this site or MS Word is not available.');
 	else {
         editdoc.execCommand('copy');
 	   if (editdoc.selection.createRange().text != "") {CheckDocument(); return true;}
