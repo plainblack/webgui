@@ -22,5 +22,26 @@ alter table UserSubmission add column karmaPerSubmission int not null default 0;
 alter table UserSubmission add column karmaPerPost int not null default 0;
 alter table MessageBoard add column karmaPerPost int not null default 0;
 alter table Article add column karmaPerPost int not null default 0;
-
+CREATE TABLE imageGroup (
+  imageGroupId int(11) NOT NULL auto_increment,
+  name varchar(128) NOT NULL default 'untitled',
+  parentId int(11) NOT NULL default '0',
+  description varchar(255) default NULL,
+  PRIMARY KEY  (imageGroupId),
+  UNIQUE KEY imageGroupId (imageGroupId)
+);
+INSERT INTO incrementer (incrementId, nextValue) VALUES('imageGroupId',1);
+INSERT INTO imageGroup (imageGroupId, name, parentId, description) VALUES (0, 'Root', 0, 'Top level');
+alter table images add column imageGroupId int not null default 0;
+INSERT INTO groups (groupId, groupName, description) VALUES (9, 'Image Managers', 'Users that have privileges to add, edit, and delete images from the image manager. Content managers can view by default');
+INSERT INTO international VALUES (542,'WebGUI','English','Previous..');
+INSERT INTO international VALUES (543,'WebGUI','English','Add a new group');
+INSERT INTO international VALUES (544,'WebGUI','English','Are you certain you wish to delete this group?');
+INSERT INTO international VALUES (545,'WebGUI','English','Editing Image group');
+INSERT INTO international VALUES (546,'WebGUI','English','Group Id');
+INSERT INTO international VALUES (547,'WebGUI','English','Parent group');
+INSERT INTO international VALUES (548,'WebGUI','English','Group name');
+INSERT INTO international VALUES (549,'WebGUI','English','Group description');
+INSERT INTO international VALUES (550,'WebGUI','English','View Image group');
+INSERT INTO international VALUES (382,'WebGUI','English','Edit Image');
 

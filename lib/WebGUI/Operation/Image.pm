@@ -26,19 +26,19 @@ use WebGUI::URL;
 use WebGUI::Utility;
 
 our @ISA = qw(Exporter);
-our @EXPORT = qw(&www_editImage &www_editImageSave &www_viewImage &www_deleteImage &www_deleteImageConfirm &www_listImages &www_deleteImageFile);
+our @EXPORT = qw(&www_editImage &www_editImageSave &www_viewImage &www_deleteImage &www_deleteImageConfirm &www_listImages &www_deleteImageFile &www_editImageGroup &www_editImageGroupSave &www_viewImageGroup &www_deleteImageGroup &www_deleteImageGroupConfirm);
 
 #-------------------------------------------------------------------
 sub www_deleteImage {
         my ($output);
-        if (WebGUI::Privilege::isInGroup(4)) {
+        if (WebGUI::Privilege::isInGroup(9)) {
                 $output .= helpIcon(23);
                 $output .= '<h1>'.WebGUI::International::get(42).'</h1>';
                 $output .= WebGUI::International::get(392).'<p>';
                 $output .= '<div align="center"><a href="'.
-			WebGUI::URL::page('op=deleteImageConfirm&iid='.$session{form}{iid})
+			WebGUI::URL::page('op=deleteImageConfirm&iid='.$session{form}{iid}.'&gid='.$session{form}{gid})
 			.'">'.WebGUI::International::get(44).'</a>';
-                $output .= '&nbsp;&nbsp;&nbsp;&nbsp;<a href="'.WebGUI::URL::page('op=listImages').'">'.
+                $output .= '&nbsp;&nbsp;&nbsp;&nbsp;<a href="'.WebGUI::URL::page('op=listImages&gid='.$session{form}{gid}).'">'.
 			WebGUI::International::get(45).'</a></div>';
                 return $output;
         } else {
@@ -49,7 +49,7 @@ sub www_deleteImage {
 #-------------------------------------------------------------------
 sub www_deleteImageConfirm {
 	my ($image);
-        if (WebGUI::Privilege::isInGroup(4)) {
+        if (WebGUI::Privilege::isInGroup(9)) {
                 $image = WebGUI::Attachment->new("","images",$session{form}{iid});
 		$image->deleteNode;
                 WebGUI::SQL->write("delete from images where imageId=$session{form}{iid}");
@@ -61,7 +61,7 @@ sub www_deleteImageConfirm {
 
 #-------------------------------------------------------------------
 sub www_deleteImageFile {
-        if (WebGUI::Privilege::isInGroup(4)) {
+        if (WebGUI::Privilege::isInGroup(9)) {
                 WebGUI::SQL->write("update images set filename='' where imageId=$session{form}{iid}");
                 return www_editImage();
         } else {
@@ -71,19 +71,21 @@ sub www_deleteImageFile {
 
 #-------------------------------------------------------------------
 sub www_editImage {
-        my ($output, %data, $image, $f);
+        my ($output, %data, $image, $f, $imageGroupId);
 	tie %data, 'Tie::CPHash';
-        if (WebGUI::Privilege::isInGroup(4)) {
+        if (WebGUI::Privilege::isInGroup(9)) {
 		if ($session{form}{iid} eq "new") {
-		
+			$imageGroupId = $session{form}{gid};
 		} else {
 			%data = WebGUI::SQL->quickHash("select * from images where imageId=$session{form}{iid}");
+			$imageGroupId = $data{imageGroupId};
 		}
                 $output = helpIcon(20);
                 $output .= '<h1>'.WebGUI::International::get(382).'</h1>';
 		$f = WebGUI::HTMLForm->new;
                 $f->hidden("op","editImageSave");
                 $f->hidden("iid",$session{form}{iid});
+                $f->hidden("gid",$imageGroupId);
                 $f->readOnly($session{form}{iid},WebGUI::International::get(389));
                 $f->text("name",WebGUI::International::get(383),$data{name});
 		if ($data{filename} ne "") {
@@ -108,7 +110,7 @@ sub www_editImage {
 #-------------------------------------------------------------------
 sub www_editImageSave {
         my ($file, $sqlAdd, $test);
-        if (WebGUI::Privilege::isInGroup(4)) {
+        if (WebGUI::Privilege::isInGroup(9)) {
 		if ($session{form}{iid} eq "new") {
 			$session{form}{iid} = getNextId("imageId");
 			WebGUI::SQL->write("insert into images (imageId) values ($session{form}{iid})");
@@ -129,6 +131,7 @@ sub www_editImageSave {
 		WebGUI::SQL->write("update images set name=".quote($session{form}{name}).
                         $sqlAdd.", parameters=".quote($session{form}{parameters}).", userId=$session{user}{userId}, ".
                         " username=".quote($session{user}{username}).
+                        ", imageGroupId=".$session{form}{gid}.
 			", dateUploaded=".time()." where imageId=$session{form}{iid}");
                 return www_listImages();
         } else {
@@ -138,14 +141,29 @@ sub www_editImageSave {
 
 #-------------------------------------------------------------------
 sub www_listImages {
-        my ($f, $output, $sth, %data, @row, $image, $p, $i, $search, $isAdmin);
+        my ($f, $output, $sth, %data, @row, $image, $p, $i, $search, $search_group, $imageGroupId, $isImageManager, $imageGroupParentId);
 	tie %data, 'Tie::CPHash';
         if (WebGUI::Privilege::isInGroup(4)) {
+		$isImageManager = WebGUI::Privilege::isInGroup(9);
+		if($session{form}{gid} ne "") { 
+			$imageGroupId = $session{form}{gid};
+		} else {
+			$imageGroupId = 0;
+		}
+                %data = WebGUI::SQL->quickHash("select parentId,name from imageGroup where imageGroupId=".$imageGroupId);
+		if($session{form}{pid} ne "") { 
+			$imageGroupParentId = $session{form}{pid};
+		} elsif($imageGroupId != 0) {
+			$imageGroupParentId = $data{parentId};
+		}
                 $output = helpIcon(26);
-                $output .= '<h1>'.WebGUI::International::get(393).'</h1>';
-                $output .= '<table class="tableData" align="center" width="75%"><tr><td>';
-                $output .= '<a href="'.WebGUI::URL::page('op=editImage&iid=new').'">'.WebGUI::International::get(395).'</a>';
-                $output .= '</td>';
+                $output .= '<h1>'.WebGUI::International::get(393).' - '.$data{name}.'</h1>';
+                $output .= '<table class="tableData" align="center" width="75%"><tr>';
+		if($isImageManager) {
+	                $output .= '<td><a href="'.WebGUI::URL::page('op=editImage&iid=new&gid='.$imageGroupId).'">'.WebGUI::International::get(395).'</a>';
+	                $output .= '</td>';
+	                $output .= '<td><a href="'.WebGUI::URL::page('op=editImageGroup&gid=new&pid='.$imageGroupId).'">'.WebGUI::International::get(543).'</a></td>';
+		}
 		$f = WebGUI::HTMLForm->new(1);
 		$f->raw('<td align="right">');
                 $f->hidden("op","listImages");
@@ -158,19 +176,58 @@ sub www_listImages {
                         $search = " where (name like '%".$session{form}{keyword}.
                         	"%' or username like '%".$session{form}{keyword}.
 				"%' or filename like '%".$session{form}{keyword}."%') ";
+			$search_group = " where (name like '%".$session{form}{keyword}.
+				"%' or description like '%".$session{form}{keyword}."%') and imageGroupId>0";
+                } else {
+			$search = " where imageGroupId='".$imageGroupId."' ";
+			$search_group = " where parentId='".$imageGroupId."' and imageGroupId>0 ";
+		}
+		# do image groups
+		if($imageGroupId > 0) {  # show previous link
+                	$row[$i] = '<tr class="tableData">';
+                        $row[$i] .= '<td>&nbsp;</td>';
+			$row[$i] .= '<td><a href="'.WebGUI::URL::page('op=listImages&gid='.$imageGroupParentId)
+				.'"><img src="'.$session{setting}{lib}.'/smallAttachment.gif" border="0"></a>'
+				.'&nbsp;<a href="'.WebGUI::URL::page('op=listImages&gid='.$imageGroupParentId)
+				.'">'.WebGUI::International::get(542).'</a></td>'; # FIXME folder icon
+                        $row[$i] .= '<td>&nbsp;</td>';
+                        $row[$i] .= '<td>&nbsp; </td>';
+                        $row[$i] .= '<td>&nbsp; </td>';
+                        $row[$i] .= '</tr>';
+                        $i++;
+		}
+                $sth = WebGUI::SQL->read("select * from imageGroup $search_group order by name");
+                while (%data = $sth->hash) {
+                        $row[$i] = '<tr class="tableData"><td>';
+			if ($isImageManager) {
+	                        $row[$i] .= deleteIcon('op=deleteImageGroup&gid='.$data{imageGroupId}.'&pid='.$imageGroupId);
+                                $row[$i] .= editIcon('op=editImageGroup&gid='.$data{imageGroupId}.'&pid='.$imageGroupId);
+			}
+                        $row[$i] .= viewIcon('op=viewImageGroup&gid='.$data{imageGroupId}.'&pid='.$imageGroupId);
+                        $row[$i] .= '</td>';
+			$row[$i] .= '<td><a href="'.WebGUI::URL::page('op=listImages&gid='.$data{imageGroupId}.'&pid='.$imageGroupId)
+				.'"><img src="'.$session{setting}{lib}.'/smallAttachment.gif" border="0"></a>'
+				.'&nbsp;<a href="'.WebGUI::URL::page('op=listImages&gid='.$data{imageGroupId}.'&pid='.$imageGroupId)
+				.'">'.$data{name}.'</a></td>'; # FIXME folder icon
+                        $row[$i] .= '<td>'.$data{description}.'&nbsp;</td>';
+                        $row[$i] .= '<td>&nbsp; </td>';
+                        $row[$i] .= '<td>&nbsp; </td>';
+                        $row[$i] .= '</tr>';
+                        $i++;
                 }
-		$isAdmin = WebGUI::Privilege::isInGroup(3);
+                $sth->finish;
+		# do images
                 $sth = WebGUI::SQL->read("select * from images $search order by name");
                 while (%data = $sth->hash) {
 			$image = WebGUI::Attachment->new($data{filename},"images",$data{imageId});
                         $row[$i] = '<tr class="tableData"><td>';
-			if ($session{user}{userId} == $data{userId} || $isAdmin) {
-	                        $row[$i] .= deleteIcon('op=deleteImage&iid='.$data{imageId});
-                                $row[$i] .= editIcon('op=editImage&iid='.$data{imageId});
+			if ($isImageManager) {
+	                        $row[$i] .= deleteIcon('op=deleteImage&iid='.$data{imageId}.'&gid='.$data{imageGroupId});
+                                $row[$i] .= editIcon('op=editImage&iid='.$data{imageId}.'&gid='.$data{imageGroupId});
 			}
-                        $row[$i] .= viewIcon('op=viewImage&iid='.$data{imageId});
+                        $row[$i] .= viewIcon('op=viewImage&iid='.$data{imageId}.'&gid='.$data{imageGroupId});
                         $row[$i] .= '</td>';
-			$row[$i] .= '<td><a href="'.WebGUI::URL::page('op=viewImage&iid='.$data{imageId})
+			$row[$i] .= '<td><a href="'.WebGUI::URL::page('op=viewImage&iid='.$data{imageId}.'&gid='.$data{imageGroupId})
 				.'"><img src="'.$image->getThumbnail.'" border="0"></a>';
                         $row[$i] .= '<td>'.$data{name}.'</td>';
                         $row[$i] .= '<td>'.$data{username}.'</td>';
@@ -198,7 +255,7 @@ sub www_viewImage {
                 %data = WebGUI::SQL->quickHash("select * from images where imageId=$session{form}{iid}");
 		$image = WebGUI::Attachment->new($data{filename},"images",$data{imageId});
                 $output .= '<h1>'.WebGUI::International::get(396).'</h1>';
-		$output .= '<a href="'.WebGUI::URL::page('op=listImages').'">'.WebGUI::International::get(397).'</a>';
+		$output .= '<a href="'.WebGUI::URL::page('op=listImages&gid='.$session{form}{gid}).'">'.WebGUI::International::get(397).'</a>';
 		$f = WebGUI::HTMLForm->new;
 		$f->readOnly($data{imageId},WebGUI::International::get(389));
 		$f->readOnly($data{name},WebGUI::International::get(383));
@@ -214,6 +271,118 @@ sub www_viewImage {
         }
 }
 
+#-------------------------------------------------------------------
+sub www_deleteImageGroup {
+        my ($output);
+        if (WebGUI::Privilege::isInGroup(9)) {
+                $output .= helpIcon(23);
+                $output .= '<h1>'.WebGUI::International::get(42).'</h1>';
+                $output .= WebGUI::International::get(544).'<p>';
+                $output .= '<div align="center"><a href="'.
+			WebGUI::URL::page('op=deleteImageGroupConfirm&gid='.$session{form}{gid}.'&pid='.$session{form}{pid})
+			.'">'.WebGUI::International::get(44).'</a>';
+                $output .= '&nbsp;&nbsp;&nbsp;&nbsp;<a href="'.WebGUI::URL::page('op=listImages&gid='.$session{form}{pid}).'">'.
+			WebGUI::International::get(45).'</a></div>';
+                return $output;
+        } else {
+                return WebGUI::Privilege::insufficient();
+        }
+}
+
+#-------------------------------------------------------------------
+sub www_deleteImageGroupConfirm {
+	my ($image, %data);
+	tie %data, 'Tie::CPHash';
+        if (WebGUI::Privilege::isInGroup(9)) {
+		# FIXME reparent all children of this group to this group's parent
+		# or delete all children....this would also have to delete all images
+		%data = WebGUI::SQL->quickHash("select parentId from imageGroup where imageGroupId=$session{form}{gid}");
+		WebGUI::SQL->write("update images set imageGroupId=$data{parentId} where imageGroupId=$session{form}{gid}");
+		WebGUI::SQL->write("update imageGroup set parentId=$data{parentId} where parentId=$session{form}{gid}");
+                WebGUI::SQL->write("delete from imageGroup where imageGroupId=$session{form}{gid}");
+		$session{form}{gid}=$session{form}{pid};
+                return www_listImages();
+        } else {
+                return WebGUI::Privilege::insufficient();
+        }
+}
+
+#-------------------------------------------------------------------
+sub www_editImageGroup {
+        my ($output, %data, %parent_data, $image, $f);
+	tie %data, 'Tie::CPHash';
+	tie %parent_data, 'Tie::CPHash';
+        if (WebGUI::Privilege::isInGroup(9)) {
+		if ($session{form}{gid} eq "new") {
+		
+		} else {
+			%data = WebGUI::SQL->quickHash("select * from imageGroup where imageGroupId=$session{form}{gid}");
+		}
+                %parent_data = WebGUI::SQL->quickHash("select name from imageGroup where imageGroupId=$data{parentId}");
+                $output = helpIcon(20);
+                $output .= '<h1>'.WebGUI::International::get(545).'</h1>';
+		$f = WebGUI::HTMLForm->new;
+                $f->hidden("op","editImageGroupSave");
+                $f->hidden("gid",$session{form}{gid});
+                $f->hidden("pid",$session{form}{pid}); #FIXME make this dropdown group tree
+                $f->readOnly($session{form}{gid},WebGUI::International::get(546));
+                $f->readOnly($parent_data{name},WebGUI::International::get(547));
+                $f->text("name",WebGUI::International::get(548),$data{name});
+                $f->text("description",WebGUI::International::get(549),$data{description});
+		$f->submit;
+		$output .= $f->print;
+                return $output;
+        } else {
+                return WebGUI::Privilege::insufficient();
+        }
+}
+
+#-------------------------------------------------------------------
+sub www_editImageGroupSave {
+        my ($test);
+        if (WebGUI::Privilege::isInGroup(9)) {
+		if ($session{form}{gid} eq "new") {
+			$session{form}{gid} = getNextId("imageGroupId");
+			WebGUI::SQL->write("insert into imageGroup (imageGroupId) values ($session{form}{gid})");
+		}
+	        while (($test) = WebGUI::SQL->quickArray("select name from imageGroup 
+			where name=".quote($session{form}{name})." and imageGroupId<>$session{form}{gid}")) {
+        	        if ($session{form}{name} =~ /(.*)(\d+$)/) {
+                	        $session{form}{name} = $1.($2+1);
+	                } elsif ($test ne "") {
+        	                $session{form}{name} .= "2";
+                	}
+        	}
+		WebGUI::SQL->write("update imageGroup set name=".quote($session{form}{name}).
+                        ", parentId=".$session{form}{pid}.", description=".quote($session{form}{description}).
+			" where imageGroupId=$session{form}{gid}");
+                return www_listImages();
+        } else {
+                return WebGUI::Privilege::insufficient();
+        }
+}
+
+#-------------------------------------------------------------------
+sub www_viewImageGroup {
+        my ($output, %data, %parent_data, $image,$f);
+        tie %data, 'Tie::CPHash';
+        tie %parent_data, 'Tie::CPHash';
+        if (WebGUI::Privilege::isInGroup(4)) {
+                %data = WebGUI::SQL->quickHash("select * from imageGroup where imageGroupId=$session{form}{gid}");
+                %parent_data = WebGUI::SQL->quickHash("select name from imageGroup where imageGroupId=".$data{parentId});
+                $output .= '<h1>'.WebGUI::International::get(550).'</h1>';
+		$output .= '<a href="'.WebGUI::URL::page('op=listImages&gid='.$session{form}{pid}).'">'.WebGUI::International::get(397).'</a>';
+		$f = WebGUI::HTMLForm->new;
+		$f->readOnly($data{imageGroupId},WebGUI::International::get(546));
+		$f->readOnly($parent_data{name},WebGUI::International::get(547)); 
+		$f->readOnly($data{name},WebGUI::International::get(548));
+		$f->readOnly($data{description},WebGUI::International::get(549));
+		$output .= $f->print;
+                return $output;
+        } else {
+                return WebGUI::Privilege::insufficient();
+        }
+}
 
 1;
 
