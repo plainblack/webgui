@@ -287,31 +287,48 @@ sub showReplyTree {
 #-------------------------------------------------------------------
 sub showThreads {
         my ($sth, %data, $html, $sql);
-        $html .= '<table border=0 cellpadding=2 cellspacing=1 width="100%">';
-        $html .= '<tr><td class="tableHeader">'.WebGUI::International::get(229).'</td>
-                <td class="tableHeader">'.WebGUI::International::get(244).'</td>
-                <td class="tableHeader">'.WebGUI::International::get(245).'</td></tr>';
-	$sql = "select messageId,subject,username,dateOfPost,userId from discussion where wobjectId=$session{form}{wid}";
-	if ($session{form}{sid}) {
-		$sql .= " and subId=$session{form}{sid}";
-	}
-	$sql .= " and pid=0 order by messageId desc";
+        $sql = "select * from discussion where wobjectId=$session{form}{wid}";
+        if ($session{form}{sid}) {
+                $sql .= " and subId=$session{form}{sid}";
+        }
+        $sql .= " and pid=0 order by messageId desc";
         $sth = WebGUI::SQL->read($sql);
-        while (%data = $sth->hash) {
-                $data{subject} = WebGUI::HTML::filter($data{subject},'all');
-                $html .= '<tr';
-                if ($data{messageId} == $session{form}{mid}) {
-                        $html .= ' class="highlight"';
-                }
-                $html .= '><td class="tableData"><a href="'.WebGUI::URL::page('func=showMessage&mid='.
+       	$html .= '<table border=0 cellpadding=2 cellspacing=1 width="100%">';
+	if ($session{user}{discussionLayout} eq "flat") {
+		while (%data = $sth->hash) {
+			$html .= '<tr><td class="tableHeader"><b>'.WebGUI::International::get(237).'</b> '.$data{subject}.'<br>';
+			$html .= '<b>'.WebGUI::International::get(238).'</b>
+                        	<a href="'.WebGUI::URL::page('op=viewProfile&uid='.$data{userId}).'">'.$data{username}.'</a><br>';
+                	$html .= "<b>".WebGUI::International::get(239)."</b> ".epochToHuman($data{dateOfPost},"%z %Z")."<br>";
+			$html .= '</td></tr>';
+			unless ($data{message} =~ /\<div\>/ig || $data{message} =~ /\<br\>/ig || $data{message} =~ /\<p\>/ig) {
+                		$data{message} =~ s/\n/\<br\>/g;
+        		}		
+			$html .= '<tr><td class="tableData">'.$data{message}.'</td></tr>';
+		}
+	} else {
+        	$html .= '<table border=0 cellpadding=2 cellspacing=1 width="100%">';
+       		$html .= '<tr><td class="tableHeader">'.WebGUI::International::get(229).'</td>
+                	<td class="tableHeader">'.WebGUI::International::get(244).'</td>
+                	<td class="tableHeader">'.WebGUI::International::get(245).'</td></tr>';
+        	while (%data = $sth->hash) {
+                	$data{subject} = WebGUI::HTML::filter($data{subject},'all');
+                	$html .= '<tr';
+                	if ($data{messageId} == $session{form}{mid}) {
+                        	$html .= ' class="highlight"';
+                	}
+                	$html .= '><td class="tableData"><a href="'.WebGUI::URL::page('func=showMessage&mid='.
                                 $data{messageId}.'&wid='.$session{form}{wid}.'&sid='.$session{form}{sid}).'">'.substr($data{subject},0,30).
                                 '</a></td><td class="tableData"><a href="'.
                                 WebGUI::URL::page('op=viewProfile&uid='.$data{userId}).'">'.$data{username}.
                                 '</a></td><td class="tableData">'.epochToHuman($data{dateOfPost},"%z %Z").
                                 '</td></tr>';
-                $html .= WebGUI::Discussion::traverseReplyTree($data{messageId},1);
-        }
-        $html .= '</table>';
+                	$html .= WebGUI::Discussion::traverseReplyTree($data{messageId},1);
+        	}
+        	$html .= '</table>';
+	}
+       	$html .= '</table>';
+	$sth->finish;
         return $html;
 }
 
