@@ -1,5 +1,6 @@
 package WebGUI::Forum::Post;
 
+use strict;
 use WebGUI::DateTime;
 use WebGUI::Forum::Thread;
 use WebGUI::Session;
@@ -29,6 +30,17 @@ sub get {
 		return $self->{_properties};
 	}
 	return $self->{_properties}->{$key};
+}
+
+sub getReplies {
+	my ($self) = @_;
+	my @replies;
+	my $sth = WebGUI::SQL->read("select forumPostId from forumPost where parentId=".$self->get("forumPostId")." order by forumPostId");
+	while (my ($postId) = $sth->array) {
+		push(@replies,WebGUI::Forum::Post->new($postId));
+	}
+	$sth->finish;
+	return \@replies;
 }
 
 sub getThread {

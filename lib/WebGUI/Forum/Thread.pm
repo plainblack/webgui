@@ -1,5 +1,6 @@
 package WebGUI::Forum::Thread;
 
+use strict;
 use WebGUI::Forum;
 use WebGUI::Forum::Post;
 use WebGUI::Session;
@@ -21,8 +22,8 @@ sub create {
 	$data->{forumThreadId} = "new";
 	my $forumThreadId = WebGUI::SQL->setRow("forumThread","forumThreadId",$data);
 	$self = WebGUI::Forum::Thread->new($forumThreadId);
-	$postData{forumThreadId} = $forumThreadId;
-	$postData{parentId} = 0;
+	$postData->{forumThreadId} = $forumThreadId;
+	$postData->{parentId} = 0;
 	my $post = WebGUI::Discuss::Post->create($postData);
 	$self->set({
 		rootPostId=>$post->get("forumPostId"),
@@ -49,12 +50,30 @@ sub getForum {
 	return $self->{_forum};
 }
 
+sub getNextThread {
+	my ($self) = @_;
+	unless (exists $self->{_next}) {
+		my ($nextId) = WebGUI::SQL->quickArray("select min(forumThreadId) from forumThread where forumThreadId>".$self->get("forumThreadId"));
+		$self->{_next} = WebGUI::Forum::Thread->new($nextId);
+	}
+	return $self->{_next};
+}
+
 sub getPost {
 	my ($self, $postId) = @_;
 	unless (exists $self->{_post}{$postId}) {
 		$self->{_post}{$postId} = WebGUI::Forum::Post->new($postId);
 	}
 	return $self->{_post}{$postId};
+}
+
+sub getPreviousThread {
+	my ($self) = @_;
+	unless (exists $self->{_previous}) {
+		my ($nextId) = WebGUI::SQL->quickArray("select max(forumThreadId) from forumThread where forumThreadId<".$self->get("forumThreadId"));
+		$self->{_previous} = WebGUI::Forum::Thread->new($nextId);
+	}
+	return $self->{_previous};
 }
 
 sub isLocked {
@@ -86,9 +105,13 @@ sub stick {
 }
 
 sub new {
-	my ($self, $forumThreadId) = @_;
+	my ($class, $forumThreadId) = @_;
 	my $properties = WebGUI::SQL->getRow("forumThread","forumThreadId",$forumThreadId);
-	bless {_properties=>$properties}, $self;
+	if (defined $properties) {
+		bless {_properties=>$properties}, $class;
+	} else {
+		return undef;
+	}
 }
 
 sub set {

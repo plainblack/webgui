@@ -1,8 +1,12 @@
 package WebGUI::Forum;
 
+use strict;
 use WebGUI::Forum::Thread;
+use WebGUI::Paginator;
+use WebGUI::Privilege;
 use WebGUI::Session;
 use WebGUI::SQL;
+
 
 sub create {
 	my ($self, $data) = @_;
@@ -25,6 +29,12 @@ sub getThread {
 		$self->{_thread}{$threadId} = WebGUI::Forum::Thread->new($threadId);
 	}
 	return $self->{_thread}{$threadId};
+}
+
+sub isModerator {
+	my ($self, $userId) = @_;
+	$userId = $session{user}{userId} unless ($userId);
+	return WebGUI::Privilege::isInGroup($self->get("groupToModerate"), $userId);
 }
 
 sub new {
