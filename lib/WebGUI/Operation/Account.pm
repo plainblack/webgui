@@ -30,7 +30,7 @@ use WebGUI::Utility;
 use WebGUI::Authentication;
 
 our @ISA = qw(Exporter);
-our @EXPORT = qw(&www_viewMessageLogMessage &www_viewMessageLog &www_viewProfile &www_editProfile &www_editProfileSave &www_createAccount &www_deactivateAccount &www_deactivateAccountConfirm &www_displayAccount &www_displayLogin &www_login &www_logout &www_recoverPassword &www_recoverPasswordFinish &www_createAccountSave &www_updateAccount);
+our @EXPORT = qw(&www_viewMessageLogMessage &www_viewThreadSubscriptions &www_viewMessageLog &www_viewProfile &www_editProfile &www_editProfileSave &www_createAccount &www_deactivateAccount &www_deactivateAccountConfirm &www_displayAccount &www_displayLogin &www_login &www_logout &www_recoverPassword &www_recoverPasswordFinish &www_createAccountSave &www_updateAccount);
 
 #-------------------------------------------------------------------
 sub _accountOptions {
@@ -53,6 +53,8 @@ sub _accountOptions {
 		unless ($session{form}{op} eq "viewProfile");
 	$output .= '<li><a href="'.WebGUI::URL::page('op=viewMessageLog').'">'.WebGUI::International::get(354).'</a>'
 		unless ($session{form}{op} eq "viewMessageLog");
+	$output .= '<li><a href="'.WebGUI::URL::page('op=viewThreadSubscriptions').'">'.WebGUI::International::get(876).'</a>'
+		unless ($session{form}{op} eq "viewThreadSubscriptions");
 	$output .= '<li><a href="'.WebGUI::URL::page('op=logout').'">'.WebGUI::International::get(64).'</a>'; 
 
 	$output .= '<li><a href="'.WebGUI::URL::page('op=deactivateAccount').'">'.
@@ -558,7 +560,7 @@ sub www_viewProfile {
 		return WebGUI::Privilege::notMember();
 	} elsif ($u->profileField("publicProfile") < 1) {
 		return $header.WebGUI::International::get(862);
-        } elsif ($session{user}{userId} != 1) {
+        } elsif (WebGUI::Privilege::isInGroup(2)) {
                 $output = $header;
                 $output .= '<table>';
                 $a = WebGUI::SQL->read("select * from userProfileField,userProfileCategory
@@ -593,6 +595,33 @@ sub www_viewProfile {
                return WebGUI::Privilege::insufficient();
         }
 }
+
+
+#-------------------------------------------------------------------
+sub www_viewThreadSubscriptions {
+	WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::isInGroup(2));
+	my ($data, $output, $list);
+	$output = '<h1>'.WebGUI::International::get(877).'</h1>';
+	my $sth = WebGUI::SQL->read("select b.subject,b.messageId,b.wobjectId,b.subId,d.urlizedTitle
+ 		from discussionSubscription a left join discussion b on (a.threadId=b.rid and b.pid=0)
+ 		left join wobject c on (b.wobjectId=c.wobjectId) left join page d on (c.pageId=d.pageId)
+ 		where a.userId=$session{user}{userId}");
+	while ($data = $sth->hashRef) {
+		$list .= '<li><a href="'
+			.WebGUI::URL::gateway($data->{urlizedTitle},'func=showMessage&wid='
+			.$data->{wobjectId}.'&mid='.$data->{messageId}.'&sid='.$data->{subId})
+			.'">'.$data->{subject}.'</a>';
+	}
+	$sth->finish;
+	if ($list eq "") {
+		$output .= WebGUI::International::get(878);
+	} else {
+		$output .= '<ul>'.$list.'</ul><hr>';
+	}
+	$output .= _accountOptions();	
+	return $output;
+}
+
 
 1;
 

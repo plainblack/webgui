@@ -1294,6 +1294,20 @@ sub www_showMessage {
 
 #-------------------------------------------------------------------
 
+=head2 www_subscribeToThread ( )
+
+Subscribes the current user to a specified discussion thread.
+
+=cut
+
+sub www_subscribeToThread {
+	WebGUI::Discussion::subscribeToThread();
+	return $_[0]->www_showMessage();
+}
+
+
+#-------------------------------------------------------------------
+
 =head2 www_unlockThread ( )
 
 Unlocks a discussion thread from the current message on down.
@@ -1307,6 +1321,19 @@ sub www_unlockThread {
         } else {
                 return WebGUI::Privilege::insufficient();
         }
+}
+
+#-------------------------------------------------------------------
+
+=head2 www_subscribeToThread ( )
+
+Unsubscribes the current user from a specified discussion thread.
+
+=cut
+
+sub www_unsubscribeFromThread {
+        WebGUI::Discussion::unsubscribeFromThread();
+        return $_[0]->www_showMessage();
 }
 
 #-------------------------------------------------------------------

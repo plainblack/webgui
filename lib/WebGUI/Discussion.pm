@@ -62,6 +62,14 @@ sub _duplicateReplyTree {
 }
 
 #-------------------------------------------------------------------
+sub _isSubscribed {
+        my ($subscribed) = WebGUI::SQL->quickArray("select count(*) from discussionSubscription
+                                where threadId=$_[1] and userId=$_[0]");
+        return $subscribed;
+}
+
+
+#-------------------------------------------------------------------
 sub _lockReplyTree {
         my ($sth, %data, $messageId);
         tie %data, 'Tie::CPHash';
@@ -314,6 +322,13 @@ sub postSave {
 		WebGUI::SQL->write("insert into discussion (messageId, wobjectId, subId, rid, pid, userId, username, status) values
 			($session{form}{mid},$session{form}{wid},$session{form}{sid},$rid,$pid,$session{user}{userId},"
 			.quote($username).", '$status')");
+		my $sth = WebGUI::SQL->read("select userId from discussionSubscription where threadId=$rid");
+                while (my ($userId) = $sth->array) {
+                        WebGUI::MessageLog::addInternationalizedEntry($userId,"",
+				WebGUI::URL::page('func=showMessage&wid='.$session{form}{wid}
+                                .'&sid='.$session{form}{sid}.'&mid='.$session{form}{mid}),875);
+                }
+                $sth->finish;
 	} elsif ($session{setting}{addEditStampToPosts}) {
 		$session{form}{message} = "\n --- (Edited at ".epochToHuman(time())." by $session{user}{username}) --- \n\n"
 			.$session{form}{message};
@@ -412,6 +427,17 @@ sub showMessage {
                 	$html .= '<a href="'.WebGUI::URL::page('func=showMessage&mid='.$data[0].'&sid='.$session{form}{sid}.'&wid='.
                         	$session{form}{wid}).'">'.WebGUI::International::get(512).' &raquo;</a><br>';
         	}
+		if ($session{user}{userId} != 1) {
+                        if (_isSubscribed($session{user}{userId},$message{rid})) {
+                                $html .= '<a href="'.WebGUI::URL::page('func=unsubscribeFromThread&mid='.$session{form}{mid}.
+                                        '&wid='.$session{form}{wid}.'&sid='.$session{form}{sid}.'&threadId='.$message{rid}).'">'
+                                        .WebGUI::International::get(874).'</a><br>';
+                        } else {
+                                $html .= '<a href="'.WebGUI::URL::page('func=subscribeToThread&mid='.$session{form}{mid}.
+                                        '&wid='.$session{form}{wid}.'&sid='.$session{form}{sid}.'&threadId='.$message{rid}).'">'
+                                        .WebGUI::International::get(873).'</a><br>';
+                        }
+                }
 		if (canEditMessage($_[1],$session{form}{mid})) {
                 	$html .= '<a href="'.WebGUI::URL::page('func=post&mid='.$session{form}{mid}.
                         	'&wid='.$session{form}{wid}.'&sid='.$session{form}{sid}).'">'
@@ -574,6 +600,16 @@ sub status {
 }
 
 #-------------------------------------------------------------------
+sub subscribeToThread {
+        unless (_isSubscribed($session{user}{userId},$session{form}{threadId})) {
+                WebGUI::SQL->write("insert into discussionSubscription (threadId,userId) values (
+                $session{form}{threadId}, $session{user}{userId})");
+        }
+        return "";
+}
+
+
+#-------------------------------------------------------------------
 sub traverseReplyTree {
         my ($sth, @data, $html, $depth, $i);
         for ($i=0;$i<=$_[1];$i++) {
@@ -607,6 +643,15 @@ sub unlockThread {
         return "";
 }
 
+
+#-------------------------------------------------------------------
+sub unsubscribeFromThread {
+        if (_isSubscribed($session{user}{userId},$session{form}{threadId})) {
+                WebGUI::SQL->write("delete from discussionSubscription where
+                        threadId=$session{form}{threadId} and userId=$session{user}{userId}");
+        }
+        return "";
+}
 
 
 
