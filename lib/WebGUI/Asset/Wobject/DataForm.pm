@@ -283,7 +283,7 @@ sub getIndexerParams {
                                         where DataForm_entryData.assetId = asset.assetId
 					and asset.startDate < $now
 					and asset.endDate > $now",
-                        fieldsToIndex => ['select distinct(value) from DataForm_entryData where assetId = \'$data{assetIid}\''],
+                        fieldsToIndex => ['select distinct(value) from DataForm_entryData where assetId = \'$data{assetId}\''],
                         contentType => 'assetDetail',
                         url => 'WebGUI::URL::append($data{url}, "func=view&entryId=list}")',
                         headerShortcut => 'select title from asset where assetId = \'$data{assetId}\'',
