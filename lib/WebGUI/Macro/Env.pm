@@ -16,15 +16,14 @@ use WebGUI::Session;
 
 #-------------------------------------------------------------------
 sub _replacement {
-	my (@param, $temp);
+	my (@param);
         @param = WebGUI::Macro::getParams($_[0]);
-	$temp = $session{env}{$param[0]};
-	return $temp;
+	return $session{env}{$param[0]};
 }
 
 #-------------------------------------------------------------------
 sub process {
-	my ($output, $temp);
+	my ($output);
 	$output = $_[0];
         $output =~ s/\^Env\((.*?)\)\;/_replacement($1)/ge;
 	return $output;
