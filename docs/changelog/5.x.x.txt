@@ -6,6 +6,8 @@
  - Bugfix [ 847198 ] no final newline when data form errors display
  - Bugfix [ 699010 ] Need Approval option to Discussions like in USS
  - Bugfix [ 847808 ] Signature not displayed in forum
+ - Fixed a bug where users would only be directed to the page they were on
+   after login, and not to a deeper location with URL parameters.
 
 
 5.5.2

@@ -408,7 +408,7 @@ sub noAccess {
 	}
 	my ($output);
         if ($session{user}{userId} <= 1) {
-                $output = WebGUI::Operation::Account::www_displayAccount();
+                $output = WebGUI::Operation::Account::www_displayLogin();
         } else {
                 $output = '<h1>'.WebGUI::International::get(37).'</h1>';
                 $output .= WebGUI::International::get(39);
