@@ -26,8 +26,9 @@ our $HELP = {
 				 $tag =~ s/([A-Z]+(?![a-z]))/$1 /g; #Separate acronyms
 				 $tag =~ s/([a-z])([A-Z])/$1 $2/g;  #Separate studly caps
 				 $tag = lc $tag;
+				 $namespace = join '', 'Macro_', $_;
 				 { tag => $tag,
-				   namespace => $_ }
+				   namespace => $namespace }
 			     }
 		             values %{ $session{config}{macros} }
 			   ],

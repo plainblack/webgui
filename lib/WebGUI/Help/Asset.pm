@@ -21,11 +21,11 @@ our $HELP = {
 			},
 			{
 				tag => 'aoi hits',
-				namespace => 'AOIHits'
+				namespace => 'Macro_AOIHits'
 			},
 			{
 				tag => 'aoi rank',
-				namespace => 'AOIRank'
+				namespace => 'Macro_AOIRank'
 			},
 			{
 				tag => 'wobject add/edit',
@@ -43,11 +43,11 @@ our $HELP = {
                         },
 			{
 				tag => 'aoi hits',
-				namespace => 'AOIHits'
+				namespace => 'Macro_AOIHits'
 			},
 			{
 				tag => 'aoi rank',
-				namespace => 'AOIRank'
+				namespace => 'Macro_AOIRank'
 			},
                         {
                                 tag => 'wobject add/edit',
