@@ -210,6 +210,7 @@ sub www_editMiscSettings {
                 $f->hidden("op","editMiscSettingsSave");
 		$f->yesNo("preventProxyCache",WebGUI::International::get(400),$session{setting}{preventProxyCache});
 		$f->yesNo("showDebug",WebGUI::International::get(707),$session{setting}{showDebug});
+		$f->yesNo("trackPageStatistics",WebGUI::International::get(749),$session{setting}{trackPageStatistics});
 		$f->submit;
 		$output .= $f->print;
         } else {
@@ -223,6 +224,7 @@ sub www_editMiscSettingsSave {
         if (WebGUI::Privilege::isInGroup(3)) {
 		_saveSetting("preventProxyCache");
 		_saveSetting("showDebug");
+		_saveSetting("trackPageStatistics");
                 return www_manageSettings(); 
         } else {
                 return WebGUI::Privilege::adminOnly();

@@ -220,6 +220,13 @@ sub page {
 		$operationOutput = _processOperations();
         	$wobjectOutput = _processFunctions();
 	}
+	if ($wobjectOutput eq "" && $operationOutput eq "" && $session{setting}{trackPageStatistics}) {
+		WebGUI::SQL->write("insert into pageStatistics (dateStamp, userId, username, ipAddress, userAgent, referer,
+			pageId, pageTitle) values (".time().",".$session{user}{userId}.",".quote($session{user}{username}).",
+			".quote($session{env}{REMOTE_ADDR}).", ".quote($session{env}{HTTP_USER_AGENT}).",
+			".quote($session{env}{HTTP_REFERER}).", ".$session{page}{pageId}.", 
+			".quote($session{page}{title}).")");
+	}
 	if ($session{header}{mimetype} ne "text/html") {
 		$httpHeader = WebGUI::Session::httpHeader();
 		WebGUI::Session::close();
