@@ -509,16 +509,11 @@ sub www_updateAccount {
         if ($session{user}{userId} != 1) {
         	if ($session{form}{identifier1} ne "password") {
 			$error = _hasBadPassword($session{form}{identifier1},$session{form}{identifier2});
-        		unless ($error) {
-                		$encryptedPassword = Digest::MD5::md5_base64($session{form}{identifier1});
-				$passwordStatement = ', identifier='.quote($encryptedPassword);
-			}
 		}
 		$error .= _hasBadUsername($session{form}{username});
         	if ($error eq "") {
 			$u = WebGUI::User->new($session{user}{userId});
-                	$encryptedPassword = Digest::MD5::md5_base64($session{form}{identifier1});
-			$u->identifier($encryptedPassword) if ($session{form}{identifier1} ne "password");
+			$u->identifier(Digest::MD5::md5_base64($session{form}{identifier1})) if ($session{form}{identifier1} ne "password");
 			$u->username($session{form}{username});
                 	$output .= WebGUI::International::get(81).'<p>';
         	} else {

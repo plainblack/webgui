@@ -262,7 +262,7 @@ sub isInGroup {
 		}
         }                                       
 	### Check for groups of groups.
-	@data = WebGUI::SQL->buildArray("select groupId from groupGroupings where inGroup=$gid");
+	@data = WebGUI::SQL->buildArray("select groupId from groupGroupings where inGroup='$gid'");
 	foreach $groupId (@data) {
 		$session{isInGroup}{$groupId} = isInGroup($groupId, $uid);
 		if ($session{isInGroup}{$groupId}) {

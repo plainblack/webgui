@@ -33,7 +33,6 @@ use WebGUI::Authentication;
 
  $authMethod =		$u->authMethod("WebGUI");
  $dateCreated = 	$u->dateCreated;
- $identifier = 		$u->identifier("somepassword");
  $karma = 		$u->karma;
  $lastUpdated = 	$u->lastUpdated;
  $languagePreference = 	$u->profileField("language",1);
@@ -166,25 +165,15 @@ sub deleteFromGroups {
 }
 
 #-------------------------------------------------------------------
-
-=head2 identifier ( [ value ] )
-
- Returns the password for this user.
-
-=item value
-
- If specified, the identifier is set to this value. 
-
-=cut
-
+# This method is depricated and is provided only for reverse compatibility. See WebGUI::Authentication instead.
 sub identifier {
         my ($class, $value);
         $class = shift;
         $value = shift;
         if (defined $value) {
                 $class->{_user}{"identifier"} = $value;
-                WebGUI::SQL->write("update users set identifier=".quote($value).",
-                        lastUpdated=".time()." where userId=$class->{_userId}");
+                WebGUI::SQL->write("update authentication set fieldData=".quote($value)."
+                        where userId=$class->{_userId} and authMethod='WebGUI' and fieldName='identifier'");
         }
         return $class->{_user}{"identifier"};
 }

@@ -217,7 +217,7 @@ sub www_manageGroupsInGroup {
         $f = WebGUI::HTMLForm->new;
         $f->hidden("op","addGroupsToGroupSave");
         $f->hidden("gid",$session{form}{gid});
-        @array = WebGUI::SQL->buildArray("select groupId from groupGroupings where inGroup=$session{form}{gid}");
+        @array = WebGUI::SQL->buildArray("select groupId from groupGroupings where inGroup='$session{form}{gid}'");
 	push(@array,$session{form}{gid});
      #   push(@array,1); #visitors
      #   push(@array,2); #registered users
