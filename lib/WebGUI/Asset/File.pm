@@ -1,4 +1,4 @@
-package WebGUI::Asset::Redirect;
+package WebGUI::Asset::File;
 
 =head1 LEGAL
 
@@ -18,21 +18,22 @@ use strict;
 use WebGUI::Asset;
 use WebGUI::HTTP;
 use WebGUI::Session;
+use WebGUI::Storage;
 
 our @ISA = qw(WebGUI::Asset);
 
 
 =head1 NAME
 
-Package WebGUI::Asset::Redirect 
+Package WebGUI::Asset::File
 
 =head1 DESCRIPTION
 
-Provides a mechanism to redirect pages from the WebGUI site to external sites.
+Provides a mechanism to upload files to WebGUI.
 
 =head1 SYNOPSIS
 
-use WebGUI::Asset::Redirect;
+use WebGUI::Asset::File;
 
 
 =head1 METHODS
@@ -59,13 +60,21 @@ sub definition {
         my $class = shift;
         my $definition = shift;
         push(@{$definition}, {
-                tableName=>'redirect',
-                className=>'WebGUI::Asset::Redirect',
+                tableName=>'FileAsset',
+                className=>'WebGUI::Asset::File',
                 properties=>{
-                                redirectUrl=>{
-                                        fieldType=>'url',
+                                filename=>{
+                                        fieldType=>'hidden',
                                         defaultValue=>undef
-                                        }
+                                        },
+				storageId=>{
+					fieldType=>'hidden',
+					defaultValue=>undef
+					},
+				fileSize=>{
+					fieldType=>'hidden',
+					defaultValue=>undef
+				}
                         }
                 });
         return $class->SUPER::definition($definition);
@@ -84,25 +93,16 @@ Returns the TabForm object that will be used in generating the edit page for thi
 sub getEditForm {
 	my $self = shift;
 	my $tabform = $self->SUPER::getEditForm();
+	if ($self->get("filename") ne "") {
+		my $storage = WebGUI::Storage->new($self->get("storageId"));
+		
+	}
         $tabform->getTab("properties")->url(
-                -name=>"redirectUrl",
-                -label=>"Redirect URL",
-                -value=>$self->getValue("redirectUrl")
-                );
+               	-name=>"file",
+               	-label=>"File To Upload"
+               	);
 }
 
-
-#-------------------------------------------------------------------
-
-=head2 getUiLevel ()
-
-Returns the UI level of this asset.
-
-=cut
-
-sub getUiLevel {
-	return 9;
-}
 
 #-------------------------------------------------------------------
 
@@ -113,8 +113,31 @@ Returns the displayable name of this asset.
 =cut
 
 sub getName {
-	return "Redirect";
+	return "File";
 } 
+
+
+#-------------------------------------------------------------------
+
+=head2 www_editSave
+
+Gathers data from www_edit and persists it.
+
+=cut
+
+sub www_editSave {
+	my $self = shift;
+	$self->SUPER::www_editSave();
+	my $storage = WebGUI::Storage->create;
+	my $filename = $storage->addFileFromFormPost("file");
+	if (defined $filename) {
+		$self->update({
+			filename=>$filename,
+			storageId=>$storage->getId,
+			fileSize=>$storage->getFileSize
+			});
+	return "";
+}
 
 
 #-------------------------------------------------------------------
@@ -130,7 +153,8 @@ sub www_view {
 	if ($session{var}{adminOn}) {
 		return $self->www_edit;
 	}
-	WebGUI::HTTP::setRedirect($self->get("redirectUrl"));
+	my $storage = WebGUI::Storage->new($self->get("storageId"));
+	WebGUI::HTTP::setRedirect($storage->getUrl($self->get("filename")));
 	return "";
 }
 

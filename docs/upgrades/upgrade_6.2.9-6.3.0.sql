@@ -89,6 +89,13 @@ create table layout (
 	printableStyleTemplateId varchar(22) not null
 );
 
+create table FileAsset (
+	assetId varchar(22) not null primary key, 
+	storageId varchar(22) not null, 
+	filename varchar(256) not null, 
+	fileSize int not null
+);
+
 INSERT INTO settings VALUES ('commerceCheckoutCanceledTemplateId','1');
 INSERT INTO settings VALUES ('commerceConfirmCheckoutTemplateId','1');
 INSERT INTO settings VALUES ('commercePaymentPlugin','PayFlowPro');

@@ -39,6 +39,7 @@ This package provides a mechanism for storing and retrieving files that are not 
  $store = WebGUI::Storage->get($id);
 
  $filename = $store->addFileFromFilesystem($pathToFile);
+ $filename = $store->addFileFromFormPost($formVarName);
  $filename = $store->addFileFromHashref($filename,$hashref);
  $filename = $store->addFileFromScalar($filename,$content);
 
@@ -46,6 +47,7 @@ This package provides a mechanism for storing and retrieving files that are not 
  $hashref = $store->getFileContentsAsHashref($filename);
  $string = $store->getFileContentsAsScalar($filename);
  $string = $store->getFileExtension($filename);
+ $url = $store->getFileIconUrl($filename);
  $arrayref = $store->getFiles;
  $string = $store->getFileSize($filename);
  $guid = $store->getId;
@@ -120,7 +122,7 @@ Provide the local path to this file.
 
 =cut
 
-sub saveFromFilesystem {
+sub addFileFromFilesystem {
 	my $self = shift;
 	my $pathToFile = shift;
 	my $filename;
@@ -160,6 +162,54 @@ sub saveFromFilesystem {
                 $filename = undef;
         }
         return $filename;
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 addFileFromFormPost ( formVariableName )
+
+Grabs an attachment from a form POST and saves it to this storage location.
+
+=head3 formVariableName
+
+Provide the form variable name to which the file being uploaded is assigned.
+
+=cut
+
+sub addFileFromFormPost{
+	my $self = shift;
+	my $formVariableName = shift;
+        return "" if (WebGUI::HTTP::getStatus() =~ /^413/);
+        my $filename = $session{cgi}->upload($formVariableName);
+        if (defined $filename) {
+                if ($filename =~ /([^\/\\]+)$/) {
+                        $filename = $1;
+                } else {
+                        $filename = $filename;
+                }
+                my $type = $self->getFileExtension($filename);
+                if (isIn($type, qw(pl perl sh cgi php asp))) { # make us safe from malicious uploads
+                        $filename =~ s/\./\_/g;
+                        $filename .= ".txt";
+                }
+                $filename = WebGUI::URL::makeCompliant($filename);
+                my $file = FileHandle->new(">".$self->getPath($filename));
+                if (defined $file) {
+			my $buffer;
+                        binmode $file;
+                        while (my $bytesread=read($filename,$buffer,1024)) {
+                                print $file $buffer;
+                        }
+                        close($file);
+                } else {
+                        $self->_addError("Couldn't open file ".$self->getPath($filename)." for writing due to error: ".$!);
+                        return undef;
+                }
+                close $filename;
+                return $filename;
+        }
+        return undef;
 }
 
 
@@ -370,6 +420,50 @@ sub getFileContentsAsScalar {
 
 #-------------------------------------------------------------------
                                                                                                                                                        
+=head2 getFileExtension ( filename )
+                                                                                                                                                       
+Returns the extension or type of this file.
+
+=head3 filename
+
+The filename of the file you wish to find out the type for.
+                                                                                                                                                       
+=cut
+                                                                                                                                                       
+sub getFileExtension {
+	my $filename = shift;
+        my $extension = lc($filename);
+        $extension =~ s/.*\.(.*?)$/$1/;
+        return $extension;
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 getFileIconUrl ( filename ) 
+
+Returns the icon associated with this type of file.
+
+=head3 filename
+
+The name of the file to get the icon for.
+
+=cut
+
+sub getFileIconUrl {
+	my $self = shift;
+	my $filename = shift;
+	my $extension =  $self->getFileExtension($filename);	
+	my $path = $session{config}{extrasPath}.$session{os}{slash}."fileIcons".$session{os}{slash}.$extension.".gif";
+	if (-f $path) {
+		return $session{config}{extrasURL}."/fileIcons/".$extension.".gif";
+	}
+	return $session{config}{extrasURL}."/fileIcons/unkonwn.gif";
+}
+
+
+#-------------------------------------------------------------------
+                                                                                                                                                       
 =head2 getFileSize ( filename )
                                                                                                                                                        
 Returns the size of this file.
@@ -393,6 +487,7 @@ sub getFileSize {
         return $size;
 }
 
+
 #-------------------------------------------------------------------
 
 =head2 getFiles ( )
@@ -401,7 +496,7 @@ Returns an array reference of the files in this storage location.
 
 =cut
 
-sub getFiles ( ) {
+sub getFiles {
 	my $self = shift;
 	my @list;
 	if (opendir (DIR,$self->getPath)) {
@@ -414,28 +509,10 @@ sub getFiles ( ) {
                 }
 		return \@list;
         }
-	return [];
+	return undef;
 }
 
 
-#-------------------------------------------------------------------
-                                                                                                                                                       
-=head2 getFileExtension ( filename )
-                                                                                                                                                       
-Returns the extension or type of this file.
-
-=head3 filename
-
-The filename of the file you wish to find out the type for.
-                                                                                                                                                       
-=cut
-                                                                                                                                                       
-sub getFileExtension {
-	my $filename = shift;
-        my $extension = lc($filename);
-        $extension =~ s/.*\.(.*?)$/$1/;
-        return $extension;
-}
 
 #-------------------------------------------------------------------
                                                                                                                                                        
@@ -454,6 +531,8 @@ sub getHashref {
 	my $filename = shift;
         return retrieve($self->getPath($filename));
 }
+
+
 
 #-------------------------------------------------------------------
 

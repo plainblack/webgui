@@ -313,7 +313,7 @@ sub www_createShortcut {
 	my $self = shift;
         return WebGUI::Privilege::insufficient() unless ($self->canEdit);
 	my $w = WebGUI::Wobject::WobjectProxy->new({wobjectId=>"new",namespace=>"WobjectProxy"});
-	$w->set({
+	$w->update({
 		pageId=>'2',
 		templatePosition=>1,
 		title=>$self->getValue("title"),

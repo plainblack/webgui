@@ -30,7 +30,7 @@ sub addChild {
 	WebGUI::SQL->commit;
 	my $className = $properties->{className};
 	my $newAsset = $className->new($id);
-	$newAsset->set($properties);
+	$newAsset->update($properties);
 	return $newAsset;
 }
 
@@ -503,30 +503,6 @@ sub purge {
 	$self = undef;
 }
 
-sub set {
-	my $self = shift;
-	my $properties = shift;
-	WebGUI::SQL->beginTransaction;
-	foreach my $definition (@{$self->definition}) {
-		my @setPairs;
-		foreach my $property (keys %{$definition->{properties}}) {
-			my $value = $properties->{$property} || $definition->{properties}{$property}{defaultValue};
-			if (defined $value) {
-				if (exists $definition->{properties}{$property}{filter}) {
-					$value = $self->$definition->{properties}{$property}{filter}($value);
-				}
-				$self->{_properties}{$property} = $value;
-				push(@setPairs, $property."=".quote($value));
-			}
-		}
-		if (scalar(@setPairs) > 0) {
-			WebGUI::SQL->write("update ".$definition->{tableName}." set ".join(",",@setPairs)." where assetId=".quote($self->getId));
-		}
-	}
-	WebGUI::SQL->commit;
-	return 1;
-}
-
 sub setParent {
 	my $self = shift;
 	my $newParentId = shift;
@@ -586,6 +562,31 @@ sub swapRank {
 }
 
 
+sub update {
+	my $self = shift;
+	my $properties = shift;
+	WebGUI::SQL->beginTransaction;
+	foreach my $definition (@{$self->definition}) {
+		my @setPairs;
+		foreach my $property (keys %{$definition->{properties}}) {
+			my $value = $properties->{$property} || $definition->{properties}{$property}{defaultValue};
+			if (defined $value) {
+				if (exists $definition->{properties}{$property}{filter}) {
+					$value = $self->$definition->{properties}{$property}{filter}($value);
+				}
+				$self->{_properties}{$property} = $value;
+				push(@setPairs, $property."=".quote($value));
+			}
+		}
+		if (scalar(@setPairs) > 0) {
+			WebGUI::SQL->write("update ".$definition->{tableName}." set ".join(",",@setPairs)." where assetId=".quote($self->getId));
+		}
+	}
+	WebGUI::SQL->commit;
+	return 1;
+}
+
+
 sub www_copy {
 	my $self = shift;
 	return WebGUI::Privilege::insufficient() unless $self->canEdit;
@@ -633,7 +634,7 @@ sub www_editSave {
 				);
 		}
 	}
-	$self->set(\%data);
+	$self->update(\%data);
 	return "";
 }
 
