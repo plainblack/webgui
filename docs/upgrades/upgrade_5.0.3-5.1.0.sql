@@ -330,12 +330,6 @@ delete from international where languageId=6 and namespace='SyndicatedContent' a
 delete from international where languageId=6 and namespace='USS' and internationalId=11;
 delete from international where languageId=6 and namespace='USS' and internationalId=36;
 delete from international where languageId=6 and namespace='WebGUI' and internationalId=98;
-
-# PortuguÍs (Portuguese)
-
-# EspaÒol (Spanish)
-
-# Nederlands (Dutch)
 delete from international where languageId=3 and namespace='LinkList' and internationalId=74;
 delete from international where languageId=3 and namespace='SiteMap' and internationalId=7;
 delete from international where languageId=3 and namespace='SiteMap' and internationalId=8;
@@ -349,45 +343,6 @@ delete from international where languageId=3 and namespace='WebGUI' and internat
 delete from international where languageId=3 and namespace='WebGUI' and internationalId=726;
 delete from international where languageId=3 and namespace='WebGUI' and internationalId=727;
 delete from international where languageId=3 and namespace='WebGUI' and internationalId=822;
-
-# Deutsch (German)
-delete from international where languageId=2 and namespace='HttpProxy' and internationalId=1;
-delete from international where languageId=2 and namespace='HttpProxy' and internationalId=2;
-delete from international where languageId=2 and namespace='HttpProxy' and internationalId=3;
-delete from international where languageId=2 and namespace='HttpProxy' and internationalId=4;
-delete from international where languageId=2 and namespace='HttpProxy' and internationalId=5;
-delete from international where languageId=2 and namespace='HttpProxy' and internationalId=6;
-delete from international where languageId=2 and namespace='HttpProxy' and internationalId=7;
-delete from international where languageId=2 and namespace='HttpProxy' and internationalId=8;
-delete from international where languageId=2 and namespace='HttpProxy' and internationalId=9;
-delete from international where languageId=2 and namespace='PhotoGallery' and internationalId=1;
-delete from international where languageId=2 and namespace='PhotoGallery' and internationalId=10;
-delete from international where languageId=2 and namespace='PhotoGallery' and internationalId=11;
-delete from international where languageId=2 and namespace='PhotoGallery' and internationalId=12;
-delete from international where languageId=2 and namespace='PhotoGallery' and internationalId=13;
-delete from international where languageId=2 and namespace='PhotoGallery' and internationalId=14;
-delete from international where languageId=2 and namespace='PhotoGallery' and internationalId=15;
-delete from international where languageId=2 and namespace='PhotoGallery' and internationalId=16;
-delete from international where languageId=2 and namespace='PhotoGallery' and internationalId=17;
-delete from international where languageId=2 and namespace='PhotoGallery' and internationalId=18;
-delete from international where languageId=2 and namespace='PhotoGallery' and internationalId=19;
-delete from international where languageId=2 and namespace='PhotoGallery' and internationalId=2;
-delete from international where languageId=2 and namespace='PhotoGallery' and internationalId=20;
-delete from international where languageId=2 and namespace='PhotoGallery' and internationalId=21;
-delete from international where languageId=2 and namespace='PhotoGallery' and internationalId=22;
-delete from international where languageId=2 and namespace='PhotoGallery' and internationalId=23;
-delete from international where languageId=2 and namespace='PhotoGallery' and internationalId=24;
-delete from international where languageId=2 and namespace='PhotoGallery' and internationalId=25;
-delete from international where languageId=2 and namespace='PhotoGallery' and internationalId=26;
-delete from international where languageId=2 and namespace='PhotoGallery' and internationalId=3;
-delete from international where languageId=2 and namespace='PhotoGallery' and internationalId=4;
-delete from international where languageId=2 and namespace='PhotoGallery' and internationalId=5;
-delete from international where languageId=2 and namespace='PhotoGallery' and internationalId=6;
-delete from international where languageId=2 and namespace='PhotoGallery' and internationalId=7;
-delete from international where languageId=2 and namespace='PhotoGallery' and internationalId=8;
-delete from international where languageId=2 and namespace='PhotoGallery' and internationalId=9;
-
-# Ú’””À…  (Russian)
 delete from international where languageId=21 and namespace='Article' and internationalId=14;
 delete from international where languageId=21 and namespace='Article' and internationalId=15;
 delete from international where languageId=21 and namespace='Article' and internationalId=16;

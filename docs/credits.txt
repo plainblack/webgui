@@ -52,7 +52,7 @@ to WebGUI, but who's work has made WebGUI possible:
 
 Perl.................................Larry Wall / O'Reilly
 
-Rich Edit............................interactivetools.com
+HTML Area............................interactivetools.com
 
 Convert::ASN1........................Graham Barr
 
@@ -75,5 +75,7 @@ Tie::IxHash..........................Gurusamy Sarathy
 XML::RSSLite.........................Jerrad Pierce
                                      Scott Thomason
 
+Midas................................Mike Kaply
 
+Classic Rich Edit....................Bratta
 
