@@ -450,7 +450,7 @@ sub www_listUsers {
 		$output .= '<td class="tableData">'.epochToHuman($data->{dateCreated},"%z").'</td>';
 		$output .= '<td class="tableData">'.epochToHuman($data->{lastUpdated},"%z").'</td>';
 		my ($lastLoginStatus, $lastLogin) = WebGUI::SQL->quickArray("select status,timeStamp from userLoginLog where 
-                        userId='$data->{userId}' order by timeStamp DESC");
+                        userId=".quote($data->{userId})." order by timeStamp DESC");
                 if ($lastLogin) {
                         $output .= '<td class="tableData">'.epochToHuman($lastLogin).'</td>';
                 } else {
