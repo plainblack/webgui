@@ -388,11 +388,12 @@ sub showMessage {
         %message = getMessage($session{form}{mid});
         if ($message{messageId}) {
                 $html .= '<h1>'.$message{subject}.'</h1>';
-                $html .= '<table width="100%" cellpadding=3 cellspacing=1 border=0><tr><td class="tableHeader">';
+                $html .= '<table width="100%" cellpadding=3 cellspacing=1 border=0><tr>';
+		$html .= '<td class="tableHeader" width="100%" valign="top">';
 		$html .= formatHeader($message{subject},$message{userId},$message{username},$message{dateOfPost},
 			$message{views},'',$message{status});
                 $html .= '</td>';
-                $html .= '<td rowspan=2 valign="top" class="tableMenu" nowrap>';
+                $html .= '<td rowspan=2 valign="top" class="tableMenu" nowrap="1">';
 		if (canPostReply($_[1],\%message)) {
 			$html .= '<a href="'.WebGUI::URL::page('func=post&replyTo='.$session{form}{mid}.'&wid='
 				.$session{form}{wid}.'&sid='.$session{form}{sid})

@@ -63,11 +63,8 @@ sub _calendarLayout {
                                         .editIcon('func=editEvent&wid='.$_[0]->get("wobjectId").'&eid='.$event{eventId})
                                         .' ';
                         }
-			if ($event{description}) {
-				$message .= '<a href=\'javascript:popUp("'.$event{description}.'");\'>'.$event{name}.'</a>';
-			} else {
-				$message .= $event{name};
-			}
+			$message .= '<a href="'.WebGUI::URL::page('wid='.$_[0]->get("wobjectId")
+				.'&func=viewEvent&eid='.$event{eventId}).'">'.$event{name}.'</a>';
 			$message .= '<br>';
                         if ($event{startDate} == $event{endDate}) {
                         	$calendar->addcontent(epochToHuman($event{startDate},"%D"),$message);
@@ -405,8 +402,24 @@ sub www_viewEvent {
 	my ($output, %event);
 	tie %event, 'Tie::CPHash';
 	%event = WebGUI::SQL->quickHash("select * from EventsCalendar_event where eventId=$session{form}{eid}");
-
-	return $output;
+	$output = '<h1>'.$event{name}.'</h1>';
+	$output .= '<table width="100%" cellspacing="0" cellpadding="5" border="0">';
+	$output .= '<tr>';
+	$output .= '<td valign="top" class="tableHeader" width="100%">';
+	$output .= '<b>'.WebGUI::International::get(14,$namespace).':</b> '.epochToHuman($event{startDate},"%z").'<br>';
+	$output .= '<b>'.WebGUI::International::get(15,$namespace).':</b> '.epochToHuman($event{endDate},"%z").'<br>';
+	$output .= '</td><td valign="top" class="tableMenu" nowrap="1">';
+	if (WebGUI::Privilege::canEditPage()) {
+        	$output .= '<a href="'.WebGUI::URL::page('func=editEvent&eid='.$session{form}{eid}.'&wid='
+			.$session{form}{wid}).'">'.WebGUI::International::get(575).'</a><br>';
+                $output .= '<a href="'.WebGUI::URL::page('func=deleteEvent&eid='.$session{form}{eid}.
+                        '&wid='.$session{form}{wid}.'&rid='.$event{recurringEventId}).'">'
+                        .WebGUI::International::get(576).'</a><br>';
+        }
+	$output .= '</td></tr>';
+	$output .= '</table>';
+	$output .= $event{description};
+	return WebGUI::Macro::process($output);
 }
 
 1;

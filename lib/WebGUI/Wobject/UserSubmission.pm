@@ -654,14 +654,14 @@ sub www_viewSubmission {
 	$submission{content} =~ s/\^\-\;//g;
        	$output = "<h1>".$submission{title}."</h1>";
 	$output .= '<table width="100%" cellpadding=2 cellspacing=1 border=0>';
-	$output .= '<tr><td class="tableHeader">';
+	$output .= '<tr><td valign="top" class="tableHeader" width="100%">';
   #---header
 	$output .= '<b>'.WebGUI::International::get(22,$namespace).'</b> <a href="'.
 		WebGUI::URL::page('op=viewProfile&uid='.$submission{userId}).'">'.$submission{username}.'</a><br>';
 	$output .= '<b>'.WebGUI::International::get(23,$namespace).'</b> '.epochToHuman($submission{dateSubmitted},"%z %Z")."<br>";
 	$output .= '<b>'.WebGUI::International::get(14,$namespace).':</b> '.$submissionStatus{$submission{status}}.'<br>';
 	$output .= '<b>'.WebGUI::International::get(514).':</b> '.$submission{views}.'<br>';
-	$output .= '</td><td rowspan="2" class="tableMenu" nowrap valign="top">';
+	$output .= '</td><td rowspan="2" class="tableMenu" nowrap="1" valign="top">';
   #---menu
 	@data = WebGUI::SQL->quickArray("select max(submissionId) from UserSubmission_submission 
         	where wobjectId=$submission{wobjectId} and submissionId<$submission{submissionId}
