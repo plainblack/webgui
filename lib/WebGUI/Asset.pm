@@ -2201,6 +2201,7 @@ sub www_cut {
 	my $self = shift;
 	return $self->getAdminConsole->render(WebGUI::Privilege::insufficient()) unless $self->canEdit;
 	$self->cut;
+	$session{asset} = $self->getParent;
 	return $self->getParent->www_view;
 }
 
@@ -2237,6 +2238,7 @@ sub www_delete {
 	return $self->getAdminConsole->render(WebGUI::Privilege::insufficient()) unless $self->canEdit;
 	return $self->getAdminConsole->render(WebGUI::Privilege::vitalComponent()) if (isIn($self->getId, $session{setting}{defaultPage}, $session{setting}{notFoundPage}));
 	$self->trash;
+	$session{asset} = $self->getParent;
 	return $self->getParent->www_view;
 }
 
