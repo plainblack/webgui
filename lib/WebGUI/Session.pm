@@ -376,8 +376,8 @@ sub setCookie {
 
 sub setScratch {
 	my ($name, $value) = @_;
-	return "" unless ($session{var}{sessionId} ne "" && $name ne "" && $value ne "");
-	if ($value eq "-delete-") {
+	return "" unless ($session{var}{sessionId} ne "" && $name ne "" && defined $value);
+	if ($value eq "-delete-" || (defined $value && $value eq "")) {
 		WebGUI::SQL->write("delete from userSessionScratch where sessionId=".quote($session{var}{sessionId})
 			." and name=".quote($name));
 		$value = "";

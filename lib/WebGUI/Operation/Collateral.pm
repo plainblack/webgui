@@ -385,7 +385,6 @@ sub www_listCollateral {
 		'-delete-'=>WebGUI::International::get(782),
 		%{WebGUI::SQL->buildHashRef("select distinct(userId), username from collateral order by username")}
 		);
-	$session{form}{keyword} = '-delete-' if (exists $session{form}{keyword} && $session{form}{keyword} eq "");
 	WebGUI::Session::setScratch("keyword",$session{form}{keyword});
 	WebGUI::Session::setScratch("collateralUser",$session{form}{collateralUser});
 	WebGUI::Session::setScratch("collateralType",$session{form}{collateralType});

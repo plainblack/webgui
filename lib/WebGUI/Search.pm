@@ -30,8 +30,8 @@ use WebGUI::SQL;
 =head1 SYNOPSIS
 
  use WebGUI::Search;
+ $sql = WebGUI::Search::buildConstraints(\@fields);
  $html = WebGUI::Search::form(\%hidden);
- $sql = WebGUI::buildConstraints(\@fields);
 
 =head1 DESCRIPTION
 
@@ -44,62 +44,6 @@ use WebGUI::SQL;
 
 =cut
 
-
-#-------------------------------------------------------------------
-
-=head2 form ( hiddenFields ) { [ numResults ] }
-
- Generates and returns the advanced search form.
-
-=item hiddenFields
-
- A hash reference that contains any name/value pairs that should be
- included as hidden fields in the search form.
-
-=item numResults
-
- A form param that can optionally specify the number of results to 
- display. Defaults to 25.
-
-=cut
-
-sub form {
-	my ($key, $numResults, $output, $f, $resultsText, %results);
-	tie %results, 'Tie::IxHash';
-	$numResults = $session{form}{numResults} || 25;
-	$resultsText = WebGUI::International::get(529);
-	%results = (10=>'10 '.$resultsText, 25=>'25 '.$resultsText, 50=>'50 '.$resultsText, 100=>'100 '.$resultsText);
-	$f = WebGUI::HTMLForm->new(1);
-	foreach $key (keys %{$_[0]}) {
-		$f->hidden($key,${$_[0]}{$key});
-	}
-	$output = '<table width="100%" class="tableMenu"><tr><td align="right" width="15%">';
-	$output .= '<h1>'.WebGUI::International::get(364).'</h1>';
-	$output .= '</td>';
-	$f->raw('<td valign="top" width="70%" align="center">');
-	$f->raw('<table>');
-	$f->raw('<tr><td class="tableData">'.WebGUI::International::get(530).'</td><td class="tableData">');
-	$f->text('all','',$session{form}{all},'','','',($session{setting}{textBoxSize}-5));
-	$f->raw('</td></tr>');
-        $f->raw('<tr><td class="tableData">'.WebGUI::International::get(531).'</td><td class="tableData">');
-        $f->text('exactPhrase','',$session{form}{exactPhrase},'','','',($session{setting}{textBoxSize}-5));
-        $f->raw('</td></tr>');
-        $f->raw('<tr><td class="tableData">'.WebGUI::International::get(532).'</td><td class="tableData">');
-        $f->text('atLeastOne','',$session{form}{atLeastOne},'','','',($session{setting}{textBoxSize}-5));
-        $f->raw('</td></td>');
-        $f->raw('<tr><td class="tableData">'.WebGUI::International::get(533).'</td><td class="tableData">');
-        $f->text('without','',$session{form}{without},'','','',($session{setting}{textBoxSize}-5));
-        $f->raw('</td></tr>');
-	$f->raw('</table>');
-	$f->raw('</td><td width="15%">');
-	$f->select("numResults",\%results,'',[$numResults]);
-	$f->raw('<p/>');
-	$f->submit(WebGUI::International::get(170));
-	$f->raw('</td>');
-	$output .= $f->print;
-	$output .= '</tr></table>';
-	return $output;
-}
 
 #-------------------------------------------------------------------
 
@@ -141,10 +85,10 @@ sub form {
 
 sub buildConstraints {
 	my ($field, $all, $allSub, $exactPhrase, $atLeastOne, $without, @words, $word, $sql);
-	if ($session{form}{all} ne "") {
-		$session{form}{all} =~ s/,/ /g;
-		$session{form}{all} =~ s/\s+/ /g;
-		@words = split(/ /,$session{form}{all});
+	if ($session{scratch}{all} ne "") {
+		$session{scratch}{all} =~ s/,/ /g;
+		$session{scratch}{all} =~ s/\s+/ /g;
+		@words = split(/ /,$session{scratch}{all});
 		foreach $word (@words) {
 			$all .= " and " if ($all ne "");
 			$all .= "(";
@@ -157,16 +101,16 @@ sub buildConstraints {
 			$all .= ")";
 		}
 	}
-        if ($session{form}{exactPhrase} ne "") {
+        if ($session{scratch}{exactPhrase} ne "") {
 		foreach $field (@{$_[0]}) {
 			$exactPhrase .= " or " if ($exactPhrase ne "");
-                	$exactPhrase .= " $field like ".quote("%".$session{form}{exactPhrase}."%");
+                	$exactPhrase .= " $field like ".quote("%".$session{scratch}{exactPhrase}."%");
 		}
         }
-        if ($session{form}{atLeastOne} ne "") {
-                $session{form}{atLeastOne} =~ s/,/ /g;
-                $session{form}{atLeastOne} =~ s/\s+/ /g;
-                @words = split(/ /,$session{form}{atLeastOne});
+        if ($session{scratch}{atLeastOne} ne "") {
+                $session{scratch}{atLeastOne} =~ s/,/ /g;
+                $session{scratch}{atLeastOne} =~ s/\s+/ /g;
+                @words = split(/ /,$session{scratch}{atLeastOne});
                 foreach $word (@words) {
 			foreach $field (@{$_[0]}) {
                         	$atLeastOne .= " or " if ($atLeastOne ne "");
@@ -174,10 +118,10 @@ sub buildConstraints {
 			}
                 }
         }
-        if ($session{form}{without} ne "") {
-                $session{form}{without} =~ s/,/ /g;
-                $session{form}{without} =~ s/\s+/ /g;
-                @words = split(/ /,$session{form}{without});
+        if ($session{scratch}{without} ne "") {
+                $session{scratch}{without} =~ s/,/ /g;
+                $session{scratch}{without} =~ s/\s+/ /g;
+                @words = split(/ /,$session{scratch}{without});
                 foreach $word (@words) {
 			foreach $field (@{$_[0]}) {
                         	$without .= " and " if ($without ne "");
@@ -195,7 +139,79 @@ sub buildConstraints {
 	return $sql;
 }
 
+#-------------------------------------------------------------------
 
+=head2 form ( hiddenFields ) { [ numResults ] }
+
+ Generates and returns the advanced search form.
+
+=item hiddenFields
+
+ A hash reference that contains any name/value pairs that should be
+ included as hidden fields in the search form.
+
+=item numResults
+
+ A form param that can optionally specify the number of results to
+ display. Defaults to 25.
+
+=cut
+
+sub form {
+	WebGUI::Session::setScratch("all",$session{form}{all});
+	WebGUI::Session::setScratch("atLeastOne",$session{form}{atLeastOne});
+	WebGUI::Session::setScratch("exactPhrase",$session{form}{exactPhrase});
+	WebGUI::Session::setScratch("without",$session{form}{without});
+	WebGUI::Session::setScratch("numResults",$session{form}{numResults});
+        my ($key, $numResults, $output, $f, $resultsText, %results);
+        tie %results, 'Tie::IxHash';
+        $numResults = $session{scratch}{numResults} || 25;
+        $resultsText = WebGUI::International::get(529);
+        %results = (10=>'10 '.$resultsText, 25=>'25 '.$resultsText, 50=>'50 '.$resultsText, 100=>'100 '.$resultsText);
+        $f = WebGUI::HTMLForm->new(1);
+        foreach $key (keys %{$_[0]}) {
+                $f->hidden($key,${$_[0]}{$key});
+        }
+        $output = '<table width="100%" class="tableMenu"><tr><td align="right" width="15%">';
+        $output .= '<h1>'.WebGUI::International::get(364).'</h1>';
+        $output .= '</td>';
+        $f->raw('<td valign="top" width="70%" align="center">');
+        $f->raw('<table>');
+        $f->raw('<tr><td class="tableData">'.WebGUI::International::get(530).'</td><td class="tableData">');
+        $f->text('all','',$session{scratch}{all},'','','',($session{setting}{textBoxSize}-5));
+        $f->raw('</td></tr>');
+        $f->raw('<tr><td class="tableData">'.WebGUI::International::get(531).'</td><td class="tableData">');
+        $f->text('exactPhrase','',$session{scratch}{exactPhrase},'','','',($session{setting}{textBoxSize}-5));
+        $f->raw('</td></tr>');
+        $f->raw('<tr><td class="tableData">'.WebGUI::International::get(532).'</td><td class="tableData">');
+        $f->text('atLeastOne','',$session{scratch}{atLeastOne},'','','',($session{setting}{textBoxSize}-5));
+        $f->raw('</td></td>');
+        $f->raw('<tr><td class="tableData">'.WebGUI::International::get(533).'</td><td class="tableData">');
+        $f->text('without','',$session{scratch}{without},'','','',($session{setting}{textBoxSize}-5));
+        $f->raw('</td></tr>');
+        $f->raw('</table>');
+        $f->raw('</td><td width="15%">');
+        $f->select("numResults",\%results,'',[$numResults]);
+        $f->raw('<p/>');
+        $f->submit(WebGUI::International::get(170));
+        $f->raw('</td>');
+        $output .= $f->print;
+        $output .= '</tr></table>';
+        return $output;
+}
+
+#-------------------------------------------------------------------
+sub toggleURL {
+	WebGUI::Session::setScratch("search",$session{form}{search});
+	my $url;
+	if ($session{scratch}{search}) {
+		$url = WebGUI::URL::page("search=0");
+	} else {
+		$url = WebGUI::URL::page("search=1");
+	}
+	$url = WebGUI::URL::append($url,$_[0]) if ($_[0]);
+	return $url;
+}
 
 1;
 

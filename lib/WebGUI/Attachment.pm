@@ -48,6 +48,7 @@ use WebGUI::Utility;
  $url = 	$attachment->getThumbnail;
  $string = 	$attachment->getType;
  $url = 	$attachment->getURL;
+ $boolean = 	$attachment->isImage;
  $attachment->copy("files","10");
  $attachment->delete;
  $attachment->deleteNode;
@@ -68,7 +69,7 @@ use WebGUI::Utility;
 #-------------------------------------------------------------------
 sub _createThumbnail {
 	my ($image, $error, $x, $y, $r, $n);
-        if ($hasImageMagick && isIn($_[0]->getType, qw(jpg jpeg gif png tif tiff bmp))) {
+        if ($hasImageMagick && $_[0]->isImage) {
 		$image = Image::Magick->new;
 		$error = $image->Read($_[0]->getPath);
 		WebGUI::ErrorHandler::warn("Couldn't read image for thumnail creation: ".$error) if $error;
@@ -389,6 +390,18 @@ sub getURL {
 	return $_[0]->{_node}->getURL.'/'.$_[0]->getFilename;
 }
 
+
+#-------------------------------------------------------------------
+
+=head2 isImage ( )
+
+ Returns a 1 or 0 depending on whether the file is an image or not.
+
+=cut
+
+sub isImage {
+        return isIn($_[0]->getType, qw(gif jpeg jpg tif tiff png bmp)),;
+}
 
 #-------------------------------------------------------------------
 
