@@ -179,9 +179,9 @@ sub createThumbnail {
                         $image->Scale(width=>($x/$r),height=>($y/$r));
                 }
                 if (isIn($_[0]->getType, qw(tif tiff bmp))) {
-                        $error = $image->Write($_[0]->getNode->getPath.'/thumb-'.$_[0]->getFilename.'.png');
+                        $error = $image->Write($_[0]->getNode->getPath.$session{os}{slash}.'thumb-'.$_[0]->getFilename.'.png');
                 } else {
-                        $error = $image->Write($_[0]->getNode->getPath.'/thumb-'.$_[0]->getFilename);
+                        $error = $image->Write($_[0]->getNode->getPath.$session{os}{slash}.'thumb-'.$_[0]->getFilename);
                 }
                 WebGUI::ErrorHandler::warn("Couldn't create thumbnail: ".$error) if $error;
         }
@@ -192,12 +192,19 @@ sub createThumbnail {
 
 =head2 delete ( )
 
-Deletes an attachment from its node.
+Deletes an attachment from its node.  Also deletes image thumbnail if present.
 
 =cut
 
 sub delete {
         unlink($_[0]->getPath);
+        if ($_[0]->isImage) {
+        	if (isIn($_[0]->getType, qw(tif tiff bmp))) {
+        		unlink($_[0]->getNode->getPath.$session{os}{slash}.'thumb-'.$_[0]->getFilename.'.png');
+        	} else {
+	        	unlink($_[0]->getNode->getPath.$session{os}{slash}.'thumb-'.$_[0]->getFilename);
+        	}
+        }
 }
 
 
@@ -385,9 +392,9 @@ Returns a full URL to the thumbnail for this attachment. Thumbnails are only cre
 
 sub getThumbnail {
 	if ($hasImageMagick && isIn($_[0]->getType, qw(jpg jpeg gif png))) {
-        	return $_[0]->getNode->getURL.'/thumb-'.$_[0]->getFilename;
+        	return $_[0]->getNode->getURL.$session{os}{slash}.'thumb-'.$_[0]->getFilename;
 	} elsif ($hasImageMagick && isIn($_[0]->getType, qw(tif tiff bmp))) {
-        	return $_[0]->getNode->getURL.'/thumb-'.$_[0]->getFilename.'.png';
+        	return $_[0]->getNode->getURL.$session{os}{slash}.'thumb-'.$_[0]->getFilename.'.png';
 	} else {
 		return $_[0]->getIcon;
 	}
