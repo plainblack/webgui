@@ -6,6 +6,9 @@
  - fix [ 1173101 ] Template in ^LoginToggle();
  - Added a page to the help docs which tells you what Assets are enabled for this site.
  - Added a new Error Handling / Logging mechanism.
+ - Whitespace in URLs will now be replaced with hyphens (-) instead of
+   underscores (_) because there is some evidence that hyphens get better
+   search index ranking than underscores.
 
 
 6.5.5
