@@ -222,7 +222,6 @@ sub www_editSubmission {
         my ($output, $submission, $f, @submission, $sth);
         $submission = $_[0]->getCollateral("USS_submission","USS_submissionId",$session{form}{sid});
 	if ($submission->{USS_submissionId} eq "new") {
-		$submission->{convertCarriageReturns} = 1;
 		$submission->{userId} = $session{user}{userId};
 	}
         if (WebGUI::Privilege::isInGroup($_[0]->get("groupToContribute")) || $submission->{userId} == $session{user}{userId} || WebGUI::Privilege::isInGroup($_[0]->get("groupToApprove"))) {

@@ -660,19 +660,6 @@ sub HTMLArea {
                 	$output .= '<script>'."\n";
                 	$output .= '_editor_url = "'.$session{config}{extras}.'/htmlArea/";'."\n";
                 	$output .= '</script>'."\n";
-                	$output .= '<script language="JavaScript">
-                       		var formObj;
-                       		var extrasDir="'.$session{config}{extras}.'";
-                       		function openEditWindow(obj) {
-                       		formObj = obj;
-                       		if (navigator.userAgent.substr(navigator.userAgent.indexOf("MSIE")+5,1)>=5)
-                         		window.open("'.$session{config}{extras}.'/ieEdit.html","editWindow","width=490,height=400,resizable=1");
-                       		else
-                        		 window.open("'.$session{config}{extras}.'/nonIeEdit.html","editWindow","width=500,height=410");
-                       		}
-                       		function setContent(content) {
-                         		formObj.value = content;
-                       		} </script>';
 			$htmlArea = 1;
 		} elsif ($browser->ie && $browser->version >= 5) {
 			$output .= '<script language="JavaScript">
