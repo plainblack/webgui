@@ -324,6 +324,7 @@ sub new {
 		$properties->{allowReplacements} = $master->{allowReplacements};
 		$properties->{filterPosts} = $master->{filterPosts};
 		$properties->{karmaPerPost} = $master->{karmaPerPost};
+		$properties->{groupToView} = $master->{groupToView};
 		$properties->{groupToPost} = $master->{groupToPost};
 		$properties->{groupToModerate} = $master->{groupToModerate};
 		$properties->{moderatePosts} = $master->{moderatePosts};
