@@ -15,7 +15,7 @@ our $I18N = {
 		message => q|This wobject creates a simple multipurpose data-entry form.
 <br><br>
 
-<b>Acknowledgement</b><br>
+<b>Acknowledgment</b><br>
 This message will be displayed to the user after they submit their data..
 <p>
 
@@ -34,14 +34,14 @@ Choose a template for your form.
 Choose a template for the data that will be sent via email.
 <p>
 
-<b>Acknowlegement Template</b><br>
-Choose a template that will be used to display the acknowlegement.
+<b>Acknowledgment Template</b><br>
+Choose a template that will be used to display the acknowledgment.
 <p>
 
 <b>List Template</b><br>
 Choose a template that will be used to display the list of stored records in this Data Form.
 <p>|,
-		lastUpdated => 1099535835,
+		lastUpdated => 1101772835,
 	},
 
 	'editField-vertical-label' => {
@@ -130,7 +130,7 @@ Set the number of characters tall this form field will be. Only used on textarea
 <p>
 
 <b>Align vertical</b><br>
-This property controls wheter radio buttons and checklists are laid out horizontally or vertically.
+This property controls whether radio buttons and checklists are laid out horizontally or vertically.
 <p>
 
 <b>Extras</b><br>
@@ -146,12 +146,12 @@ Enter the default value (if any) for the field.  For Yes/No fields, enter "yes" 
 <p>
 
 |,
-		lastUpdated => 1099532598,
+		lastUpdated => 1101772844,
 	},
 
 	'16' => {
-		message => q|Acknowledgement|,
-		lastUpdated => 1031514049,
+		message => q|Acknowledgment|,
+		lastUpdated => 1101772851,
 	},
 
 	'100' => {
@@ -198,8 +198,8 @@ Enter the default value (if any) for the field.  For Yes/No fields, enter "yes" 
 		message => q|The following template variables are available for Data Form templates.
 <p/>
 
-<b>acknowledgement</b><br>
-The acknowledgement specified in the wobject's properties. This message should be displayed after a user submits data.
+<b>acknowledgment</b><br>
+The acknowledgment specified in the wobject's properties. This message should be displayed after a user submits data.
 <p>
 <b>export.tab.url</b><br>
 Following this URL will export the data stored to this data form as a tab delimited file.
@@ -347,7 +347,7 @@ The end of the form.
 <p>
 
 *Only available if the user has already submitted the form.|,
-		lastUpdated => 1098920726
+		lastUpdated => 1101772868
 	},
 
 	'61' => {
@@ -567,8 +567,8 @@ A conditional indicating whether this field exists for the mail subsystem of the
 	},
 
 	'81' => {
-		message => q|Acknowlegement Template|,
-		lastUpdated => 1052064282
+		message => q|Acknowledgment Template|,
+		lastUpdated => 1101772875
 	},
 
 	'8' => {
