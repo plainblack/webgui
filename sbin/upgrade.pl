@@ -39,7 +39,7 @@ if ($ARGV[0] ne "--doit") {
 	print "\tmysqlDump = $mysqldump\n";
 	print "\tbackupPath = $backupDir\n";
 	print "\n";
-	print "Use the following command to being the upgrade.\n";
+	print "Use the following command to begin the upgrade.\n";
 	print "\n";
 	print "\tperl $0 --doit\n";
 	print "\n";
