@@ -3,7 +3,7 @@ package WebGUI::i18n::English::a_account;
 our $I18N = {
 
     'account title' => {
-        message => q|My Account Macro|,
+        message => q|Account Macro|,
         lastUpdated => 1112466408,
     },
 

@@ -10,8 +10,9 @@ our $I18N = {
 	'can edit text body' => {
 		message => q|
 
-<b>&#94;CanEditText();</b><br>
-Display a message to a user that can edit the current page.
+<b>&#94;CanEditText(<i>text message</i>);</b><br>
+Display a message to a user that can edit the current page.  The message can be
+HTML or WebGUI Macros.
 <p>
 <i>Example:</i> &#94;CanEditText(&#94;AdminToggle;);
 <p>
