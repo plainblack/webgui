@@ -1,4 +1,4 @@
-package WebGUI::Wobject::HttpProxy;
+package WebGUI::Asset::Wobject::HttpProxy;
 
 #-------------------------------------------------------------------
 # WebGUI is Copyright 2001-2004 Plain Black Corporation.
@@ -16,155 +16,182 @@ use LWP;
 use HTTP::Cookies;
 use HTTP::Request::Common;
 use HTML::Entities;
-use WebGUI::HTMLForm;
 use WebGUI::HTTP;
-use WebGUI::Icon;
 use WebGUI::International;
 use WebGUI::Privilege;
 use WebGUI::Session;
-use WebGUI::Wobject;
-use WebGUI::Wobject::HttpProxy::Parse;
+use WebGUI::Storage;
+use WebGUI::Asset::Wobject;
+use WebGUI::Asset::Wobject::HttpProxy::Parse;
 use WebGUI::Cache;
 
-our @ISA = qw(WebGUI::Wobject);
+our @ISA = qw(WebGUI::Asset::Wobject);
 
 
 #-------------------------------------------------------------------
-sub name {
-        return WebGUI::International::get(3,$_[0]->get("namespace"));
-}
-
-#-------------------------------------------------------------------
-sub new {
-        my $class = shift;
-        my $property = shift;
-        my $self = WebGUI::Wobject->new(
-                -properties=>$property,
-                -extendedProperties=>{
+sub definition {
+	my $class = shift;
+	my $definition = shift;
+	push(@{$definition}, {
+		tableName=>'HttpProxy',
+		className=>'WebGUI::Asset::Wobject::HttpProxy',
+		properties=>{
 			proxiedUrl=>{
+				fieldType=>"url",
 				defaultValue=>'http://'
 				}, 
 			timeout=>{
+				fieldType=>"selectList",
 				defaultValue=>30
 				}, 
 			removeStyle=>{
+				fieldType=>"yesNo",
 				defaultValue=>1
 				}, 
 			filterHtml=>{
+				fieldType=>"filterContent",
 				defaultValue=>"javascript"
 				}, 
 			followExternal=>{
+				fieldType=>"yesNo",
 				defaultValue=>1
 				}, 
                         rewriteUrls=>{
+				fieldType=>"yesNo",
                                 defaultValue=>1
                                 },
 			followRedirect=>{
+				fieldType=>"yesNo",
 				defaultValue=>0
 				},
 			searchFor=>{
-                                defaultValue=>''
+				fieldType=>"text",
+                                defaultValue=>undef
                                 },
                         stopAt=>{
-                                defaultValue=>''
+				fieldType=>"text",
+                                defaultValue=>undef
                                 },
-			},
-		-useTemplate=>1,
-		-useMetaData=>1
-                );
-        bless $self, $class;
+			}
+		});
+        return $class->SUPER::definition($definition);
 }
 
 #-------------------------------------------------------------------
-sub uiLevel {
-	return 5;
+sub getCookieJar {
+	my $self = shift;
+	my $storage;
+	unless ($self->get("cookieJarStorageId")) {
+		$storage = WebGUI::Storage->create;
+		$self->update({cookieJarStorageId=>$storage->getId});
+	} else {
+		$storage = WebGUI::Storage->get($self->get("cookieJarStorageId"));
+	}
+	return $storage;
 }
 
 #-------------------------------------------------------------------
-sub www_edit {
+sub getEditForm {
+	my $self = shift;
+	my $tabform = $self->SUPER::getEditForm();
 	my %hash;
 	tie %hash, 'Tie::IxHash';
 	%hash=(5=>5,10=>10,20=>20,30=>30,60=>60);
-       	my $privileges = WebGUI::HTMLForm->new;
-       	my $properties = WebGUI::HTMLForm->new;
-       	my $layout = WebGUI::HTMLForm->new;
-        $properties->url(
+        $tabform->getTab("properties")->url(
 		-name=>"proxiedUrl", 
-		-label=>WebGUI::International::get(1,$_[0]->get("namespace")),
-		-value=>$_[0]->getValue("proxiedUrl")
+		-label=>WebGUI::International::get(1,"HttpProxy"),
+		-value=>$self->getValue("proxiedUrl")
 		);
-        $privileges->yesNo(
+        $tabform->getTab("security")->yesNo(
         	-name=>"followExternal",
-                -label=>WebGUI::International::get(5,$_[0]->get("namespace")),
-                -value=>$_[0]->getValue("followExternal")
+                -label=>WebGUI::International::get(5,"HttpProxy"),
+                -value=>$self->getValue("followExternal")
                 );
-        $properties->yesNo(
+        $tabform->getTab("properties")->yesNo(
                 -name=>"followRedirect",
-                -label=>WebGUI::International::get(8,$_[0]->get("namespace")),
-                -value=>$_[0]->getValue("followRedirect")
+                -label=>WebGUI::International::get(8,"HttpProxy"),
+                -value=>$self->getValue("followRedirect")
                 );
-        $properties->yesNo(
+        $tabform->getTab("properties")->yesNo(
                 -name=>"rewriteUrls",
-                -label=>WebGUI::International::get(12,$_[0]->get("namespace")),
-                -value=>$_[0]->getValue("rewriteUrls")
+                -label=>WebGUI::International::get(12,"HttpProxy"),
+                -value=>$self->getValue("rewriteUrls")
                 );
-        $layout->yesNo(
+        $tabform->getTab("display")->yesNo(
                 -name=>"removeStyle",
-                -label=>WebGUI::International::get(6,$_[0]->get("namespace")),
-                -value=>$_[0]->getValue("removeStyle")
+                -label=>WebGUI::International::get(6,"HttpProxy"),
+                -value=>$self->getValue("removeStyle")
                 );
-	$layout->filterContent(
+	$tabform->getTab("display")->filterContent(
 		-name=>"filterHtml",
-		-value=>$_[0]->getValue("filterHtml")
+		-value=>$self->getValue("filterHtml")
 		);
-        $properties->select(
+        $tabform->getTab("properties")->selectList(
 		-name=>"timeout", 
 		-options=>\%hash, 
-		-label=>WebGUI::International::get(4,$_[0]->get("namespace")),
-		-value=>[$_[0]->getValue("timeout")]
+		-label=>WebGUI::International::get(4,"HttpProxy"),
+		-value=>[$self->getValue("timeout")]
 		);
-        $layout->text(
+        $tabform->getTab("display")->text(
                 -name=>"searchFor",
-                -label=>WebGUI::International::get(13,$_[0]->get("namespace")),
-                -value=>$_[0]->getValue("searchFor")
+                -label=>WebGUI::International::get(13,"HttpProxy"),
+                -value=>$self->getValue("searchFor")
                 );
-        $layout->text(
+        $tabform->getTab("display")->text(
                 -name=>"stopAt",
-                -label=>WebGUI::International::get(14,$_[0]->get("namespace")),
-                -value=>$_[0]->getValue("stopAt")
+                -label=>WebGUI::International::get(14,"HttpProxy"),
+                -value=>$self->getValue("stopAt")
                 );
-        return $_[0]->SUPER::www_edit(
-		-properties=>$properties->printRowsOnly,
-		-layout=>$layout->printRowsOnly,
-		-privileges=>$privileges->printRowsOnly,
-		-helpId=>"http proxy add/edit",
-		-headingId=>2
-		);
+	return $tabform;
 }
 
 
 #-------------------------------------------------------------------
-sub www_view {
-   my (%var, %formdata, @formUpload, $redirect, $response, $header, $userAgent, $proxiedUrl, $request, $ttl);
-	$_[0]->logView() if ($session{setting}{passiveProfilingEnabled});
-   	my $node = WebGUI::Node->new("temp",$_[0]->get("namespace")."_cookies");
-	$node->create;
+sub getIcon {
+	my $self = shift;
+	my $small = shift;
+	return $session{config}{extrasURL}.'/assets/small/httpProxy.gif' if ($small);
+	return $session{config}{extrasURL}.'/assets/httpProxy.gif';
+}
+
+#-------------------------------------------------------------------
+sub getName {
+        return WebGUI::International::get(3,"HttpProxy");
+}
+
+#-------------------------------------------------------------------
+sub getUiLevel {
+	return 5;
+}
+
+
+#-------------------------------------------------------------------
+sub purge {
+	my $self = shift;
+	$self->getCookieJar->delete;	
+	$self->SUPER::purge;
+}
+
+
+#-------------------------------------------------------------------
+sub view {
+	my $self = shift;
 	my $cookiebox = WebGUI::URL::escape($session{var}{sessionId});
    	$cookiebox =~ s/[^A-Za-z0-9\-\.\_]//g;  #removes all funky characters
    	$cookiebox .= '.cookie';
-	$cookiebox = $node->getPath.$session{os}{slash}.$cookiebox;
-   	my $jar = HTTP::Cookies->new(File => $cookiebox, AutoSave => 1, Ignore_Discard => 1);
+   	my $jar = HTTP::Cookies->new(File => $self->getCookieJar->getPath($cookiebox), AutoSave => 1, Ignore_Discard => 1);
+   my (%var, %formdata, @formUpload, $redirect, $response, $header, $userAgent, $proxiedUrl, $request, $ttl);
 
-   if($session{form}{wid} eq $_[0]->get("wobjectId") && $session{form}{func}!~/editSave/i) {
-      $proxiedUrl = $session{form}{FormAction} || $session{form}{proxiedUrl} || $_[0]->get("proxiedUrl") ;
+   if($session{form}{func}!~/editSave/i) {
+      $proxiedUrl = $session{form}{FormAction} || $session{form}{proxiedUrl} || $self->get("proxiedUrl") ;
    } else {
-      $proxiedUrl = $_[0]->get("proxiedUrl");
+      $proxiedUrl = $self->get("proxiedUrl");
       $session{env}{REQUEST_METHOD}='GET';
    }
 
    $redirect=0; 
 
-   return $_[0]->processTemplate($_[0]->get("templateId"),{}) unless ($proxiedUrl ne "");
+   return $self->processTemplate({},"HttpProxy",$self->get("templateId")) unless ($proxiedUrl ne "");
    
    my $cachedContent = WebGUI::Cache->new($proxiedUrl,"URL");
    my $cachedHeader = WebGUI::Cache->new($proxiedUrl,"HEADER");
@@ -175,26 +202,26 @@ sub www_view {
       until($redirect == 5) { # We follow max 5 redirects to prevent bouncing/flapping
       $userAgent = new LWP::UserAgent;
       $userAgent->agent($session{env}{HTTP_USER_AGENT});
-      $userAgent->timeout($_[0]->get("timeout"));
+      $userAgent->timeout($self->get("timeout"));
       $userAgent->env_proxy;
 
       $proxiedUrl = URI->new($proxiedUrl);
 
-      #my $allowed_url = URI->new($_[0]->get('proxiedUrl'))->abs;;
+      #my $allowed_url = URI->new($self->get('proxiedUrl'))->abs;;
 
-      #if ($_[0]->get("followExternal")==0 && $proxiedUrl !~ /\Q$allowed_url/i) {
-      if ($_[0]->get("followExternal")==0 && 
-          (URI->new($_[0]->get('proxiedUrl'))->host) ne (URI->new($proxiedUrl)->host) ) {
+      #if ($self->get("followExternal")==0 && $proxiedUrl !~ /\Q$allowed_url/i) {
+      if ($self->get("followExternal")==0 && 
+          (URI->new($self->get('proxiedUrl'))->host) ne (URI->new($proxiedUrl)->host) ) {
 	$var{header} = "text/html";
-         return "<h1>You are not allowed to leave ".$_[0]->get("proxiedUrl")."</h1>";
+         return "<h1>You are not allowed to leave ".$self->get("proxiedUrl")."</h1>";
       }
 
       $header = new HTTP::Headers;
-	$header->referer($_[0]->get("proxiedUrl")); # To get around referrer blocking
+	$header->referer($self->get("proxiedUrl")); # To get around referrer blocking
 
       if($session{env}{REQUEST_METHOD}=~/GET/i || $redirect != 0) {  # request_method is also GET after a redirection. Just to make sure we're
                                						# not posting the same data over and over again.
-         if($redirect == 0 && $session{form}{wid} eq $_[0]->get("wobjectId")) {
+         if($redirect == 0) {
             foreach my $input_name (keys %{$session{form}}) {
                next if ($input_name !~ /^HttpProxy_/); # Skip non proxied form var's
                $input_name =~ s/^HttpProxy_//;
@@ -247,7 +274,7 @@ sub www_view {
       } else { 
          $redirect = 5; #No redirection found. Leave loop.
       }
-      $redirect=5 if (not $_[0]->get("followRedirect")); # No redirection. Overruled by setting
+      $redirect=5 if (not $self->get("followRedirect")); # No redirection. Overruled by setting
    }
    
    if($response->is_success) {
@@ -256,8 +283,8 @@ sub www_view {
       if($response->content_type eq "text/html" || 
         ($response->content_type eq "" && $var{content}=~/<html/gis)) {
  
-        $var{"search.for"} = $_[0]->getValue("searchFor");
-        $var{"stop.at"} = $_[0]->getValue("stopAt");
+        $var{"search.for"} = $self->getValue("searchFor");
+        $var{"stop.at"} = $self->getValue("stopAt");
 	if ($var{"search.for"}) {
 		$var{content} =~ /^(.*?)\Q$var{"search.for"}\E(.*)$/gis;
 		$var{"content.leading"} = $1 || $var{content};
@@ -268,7 +295,7 @@ sub www_view {
 		$var{content} = $1 || $var{content};
 		$var{"content.trailing"} = $2;
 	}
-         my $p = WebGUI::Wobject::HttpProxy::Parse->new($proxiedUrl, $var{content}, $_[0]->get("wobjectId"),$_[0]->get("rewriteUrls"));
+         my $p = WebGUI::Asset::Wobject::HttpProxy::Parse->new($proxiedUrl, $var{content}, $self->getId,$self->get("rewriteUrls"));
          $var{content} = $p->filter; # Rewrite content. (let forms/links return to us).
          $p->DESTROY; 
    
@@ -277,9 +304,9 @@ sub www_view {
             $var{content} = "<h1>HttpProxy: Can't display frames</h1>
                         Try fetching it directly <a href='$proxiedUrl'>here.</a>";
          } else {
-            $var{content} =~ s/\<style.*?\/style\>//isg if ($_[0]->get("removeStyle"));
+            $var{content} =~ s/\<style.*?\/style\>//isg if ($self->get("removeStyle"));
             $var{content} = WebGUI::HTML::cleanSegment($var{content});
-            $var{content} = WebGUI::HTML::filter($var{content}, $_[0]->get("filterHtml"));
+            $var{content} = WebGUI::HTML::filter($var{content}, $self->get("filterHtml"));
          }
       }
    } else { # Fetching page failed...
@@ -301,7 +328,18 @@ sub www_view {
 	WebGUI::HTTP::setMimeType($var{header});
 	return $var{content};
    } else {
-   	return $_[0]->processTemplate($_[0]->get("templateId"),\%var); 
+   	return $self->processTemplate(\%var,"HttpProxy",$self->get("templateId")); 
    }
 }
+
+
+#-------------------------------------------------------------------
+sub www_edit {
+        my $self = shift;
+	return $self->getAdminConsole->render(WebGUI::Privilege::insufficient()) unless $self->canEdit;
+	$self->getAdminConsole->setHelp("http proxy add/edit");
+        return $self->getAdminConsole->render($self->getEditForm->print,WebGUI::International::get("2","HttpProxy"));
+}
+
+
 1;

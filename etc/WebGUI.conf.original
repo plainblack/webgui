@@ -6,6 +6,8 @@ assets = WebGUI::Asset::File::Image, \
 	WebGUI::Asset::Wobject::USS, \
 	WebGUI::Asset::Wobject::Poll, \
 	WebGUI::Asset::Wobject::SyndicatedContent, \
+	WebGUI::Asset::Wobject::HttpProxy, \
+	WebGUI::Asset::Wobject::WSClient, \
 	WebGUI::Asset::Wobject::Article, \
 	WebGUI::Asset::Wobject::Navigation, \
 	WebGUI::Asset::FilePile

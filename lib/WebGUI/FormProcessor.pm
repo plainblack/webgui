@@ -231,7 +231,7 @@ sub fieldType {
 
 #-------------------------------------------------------------------
 
-=head2 filter ( name )
+=head2 filterContent ( name )
 
 Returns a scalar filter type. Defaults to "most".
 
@@ -241,7 +241,7 @@ The name of the form variable to retrieve.
 
 =cut
 
-sub filter {
+sub filterContent {
 	return ($session{form}{$_[0]} || "most");
 }
 

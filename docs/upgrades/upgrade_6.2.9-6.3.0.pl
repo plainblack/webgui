@@ -476,11 +476,18 @@ print "\tDeleting files which are no longer used.\n" unless ($quiet);
 #unlink("../../lib/WebGUI/Attachment.pm");
 #unlink("../../lib/WebGUI/Node.pm");
 #unlink("../../lib/WebGUI/Wobject/Article.pm");
+#unlink("../../lib/WebGUI/Help/SiteMap.pm");
+#unlink("../../lib/WebGUI/i18n/English/SiteMap.pm");
 #unlink("../../lib/WebGUI/Wobject/SiteMap.pm");
 #unlink("../../lib/WebGUI/Wobject/Poll.pm");
 #unlink("../../lib/WebGUI/Wobject/DataForm.pm");
 #unlink("../../lib/WebGUI/Wobject/USS.pm");
+#unlink("../../lib/WebGUI/Wobject/WSClient.pm");
+#unlink("../../lib/WebGUI/i18n/English/FileManager.pm");
+#unlink("../../lib/WebGUI/Help/FileManager.pm");
 #unlink("../../lib/WebGUI/Wobject/FileManager.pm");
+#rmtree("../../lib/WebGUI/Wobject/HttpProxy");
+#unlink("../../lib/WebGUI/Wobject/HttpProxy.pm");
 #unlink("../../lib/WebGUI/Operation/Clipboard.pm");
 #unlink("../../lib/WebGUI/Operation/Trash.pm");
 #unlink("../../lib/WebGUI/Operation/Collateral.pm");
@@ -521,6 +528,8 @@ $conf->set("assets"=>[
 		'WebGUI::Asset::Wobject::DataForm',
 		'WebGUI::Asset::Wobject::USS',
 		'WebGUI::Asset::Wobject::SyndicatedContent',
+		'WebGUI::Asset::Wobject::WSClient',
+		'WebGUI::Asset::Wobject::HttpProxy',
 		'WebGUI::Asset::Redirect',
 		'WebGUI::Asset::FilePile',
 		'WebGUI::Asset::File',

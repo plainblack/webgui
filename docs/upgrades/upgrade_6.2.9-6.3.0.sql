@@ -218,3 +218,7 @@ INSERT INTO template VALUES ('2','Image','<tmpl_if session.var.adminOn>\r\n<p><t
 
 INSERT INTO template VALUES ('15','File Folder','<a href=\"<tmpl_var assetId>\"></a>\r\n<tmpl_if showAdmin>\r\n<p><tmpl_var controls></p>\r\n</tmpl_if>\r\n\r\n<tmpl_if displayTitle>\r\n  <h1><tmpl_var title></h1>\r\n</tmpl_if>\r\n\r\n<tmpl_if description>\r\n  <p><tmpl_var description></p>\r\n</tmpl_if>\r\n\r\n\r\n<tmpl_if sublayout_loop>\r\n<div style=\"clear: both;\">&nbsp;</div>\r\n</tmpl_if>\r\n\r\n<tmpl_loop sublayout_loop>\r\n   <div style=\"float: left; width: 180px; text-align: center;\">\r\n  <a href=\"<tmpl_var url>\"><img src=\"<tmpl_var session.config.extrasURL>/assets/folder.gif\" border=\"0\" alt=\"Folder\" /><br /><tmpl_var title></a> \r\n   </div>\r\n</tmpl_loop>\r\n\r\n<tmpl_if sublayout_loop>\r\n<div style=\"clear: both;\">&nbsp;</div>\r\n</tmpl_if>\r\n\r\n\r\n<div style=\"clear: both;\">&nbsp;</div>\r\n\r\n<tmpl_loop position1_loop>\r\n   <div style=\"float: left; width: 180px; text-align: center;\">\r\n  <tmpl_var content>\r\n   </div>\r\n</tmpl_loop>\r\n\r\n<div style=\"clear: both;\">&nbsp;</div>\r\n','page',1,1);
 
+alter table HttpProxy add column cookieJarStorageId varchar(22);
+
+
+

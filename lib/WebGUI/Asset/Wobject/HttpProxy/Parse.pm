@@ -1,4 +1,4 @@
-package WebGUI::Wobject::HttpProxy::Parse;
+package WebGUI::Asset::Wobject::HttpProxy::Parse;
 
 
 # -------------------------------------------------------------------
@@ -51,7 +51,7 @@ sub new {
   	my $self = $pack->SUPER::new();
   	$self->{Url} = shift;
   	$self->{Content} = shift;
-  	$self->{wid} = shift;
+  	$self->{assetId} = shift;
 	$self->{rewriteUrls} = shift;
   	$self->{Filtered} ="";
   	$self->{FormAction} = "";
@@ -100,7 +100,7 @@ sub start {
   	my $self = shift;
   	my ($tag, $attr, $attrseq, $origtext) = @_;
 	# Check on the div class and div id attributes to see if we're proxying ourself.
-	if($tag eq "div" && $attr->{'class'} eq 'wobjectHttpProxy' && $attr->{'id'} eq ('wobjectId'.$self->{wid})) { 
+	if($tag eq "div" && $attr->{'class'} eq 'wobjectHttpProxy' && $attr->{'id'} eq ('assetId'.$self->{assetId})) { 
 		$self->{recurseCheck} = 1;
 	}
   	$self->output("<$tag");
@@ -138,8 +138,7 @@ sub start {
             					$val = WebGUI::URL::page;    # Form Action returns to us
           				} else {
 						$val =~ s/\n//g;	# Bugfix 757068
-            					$val = WebGUI::URL::page('proxiedUrl='.WebGUI::URL::escape($val).
-                                     			'&wid='.$self->{wid}.'&func=view'); # return to us
+            					$val = WebGUI::URL::page('proxiedUrl='.WebGUI::URL::escape($val).'&func=view'); # return to us
           				}
         			}
       			}
@@ -149,7 +148,6 @@ sub start {
   	$self->output(">");
   	if ($self->{FormAction} ne "") {
     		$self->output('<input type="hidden" name="FormAction" value="'.$self->{FormAction}.'">');
-    		$self->output('<input type="hidden" name="wid" value="'.$self->{wid}.'">');
     		$self->output('<input type="hidden" name="func" value="view">');
     		$self->{FormAction} = '';
     		$self->{FormActionIsDefined}=0;

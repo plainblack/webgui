@@ -98,6 +98,29 @@ sub _addError {
 
 #-------------------------------------------------------------------
 
+=head2 _makePath ( )
+
+Creates the filesystem folders for a storage location.
+
+NOTE: This is a private method and should never be called except internally to this package.
+
+=cut
+
+sub _makePath {
+	my $self = shift;
+	my $node = $session{config}{uploadsPath};
+	foreach my $folder ($self->{_part1}, $self->{_part2}, $self->{_id}) {
+		$node .= $session{os}{slash}.$folder;
+		unless (-e $node) { # check to see if it already exists
+			unless (mkdir($node)) { # check to see if there was an error during creation
+				$self->_addError("Couldn't create storage location: $node : $!");
+			}
+		}
+	}
+}
+
+#-------------------------------------------------------------------
+
 =head2 addFileFromFilesystem( pathToFile )
 
 Grabs a file from the server's file system and saves it to a storage location and returns a URL compliant filename.
@@ -292,15 +315,7 @@ sub create {
 	my $class = shift;
 	my $id = WebGUI::Id::generate();
 	my $self = $class->get($id); 
-	my $node = $session{config}{uploadsPath};
-	foreach my $folder ($self->{_part1}, $self->{_part2}, $id) {
-		$node .= $session{os}{slash}.$folder;
-		unless (-e $node) { # check to see if it already exists
-			unless (mkdir($node)) { # check to see if there was an error during creation
-				$self->_addError("Couldn't create storage location: $node : $!");
-			}
-		}
-	}
+	$self->_makePath;
 	return $self; 
 }
 
@@ -353,7 +368,10 @@ sub get {
 	my $class = shift;
 	my $id = shift;
 	$id =~ m/^(.{2})(.{2})/;
-	bless {_id => $id, _part1 => $1, _part2 => $2}, ref($class)||$class;
+	my $self = {_id => $id, _part1 => $1, _part2 => $2};
+	bless $self, ref($class)||$class;
+	$self->_makePath unless (-e $self->getPath); # create the folder in case it got deleted somehow
+	return $self;
 }
 
 #-------------------------------------------------------------------
