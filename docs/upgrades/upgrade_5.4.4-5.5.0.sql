@@ -58,12 +58,6 @@ create table forumRead (
   primary key (userId, forumPostId)
 );
 
-create table forumBookmark (
-  userId int not null,
-  forumPostId int not null,
-  primary key (userId, forumPostId)
-);
-
 create table forumThreadSubscription (
    forumThreadId int not null,
    userId int not null,

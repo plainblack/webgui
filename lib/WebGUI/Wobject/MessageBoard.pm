@@ -56,6 +56,18 @@ sub new {
 }
 
 #-------------------------------------------------------------------
+sub purge {
+        my $sth = WebGUI::SQL->read("select forumId from MessageBoard_forums where wobjectId=".$_[0]->get("wobjectId"));
+        while (my ($forumId) = $sth->array) {
+                my $forum = WebGUI::Forum->new($forumId);
+                $forum->purge;
+        }
+        $sth->finish;
+	WebGUI::SQL->write("delete from MessageBoard_forums where wobjectId=".$_[0]->get("wobjectId"));
+        $_[0]->SUPER::purge();
+}
+
+#-------------------------------------------------------------------
 sub www_deleteForum {
  	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId")));
         return $_[0]->confirm(WebGUI::International::get(76,$_[0]->get("namespace")),
@@ -68,6 +80,7 @@ sub www_deleteForumConfirm {
 	my $forum = WebGUI::Forum->new($session{form}{forumId});
 	$forum->purge;
 	WebGUI::SQL->write("delete from MessageBoard_forums where forumId=".$session{form}{forumId});
+	return "";
 }
 
 #-------------------------------------------------------------------

@@ -92,14 +92,13 @@ sub new {
 }
 
 sub purge {
-	my ($self);
+	my ($self) = @_;
 	my $a = WebGUI::SQL->read("select * from forumThread where forumId=".$self->get("forumId"));
 	while (my ($threadId) = $a->array) {
 		my $b = WebGUI::SQL->read("select * from forumPost where forumThreadId=".$threadId);
 		while (my ($postId) = $b->array) {
 			WebGUI::SQL->write("delete from forumPostAttachment where forumPostId=".$postId);
 			WebGUI::SQL->write("delete from forumPostRating where forumPostId=".$postId);
-			WebGUI::SQL->write("delete from forumBookmark where forumPostId=".$postId);
 		}
 		$b->finish;
 		WebGUI::SQL->write("delete from forumThreadSubscription where forumThreadId=".$threadId);

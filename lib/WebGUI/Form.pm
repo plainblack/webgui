@@ -660,12 +660,21 @@ If you want to add anything special to the form header like javascript actions o
 =cut
 
 sub formHeader {
-	my ($action, $method, $enctype);
-        $action = $_[0]->{action} || WebGUI::URL::page();
-        $method = $_[0]->{method} || "POST";
-        $enctype = $_[0]->{enctype} || "multipart/form-data";
-	return '<form action="'.$action.'" enctype="'.$enctype.'" method="'.$method.'" '.$_[0]->{extras}.'>';
-
+        my $action = $_[0]->{action} || WebGUI::URL::page();
+	my $hidden;
+	if ($action =~ /\?/) {
+		my ($path,$query) = split(/\?/,$action);
+		$action = $path;
+		my @params = split(/\&/,$query);
+		foreach my $param (@params) {
+			$param =~ s/amp;(.*)/$1/;
+			my ($name,$value) = split(/\=/,$param);
+			$hidden .= hidden({name=>$name,value=>$value});
+		}
+	}
+        my $method = $_[0]->{method} || "POST";
+        my $enctype = $_[0]->{enctype} || "multipart/form-data";
+	return '<form action="'.$action.'" enctype="'.$enctype.'" method="'.$method.'" '.$_[0]->{extras}.'>'.$hidden;
 }
 
 
