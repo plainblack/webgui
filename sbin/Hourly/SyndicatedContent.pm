@@ -23,7 +23,7 @@ sub getRSS {
        	$request = new HTTP::Request (GET => $_[0]);
 	$response = $userAgent->request($request);
 	$content = $response->content;
-	eval{parseXML(\%result, \$content)} or print $!;
+	eval{parseXML(\%result, \$content)};
 	return %result;
 }
 
