@@ -14,7 +14,7 @@ The default label for forum.add.url.
 <p>
 
 <b>title.label</b><br>
-The default label for the title columnn.
+The default label for the title column.
 <p>
 
 <b>views.label</b><br>
@@ -152,7 +152,7 @@ The editing controls for the default forum.
 A conditional indicating whether there is more than one forum.
 <p>
 |,
-		lastUpdated => 1100231440
+		lastUpdated => 1101773945
 	},
 
 	'6' => {
