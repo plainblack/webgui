@@ -51,7 +51,7 @@ Returns a message stating that this functionality can only be used by administra
 =cut
 
 sub adminOnly {
-	WebGUI::HTTP::setStatus("401 Admin Only");
+	WebGUI::HTTP::setStatus("401", "Admin Only");
 	my ($output, $sth, @data);
         $output = '<h1>'.WebGUI::International::get(35).'</h1>';
 	$output .= WebGUI::International::get(36);
@@ -68,7 +68,7 @@ Returns a message stating that the user does not have the required privileges to
 =cut
 
 sub insufficient {
-	WebGUI::HTTP::setStatus("401 Insufficient Privileges");
+	WebGUI::HTTP::setStatus("401", "Insufficient Privileges");
 	my ($output);
 	$output = '<h1>'.WebGUI::International::get(37).'</h1>';
 	$output .= WebGUI::International::get(38);
@@ -86,7 +86,7 @@ Returns a message stating that the user does not have the privileges necessary t
 =cut
 
 sub noAccess {
-	WebGUI::HTTP::setStatus("401 No Access");
+	WebGUI::HTTP::setStatus("401", "No Access");
    	my ($output);
    	if ($session{user}{userId} <= 1) {
       		$output = WebGUI::Operation::Auth::www_auth("init");
@@ -107,7 +107,7 @@ Returns a message stating that the user they requested information about is no l
 =cut
 
 sub notMember {
-	WebGUI::HTTP::setStatus("400 Not A Member");
+	WebGUI::HTTP::setStatus("400", "Not A Member");
 	my ($output);
 	$output = '<h1>'.WebGUI::International::get(345).'</h1>';
 	$output .= WebGUI::International::get(346);
@@ -124,7 +124,7 @@ Returns a message stating that the user made a request to delete something that 
 =cut
 
 sub vitalComponent {
-	WebGUI::HTTP::setStatus("403 Vital Component");
+	WebGUI::HTTP::setStatus("403", "Vital Component");
 	my ($output);
         $output = '<h1>'.WebGUI::International::get(40).'</h1>';
 	$output .= WebGUI::International::get(41);

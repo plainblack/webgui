@@ -120,7 +120,6 @@ sub page {
 	my $output = _processOperations();
 	if ($output ne "") {
 		$output = _generatePage($output);
-        	$output = WebGUI::HTTP::getHeader().$output;
 	} else {
         	my $useCache = (
 			$session{form}{op} eq "" && 
@@ -154,12 +153,12 @@ sub page {
 			} else {
 				$ttl = $session{page}{cacheTimeout};
 			}
-        		$output = WebGUI::HTTP::getHeader().$output;
-			$cache->set($output, $ttl) if ($useCache);
+			$cache->set($output, $ttl) if ($useCache && !WebGUI::HTTP::isRedirect());
 			WebGUI::PassiveProfiling::addPage();	# add wobjects on page to passive profile log
 		}
 	}
 	WebGUI::Affiliate::grabReferral();	# process affilliate tracking request
+       	$output = WebGUI::HTTP::getHeader().$output;
 	# This allows an operation or wobject to write directly to the browser.
 	$output = undef if ($session{page}{empty});
 	WebGUI::Session::close() unless ($useExistingSession);

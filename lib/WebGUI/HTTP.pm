@@ -34,6 +34,10 @@ use WebGUI::HTTP;
  WebGUI::HTTP::setRedirect($url);
  WebGUI::HTTP::setCookie($name,$value);
  WebGUI::HTTP::setNoHeader($bool);
+
+ $mimetype = WebGUI::HTTP::getMimeType();
+ $code = WebGUI::HTTP::getStatus();
+ $boolean = WebGUI::HTTP::isRedirect();
  
 =head1 METHODS
 
@@ -53,33 +57,34 @@ Generates an HTTP header.
 
 sub getHeader {
 	return undef if ($session{http}{noHeader});	
-	my $header;
-	unless (exists $session{http}{location}) {
-		unless ($session{http}{charset}) {
-			$session{http}{charset} = WebGUI::International::getLanguage($session{page}{languageId},"charset") || "ISO-8859-1";
-		}
-		unless ($session{http}{mimetype}) {
-			$session{http}{mimetype} = "text/html";
-		}
-		if ($session{setting}{preventProxyCache}) {
-       	        	$session{http}{expires} = "-1d";
-       	 	}
-		$header = $session{cgi}->header( 
-			-type => $session{http}{mimetype},
-			-charset => $session{http}{charset},
-			-cookie => $session{http}{cookie}, 
-			-status => $session{http}{status},
-			-attachment => $session{http}{filename},
-			-expires => $session{http}{expires}
+	my %params;
+	if (isRedirect()) {
+		%params = (
+			-location => $session{http}{location}
 			);
 	} else {
-		$header = $session{cgi}->header( 
-			-cookie => $session{http}{cookie}, 
-			-location => $session{http}{location},
-			-status => $session{http}{status}
+		%params = (
+			-type => $session{http}{mimetype} || "text/html",
+			-charset => $session{http}{charset} || WebGUI::International::getLanguage($session{page}{languageId},"charset") || "UTF-8"
 			);
+		if ($session{setting}{preventProxyCache}) {
+       	        	$params{"-expires"} = "-1d";
+       	 	}
+		if ($session{http}{filename}) {
+			$params{"-attachment"} => $session{http}{filename};
+		}
 	}
-	return $header;
+	$params{"-cookie"} = $session{http}{cookie};
+	if($session{env}{MOD_PERL}) {
+        	my $r = Apache->request;
+                if(defined($r)) {
+                	$r->custom_response($session{http}{status}, '<!-- '.$session{http}{statusDescription}.' -->' );
+                        $r->status($session{http}{status});
+                }
+        } else {
+		$params{"-status"} = $session{http}{status}.' '.$session{http}{statusDescription};
+	}
+	return $session{cgi}->header(%params);
 }
 
 
@@ -105,9 +110,21 @@ Returns the current HTTP status code, if one has been set.
 =cut
 
 sub getStatus {
-	return $session{http}{status} || "200 OK";
+	return $session{http}{status} || "200";
 }
 
+
+#-------------------------------------------------------------------
+
+=head2 isRedirect ( )
+
+Returns a boolean value indicating whether the current page will redirect to some other location.
+
+=cut
+
+sub isRedirect {
+	return (getStatus() eq "302");
+}
 
 #-------------------------------------------------------------------
 
@@ -215,24 +232,29 @@ The URL to redirect to.
 
 sub setRedirect {
 	$session{http}{location} = shift;
-	setStatus("302 Redirect");
+	setStatus("302", "Redirect");
 }
 
 
 #-------------------------------------------------------------------
 
-=head2 setStatus ( status )
+=head2 setStatus ( code, description )
 
 Sets the HTTP status code.
 
-=head3 status
+=head3 code
 
-An HTTP status code. It takes the form of "NNN Message" where NNN is a 3 digit status number and Message is some text explaining the status number.
+An HTTP status code. It is a 3 digit status number.
+
+=head3 description
+
+An HTTP status code description. It is a little one line of text that describes the status code.
 
 =cut
 
 sub setStatus {
 	$session{http}{status} = shift;
+	$session{http}{statusDescription} = shift;
 }
 
 1;

@@ -6,6 +6,10 @@
  - Fixed a bug in the URL checker javascript that wouldn't allow for relative
    paths.
  - bugfix [ 991205 ] 6.0.3 Data Form data field sequence problem (Steven Chan)
+ - bugfix [ 1028498 ] Problem with page link in navigation
+ - bugfix [ 1031411 ] FileCache Problem since V6.2.x
+ - Fixed a problem with HTTP codes being spewed into the page content on codes
+   other than 200.
 
 6.2.3
  - Changed to new POD format.
