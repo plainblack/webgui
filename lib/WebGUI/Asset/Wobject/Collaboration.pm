@@ -83,7 +83,7 @@ sub appendPostListTemplateVars {
                         "isThird"=>(($i+1)%3==0),
                         "isFourth"=>(($i+1)%4==0),
                         "isFifth"=>(($i+1)%5==0),
-                	"currentUserIsPoster"=>$post->isPoster
+                	"user.isPoster"=>$post->isPoster
                         });
 		$i++;
 	}

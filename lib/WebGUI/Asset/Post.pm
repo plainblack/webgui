@@ -334,7 +334,7 @@ sub getTemplateVars {
 	my $self = shift;
 	my %var = (%{$self->get});
 	$var{"userId"} = $self->get("ownerUserId");
-	$var{"user.isPoster"} = ($self->get("ownerUserId") eq $session{user}{userId});
+	$var{"user.isPoster"} = $self->isPoster;
 
 	$var{"dateSubmitted.human"} = epochToHuman($self->get("dateSubmitted"));
 	$var{"dateUpdated.human"} = epochToHuman($self->get("dateUpdated"));
