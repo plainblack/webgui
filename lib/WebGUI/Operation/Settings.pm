@@ -181,7 +181,7 @@ sub www_editFileSettingsSave {
 		_saveSetting("lib");
 		_saveSetting("maxAttachmentSize");
 		_saveSetting("thumbnailSize");
-		_saveSetting("attachementDirectoryWeb");
+		_saveSetting("attachmentDirectoryWeb");
 		_saveSetting("attachmentDirectoryLocal");
                 return www_manageSettings();
         } else {
