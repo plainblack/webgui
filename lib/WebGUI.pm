@@ -64,6 +64,7 @@ sub page {
 	my $output = _processOperations();
 	if ($output eq "") {
 		my $asset = WebGUI::Asset->newByUrl($assetUrl);
+		$session{asset} = $asset;
 		my $method = "view";
 		if (exists $session{form}{func}) {
 			$method = $session{form}{func};

@@ -160,6 +160,19 @@ sub purge {
 
 sub view {
 	my $self = shift;
+	my $storage = WebGUI::Storage->get($self->get("storageId"));
+use WebGUI::Utility;
+	if (isIn($storage->getFileExtension($self->get("filename")),qw("jpg","png","gif"))) {
+		return '<a href="'.$storage->getUrl($self->get("filename")).'"><img src="'.$storage->getUrl($self->get("filename")).'" alt="test" border="0" /></a>';
+	} else {
+		return '<a href="'.$storage->getUrl($self->get("filename")).'"><img src="'.$storage->getFileIconUrl($self->get("filename")).'" alt="test" border="0" />'.$self->get("filename").'</a>';
+	}
+}
+
+
+sub view2 {
+
+	my $self = shift;
 	if ($session{var}{adminOn}) {
 		return $self->www_edit;
 	}

@@ -77,7 +77,10 @@ sub process {
 			});
 		$i++;
 	}
-	$var{'contenttypes_loop'} = \@addcontent;
+#	$var{'contenttypes_loop'} = \@addcontent;
+foreach my $link (@{$session{asset}->getAssetAdderLinks}) {
+                push(@{$var{'contenttypes_loop'}},{'contenttype.url'=>$link->{url},'contenttype.label'=>$link->{label}});
+        }
 	$var{'addpage.url'} = WebGUI::URL::page('op=editPage&npp='.$session{page}{pageId});
 	$var{'addpage.label'} = WebGUI::International::get(2);
   #--clipboard paster

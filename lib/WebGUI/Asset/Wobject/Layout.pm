@@ -137,7 +137,6 @@ sub view {
 		["descendants"],
 		{
 			returnObjects=>1,
-			excludeClasses=>["WebGUI::Asset::Wobject::Layout"],
 			endingLineageLength=>$self->getLineageLength+1
 		}
 	);
@@ -163,11 +162,19 @@ sub view {
 	}
 	# deal with unplaced children
 	foreach my $child (@{$children}) {
-		unless (isIn($child->getId, @found)) {
-			push(@{$vars{"position1_loop"}},{
-				id=>$child->getId,
-				content=>$child->view
+		if (ref $child eq "WebGUI::Asset::Wobject::Layout") {
+			push(@{$vars{"sublayout_loop"}}, {
+				id => $child->getId,
+				url => $child->getUrl,
+				title => $child->get("title")
 				});
+		} else {
+			unless (isIn($child->getId, @found)) {
+				push(@{$vars{"position1_loop"}},{
+					id=>$child->getId,
+					content=>$child->view
+					});
+			}
 		}
 	}
 	$vars{showAdmin} = ($session{var}{adminOn} && $self->canEdit);
