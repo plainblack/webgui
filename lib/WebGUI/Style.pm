@@ -119,11 +119,11 @@ sub process {
 	$var{'head.tags'} = '
 		<meta name="generator" content="WebGUI '.$WebGUI::VERSION.'" />
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-                <script>
+                <script type="text/javascript">
                         function getWebguiProperty (propName) {
                                 var props = new Array();
                                 props["extrasURL"] = "'.$session{config}{extrasURL}.'";
-                                props["pageURL"] = "'.WebGUI::URL::page().'";
+                                props["pageURL"] = "'.WebGUI::URL::page(undef, undef, 1).'";
                                 return props[propName];
                         }
                 </script>

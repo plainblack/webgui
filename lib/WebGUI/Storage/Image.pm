@@ -169,7 +169,7 @@ sub getSizeInPixels {
         my $image = Image::Magick->new;
         my $error = $image->Read($self->getPath($filename));
 	if ($error) {
-		WebGUI::ErrorHandler::warn("Couldn't read image for resizing: ".$error);
+		WebGUI::ErrorHandler::warn("Couldn't read image to check the size of it: ".$error);
 		return 0;
 	}
         return $image->Get('width','height');

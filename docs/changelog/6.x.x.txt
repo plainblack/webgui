@@ -2,6 +2,17 @@
  - fix [ 1160953 ] JavaScript Errors in admin console - IE
  - Fixed a drag and drop problem.
  - fix [ 1168195 ] Asset manager: Space between Size and unit
+ - Fixed a bug where sticky threads were not acting sticky in the CS.
+ - fix [ 1169116 ] AdminToggle macro doesn't display correct linktext
+ - fix [ 1168189 ] Asset Manager: Double Title entries
+ - fix [ 1168181 ] Edit in Asset manager -> wrong folder
+ - fix [ 1167971 ] attachment loop code for Asset::Post::getTemplateVariables
+ - fix [ 1168867 ] WebGUI Script XHTML 1.0 Non-Compliant
+ - Fixed a fatal crash bug caused by calling the old authentication urls.
+ - fix [ 1168318 ] Rating often not working
+ - fix [ 1167937 ] Asset Manager and No-Cache Imcompatible
+ - fix [ 1167917 ] Link to Page Tree and No-Cache Imcompatible
+ - fix [ 1168084 ] file uploads don't work.
 
 
 6.5.3

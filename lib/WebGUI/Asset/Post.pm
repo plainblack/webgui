@@ -418,6 +418,7 @@ sub getTemplateVars {
 				$var{"attachment.url"} = $storage->getUrl($filename);
 				$var{"attachment.icon"} = $storage->getFileIconUrl($filename);
 				$var{"attachment.name"} = $filename;
+				$gotAttachment = 1;
        			}	
 			push(@{$var{"attachment_loop"}}, {
 				url=>$storage->getUrl($filename),
@@ -691,11 +692,11 @@ An integer between 1 and 5 (5 being best) to rate this post with.
 
 sub rate {
 	my $self = shift;
-	my $rating = shift;
+	my $rating = shift || 3;
 	unless ($self->hasRated) {
         	WebGUI::SQL->write("insert into Post_rating (assetId,userId,ipAddress,dateOfRating,rating) values ("
                 	.quote($self->getId).", ".quote($session{user}{userId}).", ".quote($session{env}{REMOTE_ADDR}).", 
-			".WebGUI::DateTime::time().", $rating)");
+			".WebGUI::DateTime::time().", ".quote($rating).")");
         	my ($count) = WebGUI::SQL->quickArray("select count(*) from Post_rating where assetId=".quote($self->getId));
         	$count = $count || 1;
         	my ($sum) = WebGUI::SQL->quickArray("select sum(rating) from Post_rating where assetId=".quote($self->getId));

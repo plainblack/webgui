@@ -234,7 +234,7 @@ sub makeCompliant {
 
 #-------------------------------------------------------------------
 
-=head2 page ( [ pairs, useSiteUrl ] )
+=head2 page ( [ pairs, useSiteUrl, skipPreventProxyCache ] )
 
 Returns the URL of the current page.
 
@@ -248,11 +248,16 @@ Name value pairs to add to the URL in the form of:
 
 If set to "1" we'll use the full site URL rather than the script (gateway) URL.
 
+=head3 skipPreventProxyCache
+
+If set to "1" we'll skip adding the prevent proxy cache code to the url.
+
 =cut
 
 sub page {
 	my $pairs = shift;
         my $useFullUrl = shift;
+	my $skipPreventProxyCache = shift;
         my $url;
         if ($useFullUrl) {
                 $url = getSiteURL();
@@ -261,7 +266,7 @@ sub page {
        	my $pathinfo = $session{env}{PATH_INFO};
 	$pathinfo =~ s/^\/(.*)/$1/;
         $url .= $pathinfo;
-        if ($session{setting}{preventProxyCache} == 1) {
+        if ($session{setting}{preventProxyCache} == 1 && !$skipPreventProxyCache) {
                 $url = append($url,"noCache=".randint(0,1000).';'.time());
         }
         if ($pairs) {

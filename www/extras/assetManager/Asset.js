@@ -174,7 +174,7 @@ this.getWrappedURL = function() {
 	if (this.url.indexOf("?") == -1) {
 		return "http://" + AssetManager_getManager().tools.getHostName(location.href) + this.url + "?";
 	}else {
-		return "http://" + AssetManager_getManager().tools.getHostName(location.href) + url + "&";
+		return "http://" + AssetManager_getManager().tools.getHostName(location.href) + this.url + "&";
     }
 }
 

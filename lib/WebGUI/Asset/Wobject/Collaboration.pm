@@ -854,7 +854,7 @@ sub view {
 		left join asset on Thread.assetId=asset.assetId
 		left join Post on Post.assetId=asset.assetId 
 		where asset.parentId=".quote($self->getId)." and asset.state='published' and asset.className='WebGUI::Asset::Post::Thread' and $constraints 
-		order by ".$sortBy." ".$sortOrder;
+		order by Thread.isLocked desc, ".$sortBy." ".$sortOrder;
 	my $p = WebGUI::Paginator->new($self->getUrl,$self->get("threadsPerPage"));
 	$self->appendPostListTemplateVars(\%var, $sql, $p);
 	$self->appendTemplateLabels(\%var);

@@ -2315,6 +2315,7 @@ sub www_copy {
 	my $self = shift;
 	return WebGUI::Privilege::insufficient() unless $self->canEdit;
 	my $newAsset = $self->duplicate;
+	$newAsset->update({ title=>$newAsset->get("title").' (copy)'});
 	$newAsset->cut;
 	return $self->getContainer->www_view;
 }
@@ -2334,6 +2335,7 @@ sub www_copyList {
 		my $asset = WebGUI::Asset->newByDynamicClass($assetId);
 		if ($asset->canEdit) {
 			my $newAsset = $asset->duplicate;
+			$newAsset->update({ title=>$newAsset->get("title").' (copy)'});
 			$newAsset->cut;
 		}
 	}
@@ -2529,12 +2531,16 @@ sub www_editSave {
 	}
 	$object->processPropertiesFromFormPost;
 	$object->updateHistory("edited");
-	return $self->www_manageAssets if ($session{form}{proceed} eq "manageAssets" && $session{form}{assetId} eq "new");
+	if ($session{form}{proceed} eq "manageAssets") {
+		$session{asset} = $object->getParent;
+		return $object->getParent->www_manageAssets;
+	}
 	if ($session{form}{proceed} ne "") {
 		my $method = "www_".$session{form}{proceed};
 		$session{asset} = $object;
 		return $object->$method();
 	}
+	$session{asset} = $object->getContainer;
 	return $self->getContainer->www_view;
 }
 
@@ -3035,7 +3041,7 @@ Main page to manage assets. Renders an AdminConsole with a list of assets. If ca
 sub www_manageAssets {
 	my $self = shift;
 	return WebGUI::Privilege::insufficient() unless $self->canEdit;
-	my $children = $self->getLineage(["children"],{returnQuickReadObjects=>1});
+	my $children = $self->getLineage(["children"],{returnObjects=>1});
 	my $output = $self->getAssetManagerControl($children);
 	$output .= ' <div class="adminConsoleSpacer">
             &nbsp;

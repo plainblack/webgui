@@ -194,14 +194,13 @@ sub getStorageLocation {
 sub processPropertiesFromFormPost {
 	my $self = shift;
 	$self->SUPER::processPropertiesFromFormPost;
-	my $storage = $self->getStorageLocation->create;
+	# might have to create a new storage location for versioning
+	my $storage = ($self->get("storageId") eq "") ? $self->getStorageLocation : $self->getStorageLocation->create;
 	my $filename = $storage->addFileFromFormPost("file");
 	if (defined $filename) {
-		my $oldVersions;
+		my $oldVersions = $self->get("olderVersions");
 		if ($self->get("filename")) { # do file versioning
-			my @old = split("\n",$self->get("olderVersions"));
-			push(@old,$self->get("storageId")."|".$self->get("filename"));
-			$oldVersions = join("\n",@old);
+			$oldVersions .= "\n".$self->get("storageId")."|".$self->get("filename");
 		}
 		my %data;
 		$data{filename} = $filename;
