@@ -197,14 +197,15 @@ sub www_editForum {
 	if($session{form}{forumId} ne "new"){
 		my ($sth, $data, %MBoards);
 		tie %MBoards, "Tie::IxHash";
-		$MBoards{0} = "--- Move Forum ---";
+		$MBoards{0} = WebGUI::International::get(92, $_[0]->get("namespace"));
 		$sth = WebGUI::SQL->read("SELECT wobject.wobjectId, wobject.title as wobjectTitle, page.title as pageTitle FROM wobject LEFT JOIN page using(pageId) WHERE wobject.namespace='MessageBoard' and page.pageId NOT IN (2,3,4,5) AND wobject.wobjectId!=".quote($_[0]->get("wobjectId"))." order by page.title ASC");
 		while ($data = $sth->hashRef){
 			$MBoards{$data->{wobjectId}} = $data->{pageTitle}." - ".$data->{wobjectTitle};
 		}
 		$f->selectList(
 			-name=>"toMBoardId",
-			-label=>"Move Forum to Message Board",
+			-label=>WebGUI::International::get(90, $_[0]->get("namespace")),
+			-subtext=>WebGUI::International::get(91, $_[0]->get("namespace")),
 			-options=>\%MBoards,
 			-value=>[$session{form}{toMBoardId}]
 			);
