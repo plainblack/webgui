@@ -1185,6 +1185,7 @@ sub getForumTemplateVars {
 			'thread.root.time'=>formatPostTime($root->get("dateOfPost")),
 			'thread.root.user.profile'=>formatUserProfileURL($root->get("userId")),
 			'thread.root.user.name'=>$root->get("username"),
+			'thread.root.user.alias'=>WebGUI::User->new($root->get("userId"))->profileField("alias");
 			'thread.root.user.id'=>$root->get("userId"),
 			'thread.root.user.isVisitor'=>($root->get("userId") == 1),
 			'thread.root.status'=>formatStatus($root->get("status")),
@@ -1261,6 +1262,7 @@ sub getPostTemplateVars {
 	$var->{'post.user.isVisitor'} = ($post->get("userId") == 1);
 	$var->{'post.user.label'} = WebGUI::International::get(244);
 	$var->{'post.user.name'} = $post->get("username");
+	$var->{'post.user.alias'} = WebGUI::User->new($post->get("userId"))->profileField("alias");
 	$var->{'post.user.Id'} = $post->get("userId");
 	$var->{'post.user.Profile'} = formatUserProfileURL($post->get("userId"));
 	$var->{'post.url'} = formatThreadURL($callback,$post->get("forumPostId"));
