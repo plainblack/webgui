@@ -148,6 +148,12 @@ sub www_editNavigation {
 
         # The documented interface of HTMLForm::combo didn't work. However the old functional interface does...
         $f->getTab("properties")->combo("startAt",$levels,WebGUI::International::get(25,'Navigation'),[$startAt]);
+        $f->getTab("properties")->selectList(
+                -name=>'method',
+                -label=>WebGUI::International::get(28,'Navigation'),
+                -options=>WebGUI::Navigation::getMethodNames(),
+                -value=>[$session{form}{method} || $config->{method}]
+                );
 	tie my %stopAtLevels, 'Tie::IxHash';
 	%stopAtLevels = (	'-1' 	=> 'no limit',
 				'0' 	=> '0. '.WebGUI::International::get(1,'Navigation'),
@@ -185,12 +191,6 @@ sub www_editNavigation {
                 -label=>WebGUI::International::get(27,'Navigation'),
 		-options=>\%depths,
                 -value=>[$session{form}{depth} || $config->{depth}]
-                );
-        $f->getTab("properties")->selectList(
-                -name=>'method',
-                -label=>WebGUI::International::get(28,'Navigation'),
-                -options=>WebGUI::Navigation::getMethodNames(),
-                -value=>[$session{form}{method} || $config->{method}]
                 );
 	$f->getTab("properties")->yesNo(
 		-name=>'showSystemPages',
