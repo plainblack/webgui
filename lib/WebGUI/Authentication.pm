@@ -10,8 +10,6 @@ package WebGUI::Authentication;
 # http://www.plainblack.com			info@plainblack.com
 #-------------------------------------------------------------------
 
-use WebGUI::Authentication::LDAP;
-use WebGUI::Authentication::WebGUI;
 use WebGUI::SQL;
 use strict;
 

@@ -14,6 +14,7 @@ use Digest::MD5 qw(md5_base64);
 use Exporter;
 use strict qw(vars subs);
 use Tie::CPHash;
+use Tie::IxHash;
 use WebGUI::DateTime;
 use WebGUI::HTMLForm;
 use WebGUI::Icon;
@@ -55,7 +56,7 @@ sub _submenu {
 
 #-------------------------------------------------------------------
 sub www_addUser {
-        my (@array, $output, $groups, %hash, $f, $cmd, $html);
+        my (@array, $output, $groups, %hash, $f, $cmd, $html, %status);
 	tie %hash, 'Tie::IxHash';
         return WebGUI::Privilege::adminOnly() unless (WebGUI::Privilege::isInGroup(3));
         $output .= helpIcon(5);
@@ -66,8 +67,15 @@ sub www_addUser {
 	}
         $f->hidden("op","addUserSave");
         $f->text("username",WebGUI::International::get(50),$session{form}{username});
-        $f->password("identifier",WebGUI::International::get(51));
         $f->email("email",WebGUI::International::get(56));
+        
+	tie %status, 'Tie::IxHash';
+	%status = (
+		Active		=>WebGUI::International::get(817),
+		Deactivated	=>WebGUI::International::get(818),
+		Selfdestructed	=>WebGUI::International::get(819)
+		);
+	$f->select("status",\%status,WebGUI::International::get(816), ['Active']);
 
 	%hash = map {$_ => $_} @{$session{authentication}{available}};
 	$f->select("authMethod",\%hash,WebGUI::International::get(164),[$session{setting}{authMethod}]);
@@ -97,6 +105,7 @@ sub www_addUserSave {
 	unless ($uid) {
                	$encryptedPassword = Digest::MD5::md5_base64($session{form}{identifier});
 		$u = WebGUI::User->new("new");
+		$session{form}{uid}=$u->userId;
 		$u->username($session{form}{username});
 
 		foreach (@{$session{authentication}{available}}) {
@@ -104,12 +113,12 @@ sub www_addUserSave {
                 	eval{&$cmd};
                 	WebGUI::ErrorHandler::fatalError("Unable to load method saveAddUser on Authentication module: $_. ".$@) if($@);
 	 	}
-
+		
+		$u->status($session{form}{status});
 		$u->authMethod($session{form}{authMethod});
                	@groups = $session{cgi}->param('groups');
 		$u->addToGroups(\@groups);
 		$u->profileField("email",$session{form}{email});
-		$session{form}{uid}=$u->userId;
                	return www_editUser();
 	} else {
 		$session{form}{op} = "addUser";
@@ -209,7 +218,7 @@ sub www_editGroupingSave {
 #-------------------------------------------------------------------
 sub www_editUser {
 	return WebGUI::Privilege::adminOnly() unless (WebGUI::Privilege::isInGroup(3));
-        my ($output, $f, $u, $cmd, $html, %hash);
+        my ($output, $f, $u, $cmd, $html, %hash, %status);
 	$u = WebGUI::User->new($session{form}{uid});
         $output .= helpIcon(5);
 	$output .= '<h1>'.WebGUI::International::get(168).'</h1>';
@@ -221,6 +230,14 @@ sub www_editUser {
         $f->readOnly(epochToHuman($u->dateCreated,"%z"),WebGUI::International::get(453));
         $f->readOnly(epochToHuman($u->lastUpdated,"%z"),WebGUI::International::get(454));
         $f->text("username",WebGUI::International::get(50),$u->username);
+
+	tie %status, 'Tie::IxHash';
+	%status = (
+		Active		=>WebGUI::International::get(817),
+		Deactivated	=>WebGUI::International::get(818),
+		Selfdestructed	=>WebGUI::International::get(819)
+		);
+	$f->select("status",\%status,WebGUI::International::get(816),[$u->status]);
 
 	%hash = map {$_ => $_} @{$session{authentication}{available}};	
        	$f->select("authMethod",\%hash,WebGUI::International::get(164),[$session{setting}{authMethod}]);
@@ -246,6 +263,7 @@ sub www_editUserSave {
 		$u = WebGUI::User->new($session{form}{uid});
 		$u->username($session{form}{username});
 		$u->authMethod($session{form}{authMethod});
+		$u->status($session{form}{status});
 		foreach (@{$session{authentication}{available}}) {
                 	$cmd = "WebGUI::Authentication::".$_."::saveEditUser";
                		eval{&$cmd};
@@ -382,23 +400,46 @@ sub www_editUserProfileSave {
 #-------------------------------------------------------------------
 sub www_listUsers {
 	return WebGUI::Privilege::adminOnly() unless (WebGUI::Privilege::isInGroup(3));
-	my ($output, $sth, %data, $f, @row, $p, $i, $search);
+	my ($output, $sth, %data, $f, @row, $p, $i, $search, %status, $selectedStatus);
 	tie %data, 'Tie::CPHash';
 	$output = helpIcon(8);
 	$output .= '<h1>'.WebGUI::International::get(149).'</h1>';
 	$output .= '<div align="center">';
+	tie %status, 'Tie::IxHash';
+	%status = (
+		"status like '%'"		=> WebGUI::International::get(821),
+		"status='Active'"		=> WebGUI::International::get(817),
+		"status='Deactivated'"		=> WebGUI::International::get(818),
+		"status='Selfdestructed'"	=> WebGUI::International::get(819)
+	);
 	$f = WebGUI::HTMLForm->new(1);
 	$f->hidden("op","listUsers");
 	$f->text("keyword",'',$session{form}{keyword});
+	$f->select(
+		-name	=> "status",
+		-value	=> [$session{form}{status} || "status like '%'"],
+		-options=> \%status
+	);
 	$f->submit(WebGUI::International::get(170));
+	$f->readOnly(WebGUI::International::get(822));
+	$f->checkbox (
+		-name	=> "searchWithinStatus",
+		-label	=> "searchWithinStatus",
+		-checked=> $session{form}{searchWithinStatus},
+	);	
 	$output .= $f->print;
 	$output .= '</div>';
+	$selectedStatus = $session{form}{status} || "status like '%'";	
 	if ($session{form}{keyword} ne "") {
-		$search = " where (users.username like '%".$session{form}{keyword}."%') ";
+		$selectedStatus = "status like '%'" unless ($session{form}{searchWithinStatus});
+		$search = " where (users.username like '%".$session{form}{keyword}."%' and ".$selectedStatus.") ";
+	} else {
+		$search = " where (".$selectedStatus.") ";
 	}
 	$sth = WebGUI::SQL->read("select * from users $search order by users.username");
 	while (%data = $sth->hash) {
 		$row[$i] = '<tr class="tableData">';
+		$row[$i] .= ($data{status} eq 'Active') ? '<td>&nbsp;</td>' : '<td>'.$data{status}.'</td>';
 		$row[$i] .= '<td><a href="'.WebGUI::URL::page('op=editUser&uid='.$data{userId})
 			.'">'.$data{username}.'</a></td>';
 		#$row[$i] .= '<td class="tableData">'.epochToHuman($data{dateCreated},"%z").'</td>';
@@ -410,6 +451,7 @@ sub www_listUsers {
         $p = WebGUI::Paginator->new(WebGUI::URL::page('op=listUsers&keyword='.$session{form}{keyword}),\@row);
         $output .= '<table border=1 cellpadding=5 cellspacing=0 align="center">';
 	$output .= '<tr>
+		<td class="tableHeader">'.WebGUI::International::get(816).'</td>
 		<td class="tableHeader">'.WebGUI::International::get(50).'</td></tr>';
 #		<td class="tableHeader">'.WebGUI::International::get(453).'</td>
 #		<td class="tableHeader">'.WebGUI::International::get(454).'</td></tr>';

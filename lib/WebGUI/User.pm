@@ -37,6 +37,7 @@ use WebGUI::Authentication;
  $karma = 		$u->karma;
  $lastUpdated = 	$u->lastUpdated;
  $languagePreference = 	$u->profileField("language",1);
+ $status =		$u->status("somestatus");
  $username = 		$u->username("jonboy");
 
  $u->addToGroups(\@arr);
@@ -305,6 +306,31 @@ sub profileField {
 
 #-------------------------------------------------------------------
 
+=head2 status ( [ value ] )
+
+ Returns the status of the user. 
+
+=item value
+
+ If specified, the status is set to this value. 
+ Possible values are 'Active', 'Selfdestructed' and 'Deactivated'.
+
+=cut
+
+sub status {
+        my ($class, $value);
+        $class = shift;
+        $value = shift;
+        if (defined $value) {
+                $class->{_user}{"status"} = $value;
+                WebGUI::SQL->write("update users set status=".quote($value).",
+                        lastUpdated=".time()." where userId=$class->{_userId}");
+        }
+        return $class->{_user}{"status"};
+}
+
+#-------------------------------------------------------------------
+
 =head2 username ( [ value ] )
 
  Returns the username. 
@@ -338,8 +364,5 @@ sub username {
 sub userId {
         return $_[0]->{_userId};
 }
-
-
-
 
 1;

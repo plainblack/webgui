@@ -261,7 +261,7 @@ sub www_deactivateAccountConfirm {
                 return WebGUI::Privilege::vitalComponent();
         } elsif (($session{user}{userId} != 1) and $session{setting}{selfDeactivation}) {
 		$u = WebGUI::User->new($session{user}{userId});
-		$u->delete;
+		$u->status("Selfdestructed");
 	        WebGUI::Session::end($session{var}{sessionId});
         }
         return www_displayLogin();
@@ -419,10 +419,13 @@ sub www_login {
 
 	if ($uid) {
 		$u = WebGUI::User->new($uid);
-
-		$cmd = $session{authentication}{$u->authMethod}."::validateUser";
-		$success = eval{&$cmd($uid, $session{form}{identifier})};
-		WebGUI::ErrorHandler::fatalError("Unable to load method validateUser on Authentication module: $_. ".$@) if($@);
+		if ($u->status eq 'Active') {
+			$cmd = $session{authentication}{$u->authMethod}."::validateUser";
+			$success = eval{&$cmd($uid, $session{form}{identifier})};
+			WebGUI::ErrorHandler::fatalError("Unable to load method validateUser on Authentication module: $_. ".$@) if($@);
+		} else {
+			$success = WebGUI::International::get(820);			
+		}
 	} else {
 		$success = WebGUI::International::get(68);
 	}
