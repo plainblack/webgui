@@ -187,10 +187,6 @@ our $HELP = {
 		body => '623',
 		related => [
 			{
-				tag => 'page template',
-				namespace => 'WebGUI'
-			},
-			{
 				tag => 'style template',
 				namespace => 'WebGUI'
 			}
@@ -333,10 +329,6 @@ our $HELP = {
 		title => '642',
 		body => '606',
 		related => [
-			{
-				tag => 'page template',
-				namespace => 'WebGUI'
-			},
 			{
 				tag => 'page delete',
 				namespace => 'WebGUI'
@@ -483,20 +475,7 @@ our $HELP = {
 			}
 		]
 	},
-	'page template' => {
-		title => '829',
-		body => '830',
-		related => [
-			{
-				tag => 'page add/edit',
-				namespace => 'WebGUI'
-			},
-			{
-				tag => 'templates manage',
-				namespace => 'Template'
-			}
-		]
-	},
+
 	'programmer macros' => {
 		title => '839',
 		body => '840',

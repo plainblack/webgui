@@ -2762,65 +2762,6 @@ Large sites using external group data will be making many calls to the external 
 		lastUpdated => 1053278208
 	},
 
-	'830' => {
-		message => q|Page templates are used to organize wobjects on your page. To do this you create page template positions. You can have any number of positions in your page template, but you must always have position one. The following are the variables available to page templates.
-
-<p>
-<b>NOTE:</b> The position elements can go up to 1 billion, which should be more than enough for the average site.
-
-<p>
-
-<b>position<i>X</i>_loop</b><br>
-The loop that defines a page position and contains a list of wobjects for that position. Replace <i>X</i> with a number, so position one would be <i>position1_loop</i>, and position two would be <i>position2_loop</i>, etc.
-<blockquote>
-
-<b>wobject.canView</b><br>
-A conditional indicating whether the current user has the privileges to view this wobject. 
-<p>
-
-<b>wobject.canEdit</b><br>
-A conditional indicating whether the current user has the privileges to edit this wobject.
-<p>
-
-<b>wobject.controls</b><br>
-The icon toolbar for manipulating the properties of this wobject and for copying, deleting and moving the wobject
-on the page.
-<p>
-
-<b>wobject.controls.drag</b><br>
-The toolbar icon that allows the wobject to be repositioned via a click and drag interface.
-<p>
-
-<b>wobject.id</b><br>
-The unique identifier for this wobject.
-<p>
-
-<b>wobject.isInDateRange</b><br>
-A conditional indicating whether the wobject is scheduled to be displayed right now. The variable <i>wobject.canView</i> already takes this into account, but content managers can always view content, so this is an extra check so they don't have to see the wobject if it's not scheduled to appear yet, or if it's end date has already passed.
-<p>
-
-<b>wobject.content</b><br>
-The content produced by the wobject.
-<p>
-
-</blockquote>
-
-<p>
-
-<b>page.canEdit</b><br>
-A conditional indicating whether the current user has the privileges to edit this page.
-<p>
-
-<b>page.controls</b><br>
-The toolbar for manipulating the properties of the page.
-<p>
-
-
-
-|,
-		lastUpdated => 1102027873,
-	},
-
 	'754' => {
 		message => q|Manage the users in this group.|,
 		lastUpdated => 1036866994
