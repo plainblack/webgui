@@ -416,7 +416,7 @@ sub www_edit {
 		});
 	$var{'endDate.form'} = WebGUI::Form::dateTime({
 		name  => 'endDate',
-		value => $self->get("startDate")
+		value => $self->get("endDate")
 		});
 	$var{'form.submit'} = WebGUI::Form::submit();
 	$var{'form.footer'} = WebGUI::Form::formFooter();
