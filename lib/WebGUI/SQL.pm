@@ -36,7 +36,10 @@ Package for interfacing with SQL databases. This package implements Perl DBI fun
 =head1 SYNOPSIS
 
  use WebGUI::SQL;
- $sth = WebGUI::SQL->new($sql);
+
+ my $sth = WebGUI::SQL->prepare($sql);
+ $sth->execute(@values);
+
  $sth = WebGUI::SQL->read($sql);
  $sth = WebGUI::SQL->unconditionalRead($sql);
  @arr = $sth->array;
@@ -45,6 +48,12 @@ Package for interfacing with SQL databases. This package implements Perl DBI fun
  $hashRef = $sth->hashRef;
  $num = $sth->rows;
  $sth->finish;
+
+ WebGUI::SQL->write($sql);
+
+ WebGUI::SQL->beginTransaction;
+ WebGUI::SQL->commit;
+ WebGUI::SQL->rollback;
 
  @arr = WebGUI::SQL->buildArray($sql);
  $arrayRef = WebGUI::SQL->buildArrayRef($sql);
@@ -55,8 +64,6 @@ Package for interfacing with SQL databases. This package implements Perl DBI fun
  %hash = WebGUI::SQL->quickHash($sql);
  $hashRef = WebGUI::SQL->quickHashRef($sql);
  $text = WebGUI::SQL->quickTab($sql);
-
- WebGUI::SQL->write($sql);
 
  $id = getNextId("wobjectId");
  $string = quote($string);
@@ -78,6 +85,29 @@ Returns the next row of data as an array.
 
 sub array {
         return $_[0]->{_sth}->fetchrow_array() or WebGUI::ErrorHandler::fatalError("Couldn't fetch array. ".$_[0]->{_sth}->errstr);
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 beginTransaction ( [ dbh ])
+
+Starts a transaction sequence. To be used with commit and rollback. Any writes after this point will not be applied to the database until commit is called.
+
+=over
+
+=item dbh
+
+A database handler. Defaults to the WebGUI default database handler.
+
+=back
+
+=cut
+
+sub beginTransaction {
+	my $class = shift;
+	my $dbh = shift;
+	$dbh->begin_work;
 }
 
 
@@ -202,6 +232,29 @@ sub buildHashRef {
                                                                                                                                                              
 #-------------------------------------------------------------------
 
+=head2 commit ( [ dbh ])
+
+Ends a transaction sequence. To be used with beginTransaction. Applies all of the writes since beginTransaction to the database.
+
+=over
+
+=item dbh
+
+A database handler. Defaults to the WebGUI default database handler.
+
+=back
+
+=cut
+
+sub commit {
+	my $class = shift;
+	my $dbh = shift;
+	$dbh->commit;
+}
+
+
+#-------------------------------------------------------------------
+
 =head2 errorCode {
 
 Returns an error code for the current handler.
@@ -228,9 +281,31 @@ sub errorMessage {
 
 #-------------------------------------------------------------------
 
+=head2 execute ( values )
+
+Executes a prepared SQL statement.
+
+=over
+
+=item values
+
+A list of values to be used in the placeholders defined in the prepared statement.
+
+=back
+
+=cut
+
+sub execute {
+	my $self = shift;
+	$self->{_sth}->execute(@_) or WebGUI::ErrorHandler::fatalError("Couldn't execute prepared statement: ". DBI->errstr);
+}
+
+
+#-------------------------------------------------------------------
+
 =head2 finish ( )
 
-Ends a query after calling the "new" or "read" methods.
+Ends a query after calling the "read" method.
 
 =cut
 
@@ -354,35 +429,35 @@ sub hashRef {
 
 #-------------------------------------------------------------------
 
-=head2 new ( sql [, dbh ] )
+=head2 prepare ( sql [, dbh ] ) {
 
-Constructor. Returns a statement handler.
+Returns a statement handler. To be used in creating prepared statements. Use with the execute method.
 
 =over
 
 =item sql
 
-An SQL query. 
+An SQL statement. Can use the "?" placeholder for maximum performance on multiple statements with the execute method.
 
 =item dbh
 
-By default this method uses the WebGUI database handler. However, you may choose to pass in your own if you wish.
+A database handler. Defaults to the WebGUI default database handler.
 
 =back
 
 =cut
 
-sub new {
-        my $class = shift;
-        my $sql = shift;
-        my $dbh = shift || $WebGUI::Session::session{dbh};
+sub prepare {
+	my $class = shift;
+	my $sql = shift;
+	my $dbh = shift || $WebGUI::Session::session{dbh};
 	if ($WebGUI::Session::session{setting}{showDebug}) {
 		push(@{$WebGUI::Session::session{SQLquery}},$sql);
 	}
         my $sth = $dbh->prepare($sql) or WebGUI::ErrorHandler::fatalError("Couldn't prepare statement: ".$sql." : ". DBI->errstr);
-        $sth->execute or WebGUI::ErrorHandler::fatalError("Couldn't execute statement: ".$sql." : ". DBI->errstr);
 	bless ({_sth => $sth}, $class);
 }
+
 
 
 #-------------------------------------------------------------------
@@ -407,7 +482,7 @@ By default this method uses the WebGUI database handler. However, you may choose
 
 sub quickArray {
 	my ($sth, @data);
-        $sth = WebGUI::SQL->new($_[1],$_[2]);
+        $sth = WebGUI::SQL->read($_[1],$_[2]);
 	@data = $sth->array;
 	$sth->finish;
 	return @data;
@@ -436,7 +511,7 @@ By default this method uses the WebGUI database handler. However, you may choose
 
 sub quickCSV {
         my ($sth, $output, @data);
-        $sth = WebGUI::SQL->new($_[1],$_[2]);
+        $sth = WebGUI::SQL->read($_[1],$_[2]);
         $output = join(",",$sth->getColumnNames)."\n";
         while (@data = $sth->array) {
                 makeArrayCommaSafe(\@data);
@@ -469,7 +544,7 @@ By default this method uses the WebGUI database handler. However, you may choose
 
 sub quickHash {
         my ($sth, $data);
-        $sth = WebGUI::SQL->new($_[1],$_[2]);
+        $sth = WebGUI::SQL->read($_[1],$_[2]);
         $data = $sth->hashRef;
         $sth->finish;
 	if (defined $data) {
@@ -503,7 +578,7 @@ sub quickHashRef {
 	my $self = shift;
 	my $sql = shift;
 	my $dbh = shift;
-        my $sth = WebGUI::SQL->new($sql,$dbh);
+        my $sth = WebGUI::SQL->read($sql,$dbh);
         my $data = $sth->hashRef;
         $sth->finish;
         if (defined $data) {
@@ -535,7 +610,7 @@ By default this method uses the WebGUI database handler. However, you may choose
 
 sub quickTab {
         my ($sth, $output, @data);
-        $sth = WebGUI::SQL->new($_[1],$_[2]);
+        $sth = WebGUI::SQL->read($_[1],$_[2]);
 	$output = join("\t",$sth->getColumnNames)."\n";
 	while (@data = $sth->array) {
                 makeArrayTabSafe(\@data);
@@ -573,7 +648,7 @@ sub quote {
 
 =head2 read ( sql [, dbh ] )
 
-An alias of the "new" method. Returns a statement handler.
+Returns a statement handler. This is a utility method that runs both a prepare and execute all in one.
 
 =over
 
@@ -590,7 +665,35 @@ By default this method uses the WebGUI database handler. However, you may choose
 =cut
 
 sub read {
-     	return WebGUI::SQL->new($_[1],$_[2],$_[3]);
+	my $class = shift;
+	my $sql = shift;
+	my $dbh = shift;
+	my $sth = WebGUI::SQL->prepare($sql, $dbh);
+	$sth->execute;
+	return $sth;
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 rollback ( [ dbh ])
+
+Ends a transaction sequence. To be used with beginTransaction. Cancels all of the writes since beginTransaction.
+
+=over
+
+=item dbh
+
+A database handler. Defaults to the WebGUI default database handler.
+
+=back
+
+=cut
+
+sub rollback {
+	my $class = shift;
+	my $dbh = shift;
+	$dbh->rollback;
 }
 
 
@@ -675,12 +778,16 @@ By default this method uses the WebGUI database handler. However, you may choose
 =cut
 
 sub unconditionalRead {
-        my ($sth,$dbh);
-	$dbh = $_[2] || $WebGUI::Session::session{dbh};
-        $sth = $dbh->prepare($_[1]) or WebGUI::ErrorHandler::warn("Unconditional read failed: ".$_[1]." : ".DBI->errstr);
+	my $class = shift;
+	my $sql = shift;
+	my $dbh = shift || $WebGUI::Session::session{dbh};
+	if ($WebGUI::Session::session{setting}{showDebug}) {
+		push(@{$WebGUI::Session::session{SQLquery}},$sql);
+	}
+        my $sth = $dbh->prepare($sql) or WebGUI::ErrorHandler::warn("Unconditional read failed: ".$sql." : ".DBI->errstr);
         if ($sth) {
-        	$sth->execute or WebGUI::ErrorHandler::warn("Unconditional read failed: ".$_[1]." : ".DBI->errstr);
-        	bless ({_sth => $sth}, $_[0]);
+        	$sth->execute or WebGUI::ErrorHandler::warn("Unconditional read failed: ".$sql." : ".DBI->errstr);
+        	bless ({_sth => $sth}, $class);
         }       
 }
 
@@ -689,7 +796,7 @@ sub unconditionalRead {
 
 =head2 write ( sql [, dbh ] )
 
-A method specifically designed for writing to the database in an efficient manner. Writing can be accomplished using the "new" method, but it is not as efficient.
+A method specifically designed for writing to the database in an efficient manner. 
 
 =over
 
@@ -706,9 +813,13 @@ By default this method uses the WebGUI database handler. However, you may choose
 =cut
 
 sub write {
-	my ($dbh);
-	$dbh = $_[2] || $WebGUI::Session::session{dbh};
-     	$dbh->do($_[1]) or WebGUI::ErrorHandler::fatalError("Couldn't prepare statement: ".$_[1]." : ". DBI->errstr);
+	my $class = shift;
+	my $sql = shift;
+	my $dbh = shift || $WebGUI::Session::session{dbh};
+	if ($WebGUI::Session::session{setting}{showDebug}) {
+		push(@{$WebGUI::Session::session{SQLquery}},$sql);
+	}
+     	$dbh->do($sql) or WebGUI::ErrorHandler::fatalError("Couldn't write to the database: ".$sql." : ". DBI->errstr);
 }
 
 
