@@ -49,83 +49,104 @@ blank, this will be set to "Untitled".
 <p>
 <b>^International("411","Asset");</b><br>
 A shorter title that will appear in navigation.  If left blank, this will default
-to the <b>Title</b>.
+to the <b>Title</b>.<br>
+<i>UI level: 1</i>
 </p>
 
 <p>
 <b>^International("104","Asset");</b><br>
 The URL for this asset.  It must be unique.  If this field is left blank, then
-a URL will be made from the parent's URL and the <b>Menu Title</b>.
+a URL will be made from the parent's URL and the <b>Menu Title</b>.<br>
+<i>UI level: 3</i>
 </p>
 
 <p>
 <b>^International("412","Asset");</b><br>
-A short description of this Asset. 
+A short description of this Asset. <br>
+<i>UI level: 6</i>
 </p>
 
 <p>
 <b>^International("886","Asset");</b><br>
-Whether or not this asset will be hidden from the navigation menu and site maps.
+Whether or not this asset will be hidden from the navigation menu and site maps.<br>
+<i>UI level: 6</i>
 </p>
 
 <p>
-<b>^International("886","Asset");</b><br>
-Select yes to open this asset in a new window.
+<b>^International("940","Asset");</b><br>
+Select yes to open this asset in a new window.<br>
+<i>UI level: 6</i>
 </p>
 
 <p>
 <b>Encrypt page?</b><br>
-Should this page be served over SSL?
+Should this page be served over SSL?<br>
+<i>UI level: 6</i>
 </p>
 
 <p>
-<b>Start Date</b><br>
-The date when users may begin viewing this page. Before this date only Content Managers with the rights to edit this page will see it.
+<b>^International("497","Asset");</b><br>
+The date when users may begin viewing this page. Before this date only Content Managers with the rights to edit this page will see it<br>
+<i>UI level: 6</i>.
 </p>
 
 <p>
-<b>End Date</b><br>
-The date when users will stop viewing this page. After this date only Content Managers with the rights to edit this page will see it.
+<b>^International("498","Asset");</b><br>
+The date when users will stop viewing this page. After this date only Content Managers with the rights to edit this page will see it.<br>
+<i>UI level: 6</i>
 </p>
 
 <p>
-<b>Owner</b><br>
-The owner of a page is usually the person who created the page. This user always has full edit and viewing rights on the page.
+<b>^International("108","Asset");</b><br>
+The owner of a page is usually the person who created the page. This user always has full edit and viewing rights on the page.<br>
+<i>UI level: 6</i>
 </p>
+
 <p>
 <b>NOTE:</b> The owner can only be changed by an administrator.
 </p>
 
 <p>
-<b>Who can view?</b><br>
-Choose which group can view this page. If you want both visitors and registered users to be able to view the page then you should choose the "Everybody" group.
+<b>^International("872","Asset");</b><br>
+Choose which group can view this page. If you want both visitors and registered users to be able to view the page then you should choose the "Everybody" group.<br>
+<i>UI level: 6</i>
 </p>
 
 <p>
-<b>Who can edit?</b><br>
-Choose the group that can edit this page. The group assigned editing rights can also always view the page.
+<b>^International("871","Asset");</b><br>
+Choose the group that can edit this page. The group assigned editing rights can also always view the page.<br>
+<i>UI level: 6</i>
 </p>
 
 <p>
-<b>Extra Head Tags</b><br>
-These tags will be added to the &lt;HEAD&gt; section of each page that the asset appears on.
+<b>^International("412","Asset");</b><br>
+A short description of this Asset.<br>
+<i>UI level: 3</i>
 </p>
 
 <p>
-<b>Make package?</b><br>
+<b>^International("extra head tags","Asset");</b><br>
+These tags will be added to the &lt;HEAD&gt; section of each page that the asset appears on.<br>
+<i>UI level: 5</i>
+</p>
+
+<p>
+<b>^International("make package","Asset");</b><br>
 Many WebGUI tasks are very repetitive.  Automating such tasks in Webgui, such as
 creating an Asset, or sets of Assets, is done by creating a package that can be reused
-through the site.  Check yes if you want this Asset to be available as a package.
+through the site.  Check yes if you want this Asset to be available as a package.<br>
+<i>UI level: 7</i>
 </p>
 
 <p>
-<b>Make prototype?</b><br>
-Chances are if you like assets to be configured a certain way, then you'll find prototypes useful. By setting an asset as a prototype you can create new items in your add content menu configured exactly as you like. For instance, if you use the Collaboration System as a photo gallery, then create a photo gallery and mark it as a prototype. From then on you can just "Add content > New Content > Photo Gallery".
+<b>^International("make prototype","Asset");</b><br>
+Chances are if you like assets to be configured a certain way, then you'll find prototypes useful. By setting an asset as a prototype you can create new items in your add content menu configured exactly as you like. For instance, if you use the Collaboration System as a photo gallery, then create a photo gallery and mark it as a prototype. From then on you can just "Add content > New Content > Photo Gallery".<br>
+<i>UI level: 9</i>
 </p>
 
         |,
         context => q|Describing the form to add or edit an Asset.|,
-        lastUpdated => 1106608067,
+        lastUpdated => 1111801111,
   },
 
     'asset fields title' => {
@@ -177,18 +198,6 @@ argument.
 		message => q|Make available as package?|,
 		context => q|label for Asset form|,
         	lastUpdated => 1106762073,
-	},
-
-	'upload files' => {
-		message => q|Upload Files|,
-		context => q|label for File Pile asset form|,
-		lastUpdated => 1107387247,
-	},
-
-	'add pile' => {
-		message => q|Add a Pile of Files|,
-		context => q|label for File Pile Admin Console|,
-		lastUpdated => 1107387324,
 	},
 
 	'errorEmptyField' => {

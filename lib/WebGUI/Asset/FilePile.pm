@@ -74,25 +74,25 @@ sub edit {
 	$tabform->getTab("properties")->yesNo(
                	-name=>"isHidden",
                	-value=>1,
-               	-label=>WebGUI::International::get(886),
+               	-label=>WebGUI::International::get(886,"Asset"),
                	-uiLevel=>6
                	);
        	$tabform->getTab("properties")->yesNo(
                 -name=>"newWindow",
        	        -value=>0,
-               	-label=>WebGUI::International::get(940),
+               	-label=>WebGUI::International::get(940,"Asset"),
                 -uiLevel=>6
        	        );
-	$tabform->addTab("security",WebGUI::International::get(107),6);
+	$tabform->addTab("security",WebGUI::International::get(107,"Asset"),6);
 	$tabform->getTab("security")->dateTime(
                	-name=>"startDate",
-                -label=>WebGUI::International::get(497),
+                -label=>WebGUI::International::get(497,"Asset"),
        	        -value=>$self->get("startDate"),
                	-uiLevel=>6
                 );
        	$tabform->getTab("security")->dateTime(
                	-name=>"endDate",
-                -label=>WebGUI::International::get(498),
+                -label=>WebGUI::International::get(498,"Asset"),
        	        -value=>$self->get("endDate"),
                	-uiLevel=>6
                	);
@@ -114,29 +114,29 @@ sub edit {
        	$tabform->getTab("security")->selectList(
        		-name=>"ownerUserId",
               	-options=>$users,
-       	       	-label=>WebGUI::International::get(108),
+       	       	-label=>WebGUI::International::get(108,"Asset"),
        		-value=>[$self->get("ownerUserId")],
        		-subtext=>$subtext,
        		-uiLevel=>6
        		);
       	$tabform->getTab("security")->group(
        		-name=>"groupIdView",
-       		-label=>WebGUI::International::get(872),
+       		-label=>WebGUI::International::get(872,"Asset"),
        		-value=>[$self->get("groupIdView")],
        		-uiLevel=>6
        		);
       	$tabform->getTab("security")->group(
        		-name=>"groupIdEdit",
-       		-label=>WebGUI::International::get(871),
+       		-label=>WebGUI::International::get(871,"Asset"),
        		-value=>[$self->get("groupIdEdit")],
        		-excludeGroups=>[1,7],
        		-uiLevel=>6
        		);
 	$tabform->getTab("properties")->readOnly(
-		-label=>WebGUI::International::get("upload files", "Asset"),
+		-label=>WebGUI::International::get("upload files", "FilePile"),
 		-value=>$self->getUploadControl
 		);
-	return $self->getAdminConsole->render($tabform->print,WebGUI::International::get("add pile", "Asset"));
+	return $self->getAdminConsole->render($tabform->print,WebGUI::International::get("add pile", "FilePile"));
 }
 
 #-------------------------------------------------------------------

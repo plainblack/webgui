@@ -11,11 +11,11 @@ our $I18N = {
 
 <P>Since Files are Assets, so they have all the properties that Assets do.  Below are the properties that are specific to Image Assets:</P>
 
-<P><b>New file to upload</b><br/>
+<P><b>^International("new file","File");</b><br/>
 Enter the path to a file, or use the "Browse" button to find a file on your local hard
 drive that you would like to be uploaded.
 
-<P><b>Current file</b><br/>
+<P><b>^International("current file","File");</b><br/>
 If this Asset already contains a file, a link to the file with its associated icon will be shown.
 
 |,

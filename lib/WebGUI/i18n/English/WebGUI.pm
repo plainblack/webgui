@@ -4682,8 +4682,14 @@ If Posts and Threads are set to being "sticky", they will appear at the top of t
 If Posts and Threads are "locked", no new posts can be added and no existing posts can be edited.
 <p>
 
+<b>UI level</b><br>
+For WebGUI content managers and Administrators, the Asset and Wobject edit
+screens can be configured to make them easier to use, based on each
+user's UI level.  The UI level can be altered by Admins in the user's profile.
+<p>
+
 |,
-		lastUpdated => 1111729014,
+		lastUpdated => 1111800470,
 	},
 
 };
