@@ -1202,7 +1202,7 @@ sub getPostTemplateVars {
                	$var->{'post.message'} =~ s/\n/\<br \/\>/g;
                	$var->{'post.message'} =~ s/\t/&nbsp;&nbsp;&nbsp;&nbsp;/g;
                	$var->{'post.message'} =~ s/ /&nbsp;/g;
-               	$var->{'post.message'} = '<div style="font-family: fixed;">'.$var->{'post.message'}.'</div>';
+               	$var->{'post.message'} = '<div style="font-family: monospace;">'.$var->{'post.message'}.'</div>';
 	}
         if ($forum->get("allowReplacements")) {
                 my $sth = WebGUI::SQL->read("select searchFor,replaceWith from replacements");

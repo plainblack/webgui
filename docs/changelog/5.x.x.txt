@@ -15,6 +15,7 @@
  - Bugfix [ 878601 ] ui level and page owner bug
  - Bugfix [ 881586 ] Forum overview
  - bugfix [ 881599 ] edit Posts
+ - Bugfix [ 883909 ] font family for contentType code in forum
 
 
 5.5.4
