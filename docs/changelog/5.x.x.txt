@@ -1,3 +1,7 @@
+5.5.1
+ - Fixed bug #829806 preventing users from updating thier passwords from the updateAccount form.
+
+
 5.5.0
  - Rewrote the discussion system and added many new features in the process.
  - Made the username field in the database unique.
