@@ -46,6 +46,7 @@ use WebGUI::Utility;
  $attachment->getFilename;
  $attachment->getIcon;
  $attachment->getPath;
+ $attachment->getSize;
  $attachment->getThumbnail;
  $attachment->getType;
  $attachment->getURL;
@@ -223,6 +224,30 @@ sub getIcon {
 
 sub getPath {
         return $_[0]->{_node}->getPath.'/'.$_[0]->getFilename;
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 getSize ( )
+
+ Returns the size of this file. 
+
+=cut
+
+sub getSize {
+	my ($size);
+	my (@attributes) = stat($_[0]->{_node}->getPath.'/'.$_[0]->getFilename);
+	if ($attributes[7] > 1048576) {
+		$size = round($attributes[7]/1048576);
+		$size .= 'mb';
+	} elsif ($attributes[7] > 1024) {
+		$size = round($attributes[7]/1024);
+		$size .= 'kb';
+	} else {
+		$size = $attributes[7]."b";
+	}
+	return $size;
 }
 
 
