@@ -336,6 +336,8 @@ sub getStatus {
                 return WebGUI::International::get('denied','Post');
         } elsif ($status eq "pending") {
                 return WebGUI::International::get('pending','Post');
+        } elsif ($status eq "archived") {
+                return WebGUI::International::get('archived','Post');
         }
 }
 

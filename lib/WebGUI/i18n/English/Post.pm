@@ -196,7 +196,7 @@ A URL to edit this Post.
 <p>
 
 <b>status</b><br>
-The status of this Post, typically "Approved", "Denied", or "Pending".
+The status of this Post, typically "Approved", "Denied", "Pending" or "Archived".
 <p>
 
 <b>approve.url</b><br>
@@ -280,7 +280,7 @@ The name of this attachment.
 </blockquote>
 
 |,
-		lastUpdated => 1111447237,
+		lastUpdated => 1111465141,
 	},
 
 	'approved' => {
@@ -298,6 +298,10 @@ The name of this attachment.
 		lastUpdated => 1031514049
 	},
 
+	'archived' => {
+		message => q|Archived|,
+		lastUpdated => 1111464988,
+	},
 
 };
 
