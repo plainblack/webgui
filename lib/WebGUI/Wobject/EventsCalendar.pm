@@ -540,8 +540,10 @@ sub www_viewEvent {
 	$var{title} = $event{name};
 	$var{"start.label"} =  WebGUI::International::get(14,$_[0]->get("namespace"));
 	$var{"start.date"} = epochToHuman($event{startDate},"%z");
+	$var{"start.time"} = epochToHuman($event{startDate},"%Z");
 	$var{"end.label"} = WebGUI::International::get(15,$_[0]->get("namespace"));
 	$var{"end.date"} = epochToHuman($event{endDate},"%z");
+	$var{"end.time"} = epochToHuman($event{endDate},"%Z");
 	$var{canEdit} = WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId"));
         $var{"edit.url"} = WebGUI::URL::page('func=editEvent&eid='.$session{form}{eid}.'&wid='.$session{form}{wid});
 	$var{"edit.label"} = WebGUI::International::get(575);
