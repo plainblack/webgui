@@ -27,7 +27,7 @@ use WebGUI::User;
 use WebGUI::Utility;
 
 our @ISA = qw(Exporter);
-our @EXPORT = qw(&www_editUserGroup &www_editUserProfile &www_editUserProfileSave &www_editUserGroupSave &www_deleteGrouping &www_editGrouping &www_editGroupingSave &www_becomeUser &www_addUser &www_addUserSave &www_deleteUser &www_deleteUserConfirm &www_editUser &www_editUserSave &www_listUsers);
+our @EXPORT = qw(&www_editUserKarma &www_editUserKarmaSave &www_editUserGroup &www_editUserProfile &www_editUserProfileSave &www_editUserGroupSave &www_deleteGrouping &www_editGrouping &www_editGroupingSave &www_becomeUser &www_addUser &www_addUserSave &www_deleteUser &www_deleteUserConfirm &www_editUser &www_editUserSave &www_listUsers);
 
 #-------------------------------------------------------------------
 sub _subMenu {
@@ -39,6 +39,9 @@ sub _subMenu {
 	$output .= '<li><a href="'.WebGUI::URL::page("op=editUser&uid=".$session{form}{uid}).'">'.WebGUI::International::get(457).'</a>';
 	$output .= '<li><a href="'.WebGUI::URL::page("op=editUserGroup&uid=".$session{form}{uid}).'">'.WebGUI::International::get(458).'</a>';
 	$output .= '<li><a href="'.WebGUI::URL::page("op=editUserProfile&uid=".$session{form}{uid}).'">'.WebGUI::International::get(459).'</a>';
+	if ($session{setting}{useKarma}) {
+		$output .= '<li><a href="'.WebGUI::URL::page("op=editUserKarma&uid=".$session{form}{uid}).'">'.WebGUI::International::get(555).'</a>';
+	}
 	$output .= '<li><a href="'.WebGUI::URL::page("op=listUsers").'">'.WebGUI::International::get(456).'</a>';
 	$output .= '</td></tr></table>';
 	return $output;
@@ -295,6 +298,38 @@ sub www_editUserGroupSave {
                         WebGUI::SQL->write("insert into groupings values ($gid, $session{form}{uid}, ".(time()+$expireAfter).")");
                 }
                 return www_editUserGroup();
+        } else {
+                return WebGUI::Privilege::adminOnly();
+        }
+}
+
+#-------------------------------------------------------------------
+sub www_editUserKarma {
+        my ($output, $f, $a, %user, %data, $method, $values, $category, $label, $default, $previousCategory);
+        if (WebGUI::Privilege::isInGroup(3)) {
+                $output = helpIcon(36);
+                $output .= '<h1>'.WebGUI::International::get(558).'</h1>';
+                $f = WebGUI::HTMLForm->new;
+                $f->hidden("op","editUserKarmaSave");
+                $f->hidden("uid",$session{form}{uid});
+		$f->integer("amount",WebGUI::International::get(556));
+		$f->text("description",WebGUI::International::get(557));
+                $f->submit;
+                $output .= $f->print;
+                $output = _subMenu($output);
+        } else {
+                $output .= WebGUI::Privilege::adminOnly();
+        }
+        return $output;
+}
+
+#-------------------------------------------------------------------
+sub www_editUserKarmaSave {
+        my ($u);
+        if (WebGUI::Privilege::isInGroup(3)) {
+                $u = WebGUI::User->new($session{form}{uid});
+                $u->karma($session{form}{amount},$session{user}{username}." (".$session{user}{userId}.")",$session{form}{description});
+                return www_editUser();
         } else {
                 return WebGUI::Privilege::adminOnly();
         }

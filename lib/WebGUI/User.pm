@@ -304,17 +304,17 @@ sub new {
 	%profile = WebGUI::SQL->buildHash("select userProfileField.fieldName, userProfileData.fieldData 
 		from userProfileField, userProfileData where userProfileField.fieldName=userProfileData.fieldName and 
 		userProfileData.userId='$user{userId}'");
-       # %default = WebGUI::SQL->buildHash("select fieldName, dataDefault from userProfileField where profileCategoryId=4");
-        #foreach $key (keys %default) {
-        #	if ($profile{$key} eq "") {
-         #       	$value = eval($default{$key});
-          #              if (ref $value eq "ARRAY") {
-           #             	$profile{$key} = $$value[0];
-            #            } else {
-             #           	$profile{$key} = $value;
-              #          }
-               # }
-        #}
+        %default = WebGUI::SQL->buildHash("select fieldName, dataDefault from userProfileField where profileCategoryId=4");
+        foreach $key (keys %default) {
+        	if ($profile{$key} eq "") {
+                	$value = eval($default{$key});
+                        if (ref $value eq "ARRAY") {
+                        	$profile{$key} = $$value[0];
+                        } else {
+                        	$profile{$key} = $value;
+                        }
+                }
+        }
         bless {_userId => $userId, _user => \%user, _profile =>\%profile }, $class;
 }
 
