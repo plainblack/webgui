@@ -18,6 +18,7 @@
  - fix [ 1149529 ] 6.3 CVS: Content positions don't save and  
        [ 1149801 ] page position not maintained (Martin Kamerbeek)
  - fix [ 1165373 ] sort templates into folders by namespace under ImportNode
+ - fix [ 1118789 ] 6.2.11 - L_loginBox display with empty 1st param [colink]
 
 
 6.5.2
