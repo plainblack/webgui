@@ -422,6 +422,33 @@ sub getValue {
 
 #-------------------------------------------------------------------
 
+=head2 i18n ( id [, namespace ]) {
+
+Returns an internationalized message.
+
+=over
+
+=item id
+
+The identifier for the internationalized message.
+
+=item namespace
+
+The namespace for the internationalized message. Defaults to the namespace of the wobject.
+
+=back
+
+=cut
+
+sub i18n {
+	my $self = shift;
+	my $id = shift;
+	my $namespace = shift || $self->get("namespace");
+	return WebGUI::International::get($id,$namespace);
+}
+
+#-------------------------------------------------------------------
+
 =head2 inDateRange ( )
 
 Returns a boolean value of whether the wobject should be displayed based upon it's start and end dates.
@@ -565,6 +592,20 @@ sub name {
 		return $name;
 	}
 } 
+
+
+#-------------------------------------------------------------------
+
+=head2 namespace ( )
+
+Returns the namespace of this wobject. This is a shortcut for $self->get("namespace");
+
+=cut
+
+sub namespace {
+	my $self = shift;
+	return $self->get("namespace");
+}
 
 
 #-------------------------------------------------------------------
@@ -1052,6 +1093,19 @@ Returns the UI Level of a wobject. Defaults to "0" for all wobjects.  Override t
 
 sub uiLevel {
 	return 0;
+}
+
+#-------------------------------------------------------------------
+
+=head2 wid ( )
+
+Returns the wobject id of this wobject. This is a shortcut for $self->get("wobjectId");
+
+=cut
+
+sub wid {
+	my $self = shift;
+	return $self->get("wobjectId");
 }
 
 #-------------------------------------------------------------------

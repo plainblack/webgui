@@ -35,9 +35,15 @@ This package provides an interface to the internationalization system.
  $string = WebGUI::International::get($internationalId,$namespace);
  %languages = WebGUI::International::getLanguages();
 
+This package can also be used in object-oriented (OO) style.
+
+ use WebGUI::International;
+ my $i = WebGUI::International->new($namespace);
+ $i->get($internationalId);
+
 =head1 METHODS
 
-These functions are available from this package:
+These functions/methods are available from this package:
 
 =cut
 
@@ -67,35 +73,33 @@ An integer that specifies the language that the user should see.  Defaults to th
 =cut
 
 sub get {
-        my ($output, $language, $namespace, $cache);
-	if ($_[2] ne "") {
-		$language = $_[2];
-	} elsif ($session{user}{language} ne "") {
-		$language = $session{user}{language};
+        my ($id, $language, $namespace);
+	if (ref($_[0]) eq "WebGUI::International") {
+		$id = $_[1] || 0;
+		$namespace = $_[2] || $_[0]->{_namespace} || "WebGUI";
+		$language = $_[3] || $_[0]->{_language} || $session{user}{language} || 1;
 	} else {
-		$language = 1;
-	}
-	if ($_[1] ne "") {
-		$namespace = $_[1];
-	} else {
-		$namespace = "WebGUI";
+		$id = $_[0] || 0;
+		$namespace = $_[1] || "WebGUI";
+		$language = $_[2] || $session{user}{language} || 1;
 	}
 	my $cachetag = $session{config}{configFile}."-International";
 	if ($session{config}{useSharedInternationalCache}) {
 		$cachetag = "International";
 	}
-	$cache = WebGUI::Cache->new($language."_".$namespace."_".$_[0],$cachetag);
-	$output = $cache->get;
+	my $cache = WebGUI::Cache->new($language."_".$namespace."_".$id,$cachetag);
+	my $output = $cache->get;
 	if (not defined $output) {
 		($output) = WebGUI::SQL->quickArray("select message from international 
-			where internationalId=$_[0] and namespace='$namespace' and languageId='$language'");
+			where internationalId=$id and namespace='$namespace' and languageId='$language'");
 		if ($output eq "" && $language ne 1) {
-			$output = get($_[0],$namespace,1);
+			$output = get($id,$namespace,1);
 		}
 		$cache->set($output, 3600);
 	}
 	return $output;
 }
+
 
 #-------------------------------------------------------------------
 
@@ -110,6 +114,35 @@ sub getLanguages {
         $hashRef = WebGUI::SQL->buildHashRef("select languageId,language from language");
         return $hashRef;
 }
+
+
+#-------------------------------------------------------------------
+
+=head2 new ( [ namespace, languageId ] ) 
+
+The constructor for the International function if using it in OO mode.
+
+=over
+
+=item namespace
+
+Specify a default namespace. Defaults to "WebGUI".
+
+=item languageId
+
+Specify a default language. Defaults to user preference.
+
+=back
+
+=cut
+
+sub new {
+	my $class = shift;
+	my $namespace = shift;
+	my $language = shift;
+	bless({_namespace=>$namespace,_language=>$language},$class);
+}
+
 
 1;
 

@@ -19,6 +19,10 @@
    performance at a cost of either memory or disk space or both. The gains
    here are primarily enjoyed by large heavy traffic sites that use lots of 
    templates.
+ - Added convenience methods to Wobject superclass for internationalization,
+   wobject ID, and namespace.
+ - Added an object-oriented interface to the internationalization system. The
+   old procedural interface still works as well.
 
 
 6.0.3
