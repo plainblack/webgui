@@ -22,6 +22,7 @@ tinyMCELang['lang_focus_alert'] = 'Pole edytora musi byæ aktywne zanim ta funkcj
 tinyMCELang['lang_edit_confirm'] = 'Czy chcesz u¿yæ trybu WYSIWYG dla tego pola tekstowego ?';
 tinyMCELang['lang_insert_link_title'] = 'Wstaw/edtytuj ³±cze';
 tinyMCELang['lang_insert'] = 'Wstaw';
+tinyMCELang['lang_update'] = 'Wstaw';
 tinyMCELang['lang_cancel'] = 'Anuluj';
 tinyMCELang['lang_insert_link_url'] = 'Adres URL';
 tinyMCELang['lang_insert_link_target'] = 'Cel';
@@ -33,4 +34,5 @@ tinyMCELang['lang_insert_image_alt'] = 'Opis zdjêcia';
 tinyMCELang['lang_help_desc'] = 'Pomoc';
 tinyMCELang['lang_bold_img'] = "bold.gif";
 tinyMCELang['lang_italic_img'] = "italic.gif";
-
+tinyMCELang['lang_underline_img'] = "underline.gif";
+tinyMCELang['lang_clipboard_msg'] = 'Copy/Cut/Paste is not available in Mozilla and Firefox.\nDo you want more information about this issue?';

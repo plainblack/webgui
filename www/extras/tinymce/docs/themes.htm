@@ -474,7 +474,25 @@ function (Optional)</span>
   </tr>
 </table>
 <br>
-<strong>Returns:</strong> return the HTML template of that control or a empty string if the control_name wasn't recognized.<br>
+<strong>Returns:</strong> return the HTML template of that control or a empty string if the control_name wasn't recognized.
+<hr noshade>
+<span class="subtitle"><a name="cleanup"></a>The TinyMCE_<font color="#CC0000">&lt;plugin&gt;</font>_cleanup(type, content) function (Optional)</span>
+<p>This function is called when a editor does cleanup of contents.</p>
+<strong>Parameters:<br>
+<br>
+</strong>
+<table border="1" cellspacing="0">
+  <tr>
+    <td><span class="subtitle">type</span></td>
+    <td>Type of cleanup, insert_to_editor or get_from_editor. Insert to editor is passed when new content is placed within the editor and get_from_editor is when content is passed out from the editor. </td>
+  </tr>
+  <tr>
+    <td width="150"><strong>content</strong></td>
+    <td>HTML contents to be cleaned up, this string contains the HTML code. </td>
+  </tr>
+</table>
+<br>
+<strong>Returns:</strong> return the cleaned up HTML code.<br>
 <hr noshade>
 <table width="100%" border="0" cellpadding="1" cellspacing="3" class="pagefooter">
   <tr> 

@@ -35,6 +35,14 @@ input, select, textarea {
 	border: 0px solid #808080;
 }
 
+#insert {
+   font-weight: bold;
+}
+
+#cancel {
+   font-weight: bold;
+}
+
 .title {
 	font-size: 12px;
 	font-weight: bold;
@@ -56,11 +64,17 @@ td.charmap, td.charmapOver {
 }
 
 td.charmapOver {
-	background-color: #CCCCCC
+	background-color: #CCCCCC;
+	cursor: hand;
 }
 
 a.charmap {
-	cursor: hand;
 	color: #000000;
 	text-decoration: none
+}
+
+.wordWrapCode {
+	vertical-align: middle;
+	border: 1px none #000000;
+	background-color: transparent;
 }

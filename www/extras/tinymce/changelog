@@ -1,3 +1,63 @@
+Version 1.38 (2004-11-28)
+	Added new textarea field for form elements when debug mode is enabled, contributed by Michael Keck.
+	Added new spacer item support for the theme_advanced_buttons<n> options, contributed by Michael Keck.
+	Added new selection borders for images and hr elements, contributed by Michael Keck.
+	Added new advhr plugin, this plugin handles advanced settings on HR elements, contributed by Michael Keck.
+	Added new german language pack for the preview plugin, contributed by Michael Keck.
+	Added new word wrap and source formatting to the source editor, contributed by Michael Keck.
+	Added new updated charmap, contributed by Michael Keck.
+	Added new flash plugin that enabled flash movied to be handled, contributed by Michael Keck.
+	Added the old cut/copy/paste commands to the advanced theme, these are not visible by default.
+	Added new theme_advanced_buttons<N>_add_before option to advanced theme.
+	Added new "update" button title for a popup windows.
+	Added new zoom prefix language variable to the zoom plugin.
+	Added new entities option, that enables you to config entity code to name convertion.
+	Added new custom cleanup possibility to plugins.
+	Added new cleanup_callback option, adds the possibilty to add custom cleanup logic.
+	Added new Norwegian language pack, contributed by Sten Aksel Heien.
+	Added new Korean language pack, contributed by Setzer Gabbiani.
+	Fixed the layout of the color picker, contributed by Michael Keck.
+	Fixed so the preview plugin doesn't include the any toolsbars in preview popup window, contributed by Michael Keck.
+	Fixed bug where anchors elements was treated as links.
+	Fixed so all popup windows are modal dialogs in MSIE.
+	Fixed bug where the word "null" sometimes appares in HTML after cleanup in Firefox/Mozilla.
+	Fixed bug where form elements with missing name attributes produced errors.
+	Fixed some default value bugs and issues with the new advlink plugin.
+	Fixed the link/image dialog sizes in the SE language pack.
+	Fixed the content duplication bug, it seems to be fixed anyway, if not please let me know.
+	Fixed bug where plugin handleNodeChange extentions broke the theme function.
+Version 1.37 (2004-11-12)
+	Added new mceResetDesignMode command that can be used when the editor is placed in tabs.
+	Added new updated Italian language pack thanks goes to "Fabrix Xm" for the contribtion.
+	Added new greek language pack thanks goes to "Jacaranda Bill" for the contribution.
+	Added new french language pack thanks goes to "Pat Boens" for the contribution.
+	Added new russian language pack thanks goes to "Roman Filippov" for the contribution.
+	Added new updated Dutch language pack thanks goes to Arnoud van Delden and Ernst de Moor for the contribution.
+	Added new convert_newlines_to_brs option, that enables newlines to be converted to br elements.
+	Added new custom_undo_redo_keyboard_shortcuts option, enables keyboard shortcuts to be enabled/disabled.
+	Added new auto_reset_designmode option, thats resets the design mode when a editor instance is focused.
+	Added new form reset handler, resets the contents of TinyMCE areas when the onreset event is trigged.
+	Added new skip_cleanup parameter to triggerSave, this parameter is optional and defaults to false.
+	Added new lang_underline_img language variable to all themes.
+	Added new title attribute to all images, enables tooltips in Mozilla and Firefox.
+	Added new insert and cancel CSS id's for all submit and cancel buttons.
+	Added new full featured example that includes all available plugins and buttons.
+	Added new advlink and advimage plugins to TinyMCE, these are more advanced link and image tools. Contributed by Michael Keck.
+	Added new parameters to insertImage and insertLink commands. Contributed by Michael Keck.
+	Added updated compatiblity chart, includes a matrix table thanks goes to Ernst de Moor.
+	Added new insert image icon contributed by Arnoud van Delden and Ernst de Moor.
+	Added window focus on all popup windows, contributed by Arnoud van Delden and Ernst de Moor.
+	Fixed some issues with the char map added some characters and removed duplicate ones, contributed by Arnoud van Delden and Ernst de Moor.
+	Fixed the insert row icon, rotated it 180 degrees, contributed by Arnoud van Delden and Ernst de Moor.
+	Fixed the visual aid icon, made it a bit darker. Contributed by Arnoud van Delden and Ernst de Moor.
+	Fixed some issues with entity encoding in source editor aswell as in core cleanup code.
+	Fixed bug where the auto import CSS feature imported invalid CSS rules with : or spaces.
+	Fixed bug where unnecessary entity encoding of characters was done.
+	Fixed the window sizes some to better function on MSIE with SP2.
+	Fixed some issued with the auto word cleanup feature, fixes some issued with content duplication.
+	Fixed bug that made the editor to throw weird error when HTML code includes <!a or <!/a> content.
+	Fixed bug where the style attribute was returned on images in source output even if it was disabled.
+	Fixed issue where the UI form elements of TinyMCE was submitted with the form submit.
 Version 1.36 (2004-10-19)
 	Added a newly modified version of the German language pack from "krokogras".
 	Added auto resizing to popup windows with the same name.

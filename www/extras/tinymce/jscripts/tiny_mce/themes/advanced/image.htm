@@ -35,6 +35,7 @@
 		formObj.width.value = tinyMCE.getWindowArg('width');
 		formObj.height.value = tinyMCE.getWindowArg('height');
 		formObj.height.value = tinyMCE.getWindowArg('height');
+		formObj.insert.value = tinyMCE.getLang('lang_' + tinyMCE.getWindowArg('action')); 
 
 		window.focus();
 	}
@@ -94,9 +95,9 @@
             <td><input name="hspace" type="text" id="hspace" value="" size="3" maxlength="3"></td>
           </tr>
           <tr>
-            <td><input type="button" name="insert" value="{$lang_insert}" onclick="insertImage();">
+            <td><input type="button" id="insert" name="insert" value="{$lang_insert}" onclick="insertImage();">
             </td>
-            <td align="right"><input type="button" name="cancel" value="{$lang_cancel}" onclick="cancelAction();"></td>
+            <td align="right"><input type="button" id="cancel" name="cancel" value="{$lang_cancel}" onclick="cancelAction();"></td>
           </tr>
         </table></td>
     </tr>

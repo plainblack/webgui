@@ -4,7 +4,7 @@
 var accuracy = 2;
 
 //list of the content item names.  Could be searched for, but hard coded for performance
-var wobjectList=new Array();
+var draggableObjectList=new Array();
 var dragableList=new Array();
 //Internal Config (Do not Edit)
 
@@ -118,7 +118,7 @@ function dragable_init(url) {
     document.onkeydown=dragable_checkKeyEvent;
     document.onmousemove=dragable_move;
     
-    //fill the wobject list
+    //fill the draggableObject list
     obj = document.getElementById("position1");    
     contentCount=2;    
     while (obj != null) {        
@@ -130,7 +130,7 @@ function dragable_init(url) {
             dragable_appendBlankRow(tbody[0]);
         }else {        
             for (i = 0; i< children.length;i++) {
-                wobjectList[wobjectList.length] = children[i];
+                draggableObjectList[draggableObjectList.length] = children[i];
                 dragableList[dragableList.length]=document.getElementById(children[i].id + "_div");
             }
         }
@@ -138,8 +138,8 @@ function dragable_init(url) {
         contentCount++;
     }
 
-    for (i=0;i<wobjectList.length;i++) {
-        eval("document.getElementById('" + wobjectList[i].id + "').onmousedown=dragable_dragStart");        
+    for (i=0;i<draggableObjectList.length;i++) {
+        eval("document.getElementById('" + draggableObjectList[i].id + "').onmousedown=dragable_dragStart");        
     }
 }
 
@@ -231,8 +231,8 @@ function dragable_isBlank(td) {
 function dragable_spy(x, y) {
     
     var returnArray = new Array();
-    for (i=0;i<wobjectList.length;i++) {
-        td = wobjectList[i];    
+    for (i=0;i<draggableObjectList.length;i++) {
+        td = draggableObjectList[i];    
         
         //this is a hack
         if (td == null || td == startTD) continue;
@@ -315,7 +315,7 @@ function dragable_dragStop(e) {
                     divName=endTD.id + "_div";
                     document.getElementById(divName).className="dragable";
                 }
-		var url = pageURL + "?op=rearrangeWobjects&map=" + dragable_getContentMap();
+		var url = pageURL + dragable_getContentMap();
 		//window.alert(url);
   		document.getElementById("dragSubmitter").src = url;
             }                        
@@ -327,12 +327,12 @@ function dragable_dragStop(e) {
             }
         
             //this is a ie hack for a render bug
-            for(i=0;i<wobjectList.length;i++) {
-                if (wobjectList[i]) {                                    
-                    wobjectList[i].style.top=1;
-                    wobjectList[i].style.left=1;                    
-                    wobjectList[i].style.top=0;
-                    wobjectList[i].style.left=0;                    
+            for(i=0;i<draggableObjectList.length;i++) {
+                if (draggableObjectList[i]) {                                    
+                    draggableObjectList[i].style.top=1;
+                    draggableObjectList[i].style.left=1;                    
+                    draggableObjectList[i].style.top=0;
+                    draggableObjectList[i].style.left=0;                    
                 }
             }
         }
@@ -364,7 +364,7 @@ function dragable_appendBlankRow(parent) {
     blank.className="blank";
     blankClone = blank.cloneNode(true);
     blankClone.id = "blank" + new Date().getTime();
-    wobjectList[wobjectList.length] = blankClone;
+    draggableObjectList[draggableObjectList.length] = blankClone;
     parent.appendChild(blankClone);
     blankClone.style.top=0;
     blankClone.style.left=0;
@@ -428,7 +428,7 @@ function dragable_getContentMap() {
             }
             
             if (children[i].id.indexOf("blank") == -1) {
-                contentMap+=children[i].id;                
+                contentMap+=children[i].id.replace(/^td/,"");                
             }
         }
 

@@ -22,6 +22,7 @@ tinyMCELang['lang_focus_alert'] = 'Una istanza dell\' editor deve essere selezio
 tinyMCELang['lang_edit_confirm'] = 'Vuoi usare la modalit\u00E0 WYSIWYG per questa textarea?';
 tinyMCELang['lang_insert_link_title'] = 'Inserisci/modifica link';
 tinyMCELang['lang_insert'] = 'Inserisci';
+tinyMCELang['lang_update'] = 'Inserisci';
 tinyMCELang['lang_cancel'] = 'Cancella';
 tinyMCELang['lang_insert_link_url'] = 'Link URL';
 tinyMCELang['lang_insert_link_target'] = 'Target';
@@ -33,4 +34,5 @@ tinyMCELang['lang_insert_image_alt'] = 'Descrizione dell\'immagine';
 tinyMCELang['lang_help_desc'] = 'Guida';
 tinyMCELang['lang_bold_img'] = "bold.gif";
 tinyMCELang['lang_italic_img'] = "italic.gif";
-
+tinyMCELang['lang_underline_img'] = "underline.gif";
+tinyMCELang['lang_clipboard_msg'] = 'Copy/Cut/Paste is not available in Mozilla and Firefox.\nDo you want more information about this issue?';

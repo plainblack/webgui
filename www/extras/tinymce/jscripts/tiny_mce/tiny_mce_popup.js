@@ -1,6 +1,12 @@
 // Get tinyMCE reference
-var tinyMCE = window.opener.tinyMCE;
-var tinyMCELang = window.opener.tinyMCELang;
+var win = window.opener ? window.opener : window.dialogArguments;
+
+// Setup window openerer
+if (!window.opener)
+	window.opener = win;
+
+var tinyMCE = win.tinyMCE;
+var tinyMCELang = win.tinyMCELang;
 
 // Setup title
 var re = new RegExp('{|\\\$|}', 'g');

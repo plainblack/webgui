@@ -22,6 +22,7 @@ tinyMCELang['lang_focus_alert'] = 'Un &eacute;diteur doit &ecirc;tre s&eacute;le
 tinyMCELang['lang_edit_confirm'] = 'D&eacute;sirez-vous utiliser l\'&eacute;diteur pour modifier cette zone?';
 tinyMCELang['lang_insert_link_title'] = 'Ins&eacute;rer/modifier un hyperlien';
 tinyMCELang['lang_insert'] = 'Ins&eacute;rer';
+tinyMCELang['lang_update'] = 'Ins&eacute;rer';
 tinyMCELang['lang_cancel'] = 'Annuler';
 tinyMCELang['lang_insert_link_url'] = 'Adresse URL';
 tinyMCELang['lang_insert_link_target'] = 'Destination';
@@ -33,4 +34,5 @@ tinyMCELang['lang_insert_image_alt'] = 'Description de l\'image';
 tinyMCELang['lang_help_desc'] = 'Aide';
 tinyMCELang['lang_bold_img'] = "bold_fr.gif";
 tinyMCELang['lang_italic_img'] = "italic.gif";
-
+tinyMCELang['lang_underline_img'] = "underline.gif";
+tinyMCELang['lang_clipboard_msg'] = 'Copy/Cut/Paste is not available in Mozilla and Firefox.\nDo you want more information about this issue?';

@@ -3,7 +3,7 @@
 tinyMCELang['lang_theme_style_select'] = '&#1578;&#1589;&#1575;&#1605;&#1610;&#1605;';
 tinyMCELang['lang_theme_code_desc'] = '&#1588;&#1601;&#1585;&#1577; &#1575;&#1604;&#1605;&#1589;&#1583;&#1585;';
 tinyMCELang['lang_theme_code_title'] = '&#1588;&#1601;&#1585;&#1577; &#1575;&#1604;&#1605;&#1589;&#1583;&#1585;';
-tinyMCELang['lang_theme_code_save'] = '&#1585;&#1601;&#1593;';
+tinyMCELang['lang_theme_code_wordwrap'] = 'Word wrap';
 tinyMCELang['lang_theme_sub_desc'] = '&#1605;&#1606;&#1582;&#1601;&#1590;';
 tinyMCELang['lang_theme_sup_desc'] = '&#1605;&#1585;&#1578;&#1601;&#1593;';
 tinyMCELang['lang_theme_hr_desc'] = '&#1573;&#1583;&#1585;&#1575;&#1580; &#1582;&#1591; &#1601;&#1575;&#1589;&#1604;';
@@ -66,3 +66,7 @@ tinyMCELang['lang_insert_anchor_title'] = 'Insert/edit anchor';
 tinyMCELang['lang_insert_anchor_name'] = 'Anchor name';
 tinyMCELang['lang_theme_anchor_desc'] = 'Insert/edit anchor';
 tinyMCELang['lang_theme_insert_link_titlefield'] = 'Title';
+tinyMCELang['lang_theme_clipboard_msg'] = 'Copy/Cut/Paste is not available in Mozilla and Firefox.\nDo you want more information about this issue?';
+tinyMCELang['lang_cut_desc'] = 'Cut';
+tinyMCELang['lang_copy_desc'] = 'Copy';
+tinyMCELang['lang_paste_desc'] = 'Paste';

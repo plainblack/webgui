@@ -5,6 +5,7 @@
 <script language="javascript">
 	function init() {
 		document.forms[0].anchorName.value = tinyMCE.getWindowArg('name');
+		document.forms[0].insert.value = tinyMCE.getLang('lang_' + tinyMCE.getWindowArg('action')); 
 		window.focus();
 	}
 
@@ -33,9 +34,9 @@
             <td><input name="anchorName" type="text" id="anchorName" value="" style="width: 200px"></td>
           </tr>
           <tr>
-            <td><input type="button" name="insert" value="{$lang_insert}" onclick="insertAnchor();">
+            <td><input type="button" id="insert" name="insert" value="{$lang_insert}" onclick="insertAnchor();">
             </td>
-            <td align="right"><input type="button" name="cancel" value="{$lang_cancel}" onclick="cancelAction();"></td>
+            <td align="right"><input type="button" id="cancel" name="cancel" value="{$lang_cancel}" onclick="cancelAction();"></td>
           </tr>
         </table></td>
     </tr>

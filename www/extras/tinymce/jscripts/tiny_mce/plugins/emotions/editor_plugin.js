@@ -24,7 +24,7 @@ function TinyMCE_emotions_execCommand(editor_id, element, command, user_interfac
 
 			template['file'] = '../../plugins/emotions/emotions.htm'; // Relative to theme
 			template['width'] = 150;
-			template['height'] = 170;
+			template['height'] = 180;
 
 			tinyMCE.openWindow(template, {editor_id : editor_id});
 

@@ -13,6 +13,7 @@
 
 		document.forms[0].href.value = tinyMCE.getWindowArg('href');
 		document.forms[0].linktitle.value = tinyMCE.getWindowArg('title');
+		document.forms[0].insert.value = tinyMCE.getLang('lang_' + tinyMCE.getWindowArg('action')); 
 
 		window.focus();
 	}
@@ -57,9 +58,9 @@
             <td><input name="linktitle" type="text" id="linktitle" value="" style="width: 200px"></td>
           </tr>
           <tr>
-            <td><input type="button" name="insert" value="{$lang_insert}" onclick="insertLink();">
+            <td><input type="button" id="insert" name="insert" value="{$lang_insert}" onclick="insertLink();">
             </td>
-            <td align="right"><input type="button" name="cancel" value="{$lang_cancel}" onclick="cancelAction();"></td>
+            <td align="right"><input type="button" id="cancel" name="cancel" value="{$lang_cancel}" onclick="cancelAction();"></td>
           </tr>
         </table></td>
     </tr>

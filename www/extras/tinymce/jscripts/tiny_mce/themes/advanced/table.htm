@@ -1,8 +1,10 @@
-<html>
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <title>{$lang_insert_table_title}</title>
-<script language="javascript" src="../../tiny_mce_popup.js"></script>
-<script language="javascript">
+<script language="javascript" type="text/javascript" src="../../tiny_mce_popup.js"></script>
+<script language="javascript" type="text/javascript">
 function insertTable() {
 	if (window.opener) {
 		var args = new Array();
@@ -65,6 +67,7 @@ function init() {
 	formObj.cellspacing.value = tinyMCE.getWindowArg('cellspacing');
 	formObj.width.value = tinyMCE.getWindowArg('width');
 	formObj.height.value = tinyMCE.getWindowArg('height');
+	formObj.insert.value = tinyMCE.getLang('lang_' + tinyMCE.getWindowArg('action')); 
 
 	window.focus();
 }
@@ -121,10 +124,10 @@ function cancelAction() {
             <td align="right">&nbsp;</td>
           </tr>
           <tr>
-            <td><input type="button" name="insert" value="{$lang_insert}" onclick="insertTable();"></td>
+            <td><input type="button" id="insert" name="insert" value="{$lang_insert}" onclick="insertTable();"></td>
             <td align="right">&nbsp;</td>
             <td align="right">&nbsp;</td>
-            <td align="right"><input type="button" name="cancel" value="{$lang_cancel}" onclick="cancelAction();"></td>
+            <td align="right"><input type="button" id="cancel" name="cancel" value="{$lang_cancel}" onclick="cancelAction();"></td>
           </tr>
         </table></td>
     </tr>

@@ -3,7 +3,7 @@
 tinyMCELang['lang_theme_style_select'] = 'Styles';
 tinyMCELang['lang_theme_code_desc'] = 'Rediger html-kode';
 tinyMCELang['lang_theme_code_title'] = 'HTML Kodeeditor';
-tinyMCELang['lang_theme_code_save'] = 'Gem';
+tinyMCELang['lang_theme_code_wordwrap'] = 'Word wrap';
 tinyMCELang['lang_theme_sub_desc'] = 'S&#230;nket skrift';
 tinyMCELang['lang_theme_sup_desc'] = 'H&#230;vet skrift';
 tinyMCELang['lang_theme_hr_desc'] = 'Inds&#230;t horisontal linje';
@@ -66,3 +66,7 @@ tinyMCELang['lang_insert_anchor_title'] = 'Inds&#230;t/rediger bogm&#230;rke';
 tinyMCELang['lang_insert_anchor_name'] = 'Bogm&#230;rkets navn';
 tinyMCELang['lang_theme_anchor_desc'] = 'Inds&#230;t/rediger bogm&#230;rke';
 tinyMCELang['lang_theme_insert_link_titlefield'] = 'Title';
+tinyMCELang['lang_theme_clipboard_msg'] = 'Copy/Cut/Paste is not available in Mozilla and Firefox.\nDo you want more information about this issue?';
+tinyMCELang['lang_cut_desc'] = 'Cut';
+tinyMCELang['lang_copy_desc'] = 'Copy';
+tinyMCELang['lang_paste_desc'] = 'Paste';

@@ -64,7 +64,7 @@ tinyMCELang['lang_theme_anchor_desc'] = '標註';
 tinyMCELang['lang_theme_charmap_desc'] = '特殊字元';
 tinyMCELang['lang_theme_charmap_title'] = '特殊字元清單';
 tinyMCELang['lang_theme_code_desc'] = '顯示 HTML 原始碼';
-tinyMCELang['lang_theme_code_save'] = '儲存';
+tinyMCELang['lang_theme_code_wordwrap'] = 'Word wrap';
 tinyMCELang['lang_theme_code_title'] = 'HTML 原始碼';
 tinyMCELang['lang_theme_colorpicker_apply'] = '變更';
 tinyMCELang['lang_theme_colorpicker_title'] = '顏色';
@@ -94,4 +94,8 @@ tinyMCELang['lang_theme_visualaid_desc'] = '顯示/隱藏非可見的元素';
 tinyMCELang['lang_underline_desc'] = '底線';
 tinyMCELang['lang_undo_desc'] = '復原';
 tinyMCELang['lang_unlink_desc'] = '取消連結';
+tinyMCELang['lang_theme_clipboard_msg'] = 'Copy/Cut/Paste is not available in Mozilla and Firefox.\nDo you want more information about this issue?';
+tinyMCELang['lang_cut_desc'] = 'Cut';
+tinyMCELang['lang_copy_desc'] = 'Copy';
+tinyMCELang['lang_paste_desc'] = 'Paste';
 

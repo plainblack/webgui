@@ -1,5 +1,5 @@
 /* Import theme specific language pack */
-tinyMCE.importPluginLanguagePack('preview', 'uk,se');
+tinyMCE.importPluginLanguagePack('preview', 'uk,se,de');
 
 /**
  * Returns the HTML contents of the preview control.
@@ -7,7 +7,7 @@ tinyMCE.importPluginLanguagePack('preview', 'uk,se');
 function TinyMCE_preview_getControlHTML(control_name) {
 	switch (control_name) {
 		case "preview":
-			return '<img id="{$editor_id}_preview" src="{$pluginurl}/images/preview.gif" title="{$lang_preview_desc}" width="20" height="20" class="mceButtonNormal" onmouseover="tinyMCE.switchClass(this,\'mceButtonOver\');" onmouseout="tinyMCE.restoreClass(this);" onmousedown="tinyMCE.restoreAndSwitchClass(this,\'mceButtonDown\');" onclick="tinyMCE.execInstanceCommand(\'{$editor_id}\',\'mcePreview\');">';
+			return '<img id="{$editor_id}_preview" src="{$pluginurl}/images/preview.gif" title="{$lang_preview_desc}" width="20" height="20" class="mceButtonNormal" onmouseover="tinyMCE.switchClass(this,\'mceButtonOver\');" onmouseout="tinyMCE.restoreClass(this);" onmousedown="tinyMCE.restoreAndSwitchClass(this,\'mceButtonDown\');" onclick="tinyMCE.execInstanceCommand(\'{$editor_id}\',\'mcePreview\');" />';
 	}
 
 	return "";
@@ -34,7 +34,7 @@ function TinyMCE_preview_execCommand(editor_id, element, command, user_interface
 
 				tinyMCE.openWindow(template, {editor_id : editor_id, resizable : "yes", scrollbars : "yes", content : tinyMCE.getContent(), content_css : tinyMCE.getParam("content_css")});
 			} else {
-				var win = window.open("", "mcePreview", "menubar=yes,toolbar=yes,scrollbars=yes,left=20,top=20,width=" + previewWidth + ",height="  + previewHeight);
+				var win = window.open("", "mcePreview", "menubar=no,toolbar=no,scrollbars=yes,resizable=yes,left=20,top=20,width=" + previewWidth + ",height="  + previewHeight);
 				var html = "";
 
 				html += '<!doctype html public "-//w3c//dtd html 4.0 transitional//en">';

@@ -3,7 +3,7 @@
 tinyMCELang['lang_theme_style_select'] = 'Estilos';
 tinyMCELang['lang_theme_code_desc'] = 'Editar codigo HTML';
 tinyMCELang['lang_theme_code_title'] = 'Editor codigo HTML';
-tinyMCELang['lang_theme_code_save'] = 'Guardar';
+tinyMCELang['lang_theme_code_wordwrap'] = 'Word wrap';
 tinyMCELang['lang_theme_sub_desc'] = 'Subindice';
 tinyMCELang['lang_theme_sup_desc'] = 'Superindice';
 tinyMCELang['lang_theme_hr_desc'] = 'Insertar un separador horizontal';
@@ -69,3 +69,7 @@ tinyMCELang['lang_insert_anchor_title'] = 'Insert/edit anchor';
 tinyMCELang['lang_insert_anchor_name'] = 'Anchor name';
 tinyMCELang['lang_theme_anchor_desc'] = 'Insert/edit anchor';
 tinyMCELang['lang_theme_insert_link_titlefield'] = 'Title';
+tinyMCELang['lang_theme_clipboard_msg'] = 'Copy/Cut/Paste is not available in Mozilla and Firefox.\nDo you want more information about this issue?';
+tinyMCELang['lang_cut_desc'] = 'Cut';
+tinyMCELang['lang_copy_desc'] = 'Copy';
+tinyMCELang['lang_paste_desc'] = 'Paste';

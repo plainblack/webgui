@@ -22,6 +22,7 @@ tinyMCELang['lang_focus_alert'] = 'Teksink‰sittelyalueella t‰ytyy olla fokus enn
 tinyMCELang['lang_edit_confirm'] = 'Haluatko k‰ytt‰‰ WYSIWYG moodia t‰h‰n tekstialueeseen?';
 tinyMCELang['lang_insert_link_title'] = 'Lis‰‰/muokkaa linkki‰';
 tinyMCELang['lang_insert'] = 'Lis‰‰';
+tinyMCELang['lang_update'] = 'Lis‰‰';
 tinyMCELang['lang_cancel'] = 'Peruuta';
 tinyMCELang['lang_insert_link_url'] = 'Linkin URL';
 tinyMCELang['lang_insert_link_target'] = 'Kohde';
@@ -33,4 +34,5 @@ tinyMCELang['lang_insert_image_alt'] = 'Kuvan selite';
 tinyMCELang['lang_help_desc'] = 'Apua';
 tinyMCELang['lang_bold_img'] = "bold.gif";
 tinyMCELang['lang_italic_img'] = "italic.gif";
-
+tinyMCELang['lang_underline_img'] = "underline.gif";
+tinyMCELang['lang_clipboard_msg'] = 'Copy/Cut/Paste is not available in Mozilla and Firefox.\nDo you want more information about this issue?';

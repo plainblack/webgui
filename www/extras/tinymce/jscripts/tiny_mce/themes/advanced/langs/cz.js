@@ -3,7 +3,7 @@
 tinyMCELang['lang_theme_style_select'] = 'Styly';
 tinyMCELang['lang_theme_code_desc'] = 'Zobrazit zdroj HTML';
 tinyMCELang['lang_theme_code_title'] = 'Editor HTML zdroje';
-tinyMCELang['lang_theme_code_save'] = 'Ulo&#190;it';
+tinyMCELang['lang_theme_code_wordwrap'] = 'Word wrap';
 tinyMCELang['lang_theme_sub_desc'] = 'Dopln&#237; index';
 tinyMCELang['lang_theme_sup_desc'] = 'Horn&#237; index';
 tinyMCELang['lang_theme_hr_desc'] = 'Vlo&#190;it vodorovn&#253; odd&#236;lova&#232;';
@@ -66,3 +66,7 @@ tinyMCELang['lang_insert_anchor_title'] = 'Insert/edit anchor';
 tinyMCELang['lang_insert_anchor_name'] = 'Anchor name';
 tinyMCELang['lang_theme_anchor_desc'] = 'Insert/edit anchor';
 tinyMCELang['lang_theme_insert_link_titlefield'] = 'Title';
+tinyMCELang['lang_theme_clipboard_msg'] = 'Copy/Cut/Paste is not available in Mozilla and Firefox.\nDo you want more information about this issue?';
+tinyMCELang['lang_cut_desc'] = 'Cut';
+tinyMCELang['lang_copy_desc'] = 'Copy';
+tinyMCELang['lang_paste_desc'] = 'Paste';
