@@ -643,7 +643,10 @@ sub processPropertiesFromFormPost {
 	$data{endDate} = $self->getThread->getParent->get("endDate") unless ($session{form}{endDate});
 	($data{synopsis}, $data{content}) = $self->getSynopsisAndContentFromFormPost;
         if ($self->getThread->getParent->get("addEditStampToPosts")) {
-        	$data{content} .= "<p>\n\n --- (Edited on ".WebGUI::DateTime::epochToHuman()." by ".$session{user}{alias}.") --- \n</p>";
+        	$data{content} .= "\n\n --- (Edited on ".WebGUI::DateTime::epochToHuman()." by ".$session{user}{alias}.") --- \n";
+		if ($self->getValue("contentType") eq "mixed" || $self->getValue("contentType") eq "html") {
+			$data{content} = '<p>'.$data{content}.'</p>';
+		}
         }
 	$self->update(\%data);
         $self->getThread->subscribe if ($session{form}{subscribe});
@@ -881,10 +884,6 @@ sub www_edit {
 		$var{'preview.content'} = $self->formatContent($var{'preview.content'},$session{form}{contentType});
 	}
 	$var{'form.preview'} = WebGUI::Form::submit({value=>"Preview"});
-	$var{'form.submit'} = WebGUI::Form::button({
-		value=>"Save",
-		extras=>"onclick=\"this.value='Please wait...'; this.form.func.value='editSave'; this.form.submit();\""
-		});
 	$var{'form.footer'} = WebGUI::Form::formFooter();
 	$var{usePreview} = $self->getThread->getParent->get("usePreview");
 	$var{'user.isVisitor'} = ($session{user}{userId} eq '1');
@@ -919,16 +918,29 @@ sub www_edit {
 		value=>$title
 		});
 	if ($self->getThread->getParent->get("allowRichEdit")) {
-		$var{'content.form'} = WebGUI::Form::HTMLArea({
+		$var{'content.form'} = WebGUI::Form::textarea({
 			name=>"content",
 			value=>$content
 			});
+	WebGUI::Style::setScript($session{config}{extrasURL}.'/tinymce/jscripts/tiny_mce/tiny_mce.js',{type=>"text/javascript"});
+	$var{'content.form'} = ' <script language="javascript" type="text/javascript">
+        tinyMCE.init({
+		theme : "simple",
+                mode : "textareas"
+        });
+</script> <textarea name="content" style="min-width: 400px; width: 100%; height: 300px;">'.$content.'</textarea>';
 	} else {
 		$var{'content.form'} = WebGUI::Form::textarea({
 			name=>"content",
 			value=>$content
 			});
 	}
+	$var{'form.submit'} = WebGUI::Form::submit({
+		extras=>"onclick=\"this.value='".WebGUI::International::get(452)."';tinyMCE.triggerSave(); this.form.func.value='editSave'; this.form.submit();\""
+		});
+	$var{'form.preview'} = WebGUI::Form::submit({
+		value=>WebGUI::International::get("preview","Collaboration")
+		});
 	$var{'attachment.form'} = $self->getUploadControl;
         $var{'contentType.form'} = WebGUI::Form::contentType({
                 name=>'contentType',

@@ -1050,7 +1050,7 @@ sub getEditForm {
 		-name=>"isPrototype",
 		-label=>WebGUI::International::get("make prototype","Asset"),
 		-value=>$self->getValue("isPrototype"),
-		-uiLevel=>7
+		-uiLevel=>9
 		);
 	return $tabform;
 }

@@ -1,6 +1,11 @@
 package WebGUI::i18n::English::Collaboration;
 
 our $I18N = {
+	'preview' => {
+		message => q|Preview|,
+		lastUpdated => 1109618544,
+	},
+
 	'add' => {
 		message => q|Add|,
 		lastUpdated => 1109618544,

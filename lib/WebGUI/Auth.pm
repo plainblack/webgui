@@ -380,8 +380,7 @@ sub displayLogin {
     	my $self = shift;
 	my $method = $_[0] || "login";
 	my $vars = $_[1];
-	unless ($session{env}{REQUEST_URI} =~ "displayLogin" || $session{env}{REQUEST_URI} =~ "displayAccount" ||
-		$session{env}{REQUEST_URI} =~ "logout" || $session{env}{REQUEST_URI} =~ "deactivateAccount"){
+	unless ($session{form}{op} eq "auth") {
 	   	WebGUI::Session::setScratch("redirectAfterLogin",$session{env}{REQUEST_URI});
 	}
 	$vars->{title} = WebGUI::International::get(66);

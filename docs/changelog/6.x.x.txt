@@ -14,6 +14,10 @@
  - Fixed a bug that wouldn't allow the HTTP Proxy wobject to rewrite the URLs
    of SSL enabled sites.
  - Using the International Macro in Help to simplify management and translation.
+ - Fixed the rich edit bug on Collaboration System posts.
+ - Fixed a login bug that brought the user to the display account page rather
+   than the page they were trying to reach when they logged in.
+ - Fixed the Collaboration System search bug.
 
 
 6.4.0
