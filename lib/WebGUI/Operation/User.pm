@@ -405,9 +405,9 @@ sub www_listUsers {
                 $p = WebGUI::Paginator->new(WebGUI::URL::page('op=listUsers'),\@row);
                 $output .= '<table border=1 cellpadding=5 cellspacing=0 align="center">';
 		$output .= '<tr><td class="tableHeader"></td>
-			<td class="tableHeader">'.WebGUI::International::get(50).'</td>
-			<td class="tableHeader">'.WebGUI::International::get(453).'</td>
-			<td class="tableHeader">'.WebGUI::International::get(454).'</td></tr>';
+			<td class="tableHeader">'.WebGUI::International::get(50).'</td></tr>';
+	#		<td class="tableHeader">'.WebGUI::International::get(453).'</td>
+	#		<td class="tableHeader">'.WebGUI::International::get(454).'</td></tr>';
                 $output .= $p->getPage($session{form}{pn});
                 $output .= '</table>';
                 $output .= $p->getBarTraditional($session{form}{pn});
