@@ -9,6 +9,7 @@
  - fix [ 1152434 ] Last Reply column is blank in a forum [mwilson]
  - fix [ 1158944 ] Validate email addresses?
  - fix [ 1157311 ] Edit User Profile fails on Windows/Firefox
+ - fix [ 1160623 ] Redirect Incorrect- 6.2.11
 
 
 6.5.0
