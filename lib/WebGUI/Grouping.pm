@@ -225,7 +225,7 @@ sub getGroupsForUser {
 
 #-------------------------------------------------------------------
 
-=head2 getGroupsInGroup ( groupId )
+=head2 getGroupsInGroup ( groupId [, recursive ] )
 
 Returns an array reference containing a list of groups that belong to the specified group.
 
@@ -235,18 +235,32 @@ Returns an array reference containing a list of groups that belong to the specif
 
 A unique identifier for the group.
 
+=item recursive
+
+A boolean value to determine whether the method should return the groups directly in the group, or to follow the entire groups of groups hierarchy. Defaults to "0".
+
 =back
 
 =cut
 
 sub getGroupsInGroup {
-        return WebGUI::SQL->buildArrayRef("select groupId from groupGroupings where inGroup=$_[0]");
+       	my $groups = WebGUI::SQL->buildArrayRef("select groupId from groupGroupings where inGroup=$_[0]");
+	if ($_[1]) {
+		my @groupsOfGroups = @$groups;
+		foreach my $group (@$groups) {
+			my $gog = getGroupsInGroup($group,1);
+			push(@groupsOfGroups, @$gog);
+		}
+		return \@groupsOfGroups;
+	} else {
+		return $groups;
+	}
 }
 
 
 #-------------------------------------------------------------------
 
-=head2 getUsersInGroup ( groupId )
+=head2 getUsersInGroup ( groupId [, recursive ] )
 
 Returns an array reference containing a list of users that belong to the specified group.
 
@@ -256,12 +270,23 @@ Returns an array reference containing a list of users that belong to the specifi
 
 A unique identifier for the group.
 
+=item recursive
+
+A boolean value to determine whether the method should return the users directly in the group or to follow the entire groups of groups hierarchy. Defaults to "0".
+
 =back
 
 =cut
 
 sub getUsersInGroup {
-        return WebGUI::SQL->buildArrayRef("select userId from groupings where groupId=$_[0]");
+	my $clause = "groupId=$_[0]";
+	if ($_[1]) {
+		my $groups = getGroupsInGroup($_[0],1);
+		if ($#$groups >= 0) {
+			$clause = "groupId in (".join(",",@$groups).")";
+		}
+	}
+       	return WebGUI::SQL->buildArrayRef("select userId from groupings where $clause");
 }
 
 

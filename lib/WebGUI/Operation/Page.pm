@@ -33,10 +33,13 @@ sub _recursivelyChangePrivileges {
         my ($sth, $pageId);
         $sth = WebGUI::SQL->read("select pageId from page where parentId=$_[0]");
         while (($pageId) = $sth->array) {
-        	WebGUI::SQL->write("update page set startDate=$session{form}{startDate}, endDate=$session{form}{endDate},
-			ownerId=$session{form}{ownerId},  groupIdView=$session{form}{groupIdView}, 
-			groupIdEdit=$session{form}{groupIdEdit} where pageId=$pageId");
-                _recursivelyChangePrivileges($pageId);
+		if (WebGUI::Privilege::canEditPage($pageId)) {
+        		WebGUI::SQL->write("update page set startDate=$session{form}{startDate}, 
+				endDate=$session{form}{endDate},
+				ownerId=$session{form}{ownerId},  groupIdView=$session{form}{groupIdView}, 
+				groupIdEdit=$session{form}{groupIdEdit} where pageId=$pageId");
+                	_recursivelyChangePrivileges($pageId);
+		}
         }
 	$sth->finish;
 }
@@ -46,8 +49,10 @@ sub _recursivelyChangeStyle {
 	my ($sth, $pageId);
 	$sth = WebGUI::SQL->read("select pageId from page where parentId=$_[0]");	
 	while (($pageId) = $sth->array) {
-		WebGUI::SQL->write("update page set styleId=$session{form}{styleId} where pageId=$pageId");
-		_recursivelyChangeStyle($pageId);
+		if (WebGUI::Privilege::canEditPage($pageId)) {
+			WebGUI::SQL->write("update page set styleId=$session{form}{styleId} where pageId=$pageId");
+			_recursivelyChangeStyle($pageId);
+		}
 	}
 	$sth->finish;
 }
@@ -324,19 +329,19 @@ sub www_editPage {
                         );
 		$f->raw(
 			-value=>'<tr><td colspan=2><hr size=1><b>'.WebGUI::International::get(107).'</b></td></tr>',
-			-uiLevel=>9
+			-uiLevel=>6
 			);
         	$f->date(
 			-name=>"startDate",
 			-label=>WebGUI::International::get(497),
 			-value=>$page{startDate},
-			-uiLevel=>9
+			-uiLevel=>6
 			);
         	$f->date(
 			-name=>"endDate",
 			-label=>WebGUI::International::get(498),
 			-value=>$page{endDate},
-			-uiLevel=>9
+			-uiLevel=>6
 			);
 		if (WebGUI::Privilege::isInGroup(3)) {
 			$subtext = ' &nbsp; <a href="'.WebGUI::URL::page('op=listUsers').'">'
@@ -346,7 +351,7 @@ sub www_editPage {
 		}
 		my $clause; 
 		if (WebGUI::Privilege::isInGroup(3)) {
-			my $contentManagers = WebGUI::Grouping::getUsersInGroup(4);
+			my $contentManagers = WebGUI::Grouping::getUsersInGroup(4,1);
 			$clause = "userId in ($session{user}{userId},".join(",",@$contentManagers).")";
 		} else {
 			$clause = "userId=$page{ownerId}";
@@ -358,7 +363,7 @@ sub www_editPage {
 			-label=>WebGUI::International::get(108),
 			-value=>[$page{ownerId}],
 			-subtext=>$subtext,
-			-uiLevel=>9
+			-uiLevel=>6
 			);
 		if (WebGUI::Privilege::isInGroup(3)) {
 			$subtext = ' &nbsp; <a href="'.WebGUI::URL::page('op=listGroups').'">'
@@ -371,7 +376,7 @@ sub www_editPage {
 			-label=>WebGUI::International::get(872),
 			-value=>[$page{groupIdView}],
 			-subtext=>$subtext,
-			-uiLevel=>9
+			-uiLevel=>6
 			);
                 $f->group(
                         -name=>"groupIdEdit",
@@ -379,7 +384,7 @@ sub www_editPage {
                         -value=>[$page{groupIdEdit}],
                         -subtext=>$subtext,
 			-excludeGroups=>[1,7],
-                        -uiLevel=>9
+                        -uiLevel=>6
                         );
 		if ($childCount) {
                 	$f->yesNo(
