@@ -101,10 +101,10 @@ sub process {
 
 	# get wobjects and store in array of arrays in order to integrate with pages and sort by buffer date
 	if ($session{setting}{sharedClipboard} eq "1") {
-        	$query = "select bufferDate,wobjectId,title,namespace from wobject where pageId=2 "
+        	$query = "select bufferDate,wobjectId,title,namespace from wobject where pageId='2' "
 			." order by bufferDate";
 	} else {
-        	$query = "select bufferDate,wobjectId,title,namespace from wobject where pageId=2 "
+        	$query = "select bufferDate,wobjectId,title,namespace from wobject where pageId='2' "
 			." and bufferUserId=".quote($session{user}{userId})
 			." order by bufferDate";
 	}
