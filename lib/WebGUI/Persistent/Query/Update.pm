@@ -23,15 +23,15 @@ our @ISA = qw(WebGUI::Persistent::Query);
 
 =head1 NAME
 
-Package WebGUI::Persistent::Query::Insert
+Package WebGUI::Persistent::Query::Update
 
 =head1 DESCRIPTION
 
-This class allows reliable dynamic building of Sql insert queries.
+This class allows reliable dynamic building of Sql update queries.
 
 =head1 SYNOPSIS
 
- my $query = WebGUI::Persistent::Query::Insert->new(
+ my $query = WebGUI::Persistent::Query::Update->new(
    table => 'myTable',
    where => [A => [1,2],[{C => 'hello',B => 1}]],
    data => {

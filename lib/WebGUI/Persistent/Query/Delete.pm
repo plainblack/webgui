@@ -22,7 +22,7 @@ our @ISA = qw(WebGUI::Persistent::Query);
 
 =head1 NAME
 
-Package WebGUI::Persistent::Query::Insert
+Package WebGUI::Persistent::Query::Delete
 
 =head1 DESCRIPTION
 
@@ -30,15 +30,9 @@ This class allows reliable dynamic building of Sql delete queries.
 
 =head1 SYNOPSIS
 
- my $query = WebGUI::Persistent::Query::Insert->new(
+ my $query = WebGUI::Persistent::Query::Delete->new(
    table => 'myTable',
-   where => [A => [1,2],[{C => 'hello',B => 1}]],
-   properties => {
-     A => { },
-     B => { },
-     C => { quote => 1 },
-     D => { quote => 1 },
-   }
+   where => [A => [1,2],[{C => 'hello',B => 1}]]
  );
 
  $query->buildQuery();
