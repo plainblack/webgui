@@ -236,6 +236,11 @@ our $I18N = {
 		lastUpdated => 1109696029,
 	},
 
+	'synopsis' => {
+		message => q|Synopsis|,
+		lastUpdated => 1109696029,
+	},
+
 	'start date' => {
 		message => q|Start Date|,
 		lastUpdated => 1109696029,

@@ -22,6 +22,8 @@
  - fix [ 1165373 ] sort templates into folders by namespace under ImportNode
  - fix [ 1118789 ] 6.2.11 - L_loginBox display with empty 1st param [colink]
  - fix [ 1165635 ] IndexedSearch - double toolbar in AdminMode [mwilson]
+ - fix [ 1165598 ] Auth module numeric comparisons against Ids
+ - Fixed a bunch of Collaboration System template problems.
 
 
 6.5.2

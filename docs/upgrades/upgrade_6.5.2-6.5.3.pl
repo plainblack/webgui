@@ -21,7 +21,8 @@ WebGUI::Session::open("../..",$configFile);
 #--------------------------------------------
 print "\tSorting templates under the Import Node into folders by namespace.\n" unless ($quiet);
 my ($templateFolder) = WebGUI::SQL->quickArray("select assetId from asset where parentId='PBasset000000000000002' and className='WebGUI::Asset::Wobject::Folder' and title='Templates' limit 1");
-my $namespacesQuery = "select distinct template.namespace from asset, template where asset.parentId='".$templateFolder."' and asset.assetId=template.assetId and asset.className='WebGUI::Asset::Template' order by template.namespace";
+$templateFolder ||= 'PBasset000000000000002';
+my $namespacesQuery = "select distinct template.namespace from asset, template where asset.assetId=template.assetId and asset.className='WebGUI::Asset::Template' order by template.namespace";
 my $parent = WebGUI::Asset->new($templateFolder);
 my $sth = WebGUI::SQL->read($namespacesQuery);
 my $folder;
@@ -43,7 +44,7 @@ while (my $namespace = $sth->hashRef) {
 		groupIdEdit=>'3',
 		description=>''
 	});
-	my $templatesquery = "select * from asset, template where asset.parentId='".$templateFolder."' and asset.assetId=template.assetId and asset.className='WebGUI::Asset::Template' and template.namespace='".$namespace->{namespace}."' order by title asc";
+	my $templatesquery = "select * from asset, template where asset.assetId=template.assetId and asset.className='WebGUI::Asset::Template' and template.namespace='".$namespace->{namespace}."' order by title asc";
 	my $newParentId = $folder->getId;
 	my $sth2 = WebGUI::SQL->read($templatesquery);
 	my $first = 1;

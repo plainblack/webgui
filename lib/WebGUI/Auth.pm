@@ -61,7 +61,7 @@ sub _isDuplicateUsername {
 	my $self = shift;
 	my $username = shift;
 	#Return false if the user is already logged in, but not changing their username.
-	return 0 if($self->userId != 1 && $session{user}{username} eq $username);
+	return 0 if($self->userId ne "1" && $session{user}{username} eq $username);
 	my ($otherUser) = WebGUI::SQL->quickArray("select count(*) from users where username=".quote($username));
 	return 0 if !$otherUser;
 	$self->error('<li>'.WebGUI::International::get(77).' "'.$username.'too", "'.$username.'2", '.'"'.$username.'_'.WebGUI::DateTime::epochToHuman(time(),"%y").'"');
@@ -81,7 +81,7 @@ sub _isValidUsername {
    my $username = shift;
    my $error = "";
    
-   return 1 if($self->userId != 1 && $session{user}{username} eq $username);
+   return 1 if($self->userId ne "1" && $session{user}{username} eq $username);
    
    if ($username =~ /^\s/ || $username =~ /\s$/) {
       $error .= '<li>'.WebGUI::International::get(724);

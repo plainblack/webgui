@@ -158,6 +158,7 @@ sub appendTemplateLabels {
 	$var->{'startDate.label'} = $i18n->get("start date");
 	$var->{"stick.label"} = $i18n->get("sticky");
 	$var->{"status.label"} = $i18n->get("status");
+	$var->{"synopsis.label"} = $i18n->get("synopsis");
 	$var->{"thumbnail.label"} = $i18n->get("thumbnail");
 	$var->{"title.label"} = $i18n->get("title");
 	$var->{"layout.threaded.label"} = $i18n->get("threaded");

@@ -900,6 +900,7 @@ sub www_edit {
 	}
 	$var{'form.footer'} = WebGUI::Form::formFooter();
 	$var{usePreview} = $self->getThread->getParent->get("usePreview");
+	$var{'user.isModerator'} = $self->getThread->getParent->canModerate;
 	$var{'user.isVisitor'} = ($session{user}{userId} eq '1');
 	$var{'visitorName.form'} = WebGUI::Form::text({
 		name=>"visitorName",
@@ -966,13 +967,17 @@ sub www_edit {
                 name=>'contentType',
                 value=>$self->getValue("contentType") || "mixed"
                 });
+	my $startDate = $self->get("startDate");
+	$startDate = WebGUI::DateTime::setToEpoch($session{form}{startDate}) if ($session{form}{startDate});
 	$var{'startDate.form'} = WebGUI::Form::dateTime({
 		name  => 'startDate',
-		value => $self->getValue("startDate")
+		value => $startDate
 		});
+	my $endDate = $self->get("endDate");
+	$endDate = WebGUI::DateTime::setToEpoch($session{form}{endDate}) if ($session{form}{endDate});
 	$var{'endDate.form'} = WebGUI::Form::dateTime({
 		name  => 'endDate',
-		value => $self->getValue("endDate")
+		value => $endDate
 		});
 	$self->getThread->getParent->appendTemplateLabels(\%var);
 	return $self->getThread->getParent->processStyle($self->processTemplate(\%var,$self->getThread->getParent->get("postFormTemplateId")));

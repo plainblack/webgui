@@ -7,6 +7,7 @@ use SOAP::Lite;
 use Storable;
 use WebGUI::Cache;
 use WebGUI::ErrorHandler;
+use WebGUI::HTTP;
 use WebGUI::International;
 use WebGUI::Macro;
 use WebGUI::Paginator;
@@ -514,9 +515,8 @@ sub view {
    if ($session{'config'}{'soapHttpHeaderOverride'} &&
       $self->get("httpHeader")) {
 
-      $session{'header'}{'mimetype'} = $self->get("httpHeader");
-      WebGUI::ErrorHandler::warn("changed mimetype: " . 
-         $session{'header'}{'mimetype'});
+      WebGUI::HTTP::setMimeType($self->get("httpHeader"));
+      WebGUI::ErrorHandler::warn("changed mimetype: " .  $session{'header'}{'mimetype'});
    }
 
    # Note, we still process our template below even though it will never

@@ -158,7 +158,7 @@ sub authenticate {
 sub createAccount {
    my $self = shift;
    my $vars;
-   if ($session{user}{userId} != 1) {
+   if ($session{user}{userId} ne "1") {
       return $self->displayAccount;
    } elsif (!$session{setting}{anonymousRegistration}) {
  	  return $self->displayLogin;
@@ -190,7 +190,7 @@ sub createAccount {
 sub createAccountSave {
    my $self = shift;
    
-   return $self->displayAccount if ($session{user}{userId} != 1);
+   return $self->displayAccount if ($session{user}{userId} ne "1");
    
    my $username = $session{form}{'authWebGUI.username'};
    my $password = $session{form}{'authWebGUI.identifier'};
@@ -290,7 +290,7 @@ sub displayAccount {
 sub displayLogin {
    	my $self = shift;
    	my $vars;
-   	return $self->displayAccount($_[0]) if ($self->userId != 1);
+   	return $self->displayAccount($_[0]) if ($self->userId ne "1");
    	$vars->{'login.message'} = $_[0] if ($_[0]);
    	$vars->{'recoverPassword.isAllowed'} = $self->getSetting("passwordRecovery");
    	$vars->{'recoverPassword.url'} = WebGUI::URL::page('op=auth&method=recoverPassword');
@@ -494,7 +494,7 @@ sub new {
 #-------------------------------------------------------------------
 sub recoverPassword {
    my $self = shift;
-   return $self->displayLogin if($self->userId != 1);	
+   return $self->displayLogin if($self->userId ne "1");	
    my $template = 'Auth/WebGUI/Recovery';
    my $vars;
    $vars->{title} = WebGUI::International::get(71);
