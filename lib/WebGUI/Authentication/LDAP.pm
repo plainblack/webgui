@@ -47,7 +47,7 @@ sub authenticate {
         	$port = $uri->port;
         }
         %args = (port => $port);
-        $ldap = Net::LDAP->new($uri->host, %args) or $result = WebGUI::International::get(79);
+        $ldap = Net::LDAP->new($uri->host, %args) or $result = WebGUI::International::get(2,'Auth/LDAP');
 	return $result if $result;
         $auth = $ldap->bind(dn=>$$userData{connectDN}, password=>$identifier);
                 if ($auth->code == 48 || $auth->code == 49) {
@@ -71,8 +71,8 @@ sub adminForm {
 	my $f;
 	$f = WebGUI::HTMLForm->new;
 	$f->readOnly('<b>'.optionsLabel().'</b>');
-	$f->url("ldapURL",WebGUI::International::get(165),$ldapURL);
-	$f->text("connectDN",WebGUI::International::get(166),$connectDN);
+	$f->url("ldapURL",WebGUI::International::get(3,'Auth/LDAP'),$ldapURL);
+	$f->text("connectDN",WebGUI::International::get(4,'Auth/LDAP'),$connectDN);
 	return $f->printRowsOnly;
 }
 
@@ -92,7 +92,7 @@ sub adminFormValidate {
 
 #-------------------------------------------------------------------
 sub optionsLabel {
-	return "LDAP Authentication Options";
+	return WebGUI::International::get(1,'Auth/LDAP');
 }
 
 #-------------------------------------------------------------------
@@ -145,7 +145,7 @@ sub registrationFormValidate {
         		if (defined $search->entry(0)) {
                 		$connectDN = "cn=".$search->entry(0)->get_value("cn");
                 		$ldap->unbind;
-                		$ldap = Net::LDAP->new($uri->host, {port=>$port}) or $error .= WebGUI::International::get(79);
+                		$ldap = Net::LDAP->new($uri->host, {port=>$port}) or $error .= WebGUI::International::get(2,'Auth/LDAP');
                 		$auth = $ldap->bind(dn=>$connectDN, password=>$session{form}{ldapPassword});
                 		if ($auth->code == 48 || $auth->code == 49) {
                         		$error .= '<li>'.WebGUI::International::get(68);
@@ -161,10 +161,10 @@ sub registrationFormValidate {
                 		WebGUI::ErrorHandler::warn("Invalid LDAP information for registration of LDAP ID: ".$session{form}{ldapId});
         		}
 		} else {
-			$error = WebGUI::International::get(79);
+			$error = WebGUI::International::get(2,'Auth/LDAP');
 		}
 	} else {
-		$error = WebGUI::International::get(79);
+		$error = WebGUI::International::get(2,'Auth/LDAP');
 	}
 	return $error;
 }
@@ -174,10 +174,10 @@ sub settingsForm {
 	my $f;
 	$f = WebGUI::HTMLForm->new;
 	$f->readOnly('<b>'.optionsLabel().'</b>');
-	$f->url("ldapURL",WebGUI::International::get(120),$session{setting}{ldapURL});
-        $f->text("ldapId",WebGUI::International::get(121),$session{setting}{ldapId});
-        $f->text("ldapIdName",WebGUI::International::get(122),$session{setting}{ldapIdName});
-        $f->text("ldapPasswordName",WebGUI::International::get(123),$session{setting}{ldapPasswordName});
+	$f->url("ldapURL",WebGUI::International::get(5,'Auth/LDAP'),$session{setting}{ldapURL});
+        $f->text("ldapId",WebGUI::International::get(6,'Auth/LDAP'),$session{setting}{ldapId});
+        $f->text("ldapIdName",WebGUI::International::get(7,'Auth/LDAP'),$session{setting}{ldapIdName});
+        $f->text("ldapPasswordName",WebGUI::International::get(8,'Auth/LDAP'),$session{setting}{ldapPasswordName});
 	return $f->printRowsOnly;
 }
 

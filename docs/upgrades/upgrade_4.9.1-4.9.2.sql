@@ -1,3 +1,23 @@
 insert into webguiVersion values ('4.9.2','upgrade',unix_timestamp());
-
-
+insert into international (internationalId,languageId,namespace,message,lastUpdated) values (1,1,'Auth/LDAP','LDAP Authentication Options', 1039450730);
+insert into international (internationalId,languageId,namespace,message,lastUpdated) values (1,1,'Auth/WebGUI','WebGUI Authentication Options', 1039449605);
+update international set namespace='Auth/WebGUI', internationalId=2 where internationalId=55 and namespace='WebGUI';
+update international set namespace='Auth/WebGUI', internationalId=3 where internationalId=78 and namespace='WebGUI';
+update international set namespace='Auth/WebGUI', internationalId=4 where internationalId=726 and namespace='WebGUI';
+update international set namespace='Auth/WebGUI', internationalId=5 where internationalId=727 and namespace='WebGUI';
+update international set namespace='Auth/LDAP', internationalId=2 where internationalId=79 and namespace='WebGUI';
+update international set namespace='Auth/LDAP', internationalId=3 where internationalId=165 and namespace='WebGUI';
+update international set namespace='Auth/LDAP', internationalId=4 where internationalId=166 and namespace='WebGUI';
+update international set namespace='Auth/LDAP', internationalId=5 where internationalId=120 and namespace='WebGUI';
+update international set namespace='Auth/LDAP', internationalId=6 where internationalId=121 and namespace='WebGUI';
+update international set namespace='Auth/LDAP', internationalId=7 where internationalId=122 and namespace='WebGUI';
+update international set namespace='Auth/LDAP', internationalId=8 where internationalId=123 and namespace='WebGUI';
+insert into international (internationalId,languageId,namespace,message,lastUpdated) values (9,1,'Auth/SMB','NT Password', 1039453225);
+insert into international (internationalId,languageId,namespace,message,lastUpdated) values (8,1,'Auth/SMB','NT Login', 1039452980);
+insert into international (internationalId,languageId,namespace,message,lastUpdated) values (7,1,'Auth/SMB','NT Domain', 1039452950);
+insert into international (internationalId,languageId,namespace,message,lastUpdated) values (6,1,'Auth/SMB','BDC', 1039452936);
+insert into international (internationalId,languageId,namespace,message,lastUpdated) values (5,1,'Auth/SMB','PDC', 1039452926);
+insert into international (internationalId,languageId,namespace,message,lastUpdated) values (4,1,'Auth/SMB','SMB Logon Error (3)<br>You have supplied an invalid username/password pair. Probably a typo, please try again.', 1039452797);
+insert into international (internationalId,languageId,namespace,message,lastUpdated) values (3,1,'Auth/SMB','SMB Protocol Error (2)<br>Please contact your sysadmin.', 1039452769);
+insert into international (internationalId,languageId,namespace,message,lastUpdated) values (2,1,'Auth/SMB','SMB Server Error (1)<br>Something went wrong accessing the domain controller. Perhaps the connection timed out. Please try again or contact your sysadmin.', 1039452744);
+insert into international (internationalId,languageId,namespace,message,lastUpdated) values (1,1,'Auth/SMB','SMB Authentication Options', 1039451963);

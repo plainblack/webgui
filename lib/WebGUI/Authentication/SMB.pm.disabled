@@ -9,7 +9,7 @@ package WebGUI::Authentication::SMB;
 #-------------------------------------------------------------------
 # http://www.plainblack.com			info@plainblack.com
 #-------------------------------------------------------------------~
-
+   
 use strict;
 use WebGUI::Session; 
 use WebGUI::HTMLForm;
@@ -18,21 +18,21 @@ use Authen::Smb;
 use warnings;
 
 my %smbError = (
-	1 => 'SMB Server Error (1)<br>Something went wrong accessing the domain controller. Perhaps the connection timed out. Please try again or contact your sysadmin.',
-	2 => 'SMB Protocol Error (2)<br>Please contact your sysadmin',
-	3 => 'SMB Logon Error (3)<br>You have supplied an invalid username/password pair. Probably a typo, please try again.'
+	1 => WebGUI::International::get(2,'Auth/SMB'),
+	2 => WebGUI::International::get(3,'Auth/SMB'),
+	3 => WebGUI::International::get(4,'Auth/SMB')
 );
 
 #-------------------------------------------------------------------
 sub authenticate {
-	my ($uid, $password, $userData, $smb, $result);
+	my ($userId, $password, $userData, $smb, $result);
 	$userId = $_[0]->[0];
         $password = $_[0]->[1];
-	$userData = WebGUI::Authentication::getParams($uid, 'SMB');
+	$userData = WebGUI::Authentication::getParams($userId, 'SMB');
 
 	$smb = Authen::Smb::authen($userData->{smbLogin}, $password, $userData->{smbPDC}, $userData->{smbBDC}, $userData->{smbDomain});
 	if ($smb > 0) {
-		$result = '<li>'. $smbError{$smb} . <br> ."Login: *$userData->{smbLogin}, PDC: *$userData->{smbPDC}*, BDC: *$userData->{smbBDC}*, Domain: *$userData->{smbDomain}*";
+		$result = '<li>'. $smbError{$smb};
 	} else {
 		$result = 1;
 	}
@@ -50,10 +50,10 @@ sub adminForm {
 	my $f;
 	$f = WebGUI::HTMLForm->new;
 	$f->readOnly('<b>'.optionsLabel().'</b>');
-	$f->text("smbPDC","PDC",$pdc);
-	$f->text("smbBDC","BDC",$bdc);
-	$f->text("smbDomain","NT Domain",$domain);
-	$f->text("smbLogin","NT Login name",$login);
+	$f->text("smbPDC",WebGUI::International::get(5,'Auth/SMB'),$pdc);
+	$f->text("smbBDC",WebGUI::International::get(6,'Auth/SMB'),$bdc);
+	$f->text("smbDomain",WebGUI::International::get(7,'Auth/SMB'),$domain);
+	$f->text("smbLogin",WebGUI::International::get(8,'Auth/SMB'),$login);
 	return $f->printRowsOnly;
 }
 
@@ -70,15 +70,15 @@ sub adminFormSave {
 
 #-------------------------------------------------------------------
 sub optionsLabel {
-	return "SMB Authentication Options";
+	return WebGUI::International::get(1,'Auth/SMB');
 }
 
 #-------------------------------------------------------------------
 sub registrationForm {
 	my $f;
 	$f = WebGUI::HTMLForm->new;
-	$f->text("loginId","NT Login Id");
-	$f->password("smbPassword","NT Password");
+	$f->text("loginId",WebGUI::International::get(8,'Auth/SMB'));
+	$f->password("smbPassword",WebGUI::International::get(9,'Auth/SMB'));
 	return $f->printRowsOnly;
 }
 
@@ -115,9 +115,9 @@ sub settingsForm {
 	my $f;
 	$f = WebGUI::HTMLForm->new;
 	$f->readOnly('<b>'.optionsLabel().'</b>');
-	$f->text("smbPDC","PDC",$session{setting}{smbPDC});
-	$f->text("smbBDC","BDC",$session{setting}{smbBDC});
-	$f->text("smbDomain","NT Domain",$session{setting}{smbDomain});
+	$f->text("smbPDC",WebGUI::International::get(5,'Auth/SMB'),$session{setting}{smbPDC});
+	$f->text("smbBDC",WebGUI::International::get(6,'Auth/SMB'),$session{setting}{smbBDC});
+	$f->text("smbDomain",WebGUI::International::get(7,'Auth/SMB'),$session{setting}{smbDomain});
 	return $f->printRowsOnly;
 }
 

@@ -55,7 +55,7 @@ sub adminFormValidate {
 
 #-------------------------------------------------------------------
 sub optionsLabel {
-        return "WebGUI Authentication Options";
+        return WebGUI::International::get(1,'Auth/WebGUI');
 }
 
 #-------------------------------------------------------------------
@@ -63,7 +63,7 @@ sub registrationForm {
 	my $f;
 	$f = WebGUI::HTMLForm->new;
 	$f->password("identifier",WebGUI::International::get(51));
-	$f->password("identifierConfirm",WebGUI::International::get(55));
+	$f->password("identifierConfirm",WebGUI::International::get(2,'Auth/WebGUI'));
 	return $f->printRowsOnly;
 }
 
@@ -76,13 +76,13 @@ sub registrationFormSave {
 sub registrationFormValidate {
 	my ($error);
         if ($session{form}{identifier} ne $session{form}{identifierConfirm}) {
-                $error = '<li>'.WebGUI::International::get(78);
+                $error = '<li>'.WebGUI::International::get(3,'Auth/WebGUI');
         }
         if ($session{form}{identifier} eq "password") {
-                $error .= '<li>'.WebGUI::International::get(727);
+                $error .= '<li>'.WebGUI::International::get(5,'Auth/WebGUI');
         }
         if ($session{form}{identifier} eq "") {
-                $error .= '<li>'.WebGUI::International::get(726);
+                $error .= '<li>'.WebGUI::International::get(4,'Auth/WebGUI');
         }
         return $error;
 }
@@ -97,7 +97,7 @@ sub userForm {
         my $f;
         $f = WebGUI::HTMLForm->new;
         $f->password("identifier",WebGUI::International::get(51),"password");
-        $f->password("identifierConfirm",WebGUI::International::get(55),"password");
+        $f->password("identifierConfirm",WebGUI::International::get(2,'Auth/WebGUI'),"password");
         return $f->printRowsOnly;
 }
 
@@ -110,10 +110,10 @@ sub userFormSave {
 sub userFormValidate {
         my ($error);
         if ($session{form}{identifier} ne $session{form}{identifierConfirm}) {
-                $error = '<li>'.WebGUI::International::get(78);
+                $error = '<li>'.WebGUI::International::get(3,'Auth/WebGUI');
         }
         if ($session{form}{identifier} eq "") {
-                $error .= '<li>'.WebGUI::International::get(726);
+                $error .= '<li>'.WebGUI::International::get(4,'Auth/WebGUI');
         }
         return $error;
 }
