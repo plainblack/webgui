@@ -68,7 +68,7 @@ sub _submenu {
 #-------------------------------------------------------------------
 sub www_deleteCollateral {
 	my $collateral = WebGUI::Collateral->new($session{form}{cid});
-        return WebGUI::Privilege::insufficient unless ($collateral->get("userId") == $session{user}{userId} || WebGUI::Grouping::isInGroup(3));
+    return WebGUI::Privilege::insufficient unless ($collateral->get("userId") eq $session{user}{userId} || WebGUI::Grouping::isInGroup(3));
 	my $output = '<h1>'.WebGUI::International::get(42).'</h1>';
 	$output .= WebGUI::International::get(774).'<p/><div align="center">';
 	$output .= '<a href="'.WebGUI::URL::page('op=deleteCollateralConfirm&cid='.$session{form}{cid}).'">'
@@ -82,7 +82,7 @@ sub www_deleteCollateral {
 #-------------------------------------------------------------------
 sub www_deleteCollateralConfirm {
 	my $collateral = WebGUI::Collateral->new($session{form}{cid});
-        return WebGUI::Privilege::insufficient unless ($collateral->get("userId") == $session{user}{userId} || WebGUI::Grouping::isInGroup(3));
+    return WebGUI::Privilege::insufficient unless ($collateral->get("userId") eq $session{user}{userId} || WebGUI::Grouping::isInGroup(3));
 	$collateral->delete;
 	WebGUI::Session::deleteScratch("collateralPageNumber");
 	return www_listCollateral();
@@ -91,7 +91,7 @@ sub www_deleteCollateralConfirm {
 #-------------------------------------------------------------------
 sub www_deleteCollateralFile {
 	my $collateral = WebGUI::Collateral->new($session{form}{cid});
-        return WebGUI::Privilege::insufficient unless ($collateral->get("userId") == $session{user}{userId} || WebGUI::Grouping::isInGroup(3));
+    return WebGUI::Privilege::insufficient unless ($collateral->get("userId") eq $session{user}{userId} || WebGUI::Grouping::isInGroup(3));
 	$collateral->deleteFile;
 	return www_editCollateral($collateral);
 }
@@ -161,7 +161,7 @@ sub www_editCollateral {
 		my $c = $_[1] || WebGUI::Collateral->new($session{form}{cid});
 		$collateral = $c->get;
 	}
-	$canEdit = ($collateral->{userId} == $session{user}{userId} || WebGUI::Grouping::isInGroup(3));
+	$canEdit = ($collateral->{userId} eq $session{user}{userId} || WebGUI::Grouping::isInGroup(3));
 	$folderId = $session{scratch}{collateralFolderId} || 0;
 	$f = WebGUI::HTMLForm->new;
 	$f->hidden("op","editCollateralSave");
