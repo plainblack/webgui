@@ -36,7 +36,7 @@ sub process {
 	$var{'account.display.url'} = WebGUI::URL::page('op=displayAccount');
         $var{'logout.label'} = WebGUI::International::get(49);
         my $boxSize = $param[0];
-        $boxSize = 12 if (not defined $boxSize);
+        $boxSize = 12 unless $boxSize;
         if (index(lc($ENV{HTTP_USER_AGENT}),"msie") < 0) {
         	$boxSize = int($boxSize=$boxSize*2/3);
         }
