@@ -30,11 +30,11 @@ our $name = WebGUI::International::get(2,$namespace);
 sub duplicate {
 	my ($w);
 	$w = $_[0]->SUPER::duplicate($_[1]);
-        $w = WebGUI::Wobject::Article->new({wobjectId=>$w,namespace=>$namespace});
+        $w = WebGUI::Wobject::SyndicatedContent->new({wobjectId=>$w,namespace=>$namespace});
 	$w->set({
 		rssUrl=>$_[0]->get("rssUrl"),
-		rssUrl=>$_[0]->get("content"),
-		rssUrl=>$_[0]->get("lastFetched")
+		content=>$_[0]->get("content"),
+		lastFetched=>$_[0]->get("lastFetched")
 		});
 }
 
