@@ -1,3 +1,5 @@
+#!/usr/bin/perl
+
 #-------------------------------------------------------------------
 # WebGUI is Copyright 2001-2003 Plain Black LLC.
 #-------------------------------------------------------------------
@@ -15,34 +17,14 @@
 
 use File::stat;
 use Image::Magick;
+use lib "../lib";
+use WebGUI::Utility;
+
 
 if ($ARGV[0] ne ""){
   $results = recurseFileSystem($ARGV[0]);
 } else {
-  print "Usage: $0 <uploadsPath> [<thumbnailSize (50)>]\n";
-}
-
-#-----------------------------------------
-# isIn(string, listToCheck)
-#-----------------------------------------
-sub isIn {
-        my ($i, @a, @b, @isect, %union, %isect, $e);
-        foreach $e (@_) {
-                if ($a[0] eq "") {
-                        $a[0] = $e;
-                } else {
-                        $b[$i] = $e;
-                        $i++;
-                }
-        }
-        foreach $e (@a, @b) { $union{$e}++ && $isect{$e}++ }
-        @isect = keys %isect;
-        if (defined @isect) {
-                undef @isect;
-                return 1;
-        } else {
-                return 0;
-        }
+  print "Usage: perl $0 <uploadsPath> [<thumbnailSize (50)>]\n";
 }
 
 #-----------------------------------------

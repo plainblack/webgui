@@ -68,6 +68,9 @@ save you many hours of grief.
 	sbin/Hourly as it is no longer required, and will cause
 	problems if it is not removed.
 
+ * imageCollateralImport.pl has been replaced by collateralImport.pl.
+	Please delete imageCollateralImport.pl.
+
 
 5.1.0
 --------------------------------------------------------------------

@@ -1,3 +1,5 @@
+#!/usr/bin/perl
+
 #-------------------------------------------------------------------
 # WebGUI is Copyright 2001-2003 Plain Black LLC.
 #-------------------------------------------------------------------
@@ -38,6 +40,8 @@ my $ldapUrl;
 my $status = 'Active';
 my $expireOffset;
 my $expireUnits = 'seconds';
+my $override;
+my $quiet;
 
 GetOptions(
 	'usersfile=s'=>\$usersFile,
@@ -48,9 +52,11 @@ GetOptions(
 	'password|identifier:s'=>\$defaultIdentifier,
 	'groups:s'=>\$groups,
 	'ldapUrl:s'=>\$ldapUrl,
+	'quiet'=>\$quiet,
 	'status:s'=>\$status,
 	'expireOffset:i'=>\$expireOffset,
-	'expireUnits:s'=>\$expireUnits
+	'expireUnits:s'=>\$expireUnits,
+	'override'=>\$override
 );
 
 
@@ -61,7 +67,7 @@ unless ($usersFile && $configFile && !$help) {
 	print <<STOP;
 
 
-Usage: $0 --userfile=<pathToFile> --configfile=<webguiConfig>
+Usage: perl $0 --userfile=<pathToFile> --configfile=<webguiConfig>
 
 	--usersFile	File containing import information.
 
@@ -103,10 +109,19 @@ Options:
 			for authentication. Can be overridden in
 			the import file.
 
+	--override      This utility is designed to be run as
+                        a privileged user on Linux style systems.
+                        If you wish to run this utility without
+                        being the super user, then use this flag,
+                        but note that it may not work as
+                        intended.
+
 	--password	The default password to use when none is 
 			specified with the user. Defaults to 
 			'123qwe'. Can be overridden in the import
 			file.
+
+	--quiet         Disable output unless there's an error.
 
 	--status	The user's account status. Defaults to
 			'Active'. Other valid value is 'Deactivated'.
@@ -147,11 +162,18 @@ STOP
 }
 
 
-print "Starting up...";
+if (!($^O =~ /^Win/i) && $> != 0 && !$override) {
+        print "You must be the super user to use this utility.\n";
+        exit;
+}
+
+
+
+print "Starting up..." unless ($quiet);
 WebGUI::Session::open($webguiRoot,$configFile);
 WebGUI::Session::refreshUserInfo(3); # The script should run as admin.
 open(FILE,"<".$usersFile);
-print "OK\n";
+print "OK\n" unless ($quiet);
 
 my $first = 1;
 my $lineNumber = 0;
@@ -197,11 +219,11 @@ while(<FILE>) {
 		# process user
 		my ($duplicate) = WebGUI::SQL->quickArray("select count(*) from users where username=".quote($user{username}));
   		if ($user{username} eq "") {
-    			print "Skipping line $lineNumber.\n";
+    			print "Skipping line $lineNumber.\n" unless ($quiet);
 		} elsif ($duplicate) {
-			print "User $user{username} already exists. Skipping.\n";
+			print "User $user{username} already exists. Skipping.\n" unless ($quiet);
 		} else {
-    			print "Adding user $user{username}\n";
+    			print "Adding user $user{username}\n" unless ($quiet);
 			my $u = WebGUI::User->new("new");
 			$u->username($user{username});
 			$u->authMethod($user{authMethod});
@@ -223,10 +245,11 @@ while(<FILE>) {
   		}
 	}
 }
-print "Cleaning up...";
+print "Cleaning up..." unless ($quiet);
 close(FILE);
+WebGUI::Session::end($session{var}{sessionId});
 WebGUI::Session::close();
-print "OK\n";
+print "OK\n" unless ($quiet);
 
 
 #-------------------------------------------------

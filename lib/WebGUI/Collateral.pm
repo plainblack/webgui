@@ -56,7 +56,7 @@ These methods are available from this class:
 #-------------------------------------------------------------------
 # extended only to save info to database
 sub createThumbnail {
-        $_[0]->SUPER::createThumbnail(@_);
+        $_[0]->SUPER::createThumbnail($_[1]);
         if ($_[1] != $_[0]->get("thumbnailSize")) {
 		$_[0]->set({thumbnailSize=>$_[1]});
         }
