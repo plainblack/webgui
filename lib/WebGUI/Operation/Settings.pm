@@ -94,7 +94,7 @@ sub www_editContentSettings {
         $f->integer("maxAttachmentSize",WebGUI::International::get(130),$session{setting}{maxAttachmentSize});
         $f->integer("maxImageSize",WebGUI::International::get(583),$session{setting}{maxImageSize});
         $f->integer("thumbnailSize",WebGUI::International::get(406),$session{setting}{thumbnailSize});
-        $f->integer("snippetsPreviewLength",'Snippets preview length',$session{setting}{snippetsPreviewLength});
+        $f->integer("snippetsPreviewLength",WebGUI::International::get(888),$session{setting}{snippetsPreviewLength});
         $f->integer("textAreaRows",WebGUI::International::get(463),$session{setting}{textAreaRows});
         $f->integer("textAreaCols",WebGUI::International::get(464),$session{setting}{textAreaCols});
         $f->integer("textBoxSize",WebGUI::International::get(465),$session{setting}{textBoxSize});
