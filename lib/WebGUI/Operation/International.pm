@@ -81,6 +81,7 @@ sub www_addInternationalMessage {
 	$output = '<h1>Add English Message</h1>';
 	$namespace = $session{wobject};
 	$namespace->{WebGUI} = 'WebGUI';
+	$namespace = {%{$namespace}, map {'Auth/'.$_ => 'Authentication: '.$session{authentication}->{$_}} keys(%{$session{authentication}})};
 	$f = WebGUI::HTMLForm->new();
 	$f->hidden("lid",1);
 	$f->hidden("op","addInternationalMessageSave");
