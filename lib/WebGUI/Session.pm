@@ -223,8 +223,8 @@ sub open {
 	$session{setting} = WebGUI::SQL->buildHashRef("select name,value from settings");
 	###----------------------------
 	### CGI object
-	$session{cgi} = CGI->new();
 	$CGI::POST_MAX=1024 * $session{setting}{maxAttachmentSize};
+	$session{cgi} = CGI->new();
 	###----------------------------
 	### header variables
 	$session{header}{mimetype} = 'text/html';
