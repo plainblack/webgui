@@ -72,15 +72,14 @@ sub www_deleteQuestionConfirm {
 
 #-------------------------------------------------------------------
 sub www_edit {
-        my ($f, $output, $template);
+        my ($f, $output);
         return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
-	$template = $_[0]->get("templateId") || 1;
 	$output = helpIcon(1,$namespace);
         $output .= '<h1>'.WebGUI::International::get(8,$namespace).'</h1>';
 	$f = WebGUI::HTMLForm->new;
 	$f->template(
               	-name=>"templateId",
-               	-value=>$template,
+               	-value=>$_[0]->get("templateId"),
                	-namespace=>$namespace,
                	-label=>WebGUI::International::get(74,$namespace),
                	-afterEdit=>'func=edit&wid='.$_[0]->get("wobjectId")
