@@ -26,7 +26,7 @@ CREATE TABLE imageGroup (
   imageGroupId int(11) NOT NULL,
   name varchar(128) NOT NULL default 'untitled',
   parentId int(11) NOT NULL default '0',
-  description varchar(255) default NULL,
+  description varchar(255) default NULL
 );
 INSERT INTO incrementer VALUES('imageGroupId',1);
 INSERT INTO imageGroup (imageGroupId, name, parentId, description) VALUES (0, 'Root', 0, 'Top level');
