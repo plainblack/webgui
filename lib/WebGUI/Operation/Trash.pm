@@ -167,28 +167,6 @@ sub www_cutTrashItem {
 }
 
 #-------------------------------------------------------------------
-sub www_deleteTrashItem {
-	return WebGUI::Privilege::insufficient() unless (WebGUI::Grouping::isInGroup(4));
-        my ($output);
-	if ($session{form}{wid} ne "") {
-        	$output .= helpIcon("wobject delete");
-	} elsif ($session{form}{pageId} ne "") {
-        	$output .= helpIcon("page delete");
-	}
-        $output .= WebGUI::International::get(966).'<p>';
-	if ($session{form}{wid} ne "") {
-        	$output .= '<div align="center"><a href="'.WebGUI::URL::page('op=deleteTrashItemConfirm&wid='
-			.$session{form}{wid}) . '">'.WebGUI::International::get(44).'</a>';
-	} elsif ($session{form}{pageId} ne "") {
-        	$output .= '<div align="center"><a href="'.WebGUI::URL::page('op=deleteTrashItemConfirm&pageId='
-			.$session{form}{pageId}) . '">'.WebGUI::International::get(44).'</a>';
-	}
-        $output .= '&nbsp;&nbsp;&nbsp;&nbsp;<a href="'.WebGUI::URL::page().'">'
-		.WebGUI::International::get(45).'</a></div>';
-        return _submenu($output,'42');
-}
-
-#-------------------------------------------------------------------
 sub www_deleteTrashItemConfirm {
 	return WebGUI::Privilege::insufficient() unless (WebGUI::Grouping::isInGroup(4));
 	if ($session{form}{wid} ne "") {
