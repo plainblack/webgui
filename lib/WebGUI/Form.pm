@@ -100,6 +100,11 @@ sub _fixTags {
 }
 
 #-------------------------------------------------------------------
+sub _javascriptFile {
+        return '<script language="JavaScript" src="'.$session{config}{extrasURL}.'/'.$_[0].'"></script>'."\n";
+}
+
+#-------------------------------------------------------------------
 
 =head2 checkbox ( hashRef )
 
@@ -340,7 +345,7 @@ The number of characters wide this form element should be. There should be no re
 
 sub email {
         my ($output);
-	$output = '<script language="javascript" src="'.$session{config}{extrasURL}.'/emailCheck.js"></script>';
+	$output = _javascriptFile('emailCheck.js');;
 	$output .= text({
 		name=>$_[0]->{name},
 		value=>$_[0]->{value},
@@ -364,7 +369,7 @@ The name field for this form element.
 
 =item types 
 
-An array reference of field types to be displayed. The field names are the names of the methods from this forms package. Note that not all field types are supported.
+An array reference of field types to be displayed. The field names are the names of the methods from this forms package. Note that not all field types are supported. Defaults to all.
 
 =item value
 
@@ -395,7 +400,9 @@ sub fieldType {
 	# without adult supervision. =) It was done this way because a huge
 	# if/elsif construct executes much more quickly than a bunch of
 	# unnecessary database hits.
-	foreach $type (@$_[0]->{types}) {
+	my @types = qw(zipcode text textarea HTMLArea url date email phone integer yesNo selectList radioList checkboxList checkbox);
+	$_[0]->{types} = \@types unless ($_[0]->{types});
+	foreach $type (@{$_[0]->{types}}) {
 		if ($type eq "text") {
 			$hash{text} = WebGUI::International::get(475);
 		} elsif ($type eq "textarea") {
@@ -416,6 +423,14 @@ sub fieldType {
         		$hash{yesNo} = WebGUI::International::get(483);
 		} elsif ($type eq "selectList") {
         		$hash{selectList} = WebGUI::International::get(484);
+		} elsif ($type eq "radioList") {
+        		$hash{radioList} = WebGUI::International::get(942);
+		} elsif ($type eq "checkboxList") {
+        		$hash{checkboxList} = WebGUI::International::get(941);
+		} elsif ($type eq "zipcode") {
+			$hash{zipcode} = WebGUI::International::get(944);
+		} elsif ($type eq "checkbox") {
+        		$hash{checkbox} = WebGUI::International::get(943);
 		}
 	}
 	return selectList({
@@ -581,12 +596,12 @@ The number of characters wide this form element should be. There should be no re
 sub float {
         my $value = $_[0]->{value} || 0;
         my $size = $_[0]->{size} || 11;
-        my $output = '<script language="JavaScript" src="'.$session{config}{extrasURL}.'/floatCheck.js"></script>';
+        my $output = _javascriptFile('inputCheck.js');
 	$output .= text({
 		name=>$_[0]->{name},
 		value=>$value,
 		size=>$size,
-		extras=>'onKeyUp="doFloatCheck(this.form.'.$_[0]->{name}.')" '.$_[0]->{extras},
+		extras=>'onKeyUp="doInputCheck(this.form.'.$_[0]->{name}.',\'0123456789.\')" '.$_[0]->{extras},
 		maxlength=>$_[0]->{maxlength}
 		});
 	return $output;
@@ -792,8 +807,7 @@ sub HTMLArea {
                 		} </script>';
                        	$output .= $button;
 		} else {
-			$output .= '<script language="Javascript1.2" src="'.$session{config}{extrasURL}
-				.'/htmlArea/editor.js"></script>'."\n";
+			$output .= _javascriptFile('htmlArea/editor.js');
                		$output .= '<script>'."\n";
                		$output .= '_editor_url = "'.$session{config}{extrasURL}.'/htmlArea/";'."\n";
                		$output .= '</script>'."\n";
@@ -815,18 +829,6 @@ sub HTMLArea {
                 	 		window.open("'.$session{config}{extrasURL}.'/ie5edit.html","editWindow","width=490,height=400,resizable=1");			}
         	       		function setContent(content) { formObj.value = content; } </script>';
 			$output .= $button;
-### UNCOMMENT THIS WHEN MOZILLA 1.3 COMES OUT
-#	} elsif ($session{user}{richEditor} eq "wendedit" && $browser->gecko && $browser->version >= 1.3) {
-#			$output .= '<script language="JavaScript">
- #                       var formObj;
-  ##                     var extrasDir="'.$session{config}{extrasURL}.'";
-    #                   function openEditWindow(obj) {
-     #                  formObj = obj;
-      #                   window.open("'.$session{config}{extrasURL}.'/wendedit.html","editWindow","width=490,height=400,resizable=1");			}
-       #                function setContent(content) {
-        #                 formObj.value = content;
-         #              } </script>';
-	#		$output .= $button;
 	} elsif ($session{user}{richEditor} eq "lastResort") {
 		$output .= '<script language="JavaScript">
 			var formObj;
@@ -896,12 +898,12 @@ sub integer {
         my ($output, $size, $value);
         $value = $_[0]->{value} || 0;
         $size = $_[0]->{size} || 11;
-        $output = '<script language="JavaScript" src="'.$session{config}{extrasURL}.'/numberCheck.js"></script>';
+        $output = _javascriptFile('inputCheck.js');
 	$output .= text({
 		name=>$_[0]->{name},
 		value=>$value,
 		size=>$size,
-		extras=>'onKeyUp="doNumCheck(this.form.'.$_[0]->{name}.')" '.$_[0]->{extras},
+		extras=>'onKeyUp="doInputCheck(this.form.'.$_[0]->{name}.',\'0123456789-\')" '.$_[0]->{extras},
 		maxlength=>$_[0]->{maxlength}
 		});
 	return $output;
@@ -1041,15 +1043,16 @@ The number of characters wide this form element should be. There should be no re
 =cut
 
 sub phone {
-        my ($maxLength);
-        $maxLength = $_[0]->{maxLength} || 30;
-	return text({
+        my $output = _javascriptFile('inputCheck.js');
+        my $maxLength = $_[0]->{maxLength} || 30;
+	$output .= text({
 		name=>$_[0]->{name},
 		maxlength=>$maxLength,
-		extras=>$_[0]->{extras},
+		extras=>'onKeyUp="doInputCheck(this.form.'.$_[0]->{name}.',\'0123456789-()+ \')" '.$_[0]->{extras},
 		value=>$_[0]->{value},
 		size=>$_[0]->{size}
 		});
+	return $output;
 }
 
 #-------------------------------------------------------------------
@@ -1349,7 +1352,7 @@ The number of characters wide this form element should be. There should be no re
 
 sub textarea {
         my ($columns, $value, $rows, $wrap);
-	$wrap = $_[0]->{virtual} || "virtual";
+	$wrap = $_[0]->{wrap} || "virtual";
 	$rows = $_[0]->{rows} || $session{setting}{textAreaRows} || 5;
 	$columns = $_[0]->{columns} || $session{setting}{textAreaCols} || 50;
 	$value = _fixSpecialCharacters($_[0]->{value});
@@ -1394,11 +1397,8 @@ The number of characters wide this form element should be. There should be no re
 =cut
 
 sub url {
-        my ($output, $maxLength);
-        $maxLength = $_[0]->{maxlength} || 2048;
-	$output = '<script language="JavaScript">function addHTTP(element) {
-		if (!element.value.match(":\/\/") && element.value.match(/\.\w+/)) 
-		{ element.value = "http://"+element.value}}</script>';
+        my $maxLength = $_[0]->{maxlength} || 2048;
+	my $output = _javascriptFile('addHTTP.js');
 	$output .= text({
 		name=>$_[0]->{name},
 		value=>$_[0]->{value},
@@ -1537,8 +1537,16 @@ The number of characters wide this form element should be. There should be no re
 =cut
 
 sub zipcode {
-	#this is here for future expansion
-	return text($_[0]);
+        my $output = _javascriptFile('inputCheck.js');
+        my $maxLength = $_[0]->{maxLength} || 10;
+	$output .= text({
+		name=>$_[0]->{name},
+		maxlength=>$maxLength,
+		extras=>'onKeyUp="doInputCheck(this.form.'.$_[0]->{name}.',\'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ- \')" '.$_[0]->{extras},
+		value=>$_[0]->{value},
+		size=>$_[0]->{size}
+		});
+	return $output;
 }
 
 

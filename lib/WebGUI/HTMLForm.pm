@@ -565,7 +565,7 @@ The name field for this form element.
 
 =item types
 
-An array reference of field types to be displayed. The field names are the names of the methods from this forms package. Note that not all field types are supported.
+An array reference of field types to be displayed. The field names are the names of the methods from this forms package. Note that not all field types are supported. Defaults to all types.
 
 =item label
 
@@ -607,7 +607,7 @@ sub fieldType {
         my ($name, $types, $label, $value, $size, $multiple, $extras, $subtext, $uiLevel) =
                 rearrange([qw(name types label value size multiple extras subtext uiLevel)], @p);
         if (_uiLevelChecksOut($uiLevel)) {
-                $output = WebGUI::Form::fieldTypes({
+                $output = WebGUI::Form::fieldType({
                         "name"=>$name,
                         "types"=>$types,
                         "value"=>$value,
