@@ -100,6 +100,12 @@ This is an informative text label to let the user know what this field represent
 The name of this field.  It must be unique among all of the other fields on your form.
 <p>
 
+<b>Tab</b><br>
+When the form has multiple tabs, defines which tab of the form that the
+field is displayed in.  Otherwise, all fields are displayed on the same
+page.
+<p>
+
 <b>Subtext</b><br>
 An extension of the label, this is a description of what should go in the field or optional instructions for the field.
 <p>
@@ -607,6 +613,7 @@ A conditional indicating whether this field exists for the mail subsystem of the
 		message => q|Displayed|,
 		lastUpdated => 1031514049
 	},
+
 
 };
 

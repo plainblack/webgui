@@ -70,7 +70,11 @@ our $HELP = {
 			{
 				tag => 'settings manage',
 				namespace => 'WebGUI'
-			}
+			},
+			{
+				tag => 'style macros',
+				namespace => 'WebGUI'
+			},
 		]
 	},
 	'trash empty' => {

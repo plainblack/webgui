@@ -267,8 +267,8 @@ The URL for your company specified in the settings by your Administrator.
 
 <P><B>Text Box Size</B><BR>Some sites wish to control the size of the forms that WebGUI generates. With this setting you can specify how characters can be displayed at once in text boxes on the site. 
 
-<BR><BR><B>Wobject Privileges</B><BR>Choose 'Yes' to enable privileges at the Wobject level.&nbsp; By default, Wobjects are set to inherit page level privileges</P>|,
-		lastUpdated => 1070026791
+|,
+		lastUpdated => 1094410006
 	},
 
 	'1021' => {
@@ -2994,14 +2994,13 @@ The password you use to connect to the DSN.
 	},
 
 	'632' => {
-		message => q|You can add wobjects by selecting from the <I>Add Content</I> pulldown menu. You can edit them by clicking on the "Edit" button that appears directly above an instance of a particular wobject. 
+		message => q|You can add wobjects by selecting from the <I>Add Content</I> pulldown menu. You can edit them by clicking on the "Edit" button that appears directly above an instance of a particular wobject while in Admin mode. 
 <P>Almost all wobjects share some properties. Those properties are: 
-<P><B>Wobject ID</B><BR>This is the unique identifier WebGUI uses to keep track of this wobject instance. Normal users should never need to be concerned with the Wobject ID, but some advanced users may need to know it for things like SQL Reports. 
+<P><B>Wobject ID</B><BR>This is the unique identifier WebGUI uses to keep track of this wobject instance. Normal users should never need to be concerned with the Wobject ID, but some advanced users may need to know it for things like SQL Reports. The Wobject ID is not editable.
 <P><B>Title</B> The title of the wobject. This is typically displayed at the top of each wobject. 
 <P><I>Note:</I> You should always specify a title even if you are going to turn it off (with the next property). This is because the title shows up in the trash and clipboard and you'll want to be able to distinguish which wobject is which. 
 <P><B>Display title?</B><BR>Do you wish to display the title you specified? On some sites, displaying the title is not necessary. 
 <P><B>Metadata</B><BR>Under the Metadata tab you can set the metadata properties for this content. Metadata must be enabled in the Manage Settings menu.
-<P><B>Process macros?</B><BR>Do you wish to process macros in the content of this wobject? Sometimes you'll want to do this, but more often than not you'll want to say "no" to this question. By disabling the processing of macros on the wobjects that don't use them, you'll speed up your web server slightly. 
 <P><B>Template Position</B><BR>Template positions range from 0 (zero) to any number. How many are available depends upon the Template associated with this page. The default template has only one template position, others may have more. By selecting a template position, you're specifying where this wobject should be placed within the template. 
 <P><B>Start Date</B><BR>On what date should this wobject become visible? Before this date, the wobject will only be displayed to Content Managers. 
 <P><B>End Date</B><BR>On what date should this wobject become invisible? After this date, the wobject will only be displayed to Content Managers. <BR><BR><B>Owner</B><BR>The owner of a&nbsp;wobject is usually the person who created the wobject. This user&nbsp;has full edit and viewing rights on the wobject unless privileges to edit the page the wobject apears on are taken away. 
@@ -3010,7 +3009,7 @@ The password you use to connect to the DSN.
 <P><B>Who can edit?</B><BR>Choose the group that can edit this wobject. The group assigned editing rights can also always view the wobject. </P>
 <P><B>Description</B><BR>A content area in which you can place as much content as you wish. For instance, even before an FAQ there is usually a paragraph describing what is contained in the FAQ. 
 <P></P>|,
-		lastUpdated => 1056055106
+		lastUpdated => 1094412933
 	},
 
 	'991' => {
@@ -3391,9 +3390,14 @@ The style-sheet class is the word "wobject" plus the type of wobject it is. So f
 
 The style-sheet id is the word "wobjectId" plus the Wobject Id for that wobject instance. So if you had an Article with a Wobject Id of 94, then the id would be "wobjectId94".
 <p>
-
+<i>Direct Linking</i>: You can create a URL to link directly to a wobject
+on the page be appending the Wobject Id to the URL for the page.
+<p>
+For example, if the Article above was on a page http://www.mysite.com/thisPage, to create a link that will jump directly to the wobject the URL would
+be http://www.mysite.com/thisPage#94
+<p>
 |,
-		lastUpdated => 1047858549
+		lastUpdated => 1094406751
 	},
 
 	'543' => {
@@ -3825,17 +3829,17 @@ You also cannot import a theme from a version of WebGUI that is newer than the o
 
 	'611' => {
 		message => q|<b>Company Name</b><br>
-The name of your company. It will appear on all emails and anywhere you use the Company Name macro.
+The name of your company. It will appear on all emails and anywhere you use the Company Name style macro.
 <br><br>
 
 <b>Company Email Address</b><br>
-A general email address at your company. This is the address that all automated messages will come from. It can also be used via the WebGUI macro system.
+A general email address at your company. This is the address that all automated messages will come from. It can also be used via Company Email Address style macro.
 <br><br>
 
 <b>Company URL</b><br>
-The primary URL of your company. This will appear on all automated emails sent from the WebGUI system. It is also available via the WebGUI macro system.
+The primary URL of your company. This will appear on all automated emails sent from the WebGUI system. It is also available via the Company URL style macro.
 |,
-		lastUpdated => 1038872019
+		lastUpdated => 1094408401
 	},
 
 	'988' => {
@@ -5537,7 +5541,7 @@ A comment.
 	},
 
 	'838' => {
-		message => q|Folders are used to organize collateral, much the same way you'd use folders on your hard drive or in a file cabinet.
+		message => q|Folders are used to organize collateral, much the same way you'd use folders on your hard drive or in a file cabinet.  Unlike files on your hard drive, collateral names must be unique, even if they are in different folders.
 <p/>
 <b>Organize in Folder</b><br/>
 Folders can be inside of other folders. In which folder would you like to put this folder?
@@ -5550,7 +5554,7 @@ Give this folder a name so you can recognize what's in it.
 <b>Description</b><br/>
 Describe the folder so that you remember why you created it and what it's supposed to contain.
 <p/>|,
-		lastUpdated => 1038871918
+		lastUpdated => 1094406796
 	},
 
 	'761' => {
@@ -6134,14 +6138,12 @@ Start typing! Or better yet, copy the snippet from some other electronic documen
 		message => q|WebGUI macros are used to create dynamic content within otherwise static content. For instance, you may wish to show which user is logged in on every page, or you may wish to have a dynamically built menu or crumb trail. 
 <p>
 
-Macros always begin with a carat (&#94;) and follow with at least one other character and ended with a semicolon (;). Some macros can be extended/configured by taking the format of &#94;<i>x</i>("<b>config text</b>");. 
+Macros always begin with a caret (&#94;) and follow with at least one other character and ended with a semicolon (;). Some macros can be extended/configured by taking the format of &#94;<i>x</i>("<b>config text</b>");.  When providing  multiple arguments to a macro, they should be separated by only commas:<br>
+&#94;<i>x</i>(<b>"First argument",2</b>);
 <p>
 
-NOTE: The following macros are reserved for system/wobject-specific functions as in the SQL Report wobject and the Body in the Style Manager: 
-<b>&#94;-;,&#94;0;,&#94;1;,&#94;2;,&#94;3;, etc.</b><br>
-<p>
 |,
-		lastUpdated => 1046656837
+		lastUpdated => 1094406922
 	},
 
 	'823' => {
@@ -6714,7 +6716,7 @@ Privileges and styles assigned to pages in the package will not be copied when t
 	},
 
 	'625' => {
-		message => q|Upload any images that you'll possibly use in more than one location on your site.
+		message => q|Upload any images that you'll possibly use in more than one location on your site.  Image collateral differ from regular file collateral in that thumbnails can be displayed instead of icons and additional parameters can be added to the HTML tag when they are displayed.
 <p/>
 
 <b>Name</b><br>
@@ -6730,7 +6732,7 @@ Select a file from your local drive to upload to the server.
 <p>
 
 <b>Parameters</b><br>
-Add any HTML &ltimg&rt; parameters that you wish to act as the defaults for this image.
+Add any HTML &lt;img&rt; parameters that you wish to act as the defaults for this image.
 <p>
 
 <i>Example:</i><br>
@@ -6741,7 +6743,7 @@ alt="This is an image"<br>
 <b>Thumbnail Size</b><br>
 How big (in pixels) should the thumbnail for this image be?
 <p/>|,
-		lastUpdated => 1038871530
+		lastUpdated => 1094407031
 	},
 
 	'304' => {
@@ -7185,11 +7187,8 @@ This macro will allow you to display any information from a user's account or pr
 A randomly generated number. This is often used on images (such as banner ads) that you want to ensure do not cache. In addition, you may configure this macro like this <b>&#94;*(100);</b> to create a random number between 0 and 100.
 <p>
 
-<b>&#94;-;,&#94;0;,&#94;1;,&#94;2;,&#94;3;, etc.</b><br>
-These macros are reserved for system/wobject-specific functions as in the SQL Report wobject and the Body in the Style Manager.
-<p>
 |,
-		lastUpdated => 1092652208 
+		lastUpdated => 1094407066
 	},
 
 	'146' => {
@@ -7441,7 +7440,7 @@ config file.</p>
 |,
 		lastUpdated =>1092930637,
 		context => q|help body forum post preview template|
-	}
+	},
 };
 
 1;
