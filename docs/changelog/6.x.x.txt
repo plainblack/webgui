@@ -81,6 +81,7 @@
  - Replaced Date::Calc with Date::Manip to allow for dates before 1970 and
    after 2035. (Emiliano Bruni)
  - Added Date::Manip to the WebGUI distribution.
+ - RFE [ 718739 ]. USS Submission Start/End Dates (Thanks to Roy Johnson).
 
 
 6.1.1
