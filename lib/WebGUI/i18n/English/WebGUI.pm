@@ -3346,31 +3346,31 @@ The translated label for the link to the home page or the text that you supply t
 <P><B>^\; - Page URL</B><BR>The URL to the current page (example: <I>/index.pl/pagename</I>). 
 <P><STRONG>^Navigation(crumbTrail);<BR></STRONG>A dynamically generated crumb trail to the current page.
 <P><B>NOTE:</B> The .crumbTrail style sheet class is tied to this macro. </P>
-<P><STRONG>^Navigation(FlexMenu);<BR></STRONG>This menu macro creates a top-level menu that expands as the user selects each menu item. </P>
-<P><STRONG>^Navigation(currentMenuVertical);<BR></STRONG>A vertical menu containing the sub-pages at the current level. By default it tracks 1 level deep. </P>
-<P><STRONG>^Navigation(currentMenuHorizontal);<BR></STRONG>A horizontal menu containing the sub-pages at the current level.</P>
-<P><STRONG>^Navigation(PreviousDropMenu);<BR></STRONG>Create a drop down menu containing the sub-pages at the previous level in the page tree. </P>
-<P><STRONG>^Navigation(previousMenuVertical);<BR></STRONG>A vertical menu containing the sub-pages at the previous level. By default it will show only the first level. </P>
-<P><STRONG>^Navigation(previousMenuHorizontal);<BR></STRONG>A horizontal menu containing the sub-pages at the previous level. </P>
-<P><STRONG>^Navigation(rootmenu);<BR></STRONG>Creates a horizontal menu of the various roots on your system (except for the WebGUI system roots).</P>
-<P><STRONG>^Navigation(SpecificDropMenu);<BR></STRONG>Create a drop down menu starting at a specific point in your navigation tree. The default start page is "home". </P>
-<P><STRONG>^Navigation(SpecificSubMenuVertical);<BR></STRONG>Allows you to get the submenu of any page, starting with the page you specified. The default start page is "home" and it will show the first level. </P>
-<P><STRONG>^Navigation(SpecificSubMenuHorizontal);<BR></STRONG>Allows you to get the submenu of any page, starting with the page you specified. The default start page is "home" and it will show the first level. </P>
-<P><STRONG>^Navigation(TopLevelMenuVertical);<BR></STRONG>A vertical menu containing the main pages of the site (aka the sub-pages from the home page). By default it will show only the first level. </P>
-<P><STRONG>^Navigation(TopLevelMenuHorizontal);<BR></STRONG>A vertical menu containing the main pages of the site (aka the sub-pages from the home page).</P>
-<P><STRONG>^Navigation(RootTab);<BR></STRONG>Create a tab navigation system from the roots on your site (except WebGUI's system roots) similar to the tabs used in the tab forms (editing wobjects or pages). </P>
-<P><STRONG>NOTE:</STRONG> Has two special style sheet classes: .RootTabOn{} and .RootTabOff{}. 
+<P><STRONG>^Navigation(FlexMenu);</STRONG><BR>This menu macro creates a top-level menu that expands as the user selects each menu item. </P>
+<P><STRONG>^Navigation(currentMenuVertical);</STRONG><BR>A vertical menu containing the sub-pages at the current level. By default it tracks 1 level deep. </P>
+<P><STRONG>^Navigation(currentMenuHorizontal);</STRONG><BR>A horizontal menu containing the sub-pages at the current level.</P>
+<P><STRONG>^Navigation(PreviousDropMenu);</STRONG><BR>Create a drop down menu containing the sub-pages at the previous level in the page tree. </P>
+<P><STRONG>^Navigation(previousMenuVertical);</STRONG><BR>A vertical menu containing the sub-pages at the previous level. By default it will show only the first level. </P>
+<P><STRONG>^Navigation(previousMenuHorizontal);</STRONG><BR>A horizontal menu containing the sub-pages at the previous level. </P>
+<P><STRONG>^Navigation(rootmenu);</STRONG><BR>Creates a horizontal menu of the various roots on your system (except for the WebGUI system roots).</P>
+<P><STRONG>^Navigation(SpecificDropMenu);</STRONG><BR>Create a drop down menu starting at a specific point in your navigation tree. The default start page is "home". </P>
+<P><STRONG>^Navigation(SpecificSubMenuVertical);</STRONG><BR>Allows you to get the submenu of any page, starting with the page you specified. The default start page is "home" and it will show the first level. </P>
+<P><STRONG>^Navigation(SpecificSubMenuHorizontal);</STRONG><BR>Allows you to get the submenu of any page, starting with the page you specified. The default start page is "home" and it will show the first level. </P>
+<P><STRONG>^Navigation(TopLevelMenuVertical);</STRONG><BR>A vertical menu containing the main pages of the site (aka the sub-pages from the home page). By default it will show only the first level. </P>
+<P><STRONG>^Navigation(TopLevelMenuHorizontal);</STRONG><BR>A vertical menu containing the main pages of the site (aka the sub-pages from the home page).</P>
+<P><STRONG>^Navigation(RootTab);</STRONG><BR>Create a tab navigation system from the roots on your site (except WebGUI's system roots) similar to the tabs used in the tab forms (editing wobjects or pages). </P>
+<P><STRONG>NOTE:</STRONG> Has two special style sheet classes: .RootTabOn and .RootTabOff}. 
 <P><I>Example:</I><BR>&lt;style&gt; .rootTabOn { line-height: 17px; font-size: 16px; spacing: 3px; border: 1px solid black; border-bottom-width: 0px; background-color: #333333; z-index: 10000; padding: 3px 9px 5px 9px; color: white; } .rootTabOn A, .rootTabOn A:visited { color: white; font-weight: bold; text-decoration: none; } .rootTabOff { line-height: 15px; font-size: 14px; border: 1px solid black; border-bottom-width: 0px; background-color: #c8c8c8; z-index: 1000; padding: 2px 9px 2px 9px; } .rootTabOff A, .rootTabOff A:visited { color: black; text-decoration: underline; } .rootTabOff A:hover { font-weight: bold; } &lt;/style&gt; ^RootTab; </P>
-<P><STRONG>^Navigation(TopDropMenu);<BR></STRONG>Create a drop down menu of your top level navigation. </P>
-<P><STRONG>^Navigation(dtree);<BR></STRONG>Create a dynamic tree menu.</P>
-<P><STRONG>^Navigation(coolmenu);<BR></STRONG>Create a DHTML driven menu. </P>
-<P><STRONG>^Navigation(Synopsis);<BR></STRONG>This macro allows you to get the submenu of a page along with the synopsis of each link. </P>
+<P><STRONG>^Navigation(TopDropMenu);</STRONG><BR>Create a drop down menu of your top level navigation. </P>
+<P><STRONG>^Navigation(dtree);</STRONG><BR>Create a dynamic tree menu.</P>
+<P><STRONG>^Navigation(coolmenu);</STRONG><BR>Create a DHTML driven menu. </P>
+<P><STRONG>^Navigation(Synopsis);</STRONG><BR>This macro allows you to get the submenu of a page along with the synopsis of each link. </P>
 <P><STRONG>NOTES:</STRONG> The .synopsis_sub, .synopsis_summary, and .synopsis_title style sheet classes are tied to this macro. <BR></P>
 <P>It should be noted that many of these macros can also make use of these style sheet classes: </P>
 <P><B>.selectedMenuItem</B><BR>Use this class to highlight the current page in any of the menu macros. 
 <P><B>.verticalMenu </B><BR>The vertical menu (if you use a vertical menu macro). 
 <P><B>.horizontalMenu </B><BR>The horizontal menu (if you use a horizontal menu macro). </P>|,
-		lastUpdated => 1089730066
+		lastUpdated => 1100233307
 	},
 
 	'511' => {
