@@ -235,6 +235,7 @@ sub www_deactivateAccountConfirm {
 		$u = WebGUI::User->new($session{user}{userId});
 		$u->status("Selfdestructed");
 	        WebGUI::Session::end($session{var}{sessionId});
+		WebGUI::Session::start(1);
         }
         return www_displayLogin();
 }
@@ -408,6 +409,7 @@ sub www_login {
 #-------------------------------------------------------------------
 sub www_logout {
 	WebGUI::Session::end($session{var}{sessionId});
+	WebGUI::Session::start(1);
 	return "";
 }
 
