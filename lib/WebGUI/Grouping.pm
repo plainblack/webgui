@@ -261,7 +261,7 @@ sub getGroupsInGroup {
 	if ($_[1]) {
 		my $loopCount = $_[2]++ || 1;
 		if ($loopCount > 99) {
-			WebGUI::ErrorHandler::fatalError("Endless recursive loop detected while determinating".
+			WebGUI::ErrorHandler::fatalError("Endless recursive loop detected while determining".
 				" groups in group.\nRequested groupId: ".$_[0]."\nGroups in that group: ".join(",",@$groups));
 		}
 		my @groupsOfGroups = @$groups;
