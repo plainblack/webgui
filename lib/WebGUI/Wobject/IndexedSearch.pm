@@ -116,12 +116,17 @@ sub www_edit {
 	}
 	
 	# Index to use
-	$properties->radioList(	-name=>'indexName',
-					-options=>\%indexName,
-					-label=>WebGUI::International::get(5,$self->get("namespace")),
-					-value=>$self->getValue("indexName"),
-					-vertical=>1
-				);
+#	$properties->radioList(	-name=>'indexName',
+#					-options=>\%indexName,
+#					-label=>WebGUI::International::get(5,$self->get("namespace")),
+#					-value=>$self->getValue("indexName"),
+#					-vertical=>1
+#				);
+	# NOTE: For now we're limiting each site to one index. Will allow more in the future.
+	$properties->hidden(
+		-name=>"indexName",
+		-value=>"IndexedSearch_default"
+		);
 
 	# Page roots
 	%searchRoot = (	'any'=>WebGUI::International::get(15,$self->get("namespace")), 

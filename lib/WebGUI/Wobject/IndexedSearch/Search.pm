@@ -16,6 +16,7 @@ package WebGUI::Wobject::IndexedSearch::Search;
 
 use strict;
 use DBIx::FullTextSearch;
+use WebGUI::DateTime;
 use WebGUI::SQL;
 use WebGUI::URL;
 use WebGUI::HTML;
@@ -436,7 +437,8 @@ sub indexDocument {
 										headerShortcut,
 										bodyShortcut,
 										contentType,
-										ownerId  ) 
+										ownerId,
+										dateIndexed  ) 
                                       values (	".
 							($document->{docId} || $self->{_docId}).", ". 
 							quote($self->getIndexName).", ".
@@ -451,7 +453,8 @@ sub indexDocument {
 							quote($document->{headerShortcut})." ,".
 							quote($document->{bodyShortcut})." ,".
 							quote($document->{contentType})." ,".
-							($document->{ownerId} || 3)." )"
+							($document->{ownerId} || 3).",
+							".WebGUI::DateTime::time()." )"
 				);
 	$self->{_docId}++;
 }

@@ -23,8 +23,13 @@ use WebGUI::Wobject::IndexedSearch::Search;
 #-------------------------------------------------------------------
 sub process {
 	my $verbose = shift;
-	print "\n";
 	my $indexName = 'IndexedSearch_default';
+	my ($dateIndexed) = WebGUI::SQL->quickArray("select max(dateIndexed) from IndexedSearch_docInfo where indexName = ".quote($indexName)); 
+	if (WebGUI::DateTime::time()-$dateIndexed < 86400) {
+		print " - Recently Indexed: Skipping " if ($verbose);
+		return "";
+	}	
+	print "\n";
 	my $htmlFilter = 'all';
 	my $stopList = 'none'; 
 	undef $stopList if ($stopList eq 'none');
