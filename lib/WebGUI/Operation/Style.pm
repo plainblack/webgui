@@ -94,7 +94,7 @@ sub www_editStyle {
         $f->hidden("sid",$session{form}{sid});
 	$f->readOnly($session{form}{sid},WebGUI::International::get(380));
         $f->text("name",WebGUI::International::get(151),$style{name});
-        $f->HTMLArea("body",WebGUI::International::get(501),$style{body},'','','',(5+$session{setting}{textAreaRows}));
+        $f->textarea("body",WebGUI::International::get(501),$style{body},'','','',(5+$session{setting}{textAreaRows}));
         $f->textarea("styleSheet",WebGUI::International::get(154),$style{styleSheet},'','','',(5+$session{setting}{textAreaRows}));
         $f->submit;
 	$output .= $f->print;
