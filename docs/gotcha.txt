@@ -17,6 +17,9 @@ save you many hours of grief.
 	you may need to update some portions of your templates
 	manually.
 
+ * The Authentication Module API has been completely rewritten.
+	Please see docs/migration.txt for details.
+
 
 
 5.5.0
