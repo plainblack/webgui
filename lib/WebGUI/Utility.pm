@@ -13,13 +13,9 @@ package WebGUI::Utility;
 use Exporter;
 use strict;
 use Tie::IxHash;
-use WebGUI::International;
-use WebGUI::Session;
-use WebGUI::SQL;
-use WebGUI::URL;
 
 our @ISA = qw(Exporter);
-our @EXPORT = qw(&sortByColumn &sortHashDescending &sortHash &isIn &randint &round);
+our @EXPORT = qw(&sortHashDescending &sortHash &isIn &randint &round);
 
 #-------------------------------------------------------------------
 sub isIn {
@@ -54,27 +50,6 @@ sub randint {
 #-------------------------------------------------------------------
 sub round {
         return sprintf("%.0f", $_[0]);
-}
-
-#-------------------------------------------------------------------
-# example: sortByColumn(columnToSort,columnLabel);
-sub sortByColumn {
-        my ($output);
-	$output = '<a href="'.WebGUI::URL::append($_[2],'sort='.$_[0].'&sortDirection=');
-	if ($session{form}{sortDirection} eq "asc") {
-		$output .= "desc";
-	} else {
-		$output .= "asc";
-	}
-	$output .= '">'.$_[1].'</a>';
-        if ($session{form}{sort} eq $_[0]) {
-		if ($session{form}{sortDirection} eq "desc") {
-                	$output .= ' <img src="'.$session{config}{extras}.'/desc.gif">';
-		} else {
-                	$output .= ' <img src="'.$session{config}{extras}.'/asc.gif">';
-		}
-        }
-        return $output;
 }
 
 #-------------------------------------------------------------------

@@ -29,6 +29,28 @@ our @ISA = qw(WebGUI::Wobject);
 our $namespace = "DownloadManager";
 our $name = WebGUI::International::get(1,$namespace);
 
+#-------------------------------------------------------------------
+# example: sortByColumn(columnToSort,columnLabel);
+sub sortByColumn {
+        my ($output);
+        $output = '<a href="'.WebGUI::URL::append($_[2],'sort='.$_[0].'&sortDirection=');
+        if ($session{form}{sortDirection} eq "asc") {
+                $output .= "desc";
+        } else {
+                $output .= "asc";
+        }
+        $output .= '">'.$_[1].'</a>';
+        if ($session{form}{sort} eq $_[0]) {
+                if ($session{form}{sortDirection} eq "desc") {
+                        $output .= ' <img src="'.$session{setting}{lib}.'/desc.gif">';
+                } else {
+                        $output .= ' <img src="'.$session{setting}{lib}.'/asc.gif">';
+                }
+        }
+        return $output;
+}
+
+
 
 #-------------------------------------------------------------------
 sub _reorderDownloads {

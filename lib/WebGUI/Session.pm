@@ -18,6 +18,7 @@ use strict;
 use Tie::CPHash;
 use WebGUI::ErrorHandler;
 use WebGUI::SQL;
+use WebGUI::Utility;
 
 our @ISA = qw(Exporter);
 our @EXPORT = qw(%session);
@@ -106,7 +107,7 @@ sub _getUserInfo {
 
 #-------------------------------------------------------------------
 sub _loadMacros {
-	my ($slash, $namespace, $cmd, @files, $file, $dir);
+	my ($slash, $namespace, $cmd, @files, $file, $dir, $exclude);
 	$slash = ($^O =~ /Win/i) ? "\\" : "/";
 	$dir = $slash."lib".$slash."WebGUI".$slash."Macro";
 	opendir (DIR,$session{config}{webguiRoot}.$dir) or WebGUI::ErrorHandler::fatalError("Can't open macro directory!");
@@ -117,7 +118,11 @@ sub _loadMacros {
 			$cmd = "use WebGUI::Macro::".$1;
 			eval($cmd);
 			WebGUI::ErrorHandler::fatalError("Macro failed to compile: $namespace.") if($@);
-			$session{macro}{$namespace} = $namespace;
+			$exclude = $session{config}{excludeMacro};
+                        $exclude =~ s/ //g;
+                        unless (isIn($namespace, split(/,/,$exclude))) {
+				$session{macro}{$namespace} = $namespace;
+			}
 		}
 	}
 	closedir(DIR);
@@ -125,7 +130,7 @@ sub _loadMacros {
 
 #-------------------------------------------------------------------
 sub _loadWobjects {
-	my ($dir, @files, $slash, $file, $cmd, $namespace);
+	my ($dir, @files, $slash, $file, $cmd, $namespace, $exclude);
 	$slash = ($^O =~ /Win/i) ? "\\" : "/";
 	$dir = $slash."lib".$slash."WebGUI".$slash."Wobject";
 	opendir (DIR,$session{config}{webguiRoot}.$dir) or WebGUI::ErrorHandler::fatalError("Can't open wobject directory!");
@@ -136,9 +141,13 @@ sub _loadWobjects {
 			$cmd = "use WebGUI::Wobject::".$namespace;
 			eval($cmd);
 			WebGUI::ErrorHandler::fatalError("Wobject failed to compile: $namespace. ".$@) if($@);
-			$cmd = "\$WebGUI::Wobject::".$namespace."::name";
-			$session{wobject}{$namespace} = eval($cmd);
-			WebGUI::ErrorHandler::fatalError("No name method in wobject: $namespace. ".$@) if($@);
+			$exclude = $session{config}{excludeWobject};
+                        $exclude =~ s/ //g;
+			unless (isIn($namespace, split(/,/,$exclude))) {
+				$cmd = "\$WebGUI::Wobject::".$namespace."::name";
+				$session{wobject}{$namespace} = eval($cmd);
+				WebGUI::ErrorHandler::fatalError("No name method in wobject: $namespace. ".$@) if($@);
+			}
 		}
 	}
 	closedir(DIR);

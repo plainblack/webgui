@@ -22,7 +22,7 @@ use Data::Config;
 use WebGUI::Utility;
 
 
-my (@files, $cmd, $namespace, $file, $slash, $confdir, %plugins, $plugdir, $skip);
+my (@files, $cmd, $namespace, $file, $slash, $confdir, %plugins, $plugdir, $exclude);
 $slash = ($^O =~ /Win/i) ? "\\" : "/";
 $confdir = $webguiRoot.$slash."etc".$slash;
 $plugdir = $webguiRoot.$slash."sbin".$slash."Hourly".$slash;
@@ -55,9 +55,9 @@ if (opendir (CONFDIR,$confdir)) {
                                         print "Can't connect to ".$config->param('dsn')." with info provided. Skipping.\n";
                                 } else {
 					foreach $namespace (keys %plugins) {
-						$skip = $config->param('skipHourly');
-						$skip =~ s/ //g;
-						unless (isIn($namespace, split(/,/,$skip))) {
+						$exclude = $config->param('excludeHourly');
+						$exclude =~ s/ //g;
+						unless (isIn($namespace, split(/,/,$exclude))) {
 							$cmd = $plugins{$namespace};
 							&$cmd($dbh);
 						}
