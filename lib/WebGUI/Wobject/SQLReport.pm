@@ -41,14 +41,10 @@ sub new {
         my $self = WebGUI::Wobject->new(
                 -properties=>$property,
                 -extendedProperties=>{
-			template=>{}, 
 			dbQuery=>{}, 
 			databaseLinkId=>{
 				defaultValue=>0
 			},
-			convertCarriageReturns=>{
-				defaultValue=>0
-				}, 
 			paginateAfter=>{
 				defaultValue=>50
 				},
@@ -88,11 +84,6 @@ sub www_edit {
 		-label=>WebGUI::International::get(4,$_[0]->get("namespace")),
 		-value=>$_[0]->getValue("dbQuery")
 		);
-       	$layout->textarea(
-		-name=>"template",
-		-label=>WebGUI::International::get(3,$_[0]->get("namespace")),
-		-value=>$_[0]->getValue("template")
-		);
 	$privileges->databaseLink(
 		-value=>$_[0]->getValue("databaseLinkId")
 		);
@@ -100,11 +91,6 @@ sub www_edit {
 		-name=>"paginateAfter",
 		-label=>WebGUI::International::get(14,$_[0]->get("namespace")),
 		-value=>$_[0]->getValue("paginateAfter")
-		);
-	$layout->yesNo(
-		-name=>"convertCarriageReturns",
-		-label=>WebGUI::International::get(13,$_[0]->get("namespace")),
-		-value=>$_[0]->getValue("convertCarriageReturns")
 		);
 	return $_[0]->SUPER::www_edit(
 		-layout=>$layout->printRowsOnly,
