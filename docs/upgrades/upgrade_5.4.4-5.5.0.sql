@@ -142,5 +142,21 @@ update international set internationalId=1015, namespace='WebGUI' where internat
 alter table users add column referringAffiliate int not null default 0;
 update users set referringAffiliate=1 where userId<>1;
 delete from international where namespace='WebGUI' and internationalId=573;
-
+update international set internationalId=1016, namespace='WebGUI' where internationalId=19 and namespace='MessageBoard';
+update international set internationalId=1017, namespace='WebGUI' where internationalId=20 and namespace='MessageBoard';
+delete from international where namespace='WebGUI' and internationalId=237;
+delete from international where namespace='WebGUI' and internationalId=238;
+delete from international where namespace='WebGUI' and internationalId=239;
+delete from international where namespace='WebGUI' and internationalId=1014;
+delete from international where namespace='WebGUI' and internationalId=1015;
+delete from international where languageId=1 and namespace='WebGUI' and internationalId=512;
+insert into international (internationalId,languageId,namespace,message,lastUpdated,context) values (512,1,'WebGUI','Go to next thread.', 1065280309,NULL);
+delete from international where languageId=1 and namespace='WebGUI' and internationalId=513;
+insert into international (internationalId,languageId,namespace,message,lastUpdated,context) values (513,1,'WebGUI','Go to previous thread.', 1065280287,NULL);
+delete from international where languageId=1 and namespace='WebGUI' and internationalId=1019;
+insert into international (internationalId,languageId,namespace,message,lastUpdated,context) values (1019,1,'WebGUI','Back to thread list.', 1065280160,'Return to the list of threads in a discussion.');
+delete from international where languageId=1 and namespace='WebGUI' and internationalId=1018;
+insert into international (internationalId,languageId,namespace,message,lastUpdated,context) values (1018,1,'WebGUI','Start a new thread.', 1065279960,'Add a new line of discussion to a forum.');
+delete from international where languageId=1 and namespace='WebGUI' and internationalId=1020;
+insert into international (internationalId,languageId,namespace,message,lastUpdated,context) values (1020,1,'WebGUI','Rating', 1065280882,'How useful/interesting a user thinks another poster\'s post is.');
 

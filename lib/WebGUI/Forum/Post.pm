@@ -19,7 +19,7 @@ sub create {
 	my $forumPostId = WebGUI::SQL->setRow("forumPost","forumPostId", $data);
 	$self = WebGUI::Forum::Post->new($forumPostId);
 	if ($data->{parentId} > 0) {
-		$self->getThread->addReply($forumPostId,$self->get("dateOfPost"),$self->get("forumPostId"));
+		$self->getThread->addReply($self->get("forumPostId"),$forumPostId,$self->get("dateOfPost"));
 	}
 	return $self;
 }
