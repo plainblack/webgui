@@ -828,17 +828,21 @@ A namespace to use for the template. Defaults to the wobject's namespace.
 =cut
 
 sub processTemplate {
+	my $self = shift;
+	my $templateId = shift;
+	my $var = shift;
+	my $namespace = shift;
 	my %vars = (
-		%{$_[0]->{_property}},
-		%{$_[2]}
+		%{$self->{_property}},
+		%{$var}
 		);
-	if (defined $_[0]->get("_WobjectProxy")) {
+	if (defined $self->get("_WobjectProxy")) {
 		$vars{isShortcut} = 1;
-		my ($originalPageURL) = WebGUI::SQL->quickArray("select urlizedTitle from page where pageId=".$_[0]->get("pageId"));
-		$vars{originalURL} = WebGUI::URL::gateway($originalPageURL."#".$_[0]->get("wobjectId"));
+		my ($originalPageURL) = WebGUI::SQL->quickArray("select urlizedTitle from page where pageId=".$self->get("pageId"));
+		$vars{originalURL} = WebGUI::URL::gateway($originalPageURL."#".$self->get("wobjectId"));
 	}
-	my $namespace = $_[3] || $_[0]->get("namespace");
-	return WebGUI::Template::process($_[1],$namespace, \%vars);
+	my $namespace = $namespace || $self->get("namespace");
+	return WebGUI::Template::process($templateId,$namespace, \%vars);
 }
 
 #-------------------------------------------------------------------

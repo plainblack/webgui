@@ -235,7 +235,8 @@ Ends a query after calling the "new" or "read" methods.
 =cut
 
 sub finish {
-        return $_[0]->{_sth}->finish;
+        $_[0]->{_sth}->finish;
+	return "";
 }
 
 
@@ -372,14 +373,13 @@ By default this method uses the WebGUI database handler. However, you may choose
 =cut
 
 sub new {
-	my ($class, $sql, $dbh, $sth);
-        $class = shift;
-        $sql = shift;
-        $dbh = shift || $WebGUI::Session::session{dbh};
+        my $class = shift;
+        my $sql = shift;
+        my $dbh = shift || $WebGUI::Session::session{dbh};
 	if ($WebGUI::Session::session{setting}{showDebug}) {
 		push(@{$WebGUI::Session::session{SQLquery}},$sql);
 	}
-        $sth = $dbh->prepare($sql) or WebGUI::ErrorHandler::fatalError("Couldn't prepare statement: ".$sql." : ". DBI->errstr);
+        my $sth = $dbh->prepare($sql) or WebGUI::ErrorHandler::fatalError("Couldn't prepare statement: ".$sql." : ". DBI->errstr);
         $sth->execute or WebGUI::ErrorHandler::fatalError("Couldn't execute statement: ".$sql." : ". DBI->errstr);
 	bless ({_sth => $sth}, $class);
 }
@@ -500,9 +500,11 @@ By default this method uses the WebGUI database handler. However, you may choose
 =cut
 
 sub quickHashRef {
-        my ($sth, $data);
-        $sth = WebGUI::SQL->new($_[1],$_[2]);
-        $data = $sth->hashRef;
+	my $self = shift;
+	my $sql = shift;
+	my $dbh = shift;
+        my $sth = WebGUI::SQL->new($sql,$dbh);
+        my $data = $sth->hashRef;
         $sth->finish;
         if (defined $data) {
                 return $data;

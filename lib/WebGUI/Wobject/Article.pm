@@ -120,17 +120,18 @@ sub www_editSave {
 
 #-------------------------------------------------------------------
 sub www_view {
+	my $self = shift;
 	my ($file, %var);
-	if ($_[0]->get("image") ne "") {
-		$file = WebGUI::Attachment->new($_[0]->get("image"),$_[0]->get("wobjectId"));
+	if ($self->get("image") ne "") {
+		$file = WebGUI::Attachment->new($self->get("image"),$self->get("wobjectId"));
 		$var{"image.url"} = $file->getURL;
 		$var{"image.thumbnail"} = $file->getThumbnail;
 	}
-        $var{description} = $_[0]->get("description");
-	if ($_[0]->get("convertCarriageReturns")) {
+        $var{description} = $self->get("description");
+	if ($self->get("convertCarriageReturns")) {
 		$var{description} =~ s/\n/\<br\>\n/g;
 	}
-	$var{"new.template"} = WebGUI::URL::page("wid=".$_[0]->get("wobjectId")."&func=view")."&overrideTemplateId=";
+	$var{"new.template"} = WebGUI::URL::page("wid=".$self->get("wobjectId")."&func=view")."&overrideTemplateId=";
 	$var{"description.full"} = $var{description};
 	$var{"description.full"} =~ s/\^\-\;//g;
 	$var{"description.first.100words"} = $var{"description.full"};
@@ -155,7 +156,7 @@ sub www_view {
 	$var{"description.first.2sentences"} =~ s/^((.*?\.){2}).*/$1/s;
 	$var{"description.first.sentence"} = $var{"description.first.2sentences"};
 	$var{"description.first.sentence"} =~ s/^(.*?\.).*/$1/s;
-	my $p = WebGUI::Paginator->new(WebGUI::URL::page("wid=".$_[0]->get("wobjectId")."&func=view"),1);
+	my $p = WebGUI::Paginator->new(WebGUI::URL::page("wid=".$self->get("wobjectId")."&func=view"),1);
 	if ($session{form}{makePrintable} || $var{description} eq "") {
 		$var{description} =~ s/\^\-\;//g;
 		$p->setDataByArrayRef([$var{description}]);
@@ -165,39 +166,39 @@ sub www_view {
 		$var{description} = $p->getPage;
 	}
 	$p->appendTemplateVars(\%var);
-	if ($_[0]->get("attachment") ne "") {
-		$file = WebGUI::Attachment->new($_[0]->get("attachment"),$_[0]->get("wobjectId"));
+	if ($self->get("attachment") ne "") {
+		$file = WebGUI::Attachment->new($self->get("attachment"),$self->get("wobjectId"));
 		$var{"attachment.box"} = $file->box;
 		$var{"attachment.icon"} = $file->getIcon;
 		$var{"attachment.url"} = $file->getURL;
 		$var{"attachment.name"} = $file->getFilename;
 	}	
-	my $callback = WebGUI::URL::page("func=view&amp;wid=".$_[0]->get("wobjectId"));
-	if ($_[0]->get("allowDiscussion")) {
-		my $forum = WebGUI::Forum->new($_[0]->get("forumId"));
+	my $callback = WebGUI::URL::page("func=view&amp;wid=".$self->get("wobjectId"));
+	if ($self->get("allowDiscussion")) {
+		my $forum = WebGUI::Forum->new($self->get("forumId"));
 		$var{"replies.count"} = ($forum->get("replies") + $forum->get("threads"));
 		$var{"replies.URL"} = WebGUI::Forum::UI::formatForumURL($callback,$forum->get("forumId"));
-		$var{"replies.label"} = WebGUI::International::get(28,$_[0]->get("namespace"));
+		$var{"replies.label"} = WebGUI::International::get(28,$self->get("namespace"));
 		$var{"post.URL"} = WebGUI::Forum::UI::formatNewThreadURL($callback,$forum->get("forumId"));
-        	$var{"post.label"} = WebGUI::International::get(24,$_[0]->get("namespace"));
+        	$var{"post.label"} = WebGUI::International::get(24,$self->get("namespace"));
 	}
-	my $templateId = $_[0]->getValue("templateId");
+	my $templateId = $self->getValue("templateId");
         if ($session{form}{overrideTemplateId} ne "") {
                 $templateId = $session{form}{overrideTemplateId};
         }
 	if ($session{form}{forumOp}) {
-		unless ($!= $_[0]->get("wobjectId")) {
-                        WebGUI::ErrorHandler::security("access a forum that was not related to this message board (".$_[0]->get("wobjectId").")");
+		unless ($!= $self->get("wobjectId")) {
+                        WebGUI::ErrorHandler::security("access a forum that was not related to this message board (".$self->get("wobjectId").")");
                         return WebGUI::Privilege::insufficient();
                 }
 		return WebGUI::Forum::UI::forumOp({
 			callback=>$callback,
-			title=>$_[0]->get("title"),
-			description=>$_[0]->get("description"),
-			forumId=>$_[0]->get("forumId")
+			title=>$self->get("title"),
+			description=>$self->get("description"),
+			forumId=>$self->get("forumId")
 			});
 	} else {
-		return $_[0]->processTemplate($templateId,\%var);
+		return $self->processTemplate($templateId,\%var);
 	}
 }
 
