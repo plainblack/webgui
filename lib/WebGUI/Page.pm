@@ -290,9 +290,14 @@ sub drawTemplate {
 	$template =~ s/\r//g;
 	$template =~ s/\'/\\\'/g;
 	$template = WebGUI::Macro::negate($template);
+	$template =~ s/\<style.*?\>.*?\<\/style\>//gi;
 	$template =~ s/\<script.*?\>.*?\<\/script\>//gi;
 	$template =~ s/\<table.*?\>/\<table cellspacing=0 cellpadding=3 width=100 height=80 border=1\>/ig;
 	$template =~ s/\<tmpl_loop\s+position(\d+)\_loop\>.*?\<\/tmpl\_loop\>/$1/ig;
+	$template =~ s/\<tmpl_if.*?\>.*?\<\/tmpl_if\>//ig;
+	$template =~ s/\<tmpl_if.*?\>//ig;
+	$template =~ s/\<\/tmpl_if\>//ig;
+	$template =~ s/\<tmpl_var.*?\>//ig;
 	return $template;
 }
 

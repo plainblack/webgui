@@ -7,6 +7,9 @@ Andreas Graf).
  - Bugfix 914825 / 912203: Bug in template system (LenK).
  - Apache 2.0 is now the default web server for WebGUI. See gotcha.txt for
    details.
+ - Bugfix [ 904313 ] Problem with page-template preview in 6.0.0
+
+
 
 6.0.0
 

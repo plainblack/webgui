@@ -1388,6 +1388,12 @@ The unique identifier for the selected template. Defaults to "1".
 
 The namespace for the list of templates to return. If this is omitted, all templates will be displayed.
 
+=item extras
+
+If you want to add anything special to this form element like javascript actions, or stylesheet information, you'd add it in here as follows:
+
+ 'onChange="this.form.submit()"'
+
 =back
 
 =cut
@@ -1398,7 +1404,8 @@ sub template {
         return selectList({
                 name=>$name,
                 options=>WebGUI::Template::getList($_[0]->{namespace}),
-                value=>[$templateId]
+                value=>[$templateId],
+		extras=>$_[0]->{extras}
                 });
 }
 
