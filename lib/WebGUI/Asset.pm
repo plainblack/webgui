@@ -1650,6 +1650,8 @@ A properties hash reference. The className of the properties hash must be valid.
 sub newByPropertyHashRef {
 	my $class = shift;
 	my $properties = shift;
+	return undef unless defined $properties;
+	return undef unless exists $properties->{className};
 	my $className = $properties->{className};
 	my $cmd = "use ".$className;
         eval ($cmd);
@@ -2119,6 +2121,7 @@ sub www_add {
 		);
 	$properties{isHidden} = 1 unless (WebGUI::Utility::isIn(ref $session{form}{class}, @{$session{config}{assetContainers}}));
 	my $newAsset = WebGUI::Asset->newByDynamicClass("new",$session{form}{class},\%properties);
+	$newAsset->{_parent} = $self;
 	return $newAsset->www_edit();
 }
 

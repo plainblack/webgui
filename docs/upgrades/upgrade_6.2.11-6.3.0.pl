@@ -1034,37 +1034,12 @@ sub walkTree {
 				   $newProductStoreId = copyFile($namespace->{warranty},$wobject->{wobjectId});
 				   WebGUI::SQL->write("update Product set warranty=".quote($newProductStoreId)." where wobjectId=".quote($wobject->{wobjectId}));
 				}
-				
-				# migrate collateral
 				print "\t\t\tMigrating product collateral data\n" unless ($quiet);
 				foreach my $table (qw(Product_accessory Product_benefit Product_feature Product_related Product_specification)) {
 					WebGUI::SQL->write("update $table set assetId=".quote($wobjectId)." where wobjectId=".quote($wobject->{wobjectId}));
 				}
 			} elsif ($wobject->{namespace} eq "USS") {
 				print "\t\t\tMigrating submissions for USS ".$wobject->{wobjectId}."\n" unless ($quiet);
-#| dateSubmitted    | int(11)      | YES  |     | NULL       |       |
-#| username         | varchar(30)  | YES  |     | NULL       |       |
-#| userId           | varchar(22)  | YES  |     | NULL       |       |
-#| status           | varchar(30)  |      | MUL | Approved   |       |
-#| views            | int(11)      |      |     | 0          |       |
-#| dateUpdated      | int(11)      |      |     | 0          |       |
-#| contentType      | varchar(35)  |      |     | mixed      |       |
-#| userDefined1     | text         | YES  |     | NULL       |       |
-#| userDefined2     | text         | YES  |     | NULL       |       |
-#| userDefined3     | text         | YES  |     | NULL       |       |
-#| userDefined4     | text         | YES  |     | NULL       |       |
-#| userDefined5     | text         | YES  |     | NULL       |       |
-#| forumId          | varchar(22)  | YES  |     | NULL       |       |
-#| sequenceNumber   | int(11)      |      |     | 0          |       |
-#| startDate        | int(11)      | YES  |     | 946710000  |       |
-#| title            | varchar(128) | YES  |     | NULL       |       |
-#| USS_id           | varchar(22)  | YES  |     | NULL       |       |
-#| endDate          | int(11)      | YES  |     | 2114406000 |       |
-#| USS_submissionId | varchar(22)  |      | PRI |            |       |
-#| pageId           | varchar(22)  |      |     |            |       |
-#| content          | text         | YES  |     | NULL       |       |
-#| image            | varchar(255) | YES  |     | NULL       |       |
-#| attachment       | varchar(255) | YES  |     | NULL       |       |
 				my ($ussId) = WebGUI::SQL->quickArray("select USS_id from USS where wobjectId=".quote($wobject->{wobjectId}));
 				my $sth = WebGUI::SQL->read("select * from USS_submission where USS_id=".quote($ussId));
 				my $usssubrank = 1;
@@ -1098,7 +1073,6 @@ sub walkTree {
 					$usssubrank++;
 				}
 				# migrate master forum
-				# migrate submissions
 				# migrate submission forums
 				# migrate submission attachments
 				# migrate submission images
