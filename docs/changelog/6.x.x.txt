@@ -71,6 +71,7 @@
  - bugfix [ 1015319 ] Crash on non-existent URI request (Leendert Bottelberghs).
  - Updated some out of date and missing help information. (Colin Kuskie)
  - RFE [ 855761 ]. Move forum to another Message Board (Leendert Bottelberghs).
+ - RFE [ 1010055 ]. Added template variables for current user alias (Leendert Bottelberghs).
 
 
 6.1.1
