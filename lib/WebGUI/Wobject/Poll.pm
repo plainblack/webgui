@@ -13,6 +13,7 @@ package WebGUI::Wobject::Poll;
 
 use strict;
 use Tie::CPHash;
+use WebGUI::Form;
 use WebGUI::HTMLForm;
 use WebGUI::Icon;
 use WebGUI::International;
@@ -26,6 +27,13 @@ use WebGUI::Wobject;
 
 our @ISA = qw(WebGUI::Wobject);
 
+#-------------------------------------------------------------------
+sub _hasVoted {
+	my ($hasVoted) = WebGUI::SQL->quickArray("select count(*) from Poll_answer 
+		where wobjectId=".$_[0]->get("wobjectId")." and ((userId=$session{user}{userId} 
+		and userId<>1) or (userId=1 and ipAddress='$session{env}{REMOTE_ADDR}'))");
+	return $hasVoted;
+}
 
 #-------------------------------------------------------------------
 sub duplicate {
@@ -182,15 +190,12 @@ sub www_resetVotes {
 
 #-------------------------------------------------------------------
 sub www_view {
-	my ($hasVoted, $answer, $output, @answers, $showPoll, $f, $i, $totalResponses, @data);
-        $output = $_[0]->displayTitle;
-        $output .= $_[0]->description;
+	my (%var, $answer, @answers, $showPoll, $f);
+        $var{question} = $_[0]->get("question");
 	if ($_[0]->get("active") eq "0") {
 		$showPoll = 0;
 	} elsif (WebGUI::Privilege::isInGroup($_[0]->get("voteGroup"),$session{user}{userId})) {
-		($hasVoted) = WebGUI::SQL->quickArray("select count(*) from Poll_answer where wobjectId=".$_[0]->get("wobjectId")." 
-			and ((userId=$session{user}{userId} and userId<>1) or (userId=1 and ipAddress='$session{env}{REMOTE_ADDR}'))");
-		if ($hasVoted) {
+		if ($_[0]->_hasVoted()) {
 			$showPoll = 0;
 		} else {
 			$showPoll = 1;
@@ -198,51 +203,41 @@ sub www_view {
 	} else {
 		$showPoll = 0;
 	}
-        $output .= '<span class="pollQuestion">'.$_[0]->get("question").'</span><br>';
-	if ($showPoll) {
-		$f = WebGUI::HTMLForm->new(1);
-                $f->hidden('wid',$_[0]->get("wobjectId"));
-                $f->hidden('func','vote');
-                for ($i=1; $i<=20; $i++) {
-                        if ($_[0]->get('a'.$i) =~ /\C/) {
-                                $answers[($i-1)] = '<input type="radio" name="answer" value="a'.$i.'"> <span class="pollAnswer">'.$_[0]->get('a'.$i).'</span><br>';
-                        }
+	$var{canVote} = $showPoll;
+        my ($totalResponses) = WebGUI::SQL->quickArray("select count(*) from Poll_answer where wobjectId="
+		.$_[0]->get("wobjectId"));
+	$var{"responses.label"} = WebGUI::International::get(12,$_[0]->get("namespace"));
+	$var{"responses.total"} = $totalResponses;
+	$var{"form.start"} = WebGUI::Form::formHeader();
+        $var{"form.start"} .= WebGUI::Form::hidden({name=>'wid',value=>$_[0]->get("wobjectId")});
+        $var{"form.start"} .= WebGUI::Form::hidden({name=>'func',value=>'vote'});
+	$var{"form.submit"} = WebGUI::Form::submit({value=>WebGUI::International::get(11,$_[0]->get("namespace"))});
+	$var{"form.end"} = "</form>";
+	$totalResponses = 1 if ($totalResponses < 1);
+        for (my $i=1; $i<=20; $i++) {
+        	if ($_[0]->get('a'.$i) =~ /\C/) {
+                        my ($tally) = WebGUI::SQL->quickArray("select count(*) from Poll_answer where answer='a"
+				.$i."' and wobjectId=".$_[0]->get("wobjectId")." group by answer");
+                	push(@answers,{
+				"answer.form"=>WebGUI::Form::radio({name=>"answer",value=>"a".$i}),
+				"answer.text"=>$_[0]->get('a'.$i),
+				"answer.graphWidth"=>round($_[0]->get("graphWidth")*$tally/$totalResponses),
+				"answer.number"=>$i,
+				"answer.percent"=>round(100*$tally/$totalResponses),
+				"answer.total"=>($tally+0)
+                        	});
+		
                 }
-		if ($_[0]->get("randomizeAnswers")) {
-			randomizeArray(\@answers);
-		}
-		foreach $answer (@answers) {
-			$f->raw($answer);
-		}
-                $f->raw('<br>');
-		$f->submit(WebGUI::International::get(11,$_[0]->get("namespace")));
-		$output .= $f->print;
-	} else {
-                ($totalResponses) = WebGUI::SQL->quickArray("select count(*) from Poll_answer where wobjectId=".$_[0]->get("wobjectId"));
-                if ($totalResponses < 1) {
-                        $totalResponses = 1;
-                }
-                for ($i=1; $i<=20; $i++) {
-                        if ($_[0]->get('a'.$i) =~ /\C/) {
-                                $output .= '<span class="pollAnswer"><hr size="1">'.$_[0]->get('a'.$i).'<br></span>';
-                                @data = WebGUI::SQL->quickArray("select count(*), answer from Poll_answer where answer='a$i' and wobjectId="
-					.$_[0]->get("wobjectId")." group by answer");
-                                $output .= '<table cellpadding=0 cellspacing=0 border=0><tr><td width="'.
-					round($_[0]->get("graphWidth")*$data[0]/$totalResponses).'" class="pollColor"><img src="'.
-					$session{config}{extrasURL}.'/spacer.gif" height="1" width="1"></td><td class="pollAnswer">&nbsp;&nbsp;'.
-					round(100*$data[0]/$totalResponses).'% ('.($data[0]+0).')</td></tr></table>';
-                        }
-                }
-                $output .= '<span class="pollAnswer"><hr size="1"><b>'.WebGUI::International::get(12,$_[0]->get("namespace")).'</b> '.$totalResponses.'</span>';
 	}
-	return $output;
+	randomizeArray(\@answers) if ($_[0]->get("randomizeAnswers"));
+	$var{answer_loop} = \@answers;
+	return $_[0]->processTemplate($_[0]->get("templateId"),\%var);
 }
 
 #-------------------------------------------------------------------
 sub www_vote {
-	my ($hasVoted, $u);
-	($hasVoted) = WebGUI::SQL->quickArray("select count(*) from Poll_answer where wobjectId=".$_[0]->get("wobjectId")." and ((userId=$session{user}{userId} and userId<>1) or (userId=1 and ipAddress='$session{env}{REMOTE_ADDR}'))");
-        if ($session{form}{answer} ne "" && WebGUI::Privilege::isInGroup($_[0]->get("voteGroup"),$session{user}{userId}) && !($hasVoted)) {
+	my $u;
+        if ($session{form}{answer} ne "" && WebGUI::Privilege::isInGroup($_[0]->get("voteGroup"),$session{user}{userId}) && !($_[0]->_hasVoted())) {
         	WebGUI::SQL->write("insert into Poll_answer values (".$_[0]->get("wobjectId").", 
 			'$session{form}{answer}', $session{user}{userId}, '$session{env}{REMOTE_ADDR}')");
 		if ($session{setting}{useKarma}) {
