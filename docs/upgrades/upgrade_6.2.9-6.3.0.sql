@@ -223,3 +223,12 @@ alter table HttpProxy add column cookieJarStorageId varchar(22);
 alter table Survey drop column reportcardTemplateId;
 alter table Survey add column gradebookTemplateId varchar(22) default 'PBtmpl0000000000000062';
 
+-- Len Kranendonk 20050112 --
+-- Converting the Indexed Search system to Assets. --
+truncate table IndexedSearch_docInfo;
+alter table IndexedSearch_docInfo drop pageId;
+alter table IndexedSearch_docInfo drop languageId;
+alter table IndexedSearch_docInfo change wobjectId assetId varchar(22);
+alter table IndexedSearch_docInfo drop page_groupIdView;
+alter table IndexedSearch_docInfo change wobject_special_groupIdView special_groupIdView varchar(22);
+alter table IndexedSearch_docInfo change wobject_groupIdView groupIdView varchar(22);
