@@ -21,6 +21,7 @@ use WebGUI::HTMLForm;
 use WebGUI::Icon;
 use WebGUI::International;
 use WebGUI::Operation::Shared;
+use WebGUI::Operation::Auth;
 use WebGUI::Paginator;
 use WebGUI::Privilege;
 use WebGUI::Session;
@@ -30,7 +31,8 @@ use WebGUI::User;
 use WebGUI::Utility;
 
 our @ISA = qw(Exporter);
-our @EXPORT = qw(&www_editUserKarma &www_editUserKarmaSave &www_editUserGroup &www_editUserProfile &www_editUserProfileSave &www_addUserToGroupSave &www_deleteGrouping &www_editGrouping &www_editGroupingSave &www_becomeUser &www_addUser &www_addUserSave &www_deleteUser &www_deleteUserConfirm &www_editUser &www_editUserSave &www_listUsers &www_addUserSecondary &www_addUserSecondarySave);
+#&www_addUserSecondary &www_addUserSecondarySave
+our @EXPORT = qw(&www_editUserKarma &www_editUserKarmaSave &www_editUserGroup &www_editUserProfile &www_editUserProfileSave &www_addUserToGroupSave &www_deleteGrouping &www_editGrouping &www_editGroupingSave &www_becomeUser &www_addUser &www_addUserSave &www_deleteUser &www_deleteUserConfirm &www_editUser &www_editUserSave &www_listUsers);
 
 
 #-------------------------------------------------------------------
@@ -54,119 +56,92 @@ sub _submenu {
 		}
 		$menu{WebGUI::URL::page("op=listUsers")} = WebGUI::International::get(456);
 	} else {
-		$menu{WebGUI::URL::page("op=addUserSecondary")} = WebGUI::International::get(169);
+		$menu{WebGUI::URL::page("op=addUser")} = WebGUI::International::get(169);
 	}
 	return menuWrapper($_[0],\%menu); 
 }
 
 #-------------------------------------------------------------------
 sub www_addUser {
-        my ($output, $f, $cmd, $html, %status);
-        return WebGUI::Privilege::adminOnly() unless (WebGUI::Privilege::isInGroup(3));
-        $output .= helpIcon(5);
+    my ($output, $f, $cmd, $html, %status);
+    return WebGUI::Privilege::adminOnly() unless (WebGUI::Privilege::isInGroup(3) || WebGUI::Privilege::isInGroup(11));
+    $output .= helpIcon(5);
 	$output .= '<h1>'.WebGUI::International::get(163).'</h1>';
-	$f = WebGUI::HTMLForm->new;
+	$output .= WebGUI::Form::_javascriptFile("swapLayers.js");
+	$output .= '<script language="JavaScript" > var active="'.$session{setting}{authMethod}.'"; </script>';
+			
 	if ($session{form}{op} eq "addUserSave") {
 		$output .= '<ul><li>'.WebGUI::International::get(77).' '.$session{form}{username}.'Too or '.$session{form}{username}.'02</ul>';
 	}
-        $f->hidden("op","addUserSave");
-        $f->text("username",WebGUI::International::get(50),$session{form}{username});
-        $f->email("email",WebGUI::International::get(56));
-        
-	tie %status, 'Tie::IxHash';
-	%status = (
-		Active		=>WebGUI::International::get(817),
-		Deactivated	=>WebGUI::International::get(818)
-		);
-	$f->select("status",\%status,WebGUI::International::get(816), ['Active']);
-        $f->group(
-		-name=>"groups",
-		-excludeGroups=>[1,2,7],
-		-label=>WebGUI::International::get(605),
-		-size=>5,
-		-multiple=>1
-		);
+	
+	$f = WebGUI::HTMLForm->new(-tableOptions=>"border=0 cellspacing=0 cellpadding=0");
+	$f->hidden("op","addUserSave");
+	$f->raw('<tr><td width="170">&nbsp;</td><td>&nbsp;</td></tr>');
+    $f->text("username",WebGUI::International::get(50),$session{form}{username});
+    $f->email("email",WebGUI::International::get(56));
+    
+	if(WebGUI::Privilege::isInGroup(3)){    
+	   tie %status, 'Tie::IxHash';
+	   %status = (
+		   Active		=>WebGUI::International::get(817),
+		   Deactivated	=>WebGUI::International::get(818)
+		   );
+	   $f->select("status",\%status,WebGUI::International::get(816), ['Active']);
+       $f->group(
+		     -name=>"groups",
+		     -excludeGroups=>[1,2,7],
+		     -label=>WebGUI::International::get(605),
+		     -size=>5,
+		     -multiple=>1
+	   );
+	}else{
+	   $f->hidden("status","Active");
+	}
 	my $options;
 	foreach (@{$session{config}{authMethods}}) {
 		$options->{$_} = $_;
 	}
-	$f->select("authMethod",$options,WebGUI::International::get(164),[$session{setting}{authMethod}]);
+	$f->select(
+	            -name=>"authMethod",
+				-options=>$options,
+				-label=>WebGUI::International::get(164),
+				-value=>[$session{setting}{authMethod}],
+				-extras=>"onChange=\"active=operateHidden(this.options[this.selectedIndex].value,active)\""
+			  );
+	my $jscript = '<script language="JavaScript">';
 	foreach (@{$session{config}{authMethods}}) {
-		$f->raw(WebGUI::Authentication::adminForm(0,$_));
+		my $authInstance = WebGUI::Operation::Auth::getInstance($_,1);
+		$f->raw('<tr id="'.$_.'"><td colspan="2" align="center"><table border=0 cellspacing=0 cellpadding=0>'.$authInstance->addUserForm("new").'<tr><td width="170">&nbsp;</td><td>&nbsp;</td></tr></table></td></tr>');
+		$jscript .= "document.getElementById(\"$_\").style.display='".(($_ eq $session{setting}{authMethod})?"":"none")."';";
 	}
+	$jscript .= "</script>";	
 	$f->submit;
 	$output .= $f->print;
-        return _submenu($output);
+	$output .= $jscript;
+    return _submenu($output);
 }
 
 #-------------------------------------------------------------------
 sub www_addUserSave {
-        my (@groups, $uid, $u);
-	return WebGUI::Privilege::adminOnly() unless (WebGUI::Privilege::isInGroup(3));
+    my (@groups, $uid, $u);
+	return WebGUI::Privilege::adminOnly() unless (WebGUI::Privilege::isInGroup(3) || WebGUI::Privilege::isInGroup(11));
 	($uid) = WebGUI::SQL->quickArray("select userId from users where username=".quote($session{form}{username}));
-	unless ($uid) {
-		$u = WebGUI::User->new("new");
-		$session{form}{uid}=$u->userId;
-		$u->username($session{form}{username});
-		foreach (@{$session{config}{authMethods}}) {
-			WebGUI::Authentication::adminFormSave($u->userId,$_);
-	 	}
-		$u->status($session{form}{status});
-		$u->authMethod($session{form}{authMethod});
-               	@groups = $session{cgi}->param('groups');
-		$u->addToGroups(\@groups);
-		$u->profileField("email",$session{form}{email});
-               	return www_editUser();
-	} else {
-		$session{form}{op} = "addUser";
-		return www_addUser();
+	return www_addUser if ($uid);
+	
+	$u = WebGUI::User->new("new");
+	$u->username($session{form}{username});
+	foreach (@{$session{config}{authMethods}}) {
+	   my $authInstance = WebGUI::Operation::Auth::getInstance($_,$u->userId);
+	   $authInstance->addUserFormSave;
 	}
-}
-
-#-------------------------------------------------------------------
-sub www_addUserSecondary {
-        return WebGUI::Privilege::adminOnly() unless (WebGUI::Privilege::isInGroup(11));
-        my $output .= '<h1>'.WebGUI::International::get(163).'</h1>';
-        my $f = WebGUI::HTMLForm->new;
-        if ($session{form}{op} eq "addUserSecondarySave") {
-                $output .= '<ul><li>'.WebGUI::International::get(77).' '.$session{form}{username}.'Too or '.$session{form}{username}.'02</ul>';
-        }
-        $f->hidden("op","addUserSecondarySave");
-        $f->text("username",WebGUI::International::get(50),$session{form}{username});
-        $f->email("email",WebGUI::International::get(56));
-        my $options;
-        foreach (@{$session{config}{authMethods}}) {
-                $options->{$_} = $_;
-        }
-        $f->select("authMethod",$options,WebGUI::International::get(164),[$session{setting}{authMethod}]);
-        foreach (@{$session{config}{authMethods}}) {
-                $f->raw(WebGUI::Authentication::adminForm(0,$_));
-        }
-        $f->submit;
-        $output .= $f->print;
-        return _submenu($output);
-}
-
-#-------------------------------------------------------------------
-sub www_addUserSecondarySave {
-        my (@groups, $uid, $u);
-        return WebGUI::Privilege::adminOnly() unless (WebGUI::Privilege::isInGroup(11));
-        ($uid) = WebGUI::SQL->quickArray("select userId from users where username=".quote($session{form}{username}));
-        unless ($uid) {
-                $u = WebGUI::User->new("new");
-                $session{form}{uid}=$u->userId;
-                $u->username($session{form}{username});
-                foreach (@{$session{config}{authMethods}}) {
-                        WebGUI::Authentication::adminFormSave($u->userId,$_);
-                }
-                $u->status('Active');
-                $u->authMethod($session{form}{authMethod});
-                $u->profileField("email",$session{form}{email});
-		return _submenu(WebGUI::International::get(978));
-        } else {
-                $session{form}{op} = "addUserSecondary";
-        	return www_addUserSecondary();
-        }
+	$session{form}{uid}=$u->userId;
+	$u->status($session{form}{status});
+	$u->authMethod($session{form}{authMethod});
+    @groups = $session{cgi}->param('groups');
+	$u->addToGroups(\@groups);
+	$u->profileField("email",$session{form}{email});
+    return _submenu(WebGUI::International::get(978)) if(!WebGUI::Privilege::isInGroup(3));
+	return www_editUser();
 }
 
 #-------------------------------------------------------------------
@@ -223,14 +198,13 @@ sub www_deleteUser {
 sub www_deleteUserConfirm {
 	return WebGUI::Privilege::adminOnly() unless (WebGUI::Privilege::isInGroup(3));
 	my ($u);
-        if ($session{form}{uid} < 26) {
-		return WebGUI::Privilege::vitalComponent();
-        } else {
-		$u = WebGUI::User->new($session{form}{uid});
-		WebGUI::Authentication::deleteParams($u->userId);
-		$u->delete;
-                return www_listUsers();
-        }
+    if ($session{form}{uid} < 26) {
+	   return WebGUI::Privilege::vitalComponent();
+    } else {
+	   $u = WebGUI::User->new($session{form}{uid});
+	   $u->delete;
+       return www_listUsers();
+    }
 }
 
 #-------------------------------------------------------------------
@@ -267,18 +241,21 @@ sub www_editGroupingSave {
 #-------------------------------------------------------------------
 sub www_editUser {
 	return WebGUI::Privilege::adminOnly() unless (WebGUI::Privilege::isInGroup(3));
-        my ($output, $f, $u, $cmd, $html, %status);
+	my ($output, $f, $u, $cmd, $html, %status);
 	$u = WebGUI::User->new($session{form}{uid});
-        $output .= helpIcon(5);
+	$output .= WebGUI::Form::_javascriptFile("swapLayers.js");
+	$output .= '<script language="JavaScript" > var active="'.$u->authMethod.'"; </script>';
+    $output .= helpIcon(5);
 	$output .= '<h1>'.WebGUI::International::get(168).'</h1>';
 	$f = WebGUI::HTMLForm->new;
-        $f->hidden("op","editUserSave");
-        $f->hidden("uid",$session{form}{uid});
-        $f->readOnly($session{form}{uid},WebGUI::International::get(378));
-        $f->readOnly($u->karma,WebGUI::International::get(537)) if ($session{setting}{useKarma});
-        $f->readOnly(epochToHuman($u->dateCreated,"%z"),WebGUI::International::get(453));
-        $f->readOnly(epochToHuman($u->lastUpdated,"%z"),WebGUI::International::get(454));
-        $f->text("username",WebGUI::International::get(50),$u->username);
+    $f->hidden("op","editUserSave");
+    $f->hidden("uid",$session{form}{uid});
+    $f->raw('<tr><td width="170">&nbsp;</td><td>&nbsp;</td></tr>');
+	$f->readOnly($session{form}{uid},WebGUI::International::get(378));
+    $f->readOnly($u->karma,WebGUI::International::get(537)) if ($session{setting}{useKarma});
+    $f->readOnly(epochToHuman($u->dateCreated,"%z"),WebGUI::International::get(453));
+    $f->readOnly(epochToHuman($u->lastUpdated,"%z"),WebGUI::International::get(454));
+    $f->text("username",WebGUI::International::get(50),$u->username);
 	tie %status, 'Tie::IxHash';
 	%status = (
 		Active		=>WebGUI::International::get(817),
@@ -290,34 +267,48 @@ sub www_editUser {
 	} else {
 		$f->select("status",\%status,WebGUI::International::get(816),[$u->status]);
 	}
+	
 	my $options;
-        foreach (@{$session{config}{authMethods}}) {
-                $options->{$_} = $_;
-        }       	
-	$f->select("authMethod",$options,WebGUI::International::get(164),[$u->authMethod]);
 	foreach (@{$session{config}{authMethods}}) {
-		$f->raw(WebGUI::Authentication::adminForm($u->userId,$_));
- 	}
-        $f->submit;
+		$options->{$_} = $_;
+	}
+	$f->select(
+	            -name=>"authMethod",
+				-options=>$options,
+				-label=>WebGUI::International::get(164),
+				-value=>[$u->authMethod],
+				-extras=>"onChange=\"active=operateHidden(this.options[this.selectedIndex].value,active)\""
+			  );
+	my $jscript = '<script language="JavaScript">';
+	foreach (@{$session{config}{authMethods}}) {
+		my $authInstance = WebGUI::Operation::Auth::getInstance($_,$u->userId);
+		$f->raw('<tr id="'.$_.'"><td colspan="2" align="center"><table>'.$authInstance->editUserForm.'<tr><td width="170">&nbsp;</td><td>&nbsp;</td></tr></table></td></tr>');
+		$jscript .= "document.getElementById(\"$_\").style.display='".(($_ eq $u->authMethod)?"":"none")."';";
+	}
+	$jscript .= "</script>";	    
+	$f->submit;
 	$output .= $f->print;
+	$output .= $jscript;
 	return _submenu($output);
 }
 
 #-------------------------------------------------------------------
 sub www_editUserSave {
 	return WebGUI::Privilege::adminOnly() unless (WebGUI::Privilege::isInGroup(3));
-        my ($error, $uid, $u);
-        ($uid) = WebGUI::SQL->quickArray("select userId from users where username=".quote($session{form}{username}));
-        if ($uid == $session{form}{uid} || $uid < 1) {
-		$u = WebGUI::User->new($session{form}{uid});
-		$u->username($session{form}{username});
-		$u->authMethod($session{form}{authMethod});
-		$u->status($session{form}{status});
-		foreach (@{$session{config}{authMethods}}) {
-			WebGUI::Authentication::adminFormSave($u->userId,$_);
-	 	}
+    my ($error, $uid, $u);
+	($uid) = WebGUI::SQL->quickArray("select userId from users where username=".quote($session{form}{username}));
+    
+	if ($uid == $session{form}{uid} || $uid < 1) {
+	   $u = WebGUI::User->new($session{form}{uid});
+	   $u->username($session{form}{username});
+	   $u->authMethod($session{form}{authMethod});
+	   $u->status($session{form}{status});
+	   foreach (@{$session{config}{authMethods}}) {
+	      my $authInstance = WebGUI::Operation::Auth::getInstance($_,$u->userId);
+	      $authInstance->editUserFormSave;
+       }
 	} else {
-                $error = '<ul><li>'.WebGUI::International::get(77).' '.$session{form}{username}.'Too or '.$session{form}{username}.'02</ul>';
+       $error = '<ul><li>'.WebGUI::International::get(77).' '.$session{form}{username}.'Too or '.$session{form}{username}.'02</ul>';
 	}
 	return $error.www_editUser();
 }

@@ -39,7 +39,17 @@ There have currently been no changes to the macro API.
 
 There have currently been no changes to the authentication API.
 In 6.0 all Authentication modules will need to be rewritten as Auth modules according to the new
-Auth API in WebGUI::Auth.  Details to follow.
+Auth API in WebGUI::Auth.  
+
+The following modules will no longer be needed:
+WebGUI::Authentication::WebGUI
+WebGUI::Authentication::LDAP
+WebGUI::Authentication::SMB
+
+WebGUI::Authentication
+WebGUI::Operation::Account
+
+Details to follow.
 
 
 

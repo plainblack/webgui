@@ -22,7 +22,7 @@ use WebGUI::International;
 use WebGUI::Session;
 use WebGUI::SQL;
 use WebGUI::URL;
-use WebGUI::Authentication;
+use WebGUI::Operation::Auth;
 
 =head1 NAME
 
@@ -39,7 +39,7 @@ This package provides an object-oriented way of managing WebGUI users as well as
 
  $authMethod =		$u->authMethod("WebGUI");
  $dateCreated = 	$u->dateCreated;
- $karma = 		$u->karma;
+ $karma = 		    $u->karma;
  $lastUpdated = 	$u->lastUpdated;
  $languagePreference = 	$u->profileField("language",1);
  $referringAffiliate =	$u->referringAffiliate;
@@ -137,18 +137,20 @@ Deletes this user.
 =cut
 
 sub delete {
-        my ($class);
+        my ($class,$authMethod);
         $class = shift;
         WebGUI::SQL->write("delete from users where userId=".$class->{_userId});
         WebGUI::SQL->write("delete from userProfileData where userId=".$class->{_userId});
 	WebGUI::Grouping::deleteUsersFromGroups([$class->{_userId}],WebGUI::Grouping::getGroupsForUser($class->{_userId}));
 	WebGUI::SQL->write("delete from messageLog where userId=".$class->{_userId});
-	WebGUI::Authentication::deleteParams($class->{_userId});
-        my $sth = WebGUI::SQL->read("select sessionId from userSession where userId=$class->{_userId}");
-        while (my ($sid) = $sth->array) {
-                WebGUI::Sesssion::end($sid);
-        }
-        $sth->finish;
+
+	my $authMethod = WebGUI::Operation::Auth::getInstance($class->authMethod,$class->{_userId});
+	$authMethod->deleteParams($class->{_userId});
+    my $sth = WebGUI::SQL->read("select sessionId from userSession where userId=$class->{_userId}");
+    while (my ($sid) = $sth->array) {
+       WebGUI::Sesssion::end($sid);
+    }
+    $sth->finish;
 }
 
 #-------------------------------------------------------------------
@@ -172,7 +174,7 @@ sub deleteFromGroups {
 }
 
 #-------------------------------------------------------------------
-# This method is depricated and is provided only for reverse compatibility. See WebGUI::Authentication instead.
+# This method is depricated and is provided only for reverse compatibility. See WebGUI::Auth instead.
 sub identifier {
         my ($class, $value);
         $class = shift;
