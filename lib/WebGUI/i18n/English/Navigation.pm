@@ -75,9 +75,9 @@ the Navigation Template to determine who can see them in the menu.</P>
 		message => q| <P><STRONG>currentPage.menuTitle</STRONG><BR>The pageId of the base page.</P>
 <P><STRONG>currentPage.title</STRONG><BR>The title of the base page.</P>
 <P><STRONG>currentPage.url</STRONG><BR>The URL of the base page.</P>
-<P><STRONG>currentPage.assetId</STRONG><BR>The pageId of the base page.</P>
-<P><STRONG>currentPage.parentId</STRONG><BR>The parentId of the base page.</P>
-<P><STRONG>currentPage.ownerUserId</STRONG><BR>The ownerId of the base page.</P>
+<P><STRONG>currentPage.assetId</STRONG><BR>The assetId of the base page.</P>
+<P><STRONG>currentPage.parentId</STRONG><BR>The assetId of the parent of the base page.</P>
+<P><STRONG>currentPage.ownerUserId</STRONG><BR>The userId of the owner of the base page.</P>
 <P><STRONG>currentPage.synopsis</STRONG><BR>The synopsis of the base page.</P>
 <P><STRONG>currentPage.newWindow</STRONG><BR>A conditional indicating whether the base page should be opened in a new window.</P>
 <P><STRONG>currentPage.hasChild</STRONG><BR>A conditional indicating whether the base page has daughters.</P>
@@ -117,18 +117,21 @@ loop variables:</p>
 <P dir=ltr><STRONG>page.parent.*</STRONG><BR>These variables will be undefined if the page is a root.</P>
 <P dir=ltr><STRONG>page.parent.title</STRONG><BR>The title of the mother of this page.</P>
 <P dir=ltr><STRONG>page.parent.url</STRONG><BR>The urlized title of the mother of this page.</P>
-<P dir=ltr><STRONG>page.parent.assetId</STRONG><BR>The pageId of the mother of this page.</P>
-<P dir=ltr><STRONG>page.parent.parentId</STRONG><BR>The parentId of the mother of this page.</P>
+<P dir=ltr><STRONG>page.parent.assetId</STRONG><BR>The assetId of the mother of this page.</P>
+<P dir=ltr><STRONG>page.parent.parentId</STRONG><BR>The assetId of the grandmother of this page.</P>
+<P dir=ltr><STRONG>page.parent.ownerUserId</STRONG><BR>The userId of the owner of the mother of this page.</P>
+<P dir=ltr><STRONG>page.parent.synopsis</STRONG><BR>The synopsis of the mother of this page.</P>
+<P dir=ltr><STRONG>page.parent.newWindow</STRONG><BR>A conditional indicating whether the mother of this page should be opened in a new window.</P>
 <P dir=ltr><STRONG>page.depthIs1 , page.depthIs2 , page.depthIs3 , page.depthIs4 , page.depthIsN<BR></STRONG>A conditional indicating whether the depth of this page is N. This variable is useful if you want to style a certain level.</P>
 <P dir=ltr>&lt;tmpl_if page.depthIs1&gt;<BR>&nbsp;&nbsp; &lt;img src="level1.gif"&gt;<BR>&lt;tmpl_else&gt;<BR>&nbsp;&nbsp; &lt;img src="defaultBullet.gif"&gt;<BR>&lt;/tmpl_if&gt;</P>
 <P dir=ltr><STRONG>page.relativeDepthIs1 , page.relativeDepthIs2 , page.relativeDepthIs3 , page.relativeDepthIsN</STRONG><BR>A conditional indicating whether the relative depth of this page is N.</P>
 <P dir=ltr><STRONG>page.isRankedFirst</STRONG><BR>This property is true if this page is the first within this level. Ie. has no left sister.</P>
 <P dir=ltr><STRONG>page.isRankedLast</STRONG><BR>This property is true if this page is the last within this level. Ie. has no right sister.</P>
-<P dir=ltr><STRONG>page.depthDiff</STRONG><BR>The difference in depth of this page and the page processed before it. This only has a value when you go up in depth. If you go down, this would be always 1 and going down a level can be detected with <STRONG>page.isLeftMost</STRONG>.</P>
+<P dir=ltr><STRONG>page.depthDiff</STRONG><BR>The difference in depth of this page and the page processed before it. This only has a value when you go up in depth. If you go down, this would be always 1 and going down a level can be detected with <STRONG>page.isRankedFirst</STRONG>.</P>
 <P dir=ltr><STRONG>page.depthDiffIs1, page.depthDiffIs2, page.depthDiffIs3, page.depthDiffIsN</STRONG><BR>True if the <STRONG>page.depthDiff</STRONG> variable is N.</P>
 <P dir=ltr><STRONG>page.depthDiff_loop</STRONG><BR>A loop that runs <STRONG>page.depthDiff</STRONG> times. This loop contains no loop variables.</P></BLOCKQUOTE>
 <P dir=ltr>&nbsp;</P>|,
-		lastUpdated => 1101774191
+		lastUpdated => 1104367754,
 	},
 
 	'1094' => {
