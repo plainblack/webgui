@@ -116,17 +116,17 @@ sub getEditForm {
 	my $tabform = $self->SUPER::getEditForm();
         $tabform->getTab("properties")->integer(
                	-name=>"thumbnailSize",
-		-label=>WebGUI::International::get('thumbnail size', 'Asset'),
+		-label=>WebGUI::International::get('thumbnail size', 'Image'),
 		-value=>$self->getValue("thumbnailSize")
                	);
 	$tabform->getTab("properties")->textarea(
 		-name=>"parameters",
-		-label=>WebGUI::International::get('parameters', 'Asset'),
+		-label=>WebGUI::International::get('parameters', 'Image'),
 		-value=>$self->getValue("parameters")
 		);
 	if ($self->get("filename") ne "") {
 		$tabform->getTab("properties")->readOnly(
-			-label=>WebGUI::International::get('thumbnail', 'Asset'),
+			-label=>WebGUI::International::get('thumbnail', 'Image'),
 			-value=>'<a href="'.$self->getFileUrl.'"><img src="'.$self->getThumbnailUrl.'?noCache='.time().'" alt="thumbnail" /></a>'
 			);
 	}
