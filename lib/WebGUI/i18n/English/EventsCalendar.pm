@@ -530,19 +530,19 @@ The title for this event.
 <p>
 
 <b>Description</b><br>
-Describe the activities of this event or information about where the event is to be held.
+The activities of this event or information about where the event is to be held.
 <p>
 
 <b>Start Date</b><br>
-On what date will this event begin?
+The date and time when the event begins.
 <p>
 
 <b>End Date</b><br>
-On what date will this event end?
+The date and time when the event ends.
 <p>
 
-<b>Recurs every<b><br>
-Select a recurrence interval for this event. 
+<b>Recurs every</b><br>
+How many times and how often the event recurs.
 
 <p>
 
@@ -550,7 +550,7 @@ Select a recurrence interval for this event.
 Select "add new event" if you'd like to add another event, otherwise select "go back to page".
 <p>
 |,
-		lastUpdated => 1038887363
+		lastUpdated => 1096221250
 	},
 
 	'19' => {

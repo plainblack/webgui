@@ -33,7 +33,7 @@ How many levels deep of navigation should the Site Map show? If 0 (zero) is spec
 <p>
 
 <b>Indent</b><br>
-How many characters should indent each level?
+How many &amp;nbsp;'s should indent each level?
 <p>
 
 <b>Alphabetic?</b><br>
@@ -41,7 +41,7 @@ If this setting is true, site map entries are sorted alphabetically.  If this se
 <p>
 
 |,
-		lastUpdated => 1039908464
+		lastUpdated => 1096092248
 	},
 
 	'3' => {
@@ -83,7 +83,8 @@ This loop contains all of the pages in the site map.
 <blockquote>
 
 <b>page.indent</b><br />
-The indent spacer for this page indicating the depth of the page in the tree.
+The indent spacer for this page indicating the depth of the page in the tree,
+which by default is 5 &amp;nbsp;'s for each level of depth in the tree.
 <p />
 
 <b>page.url</b><br />
@@ -117,7 +118,7 @@ A condition indicating whether or not this page is at the top of the navigation 
 
 </blockquote>
 <p />|,
-		lastUpdated => 1047855100
+		lastUpdated => 1096092207
 	},
 
 	'5' => {

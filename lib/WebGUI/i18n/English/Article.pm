@@ -209,11 +209,11 @@ The URL to the attached image.
 <p/>
 
 <b>linkTitle</b><br/>
-The title of the link to display to the user.
+The title of the link added to the article.
 <p/>
 
 <b>linkURL</b><br/>
-The URL for the link to display to the user.
+The URL for the link added to the article.
 <p/>
 
 <b>post.label</b><br/>
@@ -237,7 +237,7 @@ The URL to view the replies to this article.
 <p/>
 
 |,
-		lastUpdated => 1095829149
+		lastUpdated => 1096219144
 	},
 
 	'24' => {
