@@ -257,12 +257,15 @@ A boolean value to determine whether the method should return the groups directl
 =cut
 
 sub getGroupsInGroup {
-       	my $groups = WebGUI::SQL->buildArrayRef("select groupId from groupGroupings where inGroup=$_[0]");
-	if ($_[1]) {
-		my $loopCount = $_[2]++ || 1;
+	my $groupId = shift;
+	my $isRecursive = shift;
+	my $loopCount = shift;
+       	my $groups = WebGUI::SQL->buildArrayRef("select groupId from groupGroupings where inGroup=$groupId");
+	if ($isRecursive) {
+		$loopCount++;
 		if ($loopCount > 99) {
 			WebGUI::ErrorHandler::fatalError("Endless recursive loop detected while determining".
-				" groups in group.\nRequested groupId: ".$_[0]."\nGroups in that group: ".join(",",@$groups));
+				" groups in group.\nRequested groupId: ".$groupId."\nGroups in that group: ".join(",",@$groups));
 		}
 		my @groupsOfGroups = @$groups;
 		foreach my $group (@$groups) {
