@@ -380,7 +380,7 @@ sub www_deleteEvent {
 	$output .= WebGUI::International::get(75,"EventsCalendar").'<p><blockquote>';
 	$output .= '<a href="'.WebGUI::URL::page('func=deleteEventConfirm').'">'.WebGUI::International::get(76,"EventsCalendar").'</a><p>';
 	$output .= '<a href="'.WebGUI::URL::page('func=deleteEventConfirm&rid='.$session{form}{rid}).'">'
-		.WebGUI::International::get(77,"EventsCalendar").'</a><p>' if ($session{form}{rid});
+		.WebGUI::International::get(77,"EventsCalendar").'</a><p>' if (($session{form}{rid} ne "") and ($session{form}{rid} ne "0"));
 	$output .= '<a href="'.$self->getUrl.'">'.WebGUI::International::get(78,"EventsCalendar").'</a>';
 	$output .= '</blockquote>';
 	return return WebGUI::Style::process($output,$self->getParent->getValue("styleTemplateId"));
