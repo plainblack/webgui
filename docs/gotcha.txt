@@ -57,6 +57,9 @@ save you many hours of grief.
  * The discussions on USS and Articles have been turned off. They'll
 	need to be manually turned back on.
 
+ * The setting "cachePages" has been removed from the config file. It
+	has been moved to the content settings page inside the UI.
+
 
 5.1.0
 --------------------------------------------------------------------

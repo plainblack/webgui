@@ -3095,6 +3095,14 @@ alter table Article drop column allowDiscussion;
 alter table USS drop column allowDiscussion;
 delete from settings where name='usernameBinding';
 delete from settings where name='addEditStampToPosts';
+insert into settings values ("cachePages","60");
+insert into settings values ("cachePagesVisitor","600");
+delete from international where languageId=1 and namespace='WebGUI' and internationalId=887;
+insert into international (internationalId,languageId,namespace,message,lastUpdated) values (887,1,'WebGUI','Midas (Mozilla 1.3+)', 1047342950);
+delete from international where languageId=1 and namespace='WebGUI' and internationalId=896;
+insert into international (internationalId,languageId,namespace,message,lastUpdated) values (896,1,'WebGUI','Page Cache Timeout (Visitors)', 1047342926);
+delete from international where languageId=1 and namespace='WebGUI' and internationalId=895;
+insert into international (internationalId,languageId,namespace,message,lastUpdated) values (895,1,'WebGUI','Page Cache Timeout', 1047342910);
 
 
 

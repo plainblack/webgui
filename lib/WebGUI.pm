@@ -11,12 +11,9 @@ our $VERSION = "5.2.0";
 # http://www.plainblack.com			info@plainblack.com
 #-------------------------------------------------------------------
 
-#Test to see if Cache::FileCache will load.
-my $hasCache=1;
-eval " use Cache::FileCache; "; $hasCache=0 if $@;
-
 use strict qw(vars subs);
 use Tie::CPHash;
+use WebGUI::Cache;
 use WebGUI::ErrorHandler;
 use WebGUI::Icon;
 use WebGUI::International;
@@ -225,15 +222,12 @@ sub _processOperations {
 
 #-------------------------------------------------------------------
 sub page {
-	my ($debug, $positions, $wobjectOutput, $pageEdit, $httpHeader, $content, $operationOutput, $template);
+	my ($cache, $debug, $positions, $wobjectOutput, $pageEdit, $httpHeader, $content, $operationOutput, $template);
 	WebGUI::Session::open($_[0],$_[1]);
-        my $useCache = ($hasCache && $session{config}{cachePages} && $session{form}{op} eq ""
-                && $session{form}{wid} eq "" && not $session{var}{adminOn});
-        my $cache;
-        my $cacheKey = "page_".$session{page}{pageId}."_".$session{user}{userId};
+        my $useCache = ($session{form}{op} eq "" && $session{form}{wid} eq "" && not $session{var}{adminOn});
         if ($useCache) {
-                $cache = new Cache::FileCache({'namespace'=>$_[1]});
-                $content = $cache->get($cacheKey);
+                $cache = WebGUI::Cache->new("page_".$session{page}{pageId}."_".$session{user}{userId});
+                $content = $cache->get;
         }
 	$operationOutput = _processOperations();
 	$wobjectOutput = _processFunctions();
@@ -272,7 +266,13 @@ sub page {
 	$httpHeader = WebGUI::Session::httpHeader();
 	unless ($useCache && defined $content) {
 		$content = WebGUI::Macro::process(WebGUI::Template::process(WebGUI::Style::get($pageEdit.WebGUI::Page::getTemplate($template)), $positions));
-		$cache->set($cacheKey, $content, $session{config}{cachePages}) if ($useCache);
+		my $ttl;
+		if ($session{user}{userId} == 1) {
+			$ttl = $session{setting}{cachePagesVisitor};
+		} else {
+			$ttl = $session{setting}{cachePages};
+		}
+		$cache->set($content, $ttl) if ($useCache);
 	}
 	$debug = _generateDebug();
 	WebGUI::Session::close();
