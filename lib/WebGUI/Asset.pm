@@ -3015,7 +3015,8 @@ sub www_setRank {
 	return $self->getAdminConsole->render(WebGUI::Privilege::insufficient()) unless $self->canEdit;
 	my $newRank = $session{form}{rank};
 	$self->setRank($newRank) if (defined $newRank);
-	return $self->www_manageAssets();
+	$session{asset} = $self->getParent;
+	return $self->getParent->www_manageAssets();
 }
 
 #-------------------------------------------------------------------
