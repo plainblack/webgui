@@ -91,7 +91,7 @@ The path to the WebGUI installation.
 
 =cut
 
-sub laodAllConfigs {
+sub loadAllConfigs {
 	my $webguiPath = shift;
 	opendir(DIR,$webguiPath."/etc");
 	my @files = readdir(DIR);

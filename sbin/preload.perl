@@ -211,7 +211,7 @@ use WebGUI::Macro::Navigation ();
 #----------------------------------------
 # Preload all site configs.
 #----------------------------------------
-WebGUI::Config::laodAllConfigs($webguiRoot);
+WebGUI::Config::loadAllConfigs($webguiRoot);
 
 
 
