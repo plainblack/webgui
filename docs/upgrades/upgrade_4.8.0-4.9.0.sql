@@ -956,10 +956,9 @@ INSERT INTO template VALUES (3,'Ordered List','<tmpl_if displayTitle>\r\n    <h1
 INSERT INTO template VALUES (4,'Descriptive','<tmpl_if displayTitle>\r\n    <h1><tmpl_var title></h1>\r\n</tmpl_if>\r\n\r\n<tmpl_if description>\r\n    <tmpl_var description><p/>\r\n</tmpl_if>\r\n\r\n<tmpl_if session.var.adminOn>\r\n  <a href=\"<tmpl_var addlink.url>\"><tmpl_var addlink.label></a><p />\r\n</tmpl_if>\r\n\r\n<tmpl_loop link_loop>\r\n   <tmpl_if session.var.adminOn>\r\n         <tmpl_var link.controls> <br />\r\n   </tmpl_if>\r\n\r\n  <a href=\"<tmpl_var link.url\"\r\n   <tmpl_if link.newwindow>\r\n          target=\"_blank\"\r\n    </tmpl_if>\r\n    ><span class=\"linkTitle\"><tmpl_var link.name></span></a>\r\n\r\n    <tmpl_if link.description>\r\n              - <tmpl_var link.description>\r\n   </tmpl_if>\r\n   <p />\r\n</tmpl_loop>\r\n','LinkList');
 insert into settings (name, value) values ('snippetsPreviewLength', 30);
 alter table users add column status enum('Active','Deactivated','Selfdestructed') not null default 'Active';
-insert into international (internationalId,languageId,namespace,message,lastUpdated) values (822,1,'WebGUI','Search users within selected status.', 1038433447);
 insert into international (internationalId,languageId,namespace,message,lastUpdated) values (821,1,'WebGUI','Any', 1038432387);
 insert into international (internationalId,languageId,namespace,message,lastUpdated) values (820,1,'WebGUI','Your account is not activated. Therefore you cannot log in until it\'s activated, which only can be done by the admin.', 1038431645);
-insert into international (internationalId,languageId,namespace,message,lastUpdated) values (819,1,'WebGUI','Selfdestructed', 1038431323);
+insert into international (internationalId,languageId,namespace,message,lastUpdated) values (819,1,'WebGUI','Self-Deactivated', 1038431323);
 insert into international (internationalId,languageId,namespace,message,lastUpdated) values (818,1,'WebGUI','Deactivated', 1038431300);
 insert into international (internationalId,languageId,namespace,message,lastUpdated) values (817,1,'WebGUI','Active', 1038431287);
 insert into international (internationalId,languageId,namespace,message,lastUpdated) values (816,1,'WebGUI','Status', 1038431169);

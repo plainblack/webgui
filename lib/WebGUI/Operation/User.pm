@@ -72,11 +72,14 @@ sub www_addUser {
 	tie %status, 'Tie::IxHash';
 	%status = (
 		Active		=>WebGUI::International::get(817),
-		Deactivated	=>WebGUI::International::get(818),
-		Selfdestructed	=>WebGUI::International::get(819)
+		Deactivated	=>WebGUI::International::get(818)
 		);
 	$f->select("status",\%status,WebGUI::International::get(816), ['Active']);
-
+        push(@array,1); #visitors
+        push(@array,2); #registered users
+        push(@array,7); #everyone
+        $groups = WebGUI::SQL->buildHashRef("select groupId,groupName from groups where groupId not in (".join(",",@array).") order by groupName");
+        $f->select("groups",$groups,WebGUI::International::get(605),[],5,1);
 	%hash = map {$_ => $_} @{$session{authentication}{available}};
 	$f->select("authMethod",\%hash,WebGUI::International::get(164),[$session{setting}{authMethod}]);
 
@@ -86,12 +89,6 @@ sub www_addUser {
                	WebGUI::ErrorHandler::fatalError("Unable to load method formAddUser on Authentication module: $_. ".$@) if($@);
 		$f->raw($html);
 	}
-
-        push(@array,1); #visitors
-        push(@array,2); #registered users
-        push(@array,7); #everyone
-        $groups = WebGUI::SQL->buildHashRef("select groupId,groupName from groups where groupId not in (".join(",",@array).") order by groupName");
-        $f->select("groups",$groups,WebGUI::International::get(605),[],5,1);
 	$f->submit;
 	$output .= $f->print;
         return _submenu($output);
@@ -400,64 +397,59 @@ sub www_editUserProfileSave {
 #-------------------------------------------------------------------
 sub www_listUsers {
 	return WebGUI::Privilege::adminOnly() unless (WebGUI::Privilege::isInGroup(3));
-	my ($output, $sth, %data, $f, @row, $p, $i, $search, %status, $selectedStatus);
-	tie %data, 'Tie::CPHash';
+	WebGUI::Session::setScratch("userSearchKeyword",$session{form}{keyword});
+	WebGUI::Session::setScratch("userSearchStatus",$session{form}{status});
+	my ($output, $data, $f, $rows, $p, $search, %status, $selectedStatus);
 	$output = helpIcon(8);
 	$output .= '<h1>'.WebGUI::International::get(149).'</h1>';
 	$output .= '<div align="center">';
 	tie %status, 'Tie::IxHash';
 	%status = (
-		"status like '%'"		=> WebGUI::International::get(821),
-		"status='Active'"		=> WebGUI::International::get(817),
-		"status='Deactivated'"		=> WebGUI::International::get(818),
-		"status='Selfdestructed'"	=> WebGUI::International::get(819)
+		""		=> WebGUI::International::get(821),
+		Active		=> WebGUI::International::get(817),
+		Deactivated	=> WebGUI::International::get(818),
+		Selfdestructed	=> WebGUI::International::get(819)
 	);
 	$f = WebGUI::HTMLForm->new(1);
 	$f->hidden("op","listUsers");
-	$f->text("keyword",'',$session{form}{keyword});
+	$f->text("keyword",'',$session{scratch}{userSearchKeyword});
 	$f->select(
 		-name	=> "status",
 		-value	=> [$session{form}{status} || "status like '%'"],
 		-options=> \%status
 	);
 	$f->submit(WebGUI::International::get(170));
-	$f->readOnly(WebGUI::International::get(822));
-	$f->checkbox (
-		-name	=> "searchWithinStatus",
-		-label	=> "searchWithinStatus",
-		-checked=> $session{form}{searchWithinStatus},
-	);	
 	$output .= $f->print;
 	$output .= '</div>';
-	$selectedStatus = $session{form}{status} || "status like '%'";	
-	if ($session{form}{keyword} ne "") {
-		$selectedStatus = "status like '%'" unless ($session{form}{searchWithinStatus});
-		$search = " where (users.username like '%".$session{form}{keyword}."%' and ".$selectedStatus.") ";
-	} else {
-		$search = " where (".$selectedStatus.") ";
-	}
-	$sth = WebGUI::SQL->read("select * from users $search order by users.username");
-	while (%data = $sth->hash) {
-		$row[$i] = '<tr class="tableData">';
-		$row[$i] .= ($data{status} eq 'Active') ? '<td>&nbsp;</td>' : '<td>'.$data{status}.'</td>';
-		$row[$i] .= '<td><a href="'.WebGUI::URL::page('op=editUser&uid='.$data{userId})
-			.'">'.$data{username}.'</a></td>';
-		#$row[$i] .= '<td class="tableData">'.epochToHuman($data{dateCreated},"%z").'</td>';
-		#$row[$i] .= '<td class="tableData">'.epochToHuman($data{lastUpdated},"%z").'</td>';
-		$row[$i] .= '</tr>';
-		$i++;
-	}
-	$sth->finish;
-        $p = WebGUI::Paginator->new(WebGUI::URL::page('op=listUsers&keyword='.$session{form}{keyword}),\@row);
         $output .= '<table border=1 cellpadding=5 cellspacing=0 align="center">';
-	$output .= '<tr>
-		<td class="tableHeader">'.WebGUI::International::get(816).'</td>
-		<td class="tableHeader">'.WebGUI::International::get(50).'</td></tr>';
-#		<td class="tableHeader">'.WebGUI::International::get(453).'</td>
-#		<td class="tableHeader">'.WebGUI::International::get(454).'</td></tr>';
-        $output .= $p->getPage($session{form}{pn});
+        $output .= '<tr>
+                <td class="tableHeader">'.WebGUI::International::get(816).'</td>
+                <td class="tableHeader">'.WebGUI::International::get(50).'</td>
+                <td class="tableHeader">'.WebGUI::International::get(453).'</td>
+                <td class="tableHeader">'.WebGUI::International::get(454).'</td></tr>';
+	if ($session{scratch}{userSearchStatus}) {
+		$selectedStatus = "status='".$session{scratch}{userSearchStatus}."'";
+	} else {
+		$selectedStatus = "status like '%'";
+	}
+	if ($session{scratch}{userSearchKeyword} ne "") {
+		$search = " and users.username like ".quote("%".$session{scratch}{userSearchKeyword}."%");
+	}
+        $p = WebGUI::Paginator->new(WebGUI::URL::page("op=listUsers"));
+	$p->setDataByQuery("select userId,username,status,dateCreated,lastUpdated from users 
+		where $selectedStatus $search order by users.username");
+	$rows = $p->getPageData;
+	foreach $data (@$rows) {
+		$output .= '<tr class="tableData">';
+		$output .= '<td>'.$status{$data->{status}}.'</td>';
+		$output .= '<td><a href="'.WebGUI::URL::page('op=editUser&uid='.$data->{userId})
+			.'">'.$data->{username}.'</a></td>';
+		$output .= '<td class="tableData">'.epochToHuman($data->{dateCreated},"%z").'</td>';
+		$output .= '<td class="tableData">'.epochToHuman($data->{lastUpdated},"%z").'</td>';
+		$output .= '</tr>';
+	}
         $output .= '</table>';
-        $output .= $p->getBarTraditional($session{form}{pn});
+        $output .= $p->getBarTraditional;
 	return _submenu($output);
 }
 
