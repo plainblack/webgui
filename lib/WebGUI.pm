@@ -177,7 +177,9 @@ sub page {
                                 } elsif (ref $value eq 'HASH') {
                                         $value = '{'.join(', ',map {"$_ => $value->{$_}"} keys %$value).'}';
                                 }
-                                $debug .= '<tr><td align="right"><b>'.$section.'.'.$key.':</b></td><td>'.$value.'</td>';
+				unless (lc($key) eq "password" || lc($key) eq "identifier") {
+                                	$debug .= '<tr><td align="right"><b>'.$section.'.'.$key.':</b></td><td>'.$value.'</td>';
+				}
                         }
                         $debug .= '<tr height=10><td>&nbsp;</td><td>&nbsp</td></tr>';
                 }
