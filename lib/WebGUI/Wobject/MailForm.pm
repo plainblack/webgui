@@ -68,7 +68,7 @@ sub duplicate {
 sub purge {
     WebGUI::SQL->write("delete from MailForm_field where wobjectId=".$_[0]->get("wobjectId"));
     WebGUI::SQL->write("delete from MailForm_entry where wobjectId=".$_[0]->get("wobjectId"));
-    WebGUI::SQL->write("delete from MailForm_entry_data where wobjectId=".$_[0]->get("wobjectId"));
+    WebGUI::SQL->write("delete from MailForm_entryData where wobjectId=".$_[0]->get("wobjectId"));
     $_[0]->SUPER::purge();
 }
 
@@ -427,7 +427,7 @@ sub _textSelectRow {
 		$output .= '>'.${$selectOptions}{$key};
 	}
 	$output .= '</select>';
-	return WebGUI::HTMLForm::_tableFormRow($textLabel, $output);
+	return '<tr><td class="formDescription" valign="top">'.$textLabel.'</td><td class="tableData">'.$output."</td></tr>\n";
 }
 
 #-------------------------------------------------------------------
@@ -459,7 +459,7 @@ sub www_send {
 		
 		# store results
 		if ($_[0]->get("storeEntries")) {
-			WebGUI::SQL->write("insert into MailForm_entry_data values ($entryId, ".$_[0]->get("wobjectId").", ".$data{sequenceNumber}.", ".quote($data{name}).", ".quote($value).")");
+			WebGUI::SQL->write("insert into MailForm_entryData values ($entryId, ".$_[0]->get("wobjectId").", ".$data{sequenceNumber}.", ".quote($data{name}).", ".quote($value).")");
 		}
 		
 		$data{name} .= ":" unless ($data{name} =~ /:$/);
