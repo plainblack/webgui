@@ -411,6 +411,9 @@ sub open {
 		# default to the "real" path to script.
 		$session{config}{scripturl} = $ENV{SCRIPT_NAME};
 	}
+	$session{config}{extrasURL} = $session{config}{extrasURL} || $session{config}{extras} || "/extras";
+	$session{config}{extras} = $session{config}{extras} || $session{config}{extrasURL}; # for backward compatibility
+	$session{config}{extrasPath} = $session{config}{extrasPath} || "/data/WebGUI/www/extras";
 	###----------------------------
 	### default database handler object
 	$session{dbh} = DBI->connect($session{config}{dsn},$session{config}{dbuser},$session{config}{dbpass},{ RaiseError=>0,AutoCommit=>1 });

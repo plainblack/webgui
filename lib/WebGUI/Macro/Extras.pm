@@ -17,7 +17,7 @@ use WebGUI::Session;
 sub process {
 	my ($output);
 	$output = $_[0];
-        $output =~ s/\^Extras\;/$session{config}{extras}\//g;
+        $output =~ s/\^Extras\;/$session{config}{extrasURL}\//g;
 	return $output;
 }
 

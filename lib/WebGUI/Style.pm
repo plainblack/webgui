@@ -63,7 +63,7 @@ sub get {
         @body = split(/\^\-\;/,$style{body});
         $header = $session{setting}{docTypeDec}."\n".'<!-- WebGUI '.$WebGUI::VERSION.' --> <html> <head> <title>';
         $header .= $session{page}{title}.' - '.$session{setting}{companyName};
-        $header .= '</title><link REL="icon" HREF="'.$session{config}{extras}.'/favicon.png" TYPE="image/png">'
+        $header .= '</title><link REL="icon" HREF="'.$session{config}{extrasURL}.'/favicon.png" TYPE="image/png">'
                 .$style{styleSheet}.$session{page}{metaTags};
         if ($session{var}{adminOn}) {
                 # This "triple incantation" panders to the delicate tastes of various browsers for reliable cache suppression.

@@ -171,11 +171,10 @@ sub www_editInternationalMessageSave {
 
 #-------------------------------------------------------------------
 sub www_editLanguage {
-	my ($output, $slash, $dir, @files, $file, %data, $f, %options);
+	my ($output, $dir, @files, $file, %data, $f, %options);
 	return WebGUI::Privilege::adminOnly() unless (WebGUI::Privilege::isInGroup(3));
 	tie %data, 'Tie::CPHash';
-        $slash = ($^O =~ /Win/i) ? "\\" : "/";
-        $dir = $session{config}{webguiRoot}.$slash."www".$slash."extras".$slash."toolbar";
+        $dir = $session{config}{extrasPath}.$session{os}{slash}."toolbar";
         opendir (DIR,$dir) or WebGUI::ErrorHandler::warn("Can't open toolbar directory!");
         @files = readdir(DIR);
         foreach $file (@files) {

@@ -78,7 +78,7 @@ sub becomeIcon {
         my ($output, $pageURL);
 	$pageURL = $_[1] || $session{page}{urlizedTitle};
         $output = '<a href="'.WebGUI::URL::gateway($pageURL,$_[0]).'">';
-        $output .= '<img src="'.$session{config}{extras}.'/toolbar/'.$session{language}{toolbar}.'/become.gif" align="middle" border="0" alt="Become"></a>';
+        $output .= '<img src="'.$session{config}{extrasURL}.'/toolbar/'.$session{language}{toolbar}.'/become.gif" align="middle" border="0" alt="Become"></a>';
         return $output;
 }
 
@@ -106,7 +106,7 @@ sub copyIcon {
         my ($output, $pageURL);
         $pageURL = $_[1] || $session{page}{urlizedTitle};
         $output = '<a href="'.WebGUI::URL::gateway($pageURL,$_[0]).'">';
-        $output .= '<img src="'.$session{config}{extras}.'/toolbar/'.$session{language}{toolbar}.'/copy.gif" align="middle" border="0" alt="Copy"></a>';
+        $output .= '<img src="'.$session{config}{extrasURL}.'/toolbar/'.$session{language}{toolbar}.'/copy.gif" align="middle" border="0" alt="Copy"></a>';
         return $output;
 }
 
@@ -134,7 +134,7 @@ sub cutIcon {
         my ($output, $pageURL);
         $pageURL = $_[1] || $session{page}{urlizedTitle};
         $output = '<a href="'.WebGUI::URL::gateway($pageURL,$_[0]).'">';
-        $output .= '<img src="'.$session{config}{extras}.'/toolbar/'.$session{language}{toolbar}.'/cut.gif" align="middle" border="0" alt="Cut"></a>';
+        $output .= '<img src="'.$session{config}{extrasURL}.'/toolbar/'.$session{language}{toolbar}.'/cut.gif" align="middle" border="0" alt="Cut"></a>';
         return $output;
 }
 
@@ -162,7 +162,7 @@ sub deleteIcon {
         my ($output, $pageURL);
         $pageURL = $_[1] || $session{page}{urlizedTitle};
         $output = '<a href="'.WebGUI::URL::gateway($pageURL,$_[0]).'">';
-	$output .= '<img src="'.$session{config}{extras}.'/toolbar/'.$session{language}{toolbar}.'/delete.gif" align="middle" border="0" alt="Delete"></a>';
+	$output .= '<img src="'.$session{config}{extrasURL}.'/toolbar/'.$session{language}{toolbar}.'/delete.gif" align="middle" border="0" alt="Delete"></a>';
 	return $output;
 }
 
@@ -190,7 +190,7 @@ sub editIcon {
         my ($output, $pageURL);
         $pageURL = $_[1] || $session{page}{urlizedTitle};
         $output = '<a href="'.WebGUI::URL::gateway($pageURL,$_[0]).'">';
-        $output .= '<img src="'.$session{config}{extras}.'/toolbar/'.$session{language}{toolbar}.'/edit.gif" align="middle" border="0" alt="Edit"></a>';
+        $output .= '<img src="'.$session{config}{extrasURL}.'/toolbar/'.$session{language}{toolbar}.'/edit.gif" align="middle" border="0" alt="Edit"></a>';
         return $output;
 }
 
@@ -218,7 +218,7 @@ sub helpIcon {
 	my ($output, $namespace);
 	$namespace = $_[1] || "WebGUI";
 	$output = '<a href="'.WebGUI::URL::page('op=viewHelp&hid='.$_[0].'&namespace='.$namespace).
-		'" target="_blank"><img src="'.$session{config}{extras}.'/toolbar/'.$session{language}{toolbar}.'/help.gif" border="0" align="right"></a>';
+		'" target="_blank"><img src="'.$session{config}{extrasURL}.'/toolbar/'.$session{language}{toolbar}.'/help.gif" border="0" align="right"></a>';
 	return $output;
 }
 
@@ -246,7 +246,7 @@ sub moveBottomIcon {
         my ($output, $pageURL);
         $pageURL = $_[1] || $session{page}{urlizedTitle};
         $output = '<a href="'.WebGUI::URL::gateway($pageURL,$_[0]).'">';
-        $output .= '<img src="'.$session{config}{extras}.'/toolbar/'.$session{language}{toolbar}.'/moveBottom.gif" align="middle" border="0" alt="Move To Bottom"></a>';
+        $output .= '<img src="'.$session{config}{extrasURL}.'/toolbar/'.$session{language}{toolbar}.'/moveBottom.gif" align="middle" border="0" alt="Move To Bottom"></a>';
         return $output;
 }
 
@@ -274,7 +274,7 @@ sub moveDownIcon {
         my ($output, $pageURL);
         $pageURL = $_[1] || $session{page}{urlizedTitle};
         $output = '<a href="'.WebGUI::URL::gateway($pageURL,$_[0]).'">';
-        $output .= '<img src="'.$session{config}{extras}.'/toolbar/'.$session{language}{toolbar}.'/moveDown.gif" align="middle" border="0" alt="Move Down"></a>';
+        $output .= '<img src="'.$session{config}{extrasURL}.'/toolbar/'.$session{language}{toolbar}.'/moveDown.gif" align="middle" border="0" alt="Move Down"></a>';
         return $output;
 }
 
@@ -302,7 +302,7 @@ sub moveTopIcon {
         my ($output, $pageURL);
         $pageURL = $_[1] || $session{page}{urlizedTitle};
         $output = '<a href="'.WebGUI::URL::gateway($pageURL,$_[0]).'">';
-        $output .= '<img src="'.$session{config}{extras}.'/toolbar/'.$session{language}{toolbar}.'/moveTop.gif" align="middle" border="0" alt="Move To Top"></a>';
+        $output .= '<img src="'.$session{config}{extrasURL}.'/toolbar/'.$session{language}{toolbar}.'/moveTop.gif" align="middle" border="0" alt="Move To Top"></a>';
         return $output;
 }
 
@@ -330,7 +330,7 @@ sub moveUpIcon {
         my ($output, $pageURL);
         $pageURL = $_[1] || $session{page}{urlizedTitle};
         $output = '<a href="'.WebGUI::URL::gateway($pageURL,$_[0]).'">';
-        $output .= '<img src="'.$session{config}{extras}.'/toolbar/'.$session{language}{toolbar}.'/moveUp.gif" align="middle" border="0" alt="Move Up"></a>';
+        $output .= '<img src="'.$session{config}{extrasURL}.'/toolbar/'.$session{language}{toolbar}.'/moveUp.gif" align="middle" border="0" alt="Move Up"></a>';
         return $output;
 }
 
@@ -343,7 +343,7 @@ Generates an icon that looks like a page. It's purpose is to represent whether y
 =cut
 
 sub pageIcon {
-        return '<img src="'.$session{config}{extras}.'/toolbar/'.$session{language}{toolbar}.'/page.gif" align="middle" border="0" alt="Page Settings">';
+        return '<img src="'.$session{config}{extrasURL}.'/toolbar/'.$session{language}{toolbar}.'/page.gif" align="middle" border="0" alt="Page Settings">';
 }
 
 #-------------------------------------------------------------------
@@ -370,7 +370,7 @@ sub viewIcon {
         my ($output, $pageURL);
         $pageURL = $_[1] || $session{page}{urlizedTitle};
         $output = '<a href="'.WebGUI::URL::gateway($pageURL,$_[0]).'">';
-        $output .= '<img src="'.$session{config}{extras}.'/toolbar/'.$session{language}{toolbar}.'/view.gif" align="middle" border="0" alt="View"></a>';
+        $output .= '<img src="'.$session{config}{extrasURL}.'/toolbar/'.$session{language}{toolbar}.'/view.gif" align="middle" border="0" alt="View"></a>';
         return $output;
 }
 
@@ -383,7 +383,7 @@ Generates an icon that looks like a wobject. It's purpose is to represent whethe
 =cut
 
 sub wobjectIcon {
-        return '<img src="'.$session{config}{extras}.'/toolbar/'.$session{language}{toolbar}.'/wobject.gif" align="middle" border="0" alt="Wobject Settings">';
+        return '<img src="'.$session{config}{extrasURL}.'/toolbar/'.$session{language}{toolbar}.'/wobject.gif" align="middle" border="0" alt="Wobject Settings">';
 }
 
 

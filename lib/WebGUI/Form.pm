@@ -279,7 +279,7 @@ sub date {
 		extras=>$_[0]->{extras}
 		});
 	$output .= '<input type="button" style="font-size: 8pt;" onClick="window.dateField = this.form.'.
-		$_[0]->{name}.';calendar = window.open(\''.$session{config}{extras}.
+		$_[0]->{name}.';calendar = window.open(\''.$session{config}{extrasURL}.
 		'/calendar.html\',\'cal\',\'WIDTH=200,HEIGHT=250\');return false" value="'.
 		WebGUI::International::get(34).'">';
 	return $output;
@@ -323,7 +323,7 @@ The number of characters wide this form element should be. There should be no re
 
 sub email {
         my ($output);
-	$output = '<script language="javascript" src="'.$session{config}{extras}.'/emailCheck.js"></script>';
+	$output = '<script language="javascript" src="'.$session{config}{extrasURL}.'/emailCheck.js"></script>';
 	$output .= text({
 		name=>$_[0]->{name},
 		value=>$_[0]->{value},
@@ -647,25 +647,25 @@ sub HTMLArea {
 			var formObj;
 			function openEditWindow(obj) {
 	                	formObj = obj;
-				window.open("'.$session{config}{extras}.'/eopro.html","editWindow","width=720,height=450,resizable=1");
+				window.open("'.$session{config}{extrasURL}.'/eopro.html","editWindow","width=720,height=450,resizable=1");
 			}
 			</script>';
 	} else {
 		my $browser = HTTP::BrowserDetect->new($session{env}{HTTP_USER_AGENT});
 		if ($browser->ie && $browser->version >= 5.5) {
-			$output .= '<script language="Javascript1.2" src="'.$session{config}{extras}
+			$output .= '<script language="Javascript1.2" src="'.$session{config}{extrasURL}
 				.'/htmlArea/editor.js"></script>'."\n";
                 	$output .= '<script>'."\n";
-                	$output .= '_editor_url = "'.$session{config}{extras}.'/htmlArea/";'."\n";
+                	$output .= '_editor_url = "'.$session{config}{extrasURL}.'/htmlArea/";'."\n";
                 	$output .= '</script>'."\n";
 			$htmlArea = 1;
 		} elsif ($browser->ie && $browser->version >= 5) {
 			$output .= '<script language="JavaScript">
 			var formObj;
-	               var extrasDir="'.$session{config}{extras}.'";
+	               var extrasDir="'.$session{config}{extrasURL}.'";
         	       function openEditWindow(obj) {
 	               formObj = obj;
-                	 window.open("'.$session{config}{extras}.'/ie5edit.html","editWindow","width=490,height=400,resizable=1");			}
+                	 window.open("'.$session{config}{extrasURL}.'/ie5edit.html","editWindow","width=490,height=400,resizable=1");			}
         	       function setContent(content) {
                 	 formObj.value = content;
 	               } </script>';
@@ -674,10 +674,10 @@ sub HTMLArea {
 #		} elsif ($browser->gecko && $browser->version >= 1.3) {
 #			$output .= '<script language="JavaScript">
  #                       var formObj;
-  ##                     var extrasDir="'.$session{config}{extras}.'";
+  ##                     var extrasDir="'.$session{config}{extrasURL}.'";
     #                   function openEditWindow(obj) {
      #                  formObj = obj;
-      #                   window.open("'.$session{config}{extras}.'/wendedit.html","editWindow","width=490,height=400,resizable=1");			}
+      #                   window.open("'.$session{config}{extrasURL}.'/wendedit.html","editWindow","width=490,height=400,resizable=1");			}
        #                function setContent(content) {
         #                 formObj.value = content;
          #              } </script>';
@@ -685,10 +685,10 @@ sub HTMLArea {
 		} else {
 			$output .= '<script language="JavaScript">
 			var formObj;
-	               var extrasDir="'.$session{config}{extras}.'";
+	               var extrasDir="'.$session{config}{extrasURL}.'";
         	       function openEditWindow(obj) {
 	               formObj = obj;
-        	         window.open("'.$session{config}{extras}.'/lastResortEdit.html","editWindow","width=500,height=410");
+        	         window.open("'.$session{config}{extrasURL}.'/lastResortEdit.html","editWindow","width=500,height=410");
 			}
         	       function setContent(content) {
                 	 formObj.value = content;

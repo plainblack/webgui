@@ -80,7 +80,7 @@ Displays the attachment in WebGUI's standard "Attachment Box".
 sub box {
         my ($output);
         $output = '<p><table cellpadding=3 cellspacing=0 border=1><tr><td class="tableHeader">'.
-                '<a href="'.$_[0]->getURL.'"><img src="'.$session{config}{extras}.
+                '<a href="'.$_[0]->getURL.'"><img src="'.$session{config}{extrasURL}.
                 '/attachment.gif" border=0 alt="'.
                 $_[0]->getFilename.'"></a></td><td><a href="'.$_[0]->getURL.
                 '"><img src="'.$_[0]->getIcon.
@@ -230,7 +230,7 @@ Returns the full URL to the file icon for this attachment.
 sub getIcon {
 	my ($extension, $icon);
 	$extension = $_[0]->getType;
-	$icon = $session{config}{extras}."/fileIcons/";
+	$icon = $session{config}{extrasURL}."/fileIcons/";
 	if (isIn($extension, qw(doc dot wri))) {
                 $icon .= "doc.gif";
         } elsif (isIn($extension, qw(txt log sql config conf pm cnf readme))) {

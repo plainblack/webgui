@@ -195,7 +195,7 @@ sub www_view {
 					.$_[0]->get("wobjectId")." group by answer");
                                 $output .= '<table cellpadding=0 cellspacing=0 border=0><tr><td width="'.
 					round($_[0]->get("graphWidth")*$data[0]/$totalResponses).'" class="pollColor"><img src="'.
-					$session{config}{extras}.'/spacer.gif" height="1" width="1"></td><td class="pollAnswer">&nbsp;&nbsp;'.
+					$session{config}{extrasURL}.'/spacer.gif" height="1" width="1"></td><td class="pollAnswer">&nbsp;&nbsp;'.
 					round(100*$data[0]/$totalResponses).'% ('.($data[0]+0).')</td></tr></table>';
                         }
                 }

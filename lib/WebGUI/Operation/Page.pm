@@ -129,7 +129,7 @@ sub _traversePageTree {
         my ($a, $b, %page, %wobject, $output, $depth, $i, $spacer);
 	tie %page, 'Tie::CPHash';
 	tie %wobject, 'Tie::CPHash';
-        $spacer = '<img src="'.$session{config}{extras}.'/spacer.gif" width=12>';
+        $spacer = '<img src="'.$session{config}{extrasURL}.'/spacer.gif" width=12>';
         for ($i=1;$i<=$_[1];$i++) {
                 $depth .= $spacer;
         }

@@ -8,6 +8,14 @@ versions. Be sure to heed the warnings contained herein as they will
 save you many hours of grief.
 
 
+4.9.4
+--------------------------------------------------------------------
+ * The "extras" property in the config file has been renamed to
+	"extrasURL". You also need to add an "extrasPath" to your
+	config file that points to the server path of your extras
+	folder.
+
+
 4.9.3
 --------------------------------------------------------------------
  * The import utilities imImport.pl and dmImport.pl have been

@@ -431,7 +431,7 @@ sub www_listCollateral {
 			where collateralFolderId=$folderId");
 		$output .= '<tr><td colspan="5" class="tableData"><a href="'.WebGUI::URL::page('op=listCollateral&fid='
 			.$parent.'&pn=1')
-                        .'"><img src="'.$session{config}{extras}.'/smallAttachment.gif" border="0">'
+                        .'"><img src="'.$session{config}{extrasURL}.'/smallAttachment.gif" border="0">'
                         .'&nbsp;'.WebGUI::International::get(542).'</a></td></tr>';
 	}
 	$sth = WebGUI::SQL->read("select collateralFolderId, name, description from collateralFolder 
@@ -439,7 +439,7 @@ sub www_listCollateral {
 	while ($data = $sth->hashRef) {
 		$output .= '<tr><td class="tableData"><a href="'.WebGUI::URL::page('op=listCollateral&fid='
 			.$data->{collateralFolderId}.'&pn=1')
-                        .'"><img src="'.$session{config}{extras}.'/smallAttachment.gif" border="0">'
+                        .'"><img src="'.$session{config}{extrasURL}.'/smallAttachment.gif" border="0">'
                         .'&nbsp;'.$data->{name}.'</a></td><td class="tableData" colspan="4">'.$data->{description}.'</td></tr>';
 	}
 	$sth->finish;
