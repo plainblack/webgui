@@ -3338,6 +3338,10 @@ delete from international where languageId=1 and namespace='HttpProxy' and inter
 insert into international (internationalId,languageId,namespace,message,lastUpdated) values (9,1,'HttpProxy','Cookie Jar', 1047835842);
 delete from international where languageId=1 and namespace='HttpProxy' and internationalId=5;
 insert into international (internationalId,languageId,namespace,message,lastUpdated) values (5,1,'HttpProxy','Allow proxying of other domains?', 1047835817);
+delete from international where languageId=1 and namespace='WebGUI' and internationalId=891;
+insert into international (internationalId,languageId,namespace,message,lastUpdated) values (891,1,'WebGUI','Only negate macros.', 1047838859);
+delete from international where languageId=1 and namespace='WebGUI' and internationalId=526;
+insert into international (internationalId,languageId,namespace,message,lastUpdated) values (526,1,'WebGUI','Remove JavaScript and negate macros.', 1047838780);
 
 
 

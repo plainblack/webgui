@@ -97,7 +97,7 @@ sub filter {
 	if ($type eq "all") {
 		$filter = HTML::TagFilter->new(allow=>{'none'},strip_comments=>1);
 		$html = $filter->filter($_[0]);
-		return WebGUI::Macro::filter($html);
+		return WebGUI::Macro::negate($html);
 	} elsif ($type eq "javascript") {
 		$html = $_[0];
 		$html =~ s/\<script.*?\/script\>//ixsg;
@@ -115,9 +115,9 @@ sub filter {
 		$html =~ s/onKeyDown/removed/ixsg;
 		$html =~ s/onSubmit/removed/ixsg;
 		$html =~ s/onReset/removed/ixsg;
-		$html = WebGUI::Macro::filter($html);
+		$html = WebGUI::Macro::negate($html);
 	} elsif ($type eq "macros") {
-		return WebGUI::Macro::filter($_[0]);
+		return WebGUI::Macro::negate($_[0]);
 	} elsif ($type eq "none") {
 		return $_[0];
 	} else {

@@ -125,6 +125,29 @@ sub getParams {
 
 #-------------------------------------------------------------------
 
+=head2 negate ( html )
+
+Nullifies all macros in this content segment.
+
+=over
+
+=item html
+
+A string of HTML to be processed.
+
+=back
+
+=cut
+
+sub negate {
+	my $html = $_[0];
+	$html =~ s/\^/\&\#94\;/g;
+	return $html;
+}
+
+
+#-------------------------------------------------------------------
+
 =head2 process ( html )
 
 Runs all the WebGUI macros to and replaces them in the HTML with their output.
