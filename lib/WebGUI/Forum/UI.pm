@@ -351,7 +351,7 @@ The unique id for the forum.
 =cut
 
 sub formatForumURL {
-	return WebGUI::URL::append($_[0],"forumOp=viewForum&amp;forumId=".$_[1]);
+	return WebGUI::URL::append($_[0],"forumOp=viewForum&forumId=".$_[1]);
 }
 
 
@@ -782,7 +782,7 @@ The unique id for the post.
 =cut
 
 sub formatThreadURL {
-	return WebGUI::URL::append($_[0],"forumOp=viewThread&amp;forumPostId=".$_[1]."#".$_[1]);
+	return WebGUI::URL::append($_[0],"forumOp=viewThread&forumPostId=".$_[1]."#".$_[1]);
 }
 
 #-------------------------------------------------------------------
@@ -1936,7 +1936,9 @@ sub www_postSave {
 		$postData{parentId} = $session{form}{parentId};
 		my $post = WebGUI::Forum::Post->create(\%postData);
 		setPostStatus($caller,$post);
-		return www_viewThread($caller,$post->get("forumPostId"));
+		WebGUI::HTTP::setRedirect(formatThreadURL($caller->{callback}, $post->get("forumPostId")));
+		return "Redirecting...";
+		#return www_viewThread($caller,$post->get("forumPostId"));
 	}
 	if ($session{form}{forumPostId} > 0) { # edit
 		my $post = WebGUI::Forum::Post->new($session{form}{forumPostId});
@@ -1947,7 +1949,9 @@ sub www_postSave {
                         ." $session{user}{username}) --- \n";
 		}
 		$post->set(\%postData);	
-		return www_viewThread($caller,$post->get("forumPostId"));
+		WebGUI::HTTP::setRedirect(formatThreadURL($caller->{callback}, $post->get("forumPostId")));
+		return "Redirecting...";
+		#return www_viewThread($caller,$post->get("forumPostId"));
 	}
 	if ($forumId) { # new post
 		%postData = (%postData, %postDataNew);
@@ -1961,7 +1965,8 @@ sub www_postSave {
 		$thread->subscribe($session{user}{userId}) if ($session{form}{subscribe});
 		setPostStatus($caller,$thread->getPost($thread->get("rootPostId")));
 		WebGUI::HTTP::setRedirect(formatForumURL($caller->{callback}, $forumId));
-		return "";
+		return "Redirecting...";
+		#return www_viewForum($caller,$forumId);
 	}
 }
 
@@ -2289,8 +2294,14 @@ Specify a forumId and call this method directly, rather than over the web.
 
 sub www_viewForum {
 	my ($caller, $forumId) = @_;
-	WebGUI::Session::setScratch("forumSortBy",$session{form}{sortBy});
+	# If POST, cause redirect, so new post is displayed using GET instead of POST
+ #       if ($session{env}{REQUEST_METHOD} =~ /POST/i) { 
+  #              my $url= formatForumURL($caller->{callback}, $forumId); 
+#		WebGUI::HTTP::setRedirect($url);
+ #               return "";
+  #      }
 	$forumId = $session{form}{forumId} unless ($forumId);
+	WebGUI::Session::setScratch("forumSortBy",$session{form}{sortBy});
 	my $forum = WebGUI::Forum->new($forumId);
 	return WebGUI::Privilege::insufficient() unless ($forum->canView);
 	my $var = getForumTemplateVars($caller, $forum);
@@ -2321,12 +2332,6 @@ sub www_viewThread {
 	my ($caller, $postId) = @_;
 	WebGUI::Session::setScratch("forumThreadLayout",$session{form}{layout});
 	$postId = $session{form}{forumPostId} unless ($postId);
-	# If POST, cause redirect, so new post is displayed using GET instead of POST
-        if ($session{env}{REQUEST_METHOD} =~ /POST/i) { 
-                my $url= formatThreadURL($caller-> {callback}, $postId); 
-		WebGUI::HTTP::setRedirect($url);
-                return "";
-        }
         my $post = WebGUI::Forum::Post->new($postId);
 	return WebGUI::Privilege::insufficient() unless ($post->getThread->getForum->canView);
 	my $var = getThreadTemplateVars($caller, $post);

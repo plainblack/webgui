@@ -95,7 +95,7 @@ sub append {
 	my ($url);
 	$url = $_[0];
 	if ($url =~ /\?/) {
-		$url .= '&amp;'.$_[1];
+		$url .= '&'.$_[1];
 	} else {
 		$url .= '?'.$_[1];
 	}

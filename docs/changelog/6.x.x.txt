@@ -80,6 +80,7 @@
    providing the DBIx::Tree::NestedSet module.
  - Dropped page tree caching and stepped onto Navigation caching. This helps
    scalability a lot. Thanks to Martin Kamerbeek / Procolix
+ - bugfix [ 977201 ] ws client bug
 
 
 
