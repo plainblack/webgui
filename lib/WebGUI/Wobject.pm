@@ -1670,11 +1670,11 @@ sub www_paste {
 		($nextSeq) = WebGUI::SQL->quickArray("select max(sequenceNumber) from wobject where pageId=".quote($session{page}{pageId}));
 		$nextSeq += 1;
 		WebGUI::SQL->write("UPDATE wobject SET "
-					."pageId=". $session{page}{pageId} .", "
+					."pageId=".quote($session{page}{pageId}).", "
 					."templatePosition=1, "
 					."sequenceNumber=". $nextSeq .", "
                             		."bufferUserId=NULL, bufferDate=NULL, bufferPrevId=NULL "
-					."WHERE wobjectId=".$self->get("wobjectId"));
+					."WHERE wobjectId=".quote($self->get("wobjectId")));
                 return "";
         } else {
                 return WebGUI::Privilege::insufficient();
