@@ -7247,7 +7247,13 @@ config file.</p>
 		message => q|Use Post Preview?|,
 		lastUpdated =>1092748557,
 		context => q|Label for Forum Settings|
-	}
+	},
+	'HTMLArea 3' => {
+                message => q|HTMLArea 3 (all OS)|,
+                lastUpdated =>1092748557,
+                context => q|option for Rich Editor in profile|
+        },
+
 
 };
 
