@@ -8,9 +8,15 @@ our $I18N = {
 
 	'71' => {
 		message => q|SQL Reports are perhaps the most powerful wobject in the WebGUI arsenal. They allow a user to query data from any database that they have access to. This is great for getting sales figures from your Accounting database or even summarizing all the message boards on your web site.
+<p>SQL Reports are Wobjects and Assets, so they share the properties of both.  SQL Reports also have these unique properties:
 <p>
+
+<b>Template</b><br>
+Select a template to display the results of your SQL Report.
+<p>
+
 <b>Nested query support</b><br>
-The SQL Report wobject supports up to 4 nested queries. Each subsequent query is executed for each row in the previous query results. For example, if you have two queries: query1 and query2, then query2 will be executed once for each row returned in query1. You can use placeholder parameters to compose subqueries with data from prior queries. 
+The SQL Report wobject supports up to 5 nested queries (1 base query and 4 subqueries). Each subsequent query is executed for each row in the previous query results. For example, if you have two queries: query1 and query2, then query2 will be executed once for each row returned in query1. You can use placeholder parameters to compose subqueries with data from prior queries. 
 <p>
 
 <b>Debug?</b><br>
@@ -56,7 +62,7 @@ How many rows should be displayed before splitting the results into separate pag
 
 
 |,
-		lastUpdated => 1101774391
+		lastUpdated => 1110001858,
 	},
 
 	'61' => {
@@ -131,6 +137,18 @@ The name of this column as returned by the query.
 
 </blockquote>
 
+<b>rows.count</b><br />
+The total number of rows returned by the query.
+<br /><br />
+
+<b>rows.count.isZero</b><br />
+A boolean indicating that the query returned zero rows.
+<br /><br />
+
+<b>rows.count.isZero.label</b><br />
+The default label for rows.count.isZero.
+<br /><br />
+
 <b>rows_loop</b><br />
 A loop containing the data returned from the query.
 <br /><br />
@@ -168,8 +186,12 @@ The data in this field.
 A boolean indicating whether query2 has returned any results.
 <br /><br />
 
-<b>query2.columns_loop</b><br />
-A loop containing information about each column for query2.
+Any subqueries will have exactly the same format as the loops
+and variables above, but will be prefixed with queryN where N
+goes from 2 to 5.<br /><br />
+
+<b>queryN.columns_loop</b><br />
+A loop containing information about each column for queryN.
 <br /><br />
 <blockquote>
 
@@ -182,20 +204,32 @@ The name of this column as returned by the query.
 <br /><br />
 </blockquote>
 
-<b>query2.rows_loop</b><br />
-A loop containing the data returned from query2.
+<b>queryN.rows.count</b><br />
+The total number of rows returned by queryN.
+<br /><br />
+
+<b>queryN.count.isZero</b><br />
+A boolean indicating that queryN returned zero rows.
+<br /><br />
+
+<b>queryN.rows.count.isZero.label</b><br />
+The default label for rows.count.isZero.
+<br /><br />
+
+<b>queryN.rows_loop</b><br />
+A loop containing the data returned from queryN.
 <br /><br />
 <blockquote>
 
-<b>query2.row.number</b><br />
+<b>queryN.row.number</b><br />
 An integer starting with 1 and counting through the total list of rows.
 <br /><br />
 
-<b>query2.row.field.<b><i>NAME</i></b>.value</b><br />
+<b>queryN.row.field.<b><i>NAME</i></b>.value</b><br />
 The data for a given field in this row where NAME is the name of the field as it is returned by the query.
 <br /><br />
 
-<b>query2.row.field_loop</b><br />
+<b>queryN.row.field_loop</b><br />
 A loop containing all of the fields for this row.
 <br /><br />
 <blockquote>
@@ -214,46 +248,15 @@ The data in this field.
 
 </blockquote>
 
-<b>query2.hasNest</b><br />
-A boolean indicating whether the query3 has returned any results.
-<br /><br />
-
-<b>query3.columns_loop</b><br />
-A loop containing information about each column for query3.
-<br /><br />
-
-<b>query3.rows_loop</b><br />
-A loop containing the data returned from query3.
-<br /><br />
-
-<b>query2.rows.count</b><br />
-The total number of rows returned by query2.
-<br /><br />
-
-<b>query2.count.isZero</b><br />
-A boolean indicating that query2 returned zero rows.
-<br /><br />
-
-<blockquote>
-
 </blockquote>
 
-</blockquote>
-
-<b>rows.count</b><br />
-The total number of rows returned by the query.
-<br /><br />
-
-<b>rows.count.isZero</b><br />
-A boolean indicating that the query returned zero rows.
-<br /><br />
-
-<b>rows.count.isZero.label</b><br />
-The default label for rows.count.isZero.
+<b>queryN.hasNest</b><br />
+A boolean indicating whether the queryN+1 has returned any results.  This variable
+will always be false for query5.
 <br /><br />
 
 |,
-		lastUpdated => 1100235434
+		lastUpdated => 1110004844,
 	},
 
 	'16' => {
