@@ -158,8 +158,7 @@ sub www_viewStatistics {
 	my $cache = WebGUI::Cache->new($url,"URL");
 	my $version = $cache->get;
 	if (not defined $version) {
-		$cache->setByHTTP($url,43200);
-		$version = $cache->get;
+		$version = $cache->setByHTTP($url,43200);
 	}
 	chomp $version;
         $output .= helpIcon(12);

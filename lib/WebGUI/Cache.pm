@@ -179,7 +179,7 @@ sub set {
 
 =head2 setByHTTP ( url [, ttl ] )
 
-Retrieves a document via HTTP and stores it in the cache.
+Retrieves a document via HTTP and stores it in the cache and returns the content as a string.
 
 =over
 
@@ -204,6 +204,7 @@ sub setByHTTP {
         my $request = new HTTP::Request (GET => $_[1], $header);
         my $response = $userAgent->request($request);
 	$_[0]->set($response->content,$_[2]);
+	return $response->content;
 }
 
 
