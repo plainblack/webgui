@@ -542,7 +542,7 @@ sub www_moveDownloadUp {
 
 #-------------------------------------------------------------------
 sub www_view {
-        my ($url, @row, $i, $p, $search, %data, @test, $file, $alt1, $alt2, $output, $sth, 
+        my ($url, @row, $head, $searchForm, $i, $p, $search, %data, @test, $file, $alt1, $alt2, $output, $sth, 
 		%download, $flag, $sort, $sortDirection);
         tie %download, 'Tie::CPHash';
         tie %data, 'Tie::CPHash';
@@ -555,11 +555,11 @@ sub www_view {
 		if ($data{description} ne "") {
                 	$output .= $data{description}.'<p>';
 		}
-		$output .= formHeader();
-                $output .= WebGUI::Form::text("keyword",20,50);
-                $output .= WebGUI::Form::submit(WebGUI::International::get(170));
-                $output .= '</form>';
-		$output .= '<table cellpadding="3" cellspacing="1" border="0" width="100%">';
+		$searchForm = formHeader();
+                $searchForm .= WebGUI::Form::text("keyword",20,50);
+                $searchForm .= WebGUI::Form::submit(WebGUI::International::get(170));
+                $searchForm .= '</form>';
+		$head = '<table cellpadding="3" cellspacing="1" border="0" width="100%">';
 		if ($session{form}{keyword} ne "") {
                         $search = " and (fileTitle like '%".$session{form}{keyword}.
 				"%' or downloadFile like '%".$session{form}{keyword}.
@@ -578,7 +578,7 @@ sub www_view {
 			$sortDirection = $session{form}{sortDirection};
 			$url = WebGUI::URL::append($url,"sortDirection=".$session{form}{sortDirection});
 		}
-                $output .= '<tr><td class="tableHeader">'.
+                $head .= '<tr><td class="tableHeader">'.
 			sortByColumn("fileTitle",WebGUI::International::get(14,$namespace)).
 			'</td><td class="tableHeader">'.
 			sortByColumn("briefSynopsis",WebGUI::International::get(15,$namespace)).
@@ -633,6 +633,8 @@ sub www_view {
 				WebGUI::International::get(19,$namespace).'</td></tr>';
 		}
 		$p = WebGUI::Paginator->new($url,\@row,$data{paginateAfter});
+		$output .= $searchForm if ($p->getNumberOfPages > 1);
+		$output .= $head;
                 $output .= $p->getPage($session{form}{pn});
                 $output .= '</table>';
                 $output .= $p->getBarTraditional($session{form}{pn});

@@ -98,11 +98,16 @@ sub copy {
 	$newNode = WebGUI::Node->new($_[1],$_[2]);
        	$a = FileHandle->new($_[0]->getPath,"r");
 	$b = FileHandle->new(">".$newNode->getPath.'/'.$_[0]->getFilename);
-	binmode($a); 
-	binmode($b); 
-       	cp($a,$b);
-	$a->close;
-	$b->close;
+	if (defined $a) {
+		binmode($a); 
+		$b = FileHandle->new(">".$newNode->getPath.'/'.$_[0]->getFilename);
+		if (defined $b) {
+			binmode($b); 
+       			cp($a,$b);
+			$b->close;
+		}
+		$a->close;
+	}
 }
 
 

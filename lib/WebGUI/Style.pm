@@ -22,7 +22,7 @@ sub getStyle {
 	if ($session{form}{makePrintable}) {
 		%style = WebGUI::SQL->quickHash("select header,footer,styleSheet from style where styleId=3");
 		$header = '<html><!-- WebGUI '.$session{wg}{version}.' -->'."\n";
-		$header .= '<head><title>'.$session{page}{title}.'</title>';
+		$header .= '<head><title>'.$session{page}{title}.' - '.$session{setting}{companyName}.'</title>';
 		$header .= $style{styleSheet}.'</head>'.$style{header};
 		$footer = $style{footer}.'</html>'; 
 	} else {
@@ -32,11 +32,7 @@ sub getStyle {
 			<html>
 			<head>
 			<title>';
-		if ($session{page}{pageId} == 1) {
-			$header .= $session{setting}{companyName}.' - '.$session{page}{title};
-		} else {
-			$header .= $session{page}{title};
-		}
+		$header .= $session{page}{title}.' - '.$session{setting}{companyName};
 		$header .= '</title>'
 			.$style{styleSheet}
 			.$session{page}{metaTags};

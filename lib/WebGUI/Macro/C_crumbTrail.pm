@@ -25,7 +25,7 @@ sub _recurseCrumbTrail {
         if ($data{pageId} > 1) {
                 $output .= _recurseCrumbTrail($data{parentId},$_[1]);
         }
-        if ($data{title} ne "") {
+        if ($data{menuTitle} ne "") {
 		$output .= '<a class="crumbTrail" href="'.WebGUI::URL::gateway($data{urlizedTitle})
 			.'">'.$data{menuTitle}.'</a>'.$_[1];
         }
@@ -42,7 +42,7 @@ sub _replacement {
                 $delimeter = " ".$param[0]." ";
         }
         $temp = '<span class="crumbTrail">'._recurseCrumbTrail($session{page}{parentId},$delimeter).
-		'<a href="'.WebGUI::URL::page().'">'.$session{page}{title}.'</a></span>';
+		'<a href="'.WebGUI::URL::page().'">'.$session{page}{menuTitle}.'</a></span>';
 	return $temp;
 }
 
