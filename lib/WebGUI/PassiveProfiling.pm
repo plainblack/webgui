@@ -1,0 +1,151 @@
+package WebGUI::PassiveProfiling;
+
+=head1 LEGAL
+
+ -------------------------------------------------------------------
+  WebGUI is Copyright 2001-2004 Plain Black LLC.
+ -------------------------------------------------------------------
+  Please read the legal notices (docs/legal.txt) and the license
+  (docs/license.txt) that came with this distribution before using
+  this software.
+ -------------------------------------------------------------------
+  http://www.plainblack.com                     info@plainblack.com
+ -------------------------------------------------------------------
+
+=cut
+
+
+use strict;
+use WebGUI::Session;
+use WebGUI::SQL;
+use WebGUI::DateTime;
+use Tie::IxHash;
+
+=head1 NAME
+
+Package WebGUI::PassiveProfiling
+
+=head1 DESCRIPTION
+
+This package provides an interface to the passive profiling system.
+
+=head1 SYNOPSIS
+
+ use WebGUI::PassiveProfiling;
+ WebGUI::PassiveProfiling::add( $wobjectId );
+
+=head1 METHODS
+
+These functions/methods are available from this package:
+
+=cut
+
+#-------------------------------------------------------------------
+
+=head2 add ( wobjectId )
+
+Adds a wobjectId to the passive profile log.
+
+=over
+
+=item wobjectId
+
+The wobjectId to add.
+
+=back
+
+=cut
+
+sub add {
+	return unless ($session{setting}{passiveProfilingEnabled});
+	my $wobjectId = shift;
+	my $sql = "insert into passiveProfileLog (passiveProfileLogId, userId, sessionId, wobjectId, dateOfEntry)
+		     values (".quote(getNextId("passiveProfileLogId")).",".
+				quote($session{user}{userId}).",".
+				quote($session{var}{sessionId}).",".
+				quote($wobjectId).",".
+				quote(WebGUI::DateTime::time()).")";
+	WebGUI::SQL->write($sql);
+	return;
+}
+
+#-------------------------------------------------------------------
+                                                                                                                             
+=head2 addPage ( [ pageId ] )
+                                                                                                                             
+Adds all wobjects on current page to the passive profile log.
+Optionally you can specify an alternate pageId.
+                                                                                                                             
+=over
+                                                                                                                             
+=item pageId
+                                                                                                                             
+The pageId of the page you want to log.
+                                                                                                                             
+=back
+                                                                                                                             
+=cut
+
+sub addPage {
+	return unless ($session{setting}{passiveProfilingEnabled});
+	my $pageId = shift || $session{page}{pageId};
+	my @wids = WebGUI::SQL->buildArray("select * from wobject where pageId=".quote($pageId));
+	foreach my $wid (@wids) {
+		add($wid);
+	}
+	return;
+}
+
+#-------------------------------------------------------------------
+
+=head2 summarizeAOI ( hashRef )
+
+Summarizes passive profile log data using the metadata attributes. An entry
+is logged in the passiveProfileAOI table.
+
+=item hashRef
+
+A hashRef with userId and wobjectId.
+
+=back
+
+=cut
+
+sub summarizeAOI {
+	my $data = shift;
+	my $sql = "
+		select f.fieldName, 
+			f.fieldType, 
+			d.fieldId, 
+			d.wobjectId, 
+			d.value 
+		from metaData_data d , metaData_fields f 
+		where f.fieldId = d.fieldId 
+			and d.wobjectId = ".$data->{wobjectId};
+
+        my $sth = WebGUI::SQL->read($sql);
+        while (my $field = $sth->hashRef) {
+		my $aoi = WebGUI::SQL->quickHashRef("select * from passiveProfileAOI 
+						where userId=".quote($data->{userId})."
+						and fieldId=".quote($field->{fieldId})." and
+						value=".quote($field->{value}));
+		if(not exists $aoi->{userId}) {
+			# Add record to DB
+			WebGUI::SQL->write("insert into passiveProfileAOI (userId, fieldId, value)
+						values (".quote($data->{userId}).",".
+							quote($field->{fieldId}).",".
+							quote($field->{value}).")");
+		}
+		my $count = $aoi->{count};
+		$count++;
+
+		WebGUI::SQL->write("update passiveProfileAOI set count=".quote($count)."
+					where userId=".quote($data->{userId})."
+                                        and fieldId=".quote($field->{fieldId})." and
+                                        value=".quote($field->{value})); 
+	}
+	$sth->finish;
+}
+
+1;
+
