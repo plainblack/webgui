@@ -96,8 +96,7 @@ sub www_deleteQuestion {
 		$output .= '<div align="center"><a href="'.
 			WebGUI::URL::page('func=deleteQuestionConfirm&wid='.$_[0]->get("wobjectId").
 			'&qid='.$session{form}{qid}).'">'.WebGUI::International::get(44).'</a>';
-		$output .= ' &nbsp; <a href="'.WebGUI::URL::page('func=edit&wid='.$_[0]->get("wobjectId"))
-			.'">'.WebGUI::International::get(45).'</a></div>';
+		$output .= ' &nbsp; <a href="'.WebGUI::URL::page().'">'.WebGUI::International::get(45).'</a></div>';
                 return $output;
         } else {
                 return WebGUI::Privilege::insufficient();
