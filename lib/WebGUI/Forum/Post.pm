@@ -32,6 +32,7 @@ Data management class for forum posts.
  $post = WebGUI::Forum::Post->new($postId);
 
  $boolean = $post->canEdit;
+ $boolean = $post->canView;
  $scalar = $post->get("forumPostId");
  $arrayRef = $post->getReplies;
  $obj = $post->getThread;
@@ -78,6 +79,36 @@ sub canEdit {
 	$userId = $session{user}{userId} unless ($userId);
         return ($self->getThread->getForum->isModerator || ($self->get("userId") == $userId && $userId != 1 
 		&& $self->getThread->getForum->get("editTimeout") < (WebGUI::DateTime::time() - $self->get("dateOfPost"))));
+}
+
+#-------------------------------------------------------------------
+
+=head2 canView ( [ userId ] )
+
+Returns a boolean indicating whether the user can view the current post.
+
+=over
+
+=item userId
+
+The unique identifier to check privileges against. Defaults to the current user.
+
+=back
+
+=cut
+
+sub canView {
+        my ($self, $userId) = @_;
+	$userId = $session{user}{userId} unless ($userId);
+	if ($self->get("status") eq "deleted") {
+		return 0;
+	} elsif ($self->get("status") eq "denied" && $userId == $self->get("userId")) {
+		return 1;
+	} elsif ($self->getThread->getForum->isModerator) {
+		return 1;
+	} else {
+		return 0;
+	}
 }
 
 #-------------------------------------------------------------------
@@ -432,6 +463,7 @@ Sets the status of this post to deleted.
 sub setStatusDeleted {
 	my ($self) = @_;
 	$self->set({status=>'deleted'});
+	$self->getThread->decrementReplies;
 	$self->getThread->setStatusDeleted if ($self->getThread->get("rootPostId") == $self->get("forumPostId"));
 	if ($self->getThread->get("lastPostId") == $self->get("forumPostId")) {
 		my ($id, $date) = WebGUI::SQL->quickArray("select forumPostId,dateOfPost from forumPost where forumThreadId="

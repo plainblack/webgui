@@ -1,13 +1,12 @@
 5.5.2
- - Fixed a bug introduced in the last version that only occurs if there was
-   one forum in a message board.
- - Fixed a bug introduced in the last version when replying to USS
-   submissions.
- - Fixed a bug introduced in 5.5.0 because the reply.url variable in the USS
-   submission template didn't get updated to reflect the new forum system.
+ - Fixed a whole slew of bugs in the forums introduced in the last version.
+ - Fixed a bug in the reply.url variable in the USS submission where template didn't get updated to reflect the new forum system.
+ - Fixed a bug in the forum search system where it would search all messages
+   regardless of forum.
+ - Fixed bugs where counters weren't being decremented when a post was
+   deleted.
  - Fixed bug [ 843591 ] Fatal error while creating a new Message Board if
    there are no Forums yet.
-
 
 5.5.1
  - Fixed bug #829806 preventing users from updating thier passwords from the updateAccount form.

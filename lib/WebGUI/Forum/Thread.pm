@@ -41,6 +41,7 @@ Data management class for forum threads.
  $boolean = $thread->isSticky;
  $boolean = $thread->isSubscribed;
 
+ $thread->decrementReplies;
  $thread->incrementReplies($postDate, $postId);
  $thread->incrementViews;
  $thread->lock;
@@ -99,6 +100,20 @@ sub create {
 	$self->{_post}{$post->get("forumPostId")} = $post;
 	$self->getForum->incrementThreads($post->get("dateOfPost"),$post->get("forumPostId"));
 	return $self;
+}
+
+#-------------------------------------------------------------------
+
+=head2 decrementReplies ( )
+
+Decrements the replies counter for this thread.
+
+=cut
+
+sub deccrementReplies {
+        my ($self) = @_;
+        WebGUI::SQL->write("update forumThread set replies=replies-1 where forumThreadId=".$self->get("forumThreadId"));
+	$self->getForum->decrementReplies;
 }
 
 #-------------------------------------------------------------------
@@ -439,6 +454,7 @@ Sets the status of this thread to deleted.
 sub setStatusDeleted {
         my ($self) = @_;
         $self->set({status=>'deleted'});
+	$self->getForum->decrementThreads;
 }
                                                                                                                                                              
 #-------------------------------------------------------------------

@@ -26,6 +26,7 @@ use WebGUI::MessageLog;
 use WebGUI::Search;
 use WebGUI::Session;
 use WebGUI::Template;
+use WebGUI::User;
 
 
 =head1 DESCRIPTION
@@ -1273,7 +1274,7 @@ sub getThreadTemplateVars {
 	my $callback = $caller->{callback};
         $post->markRead($session{user}{userId});
         my $thread = $post->getThread;
-	if (($post->get("status") eq "denied" && $session{user}{userId} != $post->get("userId")) || $post->get("status") eq "deleted") {
+	unless ($post->canView) {
 		$post = $thread->getPost($thread->get("rootPostId"));
 	}
         my $forum = $thread->getForum;
@@ -1370,16 +1371,16 @@ sub notifySubscribers {
 	my %lang;
 	foreach my $userId (keys %subscribers) {
 		my $u = WebGUI::User->new($userId);
-		unless (exists $lang{$u->get("language")}) {
-			$lang{$u->get("language")}{var} = {
-				'notify.subscription.message' => WebGUI::International::get(875,$u->get("language"))
+		unless (exists $lang{$u->profileField("language")}) {
+			$lang{$u->profileField("language")}{var} = {
+				'notify.subscription.message' => WebGUI::International::get(875,$u->profileField("language"))
 				};
-			$lang{$u->get("language")}{var} = getPostTemplateVars($post, $thread, $forum, $caller, $lang{$u->get("language")}{var});
-			$lang{$u->get("language")}{subject} = WebGUI::International::get(523,$u->get("language"));
-       			$lang{$u->get("language")}{message} = WebGUI::Template::process(WebGUI::Template::get($forum->get("notificationTemplateId"),"Forum/Notification"), 
-				$lang{$u->get("language")}{var});
+			$lang{$u->profileField("language")}{var} = getPostTemplateVars($post, $thread, $forum, $caller, $lang{$u->profileField("language")}{var});
+			$lang{$u->profileField("language")}{subject} = WebGUI::International::get(523,$u->profileField("language"));
+       			$lang{$u->profileField("language")}{message} = WebGUI::Template::process(WebGUI::Template::get($forum->get("notificationTemplateId"),"Forum/Notification"), 
+				$lang{$u->profileField("language")}{var});
 		}
-               	WebGUI::MessageLog::addEntry($userId,"",$lang{$u->get("language")}{subject},$lang{$u->get("language")}{message});
+               	WebGUI::MessageLog::addEntry($userId,"",$lang{$u->profileField("language")}{subject},$lang{$u->profileField("language")}{message});
 	}
 }
 
@@ -1426,15 +1427,17 @@ sub recurseThread {
                 push(@depth_loop,{depth=>$i});
         }
         my @post_loop;
-        push (@post_loop, getPostTemplateVars($post, $thread, $forum, $caller, {
-                'post.indent_loop'=>\@depth_loop,
-                'post.indent.depth'=>$depth,
-                'post.isCurrent'=>($currentPost == $post->get("forumPostId"))
-                }));
-        my $replies = $post->getReplies;
-        foreach my $reply (@{$replies}) {
-                @post_loop = (@post_loop,@{recurseThread($reply, $thread, $forum, $depth+1, $caller, $currentPost)});
-        }
+	if ($post->canView) {
+        	push (@post_loop, getPostTemplateVars($post, $thread, $forum, $caller, {
+                	'post.indent_loop'=>\@depth_loop,
+                	'post.indent.depth'=>$depth,
+                	'post.isCurrent'=>($currentPost == $post->get("forumPostId"))
+                	}));
+        	my $replies = $post->getReplies;
+        	foreach my $reply (@{$replies}) {
+                	@post_loop = (@post_loop,@{recurseThread($reply, $thread, $forum, $depth+1, $caller, $currentPost)});
+        	}
+	}
         return \@post_loop;
 }
                                                                                                                                                              
@@ -2071,9 +2074,12 @@ sub www_search {
 		$var{'post.subject.label'} = WebGUI::International::get(229);
       	  	$var{'post.date.label'} = WebGUI::International::get(245);
         	$var{'post.user.label'} = WebGUI::International::get(244);
-		my $query = "select forumPostId,subject,userId,username,dateOfPost from forumPost where (status='approved' or status='archived') and ";
-		$query .= WebGUI::Search::buildConstraints([qw(subject username message)]);
-		my $p = WebGUI::Paginator->new(WebGUI::URL::append($caller->{callback},"forumOp=search&amp;doit=1&amp;forumId=".$forum->get("forumId")),"", $numResults);
+		my $query = "select a.forumPostId, a.subject, a.userId, a.username, a.dateOfPost from forumPost a left join forumThread b
+			on a.forumThreadId=b.forumThreadId where b.forumId=".$forum->get("forumId")." and 
+			(a.status='approved' or a.status='archived') and ".WebGUI::Search::buildConstraints([qw(a.subject a.username a.message)])
+			." order by a.dateOfPost desc";
+		my $p = WebGUI::Paginator->new(WebGUI::URL::append($caller->{callback},"forumOp=search&amp;doit=1&amp;forumId=".$forum->get("forumId")),
+			"", $numResults);
 		$p->setDataByQuery($query);
 		my @post_loop;
 		foreach my $row (@{$p->getPageData}) {
@@ -2299,7 +2305,7 @@ sub www_viewThread {
 	$postId = $session{form}{forumPostId} unless ($postId);
         my $post = WebGUI::Forum::Post->new($postId);
 	my $var = getThreadTemplateVars($caller, $post);
-	if (($post->get("forumPostId") == $post->getThread->get("rootPostId") && $post->get("status") eq "denied" && $session{user}{userId} != $post->get("userId")) || $post->get("status") eq "deleted") {
+	if ($post->get("forumPostId") == $post->getThread->get("rootPostId") && !$post->canView) {
 		return www_viewForum($caller, $post->getThread->getForum->get("forumId"));
 	} else {	
 		return WebGUI::Template::process(WebGUI::Template::get($post->getThread->getForum->get("threadTemplateId"),"Forum/Thread"), $var); 

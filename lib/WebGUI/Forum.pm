@@ -39,6 +39,8 @@ Data management class for forums.
  $boolean = $forum->isModerator;
  $boolean = $forum->isSubscribed;
 
+ $forum->decrementReplies;
+ $forum->decrementThreads;
  $forum->incrementReplies($postDate, $postId);
  $forum->incrementThreads($postDate, $postId);
  $forum->incrementViews;
@@ -118,6 +120,32 @@ sub create {
 	$data->{forumId} = "new";
 	my $forumId = WebGUI::SQL->setRow("forum","forumId",$data);
 	return WebGUI::Forum->new($forumId);
+}
+
+#-------------------------------------------------------------------
+
+=head2 decrementReplies ( )
+
+Deccrements this forum's reply counter.
+
+=cut
+
+sub incrementReplies {
+        my ($self) = @_;
+        WebGUI::SQL->write("update forum set replies=replies-1 where forumId=".$self->get("forumId"));
+}
+
+#-------------------------------------------------------------------
+
+=head2 decrementThreads ( )
+
+Decrements this forum's thread counter.
+
+=cut
+
+sub incrementReplies {
+        my ($self) = @_;
+        WebGUI::SQL->write("update forum set threads=threads-1 where forumId=".$self->get("forumId"));
 }
 
 #-------------------------------------------------------------------

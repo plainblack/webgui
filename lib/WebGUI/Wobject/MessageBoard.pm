@@ -164,73 +164,77 @@ sub www_moveForumUp {
 
 #-------------------------------------------------------------------
 sub www_view {
-	my $callback = WebGUI::URL::page("func=view&amp;wid=".$_[0]->get("wobjectId"));
-	if ($session{form}{forumId} eq "" || $session{form}{forumId} eq "new") {
-		($session{form}{forumId}) = WebGUI::SQL->quickArray("select forumId from MessageBoard_forums 
-			where wobjectId=".$_[0]->get("wobjectId")." order by sequenceNumber");
-	}
-	my ($forumId, $title, $description) = WebGUI::SQL->quickArray("select forumId, title, description from MessageBoard_forums 
-		where wobjectId=".$_[0]->get("wobjectId")." and forumId=".quote($session{form}{forumId}));
-	my $forumParam = "forumId=".$forumId;
-	$callback = WebGUI::URL::append($callback,$forumParam);
-	my $caller = {
-		callback=>$callback,
-                title=>$title,
-                description=>$description,
-                forumId=>$forumId
-		};
-	if ($session{form}{forumOp}) {
-		return WebGUI::Forum::UI::forumOp($caller);
-	}
 	my %var;
-	$var{title} = $_[0]->get("title");
-	$var{description} = $_[0]->get("description");
-	$var{'forum.add.url'} = WebGUI::URL::page("func=editForum&amp;forumId=new&amp;wid=".$_[0]->get("wobjectId"));
-	$var{'forum.add.label'} = WebGUI::International::get(75,$_[0]->get("namespace"));
-	$var{'title.label'} = WebGUI::International::get(99);
-	$var{'views.label'} = WebGUI::International::get(514);
-	$var{'rating.label'} = WebGUI::International::get(1020);
-	$var{'threads.label'} = WebGUI::International::get(1036);
-	$var{'replies.label'} = WebGUI::International::get(1016);
-	$var{'lastpost.label'} = WebGUI::International::get(1017);
 	my $count = 1;
 	my @forum_loop;
+	my $caller;
 	my $sth = WebGUI::SQL->read("select * from MessageBoard_forums where wobjectId=".$_[0]->get("wobjectId")." order by sequenceNumber");
 	while (my $forumMeta = $sth->hashRef) {
-		my $forum = WebGUI::Forum->new($forumMeta->{forumId});
-		if ($count == 1) {
-			$var{'default.listing'} = WebGUI::Forum::UI::www_viewForum($caller,$forumMeta->{forumId});
-			$var{'default.description'} = $forumMeta->{description};
-			$var{'default.title'} = $forumMeta->{title};
-			$var{'default.controls'} = $_[0]->_formatControls($forum->get("forumId"));
+		my $callback = WebGUI::URL::page("func=view&amp;wid=".$_[0]->get("wobjectId")."&amp;forumId=".$forumMeta->{forumId});
+		if ($session{form}{forumOp}) { 
+			if ($session{form}{forumId} == $forumMeta->{forumId}) {
+				$caller = {
+					callback=>$callback,
+					title=>$forumMeta->{title},
+					description=>$forumMeta->{description},
+					forumId=>$forumMeta->{forumId}
+					};
+			}
+		} else {
+			my $forum = WebGUI::Forum->new($forumMeta->{forumId});
+			if ($count == 1) {
+				$var{'default.listing'} = WebGUI::Forum::UI::www_viewForum({
+					callback=>$callback,
+					title=>$forumMeta->{title},
+					description=>$forumMeta->{description},
+					forumId=>$forumMeta->{forumId}
+					},$forumMeta->{forumId});
+				$var{'default.description'} = $forumMeta->{description};
+				$var{'default.title'} = $forumMeta->{title};
+				$var{'default.controls'} = $_[0]->_formatControls($forum->get("forumId"));
+			}
+			my $lastPost = WebGUI::Forum::Post->new($forum->get("lastPostId"));
+			push(@forum_loop, {
+				'forum.controls' => $_[0]->_formatControls($forum->get("forumId")),
+				'forum.count' => $count,
+				'forum.title' => $forumMeta->{title},
+				'forum.description' => $forumMeta->{description},
+				'forum.replies' => $forum->get("replies"),
+				'forum.rating' => $forum->get("rating"),
+				'forum.views' => $forum->get("views"),
+				'forum.threads' => $forum->get("threads"),
+				'forum.url' => WebGUI::Forum::UI::formatForumURL($callback,$forum->get("forumId")),
+				'forum.lastPost.url' => WebGUI::Forum::UI::formatThreadURL($callback,$lastPost->get("forumPostId")),
+				'forum.lastPost.date' => WebGUI::Forum::UI::formatPostDate($lastPost->get("dateOfPost")),
+				'forum.lastPost.time' => WebGUI::Forum::UI::formatPostTime($lastPost->get("dateOfPost")),
+				'forum.lastPost.epoch' => $lastPost->get("dateOfPost"),
+				'forum.lastPost.subject' => WebGUI::Forum::UI::formatSubject($lastPost->get("subject")),
+				'forum.lastPost.user.id' => $lastPost->get("userId"),
+				'forum.lastPost.user.name' => $lastPost->get("username"),
+				'forum.lastPost.user.profile' => WebGUI::Forum::UI::formatUserProfileURL($lastPost->get("userId")),
+					'forum.lastPost.user.isVisitor' => ($lastPost->get("userId") == 1)
+				});
+			$count++;
 		}
-		my $lastPost = WebGUI::Forum::Post->new($forum->get("lastPostId"));
-		push(@forum_loop, {
-			'forum.controls' => $_[0]->_formatControls($forum->get("forumId")),
-			'forum.count' => $count,
-			'forum.title' => $forumMeta->{title},
-			'forum.description' => $forumMeta->{description},
-			'forum.replies' => $forum->get("replies"),
-			'forum.rating' => $forum->get("rating"),
-			'forum.views' => $forum->get("views"),
-			'forum.threads' => $forum->get("threads"),
-			'forum.url' => WebGUI::Forum::UI::formatForumURL($callback,$forum->get("forumId")),
-			'forum.lastPost.url' => WebGUI::Forum::UI::formatThreadURL($callback,$lastPost->get("forumPostId")),
-			'forum.lastPost.date' => WebGUI::Forum::UI::formatPostDate($lastPost->get("dateOfPost")),
-			'forum.lastPost.time' => WebGUI::Forum::UI::formatPostTime($lastPost->get("dateOfPost")),
-			'forum.lastPost.epoch' => $lastPost->get("dateOfPost"),
-			'forum.lastPost.subject' => WebGUI::Forum::UI::formatSubject($lastPost->get("subject")),
-			'forum.lastPost.user.id' => $lastPost->get("userId"),
-			'forum.lastPost.user.name' => $lastPost->get("username"),
-			'forum.lastPost.user.profile' => WebGUI::Forum::UI::formatUserProfileURL($lastPost->get("userId")),
-			'forum.lastPost.user.isVisitor' => ($lastPost->get("userId") == 1)
-			});
-		$count++;
 	}
 	$sth->finish;
-	$var{areMultipleForums} = ($count > 2);
-	$var{forum_loop} = \@forum_loop;
-        return $_[0]->processTemplate($_[0]->get("templateId"),\%var);
+	if ($session{form}{forumOp}) {
+		return WebGUI::Forum::UI::forumOp($caller);
+	} else {
+		$var{title} = $_[0]->get("title");
+		$var{description} = $_[0]->get("description");
+		$var{'forum.add.url'} = WebGUI::URL::page("func=editForum&amp;forumId=new&amp;wid=".$_[0]->get("wobjectId"));
+		$var{'forum.add.label'} = WebGUI::International::get(75,$_[0]->get("namespace"));
+		$var{'title.label'} = WebGUI::International::get(99);
+		$var{'views.label'} = WebGUI::International::get(514);
+		$var{'rating.label'} = WebGUI::International::get(1020);
+		$var{'threads.label'} = WebGUI::International::get(1036);
+		$var{'replies.label'} = WebGUI::International::get(1016);
+		$var{'lastpost.label'} = WebGUI::International::get(1017);
+		$var{areMultipleForums} = ($count > 2);
+		$var{forum_loop} = \@forum_loop;
+        	return $_[0]->processTemplate($_[0]->get("templateId"),\%var);
+	}
 }
 
 1;
