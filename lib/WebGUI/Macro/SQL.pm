@@ -20,19 +20,23 @@ sub process {
 	my ($output, @data, $rownum, $temp);
 	my ($statement, $format) = WebGUI::Macro::getParams(shift);
 	$format = '^0;' if ($format eq "");
-	my $sth = WebGUI::SQL->unconditionalRead($statement);
-	unless ($sth->errorCode < 1) { 
-		return '<p><b>SQL Macro Failed:</b> '.$sth->errorMessage.'<p>';
+	if ($statement =~ /^select/i || $statement =~ /^show/i || $statement =~ /^describe/i) {
+		my $sth = WebGUI::SQL->unconditionalRead($statement);
+		unless ($sth->errorCode < 1) { 
+			return '<p><b>SQL Macro Failed:</b> '.$sth->errorMessage.'<p>';
+		} else {
+			while (@data = $sth->array) {
+                		$temp = $format; 
+	                        $temp =~ s/\^(\d+)\;/$data[$1]/g; 
+        	                $rownum++;
+                	        $temp =~ s/\^rownum\;/$rownum/g;
+				$output .= $temp;
+	                }
+			$sth->finish;
+			return $output;
+		}
 	} else {
-		while (@data = $sth->array) {
-                	$temp = $format; 
-                        $temp =~ s/\^(\d+)\;/$data[$1]/g; 
-                        $rownum++;
-                        $temp =~ s/\^rownum\;/$rownum/g;
-			$output .= $temp;
-                }
-		$sth->finish;
-		return $output;
+		return "Cannot execute this type of query.";
 	}
 }
 

@@ -8,6 +8,14 @@ versions. Be sure to heed the warnings contained herein as they will
 save you many hours of grief.
 
 
+5.4.1
+--------------------------------------------------------------------
+ * The programmer macros have been disabled by default in the sample
+	config file.
+
+ * The SQL macro no longer allows write actions.
+
+
 5.4.0
 --------------------------------------------------------------------
  * Page caching has been moved to individual pages rather than a

@@ -185,7 +185,7 @@ sub www_view {
 		WebGUI::ErrorHandler::warn("SQLReport [".$_[0]->get("wobjectId")."] The DSN specified is of an improper format.");
         }
 	if (defined $dbh) {
-		if ($query =~ /select/i || $query =~ /show/i || $query =~ /describe/i) {
+		if ($query =~ /^select/i || $query =~ /^show/i || $query =~ /^describe/i) {
 			$sth = WebGUI::SQL->unconditionalRead($query,$dbh);
 			unless ($sth->errorCode < 1) {
 				$errorMessage = $sth->errorMessage;
