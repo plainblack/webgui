@@ -66,15 +66,15 @@ sub addEntry {
 			if ($_[2] ne "") {
 				$message .= "\n".WebGUI::URL::append('http://'.$session{env}{HTTP_HOST}.$_[2],'mlog='.$messageLogId);
 			}
-			if (${$user}{INBOXNotifications} = "email") {
+			if (${$user}{INBOXNotifications} eq "email") {
 				if (${$user}{email} ne "") {
 					WebGUI::Mail::send(${$user}{email},$subject,$message);
 				}
-			} elsif (${$user}{INBOXNotifications} = "emailToPager") {
+			} elsif (${$user}{INBOXNotifications} eq "emailToPager") {
 				if (${$user}{emailToPagerGateway} ne "") {
 					WebGUI::Mail::send(${$user}{emailToPagerGateway},$subject,$message);
 				}
-			} elsif (${$user}{INBOXNotifications} = "icq") {
+			} elsif (${$user}{INBOXNotifications} eq "icq") {
 				if (${$user}{icq}) {
 					WebGUI::Mail::send(${$user}{icq}.'@pager.icq.com',$subject,$message);
 				}
