@@ -144,6 +144,7 @@ $sth->finish;
 	"update DataForm_field set status='editable' where status=3",
 	"update DataForm_field set type='selectList' where type='select'",
 	"alter table DataForm add column templateId int not null default 1",
+	"alter table DataForm_entryData drop primary key",
 	"alter table DataForm_entryData drop column sequenceNumber",
 	"alter table DataForm add column emailTemplateId int not null default 2",
 	"alter table DataForm add column acknowlegementTemplateId int not null default 3",
@@ -173,11 +174,18 @@ foreach (qw(Article DataForm EventsCalendar FAQ FileManager Item LinkList Messag
 	$sth->finish;
 	WebGUI::SQL->write("alter table $_ drop column templateId");
 }
+
+print "\tMigrating wobject proxies.\n" unless ($quiet);
 WebGUI::SQL->write("alter table WobjectProxy add column proxiedNamespace varchar(35)");
-my $sth = WebGUI::SQL->read("select wobject.namespace,wobject.wobjectId from WobjectProxy left join wobject 
+my $sth = WebGUI::SQL->read("select wobject.namespace,wobject.wobjectId,WobjectProxy.proxiedWobjectId from WobjectProxy left join wobject 
 	on WobjectProxy.proxiedWobjectId=wobject.wobjectId");
 while (my @data = $sth->array) {
-	WebGUI::SQL->write("update WobjectProxy set proxiedNamespace=".quote($data[0])." where proxiedWobjectId=$data[1]");
+	if ($data[1] eq "") {
+		WebGUI::SQL->write("delete from WobjectProxy where proxiedWobjectId='$data[2]'");
+		WebGUI::SQL->write("delete from wobject where wobjectId='$data[2]'");
+	} else {
+		WebGUI::SQL->write("update WobjectProxy set proxiedNamespace=".quote($data[0])." where proxiedWobjectId=$data[1]");
+	}
 }
 $sth->finish;
 
