@@ -121,17 +121,9 @@ sub www_deleteFile {
 
 #-------------------------------------------------------------------
 sub www_deleteDownload {
-        my ($output);
         if (WebGUI::Privilege::canEditPage()) {
-                $output = '<h1>'.WebGUI::International::get(42).'</h1>';
-                $output .= WebGUI::International::get(12,$namespace).'<p>';
-                $output .= '<div align="center">'.
-			'<a href="'.WebGUI::URL::page('func=deleteDownloadConfirm&wid='.
-			$session{form}{wid}.'&did='.$session{form}{did}).'">'.
-			WebGUI::International::get(44).'</a>';
-                $output .= ' &nbsp; <a href="'.WebGUI::URL::page('func=edit&wid='.$session{form}{wid}).'">'.
-			WebGUI::International::get(45).'</a></div>';
-                return $output;
+		return $_[0]->confirm(WebGUI::International::get(12,$namespace),
+			WebGUI::URL::page('func=deleteDownloadConfirm&wid='.$session{form}{wid}.'&did='.$session{form}{did}));
         } else {
                 return WebGUI::Privilege::insufficient();
         }
@@ -143,7 +135,7 @@ sub www_deleteDownloadConfirm {
         if (WebGUI::Privilege::canEditPage()) {
                 $file = WebGUI::Attachment->new("",$session{form}{wid},$session{form}{did});
                 $file->deleteNode;
-                WebGUI::SQL->write("delete from DownloadManager_file where downloadId=$session{form}{did}");
+		$_[0]->deleteCollateral("DownloadManager_file","downloadId",$session{form}{did});
                 _reorderDownloads($session{form}{wid});
                 return "";
         } else {
@@ -267,37 +259,27 @@ sub www_editDownload {
 
 #-------------------------------------------------------------------
 sub www_editDownloadSave {
-        my ($file, $alt1, $alt2, $sqlAdd);
+        my ($file, %files);
         if (WebGUI::Privilege::canEditPage()) {
-		if ($session{form}{did} eq "new") {
-			$session{form}{did} = getNextId("downloadId");
-			WebGUI::SQL->write("insert into DownloadManager_file (wobjectId,downloadId,sequenceNumber) 
-				values (".$_[0]->get("wobjectId").",$session{form}{did},-1)");
-			_reorderDownloads($_[0]->get("wobjectId"));
-		}
+		$files{downloadId} = $_[0]->setCollateral("DownloadManager_file", "downloadId", {
+                        downloadId => $session{form}{did},
+                        fileTitle => $session{form}{fileTitle},
+                        briefSynopsis => $session{form}{briefSynopsis},
+                        dateUploaded => time(),
+                        groupToView => $session{form}{groupToView}
+                        });
+		_reorderDownloads($_[0]->get("wobjectId"));
                 $file = WebGUI::Attachment->new("",$session{form}{wid},$session{form}{did});
 		$file->save("downloadFile");
-                if ($file->getFilename ne "") {
-                        $sqlAdd = ', downloadFile='.quote($file->getFilename);
-                }
-                $alt1 = WebGUI::Attachment->new("",$session{form}{wid},$session{form}{did});
-		$alt1->save("alternateVersion1");
-                if ($alt1->getFilename ne "") {
-                        $sqlAdd .= ', alternateVersion1='.quote($alt1->getFilename);
-                }
-                $alt2 = WebGUI::Attachment->new("",$session{form}{wid},$session{form}{did});
-		$alt2->save("alternateVersion2");
-                if ($alt2->getFilename ne "") {
-                        $sqlAdd = ', alternateVersion2='.quote($alt2->getFilename);
-                }
-                WebGUI::SQL->write("update DownloadManager_file set ".
-                        "fileTitle=".quote($session{form}{fileTitle}).
-			$sqlAdd.
-                        ", groupToView='$session{form}{groupToView}'".
-                        ", briefSynopsis=".quote($session{form}{briefSynopsis}).
-                        ", dateUploaded=".time().
-			" where downloadId=".$session{form}{did}
-                        );
+		$files{downloadFile} = $file->getFilename;
+		$files{fileTitle} = $files{downloadFile} if ($session{form}{fileTitle} eq "");
+                $file = WebGUI::Attachment->new("",$session{form}{wid},$session{form}{did});
+		$file->save("alternateVersion1");
+		$files{alternateVersion1} = $file->getFilename;
+                $file = WebGUI::Attachment->new("",$session{form}{wid},$session{form}{did});
+		$file->save("alternateVersion2");
+		$files{alternateVersion2} = $file->getFilename;
+		$_[0]->setCollateral("DownloadManager_file", "downloadId", \%files);
                 if ($session{form}{proceed}) {
                         $session{form}{did} = "new";
                         $_[0]->www_editDownload();

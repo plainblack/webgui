@@ -575,7 +575,7 @@ sub set {
 
 #-----------------------------------------------------------------
 
-=head2 setCollateral ( tableName, keyName, properties [ , useSequenceNumber, wobjectId ] )
+=head2 setCollateral ( tableName, keyName, properties [ , useSequenceNumber, useWobjectId ] )
 
  Performs and insert/update of collateral data for any wobject's
  collateral data. Returns the primary key value for that row of

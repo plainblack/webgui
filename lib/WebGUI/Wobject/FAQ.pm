@@ -70,15 +70,9 @@ sub set {
 
 #-------------------------------------------------------------------
 sub www_deleteQuestion {
-	my ($output);
         if (WebGUI::Privilege::canEditPage()) {
-		$output = '<h1>'.WebGUI::International::get(42).'</h1>';
-		$output .= WebGUI::International::get(7,$namespace).'<p>';
-		$output .= '<div align="center"><a href="'.
-			WebGUI::URL::page('func=deleteQuestionConfirm&wid='.$_[0]->get("wobjectId").
-			'&qid='.$session{form}{qid}).'">'.WebGUI::International::get(44).'</a>';
-		$output .= ' &nbsp; <a href="'.WebGUI::URL::page().'">'.WebGUI::International::get(45).'</a></div>';
-                return $output;
+		return $_[0]->confirm(WebGUI::International::get(7,$namespace),
+			WebGUI::URL::page('func=deleteQuestionConfirm&wid='.$_[0]->get("wobjectId").'&qid='.$session{form}{qid}));
         } else {
                 return WebGUI::Privilege::insufficient();
         }
@@ -88,7 +82,7 @@ sub www_deleteQuestion {
 sub www_deleteQuestionConfirm {
         my ($output);
         if (WebGUI::Privilege::canEditPage()) {
-		WebGUI::SQL->write("delete from FAQ_question where questionId=$session{form}{qid}");
+		$_[0]->deleteCollateral("FAQ_question","questionId",$session{form}{qid});
 		_reorderQuestions($_[0]->get("wobjectId"));
                 return "";
         } else {
@@ -165,14 +159,11 @@ sub www_editQuestion {
 sub www_editQuestionSave {
 	my ($seq);
         if (WebGUI::Privilege::canEditPage()) {
-		if ($session{form}{qid} eq "new") {
-                	($seq) = WebGUI::SQL->quickArray("select max(sequenceNumber) from FAQ_question where wobjectId=".$_[0]->get("wobjectId"));
-			$session{form}{qid} = getNextId("questionId");
-			WebGUI::SQL->write("insert into FAQ_question (wobjectId,questionId,sequenceNumber) values 
-				(".$_[0]->get("wobjectId").",$session{form}{qid},".($seq+1).")");
-		}
-                WebGUI::SQL->write("update FAQ_question set question=".quote($session{form}{question}).", 
-			answer=".quote($session{form}{answer})." where questionId=$session{form}{qid}");
+		$_[0]->setCollateral("FAQ_question", "questionId", {
+                        questionId => $session{form}{qid},
+                        question => $session{form}{question},
+                        answer => $session{form}{answer}
+                        });
 		if ($session{form}{proceed}) {
 			$session{form}{qid} = "new";
 			return $_[0]->www_editQuestion();

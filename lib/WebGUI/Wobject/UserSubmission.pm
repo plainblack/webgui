@@ -272,15 +272,11 @@ sub www_deleteImage {
 
 #-------------------------------------------------------------------
 sub www_deleteSubmission {
-	my ($output, $owner);
+	my ($owner);
 	($owner) = WebGUI::SQL->quickArray("select userId from UserSubmission_submission where submissionId=$session{form}{sid}");
         if ($owner == $session{user}{userId} || WebGUI::Privilege::isInGroup($_[0]->get("groupToApprove"))) {
-		$output = '<h1>'.WebGUI::International::get(42).'</h1>';
-		$output .= WebGUI::International::get(17,$namespace).'<p>';
-		$output .= '<div align="center"><a href="'.WebGUI::URL::page('func=deleteSubmissionConfirm&wid='.
-			$session{form}{wid}.'&sid='.$session{form}{sid}).'">'.WebGUI::International::get(44).'</a>';
-		$output .= ' &nbsp; <a href="'.WebGUI::URL::page().'">'.WebGUI::International::get(45).'</a></div>';
-                return $output;
+		return $_[0]->confirm(WebGUI::International::get(17,$namespace),
+			WebGUI::URL::page('func=deleteSubmissionConfirm&wid='.$session{form}{wid}.'&sid='.$session{form}{sid}));
         } else {
                 return WebGUI::Privilege::insufficient();
         }
@@ -291,7 +287,7 @@ sub www_deleteSubmissionConfirm {
         my ($output, $owner, $file);
 	($owner) = WebGUI::SQL->quickArray("select userId from UserSubmission_submission where submissionId=$session{form}{sid}");
         if ($owner == $session{user}{userId} || WebGUI::Privilege::isInGroup($_[0]->get("groupToApprove"))) {
-		WebGUI::SQL->write("delete from UserSubmission_submission where submissionId=$session{form}{sid}");
+		$_[0]->deleteCollateral("UserSubmission_submission","submissionId",$session{form}{sid});
 		$file = WebGUI::Attachment->new("",$session{form}{wid},$session{form}{sid});
 		$file->deleteNode;
                 return "";
@@ -412,41 +408,38 @@ sub www_editSubmission {
 
 #-------------------------------------------------------------------
 sub www_editSubmissionSave {
-	my ($sqlAdd,$submission,$image,$attachment,$title,$u);
+	my ($submission, %hash, $file, $u);
 	$submission = $_[0]->getCollateral("UserSubmission_submission","submissionId",$session{form}{sid});
-        if ($submission->{userId} == $session{user}{userId} || ($submission->{submissionId} eq "new" && WebGUI::Privilege::isInGroup($_[0]->get("groupToContribute"))) || WebGUI::Privilege::isInGroup($_[0]->get("groupToApprove"))) {
-		if ($submission->{submissionId} eq "new") {
-			$session{form}{sid} = getNextId("submissionId");
-			WebGUI::SQL->write("insert into UserSubmission_submission (wobjectId,submissionId,userId,username) 
-				values (".$_[0]->get("wobjectId").",$session{form}{sid},$session{user}{userId},".quote($session{user}{username}).")");
+        if ($submission->{userId} == $session{user}{userId} 
+		|| ($submission->{submissionId} eq "new" 
+		&& WebGUI::Privilege::isInGroup($_[0]->get("groupToContribute"))) 
+		|| WebGUI::Privilege::isInGroup($_[0]->get("groupToApprove"))) {
+                $hash{title} = $session{form}{title} || WebGUI::International::get(16,$namespace);
+                if ($session{form}{sid} eq "new") {
+			$hash{username} = $session{user}{username};
+			$hash{userId} = $session{user}{userId};
 			if ($session{setting}{useKarma}) {
-				$u = WebGUI::User->new($session{user}{userId});
-				$u->karma($_[0]->get("karmaPerSubmission"),$namespace." (".$_[0]->get("wobjectId")."/".$session{form}{sid}.")","User submission.");
+                        	$u = WebGUI::User->new($session{user}{userId});
+                        	$u->karma($_[0]->get("karmaPerSubmission"),$namespace." (".$_[0]->get("wobjectId")
+                                	."/".$session{form}{sid}.")","User submission.");
 			}
-		}
-                $image = WebGUI::Attachment->new("",$session{form}{wid},$session{form}{sid});
-		$image->save("image");
-		if ($image->getFilename ne "") {
-			$sqlAdd = 'image='.quote($image->getFilename).', ';
-		}
-                $attachment = WebGUI::Attachment->new("",$session{form}{wid},$session{form}{sid});
-		$attachment->save("attachment");
-                if ($attachment->getFilename ne "") {
-                        $sqlAdd .= 'attachment='.quote($attachment->getFilename).', ';
+			
                 }
-                if ($session{form}{title} ne "") {
-                        $title = $session{form}{title};
-                } else {
-                        $title = WebGUI::International::get(16,$namespace);
-                }
-                WebGUI::SQL->write("update UserSubmission_submission set 
-			dateSubmitted=".time().", 
-			convertCarriageReturns=$session{form}{convertCarriageReturns}, 
-			title=".quote($title).", 
-			content=".quote($session{form}{content}).", 
-			".$sqlAdd." 
-			status='".$_[0]->get("defaultStatus")."'
-			where submissionId=$session{form}{sid}");
+		$hash{submissionId} = $session{form}{sid};
+		$hash{dateSubmitted} = time();
+		$hash{content} = $session{form}{content};
+		$hash{convertCarriageReturns} => $session{form}{convertCarriageReturns};
+		$hash{status} = $_[0]->get("defaultStatus");
+		$session{form}{sid} = $_[0]->setCollateral("UserSubmission_submission", "submissionId",\%hash,0);
+		%hash = ();
+		$hash{submissionId} = $session{form}{sid};
+                $file = WebGUI::Attachment->new("",$session{form}{wid},$session{form}{sid});
+		$file->save("image");
+		$hash{image} = $file->getFilename;
+                $file = WebGUI::Attachment->new("",$session{form}{wid},$session{form}{sid});
+		$file->save("attachment");
+		$hash{attachment} = $file->getFilename;
+		$_[0]->setCollateral("UserSubmission_submission", "submissionId", \%hash, 0);
 		if ($_[0]->get("defaultStatus") ne "Approved") {
 			WebGUI::MessageLog::addInternationalizedEntry('',$_[0]->get("groupToApprove"),
 				WebGUI::URL::page('func=viewSubmission&wid='.$_[0]->get("wobjectId").'&sid='.

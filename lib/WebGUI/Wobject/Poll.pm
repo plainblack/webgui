@@ -149,7 +149,7 @@ sub www_editSave {
 #-------------------------------------------------------------------
 sub www_resetVotes {
 	if (WebGUI::Privilege::canEditPage()) {
-		WebGUI::SQL->write("delete from Poll_answer where wobjectId=".$_[0]->get("wobjectId"));
+		$_[0]->deleteCollateral("Poll_answer","wobjectId",$_[0]->get("wobjectId"));
 	}
 	return "";
 }

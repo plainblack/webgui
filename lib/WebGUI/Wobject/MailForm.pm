@@ -90,31 +90,25 @@ sub set {
 
 #-------------------------------------------------------------------
 sub www_deleteField {
-    my ($output);
-    if (WebGUI::Privilege::canEditPage()) {
-        $output = '<h1>'.WebGUI::International::get(42).'</h1>';
-        $output .= WebGUI::International::get(19,$namespace).'<p>';
-        $output .= '<div align="center"><a href="'.
-            WebGUI::URL::page('func=deleteFieldConfirm&wid='.$_[0]->get("wobjectId").
-            '&fid='.$session{form}{fid}).'">'.WebGUI::International::get(44).'</a>';
-        $output .= ' &nbsp; <a href="'.WebGUI::URL::page('func=edit&wid='.$_[0]->get("wobjectId"))
-            .'">'.WebGUI::International::get(45).'</a></div>';
-        return $output;
-    } else {
-        return WebGUI::Privilege::insufficient();
-    }
+    	my ($output);
+    	if (WebGUI::Privilege::canEditPage()) {
+		return $_[0]->confirm(WebGUI::International::get(19,$namespace),
+            		WebGUI::URL::page('func=deleteFieldConfirm&wid='.$_[0]->get("wobjectId").'&fid='.$session{form}{fid}));
+    	} else {
+        	return WebGUI::Privilege::insufficient();
+    	}
 }
 
 #-------------------------------------------------------------------
 sub www_deleteFieldConfirm {
-    my ($output);
-    if (WebGUI::Privilege::canEditPage()) {
-        WebGUI::SQL->write("delete from MailForm_field where mailFieldId=$session{form}{fid}");
-        _reorderFields($_[0]->get("wobjectId"));
-        return "";
-    } else {
-        return WebGUI::Privilege::insufficient();
-    }
+    	my ($output);
+    	if (WebGUI::Privilege::canEditPage()) {
+		$_[0]->deleteCollateral("MailForm_field","mailFieldId",$session{form}{fid});
+        	_reorderFields($_[0]->get("wobjectId"));
+        	return "";
+    	} else {
+        	return WebGUI::Privilege::insufficient();
+    	}
 }
 
 #-------------------------------------------------------------------

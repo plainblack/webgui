@@ -141,9 +141,9 @@ sub www_deleteEvent {
 sub www_deleteEventConfirm {
         if (WebGUI::Privilege::canEditPage()) {
 		if ($session{form}{rid} > 0) {
-			WebGUI::SQL->write("delete from EventsCalendar_event where recurringEventId=$session{form}{rid}");
+			$_[0]->deleteCollateral("EventsCalendar_event","recurringEventId",$session{form}{rid});
 		} else {
-			WebGUI::SQL->write("delete from EventsCalendar_event where eventId=$session{form}{eid}");
+			$_[0]->deleteCollateral("EventsCalendar_event","eventId",$session{form}{eid});
 		}
                 return "";
         } else {

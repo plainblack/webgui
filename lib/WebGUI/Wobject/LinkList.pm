@@ -70,16 +70,9 @@ sub set {
 
 #-------------------------------------------------------------------
 sub www_deleteLink {
-	my ($output);
         if (WebGUI::Privilege::canEditPage()) {
-		$output = '<h1>'.WebGUI::International::get(42).'</h1>';
-		$output .= WebGUI::International::get(9,$namespace).'<p>';
-		$output .= '<div align="center"><a href="'.
-			WebGUI::URL::page('func=deleteLinkConfirm&wid='.$session{form}{wid}.'&lid='.$session{form}{lid})
-			.'">'.WebGUI::International::get(44).'</a>';
-		$output .= ' &nbsp; <a href="'.WebGUI::URL::page('func=edit&wid='.$session{form}{wid})
-			.'">'.WebGUI::International::get(45).'</a></div>';
-                return $output;
+		return $_[0]->confirm(WebGUI::International::get(9,$namespace),
+			WebGUI::URL::page('func=deleteLinkConfirm&wid='.$session{form}{wid}.'&lid='.$session{form}{lid}));
         } else {
                 return WebGUI::Privilege::insufficient();
         }
@@ -89,7 +82,7 @@ sub www_deleteLink {
 sub www_deleteLinkConfirm {
         my ($output);
         if (WebGUI::Privilege::canEditPage()) {
-		WebGUI::SQL->write("delete from LinkList_link where linkId=$session{form}{lid}");
+		$_[0]->deleteCollateral("LinkList_link","linkId",$session{form}{lid});
 		_reorderLinks($session{form}{wid});
                 return "";
         } else {
@@ -175,15 +168,13 @@ sub www_editLink {
 #-------------------------------------------------------------------
 sub www_editLinkSave {
         if (WebGUI::Privilege::canEditPage()) {
-		if ($session{form}{lid} eq "new") {
-			$session{form}{lid} = getNextId("linkId");
-                	WebGUI::SQL->write("insert into LinkList_link (wobjectId,linkId,sequenceNumber) values (".$_[0]->get("wobjectId")
-				.",$session{form}{lid},-1)");
-			_reorderLinks($_[0]->get("wobjectId"));
-		}
-                WebGUI::SQL->write("update LinkList_link set name=".quote($session{form}{name}).",
-			url=".quote($session{form}{url}).",description=".quote($session{form}{description}).",
-			newWindow='$session{form}{newWindow}' where linkId=$session{form}{lid}");
+		$_[0]->setCollateral("LinkList_link", "linkId", {
+                        linkId => $session{form}{lid},
+                        description => $session{form}{description},
+                        newWindow => $session{form}{newWindow},
+                        url => $session{form}{url},
+                        name => $session{form}{name}
+                        });
                 if ($session{form}{proceed}) {
 			$session{form}{lid} = "new";
                         $_[0]->www_editLink();
