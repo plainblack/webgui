@@ -91,7 +91,7 @@ use WebGUI::International ();
 use WebGUI::Macro ();
 use WebGUI::Mail ();
 use WebGUI::MessageLog ();
-use WebGUI::Navigation ();
+#use WebGUI::Navigation ();
 use WebGUI::Node ();
 use WebGUI::Operation ();
 use WebGUI::Persistent ();
@@ -179,7 +179,7 @@ use WebGUI::Auth::WebGUI ();
 
 # macros
 use WebGUI::Macro::AdminBar ();
-use WebGUI::Macro::Navigation ();
+#use WebGUI::Macro::Navigation ();
 
 
 
