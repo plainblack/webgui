@@ -263,6 +263,9 @@ sub open {
 	### current page's properties (from page table)
 	$session{page} = _getPageInfo("",$session{dbh},$session{setting}{notFoundPage},$session{config}{scripturl});
 	###----------------------------
+	### language settings
+	$session{language} = WebGUI::SQL->quickHashRef("select * from language where languageId=$session{user}{language}");
+	###----------------------------
 	### loading plugins
 	_loadWobjects();
 	_loadMacros();

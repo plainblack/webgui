@@ -930,7 +930,104 @@ INSERT INTO international VALUES (3,'WobjectProxy',11,'ÊÊ»ÃÌﬂ  »—Êﬂ”Ì',103151404
 INSERT INTO international VALUES (4,'WobjectProxy',11,'›‘·  ⁄„·Ì… ÷„ «·ÊÊ»Ãﬂ  ≈·Ï »—Êﬂ”Ì.  —»„« Ã—Ï Õ–› Â–« «·ÊÊ»ÃÌﬂ ',1031514049);
 INSERT INTO international VALUES (5,'WobjectProxy',11,'ÊÊ»ÃÌﬂ  »—Êﬂ”Ì° ≈÷«›…/ Õ—Ì—',1031514049);
 delete from incrementer where incrementerId='Product_templateId';
+alter table language add column toolbar varchar(35) not null default 'default';
+insert into international (internationalId,languageId,namespace,message,lastUpdated) values (746,1,'WebGUI','Toolbar Icon Set', 1036046598);
+insert into international (internationalId,languageId,namespace,message,lastUpdated) values (45,1,'Survey','Are you certain you wish to delete this answer and its responses?', 1035951913);
+insert into international (internationalId,languageId,namespace,message,lastUpdated) values (44,1,'Survey','Are you certain you wish to delete this question, its answers and responses?', 1035951626);
+insert into international (internationalId,languageId,namespace,message,lastUpdated) values (34,1,'Survey','Agree.', 1035948150);
+insert into international (internationalId,languageId,namespace,message,lastUpdated) values (33,1,'Survey','Strongly agree.', 1035948137);
+insert into international (internationalId,languageId,namespace,message,lastUpdated) values (32,1,'Survey','False.', 1035948033);
+insert into international (internationalId,languageId,namespace,message,lastUpdated) values (31,1,'Survey','True.', 1035948023);
+insert into international (internationalId,languageId,namespace,message,lastUpdated) values (27,1,'Survey','Add an opinion (agree/disagree) answer scale.', 1035948010);
+insert into international (internationalId,languageId,namespace,message,lastUpdated) values (25,1,'Survey','Add a true/false answer.', 1035947960);
+insert into international (internationalId,languageId,namespace,message,lastUpdated) values (26,1,'Survey','Add a frequency (always/never) answer scale.', 1035947924);
+insert into international (internationalId,languageId,namespace,message,lastUpdated) values (43,1,'Survey','Never.', 1035947630);
+insert into international (internationalId,languageId,namespace,message,lastUpdated) values (42,1,'Survey','Occasionally.', 1035947620);
+insert into international (internationalId,languageId,namespace,message,lastUpdated) values (41,1,'Survey','Frequently.', 1035947594);
+insert into international (internationalId,languageId,namespace,message,lastUpdated) values (40,1,'Survey','Always.', 1035947586);
+insert into international (internationalId,languageId,namespace,message,lastUpdated) values (39,1,'Survey','Not applicable.', 1035947497);
+insert into international (internationalId,languageId,namespace,message,lastUpdated) values (38,1,'Survey','Strongly disagree.', 1035947488);
+insert into international (internationalId,languageId,namespace,message,lastUpdated) values (37,1,'Survey','Disagree.', 1035947477);
+insert into international (internationalId,languageId,namespace,message,lastUpdated) values (36,1,'Survey','Somewhat disagree.', 1035947465);
+insert into international (internationalId,languageId,namespace,message,lastUpdated) values (35,1,'Survey','Somewhat agree.', 1035947450);
+insert into international (internationalId,languageId,namespace,message,lastUpdated) values (30,1,'Survey','Add a new question.', 1035944708);
+insert into international (internationalId,languageId,namespace,message,lastUpdated) values (29,1,'Survey','Add a text answer.', 1035874640);
+insert into international (internationalId,languageId,namespace,message,lastUpdated) values (24,1,'Survey','Add a multiple choice answer.', 1035874502);
+insert into international (internationalId,languageId,namespace,message,lastUpdated) values (745,1,'WebGUI','Go back to the page.', 1035872437);
+insert into international (internationalId,languageId,namespace,message,lastUpdated) values (28,1,'Survey','Add a question.', 1035872173);
+insert into international (internationalId,languageId,namespace,message,lastUpdated) values (744,1,'WebGUI','What next?', 1035864828);
+insert into international (internationalId,languageId,namespace,message,lastUpdated) values (23,1,'Survey','Add a new answer.', 1035864494);
+insert into international (internationalId,languageId,namespace,message,lastUpdated) values (22,1,'Survey','Answer Type', 1035864413);
+insert into international (internationalId,languageId,namespace,message,lastUpdated) values (21,1,'Survey','Go To', 1035506057);
+insert into international (internationalId,languageId,namespace,message,lastUpdated) values (20,1,'Survey','Is this answer correct?', 1035436321);
+insert into international (internationalId,languageId,namespace,message,lastUpdated) values (19,1,'Survey','Answer', 1035436296);
+insert into international (internationalId,languageId,namespace,message,lastUpdated) values (18,1,'Survey','Edit Answer', 1035436102);
+insert into international (internationalId,languageId,namespace,message,lastUpdated) values (17,1,'Survey','Edit Question', 1035436091);
+insert into international (internationalId,languageId,namespace,message,lastUpdated) values (16,1,'Survey','Randomize answers?', 1035429242);
+insert into international (internationalId,languageId,namespace,message,lastUpdated) values (15,1,'Survey','Allow comment?', 1035429212);
+insert into international (internationalId,languageId,namespace,message,lastUpdated) values (14,1,'Survey','Question', 1035428770);
+insert into international (internationalId,languageId,namespace,message,lastUpdated) values (743,1,'WebGUI','You must specify a valid email address in order to attempt to recover your password.', 1035246389);
+create table Survey (
+wobjectId int not null primary key,
+questionOrder varchar(30),
+groupToTakeSurvey int,
+groupToViewReports int,
+mode varchar(30)
+);
 
+create table Survey_question(
+wobjectId int not null,
+Survey_questionId int not null primary key,
+question text,
+sequenceNumber int not null default 1,
+allowComment int not null default 0,
+randomizeAnswers int not null default 0
+);
+
+create table Survey_answer (
+wobjectId int not null,
+Survey_questionId int not null,
+Survey_answerId int not null primary key,
+sequenceNumber int not null default 1,
+goto int,
+answer varchar(255),
+isCorrect int not null default 0,
+fieldType varchar(30) not null default 'radio'
+);
+
+create table Survey_response (
+wobjectId int not null,
+Survey_questionId int not null,
+Survey_answerId int not null,
+Survey_responseId int not null primary key,
+userId int,
+username varchar(255),
+ipAddress varchar(15),
+response varchar(255),
+comment text,
+dateOfResponse int
+);
+
+alter table Survey_question add column answerFieldType varchar(35);
+alter table Survey_answer drop column fieldType;
+
+INSERT INTO incrementer VALUES ('Survey_answerId',1000);
+INSERT INTO incrementer VALUES ('Survey_questionId',1000);
+INSERT INTO incrementer VALUES ('Survey_responseId',1000);
+insert into help (helpId,namespace,titleId,bodyId,seeAlso) values (1, 'Survey', 3, 4, '21,WebGUI;');
+insert into international (internationalId,languageId,namespace,message,lastUpdated) values (13,1,'Survey','Who can view reports?', 1033949863);
+insert into international (internationalId,languageId,namespace,message,lastUpdated) values (12,1,'Survey','Who can take the survey?', 1033949789);
+insert into international (internationalId,languageId,namespace,message,lastUpdated) values (11,1,'Survey','Mode', 1033949647);
+insert into international (internationalId,languageId,namespace,message,lastUpdated) values (10,1,'Survey','Quiz', 1033949566);
+insert into international (internationalId,languageId,namespace,message,lastUpdated) values (9,1,'Survey','Survey', 1033949540);
+insert into international (internationalId,languageId,namespace,message,lastUpdated) values (8,1,'Survey','Question Order', 1033949393);
+insert into international (internationalId,languageId,namespace,message,lastUpdated) values (7,1,'Survey','Response Driven', 1033944729);
+insert into international (internationalId,languageId,namespace,message,lastUpdated) values (6,1,'Survey','Random', 1033944643);
+insert into international (internationalId,languageId,namespace,message,lastUpdated) values (5,1,'Survey','Sequential', 1033944535);
+insert into international (internationalId,languageId,namespace,message,lastUpdated) values (3,1,'Survey','Survey, Add/Edit', 1033944306);
+insert into international (internationalId,languageId,namespace,message,lastUpdated) values (4,1,'Survey','', 1033944306);
+insert into international (internationalId,languageId,namespace,message,lastUpdated) values (2,1,'Survey','Edit Survey', 1033943825);
+insert into international (internationalId,languageId,namespace,message,lastUpdated) values (1,1,'Survey','Survey', 1033942924);
 
 
 

@@ -187,6 +187,7 @@ sub www_editLanguage {
 	if (WebGUI::Privilege::isInGroup(3)) {
 		if ($session{form}{lid} eq "new") {
 			$data{characterSet} = "ISO-8859-1";
+			$data{toolbar} = "default";
 		} else {
 			%data = WebGUI::SQL->quickHash("select * from language where languageId=".$session{form}{lid});
 		}
@@ -197,6 +198,7 @@ sub www_editLanguage {
 		$f->hidden("op","editLanguageSave");
 		$f->text("language",WebGUI::International::get(591),$data{language});
 		$f->text("characterSet",WebGUI::International::get(592),$data{characterSet});
+		$f->text("toolbar",WebGUI::International::get(746),$data{toolbar});
 		$f->submit;
 		$output .= $f->print;
 		return _submenu($output);	
