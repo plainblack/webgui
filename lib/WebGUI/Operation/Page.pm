@@ -164,7 +164,7 @@ sub www_editPage {
                 $f->text("urlizedTitle",WebGUI::International::get(104),$page{urlizedTitle});
 		$f->readOnly(WebGUI::Template::selectTemplate($page{templateId}),WebGUI::International::get(356));
 		$f->textarea("synopsis",WebGUI::International::get(412),$page{synopsis});
-		$f->textarea("metatags",WebGUI::International::get(100),$page{metaTags});
+		$f->textarea("metaTags",WebGUI::International::get(100),$page{metaTags});
                 $f->yesNo("defaultMetaTags",WebGUI::International::get(307),$page{defaultMetaTags});
 		$f->raw('<tr><td colspan=2><hr size=1><b>'.WebGUI::International::get(105).'</b></td></tr>');
 		%hash = WebGUI::SQL->buildHash("select styleId,name from style where name<>'Reserved' order by name");
@@ -232,7 +232,7 @@ sub www_editPageSave {
 			synopsis=".quote($session{form}{synopsis})." 
 			where pageId=$session{form}{pageId}");
 		WebGUI::SQL->write("update wobject set templatePosition=0 where pageId=$session{form}{pageId} 
-			and templatePosition=".WebGUI::Template::countPositions($session{form}{templateId}));
+			and templatePosition>".(WebGUI::Template::countPositions($session{form}{templateId})-1));
 		_recursivelyChangeStyle($session{page}{pageId}) if ($session{form}{recurseStyle});
 		_recursivelyChangePrivileges($session{page}{pageId}) if ($session{form}{recursePrivs});
 		WebGUI::Session::refreshPageInfo($session{page}{pageId}) if ($session{form}{pageId} == $session{page}{pageId});
