@@ -371,8 +371,8 @@ The form in which the user can enter his subscription code.<br>|,
 	},
 	'code length' => {
 		message => q|Subscription code length|,
-		lastUpdated => 0,
-		context => q|The label of the formfield in which the length of a subscription code is entered.|
+		lastUpdated => 1102660410,
+		context => q|The label of the form field in which the length of a subscription code is entered.|
 	},
 	'code length error' => {
 		message => q|You must enter a subscription code length between 10 and 64 (border values included).|,
