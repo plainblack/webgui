@@ -59,11 +59,12 @@ template is used to create the menu.</P>
 <P><B>Show Hidden Pages</B><BR>Should the menus include pages which are marked as Hidden? Similar to
 System Pages, if you want certain groups to be able to see Hidden Pages, then select Yes and use
 the Navigation Template to determine who can see them in the menu.</P>
+<P>NOTE: Any user in Admin mode will automatically be able to see all pages that they can edit regardless of whether they are hidden or the value of this property.</P>
 <P><B>Show Unprivileged Pages</B><BR>Should the menus the macro creates include pages which the currently logged-in user does not have the privilege to view? </P>
 <P><B>Template</B><BR>This menu permits you to select a template which is used to style the output created by the macro -- if you need the same collection of pages in multiple formats, you'll need to create multiple Navigation entries with (slightly) different names; the Copy Navigation button is useful for this.</P>
 <P><B>Reverse Output</B><BR>When this option is switched on, the menu will be in reverse order.</P>
 <P><B>Preview</B><BR>The Preview button allows you to view a navigation setup without actually saving it.</P>|,
-		lastUpdated => 1101774179,
+		lastUpdated => 1106872055,
 	},
 
 	'1096' => {
@@ -96,9 +97,9 @@ loop variables:</p>
 <P dir=ltr><STRONG>page.newWindow</STRONG><BR>A conditional indicating whether this page should be opened in a new window.</P>
 <P dir=ltr><STRONG>page.absDepth</STRONG><BR>The absolute depth of this page&nbsp;(relative to nameless root).</P>
 <P><STRONG>page.relDepth</STRONG><BR>The relative depth of this page (relative to starting point).</P>
-<P><STRONG>page.isHidden</STRONG><BR>A conditional indicating whether this page is a hidden page.<BR><EM>(Note: This variable is only visible if "Show hidden pages" is switched on.)</EM></P>
-<P><STRONG>page.isSystem</STRONG><BR>A conditional indicating whether this page is a system page (Trash, Clipboard, etc).<BR><EM>(Note: This variable is only visible if "Show system pages" is switched on.)</EM></P>
-<P><STRONG>page.isViewable</STRONG><BR>A conditional indicating whether the user has permission to view it.<BR><EM>(Note: This variable is only visible if "Show unprivileged pages" is switched on.)</EM></P>
+<P><STRONG>page.isHidden</STRONG><BR>A conditional indicating whether this page is a hidden page.</P>
+<P><STRONG>page.isSystem</STRONG><BR>A conditional indicating whether this page is a system page (Trash, Clipboard, etc).</P>
+<P><STRONG>page.isViewable</STRONG><BR>A conditional indicating whether the user has permission to view it.</P>
 <P><STRONG>page.indent</STRONG><BR>A variable containing the indent for the current page. The default indent is three spaces. Use the <STRONG>page.indent_loop</STRONG> if you need a more flexible indent.</P>
 <P><STRONG>page.indent_loop</STRONG><BR>A loop that runs <STRONG>page.relDepth</STRONG> times.</P>
 <BLOCKQUOTE dir=ltr style="MARGIN-RIGHT: 0px">
@@ -131,7 +132,7 @@ loop variables:</p>
 <P dir=ltr><STRONG>page.depthDiffIs1, page.depthDiffIs2, page.depthDiffIs3, page.depthDiffIsN</STRONG><BR>True if the <STRONG>page.depthDiff</STRONG> variable is N.</P>
 <P dir=ltr><STRONG>page.depthDiff_loop</STRONG><BR>A loop that runs <STRONG>page.depthDiff</STRONG> times. This loop contains no loop variables.</P></BLOCKQUOTE>
 <P dir=ltr>&nbsp;</P>|,
-		lastUpdated => 1104367983,
+		lastUpdated => 1106872049,
 	},
 
 	'1094' => {
