@@ -49,7 +49,7 @@ These methods are available from this package:
 
 =head2 drawHorizontal ( tree [ , seperator, class ] )
 
-Draws a vertical navigation system. Returns HTML.
+Draws a horizontal navigation system. Returns HTML.
 
 =over
 
