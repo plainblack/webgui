@@ -635,7 +635,7 @@ sub getAdminConsole {
 
 #-------------------------------------------------------------------
 
-=head2 getAssetAdderLinks ( [addToUrl] )
+=head2 getAssetAdderLinks ( [addToUrl, getContainerLinks] )
 
 Returns an array that contains a label (name of the class of Asset) and url (url link to function to add the class).
 
@@ -643,13 +643,20 @@ Returns an array that contains a label (name of the class of Asset) and url (url
 
 Any text to append to the getAssetAdderLinks URL. Usually name/variable pairs to pass in the url. If addToURL is specified, the character "&" and the text in addToUrl is appended to the returned url.
 
+=head3 getContainerLinks
+
+A boolean indicating whether to return asset container links or regular asset links.
+
 =cut
 
 sub getAssetAdderLinks {
 	my $self = shift;
 	my $addToUrl = shift;
+	my $getContainerLinks = shift;
+	my $type = "assets";
+	$type = "assetContainers" if ($getContainerLinks);
 	my @links;
-	foreach my $class (@{$session{config}{assets}}) {
+	foreach my $class (@{$session{config}{$type}}) {
 		my $load = "use ".$class;
 		eval ($load);
 		if ($@) {
@@ -2051,6 +2058,9 @@ sub www_add {
 		groupIdEdit => $self->get("groupIdEdit"),
 		ownerUserId => $self->get("ownerUserId"),
 		encryptPage => $self->get("encryptPage"),
+		templateId => $self->get("templateId"),
+		styleTemplateId => $self->get("styleTemplateId"),
+		printableStyleTemplateId => $self->get("printableStyleTemplateId"),
 		isHidden => $self->get("isHidden"),
 		startDate => $self->get("startDate"),
 		endDate => $self->get("endDate")
@@ -2256,11 +2266,13 @@ sub www_editSave {
 	$object->processPropertiesFromFormPost;
 	$object->updateHistory("edited");
 	return $self->www_manageAssets if ($session{form}{proceed} eq "manageAssets" && $session{form}{assetId} eq "new");
-	if (exists $session{form}{proceed}) {
+	if ($session{form}{proceed} ne "") {
 		my $method = "www_".$session{form}{proceed};
-		return $object->getParent->$method();
+		$session{asset} = $object;
+		return $object->$method();
 	}
-	return $object->www_view;
+	$session{asset} = $object->getParent;
+	return $object->getParent->www_view;
 }
 
 #-------------------------------------------------------------------
@@ -2764,6 +2776,10 @@ sub www_manageAssets {
             &nbsp;
         </div>
 		<div style="float: left; padding-right: 30px; font-size: 14px;"><b>'.WebGUI::International::get(1083).'</b><br />';
+	foreach my $link (@{$self->getAssetAdderLinks("proceed=manageAssets",1)}) {
+		$output .= '<a href="'.$link->{url}.'">'.$link->{label}.'</a><br />';
+	}
+	$output .= '<hr>';
 	foreach my $link (@{$self->getAssetAdderLinks("proceed=manageAssets")}) {
 		$output .= '<a href="'.$link->{url}.'">'.$link->{label}.'</a><br />';
 	}

@@ -88,14 +88,15 @@ sub getEditForm {
       		-value=>$self->getValue('templateId'),
       		-namespace=>"Folder"
    		);
-	#if ($self->get("assetId") eq "new") {
-        #       	$tabform->getTab("properties")->whatNext(
-        #               	-options=>{
-        #                       	gotoNewPage=>WebGUI::International::get(823),
-        #              	 	backToPage=>WebGUI::International::get(847)
-        #                      	},
-#			);
-#	}
+	if ($self->get("assetId") eq "new") {
+               	$tabform->getTab("properties")->whatNext(
+                       	-options=>{
+                               	view=>WebGUI::International::get(823),
+                      	 	""=>WebGUI::International::get(847)
+                              	},
+			-value=>"view"
+			);
+	}
 	return $tabform;
 }
 
