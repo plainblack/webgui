@@ -83,11 +83,13 @@ sub www_view {
 		WebGUI::ErrorHandler::warn($_[0]->get("rssUrl")." ".$@);
 	}
 	my %var;
-	$var{"channel.title"} = $rss{title} || $rss{channel}{title};
-        $var{"channel.link"} = $rss{link} || $rss{channel}{link};
-        $var{"channel.description"} = $rss{description} || $rss{channel}{description};
+	$var{"channel.title"} = $rss{title} || $rss{channel}{title} || $rss{RDF}{channel}{title};
+        $var{"channel.link"} = $rss{link} || $rss{channel}{link} || $rss{RDF}{channel}{link};
+        $var{"channel.description"} = $rss{description} || $rss{channel}{description} || $rss{RDF}{channel}{description};
 	my @items;
-        foreach my $item (@{$rss{item}}) {
+	my $rssItem = \$rss{item};
+	$rssItem = \$rss{RDF}{item} unless ($rss{item});
+        foreach my $item (@{$$rssItem}) {
 		push (@items,{
 			link=>$item->{link},
 			title=>$item->{title},
