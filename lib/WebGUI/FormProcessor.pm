@@ -17,6 +17,7 @@ package WebGUI::FormProcessor;
 use strict;
 use WebGUI::DateTime;
 use WebGUI::HTML;
+use WebGUI::Session;
 
 =head1 NAME
 
@@ -79,6 +80,8 @@ The name of the form variable to retrieve.
 
 =back
 
+=cut
+
 sub checkbox {
 	return selectList($_[0]);
 }
@@ -98,6 +101,8 @@ The name of the form variable to retrieve.
 
 =back
 
+=cut
+
 sub checkboxList {
 	return selectList($_[0]);
 }
@@ -116,6 +121,8 @@ Returns either an array of values or a scalar value depending upon what you requ
 The name of the form variable to retrieve.
 
 =back
+
+=cut
 
 sub combo {
 	if ($session{form}{$_[0]."_new"}) {
@@ -139,6 +146,8 @@ The name of the form variable to retrieve.
 
 =back
 
+=cut
+
 sub date {
 	return WebGUI::DateTime::setToEpoch($session{form}{$_[0]});
 }
@@ -158,6 +167,8 @@ The name of the form variable to retrieve.
 
 =back
 
+=cut
+
 sub dateTime {
 	return (date($_[0]."_date")+time($_[0]."_time"));
 }
@@ -176,6 +187,8 @@ Returns an email address.
 The name of the form variable to retrieve.
 
 =back
+
+=cut
 
 sub email {
 	if ($session{form}{$_[0]} =~ /^[\w-\.]{1,}\@([\da-zA-Z-]{1,}\.){1,}[\da-zA-Z-]{2,3}$/i) {
@@ -199,6 +212,8 @@ The name of the form variable to retrieve.
 
 =back
 
+=cut
+
 sub fieldType {
 	return (selectList($_[0]) || "text");
 }
@@ -218,6 +233,8 @@ The name of the form variable to retrieve.
 
 =back
 
+=cut
+
 sub filter {
 	return ($session{form}{$_[0]} || "most");
 }
@@ -236,6 +253,8 @@ Returns a floating point (decimal) number. Defaults to "0.0".
 The name of the form variable to retrieve.
 
 =back
+
+=cut
 
 sub float {
 	if ($session{form}{$_[0]} =~ /^[\d\.\-]+$/) {
@@ -259,6 +278,8 @@ The name of the form variable to retrieve.
 
 =back
 
+=cut
+
 sub hidden {
 	return $session{form}{$_[0]};
 }
@@ -277,6 +298,8 @@ Returns either an array or a scalar depending upon what you request.
 The name of the form variable to retrieve.
 
 =back
+
+=cut
 
 sub hiddenList {
 	return selectList($_[0]);
@@ -297,6 +320,8 @@ The name of the form variable to retrieve.
 
 =back
 
+=cut
+
 sub HTMLArea {
 	return WebGUI::HTML::cleanSegment($session{form}{$_[0]});
 }
@@ -315,6 +340,8 @@ Returns an integer. Defaults to "0".
 The name of the form variable to retrieve.
 
 =back
+
+=cut
 
 sub integer {
 	if ($session{form}{$_[0]} =~ /^[\d\-]+$/) {
@@ -338,6 +365,8 @@ The name of the form variable to retrieve.
 
 =back
 
+=cut
+
 sub interval {
 	return (WebGUI::DateTime::intervalToSeconds($session{form}{$_[0]."_interval"},$session{form}{$_[0]."_units"}) || 0);
 }
@@ -356,6 +385,8 @@ Returns a string.
 The name of the form variable to retrieve.
 
 =back
+
+=cut
 
 sub password {
 	return $session{form}{$_[0]};
@@ -376,6 +407,8 @@ The name of the form variable to retrieve.
 
 =back
 
+=cut
+
 sub phone {
 	if ($session{form}{$_[0]} =~ /^[\d\s\-\+\(\)]+$/) {
 		return $session{form}{$_[0]};
@@ -388,7 +421,7 @@ sub phone {
 
 =head2 process ( name, type [ , default ] )
 
-Returns whatever would be the expected result of the method type that was specified.
+Returns whatever would be the expected result of the method type that was specified. This method also checks to make sure that the field is not returning a string filled with nothing but whitespace.
 
 =over 
 
@@ -406,12 +439,20 @@ The default value for this variable. If the variable is undefined then the defau
 
 =back
 
+=cut
+
 sub process {
 	my ($name, $type, $default) = @_;
+	my $value;
 	if (exists $session{form}{$name}) {
-		return &$type($name);
-        } 
-	return $default;
+		$value = &$type($name);
+        } else {
+		$value = $default;
+	}
+	if ($value =~ /^[\s]+$/) {
+		return undef;
+	}
+	return $value;
 }
 
 
@@ -428,6 +469,8 @@ Returns a string.
 The name of the form variable to retrieve.
 
 =back
+
+=cut
 
 sub radio {
 	return $session{form}{$_[0]};
@@ -448,6 +491,8 @@ The name of the form variable to retrieve.
 
 =back
 
+=cut
+
 sub radioList {
 	return $session{form}{$_[0]};
 }
@@ -457,7 +502,7 @@ sub radioList {
 
 =head2 selectList ( name )
 
-Returns either an array or a scalar depending upon what you request.
+Returns an array or a string depending upon which you request.
 
 =over 
 
@@ -467,12 +512,10 @@ The name of the form variable to retrieve.
 
 =back
 
+=cut
+
 sub selectList {
-	my @array = $session{cgi}->param($_[0]);
-	if ($#array) {
-		return = \@array;
-	}
-	return $session{form}{$_[0]};
+	return $session{cgi}->param($_[0]);
 }
 
 
@@ -489,6 +532,8 @@ Returns a template id. Defaults to "1".
 The name of the form variable to retrieve.
 
 =back
+
+=cut
 
 sub template {
 	if ($session{form}{$_[0]} =~ /^\d+$/) {
@@ -512,6 +557,8 @@ The name of the form variable to retrieve.
 
 =back
 
+=cut
+
 sub text {
 	return $session{form}{$_[0]};
 }
@@ -530,6 +577,8 @@ Returns a string of text.
 The name of the form variable to retrieve.
 
 =back
+
+=cut
 
 sub textarea {
 	return $session{form}{$_[0]};
@@ -550,6 +599,8 @@ The name of the form variable to retrieve.
 
 =back
 
+=cut
+
 sub time {
 	return WebGUI::DateTime::timeToEpoch($session{form}{$_[0]});
 }
@@ -568,6 +619,8 @@ Returns a URL.
 The name of the form variable to retrieve.
 
 =back
+
+=cut
 
 sub url {
 	if ($session{form}{$_[0]} =~ /^[\w-\.]{1,}\@([\da-zA-Z-]{1,}\.){1,}[\da-zA-Z-]{2,3}$/i) {
@@ -596,6 +649,8 @@ The name of the form variable to retrieve.
 
 =back
 
+=cut
+
 sub yesNo {
 	if ($session{form}{$_[0]} > 0) {
 		return 1;
@@ -618,12 +673,15 @@ The name of the form variable to retrieve.
 
 =back
 
+=cut
+
 sub zipcode {
 	if ($session{form}{$_[0]} =~ /^[A-Z\d\s\-]+$/) {
 		return $session{form}{$_[0]};
 	}
 	return undef;
 }
+
 
 
 1;
