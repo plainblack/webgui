@@ -254,7 +254,10 @@ sub www_view {
 	$var{query} .= " ".join(" ",map("+".$_,split(/\s+/,$var{allWords}))) if ($var{allWords});
 	$var{query} .= qq{ $var{atLeastOne}} if ($var{atLeastOne});
 	$var{query} .= " ".join(" ",map("-".$_,split(/\s+/,$var{without}))) if ($var{without});
-
+	
+	# Remove macro's from query
+	$var{query} = WebGUI::Macro::negate($var{query});
+ 
 	# Set some standard vars
 	$var{submit} = WebGUI::Form::submit({value=>WebGUI::International::get(16, $self->get("namespace"))});
 	$var{"int.search"} = WebGUI::International::get(16,$self->get("namespace"));
