@@ -490,11 +490,12 @@ if ( grep /^FAQ$/i, @tables ){
 		my $b = WebGUI::SQL->read("select * from FAQ_question where wobjectId=".$data->{wobjectId});
 		while (my $sub = $b->hashRef) {
 			my $subId = getNextId("USS_submissionId");
-			my $forum = WebGUI::Forum->create({});
+			 my $forumId = getNextId("forumId");
+			WebGUI::SQL->write("insert into forum (forumId) values (".$forumId.")");
 			WebGUI::SQL->write("insert into USS_submission (USS_submissionId, USS_id, title, username, userId, content, 
 				dateUpdated, dateSubmitted, forumId,contentType) values ( $subId, $ussId, ".quote($sub->{question}).", 
 				".quote($data->{username}).", ".$data->{ownerId}.", ".quote($sub->{answer}).", ".$data->{lastEdited}.", 
-				".$data->{dateAdded}.", ".$forum->get("forumId").", 'html')");
+				".$data->{dateAdded}.", ".$forumId.", 'html')");
 		}
 		$b->finish;
 	}
@@ -566,11 +567,12 @@ if ( grep /^LinkList$/i, @tables ){
 		my $b = WebGUI::SQL->read("select * from LinkList_link where wobjectId=".$data->{wobjectId});
 		while (my $sub = $b->hashRef) {
 			my $subId = getNextId("USS_submissionId");
-			my $forum = WebGUI::Forum->create({});
+			 my $forumId = getNextId("forumId");
+			WebGUI::SQL->write("insert into forum (forumId) values (".$forumId.")");
 			WebGUI::SQL->write("insert into USS_submission (USS_submissionId, USS_id, title, username, userId, content, 
 				dateUpdated, dateSubmitted, forumId,contentType,userDefined1, userDefined2) values ( $subId, $ussId, ".quote($sub->{name}).", 
 				".quote($data->{username}).", ".$data->{ownerId}.", ".quote($sub->{description}).", ".$data->{lastEdited}.", 
-				".$data->{dateAdded}.", ".$forum->get("forumId").", 'html', ".quote($sub->{url}).", ".quote($sub->{newWindow}).")");
+				".$data->{dateAdded}.", ".$forumId.", 'html', ".quote($sub->{url}).", ".quote($sub->{newWindow}).")");
 		}
 		$b->finish;
 	}

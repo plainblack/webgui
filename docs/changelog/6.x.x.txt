@@ -7,6 +7,8 @@
  - bugfix [ 1038129 ] Error importing with filemanagerimport.pl
  - bugfix [ 1037605 ] Template changes not saved
  - bugfix [ 1037531 ] 6.2.6 error (and further back) 
+ - Sped up WebGUI::DateTime::time() calls.
+
 
 6.2.6
  - Fixed a GUID bug in the Site Map wobject.
