@@ -29,7 +29,7 @@ use WebGUI::Utility;
 our @ISA = qw(Exporter);
 our @EXPORT = qw(&www_viewPageTree &www_movePageUp &www_movePageDown 
         &www_cutPage &www_deletePage &www_deletePageConfirm &www_editPage 
-        &www_editPageSave &www_pastePage &www_moveTreePageUp 
+        &www_editPageSave &www_pastePage &www_moveTreePageUp &www_rearrangeWobjects
         &www_moveTreePageDown &www_moveTreePageLeft &www_moveTreePageRight);
 
 #-------------------------------------------------------------------
@@ -607,6 +607,30 @@ sub www_pastePage {
                 return WebGUI::Privilege::insufficient();
         }
 }
+
+#-------------------------------------------------------------------
+sub www_rearrangeWobjects {
+	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage($session{page}{pageId}));
+	$session{page}{styleId} = 2;
+	my @contentAreas = split(/\./,$session{form}{map});
+	my $templatePosition = 1;
+	foreach my $position (@contentAreas) {
+		my @sequence = split(",",$position);
+		my $sequenceNumber = 1;
+		foreach my $wobjectId (@sequence) {
+			$wobjectId =~ s/td(\d+)/$1/;
+			WebGUI::SQL->setRow("wobject","wobjectId",{
+				wobjectId=>$wobjectId,
+				sequenceNumber=>$sequenceNumber,
+				templatePosition=>$templatePosition
+				});
+			$sequenceNumber++;
+		}
+		$templatePosition++;
+	}
+	return $session{form}{map};
+}
+
 
 #-------------------------------------------------------------------
 sub www_viewPageTree {

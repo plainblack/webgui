@@ -119,13 +119,72 @@ while (my $template = $sth->hashRef) {
 			div.wobject {
 				border: 2px hidden;
 			}
-		</style>
+			.dragable{
+  position: relative;
+}
+.dragTrigger{
+  position: relative;
+  cursor: move;
+}
+.dragging{
+  position: relative;
+  cursor: hand;
+  z-index: 2000; 
+  background-image: url("^Extras;opaque.gif");
+}
+.draggedOverTop{
+  position: relative;
+  border: 1px dotted #aaaaaa;
+  border-top: 8px #aaaaaa dotted;
+}
+.draggedOverBottom {
+  position: relative;
+  border: 1px dotted #aaaaaa;
+  border-bottom: 8px #aaaaaa dotted;
+}
+.hidden{
+  display: none;
+}
+.blank {
+  position: relative;
+  cursor: hand;
+  background-color: white;
+}
+.blankOver {
+  position: relative;
+  cursor: hand;
+  background-color: black;
+}
+.empty {
+  position: relative;
+  padding: 25px;
+  width: 50px;
+  height: 100px;
+  background-image: url("^Extras;opaque.gif");
+}
+		</style><script language=JavaScript1.2 src="^Extras;draggable.js"></script>
 		</tmpl_if>
 		<tmpl_if session.var.adminOn> <tmpl_if page.canEdit>
 			<tmpl_var page.controls>
 		</tmpl_if> </tmpl_if>
 		'.$template->{template};
 	$template->{template} =~ s/\<tmpl_var page\.position(\d+)\>/_positionFormat6x($1)/eg; 
+	$template->{template} .= '
+<tmpl_if session.var.adminOn> 
+
+<table>
+<tr id="blank" class="hidden">
+<td>
+<div><div class="empty">&nbsp;</div></div>
+</td>
+</tr>
+</table>
+<iframe id="dragSubmitter" style="display: none;"></iframe>
+<script>
+dragable_init("^\;");
+</script>
+</tmpl_if>
+		';
 	WebGUI::SQL->write("update template set namespace='page', template=".quote($template->{template})
 		." where templateId=".$template->{templateId}." and namespace='Page'");
 }
@@ -243,7 +302,7 @@ while (my $data = $a->hashRef) {
 		my $subId = getNextId("USS_submissionId");
 		my $forum = WebGUI::Forum->create({});
 		WebGUI::SQL->write("insert into USS_submission (USS_submissionId, USS_id, title, username, userId, content, 
-			dateUpdated, dateSubmited, forumId,contentType) values ( $subId, $ussId, ".quote($sub->{question}).", 
+			dateUpdated, dateSubmitted, forumId,contentType) values ( $subId, $ussId, ".quote($sub->{question}).", 
 			".quote($data->{username}).", ".$data->{ownerId}.", ".quote($sub->{answer}).", ".$data->{lastEdited}.", 
 			".$data->{dateAdded}.", ".$forum->get("forumId").", 'html')");
 	}
@@ -309,7 +368,7 @@ while (my $data = $a->hashRef) {
 		my $subId = getNextId("USS_submissionId");
 		my $forum = WebGUI::Forum->create({});
 		WebGUI::SQL->write("insert into USS_submission (USS_submissionId, USS_id, title, username, userId, content, 
-			dateUpdated, dateSubmited, forumId,contentType,userDefined1, userDefined2) values ( $subId, $ussId, ".quote($sub->{name}).", 
+			dateUpdated, dateSubmitted, forumId,contentType,userDefined1, userDefined2) values ( $subId, $ussId, ".quote($sub->{name}).", 
 			".quote($data->{username}).", ".$data->{ownerId}.", ".quote($sub->{description}).", ".$data->{lastEdited}.", 
 			".$data->{dateAdded}.", ".$forum->get("forumId").", 'html', ".quote($sub->{url}).", ".quote($sub->{newWindow}).")");
 	}
@@ -534,11 +593,23 @@ sub _positionFormat5x {
 #-------------------------------------------------------------------
 sub _positionFormat6x {
 	my $newPositionCode = '	
+<tmpl_if session.var.adminOn> <tmpl_if page.canEdit>
+<table border=0 id="position'.$_[0].'">
+            <tbody>
+</tmpl_if> </tmpl_if>
 		<tmpl_loop position'.$_[0].'_loop>
+<tmpl_if session.var.adminOn> <tmpl_if page.canEdit>
+            <tr id="td<tmpl_var wobject.id>">
+            <td>
+            <div id="td<tmpl_var wobject.id>_div" class="dragable">      
+</tmpl_if></tmpl_if>
 			<tmpl_if wobject.canView> 
 				<div class="wobject"> <div class="wobject<tmpl_var wobject.namespace>" id="wobjectId<tmpl_var wobject.id>">
 				<tmpl_if session.var.adminOn> <tmpl_if wobject.canEdit>
 					<tmpl_var wobject.controls>
+					<tmpl_if page.canEdit>
+						<tmpl_var wobject.controls.drag>
+					</tmpl_if>
 				</tmpl_if> </tmpl_if>
 				<tmpl_if wobject.isInDateRange>
                       			<a name="<tmpl_var wobject.id>"></a>
@@ -546,7 +617,16 @@ sub _positionFormat6x {
 				</tmpl_if wobject.isInDateRange> 
 				</div> </div>
 			</tmpl_if>
+			<tmpl_if session.var.adminOn> <tmpl_if page.canEdit>
+         </div>
+                </td>
+            </tr>
+</tmpl_if></tmpl_if>
 		</tmpl_loop>
+		<tmpl_if session.var.adminOn> 
+            </tbody>
+        </table>
+</tmpl_if>
 	';
 	return $newPositionCode;
 }

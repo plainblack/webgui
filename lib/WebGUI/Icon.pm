@@ -22,7 +22,7 @@ use WebGUI::URL;
 our @ISA = qw(Exporter);
 our @EXPORT = qw(&helpIcon &becomeIcon &cutIcon &copyIcon &deleteIcon &editIcon
 	&moveBottomIcon &moveDownIcon &moveLeftIcon &moveRightIcon &moveTopIcon &moveUpIcon
-	&pageIcon &shortcutIcon &pasteIcon &wobjectIcon &viewIcon);
+	&pageIcon &dragIcon &shortcutIcon &pasteIcon &wobjectIcon &viewIcon);
 
 =head1 NAME
 
@@ -38,6 +38,7 @@ A package for generating user interface buttons. The subroutines found herein do
  $html = copyIcon('op=something');
  $html = cutIcon('op=something');
  $html = deleteIcon('op=something');
+ $html = dragIcon();
  $html = editIcon('op=something');
  $html = helpIcon(1,"MyNamespace");
  $html = moveBottomIcon('op=something');
@@ -118,7 +119,7 @@ sub cutIcon {
 
 =head2 deleteIcon ( urlParameters [, pageURL ] )
 
-Generates a button with an "X" printed on it.
+Generates a button that represents a delete operation.
 
 =over
 
@@ -140,6 +141,18 @@ sub deleteIcon {
         $output = '<a href="'.WebGUI::URL::gateway($pageURL,$_[0]).'">';
 	$output .= '<img src="'.$session{config}{extrasURL}.'/toolbar/'.$session{language}{toolbar}.'/delete.gif" align="middle" border="0" alt="Delete" title="Delete" /></a>';
 	return $output;
+}
+
+#-------------------------------------------------------------------
+
+=head2 dragIcon ( )
+
+Generates an icon that can be used to drag content.
+
+=cut
+
+sub dragIcon {
+        return '<img id="dragTrigger" class="dragTrigger" src="'.$session{config}{extrasURL}.'/toolbar/'.$session{language}{toolbar}.'/drag.gif" align="middle" border="0" alt="Drag" title="Drag" />';
 }
 
 #-------------------------------------------------------------------
@@ -471,7 +484,7 @@ Generates an icon that looks like a wobject. It's purpose is to represent whethe
 =cut
 
 sub wobjectIcon {
-        return '<img  class="dragTrigger" src="'.$session{config}{extrasURL}.'/toolbar/'.$session{language}{toolbar}.'/wobject.gif" align="middle" border="0" alt="Wobject Settings" title="Wobject Settings" />';
+        return '<img src="'.$session{config}{extrasURL}.'/toolbar/'.$session{language}{toolbar}.'/wobject.gif" align="middle" border="0" alt="Wobject Settings" title="Wobject Settings" />';
 }
 
 
