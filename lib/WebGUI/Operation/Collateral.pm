@@ -34,7 +34,6 @@ our @EXPORT = qw(&www_editCollateral &www_editCollateralSave &www_deleteCollater
 
 #-------------------------------------------------------------------
 sub _submenu {
-	return WebGUI::Privilege::insufficient unless (WebGUI::Privilege::isInGroup(4));
 	my (%menu);
 	tie %menu, 'Tie::IxHash';
 	$menu{WebGUI::URL::page('op=editCollateralFolder&fid=new')} = WebGUI::International::get(758);
