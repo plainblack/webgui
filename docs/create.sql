@@ -969,6 +969,7 @@ CREATE TABLE forum (
   threadTemplateId int(11) NOT NULL default '1',
   postTemplateId int(11) NOT NULL default '1',
   postformTemplateId int(11) NOT NULL default '1',
+  postPreviewTemplateId int(11) NOT NULL default '1',
   notificationTemplateId int(11) NOT NULL default '1',
   searchTemplateId int(11) NOT NULL default '1',
   archiveAfter int(11) NOT NULL default '31536000',
@@ -976,6 +977,7 @@ CREATE TABLE forum (
   threadsPerPage int(11) NOT NULL default '30',
   masterForumId int(11) default NULL,
   groupToView int(11) NOT NULL default '7',
+  usePreview int(11) NOT NULL default '1',
   PRIMARY KEY  (forumId)
 ) TYPE=MyISAM;
 
@@ -1656,6 +1658,7 @@ INSERT INTO template VALUES (1,'Default Homelink','<a class=\"homeLink\" href=\"
 INSERT INTO template VALUES (1,'Default Make Printable','<a class=\"makePrintableLink\" href=\"<tmpl_var printable.url>\"><tmpl_var printable.text></a>','Macro/r_printable',1,1);
 INSERT INTO template VALUES (1,'Default LoginToggle','<a class=\"loginToggleLink\" href=\"<tmpl_var toggle.url>\"><tmpl_var toggle.text></a>','Macro/LoginToggle',1,1);
 INSERT INTO template VALUES (1,'Attachment Box','<p>\r\n  <table cellpadding=3 cellspacing=0 border=1>\r\n  <tr>   \r\n    <td class=\"tableHeader\">\r\n<a href=\"<tmpl_var attachment.url>\"><img src=\"<tmpl_var session.config.extrasURL>/attachment.gif\" border=\"0\" alt=\"<tmpl_var attachment.name>\"></a></td><td>\r\n<a href=\"<tmpl_var attachment.url>\"><img src=\"<tmpl_var attachment.icon>\" align=\"middle\" width=\"16\" height=\"16\" border=\"0\" alt=\"<tmpl_var attachment.name>\"><tmpl_var attachment.name></a>\r\n    </td>\r\n  </tr>\r\n  </table>\r\n</p>\r\n','AttachmentBox',1,1);
+INSERT INTO TEMPLATE VALUES (1,'Default Post Preview','<h2><tmpl_var newpost.header></h2>\n\n<h1><tmpl_var post.subject></h1>\n\n<table width=\"100%\">\n<tr>\n<td class=\"content\" valign=\"top\">\n<tmpl_var post.message>\n</td>\n</tr>\n</table>\n\n<tmpl_var form.begin>\n<input type=\"button\" value=\"cancel\" onclick=\"window.history.go(-1)\"><tmpl_var form.submit>\n<tmpl_var form.end>\n','Forum/PostPreview',1,1);
 
 --
 -- Table structure for table `theme`

@@ -267,3 +267,6 @@ create table urls (
 );
 
 alter table page drop column id;
+alter table forum add postPreviewTemplateId varchar(22) NULL after postformTemplateId;
+alter table forum add usePreview int(11) NOT NULL default 1;
+INSERT INTO TEMPLATE VALUES (1,'Default Post Preview','<h2><tmpl_var newpost.header></h2>\n\n<h1><tmpl_var post.subject></h1>\n\n<table width=\"100%\">\n<tr>\n<td class=\"content\" valign=\"top\">\n<tmpl_var post.message>\n</td>\n</tr>\n</table>\n\n<tmpl_var form.begin>\n<input type=\"button\" value=\"cancel\" onclick=\"window.history.go(-1)\"><tmpl_var form.submit>\n<tmpl_var form.end>\n','Forum/PostPreview',1,1);
