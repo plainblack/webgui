@@ -39,6 +39,7 @@ Package to manipulate WebGUI storage nodes. The nodes system is a two-tiered fil
  $node->getPath;
  $node->getURL;
  $node->tar($filename);
+ $node->untar($filename);
 
 =head1 METHODS
 
@@ -172,13 +173,13 @@ sub new {
 
 =head2 tar ( filename [ , node1, node2 ] )
 
-Archives this node into a tar file.
+Archives this node into a tar file and then compresses it with a zlib algorithm.
 
 =over
 
 =item filename
 
-The name of the tar file to be created. Should ideally end with ".tar".
+The name of the tar file to be created. Should ideally end with ".tar.gz".
 
 =item node1
 
@@ -194,15 +195,50 @@ If you need a second level node to store the file, then specify it here.
 
 sub tar {
 	my $self = $_[0];
-	my $filename = $_[1] || $self->{_node1}."_".$self->{_node2}.".tar";
+	my $filename = $_[1] || $self->{_node1}."_".$self->{_node2}.".tar.gz";
 	my $node1 = $_[2] || "temp";
 	my $node2 = $_[3];
 	chdir $self->getPath;
-	my $tar = Archive::Tar->new;
-	$tar->add_files($_[0]->getFiles);
 	my $temp = WebGUI::Node->new($node1,$node2);
-	$tar->write($temp->getPath.$session{os}{slash}.$filename);
+	$temp->create;
+	Archive::Tar->create_archive($temp->getPath.$session{os}{slash}.$filename,1,$_[0]->getFiles);
 }
+
+#-------------------------------------------------------------------
+
+=head2 untar ( filename [ , node1, node2 ] )
+
+Unarchives a file into this node.
+
+=over
+
+=item filename
+
+The name of the tar file to be untarred.
+
+=item node1
+
+The node where the tar file exists. Defaults to "temp".
+
+=item node2
+
+If the file exists in a sub-node, then specifiy it here.
+
+=back
+
+=cut
+
+sub untar {
+        my $self = $_[0];
+	$self->create;
+        my $filename = $_[1];
+        my $node1 = $_[2] || "temp";
+        my $node2 = $_[3];
+        chdir $self->getPath;
+	my $temp = WebGUI::Node->new($node1,$node2);
+	Archive::Tar->extract_archive($temp->getPath.$session{os}{slash}.$filename,1);
+}
+
 
 1;
 
