@@ -350,9 +350,9 @@ A template loop containing the items that were checked out. The following templa
 		lastUpdated => 0,
 		context => q|The body of the help page of the checkout error template.|
 	},
-	'help checkout error template body' => {
+	'help checkout error template title' => {
 		message => q|Checkout error template|,
-		lastUpdated => 0,
+		lastUpdated => 1101791348,
 		context => q|The title of the help page of the checkout error template.|
 	},
 };
