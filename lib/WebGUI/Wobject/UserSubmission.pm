@@ -572,7 +572,7 @@ sub www_search {
         		$output .= '</td><td class="tableHeader">'.WebGUI::International::get(13,$namespace).
                 		'</td><td class="tableHeader">'.WebGUI::International::get(21,$namespace).'</td></tr>';
                 	$sql = "select * from UserSubmission_submission where wobjectId=$session{form}{wid} ";
-                	$sql .= " and ".$constraints." order by dateSubmitted desc";
+                	$sql .= " and (status='Approved' or userId=$session{user}{userId}) and ".$constraints." order by dateSubmitted desc";
                 	$sth = WebGUI::SQL->read($sql);
                 	while (%submission = $sth->hash) {
 				$submission{title} = WebGUI::HTML::filter($submission{title},'all');
@@ -596,6 +596,7 @@ sub www_search {
                 		$row[$i] .= '<td class="tableData">'.epochToHuman($submission{dateSubmitted},"%z").
                         		'</td><td class="tableData"><a href="'.WebGUI::URL::page('op=viewProfile&uid='.
                         		$submission{userId}).'">'.$submission{username}.'</a></td></tr>';
+				$i++;
                 	}
                 	$sth->finish;
                 	$p = WebGUI::Paginator->new($url,\@row,$session{form}{numResults});
