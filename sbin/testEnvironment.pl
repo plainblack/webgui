@@ -161,12 +161,23 @@ if (eval { require Date::Calc }) {
         }
 }
 
-print "Cache::FileCache module (optional) ....... ";
+print "Cache::FileCache module (optional*) ...... ";
 if (eval { require Cache::FileCache }) {
         print "OK\n";
 } else {
         print "Not installed. Caching not possible.\n";
 }
+
+print <<STOP;
+
+* Please note that Cache::FileCache is not
+  optional in all environments (such as Mac 
+  OS X). Also note, that Cache::FileCache
+  is not available for Windows style
+  environments due to limitations on those
+  systems.
+
+STOP
 
 print "Image::Magick module (optional) .......... ";
 if (eval { require Image::Magick }) {
