@@ -49,7 +49,7 @@ sub www_copyStyle {
 	%style = WebGUI::SQL->quickHash("select * from style where styleId=$session{form}{sid}");
         WebGUI::SQL->write("insert into style (styleId,name,body,styleSheet) values (".getNextId("styleId").", 
 		".quote('Copy of '.$style{name}).", ".quote($style{body}).", ".quote($style{styleSheet}).")");
-        return _submenu(www_listStyles());
+        return www_listStyles();
 }
 
 #-------------------------------------------------------------------
