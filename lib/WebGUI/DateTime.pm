@@ -407,7 +407,7 @@ An integer which represents the amount of time for the interval.
 
 =item units
 
-A string which represents the units of the interval. The string must be 'years', 'months', 'days', 'hours', 'minutes', or 'seconds'. 
+A string which represents the units of the interval. The string must be 'years', 'months', 'weeks', 'days', 'hours', 'minutes', or 'seconds'. 
 
 =back
 

@@ -83,7 +83,7 @@ sub addGroupsToGroups {
 
 #-------------------------------------------------------------------
 
-=head2 addUsersToGroups ( users, groups )
+=head2 addUsersToGroups ( users, groups [, expireOffset ] )
 
 Adds users to the specified groups.
 
@@ -97,13 +97,22 @@ An array reference containing a list of users.
 
 An array reference containing a list of groups.
 
+=item expireOffset
+
+An override for the default offset of the grouping. Specified in seconds.
+
 =back
 
 =cut
 
 sub addUsersToGroups {
         foreach my $gid (@{$_[1]}) {
-        	my ($expireOffset) = WebGUI::SQL->quickArray("select expireOffset from groups where groupId=$gid");
+		my $expireOffset;
+		if ($_[2]) {
+			$expireOffset = $_[2];
+		} else { 
+        		($expireOffset) = WebGUI::SQL->quickArray("select expireOffset from groups where groupId=$gid");
+		}
 		foreach my $uid (@{$_[0]}) {
 			my ($isIn) = WebGUI::SQL->quickArray("select count(*) from groupings where groupId=$gid and userId=$uid");
 			unless ($isIn) {

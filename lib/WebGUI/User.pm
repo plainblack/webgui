@@ -65,7 +65,7 @@ sub _create {
 
 #-------------------------------------------------------------------
 
-=head2 addToGroups ( groups )
+=head2 addToGroups ( groups [, expireOffset ] )
 
 Adds this user to the specified groups.
 
@@ -75,12 +75,16 @@ Adds this user to the specified groups.
 
 An array reference containing a list of groups.
 
+=item expireOffset
+
+An override for the default offset of the grouping. Specified in seconds.
+
 =back
 
 =cut
 
 sub addToGroups {
-	WebGUI::Grouping::addUsersToGroups([$_[0]->{_userId}],$_[1]);
+	WebGUI::Grouping::addUsersToGroups([$_[0]->{_userId}],$_[1],$_[2]);
 }
 
 #-------------------------------------------------------------------

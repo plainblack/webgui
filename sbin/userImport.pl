@@ -18,6 +18,7 @@ BEGIN {
 use Digest::MD5;
 use Getopt::Long;
 use strict;
+use WebGUI::DateTime;
 use WebGUI::Grouping;
 use WebGUI::Session;
 use WebGUI::SQL;
@@ -35,6 +36,8 @@ my $authMethod = 'WebGUI';
 my $groups;
 my $ldapUrl;
 my $status = 'Active';
+my $expireOffset;
+my $expireUnits = 'seconds';
 
 GetOptions(
 	'usersfile=s'=>\$usersFile,
@@ -45,7 +48,9 @@ GetOptions(
 	'password|identifier:s'=>\$defaultIdentifier,
 	'groups:s'=>\$groups,
 	'ldapUrl:s'=>\$ldapUrl,
-	'status:s'=>\$status
+	'status:s'=>\$status,
+	'expireOffset:i'=>\$expireOffset,
+	'expireUnits:s'=>\$expireUnits
 );
 
 
@@ -71,6 +76,20 @@ Options:
 
 	--delimiter	The string that separates each field in the
 			import file. Defaults to tab.
+
+	--expireOffset	The the amount of time before the user will
+			be expired from the groups they are added
+			to. Defaults to the expire offset set in
+			the group definition within WebGUI. May be
+			overridden in the import file.
+
+	--expireUnits	Valid values are "seconds", "minutes",
+			"hours", "days", "weeks", "months", "years",
+			or "epoch". Defaults to "seconds". This is 
+			the units of the expire offset. If set to
+			"epoch" the system will assume that the
+			expire offset is an epoch date rather than
+			an interval.
 
 	--groups	A comma separated list of group ids that
 			each user in the import file will be set
@@ -102,7 +121,7 @@ User File Format:
 	-Valid field names:
 	
 		username password authMethod status
-		ldapUrl connectDN groups
+		ldapUrl connectDN groups expireOffset
 
 	-In addition to the field names above, you may use any 
 	valid profile field name.
@@ -172,6 +191,8 @@ while(<FILE>) {
 		$user{authMethod} = $authMethod if ($user{authMethod} eq "");
 		$user{groups} = $groups if ($user{groups} eq "");
 		$user{status} = $status if ($user{status} eq "");
+		$user{expireOffset} = $expireOffset if ($user{expireOffset} eq "");
+		$user{expireOffset} = calculateExpireOffset($user{expireOffset},$expireUnits);
 
 		# process user
 		my ($duplicate) = WebGUI::SQL->quickArray("select count(*) from users where username=".quote($user{username}));
@@ -197,7 +218,7 @@ while(<FILE>) {
 			}
 			if ($user{groups} ne "") {
 				my @groups = split(/,/,$user{groups});
-				$u->addToGroups(\@groups);
+				$u->addToGroups(\@groups,$user{expireOffset});
 			}
   		}
 	}
@@ -208,6 +229,20 @@ WebGUI::Session::close();
 print "OK\n";
 
 
-
-
+#-------------------------------------------------
+# calculateExpireOffset(expireOffset,expireUnits)
+# return: offsetInSeconds
+sub calculateExpireOffset {
+	my ($offset, $units) = @_;
+	return undef if ($offset < 1);
+	if ($units eq "epoch") {
+		my $seconds = (WebGUI::DateTime::time() - $offset);
+		if ($seconds < 1) {
+			return undef;
+		} else {
+			return $seconds;
+		}
+	}
+	return WebGUI::DateTime::intervalToSeconds($offset, $units)
+}
 
