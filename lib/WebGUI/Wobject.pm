@@ -1303,7 +1303,7 @@ sub www_editSave {
 	foreach my $key (keys %{$_[0]->{_wobjectProperties}}) {
 		if (exists $session{form}{$key}) {
 			$set{$key} = _validateField($key,$_[0]->{_wobjectProperties}{$key}{fieldType});
-		} else {
+		} elsif (exists $_[0]->{_wobjectProperties}{$key}{defaultValue}) {
 			$set{$key} = $_[0]->{_wobjectProperties}{$key}{defaultValue};
 		}
 	}
@@ -1311,7 +1311,7 @@ sub www_editSave {
 	foreach my $key (keys %{$_[0]->{_extendedProperties}}) {
 		if (exists $session{form}{$key}) {	
 			$set{$key} = _validateField($key,$_[0]->{_extendedProperties}{$key}{fieldType});
-		} else {
+		} elsif (exists $_[0]->{_extendedProperties}{$key}{defaultValue}) {
 			$set{$key} = $_[0]->{_extendedProperties}{$key}{defaultValue};
 		}
 	}
