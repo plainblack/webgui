@@ -226,6 +226,11 @@ sub duplicate {
 		});
 	$w->set({
 		pageId => $pageId,
+		userDefined1 => $_[0]->get("userDefined1"),
+		userDefined2 => $_[0]->get("userDefined2"),
+		userDefined3 => $_[0]->get("userDefined3"),
+		userDefined4 => $_[0]->get("userDefined4"),
+		userDefined5 => $_[0]->get("userDefined5"),
 		title => $_[0]->get("title"),
 		description => $_[0]->get("description"),
 		displayTitle => $_[0]->get("displayTitle"),
@@ -512,7 +517,7 @@ sub set {
 	$sql = "update wobject set";
 	foreach $key (keys %{$_[1]}) {
 		$_[0]->{_property}{$key} = ${$_[1]}{$key};
-		if (isIn($key, qw(moderationType groupToModerate groupToPost karmaPerPost editTimeout title displayTitle description processMacros pageId templatePosition startDate endDate sequenceNumber))) {
+		if (isIn($key, qw(userDefined1 userDefined2 userDefined3 userDefined4 userDefined5 moderationType groupToModerate groupToPost karmaPerPost editTimeout title displayTitle description processMacros pageId templatePosition startDate endDate sequenceNumber))) {
         		$sql .= " ".$key."=".quote(${$_[1]}{$key}).",";
 		}
                 if (isIn($key, @{$_[2]})) {
