@@ -111,7 +111,8 @@ sub www_viewLoginHistory {
 #-------------------------------------------------------------------
 sub www_viewPageReport {
         return WebGUI::Privilege::adminOnly() unless (WebGUI::Privilege::isInGroup(3));
-	my ($output, $count, $user, $data, $sth, $page, $pageId);
+	my ($output, $count, $user, $data, $sth, %page, $pageId);
+	tie %page, "Tie::IxHash";
 	$output = '<h1>Page Statistics</h1>';
 	unless ($session{setting}{trackPageStatistics}) {
 		$output .= WebGUI::International::get(802);
@@ -124,10 +125,10 @@ sub www_viewPageReport {
 			} else {
 				$user = $data->{userId};
 			}
-			$page->{$data->{pageId}}{pageTitle} = $data->{pageTitle};
-			$page->{$data->{pageId}}{users}{$user}++;
-			$page->{$data->{pageId}}{views}++;
-			$page->{$data->{pageId}}{interact}++ if ($data->{wobjectId});
+			$page{$data->{pageId}}{pageTitle} = $data->{pageTitle};
+			$page{$data->{pageId}}{users}{$user}++;
+			$page{$data->{pageId}}{views}++;
+			$page{$data->{pageId}}{interact}++ if ($data->{wobjectId});
 		}
 		$sth->finish;
 		$output .= '<table width="100%" cellpadding="3" cellspacing="0" border="1">
@@ -135,15 +136,15 @@ sub www_viewPageReport {
 			<td class="tableHeader">'.WebGUI::International::get(799).'</td>
 			<td class="tableHeader">'.WebGUI::International::get(800).'</td>
 			<td class="tableHeader">'.WebGUI::International::get(801).'</td></tr>';
-		foreach $pageId (keys %{$page}) {
-			$output .= '<tr><td class="tableData">'.$page->{$pageId}{pageTitle}.'</td>';
-			$output .= '<td class="tableData">'.$page->{$pageId}{views}.'</td>';
+		foreach $pageId (keys %page) {
+			$output .= '<tr><td class="tableData">'.$page{$pageId}{pageTitle}.'</td>';
+			$output .= '<td class="tableData">'.$page{$pageId}{views}.'</td>';
 			$count = 0;
-			foreach (keys %{$page->{$pageId}{users}}) {
+			foreach (keys %{$page{$pageId}{users}}) {
 				$count++;
 			}
 			$output .= '<td class="tableData">'.$count.'</td>';
-			$output .= '<td class="tableData">'.$page->{$pageId}{interact}.'</td></tr>';
+			$output .= '<td class="tableData">'.$page{$pageId}{interact}.'</td></tr>';
 		}
 		$output .= '</table>';
 	}
