@@ -10,8 +10,15 @@ package WebGUI::Operation::WebGUI;
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
+use Digest::MD5;
 use strict;
+use WebGUI::FormProcessor;
+use WebGUI::HTMLForm;
+use WebGUI::HTTP;
 use WebGUI::Session;
+use WebGUI::SQL;
+use WebGUI::Style;
+use WebGUI::User;
 
 #-------------------------------------------------------------------
 sub www_genesis {
@@ -30,6 +37,100 @@ sub www_genesis {
 	</body></html>';
 	return $output;
 }
+
+#-------------------------------------------------------------------
+sub www_setup {
+	unless ($session{setting}{specialState} eq "init") {
+		if (rand(10)>5) {
+			return www_genesis();
+		} else {
+			return www_theWg();
+		}
+	}
+	my $output = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+	<head>
+		<title>WebGUI Initial Configuration</title>
+	</head>
+	<body><div style="font-family: georgia, helvetica, arial, sans-serif; color: white; z-index: 10; width: 550px; height: 400px; top: 20%; left: 20%; position: absolute;"><h1>WebGUI Initial Configuration</h1><fieldset>';
+	if ($session{form}{step} eq "2") {
+		$output .= '<legend align="left">Company Information</legend>';
+		my $u = WebGUI::User->new("3");
+		$u->username(WebGUI::FormProcessor::process("username","text","Admin"));
+		$u->profileField("email",WebGUI::FormProcessor::email("email"));
+		$u->identifier(Digest::MD5::md5_base64(WebGUI::FormProcessor::process("identifier","password","123qwe")));
+		my $f = WebGUI::HTMLForm->new;
+		$f->hidden(
+			-name=>"op",
+			-value=>"setup"
+			);
+		$f->hidden(
+			-name=>"step",
+			-value=>"3"
+			);
+		$f->text(
+			-name=>"companyName",
+			-value=>$session{setting}{companyName},
+			-label=>"Company Name"
+			);
+		$f->email(
+			-name=>"companyEmail",
+			-value=>$session{setting}{companyEmail},
+			-label=>"Company Email Address"
+			);
+		$f->url(
+			-name=>"companyURL",
+			-value=>$session{setting}{companyURL},
+			-label=>"Company URL"
+			);
+		$f->submit;
+		$output .= $f->print;
+	} elsif ($session{form}{step} eq "3") {
+		WebGUI::SQL->write("update settings set value=".quote(WebGUI::FormProcessor::text("companyName"))." where name='companyName'");
+		WebGUI::SQL->write("update settings set value=".quote(WebGUI::FormProcessor::url("companyURL"))." where name='companyURL'");
+		WebGUI::SQL->write("update settings set value=".quote(WebGUI::FormProcessor::email("companyEmail"))." where name='companyEmail'");
+		WebGUI::SQL->write("delete from settings where name='specialState'");
+		WebGUI::HTTP::setRedirect($session{env}{SCRIPT_NAME});
+		return "";
+	} else {
+		$output .= '<legend align="left">Admin Account</legend>';
+		my $u = WebGUI::User->new('3');
+		my $f = WebGUI::HTMLForm->new;
+		$f->hidden(
+			-name=>"op",
+			-value=>"setup"
+			);
+		$f->hidden(
+			-name=>"step",
+			-value=>"2"
+			);
+		$f->text(
+			-name=>"username",
+			-value=>$u->username,
+			-label=>"Username"
+			);
+		$f->text(
+			-name=>"identifier",
+			-value=>"123qwe",
+			-label=>"Password",
+			-subtext=>'<div style=\"font-size: 10px;\">(Displayed in clear text so you can ensure you\'ve typed it correctly.)</div>'
+			);
+		$f->email(
+			-name=>"email",
+			-value=>$u->profileField("email"),
+			-label=>"Email Address"
+			);
+		$f->submit;
+		$output .= $f->print; 
+	}
+	$output .= '</fieldset></div>
+		<img src="'.$session{config}{extrasURL}.'/background.jpg" border="0" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 5;" />
+	</body>
+</html>';
+	return $output;
+}
+
 
 #-------------------------------------------------------------------
 sub www_theWg {

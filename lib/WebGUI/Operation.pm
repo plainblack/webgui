@@ -177,6 +177,7 @@ sub getOperations {
           'editUser' => 'WebGUI::Operation::User',
           'editUserSave' => 'WebGUI::Operation::User',
           'listUsers' => 'WebGUI::Operation::User',
+          'setup' => 'WebGUI::Operation::WebGUI',
           'theWg' => 'WebGUI::Operation::WebGUI',
           'genesis' => 'WebGUI::Operation::WebGUI',
 	  'deleteSubscription' => 'WebGUI::Operation::Subscription',

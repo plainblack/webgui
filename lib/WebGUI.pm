@@ -1,5 +1,5 @@
 package WebGUI;
-our $VERSION = "6.3.0";
+our $VERSION = "6.4.0";
 our $STATUS = "beta";
 
 #-------------------------------------------------------------------
@@ -54,6 +54,15 @@ sub _processOperations {
 }
 
 #-------------------------------------------------------------------
+sub _setup {
+	require WebGUI::Operation::WebGUI;
+	my $output = WebGUI::Operation::WebGUI::www_setup();
+        $output = WebGUI::HTTP::getHeader().$output;
+	WebGUI::Session::close();
+	return $output;
+}
+
+#-------------------------------------------------------------------
 sub _upgrading {
 	my $webguiRoot = shift;
         my $output = WebGUI::HTTP::getHeader();
@@ -76,6 +85,7 @@ sub page {
 	my $fastcgi = shift;
 	WebGUI::Session::open($webguiRoot,$configFile,$fastcgi) unless ($useExistingSession);
 	return _upgrading($webguiRoot) if ($session{setting}{specialState} eq "upgrading");
+	return _setup() if ($session{setting}{specialState} eq "init");
 	my $output = _processOperations();
 	if ($output eq "") {
 		my $asset = WebGUI::Asset->newByUrl($assetUrl);

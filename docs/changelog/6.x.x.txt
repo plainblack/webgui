@@ -4,6 +4,8 @@
  - Fixed resetting votes on Poll would crash it.
  - Fixed not being able to set display title and other yes no questions to no.
  - Fixed a bug where URLs would become unreachable when using SSL.
+ - Added an initial configuration wizard which prompts the site owner to
+   configure a custom admin username and password for better security.
 
 
 6.3.0
