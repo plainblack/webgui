@@ -48,7 +48,7 @@ sub _getSessionVars {
         if ($_[0] ne "") {
         	%vars = WebGUI::SQL->quickHash("select * from session where sessionId='$_[0]'", $_[1]);
 		if ($vars{sessionId} ne "") {
-			WebGUI::SQL->write("update session set lastPageView=now(), expires=date_add(now(),interval $_[2] second) where sessionId='$_[0]'",$_[1]);
+			WebGUI::SQL->write("update session set lastPageView=now(), lastIP='$ENV{REMOTE_ADDR}', expires=date_add(now(),interval $_[2] second) where sessionId='$_[0]'",$_[1]);
 		}
 	}
         return %vars;
@@ -94,7 +94,7 @@ sub httpRedirect {
 #-------------------------------------------------------------------
 sub open {
         my ($key, %WebGUI, %CONFIG, %VARS, %PAGE, %FORM, $query, %COOKIES, $config, %USER, %SETTINGS, $dbh);
-	%WebGUI = (version=>"0.10.0", date=>"2001-08-17");
+	%WebGUI = (version=>"0.11.0", date=>"2001-08-22");
         $config = new WebGUI::Config '../etc/WebGUI.conf';
         foreach ($config->param) {
                 $CONFIG{$_} = $config->param($_);

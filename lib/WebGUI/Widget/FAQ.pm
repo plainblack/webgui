@@ -240,7 +240,7 @@ sub www_view {
 		$sth = WebGUI::SQL->read("select questionId,question,answer from faqQuestion where widgetId='$widgetId' order by sequenceNumber",$session{dbh});
 		while (@question = $sth->array) {
 			$output .= '<li><a href="#'.$question[0].'">'.$question[1].'</a>';
-			$qNa .= '<span class="faqQuestion"><a name="'.$question[0].'">'.$question[1].'</a></span><br>'.$question[2].'<p>';
+			$qNa .= '<a name="'.$question[0].'"><span class="faqQuestion">'.$question[1].'</span></a><br>'.$question[2].'<p>';
 		}
 		$sth->finish;
 		$output .= '</ul>'.$qNa;

@@ -29,6 +29,30 @@ sub _recurseCrumbTrail {
 }
 
 #-------------------------------------------------------------------
+sub _traversePageTree {
+        my ($sth, @data, $output, $depth, $i, $toLevel);
+	if ($_[2] > 0) {
+		$toLevel = $_[2];
+	} else {
+		$toLevel = 99;
+	}
+        for ($i=0;$i<=$_[1];$i++) {
+                $depth .= "&nbsp;&nbsp;";
+        }
+	if ($_[1] < $toLevel) {
+        	$sth = WebGUI::SQL->read("select urlizedTitle, title, pageId from page where parentId='$_[0]' order by sequenceNumber",$session{dbh});
+        	while (@data = $sth->array) {
+                	if (WebGUI::Privilege::canViewPage($data[2])) {
+                        	$output .= $depth.'<a href="'.$session{env}{SCRIPT_NAME}.'/'.$data[0].'">'.$data[1].'</a><br>';
+                        	$output .= _traversePageTree($data[2],$_[1]+1,$_[2]);
+                	}
+        	}
+        	$sth->finish;
+	}
+        return $output;
+}
+
+#-------------------------------------------------------------------
 sub process {
 	my ($output, $temp, @data, $sth, $first);
 	$output = $_[0];
@@ -38,7 +62,7 @@ sub process {
         }
   #---page url---
         if ($output =~ /\^\//) {
-                $output =~ s/\^\//\$session{env}{SCRIPT_NAME}/g;
+                $output =~ s/\^\//$session{env}{SCRIPT_NAME}/g;
         }
   #---username---
         if ($output =~ /\^\@/) {
@@ -46,7 +70,7 @@ sub process {
         }
   #---uid---
         if ($output =~ /\^\#/) {
-                $output =~ s/\^\#/$session{page}{userId}/g;
+                $output =~ s/\^\#/$session{user}{userId}/g;
         }
   #---random number---
         if ($output =~ /\^\*/) {
@@ -75,6 +99,21 @@ sub process {
   #---company email---
         if ($output =~ /\^e/) {
                 $output =~ s/\^e/$session{setting}{companyEmail}/g;
+        }
+  #---full menu (vertical)---
+        if ($output =~ /\^f/) {
+        	$temp = _traversePageTree(1,0);
+                $output =~ s/\^f/$temp/g;
+	}
+  #---2 level menu (vertical)---
+        if ($output =~ /\^F/) {
+        	$temp = _traversePageTree(1,0,2);
+                $output =~ s/\^F/$temp/g;
+        }
+  #---3 level menu (vertical)---
+        if ($output =~ /\^h/) {
+        	$temp = _traversePageTree(1,0,3);
+                $output =~ s/\^h/$temp/g;
         }
   #---home link---
 	if ($output =~ /\^H/) {

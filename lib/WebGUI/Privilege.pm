@@ -53,7 +53,7 @@ sub canViewPage {
 
 #-------------------------------------------------------------------
 sub insufficient {
-	return '<h1>Permission Denied!</h1>You do not have sufficient privileges to perform this operation. Please log in with an account that has sufficient privileges before attempting this operation.<p>';
+	return '<h1>Permission Denied!</h1>You do not have sufficient privileges to perform this operation. Please <a href="'.$session{page}{url}.'?op=displayLogin">log in with an account</a> that has sufficient privileges before attempting this operation.<p>';
 }
 
 #-------------------------------------------------------------------
@@ -64,6 +64,9 @@ sub isInGroup {
 		$uid = $session{user}{userId};
 	}
 	($result) = WebGUI::SQL->quickArray("select count(*) from groupings where groupId='$gid' && userId='$uid'",$session{dbh});
+	if ($result < 1 && $gid == 1) { 	# registered users can 
+		isInGroup(2, $uid); 		# do anything visitors
+	}					# can do
 	return $result;
 }
 

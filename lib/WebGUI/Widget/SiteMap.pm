@@ -43,12 +43,12 @@ sub widgetName {
 sub www_add {
         my ($output);
       	if (WebGUI::Privilege::canEditPage()) {
-                $output = '<h1>Add Site Map</h1><form method="post" enctype="multipart/form-data" action="'.$session{page}{url}.'">';
+                $output = '<a href="'.$session{page}{url}.'?op=viewHelp&hid=30"><img src="'.$session{setting}{lib}.'/help.gif" border="0" align="right"></a><h1>Add Site Map</h1><form method="post" enctype="multipart/form-data" action="'.$session{page}{url}.'">';
                 $output .= WebGUI::Form::hidden("widget","SiteMap");
                 $output .= WebGUI::Form::hidden("func","addSave");
                 $output .= '<table>';
                 $output .= '<tr><td class="formDescription">Title</td><td>'.WebGUI::Form::text("title",20,30).'</td></tr>';
-                $output .= '<tr><td class="formDescription">Disply title?</td><td>'.WebGUI::Form::checkbox("displayTitle",1).'</td></tr>';
+                $output .= '<tr><td class="formDescription">Display title?</td><td>'.WebGUI::Form::checkbox("displayTitle",1).'</td></tr>';
                 $output .= '<tr><td class="formDescription">Description</td><td>'.WebGUI::Form::textArea("description",'').'</td></tr>';
                 $output .= '<tr><td class="formDescription">Starting from this level?</td><td>'.WebGUI::Form::checkbox("startAtThisLevel",1,1).'</td></tr>';
                 $output .= '<tr><td class="formDescription">Show only one level?</td><td>'.WebGUI::Form::checkbox("showOnlyThisLevel",1,1).'</td></tr>';
@@ -78,12 +78,12 @@ sub www_edit {
         my ($output, %data);
         if (WebGUI::Privilege::canEditPage()) {
 		%data = WebGUI::SQL->quickHash("select * from widget,SiteMap where widget.widgetId=SiteMap.widgetId and widget.widgetId=$session{form}{wid}",$session{dbh});
-                $output = '<h1>Edit Site Map</h1><form method="post" action="'.$session{page}{url}.'">';
+                $output = '<a href="'.$session{page}{url}.'?op=viewHelp&hid=31"><img src="'.$session{setting}{lib}.'/help.gif" border="0" align="right"></a><h1>Edit Site Map</h1><form method="post" action="'.$session{page}{url}.'">';
                 $output .= WebGUI::Form::hidden("wid",$session{form}{wid});
                 $output .= WebGUI::Form::hidden("func","editSave");
                 $output .= '<table>';
                 $output .= '<tr><td class="formDescription">Title</td><td>'.WebGUI::Form::text("title",20,30,$data{title}).'</td></tr>';
-                $output .= '<tr><td class="formDescription">Disply title?</td><td>'.WebGUI::Form::checkbox("displayTitle",1,$data{displayTitle}).'</td></tr>';
+                $output .= '<tr><td class="formDescription">Display title?</td><td>'.WebGUI::Form::checkbox("displayTitle",1,$data{displayTitle}).'</td></tr>';
                 $output .= '<tr><td class="formDescription">Description</td><td>'.WebGUI::Form::textArea("description",$data{description}).'</td></tr>';
                 $output .= '<tr><td class="formDescription">Starting from this level?</td><td>'.WebGUI::Form::checkbox("startAtThisLevel",1,$data{startAtThisLevel}).'</td></tr>';
                 $output .= '<tr><td class="formDescription">Show only one level?uuuu</td><td>'.WebGUI::Form::checkbox("showOnlyThisLevel",1,$data{showOnlyThisLevel}).'</td></tr>';
@@ -129,6 +129,7 @@ sub www_view {
 				}
 			}
 		}
+		$sth->finish;
 	}
 	return $output;
 }

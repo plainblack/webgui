@@ -26,6 +26,9 @@ sub _viewPoll {
                 if ($poll{displayTitle} == 1) {
                         $output = "<h2>".$poll{title}."</h2>";
                 }
+                if ($poll{description} ne "") {
+                        $output .= $poll{description}.'<p>';
+                }
 		$output .= '<form method="post" action="'.$session{page}{url}.'">';
 		$output .= WebGUI::Form::hidden('wid',$widgetId);
 		$output .= WebGUI::Form::hidden('func','vote');
@@ -50,6 +53,9 @@ sub _viewResults {
         if (defined %poll) {
                 if ($poll{displayTitle} == 1) {
                         $output = "<h2>".$poll{title}."</h2>";
+                }
+                if ($poll{description} ne "") {
+                        $output .= $poll{description}.'<p>';
                 }
 		$output .= '<span class="pollQuestion">'.$poll{question}.'</span>';
 		($totalResponses) = WebGUI::SQL->quickArray("select count(*) from pollAnswer where widgetId=$widgetId",$session{dbh});
@@ -77,16 +83,17 @@ sub www_add {
         my ($output, %hash);
 	tie %hash, "Tie::IxHash";
       	if (WebGUI::Privilege::canEditPage()) {
-                $output = '<h1>Add Poll</h1><form method="post" enctype="multipart/form-data" action="'.$session{page}{url}.'">';
+                $output = '<a href="'.$session{page}{url}.'?op=viewHelp&hid=28"><img src="'.$session{setting}{lib}.'/help.gif" border="0" align="right"></a><h1>Add Poll</h1><form method="post" enctype="multipart/form-data" action="'.$session{page}{url}.'">';
                 $output .= WebGUI::Form::hidden("widget","Poll");
                 $output .= WebGUI::Form::hidden("func","addSave");
                 $output .= '<table>';
                 $output .= '<tr><td class="formDescription">Title</td><td>'.WebGUI::Form::text("title",20,30).'</td></tr>';
                 $output .= '<tr><td class="formDescription">Display the title?</td><td>'.WebGUI::Form::checkbox("displayTitle",1).'</td></tr>';
+                $output .= '<tr><td class="formDescription">Description</td><td>'.WebGUI::Form::textArea("description",'').'</td></tr>';
                 $output .= '<tr><td class="formDescription">Active</td><td>'.WebGUI::Form::checkbox("active",1,1).'</td></tr>';
 		%hash = WebGUI::SQL->buildHash("select groupId,groupName from groups where groupName<>'Reserved' order by groupName",$session{dbh});
                 $output .= '<tr><td class="formDescription" valign="top">Who can vote?</td><td>'.WebGUI::Form::selectList("voteGroup",\%hash,).'</td></tr>';
-                $output .= '<tr><td class="formDescription">Graph Width</td><td>'.WebGUI::Form::text("graphWidth",20,3).'</td></tr>';
+                $output .= '<tr><td class="formDescription">Graph Width</td><td>'.WebGUI::Form::text("graphWidth",20,3,150).'</td></tr>';
                 $output .= '<tr><td class="formDescription">Question</td><td>'.WebGUI::Form::text("question",50,255).'</td></tr>';
                 $output .= '<tr><td class="formDescription">Answers<span><br>(Enter one answer per line. No more than 20.)</span></td><td>'.WebGUI::Form::textArea("answers",'',50,8,0,'on').'</td></tr>';
                 $output .= '<tr><td></td><td>'.WebGUI::Form::submit("save").'</td></tr>';
@@ -117,12 +124,13 @@ sub www_edit {
 	tie %hash, "Tie::IxHash";
         if (WebGUI::Privilege::canEditPage()) {
 		%data = WebGUI::SQL->quickHash("select * from widget,Poll where widget.widgetId=Poll.widgetId and widget.widgetId=$session{form}{wid}",$session{dbh});
-                $output = '<h1>Edit Poll</h1><form method="post" enctype="multipart/form-data" action="'.$session{page}{url}.'">';
+                $output = '<a href="'.$session{page}{url}.'?op=viewHelp&hid=29"><img src="'.$session{setting}{lib}.'/help.gif" border="0" align="right"></a><h1>Edit Poll</h1><form method="post" enctype="multipart/form-data" action="'.$session{page}{url}.'">';
                 $output .= WebGUI::Form::hidden("wid",$session{form}{wid});
                 $output .= WebGUI::Form::hidden("func","editSave");
                 $output .= '<table>';
                 $output .= '<tr><td class="formDescription">Title</td><td>'.WebGUI::Form::text("title",20,30,$data{title}).'</td></tr>';
                 $output .= '<tr><td class="formDescription">Display the title?</td><td>'.WebGUI::Form::checkbox("displayTitle",1,$data{displayTitle}).'</td></tr>';
+                $output .= '<tr><td class="formDescription">Description</td><td>'.WebGUI::Form::textArea("description",$data{description}).'</td></tr>';
                 $output .= '<tr><td class="formDescription">Active</td><td>'.WebGUI::Form::checkbox("active",1,$data{active}).'</td></tr>';
 		%hash = WebGUI::SQL->buildHash("select groupId,groupName from groups where groupName<>'Reserved' order by groupName",$session{dbh});
                 $array[0] = $data{voteGroup};
@@ -158,7 +166,10 @@ sub www_view {
 	if ($data{active} eq "0") {
 		$output = _viewResults($_[0]);
 	} elsif (WebGUI::Privilege::isInGroup($data{voteGroup},$session{user}{userId})) {
-		($hasVoted) = WebGUI::SQL->quickArray("select count(*) from pollAnswer where userId=$session{user}{userId} and widgetId=$_[0]",$session{dbh});
+		($hasVoted) = WebGUI::SQL->quickArray("select count(*) from pollAnswer where (userId=$session{user}{userId} or (userId=1 and ipAddress<>'$session{env}{REMOTE_ADDR}')) and widgetId=$_[0]",$session{dbh});
+		unless (WebGUI::Privilege::isInGroup($data{voteGroup},$session{user}{userId})) {
+			$hasVoted = 1;
+		}
 		if ($hasVoted) {
 			$output = _viewResults($_[0]);
 		} else {
@@ -172,7 +183,11 @@ sub www_view {
 
 #-------------------------------------------------------------------
 sub www_vote {
-        WebGUI::SQL->write("insert into pollAnswer set widgetId=$session{form}{wid}, userId=$session{user}{userId}, answer='$session{form}{answer}'",$session{dbh});
+	my ($voteGroup);
+	($voteGroup) = WebGUI::SQL->quickArray("select voteGroup from Poll where widgetId='$session{form}{wid}'",$session{dbh});
+        if (WebGUI::Privilege::isInGroup($voteGroup,$session{user}{userId})) {
+        	WebGUI::SQL->write("insert into pollAnswer set widgetId=$session{form}{wid}, userId=$session{user}{userId}, answer='$session{form}{answer}', ipAddress='$session{env}{REMOTE_ADDR}'",$session{dbh});
+	}
 	return "";
 }
 

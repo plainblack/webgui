@@ -27,7 +27,7 @@ sub widgetName {
 sub www_add {
         my ($output);
       	if (WebGUI::Privilege::canEditPage()) {
-                $output = '<h1>Add Article</h1><form method="post" enctype="multipart/form-data" action="'.$session{page}{url}.'">';
+                $output = '<a href="'.$session{page}{url}.'?op=viewHelp&hid=23"><img src="'.$session{setting}{lib}.'/help.gif" border="0" align="right"></a><h1>Add Article</h1><form method="post" enctype="multipart/form-data" action="'.$session{page}{url}.'">';
                 $output .= WebGUI::Form::hidden("widget","Article");
                 $output .= WebGUI::Form::hidden("func","addSave");
                 $output .= '<table>';
@@ -89,7 +89,7 @@ sub www_edit {
         my ($output, %article);
         if (WebGUI::Privilege::canEditPage()) {
 		%article = WebGUI::SQL->quickHash("select widget.title, widget.displayTitle, date_format(Article.startDate,'%m/%d/%Y') as start, date_format(Article.endDate,'%m/%d/%Y') as end, Article.body, Article.image, Article.linkTitle, Article.linkURL, Article.attachment, widget.processMacros from widget left join Article on (widget.widgetId=Article.widgetId) where widget.widgetId=$session{form}{wid}",$session{dbh});
-                $output = '<h1>Edit Article</h1><form method="post" enctype="multipart/form-data" action="'.$session{page}{url}.'">';
+                $output = '<a href="'.$session{page}{url}.'?op=viewHelp&hid=24"><img src="'.$session{setting}{lib}.'/help.gif" border="0" align="right"></a><h1>Edit Article</h1><form method="post" enctype="multipart/form-data" action="'.$session{page}{url}.'">';
                 $output .= WebGUI::Form::hidden("wid",$session{form}{wid});
                 $output .= WebGUI::Form::hidden("func","editSave");
                 $output .= '<table>';

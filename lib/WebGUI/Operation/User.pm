@@ -153,7 +153,8 @@ sub www_listUsers {
 		$sth = WebGUI::SQL->read("select userId,username,email from user where username<>'Reserved' order by username limit ".(($currentPage*$itemsPerPage)-$itemsPerPage).",".$itemsPerPage,$session{dbh});
 		while (@data = $sth->array) {
 			$output .= '<tr><td><a href="'.$session{page}{url}.'?op=deleteUser&uid='.$data[0].'"><img src="'.$session{setting}{lib}.'/delete.gif" border=0></a><a href="'.$session{page}{url}.'?op=editUser&uid='.$data[0].'"><img src="'.$session{setting}{lib}.'/edit.gif" border=0></a></td>';
-			$output .= '<td><a href="'.$session{page}{url}.'?op=viewUserProfile&uid='.$data[0].'">'.$data[1].'</a></td>';
+			#$output .= '<td><a href="'.$session{page}{url}.'?op=viewUserProfile&uid='.$data[0].'">'.$data[1].'</a></td>';
+			$output .= '<td>'.$data[1].'</td>';
 			$output .= '<td><a href="mailto:'.$data[2].'">'.$data[2].'</a></td></tr>';
 		}
 		$output .= '</table><div class="pagination">';

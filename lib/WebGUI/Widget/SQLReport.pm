@@ -65,7 +65,7 @@ sub www_addSave {
 sub www_edit {
         my ($output, %data);
         if (WebGUI::Privilege::canEditPage()) {
-		%data = WebGUI::SQL->quickHash("select * from widget,SQLReport where widget.widgetId=$session{form}{wid}",$session{dbh});
+		%data = WebGUI::SQL->quickHash("select * from widget,SQLReport where widget.widgetId=$session{form}{wid} and widget.widgetId=SQLReport.widgetId",$session{dbh});
                 $output = '<h1>Edit SQL Report</h1><form method="post" enctype="multipart/form-data" action="'.$session{page}{url}.'">';
                 $output .= WebGUI::Form::hidden("wid",$session{form}{wid});
                 $output .= WebGUI::Form::hidden("func","editSave");
@@ -103,7 +103,7 @@ sub www_editSave {
 sub www_view {
 	my (%data, $output, $widgetId, $sth, $dbh, @result, @template, $temp);
 	$widgetId = shift;
-	%data = WebGUI::SQL->quickHash("select * from widget,SQLReport where widget.widgetId=$widgetId",$session{dbh});
+	%data = WebGUI::SQL->quickHash("select * from widget,SQLReport where widget.widgetId=$widgetId and widget.widgetId=SQLReport.widgetId",$session{dbh});
 	if (defined %data) {
 		if ($data{displayTitle} == 1) {
 			$output = "<h2>".$data{title}."</h2>";

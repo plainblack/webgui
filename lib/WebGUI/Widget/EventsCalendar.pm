@@ -201,8 +201,9 @@ sub www_view {
 			$output .= '<span class="eventTitle">'.$event[0].'</span>';
 			if ($event[1] ne "") {
 				$output .= ' - ';
-				$output .= ''.$event[1].'<p>';
+				$output .= ''.$event[1];
 			}
+			$output .= '<p>';
 		}
 		$sth->finish;
 	}

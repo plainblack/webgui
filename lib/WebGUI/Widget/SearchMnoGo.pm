@@ -24,19 +24,27 @@ sub _mnogoSearch {
 	%data = @_;
 	@keyword = split(/ /,$session{form}{query});
 	$dbh = DBI->connect($data{DSN},$data{username},$data{identifier});
-	foreach $word (@keyword) {
-		$sth = WebGUI::SQL->read("select url_id from dict where soundex(word)=soundex(lcase('$word'))",$dbh);
-		while (($urlId) = $sth->array) {
-			$result{$urlId}++;
+	if (defined $dbh) {
+		foreach $word (@keyword) {
+			$sth = WebGUI::SQL->read("select url_id from dict where soundex(word)=soundex(lcase('$word'))",$dbh);
+			if (defined $sth) {
+				while (($urlId) = $sth->array) {
+					$result{$urlId}++;
+				}
+				$sth->finish;
+			} else {
+				$output .= '<b>Error</b>: There was a problem with the query.';
+			}
 		}
-		$sth->finish;
-	}
-	foreach $key (sort {$result{$b} <=> $result{$a}} keys %result) {
-		if ($i < 50) {
-			%match = WebGUI::SQL->quickHash("select url,title,txt from url where rec_id=$key",$dbh);
-			$output .= '<a href="'.$match{url}.'">'.$match{title}.'</a> ('.$result{$key}.')<br>'.$match{txt}.'<br><a href="'.$match{url}.'">'.$match{url}.'</a><p>';
-		} 
-		$i++;	
+		foreach $key (sort {$result{$b} <=> $result{$a}} keys %result) {
+			if ($i < 50) {
+				%match = WebGUI::SQL->quickHash("select url,title,txt from url where rec_id=$key",$dbh);
+				$output .= '<a href="'.$match{url}.'">'.$match{title}.'</a> ('.$result{$key}.')<br>'.$match{txt}.'<br><a href="'.$match{url}.'">'.$match{url}.'</a><p>';
+			} 
+			$i++;	
+		}
+	} else {
+		$output .= '<b>Error</b>: Could not connect to remote database.';
 	}
 	$dbh->disconnect();
 	return $output;

@@ -239,7 +239,7 @@ sub www_postReply {
 
 #-------------------------------------------------------------------
 sub www_postReplySave {
-	my ($rid, %board);
+	my ($rid, %board, $mid);
 	%board = _getBoardProperties($session{form}{wid});
 	if (WebGUI::Privilege::isInGroup($board{groupToPost},$session{user}{userId})) {
                 if ($session{form}{subject} eq "") {
@@ -248,8 +248,9 @@ sub www_postReplySave {
 	 	if ($session{form}{message} eq "") {
                 	$session{form}{subject} .= ' (eom)';
                 }
+		$mid = getNextId("messageId");
 		($rid) = WebGUI::SQL->quickArray("select rid from message where messageId=$session{form}{mid}",$session{dbh});
-		WebGUI::SQL->write("insert into message set userId=$session{user}{userId}, username=".quote($session{user}{username}).", subject=".quote($session{form}{subject}).", message=".quote($session{form}{message}).", rid=$rid, widgetId=$session{form}{wid}, pid=$session{form}{mid}, dateOfPost=now()", $session{dbh});
+		WebGUI::SQL->write("insert into message set messageId=$mid, userId=$session{user}{userId}, username=".quote($session{user}{username}).", subject=".quote($session{form}{subject}).", message=".quote($session{form}{message}).", rid=$rid, widgetId=$session{form}{wid}, pid=$session{form}{mid}, dateOfPost=now()", $session{dbh});
 		return www_showMessage();
 	} else {
 		return WebGUI::Privilege::insufficient();

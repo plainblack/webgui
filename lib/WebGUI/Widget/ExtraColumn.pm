@@ -26,14 +26,14 @@ sub widgetName {
 sub www_add {
         my ($output);
       	if (WebGUI::Privilege::canEditPage()) {
-                $output = '<h1>Add Column</h1><form method="post" enctype="multipart/form-data" action="'.$session{page}{url}.'">';
+                $output = '<a href="'.$session{page}{url}.'?op=viewHelp&hid=25"><img src="'.$session{setting}{lib}.'/help.gif" border="0" align="right"></a><h1>Add Column</h1><form method="post" enctype="multipart/form-data" action="'.$session{page}{url}.'">';
                 $output .= WebGUI::Form::hidden("widget","ExtraColumn");
                 $output .= WebGUI::Form::hidden("func","addSave");
                 $output .= WebGUI::Form::hidden("title","column");
                 $output .= '<table>';
-                $output .= '<tr><td class="formDescription">Spacer</td><td>'.WebGUI::Form::text("spacer",20,3).'</td></tr>';
-                $output .= '<tr><td class="formDescription">Width</td><td>'.WebGUI::Form::text("width",20,3).'</td></tr>';
-                $output .= '<tr><td class="formDescription">StyleSheet Class</td><td>'.WebGUI::Form::text("class",20,50).'</td></tr>';
+                $output .= '<tr><td class="formDescription">Spacer</td><td>'.WebGUI::Form::text("spacer",20,3,10).'</td></tr>';
+                $output .= '<tr><td class="formDescription">Width</td><td>'.WebGUI::Form::text("width",20,3,200).'</td></tr>';
+                $output .= '<tr><td class="formDescription">StyleSheet Class</td><td>'.WebGUI::Form::text("class",20,50,"content").'</td></tr>';
                 $output .= '<tr><td></td><td>'.WebGUI::Form::submit("save").'</td></tr>';
                 $output .= '</table></form>';
                 return $output;
@@ -60,7 +60,7 @@ sub www_edit {
         my ($output, %data);
         if (WebGUI::Privilege::canEditPage()) {
 		%data = WebGUI::SQL->quickHash("select * from ExtraColumn where widgetId=$session{form}{wid}",$session{dbh});
-                $output = '<h1>Edit Column</h1><form method="post" action="'.$session{page}{url}.'">';
+                $output = '<a href="'.$session{page}{url}.'?op=viewHelp&hid=26"><img src="'.$session{setting}{lib}.'/help.gif" border="0" align="right"></a><h1>Edit Column</h1><form method="post" action="'.$session{page}{url}.'">';
                 $output .= WebGUI::Form::hidden("wid",$session{form}{wid});
                 $output .= WebGUI::Form::hidden("func","editSave");
                 $output .= WebGUI::Form::hidden("title","column");
