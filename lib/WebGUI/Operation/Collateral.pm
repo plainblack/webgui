@@ -10,6 +10,13 @@ package WebGUI::Operation::Collateral;
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
+
+# test for ImageMagick. if it's not installed set $hasImageMagick to 0,
+# if it is installed it will be set to 1
+my $hasImageMagick=1;
+eval " use Image::Magick; "; $hasImageMagick=0 if $@;
+
+
 use Exporter;
 use strict;
 use WebGUI::Attachment;
@@ -109,13 +116,14 @@ sub www_deleteFile {
 #-------------------------------------------------------------------
 sub www_editCollateral {
 	return WebGUI::Privilege::insufficient unless (WebGUI::Privilege::isInGroup(4));
-	my ($canEdit, $file, $folderId, $output, $f, $collateral);
+	my ($canEdit, $file, $folderId, $output, $f, $collateral, $image, $error, $x, $y);
 	if ($session{form}{cid} eq "new") {
 		$collateral->{collateralType} = $session{form}{type};
 		$collateral->{collateralId} = "new";
 		$collateral->{username} = $session{user}{username};
 		$collateral->{userId} = $session{user}{userId};
 		$collateral->{parameters} = 'border="0"' if ($session{form}{type} eq "image");
+		$collateral->{thumbnailSize} = $session{setting}{thumbnailSize};
 	} else {
 		$collateral = WebGUI::SQL->quickHashRef("select * from collateral where collateralId=".$session{form}{cid});
 	}
@@ -215,7 +223,17 @@ sub www_editCollateral {
 			$f->readOnly(
                 		-value=>'<a href="'.$file->getURL.'"><img src="'.$file->getThumbnail.'" border="0" /></a>'
 				);
-        	}
+        		if ($hasImageMagick) {
+        			$image = Image::Magick->new;
+				$error = $image->Read($file->getPath);
+				($x, $y) = $image->Get('width','height');
+				$f->readOnly(
+					-value=>$error ? "Error reading image: $error" : "$x x $y",
+					-label=>"Image dimensions"
+					);
+			}
+		}
+
 		if ($canEdit) {
                 	$f->textarea(
                         	-name=>"parameters",
@@ -228,6 +246,13 @@ sub www_editCollateral {
 				-value=>$collateral->{parameters}
 				);
 		}
+		if ($canEdit && $collateral->{collateralType} eq 'image') {
+			$f->text(
+				-name=>"thumbnailSize",
+				-value=>$collateral->{thumbnailSize},
+				-label=>"Thumbnail size"
+				);
+		}
         }
 	$f->submit if ($canEdit);
 	$output .= $f->print;
@@ -238,18 +263,25 @@ sub www_editCollateral {
 sub www_editCollateralSave {
 	return WebGUI::Privilege::insufficient unless (WebGUI::Privilege::isInGroup(4));
 	WebGUI::Session::setScratch("collateralFolderId",$session{form}{collateralFolderId});
-	my ($test, $file, $addFile);
+	my ($test, $file, $addFile, $thumbnailSize, $collateral);
+	$collateral = WebGUI::SQL->quickHashRef("select * from collateral where collateralId=".$session{form}{cid}) unless ($session{form}{cid} eq "new");	
+	$thumbnailSize = $session{form}{thumbnailSize} || $collateral->{thumbnailSize} || $session{setting}{thumbnailSize};
+
 	if ($session{form}{cid} eq "new") {
 		$session{form}{cid} = getNextId("collateralId");
 		WebGUI::SQL->write("insert into collateral (collateralId,userId,username,collateralType) 
 			values ($session{form}{cid},
 			$session{user}{userId}, ".quote($session{user}{username}).",
 			".quote($session{form}{collateralType}).")");
+        	$file = WebGUI::Attachment->new("","images",$session{form}{cid});
+       		$file->save("filename", $thumbnailSize);
+	} else {
+		print "<h1> thumbnailsize: $thumbnailSize</h1>";
+		$file = WebGUI::Attachment->new($collateral->{filename},"images", $session{form}{cid});
+		WebGUI::Attachment::_createThumbnail($file, $thumbnailSize);
 	}
-        $file = WebGUI::Attachment->new("","images",$session{form}{cid});
-       	$file->save("filename");
 	if ($file->getFilename ne "") {
-        	$addFile = ", filename=".quote($file->getFilename);
+       		$addFile = ", filename=".quote($file->getFilename);
 		$session{form}{name} = $file->getFilename if ($session{form}{name} eq "");
 	}
 	$session{form}{name} = "untitled" if ($session{form}{name} eq "");
@@ -261,7 +293,7 @@ sub www_editCollateralSave {
                 	$session{form}{name} .= "2";
                 }
         }
-	WebGUI::SQL->write("update collateral set name=".quote($session{form}{name}).", parameters="
+	WebGUI::SQL->write("update collateral set thumbnailSize=$thumbnailSize, name=".quote($session{form}{name}).", parameters="
 		.quote($session{form}{parameters}).", collateralFolderId=$session{form}{collateralFolderId}, dateUploaded="
 		.time()." $addFile where collateralId=$session{form}{cid}");
 	$session{form}{collateralType} = "";
