@@ -12,8 +12,8 @@ package WebGUI::Asset::Wobject::Article;
 
 use strict;
 use WebGUI::DateTime;
-use WebGUI::Forum;
-use WebGUI::Forum::UI;
+#use WebGUI::Forum;
+#use WebGUI::Forum::UI;
 use WebGUI::International;
 use WebGUI::Paginator;
 use WebGUI::Privilege;
