@@ -25,6 +25,11 @@ our $I18N = {
 		lastUpdated => 1099344172,
 	},
 
+	'make prototype' => {
+		message => q|Make prototype?|,
+		lastUpdated => 1099344172,
+	},
+
 	'asset id' => {
 		message => q|Asset ID|,
 		lastUpdated => 1099344172,
@@ -107,10 +112,15 @@ These tags will be added to the &lt;HEAD&gt; section of each page that the asset
 </p>
 
 <p>
-<b>Make available as package?</b><br>
+<b>Make package?</b><br>
 Many WebGUI tasks are very repetitive.  Automating such tasks in Webgui, such as
 creating an Asset, or sets of Assets, is done by creating a package that can be reused
 through the site.  Check yes if you want this Asset to be available as a package.
+</p>
+
+<p>
+<b>Make prototype?</b><br>
+Chances are if you like assets to be configured a certain way, then you'll find prototypes useful. By setting an asset as a prototype you can create new items in your add content menu configured exactly as you like. For instance, if you use the Collaboration System as a photo gallery, then create a photo gallery and mark it as a prototype. From then on you can just "Add content > New Content > Photo Gallery".
 </p>
 
         |,

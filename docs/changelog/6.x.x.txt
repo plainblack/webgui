@@ -1,6 +1,10 @@
 6.5.0
+ - Added content prototypes.
  - Fixed a bug in the Collaboration post where the post end date was set to
    the start date.
+ - fix [ 1157202 ] users can add themselves to Admins group
+ - fix [ 1157218 ] user cannot view it's own profile
+
 
 6.4.0
  - You can now see the groups of groups hierarchy in the group manager.

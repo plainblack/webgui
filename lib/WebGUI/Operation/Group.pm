@@ -303,16 +303,27 @@ sub www_editGroup {
 		-value=>$g->scratchFilter,
 		-label=>WebGUI::International::get(945)
 		);
-	$f->yesNo(
-		-name=>"autoAdd",
-		-value=>$g->autoAdd,
-		-label=>WebGUI::International::get(974)
-		);
-	$f->yesNo(
-		-name=>"autoDelete",
-		-value=>$g->autoDelete,
-		-label=>WebGUI::International::get(975)
-		);
+	if ($session{form}{gid} eq "3") {
+		$f->hidden(
+			-name=>"autoAdd",
+			-value=>0
+			);
+		$f->hidden(
+			-name=>"autoDelete",
+			-value=>0
+			);
+	} else {
+		$f->yesNo(
+			-name=>"autoAdd",
+			-value=>$g->autoAdd,
+			-label=>WebGUI::International::get(974)
+			);
+		$f->yesNo(
+			-name=>"autoDelete",
+			-value=>$g->autoDelete,
+			-label=>WebGUI::International::get(975)
+			);
+	}
 	$f->databaseLink(
                 -value=>[$g->databaseLinkId]
                 );

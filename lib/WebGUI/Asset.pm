@@ -381,6 +381,10 @@ sub definition {
 					fieldType=>'yesNo',
 					defaultValue=>0
 					},
+				isPrototype=>{
+					fieldType=>'yesNo',
+					defaultValue=>0
+					},
 				isHidden=>{
 					fieldType=>'yesNo',
 					defaultValue=>0
@@ -703,6 +707,22 @@ sub getAssetAdderLinks {
 			}
 		}
 	}
+	my $constraint;
+	if ($getContainerLinks) {
+		$constraint = quoteAndJoin($session{config}{assetContainers});
+	} else {
+		$constraint = quoteAndJoin($session{config}{assets});
+	}
+	my $sth = WebGUI::SQL->read("select className,assetId from asset where isPrototype=1 and className in ($constraint)");
+	while (my ($class,$id) = $sth->array) {
+		my $asset = WebGUI::Asset->newByDynamicClass($id,$class);
+		my $url = $self->getUrl("func=add&class=".$class."&prototype=".$id);
+		$url = WebGUI::URL::append($url,$addToUrl) if ($addToUrl);
+		push(@links,{
+			label=>$asset->get("title"),
+			url=>$url
+			});
+	}
 	return \@links;
 }
 
@@ -1024,6 +1044,12 @@ sub getEditForm {
 		-name=>"isPackage",
 		-label=>WebGUI::International::get("make package","Asset"),
 		-value=>$self->getValue("isPackage"),
+		-uiLevel=>7
+		);
+	$tabform->getTab("meta")->yesNo(
+		-name=>"isPrototype",
+		-label=>WebGUI::International::get("make prototype","Asset"),
+		-value=>$self->getValue("isPrototype"),
 		-uiLevel=>7
 		);
 	return $tabform;
@@ -2222,7 +2248,20 @@ Adds a new Asset based upon the class of the current form. Returns the Asset cal
 
 sub www_add {
 	my $self = shift;
+	my %prototypeProperties; 
+	if ($session{form}{'prototype'}) {
+		my $prototype = WebGUI::Asset->newByDynamicClass($session{form}{'prototype'},$session{form}{class});
+		foreach my $definition (@{$prototype->definition}) { # cycle through rather than copying properties to avoid grabbing stuff we shouldn't grab
+			foreach my $property (keys %{$definition->{properties}}) {
+				next if (isIn($property,qw(title menuTitle url isPrototype isPackage)));
+				next if ($definition->{properties}{$property}{noFormPost});
+				$prototypeProperties{$property} = $prototype->get($property);
+			}
+		}
+		
+	}
 	my %properties = (
+		%prototypeProperties,
 		groupIdView => $self->get("groupIdView"),
 		groupIdEdit => $self->get("groupIdEdit"),
 		ownerUserId => $self->get("ownerUserId"),
