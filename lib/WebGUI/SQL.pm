@@ -61,6 +61,11 @@ sub finish {
 }
 
 #-------------------------------------------------------------------
+sub getColumnNames {
+        return @{$_[0]->{_sth}->{NAME}};
+}
+
+#-------------------------------------------------------------------
 sub getNextId {
         my ($id);
         ($id) = WebGUI::SQL->quickArray("select nextValue from incrementer where incrementerId='$_[0]'");

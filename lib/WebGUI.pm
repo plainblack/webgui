@@ -1,5 +1,5 @@
 package WebGUI;
-our $VERSION = "3.0.3";
+our $VERSION = "3.1.0";
 
 #-------------------------------------------------------------------
 # WebGUI is Copyright 2001-2002 Plain Black Software.
@@ -61,15 +61,16 @@ sub _displayAdminBar {
 			$session{page}{url}.'?op=listGroups'=>WebGUI::International::get(5), 
 			$session{page}{url}.'?op=manageSettings'=>WebGUI::International::get(4), 
 			$session{page}{url}.'?op=listUsers'=>WebGUI::International::get(7),
-			$session{env}{SCRIPT_NAME}.'/page_not_found'=>WebGUI::International::get(8),
-			$session{env}{SCRIPT_NAME}.'/trash'=>WebGUI::International::get(10),
+			$session{config}{scripturl}.'/page_not_found'=>WebGUI::International::get(8),
+			$session{config}{scripturl}.'/trash'=>WebGUI::International::get(10),
 			$session{page}{url}.'?op=purgeTrash'=>WebGUI::International::get(11),
 			$session{page}{url}.'?op=viewStatistics'=>WebGUI::International::get(144)
 		);
 	}
 	if (WebGUI::Privilege::isInGroup(4,$session{user}{userId})) {
         	%hash = ( 
-			$session{env}{SCRIPT_NAME}.'/clipboard'=>WebGUI::International::get(9),
+			$session{page}{url}.'?op=listImages'=>WebGUI::International::get(394),
+			$session{config}{scripturl}.'/clipboard'=>WebGUI::International::get(9),
 			%hash
 		);
 	}
@@ -81,7 +82,7 @@ sub _displayAdminBar {
         }
         if (WebGUI::Privilege::isInGroup(6,$session{user}{userId})) {
                 %hash = (
-			$session{env}{SCRIPT_NAME}.'/packages'=>WebGUI::International::get(374),
+			$session{config}{scripturl}.'/packages'=>WebGUI::International::get(374),
                         %hash
                 );
         }
@@ -174,7 +175,7 @@ sub page {
 	} else {
 		if (WebGUI::Privilege::canViewPage()) {
 			if ($session{var}{adminOn}) {
-                        	$pageEdit = '<br><img src="'.$session{setting}{lib}.'/page.gif" border=0 alt="Page Settings:"><a href="'.$session{page}{url}.'?op=editPage"><img src="'.$session{setting}{lib}.'/edit.gif" border=0 alt="Edit Page"></a><a href="'.$session{page}{url}.'?op=cutPage"><img src="'.$session{setting}{lib}.'/cut.gif" border=0 alt="Cut Page"></a><a href="'.$session{page}{url}.'?op=deletePage"><img src="'.$session{setting}{lib}.'/delete.gif" border=0 alt="Delete Page"></a><a href="'.$session{page}{url}.'?op=movePageUp"><img src="'.$session{setting}{lib}.'/pageUp.gif" border=0 alt="Move Page Up"></a><a href="'.$session{page}{url}.'?op=movePageDown"><img src="'.$session{setting}{lib}.'/pageDown.gif" border=0 alt="Move Page Down"></a></span>';
+                        	$pageEdit = '<br><img src="'.$session{setting}{lib}.'/page.gif" border=0 alt="Page Settings:"><a href="'.$session{page}{url}.'?op=editPage"><img src="'.$session{setting}{lib}.'/edit.gif" border=0 alt="Edit Page"></a><a href="'.$session{page}{url}.'?op=cutPage"><img src="'.$session{setting}{lib}.'/cut.gif" border=0 alt="Cut Page"></a><a href="'.$session{page}{url}.'?op=deletePage"><img src="'.$session{setting}{lib}.'/delete.gif" border=0 alt="Delete Page"></a><a href="'.$session{page}{url}.'?op=movePageUp"><img src="'.$session{setting}{lib}.'/pageUp.gif" border=0 alt="Move Page Up"></a><a href="'.$session{page}{url}.'?op=movePageDown"><img src="'.$session{setting}{lib}.'/pageDown.gif" border=0 alt="Move Page Down"></a></span>'."\n\n";
                 	}	
 			$sth = WebGUI::SQL->read("select widgetId, namespace, templatePosition from widget where pageId=".$session{page}{pageId}." order by sequenceNumber, widgetId");
 			while (@widgetList = $sth->array) {
@@ -182,7 +183,7 @@ sub page {
                        			$contentHash{$widgetList[2]} .= '<hr><a href="'.$session{page}{url}.'?func=edit&wid='.$widgetList[0].'"><img src="'.$session{setting}{lib}.'/edit.gif" border=0 alt="Edit"></a><a href="'.$session{page}{url}.'?func=cut&wid='.$widgetList[0].'"><img src="'.$session{setting}{lib}.'/cut.gif" border=0 alt="Cut"></a><a href="'.$session{page}{url}.'?func=copy&wid='.$widgetList[0].'"><img src="'.$session{setting}{lib}.'/copy.gif" border=0 alt="Copy"></a><a href="'.$session{page}{url}.'?wid='.$widgetList[0].'&func=delete"><img src="'.$session{setting}{lib}.'/delete.gif" border=0 alt="Delete"></a><a href="'.$session{page}{url}.'?func=moveUp&wid='.$widgetList[0].'"><img src="'.$session{setting}{lib}.'/upArrow.gif" border=0 alt="Move Up"></a><a href="'.$session{page}{url}.'?func=moveDown&wid='.$widgetList[0].'"><img src="'.$session{setting}{lib}.'/downArrow.gif" border=0 alt="Move Down"></a><a href="'.$session{page}{url}.'?func=jumpUp&wid='.$widgetList[0].'"><img src="'.$session{setting}{lib}.'/jumpUp.gif" border=0 alt="Move to Top"></a><a href="'.$session{page}{url}.'?func=jumpDown&wid='.$widgetList[0].'"><img src="'.$session{setting}{lib}.'/jumpDown.gif" border=0 alt="Move to Bottom"></a><br>';
 				}
 				$cmd = "WebGUI::Widget::".$widgetList[1]."::www_view";
-				$contentHash{$widgetList[2]} .= &$cmd($widgetList[0])."<p>";
+				$contentHash{$widgetList[2]} .= &$cmd($widgetList[0])."<p>\n\n";
 			}
 			$sth->finish;
 			$cmd = "use WebGUI::Template::".$session{page}{template};
@@ -197,10 +198,14 @@ sub page {
 	if ($session{var}{adminOn}) {
 		$adminBar = _displayAdminBar(@availableWidgets);
 	}
-	$httpHeader = WebGUI::Session::httpHeader();
-	($header, $footer) = WebGUI::Style::getStyle();
-	WebGUI::Session::close();
-	return $httpHeader.$adminBar.$header.$pageEdit.$content.$footer;
+	if ($session{header}{redirect} ne "") {
+		return $session{header}{redirect};
+	} else {
+		$httpHeader = WebGUI::Session::httpHeader();
+		($header, $footer) = WebGUI::Style::getStyle();
+		WebGUI::Session::close();
+		return $httpHeader.$adminBar.$header.$pageEdit.$content.$footer;
+	}
 }
 
 

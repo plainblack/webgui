@@ -29,7 +29,7 @@ sub _replacement {
                         } else {
                                 $temp .= " &middot; ";
                         }
-                        $temp .= '<a class="horizontalMenu" href="'.$session{env}{SCRIPT_NAME}.'/'.$data[1].'">'.$data[0].'</a>';
+                        $temp .= '<a class="horizontalMenu" href="'.$session{config}{scripturl}.'/'.$data[1].'">'.$data[0].'</a>';
                 }
         }
         $sth->finish;

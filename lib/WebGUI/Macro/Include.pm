@@ -1,4 +1,4 @@
-package WebGUI::Macro::H_homeLink;
+package WebGUI::Macro::Include;
 
 #-------------------------------------------------------------------
 # WebGUI is Copyright 2001-2002 Plain Black Software.
@@ -11,32 +11,33 @@ package WebGUI::Macro::H_homeLink;
 #-------------------------------------------------------------------
 
 use strict;
-use WebGUI::International;
+use FileHandle;
 use WebGUI::Macro;
-use WebGUI::Session;
 
 #-------------------------------------------------------------------
 sub _replacement {
-        my (@param, $temp);
-        @param = WebGUI::Macro::getParams($1);
-        $temp = '<a class="homeLink" href="'.$session{config}{scripturl}.'/home">';
-        if ($param[0] ne "") {
-		$temp .= $param[0];
+	my (@param, $temp, $file);
+        @param = WebGUI::Macro::getParams($_[0]);
+        if ($param[0] =~ /passwd/ || $param[0] =~ /shadow/ || $param[0] =~ /WebGUI.conf/) {
+                $temp = "SECURITY VIOLATION";
         } else {
-        	$temp .= WebGUI::International::get(47);
-        }
-        $temp .= '</a>';
+		$file = FileHandle->new($param[0],"r");
+		while (<$file>) {
+       			$temp .= $_;
+		}
+		$file->close;
+	}
 	return $temp;
 }
 
 #-------------------------------------------------------------------
 sub process {
-        my ($output, $temp, @param);
-        $output = $_[0];
-        $output =~ s/\^H\((.*?)\)\;/_replacement($1)/ge;
-        $output =~ s/\^H\;/_replacement()/ge;
+	my ($output, $temp);
+	$output = $_[0];
+        $output =~ s/\^Include\((.*?)\)\;/_replacement($1)/ge;
 	return $output;
 }
 
 1;
+
 

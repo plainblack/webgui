@@ -58,17 +58,20 @@ sub www_add {
                 $output .= WebGUI::Form::hidden("widget",$namespace);
                 $output .= WebGUI::Form::hidden("func","addSave");
                 $output .= '<table>';
-                $output .= tableFormRow(WebGUI::International::get(99),WebGUI::Form::text("title",20,128,'Message Board'));
+                $output .= tableFormRow(WebGUI::International::get(99),
+			WebGUI::Form::text("title",20,128,'Message Board'));
                 $output .= tableFormRow(WebGUI::International::get(174),WebGUI::Form::checkbox("displayTitle",1,1));
                 $output .= tableFormRow(WebGUI::International::get(175),WebGUI::Form::checkbox("processMacros",1));
 		%hash = WebGUI::Widget::getPositions();
-                $output .= tableFormRow(WebGUI::International::get(363),WebGUI::Form::selectList("templatePosition",\%hash));
+                $output .= tableFormRow(WebGUI::International::get(363),
+			WebGUI::Form::selectList("templatePosition",\%hash));
 		$output .= tableFormRow(WebGUI::International::get(85),WebGUI::Form::textArea("description",'',50,5,1));
-                %hash = WebGUI::SQL->buildHash("select groupId,groupName from groups where groupName<>'Reserved' order by groupName");
-		$array[0] = 2;
-                $output .= tableFormRow(WebGUI::International::get(3,$namespace),WebGUI::Form::selectList("groupToPost",\%hash,\@array));
-                $output .= tableFormRow(WebGUI::International::get(4,$namespace),WebGUI::Form::text("messagesPerPage",20,2,30));
-                $output .= tableFormRow(WebGUI::International::get(5,$namespace),WebGUI::Form::text("editTimeout",20,3,1));
+                $output .= tableFormRow(WebGUI::International::get(3,$namespace),
+			WebGUI::Form::groupList("groupToPost",2));
+                $output .= tableFormRow(WebGUI::International::get(4,$namespace),
+			WebGUI::Form::text("messagesPerPage",20,2,30));
+                $output .= tableFormRow(WebGUI::International::get(5,$namespace),
+			WebGUI::Form::text("editTimeout",20,3,1));
                 $output .= formSave();
                 $output .= '</table></form>';
                 return $output;
@@ -120,9 +123,8 @@ sub www_edit {
                 $array[0] = $board{templatePosition};
                 $output .= tableFormRow(WebGUI::International::get(363),WebGUI::Form::selectList("templatePosition",\%hash,\@array));
 		$output .= tableFormRow(WebGUI::International::get(85),WebGUI::Form::textArea("description",$board{description},50,5,1));
-                %hash = WebGUI::SQL->buildHash("select groupId,groupName from groups where groupName<>'Reserved' order by groupName");
-		$array[0] = $board{groupToPost};
-                $output .= tableFormRow(WebGUI::International::get(3,$namespace),WebGUI::Form::selectList("groupToPost",\%hash,\@array,1));
+                $output .= tableFormRow(WebGUI::International::get(3,$namespace),
+			WebGUI::Form::selectList("groupToPost",$board{groupToPost}));
                 $output .= tableFormRow(WebGUI::International::get(4,$namespace),WebGUI::Form::text("messagesPerPage",20,2,$board{messagesPerPage}));
                 $output .= tableFormRow(WebGUI::International::get(5,$namespace),WebGUI::Form::text("editTimeout",20,2,$board{editTimeout}));
                 $output .= formSave();

@@ -29,6 +29,7 @@ our @EXPORT = qw(&www_editUserGroupSave &www_deleteGrouping &www_editGrouping &w
 #-------------------------------------------------------------------
 sub www_addUser {
         my ($output, %hash, @array);
+	tie %hash, 'Tie::IxHash';
         if (WebGUI::Privilege::isInGroup(3)) {
                 $output .= helpLink(5);
 		$output .= '<h1>'.WebGUI::International::get(163).'</h1>';
@@ -178,8 +179,10 @@ sub www_editGroupingSave {
 
 #-------------------------------------------------------------------
 sub www_editUser {
-        my ($output, %user, %hash, @array, %gender, $sth);
+        my ($output, %user, %hash, @array, %gender, $sth, %data);
+	tie %user, 'Tie::CPHash';
 	tie %hash, 'Tie::CPHash';
+	tie %data, 'Tie::IxHash';
         if (WebGUI::Privilege::isInGroup(3)) {
 		%gender = ('male'=>WebGUI::International::get(339),'female'=>WebGUI::International::get(340));
 		%user = WebGUI::SQL->quickHash("select * from users where userId=$session{form}{uid}");
@@ -196,16 +199,16 @@ sub www_editUser {
                 $output .= tableFormRow(WebGUI::International::get(378),$session{form}{uid});
                 $output .= tableFormRow(WebGUI::International::get(50),WebGUI::Form::text("username",20,30,$user{username}));
                 $output .= tableFormRow(WebGUI::International::get(51),WebGUI::Form::password("identifier",20,30,"password"));
-		%hash = ('WebGUI'=>'WebGUI', 'LDAP'=>'LDAP');
+		%data = ('WebGUI'=>'WebGUI', 'LDAP'=>'LDAP');
 		$array[0] = $user{authMethod};
-                $output .= tableFormRow(WebGUI::International::get(164),WebGUI::Form::selectList("authMethod",\%hash,\@array));
+                $output .= tableFormRow(WebGUI::International::get(164),WebGUI::Form::selectList("authMethod",\%data,\@array));
                 $output .= tableFormRow(WebGUI::International::get(165),WebGUI::Form::text("ldapURL",20,2048,$user{ldapURL}));
                 $output .= tableFormRow(WebGUI::International::get(166),WebGUI::Form::text("connectDN",20,255,$user{connectDN}));
                 $output .= tableFormRow(WebGUI::International::get(56),WebGUI::Form::text("email",20,255,$user{email}));
-		%hash = WebGUI::SQL->buildHash("select distinct(language) from international");
+		%data = WebGUI::SQL->buildHash("select distinct(language) from international");
 		@array = [];
 		$array[0] = $user{language};
-                $output .= tableFormRow(WebGUI::International::get(304),WebGUI::Form::selectList("language",\%hash,\@array));
+                $output .= tableFormRow(WebGUI::International::get(304),WebGUI::Form::selectList("language",\%data,\@array));
                 $output .= tableFormRow(WebGUI::International::get(314),WebGUI::Form::text("firstName",20,50,$user{firstName}));
                 $output .= tableFormRow(WebGUI::International::get(315),WebGUI::Form::text("middleName",20,50,$user{middleName}));
                 $output .= tableFormRow(WebGUI::International::get(316),WebGUI::Form::text("lastName",20,50,$user{lastName}));
@@ -239,16 +242,20 @@ sub www_editUser {
                 $output .= formHeader();
                 $output .= WebGUI::Form::hidden("op","editUserGroupSave");
                 $output .= WebGUI::Form::hidden("uid",$session{form}{uid});
-                %hash = WebGUI::SQL->buildHash("select groupId,groupName from groups where groupName<>'Reserved' order by groupName");
+                %data = WebGUI::SQL->buildHash("select groupId,groupName from groups where groupName<>'Reserved' order by groupName");
                 @array = WebGUI::SQL->buildArray("select groupId from groupings where userId=$session{form}{uid}");
-                $output .= WebGUI::Form::selectList("groups",\%hash,\@array,5,1);
+                $output .= WebGUI::Form::selectList("groups",\%data,\@array,5,1);
                 $output .= '<br>'.WebGUI::Form::submit(WebGUI::International::get(62));
                 $output .= '<p>'.WebGUI::International::get(373).'<p></form>';
                 $output .= '<table><tr><td class="tableHeader">'.WebGUI::International::get(89).'</td><td class="tableHeader">'.WebGUI::International::get(84).'</td><td class="tableHeader">'.WebGUI::International::get(369).'</td></tr>';
                 $sth = WebGUI::SQL->read("select groups.groupId,groups.groupName,groupings.expireDate from groupings,groups where groupings.groupId=groups.groupId and groupings.userId=$session{form}{uid} order by groups.groupName");
                 while (%hash = $sth->hash) {
-                        $output .= '<tr><td><a href="'.$session{page}{url}.'?op=deleteGrouping&uid='.$session{form}{uid}.'&gid='.$hash{groupId}.'"><img src="'.$session{setting}{lib}.'/delete.gif" border=0></a><a href="'.$session{page}{url}.
-'?op=editGrouping&uid='.$session{form}{uid}.'&gid='.$hash{groupId}.'"><img src="'.$session{setting}{lib}.'/edit.gif" border=0></a></td>';
+                        $output .= '<tr><td><a href="'.$session{page}{url}.'?op=deleteGrouping&uid='.
+				$session{form}{uid}.'&gid='.$hash{groupId}.'"><img src="'.
+				$session{setting}{lib}.'/delete.gif" border=0></a><a href="'.
+				$session{page}{url}.'?op=editGrouping&uid='.$session{form}{uid}.
+				'&gid='.$hash{groupId}.'"><img src="'.$session{setting}{lib}.
+				'/edit.gif" border=0></a></td>';
                         $output .= '<td class="tableData">'.$hash{groupName}.'</td>';
 			$output .= '<td class="tableData">'.epochToHuman($hash{expireDate},"%M/%D/%y").'</td></tr>';
                 }

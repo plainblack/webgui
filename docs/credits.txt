@@ -12,5 +12,5 @@ IE Rich Edit.........................Brattli
 Spanish Translation..................Ricardo Markiewicz
 Portuguese Translation...............Jose Caneira
 Dutch Translation....................Joeri de Bruin
-
+mod_rewrite Support..................Peter Beardsley / Appropriate Solutions, Inc.
 

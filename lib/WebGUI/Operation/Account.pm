@@ -491,7 +491,7 @@ sub www_viewMessageLog {
                         if ($data[2] ne "") {
                                 $row[$i] .= '</a>';
                         }
-                        $row[$i] .= '</td><td class="tableData">'.epochToHuman($data[3],"%m/%d/%Y @ %H:%m%p").'</td></tr>';
+                        $row[$i] .= '</td><td class="tableData">'.epochToHuman($data[3],"%m/%d/%Y @ %H:%n%p").'</td></tr>';
                         $i++;
                 }
                 $sth->finish;

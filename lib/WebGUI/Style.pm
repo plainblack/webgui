@@ -31,7 +31,13 @@ sub getStyle {
 		$header = '<!-- WebGUI '.$WebGUI::VERSION.' -->
 			<html>
 			<head>
-			<title>'.$session{page}{title}.'</title>'
+			<title>';
+		if ($session{page}{pageId} == 1) {
+			$header .= $session{setting}{companyName}.' - '.$session{page}{title};
+		} else {
+			$header .= $session{page}{title};
+		}
+		$header .= '</title>'
 			.$style{styleSheet}
 			.$session{page}{metaTags};
 		if ($session{page}{defaultMetaTags}) {

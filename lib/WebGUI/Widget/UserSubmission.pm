@@ -38,6 +38,7 @@ sub duplicate {
         $sth = WebGUI::SQL->read("select * from UserSubmission_submission where widgetId=$_[0]");
         while (@row = $sth->array) {
                 $newSubmissionId = getNextId("submissionId");
+		WebGUI::Attachment::copy($row[8],$_[0],$newWidgetId,$row[1],$newSubmissionId);
                 WebGUI::SQL->write("insert into UserSubmission_submission values ($newWidgetId, $newSubmissionId, ".quote($row[2]).", $row[3], ".quote($row[4]).", '$row[5]', ".quote($row[6]).", ".quote($row[7]).", ".quote($row[8]).", '$row[9]', '$row[10]')");
         }
         $sth->finish;
@@ -71,11 +72,10 @@ sub www_add {
 		%hash = WebGUI::Widget::getPositions();
                 $output .= tableFormRow(WebGUI::International::get(363),WebGUI::Form::selectList("templatePosition",\%hash));
                 $output .= tableFormRow(WebGUI::International::get(85),WebGUI::Form::textArea("description",'',50,5,1));
-                %hash = WebGUI::SQL->buildHash("select groupId,groupName from groups where groupName<>'Reserved' order by groupName");
-		$array[0] = 4;
-                $output .= tableFormRow(WebGUI::International::get(1,$namespace),WebGUI::Form::selectList("groupToApprove",\%hash,\@array));
-		$array[0] = 2;
-                $output .= tableFormRow(WebGUI::International::get(2,$namespace),WebGUI::Form::selectList("groupToContribute",\%hash,\@array));
+                $output .= tableFormRow(WebGUI::International::get(1,$namespace),
+			WebGUI::Form::groupList("groupToApprove",4));
+                $output .= tableFormRow(WebGUI::International::get(2,$namespace),
+			WebGUI::Form::groupList("groupToContribute",2));
                 $output .= tableFormRow(WebGUI::International::get(6,$namespace),WebGUI::Form::text("submissionsPerPage",20,2,50));
                 %hash = ("Approved"=>WebGUI::International::get(7,$namespace),"Denied"=>WebGUI::International::get(8,$namespace),"Pending"=>WebGUI::International::get(9,$namespace));
                 $output .= tableFormRow(WebGUI::International::get(10,$namespace),WebGUI::Form::selectList("defaultStatus",\%hash,'',1));
@@ -265,11 +265,10 @@ sub www_edit {
                 $array[0] = $data{templatePosition};
                 $output .= tableFormRow(WebGUI::International::get(363),WebGUI::Form::selectList("templatePosition",\%hash,\@array));
                 $output .= tableFormRow(WebGUI::International::get(85),WebGUI::Form::textArea("description",$data{description}));
-		$array[0] = $data{groupToApprove};
-		%hash = WebGUI::SQL->buildHash("select groupId,groupName from groups where groupName<>'Reserved' order by groupName");
-                $output .= tableFormRow(WebGUI::International::get(1,$namespace),WebGUI::Form::selectList("groupToApprove",\%hash,\@array,1));
-		$array[0] = $data{groupToContribute};
-                $output .= tableFormRow(WebGUI::International::get(2,$namespace),WebGUI::Form::selectList("groupToContribute",\%hash,\@array,1));
+                $output .= tableFormRow(WebGUI::International::get(1,$namespace),
+			WebGUI::Form::groupList("groupToApprove",$data{groupToApprove}));
+                $output .= tableFormRow(WebGUI::International::get(2,$namespace),
+			WebGUI::Form::groupList("groupToContribute",$data{groupToContribute}));
                 $output .= tableFormRow(WebGUI::International::get(6,$namespace),WebGUI::Form::text("submissionsPerPage",20,2,$data{submissionsPerPage}));
                 %hash = ("Approved"=>WebGUI::International::get(7,$namespace),"Denied"=>WebGUI::International::get(8,$namespace),"Pending"=>WebGUI::International::get(9,$namespace));
 		$array[0] = $data{defaultStatus};
@@ -404,7 +403,7 @@ sub www_viewSubmission {
   #---menu
         $output .= '<a href="'.$session{page}{url}.'">'.WebGUI::International::get(28,$namespace).'</a><br>';
         if ($submission{userId} == $session{user}{userId}) {
-                $output .= '<a href="'.$session{page}{url}.'?func=deleteSubmission&wid='.$session{form}{wid}.'&sid='.$session{form}{sid}.'">'.WebGUI::International::get(186).'</a><br>';
+                $output .= '<a href="'.$session{page}{url}.'?func=deleteSubmission&wid='.$session{form}{wid}.'&sid='.$session{form}{sid}.'">'.WebGUI::International::get(37,$namespace).'</a><br>';
                 $output .= '<a href="'.$session{page}{url}.'?func=editSubmission&wid='.$session{form}{wid}.'&sid='.$session{form}{sid}.'">'.WebGUI::International::get(27,$namespace).'</a><br>';
         }
         if ($submission{status} eq "Pending" && (WebGUI::Privilege::isInGroup(3,$session{user}{userId}) || WebGUI::Privilege::isInGroup(4,$session{user}{userId}))) {
@@ -422,7 +421,7 @@ sub www_viewSubmission {
 	}	
 	$output .= $submission{content}.'<p>';
 	if ($submission{attachment} ne "") {
-               	$output .= '<p><a href="'.$session{setting}{attachmentDirectoryWeb}.'/'.$session{form}{wid}.'/'.$session{form}{sid}.'/'.$submission{attachment}.'"><img src="'.$session{setting}{lib}.'/attachment.gif" border=0 alt="Download Attachment"></a><p>';
+               	$output .= attachmentBox($submission{attachment},$session{form}{wid},$session{form}{sid});
         }		
 	$output .= '</td></tr></table>';
 	return $output;

@@ -155,7 +155,7 @@ sub www_editSave {
 
 #-------------------------------------------------------------------
 sub www_view {
-	my (%data, @test, $output);
+	my (%data, @test, $output, %fileType);
 	tie %data, 'Tie::CPHash';
 	%data = getProperties($namespace,$_[0]);
 	if (defined %data) {
@@ -165,12 +165,18 @@ sub www_view {
 			$output .= '<span class="itemTitle">'.$data{title}.'</span>';
 		}
 		if ($data{attachment} ne "") {
-			$output .= ' - <a href="'.$session{setting}{attachmentDirectoryWeb}.'/'.$_[0].'/'.$data{attachment}.'"><img src="'.$session{setting}{lib}.'/smallAttachment.gif" border=0 alt="'.WebGUI::International::get(5,$namespace).'"></a>';
+			%fileType = WebGUI::Attachment::getType($data{attachment});
+			$output .= ' - <a href="'.$session{setting}{attachmentDirectoryWeb}.'/'.$_[0].'/'.
+				$data{attachment}.'"><img src="'.$fileType{icon}.'" border=0 alt="'.
+				$data{attachment}.'" width=16 height=16 border=0 align="middle"></a>';
 		}
 		if ($data{description} ne "") {
 			$output .= ' - '.$data{description};
 		}
 	}
+        if ($data{processMacros} == 1) {
+                $output = WebGUI::Macro::process($output);
+        }
 	return $output;
 }
 

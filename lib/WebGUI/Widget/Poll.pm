@@ -94,8 +94,8 @@ sub widgetName {
 
 #-------------------------------------------------------------------
 sub www_add {
-        my ($output, %hash, @array);
-	tie %hash, "Tie::IxHash";
+        my ($output, %hash);
+	tie %hash, 'Tie::IxHash';
       	if (WebGUI::Privilege::canEditPage()) {
                 $output = helpLink(1,$namespace);
 		$output .= '<h1>'.WebGUI::International::get(2,$namespace).'</h1>';
@@ -107,15 +107,17 @@ sub www_add {
                 $output .= tableFormRow(WebGUI::International::get(174),WebGUI::Form::checkbox("displayTitle",1));
                 $output .= tableFormRow(WebGUI::International::get(175),WebGUI::Form::checkbox("processMacros",1));
 		%hash = WebGUI::Widget::getPositions();
-                $output .= tableFormRow(WebGUI::International::get(363),WebGUI::Form::selectList("templatePosition",\%hash));
+                $output .= tableFormRow(WebGUI::International::get(363),
+			WebGUI::Form::selectList("templatePosition",\%hash));
                 $output .= tableFormRow(WebGUI::International::get(85),WebGUI::Form::textArea("description",'',50,5,1));
                 $output .= tableFormRow(WebGUI::International::get(3,$namespace),WebGUI::Form::checkbox("active",1,1));
-		%hash = WebGUI::SQL->buildHash("select groupId,groupName from groups where groupName<>'Reserved' order by groupName");
-		$array[0] = 1;
-                $output .= tableFormRow(WebGUI::International::get(4,$namespace),WebGUI::Form::selectList("voteGroup",\%hash,\@array));
-                $output .= tableFormRow(WebGUI::International::get(5,$namespace),WebGUI::Form::text("graphWidth",20,3,150));
+                $output .= tableFormRow(WebGUI::International::get(4,$namespace),
+			WebGUI::Form::groupList("voteGroup",1));
+                $output .= tableFormRow(WebGUI::International::get(5,$namespace),
+			WebGUI::Form::text("graphWidth",20,3,150));
                 $output .= tableFormRow(WebGUI::International::get(6,$namespace),WebGUI::Form::text("question",50,255));
-                $output .= tableFormRow(WebGUI::International::get(7,$namespace).'<span><br>'.WebGUI::International::get(8,$namespace).'</span>',WebGUI::Form::textArea("answers",'',50,8,0,'on'));
+                $output .= tableFormRow(WebGUI::International::get(7,$namespace).'<span><br>'.WebGUI::International::get(8,$namespace).'</span>',
+			WebGUI::Form::textArea("answers",'',50,8,0,'on'));
                 $output .= formSave();
                 $output .= '</table></form>';
                 return $output;
@@ -162,19 +164,26 @@ sub www_edit {
                 $output .= WebGUI::Form::hidden("func","editSave");
                 $output .= '<table>';
                 $output .= tableFormRow(WebGUI::International::get(99),WebGUI::Form::text("title",20,128,$data{title}));
-                $output .= tableFormRow(WebGUI::International::get(174),WebGUI::Form::checkbox("displayTitle",1,$data{displayTitle}));
-                $output .= tableFormRow(WebGUI::International::get(175),WebGUI::Form::checkbox("processMacros",1,$data{processMacros}));
+                $output .= tableFormRow(WebGUI::International::get(174),
+			WebGUI::Form::checkbox("displayTitle",1,$data{displayTitle}));
+                $output .= tableFormRow(WebGUI::International::get(175),
+			WebGUI::Form::checkbox("processMacros",1,$data{processMacros}));
 		%hash = WebGUI::Widget::getPositions();
                 $array[0] = $data{templatePosition};
-                $output .= tableFormRow(WebGUI::International::get(363),WebGUI::Form::selectList("templatePosition",\%hash,\@array));
-                $output .= tableFormRow(WebGUI::International::get(85),WebGUI::Form::textArea("description",$data{description},50,5,1));
-                $output .= tableFormRow(WebGUI::International::get(3,$namespace),WebGUI::Form::checkbox("active",1,$data{active}));
-		%hash = WebGUI::SQL->buildHash("select groupId,groupName from groups where groupName<>'Reserved' order by groupName");
-                $array[0] = $data{voteGroup};
-                $output .= tableFormRow(WebGUI::International::get(4,$namespace),WebGUI::Form::selectList("voteGroup",\%hash,\@array));
-                $output .= tableFormRow(WebGUI::International::get(5,$namespace),WebGUI::Form::text("graphWidth",20,3,$data{graphWidth}));
-                $output .= tableFormRow(WebGUI::International::get(6,$namespace),WebGUI::Form::text("question",50,255,$data{question}));
-                $output .= tableFormRow(WebGUI::International::get(7,$namespace).'<span><br>'.WebGUI::International::get(8,$namespace).'</span>',WebGUI::Form::textArea("answers",$data{a1}."\n".$data{a2}."\n".$data{a3}."\n".$data{a4}."\n".$data{a5}."\n".$data{a6}."\n".$data{a7}."\n".$data{a8}."\n".$data{a9}."\n".$data{a10}."\n".$data{a11}."\n".$data{a12}."\n".$data{a13}."\n".$data{a14}."\n".$data{a15}."\n".$data{a16}."\n".$data{a17}."\n".$data{a18}."\n".$data{a19}."\n".$data{a20}."\n",50,8,0,'on'));
+                $output .= tableFormRow(WebGUI::International::get(363),
+			WebGUI::Form::selectList("templatePosition",\%hash,\@array));
+                $output .= tableFormRow(WebGUI::International::get(85),
+			WebGUI::Form::textArea("description",$data{description},50,5,1));
+                $output .= tableFormRow(WebGUI::International::get(3,$namespace),
+			WebGUI::Form::checkbox("active",1,$data{active}));
+                $output .= tableFormRow(WebGUI::International::get(4,$namespace),
+			WebGUI::Form::groupList("voteGroup",$data{voteGroup}));
+                $output .= tableFormRow(WebGUI::International::get(5,$namespace),
+			WebGUI::Form::text("graphWidth",20,3,$data{graphWidth}));
+                $output .= tableFormRow(WebGUI::International::get(6,$namespace),
+			WebGUI::Form::text("question",50,255,$data{question}));
+                $output .= tableFormRow(WebGUI::International::get(7,$namespace).'<span><br>'.WebGUI::International::get(8,$namespace).'</span>',
+			WebGUI::Form::textArea("answers",$data{a1}."\n".$data{a2}."\n".$data{a3}."\n".$data{a4}."\n".$data{a5}."\n".$data{a6}."\n".$data{a7}."\n".$data{a8}."\n".$data{a9}."\n".$data{a10}."\n".$data{a11}."\n".$data{a12}."\n".$data{a13}."\n".$data{a14}."\n".$data{a15}."\n".$data{a16}."\n".$data{a17}."\n".$data{a18}."\n".$data{a19}."\n".$data{a20}."\n",50,8,0,'on'));
                 $output .= formSave();
 		$output .= tableFormRow("",'<a href="'.$session{page}{url}.'?func=resetVotes&wid='.$session{form}{wid}.'">'.WebGUI::International::get(10,$namespace).'</a>');
                 $output .= '</table></form>';

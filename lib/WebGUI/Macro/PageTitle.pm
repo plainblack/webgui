@@ -1,4 +1,4 @@
-package WebGUI::Operation;
+package WebGUI::Macro::PageTitle;
 
 #-------------------------------------------------------------------
 # WebGUI is Copyright 2001-2002 Plain Black Software.
@@ -11,19 +11,15 @@ package WebGUI::Operation;
 #-------------------------------------------------------------------
 
 use strict;
-use WebGUI::Operation::Account;
-use WebGUI::Operation::Admin;
-use WebGUI::Operation::Group;
-use WebGUI::Operation::Help;
-use WebGUI::Operation::Image;
-use WebGUI::Operation::Package;
-use WebGUI::Operation::Page;
-use WebGUI::Operation::Search;
-use WebGUI::Operation::Settings;
-use WebGUI::Operation::Statistics;
-use WebGUI::Operation::Style;
-use WebGUI::Operation::Trash;
-use WebGUI::Operation::User;
+use WebGUI::Session;
 
+#-------------------------------------------------------------------
+sub process {
+	my ($output);
+	$output = $_[0];
+        $output =~ s/\^PageTitle\;/$session{page}{title}/g;
+	return $output;
+}
 
 1;
+

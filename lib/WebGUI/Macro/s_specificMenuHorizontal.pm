@@ -18,11 +18,11 @@ use WebGUI::SQL;
 
 #-------------------------------------------------------------------
 sub _replacement {
-        my ($temp, @data, $pageTitle, $parentId, $sth, $first);
-        $pageTitle = $1;
+        my ($temp, @data, $pageTitle, $parentId, $sth, $first, @param);
+	@param = WebGUI::Macro::getParams($_[0]);
         $temp = '<span class="horizontalMenu">';
         $first = 1;
-        ($parentId) = WebGUI::SQL->quickArray("select pageId from page where urlizedTitle='$pageTitle'");
+        ($parentId) = WebGUI::SQL->quickArray("select pageId from page where urlizedTitle='$param[0]'");
         $sth = WebGUI::SQL->read("select title,urlizedTitle,pageId from page where parentId='$parentId' order by sequenceNumber");
         while (@data = $sth->array) {
         	if (WebGUI::Privilege::canViewPage($data[2])) {
@@ -31,7 +31,8 @@ sub _replacement {
                         } else {
                                 $temp .= " &middot; ";
                         }
-                        $temp .= '<a class="horizontalMenu" href="'.$session{env}{SCRIPT_NAME}.'/'.$data[1].'">'.$data[0].'</a>';
+                        $temp .= '<a class="horizontalMenu" href="'.$session{config}{scripturl}.
+				'/'.$data[1].'">'.$data[0].'</a>';
                 }
         }
         $sth->finish;
@@ -44,7 +45,7 @@ sub process {
 	my ($output,@data, $pageTitle, $parentId, $sth, $first, $temp);
 	$output = $_[0];
         $output =~ s/\^s\((.*?)\)\;/_replacement($1)/ge;
-        $output =~ s/\^s\;/_replacement()/ge;
+        #$output =~ s/\^s\;/_replacement()/ge;
 	return $output;
 }
 

@@ -27,7 +27,6 @@ sub www_viewHelp {
 	tie %help, 'Tie::CPHash';
 	%help = WebGUI::SQL->quickHash("select * from help where helpId=$session{form}{hid} and namespace='$namespace' and language='$session{user}{language}'");
         $output = '<h1>'.WebGUI::International::get(93).': '.$help{action}.' '.$help{object}.'</h1>';
-	$help{body} =~ s/\n/\<br\>/g;
 	$output .= $help{body};
 	$output .= '<p><b>'.WebGUI::International::get(94).':';
         $sth = WebGUI::SQL->read("select helpId, action, object, namespace from help where object='$help{object}' and action<>'$help{action}' and language='$session{user}{language}' order by action");

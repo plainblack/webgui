@@ -17,7 +17,7 @@ use WebGUI::Session;
 sub process {
 	my ($output);
 	$output = $_[0];
-        $output =~ s/\^\/\;/$session{ENV}{SCRIPT_NAME}/g;
+        $output =~ s/\^\/\;/$session{config}{scripturl}/g;
 	return $output;
 }
 

@@ -13,6 +13,7 @@ package WebGUI::Form;
 use strict qw(vars subs);
 use WebGUI::International;
 use WebGUI::Session;
+use WebGUI::SQL;
 
 #-------------------------------------------------------------------
 sub _fixQuotes {
@@ -38,6 +39,16 @@ sub file {
         ($name) = @_;
         $output = '<input type="file" name="'.$name.'">';
         return $output;
+}
+
+#-------------------------------------------------------------------
+sub groupList {
+	my ($output, %hash, @array);
+	tie %hash, 'Tie::IxHash';
+ 	%hash = WebGUI::SQL->buildHash("select groupId,groupName from groups where groupName<>'Reserved' order by groupName");
+        $array[0] = $_[1];
+        $output = selectList($_[0],\%hash,\@array);
+	return $output;
 }
 
 #-------------------------------------------------------------------

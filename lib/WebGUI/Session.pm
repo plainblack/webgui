@@ -41,7 +41,7 @@ sub _getPageInfo {
         	}
 	}
 	%page = WebGUI::SQL->quickHash("select * from page where pageId='".$pageId."'",$_[1]);
-	$page{url} = $ENV{SCRIPT_NAME}."/".$page{urlizedTitle};
+	$page{url} = $_[3]."/".$page{urlizedTitle};
         return %page;
 }
 
@@ -107,6 +107,13 @@ sub open {
         foreach ($config->param) {
                 $CONFIG{$_} = $config->param($_);
         }
+        if( defined( $CONFIG{scripturl} ) ) {
+                # get rid of leading "/" if present.
+                $CONFIG{scripturl} =~ s/^\///;
+        } else {
+                # default to the "real" path to script.
+                $CONFIG{scripturl} = $ENV{SCRIPT_NAME};
+        }
         $dbh = DBI->connect($CONFIG{dsn}, $CONFIG{dbuser}, $CONFIG{dbpass}, { RaiseError => 0, AutoCommit => 1 });
         $query = CGI->new();
         foreach ($query->param) {
@@ -119,7 +126,7 @@ sub open {
 	%VARS = _getSessionVars($COOKIES{wgSession},$dbh,$SETTINGS{sessionTimeout});
         %USER = _getUserInfo($VARS{sessionId},$dbh);
 	$CGI::POST_MAX=1024 * $SETTINGS{maxAttachmentSize};
-	%PAGE = _getPageInfo("",$dbh,$SETTINGS{notFoundPage});
+	%PAGE = _getPageInfo("",$dbh,$SETTINGS{notFoundPage},$CONFIG{scripturl});
         %session = (
                 env => \%ENV,					# environment variables from the web server
                 config=> \%CONFIG,				# variables loaded from the config file

@@ -1,4 +1,4 @@
-package WebGUI::Macro::C_crumbTrail;
+package WebGUI::Macro::I_imageWithTags;
 
 #-------------------------------------------------------------------
 # WebGUI is Copyright 2001-2002 Plain Black Software.
@@ -12,28 +12,18 @@ package WebGUI::Macro::C_crumbTrail;
 
 use strict;
 use Tie::CPHash;
+use WebGUI::Macro;
 use WebGUI::Session;
 use WebGUI::SQL;
 
 #-------------------------------------------------------------------
-sub _recurseCrumbTrail {
-        my ($sth, %data, $output);
-        tie %data, 'Tie::CPHash';
-        %data = WebGUI::SQL->quickHash("select pageId,parentId,title,urlizedTitle from page where pageId=$_[0]");
-        if ($data{pageId} > 1) {
-                $output .= _recurseCrumbTrail($data{parentId});
-        }
-        if ($data{title} ne "") {
-		$output .= '<a class="crumbTrail" href="'.$session{config}{scripturl}.
-			'/'.$data{urlizedTitle}.'">'.$data{title}.'</a> &gt; ';
-        }
-        return $output;
-}
-
-#-------------------------------------------------------------------
 sub _replacement {
-        my (@param, $temp);
-        $temp = '<span class="crumbTrail">'._recurseCrumbTrail($session{page}{parentId}).'<a href="'.$session{page}{url}.'">'.$session{page}{title}.'</a></span>';
+	my (@param, $temp, %data);
+	tie %data, 'Tie::CPHash';
+        @param = WebGUI::Macro::getParams($_[0]);
+	%data = WebGUI::SQL->quickHash("select * from images where name='$param[0]'");
+	$temp = '<img src="'.$session{setting}{attachmentDirectoryWeb}.'/images/'.
+		$data{imageId}.'/'.$data{filename}.'" '.$data{parameters}.'>'; 
 	return $temp;
 }
 
@@ -41,9 +31,10 @@ sub _replacement {
 sub process {
 	my ($output, $temp);
 	$output = $_[0];
-        $output =~ s/\^C\;/_replacement()/ge;
+	$output =~ s/\^I\((.*?)\)\;/_replacement($1)/ge;
 	return $output;
 }
 
 1;
+
 

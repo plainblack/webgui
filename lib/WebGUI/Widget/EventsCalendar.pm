@@ -29,8 +29,9 @@ sub duplicate {
         tie %data, 'Tie::CPHash';
         %data = getProperties($namespace,$_[0]);
 	$pageId = $_[1] || $data{pageId};
-        $newWidgetId = create($pageId,$namespace,$data{title},$data{displayTitle},$data{description},$data{processMacros},$data{templatePosition});
-        WebGUI::SQL->write("insert into EventsCalendar values ($newWidgetId)");
+        $newWidgetId = create($pageId,$namespace,$data{title},
+		$data{displayTitle},$data{description},$data{processMacros},$data{templatePosition});
+        WebGUI::SQL->write("insert into EventsCalendar values ($newWidgetId, '$data{calendarLayout}', '$data{paginateAfter}')");
 	$sth = WebGUI::SQL->read("select * from EventsCalendar_event where widgetId=$_[0] order by recurringEventId");
 	while (@row = $sth->array) {
 		$newEventId = getNextId("eventId");
@@ -38,7 +39,9 @@ sub duplicate {
 			$row[6] = getNextId("recurringEventId");
 			$previousRecurringEventId = $row[6];
 		}
-               	WebGUI::SQL->write("insert into EventsCalendar_event values ($newEventId, $newWidgetId, ".quote($row[2]).", ".quote($row[3]).", '".$row[4]."', '".$row[5]."', $row[6])");
+               	WebGUI::SQL->write("insert into EventsCalendar_event values ($newEventId, $newWidgetId, ".
+			quote($row[2]).", ".quote($row[3]).", '".$row[4].
+			"', '".$row[5]."', $row[6])");
 	}
 	$sth->finish;
 }
@@ -65,12 +68,20 @@ sub www_add {
                 $output .= WebGUI::Form::hidden("widget",$namespace);
                 $output .= WebGUI::Form::hidden("func","addSave");
                 $output .= '<table>';
-                $output .= tableFormRow(WebGUI::International::get(99),WebGUI::Form::text("title",20,128,'Events Calendar'));
+                $output .= tableFormRow(WebGUI::International::get(99),
+			WebGUI::Form::text("title",20,128,'Events Calendar'));
                 $output .= tableFormRow(WebGUI::International::get(174),WebGUI::Form::checkbox("displayTitle",1,1));
                 $output .= tableFormRow(WebGUI::International::get(175),WebGUI::Form::checkbox("processMacros",1));
 		%hash = WebGUI::Widget::getPositions();
-                $output .= tableFormRow(WebGUI::International::get(363),WebGUI::Form::selectList("templatePosition",\%hash));
+                $output .= tableFormRow(WebGUI::International::get(363),
+			WebGUI::Form::selectList("templatePosition",\%hash));
                 $output .= tableFormRow(WebGUI::International::get(85),WebGUI::Form::textArea("description",'',50,5,1));
+		%hash = (list => WebGUI::International::get(17,$namespace),
+			calendar => WebGUI::International::get(18,$namespace));
+                $output .= tableFormRow(WebGUI::International::get(16,$namespace),
+			WebGUI::Form::selectList("calendarLayout",\%hash));
+                $output .= tableFormRow(WebGUI::International::get(19,$namespace),
+			WebGUI::Form::text("paginateAfter",20,30,50));
                 $output .= tableFormRow(WebGUI::International::get(1,$namespace),WebGUI::Form::checkbox("proceed",1,1));
                 $output .= formSave();
                 $output .= '</table></form>';
@@ -85,8 +96,10 @@ sub www_add {
 sub www_addSave {
 	my ($widgetId);
 	if (WebGUI::Privilege::canEditPage()) {
-		$widgetId = create($session{page}{pageId},$session{form}{widget},$session{form}{title},$session{form}{displayTitle},$session{form}{description},$session{form}{processMacros},$session{form}{templatePosition});	
-                WebGUI::SQL->write("insert into EventsCalendar values ($widgetId)");
+		$widgetId = create($session{page}{pageId},$session{form}{widget},
+			$session{form}{title},$session{form}{displayTitle},$session{form}{description},
+			$session{form}{processMacros},$session{form}{templatePosition});	
+                WebGUI::SQL->write("insert into EventsCalendar values ($widgetId, '$session{form}{calendarLayout}', '$session{form}{paginateAfter}')");
                 if ($session{form}{proceed} == 1) {
                         $session{form}{wid} = $widgetId;
                         return www_addEvent();
@@ -114,9 +127,12 @@ sub www_addEvent {
                 $output .= WebGUI::Form::hidden("func","addEventSave");
                 $output .= '<table>';
                 $output .= tableFormRow(WebGUI::International::get(99),WebGUI::Form::text("name",20,128));
-                $output .= tableFormRow(WebGUI::International::get(85),WebGUI::Form::textArea("description",'',50,10,1));
-                $output .= tableFormRow(WebGUI::International::get(176),WebGUI::Form::text("startDate",20,30,$today,1,'onBlur="this.form.endDate.value=this.form.startDate.value;this.form.until.value=this.form.startDate.value;"'));
-                $output .= tableFormRow(WebGUI::International::get(177),WebGUI::Form::text("endDate",20,30,$today,1));
+                $output .= tableFormRow(WebGUI::International::get(85),
+			WebGUI::Form::textArea("description",'',50,10,1));
+                $output .= tableFormRow(WebGUI::International::get(14,$namespace),
+			WebGUI::Form::text("startDate",20,30,$today,1,'onBlur="this.form.endDate.value=this.form.startDate.value;this.form.until.value=this.form.startDate.value;"'));
+                $output .= tableFormRow(WebGUI::International::get(15,$namespace),
+			WebGUI::Form::text("endDate",20,30,$today,1));
                 $output .= tableFormRow(WebGUI::International::get(8,$namespace),WebGUI::Form::selectList("recursEvery",\%recursEvery).' '.WebGUI::International::get(9,$namespace).' '.WebGUI::Form::text("until",20,30,$today,1));
                 $output .= formSave();
                 $output .= '</table></form>';
@@ -220,12 +236,23 @@ sub www_edit {
                 $output .= WebGUI::Form::hidden("func","editSave");
                 $output .= '<table>';
                 $output .= tableFormRow(WebGUI::International::get(99),WebGUI::Form::text("title",20,128,$data{title}));
-                $output .= tableFormRow(WebGUI::International::get(174),WebGUI::Form::checkbox("displayTitle",1,$data{displayTitle}));
-                $output .= tableFormRow(WebGUI::International::get(175),WebGUI::Form::checkbox("processMacros",1,$data{processMacros}));
-                $output .= tableFormRow(WebGUI::International::get(85),WebGUI::Form::textArea("description",$data{description},50,5,1));
+                $output .= tableFormRow(WebGUI::International::get(174),
+			WebGUI::Form::checkbox("displayTitle",1,$data{displayTitle}));
+                $output .= tableFormRow(WebGUI::International::get(175),
+			WebGUI::Form::checkbox("processMacros",1,$data{processMacros}));
+                $output .= tableFormRow(WebGUI::International::get(85),
+			WebGUI::Form::textArea("description",$data{description},50,5,1));
 		%hash = WebGUI::Widget::getPositions();
                 $array[0] = $data{templatePosition};
-                $output .= tableFormRow(WebGUI::International::get(363),WebGUI::Form::selectList("templatePosition",\%hash,\@array));
+                $output .= tableFormRow(WebGUI::International::get(363),
+			WebGUI::Form::selectList("templatePosition",\%hash,\@array));
+                %hash = (list => WebGUI::International::get(17,$namespace),
+                        calendar => WebGUI::International::get(18,$namespace));
+		$array[0] = $data{calendarLayout};
+                $output .= tableFormRow(WebGUI::International::get(16,$namespace),
+                        WebGUI::Form::selectList("calendarLayout",\%hash,\@array));
+                $output .= tableFormRow(WebGUI::International::get(19,$namespace),
+                        WebGUI::Form::text("paginateAfter",20,30,$data{paginateAfter}));
                 $output .= formSave();
                 $output .= '</table></form>';
                 $output .= '<p><a href="'.$session{page}{url}.'?func=addEvent&wid='.$session{form}{wid}.'">Add New Event</a><p>';
@@ -246,6 +273,7 @@ sub www_edit {
 sub www_editSave {
         if (WebGUI::Privilege::canEditPage()) {
 		update();
+		WebGUI::SQL->write("update EventsCalendar set calendarLayout='$session{form}{calendarLayout}', paginateAfter='$session{form}{paginateAfter}' where widgetId=$session{form}{wid}");
                 return "";
         } else {
                 return WebGUI::Privilege::insufficient();
@@ -264,10 +292,14 @@ sub www_editEvent {
                 $output .= WebGUI::Form::hidden("eid",$session{form}{eid});
                 $output .= WebGUI::Form::hidden("func","editEventSave");
                 $output .= '<table>';
-                $output .= tableFormRow(WebGUI::International::get(99),WebGUI::Form::text("name",20,128,$event{name}));
-                $output .= tableFormRow(WebGUI::International::get(85),WebGUI::Form::textArea("description",$event{description},50,10,1));
-                $output .= tableFormRow(WebGUI::International::get(176),WebGUI::Form::text("startDate",20,30,epochToSet($event{startDate}),1));
-                $output .= tableFormRow(WebGUI::International::get(177),WebGUI::Form::text("endDate",20,30,epochToSet($event{endDate}),1));
+                $output .= tableFormRow(WebGUI::International::get(99),
+			WebGUI::Form::text("name",20,128,$event{name}));
+                $output .= tableFormRow(WebGUI::International::get(85),
+			WebGUI::Form::textArea("description",$event{description},50,10,1));
+                $output .= tableFormRow(WebGUI::International::get(14,$namespace),
+			WebGUI::Form::text("startDate",20,30,epochToSet($event{startDate}),1));
+                $output .= tableFormRow(WebGUI::International::get(15,$namespace),
+			WebGUI::Form::text("endDate",20,30,epochToSet($event{endDate}),1));
                 $output .= formSave();
                 $output .= '</table></form>';
                 return $output;

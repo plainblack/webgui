@@ -40,7 +40,8 @@ sub _traversePageTree {
                 $sth = WebGUI::SQL->read("select urlizedTitle, title, pageId from page where parentId='$_[0]' order by sequenceNumber");
                 while (@data = $sth->array) {
                         if (WebGUI::Privilege::canViewPage($data[2])) {
-                                $output .= $depth.$_[4].' <a href="'.$session{env}{SCRIPT_NAME}.'/'.$data[0].'">'.$data[1].'</a>';
+                                $output .= $depth.$_[4].' <a href="'.$session{config}{scripturl}.
+					'/'.$data[0].'">'.$data[1].'</a>';
 				$output .= $lineSpacing;
                                 $output .= _traversePageTree($data[2],$_[1]+1,$_[2],$_[3],$_[4],$_[5]);
                         }
