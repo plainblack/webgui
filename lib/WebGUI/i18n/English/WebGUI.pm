@@ -86,11 +86,6 @@ our $I18N = {
 		lastUpdated => 1036892929
 	},
 
-	'898' => {
-		message => q|Site Icon|,
-		lastUpdated => 1050172395
-	},
-
 	'798' => {
 		message => q|Page Title|,
 		lastUpdated => 1036978688
@@ -1481,11 +1476,6 @@ How should this user be notified when they get a new WebGUI message?
 	'765' => {
 		message => q|Delete this collateral item.|,
 		lastUpdated => 1036892866
-	},
-
-	'897' => {
-		message => q|Favicon|,
-		lastUpdated => 1050170767
 	},
 
 	'784' => {
@@ -7075,10 +7065,6 @@ The primary URL of your company. This will appear on all automated emails sent f
 <P><B>Not Found Page</B><BR>If a page that a user requests is not found in the system, the user can either be redirected to the home page or to an error page where they can attempt to find what they were looking for. You decide which is better for your users. 
 
 <p><b>URL Extension</b><br />Add an extension such as "html", "php", or "asp" to each new page URL as it is created. <p><b>NOTE:</b> Do NOT include the dot "." in this. So the field should look like "html" not ".html".
-
-<P><B>Favicon</B><BR>An icon that appears on Internet Explorer short cuts such as your "Favorites". More information about <A href="http://msdn.microsoft.com/workshop/author/dhtml/howto/shortcuticon.asp">Favicon</A> is available online.
-
-<P><B>Site Icon</B><BR>An icon that appears in the URL bar of most modern browsers. It may also appear in the bookmarks of the browser. The image must be 16x16 pixels. 
 
 <P><B>Maximum Attachment Size</B><BR>The size (in kilobytes) of the maximum allowable attachment to be uploaded to your system. 
 

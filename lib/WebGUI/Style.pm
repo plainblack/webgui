@@ -136,13 +136,9 @@ sub process {
 	} elsif ($session{page}{useEmptyStyle}) {
 		$templateId = 6;
 	}
-        my $type = lc($session{setting}{siteicon});
-        $type =~ s/.*\.(.*?)$/$1/;
 	$var{'head.tags'} = '
 		<meta name="generator" content="WebGUI '.$WebGUI::VERSION.'" />
 		<meta http-equiv="Content-Type" content="text/html; charset='.WebGUI::International::getLanguage($session{page}{languageId},"charset").'" />
-		<link rel="icon" href="'.$session{setting}{siteicon}.'" type="image/'.$type.'" />
-		<link rel="SHORTCUT ICON" href="'.$session{setting}{favicon}.'" />
                 <script>
                         function getWebguiProperty (propName) {
                                 var props = new Array();

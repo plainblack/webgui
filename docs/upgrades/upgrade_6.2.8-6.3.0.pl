@@ -32,6 +32,24 @@ while (my $data = $sth->hashRef) {
 $sth->finish;
 
 
+print "\tMoving site icons into style templates.\n" unless ($quiet);
+my $type = lc($session{setting}{siteicon});
+$type =~ s/.*\.(.*?)$/$1/;
+my $tags = '	
+	<link rel="icon" href="'.$session{setting}{siteicon}.'" type="image/'.$type.'" />
+	<link rel="SHORTCUT ICON" href="'.$session{setting}{favicon}.'" />
+	<tmpl_var head.tags>
+	';
+$sth = WebGUI::SQL->read("select templateId,template from template where namespace='style'");
+while (my ($id,$template) = $sth->array) {
+	$template =~ s/\<tmpl_var head\.tags\>/$tags/ig;
+	WebGUI::SQL->write("update template set template=".quote($template)." where templateId=".quote($id)." and namespace='style'");
+}
+$sth->finish;
+WebGUI::SQL->write("delete from settings where name in ('siteicon','favicon')");
+
+
+
 WebGUI::Session::close();
 
 

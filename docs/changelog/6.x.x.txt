@@ -32,6 +32,7 @@
  - Fixed a user profile vulnerability.
  - Fixed a sequence ordering problem with the USS.
  - Added internationalized URL handling.
+ - Moved site icon and fav icon directly into style templates.
 
 
 6.2.8

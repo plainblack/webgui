@@ -84,16 +84,6 @@ sub www_editSettings {
 		-value=>$session{setting}{urlExtension},
 		-label=>$i18n->get("url extension")
 		);
-        $tabform->getTab("content")->text(
-		-name=>"favicon",
-		-label=>$i18n->get(897),
-		-value=>$session{setting}{favicon}
-		);
-	$tabform->getTab("content")->text(
-                -name=>"siteicon",
-                -label=>$i18n->get(898),
-                -value=>$session{setting}{siteicon}
-                );
         $tabform->getTab("content")->integer(
 		-name=>"maxAttachmentSize",
 		-label=>$i18n->get(130),
