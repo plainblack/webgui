@@ -60,16 +60,15 @@ sub getName {
 sub view {
 	my $self = shift;
 	my %var;
-	my $count = 1;
+	my $count;
+	my $first;
 	my @forum_loop;
-	my $children = $self->getLineage(["children"],{includeOnlyClasses=>["WebGUI::Asset::Wobject::Collaboration"]});
+	my $children = $self->getLineage(["children"],{includeOnlyClasses=>["WebGUI::Asset::Wobject::Collaboration"],returnObjects=>1});
 	foreach my $child (@{$children}) {
+		$count++;
 		next unless ($child->canView);
 		if ($count == 1) {
-			$var{'default.listing'} = $child->view;
-			$var{'default.description'} = $child->get("description");
-			$var{'default.title'} = $child->get("title");
-			$var{'default.controls'} = $child->getToolbar;
+			$first = $child;
 		}
 		my %lastPostVars;
 		my $lastPost = WebGUI::Asset::Wobject::MessageBoard->newByDynamicClass($child->get("lastPostId"));
@@ -87,23 +86,22 @@ sub view {
 				'forum.lastPost.user.isVisitor' => ($lastPost->get("ownerUserId") eq '1')
 				);
 		}
-			push(@forum_loop, {
-				%lastPostVars,
-				'forum.controls' => $child->getToolbar,
-				'forum.count' => $count,
-				'forum.title' => $child->get('title'),
-				'forum.description' => $child->get("description"),
-				'forum.replies' => $child->get("replies"),
-				'forum.rating' => $child->get("rating"),
-				'forum.views' => $child->get("views"),
-				'forum.threads' => $child->get("threads"),
-				'forum.url' => $child->getUrl,
-				'forum.user.canView' => $child->canView,
-				'forum.user.canPost' => $child->canPost
-				});
-			$count++;
-		}
+		push(@forum_loop, {
+			%lastPostVars,
+			'forum.controls' => $child->getToolbar,
+			'forum.count' => $count,
+			'forum.title' => $child->get('title'),
+			'forum.description' => $child->get("description"),
+			'forum.replies' => $child->get("replies"),
+			'forum.rating' => $child->get("rating"),
+			'forum.views' => $child->get("views"),
+			'forum.threads' => $child->get("threads"),
+			'forum.url' => $child->getUrl,
+			'forum.user.canView' => $child->canView,
+			'forum.user.canPost' => $child->canPost
+			});
 	}
+	$var{'default.listing'} = $first->view if ($count == 1 && defined $first);
 	$var{'forum.add.url'} = $self->getUrl("func=add&class=WebGUI::Asset::Wobject::Collaboration");
 	$var{'forum.add.label'} = WebGUI::International::get(75,"MessageBoard");
 	$var{'title.label'} = WebGUI::International::get(99);
@@ -112,7 +110,7 @@ sub view {
 	$var{'threads.label'} = WebGUI::International::get(1036);
 	$var{'replies.label'} = WebGUI::International::get(1016);
 	$var{'lastpost.label'} = WebGUI::International::get(1017);
-	$var{areMultipleForums} = ($count > 2);
+	$var{areMultipleForums} = ($count > 1);
 	$var{forum_loop} = \@forum_loop;
        	return $self->processTemplate(\%var,$self->get("templateId"));
 }

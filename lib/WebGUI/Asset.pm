@@ -1597,6 +1597,7 @@ Any properties to set besides defaults.
 sub newByDynamicClass {
 	my $class = shift;
 	my $assetId = shift;
+	return undef unless defined $assetId;
 	my $className = shift;
 	my $overrideProperties = shift;
 	unless (defined $className) {
