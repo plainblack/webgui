@@ -19,11 +19,21 @@ use WebGUI::Session;
 sub process {
         my ($temp, $tree, @param);
 	@param = WebGUI::Macro::getParams($_[0]);
-	$tree = WebGUI::Navigation::tree(1,1);
+	my $root = _findRoot($session{page}{pageId});
+	$tree = WebGUI::Navigation::tree($root,1);
         $temp = '<span class="horizontalMenu">';
 	$temp .= WebGUI::Navigation::drawHorizontal($tree,$param[0]);
         $temp .= '</span>';
 	return $temp;
+}
+
+sub _findRoot {
+        my ($pageId,$parentId) = WebGUI::SQL->quickArray("select pageId,parentId from page where pageId=$_[0]");
+        if ($parentId == $_[1]) {
+                return $pageId;
+        } else {
+                return _findRoot($parentId);
+        }
 }
 
 
