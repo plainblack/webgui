@@ -19,6 +19,8 @@ use DBI;
 use strict qw(subs vars);
 use Tie::IxHash;
 use WebGUI::DateTime;
+use WebGUI::HTML;
+use WebGUI::HTMLForm;
 use WebGUI::Icon;
 use WebGUI::International;
 use WebGUI::Macro;
@@ -436,6 +438,7 @@ sub www_editSave {
         $templatePosition = $session{form}{templatePosition} || 'A';
         $startDate = setToEpoch($session{form}{startDate}) || setToEpoch(time());
         $endDate = setToEpoch($session{form}{endDate}) || setToEpoch(time()+315360000);
+	$session{form}{description} = WebGUI::HTML::cleanSegment($session{form}{description});
 	$_[0]->set({
 		title=>$title,
 		displayTitle=>$session{form}{displayTitle},

@@ -25,6 +25,7 @@ use WebGUI::Session;
 =head1 SYNOPSIS
 
  use WebGUI::HTML;
+ $html = WebGUI::HTML::cleanSegment($html);
  $html = WebGUI::HTML::filter($html);
 
 =head1 DESCRIPTION
@@ -37,6 +38,33 @@ use WebGUI::Session;
 
 =cut
 
+
+#-------------------------------------------------------------------
+
+=head2 cleanSegment ( html )
+
+ Returns an HTML segment that has been stripped of the <BODY> tag
+ and anything before it, as well as the </BODY> tag and anything
+ after it. 
+
+ NOTE: This filter does have one exception, it leaves anything before
+ the <BODY> tag that is enclosed in <STYLE></STYLE> tags.
+
+=item html
+
+ The HTML segment you want cleaned.
+
+=cut
+
+sub cleanSegment {
+	my ($style, $value);
+	$value = $_[0];
+	$value =~ m/(\<style.*?\/style\>)/ixsg;
+	$style = $1;
+	$value =~ s/\A.*?\<body.*?\>(.*?)/$style$1/ixsg;
+        $value =~ s/(.*?)\<\/body\>.*?\z/$1/ixsg;
+	return $value;
+}
 
 #-------------------------------------------------------------------
 
