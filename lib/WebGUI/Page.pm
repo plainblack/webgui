@@ -1236,7 +1236,7 @@ sub moveUp {
 				parentId
 			end
 		where 
-			nestedSetRight between ". $self->get('nestedSetLeft') ." and ". $mother->get('nestedSetRight')."
+			nestedSetRight between ". $self->get('nestedSetLeft') ." and ". $mother->get('nestedSetRight')." or 
 			nestedSetLeft between ". $self->get('nestedSetLeft') ." and ". $mother->get('nestedSetRight');
 			
 	WebGUI::SQL->write($sql);
