@@ -84,7 +84,7 @@ sub www_edit {
         	$f->hidden("title",$namespace);
         	$f->hidden("displayTitle",0);
         	$f->hidden("processMacros",0);
-        	$f->hidden("templatePosition",'A');
+        	$f->hidden("templatePosition",0);
         	$f->date("startDate",WebGUI::International::get(497),$_[0]->get("startDate"));
         	$f->date("endDate",WebGUI::International::get(498),$endDate);
 		$f->integer("spacer",WebGUI::International::get(3,$namespace),$spacer);
