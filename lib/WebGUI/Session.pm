@@ -179,13 +179,18 @@ sub end {
 
 #-------------------------------------------------------------------
 sub httpHeader {
-	my ($charset);
-	($charset) = WebGUI::SQL->quickArray("select characterSet from language where languageId=".$session{user}{language});
-	$charset = "ISO-8859-1" if ($charset eq "");
+	unless ($session{header}{charset}) {
+		my ($charset) = WebGUI::SQL->quickArray("select characterSet from language where languageId=".$session{user}{language});
+		$session{header}{charset} = $charset || "ISO-8859-1";
+	}
+	if ($session{header}{filename} && $session{header}{mimetype} eq "text/html") {
+		$session{header}{mimetype} = "application/octet-stream";
+	}
 	return $session{cgi}->header( 
 		-type => $session{header}{mimetype}.'; charset='.$charset,
 		-cookie => $session{header}{cookie}, 
-		-status => $session{header}{status} 
+		-status => $session{header}{status},
+		-attachment => $session{header}{filename}
 		);
 }
 
