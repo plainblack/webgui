@@ -177,7 +177,7 @@ sub www_editCollateral {
 			-value=>$collateral->{name},
 			-label=>WebGUI::International::get(768)
 			);
-		$f->select(
+		$f->selectList(
 			-name=>"collateralFolderId",
 			-value=>[$folderId],
 			-label=>WebGUI::International::get(769),
@@ -334,7 +334,7 @@ sub www_editCollateralFolder {
 	if ($folder->{collateralFolderId} eq "0") {
 		$f->hidden("parentId",0);
 	} else {
-		$f->select(
+		$f->selectList(
                 	-name=>"parentId",
                 	-value=>[$folder->{parentId}],
                 	-label=>WebGUI::International::get(769),
@@ -421,12 +421,12 @@ sub www_listCollateral {
 		-value=>$session{scratch}{keyword},
 		-size=>15
 		);
-	$f->select(
+	$f->selectList(
 		-name=>"collateralUser",
 		-value=>[$session{scratch}{collateralUser}],
 		-options=>\%user
 		);
-	$f->select(
+	$f->selectList(
 		-name=>"collateralType",
 		-value=>[$session{scratch}{collateralType}],
 		-options=>\%type

@@ -237,7 +237,7 @@ sub www_editSettings {
    	foreach (@{$session{config}{authMethods}}) {
       		$options->{$_} = $_;
    	}
-   	$tabform->getTab("auth")->select(
+   	$tabform->getTab("auth")->selectList(
             	-name=>"authMethod",
 		-options=>$options,
 		-label=>$i18n->get(164),

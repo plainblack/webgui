@@ -118,7 +118,7 @@ sub www_editTemplate {
 		if ($session{form}{tid} eq "new") {
 			$namespaces = WebGUI::SQL->buildHashRef("select distinct(namespace),namespace 
 				from template order by namespace");
-			$f->select("namespace",$namespaces,WebGUI::International::get(721),[$session{form}{namespace}]);
+			$f->selectList("namespace",$namespaces,WebGUI::International::get(721),[$session{form}{namespace}]);
 		} else {
                 	$f->hidden("namespace",$session{form}{namespace});
 		}

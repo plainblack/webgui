@@ -181,7 +181,7 @@ sub www_editProfileField {
 	foreach $key (keys %hash) {
 		$hash{$key} = eval $hash{$key};
 	}
-	$f->select(
+	$f->selectList(
 		-name=>"profileCategoryId",
 		-options=>\%hash,
 		-label=>WebGUI::International::get(489,"WebGUIProfile"),

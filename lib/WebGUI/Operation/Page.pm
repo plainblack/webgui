@@ -452,7 +452,7 @@ sub www_editPage {
 			$clause = "userId=".quote($page{ownerId});
                 }
 		my $users = WebGUI::SQL->buildHashRef("select userId,username from users where $clause order by username");
-		$f->getTab("privileges")->select(
+		$f->getTab("privileges")->selectList(
 			-name=>"ownerId",
 			-options=>$users,
 			-label=>WebGUI::International::get(108),
