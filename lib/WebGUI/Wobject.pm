@@ -79,6 +79,34 @@ sub _getPositions {
 
 #-------------------------------------------------------------------
 
+=head2 description ( )
+
+ Returns this instance's description if it exists.
+
+=cut
+
+sub description {
+        if ($_[0]->get("description")) {
+                return $_[0]->get("description").'<p>';
+        }
+}
+
+#-------------------------------------------------------------------
+
+=head2 displayTitle ( )
+
+ Returns this instance's title if displayTitle is set to yes.
+
+=cut
+
+sub displayTitle {
+        if ($_[0]->get("displayTitle")) {
+                return "<h1>".$_[0]->get("title")."</h1>";
+        }
+}
+
+#-------------------------------------------------------------------
+
 =head2 duplicate ( [ pageId ] )
 
  Duplicates this wobject with a new wobject ID. Returns the new
@@ -107,7 +135,7 @@ sub duplicate {
 		displayTitle => $_[0]->get("displayTitle"),
 		processMacros => $_[0]->get("processMacros"),
 		startDate => $_[0]->get("startDate"),
-		endDate => $_[0]->get("startDate"),
+		endDate => $_[0]->get("endDate"),
 		templatePosition => $_[0]->get("templatePosition")
 		});
         return $w->get("wobjectId");

@@ -1136,7 +1136,7 @@ sub url {
 
 =head2 yesNo ( name [ label, value, extras, subtext ] )
 
- Adds a yes/no pull down menu to this form.
+ Adds a yes/no radio menu to this form.
 
 =item name
 
@@ -1167,24 +1167,20 @@ sub url {
 =cut
 
 sub yesNo {
-        my (%hash, $subtext, $class, $key, $output, $name, $label, $extras, $value);
+        my ($subtext, $class, $output, $name, $label, $extras, $value);
         $class = shift;
         $name = shift;
         $label = shift;
         $value = shift;
         $extras = shift;
         $subtext = shift;
-        tie %hash, 'Tie::IxHash';
-	%hash = ('1'=>WebGUI::International::get(138), '0'=>WebGUI::International::get(139));
-        $output = '<select name="'.$name.'" '.$extras.'>';
-        foreach $key (keys %hash) {
-                $output .= '<option value="'.$key.'"';
-                if ($value eq $key) {
-                	$output .= " selected";
-                }
-                $output .= '>'.$hash{$key};
-        }
-        $output .= '</select>';
+        $output = '<input type="radio" name="'.$name.'" value="1"';
+	$output .= ' checked="1"' if ($value == 1);
+	$output .= $extras.'>'.WebGUI::International::get(138);
+	$output .= '&nbsp;&nbsp;&nbsp;';
+        $output .= '<input type="radio" name="'.$name.'" value="0"';
+        $output .= ' checked="1"' if ($value == 0);
+        $output .= $extras.'>'.WebGUI::International::get(139);
         $output .= _subtext($subtext);
         $output = _tableFormRow($label,$output);
         $class->{_data} .= $output;
