@@ -2,4 +2,7 @@ dsn = DBI:mysql:WebGUI
 dbuser = webgui
 dbpass = password
 logfile = /data/webgui.log
+extras = /extras
+uploadsURL = /uploads
+uploadsPath = /data/WebGUI/www/uploads
 #scripturl = /

@@ -180,7 +180,7 @@ sub _layoutStandard {
                 $i++;
         }
         $sth->finish;
-	$seperator = '<td class="productAttributeSeperator"><img src="'.$session{setting}{lib}.'/spacer.gif" width="1" height="1"></td>';
+	$seperator = '<td class="productAttributeSeperator"><img src="'.$session{config}{extras}.'/spacer.gif" width="1" height="1"></td>';
 	$output .= join($seperator,@column);
 	$output .= '</tr>';
 	$output .= '</table>';

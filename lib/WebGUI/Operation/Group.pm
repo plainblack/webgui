@@ -142,11 +142,10 @@ sub www_listGroups {
                 $sth = WebGUI::SQL->read("select groupId,groupName,description from groups 
 			where groupId<>1 and groupId<>2 and groupId<>7 order by groupName");
                 while (@data = $sth->array) {
-                        $row[$i] = '<tr><td valign="top" class="tableData"><a href="'.
-				WebGUI::URL::page('op=deleteGroup&gid='.$data[0]).
-				'"><img src="'.$session{setting}{lib}.'/delete.gif" border=0></a><a href="'.
-				WebGUI::URL::page('op=editGroup&gid='.$data[0]).
-				'"><img src="'.$session{setting}{lib}.'/edit.gif" border=0></a></td>';
+                        $row[$i] = '<tr><td valign="top" class="tableData">'
+				.deleteIcon('op=deleteGroup&gid='.$data[0])
+				.editIcon('op=editGroup&gid='.$data[0])
+				.'</td>';
                         $row[$i] .= '<td valign="top" class="tableData">'.$data[1].'</td>';
                         $row[$i] .= '<td valign="top" class="tableData">'.$data[2].'</td></tr>';
                         $i++;

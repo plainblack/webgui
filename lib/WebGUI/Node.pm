@@ -59,13 +59,13 @@ use WebGUI::Session;
 sub create {
 	my ($slash, $node);
 	$slash = ($^O =~ /Win/i) ? "\\" : "/";
-	$node = $session{setting}{attachmentDirectoryLocal}.$slash.$_[0]->{_node1};
+	$node = $session{config}{uploadsPath}.$slash.$_[0]->{_node1};
 	mkdir($node);
 	unless ($! eq "File exists" || $! eq "") {
 		WebGUI::ErrorHandler::warn("Couldn't create node: $node : $!");
 	}
         if ($_[0]->{_node2} ne "") {
-		$node = $session{setting}{attachmentDirectoryLocal}.$slash.$_[0]->{_node1}.$slash.$_[0]->{_node2};
+		$node = $session{config}{uploadsPath}.$slash.$_[0]->{_node1}.$slash.$_[0]->{_node2};
 		mkdir($node);
 		unless ($! eq "File exists" || $! eq "") {
                 	WebGUI::ErrorHandler::warn("Couldn't create node: $node : $!");
@@ -97,7 +97,7 @@ sub delete {
 sub getPath {
         my ($path,$slash);
 	$slash = ($^O =~ /Win/i) ? "\\" : "/";
-        $path = $session{setting}{attachmentDirectoryLocal}.$slash.$_[0]->{_node1};
+        $path = $session{config}{uploadsPath}.$slash.$_[0]->{_node1};
         if ($_[0]->{_node2} ne "") {
                 $path .= $slash.$_[0]->{_node2};
         }
@@ -115,7 +115,7 @@ sub getPath {
 
 sub getURL {
 	my ($url);
-	$url = $session{setting}{attachmentDirectoryWeb}.'/'.$_[0]->{_node1};
+	$url = $session{config}{uploadsURL}.'/'.$_[0]->{_node1};
 	if ($_[0]->{_node2} ne "") {
 		$url .= '/'.$_[0]->{_node2};
 	}

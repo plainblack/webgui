@@ -187,7 +187,7 @@ sub www_listImages {
 		if($imageGroupId > 0) {  # show previous link
                 	$row[$i] = '<tr class="tableData">';
 			$row[$i] .= '<td colspan="5"><a href="'.WebGUI::URL::page('op=listImages&gid='.$imageGroupParentId)
-				.'"><img src="'.$session{setting}{lib}.'/smallAttachment.gif" border="0"></a>'
+				.'"><img src="'.$session{config}{extras}.'/smallAttachment.gif" border="0"></a>'
 				.'&nbsp;<a href="'.WebGUI::URL::page('op=listImages&gid='.$imageGroupParentId)
 				.'">'.WebGUI::International::get(542).'</a></td>'; # FIXME folder icon
                         $row[$i] .= '</tr>';
@@ -203,7 +203,7 @@ sub www_listImages {
                         $row[$i] .= viewIcon('op=viewImageGroup&gid='.$data{imageGroupId}.'&pid='.$imageGroupId);
                         $row[$i] .= '</td>';
 			$row[$i] .= '<td><a href="'.WebGUI::URL::page('op=listImages&gid='.$data{imageGroupId}.'&pid='.$imageGroupId)
-				.'"><img src="'.$session{setting}{lib}.'/smallAttachment.gif" border="0"></a>'
+				.'"><img src="'.$session{config}{extras}.'/smallAttachment.gif" border="0"></a>'
 				.'&nbsp;<a href="'.WebGUI::URL::page('op=listImages&gid='.$data{imageGroupId}.'&pid='.$imageGroupId)
 				.'">'.$data{name}.'</a></td>'; # FIXME folder icon
                         $row[$i] .= '<td>'.$data{description}.'&nbsp;</td>';

@@ -291,12 +291,10 @@ sub www_editUserGroup {
 			from groupings,groups where groupings.groupId=groups.groupId and 
 			groupings.userId=$session{form}{uid} order by groups.groupName");
                 while (%hash = $sth->hash) {
-                        $output .= '<tr><td><a href="'.WebGUI::URL::page('op=deleteGrouping&uid='.
-                                $session{form}{uid}.'&gid='.$hash{groupId}).'"><img src="'.
-                                $session{setting}{lib}.'/delete.gif" border=0></a><a href="'.
-                                WebGUI::URL::page('op=editGrouping&uid='.$session{form}{uid}.
-                                '&gid='.$hash{groupId}).'"><img src="'.$session{setting}{lib}.
-                                '/edit.gif" border=0></a></td>';
+                        $output .= '<tr><td>'
+				.deleteIcon('op=deleteGrouping&uid='.$session{form}{uid}.'&gid='.$hash{groupId})
+                                .editIcon('op=editGrouping&uid='.$session{form}{uid}.'&gid='.$hash{groupId})
+                                .'</td>';
                         $output .= '<td class="tableData">'.$hash{groupName}.'</td>';
                         $output .= '<td class="tableData">'.epochToHuman($hash{expireDate},"%z").'</td></tr>';
                 }
@@ -434,13 +432,10 @@ sub www_listUsers {
 		}
 		$sth = WebGUI::SQL->read("select * from users $search order by users.username");
 		while (%data = $sth->hash) {
-			$row[$i] = '<tr class="tableData"><td>';
-			$row[$i] .= '<a href="'.WebGUI::URL::page('op=deleteUser&uid='.$data{userId}).
-				'"><img src="'.$session{setting}{lib}.'/delete.gif" border=0></a>';
-			$row[$i] .= '<a href="'.WebGUI::URL::page('op=editUser&uid='.$data{userId}).
-				'"><img src="'.$session{setting}{lib}.'/edit.gif" border=0></a>';
-			$row[$i] .= '<a href="'.WebGUI::URL::page('op=becomeUser&uid='.$data{userId}).
-				'"><img src="'.$session{setting}{lib}.'/become.gif" border=0></a>';
+			$row[$i] = '<tr class="tableData"><td>'
+				.deleteIcon('op=deleteUser&uid='.$data{userId})
+				.editIcon('op=editUser&uid='.$data{userId})
+				.becomeIcon('op=becomeUser&uid='.$data{userId});
 			$row[$i] .= '</td>';
 			$row[$i] .= '<td><a href="'.WebGUI::URL::page('op=viewProfile&uid='.$data{userId})
 				.'">'.$data{username}.'</a></td>';

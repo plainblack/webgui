@@ -67,18 +67,18 @@ sub _traversePageTree {
         my ($a, $b, %page, %wobject, $output, $depth, $i, $spacer);
 	tie %page, 'Tie::CPHash';
 	tie %wobject, 'Tie::CPHash';
-        $spacer = '<img src="'.$session{setting}{lib}.'/spacer.gif" width=12>';
+        $spacer = '<img src="'.$session{config}{extras}.'/spacer.gif" width=12>';
         for ($i=1;$i<=$_[1];$i++) {
                 $depth .= $spacer;
         }
         $a = WebGUI::SQL->read("select * from page where (pageId<2 or pageId>25) and parentId='$_[0]' order by sequenceNumber");
         while (%page = $a->hash) {
-                $output .= $depth.'<img src="'.$session{setting}{lib}.'/page.gif" align="middle">'.
+                $output .= $depth.'<img src="'.$session{config}{extras}.'/page.gif" align="middle">'.
 			' <a href="'.WebGUI::URL::gateway($page{urlizedTitle}).'">'.$page{title}.'</a><br>';
 		$b = WebGUI::SQL->read("select * from wobject where pageId=$page{pageId}");
 		while (%wobject = $b->hash) {
                 	$output .= $depth.$spacer.
-				'<img src="'.$session{setting}{lib}.'/wobject.gif"> '.
+				'<img src="'.$session{config}{extras}.'/wobject.gif"> '.
 				$wobject{title}.'<br>';
 		}
 		$b->finish;

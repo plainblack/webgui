@@ -22,7 +22,7 @@ use WebGUI::URL;
 
 our @ISA = qw(Exporter);
 our @EXPORT = qw(&www_editUserSettings &www_editUserSettingsSave &www_editCompanyInformation &www_editCompanyInformationSave 
-	&www_editFileSettings &www_editFileSettingsSave &www_editMailSettings &www_editMailSettingsSave &www_editMiscSettings 
+	&www_editMailSettings &www_editMailSettingsSave &www_editMiscSettings 
 	&www_editContentSettings &www_editContentSettingsSave &www_editMiscSettingsSave &www_manageSettings);
 
 #-------------------------------------------------------------------
@@ -130,6 +130,9 @@ sub www_editContentSettings {
                 $f->text("docTypeDec",WebGUI::International::get(398),$session{setting}{docTypeDec});
                 $f->yesNo("addEditStampToPosts",WebGUI::International::get(524),$session{setting}{addEditStampToPosts});
                 $f->select("filterContributedHTML",\%htmlFilter,WebGUI::International::get(418),[$session{setting}{filterContributedHTML}]);
+                $f->integer("maxAttachmentSize",WebGUI::International::get(130),$session{setting}{maxAttachmentSize});
+                $f->integer("maxImageSize",WebGUI::International::get(583),$session{setting}{maxImageSize});
+                $f->integer("thumbnailSize",WebGUI::International::get(406),$session{setting}{thumbnailSize});
                 $f->integer("textAreaRows",WebGUI::International::get(463),$session{setting}{textAreaRows});
                 $f->integer("textAreaCols",WebGUI::International::get(464),$session{setting}{textAreaCols});
                 $f->integer("textBoxSize",WebGUI::International::get(465),$session{setting}{textBoxSize});
@@ -154,43 +157,9 @@ sub www_editContentSettingsSave {
                 _saveSetting("textAreaCols");
                 _saveSetting("textBoxSize");
                 _saveSetting("richEditor");
-                return www_manageSettings();
-        } else {
-                return WebGUI::Privilege::adminOnly();
-        }
-}
-
-#-------------------------------------------------------------------
-sub www_editFileSettings {
-        my ($output, $f);
-        if (WebGUI::Privilege::isInGroup(3)) {
-                $output .= helpIcon(11);
-		$output .= '<h1>'.WebGUI::International::get(128).'</h1>';
-		$f = WebGUI::HTMLForm->new;
-                $f->hidden("op","editFileSettingsSave");
-                $f->text("lib",WebGUI::International::get(129),$session{setting}{lib});
-                $f->integer("maxAttachmentSize",WebGUI::International::get(130),$session{setting}{maxAttachmentSize});
-                $f->integer("maxImageSize",WebGUI::International::get(583),$session{setting}{maxImageSize});
-                $f->integer("thumbnailSize",WebGUI::International::get(406),$session{setting}{thumbnailSize});
-                $f->text("attachmentDirectoryWeb",WebGUI::International::get(131),$session{setting}{attachmentDirectoryWeb});
-                $f->text("attachmentDirectoryLocal",WebGUI::International::get(132),$session{setting}{attachmentDirectoryLocal});
-		$f->submit;
-		$output .= $f->print;
-        } else {
-                $output = WebGUI::Privilege::adminOnly();
-        }
-        return $output;
-}
-
-#-------------------------------------------------------------------
-sub www_editFileSettingsSave {
-        if (WebGUI::Privilege::isInGroup(3)) {
-		_saveSetting("lib");
-		_saveSetting("maxImageSize");
-		_saveSetting("maxAttachmentSize");
-		_saveSetting("thumbnailSize");
-		_saveSetting("attachmentDirectoryWeb");
-		_saveSetting("attachmentDirectoryLocal");
+                _saveSetting("maxImageSize");
+                _saveSetting("maxAttachmentSize");
+                _saveSetting("thumbnailSize");
                 return www_manageSettings();
         } else {
                 return WebGUI::Privilege::adminOnly();
@@ -265,7 +234,6 @@ sub www_manageSettings {
                 $output .= '<ul>';
                 $output .= '<li><a href="'.WebGUI::URL::page('op=editCompanyInformation').'">'.WebGUI::International::get(124).'</a>';
                 $output .= '<li><a href="'.WebGUI::URL::page('op=editContentSettings').'">'.WebGUI::International::get(525).'</a>';
-                $output .= '<li><a href="'.WebGUI::URL::page('op=editFileSettings').'">'.WebGUI::International::get(128).'</a>';
                 $output .= '<li><a href="'.WebGUI::URL::page('op=editMailSettings').'">'.WebGUI::International::get(133).'</a>';
                 $output .= '<li><a href="'.WebGUI::URL::page('op=editMiscSettings').'">'.WebGUI::International::get(140).'</a>';
                 $output .= '<li><a href="'.WebGUI::URL::page('op=editProfileSettings').'">'.WebGUI::International::get(308).'</a>';

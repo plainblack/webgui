@@ -7,6 +7,23 @@ upgrading from one version to the next, or even between multiple
 versions. Be sure to heed the warnings contained herein as they will
 save you many hours of grief.
 
+4.3.0
+--------------------------------------------------------------------
+ * The settings "extras", "uploadsURL", and "uploadsPath" have all 
+	been moved to the config file to make installations easier. 
+	This means that you must add those lines to your old 
+	configuration files before you upgrade. See 
+	etc/WebGUI.conf.original for details. 
+
+ * For wobject and macro developers this also means that any third-
+	party wobjects that use those settings, must be modified to 
+	use the new variable name. The following is the change in 
+	relationship:
+
+	$session{setting}{lib} = $session{config}{extras}
+	$session{setting}{attachmentDirectoryWeb} = $session{config}{uploadsURL}
+	$session{setting}{attachmentDirectoryLocal} = $session{config}{uploadsPath}
+
 4.2.0
 --------------------------------------------------------------------
  * All Discussion properties have been reset to enable the new

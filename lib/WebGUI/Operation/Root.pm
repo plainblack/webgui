@@ -37,13 +37,13 @@ sub www_listRoots {
                 while (%data = $sth->hash) {
                         $row[$i] = '<tr><td valign="top" class="tableData">'.
 				'<a href="'.WebGUI::URL::gateway($data{urlizedTitle}.'?op=deletePage').'">'.
-				'<img src="'.$session{setting}{lib}.'/delete.gif" border=0></a>'.
+				'<img src="'.$session{config}{extras}.'/delete.gif" border=0></a>'.
                                 '<a href="'.WebGUI::URL::gateway($data{urlizedTitle}.'?op=cutPage').'">'.
-                                '<img src="'.$session{setting}{lib}.'/cut.gif" border=0></a>'.
+                                '<img src="'.$session{config}{extras}.'/cut.gif" border=0></a>'.
 				'<a href="'.WebGUI::URL::gateway($data{urlizedTitle}.'?op=editPage').'">'.
-				'<img src="'.$session{setting}{lib}.'/edit.gif" border=0></a>'.
+				'<img src="'.$session{config}{extras}.'/edit.gif" border=0></a>'.
                                 '<a href="'.WebGUI::URL::gateway($data{urlizedTitle}).'">'.
-                                '<img src="'.$session{setting}{lib}.'/view.gif" border=0></a>'.
+                                '<img src="'.$session{config}{extras}.'/view.gif" border=0></a>'.
 				'</td>';
                         $row[$i] .= '<td valign="top" class="tableData">'.$data{title}.'</td>';
                         $row[$i] .= '<td valign="top" class="tableData">'.$data{urlizedTitle}.'</td></tr>';

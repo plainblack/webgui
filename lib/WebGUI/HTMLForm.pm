@@ -272,7 +272,7 @@ sub date {
         $output = '<input type="text" name="'.$name.'" value="'.$value.'" size="'.
                 $size.'" maxlength="10" '.$extras.'>';
 	$output .= '<input type="button" style="font-size: 8pt;" onClick="window.dateField = this.form.'.
-		$name.';calendar = window.open(\''.$session{setting}{lib}.
+		$name.';calendar = window.open(\''.$session{config}{extras}.
 		'/calendar.html\',\'cal\',\'WIDTH=200,HEIGHT=250\');return false" value="'.
 		WebGUI::International::get(34).'">';
 	$output .= _subtext($subtext);
@@ -335,7 +335,7 @@ sub email {
         $extras = shift;
         $subtext = shift;
         $size = shift || $session{setting}{textBoxSize} || 30;
-	$output = '<script language="javascript" src="'.$session{setting}{lib}.'/emailCheck.js"></script>';
+	$output = '<script language="javascript" src="'.$session{config}{extras}.'/emailCheck.js"></script>';
         $output .= '<input type="text" name="'.$name.'" value="'.$value.'" size="'.
                 $size.'" maxlength="'.$maxLength.'" onBlur="emailCheck(this.value)" '.$extras.'>';
         $output .= _subtext($subtext);
@@ -564,19 +564,19 @@ sub HTMLArea {
 			var formObj;
 			function openEditWindow(obj) {
 	                	formObj = obj;
-				window.open("'.$session{setting}{lib}.'/eopro.html","editWindow","width=720,height=450,resizable=1");
+				window.open("'.$session{config}{extras}.'/eopro.html","editWindow","width=720,height=450,resizable=1");
 			}
 			</script>';
 	} else {
 	        $output .= '<script language="JavaScript">
         	       var formObj;
-	               var extrasDir="'.$session{setting}{lib}.'";
+	               var extrasDir="'.$session{config}{extras}.'";
         	       function openEditWindow(obj) {
 	               formObj = obj;
         	       if (navigator.userAgent.substr(navigator.userAgent.indexOf("MSIE")+5,1)>=5)
-                	 window.open("'.$session{setting}{lib}.'/ieEdit.html","editWindow","width=490,height=400,resizable=1");
+                	 window.open("'.$session{config}{extras}.'/ieEdit.html","editWindow","width=490,height=400,resizable=1");
 	               else
-        	         window.open("'.$session{setting}{lib}.'/nonIeEdit.html","editWindow","width=500,height=410");
+        	         window.open("'.$session{config}{extras}.'/nonIeEdit.html","editWindow","width=500,height=410");
 	               }
         	       function setContent(content) {
                 	 formObj.value = content;

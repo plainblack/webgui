@@ -649,8 +649,13 @@ INSERT INTO international VALUES (555,'WebGUI',8,'Modifica il karma di questo ut
 INSERT INTO international VALUES (556,'WebGUI',8,'Ammontare');
 INSERT INTO international VALUES (557,'WebGUI',8,'Descrizione');
 INSERT INTO international VALUES (558,'WebGUI',8,'Modifica il karma dell\'utente');
-
-
+delete from international where namespace='WebGUI' and internationalId=129;
+delete from international where namespace='WebGUI' and internationalId=132;
+delete from international where namespace='WebGUI' and internationalId=131;
+delete from international where namespace='WebGUI' and internationalId=128;
+delete from settings where name='attachmentDirectoryLocal';
+delete from settings where name='attachmentDirectoryWeb';
+delete from settings where name='lib';
 
 
 

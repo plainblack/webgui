@@ -69,9 +69,9 @@ sub sortByColumn {
 	$output .= '">'.$_[1].'</a>';
         if ($session{form}{sort} eq $_[0]) {
 		if ($session{form}{sortDirection} eq "desc") {
-                	$output .= ' <img src="'.$session{setting}{lib}.'/desc.gif">';
+                	$output .= ' <img src="'.$session{config}{extras}.'/desc.gif">';
 		} else {
-                	$output .= ' <img src="'.$session{setting}{lib}.'/asc.gif">';
+                	$output .= ' <img src="'.$session{config}{extras}.'/asc.gif">';
 		}
         }
         return $output;

@@ -72,7 +72,7 @@ our @EXPORT = qw(&helpIcon &becomeIcon &cutIcon &copyIcon &deleteIcon &editIcon 
 sub becomeIcon {
         my ($output);
         $output = '<a href="'.WebGUI::URL::page($_[0]).'">';
-        $output .= '<img src="'.$session{setting}{lib}.'/become.gif" align="middle" border="0" alt="Become"></a>';
+        $output .= '<img src="'.$session{config}{extras}.'/become.gif" align="middle" border="0" alt="Become"></a>';
         return $output;
 }
 
@@ -92,7 +92,7 @@ sub becomeIcon {
 sub copyIcon {
         my ($output);
         $output = '<a href="'.WebGUI::URL::page($_[0]).'">';
-        $output .= '<img src="'.$session{setting}{lib}.'/copy.gif" align="middle" border="0" alt="Copy"></a>';
+        $output .= '<img src="'.$session{config}{extras}.'/copy.gif" align="middle" border="0" alt="Copy"></a>';
         return $output;
 }
 
@@ -112,7 +112,7 @@ sub copyIcon {
 sub cutIcon {
         my ($output);
         $output = '<a href="'.WebGUI::URL::page($_[0]).'">';
-        $output .= '<img src="'.$session{setting}{lib}.'/cut.gif" align="middle" border="0" alt="Cut"></a>';
+        $output .= '<img src="'.$session{config}{extras}.'/cut.gif" align="middle" border="0" alt="Cut"></a>';
         return $output;
 }
 
@@ -132,7 +132,7 @@ sub cutIcon {
 sub deleteIcon {
 	my ($output);
 	$output = '<a href="'.WebGUI::URL::page($_[0]).'">';
-	$output .= '<img src="'.$session{setting}{lib}.'/delete.gif" align="middle" border="0" alt="Delete"></a>';
+	$output .= '<img src="'.$session{config}{extras}.'/delete.gif" align="middle" border="0" alt="Delete"></a>';
 	return $output;
 }
 
@@ -152,7 +152,7 @@ sub deleteIcon {
 sub editIcon {
         my ($output);
         $output = '<a href="'.WebGUI::URL::page($_[0]).'">';
-        $output .= '<img src="'.$session{setting}{lib}.'/edit.gif" align="middle" border="0" alt="Edit"></a>';
+        $output .= '<img src="'.$session{config}{extras}.'/edit.gif" align="middle" border="0" alt="Edit"></a>';
         return $output;
 }
 
@@ -178,7 +178,7 @@ sub helpIcon {
 	my ($output, $namespace);
 	$namespace = $_[1] || "WebGUI";
 	$output = '<a href="'.WebGUI::URL::page('op=viewHelp&hid='.$_[0].'&namespace='.$namespace).
-		'" target="_blank"><img src="'.$session{setting}{lib}.'/help.gif" border="0" align="right"></a>';
+		'" target="_blank"><img src="'.$session{config}{extras}.'/help.gif" border="0" align="right"></a>';
 	return $output;
 }
 
@@ -198,7 +198,7 @@ sub helpIcon {
 sub moveBottomIcon {
         my ($output);
         $output = '<a href="'.WebGUI::URL::page($_[0]).'">';
-        $output .= '<img src="'.$session{setting}{lib}.'/jumpDown.gif" align="middle" border="0" alt="Move To Bottom"></a>';
+        $output .= '<img src="'.$session{config}{extras}.'/jumpDown.gif" align="middle" border="0" alt="Move To Bottom"></a>';
         return $output;
 }
 
@@ -218,7 +218,7 @@ sub moveBottomIcon {
 sub moveDownIcon {
         my ($output);
         $output = '<a href="'.WebGUI::URL::page($_[0]).'">';
-        $output .= '<img src="'.$session{setting}{lib}.'/downArrow.gif" align="middle" border="0" alt="Move Down"></a>';
+        $output .= '<img src="'.$session{config}{extras}.'/downArrow.gif" align="middle" border="0" alt="Move Down"></a>';
         return $output;
 }
 
@@ -238,7 +238,7 @@ sub moveDownIcon {
 sub moveTopIcon {
         my ($output);
         $output = '<a href="'.WebGUI::URL::page($_[0]).'">';
-        $output .= '<img src="'.$session{setting}{lib}.'/jumpUp.gif" align="middle" border="0" alt="Move To Top"></a>';
+        $output .= '<img src="'.$session{config}{extras}.'/jumpUp.gif" align="middle" border="0" alt="Move To Top"></a>';
         return $output;
 }
 
@@ -258,7 +258,7 @@ sub moveTopIcon {
 sub moveUpIcon {
         my ($output);
         $output = '<a href="'.WebGUI::URL::page($_[0]).'">';
-        $output .= '<img src="'.$session{setting}{lib}.'/upArrow.gif" align="middle" border="0" alt="Move Up"></a>';
+        $output .= '<img src="'.$session{config}{extras}.'/upArrow.gif" align="middle" border="0" alt="Move Up"></a>';
         return $output;
 }
 
@@ -273,7 +273,7 @@ sub moveUpIcon {
 =cut
 
 sub pageIcon {
-        return '<img src="'.$session{setting}{lib}.'/page.gif" align="middle" border="0" alt="Page Settings">';
+        return '<img src="'.$session{config}{extras}.'/page.gif" align="middle" border="0" alt="Page Settings">';
 }
 
 #-------------------------------------------------------------------
@@ -292,7 +292,7 @@ sub pageIcon {
 sub viewIcon {
         my ($output);
         $output = '<a href="'.WebGUI::URL::page($_[0]).'">';
-        $output .= '<img src="'.$session{setting}{lib}.'/view.gif" align="middle" border="0" alt="View"></a>';
+        $output .= '<img src="'.$session{config}{extras}.'/view.gif" align="middle" border="0" alt="View"></a>';
         return $output;
 }
 
