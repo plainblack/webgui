@@ -20,7 +20,8 @@
  - Fixed bug [ 831331 ] translation errors
  - Fixed bug [ 834792 ] Karma Decay triggers SQL error
  - Fixed bug [ 832284 ] Pagination broken in Messageboard with Search
-
+ - Fixed bug [ 838091 ] Read-Only Forum User Cannot Subscribe
+ 
 
 5.5.0
  - Rewrote the discussion system and added many new features in the process.

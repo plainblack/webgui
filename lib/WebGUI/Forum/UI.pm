@@ -1677,7 +1677,7 @@ A hash reference containing information passed from the calling object.
 sub www_forumSubscribe {
 	my ($caller) = @_;
 	my $forum = WebGUI::Forum->new($session{form}{forumId});
-	return WebGUI::Privilege::insufficient() unless ($forum->canPost && $session{user}{userId} != 1);
+	return WebGUI::Privilege::insufficient() unless ($session{user}{userId} != 1);
 	$forum->subscribe;
 	return www_viewForum($caller, $session{form}{forumId});
 }
@@ -2152,7 +2152,7 @@ A hash reference containing information passed from the calling object.
 sub www_threadSubscribe {
 	my ($caller) = @_;
 	my $post = WebGUI::Forum::Post->new($session{form}{forumPostId});
-	return WebGUI::Privilege::insufficient() unless ($session{user}{userId} != 1 && $post->getThread->getForum->canPost);
+	return WebGUI::Privilege::insufficient() unless ($session{user}{userId} != 1);
 	$post->getThread->subscribe;
 	return www_viewThread($caller, $session{form}{forumPostId});
 }
