@@ -141,13 +141,20 @@ sub _loadWobjects {
 			$namespace = $1;
 			$cmd = "use WebGUI::Wobject::".$namespace;
 			eval($cmd);
-			WebGUI::ErrorHandler::fatalError("Wobject failed to compile: $namespace. ".$@) if($@);
-			$exclude = $session{config}{excludeWobject};
-                        $exclude =~ s/ //g;
-			unless (isIn($namespace, split(/,/,$exclude))) {
-				$cmd = "\$WebGUI::Wobject::".$namespace."::name";
-				$session{wobject}{$namespace} = eval($cmd);
-				WebGUI::ErrorHandler::fatalError("No name method in wobject: $namespace. ".$@) if($@);
+			unless ($@) {
+				$exclude = $session{config}{excludeWobject};
+                        	$exclude =~ s/ //g;
+				unless (isIn($namespace, split(/,/,$exclude))) {
+					$cmd = "\$WebGUI::Wobject::".$namespace."::name";
+					$session{wobject}{$namespace} = eval($cmd);
+					if ($@) {
+						WebGUI::ErrorHandler::warn("No name method in wobject: $namespace. ".$@);
+						$session{wobject}{$namespace} = "ERROR: ".$namespace;
+					}
+				}
+			} else {
+				WebGUI::ErrorHandler::warn("Wobject failed to compile: $namespace. ".$@);
+				$session{wobject}{$namespace} = "ERROR: ".$namespace;
 			}
 		}
 	}
