@@ -136,7 +136,7 @@ sub _processOperations {
 sub page {
 	WebGUI::Session::open($_[0],$_[1]);
         my $useCache = ($session{form}{op} eq "" && $session{form}{wid} eq "" && $session{form}{makePrintable} eq "" 
-		&& (($session{page}{cacheTimeout} > 10 && $session{user}{userId} !=1) || ($session{page}{cacheTimeout} > 10 && $session{user}{userId} == 1)) 
+		&& (($session{page}{cacheTimeout} > 10 && $session{user}{userId} !=1) || ($session{page}{cacheTimeoutVisitor} > 10 && $session{user}{userId} == 1)) 
 		&& not $session{var}{adminOn});
 	my ($output, $cache);
         if ($useCache) {
