@@ -5,7 +5,8 @@
 The following people/companies are responsible for WebGUI:
 
 
-WebGUI Core..........................JT Smith / Plain Black
+WebGUI Core..........................JT Smith / Plain Black LLC
+                                     Jeff Szpak / Plain Black LLC
 
 Contributing Developers..............Peter Beardsley / Appropriate Solutions, Inc.
                                      Richard Caelius / 100 World
@@ -13,9 +14,11 @@ Contributing Developers..............Peter Beardsley / Appropriate Solutions, In
                                      Doug Collinge
                                      Flavio Curti
                                      Frank Dillon
+                                     Chris Gebhardt / OpenServe
                                      Andy Grundman
                                      Koen de Jonge / ProcoliX
                                      Christophe Marcant
+                                     Tavis Parker / ParkerOne Consulting
                                      Daniel Quinlan
 
 Contributing Translators.............Andreas Ljunggren
