@@ -1308,11 +1308,6 @@ How should this user be notified when they get a new WebGUI message?
 		lastUpdated => 1066073923
 	},
 
-	'410' => {
-		message => q|Manage roots.|,
-		lastUpdated => 1031514049
-	},
-
 	'999' => {
 		message => q|Database Link, Delete|,
 		lastUpdated => 1056151382
@@ -1340,11 +1335,6 @@ How should this user be notified when they get a new WebGUI message?
 
 	'430' => {
 		message => q|Last Page View|,
-		lastUpdated => 1031514049
-	},
-
-	'447' => {
-		message => q|Manage page tree.|,
 		lastUpdated => 1031514049
 	},
 
@@ -1450,11 +1440,6 @@ How should this user be notified when they get a new WebGUI message?
 
 	'541' => {
 		message => q|Karma Per Post|,
-		lastUpdated => 1031514049
-	},
-
-	'508' => {
-		message => q|Manage templates.|,
 		lastUpdated => 1031514049
 	},
 
@@ -2505,11 +2490,6 @@ will be modified to make it unique.|,
 		lastUpdated => 1031514049
 	},
 
-	'7' => {
-		message => q|Manage users.|,
-		lastUpdated => 1031514049
-	},
-
 	'26' => {
 		message => q|December|,
 		lastUpdated => 1031514049
@@ -2703,11 +2683,6 @@ The password you use to connect to the DSN.
 	'167' => {
 		message => q|Are you certain you want to delete this user? Be warned that all this user's information will be lost permanently if you choose to proceed.|,
 		lastUpdated => 1031514049
-	},
-
-	'394' => {
-		message => q|Manage collateral.|,
-		lastUpdated => 1036954925
 	},
 
 	'48' => {
@@ -3601,11 +3576,6 @@ The translated label for the link to the home page or the text that you supply t
 		lastUpdated => 1050190959
 	},
 
-	'374' => {
-		message => q|Manage packages.|,
-		lastUpdated => 1031514049
-	},
-
 	'930' => {
 		message => q|View Theme|,
 		lastUpdated => 1050270912
@@ -4268,11 +4238,6 @@ As with any delete operation, you are prompted to be sure you wish to proceed wi
 	'1029' => {
 		message => q|Edited at|,
 		lastUpdated => 1047842180
-	},
-
-	'5' => {
-		message => q|Manage groups.|,
-		lastUpdated => 1031514049
 	},
 
 	'698' => {
@@ -5650,11 +5615,6 @@ Start typing! Or better yet, copy the snippet from some other electronic documen
 		lastUpdated => 1031514049
 	},
 
-	'981' => {
-		message => q|Manage database links.|,
-		lastUpdated => 1056151382
-	},
-
 	'697' => {
 		message => q|Karma, Using|,
 		lastUpdated => 1031514049
@@ -6673,11 +6633,6 @@ What group should be alerted when a new user registers?
 
 	'318' => {
 		message => q|<a href="http://www.aol.com/aim/homenew.adp">AIM</a> Id|,
-		lastUpdated => 1031514049
-	},
-
-	'13' => {
-		message => q|View help index.|,
 		lastUpdated => 1031514049
 	},
 

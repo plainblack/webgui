@@ -7,12 +7,6 @@ our $I18N = {
 		context => q|A submenu item in admin console that allows the user to add a new nav config.|
 	},
 
-	'manage navigation' => {
-		message => q|Manage Navigation|,
-		lastUpdated => 1077081255,
-		context=>q|Used in the Admin Bar|
-	},
-
 	'33' => {
 		message => q|Error: This identifier is already in use. Please use an unique value.|,
 		lastUpdated => 1077081255

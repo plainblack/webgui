@@ -28,6 +28,14 @@ sub addSubmenuItem {
 		});
 }
 
+sub getAdminConsoleParams {
+	return { 'title' => WebGUI::International::get("admin console","AdminConsole"),
+		url => WebGUI::URL::page("op=adminConsole"),
+		canUse => WebGUI::Grouping::isInGroup("12"),
+		icon => $session{config}{extrasURL}."/adminConsole/adminConsole.gif"
+		};
+}
+
 sub getAdminFunction {
 	my $self = shift;
 	my $id = shift;
@@ -216,7 +224,7 @@ sub new {
 	my $class = shift;
 	my $id = shift;
 	my %self;
-	$self{_function} = $class->getAdminFunction($id);
+	$self{_function} = $class->getAdminFunction($id) if ($id);
 	bless \%self, $class;
 }
 
@@ -234,10 +242,11 @@ sub render {
 	if (exists $self->{_submenuItem}) {
 		$var{submenu_loop} = $self->{_submenuItem};
 	}
-	$var{"console.title"} = WebGUI::International::get("admin console","AdminConsole");
-	$var{"console.url"} = WebGUI::URL::page("op=adminConsole");
-	$var{"console.canUse"} = WebGUI::Grouping::isInGroup("12");
-	$var{"console.icon"} = $session{config}{extrasURL}."/adminConsole/adminConsole.gif";
+	my $acParams = $self->getAdminConsoleParams;
+	$var{"console.title"} = $acParams->{title};
+	$var{"console.url"} = $acParams->{url};
+	$var{"console.canUse"} = $acParams->{canUse};
+	$var{"console.icon"} = $acParams->{icon};
 	$var{"help.url"} = $self->{_helpUrl};
 	$var{"application_loop"} = $self->getAdminFunction;
 	$session{page}{useAdminStyle} = 1;

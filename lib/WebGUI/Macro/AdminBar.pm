@@ -13,6 +13,7 @@ package WebGUI::Macro::AdminBar;
 use strict qw(refs vars);
 use Tie::CPHash;
 use Tie::IxHash;
+use WebGUI::AdminConsole;
 use WebGUI::Grouping;
 use WebGUI::International;
 use WebGUI::Macro;
@@ -136,56 +137,18 @@ sub process {
 	}
 	$var{'clipboard_loop'} = \@clipboard;
    #--admin functions
-	%hash = ();
-	if (WebGUI::Grouping::isInGroup(3)) {
-        	%hash = ( 
-			WebGUI::URL::page('op=listGroups')=>WebGUI::International::get(5), 
-			WebGUI::URL::page('op=manageSettings')=>WebGUI::International::get(4), 
-			WebGUI::URL::page('op=listUsers')=>WebGUI::International::get(7),
-			WebGUI::URL::page('op=viewStatistics')=>WebGUI::International::get(144),
-			WebGUI::URL::page('op=listDatabaseLinks')=>WebGUI::International::get(981),
-			WebGUI::URL::page('op=listNavigation')=>WebGUI::International::get("manage navigation","Navigation")
+	%hash = (
+		'http://validator.w3.org/check?uri='.WebGUI::URL::escape(WebGUI::URL::page())=>WebGUI::International::get(399),
 		);
-	} elsif (WebGUI::Grouping::isInGroup(11)) {
-                %hash = (
-			WebGUI::URL::page('op=listGroupsSecondary')=>WebGUI::International::get(5), 
-			WebGUI::URL::page('op=addUser')=>WebGUI::International::get(169),
-                        %hash
-                );
-        }
-	if (WebGUI::Grouping::isInGroup(4)) {
-        	%hash = ( 
-			WebGUI::URL::page('op=listRoots')=>WebGUI::International::get(410),
-			'http://validator.w3.org/check?uri='.WebGUI::URL::escape(WebGUI::URL::page())=>WebGUI::International::get(399),
-			WebGUI::URL::page('op=manageClipboard')=>WebGUI::International::get(949),
-                        WebGUI::URL::page('op=listCollateral')=>WebGUI::International::get(394),
-			WebGUI::URL::page('op=viewPageTree')=>WebGUI::International::get(447),
-			WebGUI::URL::page('op=manageTrash')=>WebGUI::International::get(10),
-			%hash
-		);
-	}
-        if (WebGUI::Grouping::isInGroup(6)) {
-                %hash = (
-			WebGUI::URL::gateway('packages')=>WebGUI::International::get(374),
-                        %hash
-                );
-        }
-        if (WebGUI::Grouping::isInGroup(8)) {
-                %hash = (
-                        WebGUI::URL::page('op=listTemplates')=>WebGUI::International::get(508),
-                        %hash
-                );
-        }
-        if (WebGUI::Grouping::isInGroup(9)) {
-                %hash = (
-                        WebGUI::URL::page('op=listThemes')=>WebGUI::International::get(900),
-                        %hash
-                );
-        }
-        %hash = (  
-		WebGUI::URL::page('op=viewHelpIndex')=>WebGUI::International::get(13),
-		%hash
-	);
+	my $acParams = WebGUI::AdminConsole->getAdminConsoleParams;
+	$hash{$acParams->{url}} = $acParams->{title} if ($acParams->{canUse});
+#	$acParams = WebGUI::AdminConsole->getAdminFunction("users");
+#	$hash{$acParams->{url}} = $acParams->{title} if ($acParams->{canUse});
+#	$acParams = WebGUI::AdminConsole->getAdminFunction("groups");
+#	$hash{$acParams->{url}} = $acParams->{title} if ($acParams->{canUse});
+#	$acParams = WebGUI::AdminConsole->getAdminFunction("assets");
+#	$hash{$acParams->{url}} = $acParams->{title} if ($acParams->{canView});
+
 	%hash = sortHash(%hash);
         %hash = ( 
 		WebGUI::URL::page('op=switchOffAdmin')=>WebGUI::International::get(12),

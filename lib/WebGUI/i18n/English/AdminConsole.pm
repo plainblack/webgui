@@ -2,7 +2,7 @@ package WebGUI::i18n::English::AdminConsole;
 
 our $I18N = {
 	'admin console' => {
-		message => q|WebGUI Admin Console|,
+		message => q|Admin Console|,
 		lastUpdated => 1099344172,
 		context => q|The title of the admin console.|
 	},
