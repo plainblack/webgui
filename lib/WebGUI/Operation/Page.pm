@@ -593,7 +593,7 @@ sub www_editPageSave {
 	}
 	_recursivelyChangeProperties($page) if ($session{form}{recursePrivs} || $session{form}{recurseStyle});
 	if ($session{form}{proceed} eq "gotoNewPage") {
-		WebGUI::Session::refreshPageInfo($session{form}{pageId});
+		WebGUI::Session::refreshPageInfo($page->get('pageId'));
 	} elsif ($session{form}{pageId} == $session{page}{pageId}) {
 		WebGUI::Session::refreshPageInfo($session{page}{pageId});
 	}
