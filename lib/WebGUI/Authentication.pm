@@ -26,6 +26,10 @@ use WebGUI::SQL;
 
 Package WebGUI::Authentication
 
+=head1 DESCRIPTION
+
+This package is used to access WebGUI's pluggable authentication system.
+
 =head1 SYNOPSIS
 
  use WebGUI::Authentication;
@@ -51,10 +55,6 @@ Package WebGUI::Authentication
  $html = WebGUI::Authentication::userForm();
  WebGUI::Authentication::userFormSave();
  $error = WebGUI::Authentication::userFormValidate();
-
-=head1 DESCRIPTION
-
-This package is used to access WebGUI's pluggable authentication system.
 
 =head1 METHODS
 

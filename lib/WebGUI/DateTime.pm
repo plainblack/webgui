@@ -30,27 +30,27 @@ our @EXPORT = qw(&localtime &time &addToTime &addToDate &epochToHuman &epochToSe
 
 Package WebGUI::DateTime
 
-=head1 SYNOPSIS
-
- use WebGUI::DateTime;
- $epoch =			WebGUI::DateTime::addToDate($epoch, $years, $months, $days);
- $epoch =			WebGUI::DateTime::addToTime($epoch, $hours, $minutes, $seconds);
- ($startEpoch, $endEpoch) = 	WebGUI::DateTime::dayStartEnd($epoch);
- $dateString = 			WebGUI::DateTime::epochToHuman($epoch, $formatString);
- $setString = 			WebGUI::DateTime::epochToSet($epoch);
- $day = 			WebGUI::DateTime::getDayName($dayInteger);
- $month =			WebGUI::DateTime::getMonthName($monthInteger);
- $epoch =			WebGUI::DateTime::humanToEpoch($dateString);
- $seconds =			WebGUI::DateTime::intervalToSeconds($interval, $units);
- @date =			WebGUI::DateTime::localtime($epoch);
- ($startEpoch, $endEpoch) = 	WebGUI::DateTime::monthStartEnd($epoch);
- ($interval, $units) =		WebGUI::DateTime::secondsToInterval($seconds);
- $epoch =			WebGUI::DateTime::setToEpoch($setString);
- $epoch =			WebGUI::DateTime::time();
-
 =head1 DESCRIPTION
 
 This package provides easy to use date math functions, which are normally a complete pain.
+
+=head1 SYNOPSIS
+
+ use WebGUI::DateTime;
+ $epoch = WebGUI::DateTime::addToDate($epoch, $years, $months, $days);
+ $epoch = WebGUI::DateTime::addToTime($epoch, $hours, $minutes, $seconds);
+ ($startEpoch, $endEpoch) = WebGUI::DateTime::dayStartEnd($epoch);
+ $dateString = WebGUI::DateTime::epochToHuman($epoch, $formatString);
+ $setString = WebGUI::DateTime::epochToSet($epoch);
+ $day = WebGUI::DateTime::getDayName($dayInteger);
+ $month = WebGUI::DateTime::getMonthName($monthInteger);
+ $epoch = WebGUI::DateTime::humanToEpoch($dateString);
+ $seconds = WebGUI::DateTime::intervalToSeconds($interval, $units);
+ @date = WebGUI::DateTime::localtime($epoch);
+ ($startEpoch, $endEpoch) = WebGUI::DateTime::monthStartEnd($epoch);
+ ($interval, $units) = WebGUI::DateTime::secondsToInterval($seconds);
+ $epoch = WebGUI::DateTime::setToEpoch($setString);
+ $epoch = WebGUI::DateTime::time();
 
 =head1 METHODS
 

@@ -31,11 +31,13 @@ use WebGUI::Template;
 use WebGUI::URL;
 use WebGUI::Utility;
 
-
-
 =head1 NAME
 
 Package WebGUI::Wobject
+
+=head1 DESCRIPTION
+
+An abstract class for all other wobjects to extend.
 
 =head1 SYNOPSIS
 
@@ -43,10 +45,6 @@ Package WebGUI::Wobject
  our @ISA = qw(WebGUI::Wobject);
 
 See the subclasses in lib/WebGUI/Wobjects for details.
-
-=head1 DESCRIPTION
-
-An abstract class for all other wobjects to extend. 
 
 =head1 METHODS
 

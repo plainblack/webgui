@@ -27,15 +27,15 @@ use WebGUI::SQL;
 
 Package WebGUI::Search
 
+=head1 DESCRIPTION
+
+A package built to take the hassle out of creating advanced search functionality in WebGUI applications.
+
 =head1 SYNOPSIS
 
  use WebGUI::Search;
  $sql = WebGUI::Search::buildConstraints(\@fields);
  $html = WebGUI::Search::form(\%hidden);
-
-=head1 DESCRIPTION
-
-A package built to take the hassle out of creating advanced search functionality in WebGUI applications.
 
 =head1 METHODS
 

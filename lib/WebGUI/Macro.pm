@@ -24,17 +24,17 @@ use WebGUI::Session;
 
 Package WebGUI::Macro
 
+=head1 DESCRIPTION
+
+This package is the interface to the WebGUI macro system.
+
+NOTE: This entire system is likely to be replaced in the near future.  It has served WebGUI well since the very beginning but lacks the speed and flexibility that WebGUI users will require in the future.
+
 =head1 SYNOPSIS
 
  use WebGUI::Macro;
  @array = WebGUI::Macro::getParams($parameterString);
  $html = WebGUI::Macro::process($html);
-
-=head1 DESCRIPTION
-
-This package is the interface to the WebGUI macro system.
-
-NOTE: This entire system is likely to be replaced in the near future.  It has served WebGUI well since the very beginning but lacks the speed and flexibility that WebGUI users will require in the future.  
 
 =head1 METHODS
 

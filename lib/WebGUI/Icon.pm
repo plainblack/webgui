@@ -27,6 +27,10 @@ our @EXPORT = qw(&helpIcon &becomeIcon &cutIcon &copyIcon &deleteIcon &editIcon 
 
 Package WebGUI::Icon
 
+=head1 DESCRIPTION
+
+A package for generating user interface buttons. The subroutines found herein do nothing other than to create a short way of doing much longer repetitive tasks. They simply make the programmer's life easier through fewer keystrokes and less cluttered code.
+
 =head1 SYNOPSIS
 
  use WebGUI::Icon;
@@ -43,10 +47,6 @@ Package WebGUI::Icon
  $html = pageIcon();
  $html = viewIcon('op=something');
  $html = wobjectIcon();
-
-=head1 DESCRIPTION
-
-A package for generating user interface buttons. The subroutines found herein do nothing other than to create a short way of doing much longer repetitive tasks. They simply make the programmer's life easier through fewer keystrokes and less cluttered code.
 
 =head1 METHODS
 

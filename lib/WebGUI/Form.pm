@@ -27,6 +27,10 @@ use WebGUI::URL;
 
 Package WebGUI::Form
 
+=head1 DESCRIPTION
+
+Base forms package. Eliminates some of the normal code work that goes along with creating forms. Used by the HTMLForm package.
+
 =head1 SYNOPSIS
 
  use WebGUI::Form;
@@ -58,11 +62,7 @@ Package WebGUI::Form
  $html = WebGUI::Form::yesNo({name=>"happy"});
  $html = WebGUI::Form::zipcode({name=>"workZip"});
 
-=head1 DESCRIPTION
-
-Base forms package. Eliminates some of the normal code work that goes along with creating forms. Used by the HTMLForm package.
-
-=head1 FUNCTIONS 
+=head1 METHODS 
 
 All of the functions in this package accept the input of a hash reference containing the parameters to populate the form element. These functions are available from this package:
 

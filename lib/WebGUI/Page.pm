@@ -30,6 +30,10 @@ use WebGUI::Template;
 
 Package WebGUI::Page
 
+=head1 DESCRIPTION
+
+This package provides utility functions for WebGUI's page system.
+
 =head1 SYNOPSIS
 
  use WebGUI::Page;
@@ -39,10 +43,6 @@ Package WebGUI::Page
  $template = WebGUI::Page::getTemplate($templateId);
  $hashRef = WebGUI::Page::getTemplatePositions($templateId);
  $url = WebGUI::Page::makeUnique($url,$pageId);
-
-=head1 DESCRIPTION
-
-This package provides utility functions for WebGUI's page system.
 
 =head1 METHODS
 

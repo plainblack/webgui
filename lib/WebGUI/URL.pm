@@ -25,6 +25,10 @@ use WebGUI::Utility;
 
 Package WebGUI::URL
 
+=head1 DESCRIPTION
+
+This package provides URL writing functionality. It is important that all WebGUI URLs be written using these methods so that they can contain any extra information that WebGUI needs to add to the URLs in order to function properly.
+
 =head1 SYNOPSIS
 
  use WebGUI::URL;
@@ -35,10 +39,6 @@ Package WebGUI::URL
  $url = WebGUI::URL::page($url,$pairs);
  $string = WebGUI::URL::unescape($string);
  $url = WebGUI::URL::urlize($string);
-
-=head1 DESCRIPTION
-
-This package provides URL writing functionality. It is important that all WebGUI URLs be written using these methods so that they can contain any extra information that WebGUI needs to add to the URLs in order to function properly.
 
 =head1 METHODS
 

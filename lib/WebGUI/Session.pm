@@ -35,6 +35,14 @@ tie %session, 'Tie::CPHash';
 
 Package WebGUI::Session
 
+=head1 DESCRIPTION
+
+This package is the heart and lifeblood of WebGUI. Without it WebGUI could not exist. By using this package a package gains access to WebGUI's $session variable which contains everything WebGUI needs to know to operate.
+
+NOTE: It is important to distinguish the difference between a WebGUI session and a user session. A user session is attached to a WebGUI session. A WebGUI session is all of the basic data the WebGUI needs to operate.
+
+TIP: The $session variable is a case-insensitive hash. The contents of the has vary, but can be seen by adding debug=1 to the end of any WebGUI URL while logged in as an admin user.
+
 =head1 SYNOPSIS
 
  use WebGUI::Session;
@@ -50,14 +58,6 @@ Package WebGUI::Session
  WebGUI::Session::setCookie($name,$value);
  WebGUI::Session::setScratch($name,$value);
  WebGUI::Session::start($userId);
-
-=head1 DESCRIPTION
-
-This package is the heart and lifeblood of WebGUI. Without it WebGUI could not exist. By using this package a package gains access to WebGUI's $session variable which contains everything WebGUI needs to know to operate.
-
-NOTE: It is important to distinguish the difference between a WebGUI session and a user session. A user session is attached to a WebGUI session. A WebGUI session is all of the basic data the WebGUI needs to operate.
-
-TIP: The $session variable is a case-insensitive hash. The contents of the has vary, but can be seen by adding debug=1 to the end of any WebGUI URL while logged in as an admin user.
 
 =head1 METHODS
 

@@ -26,6 +26,10 @@ use WebGUI::URL;
 
 Package WebGUI::Privilege
 
+=head1 DESCRIPTION
+
+This package provides access to the WebGUI security system and security messages.
+
 =head1 SYNOPSIS
 
  use WebGUI::Privilege;
@@ -38,12 +42,7 @@ Package WebGUI::Privilege
  $html =	WebGUI::Privilege::notMember();
  $html =	WebGUI::Privilege::vitalComponent();
 
-
-=head1 DESCRIPTION
-
-This package provides access to the WebGUI security system and security messages. 
-
-=head1 FUNCTIONS 
+=head1 METHODS 
 
 These functions are available from this package:
 

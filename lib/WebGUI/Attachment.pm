@@ -36,19 +36,23 @@ use WebGUI::Utility;
 
 Package WebGUI::Attachment
 
+=head1 DESCRIPTION
+
+Package to manipulate WebGUI Attachments.
+
 =head1 SYNOPSIS
 
  use WebGUI::Attachment;
  $attachment = WebGUI::Attachment->new("file.txt","100","20");
- $html = 	$attachment->box;
- $string = 	$attachment->getFilename;
- $url = 	$attachment->getIcon;
- $string = 	$attachment->getPath;
- $integer = 	$attachment->getSize;
- $url = 	$attachment->getThumbnail;
- $string = 	$attachment->getType;
- $url = 	$attachment->getURL;
- $boolean = 	$attachment->isImage;
+ $html = $attachment->box;
+ $string = $attachment->getFilename;
+ $url = $attachment->getIcon;
+ $string = $attachment->getPath;
+ $integer = $attachment->getSize;
+ $url = $attachment->getThumbnail;
+ $string = $attachment->getType;
+ $url = $attachment->getURL;
+ $boolean = $attachment->isImage;
  $attachment->copy("files","10");
  $attachment->createThumbnail;
  $attachment->delete;
@@ -57,10 +61,6 @@ Package WebGUI::Attachment
  $attachment->resizeImage(300);
  $filename = $attachment->save("formImage");
  $filename = $attachment->saveFromFilesystem($pathToFile);
-
-=head1 DESCRIPTION
-
-Package to manipulate WebGUI Attachments.
 
 =head1 METHODS
 

@@ -24,17 +24,17 @@ my %international;
 
 Package WebGUI::International
 
+=head1 DESCRIPTION
+
+This package provides an interface to the internationalization system.
+
 =head1 SYNOPSIS
 
  use WebGUI::International;
- $string = 	WebGUI::International::get($internationalId,$namespace,$languageId);
- %languages =	WebGUI::International::getLanguages();
+ $string = WebGUI::International::get($internationalId,$namespace);
+ %languages = WebGUI::International::getLanguages();
 
-=head1 DESCRIPTION
-
-This package provides an interface to the internationalization system. 
-
-=head1 FUNCTIONS
+=head1 METHODS
 
 These functions are available from this package:
 

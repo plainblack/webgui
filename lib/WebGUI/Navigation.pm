@@ -27,6 +27,10 @@ use WebGUI::URL;
 
 Package WebGUI::Navigation
 
+=head1 DESCRIPTION
+
+A package used to generate navigation.
+
 =head1 SYNOPSIS
 
  use WebGUI::Navigation;
@@ -34,10 +38,6 @@ Package WebGUI::Navigation
 
  $html = WebGUI::Navigation::drawHorizontal($tree);
  $html = WebGUI::Navigation::drawVertical($tree);
-
-=head1 DESCRIPTION
-
-A package used to generate navigation.
 
 =head1 METHODS
 

@@ -22,15 +22,15 @@ use WebGUI::Session;
 
 Package WebGUI::HTML
 
+=head1 DESCRIPTION
+
+A package for manipulating and massaging HTML.
+
 =head1 SYNOPSIS
 
  use WebGUI::HTML;
  $html = WebGUI::HTML::cleanSegment($html);
  $html = WebGUI::HTML::filter($html);
-
-=head1 DESCRIPTION
-
-A package for manipulating and massaging HTML.
 
 =head1 METHODS
 

@@ -28,17 +28,16 @@ use WebGUI::SQL;
 
 Package WebGUI::Template
 
+=head1 DESCRIPTION
+
+This package contains utility methods for WebGUI's template system.
+
 =head1 SYNOPSIS
 
  use WebGUI::Template;
  $template = WebGUI::Template::get($templateId, $namespace);
  $hashRef = WebGUI::Template::getList($namespace);
  $html = WebGUI::Template::process($template);
-
-
-=head1 DESCRIPTION
-
-This package contains utility methods for WebGUI's template system.
 
 =head1 METHODS
 

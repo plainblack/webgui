@@ -31,16 +31,16 @@ use WebGUI::Utility;
 
 Package WebGUI::MessageLog
 
+=head1 DESCRIPTION
+
+This package is WebGUI's notification system.
+
 =head1 SYNOPSIS
 
  use WebGUI::MessageLog;
  WebGUI::MessageLog::addEntry($userId, $groupId,$subject,$message);
  WebGUI::MessageLog::addInternationalizedEntry($userId,$groupId,$url,$internationalId);
  WebGUI::MessageLog::completeEntry($messageLogId);
-
-=head1 DESCRIPTION
-
-This package is WebGUI's notification system.
 
 =head1 METHODS
 

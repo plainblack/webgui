@@ -24,6 +24,10 @@ use WebGUI::Session;
 
 Package WebGUI::Node
 
+=head1 DESCRIPTION
+
+Package to manipulate WebGUI storage nodes. The nodes system is a two-tiered filesystem hash that WebGUI uses to keep attachment data separated. There should be no need for anyone other than Plain Black Software to use this package.
+
 =head1 SYNOPSIS
 
  use WebGUI::Node;
@@ -33,10 +37,6 @@ Package WebGUI::Node
  $node->delete;
  $node->getPath;
  $node->getURL;
-
-=head1 DESCRIPTION
-
-Package to manipulate WebGUI storage nodes. The nodes system is a two-tiered filesystem hash that WebGUI uses to keep attachment data separated. There should be no need for anyone other than Plain Black Software to use this package.
 
 =head1 METHODS
 

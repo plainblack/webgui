@@ -29,6 +29,10 @@ our @EXPORT = qw(&makeTabSafe &makeArrayTabSafe &randomizeHash &commify &randomi
 
 Package WebGUI::Utility
 
+=head1 DESCRIPTION
+
+This package provides miscellaneous but useful utilities to the WebGUI programmer.
+
 =head1 SYNOPSIS
 
  use WebGUI::Utility;
@@ -43,11 +47,6 @@ Package WebGUI::Utility
  $hashRef = randomizeHash(\%hash);
  $hashRef = sortHash(\%hash);
  $hashRef = sortHashDescending(\%hash);
-
-
-=head1 DESCRIPTION
-
-This package provides miscellaneous but useful utilities to the WebGUI programmer.
 
 =head1 METHODS
 

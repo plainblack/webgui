@@ -29,6 +29,10 @@ our @EXPORT = qw(&quote &getNextId);
 
 Package WebGUI::SQL
 
+=head1 DESCRIPTION
+
+Package for interfacing with SQL databases. This package implements Perl DBI functionality in a less code-intensive manner and adds some extra functionality.
+
 =head1 SYNOPSIS
 
  use WebGUI::SQL;
@@ -55,10 +59,6 @@ Package WebGUI::SQL
 
  $id = getNextId("wobjectId");
  $string = quote($string);
-
-=head1 DESCRIPTION
-
-Package for interfacing with SQL databases. This package implements Perl DBI functionality in a less code-intensive manner and adds some extra functionality.
 
 =head1 METHODS
 

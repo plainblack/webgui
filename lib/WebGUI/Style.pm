@@ -27,14 +27,14 @@ use WebGUI::Template;
 
 Package WebGUI::Style
 
+=head1 DESCRIPTION
+
+This package contains utility methods for WebGUI's style system.
+
 =head1 SYNOPSIS
 
  use WebGUI::Style;
  $style = WebGUI::Style::get();
-
-=head1 DESCRIPTION
-
-This package contains utility methods for WebGUI's style system.
 
 =head1 METHODS
 

@@ -26,6 +26,10 @@ use WebGUI::Authentication;
 
 Package WebGUI::User
 
+=head1 DESCRIPTION
+
+This package provides an object-oriented way of managing WebGUI users as well as getting/setting a users's profile data.
+
 =head1 SYNOPSIS
 
  use WebGUI::User;
@@ -42,10 +46,6 @@ Package WebGUI::User
  $u->addToGroups(\@arr);
  $u->deleteFromGroups(\@arr);
  $u->delete;
-
-=head1 DESCRIPTION
-
-This package provides an object-oriented way of managing WebGUI users as well as getting/setting a users's profile data.
 
 =head1 METHODS
 

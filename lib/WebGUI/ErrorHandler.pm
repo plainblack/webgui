@@ -20,7 +20,11 @@ use WebGUI::Session;
 
 =head1 NAME 
 
-WebGUI::ErrorHandler
+Package WebGUI::ErrorHandler
+
+=head1 DESCRIPTION
+
+This package provides simple but effective error handling and logging for WebGUI.
 
 =head1 SYNOPSIS
 
@@ -29,10 +33,6 @@ WebGUI::ErrorHandler
  WebGUI::ErrorHandler::fatalError();
  WebGUI::ErrorHandler::security(message);
  WebGUI::ErrorHandler::warn(message);
-
-=head1 DESCRIPTION
-
-This package provides simple but effective error handling and logging for WebGUI.
 
 =head1 METHODS
 

@@ -26,11 +26,11 @@ use WebGUI::URL;
 use WebGUI::User;
 
 
-=head1 WebGUI Discussions
 
-This package implements WebGUI's discussion system. However it is outdated and cludgy. We recommend not coding any new systems against this package, but instead wait for the new package that will be created in 6.0.0.
+### NOTE: This package implements WebGUI's discussion system. However it is 
+### outdated and cludgy. We recommend not coding any new systems against this 
+### package, but instead wait for the new package that will be created in 6.0.0.
 
-=cut
 
 #-------------------------------------------------------------------
 sub _deleteReplyTree {

@@ -27,6 +27,10 @@ use WebGUI::SQL;
 
 Package WebGUI::HTMLForm
 
+=head1 DESCRIPTION
+
+Package that makes HTML forms typed data and significantly reduces the code needed for properties pages in WebGUI.
+
 =head1 SYNOPSIS
 
  use WebGUI::HTMLForm;
@@ -71,10 +75,6 @@ Alternatively each of these methods can also be called with the tag element synt
 
  $f->print;
  $f->printRowsOnly;
-
-=head1 DESCRIPTION
-
-Package that makes HTML forms typed data and significantly reduces the code needed for properties pages in WebGUI. 
 
 =head1 METHODS
 
@@ -1341,13 +1341,7 @@ sub readOnly {
 }
 
 #-------------------------------------------------------------------
-
-=head2 select
-
-Use of this method is depricated. Use selectList instead.
-
-=cut
-
+#Use of this method is depricated. Use selectList instead.
 sub select {
 	my $self = shift;
 	return $self->selectList(@_);
@@ -1355,7 +1349,7 @@ sub select {
 
 #-------------------------------------------------------------------
 
-=head2 selectList ( name, options [ label, value, size, multiple, extras, subtext, uiLevel ] )
+=head2 selectList ( name, options, [ label, value, size, multiple, extras, subtext, uiLevel ] )
 
 Adds a select list row to this form.
 

@@ -23,6 +23,10 @@ use WebGUI::URL;
 
 Package WebGUI::Paginator
 
+=head1 DESCRIPTION
+
+Package that paginates rows of arbitrary data for display on the web.
+
 =head1 SYNOPSIS
 
  use WebGUI::Paginator;
@@ -42,10 +46,6 @@ Package WebGUI::Paginator
  $integer = $p->getPageNumber;
  $html = $p->getPageLinks;
  $html = $p->getPreviousPageLink;
-
-=head1 DESCRIPTION
-
-Package that paginates rows of arbitrary data for display on the web.
 
 =head1 METHODS
 

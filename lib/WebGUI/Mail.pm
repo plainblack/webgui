@@ -24,14 +24,14 @@ use WebGUI::Session;
 
 Package WebGUI::Mail
 
+=head1 DESCRIPTION
+
+This package provides access to use SMTP based email services.
+
 =head1 SYNOPSIS
 
  use WebGUI::Mail;
  WebGUI::Mail::send($to,$subject,$message);
-
-=head1 DESCRIPTION
-
-This package provides access to use SMTP based email services.
 
 =head1 METHODS
 

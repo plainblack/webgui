@@ -23,14 +23,14 @@ use WebGUI::URL;
 
 Package WebGUI::Profile
 
+=head1 DESCRIPTION
+
+Package that allows getting and setting of user profile information.
+
 =head1 SYNOPSIS
 
  use WebGUI::Profile;
  $p = WebGUI::Profile->new(39);
-
-=head1 DESCRIPTION
-
-Package that allows getting and setting of user profile information.
 
 =head1 METHODS
 
