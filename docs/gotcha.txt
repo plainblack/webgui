@@ -7,6 +7,14 @@ upgrading from one version to the next, or even between multiple
 versions. Be sure to heed the warnings contained herein as they will
 save you many hours of grief.
 
+4.7.0
+--------------------------------------------------------------------
+ * WebGUI::HTMLForm->radioList has been changed to correct an API
+	error. However, if your applications use this method, this
+	change will break your application. If you do not use any
+	third-party or custom plug-ins, you can disregard this
+	warning.
+
 4.6.3
 --------------------------------------------------------------------
  * It has been reported that some people had a duplicate key error
@@ -16,7 +24,6 @@ save you many hours of grief.
 	choice of restoring to a backup version and reapplying the
 	patches, or just moving forward. Either way will produce
 	the same result.
-
 
 4.6.0
 --------------------------------------------------------------------

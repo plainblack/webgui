@@ -12,7 +12,7 @@ package WebGUI::Macro::AdminBar;
 
 use strict;
 use Tie::IxHash;
-use WebGUI::HTMLForm;
+use WebGUI::Form;
 use WebGUI::International;
 use WebGUI::Privilege;
 use WebGUI::Session;
@@ -22,7 +22,7 @@ use WebGUI::Utility;
 
 #-------------------------------------------------------------------
 sub _replacement {
-	my (%hash2, $f, $miscSelect, $adminSelect, $clipboardSelect, %hash, $output, $contentSelect, $key);
+	my (%hash2, $miscSelect, $adminSelect, $clipboardSelect, %hash, $output, $contentSelect, $key);
 	tie %hash, "Tie::IxHash";
 	tie %hash2, "Tie::IxHash";
   #--content adder
@@ -34,9 +34,11 @@ sub _replacement {
 	}
 	%hash2 = sortHash(%hash2);
 	%hash = (%hash, %hash2);
-        $f = WebGUI::HTMLForm->new(1);
-        $f->select("contentSelect",\%hash,'',[],'','','onChange="goContent()"');
-        $contentSelect = $f->printRowsOnly;
+        $contentSelect = WebGUI::Form::selectList({
+		name=>"contentSelect",
+		options=>\%hash,
+		extras=>'onChange="goContent()"'
+		});
   #--clipboard paster
 	%hash2 = ();
 	$hash2{WebGUI::URL::page()} = WebGUI::International::get(3);
@@ -48,9 +50,11 @@ sub _replacement {
         foreach $key (keys %hash) {
                 $hash2{WebGUI::URL::page('func=paste&wid='.$key)} = $hash{$key};
         }
-        $f = WebGUI::HTMLForm->new(1);
-        $f->select("clipboardSelect",\%hash2,'',[],'','','onChange="goClipboard()"');
-        $clipboardSelect = $f->printRowsOnly;
+        $clipboardSelect = WebGUI::Form::selectList({
+		name=>"clipboardSelect",
+		options=>\%hash2,
+		extras=>'onChange="goClipboard()"'
+		});
    #--admin functions
 	%hash = ();
 	if (WebGUI::Privilege::isInGroup(3,$session{user}{userId})) {
@@ -106,9 +110,11 @@ sub _replacement {
 		WebGUI::URL::page('op=switchOffAdmin')=>WebGUI::International::get(12),
 		%hash
 	);
-	$f = WebGUI::HTMLForm->new(1);
-	$f->select("adminSelect",\%hash,'',[],'','','onChange="goAdmin()"');
-	$adminSelect = $f->printRowsOnly;
+	$adminSelect = WebGUI::Form::selectList({
+		name=>"adminSelect",
+		options=>\%hash,
+		extras=>'onChange="goAdmin()"'
+		});
   #--output admin bar
 	$output = '
 	<div class="adminBar"><table class="adminBar" width="100%" cellpadding="3" cellspacing="0" border="0"><tr>
