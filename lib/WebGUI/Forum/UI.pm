@@ -75,7 +75,7 @@ sub formatPreviousThreadURL {
 }
 
 sub formatRatePostURL {
-	return WebGUI::URL::append($_[0],"forumOp=ratePost&amp;forumPostId=".$_[1]."&amp;rating=".$_[2]);
+	return WebGUI::URL::append($_[0],"forumOp=ratePost&amp;forumPostId=".$_[1]."&amp;rating=".$_[2]."#".$_[1]);
 }
 
 sub formatReplyPostURL {
@@ -105,27 +105,27 @@ sub formatThreadLayoutURL {
 }
 
 sub formatThreadLockURL {
-	return WebGUI::URL::append($_[0],"forumOp=threadLock&amp;forumPostId=".$_[1]);
+	return WebGUI::URL::append($_[0],"forumOp=threadLock&amp;forumPostId=".$_[1]."#".$_[1]);
 }
 
 sub formatThreadUnlockURL {
-	return WebGUI::URL::append($_[0],"forumOp=threadUnlock&amp;forumPostId=".$_[1]);
+	return WebGUI::URL::append($_[0],"forumOp=threadUnlock&amp;forumPostId=".$_[1]."#".$_[1]);
 }
 
 sub formatThreadStickURL {
-	return WebGUI::URL::append($_[0],"forumOp=threadStick&amp;forumPostId=".$_[1]);
+	return WebGUI::URL::append($_[0],"forumOp=threadStick&amp;forumPostId=".$_[1]."#".$_[1]);
 }
 
 sub formatThreadSubscribeURL {
-	return WebGUI::URL::append($_[0],"forumOp=threadSubscribe&amp;forumPostId=".$_[1]);
+	return WebGUI::URL::append($_[0],"forumOp=threadSubscribe&amp;forumPostId=".$_[1]."#".$_[1]);
 }
 
 sub formatThreadUnstickURL {
-	return WebGUI::URL::append($_[0],"forumOp=threadUnstick&amp;forumPostId=".$_[1]);
+	return WebGUI::URL::append($_[0],"forumOp=threadUnstick&amp;forumPostId=".$_[1]."#".$_[1]);
 }
 
 sub formatThreadUnsubscribeURL {
-	return WebGUI::URL::append($_[0],"forumOp=threadUnsubscribe&amp;forumPostId=".$_[1]);
+	return WebGUI::URL::append($_[0],"forumOp=threadUnsubscribe&amp;forumPostId=".$_[1]."#".$_[1]);
 }
 
 sub formatThreadURL {
@@ -316,6 +316,7 @@ sub getForumTemplateVars {
 	$var{'forum.unsubscribe.label'} = WebGUI::International::get(1023);
 	$var{'forum.unsubscribe.url'} = formatForumUnsubscribeURL($callback,$forum->get("forumId"));
 	$var{'user.isSubscribed'} = $forum->isSubscribed;
+	$var{'user.isModerator'} = $forum->isModerator;
 	$var{'user.canPost'} = $forum->canPost;
 	$var{'thread.sortby.date.url'} = formatForumSortByURL($callback,$forum->get("forumId"),"date");
 	$var{'thread.sortby.lastreply.url'} = formatForumSortByURL($callback,$forum->get("forumId"),"lastreply");
@@ -329,7 +330,13 @@ sub getForumTemplateVars {
         $var{"thread.replies.label"} = WebGUI::International::get(1016);
 	$var{'thread.rating.label'} = WebGUI::International::get(1020);
         $var{"thread.last.label"} = WebGUI::International::get(1017);
-	my $query = "select * from forumThread where forumId=".$forum->get("forumId")." order by isSticky desc, ";
+	my $query = "select * from forumThread where forumId=".$forum->get("forumId")." and ";
+	if ($forum->isModerator) {
+		$query .= "(status='approved' or status='pending')";
+	} else {
+		$query .= "status='approved'";
+	}
+	$query .= " order by isSticky desc, ";
 	if ($session{scratch}{forumSortBy} eq "date") {
 		$query .= "rootPostId desc";
 	} elsif ($session{scratch}{forumSortBy} eq "views") {

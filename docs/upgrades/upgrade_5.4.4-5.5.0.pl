@@ -207,7 +207,12 @@ WebGUI::SQL->write("update incrementer set nextValue=$max where incrementerId='f
 ($max) = WebGUI::SQL->quickArray("select max(forumThreadId) from forumThread");
 $max++;
 WebGUI::SQL->write("update incrementer set nextValue=$max where incrementerId='forumThreadId'");
-
+WebGUI::SQL->write("update forumThread set status='approved' where status='Approved'");
+WebGUI::SQL->write("update forumPost set status='approved' where status='Approved'");
+WebGUI::SQL->write("update forumThread set status='denied' where status='Denied'");
+WebGUI::SQL->write("update forumPost set status='denied' where status='Denied'");
+WebGUI::SQL->write("update forumThread set status='pending' where status='Pending'");
+WebGUI::SQL->write("update forumPost set status='pending' where status='Pending'");
 
 
 #--------------------------------------------

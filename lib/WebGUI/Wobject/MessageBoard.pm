@@ -212,7 +212,7 @@ sub www_view {
 		$count++;
 	}
 	$sth->finish;
-	$var{areMultipleForums} = ($count > 1);
+	$var{areMultipleForums} = ($count > 2);
 	$var{forum_loop} = \@forum_loop;
         return $_[0]->processTemplate($_[0]->get("templateId"),\%var);
 }

@@ -19,13 +19,17 @@ use WebGUI::SQL;
 #-----------------------------------------
 sub process {
 	my $epoch = WebGUI::DateTime::time();
-	my $a = WebGUI::SQL->read("select forumId,archiveAfter from forum");
+	my $a = WebGUI::SQL->read("select forumId,archiveAfter,masterForumId from forum");
 	while (my $forum = $a->hashRef) {
+		if ($forum->{masterForumId}) {
+			($forum->{archiveAfter}) = WebGUI::SQL->quickArray("select archiveAfter from forum where masterForumId=$forum->{masterForumId}");
+		}
 		my $archiveDate = $epoch - $forum->{archiveAfter};
 		my $b = WebGUI::SQL->read("select forumThreadId from forumThread where forumId=".$forum->{forumId}
 			." and lastPostDate<$archiveDate");
 		while (my ($threadId) = $b->array) {
 			WebGUI::SQL->write("update forumPost set status='archived' where status='approved' and forumThreadId=$threadId");
+			WebGUI::SQL->write("update forumThread set status='archived' where status='approved' and forumThreadId=$threadId");
 		}
 		$b->finish;
 	}

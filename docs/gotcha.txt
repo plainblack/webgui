@@ -19,6 +19,10 @@ save you many hours of grief.
 	these fields no longer exist in the new discussion system
 	due to the complexities of the new system.
 
+ * If you have any SQL Reports or custom macros that pull data from 
+	discussions then you'll need to rebuild them because the 
+	discussion data structures have changed significantly.
+
 
 5.4.1
 --------------------------------------------------------------------

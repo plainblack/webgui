@@ -39,7 +39,14 @@ sub get {
 sub getReplies {
 	my ($self) = @_;
 	my @replies = ();
-	my $sth = WebGUI::SQL->read("select forumPostId from forumPost where parentId=".$self->get("forumPostId")." order by forumPostId");
+ 	my $query = "select forumPostId from forumPost where parentId=".$self->get("forumPostId")." and ";
+        if ($self->getThread->getForum->isModerator) {
+                $query .= "(status='approved' or status='pending' or status='denied'";
+        } else {
+                $query .= "(status='approved'";
+        }
+        $query .= " or userId=$session{user}{userId})  order by forumPostId";
+	my $sth = WebGUI::SQL->read($query);
 	while (my @data = $sth->array) {
 		push(@replies,WebGUI::Forum::Post->new($data[0]));
 	}

@@ -516,6 +516,9 @@ sub www_viewSubmission {
 	my $submission = $_[0]->getCollateral("USS_submission","USS_submissionId",$session{form}{sid});
 	return $_[0]->www_view unless ($submission->{USS_submissionId});
 	my $callback = WebGUI::URL::page("func=viewSubmission&amp;wid=".$_[0]->get("wobjectId")."&amp;sid=".$submission->{USS_submissionId});
+	if ($session{form}{forumOp}) {	
+		return WebGUI::Forum::UI::forumOp($callback);
+	}
 	WebGUI::SQL->write("update USS_submission set views=views+1 where USS_submissionId=$session{form}{sid}");
 	$var{title} = $submission->{title};
 	$var{content} = WebGUI::HTML::filter($submission->{content},$_[0]->get("filterContent"));
@@ -579,11 +582,7 @@ sub www_viewSubmission {
 		$var{"attachment.name"} = $file->getFilename;
         }	
 	if ($_[0]->get("allowDiscussion")) {
-		if ($session{form}{forumOp}) {	
-			$var{"replies"} = WebGUI::Forum::UI::forumOp($callback);
-		} else {
-			$var{"replies"} = WebGUI::Forum::UI::www_viewForum($callback,$submission->{forumId});
-		}
+		$var{"replies"} = WebGUI::Forum::UI::www_viewForum($callback,$submission->{forumId});
 	}
 	return WebGUI::Template::process(WebGUI::Template::get($_[0]->get("submissionTemplateId"),"USS/Submission"), \%var);
 }
