@@ -162,7 +162,7 @@ sub makeCompliant {
 	$value =~ s/^\\//;			#removes leading slash
         $value =~ s/ /_/g;              	#replaces whitespace with underscores
         $value =~ s/\.$//;             		#removes trailing period
-        $value =~ s/[^A-Za-z0-9\-\.\_\\]//g; 	#removes all funky characters
+        $value =~ s/[^A-Za-z0-9\-\.\_\\\/]//g; 	#removes all funky characters
         return $value;
 }
 
