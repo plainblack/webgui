@@ -375,7 +375,7 @@ sub duplicate {
 
 =head2 fixUrl ( string )
 
-Makes string into a URL, removing invalid characters. 
+Makes string into a URL, removing invalid characters and making it unique.
 
 =head3 string
 
