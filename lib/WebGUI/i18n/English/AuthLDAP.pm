@@ -68,7 +68,7 @@ Default text for password form field.
 
 <P>
 <B>title</B><BR>
-Default page title .
+Default page title.
 
 <P>
 <B>login.message</B><BR>
@@ -176,7 +176,7 @@ The default submit button for the anonymous registration form.
 
 <P>
 <B>title</B><BR>
-Default page title .
+Default page title.
 
 <P>
 <B>create.form.profile</B><BR>
