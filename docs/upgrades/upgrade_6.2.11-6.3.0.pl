@@ -1729,6 +1729,7 @@ WebGUI::Session::close();
 
 sub replaceMacros {
    	my $content = shift;
+	return $content if ($content =~ /\^\^/); # double carets bad
 my $parenthesis;
 $parenthesis = qr /\(                      # Start with '(',
                      (?:                     # Followed by

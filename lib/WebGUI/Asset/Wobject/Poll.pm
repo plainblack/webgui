@@ -284,14 +284,14 @@ sub processPropertiesFromFormPost {
              	$property->{'a'.$i} = $answer[($i-1)];
         }
 	$self->update($property);
-	WebGUI::SQL->write("delete from Poll_answers where assetId=".quote($self->getId)) if ($session{form}{resetVotes});
+	WebGUI::SQL->write("delete from Poll_answer where assetId=".quote($self->getId)) if ($session{form}{resetVotes});
 }
 
 
 #-------------------------------------------------------------------
 sub purge {
 	my $self = shift;
-	WebGUI::SQL->write("delete from Poll_answers where assetId=".quote($self->getId));
+	WebGUI::SQL->write("delete from Poll_answer where assetId=".quote($self->getId));
 	$self->SUPER::purge();
 }	
 
@@ -369,7 +369,7 @@ sub www_vote {
 			$u->karma($self->get("karmaPerVote"),"Poll (".$self->getId.")","Voted on this poll.");
 		}
 	}
-	return "";
+	return $self->getContainer->www_view;
 }
 
 

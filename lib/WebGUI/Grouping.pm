@@ -15,10 +15,11 @@ package WebGUI::Grouping;
 =cut
 
 use strict;
+use WebGUI::Cache;
 use WebGUI::DateTime;
+use WebGUI::ErrorHandler;
 use WebGUI::Session;
 use WebGUI::SQL;
-use WebGUI::ErrorHandler;
 use WebGUI::Utility;
 
 =head1 NAME
@@ -252,7 +253,11 @@ sub getGroupsInGroup {
 	} elsif (exists $session{gotGroupsInGroup}{recursive}{$groupId}) {
 		return $session{gotGroupsInGroup}{direct}{$groupId};
 	}
-        my $groups = WebGUI::SQL->buildArrayRef("select groupId from groupGroupings where inGroup=".quote($groupId));
+	my $groups = WebGUI::Cache->new("groups_in_group_".$groupId)->get;
+	unless (defined $groups) {
+        	$groups = WebGUI::SQL->buildArrayRef("select groupId from groupGroupings where inGroup=".quote($groupId));
+		WebGUI::Cache->new("groups_in_group_".$groupId)->set($groups);
+	}
         if ($isRecursive) {
                 $loopCount++;
                 if ($loopCount > 99) {

@@ -18,6 +18,7 @@ use strict;
 use Tie::IxHash;
 use WebGUI::Asset::Template;
 use WebGUI::AdminConsole;
+use WebGUI::Cache;
 use WebGUI::DateTime;
 use WebGUI::ErrorHandler;
 use WebGUI::Form;
@@ -256,6 +257,8 @@ sub cascadeLineage {
 	my $self = shift;
 	my $newLineage = shift;
 	my $oldLineage = shift || $self->get("lineage");
+	WebGUI::Cache->new($self->getId)->deleteByRegex(/^asset_/);
+	WebGUI::Cache->new($self->getId)->deleteByRegex(/^lineage_$oldLineage/);
 	WebGUI::SQL->write("update asset set lineage=concat(".quote($newLineage).", substring(lineage from ".(length($oldLineage)+1).")) 
 		where lineage like ".quote($oldLineage.'%'));
 }
@@ -1033,7 +1036,11 @@ Returns the highest rank, top of the highest rank Asset under current Asset.
 sub getFirstChild {
 	my $self = shift;
 	unless (exists $self->{_firstChild}) {
-		my ($lineage) = WebGUI::SQL->quickArray("select min(lineage) from asset where parentId=".quote($self->getId));
+		my $lineage = WebGUI::Cache->new("firstchild_".$self->getId)->get;
+		unless ($lineage) {
+			($lineage) = WebGUI::SQL->quickArray("select min(lineage) from asset where parentId=".quote($self->getId));
+			WebGUI::Cache->new("firstchild_".$self->getId)->set($lineage);
+		}
 		$self->{_firstChild} = WebGUI::Asset->newByLineage($lineage);
 	}
 	return $self->{_firstChild};
@@ -1108,7 +1115,11 @@ Returns the lowest rank, bottom of the lowest rank Asset under current Asset.
 sub getLastChild {
 	my $self = shift;
 	unless (exists $self->{_lastChild}) {
-		my ($lineage) = WebGUI::SQL->quickArray("select max(lineage) from asset where parentId=".quote($self->getId));
+		my $lineage = WebGUI::Cache->new("lastchild_".$self->getId)->get;
+		unless ($lineage) {
+			($lineage) = WebGUI::SQL->quickArray("select max(lineage) from asset where parentId=".quote($self->getId));
+			WebGUI::Cache->new("lastchild_".$self->getId)->set($lineage);
+		}
 		$self->{_lastChild} = WebGUI::Asset->newByLineage($lineage);
 	}
 	return $self->{_lastChild};
@@ -1215,7 +1226,7 @@ sub getLineage {
 	my $columns = "asset.assetId, asset.className, asset.parentId";
 	my $slavedb;
 	if ($rules->{returnQuickReadObjects}) {
-		$columns = "asset.*";
+		$columns = "*";
 		$slavedb = WebGUI::SQL->getSlave;
 	}
 	my $sortOrder = ($rules->{invertTree}) ? "desc" : "asc"; 
@@ -1534,7 +1545,11 @@ sub hasChildren {
 		} elsif (exists $self->{_lastChild}) {
 			$self->{_hasChildren} = 1;
 		} else {
-			my ($hasChildren) = WebGUI::SQL->quickArray("select count(*) from asset where parentId=".quote($self->getId));
+			my $hasChildren = WebGUI::Cache->new("childCount_".$self->getId)->get;
+			unless (defined $hasChildren) {
+				($hasChildren) = WebGUI::SQL->quickArray("select count(*) from asset where parentId=".quote($self->getId));
+				WebGUI::Cache->new("childCount_".$self->getId)->set($hasChildren);
+			}
 			$self->{_hasChildren} = $hasChildren;
 		}
 	}
@@ -1563,11 +1578,13 @@ sub new {
 	my $class = shift;
 	my $assetId = shift;
 	my $overrideProperties = shift;
-	my $properties;
+	my $properties = WebGUI::Cache->new("asset_".$assetId)->get;
 	if ($assetId eq "new") {
 		$properties = $overrideProperties;
 		$properties->{assetId} = "new";
 		$properties->{className} = $class;
+	} elsif (exists $properties->{assetId}) {
+		# got properties from cache
 	} else { 
 		my $definitions = $class->definition;
 		my @definitionsReversed = reverse(@{$definitions});
@@ -1579,6 +1596,7 @@ sub new {
 		$sql .= " where asset.assetId=".quote($assetId);
 		$properties = WebGUI::SQL->quickHashRef($sql);
 		return undef unless (exists $properties->{assetId});
+		WebGUI::Cache->new("asset_".$assetId)->set($properties,$properties->{cacheTimeout});
 	}
 	if (defined $overrideProperties) {
 		foreach my $definition (@{$class->definition}) {
@@ -1624,7 +1642,12 @@ sub newByDynamicClass {
 	my $className = shift;
 	my $overrideProperties = shift;
 	unless (defined $className) {
-        	($className) = WebGUI::SQL->quickArray("select className from asset where assetId=".quote($assetId));
+		my $asset = WebGUI::Cache->new("asset_".$assetId)->get;
+		if (exists $asset->{className}) {
+			$className = $asset->{className};
+		} else {
+        		($className) = WebGUI::SQL->quickArray("select className from asset where assetId=".quote($assetId));
+		}
 	}
         if ($className eq "") {
         	WebGUI::HTTP::setStatus('404',"Page Not Found");
@@ -1655,7 +1678,11 @@ Lineage string.
 sub newByLineage {
 	my $class = shift;
         my $lineage = shift;
-        my $asset = WebGUI::SQL->quickHashRef("select assetId, className from asset where lineage=".quote($lineage));
+	my $asset = WebGUI::Cache->new("lineage_".$lineage)->get;
+	unless (exists $asset->{assetId}) {
+        	$asset = WebGUI::SQL->quickHashRef("select assetId, className from asset where lineage=".quote($lineage));
+		WebGUI::Cache->new("lineage_".$lineage)->set($asset);
+	}
 	return WebGUI::Asset->newByDynamicClass($asset->{assetId}, $asset->{className});
 }
 
@@ -1705,7 +1732,11 @@ sub newByUrl {
         $url =~ s/\"//;
         my $asset;
         if ($url ne "") {
-                $asset = WebGUI::SQL->quickHashRef("select assetId, className from asset where url=".quote($url));
+		my $asset = WebGUI::Cache->new("asseturl_".$url)->get;
+		unless (exists $asset->{assetId}) {
+                	$asset = WebGUI::SQL->quickHashRef("select assetId, className from asset where url=".quote($url));
+			WebGUI::Cache->new("asseturl_".$url)->set($asset,3600);
+		}
 		if ($asset->{assetId} ne "" || $asset->{className} ne "") {
 			return WebGUI::Asset->newByDynamicClass($asset->{assetId}, $asset->{className});
 		}
@@ -1819,7 +1850,7 @@ sub processTemplate {
 	my $self = shift;
 	my $var = shift;
 	my $templateId = shift;
-        my $meta = $self->getMetaDataFields();
+        my $meta = $self->getMetaDataFields() if ($session{setting}{metaDataEnabled});
         foreach my $field (keys %$meta) {
 		$var->{$meta->{$field}{fieldName}} = $meta->{$field}{value};
 	}
@@ -1868,6 +1899,7 @@ Returns 1. Deletes an asset from tables and removes anything bound to that asset
 
 sub purge {
 	my $self = shift;
+	WebGUI::Cache->new("asset_".$self->getId)->delete;
 	$self->updateHistory("purged");
 	WebGUI::SQL->beginTransaction;
 	foreach my $definition (@{$self->definition}) {
@@ -2064,33 +2096,32 @@ Hash reference of properties and values to set.
 =cut
 
 sub update {
-	my $self = shift;
-	my $properties = shift;
-	WebGUI::SQL->beginTransaction;
-	foreach my $definition (@{$self->definition}) {
-		my @setPairs;
-		if ($definition->{tableName} eq "asset") {
-			push(@setPairs,"lastUpdated=".time());
-		}
-		foreach my $property (keys %{$definition->{properties}}) {
-			next unless (exists $properties->{$property});
-			my $value = $properties->{$property} || $definition->{properties}{$property}{defaultValue};
-			if (defined $value) {
-				if (exists $definition->{properties}{$property}{filter}) {
-					my $filter = $definition->{properties}{$property}{filter};
-					$value = $self->$filter($value);
-				}
-				$self->{_properties}{$property} = $value;
-				push(@setPairs, $property."=".quote($value));
-			}
-		}
-		if (scalar(@setPairs) > 0) {
-			WebGUI::SQL->write("update ".$definition->{tableName}." set ".join(",",@setPairs)." where assetId=".quote($self->getId));
-		}
-	}
-	$self->setSize;
-	WebGUI::SQL->commit;
-	return 1;
+        my $self = shift;
+        my $properties = shift;
+	WebGUI::Cache->new($self->getId)->delete;
+        WebGUI::SQL->beginTransaction;
+        foreach my $definition (@{$self->definition}) {
+                my @setPairs;
+                if ($definition->{tableName} eq "asset") {
+                        push(@setPairs,"lastUpdated=".time());
+                }
+                foreach my $property (keys %{$definition->{properties}}) {
+                        next unless (exists $properties->{$property});
+                        my $value = $properties->{$property};
+                        if (exists $definition->{properties}{$property}{filter}) {
+                                my $filter = $definition->{properties}{$property}{filter};
+                                $value = $self->$filter($value);
+                        }
+                        $self->{_properties}{$property} = $value;
+                        push(@setPairs, $property."=".quote($value));
+                }
+                if (scalar(@setPairs) > 0) {
+                        WebGUI::SQL->write("update ".$definition->{tableName}." set ".join(",",@setPairs)." where assetId=".quote($self->getId));
+                }
+        }
+        $self->setSize;
+        WebGUI::SQL->commit;
+        return 1;
 }
 
 #-------------------------------------------------------------------
@@ -2377,14 +2408,14 @@ Saves and updates history. If canEdit, returns www_manageAssets() if a new Asset
 
 sub www_editSave {
 	my $self = shift;
-        return WebGUI::Privilege::insufficient() unless $self->canEdit;
+	return WebGUI::Privilege::insufficient() unless $self->canEdit;
 	my $object;
 	if ($session{form}{assetId} eq "new") {
-                $object = $self->addChild({className=>$session{form}{class}});
-                $object->{_parent} = $self;
-        } else {
-                $object = $self;
-        }
+		$object = $self->addChild({className=>$session{form}{class}});	
+		$object->{_parent} = $self;
+	} else {
+		$object = $self;
+	}
 	$object->processPropertiesFromFormPost;
 	$object->updateHistory("edited");
 	return $self->www_manageAssets if ($session{form}{proceed} eq "manageAssets" && $session{form}{assetId} eq "new");

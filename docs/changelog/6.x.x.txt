@@ -1,3 +1,10 @@
+6.3.1
+ - Added some indicies to increase performance.
+ - Added all sorts of caching to increase performance.
+ - Fixed resetting votes on Poll would crash it.
+ - Fixed not being able to set display title and other yes no questions to no.
+
+
 6.3.0
  - Migrated all wobjects to assets.
  - Migrated pages to the layout and redirect assets.
