@@ -174,7 +174,7 @@ sub editSave {
 					);
 			}
 		}
-		$data->{className} = $class;
+		$data{className} = $class;
 		$data{storageId} = $storage->getId;
 		$data{filename} = $data{title} = $data{menuTitle} = $filename;
 		$data{url} = $parent->getUrl.'/'.$filename;

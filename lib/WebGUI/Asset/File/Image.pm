@@ -16,7 +16,6 @@ package WebGUI::Asset::File::Image;
 
 use strict;
 use WebGUI::Asset::File;
-use WebGUI::Asset::Template;
 use WebGUI::HTTP;
 use WebGUI::Session;
 use WebGUI::Utility;
@@ -208,7 +207,7 @@ sub view {
 	$var{fileUrl} = $self->getFileUrl;
 	$var{fileIcon} = $self->getFileIconUrl;
 	$var{thumbnail} = $self->getThumbnailUrl;
-	return WebGUI::Asset::Template->new("PBtmpl0000000000000088")->process(\%var);
+	return $self->processTemplate(\%var,"PBtmpl0000000000000088");
 }
 
 
