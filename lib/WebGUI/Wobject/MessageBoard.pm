@@ -261,9 +261,9 @@ sub www_view {
 	my $caller;
 	my $sth = WebGUI::SQL->read("select * from MessageBoard_forums where wobjectId=".quote($_[0]->get("wobjectId"))." order by sequenceNumber");
 	while (my $forumMeta = $sth->hashRef) {
-		my $callback = WebGUI::URL::page("func=view&wid=".$_[0]->get("wobjectId"));
+		my $callback = WebGUI::URL::page("func=view&wid=".$_[0]->get("wobjectId")."&forumId=".$forumMeta->{forumId});
 		if ($session{form}{forumOp}) { 
-			if ($session{form}{forumId} == $forumMeta->{forumId}) {
+			if ($session{form}{forumId} eq $forumMeta->{forumId}) {
 				$caller = {
 					callback=>$callback,
 					title=>$forumMeta->{title},
@@ -305,7 +305,7 @@ sub www_view {
 				'forum.lastPost.user.name' => $lastPost->get("username"),
 				'forum.lastPost.user.alias' => WebGUI::User->new($lastPost->get("userId"))->profileField("alias"),
 				'forum.lastPost.user.profile' => WebGUI::Forum::UI::formatUserProfileURL($lastPost->get("userId")),
-				'forum.lastPost.user.isVisitor' => ($lastPost->get("userId") == 1),
+				'forum.lastPost.user.isVisitor' => ($lastPost->get("userId") eq 1),
 				'forum.user.canView' => $forum->canView,
 				'forum.user.canPost' => $forum->canPost
 				});

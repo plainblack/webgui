@@ -81,7 +81,7 @@ The unique identifier to check privileges against. Defaults to the current user.
 sub canEdit {
         my ($self, $userId) = @_;
 	$userId = $session{user}{userId} unless ($userId);
-        return ($self->getThread->getForum->isModerator || ($self->get("userId") == $userId && $userId != 1 
+        return ($self->getThread->getForum->isModerator || ($self->get("userId") eq $userId && $userId != 1 
 		&& $self->getThread->getForum->get("editTimeout") > (WebGUI::DateTime::time() - $self->get("dateOfPost"))));
 }
 
@@ -108,7 +108,7 @@ sub canView {
 		return 1;
 	} elsif ($self->get("status") eq "deleted") {
 		return 0;
-	} elsif ($self->get("status") eq "denied" && $userId == $self->get("userId")) {
+	} elsif ($self->get("status") eq "denied" && $userId eq $self->get("userId")) {
 		return 1;
 	} elsif ($self->getThread->getForum->isModerator) {
 		return 1;
@@ -231,7 +231,7 @@ If the user ID equals 1 (visitor) then an IP address is used to distinguish the 
 sub hasRated {
 	my ($self, $userId, $ipAddress) = @_;
 	$userId = $session{user}{userId} unless ($userId);
-	return 1 if ($userId != 1 && $userId == $self->get("userId")); # is poster
+	return 1 if ($userId != 1 && $userId eq $self->get("userId")); # is poster
 	$ipAddress = $session{env}{REMOTE_ADDR} unless ($ipAddress);
 	my ($flag) = WebGUI::SQL->quickArray("select count(*) from forumPostRating where forumPostId="
 		.quote($self->get("forumPostId"))." and ((userId=".quote($userId)." and userId<>1) or (userId=1 and 
@@ -434,7 +434,7 @@ Sets the status of this post to approved.
 sub setStatusApproved {
 	my ($self) = @_;
 	$self->set({status=>'approved'});
-	$self->getThread->setStatusApproved if ($self->getThread->get("rootPostId") == $self->get("forumPostId"));
+	$self->getThread->setStatusApproved if ($self->getThread->get("rootPostId") eq $self->get("forumPostId"));
 	if ($self->isReply) {
 		$self->getThread->incrementReplies($self->get("dateOfPost"),$self->get("forumPostId"));
 	}
@@ -452,7 +452,7 @@ Sets the status of this post to archived.
 sub setStatusArchived {
 	my ($self) = @_;
 	$self->set({status=>'archived'});
-	$self->getThread->setStatusArchived if ($self->getThread->get("rootPostId") == $self->get("forumPostId"));
+	$self->getThread->setStatusArchived if ($self->getThread->get("rootPostId") eq $self->get("forumPostId"));
 	if ($self->isReply) {
 		$self->getThread->incrementReplies($self->get("dateOfPost"),$self->get("forumPostId"));
 	}
@@ -470,7 +470,7 @@ sub setStatusDeleted {
 	my ($self) = @_;
 	$self->set({status=>'deleted'});
 	$self->getThread->decrementReplies;
-	$self->getThread->setStatusDeleted if ($self->getThread->get("rootPostId") == $self->get("forumPostId"));
+	$self->getThread->setStatusDeleted if ($self->getThread->get("rootPostId") eq $self->get("forumPostId"));
 	my ($id, $date) = WebGUI::SQL->quickArray("select forumPostId,dateOfPost from forumPost where forumThreadId="
 		.quote($self->get("forumThreadId"))." and status='approved'");
 	$self->getThread->setLastPost($date,$id);
@@ -487,7 +487,7 @@ Sets the status of this post to denied.
 sub setStatusDenied {
 	my ($self) = @_;
 	$self->set({status=>'denied'});
-	$self->getThread->setStatusDenied if ($self->getThread->get("rootPostId") == $self->get("forumPostId"));
+	$self->getThread->setStatusDenied if ($self->getThread->get("rootPostId") eq $self->get("forumPostId"));
 }
 
 #-------------------------------------------------------------------
@@ -501,7 +501,7 @@ Sets the status of this post to pending.
 sub setStatusPending {
 	my ($self) = @_;
 	$self->set({status=>'pending'});
-	$self->getThread->setStatusPending if ($self->getThread->get("rootPostId") == $self->get("forumPostId"));
+	$self->getThread->setStatusPending if ($self->getThread->get("rootPostId") eq $self->get("forumPostId"));
 }
 
 

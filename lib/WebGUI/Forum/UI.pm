@@ -1162,7 +1162,7 @@ sub getForumTemplateVars {
 	foreach my $thread (@$threads) {
 		my $root = WebGUI::Forum::Post->new($thread->{rootPostId});
 		my $last;
-		if ($thread->{rootPostId} == $thread->{lastPostId}) { #saves the lookup if it's the same id
+		if ($thread->{rootPostId} eq $thread->{lastPostId}) { #saves the lookup if it's the same id
 			$last = $root;
 		} else {
 			$last = WebGUI::Forum::Post->new($thread->{lastPostId});
@@ -1418,12 +1418,12 @@ sub notifySubscribers {
 	my %subscribers;
         my $sth = WebGUI::SQL->read("select userId from forumThreadSubscription where forumThreadId=".quote($thread->get("forumThreadId")));
 	while (my ($userId) = $sth->array) { 
-		$subscribers{$userId} = $userId unless ($userId == $post->get("userId"));	# make sure we don't send unnecessary messages 
+		$subscribers{$userId} = $userId unless ($userId eq $post->get("userId"));	# make sure we don't send unnecessary messages 
 	}
         $sth->finish;
         $sth = WebGUI::SQL->read("select userId from forumSubscription where forumId=".quote($forum->get("forumId")));
 	while (my ($userId) = $sth->array) { 
-		$subscribers{$userId} = $userId unless ($userId == $post->get("userId"));	# make sure we don't send unnecessary messages 
+		$subscribers{$userId} = $userId unless ($userId eq $post->get("userId"));	# make sure we don't send unnecessary messages 
 	}
         $sth->finish;
 	my %lang;
@@ -1569,7 +1569,7 @@ A post object.
 sub setPostApproved {
 	my ($caller, $post) = @_;
 	$post->setStatusApproved;
-	unless ($session{user}{userId} == $post->get("userId")) {
+	unless ($session{user}{userId} eq $post->get("userId")) {
 		WebGUI::MessageLog::addInternationalizedEntry($post->get("userId"),'',formatThreadURL($caller->{callback},$post->get("forumPostId")),579);
 	}
 	notifySubscribers($post,$post->getThread,$post->getThread->getForum,$caller);
@@ -2504,7 +2504,7 @@ sub www_viewThread {
         my $post = WebGUI::Forum::Post->new($postId);
 	return WebGUI::Privilege::insufficient() unless ($post->getThread->getForum->canView);
 	my $var = getThreadTemplateVars($caller, $post);
-	if ($post->get("forumPostId") == $post->getThread->get("rootPostId") && !$post->canView) {
+	if ($post->get("forumPostId") eq $post->getThread->get("rootPostId") && !$post->canView) {
 		return www_viewForum($caller, $post->getThread->getForum->get("forumId"));
 	} else {	
 		return WebGUI::Template::process($post->getThread->getForum->get("threadTemplateId"),"Forum/Thread", $var); 

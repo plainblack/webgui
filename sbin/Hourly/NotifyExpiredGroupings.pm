@@ -27,7 +27,7 @@ sub process {
         	while (my $group = $a->hashRef) {
 			my $start = $now + (86400 * $group->{expireNotifyOffset});
 			my $end = $start + 86400;
-			my $b = WebGUI::SQL->read("select userId from groupings where groupId=".$group->{groupId}." and 
+			my $b = WebGUI::SQL->read("select userId from groupings where groupId=".quote($group->{groupId})." and 
 				expireDate>=".$start." and expireDate<=".$end);
 			while (my ($userId) = $b->array) { 
 				WebGUI::MessageLog::addEntry($userId,"",WebGUI::International::get(867),$group->{expireNotifyMessage});

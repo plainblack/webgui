@@ -23,10 +23,10 @@ sub process {
         	while (my $data = $sth->hashRef) {
         		if ($data->{dbCacheTimeout} > 0) {
 					# there is no need to wait deleteOffset days for expired external group cache data
-					WebGUI::SQL->write("delete from groupings where groupId=$data->{groupId} and expireDate < ".time());
+					WebGUI::SQL->write("delete from groupings where groupId=".quote($data->{groupId})." and expireDate < ".WebGUI::DateTime::time());
 				} else {
-        			WebGUI::SQL->write("delete from groupings where groupId=$data->{groupId} and expireDate < "
-                        	.(time()-(86400*$data->{deleteOffset})));
+        			WebGUI::SQL->write("delete from groupings where groupId=".quote($data->{groupId})." and expireDate < "
+                        		.(WebGUI::DateTime::time()-(86400*$data->{deleteOffset})));
 				}
         	}
 	        $sth->finish;

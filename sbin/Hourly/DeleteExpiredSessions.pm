@@ -17,7 +17,7 @@ use WebGUI::SQL;
 
 #-------------------------------------------------------------------
 sub process {
-	my $epoch = time();
+	my $epoch = WebGUI::DateTime::time();
 	my $sth = WebGUI::SQL->read("select sessionId from userSession where expires<".$epoch);
 	while (my ($sessionId) = $sth->array) {
 		WebGUI::Session::end($sessionId);

@@ -270,7 +270,7 @@ sub www_copy {
 #-------------------------------------------------------------------
 sub www_deleteFile {
 	my ($owner) = WebGUI::SQL->quickArray("select userId from USS_submission where USS_submissionId=".quote($session{form}{sid}));
-        if ($owner == $session{user}{userId} || WebGUI::Grouping::isInGroup($_[0]->get("groupToApprove"))) {
+        if ($owner eq $session{user}{userId} || WebGUI::Grouping::isInGroup($_[0]->get("groupToApprove"))) {
 		$_[0]->setCollateral("USS_submission","USS_submissionId",{
 			$session{form}{file}=>'',
 		 	USS_submissionId=>$session{form}{sid}
@@ -284,7 +284,7 @@ sub www_deleteFile {
 #-------------------------------------------------------------------
 sub www_deleteSubmission {
 	my ($owner) = WebGUI::SQL->quickArray("select userId from USS_submission where USS_submissionId=".quote($session{form}{sid}));
-        if ($owner == $session{user}{userId} || WebGUI::Grouping::isInGroup($_[0]->get("groupToApprove"))) {
+        if ($owner eq $session{user}{userId} || WebGUI::Grouping::isInGroup($_[0]->get("groupToApprove"))) {
 		return $_[0]->confirm(WebGUI::International::get(17,$_[0]->get("namespace")),
 			WebGUI::URL::page('func=deleteSubmissionConfirm&wid='.$session{form}{wid}.'&sid='.$session{form}{sid}));
         } else {
@@ -295,7 +295,7 @@ sub www_deleteSubmission {
 #-------------------------------------------------------------------
 sub www_deleteSubmissionConfirm {
 	my ($owner, $forumId, $pageId) = WebGUI::SQL->quickArray("select userId,forumId,pageId from USS_submission where USS_submissionId=".quote($session{form}{sid}));
-        if ($owner == $session{user}{userId} || WebGUI::Grouping::isInGroup($_[0]->get("groupToApprove"))) {
+        if ($owner eq $session{user}{userId} || WebGUI::Grouping::isInGroup($_[0]->get("groupToApprove"))) {
 		my ($inUseElsewhere) = WebGUI::SQL->quickArray("select count(*) from USS_submission where forumId=".quote($forumId));
                 unless ($inUseElsewhere > 1) {
 			my $forum = WebGUI::Forum->new($forumId);
@@ -425,7 +425,7 @@ sub www_editSubmission {
 		$var{'submission.isNew'} = 1;
 	}
         return WebGUI::Privilege::insufficient() unless (WebGUI::Grouping::isInGroup($_[0]->get("groupToContribute")) 
-		|| $submission->{userId} == $session{user}{userId} 
+		|| $submission->{userId} eq $session{user}{userId} 
 		|| WebGUI::Grouping::isInGroup($_[0]->get("groupToApprove")));
 	$var{'link.header.label'} = WebGUI::International::get(90,$_[0]->get("namespace"));
 	$var{'question.header.label'} = WebGUI::International::get(84,$_[0]->get("namespace"));
@@ -600,7 +600,7 @@ sub www_editSubmission {
 sub www_editSubmissionSave {
 	my ($submission, %hash, $file, $u);
 	$submission = $_[0]->getCollateral("USS_submission","USS_submissionId",$session{form}{sid});
-        if ($submission->{userId} == $session{user}{userId} 
+        if ($submission->{userId} eq $session{user}{userId} 
 		|| ($submission->{USS_submissionId} eq "new" 
 		&& WebGUI::Grouping::isInGroup($_[0]->get("groupToContribute"))) 
 		|| WebGUI::Grouping::isInGroup($_[0]->get("groupToApprove"))) {
@@ -794,7 +794,7 @@ sub www_view {
                         "submission.image"=>$imageURL,
                         "submission.date"=>epochToHuman($page->[$i]->{dateSubmitted}),
                         "submission.date.updated"=>epochToHuman($page->[$i]->{dateUpdated}),
-                        "submission.currentUser"=>($session{user}{userId} == $page->[$i]->{userId} && $session{user}{userId} != 1),
+                        "submission.currentUser"=>($session{user}{userId} eq $page->[$i]->{userId} && $session{user}{userId} != 1),
                         "submission.userProfile"=>WebGUI::URL::page('op=viewProfile&uid='.$page->[$i]->{userId}),
         		"submission.edit.url"=>WebGUI::URL::page($quickurl.'editSubmission'),
                         "submission.secondColumn"=>(($i+1)%2==0),
@@ -877,7 +877,7 @@ sub www_viewSubmission {
 	my $submission = $self->getCollateral("USS_submission","USS_submissionId",$submissionId);
 	return "" unless ($submission->{USS_submissionId});
         return "" unless ($submission->{status} eq 'Approved' ||
-                ($submission->{userId} == $session{user}{userId} && $session{user}{userId} != 1) ||
+                ($submission->{userId} eq $session{user}{userId} && $session{user}{userId} != 1) ||
                 WebGUI::Grouping::isInGroup($self->getValue("groupToApprove")));
 	my $parentsPage = WebGUI::Page->new($self->get("pageId"));
 	my $callback = WebGUI::URL::gateway($parentsPage->get("urlizedTitle"),"func=viewSubmission&amp;wid=".$self->wid."&amp;sid=".$submission->{USS_submissionId});
@@ -930,7 +930,7 @@ sub www_viewSubmission {
 	        $var{"next.url"} = WebGUI::URL::gateway($nextPage->get("urlizedTitle"));
 	}
 	$var{"next.label"} = WebGUI::International::get(59,$self->get("namespace"));
-        $var{canEdit} = (($submission->{userId} == $session{user}{userId} || WebGUI::Grouping::isInGroup($self->get("groupToApprove"))) && $session{user}{userId} != 1);
+        $var{canEdit} = (($submission->{userId} eq $session{user}{userId} || WebGUI::Grouping::isInGroup($self->get("groupToApprove"))) && $session{user}{userId} != 1);
         $var{"delete.url"} = WebGUI::URL::gateway($parentsPage->get("urlizedTitle"),'func=deleteSubmission&wid='.$self->wid.'&sid='.$submissionId);
 	$var{"delete.label"} = WebGUI::International::get(37,$self->get("namespace"));
         $var{"edit.url"} = WebGUI::URL::gateway($parentsPage->get("urlizedTitle"),'func=editSubmission&wid='.$self->wid.'&sid='.$submissionId);

@@ -1,6 +1,11 @@
 6.2.1
  - Fixed a GUID quoting bug in WebGUI.pm setCollateral.
-
+ - Fixed all sorts of GUID related bugs in the Forums.
+ - Fixed a bug in the Message Board wobject that caused users not to be able
+   to do anything useful on the message board.
+ - Fixed a version check problem in Syndicated Content wobject.
+ - Fixed some GUID problems in the scheduler plug-ins.
+ - Fixed some epoch bugs in the scheduler plug-ins.
 
 
 6.2.0

@@ -22,13 +22,13 @@ sub process {
 		my (%properties, $base, $extended, $b, $w, $cmd, $purgeDate, $a, $pageId);
 		tie %properties, 'Tie::CPHash';
 
-		$purgeDate = (time()-(86400*$session{config}{DeleteExpiredTrash_offset}));
+		$purgeDate = (WebGUI::DateTime::time()-(86400*$session{config}{DeleteExpiredTrash_offset}));
 
 		# Delete wobjects
 		$b = WebGUI::SQL->read("select * from wobject where pageId=3 and bufferDate<" . $purgeDate);
 		while ($base = $b->hashRef) {
 			$extended = WebGUI::SQL->quickHashRef("select * from ".$base->{namespace}."
-				where wobjectId=".$base->{wobjectId});
+				where wobjectId=".quote($base->{wobjectId}));
 			%properties = (%{$base}, %{$extended});
 			$cmd = "WebGUI::Wobject::".$properties{namespace};
 			$w = $cmd->new(\%properties);
@@ -44,7 +44,7 @@ sub process {
 			WebGUI::ErrorHandler::audit("purging expired page ". $pageId ." from trash");
 			WebGUI::Operation::Trash::_recursePageTree($pageId);
 			WebGUI::Operation::Trash::_purgeWobjects($pageId);
-			WebGUI::SQL->write("delete from page where pageId=$pageId");
+			WebGUI::SQL->write("delete from page where pageId=".quote($pageId));
 		}
 		$a->finish;
 	}

@@ -23,10 +23,10 @@ sub process {
 
 		WebGUI::ErrorHandler::audit("moving expired clipboard items to trash");
 
-		WebGUI::SQL->write("update page set parentId=3, bufferPrevId=2, bufferDate=" .time()
+		WebGUI::SQL->write("update page set parentId=3, bufferPrevId=2, bufferDate=" .WebGUI::DateTime::time()
 				." where parentId=2 and bufferDate < ". $expireDate );
 
-		WebGUI::SQL->write("update wobject set pageId=3, bufferPrevId=2, bufferDate=" .time()
+		WebGUI::SQL->write("update wobject set pageId=3, bufferPrevId=2, bufferDate=" .WebGUI::DateTime::time()
 				." where pageId=2 and bufferDate < ". $expireDate );
 	}
 }
