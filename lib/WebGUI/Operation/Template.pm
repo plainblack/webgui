@@ -117,7 +117,12 @@ sub www_editTemplate {
 		}
                 $f->hidden("tid",$session{form}{tid});
                 $f->text("name",WebGUI::International::get(528),$template{name});
-                $f->HTMLArea("template",WebGUI::International::get(504),$template{template},'','','',(5+$session{setting}{textAreaRows}));
+                $f->HTMLArea(
+			-name=>"template",
+			-label=>WebGUI::International::get(504),
+			-value=>$template{template},
+			-rows=>(5+$session{setting}{textAreaRows})
+			);
                 $f->submit;
 		$output .= $f->print;
         } else {

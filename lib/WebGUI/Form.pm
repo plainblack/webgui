@@ -659,7 +659,7 @@ sub HTMLArea {
                       WebGUI::International::get(171).'" style="font-size: 8pt;"><br>';
         }
 	$rows = $_[0]->{rows} || ($session{setting}{textAreaRows}+7);
-	$columns = $_[0]->{rows} || ($session{setting}{textAreaCols}+5);
+	$columns = $_[0]->{columns} || ($session{setting}{textAreaCols}+5);
         $output .= textarea({
                 name=>$_[0]->{name},
                 value=>$_[0]->{value},
