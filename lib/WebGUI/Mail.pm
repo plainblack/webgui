@@ -76,7 +76,7 @@ use WebGUI::Session;
 
 sub send {
         my ($smtp, $message, $from, $footer);
-	$from = $_[4] || ($session{setting}{companyName}.' <'.$session{setting}{companyEmail}.'>');
+	$from = $_[4] || $session{setting}{companyEmail};
 	#header
 	$message = "To: $_[0]\n";
         $message .= "From: $from\n";
