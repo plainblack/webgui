@@ -9,6 +9,12 @@ alter table users drop column connectDN;
 insert into international (internationalId,languageId,namespace,message,lastUpdated) values (814,1,'WebGUI','Back to styles.', 1038022043);
 alter table collateral change parameters parameters text;
 insert into international (internationalId,languageId,namespace,message,lastUpdated) values (815,1,'WebGUI','The file you tried to upload is too large.', 1038023800);
+delete from international where languageId=1 and namespace='FileManager' and internationalId=9;
+insert into international (internationalId,languageId,namespace,message,lastUpdated) values (9,1,'FileManager','Edit File Manager', 1038028499);
+delete from international where languageId=1 and namespace='FileManager' and internationalId=61;
+insert into international (internationalId,languageId,namespace,message,lastUpdated) values (61,1,'FileManager','File Manager, Add/Edit', 1038028480);
+delete from international where languageId=1 and namespace='FileManager' and internationalId=1;
+insert into international (internationalId,languageId,namespace,message,lastUpdated) values (1,1,'FileManager','File Manager', 1038028463);
 
 
 
