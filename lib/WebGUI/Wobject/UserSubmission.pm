@@ -14,6 +14,7 @@ use strict;
 use Tie::CPHash;
 use WebGUI::Attachment;
 use WebGUI::DateTime;
+use WebGUI::Discussion;
 use WebGUI::HTML;
 use WebGUI::HTMLForm;
 use WebGUI::Icon;
@@ -33,6 +34,49 @@ our $namespace = "UserSubmission";
 our $name = WebGUI::International::get(29,$namespace);
 
 #-------------------------------------------------------------------
+sub _canEditMessage {
+        my (%message);
+        tie %message, 'Tie::CPHash';
+        %message = WebGUI::Discussion::getMessage($_[1]);
+        if (
+                (time()-$message{dateOfPost}) < 3600*$_[0]->get("editTimeout")
+                && $message{userId} eq $session{user}{userId}
+                || WebGUI::Privilege::isInGroup($_[0]->get("groupToModerate"))
+                ) {
+                return 1;
+        } else {
+                return 0;
+        }
+}
+
+#-------------------------------------------------------------------
+sub _showReplies {
+        my ($sth, @data, $html);
+        $html .= '<table border=0 cellpadding=2 cellspacing=1 width="100%">';
+        $html .= '<tr><td class="tableHeader">'.WebGUI::International::get(229).'</td>
+		<td class="tableHeader">'.WebGUI::International::get(40,$namespace).'</td>
+		<td class="tableHeader">'.WebGUI::International::get(41,$namespace).'</td></tr>';
+        $sth = WebGUI::SQL->read("select messageId,subject,username,dateOfPost,userId from discussion 
+		where wobjectId=$session{form}{wid} and subId=$session{form}{sid} and pid=0 order by messageId desc");
+        while (@data = $sth->array) {
+                $data[1] = WebGUI::HTML::filter($data[1],'all');
+                $html .= '<tr';
+                if ($data[0] == $session{form}{mid}) {
+                        $html .= ' class="highlight"';
+                }
+                $html .= '><td class="tableData"><a href="'.WebGUI::URL::page('func=showMessage&mid='.
+                                $data[0].'&wid='.$session{form}{wid}.'&sid='.$session{form}{sid}).'">'.substr($data[1],0,30).
+                                '</a></td><td class="tableData"><a href="'.
+                                WebGUI::URL::page('op=viewProfile&uid='.$data[4]).'">'.$data[2].
+                                '</a></td><td class="tableData">'.epochToHuman($data[3],"%z %Z").
+                                '</td></tr>';
+                $html .= WebGUI::Discussion::traverseReplyTree($data[0],1);
+        }
+        $html .= '</table>';
+        return $html;
+}
+
+#-------------------------------------------------------------------
 sub duplicate {
         my ($sth, $file, @row, $newSubmissionId, $w);
 	$w = $_[0]->SUPER::duplicate($_[1]);
@@ -41,7 +85,11 @@ sub duplicate {
 		groupToContribute=>$_[0]->get("groupToContribute"),
 		submissionsPerPage=>$_[0]->get("submissionsPerPage"),
 		defaultStatus=>$_[0]->get("defaultStatus"),
-		groupToApprove=>$_[0]->get("groupToApprove")
+		groupToApprove=>$_[0]->get("groupToApprove"),
+		allowDiscussion=>$_[0]->get("allowDiscussion"),
+		editTimeout=>$_[0]->get("editTimeout"),
+		groupToPost=>$_[0]->get("groupToPost"),
+		groupToModerate=>$_[0]->get("groupToModerate")
 		});
         $sth = WebGUI::SQL->read("select * from UserSubmission_submission where wobjectId=".$_[0]->get("wobjectId"));
         while (@row = $sth->array) {
@@ -72,7 +120,8 @@ sub purge {
 
 #-------------------------------------------------------------------
 sub set {
-        $_[0]->SUPER::set($_[1],[qw(submissionsPerPage groupToContribute groupToApprove defaultStatus)]);
+        $_[0]->SUPER::set($_[1],[qw(submissionsPerPage groupToContribute groupToApprove defaultStatus groupToModerate 
+		groupToPost editTimeout allowDiscussion)]);
 }
 
 #-------------------------------------------------------------------
@@ -126,6 +175,24 @@ sub www_deleteImage {
 }
 
 #-------------------------------------------------------------------
+sub www_deleteMessage {
+        if (_canEditMessage($_[0],$session{form}{mid})) {
+                return WebGUI::Discussion::deleteMessage();
+        } else {
+                return WebGUI::Privilege::insufficient();
+        }
+}
+
+#-------------------------------------------------------------------
+sub www_deleteMessageConfirm {
+        if (_canEditMessage($_[0],$session{form}{mid})) {
+                return WebGUI::Discussion::deleteMessageConfirm();
+        } else {
+                return WebGUI::Privilege::insufficient();
+        }
+}
+
+#-------------------------------------------------------------------
 sub www_deleteSubmission {
 	my ($output, $owner);
 	($owner) = WebGUI::SQL->quickArray("select userId from UserSubmission_submission where submissionId=$session{form}{sid}");
@@ -173,9 +240,10 @@ sub www_denySubmission {
 
 #-------------------------------------------------------------------
 sub www_edit {
-        my ($output, %hash, $f, $defaultStatus, $submissionsPerPage, $groupToApprove);
+        my ($output, %hash, $f, $defaultStatus, $submissionsPerPage, $groupToApprove, $groupToModerate);
 	tie %hash, 'Tie::IxHash';
 	$groupToApprove = $_[0]->get("groupToApprove") || 4;
+	$groupToModerate = $_[0]->get("groupToModerate") || 4;
 	$submissionsPerPage = $_[0]->get("submissionsPerPage") || 50;
 	$defaultStatus = $_[0]->get("defaultStatus") || "Approved";
         if (WebGUI::Privilege::canEditPage()) {
@@ -189,6 +257,10 @@ sub www_edit {
 			"Denied"=>WebGUI::International::get(8,$namespace),
 			"Pending"=>WebGUI::International::get(9,$namespace));
                 $f->select("defaultStatus",\%hash,WebGUI::International::get(10,$namespace),[$defaultStatus]);
+		$f->yesNo("allowDiscussion",WebGUI::International::get(48,$namespace),$_[0]->get("allowDiscussion"));
+		$f->integer("editTimeout",WebGUI::International::get(49,$namespace),$_[0]->get("editTimeout"));
+		$f->group("groupToPost",WebGUI::International::get(50,$namespace),[$_[0]->get("groupToPost")]);
+		$f->group("groupToModerate",WebGUI::International::get(44,$namespace),[$groupToModerate]);
 		$output .= $_[0]->SUPER::www_edit($f->printRowsOnly);
                 return $output;
         } else {
@@ -204,9 +276,32 @@ sub www_editSave {
 			submissionsPerPage=>$session{form}{submissionsPerPage},
 			groupToContribute=>$session{form}{groupToContribute},
 			groupToApprove=>$session{form}{groupToApprove},
-			defaultStatus=>$session{form}{defaultStatus}
+			defaultStatus=>$session{form}{defaultStatus},
+			groupToModerate=>$session{form}{groupToModerate},
+			groupToPost=>$session{form}{groupToPost},
+			editTimeout=>$session{form}{editTimeout},
+			allowDiscussion=>$session{form}{allowDiscussion}
 			});
                 return "";
+        } else {
+                return WebGUI::Privilege::insufficient();
+        }
+}
+
+#-------------------------------------------------------------------
+sub www_editMessage {
+        if (_canEditMessage($_[0],$session{form}{mid})) {
+                return WebGUI::Discussion::editMessage();
+        } else {
+                return WebGUI::Privilege::insufficient();
+        }
+}
+
+#-------------------------------------------------------------------
+sub www_editMessageSave {
+        if (_canEditMessage($_[0],$session{form}{mid})) {
+                WebGUI::Discussion::editMessageSave();
+                return $_[0]->www_showMessage();
         } else {
                 return WebGUI::Privilege::insufficient();
         }
@@ -297,6 +392,82 @@ sub www_editSubmissionSave {
 }
 
 #-------------------------------------------------------------------
+sub www_postNewMessage {
+        if (WebGUI::Privilege::isInGroup($_[0]->get("groupToPost"),$session{user}{userId})) {
+                return WebGUI::Discussion::postNewMessage();
+        } else {
+                return WebGUI::Privilege::insufficient();
+        }
+}
+
+#-------------------------------------------------------------------
+sub www_postNewMessageSave {
+        if (WebGUI::Privilege::isInGroup($_[0]->get("groupToPost"),$session{user}{userId})) {
+                WebGUI::Discussion::postNewMessageSave();
+		return $_[0]->www_viewSubmission();
+        } else {
+                return WebGUI::Privilege::insufficient();
+        }
+}
+
+#-------------------------------------------------------------------
+sub www_postReply {
+        if (WebGUI::Privilege::isInGroup($_[0]->get("groupToPost"),$session{user}{userId})) {
+                return WebGUI::Discussion::postReply();
+        } else {
+                return WebGUI::Privilege::insufficient();
+        }
+}
+
+#-------------------------------------------------------------------
+sub www_postReplySave {
+        if (WebGUI::Privilege::isInGroup($_[0]->get("groupToPost"),$session{user}{userId})) {
+                WebGUI::Discussion::postReplySave();
+                return $_[0]->www_showMessage();
+        } else {
+                return WebGUI::Privilege::insufficient();
+        }
+}
+
+#-------------------------------------------------------------------
+sub www_showMessage {
+        my (@data, $html, %message, $defaultMid);
+        tie %message, 'Tie::CPHash';
+        ($defaultMid) = WebGUI::SQL->quickArray("select min(messageId) from discussion where wobjectId=$session{form}{wid} and subId=$session{form}{sid}");
+        $session{form}{mid} = $defaultMid if ($session{form}{mid} eq "");
+        %message = WebGUI::Discussion::getMessage($session{form}{mid});
+        if ($message{messageId}) {
+                $html .= '<h1>'.$message{subject}.'</h1>';
+                $html .= '<table width="100%" cellpadding=3 cellspacing=1 border=0><tr><td class="tableHeader">';
+                $html .= '<b>'.WebGUI::International::get(40,$namespace).'</b> <a href="'.
+                        WebGUI::URL::page('op=viewProfile&uid='.$message{userId}).'">'.$message{username}.'</a><br>';
+                $html .= "<b>".WebGUI::International::get(41,$namespace)."</b> ".
+                        epochToHuman($message{dateOfPost},"%z %Z")."<br>";
+                $html .= '</td>';
+                $html .= '<td rowspan=2 valign="top" class="tableMenu" nowrap>';
+                $html .= '<a href="'.WebGUI::URL::page('func=postReply&mid='.$session{form}{mid}.
+                        '&wid='.$session{form}{wid}.'&sid='.$session{form}{sid})
+                        .'">'.WebGUI::International::get(39,$namespace).'</a><br>';
+                if (_canEditMessage($_[0],$session{form}{mid})) {
+                        $html .= '<a href="'.WebGUI::URL::page('func=editMessage&mid='.$session{form}{mid}.
+                                '&wid='.$session{form}{wid}.'&sid='.$session{form}{sid}).'">'.WebGUI::International::get(42,$namespace).'</a><br>';
+                        $html .= '<a href="'.WebGUI::URL::page('func=deleteMessage&mid='.$session{form}{mid}.
+                                '&wid='.$session{form}{wid}.'&sid='.$session{form}{sid}).'">'.WebGUI::International::get(43,$namespace).'</a><br>';
+                }
+                $html .= '<a href="'.WebGUI::URL::page('func=viewSubmission&wid='.$session{form}{wid}.
+			'&sid='.$session{form}{sid}).'">'.WebGUI::International::get(45,$namespace).'</a><br>';
+                $html .= '<a href="'.WebGUI::URL::page().'">'.WebGUI::International::get(28,$namespace).'</a><br>';
+                $html .= '</tr><tr><td class="tableData">';
+                $html .= $message{message};
+                $html .= '</td></tr></table>';
+                $html .= _showReplies();
+        } else {
+                $html = WebGUI::International::get(402);
+        }
+        return $html;
+}
+
+#-------------------------------------------------------------------
 sub www_view {
 	my (@submission, $output, $sth, @row, $i, $p);
 	$output = $_[0]->displayTitle;
@@ -330,7 +501,7 @@ sub www_view {
 
 #-------------------------------------------------------------------
 sub www_viewSubmission {
-	my ($output, %submission, $file);
+	my ($output, %submission, $file, $replies);
 	tie %submission, 'Tie::CPHash';
 	%submission = WebGUI::SQL->quickHash("select * from UserSubmission_submission where submissionId=$session{form}{sid}");
 	$submission{title} = WebGUI::HTML::filter($submission{title},'all');
@@ -345,7 +516,6 @@ sub www_viewSubmission {
 	$output .= '<b>'.WebGUI::International::get(14,$namespace).':</b> '.$submission{status};
 	$output .= '</td><td rowspan="2" class="tableMenu" nowrap valign="top">';
   #---menu
-        $output .= '<a href="'.WebGUI::URL::page().'">'.WebGUI::International::get(28,$namespace).'</a><br>';
         if ($submission{userId} == $session{user}{userId}) {
                 $output .= '<a href="'.WebGUI::URL::page('func=deleteSubmission&wid='.$session{form}{wid}.'&sid='.
 			$session{form}{sid}).'">'.WebGUI::International::get(37,$namespace).'</a><br>';
@@ -362,6 +532,11 @@ sub www_viewSubmission {
 			'&sid='.$session{form}{sid}.'&mlog='.$session{form}{mlog}).'">'.
 			WebGUI::International::get(26,$namespace).'</a><br>';
         }
+	if ($_[0]->get("allowDiscussion")) {
+		$output .= '<a href="'.WebGUI::URL::page('func=postNewMessage&wid='.$_[0]->get("wobjectId")
+			.'&sid='.$session{form}{sid}).'">'.WebGUI::International::get(47,$namespace).'</a><br>';
+	}
+        $output .= '<a href="'.WebGUI::URL::page().'">'.WebGUI::International::get(28,$namespace).'</a><br>';
 	$output .= '</td</tr><tr><td class="tableData">';
   #---content
 	if ($submission{image} ne "") {
@@ -377,6 +552,18 @@ sub www_viewSubmission {
 		$output .= $file->box;
         }		
 	$output .= '</td></tr></table>';
+        if ($_[0]->get("allowDiscussion")) {
+                ($replies) = WebGUI::SQL->quickArray("select count(*) from discussion 
+			where wobjectId=".$_[0]->get("wobjectId")." and subId=".$session{form}{sid});
+                $output .= '<p><table width="100%" cellspacing="2" cellpadding="1" border="0">';
+                $output .= '<tr><td align="center" width="50%" class="tableMenu"><a href="'.
+                        WebGUI::URL::page('func=showMessage&wid='.$_[0]->get("wobjectId").'&sid='.$session{form}{sid}).'">'.
+                        WebGUI::International::get(46,$namespace).' ('.$replies.')</a></td>';
+                $output .= '<td align="center" width="50%" class="tableMenu"><a href="'.
+                        WebGUI::URL::page('func=postNewMessage&wid='.$_[0]->get("wobjectId").'&sid='.$session{form}{sid}).'">'.
+                        WebGUI::International::get(47,$namespace).'</a></td></tr>';
+                $output .= '</table>';
+        }
 	return $output;
 }
 

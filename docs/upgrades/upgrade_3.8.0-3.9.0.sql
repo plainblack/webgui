@@ -47,6 +47,22 @@ update wobject set templatePosition=0 where templatePosition='A';
 update wobject set templatePosition=1 where templatePosition='B';
 update wobject set templatePosition=2 where templatePosition='C';
 update wobject set templatePosition=3 where templatePosition='D';
+alter table UserSubmission add column allowDiscussion int not null default 0;
+alter table UserSubmission add column editTimeout int not null default 1;
+alter table UserSubmission add column groupToPost int not null default 2;
+alter table UserSubmission add column groupToApprove int not null default 4;
+INSERT INTO international VALUES (39,'UserSubmission','English','Post a Reply');
+INSERT INTO international VALUES (40,'UserSubmission','English','Posted By');
+INSERT INTO international VALUES (41,'UserSubmission','English','Date');
+INSERT INTO international VALUES (42,'UserSubmission','English','Edit Response');
+INSERT INTO international VALUES (43,'UserSubmission','English','Delete Response');
+INSERT INTO international VALUES (45,'UserSubmission','English','Return to Submission');
+INSERT INTO international VALUES (46,'UserSubmission','English','View Responses');
+INSERT INTO international VALUES (47,'UserSubmission','English','Post a Response');
+INSERT INTO international VALUES (48,'UserSubmission','English','Allow discussion?');
+INSERT INTO international VALUES (49,'UserSubmission','English','Edit Timeout');
+INSERT INTO international VALUES (50,'UserSubmission','English','Group To Post');
+INSERT INTO international VALUES (44,'UserSubmission','English','Group To Moderate');
 
 
 
