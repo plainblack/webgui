@@ -10,7 +10,8 @@
  - bugfix [ 1025120 ] Pagination in forum thread doesn't work. New default thread template. (Leendert Bottelberghs)
  - Fixed a bug where you couldn't delete templates.
  - bugfix [ 1025755 ] UILevel can't be set to beginner (0)
-
+ - bugfix [ 1006981 ] Syndicated Content doesn't show channel description (Don
+   Ji).
 
 
 6.2.1

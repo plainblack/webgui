@@ -330,7 +330,7 @@ sub _view_single_feed {
         my %var;
         $var{"channel.title"} = $rss->{channel}->{title};
         $var{"channel.link"} = $rss->{channel}->{link};
-        $var{"channel.description"} = $rss->{description};
+        $var{"channel.description"} = $rss->{channel}->{description};
         my @items;
         $rss->{items} ||= [];
         for (my $i = 0; ($i < @{$rss->{items}}) && ($i < $maxHeadlines);$i++) {
