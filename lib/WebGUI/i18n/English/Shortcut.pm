@@ -1,6 +1,12 @@
 package WebGUI::i18n::English::Shortcut;
 
 our $I18N = {
+
+	'85' => {
+		message => q|Description|,
+		lastUpdated => 1031514049
+	},
+
 	'Criteria' => {
 		message => q|Criteria|,
 		lastUpdated => 1053183804

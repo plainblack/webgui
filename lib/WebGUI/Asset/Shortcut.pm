@@ -86,7 +86,7 @@ sub getEditForm {
 	my $originalTemplate = WebGUI::Asset::Template->new($self->getShortcut->get("templateId"));
 	$tabform->getTab("properties")->HTMLArea(
 		-value=>$self->getValue("description"),
-                -label=>WebGUI::International::get(85),
+                -label=>WebGUI::International::get(85, 'Shortcut'),
 		-name=>"description"
 		);
 	$tabform->getTab("display")->template(
