@@ -59,7 +59,6 @@ sub addUserFormSave {
    if($session{setting}{webguiExpirePasswordOnCreation}){
       $properties->{passwordLastUpdated} = time() - $properties->{passwordTimeout};   
    }
-   
    $self->SUPER::addUserFormSave($properties);
 }
 

@@ -445,7 +445,6 @@ sub getSetting {
 #-------------------------------------------------------------------
 sub init {
    my $self = shift;
-   WebGUI::ErrorHandler::warn("In init");
    return $self->displayLogin;
 }
 
