@@ -225,6 +225,16 @@ sub www_completePendingTransaction {
 }
 
 #-------------------------------------------------------------------
+sub www_confirmRecurringTransaction {
+	my($plugin, %var);
+	$plugin = WebGUI::Commerce::Payment->load($session{form}{gateway});
+
+	if ($plugin) {
+		$plugin->confirmRecurringTransaction;
+	}
+}
+
+#-------------------------------------------------------------------
 sub www_confirmTransaction {
 	my($plugin, %var);
 	$plugin = WebGUI::Commerce::Payment->load($session{form}{pg});
@@ -288,7 +298,7 @@ sub www_editCommerceSettings {
 		$plugin = WebGUI::Commerce::Payment->load($_);
 		if ($plugin) {
 			push(@paymentPlugins, $plugin);
-			$paymentPlugins{$_} = $_;
+			$paymentPlugins{$_} = $plugin->name;
 		} else {
 			push(@failedPaymentPlugins, $_);
 		}

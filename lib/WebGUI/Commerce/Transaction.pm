@@ -42,7 +42,8 @@ sub cancelTransaction {
 
 	$plugin = WebGUI::Commerce::Payment->load($self->gateway);
 	$plugin->cancelRecurringPayment({
-		id => $self->gatewayId
+		id => $self->gatewayId,
+		transaction => $self,
 		});
 	return $plugin->resultMessage.' (code: '.$plugin->errorCode.')' if ($plugin->errorCode);
 
@@ -110,6 +111,20 @@ sub get {
 	
 	return $self->{_properties}{$key} if ($key);
 	return $self->{_properties};
+}
+
+#-------------------------------------------------------------------
+sub getByGatewayId {
+	my ($self, $gatewayId, $paymentGateway, $transactionId);
+	$self = shift;
+	$gatewayId = shift;
+	$paymentGateway = shift;
+
+	($transactionId) = WebGUI::SQL->quickArray("select transaction Id from transaction where gatewayId=".quote($gatewayId).
+		" and gateway=".quote($paymentGateway));
+
+	return WebGUI::Commerce::Transaction->new($transactionId) if $transactionId;
+	return undef;
 }
 
 #-------------------------------------------------------------------
