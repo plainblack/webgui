@@ -125,6 +125,64 @@ sub duplicate {
 }
 
 #-------------------------------------------------------------------
+sub getIndexerParams {
+	my $self = shift;        
+	my $now = shift;
+	return {
+		DataForm_field => {
+                        sql => "select DataForm_field.label as label,
+                                        DataForm_field.subtext as subtext,
+                                        DataForm_field.possibleValues as possibleValues,
+                                        DataForm_field.wobjectId as wid,
+                                        DataForm_field.DataForm_fieldId as fid,
+                                        wobject.namespace as namespace,
+                                        wobject.addedBy as ownerId,
+                                        page.urlizedTitle as urlizedTitle,
+                                        page.languageId as languageId,
+                                        page.pageId as pageId,
+                                        page.groupIdView as page_groupIdView,
+                                        wobject.groupIdView as wobject_groupIdView,
+                                        7 as wobject_special_groupIdView
+                                        from DataForm_field, wobject, page
+                                        where DataForm_field.wobjectId = wobject.wobjectId
+                                        and wobject.pageId = page.pageId
+                                        and wobject.startDate < $now 
+                                        and wobject.endDate > $now
+                                        and page.startDate < $now
+                                        and page.endDate > $now",
+                        fieldsToIndex => ["label", "subtext", "possibleValues"],
+                        contentType => 'wobjectDetail',
+                        url => '$data{urlizedTitle}."#".$data{wid}',
+                        headerShortcut => 'select label from DataForm_field where DataForm_fieldId = $data{fid}',
+                        bodyShortcut => 'select subtext from DataForm_field where DataForm_fieldId = $data{fid}',
+                },
+        DataForm_entryData => {
+                        sql => "select distinct(DataForm_entryData.wobjectId) as wid,
+                                        wobject.namespace as namespace,
+                                        wobject.addedBy as ownerId,
+                                        page.urlizedTitle as urlizedTitle,
+                                        page.languageId as languageId,
+                                        page.pageId as pageId,
+                                        page.groupIdView as page_groupIdView,
+                                        wobject.groupIdView as wobject_groupIdView,
+                                        wobject.groupIdEdit as wobject_special_groupIdView
+                                        from DataForm_entryData, wobject, page
+                                        where DataForm_entryData.wobjectId = wobject.wobjectId
+                                        and wobject.pageId = page.pageId
+                                        and wobject.startDate < $now 
+                                        and wobject.endDate > $now
+                                        and page.startDate < $now
+                                        and page.endDate > $now",
+                        fieldsToIndex => ['select distinct(value) from DataForm_entryData where wobjectId = $data{wid}'],
+                        contentType => 'wobjectDetail',
+                        url => 'WebGUI::URL::append($data{urlizedTitle}, "func=view&entryId=list&wid=$data{wid}")',
+                        headerShortcut => 'select title from wobject where wobjectId = $data{wid}',
+                }
+	};
+}
+
+
+#-------------------------------------------------------------------
 sub getListTemplateVars {
 	my $self = shift;
 	my $var = shift;

@@ -75,6 +75,54 @@ sub duplicate {
 }
 
 #-------------------------------------------------------------------
+sub getIndexerParams {
+	my $self = shift;        
+	my $now = shift;
+	return {
+		Product => {
+                        sql => "select Product.wobjectId as wid,
+                                        Product.image1 as image1,
+                                        Product.image2 as image2,
+                                        Product.image3 as image3,
+                                        Product.brochure as brochure,
+                                        Product.manual as manual,
+                                        Product.warranty as warranty,
+                                        Product.price as price,
+                                        Product.productNumber as productNumber,
+                                        Product_benefit.benefit as benefit,
+                                        Product_feature.feature as feature,
+                                        Product_specification.name as name,
+                                        Product_specification.value as value,
+                                        Product_specification.units as units,
+                                        wobject.namespace as namespace,
+                                        wobject.addedBy as ownerId,
+                                        page.urlizedTitle as urlizedTitle,
+                                        page.languageId as languageId,
+                                        page.pageId as pageId,
+                                        page.groupIdView as page_groupIdView,
+                                        wobject.groupIdView as wobject_groupIdView,
+                                        7 as wobject_special_groupIdView
+                                        from Product, wobject, page
+                                        left join Product_benefit on Product_benefit.wobjectId=Product.wobjectId
+                                        left join Product_feature on Product_feature.wobjectId=Product.wobjectId
+                                        left join Product_specification on Product_specification.wobjectId=Product.wobjectId
+                                        where Product.wobjectId = wobject.wobjectId
+                                        and wobject.pageId = page.pageId
+                                        and wobject.startDate < $now 
+                                        and wobject.endDate > $now
+                                        and page.startDate < $now
+                                        and page.endDate > $now",
+                        fieldsToIndex => ["image1", "image2", "image3", "brochure", "manual", "warranty", "price", 
+                                          "productNumber", "benefit", "feature", "name", "value", "units"],
+                        contentType => 'wobjectDetail',
+                        url => 'WebGUI::URL::append($data{urlizedTitle}, "func=view&wid=$data{wid}")',
+                        headerShortcut => 'select title from wobject where wobjectId = $data{wid}',
+                        bodyShortcut => 'select description from wobject where wobjectId = $data{wid}',
+                }
+	};
+}
+
+#-------------------------------------------------------------------
 sub name {
         return WebGUI::International::get(1,$_[0]->get("namespace"));
 }

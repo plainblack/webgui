@@ -81,6 +81,77 @@ sub duplicate {
 }
 
 #-------------------------------------------------------------------
+sub getIndexerParams {
+	my $self = shift;
+	my $now = shift;
+	return {
+		USS_discussion => {
+                        sql => "select  forumPost.forumPostId,
+                                        forumPost.username,
+                                        forumPost.subject,
+                                        forumPost.message,
+                                        forumPost.userId as ownerId,
+                                        forumThread.forumId as forumId,
+                                        USS_submission.USS_submissionId as sid,
+                                        wobject.namespace as namespace,
+                                        wobject.wobjectId as wid,
+                                        page.urlizedTitle as urlizedTitle,
+                                        page.languageId as languageId,
+                                        page.pageId as pageId,
+                                        page.groupIdView as page_groupIdView,
+                                        wobject.groupIdView as wobject_groupIdView,
+                                        7 as wobject_special_groupIdView
+                                from forumPost, forumThread, USS_submission, wobject, page, USS
+                                where forumPost.forumThreadId = forumThread.forumThreadId
+                                        and forumThread.forumId = USS_submission.forumId
+                                        and USS_submission.USS_id = USS.USS_id
+					and USS.wobjectId = wobject.wobjectId
+                                        and wobject.pageId = page.pageId
+                                        and wobject.startDate < $now 
+                                        and wobject.endDate > $now
+                                        and page.startDate < $now
+                                        and page.endDate > $now",
+                        fieldsToIndex => ["username", "subject", "message"],
+                        contentType => 'discussion',
+                        url => 'WebGUI::URL::append($data{urlizedTitle},"func=viewSubmission&wid=$data{wid}&sid=$data{sid}&forumOp=viewThread&forumPostId=$data{forumPostId}&forumId=$data{forumId}")',
+                        headerShortcut => 'select subject from forumPost where forumPostId = $data{forumPostId}',
+                        bodyShortcut => 'select message from forumPost where forumPostId = $data{forumPostId}',
+	        	},
+		USS_submission => {
+                        sql => "select USS_submission.title as title,
+                                        USS_submission.username as username,
+                                        USS_submission.content as content,
+                                        USS_submission.image as image,
+                                        USS_submission.attachment as attachment,
+                                        USS.wobjectId as wid,
+                                        USS_submission.USS_submissionId as sid,
+                                        USS_submission.userId as ownerId,
+                                        wobject.namespace as namespace,
+                                        page.urlizedTitle as urlizedTitle,
+                                        page.languageId as languageId,
+                                        page.pageId as pageId,
+                                        page.groupIdView as page_groupIdView,
+                                        wobject.groupIdView as wobject_groupIdView,
+                                        7 as wobject_special_groupIdView
+                                        from wobject, page, USS_submission, USS
+                                        where USS_submission.USS_id = USS.USS_id
+					and USS.wobjectId = wobject.wobjectId
+                                        and wobject.pageId = page.pageId
+                                        and USS_submission.status = 'Approved' 
+                                        and wobject.startDate < $now 
+                                        and wobject.endDate > $now
+                                        and page.startDate < $now
+                                        and page.endDate > $now",
+                        fieldsToIndex => ["username", "title", "content", "image", "attachment"],
+                        contentType => 'wobjectDetail',
+                        url => 'WebGUI::URL::append($data{urlizedTitle}, "func=viewSubmission&wid=$data{wid}&sid=$data{sid}")',
+                        headerShortcut => 'select title from USS_submission where USS_submissionId = $data{sid}',
+                        bodyShortcut => 'select content from USS_submission where USS_submissionId = $data{sid}',
+                }
+	};
+}
+
+#-------------------------------------------------------------------
 sub name {
         return WebGUI::International::get(29,$_[0]->get("namespace"));
 }

@@ -522,6 +522,7 @@ foreach my $wobject (@{$wobjects}) {
 		push(@newWobjects,$wobject);
 	}
 }
+push(@newWobjects,"IndexedSearch");
 push(@newWobjects,"WSClient");
 $conf->set("wobjects"=>\@newWobjects);
 $conf->set("emailRecoveryLoggingEnabled"=>1);

@@ -60,6 +60,44 @@ sub duplicate {
 }
 
 #-------------------------------------------------------------------
+sub getIndexerParams {
+	my $self = shift;        
+	my $now = shift;
+	return {
+		FileManager_file => {
+                        sql => "select FileManager_file.wobjectId as wid,
+                                        FileManager_file.fileTitle as fileTitle,
+                                        FileManager_file.downloadFile as downloadFile,
+                                        FileManager_file.briefSynopsis as briefSynopsis,
+                                        FileManager_file.alternateVersion1 as alternateVersion1,
+                                        FileManager_file.alternateVersion2 as alternateVersion2,
+                                        FileManager_file.FileManager_fileId as fid,
+                                        wobject.addedBy as ownerId,
+                                        wobject.namespace as namespace,
+                                        page.urlizedTitle as urlizedTitle,
+                                        page.languageId as languageId,
+                                        page.pageId as pageId,
+                                        page.groupIdView as page_groupIdView,
+                                        wobject.groupIdView as wobject_groupIdView,
+                                        FileManager_file.groupToView as wobject_special_groupIdView
+                                        from FileManager_file, wobject, page
+                                        where FileManager_file.wobjectId = wobject.wobjectId
+                                        and wobject.pageId = page.pageId
+                                        and wobject.startDate < $now 
+                                        and wobject.endDate > $now
+                                        and page.startDate < $now
+                                        and page.endDate > $now",
+                        fieldsToIndex => ["fileTitle", "downloadFile", "briefSynopsis", "alternateVersion1", "alternateVersion2"],
+                        contentType => 'wobjectDetail',
+                        url => '$data{urlizedTitle}."#".$data{wid}',
+                        headerShortcut => 'select fileTitle from FileManager_file where FileManager_fileId = $data{fid}',
+                        bodyShortcut => 'select briefSynopsis from FileManager_file where FileManager_fileId = $data{fid}',
+                }
+	};
+}
+
+
+#-------------------------------------------------------------------
 sub name {
         return WebGUI::International::get(1,$_[0]->get("namespace"));
 }

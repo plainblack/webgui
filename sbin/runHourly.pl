@@ -94,7 +94,7 @@ if (opendir (CONFDIR,$confdir)) {
 				$exclude =~ s/ //g;
 				unless (isIn($namespace, split(/,/,$exclude))) {
 					$cmd = $plugins{$namespace};
-					&$cmd();
+					&$cmd($verbose);
 				}
 				print " (".($currentTime-$previousTime)." seconds)\n" if ($verbose);
 				$previousTime = $currentTime;

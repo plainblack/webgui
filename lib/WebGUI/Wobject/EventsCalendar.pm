@@ -48,6 +48,41 @@ sub duplicate {
 }
 
 #-------------------------------------------------------------------
+sub getIndexerParams {
+	my $self = shift;        
+	my $now = shift;
+	return {
+		EventsCalendar => {
+                        sql => "select EventsCalendar_event.EventsCalendar_eventId as eid,
+                                        EventsCalendar_event.wobjectId as wid,
+                                        EventsCalendar_event.name as name,
+                                        EventsCalendar_event.description as description,
+                                        wobject.namespace as namespace,
+                                        wobject.addedBy as ownerId,
+                                        page.urlizedTitle as urlizedTitle,
+                                        page.languageId as languageId,
+                                        page.pageId as pageId,
+                                        page.groupIdView as page_groupIdView,
+                                        wobject.groupIdView as wobject_groupIdView,
+                                        7 as wobject_special_groupIdView
+                                        from EventsCalendar_event, wobject, page
+                                        where EventsCalendar_event.wobjectId = wobject.wobjectId
+                                        and wobject.pageId = page.pageId
+                                        and wobject.startDate < $now 
+                                        and wobject.endDate > $now
+                                        and page.startDate < $now
+                                        and page.endDate > $now",
+                        fieldsToIndex => ["description", "name"],
+                        contentType => 'wobjectDetail',
+                        url => 'WebGUI::URL::append($data{urlizedTitle},"func=viewEvent&wid=$data{wid}&eid=$data{eid}")',
+                        headerShortcut => 'select name from EventsCalendar_event where EventsCalendar_eventId=$data{eid}',
+                        bodyShortcut => 'select description from EventsCalendar_event where EventsCalendar_eventId=$data{eid}',
+                }
+	};
+}
+
+
+#-------------------------------------------------------------------
 sub name {
         return WebGUI::International::get(2,$_[0]->get("namespace"));
 }

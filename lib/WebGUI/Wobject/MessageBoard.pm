@@ -40,6 +40,71 @@ sub _formatControls {
 
 
 #-------------------------------------------------------------------
+sub getIndexerParams {
+	my $self = shift;        
+	my $now = shift;
+	return {
+		MessageBoard => {
+                        sql => "select MessageBoard_forums.title,
+                                        MessageBoard_forums.description,
+                                        MessageBoard_forums.wobjectId as wid,
+                                        wobject.namespace as namespace,
+                                        wobject.addedBy as ownerId,
+                                        page.urlizedTitle as urlizedTitle,
+                                        page.languageId as languageId,
+                                        page.pageId as pageId,
+                                        page.groupIdView as page_groupIdView,
+                                        wobject.groupIdView as wobject_groupIdView,
+                                        7 as wobject_special_groupIdView
+                                from MessageBoard_forums, wobject, page
+                                where MessageBoard_forums.wobjectId = wobject.wobjectId
+                                        and wobject.pageId = page.pageId
+                                        and wobject.startDate < $now 
+                                        and wobject.endDate > $now
+                                        and page.startDate < $now
+                                        and page.endDate > $now",
+                        fieldsToIndex => ["title", "description"],
+                        contentType => 'wobject',
+                        url => '$data{urlizedTitle}."#".$data{wid}',
+                        headerShortcut => 'select title from MessageBoard_forums where wobjectId = $data{wid}',
+                        bodyShortcut => 'select description from MessageBoard_forums where wobjectId = $data{wid}',
+                	},
+        	MessageBoard_Forum => {
+                        sql => "select  forumPost.forumPostId,
+                                        forumPost.username,
+                                        forumPost.subject,
+                                        forumPost.message,
+                                        forumPost.userId as ownerId,
+                                        forumThread.forumId as forumId,
+                                        MessageBoard_forums.wobjectId,
+                                        wobject.namespace as namespace,
+                                        wobject.wobjectId as wid,
+                                        page.urlizedTitle as urlizedTitle,
+                                        page.languageId as languageId,
+                                        page.pageId as pageId,
+                                        page.groupIdView as page_groupIdView,
+                                        wobject.groupIdView as wobject_groupIdView,
+                                        7 as wobject_special_groupIdView
+                                from forumPost, forumThread, MessageBoard_forums, wobject, page
+                                where forumPost.forumThreadId = forumThread.forumThreadId
+                                        and forumThread.forumId = MessageBoard_forums.forumId
+                                        and MessageBoard_forums.wobjectId = wobject.wobjectId
+                                        and wobject.pageId = page.pageId
+                                        and wobject.startDate < $now 
+                                        and wobject.endDate > $now
+                                        and page.startDate < $now
+                                        and page.endDate > $now",
+                        fieldsToIndex => ["username", "subject", "message"],
+                        contentType => 'discussion',
+                        url => 'WebGUI::URL::append($data{urlizedTitle},"func=view&wid=$data{wid}&forumOp=viewThread&forumPostId=$data{forumPostId}&forumId=$data{forumId}")',
+                        headerShortcut => 'select subject from forumPost where forumPostId = $data{forumPostId}',
+                        bodyShortcut => 'select message from forumPost where forumPostId = $data{forumPostId}',
+        		}
+		};
+}
+
+
+#-------------------------------------------------------------------
 sub name {
         return WebGUI::International::get(2,$_[0]->get("namespace"));
 }

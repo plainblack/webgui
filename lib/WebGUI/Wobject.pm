@@ -340,6 +340,18 @@ sub getDefaultValue {
 
 #-------------------------------------------------------------------
 
+=head2 getIndexerParams ( )
+
+Override this method and return a hash reference that includes the properties necessary to index the content of the wobject.
+
+=cut
+
+sub getIndexerParams {
+	return {};
+}
+
+#-------------------------------------------------------------------
+
 =head2 getValue ( propertyName )
 
 Returns a value for a wobject property however possible. It first looks in form variables for the property, then looks to the value stored in the wobject instance, and if all else fails it returns the default value for the property.

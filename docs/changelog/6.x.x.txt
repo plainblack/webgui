@@ -84,5 +84,7 @@ webgui.
  - Migrated the navigation items (Thanks to Leendert Bottelberghs, Len
    Kranendonk).
  - Removed all old navigation macros. See gotcha's for details.
-
+ - Added a variation on Len's Advanced Search wobject. Thanks to Len
+   Kranendonk for creating the original version for the WebGUI community
+   contest.
 

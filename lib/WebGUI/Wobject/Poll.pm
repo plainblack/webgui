@@ -47,6 +47,44 @@ sub duplicate {
 }
 
 #-------------------------------------------------------------------
+sub getIndexerParams {
+	my $self = shift;        
+	my $now = shift;
+	return {
+		Poll => {
+                        sql => "select Poll.wobjectId as wid,
+                                        Poll.question as question,
+                                        Poll.a1 as a1,   Poll.a2 as a2,   Poll.a3 as a3,   Poll.a4 as a4,   Poll.a5 as a5,
+                                        Poll.a6 as a6,   Poll.a7 as a7,   Poll.a8 as a8,   Poll.a9 as a9,   Poll.a10 as a10,            
+                                        Poll.a11 as a11, Poll.a12 as a12, Poll.a13 as a13, Poll.a14 as a14, Poll.a15 as a15,            
+                                        Poll.a16 as a16, Poll.a17 as a17, Poll.a18 as a18, Poll.a19 as a19, Poll.a20 as a20,
+                                        wobject.namespace as namespace,
+                                        wobject.addedBy as ownerId,
+                                        page.urlizedTitle as urlizedTitle,
+                                        page.languageId as languageId,
+                                        page.pageId as pageId,
+                                        page.groupIdView as page_groupIdView,
+                                        wobject.groupIdView as wobject_groupIdView,
+                                        7 as wobject_special_groupIdView
+                                        from Poll, wobject, page
+                                        where Poll.wobjectId = wobject.wobjectId
+                                        and wobject.pageId = page.pageId
+                                        and wobject.startDate < $now 
+                                        and wobject.endDate > $now
+                                        and page.startDate < $now
+                                        and page.endDate > $now",
+                        fieldsToIndex => ["question", "a1", "a2", "a3", "a4", "a5", "a6", "a7", "a8", "a9", "a10",
+                                        "a11", "a12", "a13", "a14", "a15", "a16", "a17", "a18", "a19", "a20"],
+                        contentType => 'wobjectDetail',
+                        url => 'WebGUI::URL::append($data{urlizedTitle}, "func=view&wid=$data{wid}")',
+                        headerShortcut => 'select question from Poll where wobjectId = $data{wid}',
+                        bodyShortcut => 'select a1,a2,a3,a4,a5,a6,a7,a8,a9,a10,a11,a12,a13,a14,a15,a16,a17,a18,a19,a20
+                                         from Poll where wobjectId = $data{wid}',
+                }
+	};
+}
+
+#-------------------------------------------------------------------
 sub name {
         return WebGUI::International::get(1,$_[0]->get("namespace"));
 }
