@@ -187,7 +187,7 @@ sub httpHeader {
 		$session{header}{mimetype} = "application/octet-stream";
 	}
 	return $session{cgi}->header( 
-		-type => $session{header}{mimetype}.'; charset='.$charset,
+		-type => $session{header}{mimetype}.'; charset='.$session{header}{charset},
 		-cookie => $session{header}{cookie}, 
 		-status => $session{header}{status},
 		-attachment => $session{header}{filename}
