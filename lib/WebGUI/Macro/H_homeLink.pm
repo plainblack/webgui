@@ -20,7 +20,11 @@ use WebGUI::SQL;
 sub _replacement {
         my (@param, $temp);
         @param = WebGUI::Macro::getParams($1);
-	($temp) = WebGUI::SQL->quickArray("select urlizedTitle from page where pageId=$session{setting}{defaultPage}");
+	if ($session{setting}{defaultPage} == $session{page}{pageId}) {
+		$temp = $session{page}{urlizedTitle};
+	} else {
+		($temp) = WebGUI::SQL->quickArray("select urlizedTitle from page where pageId=$session{setting}{defaultPage}");
+	}
 	$temp = WebGUI::URL::gateway($temp);
 	if ($param[0] ne "linkonly") {
         	$temp = '<a class="homeLink" href="'.$temp.'">';
@@ -36,7 +40,7 @@ sub _replacement {
 
 #-------------------------------------------------------------------
 sub process {
-        my ($output, $temp, @param);
+        my ($output);
         $output = $_[0];
         $output =~ s/\^H\((.*?)\)\;/_replacement($1)/ge;
         $output =~ s/\^H\;/_replacement()/ge;

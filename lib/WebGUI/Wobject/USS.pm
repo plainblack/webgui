@@ -34,10 +34,6 @@ our @ISA = qw(WebGUI::Wobject);
 our $namespace = "USS";
 our $name = WebGUI::International::get(29,$namespace);
 
-our %submissionStatus =("Approved"=>WebGUI::International::get(560),
-	"Denied"=>WebGUI::International::get(561),
-	"Pending"=>WebGUI::International::get(562));
-
 #-------------------------------------------------------------------
 sub duplicate {
         my ($sth, $file, %row, $newSubmissionId, $w);
@@ -80,6 +76,17 @@ sub purge {
 sub set {
         $_[0]->SUPER::set($_[1],[qw(submissionsPerPage groupToContribute groupToApprove defaultStatus  
 		submissionTemplateId templateId karmaPerSubmission allowDiscussion)]);
+}
+
+#-------------------------------------------------------------------
+sub status {
+        if ($_[0] eq "Approved") {
+                return WebGUI::International::get(560);
+        } elsif ($_[0] eq "Denied") {
+                return WebGUI::International::get(561);
+        } elsif ($_[0] eq "Pending") {
+                return WebGUI::International::get(562);
+        }
 }
 
 #-------------------------------------------------------------------
@@ -181,7 +188,8 @@ sub www_edit {
         $f->group("groupToApprove",WebGUI::International::get(1,$namespace),[$groupToApprove]);
         $f->group("groupToContribute",WebGUI::International::get(2,$namespace),[$_[0]->get("groupToContribute")]);
         $f->integer("submissionsPerPage",WebGUI::International::get(6,$namespace),$submissionsPerPage);
-        $f->select("defaultStatus",\%submissionStatus,WebGUI::International::get(563),[$defaultStatus]);
+        $f->select("defaultStatus",{Approved=>status('Approved'),Denied=>status('Denied'),Pending=>status('Pending')}
+		,WebGUI::International::get(563),[$defaultStatus]);
         if ($session{setting}{useKarma}) {
                 $f->integer("karmaPerSubmission",WebGUI::International::get(30,$namespace),$_[0]->get("karmaPerSubmission"));
         } else {
@@ -395,7 +403,7 @@ sub www_viewSubmission {
 	$var{"date.epoch"} = $submission->{dateSubmitted};
 	$var{"date.human"} = epochToHuman($submission->{dateSubmitted});
 	$var{"status.label"} = WebGUI::International::get(14,$namespace);
-	$var{"status.status"} = $submissionStatus{$submission->{status}};
+	$var{"status.status"} = status($submission->{status});
 	$var{"views.label"} = WebGUI::International::get(514);
 	$var{"views.count"} = $submission->{views};
         $var{canPost} = WebGUI::Privilege::isInGroup($_[0]->get("groupToContribute"));

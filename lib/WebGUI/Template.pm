@@ -44,6 +44,7 @@ sub process {
 		strict=>0
 		);
         while (my ($section, $hash) = each %session) {
+		next unless (ref $hash eq 'HASH');
         	while (my ($key, $value) = each %$hash) {
                 	if (ref $value eq 'ARRAY') {
 				next;

@@ -37,16 +37,24 @@ sub _generateDebug {
                 $debug .= '<div style="background-color: #ffffdd;color: #000000;">'.$session{debug}{audit}.'</div>';
                 $debug .= '<table bgcolor="#ffffff" style="color: #000000; font-size: 10pt; font-family: helvetica;">';
                 while (my ($section, $hash) = each %session) {
-                        while (my ($key, $value) = each %$hash) {
-                                if (ref $value eq 'ARRAY') {
-                                        $value = '['.join(', ',@$value).']';
-                                } elsif (ref $value eq 'HASH') {
-                                        $value = '{'.join(', ',map {"$_ => $value->{$_}"} keys %$value).'}';
+			if (ref $hash eq 'HASH') {
+                        	while (my ($key, $value) = each %$hash) {
+                                	if (ref $value eq 'ARRAY') {
+                                        	$value = '['.join(', ',@$value).']';
+                                	} elsif (ref $value eq 'HASH') {
+                                        	$value = '{'.join(', ',map {"$_ => $value->{$_}"} keys %$value).'}';
+                                	}
+                                	unless (lc($key) eq "password" || lc($key) eq "identifier") {
+                                        	$debug .= '<tr><td align="right"><b>'.$section.'.'.$key.':</b></td><td>'.$value.'</td>';
+                                	}
+				}
+                        } elsif (ref $hash eq 'ARRAY') {
+				my $i = 1;
+				foreach (@$hash) {
+                                        $debug .= '<tr><td align="right"><b>'.$section.'.'.$i.':</b></td><td>'.$_.'</td>';
+					$i++;
                                 }
-                                unless (lc($key) eq "password" || lc($key) eq "identifier") {
-                                        $debug .= '<tr><td align="right"><b>'.$section.'.'.$key.':</b></td><td>'.$value.'</td>';
-                                }
-                        }
+			}
                         $debug .= '<tr><td colspan="2">&nbsp;</td></tr>';
                 }
                 $debug .='</table>';

@@ -17,18 +17,21 @@ use WebGUI::Session;
 use WebGUI::URL;
 
 #-------------------------------------------------------------------
-sub process {
-	my ($output, $temp, $f);
-	$output = $_[0];
+sub _replacement {
+	my ($f);
 	$f = WebGUI::HTMLForm->new(1);
         $f->hidden("op","search");
         $f->text("atLeastOne",'',$session{form}{atLeastOne});
         $f->submit(WebGUI::International::get(364));
-	$temp = $f->print;
-        $output =~ s/\^\?\;/$temp/g;
-	return $output;
+	return $f->print;
 }
 
-
+#-------------------------------------------------------------------
+sub process {
+        my ($output);
+        $output = $_[0];
+        $output =~ s/\^\?\;/_replacement()/ge;
+        return $output;
+}
 
 1;

@@ -158,13 +158,17 @@ sub www_view {
 		$var{"attachment.url"} = $file->getURL;
 		$var{"attachment.name"} = $file->getFilename;
 	}
-	($var{"replies.count"}) = WebGUI::SQL->quickArray("select count(*) from discussion where wobjectId=".$_[0]->get("wobjectId"));
-	$var{"replies.URL"} = WebGUI::URL::page('func=showMessage&wid='.$_[0]->get("wobjectId"));
-	$var{"replies.label"} = WebGUI::International::get(28,$namespace);
-        $var{"post.URL"} = WebGUI::URL::page('func=post&mid=new&wid='.$_[0]->get("wobjectId"));
-        $var{"post.label"} = WebGUI::International::get(24,$namespace);
+	if ($_[0]->get("allowDiscussion")) {
+		($var{"replies.count"}) = WebGUI::SQL->quickArray("select count(*) from discussion 
+			where wobjectId=".$_[0]->get("wobjectId"));
+		$var{"replies.URL"} = WebGUI::URL::page('func=showMessage&wid='.$_[0]->get("wobjectId"));
+		$var{"replies.label"} = WebGUI::International::get(28,$namespace);
+        	$var{"post.URL"} = WebGUI::URL::page('func=post&mid=new&wid='.$_[0]->get("wobjectId"));
+        	$var{"post.label"} = WebGUI::International::get(24,$namespace);
+	}
 	return $_[0]->processMacros($_[0]->processTemplate($_[0]->get("templateId"),\%var));
 }
+
 
 1;
 

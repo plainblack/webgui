@@ -10,7 +10,7 @@ package WebGUI::Macro::AdminBar;
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
-use strict;
+use strict qw(refs vars);
 use Tie::IxHash;
 use WebGUI::Form;
 use WebGUI::International;
@@ -31,7 +31,10 @@ sub _replacement {
 		$hash{WebGUI::URL::page('op=selectPackageToDeploy')} = WebGUI::International::get(376);
 	}
 	foreach $key (keys %{$session{wobject}}) {
-		$hash{WebGUI::URL::page('func=edit&wid=new&namespace='.$key)} = $session{wobject}{$key};
+		my $cmd = "\$WebGUI::Wobject::".$key."::name";
+		#$hash{WebGUI::URL::page('func=edit&wid=new&namespace='.$key)} = $session{wobject}{$key};
+		$hash{WebGUI::URL::page('func=edit&wid=new&namespace='.$key)} = eval($cmd);
+		WebGUI::ErrorHandler::warn("Could use wobject $key because: ".$@) if ($@);
 	}
 	%hash = sortHash(%hash);
 	%hash = (%{{WebGUI::URL::page()=>WebGUI::International::get(1)}},%hash);

@@ -307,6 +307,9 @@ sub new {
         $class = shift;
         $sql = shift;
         $dbh = shift || $WebGUI::Session::session{dbh};
+	if ($WebGUI::Session::session{setting}{showDebug}) {
+		push(@{$WebGUI::Session::session{SQLquery}},$sql);
+	}
         $sth = $dbh->prepare($sql) or WebGUI::ErrorHandler::fatalError("Couldn't prepare statement: ".$sql." : ". DBI->errstr);
         $sth->execute or WebGUI::ErrorHandler::fatalError("Couldn't execute statement: ".$sql." : ". DBI->errstr);
 	bless ({_sth => $sth}, $class);

@@ -29,11 +29,6 @@ our @ISA = qw(WebGUI::Wobject);
 our $namespace = "MessageBoard";
 our $name = WebGUI::International::get(2,$namespace);
 
-our %status =("Approved"=>WebGUI::International::get(560),
-        "Denied"=>WebGUI::International::get(561),
-        "Pending"=>WebGUI::International::get(562));
-
-
 #-------------------------------------------------------------------
 sub duplicate {
         my ($w);
@@ -48,6 +43,17 @@ sub duplicate {
 #-------------------------------------------------------------------
 sub set {
         $_[0]->SUPER::set($_[1],[qw(templateId messagesPerPage)]);
+}
+
+#-------------------------------------------------------------------
+sub status {
+        if ($_[0] eq "Approved") {
+                return WebGUI::International::get(560);
+        } elsif ($_[0] eq "Denied") {
+                return WebGUI::International::get(561);
+        } elsif ($_[0] eq "Pending") {
+                return WebGUI::International::get(562);
+        }
 }
 
 #-------------------------------------------------------------------
@@ -124,7 +130,7 @@ sub www_view {
 			"message.url" => WebGUI::URL::page('func=showMessage&mid='.$data->{messageId}.'&wid='.$_[0]->get("wobjectId")),
 			"message.subject" => substr($data->{subject},0,30),
 			"message.currentUser" => ($data->{userId} == $session{user}{userId}),
-			"message.status" => $status{$data->{status}},
+			"message.status" => status($data->{status}),
 			"message.userProfile" => WebGUI::URL::page('op=viewProfile&uid='.$data->{userId}),
 			"message.username" => $data->{username},
 			"message.date" => epochToHuman($data->{dateOfPost}),

@@ -25,10 +25,6 @@ use WebGUI::SQL;
 use WebGUI::URL;
 use WebGUI::User;
 
-our %status =("Approved"=>WebGUI::International::get(560),
-        "Denied"=>WebGUI::International::get(561),
-        "Pending"=>WebGUI::International::get(562));
-
 #-------------------------------------------------------------------
 sub _deleteReplyTree {
         my ($sth, %data, $messageId);
@@ -474,7 +470,7 @@ sub showReplyTree {
                 	$html .= '><td class="tableData"><a href="'.WebGUI::URL::page('func=showMessage&mid='.$data[0].'&wid='.
                         	$message{wobjectId}).'">'.substr($data[1],0,30).'</a>';
 			if ($data[4] == $session{user}{userId}) {
-				$html .= ' ('.$status{$data[5]}.')';
+				$html .= ' ('.status($data[5]).')';
 			}
 			$html .= '</td><td class="tableData"><a href="'.
                         	WebGUI::URL::page('op=viewProfile&uid='.$data[4]).'">'.$data[2].
@@ -533,7 +529,7 @@ sub showThreads {
                                 $data{messageId}.'&wid='.$session{form}{wid}.'&sid='.$session{form}{sid}).'">'.substr($data{subject},0,30).
                                 '</a>';
                         if ($data{userId} == $session{user}{userId}) {
-                                $html .= ' ('.$status{$data{status}}.')';
+                                $html .= ' ('.status($data{status}).')';
                         }
                         $html .= '</td><td class="tableData"><a href="'.
                                 WebGUI::URL::page('op=viewProfile&uid='.$data{userId}).'">'.$data{username}.
@@ -562,6 +558,17 @@ sub showThreads {
 }
 
 #-------------------------------------------------------------------
+sub status {
+	if ($_[0] eq "Approved") {
+		return WebGUI::International::get(560);
+	} elsif ($_[0] eq "Denied") {
+		return WebGUI::International::get(561);
+	} elsif ($_[0] eq "Pending") {
+		return WebGUI::International::get(562);
+	}
+}
+
+#-------------------------------------------------------------------
 sub traverseReplyTree {
         my ($sth, @data, $html, $depth, $i);
         for ($i=0;$i<=$_[1];$i++) {
@@ -578,7 +585,7 @@ sub traverseReplyTree {
                 $html .= '><td class="tableData">'.$depth.'<a href="'.WebGUI::URL::page('func=showMessage&mid='.$data[0]
 			.'&wid='.$session{form}{wid}.'&sid='.$session{form}{sid}).'">'.substr($data[1],0,30).'</a>';
                 if ($data[4] == $session{user}{userId}) {
-                        $html .= ' ('.$status{$data[5]}.')';
+                        $html .= ' ('.status($data[5]).')';
                 }
                 $html .= '</td><td class="tableData"><a href="'.WebGUI::URL::page('op=viewProfile&uid='.$data[4]).'">'
 			.$data[2].'</a></td><td class="tableData">'.epochToHuman($data[3],"%z %Z").'</td></tr>';

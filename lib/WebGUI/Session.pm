@@ -185,12 +185,13 @@ sub _loadWobjects {
 				next if (isIn($namespace, split(/,/,$exclude)));
 				$cmd = "WebGUI::Wobject::".$namespace."::uiLevel";
 				next if (eval($cmd) > $session{user}{uiLevel});	
-				$cmd = "\$WebGUI::Wobject::".$namespace."::name";
-				$session{wobject}{$namespace} = eval($cmd);
-				if ($@) {
-					WebGUI::ErrorHandler::warn("No name method in wobject: $namespace. ".$@);
-					$session{wobject}{$namespace} = "ERROR: ".$namespace;
-				}
+		#		$cmd = "\$WebGUI::Wobject::".$namespace."::name";
+		#		$session{wobject}{$namespace} = eval($cmd);
+				$session{wobject}{$namespace} = $namespace;
+		#		if ($@) {
+		#			WebGUI::ErrorHandler::warn("No name method in wobject: $namespace. ".$@);
+		#			$session{wobject}{$namespace} = "ERROR: ".$namespace;
+		#		}
 			} else {
 				WebGUI::ErrorHandler::warn("Wobject failed to compile: $namespace. ".$@);
 				$session{wobject}{$namespace} = "ERROR: ".$namespace;
@@ -226,8 +227,7 @@ sub end {
 #-------------------------------------------------------------------
 sub httpHeader {
 	unless ($session{header}{charset}) {
-		my ($charset) = WebGUI::SQL->quickArray("select characterSet from language where languageId=".$session{user}{language});
-		$session{header}{charset} = $charset || "ISO-8859-1";
+		$session{header}{charset} = $session{language}{characterSet} || "ISO-8859-1";
 	}
 	if ($session{header}{filename} && $session{header}{mimetype} eq "text/html") {
 		$session{header}{mimetype} = "application/octet-stream";
