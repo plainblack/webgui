@@ -239,10 +239,10 @@ sub getAdminFunction {
 		"contentProfiling"=>{
 			title=>{
 				id=>"content profiling",
-				namespace=>"MetaData"
+				namespace=>"Asset"
 			},
 			icon=>"contentProfiling.gif",
-			op=>"manageMetaData",
+			func=>"manageMetaData",
 			group=>"4"
 		},
 		"contentFilters"=>{

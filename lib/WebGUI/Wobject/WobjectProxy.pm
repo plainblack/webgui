@@ -308,3 +308,127 @@ sub www_view {
 
 1;
 
+
+#-------------------------------------------------------------------
+
+=head2 getAssetByCriteria ( hashRef )
+
+This function will search for a asset that match a metadata criteria set.
+If no asset is found, undef will be returned.
+
+=head3 hashRef
+
+A typical hashRef for this function will look like:
+
+{
+	proxiedNamespace => "Article",
+	resolveMultiples => "random",
+	proxyCriteria => "State = Wisconsin AND Country != Sauk"
+}
+
+Most of the time this will be a:
+
+WebGUI::SQL->quickHashRef("select * from AssetProxy where assetId=".quote($proxiedId));
+
+=cut
+
+sub getAssetByCriteria {
+	my $assetProxy = shift;
+	my $criteria = $assetProxy->{proxyCriteria};
+	my $order = $assetProxy->{resolveMultiples};
+	my $namespace = $assetProxy->{proxiedNamespace};
+	my $assetId = $assetProxy->{assetId};
+
+	# Parse macro's in criteria
+	$criteria = WebGUI::Macro::process($criteria);
+
+	# Once a asset is found, we will stick to that asset, 
+	# to prevent the proxying of multiple- depth assets like Surveys and USS.
+	my $scratchId;
+	if ($assetId) {
+		$scratchId = "AssetProxy_" . $assetId;
+		if($session{scratch}{$scratchId}) {
+			return $session{scratch}{$scratchId} unless ($session{var}{adminOn});
+		}
+	}
+
+	# $criteria = "State = Wisconsin AND Country != Sauk";
+	#
+	# State          =             Wisconsin AND Country != Sauk
+	# |              |             |
+	# |- $field      |_ $operator  |- $value
+	# |_ $attribute                |_ $attribute
+	my $operator = qr/<>|!=|=|>=|<=|>|<|like/i;
+	my $attribute = qr/['"][^()|=><!]+['"]|[^()|=><!\s]+/i; 
+                                                                                                      
+	my $constraint = $criteria;
+	
+	# Get each expression from $criteria
+	foreach my $expression ($criteria =~ /($attribute\s*$operator\s*$attribute)/gi) {
+		# $expression will match "State = Wisconsin"
+
+        	my $replacement = $expression;	# We don't want to modify $expression.
+						# We need it later.
+
+		# Get the field (State) and the value (Wisconsin) from the $expression.
+	        $expression =~ /($attribute)\s*$operator\s*($attribute)/gi;
+	        my $field = $1;
+	        my $value = $2;
+
+		# quote the field / value variables.
+		my $quotedField = $field;
+		my $quotedValue = $value;
+		unless ($field =~ /^\s*['"].*['"]\s*/) {
+			$quotedField = quote($field);
+		}
+                unless ($value =~ /^\s*['"].*['"]\s*/) {
+                        $quotedValue = quote($value);
+                }
+		
+		# transform replacement from "State = Wisconsin" to 
+		# "(fieldname=State and value = Wisconsin)"
+	        $replacement =~ s/\Q$field/(fieldname=$quotedField and value /;
+	        $replacement =~ s/\Q$value/$quotedValue )/i;
+
+		# replace $expression with the new $replacement in $constraint.
+	        $constraint =~ s/\Q$expression/$replacement/;
+	}
+	my $sql =  "	select w.assetId 
+			from metaData_values d, metaData_properties f, asset w 
+			where f.fieldId = d.fieldId
+				and w.assetId = d.assetId
+				and w.namespace = ".quote($namespace); 			
+
+	
+	# Add constraint only if it has been modified.
+	$sql .= " and ".$constraint if (($constraint ne $criteria) && $constraint ne "");
+	$sql .= " order by w.lastEdited desc";
+
+	# Execute the query with an unconditional read
+	my @wids;
+        my $sth = WebGUI::SQL->unconditionalRead($sql);
+        while (my ($data) = $sth->array) {
+		push (@wids, $data);
+        }
+        $sth->finish;
+
+	# No matching assets found.
+        if (scalar(@wids) == 0) {
+                return undef; # fall back to the originally mirrored asset.
+	}
+	my $wid;
+	# Grab a wid from the results
+	if ($order eq 'random') {
+		$wid = $wids[ rand @wids ];
+	} else { 
+				 #default order is mostRecent
+		$wid = $wids[0]; # 1st element in list is most recent.
+	}
+
+	# Store the matching assetId in user scratch. 
+	WebGUI::Session::setScratch($scratchId,$wid) if ($scratchId);
+
+	return $wid;		
+}
+
+

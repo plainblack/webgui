@@ -14,7 +14,7 @@ our ($webguiRoot, @nailable);
 
 BEGIN { 
 	$webguiRoot = "..";
-	@nailable = qw(jpg jpeg png gif tif tiff bmp);
+	@nailable = qw(jpg jpeg png gif);
 	unshift (@INC, $webguiRoot."/lib"); 
 }
 
@@ -25,59 +25,71 @@ use File::Path;
 use File::stat;
 use FileHandle;
 use Getopt::Long;
-use Image::Magick;
 use POSIX;
 use strict;
-use WebGUI::Attachment;
+use WebGUI::Asset::File;
+use WebGUI::Asset::File::Image;
 use WebGUI::DateTime;
 use WebGUI::Session;
-use WebGUI::SQL;
+use WebGUI::Storage;
 use WebGUI::Utility;
-use WebGUI::Wobject::FileManager;
+
 
 
 my $configFile;
-my $groupToView = 2;
+my $owner = 3;
+my $groupToView = 7;
+my $groupToEdit = 4;
 my $help;
 my $pathToFiles;
 my $override;
 my $quiet;
 my $webUser = 'apache';
-my $wobjectId;
+my $assetId;
 
 GetOptions(
 	'configFile=s'=>\$configFile,
+	'owner=s'=>\$owner,
 	'groupToView=s'=>\$groupToView,
+	'groupToEdit=s'=>\$groupToEdit,
         'help'=>\$help,
 	'override'=>$override,
 	'pathToFiles=s'=>\$pathToFiles,
         'quiet'=>\$quiet,
 	'webUser=s'=>\$webUser,
-	'wobjectId=s'=>\$wobjectId
+	'parentAssetId=s'=>\$parrentAssetId
 );
 
 
-if ($help || $configFile eq "" || $pathToFiles eq "" || $wobjectId eq ""){
+if ($help || $configFile eq "" || $pathToFiles eq "" || $parentAssetId eq ""){
         print <<STOP;
 
 
-Usage: perl $0 --pathToFiles=<pathToImportFiles> --configfile=<webguiConfig> --wobjectId=<fileManagerWobjectId>
+Usage: perl $0 --pathToFiles=<pathToImportFiles> --configfile=<webguiConfig> --parentAssetId=<assetId>
 
         --configFile	WebGUI config file.
 
         --pathToFiles	Folder containing files to import.
 
-	--wobjectId	The wobject ID of the file manager you
-			wish to import these files to.
+	--parentAssetId	The asset ID of the asset you wish
+			to attach these files to.
 
 
 Options:
 
+	--groupToEdit	The group ID of the group that should
+			have the privileges to edit these
+			files. Defaults to '4' (Content Managers).
+
 	--groupToView	The group ID of the group that should
 			have the privileges to view these
-			files. Defaults to '2'.
+			files. Defaults to '7' (Everybody).
 
         --help		Display this help message and exit.
+
+	--owner		The user ID of the user that should
+			have the privileges to modify these
+			files. Defaults to '3' (Admin).
 
 	--override	This utility is designed to be run as
 			a privileged user on Linux style systems.
@@ -119,39 +131,33 @@ print "OK\n" unless ($quiet);
 # addFiles(dbHandler, filelistHashRef, webguiSettingsHashRef, pathToCopyFrom)
 #-----------------------------------------
 sub addFiles {
-  	my ($exists, @files, $filename, $ext, $id, $i, $file1, $file2, $file3, $seq);
+	my $filelist = shift;
   	print "Adding files...\n" unless ($quiet);
-    	($exists) = WebGUI::SQL->quickArray("select count(*) from FileManager where wobjectId='$wobjectId'");
-    	if ($exists) {
-		my $w = WebGUI::Wobject::FileManager->new({wobjectId=>$wobjectId,namespace=>"FileManager"});
-      		foreach $filename (keys %{$_[0]}) {
-        		print "Processing $filename.\n" unless ($quiet);
-        		$i = 0;
-        		@files = [];
-        		print "\tAdding $filename to the database.\n" unless ($quiet);
-			my $fileId = $w->setCollateral("FileManager_file","FileManager_fileId",{
-				FileManager_fileId=>"new",
-				groupToView=>$groupToView,
-				dateUploaded=>time(),
-				fileTitle=>$filename
+	my $parent = WebGUI::Asset::File->newByDynamicClass($parentAssetId);
+    	if (defined $parent) {
+		foreach my $file (@{$filelist}) {
+        		print "\tAdding ".$file->{filename}." to the database.\n" unless ($quiet);
+			my $class = 'WebGUI::Asset::File';
+			$class = 'WebGUI::Asset::File::Image' if (isIn($file->{ext},@nailable));
+			my $url = $parent->getUrl.'/'.$file->{filename};
+			my $storage = WebGUI::Storage->create;
+			my $filename = $storage->addFileFromFilesystem($pathToFiles.$session{os}{slash}.$file->{filename});
+			my $newAsset = $parent->addChild({
+				className=>$class,
+				title=>$filename,
+				menuTitle=>$filename,
+				filename=>$filename,
+				storageId=>$storage->getId,
+				url=>$url,
+				groupIdView=>$groupToView,
+				groupIdEdit=>$groupToEdit,
+				ownerUserId=>$owner
 				});
-			my $attachment = WebGUI::Attachment->new("new",$w->get("wobjectId"),$fileId);
-        		foreach $ext (keys %{${$_[0]}{$filename}}) {
-          			print "\tCopying ".${$_[0]}{$filename}{$ext}.".\n" unless ($quiet);
-				$attachment->saveFromFilesystem($pathToFiles.$session{os}{slash}.${$_[0]}{$filename}{$ext});
-          			$files[$i] = ${$_[0]}{$filename}{$ext};
-          			$i++;
-	       		}
-			my @files = sort {isIn(getType($b),@nailable) cmp isIn(getType($a),@nailable)} @files;
-			$w->setCollateral("FileManager_file","FileManager_fileId",{
-                                FileManager_fileId=>$fileId,
-				downloadFile=>$files[0],
-				alternateVersion1=>$files[1],
-				alternateVersion2=>$files[2]
-				});
+			$newAsset->generateThumbnail if ($class eq 'WebGUI::Asset::File::Image');
+			$newAsset->setSize($storage->getFileSize($filename));
 		}
     	} else {
-      		print "Warning: File Manager '".$wobjectId."' does not exist. Cannot import files.\n";
+      		print "Warning: Parent asset '".$parentAssetId."' does not exist. Cannot import files.\n";
   	}
   	print "Finished adding.\n" unless ($quiet);
 }
@@ -177,7 +183,7 @@ sub setPrivileges {
 #-----------------------------------------
 sub buildFileList {
         print "Building file list.\n" unless ($quiet);
-        my (%filelist, @files, $file, $filename, $ext);
+        my (@filelist, @files, $file, $filename, $ext);
         if (opendir(FILES,$_[0])) {
                 @files = readdir(FILES);
                 foreach $file (@files) {
@@ -185,13 +191,14 @@ sub buildFileList {
                                 $file =~ /(.*?)\.(.*?)$/;
                                 $filename = $1;
                                 $ext = $2;
+				push(@filelist,{ext=>$ext, filename=>$file});
                                 $filelist{$filename}{$ext} = $file;
                                 print "Found file $file.\n" unless ($quiet);
                         }
                 }
                 closedir(FILES);
                 print "File list complete.\n" unless ($quiet);
-                return \%filelist;
+                return \@filelist;
         } else {
                 print "Error: Could not open folder.\n";
                 exit;

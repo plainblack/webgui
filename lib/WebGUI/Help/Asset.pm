@@ -41,6 +41,42 @@ our $HELP = {
 		]
 	},
 
+	'metadata manage'=> {
+		title => 'content profiling',
+		body => 'metadata manage body',
+		related => [
+			{
+				tag => 'metadata edit property',
+				namespace => 'Asset'
+			},
+			{
+				tag => 'user macros',
+				namespace => 'WebGUI'
+			},
+			{
+				tag => 'wobject add/edit',
+				namespace => 'WebGUI',
+			},
+		],
+	},
+	'metadata edit property' => {
+                title => 'Metadata, Edit property',
+                body => 'metadata edit property body',
+                related => [
+			{
+				tag => 'metadata manage',
+				namespace => 'Asset'
+                        },
+                        {
+                                tag => 'user macros',
+                                namespace => 'WebGUI'
+                        },
+                        {
+                                tag => 'wobject add/edit',
+                                namespace => 'WebGUI',
+                        },
+                ],
+        },
 };
 
 1;

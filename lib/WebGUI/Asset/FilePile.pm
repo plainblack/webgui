@@ -165,7 +165,6 @@ sub editSave {
 		my %data;
 		my $class = 'WebGUI::Asset::File';
 		$class = "WebGUI::Asset::File::Image" if (isIn($storage->getFileExtension($filename),qw(jpg jpeg gif png)));
-		my $newAsset = $parent->addChild({className=>$class});
 		foreach my $definition (@{$self->definition}) {
 			foreach my $property (keys %{$definition->{properties}}) {
 				$data{$property} = WebGUI::FormProcessor::process(
@@ -175,11 +174,11 @@ sub editSave {
 					);
 			}
 		}
-		$data{filename} = $filename;
+		$data->{className} = $class;
 		$data{storageId} = $storage->getId;
-		$data{title} = $data{menuTitle} = $filename;
+		$data{filename} = $data{title} = $data{menuTitle} = $filename;
 		$data{url} = $parent->getUrl.'/'.$filename;
-		$newAsset->update(\%data);
+		my $newAsset = $parent->addChild(\%data);
 		$newAsset->setSize($storage->getFileSize($filename));
 		$newAsset->generateThumbnail if ($class eq "WebGUI::Asset::File::Image");
 	}

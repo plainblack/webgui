@@ -16,6 +16,7 @@ package WebGUI::Asset;
 
 use strict;
 use Tie::IxHash;
+use WebGUI::Asset::Template;
 use WebGUI::AdminConsole;
 use WebGUI::DateTime;
 use WebGUI::ErrorHandler;
@@ -29,6 +30,7 @@ use WebGUI::Privilege;
 use WebGUI::Session;
 use WebGUI::SQL;
 use WebGUI::TabForm;
+use WebGUI::URL;
 use WebGUI::Utility;
 
 =head1 NAME
@@ -335,6 +337,28 @@ sub definition {
 
 #-------------------------------------------------------------------
 
+=head2 deleteMetaDataField ( fieldId )
+
+Deletes a field from the metadata system.
+
+=head3 fieldId
+
+The fieldId to be deleted.
+
+=cut
+
+sub deleteMetaDataField {
+	my $fieldId = shift;
+	return unless ($fieldId =~ /^\d+$/ || length($fieldId) == 22);
+	WebGUI::SQL->beginTransaction;
+        WebGUI::SQL->write("delete from metaData_properties where fieldId = ".quote($fieldId));
+        WebGUI::SQL->write("delete from metaData_values where fieldId = ".quote($fieldId));
+	WebGUI::SQL->commit;
+}
+
+
+#-------------------------------------------------------------------
+
 =head2 demote ( )
 
 Swaps lineage with sister below. Returns 1 if there is a sister to swap. Otherwise returns 0.
@@ -388,6 +412,12 @@ sub duplicate {
 	my $self = shift;
 	my $assetToDuplicate = shift || $self;
 	my $newAsset = $self->addChild($assetToDuplicate->get);
+        my $sth = WebGUI::SQL->read("select * from metaData_values where assetId = ".quote($self->getId));
+        while( my $h = $sth->hashRef) {
+		WebGUI::SQL->write("insert into metaData_values (fieldId, assetId, value) values (".
+					quote($h->{fieldId}).",".quote($newAsset->getId).",".quote($h->{value}).")");
+        }
+        $sth->finish;
 	return $newAsset;
 }
 
@@ -1044,6 +1074,44 @@ sub getLineageLength {
 
 #-------------------------------------------------------------------
 
+=head2 getMetaDataFields ( [fieldId] )
+
+Returns a hash reference containing all metadata field properties.  You can limit the output to a certain field by specifying a fieldId.
+
+=head3 fieldId
+
+If specified, the hashRef will contain only this field.
+
+=cut
+
+sub getMetaDataFields {
+	my $self = shift;
+	my $fieldId = shift;
+	tie my %hash, 'Tie::IxHash';
+	my $sql = "select
+		 	f.fieldId, 
+			f.fieldName, 
+			f.description, 
+			f.defaultValue,
+			f.fieldType,
+			f.possibleValues,
+			d.value
+		from metaData_properties f
+		left join metaData_values d on f.fieldId=d.fieldId and d.assetId=".quote($self->getId);
+	$sql .= " where f.fieldId = ".quote($fieldId) if ($fieldId);
+	$sql .= " order by f.fieldName";
+	my $sth = WebGUI::SQL->read($sql);
+        while( my $h = $sth->hashRef) {
+		foreach(keys %$h) {
+			$hash{$h->{fieldId}}{$_} = $h->{$_};
+		}
+	}
+        $sth->finish;
+        return \%hash;
+}
+
+#-------------------------------------------------------------------
+
 =head2 getName ( )
 
 Returns the internationalization of the word "Asset".
@@ -1500,6 +1568,65 @@ sub processPropertiesFromFormPost {
 	$data{menuTitle} = $data{title} unless ($data{menuTitle});
 	$data{url} = $self->getParent->get("url").'/'.$data{menuTitle} unless ($data{url});
 	$self->update(\%data);
+	foreach my $form (keys %{$session{form}}) {
+		if ($form =~ /^metadata_(\d+)$/) {
+			my $fieldId = $1; 
+			my ($exists) = WebGUI::SQL->quickArray("select count(*) from metaData_values
+							where assetId = ".quote($self->getId)."
+							and fieldId = ".quote($fieldId));
+			if(! $exists && $session{form}{$form} ne "") {
+				WebGUI::SQL->write("insert into metaData_values (fieldId, assetId)
+							values (".quote($fieldId).",".quote($self->getId).")");
+			}
+			if($session{form}{$form} eq "") {
+				# Keep it clean
+				WebGUI::SQL->write("delete from metaData_values where assetId = ".
+							quote($self->getId)." and fieldId = ".quote($fieldId));
+			} else {
+				WebGUI::SQL->write("update metaData_values set value = ".quote($session{form}{$form})."
+							where assetId = ".quote($self->getId)." and fieldId = ".
+							quote($fieldId));
+			}
+		}
+	}
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 processTemplate ( vars, templateId ) 
+
+Returns the content generated from this template.
+
+=head3 hashRef
+
+A hash reference containing variables and loops to pass to the template engine.
+
+=head3 templateId
+
+An id referring to a particular template in the templates table. 
+
+=cut
+
+sub processTemplate {
+	my $self = shift;
+	my $var = shift;
+	my $templateId = shift;
+        my $meta = $self->getMetaDataFields();
+        foreach my $field (keys %$meta) {
+		$var->{$meta->{$field}{fieldName}} = $meta->{$field}{value};
+	}
+	$var->{'controls'} = $self->getToolbar;
+	my %vars = (
+		%{$self->{_properties}},
+		%{$var}
+		);
+	if (defined $self->get("_WobjectProxy")) {
+		$vars{isShortcut} = 1;
+		my ($originalPageURL) = WebGUI::SQL->quickArray("select url from asset where assetId=".quote($self->getId),WebGUI::SQL->getSlave);
+		$vars{originalURL} = WebGUI::URL::gateway($originalPageURL."#".$self->getId);
+	}
+	return WebGUI::Asset::Template->new($templateId)->process(\%vars);
 }
 
 #-------------------------------------------------------------------
@@ -1538,6 +1665,7 @@ sub purge {
 	foreach my $definition (@{$self->definition}) {
 		WebGUI::SQL->write("delete from ".$definition->{tableName}." where assetId=".quote($self->getId));
 	}
+	WebGUI::SQL->write("delete from metaData_values where assetId = ".quote($self->getId));
 	WebGUI::SQL->commit;
 	# eliminate anything bound to this asset
 	my $sth = WebGUI::SQL->read("select assetId,className from asset where boundToId=".quote($self->getId));
@@ -1921,6 +2049,15 @@ sub www_deleteList {
 }
 
 #-------------------------------------------------------------------
+sub www_deleteMetaDataField {
+	my $self = shift;
+	my $ac = WebGUI::AdminConsole->new("content profiling");
+	return $ac->render(WebGUI::Privilege::insufficient()) unless (WebGUI::Grouping::isInGroup(4));
+	$self->deleteMetaDataField($session{form}{fid});
+	return $self->www_manageMetaData;
+}
+
+#-------------------------------------------------------------------
 
 =head2 www_demote ( )
 
@@ -1998,6 +2135,81 @@ sub www_editSave {
 	}
 	return $object->www_view;
 }
+
+#-------------------------------------------------------------------
+sub www_editMetaDataField {
+	my $self = shift;
+	my $ac = WebGUI::AdminConsole->new("content profiling");
+	return $ac->render(WebGUI::Privilege::insufficient()) unless (WebGUI::Grouping::isInGroup(4));
+        my $fieldInfo;
+	if($session{form}{fid} && $session{form}{fid} ne "new") {
+		$fieldInfo = WebGUI::MetaData::getField($session{form}{fid});
+	}
+	my $fid = $session{form}{fid} || "new";
+        my $f = WebGUI::HTMLForm->new(-action=>$self->getUrl);
+        $f->hidden("func", "editMetaDataFieldSave");
+        $f->hidden("fid", $fid);
+        $f->readOnly(
+                -value=>$fid,
+                -label=>WebGUI::International::get('Field Id','Asset'),
+                );
+        $f->text("fieldName", WebGUI::International::get('Field name','Asset'), $fieldInfo->{fieldName});
+	$f->textarea("description", WebGUI::International::get(85), $fieldInfo->{description});
+        $f->fieldType(
+                -name=>"fieldType",
+                -label=>WebGUI::International::get(486),
+                -value=>[$fieldInfo->{fieldType} || "text"],
+		-types=> [ qw /text integer yesNo selectList radioList/ ]
+                );
+	$f->textarea("possibleValues",WebGUI::International::get(487),$fieldInfo->{possibleValues});
+        $f->submit();
+	$ac->setHelp("metadata edit property","Asset");
+	return $ac->render($f->print, WebGUI::International::get('Edit Metadata',"Asset"));
+}
+
+#-------------------------------------------------------------------
+sub www_editMetaDataFieldSave {
+	my $self = shift;
+	my $ac = WebGUI::AdminConsole->new("content profiling");
+	return $ac->render(WebGUI::Privilege::insufficient()) unless (WebGUI::Grouping::isInGroup(4));
+	$ac->setHelp("metadata edit property","Asset");
+	# Check for duplicate field names
+	my $sql = "select count(*) from metaData_properties where fieldName = ".
+                                quote($session{form}{fieldName});
+	if ($session{form}{fid} ne "new") {
+		$sql .= " and fieldId <> ".quote($session{form}{fid});
+	}
+	my ($isDuplicate) = WebGUI::SQL->buildArray($sql);
+	if($isDuplicate) {
+		my $error = WebGUI::International::get("duplicateField", "Asset");
+		$error =~ s/\%field\%/$session{form}{fieldName}/;
+		return $ac->render($error,WebGUI::International::get('Edit Metadata',"Asset"));
+	}
+	if($session{form}{fieldName} eq "") {
+		return $ac->render(WebGUI::International::get("errorEmptyField", "Asset"),WebGUI::International::get('Edit Metadata',"Asset"));
+	}
+	if($session{form}{fid} eq 'new') {
+		$session{form}{fid} = WebGUI::Id::generate();
+		WebGUI::SQL->write("insert into metaData_properties (fieldId, fieldName, defaultValue, description, fieldType, possibleValues) values (".
+					quote($session{form}{fid}).",".
+					quote($session{form}{fieldName}).",".
+					quote($session{form}{defaultValue}).",".
+					quote($session{form}{description}).",".
+					quote($session{form}{fieldType}).",".
+					quote($session{form}{possibleValues}).")");
+	} else {
+                WebGUI::SQL->write("update metaData_properties set fieldName = ".quote($session{form}{fieldName}).", ".
+					"defaultValue = ".quote($session{form}{defaultValue}).", ".
+					"description = ".quote($session{form}{description}).", ".
+					"fieldType = ".quote($session{form}{fieldType}).", ".
+					"possibleValues = ".quote($session{form}{possibleValues}).
+					" where fieldId = ".quote($session{form}{fid}));
+	}
+
+	return $self->www_manageMetaData; 
+}
+
+
 
 #-------------------------------------------------------------------
 
@@ -2313,7 +2525,7 @@ sub www_manageAssets {
 sub www_manageClipboard {
 	my $self = shift;
 	my $ac = WebGUI::AdminConsole->new("clipboard");
-	return $ac->render(WebGUI::Privilege::insufficient()) unless (WebGUI::Grouping::isInGroup(4));
+	return $ac->render(WebGUI::Privilege::insufficient()) unless (WebGUI::Grouping::isInGroup(12));
 	my @assets;
 	my ($header,$limit);
         $ac->setHelp("clipboard manage");
@@ -2332,6 +2544,22 @@ sub www_manageClipboard {
 		push(@assets,WebGUI::Asset->newByDynamicClass($assetData->{assetId},"ManageClipboard",$assetData->{className}));
 	}
 	return $ac->render($self->getAssetManagerControl(\@assets), $header);
+}
+
+#-------------------------------------------------------------------
+sub www_manageMetaData {
+	my $self = shift;
+	my $ac = WebGUI::AdminConsole->new("content profiling");
+	return $ac->render(WebGUI::Privilege::insufficient()) unless (WebGUI::Grouping::isInGroup(4));
+	my $output;
+	my $fields = $self->getMetaDataFields();
+	foreach my $fieldId (keys %{$fields}) {
+		$output .= deleteIcon("func=deleteMetaDataField&fid=".$fieldId,$self->getUrl,WebGUI::International::get('deleteConfirm','Asset'));
+		$output .= editIcon("func=editMetaDataField&fid=".$fieldId,$self->getUrl);
+		$output .= "<b>".$fields->{$fieldId}{fieldName}."</b><br>";
+	}	
+        $ac->setHelp("metadata manage");
+	return $ac->render($output);
 }
 
 #-------------------------------------------------------------------

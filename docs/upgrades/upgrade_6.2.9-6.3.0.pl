@@ -76,6 +76,7 @@ WebGUI::SQL->write("alter table wobject add styleTemplateId varchar(22) not null
 WebGUI::SQL->write("alter table wobject add printableStyleTemplateId varchar(22) not null");
 WebGUI::SQL->write("alter table wobject add cacheTimeout int not null default 60");
 WebGUI::SQL->write("alter table wobject add cacheTimeoutVisitor int not null default 3600");
+WebGUI::SQL->write("alter table metaData_values add assetId varchar(22) not null");
 WebGUI::SQL->write("alter table wobject drop primary key");
 WebGUI::SQL->write("alter table Poll_answer add column assetId varchar(22)");
 WebGUI::SQL->write("alter table DataForm_entry add column assetId varchar(22)");
@@ -139,6 +140,7 @@ WebGUI::SQL->write("alter table wobject drop column dateAdded");
 WebGUI::SQL->write("alter table wobject drop column editedBy");
 WebGUI::SQL->write("alter table wobject drop column lastEdited");
 WebGUI::SQL->write("alter table wobject drop column allowDiscussion");
+WebGUI::SQL->write("alter table metaData_values drop column wobjectId");
 WebGUI::SQL->write("drop table page");
 WebGUI::SQL->write("drop table FileManager");
 WebGUI::SQL->write("drop table FileManager_file");
@@ -581,6 +583,13 @@ $sth->finish;
 
 
 print "\tDeleting files which are no longer used.\n" unless ($quiet);
+#unlink("../../lib/WebGUI/MetaData.pm");
+#unlink("../../lib/WebGUI/Operation/MetaData.pm");
+#unlink("../../lib/WebGUI/i18n/English/MetaData.pm");
+#unlink("../../lib/WebGUI/Help/MetaData.pm");
+#unlink("../../sbin/fileManagerImport.pl");
+#unlink("../../sbin/collateralImport.pl");
+#unlink("../../lib/WebGUI/Page.pm");
 #unlink("../../lib/WebGUI/Page.pm");
 #unlink("../../lib/WebGUI/Operation/Page.pm");
 #unlink("../../lib/WebGUI/Operation/Package.pm");
@@ -819,6 +828,7 @@ sub walkTree {
 				.", cacheTimeoutVisitor=".quote($page->{cacheTimeoutVisitor})." where wobjectId=".quote($wobject->{wobjectId}));
 			WebGUI::SQL->write("update ".$wobject->{namespace}." set assetId=".quote($wobjectId)." where wobjectId="
 				.quote($wobject->{wobjectId}));
+			WebGUI::SQL->write("update metaData_values set assetId=".quote($wobjectId)." where wobjectId=".quote($wobject->{wobjectId}));
 			if ($wobject->{namespace} eq "Article") {
 				print "\t\t\tMigrating attachments for Article ".$wobject->{wobjectId}."\n" unless ($quiet);
 				if ($namespace->{attachment}) {

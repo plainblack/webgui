@@ -19,12 +19,7 @@ use DBI;
 use strict qw(subs vars);
 use Tie::IxHash;
 use WebGUI::Asset;
-use WebGUI::AdminConsole;
 use WebGUI::DateTime;
-use WebGUI::FormProcessor;
-use WebGUI::Grouping;
-use WebGUI::HTML;
-use WebGUI::HTMLForm;
 use WebGUI::Id;
 use WebGUI::International;
 use WebGUI::Macro;
@@ -32,11 +27,7 @@ use WebGUI::Privilege;
 use WebGUI::Session;
 use WebGUI::Style;
 use WebGUI::SQL;
-use WebGUI::TabForm;
-use WebGUI::Asset::Template;
-use WebGUI::URL;
 use WebGUI::Utility;
-use WebGUI::MetaData;
 #use WebGUI::Asset::Wobject::WobjectProxy;
 
 our @ISA = qw(WebGUI::Asset);
@@ -160,22 +151,6 @@ sub confirm {
         $output .= '<div align="center"><a href="'.$_[2].'">'.WebGUI::International::get(44).'</a>';
         $output .= ' &nbsp; <a href="'.$noURL.'">'.WebGUI::International::get(45).'</a></div>';
         return $output;
-}
-
-
-#-------------------------------------------------------------------
-
-=head2 duplicate ( asset )
-
-Extends the Asset duplicate method to also duplicate meta data.
-
-=cut
-
-sub duplicate {
-	my $self = shift;
-	my $newAsset = $self->SUPER::duplicate(shift);
-	WebGUI::MetaData::MetaDataDuplicate($self->getId, $newAsset->getId);
-        return $newAsset; 
 }
 
 
@@ -417,12 +392,6 @@ sub processMacros {
 	return WebGUI::Macro::process($_[1]);
 }
 
-#-------------------------------------------------------------------
-sub processPropertiesFromFormPost {
-	my $self = shift;
-	my $output = $self->SUPER::processPropertiesFromFormPost;
-	WebGUI::MetaData::metaDataSave($self->getId);
-}
 
 
 
@@ -432,58 +401,6 @@ sub processStyle {
 	my $self = shift;
 	my $output = shift;
 	return WebGUI::Style::process($output,$self->get("styleTemplateId"));
-}
-
-
-#-------------------------------------------------------------------
-
-=head2 processTemplate ( vars, templateId ) 
-
-Returns the content generated from this template.
-
-=head3 hashRef
-
-A hash reference containing variables and loops to pass to the template engine.
-
-=head3 templateId
-
-An id referring to a particular template in the templates table. 
-
-=cut
-
-sub processTemplate {
-	my $self = shift;
-	my $var = shift;
-	my $templateId = shift;
-        my $meta = WebGUI::MetaData::getMetaDataFields($self->get("wobjectId"));
-        foreach my $field (keys %$meta) {
-		$var->{$meta->{$field}{fieldName}} = $meta->{$field}{value};
-	}
-	$var->{'controls'} = $self->getToolbar;
-	my %vars = (
-		%{$self->{_properties}},
-		%{$var}
-		);
-	if (defined $self->get("_WobjectProxy")) {
-		$vars{isShortcut} = 1;
-		my ($originalPageURL) = WebGUI::SQL->quickArray("select url from asset where assetId=".quote($self->getId),WebGUI::SQL->getSlave);
-		$vars{originalURL} = WebGUI::URL::gateway($originalPageURL."#".$self->getId);
-	}
-	return WebGUI::Asset::Template->new($templateId)->process(\%vars);
-}
-
-#-------------------------------------------------------------------
-
-=head2 purge ( )
-
-Removes this wobject and it's descendants from the database.
-
-=cut
-
-sub purge {
-	my $self = shift;
-	$self->SUPER::purge();
-	WebGUI::MetaData::metaDataDelete($self->getId);
 }
 
 
