@@ -234,7 +234,7 @@ sub www_editSubmission {
                 $f->hidden("sid",$submission->{USS_submissionId});
                 $f->hidden("func","editSubmissionSave");
                 $f->text("title",WebGUI::International::get(35,$namespace),$submission->{title});
-                $f->HTMLArea("content",WebGUI::International::get(31,$namespace),$submission->{content});
+                $f->HTMLArea("body",WebGUI::International::get(31,$namespace),$submission->{content});
                 if ($submission->{image} ne "") {
 			$f->readOnly('<a href="'.WebGUI::URL::page('func=deleteFile&file=image&wid='.$session{form}{wid}.'&sid='.$submission->{USS_submissionId}).'">'
 				.WebGUI::International::get(391).'</a>',WebGUI::International::get(32,$namespace));
@@ -282,7 +282,7 @@ sub www_editSubmissionSave {
                 $hash{title} = WebGUI::HTML::filter($session{form}{title},'all') || WebGUI::International::get(16,$namespace);
 		$hash{USS_submissionId} = $session{form}{sid};
 		$hash{dateSubmitted} = time();
-		$hash{content} = $session{form}{content};
+		$hash{content} = $session{form}{body};
 		$hash{convertCarriageReturns} = $session{form}{convertCarriageReturns};
 		$hash{status} = $_[0]->get("defaultStatus");
                 $file = WebGUI::Attachment->new("",$session{form}{wid},$session{form}{sid});
