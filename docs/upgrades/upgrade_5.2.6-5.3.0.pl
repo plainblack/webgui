@@ -4,6 +4,7 @@ use lib "../../lib";
 use Getopt::Long;
 use Parse::PlainConfig;
 use strict;
+use WebGUI::Session;
 use WebGUI::International;
 use WebGUI::SQL;
 use WebGUI::URL;
@@ -97,25 +98,25 @@ my $sth = WebGUI::SQL->read("select * from DataForm");
 while (my %dataform = $sth->hash) {
 	my $startInsert = "insert into DataForm_field (wobjectId, DataForm_fieldId, sequenceNumber, name, status, type, 
 		defaultValue, width, isMailField, label) values";
-	WebGUI::SQL->write($startInsert." ($dataform{wobjectId}, ".getNext("DataForm_fieldId").", -5, 'from', 
+	WebGUI::SQL->write($startInsert." ($dataform{wobjectId}, ".getNextId("DataForm_fieldId").", -5, 'from', 
 		".quote($dataform{fromStatus}).", 'email', ".quote($dataform{fromField}).", $dataform{width}, 1,
 		".quote(WebGUI::International::get(10,"DataForm")).")");
-	WebGUI::SQL->write($startInsert." ($dataform{wobjectId}, ".getNext("DataForm_fieldId").", -4, 'to', 
+	WebGUI::SQL->write($startInsert." ($dataform{wobjectId}, ".getNextId("DataForm_fieldId").", -4, 'to', 
 		".quote($dataform{toStatus}).", 'email', ".quote($dataform{toField}).", $dataform{width}, 1,
 		".quote(WebGUI::International::get(11,"DataForm")).")");
-	WebGUI::SQL->write($startInsert." ($dataform{wobjectId}, ".getNext("DataForm_fieldId").", -3, 'cc', 
+	WebGUI::SQL->write($startInsert." ($dataform{wobjectId}, ".getNextId("DataForm_fieldId").", -3, 'cc', 
 		".quote($dataform{ccStatus}).", 'email', ".quote($dataform{ccField}).", $dataform{width}, 1,
 		".quote(WebGUI::International::get(12,"DataForm")).")");
-	WebGUI::SQL->write($startInsert." ($dataform{wobjectId}, ".getNext("DataForm_fieldId").", -2, 'bcc', 
+	WebGUI::SQL->write($startInsert." ($dataform{wobjectId}, ".getNextId("DataForm_fieldId").", -2, 'bcc', 
 		".quote($dataform{bccStatus}).", 'email', ".quote($dataform{bccField}).", $dataform{width}, 1,
 		".quote(WebGUI::International::get(13,"DataForm")).")");
-	WebGUI::SQL->write($startInsert." ($dataform{wobjectId}, ".getNext("DataForm_fieldId").", -1, 'subject', 
+	WebGUI::SQL->write($startInsert." ($dataform{wobjectId}, ".getNextId("DataForm_fieldId").", -1, 'subject', 
 		".quote($dataform{subjectStatus}).", 'text', ".quote($dataform{subjectField}).", $dataform{width}, 1,
 		".quote(WebGUI::International::get(14,"DataForm")).")");
 	my $i = 1;
         my $sth2 = WebGUI::SQL->read("select DataForm_fieldId from DataForm_field where wobjectId=$dataform{wobjectId} order by sequenceNumber");
         while (my ($id) = $sth2->array) {
-                WebGUI::SQL->write("update DataForm_fieldId set sequenceNumber=$i where MailForm_entryId=$id");
+                WebGUI::SQL->write("update DataForm_field set sequenceNumber=$i where DataForm_fieldId=$id");
                 $i++;
         }
         $sth2->finish;

@@ -199,7 +199,8 @@ foreach my $file (@files) {
 print "\nREADY TO BEGIN UPGRADES\n" unless ($quiet);
 
 my $notRun = 1;
-
+			
+chdir($upgradesPath);
 foreach my $config (keys %config) {
 	my $clicmd = $config{$config}{mysqlCLI} || $mysql;
 	my $dumpcmd = $config{$config}{mysqlDump} || $mysqldump;
@@ -223,20 +224,18 @@ foreach my $config (keys %config) {
 		print "\tUpgrading to ".$upgrade{$upgrade}{to}."..." unless ($quiet);
 		my $cmd = $clicmd." -u".$config{$config}{dbuser}." -p".$config{$config}{dbpass};
 		$cmd .= " --host=".$config{$config}{host} if ($config{$config}{host});
-		$cmd .= " --database=".$config{$config}{db}." < ".$upgradesPath.$upgrade{$upgrade}{sql};
+		$cmd .= " --database=".$config{$config}{db}." < ".$upgrade{$upgrade}{sql};
 		unless (system($cmd)) {
 			print "OK\n" unless ($quiet);
 		} else {
                 	print "Failed!\n" unless ($quiet);
                 }
 		if ($upgrade{$upgrade}{pl} ne "") {
-			chdir($upgradesPath);
 			my $cmd = $perl." ".$upgrade{$upgrade}{pl}." --configFile=".$config;
 			$cmd .= " --quiet" if ($quiet);
 			if (system($cmd)) {
-				print "\tProcessing upgrade executable failed! $!\n";
+				print "\tProcessing upgrade executable failed!\n";
 			}
-			chdir("..".$slash."sbin");
 		}
 		$config{$config}{version} = $upgrade{$upgrade}{to};
 		$notRun = 0;
