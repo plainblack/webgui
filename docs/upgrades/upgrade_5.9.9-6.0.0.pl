@@ -23,6 +23,11 @@ WebGUI::Session::open("../..",$configFile);
 print "\tMigrating styles.\n" unless ($quiet);
 my $sth = WebGUI::SQL->read("select * from style");
 while (my $style = $sth->hashRef) {
+	if ($style->{styleId} == 3) {
+		$style->{body} =~ s/styles\/plainblack\/logo-white\.gif/plainblack.gif/ixsg;
+		$style->{body} =~ s/2001-2002/2001-2004/ixsg;
+		$style->{body} =~ s/Plain\s+Black\s+Software/Plain Black LLC/ixsg;
+	}
 	my ($header,$footer) = split(/\^\-\;/,$style->{body});
 	my ($newStyleId) = WebGUI::SQL->quickArray("select max(templateId) from template where namespace='style'");
        	if ($style->{styleId} > 0 && $style->{styleId} < 25) {
