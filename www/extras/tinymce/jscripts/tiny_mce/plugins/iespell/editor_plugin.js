@@ -23,11 +23,10 @@ function TinyMCE_iespell_execCommand(editor_id, element, command, user_interface
 			ieSpell.CheckDocumentNode(tinyMCE._getInstanceById(editor_id).contentDocument.documentElement);
 		} catch (e) {
 			if (e.number == -2146827859) {
-				if (confirm("ieSpell not detected. Click OK to go to download page."))
-					window.open('http://www.iespell.com/download.php','Download','');
-				else
-					alert("Error Loading ieSpell: Exception " + exception.number);
-			}
+				if (confirm(tinyMCE.getLang("lang_iespell_download", "", true)))
+					window.open('http://www.iespell.com/download.php', 'ieSpellDownload', '');
+			} else
+				alert("Error Loading ieSpell: Exception " + e.number);
 		}
 
 		return true;

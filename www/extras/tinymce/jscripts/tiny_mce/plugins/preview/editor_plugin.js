@@ -20,23 +20,38 @@ function TinyMCE_preview_execCommand(editor_id, element, command, user_interface
 	// Handle commands
 	switch (command) {
 		case "mcePreview":
-			var win = window.open("", "mcePreview", "menubar=yes,toolbar=yes,scrollbars=yes,left=20,top=20,width=" + tinyMCE.getParam("plugin_preview_width", "550") + ",height="  + tinyMCE.getParam("plugin_preview_height", "600"));
-			var html = "";
+			var previewPage = tinyMCE.getParam("plugin_preview_pageurl", null);
+			var previewWidth = tinyMCE.getParam("plugin_preview_width", "550");
+			var previewHeight = tinyMCE.getParam("plugin_preview_height", "600");
 
-			html += '<!doctype html public "-//w3c//dtd html 4.0 transitional//en">';
-			html += '<html>';
-			html += '<head>';
-			html += '<title>' + tinyMCE.getLang('lang_preview_desc') + '</title>';
-			html += '<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">';
-			html += '<link href="' + tinyMCE.getParam("content_css") + '" rel="stylesheet" type="text/css">';
-			html += '</head>';
-			html += '<body>';
-			html += tinyMCE.getContent();
-			html += '</body>';
-			html += '</html>';
+			// Use a custom preview page
+			if (previewPage) {
+				var template = new Array();
 
-			win.document.write(html);
-			win.document.close();
+				template['file'] = previewPage;
+				template['width'] = previewWidth;
+				template['height'] = previewHeight;
+
+				tinyMCE.openWindow(template, {editor_id : editor_id, resizable : "yes", scrollbars : "yes", content : tinyMCE.getContent(), content_css : tinyMCE.getParam("content_css")});
+			} else {
+				var win = window.open("", "mcePreview", "menubar=yes,toolbar=yes,scrollbars=yes,left=20,top=20,width=" + previewWidth + ",height="  + previewHeight);
+				var html = "";
+
+				html += '<!doctype html public "-//w3c//dtd html 4.0 transitional//en">';
+				html += '<html>';
+				html += '<head>';
+				html += '<title>' + tinyMCE.getLang('lang_preview_desc') + '</title>';
+				html += '<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">';
+				html += '<link href="' + tinyMCE.getParam("content_css") + '" rel="stylesheet" type="text/css">';
+				html += '</head>';
+				html += '<body>';
+				html += tinyMCE.getContent();
+				html += '</body>';
+				html += '</html>';
+
+				win.document.write(html);
+				win.document.close();
+			}
 
 			return true;
 	}

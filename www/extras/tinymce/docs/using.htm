@@ -205,9 +205,9 @@ optional and is not a requierd setting.<br>
     <td><strong>[insertlink_callback]</strong></td>
     <td>Name of function to call when &quot;insertlink&quot; command is executed. 
       This function gets the selected link url and target and should return a 
-      array with &quot;href&quot; and &quot;target&quot; as collection names or 
+      array with &quot;href&quot;, &quot;target&quot; and &quot;title&quot; as collection names or 
       call the tinyMCE.insertLink on window.opener for compatiblity with Mozilla 
-      if a new window was used. Function format: linkcallback(href, target).</td>
+      if a new window was used. Function format: linkcallback(href, target, title).</td>
   </tr>
   <tr> 
     <td><strong>[insertimage_callback]</strong></td>
@@ -343,7 +343,7 @@ optional and is not a requierd setting.<br>
   </tr>
   <tr> 
     <td><strong>[inline_styles]</strong></td>
-    <td>If enabled attributes like width, height, vspace, hspace and align gets placed within the style attribute instead. The default value for this option is false.</td>
+    <td>If enabled attributes like width, height, vspace, hspace and align gets placed within the style attribute instead. The default value for this option is false. Remeber to enable the style attribute in valid elements when using this one. </td>
   </tr>
   <tr bgcolor="#CCCCCC"> 
     <td colspan="2"><strong>Advanced theme specific settings </strong></td>
@@ -390,9 +390,13 @@ optional and is not a requierd setting.<br>
     <td><strong>[theme_advanced_source_editor_width]</strong></td>
     <td>Source editor window width.</td>
   </tr>
-  <tr> 
+  <tr>
     <td><strong>[theme_advanced_source_editor_height]</strong></td>
     <td>Source editor window height.</td>
+  </tr>
+  <tr> 
+    <td><strong>[theme_advanced_blockformats]</strong></td>
+    <td>Comma separated list of blockformats for the formatselect list. Defaults to: p,address,pre,h1,h2,h3,h4,h5,h6.</td>
   </tr>
 </table>
 <br>
@@ -674,7 +678,18 @@ template - Name/Value array with width, height and html keys in it. <br>
 name - Name of window argument to get. <br>
 [default_value] - Default value to be returned if window argument is missing. <br>
 <br>
-<strong>Returns:</strong> Window argument value.<br>
+<strong>Returns:</strong> Window argument value.
+<hr noshade>
+<strong>Syntax:</strong> tinyMCE.getParam(name, [default_value], [strip_whitespace]);<br>
+<br>
+<strong>Description: </strong>This method returns a TinyMCE configuration parameter. <br>
+<br>
+<strong>Parameters:</strong> <br>
+name - Name of window argument to get. <br>
+[default_value] - Default value to be returned if window argument is missing. <br>
+[strip_whitespace] - If true all whitespace will be removed from return value, default: false. <br>
+<br>
+<strong>Returns:</strong> TinyMCE configuration parameter.<br>
 <hr noshade>
 <table width="100%" border="0" cellpadding="1" cellspacing="3" class="pagefooter">
   <tr> 

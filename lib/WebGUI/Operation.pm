@@ -168,6 +168,7 @@ sub getOperations {
           'moveTreePageDown' => 'WebGUI::Operation::Page',
           'moveTreePageLeft' => 'WebGUI::Operation::Page',
           'moveTreePageRight' => 'WebGUI::Operation::Page',
+	  'richEditPageTree' => 'WebGUI::Operation::Page',
           'editProfile' => 'WebGUI::Operation::Profile',
           'editProfileSave' => 'WebGUI::Operation::Profile',
           'viewProfile' => 'WebGUI::Operation::Profile',

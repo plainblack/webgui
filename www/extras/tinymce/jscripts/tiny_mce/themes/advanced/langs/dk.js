@@ -65,3 +65,4 @@ tinyMCELang['lang_theme_visualaid_desc'] = 'Sl&#229; linjer/usynlige elementer t
 tinyMCELang['lang_insert_anchor_title'] = 'Inds&#230;t/rediger bogm&#230;rke';
 tinyMCELang['lang_insert_anchor_name'] = 'Bogm&#230;rkets navn';
 tinyMCELang['lang_theme_anchor_desc'] = 'Inds&#230;t/rediger bogm&#230;rke';
+tinyMCELang['lang_theme_insert_link_titlefield'] = 'Title';

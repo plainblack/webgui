@@ -12,6 +12,7 @@
 		}
 
 		document.forms[0].href.value = tinyMCE.getWindowArg('href');
+		document.forms[0].linktitle.value = tinyMCE.getWindowArg('title');
 
 		window.focus();
 	}
@@ -20,8 +21,9 @@
 		if (window.opener) {
 			var href = document.forms[0].href.value;
 			var target = document.forms[0].target.options[document.forms[0].target.selectedIndex].value;
+			var title = document.forms[0].linktitle.value;
 
-			window.opener.tinyMCE.insertLink(href, target);
+			window.opener.tinyMCE.insertLink(href, target, title);
 			top.close();
 		}
 	}
@@ -48,7 +50,11 @@
             <td><select name="target" style="width: 200px">
                 <option value="_self">{$lang_insert_link_target_same}</option>
                 <option value="_blank">{$lang_insert_link_target_blank}</option>
-              </select></td>
+            </select></td>
+          </tr>
+          <tr>
+            <td>{$lang_theme_insert_link_titlefield}:</td>
+            <td><input name="linktitle" type="text" id="linktitle" value="" style="width: 200px"></td>
           </tr>
           <tr>
             <td><input type="button" name="insert" value="{$lang_insert}" onclick="insertLink();">

@@ -19,3 +19,5 @@ Initialization example:
 Configuration:
   plugin_preview_width - Preview window width. Defaults to 550.
   plugin_preview_height - Preview window height. Defaults to 600.
+  plugin_preview_pageurl - Custom preview page URL relative from theme
+                           use "../../plugins/preview/example.html" for a example.

@@ -65,4 +65,4 @@ tinyMCELang['lang_theme_visualaid_desc'] = 'Active/D&eacute;sactive les lignes g
 tinyMCELang['lang_insert_anchor_title'] = 'Ins&eacute;rer/Modifier une ancre';
 tinyMCELang['lang_insert_anchor_name'] = 'Nom de l\'ancre';
 tinyMCELang['lang_theme_anchor_desc'] = 'Ins&eacute;rer/Modifier une ancre';
-
+tinyMCELang['lang_theme_insert_link_titlefield'] = 'Titre';

@@ -21,7 +21,7 @@ use strict;
 use Tie::IxHash;
 
 our @ISA = qw(Exporter);
-our @EXPORT = qw(&makeTabSafe &makeArrayTabSafe &randomizeHash &commify &randomizeArray 
+our @EXPORT = qw(&isBetween &makeTabSafe &makeArrayTabSafe &randomizeHash &commify &randomizeArray 
 	&sortHashDescending &sortHash &isIn &makeCommaSafe &makeArrayCommaSafe &randint &round);
 
 
@@ -71,6 +71,41 @@ sub commify {
 	my $text = reverse $_[0];
 	$text =~ s/(\d\d\d)(?=\d)(?!\d*\.)/$1,/g;
 	return scalar reverse $text;
+}
+
+#-------------------------------------------------------------------
+
+=head2 isBetween ( value, first, second )
+
+Returns true if value is between two other values (inclusive). Otherwise returns false.
+
+=head3 value
+
+An integer to compare against first and second.
+
+=head3 first
+
+An integer to compare value against.
+
+=head3 second
+
+Another integer to compare value against.
+
+=cut
+
+sub isBetween {
+	my $value = shift;
+	my $first = shift;
+	my $second = shift;
+	if ($first > $second) {
+		my $temp = $first;
+		$first = $second;
+		$second = $temp;
+	}
+	if ($value >= $first && $value <= $second) {
+		return 1;
+	}
+	return 0;
 }
 
 #-------------------------------------------------------------------

@@ -1,11 +1,24 @@
-
+body{
+	background-image: url(bg.jpg);
+	background-repeat: repeat-x;
+	border: 5px #4E8AAB solid;
+	margin:0px;
+}
 .adminConsoleTitleIcon {
 	position: absolute;
-	top: 10px;
-	left: 20px;
+	top: 12px;
+	left: 22px;
 	width: 48px;
 	height: 48px;
 	text-align: center;
+	z-index: 10;
+}
+
+.adminConsoleTitleIconMedalian {
+	z-index: 5;
+	position: absolute;
+	top: 4px;
+	left: 14px;
 }
 
 .adminConsoleTitle {
@@ -14,10 +27,9 @@
 	left: 85px;
 	font-size: 50px;
 	text-align: left;
-	/*background-image: url(bg_title.gif);*/
-	background-repeat: repeat-x;
+	padding: 20px 0px 0px 0px;
 	font-family: "Lucida Grande", "Lucida Sans Unicode", Tahoma, Verdana, Arial, sans-serif;
-	color: black;
+	color: white;
 	text-transform: uppercase;
 	letter-spacing: 2px;
 	font-size: 25px;
@@ -26,12 +38,13 @@
 }
 
 .adminConsoleWorkArea {
- 	border: 1px solid #ddd;
-	margin: 65px 200px 50px 10px;
-	padding: 5px;
-	-moz-border-radius: 10px;
+ 	border: 1px solid #D7D7D7;
+	margin: 65px 190px 50px 10px;
+	padding: 15px;
+	/*-moz-border-radius: 10px;*/
 	background-image: url(bg_console.gif);
 	background-repeat: repeat-x;
+	min-height: 400px;
 }
 /* Hides from non-ie: the holly hack \*/
 * html .adminConsoleWorkArea {
@@ -50,33 +63,33 @@
 	padding: 5px; */
 	font-family: helvetica, arial;
 	font-size: 12px;
-	background-image: url(bg_console.gif);
-	background-repeat: repeat-x;
+	/* background-image: url(bg_console.gif);
+	background-repeat: repeat-x; */
 }
 
 .adminConsoleMainMenu {
- 	border: 1px solid #ddd;
+ 	border: 1px solid #D7D7D7;
 	padding: 5px;
 	margin: 5px;
-	-moz-border-radius: 10px;
+	/*-moz-border-radius: 10px;*/
 	background-image: url(bg_console.gif);
 	background-repeat: repeat-x;
 }
 
 .adminConsoleSubmenu {
- 	border: 1px solid #ddd;
+ 	border: 1px solid #D7D7D7;
 	padding: 5px;
 	margin: 5px;
-	-moz-border-radius: 10px;
+	/*-moz-border-radius: 10px;*/
 	background-image: url(bg_console.gif);
 	background-repeat: repeat-x;
 }
 
 .adminConsoleUtilityMenu {
- 	border: 1px solid #ddd;
+ 	border: 1px solid #D7D7D7;
 	padding: 5px;
 	margin: 5px;
-	-moz-border-radius: 10px;
+	/*-moz-border-radius: 10px;*/
 	background-image: url(bg_console.gif);
 	background-repeat: repeat-x;
 }
@@ -142,17 +155,19 @@
 /* tab forms */
 
 .tab {
-  	border: 1px solid black;
+  	border: 1px solid #dddddd;
    	background-color: #eeeeee;
-	-moz-border-radius: 6px 6px 0px 0px;
+	background-image: url(bg_console.gif);
+	background-repeat: repeat-x;		
+	/*-moz-border-radius: 6px 6px 0px 0px;*/
 }
 
 .tabBody {
-   	border: 1px solid black;
-   	border-top: 1px solid black;
-   	border-left: 1px solid black;
-   	background-color: #dddddd; 
-	-moz-border-radius: 10px;
+   	border: 1px solid #dddddd;
+   	border-top: 1px solid #dddddd;
+   	border-left: 1px solid #dddddd;
+   	background-color: #ffffff; 
+	/*-moz-border-radius: 10px;*/
 }
 
 div.tabs {
@@ -178,4 +193,17 @@ div.tabs {
 .formSubtext {
 	font-family: helvetica, arial;
 	font-size: 11px;
+}
+
+a{
+	font-family:  "Lucida Grande", "Lucida Sans Unicode", Tahoma, Verdana, Arial, sans-serif;
+	color: #639CBA;
+	text-decoration: none;
+}
+
+a:hover{
+	font-family:  "Lucida Grande", "Lucida Sans Unicode", Tahoma, Verdana, Arial, sans-serif;
+	color: 336B8A;
+	text-decoration: underline;	
+	
 }

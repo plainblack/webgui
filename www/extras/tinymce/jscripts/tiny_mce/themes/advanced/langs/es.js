@@ -68,3 +68,4 @@ tinyMCELang['lang_theme_visualaid_desc'] = 'Toggle guidelines/invisible elements
 tinyMCELang['lang_insert_anchor_title'] = 'Insert/edit anchor';
 tinyMCELang['lang_insert_anchor_name'] = 'Anchor name';
 tinyMCELang['lang_theme_anchor_desc'] = 'Insert/edit anchor';
+tinyMCELang['lang_theme_insert_link_titlefield'] = 'Title';

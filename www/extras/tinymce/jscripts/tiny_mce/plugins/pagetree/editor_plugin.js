@@ -21,7 +21,11 @@ function TinyMCE_pagetree_execCommand(editor_id, element, command, user_interfac
 		case "wgPageTree":
 			var template = new Array();
 						
-			template['file'] = getWebguiProperty ("pageURL") + '?op=richEditPageTree'; // Relative to theme
+			alert(getWebguiProperty("pageURL"));
+
+			template['file'] = "../../../../../.." + getWebguiProperty ("pageURL") + '?op=richEditPageTree'; // Relative to theme
+			
+			alert(template['file']);
 			template['width'] = 500;
 			template['height'] = 500;
 

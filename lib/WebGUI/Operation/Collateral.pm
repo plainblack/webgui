@@ -493,13 +493,12 @@ sub _htmlAreaCreateTree {
 	my ($name, $description, $url, $image, $indent, $target, $delete) = @_;
 	if($delete) {
 		$delete  = qq/<a href="javascript:deleteCollateral('$delete')" title="delete $name">/;
-		$delete .= '<img align="bottom" border="0" src="'.$session{config}{extrasURL}.
-			   '/toolbar/default/delete.gif" width="16" heigth="17"></a>';
+		 $delete .= deleteIcon()."</a>";
 	}
 	$target = ' target="'.$target.'" ' if ($target);
 	$output .= '<tr><td align="left" valign="bottom" width="100%">';
-	$output .= ('<img src="'.$session{config}{extrasURL}.'/htmlArea/images/indent.gif" width="17" heigth="17">') x$indent;
-	$output .= '<img src="'.$session{config}{extrasURL}.'/htmlArea/images/'.$image.'" align="bottom" alt="'.$name.'">';
+	$output .= ('<img src="'.$session{config}{extrasURL}.'/tinymce/images/indent.gif" width="17" heigth="17">') x$indent;
+	$output .= '<img src="'.$session{config}{extrasURL}.'/tinymce/images/'.$image.'" align="bottom" alt="'.$name.'">';
 	$output .= '<a title="'.$description.'" href="'.$url.'" '.$target.'><b>'.$name.'</b></a></td>';
 	$output .= '<td class="delete" align="right" valign="bottom">'.$delete.'</td></tr>';
 	return $output;
@@ -566,7 +565,7 @@ sub www_htmlAreaviewCollateral {
         $output .= '<table align="center" border="0" cellspacing="0" cellpadding="2" width="100%" height="100%">';
 	if($session{form}{cid} eq "" || ! WebGUI::Grouping::isInGroup(4)) {
 		$output .= '<tr><td align="center" valign="middle" width="100%" height="100%">';
-		$output .= '<p align="center"><br><img src="'.$session{config}{extrasURL}.'/htmlArea/images/icon.gif" 
+		$output .= '<p align="center"><br><img src="'.$session{config}{extrasURL}.'/tinymce/images/icon.gif" 
 			    border="0"></p>';
 		$output .= '<P align=center><STRONG>WebGUI Image Manager<BR>for TinyMCE</STRONG></P>';
 		$output .= '</td></tr></table>';

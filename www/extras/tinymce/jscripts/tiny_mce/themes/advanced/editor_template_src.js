@@ -58,18 +58,32 @@ function TinyMCE_advanced_getControlHTML(button_name) {
 	// Custom controlls other than buttons
 	switch (button_name) {
 		case "formatselect":
-			return '<select id="{$editor_id}_formatSelect" name="{$editor_id}_formatSelect" onchange="tinyMCE.execInstanceCommand(\'{$editor_id}\',\'FormatBlock\',false,this.options[this.selectedIndex].value);" class="mceSelectList">\
-					<option value="<p>">{$lang_theme_paragraph}</option>\
-					<!-- <option value="<div>">{$lang_theme_div}</option> -->\
-					<option value="<address>">{$lang_theme_address}</option>\
-					<option value="<pre>">{$lang_theme_pre}</option>\
-					<option value="<h1>">{$lang_theme_h1}</option>\
-					<option value="<h2>">{$lang_theme_h2}</option>\
-					<option value="<h3>">{$lang_theme_h3}</option>\
-					<option value="<h4>">{$lang_theme_h4}</option>\
-					<option value="<h5>">{$lang_theme_h5}</option>\
-					<option value="<h6>">{$lang_theme_h6}</option>\
-					</select>';
+			var html = '<select id="{$editor_id}_formatSelect" name="{$editor_id}_formatSelect" onchange="tinyMCE.execInstanceCommand(\'{$editor_id}\',\'FormatBlock\',false,this.options[this.selectedIndex].value);" class="mceSelectList">';
+			var formats = tinyMCE.getParam("theme_advanced_blockformats", "p,address,pre,h1,h2,h3,h4,h5,h6", true).split(',');
+			var lookup = [
+				['p', '{$lang_theme_paragraph}'],
+				['address', '{$lang_theme_address}'],
+				['pre', '{$lang_theme_pre}'],
+				['h1', '{$lang_theme_h1}'],
+				['h2', '{$lang_theme_h2}'],
+				['h3', '{$lang_theme_h3}'],
+				['h4', '{$lang_theme_h4}'],
+				['h5', '{$lang_theme_h5}'],
+				['h6', '{$lang_theme_h6}']
+			];
+
+			// Build format select
+			for (var i=0; i<formats.length; i++) {
+				for (var x=0; x<lookup.length; x++) {
+					if (formats[i] == lookup[x][0])
+						html += '<option value="<' + lookup[x][0] + '>">' + lookup[x][1] + '</option>';
+				}
+			}
+
+			html += '</select>';
+
+			return html;
+
 
 		case "styleselect":
 			return '<select id="{$editor_id}_styleSelect" onmousedown="TinyMCE_advanced_setupCSSClasses(\'{$editor_id}\');" name="{$editor_id}_styleSelect" onchange="tinyMCE.execInstanceCommand(\'{$editor_id}\',\'mceSetCSSClass\',false,this.options[this.selectedIndex].value);" class="mceSelectList">{$style_select_options}</select>';
@@ -193,9 +207,9 @@ function TinyMCE_advanced_getEditorTemplate(settings) {
 	var toolbarLocation = tinyMCE.getParam("theme_advanced_toolbar_location", "bottom");
 
 	// Render row 1
-	var buttonNamesRow1 = tinyMCE.getParam("theme_advanced_buttons1", "bold,italic,underline,strikethrough,separator,justifyleft,justifycenter,justifyright,justifyfull,separator,styleselect,formatselect").split(',');
-	buttonNamesRow1 = removeFromArray(buttonNamesRow1, tinyMCE.getParam("theme_advanced_disable", "").split(','));
-	buttonNamesRow1 = addToArray(buttonNamesRow1, tinyMCE.getParam("theme_advanced_buttons1_add", "").split(','));
+	var buttonNamesRow1 = tinyMCE.getParam("theme_advanced_buttons1", "bold,italic,underline,strikethrough,separator,justifyleft,justifycenter,justifyright,justifyfull,separator,styleselect,formatselect", true, ',');
+	buttonNamesRow1 = removeFromArray(buttonNamesRow1, tinyMCE.getParam("theme_advanced_disable", "", true, ','));
+	buttonNamesRow1 = addToArray(buttonNamesRow1, tinyMCE.getParam("theme_advanced_buttons1_add", "", true, ','));
 	for (var i=0; i<buttonNamesRow1.length; i++)
 		toolbarHTML += tinyMCE.getControlHTML(buttonNamesRow1[i]);
 
@@ -203,9 +217,9 @@ function TinyMCE_advanced_getEditorTemplate(settings) {
 		toolbarHTML += "<br>";
 
 	// Render row 2
-	var buttonNamesRow2 = tinyMCE.getParam("theme_advanced_buttons2", "bullist,numlist,separator,outdent,indent,separator,undo,redo,separator,link,unlink,anchor,image,cleanup,help,code").split(',');
-	buttonNamesRow2 = removeFromArray(buttonNamesRow2, tinyMCE.getParam("theme_advanced_disable", "").split(','));
-	buttonNamesRow2 = addToArray(buttonNamesRow2, tinyMCE.getParam("theme_advanced_buttons2_add", "").split(','));
+	var buttonNamesRow2 = tinyMCE.getParam("theme_advanced_buttons2", "bullist,numlist,separator,outdent,indent,separator,undo,redo,separator,link,unlink,anchor,image,cleanup,help,code", true, ',');
+	buttonNamesRow2 = removeFromArray(buttonNamesRow2, tinyMCE.getParam("theme_advanced_disable", "", true, ','));
+	buttonNamesRow2 = addToArray(buttonNamesRow2, tinyMCE.getParam("theme_advanced_buttons2_add", "", true, ','));
 	for (var i=0; i<buttonNamesRow2.length; i++)
 		toolbarHTML += tinyMCE.getControlHTML(buttonNamesRow2[i]);
 
@@ -213,9 +227,9 @@ function TinyMCE_advanced_getEditorTemplate(settings) {
 		toolbarHTML += "<br>";
 
 	// Render row 3
-	var buttonNamesRow3 = tinyMCE.getParam("theme_advanced_buttons3", "table,separator,row_before,row_after,delete_row,separator,col_before,col_after,delete_col,separator,hr,removeformat,visualaid,separator,sub,sup,separator,charmap").split(',');
-	buttonNamesRow3 = removeFromArray(buttonNamesRow3, tinyMCE.getParam("theme_advanced_disable", "").split(','));
-	buttonNamesRow3 = addToArray(buttonNamesRow3, tinyMCE.getParam("theme_advanced_buttons3_add", "").split(','));
+	var buttonNamesRow3 = tinyMCE.getParam("theme_advanced_buttons3", "table,separator,row_before,row_after,delete_row,separator,col_before,col_after,delete_col,separator,hr,removeformat,visualaid,separator,sub,sup,separator,charmap", true, ',');
+	buttonNamesRow3 = removeFromArray(buttonNamesRow3, tinyMCE.getParam("theme_advanced_disable", "", true, ','));
+	buttonNamesRow3 = addToArray(buttonNamesRow3, tinyMCE.getParam("theme_advanced_buttons3_add", "", true, ','));
 	for (var i=0; i<buttonNamesRow3.length; i++)
 		toolbarHTML += tinyMCE.getControlHTML(buttonNamesRow3[i]);
 
@@ -268,7 +282,7 @@ function TinyMCE_advanced_getInsertLinkTemplate() {
 
 	template['file'] = 'link.htm';
 	template['width'] = 320;
-	template['height'] = 130;
+	template['height'] = 160;
 
 	// Language specific width and height addons
 	template['width'] += tinyMCE.getLang('lang_insert_link_delta_width', 0);
