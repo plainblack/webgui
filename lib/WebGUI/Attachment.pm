@@ -25,6 +25,7 @@ use FileHandle;
 eval " use Image::Magick; "; $hasImageMagick=0 if $@;
 
 use POSIX;
+use Storable;
 use strict;
 use WebGUI::ErrorHandler;
 use WebGUI::Node;
@@ -44,6 +45,7 @@ Package to manipulate WebGUI Attachments.
 
  use WebGUI::Attachment;
  $attachment = WebGUI::Attachment->new("file.txt","100","20");
+
  $html = $attachment->box;
  $string = $attachment->getFilename;
  $url = $attachment->getIcon;
@@ -54,14 +56,19 @@ Package to manipulate WebGUI Attachments.
  $string = $attachment->getType;
  $url = $attachment->getURL;
  $boolean = $attachment->isImage;
+
  $attachment->copy("files","10");
  $attachment->createThumbnail;
  $attachment->delete;
  $attachment->deleteNode;
  $attachment->rename("thisfile.txt");
  $attachment->resizeImage(300);
+
  $filename = $attachment->save("formImage");
  $filename = $attachment->saveFromFilesystem($pathToFile);
+
+ $filename = $attachment->saveFromHashref($hashRef);
+ $hashRef = $attachment->getHashref;
 
 =head1 METHODS
 
@@ -217,6 +224,18 @@ Returns the attachment's filename.
 
 sub getFilename {
         return $_[0]->{_filename};
+}
+
+#-------------------------------------------------------------------
+
+=head2 getHashref ( )
+
+Returns a hash reference from the attachment. Must be used in conjunction with a file that was saved using the saveFromHashref method.
+
+=cut
+
+sub getHashref {
+	return retrieve($_[0]->getPath);
 }
 
 
@@ -631,7 +650,27 @@ sub saveFromFilesystem {
         return $_[0]->getFilename;
 }
 
+#-------------------------------------------------------------------
 
+=head saveFromHashref ( hashref ) 
+
+Stores a hash reference as an attachment.
+
+=over
+
+=item hashref
+
+A hash reference containing the data you wish to persist to the filesystem.
+
+=back
+
+=cut
+
+sub saveFromHashref {
+	my ($self, $hashref) = @_;
+	store $hashref, $self->getPath;
+	return $self->getFilename;
+}
 
 1;
 
