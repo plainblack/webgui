@@ -76,7 +76,6 @@ sub appendTemplateVars {
 	$var->{'pagination.isFirstPage'} = ($self->getPageNumber == 1);
 	$var->{'pagination.isLastPage'} = ($self->getPageNumber == $self->getNumberOfPages);
 	$var->{'pagination.firstPage'} = $self->getFirstPageLink;
-	$var->{'pagination.firstPage'} = $self->getFirstPageLink;
 	$var->{'pagination.lastPage'} = $self->getLastPageLink;
 	$var->{'pagination.nextPage'} = $self->getNextPageLink;
 	$var->{'pagination.previousPage'} = $self->getPreviousPageLink;
