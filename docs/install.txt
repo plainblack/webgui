@@ -26,6 +26,9 @@ QnD INSTALL INSTRUCTIONS:
    SOAP::Lite
    Cache::Cache 
    Image::Magick
+   Parse::PlainConfig
+   Tie::IxHash
+   Tie::CPHash
  
 
 3. Install Apache with mod_perl and set up your config. See Ruling WebGUI
