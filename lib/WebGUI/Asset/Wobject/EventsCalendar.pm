@@ -22,7 +22,6 @@ use WebGUI::SQL;
 use WebGUI::URL;
 use WebGUI::Utility;
 use WebGUI::Asset::Wobject;
-use WebGUI::Asset::Event;
 
 our @ISA = qw(WebGUI::Asset::Wobject);
 
