@@ -990,7 +990,7 @@ sub HTMLArea {
                 wrap=>$_[0]->{wrap},
                 columns=>$columns,
                 rows=>$rows,
-                extras=>$_[0]->{extras}.' onBlur="fixChars(this.form.'.$_[0]->{name}.')" id="'.$_[0]->{name}.'"'
+                extras=>$_[0]->{extras}.' onBlur="fixChars(this.form.'.$_[0]->{name}.')" id="'.$_[0]->{name}.'"'.' mce_editable="true" '
                 });
 
 	# Other variables
