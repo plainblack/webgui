@@ -272,8 +272,17 @@ sub processPropertiesFromFormPost {
              	$property->{'a'.$i} = $answer[($i-1)];
         }
 	$self->update($property);
-	$self->deleteCollateral("Poll_answer","assetId",$self->getId) if ($session{form}{resetVotes});
+	WebGUI::SQL->write("delete from Poll_answers where assetId=".quote($self->getId)) if ($session{form}{resetVotes});
 }
+
+
+#-------------------------------------------------------------------
+sub purge {
+	my $self = shift;
+	WebGUI::SQL->write("delete from Poll_answers where assetId=".quote($self->getId));
+	$self->SUPER::purge();
+}	
+
 
 #-------------------------------------------------------------------
 sub view {
@@ -295,7 +304,7 @@ sub view {
         my ($totalResponses) = WebGUI::SQL->quickArray("select count(*) from Poll_answer where assetId=".quote($self->getId));
 	$var{"responses.label"} = WebGUI::International::get(12,"Poll");
 	$var{"responses.total"} = $totalResponses;
-	$var{"form.start"} = WebGUI::Form::formHeader();
+	$var{"form.start"} = WebGUI::Form::formHeader({action=>$self->getUrl});
         $var{"form.start"} .= WebGUI::Form::hidden({name=>'func',value=>'vote'});
 	$var{"form.submit"} = WebGUI::Form::submit({value=>WebGUI::International::get(11,"Poll")});
 	$var{"form.end"} = WebGUI::Form::formFooter();
@@ -333,7 +342,7 @@ sub www_vote {
 	my $self = shift;
 	my $u;
         if ($session{form}{answer} ne "" && WebGUI::Grouping::isInGroup($self->get("voteGroup")) && !($self->_hasVoted())) {
-        	WebGUI::SQL->write("insert into Poll_answer values (".quote($self->getId).", 
+        	WebGUI::SQL->write("insert into Poll_answer (assetId, answer, userId, ipAddress) values (".quote($self->getId).", 
 			".quote($session{form}{answer}).", ".quote($session{user}{userId}).", '$session{env}{REMOTE_ADDR}')");
 		if ($session{setting}{useKarma}) {
 			$u = WebGUI::User->new($session{user}{userId});

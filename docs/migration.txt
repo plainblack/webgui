@@ -27,6 +27,75 @@ for the Ids being strings. Also, anything using the setCollateral method will st
 GUIDs as well.
 
 
+1.2 Converting Wobjects To Asset Wobjects
+
+In WebGUI 6.3 we made the first major change to the Wobject API. This should
+be the last major change until versioning is introduced in 6.7. In order to
+migrate your wobjects you will probably want to look at lib/WebGUI/Asset.pm,
+and lib/WebGUI/Asset/Wobject.pm as well as the wobjects that come with WebGUI.
+The following tips should also help make your migration easer:
+
+	1.2.1 The wobjectId field has been changed to assetId. In addition the Wobject ID 
+	should no longer be passed in the URL as wid. Instead all wobjects now have
+	their own unique URL. Use this to call your methods.
+	
+	Old: WebGUI::URL::page("func=edit&wid=".$self->get("wobjectId"))
+	New: $self->getUrl("func=edit")
+	
+	1.2.2 You can no longer assume that your forms and links are on the page they need 
+	to be to be called. Therefore use the getUrl() method inherited from Asset to
+	build your forms and links. 
+	
+	EXAMPLE: WebGUI::Form::formHeader({action=>$self->getUrl});
+	
+	1.2.3 Your wobject instance data (the data in the wobject table and the namespace
+	table) will automatically be assigned an assetId. The wobjectId field in the
+	namespace table will be left in place so that you have a reference of what the
+	old ID was. Use this information (the assetId and wobjectId) to write a
+	conversion script to convert the wobject data (if necessary).
+
+	1.2.4 Use the definition of the the fields in your old new() method to create a
+	new definition method. See other wobjects as an example.
+	
+	1.2.5 The concept of namespace no longer exists. While it still works very well
+	in practice, it is no longer required that you call your table by the same
+	name as your class. And the same goes for help, internationalization, etc. We
+	still recommend using something like that, it's just not required.
+	
+	1.2.6 Because namespace no longer exists you can't call the namespace to get
+	international ids etc. Instead, hard code the international namespace. This is
+	important for a number of reasons, but the most pressing is inheritance.
+	Wobjects are now truely objects in that they support inheritance. To avoid
+	subclass wobjects having to define a whole new international file with the
+	exact same labels you have in your your international file, you need to hard
+	code your namespace.
+
+	Old: WebGUI::International::get("label",$self->get("namespace"));
+	New: WebGUI::International::get("label","Example");
+
+	1.2.7 Convert your www_edit() method into the two methods getEditForm() and
+	www_edit(). See other wobjects for details.
+
+	1.2.8 Convert your www_view() method into a view() method. It should no longer
+	have a check to see if the user can view it. The www_view() method in the
+	Wobject superclass will do that.
+
+	1.2.9 Add a getIcon() method to your wobject. See other wobjects for examples.
+	If you don't wish to make icons, then exclude this method, it will be
+	inherited from the Asset superclass with the generic asset icon.
+
+	1.2.10 Rename your uiLevel() method to getUiLevel().
+
+	1.2.11 Rename your name() method to getName().
+
+	1.2.12 If your wobject used the forum system, then check out the new
+	lib/WebGUI/Asset/Wobject/Forum.pm system.
+
+	1.2.13 If your wobject used attachments, then at bare minimum check
+	lib/WebGUI/Storage.pm, but also consider using loose coupling with 
+	lib/WebGUI/Asset/File.pm or lib/WebGUI/Asset/File/Image.pm the same
+	way that the Article wobject does.
+
 
 2. Macro Migration
 -------------------
@@ -42,6 +111,11 @@ configuration to do what your old nav once did.
 If you absolutely must write a navigation macro for some reason that our nav
 system does not accomodate you, then please check out the new API in
 WebGUI::Navigation.
+
+2.1 Navigation Macros Revisited
+
+As of 6.3 check out lib/WebGUI/Asset/Wobject/Navigation.pm if you want to
+write custom navigation macros.
 
 
 
