@@ -37,9 +37,8 @@ sub fatalError {
 	if (exists $session{config}{logfile}) {
 		$logfile = $session{config}{logfile};
 	} else {
-		use Data::Config;
-        	$config = new Data::Config '../etc/WebGUI.conf';
-		$logfile = $config->param('logfile');
+		print STDOUT "ERROR! Cannot open log file. No session information available. Exiting.\n";
+		exit 1;
 	}
         print "<h1>WebGUI Fatal Error</h1>Something unexpected happened that caused this system to fault.<p>" if ($session{setting}{showDebug}); 
 	$log = FileHandle->new(">>$logfile") or print "Can't open log file: ".$logfile
