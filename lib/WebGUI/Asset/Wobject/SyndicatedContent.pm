@@ -40,6 +40,10 @@ sub definition {
                 tableName=>'SyndicatedContent',
                 className=>'WebGUI::Asset::Wobject::SyndicatedContent',
                 properties=>{
+			templateId =>{
+				fieldType=>"template",
+				defaultValue=>'PBtmpl0000000000000065'
+				},
 			rssUrl=>{
 				defaultValue=>undef,
 				fieldType=>"url"
@@ -77,6 +81,10 @@ sub getUiLevel {
 sub getEditForm {
 	my $self = shift;
 	my $tabform = $self->SUPER::getEditForm();
+   	$tabform->getTab("display")->template(
+      		-value=>$self->getValue('templateId'),
+      		-namespace=>"SyndicatedContent"
+   		);
 	$tabform->getTab("properties")->url(
 		-name=>"rssUrl",
 		-label=>WebGUI::International::get(1,"SyndicatedContent"),

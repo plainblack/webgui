@@ -34,7 +34,7 @@ use WebGUI::Session;
 use WebGUI::Style;
 use WebGUI::SQL;
 use WebGUI::TabForm;
-use WebGUI::Template;
+use WebGUI::Asset::Template;
 use WebGUI::URL;
 use WebGUI::Utility;
 use WebGUI::MetaData;
@@ -86,10 +86,6 @@ sub definition {
                                         fieldType=>'interval',
                                         defaultValue=>600
                                         },
-				templateId=>{
-					fieldType=>'template',
-					defaultValue=>undef
-					},
 				styleTemplateId=>{
 					fieldType=>'template',
 					defaultValue=>undef
@@ -240,11 +236,6 @@ sub getEditForm {
                 -label=>WebGUI::International::get(174),
                 -value=>$self->getValue("displayTitle"),
                 -uiLevel=>5
-                );
-	$tabform->getTab("display")->template(
-                -value=>$self->getValue("templateId"),
-                -namespace=>$self->get("namespace"),
-                -afterEdit=>'func=edit&amp;wid='.$self->get("wobjectId")."&amp;namespace=".$self->get("namespace")
                 );
          $tabform->getTab("display")->template(
 		-name=>"styleTemplateId",
@@ -444,7 +435,7 @@ sub processPropertiesFromFormPost {
 
 #-------------------------------------------------------------------
 
-=head2 processTemplate ( vars, namespace [ , templateId ] ) 
+=head2 processTemplate ( vars, templateId ) 
 
 Returns the content generated from this template.
 
@@ -452,21 +443,16 @@ Returns the content generated from this template.
 
 A hash reference containing variables and loops to pass to the template engine.
 
-=head3 namespace
-
-A namespace to use for the template. Defaults to the wobject's namespace.
-
 =head3 templateId
 
-An id referring to a particular template in the templates table. Defaults to $self->get("templateId").
+An id referring to a particular template in the templates table. 
 
 =cut
 
 sub processTemplate {
 	my $self = shift;
 	my $var = shift;
-	my $namespace = shift;
-	my $templateId = shift || $self->get("templateId");
+	my $templateId = shift;
         my $meta = WebGUI::MetaData::getMetaDataFields($self->get("wobjectId"));
         foreach my $field (keys %$meta) {
 		$var->{$meta->{$field}{fieldName}} = $meta->{$field}{value};
@@ -481,7 +467,7 @@ sub processTemplate {
 		my ($originalPageURL) = WebGUI::SQL->quickArray("select url from asset where assetId=".quote($self->getId),WebGUI::SQL->getSlave);
 		$vars{originalURL} = WebGUI::URL::gateway($originalPageURL."#".$self->getId);
 	}
-	return WebGUI::Template::process($templateId,$namespace, \%vars);
+	return WebGUI::Asset::Template->new($templateId)->process(\%vars);
 }
 
 #-------------------------------------------------------------------

@@ -12,6 +12,7 @@ package WebGUI::Operation::Profile;
 
 use strict qw(vars subs);
 use URI;
+use WebGUI::Asset::Template;
 use WebGUI::Operation::Auth;
 use WebGUI::DateTime;
 use WebGUI::ErrorHandler;
@@ -192,7 +193,7 @@ sub www_editProfile {
 	$vars->{'profile.form.elements'} = \@array;
     $vars->{'profile.form.submit'} = WebGUI::Form::submit({});
     $vars->{'profile.accountOptions'} = WebGUI::Operation::Shared::accountOptions();
-	return WebGUI::Template::process(1,'Operation/Profile/Edit', $vars);
+	return WebGUI::Asset::Template->new("PBtmpl0000000000000051")->process($vars);
 }
 
 #-------------------------------------------------------------------
@@ -255,7 +256,7 @@ sub www_viewProfile {
 	if ($session{user}{userId} eq $session{form}{uid}) {
        $vars->{'profile.accountOptions'} = WebGUI::Operation::Shared::accountOptions();
 	}
-    return WebGUI::Template::process(1,'Operation/Profile/View', $vars);
+    return WebGUI::Asset::Template->new("PBtmpl0000000000000052")->process($vars);
 }
 
 1;

@@ -20,7 +20,7 @@ use Tie::CPHash;
 use WebGUI::International;
 use WebGUI::Macro;
 use WebGUI::Session;
-use WebGUI::Template;
+use WebGUI::Asset::Template;
 use WebGUI::URL;
 
 =head1 NAME
@@ -88,23 +88,6 @@ sub generateAdditionalHeadTags {
 	return $tags;
 }
 
-#-------------------------------------------------------------------
-
-=head2 getTemplate ( [ templateId ] )
-
-Retrieves the template for this style.
-
-=head3 templateId
-
-The unique identifier for the template to retrieve. Defaults to the style template tied to the current page.
-
-=cut
-
-sub getTemplate {
-	my $templateId = shift || $session{page}{styleId};
-	return WebGUI::Template::get($templateId,"style");
-}
-
 
 #-------------------------------------------------------------------
 
@@ -155,7 +138,7 @@ sub process {
         }
 	$var{'head.tags'} .= generateAdditionalHeadTags();
 	$var{'head.tags'} .= "\n<!-- macro head tags -->\n";
-	my $output = WebGUI::Template::process($templateId,"style",\%var);
+	my $output = WebGUI::Asset::Template->new($templateId)->process(\%var);
 	$output = WebGUI::Macro::process($output);
 	my $macroHeadTags = generateAdditionalHeadTags();
 	$macroHeadTags = WebGUI::Macro::process($macroHeadTags);

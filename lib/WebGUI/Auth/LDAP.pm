@@ -19,6 +19,7 @@ use WebGUI::Mail;
 use WebGUI::Session;
 use WebGUI::Utility;
 use WebGUI::Operation::Shared;
+use WebGUI::Asset::Template;
 use URI;
 use Net::LDAP;
 
@@ -260,7 +261,7 @@ sub displayAccount {
 	  $vars->{'account.form.karma.label'} = WebGUI::International::get(537);
    }
    $vars->{'account.options'} = WebGUI::Operation::Shared::accountOptions();
-   return WebGUI::Template::process(1,'Auth/LDAP/Account', $vars);
+   return WebGUI::Asset::Template->new($self->getAccountTemplateId)->process($vars);
 }
 
 #-------------------------------------------------------------------
@@ -325,6 +326,21 @@ sub editUserSettingsForm {
                 -label=>WebGUI::International::get(869)
                );
    return $f->printRowsOnly;
+}
+
+#-------------------------------------------------------------------
+sub getAccountTemplateId {
+	return "PBtmpl0000000000000004";
+}
+
+#-------------------------------------------------------------------
+sub getCreateAccountTemplateId {
+	return "PBtmpl0000000000000005";
+}
+
+#-------------------------------------------------------------------
+sub getLoginTemplateId {
+	return "PBtmpl0000000000000006";
 }
 
 #-------------------------------------------------------------------

@@ -14,7 +14,7 @@ use strict;
 use WebGUI::International;
 use WebGUI::Macro;
 use WebGUI::Session;
-use WebGUI::Template;
+use WebGUI::Asset::Template;
 use WebGUI::URL;
 
 #-------------------------------------------------------------------
@@ -24,7 +24,7 @@ sub process {
 	return WebGUI::URL::page("op=displayAccount") if ($param[0] eq "linkonly");
        $var{'account.url'} = WebGUI::URL::page('op=displayAccount');
        $var{'account.text'} = $param[0] || WebGUI::International::get(46);
-         return WebGUI::Template::process(WebGUI::Template::getIdByName($param[1],"Macro/a_account"),"Macro/a_account",\%var);
+         return WebGUI::Asset::Template->newByUrl($param[1])->process(\%var);
 }
 
 

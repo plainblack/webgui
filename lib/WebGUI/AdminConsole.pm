@@ -19,7 +19,7 @@ use WebGUI::Grouping;
 use WebGUI::International;
 use WebGUI::Session;
 use WebGUI::Style;
-use WebGUI::Template;
+use WebGUI::Asset::Template;
 use WebGUI::URL;
 
 =head1 NAME
@@ -218,15 +218,6 @@ sub getAdminFunction {
 			op=>"editSettings",
 			group=>"3"
 		},
-		"templates"=>{
-			title=>{
-				id=>"templates",
-				namespace=>"WebGUI"
-			},
-			icon=>"templates.gif",
-			op=>"listTemplates",
-			group=>"8"
-		},
 		"themes"=>{
 			title=>{
 				id=>"themes",
@@ -389,7 +380,7 @@ sub render {
 	$var{"console.icon"} = $acParams->{icon};
 	$var{"help.url"} = $self->{_helpUrl};
 	$var{"application_loop"} = $self->getAdminFunction;
-	return WebGUI::Style::process(WebGUI::Template::process($session{setting}{AdminConsoleTemplate}, "AdminConsole", \%var),"adminConsole");
+	return WebGUI::Style::process(WebGUI::Asset::Template->new($session{setting}{AdminConsoleTemplate})->process(\%var),"PBtmpl0000000000000137");
 }
 
 #-------------------------------------------------------------------

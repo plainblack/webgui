@@ -65,10 +65,6 @@ while (my $t = $sth->hashRef) {
 $sth->finish;
 
 
-# <this is here because we don't want to actually migrate stuff yet
-#WebGUI::Session::close();
-#exit;
-# >this is here because we don't want to actually migrate stuff yet
 
 
 
@@ -88,16 +84,19 @@ WebGUI::SQL->write("alter table DataForm_field add column assetId varchar(22)");
 WebGUI::SQL->write("alter table DataForm_tab add column assetId varchar(22)");
 # next 2 lines are for sitemap to nav migration
 WebGUI::SQL->write("alter table Navigation rename tempoldnav");
-WebGUI::SQL->write("create table Navigation (assetId varchar(22) not null primary key, assetsToInclude text, startType varchar(35), startPoint varchar(255), endPoint varchar(35), showSystemPages int not null default 0, showHiddenPages int not null default 0, showUnprivilegedPages int not null default 0)");
-my @wobjects = qw(Article Poll Survey USS WSClient DataForm FileManager EventsCalendar HttpProxy IndexedSearch MessageBoard Product SQLReport SyndicatedContent WobjectProxy);
-foreach my $namespace (@wobjects) {
+WebGUI::SQL->write("create table Navigation (assetId varchar(22) not null primary key, assetsToInclude text, startType varchar(35), startPoint varchar(255), endPoint varchar(35), showSystemPages int not null default 0, showHiddenPages int not null default 0, showUnprivilegedPages int not null default 0, templateId varchar(22) not null)");
+my @wobjects = qw(SiteMap Article Poll Survey USS WSClient DataForm FileManager EventsCalendar HttpProxy IndexedSearch MessageBoard Product SQLReport SyndicatedContent WobjectProxy);
+my @otherWobjects = WebGUI::SQL->buildArray("select distinct(namespace) from wobject where namespace not in (".quoteAndJoin(\@wobjects).")");
+my @allWobjects = (@wobjects,@otherWobjects);
+foreach my $namespace (@allWobjects) {
 	WebGUI::SQL->write("alter table ".$namespace." add column assetId varchar(22) not null");
+	WebGUI::SQL->write("alter table ".$namespace." add column templateId varchar(22) not null");
+	my $sth = WebGUI::SQL->read("select wobjectId, templateId from wobject where namespace=".quote($namespace));
+	while (my ($wid, $tid) = $sth->array) {
+		WebGUI::SQL->write("update ".$namespace." set templateId=".quote($tid)." where wobjectId=".quote($wid));
+	}
+	$sth->finish;
 }
-my $sth = WebGUI::SQL->read("select distinct(namespace) from wobject where namespace not in (".quoteAndJoin(\@wobjects).")");
-while (my ($namespace) = $sth->array) {
-	WebGUI::SQL->write("alter table ".$namespace." add column assetId varchar(22) not null");
-}
-$sth->finish;
 walkTree('0','PBasset000000000000001','000001','1');
 print "\t\tMaking second round of table structure changes\n" unless ($quiet);
 my $sth = WebGUI::SQL->read("select distinct(namespace) from wobject where namespace is not null");
@@ -115,6 +114,7 @@ while (my ($namespace) = $sth->array) {
 $sth->finish;
 WebGUI::SQL->write("alter table wobject drop column wobjectId");
 WebGUI::SQL->write("alter table wobject add primary key (assetId)");
+WebGUI::SQL->write("alter table wobject drop column templateId");
 WebGUI::SQL->write("alter table wobject drop column namespace");
 WebGUI::SQL->write("alter table wobject drop column pageId");
 WebGUI::SQL->write("alter table wobject drop column sequenceNumber");
@@ -153,7 +153,12 @@ WebGUI::SQL->write("alter table DataForm_entryData drop column wobjectId");
 WebGUI::SQL->write("alter table DataForm_field drop column wobjectId");
 WebGUI::SQL->write("alter table DataForm_tab drop column wobjectId");
 
+
+
 my %migration;
+
+
+
 
 print "\tConverting navigation system to asset tree\n" unless ($quiet);
 my ($navRootLineage) = WebGUI::SQL->quickArray("select lineage from asset where length(lineage)=12 order by lineage desc limit 1");
@@ -175,13 +180,13 @@ my $navRootId = WebGUI::SQL->setRow("asset","assetId",{
 	});
 WebGUI::SQL->setRow("wobject","assetId",{
 	assetId=>$navRootId,
-	templateId=>"1",
 	styleTemplateId=>"1",
 	printableStyleTemplateId=>"3"
 	},undef,$navRootId);
 WebGUI::SQL->setRow("Navigation","assetId",{
 	assetId=>$navRootId,
 	startType=>"relativeToCurrentUrl",
+	templateId=>"1",
 	startPoint=>"0",
 	endPoint=>"55",
 	assetsToInclude=>"descendants",
@@ -206,7 +211,7 @@ while (my $data = $sth->hashRef) {
 	$newAsset{lastUpdated} = time();
 	$newAsset{parentId} = $navRootId;
 	$newAsset{lineage} = $navRootLineage.sprintf("%06d",$navRankCounter);
-	$newWobject{templateId} = $data->{templateId};
+	$newNav{templateId} = $data->{templateId};
 	$newWobject{styleTemplateId}="1";
 	$newWobject{printableStyleTemplateId}="3";
 	$newWobject{displayTitle} = "0";
@@ -336,13 +341,13 @@ my $collateralRootId = WebGUI::SQL->setRow("asset","assetId",{
 	});
 WebGUI::SQL->setRow("wobject","assetId",{
 	assetId=>$collateralRootId,
-	templateId=>"1",
 	styleTemplateId=>"1",
 	printableStyleTemplateId=>"3"
 	},undef,$collateralRootId);
 WebGUI::SQL->setRow("Navigation","assetId",{
 	assetId=>$collateralRootId,
 	startType=>"relativeToCurrentUrl",
+	templateId=>"1",
 	startPoint=>"0",
 	endPoint=>"55",
 	assetsToInclude=>"descendants",
@@ -371,12 +376,12 @@ while (my $data = $sth->hashRef) {
 		});
 	WebGUI::SQL->setRow("wobject","assetId",{
 		assetId=>quote($folderId),
-		templateId=>'15',
 		styleTemplateId=>"1",
 		printableStyleTemplateId=>"3",
 		description=>$data->{description}
 		},undef,$folderId);
-	WebGUI::SQL->setRow("layout","assetId",{
+	WebGUI::SQL->setRow("Layout","assetId",{
+		templateId=>'15',
 		assetId=>$folderId
 		},undef,$folderId);
 	$folderCache{$data->{collateralFolderId}} = {
@@ -436,11 +441,126 @@ WebGUI::SQL->write("drop table collateral");
 
 
 
+
+
+print "\tConverting template system to asset tree\n" unless ($quiet);
+WebGUI::SQL->write("update template set namespace='Layout' where namespace='page'");
+WebGUI::SQL->write("alter table template add column assetId varchar(22) not null");
+my ($tempRootLineage) = WebGUI::SQL->quickArray("select lineage from asset where length(lineage)=12 order by lineage desc limit 1");
+$tempRootLineage = sprintf("%012d",($tempRootLineage+1));
+my $tempRootId = WebGUI::SQL->setRow("asset","assetId",{
+	assetId=>"new",
+	isHidden=>1,
+	title=>"Templates",
+	menuTitle=>"Templates",
+	url=>fixUrl('doesntexistyet',"Templates"),
+	ownerUserId=>"3",
+	groupIdView=>"4",
+	groupIdEdit=>"4",
+	parentId=>"PBasset000000000000001",
+	lineage=>$tempRootLineage,
+	lastUpdated=>time(),
+	className=>"WebGUI::Asset::Wobject::Navigation",
+	state=>"published"
+	});
+WebGUI::SQL->setRow("wobject","assetId",{
+	assetId=>$tempRootId,
+	styleTemplateId=>"1",
+	printableStyleTemplateId=>"3"
+	},undef,$tempRootId);
+WebGUI::SQL->setRow("Navigation","assetId",{
+	assetId=>$tempRootId,
+	templateId=>"1",
+	startType=>"relativeToCurrentUrl",
+	startPoint=>"0",
+	endPoint=>"55",
+	assetsToInclude=>"descendants",
+	showHiddenPages=>1
+	},undef,$tempRootId);
+my $tempRankCounter = 1;
+my %templateCache;
+my $sth = WebGUI::SQL->read("select * from template");
+while (my $data = $sth->hashRef) {
+	print "\t\tConverting ".$data->{name}."\n" unless ($quiet);
+	my ($templateId ,%newAsset);
+	$templateId = $newAsset{assetId} = getNewId("tmpl",$data->{templateId},$data->{namespace}); 
+	$newAsset{url} = fixUrl($newAsset{assetId},$data->{name});
+	$newAsset{isHidden} = 1;
+	$newAsset{title} = $newAsset{menuTitle} = $data->{name};
+	$newAsset{ownerUserId} = "3";
+	$newAsset{groupIdView} = "7";
+	$newAsset{groupIdEdit} = "4";
+	$newAsset{className} = 'WebGUI::Asset::Template';
+	$newAsset{state} = 'published';
+	$newAsset{lastUpdated} = time();
+	$newAsset{parentId} = $tempRootId;
+	$newAsset{lineage} = $tempRootLineage.sprintf("%06d",$tempRankCounter);
+	WebGUI::SQL->setRow("asset","assetId",\%newAsset,undef,$templateId);
+	WebGUI::SQL->write("update template set assetId=".quote($templateId)." where templateId=".quote($data->{templateId})."
+		and namespace=".quote($data->{namespace}));
+	$templateCache{$data->{namespace}}{$data->{templateId}} = $templateId;
+	$tempRankCounter++;
+}
+$sth->finish;
+WebGUI::SQL->write("alter table template drop primary key");
+WebGUI::SQL->write("alter table template drop column templateId");
+WebGUI::SQL->write("alter table template drop column name");
+WebGUI::SQL->write("alter table template add primary key (assetId)");
+my @wobjectTypes = qw(Article Poll Survey USS WSClient DataForm Layout EventsCalendar Navigation HttpProxy IndexedSearch MessageBoard Product SQLReport SyndicatedContent WobjectProxy);
+my @allWobjectTypes = (@wobjectTypes,@otherWobjects);
+print "\t\tMigrating wobject templates to new IDs\n" unless ($quiet);
+foreach my $type (@allWobjectTypes) {
+	print "\t\t\t$type\n" unless ($quiet);
+	my $sth = WebGUI::SQL->read("select assetId, templateId from $type");
+	while (my ($assetId, $templateId) = $sth->array) {
+		WebGUI::SQL->setRow($type,"assetId",{
+			assetId=>$assetId,
+			templateId=>$templateCache{$type}{$templateId}
+			});
+	}
+	$sth->finish;
+}
+print "\t\tMigrating wobject style templates to new IDs\n" unless ($quiet);
+my $sth = WebGUI::SQL->read("select assetId, styleTemplateId, printableStyleTemplateId from wobject");
+while (my ($assetId, $styleId, $printId) = $sth->array) {
+	WebGUI::SQL->setRow("wobject","assetId",{
+		assetId=>$assetId,
+		styleTemplateId=>$templateCache{style}{$styleId},
+		printableStyleTemplateId=>$templateCache{style}{$printId}
+		});
+}
+$sth->finish;
+print "\t\tMigrating DataForm templates to new IDs\n" unless ($quiet);
+my $sth = WebGUI::SQL->read("select assetId,emailTemplateId,acknowlegementTemplateId,listTemplateId from DataForm");
+while (my ($assetId, $emailId, $ackId, $listId) = $sth->array) {
+	WebGUI::SQL->setRow("DataForm","assetId",{
+		assetId=>$assetId,
+		emailTemplateId=>$templateCache{DataForm}{$emailId},
+		acknowlegementTemplateId=>$templateCache{DataForm}{$ackId},
+		listTemplateId=>$templateCache{"DataForm/List"}{$listId}
+		});
+}
+$sth->finish;
+print "\t\tMigrating USS templates to new IDs\n" unless ($quiet);
+my $sth = WebGUI::SQL->read("select assetId, submissionTemplateId, submissionFormTemplateId from USS");
+while (my ($assetId, $subId, $formId) = $sth->array) {
+	WebGUI::SQL->setRow("USS","assetId",{
+		assetId=>$assetId,
+		submissionTemplateId=>$templateCache{"USS/Submission"}{$subId},
+		submissionFormTemplateId=>$templateCache{"USS/SubmissionForm"}{$formId}
+		});
+}
+$sth->finish;
+
+
+
+
+
+
 print "\tReplacing some old macros with new ones\n" unless ($quiet);
-my $sth = WebGUI::SQL->read("select templateId, namespace, template from template");
-while (my ($id, $namespace, $template) = $sth->array) {
-	WebGUI::SQL->write("update template set template=".quote(replaceMacros($template))." where 
-		templateId=".quote($id)." and namespace=".quote($namespace));
+my $sth = WebGUI::SQL->read("select assetId, template from template");
+while (my ($id, $template) = $sth->array) {
+	WebGUI::SQL->write("update template set template=".quote(replaceMacros($template))." where assetId=".quote($id));
 }
 $sth->finish;
 my $sth = WebGUI::SQL->read("select assetId, description from wobject");
@@ -459,9 +579,12 @@ $sth->finish;
 
 
 
+
 print "\tDeleting files which are no longer used.\n" unless ($quiet);
 #unlink("../../lib/WebGUI/Page.pm");
 #unlink("../../lib/WebGUI/Operation/Page.pm");
+#unlink("../../lib/WebGUI/Template.pm");
+#unlink("../../lib/WebGUI/Operation/Template.pm");
 #unlink("../../lib/WebGUI/Operation/Root.pm");
 #unlink("../../lib/WebGUI/Navigation.pm");
 #unlink("../../lib/WebGUI/Operation/Navigation.pm");
@@ -533,6 +656,7 @@ $conf->set("assets"=>[
 		'WebGUI::Asset::Wobject::HttpProxy',
 		'WebGUI::Asset::Wobject::SQLReport',
 		'WebGUI::Asset::Redirect',
+		'WebGUI::Asset::Template',
 		'WebGUI::Asset::FilePile',
 		'WebGUI::Asset::File',
 		'WebGUI::Asset::File::Image',
@@ -599,6 +723,14 @@ $nestedMacro = qr /(\^                     # Start with carat
 		} elsif (isIn($searchString, qw(RandomSnippet RandomImage))) {
 			my $url = (exists $macroCache{$parsed[0]}) ? $folderCache{$parsed[0]} : $parsed[0];
 			$result = '^RandomAssetProxy("'.$url.'");';
+		} elsif (isIn($searchString, qw(AdminBar))) {
+			my $newId =$templateCache{"Macro/AdminBar"}{$parsed[0]};
+			my $id = (defined $newId) ? $newId : $parsed[0];
+			$result = '^AdminBarXXX("'.$id.'");';
+		} elsif (isIn($searchString, qw(L))) {
+			my $newId =$templateCache{"Macro/L_loginBox"}{$parsed[2]};
+			my $id = (defined $newId) ? $newId : $parsed[2];
+			$result = '^LoginBoxXXX("'.$parsed[0].'","'.$parsed[1].'","'.$id.'");';
 		} elsif (isIn($searchString, qw(i))) {
 			my $url = (exists $macroCache{$parsed[0]}) ? $macroCache{$parsed[0]} : $parsed[0];
 			$result = '^FileUrl("'.$url.'");';
@@ -609,6 +741,9 @@ $nestedMacro = qr /(\^                     # Start with carat
 		}
 		$content =~ s/\Q$macro/$result/ges;
    	}
+	# a nasty hack to stop an infinite loop
+	$content =~ s/AdminBarXXX/AdminBar/xg;
+	$content =~ s/LoginBoxXXX/L/xg;
    	return $content;
 }
 
@@ -646,12 +781,12 @@ sub walkTree {
 		if ($page->{redirectURL} ne "") {
 			WebGUI::SQL->write("insert into redirect (assetId, redirectUrl) values (".quote($pageId).",".quote($page->{redirectURL}).")");
 		} else {
-			WebGUI::SQL->write("insert into wobject (assetId, styleTemplateId, templateId, printableStyleTemplateId, 
+			WebGUI::SQL->write("insert into wobject (assetId, styleTemplateId, printableStyleTemplateId, 
 				cacheTimeout, cacheTimeoutVisitor, displayTitle, namespace) values (
-				".quote($pageId).", ".quote($page->{styleId}).", ".quote($page->{templateId}).", 
+				".quote($pageId).", ".quote($page->{styleId}).",  
 				".quote($page->{printableStyleId}).", ".quote($page->{cacheTimeout}).",".quote($page->{cacheTimeoutVisitor}).",
 				0,'Layout')");
-			WebGUI::SQL->write("insert into layout (assetId) values (".quote($pageId).")");
+			WebGUI::SQL->write("insert into Layout (assetId,templateId) values (".quote($pageId).", ".quote($page->{templateId}).")");
 		}
 		my $rank = 1;
 		print "\t\tFinding wobjects on page ".$page->{pageId}."\n" unless ($quiet);
@@ -728,15 +863,16 @@ sub walkTree {
 					endPoint=>$namespace->{depth},
 					startPoint=>$starturl,
 					startType=>"specificUrl",
+					templateId=>"1",
 					assetsToInclude=>"descendants"
 					},undef,$wobjectId);
 				WebGUI::SQL->write("update asset set className='WebGUI::Asset::Wobject::Navigation' where assetId=".quote($wobjectId));
-				WebGUI::SQL->write("update wobject set namespace='Navigation', templateId='1' where assetId=".quote($wobjectId));
+				WebGUI::SQL->write("update wobject set namespace='Navigation'  where assetId=".quote($wobjectId));
 			} elsif ($wobject->{namespace} eq "FileManager") {
 				print "\t\t\tConverting File Manager ".$wobject->{wobjectId}." into File Folder Layout\n" unless ($quiet);
 				WebGUI::SQL->write("update asset set className='WebGUI::Asset::Layout' where assetId=".quote($wobjectId));
-				WebGUI::SQL->write("insert into layout (assetId) values (".quote($wobjectId).")");
-				WebGUI::SQL->write("update wobject set templateId='15', namespace='Layout' where wobjectId=".quote($wobjectId));
+				WebGUI::SQL->write("insert into Layout (assetId,templateId) values (".quote($wobjectId).", '15')");
+				WebGUI::SQL->write("update wobject set namespace='Layout' where wobjectId=".quote($wobjectId));
 				print "\t\t\tMigrating attachments for File Manager ".$wobject->{wobjectId}."\n" unless ($quiet);
 				my $sth = WebGUI::SQL->read("select * from FileManager_file where wobjectId=".quote($wobjectId)." order by sequenceNumber");
 				my $rank = 1;
@@ -809,7 +945,7 @@ sub walkTree {
 			}
 			$b->finish;
 			my $contentPositions = join("\.",@positions);
-			WebGUI::SQL->write("update layout set contentPositions=".quote($contentPositions)." where assetId=".quote($pageId));
+			WebGUI::SQL->write("update Layout set contentPositions=".quote($contentPositions)." where assetId=".quote($pageId));
 		}
 		walkTree($page->{pageId},$pageId,$pageLineage,$rank);
 		$myRank++;
@@ -971,9 +1107,7 @@ sub getNewId {
                                    '6' => 'PBtmpl0000000000000132',
                                    'adminConsole' => 'PBtmpl0000000000000137',
                                    '3' => 'PBtmpl0000000000000111',
-                                   '1001' => 'PBtmpl0000000000000076',
                                    '1' => 'PBtmpl0000000000000060',
-                                   '1000' => 'PBtmpl0000000000000072',
                                    '10' => 'PBtmpl0000000000000070'
                                  },
                       'Macro/SubscriptionItem' => {
@@ -1006,7 +1140,7 @@ sub getNewId {
                       'Auth/WebGUI/Create' => {
                                                 '1' => 'PBtmpl0000000000000011'
                                               },
-                      'page' => {
+                      'Layout' => {
                                   '6' => 'PBtmpl0000000000000131',
                                   '3' => 'PBtmpl0000000000000109',
                                   '7' => 'PBtmpl0000000000000135',
@@ -1113,8 +1247,7 @@ sub getNewId {
                                                     '1' => 'PBtmpl0000000000000051'
                                                   },
                       'SyndicatedContent' => {
-                                               '1' => 'PBtmpl0000000000000065',
-                                               '1000' => 'PBtmpl0000000000000073'
+                                               '1' => 'PBtmpl0000000000000065'
                                              },
                       'USS/SubmissionForm' => {
                                                 '4' => 'PBtmpl0000000000000122',

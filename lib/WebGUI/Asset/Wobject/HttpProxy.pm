@@ -36,6 +36,10 @@ sub definition {
 		tableName=>'HttpProxy',
 		className=>'WebGUI::Asset::Wobject::HttpProxy',
 		properties=>{
+			templateId =>{
+				fieldType=>"template",
+				defaultValue=>'PBtmpl0000000000000033'
+				},
 			proxiedUrl=>{
 				fieldType=>"url",
 				defaultValue=>'http://'
@@ -94,6 +98,10 @@ sub getCookieJar {
 sub getEditForm {
 	my $self = shift;
 	my $tabform = $self->SUPER::getEditForm();
+   	$tabform->getTab("display")->template(
+      		-value=>$self->getValue('templateId'),
+      		-namespace=>"HttpProxy"
+   		);
 	my %hash;
 	tie %hash, 'Tie::IxHash';
 	%hash=(5=>5,10=>10,20=>20,30=>30,60=>60);
@@ -191,7 +199,7 @@ sub view {
 
    $redirect=0; 
 
-   return $self->processTemplate({},"HttpProxy",$self->get("templateId")) unless ($proxiedUrl ne "");
+   return $self->processTemplate({},$self->get("templateId")) unless ($proxiedUrl ne "");
    
    my $cachedContent = WebGUI::Cache->new($proxiedUrl,"URL");
    my $cachedHeader = WebGUI::Cache->new($proxiedUrl,"HEADER");
@@ -328,7 +336,7 @@ sub view {
 	WebGUI::HTTP::setMimeType($var{header});
 	return $var{content};
    } else {
-   	return $self->processTemplate(\%var,"HttpProxy",$self->get("templateId")); 
+   	return $self->processTemplate(\%var,$self->get("templateId")); 
    }
 }
 

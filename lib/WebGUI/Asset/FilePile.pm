@@ -22,7 +22,6 @@ use WebGUI::Session;
 use WebGUI::SQL;
 use WebGUI::Storage;
 use WebGUI::TabForm;
-use WebGUI::Template;
 use WebGUI::Utility;
 
 our @ISA = qw(WebGUI::Asset);

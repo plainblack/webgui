@@ -15,7 +15,7 @@ use WebGUI::Grouping;
 use WebGUI::International;
 use WebGUI::Macro;
 use WebGUI::Session;
-use WebGUI::Template;
+use WebGUI::Asset::Template;
 use WebGUI::URL;
 
 #-------------------------------------------------------------------
@@ -32,7 +32,11 @@ sub process {
                       $var{'toggle.url'} = WebGUI::URL::page('op=switchOnAdmin');
                       $var{'toggle.text'} = $turnOn;
                  }
-                return WebGUI::Template::process(WebGUI::Template::getIdByName($templateName,"Macro/AdminToggle")||1,"Macro/AdminToggle",\%var);
+		if (defined $templateName) {
+                	return WebGUI::Asset::Template->newByUrl($templateName)->process(\%var);
+		} else {
+                	return WebGUI::Asset::Template->new("PBtmpl0000000000000036")->process(\%var);
+		}
 	}
        return "";
 }

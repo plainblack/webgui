@@ -12,7 +12,7 @@ use WebGUI::FormProcessor;
 use WebGUI::Subscription;
 use WebGUI::Commerce::ShoppingCart;
 use WebGUI::AdminConsole;
-use WebGUI::Template;
+use WebGUI::Asset::Template;
 use WebGUI::Form;
 use WebGUI::International;
 
@@ -426,7 +426,7 @@ sub www_redeemSubscriptionCode {
 	$f->submit;
 	$var{codeForm} = $f->print;
 
-	return WebGUI::Template::process(1, 'Operation/RedeemSubscription', \%var);
+	return WebGUI::Asset::Template->new("PBtmpl0000000000000053")->process(\%var);
 }
 
 1;

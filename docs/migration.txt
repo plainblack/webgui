@@ -98,6 +98,10 @@ The following tips should also help make your migration easer:
 
 	1.2.14 The parameters for the wobject processTemplate() method have changed.
 
+	1.2.15 If you were using the template system directly rather than
+	using the wobject processTemplate() method, please note that it has
+	been replaced by the WebGUI::Asset::Template asset.
+
 
 2. Macro Migration
 -------------------
@@ -126,7 +130,7 @@ write custom navigation macros.
 
 3.1 Authentication Modules Changes
 
-Authentication in WebGUI is now completely Object Oriented.  The superclass WebGUI::Auth defines a loose set of rules by which
+Authentication in 6.0 is now completely Object Oriented.  The superclass WebGUI::Auth defines a loose set of rules by which
 to create authentication parameters.  Subclasses MUST be WebGUI::Auth objects, however they can define thier own rules
 for authentication.  No methods are required to be overwritten as it is up to the user to decide which methods may be called
 through WebGUI.  The only method that MUST be calllable is the init routine which should define the starting point for authentication.
@@ -142,6 +146,15 @@ www_logout
 www_recoverPassword
 
 There is no guarentee, however that any custom apps which call these routines will work for custom authentication instances.
+
+3.2 Auth Templates
+
+As of 6.3 you must add three new methods to your authentication modules. They are
+getAccountTemplateId(), getCreateAccountTemplateId(), and
+getLoginTemplateId(). If you are not using the superclass methods associated
+with these, then you can skip this. Also the template parameters for the
+associated methods has been removed in favor of these methods. And finally,
+take a look a WebGUI::Asset::Template for changes in the template system API.
 
 
 4. Scheduler Migration
@@ -298,10 +311,16 @@ anyway.
 
 5.15 Node/Attachment System Replaced
 
-The file system storage mechanism of lib/WebGUI/Node.pm and
+In 6.3 the file system storage mechanism of lib/WebGUI/Node.pm and
 lib/WebGUI/Attachment.pm have been replaced in favor of lib/WebGUI/Storage.pm.
 If you had anything using the old system we highly recommend migrating it into
 the new system as it is much more flexible. Alternatively you can copy the old 
 system back into place (it should still work, but no guarantees).
+
+
+5.16 Template System Replaced
+
+In 6.3 the template system has been replaced in favor of the new template
+asset. Please see WebGUI::Asset::Template for details.
 
 

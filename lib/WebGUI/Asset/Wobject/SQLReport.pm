@@ -35,6 +35,10 @@ sub definition {
 		tableName=>'SQLReport',
 		className=>'WebGUI::Asset::Wobject::SQLReport',
 		properties=>{
+			templateId =>{
+				fieldType=>"template",
+				defaultValue=>'PBtmpl0000000000000059'
+				},
 			paginateAfter=>{
 				fieldType=>"integer",
 				defaultValue=>50
@@ -132,6 +136,10 @@ sub definition {
 sub getEditForm {
 	my $self = shift;
 	my $tabform = $self->SUPER::getEditForm();
+   	$tabform->getTab("display")->template(
+      		-value=>$self->getValue('templateId'),
+      		-namespace=>"SQLReport"
+   		);
         $tabform->getTab("properties")->yesNo(
                 -name=>"debugMode",
                 -label=>WebGUI::International::get(16,"SQLReport"),
@@ -253,7 +261,7 @@ sub www_view {
 	# Add debug loop to template vars
 	$var->{'debug_loop'} = $self->{_debug_loop};
 	#use Data::Dumper; return '<pre>'.Dumper($var).'</pre>';
-	return $self->processTemplate($self->get("templateId"),$var);
+	return $self->processTemplate($var, $self->get("templateId"));
 }
 
 #-------------------------------------------------------------------

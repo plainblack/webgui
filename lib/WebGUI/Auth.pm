@@ -30,7 +30,7 @@ use WebGUI::Macro;
 use WebGUI::Session;
 use WebGUI::SQL;
 use WebGUI::TabForm;
-use WebGUI::Template;
+use WebGUI::Asset::Template;
 use WebGUI::URL;
 use WebGUI::Utility;
 use WebGUI::Operation::Shared;
@@ -174,7 +174,7 @@ sub authMethod {
 
 #-------------------------------------------------------------------
 
-=head2 createAccount ( method [,vars,template] )
+=head2 createAccount ( method [,vars] )
 
 Superclass method that performs general functionality for creating new accounts.
 
@@ -186,17 +186,12 @@ Auth method that the form for creating users should call
    
 Array ref of template vars from subclass
    
-=head3 template
-
-Template that this class should use for display purposes
-
 =cut
 
 sub createAccount {
     my $self = shift;
 	my $method = $_[0];
 	my $vars = $_[1];
-    my $template = $_[2] || 'Auth/'.$self->authMethod.'/Create';
 	$vars->{title} = WebGUI::International::get(54);
    	
 	$vars->{'create.form.header'} = WebGUI::Form::formHeader({});
@@ -212,7 +207,7 @@ sub createAccount {
     $vars->{'login.url'} = WebGUI::URL::page('op=auth&method=init');
     $vars->{'login.label'} = WebGUI::International::get(58);
 
-	return WebGUI::Template::process(1,$template, $vars);
+	return WebGUI::Asset::Template->new($self->getCreateAccountTemplateId)->process($vars);
 }
 
 #-------------------------------------------------------------------
@@ -294,7 +289,7 @@ sub deactivateAccount {
 	$var{'yes.label'} = WebGUI::International::get(44);
    	$var{'no.url'} = WebGUI::URL::page();
 	$var{'no.label'} = WebGUI::International::get(45);
-	return WebGUI::Template::process(1,"prompt", \%var);
+	return WebGUI::Asset::Template->new("PBtmpl0000000000000057")->process(\%var);
 }
 
 #-------------------------------------------------------------------
@@ -329,7 +324,7 @@ sub deleteParams {
 
 #-------------------------------------------------------------------
 
-=head2 displayAccount ( method [,vars,template] )
+=head2 displayAccount ( method [,vars] )
 
 Superclass method that performs general functionality for viewing editable fields related to a user's account.
 
@@ -341,17 +336,12 @@ Auth method that the form for updating a user's account should call
    
 Array ref of template vars from subclass
    
-=head3 template
-
-Template that this class should use for display purposes
-
 =cut
 
 sub displayAccount {
    my $self = shift;
    my $method = $_[0];
    my $vars = $_[1];
-   my $template = $_[2] || 'Auth/'.$self->authMethod.'/Account';
    
    $vars->{title} = WebGUI::International::get(61);
    
@@ -366,12 +356,12 @@ sub displayAccount {
    $vars->{'account.form.footer'} = WebGUI::Form::formFooter();
    
    $vars->{'account.options'} = WebGUI::Operation::Shared::accountOptions();
-   return WebGUI::Template::process(1,$template, $vars);
+   return WebGUI::Asset::Template->new($self->getAccountTemplateId)->process($vars);
 }
 
 #-------------------------------------------------------------------
 
-=head2 displayLogin ( [method,vars,template] )
+=head2 displayLogin ( [method,vars] )
 
 Superclass method that performs general functionality for creating new accounts.
 
@@ -383,17 +373,12 @@ Auth method that the form for performing the login routine should call
    
 Array ref of template vars from subclass
    
-=head3 template
-
-Template that this class should use for display purposes
-
 =cut
 
 sub displayLogin {
     	my $self = shift;
 	my $method = $_[0] || "login";
 	my $vars = $_[1];
-	my $template = $_[2] || 'Auth/'.$self->authMethod.'/Login';
 	unless ($session{env}{REQUEST_URI} =~ "displayLogin" || $session{env}{REQUEST_URI} =~ "displayAccount" ||
 		$session{env}{REQUEST_URI} =~ "logout" || $session{env}{REQUEST_URI} =~ "deactivateAccount"){
 	   	WebGUI::Session::setScratch("redirectAfterLogin",$session{env}{REQUEST_URI});
@@ -416,7 +401,7 @@ sub displayLogin {
 	$vars->{'anonymousRegistration.isAllowed'} = ($session{setting}{anonymousRegistration});
 	$vars->{'createAccount.url'} = WebGUI::URL::page('op=createAccount');
 	$vars->{'createAccount.label'} = WebGUI::International::get(67);
-	return WebGUI::Template::process(1,$template, $vars);
+	return WebGUI::Asset::Template->new($self->getLoginTemplateId)->process($vars);
 }
 
 #-------------------------------------------------------------------
@@ -456,6 +441,42 @@ sub error {
    my $self = shift;
    return $self->{error} if (!$_[0]);
    $self->{error} = $_[0];
+}
+
+#-------------------------------------------------------------------
+
+=head2 getAccountTemplateId ()
+
+This method should be overridden by the subclass and should return the template ID for the display/edit account screen.
+
+=cut
+
+sub getAccountTemplateId {
+	return "PBtmpl0000000000000010";
+}
+
+#-------------------------------------------------------------------
+
+=head2 getAccountTemplateId ()
+
+This method should be overridden by the subclass and should return the template ID for the create account screen.
+
+=cut
+
+sub getCreateAccountTemplateId {
+	return "PBtmpl0000000000000011";
+}
+
+#-------------------------------------------------------------------
+
+=head2 getAccountTemplateId ()
+
+This method should be overridden by the subclass and should return the template ID for the login screen.
+
+=cut
+
+sub getLoginTemplateId {
+	return "PBtmpl0000000000000013";
 }
 
 #-------------------------------------------------------------------

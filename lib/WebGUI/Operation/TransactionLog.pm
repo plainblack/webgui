@@ -3,7 +3,7 @@ package WebGUI::Operation::TransactionLog;
 use strict;
 use WebGUI::Session;
 use WebGUI::Commerce::Transaction;
-use WebGUI::Template;
+use WebGUI::Asset::Template;
 use WebGUI::DateTime;
 use WebGUI::Operation;
 
@@ -28,7 +28,7 @@ sub www_viewPurchaseHistory {
 
 	$var{purchaseHistoryLoop} = \@historyLoop;
 
-	return WebGUI::Template::process(1, 'Commerce/ViewPurchaseHistory', \%var);
+	return WebGUI::Asset::Template->new("PBtmpl0000000000000019")->process(\%var);
 }
 
 #-------------------------------------------------------------------

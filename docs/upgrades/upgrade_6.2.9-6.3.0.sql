@@ -89,8 +89,9 @@ create table snippet (
 	snippet mediumtext
 );
 
-create table layout (
+create table Layout (
 	assetId varchar(22) not null primary key,
+	templateId varchar(22) not null,
 	contentPositions text
 );
 

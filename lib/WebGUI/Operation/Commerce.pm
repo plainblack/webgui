@@ -14,7 +14,7 @@ use WebGUI::Commerce;
 use WebGUI::Operation;
 use WebGUI::URL;
 use WebGUI::International;
-use WebGUI::Template;
+use WebGUI::Asset::Template;
 use WebGUI::HTTP;
 use WebGUI::Paginator;
 use WebGUI::Form;
@@ -55,7 +55,7 @@ sub www_cancelTransaction {
 
 	$var{message} = WebGUI::International::get('checkout canceled message', 'Commerce');
 	
-	return WebGUI::Template::process($session{setting}{commerceCheckoutCanceledTemplateId}, 'Commerce/CheckoutCanceled', \%var);
+	return WebGUI::Asset::Template->new($session{setting}{commerceCheckoutCanceledTemplateId})->process(\%var);
 }
 
 # This operation is here for easier future extensions to the commerce system.
@@ -103,7 +103,7 @@ sub www_checkoutConfirm {
 	$var{form} = $f->print;
 	$var{title} = $i18n->get('checkout confirm title');
 
-	return WebGUI::Template::process($session{setting}{commerceConfirmCheckoutTemplateId}, 'Commerce/ConfirmCheckout', \%var);
+	return WebGUI::Asset::Template->new($session{setting}{commerceConfirmCheckoutTemplateId})->process(\%var);
 }
 
 #-------------------------------------------------------------------
@@ -212,7 +212,7 @@ sub www_checkoutSubmit {
 	return WebGUI::Operation::execute('viewPurchaseHistory') unless ($checkoutError);
 
 	# If an error has occurred show the template errorlog
-	return WebGUI::Template::process($session{setting}{commerceTransactionErrorTemplateId}, 'Commerce/TransactionError', \%param);
+	return WebGUI::Asset::Template->new($session{setting}{commerceTransactionErrorTemplateId})->process(\%param);
 }
 
 #-------------------------------------------------------------------
@@ -417,7 +417,7 @@ sub www_selectPaymentGateway {
 	$var{formSubmit} = WebGUI::Form::submit({value=>$i18n->get('payment gateway select')});
 	$var{formFooter} = WebGUI::Form::formFooter;		
 	
-	return WebGUI::Template::process($session{setting}{commerceSelectPaymentGatewayTemplateId}, 'Commerce/SelectPaymentGateway', \%var);
+	return WebGUI::Asset::Template->new($session{setting}{commerceSelectPaymentGatewayTemplateId})->process(\%var);
 }
 
 #-------------------------------------------------------------------

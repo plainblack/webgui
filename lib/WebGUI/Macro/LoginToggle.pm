@@ -14,7 +14,7 @@ use strict;
 use WebGUI::International;
 use WebGUI::Macro;
 use WebGUI::Session;
-use WebGUI::Template;
+use WebGUI::Asset::Template;
 use WebGUI::URL;
 
 #-------------------------------------------------------------------
@@ -32,7 +32,11 @@ sub process {
                 $var{'toggle.url'} = WebGUI::URL::page('op=logout');
                	$var{'toggle.text'} = $logout;
         }
-        return  WebGUI::Template::process(WebGUI::Template::getIdByName($param[3],"Macro/LoginToggle")||1, "Macro/LoginToggle", \%var);
+	if ($param[3]) {
+               	return WebGUI::Asset::Template->newByUrl($param[3])->process(\%var);
+	} else {
+               	return WebGUI::Asset::Template->new("PBtmpl0000000000000043")->process(\%var);
+	}
 }
 
 

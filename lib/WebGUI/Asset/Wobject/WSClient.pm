@@ -55,6 +55,10 @@ sub definition {
 		tableName=>'WSClient',
 		className=>'WebGUI::Asset::Wobject::WSClient',
 		properties=>{
+			templateId =>{
+				fieldType=>"template",
+				defaultValue=>'PBtmpl0000000000000069'
+				},
          callMethod             => {
             fieldType     => 'textarea',
 		defaultValue=>undef
@@ -138,7 +142,7 @@ sub getEditForm {
    $tabform->getTab("display")->template(
       -name      => 'templateId',
       -value     => $self->getValue('templateId'),
-      -namespace => "WSClient",
+      -namespace => "WSClient"
    );
    $tabform->getTab("display")->yesNo (
       -name  => 'preprocessMacros',
@@ -275,7 +279,7 @@ sub view {
                                                                                 
       WebGUI::ErrorHandler::warn("disabling soap call $call");
       $var{'disableWobject'} = 1;
-      return $self->processTemplate(\%var,"WSClient",$self->get("templateId"));
+      return $self->processTemplate(\%var,$self->get("templateId"));
    }
 
    # advanced use, if you want to pass SOAP results to a single, particular
@@ -484,7 +488,7 @@ sub view {
    }
 
    $var{'results'} = \@result;
-   return $self->processTemplate(\%var, "WSClient",$self->get("templateId"));
+   return $self->processTemplate(\%var, $self->get("templateId"));
 }   
 
 

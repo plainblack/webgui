@@ -11,6 +11,7 @@ package WebGUI::Macro::H_homeLink;
 #-------------------------------------------------------------------
 
 use strict;
+use WebGUI::Asset::Template;
 use WebGUI::International;
 use WebGUI::Macro;
 use WebGUI::Session;
@@ -34,7 +35,11 @@ sub process {
        		} else {
                		$var{'homeLink.text'} = WebGUI::International::get(47);
        		}
-        	$temp =  WebGUI::Template::process(WebGUI::Template::getIdByName($param[1],"Macro/H_homeLink"), "Macro/H_homeLink", \%var);
+		if (defined $param[1]) {
+        		$temp =  WebGUI::Asset::Template->newByUrl($param[1])->process(\%var);
+		} else {
+			$temp = WebGUI::Asset::Template->new("PBtmpl0000000000000042")->process(\%var);
+		}
 	}
 	return $temp;
 }

@@ -16,9 +16,11 @@ package WebGUI::Asset::File::Image;
 
 use strict;
 use WebGUI::Asset::File;
+use WebGUI::Asset::Template;
 use WebGUI::HTTP;
 use WebGUI::Session;
 use WebGUI::Utility;
+
 
 # do a check to see if they've installed Image::Magick
 my  $hasImageMagick = 1;
@@ -206,7 +208,7 @@ sub view {
 	$var{fileUrl} = $self->getFileUrl;
 	$var{fileIcon} = $self->getFileIconUrl;
 	$var{thumbnail} = $self->getThumbnailUrl;
-	return WebGUI::Template::process("1","ImageAsset",\%var);
+	return WebGUI::Asset::Template->new("PBtmpl0000000000000088")->process(\%var);
 }
 
 

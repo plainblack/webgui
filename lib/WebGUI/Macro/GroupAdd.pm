@@ -15,7 +15,7 @@ use WebGUI::Group;
 use WebGUI::Grouping;
 use WebGUI::Macro;
 use WebGUI::Session;
-use WebGUI::Template;
+use WebGUI::Asset::Template;
 use WebGUI::URL;
 
 #-------------------------------------------------------------------
@@ -31,7 +31,7 @@ sub process {
        my %var = ();
        $var{'group.url'} = WebGUI::URL::page("op=autoAddToGroup&groupId=".$g->groupId);
        $var{'group.text'} = $param[1];
-       return WebGUI::Template::process(WebGUI::Template::getIdByName($param[2],"Macro/GroupAdd"), "Macro/GroupAdd", \%var);
+       return WebGUI::Asset::Template->newByUrl($param[2])->process(\%var);
 }
 
 

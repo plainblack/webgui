@@ -31,6 +31,10 @@ sub definition {
 		tableName=>'Article',
 		className=>'WebGUI::Asset::Wobject::Article',
 		properties=>{
+			templateId =>{
+				fieldType=>"template",
+				defaultValue=>'PBtmpl0000000000000002'
+				},
 			linkURL=>{
 				fieldType=>'url',
 				defaultValue=>undef
@@ -54,6 +58,10 @@ sub definition {
 sub getEditForm {
 	my $self = shift;
 	my $tabform = $self->SUPER::getEditForm();
+   	$tabform->getTab("display")->template(
+      		-value=>$self->getValue('templateId'),
+      		-namespace=>"Article"
+   		);
 	$tabform->getTab("properties")->text(
 		-name=>"linkTitle",
 		-label=>WebGUI::International::get(7,"Article"),
@@ -169,7 +177,7 @@ sub view {
 			forumId=>$self->get("forumId")
 			});
 	} else {
-		return $self->processTemplate(\%var, "Article", $templateId);
+		return $self->processTemplate(\%var, $templateId);
 	}
 }
 

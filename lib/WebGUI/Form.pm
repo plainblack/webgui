@@ -22,7 +22,7 @@ use WebGUI::International;
 use WebGUI::Session;
 use WebGUI::SQL;
 use WebGUI::Style;
-use WebGUI::Template;
+use WebGUI::Asset::Template;
 use WebGUI::URL;
 use WebGUI::Utility;
 
@@ -1084,7 +1084,7 @@ sub HTMLArea {
 	if ($session{user}{richEditor} eq 'none') {
 		return $var{textarea};
 	} else {
-		return WebGUI::Template::process($session{user}{richEditor},'richEditor',\%var);
+		return WebGUI::Asset::Template->new($session{user}{richEditor})->process(\%var);
 	}
 }
 
@@ -1517,7 +1517,7 @@ sub template {
 	my $name = $params->{name} || "templateId";
         return selectList({
                 name=>$name,
-                options=>WebGUI::Template::getList($params->{namespace}),
+                options=>WebGUI::Asset::Template->getList($params->{namespace}),
                 value=>[$templateId],
 		extras=>$params->{extras}
                 });

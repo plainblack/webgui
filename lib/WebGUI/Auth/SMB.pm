@@ -11,6 +11,7 @@ package WebGUI::Auth::SMB;
 #-------------------------------------------------------------------
 
 use strict;
+use WebGUI::Asset::Template;
 use WebGUI::Auth;
 use WebGUI::HTMLForm;
 use WebGUI::Form;
@@ -169,7 +170,7 @@ sub displayAccount {
 	  $vars->{'account.form.karma.label'} = WebGUI::International::get(537);
    }
    $vars->{'account.options'} = WebGUI::Operation::Shared::accountOptions();
-   return WebGUI::Template::process(1,'Auth/SMB/Account', $vars);
+   return WebGUI::Asset::Template->new($self->getAccountTemplateId)->process($vars);
 }
 
 #-------------------------------------------------------------------
@@ -232,6 +233,21 @@ sub editUserSettingsForm {
                 -label=>WebGUI::International::get(869)
                );
    return $f->printRowsOnly;
+}
+
+#-------------------------------------------------------------------
+sub getAccountTemplateId {
+	return "PBtmpl0000000000000007";
+}
+
+#-------------------------------------------------------------------
+sub getCreateAccountTemplateId {
+	return "PBtmpl0000000000000008";
+}
+
+#-------------------------------------------------------------------
+sub getLoginTemplateId {
+	return "PBtmpl0000000000000009";
 }
 
 #-------------------------------------------------------------------

@@ -46,6 +46,10 @@ sub definition {
                 tableName=>'USS_submission',
                 className=>'WebGUI::Asset::Wobject::USS_submission',
                 properties=>{
+			templateId =>{
+				fieldType=>"template",
+				defaultValue=>'PBtmpl0000000000000067'
+				},
 			submissionsPerPage=>{
 				fieldType=>"integer",
 				defaultValue=>50

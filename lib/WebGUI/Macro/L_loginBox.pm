@@ -15,7 +15,7 @@ use WebGUI::Form;
 use WebGUI::International;
 use WebGUI::Macro;
 use WebGUI::Session;
-use WebGUI::Template;
+use WebGUI::Asset::Template;
 use WebGUI::URL;
 
 #-------------------------------------------------------------------
@@ -26,7 +26,7 @@ sub _createURL {
 #-------------------------------------------------------------------
 sub process {
         my @param = WebGUI::Macro::getParams($_[0]);
-	my $templateId = $param[2] || 1;
+	my $templateId = $param[2] || "PBtmpl0000000000000092";
 	my %var;	
         $var{'user.isVisitor'} = ($session{user}{userId} eq "1");
 	$var{'customText'} = $param[1];
@@ -69,7 +69,7 @@ sub process {
         $var{'account.create.url'} = WebGUI::URL::page('op=createAccount');
 	$var{'account.create.label'} = WebGUI::International::get(407);
 	$var{'form.footer'} = WebGUI::Form::formFooter();
-        return WebGUI::Template::process($templateId,"Macro/L_loginBox",\%var); 
+        return WebGUI::Asset::Template->new($templateId)->process(\%var); 
 }
 
 1;

@@ -59,9 +59,13 @@ sub definition {
         my $class = shift;
         my $definition = shift;
         push(@{$definition}, {
-                tableName=>'layout',
+                tableName=>'Layout',
                 className=>'WebGUI::Asset::Wobject::Layout',
                 properties=>{
+			templateId =>{
+				fieldType=>"template",
+				defaultValue=>'PBtmpl0000000000000054'
+				},
 			contentPositions => {
 				defaultValue=>undef,
 				fieldType=>"hidden"
@@ -84,6 +88,10 @@ Returns the TabForm object that will be used in generating the edit page for thi
 sub getEditForm {
 	my $self = shift;
 	my $tabform = $self->SUPER::getEditForm();
+   	$tabform->getTab("display")->template(
+      		-value=>$self->getValue('templateId'),
+      		-namespace=>"Layout"
+   		);
 	if ($self->get("assetId") eq "new") {
                	$tabform->getTab("properties")->whatNext(
                        	-options=>{
@@ -191,7 +199,7 @@ sub view {
 			';
 	}
 
-	return $self->processTemplate(\%vars, "page");
+	return $self->processTemplate(\%vars,$self->get("templateId"));
 }
 
 

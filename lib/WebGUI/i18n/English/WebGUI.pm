@@ -1511,11 +1511,6 @@ As with any delete operation, you are prompted to be sure you wish to proceed wi
 		lastUpdated => 1031514049
 	},
 
-	'851' => {
-		message => q|Edit this template.|,
-		lastUpdated => 1039926394
-	},
-
 	'927' => {
 		message => q|Import Theme|,
 		lastUpdated => 1050265139
@@ -1895,11 +1890,6 @@ The user id of the currently logged in user.
 	'515' => {
 		message => q|Add edit stamp to posts?|,
 		lastUpdated => 1031514049
-	},
-
-	'853' => {
-		message => q|Delete this template.|,
-		lastUpdated => 1039926459
 	},
 
 	'138' => {
@@ -2636,11 +2626,6 @@ The Groups page displays all groups that you are allowed to edit.  The form on t
 	'476' => {
 		message => q|Text Area|,
 		lastUpdated => 1031514049
-	},
-
-	'854' => {
-		message => q|List all templates like this one.|,
-		lastUpdated => 1039926488
 	},
 
 	'969' => {
@@ -3671,11 +3656,6 @@ Large sites using external group data will be making many calls to the external 
 		lastUpdated => 1052850265
 	},
 
-	'502' => {
-		message => q|Are you certain you wish to delete this template and set all pages using this template to the default template?|,
-		lastUpdated => 1031514049
-	},
-
 	'307' => {
 		message => q|Use default meta tags?|,
 		lastUpdated => 1031514049
@@ -3855,11 +3835,6 @@ As with any delete operation, you are prompted to be sure you wish to proceed wi
 	'335' => {
 		message => q|Gender|,
 		lastUpdated => 1031514049
-	},
-
-	'855' => {
-		message => q|List all templates.|,
-		lastUpdated => 1039926498
 	},
 
 	'1029' => {
@@ -4563,11 +4538,6 @@ A list of links to the 10 nearest in the paginator relative to the current page.
 	'768' => {
 		message => q|Name|,
 		lastUpdated => 1036892946
-	},
-
-	'503' => {
-		message => q|Template ID|,
-		lastUpdated => 1031514049
 	},
 
 	'68' => {
@@ -5475,11 +5445,6 @@ Privileges and styles assigned to pages in the package will not be copied when t
 		lastUpdated => 1031514049
 	},
 
-	'852' => {
-		message => q|Copy this template.|,
-		lastUpdated => 1039926448
-	},
-
 	'63' => {
 		message => q|Turn admin on.|,
 		lastUpdated => 1031514049
@@ -5542,10 +5507,6 @@ Privileges and styles assigned to pages in the package will not be copied when t
 
 	'10' => {
 		message => q|Manage trash.|,
-		lastUpdated => 1031514049
-	},
-	'505' => {
-		message => q|Add a new template.|,
 		lastUpdated => 1031514049
 	},
 
@@ -6048,11 +6009,6 @@ A randomly generated number. This is often used on images (such as banner ads) t
 		lastUpdated => 1031514049
 	},
 
-	'528' => {
-		message => q|Template Name|,
-		lastUpdated => 1031514049
-	},
-
 	'164' => {
 		message => q|Authentication Method|,
 		lastUpdated => 1031514049
@@ -6204,12 +6160,6 @@ config file.</p>
 		message => q|Packages|,
 		lastUpdated =>1092930637,
                 context => q|Title of the package manager for the admin console.|
-        },
-	
-	'templates' => {
-		message => q|Templates|,
-		lastUpdated =>1092930637,
-                context => q|Title of the templates manager for the admin console.|
         },
 	
 	'themes' => {

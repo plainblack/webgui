@@ -62,6 +62,9 @@ save you many hours of grief.
 		PerlAccessHandler WebGUI::UploadsAccessHandler
 	</Location>
 
+ * If you have any custom code, please check out docs/migration.txt as
+	there have been many changes to the API in this release.
+
 
 6.2.8
 --------------------------------------------------------------------

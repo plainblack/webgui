@@ -66,6 +66,10 @@ sub definition {
                 tableName=>'USS',
                 className=>'WebGUI::Asset::Wobject::USS',
                 properties=>{
+			templateId =>{
+				fieldType=>"template",
+				defaultValue=>'PBtmpl0000000000000066'
+				},
 			submissionsPerPage=>{
 				fieldType=>"integer",
 				defaultValue=>50
@@ -160,6 +164,10 @@ sub duplicate {
 sub getEditForm {
 	my $self = shift;
 	my $tabform = $self->getEditForm;
+   	$tabform->getTab("display")->template(
+      		-value=>$self->getValue('templateId'),
+      		-namespace=>"USS"
+   		);
         $tabform->getTab("display")->template(
                 -name=>"submissionTemplateId",
                 -value=>$self->getValue("submissionTemplateId"),
@@ -460,7 +468,7 @@ sub view {
 	}
 	$var{submissions_loop} = \@submission;
 	$p->appendTemplateVars(\%var);
-	return $_[0]->processTemplate(\%var,"USS",$_[0]->get("templateId"));
+	return $_[0]->processTemplate(\%var,$_[0]->get("templateId"));
 }
 
 #-------------------------------------------------------------------

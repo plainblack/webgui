@@ -14,6 +14,8 @@ use strict qw(refs vars);
 use Tie::CPHash;
 use Tie::IxHash;
 use WebGUI::AdminConsole;
+use WebGUI::Asset;
+use WebGUI::Asset::Template;
 use WebGUI::Grouping;
 use WebGUI::International;
 use WebGUI::Macro;
@@ -26,7 +28,7 @@ use WebGUI::Utility;
 sub process {
 	return "" unless ($session{var}{adminOn});
 	my @param = WebGUI::Macro::getParams($_[0]);
-        my $templateId = $param[0] || 1;
+        my $templateId = $param[0] || "PBtmpl0000000000000090";
         my %var;
 	my (%cphash, %hash2, %hash, $r, @item, $query);
 	tie %hash, "Tie::IxHash";
@@ -97,7 +99,7 @@ sub process {
 		$i++;
 	}
 	$var{'admin_loop'} = \@admin;
-	return WebGUI::Template::process($templateId,"Macro/AdminBar",\%var);
+	return WebGUI::Asset::Template->new($templateId)->process(\%var);
 }
 
 

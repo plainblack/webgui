@@ -1,4 +1,4 @@
-package WebGUI::Template;
+package WebGUI::Asset::Template;
 
 =head1 LEGAL
 
@@ -14,38 +14,32 @@ package WebGUI::Template;
 
 =cut
 
-
-
-use File::Path;
 use HTML::Template;
 use strict;
-use WebGUI::Attachment;
-use WebGUI::ErrorHandler;
-use WebGUI::Id;
-use WebGUI::International;
+use WebGUI::Asset;
+use WebGUI::HTTP;
 use WebGUI::Session;
-use WebGUI::SQL;
+use WebGUI::Storage;
+
+our @ISA = qw(WebGUI::Asset);
+
 
 =head1 NAME
 
-Package WebGUI::Template
+Package WebGUI::Asset::Template
 
 =head1 DESCRIPTION
 
-This package contains utility methods for WebGUI's template system.
+Provides a mechanism to provide a templating system in WebGUI.
 
 =head1 SYNOPSIS
 
- use WebGUI::Template;
- $hashRef = WebGUI::Template::get($templateId, $namespace);
- $hashRef = WebGUI::Template::getList($namespace);
- $templateId = WebGUI::Template::getIdByName($name,$namespace);
- $html = WebGUI::Template::process($templateId, $namespace, $vars);
- $templateId = WebGUI::Template::set(\%data);
+use WebGUI::Asset::Template;
+
 
 =head1 METHODS
 
-These subroutines are available from this package:
+These methods are available from this class:
 
 =cut
 
@@ -53,8 +47,7 @@ These subroutines are available from this package:
 #-------------------------------------------------------------------
 sub _getTemplateFile {
 	my $templateId = shift;
-	my $namespace = shift;
-	my $filename = $namespace."-".$templateId.".tmpl";
+	my $filename = $templateId.".tmpl";
 	$filename =~ s/\//-/g;
 	$filename =~ s/ /-/g;
 	return WebGUI::Attachment->new($filename,"temp","templates");
@@ -88,85 +81,133 @@ sub _execute {
 	}
 }
 
+
 #-------------------------------------------------------------------
 
-=head2 get ( templateId, namespace )
+=head2 definition ( definition )
 
-Returns a hash reference containing all of the template parameters.
+Defines the properties of this asset.
 
-=head3 templateId
+=head3 definition
 
-Specify the templateId of the template to retrieve.
-
-=head3 namespace
-
-Specify the namespace of the template to retrieve.
+A hash reference passed in from a subclass definition.
 
 =cut
 
-sub get {
-	my $templateId = shift;
-	my $namespace = shift;
-        return WebGUI::SQL->quickHashRef("select * from template where templateId=".quote($templateId)." and namespace=".quote($namespace),WebGUI::SQL->getSlave);
+sub definition {
+        my $class = shift;
+        my $definition = shift;
+        push(@{$definition}, {
+                tableName=>'template',
+                className=>'WebGUI::Asset::Template',
+                properties=>{
+                                template=>{
+                                        fieldType=>'codearea',
+                                        defaultValue=>undef
+                                        },
+				isEditable=>{
+					fieldType=>'hidden',
+					defaultValue=>1
+					},
+				showInForms=>{
+					fieldType=>'yesNo',
+					defaultValue=>1
+				},
+				namespace=>{
+					fieldType=>'hidden',
+					defaultValue=>undef
+					}
+                        }
+                });
+        return $class->SUPER::definition($definition);
 }
 
 
 #-------------------------------------------------------------------
 
-=head2 getList ( [ namespace ] )
+=head2 getEditForm ()
+
+Returns the TabForm object that will be used in generating the edit page for this asset.
+
+=cut
+
+sub getEditForm {
+	my $self = shift;
+	my $tabform = $self->SUPER::getEditForm();
+        $tabform->getTab("properties")->raw('<input type="hidden" name="op2" value="'.$session{form}{afterEdit}.'" />');
+	if ($session{form}{tid} eq "new") {
+		my $namespaces = WebGUI::SQL->buildHashRef("select distinct(namespace),namespace 
+			from template order by namespace");
+		$tabform->getTab("properties")->selectList(
+			-name=>"namespace",
+			-options=>$namespaces,
+			-label=>WebGUI::International::get(721),
+			-value=>[$session{form}{namespace}]
+			);
+	}
+	$tabform->getTab("display")->yesNo(
+		-name=>"showInForms",
+		-value=>$self->getValue("showInForms"),
+		-label=>"Show in forms?"
+		);
+        $tabform->getTab("properties")->codearea(
+		-name=>"template",
+		-label=>WebGUI::International::get(504),
+		-value=>$self->getValue("template")
+		);
+	return $tabform;
+}
+
+
+
+#-------------------------------------------------------------------
+sub getIcon {
+	my $self = shift;
+	my $small = shift;
+	return $session{config}{extrasURL}.'/assets/small/template.gif' if ($small);
+	return $session{config}{extrasURL}.'/assets/template.gif';
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 getList ( namespace )
 
 Returns a hash reference containing template ids and template names of all the templates in the specified namespace.
 
+NOTE: This is a class method.
+
 =head3 namespace
 
-Defaults to "page". Specify the namespace to build the list for.
+Specify the namespace to build the list for.
 
 =cut
 
 sub getList {
-	my $namespace = $_[0] || "page";
+	my $class = shift;
+	my $namespace = shift;
 	return WebGUI::SQL->buildHashRef("select templateId,name from template where namespace=".quote($namespace)." and showInForms=1 order by name",WebGUI::SQL->getSlave);
 }
 
 
 #-------------------------------------------------------------------
 
-=head2 getIdByName ( name, namespace ) {
+=head2 getName 
 
-Returns a template ID by looking up the name for it.
-
-=head3 name
-
-The name to look up.
-
-=head3 namespace
-
-The namespace to focus on when searching.
+Returns the displayable name of this asset.
 
 =cut
 
-sub getIdByName {
-	my $name = shift;
-	my $namespace = shift;
-	my ($templateId) = WebGUI::SQL->quickArray("select templateId from template where namespace=".quote($namespace)." and name=".quote($name),WebGUI::SQL->getSlave);
-	return $templateId;
-}
-
+sub getName {
+	return "Template";
+} 
 
 
 #-------------------------------------------------------------------
 
-=head2 process ( templateId, namespace, vars )
+=head2 process ( vars )
 
 Evaluate a template replacing template commands for HTML.
-
-=head3 templateId
-
-Specify the templateId of the template to retrieve.
-
-=head3 namespace
-
-Specify the namespace of the template to retrieve.
 
 =head3 vars
 
@@ -175,10 +216,11 @@ A hash reference containing template variables and loops. Automatically includes
 =cut
 
 sub process {
-	my $templateId = shift;
-	my $namespace = shift;
+	my $self = shift;
 	my $vars = shift;
-	my $file = _getTemplateFile($templateId,$namespace);
+	return $self->processRaw($self->get("template"),$vars);
+# skip all the junk below here for now until we have time to bring it inline with the new system
+	my $file = _getTemplateFile($self->get("templateId"));
 	my $fileCacheDir = $session{config}{uploadsPath}.$session{os}{slash}."temp".$session{os}{slash}."templatecache";
 	my %params = (
 		filename=>$file->getPath,
@@ -213,12 +255,10 @@ sub process {
 	} elsif ($session{config}{templateCacheType} eq "memory-file" && not $error) {
 		$params{double_file_cache} = 1;
 	}
-
 	my $template;
-	unless (-f $file->getPath) {
-        	($template) = WebGUI::SQL->quickArray("select template from template where templateId=".quote($templateId)." and namespace=".quote($namespace),WebGUI::SQL->getSlave);
-		$file->saveFromScalar($template);
-		unless (-f $file->getPath) {
+	unless (-e $file->getPath) {
+		$file->saveFromScalar($self->get("template"));
+		unless (-e $file->getPath) {
 	                WebGUI::ErrorHandler::warn("Could not create file ".$file->getPath."\nTemplate file caching is disabled");
         	        $params{scalarref} = \$template;
 			delete $params{filename};
@@ -227,11 +267,16 @@ sub process {
 	return _execute(\%params,$vars);
 }
 
+
+
+
 #-------------------------------------------------------------------
 
 =head2 processRaw ( template, vars )
 
-Evaluate a template replacing template commands for HTML.
+Evaluate a template replacing template commands for HTML. 
+
+NOTE: This is a class method, no instance data required.
 
 =head3 template
 
@@ -244,6 +289,7 @@ A hash reference containing template variables and loops. Automatically includes
 =cut
 
 sub processRaw {
+	my $class = shift;
 	my $template = shift;
 	my $vars = shift;
 	return _execute({
@@ -256,45 +302,31 @@ sub processRaw {
 		},$vars);
 }
 
-#-------------------------------------------------------------------
 
-=head2 set ( data )
-
-Store a template and it's metadata.
-
-=head3 data
-
-A hash reference containing the data to be stored. At minimum the hash reference must include "templateId" and "namespace". The following are the elements allowed to be stored.
-
- templateId - The unique id for the template. If set to "new" then a new one will be generated.
-
- namespace - The namespace division for this template.
-
- template - The content of the template.
-
- name - A human friendly name for the template.
-
- showInForms - A boolean indicating whether this template should appear when using the "template" subroutine in WebGUI::Form.
-
- isEditable - A boolean indicating whether this template should be editable through the template manager. 
-
-=cut
-
-sub set {
-	my $data = shift;
-	if ($data->{templateId} eq "new") {
-		$data->{templateId} = WebGUI::Id::generate();	
-		WebGUI::SQL->write("insert into template (templateId,namespace) values (".quote($data->{templateId}).",".quote($data->{namespace}).")");
-	}
-	my @pairs;
-	foreach my $key (keys %{$data}) {
-		push(@pairs, $key."=".quote($data->{$key})) unless ($key eq "namespace" || $key eq "templateId");
-	}
-	WebGUI::SQL->write("update template set ".join(",",@pairs)." where templateId=".quote($data->{templateId})." and namespace=".quote($data->{namespace}));
-	my $file = _getTemplateFile($data->{templateId},$data->{namespace});
-	$file->delete;
-	return $data->{templateId};
+sub view {
+	my $self = shift;
+	return $self->get("template");
 }
+
+
+#-------------------------------------------------------------------
+sub www_edit {
+        my $self = shift;
+        return WebGUI::Privilege::insufficient() unless $self->canEdit;
+	$self->getAdminConsole->setHelp("template add/edit");
+        return $self->getAdminConsole->render($self->getEditForm->print,WebGUI::International::get(507));
+}
+
+
+sub www_view {
+	my $self = shift;
+	return WebGUI::Privilege::noAccess() unless $self->canView;
+	if ($session{var}{adminOn}) {
+		return $self->www_edit;
+	}
+	return $self->view;
+}
+
 
 1;
 

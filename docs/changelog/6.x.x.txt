@@ -1,10 +1,17 @@
 6.3.0
  - Migrated all wobjects to assets.
  - Migrated pages to the layout and redirect assets.
+ - Converted the navigation system to navigation assets.
+ - Converted the template system to template assets.
  - Converted site maps to navigation assets.
  - Converted file managers to layout assets with file and image assets
    attached.
- - Added AssetProxy macro.
+ - Added AssetProxy macro, which replaces the Navigation, I, Snippet, and File
+   macros.
+ - Added the RandomAssetProxy macro, which replaces the RandomImage and
+   RandomSnippet macros.
+ - Renamed the i macro to FileUrl.
+ - Renamed the \ macro to PageUrl.
  - Converted page templates to use CSS-based layouts instead of tables.
  - Added a "Position" property to the DataForm Edit Field interface. This makes it easier to move a field to a certain position. (Len Kranendonk).
  - Added the variables "record.edit.icon", "record.delete.url" and "record.delete.icon" to the DataForm DataList template. (Len Kranendonk).

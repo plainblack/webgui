@@ -34,6 +34,10 @@ sub definition {
 		tableName=>'Navigation',
 		className=>'WebGUI::Asset::Wobject::Navigation',
 		properties=>{
+			templateId =>{
+				fieldType=>"template",
+				defaultValue=>'PBtmpl0000000000000048'
+				},
 			assetsToInclude=>{
 				fieldType=>'checkList',
 				defaultValue=>"descendants"
@@ -70,6 +74,10 @@ sub definition {
 sub getEditForm {
 	my $self = shift;
 	my $tabform = $self->SUPER::getEditForm;
+   	$tabform->getTab("display")->template(
+      		-value=>$self->getValue('templateId'),
+      		-namespace=>"Navigation"
+   		);
 	my ($descendantsChecked, $selfChecked, $pedigreeChecked, $siblingsChecked);
 	my @assetsToInclude = split("\n",$self->getValue("assetsToInclude"));
 	my $afterScript;
@@ -337,7 +345,7 @@ sub view {
 		}
 		push(@{$var->{page_loop}}, $pageData);	
 	}
-	return $self->processTemplate($var,"Navigation",$self->get("templateId"));
+	return $self->processTemplate($var,$self->get("templateId"));
 }
 
 

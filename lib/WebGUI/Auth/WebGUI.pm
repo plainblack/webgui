@@ -12,6 +12,7 @@ package WebGUI::Auth::WebGUI;
 
 use Digest::MD5;
 use strict;
+use WebGUI::Asset::Template;
 use WebGUI::Auth;
 use WebGUI::DateTime;
 use WebGUI::HTMLForm;
@@ -349,6 +350,32 @@ sub editUserSettingsForm {
 }
 
 #-------------------------------------------------------------------
+sub getAccountTemplateId {
+	return "PBtmpl0000000000000010";
+}
+
+#-------------------------------------------------------------------
+sub getCreateAccountTemplateId {
+	return "PBtmpl0000000000000011";
+}
+
+#-------------------------------------------------------------------
+sub getExpiredPasswordTemplateId {
+	return "PBtmpl0000000000000012";
+}
+
+#-------------------------------------------------------------------
+sub getLoginTemplateId {
+	return "PBtmpl0000000000000013";
+}
+
+#-------------------------------------------------------------------
+sub getPasswordRecoveryTemplateId {
+	return "PBtmpl0000000000000014";
+}
+
+
+#-------------------------------------------------------------------
 sub login {
    my $self = shift;
    if(!$self->authenticate($session{form}{username},$session{form}{identifier})){
@@ -402,7 +429,7 @@ sub recoverPassword {
    $vars->{'recover.message'} = $_[0] if ($_[0]);
    $vars->{'recover.form.email'} = WebGUI::Form::text({"name"=>"email"});
    $vars->{'recover.form.email.label'} = WebGUI::International::get(56);
-   return WebGUI::Template::process(1,$template, $vars);
+   return WebGUI::Asset::Template->new($self->getPasswordRecoveryTemplateId)->process($vars);
 }
 
 #-------------------------------------------------------------------
@@ -460,7 +487,7 @@ sub resetExpiredPassword {
     $vars->{'expired.form.submit'} = WebGUI::Form::submit({});
     $vars->{'expired.form.footer'} = WebGUI::Form::formFooter();
 	
-	return WebGUI::Template::process(1,'AuthWebGUI/Expired', $vars);
+	return WebGUI::Asset::Template->new($self->getExpiredPasswordTemplateId)->process($vars);
 }
 
 #-------------------------------------------------------------------

@@ -131,6 +131,10 @@ sub definition {
                 tableName=>'DataForm',
                 className=>'WebGUI::Asset::Wobject::DataForm',
                 properties=>{
+			templateId =>{
+				fieldType=>"template",
+				defaultValue=>'PBtmpl0000000000000020'
+				},
 			acknowledgement=>{
 				fieldType=>"textarea",
 				defaultValue=>undef
@@ -188,6 +192,10 @@ sub duplicate {
 sub getEditForm {
 	my $self = shift;
 	my $tabform = $self->SUPER::getEditForm;
+   	$tabform->getTab("display")->template(
+      		-value=>$self->getValue('templateId'),
+      		-namespace=>"DataForm"
+   		);
         $tabform->getTab("display")->template(
                 -name=>"emailTemplateId",
                 -value=>$self->getValue("emailTemplateId"),
@@ -563,7 +571,7 @@ sub purge {
 sub sendEmail {
 	my $self = shift;
 	my $var = shift;
-	my $message = WebGUI::Macro::process($self->processTemplate($var,"DataForm",$self->get("emailTemplateId")));
+	my $message = WebGUI::Macro::process($self->processTemplate($var,$self->get("emailTemplateId")));
 	my ($to, $subject, $from, $bcc, $cc);
 	foreach my $row (@{$var->{field_loop}}) {
 		if ($row->{"field.name"} eq "to") {

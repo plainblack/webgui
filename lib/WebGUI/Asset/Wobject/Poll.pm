@@ -41,6 +41,10 @@ sub definition {
 		tableName=>'Poll',
 		className=>'WebGUI::Asset::Wobject::Poll',
 		properties=>{
+			templateId =>{
+				fieldType=>"template",
+				defaultValue=>'PBtmpl0000000000000055'
+				},
 			active=>{
 				fieldType=>"yesNo",
 				defaultValue=>1
@@ -165,6 +169,10 @@ sub duplcate {
 sub getEditForm {
 	my $self = shift;
 	my $tabform = $self->SUPER::getEditForm; 
+   	$tabform->getTab("display")->template(
+      		-value=>$self->getValue('templateId'),
+      		-namespace=>"Poll"
+   		);
         my ($i, $answers);
 	for ($i=1; $i<=20; $i++) {
                 if ($self->get('a'.$i) =~ /\C/) {
@@ -346,7 +354,7 @@ sub view {
 	}
 	randomizeArray(\@answers) if ($self->get("randomizeAnswers"));
 	$var{answer_loop} = \@answers;
-	return $self->processTemplate(\%var,"Poll",$self->get("templateId"));
+	return $self->processTemplate(\%var,$self->get("templateId"));
 }
 
 #-------------------------------------------------------------------

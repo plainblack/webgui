@@ -19,7 +19,7 @@ use WebGUI::Asset;
 use WebGUI::HTTP;
 use WebGUI::Session;
 use WebGUI::Storage;
-use WebGUI::Template;
+use WebGUI::Asset::Template;
 
 our @ISA = qw(WebGUI::Asset);
 
@@ -93,7 +93,7 @@ sub getBox {
        	$var{"attachment.name"} = $self->get("filename");
        	$var{"attachment.size"} = $self->getStorageLocation->getSize;
        	$var{"attachment.type"} = $self->getStorageLocation->getFileExtension;
-       	return WebGUI::Template::process(1,"AttachmentBox",\%var);
+       	return WebGUI::Asset::Template->new("PBtmpl0000000000000003")->process(\%var);
 }
 
 
@@ -224,7 +224,7 @@ sub view {
 	$var{controls} = $self->getToolbar;
 	$var{fileUrl} = $self->getFileUrl;
 	$var{fileIcon} = $self->getFileIconUrl;
-	return WebGUI::Template::process("1","FileAsset",\%var);
+	return WebGUI::Asset::Template->new("PBtmpl0000000000000024")->process(\%var);
 }
 
 
