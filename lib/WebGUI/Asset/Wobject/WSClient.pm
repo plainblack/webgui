@@ -42,6 +42,19 @@ our @ISA = qw(WebGUI::Asset::Wobject);
 
 
 #-------------------------------------------------------------------
+sub _create_cache_key {
+   my ($wobject, $call, $param_str) = @_;
+   my $cache_key;
+
+   $cache_key = $_[0]->get('sharedCache')
+      ? Digest::MD5::md5_hex($call, $param_str)
+      : Digest::MD5::md5_hex($call, $param_str, $session{'var'}{'sessionId'});
+   WebGUI::ErrorHandler::warn(($_[0]->get('sharedCache')?'shared':'session')
+      . " cache_key=$cache_key md5_hex($call, $param_str)");
+   return $cache_key;
+}
+
+#-------------------------------------------------------------------
 sub definition {
 	my $class = shift;
 	my $definition = shift;
@@ -249,10 +262,13 @@ sub view {
         $cache_key,                    # unique cache identifier
         $cache,                        # cache object
         $call,                         # SOAP method call
+	@exclude_params,               # input params NOT to pass to next pg
         $p,                            # pagination object
         $param_str,                    # raw SOAP params before parsing
-        @params,                       # params to soap method call
-        @result,                       # SOAP result reference
+        @params,                       # params to soap method call	
+	$query_string,                 # query string to pass thru to next pg
+        @result,                       # SOAP result reference	
+	%seen,                         # counts diff bxt input & output params
         $soap,                         # SOAP object
         @targetWobjects,               # list of non-default wobjects to exec
         $url,                          # current page url
@@ -261,6 +277,22 @@ sub view {
    my $self= shift;
    # this page, with important params
    $url = $self->getUrl("func=view");
+
+    # This could belong up towards the top of the script, but it's nice to
+    # have it down right close to the impacted code.  Add to this list params
+    # that should never, ever be passed across multiple results pages
+    @exclude_params = qw(cache func pn wid);
+
+   # this page, with important params
+    @seen{@exclude_params} = ();
+    for (keys %{$session{'form'}}) {
+       unless (exists $seen{$_}) {
+          $query_string .= WebGUI::URL::escape($_) . '='
+             . WebGUI::URL::escape($session{'form'}{$_}) . '&';
+       }
+    }
+    $url = WebGUI::URL::page($query_string);
+
 
    # snag our SOAP call and preprocess if needed
    if ($self->get('preprocessMacros')) {
@@ -292,11 +324,19 @@ sub view {
 
    # check to see if this exact query has already been cached, using either
    # a cache specific to this session, or a shared global cache
-   $cache_key = $self->get('sharedCache')
-      ? Digest::MD5::md5_hex($call, $param_str)
-      : Digest::MD5::md5_hex($call, $param_str, $session{'var'}{'sessionId'});
-   WebGUI::ErrorHandler::warn(($self->get('sharedCache')?'shared':'session')
-      . " cache_key=$cache_key md5_hex($call, $param_str)");
+   if ($session{'form'}{'cache'}) {
+      if ($session{'form'}{'targetWobjects'}
+         && grep /^$call$/, @targetWobjects) {
+
+         $cache_key = $session{'form'}{'cache'};
+         WebGUI::ErrorHandler::warn("passed a cache_key for $call");
+      } else {
+         WebGUI::ErrorHandler::warn("cache_key not applicable to $call ");
+         $cache_key = _create_cache_key($self, $call, $param_str);
+      }
+   } else {
+      $cache_key = _create_cache_key($self, $call, $param_str);
+   }
    $cache = WebGUI::Cache->new($cache_key,
       WebGUI::International::get(4, "WSClient"));
 
@@ -515,7 +555,7 @@ sub _instantiate_soap {
       $soap = new SOAP::Lite     
          on_fault => sub {    
             my ($soap, $res) = @_;     
-            die $res->faultstring;     
+     	    die ref $res ? $res->faultstring : $soap->transport->status, "\n";
          };
       $soap->uri($self->get('uri'));
                                                                                 
