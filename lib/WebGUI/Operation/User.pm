@@ -202,6 +202,7 @@ sub www_editUser {
                 $f->hidden("op","editUserSave");
                 $f->hidden("uid",$session{form}{uid});
                 $f->readOnly($session{form}{uid},WebGUI::International::get(378));
+                $f->readOnly($u->karma,WebGUI::International::get(537));
                 $f->readOnly(epochToHuman($u->dateCreated,"%z"),WebGUI::International::get(453));
                 $f->readOnly(epochToHuman($u->lastUpdated,"%z"),WebGUI::International::get(454));
                 $f->text("username",WebGUI::International::get(50),$u->username);

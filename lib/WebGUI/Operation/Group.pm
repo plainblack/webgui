@@ -68,6 +68,7 @@ sub www_editGroup {
         if (WebGUI::Privilege::isInGroup(3)) {
 		if ($session{form}{gid} eq "new") {
 			$group{expireAfter} = 314496000;
+			$group{karmaThreshold} = 1000000000;
 		} else {
                 	%group = WebGUI::SQL->quickHash("select * from groups where groupId=$session{form}{gid}");
 		}
@@ -80,6 +81,7 @@ sub www_editGroup {
                 $f->text("groupName",WebGUI::International::get(84),$group{groupName});
                 $f->textarea("description",WebGUI::International::get(85),$group{description});
                 $f->integer("expireAfter",WebGUI::International::get(367),$group{expireAfter});
+                $f->integer("karmaThreshold",WebGUI::International::get(538),$group{karmaThreshold});
 		$f->submit;
 		$output .= $f->print;
 		unless ($session{form}{gid} eq "new") {
@@ -116,7 +118,8 @@ sub www_editGroupSave {
 			WebGUI::SQL->write("insert into groups (groupId) values ($session{form}{gid})");
 		}
                 WebGUI::SQL->write("update groups set groupName=".quote($session{form}{groupName}).", 
-			description=".quote($session{form}{description}).", expireAfter='$session{form}{expireAfter}' 
+			description=".quote($session{form}{description}).", expireAfter='$session{form}{expireAfter}',
+			karmaThreshold='$session{form}{karmaThreshold}'
 			where groupId=".$session{form}{gid});
                 return www_listGroups();
         } else {

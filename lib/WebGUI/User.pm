@@ -30,14 +30,15 @@ use WebGUI::URL;
  use WebGUI::User;
  $u = WebGUI::User->new(3); or  $f = WebGUI::User->new("new");
 
- $authMethod = $u->authMethod("WebGUI");
- $connectDN = $u->authMethod("cn=Jon Doe");
- $dateCreated = $u->dateCreated;
- $identifier = $u->identifier("somepassword");
- $lastUpdated = $u->lastUpdated;
- $ldapURL = $u->ldapURL("ldap://ldap.mycompany.com:389/o=MyCompany");
- $languagePreference = $u->profileField("language","English");
- $username = $u->username("jonboy");
+ $authMethod =		$u->authMethod("WebGUI");
+ $connectDN = 		$u->authMethod("cn=Jon Doe");
+ $dateCreated = 	$u->dateCreated;
+ $identifier = 		$u->identifier("somepassword");
+ $karma = 		$u->karma;
+ $lastUpdated = 	$u->lastUpdated;
+ $ldapURL = 		$u->ldapURL("ldap://ldap.mycompany.com:389/o=MyCompany");
+ $languagePreference = 	$u->profileField("language","English");
+ $username = 		$u->username("jonboy");
 
  $u->addToGroups(\@arr);
  $u->deleteFromGroups(\@arr);
@@ -209,6 +210,18 @@ sub identifier {
                         lastUpdated=".time()." where userId=$class->{_userId}");
         }
         return $class->{_user}{"identifier"};
+}
+
+#-------------------------------------------------------------------
+
+=head2 karma ( )
+
+ Returns the current level of karma this user has earned. 
+
+=cut
+
+sub karma {
+        return $_[0]->{_user}{karma};
 }
 
 #-------------------------------------------------------------------
