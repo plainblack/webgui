@@ -106,7 +106,7 @@ sub www_editContentSettings {
 		-intervalValue=>$data[0],
 		-unitsValue=>$data[1]
 		);
-        my @data = WebGUI::DateTime::secondsToInterval($session{setting}{cachePagesVisitor});
+        @data = WebGUI::DateTime::secondsToInterval($session{setting}{cachePagesVisitor});
         $f->interval(
                 -name=>"cachePagesVisitor",
                 -label=>WebGUI::International::get(896),
