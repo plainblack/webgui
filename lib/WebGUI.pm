@@ -1,5 +1,5 @@
 package WebGUI;
-our $VERSION = "4.6.2";
+our $VERSION = "4.6.3";
 
 #-------------------------------------------------------------------
 # WebGUI is Copyright 2001-2002 Plain Black LLC.

@@ -118,7 +118,7 @@ sub _loadMacros {
 			$namespace = $1;
 			$cmd = "use WebGUI::Macro::".$1;
 			eval($cmd);
-			WebGUI::ErrorHandler::fatalError("Macro failed to compile: $namespace.") if($@);
+			WebGUI::ErrorHandler::fatalError("Macro failed to compile: $namespace.".$@) if($@);
 			$exclude = $session{config}{excludeMacro};
                         $exclude =~ s/ //g;
                         unless (isIn($namespace, split(/,/,$exclude))) {

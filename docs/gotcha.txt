@@ -7,6 +7,17 @@ upgrading from one version to the next, or even between multiple
 versions. Be sure to heed the warnings contained herein as they will
 save you many hours of grief.
 
+4.6.3
+--------------------------------------------------------------------
+ * It has been reported that some people had a duplicate key error
+	when upgrading from 4.5.0 to 4.6.0. This version has removed
+	the possibility of that problem. The error actually didn't
+	cause anything more than cosmetic problems. You have the
+	choice of restoring to a backup version and reapplying the
+	patches, or just moving forward. Either way will produce
+	the same result.
+
+
 4.6.0
 --------------------------------------------------------------------
  * The runHourly scheduler has been updated to allow for more
