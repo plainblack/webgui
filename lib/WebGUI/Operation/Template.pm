@@ -32,7 +32,7 @@ our @EXPORT = qw(&www_copyTemplate &www_deleteTemplate &www_deleteTemplateConfir
 sub www_copyTemplate {
 	my (%template);
         if (WebGUI::Privilege::isInGroup($session{setting}{templateManagersGroup})) {
-		%template = WebGUI::SQL->quickHash("select * from template where templateId=$session{form}{tid}");
+		%template = WebGUI::SQL->quickHash("select * from template where templateId=$session{form}{tid} and namespace=".quote($session{form}{namespace}));
                 WebGUI::SQL->write("insert into template (templateId,name,template,namespace) 
 			values (".getNextId("templateId").", 
 			".quote('Copy of '.$template{name}).", ".quote($template{template}).",
