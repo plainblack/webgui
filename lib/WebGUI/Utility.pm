@@ -45,8 +45,8 @@ This package provides miscellaneous but useful utilities to the WebGUI programme
  $integer = randint($low,$high);
  randomizeArray(\@array);
  $hashRef = randomizeHash(\%hash);
- $hash = sortHash(%hash);
- $hash = sortHashDescending(%hash);
+ %hash = sortHash(%hash);
+ %hash = sortHashDescending(%hash);
 
 =head1 METHODS
 

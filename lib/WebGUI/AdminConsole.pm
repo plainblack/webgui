@@ -198,9 +198,15 @@ sub getAdminFunction {
 	if ($id) {
 		return $self->_formatFunction($functions->{$id});
 	} else {
-		my @list;
+		my %names;
 		foreach my $id (keys %{$functions}) {
-			push(@list,$self->_formatFunction($functions->{$id}));
+			my $func = $self->_formatFunction($functions->{$id});
+			$names{$func->{title}} = $func;
+		}
+		my @sorted = sort {$a cmp $b} keys %names;
+		my @list;
+		foreach my $key (@sorted) {
+			push(@list,$names{$key});
 		}
 		return \@list;
 	}
