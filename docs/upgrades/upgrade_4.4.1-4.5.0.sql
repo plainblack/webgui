@@ -20,7 +20,12 @@ update international set message='Year(s)' where internationalId=703 and languag
 insert into international values (704,'WebGUI',1,'Second(s)');
 insert into international values (705,'WebGUI',1,'Minute(s)');
 insert into international values (706,'WebGUI',1,'Hours(s)');
-
+delete from international where namespace='EventsCalendar' and internationalId=10;
+delete from international where namespace='EventsCalendar' and internationalId=11;
+insert into international values (75,'EventsCalendar',1,'Which do you wish to do?');
+insert into international values (76,'EventsCalendar',1,'Delete only this event.');
+insert into international values (77,'EventsCalendar',1,'Delete this event <b>and</b> all of its recurring events.');
+insert into international values (78,'EventsCalendar',1,'Don\'t delete anything, I made a mistake.');
 
 
 

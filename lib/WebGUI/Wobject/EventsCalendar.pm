@@ -132,16 +132,15 @@ sub www_deleteEvent {
 	my ($output);
         if (WebGUI::Privilege::canEditPage()) {
 		$output = '<h1>'.WebGUI::International::get(42).'</h1>';
-		$output .= WebGUI::International::get(10,$namespace);
-		if ($session{form}{rid} > 0) {
-			$output .= ' '.WebGUI::International::get(11,$namespace);
-		}
-		$output .= '?<p><div align="center"><a href="'.
-			WebGUI::URL::page('func=deleteEventConfirm&wid='.$session{form}{wid}.
-			'&eid='.$session{form}{eid}.'&rid='.$session{form}{rid}).'">'.
-			WebGUI::International::get(44).'</a> &nbsp; <a href="'.
-			WebGUI::URL::page('func=edit&wid='.$session{form}{wid}).'">'.
-			WebGUI::International::get(45).'</a></div>';
+		$output .= WebGUI::International::get(75,$namespace).'<p><blockquote>';
+		$output .= '<a href="'.WebGUI::URL::page('func=deleteEventConfirm&wid='.$session{form}{wid}.'&eid='
+			.$session{form}{eid}).'">'.WebGUI::International::get(76,$namespace).'</a><p>';
+		$output .= '<a href="'.WebGUI::URL::page('func=deleteEventConfirm&wid='.$session{form}{wid}.'&eid='
+			.$session{form}{eid}.'&rid='.$session{form}{rid}).'">'
+			.WebGUI::International::get(77,$namespace).'</a><p>'; 
+		$output .= '<a href="'.WebGUI::URL::page('func=edit&wid='.$session{form}{wid}).'">'
+			.WebGUI::International::get(78,$namespace).'</a>';
+		$output .= '</blockquote>';
                 return $output;
         } else {
                 return WebGUI::Privilege::insufficient();

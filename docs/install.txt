@@ -17,12 +17,11 @@ QnD INSTALL INSTRUCTIONS:
    LWP
    Tie::IxHash
    DBI
-   Mysql (or some other DB driver)
+   Mysql
    Digest::MD5
    Net::LDAP
    Tie::CPHash
    Date::Calc
-   HTML::CalendarMonthSimple
    Image::Magick
    HTML::Parser
 
