@@ -10,8 +10,8 @@ $ENV{GATEWAY_INTERFACE} =~ /^CGI-Perl/ or die "GATEWAY_INTERFACE not Perl!";
 #----------------------------------------
 # Enable the mod_perl environment. 
 #----------------------------------------
-use Apache::Registry (); # Uncomment this for use with mod_perl 1.0
-#use ModPerl::Registry (); # Uncomment this for use with mod_perl 2.0
+#use Apache::Registry (); # Uncomment this for use with mod_perl 1.0
+use ModPerl::Registry (); # Uncomment this for use with mod_perl 2.0
 
 
 #----------------------------------------

@@ -8,6 +8,15 @@ versions. Be sure to heed the warnings contained herein as they will
 save you many hours of grief.
 
 
+6.0.1
+--------------------------------------------------------------------
+ * Apache 2.0 is now the recommended web server for WebGUI. As such
+	sbin/preload.perl has been defaulted for use with mod_perl
+	2.0. If you are still using Apache 1.3, don't worry, WebGUI
+	will still work great for you. You just need to edit
+	sbin/preload.perl to match your environment.
+
+
 6.0.0
 --------------------------------------------------------------------
  * As part of the upgrade process our scripts will attempt to

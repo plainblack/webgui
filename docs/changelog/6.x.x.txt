@@ -5,6 +5,8 @@
  = Fixed bug [ 910145 ] htmlArea - insert image not working (Len Kranendonk /
 Andreas Graf).
  - Bugfix 914825 / 912203: Bug in template system (LenK).
+ - Apache 2.0 is now the default web server for WebGUI. See gotcha.txt for
+   details.
 
 6.0.0
 
