@@ -1,11 +1,14 @@
 6.2.2
  - Made a dramatic performance enhancement to the page tree system by
    restructuring an overused, and inefficent method.
+ - Added a gotcha warning about setting the TZ environment variable on Windows
+   systems.
  - bugfix [1024275]. Drag and drop not working (Leendert Bottelberghs).
  - bugfix [ 1025671 ] Crash on manage page tree. (Leendert Bottelberghs)
  - bugfix [ 1025271 ] Cut page not working. (Leendert Bottelberghs)
  - bugfix [ 1024643 ] Unknown column error. (Leendert Bottelberghs)
  - bugfix [ 1025120 ] Pagination in forum thread doesn't work. New default thread template. (Leendert Bottelberghs)
+ - Fixed a bug where you couldn't delete templates.
 
 
 6.2.1

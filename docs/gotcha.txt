@@ -7,6 +7,18 @@ upgrading from one version to the next, or even between multiple
 versions. Be sure to heed the warnings contained herein as they will
 save you many hours of grief.
 
+6.2.2
+--------------------------------------------------------------------
+ * If you're on a Windows environment and upgrading to 6.2 you'll
+	need to set a TZ environment variable. Our recommendation is
+	to set the variable like follows
+
+	TZ = EST5EDT
+
+	If your first install is the WebGUI 6.2 zip-n-go then you
+	won't need to do this, as the installer will do it for you.
+
+
 6.2.0
 --------------------------------------------------------------------
  * WebGUI now requires Time::HiRes to operate. Be sure to have it 

@@ -67,7 +67,7 @@ sub www_copyTemplate {
 #-------------------------------------------------------------------
 sub www_deleteTemplate {
         my ($output);
-        if ($session{form}{tid} < 1000 && $session{form}{tid} > 0) {
+        if ($session{form}{tid} =~ /^\d+$/ && $session{form}{tid} < 1000 && $session{form}{tid} > 0) {
 		return WebGUI::Privilege::vitalComponent();
         } elsif (WebGUI::Grouping::isInGroup(8)) {
                 $output .= helpIcon("template delete");
@@ -88,7 +88,7 @@ sub www_deleteTemplate {
 #-------------------------------------------------------------------
 sub www_deleteTemplateConfirm {
 	my ($a, $pageId);
-        if ($session{form}{tid} < 1000 && $session{form}{tid} > 1000) {
+        if ($session{form}{tid} =~ /^\d+$/ && $session{form}{tid} < 1000 && $session{form}{tid} > 0) {
 		return WebGUI::Privilege::vitalComponent();
         } elsif (WebGUI::Grouping::isInGroup(8)) {
 		if ($session{form}{namespace} eq "Page") {
