@@ -70,7 +70,7 @@ sub www_addUser {
                 push(@array,1); #visitors
                 push(@array,2); #registered users
                 push(@array,7); #everyone
-                $groups = WebGUI::SQL->buildHashRef("select groupId,groupName from groups where groupId not in (".join(",",@array).")");
+                $groups = WebGUI::SQL->buildHashRef("select groupId,groupName from groups where groupId not in (".join(",",@array).") order by groupName");
                 $f->select("groups",$groups,WebGUI::International::get(605),[],5,1);
 		$f->submit;
 		$output .= $f->print;
@@ -224,7 +224,7 @@ sub www_editUser {
                 $f->hidden("op","editUserSave");
                 $f->hidden("uid",$session{form}{uid});
                 $f->readOnly($session{form}{uid},WebGUI::International::get(378));
-                $f->readOnly($u->karma,WebGUI::International::get(537));
+                $f->readOnly($u->karma,WebGUI::International::get(537)) if ($session{setting}{useKarma});
                 $f->readOnly(epochToHuman($u->dateCreated,"%z"),WebGUI::International::get(453));
                 $f->readOnly(epochToHuman($u->lastUpdated,"%z"),WebGUI::International::get(454));
                 $f->text("username",WebGUI::International::get(50),$u->username);
@@ -280,7 +280,7 @@ sub www_editUserGroup {
                 push(@array,1); #visitors
                 push(@array,2); #registered users
                 push(@array,7); #everyone
-                $groups = WebGUI::SQL->buildHashRef("select groupId,groupName from groups where groupId not in (".join(",",@array).")");
+                $groups = WebGUI::SQL->buildHashRef("select groupId,groupName from groups where groupId not in (".join(",",@array).") order by groupName");
                 $f->select("groups",$groups,WebGUI::International::get(605),[],5,1);
                 $f->submit;
 		$output .= $f->print;
