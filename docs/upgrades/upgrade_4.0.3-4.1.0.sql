@@ -7,4 +7,6 @@ create table karmaLog (
  source varchar(255),
  description text
 );
+INSERT INTO international VALUES (537,'WebGUI','English','Karma');
+INSERT INTO international VALUES (538,'WebGUI','English','Karma Threshold');
 
