@@ -46,7 +46,7 @@ sub www_copyTemplate {
 #-------------------------------------------------------------------
 sub www_deleteTemplate {
         my ($output);
-        if ($session{form}{tid} < 1000 && $session{form}{tid} > 1000) {
+        if ($session{form}{tid} < 1000 && $session{form}{tid} > 0) {
 		return WebGUI::Privilege::vitalComponent();
         } elsif (WebGUI::Privilege::isInGroup($session{setting}{templateManagersGroup})) {
                 $output .= helpIcon(35);
