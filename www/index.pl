@@ -15,6 +15,7 @@ our ($webguiRoot, $configFile);
 BEGIN {
         $configFile = "WebGUI.conf";
         $webguiRoot = "..";
+	# $webguiRoot = "/data/WebGUI"; # Uncomment this for use with mod_perl 2.0
         unshift (@INC, $webguiRoot."/lib");
 }
 
