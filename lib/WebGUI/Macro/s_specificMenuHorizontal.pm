@@ -38,8 +38,13 @@ sub _replacement {
                         } else {
                                 $temp .= $delimeter;
                         }
-                        $temp .= '<a class="horizontalMenu" href="'.WebGUI::URL::gateway($data[1]).'">'.
-				$data[0].'</a>';
+                        $temp .= '<a class="horizontalMenu" href="'.WebGUI::URL::gateway($data[1]).'">';
+                        if ($session{page}{pageId} == $data[2]) {
+                                $temp .= '<span class="selectedMenuItem">'.$data[1].'</span>';
+                        } else {
+                                $temp .= $data[1];
+                        }
+                        $temp .= '</a>';
                 }
         }
         $sth->finish;

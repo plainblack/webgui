@@ -40,8 +40,13 @@ sub traversePageTree {
         	$sth = WebGUI::SQL->read("select urlizedTitle, menuTitle, pageId from page where parentId='$_[0]' order by sequenceNumber");
         	while (@data = $sth->array) {
                 	if (WebGUI::Privilege::canViewPage($data[2])) {
-                        	$output .= $depth.'<a class="verticalMenu" href="'.
-					WebGUI::URL::gateway($data[0]).'">'.$data[1].'</a><br>';
+                        	$output .= $depth.'<a class="verticalMenu" href="'.WebGUI::URL::gateway($data[0]).'">';
+				if ($session{page}{pageId} == $data[2]) {
+					$output .= '<span class="selectedMenuItem">'.$data[1].'</span>';
+				} else {
+					$output .= $data[1];
+				}
+				$output .= '</a><br>';
                         	$output .= traversePageTree($data[2],$_[1]+1,$toLevel);
                 	}
         	}
