@@ -65,7 +65,10 @@ sub getRequiredProfileFields {
              $default = $session{form}{$data->{fieldName}};
           } elsif (exists $session{user}{$data->{fieldName}}) {
              $default = $session{user}{$data->{fieldName}};
-	      }
+	  } else {
+	     $default = $data->{dataDefault};
+	  }
+	     
 		  my $cmd = 'WebGUI::Form::'.$method.'({"name"=>$data->{fieldName},"value"=>$default})';
 		  $hash{'profile.formElement'} = eval($cmd);
 		  

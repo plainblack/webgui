@@ -228,7 +228,7 @@ sub www_editProfileFieldSave {
         $session{form}{fieldLabel} = 'Unamed' if ($session{form}{fieldLabel} eq "" || $session{form}{fieldLabel} eq "''");
         $test = eval($session{form}{fieldLabel});
         $session{form}{fieldLabel} = "'".$session{form}{fieldLabel}."'" if ($test eq "");
-	if ($session{form}{dataDefault} ne "") {
+	if ($session{form}{dataDefault} && $session{form}{dataType}=~/List$/) {
                 unless ($session{form}{dataDefault} =~ /^\[/) {
                         $session{form}{dataDefault} = "[".$session{form}{dataDefault};
                 }
