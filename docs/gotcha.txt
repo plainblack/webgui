@@ -20,11 +20,6 @@ save you many hours of grief.
 	sitename = www.mycompany.com
 
 
-5.2.5
---------------------------------------------------------------------
- * You'll need to upgrade HTML::Parser to at least version 3.27.
-
-
 5.2.0
 --------------------------------------------------------------------
  * You'll need to add a section to the style sheet of each one of

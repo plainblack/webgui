@@ -19,7 +19,7 @@ QnD INSTALL INSTRUCTIONS:
    DBD::mysql
    Digest::MD5
    Date::Calc
-   HTML::Parser (3.27+)
+   HTML::Parser 
    Image::Magick (optional)
    Cache::FileCache (optional)
 
