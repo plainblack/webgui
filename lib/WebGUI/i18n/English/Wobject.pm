@@ -39,55 +39,34 @@ If this wobject is a shortcut, then this URL will direct you to the original wob
                      message => q|Wobject Template|
                    },
           '632' => {
-                     lastUpdated => 1106767207,
-                     message => q|<p>You can add wobjects by selecting from the <I>Add Content</I> pulldown menu. You can edit them by clicking on the "Edit" button that appears directly above an instance of a particular wobject while in Admin mode.</p>
-<p>Wobjects are one kind of Asset, so they have all of the properties that Assets do.  Additionally, almost all Wobjects share some properties. Those properties are:</p>
+                     lastUpdated => 1110135335,
+                     message => q|<p>You can add wobjects by selecting from the <I>^International("1","WebGUI");</I> pulldown menu. You can edit them by clicking on the "Edit" button that appears directly above an instance of a particular wobject while in Admin mode.</p>
+<p>Wobjects are Assets, so they have all of the properties that Assets do.  Additionally, most Wobjects share some basic properties. Those properties are:</p>
 
-<P><B>Display title?</B><BR>
+<P><B>^International("174","Wobject");</B><BR>
 Do you wish to display the Wobject's title? On some sites, displaying the title is not necessary. 
 
-<P><b>Style Template</b><br>
+<P><b>^International("1073","Wobject");</b><br>
 Select a style template from the list to enclose your Wobject if it is viewed directly.  If the Wobject
 is displayed as part of a Layout Asset, the Layout Asset's <b>Style Template</b> is used instead.
 
-<p><b>Printable Style</b><br>
+<p><b>^International("1079","Wobject");</b><br>
 This sets the printable style for this page to be something other than the WebGUI Default Printable Style.  It behaves similarly to the <b>Style Template</b> with respect to when it is used.
 
-<P><B>Description</B><BR>A content area in which you can place as much content as you wish. For instance, even before a FAQ there is usually a paragraph describing what is contained in the FAQ. 
+<P><B>^International("85","Wobject");</B><BR>A content area in which you can place as much content as you wish. For instance, even before a FAQ there is usually a paragraph describing what is contained in the FAQ. 
 
-<P><B>Cache Timeout</B><BR>The amount of time this page should remain cached for registered users.  
+<P><B>^International("895","Wobject");</B><BR>The amount of time this page should remain cached for registered users.  
 
-<P><B>Cache Timeout (Visitors)</B><BR>The amount of time this page should remain cached for visitors.
-
-<P><B>NOTE:</B> Page caching is only available if your administrator has installed the Cache::FileCache Perl module. Using page caching can improve site performance by as much as 1000%.&nbsp;
-
+<P><B>^International("896","Wobject");</B><BR>The amount of time this page should remain cached for visitors.
 |
                    },
           '626' => {
                      lastUpdated => 1101775387,
                      message => q|Wobjects are the true power of WebGUI. Wobjects are tiny pluggable applications built to run under WebGUI. Articles, message boards and polls are examples of wobjects.
+Wobjects can be standalone pages all by themselves, or can be individual parts of pages.
 <p>
 
 To add a wobject to a page, first go to that page, then select <b>Add Content...</b> from the upper left corner of your screen. Each wobject has it's own help so be sure to read the help if you're not sure how to use it.
-<p>
-
-
-<b>Style Sheets:</b><br>
-All wobjects have a style-sheet class and id attached to them. 
-The style-sheet class is the word "wobject" plus the type of wobject it is. So for a poll the class would be "wobjectPoll". The class pertains to all wobjects of that type in the system. 
-<p>
-
-The style-sheet id is the word "wobjectId" plus the Wobject Id for that wobject instance. So if you had an Article with a Wobject Id of 94, then the id would be "wobjectId94".
-<p>
-<h3>URLs</h3>
-
-<b>Direct Linking:</b><br>
-You can create a URL to link directly to a wobject
-on the page be appending the Wobject Id to the URL for the page.
-<p>
-For example, if the Article above was on a page http://www.mysite.com/thisPage, the link below will jump directly to the wobject on that page:<br>
-
-http://www.mysite.com/thisPage#94
 <p>
 |
                    },
