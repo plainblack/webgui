@@ -169,7 +169,7 @@ sub displayAccount {
 	  $vars->{'account.form.karma.label'} = WebGUI::International::get(537);
    }
    $vars->{'account.options'} = WebGUI::Operation::Shared::accountOptions();
-   return WebGUI::Template::process(1,'AuthSMB/Account', $vars);
+   return WebGUI::Template::process(1,'Auth/SMB/Account', $vars);
 }
 
 #-------------------------------------------------------------------

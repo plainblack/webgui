@@ -260,7 +260,7 @@ sub displayAccount {
 	  $vars->{'account.form.karma.label'} = WebGUI::International::get(537);
    }
    $vars->{'account.options'} = WebGUI::Operation::Shared::accountOptions();
-   return WebGUI::Template::process(1,'AuthLDAP/Account', $vars);
+   return WebGUI::Template::process(1,'Auth/LDAP/Account', $vars);
 }
 
 #-------------------------------------------------------------------
