@@ -1,7 +1,5 @@
 package Hourly::TrashExpiredContent;
 
-my $offset = 0; # in seconds, time to wait before deleting
-
 #-------------------------------------------------------------------
 # WebGUI is Copyright 2001-2002 Plain Black LLC.
 #-------------------------------------------------------------------
@@ -13,13 +11,18 @@ my $offset = 0; # in seconds, time to wait before deleting
 #-------------------------------------------------------------------
 
 use strict;
+use WebGUI::DateTime;
 use WebGUI::Session;
 use WebGUI::SQL;
 
 #-----------------------------------------
 sub process {
-	WebGUI::SQL->write("update page set parentId=3, endDate=endDate+31536000 where endDate<".(time()-(86400*$offset)));
-	WebGUI::SQL->write("update wobject set pageId=3, endDate=endDate+31536000 where endDate<".(time()-(86400*$offset)));
+	my $offset = $session{config}{TrashExpiredContent_offset};
+	if ($offset ne "") {
+		my $epoch = time()-(86400*$offset);
+		WebGUI::SQL->write("update page set parentId=3, endDate=endDate+31536000 where endDate<".$epoch);
+		WebGUI::SQL->write("update wobject set pageId=3, endDate=endDate+31536000 where endDate<".$epoch);
+	}
 }
 
 1;

@@ -12,6 +12,7 @@ package Hourly::CleanLoginHistory;
 
 
 use strict;
+use WebGUI::DateTime;
 use WebGUI::Session;
 use WebGUI::SQL;
 
