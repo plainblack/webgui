@@ -105,7 +105,7 @@ sub generateResponseId {
 		'Survey_id'=>$self->get("Survey_id")
 		});
 	WebGUI::Session::setScratch($varname,$responseId);
-	return $session{scratch}{$varname};
+	return $responseId;
 }
 
 #-------------------------------------------------------------------
@@ -324,7 +324,7 @@ sub getSequentialQuestionIds {
 	my @usedQuestionIds = WebGUI::SQL->buildArray("select Survey_questionId from Survey_questionResponse where Survey_responseId=".$responseId);
 	my $where = " where Survey_id=".$self->get("Survey_id");
 	if ($#usedQuestionIds+1 > 0) {
-		$where = " and Survey_questionId not in (".join(",",@usedQuestionIds).")";
+		$where .= " and Survey_questionId not in (".join(",",@usedQuestionIds).")";
 	}
 	my @questions = WebGUI::SQL->buildArray("select Survey_questionId from Survey_question $where order by sequenceNumber");
 	return @questions;
@@ -742,7 +742,6 @@ sub www_editQuestionSave {
 	} elsif ($session{form}{proceed} eq "addBooleanAnswer") {
         	$_[0]->addAnswer(31,$session{form}{qid});
         	$_[0]->addAnswer(32,$session{form}{qid});
-                return $_[0]->www_editQuestion();
 	} elsif ($session{form}{proceed} eq "addOpinionAnswer") {
                 $_[0]->addAnswer(33,$session{form}{qid});
                 $_[0]->addAnswer(34,$session{form}{qid});
@@ -751,14 +750,12 @@ sub www_editQuestionSave {
                 $_[0]->addAnswer(37,$session{form}{qid});
                 $_[0]->addAnswer(38,$session{form}{qid});
                 $_[0]->addAnswer(39,$session{form}{qid});
-                return $_[0]->www_editQuestion();
 	} elsif ($session{form}{proceed} eq "addFrequencyAnswer") {
                 $_[0]->addAnswer(40,$session{form}{qid});
                 $_[0]->addAnswer(41,$session{form}{qid});
                 $_[0]->addAnswer(42,$session{form}{qid});
                 $_[0]->addAnswer(43,$session{form}{qid});
                 $_[0]->addAnswer(39,$session{form}{qid});
-                return $_[0]->www_editQuestion();
 	} elsif ($session{form}{proceed} eq "addQuestion") {
 		$session{form}{qid} eq "new";
                 return $_[0]->www_editQuestion();
@@ -886,7 +883,7 @@ sub www_view {
 		$var->{'user.isFirstResponse'} = ($var->{'response.Count'} == 0 && !(exists $var->{'response.id'}));
 		$var->{'user.canRespondAgain'} = ($var->{'response.Count'} < $self->get("maxResponsesPerUser"));
 		if (($var->{'user.isFirstResponse'}) || ($session{form}{startNew} && $var->{'user.canRespondAgain'})) {
-			$var->{'response.id'} = $self->generateResponseId;
+			$var->{'response.Id'} = $self->generateResponseId;
 		}
 		if ($var->{'response.Id'}) {
 			$var->{'questions.soFar.count'} = $self->getQuestionResponseCount($var->{'response.Id'});
