@@ -431,7 +431,7 @@ The name of the form variable to retrieve.
 
 =item type
 
-The type of form element this variable came from.
+The type of form element this variable came from. Defaults to "text" if not specified.
 
 =item default
 
@@ -444,6 +444,7 @@ The default value for this variable. If the variable is undefined then the defau
 sub process {
 	my ($name, $type, $default) = @_;
 	my $value;
+	$type = "text" if ($type eq "");
 	if (exists $session{form}{$name}) {
 		$value = &$type($name);
         } else {

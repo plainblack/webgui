@@ -19,6 +19,7 @@ use DBI;
 use strict qw(subs vars);
 use Tie::IxHash;
 use WebGUI::DateTime;
+use WebGUI::FormProcessor;
 use WebGUI::HTML;
 use WebGUI::HTMLForm;
 use WebGUI::Icon;
@@ -71,20 +72,6 @@ sub _getNextSequenceNumber {
 	my ($sequenceNumber);
 	($sequenceNumber) = WebGUI::SQL->quickArray("select max(sequenceNumber) from wobject where pageId='$_[0]'");
 	return ($sequenceNumber+1);
-}
-
-#-------------------------------------------------------------------
-sub _validateField {
-	my ($key, $type) = @_;
-	if ($type eq "date") {
-        	return WebGUI::DateTime::setToEpoch($session{form}{$key});
-        } elsif ($type eq "interval") {
-        	return (WebGUI::DateTime::intervalToSeconds($session{form}{$key."_interval"},$session{form}{$key."_units"}) || 0);
-        } elsif ($type eq "HTMLArea") {
-        	return WebGUI::HTML::cleanSegment($session{form}{$key});
-        } else {
-		return $session{form}{$key};
-	}
 }
 
 #-------------------------------------------------------------------
@@ -595,16 +582,33 @@ NOTE: It may seem a little weird that the initial data for the wobject instance 
 
 =item -extendedProperties
 
-An array reference containing a list of properties that extend the wobject class. This list should match the properties that are added to this wobject's namespace table in the database. So if this wobject has a namespace of "MyWobject" and a table definition that looks like this:
+A hash reference containing the properties that extend the wobject class. They should match the properties that are added to this wobject's namespace table in the database. So if this wobject has a namespace of "MyWobject" and a table definition that looks like this:
 
  create MyWobject (
 	wobjectId int not null primary key,
 	something varchar(25),
+	isCool int not null default 0,
 	foo int not null default 1,
-	bar int
+	bar text
  );
 
-Then the extended property list would be "[something, foo, bar]".
+Then the extended property list would be:
+ 	{
+ 		something=>{
+			fieldType=>"text"
+			},
+		isCool=>{
+			fieldType=>"yesNo",
+			defaultValue=>1
+			},
+		foo=>{
+			fieldType=>"integer",
+			defaultValue=>1
+			},
+		bar=>{
+			fieldType=>"textarea"
+			}
+ 	}
 
 NOTE: This is used to define the wobject and should only be passed in by a wobject subclass.
 
@@ -629,24 +633,39 @@ sub new {
 	} 
 	$useDiscussion = 0 unless ($useDiscussion);
 	my $wobjectProperties = {
-		userDefined1=>{},
-		userDefined2=>{}, 
-		userDefined3=>{}, 
-		userDefined4=>{}, 
-		userDefined5=>{}, 
+		userDefined1=>{
+			fieldType=>"text"
+		},
+		userDefined2=>{
+			fieldType=>"text"
+			}, 
+		userDefined3=>{
+			fieldType=>"text"
+			}, 
+		userDefined4=>{
+			fieldType=>"text"
+			}, 
+		userDefined5=>{
+			fieldType=>"text"
+			}, 
 		allowDiscussion=>{
+			fieldType=>"yesNo",
 			defaultValue=>0
 			},
 		moderationType=>{
+			fieldType=>"selectList",
 			defaultValue=>"after"
 			},
 		groupToModerate=>{
+			fieldType=>"group",
 			defaultValue=>4
 			}, 
 		groupToPost=>{
+			fieldType=>"group",
 			defaultValue=>2
 			},
  		karmaPerPost=>{
+			fieldType=>"integer",
 			defaultValue=>0
 			} ,
 		editTimeout=>{
@@ -654,22 +673,30 @@ sub new {
 			fieldType=>"interval"
 			}, 
 		filterPost=>{
+			fieldType=>"filter",
 			defaultValue=>"javascript",
 			}, 
 		addEditStampToPosts=>{
+			fieldType=>"yesNo",
 			defaultValue=>1,
 			},
-		title=>{}, 
+		title=>{
+			fieldType=>"text"
+			}, 
 		displayTitle=>{
+			fieldType=>"yesNo",
 			defaultValue=>1
 			}, 
 		description=>{
+			fieldType=>"textarea",
 			fieldType=>"HTMLArea"
 			},
  		pageId=>{
+			fieldType=>"integer",
 			defaultValue=>$session{page}{pageId}
 			}, 
 		templatePosition=>{
+			fieldType=>"selectList",
 			defaultValue=>1
 			}, 
 		startDate=>{
@@ -680,7 +707,9 @@ sub new {
 			defaultValue=>$session{page}{endDate},
 			fieldType=>"date"
 			},
-		sequenceNumber=>{}
+		sequenceNumber=>{
+			fieldType=>"integer"
+			}
 		};
         bless({
 		_property=>$properties, 
@@ -1316,19 +1345,19 @@ sub www_editSave {
 	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
 	my %set;
 	foreach my $key (keys %{$_[0]->{_wobjectProperties}}) {
-		if (exists $session{form}{$key}) {
-			$set{$key} = _validateField($key,$_[0]->{_wobjectProperties}{$key}{fieldType});
-		} elsif (exists $_[0]->{_wobjectProperties}{$key}{defaultValue}) {
-			$set{$key} = $_[0]->{_wobjectProperties}{$key}{defaultValue};
-		}
+		$set{$key} = WebGUI::FormProcessor::process(
+			$key,
+			$_[0]->{_wobjectProperties}{$key}{fieldType},
+			$_[0]->{_wobjectProperties}{$key}{defaultValue}
+			);
 	}
 	$set{title} = $session{form}{title} || $_[0]->name;
 	foreach my $key (keys %{$_[0]->{_extendedProperties}}) {
-		if (exists $session{form}{$key}) {	
-			$set{$key} = _validateField($key,$_[0]->{_extendedProperties}{$key}{fieldType});
-		} elsif (exists $_[0]->{_extendedProperties}{$key}{defaultValue}) {
-			$set{$key} = $_[0]->{_extendedProperties}{$key}{defaultValue};
-		}
+		$set{$key} = WebGUI::FormProcessor::process(
+			$key,
+			$_[0]->{_extendedProperties}{$key}{fieldType},
+			$_[0]->{_extendedProperties}{$key}{defaultValue}
+			);
 	}
 	%set = (%set, %{$_[1]});
 	$_[0]->set(\%set);
