@@ -120,6 +120,28 @@ sub countTemplatePositions {
 
 #-------------------------------------------------------------------
 
+=head2 deCache ( [ pageId ] )
+
+Deletes the cached version of a specified page.
+
+=over
+
+=item pageId
+
+The id of the page to decache. Defaults to the current page id.
+
+=back
+
+=cut
+
+sub deCache {
+	my $cache = WebGUI::Cache->new;
+	my $pageId = $_[0] || $session{page}{pageId};
+	$cache->deleteByRegex("m/^page_".$pageId."_\\d+\$/");
+}
+
+#-------------------------------------------------------------------
+
 =head2 drawTemplate ( templateId )
 
 Returns an HTML string containing a small representation of the page template.

@@ -32,7 +32,6 @@ our @EXPORT = qw(&www_viewPageTree &www_movePageUp &www_movePageDown
         &www_editPageSave &www_pastePage &www_moveTreePageUp 
         &www_moveTreePageDown &www_moveTreePageLeft &www_moveTreePageRight);
 
-#Method Added By Frank Dillon - Changes Wobject Privileges on a page
 #-------------------------------------------------------------------
 sub _changeWobjectPrivileges {
    my($wobject,$sth);
@@ -48,9 +47,7 @@ sub _changeWobjectPrivileges {
 sub _recursivelyChangePrivileges {
         my ($sth, $pageId);
         $sth = WebGUI::SQL->read("select pageId from page where parentId=$_[0]");
-		#--Added By Frank Dillon - Change the Wobject Privileges on the current page
-		_changeWobjectPrivileges($_[0]);
-		#--End Changes
+	_changeWobjectPrivileges($_[0]);
         while (($pageId) = $sth->array) {
 		if (WebGUI::Privilege::canEditPage($pageId)) {
         		WebGUI::SQL->write("update page set startDate=$session{form}{startDate}, 
@@ -343,6 +340,22 @@ sub www_editPage {
 			-value=>$page{defaultMetaTags},
 			-uiLevel=>5
 			);
+		my @data = WebGUI::DateTime::secondsToInterval($page{cacheTimeout});
+	        $f->getTab("properties")->interval(
+        	        -name=>"cacheTimeout",
+                	-label=>WebGUI::International::get(895),
+	                -intervalValue=>$data[0],
+        	        -unitsValue=>$data[1],
+			-uiLevel=>8
+                	);
+	        @data = WebGUI::DateTime::secondsToInterval($page{cacheTimeoutVisitor});
+        	$f->getTab("properties")->interval(
+                	-name=>"cacheTimeoutVisitor",
+	                -label=>WebGUI::International::get(896),
+        	        -intervalValue=>$data[0],
+                	-unitsValue=>$data[1],
+			-uiLevel=>8
+                	);
 		%hash = WebGUI::SQL->buildHash("select styleId,name from style where name<>'Reserved' order by name");
 		if (WebGUI::Privilege::isInGroup(5)) {
 			$subtext = ' &nbsp; <a href="'.WebGUI::URL::page('op=listStyles')
@@ -470,8 +483,6 @@ sub www_editPageSave {
         $session{form}{menuTitle} = $session{form}{title} if ($session{form}{menuTitle} eq "");
         $session{form}{urlizedTitle} = $session{form}{menuTitle} if ($session{form}{urlizedTitle} eq "");
 	$session{form}{urlizedTitle} = WebGUI::Page::makeUnique(WebGUI::URL::urlize($session{form}{urlizedTitle}),$session{form}{pageId});
-	$session{form}{startDate} = WebGUI::FormProcessor::dateTime("startDate");
-	$session{form}{endDate} = WebGUI::FormProcessor::dateTime("endDate");
         WebGUI::SQL->write("update page set 
 		title=".quote($session{form}{title}).", 
 		styleId=$session{form}{styleId}, 
@@ -480,8 +491,10 @@ sub www_editPageSave {
 		groupIdEdit=$session{form}{groupIdEdit}, 
 		newWindow=$session{form}{newWindow},
 		hideFromNavigation=$session{form}{hideFromNavigation},
-		startDate=$session{form}{startDate},
-		endDate=$session{form}{endDate},
+		startDate=".WebGUI::FormProcessor::dateTime("startDate").",
+		endDate=".WebGUI::FormProcessor::dateTime("endDate").",
+		cacheTimeout=".WebGUI::FormProcessor::interval("cacheTimeout").",
+		cacheTimeoutVisitor=".WebGUI::FormProcessor::interval("cacheTimeoutVisitor").",
 		metaTags=".quote($session{form}{metaTags}).", 
 		urlizedTitle='$session{form}{urlizedTitle}', 
 		redirectURL='$session{form}{redirectURL}', 

@@ -8,6 +8,13 @@ versions. Be sure to heed the warnings contained herein as they will
 save you many hours of grief.
 
 
+5.4.0
+--------------------------------------------------------------------
+ * Page caching has been moved to individual pages rather than a
+	global setting. As a result all pages have been defaulted
+	back to the original setting.
+
+
 5.3.2
 --------------------------------------------------------------------
  * On some systems the ^\; macro is not specified properly in the

@@ -277,11 +277,15 @@ sub page {
 		$content = WebGUI::Macro::process(WebGUI::Template::process(WebGUI::Style::get($pageEdit.WebGUI::Page::getTemplate($template)), $positions));
 		my $ttl;
 		if ($session{user}{userId} == 1) {
-			$ttl = $session{setting}{cachePagesVisitor};
+			$ttl = $session{page}{cacheTimeoutVisitor};
+			WebGUI::ErrorHandler::warn("setting visitor cache");
 		} else {
-			$ttl = $session{setting}{cachePages};
+			$ttl = $session{page}{cacheTimeout};
+			WebGUI::ErrorHandler::warn("setting user cache");
 		}
 		$cache->set($content, $ttl) if ($useCache);
+	} else {
+			WebGUI::ErrorHandler::warn("using cache");
 	}
 	$debug = _generateDebug();
 	WebGUI::Session::close();
