@@ -60,6 +60,10 @@ save you many hours of grief.
  * The setting "cachePages" has been removed from the config file. It
 	has been moved to the content settings page inside the UI.
 
+ * The setting "cacheInternational" has been removed from the config
+	file. The international messages are now automatically cached
+	if caching is available.
+
 
 5.1.0
 --------------------------------------------------------------------

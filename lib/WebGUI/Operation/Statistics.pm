@@ -11,10 +11,8 @@ package WebGUI::Operation::Statistics;
 #-------------------------------------------------------------------
 
 use Exporter;
-use HTTP::Request;
-use HTTP::Headers;
-use LWP::UserAgent;
 use strict;
+use WebGUI::Cache;
 use WebGUI::DateTime;
 use WebGUI::Icon;
 use WebGUI::International;
@@ -155,17 +153,14 @@ sub www_viewPageReport {
 #-------------------------------------------------------------------
 sub www_viewStatistics {
         return WebGUI::Privilege::adminOnly() unless (WebGUI::Privilege::isInGroup(3));
-        my ($output, $data, $header, $userAgent, $request, $response, $version, $referer);
-	$userAgent = new LWP::UserAgent;
-	$userAgent->agent("WebGUI-Check/2.0");
-	$userAgent->timeout(10);
-	$header = new HTTP::Headers;
-	$referer = "http://webgui.web.getversion/".$session{env}{SERVER_NAME}.$session{env}{REQUEST_URI};
-	chomp $referer;
-	$header->referer($referer);
-	$request = new HTTP::Request (GET => "http://www.plainblack.com/downloads/latest-version.txt", $header);
-	$response = $userAgent->request($request);
-	$version = $response->content;
+        my ($output, $data);
+	my $url = "http://www.plainblack.com/downloads/latest-version.txt";
+	my $cache = WebGUI::Cache->new($url,"URL");
+	my $version = $cache->get;
+	if (not defined $version) {
+		$cache->setByHTTP($url,43200);
+		$version = $cache->get;
+	}
 	chomp $version;
         $output .= helpIcon(12);
         $output .= '<h1>'.WebGUI::International::get(437).'</h1>';

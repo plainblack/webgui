@@ -15,13 +15,11 @@ package WebGUI::International;
 =cut
 
 
-#Test to see if Cache::FileCache will load.
-my $hasCache=1;
-eval " use Cache::FileCache; "; $hasCache=0 if $@;
-
 use strict;
+use WebGUI::Cache;
 use WebGUI::Session;
 use WebGUI::SQL;
+
 
 =head1 NAME
 
@@ -70,7 +68,6 @@ An integer that specifies the language that the user should see.  Defaults to th
 
 sub get {
         my ($output, $language, $namespace, $cache);
-	my $useCache = ($hasCache && $session{config}{cacheInternational});
 	if ($_[2] ne "") {
 		$language = $_[2];
 	} elsif ($session{user}{language} ne "") {
@@ -83,17 +80,15 @@ sub get {
 	} else {
 		$namespace = "WebGUI";
 	}
-	if ($useCache) {
-		$cache = new Cache::FileCache({'namespace'=>'International'});
-		$output = $cache->get($language."_".$namespace."_".$_[0]);
-	}
+	$cache = WebGUI::Cache->new($language."_".$namespace."_".$_[0],"International");
+	$output = $cache->get;
 	if (not defined $output) {
 		($output) = WebGUI::SQL->quickArray("select message from international 
 			where internationalId=$_[0] and namespace='$namespace' and languageId='$language'");
 		if ($output eq "" && $language ne 1) {
 			$output = get($_[0],$namespace,1);
 		}
-		$cache->set($language."_".$namespace."_".$_[0], $output, $session{config}{cacheInternational}) if ($useCache);
+		$cache->set($output, 3600);
 	}
 	return $output;
 }

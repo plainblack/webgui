@@ -19,6 +19,7 @@ package WebGUI::Cache;
 my $hasCache=1;
 eval " use Cache::FileCache; "; $hasCache=0 if $@;
 
+use HTTP::Headers;
 use HTTP::Request;
 use LWP::UserAgent;
 use WebGUI::Session;
@@ -69,6 +70,35 @@ sub delete {
 
 #-------------------------------------------------------------------
 
+=head2 deleteByRegex ( regex )
+
+Remove content from the filesystem cache where the key meets the condition of the regular expression.
+
+=over
+
+=item regex
+
+A regular expression that will match keys in the current namespace. Example: m/^navigation_.*/
+
+=back
+
+=cut
+
+sub deleteByRegex {
+        if (_canCache()) {
+		my @keys = $_[0]->{_cache}->get_keys();
+		foreach my $key (@keys) {
+			if ($key =~ $_[1]) {
+                		$_[0]->{_cache}->remove($key);
+			}
+		}
+        } else {
+                $_[0]->{_cache} = "";
+        }
+}
+
+#-------------------------------------------------------------------
+
 =head2 get ( )
 
 Retrieve content from the filesystem cache.
@@ -99,7 +129,7 @@ A key unique to this namespace. It is used to uniquely identify the cached conte
 
 =item namespace
 
-Defaults to the database DSN for your WebGUI database. The only reason to override the default is if you want the cached content to be shared among all WebGUI instances on this machine.
+Defaults to the config filename for the current site. The only reason to override the default is if you want the cached content to be shared among all WebGUI instances on this machine. A common alternative namespace is "URL", which is typically used when caching content using the setByHTTP method.
 
 =back
 
@@ -109,8 +139,8 @@ sub new {
 	my $cache;
 	my $class = shift;
 	my $key = shift;
-	my $namespace = shift || $session{config}{dsn};
-	$cache = new Cache::FileCache({'namespace'=>$namespace}) if (_canCache());
+	my $namespace = shift || $session{config}{configFile};
+	$cache = new Cache::FileCache({namespace=>$namespace, auto_purge_on_set=>1}) if (_canCache());
 	bless {_cache => $cache, _key => $key}, $class;
 }
 
@@ -167,7 +197,11 @@ sub setByHTTP {
 	my $userAgent = new LWP::UserAgent;
         $userAgent->agent("WebGUI/".$WebGUI::VERSION);
         $userAgent->timeout(30);
-        my $request = new HTTP::Request (GET => $_[1]);
+	my $header = new HTTP::Headers;
+        my $referer = "http://webgui.http.request/".$session{env}{SERVER_NAME}.$session{env}{REQUEST_URI};
+        chomp $referer;
+        $header->referer($referer);
+        my $request = new HTTP::Request (GET => $_[1], $header);
         my $response = $userAgent->request($request);
 	$_[0]->set($response->content,$_[2]);
 }
