@@ -17,7 +17,7 @@ our $I18N = {
 	'properties' => {
 		message => q|Properties|,
 		lastUpdated => 1099344172,
-		context => q|The name of the properties tab on the edit page.|
+		context => q|The name of the properties tab on the edit asset.|
 	},
 	
 	'make package' => {
@@ -281,7 +281,7 @@ It is advisable to use only letters (a-z), numbers (0-9) or underscores (_) for
 the field names.
 <p><b>Description<br>
 </b>An optional description for this metadata property. This text is displayed
-as mouseover text in the wobject properties tab.</p>
+as mouseover text in the asset properties tab.</p>
 <p><b>Data Type<br>
 </b>Choose the type of form element for this field.<b><br>
 <br>
@@ -305,7 +305,7 @@ information about the content, and is defined in terms of property-value pairs.<
 <p>In the example <b>source: newspaper</b>, this metadata has a <i>property</i> named
 <i>source</i> with a <i>value</i> of <i>newspaper</i>.</p>
 <p>Metadata properties are defined globally, while Metadata values are set for
-each wobject under the tab &quot;Metadata&quot; in the wobject properties.</p>
+each asset under the tab &quot;Meta&quot; in the asset properties.</p>
 <p>Before you can use metadata in WebGUI, you'll have to switch the &quot;Enable Metadata
 ?&quot; setting to Yes in the Manage Settings menu.</p>
 <p>Usage of metadata:</p>
@@ -330,9 +330,15 @@ each wobject under the tab &quot;Metadata&quot; in the wobject properties.</p>
     You can use the AOI macro's described above in the criteria, so you can
     present content based upon the users Areas of Interest. Example:<br>
     type = &#94;AOIRank(contenttype);</p></li>
+	<li><p><b>Display</b><br />
+	Metadata fields are exposed to the asset templates as their property name. So you can actually display the metadata
+	to the rendered page using a template variable like &lt;tmpl_var <i>propertyname</i>&gt;</p></li>
+	<li><p><b>Meta tags</b><br />
+	Since the meta data is exposed as template variables, you can use that in combination with the &#94;RawHeadTags();
+	macro to create meta tags from meta data, including the tags from the Dublin Core standard.</p></li>
 </ul>|,
                 context => q|Metadata help|,
-                lastUpdated => 1099530955
+                lastUpdated => 1110530955
         },
 
 	'Metadata, Edit property' => {

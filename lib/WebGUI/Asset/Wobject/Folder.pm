@@ -64,7 +64,7 @@ sub definition {
                 properties=>{
 			templateId =>{
 				fieldType=>"template",
-				defaultValue=>'PBtmpl0000000000000054'
+				defaultValue=>'PBtmpl0000000000000078'
 				}
                         }
                 });

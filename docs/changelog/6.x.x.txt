@@ -24,6 +24,10 @@
  - fix [ 1171110 ] nav ancestor
  - fix [ 1171574 ] purgeList doesn't purgeList
  - fix [ 1170244 ] cs notification
+ - fix [ 1171616 ] default templateId for Folder is wrong
+ - fix [ 1170269 ] 6.2.11->6.3.0 fails if any product-related/accessories
+   exist
+ - fix [ 1170426 ] missing entries and wrong descriptions in webgui help
 
 
 6.5.4 

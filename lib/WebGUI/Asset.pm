@@ -814,7 +814,7 @@ sub getAssetManagerControl {
 	$output .= "manager.assetType='".$controlType."';\n" if (defined $controlType);
 	$output .= "manager.disableDisplay(0);\n" if (defined $removeRank);
 	if ($controlType eq "ManageTrash" || $controlType eq "ManageClipboard") {
-	#	$output .= "manager.displayCrumbTrail = false;\n";
+		#$output .= "manager.displayCrumbTrail = false;\n";
 	#	$output .= "manager.sortEnabled = false;\n";
 	}
 	$output .= "manager.renderAssets();\n";
