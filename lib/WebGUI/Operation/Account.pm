@@ -259,7 +259,7 @@ sub www_deactivateAccountConfirm {
 	my ($u);
         if ($session{user}{userId} < 26) {
                 return WebGUI::Privilege::vitalComponent();
-        } elsif (($session{user}{userId} != 1) and $session{setting}{selfDeactivation}) {
+        } elsif ($session{setting}{selfDeactivation}) {
 		$u = WebGUI::User->new($session{user}{userId});
 		$u->status("Selfdestructed");
 	        WebGUI::Session::end($session{var}{sessionId});
@@ -302,7 +302,7 @@ sub www_displayAccount {
 #-------------------------------------------------------------------
 sub www_displayLogin {
 	my ($output, $f);
-	if ($session{var}{sessionId}) {
+	if ($session{user}{userId} != 1) {
 		$output .= www_displayAccount();
 	} else {
         	$output .= '<h1>'.WebGUI::International::get(66).'</h1>';
@@ -431,7 +431,7 @@ sub www_login {
 	}
 
 	if ($success == 1) {
-		WebGUI::Session::start($uid);
+		WebGUI::Session::convertVisitorToUser($session{var}{sessionId},$uid);
 		$u->karma($session{setting}{karmaPerLogin},"Login","Just for logging in.") if ($session{setting}{useKarma});
                 _logLogin($uid,"success");
 		return "";
@@ -450,7 +450,7 @@ sub www_logout {
 #-------------------------------------------------------------------
 sub www_recoverPassword {
 	my ($output, $f);
-        if ($session{var}{sessionId}) {
+        if ($session{user}{userId} != 1) {
                 $output .= www_displayAccount();
         } else {
                 $output .= '<h1>'.WebGUI::International::get(71).'</h1>';
@@ -506,7 +506,7 @@ sub www_recoverPasswordFinish {
 #-------------------------------------------------------------------
 sub www_updateAccount {
         my ($output, $error, $encryptedPassword, $passwordStatement, $u);
-        if ($session{var}{sessionId}) {
+        if ($session{user}{userId} != 1) {
         	if ($session{form}{identifier1} ne "password") {
 			$error = _hasBadPassword($session{form}{identifier1},$session{form}{identifier2});
         		unless ($error) {

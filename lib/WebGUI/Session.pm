@@ -209,6 +209,13 @@ sub close {
 }
 
 #-------------------------------------------------------------------
+sub convertVisitorToUser {
+	WebGUI::SQL->write("update userSession set userId=$_[1] where sessionId=".quote($_[0]));
+	$session{var}{userId} = $_[1];
+	refreshUserInfo($_[1]);
+}
+
+#-------------------------------------------------------------------
 sub end {
 	WebGUI::SQL->write("delete from userSession where sessionId='$_[0]'",$session{dbh});
 	WebGUI::SQL->write("delete from userSessionScratch where sessionId='$_[0]'",$session{dbh});
@@ -319,7 +326,11 @@ sub open {
 	}
 	###----------------------------
 	### session variables 
-	_setupSessionVars($session{cookie}{wgSession},$session{setting}{sessionTimeout});
+	if ($session{cookie}{wgSession} eq "") {
+		start(1); #setting up a visitor session
+	} else {
+		_setupSessionVars($session{cookie}{wgSession},$session{setting}{sessionTimeout});
+	}
 	###----------------------------
 	### current user's account and profile information (from users and userProfileData tables)
 	_setupUserInfo($session{var}{userId});
@@ -403,8 +414,7 @@ sub start {
 	my ($sessionId);
 	$sessionId = _generateSessionId();
 	WebGUI::SQL->write("insert into userSession values ('$sessionId', ".
-		(time()+$session{setting}{sessionTimeout}).", ".
-		time().", 0, '$ENV{REMOTE_ADDR}', $_[0])",$session{dbh});
+		(time()+$session{setting}{sessionTimeout}).", ".time().", 0, '$ENV{REMOTE_ADDR}', $_[0])");
 	setCookie("wgSession",$sessionId);
 	refreshSessionVars($sessionId);
 }
