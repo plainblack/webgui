@@ -623,7 +623,12 @@ A conditional indicating whether this field exists for the mail subsystem of the
 	'Field Position' => {
 		message =>q|Field Position|,
 		lastUpdated=>1095701013
-	}
+	},
+	'Delete entry confirmation' => {
+                message => q|Are you certain that you wish to delete this data entry?|,
+                lastUpdated => 1095701013 
+        },
+
 };
 
 1;

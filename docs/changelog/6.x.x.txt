@@ -1,4 +1,6 @@
 6.3.0
+ - Added a "Position" property to the DataForm Edit Field interface. This makes it easier to move a field to a certain position.
+ - Added the variables "record.edit.icon", "record.delete.url" and "record.delete.icon" to the DataForm DataList template.
  - Converted all confirmation pages to client-side confirmation dialogs. Saves
    a pageload. (Len Kranendonk).
  - Added a new, more user-friendly administrative console.

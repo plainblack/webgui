@@ -246,6 +246,9 @@ sub getListTemplateVars {
 		push(@recordLoop,{
 			"record.ipAddress"=>$record->{ipAddress},
 			"record.edit.url"=>WebGUI::URL::page("func=view&entryId=".$record->{DataForm_entryId}."&wid=".$self->get("wobjectId")),
+			"record.edit.icon"=>editIcon(WebGUI::URL::page("func=view&entryId=".$record->{DataForm_entryId}."&wid=".$self->get("wobjectId"))),
+			"record.delete.url"=>WebGUI::URL::page("func=deleteEntry&entryId=".$record->{DataForm_entryId}."&wid=".$self->get("wobjectId")),
+			"record.delete.icon"=>deleteIcon(WebGUI::URL::page("func=deleteEntry&entryId=".$record->{DataForm_entryId}."&wid=".$self->get("wobjectId")),'',WebGUI::International::get('Delete entry confirmation',$self->get('namespace'))),
 			"record.username"=>$record->{username},
 			"record.userId"=>$record->{userId},
 			"record.submissionDate.epoch"=>$record->{submissionDate},
