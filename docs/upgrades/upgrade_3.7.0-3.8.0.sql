@@ -68,6 +68,10 @@ delete from widget where namespace='MessageBoard';
 alter table MessageBoard change widgetId wobjectId int not null;
 alter table discussion change widgetId wobjectId int not null;
 
+insert into wobject (wobjectId, pageId, title, displayTitle, processMacros, description, dateAdded, addedBy, namespace, lastEdited, editedBy, templatePosition, sequenceNumber, startDate, endDate) select widgetId, pageId, title, displayTitle, processMacros, description, dateAdded, addedBy, namespace, lastEdited, editedBy, templatePosition, sequenceNumber, dateAdded, 1336444487 from widget where namespace='ExtraColumn';
+delete from widget where namespace='ExtraColumn';
+alter table ExtraColumn change widgetId wobjectId int not null;
+
 
 
 delete from international where language='Svenska';
