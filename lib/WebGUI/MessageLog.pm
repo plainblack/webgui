@@ -195,7 +195,7 @@ sub addInternationalizedEntry {
         $namespace = $_[4] || "WebGUI";
 	$status = $_[5] || 'notice';
 	my $languages = WebGUI::International::getLanguages();
-	foreach my $language (keys $languages) {
+	foreach my $language (keys %{$languages}) {
 		$message{$language} = WebGUI::International::get($internationalId,$namespace,$language);
 		$subject{$language} = WebGUI::International::get(523,"WebGUI",$language);
 	}
