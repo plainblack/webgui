@@ -107,7 +107,7 @@ sub classSettings {
 		metaTags        	=> { quote => 1 },
 		urlizedTitle    	=> { quote => 1 },
 		redirectURL		=> { quote => 1 },
-		languageId   		=> { defaultValue => 1 },
+		languageId   		=> { defaultValue => "English", quote=>1 },
 		defaultMetaTags 	=> { defaultValue => 0 },
 		templateId		=> { defaultValue => 1 },
 		menuTitle    		=> { quote => 1 },
