@@ -44,6 +44,7 @@ Contributing Translators.............AGOFER Ltda.
                                      Bart Jol / ProcoliX
                                      Mattias Kunkel / WERU AG
                                      Nils-Magne Kvammen
+                                     Nuspace Pty Ltd
                                      Andreas Ljunggren
                                      Ricardo Markiewicz
                                      Ryan McCombs
