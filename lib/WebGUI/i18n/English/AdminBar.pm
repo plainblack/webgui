@@ -15,7 +15,7 @@ our $I18N = {
 Places the administrative tool bar on the page. Omitting this macro will prevent you from adding content, pasting
 content from the clipboard, accessing the help system and other administrative functions.
 <p>
-The macro takes up to one optional argument, an alternate template in the Macro/AdminBar namespace for generating the AdminBar.  The following variables are available in the template:
+The macro may take one optional argument, an alternate template in the Macro/AdminBar namespace for generating the AdminBar.  The following variables are available in the template:
 
 <p/>
 <b>packages.label</b><br/>
@@ -94,7 +94,7 @@ The URL for executing this admin function.
 <p/>
  The <i>.adminBar</i> style sheet class is tied to the default template for this macro.
 |,
-		lastUpdated => 1112374920,
+		lastUpdated => 1112583521,
 	},
 };
 

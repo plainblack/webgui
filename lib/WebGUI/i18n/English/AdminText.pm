@@ -10,12 +10,12 @@ our $I18N = {
 	'admin text body' => {
 		message => q|
 
-<b>&#94;AdminText();</b><br>
+<b>&#94;AdminText(<i>text message</i>);</b><br>
 Displays a small text message to a user who is in admin mode. Example: &#94;AdminText("You are in admin mode!");
 <p>
 
 |,
-		lastUpdated => 1112466919,
+		lastUpdated => 1112583570,
 	},
 };
 

@@ -10,6 +10,10 @@ our $HELP = {
 				tag => 'macros using',
 				namespace => 'Macros'
 			},
+			{
+				tag => 'shortcut add/edit',
+				namespace => 'Shortcut'
+			},
 		]
 	},
 

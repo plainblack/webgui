@@ -10,6 +10,10 @@ our $HELP = {
 				tag => 'macros using',
 				namespace => 'Macros'
 			},
+			{
+				tag => 'metadata manage',
+				namespace => 'Asset'
+			},
 		]
 	},
 

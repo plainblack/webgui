@@ -18,7 +18,9 @@ our $HELP = {
         'macros list' => {
 		title => 'macros list title',
 		body => 'macros list body',
-		related => [ map {
+		related => [ 
+                             sort { $a->{tag} cmp $b->{tag} }
+                             map {
                                  $tag = $_;
                                  $tag =~ s/^[a-zA-Z]+_//;           #Remove initial shortcuts
 				 $tag =~ s/([A-Z]+(?![a-z]))/$1 /g; #Separate acronyms
@@ -27,7 +29,7 @@ our $HELP = {
 				 { tag => $tag,
 				   namespace => $_ }
 			     }
-		             sort values %{ $session{config}{macros} }
+		             values %{ $session{config}{macros} }
 			   ],
         },
 

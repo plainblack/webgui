@@ -7,7 +7,7 @@ our $I18N = {
 	},
 
 	'macros list body' => {
-                message => q|<P>These Macros are available for use on your site.  The set of available Macros is defined in the WebGUI configuration file:</P>|,
+                message => q|<P>The set of available Macros is defined in the WebGUI configuration file.  These Macros are available for use on your site:</P>|,
 		context => 'Content for dynamically generated macro list',
 		lastUpdated => 1112560683,
 	},
