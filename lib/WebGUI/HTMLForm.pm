@@ -178,7 +178,7 @@ sub checkbox {
 
 #-------------------------------------------------------------------
 
-=head2 checkList ( name, options [ label, value, vertical, extras, subtext, uiLevel ] )
+=head2 checkList ( name, options [ , label, value, vertical, extras, subtext, uiLevel ] )
 
 Adds a checkbox list row to this form.
 
@@ -249,7 +249,7 @@ sub checkList {
 
 #-------------------------------------------------------------------
 
-=head2 combo ( name, options [ label, value, size, multiple, extras, subtext, uiLevel ] )
+=head2 combo ( name, options, [ label, value, size, multiple, extras, subtext, uiLevel ] )
 
 Adds a combination select list / text box row to this form. If the text box is filled out it will have a value stored in "name"_new where name is the first field passed into this method.
 
@@ -1204,7 +1204,7 @@ sub radio {
 
 #-------------------------------------------------------------------
 
-=head2 radioList ( name, options [ label, value, vertical, extras, subtext, uiLevel ] )
+=head2 radioList ( name, options, [ label, value, vertical, extras, subtext, uiLevel ] )
 
 Adds a radio button list row to this form.
 
