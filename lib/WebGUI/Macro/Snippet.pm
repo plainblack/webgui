@@ -18,10 +18,13 @@ use WebGUI::Session;
 
 #-------------------------------------------------------------------
 sub process {
-	my (@param, $temp);
-        @param = WebGUI::Macro::getParams($_[0]);
+        my @param = WebGUI::Macro::getParams($_[0]);
 	if (my $collateral = WebGUI::Collateral->find($param[0])) {
-	        return $collateral->get("parameters");
+		my $temp = $collateral->get("parameters");
+               	for my $i ( 1 .. $#param ) {
+                 	$temp =~ s/\^$i\;/$param[$i]/g;
+                }
+        	return $temp;
         } else {
                 return undef;
         }

@@ -31,6 +31,7 @@ use WebGUI::ErrorHandler;
 use WebGUI::HTTP;
 use WebGUI::Node;
 use WebGUI::Session;
+use Template;
 use WebGUI::URL;
 use WebGUI::Utility;
 
@@ -83,20 +84,25 @@ These methods are available from this class:
 
 =head2 box ( )
 
-Displays the attachment in WebGUI's standard "Attachment Box".
+Displays the attachment box template.
+
+Template-Variables:
+ attachment.icon
+ attachment.url
+ attachment.name
+ attachment.size
+ attachment.type
 
 =cut
 
 sub box {
-        my ($output);
-        $output = '<p><table cellpadding=3 cellspacing=0 border=1><tr><td class="tableHeader">'.
-                '<a href="'.$_[0]->getURL.'"><img src="'.$session{config}{extrasURL}.
-                '/attachment.gif" border=0 alt="'.
-                $_[0]->getFilename.'"></a></td><td><a href="'.$_[0]->getURL.
-                '"><img src="'.$_[0]->getIcon.
-                '" align="middle" width="16" height="16" border="0" alt="'.$_[0]->getFilename
-                .'">'.$_[0]->getFilename.'</a></td></tr></table>';
-        return $output;
+	my %var;
+       	$var{"attachment.icon"} = $_[0]->getIcon;
+       	$var{"attachment.url"} = $_[0]->getURL;
+       	$var{"attachment.name"} = $_[0]->getFilename;
+       	$var{"attachment.size"} = $_[0]->getSize;
+       	$var{"attachment.type"} = $_[0]->getType;
+       	return WebGUI::Template::process(1,"AttachmentBox",\%var);
 }
 
 #-------------------------------------------------------------------

@@ -15,5 +15,6 @@ INSERT INTO template VALUES (1,'Default Group Delete Macro','<a href="<tmpl_var 
 INSERT INTO template VALUES (1,'Default Homelink','<a class="homeLink" href="<tmpl_var homeLink.url>"><tmpl_var homeLink.text></a>','Macro/H_homeLink',1,1);
 INSERT INTO template VALUES (1,'Default Make Printable','<a class="makePrintableLink" href="<tmpl_var printable.url>"><tmpl_var printable.text></a>','Macro/r_printable',1,1);
 INSERT INTO template VALUES (1,'Default LoginToggle','<a class="loginToggleLink" href="<tmpl_var toggle.url>"><tmpl_var toggle.text></a>','Macro/LoginToggle',1,1);
-
+INSERT INTO template VALUES (1, 'Attachment Box', '<p>\r\n  <table cellpadding=3 cellspacing=0 border=1>\r\n  <tr>   \r\n    <td class="tableHeader">\r\n<a href="<tmpl_var attachment.url>"><img src="<tmpl_var session.config.extrasURL>/attachment.gif" border="0" alt="<tmpl_var attachment.name>"></a></td><td>\r\n<a href="<tmpl_var attachment.url>"><img src="<tmpl_var attachment.icon>" align="middle" width="16" height="16" border="0" alt="<tmpl_var attachment.name>"><tmpl_var attachment.name></a>\r\n    </td>\r\n  </tr>\r\n  </table>\r\n</p>\r\n', 'AttachmentBox', 1, 1);
+ 
 

@@ -83,6 +83,9 @@
  - bugfix [ 977201 ] ws client bug
  - bugfix [ 969740 ] Messageboard: Deleting of postings
  - Added an option to sort a select list by its values. Thanks to Roy Johnson.
+ - RFE [ 960747 ] Make the attachment box templated. Thanks to Flavio Curti.
+ - Snippets can now take up to 9 optional parameters as replacements similar
+   to the SQL macro. Thanks to Andreas Ljunggren.
 
 
 6.0.3

@@ -4637,7 +4637,7 @@ A comment.
 <p/>
 
 <b>&#94;a; or &#94;a(); - My Account Link</b><br>
-A link to your account information. In addition you can change the link text by creating a macro like this <b>&#94;a("Account Info");</b>. 
+A link to your account information. In addition you can change the link text by creating a macro like this <b>&#94;a("Account Info");</b>.  If you specify "linkonly" in the first parameter then only the URL will be returned. Also, you can specify the name of a template in the Macro/a_account namespace as the second parameter to override the default template.
 <p>
 
 <b>NOTES:</b> You can also use the special case &#94;a(linkonly); to return only the URL to the account page and nothing more. Also, the .myAccountLink style sheet class is tied to this macro.
@@ -4649,7 +4649,7 @@ Displays a small text message to a user who is in admin mode. Example: &#94;Admi
 <p>
 
 <b>&#94;AdminToggle; or &#94;AdminToggle();</b><br>
-Places a link on the page which is only visible to content managers and adminstrators. The link toggles on/off admin mode. You can optionally specify other messages to display like this: &#94;AdminToggle("Edit On","Edit Off");
+Places a link on the page which is only visible to content managers and adminstrators. The link toggles on/off admin mode. You can optionally specify other messages to display like this: &#94;AdminToggle("Edit On","Edit Off"); This macro optionally takes a third parameter that allows you to specify an alternate template name in the Macro/AdminToggle namespace.
 <p>
 
 <b>&#94;CanEditText();</b><br>
@@ -4659,18 +4659,18 @@ Display a message to a user that can edit the current page.
 <p>
 
 <b>&#94;EditableToggle; or &#94;EditableToggle();</b><br>
-Exactly the same as AdminToggle, except that the toggle is only displayed if the user has the rights to edit the current page.
+Exactly the same as AdminToggle, except that the toggle is only displayed if the user has the rights to edit the current page. This macro takes up to three parameters. The first is a labe for "Turn Admin On", the second is a label for "Turn Admin Off", and the third is the name of a template in the Macro/EditableToggle namespace to replace the default template.
 <p>
 
 <b>&#94;GroupAdd();</b><br>
-Using this macro you can allow users to add themselves to a group. The first parameter is the name of the group this user should be added to. The second parameter is a text string for the user to click on to add themselves to this group.
+Using this macro you can allow users to add themselves to a group. The first parameter is the name of the group this user should be added to. The second parameter is a text string for the user to click on to add themselves to this group. The third parameter allows you to specify the name of a template in the Macro/GroupAdd namespace to replace the default template.
 <p>
 <b>NOTE:</b> If the user is not logged in, or or already belongs to the group, or the group is not set to allow auto adds, then no link will be displayed.
 <p>
 
 
 <b>&#94;GroupDelete();</b><br>
-Using this macro you can allow users to delete themselves from a group. The first parameter is the name of the group this user should be deleted from. The second parameter is a text string for the user to click on to delete themselves from this group.
+Using this macro you can allow users to delete themselves from a group. The first parameter is the name of the group this user should be deleted from. The second parameter is a text string for the user to click on to delete themselves from this group. The third parameter allows you to specify the name of a template in the Macro/GroupDelete namespace to replace the default template.
 <p>
 <b>NOTE:</b> If the user is not logged in or the user does not belong to the group, or the group is not set to allow auto deletes, then no link will be displayed.
 <p>
@@ -4702,7 +4702,7 @@ The user id of the currently logged in user.
 <p>
 
 |,
-		lastUpdated => 1053779917
+		lastUpdated => 1089730066
 	},
 
 	'841' => {
@@ -5776,7 +5776,7 @@ Using parameters<br>
 
 
 <b>&#94;Snippet();</b><br/>
-This macro retrieves the contents of a snippet in the collateral management system and inserts it into the page.
+This macro retrieves the contents of a snippet in the collateral management system and inserts it into the page. You can optionally specify up to 9 additional parameters that will be replace these special characters in the snippet: ^1; ^2; ^3; ^4; ^5; ^6; ^7; ^8; ^9;
 <p />
 <i>Example:</i> &#94;Snippet("flash code");
 <p />
@@ -5794,7 +5794,7 @@ This macro builds a quick image viewer using nothing more than the collateral ma
 <p/>
 
 |,
-		lastUpdated => 1051221379
+		lastUpdated => 1089730066
 	},
 
 	'930' => {
@@ -6956,7 +6956,7 @@ The description of this forum as passed by the calling object.
 	'842' => {
 		message => q|<P>These macros are used to create navigation on the site. </P>
 <P><B>^H; or ^H(); - Home Link</B><BR>A link to the home page of this site. In addition you can change the link text by creating a macro like this <B>^H("Go Home");</B>. 
-<P><B>NOTES:</B> You can also use the special case ^H(linkonly); to return only the URL to the home page and nothing more. Also, the .homeLink style sheet class is tied to this macro. </P>
+<P><B>NOTES:</B> You can also use the special case ^H(linkonly); to return only the URL to the home page and nothing more. Also, the .homeLink style sheet class is tied to this macro. And you can specify a second parameter that with the name of a template in the Macro/H_homeLink namespace that will override the default template. </P>
 <P><B>^/; - System URL</B><BR>The URL to the gateway script (example: <I>/index.pl/</I>). 
 <P><B>^\; - Page URL</B><BR>The URL to the current page (example: <I>/index.pl/pagename</I>). 
 <P><STRONG>^Navigation(crumbTrail);<BR></STRONG>A dynamically generated crumb trail to the current page.
@@ -6985,7 +6985,7 @@ The description of this forum as passed by the calling object.
 <P><B>.selectedMenuItem</B><BR>Use this class to highlight the current page in any of the menu macros. 
 <P><B>.verticalMenu </B><BR>The vertical menu (if you use a vertical menu macro). 
 <P><B>.horizontalMenu </B><BR>The horizontal menu (if you use a horizontal menu macro). </P>|,
-		lastUpdated => 1078477366
+		lastUpdated => 1089730066
 	},
 
 	'1073' => {
