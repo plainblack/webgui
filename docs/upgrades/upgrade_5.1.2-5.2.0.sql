@@ -58,6 +58,11 @@ INSERT INTO international VALUES (4,'HttpProxy',2,'Timeout (Sekunden)',104039557
 INSERT INTO international VALUES (3,'HttpProxy',2,'HTTP Proxy',1040395372);
 INSERT INTO international VALUES (2,'HttpProxy',2,'HTTP Proxy ändern',1040395360);
 INSERT INTO international VALUES (1,'HttpProxy',2,'URL',1040395344);
+alter table wobject add column filterPost varchar(30) not null default 'javascript';
+delete from settings where name='filterContributedHTML';
+update international set namespace='Discussion' where internationalId=524 and namespace='WebGUI';
+alter table wobject add column addEditStampToPosts int not null default 1;
+
 
 
 

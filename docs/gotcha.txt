@@ -49,6 +49,11 @@ save you many hours of grief.
 	significantly. Macros written for versions prior to 5.2.0
 	are not compatible with this version or after.
 
+ * All discussions and user submission systems now have a property
+	for filtering content. This filter has been set to remove
+	javascript and macros, but you may wish to set these to one
+	of the other options.
+
 
 5.1.0
 --------------------------------------------------------------------

@@ -16,6 +16,7 @@ package WebGUI::HTML;
 
 use HTML::TagFilter;
 use strict;
+use WebGUI::Macro;
 use WebGUI::Session;
 
 =head1 NAME
@@ -84,7 +85,7 @@ The HTML content you want filtered.
 
 =item filter
 
-Choose from all, none, javascript, or most. Defaults to most.  All removes all HTML tags; none removes no HTML tags; javascript removes all references to javacript; and most removes all but simple formatting tags like bold and italics.
+Choose from "all", "none", "macros", "javascript", or "most". Defaults to "most". "all" removes all HTML tags and macros; "none" removes no HTML tags; "javascript" removes all references to javacript and macros; "macros" removes all macros, but nothing else; and "most" removes all but simple formatting tags like bold and italics.
 
 =back
 
@@ -92,10 +93,11 @@ Choose from all, none, javascript, or most. Defaults to most.  All removes all H
 
 sub filter {
 	my ($filter, $html, $type);
-	$type = $_[1] || $session{setting}{filterContributedHTML};
+	$type = $_[1];
 	if ($type eq "all") {
 		$filter = HTML::TagFilter->new(allow=>{'none'},strip_comments=>1);
 		$html = $filter->filter($_[0]);
+		return WebGUI::Macro::filter($html);
 	} elsif ($type eq "javascript") {
 		$html = $_[0];
 		$html =~ s/\<script.*?\/script\>//ixsg;
@@ -113,15 +115,17 @@ sub filter {
 		$html =~ s/onKeyDown/removed/ixsg;
 		$html =~ s/onSubmit/removed/ixsg;
 		$html =~ s/onReset/removed/ixsg;
+		$html = WebGUI::Macro::filter($html);
+	} elsif ($type eq "macros") {
+		return WebGUI::Macro::filter($_[0]);
 	} elsif ($type eq "none") {
-		$html = $_[0];
+		return $_[0];
 	} else {
 		$filter = HTML::TagFilter->new; # defaultly strips almost everything
 		$html = $filter->filter($_[0]);
+		return WebGUI::Macro::filter($html);
 	}
-	return $html;
 }
-
 
 
 

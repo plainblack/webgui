@@ -210,8 +210,7 @@ sub formatHeader {
 #-------------------------------------------------------------------
 sub formatMessage {
         my $output;
-	$output = $_[0];
-	$output = WebGUI::HTML::filter($output);
+	$output = WebGUI::HTML::filter($_[0],$_[1]);
 	unless ($output =~ /\<div\>/ig || $output =~ /\<br\>/ig || $output =~ /\<p\>/ig) {
 		$output =~ s/\n/\<br\>/g;
 	}
@@ -244,7 +243,7 @@ sub post {
 		%message = getMessage($session{form}{replyTo});
 		$footer = formatHeader($message{subject},$message{userId},$message{username},$message{dateOfPost},$message{views},
 			'',$message{status})
-			.'<p>'.formatMessage($message{message});
+			.'<p>'.formatMessage($message{message},$_[0]->get("filterPost"));
 		$message{message} = $signature;
 		$message{subject} = "Re: ".$message{subject} unless ($message{subject} =~ /^Re:/);
 		$session{form}{mid} = "new";
@@ -278,7 +277,7 @@ sub post {
 		%message = getMessage($session{form}{mid});
 		$footer = formatHeader($message{subject},$message{userId},$message{username},$message{dateOfPost},$message{views},
 			'',$message{status})
-			.'<p>'.formatMessage($message{message});
+			.'<p>'.formatMessage($message{message},$_[0]->get("filterPost"));
 	}
        	$f->hidden("func","postSave");
         $f->hidden("wid",$session{form}{wid});
@@ -347,7 +346,7 @@ sub postSave {
 		if ($session{form}{subscribe}) {
          	       subscribeToThread($session{user}{userId},$rid);
         	}
-	} elsif ($session{setting}{addEditStampToPosts}) {
+	} elsif ($_[0]->get("addEditStampToPosts")) {
 		$session{form}{message} = "\n --- (Edited at ".epochToHuman(time())." by $session{user}{username}) --- \n\n"
 			.$session{form}{message};
 	}
@@ -490,7 +489,7 @@ sub showMessage {
                 	.WebGUI::International::get(364).'</a><br>';
 		$html .= $_[0];
                 $html .= '</tr><tr><td class="tableData">';
-                $html .= formatMessage($message{message}).'<p>';
+                $html .= formatMessage($message{message},$_[1]->get("filterPost")).'<p>';
                 $html .= '</td></tr></table>';
         } else {
                 $html = WebGUI::International::get(402);
@@ -544,7 +543,7 @@ sub showReplyTree {
 					if ($data{messageId} == $message{messageId}) {
 						$html .= 'class="highlight"';
 					}
-					$html .= '>'.formatMessage($data{message}).'<br/><br/></td></tr>';
+					$html .= '>'.formatMessage($data{message},$_[0]->get("filterPost")).'<br/><br/></td></tr>';
 				}
                 	}
 			$sth->finish;
@@ -598,7 +597,7 @@ sub showThreads {
 			if ($data{messageId} eq $session{form}{mid}) {
 				$html .= 'class="highlight"';
 			}
-			$html .= '>'.formatMessage($data{message}).'<br/><br/></td></tr>';
+			$html .= '>'.formatMessage($data{message},$_[0]->get("filterPost")).'<br/><br/></td></tr>';
 		}
 	}
        	$html .= '</table>';

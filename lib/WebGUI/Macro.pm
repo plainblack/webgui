@@ -45,8 +45,8 @@ These functions are available from this package:
 
 
 #-------------------------------------------------------------------
+# Returns a complex regular expression for matching macro patterns.
 sub _nestedMacro {
-   # This sub returns the regular expression for matching nested macro's.
    # Regular expression for matching balanced parenthesis
    my $parenthesis = qr /\(                      # Start with '(',
                       (?:                     # Followed by
@@ -67,6 +67,32 @@ sub _nestedMacro {
    return $nestedMacro;
 }
 
+
+
+#-------------------------------------------------------------------
+
+=head2 filter ( html )
+
+Removes all the macros from the HTML segment.
+
+=over
+
+=item html
+
+The segment to be filtered.
+
+=back
+
+=cut
+
+sub filter {
+	my $content = shift;
+        my $nestedMacro = _nestedMacro();
+        while ($content =~ /($nestedMacro)/gs) {
+		$content =~ s/\Q$1//gs;
+	}
+	return $content;
+}
 
 
 #-------------------------------------------------------------------
@@ -115,7 +141,7 @@ A string of HTML to be processed.
 
 sub process {
    	my $content = shift;
-   	my $nestedMacro = &_nestedMacro;
+   	my $nestedMacro = _nestedMacro();
    	while ($content =~ /($nestedMacro)/gs) {
       		my ($macro, $searchString, $params) = ($1, $2, $3);
       		next if ($searchString =~ /^\d+$/); # don't process ^0; ^1; ^2; etc.

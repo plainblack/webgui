@@ -456,7 +456,7 @@ sub www_viewSubmission {
 		$var{"attachment.icon"} = $file->getIcon;
 		$var{"attachment.name"} = $file->getFilename;
         }		
-	$var{"replies"} = WebGUI::Discussion::showThreads();
+	$var{"replies"} = WebGUI::Discussion::showThreads($_[0]);
 	return WebGUI::Template::process(WebGUI::Template::get($_[0]->get("submissionTemplateId"),"USS/Submission"), \%var);
 }
 

@@ -177,6 +177,13 @@ sub discussionProperties {
                 $editTimeout = $_[0]->get("editTimeout");
                 $moderationType = $_[0]->get("moderationType");
         }
+	my $filterPost = $_[0]->get("filterPost") || "most";
+	$f->filterContent(
+		-name=>"filterPost",
+		-value=>$filterPost,
+		-label=>WebGUI::International::get(1,"Discussion"),
+		-uiLevel=>7
+		);
         $groupToModerate = $_[0]->get("groupToModerate") || 4;
         $f->group(
 		-name=>"groupToPost",
@@ -210,6 +217,12 @@ sub discussionProperties {
 		-value=>[$moderationType],
 		-uiLevel=>7
 		);
+        $f->yesNo(
+                -name=>"addEditStampToPosts",
+                -label=>WebGUI::International::get(524,"Discussion"),
+                -value=>$_[0]->get("addEditStampToPosts"),
+                -uiLevel=>9
+                );
         return $f->printRowsOnly;
 }
 
@@ -487,7 +500,7 @@ sub moveCollateralUp {
 
 #-------------------------------------------------------------------
 
-=head2 new ( properties )
+=head2 new ( properties [, extendedProperties, allowDiscussion] )
 
 Constructor.
 
@@ -497,16 +510,46 @@ NOTE: This method should never need to be overridden or extended.
 
 =item properties
 
-A hash reference containing at minimum "wobjectId" and "namespace" and wobjectId may be set to "new" if you're creating a new instance. This hash reference should be the one created by WebGUI.pm and passed to the wobject subclass.
+A hash reference containing at minimum "wobjectId" and "namespace". wobjectId may be set to "new" if you're creating a new instance. This hash reference should be the one created by WebGUI.pm and passed to the wobject subclass.
 
 NOTE: It may seem a little weird that the initial data for the wobject instance is coming from WebGUI.pm, but this was done to lessen database traffic thus increasing the speed of all wobjects.
+
+=item extendedProperties
+
+An array reference containing a list of properties that extend the wobject class. This list should match the properties that are added to this wobject's namespace table in the database. So if this wobject has a namespace of "MyWobject" and a table definition that looks like this:
+
+ create MyWobject (
+	wobjectId int not null primary key,
+	something varchar(25),
+	foo int not null default 1,
+	bar int
+ );
+
+Then the extended property list would be "[something, foo, bar]".
+
+NOTE: This is used to define the wobject and should only be passed in by a wobject subclass.
+
+=item allowDiscussion
+
+ Defaults to "0". If set to "1" this will add a discussion properties tab to this wobject to enable content managers to set the properties of a discussion attached to this wobject.
+
+NOTE: This is used to define the wobject and should only be passed in by a wobject subclass.
 
 =back
 
 =cut
 
 sub new {
-        bless {_property => $_[1]}, $_[0];
+	my $self = shift;
+	my $properties = shift;
+	my $extendedProperties = shift;
+	my $allowDiscussion = shift || 0;
+        bless({
+		_property=>$properties, 
+		_extendedProperties=>$extendedProperties,
+		_allowDiscussion=>$allowDiscussion
+		}, 
+		$self);
 }
 
 #-------------------------------------------------------------------
@@ -1224,7 +1267,7 @@ Displays a discussion message post form.
 
 sub www_post {
         if (WebGUI::Privilege::isInGroup($_[0]->get("groupToPost"))) {
-                return WebGUI::Discussion::post();
+                return WebGUI::Discussion::post($_[0]);
         } else {
                 return WebGUI::Privilege::insufficient();
         }
@@ -1280,7 +1323,7 @@ sub www_showMessage {
         ($defaultMid) = WebGUI::SQL->quickArray("select min(messageId) from discussion where wobjectId=".$_[0]->get("wobjectId"));
         $session{form}{mid} = $session{form}{mid} || $defaultMid || 0;
         $output = WebGUI::Discussion::showMessage($_[1],$_[0]);
-        $output .= WebGUI::Discussion::showReplyTree();
+        $output .= WebGUI::Discussion::showReplyTree($_[0]);
         return $output;
 }
 

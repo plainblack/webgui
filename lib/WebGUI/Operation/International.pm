@@ -86,7 +86,7 @@ sub www_addInternationalMessage {
 	$f->hidden("lid",1);
 	$f->hidden("op","addInternationalMessageSave");
 	$f->combo("namespace",
-		WebGUI::SQL->buildHashRef("select namespace,namespace from international where language=1 order by namespace")
+		WebGUI::SQL->buildHashRef("select namespace,namespace from international where languageId=1 order by namespace")
 		,"Namespace",['WebGUI']);
 	$f->textarea("message","Message");
 	$f->submit;
@@ -100,8 +100,9 @@ sub www_addInternationalMessageSave {
 	($nextId) = WebGUI::SQL->quickArray("select max(internationalId) from international where languageId=1 
 		and namespace=".quote($session{form}{namespace}));
 	$nextId++;
+	my $namespace = $session{form}{namespace_new} || $session{form}{namespace};
  	WebGUI::SQL->write("insert into international (languageId, internationalId, namespace, message, lastUpdated) values
-		(1,$nextId,".quote($session{form}{namespace}).",".quote($session{form}{message}).",".time().")");
+		(1,$nextId,".quote($namespace).",".quote($session{form}{message}).",".time().")");
 	return "<b>Message was added with id $nextId.</b>".www_listInternationalMessages();
 }
 

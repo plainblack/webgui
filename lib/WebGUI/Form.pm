@@ -443,6 +443,52 @@ sub file {
         return '<input type="file" name="'.$_[0]->{name}.'" size="'.$size.'" '.$_[0]->{extras}.'>';
 }
 
+
+#-------------------------------------------------------------------
+
+=head2 filterContent ( hashRef )
+
+Returns a select list containing the content filter options. This is for use with WebGUI::HTML::filter().
+
+=over
+
+=item name
+
+The name field for this form element. This defaults to "filterContent".
+
+=item value
+
+The default value for this form element. 
+
+=item extras
+
+If you want to add anything special to this form element like javascript actions, or stylesheet information, you'd add it in here as follows:
+
+ 'onChange="this.form.submit()"'
+
+=back
+
+=cut
+
+sub filterContent {
+	my %filter;
+	tie %filter, 'Tie::IxHash';
+	%filter = (
+		'none'=>WebGUI::International::get(420), 
+                'macros'=>WebGUI::International::get(891), 
+                'javascript'=>WebGUI::International::get(526), 
+		'most'=>WebGUI::International::get(421),
+		'all'=>WebGUI::International::get(419)
+		);
+	my $name = $_[0]->{name} || "filterContent";
+        return selectList({
+		name=>$name,
+		options=>\%filter,
+		value=>[$_[0]->{value}],
+		extras=>$_[0]->{extras}
+		});
+}
+
 #-------------------------------------------------------------------
 
 =head2 formHeader ( hashRef )

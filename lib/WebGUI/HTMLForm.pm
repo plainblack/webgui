@@ -43,6 +43,7 @@ Package that makes HTML forms typed data and significantly reduces the code need
  $f->email("emailAddress","Email Address");
  $f->fieldType("dataType",\%supportedTypes,"Type of Field");
  $f->file("image","Image to Upload");
+ $f->filterContent("filterThisContent","Filter This Content");
  $f->group("groupToPost","Who can post?");
  $f->hidden("wid","55");
  $f->HTMLArea("description","Description");
@@ -596,6 +597,69 @@ sub file {
         }
         $self->{_data} .= $output;
 }
+
+#-------------------------------------------------------------------
+
+=head2 filterContent ( [ name, label, value, extras, subtext, uiLevel ] )
+
+Adds a content filter select list to the form for use with the WebGUI::HTML::filter() function.
+
+=over
+
+=item name
+
+The name field for this form element. Defaults to "filterContent".
+
+=item label
+
+The left column label for this form row. Defaults to "Filter Content" (internationalized).
+
+=item value
+
+The default value for this form element. 
+
+=item extras
+
+If you want to add anything special to this form element like javascript actions, or stylesheet information, you'd add it in here
+as follows:
+
+ 'onChange="this.form.submit()"'
+
+=item subtext
+
+Extra text to describe this form element or to provide special instructions.
+
+=item uiLevel
+
+The UI level for this field. See the WebGUI developer's site for details. Defaults to "0".
+
+=back
+
+=cut
+
+sub filterContent {
+        my ($output);
+        my ($self, @p) = @_;
+        my ($name, $label, $value, $extras, $subtext, $uiLevel) =
+                rearrange([qw(name label value extras subtext uiLevel)], @p);
+        if (_uiLevelChecksOut($uiLevel)) {
+		$label = WebGUI::International::get(418) if ($label eq "");
+                $output = WebGUI::Form::filterContent({
+                        "name"=>$name,
+                        "value"=>$value,
+                        "extras"=>$extras
+                        });
+                $output .= _subtext($subtext);
+                $output = $self->_tableFormRow($label,$output);
+        } else {
+                $output = WebGUI::Form::hidden({
+                        "name"=>$name,
+                        "value"=>$value
+                        });
+        }
+        $self->{_data} .= $output;
+}
+
 
 #-------------------------------------------------------------------
 

@@ -134,7 +134,9 @@ sub fatalError {
                 print '<br>'.$WebGUI::Session::session{setting}{companyURL};
         } else {
 	        print "<h1>WebGUI Fatal Error</h1>Something unexpected happened that caused this system to fault.<p>"; 
-		print "<pre>".$data."</pre>";
+		my $formattedData = $data;
+		$formattedData =~ s/\n/\<br\>/g;
+		print $formattedData;
 	}
         my $log = _log();
         print $log $data;
