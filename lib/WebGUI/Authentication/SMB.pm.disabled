@@ -43,10 +43,10 @@ sub authenticate {
 #-------------------------------------------------------------------
 sub adminForm {
 	my $userData = WebGUI::Authentication::getParams($_[0], 'SMB');
-	my $pdc = $session{form}{authSMB.smbPDC} || $userData->{smbPDC} || $session{setting}{smbPDC};
-	my $bdc = $session{form}{authSMB.smbBDC} || $userData->{smbBDC} || $session{setting}{smbBDC};
-	my $domain = $session{form}{authSMB.smbDomain} || $userData->{smbDomain} || $session{setting}{smbDomain};
-	my $login = $session{form}{authSMB.smbLogin} || $userData->{smbLogin};
+	my $pdc = $session{form}{'authSMB.smbPDC'} || $userData->{smbPDC} || $session{setting}{smbPDC};
+	my $bdc = $session{form}{'authSMB.smbBDC'} || $userData->{smbBDC} || $session{setting}{smbBDC};
+	my $domain = $session{form}{'authSMB.smbDomain'} || $userData->{smbDomain} || $session{setting}{smbDomain};
+	my $login = $session{form}{'authSMB.smbLogin'} || $userData->{smbLogin};
 	my $f;
 	$f = WebGUI::HTMLForm->new;
 	$f->readOnly('<b>'.optionsLabel().'</b>');
@@ -61,10 +61,10 @@ sub adminForm {
 sub adminFormSave {
 	WebGUI::Authentication::saveParams($session{form}{uid},'SMB', 
 	{
-		smbPDC 		=> $session{form}{authSMB.smbPDC}, 
-		smbBDC 		=> $session{form}{authSMB.smbBDC},
-		smbDomain 	=> $session{form}{authSMB.smbDomain},
-		smbLogin 	=> $session{form}{authSMB.smbLogin}
+		smbPDC 		=> $session{form}{'authSMB.smbPDC'}, 
+		smbBDC 		=> $session{form}{'authSMB.smbBDC'},
+		smbDomain 	=> $session{form}{'authSMB.smbDomain'},
+		smbLogin 	=> $session{form}{'authSMB.smbLogin'}
 	});
 }
 
@@ -91,7 +91,7 @@ sub registrationFormSave {
 		smbPDC 		=> $session{setting}{smbPDC}, 
 		smbBDC 		=> $session{setting}{smbBDC},
 		smbDomain 	=> $session{setting}{smbDomain},
-		smbLogin 	=> $session{form}{authSMB.loginId}
+		smbLogin 	=> $session{form}{'authSMB.loginId'}
 	});
 }
 
@@ -101,8 +101,8 @@ sub registrationFormValidate {
         $pdc = $session{setting}{smbPDC};
        	$bdc = $session{setting}{smbBDC};
         $ntDomain = $session{setting}{smbDomain};
-        $smbLogin = $session{form}{authSMB.loginId};
-        $smb = Authen::Smb::authen($smbLogin, $session{form}{authSMB.smbPassword}, $pdc, $bdc, $ntDomain);
+        $smbLogin = $session{form}{'authSMB.loginId'};
+        $smb = Authen::Smb::authen($smbLogin, $session{form}{'authSMB.smbPassword'}, $pdc, $bdc, $ntDomain);
         if ($smb > 0) {
                 $error = '<li>'. $smbError{$smb} . "pdc: $pdc, bdc: $bdc, domain: $ntDomain";
         }

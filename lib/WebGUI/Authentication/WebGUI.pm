@@ -43,8 +43,8 @@ sub adminForm {
 
 #-------------------------------------------------------------------
 sub adminFormSave {
-	unless ($session{form}{authWebGUI.identifier} eq "password") {
-		WebGUI::Authentication::saveParams($_[0],'WebGUI',{identifier => Digest::MD5::md5_base64($session{form}{authWebGUI.identifier})});
+	unless ($session{form}{'authWebGUI.identifier'} eq "password") {
+		WebGUI::Authentication::saveParams($_[0],'WebGUI',{identifier => Digest::MD5::md5_base64($session{form}{'authWebGUI.identifier'})});
 	}
 }
 
@@ -75,13 +75,13 @@ sub registrationFormSave {
 #-------------------------------------------------------------------
 sub registrationFormValidate {
 	my ($error);
-        if ($session{form}{authWebGUI.identifier} ne $session{form}{authWebGUI.identifierConfirm}) {
+        if ($session{form}{'authWebGUI.identifier'} ne $session{form}{'authWebGUI.identifierConfirm'}) {
                 $error = '<li>'.WebGUI::International::get(3,'Auth/WebGUI');
         }
-        if ($session{form}{authWebGUI.identifier} eq "password") {
+        if ($session{form}{'authWebGUI.identifier'} eq "password") {
                 $error .= '<li>'.WebGUI::International::get(5,'Auth/WebGUI');
         }
-        if ($session{form}{authWebGUI.identifier} eq "") {
+        if ($session{form}{'authWebGUI.identifier'} eq "") {
                 $error .= '<li>'.WebGUI::International::get(4,'Auth/WebGUI');
         }
         return $error;
@@ -109,10 +109,10 @@ sub userFormSave {
 #-------------------------------------------------------------------
 sub userFormValidate {
         my ($error);
-        if ($session{form}{authWebGUI.identifier} ne $session{form}{identifierConfirm}) {
+        if ($session{form}{'authWebGUI.identifier'} ne $session{form}{identifierConfirm}) {
                 $error = '<li>'.WebGUI::International::get(3,'Auth/WebGUI');
         }
-        if ($session{form}{authWebGUI.identifier} eq "") {
+        if ($session{form}{'authWebGUI.identifier'} eq "") {
                 $error .= '<li>'.WebGUI::International::get(4,'Auth/WebGUI');
         }
         return $error;

@@ -66,8 +66,8 @@ sub authenticate {
 #-------------------------------------------------------------------
 sub adminForm {
 	my $userData = WebGUI::Authentication::getParams($_[0],'LDAP');
-	my $ldapURL = $session{form}{authLDAP.ldapURL} || $userData->{ldapURL} || $session{setting}{ldapURL};
-	my $connectDN = $session{form}{authLDAP.connectDN} || $userData->{connectDN};
+	my $ldapURL = $session{form}{'authLDAP.ldapURL'} || $userData->{ldapURL} || $session{setting}{ldapURL};
+	my $connectDN = $session{form}{'authLDAP.connectDN'} || $userData->{connectDN};
 	my $f;
 	$f = WebGUI::HTMLForm->new;
 	$f->readOnly('<b>'.optionsLabel().'</b>');
@@ -80,8 +80,8 @@ sub adminForm {
 sub adminFormSave {
 	WebGUI::Authentication::saveParams($_[0],'LDAP',
 	{
-		connectDN 	=> $session{form}{authLDAP.connectDN}, 
-		ldapURL 	=> $session{form}{authLDAP.ldapURL}
+		connectDN 	=> $session{form}{'authLDAP.connectDN'}, 
+		ldapURL 	=> $session{form}{'authLDAP.ldapURL'}
 	});
 }
 
@@ -117,7 +117,7 @@ sub registrationFormSave {
 	%args = (port => $port);
 	$ldap = Net::LDAP->new($uri->host, %args);
 	$ldap->bind;
-	$search = $ldap->search (base => $uri->dn, filter => $session{setting}{ldapId}."=".$session{form}{authLDAP.ldapId});
+	$search = $ldap->search (base => $uri->dn, filter => $session{setting}{ldapId}."=".$session{form}{'authLDAP.ldapId'});
 	if (defined $search->entry(0)) {
 		$connectDN = "cn=".$search->entry(0)->get_value("cn");
 	}
@@ -127,7 +127,7 @@ sub registrationFormSave {
 		connectDN 	=> $connectDN, 
 		ldapURL 	=> $session{setting}{ldapURL}
 	});
-	return $session{form}{authLDAP.ldapId};
+	return $session{form}{'authLDAP.ldapId'};
 }
 
 #-------------------------------------------------------------------
@@ -141,15 +141,15 @@ sub registrationFormValidate {
         }
 	if ($ldap = Net::LDAP->new($uri->host, {port=>$port})) {
         	if ($ldap->bind) {
-        		$search = $ldap->search (base=>$uri->dn,filter=>$session{setting}{ldapId}."=".$session{form}{authLDAP.ldapId});
+        		$search = $ldap->search (base=>$uri->dn,filter=>$session{setting}{ldapId}."=".$session{form}{'authLDAP.ldapId'});
         		if (defined $search->entry(0)) {
                 		$connectDN = "cn=".$search->entry(0)->get_value("cn");
                 		$ldap->unbind;
                 		$ldap = Net::LDAP->new($uri->host, {port=>$port}) or $error .= WebGUI::International::get(2,'Auth/LDAP');
-                		$auth = $ldap->bind(dn=>$connectDN, password=>$session{form}{authLDAP.ldapPassword});
+                		$auth = $ldap->bind(dn=>$connectDN, password=>$session{form}{'authLDAP.ldapPassword'});
                 		if ($auth->code == 48 || $auth->code == 49) {
                         		$error .= '<li>'.WebGUI::International::get(68);
-                        		WebGUI::ErrorHandler::warn("Invalid LDAP information for registration of LDAP ID: ".$session{form}{authLDAP.ldapId});
+                        		WebGUI::ErrorHandler::warn("Invalid LDAP information for registration of LDAP ID: ".$session{form}{'authLDAP.ldapId'});
                 		} elsif ($auth->code > 0) {
                         		$error .= '<li>LDAP error "'.$ldapStatusCode{$auth->code}.'" occured. '
 						.WebGUI::International::get(69);
@@ -158,7 +158,7 @@ sub registrationFormValidate {
                 		$ldap->unbind;
         		} else {
                 		$error .= '<li>'.WebGUI::International::get(68);
-                		WebGUI::ErrorHandler::warn("Invalid LDAP information for registration of LDAP ID: ".$session{form}{authLDAP.ldapId});
+                		WebGUI::ErrorHandler::warn("Invalid LDAP information for registration of LDAP ID: ".$session{form}{'authLDAP.ldapId'});
         		}
 		} else {
 			$error = WebGUI::International::get(2,'Auth/LDAP');
