@@ -17,29 +17,34 @@ use WebGUI::Session;
 use WebGUI::SQL;
 
 #-------------------------------------------------------------------
-sub process {
-	my ($output, $temp, @data, $pageTitle, $parentId, $sth, $first);
-	$output = $_[0];
-        while ($output =~ /\^s(.*?)\;/) {
-                $pageTitle = $1;
-                $temp = '<span class="horizontalMenu">';
-                $first = 1;
-                ($parentId) = WebGUI::SQL->quickArray("select pageId from page where urlizedTitle='$pageTitle'",$session{dbh});
-                $sth = WebGUI::SQL->read("select title,urlizedTitle,pageId from page where parentId='$parentId' order by sequenceNumber",$session{dbh});
-                while (@data = $sth->array) {
-                        if (WebGUI::Privilege::canViewPage($data[2])) {
-                                if ($first) {
-                                        $first = 0;
-                                } else {
-                                        $temp .= " &middot; ";
-                                }
-                                $temp .= '<a class="horizontalMenu" href="'.$session{env}{SCRIPT_NAME}.'/'.$data[1].'">'.$data[0].'</a>';
+sub _replacement {
+        my ($temp, @data, $pageTitle, $parentId, $sth, $first);
+        $pageTitle = $1;
+        $temp = '<span class="horizontalMenu">';
+        $first = 1;
+        ($parentId) = WebGUI::SQL->quickArray("select pageId from page where urlizedTitle='$pageTitle'",$session{dbh});
+        $sth = WebGUI::SQL->read("select title,urlizedTitle,pageId from page where parentId='$parentId' order by sequenceNumber",$session{dbh});
+        while (@data = $sth->array) {
+        	if (WebGUI::Privilege::canViewPage($data[2])) {
+                	if ($first) {
+                        	$first = 0;
+                        } else {
+                                $temp .= " &middot; ";
                         }
+                        $temp .= '<a class="horizontalMenu" href="'.$session{env}{SCRIPT_NAME}.'/'.$data[1].'">'.$data[0].'</a>';
                 }
-                $sth->finish;
-                $temp .= '</span>';
-                $output =~ s/\^s(.*?)\;/$temp/;
         }
+        $sth->finish;
+        $temp .= '</span>';
+	return $temp;
+}
+
+#-------------------------------------------------------------------
+sub process {
+	my ($output,@data, $pageTitle, $parentId, $sth, $first, $temp);
+	$output = $_[0];
+        $output =~ s/\^s\((.*?)\)\;/_replacement($1)/ge;
+        $output =~ s/\^s\;/_replacement()/ge;
         #---everything below this line will go away in a later rev.
         if ($output =~ /\^s(.*)\^\/s/) {
 		$pageTitle = $1;

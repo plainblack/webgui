@@ -17,9 +17,7 @@ use WebGUI::Session;
 sub process {
 	my ($output);
 	$output = $_[0];
-        while ($output =~ /\^\\(.*?)\;/) {
-                $output =~ s/\^\\(.*?)\;/$session{page}{url}/;
-        }
+        $output =~ s/\^\\\;/$session{page}{url}/g;
         #---everything below this line will go away in a later rev.
         if ($output =~ /\^\\/) {
                 $output =~ s/\^\\/$session{page}{url}/g;

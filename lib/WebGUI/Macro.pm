@@ -18,7 +18,6 @@ use WebGUI::Session;
 sub getParams {
         my ($data, @param);
         $data = $_[0];
-        $data = substr($data,1,length($data)-2);
         push(@param, $+) while $data =~ m {
                 "([^\"\\]*(?:\\.[^\"\\]*)*)",?
                 |       ([^,]+),?

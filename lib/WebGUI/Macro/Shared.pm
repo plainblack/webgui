@@ -40,7 +40,7 @@ sub traversePageTree {
         	while (@data = $sth->array) {
                 	if (WebGUI::Privilege::canViewPage($data[2])) {
                         	$output .= $depth.'<a class="verticalMenu" href="'.$session{env}{SCRIPT_NAME}.'/'.$data[0].'">'.$data[1].'</a><br>';
-                        	$output .= traversePageTree($data[2],$_[1]+1,$_[2]);
+                        	$output .= traversePageTree($data[2],$_[1]+1,$toLevel);
                 	}
         	}
         	$sth->finish;

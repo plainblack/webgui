@@ -1,4 +1,4 @@
-package WebGUI::Macro::e_companyEmail;
+package WebGUI::Macro::Slash_gatewayUrl;
 
 #-------------------------------------------------------------------
 # WebGUI is Copyright 2001 Plain Black Software.
@@ -17,13 +17,11 @@ use WebGUI::Session;
 sub process {
 	my ($output);
 	$output = $_[0];
-        $output =~ s/\^e\;/$session{setting}{companyEmail}/g;
-        #---everything below this line will go away in a later rev.
-        if ($output =~ /\^e/) {
-                $output =~ s/\^e/$session{setting}{companyEmail}/g;
-        }
+        $output =~ s/\^\/\;/$session{ENV}{SCRIPT_NAME}/g;
 	return $output;
 }
+
+
 
 1;
 

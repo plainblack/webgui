@@ -54,6 +54,26 @@ sub _getWeekday {
 #-------------------------------------------------------------------
 sub epochToHuman {
 	my ($hour12, $value, $output, @date, %weekday, %month);
+
+      #  0    1    2     3     4    5     6     7     8
+#      $sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) =
+#                                                               localtime(time);
+#
+#               All list elements are numeric, and come straight
+#               out of the C `struct tm'.  $sec, $min, and $hour
+#               are the seconds, minutes, and hours of the
+#               specified time.  $mday is the day of the month,
+#               and $mon is the month itself, in the range `0..11'
+#               with 0 indicating January and 11 indicating
+#               December.  $year is the number of years since
+#               1900.  That is, $year is `123' in year 2023.
+#               $wday is the day of the week, with 0 indicating
+#               Sunday and 3 indicating Wednesday.  $yday is the
+#               day of the year, in the range `1..365' (or
+#               `1..366' in leap years.)  $isdst is true if the
+#               specified time occurs during daylight savings
+#               time, false otherwise.
+
 	@date = localtime($_[0]);
 	$date[4]++; 		# offset the months starting from 0
 	$date[5] += 1900;	# original value is Year-1900
@@ -82,7 +102,7 @@ sub epochToHuman {
 		$output =~ s/\%w/$weekday{$date[6]}/g;
 	}
   #---hour stuff
-	$hour12 = $date[2]+1;
+	$hour12 = $date[2];
 	if ($hour12 > 12) {
 		$hour12 = $hour12 - 12;
 	}	

@@ -15,20 +15,25 @@ use WebGUI::Macro;
 use WebGUI::Macro::Shared;
 
 #-------------------------------------------------------------------
-sub process {
-        my ($output, $temp, @param);
-        $output = $_[0];
-        while ($output =~ /\^T(.*?)\;/) {
-                @param = WebGUI::Macro::getParams($1);
-                $temp = '<span class="verticalMenu">';
-                if ($param[0] ne "") {
-                	$temp .= traversePageTree(1,0,$param[0]);
-                } else {
-                	$temp .= traversePageTree(1,0,1);
-                }
-                $temp .= '</span>';
-                $output =~ s/\^T(.*?)\;/$temp/;
+sub _replacement {
+        my ($temp, @param);
+        @param = WebGUI::Macro::getParams($_[0]);
+        $temp = '<span class="verticalMenu">';
+        if ($param[0] ne "") {
+        	$temp .= traversePageTree(1,0,$param[0]);
+        } else {
+        	$temp .= traversePageTree(1,0,1);
         }
+        $temp .= '</span>';
+	return $temp;
+}
+
+#-------------------------------------------------------------------
+sub process {
+        my ($output,$temp);
+        $output = $_[0];
+        $output =~ s/\^T\((.*?)\)\;/_replacement($1)/ge;
+        $output =~ s/\^T\;/_replacement()/ge;
         #---everything below this line will go away in a later rev.
         if ($output =~ /\^T(.*)\^\/T/) {
                 $temp = '<span class="verticalMenu">';

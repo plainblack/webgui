@@ -13,10 +13,12 @@ package WebGUI::Widget;
 use CGI::Carp qw(fatalsToBrowser);
 use DBI;
 use Exporter;
-use strict;
+use strict qw(subs vars);
+use Tie::IxHash;
 use WebGUI::International;
 use WebGUI::Session;
 use WebGUI::SQL;
+use WebGUI::Template;
 use WebGUI::Utility;
 
 our @ISA = qw(Exporter);
@@ -25,7 +27,7 @@ our @EXPORT = qw(&purgeWidget &www_jumpDown &www_jumpUp &update &www_moveUp &www
 #-------------------------------------------------------------------
 sub _reorderWidgets {
 	my ($sth, $i, $wid);
-	$sth = WebGUI::SQL->read("select widgetId from widget where pageId=$_[0] order by sequenceNumber",$session{dbh});
+	$sth = WebGUI::SQL->read("select widgetId from widget where pageId=$_[0] order by position,sequenceNumber",$session{dbh});
 	while (($wid) = $sth->array) {
 		$i++;
 		WebGUI::SQL->write("update widget set sequenceNumber='$i' where widgetId=$wid",$session{dbh});
@@ -38,13 +40,21 @@ sub create {
 	my ($widgetId, $nextSeq);
 	$widgetId = getNextId("widgetId");
 	($nextSeq) = WebGUI::SQL->quickArray("select max(sequenceNumber)+1 from widget where pageId=$session{page}{pageId}",$session{dbh});
-        WebGUI::SQL->write("insert into widget values ($widgetId, $session{page}{pageId}, '$session{form}{widget}', '$nextSeq', ".quote($session{form}{title}).", '$session{form}{displayTitle}', ".quote($session{form}{description}).", '$session{form}{processMacros}', ".time().", '$session{user}{userId}', 0, 0)",$session{dbh});
+        WebGUI::SQL->write("insert into widget values ($widgetId, $session{page}{pageId}, '$session{form}{widget}', '$nextSeq', ".quote($session{form}{title}).", '$session{form}{displayTitle}', ".quote($session{form}{description}).", '$session{form}{processMacros}', ".time().", '$session{user}{userId}', 0, 0, '$session{form}{position}')",$session{dbh});
 	return $widgetId;
 }
 
 #-------------------------------------------------------------------
+sub getPositions {
+	my (%hash);
+	tie %hash, "Tie::IxHash";
+	%hash = WebGUI::Template::getPositions($session{page}{template});
+	return %hash;
+}
+
+#-------------------------------------------------------------------
 sub update {
-	WebGUI::SQL->write("update widget set title=".quote($session{form}{title}).", displayTitle='$session{form}{displayTitle}', description=".quote($session{form}{description}).", processMacros='$session{form}{processMacros}', lastEdited=".time().", editedBy='$session{user}{userId}' where widgetId=$session{form}{wid}",$session{dbh});
+	WebGUI::SQL->write("update widget set title=".quote($session{form}{title}).", displayTitle='$session{form}{displayTitle}', description=".quote($session{form}{description}).", processMacros='$session{form}{processMacros}', lastEdited=".time().", editedBy='$session{user}{userId}', position='$session{form}{position}' where widgetId=$session{form}{wid}",$session{dbh});
 }
 
 #-------------------------------------------------------------------
@@ -126,6 +136,7 @@ sub www_moveDown {
 		if ($data[0] ne "") {
                 	WebGUI::SQL->write("update widget set sequenceNumber=sequenceNumber+1 where widgetId=$session{form}{wid}",$session{dbh});
                 	WebGUI::SQL->write("update widget set sequenceNumber=sequenceNumber-1 where widgetId=$data[0]",$session{dbh});
+                	_reorderWidgets($session{page}{pageId});
 		}
                 return "";
         } else {
@@ -142,6 +153,7 @@ sub www_moveUp {
                 if ($data[0] ne "") {
                         WebGUI::SQL->write("update widget set sequenceNumber=sequenceNumber-1 where widgetId=$session{form}{wid}",$session{dbh});
                         WebGUI::SQL->write("update widget set sequenceNumber=sequenceNumber+1 where widgetId=$data[0]",$session{dbh});
+                	_reorderWidgets($session{page}{pageId});
                 }
                 return "";
         } else {
@@ -155,6 +167,7 @@ sub www_paste {
         if (WebGUI::Privilege::canEditPage()) {
 		($nextSeq) = WebGUI::SQL->quickArray("select max(sequenceNumber)+1 from widget where pageId=$session{page}{pageId}",$session{dbh});
                 WebGUI::SQL->write("update widget set pageId=$session{page}{pageId}, sequenceNumber='$nextSeq' where widgetId=$session{form}{wid}",$session{dbh});
+               	_reorderWidgets($session{page}{pageId});
                 return "";
         } else {
                 return WebGUI::Privilege::insufficient();

@@ -180,8 +180,7 @@ if (eval { require Net::LDAP }) {
 
 # this is here to insure they installed correctly.
 print "WebGUI modules:\t\t";
-#if (eval { require WebGUI } && eval { require WebGUI::SQL }) {
-if (eval { require WebGUI::SQL }) {
+if (eval { require WebGUI } && eval { require WebGUI::SQL }) {
         print "OK\n";
 } else {
         print "Please install.\n";

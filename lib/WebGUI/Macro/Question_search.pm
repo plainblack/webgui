@@ -1,4 +1,4 @@
-package WebGUI::Macro::e_companyEmail;
+package WebGUI::Macro::Question_search;
 
 #-------------------------------------------------------------------
 # WebGUI is Copyright 2001 Plain Black Software.
@@ -11,19 +11,23 @@ package WebGUI::Macro::e_companyEmail;
 #-------------------------------------------------------------------
 
 use strict;
+use WebGUI::Form;
+use WebGUI::International;
 use WebGUI::Session;
 
 #-------------------------------------------------------------------
 sub process {
-	my ($output);
+	my ($output, $temp);
 	$output = $_[0];
-        $output =~ s/\^e\;/$session{setting}{companyEmail}/g;
-        #---everything below this line will go away in a later rev.
-        if ($output =~ /\^e/) {
-                $output =~ s/\^e/$session{setting}{companyEmail}/g;
-        }
+        $temp = '<form class="searchBox" method="post" action="'.$session{page}{url}.'">';
+        $temp .= WebGUI::Form::hidden("op","search");
+        $temp .= WebGUI::Form::text("keywords",10,100,$session{form}{keywords});
+        $temp .= WebGUI::Form::submit(WebGUI::International::get(364));
+        $temp .= '</form>';
+        $output =~ s/\^\?\;/$temp/g;
 	return $output;
 }
 
-1;
 
+
+1;

@@ -34,7 +34,8 @@ sub widgetName {
 
 #-------------------------------------------------------------------
 sub www_add {
-        my ($output);
+        my ($output, %hash);
+	tie %hash, 'Tie::IxHash';
       	if (WebGUI::Privilege::canEditPage()) {
                 $output = '<a href="'.$session{page}{url}.'?op=viewHelp&hid=1&namespace='.$namespace.'"><img src="'.$session{setting}{lib}.'/help.gif" border="0" align="right"></a>';
 		$output .= '<h1>'.WebGUI::International::get(200).'</h1>';
@@ -43,6 +44,8 @@ sub www_add {
                 $output .= WebGUI::Form::hidden("func","addSave");
                 $output .= WebGUI::Form::hidden("title","column");
                 $output .= '<table>';
+		%hash = WebGUI::Widget::getPositions();
+                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(363).'</td><td>'.WebGUI::Form::selectList("position",\%hash).'</td></tr>';
                 $output .= '<tr><td class="formDescription">'.WebGUI::International::get(201).'</td><td>'.WebGUI::Form::text("spacer",20,3,10).'</td></tr>';
                 $output .= '<tr><td class="formDescription">'.WebGUI::International::get(202).'</td><td>'.WebGUI::Form::text("width",20,3,200).'</td></tr>';
                 $output .= '<tr><td class="formDescription">'.WebGUI::International::get(203).'</td><td>'.WebGUI::Form::text("class",20,50,"content").'</td></tr>';
@@ -69,10 +72,11 @@ sub www_addSave {
 
 #-------------------------------------------------------------------
 sub www_edit {
-        my ($output, %data);
+        my ($output, %data, %hash, @array);
+	tie %hash, 'Tie::IxHash';
 	tie %data, 'Tie::CPHash';
         if (WebGUI::Privilege::canEditPage()) {
-		%data = WebGUI::SQL->quickHash("select * from ExtraColumn where widgetId=$session{form}{wid}",$session{dbh});
+		%data = WebGUI::SQL->quickHash("select * from widget,ExtraColumn where widget.widgetId=$session{form}{wid} and widget.widgetId=ExtraColumn.widgetId",$session{dbh});
                 $output = '<a href="'.$session{page}{url}.'?op=viewHelp&hid=1&namespace='.$namespace.'"><img src="'.$session{setting}{lib}.'/help.gif" border="0" align="right"></a>';
 		$output .= '<h1>'.WebGUI::International::get(204).'</h1>';
 		$output .= '<form method="post" action="'.$session{page}{url}.'">';
@@ -80,6 +84,9 @@ sub www_edit {
                 $output .= WebGUI::Form::hidden("func","editSave");
                 $output .= WebGUI::Form::hidden("title","column");
                 $output .= '<table>';
+		%hash = WebGUI::Widget::getPositions();
+                $array[0] = $data{position};
+                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(363).'</td><td>'.WebGUI::Form::selectList("position",\%hash,\@array).'</td></tr>';
                 $output .= '<tr><td class="formDescription">'.WebGUI::International::get(201).'</td><td>'.WebGUI::Form::text("spacer",20,3,$data{spacer}).'</td></tr>';
                 $output .= '<tr><td class="formDescription">'.WebGUI::International::get(202).'</td><td>'.WebGUI::Form::text("width",20,3,$data{width}).'</td></tr>';
                 $output .= '<tr><td class="formDescription">'.WebGUI::International::get(203).'</td><td>'.WebGUI::Form::text("class",20,50,$data{class}).'</td></tr>';

@@ -1,422 +1,8 @@
-# MySQL dump 8.13
-#
-# Host: localhost    Database: WebGUI
-#--------------------------------------------------------
-# Server version	3.23.36
-
-#
-# Table structure for table 'Article'
-#
-
-CREATE TABLE Article (
-  widgetId int(11) default NULL,
-  startDate int(11) default NULL,
-  endDate int(11) default NULL,
-  body mediumtext,
-  image varchar(255) default NULL,
-  linkTitle varchar(255) default NULL,
-  linkURL text,
-  attachment varchar(255) default NULL,
-  convertCarriageReturns int(11) NOT NULL default '0'
-) TYPE=MyISAM;
-
-#
-# Dumping data for table 'Article'
-#
-
-
-#
-# Table structure for table 'EventsCalendar'
-#
-
-CREATE TABLE EventsCalendar (
-  widgetId int(11) NOT NULL default '0',
-  PRIMARY KEY  (widgetId)
-) TYPE=MyISAM;
-
-#
-# Dumping data for table 'EventsCalendar'
-#
-
-
-#
-# Table structure for table 'EventsCalendar_event'
-#
-
-CREATE TABLE EventsCalendar_event (
-  eventId int(11) NOT NULL default '1',
-  widgetId int(11) default NULL,
-  name varchar(255) default NULL,
-  description text,
-  startDate int(11) default NULL,
-  endDate int(11) default NULL,
-  recurringEventId int(11) NOT NULL default '0',
-  PRIMARY KEY  (eventId)
-) TYPE=MyISAM;
-
-#
-# Dumping data for table 'EventsCalendar_event'
-#
-
-
-#
-# Table structure for table 'ExtraColumn'
-#
-
-CREATE TABLE ExtraColumn (
-  widgetId int(11) NOT NULL default '0',
-  spacer int(11) default NULL,
-  width int(11) default NULL,
-  class varchar(50) default NULL,
-  PRIMARY KEY  (widgetId)
-) TYPE=MyISAM;
-
-#
-# Dumping data for table 'ExtraColumn'
-#
-
-
-#
-# Table structure for table 'FAQ'
-#
-
-CREATE TABLE FAQ (
-  widgetId int(11) NOT NULL default '0',
-  PRIMARY KEY  (widgetId)
-) TYPE=MyISAM;
-
-#
-# Dumping data for table 'FAQ'
-#
-
-
-#
-# Table structure for table 'FAQ_question'
-#
-
-CREATE TABLE FAQ_question (
-  widgetId int(11) default NULL,
-  questionId int(11) NOT NULL default '0',
-  question text,
-  answer text,
-  sequenceNumber int(11) NOT NULL default '0',
-  PRIMARY KEY  (questionId)
-) TYPE=MyISAM;
-
-#
-# Dumping data for table 'FAQ_question'
-#
-
-
-#
-# Table structure for table 'LinkList'
-#
-
-CREATE TABLE LinkList (
-  widgetId int(11) NOT NULL default '0',
-  indent int(11) NOT NULL default '0',
-  lineSpacing int(11) NOT NULL default '1',
-  bullet varchar(255) NOT NULL default '&middot;',
-  PRIMARY KEY  (widgetId)
-) TYPE=MyISAM;
-
-#
-# Dumping data for table 'LinkList'
-#
-
-
-#
-# Table structure for table 'LinkList_link'
-#
-
-CREATE TABLE LinkList_link (
-  widgetId int(11) default NULL,
-  linkId int(11) NOT NULL default '0',
-  name varchar(128) default NULL,
-  url text,
-  description text,
-  sequenceNumber int(11) NOT NULL default '0',
-  newWindow int(11) NOT NULL default '0',
-  PRIMARY KEY  (linkId)
-) TYPE=MyISAM;
-
-#
-# Dumping data for table 'LinkList_link'
-#
-
-
-#
-# Table structure for table 'MessageBoard'
-#
-
-CREATE TABLE MessageBoard (
-  widgetId int(11) default NULL,
-  groupToPost int(11) default NULL,
-  messagesPerPage int(11) NOT NULL default '50',
-  editTimeout int(11) default NULL
-) TYPE=MyISAM;
-
-#
-# Dumping data for table 'MessageBoard'
-#
-
-
-#
-# Table structure for table 'Poll'
-#
-
-CREATE TABLE Poll (
-  widgetId int(11) NOT NULL default '0',
-  active int(11) NOT NULL default '1',
-  graphWidth int(11) NOT NULL default '150',
-  voteGroup int(11) default NULL,
-  question varchar(255) default NULL,
-  a1 varchar(255) default NULL,
-  a2 varchar(255) default NULL,
-  a3 varchar(255) default NULL,
-  a4 varchar(255) default NULL,
-  a5 varchar(255) default NULL,
-  a6 varchar(255) default NULL,
-  a7 varchar(255) default NULL,
-  a8 varchar(255) default NULL,
-  a9 varchar(255) default NULL,
-  a10 varchar(255) default NULL,
-  a11 varchar(255) default NULL,
-  a12 varchar(255) default NULL,
-  a13 varchar(255) default NULL,
-  a14 varchar(255) default NULL,
-  a15 varchar(255) default NULL,
-  a16 varchar(255) default NULL,
-  a17 varchar(255) default NULL,
-  a18 varchar(255) default NULL,
-  a19 varchar(255) default NULL,
-  a20 varchar(255) default NULL,
-  PRIMARY KEY  (widgetId)
-) TYPE=MyISAM;
-
-#
-# Dumping data for table 'Poll'
-#
-
-
-#
-# Table structure for table 'Poll_answer'
-#
-
-CREATE TABLE Poll_answer (
-  widgetId int(11) NOT NULL default '0',
-  answer char(3) default NULL,
-  userId int(11) default NULL,
-  ipAddress varchar(50) default NULL
-) TYPE=MyISAM;
-
-#
-# Dumping data for table 'Poll_answer'
-#
-
-
-#
-# Table structure for table 'SQLReport'
-#
-
-CREATE TABLE SQLReport (
-  widgetId int(11) NOT NULL default '0',
-  template text,
-  dbQuery text,
-  DSN varchar(255) default NULL,
-  username varchar(255) default NULL,
-  identifier varchar(255) default NULL,
-  convertCarriageReturns int(11) NOT NULL default '0',
-  PRIMARY KEY  (widgetId)
-) TYPE=MyISAM;
-
-#
-# Dumping data for table 'SQLReport'
-#
-
-
-#
-# Table structure for table 'SiteMap'
-#
-
-CREATE TABLE SiteMap (
-  widgetId int(11) NOT NULL default '0',
-  startAtThisLevel int(11) default NULL,
-  depth int(11) NOT NULL default '0',
-  indent int(11) NOT NULL default '5',
-  bullet varchar(30) NOT NULL default '&middot',
-  lineSpacing int(11) NOT NULL default '1',
-  PRIMARY KEY  (widgetId)
-) TYPE=MyISAM;
-
-#
-# Dumping data for table 'SiteMap'
-#
-
-INSERT INTO SiteMap VALUES (-1,0,0,5,'&middot;',1);
-
-#
-# Table structure for table 'SyndicatedContent'
-#
-
-CREATE TABLE SyndicatedContent (
-  widgetId int(11) NOT NULL default '0',
-  rssUrl text,
-  content text,
-  lastFetched int(11) default NULL,
-  PRIMARY KEY  (widgetId)
-) TYPE=MyISAM;
-
-#
-# Dumping data for table 'SyndicatedContent'
-#
-
-
-#
-# Table structure for table 'UserSubmission'
-#
-
-CREATE TABLE UserSubmission (
-  widgetId int(11) NOT NULL default '0',
-  groupToContribute int(11) default NULL,
-  submissionsPerPage int(11) NOT NULL default '50',
-  defaultStatus varchar(30) default 'Approved',
-  groupToApprove int(11) NOT NULL default '4',
-  PRIMARY KEY  (widgetId)
-) TYPE=MyISAM;
-
-#
-# Dumping data for table 'UserSubmission'
-#
-
-
-#
-# Table structure for table 'UserSubmission_submission'
-#
-
-CREATE TABLE UserSubmission_submission (
-  widgetId int(11) default NULL,
-  submissionId int(11) NOT NULL default '0',
-  title varchar(128) default NULL,
-  dateSubmitted int(11) default NULL,
-  username varchar(30) default NULL,
-  userId int(11) default NULL,
-  content text,
-  image varchar(255) default NULL,
-  attachment varchar(255) default NULL,
-  status varchar(30) default NULL,
-  convertCarriageReturns int(11) NOT NULL default '0',
-  PRIMARY KEY  (submissionId)
-) TYPE=MyISAM;
-
-#
-# Dumping data for table 'UserSubmission_submission'
-#
-
-
-#
-# Table structure for table 'discussion'
-#
-
-CREATE TABLE discussion (
-  messageId int(11) NOT NULL default '0',
-  rid int(11) default NULL,
-  widgetId int(11) default NULL,
-  pid int(11) default NULL,
-  userId int(11) default NULL,
-  username varchar(30) default NULL,
-  subject varchar(255) default NULL,
-  message text,
-  dateOfPost int(11) default NULL,
-  subId int(11) default NULL,
-  PRIMARY KEY  (messageId)
-) TYPE=MyISAM;
-
-#
-# Dumping data for table 'discussion'
-#
-
-
-#
-# Table structure for table 'groupings'
-#
-
-CREATE TABLE groupings (
-  groupId int(11) NOT NULL default '0',
-  userId int(11) NOT NULL default '0',
-  PRIMARY KEY  (groupId,userId)
-) TYPE=MyISAM;
-
-#
-# Dumping data for table 'groupings'
-#
-
-INSERT INTO groupings VALUES (1,1);
-INSERT INTO groupings VALUES (2,3);
-INSERT INTO groupings VALUES (3,3);
-INSERT INTO groupings VALUES (4,3);
-
-#
-# Table structure for table 'groups'
-#
-
-CREATE TABLE groups (
-  groupId int(11) NOT NULL default '0',
-  groupName varchar(30) default NULL,
-  description varchar(255) default NULL,
-  PRIMARY KEY  (groupId)
-) TYPE=MyISAM;
-
-#
-# Dumping data for table 'groups'
-#
-
-INSERT INTO groups VALUES (1,'Visitors','This is the public group that has no privileges.');
-INSERT INTO groups VALUES (2,'Registered Users','All registered users belong to this group automatically.');
-INSERT INTO groups VALUES (3,'Admins','Anyone who belongs to this group has privileges to everything.');
-INSERT INTO groups VALUES (4,'Content Managers','Users that have privileges to edit content on this site. The user still needs to be added to a group that has editing privileges on specific pages.');
-INSERT INTO groups VALUES (5,'Reserved','');
-INSERT INTO groups VALUES (6,'Reserved','');
-INSERT INTO groups VALUES (7,'Reserved','');
-INSERT INTO groups VALUES (8,'Reserved','');
-INSERT INTO groups VALUES (9,'Reserved','');
-INSERT INTO groups VALUES (10,'Reserved','');
-INSERT INTO groups VALUES (11,'Reserved','');
-INSERT INTO groups VALUES (12,'Reserved','');
-INSERT INTO groups VALUES (13,'Reserved','');
-INSERT INTO groups VALUES (14,'Reserved','');
-INSERT INTO groups VALUES (15,'Reserved','');
-INSERT INTO groups VALUES (16,'Reserved','');
-INSERT INTO groups VALUES (17,'Reserved','');
-INSERT INTO groups VALUES (18,'Reserved','');
-INSERT INTO groups VALUES (19,'Reserved','');
-INSERT INTO groups VALUES (20,'Reserved','');
-INSERT INTO groups VALUES (21,'Reserved','');
-INSERT INTO groups VALUES (22,'Reserved','');
-INSERT INTO groups VALUES (23,'Reserved','');
-INSERT INTO groups VALUES (24,'Reserved','');
-INSERT INTO groups VALUES (25,'Reserved','');
-
-#
-# Table structure for table 'help'
-#
-
-CREATE TABLE help (
-  helpId int(11) NOT NULL default '0',
-  namespace varchar(30) NOT NULL default 'WebGUI',
-  language varchar(30) NOT NULL default 'English',
-  action varchar(30) default NULL,
-  object varchar(30) default NULL,
-  body text,
-  seeAlso varchar(50) NOT NULL default '0',
-  PRIMARY KEY  (helpId,namespace,language),
-  KEY helpId (helpId,language)
-) TYPE=MyISAM;
-
-#
-# Dumping data for table 'help'
-#
-
+alter table widget add column position char(1) not null default 'A';
+alter table page add column template varchar(30) not null default 'Default';
+update widget set position='A';
+update page set template='Default';
+delete from help;
 INSERT INTO help VALUES (1,'WebGUI','English','Add/Edit','Page','Think of pages as containers for content. For instance, if you want to write a letter to the editor of your favorite magazine you\'d get out a notepad (or open a word processor) and start filling it with your thoughts. The same is true with WebGUI. Create a page, then add your content to the page.\r\n\r\n<b>Title</b>\r\nThe title of the page is what your users will use to navigate through the site. Titles should be descriptive, but not very long.\r\n\r\n<b>Page URL</b>\r\nWhen you create a page a url for the page is generated based on the page title. If you are unhappy with the url that was chosen, you can change it here.\r\n\r\n<b>Meta Tags</b>\r\nMeta tags are used by some search engines to associate key words to a particular page. There is a great site called <a href=\"http://www.metatagbuilder.com/\">Meta Tag Builder</a> that will help you build meta tags if you\'ve never done it before.\r\n\r\n<i>Advanced Users:</i> If you have other things (like JavaScript) you usually put in the &lt;head&gt; area of your pages, you may put them here as well.\r\n\r\n<b>Use default meta tags?</b>\r\nIf you don\'t wish to specify meta tags yourself, WebGUI can generate meta tags based on the page title and your company\'s name. Check this box to enable the defaultly generated meta tags.\r\n\r\n<b>Style</b>\r\nBy default, when you create a page, it inherits a few traits from its parent. One of those traits is style. Choose from the list of styles if you would like to change the appearance of this page. See <i>Add Style</i> for more details.\r\n\r\nIf you check the box below to the style pull-down menu, all of the pages below this page will take on the style you\'ve chosen for this page.\r\n\r\n<b>Owner</b>\r\nThe owner of a page is usually the person who created the page.\r\n\r\n<b>Owner can view?</b>\r\nCan the owner view the page or not?\r\n\r\n<b>Owner can edit?</b>\r\nCan the owner edit the page or not? Be careful, if you decide that the owner cannot edit the page and you do not belong to the page group, then you\'ll lose the ability to edit this page.\r\n\r\n<b>Group</b>\r\nA group is assigned to every page for additional privilege control. Pick a group from the pull-down menu.\r\n\r\n<b>Group can view?</b>\r\nCan members of this group view this page?\r\n\r\n<b>Group can edit?</b>\r\nCan members of this group edit this page?\r\n\r\n<b>Anybody can view?</b>\r\nCan any visitor or member regardless of the group and owner view this page?\r\n\r\n<b>Anybody can edit?</b>\r\nCan any visitor or member regardless of the group and owner edit this page?\r\n\r\nYou can optionally give these privileges to all pages under this page.\r\n','0');
 INSERT INTO help VALUES (3,'WebGUI','English','Delete','Page','Deleting a page can create a big mess if you are uncertain about what you are doing. When you delete a page you are also deleting the content it contains, all sub-pages connected to this page, and all the content they contain. Be certain that you have already moved all the content you wish to keep before you delete a page.\r\n\r\nAs with any delete operation, you are prompted to be sure you wish to proceed with the delete. If you answer yes, the delete will proceed and there is no recovery possible. If you answer no you\'ll be returned to the prior screen.','0');
 INSERT INTO help VALUES (4,'WebGUI','English','Delete','Style','When you delete a style all pages using that style will be reverted to the fail safe (default) style. To ensure uninterrupted viewing, you should be sure that no pages are using a style before you delete it.\r\n\r\nAs with any delete operation, you are prompted to be sure you wish to proceed with the delete. If you answer yes, the delete will proceed and there is no recovery possible. If you answer no you\'ll be returned to the prior screen.','4,5');
@@ -431,99 +17,29 @@ INSERT INTO help VALUES (15,'WebGUI','English','Delete','Group','As the function
 INSERT INTO help VALUES (16,'WebGUI','English','Add/Edit','Style','Styles are WebGUI macro enabled. See <i>Using Macros</i> for more information.\r\n\r\n<b>Style Name</b>\r\nA unique name to describe what this style looks like at a glance. The name has no effect on the actual look of the style.\r\n\r\n<b>Header</b>\r\nThe header is the start of the look of your site. It is helpful to look at your design and cut it into three pieces. The top and left of your design is the header. The center part is the content, and the right and bottom is the footer. Cut the HTML from your header and paste it in the space provided.\r\n\r\nIf you are in need of assistance for creating a look for your site, or if you need help cutting apart your design, <a href=\"http://www.plainblack.com\">Plain Black Software</a> provides support services for a small fee.\r\n\r\nMany people will add WebGUI macros to their header for automated navigation, and other features.\r\n\r\n<b>Footer</b>\r\nThe footer is the end of the look for your site. It is the right and bottom portion of your design. You may also place WebGUI macros in your footer.\r\n\r\n<b>Style Sheet</b>\r\nPlace your style sheet entries here. Style sheets are used to control colors, sizes, and other properties of the elements on your site. See <i>Using Style Sheets</i> for more information.\r\n\r\n<i>Advanced Users:</i> for greater performance create your stylesheet on the file system (call it something like webgui.css) and add an entry like this to this area: \r\n&lt;link href=\"/webgui.css\" rel=\"stylesheet\" rev=\"stylesheet\" type=\"text/css\"&gt;','4,5');
 INSERT INTO help VALUES (17,'WebGUI','English','Add/Edit','Group','See <i>Manage Group</i> for a description of grouping functions and the default groups.\r\n\r\n<b>Group Name</b>\r\nA name for the group. It is best if the name is descriptive so you know what it is at a glance.\r\n\r\n<b>Description</b>\r\nA longer description of the group so that other admins and content managers (or you if you forget) will know what the purpose of this group is.','0');
 INSERT INTO help VALUES (24,'WebGUI','English','Edit','Miscellaneous Settings','<b>Not Found Page</b>\r\nIf a page that a user requests is not found in the system, the user can be redirected to the home page or to an error page where they can attempt to find what they were looking for. You decide which is better for your users.\r\n\r\n<b>Session Timeout</b>\r\nThe time (in seconds) that a user session remains active (before needing to log in again). This timeout is reset each time a visitor hits a page. Therefore if you set the timeout for 8 hours, a user would have to log in again if s/he hadn\'t visited the site for 8 hours.\r\n\r\n1800 = half hour\r\n3600 = 1 hour\r\n28000 = 8 hours\r\n86400 = 1 day\r\n604800 = 1 week\r\n1209600 = 2 weeks\r\n','6');
-INSERT INTO help VALUES (18,'WebGUI','English','Using','Style Sheets','<a href=\"http://www.w3.org/Style/CSS/\">Cascading Style Sheets (CSS)</a> are a great way to manage the look and feel of any web site. They are used extensively in WebGUI.\r\n\r\nIf you are unfamiliar with how to use CSS, <a href=\"http://www.plainblack.com\">Plain Black Software</a> provides training classes on XHTML and CSS. Alternatively, Bradsoft makes an excellent CSS editor called <a href=\"http://www.bradsoft.com/topstyle/index.asp\">Top Style</a>.\r\n\r\nThe following is a list of classes used to control the look of WebGUI:\r\n\r\n<b>A</b>\r\nThe links throughout the style.\r\n\r\n<b>BODY</b>\r\nThe default setup of all pages within a style.\r\n\r\n<b>H1</b>\r\nThe headers on every page.\r\n\r\n<b>.accountOptions</b>\r\nThe links that appear under the login and account update forms.\r\n\r\n<b>.adminBar </b>\r\nThe bar that appears at the top of the page when you\'re in admin mode.\r\n\r\n<b>.content</b>\r\nThe main content area on all pages of the style.\r\n\r\n<b>.crumbTrail </b>\r\nThe crumb trail (if you\'re using that macro).\r\n\r\n<b>.formDescription </b>\r\nThe tags on all forms next to the form elements. \r\n\r\n<b>.formSubtext </b>\r\nThe tags below some form elements.\r\n\r\n<b>.highlight </b>\r\nDenotes a highlighted item, such as which message you are viewing within a list.\r\n\r\n<b>.homeLink</b>\r\nUsed by the my home (^H) macro.\r\n\r\n<b>.horizontalMenu </b>\r\nThe horizontal menu (if you use a horizontal menu macro).\r\n\r\n<b>.loginBox</b>\r\nThe login box (^L) macro.\r\n\r\n<b>.makePrintableLink</b>\r\nUsed by the make printable (^r) macro.\r\n\r\n<b>.myAccountLink</b>\r\nUsed by the my account (^a) macro.\r\n\r\n<b>.pagination </b>\r\nThe Previous and Next links on pages with pagination.\r\n\r\n<b>.tableData </b>\r\nThe data rows on things like message boards and user contributions.\r\n\r\n<b>.tableHeader </b>\r\nThe headings of columns on things like message boards and user contributions.\r\n\r\n<b>.tableMenu </b>\r\nThe menu on things like message boards and user submissions.\r\n\r\n<b>.verticalMenu </b>\r\nThe vertical menu (if you use a verticall menu macro).\r\n\r\n<i><b>Note:</b></i> Some widgets have their own unique styles.\r\n\r\n','0');
-INSERT INTO help VALUES (19,'WebGUI','English','Using','Macros','WebGUI macros are used to create dynamic content within otherwise static content. For instance, you may wish to show which user is logged in on every page, or you may wish to have a dynamically built menu or crumb trail. \r\n\r\nMacros always begin with a carat (^) and follow with at least one other character and ended with w semicolon (;). Some macros can be extended/configured by taking the format of ^<i>x</i>(\"<b>config text</b>\");. The following is a description of all the macros in the WebGUI system.\r\n\r\n<b>^a; or ^a(\"new link title\"); - My Account Link</b>\r\nA link to your account information. In addition you can change the link text by creating a macro like this <b>^a(\"Account Info\");</b>.\r\n\r\n<b>^C; - Crumb Trail</b>\r\nA dynamically generated crumb trail to the current page.\r\n\r\n<b>^c; - Company Name</b>\r\nThe name of your company specified in the settings by your Administrator.\r\n\r\n<b>^D; or ^D(\"%c %D, %y\"); - Date</b>\r\nThe current date and time.\r\n\r\nYou can configure the date by using date formatting symbols. For instance, if you created a macro like this <b>^D(\"%c %D, %y\");</b> it would output <b>September 26, 2001</b>. The following are the available date formatting symbols:\r\n<span style=\"font-family: courier;\">\r\n    %% = %\r\n    %y = 4 digit year\r\n    %Y = 2 digit year\r\n    %m = 2 digit month\r\n    %M = variable digit month\r\n    %c = month name\r\n    %d = 2 digit day of month\r\n    %D = variable digit day of month\r\n    %w = day of week name\r\n    %h = 2 digit base 12 hour\r\n    %H = variable digit base 12 hour\r\n    %j = 2 digit base 24 hour\r\n    %J = variable digit base 24 hour\r\n    %p = lower case am/pm\r\n    %P = upper case AM/PM\r\n</span>\r\n<b>^e; - Company Email Address</b>\r\nThe email address for your company specified in the settings by your Administrator.\r\n\r\n<b>^H; or ^H(\"Go Home\"); - Home Link</b>\r\nA link to the home page of this site.  In addition you can change the link text by creating a macro like this <b>^H(\"Go Home\");</b>.\r\n\r\n<b>^L; - Login</b>\r\nA small login form.\r\n\r\n<b>^M; or ^M(3); - Current Menu (Vertical)</b>\r\nA vertical menu containing the sub-pages at the current level. In addition, you may configure this macro by specifying how many levels deep the menu should go. By default it will show only the first level. To go three levels deep create a macro like this <b>^M(3);</b>. If you set the macro to \"0\" it will track the entire site tree.\r\n\r\n<b>^m; - Current Menu (Horizontal)</b>\r\nA horizontal menu containing the sub-pages at the current level.\r\n\r\n<b>^P; or ^P(3); - Previous Menu (Vertical)</b>\r\nA vertical menu containing the sub-pages at the previous level. In addition, you may configure this macro by specifying how many levels deep the menu should go. By default it will show only the first level. To go three levels deep create a macro like this <b>^P(3);</b>. If you set the macro to \"0\" it will track the entire site tree.\r\n\r\n<b>^p; - Previous Menu (Horizontal)</b>\r\nA horizontal menu containing the sub-pages at the previous level.\r\n\r\n<b>^r; or ^r(\"Print Me!\"); - Make Page Printable</b>\r\nCreates a link to remove the style from a page to make it printable.  In addition, you can change the link text by creating a macro like this <b>^r(\"Print Me!\");</b>.\r\n\r\n<b>^S(\"home\",0); - Specific SubMenu (Vertical)</b>\r\nThis macro allows you to get the submenu of any page, starting with the page you specified. For instance, you could get the home page submenu by creating a macro that looks like this <b>^S(\"home\",0);</b>. The first value is the urlized title of the page and the second value is the depth you\'d like the menu to go. By default it will show only the first level. To go three levels deep create a macro like this <b>^S(\"home\",3);</b>.\r\n\r\n<b>^s(\"home\"); - Specific SubMenu (Horizontal)</b>\r\nThis macro allows you to get the submenu of any page, starting with the page you specified. For instance, you could get the home page submenu by creating a macro that looks like this <b>^s(\"home\");</b>. The value is the urlized title of the page.\r\n\r\n<b>^T; or ^T(3); - Top Level Menu (Vertical)</b>\r\nA vertical menu containing the main pages of the site (aka the sub-pages from the home page). In addition, you may configure this macro by specifying how many levels deep the menu should go. By default it will show only the first level. To go three levels deep create a macro like this <b>^T(3);</b>. If you set the macro to \"0\" it will track the entire site tree.\r\n\r\n<b>^t; - Top Level Menu (Horizontal)</b>\r\nA vertical menu containing the main pages of the site (aka the sub-pages from the home page).\r\n\r\n<b>^u; - Company URL</b>\r\nThe URL for your company specified in the settings by your Administrator.\r\n\r\n<b>^/; - System URL</b>\r\nThe URL to the gateway script (including the domain for this site). This is often used within pages so that if your development server is on a domain different than your production server that your URLs will still worked when moved.\r\n\r\n<b>^\\; - Page URL</b>\r\nThe URL to the current page (including the domain for this site). This is often used within pages so that if your development server is on a domain different than your production server that your URLs will still worked when moved.\r\n\r\n<b>^@; - Username</b>\r\nThe username of the currently logged in user.\r\n\r\n<b>^#; - User ID</b>\r\nThe user id of the currently logged in user.\r\n\r\n<b>^*; or ^*(100); - Random Number</b>\r\nA randomly generated number. This is often used on images (such as banner ads) that you want to ensure do not cache. In addition, you may configure this macro like this <b>^*(100);</b> to create a random number between 0 and 100.\r\n\r\n<b>^0;,^1;,^2;,^3;,^4;,^5;,^6;,^7;,^8;,^9;, ^-;</b>\r\nThese macros are reserved for widget-specific functions as in the SQL Report widget.\r\n','0');
-INSERT INTO help VALUES (1,'SQLReport','English','Add/Edit','SQL Report','SQL Reports are perhaps the most powerful widget in the WebGUI arsenal. They allow a user to query data from any database that they have access to. This is great for getting sales figures from your Accounting database or even summarizing all the message boards on your web site.\r\n\r\n<b>Title</b>\r\nThe title of this report.\r\n\r\n<b>Display the title?</b>\r\nDo you wish to disply the title?\r\n\r\n<b>Process macros?</b>\r\nDo you wish to process WebGUI macros? Unchecking this box will not process macros and will speed up page execution.\r\n\r\n<b>Description</b>\r\nDescribe the content of this report so your users will better understand what the report is all about.\r\n\r\n<b>Template</b>\r\nLayout a template of how this report should look. Usually you\'ll use HTML tables to generate a report. An example is included below.\r\n\r\nThere are 11 special macro characters used in generating SQL Reports. They are ^-;, ^0;, ^1;, ^2;, ^3;, ^4;, ^5;, ^6;, ^7;, ^8;, and ^9;. These macros will be processed regardless of whether you checked the process macros box above. The ^- macro represents split points in the document where the report will begin and end looping. The numeric macros represent the data fields that will be returned from your query. Note that you may only have 10 fields returned per row in your query.\r\n\r\n<i>Sample Template:</i>\r\n&lt;table&gt;\r\n&lt;tr&gt;&lt;th&gt;Employee Name&lt;/th&gt;&lt;th&gt;Employee #&lt;/th&gt;&lt;th&gt;Vacation Days Remaining&lt;/th&gt;&lt;th&gt;Monthly Salary&lt;/th&gt;&lt;/tr&gt;\r\n^-;\r\n&lt;tr&gt;&lt;td&gt;^0;&lt;/td&gt;&lt;td&gt;^1;&lt;/td&gt;&lt;td&gt;^2;&lt;/td&gt;&lt;td&gt;^3;&lt;/td&gt;&lt;/tr&gt;\r\n^-;\r\n&lt;/table&gt;\r\n\r\n<b>Query</b>\r\nThis is a standard SQL query. If you are unfamiliar with SQL, <a href=\"http://www.plainblack.com\">Plain Black Software</a> provides training courses in SQL and database management.\r\n\r\n<b>DSN</b>\r\n<b>D</b>ata <b>S</b>ource <b>N</b>ame is the unique identifier that Perl uses to describe the location of your database. It takes the format of DBI:[driver]:[database name]:[host]. \r\n\r\n<i>Example:</i> DBI:mysql:WebGUI:localhost\r\n\r\n<b>Database User</b>\r\nThe username you use to connect to the DSN.\r\n\r\n<b>Database Password</b>\r\nThe password you use to connect to the DSN.\r\n\r\n<b>Convert carriage returns?</b>\r\nDo you wish to convert the carriage returns in the resultant data to HTML breaks (&lt;br&gt;).\r\n','1,2,3,4,5');
+INSERT INTO help VALUES (18,'WebGUI','English','Using','Style Sheets','<a href=\"http://www.w3.org/Style/CSS/\">Cascading Style Sheets (CSS)</a> are a great way to manage the look and feel of any web site. They are used extensively in WebGUI.\r\n\r\nIf you are unfamiliar with how to use CSS, <a href=\"http://www.plainblack.com\">Plain Black Software</a> provides training classes on XHTML and CSS. Alternatively, Bradsoft makes an excellent CSS editor called <a href=\"http://www.bradsoft.com/topstyle/index.asp\">Top Style</a>.\r\n\r\nThe following is a list of classes used to control the look of WebGUI:\r\n\r\n<b>A</b>\r\nThe links throughout the style.\r\n\r\n<b>BODY</b>\r\nThe default setup of all pages within a style.\r\n\r\n<b>H1</b>\r\nThe headers on every page.\r\n\r\n<b>.accountOptions</b>\r\nThe links that appear under the login and account update forms.\r\n\r\n<b>.adminBar </b>\r\nThe bar that appears at the top of the page when you\'re in admin mode.\r\n\r\n<b>.content</b>\r\nThe main content area on all pages of the style.\r\n\r\n<b>.crumbTrail </b>\r\nThe crumb trail (if you\'re using that macro).\r\n\r\n<b>.formDescription </b>\r\nThe tags on all forms next to the form elements. \r\n\r\n<b>.formSubtext </b>\r\nThe tags below some form elements.\r\n\r\n<b>.highlight </b>\r\nDenotes a highlighted item, such as which message you are viewing within a list.\r\n\r\n<b>.homeLink</b>\r\nUsed by the my home (^H;) macro.\r\n\r\n<b>.horizontalMenu </b>\r\nThe horizontal menu (if you use a horizontal menu macro).\r\n\r\n<b>.loginBox</b>\r\nThe login box (^L;) macro.\r\n\r\n<b>.makePrintableLink</b>\r\nUsed by the make printable (^r;) macro.\r\n\r\n<b>.myAccountLink</b>\r\nUsed by the my account (^a;) macro.\r\n\r\n<b>.pagination </b>\r\nThe Previous and Next links on pages with pagination.\r\n\r\n<b>.searchBox</b>\r\nUsed by the search (^?;) macro.\r\n\r\n<b>.tableData </b>\r\nThe data rows on things like message boards and user contributions.\r\n\r\n<b>.tableHeader </b>\r\nThe headings of columns on things like message boards and user contributions.\r\n\r\n<b>.tableMenu </b>\r\nThe menu on things like message boards and user submissions.\r\n\r\n<b>.verticalMenu </b>\r\nThe vertical menu (if you use a verticall menu macro).\r\n\r\n<i><b>Note:</b></i> Some widgets have their own unique styles.\r\n\r\n','0');
+INSERT INTO help VALUES (19,'WebGUI','English','Using','Macros','WebGUI macros are used to create dynamic content within otherwise static content. For instance, you may wish to show which user is logged in on every page, or you may wish to have a dynamically built menu or crumb trail. \r\n\r\nMacros always begin with a carat (^) and follow with at least one other character and ended with w semicolon (;). Some macros can be extended/configured by taking the format of ^<i>x</i>(\"<b>config text</b>\");. The following is a description of all the macros in the WebGUI system.\r\n\r\n<b>^a; or ^a(\"new link title\"); - My Account Link</b>\r\nA link to your account information. In addition you can change the link text by creating a macro like this <b>^a(\"Account Info\");</b>.\r\n\r\n<b>^C; - Crumb Trail</b>\r\nA dynamically generated crumb trail to the current page.\r\n\r\n<b>^c; - Company Name</b>\r\nThe name of your company specified in the settings by your Administrator.\r\n\r\n<b>^D; or ^D(\"%c %D, %y\"); - Date</b>\r\nThe current date and time.\r\n\r\nYou can configure the date by using date formatting symbols. For instance, if you created a macro like this <b>^D(\"%c %D, %y\");</b> it would output <b>September 26, 2001</b>. The following are the available date formatting symbols:\r\n<span style=\"font-family: courier;\">\r\n    %% = %\r\n    %y = 4 digit year\r\n    %Y = 2 digit year\r\n    %m = 2 digit month\r\n    %M = variable digit month\r\n    %c = month name\r\n    %d = 2 digit day of month\r\n    %D = variable digit day of month\r\n    %w = day of week name\r\n    %h = 2 digit base 12 hour\r\n    %H = variable digit base 12 hour\r\n    %j = 2 digit base 24 hour\r\n    %J = variable digit base 24 hour\r\n    %p = lower case am/pm\r\n    %P = upper case AM/PM\r\n</span>\r\n<b>^e; - Company Email Address</b>\r\nThe email address for your company specified in the settings by your Administrator.\r\n\r\n<b>^H; or ^H(\"Go Home\"); - Home Link</b>\r\nA link to the home page of this site.  In addition you can change the link text by creating a macro like this <b>^H(\"Go Home\");</b>.\r\n\r\n<b>^L; - Login</b>\r\nA small login form.\r\n\r\n<b>^M; or ^M(3); - Current Menu (Vertical)</b>\r\nA vertical menu containing the sub-pages at the current level. In addition, you may configure this macro by specifying how many levels deep the menu should go. By default it will show only the first level. To go three levels deep create a macro like this <b>^M(3);</b>. If you set the macro to \"0\" it will track the entire site tree.\r\n\r\n<b>^m; - Current Menu (Horizontal)</b>\r\nA horizontal menu containing the sub-pages at the current level.\r\n\r\n<b>^P; or ^P(3); - Previous Menu (Vertical)</b>\r\nA vertical menu containing the sub-pages at the previous level. In addition, you may configure this macro by specifying how many levels deep the menu should go. By default it will show only the first level. To go three levels deep create a macro like this <b>^P(3);</b>. If you set the macro to \"0\" it will track the entire site tree.\r\n\r\n<b>^p; - Previous Menu (Horizontal)</b>\r\nA horizontal menu containing the sub-pages at the previous level.\r\n\r\n<b>^r; or ^r(\"Print Me!\"); - Make Page Printable</b>\r\nCreates a link to remove the style from a page to make it printable.  In addition, you can change the link text by creating a macro like this <b>^r(\"Print Me!\");</b>.\r\n\r\n<b>^S(\"home\",0); - Specific SubMenu (Vertical)</b>\r\nThis macro allows you to get the submenu of any page, starting with the page you specified. For instance, you could get the home page submenu by creating a macro that looks like this <b>^S(\"home\",0);</b>. The first value is the urlized title of the page and the second value is the depth you\'d like the menu to go. By default it will show only the first level. To go three levels deep create a macro like this <b>^S(\"home\",3);</b>.\r\n\r\n<b>^s(\"home\"); - Specific SubMenu (Horizontal)</b>\r\nThis macro allows you to get the submenu of any page, starting with the page you specified. For instance, you could get the home page submenu by creating a macro that looks like this <b>^s(\"home\");</b>. The value is the urlized title of the page.\r\n\r\n<b>^T; or ^T(3); - Top Level Menu (Vertical)</b>\r\nA vertical menu containing the main pages of the site (aka the sub-pages from the home page). In addition, you may configure this macro by specifying how many levels deep the menu should go. By default it will show only the first level. To go three levels deep create a macro like this <b>^T(3);</b>. If you set the macro to \"0\" it will track the entire site tree.\r\n\r\n<b>^t; - Top Level Menu (Horizontal)</b>\r\nA vertical menu containing the main pages of the site (aka the sub-pages from the home page).\r\n\r\n<b>^u; - Company URL</b>\r\nThe URL for your company specified in the settings by your Administrator.\r\n\r\n<b>^/; - System URL</b>\r\nThe URL to the gateway script (including the domain for this site). This is often used within pages so that if your development server is on a domain different than your production server that your URLs will still worked when moved.\r\n\r\n<b>^\\; - Page URL</b>\r\nThe URL to the current page (including the domain for this site). This is often used within pages so that if your development server is on a domain different than your production server that your URLs will still worked when moved.\r\n\r\n<b>^@; - Username</b>\r\nThe username of the currently logged in user.\r\n\r\n<b>^?; - Search</b>\r\nAdd a search box.\r\n\r\n<b>^#; - User ID</b>\r\nThe user id of the currently logged in user.\r\n\r\n<b>^*; or ^*(100); - Random Number</b>\r\nA randomly generated number. This is often used on images (such as banner ads) that you want to ensure do not cache. In addition, you may configure this macro like this <b>^*(100);</b> to create a random number between 0 and 100.\r\n\r\n<b>^0;,^1;,^2;,^3;,^4;,^5;,^6;,^7;,^8;,^9;, ^-;</b>\r\nThese macros are reserved for widget-specific functions as in the SQL Report widget.\r\n','0');
+INSERT INTO help VALUES (1,'SQLReport','English','Add/Edit','SQL Report','SQL Reports are perhaps the most powerful widget in the WebGUI arsenal. They allow a user to query data from any database that they have access to. This is great for getting sales figures from your Accounting database or even summarizing all the message boards on your web site.\r\n\r\n<b>Title</b>\r\nThe title of this report.\r\n\r\n<b>Display the title?</b>\r\nDo you wish to disply the title?\r\n\r\n<b>Process macros?</b>\r\nDo you wish to process WebGUI macros? Unchecking this box will not process macros and will speed up page execution.\r\n\r\n<b>Position</b>\r\nSelect the position in the current page template where this widget should be placed.\r\n\r\n<b>Description</b>\r\nDescribe the content of this report so your users will better understand what the report is all about.\r\n\r\n<b>Template</b>\r\nLayout a template of how this report should look. Usually you\'ll use HTML tables to generate a report. An example is included below.\r\n\r\nThere are 11 special macro characters used in generating SQL Reports. They are ^-;, ^0;, ^1;, ^2;, ^3;, ^4;, ^5;, ^6;, ^7;, ^8;, and ^9;. These macros will be processed regardless of whether you checked the process macros box above. The ^- macro represents split points in the document where the report will begin and end looping. The numeric macros represent the data fields that will be returned from your query. Note that you may only have 10 fields returned per row in your query.\r\n\r\n<i>Sample Template:</i>\r\n&lt;table&gt;\r\n&lt;tr&gt;&lt;th&gt;Employee Name&lt;/th&gt;&lt;th&gt;Employee #&lt;/th&gt;&lt;th&gt;Vacation Days Remaining&lt;/th&gt;&lt;th&gt;Monthly Salary&lt;/th&gt;&lt;/tr&gt;\r\n^-;\r\n&lt;tr&gt;&lt;td&gt;^0;&lt;/td&gt;&lt;td&gt;^1;&lt;/td&gt;&lt;td&gt;^2;&lt;/td&gt;&lt;td&gt;^3;&lt;/td&gt;&lt;/tr&gt;\r\n^-;\r\n&lt;/table&gt;\r\n\r\n<b>Query</b>\r\nThis is a standard SQL query. If you are unfamiliar with SQL, <a href=\"http://www.plainblack.com\">Plain Black Software</a> provides training courses in SQL and database management.\r\n\r\n<b>DSN</b>\r\n<b>D</b>ata <b>S</b>ource <b>N</b>ame is the unique identifier that Perl uses to describe the location of your database. It takes the format of DBI:[driver]:[database name]:[host]. \r\n\r\n<i>Example:</i> DBI:mysql:WebGUI:localhost\r\n\r\n<b>Database User</b>\r\nThe username you use to connect to the DSN.\r\n\r\n<b>Database Password</b>\r\nThe password you use to connect to the DSN.\r\n\r\n<b>Convert carriage returns?</b>\r\nDo you wish to convert the carriage returns in the resultant data to HTML breaks (&lt;br&gt;).\r\n','1,2,3,4,5');
 INSERT INTO help VALUES (21,'WebGUI','English','Using','Widget','Widgets are the true power of WebGUI. Widgets are tiny pluggable applications built to run under WebGUI. Message boards and polls are examples of widgets.\r\n\r\nTo add a widget to a page, first go to that page, then select <i>Add Content...</i> from the upper left corner of your screen. Each widget has it\'s own help so be sure to read the help if you\'re not sure how to use a widget.\r\n','0');
-INSERT INTO help VALUES (1,'Article','English','Add/Edit','Article','Articles are the Swiss Army knife of WebGUI. Most pieces of static content can be added via the Article widget.\r\n\r\n<b>Title</b>\r\nWhat\'s the title for this content? Even if you don\'t wish the title to appear, it\'s a good idea to title your content so that if it is ever copied to the clipboard it will have a name.\r\n\r\n<b>Display the title?</b>\r\nDo you wish to display the title listed above?\r\n\r\n<b>Process macros?</b>\r\nDo you wish to process WebGUI macros on this article? Unchecking this box will not process macros and will speed up page execution.\r\n\r\n<b>Start Date</b>\r\nWhat date do you want this article to appear on the site? Dates are in the format of MM/DD/YYYY. You can use the JavaScript wizard to choose your date from a calendar by clicking on the <i>set date</i> button. By default the date is set to 01/01/2000.\r\n\r\n<b>End Date</b>\r\nWhat date do you want this article to be removed from the site? By default the date is set to 100 years in the future, 01/01/2100.\r\n\r\n<b>Body</b>\r\nThe body of the article is where all the content goes. You may feel free to add HTML tags as necessary to format your content. Be sure to put a &lt;p&gt; between paragraphs to add white space to your content.\r\n\r\n<b>Image</b>\r\nChoose an image (.jpg, .gif, .png) file from your hard drive. This file will be uploaded to the server and displayed in the upper-right corner of your article.\r\n\r\n<b>Link Title</b>\r\nIf you wish to add a link to your article, enter the title of the link in this field. \r\n\r\n<i>Example:</i> Google\r\n\r\n<b>Link URL</b>\r\nIf you added a link title, now add the URL (uniform resource locator) here. \r\n\r\n<i>Example:</i> http://www.google.com\r\n\r\n<b>Attachment</b>\r\nIf you wish to attach a word processor file, a zip file, or any other file for download by your users, then choose it from your hard drive.\r\n\r\n<b>Convert carriage returns?</b>\r\nIf you\'re publishin HTML there\'s generally no need to check this option, but if you aren\'t using HTML and you want a carriage return every place you hit your \"Enter\" key, then check this option.\r\n','1,2,3,4,5');
-INSERT INTO help VALUES (1,'ExtraColumn','English','Add/Edit','Extra Column','Extra columns allow you to change the layout of your page for one page only. If you wish to have multiple columns on all your pages. Perhaps you should consider altering the <i>style</i> applied to your pages. \r\n\r\nColumns are always added from left to right. Therefore any existing content will be on the left of the new column.\r\n\r\n<b>Spacer</b>\r\nSpacer is the amount of space between your existing content and your new column. It is measured in pixels.\r\n\r\n<b>Width</b>\r\nWidth is the actual width of the new column to be added. Width is measured in pixels.\r\n\r\n<b>StyleSheet Class</b>\r\nBy default the <i>content</i> style (which is the style the body of your site should be using) that is applied to all columns. However, if you\'ve created a style specifically for columns, then feel free to modify this class.\r\n','1,2,3,4,5');
+INSERT INTO help VALUES (1,'Article','English','Add/Edit','Article','Articles are the Swiss Army knife of WebGUI. Most pieces of static content can be added via the Article widget.\r\n\r\n<b>Title</b>\r\nWhat\'s the title for this content? Even if you don\'t wish the title to appear, it\'s a good idea to title your content so that if it is ever copied to the clipboard it will have a name.\r\n\r\n<b>Display the title?</b>\r\nDo you wish to display the title listed above?\r\n\r\n<b>Process macros?</b>\r\nDo you wish to process WebGUI macros on this article? Unchecking this box will not process macros and will speed up page execution.\r\n\r\n<b>Position</b>\r\nSelect the position in the current page template where this widget should be placed.\r\n\r\n<b>Start Date</b>\r\nWhat date do you want this article to appear on the site? Dates are in the format of MM/DD/YYYY. You can use the JavaScript wizard to choose your date from a calendar by clicking on the <i>set date</i> button. By default the date is set to 01/01/2000.\r\n\r\n<b>End Date</b>\r\nWhat date do you want this article to be removed from the site? By default the date is set to 100 years in the future, 01/01/2100.\r\n\r\n<b>Body</b>\r\nThe body of the article is where all the content goes. You may feel free to add HTML tags as necessary to format your content. Be sure to put a &lt;p&gt; between paragraphs to add white space to your content.\r\n\r\n<b>Image</b>\r\nChoose an image (.jpg, .gif, .png) file from your hard drive. This file will be uploaded to the server and displayed in the upper-right corner of your article.\r\n\r\n<b>Link Title</b>\r\nIf you wish to add a link to your article, enter the title of the link in this field. \r\n\r\n<i>Example:</i> Google\r\n\r\n<b>Link URL</b>\r\nIf you added a link title, now add the URL (uniform resource locator) here. \r\n\r\n<i>Example:</i> http://www.google.com\r\n\r\n<b>Attachment</b>\r\nIf you wish to attach a word processor file, a zip file, or any other file for download by your users, then choose it from your hard drive.\r\n\r\n<b>Convert carriage returns?</b>\r\nIf you\'re publishin HTML there\'s generally no need to check this option, but if you aren\'t using HTML and you want a carriage return every place you hit your \"Enter\" key, then check this option.\r\n','1,2,3,4,5');
+INSERT INTO help VALUES (1,'ExtraColumn','English','Add/Edit','Extra Column','Extra columns allow you to change the layout of your page for one page only. If you wish to have multiple columns on all your pages. Perhaps you should consider altering the <i>style</i> applied to your pages. \r\n\r\nColumns are always added from left to right. Therefore any existing content will be on the left of the new column.\r\n\r\n<b>Position</b>\r\nSelect the position in the current page template where this widget should be placed.\r\n\r\n<b>Spacer</b>\r\nSpacer is the amount of space between your existing content and your new column. It is measured in pixels.\r\n\r\n<b>Width</b>\r\nWidth is the actual width of the new column to be added. Width is measured in pixels.\r\n\r\n<b>StyleSheet Class</b>\r\nBy default the <i>content</i> style (which is the style the body of your site should be using) that is applied to all columns. However, if you\'ve created a style specifically for columns, then feel free to modify this class.\r\n','1,2,3,4,5');
 INSERT INTO help VALUES (27,'WebGUI','English','Add/Edit','Widget','You can add widgets by selecting from the <i>Add Content</i> pulldown menu. You can edit them by clicking on the \"Edit\" button that appears directly above an instance of a particular widget.','0');
-INSERT INTO help VALUES (1,'Poll','English','Add/Edit','Poll','Polls can be used to get the impressions of your users on various topics.\r\n\r\n<b>Title</b>\r\nThe title of the poll. Even if you don\'t wish to display the title you should fill out this field so this poll will have a name if it is ever placed in the clipboard.\r\n\r\n<b>Display the title?</b>\r\nDo you wish to disply the title?\r\n\r\n<b>Process macros?</b>\r\nDo you wish to process WebGUI macros? Unchecking this box will not process macros and will speed up page execution.\r\n\r\n<b>Description</b>\r\nYou may provide a description for this poll, or give the user some background information.\r\n\r\n<b>Active</b>\r\nIf this box is checked, then users will be able to vote. Otherwise they\'ll only be able to see the results of the poll.\r\n\r\n<b>Who can vote?</b>\r\nChoose a group that can vote on this poll.\r\n\r\n<b>Graph Width</b>\r\nThe width of the poll results graph. The width is measured in pixels.\r\n\r\n<b>Question</b>\r\nWhat is the question you\'d like to ask your users?\r\n\r\n<b>Answers</b>\r\nEnter the possible answers to your question. Enter only one answer per line. Polls are only capable of 20 possible answers.\r\n\r\n<b>Reset votes.</b>\r\nReset the votes on this poll.\r\n\r\n<hr size=1>\r\n<i><b>Note:</b></i> The following style sheet entries are custom to the Poll widget:\r\n\r\n<b>.pollAnswer </b>\r\nAn answer on a poll.\r\n\r\n<b>.pollColor </b>\r\nThe color of the percentage bar on a poll.\r\n\r\n<b>.pollQuestion </b>\r\nThe question on a poll.\r\n\r\n','1,2,3,4,5');
-INSERT INTO help VALUES (1,'SiteMap','English','Add/Edit','Site Map','Site maps are used to provide additional navigation in WebGUI. You could set up a traditional site map that would display a hierarchical view of all the pages in the site. On the other hand, you could use site maps to provide extra navigation at certain levels in your site.\r\n\r\n<b>Title</b>\r\nWhat title would you give to this site map? You should fill this field out even if you don\'t wish it to be displayed.\r\n\r\n<b>Display the title?</b>\r\nDo you wish to disply the title?\r\n\r\n<b>Process macros?</b>\r\nDo you wish to process WebGUI macros? Unchecking this box will not process macros and will speed up page execution.\r\n\r\n<b>Description</b>\r\nEnter a description as to why this site map is here and what purpose it serves.\r\n\r\n<b>Starting from this level?</b>\r\nIf the site map should display the page tree starting from this level, then check this box. If you wish the site map to start from the home page then uncheck it.\r\n\r\n<b>Show only one level?</b>\r\nShould the site map display only the current level of pages or all pages from this point forward? \r\n','1,2,3,4,5');
-INSERT INTO help VALUES (1,'MessageBoard','English','Add/Edit','Message Board','Message boards, also called Forums and/or Discussions, are a great way to add community to any site or intranets. Many companies use message boards internally to collaborate on projects.\r\n\r\n<b>Title</b>\r\nThe name of this board.\r\n\r\n<b>Display the title?</b>\r\nDo you wish to disply the title?\r\n\r\n<b>Process macros?</b>\r\nDo you wish to process WebGUI macros? Unchecking this box will not process macros and will speed up page execution.\r\n\r\n<b>Description</b>\r\nBriefly describe what should be displayed on this message board.\r\n\r\n<b>Who can post?</b>\r\nWhat group can post to this message board?\r\n\r\n<b>Messages Per Page</b>\r\nWhen a visitor first comes to a message board s/he will be presented with a listing of all the topics (aka threads) of the message board. If a board is popular, it will quickly have many topics. The messages per page attribute allows you to specify how many topics should be shown on one page.\r\n\r\n<b>Edit Timeout</b>\r\nHow long after a user has posted to the board will their message be available for them to edit. This timeout is measured in hours.\r\n\r\n<i>Note:</i> Don\'t set this limit too high. One of the great things about message boards is that they are an accurate record of a discussion. If you allow editing for a long time, then a user has a chance to go back and change his/her mind a long time after the original statement was made.\r\n','1,2,3,4,5');
-INSERT INTO help VALUES (1,'LinkList','English','Add/Edit','Link List','Link lists are just what they sound like, a list of links. Many sites have a links section, and this just automates the process.\r\n\r\n<b>Title</b>\r\nWhat is the title of this link list?\r\n\r\n<b>Display the title?</b>\r\nDo you wish to disply the title?\r\n\r\n<b>Process macros?</b>\r\nDo you wish to process WebGUI macros? Unchecking this box will not process macros and will speed up page execution.\r\n\r\n<b>Description</b>\r\nDescribe the purpose of the links in this list.\r\n\r\n<b>Proceed to add link?</b>\r\nLeave this checked if you want to add links to the link list directly after creating it.\r\n\r\n<b>Adding / Editing Links</b>\r\nYou\'ll notice at the bottom of the Edit screen that there are some options to add, edit, delete and reorder the links in your link lists. This process works exactly as the process for doing the same with widgets and pages. The three properties of links are <i>name</i>, <i>url</i>, and <i>description</i>.\r\n','1,2,3,4,5');
+INSERT INTO help VALUES (1,'Poll','English','Add/Edit','Poll','Polls can be used to get the impressions of your users on various topics.\r\n\r\n<b>Title</b>\r\nThe title of the poll. Even if you don\'t wish to display the title you should fill out this field so this poll will have a name if it is ever placed in the clipboard.\r\n\r\n<b>Display the title?</b>\r\nDo you wish to disply the title?\r\n\r\n<b>Process macros?</b>\r\nDo you wish to process WebGUI macros? Unchecking this box will not process macros and will speed up page execution.\r\n\r\n<b>Position</b>\r\nSelect the position in the current page template where this widget should be placed.\r\n\r\n<b>Description</b>\r\nYou may provide a description for this poll, or give the user some background information.\r\n\r\n<b>Active</b>\r\nIf this box is checked, then users will be able to vote. Otherwise they\'ll only be able to see the results of the poll.\r\n\r\n<b>Who can vote?</b>\r\nChoose a group that can vote on this poll.\r\n\r\n<b>Graph Width</b>\r\nThe width of the poll results graph. The width is measured in pixels.\r\n\r\n<b>Question</b>\r\nWhat is the question you\'d like to ask your users?\r\n\r\n<b>Answers</b>\r\nEnter the possible answers to your question. Enter only one answer per line. Polls are only capable of 20 possible answers.\r\n\r\n<b>Reset votes.</b>\r\nReset the votes on this poll.\r\n\r\n<hr size=1>\r\n<i><b>Note:</b></i> The following style sheet entries are custom to the Poll widget:\r\n\r\n<b>.pollAnswer </b>\r\nAn answer on a poll.\r\n\r\n<b>.pollColor </b>\r\nThe color of the percentage bar on a poll.\r\n\r\n<b>.pollQuestion </b>\r\nThe question on a poll.\r\n\r\n','1,2,3,4,5');
+INSERT INTO help VALUES (1,'SiteMap','English','Add/Edit','Site Map','Site maps are used to provide additional navigation in WebGUI. You could set up a traditional site map that would display a hierarchical view of all the pages in the site. On the other hand, you could use site maps to provide extra navigation at certain levels in your site.\r\n\r\n<b>Title</b>\r\nWhat title would you give to this site map? You should fill this field out even if you don\'t wish it to be displayed.\r\n\r\n<b>Display the title?</b>\r\nDo you wish to disply the title?\r\n\r\n<b>Process macros?</b>\r\nDo you wish to process WebGUI macros? Unchecking this box will not process macros and will speed up page execution.\r\n\r\n<b>Position</b>\r\nSelect the position in the current page template where this widget should be placed.\r\n\r\n<b>Description</b>\r\nEnter a description as to why this site map is here and what purpose it serves.\r\n\r\n<b>Starting from this level?</b>\r\nIf the site map should display the page tree starting from this level, then check this box. If you wish the site map to start from the home page then uncheck it.\r\n\r\n<b>Show only one level?</b>\r\nShould the site map display only the current level of pages or all pages from this point forward? \r\n','1,2,3,4,5');
+INSERT INTO help VALUES (1,'MessageBoard','English','Add/Edit','Message Board','Message boards, also called Forums and/or Discussions, are a great way to add community to any site or intranets. Many companies use message boards internally to collaborate on projects.\r\n\r\n<b>Title</b>\r\nThe name of this board.\r\n\r\n<b>Display the title?</b>\r\nDo you wish to disply the title?\r\n\r\n<b>Process macros?</b>\r\nDo you wish to process WebGUI macros? Unchecking this box will not process macros and will speed up page execution.\r\n\r\n<b>Position</b>\r\nSelect the position in the current page template where this widget should be placed.\r\n\r\n<b>Description</b>\r\nBriefly describe what should be displayed on this message board.\r\n\r\n<b>Who can post?</b>\r\nWhat group can post to this message board?\r\n\r\n<b>Messages Per Page</b>\r\nWhen a visitor first comes to a message board s/he will be presented with a listing of all the topics (aka threads) of the message board. If a board is popular, it will quickly have many topics. The messages per page attribute allows you to specify how many topics should be shown on one page.\r\n\r\n<b>Edit Timeout</b>\r\nHow long after a user has posted to the board will their message be available for them to edit. This timeout is measured in hours.\r\n\r\n<i>Note:</i> Don\'t set this limit too high. One of the great things about message boards is that they are an accurate record of a discussion. If you allow editing for a long time, then a user has a chance to go back and change his/her mind a long time after the original statement was made.\r\n','1,2,3,4,5');
+INSERT INTO help VALUES (1,'LinkList','English','Add/Edit','Link List','Link lists are just what they sound like, a list of links. Many sites have a links section, and this just automates the process.\r\n\r\n<b>Title</b>\r\nWhat is the title of this link list?\r\n\r\n<b>Display the title?</b>\r\nDo you wish to disply the title?\r\n\r\n<b>Process macros?</b>\r\nDo you wish to process WebGUI macros? Unchecking this box will not process macros and will speed up page execution.\r\n\r\n<b>Position</b>\r\nSelect the position in the current page template where this widget should be placed.\r\n\r\n<b>Description</b>\r\nDescribe the purpose of the links in this list.\r\n\r\n<b>Proceed to add link?</b>\r\nLeave this checked if you want to add links to the link list directly after creating it.\r\n\r\n<b>Adding / Editing Links</b>\r\nYou\'ll notice at the bottom of the Edit screen that there are some options to add, edit, delete and reorder the links in your link lists. This process works exactly as the process for doing the same with widgets and pages. The three properties of links are <i>name</i>, <i>url</i>, and <i>description</i>.\r\n','1,2,3,4,5');
 INSERT INTO help VALUES (13,'WebGUI','English','Edit','Mail Settings','<b>Recover Password Message</b>\r\nThe message that gets sent to a user when they use the \"recover password\" function.\r\n\r\n<b>SMTP Server</b>\r\nThis is the address of your local mail server. It is needed for all features that use the Internet email system (such as password recovery).\r\n\r\n','6');
-INSERT INTO help VALUES (1,'SyndicatedContent','English','Add/Edit','Syndicated Content','Syndicated content is content that is pulled from another site using the RDF/RSS specification. This technology is often used to pull headlines from various news sites like <a href=\"http://www.cnn.com\">CNN</a> and  <a href=\"http://slashdot.org\">Slashdot</a>. It can, of course, be used for other things like sports scores, stock market info, etc.\r\n\r\nYou can find a list of syndicated content at <a href=\"http://my.userland.com\">http://my.userland.com</a>. You will need to register with an account to browse their listing of content. Also, the list contained there is by no means a complete list of all the syndicated content on the internet.\r\n\r\n<b>Title</b>\r\nWhat is the title for this content? This is often the title of the site that the content comes from.\r\n\r\n<b>Display the title?</b>\r\nDo you wish to disply the title?\r\n\r\n<b>Process macros?</b>\r\nDo you wish to process WebGUI macros? Unchecking this box will not process macros and will speed up page execution.\r\n\r\n<b>Description</b>\r\nBriefly describe the content being pulled so that your users will know what they are seeing.\r\n\r\n<b>URL to RSS file</b>\r\nProvide the exact URL (starting with http://) to the syndicated content\'s RDF or RSS file. The syndicated content will be downloaded from this URL hourly.','1,2,3,4,5');
-INSERT INTO help VALUES (1,'EventsCalendar','English','Add/Edit','Events Calendar','Events calendars are used on many intranets to keep track of internal dates that affect a whole organization. Also events calendars on consumer sites are a great way to let your customers know what events you\'ll be attending and what promotions you\'ll be having.\r\n\r\n<b>Title</b>\r\nWhat is the title of this events calendar?\r\n\r\n<b>Display the title?</b>\r\nDo you wish to disply the title?\r\n\r\n<b>Process macros?</b>\r\nDo you wish to process WebGUI macros? Unchecking this box will not process macros and will speed up page execution.\r\n\r\n<b>Description</b>\r\nBriefly describe what this events calendar details.\r\n\r\n<b>Proceed to add event?</b>\r\nLeave this checked if you want to add events to the events calendar directly after creating it.\r\n\r\n<b>Add / Edit Events</b>\r\nOn the edit screen you\'ll notice that there are options to add, edit, and delete the events in your events calendar. The properties for events are <i>name</i>, <i>description</i>, <i>start date</i>,  and <i>end date</i>.\r\n\r\n<i>Note:</i> Events that have already happened will not be displayed on the events calendar.\r\n\r\n<hr size=1>\r\n<i><b>Note:</b></i> The following style is specific to the Events Calendar.\r\n\r\n<b>.eventTitle </b>\r\nThe title of an individual event.\r\n\r\n','1,2,3,4,5');
-INSERT INTO help VALUES (1,'FAQ','English','Add/Edit','F.A.Q.','It seems that almost every web site, intranet, and extranet in the world has a frequently asked questions area. This widget helps you build one too.\r\n\r\n<b>Title</b>\r\nWhat is the title for this FAQ section?\r\n\r\n<b>Display the title?</b>\r\nDo you wish to disply the title?\r\n\r\n<b>Process macros?</b>\r\nDo you wish to process WebGUI macros? Unchecking this box will not process macros and will speed up page execution.\r\n\r\n<b>Description</b>\r\nBriefly describe what this FAQ covers.\r\n\r\n<b>Proceed to add question?</b>\r\nLeave this checked if you want to add questions to the FAQ directly after creating it.\r\n\r\n<b>Add / Edit Questions</b>\r\nOn the edit screen you\'ll notice options for adding, editing, deleting, and reordering the questions in your FAQ. The two properties of FAQ questions are <i>question</i> and <i>answer</i>.\r\n\r\n<hr size=1>\r\n<i><b>Note:</b></i> The following style is specific to the FAQ widget.\r\n\r\n<b>.faqQuestion</b>\r\nAn F.A.Q. question. To distinguish it from an answer.\r\n\r\n','1,2,3,4,5');
+INSERT INTO help VALUES (1,'SyndicatedContent','English','Add/Edit','Syndicated Content','Syndicated content is content that is pulled from another site using the RDF/RSS specification. This technology is often used to pull headlines from various news sites like <a href=\"http://www.cnn.com\">CNN</a> and  <a href=\"http://slashdot.org\">Slashdot</a>. It can, of course, be used for other things like sports scores, stock market info, etc.\r\n\r\nYou can find a list of syndicated content at <a href=\"http://my.userland.com\">http://my.userland.com</a>. You will need to register with an account to browse their listing of content. Also, the list contained there is by no means a complete list of all the syndicated content on the internet.\r\n\r\n<b>Title</b>\r\nWhat is the title for this content? This is often the title of the site that the content comes from.\r\n\r\n<b>Display the title?</b>\r\nDo you wish to disply the title?\r\n\r\n<b>Process macros?</b>\r\nDo you wish to process WebGUI macros? Unchecking this box will not process macros and will speed up page execution.\r\n\r\n<b>Position</b>\r\nSelect the position in the current page template where this widget should be placed.\r\n\r\n<b>Description</b>\r\nBriefly describe the content being pulled so that your users will know what they are seeing.\r\n\r\n<b>URL to RSS file</b>\r\nProvide the exact URL (starting with http://) to the syndicated content\'s RDF or RSS file. The syndicated content will be downloaded from this URL hourly.','1,2,3,4,5');
+INSERT INTO help VALUES (1,'EventsCalendar','English','Add/Edit','Events Calendar','Events calendars are used on many intranets to keep track of internal dates that affect a whole organization. Also events calendars on consumer sites are a great way to let your customers know what events you\'ll be attending and what promotions you\'ll be having.\r\n\r\n<b>Title</b>\r\nWhat is the title of this events calendar?\r\n\r\n<b>Display the title?</b>\r\nDo you wish to disply the title?\r\n\r\n<b>Process macros?</b>\r\nDo you wish to process WebGUI macros? Unchecking this box will not process macros and will speed up page execution.\r\n\r\n<b>Position</b>\r\nSelect the position in the current page template where this widget should be placed.\r\n\r\n<b>Description</b>\r\nBriefly describe what this events calendar details.\r\n\r\n<b>Proceed to add event?</b>\r\nLeave this checked if you want to add events to the events calendar directly after creating it.\r\n\r\n<b>Add / Edit Events</b>\r\nOn the edit screen you\'ll notice that there are options to add, edit, and delete the events in your events calendar. The properties for events are <i>name</i>, <i>description</i>, <i>start date</i>,  and <i>end date</i>.\r\n\r\n<i>Note:</i> Events that have already happened will not be displayed on the events calendar.\r\n\r\n<hr size=1>\r\n<i><b>Note:</b></i> The following style is specific to the Events Calendar.\r\n\r\n<b>.eventTitle </b>\r\nThe title of an individual event.\r\n\r\n','1,2,3,4,5');
+INSERT INTO help VALUES (1,'FAQ','English','Add/Edit','F.A.Q.','It seems that almost every web site, intranet, and extranet in the world has a frequently asked questions area. This widget helps you build one too.\r\n\r\n<b>Title</b>\r\nWhat is the title for this FAQ section?\r\n\r\n<b>Display the title?</b>\r\nDo you wish to disply the title?\r\n\r\n<b>Process macros?</b>\r\nDo you wish to process WebGUI macros? Unchecking this box will not process macros and will speed up page execution.\r\n\r\n<b>Position</b>\r\nSelect the position in the current page template where this widget should be placed.\r\n\r\n<b>Description</b>\r\nBriefly describe what this FAQ covers.\r\n\r\n<b>Proceed to add question?</b>\r\nLeave this checked if you want to add questions to the FAQ directly after creating it.\r\n\r\n<b>Add / Edit Questions</b>\r\nOn the edit screen you\'ll notice options for adding, editing, deleting, and reordering the questions in your FAQ. The two properties of FAQ questions are <i>question</i> and <i>answer</i>.\r\n\r\n<hr size=1>\r\n<i><b>Note:</b></i> The following style is specific to the FAQ widget.\r\n\r\n<b>.faqQuestion</b>\r\nAn F.A.Q. question. To distinguish it from an answer.\r\n\r\n','1,2,3,4,5');
 INSERT INTO help VALUES (11,'WebGUI','English','Edit','File Settings','<b>Path to WebGUI Extras</b>\r\nThe web-path to the directory containing WebGUI images and javascript files.\r\n\r\n<b>Maximum Attachment Size</b>\r\nThe maximum size of files allowed to be uploaded to this site. This applies to all widgets that allow uploaded files and images (like Article and User Contributions). This size is measured in kilobytes.\r\n\r\n<b>Web Attachment Path</b>\r\nThe web-path of the directory where attachments are to be stored.\r\n\r\n<b>Server Attachment Path</b>\r\nThe local path of the directory where attachments are to be stored. (Perhaps /var/www/public/uploads) Be sure that the web server has the rights to write to that directory.\r\n','6');
 INSERT INTO help VALUES (2,'WebGUI','English','Edit','Authentication Settings','<b>Anonymous Registration</b>\r\nDo you wish visitors to your site to be able to register themselves?\r\n\r\n<b>Authentication Method (default)</b>\r\nWhat should the default authentication method be for new accounts that are created? The two available options are WebGUI and LDAP. WebGUI authentication means that the users will authenticate against the username and password stored in the WebGUI database. LDAP authentication means that users will authenticate against an external LDAP server.\r\n\r\n<i>Note:</i> Authentication settings can be customized on a per user basis.\r\n\r\n<b>Username Binding</b>\r\nBind the WebGUI username to the LDAP Identity. This requires the user to have the same username in WebGUI as they specified during the Anonymous Registration process. It also means that they won\'t be able to change their username later. This only in effect if the user is authenticating against LDAP.\r\n\r\n<b>LDAP URL (default)</b>\r\nThe default url to your LDAP server. The LDAP URL takes the form of <b>ldap://[server]:[port]/[base DN]</b>. Example: ldap://ldap.mycompany.com:389/o=MyCompany.\r\n\r\n<b>LDAP Identity</b>\r\nThe LDAP Identity is the unique identifier in the LDAP server that the user will be identified against. Often this field is <b>shortname</b>, which takes the form of first initial + last name. Example: jdoe. Therefore if you specify the LDAP identity to be <i>shortname</i> then Jon Doe would enter <i>jdoe</i> during the registration process.\r\n\r\n<b>LDAP Identity Name</b>\r\nThe label used to describe the LDAP Identity to the user. For instance, some companies use an LDAP server for their proxy server users to authenticate against. In the documentation or training already provided to their users, the LDAP identity is known as their <i>Web Username</b>. So you could enter that label here for consitency.\r\n\r\n<b>LDAP Password Name</b>\r\nJust as the LDAP Identity Name is a label, so is the LDAP Password Name. Use this label as you would LDAP Identity Name.\r\n\r\n','6');
-INSERT INTO help VALUES (1,'UserSubmission','English','Add/Edit','User Submission System','User submission systems are a great way to add a sense of community to any site as well as get free content from your users.\r\n\r\n<b>Title</b>\r\nWhat is the title for this user submission system?\r\n\r\n<b>Display the title?</b>\r\nDo you wish to disply the title?\r\n\r\n<b>Process macros?</b>\r\nDo you wish to process WebGUI macros? Unchecking this box will not process macros and will speed up page execution.\r\n\r\n<b>Description</b>\r\nBriefly describe why this user submission system is here and what should be submitted to it.\r\n\r\n<b>Who can approve?</b>\r\nWhat group is allowed to approve and deny content?\r\n\r\n<b>Who can contribute?</b>\r\nWhat group is allowed to contribute content?\r\n\r\n<b>Submissions Per Page</b>\r\nHow many submissions should be listed per page in the submissions index?\r\n\r\n<b>Default Status</b>\r\nShould submissions be set to <i>approved</i>, <i>pending</i>, or <i>denied</i> by default?\r\n\r\n<i>Note:</i> If you set the default status to pending, then be prepared to monitor the pending queue under the Admin menu.\r\n','1,2,3,4,5');
+INSERT INTO help VALUES (1,'UserSubmission','English','Add/Edit','User Submission System','User submission systems are a great way to add a sense of community to any site as well as get free content from your users.\r\n\r\n<b>Title</b>\r\nWhat is the title for this user submission system?\r\n\r\n<b>Display the title?</b>\r\nDo you wish to disply the title?\r\n\r\n<b>Process macros?</b>\r\nDo you wish to process WebGUI macros? Unchecking this box will not process macros and will speed up page execution.\r\n\r\n<b>Position</b>\r\nSelect the position in the current page template where this widget should be placed.\r\n\r\n<b>Description</b>\r\nBriefly describe why this user submission system is here and what should be submitted to it.\r\n\r\n<b>Who can approve?</b>\r\nWhat group is allowed to approve and deny content?\r\n\r\n<b>Who can contribute?</b>\r\nWhat group is allowed to contribute content?\r\n\r\n<b>Submissions Per Page</b>\r\nHow many submissions should be listed per page in the submissions index?\r\n\r\n<b>Default Status</b>\r\nShould submissions be set to <i>approved</i>, <i>pending</i>, or <i>denied</i> by default?\r\n\r\n<i>Note:</i> If you set the default status to pending, then be prepared to monitor the pending queue under the Admin menu.\r\n','1,2,3,4,5');
 INSERT INTO help VALUES (6,'WebGUI','English','Edit','Company Information','<b>Company Name</b>\r\nThe name of your company. It will appear on all emails and anywhere you use the Company Name macro.\r\n\r\n<b>Company Email Address</b>\r\nA general email address at your company. This is the address that all automated messages will come from. It can also be used via the WebGUI macro system.\r\n\r\n<b>Company URL</b>\r\nThe primary URL of your company. This will appear on all automated emails sent from the WebGUI system. It is also available via the WebGUI macro system.\r\n','6');
 INSERT INTO help VALUES (46,'WebGUI','English','Empty','Trash','If you choose to empty your trash, any items contained in it will be lost forever. If you\'re unsure about a few items, it might be best to cut them to your clipboard before you empty the trash.','0');
 INSERT INTO help VALUES (22,'WebGUI','English','Edit','Profile Settings','Profiles are used to extend the information of a particular user. In some cases profiles are important to a site, in others they are not. Use the following switches to turn the various profile sections on and off.\r\n\r\n<b>Allow real name?</b>\r\nDo you want users to enter and display their real names?\r\n\r\n<b>Allow extra contact information?</b>\r\nDo you want users to enter and display their extra contact information such as Instant Messenger IDs, cell phone numbers, and pager numbers?\r\n\r\n<b>Allow home information?</b>\r\nDo you want users to enter and display their home address and phone number?\r\n\r\n<b>Allow business information?</b>\r\nDo you want users to enter and display their work address and phone number?\r\n\r\n<b>Allow miscellaneous information?</b>\r\nDo you want users to enter and display any extra info such as gender, birthdate and home page?','6');
-
-#
-# Table structure for table 'helpSeeAlso'
-#
-
-CREATE TABLE helpSeeAlso (
-  seeAlsoId int(11) NOT NULL default '0',
-  helpId int(11) default NULL,
-  namespace varchar(30) default NULL,
-  PRIMARY KEY  (seeAlsoId)
-) TYPE=MyISAM;
-
-#
-# Dumping data for table 'helpSeeAlso'
-#
-
-INSERT INTO helpSeeAlso VALUES (1,21,'WebGUI');
-INSERT INTO helpSeeAlso VALUES (2,27,'WebGUI');
-INSERT INTO helpSeeAlso VALUES (3,14,'WebGUI');
-INSERT INTO helpSeeAlso VALUES (4,18,'WebGUI');
-INSERT INTO helpSeeAlso VALUES (5,19,'WebGUI');
-INSERT INTO helpSeeAlso VALUES (6,12,'WebGUI');
-INSERT INTO helpSeeAlso VALUES (7,2,'WebGUI');
-INSERT INTO helpSeeAlso VALUES (8,6,'WebGUI');
-INSERT INTO helpSeeAlso VALUES (9,11,'WebGUI');
-INSERT INTO helpSeeAlso VALUES (10,13,'WebGUI');
-INSERT INTO helpSeeAlso VALUES (11,24,'WebGUI');
-INSERT INTO helpSeeAlso VALUES (12,22,'WebGUI');
-
-#
-# Table structure for table 'incrementer'
-#
-
-CREATE TABLE incrementer (
-  incrementerId varchar(50) NOT NULL default '',
-  nextValue int(11) NOT NULL default '1',
-  PRIMARY KEY  (incrementerId)
-) TYPE=MyISAM;
-
-#
-# Dumping data for table 'incrementer'
-#
-
-INSERT INTO incrementer VALUES ('groupId',26);
-INSERT INTO incrementer VALUES ('messageId',7);
-INSERT INTO incrementer VALUES ('pageId',26);
-INSERT INTO incrementer VALUES ('styleId',26);
-INSERT INTO incrementer VALUES ('userId',26);
-INSERT INTO incrementer VALUES ('widgetId',1);
-INSERT INTO incrementer VALUES ('eventId',1);
-INSERT INTO incrementer VALUES ('linkId',1);
-INSERT INTO incrementer VALUES ('questionId',1);
-INSERT INTO incrementer VALUES ('submissionId',1);
-INSERT INTO incrementer VALUES ('recurringEventId',1);
-INSERT INTO incrementer VALUES ('messageLogId',1);
-
-#
-# Table structure for table 'international'
-#
-
-CREATE TABLE international (
-  internationalId int(11) NOT NULL default '0',
-  namespace varchar(30) NOT NULL default 'WebGUI',
-  language varchar(30) NOT NULL default 'English',
-  message text,
-  PRIMARY KEY  (internationalId,namespace,language)
-) TYPE=MyISAM;
-
-#
-# Dumping data for table 'international'
-#
-
+INSERT INTO help VALUES (25,'WebGUI','English','Using','Search Engine','Due to many requests by our customers, we\'ve built a small, but sturdy search engine into WebGUI. If you wish to use the internal search engine, you can use the ^?; macro or feel free to build your own form to access it.\r\n\r\nWe do not recommend the built-in search engine\'s use on large sites as it can be very slow. There are many great search engines available around the Internet that can be used with WebGUI.\r\n\r\n<a href=\"http://www.mnogosearch.org\">MnoGo Search</a> - A very powerful and very fast open-source search engine. We maintain an unsupported WebGUI widget on the <a href=\"http://www.plainblack.com\">Plain Black</a> site that will allow you to use MnoGo search directly within WebGUI or you can use the super-powerful external search engine it provides.\r\n\r\n<a href=\"http://www.htdig.org/\">ht://Dig</a> - Another great open-source search engine. We\'ve used it in many instances and it always proves to be reliable and fast.','0');
+delete from international;
 INSERT INTO international VALUES (1,'WebGUI','English','Add content...');
 INSERT INTO international VALUES (2,'WebGUI','English','Page');
 INSERT INTO international VALUES (3,'WebGUI','English','Paste from clipboard...');
@@ -813,7 +329,7 @@ INSERT INTO international VALUES (286,'WebGUI','English','(Uncheck if you\'re wr
 INSERT INTO international VALUES (287,'WebGUI','English','Date Submitted');
 INSERT INTO international VALUES (288,'WebGUI','English','Status');
 INSERT INTO international VALUES (289,'WebGUI','English','Edit/Delete');
-INSERT INTO international VALUES (290,'WebGUI','English','Untitiled');
+INSERT INTO international VALUES (290,'WebGUI','English','Untitled');
 INSERT INTO international VALUES (291,'WebGUI','English','Are you certain you wish to delete this submission?');
 INSERT INTO international VALUES (292,'WebGUI','English','Edit User Submission System');
 INSERT INTO international VALUES (293,'WebGUI','English','Edit Submission');
@@ -1544,272 +1060,393 @@ INSERT INTO international VALUES (5,'SiteMap','English','Edit Site Map');
 INSERT INTO international VALUES (6,'SiteMap','English','Indent');
 INSERT INTO international VALUES (7,'SiteMap','English','Bullet');
 INSERT INTO international VALUES (8,'SiteMap','English','Line Spacing');
+INSERT INTO international VALUES (355,'WebGUI','English','Default');
+INSERT INTO international VALUES (250,'WebGUI','Português','Sondagem');
+INSERT INTO international VALUES (249,'WebGUI','Português','Ultima resposta');
+INSERT INTO international VALUES (248,'WebGUI','Português','Respostas');
+INSERT INTO international VALUES (247,'WebGUI','Português','Inicial');
+INSERT INTO international VALUES (246,'WebGUI','Português','Colocar nova mensagem');
+INSERT INTO international VALUES (245,'WebGUI','Português','Data');
+INSERT INTO international VALUES (244,'WebGUI','Português','Autor');
+INSERT INTO international VALUES (243,'WebGUI','Português','Próxima');
+INSERT INTO international VALUES (242,'WebGUI','Português','Voltar á lista de mensagens');
+INSERT INTO international VALUES (241,'WebGUI','Português','Anterior');
+INSERT INTO international VALUES (240,'WebGUI','Português','ID da mensagem:');
+INSERT INTO international VALUES (239,'WebGUI','Português','Data:');
+INSERT INTO international VALUES (238,'WebGUI','Português','Autor:');
+INSERT INTO international VALUES (237,'WebGUI','Português','Assunto:');
+INSERT INTO international VALUES (236,'WebGUI','Português','Responder');
+INSERT INTO international VALUES (235,'WebGUI','Português','Modificar mensagem');
+INSERT INTO international VALUES (234,'WebGUI','Português','Respondendo...');
+INSERT INTO international VALUES (233,'WebGUI','Português','(eom)');
+INSERT INTO international VALUES (232,'WebGUI','Português','sem assunto');
+INSERT INTO international VALUES (231,'WebGUI','Português','Colocando nova mensagem...');
+INSERT INTO international VALUES (230,'WebGUI','Português','Mensagem');
+INSERT INTO international VALUES (229,'WebGUI','Português','Assunto');
+INSERT INTO international VALUES (228,'WebGUI','Português','Modificando mensagem...');
+INSERT INTO international VALUES (227,'WebGUI','Português','Modificar quadro de mensagens');
+INSERT INTO international VALUES (226,'WebGUI','Português','Modificar Timeout');
+INSERT INTO international VALUES (225,'WebGUI','Português','Mensagens por página');
+INSERT INTO international VALUES (224,'WebGUI','Português','Quem pode colocar novas?');
+INSERT INTO international VALUES (223,'WebGUI','Português','Quadro de mensagens');
+INSERT INTO international VALUES (222,'WebGUI','Português','Adicionar quadro de mensagens');
+INSERT INTO international VALUES (221,'WebGUI','Português','Adicionar nova hiperlink.');
+INSERT INTO international VALUES (220,'WebGUI','Português','Modificar hiperlink');
+INSERT INTO international VALUES (219,'WebGUI','Português','Adicionar lista de hiperlinks');
+INSERT INTO international VALUES (218,'WebGUI','Português','Modificar lista de hiperlinks');
+INSERT INTO international VALUES (217,'WebGUI','Português','Tem a certeza que quer apagar esta hiperlink?');
+INSERT INTO international VALUES (216,'WebGUI','Português','URL');
+INSERT INTO international VALUES (215,'WebGUI','Português','Adicionar hiperlink');
+INSERT INTO international VALUES (214,'WebGUI','Português','Lista de hiperlinks');
+INSERT INTO international VALUES (213,'WebGUI','Português','Modificar questão');
+INSERT INTO international VALUES (212,'WebGUI','Português','Adicionar nova questão.');
+INSERT INTO international VALUES (211,'WebGUI','Português','Modificar perguntas mais frequentes');
+INSERT INTO international VALUES (210,'WebGUI','Português','Tem a certeza que quer apagar esta questão?');
+INSERT INTO international VALUES (209,'WebGUI','Português','Resposta');
+INSERT INTO international VALUES (207,'WebGUI','Português','Adicionar questão');
+INSERT INTO international VALUES (208,'WebGUI','Português','Questão');
+INSERT INTO international VALUES (206,'WebGUI','Português','Adicionar perguntas mais frequentes');
+INSERT INTO international VALUES (205,'WebGUI','Português','Perguntas mais frequentes');
+INSERT INTO international VALUES (203,'WebGUI','Português','StyleSheet Class');
+INSERT INTO international VALUES (204,'WebGUI','Português','Modificar coluna extra');
+INSERT INTO international VALUES (202,'WebGUI','Português','Largura');
+INSERT INTO international VALUES (201,'WebGUI','Português','Espaçamento');
+INSERT INTO international VALUES (200,'WebGUI','Português','Adicinar coluna extra');
+INSERT INTO international VALUES (199,'WebGUI','Português','Coluna extra');
+INSERT INTO international VALUES (198,'WebGUI','Português','Modificar evento');
+INSERT INTO international VALUES (197,'WebGUI','Português','Modificar calendário de eventos');
+INSERT INTO international VALUES (196,'WebGUI','Português','<b>e</b> todos os recurrentes');
+INSERT INTO international VALUES (195,'WebGUI','Português','Tem a certeza que quer apagar este evento?');
+INSERT INTO international VALUES (194,'WebGUI','Português','até');
+INSERT INTO international VALUES (193,'WebGUI','Português','Repetição');
+INSERT INTO international VALUES (191,'WebGUI','Português','Semana');
+INSERT INTO international VALUES (192,'WebGUI','Português','Adicionar evento');
+INSERT INTO international VALUES (190,'WebGUI','Português','Dia');
+INSERT INTO international VALUES (189,'WebGUI','Português','Apenas uma vez.');
+INSERT INTO international VALUES (188,'WebGUI','Português','Adicionar calendário de eventos');
+INSERT INTO international VALUES (187,'WebGUI','Português','Calendário de eventos');
+INSERT INTO international VALUES (186,'WebGUI','Português','Apagar');
+INSERT INTO international VALUES (185,'WebGUI','Português','Modificar artigo');
+INSERT INTO international VALUES (184,'WebGUI','Português','(escolher se não adicionar &lt;br&gt; manualmente.)');
+INSERT INTO international VALUES (181,'WebGUI','Português','URL da hiperlink');
+INSERT INTO international VALUES (182,'WebGUI','Português','Anexar');
+INSERT INTO international VALUES (183,'WebGUI','Português','Converter o caracter de retorno (CR) ?');
+INSERT INTO international VALUES (180,'WebGUI','Português','Titulo da hiperlink');
+INSERT INTO international VALUES (179,'WebGUI','Português','Imagem');
+INSERT INTO international VALUES (178,'WebGUI','Português','Corpo');
+INSERT INTO international VALUES (177,'WebGUI','Português','Data de fim');
+INSERT INTO international VALUES (176,'WebGUI','Português','Data de inicio');
+INSERT INTO international VALUES (175,'WebGUI','Português','Processar macros?');
+INSERT INTO international VALUES (173,'WebGUI','Português','Adicionar artigo');
+INSERT INTO international VALUES (174,'WebGUI','Português','Mostrar o titulo?');
+INSERT INTO international VALUES (171,'WebGUI','Português','rich edit');
+INSERT INTO international VALUES (172,'WebGUI','Português','Artigo');
+INSERT INTO international VALUES (170,'WebGUI','Português','procurar');
+INSERT INTO international VALUES (169,'WebGUI','Português','Adicionar utilizador.');
+INSERT INTO international VALUES (168,'WebGUI','Português','Modificar utilizador');
+INSERT INTO international VALUES (167,'WebGUI','Português','Tem a certeza que quer apagar este utilizador? Se o fizer perde todas as informações do utilizador.');
+INSERT INTO international VALUES (166,'WebGUI','Português','Connectar DN');
+INSERT INTO international VALUES (164,'WebGUI','Português','Metodo de autenticação');
+INSERT INTO international VALUES (165,'WebGUI','Português','LDAP URL');
+INSERT INTO international VALUES (163,'WebGUI','Português','Adicionar utilizador');
+INSERT INTO international VALUES (162,'WebGUI','Português','Tem a certeza que quer limpar todas as páginas e widgets para o caixote do lixo?');
+INSERT INTO international VALUES (161,'WebGUI','Português','Submetido por');
+INSERT INTO international VALUES (160,'WebGUI','Português','Data de submissão');
+INSERT INTO international VALUES (159,'WebGUI','Português','Log das mensagens');
+INSERT INTO international VALUES (158,'WebGUI','Português','Adicionar novo estilo.');
+INSERT INTO international VALUES (157,'WebGUI','Português','Estilos');
+INSERT INTO international VALUES (156,'WebGUI','Português','Modificar estilo');
+INSERT INTO international VALUES (155,'WebGUI','Português','\"Tem a certeza que quer apagar este estilo e migrar todas as páginas para o estilo \"\"Fail Safe\"\"?\"');
+INSERT INTO international VALUES (154,'WebGUI','Português','Estilo de página');
+INSERT INTO international VALUES (153,'WebGUI','Português','Rodapé');
+INSERT INTO international VALUES (151,'WebGUI','Português','Nome do estilo');
+INSERT INTO international VALUES (152,'WebGUI','Português','Cabeçalho');
+INSERT INTO international VALUES (150,'WebGUI','Português','Adicionar estilo');
+INSERT INTO international VALUES (149,'WebGUI','Português','Utilizadores');
+INSERT INTO international VALUES (148,'WebGUI','Português','Widgets visiveis');
+INSERT INTO international VALUES (147,'WebGUI','Português','páginas visiveis');
+INSERT INTO international VALUES (146,'WebGUI','Português','Sessões activas');
+INSERT INTO international VALUES (145,'WebGUI','Português','WebGUI versão');
+INSERT INTO international VALUES (144,'WebGUI','Português','Ver estatisticas.');
+INSERT INTO international VALUES (143,'WebGUI','Português','Organizar preferências');
+INSERT INTO international VALUES (142,'WebGUI','Português','Timeout de sessão');
+INSERT INTO international VALUES (141,'WebGUI','Português','Página não encontrada');
+INSERT INTO international VALUES (140,'WebGUI','Português','Modificar preferências mistas');
+INSERT INTO international VALUES (139,'WebGUI','Português','Não');
+INSERT INTO international VALUES (138,'WebGUI','Português','Sim');
+INSERT INTO international VALUES (137,'WebGUI','Português','Página de página não encontrada');
+INSERT INTO international VALUES (136,'WebGUI','Português','Página inicial');
+INSERT INTO international VALUES (135,'WebGUI','Português','Servidor SMTP');
+INSERT INTO international VALUES (134,'WebGUI','Português','Mensagem de recuperação de password');
+INSERT INTO international VALUES (133,'WebGUI','Português','Modificar preferências de e-mail');
+INSERT INTO international VALUES (132,'WebGUI','Português','Caminho de anexos no servidor');
+INSERT INTO international VALUES (131,'WebGUI','Português','caminho de anexos via web');
+INSERT INTO international VALUES (130,'WebGUI','Português','Tamanho máximo dos anexos');
+INSERT INTO international VALUES (129,'WebGUI','Português','Caminho para os extras do WebGUI');
+INSERT INTO international VALUES (128,'WebGUI','Português','Modificar preferências de ficheiros');
+INSERT INTO international VALUES (127,'WebGUI','Português','URL da empresa');
+INSERT INTO international VALUES (126,'WebGUI','Português','Moarada da empresa');
+INSERT INTO international VALUES (125,'WebGUI','Português','Nome da empresa');
+INSERT INTO international VALUES (124,'WebGUI','Português','Modificar informação da empresa');
+INSERT INTO international VALUES (123,'WebGUI','Português','Nome da password LDAP');
+INSERT INTO international VALUES (122,'WebGUI','Português','Nome da entidade LDAP');
+INSERT INTO international VALUES (121,'WebGUI','Português','Identidade LDAP (defeito)');
+INSERT INTO international VALUES (120,'WebGUI','Português','URL LDAP (defeito)');
+INSERT INTO international VALUES (119,'WebGUI','Português','Método de autenticação (defeito)');
+INSERT INTO international VALUES (118,'WebGUI','Português','Registo anónimo');
+INSERT INTO international VALUES (117,'WebGUI','Português','Modificar preferências de autenticação');
+INSERT INTO international VALUES (115,'WebGUI','Português','Qualquer pessoa pode modificar?');
+INSERT INTO international VALUES (116,'WebGUI','Português','Escolher para atribuir estes privilégios a todas as sub-páginas.');
+INSERT INTO international VALUES (114,'WebGUI','Português','Qualquer pessoa pode ver?');
+INSERT INTO international VALUES (113,'WebGUI','Português','O grupo pode modificar?');
+INSERT INTO international VALUES (112,'WebGUI','Português','O grupo pode ver?');
+INSERT INTO international VALUES (110,'WebGUI','Português','O dono pode modificar?');
+INSERT INTO international VALUES (111,'WebGUI','Português','Grupo');
+INSERT INTO international VALUES (109,'WebGUI','Português','O dono pode ver?');
+INSERT INTO international VALUES (108,'WebGUI','Português','Dono');
+INSERT INTO international VALUES (107,'WebGUI','Português','Privilégios');
+INSERT INTO international VALUES (105,'WebGUI','Português','Estilo');
+INSERT INTO international VALUES (106,'WebGUI','Português','Escolha para atribuir este estilo a todas as sub-páginas');
+INSERT INTO international VALUES (104,'WebGUI','Português','URL da página');
+INSERT INTO international VALUES (103,'WebGUI','Português','Especificações da página');
+INSERT INTO international VALUES (102,'WebGUI','Português','Modificar a página');
+INSERT INTO international VALUES (101,'WebGUI','Português','\"Tem a certeza que quer apagar esta página, o seu conteudo e tudo que está abaixo?\"');
+INSERT INTO international VALUES (100,'WebGUI','Português','Meta Tags');
+INSERT INTO international VALUES (99,'WebGUI','Português','Titulo');
+INSERT INTO international VALUES (98,'WebGUI','Português','Adicionar página');
+INSERT INTO international VALUES (97,'WebGUI','Português','Ordenar por objecto');
+INSERT INTO international VALUES (96,'WebGUI','Português','Ordenar por acção');
+INSERT INTO international VALUES (95,'WebGUI','Português','Indice da ajuda');
+INSERT INTO international VALUES (93,'WebGUI','Português','Ajuda');
+INSERT INTO international VALUES (94,'WebGUI','Português','Ver tembém');
+INSERT INTO international VALUES (92,'WebGUI','Português','Próxima página');
+INSERT INTO international VALUES (91,'WebGUI','Português','Página anterior');
+INSERT INTO international VALUES (90,'WebGUI','Português','Adicionar novo grupo.');
+INSERT INTO international VALUES (89,'WebGUI','Português','Grupos');
+INSERT INTO international VALUES (88,'WebGUI','Português','Utilizadores no grupo');
+INSERT INTO international VALUES (87,'WebGUI','Português','Modificar grupo');
+INSERT INTO international VALUES (86,'WebGUI','Português','Tem a certeza que quer apagar este grupo. Se o fizer apaga-o permanentemente e a todos os seus provilégios.');
+INSERT INTO international VALUES (85,'WebGUI','Português','Descrição');
+INSERT INTO international VALUES (84,'WebGUI','Português','Nome do grupo');
+INSERT INTO international VALUES (83,'WebGUI','Português','Adicionar grupo');
+INSERT INTO international VALUES (82,'WebGUI','Português','Funções administrativas...');
+INSERT INTO international VALUES (81,'WebGUI','Português','Conta actualizada com sucesso!');
+INSERT INTO international VALUES (80,'WebGUI','Português','Conta criada com sucesso!');
+INSERT INTO international VALUES (79,'WebGUI','Português','Impossivel ligar ao LDAP.');
+INSERT INTO international VALUES (78,'WebGUI','Português','\"As suas passwords não coincidem, tente novamente.\"');
+INSERT INTO international VALUES (77,'WebGUI','Português','\"Esse nome de conta já existe, tente outro. Veja as nossas sugestões:\"');
+INSERT INTO international VALUES (76,'WebGUI','Português','Esse endereço de e-mail não foi encontrado nas nossas bases de dados');
+INSERT INTO international VALUES (75,'WebGUI','Português','As informações da sua conta foram envidas para o seu e-mail.');
+INSERT INTO international VALUES (74,'WebGUI','Português','Informações da sua conta');
+INSERT INTO international VALUES (73,'WebGUI','Português','Entrar.');
+INSERT INTO international VALUES (72,'WebGUI','Português','recoperar');
+INSERT INTO international VALUES (71,'WebGUI','Português','Recuperar password');
+INSERT INTO international VALUES (70,'WebGUI','Português','Erro');
+INSERT INTO international VALUES (69,'WebGUI','Português','Contacte o seu administrador de sistemas para assistência.');
+INSERT INTO international VALUES (68,'WebGUI','Português','As informações da sua conta não foram encontradas. Não existe ou a combinação username/password está incorrecta.');
+INSERT INTO international VALUES (67,'WebGUI','Português','Criar nova conta.');
+INSERT INTO international VALUES (66,'WebGUI','Português','Entrar');
+INSERT INTO international VALUES (65,'WebGUI','Português','Desactivar a minha conta permanentemente.');
+INSERT INTO international VALUES (64,'WebGUI','Português','Sair.');
+INSERT INTO international VALUES (63,'WebGUI','Português','Ligar modo administrativo.');
+INSERT INTO international VALUES (62,'WebGUI','Português','gravar');
+INSERT INTO international VALUES (61,'WebGUI','Português','Actualizar as informações da conta');
+INSERT INTO international VALUES (60,'WebGUI','Português','Tem a certeza que quer desactivar a sua conta. Se o fizer é permanente!');
+INSERT INTO international VALUES (59,'WebGUI','Português','Esqueci a minha password.');
+INSERT INTO international VALUES (58,'WebGUI','Português','Já tenho uma conta.');
+INSERT INTO international VALUES (57,'WebGUI','Português','Apenas é necessário se pretender utilizar as funcionalidade que envolvam e-mail.');
+INSERT INTO international VALUES (56,'WebGUI','Português','Endereço de e-mail');
+INSERT INTO international VALUES (55,'WebGUI','Português','Password (confirmar)');
+INSERT INTO international VALUES (54,'WebGUI','Português','Criar conta');
+INSERT INTO international VALUES (52,'WebGUI','Português','entrar');
+INSERT INTO international VALUES (53,'WebGUI','Português','Versão para impressão');
+INSERT INTO international VALUES (51,'WebGUI','Português','Password');
+INSERT INTO international VALUES (50,'WebGUI','Português','Username');
+INSERT INTO international VALUES (49,'WebGUI','Português','\"Clique <a href=\"\"^\\?op=logout\"\">aqui</a> para sair.\"');
+INSERT INTO international VALUES (48,'WebGUI','Português','Ola');
+INSERT INTO international VALUES (47,'WebGUI','Português','Inicio');
+INSERT INTO international VALUES (46,'WebGUI','Português','Minha Conta');
+INSERT INTO international VALUES (45,'WebGUI','Português','\"Não, enganei-me.\"');
+INSERT INTO international VALUES (44,'WebGUI','Português','\"Sim, tenho a certeza.\"');
+INSERT INTO international VALUES (43,'WebGUI','Português','Tem a certeza que quer apagar este conteudo?');
+INSERT INTO international VALUES (42,'WebGUI','Português','Confirma');
+INSERT INTO international VALUES (41,'WebGUI','Português','Está a tentar remover um componente vital do WebGUI. Se continuar pode haver um erro grave.');
+INSERT INTO international VALUES (40,'WebGUI','Português','Componente vital');
+INSERT INTO international VALUES (39,'WebGUI','Português','Não tem privilégios para aceder a essa página.');
+INSERT INTO international VALUES (38,'WebGUI','Português','\"Não tem privilégios para essa operação. <a href=\"\"^\\?op=displayLogin\"\">Identifique-se na entrada</a> com uma conta que permita essa operação.\"');
+INSERT INTO international VALUES (37,'WebGUI','Português','Permissão negada!');
+INSERT INTO international VALUES (36,'WebGUI','Português','Função reservada a administradores. Fale com um dos seguintes administradores:');
+INSERT INTO international VALUES (35,'WebGUI','Português','Função administrativa');
+INSERT INTO international VALUES (34,'WebGUI','Português','acertar a data');
+INSERT INTO international VALUES (33,'WebGUI','Português','Sabado');
+INSERT INTO international VALUES (32,'WebGUI','Português','Sexta');
+INSERT INTO international VALUES (31,'WebGUI','Português','Quinta');
+INSERT INTO international VALUES (30,'WebGUI','Português','Quarta');
+INSERT INTO international VALUES (29,'WebGUI','Português','Terça');
+INSERT INTO international VALUES (28,'WebGUI','Português','Segunda');
+INSERT INTO international VALUES (27,'WebGUI','Português','Domingo');
+INSERT INTO international VALUES (26,'WebGUI','Português','Dezembro');
+INSERT INTO international VALUES (25,'WebGUI','Português','Novembro');
+INSERT INTO international VALUES (24,'WebGUI','Português','Outubro');
+INSERT INTO international VALUES (23,'WebGUI','Português','Setembro');
+INSERT INTO international VALUES (22,'WebGUI','Português','Agosto');
+INSERT INTO international VALUES (21,'WebGUI','Português','Julho');
+INSERT INTO international VALUES (20,'WebGUI','Português','Junho');
+INSERT INTO international VALUES (19,'WebGUI','Português','Maio');
+INSERT INTO international VALUES (18,'WebGUI','Português','Abril');
+INSERT INTO international VALUES (17,'WebGUI','Português','Março');
+INSERT INTO international VALUES (16,'WebGUI','Português','Fevereiro');
+INSERT INTO international VALUES (15,'WebGUI','Português','Janeiro');
+INSERT INTO international VALUES (14,'WebGUI','Português','Ver submissões pendentes.');
+INSERT INTO international VALUES (13,'WebGUI','Português','Ver o indice da ajuda.');
+INSERT INTO international VALUES (12,'WebGUI','Português','Desligar o modo administrativo.');
+INSERT INTO international VALUES (11,'WebGUI','Português','Esvaziar o caixote do lixo.');
+INSERT INTO international VALUES (10,'WebGUI','Português','Ver o caixote do lixo.');
+INSERT INTO international VALUES (9,'WebGUI','Português','Ver o clipboard.');
+INSERT INTO international VALUES (8,'WebGUI','Português','Ver página não encontrada.');
+INSERT INTO international VALUES (7,'WebGUI','Português','Organizar utilizadores.');
+INSERT INTO international VALUES (6,'WebGUI','Português','Organizar estilos.');
+INSERT INTO international VALUES (5,'WebGUI','Português','Organizar grupos.');
+INSERT INTO international VALUES (3,'WebGUI','Português','Colar do clipboard...');
+INSERT INTO international VALUES (4,'WebGUI','Português','Organizar preferências.');
+INSERT INTO international VALUES (2,'WebGUI','Português','Página');
+INSERT INTO international VALUES (1,'WebGUI','Português','Adicionar conteudo...');
+INSERT INTO international VALUES (5,'UserSubmission','Português','A sua submissão não foi aprovada.');
+INSERT INTO international VALUES (4,'UserSubmission','Português','A sua submissão foi aprovada.');
+INSERT INTO international VALUES (3,'UserSubmission','Português','Tem nova submissão para aprovar.');
+INSERT INTO international VALUES (2,'UserSubmission','Português','Quem pode contribuir?');
+INSERT INTO international VALUES (1,'UserSubmission','Português','Quem pode aprovar?');
+INSERT INTO international VALUES (8,'SiteMap','Português','Espaçamento de linha');
+INSERT INTO international VALUES (7,'SiteMap','Português','Marca');
+INSERT INTO international VALUES (6,'SiteMap','Português','Destaque');
+INSERT INTO international VALUES (5,'SiteMap','Português','Editar mapa do site');
+INSERT INTO international VALUES (4,'SiteMap','Português','profundidade a travessar');
+INSERT INTO international VALUES (3,'SiteMap','Português','Iniciando neste nível?');
+INSERT INTO international VALUES (2,'SiteMap','Português','Mapa do site');
+INSERT INTO international VALUES (1,'SiteMap','Português','Adicionar mapa do site');
+INSERT INTO international VALUES (5,'LinkList','Português','Proseguir com a adição do hiperlink?');
+INSERT INTO international VALUES (4,'LinkList','Português','Marca');
+INSERT INTO international VALUES (3,'LinkList','Português','Abrir numa nova janela?');
+INSERT INTO international VALUES (2,'LinkList','Português','Espaço entre linhas');
+INSERT INTO international VALUES (1,'LinkList','Português','Destaque');
+INSERT INTO international VALUES (1,'FAQ','Português','Proseguir com a adição da questão?');
+INSERT INTO international VALUES (1,'EventsCalendar','Português','Proseguir com a adição do evento?');
+INSERT INTO international VALUES (251,'WebGUI','Português','Adicionar sondagem');
+INSERT INTO international VALUES (252,'WebGUI','Português','Activo');
+INSERT INTO international VALUES (253,'WebGUI','Português','Quem pode votar?');
+INSERT INTO international VALUES (254,'WebGUI','Português','Largura do gráfico');
+INSERT INTO international VALUES (255,'WebGUI','Português','Questão');
+INSERT INTO international VALUES (256,'WebGUI','Português','Respostas');
+INSERT INTO international VALUES (257,'WebGUI','Português','(Introduza uma resposta por linha. Não passe das 20.)');
+INSERT INTO international VALUES (258,'WebGUI','Português','Modificar sondagem');
+INSERT INTO international VALUES (259,'WebGUI','Português','Relatório SQL');
+INSERT INTO international VALUES (260,'WebGUI','Português','Adicionar relatório SQL');
+INSERT INTO international VALUES (261,'WebGUI','Português','Template');
+INSERT INTO international VALUES (262,'WebGUI','Português','Query');
+INSERT INTO international VALUES (263,'WebGUI','Português','DSN');
+INSERT INTO international VALUES (264,'WebGUI','Português','User da base de dados');
+INSERT INTO international VALUES (265,'WebGUI','Português','Password da base de dados');
+INSERT INTO international VALUES (266,'WebGUI','Português','Modificar o relaório SQL');
+INSERT INTO international VALUES (267,'WebGUI','Português','Erro: O DSN especificado tem um formato impróprio.');
+INSERT INTO international VALUES (268,'WebGUI','Português','Erro: O SQL especificado tem um formato impróprio.');
+INSERT INTO international VALUES (269,'WebGUI','Português','Erro: Houve um problema com a query.');
+INSERT INTO international VALUES (270,'WebGUI','Português','Erro: Não é possível ligar á base de dados.');
+INSERT INTO international VALUES (271,'WebGUI','Português','Conteudo sindical');
+INSERT INTO international VALUES (272,'WebGUI','Português','Adicionar conteudo sindical');
+INSERT INTO international VALUES (273,'WebGUI','Português','Ficheiro de URL para RSS');
+INSERT INTO international VALUES (274,'WebGUI','Português','Modificar conteudo sindical');
+INSERT INTO international VALUES (275,'WebGUI','Português','Ultima retirada');
+INSERT INTO international VALUES (276,'WebGUI','Português','Conteudo actual');
+INSERT INTO international VALUES (277,'WebGUI','Português','Sistema de submissão do utilizador');
+INSERT INTO international VALUES (278,'WebGUI','Português','Adicionar sistema de submissão do utilizador');
+INSERT INTO international VALUES (280,'WebGUI','Português','Submissões por página');
+INSERT INTO international VALUES (281,'WebGUI','Português','Aprovado');
+INSERT INTO international VALUES (282,'WebGUI','Português','Negado');
+INSERT INTO international VALUES (283,'WebGUI','Português','Pendente');
+INSERT INTO international VALUES (284,'WebGUI','Português','Estado por defeito');
+INSERT INTO international VALUES (285,'WebGUI','Português','Adicionar submissão');
+INSERT INTO international VALUES (286,'WebGUI','Português','(deixar em branco se a submissão for em HTML.)');
+INSERT INTO international VALUES (287,'WebGUI','Português','Data de submissão');
+INSERT INTO international VALUES (288,'WebGUI','Português','Estado');
+INSERT INTO international VALUES (289,'WebGUI','Português','Modificar/Apagar');
+INSERT INTO international VALUES (290,'WebGUI','Português','Sem titulo');
+INSERT INTO international VALUES (291,'WebGUI','Português','Tem a certeza que quer apagar esta submissão?');
+INSERT INTO international VALUES (292,'WebGUI','Português','Modificar sistema de submissão do utilizador');
+INSERT INTO international VALUES (293,'WebGUI','Português','Modificar submissão');
+INSERT INTO international VALUES (294,'WebGUI','Português','Colocar nova submissão');
+INSERT INTO international VALUES (295,'WebGUI','Português','Data de submissão');
+INSERT INTO international VALUES (296,'WebGUI','Português','Submetido por');
+INSERT INTO international VALUES (297,'WebGUI','Português','Submetido por:');
+INSERT INTO international VALUES (298,'WebGUI','Português','Data de submissão:');
+INSERT INTO international VALUES (299,'WebGUI','Português','Aprovar');
+INSERT INTO international VALUES (300,'WebGUI','Português','Deixar pendente');
+INSERT INTO international VALUES (301,'WebGUI','Português','Negar');
+INSERT INTO international VALUES (302,'WebGUI','Português','Modificar');
+INSERT INTO international VALUES (303,'WebGUI','Português','Voltar á lista de submissões');
+INSERT INTO international VALUES (304,'WebGUI','Português','Lingua');
+INSERT INTO international VALUES (305,'WebGUI','Português','Reinicializar os votos.');
+INSERT INTO international VALUES (306,'WebGUI','Português','Ligação ao username');
+INSERT INTO international VALUES (307,'WebGUI','Português','Usar as meta tags de defeito?');
+INSERT INTO international VALUES (308,'WebGUI','Português','Modificar as preferências do perfil');
+INSERT INTO international VALUES (309,'WebGUI','Português','Permitir o nome real?');
+INSERT INTO international VALUES (310,'WebGUI','Português','Permitir informação extra de contacto?');
+INSERT INTO international VALUES (311,'WebGUI','Português','Permitir informação de casa?');
+INSERT INTO international VALUES (312,'WebGUI','Português','Permitir informação do emprego?');
+INSERT INTO international VALUES (313,'WebGUI','Português','Permitir informaçao mista?');
+INSERT INTO international VALUES (314,'WebGUI','Português','Nome');
+INSERT INTO international VALUES (315,'WebGUI','Português','segundo(s) nome(s)');
+INSERT INTO international VALUES (316,'WebGUI','Português','Apelido');
+INSERT INTO international VALUES (317,'WebGUI','Português','\"<a href=\"\"http://www.icq.com\"\">ICQ</a> UIN\"');
+INSERT INTO international VALUES (318,'WebGUI','Português','\"<a href=\"\"http://www.aol.com/aim/homenew.adp\"\">AIM</a> Id\"');
+INSERT INTO international VALUES (319,'WebGUI','Português','\"<a href=\"\"http://messenger.msn.com/\"\">MSN Messenger</a> Id\"');
+INSERT INTO international VALUES (320,'WebGUI','Português','\"<a href=\"\"http://messenger.yahoo.com/\"\">Yahoo! Messenger</a> Id\"');
+INSERT INTO international VALUES (321,'WebGUI','Português','Telemóvel');
+INSERT INTO international VALUES (322,'WebGUI','Português','Pager');
+INSERT INTO international VALUES (323,'WebGUI','Português','Morada (de casa)');
+INSERT INTO international VALUES (324,'WebGUI','Português','Cidade (de casa)');
+INSERT INTO international VALUES (325,'WebGUI','Português','Concelho (de casa)');
+INSERT INTO international VALUES (326,'WebGUI','Português','Código postal (de casa)');
+INSERT INTO international VALUES (327,'WebGUI','Português','País (de casa)');
+INSERT INTO international VALUES (328,'WebGUI','Português','Telefone (de casa)');
+INSERT INTO international VALUES (329,'WebGUI','Português','Morada (do emprego)');
+INSERT INTO international VALUES (330,'WebGUI','Português','Cidade (do emprego)');
+INSERT INTO international VALUES (331,'WebGUI','Português','Concelho (do emprego)');
+INSERT INTO international VALUES (332,'WebGUI','Português','Código postal (do emprego)');
+INSERT INTO international VALUES (333,'WebGUI','Português','País (do emprego)');
+INSERT INTO international VALUES (334,'WebGUI','Português','Telefone (do emprego)');
+INSERT INTO international VALUES (335,'WebGUI','Português','Sexo');
+INSERT INTO international VALUES (336,'WebGUI','Português','Data de nascimento');
+INSERT INTO international VALUES (337,'WebGUI','Português','Endereço da Homepage');
+INSERT INTO international VALUES (338,'WebGUI','Português','Modificar perfil');
+INSERT INTO international VALUES (339,'WebGUI','Português','Masculino');
+INSERT INTO international VALUES (340,'WebGUI','Português','Feminino');
+INSERT INTO international VALUES (341,'WebGUI','Português','Modificar o perfil.');
+INSERT INTO international VALUES (342,'WebGUI','Português','Modificar as informações da conta.');
+INSERT INTO international VALUES (343,'WebGUI','Português','Ver perfil.');
+INSERT INTO international VALUES (344,'WebGUI','Português','Ver log de mensagens');
+INSERT INTO international VALUES (345,'WebGUI','Português','Não é membro');
+INSERT INTO international VALUES (346,'WebGUI','Português','Esse utilizador já não é membro do site. Não existe mais informação.');
+INSERT INTO international VALUES (347,'WebGUI','Português','Ver o perfil de');
+INSERT INTO international VALUES (348,'WebGUI','Português','Nome');
+INSERT INTO international VALUES (349,'WebGUI','Português','Ultima versão disponível');
+INSERT INTO international VALUES (350,'WebGUI','Português','Completo');
+INSERT INTO international VALUES (351,'WebGUI','Português','Entrada no log de mensagens');
+INSERT INTO international VALUES (352,'WebGUI','Português','Data de entrada');
+INSERT INTO international VALUES (353,'WebGUI','Português','Actualmente não tem entradas no log de mensagens.');
+INSERT INTO international VALUES (354,'WebGUI','Português','Ver o log das mensagens.');
+INSERT INTO international VALUES (355,'WebGUI','Português','Por defeito');
+INSERT INTO international VALUES (356,'WebGUI','English','Template');
+INSERT INTO international VALUES (357,'WebGUI','English','News');
+INSERT INTO international VALUES (358,'WebGUI','English','Left Column');
+INSERT INTO international VALUES (359,'WebGUI','English','Right Column');
+INSERT INTO international VALUES (360,'WebGUI','English','One Over Three');
+INSERT INTO international VALUES (361,'WebGUI','English','Three Over One');
+INSERT INTO international VALUES (362,'WebGUI','English','SideBySide');
+INSERT INTO international VALUES (363,'WebGUI','English','Template Position');
+INSERT INTO international VALUES (364,'WebGUI','English','Search');
+INSERT INTO international VALUES (365,'WebGUI','English','Search results...');
+INSERT INTO international VALUES (366,'WebGUI','English','No  pages were found with content that matched your query.');
+update settings set value='2.5.0' where name='VERSION';
 
-#
-# Table structure for table 'messageLog'
-#
 
-CREATE TABLE messageLog (
-  messageLogId int(11) NOT NULL default '0',
-  userId int(11) NOT NULL default '0',
-  message text,
-  url text,
-  dateOfEntry int(11) default NULL,
-  PRIMARY KEY  (messageLogId,userId)
-) TYPE=MyISAM;
-
-#
-# Dumping data for table 'messageLog'
-#
-
-
-#
-# Table structure for table 'page'
-#
-
-CREATE TABLE page (
-  pageId int(11) NOT NULL default '0',
-  parentId int(11) NOT NULL default '0',
-  title varchar(255) NOT NULL default '',
-  styleId int(11) NOT NULL default '0',
-  ownerId int(11) NOT NULL default '0',
-  ownerView int(11) NOT NULL default '1',
-  ownerEdit int(11) NOT NULL default '1',
-  groupId int(11) default NULL,
-  groupView int(11) NOT NULL default '1',
-  groupEdit int(11) NOT NULL default '0',
-  worldView int(11) NOT NULL default '1',
-  worldEdit int(11) NOT NULL default '0',
-  sequenceNumber int(11) NOT NULL default '1',
-  metaTags text,
-  urlizedTitle varchar(255) default NULL,
-  defaultMetaTags int(11) NOT NULL default '0',
-  PRIMARY KEY  (pageId)
-) TYPE=MyISAM;
-
-#
-# Dumping data for table 'page'
-#
-
-INSERT INTO page VALUES (1,0,'Home',3,3,1,1,1,1,0,1,0,1,'','home',1);
-INSERT INTO page VALUES (6,0,'Reserved',0,0,1,1,NULL,1,0,1,0,1,NULL,NULL,0);
-INSERT INTO page VALUES (7,0,'Reserved',0,0,1,1,NULL,1,0,1,0,1,NULL,NULL,0);
-INSERT INTO page VALUES (8,0,'Reserved',0,0,1,1,NULL,1,0,1,0,1,NULL,NULL,0);
-INSERT INTO page VALUES (9,0,'Reserved',0,0,1,1,NULL,1,0,1,0,1,NULL,NULL,0);
-INSERT INTO page VALUES (10,0,'Reserved',0,0,1,1,NULL,1,0,1,0,1,NULL,NULL,0);
-INSERT INTO page VALUES (11,0,'Reserved',0,0,1,1,NULL,1,0,1,0,1,NULL,NULL,0);
-INSERT INTO page VALUES (12,0,'Reserved',0,0,1,1,NULL,1,0,1,0,1,NULL,NULL,0);
-INSERT INTO page VALUES (13,0,'Reserved',0,0,1,1,NULL,1,0,1,0,1,NULL,NULL,0);
-INSERT INTO page VALUES (14,0,'Reserved',0,0,1,1,NULL,1,0,1,0,1,NULL,NULL,0);
-INSERT INTO page VALUES (15,0,'Reserved',0,0,1,1,NULL,1,0,1,0,1,NULL,NULL,0);
-INSERT INTO page VALUES (16,0,'Reserved',0,0,1,1,NULL,1,0,1,0,1,NULL,NULL,0);
-INSERT INTO page VALUES (17,0,'Reserved',0,0,1,1,NULL,1,0,1,0,1,NULL,NULL,0);
-INSERT INTO page VALUES (18,0,'Reserved',0,0,1,1,NULL,1,0,1,0,1,NULL,NULL,0);
-INSERT INTO page VALUES (19,0,'Reserved',0,0,1,1,NULL,1,0,1,0,1,NULL,NULL,0);
-INSERT INTO page VALUES (20,0,'Reserved',0,0,1,1,NULL,1,0,1,0,1,NULL,NULL,0);
-INSERT INTO page VALUES (21,0,'Reserved',0,0,1,1,NULL,1,0,1,0,1,NULL,NULL,0);
-INSERT INTO page VALUES (22,0,'Reserved',0,0,1,1,NULL,1,0,1,0,1,NULL,NULL,0);
-INSERT INTO page VALUES (23,0,'Reserved',0,0,1,1,NULL,1,0,1,0,1,NULL,NULL,0);
-INSERT INTO page VALUES (24,0,'Reserved',0,0,1,1,NULL,1,0,1,0,1,NULL,NULL,0);
-INSERT INTO page VALUES (25,0,'Reserved',0,0,1,1,NULL,1,0,1,0,1,NULL,NULL,0);
-INSERT INTO page VALUES (4,0,'Page Not Found',3,1,1,1,1,1,0,1,0,1,NULL,'page_not_found',0);
-INSERT INTO page VALUES (3,0,'Trash',4,3,1,1,3,1,1,0,0,1,'','trash',0);
-INSERT INTO page VALUES (2,0,'Clipboard',4,3,1,1,4,1,1,0,0,1,'','clipboard',0);
-
-#
-# Table structure for table 'session'
-#
-
-CREATE TABLE session (
-  sessionId varchar(60) NOT NULL default '',
-  expires int(11) default NULL,
-  lastPageView int(11) default NULL,
-  adminOn int(11) NOT NULL default '0',
-  lastIP varchar(50) default NULL,
-  userId int(11) default NULL,
-  PRIMARY KEY  (sessionId)
-) TYPE=MyISAM;
-
-#
-# Dumping data for table 'session'
-#
-
-
-#
-# Table structure for table 'settings'
-#
-
-CREATE TABLE settings (
-  name varchar(255) NOT NULL default '',
-  value text,
-  PRIMARY KEY  (name)
-) TYPE=MyISAM;
-
-#
-# Dumping data for table 'settings'
-#
-
-INSERT INTO settings VALUES ('attachmentDirectoryWeb','/uploads');
-INSERT INTO settings VALUES ('maxAttachmentSize','300');
-INSERT INTO settings VALUES ('lib','/extras');
-INSERT INTO settings VALUES ('sessionTimeout','28000');
-INSERT INTO settings VALUES ('attachmentDirectoryLocal','/data/WebGUI/www/uploads');
-INSERT INTO settings VALUES ('smtpServer','localhost');
-INSERT INTO settings VALUES ('companyEmail','info@mycompany.com');
-INSERT INTO settings VALUES ('ldapURL','ldap://ldap.mycompany.com:389/o=MyCompany');
-INSERT INTO settings VALUES ('companyName','My Company');
-INSERT INTO settings VALUES ('companyURL','http://www.mycompany.com');
-INSERT INTO settings VALUES ('ldapId','shortname');
-INSERT INTO settings VALUES ('ldapIdName','LDAP Shortname');
-INSERT INTO settings VALUES ('ldapPasswordName','LDAP Password');
-INSERT INTO settings VALUES ('authMethod','WebGUI');
-INSERT INTO settings VALUES ('anonymousRegistration','yes');
-INSERT INTO settings VALUES ('notFoundPage','1');
-INSERT INTO settings VALUES ('recoverPasswordEmail','Someone (probably you) requested your account information be sent. Your password has been reset. The following represents your new account information:');
-INSERT INTO settings VALUES ('usernameBinding','no');
-INSERT INTO settings VALUES ('profileName','1');
-INSERT INTO settings VALUES ('profileExtraContact','1');
-INSERT INTO settings VALUES ('profileMisc','1');
-INSERT INTO settings VALUES ('profileHome','0');
-INSERT INTO settings VALUES ('profileWork','0');
-INSERT INTO settings VALUES ('VERSION','2.4.0');
-
-#
-# Table structure for table 'style'
-#
-
-CREATE TABLE style (
-  styleId int(11) NOT NULL default '0',
-  name varchar(30) default NULL,
-  header text,
-  footer text,
-  styleSheet text,
-  PRIMARY KEY  (styleId)
-) TYPE=MyISAM;
-
-#
-# Dumping data for table 'style'
-#
-
-INSERT INTO style VALUES (1,'Reserved','<body bgcolor=\"#000000\" text=\"#ffffff\">\r\n<table width=\"100%\"><tr><td>^C</td><td align=\"right\">^D</td></tr></table>\r\n<hr>\r\nhorizontal top level menu: ^t\r\n<hr>\r\nhorizontal current level menu: ^m\r\n<hr>\r\n<table width=\"100%\"><tr><td valign=\"top\" width=\"180\">\r\nvertical top level menu: ^T<br>\r\n<hr>\r\nvertical current level menu: ^M<br>\r\n\r\n\r\n</td><td valign=\"top\">\r\n\r\n','</td><td valign=\"top\" width=\"180\">\r\n^@<br>\r\n^#<br>\r\n^*<br>\r\n^?<br>\r\n</td></tr></table>\r\n</body>\r\n</html>\r\n','<style>\r\n/* WebGUI Default Style Sheet */\r\n\r\nH1 {\r\n  font-family: verdana, helvetica, arial;\r\n}\r\n\r\n.pagination {\r\n  font-family: helvetica, arial;\r\n  text-align: center;\r\n  width: 100%;\r\n  font-size: 8pt;\r\n}\r\n\r\n.adminBar {\r\n        background-color: #dddddd;\r\n        font-size: 8pt;\r\n        font-family: helvetica, arial;\r\n        color: #000055;\r\n}\r\n\r\n.crumbTrail {\r\n        font-family: helvetica, arial;\r\n        color: #dddddd;\r\n        font-size: 8pt;\r\n}\r\n\r\n.crumbTrail A {\r\n        color: #ffff00;\r\n}\r\n\r\n.crumbTrail A:visited {\r\n        color: #ffff00;\r\n}\r\n\r\n.verticalMenu {\r\n        font-family: helvetica, arial;\r\n        color: #dddddd;\r\n        font-size: 10pt;\r\n}\r\n\r\n.verticalMenu A {\r\n        color: #ffff00;\r\n}\r\n\r\n.verticalMenu A:visited {\r\n        color: #cccc00;\r\n}\r\n\r\n.highlight {\r\n  background-color: #800000;\r\n}\r\n\r\n.formDescription {\r\n        font-family: helvetica, arial;\r\n        color: #dddddd;\r\n        font-size: 10pt;\r\n}\r\n\r\n.formSubtext {\r\n        font-family: helvetica, arial;\r\n        color: #ffffff;\r\n        font-size: 8pt;\r\n}\r\n\r\n.boardTitle {\r\n  font-size: 16pt;\r\n}\r\n\r\n.boardMenu a {\r\n  color: #00ff00;\r\n  text-decoration: none;\r\n}\r\n\r\n.boardHeader {\r\n  font-weight: bold;\r\n  background-color: #008000\r\n}\r\n\r\n.boardData {\r\n  font-size: 10pt;\r\n  font-family: Helvetica, Arial;\r\n}\r\n\r\n.boardMessage {\r\n  font-style: italics;\r\n}\r\n</style>');
-INSERT INTO style VALUES (2,'Fail Safe','<body>\r\n^H; / ^t; / ^m; / ^a;\r\n<hr>','<hr>\r\n^H; / ^t; / ^m; / ^a;\r\n</body>','<style>\r\n.adminBar {\r\n        background-color: #dddddd;\r\n        font-size: 8pt;\r\n        font-family: helvetica, arial;\r\n        color: #000055;\r\n}\r\n</style>');
-INSERT INTO style VALUES (3,'Plain Black Software','<body bgcolor=\"#eaeaef\" text=\"#000000\" link=\"#5555ff\">\r\n<a href=\"/\"><img src=\"/extras/plainBlackSoftware.gif\" border=0></a>\r\n<table width=\"100%\"><tr><td>^C;</td><td align=\"right\">^D;</td></tr></table>\r\n<table width=\"100%\"><tr><td valign=\"top\" width=\"130\">\r\nuser: ^@;\r\n<hr size=1>\r\n^T;\r\n</td><td valign=\"top\">\r\n^m;\r\n','</td></tr></table><hr size=1>\r\n<a href=\"/\"><img src=\"/extras/pbs.gif\" border=0 align=\"right\"></a>\r\n^H; / ^a;\r\n</body></html>','<style>\r\n/* WebGUI Default Style Sheet */\r\n\r\n.content, body {\r\n  background-color: #eaeaef;\r\n  color: #000000;\r\n  font-family: helvetica, arial;\r\n  font-size: 10pt;\r\n}\r\n\r\n.verticalMenu {\r\n  font-size: 10pt;\r\n}\r\nH1 {\r\n  font-family: helvetica, arial;\r\n}\r\n\r\nA {\r\n  color: #5555ff;\r\n}\r\n\r\n.pagination {\r\n  font-family: helvetica, arial;\r\n  font-size: 8pt;\r\n  text-align: center;\r\n}\r\n\r\n.horizontalMenu {\r\n  font-size: 8pt;\r\n  background-color: #ffffff;\r\n  font-weight: bold;\r\n  border: 1px;\r\n}\r\n\r\n.adminBar {\r\n        background-color: #dddddd;\r\n        font-size: 8pt;\r\n        font-family: helvetica, arial;\r\n        color: #000055;\r\n}\r\n\r\n.crumbTrail {\r\n        font-family: helvetica, arial;\r\n        color: #666666;\r\n        font-size: 8pt;\r\n}\r\n\r\n.crumbTrail A {\r\n        color: #555555;\r\n}\r\n\r\n.crumbTrail A:visited {\r\n        color: #666666;\r\n}\r\n\r\n.formDescription {\r\n        font-family: helvetica, arial;\r\n        font-size: 10pt;\r\n}\r\n\r\n.formSubtext {\r\n        font-family: helvetica, arial;\r\n        font-size: 8pt;\r\n}\r\n\r\n.highlight {\r\n  background-color: #aaaaaa;\r\n}\r\n\r\n.tableMenu {\r\n  background-color: #dddddd;\r\n  font-size: 8pt;\r\n  font-family: Helvetica, Arial;\r\n}\r\n\r\n.tableMenu a {\r\n  text-decoration: none;\r\n}\r\n\r\n.tableHeader {\r\n  background-color: #cccccc;\r\n  font-size: 10pt;\r\n  font-family: Helvetica, Arial;\r\n}\r\n\r\n.tableData {\r\n  font-size: 10pt;\r\n  font-family: Helvetica, Arial;\r\n}\r\n\r\n.pollAnswer {\r\n  font-family: Helvetica, Arial;\r\n  font-size: 8pt;\r\n}\r\n\r\n.pollColor {\r\n  background-color: #ffddbb;\r\n}\r\n\r\n.pollQuestion {\r\n  font-face: Helvetica, Arial;\r\n  font-weight: bold;\r\n}\r\n\r\n</style>');
-INSERT INTO style VALUES (4,'Trash / Clipboard','<body>\r\n<table width=\"100%\"><tr><td valign=\"top\" width=\"30%\"><b>PAGES</b><br>^M(0);</td><td valign=\"top\" width=\"70%\"><b>CONTENT</b><br>','</td></tr></table>\r\n<hr>\r\n^H; / ^a;\r\n</body>','<style>\r\n.adminBar {\r\n        background-color: #dddddd;\r\n        font-size: 8pt;\r\n        font-family: helvetica, arial;\r\n        color: #000055;\r\n}\r\n</style>');
-INSERT INTO style VALUES (5,'Reserved','<body>','</body></html>',NULL);
-INSERT INTO style VALUES (6,'Reserved','<body>','</body></html>',NULL);
-INSERT INTO style VALUES (7,'Reserved','<body>','</body></html>',NULL);
-INSERT INTO style VALUES (8,'Reserved','<body>','</body></html>',NULL);
-INSERT INTO style VALUES (9,'Reserved','<body>','</body></html>',NULL);
-INSERT INTO style VALUES (10,'Reserved','<body>','</body></html>',NULL);
-INSERT INTO style VALUES (11,'Reserved','<body>','</body></html>',NULL);
-INSERT INTO style VALUES (12,'Reserved','<body>','</body></html>',NULL);
-INSERT INTO style VALUES (13,'Reserved','<body>','</body></html>',NULL);
-INSERT INTO style VALUES (14,'Reserved','<body>','</body></html>',NULL);
-INSERT INTO style VALUES (15,'Reserved','<body>','</body></html>',NULL);
-INSERT INTO style VALUES (16,'Reserved','<body>','</body></html>',NULL);
-INSERT INTO style VALUES (17,'Reserved','<body>','</body></html>',NULL);
-INSERT INTO style VALUES (18,'Reserved','<body>','</body></html>',NULL);
-INSERT INTO style VALUES (19,'Reserved','<body>','</body></html>',NULL);
-INSERT INTO style VALUES (20,'Reserved','<body>','</body></html>',NULL);
-INSERT INTO style VALUES (21,'Reserved','<body>','</body></html>',NULL);
-INSERT INTO style VALUES (22,'Reserved','<body>','</body></html>',NULL);
-INSERT INTO style VALUES (23,'Reserved','<body>','</body></html>',NULL);
-INSERT INTO style VALUES (24,'Reserved','<body>','</body></html>',NULL);
-INSERT INTO style VALUES (25,'Yahoo!','<html><head><title>Yahoo!</title><meta http-equiv=\"PICS-Label\" content=\'(PICS-1.1 \"http://www.rsac.org/ratingsv01.html\" l gen true for \"http://www.yahoo.com\" r (n 0 s 0 v 0 l 0))\'></head><body>\r\n<script language=javascript><!--\r\nfunction f(){\r\nvar f,m,p,a,i,k,o,e,l,c,d;\r\nf=\"0123456789abcdefghijklmnopqrstuvwxyz\";\r\nm=new Array;\r\np=\"claim-your-name\";\r\na=10;\r\nfor(i=0;i<36;i++){\r\n if(i==26)a=-26;\r\n m[f.charAt(i)]=f.charAt(i+a);\r\n}\r\nk=document.cookie;\r\nif((o=k.indexOf(\"Y=\"))==-1)return p;\r\nif((o=k.indexOf(\"l=\",o+2))==-1)return p;\r\nif((e=k.indexOf(\"/\",o+2))==-1)return p;\r\nif(e>o+18)e=o+18;\r\nl=k.substring(o+2,e);\r\np=\"\";\r\nfor(i=0;i<l.length;i++){\r\n c=l.charAt(i);\r\n if(m[c])p+=m[c];else p+=\'-\';\r\n}\r\nreturn p;\r\n}\r\nd=f();//-->\r\n</script>\r\n<center><form name=f action=http://search.yahoo.com/bin/search><map name=m><area coords=\"0,0,52,52\" href=r/c1><area coords=\"53,0,121,52\" href=r/p1><area coords=\"122,0,191,52\" href=r/m1><area coords=\"441,0,510,52\" href=r/wn><area coords=\"511,0,579,52\" href=r/i1><area coords=\"580,0,637,52\" href=r/hw></map><img width=638 height=53 border=0 usemap=\"#m\" src=http://us.a1.yimg.com/us.yimg.com/i/ww/m5v5.gif alt=Yahoo><br><table border=0 cellspacing=0 cellpadding=3 width=640><tr><td align=center width=205>\r\n<font color=ff0020>new!</font> <a href=\"http://www.yahoo.com/homet/?http://new.domains.yahoo.com\"><b>Y! Domains</b></a><br><small>reserve .biz & .info domains</small></td><td align=center><a href=\"http://rd.yahoo.com/M=77122.1317476.2909345.220161/D=yahoo_top/S=2716149:NP/A=656341/?http://website.yahoo.com/\" target=\"_top\"><img width=230 height=33 src=\"http://us.a1.yimg.com/us.yimg.com/a/pr/promo/anchor/hp_website2.gif\" alt=\"\" border=0></a></td><td align=center width=205><a href=\"http://www.yahoo.com//homet/?http://mail.yahoo.com\"><b>Yahoo! Mail</b></a><br>you@yahoo.com</td></tr><tr><td colspan=3 align=center><input size=30 name=p>\r\n<input type=submit value=Search> <a href=http://www.yahoo.com/r/so>advanced search</a></td></tr></table>\r\n</form>\r\n<div align=\"left\">\r\n','</div>\r\n<hr noshade size=1 width=640><small><a href=http://www.yahoo.com/r/ad>How to Suggest a Site</a> -\r\n<a href=http://www.yahoo.com/r/cp>Company Info</a> -\r\n<a href=http://www.yahoo.com/r/cy>Copyright Policy</a> -\r\n<a href=http://www.yahoo.com/r/ts>Terms of Service</a> -\r\n<a href=http://www.yahoo.com/r/cb>Contributors</a> -\r\n<a href=http://www.yahoo.com/r/hr>Jobs</a> -\r\n<a href=http://www.yahoo.com/r/ao>Advertising</a><p>Copyright © 2001 Yahoo! Inc. All rights reserved.</small><br><a href=http://www.yahoo.com/r/pv>Privacy Policy</a></form></center></body></html>\r\n','');
-
-#
-# Table structure for table 'users'
-#
-
-CREATE TABLE users (
-  userId int(11) NOT NULL default '0',
-  username varchar(35) default NULL,
-  identifier varchar(35) default NULL,
-  email varchar(255) default NULL,
-  authMethod varchar(30) NOT NULL default 'WebGUI',
-  ldapURL text,
-  connectDN varchar(255) default NULL,
-  language varchar(30) NOT NULL default 'English',
-  firstName varchar(50) default NULL,
-  middleName varchar(50) default NULL,
-  lastName varchar(50) default NULL,
-  icq varchar(30) default NULL,
-  aim varchar(30) default NULL,
-  msnIM varchar(30) default NULL,
-  yahooIM varchar(30) default NULL,
-  homeAddress varchar(128) default NULL,
-  homeCity varchar(30) default NULL,
-  homeState varchar(30) default NULL,
-  homeZip varchar(15) default NULL,
-  homeCountry varchar(30) default NULL,
-  homePhone varchar(30) default NULL,
-  workAddress varchar(128) default NULL,
-  workCity varchar(30) default NULL,
-  workState varchar(30) default NULL,
-  workZip varchar(15) default NULL,
-  workCountry varchar(30) default NULL,
-  workPhone varchar(30) default NULL,
-  cellPhone varchar(30) default NULL,
-  pager varchar(30) default NULL,
-  gender varchar(6) default NULL,
-  birthdate varchar(30) default NULL,
-  homepage text,
-  PRIMARY KEY  (userId)
-) TYPE=MyISAM;
-
-#
-# Dumping data for table 'users'
-#
-
-INSERT INTO users VALUES (1,'Visitor','No Login','','WebGUI',NULL,NULL,'English',NULL,NULL,NULL,'',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL);
-INSERT INTO users VALUES (2,'Reserved','No Login',NULL,'WebGUI',NULL,NULL,'English',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL);
-INSERT INTO users VALUES (3,'Admin','RvlMjeFPs2aAhQdo/xt/Kg','','WebGUI',NULL,NULL,'English',NULL,NULL,NULL,'',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL);
-INSERT INTO users VALUES (4,'Reserved','No Login',NULL,'WebGUI',NULL,NULL,'English',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL);
-INSERT INTO users VALUES (5,'Reserved','No Login',NULL,'WebGUI',NULL,NULL,'English',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL);
-INSERT INTO users VALUES (6,'Reserved','No Login',NULL,'WebGUI',NULL,NULL,'English',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL);
-INSERT INTO users VALUES (7,'Reserved','No Login',NULL,'WebGUI',NULL,NULL,'English',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL);
-INSERT INTO users VALUES (8,'Reserved','No Login',NULL,'WebGUI',NULL,NULL,'English',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL);
-INSERT INTO users VALUES (9,'Reserved','No Login',NULL,'WebGUI',NULL,NULL,'English',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL);
-INSERT INTO users VALUES (10,'Reserved','No Login',NULL,'WebGUI',NULL,NULL,'English',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL);
-INSERT INTO users VALUES (11,'Reserved','No Login',NULL,'WebGUI',NULL,NULL,'English',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL);
-INSERT INTO users VALUES (12,'Reserved','No Login',NULL,'WebGUI',NULL,NULL,'English',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL);
-INSERT INTO users VALUES (13,'Reserved','No Login',NULL,'WebGUI',NULL,NULL,'English',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL);
-INSERT INTO users VALUES (14,'Reserved','No Login',NULL,'WebGUI',NULL,NULL,'English',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL);
-INSERT INTO users VALUES (15,'Reserved','No Login',NULL,'WebGUI',NULL,NULL,'English',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL);
-INSERT INTO users VALUES (16,'Reserved','No Login',NULL,'WebGUI',NULL,NULL,'English',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL);
-INSERT INTO users VALUES (17,'Reserved','No Login',NULL,'WebGUI',NULL,NULL,'English',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL);
-INSERT INTO users VALUES (18,'Reserved','No Login',NULL,'WebGUI',NULL,NULL,'English',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL);
-INSERT INTO users VALUES (19,'Reserved','No Login',NULL,'WebGUI',NULL,NULL,'English',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL);
-INSERT INTO users VALUES (20,'Reserved','No Login',NULL,'WebGUI',NULL,NULL,'English',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL);
-INSERT INTO users VALUES (21,'Reserved','No Login',NULL,'WebGUI',NULL,NULL,'English',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL);
-INSERT INTO users VALUES (22,'Reserved','No Login',NULL,'WebGUI',NULL,NULL,'English',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL);
-INSERT INTO users VALUES (23,'Reserved','No Login',NULL,'WebGUI',NULL,NULL,'English',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL);
-INSERT INTO users VALUES (24,'Reserved','No Login',NULL,'WebGUI',NULL,NULL,'English',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL);
-INSERT INTO users VALUES (25,'Reserved','No Login',NULL,'WebGUI',NULL,NULL,'English',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL);
-
-#
-# Table structure for table 'widget'
-#
-
-CREATE TABLE widget (
-  widgetId int(11) NOT NULL default '0',
-  pageId int(11) default NULL,
-  widgetType varchar(35) default NULL,
-  sequenceNumber int(11) NOT NULL default '1',
-  title varchar(255) default NULL,
-  displayTitle int(11) NOT NULL default '1',
-  description text,
-  processMacros int(11) NOT NULL default '0',
-  dateAdded int(11) default NULL,
-  addedBy int(11) default NULL,
-  lastEdited int(11) default NULL,
-  editedBy int(11) default NULL,
-  PRIMARY KEY  (widgetId)
-) TYPE=MyISAM;
-
-#
-# Dumping data for table 'widget'
-#
-
-INSERT INTO widget VALUES (-1,4,'SiteMap',0,'Page Not Found',1,'The page you were looking for could not be found on this system. Perhaps it has been deleted or renamed. The following list is a site map of this site. If you don\'t find what you\'re looking for on the site map, you can always start from the <a href=\"^/\">Home Page</a>.',1,1001744792,3,1001744968,3);
 

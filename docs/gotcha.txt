@@ -8,6 +8,12 @@ versions. Be sure to heed the warnings contained herein as they will
 save you many hours of grief.
 
 
+2.5.0
+--------------------------------------------------------------------
+ * Any third-party Widgets you have installed are likely not to work
+	any longer unless they have been updated to work with
+	the new templating features in WebGUI.
+
 2.4.0
 --------------------------------------------------------------------
  * You must convert your old macros to the new format by version

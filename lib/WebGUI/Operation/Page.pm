@@ -17,6 +17,7 @@ use WebGUI::International;
 use WebGUI::Privilege;
 use WebGUI::Session;
 use WebGUI::SQL;
+use WebGUI::Template;
 use WebGUI::Utility;
 
 our @ISA = qw(Exporter);
@@ -57,7 +58,8 @@ sub _reorderPages {
 
 #-------------------------------------------------------------------
 sub www_addPage {
-	my ($output);
+	my ($output, @array, %hash);
+	tie %hash, "Tie::IxHash";
 	if (WebGUI::Privilege::canEditPage()) {
 		$output = '<a href="'.$session{page}{url}.'?op=viewHelp&hid=1&namespace=WebGUI"><img src="'.$session{setting}{lib}.'/help.gif" border="0" align="right"></a>';
 		$output .= '<h1>'.WebGUI::International::get(98).'</h1>';
@@ -65,6 +67,10 @@ sub www_addPage {
 		$output .= WebGUI::Form::hidden("op","addPageSave");
 		$output .= '<table>';
 		$output .= '<tr><td class="formDescription">'.WebGUI::International::get(99).'</td><td>'.WebGUI::Form::text("title",20,128,$session{form}{title}).'</td></tr>';
+		%hash = sortHash(WebGUI::Template::getList());
+		$array[0] = "Default";
+		$output .= '<script language="JavaScript"> function updateTemplateImage(template) { document.template.src = "'.$session{setting}{lib}.'/templates/"+template+".gif"; } </script>';
+		$output .= '<tr><td class="formDescription">'.WebGUI::International::get(356).'</td><td>'.WebGUI::Form::selectList("template",\%hash, \@array, 1, 0, "updateTemplateImage(this.form.template.value)").'<br><img src="'.$session{setting}{lib}.'/templates/Default.gif" name="template"></td></tr>';
 		$output .= '<tr><td class="formDescription">'.WebGUI::International::get(100).'</td><td>'.WebGUI::Form::textArea("metaTags",$session{form}{metaTags}).'</td></tr>';
                 $output .= '<tr><td class="formDescription">'.WebGUI::International::get(307).'</td><td>'.WebGUI::Form::checkbox("defaultMetaTags",1,1).'</td></tr>';
 		$output .= '<tr><td></td><td>'.WebGUI::Form::submit(WebGUI::International::get(62)).'</td></tr>';
@@ -84,7 +90,7 @@ sub www_addPageSave {
 		while (($test) = WebGUI::SQL->quickArray("select urlizedTitle from page where urlizedTitle='$urlizedTitle'",$session{dbh})) {
 			$urlizedTitle .= 2;
 		}
-		WebGUI::SQL->write("insert into page values (".getNextId("pageId").", $session{page}{pageId}, ".quote($session{form}{title}).", $session{page}{styleId}, $session{user}{userId}, $session{page}{ownerView}, $session{page}{ownerEdit}, $session{page}{groupId}, $session{page}{groupView}, $session{page}{groupEdit}, $session{page}{worldView}, $session{page}{worldEdit}, '$nextSeq', ".quote($session{form}{metaTags}).", '$urlizedTitle', '$session{form}{defaultMetaTags}')",$session{dbh});
+		WebGUI::SQL->write("insert into page values (".getNextId("pageId").", $session{page}{pageId}, ".quote($session{form}{title}).", $session{page}{styleId}, $session{user}{userId}, $session{page}{ownerView}, $session{page}{ownerEdit}, $session{page}{groupId}, $session{page}{groupView}, $session{page}{groupEdit}, $session{page}{worldView}, $session{page}{worldEdit}, '$nextSeq', ".quote($session{form}{metaTags}).", '$urlizedTitle', '$session{form}{defaultMetaTags}', '$session{form}{template}')",$session{dbh});
 		return "";
 	} else {
 		return WebGUI::Privilege::insufficient();
@@ -150,6 +156,10 @@ sub www_editPage {
 		$output .= '<tr><td colspan=2><b>'.WebGUI::International::get(103).'</b></td></tr>';
                 $output .= '<tr><td class="formDescription">'.WebGUI::International::get(99).'</td><td>'.WebGUI::Form::text("title",20,128,$session{page}{title}).'</td></tr>';
                 $output .= '<tr><td class="formDescription">'.WebGUI::International::get(104).'</td><td>'.WebGUI::Form::text("urlizedTitle",20,128,$session{page}{urlizedTitle}).'</td></tr>';
+		%hash = sortHash(WebGUI::Template::getList());
+                $array[0] = $session{page}{template};
+                $output .= '<script language="JavaScript"> function updateTemplateImage(template) { document.template.src = "'.$session{setting}{lib}.'/templates/"+template+".gif"; } </script>';
+                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(356).'</td><td>'.WebGUI::Form::selectList("template",\%hash,\@array,1,0,"updateTemplateImage(this.form.template.value)").'<br><img src="'.$session{setting}{lib}.'/templates/'.$session{page}{template}.'.gif" name="template"></td></tr>';
                 $output .= '<tr><td class="formDescription">'.WebGUI::International::get(100).'</td><td>'.WebGUI::Form::textArea("metaTags",$session{page}{metaTags}).'</td></tr>';
                 $output .= '<tr><td class="formDescription">'.WebGUI::International::get(307).'</td><td>'.WebGUI::Form::checkbox("defaultMetaTags",1,$session{page}{defaultMetaTags}).'</td></tr>';
 		$output .= '<tr><td colspan=2><hr size=1><b>'.WebGUI::International::get(105).'</b></td></tr>';
@@ -193,7 +203,7 @@ sub www_editPageSave {
                 while (($test) = WebGUI::SQL->quickArray("select urlizedTitle from page where urlizedTitle='$urlizedTitle' and pageId<>$session{page}{pageId}",$session{dbh})) {
                         $urlizedTitle .= 2;
                 }
-                WebGUI::SQL->write("update page set title=".quote($session{form}{title}).", styleId=$session{form}{styleId}, ownerId=$session{form}{ownerId}, ownerView=$session{form}{ownerView}, ownerEdit=$session{form}{ownerEdit}, groupId='$session{form}{groupId}', groupView=$session{form}{groupView}, groupEdit=$session{form}{groupEdit}, worldView=$session{form}{worldView}, worldEdit=$session{form}{worldEdit}, metaTags=".quote($session{form}{metaTags}).", urlizedTitle='$urlizedTitle', defaultMetaTags='$session{form}{defaultMetaTags}' where pageId=$session{page}{pageId}",$session{dbh});
+                WebGUI::SQL->write("update page set title=".quote($session{form}{title}).", styleId=$session{form}{styleId}, ownerId=$session{form}{ownerId}, ownerView=$session{form}{ownerView}, ownerEdit=$session{form}{ownerEdit}, groupId='$session{form}{groupId}', groupView=$session{form}{groupView}, groupEdit=$session{form}{groupEdit}, worldView=$session{form}{worldView}, worldEdit=$session{form}{worldEdit}, metaTags=".quote($session{form}{metaTags}).", urlizedTitle='$urlizedTitle', defaultMetaTags='$session{form}{defaultMetaTags}', template='$session{form}{template}' where pageId=$session{page}{pageId}",$session{dbh});
 		if ($session{form}{recurseStyle} eq "yes") {
 			_recursivelyChangeStyle($session{page}{pageId});
 		}

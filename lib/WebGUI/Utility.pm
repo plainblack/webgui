@@ -14,12 +14,13 @@ use CGI;
 use Exporter;
 use FileHandle;
 use strict;
+use Tie::IxHash;
 use WebGUI::International;
 use WebGUI::Session;
 use WebGUI::SQL;
 
 our @ISA = qw(Exporter);
-our @EXPORT = qw(&paginate &appendToUrl &randint &getNextId &saveAttachment &round &urlize &quote);
+our @EXPORT = qw(&sortHashDescending &sortHash &paginate &appendToUrl &randint &getNextId &saveAttachment &round &urlize &quote);
 
 #-------------------------------------------------------------------
 sub appendToUrl {
@@ -111,8 +112,8 @@ sub saveAttachment {
 			mkdir ($path,0755);
 		}
 		$file = FileHandle->new(">".$path.$urlizedFilename);
-		binmode $file;
 		if (defined $file) {
+			binmode $file;
 			while ($bytesread=read($filename,$buffer,1024)) {
         			print $file $buffer;
 			}
@@ -124,6 +125,36 @@ sub saveAttachment {
 	} else {
 		return "";
 	}
+}
+
+#-------------------------------------------------------------------
+sub sortHash {
+	my (%hash, %reversedHash, %newHash, $key);
+	tie %hash, "Tie::IxHash";
+	tie %reversedHash, "Tie::IxHash";
+	tie %newHash, "Tie::IxHash";
+        %hash = @_;
+	%reversedHash = reverse %hash;
+	foreach $key (sort {$b cmp $a} keys %reversedHash) {
+        	$newHash{$key}=$reversedHash{$key};
+	}
+	%reversedHash = reverse %newHash;
+        return %reversedHash;
+}
+
+#-------------------------------------------------------------------
+sub sortHashDescending {
+        my (%hash, %reversedHash, %newHash, $key);
+        tie %hash, "Tie::IxHash";
+        tie %reversedHash, "Tie::IxHash";
+        tie %newHash, "Tie::IxHash";
+        %hash = @_;
+        %reversedHash = reverse %hash;
+        foreach $key (sort {$a cmp $b} keys %reversedHash) {
+                $newHash{$key}=$reversedHash{$key};
+        }
+        %reversedHash = reverse %newHash;
+        return %reversedHash;
 }
 
 #-------------------------------------------------------------------

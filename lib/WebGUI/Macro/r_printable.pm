@@ -17,21 +17,26 @@ use WebGUI::Session;
 use WebGUI::Utility;
 
 #-------------------------------------------------------------------
-sub process {
-        my ($output, $temp, @param);
-        $output = $_[0];
-        while ($output =~ /\^r(.*?)\;/) {
-                @param = WebGUI::Macro::getParams($1);
-                $temp = appendToUrl($session{env}{REQUEST_URI},'makePrintable=1');
-		$temp = '<a class="makePrintableLink" href="'.$temp.'">';
-                if ($param[0] ne "") {
-                        $temp .= $param[0];
-                } else {
-                        $temp .= WebGUI::International::get(53);
-                }
-		$temp .= '</a>';
-                $output =~ s/\^r(.*?)\;/$temp/;
+sub _replacement {
+        my ($temp, @param);
+        @param = WebGUI::Macro::getParams($_[0]);
+        $temp = appendToUrl($session{env}{REQUEST_URI},'makePrintable=1');
+        $temp = '<a class="makePrintableLink" href="'.$temp.'">';
+        if ($param[0] ne "") {
+        	$temp .= $param[0];
+        } else {
+                $temp .= WebGUI::International::get(53);
         }
+        $temp .= '</a>';
+	return $temp;
+}
+
+#-------------------------------------------------------------------
+sub process {
+        my ($output, $temp);
+        $output = $_[0];
+        $output =~ s/\^r\((.*?)\)\;/_replacement($1)/ge;
+        $output =~ s/\^r\;/_replacement()/ge;
         #---everything below this line will go away in a later rev.
         if ($output =~ /\^r(.*)\^\/r/) {
                 $temp = appendToUrl($session{env}{REQUEST_URI},'makePrintable=1');
