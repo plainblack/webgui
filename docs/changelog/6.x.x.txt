@@ -1,4 +1,5 @@
 6.3.0
+ - bugfix [1066029] IDs with dashes break search
  - bugfix [1059353] index.fpl broken
  - bugfix [1066824] lib/WebGUI/Forum.pm problem, and the fix
  - Fixed the Slash_gatewayUrl macro. 
