@@ -7,6 +7,18 @@ upgrading from one version to the next, or even between multiple
 versions. Be sure to heed the warnings contained herein as they will
 save you many hours of grief.
 
+4.1.0
+--------------------------------------------------------------------
+ * Between 3.6.5 and now, much of the WebGUI filesystem has changed
+	dramatically. If you've been copying new WebGUI installs
+	over the top of old WebGUI installs, you may want to
+	consider starting with a clean slate. To do that just move
+	your WebGUI folder to WebGUI.old and put the latest
+	WebGUI distribution in its place. Then copy any necessary
+	files (like conf files) from WebGUI.old to your new WebGUI
+	folder.
+
+
 3.10.0 && 3.10.1
 --------------------------------------------------------------------
  * Be very very careful when applying the patch files for these
