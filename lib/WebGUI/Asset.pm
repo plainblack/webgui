@@ -371,6 +371,14 @@ sub definition {
 				isPackage=>{
 					fieldType=>'yesNo',
 					defaultValue=>0
+					},
+				isHidden=>{
+					fieldType=>'yesNo',
+					defaultValue=>0
+					},
+				newWindow=>{
+					fieldType=>'yesNo',
+					defaultValue=>0
 					}
                         }
                 });
