@@ -1,4 +1,4 @@
-package WebGUI::Macro::RandomSnippet;
+package WebGUI::Macro::LastModified;
 
 #-------------------------------------------------------------------
 # WebGUI is Copyright 2001-2003 Plain Black LLC.
@@ -11,28 +11,26 @@ package WebGUI::Macro::RandomSnippet;
 #-------------------------------------------------------------------
 
 use strict;
-use Tie::CPHash;
-use WebGUI::Collateral;
+use WebGUI::DateTime;
 use WebGUI::Macro;
 use WebGUI::Session;
 use WebGUI::SQL;
 
 #-------------------------------------------------------------------
 sub process {
-        my @param = WebGUI::Macro::getParams($_[0]);
-	my $collateralFolderId;
-	if ($param[0] ne "") {
-		($collateralFolderId) = WebGUI::SQL->quickArray("select collateralFolderId from collateralFolder 
-			where name=".quote($param[0]));
-	} else {
-                $collateralFolderId = 0; #Root
-        }
-	my @snippets = WebGUI::SQL->buildArray("select collateralId from collateral 
-		where collateralType='snippet' and collateralFolderId=".$collateralFolderId);
-	my $collateral = WebGUI::Collateral->new($snippets[rand($#snippets+1)]);
-	return $collateral->get("parameters");
-}
+        my ($label, $format, $time, $output);
 
+        ($label, $format) = WebGUI::Macro::getParams(shift);
+        $format = '%z' if ($format eq "");
+	$output = "";
+
+        ($time) = WebGUI::SQL->quickArray("SELECT max(lastEdited) FROM wobject where pageId=$session{page}{pageId}");
+        if ($time) {
+		$output = $label.epochToHuman($time,$format);
+	}
+
+        return $output;
+}
 
 1;
 

@@ -30,6 +30,7 @@ Contributing Developers..............Peter Beardsley / Appropriate Solutions
                                      Ben Simpson
                                      Jeff Szpak / Plain Black
                                      Sean Tu / WDI
+                                     Madsen Wikholm
 
 Contributing Translators.............AGOFER Ltda.
                                      Natalia Almazova
