@@ -96,7 +96,9 @@ sub description {
 sub displayTitle {
         if ($_[0]->get("displayTitle")) {
                 return "<h1>".$_[0]->get("title")."</h1>";
-        }
+        } else {
+		return "";
+	}
 }
 
 #-------------------------------------------------------------------
