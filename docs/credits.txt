@@ -13,12 +13,12 @@ Contributing Developers..............Peter Beardsley / Appropriate Solutions, In
                                      Flavio Curti
                                      Frank Dillon
                                      Andy Grundman
-                                     Koen de Jonge / ProcliX
+                                     Koen de Jonge / ProcoliX
                                      Christophe Marcant
                                      Daniel Quinlan
 
 Contributing Translators.............Andreas Ljunggren
-                                     Joeri de Bruin
+                                     Joeri de Bruin / ProcoliX
                                      Jose Caneira
                                      Emiliano Grilli
                                      Mattias Kunkel / WERU AG
