@@ -320,8 +320,8 @@ sub www_view {
 	$numResults = $_[0]->get("submissionsPerPage");
 	$var{"readmore.label"} = WebGUI::International::get(46,$namespace);
 	$var{"responses.label"} = WebGUI::International::get(57,$namespace);
-	$var{title} = $_[0]->processMacros($_[0]->get("title"));
-        $var{description} = $_[0]->processMacros($_[0]->get("description"));
+	$var{title} = $_[0]->get("title");
+        $var{description} = $_[0]->get("description");
 	$var{canPost} = WebGUI::Privilege::isInGroup($_[0]->get("groupToContribute"));
         $var{"post.url"} = WebGUI::URL::page('func=editSubmission&sid=new&wid='.$_[0]->get("wobjectId"));
 	$var{"post.label"} = WebGUI::International::get(20,$namespace);

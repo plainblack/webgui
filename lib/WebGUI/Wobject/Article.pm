@@ -166,7 +166,7 @@ sub www_view {
         	$var{"post.URL"} = WebGUI::URL::page('func=post&mid=new&wid='.$_[0]->get("wobjectId"));
         	$var{"post.label"} = WebGUI::International::get(24,$namespace);
 	}
-	return $_[0]->processMacros($_[0]->processTemplate($_[0]->get("templateId"),\%var));
+	return $_[0]->processTemplate($_[0]->get("templateId"),\%var);
 }
 
 

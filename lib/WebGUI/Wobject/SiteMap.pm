@@ -128,7 +128,7 @@ sub www_editSave {
 sub www_view {
         my (%var);
 	$var{page_loop} = _traversePageTree($_[0]->get("startAtThisLevel"),0,$_[0]->get("depth"),$_[0]->get("indent"));
-	return $_[0]->processMacros($_[0]->processTemplate($_[0]->get("templateId"),\%var));
+	return $_[0]->processTemplate($_[0]->get("templateId"),\%var);
 }
 
 1;

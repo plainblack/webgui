@@ -195,7 +195,7 @@ sub www_view {
 	}
 	$sth->finish;
 	$var{qa_loop} = \@qa;
-	return $_[0]->processMacros($_[0]->processTemplate($_[0]->get("templateId"),\%var));
+	return $_[0]->processTemplate($_[0]->get("templateId"),\%var);
 }
 
 

@@ -17,7 +17,6 @@ package WebGUI::Style;
 
 use strict;
 use Tie::CPHash;
-use WebGUI::Macro;
 use WebGUI::Session;
 use WebGUI::SQL;
 use WebGUI::Template;
@@ -79,7 +78,7 @@ sub get {
         }
         $header .= '</head>'.$body[0];
         $footer = $body[1].' </html>';
-        return WebGUI::Macro::process($header.$_[0].$footer);
+        return $header.$_[0].$footer;
 }
 
 

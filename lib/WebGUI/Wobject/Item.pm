@@ -89,7 +89,7 @@ sub www_view {
 		$var{"attachment.URL"} = $file->getURL;
 		$var{"attachment.Icon"} = $file->getIcon;
 	}
-        return $_[0]->processMacros($_[0]->processTemplate($_[0]->get("templateId"),\%var));
+        return $_[0]->processTemplate($_[0]->get("templateId"),\%var);
 }	
 
 

@@ -183,7 +183,7 @@ sub www_view {
 		$output .= WebGUI::International::get(12,$namespace).'<p>' if ($_[0]->get("debugMode"));
 		WebGUI::ErrorHandler::warn("SQLReport [".$_[0]->get("wobjectId")."] Could not connect to database.");
 	}	
-	return $_[0]->processMacros($output);
+	return $output;
 }
 
 

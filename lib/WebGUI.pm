@@ -271,8 +271,7 @@ sub page {
 	}
 	$httpHeader = WebGUI::Session::httpHeader();
 	unless ($useCache && defined $content) {
-		$content = WebGUI::Template::process(WebGUI::Style::get($pageEdit.WebGUI::Page::getTemplate($template)), 
-			$positions);
+		$content = WebGUI::Macro::process(WebGUI::Template::process(WebGUI::Style::get($pageEdit.WebGUI::Page::getTemplate($template)), $positions));
 		$cache->set($cacheKey, $content, $session{config}{cachePages}) if ($useCache);
 	}
 	$debug = _generateDebug();

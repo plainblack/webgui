@@ -677,7 +677,7 @@ sub www_view {
                         $output .= WebGUI::International::get(49,$namespace);
                 }
 	}
-	return $_[0]->processMacros($output);
+	return $output;
 }
 
 #-------------------------------------------------------------------

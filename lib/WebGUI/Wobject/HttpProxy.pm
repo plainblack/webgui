@@ -139,7 +139,6 @@ sub www_view {
 
    $output = $_[0]->displayTitle;
    $output .= $_[0]->description;
-   $output = $_[0]->processMacros($output);
 
    if(not(-w $_[0]->get("cookiebox") && -r $_[0]->get("cookiebox"))) {
       return "<b>Error while opening cookie directory ".$_[0]->get("cookiebox")."</b><p><i>$!</i>";

@@ -264,7 +264,6 @@ sub duplicate {
 		title => $_[0]->get("title"),
 		description => $_[0]->get("description"),
 		displayTitle => $_[0]->get("displayTitle"),
-		processMacros => $_[0]->get("processMacros"),
 		startDate => $_[0]->get("startDate"),
 		endDate => $_[0]->get("endDate"),
 		templatePosition => $_[0]->get("templatePosition")
@@ -642,7 +641,7 @@ NOTE: This method should be extended by all subclasses.
 
 A hash reference of the properties of this wobject instance. This method will accept any name/value pair and associate it with this wobject instance in memory, but will only store the following fields to the database:
 
- title, displayTitle, description, processMacros, pageId, templatePosition, startDate, endDate, sequenceNumber
+ title, displayTitle, description, pageId, templatePosition, startDate, endDate, sequenceNumber
 
 =item arrayRef
 
@@ -678,7 +677,7 @@ sub set {
 	$sql = "update wobject set";
 	foreach $key (keys %{$_[1]}) {
 		$_[0]->{_property}{$key} = ${$_[1]}{$key};
-		if (isIn($key, qw(userDefined1 userDefined2 userDefined3 userDefined4 userDefined5 moderationType groupToModerate groupToPost karmaPerPost editTimeout title displayTitle description processMacros pageId templatePosition startDate endDate sequenceNumber))) {
+		if (isIn($key, qw(userDefined1 userDefined2 userDefined3 userDefined4 userDefined5 moderationType groupToModerate groupToPost karmaPerPost editTimeout title displayTitle description pageId templatePosition startDate endDate sequenceNumber))) {
         		$sql .= " ".$key."=".quote(${$_[1]}{$key}).",";
 		}
                 if (isIn($key, @{$_[2]})) {
@@ -1023,12 +1022,6 @@ sub www_edit {
 		-value=>$displayTitle,
 		-uiLevel=>5
 		);
-	$f->yesNo(
-		-name=>"processMacros",
-		-label=>WebGUI::International::get(175),
-		-value=>$_[0]->get("processMacros"),
-		-uiLevel=>5
-		);
 	$f->select(
 		-name=>"templatePosition",
 		-label=>WebGUI::International::get(363),
@@ -1084,7 +1077,6 @@ sub www_editSave {
 	$_[0]->set({
 		title=>$title,
 		displayTitle=>$session{form}{displayTitle},
-		processMacros=>$session{form}{processMacros},
 		templatePosition=>$templatePosition,
 		startDate=>$startDate,
 		endDate=>$endDate,
@@ -1348,7 +1340,6 @@ sub www_view {
 	my ($output);
 	$output = $_[0]->displayTitle;
 	$output .= $_[0]->description;
-	$output = $_[0]->processMacros($output);
 	return $output;
 }
 

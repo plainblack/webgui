@@ -16,7 +16,6 @@ use WebGUI::DateTime;
 use WebGUI::HTMLForm;
 use WebGUI::Icon;
 use WebGUI::International;
-use WebGUI::Macro;
 use WebGUI::Privilege;
 use WebGUI::Session;
 use WebGUI::SQL;
@@ -83,7 +82,6 @@ sub www_view {
 	my ($output);
 	$output = $_[0]->displayTitle;
 	$output .= $_[0]->description;
-	$output = $_[0]->processMacros($output);
 	$output .= $_[0]->get("content");
 	return $output;
 }

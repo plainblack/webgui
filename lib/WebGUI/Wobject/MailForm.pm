@@ -321,8 +321,6 @@ sub www_view {
 	
 	$sth = WebGUI::SQL->read("select * from MailForm_field where wobjectId=".$_[0]->get("wobjectId")." order by sequenceNumber");
 	while (%data = $sth->hash) {
-		# process macros on default values
-		$data{defaultValue} = $_[0]->processMacros($data{defaultValue});
 		if ($data{status} == 1) {
 			# hidden field, don't show on form for security reasons
 			$row = "";
@@ -348,7 +346,7 @@ sub www_view {
 	$f->submit(WebGUI::International::get(73, $namespace));
 	$output .= $f->print;
 	
-	return $_[0]->processMacros($output);	
+	return $output;	
 }
 
 #-------------------------------------------------------------------
@@ -452,7 +450,7 @@ sub _createField {
 			# add an empty option if no default value is provided
 			foreach (split(/\n/, $data->{possibleValues})) {
 				s/\s+$//; # remove trailing spaces
-				$selectOptions{$_} = $_[0]->processMacros($_);
+				$selectOptions{$_} = $_;
 			}
 			$f->selectList(
                                 -name=>$name,
@@ -470,7 +468,7 @@ sub _createField {
 			tie %selectOptions, 'Tie::IxHash';
 			foreach (split(/\n/, $data->{possibleValues})) {
 				s/\s+$//; # remove trailing spaces
-                                $selectOptions{$_} = $_[0]->processMacros($_);
+                                $selectOptions{$_} = $_;
                         }
 			if ($session{form}{$name}) {
 				@defaultValues = $session{cgi}->param($name);
@@ -498,7 +496,7 @@ sub _createField {
                         tie %selectOptions, 'Tie::IxHash';
                         foreach (split(/\n/, $data->{possibleValues})) {
                                 s/\s+$//; # remove trailing spaces
-                                $selectOptions{$_} = $_[0]->processMacros($_);
+                                $selectOptions{$_} = $_;
                         }
                         if ($session{form}{$name}) {
                                 @defaultValues = $session{cgi}->param($name);

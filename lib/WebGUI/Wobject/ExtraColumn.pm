@@ -69,7 +69,6 @@ sub www_edit {
        	$f->readOnly($_[0]->get("wobjectId"),WebGUI::International::get(499));
        	$f->hidden("title",$namespace);
        	$f->hidden("displayTitle",0);
-       	$f->hidden("processMacros",0);
 	$f->select(
                 -name=>"templatePosition",
                 -label=>WebGUI::International::get(363),

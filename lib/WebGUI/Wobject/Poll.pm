@@ -201,7 +201,7 @@ sub www_view {
                 }
                 $output .= '<span class="pollAnswer"><hr size="1"><b>'.WebGUI::International::get(12,$namespace).'</b> '.$totalResponses.'</span>';
 	}
-	return $_[0]->processMacros($output);
+	return $output;
 }
 
 #-------------------------------------------------------------------

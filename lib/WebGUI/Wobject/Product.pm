@@ -642,7 +642,7 @@ sub www_view {
         }
         $sth->finish;
 	$var{relatedproduct_loop} = \@relatedloop;
-        return $_[0]->processMacros($_[0]->processTemplate($_[0]->get("templateId"),\%var));
+        return $_[0]->processTemplate($_[0]->get("templateId"),\%var);
 }
 
 

@@ -15,7 +15,6 @@ use Tie::CPHash;
 use WebGUI::HTMLForm;
 use WebGUI::Icon;
 use WebGUI::International;
-use WebGUI::Macro;
 use WebGUI::Privilege;
 use WebGUI::Session;
 use WebGUI::SQL;
@@ -206,7 +205,7 @@ sub www_view {
 	}
 	$sth->finish;
 	$var{link_loop} = \@linkloop;
-	return $_[0]->processMacros($_[0]->processTemplate($_[0]->get("templateId"),\%var));
+	return $_[0]->processTemplate($_[0]->get("templateId"),\%var);
 }
 
 

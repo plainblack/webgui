@@ -366,7 +366,7 @@ sub www_view {
         $var{pageList} = $p->getPageLinks;
         $var{previousPage} = $p->getPreviousPageLink;
         $var{multiplePages} = ($p->getNumberOfPages > 1);
-        return $_[0]->processMacros($_[0]->processTemplate($_[0]->get("templateId"),\%var));
+        return $_[0]->processTemplate($_[0]->get("templateId"),\%var);
 }
 
 

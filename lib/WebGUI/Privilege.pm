@@ -173,7 +173,6 @@ sub insufficient {
 	$output = '<h1>'.WebGUI::International::get(37).'</h1>';
 	$output .= WebGUI::International::get(38);
 	$output .= '<p>';
-	$output = WebGUI::Macro::process($output);
 	return $output;
 }
 
