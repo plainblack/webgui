@@ -345,7 +345,7 @@ sub getSize {
 
 =head2 getThumbnail ( )
 
-Returns a full URL to the thumbnail for this attachment. Thumbnails are only created for jpg, gif, png, tif, and bmp with Image::Magick installed so getThumbnail only returns a thumbnail if the file is one of those types and Image::Magick is installed.
+Returns a full URL to the thumbnail for this attachment. Thumbnails are only created for jpg, gif, png, tif, and bmp with Image::Magick installed so getThumbnail only returns a thumbnail if the file is one of those types and Image::Magick is installed. Otherwise, it returns the full URL to the file icon for this attachment (identical to getIcon).
 
 =cut
 
@@ -355,7 +355,7 @@ sub getThumbnail {
 	} elsif ($hasImageMagick && isIn($_[0]->getType, qw(tif tiff bmp))) {
         	return $_[0]->{_node}->getURL.'/thumb-'.$_[0]->getFilename.'.png';
 	} else {
-		return "";
+		return $_[0]->getIcon;
 	}
 }
 
