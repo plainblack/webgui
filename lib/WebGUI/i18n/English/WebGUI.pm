@@ -450,11 +450,6 @@ The URL of the web site for this theme's designer. If you are in the business of
 		lastUpdated => 1031514049
 	},
 
-	'101' => {
-		message => q|Are you certain that you wish to delete this page, its content, and all items under it?|,
-		lastUpdated => 1031514049
-	},
-
 	'340' => {
 		message => q|Female|,
 		lastUpdated => 1031514049
@@ -575,11 +570,6 @@ The URL of the web site for this theme's designer. If you are in the business of
 <p>
 
 |,
-		lastUpdated => 1031514049
-	},
-
-	'715' => {
-		message => q|Redirect URL|,
 		lastUpdated => 1031514049
 	},
 
@@ -1343,11 +1333,6 @@ How should this user be notified when they get a new WebGUI message?
 		lastUpdated => 1031514049
 	},
 
-	'417' => {
-		message => q|<h1>Security Violation</h1>You attempted to access a wobject not associated with this page. This incident has been reported.|,
-		lastUpdated => 1031514049
-	},
-
 	'12' => {
 		message => q|Turn admin off.|,
 		lastUpdated => 1031514049
@@ -1426,11 +1411,6 @@ As with any delete operation, you are prompted to be sure you wish to proceed wi
 		lastUpdated => 1031514049
 	},
 
-	'116' => {
-		message => q|Select "Yes" to change the privileges of all pages and wobjects under this page to these privileges.|,
-		lastUpdated => 1056054674
-	},
-
 	'144' => {
 		message => q|View statistics.|,
 		lastUpdated => 1031514049
@@ -1439,11 +1419,6 @@ As with any delete operation, you are prompted to be sure you wish to proceed wi
 	'914' => {
 		message => q|Image|,
 		lastUpdated => 1050232286
-	},
-
-	'100' => {
-		message => q|Meta Tags|,
-		lastUpdated => 1031514049
 	},
 
 	'965' => {
@@ -2306,11 +2281,6 @@ will be modified to make it unique.|,
 		lastUpdated => 1044138730
 	},
 
-	'500' => {
-		message => q|Page ID|,
-		lastUpdated => 1031514049
-	},
-
 	'533' => {
 		message => q|<b>without</b> the words|,
 		lastUpdated => 1031514049
@@ -2993,11 +2963,6 @@ If this wobject is a shortcut, then this URL will direct you to the original wob
 		lastUpdated => 1031514049
 	},
 
-	'102' => {
-		message => q|Edit Page|,
-		lastUpdated => 1031514049
-	},
-
 	'565' => {
 		message => q|Who can moderate?|,
 		lastUpdated => 1031514049
@@ -3654,11 +3619,6 @@ Large sites using external group data will be making many calls to the external 
 	'954' => {
 		message => q|Manage system clipboard.|,
 		lastUpdated => 1052850265
-	},
-
-	'307' => {
-		message => q|Use default meta tags?|,
-		lastUpdated => 1031514049
 	},
 
 	'314' => {
@@ -4322,11 +4282,6 @@ div.tabs {
 	'1027' => {
 		message => q|Use content filters?|,
 		lastUpdated => 1099434667
-	},
-
-	'103' => {
-		message => q|Page Properties|,
-		lastUpdated => 1046638742
 	},
 
 	'922' => {
@@ -5152,11 +5107,6 @@ Macros always begin with a caret (&#94;) and follow with at least one other char
 		lastUpdated => 1031514049
 	},
 
-	'829' => {
-		message => q|Page Template|,
-		lastUpdated => 1038870260
-	},
-
 	'345' => {
 		message => q|Not A Member|,
 		lastUpdated => 1031514049
@@ -5435,11 +5385,6 @@ Privileges and styles assigned to pages in the package will not be copied when t
 		lastUpdated => 1031514049
 	},
 
-	'448' => {
-		message => q|Page Tree|,
-		lastUpdated => 1031514049
-	},
-
 	'357' => {
 		message => q|News|,
 		lastUpdated => 1031514049
@@ -5544,11 +5489,6 @@ Privileges and styles assigned to pages in the package will not be copied when t
 		message => q|Users|,
 		lastUpdated => 1031514049,
                 context => q|Title of the user manager for the admin console.|
-	},
-
-	'304' => {
-		message => q|Language|,
-		lastUpdated => 1031514049
 	},
 
 	'406' => {
