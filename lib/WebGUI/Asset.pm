@@ -3236,9 +3236,9 @@ sub www_promote {
 
 #-------------------------------------------------------------------
 
-=head2 www_restoreList ( )
+=head2 www_purgeList ( )
 
-Restores a piece of content from the trash back to it's original location.
+Purges assets from "trash".  Returns the Manage Trash asset list.
 
 =cut
 
