@@ -824,15 +824,15 @@ sub getLastChild {
 
 =head2 getLineage ( relatives,rules )
 
-Returns an array of lineages of relatives based upon rules.
+Returns an array reference of lineages of relatives based upon rules.
 
 =head3 relatives
 
-Square bracketed, comma separated list, quoted entries; eg ["siblings"] or ["self","ancestors"].Valid parameters are "siblings", "ancestors", "self", "descendants", "pedigree"
+An arrary reference of relatives to retrieve. Valid parameters are "siblings", "children", "ancestors", "self", "descendants", "pedigree"
 
 =head3 rules
 
-A hash comprising limits to relative listing. Variables to rules include endingLineageLength, assetToPedigree, excludeClasses, returnQuickReadObjects, returnObjects.
+A hash reference comprising limits to relative listing. Variables to rules include endingLineageLength, assetToPedigree, excludeClasses, returnQuickReadObjects, returnObjects, invertTree, includeOnlyClasses.
 
 =cut
 
@@ -893,7 +893,10 @@ sub getLineage {
 		foreach my $className (@{$rules->{excludeClasses}}) {
 			push(@set,"className <> ".quote($className));
 		}
-		$where .= 'and ('.join(" and ",@set).')';
+		$where .= ' and ('.join(" and ",@set).')';
+	}
+	if (exists $rules->{includeOnlyClasses}) {
+		$where .= ' and (className in ('.quoteAndJoin($rules->{includeOnlyClasses}).'))';
 	}
 	$where .= " and ".join(" or ",@whereModifiers) if (scalar(@whereModifiers));
 	# based upon all available criteria, let's get some assets
@@ -1898,7 +1901,7 @@ sub www_emptyTrash {
 sub www_manageAssets {
 	my $self = shift;
 	return $self->getAdminConsole->render(WebGUI::Privilege::insufficient()) unless $self->canEdit;
-	my $children = $self->getLineage(["descendants"],{returnObjects=>1, endingLineageLength=>$self->getLineageLength+1});
+	my $children = $self->getLineage(["children"],{returnObjects=>1});
 	my $output = $self->getAssetManagerControl($children);
 	$output .= ' <div class="adminConsoleSpacer">
             &nbsp;
@@ -1908,11 +1911,10 @@ sub www_manageAssets {
 		$output .= '<a href="'.$link->{url}.'">'.$link->{label}.'</a><br />';
 	}
 	$output .= '</div>'; 
-	my $clipboard = WebGUI::Clipboard::getAssetsInClipboard();
 	my %options;
 	tie %options, 'Tie::IxHash';
 	my $hasClips = 0;
-        foreach my $item (@{$clipboard}) {
+        foreach my $item (@{$self->getAssetsInClipboard(1)}) {
               	$options{$item->{assetId}} = $item->{title};
 		$hasClips = 1;
         }

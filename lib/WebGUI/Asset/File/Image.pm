@@ -18,7 +18,6 @@ use strict;
 use WebGUI::Asset::File;
 use WebGUI::HTTP;
 use WebGUI::Session;
-use WebGUI::Storage;
 use WebGUI::Utility;
 
 # do a check to see if they've installed Image::Magick
@@ -102,7 +101,7 @@ sub generateThumbnail {
 		$self->update({thumbnailSize=>$thumbnailSize});
 	}
 	if (defined $self->get("filename") && $hasImageMagick) {
-		my $storage = WebGUI::Storage->get($self->get("storageId"));
+		my $storage = $self->getStorageLocation;
                 my $image = Image::Magick->new;
                 my $error = $image->Read($storage->getPath($self->get("filename")));
 		if ($error) {
@@ -153,10 +152,9 @@ sub getEditForm {
 		-value=>$self->getValue("parameters")
 		);
 	if ($self->get("filename") ne "") {
-		my $storage = WebGUI::Storage->get($self->get("storageId"));
 		$tabform->getTab("properties")->readOnly(
 			-label=>"Thumbnail",
-			-value=>'<a href="'.$storage->getUrl($self->get("filename")).'"><img src="'.$storage->getUrl("thumb-".$self->get("filename")).'?noCache='.time().'" alt="thumbnail" /></a>'
+			-value=>'<a href="'.$self->getFileUrl.'"><img src="'.$self->getThumbnailUrl.'?noCache='.time().'" alt="thumbnail" /></a>'
 			);
 	}
 	return $tabform;
@@ -184,6 +182,13 @@ sub getName {
 	return "Image";
 } 
 
+
+sub getThumbnailUrl {
+	my $self = shift;
+	return $self->getStorageLocation->getUrl("thumb-".$self->get("filename"));
+}
+
+
 sub processPropertiesFromFormPost {
 	my $self = shift;
 	$self->SUPER::processPropertiesFromFormPost;
@@ -196,12 +201,11 @@ sub processPropertiesFromFormPost {
 
 sub view {
 	my $self = shift;
-	my $storage = WebGUI::Storage->get($self->get("storageId"));
 	my %var = %{$self->get};
 	$var{controls} = $self->getToolbar;
-	$var{fileUrl} = $storage->getUrl($self->get("filename"));
-	$var{fileIcon} = $storage->getFileIconUrl($self->get("filename"));
-	$var{thumbnail} = $storage->getUrl("thumb-".$self->get("filename"));
+	$var{fileUrl} = $self->getFileUrl;
+	$var{fileIcon} = $self->getFileIconUrl;
+	$var{thumbnail} = $self->getThumbnailUrl;
 	return WebGUI::Template::process("1","ImageAsset",\%var);
 }
 
@@ -227,7 +231,7 @@ sub www_view {
 	if ($session{var}{adminOn}) {
 		return $self->www_edit;
 	}
-	my $storage = WebGUI::Storage->get($self->get("storageId"));
+	my $storage = $self->getStorageLocation;
 	WebGUI::HTTP::setRedirect($storage->getUrl($self->get("filename")));
 	return "";
 }

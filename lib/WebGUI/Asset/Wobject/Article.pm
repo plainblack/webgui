@@ -96,17 +96,24 @@ sub getName {
 #-------------------------------------------------------------------
 sub view {
 	my $self = shift;
-	my ($file, %var);
-	if ($self->get("image") ne "") {
-		$file = WebGUI::Attachment->new($self->get("image"),$self->get("wobjectId"));
-		$var{"image.url"} = $file->getURL;
-		$var{"image.thumbnail"} = $file->getThumbnail;
+	my %var;
+	my $children = $self->getLineage(["children"],{returnObjects=>1,includeOnlyClasses=>["WebGUI::Asset::File","WebGUI::Asset::File::Image"]});
+	foreach my $child (@{$children}) {
+		if (ref $child eq "WebGUI::Asset::File") {
+			$var{"attachment.box"} = $child->getBox;
+			$var{"attachment.icon"} = $child->getFileIcon;
+			$var{"attachment.url"} = $child->getFileUrl;
+			$var{"attachment.name"} = $child->get("filename");
+		} elsif (ref $child eq "WebGUI::Asset::File::Image") {
+			$var{"image.url"} = $child->getFileUrl;
+			$var{"image.thumbnail"} = $child->getThumbnailUrl; 
+		}
 	}
         $var{description} = $self->get("description");
 	if ($self->get("convertCarriageReturns")) {
 		$var{description} =~ s/\n/\<br\>\n/g;
 	}
-	$var{"new.template"} = $self->getUrl("wid=".$self->get("wobjectId")."&func=view")."&overrideTemplateId=";
+	$var{"new.template"} = $self->getUrl."&overrideTemplateId=";
 	$var{"description.full"} = $var{description};
 	$var{"description.full"} =~ s/\^\-\;//g;
 	$var{"description.first.100words"} = $var{"description.full"};
@@ -131,7 +138,7 @@ sub view {
 	$var{"description.first.2sentences"} =~ s/^((.*?\.){2}).*/$1/s;
 	$var{"description.first.sentence"} = $var{"description.first.2sentences"};
 	$var{"description.first.sentence"} =~ s/^(.*?\.).*/$1/s;
-	my $p = WebGUI::Paginator->new($self->getUrl("wid=".$self->get("wobjectId")."&func=view"),1);
+	my $p = WebGUI::Paginator->new($self->getUrl,1);
 	if ($session{form}{makePrintable} || $var{description} eq "") {
 		$var{description} =~ s/\^\-\;//g;
 		$p->setDataByArrayRef([$var{description}]);
@@ -141,21 +148,14 @@ sub view {
 		$var{description} = $p->getPage;
 	}
 	$p->appendTemplateVars(\%var);
-	if ($self->get("attachment") ne "") {
-		$file = WebGUI::Attachment->new($self->get("attachment"),$self->get("wobjectId"));
-		$var{"attachment.box"} = $file->box;
-		$var{"attachment.icon"} = $file->getIcon;
-		$var{"attachment.url"} = $file->getURL;
-		$var{"attachment.name"} = $file->getFilename;
-	}	
-	my $callback = $self->getUrl("func=view&amp;wid=".$self->get("wobjectId"));
+	my $callback = $self->getUrl;
 	if ($self->get("allowDiscussion")) {
 		my $forum = WebGUI::Forum->new($self->get("forumId"));
 		$var{"replies.count"} = ($forum->get("replies") + $forum->get("threads"));
 		$var{"replies.URL"} = WebGUI::Forum::UI::formatForumURL($callback,$forum->get("forumId"));
-		$var{"replies.label"} = WebGUI::International::get(28,$self->get("namespace"));
+		$var{"replies.label"} = WebGUI::International::get(28,"Article");
 		$var{"post.URL"} = WebGUI::Forum::UI::formatNewThreadURL($callback,$forum->get("forumId"));
-        	$var{"post.label"} = WebGUI::International::get(24,$self->get("namespace"));
+        	$var{"post.label"} = WebGUI::International::get(24,"Article");
 	}
 	my $templateId = $self->get("templateId");
         if ($session{form}{overrideTemplateId} ne "") {

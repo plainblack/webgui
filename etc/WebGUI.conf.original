@@ -42,11 +42,6 @@ passwordChangeLoggingEnabled = 1
 
 authMethods = LDAP, WebGUI
 
-wobjects = Article, EventsCalendar, FileManager, HttpProxy, \
-	DataForm, MessageBoard, Poll, Product, SiteMap, \
-	SQLReport, Survey, SyndicatedContent, USS, WobjectProxy, \
-	WSClient, IndexedSearch
-
 macros = a => a_account, \
 	AdminBar => AdminBar, \
 	AdminText => AdminText, \

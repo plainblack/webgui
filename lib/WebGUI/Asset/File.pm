@@ -85,6 +85,16 @@ sub definition {
         return $class->SUPER::definition($definition);
 }
 
+sub getBox {
+	my $self = shift;
+	my %var;
+       	$var{"attachment.icon"} = $self->getFileIcon;
+       	$var{"attachment.url"} = $self->getFileUrl;
+       	$var{"attachment.name"} = $self->get("filename");
+       	$var{"attachment.size"} = $self->getStorageLocation->getSize;
+       	$var{"attachment.type"} = $self->getStorageLocation->getFileExtension;
+       	return WebGUI::Template::process(1,"AttachmentBox",\%var);
+}
 
 
 #-------------------------------------------------------------------
@@ -99,10 +109,9 @@ sub getEditForm {
 	my $self = shift;
 	my $tabform = $self->SUPER::getEditForm();
 	if ($self->get("filename") ne "") {
-		my $storage = WebGUI::Storage->get($self->get("storageId"));
 		$tabform->getTab("properties")->readOnly(
 			-label=>"Current File",
-			-value=>'<a href="'.$storage->getUrl($self->get("filename")).'"><img src="'.$storage->getFileIconUrl($self->get("filename")).'" alt="'.$self->get("filename").'" border="0" align="middle" /> '.$self->get("filename").'</a>'
+			-value=>'<a href="'.$self->getFileUrl.'"><img src="'.$self->getFileIconUrl.'" alt="'.$self->get("filename").'" border="0" align="middle" /> '.$self->get("filename").'</a>'
 			);
 		
 	}
@@ -115,12 +124,26 @@ sub getEditForm {
 
 
 #-------------------------------------------------------------------
+sub getFileUrl {
+	my $self = shift;
+	return $self->getStorageLocation->getUrl($self->get("filename"));
+}
+
+
+#-------------------------------------------------------------------
+sub getFileIconUrl {
+	my $self = shift;
+	return $self->getStorageLocation->getFileIconUrl($self->get("filename"));
+}
+
+
+
+#-------------------------------------------------------------------
 sub getIcon {
 	my $self = shift;
 	my $small = shift;
 	if ($small) {
-		my $storage = WebGUI::Storage->get($self->get("storageId"));
-		return $storage->getFileIconUrl($self->get("filename"));	
+		return $self->getFileIconUrl;	
 	}
 	return $session{config}{extrasURL}.'/assets/file.gif';
 }
@@ -138,11 +161,19 @@ sub getName {
 	return "File";
 } 
 
+sub getStorageLocation {
+	my $self = shift;
+	unless (exists $self->{_storageLocation}) {
+		$self->{_storageLocation} = WebGUI::Storage->get($self->get("storageId"));
+	}
+	return $self->{_storageLocation};
+}
+
 
 sub processPropertiesFromFormPost {
 	my $self = shift;
 	$self->SUPER::processPropertiesFromFormPost;
-	my $storage = WebGUI::Storage->create;
+	my $storage = $self->{_storageLocation} = WebGUI::Storage->create;
 	my $filename = $storage->addFileFromFormPost("file");
 	if (defined $filename) {
 		my $oldVersions;
@@ -163,8 +194,7 @@ sub processPropertiesFromFormPost {
 		$storage->setPrivileges($self->get("ownerUserId"), $self->get("groupIdView"), $self->get("groupIdEdit"));
 	} else {
 		$storage->delete;
-		my $storage = WebGUI::Storage->get($self->get("storageId"));
-		$storage->setPrivileges($self->get("ownerUserId"), $self->get("groupIdView"), $self->get("groupIdEdit"));
+		$self->getStorageLocation->setPrivileges($self->get("ownerUserId"), $self->get("groupIdView"), $self->get("groupIdEdit"));
 	}
 }
 
@@ -183,19 +213,17 @@ sub purge {
 		my $storage = WebGUI::Storage->get($storageId);
 		$storage->delete;
 	}
-	my $storage = WebGUI::Storage->get($self->get("storageId"));
-	$storage->delete;
+	$self->getStorageLocation->delete;
 	return $self->SUPER::purge;
 }
 
 
 sub view {
 	my $self = shift;
-	my $storage = WebGUI::Storage->get($self->get("storageId"));
 	my %var = %{$self->get};
 	$var{controls} = $self->getToolbar;
-	$var{fileUrl} = $storage->getUrl($self->get("filename"));
-	$var{fileIcon} = $storage->getFileIconUrl($self->get("filename"));
+	$var{fileUrl} = $self->getFileUrl;
+	$var{fileIcon} = $self->getFileIconUrl;
 	return WebGUI::Template::process("1","FileAsset",\%var);
 }
 
@@ -214,8 +242,7 @@ sub www_view {
 	if ($session{var}{adminOn}) {
 		return $self->www_edit;
 	}
-	my $storage = WebGUI::Storage->get($self->get("storageId"));
-	WebGUI::HTTP::setRedirect($storage->getUrl($self->get("filename")));
+	WebGUI::HTTP::setRedirect($self->getFileUrl);
 	return "";
 }
 

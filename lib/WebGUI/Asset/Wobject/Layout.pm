@@ -133,13 +133,7 @@ sub getUiLevel {
 #-------------------------------------------------------------------
 sub view {
 	my $self = shift;
-	my $children = $self->getLineage(
-		["descendants"],
-		{
-			returnObjects=>1,
-			endingLineageLength=>$self->getLineageLength+1
-		}
-	);
+	my $children = $self->getLineage( ["children"], { returnObjects=>1 });
 	my %vars;
 	# I'm sure there's a more efficient way to do this. We'll figure it out someday.
 	my @positions = split(/\./,$self->get("contentPositions"));

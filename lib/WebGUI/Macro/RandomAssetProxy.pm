@@ -20,7 +20,7 @@ sub process {
         my ($url) = WebGUI::Macro::getParams(shift);
 	my $asset = WebGUI::Asset->newByUrl($url);
 	if (defined $asset) {
-		my $children = $asset->getLineage(["descendants"],{endingLineageLength=>$asset->getLineageLength+1});
+		my $children = $asset->getLineage(["children"]);
 		randomize;
 		my $randomAssetId = $children->[rand(scalar(@{$children})];	
 		my $randomAsset = WebGUI::Asset->newByDynamicClass($randomAssetId);
