@@ -1,3 +1,14 @@
+6.2.0
+ - Added generateContent.pl script to generate content offline. This script is
+   not backwards compatible with previous WebGUI versions.
+ - Added metadata functionality to wobjects.
+ - Added a new passive profiling mechanism.
+ - Added a passive profile summarizer.
+ - Added AOIRank and AOIHits macro's to retrieve user's Area's Of Interest
+   statistics.
+ - Fixed a typo in Forum/UI.pm
+
+
 6.1.0
  - Changed the output of upgrade.pl for better understanding.
  - Added a --history option to upgrade.pl that displays the upgrade history
