@@ -213,6 +213,9 @@ The user for the session to become.
 
 sub convertVisitorToUser {
 	WebGUI::SQL->write("update userSession set userId=$_[1] where sessionId=".quote($_[0]));
+	if ($session{setting}{passiveProfilingEnabled}) {
+		WebGUI::SQL->write("update passiveProfileLog set userId = ".quote($_[1])." where sessionId = ".quote($_[0]));
+	}	
 	undef $session{isInGroup};		# decache some performance enhancers because we're
 	undef $session{gotGroupsForUser};       # user ids.
 	$session{var}{userId} = $_[1];
