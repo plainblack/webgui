@@ -17,7 +17,7 @@ use WebGUI::URL;
 
 #-------------------------------------------------------------------
 sub process {
-        my @param = WebGUI::Macro::getParams($1);
+        my @param = WebGUI::Macro::getParams($_[0]);
 	return WebGUI::URL::escape($param[0]);
 }
 
