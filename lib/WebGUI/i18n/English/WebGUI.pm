@@ -5532,7 +5532,8 @@ loop variables:</p>
 <P dir=ltr><STRONG>page.isMyAncestor</STRONG><BR>A condition indication whether this page is an ancestor of current page.</P>
 <P dir=ltr><STRONG>page.isMyDaughter</STRONG><BR>A condition indication whether this page is a daughter of current page.</P>
 <P dir=ltr><STRONG>page.isMyMother</STRONG><BR>A condition indication whether this page is the mother of current page.</P>
-<P dir=ltr><STRONG>page.mother.title</STRONG><BR>The title of the mother of this&nbsp;page.</P>
+<P dir=ltr><STRONG>page.mother.*</STRONG><BR>These variables will be undefined if the page is a root.</P>
+<P dir=ltr><STRONG>page.mother.title</STRONG><BR>The title of the mother of this page.</P>
 <P dir=ltr><STRONG>page.mother.urlizedTitle</STRONG><BR>The urlized title of the mother of this page.</P>
 <P dir=ltr><STRONG>page.mother.pageId</STRONG><BR>The pageId of the mother of this page.</P>
 <P dir=ltr><STRONG>page.mother.parentId</STRONG><BR>The parentId of the mother of this page.</P>
@@ -5545,7 +5546,7 @@ loop variables:</p>
 <P dir=ltr><STRONG>page.depthDiffIs1, page.depthDiffIs2, page.depthDiffIs3, page.depthDiffIsN</STRONG><BR>True if the <STRONG>page.depthDiff</STRONG> variable is N.</P>
 <P dir=ltr><STRONG>page.depthDiff_loop</STRONG><BR>A loop that runs <STRONG>page.depthDiff</STRONG> times. This loop contains no loop variables.</P></BLOCKQUOTE>
 <P dir=ltr>&nbsp;</P>|,
-		lastUpdated => 1097119432
+		lastUpdated => 1097206762
 	},
 
 	'893' => {
