@@ -195,7 +195,7 @@ sub _get_rss_data {
 		if ($] >= 5.008 && $hasEncode) {
 			$xml =~ /<\?xml.*?encoding=['"](\S+)['"]/i;
 			my $xmlEncoding = $1;
-			my $encoding = WebGUI::International::getLanguage($session{page}{languageId},"charset");
+			my $encoding = "UTF-8";
 			if (lc($xmlEncoding) ne lc($encoding)) {
 				eval {	from_to($xml, $xmlEncoding, $encoding) };
 				WebGUI::ErrorHandler::warn($@) if ($@);

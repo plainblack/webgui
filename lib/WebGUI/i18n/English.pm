@@ -5,7 +5,6 @@ use strict;
 
 our $LANGUAGE = {
 	label => 'English',
-	charset => 'UTF-8',
 	toolbar => 'metal'
 };
 

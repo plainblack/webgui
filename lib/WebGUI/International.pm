@@ -104,7 +104,7 @@ Defaults to "English". The language to retrieve the properties for.
 
 =head3 propertyName
 
-If this is specified, only the value of the property will be returned, instead of the hash reference to all properties. The valid values are "charset", "toolbar", and "label".
+If this is specified, only the value of the property will be returned, instead of the hash reference to all properties. The valid values are "toolbar" and "label".
 
 =cut
 

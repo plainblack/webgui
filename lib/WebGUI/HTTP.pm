@@ -16,7 +16,6 @@ package WebGUI::HTTP;
 
 
 use strict;
-use WebGUI::International;
 use WebGUI::Session;
 use WebGUI::Style;
 
@@ -69,7 +68,7 @@ sub getHeader {
 	} else {
 		%params = (
 			-type => $session{http}{mimetype} || "text/html",
-			-charset => $session{http}{charset} || WebGUI::International::getLanguage($session{page}{languageId},"charset") || "UTF-8"
+			-charset => "UTF-8"
 			);
 		if ($session{setting}{preventProxyCache}) {
        	        	$params{"-expires"} = "-1d";
