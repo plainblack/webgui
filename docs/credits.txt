@@ -27,7 +27,8 @@ Contributing Developers..............Peter Beardsley / Appropriate Solutions, In
                                      Jeff Szpak / Plain Black LLC
                                      Sean Tu / Web Den Interactive
 
-Contributing Translators.............Natalia Almazova
+Contributing Translators.............AGOFER Ltda.
+                                     Natalia Almazova
                                      Joeri de Bruin / ProcoliX
                                      Jose Caneira
                                      Emiliano Grilli
