@@ -28,7 +28,14 @@ save you many hours of grief.
 	check your site after the upgrade for all site maps to make
 	sure that they look the way you want them to look.
 
-* If you want to use the e-commerce system, you'll have to enable the
+ * All File Manager wobjects have been migrated to File Folder Layout
+	assets.
+
+ * If you have any SQL reports querying internal WebGUI database tables,
+	you'll need to update them after the upgrade. Most of WebGUI's 
+	database tables will be changed during the upgrade process.
+
+ * If you want to use the e-commerce system, you'll have to enable the
 	PayFlowPro plugin in the config file. To do this correctly 
 	you'll also have to download the Payflow Pro SDK from Verisign.
 	Be sure to export the cert path into the PFPRO_CERT_PATH 

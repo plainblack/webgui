@@ -2,6 +2,7 @@
 
 use lib "../../lib";
 use FileHandle;
+use File::Path;
 use Getopt::Long;
 use strict;
 use WebGUI::Id;
@@ -209,12 +210,12 @@ sub walkTree {
 				if ($namespace->{attachment}) {
 					my $attachmentId = WebGUI::Id::generate();
 					WebGUI::SQL->write("insert into asset (assetId, parentId, lineage, className, state, title, menuTitle, 
-						url, startDate, endDate, isHidden, ownerUserId, groupIdView, groupIdEdit, boundToId) values (".
+						url, startDate, endDate, isHidden, ownerUserId, groupIdView, groupIdEdit) values (".
 						quote($attachmentId).", ".quote($wobjectId).", ".quote($wobjectLineage.sprintf("%06d",1)).", 
 						'WebGUI::Asset::File','published',".quote($namespace->{attachment}).", ".
-						quote($namespace->{attachment}).", ".quote(fixUrl($attachmentId,$wobjectUrl.$namespace->{attachment})).", 
+						quote($namespace->{attachment}).", ".quote(fixUrl($attachmentId,$wobjectUrl.'/'.$namespace->{attachment})).", 
 						".quote($wobject->{startDate}).", ".quote($wobject->{endDate}).", 1, ".quote($ownerId).", 
-						".quote($groupIdView).", ".quote($groupIdEdit).", ".quote($wobjectId).")");
+						".quote($groupIdView).", ".quote($groupIdEdit).")");
 					my $storageId = copyFile($namespace->{attachment},$wobject->{wobjectId});
 					WebGUI::SQL->write("insert into FileAsset (assetId, filename, storageId, fileSize) values (
 						".quote($attachmentId).", ".quote($namespace->{attachment}).", ".quote($storageId).",
@@ -225,12 +226,12 @@ sub walkTree {
 					$rank ++ if ($namespace->{attachment});
 					my $imageId = WebGUI::Id::generate();
 					WebGUI::SQL->write("insert into asset (assetId, parentId, lineage, className, state, title, menuTitle, 
-						url, startDate, endDate, isHidden, ownerUserId, groupIdView, groupIdEdit, boundToId) values (".
+						url, startDate, endDate, isHidden, ownerUserId, groupIdView, groupIdEdit) values (".
 						quote($imageId).", ".quote($wobjectId).", ".quote($wobjectLineage.sprintf("%06d",$rank)).", 
-						'WebGUI::Asset::File::Image','published',".quote($namespace->{attachment}).", ".
-						quote($namespace->{image}).", ".quote(fixUrl($imageId,$wobjectUrl.$namespace->{image})).", 
+						'WebGUI::Asset::File::Image','published',".quote($namespace->{image}).", ".
+						quote($namespace->{image}).", ".quote(fixUrl($imageId,$wobjectUrl.'/'.$namespace->{image})).", 
 						".quote($wobject->{startDate}).", ".quote($wobject->{endDate}).", 1, ".quote($ownerId).", 
-						".quote($groupIdView).", ".quote($groupIdEdit).", ".quote($wobjectId).")");
+						".quote($groupIdView).", ".quote($groupIdEdit).")");
 					my $storageId = copyFile($namespace->{image},$wobject->{wobjectId});
 					copyFile('thumb-'.$namespace->{image},$wobject->{wobjectId},$storageId);
 					WebGUI::SQL->write("insert into FileAsset (assetId, filename, storageId, fileSize) values (
@@ -240,6 +241,7 @@ sub walkTree {
 						".quote($session{setting}{thumbnailSize}).")");
 				}
 				# migrate forums
+				rmtree($session{config}{uploadsPath}.'/'.$wobject->{wobjectId});
 			} elsif ($wobject->{namespace} eq "SiteMap") {
 				print "\t\t\tConverting SiteMap ".$wobject->{wobjectId}." into Navigation\n" unless ($quiet);
 				my $navident = 'SiteMap_'.$namespace->{wobjectId};
@@ -255,7 +257,43 @@ sub walkTree {
 				WebGUI::SQL->write("insert into Article (assetId,wobjectId) values (".quote($wobjectId).",
 					".quote($wobject->{wobjectId}).")");
 			} elsif ($wobject->{namespace} eq "FileManager") {
-				# we're dumping file manager's so do that here
+				print "\t\t\tConverting File Manager ".$wobject->{wobjectId}." into File Folder Layout\n" unless ($quiet);
+				WebGUI::SQL->write("update asset set className='WebGUI::Asset::Layout' where assetId=".quote($wobjectId));
+				WebGUI::SQL->write("insert into layout (assetId) values (".quote($wobjectId).")");
+				WebGUI::SQL->write("update wobject set templateId='15' where wobjectId=".quote($wobjectId));
+				print "\t\t\tMigrating attachments for File Manager ".$wobject->{wobjectId}."\n" unless ($quiet);
+				my $sth = WebGUI::SQL->read("select * from FileManager_file where wobjectId=".quote($wobjectId)." order by sequenceNumber");
+				my $rank = 1;
+				while (my $data = $sth->hashRef) {
+					foreach my $field ("downloadFile","alternateVersion1","alternateVersion2") {
+						next if ($data->{$field} eq "");
+						print "\t\t\t\tMigrating file ".$data->{$field}." (".$data->{FileManager_fileId}.")\n" unless ($quiet);
+						my $newId = WebGUI::Id::generate();
+						my $storageId = copyFile($data->{$field},$wobject->{wobjectId}.'/'.$data->{FileManager_fileId});
+						my $class;
+						if (isIn(getFileExtension($data->{$field}), qw(jpg jpeg gif png))) {
+							copyFile('thumb-'.$data->{$field},$wobject->{wobjectId}.'/'.$data->{FileManager_fileId},$storageId);
+							WebGUI::SQL->write("insert into ImageAsset (assetId, thumbnailSize) values (".quote($newId).",
+								".quote($session{setting}{thumbnailSize}).")");
+							$class = 'WebGUI::Asset::File::Image';
+						} else {
+							$class = 'WebGUI::Asset::File';
+						}
+						WebGUI::SQL->write("insert into FileAsset (assetId, filename, storageId, fileSize) values (
+							".quote($newId).", ".quote($data->{$field}).", ".quote($storageId).",
+							".quote(getFileSize($storageId,$data->{$field})).")");
+						WebGUI::SQL->write("insert into asset (assetId, parentId, lineage, className, state, title, menuTitle, 
+							url, startDate, endDate, isHidden, ownerUserId, groupIdView, groupIdEdit, synopsis) values (".
+							quote($newId).", ".quote($wobjectId).", ".quote($wobjectLineage.sprintf("%06d",1)).", 
+							'".$class."','published',".quote($data->{fileTitle}).", ".
+							quote($data->{fileTitle}).", ".quote(fixUrl($newId,$wobjectUrl.'/'.$data->{$field})).", 
+							".quote($wobject->{startDate}).", ".quote($wobject->{endDate}).", 1, ".quote($ownerId).", 
+							".quote($data->{groupToView}).", ".quote($groupIdEdit).", ".quote($data->{briefSynopsis}).")");
+						$rank++;
+					}
+				}
+				$sth->finish;
+				rmtree($session{config}{uploadsPath}.'/'.$wobject->{wobjectId});
 			} elsif ($wobject->{namespace} eq "Product") {
 				# migrate attachments to file assets
 				# migrate images to image assets
@@ -343,6 +381,13 @@ sub getFileSize {
 	my $path = $session{config}{uploadsPath}.$session{os}{slash}.$1.$session{os}{slash}.$2.$session{os}{slash}.$id.$session{os}{slash}.$filename;
 	my (@attributes) = stat($path);
 	return $attributes[7];
+}
+
+sub getFileExtension {
+	my $filename = shift;
+        my $extension = lc($filename);
+        $extension =~ s/.*\.(.*?)$/$1/;
+        return $extension;
 }
 
 sub isIn {
