@@ -1,0 +1,36 @@
+<html>
+<head>
+<link href="../docs/style.css" rel="stylesheet" type="text/css">
+
+<!-- tinyMCE -->
+<script language="javascript" type="text/javascript" src="../jscripts/tiny_mce/tiny_mce.js"></script>
+<script language="javascript" type="text/javascript">
+	tinyMCE.init({
+		theme : "advanced",
+		mode : "textareas",
+		theme_advanced_buttons1 : "bold,italic,underline,strikethrough,separator,justifyleft,justifycenter,justifyright,justifyfull,separator,formatselect,fontselect,fontsizeselect,forecolor",
+		extended_valid_elements : "font[face|size|color]"
+	});
+</script>
+<!-- /tinyMCE -->
+
+</head>
+<body>
+ <a href="example_simple.htm">[Simple example]</a> <a href="example_advanced.htm">[Advanced example]</a> [Mail example]
+ <h3>Mail example</h3>
+This example shows how to enable the font face and size select boxes for usage in online email systems and other situations where CSS classes is impossible to use. But for contents used on websites I suggest using the CSS approach.
+Read more about the features and possible settings of TinyMCE in the <a href="../docs/index.htm">manual</a>.<br>
+<br>
+
+<!-- Form with textare element with width: 100% -->
+<form method="post" action="post.php">
+<textarea id="elm1" name="elm2" style="width:100%" rows="15">
+	<h3>Test mail header 3</h3>
+	Some <b>element</b>. <br /> This editor instance has a 100% width to it.
+	<p>Some paragraph. <a href="http://www.sourceforge.net">Some link</a></p>
+	<img src="logo.jpg">
+</textarea>
+</form>
+
+</body>
+</html>

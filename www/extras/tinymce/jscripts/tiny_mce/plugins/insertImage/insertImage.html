@@ -1,0 +1,331 @@
+<html> <!-- ALL features enabled -->
+
+<head>
+<title>WebGUI Collateral -- Insert Image</title>
+<script language="javascript" src="../../tiny_mce_popup.js"></script>
+
+<style type="text/css">
+BODY { font-size: 9; font-family:  Verdana,Helvetica, sans-serif; }
+#INPUT { font-size: 9; font-family: Verdana,Helvetica, sans-serif; }
+#TD { font-size: 9; font-family:  Verdana,Helvetica, sans-serif; }
+</style>
+
+
+<!-- script copied from original "insert_image.html" -->
+<script>
+
+window.onerror = HandleError;
+
+function HandleError(message, url, line) {
+    var str = "An error has occurred in this dialog." + "\n\n"
+               + "Error: " + line + "\n" + message;
+
+    alert(str);
+    window.close();
+    return true;
+}
+
+function Init() {    
+    var pageURL = window.opener.getWebguiProperty("pageURL");
+
+    if(document.getElementById("dpicheck")) {
+        dpi = document.getElementById("dpicheck").width;
+    }
+    document.getElementById("lister").src = pageURL + '?op=htmlArealistCollateral&DPI=' + dpi;
+    document.getElementById("viewer").src = pageURL + '?op=htmlAreaviewCollateral&DPI=' + dpi;
+
+    var txtFileName = document.getElementById("txtFileName");
+		
+    if ((!txtFileName.value) || (txtFileName.value== "")) {
+    	txtFileName.value = "http://";
+    }    
+}
+
+function _isValidNumber(txtBox) {
+    var val = parseInt(txtBox);
+
+    if(isNaN(val) || val < 0 || val > 999) {
+        return false;
+    }
+    return true;
+}
+function OKClick() {
+    var pageURL = window.opener.getWebguiProperty("pageURL");
+
+    // error checking
+    if(!document.getElementById("txtFileName").value || document.getElementById("txtFileName").value == "http://") {
+        alert("Image URL must be specified.");
+        document.getElementById("txtFileName").focus();
+        return;
+    }
+    if(document.getElementById("txtHorizontal").value && !_isValidNumber(document.getElementById("txtHorizontal").value)) {
+        alert("Horizontal spacing must be a number between 0 and 999.");
+        document.getElementById("txtHorizontal").focus();
+        return;
+    }
+    if(document.getElementById("txtBorder").value && !_isValidNumber(document.getElementById("txtBorder").value)) {
+        alert("Border thickness must be a number between 0 and 999.");
+        document.getElementById("txtBorder").focus();
+        return;
+    }
+    if(document.getElementById("txtVertical").value && !_isValidNumber(document.getElementById("txtVertical").value)) {
+        alert("Vertical spacing must be a number between 0 and 999.");
+        document.getElementById("txtVertical").focus();
+        return;
+    }
+
+    if(document.getElementById("txtFileName").value.length > 2040) {
+        document.getElementById("txtFileName").value = document.getElementById("txtFileName").value.substring(0,2040);
+    }
+
+    src = document.getElementById("txtFileName").value;
+
+    if(document.getElementById("txtHorizontal").value != "") {
+        hspace = parseInt(document.getElementById("txtHorizontal").value);
+    }
+    else {
+        hspace = 0;
+    }
+
+    if(document.getElementById("txtVertical").value != "") {
+        vspace = parseInt(txtVertical.value);
+    }
+    else {
+        vspace = 0;
+    }
+
+    alt = document.getElementById("txtAltText").value;
+
+    if(document.getElementById("txtBorder").value != "") {
+        border = parseInt(document.getElementById("txtBorder").value);
+    }
+    else {
+        border = 0;
+    }
+
+    align = document.getElementById("selAlignment").value;
+
+	width="";
+	height="";
+    
+    tinyMCE.insertImage(src, alt, border, hspace, vspace, width, height, align);
+    
+    window.close();
+}
+var initialLoad = true;
+function resetForm() {
+       if (!initialLoad) {
+           document.getElementById("name").value = '';
+           document.getElementById("thumbnailSize").value = '';         
+           document.getElementById("description").value = '';         
+           document.getElementById("folder").value = '';
+           document.getElementById("viewer").src=window.opener.getWebguiProperty("pageURL") + "?op=htmlAreaviewCollateral";
+       }else {
+       	   initialLoad=false;
+       }
+}
+
+
+</script>
+
+</head>
+
+<body onLoad="Init()">
+<img id="dpicheck" style="position: absolute; left: 1; top: 1; width: 1in; height: 1; visibility: hidden;" src="dpi.gif">
+<table border="0" cellpadding="0" cellspacing="5">
+  <tr>
+    <td>
+      <table name="manager" id="manager" border="0" cellpadding="0" cellspacing="0">
+        <tr>
+          <td  colspan="3" align="center" valign="middle">
+            <fieldset>
+              <legend align="left">WebGUI Collateral Image Manager</legend>
+              <table name="wrapper" id="wrapper" border="1" cellpadding="2" cellspacing="0" width="300">
+                <tr>
+                  <td>
+                    <iframe  width="215" height="150" name="lister" id="lister">lister</iframe>
+                  </td>
+                  <td>
+                    <iframe  width="215" height="150" name="viewer" id="viewer">viewer</iframe>
+                  </td>
+                </tr>
+                <tr>
+                  <td colspan="3">
+		<script>
+
+                    document.write('<form name="actions" id="actions" method="POST" action="'+ window.opener.getWebguiProperty("pageURL") +'" enctype="multipart/form-data" target="lister">');
+		</script>
+                      <table border="0" cellpadding="0" cellspacing="0">
+                        <tr>
+                          <td  colspan="2">
+                            <fieldset>
+                              <legend align="left">Upload New Image</legend>
+                              <table border="0" cellpadding="1" cellspacing="0">
+                                <tr>
+                                  <td  align="left" valign="middle">
+                                   <input  type="submit" value="Upload" onclick="this.form.op.value='htmlAreaUpload'">&nbsp;
+                                  </td>
+                                  <td colspan="2">
+                                    <input  type="file" name="image" id="image" size="54">
+                                  </td>
+                                </tr>
+                                <tr>
+                                  <td align="left" valign="middle">
+                                    Name as:
+                                  </td>
+                                  <td colspan="2">
+                                    <input type="input" name="name" id="name" size="54">
+                                  </td>
+                                </tr>
+                                <tr>
+                                  <td align="left" valign="middle">
+                                    Thumbnail:
+                                  </td>
+                                  <td align="left" valign="middle">
+                                    <input type="input" name="thumbnailSize" id="thumbnailSize" size="10">
+                                    <i>
+                                      &nbsp;(size in pixels)&nbsp;
+                                    </i>
+                                  </td>
+                                </tr>
+                              </table>
+                            </fieldset>
+                          </td>
+                        </tr>
+<!-- END 'UPLOAD' HTML -->
+<!-- BEGIN 'CREATE' HTML (delete the '>' at the end of this comment to disable the 'CREATE' feature) -->
+                        <tr>
+                          <td colspan="2">
+                            <fieldset>
+                              <legend align="left">Create New Folder</legend>
+                              <table border="0" cellpadding="1" cellspacing="0">
+                                <tr>
+                                  <td align="left" valign="middle">
+				    Name:
+                                  </td>
+                                  <td colspan="2">
+                                    <input type="input" name="folder" id="folder" size="54">
+                                  </td>
+                                </tr>
+				<tr>
+                                  <td align="left" valign="middle">
+                                    Description:
+                                  </td>
+                                  <td>
+                                    <input type="input" name="description" id="description" size="54">
+                                  </td>
+                                  <td align="left" valign="top">
+                                  &nbsp;<input type="submit" value="Create" onclick="this.form.op.value='htmlAreaCreateFolder'">
+                                  </td>
+
+
+                              </table>
+                            </fieldset>
+                          </td>
+                        </tr>
+<!-- END 'UPLOAD' HTML -->
+                      </table>
+                      <input type="hidden" name="DPI" value="96" id="DPI">
+                      <input type="hidden" name="action" value="" id="action">
+                      <input type="hidden" name="path" value="0" id="path">
+                      <input type="hidden" name="op" value="" id="op">
+                    </form>
+                  </td>
+                </tr>
+              </table>
+            </fieldset>
+          </td>
+        </tr>
+        <tr>
+          <td colspan="3" valign="middle">
+            <fieldset>
+              <legend align="left">Selected Image</legend>
+              <table border="0" cellpadding="1" cellspacing="0">
+                <tr>
+                  <td valign="middle">Image URL:&nbsp;&nbsp;</td>
+                  <td valign="middle">
+                    <input type="text" name="txtFileName" id="txtFileName" onfocus="select()" value="http://" size="54">
+                  </td>
+                </tr>
+                <tr>
+                  <td valign="middle">Alt Text:</td>
+                  <td valign="middle">
+                    <input type="text" name="txtAltText" id="txtAltText" onfocus="select()" size="54">
+                  </td>
+                </tr>
+              </table>
+            </fieldset>
+          </td>
+        </tr>
+        <tr>
+          <td >
+            <fieldset name="fldLayout" id="fldLayout">
+              <legend align="left">Layout</legend>
+              <table border="0" cellpadding="1" cellspacing="0">
+                <tr>
+                  <td valign="middle">Alignment:</td>
+                  <td valign="middle">
+                    <select size="1" name="selAlignment" id="selAlignment">
+                      <OPTION id="optNotSet" value="">(none)</OPTION>
+                      <OPTION id="optAbsBottom" value="absbottom">absbottom</OPTION>
+                      <OPTION id="optAbsMiddle" value="absmiddle">absmiddle</OPTION>
+                      <OPTION id="optBaseline" value="baseline" selected>baseline</OPTION>
+                      <OPTION id="optBottom" value="bottom">bottom</OPTION>
+                      <OPTION id="optLeft" value="left">left</OPTION>
+                      <OPTION id="optMiddle" value="middle">middle</OPTION>
+                      <OPTION id="optRight" value="right">right</OPTION>
+                      <OPTION id="optTexttop" value="texttop">texttop</OPTION>
+                      <OPTION id="optTop" value="top">top</OPTION>
+                    </select>
+                  </td>
+                </tr>
+                <tr>
+                  <td valign="middle">Border:</td>
+                  <td valign="middle">
+                    <input type="text" name="txtBorder" id="txtBorder" size="5" maxlength="3" onfocus="select()">
+                  </td>
+                </tr>
+              </table
+            </fieldset>
+          </td>
+          <td >
+            <fieldset name="fldSpacing" id="fldSpacing">
+              <legend align="left">Spacing</legend>
+              <table border="0" cellpadding="1" cellspacing="0">
+                <tr>
+                  <td valign="middle">Horizontal:</td>
+                  <td valign="middle">
+                    <input type="text" name="txtHorizontal" id="txtHorizontal" size="5" maxlength="3" onfocus="select()">
+                  </td>
+                </tr>
+                <tr>
+                  <td valign="middle">Vertical:</td>
+                  <td valign="middle">
+                    <input type="text" name="txtVertical" id="txtVertical" size="5" maxlength="3" onfocus="select()">
+                  </td>
+                </tr>
+              </table
+            </fieldset>
+          </td>
+          <td valign="bottom">
+            <table align="right" border="0" cellpadding="2" cellspacing="0">
+              <tr>
+                <td valign="middle">
+                  <input type="submit" value="OK" name="btnOK" id="btnOK" onClick="OKClick()">
+                </td>
+              </tr>
+              <tr>
+                <td valign="middle">
+                  <input type="reset" value="Cancel" name="btnCancel" id="btnCancel" onClick="window.close();">
+                </td>
+              </tr>
+            </table
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+</body>
+
+</html>

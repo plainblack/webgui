@@ -1,0 +1,46 @@
+/* Import theme specific language pack */
+tinyMCE.importPluginLanguagePack('preview', 'uk,se');
+
+/**
+ * Returns the HTML contents of the preview control.
+ */
+function TinyMCE_preview_getControlHTML(control_name) {
+	switch (control_name) {
+		case "preview":
+			return '<img id="{$editor_id}_preview" src="{$pluginurl}/images/preview.gif" title="{$lang_preview_desc}" width="20" height="20" class="mceButtonNormal" onmouseover="tinyMCE.switchClass(this,\'mceButtonOver\');" onmouseout="tinyMCE.restoreClass(this);" onmousedown="tinyMCE.restoreAndSwitchClass(this,\'mceButtonDown\');" onclick="tinyMCE.execInstanceCommand(\'{$editor_id}\',\'mcePreview\');">';
+	}
+
+	return "";
+}
+
+/**
+ * Executes the mcePreview command.
+ */
+function TinyMCE_preview_execCommand(editor_id, element, command, user_interface, value) {
+	// Handle commands
+	switch (command) {
+		case "mcePreview":
+			var win = window.open("", "mcePreview", "menubar=yes,toolbar=yes,scrollbars=yes,left=20,top=20,width=" + tinyMCE.getParam("plugin_preview_width", "550") + ",height="  + tinyMCE.getParam("plugin_preview_height", "600"));
+			var html = "";
+
+			html += '<!doctype html public "-//w3c//dtd html 4.0 transitional//en">';
+			html += '<html>';
+			html += '<head>';
+			html += '<title>' + tinyMCE.getLang('lang_preview_desc') + '</title>';
+			html += '<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">';
+			html += '<link href="' + tinyMCE.getParam("content_css") + '" rel="stylesheet" type="text/css">';
+			html += '</head>';
+			html += '<body>';
+			html += tinyMCE.getContent();
+			html += '</body>';
+			html += '</html>';
+
+			win.document.write(html);
+			win.document.close();
+
+			return true;
+	}
+
+	// Pass to next handler in chain
+	return false;
+}

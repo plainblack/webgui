@@ -1,0 +1,53 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+<HEAD>
+<TITLE> FAQ - Frequently Asked Questions </TITLE>
+<link href="style.css" rel="stylesheet" type="text/css">
+</HEAD>
+
+<BODY>
+
+<table width="100%" border="0" cellpadding="1" cellspacing="3" class="pageheader">
+  <tr> 
+    <td><span class="title">FAQ - Frequently Asked Questions</span></td>
+    <td align="right"><a href="index.htm">TOC</a></td>
+  </tr>
+</table>
+<hr noshade>
+<br>
+<span class="subtitle">Why where the &quot;Cut/Copy/Paste&quot; icons removed?</span><br>
+<br>
+In version 1.20 the Cut/Copy/Paste icons where removed due to a security issue 
+in Mozilla and Firefox. If a function doesn't work in 2 out of 3 of the target 
+platforms it shouldn't be included in other words then it's not cross platform. 
+The keyboard shortcurts like Ctrl-X/C/V still works and allso the menu items for 
+these actions in the browsers &quot;Edit&quot; menu. It's only the icon shortcuts 
+that where removed. For more information about this security issue check <a href="http://bugzilla.mozilla.org/show_bug.cgi?id=192355" target="_blank">bugzilla</a> 
+at Mozilla.<br>
+<br>
+<span class="subtitle">Why doesn't MCE work in the Opera/Konqueror/Safari browser?</span><br>
+<br>
+As long as these browsers doesn't support the execCommand and designMode specifications that Mozilla and MSIE does, it's not possible to do a WYSIWYG editor in JavaScript. But when these browsers do get that support we will begin the work on making the editor work on these aswell. <br>
+<br>
+<span class="subtitle">Why is content sometimes duplicated for example when I copy/paste from Word?</span><br>
+<br>
+This bug occures when the HTML is not correctly formatted, this is a MSIE bug. It happens when the HTML code contains &quot;&lt;b/&gt;&quot; or nestled paragraph elements &quot;&lt;p&gt;&lt;p&gt;x&lt;/p&gt;&lt;/p&gt;&quot; this produces a incorrect DOM tree and incorrect output on innerHTML. If anyone have a solution for this problem please let me know.<span class="subtitle"><br>
+<br>
+Why isn't there a color picker and/or a font selector?</span><br>
+<br>
+There is no need for a color picker or font selector in TinyMCE due to the fact that it would break the layout standards of the site/system implementing it i.e. it would be to loose. Font and colors can be applied by using the CSS classes instead.<br>
+<br>
+<span class="subtitle">Why doesn't the undo/redo  menu items in Mozilla function?</span><br>
+<br>
+This is becurse the &quot;custom_undo_redo&quot; option is enabled, that option overrides the keyboard shortcuts and the buttons available in the command toolbar. But there currenly no way to override the build in undo/redo menu items. <br>
+<br>
+<hr noshade>
+<table width="100%" border="0" cellpadding="1" cellspacing="3" class="pagefooter">
+  <tr> 
+    <td>Go to: <a href="index.htm">Table of contents</a></td>
+    <td align="right"><a href="#">Top</a></td>
+  </tr>
+</table>
+<br>
+</BODY>
+</HTML>
