@@ -31,3 +31,4 @@
  - Added admin style option.
  - Added per page printable styles.
  - Wobject privileges are available per page rather than site-wide.
+ - Templatized the Rich Editor support. Tnx to Len Kranendonk

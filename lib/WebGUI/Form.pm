@@ -959,67 +959,22 @@ NOTE: WebGUI uses a great variety of rich editors. Not all of them are capable o
 sub HTMLArea {
         my ($output, $rows, $columns, $htmlArea);
 	my $browser = HTTP::BrowserDetect->new($session{env}{HTTP_USER_AGENT});
-        my $button = '<input type="button" onClick="openEditWindow(this.form.'.$_[0]->{name}.')" value="'
-		.WebGUI::International::get(171).'" style="font-size: 8pt;"><br>';
-        $output = '<script language="JavaScript">function fixChars(element) {element.value = element.value.replace(/~V/mg,"-");}</script>';
-	if ($session{user}{richEditor} eq "editOnPro2") {
-		$output .= '<script language="JavaScript">
-			var formObj;
-			function openEditWindow(obj) {
-	                	formObj = obj;
-				window.open("'.$session{config}{extrasURL}.'/eopro.html","editWindow","width=720,height=450,resizable=1");
-			} </script>';
-	} elsif ($session{user}{richEditor} eq "htmlArea" && $browser->ie && $browser->version >= 5.5) {
-		if ($session{user}{richEditorMode} eq "popup" || $_[0]->{popupToggle}) {
-			$output .= '<script language="JavaScript">
-                       	var formObj;
-               		var extrasDir="'.$session{config}{extrasURL}.'";
-               		function openEditWindow(obj) {
-             			formObj = obj;
-                       		window.open("'.$session{config}{extrasURL}.'/htmlArea/editor.html","editWindow","width=490,height=400,resizable=1");                   }
-               		function setContent(content) {
-                     		formObj.value = content;
-                		} </script>';
-                       	$output .= $button;
-		} else {
-			$output .= _javascriptFile('htmlArea/editor.js');
-               		$output .= '<script>'."\n";
-               		$output .= '_editor_url = "'.$session{config}{extrasURL}.'/htmlArea/";'."\n";
-               		$output .= '</script>'."\n";
-			$htmlArea = 1;
-		}
-        } elsif ($session{user}{richEditor} eq "midas" && (($browser->ie && $browser->version >= 6) || ($browser->gecko && $browser->version >= 1.3))) {
-                        $output .= '<script language="JavaScript">
-                                var formObj; var extrasDir="'.$session{config}{extrasURL}.'";
-                                function openEditWindow(obj) {
-                                        formObj = obj;
-                                        window.open("'.$session{config}{extrasURL}.'/midas/editor.html","editWindow","width=600,height=400,resizable=1");                    }
-                                </script>';
-                        $output .= $button;
-	} elsif ($session{user}{richEditor} eq "classic" && $browser->ie && $browser->version >= 5) {
-			$output .= '<script language="JavaScript">
-				var formObj; var extrasDir="'.$session{config}{extrasURL}.'";
-        	       		function openEditWindow(obj) {
-	               			formObj = obj;
-                	 		window.open("'.$session{config}{extrasURL}.'/ie5edit.html","editWindow","width=490,height=400,resizable=1");			}
-        	       		function setContent(content) { formObj.value = content; } </script>';
-			$output .= $button;
-	} elsif ($session{user}{richEditor} eq "lastResort") {
-		$output .= '<script language="JavaScript">
-			var formObj;
-	               var extrasDir="'.$session{config}{extrasURL}.'";
-        	       function openEditWindow(obj) {
-	               formObj = obj;
-        	         window.open("'.$session{config}{extrasURL}.'/lastResortEdit.html","editWindow","width=500,height=410");
-			}
-        	       function setContent(content) {
-                	 formObj.value = content;
-	               } </script>';
-		$output .= $button;
-	}
-	$rows = $_[0]->{rows} || ($session{setting}{textAreaRows}+7);
-	$columns = $_[0]->{columns} || ($session{setting}{textAreaCols}+5);
-        $output .= textarea({
+	my %var;
+
+	# Store all scalar options in template variables
+        foreach (keys %{$_[0]}) {
+           $var{"form.".$_} = $_[0]->{$_} unless (ref $_[0]->{$_});
+        }
+
+	# Supported Rich Editors
+	$var{"htmlArea.supported"} = ($browser->ie && $browser->version >= 5.5);
+	$var{"midas.supported"} = (($browser->ie && $browser->version >= 6) || ($browser->gecko && $browser->version >= 1.3));
+	$var{"classic.supported"} = ($browser->ie && $browser->version >= 5);
+ 
+	# Textarea field
+        $rows = $_[0]->{rows} || ($session{setting}{textAreaRows}+7);
+        $columns = $_[0]->{columns} || ($session{setting}{textAreaCols}+5);
+        $var{textarea} = textarea({
                 name=>$_[0]->{name},
                 value=>$_[0]->{value},
                 wrap=>$_[0]->{wrap},
@@ -1027,12 +982,17 @@ sub HTMLArea {
                 rows=>$rows,
                 extras=>$_[0]->{extras}.' onBlur="fixChars(this.form.'.$_[0]->{name}.')"'
                 });
-        if ($htmlArea) {
-            	$output .= '<script language="Javascript1.2">'."\n";
-            	$output .= 'editor_generate("'.$_[0]->{name}.'");'."\n";
-            	$output .= '</script>'."\n";
-        }
-	return $output;	
+
+	# Other variables
+	$var{"popup"} = ($session{user}{richEditorMode} eq "popup" || $_[0]->{popupToggle});
+	$var{"button"} = '<input type="button" onClick="openEditWindow(this.form.'.$_[0]->{name}.')" value="'
+                .WebGUI::International::get(171).'" style="font-size: 8pt;"><br>';
+
+	if ($session{user}{richEditor} eq 'none') {
+		return $var{textarea};
+	} else {
+		return WebGUI::Template::process(WebGUI::Template::get($session{user}{richEditor},'richEditor'),\%var);
+	}
 }
 
 #-------------------------------------------------------------------
