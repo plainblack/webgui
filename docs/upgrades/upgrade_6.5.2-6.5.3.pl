@@ -36,14 +36,18 @@ while (my $namespace = $sth->hashRef) {
 		menuTitle=>$namespace->{namespace},
 		url=>$newUrl,
 		description=>$namespace,
-		templateId=>'PBtmpl0000000000000078'
+		templateId=>'PBtmpl0000000000000078',
+		styleTemplateId=>'PBtmpl0000000000000060',
+		printableStyleTemplateId=>'PBtmpl0000000000000111',
+		groupIdView=>'4',
+		groupIdEdit=>'3'
 	});
 	my $templatesquery = "select * from asset, template where asset.parentId='".$templateFolder."' and asset.assetId=template.assetId and asset.className='WebGUI::Asset::Template' and template.namespace='".$namespace->{namespace}."' order by title asc";
 	my $newParentId = $folder->getId;
 	my $sth2 = WebGUI::SQL->read($templatesquery);
 	my $first = 1;
 	while (my $template = $sth2->hashRef) {
-		print "\t\tMoving ".$template->{title}." to Templates/".$namespace->{namespace}."\n" unless ($quiet);
+		print "\t\t\tMoving ".$template->{title}." to Templates/".$namespace->{namespace}."\n" unless ($quiet);
 		my $newLineage = getNextLineage($newParentId);
 		my $templateAssetId = $template->{assetId};
 		my $templateObject = WebGUI::Asset->new($templateAssetId);
