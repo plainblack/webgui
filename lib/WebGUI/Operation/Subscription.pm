@@ -59,7 +59,7 @@ sub www_createSubscriptionCodeBatch {
 	$f->interval(
 		-name	=> 'expires',
 		-label	=> $i18n->get('codes expire'),
-		-value	=> $session{form}{expires}
+		-value	=> $session{form}{expires} || WebGUI::DateTime::intervalToSeconds(1, 'months')
 		);
 	$f->selectList(
 		-name	=> 'subscriptionId',

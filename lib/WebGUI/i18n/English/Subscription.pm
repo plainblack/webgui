@@ -121,8 +121,8 @@ The amount of karma which is added to the user after he/she subscribes.<br>|,
 	},
 
 	'codes expire' => {
-		message => q|Codes expire per|,
-		lastUpdated => 1101228391,
+		message => q|Codes expire after|,
+		lastUpdated => 1101228392,
 		context => q|Form option in createSubscriptionCodeBatch.|
 	},
 
