@@ -95,6 +95,8 @@ sub process {
 		$templateId = $session{setting}{adminStyleId};
 	} elsif ($session{scratch}{personalStyleId} ne "") {
 		$templateId = $session{scratch}{personalStyleId};
+	} elsif ($session{page}{useEmptyStyle}) {
+		$templateId = 6;
 	}
         my $type = lc($session{setting}{siteicon});
         $type =~ s/.*\.(.*?)$/$1/;

@@ -187,10 +187,10 @@ sub www_editTemplateSave {
 sub www_listTemplates {
         my ($output, $sth, @data, @row, $i, $p, $where);
         if (WebGUI::Privilege::isInGroup(8)) {
-		$where = "where namespace=".quote($session{form}{namespace}) if ($session{form}{namespace});
+		$where = "and namespace=".quote($session{form}{namespace}) if ($session{form}{namespace});
                 $output = helpIcon(33);
 		$output .= '<h1>'.WebGUI::International::get(506).'</h1>';
-                $sth = WebGUI::SQL->read("select templateId,name,namespace from template $where order by namespace,name");
+                $sth = WebGUI::SQL->read("select templateId,name,namespace from template where isEditable=1 $where order by namespace,name");
                 while (@data = $sth->array) {
                         $row[$i] = '<tr><td valign="top" class="tableData">'
 				.deleteIcon('op=deleteTemplate&tid='.$data[0].'&namespace='.$data[2])

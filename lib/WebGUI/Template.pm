@@ -93,7 +93,7 @@ Defaults to "Page". Specify the namespace to build the list for.
 
 sub getList {
 	my $namespace = $_[0] || "Page";
-	return WebGUI::SQL->buildHashRef("select templateId,name from template where namespace=".quote($namespace)." order by name");
+	return WebGUI::SQL->buildHashRef("select templateId,name from template where namespace=".quote($namespace)." and showInForms=1 order by name");
 }
 
 
