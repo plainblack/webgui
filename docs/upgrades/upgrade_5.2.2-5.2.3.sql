@@ -21,6 +21,7 @@ delete from international where languageId=2 and namespace='WebGUI' and internat
 insert into international (internationalId,languageId,namespace,message,lastUpdated) values (891,2,'WebGUI','Nur Makros blockieren.', 1049099974);
 delete from international where languageId=2 and namespace='WebGUI' and internationalId=526;
 insert into international (internationalId,languageId,namespace,message,lastUpdated) values (526,2,'WebGUI','JavaScript entfernen und blockiere Makros.', 1049099918);
-
+alter table MailForm_field change validation validation varchar(255) not null default 'none';
+update MailForm_field set validation='none' where validation='';
 
 
