@@ -9,9 +9,11 @@ save you many hours of grief.
 
 3.8.0
 --------------------------------------------------------------------
- * Widgets are being replaced with Wobjects. The Widget interface
-	will remain in WebGUI until version 5.0.0, but it is
-	depricated and use is not recommended.
+ * Widgets are being replaced with Wobjects. Any custom widgets
+	you're using need to be replaced with new Wobjects or
+	they will cease to function. Please contact the developer
+	of the widget immediately to have them upgrade it to
+	a Wobject.
 
 3.6.0
 --------------------------------------------------------------------
