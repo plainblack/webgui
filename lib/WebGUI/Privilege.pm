@@ -208,7 +208,7 @@ sub insufficient {
 =cut
 
 sub isInGroup {
-	my ($gid, $uid, @data, %group, %user);
+	my ($gid, $uid, @data, %group, %user, $groupId);
 	($gid, $uid) = @_;
 	$uid = $session{user}{userId} if ($uid eq "");
         ### The "Everyone" group automatically returns true.
@@ -254,10 +254,22 @@ sub isInGroup {
 		}
 	}
 	### Admins can do anything!
-        if ($gid != 3) {                        
+        if ($gid != 3 && $session{isInGroup}{3} eq "") {                        
                 $session{isInGroup}{3} = isInGroup(3, $uid);
-		return $session{isInGroup}{3};
+		if ($session{isInGroup}{3}) {
+			$session{isInGroup}{$gid} = 1;
+			return 1;
+		}
         }                                       
+	### Check for groups of groups.
+	@data = WebGUI::SQL->buildArray("select groupId from groupGroupings where inGroup=$gid");
+	foreach $groupId (@data) {
+		$session{isInGroup}{$groupId} = isInGroup($groupId, $uid);
+		if ($session{isInGroup}{$groupId}) {
+			$session{isInGroup}{$gid} = 1;
+			return 1;
+		}
+	}
 	return 0;
 }
 

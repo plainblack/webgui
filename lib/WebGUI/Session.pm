@@ -296,6 +296,7 @@ sub refreshSessionVars {
 #-------------------------------------------------------------------
 sub refreshUserInfo {
 	$session{user} = _getUserInfo($_[0],$session{dbh});
+	$session{isInGroup} = ();
 }
 
 #-------------------------------------------------------------------

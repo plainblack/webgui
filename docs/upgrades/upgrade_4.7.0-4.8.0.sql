@@ -202,6 +202,18 @@ delete from help where helpId=47 and namespace='WebGUI';
 insert into help (helpId,namespace,titleId,bodyId,seeAlso) values (47, 'WebGUI', 697, 698, '1,Article;17,WebGUI;1,MessageBoard;1,Poll;2,WebGUI;1,USS;');
 delete from help where helpId=2 and namespace='FileManager';
 insert into help (helpId,namespace,titleId,bodyId,seeAlso) values (2, 'FileManager', 72, 73, '1,FileManager;');
+create table groupGroupings (
+	groupId int not null,
+	inGroup int not null
+);
+insert into international (internationalId,languageId,namespace,message,lastUpdated) values (813,1,'WebGUI','Groups In This Group', 1037583186);
+insert into international (internationalId,languageId,namespace,message,lastUpdated) values (812,1,'WebGUI','Your message has been sent.', 1037580328);
+insert into international (internationalId,languageId,namespace,message,lastUpdated) values (811,1,'WebGUI','From', 1037580145);
+insert into international (internationalId,languageId,namespace,message,lastUpdated) values (810,1,'WebGUI','send', 1037579743);
+insert into international (internationalId,languageId,namespace,message,lastUpdated) values (809,1,'WebGUI','Email Group', 1037579611);
+insert into international (internationalId,languageId,namespace,message,lastUpdated) values (808,1,'WebGUI','Email this group.', 1037579487);
+insert into international (internationalId,languageId,namespace,message,lastUpdated) values (807,1,'WebGUI','Manage the groups in this group.', 1037579473);
+insert into international (internationalId,languageId,namespace,message,lastUpdated) values (806,1,'WebGUI','Delete this group.', 1037579396);
 
 
 

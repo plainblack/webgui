@@ -17,6 +17,7 @@ use WebGUI::DateTime;
 use WebGUI::HTMLForm;
 use WebGUI::Icon;
 use WebGUI::International;
+use WebGUI::Mail;
 use WebGUI::Operation::Shared;
 use WebGUI::Paginator;
 use WebGUI::Privilege;
@@ -27,7 +28,8 @@ use WebGUI::Utility;
 
 our @ISA = qw(Exporter);
 our @EXPORT = qw(&www_manageUsersInGroup &www_deleteGroup &www_deleteGroupConfirm &www_editGroup 
-	&www_editGroupSave &www_listGroups);
+	&www_editGroupSave &www_listGroups &www_emailGroup &www_emailGroupSend &www_manageGroupsInGroup
+	&www_addGroupsToGroupSave &www_deleteGroupGrouping);
 
 #-------------------------------------------------------------------
 sub _submenu {
@@ -39,10 +41,23 @@ sub _submenu {
 		|| $session{form}{op} eq "deleteGroupConfirm") {
                 $menu{WebGUI::URL::page("op=editGroup&gid=".$session{form}{gid})} = WebGUI::International::get(753);
                 $menu{WebGUI::URL::page("op=manageUsersInGroup&gid=".$session{form}{gid})} = WebGUI::International::get(754);
-                $menu{WebGUI::URL::page("op=deleteGroup&gid=".$session{form}{gid})} = WebGUI::International::get(755);
+                $menu{WebGUI::URL::page("op=manageGroupsInGroup&gid=".$session{form}{gid})} = WebGUI::International::get(807);
+                $menu{WebGUI::URL::page("op=emailGroup&gid=".$session{form}{gid})} = WebGUI::International::get(808);
+                $menu{WebGUI::URL::page("op=deleteGroup&gid=".$session{form}{gid})} = WebGUI::International::get(806);
         }
         $menu{WebGUI::URL::page("op=listGroups")} = WebGUI::International::get(756);
         return menuWrapper($_[0],\%menu);
+}
+
+#-------------------------------------------------------------------
+sub www_addGroupsToGroupSave {
+        return WebGUI::Privilege::adminOnly() unless (WebGUI::Privilege::isInGroup(3));
+        my (@groups, $group);
+        @groups = $session{cgi}->param('groups');
+	foreach $group (@groups) {
+		WebGUI::SQL->write("insert into groupGroupings values ($group,$session{form}{gid})");
+	}
+        return www_manageGroupsInGroup();
 }
 
 #-------------------------------------------------------------------
@@ -67,6 +82,13 @@ sub www_deleteGroupConfirm {
         WebGUI::SQL->write("delete from groups where groupId=$session{form}{gid}");
         WebGUI::SQL->write("delete from groupings where groupId=$session{form}{gid}");
         return www_listGroups();
+}
+
+#-------------------------------------------------------------------
+sub www_deleteGroupGrouping {
+	return WebGUI::Privilege::adminOnly() unless (WebGUI::Privilege::isInGroup(3));
+	WebGUI::SQL->write("delete from groupGroupings where inGroup=$session{form}{gid} and groupId=$session{form}{delete}");
+        return www_manageGroupsInGroup();
 }
 
 #-------------------------------------------------------------------
@@ -116,6 +138,48 @@ sub www_editGroupSave {
 }
 
 #-------------------------------------------------------------------
+sub www_emailGroup {
+	return WebGUI::Privilege::adminOnly() unless (WebGUI::Privilege::isInGroup(3));
+	my ($output,$f);
+	$output = '<h1>'.WebGUI::International::get(809).'</h1>';
+	$f = WebGUI::HTMLForm->new;
+	$f->hidden("op","emailGroupSend");
+	$f->hidden("gid",$session{form}{gid});
+	$f->email(
+		-name=>"from",
+		-value=>$session{setting}{companyEmail},
+		-label=>WebGUI::International::get(811)
+		);
+	$f->text(
+		-name=>"subject",
+		-label=>WebGUI::International::get(229)
+		);
+	$f->textarea(
+		-name=>"message",
+		-label=>WebGUI::International::get(230),
+		-rows=>(5+$session{setting}{textAreaRows})
+		);
+	$f->submit(WebGUI::International::get(810));
+	$output = $f->print;
+	return _submenu($output);
+}
+
+#-------------------------------------------------------------------
+sub www_emailGroupSend {
+	return WebGUI::Privilege::adminOnly() unless (WebGUI::Privilege::isInGroup(3));
+	my ($sth, $email);
+	$sth = WebGUI::SQL->read("select b.fieldData from groupings a left join userProfileData b 
+		on a.userId=b.userId and b.fieldName='email' where a.groupId=$session{form}{gid}");
+	while (($email) = $sth->array) {
+		if ($email ne "") {
+			WebGUI::Mail::send($email,$session{form}{subject},$session{form}{message},'',$session{form}{from});
+		}
+	}
+	$sth->finish;
+	return _submenu(WebGUI::International::get(812));
+}
+
+#-------------------------------------------------------------------
 sub www_listGroups {
 	return WebGUI::Privilege::adminOnly() unless (WebGUI::Privilege::isInGroup(3));
         my ($output, $p, $sth, @data, @row, $i, $userCount);
@@ -143,6 +207,42 @@ sub www_listGroups {
         $output .= '</table>';
         $output .= $p->getBarTraditional($session{form}{pn});
         return _submenu($output);
+}
+
+#-------------------------------------------------------------------
+sub www_manageGroupsInGroup {
+        return WebGUI::Privilege::adminOnly() unless (WebGUI::Privilege::isInGroup(3));
+	my ($output, $p, $group, $groups, @array, $f);
+	$output = '<h1>'.WebGUI::International::get(813).'</h1><div align="center">';
+        $f = WebGUI::HTMLForm->new;
+        $f->hidden("op","addGroupsToGroupSave");
+        $f->hidden("gid",$session{form}{gid});
+        @array = WebGUI::SQL->buildArray("select groupId from groupGroupings where inGroup=$session{form}{gid}");
+	push(@array,$session{form}{gid});
+     #   push(@array,1); #visitors
+     #   push(@array,2); #registered users
+     #   push(@array,7); #everyone
+        $groups = WebGUI::SQL->buildHashRef("select groupId,groupName from groups where groupId not in (".join(",",@array).") order by groupName");
+        $f->select("groups",$groups,WebGUI::International::get(605),[],5,1);
+        $f->submit;
+        $output .= $f->print;
+
+	$output .= '</div><p/><table class="tableData" align="center">';
+	$output .= '<tr class="tableHeader"><td></td><td>'.WebGUI::International::get(84).'</td></tr>';
+	$p = WebGUI::Paginator->new(WebGUI::URL::page('op=manageGroupsInGroup'));
+	$p->setDataByQuery("select a.groupName as name,a.groupId as id from groups a 
+		left join groupGroupings b on a.groupId=b.groupId 
+		where b.inGroup=$session{form}{gid} order by a.groupName");
+	$groups = $p->getPageData;
+	foreach $group (@$groups) {
+		$output .= '<tr><td>'
+			.deleteIcon('op=deleteGroupGrouping&gid='.$session{form}{gid}.'&delete='.$group->{id})
+			.'</td><td><a href="'.WebGUI::URL::page('op=editGroup&gid='.$group->{id}).'">'
+			.$group->{name}.'</a></td></tr>';
+	}
+	$output .= '</table>';
+	$output .= $p->getBarTraditional;
+	return _submenu($output);
 }
 
 #-------------------------------------------------------------------
