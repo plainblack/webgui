@@ -81,12 +81,14 @@ sub unescape {
 
 #-------------------------------------------------------------------
 sub urlize {
-	my ($title);
-        $title = lc($_[0]);
-        $title =~ s/ /_/g;
-	$title =~ s/\.$//g;
-        $title =~ s/[^a-z0-9\-\.\_]//g;
-        return $title;
+	my ($value);
+        $value = lc($_[0]);		#lower cases whole string
+	$value =~ s/\W+$//g;		#removes trailing whitespace
+	$value =~ s/^\W+//g;		#removes leading whitespace
+        $value =~ s/ /_/g;		#replaces whitespace with underscores
+	$value =~ s/\.$//g;		#removes trailing period
+        $value =~ s/[^a-z0-9\-\.\_]//g;	#removes all funky characters
+        return $value;
 }
 
 
