@@ -1,7 +1,7 @@
 package WebGUI::Authentication::LDAP;
 
 #-------------------------------------------------------------------
-# This module is made by M. Kamerbeek of Procolix (procolix.com)
+# This module is copyright by M. Kamerbeek of Procolix (procolix.com)
 # for WebGUI and released under GNU/GPL. 
 #-------------------------------------------------------------------
 
@@ -16,7 +16,6 @@ package WebGUI::Authentication::LDAP;
 #-------------------------------------------------------------------
 
 use strict;
-use WebGUI::SQL;
 use WebGUI::Session; 
 use WebGUI::HTMLForm;
 use WebGUI::Authentication;
@@ -52,7 +51,7 @@ sub hasBadUserData {
 	$ldap = Net::LDAP->new($uri->host, %args) or $error .= WebGUI::International::get(79);
 	return $error if ($error);
 	$ldap->bind;
-	$search = $ldap->search (base => $uri->dn, filter => $session{setting}{ldapId}."=".$session{form}{ldapId});
+	$search = $ldap->search (base => $uri->dn, filter => $session{setting}{ldapId}."=".$session{form}{loginId});
 	if (defined $search->entry(0)) {
 		$connectDN = "cn=".$search->entry(0)->get_value("cn");
 		$ldap->unbind;
@@ -60,7 +59,7 @@ sub hasBadUserData {
 		$auth = $ldap->bind(dn=>$connectDN, password=>$session{form}{ldapPassword});
 		if ($auth->code == 48 || $auth->code == 49) {
 			$error = '<li>'.WebGUI::International::get(68);
-			WebGUI::ErrorHandler::warn("Invalid LDAP information for registration of LDAP ID: ".$session{form}{ldapId});
+			WebGUI::ErrorHandler::warn("Invalid LDAP information for registration of LDAP ID: ".$session{form}{loginId});
 		} elsif ($auth->code > 0) {
 			$error = '<li>LDAP error "'.$ldapStatusCode{$auth->code}.'" occured. '.WebGUI::International::get(69);
 			WebGUI::ErrorHandler::warn("LDAP error: ".$ldapStatusCode{$auth->code});
@@ -76,7 +75,7 @@ sub hasBadUserData {
 
 #-------------------------------------------------------------------
 sub validateUser {
-	my ($userId, $password, $userData, $uri, $port, %args, $ldap, $auth, $error);
+	my ($userId, $password, $userData, $uri, $port, %args, $ldap, $auth, $result);
 	($userId, $password) = @_;
 
 	$userData = WebGUI::Authentication::getParams($userId, 'LDAP');
@@ -88,21 +87,22 @@ sub validateUser {
         	$port = $uri->port;
         }
         %args = (port => $port);
-        $ldap = Net::LDAP->new($uri->host, %args) or $error = WebGUI::International::get(79);
-	return $error if $error;
+        $ldap = Net::LDAP->new($uri->host, %args) or $result = WebGUI::International::get(79);
+	return $result if $result;
+
         $auth = $ldap->bind(dn=>$$userData{connectDN}, password=>$session{form}{identifier});
                 if ($auth->code == 48 || $auth->code == 49) {
-			$error = WebGUI::International::get(68);
+			$result = WebGUI::International::get(68);
 			WebGUI::ErrorHandler::security("login to account ".$session{form}{username}." with invalid information.");
 		} elsif ($auth->code > 0) {
-			$error .= 'LDAP error "'.$ldapStatusCode{$auth->code}.'" occured.';
-			$error .= WebGUI::International::get(69);
+			$result .= 'LDAP error "'.$ldapStatusCode{$auth->code}.'" occured.';
+			$result .= WebGUI::International::get(69);
 			WebGUI::ErrorHandler::warn("LDAP error: ".$ldapStatusCode{$auth->code});
 		} else {
-			$error = 1;
+			$result = 1;
 		}
                 $ldap->unbind;
-	return $error
+	return $result;
 }
 
 #-------------------------------------------------------------------------
@@ -126,7 +126,11 @@ sub formAddUser {
 
 #-------------------------------------------------------------------
 sub saveAddUser {
-	WebGUI::Authentication::saveParams($session{form}{uid},'LDAP',{connectDN => $session{form}{connectDN}, ldapURL => $session{form}{ldapURL}});
+	WebGUI::Authentication::saveParams($session{form}{uid},'LDAP',
+	{
+		connectDN 	=> $session{form}{connectDN}, 
+		ldapURL 	=> $session{form}{ldapURL}
+	});
 }
 
 #-------------------------------------------------------------------
@@ -161,7 +165,11 @@ sub saveCreateAccount {
 	}
 	$ldap->unbind;
 
-	WebGUI::Authentication::saveParams($uid,'LDAP',{connectDN => $connectDN, ldapURL => $session{setting}{ldapURL}});
+	WebGUI::Authentication::saveParams($uid,'LDAP',
+	{
+		connectDN 	=> $connectDN, 
+		ldapURL 	=> $session{setting}{ldapURL}
+	});
 }
 
 #-------------------------------------------------------------------
@@ -191,7 +199,11 @@ sub formEditUser {
 
 #-------------------------------------------------------------------
 sub saveEditUser {
-	WebGUI::Authentication::saveParams($session{form}{uid},'LDAP',{connectDN => $session{form}{connectDN}, ldapURL => $session{form}{ldapURL}});
+	WebGUI::Authentication::saveParams($session{form}{uid},'LDAP',
+	{
+		connectDN 	=> $session{form}{connectDN}, 
+		ldapURL 	=> $session{form}{ldapURL}
+	});
 }
 
 

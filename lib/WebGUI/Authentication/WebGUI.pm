@@ -1,7 +1,7 @@
 package WebGUI::Authentication::WebGUI;
 
 #-------------------------------------------------------------------
-# This module is made by M. Kamerbeek of Procolix (procolix.com)
+# This module is copyright by M. Kamerbeek of Procolix (procolix.com)
 # for WebGUI and released under GNU/GPL. 
 #-------------------------------------------------------------------
 
@@ -16,7 +16,6 @@ package WebGUI::Authentication::WebGUI;
 #-------------------------------------------------------------------
 
 use strict;
-use WebGUI;
 use WebGUI::Session;
 use WebGUI::Authentication;
 use WebGUI::HTMLForm;
