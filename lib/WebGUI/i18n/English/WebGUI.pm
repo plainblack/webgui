@@ -3045,7 +3045,9 @@ Loops come with special condition variables of their own. They are __FIRST__, __
 <p/>
 
 <b>&#94;File();</b><br/>
-This macro builds a quick file link. It creates an icon for the file and outputs the files name. Then it links them both to the file for downloading.  An optional second parameter allows a custom template to be used instead of the default.  The following variables are available for use in the template:
+&#94;File(<i>collateralFileName</i>);<BR>
+&#94;File(<i>collateralFileName</i>,<i>templateName</i>);<BR>
+This macro builds a quick link to a file in the Collateral Manager. It creates an icon for the file and outputs the files' name. Then it links them both to the file for downloading.    The following variables are available for use in the template:
 <p/>
 <b>file.url</b><br/>
 The URL to the file.
@@ -3061,7 +3063,11 @@ The size of the file.
 <p/>
 <b>file.thumbnail</b><br/>
 The file's thumbnail.
+<p/>
 
+An optional second parameter, a template name, allows a custom template
+from the Macro/File template namespace to be used instead of the default.
+If a template with that name is not found, then the default is used.<br>
 <p/>
 
 <b>&#94;I();</b><br/>
@@ -3128,7 +3134,7 @@ This macro retrieves the URL for the thumbnail of any image in the collateral ma
 <i>Example:</i> &#94;Thumbnail("logo");
 <p/>
 |,
-		lastUpdated => 1098855400
+		lastUpdated => 1101855785,
 	},
 
 	'736' => {
