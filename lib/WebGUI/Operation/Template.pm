@@ -88,7 +88,7 @@ sub www_deleteTemplateConfirm {
 
 #-------------------------------------------------------------------
 sub www_editTemplate {
-        my ($output, %template, $f);
+        my ($output, $namespaces, %template, $f);
 	tie %template, 'Tie::CPHash';
         if (WebGUI::Privilege::isInGroup($session{setting}{templateManagersGroup})) {
 		if ($session{form}{tid} eq "new") {
@@ -106,10 +106,16 @@ sub www_editTemplate {
 		$output .= '<h1>'.WebGUI::International::get(507).'</h1>';
 		$f = WebGUI::HTMLForm->new;
                 $f->hidden("op","editTemplateSave");
-                $f->hidden("afterEdit",$session{form}{afterEdit});
-                $f->hidden("namespace",$session{form}{namespace});
-                $f->hidden("tid",$session{form}{tid});
 		$f->readOnly($session{form}{tid},WebGUI::International::get(503));
+                $f->hidden("action2",$session{form}{afterEdit});
+		if ($session{form}{tid} eq "new") {
+			$namespaces = WebGUI::SQL->buildHashRef("select distinct(namespace),namespace 
+				from template order by namespace");
+			$f->select("namespace",$namespaces,WebGUI::International::get(721));
+		} else {
+                	$f->hidden("namespace",$session{form}{namespace});
+		}
+                $f->hidden("tid",$session{form}{tid});
                 $f->text("name",WebGUI::International::get(528),$template{name});
                 $f->HTMLArea("template",WebGUI::International::get(504),$template{template},'','','',(5+$session{setting}{textAreaRows}));
                 $f->submit;
@@ -125,8 +131,7 @@ sub www_editTemplateSave {
         if (WebGUI::Privilege::isInGroup($session{setting}{templateManagersGroup})) {
 		if ($session{form}{tid} eq "new") {
 			($session{form}{tid}) = WebGUI::SQL->quickArray("select max(internationalId) 
-				from international where templateId=".$session{form}{tid}." 
-                		and namespace=".quote($session{form}{namespace}));
+				from international where namespace=".quote($session{form}{namespace}));
 			$session{form}{tid}++;
 			WebGUI::SQL->write("insert into template (templateId,namespace) values 
 				($session{form}{tid}, ".quote($session{form}{namespace}).")");
@@ -136,8 +141,12 @@ sub www_editTemplateSave {
 		}
                 WebGUI::SQL->write("update template set name=".quote($session{form}{name}).", 
 			template=".quote($session{form}{template})."
-			where templateId=".$session{form}{tid});
-                return www_listTemplates();
+			where templateId=".$session{form}{tid}." and namespace=".quote($session{form}{namespace}));
+		if ($session{form}{action2} eq "") {
+                	return www_listTemplates();
+		} else {
+			return "";
+		}
         } else {
                 return WebGUI::Privilege::insufficient();
         }

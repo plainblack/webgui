@@ -1437,7 +1437,8 @@ sub template {
 		rearrange([name, value, label, namespace, afterEdit, extras, uiLevel], @p);
         if (_uiLevelChecksOut($uiLevel)) {
         	if ($afterEdit) {
-                	$subtext = '<a href="'.WebGUI::URL::page("op=editTemplate&tid=".$value."&afterEdit="
+                	$subtext = '<a href="'.WebGUI::URL::page("op=editTemplate&tid=".$value."&namespace=".$namespace
+				."&afterEdit="
                         	.WebGUI::URL::escape($afterEdit)).'">'.WebGUI::International::get(741).'</a> / ';
         	}
         	$subtext .= '<a href="'.WebGUI::URL::page("op=listTemplates&namespace=$namespace").'">'
