@@ -34,7 +34,8 @@ use WebGUI::Template;
 use WebGUI::URL;
 use WebGUI::Utility;
 use WebGUI::Operation::Profile;
-use WebGUI::Operation::Auth;
+use WebGUI::Operation::Shared;
+
 
 =head1 NAME
 
@@ -316,7 +317,7 @@ sub displayAccount {
    $vars->{'account.form.submit'} = WebGUI::Form::submit({});
    $vars->{'account.form.footer'} = "</form>";
    
-   $vars->{'account.options'} = WebGUI::Operation::Profile::accountOptions();
+   $vars->{'account.options'} = WebGUI::Operation::Shared::accountOptions();
    return WebGUI::Template::process(WebGUI::Template::get(1,$template), $vars);
 }
 

@@ -19,6 +19,7 @@ use WebGUI::Mail;
 use WebGUI::Session;
 use WebGUI::SQL;
 use WebGUI::Utility;
+use WebGUI::Operation::Shared;
 use URI;
 use Net::LDAP;
 
@@ -260,7 +261,7 @@ sub displayAccount {
       $vars->{'account.form.karma'} = $session{user}{karma};
 	  $vars->{'account.form.karma.label'} = WebGUI::International::get(537);
    }
-   $vars->{'account.options'} = WebGUI::Operation::Profile::accountOptions();
+   $vars->{'account.options'} = WebGUI::Operation::Shared::accountOptions();
    return WebGUI::Template::process(WebGUI::Template::get(1,'Auth/LDAP/Account'), $vars);
 }
 

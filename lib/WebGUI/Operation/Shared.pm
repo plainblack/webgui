@@ -21,6 +21,49 @@ our @ISA = qw(Exporter);
 our @EXPORT = qw(&menuWrapper);
 
 #-------------------------------------------------------------------
+ sub accountOptions {
+	my @array;
+	if (WebGUI::Privilege::isInGroup(4) || WebGUI::Privilege::isInGroup(5) || WebGUI::Privilege::isInGroup(6) || WebGUI::Privilege::isInGroup(8) || WebGUI::Privilege::isInGroup(9) || WebGUI::Privilege::isInGroup(10) || WebGUI::Privilege::isInGroup(11)) {
+		my %hash;
+		if ($session{var}{adminOn}) {
+			$hash{'options.display'} .= '<a href="'.WebGUI::URL::page('op=switchOffAdmin').'">'.WebGUI::International::get(12).'</a>';
+		} else {
+			$hash{'options.display'} .= '<a href="'.WebGUI::URL::page('op=switchOnAdmin').'">'.WebGUI::International::get(63).'</a>';
+		}
+	    push(@array,\%hash);
+	}
+	unless ($session{form}{op} eq "displayAccount"){
+	   my %hash;
+	   $hash{'options.display'} = '<a href="'.WebGUI::URL::page('op=displayAccount').'">'.WebGUI::International::get(342).'</a>';
+	   push(@array,\%hash);
+	}
+	unless ($session{form}{op} eq "editProfile"){
+	   my %hash;
+	   $hash{'options.display'} = '<a href="'.WebGUI::URL::page('op=editProfile').'">'.WebGUI::International::get(341).'</a>';
+	   push(@array,\%hash);
+	}
+	unless ($session{form}{op} eq "viewProfile"){
+	   my %hash;
+	   $hash{'options.display'} = '<a href="'.WebGUI::URL::page('op=viewProfile&uid='.$session{user}{userId}).'">'.WebGUI::International::get(343).'</a>';
+	   push(@array,\%hash);
+    }
+	unless ($session{form}{op} eq "viewMessageLog"){
+	   my %hash;
+	   $hash{'options.display'} = '<a href="'.WebGUI::URL::page('op=viewMessageLog').'">'.WebGUI::International::get(354).'</a>';
+       push(@array,\%hash);
+	}
+	my %logout;
+	$logout{'options.display'} = '<a href="'.WebGUI::URL::page('op=logout').'">'.WebGUI::International::get(64).'</a>'; 
+	push(@array,\%logout);
+	if ($session{setting}{selfDeactivation} && !WebGUI::Privilege::isInGroup(3)){
+	   my %hash;
+	   $hash{'options.display'} = '<a href="'.WebGUI::URL::page('op=deactivateAccount').'">'.WebGUI::International::get(65).'</a>';
+	   push(@array,\%hash);
+	}
+	return \@array;
+}
+
+#-------------------------------------------------------------------
 sub menuWrapper {
         my ($output, $key);
         $output = '<table width="100%" border="0" cellpadding="5" cellspacing="0">

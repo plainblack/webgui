@@ -168,7 +168,7 @@ sub displayAccount {
       $vars->{'account.form.karma'} = $session{user}{karma};
 	  $vars->{'account.form.karma.label'} = WebGUI::International::get(537);
    }
-   $vars->{'account.options'} = WebGUI::Operation::Profile::accountOptions();
+   $vars->{'account.options'} = WebGUI::Operation::Shared::accountOptions();
    return WebGUI::Template::process(WebGUI::Template::get(1,'Auth/SMB/Account'), $vars);
 }
 
