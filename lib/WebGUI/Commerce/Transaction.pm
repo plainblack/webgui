@@ -7,6 +7,21 @@ use WebGUI::SQL;
 use WebGUI::Commerce::Payment;
 
 #-------------------------------------------------------------------
+
+=head2 addItem ( item, quantity )
+
+Add's an item to the transaction.
+
+=head3 item
+
+An WebGUI::Commerce::Item object of the item you want to add.
+
+=head3 quantity
+
+The number of items that are tobe added.
+
+=cut
+
 sub addItem {
 	my ($self, $item, $quantity);
 	$self = shift;
@@ -31,6 +46,14 @@ sub addItem {
 }
 
 #-------------------------------------------------------------------
+
+=head2 cancelTransaction
+
+Cancels a recurring transaction. This is done by trying to cancel the subscription at the gateway
+using a Payment plugin. If this is succesfull the transaction is marked as canceled.
+
+=cut
+
 sub cancelTransaction {
 	my ($self, $item, $plugin);
 	$self = shift;
@@ -53,6 +76,14 @@ sub cancelTransaction {
 }
 
 #-------------------------------------------------------------------
+
+=head2 completeTransaction
+
+Sets the status of a transaction to 'Completed' and executes the handler for every item attached to
+the transction.
+
+=cut
+
 sub completeTransaction {
 	my ($self, $item);
 	$self = shift;
@@ -66,6 +97,13 @@ sub completeTransaction {
 }
 
 #-------------------------------------------------------------------
+
+=head2 delete
+
+Deletes the transaction from the database;
+
+=cut
+
 sub delete {
 	my ($self) = shift;
 
@@ -76,6 +114,17 @@ sub delete {
 }
 
 #-------------------------------------------------------------------
+
+=head2 gateway ( gatewayName )
+
+Returns the gateway connected to the transaction. If gatewayName is given the gateway property is set to that.
+
+=head3 gatewayName
+
+The name to which to set the gateway.
+
+=cut
+
 sub gateway {
 	my ($self, $gateway);
 	$self = shift;
@@ -90,6 +139,17 @@ sub gateway {
 }
 
 #-------------------------------------------------------------------
+
+=head2 gatewayId ( id )
+
+Returns the gateway ID of the transaction. If id is given the gateway ID is set to it.
+
+=head3 id
+
+The ID which to set the gatewayId to.
+
+=cut
+
 sub gatewayId {
 	my ($self, $gatewayId);
 	$self = shift;
@@ -104,6 +164,18 @@ sub gatewayId {
 }
 
 #-------------------------------------------------------------------
+
+=head2 get ( property )
+
+Returns the property requested. If no property is specified this method returns a hashref
+containing all properties.
+
+=head3 property
+
+The name of the property you want.
+
+=cut
+
 sub get {
 	my ($self, $key);
 	$self = shift;
@@ -114,6 +186,22 @@ sub get {
 }
 
 #-------------------------------------------------------------------
+
+=head2 getByGatewayId ( id, gateway )
+
+Constructor. Return a transaction object that is identified by the given id and payment gateway.
+Returns undef if no match is found.
+
+=head3 id
+
+The gateway ID of the transaction.
+
+=head3 gateway
+
+The payment gateway which the transaction is tied to.
+
+=cut
+
 sub getByGatewayId {
 	my ($self, $gatewayId, $paymentGateway, $transactionId);
 	$self = shift;
@@ -128,6 +216,11 @@ sub getByGatewayId {
 }
 
 #-------------------------------------------------------------------
+
+=head2 getItems
+
+=cut
+
 sub getItems {
 	my ($self);
 	$self = shift;
@@ -136,6 +229,18 @@ sub getItems {
 }
 
 #-------------------------------------------------------------------
+
+=head2 isRecurring ( recurring )
+
+Returns a boolean indcating whether the transaction is recurring. If recurring is given, the isRecurring flag
+will be set to it.
+
+=head3 recurring
+
+A boolean which sets the transaction as recurring if true.
+
+=cut
+
 sub isRecurring {
 	my ($self, $recurring);
 	$self = shift;
@@ -150,6 +255,17 @@ sub isRecurring {
 }
 
 #-------------------------------------------------------------------
+
+=head2 lastPayedTerm ( term )
+
+Returns the last term number that has been paid. If term is given this number will be set to it.
+
+-head3 term
+
+The number which to set tha last payed term to.
+
+=cut
+
 sub lastPayedTerm {
 	my ($self, $lastPayedTerm);
 	$self = shift;
@@ -164,6 +280,26 @@ sub lastPayedTerm {
 }
 
 #-------------------------------------------------------------------
+
+=head2 new ( transactionId, [ gateway, [ userId ] ] )
+
+Constructor. Returns a transaction object. If transactionId is set to 'new' a new transaction is created.
+
+=head3 transactionId
+
+The transaction ID of the transaction you want. Set to 'new' for a new transaction.
+
+=head3 gateway
+
+The payment gateway to use for this transaction. Only needed for new transactions.
+
+=head3 userId
+
+The userId of the user for whom to create this transaction. Defaults to the current user. Only optional for
+new transactions.
+
+=cut
+
 sub new {
 	my ($class, $transactionId, $gatewayId, $userId, $properties, $sth, $row, @items);
 	
@@ -190,6 +326,13 @@ sub new {
 }
 
 #-------------------------------------------------------------------
+
+=head2 pendingTransactions
+
+Returns a reference to an array which contains transaction objects of all pending transactions.
+
+=cut
+
 sub pendingTransactions {
 	my (@transactionIds, @transactions);
 	@transactionIds = WebGUI::SQL->buildArray("select transactionId from transaction where status = 'Pending'");
@@ -202,6 +345,17 @@ sub pendingTransactions {
 }
 
 #-------------------------------------------------------------------
+
+=head2 status ( status )
+
+Returns the status of the transaction. If status is given the transaction status will be set to it.
+
+=head3 status
+
+The value to set the transaction status to.
+
+=cut
+
 sub status {
 	my ($self, $status);
 	$self = shift;
@@ -216,12 +370,30 @@ sub status {
 }
 
 #-------------------------------------------------------------------
+
+=head2 transactionId
+
+Returns the transactionId of the transaction.
+
+=cut
+
 sub transactionId {
 	my $self = shift;
 	return $self->{_transactionId};
 }
 
 #-------------------------------------------------------------------
+
+=head2 transactionsByUser ( userId )
+
+Returns a reference to an array containing transaction objects of all tranactions by the user corresponding to userId.
+
+=head3 userId
+
+The ID of the user you want the transaction of.
+
+=cut
+
 sub transactionsByUser {
 	my ($self, @transactionIds, @transactions, $userId);
 	my $self = shift;
