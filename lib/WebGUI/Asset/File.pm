@@ -64,14 +64,17 @@ sub definition {
                 className=>'WebGUI::Asset::File',
                 properties=>{
                                 filename=>{
+					noFormPost=>1,
                                         fieldType=>'hidden',
                                         defaultValue=>undef
                                         },
 				storageId=>{
+					noFormPost=>1,
 					fieldType=>'hidden',
 					defaultValue=>undef
 					},
 				olderVersions=>{
+					noFormPost=>1,
 					fieldType=>'hidden',
 					defaultValue=>undef
 					}

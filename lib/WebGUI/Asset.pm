@@ -373,6 +373,7 @@ sub definition {
                                         defaultValue=>undef
                                         },
 				assetSize=>{
+					noFormPost=>1,
 					fieldType=>'hidden',
 					defaultValue=>0
 					},
@@ -1837,6 +1838,7 @@ sub processPropertiesFromFormPost {
 	my %data;
 	foreach my $definition (@{$self->definition}) {
 		foreach my $property (keys %{$definition->{properties}}) {
+			next if ($definition->{properties}{$property}{noFormPost});
 			$data{$property} = WebGUI::FormProcessor::process(
 				$property,
 				$definition->{properties}{$property}{fieldType},
@@ -2229,7 +2231,7 @@ sub www_add {
 		startDate => $self->get("startDate"),
 		endDate => $self->get("endDate")
 		);
-	$properties{isHidden} = 1 unless (WebGUI::Utility::isIn(ref $session{form}{class}, @{$session{config}{assetContainers}}));
+	$properties{isHidden} = 1 unless (WebGUI::Utility::isIn($session{form}{class}, @{$session{config}{assetContainers}}));
 	my $newAsset = WebGUI::Asset->newByDynamicClass("new",$session{form}{class},\%properties);
 	$newAsset->{_parent} = $self;
 	return $newAsset->www_edit();

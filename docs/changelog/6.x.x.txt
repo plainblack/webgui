@@ -11,6 +11,7 @@
  - Fixed not being able to set display title and other yes no questions to no.
  - Fixed a bug where URLs would become unreachable when using SSL.
  - Fixed a password timeout bug caused by the change in the interval method.
+ - Fixed a bug where subscription groups where showing up in user manager.
  - Removed the depricated fileSize property from the File asset.
  - Fixed a user profile editing bug.
  - bugfix [ 1151462 ] missing slash in form URL
@@ -27,6 +28,9 @@
  - bugfix [ 1153518 ] re-edit forum post error
  - bugfix [ 1152819 ] Error when edit fild in Admin console -> user profiling
  - bugfix [ 1152047 ] Unable to create new account
+ - bugfix [ 1150173 ] Error message when logging out
+ - bugfix [ 1154247 ] Title and menuTitle set to 'untitled' if url is changed
+ - bugfix [ 1150982 ] Subscribe to forum thread causes error
 
 
 6.3.0

@@ -70,6 +70,7 @@ An array reference containing the list of group ids to add the first list to.
 =cut
 
 sub addGroupsToGroups {
+	delete $session{isInGroup};
 	foreach my $gid (@{$_[0]}) {
 		foreach my $toGid (@{$_[1]}) {
 			my ($isIn) = WebGUI::SQL->quickArray("select count(*) from groupGroupings 
@@ -104,6 +105,7 @@ An override for the default offset of the grouping. Specified in seconds.
 =cut
 
 sub addUsersToGroups {
+	delete $session{isInGroup};
         foreach my $gid (@{$_[1]}) {
 		my $expireOffset;
 		if ($_[2]) {
@@ -142,8 +144,10 @@ An array reference containing the list of group ids to delete from.
 =cut
 
 sub deleteGroupsFromGroups {
+	delete $session{isInGroup};
         foreach my $gid (@{$_[0]}) {
 		foreach my $fromGid (@{$_[1]}) {
+			WebGUI::Cache->new("groups_in_group_".$fromGid)->delete;
         		WebGUI::SQL->write("delete from groupGroupings where groupId=".quote($gid)." and inGroup=".quote($fromGid));
 		}
         }
@@ -167,6 +171,7 @@ An array reference containing a list of groups.
 =cut
 
 sub deleteUsersFromGroups {
+	delete $session{isInGroup};
         foreach my $gid (@{$_[1]}) {
 		foreach my $uid (@{$_[0]}) {
                 	WebGUI::SQL->write("delete from groupings where groupId=".quote($gid)." and userId=".quote($uid));

@@ -67,6 +67,7 @@ sub definition {
 				defaultValue=>'PBtmpl0000000000000054'
 				},
 			contentPositions => {
+				noFormPost=>1,
 				defaultValue=>undef,
 				fieldType=>"hidden"
 				}

@@ -75,10 +75,12 @@ sub definition {
                 className=>'WebGUI::Asset::Post::Thread',
                 properties=>{
 			subscriptionGroupId => {
+				noFormPost=>1,
 				fieldType=>"hidden",
 				defaultValue=>undef
 				},
 			replies => {
+				noFormPost=>1,
 				fieldType=>"hidden",
 				defaultValue=>undef
 				},
@@ -91,10 +93,12 @@ sub definition {
 				defaultValue=>0
 				},
 			lastPostId => {
+				noFormPost=>1,
 				fieldType=>"hidden",
 				defaultValue=>undef
 				},
 			lastPostDate => {
+				noFormPost=>1,
 				fieldType=>"hidden",
 				defaultValue=>undef
 				}
@@ -406,6 +410,16 @@ sub lock {
 
 
 #-------------------------------------------------------------------
+sub processPropertiesFromFormPost {
+	my $self = shift;
+	$self->SUPER::processPropertiesFromFormPost;	
+	if ($self->get("subscriptionGroupId") eq "") {
+		$self->createSubscriptionGroup;
+	}
+}
+
+
+#-------------------------------------------------------------------
 
 =head2 rate ( rating )
 
@@ -486,9 +500,7 @@ Subscribes the user to this thread.
 
 sub subscribe {
 	my $self = shift;
-	unless ($self->isSubscribed) {
-                WebGUI::Grouping::addUsersToGroups([$session{user}{userId}],[$self->get("subscriptionGroupId")]);
-        }
+        WebGUI::Grouping::addUsersToGroups([$session{user}{userId}],[$self->get("subscriptionGroupId")]);
 }
 
 #-------------------------------------------------------------------
@@ -527,9 +539,7 @@ Negates the subscribe method.
 
 sub unsubscribe {
 	my $self = shift;
-	if ($self->isSubscribed) {
-                WebGUI::Grouping::deleteUsersFromGroups([$session{user}{userId}],[$self->get("subscriptionGroupId")]);
-        }
+        WebGUI::Grouping::deleteUsersFromGroups([$session{user}{userId}],[$self->get("subscriptionGroupId")]);
 }
 
 

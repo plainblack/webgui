@@ -29,6 +29,7 @@ sub definition {
                 className=>'WebGUI::Asset::Shortcut',
                 properties=>{
                         shortcutToAssetId=>{
+				noFormPost=>1,
 				fieldType=>"hidden",
 				defaultValue=>undef
 				},

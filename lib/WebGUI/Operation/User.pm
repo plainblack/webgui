@@ -338,7 +338,7 @@ sub www_editUser {
 	$tabform->getTab("groups")->selectList(
 		-name=>"groupsToDelete",
 		-options=>WebGUI::SQL->buildHashRef("select groupId, groupName from groups 
-			where groupId in (".quoteAndJoin(\@include).") order by groupName"),
+			where groupId in (".quoteAndJoin(\@include).") and showInForms=1 order by groupName"),
 		-label=>"GROUPS TO DELETE",
 		-multiple=>1,
 		-size=>15,

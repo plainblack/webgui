@@ -13,6 +13,7 @@ package WebGUI::Asset::Wobject::Collaboration;
 use strict;
 use Tie::CPHash;
 use WebGUI::DateTime;
+use WebGUI::Group;
 use WebGUI::Grouping;
 use WebGUI::HTML;
 use WebGUI::HTTP;
@@ -255,30 +256,37 @@ sub definition {
 				defaultValue=>31536000
 				},
 			subscriptionGroupId =>{
+				noFormPost=>1,
 				fieldType=>"hidden",
 				defaultValue=>undef
 				},
 			lastPostDate =>{
+				noFormPost=>1,
 				fieldType=>"hidden",
 				defaultValue=>undef
 				},
 			lastPostId =>{
+				noFormPost=>1,
 				fieldType=>"hidden",
 				defaultValue=>undef
 				},
 			rating =>{
+				noFormPost=>1,
 				fieldType=>"hidden",
 				defaultValue=>undef
 				},
 			replies =>{
+				noFormPost=>1,
 				fieldType=>"hidden",
 				defaultValue=>undef
 				},
 			views =>{
+				noFormPost=>1,
 				fieldType=>"hidden",
 				defaultValue=>undef
 				},
 			threads =>{
+				noFormPost=>1,
 				fieldType=>"hidden",
 				defaultValue=>undef
 				},
@@ -681,7 +689,7 @@ sub isSubscribed {
 sub processPropertiesFromFormPost {
 	my $self = shift;
 	$self->SUPER::processPropertiesFromFormPost;
-	if ($session{form}{func} eq "add") {
+	if ($self->get("subscriptionGroupId") eq "") {
 		$self->createSubscriptionGroup;
 	}
 }
@@ -749,9 +757,7 @@ Subscribes a user to this collaboration system.
 
 sub subscribe {
 	my $self = shift;
-	unless ($self->isSubscribed) {
-		WebGUI::Grouping::addUsersToGroups([$session{user}{userId}],[$self->get("subscriptionGroupId")]);
-        }
+	WebGUI::Grouping::addUsersToGroups([$session{user}{userId}],[$self->get("subscriptionGroupId")]);
 }
 
 #-------------------------------------------------------------------
@@ -764,9 +770,7 @@ Unsubscribes a user from this collaboration system
 
 sub unsubscribe {
 	my $self = shift;
-	if ($self->isSubscribed) {
-		WebGUI::Grouping::deleteUsersFromGroups([$session{user}{userId}],[$self->get("subscriptionGroupId")]);
-        }
+	WebGUI::Grouping::deleteUsersFromGroups([$session{user}{userId}],[$self->get("subscriptionGroupId")]);
 }
 
 

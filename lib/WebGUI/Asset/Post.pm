@@ -89,14 +89,17 @@ sub definition {
                 className=>'WebGUI::Asset::Post',
                 properties=>{
 			storageId => {
+				noFormPost=>1,
 				fieldType=>"hidden",
 				defaultValue=>undef
 				},
 			threadId => {
+				noFormPost=>1,
 				fieldType=>"hidden",
 				defaultValue=>undef
 				},
 			dateSubmitted => {
+				noFormPost=>1,
 				fieldType=>"hidden",
 				defaultValue=>undef
 				},
@@ -105,18 +108,22 @@ sub definition {
 				defaultValue=>time()
 				},
 			username => {
+				noFormPost=>1,
 				fieldType=>"hidden",
 				defaultValue=>$session{user}{alias} || $session{user}{username}
 				},
 			status => {
+				noFormPost=>1,
 				fieldType=>"hidden",
 				defaultValue=>undef
 				},
 			rating => {
+				noFormPost=>1,
 				fieldType=>"hidden",
 				defaultValue=>undef
 				},
 			views => {
+				noFormPost=>1,
 				fieldType=>"hidden",
 				defaultValue=>undef
 				},
