@@ -12,6 +12,7 @@ package WebGUI::Operation::Help;
 
 use strict;
 use Tie::IxHash;
+use WebGUI::AdminConsole;
 use WebGUI::International;
 use WebGUI::Macro;
 use WebGUI::Session;
@@ -31,7 +32,7 @@ sub _get {
 
 #-------------------------------------------------------------------
 sub _link {
-	return '<a href="'.WebGUI::URL::page('op=viewHelp&hid='.WebGUI::URL::escape($_[0]).'&namespace='.$_[1]).'">'.$_[2].'</a>';
+	return WebGUI::URL::page('op=viewHelp&hid='.WebGUI::URL::escape($_[0]).'&namespace='.$_[1]);
 }
 
 #-------------------------------------------------------------------
@@ -39,28 +40,31 @@ sub _seeAlso {
 	my $related = shift;
 	my $namespace = shift;
 	my $output;
-	foreach my $row (@{$related}) {
-		my $help = _get($row->{tag},$row->{namespace});
-		$output .= '<li>'._link($row->{tag},$row->{namespace},WebGUI::International::get($help->{title},$row->{namespace}));
-	}
 	return $output;
 }
 
 
 #-------------------------------------------------------------------
 sub www_viewHelp {
+	return WebGUI::Privilege::insufficient() unless (WebGUI::Grouping::isInGroup(12));
+	my $ac = WebGUI::AdminConsole->new;
+	$ac->setAdminFunction("help");
 	my $namespace = $session{form}{namespace} || "WebGUI";
 	my $help = _get($session{form}{hid},$namespace);
-    my $output = '<h1>'.WebGUI::International::get(93).': '.WebGUI::International::get($help->{title},$namespace).'</h1>';
-	$output .= WebGUI::International::get($help->{body},$namespace);
-	$output .= '<p><b>'.WebGUI::International::get(94).':<ul>';
-	$output .= _seeAlso($help->{related},$namespace);
-    $output .= '<li><a href="'.WebGUI::URL::page('op=viewHelpIndex').'">'.WebGUI::International::get(95).'</a></ul></b>';
-    return WebGUI::Macro::negate($output);
+    	$ac->addSubmenuItem(WebGUI::URL::page('op=viewHelpIndex'),WebGUI::International::get(95));
+	foreach my $row (@{$help->{related}}) {
+		my $relatedHelp = _get($row->{tag},$row->{namespace});
+		$ac->addSubmenuItem(_link($row->{tag},$row->{namespace}),WebGUI::International::get($relatedHelp->{title},$row->{namespace}));
+	}
+    	return $ac->render(
+		WebGUI::Macro::negate(WebGUI::International::get($help->{body},$namespace)), 
+		WebGUI::International::get(93).': '.WebGUI::International::get($help->{title},$namespace)
+		);
 }
 
 #-------------------------------------------------------------------
 sub www_viewHelpIndex {
+	return WebGUI::Privilege::insufficient() unless (WebGUI::Grouping::isInGroup(12));
 	my %helpIndex;
 	tie %helpIndex, "Tie::IxHash";
 	my $i;
@@ -86,25 +90,23 @@ sub www_viewHelpIndex {
                         }
                 }
         }
-	my $output = '<h1>Help Index</h1><table width="100%" class="content"><tr><td valign="top">';
+	my $output = '<table width="100%" class="content"><tr><td valign="top">';
 	my $halfway = round($i/2);
 	$i = 0;
 	%helpIndex = sortHash(%helpIndex);
 	foreach my $key (keys %helpIndex) {
 		my ($id,$namespace) = split("_",$key);
 		my $help = _get($id,$namespace);
-		$output .= _link($id,$namespace,$helpIndex{$key});
-		$output .= '<ul style="padding-left: 20px; margin: 2px; font-size: smaller;">';
-		$output .= _seeAlso($help->{related},$namespace);
-		$output .= '</ul>';
-		$output .= "<br>";
+		$output .= '<p><a href="'._link($id,$namespace).'">'.$helpIndex{$key}.'</a></p>';
 		$i++;
 		if ($i == $halfway) {
 			$output .= '</td><td valign="top">';
 		}	
 	}
 	$output .= '</td></tr></table>';
-	return $output;
+	my $ac = WebGUI::AdminConsole->new;
+	$ac->setAdminFunction("help");
+	return $ac->render($output);
 }
 
 1;

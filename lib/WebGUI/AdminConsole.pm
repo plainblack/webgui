@@ -88,7 +88,7 @@ sub getAdminFunction {
 		},
 		"groups"=>{
 			title=>{
-				id=>"groups",
+				id=>"89",
 				namespace=>"WebGUI"
 			},
 			icon=>"groups.gif",
@@ -138,7 +138,7 @@ sub getAdminFunction {
 			},
 			icon=>"help.gif",
 			op=>"viewHelpIndex",
-			group=>"7"
+			group=>"12"
 		},
 		"statistics"=>{
 			title=>{

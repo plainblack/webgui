@@ -138,6 +138,17 @@ sub www_editMiscSettings {
 		-value=>$session{setting}{adminStyleId},
 		-label=>WebGUI::International::get(1081)
 		);
+	 $f->yesNo(
+                -name=>"metaDataEnabled",
+                -label=>WebGUI::International::get("Enable Metadata ?", 'MetaData'),
+                -value=>$session{setting}{metaDataEnabled},
+        );
+        $f->yesNo(
+                -name=>"passiveProfilingEnabled",
+                -label=>WebGUI::International::get("Enable passive profiling ?", 'MetaData'),
+                -value=>$session{setting}{passiveProfilingEnabled},
+                -extras=>' onChange="alert(\''.WebGUI::International::get("Illegal Warning","MetaData").'\')" '
+        );
 	$f->submit;
 	$output .= $f->print;
         return _submenu($output);

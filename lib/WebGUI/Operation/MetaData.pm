@@ -11,13 +11,12 @@ package WebGUI::Operation::MetaData;
 #-------------------------------------------------------------------
 
 use strict;
-use Tie::IxHash;
+use WebGUI::AdminConsole;
 use WebGUI::Icon;
 use WebGUI::Id;
 use WebGUI::International;
 use WebGUI::Macro;
 use WebGUI::MetaData;
-use WebGUI::Operation::Shared;
 use WebGUI::Privilege;
 use WebGUI::Session;
 use WebGUI::SQL;
@@ -26,24 +25,20 @@ use WebGUI::Utility;
 
 #-------------------------------------------------------------------
 sub _submenu {
-        my (%menu);
-        tie %menu, 'Tie::IxHash';
-	$menu{WebGUI::URL::page('op=manageSettings')} = WebGUI::International::get(4);
+        my $workarea = shift;
+        my $title = shift;
+        $title = WebGUI::International::get($title,"MetaData") if ($title);
+        my $help = shift;
+        my $ac = WebGUI::AdminConsole->new;
+        if ($help) {
+                $ac->setHelp($help,"MetaData");
+        }
+        $ac->setAdminFunction("contentProfiling");
 	if($session{form}{op} ne "manageMetaData") {
-		$menu{WebGUI::URL::page('op=manageMetaData')} = WebGUI::International::get('Manage Metadata','MetaData');
+		$ac->addSubmenuItem(WebGUI::URL::page('op=manageMetaData'), WebGUI::International::get('content profiling','MetaData'));
 	}
-        $menu{WebGUI::URL::page('op=editMetaDataField')} = WebGUI::International::get('Add new field','MetaData');
-        return menuWrapper($_[0],\%menu);
-}
-
-#-------------------------------------------------------------------
-sub www_saveMetaDataSettings {
-	return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
-	WebGUI::SQL->write("update settings set value=".quote($session{form}{metaDataEnabled})." where name='metaDataEnabled'");
-	WebGUI::SQL->write("update settings set value=".quote($session{form}{passiveProfilingEnabled})." where name='passiveProfilingEnabled'");
-	$session{setting}{metaDataEnabled} = $session{form}{metaDataEnabled};
-	$session{setting}{passiveProfilingEnabled} = $session{form}{passiveProfilingEnabled};
-	return www_manageMetaData();
+        $ac->addSubmenuItem(WebGUI::URL::page('op=editMetaDataField'), WebGUI::International::get('Add new field','MetaData'));
+        return $ac->render($workarea, $title);
 }
 
 #-------------------------------------------------------------------
@@ -52,8 +47,6 @@ sub www_editMetaDataField {
         return WebGUI::Privilege::vitalComponent() if ($session{form}{fid} < 1000 && $session{form}{fid} > 0);
 
         my ($output, $fieldName, $defaultValue, $description, $fieldInfo);
-        $output = helpIcon('metadata edit property');
-        $output .= '<h1>'.WebGUI::International::get('Edit Metadata','MetaData').'</h1>';
 	
 	if($session{form}{fid} && $session{form}{fid} ne "new") {
 		$fieldInfo = WebGUI::MetaData::getField($session{form}{fid});
@@ -78,10 +71,9 @@ sub www_editMetaDataField {
 		-types=>WebGUI::MetaData::getFieldTypes()
                 );
 	$f->textarea("possibleValues",WebGUI::International::get(487),$fieldInfo->{possibleValues});
-        #$f->text("defaultValue", "Default value", $defaultValue);
         $f->submit();
         $output .= $f->print;
-	return _submenu($output);	
+	return _submenu($output,'Edit Metadata',"metadata edit property");
 }
 
 #-------------------------------------------------------------------
@@ -130,17 +122,13 @@ sub www_deleteMetaDataField {
         return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
         return WebGUI::Privilege::vitalComponent() if ($session{form}{fid} < 1000 && $session{form}{fid} > 0);
 
-	#TODO HELP
-        my $output = helpIcon("theme delete");
-        $output .= '<h1>'.WebGUI::International::get('Delete Metadata field','MetaData').'</h1>';
-        $output .= WebGUI::International::get('deleteConfirm','MetaData').'<p>';
+        my $output = WebGUI::International::get('deleteConfirm','MetaData').'<p>';
         $output .= '<div align="center"><a href="'.
                 WebGUI::URL::page('op=deleteMetaDataFieldConfirm&fid='.$session{form}{fid})
                 .'">'.WebGUI::International::get(44).'</a>';
         $output .= '&nbsp;&nbsp;&nbsp;&nbsp;<a href="'.WebGUI::URL::page('op=manageMetaData').
                 '">'.WebGUI::International::get(45).'</a></div>';
-        return _submenu($output);
-
+        return _submenu($output,'Delete Metadata field');
 }
 
 #-------------------------------------------------------------------
@@ -157,25 +145,6 @@ sub www_deleteMetaDataFieldConfirm {
 sub www_manageMetaData {
         return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
 	my $output;
-        $output = helpIcon('metadata manage');
-        $output .= '<h1>'.WebGUI::International::get('Manage Metadata','MetaData').'</h1>';
-	my $f = new WebGUI::HTMLForm;
-	$f->hidden("op","saveMetaDataSettings");
-	$f->yesNo(
-        	-name=>"metaDataEnabled",
-	        -label=>WebGUI::International::get("Enable Metadata ?", 'MetaData'),
-		-value=>$session{setting}{metaDataEnabled},
-        );
-	$f->yesNo(
-		-name=>"passiveProfilingEnabled",
-                -label=>WebGUI::International::get("Enable passive profiling ?", 'MetaData'),
-                -value=>$session{setting}{passiveProfilingEnabled},
-		-extras=>' onChange="alert(\''.WebGUI::International::get("Illegal Warning","MetaData").'\')" '
-        );
-
-	$f->submit();
-	$output .= $f->print;
-	$output .= "<h1>".WebGUI::International::get('Manage Metadata fields','MetaData')."</h1>";
 	my $fields = WebGUI::MetaData::getMetaDataFields();
 	foreach my $fieldId (keys %{$fields}) {
 		$output .= deleteIcon("op=deleteMetaDataField&fid=".$fieldId);
@@ -185,7 +154,7 @@ sub www_manageMetaData {
 	$output .= '<p><a href="'.WebGUI::URL::page("op=editMetaDataField&fid=new").'">'.
 			WebGUI::International::get('Add new field','MetaData').
 			'</a></p>';
-        return _submenu($output);
+        return _submenu($output,undef,"metadata manage");
 }
 
 

@@ -13,7 +13,7 @@
 	position: absolute;
 	top: 0px;
 	left: 102px;
-	font-size: 60px;
+	font-size: 50px;
 	text-align: left;
 }
 
@@ -30,6 +30,8 @@
 	width: 180px;
 /* 	border: 1px solid #ddd; 
 	padding: 5px; */
+	font-family: helvetica, arial;
+	font-size: 12px;
 }
 
 .adminConsoleMainMenu {

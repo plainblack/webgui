@@ -1708,72 +1708,6 @@ As with any delete operation, you are prompted to be sure you wish to proceed wi
 		lastUpdated => 1050191766
 	},
 
-	'Metadata, Manage' => {
-		message => q|Metadata, Manage|,
-		lastUpdated => 1089039511
-	},
-
-	'metadata manage body' => {
-		message => q|
-<p>The metadata system in WebGUI allows you to identify content. Metadata is
-information about the content, and is defined in terms of property-value pairs.</p>
-<p>Examples of metadata:</p>
-<ul>
-  <li>contenttype: sport</li>
-  <li>adult content: no</li>
-  <li>source: newspaper</li>
-</ul>
-<p>In the example <b>source: newspaper</b> is <i>source</i> the <i>property</i>
-and <i>newspaper</i> the <i>value</i>.</p>
-<p>Metadata properties are defined globally, while Metadata values are set for
-each wobject under the tab &quot;Metadata&quot; in the wobject properties.</p>
-<p>Before you can use metadata, you'll have to switch the &quot;Enable Metadata
-?&quot; setting to Yes.</p>
-<p>Usage of metadata:</p>
-<ul>
-  <li><b>Passive Profiling</b><br>
-    When passive profiling is switched on, every wobject viewed by a user will
-    be logged.&nbsp;<br>
-    The WebGUI scheduler summarizes the profiling information on a regular
-    basis.&nbsp;<br>
-    The metadata is used to generate the summary. This is basically content
-    ranking based upon the user's Areas of Interest (AOI).<br>
-    By default the summarizer runs once a day. However you can change that by
-    setting: <b>passiveProfileInterval = &lt;number of seconds&gt; </b>in the
-    WebGUI config file. <br>
-  </li>
-</ul>
-<ul>
-  <li><b>Areas of Interest Ranking<br>
-    </b>Metadata in combination with passive profiling produces AOI (Areas of
-    Interest) information. You can retrieve the value of a metadata property
-    with the ^AOIRank macro:<br>
-    <br>
-    ^AOIRank(contenttype); <br>
-    This would return the highest ranked contenttype for this user, such as
-    &quot;sport&quot;.<br>
-    <br>
-    ^AOIRank(contenttype,2);<br>
-    This would return the second highest ranked contenttype for this user.<br>
-    <br>
-    You can also retrieve the number of hits a particular AOI has gotten:<br>
-    <br>
-    ^AOIHits(contenttype,sport); <br>
-    This would return 99 is this user has looked at content that was tagged
-    &quot;contenttype = sport&quot; 99 times. </li>
-</ul>
-<ul>
-  <li><b>Show content based upon criteria<br>
-    </b>The Wobject Proxy allows you to select content based upon criteria like:<br>
-    contenttype = sport AND source != newspaper<br>
-    <br>
-    You can use the AOI macro's described above in the criteria, so you can
-    present content based upon the users Areas of Interest. Example:<br>
-    type = ^AOIRank(contenttype);</li>
-</ul>|,
-		lastUpdated => 1089039511
-	},
-
 	'678' => {
 		message => q|Root, Manage|,
 		lastUpdated => 1031514049
@@ -1943,11 +1877,6 @@ Just as the LDAP Identity Name is a label, so is the LDAP Password Name. Use thi
 		lastUpdated => 1031514049
 	},
 
-	'94' => {
-		message => q|See also|,
-		lastUpdated => 1031514049
-	},
-
 	'816' => {
 		message => q|Status|,
 		lastUpdated => 1038431169
@@ -1956,11 +1885,6 @@ Just as the LDAP Identity Name is a label, so is the LDAP Password Name. Use thi
 	'51' => {
 		message => q|Password|,
 		lastUpdated => 1031514049
-	},
-
-	'Metadata, Edit property' => {
-		message => q|Metadata, Edit property|,
-		lastUpdated => 1089039511
 	},
 
 	'456' => {
@@ -3815,7 +3739,8 @@ You also cannot import a theme from a version of WebGUI that is newer than the o
 
 	'89' => {
 		message => q|Groups|,
-		lastUpdated => 1031514049
+		lastUpdated => 1031514049,
+                context => q|Title of the group manager for the admin console.|
 	},
 
 	'175' => {
@@ -7226,27 +7151,6 @@ A randomly generated number. This is often used on images (such as banner ads) t
 		lastUpdated => 1031514049
 	},
 
-	'metadata edit property body' => {
-		message => q|
-You may add as many Metadata properties as you like.<br>
-<br>
-<b>Field Name</b><br>
-The name of this metadata propertie.It must be unique. <br>
-It is advisable to use only letters (a-z), numbers (0-9) or underscores (_) for
-the field names.
-<p><b>Description<br>
-</b>An optional description for this metadata property. This text is displayed
-as mouseover text in the wobject properties tab.</p>
-<p><b>Data Type<br>
-</b>Choose the type of form element for this field.<b><br>
-<br>
-Possible Values<br>
-</b>This field is used for the list types (Radio List and Select List). Enter
-the values you wish to appear, one per line.</p>
-|,
-		lastUpdated => 1089039511
-	},
-
 	'4' => {
 		message => q|Manage settings.|,
 		lastUpdated => 1031514049
@@ -7271,67 +7175,7 @@ the values you wish to appear, one per line.</p>
 		message => q|Scratch Filter|,
 		lastUpdated => 1052560369
 	},
-	'metadata manage body' => {
-		message => q|
-<p>The metadata system in WebGUI allows you to identify content. Metadata is
-information about the content, and is defined in terms of property-value pairs.</p>
-<p>Examples of metadata:</p>
-<ul>
-  <li>contenttype: sport</li>
-  <li>adult content: no</li>
-  <li>source: newspaper</li>
-</ul>
-<p>In the example <b>source: newspaper</b> is <i>source</i> the <i>property</i>
-and <i>newspaper</i> the <i>value</i>.</p>
-<p>Metadata properties are defined globally, while Metadata values are set for
-each wobject under the tab &quot;Metadata&quot; in the wobject properties.</p>
-<p>Before you can use metadata, you'll have to switch the &quot;Enable Metadata
-?&quot; setting to Yes.</p>
-<p>Usage of metadata:</p>
-<ul>
-  <li><b>Passive Profiling</b><br>
-    When passive profiling is switched on, every wobject viewed by a user will
-    be logged.&nbsp;<br>
-    The WebGUI scheduler summarizes the profiling information on a regular
-    basis.&nbsp;<br>
-    The metadata is used to generate the summary. This is basically content
-    ranking based upon the user's Areas of Interest (AOI).<br>
-    By default the summarizer runs once a day. However you can change that by
-    setting: <b>passiveProfileInterval = &lt;number of seconds&gt; </b>in the
-    WebGUI config file. <br>
-  </li>
-</ul>
-<ul>
-  <li><b>Areas of Interest Ranking<br>
-    </b>Metadata in combination with passive profiling produces AOI (Areas of
-    Interest) information. You can retrieve the value of a metadata property
-    with the ^AOIRank macro:<br>
-    <br>
-    ^AOIRank(contenttype); <br>
-    This would return the highest ranked contenttype for this user, such as
-    &quot;sport&quot;.<br>
-    <br>
-    ^AOIRank(contenttype,2);<br>
-    This would return the second highest ranked contenttype for this user.<br>
-    <br>
-    You can also retrieve the number of hits a particular AOI has gotten:<br>
-    <br>
-    ^AOIHits(contenttype,sport); <br>
-    This would return 99 is this user has looked at content that was tagged
-    &quot;contenttype = sport&quot; 99 times. </li>
-</ul>
-<ul>
-  <li><b>Show content based upon criteria<br>
-    </b>The Wobject Proxy allows you to select content based upon criteria like:<br>
-    contenttype = sport AND source != newspaper<br>
-    <br>
-    You can use the AOI macro's described above in the criteria, so you can
-    present content based upon the users Areas of Interest. Example:<br>
-    type = ^AOIRank(contenttype);</li>
-</ul>|,
-                lastUpdated => 1089039511,
-                context => q|Metadata help|
-        },
+
         'Export Page' => {
                 message => q|Export Page|,
                 lastUpdated => 1089039511,
@@ -7468,12 +7312,6 @@ config file.</p>
 		message => q|Databases|,
 		lastUpdated =>1092930637,
                 context => q|Title of the database manager for the admin console.|
-        },
-	
-	'groups' => {
-		message => q|Groups|,
-		lastUpdated =>1092930637,
-                context => q|Title of the group manager for the admin console.|
         },
 	
 	'packages' => {
