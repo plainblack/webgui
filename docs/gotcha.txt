@@ -7,6 +7,13 @@ upgrading from one version to the next, or even between multiple
 versions. Be sure to heed the warnings contained herein as they will
 save you many hours of grief.
 
+5.5.0
+--------------------------------------------------------------------
+ * If you have any custom Message Board templates they will be
+	destroyed as they no longer apply to the new discussion
+	system. If you want to save them, please copy them to a
+	safe location prior to the upgrade.
+
 
 5.4.1
 --------------------------------------------------------------------

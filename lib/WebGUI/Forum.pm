@@ -44,8 +44,13 @@ sub isModerator {
 }
 
 sub incrementReplies {
-        my ($self) = @_;
-        WebGUI::SQL->write("update forum set replies=replies+1 where forumId=".$self->get("forumId"));
+        my ($self, $lastPostDate, $lastPostId) = @_;
+        WebGUI::SQL->write("update forum set replies=replies+1, lastPostId=$lastPostId, lastPostDate=$lastPostDate where forumId=".$self->get("forumId"));
+}
+                                                                                                                                                             
+sub incrementThreads {
+        my ($self, $lastPostDate, $lastPostId) = @_;
+        WebGUI::SQL->write("update forum set threads=threads+1, lastPostId=$lastPostId, lastPostDate=$lastPostDate where forumId=".$self->get("forumId"));
 }
                                                                                                                                                              
 sub incrementViews {
@@ -61,9 +66,9 @@ sub isSubscribed {
 }
 
 sub new {
-	my ($self, $forumId) = @_;
+	my ($class, $forumId) = @_;
 	my $properties = WebGUI::SQL->getRow("forum","forumId",$forumId);
-	bless {_properties=>$properties}, $self;
+	bless {_properties=>$properties}, $class;
 }
 
 sub purge {

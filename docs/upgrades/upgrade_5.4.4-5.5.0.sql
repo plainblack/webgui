@@ -186,5 +186,27 @@ update international set internationalId=1030, namespace='WebGUI' where internat
 delete from international where namespace='Article' and internationalId=27;
 delete from international where namespace='USS' and internationalId=28;
 delete from international where namespace='USS' and internationalId=45;
+create table MessageBoard_forums (wobjectId int, forumId int);
+alter table forum add column threads int not null default 0;
+alter table forum add column lastPostId int not null default 0;
+alter table forum add column lastPostDate int not null default 0;
+alter table MessageBoard_forums add column title varchar(255);
+alter table MessageBoard_forums add column description text;
+alter table forum add column forumTemplateId int not null default 1;
+alter table forum add column threadTemplateId int not null default 1;
+alter table forum add column postTemplateId int not null default 1;
+alter table forum add column postformTemplateId int not null default 1;
+alter table forum add column notificationTemplateId int not null default 1;
+insert into international (internationalId,languageId,namespace,message,lastUpdated,context) values (1035,1,'WebGUI','Notification Template', 1066034661,'Tell the admin to select a template for the notification messages that come from this forum.');
+insert into international (internationalId,languageId,namespace,message,lastUpdated,context) values (1034,1,'WebGUI','Post Form Template', 1066034620,'Tell the admin to select a template for post forms in this forum.');
+insert into international (internationalId,languageId,namespace,message,lastUpdated,context) values (1033,1,'WebGUI','Post Template', 1066034603,'Tell the admin to select a template for posts in this forum.');
+insert into international (internationalId,languageId,namespace,message,lastUpdated,context) values (1032,1,'WebGUI','Thread Template', 1066034586,'Tell the admin to select a template for threads in this forum.');
+insert into international (internationalId,languageId,namespace,message,lastUpdated,context) values (1031,1,'WebGUI','Forum Template', 1066034528,'Tell the admin to select a template for this forum.');
+insert into international (internationalId,languageId,namespace,message,lastUpdated,context) values (75,1,'MessageBoard','Add a forum.', 1066038194,'A label for a link that allows an admin to add a forum to a message board.');
+insert into international (internationalId,languageId,namespace,message,lastUpdated,context) values (1036,1,'WebGUI','Threads', 1066038155,'A label indicating how many threads there are in a particular forum.');
+delete from template where namespace='MessageBoard';
+alter table MessageBoard_forums add column sequenceNumber int not null default 1;
+
+
 
 

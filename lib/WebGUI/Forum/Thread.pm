@@ -21,6 +21,7 @@ sub create {
 		lastPostDate=>$post->get("dateOfPost")
 		});
 	$self->{_post}{$post->get("forumPostId")} = $post;
+	$self->getForum->incrementThreads($post->get("dateOfPost"),$post->get("forumPostId"));
 	return $self;
 }
 
@@ -75,7 +76,7 @@ sub incrementReplies {
         my ($self, $dateOfReply, $replyId) = @_;
         WebGUI::SQL->write("update forumThread set replies=replies+1, lastPostId=$replyId, lastPostDate=$dateOfReply 
 		where forumThreadId=".$self->get("forumThreadId"));
-	$self->getForum->incrementReplies;
+	$self->getForum->incrementReplies($dateOfReply,$replyId);
 }
 
 sub incrementViews {
