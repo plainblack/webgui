@@ -295,14 +295,14 @@ sub build {
 				}
 				$pageData->{"page.isRoot"} = (! $page->{'parentId'});
 				$pageData->{"page.isTop"} = ($pageData->{"page.absDepth"} == 2);
-				$pageData->{"page.hasDaughter"} = ($page->{'rgt'} - $page->{'lft'} > 1);
+				$pageData->{"page.hasDaughter"} = ($page->{'nestedSetRight'} - $page->{'nestedSetLeft'} > 1);
 				$pageData->{"page.isMyDaughter"} = ($page->{'parentId'} == 
 									$currentPage->get('pageId'));
 				$pageData->{"page.isMyMother"} = ($page->{'pageId'} ==
 									$currentPage->get('parentId'));
 				$pageData->{"page.inCurrentRoot"} = 
-					(($page->{'lft'} > $currentPage->get('lft')) && ($page->{'rgt'} < $currentPage->get('rgt'))) ||
-					(($page->{'lft'} < $currentPage->get('lft')) && ($page->{'rgt'} > $currentPage->get('rgt')));
+					(($page->{'nestedSetLeft'} > $currentPage->get('nestedSetLeft')) && ($page->{'nestedSetRight'} < $currentPage->get('nestedSetRight'))) ||
+					(($page->{'nestedSetLeft'} < $currentPage->get('nestedSetLeft')) && ($page->{'nestedSetRight'} > $currentPage->get('nestedSetRight')));
 
                                 # Anchestor info
                                 foreach my $ancestor ($currentPage->ancestors) {
@@ -317,8 +317,8 @@ sub build {
 					}
 				}
 				
-				$pageData->{"page.isLeftMost"} = (($page->{'lft'} - 1) == $mother->get('lft'));
-				$pageData->{"page.isRightMost"} = (($page->{'rgt'} + 1) == $mother->get('rgt'));
+				$pageData->{"page.isLeftMost"} = (($page->{'nestedSetLeft'} - 1) == $mother->get('nestedSetLeft'));
+				$pageData->{"page.isRightMost"} = (($page->{'nestedSetRight'} + 1) == $mother->get('nestedSetRight'));
 				my $depthDiff = ($lastPage) ? ($lastPage->{'page.absDepth'} - $pageData->{'page.absDepth'}) : 0;
 				if ($depthDiff > 0) {
 					$pageData->{"page.depthDiff"} = $depthDiff if ($depthDiff > 0);

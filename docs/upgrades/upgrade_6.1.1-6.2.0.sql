@@ -255,6 +255,6 @@ alter table users change referringAffiliate referringAffiliate char(22) not null
 
 delete from incrementer where incrementerId in ("databaseLinkId", "DataForm_entryId", "DataForm_fieldId", "DataForm_tabId", "EventsCalendar_eventId", "EventsCalendar_recurringId", "FileManager_fileId", "forumId", "forumPostId", "forumThreadId", "groupId", "languageId", "Product_benefitId", "Product_featureId", "Product_specificationId", "replacementId", "Survey_answerId", "Survey_id", "Survey_questionId", "Survey_responseId", "USS_id", "USS_submissionId", "wobjectId");
 
-
-
+alter table page change lft nestedSetLeft int(11);
+alter table page change rgt nestedSetRight int(11);
 

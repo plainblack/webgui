@@ -237,7 +237,7 @@ sub canMoveLeft {
 	$self = shift;
 	$mother = $self->getMother;
 
-	return (($self->get('lft') - $mother->get('lft')) > 1);
+	return (($self->get('nestedSetLeft') - $mother->get('nestedSetLeft')) > 1);
 }
 
 #-------------------------------------------------------------------
@@ -254,7 +254,7 @@ sub canMoveRight {
 	$self = shift;
 	$mother = $self->getMother;
 
-	return (($mother->get('rgt') - $self->get('rgt')) > 1);
+	return (($mother->get('nestedSetRight') - $self->get('nestedSetRight')) > 1);
 }
 
 #-------------------------------------------------------------------
@@ -584,7 +584,7 @@ sub generation {
 		     page as b 
 		where a.depth = b.depth and 
 		      b.pageId = ".$self->get('pageId').
-		" order by lft");
+		" order by nestedSetLeft");
 
 	while (%row = $sth->hash) {
 		push(@result, {(%row)});
@@ -723,7 +723,7 @@ sub getLeftSister {
 		$self = WebGUI::Page->new($pageId || $session{page}{pageId});
 	}
 
-	($leftSisterId) = WebGUI::SQL->quickArray("select pageId from page where rgt=".($self->get('lft') - 1));
+	($leftSisterId) = WebGUI::SQL->quickArray("select pageId from page where nestedSetRight=".($self->get('nestedSetLeft') - 1));
 	return undef unless($leftSisterId);
 	
 	return WebGUI::Page->new($leftSisterId);
@@ -812,7 +812,7 @@ sub getRightSister {
 		$self = WebGUI::Page->new($pageId || $session{page}{pageId});
 	}
 
-	($rightSisterId) = WebGUI::SQL->quickArray("select pageId from page where lft=".($self->get('rgt') + 1));
+	($rightSisterId) = WebGUI::SQL->quickArray("select pageId from page where nestedSetLeft=".($self->get('nestedSetRight') + 1));
 	return undef unless(defined $rightSisterId);
 
 	return WebGUI::Page->new($rightSisterId);
@@ -960,7 +960,7 @@ Returns true if the page has one or more daughters
 sub hasDaughter {
 	my ($self) = shift;
 	
-	return ($self->get('rgt') - $self->get('lft') > 1);
+	return ($self->get('nestedSetRight') - $self->get('nestedSetLeft') > 1);
 }
 
 #-------------------------------------------------------------------
@@ -979,10 +979,10 @@ sub leaves_under {
 		"select a.* 
 		from page as a, 
 		     page as b 
-		where (a.lft between b.lft and b.rgt) and
-		      (a.rgt = a.lft + 1)
+		where (a.nestedSetLeft between b.nestedSetLeft and b.nestedSetRight) and
+		      (a.nestedSetRight = a.nestedSetLeft + 1)
 		      b.pageId = ".$self->get('pageId').
-		" order by lft");
+		" order by nestedSetLeft");
 
 	while (%row = $sth->hash) {
 		push(@result, {(%row)});
@@ -1067,45 +1067,45 @@ sub move{
 	# We move to the right of the children of $newMother.
 	$depthDiff = $self->get('depth') - $newMother->get('depth') - 1;
 
-	# It is important if the page moves 'up' or 'down' in lft and rgt value
-	if ($self->get('lft') < $newMother->get('lft')) {
-		$between = ($self->get('rgt') + 1)." and ".($newMother->get('rgt') - 1);
-		$updateRange = $self->get('lft')." and ".$newMother->get('rgt');
-		$diff = $self->get('rgt') - $self->get('lft') + 1;
-		$diff2 = $newMother->get('rgt') - $self->get('rgt') - 1;
+	# It is important if the page moves 'up' or 'down' in nestedSetLeft and nestedSetRight value
+	if ($self->get('nestedSetLeft') < $newMother->get('nestedSetLeft')) {
+		$between = ($self->get('nestedSetRight') + 1)." and ".($newMother->get('nestedSetRight') - 1);
+		$updateRange = $self->get('nestedSetLeft')." and ".$newMother->get('nestedSetRight');
+		$diff = $self->get('nestedSetRight') - $self->get('nestedSetLeft') + 1;
+		$diff2 = $newMother->get('nestedSetRight') - $self->get('nestedSetRight') - 1;
 	} else {
-		$between = $newMother->get('rgt')." and ".($self->get('lft') - 1);
-		$updateRange = $newMother->get('lft')." and ".($self->get('rgt')+1);
-		$diff = $self->get('lft') - $self->get('rgt') - 1;
-		$diff2 = $newMother->get('rgt') - $self->get('lft');
+		$between = $newMother->get('nestedSetRight')." and ".($self->get('nestedSetLeft') - 1);
+		$updateRange = $newMother->get('nestedSetLeft')." and ".($self->get('nestedSetRight')+1);
+		$diff = $self->get('nestedSetLeft') - $self->get('nestedSetRight') - 1;
+		$diff2 = $newMother->get('nestedSetRight') - $self->get('nestedSetLeft');
 	}
 	
 	
 	# Set the new depth 
-	WebGUI::SQL->write("update page set depth=depth - $depthDiff where lft between ".$self->get('lft')." and ".$self->get('rgt'));
+	WebGUI::SQL->write("update page set depth=depth - $depthDiff where nestedSetLeft between ".$self->get('nestedSetLeft')." and ".$self->get('nestedSetRight'));
 	
 	# Do the magic: cast move on tree
 	$sql = "
 		update page set
-		lft = case
-			when lft between ". $self->get('lft')." and ".$self->get('rgt')."
-				then lft + $diff2
-			when lft between ". $between ."
-				then lft - $diff
+		nestedSetLeft = case
+			when nestedSetLeft between ". $self->get('nestedSetLeft')." and ".$self->get('nestedSetRight')."
+				then nestedSetLeft + $diff2
+			when nestedSetLeft between ". $between ."
+				then nestedSetLeft - $diff
 			else
-				lft
+				nestedSetLeft
 		      end,
-		rgt = case
-		        when rgt between ". $self->get('lft') ." and ". $self->get('rgt') ."
-				then rgt + $diff2
-			when rgt between ". $between ."
-				then rgt - $diff
+		nestedSetRight = case
+		        when nestedSetRight between ". $self->get('nestedSetLeft') ." and ". $self->get('nestedSetRight') ."
+				then nestedSetRight + $diff2
+			when nestedSetRight between ". $between ."
+				then nestedSetRight - $diff
 			else
-		      		rgt
+		      		nestedSetRight
 		      end
 		where 
-			rgt between $updateRange or
-			lft between $updateRange";
+			nestedSetRight between $updateRange or
+			nestedSetLeft between $updateRange";
 			
 	WebGUI::SQL->write($sql);
 
@@ -1204,30 +1204,30 @@ sub moveUp {
 	# Don't allow to move up if node is already a webguiroot;
 	return 0 if ($mother->get('pageId') == 0);
 	
-	# Update depth, we do this before the move because now we know the rgt range of nodes 
+	# Update depth, we do this before the move because now we know the nestedSetRight range of nodes 
 	# that change in depth.
-	WebGUI::SQL->write("update page set depth=depth-1 where rgt between ".$self->get('lft')." and ".$self->get('rgt'));
+	WebGUI::SQL->write("update page set depth=depth-1 where nestedSetRight between ".$self->get('nestedSetLeft')." and ".$self->get('nestedSetRight'));
 
 	# Do some movement magic!
-	$diff = $self->get('rgt') - $self->get('lft') + 1;
-	$diff2 = $mother->get('rgt') - $self->get('rgt');
+	$diff = $self->get('nestedSetRight') - $self->get('nestedSetLeft') + 1;
+	$diff2 = $mother->get('nestedSetRight') - $self->get('nestedSetRight');
 	$sql = "
 		update page set
-		lft =	case
-			when lft between ". $self->get('lft')." and ".$self->get('rgt')."
-				then lft + $diff2
-			when lft between ". ($self->get('rgt') + 1) ." and ". $mother->get('rgt') ."
-				then lft - $diff
+		nestedSetLeft =	case
+			when nestedSetLeft between ". $self->get('nestedSetLeft')." and ".$self->get('nestedSetRight')."
+				then nestedSetLeft + $diff2
+			when nestedSetLeft between ". ($self->get('nestedSetRight') + 1) ." and ". $mother->get('nestedSetRight') ."
+				then nestedSetLeft - $diff
 			else
-				lft
+				nestedSetLeft
 			end,
-		rgt = 	case
-		        when rgt between ". $self->get('lft') ." and ". $self->get('rgt') ."
-				then rgt + $diff2
-			when rgt between ". ($self->get('rgt') + 1) ." and ". $mother->get('rgt') ."
-				then rgt - $diff
+		nestedSetRight = 	case
+		        when nestedSetRight between ". $self->get('nestedSetLeft') ." and ". $self->get('nestedSetRight') ."
+				then nestedSetRight + $diff2
+			when nestedSetRight between ". ($self->get('nestedSetRight') + 1) ." and ". $mother->get('nestedSetRight') ."
+				then nestedSetRight - $diff
 			else
-		      		rgt
+		      		nestedSetRight
 		     	end,
 		parentId = case pageId 
 			when ". $self->get('pageId') ."
@@ -1236,8 +1236,8 @@ sub moveUp {
 				parentId
 			end
 		where 
-			rgt between ". $self->get('lft') ." and ". $mother->get('rgt')."
-			lft between ". $self->get('lft') ." and ". $mother->get('rgt');
+			nestedSetRight between ". $self->get('nestedSetLeft') ." and ". $mother->get('nestedSetRight')."
+			nestedSetLeft between ". $self->get('nestedSetLeft') ." and ". $mother->get('nestedSetRight');
 			
 	WebGUI::SQL->write($sql);
 
@@ -1275,8 +1275,8 @@ sub new {
 	($class, $properties) = @_;
 	$self = $_[0]->SUPER::new(
 		table_name		=> 'page',
-		left_column_name	=> 'lft',
-		right_column_name	=> 'rgt',
+		left_column_name	=> 'nestedSetLeft',
+		right_column_name	=> 'nestedSetRight',
 		dbh			=> $session{dbh},
 		no_alter_table		=> 1,
 		no_locking		=> 1
@@ -1441,7 +1441,7 @@ sub self_and_sisters {
 		     page as b 
 		where a.parentId = b.parentId and 
 		      b.pageId = ".$self->get('pageId').
-		" order by lft");
+		" order by nestedSetLeft");
 	while (%row = $sth->hash) {
 		push(@result, {(%row)});
 	}
@@ -1497,7 +1497,7 @@ sub sisters {
 		     page as b 
 		where a.pageId !=".$self->get('pageId')." and  
 		      a.parentId = b.parentId and b.pageId = ".$self->get('pageId').
-		" order by lft");
+		" order by nestedSetLeft");
 	while (%row = $sth->hash) {
 		push(@result, {(%row)});
 	}
