@@ -89,6 +89,7 @@ sub www_view {
 	my @items;
 	my $rssItem = \$rss{item};
 	$rssItem = \$rss{RDF}{item} unless ($rss{item});
+	$rssItem = \[ $$rssItem ] unless (ref $$rssItem eq 'ARRAY'); 
         foreach my $item (@{$$rssItem}) {
 		push (@items,{
 			link=>$item->{link},
