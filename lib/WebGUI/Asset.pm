@@ -1703,7 +1703,9 @@ sub newByUrl {
         my $asset;
         if ($url ne "") {
                 $asset = WebGUI::SQL->quickHashRef("select assetId, className from asset where url=".quote($url));
-		return WebGUI::Asset->newByDynamicClass($asset->{assetId}, $asset->{className});
+		if ($asset->{assetId} ne "" || $asset->{className} ne "") {
+			return WebGUI::Asset->newByDynamicClass($asset->{assetId}, $asset->{className});
+		}
         }
         return $class->newByDynamicClass($session{setting}{defaultPage});
 }

@@ -44,7 +44,7 @@ $defaultThreadTemplate =~ '<p>^Navigation(crumbTrail);</p>'.$defaultThreadTempla
 WebGUI::SQL->write("update template set template=".quote($defaultThreadTemplate)." where namespace='Forum/Thread' and templateId='1'");
 WebGUI::SQL->write("delete from template where namespace='Forum/Post' or (namespace='Forum/Thread' and templateId<>'1')");
 foreach my $key (%threadTemplates) {
-	WebGUI::SQL::write("insert into template (templateId, namespace, template, name) values (".quote(WebGUI::Id::generate()).", 'Forum/Thread',
+	WebGUI::SQL->write("insert into template (templateId, namespace, template, name) values (".quote(WebGUI::Id::generate()).", 'Forum/Thread',
 		".quote($threadTemplates{$key}).", ".quote($key).")");
 }
 WebGUI::SQL->write("update template set templateId='25' where templateId='1' and namespace in ('Forum','Forum/Thread','Forum/PostForm')");
@@ -159,7 +159,14 @@ foreach my $other (@temp) {
 my @allWobjects = (@wobjects,@otherWobjects);
 foreach my $namespace (@allWobjects) {
 	WebGUI::SQL->write("alter table ".$namespace." add column assetId varchar(22) not null");
-	WebGUI::SQL->write("alter table ".$namespace." add column templateId varchar(22) not null");
+	if (isIn($namespace, @otherWobjects)) {
+		my $test = WebGUI::SQL->unconditionalRead("select templateId from $namespace");
+		if ($test->errorCode > 0) { # only add this if they don't already have it
+			WebGUI::SQL->write("alter table ".$namespace." add column templateId varchar(22) not null");
+		}
+	} else {
+		WebGUI::SQL->write("alter table ".$namespace." add column templateId varchar(22) not null");
+	}
 	my $sth = WebGUI::SQL->read("select wobjectId, templateId from wobject where namespace=".quote($namespace));
 	while (my ($wid, $tid) = $sth->array) {
 		WebGUI::SQL->write("update ".$namespace." set templateId=".quote($tid)." where wobjectId=".quote($wid));
@@ -1438,12 +1445,12 @@ sub walkTree {
 			$className = 'WebGUI::Asset::Wobject::'.$wobject->{namespace};
 			WebGUI::SQL->write("insert into asset (assetId, parentId, lineage, className, state, title, menuTitle, url, startDate, 
 				endDate, isHidden, ownerUserId, groupIdView, groupIdEdit, encryptPage, assetSize) values (".quote($wobjectId).",
-				".quote($pageId).", ".quote($wobjectLineage).", ".quote($className).",'published',".quote($wobject->{title}).",
-				".quote($wobject->{title}).", ".quote($wobjectUrl).", ".quote($wobject->{startDate}).", ".quote($wobject->{endDate}).",
-				1, ".quote($ownerId).", ".quote($groupIdView).", ".quote($groupIdEdit).", ".quote($page->{encryptPage}).",
+				".quote($pageId).", ".quote($wobjectLineage).", ".quote($className).",'published',".quote($wobject->{title}||'Untitled').",
+				".quote($wobject->{title}||'Untitled').", ".quote($wobjectUrl).", ".quote($wobject->{startDate}).", ".quote($wobject->{endDate}).",
+				1, ".quote($ownerId||'3').", ".quote($groupIdView||'7').", ".quote($groupIdEdit||'3').", ".quote($page->{encryptPage}).",
 				".length($wobject->{title}.$wobject->{description}).")");
-			WebGUI::SQL->write("update wobject set assetId=".quote($wobjectId).", styleTemplateId=".quote($page->{styleId}).",
-				printableStyleTemplateId=".quote($page->{printableStyleId}).", cacheTimeout=".quote($page->{cacheTimeout})
+			WebGUI::SQL->write("update wobject set assetId=".quote($wobjectId).", styleTemplateId=".quote($page->{styleId}||'1').",
+				printableStyleTemplateId=".quote($page->{printableStyleId}||'1').", cacheTimeout=".quote($page->{cacheTimeout})
 				.", cacheTimeoutVisitor=".quote($page->{cacheTimeoutVisitor})." where wobjectId=".quote($wobject->{wobjectId}));
 			WebGUI::SQL->write("update ".$wobject->{namespace}." set assetId=".quote($wobjectId)." where wobjectId="
 				.quote($wobject->{wobjectId}));
@@ -2077,8 +2084,8 @@ sub fixUrl {
 	if (length($url) > 250) {
 		$url = substr($url,220);
 	}
-	$url = WebGUI::Id::generate() unless (defined $url);
         $url = WebGUI::URL::urlize($url);
+	$url = WebGUI::Id::generate() unless (defined $url && $url ne "");
         my ($test) = WebGUI::SQL->quickArray("select url from asset where assetId<>".quote($id)." and url=".quote($url));
         if ($test) {
                 my @parts = split(/\./,$url);
@@ -2090,6 +2097,7 @@ sub fixUrl {
                 $url = join(".",@parts);
                 $url = fixUrl($id,$url);
         }
+	$url = WebGUI::Id::generate() unless (defined $url && $url ne ""); #check one last time to make sure we don't have an empty url
         return $url;
 }
 
@@ -2132,7 +2140,7 @@ sub getFileSize {
 	$id =~ m/^(.{2})(.{2})/;
 	my $path = $session{config}{uploadsPath}.$session{os}{slash}.$1.$session{os}{slash}.$2.$session{os}{slash}.$id.$session{os}{slash}.$filename;
 	my (@attributes) = stat($path);
-	return $attributes[7];
+	return $attributes[7] || 0;
 }
 
 sub getFileExtension {
