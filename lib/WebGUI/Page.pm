@@ -1263,8 +1263,8 @@ sub moveUp {
 	return 0 if (!defined $mother);
 
 	# Don't allow to move up if node is already a webguiroot;
-	return 0 if ($mother->get('pageId') == 0);
-	
+	return 0 if ($mother->get('pageId') =~ /^\d+$/ && $mother->get('pageId') == 0);
+
 	# Update depth, we do this before the move because now we know the nestedSetRight range of nodes 
 	# that change in depth.
 	WebGUI::SQL->write("update page set depth=depth-1 where nestedSetRight between ".$self->get('nestedSetLeft')." and ".$self->get('nestedSetRight'));
@@ -1291,8 +1291,8 @@ sub moveUp {
 		      		nestedSetRight
 		     	end,
 		parentId = case pageId 
-			when ". $self->get('pageId') ."
-				then ".$mother->get('parentId')."
+			when ". quote($self->get('pageId')) ."
+				then ". quote($mother->get('parentId'))."
 			else
 				parentId
 			end
