@@ -30,11 +30,12 @@ sub _replacement {
 	if ($session{user}{uiLevel} >= 7) {
 		$hash{WebGUI::URL::page('op=selectPackageToDeploy')} = WebGUI::International::get(376);
 	}
-	foreach $key (keys %{$session{wobject}}) {
-		my $cmd = "\$WebGUI::Wobject::".$key."::name";
-		#$hash{WebGUI::URL::page('func=edit&wid=new&namespace='.$key)} = $session{wobject}{$key};
-		$hash{WebGUI::URL::page('func=edit&wid=new&namespace='.$key)} = eval($cmd);
-		WebGUI::ErrorHandler::warn("Could use wobject $key because: ".$@) if ($@);
+	foreach my $namespace (@{$session{config}{wobjects}}) {
+		my $cmd = "WebGUI::Wobject::".$namespace."::uiLevel";
+                next if (eval($cmd) > $session{user}{uiLevel});
+		$cmd = "\$WebGUI::Wobject::".$namespace."::name";
+		$hash{WebGUI::URL::page('func=edit&wid=new&namespace='.$namespace)} = eval($cmd);
+		WebGUI::ErrorHandler::warn("Could use wobject $namespace because: ".$@) if ($@);
 	}
 	%hash = sortHash(%hash);
 	%hash = (%{{WebGUI::URL::page()=>WebGUI::International::get(1)}},%hash);

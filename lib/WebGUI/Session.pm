@@ -213,35 +213,13 @@ sub _loadMacros {
 
 #-------------------------------------------------------------------
 sub _loadWobjects {
-	my ($dir, @files, $file, $cmd, $namespace, $exclude);
-	$dir = $session{config}{webguiRoot}.$session{os}{slash}."lib".$session{os}{slash}."WebGUI".$session{os}{slash}."Wobject";
-	opendir (DIR,$dir) or WebGUI::ErrorHandler::fatalError("Can't open wobject directory!");
-	@files = readdir(DIR);
-	foreach $file (@files) {
-		if ($file =~ /(.*?)\.pm$/) {
-			$namespace = $1;
-			$cmd = "use WebGUI::Wobject::".$namespace;
-			eval($cmd);
-			unless ($@) {
-				$exclude = $session{config}{excludeWobject};
-                        	$exclude =~ s/ //g;
-				next if (isIn($namespace, split(/,/,$exclude)));
-				$cmd = "WebGUI::Wobject::".$namespace."::uiLevel";
-				next if (eval($cmd) > $session{user}{uiLevel});	
-		#		$cmd = "\$WebGUI::Wobject::".$namespace."::name";
-		#		$session{wobject}{$namespace} = eval($cmd);
-				$session{wobject}{$namespace} = $namespace;
-		#		if ($@) {
-		#			WebGUI::ErrorHandler::warn("No name method in wobject: $namespace. ".$@);
-		#			$session{wobject}{$namespace} = "ERROR: ".$namespace;
-		#		}
-			} else {
-				WebGUI::ErrorHandler::warn("Wobject failed to compile: $namespace. ".$@);
-				$session{wobject}{$namespace} = "ERROR: ".$namespace;
-			}
+	foreach my $namespace (@{$session{config}{wobjects}}) {
+		my $cmd = "use WebGUI::Wobject::".$namespace;
+		eval($cmd);
+		if ($@) {
+			WebGUI::ErrorHandler::warn("Wobject failed to compile: $namespace. ".$@);
 		}
 	}
-	closedir(DIR);
 }
 
 #-------------------------------------------------------------------
