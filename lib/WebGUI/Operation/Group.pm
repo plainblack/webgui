@@ -261,7 +261,7 @@ sub www_manageGroupsInGroup {
         $output .= $f->print;
 	$output .= '</div><p/><table class="tableData" align="center">';
 	$output .= '<tr class="tableHeader"><td></td><td>'.WebGUI::International::get(84).'</td></tr>';
-	$p = WebGUI::Paginator->new(WebGUI::URL::page('op=manageGroupsInGroup'));
+	$p = WebGUI::Paginator->new(WebGUI::URL::page('op=manageGroupsInGroup&gid='.$session{form}{gid}));
 	$p->setDataByQuery("select a.groupName as name,a.groupId as id from groups a 
 		left join groupGroupings b on a.groupId=b.groupId 
 		where b.inGroup=$session{form}{gid} order by a.groupName");
