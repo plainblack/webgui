@@ -85,7 +85,8 @@ sub uiLevel {
 #-------------------------------------------------------------------
 sub www_deleteFile {
 	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
-	$_[0]->setCollateral("FileManager_file","FileManager_fileId",{$session{form}{file}=>''},0,0);
+	$_[0]->setCollateral("FileManager_file","FileManager_fileId",
+		{$session{form}{file}=>'',FileManager_fileId=>$session{form}{did}},0,0);
        	return $_[0]->www_editDownload();
 }
 
