@@ -21,6 +21,7 @@ use WebGUI::HTML;
 use WebGUI::HTMLForm;
 use WebGUI::HTTP;
 use WebGUI::Icon;
+use WebGUI::Id;
 use WebGUI::International;
 use WebGUI::MessageLog;
 use WebGUI::Operation;
@@ -68,7 +69,7 @@ sub duplicate {
 	$w = WebGUI::Wobject::USS->new({wobjectId=>$w});
         my $sth = WebGUI::SQL->read("select * from USS_submission where USS_id=".$_[0]->get("USS_id"));
         while (%row = $sth->hash) {
-                my $newSubmissionId = getNextId("USS_submissionId");
+                my $newSubmissionId = WebGUI::Id::generate();
 		my $file = WebGUI::Attachment->new($row{image},$_[0]->get("wobjectId"),$row{USS_submissionId});
 		$file->copy($w,$newSubmissionId);
 		$file = WebGUI::Attachment->new($row{attachment},$_[0]->get("wobjectId"),$row{USS_submissionId});

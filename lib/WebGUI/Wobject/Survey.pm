@@ -17,6 +17,7 @@ use WebGUI::Grouping;
 use WebGUI::HTMLForm;
 use WebGUI::HTTP;
 use WebGUI::Icon;
+use WebGUI::Id;
 use WebGUI::International;
 use WebGUI::Privilege;
 use WebGUI::Session;
@@ -56,20 +57,20 @@ sub duplicate {
 	my ($w, $newSurveyId, $qdata, $adata, $rdata, $a, $b, $c);
 	$w = $_[0]->SUPER::duplicate($_[1]);
         $w = WebGUI::Wobject::Survey->new({wobjectId=>$w,namespace=>$_[0]->get("namespace")});
-	$newSurveyId = getNextId("Survey_id");
+	$newSurveyId = WebGUI::Id::generate();
 	$w->set({
 		Survey_id=>$newSurveyId
 		});
-	$a = WebGUI::SQL->read("select * from Survey_question where Survey_id=".$_[0]->get("Survey_id")
+	$a = WebGUI::SQL->read("select * from Survey_question where Survey_id=".quote($_[0]->get("Survey_id"))
 		." order by sequenceNumber");
 	while ($qdata = $a->hashRef) {
-		$b = WebGUI::SQL->read("select * from Survey_answer where Survey_questionId=".$qdata->{Survey_questionId}
+		$b = WebGUI::SQL->read("select * from Survey_answer where Survey_questionId=".quote($qdata->{Survey_questionId})
 			." order by sequenceNumber");
 		$qdata->{Survey_questionId} = "new";
 		$qdata->{Survey_id} = $newSurveyId;
 		$qdata->{Survey_questionId} = $w->setCollateral("Survey_question","Survey_questionId",$qdata,1,0,"Survey_id");
 		while ($adata = $b->hashRef) {
-			$c = WebGUI::SQL->read("select * from Survey_response where Survey_answerId=".$adata->{Survey_answerId});
+			$c = WebGUI::SQL->read("select * from Survey_response where Survey_answerId=".quote($adata->{Survey_answerId}));
 			$adata->{Survey_answerId} = "new";
 			$adata->{Survey_questionId} = $qdata->{Survey_questionId};
 			$adata->{Survey_id} = $newSurveyId;
@@ -499,7 +500,7 @@ sub www_edit {
 	my $properties = WebGUI::HTMLForm->new;
 	my $layout = WebGUI::HTMLForm->new;
 	my $privileges = WebGUI::HTMLForm->new;
-	$properties->hidden("Survey_id",($_[0]->get("Survey_id") || getNextId("Survey_id")));
+	$properties->hidden("Survey_id",($_[0]->get("Survey_id") || WebGUI::Id::generate()));
 	$layout->selectList(
 		-name=>"questionOrder",
 		-options=>{

@@ -39,6 +39,8 @@
  - Bugfix: [ 995088 ] Error in printable macro 6.1.1
  - Bugfix: [ 1003511 ] Users cannot be added to Registered Users if removed
  - Bugfix: [ 996592 ] Fixed Infinite loop in Page.pm makeUnique in 6.1.1
+ - Converted all IDs to use global unique ids rather than incremented ids as
+   they were in the past.
 
 
 6.1.1

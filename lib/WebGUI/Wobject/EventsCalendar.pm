@@ -16,6 +16,7 @@ use WebGUI::DateTime;
 use WebGUI::FormProcessor;
 use WebGUI::HTMLForm;
 use WebGUI::Icon;
+use WebGUI::Id;
 use WebGUI::International;
 use WebGUI::Paginator;
 use WebGUI::Privilege;
@@ -36,9 +37,9 @@ sub duplicate {
 	$sth = WebGUI::SQL->read("select * from EventsCalendar_event where wobjectId="
 		.$_[0]->get("wobjectId")." order by EventsCalendar_recurringId");
 	while (@row = $sth->array) {
-		$newEventId = getNextId("EventsCalendar_eventId");
+		$newEventId = WebGUI::Id::generate();
 		if ($row[6] > 0 && $row[6] != $previousRecurringEventId) {
-			$row[6] = getNextId("EventsCalendar_recurringId");
+			$row[6] = WebGUI::Id::generate();
 			$previousRecurringEventId = $row[6];
 		}
                	WebGUI::SQL->write("insert into EventsCalendar_event values (".quote($newEventId).", ".$w.", ".
@@ -315,18 +316,18 @@ sub www_editEventSave {
 	$endDate[0] = $startDate[0] unless ($endDate[0] >= $startDate[0]);
 	if ($session{form}{eid} eq "new") {
 		$session{form}{name} = $session{form}{name} || "unnamed";
-		$session{form}{eid} = getNextId("EventsCalendar_eventId");
+		$session{form}{eid} = WebGUI::Id::generate();
                	$until = WebGUI::FormProcessor::date("until");
 		$until = $endDate[0] unless ($until >= $endDate[0]);
-               	$eventId[0] = getNextId("EventsCalendar_eventId");
+               	$eventId[0] = WebGUI::Id::generate();
 		$session{form}{interval} = 1 if ($session{form}{interval} < 1);
                	if ($session{form}{recursEvery} eq "never") {
                        	$recurringEventId = 0;
                	} else {
-                       	$recurringEventId = getNextId("EventsCalendar_recurringId");
+                       	$recurringEventId = WebGUI::Id::generate();
                        	while ($startDate[$i] < $until) {
                                	$i++;
-                               	$eventId[$i] = getNextId("EventsCalendar_eventId");
+                               	$eventId[$i] = WebGUI::Id::generate();
 				if ($session{form}{recursEvery} eq "day") {
                                		$startDate[$i] = addToDate($startDate[0],0,0,($i*$session{form}{interval}));
                                		$endDate[$i] = addToDate($endDate[0],0,0,($i*$session{form}{interval}));
@@ -344,11 +345,11 @@ sub www_editEventSave {
                	}
                	$i = 0;
                	while ($eventId[$i] > 0) {
-                       	WebGUI::SQL->write("insert into EventsCalendar_event values ($eventId[$i], 
+                       	WebGUI::SQL->write("insert into EventsCalendar_event values (".quote($eventId[$i]).", 
 				".quote($_[0]->get("wobjectId")).", 
 				".quote($session{form}{name}).", 
 				".quote($session{form}{description}).", 
-				$startDate[$i], $endDate[$i], $recurringEventId)");
+				$startDate[$i], $endDate[$i], ".quote($recurringEventId).")");
                        	$i++;
                	}
 	} else {

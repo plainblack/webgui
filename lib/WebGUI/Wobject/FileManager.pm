@@ -17,6 +17,7 @@ use WebGUI::Grouping;
 use WebGUI::HTMLForm;
 use WebGUI::HTTP;
 use WebGUI::Icon;
+use WebGUI::Id;
 use WebGUI::International;
 use WebGUI::Paginator;
 use WebGUI::Privilege;
@@ -46,7 +47,7 @@ sub duplicate {
         $w = $_[0]->SUPER::duplicate($_[1]);
         $sth = WebGUI::SQL->read("select * from FileManager_file where wobjectId=".$_[0]->get("wobjectId"));
         while (%row = $sth->hash) {
-                $newDownloadId = getNextId("FileManager_fileId");
+                $newDownloadId = WebGUI::Id::generate();
 		$file = WebGUI::Attachment->new($row{downloadFile},$_[0]->get("wobjectId"),$row{FileManager_fileId});
 		$file->copy($w,$newDownloadId);
                 $file = WebGUI::Attachment->new($row{alternateVersion1},$_[0]->get("wobjectId"),$row{FileManager_fileId});

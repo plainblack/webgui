@@ -109,7 +109,7 @@ sub _tabAdminIcons {
 #-------------------------------------------------------------------
 sub _createTabInit {
 	my $wid = $_[0];
-	my @tabCount = WebGUI::SQL->quickArray("select count(DataForm_tabId) from DataForm_tab where wobjectId=$wid");
+	my @tabCount = WebGUI::SQL->quickArray("select count(DataForm_tabId) from DataForm_tab where wobjectId=".quote($wid));
 	my $output = '<script type="text/javascript"> var numberOfTabs = '.$tabCount[0].'; initTabs();</script>';
 	return $output;
 }
@@ -120,7 +120,7 @@ sub duplicate {
 	tie %data, 'Tie::CPHash';
 	$w = $_[0]->SUPER::duplicate($_[1]);
 	$w = WebGUI::Wobject::DataForm->new({wobjectId=>$w,namespace=>$_[0]->get("namespace")});
-	$sth = WebGUI::SQL->read("select * from DataForm_field where wobjectId=".$_[0]->get("wobjectId"));
+	$sth = WebGUI::SQL->read("select * from DataForm_field where wobjectId=".quote($_[0]->get("wobjectId")));
     	while (%data = $sth->hash) {
 		$data{DataForm_fieldId} = "new";
 		$w->setCollateral("DataForm_field","DataForm_fieldId",\%data);
@@ -157,8 +157,8 @@ sub getIndexerParams {
                         fieldsToIndex => ["label", "subtext", "possibleValues"],
                         contentType => 'wobjectDetail',
                         url => '$data{urlizedTitle}."#".$data{wid}',
-                        headerShortcut => 'select label from DataForm_field where DataForm_fieldId = $data{fid}',
-                        bodyShortcut => 'select subtext from DataForm_field where DataForm_fieldId = $data{fid}',
+                        headerShortcut => 'select label from DataForm_field where DataForm_fieldId = \'$data{fid}\'',
+                        bodyShortcut => 'select subtext from DataForm_field where DataForm_fieldId = \'$data{fid}\'',
                 },
         DataForm_entryData => {
                         sql => "select distinct(DataForm_entryData.wobjectId) as wid,
@@ -177,10 +177,10 @@ sub getIndexerParams {
                                         and wobject.endDate > $now
                                         and page.startDate < $now
                                         and page.endDate > $now",
-                        fieldsToIndex => ['select distinct(value) from DataForm_entryData where wobjectId = $data{wid}'],
+                        fieldsToIndex => ['select distinct(value) from DataForm_entryData where wobjectId = \'$data{wid}\''],
                         contentType => 'wobjectDetail',
                         url => 'WebGUI::URL::append($data{urlizedTitle}, "func=view&entryId=list&wid=$data{wid}")',
-                        headerShortcut => 'select title from wobject where wobjectId = $data{wid}',
+                        headerShortcut => 'select title from wobject where wobjectId = \'$data{wid}\'',
                 }
 	};
 }
@@ -194,7 +194,7 @@ sub getListTemplateVars {
 	$var->{"back.url"} = WebGUI::URL::page();
 	$var->{"back.label"} = WebGUI::International::get(18,$self->get("namespace"));
 	my $a = WebGUI::SQL->read("select DataForm_fieldId,name,label,isMailField,type from DataForm_field
-		where wobjectId=".$self->get("wobjectId")." order by sequenceNumber");
+		where wobjectId=".quote($self->get("wobjectId"))." order by sequenceNumber");
 	while (my $field = $a->hashRef) {
 		push(@fieldLoop,{
 			"field.name"=>$field->{name},
@@ -208,11 +208,11 @@ sub getListTemplateVars {
 	$var->{field_loop} = \@fieldLoop;
 	my @recordLoop;
 	my $a = WebGUI::SQL->read("select ipAddress,username,userid,submissionDate,DataForm_entryId from DataForm_entry 
-		where wobjectId=".$self->get("wobjectId")." order by submissionDate desc");
+		where wobjectId=".quote($self->get("wobjectId"))." order by submissionDate desc");
 	while (my $record = $a->hashRef) {
 		my @dataLoop;
 		my $b = WebGUI::SQL->read("select b.name, b.label, b.isMailField, a.value from DataForm_entryData a left join DataForm_field b
-			on a.DataForm_fieldId=b.DataForm_fieldId where a.DataForm_entryId=".$record->{DataForm_entryId}."
+			on a.DataForm_fieldId=b.DataForm_fieldId where a.DataForm_entryId=".quote($record->{DataForm_entryId})."
 			order by b.sequenceNumber");
 		while (my $data = $b->hashRef) {
 			push(@dataLoop,{
@@ -265,7 +265,7 @@ sub getRecordTemplateVars {
 	my @tabs;
 	my $select = "select a.name, a.DataForm_fieldId, a.DataForm_tabId,a.label, a.status, a.isMailField, a.subtext, a.type, a.defaultValue, a.possibleValues, a.width, a.rows, a.extras, a.vertical";
 	my $join;
-	my $where = "where a.wobjectId=".$self->get("wobjectId");
+	my $where = "where a.wobjectId=".quote($self->get("wobjectId"));
 	if ($var->{entryId}) {
 		$var->{"form.start"} .= WebGUI::Form::hidden({name=>"entryId",value=>$var->{entryId}});
 		my $entry = $self->getCollateral("DataForm_entry","DataForm_entryId",$var->{entryId});
@@ -275,7 +275,7 @@ sub getRecordTemplateVars {
 		$var->{date} = WebGUI::DateTime::epochToHuman($entry->{submissionDate});
 		$var->{epoch} = $entry->{submissionDate};
 		$var->{"edit.URL"} = WebGUI::URL::page('func=view&wid='.$self->get("wobjectId").'&entryId='.$var->{entryId});
-		$where .= " and b.DataForm_entryId=".$var->{entryId};
+		$where .= " and b.DataForm_entryId=".quote($var->{entryId});
 		$join = "left join DataForm_entryData as b on a.DataForm_fieldId=b.DataForm_fieldId";
 		$select .= ", b.value";
 	}
@@ -283,10 +283,10 @@ sub getRecordTemplateVars {
 	tie %data, 'Tie::CPHash';
 	my %tab;
 	tie %tab, 'Tie::CPHash';
-	my $tabsth = WebGUI::SQL->read("select * from DataForm_tab where wobjectId=".$self->get("wobjectId")." order by sequenceNumber");
+	my $tabsth = WebGUI::SQL->read("select * from DataForm_tab where wobjectId=".quote($self->get("wobjectId"))." order by sequenceNumber");
 	while (%tab = $tabsth->hash) {
 		my @fields;
-		my $sth = WebGUI::SQL->read("$select from DataForm_field as a $join $where and a.DataForm_tabId=".$tab{DataForm_tabId}." order by a.sequenceNumber");
+		my $sth = WebGUI::SQL->read("$select from DataForm_field as a $join $where and a.DataForm_tabId=".quote($tab{DataForm_tabId})." order by a.sequenceNumber");
 		while (%data = $sth->hash) {
 			my $formValue = $session{form}{$data{name}};
 			if ((not exists $data{value}) && $session{form}{func} ne "editSave" && $session{form}{func} ne "editFieldSave" && defined $formValue) {
@@ -405,10 +405,10 @@ sub new {
 
 #-------------------------------------------------------------------
 sub purge {
-    	WebGUI::SQL->write("delete from DataForm_field where wobjectId=".$_[0]->get("wobjectId"));
-    	WebGUI::SQL->write("delete from DataForm_entry where wobjectId=".$_[0]->get("wobjectId"));
-    	WebGUI::SQL->write("delete from DataForm_entryData where wobjectId=".$_[0]->get("wobjectId"));
-	WebGUI::SQL->write("delete from DataForm_tab where wobjectId=".$_[0]->get("wobjectId"));
+    	WebGUI::SQL->write("delete from DataForm_field where wobjectId=".quote($_[0]->get("wobjectId")));
+    	WebGUI::SQL->write("delete from DataForm_entry where wobjectId=".quote($_[0]->get("wobjectId")));
+    	WebGUI::SQL->write("delete from DataForm_entryData where wobjectId=".quote($_[0]->get("wobjectId")));
+	WebGUI::SQL->write("delete from DataForm_tab where wobjectId=".quote($_[0]->get("wobjectId")));
     	$_[0]->SUPER::purge();
 }
 
@@ -625,9 +625,9 @@ sub www_editField {
 		);
         $session{form}{fid} = "new" if ($session{form}{fid} eq "");
 	unless ($session{form}{fid} eq "new") {	
-        	%field = WebGUI::SQL->quickHash("select * from DataForm_field where DataForm_fieldId=$session{form}{fid}");
+        	%field = WebGUI::SQL->quickHash("select * from DataForm_field where DataForm_fieldId=".quote($session{form}{fid}));
 	}
-	$tab = WebGUI::SQL->buildHashRef("select DataForm_tabId,label from DataForm_tab where wobjectId=".$_[0]->get("wobjectId"));
+	$tab = WebGUI::SQL->buildHashRef("select DataForm_tabId,label from DataForm_tab where wobjectId=".quote($_[0]->get("wobjectId")));
         $output = helpIcon("data form fields add/edit",$_[0]->get("namespace"));
         $output .= '<h1>'.WebGUI::International::get(20,$_[0]->get("namespace")).'</h1>';
         $f = WebGUI::HTMLForm->new;
@@ -754,7 +754,7 @@ sub www_editTab {
 
         $session{form}{tid} = "new" if ($session{form}{tid} eq "");
 	unless ($session{form}{tid} eq "new") {	
-        	%tab = WebGUI::SQL->quickHash("select * from DataForm_tab where DataForm_tabId=$session{form}{tid}");
+        	%tab = WebGUI::SQL->quickHash("select * from DataForm_tab where DataForm_tabId=".quote($session{form}{tid}));
 	}
         $output = helpIcon("data form fields add/edit",$_[0]->get("namespace"));
         $output .= '<h1>'.WebGUI::International::get(20,$_[0]->get("namespace")).'</h1>';
@@ -811,11 +811,11 @@ sub www_editTabSave {
 sub www_exportTab {
 	return WebGUI::Privilege::insufficient() unless ($_[0]->canEdit);
 	WebGUI::HTTP::setFilename(WebGUI::URL::urlize($_[0]->get("title")).".tab","text/plain");
-	my %fields = WebGUI::SQL->buildHash("select DataForm_fieldId,name from DataForm_field where wobjectId=".$_[0]->get("wobjectId")." order by sequenceNumber");
+	my %fields = WebGUI::SQL->buildHash("select DataForm_fieldId,name from DataForm_field where wobjectId=".quote($_[0]->get("wobjectId"))." order by sequenceNumber");
 	my $select = "select a.DataForm_entryId as entryId, a.ipAddress, a.username, a.userId, a.submissionDate";
 	my $from = " from DataForm_entry a";
 	my $join;
-	my $where = " where a.wobjectId=".$_[0]->get("wobjectId");
+	my $where = " where a.wobjectId=".quote($_[0]->get("wobjectId"));
 	my $orderBy = " order by a.DataForm_entryId";
 	my $columnCounter = "b";
 	foreach my $fieldId (keys %fields) {
@@ -871,7 +871,7 @@ sub www_process {
 	$var->{entryId} = $entryId;
 	tie %row, "Tie::CPHash";
 	my $sth = WebGUI::SQL->read("select DataForm_fieldId,label,name,status,type,defaultValue,isMailField from DataForm_field 
-		where wobjectId=".$_[0]->get("wobjectId")." order by sequenceNumber");
+		where wobjectId=".quote($_[0]->get("wobjectId"))." order by sequenceNumber");
 	while (%row = $sth->hash) {
 		my $value = $row{defaultValue};
 		if ($row{status} eq "required" || $row{status} eq "editable") {
@@ -889,7 +889,7 @@ sub www_process {
                         $value = WebGUI::Macro::process($row{defaultValue});
                 }
 		unless ($hadErrors) {
-			my ($exists) = WebGUI::SQL->quickArray("select count(*) from DataForm_entryData where DataForm_entryId=$entryId
+			my ($exists) = WebGUI::SQL->quickArray("select count(*) from DataForm_entryData where DataForm_entryId=".quote($entryId)."
 				and DataForm_fieldId=".quote($row{DataForm_fieldId}));
 			if ($exists) {
 				WebGUI::SQL->write("update DataForm_entryData set value=".quote($value)."
