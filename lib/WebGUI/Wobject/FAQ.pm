@@ -179,19 +179,14 @@ sub www_moveQuestionUp {
 sub www_view {
 	my (%question, $controls, $sth, %var, @qa);
 	tie %question,'Tie::CPHash';
-	if ($session{var}{adminOn}) {
-		$var{addquestion} .= '<a href="'.WebGUI::URL::page('func=editQuestion&wid='.$_[0]->get("wobjectId")).'">'
-			.WebGUI::International::get(9,$namespace).'</a>';
-	}
+	$var{"addquestion.url"} = WebGUI::URL::page('func=editQuestion&wid='.$_[0]->get("wobjectId"));
+	$var{"addquestion.label"} = WebGUI::International::get(9,$namespace);
 	$sth = WebGUI::SQL->read("select * from FAQ_question where wobjectId=".$_[0]->get("wobjectId")." order by sequenceNumber");
 	while (%question = $sth->hash) {
-		if ($session{var}{adminOn}) {
-			$controls = deleteIcon('func=deleteQuestion&wid='.$_[0]->get("wobjectId").'&qid='.$question{FAQ_questionId})
-				.editIcon('func=editQuestion&wid='.$_[0]->get("wobjectId").'&qid='.$question{FAQ_questionId})
-				.moveUpIcon('func=moveQuestionUp&wid='.$_[0]->get("wobjectId").'&qid='.$question{FAQ_questionId})
-				.moveDownIcon('func=moveQuestionDown&wid='.$_[0]->get("wobjectId").'&qid='.$question{FAQ_questionId})
-				.' ';
-		}
+		$controls = deleteIcon('func=deleteQuestion&wid='.$_[0]->get("wobjectId").'&qid='.$question{FAQ_questionId})
+			.editIcon('func=editQuestion&wid='.$_[0]->get("wobjectId").'&qid='.$question{FAQ_questionId})
+			.moveUpIcon('func=moveQuestionUp&wid='.$_[0]->get("wobjectId").'&qid='.$question{FAQ_questionId})
+			.moveDownIcon('func=moveQuestionDown&wid='.$_[0]->get("wobjectId").'&qid='.$question{FAQ_questionId});
                 push(@qa,{
                         "qa.Id"=>$question{FAQ_questionId},
                         "qa.answer"=>$question{answer},
@@ -201,7 +196,7 @@ sub www_view {
 	}
 	$sth->finish;
 	$var{qa_loop} = \@qa;
-	return $_[0]->processMacros($_[0]->displayTitle.$_[0]->processTemplate($_[0]->get("templateId"),\%var));
+	return $_[0]->processMacros($_[0]->processTemplate($_[0]->get("templateId"),\%var));
 }
 
 
