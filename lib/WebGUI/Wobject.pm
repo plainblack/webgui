@@ -714,7 +714,7 @@ sub processMacros {
 
 #-------------------------------------------------------------------
 
-=head2 processTemplate ( templateId, vars ) 
+=head2 processTemplate ( templateId, vars [ , namespace ] ) 
 
 Returns the content generated from this template.
 
@@ -730,6 +730,10 @@ An id referring to a particular template in the templates table.
 
 A hash reference containing variables and loops to pass to the template engine.
 
+=item namespace
+
+A namespace to use for the template. Defaults to the wobject's namespace.
+
 =back
 
 =cut
@@ -739,7 +743,8 @@ sub processTemplate {
 		%{$_[0]->{_property}},
 		%{$_[2]}
 		);
-	return WebGUI::Template::process(WebGUI::Template::get($_[1],$_[0]->get("namespace")), \%vars);
+	my $namespace = $_[3] || $_[0]->get("namespace");
+	return WebGUI::Template::process(WebGUI::Template::get($_[1],$namespace), \%vars);
 }
 
 #-------------------------------------------------------------------

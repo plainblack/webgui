@@ -14,7 +14,7 @@ package WebGUI::FormProcessor;
 
 =cut
 
-use strict;
+use strict qw(vars subs);
 use WebGUI::DateTime;
 use WebGUI::HTML;
 use WebGUI::Session;

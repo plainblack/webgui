@@ -33,7 +33,9 @@ NOTE: This entire system is likely to be replaced in the near future.  It has se
 =head1 SYNOPSIS
 
  use WebGUI::Macro;
+ $html = WebGUI::Macro::filter($html);
  @array = WebGUI::Macro::getParams($parameterString);
+ $html = WebGUI::Macro::negate($html);
  $html = WebGUI::Macro::process($html);
 
 =head1 METHODS

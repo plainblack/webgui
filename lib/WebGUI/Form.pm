@@ -400,7 +400,7 @@ sub fieldType {
 	# without adult supervision. =) It was done this way because a huge
 	# if/elsif construct executes much more quickly than a bunch of
 	# unnecessary database hits.
-	my @types = qw(zipcode text textarea HTMLArea url date email phone integer yesNo selectList radioList checkboxList checkbox);
+	my @types = qw(zipcode text textarea HTMLArea url date email phone integer yesNo selectList radioList checkboxList);
 	$_[0]->{types} = \@types unless ($_[0]->{types});
 	foreach $type (@{$_[0]->{types}}) {
 		if ($type eq "text") {
