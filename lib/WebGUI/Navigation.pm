@@ -234,7 +234,6 @@ sub build {
     foreach my $property (@interestingPageProperties) {
         $var->{'basepage.'.$property} = $currentPage->get($property);
     }
-    $var->{'basepage.hasDaughters'} = $currentPage->hasDaughter();
 	unless (defined $cacheContent &&
 		! $session{url}{siteURL}) {	# Never use cache if an alternate site url is specified.
 		# The loop was not cached
@@ -380,8 +379,8 @@ sub build {
 	$var->{'config.button'} = $self->_getEditButton();
 
 	# Some properties of the page the user's viewing.
-	$var->{"page.current.hasDaughter"} = ($currentPage->get('nestedSetRight') - $currentPage->get('nestedSetLeft') > 1);
-	$var->{"page.current.isHome"} = ($currentPage->get('pageId') == 1);
+    $var->{'basepage.hasDaughter'} = $currentPage->hasDaughter();
+	$var->{"basepage.isHome"} = ($currentPage->get('pageId') eq '1');
 
 	if ($self->{_template}) {
 		return WebGUI::Template::processRaw($self->{_template}, $var);
