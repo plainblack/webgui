@@ -142,7 +142,7 @@ our $HELP = {
 			},
 			{
 				tag => 'metadata manage',
-				namespace => 'MetaData'
+				namespace => 'Asset'
 			},
 			{
 				tag => 'poll add/edit',

@@ -21,11 +21,11 @@ our $HELP = {
 		related => [
 			{
 				tag => 'template language',
-				namespace => 'WebGUI'
+				namespace => 'Template'
 			},
 			{
 				tag => 'templates manage',
-				namespace => 'WebGUI'
+				namespace => 'Template'
 			}
 		]
 	},
@@ -36,11 +36,11 @@ our $HELP = {
 		related => [
 			{
 				tag => 'template language',
-				namespace => 'WebGUI'
+				namespace => 'Template'
 			},
 			{
 				tag => 'templates manage',
-				namespace => 'WebGUI'
+				namespace => 'Template'
 			}
 		],
 	},
@@ -51,11 +51,11 @@ our $HELP = {
 		related => [
 			{
 				tag => 'template language',
-				namespace => 'WebGUI'
+				namespace => 'Template'
 			},
 			{
 				tag => 'templates manage',
-				namespace => 'WebGUI'
+				namespace => 'Template'
 			}
 		]
 	},
@@ -66,11 +66,11 @@ our $HELP = {
 		related => [
 			{
 				tag => 'template language',
-				namespace => 'WebGUI'
+				namespace => 'Template'
 			},
 			{
 				tag => 'templates manage',
-				namespace => 'WebGUI'
+				namespace => 'Template'
 			}
 		]
 	},

@@ -27,7 +27,7 @@ our $HELP = {
 			},
 			{
 				tag => 'template language',
-				namespace => 'WebGUI'
+				namespace => 'Template'
 			},
 		]
 	},

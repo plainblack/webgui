@@ -19,7 +19,7 @@ our $HELP = {
 			},
 			{
 				tag => 'template add/edit',
-				namespace => 'WebGUI'
+				namespace => 'Template'
 			}
 		]
 	},
@@ -41,7 +41,7 @@ our $HELP = {
 			},
 			{
 				tag => 'template language',
-				namespace => 'WebGUI'
+				namespace => 'Template'
 			}
 		]
 	},
