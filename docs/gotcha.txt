@@ -16,6 +16,11 @@ save you many hours of grief.
 	user interface.  You may remove any config file variables 
 	you were previously using to configure it.
 
+ * The privilege overrides have been removed from the settings. They
+	are now redundant with the advent of groups of groups.
+ 	Therefore if you were making use of this functionality,
+	you'll need to start using groups of groups instead.
+
 
 4.9.4
 --------------------------------------------------------------------

@@ -151,21 +151,6 @@ sub www_editMiscSettings {
 }
 
 #-------------------------------------------------------------------
-sub www_editPrivilegeSettings {
-	WebGUI::Privilege::adminOnly() unless (WebGUI::Privilege::isInGroup(3));
-        my ($output, $f);
-        $output .= helpIcon(48);
-        $output .= '<h1>'.WebGUI::International::get(710).'</h1>';
-        $f = WebGUI::HTMLForm->new;
-        $f->hidden("op","saveSettings");
-        $f->group("styleManagersGroup",WebGUI::International::get(713),[$session{setting}{styleManagersGroup}]);
-        $f->group("templateManagersGroup",WebGUI::International::get(714),[$session{setting}{templateManagersGroup}]);
-        $f->submit;
-        $output .= $f->print;
-        return _submenu($output);
-}
-
-#-------------------------------------------------------------------
 sub www_manageSettings {
 	WebGUI::Privilege::adminOnly() unless (WebGUI::Privilege::isInGroup(3));
         my ($output);
@@ -176,7 +161,6 @@ sub www_manageSettings {
         $output .= '<li><a href="'.WebGUI::URL::page('op=editContentSettings').'">'.WebGUI::International::get(525).'</a>';
         $output .= '<li><a href="'.WebGUI::URL::page('op=editMessagingSettings').'">'.WebGUI::International::get(133).'</a>';
         $output .= '<li><a href="'.WebGUI::URL::page('op=editMiscSettings').'">'.WebGUI::International::get(140).'</a>';
-        $output .= '<li><a href="'.WebGUI::URL::page('op=editPrivilegeSettings').'">'.WebGUI::International::get(710).'</a>';
         $output .= '<li><a href="'.WebGUI::URL::page('op=editProfileSettings').'">'.WebGUI::International::get(308).'</a>';
         $output .= '<li><a href="'.WebGUI::URL::page('op=editUserSettings').'">'.WebGUI::International::get(117).'</a>';
         $output .= '</ul>';

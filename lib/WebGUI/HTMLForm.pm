@@ -1527,7 +1527,7 @@ sub template {
 		rearrange([qw(name value label namespace afterEdit extras uiLevel)], @p);
         if (_uiLevelChecksOut($uiLevel)) {
 		$label = $label || WebGUI::International::get(356);
-		if (WebGUI::Privilege::isInGroup($session{setting}{templateManagersGroup})) {
+		if (WebGUI::Privilege::isInGroup(8)) {
 			#disabled until we can resolve the "new" wobject problem
         		#if ($afterEdit) {
                 	#	$subtext = '<a href="'.WebGUI::URL::page("op=editTemplate&tid=".$value."&namespace=".$namespace

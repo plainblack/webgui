@@ -290,7 +290,7 @@ sub www_editPage {
 			-uiLevel=>5
 			);
 		%hash = WebGUI::SQL->buildHash("select styleId,name from style where name<>'Reserved' order by name");
-		if (WebGUI::Privilege::isInGroup($session{setting}{styleManagersGroup})) {
+		if (WebGUI::Privilege::isInGroup(5)) {
 			$subtext = ' &nbsp; <a href="'.WebGUI::URL::page('op=listStyles')
 				.'">'.WebGUI::International::get(6).'</a>';
 		} else {

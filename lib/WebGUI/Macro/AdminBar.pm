@@ -81,7 +81,7 @@ sub _replacement {
 			%hash
 		);
 	}
-        if (WebGUI::Privilege::isInGroup($session{setting}{styleManagersGroup},$session{user}{userId})) {
+        if (WebGUI::Privilege::isInGroup(5,$session{user}{userId})) {
                 %hash = (
 			WebGUI::URL::page('op=listStyles')=>WebGUI::International::get(6), 
 			%hash
@@ -93,7 +93,7 @@ sub _replacement {
                         %hash
                 );
         }
-        if (WebGUI::Privilege::isInGroup($session{setting}{templateManagersGroup},$session{user}{userId})) {
+        if (WebGUI::Privilege::isInGroup(8,$session{user}{userId})) {
                 %hash = (
                         WebGUI::URL::page('op=listTemplates')=>WebGUI::International::get(508),
                         %hash

@@ -71,6 +71,23 @@ alter table page drop column worldView;
 alter table page drop column worldEdit;
 alter table page drop column ownerView;
 alter table page drop column ownerEdit;
+delete from help where helpId=48 and namespace='WebGUI';
+delete from international where namespace='WebGUI' and internationalId=109;
+delete from international where namespace='WebGUI' and internationalId=110;
+delete from international where namespace='WebGUI' and internationalId=111;
+delete from international where namespace='WebGUI' and internationalId=112;
+delete from international where namespace='WebGUI' and internationalId=113;
+delete from international where namespace='WebGUI' and internationalId=114;
+delete from international where namespace='WebGUI' and internationalId=115;
+delete from international where namespace='WebGUI' and internationalId=711;
+delete from international where namespace='WebGUI' and internationalId=710;
+delete from international where namespace='WebGUI' and internationalId=713;
+delete from international where namespace='WebGUI' and internationalId=708;
+delete from international where namespace='WebGUI' and internationalId=709;
+delete from international where namespace='WebGUI' and internationalId=714;
+delete from settings where name='styleManagersGroup';
+delete from settings where name='templateManagersGroup';
+
 
 
 

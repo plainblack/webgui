@@ -43,7 +43,7 @@ sub _submenu {
 
 #-------------------------------------------------------------------
 sub www_copyStyle {
-        return WebGUI::Privilege::insufficient unless (WebGUI::Privilege::isInGroup($session{setting}{styleManagersGroup}));
+        return WebGUI::Privilege::insufficient unless (WebGUI::Privilege::isInGroup(5));
 	my (%style);
 	%style = WebGUI::SQL->quickHash("select * from style where styleId=$session{form}{sid}");
         WebGUI::SQL->write("insert into style (styleId,name,body,styleSheet) values (".getNextId("styleId").", 
@@ -53,7 +53,7 @@ sub www_copyStyle {
 
 #-------------------------------------------------------------------
 sub www_deleteStyle {
-        return WebGUI::Privilege::insufficient unless (WebGUI::Privilege::isInGroup($session{setting}{styleManagersGroup}));
+        return WebGUI::Privilege::insufficient unless (WebGUI::Privilege::isInGroup(5));
 	return WebGUI::Privilege::vitalComponent() if ($session{form}{sid} < 1000 && $session{form}{sid} > 0);
         my ($output);
         $output .= helpIcon(4);
@@ -69,7 +69,7 @@ sub www_deleteStyle {
 
 #-------------------------------------------------------------------
 sub www_deleteStyleConfirm {
-        return WebGUI::Privilege::insufficient unless (WebGUI::Privilege::isInGroup($session{setting}{styleManagersGroup}));
+        return WebGUI::Privilege::insufficient unless (WebGUI::Privilege::isInGroup(5));
 	return WebGUI::Privilege::vitalComponent() if ($session{form}{sid} < 1000 && $session{form}{sid} > 0);
         WebGUI::SQL->write("delete from style where styleId=".$session{form}{sid});
         WebGUI::SQL->write("update page set styleId=2 where styleId=".$session{form}{sid});
@@ -78,7 +78,7 @@ sub www_deleteStyleConfirm {
 
 #-------------------------------------------------------------------
 sub www_editStyle {
-        return WebGUI::Privilege::insufficient unless (WebGUI::Privilege::isInGroup($session{setting}{styleManagersGroup}));
+        return WebGUI::Privilege::insufficient unless (WebGUI::Privilege::isInGroup(5));
         my ($output, %style, $f);
 	tie %style, 'Tie::CPHash';
 	if ($session{form}{sid} eq "new") {
@@ -103,7 +103,7 @@ sub www_editStyle {
 
 #-------------------------------------------------------------------
 sub www_editStyleSave {
-        return WebGUI::Privilege::insufficient unless (WebGUI::Privilege::isInGroup($session{setting}{styleManagersGroup}));
+        return WebGUI::Privilege::insufficient unless (WebGUI::Privilege::isInGroup(5));
 	if ($session{form}{sid} eq "new") {
 		$session{form}{sid} = getNextId("styleId");
 		WebGUI::SQL->write("insert into style (styleId) values ($session{form}{sid})");
@@ -116,7 +116,7 @@ sub www_editStyleSave {
 
 #-------------------------------------------------------------------
 sub www_listStyles {
-        return WebGUI::Privilege::insufficient unless (WebGUI::Privilege::isInGroup($session{setting}{styleManagersGroup}));
+        return WebGUI::Privilege::insufficient unless (WebGUI::Privilege::isInGroup(5));
         my ($output, $sth, @data, @row, $i, $p);
         $output = helpIcon(9);
 	$output .= '<h1>'.WebGUI::International::get(157).'</h1>';
