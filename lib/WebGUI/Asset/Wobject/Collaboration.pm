@@ -364,7 +364,8 @@ sub getEditForm {
    	$tabform->getTab("display")->template(
       		-value=>$self->getValue('collaborationTemplateId'),
       		-namespace=>"Collaboration",
-		-label=>"Collaboration System Template"
+		-label=>"Collaboration System Template",
+		-name=>"collaborationTemplateId"
    		);
         $tabform->getTab("display")->template(
                 -name=>"threadTemplateId",
@@ -766,41 +767,34 @@ sub view {
         }
 	my %var;
 	$var{'user.canPost'} = $self->canPost;
-        $var{"post.url"} = $self->getNewThreadUrl;
+        $var{"add.url"} = $self->getNewThreadUrl;
         $var{"rss.url"} = $self->getRssUrl;
         $var{'user.isModerator'} = $self->canModerate;
         $var{'user.isVisitor'} = ($session{user}{userId} eq '1');
 	$var{'user.isSubscribed'} = $self->isSubscribed;
-	$var{'sortby.date.url'} = $self->getSortByUrl("date");
+	$var{'sortby.date.url'} = $self->getSortByUrl("dateSubmitted");
 	$var{'sortby.lastreply.url'} = $self->getSortByUrl("lastreply");
 	$var{'sortby.views.url'} = $self->getSortByUrl("views");
 	$var{'sortby.replies.url'} = $self->getSortByUrl("replies");
 	$var{'sortby.rating.url'} = $self->getSortByUrl("rating");
 	WebGUI::Style::setLink($var{"rss.url"},{ rel=>'alternate', type=>'application/rss+xml', title=>'RSS' });
-	#$var{"search.Form"} = WebGUI::Search::form({func=>'view',search=>1});
-	#$var{"search.url"} = WebGUI::Search::toggleURL("func=view");
-	my $constraints;
-	#if ($session{scratch}{search}) {
-        #        $numResults = $session{scratch}{numResults};
-       #		$constraints = WebGUI::Search::buildConstraints([qw(Post.username asset.synopsis asset.title Post.content Post.userDefined1 Post.userDefined2 Post.userDefined3 Post.userDefined4 Post.userDefined5)]);
-#	}
-#	if ($constraints ne "") {
- #       	$constraints = "Post.status='approved' and ".$constraints;
-#	} else {
-		$constraints = "(Post.status='approved' or (asset.ownerUserId=".quote($session{user}{userId})." and asset.ownerUserId<>'1')";
-		if ($var{canModerate}) {
-			$constraints .= " or Post.status='pending'"; 
-		}
-		$constraints .= ")";
-	#}
+	$var{"search.url"} = $self->getSearchUrl;
+	$var{"subscribe.url"} = $self->getSubscribeUrl;
+	$var{"unsubscribe.url"} = $self->getUnsubscribeUrl;
+	my $constraints = "(Post.status='approved' or (asset.ownerUserId=".quote($session{user}{userId})." and asset.ownerUserId<>'1')";
+	if ($var{canModerate}) {
+		$constraints .= " or Post.status='pending'"; 
+	}
+	$constraints .= ")";
 	my $sql = "select * 
 		from Thread
 		left join asset on Thread.assetId=asset.assetId
 		left join Post on Post.assetId=asset.assetId 
-		where Thread.parentId=".quote($self->getId)." and asset.state='published' and asset.className='WebGUI::Asset::Post::Thread' and $constraints 
+		where asset.parentId=".quote($self->getId)." and asset.state='published' and asset.className='WebGUI::Asset::Post::Thread' and $constraints 
 		order by ".$self->getValue("sortBy")." ".$self->getValue("sortOrder");
 	my $p = WebGUI::Paginator->new($self->getUrl,$self->get("threadsPerPage"));
 	$self->appendPostListTemplateVars(\%var, $sql, $p);
+	$self->appendTemplateLabels(\%var);
 	return $self->processTemplate(\%var,$self->get("collaborationTemplateId"));
 }
 

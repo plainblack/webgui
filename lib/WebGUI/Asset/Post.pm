@@ -367,6 +367,7 @@ sub getTemplateVars {
 #		$var{"attachment.icon"} = $file->getIcon;
 #		$var{"attachment.name"} = $file->getFilename;
  #       }	
+	return \%var;
 }
 
 #-------------------------------------------------------------------
@@ -705,7 +706,7 @@ sub www_edit {
                                 value=>$session{form}{'lock'}
                                 });
                 }
-		if ($session{form}{className} eq "WebGUI::Asset::Post") { # new reply
+		if ($session{form}{class} eq "WebGUI::Asset::Post") { # new reply
 			return $self->getThread->getParent->processStyle(WebGUI::Privilege::insufficient()) unless ($self->canReply);
 			$var{isReply} = 1;
 			if ($session{form}{content} || $session{form}{title}) {
@@ -720,7 +721,7 @@ sub www_edit {
 				name=>"subscribe",
 				value=>$session{form}{subscribe}
 				});
-		} elsif ($session{form}{className} eq "WebGUI::Asset::Post::Thread") { # new thread
+		} elsif ($session{form}{class} eq "WebGUI::Asset::Post::Thread") { # new thread
 			return $self->getThread->getParent->processStyle(WebGUI::Privilege::insufficient()) unless ($self->getThread->getParent->canPost);
 			$var{isNewThread} = 1;
                 	if ($self->getThread->getParent->canModerate) {
@@ -824,7 +825,7 @@ sub www_edit {
 		value => $self->getValue("startDate")
 		});
 	$self->getThread->getParent->appendTemplateLabels(\%var);
-	return $self->getParent->processStyle($self->processTemplate(\%var,$self->getParent->get("submissionFormTemplateId")));
+	return $self->getParent->processStyle($self->processTemplate(\%var,$self->getThread->getParent->get("postFormTemplateId")));
 }
 
 

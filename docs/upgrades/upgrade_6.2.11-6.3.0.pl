@@ -681,8 +681,11 @@ my $sth = WebGUI::SQL->read("select assetId,template,namespace from template whe
 while (my ($id, $template, $namespace) = $sth->array) {
 	if ($namespace eq "Forum") {
 		$namespace = "Collaboration";
+		$template = '<a name="<tmpl_var assetId>"></a><tmpl_if session.var.adminOn><p><tmpl_var controls></p></tmpl_if>'.$template;
 	} elsif ($namespace eq "Forum/PostForm") {
 		$namespace = "Collaboration/PostForm";
+	} elsif ($namespace eq "Forum/Search") {
+		$namespace = "Collaboration/Search";
 	} elsif ($namespace eq "Forum/Notification") {
 		$namespace = "Collaboration/Notification";
 	} elsif ($namespace eq "Forum/Thread") {
@@ -734,6 +737,24 @@ while (my ($id, $template, $namespace) = $sth->array) {
 	$template =~ s/thread\.last\.user.id/last.ownerUserId/ixsg;
 	$template =~ s/thread\.last\.user.isVisitor/last.user.isVisitor/ixsg;
 	$template =~ s/thread\.last\.status/last.status/ixsg;
+	$template =~ s/post\.subject\.label/subject.label/ixsg;
+	$template =~ s/post\.subject/title/ixsg;
+	$template =~ s/post\.message/content/ixsg;
+	$template =~ s/post\.time\.value/timeSubmitted.human/ixsg;
+	$template =~ s/post\.date\.value/dateSubmitted.human/ixsg;
+	$template =~ s/post\.date\.epoch/dateSubmitted/ixsg;
+	$template =~ s/post\.date\.label/date.label/ixsg;
+	$template =~ s/post\.rating\.label/rating.label/ixsg;
+	$template =~ s/post\.rating\.value/rating/ixsg;
+	$template =~ s/form\.begin/form.header/ixsg;
+	$template =~ s/form\.end/form.footer/ixsg;
+	$template =~ s/message\.form/content.form/ixsg;
+	$template =~ s/subject\.form/title.form/ixsg;
+	$template =~ s/newpost\.header/newpost.header.label/ixsg;
+	$template =~ s/newpost\.isReply/isReply/ixsg;
+	$template =~ s/newpost\.isEdit/isEdit/ixsg;
+	$template =~ s/newpost\.isNewThread/isNewThread/ixsg;
+	$template =~ s/newpost\.isNewMessage/isNewPost/ixsg;
 	$template =~ s/firstPage/pagination.firstPage/ixsg;
 	$template =~ s/lastPage/pagination.lastPage/ixsg;
 	$template =~ s/nextPage/pagination.nextPage/ixsg;
@@ -742,6 +763,8 @@ while (my ($id, $template, $namespace) = $sth->array) {
 	$template =~ s/multiplePages/pagination.pageCount.isMultiple/ixsg;
 	$template =~ s/numberOfPages/pagination.pageCount/ixsg;
 	$template =~ s/pageNumber/pagination.pageNumber/ixsg;
+	$template =~ s/thread_loop/post_loop/ixsg;
+	$template =~ s/\<div align="center"\>\s+\<a href=""\>-=:\s+:=-\<\/a\>\s+\<\/div\>//ixsg;
 	WebGUI::SQL->write("update template set template=".quote($template).", namespace=".quote($namespace)." where assetId=".quote($id)); 
 }
 $sth->finish;
@@ -851,6 +874,7 @@ $conf->set("assets"=>[
 		'WebGUI::Asset::Wobject::SQLReport',
 		'WebGUI::Asset::Wobject::Survey',
 		'WebGUI::Asset::Wobject::Product',
+		'WebGUI::Asset::Wobject::Collaboration',
 		'WebGUI::Asset::Redirect',
 		'WebGUI::Asset::Template',
 		'WebGUI::Asset::FilePile',

@@ -2,7 +2,7 @@ assets = WebGUI::Asset::File::Image, \
 	WebGUI::Asset::File, \
 	WebGUI::Asset::Snippet, \
 	WebGUI::Asset::Redirect, \
-	WebGUI::Asset::Wobject::USS, \
+	WebGUI::Asset::Wobject::Collaboration, \
 	WebGUI::Asset::Wobject::Product, \
 	WebGUI::Asset::Wobject::Poll, \
 	WebGUI::Asset::Wobject::SyndicatedContent, \
