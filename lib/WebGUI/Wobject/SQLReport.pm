@@ -100,12 +100,13 @@ sub www_edit {
 		-label=>WebGUI::International::get(3,$_[0]->get("namespace")),
 		-value=>$_[0]->getValue("template")
 		);
+	my %databaseLinkOptions;
+	tie %databaseLinkOptions, 'Tie::IxHash',
+		"0"=>WebGUI::International::get(19,$_[0]->get("namespace")),
+		WebGUI::DatabaseLink::getHash();		
 	$privileges->selectList(
 		-name=>"databaseLinkId",
-		-options=>{
-			"0"=>WebGUI::International::get(19,$_[0]->get("namespace")),
-			WebGUI::DatabaseLink::getHash(),
-		},
+		-options=>\%databaseLinkOptions,
 		-label=>WebGUI::International::get(20,$_[0]->get("namespace")),
 		-value=>[$_[0]->getValue("databaseLinkId")],
 		-subtext=>(WebGUI::Privilege::isInGroup(3)) ? '<a href="'.WebGUI::URL::page("op=listDatabaseLinks").'">'.WebGUI::International::get(981).'</a>' : ""
