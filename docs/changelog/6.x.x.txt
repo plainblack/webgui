@@ -15,7 +15,7 @@
  - Added AOIRank and AOIHits macro's to retrieve user's Area's Of Interest
    statistics. (Thanks to DonorWare for funding this feature.)
  - Fixed a typo in Forum/UI.pm
-
+ - bugfix [ 996284 ] Compile error in macro.pm
 
 6.1.1
  - bugfix [ 991313 ] Manage Translations doesn't work
