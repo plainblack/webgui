@@ -764,6 +764,10 @@ sub update {
 	return 1;
 }
 
+sub view {
+	return "";
+}
+
 sub www_add {
 	my $self = shift;
 	my %properties = (

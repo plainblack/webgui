@@ -169,7 +169,7 @@ sub edit {
 		-name=>"file",
 		-label=>"Upload File"
 		);
-	return $self->getAdminConsole->render($tabform->print);
+	return $self->getAdminConsole->render($tabform->print,"Add a Pile of Files");
 }
 
 sub editSave {

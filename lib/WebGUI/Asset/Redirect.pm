@@ -89,6 +89,7 @@ sub getEditForm {
                 -label=>"Redirect URL",
                 -value=>$self->getValue("redirectUrl")
                 );
+	return $tabform;
 }
 
 
@@ -125,6 +126,13 @@ sub getName {
 	return "Redirect";
 } 
 
+
+#-------------------------------------------------------------------
+sub www_edit {
+        my $self = shift;
+        return WebGUI::Privilege::insufficient() unless $self->canEdit;
+        return $self->getAdminConsole->render($self->getEditForm->print,"Edit Redirect");
+}
 
 #-------------------------------------------------------------------
 
