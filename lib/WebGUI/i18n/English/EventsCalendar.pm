@@ -1,6 +1,300 @@
 package WebGUI::i18n::English::EventsCalendar;
 
 our $I18N = {
+	'500' => {
+		message => q|May Manage This Calendar|,
+		lastUpdated => 1108397891
+	},
+
+	'501' => {
+		message => q|Calendar Type|,
+		lastUpdated => 1108397891
+	},
+
+	'502' => {
+		message => q|Regular|,
+		lastUpdated => 1108397891
+	},
+
+	'503' => {
+		message => q|Personal|,
+		lastUpdated => 1108397891
+	},
+
+	'504' => {
+		message => q|Agenda|,
+		lastUpdated => 1108397891
+	},
+
+	'505' => {
+		message => q|Resource|,
+		lastUpdated => 1108397891
+	},
+
+	'506' => { 
+		message => q|Tasks|,
+		lastUpdated => 1108397891
+	},
+	
+	'507' => {
+		message => q|Calendar Scope|,
+		lastUpdated => 1108397891
+	},
+	
+	'508' => {
+		message => q|Regular|,
+		lastUpdated => 1108397891
+	},
+
+	'509' => {
+		message => q|Master|,
+		lastUpdated => 1108397891
+	},
+
+	'510' => {
+		message => q|Global|,
+		lastUpdated => 1108397891
+	},
+
+	'511' => {
+		message => q|Event|,
+		lastUpdated => 1108397891
+	},
+
+	'512' => {
+		message => q|Description|,
+		lastUpdated => 1108397891
+	},
+
+	'513' => {
+		message => q|Event Starts|,
+		lastUpdated => 1108397891
+	},
+	
+	'514' => {
+		message => q|Event Ends|,
+		lastUpdated => 1108397891
+	},
+
+	'515' => {
+		message => q|Event Location|,
+		lastUpdated => 1108397891
+	},
+
+	'516' => {
+		message => q|May users register for this event?|,
+		lastUpdated => 1108397891
+	},
+
+	'517' => {
+		message => q|May users unregister for this event?|,
+		lastUpdated => 1108397891
+	},
+	
+	'518' => {
+		message => q|Present EULA-type accept/cancel form<br />for user to confirm registration?|,
+		lastUpdated => 1108397891
+	},
+
+	'519' => {
+		message => q|Notify a group when a registration occurs?|,
+		lastUpdated => 1108397891
+	},
+
+	'520' => {
+		message => q|Registration Starts|,
+		lastUpdated => 1108397891
+	},
+
+	'521' => {
+		message => q|Registration Ends|,
+		lastUpdated => 1108397891
+	},
+	
+	'522' => {
+		message => q|May users subscribe to Event Reminders?|,
+		lastUpdated => 1108397891
+	},
+
+	'523' => {
+		message => q|Reminders Start|,
+		lastUpdated => 1108397891
+	},
+
+	'524' => {
+		message => q|Reminders END|,
+		lastUpdated => 1108397891
+	},
+
+	'524.5' => {
+		message => q|Reminders Recur Every|,
+		lastUpdated => 1108397891
+	},
+
+	'525' => {
+		message => q|Add event item to Shopping Cart upon Registration?|,
+		lastUpdated => 1108397891
+	},
+	
+	'526' => {
+		message => q|Fee for first attendee|,
+		lastUpdated => 1108397891
+	},
+
+	'527' => {
+		message => q|Fee for second attendee|,
+		lastUpdated => 1108397891
+	},
+
+	'528' => {
+		message => q|Number of Seats Available (-1 for unlimited)|,
+		lastUpdated => 1108397891
+	},
+
+	'529' => {
+		message => q|Registration Confirmation (Accept/Cancel) Template|,
+		lastUpdated => 1108397891
+	},
+	
+	'530' => {
+		message => q|View Event Template|,
+		lastUpdated => 1108397891
+	},
+
+	'531' => {
+		message => q|Registration Notification Template|,
+		lastUpdated => 1108397891
+	},
+
+	'532' => {
+		message => q|Recurring Email Reminder Template|,
+		lastUpdated => 1108397891
+	},
+	
+	'533' => {
+		message => q|Group that may register for this Event|,
+		lastUpdated => 1108397891
+	},
+
+	'534' => {
+		message => q|Group that may subscribe to Event reminders|,
+		lastUpdated => 1108397891
+	},
+
+	'535' => {
+		message => q|Group to notify upon Registration|,
+		lastUpdated => 1108397891
+	},
+
+	'536' => {
+		message => q|a|,
+		lastUpdated => 1108397891
+	},
+	
+	'537' => {
+		message => q|a|,
+		lastUpdated => 1108397891
+	},
+
+	'538' => {
+		message => q|a|,
+		lastUpdated => 1108397891
+	},
+
+	'539' => {
+		message => q|a|,
+		lastUpdated => 1108397891
+	},
+	
+	'540' => {
+		message => q|Fee for first attendee|,
+		lastUpdated => 1108397891
+	},
+
+	'541' => {
+		message => q|Fee for second attendee|,
+		lastUpdated => 1108397891
+	},
+
+	'542' => {
+		message => q|Number of Seats Available (-1 for unlimited)|,
+		lastUpdated => 1108397891
+	},
+
+	'543' => {
+		message => q|Registration Confirmation (Accept/Cancel) Template|,
+		lastUpdated => 1108397891
+	},
+	
+	'544' => {
+		message => q|View Event Template|,
+		lastUpdated => 1108397891
+	},
+
+	'545' => {
+		message => q|Add event item to Shopping Cart upon Registration?|,
+		lastUpdated => 1108397891
+	},
+	
+	'546' => {
+		message => q|Fee for first attendee|,
+		lastUpdated => 1108397891
+	},
+
+	'547' => {
+		message => q|Fee for second attendee|,
+		lastUpdated => 1108397891
+	},
+
+	'548' => {
+		message => q|Number of Seats Available (-1 for unlimited)|,
+		lastUpdated => 1108397891
+	},
+
+	'549' => {
+		message => q|Registration Confirmation (Accept/Cancel) Template|,
+		lastUpdated => 1108397891
+	},
+	
+	'550' => {
+		message => q|View Event Template|,
+		lastUpdated => 1108397891
+	},
+
+	'551' => {
+		message => q|Add event item to Shopping Cart upon Registration?|,
+		lastUpdated => 1108397891
+	},
+	
+	'552' => {
+		message => q|Fee for first attendee|,
+		lastUpdated => 1108397891
+	},
+
+	'553' => {
+		message => q|Fee for second attendee|,
+		lastUpdated => 1108397891
+	},
+
+	'554' => {
+		message => q|Number of Seats Available (-1 for unlimited)|,
+		lastUpdated => 1108397891
+	},
+
+	'555' => {
+		message => q|Registration Confirmation (Accept/Cancel) Template|,
+		lastUpdated => 1108397891
+	},
+	
+	'556' => {
+		message => q|View Event Template|,
+		lastUpdated => 1108397891
+	},
+	
+	'557' => {
+		message => q|Untitled Event|,
+		lastUpdated => 1108397891
+	},
 	'90' => {
 		message => q|Default Month|,
 		lastUpdated => 1038190708
@@ -536,7 +830,7 @@ The description of this event.
 	},
 
 	'8' => {
-		message => q|Recurs every|,
+		message => q|This event recurs every|,
 		lastUpdated => 1031514049
 	},
 
