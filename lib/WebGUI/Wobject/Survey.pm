@@ -391,7 +391,7 @@ sub www_editQuestion {
                         "addBooleanAnswer"=>WebGUI::International::get(25,$namespace),
                         "addFrequencyAnswer"=>WebGUI::International::get(26,$namespace),
                         "addOpinionAnswer"=>WebGUI::International::get(27,$namespace),
-			"addQuestion"=>WebGUI::International::get(28,$namespace),
+			#"addQuestion"=>WebGUI::International::get(28,$namespace),
                         "backToPage"=>WebGUI::International::get(745)
 			);
         	$f->whatNext(
@@ -605,13 +605,13 @@ sub www_view {
 			if ($questionOrder eq "sequential") {
 				my $previousQuestion = $_[0]->getCollateral("Survey_question","Survey_questionId",
 					$previousResponse->{Survey_questionId});
-				$previousQuestion->{sequenceNumber} = 1 unless($previousQuestion->{sequenceNumber});
+				$previousQuestion->{sequenceNumber} = 0 unless($previousQuestion->{sequenceNumber});
 				$question = WebGUI::SQL->quickHashRef("select * from Survey_question where Survey_id="
 					.$_[0]->get("Survey_id")." and sequenceNumber>".$previousQuestion->{sequenceNumber}
 					." order by sequenceNumber");
 			}
 		}
-		if ($question) {
+		if ($question->{Survey_questionId}) {
 			$output .= $question->{question};
 			$f = WebGUI::HTMLForm->new;
 			$f->hidden("func","respond");
@@ -822,7 +822,13 @@ sub www_viewStatisticalOverview {
 				($data) = WebGUI::SQL->quickArray("select count(*) from Survey_response
                                         where Survey_answerId=".$answer->{Survey_answerId});
 				$output .= '<td>'.$data.'</td>';
-				$output .= '<td>'.round(($data/$totalResponses)*100).'</td>';
+				$output .= '<td>';
+				if ($totalResponses) {
+					$output .= round(($data/$totalResponses)*100);
+				} else {
+					$output .= '0';
+				}
+				$output .= '</td>';
 				$output .= '</tr>';
 			}
 			$sth->finish;
