@@ -97,12 +97,12 @@ sub www_edit {
                 -options=>WebGUI::Page::getTemplatePositions($session{page}{templateId}),
                 -subtext=>WebGUI::Page::drawTemplate($session{page}{templateId})
                 );
-       	$f->getTab("privileges")->date(
+       	$f->getTab("privileges")->dateTime(
 		-name=>"startDate",
 		-label=>WebGUI::International::get(497),
 		-value=>$_[0]->getValue("startDate")
 		);
-       	$f->getTab("privileges")->date(
+       	$f->getTab("privileges")->dateTime(
 		-name=>"endDate",
 		-label=>WebGUI::International::get(498),
 		-value=>$_[0]->getValue("endDate")
@@ -120,7 +120,7 @@ sub www_edit {
 	$f->getTab("properties")->text(
 		-name=>"class",
 		-label=>WebGUI::International::get(5,$_[0]->get("namespace")),
-		-value=>$_[0]->get("class")
+		-value=>$_[0]->getValue("class")
 		);
        	$output .= $f->print;
 	return $output;
@@ -128,7 +128,7 @@ sub www_edit {
 
 #-------------------------------------------------------------------
 sub www_view {
-	return	'</td><td width="'.$_[0]->get("spacer").'"></td><td width="'.$_[0]->get("width").'" class="'.$_[0]->get("class").'" valign="top">';
+	return '</td><td width="'.$_[0]->get("spacer").'"></td><td width="'.$_[0]->get("width").'" class="'.$_[0]->get("class").'" valign="top">';
 }
 
 
