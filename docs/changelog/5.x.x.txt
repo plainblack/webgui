@@ -6,6 +6,8 @@
  - bugfix [ 912404 ] Visitors can turn admin on
  - bugfix [ 917913, 915019, 913999, 912765, 912206 ] OwnerId was not set correctly
    when saving page.
+ - Bugfix [ 884375 ] Fix for multiple forum posts applied also to
+   www_viewForum to handle postings that start a new thread.
 
 
 

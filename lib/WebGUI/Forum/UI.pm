@@ -2289,6 +2289,12 @@ sub www_viewForum {
 	my ($caller, $forumId) = @_;
 	WebGUI::Session::setScratch("forumSortBy",$session{form}{sortBy});
 	$forumId = $session{form}{forumId} unless ($forumId);
+	# If POST, cause redirect, so new post is displayed using GET instead of POST
+	if ($session{env}{REQUEST_METHOD} =~ /POST/i) {
+		my $url= formatForumURL($caller->{callback}, $forumId);
+		$session{header}{redirect} = WebGUI::Session::httpRedirect($url);
+		return "";
+	}
 	my $forum = WebGUI::Forum->new($forumId);
 	my $var = getForumTemplateVars($caller, $forum);
 	return WebGUI::Template::process(WebGUI::Template::get($forum->get("forumTemplateId"),"Forum"), $var); 
@@ -2318,9 +2324,9 @@ sub www_viewThread {
 	my ($caller, $postId) = @_;
 	WebGUI::Session::setScratch("forumThreadLayout",$session{form}{layout});
 	$postId = $session{form}{forumPostId} unless ($postId);
-	 # If POST, cause redirect, so new post is displayed using GET instead of POST
+	# If POST, cause redirect, so new post is displayed using GET instead of POST
 	if ($session{env}{REQUEST_METHOD} =~ /POST/i) { 
-		my $url= formatThreadURL($caller-> {callback}, $postId); 
+		my $url= formatThreadURL($caller->{callback}, $postId); 
 		$session{header}{redirect} = WebGUI::Session::httpRedirect($url);
 		return "";
 	}
