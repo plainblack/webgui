@@ -66,5 +66,5 @@ webgui.
    turn off file icons.
  - Added drag and drop content arranging.
  - Added new toolbar icons. 
-
+ - Made the add content menu much more powerful.
 

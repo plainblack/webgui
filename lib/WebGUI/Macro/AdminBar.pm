@@ -31,11 +31,24 @@ sub process {
 	tie %hash, "Tie::IxHash";
 	tie %hash2, "Tie::IxHash";
 	tie %cphash, "Tie::CPHash";
-  #--content adder
-	$hash{WebGUI::URL::page('op=editPage&npp='.$session{page}{pageId})} = WebGUI::International::get(2);
-	if ($session{user}{uiLevel} >= 7) {
-		$hash{WebGUI::URL::page('op=selectPackageToDeploy')} = WebGUI::International::get(376);
-	}
+  #--packages adder
+	$var{'packages.canAdd'} = ($session{user}{uiLevel} >= 7);
+	$var{'packages.label'} = WebGUI::International::get(376);
+	my @packages;
+	my $i;
+	my $sth = WebGUI::SQL->read("select pageId,title from page where parentId=5");
+        while (my %data = $sth->hash) {
+		push(@packages, {
+        		'package.url'=>WebGUI::URL::page('op=deployPackage&pid='.$data{pageId}),
+               		'package.label'=>$data{title},
+			'package.count'=>$i
+			});
+		$i++;
+        }
+        $sth->finish;
+	$var{package_loop} = \@packages;
+  #--contenttypes adder
+	$var{'contentTypes.label'} = WebGUI::International::get(1083);
 	foreach my $namespace (@{$session{config}{wobjects}}) {
 		my $cmd = "WebGUI::Wobject::".$namespace;	
 		my $w = eval{$cmd->new({namespace=>$namespace,wobjectId=>"new"})};
@@ -52,16 +65,18 @@ sub process {
 	my $i = 0;
 	foreach my $key (keys %hash) {
 		push(@addcontent,{
-			'addcontent.url'=>$key,
-			'addcontent.label'=>$hash{$key},
-			'addcontent.count'=>$i
+			'contenttype.url'=>$key,
+			'contenttype.label'=>$hash{$key},
+			'contenttype.count'=>$i
 			});
 		$i++;
 	}
-	$var{'addcontent_loop'} = \@addcontent;
+	$var{'contenttypes_loop'} = \@addcontent;
+	$var{'addpage.url'} = WebGUI::URL::page('op=editPage&npp='.$session{page}{pageId});
+	$var{'addpage.label'} = WebGUI::International::get(2);
   #--clipboard paster
+	$var{'clipboard.label'} = WebGUI::International::get(1082);
 	%hash2 = ();
-	$var{'clipboard.label'} = WebGUI::International::get(3);
 
 	# get pages and store in array of arrays in order to integrate with wobjects and sort by buffer date
 	if ($session{setting}{sharedClipboard} eq "1") {

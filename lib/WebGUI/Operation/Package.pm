@@ -20,7 +20,7 @@ use WebGUI::SQL;
 use WebGUI::URL;
 
 our @ISA = qw(Exporter);
-our @EXPORT = qw(&www_deployPackage &www_selectPackageToDeploy);
+our @EXPORT = qw(&www_deployPackage );
 
 #-------------------------------------------------------------------
 sub _duplicateWobjects {
@@ -110,30 +110,6 @@ sub _recursePageTree {
 		_recursePageTree($package{pageId},$newPageId);
 	}
 	$a->finish;
-}
-
-#-------------------------------------------------------------------
-sub www_selectPackageToDeploy {
-	my ($output, %data, $sth, $flag);
-	$session{page}{useAdminStyle} = 1;
-	if (WebGUI::Privilege::canEditPage()) {
-		tie %data,'Tie::CPHash';
-		$output = helpIcon(30);
-		$output .= '<h1>'.WebGUI::International::get(375).'</h1>';
-		$output .= '<ul>';
-		$sth = WebGUI::SQL->read("select * from page where parentId=5");
-		while (%data = $sth->hash) {
-			$output .= '<li> <a href="'.WebGUI::URL::page('op=deployPackage&pid='.$data{pageId})
-				.'">'.$data{title}.'</a>';
-			$flag = 1;
-		}
-		$sth->finish;
-		$output .= WebGUI::International::get(377) unless $flag;
-		$output .= '</ul>';
-		return $output;
-	} else {
-		return WebGUI::Privilege::insufficient();
-	}
 }
 
 #-------------------------------------------------------------------
