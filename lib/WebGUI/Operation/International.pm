@@ -250,26 +250,40 @@ sub www_listInternationalMessages {
                 $list{"z-".$data{namespace}."-".$data{internationalId}}{status} = "deleted";
         }
         $sth->finish;
-        $sth = WebGUI::SQL->read("select * from international where languageId=1".$search);
-        while (%data = $sth->hash) {
+       	$sth = WebGUI::SQL->read("select * from international where languageId=1");
+       	while (%data = $sth->hash) {
 		$key = $data{namespace}."-".$data{internationalId};
-                unless ($list{"z-".$key}) {
-                        $list{"a-".$key}{namespace} = $data{namespace};
-                        $list{"a-".$key}{id} = $data{internationalId};
-                        $list{"a-".$key}{status} = "missing";
-                } else {
-			if ($list{"z-".$key}{lastUpdated} < $data{lastUpdated}) {
-                               	$list{"o-".$key} = $list{"z-".$key};
-				delete($list{"z-".$key});
-                               	$list{"o-".$key}{status} = "updated";
-			} else {
-                               	$list{"q-".$key} = $list{"z-".$key};
-				delete($list{"z-".$key});
-                               	$list{"q-".$key}{status} = "ok";
+		if ($session{form}{search} ne "") {
+			if ($list{"z-".$key}) {
+				if ($list{"z-".$key}{lastUpdated} < $data{lastUpdated}) {
+                                        $list{"o-".$key} = $list{"z-".$key};
+                                        delete($list{"z-".$key});
+                                        $list{"o-".$key}{status} = "updated";
+                                } else {
+                                        $list{"q-".$key} = $list{"z-".$key};
+                                        delete($list{"z-".$key});
+                                        $list{"q-".$key}{status} = "ok";
+                                }
+			}	
+		} else {
+                	unless ($list{"z-".$key}) {
+                        	$list{"a-".$key}{namespace} = $data{namespace};
+                        	$list{"a-".$key}{id} = $data{internationalId};
+                        	$list{"a-".$key}{status} = "missing";
+                	} else {
+				if ($list{"z-".$key}{lastUpdated} < $data{lastUpdated}) {
+                               		$list{"o-".$key} = $list{"z-".$key};
+					delete($list{"z-".$key});
+                               		$list{"o-".$key}{status} = "updated";
+				} else {
+                               		$list{"q-".$key} = $list{"z-".$key};
+					delete($list{"z-".$key});
+                               		$list{"q-".$key}{status} = "ok";
+				}
 			}
 		}
         }
-        $sth->finish;
+       	$sth->finish;
         foreach $key (sort {$a cmp $b} keys %list) {
 		if ($list{$key}{status} eq "updated") {
 			$status = $outOfDate;
