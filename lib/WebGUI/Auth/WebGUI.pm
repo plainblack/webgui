@@ -395,7 +395,7 @@ sub recoverPassword {
     $vars->{'login.url'} = WebGUI::URL::page('op=auth&method=init');
     $vars->{'login.label'} = WebGUI::International::get(58);
 
-	     $vars->{'anonymousRegistration.isAllowed'} = if ($session{setting}{anonymousRegistration});
+	     $vars->{'anonymousRegistration.isAllowed'} = ($session{setting}{anonymousRegistration});
            $vars->{'createAccount.url'} = WebGUI::URL::page('op=createAccount');
            $vars->{'createAccount.label'} = WebGUI::International::get(67);
    $vars->{'recover.message'} = $_[0] if ($_[0]);
