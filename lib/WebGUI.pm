@@ -86,6 +86,8 @@ sub page {
 	} elsif ($wobjectOutput ne "") {
 		$contentHash{0} = $wobjectOutput;
 		$content = WebGUI::Template::generate(\%contentHash,1);
+	} elsif ($session{page}{redirectURL}) {
+		$session{header}{redirect} = WebGUI::Session::httpRedirect($session{page}{redirectURL})
 	} else {
 		if (WebGUI::Privilege::canViewPage()) {
 			if ($session{var}{adminOn}) {

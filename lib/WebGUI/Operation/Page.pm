@@ -171,6 +171,7 @@ sub www_editPage {
                 $f->text("title",WebGUI::International::get(99),$page{title});
 		$f->text("menuTitle",WebGUI::International::get(411),$page{menuTitle});
                 $f->text("urlizedTitle",WebGUI::International::get(104),$page{urlizedTitle});
+                $f->url("redirectURL",WebGUI::International::get(715),$page{redirectURL});
 		$f->readOnly(WebGUI::Template::selectTemplate($page{templateId}),WebGUI::International::get(356));
 		$f->textarea("synopsis",WebGUI::International::get(412),$page{synopsis});
 		$f->textarea("metaTags",WebGUI::International::get(100),$page{metaTags});
@@ -242,6 +243,7 @@ sub www_editPageSave {
 			endDate=$session{form}{endDate},
 			metaTags=".quote($session{form}{metaTags}).", 
 			urlizedTitle='$session{form}{urlizedTitle}', 
+			redirectURL='$session{form}{redirectURL}', 
 			defaultMetaTags='$session{form}{defaultMetaTags}', 
 			templateId='$session{form}{templateId}', 
 			menuTitle=".quote($session{form}{menuTitle}).", 

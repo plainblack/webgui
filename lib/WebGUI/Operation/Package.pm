@@ -71,7 +71,8 @@ sub _recursePageTree {
 			synopsis,
 			templateId,
 			startDate,
-			endDate
+			endDate,
+			redirectURL
 			) values (
 			$newPageId,
 			$_[1],
@@ -93,7 +94,8 @@ sub _recursePageTree {
 			".quote($package{synopsis}).",
 			".quote($package{templateId}).",
 			$newParent{startDate},
-			$newParent{endDate}
+			$newParent{endDate},
+			$newParent{redirectURL}
 			)");
 		_recursePageTree($package{pageId},$newPageId);
 	}
