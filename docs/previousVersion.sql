@@ -76,6 +76,7 @@ CREATE TABLE DataForm_entryData (
   wobjectId int(11) NOT NULL default '0',
   name varchar(255) NOT NULL default '',
   value text,
+  PRIMARY KEY  (DataForm_entryId,name),
   KEY MailForm1 (DataForm_entryId)
 ) TYPE=MyISAM;
 
@@ -1389,7 +1390,7 @@ INSERT INTO international VALUES (561,'WebGUI',5,'Negado',1031510000,NULL);
 INSERT INTO international VALUES (8,'WebGUI',1,'View page not found.',1031514049,NULL);
 INSERT INTO international VALUES (8,'WebGUI',4,'Ver P�gina No Encontrada',1031510000,NULL);
 INSERT INTO international VALUES (8,'WebGUI',5,'Ver p�gina n�o encontrada.',1031510000,NULL);
-INSERT INTO international VALUES (12,'WebGUI',2,'Administrationsmodus abschalten',1040640906,NULL);
+INSERT INTO international VALUES (12,'WebGUI',2,'Editieren abschalten.',1050568811,NULL);
 INSERT INTO international VALUES (8,'FileManager',3,'Korte Omschrijving',1038487642,NULL);
 INSERT INTO international VALUES (9,'Article',1,'Attachment',1031514049,NULL);
 INSERT INTO international VALUES (9,'Article',4,'Adjuntar',1031510000,NULL);
@@ -6354,7 +6355,8 @@ INSERT INTO international VALUES (1,'Product',2,'Produkt',1040647163,NULL);
 INSERT INTO international VALUES (10,'DataForm',2,'Von',1040598111,NULL);
 INSERT INTO international VALUES (10,'Product',2,'Preis',1040647172,NULL);
 INSERT INTO international VALUES (11,'FAQ',2,'Inhaltsverzeichnis aktivieren?',1040644529,NULL);
-INSERT INTO international VALUES (11,'DataForm',2,'senden an (Email, Benutzername oder Gruppenname)',1040645079,NULL);
+INSERT INTO international VALUES (11,'DataForm',2,'An',1054045486,NULL);
+INSERT INTO international VALUES (897,'WebGUI/Profile',2,'Veränderbar?',1054045436,NULL);
 INSERT INTO international VALUES (11,'Product',2,'Produktnummer',1040647181,NULL);
 INSERT INTO international VALUES (12,'FAQ',2,'Frage/Antwort einschalten?',1040644541,NULL);
 INSERT INTO international VALUES (12,'DataForm',2,'Kopie',1040645088,NULL);
@@ -6366,7 +6368,7 @@ INSERT INTO international VALUES (14,'DataForm',2,'Betreff',1040645108,NULL);
 INSERT INTO international VALUES (15,'Product',2,'Garantie',1040647244,NULL);
 INSERT INTO international VALUES (954,'WebGUI',1,'Manage system clipboard.',1052850265,NULL);
 INSERT INTO international VALUES (8,'DataForm',2,'Breite',1040645492,NULL);
-INSERT INTO international VALUES (1,'DataForm',2,'Mail Formular',1040405801,NULL);
+INSERT INTO international VALUES (1,'DataForm',2,'DataForm',1054045463,NULL);
 INSERT INTO international VALUES (16,'DataForm',2,'Eingangsbest�tigung',1040645157,NULL);
 INSERT INTO international VALUES (17,'DataForm',2,'E-mail wurde gesendet',1040645170,NULL);
 INSERT INTO international VALUES (463,'WebGUI',2,'Reihen des Textbereichs',1044982063,NULL);
@@ -6420,7 +6422,7 @@ INSERT INTO international VALUES (715,'WebGUI',2,'Weiterleitungs URL',1041631643
 INSERT INTO international VALUES (27,'Product',2,'Merkmal',1041626158,NULL);
 INSERT INTO international VALUES (26,'Product',2,'Produktname',1040647368,NULL);
 INSERT INTO international VALUES (25,'Product',2,'Merkmale bearbeiten',1041626137,NULL);
-INSERT INTO international VALUES (25,'DataForm',2,'Standardwert (optional)',1041602912,NULL);
+INSERT INTO international VALUES (25,'DataForm',2,'Standardwert(e)',1054045511,NULL);
 INSERT INTO international VALUES (24,'Product',2,'Eine weitere Eigenschaft hinzuf�gen?',1040647336,NULL);
 INSERT INTO international VALUES (2,'WobjectProxy',2,'Wobject Proxy bearbeiten',1041611131,NULL);
 INSERT INTO international VALUES (947,'WebGUI',1,'Use shared clipboard?',1052850265,NULL);
@@ -11116,7 +11118,7 @@ INSERT INTO international VALUES (891,'WebGUI',2,'Nur Makros blockieren.',104909
 INSERT INTO international VALUES (889,'WebGUI',2,'Style Sheets, Tabulatoren',1048242304,NULL);
 INSERT INTO international VALUES (73,'SyndicatedContent',2,'Nachfolgend die Template Variablen f�r das Syndicated Content Template:\r\n\r\n<b>channel.title</b>\r\nDer Titel dieses Contentbereichs\r\n<b>channel.description</b>\r\nEine Beschreibung dieses Channels\r\n<b>channel.link</b>\r\nEine URL, die auf die Original-Seite dieses Channels verlinkt.\r\n<b>item_loop</b>\r\nEine Schleife, die die Daten dieses Channels enth�lt.\r\n<b>title</b>\r\nDer Titel des Channelbeitrags\r\n<b>description</b>\r\nDie Beschreibung dieses Beitrags\r\n<b>link</b>\r\nEine URL zum Beitrag',1048242285,NULL);
 INSERT INTO international VALUES (72,'SyndicatedContent',2,'Syndicated Content Template',1048242073,NULL);
-INSERT INTO international VALUES (28,'DataForm',2,'Optional f�r Textbereich',1048241987,NULL);
+INSERT INTO international VALUES (28,'DataForm',2,'Optional für Text- und HTML Bereich',1054045535,NULL);
 INSERT INTO international VALUES (27,'DataForm',2,'H�he',1048241963,NULL);
 INSERT INTO international VALUES (10,'HttpProxy',2,'HTTP Proxy, hinzuf�gen/bearbeiten',1048241949,NULL);
 INSERT INTO international VALUES (526,'Discussion',2,'von',1048241932,NULL);
@@ -13556,6 +13558,94 @@ INSERT INTO international VALUES (10,'DataForm',13,'Keneltä',1033387154,NULL);
 INSERT INTO international VALUES (1,'DataForm',13,'Sähköpostilomake',1033387152,NULL);
 INSERT INTO international VALUES (2,'DataForm',13,'Viestin aihe tähän',1032541850,NULL);
 INSERT INTO international VALUES (14,'DataForm',13,'Aihe',1032541832,NULL);
+INSERT INTO international VALUES (945,'WebGUI',2,'Scratch Filter',1054050912,NULL);
+INSERT INTO international VALUES (946,'WebGUI',2,'Gemeinsamen Mülleimer benutzen?',1054048298,NULL);
+INSERT INTO international VALUES (947,'WebGUI',2,'Gemeinsame Zwischenablage benutzen?',1054048284,NULL);
+INSERT INTO international VALUES (948,'WebGUI',2,'Zwischenablage verwalten',1054048257,NULL);
+INSERT INTO international VALUES (949,'WebGUI',2,'Verwalten: Zwischenablage',1054048234,NULL);
+INSERT INTO international VALUES (950,'WebGUI',2,'Zwischenablage leeren.',1054048162,NULL);
+INSERT INTO international VALUES (951,'WebGUI',2,'Sind Sie sicher, dass Sie den Inhalt der Zwischenablage in den Mülleimer verschieben möchten?',1054048139,NULL);
+INSERT INTO international VALUES (952,'WebGUI',2,'Datum Zwischenablage',1054048102,NULL);
+INSERT INTO international VALUES (953,'WebGUI',2,'Vorherige Location',1054048086,NULL);
+INSERT INTO international VALUES (954,'WebGUI',2,'System-Zwischenablage verwalten.',1054048052,NULL);
+INSERT INTO international VALUES (955,'WebGUI',2,'System-Zwischenablage verwalten',1054048035,NULL);
+INSERT INTO international VALUES (957,'WebGUI',2,'Zwischenablage, Verwalten',1054048016,NULL);
+INSERT INTO international VALUES (959,'WebGUI',2,'System-Zwischenablage leeren.',1054047995,NULL);
+INSERT INTO international VALUES (960,'WebGUI',2,'Mülleimer, Verwalten',1054047974,NULL);
+INSERT INTO international VALUES (962,'WebGUI',2,'Mülleimer verwalten',1054047952,NULL);
+INSERT INTO international VALUES (963,'WebGUI',2,'Lösch Datum',1054047937,NULL);
+INSERT INTO international VALUES (964,'WebGUI',2,'System-Mülleimer verwalten.',1054047881,NULL);
+INSERT INTO international VALUES (965,'WebGUI',2,'System-Mülleimer verwalten',1054047852,NULL);
+INSERT INTO international VALUES (967,'WebGUI',2,'System-Mülleimer löschen',1054047831,NULL);
+INSERT INTO international VALUES (970,'WebGUI',2,'Uhrzeit setzen',1054047795,NULL);
+INSERT INTO international VALUES (971,'WebGUI',2,'Uhrzeit',1054047781,NULL);
+INSERT INTO international VALUES (972,'WebGUI',2,'Datum und Zeit',1054047767,NULL);
+INSERT INTO international VALUES (973,'WebGUI',2,'Falls Proxy benutzt wird: echte Client IP-Adressen benutzen?',1054047756,NULL);
+INSERT INTO international VALUES (974,'WebGUI',2,'Benutzer können sich selbst hinzufügen?',1054047723,NULL);
+INSERT INTO international VALUES (10,'WobjectProxy',2,'Template überschreiben?',1054047705,NULL);
+INSERT INTO international VALUES (7,'WobjectProxy',2,'Titel überschreiben?',1054047691,NULL);
+INSERT INTO international VALUES (8,'WobjectProxy',2,'Angezeigten Titel überschreiben?',1054047678,NULL);
+INSERT INTO international VALUES (975,'WebGUI',2,'Benutzer können sich selbst von dieser Gruppe entfernen?',1054047654,NULL);
+INSERT INTO international VALUES (976,'WebGUI',2,'Benutzer hinzufügen',1054046453,NULL);
+INSERT INTO international VALUES (977,'WebGUI',2,'Zusätzlicher Administrator?',1054046425,NULL);
+INSERT INTO international VALUES (978,'WebGUI',2,'Benutzer erfolgreich hinzugefügt.',1054046403,NULL);
+INSERT INTO international VALUES (938,'WebGUI',2,'Thema, löschen',1054046371,NULL);
+INSERT INTO international VALUES (940,'WebGUI',2,'In neuem Fenster öffnen?',1054046355,NULL);
+INSERT INTO international VALUES (936,'WebGUI',2,'Thema, importieren',1054046328,NULL);
+INSERT INTO international VALUES (933,'WebGUI',2,'Thema, bearbeiten',1054046301,NULL);
+INSERT INTO international VALUES (931,'WebGUI',2,'Themen, Verwalten',1054046281,NULL);
+INSERT INTO international VALUES (930,'WebGUI',2,'Thema anschauen.',1054046267,NULL);
+INSERT INTO international VALUES (929,'WebGUI',2,'Importieren!',1054046249,NULL);
+INSERT INTO international VALUES (928,'WebGUI',2,'Möchten Sie dieses Thema importieren?',1054046238,NULL);
+INSERT INTO international VALUES (927,'WebGUI',2,'Thema importieren',1054046215,NULL);
+INSERT INTO international VALUES (926,'WebGUI',2,'Dieses Thema wurde mit einer neueren WebGUI Version erstellt. Sie müssen WebGUI zuerst updaten, bevor Sie dieses Thema installieren.',1054046200,NULL);
+INSERT INTO international VALUES (925,'WebGUI',2,'Sie haben bereits eine Version dieses Themas installiert. Sie müssen sie vor dem Neuinstallieren löschen.',1054046137,NULL);
+INSERT INTO international VALUES (924,'WebGUI',2,'Thema importieren.',1054045996,NULL);
+INSERT INTO international VALUES (923,'WebGUI',2,'Thema Version',1054045979,NULL);
+INSERT INTO international VALUES (85,'DataForm',2,'Einer pro Zeile.',1054045953,NULL);
+INSERT INTO international VALUES (921,'WebGUI',2,'Themen Paket Datei',1054045920,NULL);
+INSERT INTO international VALUES (922,'WebGUI',2,'Erstellt mit',1054045908,NULL);
+INSERT INTO international VALUES (920,'WebGUI',2,'Dieses Thema exportieren.',1054045888,NULL);
+INSERT INTO international VALUES (919,'WebGUI',2,'Dieses Thema bearbeiten.',1054045866,NULL);
+INSERT INTO international VALUES (918,'WebGUI',2,'Diese Thema löschen.',1054045852,NULL);
+INSERT INTO international VALUES (917,'WebGUI',2,'Themen-Komponente hinzufügen.',1054045837,NULL);
+INSERT INTO international VALUES (916,'WebGUI',2,'Schnippsel',1054045820,NULL);
+INSERT INTO international VALUES (915,'WebGUI',2,'Datei',1054045810,NULL);
+INSERT INTO international VALUES (914,'WebGUI',2,'Grafik',1054045801,NULL);
+INSERT INTO international VALUES (913,'WebGUI',2,'Template',1054045792,NULL);
+INSERT INTO international VALUES (912,'WebGUI',2,'Style',1054045784,NULL);
+INSERT INTO international VALUES (911,'WebGUI',2,'Komponente',1054045774,NULL);
+INSERT INTO international VALUES (910,'WebGUI',2,'Komponenten Typ',1054045760,NULL);
+INSERT INTO international VALUES (909,'WebGUI',2,'Themen Komponente hinzufügen',1054045743,NULL);
+INSERT INTO international VALUES (908,'WebGUI',2,'Sind Sie sicher, dass Sie diese Komponente von diesem Thema entfernen möchten?',1054045727,NULL);
+INSERT INTO international VALUES (907,'WebGUI',2,'Sind Sie sicher, dass Sie dieses Thema löschen möchten?',1054045699,NULL);
+INSERT INTO international VALUES (906,'WebGUI',2,'Designer URL',1054045674,NULL);
+INSERT INTO international VALUES (905,'WebGUI',2,'Thema Designer',1054045664,NULL);
+INSERT INTO international VALUES (904,'WebGUI',2,'Themen Name',1054045647,NULL);
+INSERT INTO international VALUES (903,'WebGUI',2,'Themen ID',1054045634,NULL);
+INSERT INTO international VALUES (902,'WebGUI',2,'Thema bearbeiten',1054045624,NULL);
+INSERT INTO international VALUES (901,'WebGUI',2,'Neues Thema hinzufügen.',1054045611,NULL);
+INSERT INTO international VALUES (900,'WebGUI',2,'Verwalten: Themen',1054045592,NULL);
+INSERT INTO international VALUES (899,'WebGUI',2,'Themen Verwalten',1054045577,NULL);
+INSERT INTO international VALUES (898,'WebGUI',2,'Site Icon',1054045556,NULL);
+INSERT INTO international VALUES (9,'WobjectProxy',2,'Beschreibung überschreiben?',1054045415,NULL);
+INSERT INTO international VALUES (87,'DataForm',2,'Listen Template',1054045385,NULL);
+INSERT INTO international VALUES (86,'DataForm',2,'Alle Einträge anzeigen.',1054045370,NULL);
+INSERT INTO international VALUES (88,'DataForm',2,'DataForm Listen Template',1054045351,NULL);
+INSERT INTO international VALUES (897,'WebGUI',2,'Favicon',1054045326,NULL);
+INSERT INTO international VALUES (1,'SI_scaledImage',2,'Skalierte Grafik Makro',1054045293,NULL);
+INSERT INTO international VALUES (73,'Poll',2,'Abstimmungs Template',1054045268,NULL);
+INSERT INTO international VALUES (98,'EventsCalendar',2,'Jetzt!',1054045254,NULL);
+INSERT INTO international VALUES (84,'DataForm',2,'Exportieren (durch Tabulator getrennt)',1054045239,NULL);
+INSERT INTO international VALUES (82,'DataForm',2,'DataForm Template',1054045206,NULL);
+INSERT INTO international VALUES (81,'DataForm',2,'Bestätigungs Template',1054045190,NULL);
+INSERT INTO international VALUES (80,'DataForm',2,'Email Template',1054045154,NULL);
+INSERT INTO international VALUES (79,'DataForm',2,'Zusatztext',1054045142,NULL);
+INSERT INTO international VALUES (77,'DataForm',2,'Label',1054045130,NULL);
+INSERT INTO international VALUES (76,'DataForm',2,'Feld hinzufügen.',1054045117,NULL);
+INSERT INTO international VALUES (75,'DataForm',2,'Erforderlich',1054045105,NULL);
+INSERT INTO international VALUES (74,'DataForm',2,'Daten per Email versenden?',1054045087,NULL);
+INSERT INTO international VALUES (9,'Auth/LDAP',2,'Benutzer RDN',1054045062,NULL);
 
 --
 -- Table structure for table 'karmaLog'
@@ -14107,7 +14197,7 @@ CREATE TABLE webguiVersion (
 --
 
 
-INSERT INTO webguiVersion VALUES ('5.3.1','initial install',unix_timestamp());
+INSERT INTO webguiVersion VALUES ('5.3.2','initial install',unix_timestamp());
 
 --
 -- Table structure for table 'wobject'
