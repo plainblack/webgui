@@ -29,13 +29,59 @@ Data management class for forum threads.
 =head1 SYNOPSIS
                                                                                                                                                              
  use WebGUI::Forum;
- $forum = WebGUI::Forum::Thread->create(\%params);
- $forum = WebGUI::Forum::Thread->new($threadId);
+ $thread = WebGUI::Forum::Thread->create(\%params);
+ $thread = WebGUI::Forum::Thread->new($threadId);
+
+ $scalar = $thread->get($param);
+ $obj = $thread->getForum;
+ $obj = $thread->getNextThread;
+ $obj = $thread->getPost($postId);
+ $obj = $thread->getPreviousThread;
+ $boolean = $thread->isLocked;
+ $boolean = $thread->isSticky;
+ $boolean = $thread->isSubscribed;
+
+ $thread->incrementReplies($postDate, $postId);
+ $thread->incrementViews;
+ $thread->lock;
+ $thread->recalculateRating;
+ $thread->set(\%data);
+ $thread->setLastPost($postDate,$postId);
+ $thread->setStatusApproved;
+ $thread->setStatusArchived;
+ $thread->setStatusDeleted;
+ $thread->setStatusDenied;
+ $thread->setStatusPending;
+ $thread->stick;
+ $thread->subscribe;
+ $thread->unlock;
+ $thread->unstick;
+ $thread->unsubscribe;
                                                                                                                                                              
 =head1 METHODS
                                                                                                                                                              
 These methods are available from this class:
                                                                                                                                                              
+=cut
+
+#-------------------------------------------------------------------
+
+=head2 create ( data, postData )
+
+Creates a new thread, including the root post in that thread.
+
+=over
+
+=item data
+
+The properties of this thread. See the forumThread table for details.
+
+=item postData
+
+The properties of the root post in this thread. See the forumPost table and the WebGUI::Forum::Post->create method for details.
+
+=back
+
 =cut
 
 sub create {
@@ -55,6 +101,22 @@ sub create {
 	return $self;
 }
 
+#-------------------------------------------------------------------
+
+=head2 get ( [ param ] )
+
+Returns a hash reference containing all the properties of this thread.
+
+=over
+
+=item param
+
+The name of a specific property. If specified only the value of that property will be return as a scalar.
+
+=back
+
+=cut
+
 sub get {
 	my ($self, $key) = @_;
 	if ($key eq "") {
@@ -63,6 +125,14 @@ sub get {
 	return $self->{_properties}->{$key};
 }
 
+#-------------------------------------------------------------------
+
+=head2 getForum ( )
+
+Returns a forum object for the forum that is related to this thread.
+
+=cut
+
 sub getForum {
 	my ($self) = @_;
 	unless (exists $self->{_forum}) {
@@ -70,6 +140,14 @@ sub getForum {
 	}
 	return $self->{_forum};
 }
+
+#-------------------------------------------------------------------
+
+=head2 getNextThread ( )
+
+Returns a thread object for the next (newer) thread in the same forum.
+
+=cut
 
 sub getNextThread {
 	my ($self) = @_;
@@ -81,6 +159,22 @@ sub getNextThread {
 	return $self->{_next};
 }
 
+#-------------------------------------------------------------------
+
+=head getPost ( postId ) 
+
+Returns a post object.
+
+=over
+
+=item
+
+The unique id of the post object you wish to retrieve.
+
+=back
+
+=cut
+
 sub getPost {
 	my ($self, $postId) = @_;
 	unless (exists $self->{_post}{$postId}) {
@@ -88,6 +182,14 @@ sub getPost {
 	}
 	return $self->{_post}{$postId};
 }
+
+#-------------------------------------------------------------------
+
+=head2 getPreviousThread ( )
+
+Returns a thread object for the previous (older) thread in the same forum.
+
+=cut
 
 sub getPreviousThread {
 	my ($self) = @_;
@@ -99,10 +201,38 @@ sub getPreviousThread {
 	return $self->{_previous};
 }
 
+#-------------------------------------------------------------------
+
+=head2 isLocked ( )
+
+Returns a boolean indicating whether this thread is locked from new posts and other edits.
+
+=cut
+
 sub isLocked {
 	my ($self) = @_;
 	return $self->get("isLocked");
 }
+
+#-------------------------------------------------------------------
+
+=head2 incrementReplies ( lastPostDate, lastPostId )
+
+Increments the replies counter for this thread.
+
+=over
+
+=item lastPostDate
+
+The date of the reply that caused the replies counter to be incremented.
+
+=item lastPostId
+
+The id of the reply that caused the replies counter to be incremented.
+
+=back
+
+=cut
 
 sub incrementReplies {
         my ($self, $dateOfReply, $replyId) = @_;
@@ -111,16 +241,48 @@ sub incrementReplies {
 	$self->getForum->incrementReplies($dateOfReply,$replyId);
 }
 
+#-------------------------------------------------------------------
+
+=head2 incrementViews ( )
+
+Increments the views counter for this thread.
+
+=cut
+
 sub incrementViews {
         my ($self) = @_;
         WebGUI::SQL->write("update forumThread set views=views+1 where forumThreadId=".$self->get("forumThreadId"));
 	$self->getForum->incrementViews;
 }
                                                                                                                                                              
+#-------------------------------------------------------------------
+
+=head2 isSticky ( )
+
+Returns a boolean indicating whether this thread should be "stuck" a the top of the forum and not be sorted with the rest of the threads.
+
+=cut
+
 sub isSticky {
 	my ($self) = @_;
 	return $self->get("isSticky");
 }
+
+#-------------------------------------------------------------------
+
+=head2 isSubscribed ( [ userId ] )
+
+Returns a boolean indicating whether the user is subscribed to this thread.
+
+=over
+
+=item userId
+
+The unique id of the user to check. Defaults to the current user.
+
+=back
+
+=cut
 
 sub isSubscribed {
 	my ($self, $userId) = @_;
@@ -130,10 +292,34 @@ sub isSubscribed {
 	return $isSubscribed;
 }
 
+#-------------------------------------------------------------------
+
+=head2 lock ( )
+
+Sets this thread to be locked from edits.
+
+=cut
+
 sub lock {
 	my ($self) = @_;
 	$self->set({isLocked=>1});
 }
+
+#-------------------------------------------------------------------
+
+=head2 new ( threadId ) 
+
+Constructor.
+
+=over
+
+=item threadId
+
+The unique id of the thread object you wish to retrieve.
+
+=back
+
+=cut
 
 sub new {
 	my ($class, $forumThreadId) = @_;
@@ -145,6 +331,14 @@ sub new {
 	}
 }
 
+#-------------------------------------------------------------------
+
+=head2 recalculateRating ( )
+
+Recalculates the average rating of this thread based upon all of the posts in the thread.
+
+=cut
+
 sub recalculateRating {
 	my ($self) = @_;
         my ($count) = WebGUI::SQL->quickArray("select count(*) from forumPost where forumThreadId=".$self->get("forumThreadId")." and rating>0");
@@ -155,6 +349,22 @@ sub recalculateRating {
 	$self->getForum->recalculateRating;
 }
                                                                                                                                                              
+#-------------------------------------------------------------------
+
+=head2 set ( data ) 
+
+Sets properties for this thread both to the object and to the database.
+
+=over
+
+=item data
+
+A hash reference containing the properties to set. See the forumThread table for details.
+
+=back
+
+=cut
+
 sub set {
 	my ($self, $data) = @_;
 	$data->{forumThreadId} = $self->get("forumThreadId") unless ($data->{forumThreadId});
@@ -164,38 +374,127 @@ sub set {
         }
 }
 
+#-------------------------------------------------------------------
+
+=head2 setLastPost ( lastPostDate, lastPostId ) 
+
+Sets the pertinent details for the last post. Can also be done directly using the set method.
+
+=over
+
+=item lastPostDate
+
+The epoch date of the post.
+
+=item lastPostId
+
+The unique id of the post.
+
+=back
+
+=cut
+
 sub setLastPost {
-	my ($self, $postId, $postDate) = @_;
+	my ($self, $postDate, $postId) = @_;
 	$self->set({
 		lastPostId=>$postId,
 		lastPostDate=>$postDate
 		});
 }
 
+#-------------------------------------------------------------------
+
+=head2 setStatusApproved ( )
+
+Sets the status of this thread to approved.
+
+=cut
+
 sub setStatusApproved {
         my ($self) = @_;
         $self->set({status=>'approved'});
 }
                                                                                                                                                              
+#-------------------------------------------------------------------
+
+=head2 setStatusArchived ( )
+
+Sets the status of this thread to archived.
+
+=cut
+
+sub setStatusArchived {
+        my ($self) = @_;
+        $self->set({status=>'archived'});
+}
+                                                                                                                                                             
+#-------------------------------------------------------------------
+
+=head2 setStatusDeleted ( )
+
+Sets the status of this thread to deleted.
+
+=cut
+
 sub setStatusDeleted {
         my ($self) = @_;
         $self->set({status=>'deleted'});
 }
                                                                                                                                                              
+#-------------------------------------------------------------------
+
+=head setStatusDenied ( )
+
+Sets the status of this thread to denied.
+
+=cut
+
 sub setStatusDenied {
         my ($self) = @_;
         $self->set({status=>'denied'});
 }
                                                                                                                                                              
+#-------------------------------------------------------------------
+
+=head setStatusPending ( )
+
+Sets the status of this thread to pending.
+
+=cut
+
 sub setStatusPending {
         my ($self) = @_;
         $self->set({status=>'pending'});
 }
 
+#-------------------------------------------------------------------
+
+=head2 stick ( )
+
+Makes this thread sticky.
+
+=cut
+
 sub stick {
 	my ($self) = @_;
 	$self->set({isSticky=>1});
 }
+
+#-------------------------------------------------------------------
+
+=head2 subscribe ( [ userId ] )
+
+Subscribes the user to this thread.
+
+=over
+
+=item userId
+
+The unique id of the user. Defaults to the current user.
+
+=back
+
+=cut
 
 sub subscribe {
 	my ($self, $userId) = @_;
@@ -205,15 +504,47 @@ sub subscribe {
 	}
 }
 
+#-------------------------------------------------------------------
+
+=head2 unlock ( )
+
+Negates the lock method.
+
+=cut
+
 sub unlock {
 	my ($self) = @_;
 	$self->set({isLocked=>0});
 }
 
+#-------------------------------------------------------------------
+
+=head2 unstick ( )
+
+Negates the stick method.
+
+=cut
+
 sub unstick {
 	my ($self) = @_;
 	$self->set({isSticky=>0});
 }
+
+#-------------------------------------------------------------------
+
+=head2 unsubscribe ( [ userId ] ) 
+
+Negates the subscribe method.
+
+=over
+
+=item userId
+
+The unique id of the user to unsubscribe. Defaults to the current user.
+
+=back
+
+=cut
 
 sub unsubscribe {
 	my ($self, $userId) = @_;

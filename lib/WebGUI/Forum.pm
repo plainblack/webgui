@@ -33,6 +33,21 @@ Data management class for forums.
  $forum = WebGUI::Forum->create(\%forumParams);
  $forum = WebGUI::Forum->new($forumId);
 
+ $boolean = $forum->canPost;
+ $scalar = $forum->get($param);
+ $obj = $forum->getThread($threadId);
+ $boolean = $forum->isModerator;
+ $boolean = $forum->isSubscribed;
+
+ $forum->incrementReplies($postDate, $postId);
+ $forum->incrementThreads($postDate, $postId);
+ $forum->incrementViews;
+ $forum->purge;
+ $forum->recalculateRating;
+ $forum->set(\%data);
+ $forum->subscribe;
+ $forum->unsubscribe;
+
 =head1 METHODS
 
 These methods are available from this class:

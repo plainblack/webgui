@@ -28,8 +28,28 @@ Data management class for forum posts.
 =head1 SYNOPSIS
                                                                                                                                                              
  use WebGUI::Forum::Post;
- $forum = WebGUI::Forum::Post->create(\%params);
- $forum = WebGUI::Forum::Post->new($postId);
+ $post = WebGUI::Forum::Post->create(\%params);
+ $post = WebGUI::Forum::Post->new($postId);
+
+ $boolean = $post->canEdit;
+ $scalar = $post->get("forumPostId");
+ $arrayRef = $post->getReplies;
+ $obj = $post->getThread;
+ $boolean = $post->hasRated;
+ $boolean = $post->isMarkedRead;
+ $boolean = $post->isReply;
+
+ $post->incrementViews;
+ $post->markRead;
+ $post->rate($rating);
+ $post->recalculateRating;
+ $post->set(\%data);
+ $post->setStatusApproved;
+ $post->setStatusArchived;
+ $post->setStatusDeleted;
+ $post->setStatusDenied;
+ $post->setStatusPending;
+ $post->unmarkRead;
                                                                                                                                                              
 =head1 METHODS
                                                                                                                                                              
@@ -187,11 +207,35 @@ sub hasRated {
 	return $flag;
 }
 
+#-------------------------------------------------------------------
+
+=head2 incrementViews ( )
+
+Increments the views counter for this post.
+
+=cut
+
 sub incrementViews {
 	my ($self) = @_;
 	WebGUI::SQL->write("update forumPost set views=views+1 where forumPostId=".$self->get("forumPostId"));
 	$self->getThread->incrementViews;
 }
+
+#-------------------------------------------------------------------
+
+=head2 isMarkedRead ( [ userId ] )
+
+Returns a boolean indicating whether this post is marked read for the user.
+
+=over
+
+=item userId
+
+A unique id for a user that you want to check. Defaults to the current user.
+
+=back
+
+=cut
 
 sub isMarkedRead {
 	my ($self, $userId) = @_;
@@ -199,6 +243,14 @@ sub isMarkedRead {
 	my ($isRead) = WebGUI::SQL->quickArray("select count(*) from forumRead where userId=$userId and forumPostId=".$self->get("forumPostId"));
 	return $isRead;
 }
+
+#-------------------------------------------------------------------
+
+=head2 isReply ( )
+
+Returns a boolean indicating whether this post is a reply or the root post in a thread.
+
+=cut
 
 sub isReply {
 	my ($self) = @_;
@@ -208,6 +260,22 @@ sub isReply {
 		return 0;
 	}
 }
+
+#-------------------------------------------------------------------
+
+=head2 markRead ( [ userId ] )
+
+Marks this post read for this user.
+
+=over
+
+=item userId
+
+A unique identifier for a user. Defaults to the current user.
+
+=back
+
+=cut
 
 sub markRead {
 	my ($self, $userId) = @_;
@@ -219,6 +287,22 @@ sub markRead {
 	$self->incrementViews;
 }
 
+#-------------------------------------------------------------------
+
+=head2 new ( postId )
+
+Constructor.
+
+=over
+
+=item postId
+
+The unique identifier for the post object you wish to retrieve.
+
+=back
+
+=cut
+
 sub new {
 	my ($class, $forumPostId) = @_;
 	my $properties = WebGUI::SQL->getRow("forumPost","forumPostId",$forumPostId);
@@ -229,6 +313,30 @@ sub new {
 	}
 }
 
+#-------------------------------------------------------------------
+
+=head2 rate ( rating [ , userId, ipAddress ] )
+
+Stores a rating against this post.
+
+=over
+
+=item rating
+
+An integer between 1 and 5 (5 being best) to rate this post with.
+
+=item userId
+
+The unique id for the user rating this post. Defaults to the current user.
+
+=item ipAddress
+
+The ip address of the user doing the rating. Defaults to the current user's IP.
+
+=back
+
+=cut
+
 sub rate {
 	my ($self, $rating, $userId, $ipAddress) = @_;
 	$userId = $session{user}{userId} unless ($userId);
@@ -237,6 +345,14 @@ sub rate {
 		.$self->get("forumPostId").", $userId, ".quote($ipAddress).", ".WebGUI::DateTime::time().", $rating)");
 	$self->recalculateRating;
 }
+
+#-------------------------------------------------------------------
+
+=head2 recalculateRating ( )
+
+Recalculates the average rating of the post from all the ratings and stores the result to the database.
+
+=cut
 
 sub recalculateRating {
 	my ($self) = @_;
@@ -248,6 +364,23 @@ sub recalculateRating {
 	$self->getThread->recalculateRating;
 }
 
+#-------------------------------------------------------------------
+
+=head2 set ( data )
+
+Sets properties to the database and the object.
+
+=over
+
+=item data
+
+A hash reference containing the properties to set. See the forumPost table for details.
+
+=back
+
+=cut
+
+
 sub set {
 	my ($self, $data) = @_;
 	$data->{forumPostId} = $self->get("forumPostId") unless ($data->{forumPostId});
@@ -256,6 +389,15 @@ sub set {
 		$self->{_properties}{$key} = $data->{$key};
 	}
 }
+
+#-------------------------------------------------------------------
+
+=head2 setStatusApproved ( )
+
+Sets the status of this post to approved.
+
+=cut
+
 
 sub setStatusApproved {
 	my ($self) = @_;
@@ -266,6 +408,32 @@ sub setStatusApproved {
 	}
 }
 
+#-------------------------------------------------------------------
+
+=head2 setStatusArchived ( )
+
+Sets the status of this post to archived.
+
+=cut
+
+
+sub setStatusArchived {
+	my ($self) = @_;
+	$self->set({status=>'archived'});
+	$self->getThread->setStatusArchived if ($self->getThread->get("rootPostId") == $self->get("forumPostId"));
+	if ($self->isReply) {
+		$self->getThread->incrementReplies($self->get("dateOfPost"),$self->get("forumPostId"));
+	}
+}
+
+#-------------------------------------------------------------------
+
+=head2 setStatusDeleted ( )
+
+Sets the status of this post to deleted.
+
+=cut
+
 sub setStatusDeleted {
 	my ($self) = @_;
 	$self->set({status=>'deleted'});
@@ -273,9 +441,17 @@ sub setStatusDeleted {
 	if ($self->getThread->get("lastPostId") == $self->get("forumPostId")) {
 		my ($id, $date) = WebGUI::SQL->quickArray("select forumPostId,dateOfPost from forumPost where forumThreadId="
 			.$self->get("forumThreadId")." and status='approved'");
-		$self->getThread->setLastPost($id,$date);
+		$self->getThread->setLastPost($date,$id);
 	}
 }
+
+#-------------------------------------------------------------------
+
+=head2 setStatusDenied ( )
+
+Sets the status of this post to denied.
+
+=cut
 
 sub setStatusDenied {
 	my ($self) = @_;
@@ -283,11 +459,36 @@ sub setStatusDenied {
 	$self->getThread->setStatusDenied if ($self->getThread->get("rootPostId") == $self->get("forumPostId"));
 }
 
+#-------------------------------------------------------------------
+
+=head2 setStatusPending ( )
+
+Sets the status of this post to pending.
+
+=cut
+
 sub setStatusPending {
 	my ($self) = @_;
 	$self->set({status=>'pending'});
 	$self->getThread->setStatusPending if ($self->getThread->get("rootPostId") == $self->get("forumPostId"));
 }
+
+
+#-------------------------------------------------------------------
+
+=head2 unmarkRead ( [ userId ] )
+
+Negates the markRead method.
+
+=over
+
+=item userId
+
+The unique id of the user marking unread. Defaults to the current user.
+
+=back
+
+=cut
 
 sub unmarkRead {
 	my ($self, $userId) = @_;
