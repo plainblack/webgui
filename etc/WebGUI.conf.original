@@ -12,8 +12,6 @@ extrasPath = /data/WebGUI/www/extras
 uploadsURL = /uploads
 uploadsPath = /data/WebGUI/www/uploads
 
-useSharedInternationalCache = 1
-
 templateCacheType=file
 
 emailRecoveryLoggingEnabled = 1

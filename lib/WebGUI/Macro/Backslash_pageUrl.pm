@@ -12,10 +12,11 @@ package WebGUI::Macro::Backslash_pageUrl;
 
 use strict;
 use WebGUI::Session;
+use WebGUI::URL;
 
 #-------------------------------------------------------------------
 sub process {
-        return $session{page}{url};
+        return WebGUI::URL::page();
 }
 
 

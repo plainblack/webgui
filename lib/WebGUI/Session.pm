@@ -84,7 +84,7 @@ sub _setupPageInfo {
 				if($ENV{"MOD_PERL"}) {
 					my $r = Apache->request;
 					if(defined($r)) {
-						$r->custom_response(404, $session{page}{url} );
+						$r->custom_response(404, $pageName);
 						$r->status(404);
 					}
 				} else {
@@ -96,7 +96,6 @@ sub _setupPageInfo {
 		}
 	}
 	%page = WebGUI::SQL->quickHash("select * from page where pageId='".$pageId."'");
-	$page{url} = ($session{config}{scripturl} || $session{env}{SCRIPT_NAME})."/".$page{urlizedTitle};
 	$session{page} = \%page;
 }
 

@@ -27,7 +27,7 @@ sub process {
 	my @param = WebGUI::Macro::getParams($_[0]);
         my $templateId = $param[0] || 1;
         my %var;
-	my (%cphash, %hash2, %hash, $r, $i, @item, $query);
+	my (%cphash, %hash2, %hash, $r, @item, $query);
 	tie %hash, "Tie::IxHash";
 	tie %hash2, "Tie::IxHash";
 	tie %cphash, "Tie::CPHash";
@@ -179,12 +179,6 @@ sub process {
         if (WebGUI::Grouping::isInGroup(9)) {
                 %hash = (
                         WebGUI::URL::page('op=listThemes')=>WebGUI::International::get(900),
-                        %hash
-                );
-        }
-        if (WebGUI::Grouping::isInGroup(10)) {
-                %hash = (
-			WebGUI::URL::page('op=listLanguages')=>WebGUI::International::get(585),
                         %hash
                 );
         }

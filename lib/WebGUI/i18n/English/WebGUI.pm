@@ -2457,71 +2457,6 @@ The form footer.
 		context => q|A label indicating how many threads there are in a particular forum.|
 	},
 
-	'584' => {
-		message => q|Add a new translation.|,
-		lastUpdated => 1036971092
-	},
-
-	'585' => {
-		message => q|Manage translations.|,
-		lastUpdated => 1031514049
-	},
-
-	'586' => {
-		message => q|Manage Translations|,
-		lastUpdated => 1036971445
-	},
-
-	'587' => {
-		message => q|Are you certain you wish to delete this language and all the help and international messages that go with it?|,
-		lastUpdated => 1031514049
-	},
-
-	'589' => {
-		message => q|Edit Translation|,
-		lastUpdated => 1036971172
-	},
-
-	'590' => {
-		message => q|Language ID|,
-		lastUpdated => 1031514049
-	},
-
-	'591' => {
-		message => q|Language|,
-		lastUpdated => 1031514049
-	},
-
-	'592' => {
-		message => q|Character Set|,
-		lastUpdated => 1031514049
-	},
-
-	'595' => {
-		message => q|International Messages|,
-		lastUpdated => 1031514049
-	},
-
-	'596' => {
-		message => q|MISSING|,
-		lastUpdated => 1031514049
-	},
-
-	'597' => {
-		message => q|Edit International Message|,
-		lastUpdated => 1031514049
-	},
-
-	'598' => {
-		message => q|Edit this translation.|,
-		lastUpdated => 1036971142
-	},
-
-	'601' => {
-		message => q|International ID|,
-		lastUpdated => 1031514049
-	},
-
 	'784' => {
 		message => q|Thumbnail|,
 		lastUpdated => 1036954393
@@ -4054,51 +3989,6 @@ You can find out more about karma in <a href="http://www.plainblack.com/ruling_w
 		lastUpdated => 1052850265
 	},
 
-	'588' => {
-		message => q|Are you certain you wish to submit this translation to Plain Black for inclusion in the official distribution of WebGUI? By clicking on the yes link you understand that you're giving Plain Black an unlimited license to use the translation in its software distributions.|,
-		lastUpdated => 1031514630
-	},
-
-	'593' => {
-		message => q|Submit this translation.|,
-		lastUpdated => 1036970850
-	},
-
-	'594' => {
-		message => q|Translate messages.|,
-		lastUpdated => 1031514314
-	},
-
-	'722' => {
-		message => q|Id|,
-		lastUpdated => 1031517195
-	},
-
-	'721' => {
-		message => q|Namespace|,
-		lastUpdated => 1031515005
-	},
-
-	'720' => {
-		message => q|OK|,
-		lastUpdated => 1031514777
-	},
-
-	'719' => {
-		message => q|Out of Date|,
-		lastUpdated => 1031514679
-	},
-
-	'718' => {
-		message => q|Export this translation.|,
-		lastUpdated => 1036970877
-	},
-
-	'723' => {
-		message => q|Deprecated|,
-		lastUpdated => 1031800566
-	},
-
 	'725' => {
 		message => q|Your username cannot be blank.|,
 		lastUpdated => 1031879612
@@ -4107,11 +3997,6 @@ You can find out more about karma in <a href="http://www.plainblack.com/ruling_w
 	'724' => {
 		message => q|Your username cannot begin or end with a space.|,
 		lastUpdated => 1031879593
-	},
-
-	'791' => {
-		message => q|Delete this translation.|,
-		lastUpdated => 1036970806
 	},
 
 	'802' => {

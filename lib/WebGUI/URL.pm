@@ -36,6 +36,7 @@ This package provides URL writing functionality. It is important that all WebGUI
  $url = WebGUI::URL::append($url,$pairs);
  $string = WebGUI::URL::escape($string);
  $url = WebGUI::URL::gateway($url,$pairs);
+ $url = WebGUI::URL::getSiteURL();
  $url = WebGUI::URL::makeCompliant($string);
  $url = WebGUI::URL::makeAbsolute($url);
  $url = WebGUI::URL::page($url,$pairs);
@@ -48,27 +49,6 @@ These subroutines are available from this package:
 
 =cut
 
-
-#-------------------------------------------------------------------
-sub _getSiteURL {
-        my $site;
-        my @sitenames;
-        if (ref $session{config}{sitename} eq "ARRAY") {
-                @sitenames = @{$session{config}{sitename}};
-        } else {
-                push(@sitenames,$session{config}{sitename});
-        }
-        if ($session{setting}{hostToUse} eq "sitename" || !isIn($session{env}{HTTP_HOST},@sitenames)) {
-                $site = $session{config}{defaultSitename};
-        } else {
-                $site = $session{env}{HTTP_HOST} || $session{config}{defaultSitename};
-        }
-        my $proto = "http://";
-        if ($session{env}{SERVER_PORT} == 443) {
-                $proto = "https://";
-        }
-        return $proto.$site;
-}
 
 
 #-------------------------------------------------------------------
@@ -150,7 +130,7 @@ Name value pairs to add to the URL in the form of:
 =cut
 
 sub gateway {
-        my $url = _getSiteURL().($session{config}{scripturl} || $session{env}{SCRIPT_NAME}).'/'.$_[0];
+        my $url = getSiteURL().$_[0];
 	if ($_[1]) {
 		$url = append($url,$_[1]);
 	}
@@ -185,6 +165,42 @@ sub makeAbsolute {
 	my $baseURL = shift || page();
 	return URI->new_abs($url,$baseURL);
 }
+
+#-------------------------------------------------------------------
+
+=head2 getSiteURL ( )
+
+Returns a constructed site url from protocol to gateway.
+
+=cut
+
+sub getSiteURL {
+        my $site;
+        my @sitenames;
+        if (ref $session{config}{sitename} eq "ARRAY") {
+                @sitenames = @{$session{config}{sitename}};
+        } else {
+                push(@sitenames,$session{config}{sitename});
+        }
+        if ($session{setting}{hostToUse} eq "sitename" || !isIn($session{env}{HTTP_HOST},@sitenames)) {
+                $site = $session{config}{defaultSitename};
+        } else {
+                $site = $session{env}{HTTP_HOST} || $session{config}{defaultSitename};
+        }
+        my $proto = "http://";
+        if ($session{env}{SERVER_PORT} == 443) {
+                $proto = "https://";
+        }
+	my $scripturl;
+	if (exists $session{config}{scripturl}) {
+        	$scripturl .= $session{config}{scripturl};
+	} else {
+		$scripturl .= $session{env}{SCRIPT_NAME};
+	}
+	$scripturl .= '/';
+        return $proto.$site.$scripturl;
+}
+
 
 #-------------------------------------------------------------------
 
@@ -235,7 +251,7 @@ Name value pairs to add to the URL in the form of:
 =cut
 
 sub page {
-	my $url = _getSiteURL().$session{page}{url};
+	my $url = getSiteURL().$session{page}{urlizedTitle};
 	if ($_[0]) {
 		$url = append($url,$_[0]);
 	}

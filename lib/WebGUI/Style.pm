@@ -20,7 +20,7 @@ use Tie::CPHash;
 use WebGUI::International;
 use WebGUI::Session;
 use WebGUI::Template;
-
+use WebGUI::URL;
 
 =head1 NAME
 
@@ -115,7 +115,7 @@ sub process {
                         function getWebguiProperty (propName) {
                                 var props = new Array();
                                 props["extrasURL"] = "'.$session{config}{extrasURL}.'";
-                                props["pageURL"] = "'.$session{page}{url}.'";
+                                props["pageURL"] = "'.WebGUI::URL::page().'";
                                 return props[propName];
                         }
                 </script>

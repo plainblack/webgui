@@ -1,12 +1,22 @@
 6.2.0
  - Added generateContent.pl script to generate content offline. This script is
-   not backwards compatible with previous WebGUI versions.
- - Added metadata functionality to wobjects.
- - Added a new passive profiling mechanism.
- - Added a passive profile summarizer.
+   not backwards compatible with previous WebGUI versions. (Thanks to
+   DonorWare for funding this feature.)
+ - Added metadata functionality to wobjects. (Thanks to DonorWare for funding
+   this feature.)
+ - Added a new passive profiling mechanism. (Thanks to DonorWare for funding
+   this feature.)
+ - Added a passive profile summarizer. (Thanks to DonorWare for funding this
+   feature.)
  - Added AOIRank and AOIHits macro's to retrieve user's Area's Of Interest
-   statistics.
+   statistics. (Thanks to DonorWare for funding this feature.)
  - Fixed a typo in Forum/UI.pm
+
+
+6.1.1
+ - bugfix [ 991313 ] Manage Translations doesn't work
+ - bugfix [ 991677 ] Preload erro my $i earlier declaration
+ - bugfix [ 991200 ] scriptUrl option in webgui.conf ignored
 
 
 6.1.0
