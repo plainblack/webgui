@@ -1809,8 +1809,8 @@ CREATE TABLE asset (
   extraHeadTags text,
   isPrototype int(11) NOT NULL default '0',
   PRIMARY KEY  (assetId),
-  UNIQUE KEY url (url),
   UNIQUE KEY lineage (lineage),
+  UNIQUE KEY url (url),
   KEY parentId (parentId),
   KEY state_parentId_lineage (state,parentId,lineage),
   KEY isPrototype_className_assetId (isPrototype,className,assetId)
@@ -3180,7 +3180,7 @@ CREATE TABLE webguiVersion (
 --
 
 
-INSERT INTO webguiVersion VALUES ('6.5.4','initial install',unix_timestamp());
+INSERT INTO webguiVersion VALUES ('6.5.5','initial install',unix_timestamp());
 
 --
 -- Table structure for table `wobject`
