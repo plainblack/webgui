@@ -40,7 +40,7 @@ sub duplicate {
 		manual=>$_[0]->get("manual"),
 		brochure=>$_[0]->get("brochure"),
 		price=>$_[0]->get("price"),
-		Product_templateId=>$_[0]->get("Product_templateId"),
+		templateId=>$_[0]->get("templateId"),
 		productNumber=>$_[0]->get("productNumber")
 		});
 	$file = WebGUI::Attachment->new($_[0]->get("image1"),$_[0]->get("wobjectId"));
@@ -104,7 +104,7 @@ sub purge {
 
 #-------------------------------------------------------------------
 sub set {
-        $_[0]->SUPER::set($_[1],[qw(price Product_templateId productNumber image1 image2 image3 manual brochure warranty)]);
+        $_[0]->SUPER::set($_[1],[qw(price templateId productNumber image1 image2 image3 manual brochure warranty)]);
 }
 
 #-------------------------------------------------------------------
