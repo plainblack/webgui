@@ -59,14 +59,14 @@ if ($ARGV[0] ne "" && $ARGV[1] ne ""){
 sub addFiles {
   	my ($exists, @files, $filename, $ext, $id, $i, $file1, $file2, $file3, $seq);
   	print "Adding files...\n";
-    	($exists) = WebGUI::SQL->quickArray("select count(*) from DownloadManager where wobjectId='$_[4]'",$_[0]);
+    	($exists) = WebGUI::SQL->quickArray("select count(*) from FileManager where wobjectId='$_[4]'",$_[0]);
     	if ($exists) {
 	       	mkdir($_[5]->{uploadsPath}."/".$_[4]);
       		foreach $filename (keys %{$_[1]}) {
         		print "Processing $filename.\n";
         		$id = getId($_[0]);
           		mkdir($_[5]->{uploadsPath}."/".$_[4]."/".$id);
-        		($seq) = WebGUI::SQL->quickArray("select max(sequenceNumber) from DownloadManager_file where wobjectId='$_[4]'",$_[0]);
+        		($seq) = WebGUI::SQL->quickArray("select max(sequenceNumber) from FileManager_file where wobjectId='$_[4]'",$_[0]);
         		$i = 0;
         		@files = [];
         		foreach $ext (keys %{${$_[1]}{$filename}}) {
@@ -84,12 +84,12 @@ sub addFiles {
 	       		}
 			my @files = sort {isIn(getType($b),@nailable) cmp isIn(getType($a),@nailable)} @files;
         		print "Adding $filename to the database.\n";
-        		WebGUI::SQL->write("insert into DownloadManager_file (downloadId,wobjectId,fileTitle,downloadFile,
+        		WebGUI::SQL->write("insert into FileManager_file (FileManager_fileId,wobjectId,fileTitle,downloadFile,
           			groupToView,dateUploaded,alternateVersion1,alternateVersion2,sequenceNumber) values (
           			$id,$_[4],'$filename','$files[0]',2,".time().",'$files[1]','$files[2]',".($seq+1).")",$_[0]);
 		}
     	} else {
-      		print "Warning: Download Manager '$_[4]' does not exist. Cannot import files.\n";
+      		print "Warning: File Manager '$_[4]' does not exist. Cannot import files.\n";
   	}
   	print "Finished adding.\n";
 }
