@@ -299,22 +299,30 @@ sub build {
 				$pageData->{"page.hasDaughter"} = ($page->{'nestedSetRight'} - $page->{'nestedSetLeft'} > 1);
 				$pageData->{"page.isMyDaughter"} = ($page->{'parentId'} eq $currentPage->get('pageId'));
 				$pageData->{"page.isMyMother"} = ($page->{'pageId'} eq $currentPage->get('parentId'));
-				$pageData->{"page.inCurrentRoot"} = 
-					(($page->{'nestedSetLeft'} > $currentPage->get('nestedSetLeft')) && ($page->{'nestedSetRight'} < $currentPage->get('nestedSetRight'))) ||
-					(($page->{'nestedSetLeft'} < $currentPage->get('nestedSetLeft')) && ($page->{'nestedSetRight'} > $currentPage->get('nestedSetRight')));
 
-				# Anchestor info
-                                foreach my $ancestor ($currentPage->ancestors) {
-                                        $pageData->{"page.isMyAncestor"} += ($ancestor->{'pageId'} eq $page->{'pageId'});
-                                }
-				
+                $pageData->{"page.isMyAncestor"}
+				    =  (($page->{'nestedSetLeft'} < $currentPage->get('nestedSetLeft'))
+                    && ($page->{'nestedSetRight'} > $currentPage->get('nestedSetRight')));
+                $pageData->{"page.isMyDescendent"}
+                    =  (($page->{'nestedSetLeft'} > $currentPage->get('nestedSetLeft'))
+                    && ($page->{'nestedSetRight'} < $currentPage->get('nestedSetRight')));
+
 				# Some information about my mother
 				my $mother = WebGUI::Page->getPage($page->{parentId});
 				if ($page->{parentId} ne "0") {
 					foreach (qw(title urlizedTitle parentId pageId)) {
 						$pageData->{"page.mother.$_"} = $mother->get($_);
 					}
+                    $pageData->{"page.isMySister"}
+                        = (($mother->get("pageId") eq $currentPage->get("parentId"))
+                        && !$pageData->{"page.isCurrent"});
 				}
+
+				$pageData->{"page.inCurrentRoot"}
+                    =  ($pageData->{"page.isMyAncestor"}
+                    || $pageData->{"page.isMyDescendent"}
+                    || $pageData->{"page.isMySister"}
+                    || $pageData->{"page.isCurrent"});
 				
 				$pageData->{"page.isLeftMost"} = (($page->{'nestedSetLeft'} - 1) == $mother->get('nestedSetLeft'));
 				$pageData->{"page.isRightMost"} = (($page->{'nestedSetRight'} + 1) == $mother->get('nestedSetRight'));
