@@ -139,7 +139,7 @@ sub www_editPage {
 		$f = WebGUI::HTMLForm->new;
 		if ($session{form}{npp} ne "") {
 			%page = WebGUI::SQL->quickHash("select * from page where pageId=$session{form}{npp}");
-			$page{templatePosition} = 'A';
+			$page{templateId} = 1;
 			$page{pageId} = "new";
 			$page{title} = $page{menuTitle} = $page{urlizedTitle} = $page{synopsis} = '';
 			$page{parentId} = $session{form}{npp};
@@ -158,10 +158,9 @@ sub www_editPage {
                 $f->text("title",WebGUI::International::get(99),$page{title});
 		$f->text("menuTitle",WebGUI::International::get(411),$page{menuTitle});
                 $f->text("urlizedTitle",WebGUI::International::get(104),$page{urlizedTitle});
-		%hash = sortHash(WebGUI::Template::getList());
-		$f->select("template",\%hash,WebGUI::International::get(356),[$page{templatePosition}],'','',
-			'onChange="updateTemplateImage(template.value)"',
-                	'<script language="JavaScript"> function updateTemplateImage(template) { document.template.src = "'.$session{setting}{lib}.'/templates/"+template+".gif"; } </script><br><img src="'.$session{setting}{lib}.'/templates/'.$session{page}{template}.'.gif" name="template">');
+		#%hash = WebGUI::Template::getList();
+		#$f->select("templateId",\%hash,WebGUI::International::get(356),[$page{templateId}]);
+		$f->readOnly(WebGUI::Template::selectTemplate($page{templateId}),WebGUI::International::get(356));
 		$f->textarea("synopsis",WebGUI::International::get(412),$page{synopsis});
 		$f->textarea("metatags",WebGUI::International::get(100),$page{metaTags});
                 $f->yesNo("defaultMetaTags",WebGUI::International::get(307),$page{defaultMetaTags});
@@ -226,7 +225,7 @@ sub www_editPageSave {
 			metaTags=".quote($session{form}{metaTags}).", 
 			urlizedTitle='$session{form}{urlizedTitle}', 
 			defaultMetaTags='$session{form}{defaultMetaTags}', 
-			template='$session{form}{template}', 
+			templateId='$session{form}{templateId}', 
 			menuTitle=".quote($session{form}{menuTitle}).", 
 			synopsis=".quote($session{form}{synopsis})." 
 			where pageId=$session{form}{pageId}");

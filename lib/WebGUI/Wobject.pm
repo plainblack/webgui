@@ -72,14 +72,6 @@ sub _getNextSequenceNumber {
 }
 
 #-------------------------------------------------------------------
-sub _getPositions {
-	my (%hash);
-	tie %hash, "Tie::IxHash";
-	%hash = WebGUI::Template::getPositions($session{page}{template});
-	return \%hash;
-}
-
-#-------------------------------------------------------------------
 
 =head2 description ( )
 
@@ -402,7 +394,7 @@ sub www_edit {
         	$displayTitle = $_[0]->get("displayTitle");
         }
 	$title = $_[0]->get("title") || $_[0]->get("namespace");
-	$templatePosition = $_[0]->get("templatePosition") || 'A';
+	$templatePosition = $_[0]->get("templatePosition") || '0';
 	$endDate = $_[0]->get("endDate") || (time()+315360000);
 	$f = WebGUI::HTMLForm->new;
 	$f->hidden("wid",$_[0]->get("wobjectId"));
@@ -413,7 +405,7 @@ sub www_edit {
 	$f->text("title",WebGUI::International::get(99),$title);
 	$f->yesNo("displayTitle",WebGUI::International::get(174),$displayTitle);
 	$f->yesNo("processMacros",WebGUI::International::get(175),$_[0]->get("processMacros"));
-	$f->select("templatePosition",_getPositions(),WebGUI::International::get(363),[$templatePosition]);
+	$f->select("templatePosition",WebGUI::Template::getPositions($session{page}{templateId}),WebGUI::International::get(363),[$templatePosition]);
 	$f->date("startDate",WebGUI::International::get(497),$_[0]->get("startDate"));
 	$f->date("endDate",WebGUI::International::get(498),$endDate);
 	$f->HTMLArea("description",WebGUI::International::get(85),$_[0]->get("description"));

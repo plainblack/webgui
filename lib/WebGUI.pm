@@ -23,7 +23,6 @@ use WebGUI::Session;
 use WebGUI::SQL;
 use WebGUI::Style;
 use WebGUI::Template;
-use WebGUI::Template::Default;
 use WebGUI::URL;
 use WebGUI::Utility;
 
@@ -88,6 +87,12 @@ sub _displayAdminBar {
                         %hash
                 );
         }
+        if (WebGUI::Privilege::isInGroup(8,$session{user}{userId})) {
+                %hash = (
+                        WebGUI::URL::page('op=listTemplates')=>WebGUI::International::get(508),
+                        %hash
+                );
+        }
         %hash = (  
 		WebGUI::URL::page('op=viewHelpIndex')=>WebGUI::International::get(13),
 		%hash
@@ -126,9 +131,6 @@ sub page {
 	my ($debug, %contentHash, $w, $cmd, $pageEdit, $wobject, $wobjectOutput, $extra, 
 		$sth, $httpHeader, $header, $footer, $content, $operationOutput, $adminBar, %hash);
 	WebGUI::Session::open($_[0],$_[1]);
-	# For some reason we have to pre-cache the templates when running under mod_perl
-	# so that's what we're doing with this next command.
-	WebGUI::Template::loadTemplates();
 	if ($session{form}{debug}==1 && WebGUI::Privilege::isInGroup(3)) {
 		$debug = '<table bgcolor="#ffffff" style="color: #000000; font-size: 10pt; font-family: helvetica;">';
 		while (my ($section, $hash) = each %session) {
@@ -170,11 +172,11 @@ sub page {
                 # $wobjectOutput = WebGUI::International::get(381); # bad error
 	}
 	if ($operationOutput ne "") {
-		$contentHash{A} = $operationOutput;
-		$content = WebGUI::Template::Default::generate(\%contentHash);
+		$contentHash{0} = $operationOutput;
+		$content = WebGUI::Template::generate(\%contentHash,1);
 	} elsif ($wobjectOutput ne "") {
-		$contentHash{A} = $wobjectOutput;
-		$content = WebGUI::Template::Default::generate(\%contentHash);
+		$contentHash{0} = $wobjectOutput;
+		$content = WebGUI::Template::generate(\%contentHash,1);
 	} else {
 		if (WebGUI::Privilege::canViewPage()) {
 			if ($session{var}{adminOn}) {
@@ -213,13 +215,10 @@ sub page {
 				}
 			}
 			$sth->finish;
-			$cmd = "use WebGUI::Template::".$session{page}{template};
-			eval($cmd);
-			$cmd = "WebGUI::Template::".$session{page}{template}."::generate";
-			$content = &$cmd(\%contentHash);
+			$content = WebGUI::Template::generate(\%contentHash,$session{page}{templateId});
 		} else {
-			$contentHash{A} = WebGUI::Privilege::noAccess();
-			$content = WebGUI::Template::Default::generate(\%contentHash);
+			$contentHash{0} = WebGUI::Privilege::noAccess();
+			$content = WebGUI::Template::generate(\%contentHash,1);
 		}
 	}
 	if ($session{var}{adminOn}) {

@@ -123,8 +123,8 @@ sub www_listStyles {
                 $output = helpIcon(9);
 		$output .= '<h1>'.WebGUI::International::get(157).'</h1>';
 		$output .= '<div align="center"><a href="'.WebGUI::URL::page('op=editStyle&sid=new').
-			'">'.WebGUI::International::get(158).'</a></div>';
-                $sth = WebGUI::SQL->read("select styleId,name from style where name<>'Reserved' order by name");
+			'">'.WebGUI::International::get(158).'</a><p/></div>';
+                $sth = WebGUI::SQL->read("select styleId,name from style order by name");
                 while (@data = $sth->array) {
                         $row[$i] = '<tr><td valign="top" class="tableData">'
 				.deleteIcon('op=deleteStyle&sid='.$data[0])
