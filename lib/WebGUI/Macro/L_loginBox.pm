@@ -27,7 +27,7 @@ sub _replacement {
 	my ($temp,$boxSize,@param,$text,$f);
 	@param = WebGUI::Macro::getParams($_[0]);
         $temp = '<div class="loginBox">';
-        if ($session{var}{sessionId}) {
+        if ($session{user}{userId} <> 1) {
 		$text = $param[1];
 		if (not defined $text){
 			$temp .= WebGUI::International::get(48);
