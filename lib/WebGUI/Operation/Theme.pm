@@ -10,7 +10,6 @@ package WebGUI::Operation::Theme;
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
-use Exporter;
 use strict;
 use Tie::IxHash;
 use Tie::CPHash;
@@ -30,9 +29,6 @@ use WebGUI::Session;
 use WebGUI::SQL;
 use WebGUI::URL;
 use WebGUI::Utility;
-
-our @ISA = qw(Exporter);
-our @EXPORT = qw(&www_viewTheme &www_deleteThemeComponent &www_deleteThemeComponentConfirm &www_importTheme &www_importThemeValidate &www_importThemeSave &www_exportTheme &www_addThemeComponent &www_addThemeComponentSave &www_deleteTheme &www_deleteThemeConfirm &www_editTheme &www_editThemeSave &www_listThemes);
 
 #-------------------------------------------------------------------
 sub _getComponentTypes {

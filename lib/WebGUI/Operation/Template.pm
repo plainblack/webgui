@@ -10,7 +10,6 @@ package WebGUI::Operation::Template;
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
-use Exporter;
 use strict;
 use Tie::CPHash;
 use WebGUI::Grouping;
@@ -26,9 +25,6 @@ use WebGUI::SQL;
 use WebGUI::Template;
 use WebGUI::URL;
 use WebGUI::Utility;
-
-our @ISA = qw(Exporter);
-our @EXPORT = qw(&www_copyTemplate &www_deleteTemplate &www_deleteTemplateConfirm &www_editTemplate &www_editTemplateSave &www_listTemplates);
 
 #-------------------------------------------------------------------
 sub _submenu {

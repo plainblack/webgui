@@ -10,12 +10,8 @@ package WebGUI::Operation::WebGUI;
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
-use Exporter;
 use strict;
 use WebGUI::Session;
-
-our @ISA = qw(Exporter);
-our @EXPORT = qw(&www_theWg &www_genesis);
 
 #-------------------------------------------------------------------
 sub www_genesis {

@@ -10,7 +10,6 @@ package WebGUI::Operation::Navigation;
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
-use Exporter;
 use strict;
 use Tie::IxHash;
 use Tie::CPHash;
@@ -24,6 +23,7 @@ use WebGUI::International;
 use WebGUI::Macro;
 use WebGUI::Navigation;
 use WebGUI::Operation::Shared;
+use WebGUI::Paginator;
 use WebGUI::Privilege;
 use WebGUI::Session;
 use WebGUI::SQL;
@@ -31,10 +31,6 @@ use WebGUI::URL;
 use WebGUI::Utility;
 use WebGUI::TabForm;
 use WebGUI::Cache;
-
-our @ISA = qw(Exporter);
-our @EXPORT = qw(&www_listNavigation &www_editNavigation &www_editNavigationSave &www_copyNavigation
-		 &www_deleteNavigation www_deleteNavigationConfirm www_previewNavigation);
 
 #-------------------------------------------------------------------
 sub _submenu {

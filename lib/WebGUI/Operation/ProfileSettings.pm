@@ -10,7 +10,6 @@ package WebGUI::Operation::ProfileSettings;
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
-use Exporter;
 use strict;
 use Tie::CPHash;
 use Tie::IxHash;
@@ -23,9 +22,6 @@ use WebGUI::Operation::Shared;
 use WebGUI::Privilege;
 use WebGUI::Session;
 use WebGUI::SQL;
-
-our @ISA = qw(Exporter);
-our @EXPORT = qw(&www_deleteProfileCategoryConfirm &www_deleteProfileFieldConfirm &www_editProfileCategorySave &www_editProfileFieldSave &www_deleteProfileCategory &www_deleteProfileField &www_editProfileCategory &www_editProfileField &www_moveProfileCategoryDown &www_moveProfileCategoryUp &www_moveProfileFieldDown &www_moveProfileFieldUp &www_editProfileSettings);
 
 #-------------------------------------------------------------------
 sub _reorderCategories {

@@ -10,7 +10,6 @@ package WebGUI::Operation::Root;
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
-use Exporter;
 use strict;
 use Tie::CPHash;
 use WebGUI::Grouping;
@@ -22,9 +21,6 @@ use WebGUI::Privilege;
 use WebGUI::Session;
 use WebGUI::SQL;
 use WebGUI::URL;
-
-our @ISA = qw(Exporter);
-our @EXPORT = qw(&www_listRoots);
 
 #-------------------------------------------------------------------
 sub _submenu {

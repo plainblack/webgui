@@ -10,7 +10,6 @@ package WebGUI::Operation::Help;
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
-use Exporter;
 use strict;
 use Tie::IxHash;
 use WebGUI::International;
@@ -18,9 +17,6 @@ use WebGUI::Macro;
 use WebGUI::Session;
 use WebGUI::URL;
 use WebGUI::Utility;
-
-our @ISA = qw(Exporter);
-our @EXPORT = qw(&www_viewHelp &www_viewHelpIndex);
 
 #-------------------------------------------------------------------
 sub _get {

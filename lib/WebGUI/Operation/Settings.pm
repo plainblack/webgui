@@ -10,7 +10,6 @@ package WebGUI::Operation::Settings;
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
-use Exporter;
 use strict qw(vars subs);
 use WebGUI::DateTime;
 use WebGUI::Grouping;
@@ -23,11 +22,6 @@ use WebGUI::Session;
 use WebGUI::Style;
 use WebGUI::SQL;
 use WebGUI::URL;
-
-our @ISA = qw(Exporter);
-our @EXPORT = qw(&www_saveSettings &www_editUserSettings &www_editCompanyInformation 
-	&www_editPrivilegeSettings &www_editMessagingSettings &www_editMiscSettings 
-	&www_editContentSettings &www_manageSettings);
 
 #-------------------------------------------------------------------
 sub _submenu {

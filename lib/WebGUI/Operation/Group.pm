@@ -10,7 +10,6 @@ package WebGUI::Operation::Group;
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
-use Exporter;
 use strict;
 use Tie::CPHash;
 use WebGUI::DatabaseLink;
@@ -31,14 +30,6 @@ use WebGUI::Session;
 use WebGUI::SQL;
 use WebGUI::URL;
 use WebGUI::Utility;
-
-our @ISA = qw(Exporter);
-our @EXPORT = qw(&www_manageUsersInGroup &www_deleteGroup &www_deleteGroupConfirm &www_editGroup 
-	&www_editGroupSave &www_listGroups &www_emailGroup &www_emailGroupSend &www_manageGroupsInGroup
-	&www_addGroupsToGroupSave &www_deleteGroupGrouping &www_autoAddToGroup &www_autoDeleteFromGroup
-	&www_listGroupsSecondary &www_manageUsersInGroupSecondary &www_addUsersToGroupSave &www_addUsersToGroupSecondarySave
-	&www_deleteGroupingSecondary);
-
 
 #-------------------------------------------------------------------
 sub _hasSecondaryPrivilege {

@@ -10,7 +10,6 @@ package WebGUI::Operation::Package;
 # http://www.plainblack.com			info@plainblack.com
 #-------------------------------------------------------------------
 
-use Exporter;
 use strict qw(vars subs);
 use WebGUI::Icon;
 use WebGUI::Id;
@@ -19,9 +18,6 @@ use WebGUI::Privilege;
 use WebGUI::Session;
 use WebGUI::SQL;
 use WebGUI::URL;
-
-our @ISA = qw(Exporter);
-our @EXPORT = qw(&www_deployPackage );
 
 #-------------------------------------------------------------------
 sub _duplicateWobjects {

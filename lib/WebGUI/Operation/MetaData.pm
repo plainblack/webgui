@@ -10,7 +10,6 @@ package WebGUI::Operation::MetaData;
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
-use Exporter;
 use strict;
 use Tie::IxHash;
 use WebGUI::Icon;
@@ -24,10 +23,6 @@ use WebGUI::Session;
 use WebGUI::SQL;
 use WebGUI::URL;
 use WebGUI::Utility;
-
-our @ISA = qw(Exporter);
-our @EXPORT = qw(&www_editMetaDataField &www_manageMetaData &www_editMetaDataFieldSave &www_deleteMetaDataField
-		 &www_deleteMetaDataFieldConfirm &www_saveMetaDataSettings);
 
 #-------------------------------------------------------------------
 sub _submenu {

@@ -10,14 +10,10 @@ package WebGUI::Operation::Admin;
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
-use Exporter;
 use strict;
 use WebGUI::Grouping;
 use WebGUI::Session;
 use WebGUI::SQL;
-
-our @ISA = qw(Exporter);
-our @EXPORT = qw(&www_switchOffAdmin &www_switchOnAdmin);
 
 #-------------------------------------------------------------------
 sub www_switchOffAdmin {

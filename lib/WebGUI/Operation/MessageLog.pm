@@ -10,7 +10,6 @@ package WebGUI::Operation::MessageLog;
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
-use Exporter;
 use strict qw(vars subs);
 use URI;
 use WebGUI::DateTime;
@@ -25,9 +24,6 @@ use WebGUI::URL;
 use WebGUI::User;
 use WebGUI::Utility;
 use WebGUI::Operation::Shared;
-
-our @ISA = qw(Exporter);
-our @EXPORT = qw(&www_viewMessageLog &www_viewMessageLogMessage);
 
 #-------------------------------------------------------------------
 sub _status {

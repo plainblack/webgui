@@ -10,7 +10,6 @@ package WebGUI::Operation::User;
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
-use Exporter;
 use strict qw(vars subs);
 use Tie::CPHash;
 use Tie::IxHash;
@@ -31,9 +30,6 @@ use WebGUI::Style;
 use WebGUI::URL;
 use WebGUI::User;
 use WebGUI::Utility;
-
-our @ISA = qw(Exporter);
-our @EXPORT = qw(&www_editUserKarma &www_editUserKarmaSave &www_editUserGroup &www_editUserProfile &www_editUserProfileSave &www_addUserToGroupSave &www_deleteGrouping &www_editGrouping &www_editGroupingSave &www_becomeUser &www_addUser &www_addUserSave &www_deleteUser &www_deleteUserConfirm &www_editUser &www_editUserSave &www_listUsers);
 
 
 #-------------------------------------------------------------------

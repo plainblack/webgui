@@ -10,7 +10,6 @@ package WebGUI::Operation::DatabaseLink;
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
-use Exporter;
 use strict;
 use Tie::CPHash;
 use WebGUI::DatabaseLink;
@@ -24,10 +23,6 @@ use WebGUI::Privilege;
 use WebGUI::Session;
 use WebGUI::SQL;
 use WebGUI::URL;
-
-our @ISA = qw(Exporter);
-our @EXPORT = qw(&www_copyDatabaseLink &www_deleteDatabaseLink &www_deleteDatabaseLinkConfirm 
-	&www_editDatabaseLink &www_editDatabaseLinkSave &www_listDatabaseLinks);
 
 #-------------------------------------------------------------------
 sub _submenu {

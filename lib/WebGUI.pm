@@ -84,13 +84,7 @@ sub _processOperations {
 	my $op = $session{form}{op};
 	my $opNumber = shift || 1;
         if ($op) {
-                if ($op =~ /^[A-Za-z]+$/) {
-                        $cmd = "WebGUI::Operation::www_".$op;
-                        $output = eval($cmd);
-                        WebGUI::ErrorHandler::security("call a non-existent operation: $op. Root cause: ".$@) if($@);
-                } else {
-                        WebGUI::ErrorHandler::security("execute an invalid operation: ".$op);
-                }
+		$output = WebGUI::Operation::execute($op);
         }
 	$opNumber++;
 	if ($output eq "" && exists $session{form}{"op".$opNumber}) {

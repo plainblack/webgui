@@ -17,7 +17,6 @@ my $hasImageMagick=1;
 eval " use Image::Magick; "; $hasImageMagick=0 if $@;
 
 
-use Exporter;
 use strict;
 use WebGUI::Collateral;
 use WebGUI::CollateralFolder;
@@ -35,14 +34,6 @@ use WebGUI::SQL;
 use Tie::IxHash;
 use WebGUI::URL;
 use WebGUI::HTML;
-
-our @ISA = qw(Exporter);
-our @EXPORT = qw(&www_editCollateral &www_editCollateralSave &www_deleteCollateral 
-	&www_deleteCollateralConfirm &www_listCollateral 
-	&www_deleteCollateralFile &www_editCollateralFolder &www_editCollateralFolderSave &www_deleteCollateralFolder 
-	&www_deleteCollateralFolderConfirm &www_emptyCollateralFolder &www_emptyCollateralFolderConfirm
-	&www_htmlArealistCollateral &www_htmlAreaviewCollateral &www_htmlAreaUpload
-	&www_htmlAreaDelete &www_htmlAreaCreateFolder);
 
 #-------------------------------------------------------------------
 sub _submenu {

@@ -10,16 +10,12 @@ package WebGUI::Operation::Style;
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
-use Exporter;
 use strict;
 use WebGUI::Grouping;
 use WebGUI::Paginator;
 use WebGUI::Privilege;
 use WebGUI::Session;
 use WebGUI::URL;
-
-our @ISA = qw(Exporter);
-our @EXPORT = qw(&www_makePrintable &www_setPersonalStyle &www_unsetPersonalStyle);
 
 #-------------------------------------------------------------------
 sub www_makePrintable {

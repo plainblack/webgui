@@ -10,7 +10,6 @@ package WebGUI::Operation::Profile;
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
-use Exporter;
 use strict qw(vars subs);
 use URI;
 use WebGUI::Operation::Auth;
@@ -29,9 +28,6 @@ use WebGUI::SQL;
 use WebGUI::URL;
 use WebGUI::User;
 use WebGUI::Utility;
-
-our @ISA = qw(Exporter);
-our @EXPORT = qw(&www_editProfile &www_editProfileSave &www_viewProfile);
 
 #-------------------------------------------------------------------
 # Builds Extra form requirements for anonymous registration. 

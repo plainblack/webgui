@@ -10,7 +10,6 @@ package WebGUI::Operation::Clipboard;
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
-use Exporter;
 use strict;
 use WebGUI::DateTime;
 use WebGUI::Grouping;
@@ -26,10 +25,6 @@ use WebGUI::SQL;
 use WebGUI::TabForm;
 use WebGUI::URL;
 use WebGUI::Utility;
-
-our @ISA = qw(Exporter);
-our @EXPORT = qw(&www_deleteClipboardItem &www_deleteClipboardItemConfirm
-		&www_emptyClipboard &www_emptyClipboardConfirm &www_manageClipboard);
 
 #-------------------------------------------------------------------
 sub _submenu {

@@ -10,7 +10,6 @@ package WebGUI::Operation::Page;
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
-use Exporter;
 use strict;
 use File::Path;
 use WebGUI::DateTime;
@@ -28,13 +27,6 @@ use WebGUI::TabForm;
 use WebGUI::URL;
 use WebGUI::Utility;
 use WebGUI::Export;
-
-our @ISA = qw(Exporter);
-our @EXPORT = qw(&www_viewPageTree &www_movePageUp &www_movePageDown 
-        &www_cutPage &www_deletePage &www_deletePageConfirm &www_editPage 
-        &www_editPageSave &www_exportPage &www_exportPageStatus www_exportPageGenerate
-	&www_pastePage &www_moveTreePageUp &www_rearrangeWobjects &www_moveTreePageDown 
-	&www_moveTreePageLeft &www_moveTreePageRight);
 
 #-------------------------------------------------------------------
 =head2 _changeWobjectPrivileges ( page )

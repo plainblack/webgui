@@ -10,7 +10,6 @@ package WebGUI::Operation::Trash;
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
-use Exporter;
 use strict qw(vars subs);
 use Tie::CPHash;
 use WebGUI::DateTime;
@@ -22,10 +21,6 @@ use WebGUI::Privilege;
 use WebGUI::Session;
 use WebGUI::SQL;
 use WebGUI::URL;
-
-our @ISA = qw(Exporter);
-our @EXPORT = qw(&www_cutTrashItem &www_deleteTrashItem &www_deleteTrashItemConfirm
-		&www_emptyTrash &www_emptyTrashConfirm &www_manageTrash);
 
 #-------------------------------------------------------------------
 sub _purgeUserTrash {

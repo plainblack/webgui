@@ -10,7 +10,6 @@ package WebGUI::Operation::Replacements;
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
-use Exporter;
 use strict;
 use WebGUI::Grouping;
 use WebGUI::Icon;
@@ -20,9 +19,6 @@ use WebGUI::Operation::Shared;
 use WebGUI::Privilege;
 use WebGUI::Session;
 use WebGUI::SQL;
-
-our @ISA = qw(Exporter);
-our @EXPORT = qw(&www_deleteReplacement &www_editReplacement &www_editReplacementSave &www_listReplacements);
 
 #-------------------------------------------------------------------
 sub _submenu {

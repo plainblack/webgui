@@ -13,7 +13,6 @@ package WebGUI::Operation::Auth;
 # and calling methods in the Auth Module.  This method also has some core
 # logic that defines how Authentication should happen
 
-use Exporter;
 use strict qw(vars subs);
 use URI;
 use WebGUI::ErrorHandler;
@@ -23,8 +22,6 @@ use WebGUI::URL;
 use WebGUI::User;
 use WebGUI::Utility;
 
-our @ISA = qw(Exporter);
-our @EXPORT = qw(&www_auth &www_displayLogin &www_login &www_displayAccount &www_createAccount &www_deactivateAccount &www_logout &www_recoverPassword &www_init);
 #-------------------------------------------------------------------
 
 =head2 getInstance ( )

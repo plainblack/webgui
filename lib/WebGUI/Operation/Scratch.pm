@@ -10,12 +10,8 @@ package WebGUI::Operation::Scratch;
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
-use Exporter;
 use strict;
 use WebGUI::Session;
-
-our @ISA = qw(Exporter);
-our @EXPORT = qw(&www_setScratch &www_deleteScratch);
 
 #-------------------------------------------------------------------
 sub www_deleteScratch {

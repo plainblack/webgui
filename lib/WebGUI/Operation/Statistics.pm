@@ -10,7 +10,6 @@ package WebGUI::Operation::Statistics;
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
-use Exporter;
 use strict;
 use WebGUI::Cache;
 use WebGUI::DateTime;
@@ -22,10 +21,6 @@ use WebGUI::Paginator;
 use WebGUI::Privilege;
 use WebGUI::Session;
 use WebGUI::SQL;
-
-our @ISA = qw(Exporter);
-our @EXPORT = qw(&www_viewPageReport &www_viewStatistics &www_viewTrafficReport &www_killSession 
-	&www_viewLoginHistory &www_viewActiveSessions);
 
 #-------------------------------------------------------------------
 sub _submenu {
