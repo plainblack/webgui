@@ -413,6 +413,14 @@ sub www_editUserProfile {
                 if ($method eq "selectList" || $method eq "checkList" || $method eq "radioList") {
                 	# note: this big if statement doesn't look elegant, but doing regular
                         # ORs caused problems with the array reference.
+                        
+                        # make sure the values are ordered         
+                        my $orderedValues = {};
+                        tie %{$orderedValues}, 'Tie::IxHash';
+                        foreach my $ov (sort keys %{$values}) {
+                        	$orderedValues->{$ov} = $values->{$ov};
+                        }
+                        
                         if ($session{form}{$data{fieldName}}) {
                       		$default = [$session{form}{$data{fieldName}}];
                         } elsif ($user{$data{fieldName}} && (defined($values->{$user{$data{fieldName}}}))) {
@@ -422,7 +430,7 @@ sub www_editUserProfile {
                         }
                  	$f->$method(
 				-name=>$data{fieldName},
-				-options=>$values,
+				-options=>$orderedValues,
 				-label=>$label,
 				-value=>$default
 				);
