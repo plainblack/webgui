@@ -12,6 +12,7 @@ package WebGUI::Wobject::MailForm;
 
 use strict;
 use Tie::CPHash;
+use Tie::IxHash;
 use WebGUI::Form;
 use WebGUI::HTMLForm;
 use WebGUI::Icon;
@@ -162,21 +163,27 @@ sub www_editSave {
 #-------------------------------------------------------------------
 sub www_editField {
 	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
-    my ($output, %field, $f);
+    my ($output, %field, $f, %fieldTypes, %fieldStatus);
     tie %field, 'Tie::CPHash';
-	my %fieldStatus = ( 1 => WebGUI::International::get(4, $namespace),
+    tie %fieldTypes, 'Tie::IxHash';
+
+	%fieldStatus = ( 1 => WebGUI::International::get(4, $namespace),
 		2 => WebGUI::International::get(5, $namespace),
 		3 => WebGUI::International::get(6, $namespace) );
 		
-	my %fieldTypes = ( text => "Textbox",
+	%fieldTypes = ( text => "Textbox",
 		checkbox => "Checkbox",
+                checkList => "Checkbox List",
+		radioList => "Radio Buttons List",
 		textarea => "Textarea",
 		date => "Date",
 		email => "Email Address",
 		url => "URL",
 		yesNo => "Yes/No",
-		select => "Drop-Down Box" );
-    
+		select => "Drop-Down Box",
+	);
+
+   	%fieldTypes; 
         %field = WebGUI::SQL->quickHash("select * from MailForm_field where MailForm_fieldId='$session{form}{fid}'");
         $output = helpIcon(2,$_[0]->get("namespace"));
         $output .= '<h1>'.WebGUI::International::get(20,$namespace).'</h1>';
@@ -192,7 +199,7 @@ sub www_editField {
         $f->select("type",\%fieldTypes,WebGUI::International::get(23,$namespace),$type);
 	$f->integer("width",WebGUI::International::get(8, $namespace),$field{width} || $_[0]->get("width") || 45);
         $f->textarea("possibleValues",WebGUI::International::get(24,$namespace),$field{possibleValues});
-        $f->text("defaultValue",WebGUI::International::get(25,$namespace),$field{defaultValue});
+        $f->textarea("defaultValue",WebGUI::International::get(25,$namespace),$field{defaultValue});
         $f->yesNo("proceed",WebGUI::International::get(15,$namespace));
         $f->submit;
         $output .= $f->print;
@@ -382,11 +389,49 @@ sub _createField {
 			tie %selectOptions, 'Tie::IxHash';
 			# add an empty option if no default value is provided
 			foreach (split(/\n/, $data->{possibleValues})) {
+				s/\s+$//; # remove trailing spaces
 				$selectOptions{$_} = $_[0]->processMacros($_);
 			}
 			$f->select($name, \%selectOptions, $data->{name}, [$data->{defaultValue}], "", "", "", "");
 			last SWITCH;
 		};
+		/^checkList$/ && do {
+			my (%selectOptions, @defaultValues);
+			my $vertical = 1;   # TODO: Make this configurable
+			$name = "field_".$data->{sequenceNumber} if ($name eq ""); # Empty fieldname not allowed
+			tie %selectOptions, 'Tie::IxHash';
+			foreach (split(/\n/, $data->{possibleValues})) {
+				s/\s+$//; # remove trailing spaces
+                                $selectOptions{$_} = $_[0]->processMacros($_);
+                        }
+			# put default values in array
+			foreach (split(/\n/, $data->{defaultValue})) {
+				s/\s+$//; # remove trailing spaces
+				push(@defaultValues, $_);
+			}
+			$f->checkList($name, \%selectOptions, $data->{name}, \@defaultValues, $vertical);
+			last SWITCH;
+		};
+		/^radioList$/ && do {
+			my (%selectOptions, @defaultValues);
+                        my $vertical = 1;   # TODO: Make this configurable
+                        $name = "field_".$data->{sequenceNumber} if ($name eq ""); # Empty fieldname not allowed
+                        tie %selectOptions, 'Tie::IxHash';
+                        foreach (split(/\n/, $data->{possibleValues})) {
+                                s/\s+$//; # remove trailing spaces
+                                $selectOptions{$_} = $_[0]->processMacros($_);
+                        }
+                        # put default values in array
+                        foreach (split(/\n/, $data->{defaultValue})) {
+                                s/\s+$//; # remove trailing spaces
+                                push(@defaultValues, $_);
+                        }
+                        $f->radioList($name, \%selectOptions, $data->{name}, \@defaultValues, $vertical);
+                        last SWITCH;
+                };
+
+	
+		
 	}
 	
 	my $row = '<tr><td class="formDescription" valign="top">'.$data->{name}.'</td><td class="tableData">'.$f->printRowsOnly();
@@ -456,6 +501,10 @@ sub www_send {
 			$value = ($value == 1) ? "yes" : "no";
 		} elsif ($data{type} eq "checkbox") {
 			$value = ($value) ? "checked" : "not checked";
+		} elsif ($data{type} eq "checkList" || $data{type} eq "radioList") {
+			$data{name} = $urlizedName = "field_".$data{sequenceNumber} if ($urlizedName eq ""); 
+			my @values = $session{cgi}->param($urlizedName);
+			$value = join(", ",@values);
 		}
 		
 		# store results
