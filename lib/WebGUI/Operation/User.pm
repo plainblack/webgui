@@ -217,6 +217,7 @@ sub www_editUser {
 		"groups"=> { label=>$i18n->get('89')},
 		);
 	my $tabform = WebGUI::TabForm->new(\%tabs);
+	$tabform->formHeader({extras=>'autocomplete="off"'});
 	my $u = WebGUI::User->new(($session{form}{uid} eq 'new') ? '' : $session{form}{uid});
 	WebGUI::Style::setScript($session{config}{extrasURL}."/swapLayers.js", {language=>"JavaScript"});
 	$tabform->getTab("account")->raw('<script language="JavaScript" > var active="'.$u->authMethod.'"; </script>');

@@ -23,6 +23,7 @@ use strict;
 use Tie::CPHash;
 use WebGUI::Config;
 use WebGUI::ErrorHandler;
+use WebGUI::Id;
 use WebGUI::SQL;
 use WebGUI::Utility;
 use URI::Escape;
@@ -136,7 +137,7 @@ sub _time {
 #-------------------------------------------------------------------
 # This routine returns an unique session Id.
 sub _uniqueSessionId {
-	my $sessionId = crypt((_time()*rand(1000)),rand(99));
+	my $sessionId = WebGUI::Id::generate();
 	my ($isDuplicate) = WebGUI::SQL->buildArray("select count(*) from userSession where sessionId =".quote($sessionId));
 	if ($isDuplicate) {
 		return _uniqueSessionId();

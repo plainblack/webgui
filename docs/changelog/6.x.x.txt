@@ -9,6 +9,9 @@
  - Whitespace in URLs will now be replaced with hyphens (-) instead of
    underscores (_) because there is some evidence that hyphens get better
    search index ranking than underscores.
+ - Turned off autocomplete on user manager.
+ - Switched session ID generator to use WebGUI::Id::generate() the same as
+   everything else.
 
 
 6.5.5
