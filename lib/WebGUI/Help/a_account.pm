@@ -8,7 +8,11 @@ our $HELP = {
 		related => [
 			{
 				tag => 'macros using',
-				namespace => 'Macros'
+				namespace => 'Macros',
+			},
+			{
+				tag => 'template language',
+				namespace => 'Template',
 			},
 		]
 	},

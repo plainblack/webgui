@@ -7,9 +7,19 @@ our $I18N = {
 	},
 
 	'macros list body' => {
-                message => q|<P>These Macros are available for use on your site:</P>|,
+                message => q|<P>These Macros are available for use on your site.  The set of available Macros is defined in the WebGUI configuration file:</P>|,
 		context => 'Content for dynamically generated macro list',
-		lastUpdated => 1112395932,
+		lastUpdated => 1112560683,
+	},
+
+	'macro enabled' => {
+		message => q|This macro is enabled in the WebGUI configuration file and can be used on this site.|,
+		lastUpdated => 1046656837,
+	},
+
+	'macro disabled' => {
+		message => q|This macro is not enabled in the WebGUI configuration file and cannot be used on this site.|,
+		lastUpdated => 1046656837,
 	},
 
 	'macros using title' => {
