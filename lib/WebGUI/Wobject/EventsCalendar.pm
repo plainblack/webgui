@@ -357,12 +357,15 @@ sub www_editEvent {
 sub www_editEventSave {
 	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
 	my (@startDate, @endDate, $until, @eventId, $i, $recurringEventId);
+        $startDate[0] = setToEpoch($session{form}{startDate});
+	$startDate[0] = time() unless ($startDate[0] > 0);
+        $endDate[0] = setToEpoch($session{form}{endDate});
+	$endDate[0] = $startDate[0] unless ($endDate[0] >= $startDate[0]);
 	if ($session{form}{eid} eq "new") {
 		$session{form}{name} = $session{form}{name} || "unnamed";
 		$session{form}{eid} = getNextId("EventsCalendar_eventId");
-       		$startDate[0] = setToEpoch($session{form}{startDate});
-               	$endDate[0] = setToEpoch($session{form}{endDate});
                	$until = setToEpoch($session{form}{until});
+		$until = $endDate[0] unless ($until >= $endDate[0]);
                	$eventId[0] = getNextId("EventsCalendar_eventId");
 		$session{form}{interval} = 1 if ($session{form}{interval} < 1);
                	if ($session{form}{recursEvery} eq "never") {
@@ -398,8 +401,8 @@ sub www_editEventSave {
                	}
 	} else {
                	WebGUI::SQL->write("update EventsCalendar_event set name=".quote($session{form}{name}).", 
-			description=".quote($session{form}{description}).", startDate='".setToEpoch($session{form}{startDate})."', 
-			endDate='".setToEpoch($session{form}{endDate})."' where EventsCalendar_eventId=$session{form}{eid}");
+			description=".quote($session{form}{description}).", startDate=".$startDate[0].", 
+			endDate=".$endDate[0]." where EventsCalendar_eventId=$session{form}{eid}");
 	}
 	if ($session{form}{proceed} eq "addEvent") {
 		$session{form}{eid} = "new";
@@ -419,36 +422,36 @@ sub www_view {
 		($minDate) = WebGUI::SQL->quickArray("select min(startDate) from EventsCalendar_event 
 			where wobjectId=".$_[0]->get("wobjectId"));
 	}
-	$minDate = $minDate || time();
+	$minDate = $minDate || WebGUI::DateTime::time();
 	($minDate,$junk) = WebGUI::DateTime::dayStartEnd($minDate);
 	if ($_[0]->get("endMonth") eq "last") {
 		($maxDate) = WebGUI::SQL->quickArray("select max(endDate) from EventsCalendar_event where 
 			wobjectId=".$_[0]->get("wobjectId"));	
 	} elsif ($_[0]->get("endMonth") eq "after12") {
-		$maxDate = WebGUI::DateTime::addToDate($minDate,0,12,0); 
+		$maxDate = WebGUI::DateTime::addToDate($minDate,0,11,0); 
 	} elsif ($_[0]->get("endMonth") eq "after9") {
-		$maxDate = WebGUI::DateTime::addToDate($minDate,0,9,0); 
+		$maxDate = WebGUI::DateTime::addToDate($minDate,0,8,0); 
 	} elsif ($_[0]->get("endMonth") eq "after6") {
-		$maxDate = WebGUI::DateTime::addToDate($minDate,0,6,0); 
+		$maxDate = WebGUI::DateTime::addToDate($minDate,0,5,0); 
 	} elsif ($_[0]->get("endMonth") eq "after3") {
-		$maxDate = WebGUI::DateTime::addToDate($minDate,0,3,0); 
+		$maxDate = WebGUI::DateTime::addToDate($minDate,0,2,0); 
 	}
-	$maxDate = $maxDate || time();
+	$maxDate = $maxDate || WebGUI::DateTime::time();
 	($junk,$maxDate) = WebGUI::DateTime::dayStartEnd($maxDate);
 	my $monthCount = WebGUI::DateTime::monthCount($minDate,$maxDate);
 	unless ($session{form}{pn}) {
 		$flag = 1;
 		if ($_[0]->get("defaultMonth") eq "current") {
-			$session{form}{pn} = WebGUI::DateTime::monthCount($minDate,time());
+			$session{form}{pn} = WebGUI::DateTime::monthCount($minDate,WebGUI::DateTime::time());
 		} elsif ($_[0]->get("defaultMonth") eq "last") {
 			$session{form}{pn} = WebGUI::DateTime::monthCount($minDate,$maxDate);
 		} else {
 			$session{form}{pn} = 1;
 		}
 	}
-	for ($i=0;$i<$monthCount;$i++) {
-		if ($session{form}{pn} == ($i+1)) {
-			my $thisMonth = WebGUI::DateTime::addToDate($minDate,0,($i),0);
+	for ($i=1;$i<$monthCount;$i++) {
+		if ($session{form}{pn} == ($i)) {
+			my $thisMonth = WebGUI::DateTime::addToDate($minDate,0,($i-1),0);
 			$var{"calendar.big"} = $_[0]->_drawBigCalendar($thisMonth);
 			$var{"calendar.small"} = $_[0]->_drawSmallCalendar($thisMonth);
 		}

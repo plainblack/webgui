@@ -141,7 +141,7 @@ sub addToTime {
 sub dayStartEnd {
         my ($year,$month,$day, $hour,$min,$sec, $start, $end);
         ($year,$month,$day, $hour,$min,$sec) = Date::Calc::Time_to_Date($_[0]);
-        $start = Date::Calc::Date_to_Time($year,$month,$day,0,0,0)-43200;
+        $start = Date::Calc::Date_to_Time($year,$month,$day,0,0,0);
         $end = Date::Calc::Date_to_Time($year,$month,$day,23,59,59);
         return ($start, $end);
 }
@@ -184,12 +184,12 @@ sub dayStartEnd {
 =cut
 
 sub epochToHuman {
-	my ($offset, $temp, $hour12, $value, $output, @date, $day, $month);
+	my ($offset, $temp, $hour12, $value, $output);
 	$offset = $session{user}{timeOffset} || 0;
 	$offset = $offset*3600;
 	$temp = int($_[0]) || time();
 	$temp = $temp+$offset;
-	@date = &localtime($temp);
+	my ($year,$month,$day,$hour,$min,$sec) = Date::Calc::Time_to_Date($temp);
 	$output = $_[1] || "%z %Z";
   #---dealing with percent symbol
 	$output =~ s/\%\%/\%/g;
@@ -200,27 +200,27 @@ sub epochToHuman {
 	$temp = $session{user}{timeFormat} || '%H:%n %p';
 	$output =~ s/\%Z/$temp/g;
   #---year stuff
-	$output =~ s/\%y/$date[0]/g;
-	$value = substr($date[0],2,2);
+	$output =~ s/\%y/$year/g;
+	$value = substr($year,2,2);
 	$output =~ s/\%Y/$value/g;
   #---month stuff
-	$value = sprintf("%02d",$date[1]);
+	$value = sprintf("%02d",$month);
 	$output =~ s/\%m/$value/g;
-	$output =~ s/\%M/$date[1]/g;
+	$output =~ s/\%M/$month/g;
 	if ($output =~ /\%c/) {
-		$month = getMonthName($date[1]);
-		$output =~ s/\%c/$month/g;
+		my $monthName = getMonthName($month);
+		$output =~ s/\%c/$monthName/g;
 	}
   #---day stuff
-	$value = sprintf("%02d",$date[2]);
+	$value = sprintf("%02d",$day);
 	$output =~ s/\%d/$value/g;
-	$output =~ s/\%D/$date[2]/g;
+	$output =~ s/\%D/$day/g;
 	if ($output =~ /\%w/) {
-		$day = getDayName($date[7]);
-		$output =~ s/\%w/$day/g;
+		my $dayName = getDayName(Day_of_Week($year,$month,$day));
+		$output =~ s/\%w/$dayName/g;
 	}
   #---hour stuff
-	$hour12 = $date[3];
+	$hour12 = $hour;
 	if ($hour12 > 12) {
 		$hour12 = $hour12 - 12;
 		if ($hour12 == 0) {
@@ -230,10 +230,10 @@ sub epochToHuman {
 	$value = sprintf("%02d",$hour12);
 	$output =~ s/\%h/$value/g;
 	$output =~ s/\%H/$hour12/g;
-	$value = sprintf("%02d",$date[3]);
+	$value = sprintf("%02d",$hour);
 	$output =~ s/\%j/$value/g;
-	$output =~ s/\%J/$date[3]/g;
-	if ($date[3] > 11) {
+	$output =~ s/\%J/$hour/g;
+	if ($hour > 11) {
 		$output =~ s/\%p/pm/g;
 		$output =~ s/\%P/PM/g;
 	} else {
@@ -241,10 +241,10 @@ sub epochToHuman {
 		$output =~ s/\%P/AM/g;
 	}
   #---minute stuff
-	$value = sprintf("%02d",$date[4]);
+	$value = sprintf("%02d",$min);
 	$output =~ s/\%n/$value/g;
   #---second stuff
-	$value = sprintf("%02d",$date[5]);
+	$value = sprintf("%02d",$sec);
 	$output =~ s/\%s/$value/g;
 	return $output;
 }
@@ -438,11 +438,9 @@ sub localtime {
 
 sub monthCount {
 	my ($start, $end) = @_;
-	my $count = 1;
-	while (addToDate($start,0,$count,0) < $end) {
-		$count++;
-	}
-	return $count;
+	my @delta = Date::Calc::Delta_YMDHMS( Date::Calc::Time_to_Date($start), Date::Calc::Time_to_Date($end));
+	my $change = (($delta[0]*12)+$delta[1])+1;
+	return $change;
 }
 
 
@@ -520,9 +518,9 @@ sub secondsToInterval {
 =cut
 
 sub setToEpoch {
-	my @date = &localtime(time());
+	my @date = Date::Calc::Time_to_Date(time());
  	my ($month, $day, $year) = split(/\//,$_[0]);
-	if (int($year) < 2038 && int($year) > 1900) {
+	if (int($year) < 2038 && int($year) > 1969) {
 		$year = int($year);
 	} else {
 		$year = $date[0];
@@ -549,7 +547,7 @@ sub setToEpoch {
 =cut
 
 sub time {
-	return Date::Calc::Mktime(Date::Calc::Today_and_Now());
+	return Date::Calc::Date_to_Time(Date::Calc::Today_and_Now());
 }
 
 1;
