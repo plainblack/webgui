@@ -136,7 +136,7 @@ sub www_becomeUser {
 #-------------------------------------------------------------------
 sub www_deleteGrouping {
 	my ($u);
-	if ($session{user}{userId} == $session{form}{uid} && $session{form}{gid} == 3) {
+	if (($session{user}{userId} == $session{form}{uid} || $session{form}{uid} == 3) && $session{form}{gid} == 3) {
 		return WebGUI::Privilege::vitalComponent();
         } elsif (WebGUI::Privilege::isInGroup(3)) {
 		$u = WebGUI::User->new($session{form}{uid});
