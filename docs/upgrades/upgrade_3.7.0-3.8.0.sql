@@ -95,6 +95,9 @@ delete from international where internationalId=36 and namespace='UserSubmission
 alter table UserSubmission change widgetId wobjectId int not null;
 alter table UserSubmission_submission change widgetId wobjectId int not null;
 
+insert into wobject (wobjectId, pageId, title, displayTitle, processMacros, description, dateAdded, addedBy, namespace, lastEdited, editedBy, templatePosition, sequenceNumber, startDate, endDate) select widgetId, pageId, title, displayTitle, processMacros, description, dateAdded, addedBy, namespace, lastEdited, editedBy, templatePosition, sequenceNumber, dateAdded, 1336444487 from widget where namespace='SQLReport';
+delete from widget where namespace='SQLReport';
+alter table SQLReport change widgetId wobjectId int not null;
 
 
 INSERT INTO international VALUES (38,'UserSubmission','English','(Select \"No\" if you\'re writing a HTML/Rich Edit submission.)');
