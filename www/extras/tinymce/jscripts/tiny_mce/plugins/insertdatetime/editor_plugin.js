@@ -35,6 +35,7 @@ function TinyMCE_insertdatetime_execCommand(editor_id, element, command, user_in
 	/* Returns the date object in the specified format */
 	function getDateTime(date, format) {
 		format = tinyMCE.regexpReplace(format, "%D", "%m/%d/%y");
+		format = tinyMCE.regexpReplace(format, "%r", "%I:%M:%S %p");
 		format = tinyMCE.regexpReplace(format, "%Y", "" + date.getFullYear());
 		format = tinyMCE.regexpReplace(format, "%y", "" + date.getYear());
 		format = tinyMCE.regexpReplace(format, "%m", addZeros(date.getMonth()+1, 2));
@@ -42,6 +43,8 @@ function TinyMCE_insertdatetime_execCommand(editor_id, element, command, user_in
 		format = tinyMCE.regexpReplace(format, "%H", "" + addZeros(date.getHours(), 2));
 		format = tinyMCE.regexpReplace(format, "%M", "" + addZeros(date.getMinutes(), 2));
 		format = tinyMCE.regexpReplace(format, "%S", "" + addZeros(date.getSeconds(), 2));
+		format = tinyMCE.regexpReplace(format, "%I", "" + (date.getHours() < 12 ? (date.getHours()+1) : 24-date.getHours()));
+		format = tinyMCE.regexpReplace(format, "%p", "" + (date.getHours() < 12 ? "AM" : "PM"));
 		format = tinyMCE.regexpReplace(format, "%%", "%");
 
 		return format;

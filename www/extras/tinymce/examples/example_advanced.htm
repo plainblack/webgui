@@ -76,7 +76,7 @@ This page shows a more complex usage of TinyMCE. On this page the mode is set to
 
 <!-- Form with textare element with width: 100% -->
 <form method="post" action="post.php">
-<textarea id="elm1" name="elm2" style="width:100%" rows="15">
+<textarea name="elm1" style="width:100%" rows="15">
 	<span class="header1">Test header 1</span><br />
 	<span class="header2">Test header 2</span><br />
 	<span class="header3">Test header 3</span><br />
@@ -100,8 +100,8 @@ This page shows a more complex usage of TinyMCE. On this page the mode is set to
 Some custom actions:
 <a href="javascript:tinyMCE.execCommand('Bold');">[Bold]</a> | 
 <a href="javascript:tinyMCE.execCommand('Italic');">[Italic]</a>
-<a href="javascript:tinyMCE.execCommand('mceInsertContent',false,'<b>Hello world!!</b>');">[Insert some HTML]</a>
-<a href="javascript:tinyMCE.execCommand('mceReplaceContent',false,'<b>{$selection}</b>');">[Replace selection]</a>
+<a href="javascript:void(0);" onclick="tinyMCE.execCommand('mceInsertContent',false,'<b>Hello world!!</b>');">[Insert some HTML]</a>
+<a href="javascript:void(0);" onclick="tinyMCE.execCommand('mceReplaceContent',false,'<b>{$selection}</b>');">[Replace selection]</a>
 
 <br>
 

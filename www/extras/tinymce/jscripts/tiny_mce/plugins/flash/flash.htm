@@ -45,6 +45,13 @@
             if (formObj.height2.value=='%') {
                 height = height + '%';
             }
+
+			if (width == "")
+				width = 100;
+
+			if (height == "")
+				height = 100;
+
             html += ''
                 + '<img src="' + (tinyMCE.getParam("theme_href") + "/images/spacer.gif") + '" '
                 + 'width="' + width + '" height="' + height + '" '
@@ -72,7 +79,7 @@
 </head>
 <body onload="init();">
     <form onsubmit="insertFlash();return false;">
-        <table border="0" cellpadding="0" cellspacing="0" width="100%">
+        <table border="0" cellpadding="0" cellspacing="4" width="100%">
             <tr>
                 <td class="title">{$lang_insert_flash}</td>
             </tr>
@@ -106,8 +113,8 @@
                 <td><hr size="1" noshade="noshade" /></td>
             </tr>
             <tr>
-                <td nowrap="nowrap" align="center">
-                    <input type="button" name="insert" value="{$lang_insert}" onclick="insertFlash();" id="insert" />&nbsp;<input type="button" name="cancel" value="{$lang_cancel}" onclick="cancelAction();" id="cancel" />
+                <td nowrap="nowrap" align="left">
+                    <input style="float:left" type="button" name="insert" value="{$lang_insert}" onclick="insertFlash();" id="insert" /><input style="float:right"  type="button" name="cancel" value="{$lang_cancel}" onclick="cancelAction();" id="cancel" />
                 </td>
             </tr>
         </table>

@@ -65,7 +65,7 @@ td.charmap, td.charmapOver {
 
 td.charmapOver {
 	background-color: #CCCCCC;
-	cursor: hand;
+	cursor: arrow;
 }
 
 a.charmap {
@@ -77,4 +77,16 @@ a.charmap {
 	vertical-align: middle;
 	border: 1px none #000000;
 	background-color: transparent;
+}
+
+input.radio {
+	border: 1px none #000000;
+	background-color: transparent;
+	vertical-align: middle;
+}
+
+input.checkbox {
+	border: 1px none #000000;
+	background-color: transparent;
+	vertical-align: middle;
 }

@@ -2,7 +2,7 @@
 --------------------------
 
 About:
- Adds a zoom drop list in MSIE, this plugin was mostly created to
+ Adds a zoom drop list in MSIE5.5+, this plugin was mostly created to
  show how to add custom droplists as plugins.
 
 Installation instructions:

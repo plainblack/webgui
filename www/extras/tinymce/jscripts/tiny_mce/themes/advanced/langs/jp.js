@@ -60,11 +60,14 @@ tinyMCELang['lang_insert_table_width'] = '$BI}(B';
 tinyMCELang['lang_insert_table_height'] = '$B9b$5(B';
 tinyMCELang['lang_insert_table_border'] = '$B6-3&@~(B';
 tinyMCELang['lang_insert_table_class'] = '$B%/%i%9(B';
+tinyMCELang['lang_theme_font_size'] = 'Font size';
 tinyMCELang['lang_theme_fontdefault'] = '$BI8=`(B';
 tinyMCELang['lang_theme_colorpicker_title'] = '$B?\'$N;XDj(B';
 tinyMCELang['lang_theme_colorpicker_apply'] = '$BE,MQ(B';
 tinyMCELang['lang_theme_forecolor_desc'] = '$BA07J?\'(B';
+tinyMCELang['lang_theme_backcolor_desc'] = 'Select background color';
 tinyMCELang['lang_theme_clipboard_msg'] = 'Copy/Cut/Paste is not available in Mozilla and Firefox.\nDo you want more information about this issue?';
+tinyMCELang['lang_theme_path'] = 'Path';
 tinyMCELang['lang_cut_desc'] = 'Cut';
 tinyMCELang['lang_copy_desc'] = 'Copy';
 tinyMCELang['lang_paste_desc'] = 'Paste';

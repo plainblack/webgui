@@ -1,3 +1,50 @@
+Version 1.40 (2005-01-09)
+	Added a new default value for the font size drop down, if no font size where found this gets selected.
+	Added a auto resize window feature, this is enabled by default but can be disabled with a window argument.
+	Added a new print plugin, prints the current editor contents to a printer.
+	Added a new searchreplace plugin, adds a search, searchnext and replace button.
+	Fixed bug issue where buttons didn't display correctly on some Firefox installations.
+	Fixed issue with value and type attributes of input elements getting lost in cleanup on MSIE.
+	Fixed so that the getEditorInstance command is public, returns a TinyMCEControl by id.
+	Fixed issue where "true" and "false" string wasn't treated as booleans in TinyMCE init options.
+	Fixed so cursor/mousepointer allways remains a arrow in all themes when rolling over buttons.
+	Fixed the popup windows so they are mode "modal" in Mozilla/Firefox.
+	Fixed so the ask question is displayed when elements are focused with the tab key.
+	Fixed so the ask option works when mode option is set to exact.
+	Fixed issue with visualaids on tables not working correctly when the user uses the tab key in Firefox/Mozilla.
+	Fixed some bugs with the mceSetCSSClass class command and the element path.
+	Fixed a new version of the mceInsertContent command.
+	Fixed so the auto_cleanup_word option is disabled by default.
+	Removed the langs of the zoom plugin, it now uses + instead of the "zoom" word.
+Version 1.391 (2005-01-04)
+	Fixed major spacebar bug in MSIE, spacebar was disabled.
+Version 1.39 (2005-01-04)
+	Updated the Flash plugin with a new version, contributed by jamesw.
+	Added new setWindowArg function, useful if plugins are to call other plugins.
+	Added new save plugin, this plugin adds a save/submit form button to tinyMCE, contributed by SlyD.
+	Added new hilite color support, sets a background-color style on the selected text.
+	Added new variable replacement popup URLs, check the openWindow function documentation for details.
+	Added new force_p_newlines option, forces P elements on return/enter key in Mozilla/Firefox.
+	Added new theme_advanced_path_location, adds a element path list.
+	Added new theme_advanced_toolbar_align option, defaults to center.
+	Added new Portuguese translation contributed by José Pedro Pereira.
+	Added new mceSelectNode and mceSelectNodeDepth commands.
+	Added new add_unload_trigger option, this adds a unload triggerSave call. Enabled by default.
+	Added am/pm time format to the insertdatetime plugin.
+	Fixed font color and size attribute bug, contributed by Vincent FIACK.
+	Fixed className undefined bug, Firefox/Mozilla produced a console error sometimes.
+	Fixed so mceSetCSSClass command may be applied to all sorts of elements.
+	Fixed so anchor elements can be removed by setting the anchor name to nothing.
+	Fixed typing performance some in Firefox/Mozilla, removed some nodechange triggers.
+	Fixed so the zoom plugin is invisible in MSIE 5.0, since zoom isn't available in that browser.
+	Fixed bug with the emotions plugin in MSIE 5.0, it was opening a new window.
+	Fixed so contents stay within the editor if the user hits the back/forward buttons.
+	Fixed bug where the window.name property was set to the image name.
+	Fixed so anchors links within the same page are made relative when relative_urls are set to false.
+	Updated the advanced theme so most of the images are loaded from a tiled image, improves loading time.
+	Updated the Swedish language pack, contributed by Martin.
+	Updated the readme.txt in the advlink plugin, was some problems with the valid_elements.
+	Updated the default CSS for the advanced theme some, added button backgrounds to look like office2k.
 Version 1.38 (2004-11-28)
 	Added new textarea field for form elements when debug mode is enabled, contributed by Michael Keck.
 	Added new spacer item support for the theme_advanced_buttons<n> options, contributed by Michael Keck.

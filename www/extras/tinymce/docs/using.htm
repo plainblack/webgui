@@ -286,16 +286,23 @@ optional and is not a requierd setting.<br>
       and feel. The default value of this option is: &quot;border: 1px dashed 
       #BBBBBB&quot;.</td>
   </tr>
-  <tr> 
+  <tr>
     <td><strong>[add_form_submit_trigger]</strong></td>
-    <td>True/False option. If this option is set to true a event handler will 
-      be added do &quot;onsubmit&quot; on all forms to force triggerSave. The 
-      default value of this option is true.</td>
+    <td>True/False option. If this option is set to true a event handler will be added do &quot;onsubmit&quot; on all forms to force triggerSave. The default value of this option is true.</td>
   </tr>
   <tr> 
+    <td><strong>[add_unload_trigger]</strong></td>
+    <td>True/False option. If this option is set to true a event handler will 
+      be added do &quot;onunload&quot; of the current window to force a triggerSave call. This triggerSave call will not do any cleanup since this is for handling of back/forward history buttons. The 
+      default value of this option is true.</td>
+  </tr>
+  <tr>
     <td><strong>[force_br_newlines]</strong></td>
-    <td>True/False option. This option forces output of BR elements instead of 
-      P elements. The default state of this option is off/false. (Experimental)</td>
+    <td>True/False option. This option forces output of BR elements instead of P elements. The default state of this option is off/false. (Experimental)</td>
+  </tr>
+  <tr> 
+    <td><strong>[force_p_newlines]</strong></td>
+    <td>True/False option. If this option is enabled Mozilla/Firefox will generate P elements on Enter/Return key and BR elements on Shift+Enter/Return. This option is enabled by default. </td>
   </tr>
   <tr> 
     <td><strong>[relative_urls]</strong></td>
@@ -342,7 +349,7 @@ optional and is not a requierd setting.<br>
   </tr>
   <tr>
     <td><strong>[auto_cleanup_word]</strong></td>
-    <td>If enabled cleanup of MS office/Word HTML will be executed automaticly on paste operations. The default value of this option is true. Note: This option is currently only available for MSIE. </td>
+    <td>If enabled cleanup of MS office/Word HTML will be executed automaticly on paste operations. The default value of this option is false. Note: This option is currently only available for MSIE. </td>
   </tr>
   <tr>
     <td><strong>[cleanup_on_startup]</strong></td>
@@ -374,6 +381,10 @@ optional and is not a requierd setting.<br>
   <tr>
     <td><strong>[theme_advanced_toolbar_location]</strong></td>
     <td>This option enabled you to change the location of the toolbar. Possible values are &quot;top&quot; and &quot;bottom&quot;. The default value is &quot;bottom&quot;. </td>
+  </tr>
+  <tr>
+    <td><strong>[theme_advanced_toolbar_align]</strong></td>
+    <td>This option enabled you to change toolbar alignment to left, center or right. This option defaults to center. </td>
   </tr>
   <tr> 
     <td><strong>[theme_advanced_styles]</strong></td>
@@ -420,6 +431,10 @@ optional and is not a requierd setting.<br>
   <tr>
     <td><strong>[theme_advanced_source_editor_height]</strong></td>
     <td>Source editor window height.</td>
+  </tr>
+  <tr>
+    <td><strong>[theme_advanced_path_location]</strong></td>
+    <td>Location of element path list. Possible values &quot;top&quot; or &quot;bottom&quot;. Defaults to &quot;none&quot; </td>
   </tr>
   <tr> 
     <td><strong>[theme_advanced_blockformats]</strong></td>
@@ -581,9 +596,17 @@ Mozilla Midas spec.</a> But there are a some tinyMCE specific commands. <br>
     <td><strong>mceAnchor</strong></td>
     <td><p>Inserts a named anchor element, the value is the name of the anchor. </p></td>
   </tr>
-  <tr> 
+  <tr>
     <td><strong>mceResetDesignMode</strong></td>
-    <td><p>Resets the designMode state of all editor instances, this command is useful on Firefox if the editor is placed in tabs or shown/hidden with style.display=&quot;none/block&quot;. Call this command after the editor displayed again. </p>
+    <td><p>Resets the designMode state of all editor instances, this command is useful on Firefox if the editor is placed in tabs or shown/hidden with style.display=&quot;none/block&quot;. Call this command after the editor displayed again. </p></td>
+  </tr>
+  <tr>
+    <td><strong>mceSelectNode</strong></td>
+    <td><p>Selects the node/element passed as value. This command will also scroll to the elements location within the editor. </p></td>
+  </tr>
+  <tr> 
+    <td><strong>mceSelectNodeDepth</strong></td>
+    <td><p>Selects the node/element by depth relative from the current node. So a value of 0 will select the currently focused node. This command will also scroll to the elements location within the editor. </p>
     </td>
   </tr>
 </table>
@@ -666,6 +689,15 @@ callback in the theme.<br>
 <br>
 <strong>Returns:</strong> None.
 <hr noshade>
+<strong>Syntax:</strong> tinyMCE.getEditorInstance(editor_id);<br>
+<br>
+<strong>Description: </strong>This method returns a editor instance by editor id. <br>
+<br>
+<strong>Parameters:<br>
+</strong>editor_id - Editor instance to retrive. <br>
+<br>
+<strong>Returns:</strong> TinyMCE Editor instance (TinyMCEControl).
+<hr noshade>
 <strong>Syntax:</strong> tinyMCE.importThemeLanguagePack([theme]);<br>
 <br>
 <strong>Description: </strong>This method imports/loads theme specific language packs. This may be called from custom themes. <br>
@@ -699,9 +731,14 @@ html - HTML code to apply theme variable substitution on. <br>
 <br>
 <strong>Description: </strong>This method opens a new window by the template data assigned, it will get the width, height and html data from template parameters. The args array contains variable names to be substituted.<br>
 <br>
+There are some custom window arguments:<br>
+mce_replacevariables
+- Enables/Disables the language/variable replacement of the document HTML. Enabled by default.<br>
+mce_windowresize - Enables/Disables the auto resize feature of popupwindows. Enabled by default.<br>
+<br>
 <strong>Parameters:</strong> <br>
-template - Name/Value array with width, height and html keys in it. <br>
-[args] - Name/Value array with variable names to replace. <br>
+template - Name/Value array with width, height, html and file keys in it. <br>
+[args] - Name/Value array with variable names to replace. Variables in the template file key value (URL) gets replaced with the argument list. For example: image.php?src={$src} gets replaced with image.php?src=image.gif.<br>
 <br>
 <strong>Returns:</strong> None.
 <hr noshade>
@@ -712,6 +749,16 @@ template - Name/Value array with width, height and html keys in it. <br>
 <strong>Parameters:</strong> <br>
 name - Name of window argument to get. <br>
 [default_value] - Default value to be returned if window argument is missing. <br>
+<br>
+<strong>Returns:</strong> Window argument value.
+<hr noshade>
+<strong>Syntax:</strong> tinyMCE.setWindowArg(name, value);<br>
+<br>
+<strong>Description: </strong>This method sets a window argument by name. This can for example be useful if plugin are to call other plugins. <br>
+<br>
+<strong>Parameters:</strong> <br>
+name - Name of window argument to set. <br>
+value - Value to set in window argument. <br>
 <br>
 <strong>Returns:</strong> Window argument value.
 <hr noshade>

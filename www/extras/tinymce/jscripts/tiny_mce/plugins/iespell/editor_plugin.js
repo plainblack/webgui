@@ -20,7 +20,7 @@ function TinyMCE_iespell_execCommand(editor_id, element, command, user_interface
 	if (command == "mceIESpell") {
 		try {
 			var ieSpell = new ActiveXObject("ieSpell.ieSpellExtension");
-			ieSpell.CheckDocumentNode(tinyMCE._getInstanceById(editor_id).contentDocument.documentElement);
+			ieSpell.CheckDocumentNode(tinyMCE.getInstanceById(editor_id).contentDocument.documentElement);
 		} catch (e) {
 			if (e.number == -2146827859) {
 				if (confirm(tinyMCE.getLang("lang_iespell_download", "", true)))
