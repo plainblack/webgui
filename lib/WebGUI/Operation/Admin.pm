@@ -32,7 +32,14 @@ sub www_switchOffAdmin {
 
 #-------------------------------------------------------------------
 sub www_switchOnAdmin {
-        if ($session{var}{sessionId}) {
+	my @groups = qw(3 4 5 6 8 9 10 11); # Groups that have a need to turn on admin.
+	my $showAdmin = 0;
+	if($session{var}{sessionId}){
+		foreach (@groups){
+			last if($showAdmin=WebGUI::Privilege::isInGroup($_));
+		}
+	}
+        if ($showAdmin) {
                 WebGUI::SQL->write("update userSession set adminOn=1 where sessionId='$session{var}{sessionId}'");
                 WebGUI::Session::refreshSessionVars($session{var}{sessionId});
                 return "";
