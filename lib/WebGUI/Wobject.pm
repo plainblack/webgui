@@ -801,6 +801,11 @@ sub processTemplate {
 		%{$_[0]->{_property}},
 		%{$_[2]}
 		);
+	if (defined $_[0]->get("_WobjectProxy")) {
+		$vars{isShortcut} = 1;
+		my ($originalPageURL) = WebGUI::SQL->quickArray("select urlizedTitle from page where pageId=".$_[0]->get("pageId"));
+		$vars{originalURL} = WebGUI::URL::gateway($originalPageURL."#".$_[0]->get("wobjectId"));
+	}
 	my $namespace = $_[3] || $_[0]->get("namespace");
 	return WebGUI::Template::process(WebGUI::Template::get($_[1],$namespace), \%vars);
 }

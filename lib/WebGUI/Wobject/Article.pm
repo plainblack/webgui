@@ -131,8 +131,15 @@ sub www_view {
 	}
         $var{description} = $_[0]->get("description");
 	if ($_[0]->get("convertCarriageReturns")) {
-		$var{description} =~ s/\n/\<br\>/g;
+		$var{description} =~ s/\n/\<br\>\n/g;
 	}
+	$var{"description.full"} = $var{description};
+	$var{"description.full"} =~ s/\^\-\;//g;
+	$var{"description.first.100characters"} = substr($var{"description.full"},0,100);
+	$var{"description.first.20words"} = $var{"description.full"};
+	$var{"description.first.20words"} =~ s/(((\S+)\s+){20}).*/$1/s;
+	$var{"description.first.paragraph"} = $var{"description.full"};
+	$var{"description.first.paragraph"} =~ s/^(.*?)\n.*/$1/s;
 	if ($session{form}{makePrintable}) {
 		$var{description} =~ s/\^\-\;//g;
 		$var{isFirstPage} = 1;
