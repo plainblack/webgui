@@ -23,8 +23,8 @@ sub process {
          if (exists $session{asset} && $session{asset}->canEdit && WebGUI::Grouping::isInGroup(12)) {
         	my %var;
               my @param = WebGUI::Macro::getParams($_[0]);
-              my $turnOn = $param[0] || WebGUI::International::get(516);
-              my $turnOff = $param[1] || WebGUI::International::get(517);
+              my $turnOn = $param[0] || WebGUI::International::get(516,'Macro_EditableToggle');
+              my $turnOff = $param[1] || WebGUI::International::get(517,'Macro_EditableToggle');
                  if ($session{var}{adminOn}) {
                       $var{'toggle.url'} = WebGUI::URL::page('op=switchOffAdmin');
                       $var{'toggle.text'} = $turnOff;

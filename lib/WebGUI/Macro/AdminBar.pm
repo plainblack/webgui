@@ -35,9 +35,9 @@ sub process {
 	tie %hash2, "Tie::IxHash";
 	tie %cphash, "Tie::CPHash";
 	$var{'packages.canAdd'} = ($session{user}{uiLevel} >= 7);
-	$var{'packages.label'} = WebGUI::International::get(376);
-	$var{'contentTypes.label'} = WebGUI::International::get(1083);
-	$var{'clipboard.label'} = WebGUI::International::get(1082);
+	$var{'packages.label'} = WebGUI::International::get(376,'Macro_AdminBar');
+	$var{'contentTypes.label'} = WebGUI::International::get(1083,'Macro_AdminBar');
+	$var{'clipboard.label'} = WebGUI::International::get(1082,'Macro_AdminBar');
 	if (exists $session{asset}) {
 		foreach my $package (@{$session{asset}->getPackageList}) {
 			my $title = $package->{title};
@@ -68,7 +68,7 @@ sub process {
 	$var{adminConsole_loop} = WebGUI::AdminConsole->getAdminFunction;
 	return WebGUI::Asset::Template->new($templateId)->process(\%var);
 	%hash = (
-		'http://validator.w3.org/check?uri=referer'=>WebGUI::International::get(399),
+		'http://validator.w3.org/check?uri=referer'=>WebGUI::International::get(399,'Macro_AdminBar'),
 		);
 	my $acParams = WebGUI::AdminConsole->getAdminConsoleParams;
 	$hash{$acParams->{url}} = $acParams->{title} if ($acParams->{canUse});
@@ -81,10 +81,10 @@ sub process {
 
 	%hash = sortHash(%hash);
         %hash = ( 
-		WebGUI::URL::page('op=switchOffAdmin')=>WebGUI::International::get(12),
+		WebGUI::URL::page('op=switchOffAdmin')=>WebGUI::International::get(12,'Macro_AdminBar'),
 		%hash
 	);
-	$var{'admin.label'} = WebGUI::International::get(82);
+	$var{'admin.label'} = WebGUI::International::get(82,'Macro_AdminBar');
 	my @admin;
 	my $i = 0;
 	foreach my $key (keys %hash) {	

@@ -20,8 +20,8 @@ use WebGUI::URL;
 #-------------------------------------------------------------------
 sub process {
         my @param = WebGUI::Macro::getParams($_[0]);
-        my $login = $param[0] || WebGUI::International::get(716);
-        my $logout = $param[1] || WebGUI::International::get(717);
+        my $login = $param[0] || WebGUI::International::get(716,'Macro_LoginToggle');
+        my $logout = $param[1] || WebGUI::International::get(717,'Macro_LoginToggle');
 	my %var;
         if ($session{user}{userId} eq '1') {
 		return WebGUI::URL::page("op=auth&method=init") if ($param[0] eq "linkonly");
