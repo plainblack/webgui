@@ -2,6 +2,7 @@
  - Bugfix [ 849210 ] Login Redirect should filter out the "logout" operation
  - Bugfix 859816 : DataForm - security issues. Tnx Gabor for reporting.
  - ^t; now starts in current root rather then in site root.
+ - Bugfix [ 867047 ] cannot delete Redirect URL. Thanks to Klaus Hertle.
 
 
 5.5.3
