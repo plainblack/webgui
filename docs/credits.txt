@@ -27,15 +27,16 @@ Contributing Developers..............Peter Beardsley / Appropriate Solutions, In
                                      Jeff Szpak / Plain Black LLC
                                      Sean Tu / Web Den Interactive
 
-Contributing Translators.............Andreas Ljunggren
+Contributing Translators.............Natalia Almazova
                                      Joeri de Bruin / ProcoliX
                                      Jose Caneira
                                      Emiliano Grilli
                                      Ehab Heikal
                                      Mattias Kunkel / WERU AG
-                                     orosor@yahoo.com.tw
+                                     Andreas Ljunggren
                                      Ricardo Markiewicz
                                      Ryan McCombs
+                                     orosor@yahoo.com.tw
                                      Michael Ugilt
                                      Zhou Xiaopeng
 
