@@ -921,7 +921,7 @@ sub www_rearrangeWobjects {
 		my @sequence = split(",",$position);
 		my $sequenceNumber = 1;
 		foreach my $wobjectId (@sequence) {
-			$wobjectId =~ s/td(\d+)/$1/;
+			$wobjectId =~ s/td(\S+)/$1/;
 			WebGUI::SQL->setRow("wobject","wobjectId",{
 				wobjectId=>$wobjectId,
 				sequenceNumber=>$sequenceNumber,
