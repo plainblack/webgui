@@ -14,7 +14,7 @@ use Exporter;
 use strict;
 use Tie::IxHash;
 use WebGUI::Icon;
-use WebGUI::Id;
+use WebGUI::Id::generate();
 use WebGUI::International;
 use WebGUI::Macro;
 use WebGUI::MetaData;
