@@ -37,33 +37,6 @@ sub _submenu {
 }
 
 #-------------------------------------------------------------------
-sub www_editUserSettings {
-	return WebGUI::Privilege::adminOnly() unless (WebGUI::Privilege::isInGroup(3));
-        my ($output, $f, $cmd, $html, $options);
-        $output .= helpIcon(2);
-        $output .= '<h1>'.WebGUI::International::get(117).'</h1>';
-	$f = WebGUI::HTMLForm->new;
-        $f->hidden("op","saveSettings");
-        $f->yesNo("anonymousRegistration",WebGUI::International::get(118),$session{setting}{anonymousRegistration});
-        $f->text("runOnRegistration",WebGUI::International::get(559),$session{setting}{runOnRegistration});
-        $f->yesNo("useKarma",WebGUI::International::get(539),$session{setting}{useKarma});
-        $f->integer("karmaPerLogin",WebGUI::International::get(540),$session{setting}{karmaPerLogin});
-        $f->interval("sessionTimeout",WebGUI::International::get(142),WebGUI::DateTime::secondsToInterval($session{setting}{sessionTimeout}));
-	$f->yesNo("selfDeactivation",WebGUI::International::get(885),$session{setting}{selfDeactivation});
-	$f->yesNo("encryptLogin",WebGUI::International::get(1006),$session{setting}{encryptLogin});
-	foreach (@{$session{config}{authMethods}}) {
-                $options->{$_} = $_;
-        }
-        $f->select("authMethod",$options,WebGUI::International::get(119),[$session{setting}{authMethod}]);
-	foreach (@{$session{config}{authMethods}}) {
-		$f->raw(WebGUI::Authentication::settingsForm($_));
- 	}
-	$f->submit;
-	$output .= $f->print;
-        return _submenu($output);
-}
-
-#-------------------------------------------------------------------
 sub www_editCompanyInformation {
 	return WebGUI::Privilege::adminOnly() unless (WebGUI::Privilege::isInGroup(3));
         my ($output, $f);
@@ -153,6 +126,33 @@ sub www_editMiscSettings {
 }
 
 #-------------------------------------------------------------------
+sub www_editUserSettings {
+	return WebGUI::Privilege::adminOnly() unless (WebGUI::Privilege::isInGroup(3));
+        my ($output, $f, $cmd, $html, $options);
+        $output .= helpIcon(2);
+        $output .= '<h1>'.WebGUI::International::get(117).'</h1>';
+	$f = WebGUI::HTMLForm->new;
+        $f->hidden("op","saveSettings");
+        $f->yesNo("anonymousRegistration",WebGUI::International::get(118),$session{setting}{anonymousRegistration});
+        $f->text("runOnRegistration",WebGUI::International::get(559),$session{setting}{runOnRegistration});
+        $f->yesNo("useKarma",WebGUI::International::get(539),$session{setting}{useKarma});
+        $f->integer("karmaPerLogin",WebGUI::International::get(540),$session{setting}{karmaPerLogin});
+        $f->interval("sessionTimeout",WebGUI::International::get(142),WebGUI::DateTime::secondsToInterval($session{setting}{sessionTimeout}));
+	$f->yesNo("selfDeactivation",WebGUI::International::get(885),$session{setting}{selfDeactivation});
+	$f->yesNo("encryptLogin",WebGUI::International::get(1006),$session{setting}{encryptLogin});
+	foreach (@{$session{config}{authMethods}}) {
+                $options->{$_} = $_;
+        }
+        $f->select("authMethod",$options,WebGUI::International::get(119),[$session{setting}{authMethod}]);
+	foreach (@{$session{config}{authMethods}}) {
+		$f->raw(WebGUI::Authentication::settingsForm($_));
+ 	}
+	$f->submit;
+	$output .= $f->print;
+        return _submenu($output);
+}
+
+#-------------------------------------------------------------------
 sub www_manageSettings {
 	return WebGUI::Privilege::adminOnly() unless (WebGUI::Privilege::isInGroup(3));
         my ($output);
@@ -164,6 +164,7 @@ sub www_manageSettings {
         $output .= '<li><a href="'.WebGUI::URL::page('op=editMessagingSettings').'">'.WebGUI::International::get(133).'</a>';
         $output .= '<li><a href="'.WebGUI::URL::page('op=editMiscSettings').'">'.WebGUI::International::get(140).'</a>';
         $output .= '<li><a href="'.WebGUI::URL::page('op=editProfileSettings').'">'.WebGUI::International::get(308).'</a>';
+        $output .= '<li><a href="'.WebGUI::URL::page('op=listReplacements').'">'.WebGUI::International::get(1048).'</a>';
         $output .= '<li><a href="'.WebGUI::URL::page('op=editUserSettings').'">'.WebGUI::International::get(117).'</a>';
         $output .= '</ul>';
         return _submenu($output);

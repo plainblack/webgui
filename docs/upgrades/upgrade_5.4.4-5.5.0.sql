@@ -222,8 +222,27 @@ alter table forum add column archiveAfter int not null default 31536000;
 alter table forum add column postsPerPage int not null default 30;
 insert into international (internationalId,languageId,namespace,message,lastUpdated,context) values (1045,1,'WebGUI','Nested', 1066405110,'A label indicating the layout of a forum thread.');
 insert into international (internationalId,languageId,namespace,message,lastUpdated,context) values (1046,1,'WebGUI','Archived', 1066406723,'A label indicating that the content has a status of archived.');
-
-
-
-
+create table replacements (replacementId int not null primary key, searchFor varchar(255), replaceWith text);
+update userProfileField set dataValues='{\n  threaded=>WebGUI::International::get(511),\n  flat=>WebGUI::International::get(510),\n  nested=>WebGUI::International::get(1045)\n}\n' where fieldName='discussionLayout';
+insert into international (internationalId,languageId,namespace,message,lastUpdated,context) values (1053,1,'WebGUI','Manage Replacements', 1066419031,'A heading for the replacement listings page.');
+insert into international (internationalId,languageId,namespace,message,lastUpdated,context) values (1052,1,'WebGUI','Edit Replacement', 1066418983,'A heading for the edit replacement page. ');
+insert into international (internationalId,languageId,namespace,message,lastUpdated,context) values (1051,1,'WebGUI','Replace With', 1066418940,'Prompt the admin to enter a string to replace the search for string with in the replacement text.');
+insert into international (internationalId,languageId,namespace,message,lastUpdated,context) values (1050,1,'WebGUI','Search For', 1066418903,'Prompt the admin to enter a string to search for in the replacement text.');
+insert into international (internationalId,languageId,namespace,message,lastUpdated,context) values (1049,1,'WebGUI','Replacement ID', 1066418840,'Show the admin what the unique identifier for this replacement is.');
+insert into international (internationalId,languageId,namespace,message,lastUpdated,context) values (1048,1,'WebGUI','Manage replacements.', 1066418767,'A label for a link that lists all replacements.');
+insert into international (internationalId,languageId,namespace,message,lastUpdated,context) values (1047,1,'WebGUI','Add a replacement.', 1066418669,'A label for a link that adds a new replacement (used in message boards).');
+insert into incrementer values ("replacementId","1000");
+INSERT INTO replacements VALUES (1,'[quote]','<blockquote><i>');
+INSERT INTO replacements VALUES (2,'[/quote]','</i></blockquote>');
+INSERT INTO replacements VALUES (3,'[image]','<img src=\"');
+INSERT INTO replacements VALUES (4,'[/image]','\" border=\"0\" / >');
+INSERT INTO replacements VALUES (5,'shit','crap');
+INSERT INTO replacements VALUES (6,'fuck','farg');
+INSERT INTO replacements VALUES (7,'asshole','icehole');
+INSERT INTO replacements VALUES (8,'nigger','guy');
+INSERT INTO replacements VALUES (9,'[b]','<b>');
+INSERT INTO replacements VALUES (10,'[/b]','</b>');
+INSERT INTO replacements VALUES (11,'[i]','<i>');
+INSERT INTO replacements VALUES (12,'[/i]','</i>');
+INSERT INTO replacements VALUES (0,NULL,NULL);
 

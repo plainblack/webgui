@@ -422,9 +422,9 @@ sub getPostTemplateVars {
                	$var->{'post.message'} = '<div style="font-family: fixed;">'.$var->{'post.message'}.'</div>';
 	}
         if ($forum->get("allowReplacements")) {
-                my $sth = WebGUI::SQL->read("select pattern,replaceWith from forumReplacement");
-                while (my ($pattern,$replaceWith) = $sth->array) {
-                        $var->{'post.message'} =~ s/\Q$pattern/$replaceWith/g;
+                my $sth = WebGUI::SQL->read("select searchFor,replaceWith from replacements");
+                while (my ($searchFor,$replaceWith) = $sth->array) {
+                        $var->{'post.message'} =~ s/\Q$searchFor/$replaceWith/gs;
                 }
                 $sth->finish;
         }

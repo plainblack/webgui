@@ -22,6 +22,7 @@ use WebGUI::Operation::International;
 use WebGUI::Operation::Package;
 use WebGUI::Operation::Page;
 use WebGUI::Operation::ProfileSettings;
+use WebGUI::Operation::Replacements;
 use WebGUI::Operation::Root;
 use WebGUI::Operation::Scratch;
 use WebGUI::Operation::Search;
