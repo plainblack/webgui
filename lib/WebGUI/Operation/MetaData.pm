@@ -117,20 +117,6 @@ sub www_editMetaDataFieldSave {
 }
 
 #-------------------------------------------------------------------
-sub www_deleteMetaDataField {
-        return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
-        return WebGUI::Privilege::vitalComponent() if ($session{form}{fid} < 1000 && $session{form}{fid} > 0);
-
-        my $output = WebGUI::International::get('deleteConfirm','MetaData').'<p>';
-        $output .= '<div align="center"><a href="'.
-                WebGUI::URL::page('op=deleteMetaDataFieldConfirm&fid='.$session{form}{fid})
-                .'">'.WebGUI::International::get(44).'</a>';
-        $output .= '&nbsp;&nbsp;&nbsp;&nbsp;<a href="'.WebGUI::URL::page('op=manageMetaData').
-                '">'.WebGUI::International::get(45).'</a></div>';
-        return _submenu($output,'Delete Metadata field');
-}
-
-#-------------------------------------------------------------------
 sub www_deleteMetaDataFieldConfirm {
         return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
         return WebGUI::Privilege::vitalComponent() if ($session{form}{fid} < 1000 && $session{form}{fid} > 0);
