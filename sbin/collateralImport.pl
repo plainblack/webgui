@@ -126,7 +126,7 @@ sub addFiles {
        			print "\tCopying ".${$filelist}{$filename}{$ext}.".\n" unless ($quiet);
 			$collateral->saveFromFilesystem($pathToFiles.$session{os}{slash}.${$filelist}{$filename}{$ext},$thumbnailSize);
        			print "\tAdding $filename to the database.\n" unless ($quiet);
-			if (isIn($ext, @nailable)) {
+			if (isIn(lc($ext), @nailable)) {
 				$type = "image";
 				$parameters = 'border="0"';
 			} else {
