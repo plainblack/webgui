@@ -23,6 +23,7 @@ use WebGUI::International;
 use WebGUI::Grouping;
 use WebGUI::Session;
 use WebGUI::SQL;
+use WebGUI::Utility;
 
 =head1 NAME
 
@@ -65,6 +66,10 @@ Package that makes HTML forms typed data and significantly reduces the code need
 	-label=>"End Date",
 	-value=>$endDate
 	);
+$f->dynamicField(text,
+        -name=>"firstName",
+        -label=>"First Name"
+        );
  $f->email(
 	-name=>"emailAddress",
 	-label=>"Email Address"
@@ -689,6 +694,75 @@ sub dateTime {
         $self->{_data} .= $output;
 }
 
+
+#-------------------------------------------------------------------
+                                                                                                                             
+=head2 dynamicField ( fieldType , options )
+                                                                                                                             
+Adds a dynamic field to this form. This is primarily useful for building dynamic form fields.
+Because of the dynamic nature of this field, it supports only the -option=>value 
+way of specifying parameters.
+                                                                                                                             
+=over
+                                                                                                                             
+=item fieldType
+
+The field type to use. The field name is the name of the method from this forms package.
+
+=item options
+
+The field options. See the documentation for the desired field for more information.
+                                                                                                                             
+=back
+                                                                                                                             
+=cut
+
+sub dynamicField {
+	my $self = shift;
+	my $fieldType = shift;
+	my %param = @_;
+	foreach my $key (keys %param) {		# strip off the leading minus sign in each parameter key.
+		$key=~/^-(.*)$/;
+		$param{$1} = $param{$key};
+		delete $param{$key};
+	}
+	# Set options for fields that use a list.
+        if (isIn($fieldType,qw(selectList checkList radioList))) {
+                delete $param{size};
+                my %options;
+                tie %options, 'Tie::IxHash';
+                foreach (split(/\n/, $param{possibleValues})) {
+                        s/\s+$//; # remove trailing spaces
+                        $options{$_} = $_;
+                }
+                $param{options} = \%options;
+        }
+	# Convert value to list for selectList / checkList
+	if (isIn($fieldType,qw(selectList checkList)) && ref $param{value} ne "ARRAY") {
+                my @defaultValues;
+                foreach (split(/\n/, $param{value})) {
+                                s/\s+$//; # remove trailing spaces
+                                push(@defaultValues, $_);
+                }
+                $param{value} = \@defaultValues;
+        }
+
+
+        my $cmd = "WebGUI::Form::".$fieldType;
+	my $output;
+        if (_uiLevelChecksOut($param{uiLevel})) {
+		no strict "refs";
+		$output = &$cmd(\%param);
+                $output .= _subtext($param{subtext});
+                $output = $self->_tableFormRow($param{label},$output);
+        } else {
+                $output = WebGUI::Form::hidden({
+                        "name"=>$param{name},
+                        "value"=>$param{value}
+                        });
+        }
+        $self->{_data} .= $output;
+}
 
 #-------------------------------------------------------------------
 
