@@ -234,8 +234,7 @@ WebGUI::SQL->write("alter table SQLReport drop column username");
 WebGUI::SQL->write("alter table SQLReport drop column identifier");
 use WebGUI::DatabaseLink;
 my $templateId;
-use WebGUI::Macro;
-my $a = WebGUI::SQL->read("select a.databaseLinkId, a.dbQuery, a.template, a.wobjectId, b.title, a.preprocessMacros
+my $a = WebGUI::SQL->read("select a.databaseLinkId, a.dbQuery, a.template, a.wobjectId, b.title
 	from SQLReport a , wobject b where a.wobjectId=b.wobjectId");
 while (my $data = $a->hashRef) {
 	next if ($data->{dbQuery} eq "");
@@ -247,7 +246,6 @@ while (my $data = $a->hashRef) {
 		} else {
 			$templateId = 1000;
 		}
-		$data->{dbQuery} = WebGUI::Macro::process($data->{dbQuery}) if ($data->{preprocessMacros});
 		my $b = WebGUI::SQL->unconditionalRead($data->{dbQuery},$db->dbh);
 		my @template = split(/\^\-\;/,$data->{template});
 		my $final = '<tmpl_if displayTitle>
@@ -569,6 +567,7 @@ while (my $authHash = $authSth->hashRef){
 
 #--------------------------------------------
 print "\tRemoving unneeded files and directories.\n" unless ($quiet);
+# can't delete macros and wobjects in this version or upgrade will fail. must delete in future release
 #unlink("../../lib/WebGUI/Wobject/Item.pm");
 #unlink("../../lib/WebGUI/Wobject/LinkList.pm");
 #unlink("../../lib/WebGUI/Wobject/FAQ.pm");
