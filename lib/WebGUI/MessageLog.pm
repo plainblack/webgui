@@ -19,6 +19,7 @@ use WebGUI::Session;
 use WebGUI::SQL;
 use WebGUI::URL;
 use WebGUI::User;
+use WebGUI::Utility;
 
 #-------------------------------------------------------------------
 sub _notify {
@@ -54,7 +55,7 @@ sub addEntry {
 	if ($groupId ne "") {
 		@users = WebGUI::SQL->buildArray("select userId from groupings where groupId=$groupId");
 	}
-	@users = ($userId,@users) if ($userId ne "");
+	@users = ($userId,@users) if ($userId ne "" && !isIn($userId, @users));
 	foreach $user (@users) {
 		$u = WebGUI::User->new($user);
 		if ($u->userId ne "") {
@@ -83,7 +84,7 @@ sub addInternationalizedEntry {
         if ($groupId ne "") {
                 @users = WebGUI::SQL->buildArray("select userId from groupings where groupId=$groupId");
         }
-	@users = ($userId,@users) if ($userId ne "");
+	@users = ($userId,@users) if ($userId ne "" && !isIn($userId, @users));
         foreach $user (@users) {
                 $u = WebGUI::User->new($user);
                 if ($u->userId ne "") {
