@@ -13,6 +13,8 @@
  - Bugfix [ 855228 ] word wrap not working when posting as text
  - Bugfix [ 855632 ] SyndicatedContent crashs when rss contains only one item
    (Thanks to Len Kranendonk)
+ - Bugfix [ 855682 ] USS rss feed shows unapproved items
+
 
 
 5.5.3

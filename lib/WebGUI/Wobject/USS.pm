@@ -501,7 +501,7 @@ sub www_viewRSS {
         my $res = WebGUI::SQL->read
           ("select USS_submissionId, content, title, " .
            "dateSubmitted, username from USS_submission " .
-           "where wobjectId = " .$session{dbh}->quote($wid) . " " .
+           "where wobjectId = " .$session{dbh}->quote($wid) . " and status='Approved' " .
            "order by ".$_[0]->getValue("sortBy")." ".$_[0]->getValue("sortOrder")." limit " . $numResults);
         
         while (my $row = $res->{_sth}->fetchrow_arrayref()) {
