@@ -50,7 +50,9 @@ sub _duplicateReplyTree {
                 $newMessageId = getNextId("messageId");
 		WebGUI::SQL->write("insert into discussion values ($newMessageId, $_[2], $_[3], $_[1], $data{userId}, "
 			.quote($data{username}).", ".quote($data{subject}).", ".quote($data{message}).
-			", $data{dateOfPost}, $_[4], $data{views}, $data{locked}, ".quote($data{status}).")");
+			", $data{dateOfPost}, $_[4], $data{views}, $data{locked}, ".quote($data{status})."
+			, ".quote($data{userDefined1}).", ".quote($data{userDefined2}).", ".quote($data{userDefined3})."
+			, ".quote($data{userDefined4}).", ".quote($data{userDefined5}).")");
                 _duplicateReplyTree($data{messageId},$newMessageId,$_[2],$_[3],$_[4]);
         }
         $sth->finish;
@@ -147,7 +149,8 @@ sub duplicate {
 		WebGUI::SQL->write("insert into discussion values ($newMessageId, $newMessageId, $_[1], 0, 
 			$data{userId}, ".quote($data{username}).", ".quote($data{subject}).", "
 			.quote($data{message}).", $data{dateOfPost}, $newSubId, $data{views}, $data{locked},
-			".quote($data{status}).")");
+			".quote($data{status}).", ".quote($data{userDefined1}).", ".quote($data{userDefined2})."
+			, ".quote($data{userDefined3}).", ".quote($data{userDefined4}).", ".quote($data{userDefined5}).")");
 		_duplicateReplyTree($data{messageId},$newMessageId,$newMessageId,$_[1],$newSubId);
         }
         $sth->finish;

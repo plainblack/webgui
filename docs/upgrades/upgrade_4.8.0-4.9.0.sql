@@ -15,7 +15,16 @@ delete from international where languageId=1 and namespace='FileManager' and int
 insert into international (internationalId,languageId,namespace,message,lastUpdated) values (61,1,'FileManager','File Manager, Add/Edit', 1038028480);
 delete from international where languageId=1 and namespace='FileManager' and internationalId=1;
 insert into international (internationalId,languageId,namespace,message,lastUpdated) values (1,1,'FileManager','File Manager', 1038028463);
-
+alter table page add column userDefined1 varchar(255);
+alter table page add column userDefined2 varchar(255);
+alter table page add column userDefined3 varchar(255);
+alter table page add column userDefined4 varchar(255);
+alter table page add column userDefined5 varchar(255);
+alter table discussion add column userDefined1 varchar(255);
+alter table discussion add column userDefined2 varchar(255);
+alter table discussion add column userDefined3 varchar(255);
+alter table discussion add column userDefined4 varchar(255);
+alter table discussion add column userDefined5 varchar(255);
 
 
 
