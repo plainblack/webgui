@@ -14,6 +14,7 @@ use strict;
 use Tie::CPHash;
 use WebGUI::Attachment;
 use WebGUI::DateTime;
+use WebGUI::Forum;
 use WebGUI::Forum::UI;
 use WebGUI::HTML;
 use WebGUI::HTMLForm;
@@ -314,6 +315,11 @@ sub www_editSubmissionSave {
 		&& WebGUI::Privilege::isInGroup($_[0]->get("groupToContribute"))) 
 		|| WebGUI::Privilege::isInGroup($_[0]->get("groupToApprove"))) {
                 if ($session{form}{sid} eq "new") {
+			my $forum = WebGUI::Forum->create({
+				masterForumId=>$_[0]->get("forumId"),
+				forumId=>"new"
+				});
+			$hash{forumId} = $forum->get("forumId");
 			$hash{username} = $session{form}{visitorName} || $session{user}{alias};
 			$hash{userId} = $session{user}{userId};
 			$hash{USS_submissionId} = "new";
@@ -382,7 +388,7 @@ sub www_view {
 	$var{"date.label"} = WebGUI::International::get(13,$_[0]->get("namespace"));
 	$var{"by.label"} = WebGUI::International::get(21,$_[0]->get("namespace"));
 	$p = WebGUI::Paginator->new(WebGUI::URL::page('func=view&wid='.$_[0]->get("wobjectId")),[],$numResults);
-	$p->setDataByQuery("select USS_submissionId, content, title, userId, status, image, dateSubmitted, username
+	$p->setDataByQuery("select USS_submissionId, content, title, userId, status, image, dateSubmitted, username, forumId
 		from USS_submission where wobjectId=".$_[0]->get("wobjectId")." and $constraints order by dateSubmitted desc");
 	$page = $p->getPageData;
 	$i = 0;
@@ -399,8 +405,8 @@ sub www_view {
                         $thumbnail = "";
 			$imageURL;
                 }
-		($responses) = WebGUI::SQL->quickArray("select count(*) from discussion 
-			where wobjectId=".$_[0]->get("wobjectId")." and subId=".$row->{USS_submissionId});
+		($responses) = WebGUI::SQL->quickArray("select count(*) from forumPost left join forumThread on
+			forumThread.forumThreadId=forumPost.forumThreadId where forumThread.forumId=".$row->{forumId});
                 push (@submission,{
                         "submission.id"=>$page->[$i]->{USS_submissionId},
                         "submission.url"=>WebGUI::URL::page('wid='.$_[0]->get("wobjectId").'&func=viewSubmission&sid='.$page->[$i]->{USS_submissionId}),

@@ -50,25 +50,9 @@ sub new {
         my $property = shift;
         my $self = WebGUI::Wobject->new(
                 -properties=>$property,
-                -extendedProperties=>{
-			messagesPerPage=>{
-				defaultValue=>50
-				}
-			},
 		-useTemplate=>1
                 );
         bless $self, $class;
-}
-
-#-------------------------------------------------------------------
-sub status {
-        if ($_[0] eq "Approved") {
-                return WebGUI::International::get(560);
-        } elsif ($_[0] eq "Denied") {
-                return WebGUI::International::get(561);
-        } elsif ($_[0] eq "Pending") {
-                return WebGUI::International::get(562);
-        }
 }
 
 #-------------------------------------------------------------------
@@ -89,14 +73,7 @@ sub www_deleteForumConfirm {
 #-------------------------------------------------------------------
 sub www_edit {
 	my $properties = WebGUI::HTMLForm->new;
-	my $layout = WebGUI::HTMLForm->new;
-        $layout->integer(
-		-name=>"messagesPerPage",
-		-label=>WebGUI::International::get(4,$_[0]->get("namespace")),
-		-value=>$_[0]->getValue("messagesPerPage")
-		);
 	return $_[0]->SUPER::www_edit(
-		-layout=>$layout->printRowsOnly,
 		-properties=>$properties->printRowsOnly,
 		-headingId=>6,
 		-helpId=>1
@@ -167,11 +144,6 @@ sub www_moveForumUp {
 }
 
 #-------------------------------------------------------------------
-sub www_showMessage {
-        return $_[0]->SUPER::www_showMessage('<a href="'.WebGUI::URL::page().'">'.WebGUI::International::get(11,$_[0]->get("namespace")).'</a><br>');
-}
-
-#-------------------------------------------------------------------
 sub www_view {
 	my $callback = WebGUI::URL::page("func=view&amp;wid=".$_[0]->get("wobjectId"));
 	return WebGUI::Forum::UI::forumOp($callback) if ($session{form}{forumOp});
@@ -210,7 +182,7 @@ sub www_view {
 			'forum.url' => WebGUI::Forum::UI::formatForumURL($callback,$forum->get("forumId")),
 			'forum.lastPost.url' => WebGUI::Forum::UI::formatThreadURL($callback,$lastPost->get("forumPostId")),
 			'forum.lastPost.date' => WebGUI::Forum::UI::formatPostDate($lastPost->get("dateOfPost")),
-			'forum.lastPost.time' => WebGUI::Forum::UI::formatPostDate($lastPost->get("dateOfPost")),
+			'forum.lastPost.time' => WebGUI::Forum::UI::formatPostTime($lastPost->get("dateOfPost")),
 			'forum.lastPost.epoch' => $lastPost->get("dateOfPost"),
 			'forum.lastPost.subject' => WebGUI::Forum::UI::formatSubject($lastPost->get("subject")),
 			'forum.lastPost.user.id' => $lastPost->get("userId"),

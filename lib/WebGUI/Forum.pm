@@ -68,6 +68,26 @@ sub isSubscribed {
 sub new {
 	my ($class, $forumId) = @_;
 	my $properties = WebGUI::SQL->getRow("forum","forumId",$forumId);
+	if ($properties->{masterForumId}) {
+		my $master = WebGUI::SQL->getRow("forum","forumId",$properties->{masterForumId});
+		$properties->{forumTemplateId} = $master->{forumTemplateId};
+		$properties->{threadTemplateId} = $master->{threadTemplateId};
+		$properties->{postTemplateId} = $master->{postTemplateId};
+		$properties->{searchTemplateId} = $master->{searchTemplateId};
+		$properties->{notificationTemplateId} = $master->{notificationTemplateId};
+		$properties->{postFormTemplateId} = $master->{postFormTemplateId};
+		$properties->{archiveAfter} = $master->{archiveAfter};
+		$properties->{allowRichEdit} = $master->{allowRichEdit};
+		$properties->{allowReplacements} = $master->{allowReplacements};
+		$properties->{filterPosts} = $master->{filterPosts};
+		$properties->{karmaPerPost} = $master->{karmaPerPost};
+		$properties->{groupToPost} = $master->{groupToPost};
+		$properties->{groupToModerate} = $master->{groupToModerate};
+		$properties->{moderatePosts} = $master->{moderatePosts};
+		$properties->{attachmentsPerPost} = $master->{attachmentsPerPost};
+		$properties->{addEditStampToPosts} = $master->{addEditStampsToPost};
+		$properties->{postsPerPage} = $master->{postsPerPage};
+	}
 	bless {_properties=>$properties}, $class;
 }
 

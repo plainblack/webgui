@@ -18,12 +18,6 @@ create table forum (
   allowReplacements int not null default 1
 );
 
-create table forumReplacement (
-  forumReplacementId int not null primary key,
-  pattern varchar(255),
-  replaceWith varchar(255)
-);
-
 create table forumPost (
   forumPostId int not null primary key,
   parentId int not null default 0,
@@ -149,6 +143,7 @@ delete from international where namespace='WebGUI' and internationalId=238;
 delete from international where namespace='WebGUI' and internationalId=239;
 delete from international where namespace='WebGUI' and internationalId=1014;
 delete from international where namespace='WebGUI' and internationalId=1015;
+delete from international where namespace='MessageBoard' and internationalId=4;
 delete from international where languageId=1 and namespace='WebGUI' and internationalId=512;
 insert into international (internationalId,languageId,namespace,message,lastUpdated,context) values (512,1,'WebGUI','Go to next thread', 1065280309,NULL);
 delete from international where languageId=1 and namespace='WebGUI' and internationalId=513;
@@ -245,4 +240,8 @@ INSERT INTO replacements VALUES (10,'[/b]','</b>');
 INSERT INTO replacements VALUES (11,'[i]','<i>');
 INSERT INTO replacements VALUES (12,'[/i]','</i>');
 INSERT INTO replacements VALUES (0,NULL,NULL);
+alter table forum add column masterForumId int;
+alter table USS_submission add column forumId int;
+
+
 
