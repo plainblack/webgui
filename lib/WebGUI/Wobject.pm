@@ -193,6 +193,7 @@ sub duplicate {
 	my %properties;
 	tie %properties, 'Tie::CPHash';
 	%properties = %{$_[0]->get};
+	my $originalPageId = $properties{pageId};
 	$properties{pageId} = $_[1] || 2;
 	$properties{sequenceNumber} = _getNextSequenceNumber($properties{pageId});
 	my $page = WebGUI::SQL->quickHashRef("select groupIdView,ownerId,groupIdEdit from page where pageId=".$properties{pageId});
@@ -202,7 +203,7 @@ sub duplicate {
 	if ($properties{pageId} == 2)  {
 		$properties{bufferUserId} = $session{user}{userId};
 		$properties{bufferDate} = time();
-		$properties{bufferPrevId} = {};
+		$properties{bufferPrevId} = $originalPageId;
 	}
 	delete $properties{wobjectId};
 	my $cmd = "WebGUI::Wobject::".$properties{namespace};
