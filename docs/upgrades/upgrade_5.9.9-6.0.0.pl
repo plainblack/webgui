@@ -481,7 +481,6 @@ while (my $data = $a->hashRef) {
 		$templateId = 1;
 	}
 	WebGUI::SQL->write("update wobject set templateId=$templateId where wobjectId=".$data->{wobjectId});
-	print "\tend loop\n";
 }
 $a->finish;
 WebGUI::SQL->write("alter table SQLReport drop column template");
@@ -623,7 +622,7 @@ while (my $data = $a->hashRef) {
 	my ($start) = WebGUI::SQL->quickArray("select min(dateOfResponse) from Survey_questionResponse where Survey_id=".$data->{Survey_id}."
 		and ((userId=".quote($data->{userId})." and userId<>1) or (userId=1 and ipAddress=".quote($data->{ipAddress})."))");
 	WebGUI::SQL->write("update Survey_response set startDate=$start, endDate=$end where Survey_responseId=".$data->{Survey_responseId});
-	WebGUI::SQL->quickArray("update Survey_questionResponse set Survey_responseId=".$data->{Survey_responseId}." where Survey_id=".$data->{Survey_id}."
+	WebGUI::SQL->write("update Survey_questionResponse set Survey_responseId=".$data->{Survey_responseId}." where Survey_id=".$data->{Survey_id}."
 		and ((userId=".quote($data->{userId})." and userId<>1) or (userId=1 and ipAddress=".quote($data->{ipAddress})."))");
 }
 $a->finish;
