@@ -22,7 +22,8 @@ use WebGUI::SQL;
 use WebGUI::URL;
 
 our @ISA = qw(Exporter);
-our @EXPORT = qw(&www_editUserSettings &www_editUserSettingsSave &www_editCompanyInformation &www_editCompanyInformationSave 
+our @EXPORT = qw(&www_editUserSettings &www_editUserSettingsSave &www_editCompanyInformation 
+	&www_editCompanyInformationSave &www_editPrivilegeSettings &www_editPrivilegeSettingsSave
 	&www_editMailSettings &www_editMailSettingsSave &www_editMiscSettings 
 	&www_editContentSettings &www_editContentSettingsSave &www_editMiscSettingsSave &www_manageSettings);
 
@@ -202,8 +203,7 @@ sub www_editMailSettingsSave {
 
 #-------------------------------------------------------------------
 sub www_editMiscSettings {
-        my ($output, %criticalError, $f);
-	%criticalError = ('debug'=>WebGUI::International::get(414), 'friendly'=>WebGUI::International::get(415));
+        my ($output, $f);
         if (WebGUI::Privilege::isInGroup(3)) {
                 $output .= helpIcon(24);
                 $output .= '<h1>'.WebGUI::International::get(140).'</h1>';
@@ -211,7 +211,6 @@ sub www_editMiscSettings {
                 $f->hidden("op","editMiscSettingsSave");
 		$f->yesNo("preventProxyCache",WebGUI::International::get(400),$session{setting}{preventProxyCache});
 		$f->yesNo("showDebug",WebGUI::International::get(707),$session{setting}{showDebug});
-		$f->select("onCriticalError",\%criticalError,WebGUI::International::get(413),[$session{setting}{onCriticalError}]);
 		$f->submit;
 		$output .= $f->print;
         } else {
@@ -225,11 +224,43 @@ sub www_editMiscSettingsSave {
         if (WebGUI::Privilege::isInGroup(3)) {
 		_saveSetting("preventProxyCache");
 		_saveSetting("showDebug");
-		_saveSetting("onCriticalError");
                 return www_manageSettings(); 
         } else {
                 return WebGUI::Privilege::adminOnly();
 	}
+}
+
+#-------------------------------------------------------------------
+sub www_editPrivilegeSettings {
+        my ($output, $f);
+        if (WebGUI::Privilege::isInGroup(3)) {
+                $output .= helpIcon(48);
+                $output .= '<h1>'.WebGUI::International::get(710).'</h1>';
+                $f = WebGUI::HTMLForm->new;
+                $f->hidden("op","editPrivilegeSettingsSave");
+                $f->group("imageManagersGroup",WebGUI::International::get(711),[$session{setting}{imageManagersGroup}]);
+                $f->group("packageManagersGroup",WebGUI::International::get(712),[$session{setting}{packageManagersGroup}]);
+                $f->group("styleManagersGroup",WebGUI::International::get(713),[$session{setting}{styleManagersGroup}]);
+                $f->group("templateManagersGroup",WebGUI::International::get(714),[$session{setting}{templateManagersGroup}]);
+                $f->submit;
+                $output .= $f->print;
+        } else {
+                $output = WebGUI::Privilege::adminOnly();
+        }
+        return $output;
+}
+
+#-------------------------------------------------------------------
+sub www_editPrivilegeSettingsSave {
+        if (WebGUI::Privilege::isInGroup(3)) {
+                _saveSetting("imageManagersGroup");
+                _saveSetting("packageManagersGroup");
+                _saveSetting("styleManagersGroup");
+                _saveSetting("templateManagersGroup");
+                return www_manageSettings();
+        } else {
+                return WebGUI::Privilege::adminOnly();
+        }
 }
 
 #-------------------------------------------------------------------
@@ -243,6 +274,7 @@ sub www_manageSettings {
                 $output .= '<li><a href="'.WebGUI::URL::page('op=editContentSettings').'">'.WebGUI::International::get(525).'</a>';
                 $output .= '<li><a href="'.WebGUI::URL::page('op=editMailSettings').'">'.WebGUI::International::get(133).'</a>';
                 $output .= '<li><a href="'.WebGUI::URL::page('op=editMiscSettings').'">'.WebGUI::International::get(140).'</a>';
+                $output .= '<li><a href="'.WebGUI::URL::page('op=editPrivilegeSettings').'">'.WebGUI::International::get(710).'</a>';
                 $output .= '<li><a href="'.WebGUI::URL::page('op=editProfileSettings').'">'.WebGUI::International::get(308).'</a>';
                 $output .= '<li><a href="'.WebGUI::URL::page('op=editUserSettings').'">'.WebGUI::International::get(117).'</a>';
                 $output .= '</ul>';
