@@ -55,7 +55,8 @@
  - Implemented preview function for posting messages to a forum / RFE[991000] (Leendert Bottelberghs / United Knowledge)
  - RFE [ 923878 ] htmlArea 3 (IE and Mozilla compliant) added to WebGUI (Len
    Kranendonk)
-
+ - RFE [ 806332 ] Force SSL, a new page property "Encrypt page" is added. (Len
+   Kranendonk)
 
 6.1.1
  - bugfix [ 991313 ] Manage Translations doesn't work

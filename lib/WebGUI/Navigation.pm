@@ -218,7 +218,7 @@ in the class and returns HTML.
 sub build {
 	my $self = shift;
 	my @interestingPageProperties = ('pageId', 'parentId', 'title', 'ownerId', 'urlizedTitle',
-			'synopsis', 'newWindow', 'menuTitle');
+			'synopsis', 'newWindow', 'menuTitle', 'encryptLogin');
 	my $var = {'page_loop' => []};
 	my $p = $self->_getStartPageObject();
 	my $method = $self->_methods()->{$self->{_method}}{method};
@@ -251,6 +251,9 @@ sub build {
 
 				# Initial page info
 				$pageData->{"page.url"} = WebGUI::URL::gateway($page->{'urlizedTitle'});
+			        if ($page->{'encryptPage'}) {
+					$pageData->{"page.url"} =~ s/http:/https:/;
+				}
 				$pageData->{"page.absDepth"} = $page->{'depth'} + 1;
 				$pageData->{"page.relDepth"} = $pageData->{"page.absDepth"} - $startPageDepth;
 				$pageData->{"page.isCurrent"} = ($page->{'pageId'} == $session{page}{pageId});

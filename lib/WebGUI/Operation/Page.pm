@@ -346,6 +346,7 @@ sub www_editPage {
 			$page{ownerId} = $session{user}{userId};
 			$page{hideFromNavigation} = 0;
                         $page{newWindow} = 0;
+                        $page{encryptPage} = 0;
                         $page{redirectURL} = "";
 		} else {
 			%page = %{$session{page}};
@@ -385,6 +386,12 @@ sub www_editPage {
 			-label=>WebGUI::International::get(940),
 			-uiLevel=>6
 			);
+		$f->getTab("properties")->yesNo(
+                        -name=>"encryptPage",
+                        -value=>$page{encryptPage},
+                        -label=>WebGUI::International::get('encrypt page'),
+                        -uiLevel=>6
+                        );
                 $f->getTab("properties")->text(
 			-name=>"urlizedTitle",
 			-label=>WebGUI::International::get(104),
@@ -582,6 +589,7 @@ sub www_editPageSave {
 		groupIdView		=> $session{form}{groupIdView}, 
 		groupIdEdit		=> $session{form}{groupIdEdit}, 
 		newWindow		=> $session{form}{newWindow},
+		encryptPage		=> $session{form}{encryptPage},
 		wobjectPrivileges	=> $session{form}{wobjectPrivileges},
 		hideFromNavigation	=> $session{form}{hideFromNavigation},
 		startDate		=> WebGUI::FormProcessor::dateTime("startDate"),
