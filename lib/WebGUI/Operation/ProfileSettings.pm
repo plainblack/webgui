@@ -69,20 +69,6 @@ sub _submenu {
         return $ac->render($workarea, $title);
 }
 
-
-#-------------------------------------------------------------------
-sub www_deleteProfileCategory {
-        return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
-        my ($output);
-        return WebGUI::Privilege::vitalComponent() if ($session{form}{cid} < 1000 && $session{form}{cid} > 0);
-        $output = WebGUI::International::get(466,"WebGUIProfile").'<p>';
-        $output .= '<div align="center"><a href="'.WebGUI::URL::page('op=deleteProfileCategoryConfirm&cid='.$session{form}{cid}).
-                '">'.WebGUI::International::get(44).'</a>';
-        $output .= '&nbsp;&nbsp;&nbsp;&nbsp;<a href="'.WebGUI::URL::page('op=editProfileSettings').'">'.
-                WebGUI::International::get(45).'</a></div>';
-	return _submenu($output,'42');
-}
-
 #-------------------------------------------------------------------
 sub www_deleteProfileCategoryConfirm {
         return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
@@ -90,20 +76,6 @@ sub www_deleteProfileCategoryConfirm {
 	WebGUI::SQL->write("delete from userProfileCategory where profileCategoryId=".quote($session{form}{cid}));
 	WebGUI::SQL->write("update userProfileField set profileCategoryId=1 where profileCategoryId=".quote($session{form}{cid}));
         return www_editProfileSettings();
-}
-
-#-------------------------------------------------------------------
-sub www_deleteProfileField {
-        return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
-        my ($output,$protected);
-	($protected) = WebGUI::SQL->quickArray("select protected from userProfileField where fieldname=".quote($session{form}{fid}));
-        return WebGUI::Privilege::vitalComponent() if ($protected);
-        $output .= WebGUI::International::get(467,"WebGUIProfile").'<p>';
-        $output .= '<div align="center"><a href="'.WebGUI::URL::page('op=deleteProfileFieldConfirm&fid='.$session{form}{fid}).
-                '">'.WebGUI::International::get(44).'</a>';
-        $output .= '&nbsp;&nbsp;&nbsp;&nbsp;<a href="'.WebGUI::URL::page('op=editProfileSettings').'">'.
-                WebGUI::International::get(45).'</a></div>';
-	return _submenu($output,'42');
 }
 
 #-------------------------------------------------------------------
