@@ -365,7 +365,7 @@ while (my $data = $sth->hashRef) {
 		quote($data->{fileTitle}).", ".quote(fixUrl($newId,$wobjectUrl.'/'.$data->{$field})).", 
 		".quote($wobject->{startDate}).", ".quote($wobject->{endDate}).", 1, ".quote($ownerId).", 
 		".quote($data->{groupToView}).", ".quote($groupIdEdit).", ".quote($data->{briefSynopsis}).")");
-	$collateralCache{$data->{collateralId}) = $collateralId;
+	$collateralCache{$data->{collateralId}} = $collateralId;
 	$rank++;
 }
 
