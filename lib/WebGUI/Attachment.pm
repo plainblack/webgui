@@ -330,12 +330,12 @@ sub getSize {
 	my (@attributes) = stat($_[0]->{_node}->getPath.$session{os}{slash}.$_[0]->getFilename);
 	if ($attributes[7] > 1048576) {
 		$size = round($attributes[7]/1048576);
-		$size .= 'mb';
+		$size .= 'MB';
 	} elsif ($attributes[7] > 1024) {
 		$size = round($attributes[7]/1024);
-		$size .= 'kb';
+		$size .= 'kB';
 	} else {
-		$size = $attributes[7]."b";
+		$size = $attributes[7]."B";
 	}
 	return $size;
 }
