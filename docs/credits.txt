@@ -20,6 +20,7 @@ Contributing Developers..............Peter Beardsley / Appropriate Solutions, In
                                      Andy Grundman
                                      Koen de Jonge / ProcoliX
                                      Martin Kamerbeek / ProcoliX
+                                     John W. Krahn
                                      Len Kranendonk
                                      Christophe Marcant
                                      Tavis Parker / ParkerOne Consulting
