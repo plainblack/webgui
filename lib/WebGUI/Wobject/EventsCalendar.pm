@@ -357,6 +357,7 @@ sub www_editEventSave {
 	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
 	my (@startDate, @endDate, $until, @eventId, $i, $recurringEventId);
 	if ($session{form}{eid} eq "new") {
+		$session{form}{name} = $session{form}{name} || "unnamed";
 		$session{form}{eid} = getNextId("EventsCalendar_eventId");
        		$startDate[0] = setToEpoch($session{form}{startDate});
                	$endDate[0] = setToEpoch($session{form}{endDate});
