@@ -124,7 +124,7 @@ use WebGUI::User ();
 use WebGUI::Utility ();
 use WebGUI::Wobject ();
 
-print "[  OK  ]";
+print "[  OK  ]\n";
 
 
 1;
