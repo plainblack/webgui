@@ -11,6 +11,7 @@ package WebGUI::Macro::RootTab;
 #-------------------------------------------------------------------
 
 use strict;
+use WebGUI::Macro;
 use WebGUI::Navigation;
 use WebGUI::Session;
 use WebGUI::SQL;
@@ -39,7 +40,7 @@ sub _draw {
 #-------------------------------------------------------------------
 sub _findRoot {
         my ($pageId,$parentId) = WebGUI::SQL->quickArray("select pageId,parentId from page where pageId=$_[0]");
-        if ($parentId == 0) {
+        if ($parentId == $_[1]) {
                 return $pageId;
         } else {
                 return _findRoot($parentId);
@@ -49,8 +50,9 @@ sub _findRoot {
 
 #-------------------------------------------------------------------
 sub process {
-        my $root = _findRoot($session{page}{pageId});
-        my $tree = WebGUI::Navigation::tree(0,1);
+	my @param = WebGUI::Macro::getParams($_[0]);
+        my $root = _findRoot($session{page}{pageId},$param[0]);
+        my $tree = WebGUI::Navigation::tree($param[0],1);
         return _draw($tree,$root);
 }
 
