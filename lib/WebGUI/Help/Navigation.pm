@@ -6,10 +6,6 @@ our $HELP = {
 		body => '1093',
 		related => [
 			{
-				tag => 'navigation macros',
-				namespace => 'WebGUI'
-			},
-			{
 				tag => 'navigation template',
 				namespace => 'Navigation'
 			},
@@ -28,10 +24,6 @@ our $HELP = {
 		body => '1097',
 		related => [
 			{
-				tag => 'navigation macros',
-				namespace => 'WebGUI'
-			},
-			{
 				tag => 'navigation add/edit',
 				namespace => 'Navigation'
 			},
@@ -49,10 +41,6 @@ our $HELP = {
 		title => '1094',
 		body => '1095',
 		related => [
-			{
-				tag => 'navigation macros',
-				namespace => 'WebGUI'
-			},
 			{
 				tag => 'navigation template',
 				namespace => 'Navigation'

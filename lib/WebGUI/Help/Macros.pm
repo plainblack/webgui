@@ -1,9 +1,19 @@
 package WebGUI::Help::Macros;
 
 use WebGUI::Session;
-use Data::Dumper;
 
 our $HELP = {
+
+        'macros using' => {
+		title => 'macros using title',
+		body => 'macros using body',
+		related => [
+                        {
+                                tag => "macros list",
+                                namespace => "Macros",
+                        },
+                ],
+        },
 
         'macros list' => {
 		title => 'macros list title',

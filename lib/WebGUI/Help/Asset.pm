@@ -20,8 +20,12 @@ our $HELP = {
 				namespace => 'Asset'
 			},
 			{
-				tag => 'user macros',
-				namespace => 'WebGUI'
+				tag => 'aoi hits',
+				namespace => 'AOIHits'
+			},
+			{
+				tag => 'aoi rank',
+				namespace => 'AOIRank'
 			},
 			{
 				tag => 'wobject add/edit',
@@ -37,10 +41,14 @@ our $HELP = {
 				tag => 'metadata manage',
 				namespace => 'Asset'
                         },
-                        {
-                                tag => 'user macros',
-                                namespace => 'WebGUI'
-                        },
+			{
+				tag => 'aoi hits',
+				namespace => 'AOIHits'
+			},
+			{
+				tag => 'aoi rank',
+				namespace => 'AOIRank'
+			},
                         {
                                 tag => 'wobject add/edit',
                                 namespace => 'Wobject',

@@ -29,16 +29,6 @@ our $HELP = {
 			}
 		]
 	},
-	'search engine using' => {
-		title => '675',
-		body => '630',
-		related => [
-			{
-				tag => 'style macros',
-				namespace => 'WebGUI'
-			}
-		]
-	},
 	'trash empty' => {
 		title => '696',
 		body => '651',
@@ -58,10 +48,6 @@ our $HELP = {
 		title => '1073',
 		body => '1074',
 		related => [
-			{
-				tag => 'style macros',
-				namespace => 'WebGUI'
-			},
 			{
 				tag => 'style sheets using',
 				namespace => 'WebGUI'
@@ -231,32 +217,6 @@ our $HELP = {
 		]
 	},
 
-	'macros using' => {
-		title => '669',
-		body => '624',
-		related => [
-			{
-				tag => 'asset macros',
-				namespace => 'Asset'
-			},
-			{
-				tag => 'navigation macros',
-				namespace => 'WebGUI'
-			},
-			{
-				tag => 'programmer macros',
-				namespace => 'WebGUI'
-			},
-			{
-				tag => 'style macros',
-				namespace => 'WebGUI'
-			},
-			{
-				tag => 'user macros',
-				namespace => 'WebGUI'
-			}
-		]
-	},
 	'trash manage' => {
 		title => '960',
 		body => '961',
@@ -301,55 +261,6 @@ our $HELP = {
 				tag => 'settings',
 				namespace => 'WebGUI'
 			},
-		]
-	},
-
-	'programmer macros' => {
-		title => '839',
-		body => '840',
-		related => [
-			{
-				tag => 'macros using',
-				namespace => 'WebGUI'
-			}
-		]
-	},
-	'navigation macros' => {
-		title => '841',
-		body => '842',
-		related => [
-			{
-				tag => 'macros using',
-				namespace => 'WebGUI'
-			},
-			{
-				tag => 'navigation template',
-				namespace => 'Navigation'
-			},
-		]
-	},
-	'user macros' => {
-		title => '843',
-		body => '844',
-		related => [
-			{
-				tag => 'macros using',
-				namespace => 'WebGUI'
-			}
-		]
-	},
-	'style macros' => {
-		title => '845',
-		body => '846',
-		related => [
-			{
-				tag => 'macros using',
-				namespace => 'WebGUI'
-			},
-			{
-				tag => 'style template',
-				namespace => 'WebGUI'
-			}
 		]
 	},
 	'clipboard empty' => {

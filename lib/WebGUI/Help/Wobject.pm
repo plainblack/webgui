@@ -8,7 +8,7 @@ our $HELP = {
 		related => [
 			{
 				tag => 'macros using',
-				namespace => 'WebGUI'
+				namespace => 'Macros'
 			},
 			{
 				tag => 'style sheets using',

@@ -107,184 +107,6 @@ our $I18N = {
 		lastUpdated => 1031514049
 	},
 
-	'846' => {
-		message => q|These macros are mainly useful in maintaining styles in WebGUI.
-<p/>
-
-<b>&#94;AdminBar;</b><br>
-<b>&#94;AdminBar(<i>custom template ID</i>);</b><br>
-Places the administrative tool bar on the page. Omitting this macro will prevent you from adding content, pasting
-content from the clipboard, accessing the help system and other administrative functions.
-<p>
-The macro takes up to one optional argument, an alternate template in the Macro/AdminBar namespace for generating the AdminBar.  The following variables are available in the template:
-
-<p/>
-<b>packages.label</b><br/>
-The internationalized label for adding packages.
-
-<p/>
-<b>packages.canAdd</b><br/>
-A boolean indicating whether the current user can add packages.
-
-<p/>
-<b>addContent.label</b><br/>
-The internationalized label for adding content.
-
-<p/>
-<b>contenttypes_loop</b><br/>
-The loop containing different types of content to add
-
-<blockquote>
-<p/>
-<b>contenttype.label</b><br/>
-The internationalized label for this content type.
-
-<p/>
-<b>contenttype.url</b><br/>
-The URL for adding an instance of this content type.
-
-</blockquote>
-
-<p/>
-<b>addpage.label</b><br/>
-The internationalized label for adding a page.
-
-<p/>
-<b>addpage.url</b><br/>
-The URL for adding a page.
-
-<p/>
-<b>clipboard.label</b><br/>
-The internationalized label for the clipboard.
-
-<p/>
-<b>clipboard_loop</b><br/>
-The loop containing a list of items in the clipboard.
-
-<blockquote>
-<p/>
-<b>clipboard.label</b><br/>
-The label for this item in the clipboard.
-
-<p/>
-<b>clipboard.url</b><br/>
-The URL for pasting this clipboard item onto the current page.
-
-</blockquote>
-
-<p/>
-<b>admin.label</b><br/>
-The internationalized label for administrative functions.
-
-<p/>
-<b>admin_loop</b><br/>
-The loop containing a list of administrative functions, such as turning off admin mode or
-validating the current page.
-
-<blockquote>
-<p/>
-<b>admin.label</b><br/>
-The label for this item in the clipboard.
-
-<p/>
-<b>admin.url</b><br/>
-The URL for executing this admin function.
-
-</blockquote>
-
-<p/>
- The <i>.adminBar</i> style sheet class is tied to the default template for this macro.
-
-<b>&#94;c; - Company Name</b><br>
-The name of your company specified in the settings by your Administrator.
-<p>
-
-
-<b>&#94;e; - Company Email Address</b><br>
-The email address for your company specified in the settings by your Administrator.
-<p>
-
-<b>&#94;Extras;</b><br>
-Returns the path to the WebGUI "extras" folder, which contains things like WebGUI icons.
-<p>
-
-<b>&#94;JavaScript();</b><br>
-This macro allows you to set a javascript in the head section of the page. Just pass in the URL to the javascript file.
-<p>
-
-<b>&#94;LastModified;</b><br>
-<b>&#94;LastModified(<i>"text"</i>,<i>"date format"</i>);</b><br>
-Displays the date that the current page was last modified based upon the wobjects on the page. By default, the date is displayed based upon the user's date preferences. Optionally, it can take two parameters. The first is text to display before the date. The second is a date format string (see the date macro, &#94;D;, for details.
-<p>
-<i>Example:</i> &#94;LastModified("Updated: ","%c %D, %y");
-<p>
-
-
-<b>&#94;PageTitle;</b><br>
-Displays the title of the current page.
-<p>
-
-<B>NOTE:</b> If you begin using admin functions or the in-depth functions of any wobject, the page title will become a link that will quickly bring you back to the page.
-<p>
-
-<b>&#94;r; - Make Page Printable</b><br>
-<b>&#94;r(<i>link text</i>)</b><br>
-<b>&#94;r("",<i>custom style name</i>)</b><br>
-<b>&#94;r("",<i>custom style name</i>,<i>custom template name</i>)</b><br>
-Creates a link to alter the style from a page to make it printable.
-
-<p>
-
-The macro takes up to three arguments.  The first argument allows you to replace the default internationalized link text like this <b>&#94;r("Print Me!");</b>.  If this argument is the string "linkonly", then only the URL to make the page printable will be returned and nothing more.  If you wish to use the internationalized label but need to use multiple arguments to change the printable style or template, then use the empty string.
-
-<p>
-
-Normally, the default style to make the page printable is the "Make Page Printable" style.  The second argument specifies that a different style than the default be used to make the page printable: <b>&#94;r("Print!","WebGUI");</b>.
-
-<p>
-
-The third argument allows a different template be used to generate the HTML code for presenting the link and text, by specifying the name of the template.  The following variables are available in the template:
-
-<p/>
-<b>printable.url</b><br/>
-The URL to make the page printable.
-<p/>
-<b>printable.text</b><br/>
-The translated label for the printable link, or the text that you supply to the macro.
-
-<p>
-
-<b>NOTES:</b>The <i>.makePrintableLink</i> style sheet class is tied to the default template for this macro.
-<p>
-
-
-<b>&#94;RootTitle;</b><br>
-Returns the title of the root of the current page. For instance, the main root in WebGUI is the "Home" page. Many advanced sites have many roots and thus need a way to display to the user which root they are in.
-<p>
-
-<b>&#94;StyleSheet();</b><br>
-This macro allows you to set a cascading style sheet in the head section of the page. Just pass in the URL to the CSS file.
-<p>
-
-<b>&#94;Spacer(<i>"width"</i>,<i>"height"</i>);</b><br>
-Create a spacer in your layout. Great for creating blocks of color with divs and tables. It takes two parameters, width and height.
-<p>
-<i>Example:</i> &#94;Spacer("100","50");
-<p>
-
-<b>&#94;RawHeadTags(<i>"header tags"</i>);</b><br>
-This macro allows you to set some arbitrary tags in the head section of the page. Just pass in the text.
-<p>
-
-<b>&#94;u; - Company URL</b><br>
-The URL for your company specified in the settings by your Administrator.
-<p>
-
-
-|,
-		lastUpdated => 1103785706,
-	},
-
 	'1021' => {
 		message => q|Rate Message|,
 		lastUpdated => 1065356764
@@ -378,11 +200,6 @@ The URL of the web site for this theme's designer. If you are in the business of
 	'968' => {
 		message => q|Clipboard, Empty|,
 		lastUpdated => 1052850265
-	},
-
-	'675' => {
-		message => q|Search Engine, Using|,
-		lastUpdated => 1038888957
 	},
 
 	'540' => {
@@ -1077,190 +894,6 @@ As with any delete operation, you are prompted to be sure you wish to proceed wi
 		lastUpdated => 1065966219
 	},
 
-	'844' => {
-		message => q|These macros have to do with users and logins.
-<p/>
-
-<b>&#94;a; or &#94;a(); - My Account Link</b><br>
-A link to your account information. In addition you can change the link text by creating a macro like this <b>&#94;a("Account Info");</b>.  If you specify "linkonly" in the first parameter then only the URL will be returned. Also, you can specify the name of a template in the Macro/a_account namespace as the second parameter to override the default template.
-<p>
-The following is a list of variables available in the template:
-<p/>
-<b>account.url</b><br/>
-The URL to the account page.
-<p/>
-<b>account.text</b><br/>
-The translated label for the account link, or the text that you supply to the macro.
-<p/>
-
-<b>NOTES:</b> You can also use the special case &#94;a(linkonly); to return only the URL to the account page and nothing more. Also, the .myAccountLink style sheet class is tied to this macro.
-<p>
-
-
-<b>&#94;AdminText();</b><br>
-Displays a small text message to a user who is in admin mode. Example: &#94;AdminText("You are in admin mode!");
-<p>
-
-<b>&#94;AdminToggle; or &#94;AdminToggle();</b><br>
-Places a link on the page which is only visible to content managers and administrators. The link toggles on/off admin mode. You can optionally specify other messages to display like this: &#94;AdminToggle("Edit On","Edit Off"); This macro optionally takes a third parameter that allows you to specify an alternate template name in the Macro/AdminToggle namespace.
-<p>
-The following variables are available in the template:
-<p/>
-<b>toggle.url</b><br/>
-The URL to activate or deactivate Admin mode.
-<p/>
-<b>toggle.text</b><br/>
-The Internationalized label for turning on or off Admin (depending on the state of the macro), or the text that you supply to the macro.
-<p/>
-
-
-<b>&#94;AOIHits();</b><br>
-This macro is for displaying Areas of Interest Hits, which is based on passive profiling
-of which wobjects are viewed by users, on a per user basis.  The macro takes two arguments,
-a metadata property and metadata value, and returns how many times the current user has
-viewed content with that property and value.<br>
-&#94;AOIHits(contenttype,sport); would display 99 if this user has looked at content that was tagged "contenttype = sport" 99 times.
-
-<p>
-<b>&#94;AOIRank();</b><br>
-This macro is for displaying Areas of Interest Rankings, which is based on passive profiling
-of which wobjects are viewed most frequently by users, on a per user basis.  The macro
-takes up to two arguments, a metadata property and the rank of the metadata value to
-be returned.  If the rank is left out, it defaults to 1, the highest rank.<br>
-&#94;AOIRank(contenttype); would display "sport" if the current user has looked at content tagged "contenttype = sport" the most.<br>
-&#94;AOIRank(contenttype, 2); would return the second highest ranked value for contenttype.
-<p>
-
-<b>&#94;CanEditText();</b><br>
-Display a message to a user that can edit the current page.
-<p>
-<i>Example:</i> &#94;CanEditText(&#94;AdminToggle;);
-<p>
-
-<b>&#94;EditableToggle; or &#94;EditableToggle();</b><br>
-Exactly the same as AdminToggle, except that the toggle is only displayed if the user has the rights to edit the current page. This macro takes up to three parameters. The first is a label for "Turn Admin On", the second is a label for "Turn Admin Off", and the third is the name of a template in the Macro/EditableToggle namespace to replace the default template.
-<p>
-The following variables are available in the template:
-<p/>
-<b>toggle.url</b><br/>
-The URL to activate or deactivate Admin mode.
-<p/>
-<b>toggle.text</b><br/>
-The Internationalized label for turning on or off Admin (depending on the state of the macro), or the text that you supply to the macro.
-<p/>
-
-<p>
-
-
-<b>&#94;GroupAdd();</b><br>
-Using this macro you can allow users to add themselves to a group. The first parameter is the name of the group this user should be added to. The second parameter is a text string for the user to click on to add themselves to this group. The third parameter allows you to specify the name of a template in the Macro/GroupAdd namespace to replace the default template.  These variables are available in the template:
-<p/>
-<b>group.url</b><br/>
-The URL with the action to add the user to the group.
-<p/>
-<b>group.text</b><br/>
-The supplied text string for the user to click on.
-
-<p>
-<b>NOTE:</b> If the user is not logged in, or or already belongs to the group, or the group is not set to allow auto adds, then no link will be displayed.
-<p>
-
-
-<b>&#94;GroupDelete();</b><br>
-Using this macro you can allow users to delete themselves from a group. The first parameter is the name of the group this user should be deleted from. The second parameter is a text string for the user to click on to delete themselves from this group. The third parameter allows you to specify the name of a template in the Macro/GroupDelete namespace to replace the default template.  These variables are available in the template:
-<p/>
-<b>group.url</b><br/>
-The URL with the action to add the user to the group.
-<p/>
-<b>group.text</b><br/>
-The supplied text string for the user to click on.
-
-
-<p>
-<b>NOTE:</b> If the user is not logged in or the user does not belong to the group, or the group is not set to allow auto deletes, then no link will be displayed.
-<p>
-
-<b>&#94;GroupText();</b><br>
-Displays a small text message to the user if they belong to the specified group. And you can specify an alternate message to those who are not in the group.
-<p>
-<i>Example:</i> &#94;GroupText("Visitors","You need an account to do anything cool on this site!","We value our registered users!");
-<p>
-<b>&#94;L; or &#94;L(); - Login Box</b><br>
-A small login form. This macro takes up to three parameters.  The first is used to set the width of the login box: &#94;L(20);. The second sets the message displayed after the user is logged in: &#94;L(20,"Hi &#94;a(&#94;@;);. Click %here% if you wanna log out!");.  Text between percent signs (%) is replaced by a link to the logout operation.  The third parameter is the ID of a template in the Macro/L_loginBox namespace to replace the default template.  The variables below are
-available in the template.  Not all of them are required, but variables that will cause the macro to output code that doesn't function properly (like not actually log someone in) are marked with an asterisk '*'
-<p/>
-<b>user.isVisitor</b><br/>
-True if the user is a visitor.
-<p/>
-<b>customText</b><br/>
-The user defined text to display if the user is logged in.
-<p/>
-<b>hello.label</b><br/>
-Internationalized welcome message.
-<p/>
-<b>customText</b><br/>
-The text supplied to the macro to display if the user is logged in.
-<p/>
-<b>account.display.url</b><br/>
-URL to display the account.
-<p/>
-<b>logout.label</b><br/>
-Internationalized logout message.
-<p/>
-<b>* form.header</b><br/>
-Form header.
-<p/>
-<b>username.label</b><br/>
-Internationalized label for "username".
-<p/>
-<b>* username.form</b><br/>
-Form element for the username.
-<p/>
-<b>password.label</b><br/>
-Internationalized label for "password".
-<p/>
-<b>* password.form</b><br/>
-Form element for the password.
-<p/>
-<b>* form.login</b><br/>
-Action to perform when logging in.
-<p/>
-<b>account.create.url</b><br/>
-URL to create an account.
-<p/>
-<b>account.create.label</b><br/>
-Internationalized label for "create an account"
-<p/>
-<b>* form.footer</b><br/>
-Form footer.
-<p/>
-
-<b>NOTE:</b> The .loginBox style sheet class is tied to this macro.
-<p>
-
-<b>&#94;LoginToggle; or &#94;LoginToggle();</b><br>
-Displays a "Login" or "Logout" message depending upon whether the user is logged in or not. You can optionally specify other labels like this: &#94;LoginToggle("Click here to log in.","Click here to log out.");. You can also use the special case &#94;LoginToggle(linkonly); to return only the URL with no label.
-<p>
-<b>toggle.url</b><br/>
-The URL to login or logout.
-<p/>
-<b>toggle.text</b><br/>
-The Internationalized label for logging in or logging out (depending on the state of the macro), or the text that you supply to the macro.
-<p>
-
-<b>&#94;@; - Username</b><br>
-The username of the currently logged in user.
-<p>
-
-
-<b>&#94;#; - User ID</b><br>
-The user id of the currently logged in user.
-<p>
-
-|,
-		lastUpdated => 1101775299
-	},
-
 	'329' => {
 		message => q|Work Address|,
 		lastUpdated => 1031514049
@@ -1835,11 +1468,6 @@ The password you use to connect to the DSN.
 		lastUpdated => 1031514049
 	},
 
-	'843' => {
-		message => q|User Macros|,
-		lastUpdated => 1046656765
-	},
-
 	'815' => {
 		message => q|The file you tried to upload is too large.|,
 		lastUpdated => 1038023800
@@ -2386,48 +2014,6 @@ You also cannot import a theme from a version of WebGUI that is newer than the o
 		lastUpdated => 1031514049
 	},
 
-	'842' => {
-		message => q|<P>These macros are used to create navigation on the site. </P>
-<P><B>&#94;H; or &#94;H(); - Home Link</B><BR>A link to the home page of this site. In addition you can change the link text by creating a macro like this <B>&#94;H("Go Home");</B>. 
-<P><B>NOTES:</B> You can also use the special case &#94;H(linkonly); to return only the URL to the home page and nothing more. Also, the .homeLink style sheet class is tied to this macro. And you can specify a second parameter that with the name of a template in the Macro/H_homeLink namespace that will override the default template. The following variables are available for use in the template:</P>
-<p/>
-<b>homeLink.url</b><br/>
-The URL to the home page.
-<p/>
-<b>homeLink.text</b><br/>
-The translated label for the link to the home page or the text that you supply to the macro.
-<p/>
-<P><B>&#94;/; - System URL</B><BR>The URL to the gateway script (example: <I>/index.pl/</I>). 
-<P><B>&#94;PageUrl; - Page URL</B><BR>The URL to the current page (example: <I>/index.pl/pagename</I>). 
-<P><STRONG>&#94;Navigation(crumbTrail);<BR></STRONG>A dynamically generated crumb trail to the current page.
-<P><B>NOTE:</B> The .crumbTrail style sheet class is tied to this macro. </P>
-<P><STRONG>&#94;Navigation(FlexMenu);</STRONG><BR>This menu macro creates a top-level menu that expands as the user selects each menu item. </P>
-<P><STRONG>&#94;Navigation(currentMenuVertical);</STRONG><BR>A vertical menu containing the sub-pages at the current level. By default it tracks 1 level deep. </P>
-<P><STRONG>&#94;Navigation(currentMenuHorizontal);</STRONG><BR>A horizontal menu containing the sub-pages at the current level.</P>
-<P><STRONG>&#94;Navigation(PreviousDropMenu);</STRONG><BR>Create a drop down menu containing the sub-pages at the previous level in the page tree. </P>
-<P><STRONG>&#94;Navigation(previousMenuVertical);</STRONG><BR>A vertical menu containing the sub-pages at the previous level. By default it will show only the first level. </P>
-<P><STRONG>&#94;Navigation(previousMenuHorizontal);</STRONG><BR>A horizontal menu containing the sub-pages at the previous level. </P>
-<P><STRONG>&#94;Navigation(rootmenu);</STRONG><BR>Creates a horizontal menu of the various roots on your system (except for the WebGUI system roots).</P>
-<P><STRONG>&#94;Navigation(SpecificDropMenu);</STRONG><BR>Create a drop down menu starting at a specific point in your navigation tree. The default start page is "home". </P>
-<P><STRONG>&#94;Navigation(SpecificSubMenuVertical);</STRONG><BR>Allows you to get the submenu of any page, starting with the page you specified. The default start page is "home" and it will show the first level. </P>
-<P><STRONG>&#94;Navigation(SpecificSubMenuHorizontal);</STRONG><BR>Allows you to get the submenu of any page, starting with the page you specified. The default start page is "home" and it will show the first level. </P>
-<P><STRONG>&#94;Navigation(TopLevelMenuVertical);</STRONG><BR>A vertical menu containing the main pages of the site (aka the sub-pages from the home page). By default it will show only the first level. </P>
-<P><STRONG>&#94;Navigation(TopLevelMenuHorizontal);</STRONG><BR>A vertical menu containing the main pages of the site (aka the sub-pages from the home page).</P>
-<P><STRONG>&#94;Navigation(RootTab);</STRONG><BR>Create a tab navigation system from the roots on your site (except WebGUI's system roots) similar to the tabs used in the tab forms (editing wobjects or pages). </P>
-<P><STRONG>NOTE:</STRONG> Has two special style sheet classes: .rootTabOn and .rootTabOff}. 
-<P><I>Example:</I><BR>&lt;style&gt; .rootTabOn { line-height: 17px; font-size: 16px; spacing: 3px; border: 1px solid black; border-bottom-width: 0px; background-color: #333333; z-index: 10000; padding: 3px 9px 5px 9px; color: white; } .rootTabOn A, .rootTabOn A:visited { color: white; font-weight: bold; text-decoration: none; } .rootTabOff { line-height: 15px; font-size: 14px; border: 1px solid black; border-bottom-width: 0px; background-color: #c8c8c8; z-index: 1000; padding: 2px 9px 2px 9px; } .rootTabOff A, .rootTabOff A:visited { color: black; text-decoration: underline; } .rootTabOff A:hover { font-weight: bold; } &lt;/style&gt; &#94;RootTab; </P>
-<P><STRONG>&#94;Navigation(TopDropMenu);</STRONG><BR>Create a drop down menu of your top level navigation. </P>
-<P><STRONG>&#94;Navigation(dtree);</STRONG><BR>Create a dynamic tree menu.</P>
-<P><STRONG>&#94;Navigation(coolmenu);</STRONG><BR>Create a DHTML driven menu. </P>
-<P><STRONG>&#94;Navigation(Synopsis);</STRONG><BR>This macro allows you to get the submenu of a page along with the synopsis of each link. </P>
-<P><STRONG>NOTES:</STRONG> The .synopsis_sub, .synopsis_summary, and .synopsis_title style sheet classes are tied to this macro. <BR></P>
-<P>It should be noted that many of these macros can also make use of these style sheet classes: </P>
-<P><B>.selectedMenuItem</B><BR>Use this class to highlight the current page in any of the menu macros. 
-<P><B>.verticalMenu </B><BR>The vertical menu (if you use a vertical menu macro). 
-<P><B>.horizontalMenu </B><BR>The horizontal menu (if you use a horizontal menu macro). </P>|,
-		lastUpdated => 1104545184,
-	},
-
 	'511' => {
 		message => q|Threaded|,
 		lastUpdated => 1031514049
@@ -2969,11 +2555,6 @@ div.tabs {
 		lastUpdated => 1044218026
 	},
 
-	'841' => {
-		message => q|Navigation Macros|,
-		lastUpdated => 1096434024
-	},
-
 	'1044' => {
 		message => q|Search Template|,
 		lastUpdated => 1066394621
@@ -3377,16 +2958,6 @@ The headings of columns on things like message boards and user contributions.
 		lastUpdated => 1058092984
 	},
 
-	'630' => {
-		message => q|WebGUI has a small, but sturdy real-time search engine built-in. If you wish to use the internal search engine, you can use the &#94;?; macro, or by adding <i>?op=search</i> to the end of any URL, or feel free to build your own form to access it.
-<p>
-Many people need a search engine to index their WebGUI site, plus many others. Or they have more advanced needs than what WebGUI's search engine allows. In those cases we recommend <a href="http://www.mnogosearch.org/">MnoGo Search</a> or <a href="http://www.htdig.org/">ht://Dig</a>.
-<p>
-
-|,
-		lastUpdated => 1038888957
-	},
-
 	'497' => {
 		message => q|Start Date|,
 		lastUpdated => 1031514049
@@ -3617,18 +3188,6 @@ As with any delete operation, you are prompted to be sure you wish to proceed wi
 		lastUpdated => 1036971696
 	},
 
-	'624' => {
-		message => q|WebGUI macros are used to create dynamic content within otherwise static content. For instance, you may wish to show which user is logged in on every page, or you may wish to have a dynamically built menu or crumb trail. 
-<p>
-
-Macros always begin with a caret (&#94;) and follow with at least one other character and ended with a semicolon (;). Some macros can be extended/configured by taking the format of <b>&#94;x</b>("<i>config text</i>");.  When providing  multiple arguments to a macro, they should be separated by only commas:<br>
-<b>&#94;x</b>(<i>"First argument",2</i>);
-<p>
-
-|,
-		lastUpdated => 1101885876,
-	},
-
 	'823' => {
 		message => q|Go to the new page.|,
 		lastUpdated => 1038706332
@@ -3667,11 +3226,6 @@ Macros always begin with a caret (&#94;) and follow with at least one other char
 	'808' => {
 		message => q|Email this group.|,
 		lastUpdated => 1037579487
-	},
-
-	'845' => {
-		message => q|Style Macros|,
-		lastUpdated => 1078243435
 	},
 
 	'924' => {
@@ -3778,11 +3332,6 @@ You can search users based on username and email address. You can do partial sea
 	'1043' => {
 		message => q|Archive After|,
 		lastUpdated => 1066394455
-	},
-
-	'669' => {
-		message => q|Macros, Using|,
-		lastUpdated => 1046656837
 	},
 
 	'1082' => {
@@ -4028,11 +3577,6 @@ Privileges and styles assigned to pages in the package will not be copied when t
 		lastUpdated => 1066418669
 	},
 
-	'839' => {
-		message => q|Programmer Macros|,
-		lastUpdated => 1078570360
-	},
-
 	'88' => {
 		message => q|Users In Group|,
 		lastUpdated => 1031514049
@@ -4174,108 +3718,6 @@ What group should be alerted when a new user registers?
 	'925' => {
 		message => q|You already have another version of this theme installed. You must delete it before installing it again.|,
 		lastUpdated => 1050264954
-	},
-
-	'840' => {
-		message => q|These macros are designed to provide programming-like functionality. They are powerful when used appropriately, and dangerous when used carelessly. Take care when using these macros.
-
-<p>
-<b>NOTE:</b> These macros are included in WebGUI in order to provide very powerful display mechanisms. Though they could be used to write simple web applications, this is not their intended use, nor is it supported or condoned by Plain Black. If you find yourself trying to do something like that, just write a macro. =) <b>By default these macros are disabled to protect the security of your site and server, and only your administrator can enable them.</b>
-
-<p/>
-
-<b>&#94;D; or &#94;D(); - Date</b><br>
-The current date and time.
-<p>
-
-You can configure the date by using date formatting symbols. For instance, if you created a macro like this <b>&#94;D("%c %D, %y");</b> it would output <b>September 26, 2001</b>. The following are the available date formatting symbols:
-<p>
-
-<table><tbody><tr><td>%%</td><td>%</td></tr><tr><td>%y</td><td>4 digit year</td></tr><tr><td>%Y</td><td>2 digit year</td></tr><tr><td>%m</td><td>2 digit month</td></tr><tr><td>%M</td><td>variable digit month</td></tr><tr><td>%c</td><td>month name</td></tr><tr><td>%d</td><td>2 digit day of month</td></tr><tr><td>%D</td><td>variable digit day of month</td></tr><tr><td>%w</td><td>day of week name</td></tr><tr><td>%h</td><td>2 digit base 12 hour</td></tr><tr><td>%H</td><td>variable digit base 12 hour</td></tr><tr><td>%j</td><td>2 digit base 24 hour</td></tr><tr><td>%J</td><td>variable digit base 24 hour</td></tr><tr><td>%p</td><td>lower case am/pm</td></tr><tr><td>%P</td><td>upper case AM/PM</td></tr><tr><td>%z</td><td>user preference date format</td></tr><tr><td>%Z</td><td>user preference time format</td></tr></tbody></table>
-<p>
-You can also pass in an epoch date into this macro as a secondary parameter. If no date is specified then today's date and time will be used.
-
-<p>
-<b>&#94;Env()</b><br>
-Can be used to display a web server environment variable on a page. The environment variables available on each server are different, but you can find out which ones your web server has by going to: http://www.yourwebguisite.com/env.pl
-<p>
-
-The macro should be specified like this &#94;Env("REMOTE_ADDR");
-<p>
-
-<b>&#94;Execute();</b><br>
-Allows a content manager or administrator to execute an external program. Takes the format of <b>&#94;Execute("/this/file.sh");</b>.
-<p>
-
-
-<b>&#94;FormParam();</b><br>
-This macro is mainly used in generating dynamic queries in SQL Reports. Using this macro you can pull the value of any form field simply by specifying the name of the form field, like this: &#94;FormParam("phoneNumber");
-<p>
-
-
-<b>&#94;If();</b><br>
-A simple conditional statement (IF/THEN/ELSE) to control layout and messages.
-<p>
-<i>Examples:</i><br>
-Display Happy New Year on 1st January:
-      &#94;If('&#94;D("%m%d");' eq '0101' , Happy New Year);
-<p>
-Display a message to people on your subnet (192.168.1.*):<br>
-&#94;If('&#94;Env("REMOTE_ADDR");' =~ /&#94;192.168.1/,"Hi co-worker","Hi Stranger");
-<p>
-Display a message to Windows users:<br>
-      &#94;If('&#94;URLEncode("&#94;Env("HTTP_USER_AGENT");");' =~ /windows/i,"Hey... Linux is free !");
-<p>
-Display a message if a user is behind a proxy:<br>
-      &#94;If('&#94;Env("HTTP_VIA");' ne "", You're behind a proxy !, Proxy-free is the best...);
-<p>
-Display Good Morning/Afternoon/Evening:<br>
-      &#94;If(&#94;D("%J");<=12,Good Morning,&#94;If(&#94;D("%J");<=18,Good Afternoon,Good evening););
-<p>
-
-<b>&#94;Include();</b><br>
-Allows a content manager or administrator to include a file from the local filesystem. 
-<p/>
-<i>Example:</i> &#94;Include("/this/file.html");
-<p>
-
-<b>&#94;International();</b><br/>
-Pull a translated message from the internationalization system.
-<p/>
-<i>Example:</i> &#94;International(45,"Article");
-<p/>
-
-
-<b>&#94;Quote();</b><br>
-Use this to escape a string before using it in a database query.
-<p>
-
-
-<b>&#94;Page();</b><br>
-This can be used to retrieve information about the current page. For instance it could be used to get the page URL like this &#94;Page("urlizedTitle"); or to get the menu title like this &#94;Page("menuTitle");.
-<p>
-
-<b>&#94;SQL();</b><br>
-A one line SQL report. Sometimes you just need to pull something back from the database quickly. This macro is also useful in extending the SQL Report wobject. It uses the numeric macros (&#94;0; &#94;1; &#94;2; etc) to position data and can also use the &#94;&#94;rownum; macro just like the SQL Report wobject. Examples:<p>
- &#94;SQL("select count(*) from users","There are &#94;0; users on this system.");
-<p>
-&#94;SQL("select userId,username from users order by username","&lt;a href='&#94;/;?op=viewProfile&uid=&#94;0;'&gt;&#94;1;&lt;/a&gt;&lt;br&gt;");
-<p>
-<b>&#94;URLEncode();</b><br>
-This macro is mainly useful in SQL reports, but it could be useful elsewhere as well. It takes the input of a string and URL Encodes it so that the string can be passed through a URL. It's syntax looks like this: &#94;URLEncode("Is this my string?");
-<p>
-
-
-<b>&#94;User();</b><br>
-This macro will allow you to display any information from a user's account or profile. For instance, if you wanted to display a user's email address you'd create this macro: &#94;User("email");
-<p>
-
-<b>&#94;*; or &#94;*(); - Random Number</b><br>
-A randomly generated number. This is often used on images (such as banner ads) that you want to ensure do not cache. In addition, you may configure this macro like this <b>&#94;*(100);</b> to create a random number between 0 and 100.
-<p>
-
-|,
-		lastUpdated => 1101775527,
 	},
 
 	'146' => {
