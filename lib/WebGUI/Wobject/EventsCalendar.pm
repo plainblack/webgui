@@ -449,13 +449,13 @@ sub www_view {
 			$session{form}{pn} = 1;
 		}
 	}
-	for ($i=1;$i<$monthCount;$i++) {
+	for ($i=1;$i<=$monthCount;$i++) {
 		if ($session{form}{pn} == ($i)) {
 			my $thisMonth = WebGUI::DateTime::addToDate($minDate,0,($i-1),0);
 			$var{"calendar.big"} = $_[0]->_drawBigCalendar($thisMonth);
 			$var{"calendar.small"} = $_[0]->_drawSmallCalendar($thisMonth);
 		}
-		$row[$i] = "page";
+		$row[$i-1] = "page";
 	}
 	$p = WebGUI::Paginator->new(WebGUI::URL::page("func=view&wid=".$_[0]->get("wobjectId")),\@row,1);
         $var{"calendar.firstPage"} = $p->getFirstPageLink;
