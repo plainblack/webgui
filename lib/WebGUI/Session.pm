@@ -475,19 +475,14 @@ Updates the WebGUI session to reflect new page information.
 
 =item pageId
 
-Defaults to page id "1". Specify the page id to change this WebGUI session to use.
+Defaults to the current page. Specify the page id to change this WebGUI session to use.
 
 =back
 
 =cut
 
 sub refreshPageInfo {
-	my ($pageId);
-	if ($_[0] == 0) {
-		$pageId = $session{page}{pageId};
-	} else {
-		$pageId = $_[0];
-	}
+	my $pageId = $_[0];
 	_setupPageInfo($pageId);
 }
 

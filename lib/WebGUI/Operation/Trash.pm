@@ -249,7 +249,7 @@ sub www_emptyTrashConfirm {
 		_purgeUserTrash();
         	WebGUI::ErrorHandler::audit("emptied user trash");
 	}
-        WebGUI::Session::refreshPageInfo($session{page}{pageId});
+        WebGUI::Session::refreshPageInfo();
         return "";
 }
 

@@ -4,7 +4,8 @@
  - When copying a Wobject to a clipboard, the previous location was
    not stored correctly.  (Thanks to Steve Smms.)
  - Fixed a problem in the forum that showed up under Postgres.
-
+ - Bugfix [ 822805 ] Emptying trash can cause fatal error
+   (Thanks to Steve Simms.)
 
 5.5.4
  - Bugfix [ 849210 ] Login Redirect should filter out the "logout" operation
