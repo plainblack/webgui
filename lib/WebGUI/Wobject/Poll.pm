@@ -279,7 +279,7 @@ sub www_vote {
 	my $u;
         if ($session{form}{answer} ne "" && WebGUI::Privilege::isInGroup($_[0]->get("voteGroup"),$session{user}{userId}) && !($_[0]->_hasVoted())) {
         	WebGUI::SQL->write("insert into Poll_answer values (".$_[0]->get("wobjectId").", 
-			'$session{form}{answer}', $session{user}{userId}, '$session{env}{REMOTE_ADDR}')");
+			".quote($session{form}{answer}).", $session{user}{userId}, '$session{env}{REMOTE_ADDR}')");
 		if ($session{setting}{useKarma}) {
 			$u = WebGUI::User->new($session{user}{userId});
 			$u->karma($_[0]->get("karmaPerVote"),$_[0]->get("namespace")." (".$_[0]->get("wobjectId").")","Voted on this poll.");

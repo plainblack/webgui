@@ -353,7 +353,7 @@ sub www_editEventSave {
 	} else {
                	WebGUI::SQL->write("update EventsCalendar_event set name=".quote($session{form}{name}).", 
 			description=".quote($session{form}{description}).", startDate=".$startDate[0].", 
-			endDate=".$endDate[0]." where EventsCalendar_eventId=$session{form}{eid}");
+			endDate=".$endDate[0]." where EventsCalendar_eventId=".quote($session{form}{eid}));
 	}
 	if ($session{form}{proceed} eq "addEvent") {
 		$session{form}{eid} = "new";

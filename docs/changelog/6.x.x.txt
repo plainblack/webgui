@@ -9,12 +9,15 @@
    Manager and USS to the standard pagination variables.
  - A very special thanks to Len Kranendonk for the following security
    improvements.
-	- Disabled anonymous registration by default for better security.
- 	- Set session timeout to 1 hour by default for better security.
+	- Disabled anonymous registration by default.
+ 	- Set session timeout to 1 hour by default.
  	- Sessions now auto end themselves if they are used after their
  	  expires timeout and before the scheduler has cleaned them up.
 	- Macros are now negated on user profile fields and authentication
 	  fields.
+	- Sessions are now validated against IP address to help prevent
+	  session theft.
+	- Took additional measures to prevent SQL injection.
  - Bugfix [ 930425 ] Bug in EventsCalender, causing other wobjects to fail.
  - Bugfix [ 925586 ] HttpProxy ignores javascript in <HEAD> (thanks to
    Nicklous Roberts).

@@ -191,7 +191,7 @@ sub www_addAccessorySave {
         ($seq) = WebGUI::SQL->quickArray("select max(sequenceNumber) from Product_accessory
                 where wobjectId=".$_[0]->get("wobjectId"));
         WebGUI::SQL->write("insert into Product_accessory (wobjectId,accessoryWobjectId,sequenceNumber) values
-                (".$_[0]->get("wobjectId").",$session{form}{accessoryWobjectId},".($seq+1).")");
+                (".$_[0]->get("wobjectId").",".quote($session{form}{accessoryWobjectId}).",".($seq+1).")");
         if ($session{form}{proceed}) {
                 return $_[0]->www_addAccessory();
         } else {
@@ -227,7 +227,7 @@ sub www_addRelatedSave {
         ($seq) = WebGUI::SQL->quickArray("select max(sequenceNumber) from Product_related
      		where wobjectId=".$_[0]->get("wobjectId"));
         WebGUI::SQL->write("insert into Product_related (wobjectId,relatedWobjectId,sequenceNumber) values
-                (".$_[0]->get("wobjectId").",$session{form}{relatedWobjectId},".($seq+1).")");
+                (".$_[0]->get("wobjectId").",".quote($session{form}{relatedWobjectId}).",".($seq+1).")");
         if ($session{form}{proceed}) {
                 return $_[0]->www_addRelated();
         } else {
@@ -247,7 +247,7 @@ sub www_deleteAccessory {
 #-------------------------------------------------------------------
 sub www_deleteAccessoryConfirm {
 	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId")));
-	WebGUI::SQL->write("delete from Product_accessory where wobjectId=$session{form}{wid} and accessoryWobjectId=$session{form}{aid}");
+	WebGUI::SQL->write("delete from Product_accessory where wobjectId=".$_[0]->get("wobjectId")." and accessoryWobjectId=".quote($session{form}{aid}));
 	$_[0]->reorderCollateral("Product_accessory","accessoryWobjectId");
         return "";
 }
@@ -298,7 +298,7 @@ sub www_deleteRelated {
 #-------------------------------------------------------------------
 sub www_deleteRelatedConfirm {
 	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId")));
-        WebGUI::SQL->write("delete from Product_related where wobjectId=$session{form}{wid} and relatedWobjectId=$session{form}{rid}");
+        WebGUI::SQL->write("delete from Product_related where wobjectId=".$_[0]->get("wobjectId")." and relatedWobjectId=".quote($session{form}{rid}));
 	$_[0]->reorderCollateral("Product_related","relatedWobjectId");
         return "";
 }

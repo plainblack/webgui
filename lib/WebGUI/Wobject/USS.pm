@@ -238,7 +238,7 @@ sub www_approveSubmission {
 	tie %submission, 'Tie::CPHash';
         if (WebGUI::Privilege::isInGroup(4,$session{user}{userId}) || WebGUI::Privilege::isInGroup(3,$session{user}{userId})) {
 		%submission = WebGUI::SQL->quickHash("select * from USS_submission where USS_submissionId=$session{form}{sid}");
-                WebGUI::SQL->write("update USS_submission set status='Approved' where USS_submissionId=$session{form}{sid}");
+                WebGUI::SQL->write("update USS_submission set status='Approved' where USS_submissionId=".quote($session{form}{sid}));
 		WebGUI::MessageLog::addInternationalizedEntry($submission{userId},'',WebGUI::URL::page('func=viewSubmission&wid='.
 			$session{form}{wid}.'&sid='.$session{form}{sid}),4,$_[0]->get("namespace"));
 		WebGUI::MessageLog::completeEntry($session{form}{mlog});
@@ -297,7 +297,7 @@ sub www_denySubmission {
 	tie %submission, 'Tie::CPHash';
         if (WebGUI::Privilege::isInGroup(4,$session{user}{userId}) || WebGUI::Privilege::isInGroup(3,$session{user}{userId})) {
 		%submission = WebGUI::SQL->quickHash("select * from USS_submission where USS_submissionId=$session{form}{sid}");
-                WebGUI::SQL->write("update USS_submission set status='Denied' where USS_submissionId=$session{form}{sid}");
+                WebGUI::SQL->write("update USS_submission set status='Denied' where USS_submissionId=".quote($session{form}{sid}));
                 WebGUI::MessageLog::addInternationalizedEntry($submission{userId},'',WebGUI::URL::page('func=viewSubmission&wid='.
 			$session{form}{wid}.'&sid='.$session{form}{sid}),5,$_[0]->get("namespace"));
                 WebGUI::MessageLog::completeEntry($session{form}{mlog});
@@ -815,7 +815,7 @@ sub www_viewSubmission {
 			forumId=>$submission->{forumId}
 			});
 	}
-	WebGUI::SQL->write("update USS_submission set views=views+1 where USS_submissionId=$session{form}{sid}");
+	WebGUI::SQL->write("update USS_submission set views=views+1 where USS_submissionId=".quote($session{form}{sid}));
 	$var{title} = $submission->{title};
 	$var{content} = WebGUI::HTML::filter($submission->{content},$_[0]->get("filterContent"));
 	$var{content} =~ s/\^\-\;//g;

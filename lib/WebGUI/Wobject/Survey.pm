@@ -436,7 +436,7 @@ sub www_deleteAnswer {
 #-------------------------------------------------------------------
 sub www_deleteAnswerConfirm {
         return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId")));
-        WebGUI::SQL->write("delete from Survey_response where Survey_answerId=$session{form}{aid}");
+        WebGUI::SQL->write("delete from Survey_response where Survey_answerId=".quote($session{form}{aid}));
         $_[0]->deleteCollateral("Survey_answer","Survey_answerId",$session{form}{aid});
         $_[0]->reorderCollateral("Survey_answer","Survey_answerId","Survey_id");
         return $_[0]->www_editQuestion;
@@ -452,8 +452,8 @@ sub www_deleteQuestion {
 #-------------------------------------------------------------------
 sub www_deleteQuestionConfirm {
         return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId")));
-	WebGUI::SQL->write("delete from Survey_answer where Survey_questionId=$session{form}{qid}");
-	WebGUI::SQL->write("delete from Survey_response where Survey_questionId=$session{form}{qid}");
+	WebGUI::SQL->write("delete from Survey_answer where Survey_questionId=".quote($session{form}{qid}));
+	WebGUI::SQL->write("delete from Survey_response where Survey_questionId=".quote($session{form}{qid}));
         $_[0]->deleteCollateral("Survey_question","Survey_questionId",$session{form}{qid});
         $_[0]->reorderCollateral("Survey_question","Survey_questionId","Survey_id");
         return $_[0]->www_edit;
@@ -469,8 +469,8 @@ sub www_deleteResponse {
 #-------------------------------------------------------------------
 sub www_deleteResponseConfirm {
 	return "" unless (WebGUI::Privilege::isInGroup($_[0]->get("groupToViewReports")));
-        WebGUI::SQL->write("delete from Survey_response where Survey_responseId=".$session{form}{responseId});
-        WebGUI::SQL->write("delete from Survey_questionResponse where Survey_responseId=".$session{form}{responseId});
+        WebGUI::SQL->write("delete from Survey_response where Survey_responseId=".quote($session{form}{responseId}));
+        WebGUI::SQL->write("delete from Survey_questionResponse where Survey_responseId=".quote($session{form}{responseId}));
         return $_[0]->www_viewGradebook;
 }
 

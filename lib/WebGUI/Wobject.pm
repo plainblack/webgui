@@ -1479,7 +1479,7 @@ sub www_paste {
 					."templatePosition=1, "
 					."sequenceNumber=". $nextSeq .", "
                             		."bufferUserId=NULL, bufferDate=NULL, bufferPrevId=NULL "
-					."WHERE wobjectId=". $session{form}{wid} );
+					."WHERE wobjectId=".$_[0]->get("wobjectId"));
                 return "";
         } else {
                 return WebGUI::Privilege::insufficient();

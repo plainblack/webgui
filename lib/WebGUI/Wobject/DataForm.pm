@@ -452,7 +452,7 @@ sub uiLevel {
 sub www_deleteEntry {
         return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId")));
         my $entryId = $session{form}{entryId};
-    	WebGUI::SQL->write("delete from DataForm_entry where DataForm_entryId=".$entryId);
+    	WebGUI::SQL->write("delete from DataForm_entry where DataForm_entryId=".quote($entryId));
         $session{form}{entryId} = 'list';
         return $_[0]->www_view();
 }
@@ -880,7 +880,7 @@ sub www_process {
 	$var->{error_loop} = \@errors;
 	$var = $_[0]->getRecordTemplateVars($var);
 	if ($hadErrors && !$updating) {
-		WebGUI::SQL->write("delete from DataForm_entryData where DataForm_entryId=".$entryId);
+		WebGUI::SQL->write("delete from DataForm_entryData where DataForm_entryId=".quote($entryId));
 		$_[0]->deleteCollateral("DataForm_entry","DataForm_entryId",$entryId);
 		$_[0]->www_view($var);
 	} else {

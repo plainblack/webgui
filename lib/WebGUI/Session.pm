@@ -109,21 +109,15 @@ sub _setupSessionVars {
 	tie %vars, 'Tie::CPHash';
 	if ($_[0] ne "") {
 		%vars = WebGUI::SQL->quickHash("select * from userSession where sessionId='$_[0]'");
-		if ($vars{expires} < _time()) {
+		if ($vars{expires} < _time() || $vars{lastIP} ne $session{env}{REMOTE_ADDR}) {
+			%vars = ();
 			WebGUI::Session::end($_[0]);
 		}
 		if ($vars{sessionId} ne "") {
 			$session{scratch} = WebGUI::SQL->buildHashRef("select name,value from userSessionScratch
                 		where sessionId=".quote($_[0]));
-			if (($session{setting}{proxiedClientAddress} eq "1") && ($ENV{HTTP_X_FORWARDED_FOR} ne "")) {
-				WebGUI::SQL->write("update userSession set lastPageView="._time().", 
-				lastIP='$ENV{HTTP_X_FORWARDED_FOR}', 
-				expires=".(_time()+$session{setting}{sessionTimeout})
-				." where sessionId='$_[0]'");
-			} else {
-				WebGUI::SQL->write("update userSession set lastPageView="._time().", lastIP='$ENV{REMOTE_ADDR}', 
-					expires=".(_time()+$session{setting}{sessionTimeout})." where sessionId='$_[0]'");
-			}
+			WebGUI::SQL->write("update userSession set lastPageView="._time().", lastIP='$session{env}{REMOTE_ADDR}', 
+				expires=".(_time()+$session{setting}{sessionTimeout})." where sessionId='$_[0]'");
 		} else {
 			start(1,$_[0]);
                 }
