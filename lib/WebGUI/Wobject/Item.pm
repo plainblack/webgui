@@ -24,14 +24,12 @@ use WebGUI::Utility;
 use WebGUI::Wobject;
 
 our @ISA = qw(WebGUI::Wobject);
-our $namespace = "Item";
-our $name = WebGUI::International::get(4,$namespace);
 
 #-------------------------------------------------------------------
 sub duplicate {
         my ($w, $f);
         $w = $_[0]->SUPER::duplicate($_[1]);
-	$w = WebGUI::Wobject::Item->new({wobjectId=>$w,namespace=>$namespace});
+	$w = WebGUI::Wobject::Item->new({wobjectId=>$w,namespace=>$_[0]->get("namespace")});
 	$w->set({
 		linkURL=>$_[0]->get("linkURL"),
 		attachment=>$_[0]->get("attachment"),
@@ -42,8 +40,19 @@ sub duplicate {
 }
 
 #-------------------------------------------------------------------
-sub set {
-	$_[0]->SUPER::set($_[1],[qw(linkURL attachment templateId)]);
+sub name {
+        return WebGUI::International::get(4,$_[0]->get("namespace"));
+}
+
+#-------------------------------------------------------------------
+sub new {
+        my $class = shift;
+        my $property = shift;
+        my $self = WebGUI::Wobject->new(
+                $property,
+                [qw(linkURL attachment templateId)]
+                );
+        bless $self, $class;
 }
 
 #-------------------------------------------------------------------
@@ -52,15 +61,15 @@ sub www_edit {
         my ($output, $f, $template);
 	$template = $_[0]->get("templateId") || 1;
 	$output = helpIcon(1,$_[0]->get("namespace"));
-	$output .= '<h1>'.WebGUI::International::get(6,$namespace).'</h1>';
+	$output .= '<h1>'.WebGUI::International::get(6,$_[0]->get("namespace")).'</h1>';
 	$f = WebGUI::HTMLForm->new;
 	$f->url("linkURL",WebGUI::International::get(1,$_[0]->get("namespace")),$_[0]->get("linkURL"));
 	$f->raw($_[0]->fileProperty("attachment",2));
 	$f->template(
                 -name=>"templateId",
                 -value=>$template,
-                -namespace=>$namespace,
-                -label=>WebGUI::International::get(72,$namespace),
+                -namespace=>$_[0]->get("namespace"),
+                -label=>WebGUI::International::get(72,$_[0]->get("namespace")),
                 -afterEdit=>'func=edit&wid='.$_[0]->get("wobjectId")
                 );
 	$output .= $_[0]->SUPER::www_edit($f->printRowsOnly);

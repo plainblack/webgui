@@ -22,8 +22,6 @@ use WebGUI::URL;
 use WebGUI::Wobject;
 
 our @ISA = qw(WebGUI::Wobject);
-our $namespace = "FAQ";
-our $name = WebGUI::International::get(2,$namespace);
 
 
 #-------------------------------------------------------------------
@@ -31,7 +29,7 @@ sub duplicate {
         my ($w, %data, $newQuestionId, $sth);
 	tie %data, 'Tie::CPHash';
         $w = $_[0]->SUPER::duplicate($_[1]);
-	$w = WebGUI::Wobject::FAQ->new({wobjectId=>$w,namespace=>$namespace});
+	$w = WebGUI::Wobject::FAQ->new({wobjectId=>$w,namespace=>$_[0]->get("namespace")});
 	$w->set({
 		templateId=>$_[0]->get("templateId")
 		});
@@ -45,20 +43,31 @@ sub duplicate {
 }
 
 #-------------------------------------------------------------------
+sub name {
+        return WebGUI::International::get(2,$_[0]->get("namespace"));
+}
+
+#-------------------------------------------------------------------
+sub new {
+        my $class = shift;
+        my $property = shift;
+        my $self = WebGUI::Wobject->new(
+                $property,
+                [qw(templateId)]
+                );
+        bless $self, $class;
+}
+
+#-------------------------------------------------------------------
 sub purge {
         WebGUI::SQL->write("delete from FAQ_question where wobjectId=".$_[0]->get("wobjectId"));
 	$_[0]->SUPER::purge();
 }
 
 #-------------------------------------------------------------------
-sub set {
-        $_[0]->SUPER::set($_[1],[qw(templateId)]);
-}
-
-#-------------------------------------------------------------------
 sub www_deleteQuestion {
         return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
-	return $_[0]->confirm(WebGUI::International::get(7,$namespace),
+	return $_[0]->confirm(WebGUI::International::get(7,$_[0]->get("namespace")),
 		WebGUI::URL::page('func=deleteQuestionConfirm&wid='.$_[0]->get("wobjectId").'&qid='.$session{form}{qid}));
 }
 
@@ -74,20 +83,20 @@ sub www_deleteQuestionConfirm {
 sub www_edit {
         my ($f, $output);
         return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
-	$output = helpIcon(1,$namespace);
-        $output .= '<h1>'.WebGUI::International::get(8,$namespace).'</h1>';
+	$output = helpIcon(1,$_[0]->get("namespace"));
+        $output .= '<h1>'.WebGUI::International::get(8,$_[0]->get("namespace")).'</h1>';
 	$f = WebGUI::HTMLForm->new;
 	$f->template(
               	-name=>"templateId",
                	-value=>$_[0]->get("templateId"),
-               	-namespace=>$namespace,
-               	-label=>WebGUI::International::get(74,$namespace),
+               	-namespace=>$_[0]->get("namespace"),
+               	-label=>WebGUI::International::get(74,$_[0]->get("namespace")),
                	-afterEdit=>'func=edit&wid='.$_[0]->get("wobjectId")
                	);
 	if ($_[0]->get("wobjectId") eq "new") {
 		$f->whatNext(
                        	-options=>{
-                               	addQuestion=>WebGUI::International::get(75,$namespace),
+                               	addQuestion=>WebGUI::International::get(75,$_[0]->get("namespace")),
                                	backToPage=>WebGUI::International::get(745)
                                	},
                        	-value=>"addQuestion"
@@ -115,26 +124,26 @@ sub www_editQuestion {
         my ($output, $question, $f);
         return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
         $question = $_[0]->getCollateral("FAQ_question","FAQ_questionId",$session{form}{qid});
-	$output = helpIcon(2,$namespace);
-        $output .= '<h1>'.WebGUI::International::get(10,$namespace).'</h1>';
+	$output = helpIcon(2,$_[0]->get("namespace"));
+        $output .= '<h1>'.WebGUI::International::get(10,$_[0]->get("namespace")).'</h1>';
 	$f = WebGUI::HTMLForm->new;
 	$f->hidden("wid",$_[0]->get("wobjectId"));
         $f->hidden("qid",$question->{FAQ_questionId});
         $f->hidden("func","editQuestionSave");
         $f->textarea(
 		-name=>"question",
-		-label=>WebGUI::International::get(5,$namespace),
+		-label=>WebGUI::International::get(5,$_[0]->get("namespace")),
 		-value=>$question->{question}
 		);
         $f->HTMLArea(
 		-name=>"answer",
-		-label=>WebGUI::International::get(6,$namespace),
+		-label=>WebGUI::International::get(6,$_[0]->get("namespace")),
 		-value=>$question->{answer}
 		);
 	if ($question->{FAQ_questionId} eq "new") {
                 $f->whatNext(
                 	-options=>{
-                        	addQuestion=>WebGUI::International::get(75,$namespace),
+                        	addQuestion=>WebGUI::International::get(75,$_[0]->get("namespace")),
                                 backToPage=>WebGUI::International::get(745)
                                 },
                         -value=>"backToPage"
@@ -179,7 +188,7 @@ sub www_view {
 	my (%question, $controls, $sth, %var, @qa);
 	tie %question,'Tie::CPHash';
 	$var{"addquestion.url"} = WebGUI::URL::page('func=editQuestion&wid='.$_[0]->get("wobjectId"));
-	$var{"addquestion.label"} = WebGUI::International::get(9,$namespace);
+	$var{"addquestion.label"} = WebGUI::International::get(9,$_[0]->get("namespace"));
 	$sth = WebGUI::SQL->read("select * from FAQ_question where wobjectId=".$_[0]->get("wobjectId")." order by sequenceNumber");
 	while (%question = $sth->hash) {
 		$controls = deleteIcon('func=deleteQuestion&wid='.$_[0]->get("wobjectId").'&qid='.$question{FAQ_questionId})

@@ -22,8 +22,6 @@ use WebGUI::URL;
 use WebGUI::Wobject;
 
 our @ISA = qw(WebGUI::Wobject);
-our $namespace = "SiteMap";
-our $name = WebGUI::International::get(2,$namespace);
 
 #-------------------------------------------------------------------
 sub _traversePageTree {
@@ -61,7 +59,7 @@ sub _traversePageTree {
 sub duplicate {
         my ($w, $f);
         $w = $_[0]->SUPER::duplicate($_[1]);
-        $w = WebGUI::Wobject::SiteMap->new({wobjectId=>$w,namespace=>$namespace});
+        $w = WebGUI::Wobject::SiteMap->new({wobjectId=>$w,namespace=>$_[0]->get("namespace")});
         $w->set({
                 startAtThisLevel=>$_[0]->get("startAtThisLevel"),
                 templateId=>$_[0]->get("templateId"),
@@ -71,9 +69,21 @@ sub duplicate {
 }
 
 #-------------------------------------------------------------------
-sub set {
-        $_[0]->SUPER::set($_[1],[qw(startAtThisLevel indent templateId depth)]);
+sub name {
+        return WebGUI::International::get(2,$_[0]->get("namespace"));
 }
+
+#-------------------------------------------------------------------
+sub new {
+        my $class = shift;
+        my $property = shift;
+        my $self = WebGUI::Wobject->new(
+                $property,
+                [qw(startAtThisLevel indent templateId depth)]
+                );
+        bless $self, $class;
+}
+
 
 #-------------------------------------------------------------------
 sub www_edit {
@@ -88,26 +98,26 @@ sub www_edit {
 		and (pageId=1 or pageId>999) order by title");
 	$indent = $_[0]->get("indent") || 5;
         $output = helpIcon(1,$_[0]->get("namespace"));
-        $output .= '<h1>'.WebGUI::International::get(5,$namespace).'</h1>';
+        $output .= '<h1>'.WebGUI::International::get(5,$_[0]->get("namespace")).'</h1>';
         $f = WebGUI::HTMLForm->new;
 	$f->template(
                 -name=>"templateId",
                 -value=>$_[0]->get("templateId"),
-                -namespace=>$namespace,
+                -namespace=>$_[0]->get("namespace"),
                 -afterEdit=>'func=edit&wid='.$_[0]->get("wobjectId")
                 );
         $f->select(
 		-name=>"startAtThisLevel",
-		-label=>WebGUI::International::get(3,$namespace),
+		-label=>WebGUI::International::get(3,$_[0]->get("namespace")),
 		-value=>[$startLevel],
 		-options=>{
-               	 	0=>WebGUI::International::get(75,$namespace),
-                	$session{page}{pageId}=>WebGUI::International::get(74,$namespace),
+               	 	0=>WebGUI::International::get(75,$_[0]->get("namespace")),
+                	$session{page}{pageId}=>WebGUI::International::get(74,$_[0]->get("namespace")),
                 	%{$options}
                 	}
 		);
-        $f->integer("depth",WebGUI::International::get(4,$namespace),$_[0]->get("depth"));
-	$f->integer("indent",WebGUI::International::get(6,$namespace),$indent);
+        $f->integer("depth",WebGUI::International::get(4,$_[0]->get("namespace")),$_[0]->get("depth"));
+	$f->integer("indent",WebGUI::International::get(6,$_[0]->get("namespace")),$indent);
 	$output .= $_[0]->SUPER::www_edit($f->printRowsOnly);
         return $output;
 }

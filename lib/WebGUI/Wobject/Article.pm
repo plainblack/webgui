@@ -25,14 +25,13 @@ use WebGUI::URL;
 use WebGUI::Wobject;
 
 our @ISA = qw(WebGUI::Wobject);
-our $namespace = "Article";
 
 
 #-------------------------------------------------------------------
 sub duplicate {
 	my ($file, $w);
 	$w = $_[0]->SUPER::duplicate($_[1]);
-        $w = WebGUI::Wobject::Article->new({wobjectId=>$w,namespace=>$namespace});
+        $w = WebGUI::Wobject::Article->new({wobjectId=>$w,namespace=>$_[0]->get("namespace")});
 	$file = WebGUI::Attachment->new($_[0]->get("image"),$_[0]->get("wobjectId"));
 	$file->copy($w->get("wobjectId"));
         $file = WebGUI::Attachment->new($_[0]->get("attachment"),$_[0]->get("wobjectId"));
@@ -50,12 +49,19 @@ sub duplicate {
 
 #-------------------------------------------------------------------
 sub name {
-	return WebGUI::International::get(1,$namespace);
+	return WebGUI::International::get(1,$_[0]->get("namespace"));
 }
 
 #-------------------------------------------------------------------
 sub new {
-	$_[0]->SUPER::new($_[1],[qw(image templateId linkTitle linkURL attachment convertCarriageReturns allowDiscussion)],1);
+        my $class = shift;
+        my $property = shift;
+        my $self = WebGUI::Wobject->new(
+		$property,
+		[qw(image templateId linkTitle linkURL attachment convertCarriageReturns allowDiscussion)],
+		1
+		);
+        bless $self, $class;
 }
 
 #-------------------------------------------------------------------
@@ -69,13 +75,13 @@ sub www_edit {
         }
 	$template = $_[0]->get("templateId") || 1;
 	$groupToModerate = $_[0]->get("groupToModerate") || 4;
-        $output = helpIcon(1,$namespace);
-	$output .= '<h1>'.WebGUI::International::get(12,$namespace).'</h1>';
+        $output = helpIcon(1,$_[0]->get("namespace"));
+	$output .= '<h1>'.WebGUI::International::get(12,$_[0]->get("namespace")).'</h1>';
 	$f = WebGUI::HTMLForm->new;
 	$f->template(
                 -name=>"templateId",
                 -value=>$template,
-                -namespace=>$namespace,
+                -namespace=>$_[0]->get("namespace"),
                 -label=>WebGUI::International::get(356),
                 -afterEdit=>'func=edit&wid='.$_[0]->get("wobjectId")
                 );
@@ -89,26 +95,26 @@ sub www_edit {
 		);
 	$f->text(
 		-name=>"linkTitle",
-		-label=>WebGUI::International::get(7,$namespace),
+		-label=>WebGUI::International::get(7,$_[0]->get("namespace")),
 		-value=>$_[0]->get("linkTitle"),
 		-uiLevel=>3
 		);
         $f->url(
 		-name=>"linkURL",
-		-label=>WebGUI::International::get(8,$namespace),
+		-label=>WebGUI::International::get(8,$_[0]->get("namespace")),
 		-value=>$_[0]->get("linkURL"),
 		-uiLevel=>3
 		);
 	$f->yesNo(
 		-name=>"convertCarriageReturns",
-		-label=>WebGUI::International::get(10,$namespace),
+		-label=>WebGUI::International::get(10,$_[0]->get("namespace")),
 		-value=>$_[0]->get("convertCarriageReturns"),
-		-subtext=>' &nbsp; <span style="font-size: 8pt;">'.WebGUI::International::get(11,$namespace).'</span>',
+		-subtext=>' &nbsp; <span style="font-size: 8pt;">'.WebGUI::International::get(11,$_[0]->get("namespace")).'</span>',
 		-uiLevel=>5
 		);
 	$f->yesNo(
 		-name=>"allowDiscussion",
-		-label=>WebGUI::International::get(18,$namespace),
+		-label=>WebGUI::International::get(18,$_[0]->get("namespace")),
 		-value=>$_[0]->get("allowDiscussion"),
 		-uiLevel=>5
 		);
@@ -139,7 +145,7 @@ sub www_editSave {
 
 #-------------------------------------------------------------------
 sub www_showMessage {
-	return $_[0]->SUPER::www_showMessage('<a href="'.WebGUI::URL::page().'">'.WebGUI::International::get(27,$namespace).'</a><br>');
+	return $_[0]->SUPER::www_showMessage('<a href="'.WebGUI::URL::page().'">'.WebGUI::International::get(27,$_[0]->get("namespace")).'</a><br>');
 }
 
 #-------------------------------------------------------------------
@@ -165,9 +171,9 @@ sub www_view {
 		($var{"replies.count"}) = WebGUI::SQL->quickArray("select count(*) from discussion 
 			where wobjectId=".$_[0]->get("wobjectId"));
 		$var{"replies.URL"} = WebGUI::URL::page('func=showMessage&wid='.$_[0]->get("wobjectId"));
-		$var{"replies.label"} = WebGUI::International::get(28,$namespace);
+		$var{"replies.label"} = WebGUI::International::get(28,$_[0]->get("namespace"));
         	$var{"post.URL"} = WebGUI::URL::page('func=post&mid=new&wid='.$_[0]->get("wobjectId"));
-        	$var{"post.label"} = WebGUI::International::get(24,$namespace);
+        	$var{"post.label"} = WebGUI::International::get(24,$_[0]->get("namespace"));
 	}
 	return $_[0]->processTemplate($_[0]->get("templateId"),\%var);
 }

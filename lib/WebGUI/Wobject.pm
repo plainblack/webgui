@@ -519,7 +519,7 @@ sub name {
 
 #-------------------------------------------------------------------
 
-=head2 new ( properties [, extendedProperties, allowDiscussion] )
+=head2 new ( properties [, extendedProperties, useDiscussion] )
 
 Constructor.
 
@@ -548,7 +548,7 @@ Then the extended property list would be "[something, foo, bar]".
 
 NOTE: This is used to define the wobject and should only be passed in by a wobject subclass.
 
-=item allowDiscussion
+=item useDiscussion
 
  Defaults to "0". If set to "1" this will add a discussion properties tab to this wobject to enable content managers to set the properties of a discussion attached to this wobject.
 
@@ -562,14 +562,14 @@ sub new {
 	my $self = shift;
 	my $properties = shift;
 	my $extendedProperties = shift;
-	my $allowDiscussion = shift || 0;
+	my $useDiscussion = shift || 0;
 	my $wobjectProperties = [qw(userDefined1 userDefined2 userDefined3 userDefined4 userDefined5 
 		moderationType groupToModerate groupToPost karmaPerPost editTimeout filterPost addEditStampToPosts
 		title displayTitle description pageId templatePosition startDate endDate sequenceNumber)];
         bless({
 		_property=>$properties, 
 		_extendedProperties=>$extendedProperties,
-		_allowDiscussion=>$allowDiscussion,
+		_useDiscussion=>$useDiscussion,
 		_wobjectProperties=>$wobjectProperties
 		}, 
 		$self);
@@ -593,11 +593,7 @@ sub new {
 =cut
 
 sub processMacros {
-	if ($_[0]->get("processMacros")) {
-		return WebGUI::Macro::process($_[1]);
-	} else {
-		return $_[1];
-	}
+	return WebGUI::Macro::process($_[1]);
 }
 
 #-------------------------------------------------------------------
@@ -1109,7 +1105,7 @@ sub www_edit {
 		-value=>$_[0]->get("description")
 		);
 	$f->raw($_[1]);
-	if ($_[0]->{_allowDiscussion}) {
+	if ($_[0]->{_useDiscussion}) {
 		$f->raw($_[0]->discussionProperties);
 	}
 	$f->submit;

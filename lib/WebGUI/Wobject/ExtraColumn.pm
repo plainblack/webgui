@@ -24,15 +24,13 @@ use WebGUI::Template;
 use WebGUI::Wobject;
 
 our @ISA = qw(WebGUI::Wobject);
-our $namespace = "ExtraColumn";
-our $name = WebGUI::International::get(1,$namespace);
 
 
 #-------------------------------------------------------------------
 sub duplicate {
         my ($w);
 	$w = $_[0]->SUPER::duplicate($_[1]);
-        $w = WebGUI::Wobject::ExtraColumn->new({wobjectId=>$w,namespace=>$namespace});
+        $w = WebGUI::Wobject::ExtraColumn->new({wobjectId=>$w,namespace=>$_[0]->get("namespace")});
         $w->set({
 		spacer=>$_[0]->get("spacer"),
 		width=>$_[0]->get("width"),
@@ -41,8 +39,19 @@ sub duplicate {
 }
 
 #-------------------------------------------------------------------
-sub set {
-        $_[0]->SUPER::set($_[1],[qw(spacer width class)]);
+sub name {
+        return WebGUI::International::get(1,$_[0]->get("namespace"));
+}
+
+#-------------------------------------------------------------------
+sub new {
+        my $class = shift;
+        my $property = shift;
+        my $self = WebGUI::Wobject->new(
+                $property,
+                [qw(spacer width class)]
+                );
+        bless $self, $class;
 }
 
 #-------------------------------------------------------------------
@@ -54,8 +63,8 @@ sub uiLevel {
 sub www_edit {
 	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
         my ($output, $f, $endDate, $width, $class, $spacer,$startDate, $templatePosition);
-        $output = helpIcon(1,$namespace);
-	$output .= '<h1>'.WebGUI::International::get(6,$namespace).'</h1>';
+        $output = helpIcon(1,$_[0]->get("namespace"));
+	$output .= '<h1>'.WebGUI::International::get(6,$_[0]->get("namespace")).'</h1>';
         $width = $_[0]->get("width") || 200;
         $spacer = $_[0]->get("spacer") || 10;
 	$templatePosition = $_[0]->get("templatePosition") || 1;
@@ -67,7 +76,7 @@ sub www_edit {
        	$f->hidden("namespace",$_[0]->get("namespace")) if ($_[0]->get("wobjectId") eq "new");
        	$f->hidden("func","editSave");
        	$f->readOnly($_[0]->get("wobjectId"),WebGUI::International::get(499));
-       	$f->hidden("title",$namespace);
+       	$f->hidden("title",$_[0]->get("namespace"));
        	$f->hidden("displayTitle",0);
 	$f->select(
                 -name=>"templatePosition",
@@ -79,9 +88,9 @@ sub www_edit {
                 );
        	$f->date("startDate",WebGUI::International::get(497),$startDate);
        	$f->date("endDate",WebGUI::International::get(498),$endDate);
-	$f->integer("spacer",WebGUI::International::get(3,$namespace),$spacer);
-	$f->integer("width",WebGUI::International::get(4,$namespace),$width);
-	$f->text("class",WebGUI::International::get(5,$namespace),$class);
+	$f->integer("spacer",WebGUI::International::get(3,$_[0]->get("namespace")),$spacer);
+	$f->integer("width",WebGUI::International::get(4,$_[0]->get("namespace")),$width);
+	$f->text("class",WebGUI::International::get(5,$_[0]->get("namespace")),$class);
        	$f->submit;
        	$output .= $f->print;
 	return $output;

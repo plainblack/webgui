@@ -26,18 +26,32 @@ use WebGUI::Utility;
 use WebGUI::Wobject;
 
 our @ISA = qw(WebGUI::Wobject);
-our $namespace = "MessageBoard";
-our $name = WebGUI::International::get(2,$namespace);
 
 #-------------------------------------------------------------------
 sub duplicate {
         my ($w);
 	$w = $_[0]->SUPER::duplicate($_[1]);
-        $w = WebGUI::Wobject::MessageBoard->new({wobjectId=>$w,namespace=>$namespace});
+        $w = WebGUI::Wobject::MessageBoard->new({wobjectId=>$w,namespace=>$_[0]->get("namespace")});
         $w->set({
 		messagesPerPage=>$_[0]->get("messagesPerPage"),
 		templateId=>$_[0]->get("templateId")
 		});
+}
+
+#-------------------------------------------------------------------
+sub name {
+        return WebGUI::International::get(2,$_[0]->get("namespace"));
+}
+
+#-------------------------------------------------------------------
+sub new {
+        my $class = shift;
+        my $property = shift;
+        my $self = WebGUI::Wobject->new(
+                $property,
+                [qw(templateId messagesPerPage)]
+                );
+        bless $self, $class;
 }
 
 #-------------------------------------------------------------------
@@ -61,15 +75,15 @@ sub www_edit {
 	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
         my ($output, $f, $messagesPerPage);
 	$messagesPerPage = $_[0]->get("messagesPerPage") || 50;
-        $output = helpIcon(1,$namespace);
-	$output .= '<h1>'.WebGUI::International::get(6,$namespace).'</h1>';
+        $output = helpIcon(1,$_[0]->get("namespace"));
+	$output .= '<h1>'.WebGUI::International::get(6,$_[0]->get("namespace")).'</h1>';
 	$f = WebGUI::HTMLForm->new;
-        $f->integer("messagesPerPage",WebGUI::International::get(4,$namespace),$messagesPerPage);
+        $f->integer("messagesPerPage",WebGUI::International::get(4,$_[0]->get("namespace")),$messagesPerPage);
 	$f->template(
                 -name=>"templateId",
                 -value=>$_[0]->get("templateId"),
-                -namespace=>$namespace,
-                -label=>WebGUI::International::get(72,$namespace),
+                -namespace=>$_[0]->get("namespace"),
+                -label=>WebGUI::International::get(72,$_[0]->get("namespace")),
                 -afterEdit=>'func=edit&wid='.$_[0]->get("wobjectId")
                 );
 	$f->raw($_[0]->SUPER::discussionProperties);
@@ -89,7 +103,7 @@ sub www_editSave {
 
 #-------------------------------------------------------------------
 sub www_showMessage {
-        return $_[0]->SUPER::www_showMessage('<a href="'.WebGUI::URL::page().'">'.WebGUI::International::get(11,$namespace).'</a><br>');
+        return $_[0]->SUPER::www_showMessage('<a href="'.WebGUI::URL::page().'">'.WebGUI::International::get(11,$_[0]->get("namespace")).'</a><br>');
 }
 
 #-------------------------------------------------------------------
@@ -99,15 +113,15 @@ sub www_view {
 	$var{description} = $_[0]->get("description");
 	$var{canPost} = WebGUI::Privilege::isInGroup($_[0]->get("groupToPost"));
 	$var{"post.url"} = WebGUI::URL::page('func=post&mid=new&wid='.$_[0]->get("wobjectId"));
-	$var{"post.label"} = WebGUI::International::get(17,$namespace);
+	$var{"post.label"} = WebGUI::International::get(17,$_[0]->get("namespace"));
 	$var{"search.url"} = WebGUI::URL::page('func=search&wid='.$_[0]->get("wobjectId"));
 	$var{"search.label"} = WebGUI::International::get(364);
 	$var{"subject.label"} = WebGUI::International::get(229);
-	$var{"user.label"} = WebGUI::International::get(15,$namespace);
-	$var{"date.label"} = WebGUI::International::get(18,$namespace);
+	$var{"user.label"} = WebGUI::International::get(15,$_[0]->get("namespace"));
+	$var{"date.label"} = WebGUI::International::get(18,$_[0]->get("namespace"));
 	$var{"views.label"} = WebGUI::International::get(514);
-	$var{"replies.label"} = WebGUI::International::get(19,$namespace);
-	$var{"last.label"} = WebGUI::International::get(20,$namespace);
+	$var{"replies.label"} = WebGUI::International::get(19,$_[0]->get("namespace"));
+	$var{"last.label"} = WebGUI::International::get(20,$_[0]->get("namespace"));
 	$p = WebGUI::Paginator->new(WebGUI::URL::page('wid='.$_[0]->get("wobjectId").'&func=view'),[],$_[0]->get("messagesPerPage"));
 	$p->setDataByQuery("select messageId,subject,username,dateOfPost,userId,views,status
 		from discussion where wobjectId=".$_[0]->get("wobjectId")." and pid=0 

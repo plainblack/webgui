@@ -27,8 +27,6 @@ use WebGUI::Utility;
 use WebGUI::Wobject;
 
 our @ISA = qw(WebGUI::Wobject);
-our $namespace = "EventsCalendar";
-our $name = WebGUI::International::get(2,$namespace);
 
 #-------------------------------------------------------------------
 sub _drawBigCalendar {
@@ -141,7 +139,7 @@ sub _drawSmallCalendar {
 sub duplicate {
         my ($sth, $w, @row, $newEventId, $previousRecurringEventId);
 	$w = $_[0]->SUPER::duplicate($_[1]);
-        $w = WebGUI::Wobject::EventsCalendar->new({wobjectId=>$w,namespace=>$namespace});
+        $w = WebGUI::Wobject::EventsCalendar->new({wobjectId=>$w,namespace=>$_[0]->get("namespace")});
         $w->set({
 		templateId=>$_[0]->get("templateId"),
 		eventTemplateId=>$_[0]->get("eventTemplateId"),
@@ -165,14 +163,25 @@ sub duplicate {
 }
 
 #-------------------------------------------------------------------
-sub purge {
-        WebGUI::SQL->write("delete from EventsCalendar_event where wobjectId=".$_[0]->get("wobjectId"));
-	$_[0]->SUPER::purge();
+sub name {
+        return WebGUI::International::get(2,$_[0]->get("namespace"));
 }
 
 #-------------------------------------------------------------------
-sub set {
-        $_[0]->SUPER::set($_[1],[qw(templateId eventTemplateId startMonth endMonth defaultMonth paginateAfter)]);
+sub new {
+        my $class = shift;
+        my $property = shift;
+        my $self = WebGUI::Wobject->new(
+                $property,
+                [qw(templateId eventTemplateId startMonth endMonth defaultMonth paginateAfter)]
+                );
+        bless $self, $class;
+}
+
+#-------------------------------------------------------------------
+sub purge {
+        WebGUI::SQL->write("delete from EventsCalendar_event where wobjectId=".$_[0]->get("wobjectId"));
+	$_[0]->SUPER::purge();
 }
 
 #-------------------------------------------------------------------
@@ -180,14 +189,14 @@ sub www_deleteEvent {
 	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
 	my ($output);
 	$output = '<h1>'.WebGUI::International::get(42).'</h1>';
-	$output .= WebGUI::International::get(75,$namespace).'<p><blockquote>';
+	$output .= WebGUI::International::get(75,$_[0]->get("namespace")).'<p><blockquote>';
 	$output .= '<a href="'.WebGUI::URL::page('func=deleteEventConfirm&wid='.$session{form}{wid}.'&eid='
-		.$session{form}{eid}).'">'.WebGUI::International::get(76,$namespace).'</a><p>';
+		.$session{form}{eid}).'">'.WebGUI::International::get(76,$_[0]->get("namespace")).'</a><p>';
 	$output .= '<a href="'.WebGUI::URL::page('func=deleteEventConfirm&wid='.$session{form}{wid}.'&eid='
 		.$session{form}{eid}.'&rid='.$session{form}{rid}).'">'
-		.WebGUI::International::get(77,$namespace).'</a><p>'; 
+		.WebGUI::International::get(77,$_[0]->get("namespace")).'</a><p>'; 
 	$output .= '<a href="'.WebGUI::URL::page('func=edit&wid='.$session{form}{wid}).'">'
-		.WebGUI::International::get(78,$namespace).'</a>';
+		.WebGUI::International::get(78,$_[0]->get("namespace")).'</a>';
 	$output .= '</blockquote>';
         return $output;
 }
@@ -212,60 +221,60 @@ sub www_edit {
 	$endMonth = $_[0]->get("endMonth") || "after12";
 	$defaultMonth = $_[0]->get("defaultMonth") || "current";
 	$afterEdit = 'func=edit&wid='.$_[0]->get("wobjectId") if ($_[0]->get("wobjectId") ne "new");
-        $output = helpIcon(1,$namespace);
-	$output .= '<h1>'.WebGUI::International::get(12,$namespace).'</h1>';
+        $output = helpIcon(1,$_[0]->get("namespace"));
+	$output .= '<h1>'.WebGUI::International::get(12,$_[0]->get("namespace")).'</h1>';
 	$f = WebGUI::HTMLForm->new;
         $f->template(
                 -name=>"templateId",
                 -value=>$_[0]->get("templateId"),
-                -namespace=>$namespace,
-                -label=>WebGUI::International::get(79,$namespace),
+                -namespace=>$_[0]->get("namespace"),
+                -label=>WebGUI::International::get(79,$_[0]->get("namespace")),
                 -afterEdit=>$afterEdit
                 );
         $f->template(
                 -name=>"eventTemplateId",
                 -value=>$_[0]->get("eventTemplateId"),
-                -namespace=>$namespace."/Event",
-                -label=>WebGUI::International::get(80,$namespace),
+                -namespace=>$_[0]->get("namespace")."/Event",
+                -label=>WebGUI::International::get(80,$_[0]->get("namespace")),
                 -afterEdit=>$afterEdit
                 );
 	$f->select(
 		-name=>"startMonth",
 		-options=>{
-			"current"=>WebGUI::International::get(82,$namespace),
-			"first"=>WebGUI::International::get(83,$namespace)
+			"current"=>WebGUI::International::get(82,$_[0]->get("namespace")),
+			"first"=>WebGUI::International::get(83,$_[0]->get("namespace"))
 			},
-		-label=>WebGUI::International::get(81,$namespace),
+		-label=>WebGUI::International::get(81,$_[0]->get("namespace")),
 		-value=>[$startMonth]
 		);
         $f->select(
                 -name=>"endMonth",
                 -options=>{
-                        "last"=>WebGUI::International::get(85,$namespace),
-			"after12"=>WebGUI::International::get(86,$namespace),
-			"after9"=>WebGUI::International::get(87,$namespace),
-			"after6"=>WebGUI::International::get(88,$namespace),
-			"after3"=>WebGUI::International::get(89,$namespace),
-			"current"=>WebGUI::International::get(82,$namespace),
+                        "last"=>WebGUI::International::get(85,$_[0]->get("namespace")),
+			"after12"=>WebGUI::International::get(86,$_[0]->get("namespace")),
+			"after9"=>WebGUI::International::get(87,$_[0]->get("namespace")),
+			"after6"=>WebGUI::International::get(88,$_[0]->get("namespace")),
+			"after3"=>WebGUI::International::get(89,$_[0]->get("namespace")),
+			"current"=>WebGUI::International::get(82,$_[0]->get("namespace")),
                         },
-                -label=>WebGUI::International::get(84,$namespace),
+                -label=>WebGUI::International::get(84,$_[0]->get("namespace")),
                 -value=>[$endMonth]
                 );
         $f->select(
                 -name=>"defaultMonth",
                 -options=>{
-                        "current"=>WebGUI::International::get(82,$namespace),
-                        "last"=>WebGUI::International::get(85,$namespace),
-                        "first"=>WebGUI::International::get(83,$namespace)
+                        "current"=>WebGUI::International::get(82,$_[0]->get("namespace")),
+                        "last"=>WebGUI::International::get(85,$_[0]->get("namespace")),
+                        "first"=>WebGUI::International::get(83,$_[0]->get("namespace"))
                         },
-                -label=>WebGUI::International::get(90,$namespace),
+                -label=>WebGUI::International::get(90,$_[0]->get("namespace")),
                 -value=>[$defaultMonth]
                 );
-	$f->integer("paginateAfter",WebGUI::International::get(19,$namespace),$paginateAfter);
+	$f->integer("paginateAfter",WebGUI::International::get(19,$_[0]->get("namespace")),$paginateAfter);
 	if ($_[0]->get("wobjectId") eq "new") {
 		$f->whatNext(
 			-options=>{
-				addEvent=>WebGUI::International::get(91,$namespace),
+				addEvent=>WebGUI::International::get(91,$_[0]->get("namespace")),
 				backToPage=>WebGUI::International::get(745)
 				},
 			-value=>"backToPage"
@@ -301,7 +310,7 @@ sub www_editEvent {
 	tie %event, 'Tie::CPHash';
 	tie %recursEvery, 'Tie::IxHash';
 	if ($session{form}{eid} eq "new") {
-        	%recursEvery = ('never'=>WebGUI::International::get(4,$namespace),
+        	%recursEvery = ('never'=>WebGUI::International::get(4,$_[0]->get("namespace")),
                		'day'=>WebGUI::International::get(700),
                		'week'=>WebGUI::International::get(701),
                		'month'=>WebGUI::International::get(702),
@@ -309,10 +318,10 @@ sub www_editEvent {
                		);
 		$event{endDate} = $event{endDate};
 		$f = WebGUI::HTMLForm->new(1);
-		$f->raw('<tr><td class="formdescription" valign="top">'.WebGUI::International::get(8,$namespace).'</td><td class="tableData">');
+		$f->raw('<tr><td class="formdescription" valign="top">'.WebGUI::International::get(8,$_[0]->get("namespace")).'</td><td class="tableData">');
 		$f->integer("interval","",1,"","","",3);
 		$f->select("recursEvery",\%recursEvery);
-		$f->raw(' '.WebGUI::International::get(9,$namespace).' ');
+		$f->raw(' '.WebGUI::International::get(9,$_[0]->get("namespace")).' ');
 		$f->date("until");
 		$f->raw("</td><tr>");
 		$special = $f->printRowsOnly;
@@ -322,19 +331,19 @@ sub www_editEvent {
 		$f->hidden("until");
 		$special = $f->printRowsOnly;
 	}
-	$output = helpIcon(2,$namespace);
-        $output .= '<h1>'.WebGUI::International::get(13,$namespace).'</h1>';
+	$output = helpIcon(2,$_[0]->get("namespace"));
+        $output .= '<h1>'.WebGUI::International::get(13,$_[0]->get("namespace")).'</h1>';
 	$f = WebGUI::HTMLForm->new;
         $f->hidden("wid",$_[0]->get("wobjectId"));
         $f->hidden("eid",$session{form}{eid});
         $f->hidden("func","editEventSave");
         $f->text("name",WebGUI::International::get(99),$event{name});
         $f->HTMLArea("description",WebGUI::International::get(85),$event{description});
-        $f->date("startDate",WebGUI::International::get(14,$namespace),$event{startDate},
+        $f->date("startDate",WebGUI::International::get(14,$_[0]->get("namespace")),$event{startDate},
 		'onBlur="this.form.endDate.value=this.form.startDate.value;this.form.until.value=this.form.startDate.value;"');
         $f->date(
 		-name=>"endDate",
-		-label=>WebGUI::International::get(15,$namespace),
+		-label=>WebGUI::International::get(15,$_[0]->get("namespace")),
 		-value=>$event{endDate},
 		-extras=>'onBlur="this.form.until.value=this.form.endDate.value;"'
 		);
@@ -342,7 +351,7 @@ sub www_editEvent {
 	if ($session{form}{eid} eq "new") {
                 $f->whatNext(
                         -options=>{
-                                addEvent=>WebGUI::International::get(91,$namespace),
+                                addEvent=>WebGUI::International::get(91,$_[0]->get("namespace")),
                                 backToPage=>WebGUI::International::get(745)
                                 },
 			-value=>"backToPage"
@@ -417,7 +426,7 @@ sub www_view {
 	my (%var, $junk, $sameDate, $p, @list, $date, $flag, %previous, @row, $i, $maxDate, $minDate);
 	tie %previous, 'Tie::CPHash';
 	$var{"addevent.url"} = WebGUI::URL::page('func=editEvent&eid=new&wid='.$_[0]->get("wobjectId"));
-	$var{"addevent.label"} = WebGUI::International::get(20,$namespace);
+	$var{"addevent.label"} = WebGUI::International::get(20,$_[0]->get("namespace"));
 	if ($_[0]->get("startMonth") eq "first") {
 		($minDate) = WebGUI::SQL->quickArray("select min(startDate) from EventsCalendar_event 
 			where wobjectId=".$_[0]->get("wobjectId"));
@@ -519,9 +528,9 @@ sub www_viewEvent {
 	tie %event, 'Tie::CPHash';
 	%event = WebGUI::SQL->quickHash("select * from EventsCalendar_event where EventsCalendar_eventId=$session{form}{eid}");
 	$var{title} = $event{name};
-	$var{"start.label"} =  WebGUI::International::get(14,$namespace);
+	$var{"start.label"} =  WebGUI::International::get(14,$_[0]->get("namespace"));
 	$var{"start.date"} = epochToHuman($event{startDate},"%z");
-	$var{"end.label"} = WebGUI::International::get(15,$namespace);
+	$var{"end.label"} = WebGUI::International::get(15,$_[0]->get("namespace"));
 	$var{"end.date"} = epochToHuman($event{endDate},"%z");
 	$var{canEdit} = WebGUI::Privilege::canEditPage();
         $var{"edit.url"} = WebGUI::URL::page('func=editEvent&eid='.$session{form}{eid}.'&wid='.$session{form}{wid});
@@ -532,12 +541,12 @@ sub www_viewEvent {
 	($id) = WebGUI::SQL->quickArray("select EventsCalendar_eventId from EventsCalendar_event 
 		where EventsCalendar_eventId<>$event{EventsCalendar_eventId} and
 		startDate<=$event{startDate} order by startDate desc, endDate desc");
-	$var{"previous.label"} = '&laquo;'.WebGUI::International::get(92,$namespace);
+	$var{"previous.label"} = '&laquo;'.WebGUI::International::get(92,$_[0]->get("namespace"));
 	$var{"previous.url"} = WebGUI::URL::page("func=viewEvent&wid=".$_[0]->get("wobjectId")."&eid=".$id) if ($id);
         ($id) = WebGUI::SQL->quickArray("select EventsCalendar_eventId from EventsCalendar_event
                 where EventsCalendar_eventId<>$event{EventsCalendar_eventId} and 
 		startDate>=$event{startDate} order by startDate, endDate");
-        $var{"next.label"} = WebGUI::International::get(93,$namespace).'&raquo;';
+        $var{"next.label"} = WebGUI::International::get(93,$_[0]->get("namespace")).'&raquo;';
         $var{"next.url"} = WebGUI::URL::page("func=viewEvent&wid=".$_[0]->get("wobjectId")."&eid=".$id) if ($id);
 	$var{description} = $event{description};
 	return WebGUI::Template::process( WebGUI::Template::get( $_[0]->get("eventTemplateId"), "EventsCalendar/Event"), \%var);

@@ -1,7 +1,7 @@
 package WebGUI::Wobject::HttpProxy;
 
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2002 Plain Black LLC.
+# WebGUI is Copyright 2001-2003 Plain Black LLC.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -9,7 +9,6 @@ package WebGUI::Wobject::HttpProxy;
 #-------------------------------------------------------------------
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
-# Len Kranendonk - 20021212
 
 use strict;
 use URI;
@@ -26,15 +25,13 @@ use WebGUI::Wobject;
 use WebGUI::ProxyParse;
 
 our @ISA = qw(WebGUI::Wobject);
-our $namespace = "HttpProxy";
-our $name = WebGUI::International::get(3,$namespace);
 
 
 #-------------------------------------------------------------------
 sub duplicate {
         my ($w);
 	$w = $_[0]->SUPER::duplicate($_[1]);
-        $w = WebGUI::Wobject::WobjectProxy->new({wobjectId=>$w,namespace=>$namespace});
+        $w = WebGUI::Wobject::WobjectProxy->new({wobjectId=>$w,namespace=>$_[0]->get("namespace")});
         $w->set({
 		proxiedUrl=>$_[0]->get("proxiedUrl"),
                 timeout=>$_[0]->get("timeout"),
@@ -47,17 +44,19 @@ sub duplicate {
 }
 
 #-------------------------------------------------------------------
-sub new {
-        my ($self, $class, $property);
-        $class = shift;
-        $property = shift;
-        $self = WebGUI::Wobject->new($property);
-        bless $self, $class;
+sub name {
+        return WebGUI::International::get(3,$_[0]->get("namespace"));
 }
 
 #-------------------------------------------------------------------
-sub set {
-        $_[0]->SUPER::set($_[1],[qw(proxiedUrl timeout removeStyle filterHtml followExternal followRedirect cookiebox)]);
+sub new {
+        my $class = shift;
+        my $property = shift;
+        my $self = WebGUI::Wobject->new(
+                $property,
+                [qw(proxiedUrl timeout removeStyle filterHtml followExternal followRedirect cookiebox)]
+                );
+        bless $self, $class;
 }
 
 #-------------------------------------------------------------------
@@ -77,35 +76,35 @@ sub www_edit {
 		%hash=(5=>5,10=>10,20=>20,30=>30,60=>60);
 		%htmlFilter = ('none'=>WebGUI::International::get(420), 'most'=>WebGUI::International::get(421),
                 	'javascript'=>WebGUI::International::get(526), 'all'=>WebGUI::International::get(419));
-                $output = helpIcon(1,$namespace);
-		$output .= '<h1>'.WebGUI::International::get(2,$namespace).'</h1>';
+                $output = helpIcon(1,$_[0]->get("namespace"));
+		$output .= '<h1>'.WebGUI::International::get(2,$_[0]->get("namespace")).'</h1>';
 		$templatePosition = $_[0]->get("templatePosition") || '0';
         	$startDate = $_[0]->get("startDate") || $session{page}{startDate};
         	$endDate = $_[0]->get("endDate") || $session{page}{endDate};
         	$f = WebGUI::HTMLForm->new;
-                $f->url("proxiedUrl", WebGUI::International::get(1,$namespace),$_[0]->get("proxiedUrl")||'http://');
+                $f->url("proxiedUrl", WebGUI::International::get(1,$_[0]->get("namespace")),$_[0]->get("proxiedUrl")||'http://');
                 $f->yesNo(
                         -name=>"followExternal",
-                        -label=>WebGUI::International::get(5,$namespace),
+                        -label=>WebGUI::International::get(5,$_[0]->get("namespace")),
                         -value=>($_[0]->get("wobjectId") eq "new") ? 1 : $_[0]->get("followExternal"),
                         -uiLevel=>5
                         );
                 $f->yesNo(
                         -name=>"followRedirect",
-                        -label=>WebGUI::International::get(8,$namespace),
+                        -label=>WebGUI::International::get(8,$_[0]->get("namespace")),
                         -value=>$_[0]->get("followRedirect"),
                         -uiLevel=>5
                         );
                 $f->yesNo(
                         -name=>"removeStyle",
-                        -label=>WebGUI::International::get(6,$namespace),
+                        -label=>WebGUI::International::get(6,$_[0]->get("namespace")),
                         -value=>($_[0]->get("wobjectId") eq "new") ? 1 : $_[0]->get("removeStyle"),
                         -uiLevel=>5
                         );
 
-		$f->select("filterHtml",\%htmlFilter,WebGUI::International::get(7,$namespace),[$_[0]->get("filterHtml")||"javascript"]);
-                $f->select("timeout", \%hash, WebGUI::International::get(4,$namespace),[$_[0]->get("timeout")||30]);
-		$f->text("cookiebox", WebGUI::International::get(9,$namespace),$_[0]->get("cookiebox")||'/tmp');
+		$f->select("filterHtml",\%htmlFilter,WebGUI::International::get(7,$_[0]->get("namespace")),[$_[0]->get("filterHtml")||"javascript"]);
+                $f->select("timeout", \%hash, WebGUI::International::get(4,$_[0]->get("namespace")),[$_[0]->get("timeout")||30]);
+		$f->text("cookiebox", WebGUI::International::get(9,$_[0]->get("namespace")),$_[0]->get("cookiebox")||'/tmp');
         	$output .= $_[0]->SUPER::www_edit($f->printRowsOnly);
 		return $output;
         } else {
@@ -144,7 +143,7 @@ sub www_view {
       return "<b>Error while opening cookie directory ".$_[0]->get("cookiebox")."</b><p><i>$!</i>";
    }
 
-   $cookiebox = $_[0]->get("cookiebox").'/'.$namespace.'_cookie_'.WebGUI::URL::escape($session{var}{sessionId}).'.jar';
+   $cookiebox = $_[0]->get("cookiebox").'/'.$_[0]->get("namespace").'_cookie_'.WebGUI::URL::escape($session{var}{sessionId}).'.jar';
    $jar = HTTP::Cookies->new(File => $cookiebox, AutoSave => 1);
 
    if($session{form}{wid} == $_[0]->get("wobjectId") && $session{form}{func}!~/editSave/i) {

@@ -26,12 +26,10 @@ use WebGUI::Utility;
 use WebGUI::Wobject;
 
 our @ISA = qw(WebGUI::Wobject);
-our $namespace = "FileManager";
-our $name = WebGUI::International::get(1,$namespace);
 
 #-------------------------------------------------------------------
 sub _sortByColumn {
-        if ($session{scratch}{$namespace.".".$_[0]->get("wobjectId").".sortDirection"} eq "asc") {
+        if ($session{scratch}{$_[0]->get("namespace").".".$_[0]->get("wobjectId").".sortDirection"} eq "asc") {
                 return WebGUI::URL::append($_[2],'sort='.$_[1]."&sortDirection=desc");
         } else {
                 return WebGUI::URL::append($_[2],'sort='.$_[1]."&sortDirection=asc");
@@ -44,7 +42,7 @@ sub duplicate {
         my ($file, $w, %row, $sth, $newDownloadId);
 	tie %row, 'Tie::CPHash';
         $w = $_[0]->SUPER::duplicate($_[1]);
-        $w = WebGUI::Wobject::FileManager->new({wobjectId=>$w,namespace=>$namespace});
+        $w = WebGUI::Wobject::FileManager->new({wobjectId=>$w,namespace=>$_[0]->get("namespace")});
         $w->set({
 		paginateAfter=>$_[0]->get("paginateAfter"),
 		templateId=>$_[0]->get("templateId")
@@ -67,9 +65,19 @@ sub duplicate {
 }
 
 #-------------------------------------------------------------------
-sub purge {
-	WebGUI::SQL->write("delete from FileManager_file where wobjectId=".$_[0]->get("wobjectId"));
-	$_[0]->SUPER::purge();
+sub name {
+        return WebGUI::International::get(1,$_[0]->get("namespace"));
+}
+
+#-------------------------------------------------------------------
+sub new {
+        my $class = shift;
+        my $property = shift;
+        my $self = WebGUI::Wobject->new(
+                $property,
+                [qw(paginateAfter templateId)]
+                );
+        bless $self, $class;
 }
 
 #-------------------------------------------------------------------
@@ -93,7 +101,7 @@ sub www_deleteFile {
 #-------------------------------------------------------------------
 sub www_deleteDownload {
 	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
-	return $_[0]->confirm(WebGUI::International::get(12,$namespace),
+	return $_[0]->confirm(WebGUI::International::get(12,$_[0]->get("namespace")),
 		WebGUI::URL::page('func=deleteDownloadConfirm&wid='.$session{form}{wid}.'&did='.$session{form}{did}));
 }
 
@@ -141,21 +149,21 @@ sub www_edit {
         if ($_[0]->get("wobjectId") eq "new") {
                 $proceed = 1;
         }
-        $output .= helpIcon(1,$namespace);
-        $output .= '<h1>'.WebGUI::International::get(9,$namespace).'</h1>';
+        $output .= helpIcon(1,$_[0]->get("namespace"));
+        $output .= '<h1>'.WebGUI::International::get(9,$_[0]->get("namespace")).'</h1>';
 	$paginateAfter = $_[0]->get("paginateAfter") || 50;
 	$f = WebGUI::HTMLForm->new;
 	$f->template(
                 -name=>"templateId",
                 -value=>$_[0]->get("templateId"),
-                -namespace=>$namespace,
+                -namespace=>$_[0]->get("namespace"),
                 -afterEdit=>'func=edit&wid='.$_[0]->get("wobjectId")
                 );
-	$f->integer("paginateAfter",WebGUI::International::get(20,$namespace),$paginateAfter);
+	$f->integer("paginateAfter",WebGUI::International::get(20,$_[0]->get("namespace")),$paginateAfter);
 	if ($_[0]->get("wobjectId") eq "new") {
                 $f->whatNext(
                         -options=>{
-                                addFile=>WebGUI::International::get(74,$namespace),
+                                addFile=>WebGUI::International::get(74,$_[0]->get("namespace")),
                                 backToPage=>WebGUI::International::get(745)
                                 },
                         -value=>"addFile"
@@ -185,40 +193,40 @@ sub www_editDownload {
 	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
         my ($output, $file, $f);
 	$file = $_[0]->getCollateral("FileManager_file","FileManager_fileId",$session{form}{did});
-        $output .= helpIcon(2,$namespace);
-        $output .= '<h1>'.WebGUI::International::get(10,$namespace).'</h1>';
+        $output .= helpIcon(2,$_[0]->get("namespace"));
+        $output .= '<h1>'.WebGUI::International::get(10,$_[0]->get("namespace")).'</h1>';
 	$f = WebGUI::HTMLForm->new;
         $f->hidden("wid",$_[0]->get("wobjectId"));
         $f->hidden("did",$file->{FileManager_fileId});
         $f->hidden("func","editDownloadSave");
-	$f->text("fileTitle",WebGUI::International::get(5,$namespace),$file->{fileTitle});
+	$f->text("fileTitle",WebGUI::International::get(5,$_[0]->get("namespace")),$file->{fileTitle});
 	if ($file->{downloadFile} ne "") {
 		$f->readOnly('<a href="'.WebGUI::URL::page('func=deleteFile&file=downloadFile&wid='.
 			$_[0]->get("wobjectId").'&did='.$file->{FileManager_fileId}).'">'.WebGUI::International::get(391).
-			'</a>',WebGUI::International::get(6,$namespace));
+			'</a>',WebGUI::International::get(6,$_[0]->get("namespace")));
         } else {
-		$f->file("downloadFile",WebGUI::International::get(6,$namespace));
+		$f->file("downloadFile",WebGUI::International::get(6,$_[0]->get("namespace")));
         }
         if ($file->{alternateVersion1} ne "") {
 		$f->readOnly('<a href="'.WebGUI::URL::page('func=deleteFile&file=alternateVersion1&wid='.
 			$_[0]->get("wobjectId").'&did='.$file->{FileManager_fileId}).'">'.
-			WebGUI::International::get(391).'</a>',WebGUI::International::get(17,$namespace));
+			WebGUI::International::get(391).'</a>',WebGUI::International::get(17,$_[0]->get("namespace")));
         } else {
-		$f->file("alternateVersion1",WebGUI::International::get(17,$namespace));
+		$f->file("alternateVersion1",WebGUI::International::get(17,$_[0]->get("namespace")));
         }
         if ($file->{alternateVersion2} ne "") {
 		$f->readOnly('<a href="'.WebGUI::URL::page('func=deleteFile&file=alternateVersion2&wid='.
 			$_[0]->get("wobjectId").'&did='.$file->{FileManager_fileId}).'">'.
-			WebGUI::International::get(391).'</a>',WebGUI::International::get(18,$namespace));
+			WebGUI::International::get(391).'</a>',WebGUI::International::get(18,$_[0]->get("namespace")));
         } else {
-		$f->file("alternateVersion2",WebGUI::International::get(18,$namespace));
+		$f->file("alternateVersion2",WebGUI::International::get(18,$_[0]->get("namespace")));
         }
-        $f->text("briefSynopsis",WebGUI::International::get(8,$namespace),$file->{briefSynopsis});
-        $f->group("groupToView",WebGUI::International::get(7,$namespace),[$file->{groupToView}]);
+        $f->text("briefSynopsis",WebGUI::International::get(8,$_[0]->get("namespace")),$file->{briefSynopsis});
+        $f->group("groupToView",WebGUI::International::get(7,$_[0]->get("namespace")),[$file->{groupToView}]);
 	if ($file->{FileManager_fileId} eq "new") {
                 $f->whatNext(
                         -options=>{
-                                addFile=>WebGUI::International::get(74,$namespace),
+                                addFile=>WebGUI::International::get(74,$_[0]->get("namespace")),
                                 backToPage=>WebGUI::International::get(745)
                                 },
                         -value=>"backToPage"
@@ -269,8 +277,8 @@ sub www_editDownloadSave {
 #-------------------------------------------------------------------
 sub www_moveDownloadDown {
 	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
-        WebGUI::Session::setScratch($namespace.".".$_[0]->get("wobjectId").".sortDirection","-delete-");
-        WebGUI::Session::setScratch($namespace.".".$_[0]->get("wobjectId").".sort","-delete-");
+        WebGUI::Session::setScratch($_[0]->get("namespace").".".$_[0]->get("wobjectId").".sortDirection","-delete-");
+        WebGUI::Session::setScratch($_[0]->get("namespace").".".$_[0]->get("wobjectId").".sort","-delete-");
 	$_[0]->moveCollateralUp("FileManager_file","FileManager_fileId",$session{form}{did});
 	return "";
 }
@@ -278,8 +286,8 @@ sub www_moveDownloadDown {
 #-------------------------------------------------------------------
 sub www_moveDownloadUp {
 	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
-        WebGUI::Session::setScratch($namespace.".".$_[0]->get("wobjectId").".sortDirection","-delete-");
-        WebGUI::Session::setScratch($namespace.".".$_[0]->get("wobjectId").".sort","-delete-");
+        WebGUI::Session::setScratch($_[0]->get("namespace").".".$_[0]->get("wobjectId").".sortDirection","-delete-");
+        WebGUI::Session::setScratch($_[0]->get("namespace").".".$_[0]->get("wobjectId").".sort","-delete-");
 	$_[0]->moveCollateralDown("FileManager_file","FileManager_fileId",$session{form}{did});
 	return "";
 }
@@ -289,21 +297,21 @@ sub www_view {
         my ($sortDirection, %var, @fileloop, $files, $sort, $file, $p, $file1, $file2, $file3, $constraints, 
 		$url, $numResults, $sql, $flag);
 	$url = WebGUI::URL::page("func=view&wid=".$_[0]->get("wobjectId"));
-	WebGUI::Session::setScratch($namespace.".".$_[0]->get("wobjectId").".sortDirection",$session{form}{sortDirection});
-	WebGUI::Session::setScratch($namespace.".".$_[0]->get("wobjectId").".sort",$session{form}{sort});
+	WebGUI::Session::setScratch($_[0]->get("namespace").".".$_[0]->get("wobjectId").".sortDirection",$session{form}{sortDirection});
+	WebGUI::Session::setScratch($_[0]->get("namespace").".".$_[0]->get("wobjectId").".sort",$session{form}{sort});
 	$numResults = $_[0]->get("paginateAfter") || 25;
-	$var{"titleColumn.label"} = WebGUI::International::get(14,$namespace);
+	$var{"titleColumn.label"} = WebGUI::International::get(14,$_[0]->get("namespace"));
 	$var{"titleColumn.url"} = $_[0]->_sortByColumn("fileTitle",$url);
-        $var{"descriptionColumn.label"} = WebGUI::International::get(15,$namespace);
+        $var{"descriptionColumn.label"} = WebGUI::International::get(15,$_[0]->get("namespace"));
         $var{"descriptionColumn.url"} = $_[0]->_sortByColumn("briefSynopsis",$url);
-        $var{"dateColumn.label"} = WebGUI::International::get(16,$namespace);
+        $var{"dateColumn.label"} = WebGUI::International::get(16,$_[0]->get("namespace"));
         $var{"dateColumn.url"} = $_[0]->_sortByColumn("dateUploaded",$url);
 	$session{form}{sort} = "sequenceNumber" if ($session{form}{sort} eq "");
 	$var{"search.form"} = WebGUI::Search::form({wid=>$_[0]->get("wobjectId"),func=>"view"});
 	$var{"search.url"} = WebGUI::Search::toggleURL();
 	$var{"search.label"} = WebGUI::International::get(364);
         $var{"addfile.url"} = WebGUI::URL::page('func=editDownload&did=new&wid='.$_[0]->get("wobjectId"));
-        $var{"addfile.label"} = WebGUI::International::get(11,$namespace);
+        $var{"addfile.label"} = WebGUI::International::get(11,$_[0]->get("namespace"));
 	$sql = "select * from FileManager_file where wobjectId=".$_[0]->get("wobjectId")." ";
 	if ($session{scratch}{search}) {
 		$numResults = $session{scratch}{numResults};
@@ -311,8 +319,8 @@ sub www_view {
 			[qw(fileTitle downloadFile alternateVersion1 alternateVersion2 briefSynopsis)]);
 		$sql .= " and ".$constraints if ($constraints ne "");
 	}
-	$sort = $session{scratch}{$namespace.".".$_[0]->get("wobjectId").".sort"} || "sequenceNumber";
-	$sortDirection = $session{scratch}{$namespace.".".$_[0]->get("wobjectId").".sortDirection"} || "desc";
+	$sort = $session{scratch}{$_[0]->get("namespace").".".$_[0]->get("wobjectId").".sort"} || "sequenceNumber";
+	$sortDirection = $session{scratch}{$_[0]->get("namespace").".".$_[0]->get("wobjectId").".sortDirection"} || "desc";
 	$sql .= " order by $sort $sortDirection";
 	$p = WebGUI::Paginator->new($url,[],$numResults);
 	$p->setDataByQuery($sql);
@@ -357,7 +365,7 @@ sub www_view {
 			});
 		$flag = 1;
 	}
-	$var{"noresults.message"} = WebGUI::International::get(19,$namespace);
+	$var{"noresults.message"} = WebGUI::International::get(19,$_[0]->get("namespace"));
 	$var{noresults} = !$flag;
         $var{file_loop} = \@fileloop;
         $var{firstPage} = $p->getFirstPageLink;

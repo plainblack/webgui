@@ -24,24 +24,34 @@ use WebGUI::Template;
 use WebGUI::Wobject;
 
 our @ISA = qw(WebGUI::Wobject);
-our $namespace = "WobjectProxy";
-our $name = WebGUI::International::get(3,$namespace);
 
 
 #-------------------------------------------------------------------
 sub duplicate {
         my ($w);
 	$w = $_[0]->SUPER::duplicate($_[1]);
-        $w = WebGUI::Wobject::WobjectProxy->new({wobjectId=>$w,namespace=>$namespace});
+        $w = WebGUI::Wobject::WobjectProxy->new({wobjectId=>$w,namespace=>$_[0]->get("namespace")});
         $w->set({
 		proxiedWobjectId=>$_[0]->get("proxiedWobjectId")
 		});
 }
 
 #-------------------------------------------------------------------
-sub set {
-        $_[0]->SUPER::set($_[1],[qw(proxiedWobjectId)]);
+sub name {
+        return WebGUI::International::get(3,$_[0]->get("namespace"));
 }
+
+#-------------------------------------------------------------------
+sub new {
+        my $class = shift;
+        my $property = shift;
+        my $self = WebGUI::Wobject->new(
+                $property,
+                [qw(proxiedWobjectId)]
+                );
+        bless $self, $class;
+}
+
 
 #-------------------------------------------------------------------
 sub uiLevel {
@@ -55,8 +65,8 @@ sub www_edit {
 	tie %wobject, 'Tie::CPHash';
 	tie %page, 'Tie::CPHash';
 	tie %wobjects, 'Tie::IxHash';
-        $output = helpIcon(1,$namespace);
-	$output .= '<h1>'.WebGUI::International::get(2,$namespace).'</h1>';
+        $output = helpIcon(1,$_[0]->get("namespace"));
+	$output .= '<h1>'.WebGUI::International::get(2,$_[0]->get("namespace")).'</h1>';
 	$templatePosition = $_[0]->get("templatePosition") || 1;
        	$startDate = $_[0]->get("startDate") || $session{page}{startDate};
        	$endDate = $_[0]->get("endDate") || $session{page}{endDate};
@@ -65,7 +75,7 @@ sub www_edit {
        	$f->hidden("namespace",$_[0]->get("namespace")) if ($_[0]->get("wobjectId") eq "new");
        	$f->hidden("func","editSave");
        	$f->readOnly($_[0]->get("wobjectId"),WebGUI::International::get(499));
-       	$f->hidden("title",$namespace);
+       	$f->hidden("title",$_[0]->get("namespace"));
        	$f->hidden("displayTitle",0);
 	$f->select(
                 -name=>"templatePosition",
@@ -88,7 +98,7 @@ sub www_edit {
 		$b->finish;
 	}
 	$a->finish;
-	$f->select("proxiedWobjectId",\%wobjects,WebGUI::International::get(1,$namespace),[$_[0]->get("proxiedWobjectId")]);
+	$f->select("proxiedWobjectId",\%wobjects,WebGUI::International::get(1,$_[0]->get("namespace")),[$_[0]->get("proxiedWobjectId")]);
        	$f->submit;
        	$output .= $f->print;
 	return $output;
@@ -105,7 +115,7 @@ sub www_editSave {
 
 #-------------------------------------------------------------------
 sub www_view {
-	return	WebGUI::International::get(4,$namespace);
+	return	WebGUI::International::get(4,$_[0]->get("namespace"));
 }
 
 

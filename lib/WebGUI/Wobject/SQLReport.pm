@@ -25,14 +25,12 @@ use WebGUI::Utility;
 use WebGUI::Wobject;
 
 our @ISA = qw(WebGUI::Wobject);
-our $namespace = "SQLReport";
-our $name = WebGUI::International::get(1,$namespace);
 
 #-------------------------------------------------------------------
 sub duplicate {
         my ($w);
 	$w = $_[0]->SUPER::duplicate($_[1]);
-        $w = WebGUI::Wobject::SQLReport->new({wobjectId=>$w,namespace=>$namespace});
+        $w = WebGUI::Wobject::SQLReport->new({wobjectId=>$w,namespace=>$_[0]->get("namespace")});
         $w->set({
 		template=>$_[0]->get("template"),
 		dbQuery=>$_[0]->get("dbQuery"),
@@ -47,8 +45,20 @@ sub duplicate {
 }
 
 #-------------------------------------------------------------------
-sub set {
-        $_[0]->SUPER::set($_[1],[qw(template dbQuery DSN username identifier convertCarriageReturns paginateAfter preprocessMacros debugMode)]);
+sub name {
+        return WebGUI::International::get(1,$_[0]->get("namespace"));
+}
+
+
+#-------------------------------------------------------------------
+sub new {
+        my $class = shift;
+        my $property = shift;
+        my $self = WebGUI::Wobject->new(
+                $property,
+                [qw(template dbQuery DSN username identifier convertCarriageReturns paginateAfter preprocessMacros debugMode)]
+                );
+        bless $self, $class;
 }
 
 #-------------------------------------------------------------------
@@ -64,17 +74,17 @@ sub www_edit {
 	$username = $_[0]->get("username") || $session{config}{dbuser};
 	$paginateAfter = $_[0]->get("paginateAfter") || 50;
 	$f = WebGUI::HTMLForm->new;
-        $output = helpIcon(1,$namespace);
-        $output .= '<h1>'.WebGUI::International::get(8,$namespace).'</h1>';
-	$f->yesNo("preprocessMacros",WebGUI::International::get(15,$namespace),$_[0]->get("preprocessMacros"));
-        $f->yesNo("debugMode",WebGUI::International::get(16,$namespace),$_[0]->get("debugMode"));
-	$f->textarea("dbQuery",WebGUI::International::get(4,$namespace),$_[0]->get("dbQuery"));
-       	$f->textarea("template",WebGUI::International::get(3,$namespace),$_[0]->get("template"));        
-        $f->text("DSN",WebGUI::International::get(5,$namespace),$dsn);
-	$f->text("username",WebGUI::International::get(6,$namespace),$username);
-	$f->password("identifier",WebGUI::International::get(7,$namespace),$_[0]->get("identifier"));
-	$f->integer("paginateAfter",WebGUI::International::get(14,$namespace),$paginateAfter);
-	$f->yesNo("convertCarriageReturns",WebGUI::International::get(13,$namespace),$_[0]->get("convertCarriageReturns"));
+        $output = helpIcon(1,$_[0]->get("namespace"));
+        $output .= '<h1>'.WebGUI::International::get(8,$_[0]->get("namespace")).'</h1>';
+	$f->yesNo("preprocessMacros",WebGUI::International::get(15,$_[0]->get("namespace")),$_[0]->get("preprocessMacros"));
+        $f->yesNo("debugMode",WebGUI::International::get(16,$_[0]->get("namespace")),$_[0]->get("debugMode"));
+	$f->textarea("dbQuery",WebGUI::International::get(4,$_[0]->get("namespace")),$_[0]->get("dbQuery"));
+       	$f->textarea("template",WebGUI::International::get(3,$_[0]->get("namespace")),$_[0]->get("template"));        
+        $f->text("DSN",WebGUI::International::get(5,$_[0]->get("namespace")),$dsn);
+	$f->text("username",WebGUI::International::get(6,$_[0]->get("namespace")),$username);
+	$f->password("identifier",WebGUI::International::get(7,$_[0]->get("namespace")),$_[0]->get("identifier"));
+	$f->integer("paginateAfter",WebGUI::International::get(14,$_[0]->get("namespace")),$paginateAfter);
+	$f->yesNo("convertCarriageReturns",WebGUI::International::get(13,$_[0]->get("namespace")),$_[0]->get("convertCarriageReturns"));
 	$output .= $_[0]->SUPER::www_edit($f->printRowsOnly);
         return $output;
 }
@@ -107,7 +117,7 @@ sub www_view {
 	$dsn = $_[0]->get("DSN");
 	$output = $_[0]->displayTitle;
         $output .= $_[0]->description;
-	$output .= WebGUI::International::get(17,$namespace)." ".$query."<p>" if ($_[0]->get("debugMode"));
+	$output .= WebGUI::International::get(17,$_[0]->get("namespace"))." ".$query."<p>" if ($_[0]->get("debugMode"));
 	if ($dsn eq $session{config}{dsn}) {
 		$dbh = $session{dbh};
 	} elsif ($dsn =~ /\DBI\:\w+\:\w+/) {
@@ -117,7 +127,7 @@ sub www_view {
 			undef $dbh;
 		}
        	} else {
-               	$output .= WebGUI::International::get(9,$namespace).'<p>' if ($_[0]->get("debugMode"));
+               	$output .= WebGUI::International::get(9,$_[0]->get("namespace")).'<p>' if ($_[0]->get("debugMode"));
 		WebGUI::ErrorHandler::warn("SQLReport [".$_[0]->get("wobjectId")."] The DSN specified is of an improper format.");
         }
 	if (defined $dbh) {
@@ -125,7 +135,7 @@ sub www_view {
 			$sth = WebGUI::SQL->unconditionalRead($query,$dbh);
 			unless ($sth->errorCode < 1) {
 				$errorMessage = $sth->errorMessage;
-                               	$output .= WebGUI::International::get(11,$namespace).' : '.$errorMessage.'<p>' if ($_[0]->get("debugMode"));
+                               	$output .= WebGUI::International::get(11,$_[0]->get("namespace")).' : '.$errorMessage.'<p>' if ($_[0]->get("debugMode"));
                                	WebGUI::ErrorHandler::warn("There was a problem with the query: ".$errorMessage);
 			} else {
 				if ($_[0]->get("template") ne "") {
@@ -158,7 +168,7 @@ sub www_view {
 				}
                        		if ($sth->rows < 1) {
 	               			$output .= $template[2];
-                               		$output .= WebGUI::International::get(18,$namespace).'<p>';
+                               		$output .= WebGUI::International::get(18,$_[0]->get("namespace")).'<p>';
                	        	} else {
 					$url = WebGUI::URL::page('&wid='.$_[0]->get("wobjectId").'&func=view');
 					foreach (keys %{$session{form}}) {
@@ -175,12 +185,12 @@ sub www_view {
 				$sth->finish;
 			}
                	} else {
-               		$output .= WebGUI::International::get(10,$namespace).'<p>' if ($_[0]->get("debugMode"));
+               		$output .= WebGUI::International::get(10,$_[0]->get("namespace")).'<p>' if ($_[0]->get("debugMode"));
                         WebGUI::ErrorHandler::warn("SQLReport [".$_[0]->get("wobjectId")."] The SQL query is improperly formatted.");
                 }
 		$dbh->disconnect() unless ($dsn eq $session{config}{dsn});
 	} else {
-		$output .= WebGUI::International::get(12,$namespace).'<p>' if ($_[0]->get("debugMode"));
+		$output .= WebGUI::International::get(12,$_[0]->get("namespace")).'<p>' if ($_[0]->get("debugMode"));
 		WebGUI::ErrorHandler::warn("SQLReport [".$_[0]->get("wobjectId")."] Could not connect to database.");
 	}	
 	return $output;

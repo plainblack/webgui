@@ -23,15 +23,13 @@ use WebGUI::URL;
 use WebGUI::Wobject;
 
 our @ISA = qw(WebGUI::Wobject);
-our $namespace = "Product";
-our $name = WebGUI::International::get(1,$namespace);
 
 #-------------------------------------------------------------------
 sub duplicate {
         my ($w, $file, %data, $newId, $sth);
 	tie %data, 'Tie::CPHash';
         $w = $_[0]->SUPER::duplicate($_[1]);
-	$w = WebGUI::Wobject::Product->new({wobjectId=>$w,namespace=>$namespace});
+	$w = WebGUI::Wobject::Product->new({wobjectId=>$w,namespace=>$_[0]->get("namespace")});
 	$w->set({
 		image1=>$_[0]->get("image1"),
 		image2=>$_[0]->get("image2"),
@@ -91,6 +89,22 @@ sub duplicate {
 }
 
 #-------------------------------------------------------------------
+sub name {
+        return WebGUI::International::get(1,$_[0]->get("namespace"));
+}
+
+#-------------------------------------------------------------------
+sub new {
+        my $class = shift;
+        my $property = shift;
+        my $self = WebGUI::Wobject->new(
+                $property,
+                [qw(price templateId productNumber image1 image2 image3 manual brochure warranty)]
+                );
+        bless $self, $class;
+}
+
+#-------------------------------------------------------------------
 sub purge {
         WebGUI::SQL->write("delete from Product_accessory where wobjectId=".$_[0]->get("wobjectId")." 
 		or accessoryWobjectId=".$_[0]->get("wobjectId"));
@@ -102,17 +116,13 @@ sub purge {
 	$_[0]->SUPER::purge();
 }
 
-#-------------------------------------------------------------------
-sub set {
-        $_[0]->SUPER::set($_[1],[qw(price templateId productNumber image1 image2 image3 manual brochure warranty)]);
-}
 
 #-------------------------------------------------------------------
 sub www_addAccessory {
 	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
         my ($output, $f, $accessory, @usedAccessories);
-	$output = helpIcon(4,$namespace);
-        $output .= '<h1>'.WebGUI::International::get(16,$namespace).'</h1>';
+	$output = helpIcon(4,$_[0]->get("namespace"));
+        $output .= '<h1>'.WebGUI::International::get(16,$_[0]->get("namespace")).'</h1>';
         $f = WebGUI::HTMLForm->new;
         $f->hidden("wid",$_[0]->get("wobjectId"));
         $f->hidden("func","addAccessorySave");
@@ -121,8 +131,8 @@ sub www_addAccessory {
         push(@usedAccessories,$session{form}{wid});
         $accessory = WebGUI::SQL->buildHashRef("select wobjectId,title from wobject where namespace='Product'
                 and wobjectId not in (".join(",",@usedAccessories).")");
-        $f->select("accessoryWobjectId",$accessory,WebGUI::International::get(17,$namespace));
-        $f->yesNo("proceed",WebGUI::International::get(18,$namespace));
+        $f->select("accessoryWobjectId",$accessory,WebGUI::International::get(17,$_[0]->get("namespace")));
+        $f->yesNo("proceed",WebGUI::International::get(18,$_[0]->get("namespace")));
         $f->submit;
         $output .= $f->print;
         return $output;
@@ -147,8 +157,8 @@ sub www_addAccessorySave {
 sub www_addRelated {
 	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
         my ($output, $f, $related, @usedRelated);
-	$output = helpIcon(5,$namespace);
-        $output .= '<h1>'.WebGUI::International::get(19,$namespace).'</h1>';
+	$output = helpIcon(5,$_[0]->get("namespace"));
+        $output .= '<h1>'.WebGUI::International::get(19,$_[0]->get("namespace")).'</h1>';
         $f = WebGUI::HTMLForm->new;
         $f->hidden("wid",$_[0]->get("wobjectId"));
         $f->hidden("func","addRelatedSave");
@@ -157,8 +167,8 @@ sub www_addRelated {
         push(@usedRelated,$session{form}{wid});
         $related = WebGUI::SQL->buildHashRef("select wobjectId,title from wobject where namespace='Product'
                 and wobjectId not in (".join(",",@usedRelated).")");
-        $f->select("relatedWobjectId",$related,WebGUI::International::get(20,$namespace));
-        $f->yesNo("proceed",WebGUI::International::get(21,$namespace));
+        $f->select("relatedWobjectId",$related,WebGUI::International::get(20,$_[0]->get("namespace")));
+        $f->yesNo("proceed",WebGUI::International::get(21,$_[0]->get("namespace")));
         $f->submit;
         $output .= $f->print;
         return $output;
@@ -182,7 +192,7 @@ sub www_addRelatedSave {
 #-------------------------------------------------------------------
 sub www_deleteAccessory {
         return $_[0]->confirm(
-                WebGUI::International::get(2,$namespace),
+                WebGUI::International::get(2,$_[0]->get("namespace")),
 		WebGUI::URL::page('func=deleteAccessoryConfirm&wid='.$_[0]->get("wobjectId").'&aid='.$session{form}{aid})
                 );
 }
@@ -198,7 +208,7 @@ sub www_deleteAccessoryConfirm {
 #-------------------------------------------------------------------
 sub www_deleteBenefit {
         return $_[0]->confirm(
-                WebGUI::International::get(48,$namespace),
+                WebGUI::International::get(48,$_[0]->get("namespace")),
 		WebGUI::URL::page('func=deleteBenefitConfirm&wid='.$_[0]->get("wobjectId").'&bid='.$session{form}{bid})
                 );
 }
@@ -214,7 +224,7 @@ sub www_deleteBenefitConfirm {
 #-------------------------------------------------------------------
 sub www_deleteFeature {
 	return $_[0]->confirm(
-		WebGUI::International::get(3,$namespace),
+		WebGUI::International::get(3,$_[0]->get("namespace")),
 		WebGUI::URL::page('func=deleteFeatureConfirm&wid='.$_[0]->get("wobjectId").'&fid='.$session{form}{fid})
 		);
 }
@@ -230,7 +240,7 @@ sub www_deleteFeatureConfirm {
 #-------------------------------------------------------------------
 sub www_deleteRelated {
         return $_[0]->confirm(
-                WebGUI::International::get(4,$namespace),
+                WebGUI::International::get(4,$_[0]->get("namespace")),
 		WebGUI::URL::page('func=deleteRelatedConfirm&wid='.$_[0]->get("wobjectId").'&rid='.$session{form}{rid})
                 );
 }
@@ -246,7 +256,7 @@ sub www_deleteRelatedConfirm {
 #-------------------------------------------------------------------
 sub www_deleteSpecification {
         return $_[0]->confirm(
-                WebGUI::International::get(5,$namespace),
+                WebGUI::International::get(5,$_[0]->get("namespace")),
 		WebGUI::URL::page('func=deleteSpecificationConfirm&wid='.$_[0]->get("wobjectId").'&sid='.$session{form}{sid})
                 );
 }
@@ -263,8 +273,8 @@ sub www_deleteSpecificationConfirm {
 sub www_edit {
 	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
         my ($f, $output, $template);
-	$output = helpIcon(1,$namespace);
-        $output .= '<h1>'.WebGUI::International::get(6,$namespace).'</h1>';
+	$output = helpIcon(1,$_[0]->get("namespace"));
+        $output .= '<h1>'.WebGUI::International::get(6,$_[0]->get("namespace")).'</h1>';
 	if ($_[0]->get("wobjectId") eq "new") {
 		$template = 1;
 	} else {
@@ -274,12 +284,12 @@ sub www_edit {
         $f->template(
                 -name=>"templateId",
                 -value=>$template,
-                -namespace=>$namespace,
-                -label=>WebGUI::International::get(61,$namespace),
+                -namespace=>$_[0]->get("namespace"),
+                -label=>WebGUI::International::get(61,$_[0]->get("namespace")),
 		-afterEdit=>'func=edit&wid='.$_[0]->get("wobjectId")
                 );
-	$f->text("price",WebGUI::International::get(10,$namespace),$_[0]->get("price"));
-	$f->text("productNumber",WebGUI::International::get(11,$namespace),$_[0]->get("productNumber"));
+	$f->text("price",WebGUI::International::get(10,$_[0]->get("namespace")),$_[0]->get("price"));
+	$f->text("productNumber",WebGUI::International::get(11,$_[0]->get("namespace")),$_[0]->get("productNumber"));
 	$f->raw($_[0]->fileProperty("image1",7));
 	$f->raw($_[0]->fileProperty("image2",8));
 	$f->raw($_[0]->fileProperty("image3",9));
@@ -325,15 +335,15 @@ sub www_editBenefit {
 	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
         my ($output, $data, $f, $benefits);
 	$data = $_[0]->getCollateral("Product_benefit","Product_benefitId",$session{form}{bid});
-        $output = helpIcon(6,$namespace);
-        $output .= '<h1>'.WebGUI::International::get(53,$namespace).'</h1>';
+        $output = helpIcon(6,$_[0]->get("namespace"));
+        $output .= '<h1>'.WebGUI::International::get(53,$_[0]->get("namespace")).'</h1>';
         $f = WebGUI::HTMLForm->new;
         $f->hidden("wid",$_[0]->get("wobjectId"));
         $f->hidden("bid",$data->{Product_benefitId});
         $f->hidden("func","editBenefitSave");
         $benefits = WebGUI::SQL->buildHashRef("select benefit,benefit from Product_benefit order by benefit");
-        $f->combo("benefit",$benefits,WebGUI::International::get(51,$namespace),[$data->{benefits}]);
-        $f->yesNo("proceed",WebGUI::International::get(52,$namespace));
+        $f->combo("benefit",$benefits,WebGUI::International::get(51,$_[0]->get("namespace")),[$data->{benefits}]);
+        $f->yesNo("proceed",WebGUI::International::get(52,$_[0]->get("namespace")));
         $f->submit;
         $output .= $f->print;
         return $output;
@@ -360,15 +370,15 @@ sub www_editFeature {
 	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
         my ($output, $data, $f, $features);
 	$data = $_[0]->getCollateral("Product_feature","Product_featureId",$session{form}{fid});
-	$output = helpIcon(2,$namespace);
-        $output .= '<h1>'.WebGUI::International::get(22,$namespace).'</h1>';
+	$output = helpIcon(2,$_[0]->get("namespace"));
+        $output .= '<h1>'.WebGUI::International::get(22,$_[0]->get("namespace")).'</h1>';
         $f = WebGUI::HTMLForm->new;
         $f->hidden("wid",$_[0]->get("wobjectId"));
         $f->hidden("fid",$data->{Product_featureId});
         $f->hidden("func","editFeatureSave");
 	$features = WebGUI::SQL->buildHashRef("select feature,feature from Product_feature order by feature");
-        $f->combo("feature",$features,WebGUI::International::get(23,$namespace),[$data->{feature}]);
-        $f->yesNo("proceed",WebGUI::International::get(24,$namespace));
+        $f->combo("feature",$features,WebGUI::International::get(23,$_[0]->get("namespace")),[$data->{feature}]);
+        $f->yesNo("proceed",WebGUI::International::get(24,$_[0]->get("namespace")));
         $f->submit;
         $output .= $f->print;
         return $output;
@@ -395,18 +405,18 @@ sub www_editSpecification {
 	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
         my ($output, $data, $f, $hashRef);
 	$data = $_[0]->getCollateral("Product_specification","Product_specificationId",$session{form}{sid});
-	$output = helpIcon(3,$namespace);
-        $output .= '<h1>'.WebGUI::International::get(25,$namespace).'</h1>';
+	$output = helpIcon(3,$_[0]->get("namespace"));
+        $output .= '<h1>'.WebGUI::International::get(25,$_[0]->get("namespace")).'</h1>';
         $f = WebGUI::HTMLForm->new;
         $f->hidden("wid",$_[0]->get("wobjectId"));
         $f->hidden("sid",$data->{Product_specificationId});
         $f->hidden("func","editSpecificationSave");
         $hashRef = WebGUI::SQL->buildHashRef("select name,name from Product_specification order by name");
-        $f->combo("name",$hashRef,WebGUI::International::get(26,$namespace),[$data->{name}]);
-        $f->text("value",WebGUI::International::get(27,$namespace),$data->{value});
+        $f->combo("name",$hashRef,WebGUI::International::get(26,$_[0]->get("namespace")),[$data->{name}]);
+        $f->text("value",WebGUI::International::get(27,$_[0]->get("namespace")),$data->{value});
         $hashRef = WebGUI::SQL->buildHashRef("select units,units from Product_specification order by units");
-        $f->combo("units",$hashRef,WebGUI::International::get(29,$namespace),[$data->{units}]);
-        $f->yesNo("proceed",WebGUI::International::get(28,$namespace));
+        $f->combo("units",$hashRef,WebGUI::International::get(29,$_[0]->get("namespace")),[$data->{units}]);
+        $f->yesNo("proceed",WebGUI::International::get(28,$_[0]->get("namespace")));
         $f->submit;
         $output .= $f->print;
         return $output;
@@ -509,21 +519,21 @@ sub www_view {
         if ($_[0]->get("brochure")) {
                 $file = WebGUI::Attachment->new($_[0]->get("brochure"),$_[0]->get("wobjectId"));
                 $var{"brochure.icon"} = $file->getIcon;
-		$var{"brochure.label"} = WebGUI::International::get(13,$namespace);
+		$var{"brochure.label"} = WebGUI::International::get(13,$_[0]->get("namespace"));
 		$var{"brochure.URL"} = $file->getURL;
         }
 	#---manual
         if ($_[0]->get("manual")) {
                 $file = WebGUI::Attachment->new($_[0]->get("manual"),$_[0]->get("wobjectId"));
                 $var{"manual.icon"} = $file->getIcon;
-		$var{"manual.label"} = WebGUI::International::get(14,$namespace);
+		$var{"manual.label"} = WebGUI::International::get(14,$_[0]->get("namespace"));
 		$var{"manual.URL"} = $file->getURL;
         }
 	#---warranty
         if ($_[0]->get("warranty")) {
                 $file = WebGUI::Attachment->new($_[0]->get("warranty"),$_[0]->get("wobjectId"));
                 $var{"warranty.icon"} = $file->getIcon;
-		$var{"warranty.label"} = WebGUI::International::get(15,$namespace);
+		$var{"warranty.label"} = WebGUI::International::get(15,$_[0]->get("namespace"));
 		$var{"warranty.URL"} = $file->getURL;
         }
 	#---image1
@@ -547,7 +557,7 @@ sub www_view {
 
 	#---features 
         $var{"addFeature.url"} = WebGUI::URL::page('func=editFeature&fid=new&wid='.$_[0]->get("wobjectId"));
-	$var{"addFeature.label"} = WebGUI::International::get(34,$namespace);
+	$var{"addFeature.label"} = WebGUI::International::get(34,$_[0]->get("namespace"));
         $sth = WebGUI::SQL->read("select feature,Product_featureId from Product_feature where wobjectId="
 		.$_[0]->get("wobjectId")." order by sequenceNumber");
         while (%data = $sth->hash) {
@@ -565,7 +575,7 @@ sub www_view {
 
 	#---benefits 
         $var{"addBenefit.url"} = WebGUI::URL::page('func=editBenefit&fid=new&wid='.$_[0]->get("wobjectId"));
-	$var{"addBenefit.label"} = WebGUI::International::get(55,$namespace);
+	$var{"addBenefit.label"} = WebGUI::International::get(55,$_[0]->get("namespace"));
         $sth = WebGUI::SQL->read("select benefit,Product_benefitId from Product_benefit where wobjectId="
 		.$_[0]->get("wobjectId")." order by sequenceNumber");
         while (%data = $sth->hash) {
@@ -583,7 +593,7 @@ sub www_view {
 
 	#---specifications 
         $var{"addSpecification.url"} = WebGUI::URL::page('func=editSpecification&sid=new&wid='.$_[0]->get("wobjectId"));
-	$var{"addSpecification.label"} = WebGUI::International::get(35,$namespace);
+	$var{"addSpecification.label"} = WebGUI::International::get(35,$_[0]->get("namespace"));
         $sth = WebGUI::SQL->read("select name,value,units,Product_specificationId from Product_specification 
 		where wobjectId=".$_[0]->get("wobjectId")." order by sequenceNumber");
         while (%data = $sth->hash) {
@@ -603,7 +613,7 @@ sub www_view {
 
 	#---accessories 
         $var{"addaccessory.url"} = WebGUI::URL::page('func=addAccessory&wid='.$_[0]->get("wobjectId"));
-	$var{"addaccessory.label"} = WebGUI::International::get(36,$namespace);
+	$var{"addaccessory.label"} = WebGUI::International::get(36,$_[0]->get("namespace"));
         $sth = WebGUI::SQL->read("select wobject.title,page.urlizedTitle,Product_accessory.accessoryWobjectId 
 		from Product_accessory,wobject,page 
 		where Product_accessory.wobjectId=".$_[0]->get("wobjectId")." 
@@ -624,7 +634,7 @@ sub www_view {
 
 	#---related
         $var{"addrelatedproduct.url"} = WebGUI::URL::page('func=addRelated&wid='.$_[0]->get("wobjectId"));
-	$var{"addrelatedproduct.label"} = WebGUI::International::get(37,$namespace);
+	$var{"addrelatedproduct.label"} = WebGUI::International::get(37,$_[0]->get("namespace"));
 	$sth = WebGUI::SQL->read("select wobject.title,page.urlizedTitle,Product_related.relatedWobjectId 
 		from Product_related,wobject,page 
 		where Product_related.wobjectId=".$_[0]->get("wobjectId")." 

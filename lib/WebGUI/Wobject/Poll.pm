@@ -25,15 +25,13 @@ use WebGUI::Utility;
 use WebGUI::Wobject;
 
 our @ISA = qw(WebGUI::Wobject);
-our $namespace = "Poll";
-our $name = WebGUI::International::get(1,$namespace);
 
 
 #-------------------------------------------------------------------
 sub duplicate {
         my ($w, $f, $sth, @row);
         $w = $_[0]->SUPER::duplicate($_[1]);
-        $w = WebGUI::Wobject::Poll->new({wobjectId=>$w,namespace=>$namespace});
+        $w = WebGUI::Wobject::Poll->new({wobjectId=>$w,namespace=>$_[0]->get("namespace")});
         $w->set({
                 active=>$_[0]->get("active"),
                 randomizeAnswers=>$_[0]->get("randomizeAnswers"),
@@ -70,14 +68,25 @@ sub duplicate {
 }
 
 #-------------------------------------------------------------------
-sub purge {
-        WebGUI::SQL->write("delete from Poll_answer where wobjectId=".$_[0]->get("wobjectId"));
-	$_[0]->SUPER::purge();
+sub name {
+        return WebGUI::International::get(1,$_[0]->get("namespace"));
 }
 
 #-------------------------------------------------------------------
-sub set {
-        $_[0]->SUPER::set($_[1],[qw(active karmaPerVote graphWidth voteGroup question randomizeAnswers a1 a2 a3 a4 a5 a6 a7 a8 a9 a10 a11 a12 a13 a14 a15 a16 a17 a18 a19 a20)]);
+sub new {
+        my $class = shift;
+        my $property = shift;
+        my $self = WebGUI::Wobject->new(
+                $property,
+                [qw(active karmaPerVote graphWidth voteGroup question randomizeAnswers a1 a2 a3 a4 a5 a6 a7 a8 a9 a10 a11 a12 a13 a14 a15 a16 a17 a18 a19 a20)]
+                );
+        bless $self, $class;
+}
+
+#-------------------------------------------------------------------
+sub purge {
+        WebGUI::SQL->write("delete from Poll_answer where wobjectId=".$_[0]->get("wobjectId"));
+	$_[0]->SUPER::purge();
 }
 
 #-------------------------------------------------------------------
@@ -98,25 +107,25 @@ sub www_edit {
                         $answers .= $_[0]->get("a".$i)."\n";
                 }
         }
-        $output = helpIcon(1,$namespace);
-	$output .= '<h1>'.WebGUI::International::get(9,$namespace).'</h1>';
+        $output = helpIcon(1,$_[0]->get("namespace"));
+	$output .= '<h1>'.WebGUI::International::get(9,$_[0]->get("namespace")).'</h1>';
 	$f = WebGUI::HTMLForm->new;
-	$f->yesNo("active",WebGUI::International::get(3,$namespace),$active);
-        $f->group("voteGroup",WebGUI::International::get(4,$namespace),[$voteGroup]);
+	$f->yesNo("active",WebGUI::International::get(3,$_[0]->get("namespace")),$active);
+        $f->group("voteGroup",WebGUI::International::get(4,$_[0]->get("namespace")),[$voteGroup]);
 	if ($session{setting}{useKarma}) {
-		$f->integer("karmaPerVote",WebGUI::International::get(20,$namespace),$_[0]->get("karmaPerVote"));
+		$f->integer("karmaPerVote",WebGUI::International::get(20,$_[0]->get("namespace")),$_[0]->get("karmaPerVote"));
 	} else {
 		$f->hidden("karmaPerVote",$_[0]->get("karmaPerVote"));
 	}
-	$f->integer("graphWidth",WebGUI::International::get(5,$namespace),$graphWidth);
-	$f->text("question",WebGUI::International::get(6,$namespace),$_[0]->get("question"));
-        $f->textarea("answers",WebGUI::International::get(7,$namespace).'<span class="formSubtext"><br>'.WebGUI::International::get(8,$namespace).'</span>',$answers);
-	$f->yesNo("randomizeAnswers",WebGUI::International::get(72,$namespace),$randomizeAnswers);
+	$f->integer("graphWidth",WebGUI::International::get(5,$_[0]->get("namespace")),$graphWidth);
+	$f->text("question",WebGUI::International::get(6,$_[0]->get("namespace")),$_[0]->get("question"));
+        $f->textarea("answers",WebGUI::International::get(7,$_[0]->get("namespace")).'<span class="formSubtext"><br>'.WebGUI::International::get(8,$_[0]->get("namespace")).'</span>',$answers);
+	$f->yesNo("randomizeAnswers",WebGUI::International::get(72,$_[0]->get("namespace")),$randomizeAnswers);
 	$output .= $_[0]->SUPER::www_edit($f->printRowsOnly);
 	if ($_[0]->get("wobjectId") ne "new") {
 		$output .= '<p>';
 		$output .= '<a href="'.WebGUI::URL::page('func=resetVotes&wid='.$_[0]->get("wobjectId")).'">'
-			.WebGUI::International::get(10,$namespace).'</a>';
+			.WebGUI::International::get(10,$_[0]->get("namespace")).'</a>';
 	}
         return $output;
 }
@@ -181,7 +190,7 @@ sub www_view {
 			$f->raw($answer);
 		}
                 $f->raw('<br>');
-		$f->submit(WebGUI::International::get(11,$namespace));
+		$f->submit(WebGUI::International::get(11,$_[0]->get("namespace")));
 		$output .= $f->print;
 	} else {
                 ($totalResponses) = WebGUI::SQL->quickArray("select count(*) from Poll_answer where wobjectId=".$_[0]->get("wobjectId"));
@@ -199,7 +208,7 @@ sub www_view {
 					round(100*$data[0]/$totalResponses).'% ('.($data[0]+0).')</td></tr></table>';
                         }
                 }
-                $output .= '<span class="pollAnswer"><hr size="1"><b>'.WebGUI::International::get(12,$namespace).'</b> '.$totalResponses.'</span>';
+                $output .= '<span class="pollAnswer"><hr size="1"><b>'.WebGUI::International::get(12,$_[0]->get("namespace")).'</b> '.$totalResponses.'</span>';
 	}
 	return $output;
 }
@@ -213,7 +222,7 @@ sub www_vote {
 			'$session{form}{answer}', $session{user}{userId}, '$session{env}{REMOTE_ADDR}')");
 		if ($session{setting}{useKarma}) {
 			$u = WebGUI::User->new($session{user}{userId});
-			$u->karma($_[0]->get("karmaPerVote"),$namespace." (".$_[0]->get("wobjectId").")","Voted on this poll.");
+			$u->karma($_[0]->get("karmaPerVote"),$_[0]->get("namespace")." (".$_[0]->get("wobjectId").")","Voted on this poll.");
 		}
 	}
 	return "";

@@ -22,15 +22,13 @@ use WebGUI::URL;
 use WebGUI::Wobject;
 
 our @ISA = qw(WebGUI::Wobject);
-our $namespace = "LinkList";
-our $name = WebGUI::International::get(6,$namespace);
 
 
 #-------------------------------------------------------------------
 sub duplicate {
         my ($w, $sth, $row);
 	$w = $_[0]->SUPER::duplicate($_[1]);
-	$w = WebGUI::Wobject::LinkList->new({wobjectId=>$w,namespace=>$namespace});
+	$w = WebGUI::Wobject::LinkList->new({wobjectId=>$w,namespace=>$_[0]->get("namespace")});
 	$w->set({
 		templateId=>$_[0]->get("templateId")
 		});
@@ -44,20 +42,32 @@ sub duplicate {
 }
 
 #-------------------------------------------------------------------
+sub name {
+        return WebGUI::International::get(6,$_[0]->get("namespace"));
+}
+
+#-------------------------------------------------------------------
+sub new {
+        my $class = shift;
+        my $property = shift;
+        my $self = WebGUI::Wobject->new(
+                $property,
+                [qw(templateId)]
+                );
+        bless $self, $class;
+}
+
+#-------------------------------------------------------------------
 sub purge {
         WebGUI::SQL->write("delete from LinkList_link where wobjectId=".$_[0]->get("wobjectId"));
 	$_[0]->SUPER::purge();
 }
 
-#-------------------------------------------------------------------
-sub set {
-        $_[0]->SUPER::set($_[1],[qw(templateId)]);
-}
 
 #-------------------------------------------------------------------
 sub www_deleteLink {
 	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
-	return $_[0]->confirm(WebGUI::International::get(9,$namespace),
+	return $_[0]->confirm(WebGUI::International::get(9,$_[0]->get("namespace")),
 		WebGUI::URL::page('func=deleteLinkConfirm&wid='.$session{form}{wid}.'&lid='.$session{form}{lid}));
 }
 
@@ -79,19 +89,19 @@ sub www_edit {
 	$bullet = $_[0]->get("bullet") || '&middot;';
 	$lineSpacing = $_[0]->get("lineSpacing") || 1;
 	$indent = $_[0]->get("indent") || 5;
-        $output = helpIcon(1,$namespace);
-	$output .= '<h1>'.WebGUI::International::get(10,$namespace).'</h1>';
+        $output = helpIcon(1,$_[0]->get("namespace"));
+	$output .= '<h1>'.WebGUI::International::get(10,$_[0]->get("namespace")).'</h1>';
 	$f = WebGUI::HTMLForm->new;
 	$f->template(
                 -name=>"templateId",
                 -value=>$_[0]->get("templateId"),
-                -namespace=>$namespace,
+                -namespace=>$_[0]->get("namespace"),
                 -afterEdit=>'func=edit&wid='.$_[0]->get("wobjectId")
                 );
         if ($_[0]->get("wobjectId") eq "new") {
                 $f->whatNext(
                         -options=>{
-                                addLink=>WebGUI::International::get(13,$namespace),
+                                addLink=>WebGUI::International::get(13,$_[0]->get("namespace")),
                                 backToPage=>WebGUI::International::get(745)
                                 },
                         -value=>"addLink"
@@ -125,21 +135,21 @@ sub www_editLink {
         } else {
        	        $newWindow = $link->{newWindow};
        	}
-	$output = helpIcon(2,$namespace);
-        $output .= '<h1>'.WebGUI::International::get(12,$namespace).'</h1>';
+	$output = helpIcon(2,$_[0]->get("namespace"));
+        $output .= '<h1>'.WebGUI::International::get(12,$_[0]->get("namespace")).'</h1>';
 	$f = WebGUI::HTMLForm->new;
 	$f->hidden("wid",$_[0]->get("wobjectId"));
         $f->hidden("lid",$link->{LinkList_linkId});
         $f->hidden("func","editLinkSave");
 	$f->text("name",WebGUI::International::get(99),$link->{name});
-        $f->url("url",WebGUI::International::get(8,$namespace),$link->{url});
-        $f->yesNo("newWindow",WebGUI::International::get(3,$namespace),$newWindow);
+        $f->url("url",WebGUI::International::get(8,$_[0]->get("namespace")),$link->{url});
+        $f->yesNo("newWindow",WebGUI::International::get(3,$_[0]->get("namespace")),$newWindow);
         $f->textarea("description",WebGUI::International::get(85),$link->{description});
         if ($link->{LinkList_linkId} eq "new") {
 		$f->hidden("sequenceNumber",-1);
                 $f->whatNext(
                         -options=>{
-                                addLink=>WebGUI::International::get(13,$namespace),
+                                addLink=>WebGUI::International::get(13,$_[0]->get("namespace")),
                                 backToPage=>WebGUI::International::get(745)
                                 },
                         -value=>"backToPage"
@@ -187,7 +197,7 @@ sub www_moveLinkUp {
 sub www_view {
 	my (%var, @linkloop, $controls, $link, $sth);
 	$var{"addlink.url"} = WebGUI::URL::page('func=editLink&lid=new&wid='.$_[0]->get("wobjectId"));
-	$var{"addlink.label"} = WebGUI::International::get(13,$namespace);
+	$var{"addlink.label"} = WebGUI::International::get(13,$_[0]->get("namespace"));
 	$sth = WebGUI::SQL->read("select * from LinkList_link where wobjectId=".$_[0]->get("wobjectId")." 
 		order by sequenceNumber");
 	while ($link = $sth->hashRef) {

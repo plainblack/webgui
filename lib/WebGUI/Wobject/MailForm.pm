@@ -25,8 +25,6 @@ use WebGUI::URL;
 use WebGUI::Wobject;
 
 our @ISA = qw(WebGUI::Wobject);
-our $namespace = "MailForm";
-our $name = WebGUI::International::get(1,$namespace);
 
 our @fields = qw(width fromField fromStatus toField toStatus
 	ccField ccStatus bccField bccStatus subjectField subjectStatus acknowledgement storeEntries);
@@ -36,7 +34,7 @@ sub duplicate {
 	my ($w, %data, $sth);
 	tie %data, 'Tie::CPHash';
 	$w = $_[0]->SUPER::duplicate($_[1]);
-	$w = WebGUI::Wobject::MailForm->new({wobjectId=>$w,namespace=>$namespace});
+	$w = WebGUI::Wobject::MailForm->new({wobjectId=>$w,namespace=>$_[0]->get("namespace")});
 	$w->set({
 		width=>$_[0]->get("width"),
         	fromField=>$_[0]->get("fromField"),
@@ -61,16 +59,27 @@ sub duplicate {
 }
 
 #-------------------------------------------------------------------
+sub name {
+        return WebGUI::International::get(1,$_[0]->get("namespace"));
+}
+
+#-------------------------------------------------------------------
+sub new {
+        my $class = shift;
+        my $property = shift;
+        my $self = WebGUI::Wobject->new(
+                $property,
+                \@fields
+                );
+        bless $self, $class;
+}
+
+#-------------------------------------------------------------------
 sub purge {
     	WebGUI::SQL->write("delete from MailForm_field where wobjectId=".$_[0]->get("wobjectId"));
     	WebGUI::SQL->write("delete from MailForm_entry where wobjectId=".$_[0]->get("wobjectId"));
     	WebGUI::SQL->write("delete from MailForm_entryData where wobjectId=".$_[0]->get("wobjectId"));
     	$_[0]->SUPER::purge();
-}
-
-#-------------------------------------------------------------------
-sub set {
-	$_[0]->SUPER::set($_[1],[@fields]);
 }
 
 #-------------------------------------------------------------------
@@ -81,7 +90,7 @@ sub uiLevel {
 #-------------------------------------------------------------------
 sub www_deleteField {
 	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
-	return $_[0]->confirm(WebGUI::International::get(19,$namespace),
+	return $_[0]->confirm(WebGUI::International::get(19,$_[0]->get("namespace")),
        		WebGUI::URL::page('func=deleteFieldConfirm&wid='.$_[0]->get("wobjectId").'&fid='.$session{form}{fid}));
 }
 
@@ -97,9 +106,9 @@ sub www_deleteFieldConfirm {
 sub www_edit {
 	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
 	my ($output, $f, $proceed);
-	my %fieldStatus = ( 1 => WebGUI::International::get(4, $namespace),
-		2 => WebGUI::International::get(5, $namespace),
-		3 => WebGUI::International::get(6, $namespace) );
+	my %fieldStatus = ( 1 => WebGUI::International::get(4, $_[0]->get("namespace")),
+		2 => WebGUI::International::get(5, $_[0]->get("namespace")),
+		3 => WebGUI::International::get(6, $_[0]->get("namespace")) );
         # field defaults
         my %data = (
             width => 45,
@@ -111,9 +120,9 @@ sub www_edit {
             ccStatus => 1,
             bccField => '',
             bccStatus => 1,
-            subjectField => WebGUI::International::get(2, $namespace),
+            subjectField => WebGUI::International::get(2, $_[0]->get("namespace")),
             subjectStatus => 3,
-            acknowledgement => WebGUI::International::get(3, $namespace),
+            acknowledgement => WebGUI::International::get(3, $_[0]->get("namespace")),
             storeEntries => 1,
         );
         # initialize fields from existing data, if any
@@ -125,22 +134,22 @@ sub www_edit {
             $proceed = 1;
         }
 	$output = helpIcon(1,$_[0]->get("namespace"));
-	$output .= '<h1>'.WebGUI::International::get(7, $namespace).'</h1>';
+	$output .= '<h1>'.WebGUI::International::get(7, $_[0]->get("namespace")).'</h1>';
 	$f = WebGUI::HTMLForm->new;
-	$f->integer("width",WebGUI::International::get(8, $namespace),$_[0]->get("width") || 45);
-        $f->raw( $_[0]->_textSelectRow("fromField",WebGUI::International::get(10, $namespace),$data{fromField},128,
+	$f->integer("width",WebGUI::International::get(8, $_[0]->get("namespace")),$_[0]->get("width") || 45);
+        $f->raw( $_[0]->_textSelectRow("fromField",WebGUI::International::get(10, $_[0]->get("namespace")),$data{fromField},128,
             "fromStatus",\%fieldStatus,$data{fromStatus}) );
-        $f->raw( $_[0]->_textSelectRow("toField",WebGUI::International::get(11, $namespace),$data{toField},128,
+        $f->raw( $_[0]->_textSelectRow("toField",WebGUI::International::get(11, $_[0]->get("namespace")),$data{toField},128,
             "toStatus",\%fieldStatus,$data{toStatus}) );
-        $f->raw( $_[0]->_textSelectRow("ccField",WebGUI::International::get(12, $namespace),$data{ccField},128,
+        $f->raw( $_[0]->_textSelectRow("ccField",WebGUI::International::get(12, $_[0]->get("namespace")),$data{ccField},128,
             "ccStatus",\%fieldStatus,$data{ccStatus}) );
-        $f->raw( $_[0]->_textSelectRow("bccField",WebGUI::International::get(13, $namespace),$data{bccField},128,
+        $f->raw( $_[0]->_textSelectRow("bccField",WebGUI::International::get(13, $_[0]->get("namespace")),$data{bccField},128,
             "bccStatus",\%fieldStatus,$data{bccStatus}) );
-        $f->raw( $_[0]->_textSelectRow("subjectField",WebGUI::International::get(14, $namespace),$data{subjectField},128,
+        $f->raw( $_[0]->_textSelectRow("subjectField",WebGUI::International::get(14, $_[0]->get("namespace")),$data{subjectField},128,
             "subjectStatus",\%fieldStatus,$data{subjectStatus}) );		
-	$f->HTMLArea("acknowledgement",WebGUI::International::get(16, $namespace),$_[0]->get("acknowledgement") || WebGUI::International::get(3, $namespace));
-	$f->yesNo("storeEntries",WebGUI::International::get(26,$namespace),[ $data{storeEntries} ]);
-	$f->yesNo("proceed",WebGUI::International::get(15,$namespace),$proceed);
+	$f->HTMLArea("acknowledgement",WebGUI::International::get(16, $_[0]->get("namespace")),$_[0]->get("acknowledgement") || WebGUI::International::get(3, $_[0]->get("namespace")));
+	$f->yesNo("storeEntries",WebGUI::International::get(26,$_[0]->get("namespace")),[ $data{storeEntries} ]);
+	$f->yesNo("proceed",WebGUI::International::get(15,$_[0]->get("namespace")),$proceed);
 	$output .= $_[0]->SUPER::www_edit($f->printRowsOnly);
 	return $output;
 }
@@ -168,9 +177,9 @@ sub www_editField {
     tie %fieldTypes, 'Tie::IxHash';
     tie %validation, 'Tie::IxHash';
 
-	%fieldStatus = ( 1 => WebGUI::International::get(4, $namespace),
-		2 => WebGUI::International::get(5, $namespace),
-		3 => WebGUI::International::get(6, $namespace) );
+	%fieldStatus = ( 1 => WebGUI::International::get(4, $_[0]->get("namespace")),
+		2 => WebGUI::International::get(5, $_[0]->get("namespace")),
+		3 => WebGUI::International::get(6, $_[0]->get("namespace")) );
 		
 	%fieldTypes = ( text => "Textbox",
 		checkbox => "Checkbox",
@@ -193,13 +202,13 @@ sub www_editField {
 
         %field = WebGUI::SQL->quickHash("select * from MailForm_field where MailForm_fieldId='$session{form}{fid}'");
         $output = helpIcon(2,$_[0]->get("namespace"));
-        $output .= '<h1>'.WebGUI::International::get(20,$namespace).'</h1>';
+        $output .= '<h1>'.WebGUI::International::get(20,$_[0]->get("namespace")).'</h1>';
         $f = WebGUI::HTMLForm->new;
         $f->hidden("wid",$_[0]->get("wobjectId"));
         $session{form}{fid} = "new" if ($session{form}{fid} eq "");
         $f->hidden("fid",$session{form}{fid});
         $f->hidden("func","editFieldSave");
-        $f->text("name",WebGUI::International::get(21,$namespace),$field{name});
+        $f->text("name",WebGUI::International::get(21,$_[0]->get("namespace")),$field{name});
 
         $f->text(
                 -name=>"subtext",
@@ -209,21 +218,21 @@ sub www_editField {
                 );
 
         my $status = [ $field{status} ||= 3 ]; # make it modifiable by default
-        $f->select("status",\%fieldStatus,WebGUI::International::get(22,$namespace),$status); 
+        $f->select("status",\%fieldStatus,WebGUI::International::get(22,$_[0]->get("namespace")),$status); 
         my $type = [ $field{type} ||= "text" ];
-        $f->select("type",\%fieldTypes,WebGUI::International::get(23,$namespace),$type);
+        $f->select("type",\%fieldTypes,WebGUI::International::get(23,$_[0]->get("namespace")),$type);
 	$f->select("validation",\%validation,"Input validation", [$field{validation} || "none"]);
-	$f->integer("width",WebGUI::International::get(8, $namespace),$field{width} || $_[0]->get("width") || 45);
+	$f->integer("width",WebGUI::International::get(8, $_[0]->get("namespace")),$field{width} || $_[0]->get("width") || 45);
 	$f->integer(
                 -name=>"rows",
 		-value=>$field{rows} || "",
-		-label=>WebGUI::International::get(27, $namespace),
-		-subtext=>WebGUI::International::get(28, $namespace),
+		-label=>WebGUI::International::get(27, $_[0]->get("namespace")),
+		-subtext=>WebGUI::International::get(28, $_[0]->get("namespace")),
 		);
 
-        $f->textarea("possibleValues",WebGUI::International::get(24,$namespace),$field{possibleValues});
-        $f->textarea("defaultValue",WebGUI::International::get(25,$namespace),$field{defaultValue});
-        $f->yesNo("proceed",WebGUI::International::get(15,$namespace));
+        $f->textarea("possibleValues",WebGUI::International::get(24,$_[0]->get("namespace")),$field{possibleValues});
+        $f->textarea("defaultValue",WebGUI::International::get(25,$_[0]->get("namespace")),$field{defaultValue});
+        $f->yesNo("proceed",WebGUI::International::get(15,$_[0]->get("namespace")));
         $f->submit;
         $output .= $f->print;
         return $output;
@@ -280,16 +289,16 @@ sub www_view {
 	
 	# get all international text for each field caption
 	my %text = (
-		from => WebGUI::International::get(10, $namespace),
-		to => WebGUI::International::get(11, $namespace),
-		cc => WebGUI::International::get(12, $namespace),
-		bcc => WebGUI::International::get(13, $namespace),
-		subject => WebGUI::International::get(14, $namespace),
+		from => WebGUI::International::get(10, $_[0]->get("namespace")),
+		to => WebGUI::International::get(11, $_[0]->get("namespace")),
+		cc => WebGUI::International::get(12, $_[0]->get("namespace")),
+		bcc => WebGUI::International::get(13, $_[0]->get("namespace")),
+		subject => WebGUI::International::get(14, $_[0]->get("namespace")),
 	);
 	
     if ($session{var}{adminOn}) {
         $output .= '<a href="'.WebGUI::URL::page('func=editField&wid='.$_[0]->get("wobjectId")).'">'
-            .WebGUI::International::get(9,$namespace).'</a>';
+            .WebGUI::International::get(9,$_[0]->get("namespace")).'</a>';
     }
 	
 	$f = WebGUI::HTMLForm->new();
@@ -343,7 +352,7 @@ sub www_view {
 		$f->raw($row);
 	}
 	
-	$f->submit(WebGUI::International::get(73, $namespace));
+	$f->submit(WebGUI::International::get(73, $_[0]->get("namespace")));
 	$output .= $f->print;
 	
 	return $output;	
@@ -637,7 +646,7 @@ sub www_send {
 	
 	$output = $_[0]->displayTitle;
 	$error = $@ if $@;
-	$output .= ($error || $_[0]->get("acknowledgement"))."<p>\n<a href=\"./$session{page}{urlizedTitle}\">".WebGUI::International::get(18, $namespace)."</a>";
+	$output .= ($error || $_[0]->get("acknowledgement"))."<p>\n<a href=\"./$session{page}{urlizedTitle}\">".WebGUI::International::get(18, $_[0]->get("namespace"))."</a>";
 	return $output;
 }
 
@@ -652,10 +661,10 @@ sub _validate {
                       word    => qr/^\w+$/,
                       email   => qr/^\s*<?[^@<>]+@[^@.<>]+(?:\.[^@.<>]+)+>?\s*$/,
         );
-	my %message = ( notnull => "&quot;$fieldName&quot; ".WebGUI::International::get(29,$namespace),
-			number 	=> "&quot;$fieldName&quot; ".WebGUI::International::get(30,$namespace),
-			word	=> "&quot;$fieldName&quot; ".WebGUI::International::get(31,$namespace),
-			email	=> "&quot;$value&quot; "    .WebGUI::International::get(32,$namespace),
+	my %message = ( notnull => "&quot;$fieldName&quot; ".WebGUI::International::get(29,$_[0]->get("namespace")),
+			number 	=> "&quot;$fieldName&quot; ".WebGUI::International::get(30,$_[0]->get("namespace")),
+			word	=> "&quot;$fieldName&quot; ".WebGUI::International::get(31,$_[0]->get("namespace")),
+			email	=> "&quot;$value&quot; "    .WebGUI::International::get(32,$_[0]->get("namespace")),
 		);
 
 	if ($value !~ $regex{$validation}) {
