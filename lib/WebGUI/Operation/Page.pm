@@ -170,6 +170,7 @@ sub _selectPositions {
 }
 
 #-------------------------------------------------------------------
+
 =head2 _traversePageTree( pageId [, initialDepth ] )
 
 Walks down the page tree from page with id pageId and returns an indented list of the pages it
@@ -184,8 +185,9 @@ The id of the page you want to start from
 The depth the tree should start with. Defaults to zero.
 
 =cut
+
 sub _traversePageTree {
-        my (%wobject, $output, $spacer, $page, $currentPage, $options, $currentPageId, $currentUrlizedTitle, $wobjects);
+        my (%wobject, $output, $spacer, $page, $currentPage, $currentPageId, $currentUrlizedTitle, $wobjects);
 	my ($parentId, $initialDepth) = @_;
 
 	tie %wobject, 'Tie::CPHash';
@@ -193,7 +195,7 @@ sub _traversePageTree {
 	my $sth = WebGUI::SQL->read("select pageId,isSystem,urlizedTitle,title from page where parentId=".quote($parentId));
 	while (my ($pageId,$isSystem,$url,$title) = $sth->array) {
 		unless ($isSystem) {
-			$output .= $spacer x $options->{_depth}
+			$output .= $spacer x $initialDepth
 				.pageIcon()
 				.deleteIcon('op=deletePage',$url)
                	                .moveLeftIcon(sprintf('op=moveTreePageLeft&pageId=%s',$pageId), $url)
@@ -204,7 +206,7 @@ sub _traversePageTree {
 				.' <a href="'.WebGUI::URL::gateway($url).'">'.$title.'</a><br>';
 			$wobjects = WebGUI::SQL->read("select wobjectId,title from wobject where pageId=".quote($pageId));
 			while (%wobject = $wobjects->hash) {
-				$output .= $spacer x $options->{_depth} . $spacer
+				$output .= $spacer x $initialDepth. $spacer
 					.wobjectIcon()
 					.deleteIcon('func=delete&wid='.$wobject{wobjectId},$url)
 					.editIcon('func=edit&wid='.$wobject{wobjectId},$url)
