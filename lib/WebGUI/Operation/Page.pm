@@ -26,8 +26,44 @@ use WebGUI::URL;
 use WebGUI::Utility;
 
 our @ISA = qw(Exporter);
-our @EXPORT = qw(&www_viewPageTree &www_movePageUp &www_movePageDown &www_cutPage &www_deletePage &www_deletePageConfirm 
-	&www_editPage &www_editPageSave &www_pastePage);
+our @EXPORT = qw(&www_viewPageTree &www_movePageUp &www_movePageDown 
+        &www_cutPage &www_deletePage &www_deletePageConfirm &www_editPage 
+        &www_editPageSave &www_pastePage &www_moveTreePageUp 
+        &www_moveTreePageDown);
+
+#-------------------------------------------------------------------
+sub _movePageDown {
+        my ($pageId,$parentId) = @_;
+        my (@data, $thisSeq);
+        if (WebGUI::Privilege::canEditPage()) {
+                ($thisSeq) = WebGUI::SQL->quickArray("select sequenceNumber from page where pageId=$pageId");
+                @data = WebGUI::SQL->quickArray("select pageId from page where parentId=$parentId and sequenceNumber=$thisSeq+1");
+                if ($data[0] ne "") {
+                        WebGUI::SQL->write("update page set sequenceNumber=sequenceNumber+1 where pageId=$pageId");
+                        WebGUI::SQL->write("update page set sequenceNumber=sequenceNumber-1 where pageId=$data[0]");
+                }
+                return "";
+        } else {
+                return WebGUI::Privilege::insufficient();
+        }
+}
+
+#-------------------------------------------------------------------
+sub _movePageUp {
+        my ($pageId,$parentId) = @_;
+        my (@data, $thisSeq);
+        if (WebGUI::Privilege::canEditPage()) {
+                ($thisSeq) = WebGUI::SQL->quickArray("select sequenceNumber from page where pageId=$pageId");
+                @data = WebGUI::SQL->quickArray("select pageId from page where parentId=$parentId and sequenceNumber=$thisSeq-1");
+                if ($data[0] ne "") {
+                        WebGUI::SQL->write("update page set sequenceNumber=sequenceNumber-1 where pageId=$pageId");
+                        WebGUI::SQL->write("update page set sequenceNumber=sequenceNumber+1 where pageId=$data[0]");
+                }
+                return "";
+        } else {
+                return WebGUI::Privilege::insufficient();
+        }
+}
 
 #-------------------------------------------------------------------
 sub _recursivelyChangePrivileges {
@@ -144,6 +180,8 @@ sub _traversePageTree {
                 	$output .= $depth
 				.pageIcon()
 				.deleteIcon('op=deletePage',$page{urlizedTitle})
+                                .moveUpIcon(sprintf('op=moveTreePageUp&pageId=%s&parentId=%s',$page{pageId},$_[0]),$page{urlizedTitle})
+                                .moveDownIcon(sprintf('op=moveTreePageDown&pageId=%s&parentId=%s',$page{pageId},$_[0]),$page{urlizedTitle})
 				.editIcon('op=editPage',$page{urlizedTitle})
 				.' <a href="'.WebGUI::URL::gateway($page{urlizedTitle}).'">'.$page{title}.'</a><br>';
 			$b = WebGUI::SQL->read("select * from wobject where pageId=$page{pageId}");
@@ -246,6 +284,7 @@ sub www_editPage {
 		} else {
 			%page = %{$session{page}};
 			($childCount) = WebGUI::SQL->quickArray("select count(*) from page where parentId=$page{pageId}");
+			$page{hideFromNavigation} = 0;
 		}
 		$page{endDate} = (addToDate(time(),10)) if ($page{endDate} < 0);
                 $output = helpIcon(1);
@@ -265,29 +304,17 @@ sub www_editPage {
 			-value=>$page{menuTitle},
 			-uiLevel=>1
 			);
-                $f->getTab("properties")->text(
-			-name=>"urlizedTitle",
-			-label=>WebGUI::International::get(104),
-			-value=>$page{urlizedTitle},
-			-uiLevel=>3
-			);
-                $f->getTab("properties")->url(
-			-name=>"redirectURL",
-			-label=>WebGUI::International::get(715),
-			-value=>$page{redirectURL},
-			-uiLevel=>9
-			);
 		$f->getTab("properties")->yesNo(
 			-name=>"hideFromNavigation",
 			-value=>$page{hideFromNavigation},
 			-label=>WebGUI::International::get(886),
 			-uiLevel=>6
 			);
-		$f->getTab("properties")->yesNo(
-			-name=>"newWindow",
-			-value=>$page{newWindow},
-			-label=>WebGUI::International::get(940),
-			-uiLevel=>6
+                $f->getTab("properties")->text(
+			-name=>"urlizedTitle",
+			-label=>WebGUI::International::get(104),
+			-value=>$page{urlizedTitle},
+			-uiLevel=>3
 			);
 		$f->getTab("properties")->select(
 			-name=>"languageId",
@@ -295,6 +322,12 @@ sub www_editPage {
 			-value=>[$page{languageId}],
 			-uiLevel=>1,
 			-options=>WebGUI::International::getLanguages()
+			);
+                $f->getTab("properties")->url(
+			-name=>"redirectURL",
+			-label=>WebGUI::International::get(715),
+			-value=>$page{redirectURL},
+			-uiLevel=>9
 			);
 		$f->getTab("properties")->textarea(
 			-name=>"synopsis",
@@ -449,7 +482,6 @@ sub www_editPageSave {
 		ownerId=$session{form}{ownerId}, 
 		groupIdView=$session{form}{groupIdView}, 
 		groupIdEdit=$session{form}{groupIdEdit}, 
-		newWindow=$session{form}{newWindow},
 		hideFromNavigation=$session{form}{hideFromNavigation},
 		startDate=$session{form}{startDate},
 		endDate=$session{form}{endDate},
@@ -476,34 +508,24 @@ sub www_editPageSave {
 
 #-------------------------------------------------------------------
 sub www_movePageDown {
-        my (@data, $thisSeq);
-        if (WebGUI::Privilege::canEditPage()) {
-                ($thisSeq) = WebGUI::SQL->quickArray("select sequenceNumber from page where pageId=$session{page}{pageId}");
-                @data = WebGUI::SQL->quickArray("select pageId from page where parentId=$session{page}{parentId} and sequenceNumber=$thisSeq+1");
-                if ($data[0] ne "") {
-                        WebGUI::SQL->write("update page set sequenceNumber=sequenceNumber+1 where pageId=$session{page}{pageId}");
-                        WebGUI::SQL->write("update page set sequenceNumber=sequenceNumber-1 where pageId=$data[0]");
-                }
-                return "";
-        } else {
-                return WebGUI::Privilege::insufficient();
-        }
+        return _movePageDown($session{page}{pageId},$session{page}{parentId});
 }
 
 #-------------------------------------------------------------------
 sub www_movePageUp {
-        my (@data, $thisSeq);
-        if (WebGUI::Privilege::canEditPage()) {
-                ($thisSeq) = WebGUI::SQL->quickArray("select sequenceNumber from page where pageId=$session{page}{pageId}");
-                @data = WebGUI::SQL->quickArray("select pageId from page where parentId=$session{page}{parentId} and sequenceNumber=$thisSeq-1");
-                if ($data[0] ne "") {
-                        WebGUI::SQL->write("update page set sequenceNumber=sequenceNumber-1 where pageId=$session{page}{pageId}");
-                        WebGUI::SQL->write("update page set sequenceNumber=sequenceNumber+1 where pageId=$data[0]");
-                }
-                return "";
-        } else {
-                return WebGUI::Privilege::insufficient();
-        }
+        return _movePageUp($session{page}{pageId},$session{page}{parentId});
+}
+
+#-------------------------------------------------------------------
+sub www_moveTreePageUp {
+        my $output = _movePageUp($session{form}{pageId},$session{form}{parentId});
+        return $output ? $output : www_viewPageTree();
+}
+
+#-------------------------------------------------------------------
+sub www_moveTreePageDown {
+        my $output =  _movePageDown($session{form}{pageId},$session{form}{parentId});
+        return $output ? $output : www_viewPageTree();
 }
 
 #-------------------------------------------------------------------
