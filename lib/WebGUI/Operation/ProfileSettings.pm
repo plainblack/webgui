@@ -267,7 +267,7 @@ sub www_editProfileSettings {
 	tie %field, 'Tie::CPHash';
 	$a = WebGUI::SQL->read("select * from userProfileCategory order by sequenceNumber");
 	while (%category = $a->hash) {
-		$output .= deleteIcon('op=deleteProfileCategory&cid='.$category{profileCategoryId}); 
+		$output .= deleteIcon('op=deleteProfileCategoryConfirm&cid='.$category{profileCategoryId},'',WebGUI::International::get(466,"WebGUIProfile")); 
 		$output .= editIcon('op=editProfileCategory&cid='.$category{profileCategoryId}); 
 		$output .= moveUpIcon('op=moveProfileCategoryUp&cid='.$category{profileCategoryId}); 
 		$output .= moveDownIcon('op=moveProfileCategoryDown&cid='.$category{profileCategoryId}); 
@@ -278,7 +278,7 @@ sub www_editProfileSettings {
 			profileCategoryId=".quote($category{profileCategoryId})." order by sequenceNumber");
 		while (%field = $b->hash) {
 			$output .= '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
-                        $output .= deleteIcon('op=deleteProfileField&fid='.$field{fieldName});
+                        $output .= deleteIcon('op=deleteProfileFieldConfirm&fid='.$field{fieldName},'',WebGUI::International::get(467,"WebGUIProfile"));
        	                $output .= editIcon('op=editProfileField&fid='.$field{fieldName});
                	        $output .= moveUpIcon('op=moveProfileFieldUp&fid='.$field{fieldName});
                        	$output .= moveDownIcon('op=moveProfileFieldDown&fid='.$field{fieldName});

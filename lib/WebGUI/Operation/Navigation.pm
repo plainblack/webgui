@@ -71,21 +71,6 @@ sub www_copyNavigation {
 }
 
 #-------------------------------------------------------------------
-sub www_deleteNavigation {
-	return WebGUI::Privilege::insufficient() unless (WebGUI::Grouping::isInGroup(3));
-	if ($session{form}{navigationId} < 1000 && $session{form}{navigationId} > 0) {
-		return WebGUI::Privilege::vitalComponent();
-	}
-        my $output = WebGUI::International::get(502).'<p>';
-        $output .= '<div align="center"><a href="'.
-                   WebGUI::URL::page('op=deleteNavigationConfirm&navigationId='.$session{form}{navigationId})
-                   .'">'.WebGUI::International::get(44).'</a>';
-        $output .= '&nbsp;&nbsp;&nbsp;&nbsp;<a href="'.WebGUI::URL::page('op=listNavigation').'">'.
-				WebGUI::International::get(45).'</a></div>';
-        return _submenu($output,"42");
-}
-
-#-------------------------------------------------------------------
 sub www_deleteNavigationConfirm {
         return WebGUI::Privilege::insufficient() unless (WebGUI::Grouping::isInGroup(3));
         if ($session{form}{navigationId} < 1000 && $session{form}{navigationId} > 0) {
@@ -288,7 +273,7 @@ sub www_listNavigation {
 	my @row = ();
 	while (my %data = $sth->hash) {
 		$row[$i].= '<tr><td valign="top" class="tableData">'
-			.deleteIcon('op=deleteNavigation&identifier='.$data{identifier}.'&navigationId='.$data{navigationId})
+			.deleteIcon('op=deleteNavigationConfirm&identifier='.$data{identifier}.'&navigationId='.$data{navigationId},'',WebGUI::International::get(502))
 			.editIcon('op=editNavigation&identifier='.$data{identifier}.'&navigationId='.$data{navigationId}."&afterEdit=".WebGUI::URL::escape("op=listNavigation"))
 			.copyIcon('op=copyNavigation&identifier='.$data{identifier}.'&navigationId='.$data{navigationId})
 			.'</td>';

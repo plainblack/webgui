@@ -193,7 +193,7 @@ sub _traversePageTree {
 		unless ($isSystem) {
 			$output .= $spacer x $initialDepth
 				.pageIcon()
-				.deleteIcon('op=deletePage',$url)
+				.deleteIcon('op=deletePageConfirm',$url,WebGUI::International::get(101))
                	                .moveLeftIcon(sprintf('op=moveTreePageLeft&pageId=%s',$pageId), $url)
                        	        .moveUpIcon(sprintf('op=moveTreePageUp&pageId=%s',$pageId), $url)
 				.moveDownIcon(sprintf('op=moveTreePageDown&pageId=%s',$pageId), $url)
@@ -204,7 +204,7 @@ sub _traversePageTree {
 			while (%wobject = $wobjects->hash) {
 				$output .= $spacer x $initialDepth. $spacer
 					.wobjectIcon()
-					.deleteIcon('func=delete&wid='.$wobject{wobjectId},$url)
+					.deleteIcon('func=deleteConfirm&wid='.$wobject{wobjectId},$url,WebGUI::International::get(43))
 					.editIcon('func=edit&wid='.$wobject{wobjectId},$url)
 					.' '. $wobject{title}.'<br>';
 			}
