@@ -5500,7 +5500,7 @@ A comment.
 <P><STRONG>basepage.synopsis</STRONG><BR>The synopsis of the base page.</P>
 <P><STRONG>basepage.newWindow</STRONG><BR>A conditional indicating whether the base page should be opened in a new window.</P>
 <P><STRONG>basepage.encryptLogin</STRONG><BR>A conditional indicating whether the base page should be served over SSL.</P>
-<P><STRONG>basepage.hasDaughters</STRONG><BR>A conditional indicating whether the base page has daughters.</P>
+<P><STRONG>basepage.hasDaughter</STRONG><BR>A conditional indicating whether the base page has daughters.</P>
 <P><STRONG>page_loop</STRONG><BR>A loop containing page information in nested, hierarchial order.</P>
 <P><STRONG>unfolded_page_loop</STRONG><BR>This loop contains the same data as <STRONG>page_loop</STRONG> but the order is different.  <STRONG>unfolded_page_loop</STRONG> returns it's pages in an unfolded manner; grouped by parent id. You'll probably need <STRONG>page_loop</STRONG>, but there are (CSS) menus that need <STRONG>unfolded_page_loop</STRONG> to work properly.</P>
 <p>Both <STRONG>page_loop</STRONG> and <STRONG>unfolded_page_loop</STRONG> have the following
@@ -5550,7 +5550,7 @@ loop variables:</p>
 <P dir=ltr><STRONG>page.depthDiffIs1, page.depthDiffIs2, page.depthDiffIs3, page.depthDiffIsN</STRONG><BR>True if the <STRONG>page.depthDiff</STRONG> variable is N.</P>
 <P dir=ltr><STRONG>page.depthDiff_loop</STRONG><BR>A loop that runs <STRONG>page.depthDiff</STRONG> times. This loop contains no loop variables.</P></BLOCKQUOTE>
 <P dir=ltr>&nbsp;</P>|,
-		lastUpdated => 1097642669
+		lastUpdated => 1097728363
 	},
 
 	'893' => {
