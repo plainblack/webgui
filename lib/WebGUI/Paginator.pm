@@ -350,7 +350,7 @@ Returns links to all pages in this paginator.
 
 =over
 
-=iten limit
+=item limit
 
 An integer representing the maximum number of page links to return. Defaultly all page links will be returned.
 

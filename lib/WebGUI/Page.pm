@@ -129,6 +129,7 @@ sub classSettings {
 }
 
 #-------------------------------------------------------------------
+
 =head2 add ( page )
 
 Adds page to the children of the object this method is invoked on.
@@ -188,13 +189,13 @@ sub countTemplatePositions {
 }
 
 #-------------------------------------------------------------------
+
 =head2 cut
 
 Cuts the this Page object and places it on the clipboard.
 
-=back
-
 =cut
+
 sub cut {
 	my ($self, $clipboard, $parentId);
 	$self = shift;
@@ -215,6 +216,7 @@ sub cut {
 }
 	
 #-------------------------------------------------------------------
+
 =head2 deCache ( [ pageId ] )
 
 Deletes the cached version of a specified page. Note that this is something else than the 
@@ -237,6 +239,7 @@ sub deCache {
 }
 
 #-------------------------------------------------------------------
+
 =head2 delete
 
 Deletes this Page object from the tree and places it in the trash. To physically remove
@@ -247,9 +250,8 @@ because 'delete' is the right name for the functionality within WebGUI and becau
 delete of WG::P::Tree is not very useful: it only works on one page and causes pages with 
 'zombie' parents.
 
-=back
-
 =cut
+
 sub delete {
 	my ($self, $trash, $parentId);
 	$self = shift;
@@ -270,6 +272,7 @@ sub delete {
 }
 
 #-------------------------------------------------------------------
+
 =head2 drawTemplate ( templateId )
 
 Returns an HTML string containing a small representation of the page template.
@@ -380,6 +383,7 @@ sub generate {
 
 
 #-------------------------------------------------------------------
+
 =head2 getTemplateList
 
 Returns a hash reference containing template ids and template titles for all the page templates available in the system. 
@@ -391,6 +395,7 @@ sub getTemplateList {
 }
 
 #-------------------------------------------------------------------
+
 =head2 getTemplate ( [ templateId ] )
 
 Returns an HTML template.
@@ -411,6 +416,7 @@ sub getTemplate {
 }
 
 #-------------------------------------------------------------------
+
 =head2 getTemplatePositions ( templateId ) 
 
 Returns a hash reference containing the positions available in the specified page template.
@@ -435,6 +441,7 @@ sub getTemplatePositions {
 }
 
 #-------------------------------------------------------------------
+
 =head2 makeUnique ( pageURL, pageId )
 
 Returns a unique page URL.
@@ -468,6 +475,7 @@ sub makeUnique {
 }
 
 #-------------------------------------------------------------------
+
 =head2 getPage ( [pageId] )
 
 This method fetches a WebGUI::Page object. If no pageId is given the current page will be used.
@@ -481,6 +489,7 @@ The id of the page requested.
 =back
 
 =cut
+
 sub getPage {
 	my ($cache, $pageLookup, $node, $self, $pageId, $tree, $pageInBranche);
 	($self, $pageId) = @_;
@@ -517,6 +526,7 @@ sub getPage {
 }
 
 #-------------------------------------------------------------------
+
 =head2 move( newMother )
 
 Moves a page to another page (ie. makes the page you execute this method on a child of newMother).
@@ -531,6 +541,7 @@ The page under which the current page should be moved. This should be an WebGUI:
 =back
 
 =cut
+
 sub  move{
 	my ($self, $clipboard, $parentId, $newSequenceNumber, @newSisters, $newMother);
 	($self,	$newMother) = @_;
@@ -567,6 +578,7 @@ sub  move{
 }
 
 #-------------------------------------------------------------------
+
 =head2 paste( newMother )
 
 Pastes a page under newMother.
@@ -580,6 +592,7 @@ The page under which the current page should be pasted. This should be an WebGUI
 =back
 
 =cut
+
 sub paste{
 	my ($self, $newMother);
 	($self, $newMother) = @_;
@@ -600,13 +613,13 @@ sub paste{
 }
 
 #-------------------------------------------------------------------
+
 =head2 purge
 
 This purges this object from the tree and the database.
 
-=back
-
 =cut
+
 sub purge {
 	my ($self, $currentPage, @pagesToPurge);
 	$self = shift;
@@ -628,6 +641,7 @@ sub purge {
 }
 
 #-------------------------------------------------------------------
+
 =head2 recachePageTree
 
 This method fetches all pageroots from the database, builds their underlying trees and caches them. Additionally
@@ -637,6 +651,7 @@ page tree to find a specific node.
 It should only be nescesarry to call this method when setWithoutRecache is used.
 
 =cut
+
 sub recachePageTree {
 	my ($forrest, @pageRoots, $currentTree, $serializer, $node, $serialized, $cache, %pageLookup);
 	
@@ -655,6 +670,7 @@ sub recachePageTree {
 }
 
 #-------------------------------------------------------------------
+
 =head2 set ( [ data ] )
 
 If data is given, invoking this method will set the object to the state given in data. If called without any arguments
@@ -673,6 +689,7 @@ The properties you want to set. This parameter is optional and should be a hashr
 =back
 
 =cut
+
 sub set {
 	my $self = shift;
 	my $output = $self->SUPER::set(@_);
@@ -686,6 +703,7 @@ sub set {
 }
 
 #-------------------------------------------------------------------
+
 =head2 setWithoutRecache ([data])
 
 See set. The only difference with set is that the cached version of the pagetree is not updated. This means that you must
@@ -700,6 +718,7 @@ The properties you want to set. This parameter is optional and should be a hashr
 =back
 
 =cut
+
 sub setWithoutRecache {
 	my $self = shift;
 	return $self->SUPER::set(@_);
