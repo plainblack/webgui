@@ -1069,6 +1069,11 @@ INSERT INTO template VALUES (3,'Weblog','<tmpl_var searchForm>\r\n\r\n<tmpl_if d
 INSERT INTO template VALUES (4,'Photo Gallery','<tmpl_var searchForm>\r\n\r\n<tmpl_if post>\r\n    <tmpl_var post> &middot;\r\n</tmpl_if>\r\n<tmpl_var search><p/>\r\n\r\n<table width=\"100%\" cellpadding=2 cellspacing=1 border=0>\r\n<tr>\r\n<tmpl_loop submissions_loop>\r\n\r\n<td align=\"center\" class=\"tableData\">\r\n  \r\n  <tmpl_if submission.thumbnail>\r\n       <a href=\"<tmpl_var submission.url>\"><img src=\"<tmpl_var submission.thumbnail>\" border=\"0\"/></a><br/>\r\n  </tmpl_if>\r\n  <a href=\"<tmpl_var submission.url>\"><tmpl_var submission.title></a>\r\n  <tmpl_if submission.currentUser>\r\n    (<tmpl_var submission.status>)\r\n  </tmpl_if>\r\n</td>\r\n\r\n<tmpl_if submission.thirdColumn>\r\n  </tr><tr>\r\n</tmpl_if>\r\n\r\n</tmpl_loop>\r\n</tr>\r\n</table>\r\n\r\n<tmpl_if multiplePages>\r\n  <div class=\"pagination\">\r\n    <tmpl_var previousPage>  &middot; <tmpl_var pageList> &middot; <tmpl_var nextPage>\r\n  </div>\r\n</tmpl_if>\r\n','USS');
 INSERT INTO template VALUES (2,'Item w/pop-up Links','<tmpl_if displaytitle>\r\n   <tmpl_if linkurl>\r\n       <a href=\"<tmpl_var linkurl>\">\r\n    </tmpl_if>\r\n     <span class=\"itemTitle\"><tmpl_var title></span>\r\n   <tmpl_if linkurl>\r\n      </a>\r\n    </tmpl_if>\r\n</tmpl_if>\r\n\r\n<tmpl_if attachment>\r\n   <tmpl_if displaytitle> - </tmpl_if>\r\n   <a href=\"<tmpl_var attachmenturl>\" target=\"_blank\"><img src=\"<tmpl_var attachmentIcon>\" border=0 alt=\"<tmpl_var attachment>\" width=16 height=16 border=0 align=\"middle\"></a>\r\n</tmpl_if>\r\n\r\n<tmpl_if description>\r\n  - <tmpl_var description>\r\n</tmpl_if>','Item');
 insert into international (internationalId,languageId,namespace,message,lastUpdated) values (747,1,'WebGUI','Usernames must contain only alpha-numeric characters.', 1036384261);
+INSERT INTO international VALUES (741,'WebGUI',1,'Edit this template.',1034223116);
+INSERT INTO international VALUES (742,'WebGUI',1,'Manage templates.',1034223130);
+update settings set value=value+974 where name='defaultPage' and value>25;
+update settings set value=value+974 where name='notFoundPage' and value>25;
+
 
 
 

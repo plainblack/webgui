@@ -36,6 +36,9 @@ save you many hours of grief.
 
  * All FAQ's have been reset to use the default template.
 
+ * You may need to upgrade your CGI bundle because we are now using
+	some of the newer functionality in the CGI::Util package.
+
 4.6.3
 --------------------------------------------------------------------
  * It has been reported that some people had a duplicate key error

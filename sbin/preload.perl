@@ -52,6 +52,7 @@ use WebGUI::Attachment ();
 use WebGUI::DateTime ();
 #use WebGUI::Discussion (); # compile problems when this is included
 use WebGUI::ErrorHandler ();
+use WebGUI::Form ();
 use WebGUI::HTMLForm ();
 use WebGUI::HTML ();
 use WebGUI::Icon ();

@@ -145,7 +145,7 @@ sub _loadWobjects {
 				$exclude = $session{config}{excludeWobject};
                         	$exclude =~ s/ //g;
 				next if (isIn($namespace, split(/,/,$exclude)));
-				$cmd = "\WebGUI::Wobject::".$namespace."::uiLevel";
+				$cmd = "WebGUI::Wobject::".$namespace."::uiLevel";
 				next if (eval($cmd) > $session{user}{uiLevel});	
 				$cmd = "\$WebGUI::Wobject::".$namespace."::name";
 				$session{wobject}{$namespace} = eval($cmd);

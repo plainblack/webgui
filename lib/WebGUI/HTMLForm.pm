@@ -62,8 +62,8 @@ use WebGUI::SQL;
  tag element syntax like this:
 
  $f->checkbox(
-	-name=>"whichOne", 
-	-value=>"red", 
+	-"name"=>"whichOne", 
+	-"value"=>"red", 
 	-label=>"Is red your favorite?"
 	);
 
@@ -162,21 +162,21 @@ sub checkbox {
 	my ($output);
 	my ($self, @p) = @_;
     	my ($name, $label, $checked, $subtext, $value, $extras, $uiLevel) = 
-       		rearrange([name, label, checked, subtext, value, extras, uiLevel], @p);
+		rearrange([qw(name label checked subtext value extras uiLevel)], @p);
 	if (_uiLevelChecksOut($uiLevel)) {
 		$output = WebGUI::Form::checkbox({
-			name=>$name,
-			value=>$value,
-			checked=>$checked,
-			extras=>$extras
+			"name"=>$name,
+			"value"=>$value,
+			"checked"=>$checked,
+			"extras"=>$extras
 			});
 		$output .= _subtext($subtext);
         	$output = $self->_tableFormRow($label,$output);
 	} else {
 		if ($checked) {
 			$output = WebGUI::Form::hidden({
-				name=>$name,
-				value=>$value
+				"name"=>$name,
+				"value"=>$value
 				});
 		}
 	}
@@ -235,22 +235,22 @@ sub checkList {
         my ($output);
         my ($self, @p) = @_;
         my ($name, $options, $label, $value, $vertical, $extras, $subtext, $uiLevel) =
-                rearrange([name, options, label, value, vertical, extras, subtext, uiLevel], @p);
+                rearrange([qw(name options label value vertical extras subtext uiLevel)], @p);
         if (_uiLevelChecksOut($uiLevel)) {
 		$output = WebGUI::Form::checkList({
-			name=>$name,
-			options=>$options,
-			value=>$value,
-			vertical=>$vertical,
-			extras=>$extras
+			"name"=>$name,
+			"options"=>$options,
+			"value"=>$value,
+			"vertical"=>$vertical,
+			"extras"=>$extras
 			});
         	$output .= _subtext($subtext);
                 $output = $self->_tableFormRow($label,$output);
 	} else {
 		$output = WebGUI::Form::hiddenList({
-			name=>$name,
-			options=>$options,
-			value=>$value
+			"name"=>$name,
+			"options"=>$options,
+			"value"=>$value
 			});
 	}
         $self->{_data} .= $output;
@@ -315,23 +315,23 @@ sub combo {
         my ($output);
         my ($self, @p) = @_;
         my ($name, $options, $label, $value, $size, $multiple, $extras, $subtext, $uiLevel) =
-                rearrange([name, options, label, value, size, multiple, extras, subtext, uiLevel], @p);
+                rearrange([qw(name options label value size multiple extras subtext uiLevel)], @p);
         if (_uiLevelChecksOut($uiLevel)) {
                 $output = WebGUI::Form::combo({
-                        name=>$name,
-			options=>$options,
-                        value=>$value,
-                        size=>$size,
-			multiple=>$multiple,
-                        extras=>$extras
+                        "name"=>$name,
+			"options"=>$options,
+                        "value"=>$value,
+                        "size"=>$size,
+			"multiple"=>$multiple,
+                        "extras"=>$extras
                         });
                 $output .= _subtext($subtext);
                 $output = $self->_tableFormRow($label,$output);
         } else {
                 $output = WebGUI::Form::hiddenList({
-			name=>$name,
-                        options=>$options,
-                        value=>$value
+			"name"=>$name,
+                        "options"=>$options,
+                        "value"=>$value
                         });
         }
         $self->{_data} .= $output;
@@ -389,21 +389,21 @@ sub date {
         my ($output);
         my ($self, @p) = @_;
         my ($name, $label, $value, $extras, $subtext, $size, $noDate, $uiLevel) =
-                rearrange([name, label, value, extras, subtext, size, noDate, uiLevel], @p);
+                rearrange([qw(name label value extras subtext size noDate uiLevel)], @p);
         if (_uiLevelChecksOut($uiLevel)) {
                 $output = WebGUI::Form::date({
-                        name=>$name,
-                        value=>$value,
-                        noDate=>$noDate,
-                        size=>$size,
-                        extras=>$extras
+                        "name"=>$name,
+                        "value"=>$value,
+                        "noDate"=>$noDate,
+                        "size"=>$size,
+                        "extras"=>$extras
                         });
                 $output .= _subtext($subtext);
                 $output = $self->_tableFormRow($label,$output);
         } else {
                 $output = WebGUI::Form::hidden({
-                        name=>$name,
-                        value=>epochToSet($value)
+                        "name"=>$name,
+                        "value"=>epochToSet($value)
                         });
         }
         $self->{_data} .= $output;
@@ -462,21 +462,21 @@ sub email {
         my ($output);
         my ($self, @p) = @_;
         my ($name, $label, $value, $maxlength, $extras, $subtext, $size, $uiLevel) =
-                rearrange([name, label, value, maxlength, extras, subtext, size, uiLevel], @p);
+                rearrange([qw(name label value maxlength extras subtext size uiLevel)], @p);
         if (_uiLevelChecksOut($uiLevel)) {
                 $output = WebGUI::Form::email({
-                        name=>$name,
-                        value=>$value,
-                        maxlength=>$maxlength,
-                        size=>$size,
-                        extras=>$extras
+                        "name"=>$name,
+                        "value"=>$value,
+                        "maxlength"=>$maxlength,
+                        "size"=>$size,
+                        "extras"=>$extras
                         });
                 $output .= _subtext($subtext);
                 $output = $self->_tableFormRow($label,$output);
         } else {
                 $output = WebGUI::Form::hidden({
-                        name=>$name,
-                        value=>$value
+                        "name"=>$name,
+                        "value"=>$value
                         });
         }
         $self->{_data} .= $output;
@@ -543,23 +543,23 @@ sub fieldType {
         my ($output);
         my ($self, @p) = @_;
         my ($name, $types, $label, $value, $size, $multiple, $extras, $subtext, $uiLevel) =
-                rearrange([name, types, label, value, size, multiple, extras, subtext, uiLevel], @p);
+                rearrange([qw(name types label value size multiple extras subtext uiLevel)], @p);
         if (_uiLevelChecksOut($uiLevel)) {
                 $output = WebGUI::Form::fieldTypes({
-                        name=>$name,
-                        types=>$types,
-                        value=>$value,
-                        multiple=>$multiple,
-                        size=>$size,
-                        extras=>$extras
+                        "name"=>$name,
+                        "types"=>$types,
+                        "value"=>$value,
+                        "multiple"=>$multiple,
+                        "size"=>$size,
+                        "extras"=>$extras
                         });
                 $output .= _subtext($subtext);
                 $output = $self->_tableFormRow($label,$output);
         } else {
                 $output = WebGUI::Form::hiddenList({
-                        name=>$name,
+                        "name"=>$name,
                         types=>$types,
-                        value=>$value
+                        "value"=>$value
                         });
         }
         $self->{_data} .= $output;
@@ -608,12 +608,12 @@ sub file {
         my ($output);
         my ($self, @p) = @_;
         my ($name, $label, $subtext, $extras, $size, $uiLevel) =
-                rearrange([name, label, subtext, extras, size, uiLevel], @p);
+                rearrange([qw(name label subtext extras size uiLevel)], @p);
         if (_uiLevelChecksOut($uiLevel)) {
                 $output = WebGUI::Form::file({
-                        name=>$name,
-                        size=>$size,
-                        extras=>$extras
+                        "name"=>$name,
+                        "size"=>$size,
+                        "extras"=>$extras
                         });
                 $output .= _subtext($subtext);
                 $output = $self->_tableFormRow($label,$output);
@@ -674,23 +674,23 @@ sub group {
         my ($output);
         my ($self, @p) = @_;
         my ($name, $label, $value, $size, $multiple, $extras, $subtext, $uiLevel) =
-                rearrange([name, label, value, size, multiple, extras, subtext, uiLevel], @p);
+                rearrange([qw(name label value size multiple extras subtext uiLevel)], @p);
         if (_uiLevelChecksOut($uiLevel)) {
                 $output = WebGUI::Form::group({
-                        name=>$name,
-                        size=>$size,
-                        value=>$value,
-                        multiple=>$multiple,
-                        extras=>$extras
+                        "name"=>$name,
+                        "size"=>$size,
+                        "value"=>$value,
+                        "multiple"=>$multiple,
+                        "extras"=>$extras
                         });
                 $output .= _subtext($subtext);
                 $output = $self->_tableFormRow($label,$output);
         } else {
 		my $hashRef = WebGUI::SQL->quickHashRef("select groupId,groupName from groups");
                 $output = WebGUI::Form::hiddenList({
-			name=>$name,
-                        options=>$hashRef,
-                        value=>$value
+			"name"=>$name,
+                        "options"=>$hashRef,
+                        "value"=>$value
                         });
         }
         $self->{_data} .= $output;
@@ -714,10 +714,10 @@ sub group {
 
 sub hidden {
         my ($self, @p) = @_;
-        my ($name, $value) = rearrange([name, value], @p);
+        my ($name, $value) = rearrange([qw(name value)], @p);
         $self->{_data} .= WebGUI::Form::hidden({
-		name=>$name,
-		value=>$value
+		"name"=>$name,
+		"value"=>$value
 		});
 }
 
@@ -781,22 +781,22 @@ sub HTMLArea {
         my ($output);
         my ($self, @p) = @_;
         my ($name, $label, $value, $subtext, $extras, $wrap, $rows, $columns, $uiLevel) =
-                rearrange([name, label, value, subtext, extras, wrap, rows, columns, uiLevel], @p);
+                rearrange([qw(name label value subtext extras wrap rows columns uiLevel)], @p);
         if (_uiLevelChecksOut($uiLevel)) {
                 $output = WebGUI::Form::HTMLArea({
-                        name=>$name,
-                        value=>$value,
-                        wrap=>$wrap,
-                        columns=>$columns,
-                        rows=>$rows,
-                        extras=>$extras
+                        "name"=>$name,
+                        "value"=>$value,
+                        "wrap"=>$wrap,
+                        "columns"=>$columns,
+                        "rows"=>$rows,
+                        "extras"=>$extras
                         });
                 $output .= _subtext($subtext);
                 $output = $self->_tableFormRow($label,$output);
         } else {
                 $output = WebGUI::Form::hidden({
-                        name=>$name,
-                        value=>$value
+                        "name"=>$name,
+                        "value"=>$value
                         });
         }
         $self->{_data} .= $output;
@@ -854,21 +854,21 @@ sub integer {
         my ($output);
         my ($self, @p) = @_;
         my ($name, $label, $value, $maxlength, $extras, $subtext, $size, $uiLevel) =
-                rearrange([name, label, value, maxlength, extras, subtext, size, uiLevel], @p);
+                rearrange([qw(name label value maxlength extras subtext size uiLevel)], @p);
         if (_uiLevelChecksOut($uiLevel)) {
                 $output = WebGUI::Form::integer({
-                        name=>$name,
-                        value=>$value,
-                        maxlength=>$maxlength,
-                        size=>$size,
-                        extras=>$extras
+                        "name"=>$name,
+                        "value"=>$value,
+                        "maxlength"=>$maxlength,
+                        "size"=>$size,
+                        "extras"=>$extras
                         });
                 $output .= _subtext($subtext);
                 $output = $self->_tableFormRow($label,$output);
         } else {
                 $output = WebGUI::Form::hidden({
-                        name=>$name,
-                        value=>$value
+                        "name"=>$name,
+                        "value"=>$value
                         });
         }
         $self->{_data} .= $output;
@@ -925,24 +925,24 @@ sub interval {
         my ($output);
         my ($self, @p) = @_;
         my ($name, $label, $intervalValue, $unitsValue, $extras, $subtext, $uiLevel) =
-                rearrange([name, label, intervalValue, unitsValue, extras, subtext, uiLevel], @p);
+                rearrange([qw(name label intervalValue unitsValue extras subtext uiLevel)], @p);
         if (_uiLevelChecksOut($uiLevel)) {
                 $output = WebGUI::Form::interval({
-                        name=>$name,
-                        intervalValue=>$intervalValue,
-                        unitsValue=>$unitsValue,
-                        extras=>$extras
+                        "name"=>$name,
+                        "intervalValue"=>$intervalValue,
+                        "unitsValue"=>$unitsValue,
+                        "extras"=>$extras
                         });
                 $output .= _subtext($subtext);
                 $output = $self->_tableFormRow($label,$output);
         } else {
                 $output = WebGUI::Form::hidden({
-                        name=>$name.'_interval',
-                        value=>$intervalValue
+                        "name"=>$name.'_interval',
+                        "value"=>$intervalValue
                         });
                 $output .= WebGUI::Form::hidden({
-                        name=>$name.'_units',
-                        value=>$unitsValue
+                        "name"=>$name.'_units',
+                        "value"=>$unitsValue
                         });
         }
         $self->{_data} .= $output;
@@ -976,7 +976,7 @@ sub interval {
  actions, or stylesheet information, you'd add it in here as
  follows:
 
-   'name="myForm" onChange="myForm.submit()"'
+   '"name"="myForm" onChange="myForm.submit()"'
 
 =item enctype 
 
@@ -989,22 +989,22 @@ sub interval {
  a name or stylesheet information, you'd add it in here as
  follows:
 
-   'name="myForm" class="formTable"'
+   '"name"="myForm" class="formTable"'
 
 
 =cut
 
 sub new {
-	my ($noTable, $header, $footer);
+	my ($header, $footer);
         my ($self, @p) = @_;
         my ($noTable, $action, $method, $extras, $enctype, $tableExtras) =
-                rearrange([noTable, action, method, extras, enctype, tableExtras], @p);
+                rearrange([qw(noTable action method extras enctype tableExtras)], @p);
 	$noTable = $noTable || 0;
 	$header = "\n\n".WebGUI::Form::formHeader({
-		action=>$action,
-		extras=>$extras,
-		method=>$method,
-		enctype=>$enctype
+		"action"=>$action,
+		"extras"=>$extras,
+		"method"=>$method,
+		"enctype"=>$enctype
 		});
 	$header .= "\n<table ".$tableExtras.'>' unless ($noTable);
 	$footer = "</table>\n" unless ($noTable);
@@ -1065,21 +1065,21 @@ sub password {
         my ($output);
         my ($self, @p) = @_;
         my ($name, $label, $value, $subtext, $maxlength, $extras, $size, $uiLevel) =
-                rearrange([name, label, value, subtext, maxlength, extras, size, uiLevel], @p);
+                rearrange([qw(name label value subtext maxlength extras size uiLevel)], @p);
         if (_uiLevelChecksOut($uiLevel)) {
                 $output = WebGUI::Form::password({
-                        name=>$name,
-                        value=>$value,
-                        size=>$size,
-                        maxlength=>$maxlength,
-                        extras=>$extras
+                        "name"=>$name,
+                        "value"=>$value,
+                        "size"=>$size,
+                        "maxlength"=>$maxlength,
+                        "extras"=>$extras
                         });
                 $output .= _subtext($subtext);
                 $output = $self->_tableFormRow($label,$output);
         } else {
                 $output = WebGUI::Form::hidden({
-                        name=>$name,
-                        value=>$value
+                        "name"=>$name,
+                        "value"=>$value
                         });
         }
         $self->{_data} .= $output;
@@ -1136,21 +1136,21 @@ sub phone {
         my ($output);
         my ($self, @p) = @_;
         my ($name, $label, $value, $maxlength, $extras, $subtext, $size, $uiLevel) =
-                rearrange([name, label, value, maxlength, extras, subtext, size, uiLevel], @p);
+                rearrange([qw(name label value maxlength extras subtext size uiLevel)], @p);
         if (_uiLevelChecksOut($uiLevel)) {
                 $output = WebGUI::Form::phone({
-                        name=>$name,
-                        value=>$value,
-                        size=>$size,
-                        maxlength=>$maxlength,
-                        extras=>$extras
+                        "name"=>$name,
+                        "value"=>$value,
+                        "size"=>$size,
+                        "maxlength"=>$maxlength,
+                        "extras"=>$extras
                         });
                 $output .= _subtext($subtext);
                 $output = $self->_tableFormRow($label,$output);
         } else {
                 $output = WebGUI::Form::hidden({
-                        name=>$name,
-                        value=>$value
+                        "name"=>$name,
+                        "value"=>$value
                         });
         }
         $self->{_data} .= $output;
@@ -1227,21 +1227,21 @@ sub radio {
         my ($output);
         my ($self, @p) = @_;
         my ($name, $label, $checked, $value, $subtext, $extras, $uiLevel) =
-                rearrange([name, label, checked, value, subtext, extras, uiLevel], @p);
+                rearrange([qw(name label checked value subtext extras uiLevel)], @p);
         if (_uiLevelChecksOut($uiLevel)) {
                 $output = WebGUI::Form::checkbox({
-                        name=>$name,
-                        value=>$value,
-                        checked=>$checked,
-                        extras=>$extras
+                        "name"=>$name,
+                        "value"=>$value,
+                        "checked"=>$checked,
+                        "extras"=>$extras
                         });
                 $output .= _subtext($subtext);
                 $output = $self->_tableFormRow($label,$output);
         } else {
 		if ($checked) {
                 	$output = WebGUI::Form::hidden({
-                        	name=>$name,
-                        	value=>$value
+                        	"name"=>$name,
+                        	"value"=>$value
                         	});
 		}
         }
@@ -1300,22 +1300,22 @@ sub radioList {
         my ($output);
         my ($self, @p) = @_;
         my ($name, $options, $label, $value, $vertical, $extras, $subtext, $uiLevel) =
-                rearrange([name, options, label, value, vertical, extras, subtext, uiLevel], @p);
+                rearrange([qw(name options label value vertical extras subtext uiLevel)], @p);
         if (_uiLevelChecksOut($uiLevel)) {
                 $output = WebGUI::Form::checkList({
-                        name=>$name,
-                        options=>$options,
-                        value=>$value,
-                        vertical=>$vertical,
-                        extras=>$extras
+                        "name"=>$name,
+                        "options"=>$options,
+                        "value"=>$value,
+                        "vertical"=>$vertical,
+                        "extras"=>$extras
                         });
                 $output .= _subtext($subtext);
                 $output = $self->_tableFormRow($label,$output);
         } else {
                 $output = WebGUI::Form::hiddenList({
-			name=>$name,
-                        options=>$options,
-                        value=>[$value]
+			"name"=>$name,
+                        "options"=>$options,
+                        "value"=>[$value]
                         });
         }
         $self->{_data} .= $output;
@@ -1338,7 +1338,7 @@ sub radioList {
 sub raw {
         my ($output);
         my ($self, @p) = @_;
-        my ($value, $uiLevel) = rearrange([value, uiLevel], @p);
+        my ($value, $uiLevel) = rearrange([qw(value uiLevel)], @p);
         if (_uiLevelChecksOut($uiLevel)) {
 		$self->{_data} .= $value;
         }
@@ -1377,7 +1377,7 @@ sub readOnly {
         my ($output);
         my ($self, @p) = @_;
         my ($value, $label, $subtext, $uiLevel) =
-                rearrange([value, label, subtext, uiLevel], @p);
+                rearrange([qw(value label subtext uiLevel)], @p);
         if (_uiLevelChecksOut($uiLevel)) {
                 $output = $value;
                 $output .= _subtext($subtext);
@@ -1456,23 +1456,23 @@ sub selectList {
         my ($output);
         my ($self, @p) = @_;
         my ($name, $options, $label, $value, $size, $multiple, $extras, $subtext, $uiLevel) =
-                rearrange([name, options, label, value, size, multiple, extras, subtext, uiLevel], @p);
+                rearrange([qw(name options label value size multiple extras subtext uiLevel)], @p);
         if (_uiLevelChecksOut($uiLevel)) {
                 $output = WebGUI::Form::selectList({
-                        name=>$name,
-                        options=>$options,
-                        value=>$value,
-                        multiple=>$multiple,
-                        size=>$size,
-                        extras=>$extras
+                        "name"=>$name,
+                        "options"=>$options,
+                        "value"=>$value,
+                        "multiple"=>$multiple,
+                        "size"=>$size,
+                        "extras"=>$extras
                         });
                 $output .= _subtext($subtext);
                 $output = $self->_tableFormRow($label,$output);
         } else {
                 $output = WebGUI::Form::hiddenList({
-			name=>$name,
-                        options=>$options,
-                        value=>$value
+			"name"=>$name,
+                        "options"=>$options,
+                        "value"=>$value
                         });
         }
         $self->{_data} .= $output;
@@ -1510,10 +1510,10 @@ sub selectList {
 sub submit {
         my ($output);
         my ($self, @p) = @_;
-        my ($value, $label, $extras, $subtext) = rearrange([value, label, extras, subtext], @p);
+        my ($value, $label, $extras, $subtext) = rearrange([qw(value label extras subtext)], @p);
         $output = WebGUI::Form::submit({
-                value=>$value,
-                extras=>$extras
+                "value"=>$value,
+                "extras"=>$extras
                 });
         $output .= _subtext($subtext);
         $output = $self->_tableFormRow($label,$output);
@@ -1530,7 +1530,7 @@ sub template {
         my ($output, $subtext);
         my ($self, @p) = @_;
         my ($name, $value, $label, $namespace, $afterEdit, $extras, $uiLevel) = 
-		rearrange([name, value, label, namespace, afterEdit, extras, uiLevel], @p);
+		rearrange([qw(name value label namespace afterEdit extras uiLevel)], @p);
         if (_uiLevelChecksOut($uiLevel)) {
         	if ($afterEdit) {
                 	$subtext = '<a href="'.WebGUI::URL::page("op=editTemplate&tid=".$value."&namespace=".$namespace
@@ -1540,17 +1540,17 @@ sub template {
         	$subtext .= '<a href="'.WebGUI::URL::page("op=listTemplates&namespace=$namespace").'">'
 			.WebGUI::International::get(742).'</a>';
         	$output = WebGUI::Form::template({
-                	name=>$name,
-                	value=>$value,
-                	namespace=>$namespace,
-                	extras=>$extras
+                	"name"=>$name,
+                	"value"=>$value,
+                	"namespace"=>$namespace,
+                	"extras"=>$extras
                 	});
                 $output .= _subtext($subtext);
                 $output = $self->_tableFormRow($label,$output);
         } else {
                 $output = WebGUI::Form::hidden({
-                        name=>$name,
-                        value=>$value
+                        "name"=>$name,
+                        "value"=>$value
                         });
         }
         $self->{_data} .= $output;
@@ -1607,21 +1607,21 @@ sub text {
         my ($output);
         my ($self, @p) = @_;
         my ($name, $label, $value, $maxlength, $extras, $subtext, $size, $uiLevel) =
-                rearrange([name, label, value, maxlength, extras, subtext, size, uiLevel], @p);
+                rearrange([qw(name label value maxlength extras subtext size uiLevel)], @p);
         if (_uiLevelChecksOut($uiLevel)) {
                 $output = WebGUI::Form::text({
-                        name=>$name,
-                        value=>$value,
-                        size=>$size,
-                        maxlength=>$maxlength,
-                        extras=>$extras
+                        "name"=>$name,
+                        "value"=>$value,
+                        "size"=>$size,
+                        "maxlength"=>$maxlength,
+                        "extras"=>$extras
                         });
                 $output .= _subtext($subtext);
         	$output = $self->_tableFormRow($label,$output);
         } else {
                 $output = WebGUI::Form::hidden({
-                        name=>$name,
-                        value=>$value
+                        "name"=>$name,
+                        "value"=>$value
                         });
         }
         $self->{_data} .= $output;
@@ -1684,22 +1684,22 @@ sub textarea {
         my ($output);
         my ($self, @p) = @_;
         my ($name, $label, $value, $subtext, $extras, $wrap, $rows, $columns, $uiLevel) =
-                rearrange([name, label, value, subtext, extras, wrap, rows, columns, uiLevel], @p);
+                rearrange([qw(name label value subtext extras wrap rows columns uiLevel)], @p);
         if (_uiLevelChecksOut($uiLevel)) {
                 $output = WebGUI::Form::textarea({
-                        name=>$name,
-                        value=>$value,
-                        wrap=>$wrap,
-                        columns=>$columns,
-                        rows=>$rows,
-                        extras=>$extras
+                        "name"=>$name,
+                        "value"=>$value,
+                        "wrap"=>$wrap,
+                        "columns"=>$columns,
+                        "rows"=>$rows,
+                        "extras"=>$extras
                         });
                 $output .= _subtext($subtext);
         	$output = $self->_tableFormRow($label,$output);
         } else {
                 $output = WebGUI::Form::hidden({
-                        name=>$name,
-                        value=>$value
+                        "name"=>$name,
+                        "value"=>$value
                         });
         }
         $self->{_data} .= $output;
@@ -1757,21 +1757,21 @@ sub url {
         my ($output);
         my ($self, @p) = @_;
         my ($name, $label, $value, $maxlength, $extras, $subtext, $size, $uiLevel) =
-                rearrange([name, label, value, maxlength, extras, subtext, size, uiLevel], @p);
+                rearrange([qw(name label value maxlength extras subtext size uiLevel)], @p);
         if (_uiLevelChecksOut($uiLevel)) {
                 $output = WebGUI::Form::url({
-                        name=>$name,
-                        value=>$value,
-                        size=>$size,
-                        maxlength=>$maxlength,
-                        extras=>$extras
+                        "name"=>$name,
+                        "value"=>$value,
+                        "size"=>$size,
+                        "maxlength"=>$maxlength,
+                        "extras"=>$extras
                         });
                 $output .= _subtext($subtext);
         	$output = $self->_tableFormRow($label,$output);
         } else {
                 $output = WebGUI::Form::hidden({
-                        name=>$name,
-                        value=>$value
+                        "name"=>$name,
+                        "value"=>$value
                         });
         }
         $self->{_data} .= $output;
@@ -1826,22 +1826,22 @@ sub whatNext {
         my ($output);
         my ($self, @p) = @_;
         my ($options, $value, $name, $label, $subtext, $uiLevel, $extras) =
-                rearrange([options, value, name, label, subtext, uiLevel, extras], @p);
+                rearrange([qw(options value name label subtext uiLevel extras)], @p);
 	$uiLevel |= 1;
 	$label |= WebGUI::International::get(744);
         if (_uiLevelChecksOut($uiLevel)) {
                 $output = WebGUI::Form::whatNext({
-                        name=>$name,
-			options=>$options,
-                        value=>$value,
-                        extras=>$extras
+                        "name"=>$name,
+			"options"=>$options,
+                        "value"=>$value,
+                        "extras"=>$extras
                         });
                 $output .= _subtext($subtext);
                 $output = $self->_tableFormRow($label,$output);
         } else {
                 $output = WebGUI::Form::hidden({
-                        name=>$name,
-                        value=>$value
+                        "name"=>$name,
+                        "value"=>$value
                         });
         }
         $self->{_data} .= $output;
@@ -1890,20 +1890,20 @@ sub yesNo {
         my ($output);
         my ($self, @p) = @_;
         my ($name, $label, $value, $extras, $subtext, $uiLevel) =
-                rearrange([name, label, value, extras, subtext, uiLevel], @p);
+                rearrange([qw(name label value extras subtext uiLevel)], @p);
         if (_uiLevelChecksOut($uiLevel)) {
                 $output = WebGUI::Form::yesNo({
-                        name=>$name,
-                        value=>$value,
-                        extras=>$extras
+                        "name"=>$name,
+                        "value"=>$value,
+                        "extras"=>$extras
                         });
                 $output .= _subtext($subtext);
         	$output = $self->_tableFormRow($label,$output);
         } else {
 		$value = 0 unless ($value);
                 $output = WebGUI::Form::hidden({
-                        name=>$name,
-                        value=>$value
+                        "name"=>$name,
+                        "value"=>$value
                         });
         }
         $self->{_data} .= $output;
@@ -1960,21 +1960,21 @@ sub zipcode {
         my ($output);
         my ($self, @p) = @_;
         my ($name, $label, $value, $maxlength, $extras, $subtext, $size, $uiLevel) =
-                rearrange([name, label, value, maxlength, extras, subtext, size, uiLevel], @p);
+                rearrange([qw(name label value maxlength extras subtext size uiLevel)], @p);
         if (_uiLevelChecksOut($uiLevel)) {
                 $output = WebGUI::Form::zipcode({
-                        name=>$name,
-                        value=>$value,
-                        size=>$size,
-                        maxlength=>$maxlength,
-                        extras=>$extras
+                        "name"=>$name,
+                        "value"=>$value,
+                        "size"=>$size,
+                        "maxlength"=>$maxlength,
+                        "extras"=>$extras
                         });
                 $output .= _subtext($subtext);
         	$output = $self->_tableFormRow($label,$output);
         } else {
                 $output = WebGUI::Form::hidden({
-                        name=>$name,
-                        value=>$value
+                        "name"=>$name,
+                        "value"=>$value
                         });
         }
         $self->{_data} .= $output;
