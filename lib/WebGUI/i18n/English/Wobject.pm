@@ -39,12 +39,13 @@ If this wobject is a shortcut, then this URL will direct you to the original wob
                      message => q|Wobject Template|
                    },
           '632' => {
-                     lastUpdated => 1110135335,
+                     lastUpdated => 1112031533,
                      message => q|<p>You can add wobjects by selecting from the <I>^International("1","WebGUI");</I> pulldown menu. You can edit them by clicking on the "Edit" button that appears directly above an instance of a particular wobject while in Admin mode.</p>
 <p>Wobjects are Assets, so they have all of the properties that Assets do.  Additionally, most Wobjects share some basic properties. Those properties are:</p>
 
 <P><B>^International("174","Wobject");</B><BR>
 Do you wish to display the Wobject's title? On some sites, displaying the title is not necessary. 
+<i>UI Level: 5</i>
 
 <P><b>^International("1073","Wobject");</b><br>
 Select a style template from the list to enclose your Wobject if it is viewed directly.  If the Wobject
@@ -56,8 +57,10 @@ This sets the printable style for this page to be something other than the WebGU
 <P><B>^International("85","Wobject");</B><BR>A content area in which you can place as much content as you wish. For instance, even before a FAQ there is usually a paragraph describing what is contained in the FAQ. 
 
 <P><B>^International("895","Wobject");</B><BR>The amount of time this page should remain cached for registered users.  
+<i>UI Level: 8</i>
 
 <P><B>^International("896","Wobject");</B><BR>The amount of time this page should remain cached for visitors.
+<i>UI Level: 8</i>
 |
                    },
           '626' => {
