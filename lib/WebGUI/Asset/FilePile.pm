@@ -16,11 +16,13 @@ package WebGUI::Asset::FilePile;
 
 use strict;
 use WebGUI::Asset;
+use WebGUI::Asset::File;
+use WebGUI::Asset::File::Image;
 use WebGUI::HTTP;
 use WebGUI::Icon;
 use WebGUI::Session;
 use WebGUI::SQL;
-use WebGUI::Storage;
+use WebGUI::Storage::Image;
 use WebGUI::TabForm;
 use WebGUI::Utility;
 
@@ -140,16 +142,16 @@ sub edit {
 #-------------------------------------------------------------------
 sub editSave {
 	my $class = shift;
-	my $parent = WebGUI::Asset->newByUrl;
 	my $tempStorage = WebGUI::Storage->create;
 	$tempStorage->addFileFromFormPost("file");
 	foreach my $filename (@{$tempStorage->getFiles}) {
-		my $storage = WebGUI::Storage->create;
+		my $storage = WebGUI::Storage::Image->create;
 		$storage->addFileFromFilesystem($tempStorage->getPath($filename));
+		$storage->setPrivileges($class->getParent->get("ownerUserId"),$class->getParent->get("groupIdView"),$class->getParent->get("groupIdEdit"));
 		my %data;
-		my $class = 'WebGUI::Asset::File';
-		$class = "WebGUI::Asset::File::Image" if (isIn($storage->getFileExtension($filename),qw(jpg jpeg gif png)));
-		foreach my $definition (@{$class->definition}) {
+		my $className = 'WebGUI::Asset::File';
+		$className = "WebGUI::Asset::File::Image" if ($storage->isImage($filename));
+		foreach my $definition (@{$className->definition}) {
 			foreach my $property (keys %{$definition->{properties}}) {
 				$data{$property} = WebGUI::FormProcessor::process(
 					$property,
@@ -158,17 +160,17 @@ sub editSave {
 					);
 			}
 		}
-		$data{className} = $class;
+		$data{className} = $className;
 		$data{storageId} = $storage->getId;
 		$data{filename} = $data{title} = $data{menuTitle} = $filename;
-		$data{url} = $parent->getUrl.'/'.$filename;
-		my $newAsset = $parent->addChild(\%data);
+		$data{url} = $class->getParent->getUrl.'/'.$filename;
+		my $newAsset = $class->getParent->addChild(\%data);
 		$newAsset->setSize($storage->getFileSize($filename));
-		$newAsset->generateThumbnail if ($class eq "WebGUI::Asset::File::Image");
+		$newAsset->generateThumbnail if ($className eq "WebGUI::Asset::File::Image");
 	}
 	$tempStorage->delete;
-	return $parent->www_manageAssets if ($session{form}{proceed} eq "manageAssets");
-	return $parent->www_view;
+	return $class->getParent->www_manageAssets if ($session{form}{proceed} eq "manageAssets");
+	return $class->getParent->www_view;
 }
 
 #-------------------------------------------------------------------
@@ -176,9 +178,9 @@ sub getIcon {
 	my $self = shift;
 	my $small = shift;
 	if ($small) {
-		return $session{config}{extrasURL}.'/assets/small/folder.gif';
+		return $session{config}{extrasURL}.'/assets/small/filePile.gif';
 	}
-	return $session{config}{extrasURL}.'/assets/folder.gif';
+	return $session{config}{extrasURL}.'/assets/filePile.gif';
 }
 
 
@@ -200,6 +202,7 @@ sub getUploadControl {
 	WebGUI::Style::setScript($session{config}{extrasURL}.'/FileUploadControl.js',{type=>"text/javascript"});
 	my $uploadControl = '<div id="fileUploadControl"> </div>
 		<script>
+		var fileLimit = 100;
 		var images = new Array();
 		';
 	opendir(DIR,$session{config}{extrasPath}.'/fileIcons');

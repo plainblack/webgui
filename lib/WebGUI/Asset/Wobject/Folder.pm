@@ -155,6 +155,7 @@ sub view {
 			push(@{$vars{"file_loop"}},{
 				id=>$child->getId,
 				title=>$child->get("title"),
+				synopsis=>$child->get("synopsis"),
 				size=>WebGUI::Utility::formatBytes($child->get("assetSize")),
 				"date.epoch"=>$child->get("dateStamp"),
 				"icon.small"=>$child->getIcon(1),

@@ -64,23 +64,23 @@ The file to generate a thumbnail for.
 
 =head3 thumbnailSize
 
-A size, in pixels, of the maximum height or width of a thumbnail. If specified this will change the thumbnail size of the image. If unspecified the thumbnail size set in the properties of this asset will be used.
+The size in pixels of the thumbnail to be generated. If not specified the thumbnail size in the global settings will be used.
 
 =cut
 
 sub generateThumbnail {
 	my $self = shift;
 	my $filename = shift;
-	my $thumbnailSize = shift;
-	if (defined $filename) {
+	my $thumbnailSize = shift || $session{setting}{thumbnailSize};
+	unless (defined $filename) {
 		WebGUI::ErrorHandler::warn("Can't generate a thumbnail when you haven't specified a file.");
 		return 0;
 	}
-	if ($hasImageMagick) {
+	unless ($hasImageMagick) {
 		WebGUI::ErrorHandler::warn("Can't generate a thumbnail if you don't have Image Magick.");
 		return 0;
 	}
-	if ($self->isImage($filename)) {
+	unless ($self->isImage($filename)) {
 		WebGUI::ErrorHandler::warn("Can't generate a thumbnail for something that's not an image.");
 		return 0;
 	}

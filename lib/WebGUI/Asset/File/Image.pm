@@ -160,7 +160,12 @@ sub getName {
 sub getStorageLocation {
 	my $self = shift;
 	unless (exists $self->{_storageLocation}) {
-		$self->{_storageLocation} = WebGUI::Storage::Image->get($self->get("storageId"));
+		if ($self->get("storageId") eq "") {
+			$self->{_storageLocation} = WebGUI::Storage::Image->create;
+			$self->update({storageId=>$self->{_storageLocation}->getId});
+		} else {
+			$self->{_storageLocation} = WebGUI::Storage::Image->get($self->get("storageId"));
+		}
 	}
 	return $self->{_storageLocation};
 }
@@ -168,7 +173,7 @@ sub getStorageLocation {
 #-------------------------------------------------------------------
 sub getThumbnailUrl {
 	my $self = shift;
-	return $self->getStorageLocation->getThumbnailUrl;
+	return $self->getStorageLocation->getThumbnailUrl($self->get("filename"));
 }
 
 

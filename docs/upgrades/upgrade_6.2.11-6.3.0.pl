@@ -137,7 +137,7 @@ WebGUI::SQL->write("alter table EventsCalendar_event add column eventLocation te
 WebGUI::SQL->write("alter table EventsCalendar_event change column startDate eventStartDate bigint(20)");
 WebGUI::SQL->write("alter table EventsCalendar_event change column endDate eventEndDate bigint(20)");
 WebGUI::SQL->write("alter table EventsCalendar_event add column templateId varchar(22)");
-WebGUI::SQL->write("alter table EventsCalendar_event add column assetId varchar(22)");
+WebGUI::SQL->write("alter table EventsCalendar_event add column assetId varchar(22) not null");
 WebGUI::SQL->write("alter table EventsCalendar_event drop primary key");
 
 
@@ -1152,7 +1152,7 @@ sub walkTree {
 						$wobject->{startDate}, $wobject->{endDate}, $wobject->{ownerId}, $wobject->{groupIdEdit},
 						$page->{styleId}, $page->{printableStyleId});
 				}
-				rmtree($session{config}{uploadsPath}.'/'.$wobject->{wobjectId});
+				rmtree($session{config}{uploadsPath}.$session{os}{slash}.$wobject->{wobjectId});
 			} elsif ($wobject->{namespace} eq "SiteMap") {
 				print "\t\t\tConverting SiteMap ".$wobject->{wobjectId}." into Navigation\n" unless ($quiet);
 				my ($starturl) = WebGUI::SQL->quickArray("select urlizedTitle from page 
@@ -1169,9 +1169,9 @@ sub walkTree {
 				WebGUI::SQL->write("update wobject set namespace='Navigation'  where assetId=".quote($wobjectId));
 			} elsif ($wobject->{namespace} eq "FileManager") {
 				print "\t\t\tConverting File Manager ".$wobject->{wobjectId}." into File Folder Layout\n" unless ($quiet);
-				WebGUI::SQL->write("update asset set className='WebGUI::Asset::Layout' where assetId=".quote($wobjectId));
-				WebGUI::SQL->write("insert into Layout (assetId,templateId) values (".quote($wobjectId).", '15')");
-				WebGUI::SQL->write("update wobject set namespace='Layout' where wobjectId=".quote($wobject->{wobjectId}));
+				WebGUI::SQL->write("update asset set className='WebGUI::Asset::Folder' where assetId=".quote($wobjectId));
+				WebGUI::SQL->write("insert into Folder (assetId,templateId) values (".quote($wobjectId).", '15')");
+				WebGUI::SQL->write("update wobject set namespace='Folder' where wobjectId=".quote($wobject->{wobjectId}));
 				print "\t\t\tMigrating attachments for File Manager ".$wobject->{wobjectId}."\n" unless ($quiet);
 				my $sth = WebGUI::SQL->read("select * from FileManager_file where wobjectId=".quote($wobjectId)." order by sequenceNumber");
 				my $rank = 1;
@@ -1206,7 +1206,7 @@ sub walkTree {
 					}
 				}
 				$sth->finish;
-				rmtree($session{config}{uploadsPath}.'/'.$wobject->{wobjectId});
+				rmtree($session{config}{uploadsPath}.$session{os}{slash}.$wobject->{wobjectId});
 			} elsif ($wobject->{namespace} eq "Product") {
 				print "\t\t\tMigrating information for Product ".$wobject->{wobjectId}."\n" unless ($quiet);
 			    my ($newProductStoreId);
@@ -1269,8 +1269,6 @@ sub walkTree {
 					0, 0, ".quote($master->{archiveAfter}||31536000).", ".quote($master->{postsPerPage}||10).", 
 					".quote($namespace->{submissionsPerPage}).", ".quote($sg->groupId).",
 					".quote($wobject->{allowDiscussion}).")");
-				#count threads, views, replies
-				#find last post
 				WebGUI::SQL->write("update wobject set namespace='Collaboration' where wobjectId=".quote($wobject->{wobjectId}));
 				print "\t\t\tMigrating submissions for USS ".$wobject->{wobjectId}."\n" unless ($quiet);
 				my $ussId = $namespace->{USS_id};
@@ -1379,6 +1377,13 @@ sub walkTree {
 							rating=>$post->{rating}
 							},undef,$postId);
 						$postRank++;
+						if ($submission->{image}) {
+							my $storageId = copyFile($submission->{image},$wobject->{wobjectId}.$session{os}{slash}.$submission->{USS_submissionId});
+							copyFile('thumb-'.$submission->{image},$wobject->{wobjectId}.$session{os}{slash}.$submission->{USS_submissionId},$storageId);
+						}
+						if ($submission->{attachment}) {
+							my $storageId = copyFile($submission->{attachment},$wobject->{wobjectId}.$session{os}{slash}.$submission->{USS_submissionId});
+						}
 					}
 					$posts->finish;
 					WebGUI::SQL->setRow("Thread","assetId",{
@@ -1394,6 +1399,7 @@ sub walkTree {
 						$oldestForumPost{id} = $oldestThreadPost{id};
 					}
 				}
+				rmtree($session{config}{uploadsPath}.$session{os}{slash}.$wobject->{wobjectId});
 				WebGUI::SQL->setRow("Collaboration","assetId",{
 					assetId=>$wobjectId,
 					lastPostId=>$oldestForumPost{id},
@@ -1402,8 +1408,6 @@ sub walkTree {
 					views=>$collabViewCounter,
 					threads=>$collabThreadCounter
 					});
-				# migrate submission attachments
-				# migrate submission images
 			} elsif ($wobject->{namespace} eq "WobjectProxy") {
 				WebGUI::SQL->write("update WobjectProxy set description=".quote($wobject->{description})." where
 					assetId=".quote($wobjectId));

@@ -84,17 +84,13 @@ sub definition {
         return $class->SUPER::definition($definition);
 }
 
-sub getBox {
-	my $self = shift;
-	my %var;
-       	$var{"attachment.icon"} = $self->getFileIcon;
-       	$var{"attachment.url"} = $self->getFileUrl;
-       	$var{"attachment.name"} = $self->get("filename");
-       	$var{"attachment.size"} = $self->getStorageLocation->getSize;
-       	$var{"attachment.type"} = $self->getStorageLocation->getFileExtension;
-       	return $self->processTemplate(\%var,"PBtmpl0000000000000003");
-}
 
+#-------------------------------------------------------------------
+sub DESTROY {
+	my $self = shift;
+	$self->{_storageLocation}->DESTROY if (exists $self->{_storageLocation});
+	$self->SUPER::DESTROY;
+}
 
 #-------------------------------------------------------------------
 
@@ -105,6 +101,18 @@ sub duplicate {
 	$newAsset->update({storageId=>$newStorage->getId,olderVersions=>''});
 }
 
+
+#-------------------------------------------------------------------
+sub getBox {
+	my $self = shift;
+	my %var;
+       	$var{"attachment.icon"} = $self->getFileIcon;
+       	$var{"attachment.url"} = $self->getFileUrl;
+       	$var{"attachment.name"} = $self->get("filename");
+       	$var{"attachment.size"} = $self->getStorageLocation->getSize;
+       	$var{"attachment.type"} = $self->getStorageLocation->getFileExtension;
+       	return $self->processTemplate(\%var,"PBtmpl0000000000000003");
+}
 
 #-------------------------------------------------------------------
 
@@ -170,11 +178,17 @@ sub getName {
 	return "File";
 } 
 
+
 #-------------------------------------------------------------------
 sub getStorageLocation {
 	my $self = shift;
 	unless (exists $self->{_storageLocation}) {
-		$self->{_storageLocation} = WebGUI::Storage->get($self->get("storageId"));
+		if ($self->get("storageId") eq "") {
+			$self->{_storageLocation} = WebGUI::Storage->create;
+			$self->update({storageId=>$self->{_storageLocation}->getId});
+		} else {
+			$self->{_storageLocation} = WebGUI::Storage->get($self->get("storageId"));
+		}
 	}
 	return $self->{_storageLocation};
 }
@@ -184,7 +198,7 @@ sub getStorageLocation {
 sub processPropertiesFromFormPost {
 	my $self = shift;
 	$self->SUPER::processPropertiesFromFormPost;
-	my $storage = $self->{_storageLocation} = WebGUI::Storage->create;
+	my $storage = $self->getStorageLocation->create;
 	my $filename = $storage->addFileFromFormPost("file");
 	if (defined $filename) {
 		my $oldVersions;
@@ -203,6 +217,7 @@ sub processPropertiesFromFormPost {
 		$self->update(\%data);
 		$self->setSize($storage->getFileSize($filename));
 		$storage->setPrivileges($self->get("ownerUserId"), $self->get("groupIdView"), $self->get("groupIdEdit"));
+		$self->{_storageLocation} = $storage;
 	} else {
 		$storage->delete;
 		$self->getStorageLocation->setPrivileges($self->get("ownerUserId"), $self->get("groupIdView"), $self->get("groupIdEdit"));
@@ -221,14 +236,14 @@ sub purge {
 	my @old = split("\n",$self->get("olderVersions"));
 	foreach my $oldone (@old) {
 		my ($storageId, $filename) = split("|",$oldone);
-		my $storage = WebGUI::Storage->get($storageId);
-		$storage->delete;
+		$self->getStorageLocation->delete;
 	}
 	$self->getStorageLocation->delete;
 	return $self->SUPER::purge;
 }
 
 
+#-------------------------------------------------------------------
 sub view {
 	my $self = shift;
 	my %var = %{$self->get};
