@@ -8,6 +8,11 @@ our $I18N = {
 		context => 'Default name of all snippets'
 	},
 
+	'process as template' => {
+		message => q|Process as template?|,
+        	lastUpdated => 1104630516,
+	},
+
 	'snippet add/edit title' => {
 		message => q|Snippet, Add/Edit|,
         	lastUpdated => 1104630516,
@@ -18,8 +23,13 @@ our $I18N = {
 
 <P>Since Snippets are Assets, so they have all the properties that Assets do.</P>
 
-<P><b>Snippet</b><br/>
+<p><b>Snippet</b><br />
 This is the snippet.  Either type it in or copy and paste it into the form field.
+</p>
+
+<p><b>Process as template?</b><br />
+This will run the snippet through the template engine. It will enable you to use session variables in the snippet, but it is a little slower.
+</p>
 |,
                 context => 'Describing snippets and its sole field.',
         	lastUpdated => 1106683569,

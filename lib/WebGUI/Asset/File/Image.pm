@@ -215,7 +215,7 @@ sub view {
 	$var{fileUrl} = $self->getFileUrl;
 	$var{fileIcon} = $self->getFileIconUrl;
 	$var{thumbnail} = $self->getThumbnailUrl;
-	return $self->processTemplate(\%var,"PBtmpl0000000000000088");
+	return $self->processTemplate(\%var,$self->get("templateId"));
 }
 
 
@@ -225,7 +225,13 @@ sub www_edit {
         my $self = shift;
         return WebGUI::Privilege::insufficient() unless $self->canEdit;
 	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=resize'),WebGUI::International::get("resize image","Image")) if ($self->get("filename"));
-        return $self->getAdminConsole->render($self->getEditForm->print,WebGUI::International::get("edit image","Image"));
+	my $tabform = $self->getEditForm;
+	$tabform->getTab("display")->template(
+		-value=>$self->get("templateId"),
+		-namespace=>"ImageAsset",
+		-defaultValue=>"PBtmpl0000000000000088"
+		);
+        return $self->getAdminConsole->render($tabform->print,WebGUI::International::get("edit image","Image"));
 }
 
 #-------------------------------------------------------------------

@@ -77,6 +77,10 @@ sub definition {
 					noFormPost=>1,
 					fieldType=>'hidden',
 					defaultValue=>undef
+					},
+				templateId=>{
+					fieldType=>'template',
+					defaultValue=>'PBtmpl0000000000000024'
 					}
                         }
                 });
@@ -242,7 +246,7 @@ sub view {
 	$var{controls} = $self->getToolbar;
 	$var{fileUrl} = $self->getFileUrl;
 	$var{fileIcon} = $self->getFileIconUrl;
-	return $self->processTemplate(\%var,"PBtmpl0000000000000024");
+	return $self->processTemplate(\%var,$self->getValue("templateId"));
 }
 
 
@@ -250,7 +254,12 @@ sub view {
 sub www_edit {
         my $self = shift;
         return WebGUI::Privilege::insufficient() unless $self->canEdit;
-        return $self->getAdminConsole->render($self->getEditForm->print,"Edit File");
+	my $tabform = $self->getEditForm;
+	$tabform->getTab("display")->template(
+		-value=>$self->getValue("templateId"),
+		-namespace=>"FileAsset"
+		);
+        return $self->getAdminConsole->render($tabform->print,"Edit File");
 }
 
 
@@ -258,7 +267,7 @@ sub www_view {
 	my $self = shift;
 	return WebGUI::Privilege::noAccess() unless $self->canView;
 	if ($session{var}{adminOn}) {
-		return $self->www_edit;
+		return $self->getContainer->www_view;
 	}
 	WebGUI::HTTP::setRedirect($self->getFileUrl);
 	return "";

@@ -63,10 +63,14 @@ sub definition {
                 tableName=>'snippet',
                 className=>'WebGUI::Asset::Snippet',
                 properties=>{
-                                snippet=>{
-                                        fieldType=>'codearea',
-                                        defaultValue=>undef
-                                        }
+ 			snippet=>{
+                        	fieldType=>'codearea',
+                                defaultValue=>undef
+                                },
+ 			processAsTemplate=>{
+                        	fieldType=>'yesNo',
+                                defaultValue=>0
+                                }
                         }
                 });
         return $class->SUPER::definition($definition);
@@ -88,8 +92,12 @@ sub getEditForm {
         $tabform->getTab("properties")->codearea(
                 -name=>"snippet",
                 -label=>WebGUI::International::get('snippet', 'Snippet'),
-                -label=>"Snippet",
                 -value=>$self->getValue("snippet")
+                );
+        $tabform->getTab("properties")->yesNo(
+                -name=>"processAsTemplate",
+                -label=>WebGUI::International::get('process as template', 'Snippet'),
+                -value=>$self->getValue("processAsTemplate")
                 );
 	return $tabform;
 }
@@ -147,9 +155,10 @@ sub getName {
 #-------------------------------------------------------------------
 sub view {
 	my $self = shift;
+	my $calledAsWebMethod = shift;
 	my $output = WebGUI::Macro::process($self->get("snippet"));
-# if it's a javascript file this would break it
-#	$output = '<p>'.$self->getToolbar.'</p>'.$output if ($session{var}{adminOn});
+	$output = '<p>'.$self->getToolbar.'</p>'.$output if ($session{var}{adminOn} && !$calledAsWebMethod);
+	return $output unless ($self->getValue("processAsTemplate")); 
 	return WebGUI::Asset::Template->processRaw($output);
 }
 
@@ -170,7 +179,7 @@ A web accessible version of the view method.
 
 sub www_view {
 	my $self = shift;
-	return $self->view;
+	return $self->view(1);
 }
 
 

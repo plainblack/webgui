@@ -34,6 +34,14 @@
  - fix [ 1166071 ] Create New User allows blank username [mwilson]
  - fix [ 1166133 ] DataForm www_edit and www_editField's "proceed" [mwilson] 
  - fix [ 1164211 ] DataForm export tab deliniated always contains.. [mwilson]
+ - fix [ 1165616 ] calling a non-existent func= on a good url crashes Apache
+ - fix [ 1154384 ] 6.2.11 Admins with default UI level
+ - fix [ 1151879 ] Search button changes to "Please wait"
+ - fix [ 1165645 ] Search not working
+ - fix [ 1157233 ] search crashes
+ - fix [ 1146359 ] certain templates still hardcoded
+ - fix [ 1056470 ] Improper macro hangs calendar
+ - fix [ 1120959 ] 5.5.x forms - export tab delimited
 
 
 6.5.2

@@ -883,27 +883,52 @@ sub www_editTabSave {
 
 #-------------------------------------------------------------------
 sub www_exportTab {
-	my $self = shift;
-	return WebGUI::Privilege::insufficient() unless $self->canEdit;
-	WebGUI::HTTP::setFilename($self->get("url").".tab","text/plain");
-	my %fields = WebGUI::SQL->buildHash("select DataForm_fieldId,name from DataForm_field where assetId=".quote($self->getId)." order by sequenceNumber");
-	my $select = "select a.DataForm_entryId as entryId, a.ipAddress, a.username, a.userId, a.submissionDate";
-	my $from = " from DataForm_entry a";
-	my $join;
-	my $where = " where a.assetId=".quote($self->getId);
-	my $orderBy = " order by a.DataForm_entryId";
-	my $columnCounter = "b";
-	my $mailData = ($self->get("mailData") == 0);
-	foreach my $fieldId (keys %fields) {
-		next if (isIn($fields{$fieldId}, qw(to from cc bcc subject)) && $mailData);
-		my $extension = "";
-		$extension = "mail_" if (isIn($fields{$fieldId}, qw(to from cc bcc subject)));
-		$select .= ", ".$columnCounter.".value as ".$extension.$fields{$fieldId};
-		$join .= " left join DataForm_entryData ".$columnCounter." on a.DataForm_entryId=".$columnCounter.".DataForm_entryId and "
-			.$columnCounter.".DataForm_fieldId=".quote($fieldId);
-		$columnCounter++;
-	}
-	return WebGUI::SQL->quickTab($select.$from.$join.$where.$orderBy);
+        my $self = shift;
+        return WebGUI::Privilege::insufficient() unless $self->canEdit;
+        WebGUI::HTTP::setFilename($self->get("url").".tab","text/plain");
+        my %fields = WebGUI::SQL->buildHash("select DataForm_fieldId,name from DataForm_field where
+                assetId=".quote($self->getId)." order by sequenceNumber");
+        my @data;
+        my $entries = WebGUI::SQL->read("select * from DataForm_entry where assetId=".quote($self->getId));
+        my $i;
+        my $noMailData = ($self->get("mailData") == 0);
+        while (my $entryData = $entries->hashRef) {
+                $data[$i] = {
+                        entryId => $entryData->{DataForm_entryId},
+                        ipAddress => $entryData->{ipAddress},
+                        username => $entryData->{username},
+                        userId => $entryData->{userId},
+                        submissionDate => WebGUI::DateTime::epochToHuman($entryData->{submissionDate}),
+                        };
+                my $values = WebGUI::SQL->read("select value,DataForm_fieldId from DataForm_entryData where
+                        DataForm_entryId=".quote($entryData->{DataForm_entryId}));
+                while (my ($value, $fieldId) = $values->array) {
+                        next if (isIn($fields{$fieldId}, qw(to from cc bcc subject)) && $noMailData);
+                        $data[$i]{$fields{$fieldId}} = $value;
+                }
+                $values->finish;
+                $i++;
+        }
+        $entries->finish;
+        my @row;
+        foreach my $fieldId (keys %fields) {
+                next if (isIn($fields{$fieldId}, qw(to from cc bcc subject)) && $noMailData);
+                push(@row, $fields{$fieldId});
+        }
+        my $tab = join("\t",@row)."\n";
+        foreach my $record (@data) {
+                @row = ();
+                foreach my $fieldId (keys %fields) {
+                        next if (isIn($fields{$fieldId}, qw(to from cc bcc subject)) && $noMailData);
+                        my $value = $record->{$fields{$fieldId}};
+                        $value =~ s/\t/\\t/g;
+                        $value =~ s/\r//g;
+                        $value =~ s/\n/;/g;
+                        push(@row, $value);
+                }
+                $tab .= join("\t", @row)."\n";
+        }
+        return $tab;
 }
 
 #-------------------------------------------------------------------

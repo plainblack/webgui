@@ -66,6 +66,8 @@ WebGUI::SQL->write("update asset set groupIdView='4' where className='WebGUI::As
 
 WebGUI::SQL->write("update wobject set styleTemplateId='PBtmpl0000000000000060' where assetId='$templateFolder'");
 
+#--------------------------------------------
+print "\tSetting up a new failsafe style\n" unless ($quiet);
 my $newFailSafe = '
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
         "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
@@ -131,6 +133,20 @@ my $newFailSafe = '
 ';
 WebGUI::SQL->write("update template set template=".quote($newFailSafe)." where assetId='PBtmpl0000000000000060'");
 
+
+#--------------------------------------------
+print "\tMaking templates editable for files and images.\n" unless ($quiet);
+my $sth = WebGUI::SQL->read("select assetId,className from asset where className like 'WebGUI::Asset::File%'");
+while (my ($id, $class) = $sth->array) {
+	my $template;
+	if ($class =~ /Image/) {
+		$template = 'PBtmpl0000000000000088';
+	} else {
+		$template = 'PBtmpl0000000000000024';
+	}
+	WebGUI::SQL->write("update FileAsset set templateId=".quote($template)." where assetId=".quote($id));
+}
+$sth->finish;
 
 
 WebGUI::Session::close();

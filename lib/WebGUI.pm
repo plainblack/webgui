@@ -97,7 +97,8 @@ sub page {
 		$method = "www_".$method;
 		$output = eval{$asset->$method()};
 		if ($@) {
-			WebGUI::ErrorHandler::fatalError("Couldn't call method ".$method." on asset for ".$session{env}{PATH_INFO}." Root cause: ".$@);
+			WebGUI::ErrorHandler::warn("Couldn't call method ".$method." on asset for ".$session{env}{PATH_INFO}." Root cause: ".$@);
+			$output = $asset->www_view;
 		} else {
 			if ($output eq "" && $method ne "view") {
 				$output = $asset->www_view;

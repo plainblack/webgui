@@ -422,10 +422,10 @@ sub _buildFilter {
 	my $self = shift;
 	my %filter = ();
 	
-	# pages
-	if($self->get('searchRoot') !~ /any/i) {
-		$filter{pageId} = $self->_buildPageList;
-	}
+#	# pages
+#	if($self->get('searchRoot') !~ /any/i) {
+#		$filter{assetId} = $self->_buildPageList;
+#	}
 
 	# content-types
 	if($session{form}{contentTypes} && ! isIn('any', $session{cgi}->param('contentTypes'))) {
@@ -528,10 +528,10 @@ sub _getContentTypes {
 sub _getSearchablePages {
 	my $searchRoot = shift;
 	my %pages;
-	my $sth = WebGUI::SQL->read("select pageId from page where parentId = ".quote($searchRoot));
+	my $sth = WebGUI::SQL->read("select assetId from asset where parentId = ".quote($searchRoot));
 	while (my %data = $sth->hash) {
-		$pages{$data{pageId}} = 1;
-		%pages = (%pages, _getSearchablePages($data{pageId}) );
+		$pages{$data{assetId}} = 1;
+		%pages = (%pages, _getSearchablePages($data{assetId}) );
 	}
 	return %pages;
 }

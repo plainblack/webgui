@@ -72,7 +72,6 @@ macros=# => Hash_userId, \
         GroupDelete => GroupDelete, \
         GroupText => GroupText, \
         H => H_homeLink, \
-        I => I_imageWithTags, \
         International => International, \
         JavaScript => JavaScript, \
         L => L_loginBox, \
@@ -94,7 +93,6 @@ macros=# => Hash_userId, \
         a => a_account, \
         c => c_companyName, \
         e => e_companyEmail, \
-        i => i_imageNoTags, \
         r => r_printable, \
         u => u_companyUrl
  
