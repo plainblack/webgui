@@ -392,13 +392,13 @@ sub showMessage {
 			$message{views},'',$message{status});
                 $html .= '</td>';
                 $html .= '<td rowspan=2 valign="top" class="tableMenu" nowrap>';
-        	@data = WebGUI::SQL->quickArray("select max(messageId) from discussion 
-			where wobjectId=$message{wobjectId} and pid=0 and messageId<$message{rid}".$sqlAdd);
 		if (canPostReply($_[1],\%message)) {
 			$html .= '<a href="'.WebGUI::URL::page('func=post&replyTo='.$session{form}{mid}.'&wid='
 				.$session{form}{wid}.'&sid='.$session{form}{sid})
                         	.'">'.WebGUI::International::get(577).'</a><br>';
 		} 
+        	@data = WebGUI::SQL->quickArray("select max(messageId) from discussion 
+			where wobjectId=$message{wobjectId} and pid=0 and messageId<$message{rid}".$sqlAdd);
         	if ($data[0] ne "") {
                 	$html .= '<a href="'.WebGUI::URL::page('func=showMessage&mid='.$data[0].'&sid='.$session{form}{sid}.'&wid='.
                         	$session{form}{wid}).'">&laquo; '.WebGUI::International::get(513).'</a><br>';
