@@ -27,11 +27,14 @@ our $I18N = {
 
     'asset fields body' => {
         message => q|
+<P><B>Asset ID</B><BR>This is the unique identifier WebGUI uses to keep track of this Asset instance. Normal users should never need to be concerned with the Asset ID, but some advanced users may need to know it for things like SQL Reports. The Asset ID is not editable.</P>
+
 <p>
 <b>Title</b><br>
 The title of the asset.  This should be descriptive, but not very long.  If left
 blank, this will be set to "Untitled".
 </p>
+<P><I>Note:</I> You should always specify a title, even if the Asset template will not use it. In various places on the site, like the Page Tree, Clipboard and Trash, the <B>Title</B> is used to distinguish this Asset from others.</p>
 
 <p>
 <b>Menu Title</b><br>
@@ -95,8 +98,8 @@ Choose the group that can edit this page. The group assigned editing rights can 
 
         |,
         context => q|Describing the form to add or edit an Asset.|,
-        lastUpdated => 1104621979,
-    },
+        lastUpdated => 1104622720,
+  },
 
     'asset fields title' => {
         message => q|Common Asset Fields|,
