@@ -1103,7 +1103,7 @@ The account id for the <a href="http://www.aim.com/">AOL Instant Messenger</a> s
 <p>
 
 <b>MSN Messenger Id</b><br>
-The account id for the <a href="http://messenger.msn.com/">Microsoft Network Instant Messenger</b> system.
+The account id for the <a href="http://messenger.msn.com/">Microsoft Network Instant Messenger</a> system.
 <p>
 
 <b>Yahoo! Messenger Id</b><br>
@@ -1165,7 +1165,7 @@ Should discussions be laid out flat or threaded? Flat puts all replies on one pa
 How should this user be notified when they get a new WebGUI message?
 
 |,
-		lastUpdated => 1101775266
+		lastUpdated => 1102231342,
 	},
 
 	'351' => {
