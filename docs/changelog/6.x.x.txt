@@ -67,4 +67,4 @@ webgui.
  - Added drag and drop content arranging.
  - Added new toolbar icons. 
  - Made the add content menu much more powerful.
-
+ - Added new navigation system. (Len Kranendonk).
