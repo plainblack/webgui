@@ -200,6 +200,7 @@ sub www_manageSettings {
         $output .= '<li><a href="'.WebGUI::URL::page('op=editMessagingSettings').'">'.WebGUI::International::get(133).'</a>';
         $output .= '<li><a href="'.WebGUI::URL::page('op=editMiscSettings').'">'.WebGUI::International::get(140).'</a>';
         $output .= '<li><a href="'.WebGUI::URL::page('op=editProfileSettings').'">'.WebGUI::International::get(308).'</a>';
+        $output .= '<li><a href="'.WebGUI::URL::page('op=manageMetaData').'">'.WebGUI::International::get('Manage Metadata','MetaData').'</a>';
         $output .= '<li><a href="'.WebGUI::URL::page('op=listReplacements').'">'.WebGUI::International::get(1048).'</a>';
         $output .= '<li><a href="'.WebGUI::URL::page('op=editUserSettings').'">'.WebGUI::International::get(117).'</a>';
         $output .= '</ul>';
