@@ -73,21 +73,24 @@ sub status {
 #-------------------------------------------------------------------
 sub www_edit {
 	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
-        my ($output, $f, $messagesPerPage);
-	$messagesPerPage = $_[0]->get("messagesPerPage") || 50;
-        $output = helpIcon(1,$_[0]->get("namespace"));
+	my $messagesPerPage = $_[0]->get("messagesPerPage") || 50;
+        my $output = helpIcon(1,$_[0]->get("namespace"));
 	$output .= '<h1>'.WebGUI::International::get(6,$_[0]->get("namespace")).'</h1>';
-	$f = WebGUI::HTMLForm->new;
-        $f->integer("messagesPerPage",WebGUI::International::get(4,$_[0]->get("namespace")),$messagesPerPage);
-	$f->template(
+	my $properties = WebGUI::HTMLForm->new;
+	my $layout = WebGUI::HTMLForm->new;
+        $layout->integer("messagesPerPage",WebGUI::International::get(4,$_[0]->get("namespace")),$messagesPerPage);
+	$layout->template(
                 -name=>"templateId",
                 -value=>$_[0]->get("templateId"),
                 -namespace=>$_[0]->get("namespace"),
                 -label=>WebGUI::International::get(72,$_[0]->get("namespace")),
                 -afterEdit=>'func=edit&wid='.$_[0]->get("wobjectId")
                 );
-	$f->raw($_[0]->SUPER::discussionProperties);
-	$output .= $_[0]->SUPER::www_edit($f->printRowsOnly);
+	$properties->raw($_[0]->SUPER::discussionProperties);
+	$output .= $_[0]->SUPER::www_edit(
+		-layout=>$layout->printRowsOnly,
+		-properties=>$properties->printRowsOnly
+		);
         return $output;
 }
 

@@ -206,7 +206,7 @@ sub www_deleteAllResponsesConfirm {
 #-------------------------------------------------------------------
 sub www_edit {
 	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
-        my ($f, $output, $surveyId, $questionOrder, $mode, $groupToViewReports, $sth, %data, $groupToTakeSurvey);
+        my ($output, $surveyId, $questionOrder, $mode, $groupToViewReports, $sth, %data, $groupToTakeSurvey);
 	tie %data, 'Tie::CPHash';
         $mode = $_[0]->get("mode") || "survey";
         $questionOrder = $_[0]->get("questionOrder") || "sequential";
@@ -215,9 +215,11 @@ sub www_edit {
 	$surveyId = $_[0]->get("Survey_id") || getNextId("Survey_id");
         $output = helpIcon(1,$_[0]->get("namespace"));
 	$output .= '<h1>'.WebGUI::International::get(2,$_[0]->get("namespace")).'</h1>';
-	$f = WebGUI::HTMLForm->new;
-	$f->hidden("Survey_id",$surveyId);
-	$f->select(
+	my $properties = WebGUI::HTMLForm->new;
+	my $layout = WebGUI::HTMLForm->new;
+	my $privileges = WebGUI::HTMLForm->new;
+	$properties->hidden("Survey_id",$surveyId);
+	$layout->select(
 		-name=>"questionOrder",
 		-options=>{
 			sequential => WebGUI::International::get(5,$_[0]->get("namespace")),
@@ -227,7 +229,7 @@ sub www_edit {
 		-label=>WebGUI::International::get(8,$_[0]->get("namespace")),
 		-value=>[$questionOrder]
 		);
-        $f->select(
+        $properties->select(
                 -name=>"mode",
                 -options=>{
 			survey => WebGUI::International::get(9,$_[0]->get("namespace")),
@@ -236,18 +238,18 @@ sub www_edit {
                 -label=>WebGUI::International::get(11,$_[0]->get("namespace")),
                 -value=>[$mode]
                 );
-	$f->group(
+	$privileges->group(
 		-name=>"groupToTakeSurvey",
 		-value=>[$groupToTakeSurvey],
 		-label=>WebGUI::International::get(12,$_[0]->get("namespace"))
 		);
-        $f->group(
+        $privileges->group(
                 -name=>"groupToViewReports",
                 -label=>WebGUI::International::get(13,$_[0]->get("namespace")),
                 -value=>[$groupToViewReports]
                 );
 	if ($_[0]->get("wobjectId") eq "new") {
-		$f->whatNext(
+		$properties->whatNext(
 			-options=>{
 				addQuestion=>WebGUI::International::get(28,$_[0]->get("namespace")),
 				backToPage=>WebGUI::International::get(745)
@@ -255,7 +257,11 @@ sub www_edit {
 			-value=>"addQuestion"
 			);
 	}
-	$output .= $_[0]->SUPER::www_edit($f->printRowsOnly);
+	$output .= $_[0]->SUPER::www_edit(
+		-properties=>$properties->printRowsOnly,
+		-layout=>$layout->printRowsOnly,
+		-privileges=>$privileges->printRowsOnly
+		);
 	if ($_[0]->get("wobjectId") ne "new") {
 		$output .= '<a href="'.WebGUI::URL::page('wid='.$_[0]->get("wobjectId").'&func=editQuestion&qid=new')
                         .'">'.WebGUI::International::get(30,$_[0]->get("namespace")).'</a><p>';

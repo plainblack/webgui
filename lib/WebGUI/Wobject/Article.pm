@@ -42,8 +42,7 @@ sub duplicate {
 		linkTitle=>$_[0]->get("linkTitle"),
 		linkURL=>$_[0]->get("linkURL"),
 		attachment=>$_[0]->get("attachment"),
-		convertCarriageReturns=>$_[0]->get("convertCarriageReturns"),
-		allowDiscussion=>$_[0]->get("allowDiscussion")
+		convertCarriageReturns=>$_[0]->get("convertCarriageReturns")
 		});
 }
 
@@ -58,7 +57,7 @@ sub new {
         my $property = shift;
         my $self = WebGUI::Wobject->new(
 		$property,
-		[qw(image templateId linkTitle linkURL attachment convertCarriageReturns allowDiscussion)],
+		[qw(image templateId linkTitle linkURL attachment convertCarriageReturns)],
 		1
 		);
         bless $self, $class;
@@ -67,7 +66,7 @@ sub new {
 #-------------------------------------------------------------------
 sub www_edit {
 	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
-        my ($output, $editTimeout, $groupToModerate, $f, $template);
+        my ($output, $editTimeout, $groupToModerate, $template);
 	if ($_[0]->get("wobjectId") eq "new") {
                 $editTimeout = 1;
         } else {
@@ -77,55 +76,52 @@ sub www_edit {
 	$groupToModerate = $_[0]->get("groupToModerate") || 4;
         $output = helpIcon(1,$_[0]->get("namespace"));
 	$output .= '<h1>'.WebGUI::International::get(12,$_[0]->get("namespace")).'</h1>';
-	$f = WebGUI::HTMLForm->new;
-	$f->template(
+	my $properties = WebGUI::HTMLForm->new;
+	my $layout = WebGUI::HTMLForm->new;
+	$layout->template(
                 -name=>"templateId",
                 -value=>$template,
                 -namespace=>$_[0]->get("namespace"),
                 -label=>WebGUI::International::get(356),
                 -afterEdit=>'func=edit&wid='.$_[0]->get("wobjectId")
                 );
-	$f->raw(
+	$properties->raw(
 		-value=>$_[0]->fileProperty("image",6),
 		-uiLevel=>3
 		);
-	$f->raw(
+	$properties->raw(
 		-value=>$_[0]->fileProperty("attachment",9),
 		-uiLevel=>1
 		);
-	$f->text(
+	$properties->text(
 		-name=>"linkTitle",
 		-label=>WebGUI::International::get(7,$_[0]->get("namespace")),
 		-value=>$_[0]->get("linkTitle"),
 		-uiLevel=>3
 		);
-        $f->url(
+        $properties->url(
 		-name=>"linkURL",
 		-label=>WebGUI::International::get(8,$_[0]->get("namespace")),
 		-value=>$_[0]->get("linkURL"),
 		-uiLevel=>3
 		);
-	$f->yesNo(
+	$layout->yesNo(
 		-name=>"convertCarriageReturns",
 		-label=>WebGUI::International::get(10,$_[0]->get("namespace")),
 		-value=>$_[0]->get("convertCarriageReturns"),
 		-subtext=>' &nbsp; <span style="font-size: 8pt;">'.WebGUI::International::get(11,$_[0]->get("namespace")).'</span>',
 		-uiLevel=>5
 		);
-	$f->yesNo(
-		-name=>"allowDiscussion",
-		-label=>WebGUI::International::get(18,$_[0]->get("namespace")),
-		-value=>$_[0]->get("allowDiscussion"),
-		-uiLevel=>5
+	$output .= $_[0]->SUPER::www_edit(
+		-properties=>$properties->printRowsOnly,
+		-layout=>$layout->printRowsOnly
 		);
-	$output .= $_[0]->SUPER::www_edit($f->printRowsOnly);
         return $output;
 }
 
 #-------------------------------------------------------------------
 sub www_editSave {
 	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
-#	return WebGUI::International::get(815).$_[0]->www_edit if ($session{cgi}->cgi_error eq "413 POST too large");
         my ($image, $attachment, %property);
 	$_[0]->SUPER::www_editSave() if ($_[0]->get("wobjectId") eq "new");
         $image = WebGUI::Attachment->new("",$_[0]->get("wobjectId"));
@@ -138,7 +134,6 @@ sub www_editSave {
 	$property{linkTitle} = $session{form}{linkTitle};
 	$property{templateId} = $session{form}{templateId};
 	$property{linkURL} = $session{form}{linkURL};
-	$property{allowDiscussion} = $session{form}{allowDiscussion};
 	$_[0]->SUPER::www_editSave(\%property);
        	return "";
 }

@@ -88,7 +88,7 @@ sub new {
 #-------------------------------------------------------------------
 sub www_edit {
 	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
-        my ($output, $f, $indent, $startLevel);
+        my ($output, $indent, $startLevel);
 	if ($_[0]->get("wobjectId") eq "new") {
 		$startLevel = 1;
 	} else {
@@ -99,7 +99,7 @@ sub www_edit {
 	$indent = $_[0]->get("indent") || 5;
         $output = helpIcon(1,$_[0]->get("namespace"));
         $output .= '<h1>'.WebGUI::International::get(5,$_[0]->get("namespace")).'</h1>';
-        $f = WebGUI::HTMLForm->new;
+        my $f = WebGUI::HTMLForm->new;
 	$f->template(
                 -name=>"templateId",
                 -value=>$_[0]->get("templateId"),
@@ -118,7 +118,7 @@ sub www_edit {
 		);
         $f->integer("depth",WebGUI::International::get(4,$_[0]->get("namespace")),$_[0]->get("depth"));
 	$f->integer("indent",WebGUI::International::get(6,$_[0]->get("namespace")),$indent);
-	$output .= $_[0]->SUPER::www_edit($f->printRowsOnly);
+	$output .= $_[0]->SUPER::www_edit(-layout=>$f->printRowsOnly);
         return $output;
 }
 

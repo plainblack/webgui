@@ -92,7 +92,7 @@ sub purge {
 #-------------------------------------------------------------------
 sub www_edit {
 	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
-        my ($f, $i, $output, $active, $voteGroup, $graphWidth, $answers, $randomizeAnswers);
+        my ($i, $output, $active, $voteGroup, $graphWidth, $answers, $randomizeAnswers);
 	if ($_[0]->get("wobjectId") eq "new") {
 		$active = 1;
 		$randomizeAnswers = 1;
@@ -109,19 +109,25 @@ sub www_edit {
         }
         $output = helpIcon(1,$_[0]->get("namespace"));
 	$output .= '<h1>'.WebGUI::International::get(9,$_[0]->get("namespace")).'</h1>';
-	$f = WebGUI::HTMLForm->new;
-	$f->yesNo("active",WebGUI::International::get(3,$_[0]->get("namespace")),$active);
-        $f->group("voteGroup",WebGUI::International::get(4,$_[0]->get("namespace")),[$voteGroup]);
+	my $privileges = WebGUI::HTMLForm->new;
+	my $layout = WebGUI::HTMLForm->new;
+	my $properties = WebGUI::HTMLForm->new;
+	$privileges->yesNo("active",WebGUI::International::get(3,$_[0]->get("namespace")),$active);
+        $privileges->group("voteGroup",WebGUI::International::get(4,$_[0]->get("namespace")),[$voteGroup]);
 	if ($session{setting}{useKarma}) {
-		$f->integer("karmaPerVote",WebGUI::International::get(20,$_[0]->get("namespace")),$_[0]->get("karmaPerVote"));
+		$properties->integer("karmaPerVote",WebGUI::International::get(20,$_[0]->get("namespace")),$_[0]->get("karmaPerVote"));
 	} else {
-		$f->hidden("karmaPerVote",$_[0]->get("karmaPerVote"));
+		$properties->hidden("karmaPerVote",$_[0]->get("karmaPerVote"));
 	}
-	$f->integer("graphWidth",WebGUI::International::get(5,$_[0]->get("namespace")),$graphWidth);
-	$f->text("question",WebGUI::International::get(6,$_[0]->get("namespace")),$_[0]->get("question"));
-        $f->textarea("answers",WebGUI::International::get(7,$_[0]->get("namespace")).'<span class="formSubtext"><br>'.WebGUI::International::get(8,$_[0]->get("namespace")).'</span>',$answers);
-	$f->yesNo("randomizeAnswers",WebGUI::International::get(72,$_[0]->get("namespace")),$randomizeAnswers);
-	$output .= $_[0]->SUPER::www_edit($f->printRowsOnly);
+	$layout->integer("graphWidth",WebGUI::International::get(5,$_[0]->get("namespace")),$graphWidth);
+	$properties->text("question",WebGUI::International::get(6,$_[0]->get("namespace")),$_[0]->get("question"));
+        $properties->textarea("answers",WebGUI::International::get(7,$_[0]->get("namespace")).'<span class="formSubtext"><br>'.WebGUI::International::get(8,$_[0]->get("namespace")).'</span>',$answers);
+	$layout->yesNo("randomizeAnswers",WebGUI::International::get(72,$_[0]->get("namespace")),$randomizeAnswers);
+	$output .= $_[0]->SUPER::www_edit(
+		-layout=>$layout->printRowsOnly,
+		-properties=>$properties->printRowsOnly,
+		-privileges=>$privileges->printRowsOnly
+		);
 	if ($_[0]->get("wobjectId") ne "new") {
 		$output .= '<p>';
 		$output .= '<a href="'.WebGUI::URL::page('func=resetVotes&wid='.$_[0]->get("wobjectId")).'">'

@@ -60,56 +60,50 @@ sub new {
 }
 
 #-------------------------------------------------------------------
-sub www_copy {
-        if (WebGUI::Privilege::canEditPage()) {
-		$_[0]->duplicate;
-                return "";
-        } else {
-                return WebGUI::Privilege::insufficient();
-        }
+sub uiLevel {
+	return 5;
 }
 
 #-------------------------------------------------------------------
 sub www_edit {
-        my (%htmlFilter, $output, $f, $startDate, $endDate, $templatePosition, $proxiedUrl, %hash);
-        if (WebGUI::Privilege::canEditPage()) {
-		%hash=(5=>5,10=>10,20=>20,30=>30,60=>60);
-		%htmlFilter = ('none'=>WebGUI::International::get(420), 'most'=>WebGUI::International::get(421),
-                	'javascript'=>WebGUI::International::get(526), 'all'=>WebGUI::International::get(419));
-                $output = helpIcon(1,$_[0]->get("namespace"));
-		$output .= '<h1>'.WebGUI::International::get(2,$_[0]->get("namespace")).'</h1>';
-		$templatePosition = $_[0]->get("templatePosition") || '0';
-        	$startDate = $_[0]->get("startDate") || $session{page}{startDate};
-        	$endDate = $_[0]->get("endDate") || $session{page}{endDate};
-        	$f = WebGUI::HTMLForm->new;
-                $f->url("proxiedUrl", WebGUI::International::get(1,$_[0]->get("namespace")),$_[0]->get("proxiedUrl")||'http://');
-                $f->yesNo(
-                        -name=>"followExternal",
-                        -label=>WebGUI::International::get(5,$_[0]->get("namespace")),
-                        -value=>($_[0]->get("wobjectId") eq "new") ? 1 : $_[0]->get("followExternal"),
-                        -uiLevel=>5
-                        );
-                $f->yesNo(
-                        -name=>"followRedirect",
-                        -label=>WebGUI::International::get(8,$_[0]->get("namespace")),
-                        -value=>$_[0]->get("followRedirect"),
-                        -uiLevel=>5
-                        );
-                $f->yesNo(
-                        -name=>"removeStyle",
-                        -label=>WebGUI::International::get(6,$_[0]->get("namespace")),
-                        -value=>($_[0]->get("wobjectId") eq "new") ? 1 : $_[0]->get("removeStyle"),
-                        -uiLevel=>5
-                        );
-
-		$f->select("filterHtml",\%htmlFilter,WebGUI::International::get(7,$_[0]->get("namespace")),[$_[0]->get("filterHtml")||"javascript"]);
-                $f->select("timeout", \%hash, WebGUI::International::get(4,$_[0]->get("namespace")),[$_[0]->get("timeout")||30]);
-		$f->text("cookiebox", WebGUI::International::get(9,$_[0]->get("namespace")),$_[0]->get("cookiebox")||'/tmp');
-        	$output .= $_[0]->SUPER::www_edit($f->printRowsOnly);
-		return $output;
-        } else {
-                return WebGUI::Privilege::insufficient();
-        }
+        return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
+	my %hash;
+	tie %hash, 'Tie::IxHash';
+	%hash=(5=>5,10=>10,20=>20,30=>30,60=>60);
+        my $output = helpIcon(1,$_[0]->get("namespace"));
+	$output .= '<h1>'.WebGUI::International::get(2,$_[0]->get("namespace")).'</h1>';
+       	my $privileges = WebGUI::HTMLForm->new;
+       	my $properties = WebGUI::HTMLForm->new;
+       	my $layout = WebGUI::HTMLForm->new;
+        $properties->url(
+		-name=>"proxiedUrl", WebGUI::International::get(1,$_[0]->get("namespace")),$_[0]->get("proxiedUrl")||'http://');
+        $privileges->yesNo(
+        	-name=>"followExternal",
+                -label=>WebGUI::International::get(5,$_[0]->get("namespace")),
+                -value=>($_[0]->get("wobjectId") eq "new") ? 1 : $_[0]->get("followExternal")
+                );
+        $properties->yesNo(
+                -name=>"followRedirect",
+                -label=>WebGUI::International::get(8,$_[0]->get("namespace")),
+                -value=>$_[0]->get("followRedirect")
+                );
+        $layout->yesNo(
+                -name=>"removeStyle",
+                -label=>WebGUI::International::get(6,$_[0]->get("namespace")),
+                -value=>($_[0]->get("wobjectId") eq "new") ? 1 : $_[0]->get("removeStyle")
+                );
+	$layout->filterContent(
+		-name=>"filterHtml",
+		-value=>$_[0]->get("filterHtml")||"javascript"
+		);
+        $properties->select("timeout", \%hash, WebGUI::International::get(4,$_[0]->get("namespace")),[$_[0]->get("timeout")||30]);
+	$properties->text("cookiebox", WebGUI::International::get(9,$_[0]->get("namespace")),$_[0]->get("cookiebox")||'/tmp');
+        $output .= $_[0]->SUPER::www_edit(
+		-properties=>$properties->printRowsOnly,
+		-layout=>$layout->printRowsOnly,
+		-privileges=>$privileges->printRowsOnly
+		);
+	return $output;
 }
 
 #-------------------------------------------------------------------

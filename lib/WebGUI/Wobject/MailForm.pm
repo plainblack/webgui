@@ -129,7 +129,6 @@ sub www_edit {
         foreach my $field (@fields) {
             $data{$field} = $_[0]->get($field) if ($_[0]->get($field));
         }
-		
         if ($_[0]->get("wobjectId") eq "new") {
             $proceed = 1;
         }

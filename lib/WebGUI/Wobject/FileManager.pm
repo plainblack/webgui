@@ -145,23 +145,24 @@ sub www_download {
 #-------------------------------------------------------------------
 sub www_edit {
 	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
-        my ($output, $f, $paginateAfter, $proceed);
+        my ($output, $paginateAfter, $proceed);
         if ($_[0]->get("wobjectId") eq "new") {
                 $proceed = 1;
         }
         $output .= helpIcon(1,$_[0]->get("namespace"));
         $output .= '<h1>'.WebGUI::International::get(9,$_[0]->get("namespace")).'</h1>';
 	$paginateAfter = $_[0]->get("paginateAfter") || 50;
-	$f = WebGUI::HTMLForm->new;
-	$f->template(
+	my $properties = WebGUI::HTMLForm->new;
+	my $layout = WebGUI::HTMLForm->new;
+	$layout->template(
                 -name=>"templateId",
                 -value=>$_[0]->get("templateId"),
                 -namespace=>$_[0]->get("namespace"),
                 -afterEdit=>'func=edit&wid='.$_[0]->get("wobjectId")
                 );
-	$f->integer("paginateAfter",WebGUI::International::get(20,$_[0]->get("namespace")),$paginateAfter);
+	$layout->integer("paginateAfter",WebGUI::International::get(20,$_[0]->get("namespace")),$paginateAfter);
 	if ($_[0]->get("wobjectId") eq "new") {
-                $f->whatNext(
+                $properties->whatNext(
                         -options=>{
                                 addFile=>WebGUI::International::get(74,$_[0]->get("namespace")),
                                 backToPage=>WebGUI::International::get(745)
@@ -169,7 +170,10 @@ sub www_edit {
                         -value=>"addFile"
                         );
         }
-	$output .= $_[0]->SUPER::www_edit($f->printRowsOnly);
+	$output .= $_[0]->SUPER::www_edit(
+		-properties=>$properties->printRowsOnly,
+		-layout=>$layout->printRowsOnly
+		);
         return $output;
 }
 

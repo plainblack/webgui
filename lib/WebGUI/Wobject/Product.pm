@@ -272,31 +272,35 @@ sub www_deleteSpecificationConfirm {
 #-------------------------------------------------------------------
 sub www_edit {
 	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
-        my ($f, $output, $template);
-	$output = helpIcon(1,$_[0]->get("namespace"));
+	my $output = helpIcon(1,$_[0]->get("namespace"));
+	my $template;
         $output .= '<h1>'.WebGUI::International::get(6,$_[0]->get("namespace")).'</h1>';
 	if ($_[0]->get("wobjectId") eq "new") {
 		$template = 1;
 	} else {
 		$template = $_[0]->get("templateId");
 	}
-	$f = WebGUI::HTMLForm->new;
-        $f->template(
+	my $layout = WebGUI::HTMLForm->new;
+	my $properties = WebGUI::HTMLForm->new;
+        $layout->template(
                 -name=>"templateId",
                 -value=>$template,
                 -namespace=>$_[0]->get("namespace"),
                 -label=>WebGUI::International::get(61,$_[0]->get("namespace")),
 		-afterEdit=>'func=edit&wid='.$_[0]->get("wobjectId")
                 );
-	$f->text("price",WebGUI::International::get(10,$_[0]->get("namespace")),$_[0]->get("price"));
-	$f->text("productNumber",WebGUI::International::get(11,$_[0]->get("namespace")),$_[0]->get("productNumber"));
-	$f->raw($_[0]->fileProperty("image1",7));
-	$f->raw($_[0]->fileProperty("image2",8));
-	$f->raw($_[0]->fileProperty("image3",9));
-	$f->raw($_[0]->fileProperty("brochure",13));
-	$f->raw($_[0]->fileProperty("manual",14));
-	$f->raw($_[0]->fileProperty("warranty",15));
-	$output .= $_[0]->SUPER::www_edit($f->printRowsOnly);
+	$properties->text("price",WebGUI::International::get(10,$_[0]->get("namespace")),$_[0]->get("price"));
+	$properties->text("productNumber",WebGUI::International::get(11,$_[0]->get("namespace")),$_[0]->get("productNumber"));
+	$properties->raw($_[0]->fileProperty("image1",7));
+	$properties->raw($_[0]->fileProperty("image2",8));
+	$properties->raw($_[0]->fileProperty("image3",9));
+	$properties->raw($_[0]->fileProperty("brochure",13));
+	$properties->raw($_[0]->fileProperty("manual",14));
+	$properties->raw($_[0]->fileProperty("warranty",15));
+	$output .= $_[0]->SUPER::www_edit(
+		-properties=>$properties->printRowsOnly,
+		-layout=>$layout->printRowsOnly
+		);
         return $output;
 }
 

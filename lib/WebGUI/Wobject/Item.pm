@@ -58,21 +58,24 @@ sub new {
 #-------------------------------------------------------------------
 sub www_edit {
 	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
-        my ($output, $f, $template);
-	$template = $_[0]->get("templateId") || 1;
-	$output = helpIcon(1,$_[0]->get("namespace"));
+	my $template = $_[0]->get("templateId") || 1;
+	my $output = helpIcon(1,$_[0]->get("namespace"));
 	$output .= '<h1>'.WebGUI::International::get(6,$_[0]->get("namespace")).'</h1>';
-	$f = WebGUI::HTMLForm->new;
-	$f->url("linkURL",WebGUI::International::get(1,$_[0]->get("namespace")),$_[0]->get("linkURL"));
-	$f->raw($_[0]->fileProperty("attachment",2));
-	$f->template(
+	my $properties = WebGUI::HTMLForm->new;
+	my $layout = WebGUI::HTMLForm->new;
+	$properties->url("linkURL",WebGUI::International::get(1,$_[0]->get("namespace")),$_[0]->get("linkURL"));
+	$properties->raw($_[0]->fileProperty("attachment",2));
+	$layout->template(
                 -name=>"templateId",
                 -value=>$template,
                 -namespace=>$_[0]->get("namespace"),
                 -label=>WebGUI::International::get(72,$_[0]->get("namespace")),
                 -afterEdit=>'func=edit&wid='.$_[0]->get("wobjectId")
                 );
-	$output .= $_[0]->SUPER::www_edit($f->printRowsOnly);
+	$output .= $_[0]->SUPER::www_edit(
+		-properties=>$properties->printRowsOnly,
+		-layout=>$layout->printRowsOnly
+		);
         return $output;
 }
 

@@ -13,13 +13,13 @@ package WebGUI::Wobject::WobjectProxy;
 use strict;
 use Tie::CPHash;
 use WebGUI::DateTime;
-use WebGUI::HTMLForm;
 use WebGUI::Icon;
 use WebGUI::International;
 use WebGUI::Privilege;
 use WebGUI::Session;
 use WebGUI::SQL;
 use WebGUI::Page;
+use WebGUI::TabForm;
 use WebGUI::Template;
 use WebGUI::Wobject;
 
@@ -70,14 +70,29 @@ sub www_edit {
 	$templatePosition = $_[0]->get("templatePosition") || 1;
        	$startDate = $_[0]->get("startDate") || $session{page}{startDate};
        	$endDate = $_[0]->get("endDate") || $session{page}{endDate};
-       	$f = WebGUI::HTMLForm->new;
-       	$f->hidden("wid",$_[0]->get("wobjectId"));
-       	$f->hidden("namespace",$_[0]->get("namespace")) if ($_[0]->get("wobjectId") eq "new");
-       	$f->hidden("func","editSave");
-       	$f->readOnly($_[0]->get("wobjectId"),WebGUI::International::get(499));
-       	$f->hidden("title",$_[0]->get("namespace"));
-       	$f->hidden("displayTitle",0);
-	$f->select(
+	my %tabs;
+        tie %tabs, 'Tie::IxHash';
+        %tabs = (
+                properties=>{
+                        label=>WebGUI::International::get(893)
+                        },
+                layout=>{
+                        label=>WebGUI::International::get(105),
+                        uiLevel=>5
+                        },
+                privileges=>{
+                        label=>WebGUI::International::get(107),
+                        uiLevel=>9
+                        }
+                );
+       	$f = WebGUI::TabForm->new(\%tabs);
+       	$f->hidden({name=>"wid",value=>$_[0]->get("wobjectId")});
+       	$f->hidden({name=>"namespace",value=>$_[0]->get("namespace")}) if ($_[0]->get("wobjectId") eq "new");
+       	$f->hidden({name=>"func",value=>"editSave"});
+       	$f->getTab("properties")->readOnly($_[0]->get("wobjectId"),WebGUI::International::get(499));
+       	$f->hidden({name=>"title",value=>$_[0]->name});
+       	$f->hidden({name=>"displayTitle",value=>0});
+	$f->getTab("layout")->select(
                 -name=>"templatePosition",
                 -label=>WebGUI::International::get(363),
                 -value=>[$templatePosition],
@@ -85,9 +100,9 @@ sub www_edit {
                 -options=>WebGUI::Page::getTemplatePositions($session{page}{templateId}),
                 -subtext=>WebGUI::Page::drawTemplate($session{page}{templateId})
                 );
-       	$f->date("startDate",WebGUI::International::get(497),$startDate);
-       	$f->date("endDate",WebGUI::International::get(498),$endDate);
-	$a = WebGUI::SQL->read("select pageId,menuTitle from page where pageId<2 or pageId>25 order by title");
+       	$f->getTab("privileges")->date("startDate",WebGUI::International::get(497),$startDate);
+       	$f->getTab("privileges")->date("endDate",WebGUI::International::get(498),$endDate);
+	$a = WebGUI::SQL->read("select pageId,menuTitle from page where pageId<2 or pageId>25 order by menuTitle");
 	while (%page = $a->hash) {
 		$b = WebGUI::SQL->read("select wobjectId,title from wobject 
 			where pageId=".$page{pageId}." and namespace<>'WobjectProxy' and 
@@ -98,8 +113,7 @@ sub www_edit {
 		$b->finish;
 	}
 	$a->finish;
-	$f->select("proxiedWobjectId",\%wobjects,WebGUI::International::get(1,$_[0]->get("namespace")),[$_[0]->get("proxiedWobjectId")]);
-       	$f->submit;
+	$f->getTab("properties")->select("proxiedWobjectId",\%wobjects,WebGUI::International::get(1,$_[0]->get("namespace")),[$_[0]->get("proxiedWobjectId")]);
        	$output .= $f->print;
 	return $output;
 }

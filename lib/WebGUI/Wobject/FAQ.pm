@@ -81,12 +81,12 @@ sub www_deleteQuestionConfirm {
 
 #-------------------------------------------------------------------
 sub www_edit {
-        my ($f, $output);
         return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
-	$output = helpIcon(1,$_[0]->get("namespace"));
+	my $output = helpIcon(1,$_[0]->get("namespace"));
         $output .= '<h1>'.WebGUI::International::get(8,$_[0]->get("namespace")).'</h1>';
-	$f = WebGUI::HTMLForm->new;
-	$f->template(
+	my $properties = WebGUI::HTMLForm->new;
+	my $layout = WebGUI::HTMLForm->new;
+	$layout->template(
               	-name=>"templateId",
                	-value=>$_[0]->get("templateId"),
                	-namespace=>$_[0]->get("namespace"),
@@ -94,7 +94,7 @@ sub www_edit {
                	-afterEdit=>'func=edit&wid='.$_[0]->get("wobjectId")
                	);
 	if ($_[0]->get("wobjectId") eq "new") {
-		$f->whatNext(
+		$properties->whatNext(
                        	-options=>{
                                	addQuestion=>WebGUI::International::get(75,$_[0]->get("namespace")),
                                	backToPage=>WebGUI::International::get(745)
@@ -102,7 +102,10 @@ sub www_edit {
                        	-value=>"addQuestion"
                        	);
 	}
-	$output .= $_[0]->SUPER::www_edit($f->printRowsOnly);
+	$output .= $_[0]->SUPER::www_edit(
+		-properties=>$properties->printRowsOnly,
+		-layout=>$layout->printRowsOnly
+		);
         return $output;
 }
 

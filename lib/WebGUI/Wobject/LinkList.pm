@@ -82,24 +82,21 @@ sub www_deleteLinkConfirm {
 #-------------------------------------------------------------------
 sub www_edit {
 	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
-        my ($proceed, $f, $output, $indent, $lineSpacing, $bullet);
-        if ($_[0]->get("wobjectId") eq "new") {
-                $proceed = 1;
-        }
-	$bullet = $_[0]->get("bullet") || '&middot;';
-	$lineSpacing = $_[0]->get("lineSpacing") || 1;
-	$indent = $_[0]->get("indent") || 5;
-        $output = helpIcon(1,$_[0]->get("namespace"));
+	my $bullet = $_[0]->get("bullet") || '&middot;';
+	my $lineSpacing = $_[0]->get("lineSpacing") || 1;
+	my $indent = $_[0]->get("indent") || 5;
+        my $output = helpIcon(1,$_[0]->get("namespace"));
 	$output .= '<h1>'.WebGUI::International::get(10,$_[0]->get("namespace")).'</h1>';
-	$f = WebGUI::HTMLForm->new;
-	$f->template(
+	my $layout = WebGUI::HTMLForm->new;
+	my $properties = WebGUI::HTMLForm->new;
+	$layout->template(
                 -name=>"templateId",
                 -value=>$_[0]->get("templateId"),
                 -namespace=>$_[0]->get("namespace"),
                 -afterEdit=>'func=edit&wid='.$_[0]->get("wobjectId")
                 );
         if ($_[0]->get("wobjectId") eq "new") {
-                $f->whatNext(
+                $properties->whatNext(
                         -options=>{
                                 addLink=>WebGUI::International::get(13,$_[0]->get("namespace")),
                                 backToPage=>WebGUI::International::get(745)
@@ -107,7 +104,10 @@ sub www_edit {
                         -value=>"addLink"
                         );
         }
-	$output .= $_[0]->SUPER::www_edit($f->printRowsOnly);
+	$output .= $_[0]->SUPER::www_edit(
+		-properties=>$properties->printRowsOnly,
+		-layout=>$layout->printRowsOnly
+		);
         return $output;
 }
 

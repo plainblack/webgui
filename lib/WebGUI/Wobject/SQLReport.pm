@@ -69,23 +69,29 @@ sub uiLevel {
 #-------------------------------------------------------------------
 sub www_edit {
 	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
-        my ($output, $f, $dsn, $username, $paginateAfter);
+        my ($output, $dsn, $username, $paginateAfter);
 	$dsn = $_[0]->get("DSN") || $session{config}{dsn};
 	$username = $_[0]->get("username") || $session{config}{dbuser};
 	$paginateAfter = $_[0]->get("paginateAfter") || 50;
-	$f = WebGUI::HTMLForm->new;
+	my $privileges = WebGUI::HTMLForm->new;
+	my $layout = WebGUI::HTMLForm->new;
+	my $properties = WebGUI::HTMLForm->new;
         $output = helpIcon(1,$_[0]->get("namespace"));
         $output .= '<h1>'.WebGUI::International::get(8,$_[0]->get("namespace")).'</h1>';
-	$f->yesNo("preprocessMacros",WebGUI::International::get(15,$_[0]->get("namespace")),$_[0]->get("preprocessMacros"));
-        $f->yesNo("debugMode",WebGUI::International::get(16,$_[0]->get("namespace")),$_[0]->get("debugMode"));
-	$f->textarea("dbQuery",WebGUI::International::get(4,$_[0]->get("namespace")),$_[0]->get("dbQuery"));
-       	$f->textarea("template",WebGUI::International::get(3,$_[0]->get("namespace")),$_[0]->get("template"));        
-        $f->text("DSN",WebGUI::International::get(5,$_[0]->get("namespace")),$dsn);
-	$f->text("username",WebGUI::International::get(6,$_[0]->get("namespace")),$username);
-	$f->password("identifier",WebGUI::International::get(7,$_[0]->get("namespace")),$_[0]->get("identifier"));
-	$f->integer("paginateAfter",WebGUI::International::get(14,$_[0]->get("namespace")),$paginateAfter);
-	$f->yesNo("convertCarriageReturns",WebGUI::International::get(13,$_[0]->get("namespace")),$_[0]->get("convertCarriageReturns"));
-	$output .= $_[0]->SUPER::www_edit($f->printRowsOnly);
+	$properties->yesNo("preprocessMacros",WebGUI::International::get(15,$_[0]->get("namespace")),$_[0]->get("preprocessMacros"));
+        $properties->yesNo("debugMode",WebGUI::International::get(16,$_[0]->get("namespace")),$_[0]->get("debugMode"));
+	$properties->textarea("dbQuery",WebGUI::International::get(4,$_[0]->get("namespace")),$_[0]->get("dbQuery"));
+       	$layout->textarea("template",WebGUI::International::get(3,$_[0]->get("namespace")),$_[0]->get("template"));        
+        $privileges->text("DSN",WebGUI::International::get(5,$_[0]->get("namespace")),$dsn);
+	$privileges->text("username",WebGUI::International::get(6,$_[0]->get("namespace")),$username);
+	$privileges->password("identifier",WebGUI::International::get(7,$_[0]->get("namespace")),$_[0]->get("identifier"));
+	$layout->integer("paginateAfter",WebGUI::International::get(14,$_[0]->get("namespace")),$paginateAfter);
+	$layout->yesNo("convertCarriageReturns",WebGUI::International::get(13,$_[0]->get("namespace")),$_[0]->get("convertCarriageReturns"));
+	$output .= $_[0]->SUPER::www_edit(
+		-layout=>$layout->printRowsOnly,
+		-properties=>$properties->printRowsOnly,
+		-privileges=>$privileges->printRowsOnly
+		);
         return $output;
 }
 
