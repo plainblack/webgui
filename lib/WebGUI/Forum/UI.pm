@@ -850,7 +850,7 @@ sub forumProperties {
                 -unitsValue=>$units,
                 -uiLevel=>9
                 );
-        my ($interval, $units) = WebGUI::DateTime::secondsToInterval(($forum->get("editTimeout") || 3600));
+        ($interval, $units) = WebGUI::DateTime::secondsToInterval(($forum->get("editTimeout") || 3600));
         $f->interval(
                 -name=>"editTimeout",
                 -label=>WebGUI::International::get(566),
@@ -1324,7 +1324,7 @@ sub notifySubscribers {
 		$subscribers{$userId} = $userId unless ($userId == $post->get("userId"));	# make sure we don't send unnecessary messages 
 	}
         $sth->finish;
-        my $sth = WebGUI::SQL->read("select userId from forumSubscription where forumId=".$forum->get("forumId"));
+        $sth = WebGUI::SQL->read("select userId from forumSubscription where forumId=".$forum->get("forumId"));
 	while (my ($userId) = $sth->array) { 
 		$subscribers{$userId} = $userId unless ($userId == $post->get("userId"));	# make sure we don't send unnecessary messages 
 	}
