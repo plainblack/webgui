@@ -32,10 +32,9 @@ sub _replacement {
 		$hash{WebGUI::URL::page('op=selectPackageToDeploy')} = WebGUI::International::get(376);
 	}
 	foreach $key (keys %{$session{wobject}}) {
-		$hash2{WebGUI::URL::page('func=edit&wid=new&namespace='.$key)} = $session{wobject}{$key};
+		$hash{WebGUI::URL::page('func=edit&wid=new&namespace='.$key)} = $session{wobject}{$key};
 	}
-	%hash2 = sortHash(%hash2);
-	%hash = (%hash, %hash2);
+	%hash = sortHash(%hash);
         $contentSelect = WebGUI::Form::selectList({
 		name=>"contentSelect",
 		options=>\%hash,

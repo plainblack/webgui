@@ -19,7 +19,7 @@ use WebGUI::International;
 use WebGUI::Privilege;
 use WebGUI::Session;
 use WebGUI::SQL;
-use WebGUI::Template;
+use WebGUI::Page;
 use WebGUI::URL;
 use WebGUI::Utility;
 
@@ -62,6 +62,66 @@ sub _reorderPages {
                 WebGUI::SQL->write("update page set sequenceNumber='$i' where pageId=$pid");
         }
         $sth->finish;
+}
+
+#-------------------------------------------------------------------
+sub _selectPositions {
+        my ($templates, $output, $f, $key);
+        $f = WebGUI::HTMLForm->new(1);
+        $templates = WebGUI::Page::getTemplateList();
+        $f->select("templateId",$templates,'',[$_[0]],'','','onChange="changeTemplatePreview(this.form.templateId.value)"');
+        $output = '
+        <script language="JavaScript">
+        function checkBrowser(){
+                this.ver=navigator.appVersion;
+                this.dom=document.getElementById?1:0;
+                this.ie5=(this.ver.indexOf("MSIE 5")>-1 && this.dom)?1:0;
+                this.ie4=(document.all && !this.dom)?1:0;
+                this.ns5=(this.dom && parseInt(this.ver) >= 5) ?1:0;
+                this.ns4=(document.layers && !this.dom)?1:0;
+                this.bw=(this.ie5 || this.ie4 || this.ns4 || this.ns5 || this.dom);
+                return this;
+        }
+        bw=new checkBrowser();
+        function makeChangeTextObj(obj){
+                this.css=bw.dom? document.getElementById(obj).style:bw.ie4?document.all[obj].style:bw.ns4?document.layers[obj]:0;
+                this.writeref=bw.dom? document.getElementById(obj):bw.ie4?document.all[obj]:bw.ns4?document.layers[obj].document:0
+;
+                this.writeIt=b_writeIt;
+        }
+        function b_writeIt(text){
+                var obj;
+                if(bw.ns4) {
+                if (document.loading) document.loading.visibility = "hidden";
+                        this.writeref.write(text + "&nbsp;&nbsp;&nbsp;");
+                        this.writeref.close();
+                } else {
+                        if (bw.ie4) {
+                        if (document.all.loading) obj = document.all.loading;
+                }
+                if (obj) obj.style.visibility = "hidden";
+                        this.writeref.innerHTML=text;
+                }
+        }
+        function init(){
+                if(bw.bw){
+                        oMessage=new makeChangeTextObj("templatePreview");
+                        oMessage.css.visibility="visible";
+                        changeTemplatePreview('.$_[0].');
+                }
+        }
+        onload=init
+        function changeTemplatePreview(value) {
+                oMessage.writeIt(eval("b"+value));
+        }
+        ';
+        foreach $key (keys %{$templates}) {
+                $output .= "    var b".$key." = '".WebGUI::Page::drawTemplate($key)."';\n";
+        }
+        $output .= '</script>';
+        $output .= $f->printRowsOnly;
+        $output .= '<div id="templatePreview" style="padding: 5px;"></div>';
+        return $output;
 }
 
 #-------------------------------------------------------------------
@@ -240,7 +300,7 @@ sub www_editPage {
 			-uiLevel=>9
 			);
                 $f->readOnly(
-                        -value=>WebGUI::Template::select($page{templateId}),
+                        -value=>_selectPositions($page{templateId}),
                         -label=>WebGUI::International::get(356),
                         -uiLevel=>5
                         );
@@ -384,7 +444,7 @@ sub www_editPageSave {
 		synopsis=".quote($session{form}{synopsis})." 
 		where pageId=$session{form}{pageId}");
 	WebGUI::SQL->write("update wobject set templatePosition=1 where pageId=$session{form}{pageId} 
-		and templatePosition>".WebGUI::Template::countPositions($session{form}{templateId}));
+		and templatePosition>".WebGUI::Page::countTemplatePositions($session{form}{templateId}));
 	_recursivelyChangeStyle($session{page}{pageId}) if ($session{form}{recurseStyle});
 	_recursivelyChangePrivileges($session{page}{pageId}) if ($session{form}{recursePrivs});
 	WebGUI::Session::refreshPageInfo($session{page}{pageId}) if ($session{form}{pageId} == $session{page}{pageId});

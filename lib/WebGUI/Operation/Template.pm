@@ -93,7 +93,7 @@ sub www_editTemplate {
         if (WebGUI::Privilege::isInGroup($session{setting}{templateManagersGroup})) {
 		if ($session{form}{tid} eq "new") {
 			if ($session{form}{namespace} eq "Page") {
-				$template{template} = "<table>\n <tr>\n  <td>\n\n<tmpl_var template.position1>\n\n".
+				$template{template} = "<table>\n <tr>\n  <td>\n\n<tmpl_var page.position1>\n\n".
 					"</td>\n </tr>\n</table>\n";
 			} else {
 				$template{template} = "<h1><tmpl_var title></h1>\n\n";
@@ -146,7 +146,7 @@ sub www_editTemplateSave {
 				($session{form}{tid}, ".quote($session{form}{namespace}).")");
 		}
 		if ($session{form}{template} eq "" && $session{form}{namespace} eq "Page") {
-			$session{form}{template} = "<table>\n<tr>\n<td>\n\n<tmpl_var template.position1>\n\n</td>\n </tr>\n</table>\n";
+			$session{form}{template} = "<table>\n<tr>\n<td>\n\n<tmpl_var page.position1>\n\n</td>\n </tr>\n</table>\n";
 		}
                 WebGUI::SQL->write("update template set name=".quote($session{form}{name}).", 
 			template=".quote($session{form}{template})."

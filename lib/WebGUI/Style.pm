@@ -46,7 +46,7 @@ sub get {
         }
         $header .= '</head>'.$body[0];
         $footer = $body[1].' </html>';
-        return $header.$_[0].$footer;
+        return WebGUI::Macro::process($header.$_[0].$footer);
 }
 
 

@@ -26,6 +26,7 @@ use WebGUI::Macro;
 use WebGUI::Node;
 use WebGUI::Session;
 use WebGUI::SQL;
+use WebGUI::Page;
 use WebGUI::Template;
 use WebGUI::URL;
 use WebGUI::Utility;
@@ -1070,8 +1071,8 @@ sub www_edit {
 		-label=>WebGUI::International::get(363),
 		-value=>[$templatePosition],
 		-uiLevel=>5,
-		-options=>WebGUI::Template::getPositions($session{page}{templateId}),
-		-subtext=>WebGUI::Template::draw($session{page}{templateId})
+		-options=>WebGUI::Page::getTemplatePositions($session{page}{templateId}),
+		-subtext=>WebGUI::Page::drawTemplate($session{page}{templateId})
 		);
 	$f->date(
 		-name=>"startDate",

@@ -22,6 +22,7 @@ use WebGUI::Privilege;
 use WebGUI::Session;
 use WebGUI::SQL;
 use WebGUI::Style;
+use WebGUI::Page;
 use WebGUI::Template;
 use WebGUI::URL;
 use WebGUI::Utility;
@@ -74,7 +75,7 @@ sub _generatePage {
 			order by sequenceNumber, wobjectId");
                 while ($wobject = $sth->hashRef) {
                         if ($session{var}{adminOn} && $canEdit) {
-                        	$contentHash{"template.position".${$wobject}{templatePosition}} .= "\n<hr>"
+                        	$contentHash{"page.position".${$wobject}{templatePosition}} .= "\n<hr>"
                                 	.wobjectIcon()
                                         .deleteIcon('func=delete&wid='.${$wobject}{wobjectId})
                                         .editIcon('func=edit&wid='.${$wobject}{wobjectId})
@@ -108,19 +109,19 @@ sub _generatePage {
                         $w = eval{$cmd->new($wobject)};
                         WebGUI::ErrorHandler::fatalError("Couldn't instanciate wobject: ${$wobject}{namespace}. Root cause: ".$@) if($@);
                         if ($w->inDateRange) {
-                        	$contentHash{"template.position".${$wobject}{templatePosition}} .= '<div class="wobject'
+                        	$contentHash{"page.position".${$wobject}{templatePosition}} .= '<div class="wobject'
 					.${$wobject}{namespace}.'" id="wobjectId'.${$wobject}{wobjectId}.'">';
-                                $contentHash{"template.position".${$wobject}{templatePosition}} .= '<a name="'
+                                $contentHash{"page.position".${$wobject}{templatePosition}} .= '<a name="'
 					.${$wobject}{wobjectId}.'"></a>';
-                                $contentHash{"template.position".${$wobject}{templatePosition}} .= eval{$w->www_view};
+                                $contentHash{"page.position".${$wobject}{templatePosition}} .= eval{$w->www_view};
                                 WebGUI::ErrorHandler::fatalError("Wobject runtime error: ${$wobject}{namespace}. Root cause: ".$@) if($@);
-                                $contentHash{"template.position".${$wobject}{templatePosition}} .= "</div>\n\n";
+                                $contentHash{"page.position".${$wobject}{templatePosition}} .= "</div>\n\n";
                         }
 		}
                 $sth->finish;
                 $template = $session{page}{templateId};
 	} else {
-                $contentHash{"template.position".1} = WebGUI::Privilege::noAccess();
+                $contentHash{"page.position1"} = WebGUI::Privilege::noAccess();
         }
 	return (\%contentHash,$template,$pageEdit);
 }
@@ -234,7 +235,7 @@ sub page {
 		WebGUI::Session::close();
 		return $httpHeader.$operationOutput.$wobjectOutput;
 	} elsif ($operationOutput ne "") {
-		$positions->{"template.position".1} = $operationOutput;
+		$positions->{"page.position1"} = $operationOutput;
         } elsif ($session{page}{redirectURL}) {
                 $httpHeader = WebGUI::Session::httpRedirect(WebGUI::Macro::process($session{page}{redirectURL}));
                 WebGUI::Session::close();
@@ -244,20 +245,12 @@ sub page {
                 WebGUI::Session::close();
                 return $httpHeader;
 	} elsif ($wobjectOutput ne "") {
-		$positions->{"template.position".1} = $wobjectOutput;
+		$positions->{"page.position1"} = $wobjectOutput;
 	} else {
 		($positions, $template, $pageEdit) = _generatePage();
 	}
 	$httpHeader = WebGUI::Session::httpHeader();
-	$content = WebGUI::Template::process(
-		WebGUI::Macro::process(
-			WebGUI::Style::get(
-				$pageEdit
-				.WebGUI::Template::get($template)
-			)
-		),
-		$positions
-	);
+	$content = WebGUI::Template::process(WebGUI::Style::get($pageEdit.WebGUI::Page::getTemplate($template)), $positions);
 	$debug = _generateDebug();
 	WebGUI::Session::close();
 	return $httpHeader.$content.$debug;

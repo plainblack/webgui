@@ -19,6 +19,7 @@ use WebGUI::DateTime;
 use WebGUI::International;
 use WebGUI::Session;
 use WebGUI::SQL;
+use WebGUI::Template;
 use WebGUI::URL;
 
 =head1 NAME
@@ -1079,13 +1080,11 @@ sub submit {
 =cut
 
 sub template {
-        my ($templates, $templateId, $where);
+        my ($templateId, $where);
         $templateId = $_[0]->{value} || 1;
-        $templates = WebGUI::SQL->buildHashRef("select templateId,name from template where namespace="
-		.quote($_[0]->{namespace})." order by name");
         return selectList({
                 name=>$_[0]->{name},
-                options=>$templates,
+                options=>WebGUI::Template::getList($_[0]->{namespace}),
                 value=>[$templateId]
                 });
 }

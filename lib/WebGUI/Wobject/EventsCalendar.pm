@@ -266,7 +266,7 @@ sub www_edit {
 			-options=>{
 				addEvent=>WebGUI::International::get(91,$namespace),
 				backToPage=>WebGUI::International::get(745)
-				}
+				},
 			-value=>"addEvent"
 			);
 	}
@@ -343,7 +343,7 @@ sub www_editEvent {
                         -options=>{
                                 addEvent=>WebGUI::International::get(91,$namespace),
                                 backToPage=>WebGUI::International::get(745)
-                                }
+                                },
 			-value=>"addEvent"
                         );
         }

@@ -80,6 +80,7 @@ use WebGUI::Operation::Style ();
 use WebGUI::Operation::Template ();
 use WebGUI::Operation::Trash ();
 use WebGUI::Operation::User ();
+use WebGUI::Page ();
 use WebGUI::Paginator ();
 use WebGUI::Privilege ();
 #use WebGUI::Profile (); # compile problems when this is included
