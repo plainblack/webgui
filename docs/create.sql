@@ -20,6 +20,7 @@ CREATE TABLE Article (
   groupToPost int(11) NOT NULL default '2',
   groupToModerate int(11) NOT NULL default '4',
   editTimeout int(11) NOT NULL default '1',
+  karmaPerPost int(11) NOT NULL default '0',
   PRIMARY KEY  (wobjectId)
 ) TYPE=MyISAM;
 
@@ -28,6 +29,7 @@ CREATE TABLE Article (
 --
 
 
+INSERT INTO Article VALUES (-2,NULL,'','',NULL,0,'right',0,7,4,1,0);
 
 --
 -- Table structure for table 'DownloadManager'
@@ -229,6 +231,7 @@ CREATE TABLE MessageBoard (
   messagesPerPage int(11) NOT NULL default '50',
   editTimeout int(11) default NULL,
   groupToModerate int(11) NOT NULL default '4',
+  karmaPerPost int(11) NOT NULL default '0',
   PRIMARY KEY  (wobjectId)
 ) TYPE=MyISAM;
 
@@ -268,6 +271,7 @@ CREATE TABLE Poll (
   a18 varchar(255) default NULL,
   a19 varchar(255) default NULL,
   a20 varchar(255) default NULL,
+  karmaPerVote int(11) NOT NULL default '0',
   PRIMARY KEY  (wobjectId)
 ) TYPE=MyISAM;
 
@@ -374,6 +378,8 @@ CREATE TABLE UserSubmission (
   groupToModerate int(11) NOT NULL default '4',
   displayThumbnails int(11) NOT NULL default '0',
   layout varchar(30) NOT NULL default 'traditional',
+  karmaPerSubmission int(11) NOT NULL default '0',
+  karmaPerPost int(11) NOT NULL default '0',
   PRIMARY KEY  (wobjectId)
 ) TYPE=MyISAM;
 
@@ -450,11 +456,9 @@ CREATE TABLE groupings (
 --
 
 
-INSERT INTO groupings VALUES (1,1,2114402400);
 INSERT INTO groupings VALUES (5,3,2114402400);
 INSERT INTO groupings VALUES (4,3,2114402400);
 INSERT INTO groupings VALUES (3,3,2114402400);
-INSERT INTO groupings VALUES (2,3,2114402400);
 INSERT INTO groupings VALUES (6,3,2114402400);
 
 --
@@ -466,6 +470,7 @@ CREATE TABLE groups (
   groupName varchar(30) default NULL,
   description varchar(255) default NULL,
   expireAfter int(11) NOT NULL default '314496000',
+  karmaThreshold int(11) NOT NULL default '1000000000',
   PRIMARY KEY  (groupId)
 ) TYPE=MyISAM;
 
@@ -474,14 +479,15 @@ CREATE TABLE groups (
 --
 
 
-INSERT INTO groups VALUES (1,'Visitors','This is the public group that has no privileges.',314496000);
-INSERT INTO groups VALUES (2,'Registered Users','All registered users belong to this group automatically. There are no associated privileges other than that the user has an account and is logged in.',314496000);
-INSERT INTO groups VALUES (3,'Admins','Anyone who belongs to this group has privileges to do anything and everything.',314496000);
-INSERT INTO groups VALUES (4,'Content Managers','Users that have privileges to edit content on this site. The user still needs to be added to a group that has editing privileges on specific pages.',314496000);
-INSERT INTO groups VALUES (5,'Style Managers','Users that have privileges to edit styles for this site. These privileges do not allow the user to assign privileges to a page, just define them to be used.',314496000);
-INSERT INTO groups VALUES (6,'Package Managers','Users that have privileges to add, edit, and delete packages of wobjects and pages to deploy.',314496000);
-INSERT INTO groups VALUES (7,'Everyone','A group that automatically includes all users including Visitors.',314496000);
-INSERT INTO groups VALUES (8,'Template Managers','Users that have privileges to edit templates for this site.',314496000);
+INSERT INTO groups VALUES (1,'Visitors','This is the public group that has no privileges.',314496000,1000000000);
+INSERT INTO groups VALUES (2,'Registered Users','All registered users belong to this group automatically. There are no associated privileges other than that the user has an account and is logged in.',314496000,1000000000);
+INSERT INTO groups VALUES (3,'Admins','Anyone who belongs to this group has privileges to do anything and everything.',314496000,1000000000);
+INSERT INTO groups VALUES (4,'Content Managers','Users that have privileges to edit content on this site. The user still needs to be added to a group that has editing privileges on specific pages.',314496000,1000000000);
+INSERT INTO groups VALUES (5,'Style Managers','Users that have privileges to edit styles for this site. These privileges do not allow the user to assign privileges to a page, just define them to be used.',314496000,1000000000);
+INSERT INTO groups VALUES (6,'Package Managers','Users that have privileges to add, edit, and delete packages of wobjects and pages to deploy.',314496000,1000000000);
+INSERT INTO groups VALUES (7,'Everyone','A group that automatically includes all users including Visitors.',314496000,1000000000);
+INSERT INTO groups VALUES (8,'Template Managers','Users that have privileges to edit templates for this site.',314496000,1000000000);
+INSERT INTO groups VALUES (9,'Image Managers','Users that have privileges to add, edit, and delete images from the image manager. Content managers can view by default',314496000,1000000000);
 
 --
 -- Table structure for table 'help'
@@ -552,6 +558,7 @@ INSERT INTO help VALUES (29,'WebGUI','English','Edit','Content Settings','<b>Def
 INSERT INTO help VALUES (33,'WebGUI','English','Manage','Template','Templates are used to affect how pages are laid out in WebGUI. For instance, most sites these days have more than just a menu and one big text area. Many of them have three or four columns preceeded by several headers and/or banner areas. WebGUI accomodates complex layouts through the use of Templates. There are several templates that come with WebGUI to make life easier for you, but you can create as many as you\'d like.','0');
 INSERT INTO help VALUES (34,'WebGUI','English','Add/Edit','Template','<b>Template Name</b><br>\r\nGive this template a descriptive name so that you\'ll know what it is when you\'re applying the template to a page.\r\n<p>\r\n\r\n<b>Template</b><br>\r\nCreate your template by placing the special macros ^0; ^1; ^2;  and so on in your template to represent the different content areas. Typically this is done by using a table to position the content. The following is an example of a template with two content areas side by side:\r\n<p>\r\n<pre>\r\n&lt;table&gt;\r\n  &lt;tr&gt;\r\n    &lt;td&gt;^0;&lt;/td&gt;\r\n    &lt;td&gt;^1;&lt;/td&gt;\r\n  &lt;/tr&gt;\r\n&lt;/table&gt;\r\n</pre>\r\n<p>\r\nAlso be sure to take a look at the templates that come with WebGUI for ideas.\r\n','0');
 INSERT INTO help VALUES (35,'WebGUI','English','Delete','Template','It is not a good idea to delete templates as you never know what kind of adverse affect it may have on your site (some pages may still be using the template). If you should choose to delete a template, all the pages still using the template will be set to the \"Default\" template.','0');
+INSERT INTO help VALUES (19,'WebGUI','English','Using','Macros','WebGUI macros are used to create dynamic content within otherwise static content. For instance, you may wish to show which user is logged in on every page, or you may wish to have a dynamically built menu or crumb trail. \r\n<p>\r\nMacros always begin with a carat (^) and follow with at least one other character and ended with w semicolon (;). Some macros can be extended/configured by taking the format of ^<i>x</i>(\"<b>config text</b>\");. The following is a description of all the macros in the WebGUI system.\r\n<p>\r\n\r\n<b>^a; or ^a(); - My Account Link</b><br>\r\nA link to your account information. In addition you can change the link text by creating a macro like this <b>^a(\"Account Info\");</b>. \r\n<p>\r\n<i>Notes:</i> You can also use the special case ^a(linkonly); to return only the URL to the account page and nothing more. Also, the .myAccountLink style sheet class is tied to this macro.\r\n<p>\r\n\r\n<b>^AdminBar;</b><br>\r\nPlaces the administrative tool bar on the page. This is a required element in the \"body\" segment of the Style Manager.\r\n<p>\r\n\r\n<b>^AdminToggle;</b><br>\r\nPlaces a link on the page which is only visible to content managers and adminstrators. The link toggles on/off admin mode.\r\n<p>\r\n\r\n<b>^C; or ^C(); - Crumb Trail</b><br>\r\nA dynamically generated crumb trail to the current page. You can optionally specify a delimeter to be used between page names by using ^C(::);. The default delimeter is &gt;.\r\n<p>\r\n<i>Note:</i> The .crumbTrail style sheet class is tied to this macro.\r\n<p>\r\n\r\n<b>^c; - Company Name</b><br>\r\nThe name of your company specified in the settings by your Administrator.\r\n<p>\r\n\r\n<b>^D; or ^D(); - Date</b><br>\r\nThe current date and time.\r\n<p>\r\nYou can configure the date by using date formatting symbols. For instance, if you created a macro like this <b>^D(\"%c %D, %y\");</b> it would output <b>September 26, 2001</b>. The following are the available date formatting symbols:\r\n<table>\r\n<tr><td>%%</td><td>%</td></tr>\r\n<tr><td>%y</td><td>4 digit year</td></tr>\r\n<tr><td>%Y</td><td>2 digit year</td></tr>\r\n<tr><td>%m</td><td>2 digit month</td></tr>\r\n<tr><td>%M</td><td>variable digit month</td></tr>\r\n<tr><td>%c</td><td>month name</td></tr>\r\n<tr><td>%d</td><td>2 digit day of month</td></tr>\r\n<tr><td>%D</td><td>variable digit day of month</td></tr>\r\n<tr><td>%w</td><td>day of week name</td></tr>\r\n<tr><td>%h</td><td>2 digit base 12 hour</td></tr>\r\n<tr><td>%H</td><td>variable digit base 12 hour</td></tr>\r\n<tr><td>%j</td><td>2 digit base 24 hour</td></tr>\r\n<tr><td>%J</td><td>variable digit base 24 hour</td></tr>\r\n<tr><td>%p</td><td>lower case am/pm</td></tr>\r\n<tr><td>%P</td><td>upper case AM/PM</td></tr>\r\n<tr><td>%z</td><td>user preference date format</td></tr>\r\n<tr><td>%Z</td><td>user preference time format</td></tr>\r\n</table>\r\n<p>\r\n\r\n<b>^e; - Company Email Address</b><br>\r\nThe email address for your company specified in the settings by your Administrator.\r\n<p>\r\n\r\n<b>^Env()</b><br>\r\nCan be used to display a web server environment variable on a page. The environment variables available on each server are different, but you can find out which ones your web server has by going to: http://www.yourwebguisite.com/env.pl\r\n<p>\r\nThe macro should be specified like this ^Env(\"REMOTE_ADDR\");\r\n<p>\r\n\r\n<b>^Execute();</b><br>\r\nAllows a content manager or administrator to execute an external program. Takes the format of <b>^Execute(\"/this/file.sh\");</b>.\r\n<p>\r\n\r\n<b>^Extras;</b><br>\r\nReturns the path to the WebGUI \"extras\" folder, which contains things like WebGUI icons.\r\n<p>\r\n\r\n<b>^FlexMenu;</b><br>\r\nThis menu macro creates a top-level menu that expands as the user selects each menu item.\r\n<p>\r\n\r\n<b>^FormParam();</b><br>\r\nThis macro is mainly used in generating dynamic queries in SQL Reports. Using this macro you can pull the value of any form field simply by specifing the name of the form field, like this: ^FormParam(\"phoneNumber\");\r\n<p>\r\n\r\n<b>^H; or ^H(); - Home Link</b><br>\r\nA link to the home page of this site.  In addition you can change the link text by creating a macro like this <b>^H(\"Go Home\");</b>.\r\n<p>\r\n<i>Notes:</i> You can also use the special case ^H(linkonly); to return only the URL to the home page and nothing more. Also, the .homeLink style sheet class is tied to this macro.\r\n<p>\r\n\r\n<b>^I(); - Image Manager Image with Tag</b><br>\r\nThis macro returns an image tag with the parameters for an image defined in the image manager. Specify the name of the image using a tag like this <b>^I(\"imageName\")</b>;.\r\n<p>\r\n\r\n<b>^i(); - Image Manager Image Path</b><br>\r\nThis macro returns the path of an image uploaded using the Image Manager. Specify the name of the image using a tag like this <b>^i(\"imageName\");</b>.\r\n<p>\r\n\r\n<b>^Include();</b><br>\r\nAllows a content manager or administrator to include a file from the local filesystem. Takes the format of <b>^Include(\"/this/file.html\")</b>;\r\n<p>\r\n\r\n<b>^L; or ^L(); - Login</b><br>\r\nA small login form. You can also configure this macro. You can set the width of the login box like this ^L(20);. You can also set the message displayed after the user is logged in like this ^L(20,Hi ^a(^@;);. Click %here% if you wanna log out!)\r\n<p>\r\n<i>Note:</i> The .loginBox style sheet class is tied to this macro.\r\n<p>\r\n\r\n<b>^M; or ^M(); - Current Menu (Vertical)</b><br>\r\nA vertical menu containing the sub-pages at the current level. In addition, you may configure this macro by specifying how many levels deep the menu should go. By default it will show only the first level. To go three levels deep create a macro like this <b>^M(3);</b>. If you set the macro to \"0\" it will track the entire site tree.\r\n<p>\r\n\r\n<b>^m; - Current Menu (Horizontal)</b><br>\r\nA horizontal menu containing the sub-pages at the current level. You can optionally specify a delimeter to be used between page names by using ^m(:--:);. The default delimeter is &middot;.\r\n<p>\r\n\r\n<b>^P; or ^P(); - Previous Menu (Vertical)</b><br>\r\nA vertical menu containing the sub-pages at the previous level. In addition, you may configure this macro by specifying how many levels deep the menu should go. By default it will show only the first level. To go three levels deep create a macro like this <b>^P(3);</b>. If you set the macro to \"0\" it will track the entire site tree.\r\n<p>\r\n\r\n<b>^p; - Previous Menu (Horizontal)</b><br>\r\nA horizontal menu containing the sub-pages at the previous level. You can optionally specify a delimeter to be used between page names by using ^p(:--:);. The default delimeter is &middot;.\r\n<p>\r\n\r\n<b>^Page();</b><br>\r\nThis can be used to retrieve information about the current page. For instance it could be used to get the page URL like this ^Page(\"urlizedTitle\"); or to get the menu title like this ^Page(\"menuTitle\");.\r\n<p>\r\n\r\n<b>^PageTitle;</b><br>\r\nDisplays the title of the current page.\r\n<p>\r\n<i>Note:</i> If you begin using admin functions or the indepth functions of any wobject, the page title will become a link that will quickly bring you back to the page.\r\n<p>\r\n\r\n<b>^r; or ^r(); - Make Page Printable</b><br>\r\nCreates a link to remove the style from a page to make it printable.  In addition, you can change the link text by creating a macro like this <b>^r(\"Print Me!\");</b>.\r\n<p>\r\nBy default, when this link is clicked, the current page\'s style is replaced with the \"Make Page Printable\" style in the Style Manager. However, that can be overridden by specifying the name of another style as the second parameter, like this: ^r(\"Print!\",\"WebGUI\");\r\n<p>\r\n<i>Notes:</i> You can also use the special case ^r(linkonly); to return only the URL to the make printable page and nothing more. Also, the .makePrintableLink style sheet class is tied to this macro.\r\n<p>\r\n\r\n<b>^RootTitle;</b><br>\r\nReturns the title of the root of the current page. For instance, the main root in WebGUI is the \"Home\" page. Many advanced sites have many roots and thus need a way to display to the user which root they are in.\r\n<p>\r\n\r\n<b>^S(); - Specific SubMenu (Vertical)</b><br>\r\nThis macro allows you to get the submenu of any page, starting with the page you specified. For instance, you could get the home page submenu by creating a macro that looks like this <b>^S(\"home\",0);</b>. The first value is the urlized title of the page and the second value is the depth you\'d like the menu to go. By default it will show only the first level. To go three levels deep create a macro like this <b>^S(\"home\",3);</b>.\r\n<p>\r\n\r\n<b>^s(); - Specific SubMenu (Horizontal)</b><br>\r\nThis macro allows you to get the submenu of any page, starting with the page you specified. For instance, you could get the home page submenu by creating a macro that looks like this <b>^s(\"home\");</b>. The value is the urlized title of the page.  You can optionally specify a delimeter to be used between page names by using ^s(\"home\",\":--:\");. The default delimeter is &middot;.\r\n<p>\r\n\r\n<b>^Synopsis; or ^Synopsis(); Menu</b><br>\r\nThis macro allows you to get the submenu of a page along with the synopsis of each link. You may specify an integer to specify how many levels deep to traverse the page tree.\r\n<p>\r\n<i>Notes:</i> The .synopsis_sub, .synopsis_summary, and .synopsis_title style sheet classes are tied to this macro.\r\n<p>\r\n\r\n<b>^T; or ^T(); - Top Level Menu (Vertical)</b><br>\r\nA vertical menu containing the main pages of the site (aka the sub-pages from the home page). In addition, you may configure this macro by specifying how many levels deep the menu should go. By default it will show only the first level. To go three levels deep create a macro like this <b>^T(3);</b>. If you set the macro to \"0\" it will track the entire site tree.\r\n<p>\r\n\r\n<b>^t; - Top Level Menu (Horizontal)</b><br>\r\nA vertical menu containing the main pages of the site (aka the sub-pages from the home page). You can optionally specify a delimeter to be used between page names by using ^t(:--:);. The default delimeter is &middot;.\r\n<p>\r\n\r\n<b>^Thumbnail();</b><br>\r\nReturns the URL of a thumbnail for an image from the image manager. Specify the name of the image like this <b>^Thumbnail(\"imageName\");</b>.\r\n<p>\r\n\r\n<b>^ThumbnailLinker();</b><br>\r\nThis is a good way to create a quick and dirty screenshots page or a simple photo gallery. Simply specify the name of an image in the Image Manager like this: ^ThumbnailLinker(\"My Grandmother\"); and this macro will create a thumnail image with a title under it that links to the full size version of the image.\r\n<p>\r\n\r\n<b>^u; - Company URL</b><br>\r\nThe URL for your company specified in the settings by your Administrator.\r\n<p>\r\n\r\n<b>^URLEncode();</b><br>\r\nThis macro is mainly useful in SQL reports, but it could be useful elsewhere as well. It takes the input of a string and URL Encodes it so that the string can be passed through a URL. It\'s syntax looks like this: ^URLEncode(\"Is this my string?\");<p>\r\n\r\n<b>^/; - System URL</b><br>\r\nThe URL to the gateway script (example: <i>/index.pl/</i>).\r\n<p>\r\n\r\n<b>^\\; - Page URL</b><br>\r\nThe URL to the current page (example: <i>/index.pl/pagename</i>).\r\n<p>\r\n\r\n<b>^@; - Username</b><br>\r\nThe username of the currently logged in user.\r\n<p>\r\n\r\n<b>^?; - Search</b><br>\r\nAdd a search box to the page. The search box is tied to WebGUI\'s built-in search engine.\r\n<p>\r\n<i>Note:</b> The .searchBox style sheet class is tied to this macro.\r\n<p>\r\n\r\n<b>^#; - User ID</b><br>\r\nThe user id of the currently logged in user.\r\n<p>\r\n\r\n<b>^*; or ^*(); - Random Number</b><br>\r\nA randomly generated number. This is often used on images (such as banner ads) that you want to ensure do not cache. In addition, you may configure this macro like this <b>^*(100);</b> to create a random number between 0 and 100.\r\n<p>\r\n\r\n<b>^-;,^0;,^1;,^2;,^3;, etc.</b><br>\r\nThese macros are reserved for system/wobject-specific functions as in the SQL Report wobject and the Body in the Style Manager.\r\n','0');
 
 --
 -- Table structure for table 'helpSeeAlso'
@@ -583,6 +590,24 @@ INSERT INTO helpSeeAlso VALUES (11,24,'WebGUI');
 INSERT INTO helpSeeAlso VALUES (12,22,'WebGUI');
 
 --
+-- Table structure for table 'imageGroup'
+--
+
+CREATE TABLE imageGroup (
+  imageGroupId int(11) NOT NULL default '0',
+  name varchar(128) NOT NULL default 'untitled',
+  parentId int(11) NOT NULL default '0',
+  description varchar(255) default NULL
+) TYPE=MyISAM;
+
+--
+-- Dumping data for table 'imageGroup'
+--
+
+
+INSERT INTO imageGroup VALUES (0,'Root',0,'Top level');
+
+--
 -- Table structure for table 'images'
 --
 
@@ -594,6 +619,7 @@ CREATE TABLE images (
   userId int(11) default NULL,
   username varchar(128) default NULL,
   dateUploaded int(11) default NULL,
+  imageGroupId int(11) NOT NULL default '0',
   PRIMARY KEY  (imageId)
 ) TYPE=MyISAM;
 
@@ -634,6 +660,7 @@ INSERT INTO incrementer VALUES ('downloadId',1);
 INSERT INTO incrementer VALUES ('imageId',1);
 INSERT INTO incrementer VALUES ('profileCategoryId',1000);
 INSERT INTO incrementer VALUES ('templateId',1000);
+INSERT INTO incrementer VALUES ('imageGroupId',1);
 
 --
 -- Table structure for table 'international'
@@ -4158,6 +4185,48 @@ INSERT INTO international VALUES (523,'WebGUI','Dutch','Notificatie');
 INSERT INTO international VALUES (524,'WebGUI','Dutch','Voeg bewerk stempel toe aan post');
 INSERT INTO international VALUES (525,'WebGUI','Dutch','Bewerk inhoud Settings');
 INSERT INTO international VALUES (526,'WebGUI','Dutch','Verwijder alleen javascript');
+INSERT INTO international VALUES (537,'WebGUI','English','Karma');
+INSERT INTO international VALUES (538,'WebGUI','English','Karma Threshold');
+INSERT INTO international VALUES (539,'WebGUI','English','Enable Karma?');
+INSERT INTO international VALUES (540,'WebGUI','English','Karma Per Login');
+INSERT INTO international VALUES (20,'Poll','English','Karma Per Vote');
+INSERT INTO international VALUES (541,'WebGUI','English','Karma Per Post');
+INSERT INTO international VALUES (30,'UserSubmission','English','Karma Per Submission');
+INSERT INTO international VALUES (542,'WebGUI','English','Previous..');
+INSERT INTO international VALUES (543,'WebGUI','English','Add a new group');
+INSERT INTO international VALUES (544,'WebGUI','English','Are you certain you wish to delete this group?');
+INSERT INTO international VALUES (545,'WebGUI','English','Editing Image group');
+INSERT INTO international VALUES (546,'WebGUI','English','Group Id');
+INSERT INTO international VALUES (547,'WebGUI','English','Parent group');
+INSERT INTO international VALUES (548,'WebGUI','English','Group name');
+INSERT INTO international VALUES (549,'WebGUI','English','Group description');
+INSERT INTO international VALUES (550,'WebGUI','English','View Image group');
+INSERT INTO international VALUES (382,'WebGUI','English','Edit Image');
+INSERT INTO international VALUES (551,'WebGUI','English','Notice');
+INSERT INTO international VALUES (552,'WebGUI','English','Pending');
+INSERT INTO international VALUES (553,'WebGUI','English','Status');
+INSERT INTO international VALUES (554,'WebGUI','English','Take Action');
+INSERT INTO international VALUES (555,'WebGUI','English','Edit this user\'s karma.');
+INSERT INTO international VALUES (556,'WebGUI','English','Amount');
+INSERT INTO international VALUES (557,'WebGUI','English','Description');
+INSERT INTO international VALUES (558,'WebGUI','English','Edit User\'s Karma');
+
+--
+-- Table structure for table 'karmaLog'
+--
+
+CREATE TABLE karmaLog (
+  userId int(11) NOT NULL default '0',
+  amount int(11) NOT NULL default '1',
+  source varchar(255) default NULL,
+  description text
+) TYPE=MyISAM;
+
+--
+-- Dumping data for table 'karmaLog'
+--
+
+
 
 --
 -- Table structure for table 'messageLog'
@@ -4169,6 +4238,8 @@ CREATE TABLE messageLog (
   message text,
   url text,
   dateOfEntry int(11) default NULL,
+  subject varchar(255) default NULL,
+  status varchar(30) default 'notice',
   PRIMARY KEY  (messageLogId,userId)
 ) TYPE=MyISAM;
 
@@ -4267,6 +4338,8 @@ INSERT INTO settings VALUES ('addEditStampToPosts','1');
 INSERT INTO settings VALUES ('defaultPage','1');
 INSERT INTO settings VALUES ('onNewUserAlertGroup','3');
 INSERT INTO settings VALUES ('alertOnNewUser','0');
+INSERT INTO settings VALUES ('useKarma','0');
+INSERT INTO settings VALUES ('karmaPerLogin','1');
 
 --
 -- Table structure for table 'style'
@@ -4472,6 +4545,7 @@ CREATE TABLE users (
   connectDN varchar(255) default NULL,
   dateCreated int(11) NOT NULL default '1019867418',
   lastUpdated int(11) NOT NULL default '1019867418',
+  karma int(11) NOT NULL default '0',
   PRIMARY KEY  (userId)
 ) TYPE=MyISAM;
 
@@ -4480,8 +4554,8 @@ CREATE TABLE users (
 --
 
 
-INSERT INTO users VALUES (1,'Visitor','No Login','WebGUI',NULL,NULL,1019867418,1019867418);
-INSERT INTO users VALUES (3,'Admin','RvlMjeFPs2aAhQdo/xt/Kg','WebGUI','','',1019867418,1019935552);
+INSERT INTO users VALUES (1,'Visitor','No Login','WebGUI',NULL,NULL,1019867418,1019867418,0);
+INSERT INTO users VALUES (3,'Admin','RvlMjeFPs2aAhQdo/xt/Kg','WebGUI','','',1019867418,1019935552,0);
 
 --
 -- Table structure for table 'webguiVersion'
@@ -4498,7 +4572,7 @@ CREATE TABLE webguiVersion (
 --
 
 
-INSERT INTO webguiVersion VALUES ('4.0.3','intitial install',unix_timestamp());
+INSERT INTO webguiVersion VALUES ('4.1.0','intitial install',unix_timestamp());
 
 --
 -- Table structure for table 'wobject'
@@ -4529,9 +4603,5 @@ CREATE TABLE wobject (
 
 
 INSERT INTO wobject VALUES (-1,4,'SiteMap',0,'Page Not Found',1,'The page you were looking for could not be found on this system. Perhaps it has been deleted or renamed. The following list is a site map of this site. If you don\'t find what you\'re looking for on the site map, you can always start from the <a href=\"^/;\">Home Page</a>.',1,1001744792,3,1016077239,3,0,1001744792,1336444487);
-
 INSERT INTO wobject VALUES (-2,1,'Article',1,'Welcome to WebGUI!',1,'<DIV>\r\n<P class=MsoNormal style=\"MARGIN: 0in 0in 0pt\">If you’re reading this message it means that you’ve got WebGUI up and running. Good job! The installation is not trivial.</P>\r\n<P class=MsoNormal style=\"MARGIN: 0in 0in 0pt\"> <?xml:namespace prefix = o ns = \"urn:schemas-microsoft-com:office:office\" /><o:p></o:p></P>\r\n<P class=MsoNormal style=\"MARGIN: 0in 0in 0pt\">In order to do anything useful with your new installation you’ll need to log in as the default administrator account. Follow these steps to get started:</P>\r\n<P class=MsoNormal style=\"MARGIN: 0in 0in 0pt\"> <o:p></o:p></P>\r\n<OL style=\"MARGIN-TOP: 0in\" type=1>\r\n<LI class=MsoNormal style=\"MARGIN: 0in 0in 0pt; mso-list: l1 level1 lfo2; tab-stops: list .5in\"><A href=\"^\\;?op=displayLogin\">Click here to log in.</A> (username: Admin password: 123qwe) \r\n<LI class=MsoNormal style=\"MARGIN: 0in 0in 0pt; mso-list: l1 level1 lfo2; tab-stops: list .5in\"><A href=\"^\\;?op=switchOnAdmin\">Click here to turn the administrative interface on.</A></LI></OL>\r\n<P class=MsoNormal style=\"MARGIN: 0in 0in 0pt\"> Now that you’re in as the administrator, you should <A href=\"^\\;?op=displayAccount\">change your password</A> so no one else can log in and mess with your site. You might also want to <A href=\"^\\;?op=addUser\">create another account </A>for yourself with Administrative privileges in case you can\'t log in with the Admin account for some reason.</P>\r\n<P class=MsoNormal style=\"MARGIN: 0in 0in 0pt\"> <o:p></o:p></P>\r\n<P class=MsoNormal style=\"MARGIN: 0in 0in 0pt\">You’ll notice three menus at the top of your screen. Those are your administrative menus. Going from left to right they are <I>Content</I>, <I>Clipboard</I>, and <I>Admin</I>. The content menu allows you to add new pages and content to your site. The clipboard menu is currently empty, but if you cut or copy anything from any of your pages, it will end up there. The admin menu controls things like system settings and users.</P>\r\n<P class=MsoNormal style=\"MARGIN: 0in 0in 0pt\"> <o:p></o:p></P>\r\n<P class=MsoNormal style=\"MARGIN: 0in 0in 0pt\">For more information about how to administer WebGUI consider getting a copy of <I><A href=\"http://www.plainblack.com/ruling_webgui\">Ruling WebGUI</A></I>. Plain Black Software also provides several <A href=\"http://www.plainblack.com/support_programs\">Support Programs </A>for WebGUI if you run into trouble.</P>\r\n<P class=MsoNormal style=\"MARGIN: 0in 0in 0pt\"> <o:p></o:p></P>Enjoy your new WebGUI site!\r\n</DIV>',1,1023555430,3,1023555630,3,0,1023512400,1338872400);
-
-INSERT INTO Article VALUES (-2,NULL,'','',NULL,0,'right',0,7,4,1);
-INSERT INTO help VALUES (19,'WebGUI','English','Using','Macros','WebGUI macros are used to create dynamic content within otherwise static content. For instance, you may wish to show which user is logged in on every page, or you may wish to have a dynamically built menu or crumb trail. \r\n<p>\r\nMacros always begin with a carat (^) and follow with at least one other character and ended with w semicolon (;). Some macros can be extended/configured by taking the format of ^<i>x</i>(\"<b>config text</b>\");. The following is a description of all the macros in the WebGUI system.\r\n<p>\r\n\r\n<b>^a; or ^a(); - My Account Link</b><br>\r\nA link to your account information. In addition you can change the link text by creating a macro like this <b>^a(\"Account Info\");</b>. \r\n<p>\r\n<i>Notes:</i> You can also use the special case ^a(linkonly); to return only the URL to the account page and nothing more. Also, the .myAccountLink style sheet class is tied to this macro.\r\n<p>\r\n\r\n<b>^AdminBar;</b><br>\r\nPlaces the administrative tool bar on the page. This is a required element in the \"body\" segment of the Style Manager.\r\n<p>\r\n\r\n<b>^AdminToggle;</b><br>\r\nPlaces a link on the page which is only visible to content managers and adminstrators. The link toggles on/off admin mode.\r\n<p>\r\n\r\n<b>^C; or ^C(); - Crumb Trail</b><br>\r\nA dynamically generated crumb trail to the current page. You can optionally specify a delimeter to be used between page names by using ^C(::);. The default delimeter is &gt;.\r\n<p>\r\n<i>Note:</i> The .crumbTrail style sheet class is tied to this macro.\r\n<p>\r\n\r\n<b>^c; - Company Name</b><br>\r\nThe name of your company specified in the settings by your Administrator.\r\n<p>\r\n\r\n<b>^D; or ^D(); - Date</b><br>\r\nThe current date and time.\r\n<p>\r\nYou can configure the date by using date formatting symbols. For instance, if you created a macro like this <b>^D(\"%c %D, %y\");</b> it would output <b>September 26, 2001</b>. The following are the available date formatting symbols:\r\n<table>\r\n<tr><td>%%</td><td>%</td></tr>\r\n<tr><td>%y</td><td>4 digit year</td></tr>\r\n<tr><td>%Y</td><td>2 digit year</td></tr>\r\n<tr><td>%m</td><td>2 digit month</td></tr>\r\n<tr><td>%M</td><td>variable digit month</td></tr>\r\n<tr><td>%c</td><td>month name</td></tr>\r\n<tr><td>%d</td><td>2 digit day of month</td></tr>\r\n<tr><td>%D</td><td>variable digit day of month</td></tr>\r\n<tr><td>%w</td><td>day of week name</td></tr>\r\n<tr><td>%h</td><td>2 digit base 12 hour</td></tr>\r\n<tr><td>%H</td><td>variable digit base 12 hour</td></tr>\r\n<tr><td>%j</td><td>2 digit base 24 hour</td></tr>\r\n<tr><td>%J</td><td>variable digit base 24 hour</td></tr>\r\n<tr><td>%p</td><td>lower case am/pm</td></tr>\r\n<tr><td>%P</td><td>upper case AM/PM</td></tr>\r\n<tr><td>%z</td><td>user preference date format</td></tr>\r\n<tr><td>%Z</td><td>user preference time format</td></tr>\r\n</table>\r\n<p>\r\n\r\n<b>^e; - Company Email Address</b><br>\r\nThe email address for your company specified in the settings by your Administrator.\r\n<p>\r\n\r\n<b>^Env()</b><br>\r\nCan be used to display a web server environment variable on a page. The environment variables available on each server are different, but you can find out which ones your web server has by going to: http://www.yourwebguisite.com/env.pl\r\n<p>\r\nThe macro should be specified like this ^Env(\"REMOTE_ADDR\");\r\n<p>\r\n\r\n<b>^Execute();</b><br>\r\nAllows a content manager or administrator to execute an external program. Takes the format of <b>^Execute(\"/this/file.sh\");</b>.\r\n<p>\r\n\r\n<b>^Extras;</b><br>\r\nReturns the path to the WebGUI \"extras\" folder, which contains things like WebGUI icons.\r\n<p>\r\n\r\n<b>^FlexMenu;</b><br>\r\nThis menu macro creates a top-level menu that expands as the user selects each menu item.\r\n<p>\r\n\r\n<b>^FormParam();</b><br>\r\nThis macro is mainly used in generating dynamic queries in SQL Reports. Using this macro you can pull the value of any form field simply by specifing the name of the form field, like this: ^FormParam(\"phoneNumber\");\r\n<p>\r\n\r\n<b>^H; or ^H(); - Home Link</b><br>\r\nA link to the home page of this site.  In addition you can change the link text by creating a macro like this <b>^H(\"Go Home\");</b>.\r\n<p>\r\n<i>Notes:</i> You can also use the special case ^H(linkonly); to return only the URL to the home page and nothing more. Also, the .homeLink style sheet class is tied to this macro.\r\n<p>\r\n\r\n<b>^I(); - Image Manager Image with Tag</b><br>\r\nThis macro returns an image tag with the parameters for an image defined in the image manager. Specify the name of the image using a tag like this <b>^I(\"imageName\")</b>;.\r\n<p>\r\n\r\n<b>^i(); - Image Manager Image Path</b><br>\r\nThis macro returns the path of an image uploaded using the Image Manager. Specify the name of the image using a tag like this <b>^i(\"imageName\");</b>.\r\n<p>\r\n\r\n<b>^Include();</b><br>\r\nAllows a content manager or administrator to include a file from the local filesystem. Takes the format of <b>^Include(\"/this/file.html\")</b>;\r\n<p>\r\n\r\n<b>^L; or ^L(); - Login</b><br>\r\nA small login form. You can also configure this macro. You can set the width of the login box like this ^L(20);. You can also set the message displayed after the user is logged in like this ^L(20,Hi ^a(^@;);. Click %here% if you wanna log out!)\r\n<p>\r\n<i>Note:</i> The .loginBox style sheet class is tied to this macro.\r\n<p>\r\n\r\n<b>^M; or ^M(); - Current Menu (Vertical)</b><br>\r\nA vertical menu containing the sub-pages at the current level. In addition, you may configure this macro by specifying how many levels deep the menu should go. By default it will show only the first level. To go three levels deep create a macro like this <b>^M(3);</b>. If you set the macro to \"0\" it will track the entire site tree.\r\n<p>\r\n\r\n<b>^m; - Current Menu (Horizontal)</b><br>\r\nA horizontal menu containing the sub-pages at the current level. You can optionally specify a delimeter to be used between page names by using ^m(:--:);. The default delimeter is &middot;.\r\n<p>\r\n\r\n<b>^P; or ^P(); - Previous Menu (Vertical)</b><br>\r\nA vertical menu containing the sub-pages at the previous level. In addition, you may configure this macro by specifying how many levels deep the menu should go. By default it will show only the first level. To go three levels deep create a macro like this <b>^P(3);</b>. If you set the macro to \"0\" it will track the entire site tree.\r\n<p>\r\n\r\n<b>^p; - Previous Menu (Horizontal)</b><br>\r\nA horizontal menu containing the sub-pages at the previous level. You can optionally specify a delimeter to be used between page names by using ^p(:--:);. The default delimeter is &middot;.\r\n<p>\r\n\r\n<b>^Page();</b><br>\r\nThis can be used to retrieve information about the current page. For instance it could be used to get the page URL like this ^Page(\"urlizedTitle\"); or to get the menu title like this ^Page(\"menuTitle\");.\r\n<p>\r\n\r\n<b>^PageTitle;</b><br>\r\nDisplays the title of the current page.\r\n<p>\r\n<i>Note:</i> If you begin using admin functions or the indepth functions of any wobject, the page title will become a link that will quickly bring you back to the page.\r\n<p>\r\n\r\n<b>^r; or ^r(); - Make Page Printable</b><br>\r\nCreates a link to remove the style from a page to make it printable.  In addition, you can change the link text by creating a macro like this <b>^r(\"Print Me!\");</b>.\r\n<p>\r\nBy default, when this link is clicked, the current page\'s style is replaced with the \"Make Page Printable\" style in the Style Manager. However, that can be overridden by specifying the name of another style as the second parameter, like this: ^r(\"Print!\",\"WebGUI\");\r\n<p>\r\n<i>Notes:</i> You can also use the special case ^r(linkonly); to return only the URL to the make printable page and nothing more. Also, the .makePrintableLink style sheet class is tied to this macro.\r\n<p>\r\n\r\n<b>^RootTitle;</b><br>\r\nReturns the title of the root of the current page. For instance, the main root in WebGUI is the \"Home\" page. Many advanced sites have many roots and thus need a way to display to the user which root they are in.\r\n<p>\r\n\r\n<b>^S(); - Specific SubMenu (Vertical)</b><br>\r\nThis macro allows you to get the submenu of any page, starting with the page you specified. For instance, you could get the home page submenu by creating a macro that looks like this <b>^S(\"home\",0);</b>. The first value is the urlized title of the page and the second value is the depth you\'d like the menu to go. By default it will show only the first level. To go three levels deep create a macro like this <b>^S(\"home\",3);</b>.\r\n<p>\r\n\r\n<b>^s(); - Specific SubMenu (Horizontal)</b><br>\r\nThis macro allows you to get the submenu of any page, starting with the page you specified. For instance, you could get the home page submenu by creating a macro that looks like this <b>^s(\"home\");</b>. The value is the urlized title of the page.  You can optionally specify a delimeter to be used between page names by using ^s(\"home\",\":--:\");. The default delimeter is &middot;.\r\n<p>\r\n\r\n<b>^Synopsis; or ^Synopsis(); Menu</b><br>\r\nThis macro allows you to get the submenu of a page along with the synopsis of each link. You may specify an integer to specify how many levels deep to traverse the page tree.\r\n<p>\r\n<i>Notes:</i> The .synopsis_sub, .synopsis_summary, and .synopsis_title style sheet classes are tied to this macro.\r\n<p>\r\n\r\n<b>^T; or ^T(); - Top Level Menu (Vertical)</b><br>\r\nA vertical menu containing the main pages of the site (aka the sub-pages from the home page). In addition, you may configure this macro by specifying how many levels deep the menu should go. By default it will show only the first level. To go three levels deep create a macro like this <b>^T(3);</b>. If you set the macro to \"0\" it will track the entire site tree.\r\n<p>\r\n\r\n<b>^t; - Top Level Menu (Horizontal)</b><br>\r\nA vertical menu containing the main pages of the site (aka the sub-pages from the home page). You can optionally specify a delimeter to be used between page names by using ^t(:--:);. The default delimeter is &middot;.\r\n<p>\r\n\r\n<b>^Thumbnail();</b><br>\r\nReturns the URL of a thumbnail for an image from the image manager. Specify the name of the image like this <b>^Thumbnail(\"imageName\");</b>.\r\n<p>\r\n\r\n<b>^ThumbnailLinker();</b><br>\r\nThis is a good way to create a quick and dirty screenshots page or a simple photo gallery. Simply specify the name of an image in the Image Manager like this: ^ThumbnailLinker(\"My Grandmother\"); and this macro will create a thumnail image with a title under it that links to the full size version of the image.\r\n<p>\r\n\r\n<b>^u; - Company URL</b><br>\r\nThe URL for your company specified in the settings by your Administrator.\r\n<p>\r\n\r\n<b>^URLEncode();</b><br>\r\nThis macro is mainly useful in SQL reports, but it could be useful elsewhere as well. It takes the input of a string and URL Encodes it so that the string can be passed through a URL. It\'s syntax looks like this: ^URLEncode(\"Is this my string?\");<p>\r\n\r\n<b>^/; - System URL</b><br>\r\nThe URL to the gateway script (example: <i>/index.pl/</i>).\r\n<p>\r\n\r\n<b>^\\; - Page URL</b><br>\r\nThe URL to the current page (example: <i>/index.pl/pagename</i>).\r\n<p>\r\n\r\n<b>^@; - Username</b><br>\r\nThe username of the currently logged in user.\r\n<p>\r\n\r\n<b>^?; - Search</b><br>\r\nAdd a search box to the page. The search box is tied to WebGUI\'s built-in search engine.\r\n<p>\r\n<i>Note:</b> The .searchBox style sheet class is tied to this macro.\r\n<p>\r\n\r\n<b>^#; - User ID</b><br>\r\nThe user id of the currently logged in user.\r\n<p>\r\n\r\n<b>^*; or ^*(); - Random Number</b><br>\r\nA randomly generated number. This is often used on images (such as banner ads) that you want to ensure do not cache. In addition, you may configure this macro like this <b>^*(100);</b> to create a random number between 0 and 100.\r\n<p>\r\n\r\n<b>^-;,^0;,^1;,^2;,^3;, etc.</b><br>\r\nThese macros are reserved for system/wobject-specific functions as in the SQL Report wobject and the Body in the Style Manager.\r\n','0');
 
